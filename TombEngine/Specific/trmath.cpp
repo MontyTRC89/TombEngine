@@ -197,6 +197,12 @@ const float Smoothstep(float edge0, float edge1, float x)
 	return x * x * (3 - 2 * x);
 }
 
+const float Luma(Vector3 color)
+{
+	// Use Rec.709 trichromat formula to get perceptive luma value
+	return (float)((color.x * 0.2126f) + (color.y * 0.7152f) + (color.z * 0.0722f));
+}
+
 Vector3 TranslateVector(Vector3 vector, float angle, float forward, float up, float right)
 {
 	if (forward == 0.0f && up == 0.0f && right == 0.0f)

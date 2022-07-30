@@ -952,6 +952,11 @@ float GetNearestLedgeAngle(ItemInfo* item, CollisionInfo* coll, float& distance)
 			auto floorHeight   = GetFloorHeight(ROOM_VECTOR{ block->Room, y }, ffpX, ffpZ).value_or(NO_HEIGHT);
 			auto ceilingHeight = GetCeilingHeight(ROOM_VECTOR{ block->Room, y }, ffpX, ffpZ).value_or(NO_HEIGHT);
 
+			// If probe landed inside wall (i.e. both floor/ceiling heights are NO_HEIGHT), make a fake
+			// ledge for algorithm to further succeed.
+			if (floorHeight == NO_HEIGHT && ceilingHeight == NO_HEIGHT)
+				floorHeight = y - CLICK(4);
+
 			// If ceiling height tests lower than Y value, it means ceiling
 			// ledge is in front and we should use it instead of floor.
 			bool useCeilingLedge = ceilingHeight > y;

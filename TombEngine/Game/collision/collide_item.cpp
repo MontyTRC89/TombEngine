@@ -410,7 +410,7 @@ bool TestLaraPosition(OBJECT_COLLISION_BOUNDS* bounds, ItemInfo* item, ItemInfo*
 	return true;
 }
 
-void AlignLaraPosition(Vector3Int* vec, ItemInfo* item, ItemInfo* laraItem)
+bool AlignLaraPosition(Vector3Int* vec, ItemInfo* item, ItemInfo* laraItem)
 {
 	laraItem->Pose.Orientation = item->Pose.Orientation;
 
@@ -421,10 +421,25 @@ void AlignLaraPosition(Vector3Int* vec, ItemInfo* item, ItemInfo* laraItem)
 	);
 
 	Vector3 pos = Vector3::Transform(Vector3(vec->x, vec->y, vec->z), matrix);
+	Vector3 newPos = item->Pose.Position.ToVector3() + pos;
 
-	laraItem->Pose.Position.x = item->Pose.Position.x + pos.x;
-	laraItem->Pose.Position.y = item->Pose.Position.y + pos.y;
-	laraItem->Pose.Position.z = item->Pose.Position.z + pos.z;
+	int height = GetCollision(newPos.x, newPos.y, newPos.z, laraItem->RoomNumber).Position.Floor;
+	if (abs(height - laraItem->Pose.Position.y) <= CLICK(2))
+	{
+		laraItem->Pose.Position.x = newPos.x;
+		laraItem->Pose.Position.y = newPos.y;
+		laraItem->Pose.Position.z = newPos.z;
+		return true;
+	}
+
+	auto* lara = GetLaraInfo(laraItem);
+	if (lara->Control.IsMoving)
+	{
+		lara->Control.IsMoving = false;
+		lara->Control.HandStatus = HandStatus::Free;
+	}
+
+	return false;
 }
 
 bool MoveLaraPosition(Vector3Int* vec, ItemInfo* item, ItemInfo* laraItem)
@@ -860,8 +875,8 @@ void CollideSolidStatics(ItemInfo* item, CollisionInfo* coll)
 			{
 				if (phd_Distance(&item->Pose, &mesh->pos) < COLLISION_CHECK_DISTANCE)
 				{
-					auto staticInfo = StaticObjects[mesh->staticNumber];
-					if (CollideSolidBounds(item, staticInfo.collisionBox, mesh->pos, coll))
+					auto staticInfo = &StaticObjects[mesh->staticNumber];
+					if (CollideSolidBounds(item, staticInfo->collisionBox, mesh->pos, coll))
 						coll->HitStatic = true;
 				}
 			}
@@ -914,8 +929,12 @@ bool CollideSolidBounds(ItemInfo* item, BOUNDING_BOX box, PHD_3DPOS pos, Collisi
 	}
 
 	// Get and test DX item coll bounds
-	auto collBounds = TO_DX_BBOX(PHD_3DPOS(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z), &collBox);
+	auto collBounds = TO_DX_BBOX(PHD_3DPOS(item->Pose.Position), &collBox);
 	bool intersects = staticBounds.Intersects(collBounds);
+
+	// Check if previous item horizontal position intersects bounds
+	auto oldCollBounds = TO_DX_BBOX(PHD_3DPOS(coll->Setup.OldPosition.x, item->Pose.Position.y, coll->Setup.OldPosition.z), &collBox);
+	bool oldHorIntersects = staticBounds.Intersects(oldCollBounds);
 
 	// Draw item coll bounds
 	g_Renderer.AddDebugBox(collBounds, intersects ? Vector4(1, 0, 0, 1) : Vector4(0, 1, 0, 1), RENDERER_DEBUG_PAGE::LOGIC_STATS);
@@ -977,7 +996,7 @@ bool CollideSolidBounds(ItemInfo* item, BOUNDING_BOX box, PHD_3DPOS pos, Collisi
 		auto distanceToVerticalPlane = height / 2 - yPoint;
 
 		// Correct position according to top/bottom bounds, if collided and plane is nearby
-		if (intersects && minDistance < height)
+		if (intersects && oldHorIntersects && minDistance < height)
 		{
 			if (bottom)
 			{
@@ -1183,6 +1202,11 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 
 	auto oldCollResult = GetCollision(x, y, z, item->RoomNumber);
 	auto collResult = GetCollision(item);
+
+	auto* bounds = GetBoundsAccurate(item);
+	int radius = abs(bounds->Y2 - bounds->Y1);
+
+	item->Pose.Position.y += radius;
 
 	if (item->Pose.Position.y >= collResult.Position.Floor)
 	{
@@ -1674,8 +1698,16 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 	}
 
 	collResult = GetCollision(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, item->RoomNumber);
+
 	if (collResult.RoomNumber != item->RoomNumber)
+	{
+		if (item->ObjectNumber == ID_GRENADE && TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, collResult.RoomNumber))
+			Splash(item);
+
 		ItemNewRoom(itemNumber, collResult.RoomNumber);
+	}
+
+	item->Pose.Position.y -= radius;
 }
 
 void DoObjectCollision(ItemInfo* laraItem, CollisionInfo* coll)
@@ -1848,42 +1880,43 @@ void CreatureCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll
 {
 	auto* item = &g_Level.Items[itemNumber];
 
-	if (item->ObjectNumber != ID_HITMAN || item->Animation.ActiveState != LS_INSERT_PUZZLE)
+	if (!TestBoundsCollide(item, laraItem, coll->Setup.Radius))
+		return;
+
+	if (!TestCollision(item, laraItem))
+		return;
+
+	bool playerCollision = laraItem->IsLara();
+	bool waterPlayerCollision = playerCollision && GetLaraInfo(laraItem)->Control.WaterStatus >= WaterStatus::TreadWater;
+
+	if (waterPlayerCollision || coll->Setup.EnableObjectPush)
 	{
-		if (TestBoundsCollide(item, laraItem, coll->Setup.Radius))
+		ItemPushItem(item, laraItem, coll, coll->Setup.EnableSpasm, 0);
+	}
+	else if (playerCollision && coll->Setup.EnableSpasm)
+	{
+		int x = laraItem->Pose.Position.x - item->Pose.Position.x;
+		int z = laraItem->Pose.Position.z - item->Pose.Position.z;
+
+		float sinY = sin(item->Pose.Orientation.y);
+		float cosY = cos(item->Pose.Orientation.y);
+
+		auto* frame = GetBestFrame(item);
+		int rx = (frame->boundingBox.X1 + frame->boundingBox.X2) / 2;
+		int rz = (frame->boundingBox.X2 + frame->boundingBox.Z2) / 2;
+
+		if (frame->boundingBox.Y2 - frame->boundingBox.Y1 > STEP_SIZE)
 		{
-			if (TestCollision(item, laraItem))
-			{
-				if (coll->Setup.EnableObjectPush ||
-					Lara.Control.WaterStatus == WaterStatus::Underwater ||
-					Lara.Control.WaterStatus == WaterStatus::TreadWater)
-				{
-					ItemPushItem(item, laraItem, coll, coll->Setup.EnableSpasm, 0);
-				}
-				else if (coll->Setup.EnableSpasm)
-				{
-					int x = laraItem->Pose.Position.x - item->Pose.Position.x;
-					int z = laraItem->Pose.Position.z - item->Pose.Position.z;
+			float angle = (laraItem->Pose.Orientation.y - atan2(z - cosY * rx - sinY * rz, x - cosY * rx + sinY * rz) - Angle::DegToRad(135.0f)) / Angle::DegToRad(90.0f);
 
-					float sinY = sin(item->Pose.Orientation.GetY());
-					float cosY = cos(item->Pose.Orientation.GetY());
+			auto* lara = GetLaraInfo(laraItem);
 
-					auto* frame = GetBestFrame(item);
-					int rx = (frame->boundingBox.X1 + frame->boundingBox.X2) / 2;
-					int rz = (frame->boundingBox.X2 + frame->boundingBox.Z2) / 2;
+			lara->HitDirection = angle;
 
-					if (frame->boundingBox.Y2 - frame->boundingBox.Y1 > STEP_SIZE)
-					{
-						float angle = (laraItem->Pose.Orientation.GetY() - atan2(z - cosY * rx - sinY * rz, x - cosY * rx + sinY * rz) - Angle::DegToRad(135.0f)) / Angle::DegToRad(90.0f);
-						Lara.HitDirection = angle;
-						// TODO: check if a second Lara.hitFrame++; is required there !
-						
-						Lara.HitFrame++;
-						if (Lara.HitFrame > 30)
-							Lara.HitFrame = 30;
-					}
-				}
-			}
+			// TODO: check if a second Lara.hitFrame++; is required there !						
+			lara->HitFrame++;
+			if (lara->HitFrame > 30)
+				lara->HitFrame = 30;
 		}
 	}
 }

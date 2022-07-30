@@ -44,6 +44,9 @@ void TestLaraWaterDepth(ItemInfo* item, CollisionInfo* coll);
 void GetTightropeFallOff(ItemInfo* item, int regularity);
 #endif
 
+bool TestLaraState(LaraState state, std::vector<LaraState> stateList);
+bool TestLaraWeaponType(LaraWeaponType weaponType, std::vector<LaraWeaponType> weaponTypeList);
+
 bool IsStandingWeapon(ItemInfo* item, LaraWeaponType weaponType);
 bool IsVaultState(LaraState state);
 bool IsJumpState(LaraState state);
@@ -64,30 +67,6 @@ bool TestLaraStep(ItemInfo* item, CollisionInfo* coll);
 bool TestLaraStepUp(ItemInfo* item, CollisionInfo* coll);
 bool TestLaraStepDown(ItemInfo* item, CollisionInfo* coll);
 bool TestLaraMonkeyStep(ItemInfo* item, CollisionInfo* coll);
-
-bool TestLaraMoveTolerance(ItemInfo* item, CollisionInfo* coll, MoveTestSetup testSetup, bool useCrawlSetup = false);
-bool TestLaraRunForward(ItemInfo* item, CollisionInfo* coll);
-bool TestLaraWalkForward(ItemInfo* item, CollisionInfo* coll);
-bool TestLaraWalkBack(ItemInfo* item, CollisionInfo* coll);
-bool TestLaraRunBack(ItemInfo* item, CollisionInfo* coll);
-bool TestLaraStepLeft(ItemInfo* item, CollisionInfo* coll);
-bool TestLaraStepRight(ItemInfo* item, CollisionInfo* coll);
-bool TestLaraWadeForwardSwamp(ItemInfo* item, CollisionInfo* coll);
-bool TestLaraWalkBackSwamp(ItemInfo* item, CollisionInfo* coll);
-bool TestLaraStepLeftSwamp(ItemInfo* item, CollisionInfo* coll);
-bool TestLaraStepRightSwamp(ItemInfo* item, CollisionInfo* coll);
-bool TestLaraCrawlForward(ItemInfo* item, CollisionInfo* coll);
-bool TestLaraCrawlBack(ItemInfo* item, CollisionInfo* coll);
-bool TestLaraCrouchRoll(ItemInfo* item, CollisionInfo* coll);
-bool TestLaraCrouch(ItemInfo* item);
-bool TestLaraCrouchToCrawl(ItemInfo* item);
-bool TestLaraFastTurn(ItemInfo* item);
-
-bool TestLaraMonkeyMoveTolerance(ItemInfo* item, CollisionInfo* coll, MonkeyMoveTestSetup testSetup);
-bool TestLaraMonkeyForward(ItemInfo* item, CollisionInfo* coll);
-bool TestLaraMonkeyBack(ItemInfo* item, CollisionInfo* coll);
-bool TestLaraMonkeyShimmyLeft(ItemInfo* item, CollisionInfo* coll);
-bool TestLaraMonkeyShimmyRight(ItemInfo* item, CollisionInfo* coll);
 
 VaultTestResult TestLaraVaultTolerance(ItemInfo* item, CollisionInfo* coll, VaultTestSetup testSetup);
 VaultTestResult TestLaraVault2Steps(ItemInfo* item, CollisionInfo* coll);

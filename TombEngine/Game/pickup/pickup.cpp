@@ -612,7 +612,8 @@ void PickupCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 			if (item->ObjectNumber == ID_BURNING_TORCH_ITEM)
 				break;
 
-			AlignLaraPosition(&PickUpPosition, item, laraItem);
+			if (!AlignLaraPosition(&PickUpPosition, item, laraItem))
+				break;
 
 			if (item->ObjectNumber == ID_FLARE_ITEM)
 			{
@@ -634,7 +635,8 @@ void PickupCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 				if (item->ObjectNumber == ID_BURNING_TORCH_ITEM)
 					break;
 
-				AlignLaraPosition(&PickUpPosition, item, laraItem);
+				if (!AlignLaraPosition(&PickUpPosition, item, laraItem))
+					break;
 
 				if (item->ObjectNumber == ID_FLARE_ITEM)
 				{

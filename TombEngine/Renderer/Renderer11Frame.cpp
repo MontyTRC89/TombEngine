@@ -69,7 +69,7 @@ namespace TEN::Renderer
 			// Project vertices of the door in clip space
 			Vector4 tmp = Vector4(
 				door->vertices[i].x + parentNativeRoom->x,
-				door->vertices[i].y + parentNativeRoom->y,
+				door->vertices[i].y,
 				door->vertices[i].z + parentNativeRoom->z,
 				1.0f);
 
@@ -251,8 +251,8 @@ namespace TEN::Renderer
 				{
 					CollectLightsForRoom(roomNumber, renderView);
 					CollectItems(roomNumber, renderView);
-					CollectStatics(roomNumber, renderView);
-					CollectEffects(roomNumber, renderView);
+					CollectStatics(roomNumber);
+					CollectEffects(roomNumber);
 				}
 			}
 
@@ -272,14 +272,13 @@ namespace TEN::Renderer
 			{
 				ROOM_DOOR* portal = &nativeRoom->doors[i];
 
-				Vector3 n = portal->normal;
-				Vector3 v = Vector3(
+				Vector3Int n = Vector3Int(portal->normal.x, portal->normal.y, portal->normal.z);
+				Vector3Int v = Vector3Int(
 					Camera.pos.x - (nativeRoom->x + portal->vertices[0].x),
 					Camera.pos.y - (nativeRoom->y + portal->vertices[0].y),
 					Camera.pos.z - (nativeRoom->z + portal->vertices[0].z));
 
-				// Test camera and normal positions and decide if process door or not
-				if (n.Dot(v) <= 0.0f)
+				if (n.x * v.x + n.y * v.y + n.z * v.z < 0)
 					continue;
 
 				SetRoomBounds(portal, roomNumber, renderView);
@@ -317,7 +316,7 @@ namespace TEN::Renderer
 		GetRoomBounds(renderView, onlyRooms);
 	}
 
-	void Renderer11::CollectItems(short roomNumber, RenderView &renderView)
+	void Renderer11::CollectItems(short roomNumber, RenderView& renderView)
 	{
 		if (m_rooms.size() < roomNumber)
 			return;
@@ -357,13 +356,14 @@ namespace TEN::Renderer
 			newItem->Scale = Matrix::CreateScale(1.0f);
 			newItem->World = newItem->Rotation * newItem->Translation;
 
-			CollectLightsForItem(item->RoomNumber, newItem, renderView);
+			CalculateAmbientLight(newItem);
+			CollectLightsForItem(item->RoomNumber, newItem, false);
 
 			room.ItemsToDraw.push_back(newItem);
 		}
 	}
 
-	void Renderer11::CollectStatics(short roomNumber, RenderView &renderView)
+	void Renderer11::CollectStatics(short roomNumber)
 	{
 		if (m_rooms.size() < roomNumber)
 			return;
@@ -371,209 +371,81 @@ namespace TEN::Renderer
 		RendererRoom& room = m_rooms[roomNumber];
 		ROOM_INFO* r = &g_Level.Rooms[room.RoomNumber];
 
-		if (r->mesh.size() <= 0)
+		if (r->mesh.size() == 0)
 			return;
 
 		int numStatics = r->mesh.size();
 		for (int i = 0; i < numStatics; i++)
 		{
 			auto mesh = &r->mesh[i];
-			if (mesh->flags & StaticMeshFlags::SM_VISIBLE)
+			
+			if (!(mesh->flags & StaticMeshFlags::SM_VISIBLE))
+				continue;
+
+			if (!m_staticObjects[mesh->staticNumber].has_value())
+				continue;
+
+			auto& obj = *m_staticObjects[mesh->staticNumber];
+
+			if (obj.ObjectMeshes.size() == 0)
+				continue;
+
+			std::vector<RendererLight*> lights;
+			if (obj.ObjectMeshes.front()->LightMode != LIGHT_MODES::LIGHT_MODE_STATIC)
+				CollectLights(mesh->pos.Position, room.RoomNumber, false, lights);
+
+			Matrix world = (Matrix::CreateFromYawPitchRoll(mesh->pos.Orientation.y, mesh->pos.Orientation.x, mesh->pos.Orientation.z) *
+							Matrix::CreateTranslation(mesh->pos.Position.x, mesh->pos.Position.y, mesh->pos.Position.z));
+
+			auto staticInfo = RendererStatic
 			{
-				auto sinfo = &StaticObjects[mesh->staticNumber];
+				mesh->staticNumber,
+				room.RoomNumber,
+				world,
+				room.AmbientLight * mesh->color,
+				lights
+			};
 
-				auto bounds = TO_DX_BBOX(mesh->pos, &sinfo->visibilityBox);
-				Vector3 min = bounds.Center - bounds.Extents;
-				Vector3 max = bounds.Center + bounds.Extents;
-
-				if (!renderView.camera.frustum.AABBInFrustum(min, max))
-					continue;
-
-				room.StaticsToDraw.push_back(mesh);
-			}
+			room.StaticsToDraw.push_back(staticInfo);
 		}
 	}
 
-	void Renderer11::CollectLightsForEffect(short roomNumber, RendererEffect *effect, RenderView &renderView)
+	void Renderer11::CollectLights(Vector3Int position, int roomNumber, bool collectShadowLight, std::vector<RendererLight*>& lights)
 	{
-		effect->Lights.clear();
 		if (m_rooms.size() < roomNumber)
 			return;
-
-		RendererRoom& room = m_rooms[roomNumber];
-		ROOM_INFO* r = &g_Level.Rooms[room.RoomNumber];
-
-		if (r->lights.size() <= 0)
-			return;
-		LinearArrayBuffer<RendererLight*, 8> tempLights;
-
-		Vector3 itemPosition = Vector3(effect->Effect->pos.Position.x, effect->Effect->pos.Position.y, effect->Effect->pos.Position.z);
-
-		// Dynamic lights have the priority
-		for (int i = 0; i < dynamicLights.size(); i++)
-		{
-			RendererLight* light = &dynamicLights[i];
-
-			Vector3 lightPosition = Vector3(light->Position.x, light->Position.y, light->Position.z);
-
-			float distance = (itemPosition - lightPosition).Length();
-			if (distance > light->Out)
-				continue;
-
-			tempLights.push_back(light);
-		}
-
-		int numLights = room.Lights.size();
-
-		RendererLight* brightestLight = NULL;
-		float brightest = 0.0f;
-
-		for (int j = 0; j < numLights; j++)
-		{
-			RendererLight *light = &room.Lights[j];
-
-			// Check only lights different from sun
-			if (light->Type == LIGHT_TYPE_SUN)
-			{
-				// Sun is added without checks
-			}
-			else if (light->Type == LIGHT_TYPE_POINT || light->Type == LIGHT_TYPE_SHADOW)
-			{
-				Vector3 lightPosition = Vector3(light->Position.x, light->Position.y, light->Position.z);
-
-				float distance = (itemPosition - lightPosition).Length();
-
-				// Collect only lights nearer than 20 sectors
-				if (distance >= 20 * WALL_SIZE)
-					continue;
-
-				// Check the out radius
-				if (distance > light->Out)
-					continue;
-
-				// If Lara, try to collect shadow casting light
-				if (light->CastShadows && effect->Effect->objectNumber == ID_LARA)
-				{
-					float attenuation = 1.0f - distance / light->Out;
-					float intensity = std::max(0.0f, attenuation * (light->Color.x + light->Color.y + light->Color.z) / 3.0f);
-
-					if (intensity >= brightest)
-					{
-						brightest = intensity;
-						brightestLight = light;
-					}
-				}
-			}
-			else if (light->Type == LIGHT_TYPE_SPOT)
-			{
-				Vector3 lightPosition = Vector3(light->Position.x, light->Position.y, light->Position.z);
-
-				float distance = (itemPosition - lightPosition).Length();
-
-				// Collect only lights nearer than 20 sectors
-				if (distance >= 20 * WALL_SIZE)
-					continue;
-
-				// Check the range
-				if (distance > light->Range)
-					continue;
-			}
-			else
-			{
-				// Invalid light type
-				continue;
-			}
-
-			tempLights.push_back(light);
-		}
-
-		for (int i = 0; i < std::min(static_cast<size_t>(MAX_LIGHTS_PER_ITEM), tempLights.size()); i++)
-		{
-			if (renderView.lightsToDraw.size() < NUM_LIGHTS_PER_BUFFER - 1)
-				renderView.lightsToDraw.push_back(tempLights[i]);
-		}
-	}
-
-	void Renderer11::CollectLightsForItem(short roomNumber, RendererItem *item, RenderView &renderView)
-	{
-		item->LightsToDraw.clear();
-
-		if (m_rooms.size() < roomNumber)
-			return;
-
-		RendererRoom& room = m_rooms[roomNumber];
-		ROOM_INFO* nativeRoom = &g_Level.Rooms[room.RoomNumber];
-		ItemInfo* nativeItem = &g_Level.Items[item->ItemNumber];
-
-		std::vector<int> roomsToCheck;
-		roomsToCheck.push_back(roomNumber);
-		for (auto& door : nativeRoom->doors)
-		{
-			roomsToCheck.push_back(door.room);
-		};
-
-		// Interpolate ambient light between rooms
-		if (item->PreviousRoomNumber == NO_ITEM)
-		{
-			item->PreviousRoomNumber = nativeItem->RoomNumber;
-			item->CurrentRoomNumber = nativeItem->RoomNumber;
-			item->AmbientLightSteps = AMBIENT_LIGHT_INTERPOLATION_STEPS;
-		}
-		else if (nativeItem->RoomNumber != item->CurrentRoomNumber)
-		{
-			item->PreviousRoomNumber = item->CurrentRoomNumber;
-			item->CurrentRoomNumber = nativeItem->RoomNumber;
-			item->AmbientLightSteps = 0;
-		}
-		else if (item->AmbientLightSteps < AMBIENT_LIGHT_INTERPOLATION_STEPS)
-			item->AmbientLightSteps++;
-
-		if (item->PreviousRoomNumber == NO_ITEM)
-			item->AmbientLight = m_rooms[nativeItem->RoomNumber].AmbientLight;
-		else
-		{
-			item->AmbientLight = (((AMBIENT_LIGHT_INTERPOLATION_STEPS - item->AmbientLightSteps) / (float)AMBIENT_LIGHT_INTERPOLATION_STEPS) * m_rooms[item->PreviousRoomNumber].AmbientLight +
-				(item->AmbientLightSteps / (float)AMBIENT_LIGHT_INTERPOLATION_STEPS) * m_rooms[item->CurrentRoomNumber].AmbientLight);
-			item->AmbientLight.w = 1.0f;
-		}
-
-		// Multiply calculated ambient light by object tint
-		item->AmbientLight *= nativeItem->Color;
 
 		// Now collect lights from dynamic list and from rooms
 		std::vector<RendererLight*> tempLights;
 		tempLights.reserve(MAX_LIGHTS_DRAW);
+		
+		RendererRoom& room = m_rooms[roomNumber];
+		ROOM_INFO* nativeRoom = &g_Level.Rooms[room.RoomNumber];
 
-		Vector3 itemPosition = Vector3(nativeItem->Pose.Position.x, nativeItem->Pose.Position.y, nativeItem->Pose.Position.z);
+		auto roomsToCheck = GetRoomList(roomNumber);
+		auto itemPosition = position.ToVector3();
 
-		if (nativeItem->ObjectNumber == ID_LARA)
-			shadowLight = nullptr;
-
-		RendererLight* brightestLight = NULL;
+		RendererLight* brightestLight = nullptr;
 		float brightest = 0.0f;
 
 		// Dynamic lights have the priority
-		for (int i = 0; i < dynamicLights.size(); i++)
+		for (auto& light : dynamicLights)
 		{
-			RendererLight* light = &dynamicLights[i];
-
-			Vector3 lightPosition = Vector3(light->Position.x, light->Position.y, light->Position.z);
-
-			float distance = (itemPosition - lightPosition).Length();
-			if (distance > light->Out)
+			float distance = (itemPosition - light.Position).Length();
+			if (distance > light.Out)
 				continue;
 
-			float attenuation = 1.0f - distance / light->Out;
-			float intensity = std::max(0.0f, attenuation * (light->Color.x + light->Color.y + light->Color.z) / 3.0f);
+			float attenuation = 1.0f - distance / light.Out;
+			float intensity = std::max(0.0f, attenuation * light.Intensity * Luma(light.Color));
 
-			light->LocalIntensity = intensity;
-			light->Distance = distance;
+			light.LocalIntensity = intensity;
+			light.Distance = distance;
 
-			tempLights.push_back(light);
+			tempLights.push_back(&light);
 		}
 
 		// Check current room and also neighbour rooms
-		for (int roomToCheck : roomsToCheck)
+		for (auto roomToCheck : roomsToCheck)
 		{
 			RendererRoom& currentRoom = m_rooms[roomToCheck];
 			int numLights = currentRoom.Lights.size();
@@ -609,13 +481,13 @@ namespace TEN::Renderer
 						continue;
 
 					float attenuation = 1.0f - distance / light->Out;
-					float intensity = std::max(0.0f, attenuation * (light->Color.x + light->Color.y + light->Color.z) / 3.0f);
+					float intensity = std::max(0.0f, attenuation * light->Intensity * Luma(light->Color));
 
 					light->LocalIntensity = intensity;
 					light->Distance = distance;
 
-					// If Lara, try to collect shadow casting light
-					if (light->CastShadows && nativeItem->ObjectNumber == ID_LARA && light->Type == LIGHT_TYPE_POINT)
+					// If collecting shadows, try to collect shadow casting light
+					if (light->CastShadows && collectShadowLight && light->Type == LIGHT_TYPE_POINT)
 					{
 						if (intensity >= brightest)
 						{
@@ -631,20 +503,20 @@ namespace TEN::Renderer
 					float distance = (itemPosition - lightPosition).Length();
 
 					// Collect only lights nearer than 20 sectors
-					if (distance >= 20 * WALL_SIZE)
+					if (distance >= SECTOR(20))
 						continue;
 
 					// Check the range
-					if (distance > light->Range)
+					if (distance > light->Out)
 						continue;
 
-					float attenuation = 1.0f - distance / light->Range;
-					float intensity = std::max(0.0f, attenuation * (light->Color.x + light->Color.y + light->Color.z) / 3.0f);
+					float attenuation = 1.0f - distance / light->Out;
+					float intensity = std::max(0.0f, attenuation * light->Intensity * Luma(light->Color));
 
 					light->LocalIntensity = intensity;
 
-					// If Lara, try to collect shadow casting light
-					if (light->CastShadows && nativeItem->ObjectNumber == ID_LARA)
+					// If shadow pointer provided, try to collect shadow casting light
+					if (light->CastShadows && collectShadowLight)
 					{
 						if (intensity >= brightest)
 						{
@@ -665,9 +537,6 @@ namespace TEN::Renderer
 			}
 		}
 
-		if (nativeItem->ObjectNumber == ID_LARA)
-			shadowLight = brightestLight;
-
 		// Sort lights by distance
 		std::sort(
 			tempLights.begin(),
@@ -678,19 +547,73 @@ namespace TEN::Renderer
 			}
 		);
 
+		// Now put actual lights to provided vector
+		lights.clear();
+
+		// Always add brightest light, if collecting shadow light is specified, even if it's far in range
+		if (collectShadowLight && brightestLight)
+			lights.push_back(brightestLight);
+
 		// Add max 8 lights per item, including the shadow light for Lara eventually
-		if (shadowLight != nullptr)
-			item->LightsToDraw.push_back(shadowLight);
-		for (int i = 0; i < tempLights.size(); i++)
+		for (auto l : tempLights)
 		{
-			if (shadowLight != nullptr && shadowLight == tempLights[i])
+			if (collectShadowLight && brightestLight == l)
 				continue;
 
-			item->LightsToDraw.push_back(tempLights[i]);
+			lights.push_back(l);
 
-			if (item->LightsToDraw.size() == MAX_LIGHTS_PER_ITEM)
+			if (lights.size() == MAX_LIGHTS_PER_ITEM)
 				break;
 		}
+	}
+
+	void Renderer11::CollectLightsForEffect(short roomNumber, RendererEffect *effect)
+	{
+		CollectLights(effect->Effect->pos.Position, roomNumber, false, effect->LightsToDraw);
+	}
+
+	void Renderer11::CollectLightsForItem(short roomNumber, RendererItem* item, bool collectShadowLight)
+	{
+		ItemInfo* nativeItem = &g_Level.Items[item->ItemNumber];
+		CollectLights(nativeItem->Pose.Position, roomNumber, collectShadowLight, item->LightsToDraw);
+
+		if (collectShadowLight && item->LightsToDraw.size() > 0 && item->LightsToDraw.front()->CastShadows)
+			shadowLight = item->LightsToDraw.front();
+		else
+			shadowLight = nullptr;
+	}
+
+	void Renderer11::CalculateAmbientLight(RendererItem *item)
+	{
+		ItemInfo* nativeItem = &g_Level.Items[item->ItemNumber];
+
+		// Interpolate ambient light between rooms
+		if (item->PreviousRoomNumber == NO_ITEM)
+		{
+			item->PreviousRoomNumber = nativeItem->RoomNumber;
+			item->CurrentRoomNumber = nativeItem->RoomNumber;
+			item->AmbientLightSteps = AMBIENT_LIGHT_INTERPOLATION_STEPS;
+		}
+		else if (nativeItem->RoomNumber != item->CurrentRoomNumber)
+		{
+			item->PreviousRoomNumber = item->CurrentRoomNumber;
+			item->CurrentRoomNumber = nativeItem->RoomNumber;
+			item->AmbientLightSteps = 0;
+		}
+		else if (item->AmbientLightSteps < AMBIENT_LIGHT_INTERPOLATION_STEPS)
+			item->AmbientLightSteps++;
+
+		if (item->PreviousRoomNumber == NO_ITEM)
+			item->AmbientLight = m_rooms[nativeItem->RoomNumber].AmbientLight;
+		else
+		{
+			item->AmbientLight = (((AMBIENT_LIGHT_INTERPOLATION_STEPS - item->AmbientLightSteps) / (float)AMBIENT_LIGHT_INTERPOLATION_STEPS) * m_rooms[item->PreviousRoomNumber].AmbientLight +
+				(item->AmbientLightSteps / (float)AMBIENT_LIGHT_INTERPOLATION_STEPS) * m_rooms[item->CurrentRoomNumber].AmbientLight);
+			item->AmbientLight.w = 1.0f;
+		}
+
+		// Multiply calculated ambient light by object tint
+		item->AmbientLight *= nativeItem->Color;
 	}
 
 	void Renderer11::CollectLightsForRoom(short roomNumber, RenderView &renderView)
@@ -718,7 +641,7 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer11::CollectEffects(short roomNumber, RenderView &renderView)
+	void Renderer11::CollectEffects(short roomNumber)
 	{
 		if (m_rooms.size() < roomNumber)
 			return;
@@ -743,7 +666,7 @@ namespace TEN::Renderer
 			newEffect->World = Matrix::CreateFromYawPitchRoll(fx->pos.Orientation.GetY(), fx->pos.Position.x, fx->pos.Position.z) * Matrix::CreateTranslation(fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z);
 			newEffect->Mesh = GetMesh(obj->nmeshes ? obj->meshIndex : fx->frameNumber);
 
-			CollectLightsForEffect(fx->roomNumber, newEffect, renderView);
+			CollectLightsForEffect(fx->roomNumber, newEffect);
 
 			room.EffectsToDraw.push_back(newEffect);
 		}

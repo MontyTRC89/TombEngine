@@ -72,7 +72,7 @@ struct AI_OBJECT
 	short triggerFlags;
 	short flags;
 	float yRot;
-	short boxNumber;
+	int boxNumber;
 	std::string luaName;
 };
 
@@ -91,7 +91,7 @@ struct SPRITE
 
 struct MESH
 {
-	byte LightMode;
+	int lightMode;
 	BoundingSphere sphere;
 	std::vector<Vector3> positions;
 	std::vector<Vector3> normals;

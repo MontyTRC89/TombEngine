@@ -131,6 +131,8 @@ void ControlBodyPart(short fxNumber)
 								  fx->pos.Position.y + GenerateInt( 16, 32),
 								  fx->pos.Position.z + GenerateInt(-16, 16), fx->roomNumber);
 			}
+
+			ExplodeFX(fx, -1, 32);
 			KillEffect(fxNumber);
 			return;
 		}

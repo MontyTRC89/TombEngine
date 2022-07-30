@@ -10,15 +10,16 @@ constexpr auto WALL_MASK = WALL_SIZE - 1;
 constexpr auto STEP_SIZE = WALL_SIZE / 4;
 constexpr auto STOP_SIZE = WALL_SIZE / 2;
 constexpr auto GRID_SNAP_SIZE = STEP_SIZE / 2;
-constexpr auto STEPUP_HEIGHT = ((STEP_SIZE * 3) / 2);
+constexpr auto STEPUP_HEIGHT = (STEP_SIZE * 3) / 2;
+constexpr auto CRAWL_STEPUP_HEIGHT = STEP_SIZE - 1; // Offset of 1 is required to prevent the player from crawling up/down full steps.
 constexpr auto SWIM_DEPTH = 730;
 constexpr auto WADE_DEPTH = STEPUP_HEIGHT;
 constexpr auto SHALLOW_WATER_START_LEVEL = STEP_SIZE / 4;
-constexpr auto BAD_JUMP_CEILING = ((STEP_SIZE * 3) / 4);
+constexpr auto BAD_JUMP_CEILING = (STEP_SIZE * 3) / 4;
 constexpr auto SLOPE_DIFFERENCE = 60;
 constexpr auto NO_HEIGHT  = INT_MIN + UCHAR_MAX;
-constexpr auto MAX_HEIGHT = INT_MIN + 1; // Add 1 to prevent issue with sign changes
-constexpr auto DEEP_WATER = INT_MAX - 1; // Subtract 1 to prevent issue with sign changes
+constexpr auto MAX_HEIGHT = INT_MIN + 1; // Add 1 to prevent issue with sign changes.
+constexpr auto DEEP_WATER = INT_MAX - 1; // Subtract 1 to prevent issue with sign changes.
 
 constexpr auto SQUARE = [](auto x) { return x * x; };
 constexpr auto CLICK = [](auto x) { return STEP_SIZE * x; };
@@ -56,6 +57,7 @@ Vector3Int* FP_Normalise(Vector3Int* v);
 
 const float Lerp(float v0, float v1, float t);
 const float Smoothstep(float edge0, float edge1, float x);
+const float Luma(Vector3 color);
 
 Vector3 TranslateVector(Vector3 vector, float angle, float forward, float up = 0.0f, float right = 0.0f);
 Vector3Int TranslateVector(Vector3Int vector, float angle, float forward, float up = 0.0f, float right = 0.0f);

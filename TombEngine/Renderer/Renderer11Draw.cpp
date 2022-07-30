@@ -182,20 +182,19 @@ namespace TEN::Renderer
 			if (shadowLight->Type == LIGHT_TYPE_POINT) 
 			{
 				view = Matrix::CreateLookAt(lightPos, lightPos + 
-					RenderTargetCube::forwardVectors[step]*10240,
+					RenderTargetCube::forwardVectors[step] * SECTOR(10),
 					RenderTargetCube::upVectors[step]);
 
-				projection = Matrix::CreatePerspectiveFieldOfView(90.0f, 1.0f, 16.0f,
-					shadowLight->Out);
+				projection = Matrix::CreatePerspectiveFieldOfView(90.0f, 1.0f, 16.0f, shadowLight->Out);
 
 			}
-			else if(shadowLight->Type == LIGHT_TYPE_SPOT) 
+			else if (shadowLight->Type == LIGHT_TYPE_SPOT) 
 			{
 				view = Matrix::CreateLookAt(lightPos,
-					lightPos - shadowLight->Direction*10240,
+					lightPos - shadowLight->Direction * SECTOR(10),
 					Vector3(0.0f, -1.0f, 0.0f));
 
-				projection = Matrix::CreatePerspectiveFieldOfView(shadowLight->Out, 1.0f, 16.0f, shadowLight->Range);
+				projection = Matrix::CreatePerspectiveFieldOfView(shadowLight->OutRange, 1.0f, 16.0f, shadowLight->Out);
 			}
 
 			CCameraMatrixBuffer shadowProjection;
@@ -214,16 +213,19 @@ namespace TEN::Renderer
 			m_stItem.World = m_LaraWorldMatrix;
 			m_stItem.Position = Vector4(LaraItem->Pose.Position.x, LaraItem->Pose.Position.y, LaraItem->Pose.Position.z, 1.0f);
 			m_stItem.AmbientLight = room.AmbientLight;
-			memcpy(m_stItem.BonesMatrices, laraObj.AnimationTransforms.data(), sizeof(Matrix) * 32);
+			memcpy(m_stItem.BonesMatrices, laraObj.AnimationTransforms.data(), sizeof(Matrix) * MAX_BONES);
+			for (int k = 0; k < laraSkin.ObjectMeshes.size(); k++)
+				m_stItem.BoneLightModes[k] = GetMesh(Lara.MeshPtrs[k])->LightMode;
+
 			m_cbItem.updateData(m_stItem, m_context.Get());
 			BindConstantBufferVS(CB_ITEM, m_cbItem.get());
 			BindConstantBufferPS(CB_ITEM, m_cbItem.get());
 
 			for (int k = 0; k < laraSkin.ObjectMeshes.size(); k++)
 			{
-				RendererMesh* mesh = GetMesh(Lara.MeshPtrs[k]);
+				auto* mesh = GetMesh(Lara.MeshPtrs[k]);
 
-				for (auto& bucket : mesh->buckets)
+				for (auto& bucket : mesh->Buckets)
 				{
 					if (bucket.NumVertices == 0 && bucket.BlendMode != BLEND_MODES::BLENDMODE_OPAQUE)
 						continue;
@@ -243,7 +245,7 @@ namespace TEN::Renderer
 				{
 					RendererMesh* mesh = laraSkinJoints.ObjectMeshes[k];
 
-					for (auto& bucket : mesh->buckets)
+					for (auto& bucket : mesh->Buckets)
 					{
 						if (bucket.NumVertices == 0 && bucket.BlendMode != BLEND_MODES::BLENDMODE_OPAQUE)
 							continue;
@@ -260,7 +262,7 @@ namespace TEN::Renderer
 			{
 				RendererMesh* mesh = laraSkin.ObjectMeshes[k];
 
-				for (auto& bucket : mesh->buckets)
+				for (auto& bucket : mesh->Buckets)
 				{
 					if (bucket.NumVertices == 0 && bucket.BlendMode != BLEND_MODES::BLENDMODE_OPAQUE)
 						continue;
@@ -278,16 +280,17 @@ namespace TEN::Renderer
 
 			// First matrix is Lara's head matrix, then all 6 hairs matrices. Bones are adjusted at load time for accounting this.
 			m_stItem.World = Matrix::Identity;
-			Matrix matrices[7];
-			matrices[0] = laraObj.AnimationTransforms[LM_HEAD] * m_LaraWorldMatrix;
+			m_stItem.BonesMatrices[0] = laraObj.AnimationTransforms[LM_HEAD] * m_LaraWorldMatrix;
+
 			for (int i = 0; i < hairsObj.BindPoseTransforms.size(); i++)
 			{
 				auto* hairs = &Hairs[0][i];
 				Matrix world = Matrix::CreateFromYawPitchRoll(hairs->Pose.Orientation.GetY(), hairs->Pose.Orientation.GetX(), 0) *
 					Matrix::CreateTranslation(hairs->Pose.Position.x, hairs->Pose.Position.y, hairs->Pose.Position.z);
-				matrices[i + 1] = world;
+				m_stItem.BonesMatrices[i + 1] = world;
+				m_stItem.BoneLightModes[i] = LIGHT_MODES::LIGHT_MODE_DYNAMIC;
 			}
-			memcpy(m_stItem.BonesMatrices, matrices, sizeof(Matrix) * 7);
+
 			m_cbItem.updateData(m_stItem, m_context.Get());
 			BindConstantBufferVS(CB_ITEM, m_cbItem.get());
 			BindConstantBufferPS(CB_ITEM, m_cbItem.get());
@@ -296,7 +299,7 @@ namespace TEN::Renderer
 			{
 				RendererMesh* mesh = hairsObj.ObjectMeshes[k];
 
-				for (auto& bucket : mesh->buckets)
+				for (auto& bucket : mesh->Buckets)
 				{
 					if (bucket.NumVertices == 0 && bucket.BlendMode != BLEND_MODES::BLENDMODE_OPAQUE)
 						continue;
@@ -316,14 +319,10 @@ namespace TEN::Renderer
 		RendererRoom& room = m_rooms[LaraItem->RoomNumber];
 		RendererItem* item = &m_items[Lara.ItemNumber];
 
-		m_stItem.AmbientLight = room.AmbientLight;
-		memcpy(m_stItem.BonesMatrices, &Matrix::Identity, sizeof(Matrix));
+		m_stStatic.Color = room.AmbientLight;
+		m_stStatic.LightMode = LIGHT_MODES::LIGHT_MODE_DYNAMIC;
 
-		m_stLights.NumLights = item->LightsToDraw.size();
-		for (int j = 0; j < item->LightsToDraw.size(); j++)
-			memcpy(&m_stLights.Lights[j], item->LightsToDraw[j], sizeof(ShaderLight));
-		m_cbLights.updateData(m_stLights, m_context.Get());
-		BindConstantBufferPS(CB_LIGHTS, m_cbLights.get());
+		BindLights(item->LightsToDraw);
 
 		SetAlphaTest(ALPHA_TEST_GREATER_THAN, ALPHA_TEST_THRESHOLD);
 
@@ -342,13 +341,16 @@ namespace TEN::Renderer
 																 gunshell->pos.Orientation.GetZ());
 				Matrix world = rotation * translation;
 
-				m_stItem.World = world;
-				m_cbItem.updateData(m_stItem, m_context.Get());
-				BindConstantBufferVS(CB_ITEM, m_cbItem.get());
+				m_stStatic.World = world;
+				m_stStatic.LightMode = LIGHT_MODES::LIGHT_MODE_DYNAMIC;
+
+				m_cbStatic.updateData(m_stStatic, m_context.Get());
+				BindConstantBufferVS(CB_STATIC, m_cbStatic.get());
+				BindConstantBufferPS(CB_STATIC, m_cbStatic.get());
 
 				RendererMesh* mesh = moveableObj.ObjectMeshes[0];
 
-				for (auto& bucket : mesh->buckets)
+				for (auto& bucket : mesh->Buckets)
 				{
 					if (bucket.NumVertices == 0 && bucket.BlendMode == BLEND_MODES::BLENDMODE_OPAQUE)
 						continue;
@@ -552,8 +554,10 @@ namespace TEN::Renderer
 			ObjectInfo* obj = &Objects[ID_RATS_EMITTER];
 			RendererObject& moveableObj = *m_moveableObjects[ID_RATS_EMITTER];
 
-			for (int m = 0; m < 32; m++)
+			for (int m = 0; m < MAX_BONES; m++)
 				memcpy(&m_stItem.BonesMatrices[m], &Matrix::Identity, sizeof(Matrix));
+			for (int k = 0; k < moveableObj.ObjectMeshes.size(); k++)
+				m_stItem.BoneLightModes[k] = moveableObj.ObjectMeshes[k]->LightMode;
 
 			for (int i = 0; i < NUM_RATS; i++)
 			{
@@ -572,9 +576,9 @@ namespace TEN::Renderer
 					m_stItem.AmbientLight = m_rooms[rat->RoomNumber].AmbientLight;
 					m_cbItem.updateData(m_stItem, m_context.Get());
 
-					for (int b = 0; b < mesh->buckets.size(); b++)
+					for (int b = 0; b < mesh->Buckets.size(); b++)
 					{
-						RendererBucket* bucket = &mesh->buckets[b];
+						RendererBucket* bucket = &mesh->Buckets[b];
 
 						if (bucket->Polygons.size() == 0)
 							continue;
@@ -604,12 +608,14 @@ namespace TEN::Renderer
 			RendererObject& moveableObj = *m_moveableObjects[ID_BATS_EMITTER];
 			RendererMesh* mesh = GetMesh(Objects[ID_BATS_EMITTER].meshIndex + (-GlobalCounter & 3));
 
-			for (int m = 0; m < 32; m++)
+			for (int m = 0; m < MAX_BONES; m++)
 				memcpy(&m_stItem.BonesMatrices[m], &Matrix::Identity, sizeof(Matrix));
+			for (int k = 0; k < moveableObj.ObjectMeshes.size(); k++)
+				m_stItem.BoneLightModes[k] = moveableObj.ObjectMeshes[k]->LightMode;
 
-			for (int b = 0; b < mesh->buckets.size(); b++)
+			for (int b = 0; b < mesh->Buckets.size(); b++)
 			{
-				RendererBucket* bucket = &mesh->buckets[b];
+				RendererBucket* bucket = &mesh->Buckets[b];
 
 				if (bucket->Polygons.size() == 0)
 					continue;
@@ -654,8 +660,10 @@ namespace TEN::Renderer
 			ObjectInfo* obj = &Objects[ID_LITTLE_BEETLE];
 			RendererObject& moveableObj = *m_moveableObjects[ID_LITTLE_BEETLE];
 
-			for (int m = 0; m < 32; m++)
+			for (int m = 0; m < MAX_BONES; m++)
 				memcpy(&m_stItem.BonesMatrices[m], &Matrix::Identity, sizeof(Matrix));
+			for (int k = 0; k < moveableObj.ObjectMeshes.size(); k++)
+				m_stItem.BoneLightModes[k] = moveableObj.ObjectMeshes[k]->LightMode;
 
 			for (int i = 0; i < TEN::Entities::TR4::NUM_BEETLES; i++)
 			{
@@ -675,9 +683,9 @@ namespace TEN::Renderer
 					m_stItem.AmbientLight = m_rooms[beetle->RoomNumber].AmbientLight;
 					m_cbItem.updateData(m_stItem, m_context.Get());
 
-					for (int b = 0; b < mesh->buckets.size(); b++)
+					for (int b = 0; b < mesh->Buckets.size(); b++)
 					{
-						RendererBucket* bucket = &mesh->buckets[b];
+						RendererBucket* bucket = &mesh->Buckets[b];
 
 						if (bucket->Polygons.size() == 0)
 							continue;
@@ -706,8 +714,10 @@ namespace TEN::Renderer
 			ObjectInfo* obj = &Objects[ID_LOCUSTS];
 			RendererObject& moveableObj = *m_moveableObjects[ID_LOCUSTS];
 
-			for (int m = 0; m < 32; m++)
+			for (int m = 0; m < MAX_BONES; m++)
 				memcpy(&m_stItem.BonesMatrices[m], &Matrix::Identity, sizeof(Matrix));
+			for (int k = 0; k < moveableObj.ObjectMeshes.size(); k++)
+				m_stItem.BoneLightModes[k] = moveableObj.ObjectMeshes[k]->LightMode;
 
 			for (int i = 0; i < TEN::Entities::TR4::MAX_LOCUSTS; i++)
 			{
@@ -727,9 +737,9 @@ namespace TEN::Renderer
 					m_stItem.AmbientLight = m_rooms[locust->roomNumber].AmbientLight;
 					m_cbItem.updateData(m_stItem, m_context.Get());
 
-					for (int b = 0; b < mesh->buckets.size(); b++)
+					for (int b = 0; b < mesh->Buckets.size(); b++)
 					{
-						RendererBucket* bucket = &mesh->buckets[b];
+						RendererBucket* bucket = &mesh->Buckets[b];
 
 						if (bucket->Polygons.size() == 0)
 							continue;
@@ -761,12 +771,12 @@ namespace TEN::Renderer
 			RendererLine3D* line = &m_lines3DToDraw[i];
 
 			RendererVertex v1;
-			v1.Position = line->start;
-			v1.Color = line->color;
+			v1.Position = line->Start;
+			v1.Color = line->Color;
 
 			RendererVertex v2;
-			v2.Position = line->end;
-			v2.Color = line->color;
+			v2.Position = line->End;
+			v2.Color = line->Color;
 			m_primitiveBatch->DrawLine(v1, v2);
 		}
 
@@ -780,9 +790,9 @@ namespace TEN::Renderer
 	{
 		RendererLine3D line;
 
-		line.start = start;
-		line.end = end;
-		line.color = color;
+		line.Start = start;
+		line.End = end;
+		line.Color = color;
 
 		m_lines3DToDraw.push_back(line);
 	}
@@ -838,49 +848,49 @@ namespace TEN::Renderer
 
 			switch (i)
 			{
-			case 0: line.start = corners[0];
-				line.end = corners[1];
+			case 0: line.Start = corners[0];
+				line.End = corners[1];
 				break;
-			case 1: line.start = corners[1];
-				line.end = corners[2];
+			case 1: line.Start = corners[1];
+				line.End = corners[2];
 				break;
-			case 2: line.start = corners[2];
-				line.end = corners[3];
+			case 2: line.Start = corners[2];
+				line.End = corners[3];
 				break;
-			case 3: line.start = corners[3];
-				line.end = corners[0];
-				break;
-
-
-			case 4: line.start = corners[4];
-				line.end = corners[5];
-				break;
-			case 5: line.start = corners[5];
-				line.end = corners[6];
-				break;
-			case 6: line.start = corners[6];
-				line.end = corners[7];
-				break;
-			case 7: line.start = corners[7];
-				line.end = corners[4];
+			case 3: line.Start = corners[3];
+				line.End = corners[0];
 				break;
 
 
-			case 8: line.start = corners[0];
-				line.end = corners[4];
+			case 4: line.Start = corners[4];
+				line.End = corners[5];
 				break;
-			case 9: line.start = corners[1];
-				line.end = corners[5];
+			case 5: line.Start = corners[5];
+				line.End = corners[6];
 				break;
-			case 10: line.start = corners[2];
-				line.end = corners[6];
+			case 6: line.Start = corners[6];
+				line.End = corners[7];
 				break;
-			case 11: line.start = corners[3];
-				line.end = corners[7];
+			case 7: line.Start = corners[7];
+				line.End = corners[4];
+				break;
+
+
+			case 8: line.Start = corners[0];
+				line.End = corners[4];
+				break;
+			case 9: line.Start = corners[1];
+				line.End = corners[5];
+				break;
+			case 10: line.Start = corners[2];
+				line.End = corners[6];
+				break;
+			case 11: line.Start = corners[3];
+				line.End = corners[7];
 				break;
 			}
 
-			line.color = color;
+			line.Color = color;
 			m_lines3DToDraw.push_back(line);
 		}
 	}
@@ -893,47 +903,47 @@ namespace TEN::Renderer
 
 			switch (i)
 			{
-			case 0: line.start = Vector3(min.x, min.y, min.z);
-				line.end = Vector3(min.x, min.y, max.z);
+			case 0: line.Start = Vector3(min.x, min.y, min.z);
+				line.End = Vector3(min.x, min.y, max.z);
 				break;
-			case 1: line.start = Vector3(min.x, min.y, max.z);
-				line.end = Vector3(max.x, min.y, max.z);
+			case 1: line.Start = Vector3(min.x, min.y, max.z);
+				line.End = Vector3(max.x, min.y, max.z);
 				break;
-			case 2: line.start = Vector3(max.x, min.y, max.z);
-				line.end = Vector3(max.x, min.y, min.z);
+			case 2: line.Start = Vector3(max.x, min.y, max.z);
+				line.End = Vector3(max.x, min.y, min.z);
 				break;
-			case 3: line.start = Vector3(max.x, min.y, min.z);
-				line.end = Vector3(min.x, min.y, min.z);
-				break;
-
-			case 4: line.start = Vector3(min.x, max.y, min.z);
-				line.end = Vector3(min.x, max.y, max.z);
-				break;
-			case 5: line.start = Vector3(min.x, max.y, max.z);
-				line.end = Vector3(max.x, max.y, max.z);
-				break;
-			case 6: line.start = Vector3(max.x, max.y, max.z);
-				line.end = Vector3(max.x, max.y, min.z);
-				break;
-			case 7: line.start = Vector3(max.x, max.y, min.z);
-				line.end = Vector3(min.x, max.y, min.z);
+			case 3: line.Start = Vector3(max.x, min.y, min.z);
+				line.End = Vector3(min.x, min.y, min.z);
 				break;
 
-			case 8: line.start = Vector3(min.x, min.y, min.z);
-				line.end = Vector3(min.x, max.y, min.z);
+			case 4: line.Start = Vector3(min.x, max.y, min.z);
+				line.End = Vector3(min.x, max.y, max.z);
 				break;
-			case 9: line.start = Vector3(min.x, min.y, max.z);
-				line.end = Vector3(min.x, max.y, max.z);
+			case 5: line.Start = Vector3(min.x, max.y, max.z);
+				line.End = Vector3(max.x, max.y, max.z);
 				break;
-			case 10: line.start = Vector3(max.x, min.y, max.z);
-				line.end = Vector3(max.x, max.y, max.z);
+			case 6: line.Start = Vector3(max.x, max.y, max.z);
+				line.End = Vector3(max.x, max.y, min.z);
 				break;
-			case 11: line.start = Vector3(max.x, min.y, min.z);
-				line.end = Vector3(max.x, max.y, min.z);
+			case 7: line.Start = Vector3(max.x, max.y, min.z);
+				line.End = Vector3(min.x, max.y, min.z);
+				break;
+
+			case 8: line.Start = Vector3(min.x, min.y, min.z);
+				line.End = Vector3(min.x, max.y, min.z);
+				break;
+			case 9: line.Start = Vector3(min.x, min.y, max.z);
+				line.End = Vector3(min.x, max.y, max.z);
+				break;
+			case 10: line.Start = Vector3(max.x, min.y, max.z);
+				line.End = Vector3(max.x, max.y, max.z);
+				break;
+			case 11: line.Start = Vector3(max.x, min.y, min.z);
+				line.End = Vector3(max.x, max.y, min.z);
 				break;
 			}
 
-			line.color = color;
+			line.Color = color;
 			m_lines3DToDraw.push_back(line);
 		}
 	}
@@ -961,7 +971,7 @@ namespace TEN::Renderer
 
 	void Renderer11::AddDynamicLight(int x, int y, int z, short falloff, byte r, byte g, byte b)
 	{
-		RendererLight dynamicLight;
+		RendererLight dynamicLight = {};
 
 		if (falloff >= 8)
 		{
@@ -976,6 +986,7 @@ namespace TEN::Renderer
 			dynamicLight.Color = Vector3(r / 255.0f, g / 255.0f, b / 255.0f) * 2.0f;
 		}
 
+		dynamicLight.Intensity = 1.0f;
 		dynamicLight.Position = Vector3(float(x), float(y), float(z));
 		dynamicLight.Out = falloff * 256.0f;
 		dynamicLight.Type = LIGHT_TYPES::LIGHT_TYPE_POINT;
@@ -1288,11 +1299,7 @@ namespace TEN::Renderer
 		BindConstantBufferVS(CB_SHADOW_LIGHT, m_cbShadowMap.get());
 		BindConstantBufferPS(CB_SHADOW_LIGHT, m_cbShadowMap.get());
 
-		m_stLights.NumLights = view.lightsToDraw.size();
-		for (int j = 0; j < view.lightsToDraw.size(); j++)
-			memcpy(&m_stLights.Lights[j], view.lightsToDraw[j], sizeof(ShaderLight));
-		m_cbLights.updateData(m_stLights, m_context.Get());
-		BindConstantBufferPS(CB_LIGHTS, m_cbLights.get());
+		BindLights(view.lightsToDraw);
 
 		m_stMisc.Caustics = (nativeRoom->flags & ENV_FLAG_WATER);
 		m_cbMisc.updateData(m_stMisc, m_context.Get());
@@ -1382,9 +1389,14 @@ namespace TEN::Renderer
 
 		m_stStatic.World = info->world;
 		m_stStatic.Position = Vector4(info->position.x, info->position.y, info->position.z, 1.0f);
-		m_stStatic.Color = info->color;
+		m_stStatic.Color = info->room->AmbientLight * info->color;
+		m_stStatic.LightMode = m_staticObjects[info->staticMesh->Id]->ObjectMeshes[0]->LightMode;
+
 		m_cbStatic.updateData(m_stStatic, m_context.Get());
 		BindConstantBufferVS(CB_STATIC, m_cbStatic.get());
+		BindConstantBufferPS(CB_STATIC, m_cbStatic.get());
+
+		BindLights(info->staticMesh->LightsToDraw);
 
 		SetBlendMode(info->blendMode);
 		
@@ -1420,8 +1432,6 @@ namespace TEN::Renderer
 
 		ScriptInterfaceLevel* level = g_GameFlow->GetLevel(CurrentLevel);
 
-		m_stLights.CameraPosition = view.camera.WorldPosition;
-
 		// Prepare the scene to draw
 		auto time1 = std::chrono::high_resolution_clock::now();
 		CollectRooms(view, false);
@@ -1433,14 +1443,15 @@ namespace TEN::Renderer
 		m_stAlphaTest.AlphaThreshold = -1;
 		m_stShadowMap.NumSpheres = 0;
 
+		// Setup Lara item
+		m_items[Lara.ItemNumber].ItemNumber = Lara.ItemNumber;
+		CalculateAmbientLight(&m_items[Lara.ItemNumber]);
+		CollectLightsForItem(LaraItem->RoomNumber, &m_items[Lara.ItemNumber], true);
+
 		// Prepare the shadow map
 		ClearShadowMap(view);
 		RenderShadowMap(view);
 		RenderBlobShadows(view);
-
-		// Setup Lara item
-		m_items[Lara.ItemNumber].ItemNumber = Lara.ItemNumber;
-		CollectLightsForItem(LaraItem->RoomNumber, &m_items[Lara.ItemNumber], view);
 
 		auto time2 = std::chrono::high_resolution_clock::now();
 		m_timeUpdate = (std::chrono::duration_cast<ns>(time2 - time1)).count() / 1000000;
@@ -1668,17 +1679,16 @@ namespace TEN::Renderer
 		m_stItem.World = item->World;
 		m_stItem.Position = Vector4(nativeItem->Pose.Position.x, nativeItem->Pose.Position.y, nativeItem->Pose.Position.z, 1.0f);
 		m_stItem.AmbientLight = item->AmbientLight;
-		memcpy(m_stItem.BonesMatrices, item->AnimationTransforms, sizeof(Matrix) * 32);
+		memcpy(m_stItem.BonesMatrices, item->AnimationTransforms, sizeof(Matrix) * MAX_BONES);
+		for (int k = 0; k < moveableObj.ObjectMeshes.size(); k++)
+			m_stItem.BoneLightModes[k] = moveableObj.ObjectMeshes[k]->LightMode;
+
 		m_cbItem.updateData(m_stItem, m_context.Get());
 		BindConstantBufferVS(CB_ITEM, m_cbItem.get());
 		BindConstantBufferPS(CB_ITEM, m_cbItem.get());
 
 		// Bind lights touching that item
-		m_stLights.NumLights = item->LightsToDraw.size();
-		for (int j = 0; j < m_stLights.NumLights; j++)
-			memcpy(&m_stLights.Lights[j], item->LightsToDraw[j], sizeof(ShaderLight));
-		m_cbLights.updateData(m_stLights, m_context.Get());
-		BindConstantBufferPS(CB_LIGHTS, m_cbLights.get());
+		BindLights(item->LightsToDraw);
 
 		for (int k = 0; k < moveableObj.ObjectMeshes.size(); k++)
 		{
@@ -1722,17 +1732,16 @@ namespace TEN::Renderer
 
 		m_stItem.World = info->item->World;
 		m_stItem.Position = Vector4(info->position.x, info->position.y, info->position.z, 1.0f);
-		m_stItem.AmbientLight = room.AmbientLight;
-		memcpy(m_stItem.BonesMatrices, info->item->AnimationTransforms, sizeof(Matrix) * 32);
+		m_stItem.AmbientLight = info->room->AmbientLight * info->color;
+		memcpy(m_stItem.BonesMatrices, info->item->AnimationTransforms, sizeof(Matrix) * MAX_BONES);
+		for (int k = 0; k < moveableObj.ObjectMeshes.size(); k++)
+			m_stItem.BoneLightModes[k] = moveableObj.ObjectMeshes[k]->LightMode;
+
 		m_cbItem.updateData(m_stItem, m_context.Get());
 		BindConstantBufferVS(CB_ITEM, m_cbItem.get());
 		BindConstantBufferPS(CB_ITEM, m_cbItem.get());
 
-		m_stLights.NumLights = info->item->LightsToDraw.size();
-		for (int j = 0; j < info->item->LightsToDraw.size(); j++)
-			memcpy(&m_stLights.Lights[j], info->item->LightsToDraw[j], sizeof(ShaderLight));
-		m_cbLights.updateData(m_stLights, m_context.Get());
-		BindConstantBufferPS(CB_LIGHTS, m_cbLights.get());
+		BindLights(info->item->LightsToDraw);
 
 		// Set texture
 		BindTexture(TEXTURE_COLOR_MAP, &std::get<0>(m_moveablesTextures[info->bucket->Texture]),
@@ -1807,28 +1816,16 @@ namespace TEN::Renderer
 
 		for (auto room : view.roomsToDraw)
 		{
-			for (auto msh : room->StaticsToDraw)
+			for (auto& msh : room->StaticsToDraw)
 			{
-				if (!m_staticObjects[msh->staticNumber])
-					continue;
-
-				Matrix world = (Matrix::CreateFromYawPitchRoll(msh->pos.Orientation.GetY(), msh->pos.Orientation.GetX(),
-															   msh->pos.Orientation.GetZ()) *
-					Matrix::CreateTranslation(msh->pos.Position.x, msh->pos.Position.y, msh->pos.Position.z));
-
-				m_stStatic.World = world;
-				m_stStatic.Position = Vector4(msh->pos.Position.x, msh->pos.Position.y, msh->pos.Position.z, 1);
-				m_stStatic.Color = msh->color;
-				m_cbStatic.updateData(m_stStatic, m_context.Get());
-				BindConstantBufferVS(CB_STATIC, m_cbStatic.get());
-
-				RendererObject& staticObj = *m_staticObjects[msh->staticNumber];
+				RendererObject& staticObj = *m_staticObjects[msh.Id];
 
 				if (staticObj.ObjectMeshes.size() > 0)
 				{
-					RendererMesh* mesh = staticObj.ObjectMeshes[0];
+					RendererMesh* mesh = staticObj.ObjectMeshes[0]; 
+					auto pos = Vector3::Transform(Vector3::Zero, msh.World);
 
-					for (auto& bucket : mesh->buckets)
+					for (auto& bucket : mesh->Buckets)
 					{
 						if (!((bucket.BlendMode == BLENDMODE_OPAQUE || bucket.BlendMode == BLENDMODE_ALPHATEST) ^ transparent))
 						{
@@ -1848,7 +1845,7 @@ namespace TEN::Renderer
 								RendererPolygon* p = &bucket.Polygons[j];
 
 								// As polygon distance, for moveables, we use the averaged distance
-								Vector3 centre = Vector3::Transform(p->centre, world);
+								Vector3 centre = Vector3::Transform(p->centre, msh.World);
 								int distance = (centre - cameraPosition).Length();
 
 								RendererTransparentFace face;
@@ -1858,10 +1855,10 @@ namespace TEN::Renderer
 								face.info.animated = bucket.Animated;
 								face.info.texture = bucket.Texture;
 								face.info.room = room;
-								face.info.staticMesh = msh;
+								face.info.staticMesh = &msh;
 								face.info.world = m_stStatic.World;
-								face.info.position = Vector3(msh->pos.Position.x, msh->pos.Position.y, msh->pos.Position.z);
-								face.info.color = Vector4(msh->color.x, msh->color.y, msh->color.z, 1.0f);
+								face.info.position = Vector3(pos.x, pos.y, pos.z);
+								face.info.color = Vector4(msh.AmbientLight.x, msh.AmbientLight.y, msh.AmbientLight.z, msh.AmbientLight.w);
 								face.info.blendMode = bucket.BlendMode;
 								face.info.bucket = &bucket;
 								room->TransparentFacesToDraw.push_back(face);
@@ -1869,6 +1866,17 @@ namespace TEN::Renderer
 						}
 						else
 						{
+							m_stStatic.World = msh.World;
+							m_stStatic.Position = Vector4(pos.x, pos.y, pos.z, 1);
+							m_stStatic.Color = msh.AmbientLight;
+							m_stStatic.LightMode = mesh->LightMode;
+
+							m_cbStatic.updateData(m_stStatic, m_context.Get());
+							BindConstantBufferVS(CB_STATIC, m_cbStatic.get());
+							BindConstantBufferPS(CB_STATIC, m_cbStatic.get());
+
+							BindLights(msh.LightsToDraw);
+
 							int passes = bucket.BlendMode == BLENDMODE_ALPHATEST ? 2 : 1;
 
 							for (int pass = 0; pass < passes; pass++)
@@ -1953,11 +1961,7 @@ namespace TEN::Renderer
 			Vector3 cameraPosition = Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z);
 			Vector3 roomPosition = Vector3(nativeRoom->x, nativeRoom->y, nativeRoom->z);
 
-			m_stLights.NumLights = view.lightsToDraw.size();
-			for (int j = 0; j < view.lightsToDraw.size(); j++)
-				memcpy(&m_stLights.Lights[j], view.lightsToDraw[j], sizeof(ShaderLight));
-			m_cbLights.updateData(m_stLights, m_context.Get());
-			BindConstantBufferPS(CB_LIGHTS, m_cbLights.get());
+			BindLights(view.lightsToDraw);
 
 			// TODO: make caustics optional in Tomb Editor
 			m_stMisc.Caustics = false; // (nativeRoom->flags & ENV_FLAG_WATER);
@@ -2186,6 +2190,8 @@ namespace TEN::Renderer
 
 			m_stStatic.World = (rotation * translation);
 			m_stStatic.Color = weather.SkyColor();
+			m_stStatic.LightMode = LIGHT_MODES::LIGHT_MODE_STATIC;
+
 			m_cbStatic.updateData(m_stStatic, m_context.Get());
 			BindConstantBufferVS(CB_STATIC, m_cbStatic.get());
 			BindConstantBufferPS(CB_STATIC, m_cbStatic.get());
@@ -2209,6 +2215,8 @@ namespace TEN::Renderer
 			m_stStatic.World = Matrix::CreateTranslation(Camera.pos.x, Camera.pos.y, Camera.pos.z);
 			m_stStatic.Position = Vector4::Zero;
 			m_stStatic.Color = Vector4::One;
+			m_stStatic.LightMode = LIGHT_MODES::LIGHT_MODE_STATIC;
+
 			m_cbStatic.updateData(m_stStatic, m_context.Get());
 			BindConstantBufferVS(CB_STATIC, m_cbStatic.get());
 			BindConstantBufferPS(CB_STATIC, m_cbStatic.get());
@@ -2217,7 +2225,7 @@ namespace TEN::Renderer
 			{
 				RendererMesh* mesh = moveableObj.ObjectMeshes[k];
 
-				for (auto& bucket : mesh->buckets)
+				for (auto& bucket : mesh->Buckets)
 				{
 					if (bucket.NumVertices == 0)
 						continue;
@@ -2253,7 +2261,7 @@ namespace TEN::Renderer
 	{
 		Vector3 cameraPosition = Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z);
 
-		for (auto& bucket : mesh->buckets)
+		for (auto& bucket : mesh->Buckets)
 		{
 			if (!((bucket.BlendMode == BLENDMODE_OPAQUE || bucket.BlendMode == BLENDMODE_ALPHATEST) ^ transparent))
 			{
@@ -2285,6 +2293,7 @@ namespace TEN::Renderer
 					face.info.texture = bucket.Texture;
 					face.info.room = room;
 					face.info.item = itemToDraw;
+					face.info.color = itemToDraw->AmbientLight;
 					face.info.blendMode = bucket.BlendMode;
 					face.info.bucket = &bucket;
 					room->TransparentFacesToDraw.push_back(face);

@@ -81,9 +81,10 @@ namespace TEN::Renderer
 	struct RendererStatic
 	{
 		int Id;
-		short RoomIndex;
-		MESH_INFO* Mesh;
+		int RoomIndex;
 		Matrix World;
+		Vector4 AmbientLight;
+		std::vector<RendererLight*> LightsToDraw;
 	};
 
 	struct RendererRoomNode
@@ -95,13 +96,13 @@ namespace TEN::Renderer
 
 	struct RendererItem
 	{
-		short ItemNumber;
+		int ItemNumber;
 		bool DoneAnimations;
 		Matrix World;
 		Matrix Translation;
 		Matrix Rotation;
 		Matrix Scale;
-		Matrix AnimationTransforms[32];
+		Matrix AnimationTransforms[MAX_BONES];
 		std::vector<RendererLight*> LightsToDraw;
 		int PreviousRoomNumber = NO_ROOM;
 		int CurrentRoomNumber = NO_ROOM;
@@ -111,8 +112,9 @@ namespace TEN::Renderer
 
 	struct RendererMesh
 	{
+		LIGHT_MODES LightMode;
 		BoundingSphere Sphere;
-		std::vector<RendererBucket> buckets;
+		std::vector<RendererBucket> Buckets;
 		std::vector<Vector3> Positions;
 	};
 
@@ -122,7 +124,7 @@ namespace TEN::Renderer
 		FX_INFO* Effect;
 		Matrix World;
 		RendererMesh* Mesh;
-		std::vector<RendererLight*> Lights;
+		std::vector<RendererLight*> LightsToDraw;
 	};
 
 	struct RendererObject
@@ -194,9 +196,9 @@ namespace TEN::Renderer
 
 	struct RendererLine3D
 	{
-		Vector3 start;
-		Vector3 end;
-		Vector4 color;
+		Vector3 Start;
+		Vector3 End;
+		Vector4 Color;
 	};
 
 	struct RendererLine2D
@@ -421,6 +423,7 @@ namespace TEN::Renderer
 
 		// Private functions
 		void BindTexture(TEXTURE_REGISTERS registerType, TextureBase* texture, SAMPLER_STATES samplerType);
+		void BindLights(std::vector<RendererLight*>& lights);
 		void BindRenderTargetAsTexture(TEXTURE_REGISTERS registerType, RenderTarget2D* target, SAMPLER_STATES samplerType);
 		void BindConstantBufferVS(CONSTANT_BUFFERS constantBufferType, ID3D11Buffer** buffer);
 		void BindConstantBufferPS(CONSTANT_BUFFERS constantBufferType, ID3D11Buffer** buffer);
@@ -434,11 +437,13 @@ namespace TEN::Renderer
 		void SetRoomBounds(ROOM_DOOR* door, short parentRoomNumber, RenderView& renderView);
 		void CollectRooms(RenderView& renderView, bool onlyRooms);
 		void CollectItems(short roomNumber, RenderView& renderView);
-		void CollectStatics(short roomNumber, RenderView& renderView);
-		void CollectLightsForEffect(short roomNumber, RendererEffect* effect, RenderView& renderView);
-		void CollectLightsForItem(short roomNumber, RendererItem* item, RenderView& renderView);
+		void CollectStatics(short roomNumber);
+		void CollectLights(Vector3Int position, int roomNumber, bool collectShadowLight, std::vector<RendererLight*>& lights);
+		void CollectLightsForItem(short roomNumber, RendererItem* item, bool collectShadowLight);
+		void CollectLightsForEffect(short roomNumber, RendererEffect* effect);
 		void CollectLightsForRoom(short roomNumber, RenderView& renderView);
-		void CollectEffects(short roomNumber, RenderView& renderView);
+		void CalculateAmbientLight(RendererItem* item);
+		void CollectEffects(short roomNumber);
 		void ClearScene();
 		void ClearSceneItems();
 		void ClearDynamicLights();
@@ -603,7 +608,7 @@ namespace TEN::Renderer
 		void RenderLoadingScreen(float percentage);
 		void UpdateProgress(float value);
 		void GetLaraBonePosition(Vector3* pos, int bone);
-		void ToggleFullScreen();
+		void ToggleFullScreen(bool force = false);
 		bool IsFullsScreen();
 		void RenderTitleImage();
 		void AddLine2D(int x1, int y1, int x2, int y2, byte r, byte g, byte b, byte a);

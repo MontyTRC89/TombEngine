@@ -111,6 +111,18 @@ void ReadBytes(void* dest, int count)
 	LevelDataPtr += count;
 }
 
+std::string ReadString()
+{
+	byte numBytes = ReadInt8(); // FIXME: incorrect, should be read in LEB128 format
+
+	if (!numBytes)
+		return std::string();
+
+	char buffer[255];
+	ReadBytes(buffer, numBytes);
+	return std::string(buffer, buffer + numBytes);
+}
+
 void LoadItems()
 {
 	g_Level.NumItems = ReadInt32();
@@ -138,11 +150,7 @@ void LoadItems()
 			item->Color = ReadVector4();
 			item->TriggerFlags = ReadInt16();
 			item->Flags = ReadInt16();
-
-			byte numBytes = ReadInt8();
-			char buffer[255];
-			ReadBytes(buffer, numBytes);
-			item->LuaName = std::string(buffer, buffer + numBytes);
+			item->LuaName = ReadString();
 
 			g_GameScriptEntities->AddName(item->LuaName, i);
 			g_GameScriptEntities->TryAddColliding(i);
@@ -168,7 +176,7 @@ void LoadObjects()
 	{
 		MESH mesh;
 
-		mesh.LightMode = ReadInt8();
+		mesh.lightMode = ReadInt8();
 
 		mesh.sphere.Center.x = ReadFloat();
 		mesh.sphere.Center.y = ReadFloat();
@@ -383,11 +391,7 @@ void LoadCameras()
 		camera.roomNumber = ReadInt32();
 		camera.flags = ReadInt32();
 		camera.speed = ReadInt32();
-
-		byte numBytes = ReadInt8();
-		char buffer[255];
-		ReadBytes(buffer, numBytes);
-		camera.luaName = std::string(buffer, buffer + numBytes);
+		camera.luaName = ReadString();
 
 		g_GameScriptEntities->AddName(camera.luaName, camera);
 	}
@@ -640,14 +644,14 @@ void ReadRooms()
 			ROOM_DOOR door;
 
 			door.room = ReadInt16();
-			door.normal.x = ReadInt16();
-			door.normal.y = ReadInt16();
-			door.normal.z = ReadInt16();
+			door.normal.x = ReadInt32();
+			door.normal.y = ReadInt32();
+			door.normal.z = ReadInt32();
 			for (int k = 0; k < 4; k++)
 			{
-				door.vertices[k].x = ReadInt16();
-				door.vertices[k].y = ReadInt16();
-				door.vertices[k].z = ReadInt16();
+				door.vertices[k].x = ReadInt32();
+				door.vertices[k].y = ReadInt32();
+				door.vertices[k].z = ReadInt32();
 			}
 
 			room.doors.push_back(door);
@@ -747,11 +751,7 @@ void ReadRooms()
 			mesh.color = ReadVector4();
 			mesh.staticNumber = ReadUInt16();
 			mesh.HitPoints = ReadInt16();
-
-			byte numBytes = ReadInt8();
-			char buffer[255];
-			ReadBytes(buffer, numBytes);
-			mesh.luaName = std::string(buffer, buffer + numBytes);
+			mesh.luaName = ReadString();
 
 			g_GameScriptEntities->AddName(mesh.luaName, mesh);
 		}
@@ -985,7 +985,7 @@ void LoadAIObjects()
 		obj.triggerFlags = ReadInt16();
 		obj.flags = ReadInt16();
 		obj.yRot = Angle::ShrtToRad(ReadInt16()); // TODO
-		obj.boxNumber = ReadInt16();
+		obj.boxNumber = ReadInt32();
 
 		byte numBytes = ReadInt8();
 		char buffer[255];
@@ -1002,13 +1002,7 @@ void LoadLuaFunctionNames()
 
 	int luaFunctionsCount = ReadInt32();
 	for (int i = 0; i < luaFunctionsCount; i++)
-	{
-		byte numBytes = ReadInt8();
-		char buffer[255];
-		ReadBytes(buffer, numBytes);
-		auto luaFunctionName = std::string(buffer, buffer + numBytes);
-		g_Level.LuaFunctionNames.push_back(luaFunctionName);
-	}
+		g_Level.LuaFunctionNames.push_back(ReadString());
 }
 
 FILE* FileOpen(const char* fileName)

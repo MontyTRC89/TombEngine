@@ -362,7 +362,7 @@ float ModulateLaraTurnRate(float turnRate, float accelRate, float minTurnRate, f
 
 	float newTurnRate = (turnRate + (accelRate * sign)) * sign;
 	newTurnRate = std::clamp(newTurnRate, minTurnRateNormalized, maxTurnRateNormalized);
-	return newTurnRate * sign;
+	return (newTurnRate * sign);
 }
 
 // TODO: Make these two functions methods of LaraInfo someday. @Sezz 2022.06.26

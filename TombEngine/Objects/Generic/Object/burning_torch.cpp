@@ -242,7 +242,7 @@ namespace TEN::Entities::Generic
 		if (GetCollidedObjects(item, 0, true, CollidedItems, CollidedMeshes, true))
 		{
 			LaraCollision.Setup.EnableObjectPush = true;
-			if (CollidedItems)
+			if (CollidedItems[0])
 			{
 				if (!Objects[CollidedItems[0]->ObjectNumber].intelligent &&
 					CollidedItems[0]->ObjectNumber != ID_LARA)
@@ -250,10 +250,12 @@ namespace TEN::Entities::Generic
 					ObjectCollision(CollidedItems[0] - g_Level.Items.data(), item, &LaraCollision);
 				}
 			}
-			else
+			else if (CollidedMeshes[0])
+			{
 				ItemPushStatic(item, CollidedMeshes[0], &LaraCollision);
+			}
 			
-			item->Animation.Velocity /= 2;
+			item->Animation.Velocity = -int(item->Animation.Velocity / 1.5f);
 		}
 
 		if (item->ItemFlags[3])

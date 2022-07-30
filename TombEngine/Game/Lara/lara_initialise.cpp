@@ -21,30 +21,25 @@ void InitialiseLara(int restore)
 	LaraItem->Location.roomNumber = LaraItem->RoomNumber;
 	LaraItem->Location.yNumber = LaraItem->Pose.Position.y;
 
-	if (restore)
-	{
-		LaraInfo backup;
-		memcpy(&backup, &Lara, sizeof(LaraInfo));
-		ZeroMemory(&Lara, sizeof(LaraInfo));
-	}
-	else
-	{
-		ZeroMemory(&Lara, sizeof(LaraInfo));
-		Lara.ExtraAnim = NO_ITEM;
-		Lara.Vehicle = NO_ITEM;
-	}
+	LaraInfo backup = {};
 
+	if (restore)
+		memcpy(&backup, &Lara, sizeof(LaraInfo));
+
+	ZeroMemory(&Lara, sizeof(LaraInfo));
+
+	Lara.Context = PlayerContext(LaraItem, &LaraCollision);
 	Lara.Control.CanLook = true;
 	Lara.ItemNumber = itemNumber;
 	Lara.HitDirection = -1;
 	Lara.SprintEnergy = LARA_SPRINT_ENERGY_MAX;
 	Lara.Air = LARA_AIR_MAX;
 	Lara.Control.Weapon.WeaponItem = NO_ITEM;
-	PoisonFlag = 0;
 	Lara.PoisonPotency = 0;
 	Lara.WaterSurfaceDist = 100;
 
-	Lara.Vehicle = -1;
+	Lara.ExtraAnim = NO_ITEM;
+	Lara.Vehicle = NO_ITEM;
 	Lara.Location = -1;
 	Lara.HighestLocation = -1;
 	Lara.Control.Rope.Ptr = -1;
