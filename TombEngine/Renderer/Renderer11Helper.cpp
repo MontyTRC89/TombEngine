@@ -52,7 +52,7 @@ namespace TEN::Renderer
 		static std::vector<int> boneIndexList;
 		boneIndexList.clear();
 		
-		RendererBone *Bones[32] = {};
+		RendererBone *Bones[MAX_BONES] = {};
 		int nextBone = 0;
 
 		Matrix rotation;
