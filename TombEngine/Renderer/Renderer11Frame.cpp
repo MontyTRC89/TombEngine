@@ -724,10 +724,13 @@ namespace TEN::Renderer
 
 			RendererEffect *newEffect = &m_effects[fxNum];
 
+			Matrix translation = Matrix::CreateTranslation(fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z);
+			Matrix rotation = Matrix::CreateFromYawPitchRoll(TO_RAD(fx->pos.Orientation.y), TO_RAD(fx->pos.Orientation.x), TO_RAD(fx->pos.Orientation.z));
+
 			newEffect->ObjectNumber = fx->objectNumber;
 			newEffect->RoomNumber = fx->roomNumber;
 			newEffect->Position = fx->pos.Position.ToVector3();
-			newEffect->World = Matrix::CreateFromYawPitchRoll(fx->pos.Orientation.y, fx->pos.Position.x, fx->pos.Position.z) * Matrix::CreateTranslation(fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z);
+			newEffect->World = rotation * translation;
 			newEffect->Mesh = GetMesh(obj->nmeshes ? obj->meshIndex : fx->frameNumber);
 
 			CollectLightsForEffect(fx->roomNumber, newEffect);
