@@ -375,6 +375,7 @@ namespace TEN::Renderer
 			newItem->ItemNumber = itemNum;
 			newItem->ObjectNumber = item->ObjectNumber;
 			newItem->Color = item->Color;
+			newItem->Position = item->Pose.Position.ToVector3();
 			newItem->Translation = Matrix::CreateTranslation(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z);
 			newItem->Rotation = Matrix::CreateFromYawPitchRoll(TO_RAD(item->Pose.Orientation.y),
 															   TO_RAD(item->Pose.Orientation.x),
@@ -435,6 +436,7 @@ namespace TEN::Renderer
 			{
 				mesh->staticNumber,
 				room.RoomNumber,
+				mesh->pos.Position.ToVector3(),
 				world,
 				mesh->color,
 				room.AmbientLight,
@@ -621,13 +623,12 @@ namespace TEN::Renderer
 	
 	void Renderer11::CollectLightsForEffect(short roomNumber, RendererEffect* effect)
 	{
-		CollectLights(effect->Effect->pos.Position.ToVector3(), ITEM_LIGHT_COLLECTION_RADIUS, roomNumber, NO_ROOM, false, effect->LightsToDraw);
+		CollectLights(effect->Position, ITEM_LIGHT_COLLECTION_RADIUS, roomNumber, NO_ROOM, false, effect->LightsToDraw);
 	}
 
 	void Renderer11::CollectLightsForItem(RendererItem* item)
 	{
-		auto pos = Vector3::Transform(Vector3::Zero, item->Translation);
-		CollectLights(pos, ITEM_LIGHT_COLLECTION_RADIUS, item->RoomNumber, item->PrevRoomNumber, false, item->LightsToDraw);
+		CollectLights(item->Position, ITEM_LIGHT_COLLECTION_RADIUS, item->RoomNumber, item->PrevRoomNumber, false, item->LightsToDraw);
 	}
 
 	void Renderer11::CalculateLightFades(RendererItem *item)
@@ -723,8 +724,9 @@ namespace TEN::Renderer
 
 			RendererEffect *newEffect = &m_effects[fxNum];
 
-			newEffect->Effect = fx;
-			newEffect->Id = fxNum;
+			newEffect->ObjectNumber = fx->objectNumber;
+			newEffect->RoomNumber = fx->roomNumber;
+			newEffect->Position = fx->pos.Position.ToVector3();
 			newEffect->World = Matrix::CreateFromYawPitchRoll(fx->pos.Orientation.y, fx->pos.Position.x, fx->pos.Position.z) * Matrix::CreateTranslation(fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z);
 			newEffect->Mesh = GetMesh(obj->nmeshes ? obj->meshIndex : fx->frameNumber);
 

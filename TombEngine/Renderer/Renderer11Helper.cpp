@@ -34,19 +34,6 @@ namespace TEN::Renderer
 	using std::pair;
 	using std::vector;
 
-	void Renderer11::UpdateEffects(RenderView& view)
-	{
-		for (auto room : view.roomsToDraw)
-		{
-			for (auto fx : room->EffectsToDraw)
-			{
-				Matrix translation = Matrix::CreateTranslation(fx->Effect->pos.Position.x, fx->Effect->pos.Position.y, fx->Effect->pos.Position.z);
-				Matrix rotation = Matrix::CreateFromYawPitchRoll(TO_RAD(fx->Effect->pos.Orientation.y), TO_RAD(fx->Effect->pos.Orientation.x), TO_RAD(fx->Effect->pos.Orientation.z));
-				fx->World = rotation * translation;
-			}
-		}
-	}
-
 	void Renderer11::UpdateAnimation(RendererItem *item, RendererObject& obj, ANIM_FRAME** frmptr, short frac, short rate, int mask, bool useObjectWorldRotation)
 	{
 		static std::vector<int> boneIndexList;
