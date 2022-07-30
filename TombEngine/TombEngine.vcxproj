@@ -578,6 +578,7 @@ CALL gen.bat</Command>
     <ClInclude Include="Specific\setup.h" />
     <ClInclude Include="Specific\clock.h" />
     <ClInclude Include="Specific\trmath.h" />
+    <ClInclude Include="Specific\trutils.h" />
     <ClInclude Include="Specific\winmain.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="Objects\TR5\Object\tr5_genslot.h" />
@@ -918,6 +919,7 @@ CALL gen.bat</Command>
     <ClCompile Include="Specific\IO\Streams.cpp" />
     <ClCompile Include="Specific\level.cpp" />
     <ClCompile Include="Specific\setup.cpp" />
+    <ClCompile Include="Specific\trutils.cpp" />
     <ClCompile Include="Specific\winmain.cpp" />
     <ClCompile Include="Objects\TR5\Object\tr5_genslot.cpp" />
     <ClCompile Include="Renderer\VertexBuffer\VertexBuffer.cpp" />

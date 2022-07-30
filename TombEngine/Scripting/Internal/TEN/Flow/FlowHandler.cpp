@@ -10,6 +10,7 @@
 #include "Game/gui.h"
 #include "Vec3/Vec3.h"
 #include "Objects/ScriptInterfaceObjectsHandler.h"
+#include "Specific/trutils.h"
 
 /***
 Functions for use in Flow.lua, settings.lua and strings.lua
@@ -220,14 +221,11 @@ int FlowHandler::GetLevelNumber(std::string const& fileName)
 	if (fileName.empty())
 		return -1;
 
-	auto lcFilename = fileName;
-	std::transform(lcFilename.begin(), lcFilename.end(), lcFilename.begin(), [](unsigned char c) { return std::tolower(c); });
+	auto lcFilename = TEN::Utils::ToLower(fileName);
 
 	for (int i = 0; i < Levels.size(); i++)
 	{
-		auto level = this->GetLevel(i)->FileName;
-		std::transform(level.begin(), level.end(), level.begin(), [](unsigned char c) { return std::tolower(c); });
-
+		auto level = TEN::Utils::ToLower(this->GetLevel(i)->FileName);
 		if (level == lcFilename && std::filesystem::exists(fileName))
 			return i;
 	}
@@ -314,12 +312,10 @@ bool FlowHandler::DoFlow()
 			break;
 		case GameStatus::LevelComplete:
 			if (LevelComplete >= Levels.size())
-			{
-				// TODO: final credits
-				CurrentLevel = 0;
-			}
+				CurrentLevel = 0; // TODO: final credits
 			else
-				CurrentLevel++;
+				CurrentLevel = LevelComplete;
+			LevelComplete = 0;
 			break;
 		}
 	}

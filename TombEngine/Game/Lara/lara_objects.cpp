@@ -743,7 +743,7 @@ void lara_as_pole_idle(ItemInfo* item, CollisionInfo* coll)
 		if (item->Animation.ActiveState == LA_POLE_IDLE) // HACK.
 		{
 			if (TrInput & (IN_LEFT | IN_RIGHT))
-				ModulateLaraTurnRateY(item, LARA_POLE_TURN_RATE_ACCEL, 0, LARA_POLE_TURN_RATE_MAX);
+				ModulateLaraTurnRateY(item, LARA_POLE_TURN_RATE_ACCEL, 0, LARA_POLE_TURN_RATE_MAX, true);
 		}
 
 		// TODO: Add forward jump.
@@ -834,7 +834,7 @@ void lara_as_pole_up(ItemInfo* item, CollisionInfo* coll)
 	if (TrInput & IN_ACTION)
 	{
 		if (TrInput & (IN_LEFT | IN_RIGHT))
-			ModulateLaraTurnRateY(item, LARA_POLE_TURN_RATE_ACCEL, 0, LARA_POLE_TURN_RATE_MAX);
+			ModulateLaraTurnRateY(item, LARA_POLE_TURN_RATE_ACCEL, 0, LARA_POLE_TURN_RATE_MAX, true);
 
 		if (TrInput & IN_JUMP)
 		{
@@ -883,7 +883,7 @@ void lara_as_pole_down(ItemInfo* item, CollisionInfo* coll)
 	if (TrInput & IN_ACTION)
 	{
 		if (TrInput & (IN_LEFT | IN_RIGHT))
-			ModulateLaraTurnRateY(item, LARA_POLE_TURN_RATE_ACCEL, 0, LARA_POLE_TURN_RATE_MAX);
+			ModulateLaraTurnRateY(item, LARA_POLE_TURN_RATE_ACCEL, 0, LARA_POLE_TURN_RATE_MAX, true);
 
 		if (TrInput & IN_JUMP)
 		{

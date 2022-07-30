@@ -216,7 +216,7 @@ namespace TEN::Renderer
 						vertex->UV = poly.textureCoordinates[k];
 						vertex->Color = Vector4(room.colors[index].x, room.colors[index].y, room.colors[index].z, 1.0f);
 						vertex->Tangent = poly.tangents[k];
-						vertex->BiTangent = poly.bitangents[k];
+						vertex->AnimationFrameOffset = poly.animatedFrame;
 						vertex->IndexInPoly = k;
 						vertex->OriginalIndex = index;
 						vertex->Effects = Vector4(room.effects[index].x, room.effects[index].y, room.effects[index].z, 0);
@@ -625,7 +625,7 @@ namespace TEN::Renderer
 													currentVertex->Bone = j;
 													currentVertex->Position = parentVertex->Position;
 													currentVertex->Normal = parentVertex->Normal;
-													currentVertex->BiTangent = parentVertex->BiTangent;
+													currentVertex->AnimationFrameOffset = parentVertex->AnimationFrameOffset;
 													currentVertex->Tangent = parentVertex->Tangent;
 													break;
 												}

@@ -14,6 +14,7 @@
 #include "Sound/sound.h"
 #include "Specific/level.h"
 #include "Specific/configuration.h"
+#include "Specific/trutils.h"
 #include "LanguageScript.h"
 #include "ScriptInterfaceState.h"
 #include "ScriptInterfaceLevel.h"
@@ -45,6 +46,12 @@ extern "C"
 #if _DEBUG
 string commit;
 #endif
+
+bool ArgEquals(wchar_t* incomingArg, std::string name)
+{
+	auto lowerArg = TEN::Utils::ToLower(TEN::Utils::FromWchar(incomingArg));
+	return (lowerArg == "-" + name) || (lowerArg == "/" + name);
+}
 
 Vector2Int GetScreenResolution()
 {
@@ -225,20 +232,19 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	// Parse command line arguments
 	for (int i = 1; i < argc; i++)
 	{
-		if (wcscmp(argv[i], L"/setup") == 0)
+		if (ArgEquals(argv[i], "setup"))
 		{
 			setup = true;
 		}
-		else if (wcscmp(argv[i], L"/debug") == 0)
+		else if (ArgEquals(argv[i], "debug"))
 		{
 			Debug = true;
 		}
-		else if ((wcscmp(argv[i], L"/level") == 0) && argc > (i + 1))
+		else if (ArgEquals(argv[i], "level") && argc > (i + 1))
 		{
-			std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> converter;
-			levelFile = converter.to_bytes(std::wstring(argv[i + 1]));
+			levelFile = TEN::Utils::FromWchar(argv[i + 1]);
 		}
-		else if ((wcscmp(argv[i], L"/hash") == 0) && argc > (i + 1))
+		else if (ArgEquals(argv[i], "hash") && argc > (i + 1))
 		{
 			SystemNameHash = std::stoul(std::wstring(argv[i + 1]));
 		}
