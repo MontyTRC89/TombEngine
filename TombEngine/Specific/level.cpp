@@ -1145,19 +1145,20 @@ unsigned int _stdcall LoadLevel(void* data)
 		LoadSamples();
 		g_Renderer.UpdateProgress(80);
 
-		TENLog("Preparing renderer...", LogLevel::Info);
-		
-		g_Renderer.UpdateProgress(90);
-		g_Renderer.PrepareDataForTheRenderer();
-
 		TENLog("Initializing level...", LogLevel::Info);
 
 		// Initialise the game
 		InitialiseGameFlags();
 		InitialiseLara(!(InitialiseGame || CurrentLevel == 1));
+		InitializeNeighborRoomList();
 		GetCarriedItems();
 		GetAIPickups();
 		g_GameScriptEntities->AssignLara();
+		g_Renderer.UpdateProgress(90);
+
+		TENLog("Preparing renderer...", LogLevel::Info);
+
+		g_Renderer.PrepareDataForTheRenderer();
 
 		TENLog("Level loading complete.", LogLevel::Info);
 
