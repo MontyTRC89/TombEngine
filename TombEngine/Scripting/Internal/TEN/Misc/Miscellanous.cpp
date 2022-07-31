@@ -1,5 +1,6 @@
 #include "framework.h"
 #include "ReservedScriptNames.h"
+#include "ScriptUtil.h"
 #include "Vec3/Vec3.h"
 #include "Game/camera.h"
 #include "Game/collision/collide_room.h"
@@ -37,15 +38,20 @@ namespace Misc
 		Rumble(strength, time.value_or(0.3f), RumbleMode::Both);
 	}
 
-
-	static void FadeIn(sol::optional<float> speed)
+	///Do a full-screen fade-to-black. The screen will remain black until a call to FadeIn.
+	//@function FadeOut
+	//@tparam float speed (default 1.0). Speed in "amount" per second. A value of 1 will make the fade take one second.
+	static void FadeOut(TypeOrNil<float> speed)
 	{
-		SetScreenFadeIn(speed.value_or(1.0f) / float(FPS));
+		SetScreenFadeOut(USE_IF_HAVE(float, speed, 1.0f) / float(FPS));
 	}
 
-	static void FadeOut(sol::optional<float> speed)
+	///Do a full-screen fade-in from black.
+	//@function FadeIn
+	//@tparam float speed (default 1.0). Speed in "amount" per second. A value of 1 will make the fade take one second.
+	static void FadeIn(TypeOrNil<float> speed)
 	{
-		SetScreenFadeOut(speed.value_or(1.0f) / float(FPS));
+		SetScreenFadeIn(USE_IF_HAVE(float, speed ,1.0f) / float(FPS));
 	}
 
 	static void SetCineBars(float height, sol::optional<float> speed)
@@ -136,9 +142,6 @@ namespace Misc
 		//@tparam float time (in seconds, default: 0.3)
 		table_misc.set_function(ScriptReserved_Vibrate, &Vibrate);
 
-		///Do a fade-in.
-		//@function FadeIn
-		//@tparam float speed (default: 1 second)
 		table_misc.set_function(ScriptReserved_FadeIn, &FadeIn);
 
 		///Do a fade-out.
