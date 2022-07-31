@@ -187,8 +187,8 @@ namespace TEN::Entities::Effects
 				dx = maxRotation;
 
 			if (fx->flag1 != 4 && (fx->flag1 != 6 || !fx->counter))
-				fx->pos.Orientation.SetY(fx->pos.Orientation.y + dy);
-			fx->pos.Orientation.SetX(fx->pos.Orientation.x + dx);
+				fx->pos.Orientation.y += dy;
+			fx->pos.Orientation.x += dx;
 		}
 
 		fx->pos.Orientation.SetZ(fx->pos.Orientation.z + 16 * fx->speed);

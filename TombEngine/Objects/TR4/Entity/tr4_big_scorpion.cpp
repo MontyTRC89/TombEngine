@@ -374,13 +374,13 @@ namespace TEN::Entities::TR4
 		}
 
 		if ((angle1 - item->Pose.Orientation.x) < Angle::DegToRad(1.4f))
-			item->Pose.Orientation.SetX(Angle::DegToRad(1.4f));
+			item->Pose.Orientation.x = Angle::DegToRad(1.4f);
 		else
 		{
 			if (angle1 <= item->Pose.Orientation.x)
-				item->Pose.Orientation.SetX(item->Pose.Orientation.x - Angle::DegToRad(1.4f));
+				item->Pose.Orientation.x -= Angle::DegToRad(1.4f);
 			else
-				item->Pose.Orientation.SetX(item->Pose.Orientation.x + Angle::DegToRad(1.4f));
+				item->Pose.Orientation.x += Angle::DegToRad(1.4f);
 		}
 
 		if ((angle2 - item->Pose.Orientation.z) < Angle::DegToRad(1.4f))

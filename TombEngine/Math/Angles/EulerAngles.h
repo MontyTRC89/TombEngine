@@ -45,7 +45,6 @@
 		// Setters
 		void Set(EulerAngles orient);
 		void Set(float xAngle, float yAngle, float zAngle);
-		void SetX(float angle = 0.0f);
 		void SetY(float angle = 0.0f);
 		void SetZ(float angle = 0.0f);
 

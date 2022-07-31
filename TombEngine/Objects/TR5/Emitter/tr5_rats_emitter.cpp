@@ -100,7 +100,7 @@ void InitialiseLittleRats(short itemNumber)
 
 	char flags = item->TriggerFlags / 1000;
 
-	item->Pose.Orientation.SetX(Angle::DegToRad(45.0f));
+	item->Pose.Orientation.x = Angle::DegToRad(45.0f);
 	item->ItemFlags[1] = flags & 2;
 	item->ItemFlags[2] = flags & 4;
 	item->ItemFlags[0] = flags & 1;
@@ -227,7 +227,7 @@ void UpdateRats()
 								NextRat = 0;
 							}
 							else
-								rat->Pose.Orientation.SetX(Angle::ShrtToRad(-128 * rat->VerticalVelocity));
+								rat->Pose.Orientation.x = Angle::ShrtToRad(-128 * rat->VerticalVelocity);
 						}
 						else
 						{
@@ -239,7 +239,7 @@ void UpdateRats()
 					else
 					{
 						// if block is higher than rat Poseition then run vertically
-						rat->Pose.Orientation.SetX(Angle::DegToRad(78.75f));
+						rat->Pose.Orientation.x = Angle::DegToRad(78.75f);
 						rat->Pose.Position = oldPos;
 						rat->Pose.Position.y -= 24;
 						rat->VerticalVelocity = 0;

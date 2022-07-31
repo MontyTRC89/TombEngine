@@ -336,7 +336,7 @@ void CreatureUnderwater(ItemInfo* item, int depth)
 			item->Pose.Position.y = height;
 
 		if (item->Pose.Orientation.x > Angle::DegToRad(2.0f))
-			item->Pose.Orientation.SetX(item->Pose.Orientation.x - Angle::DegToRad(2.0f));
+			item->Pose.Orientation.x = item->Pose.Orientation.x - Angle::DegToRad(2.0f);
 		else if (item->Pose.Orientation.x > 0)
 			item->Pose.Orientation.x = 0.0f;
 	}
@@ -714,11 +714,11 @@ int CreatureAnimation(short itemNumber, float angle, float tilt)
 			angle = Angle::DegToRad(20.0f);
 
 		if (angle < Angle::Normalize(item->Pose.Orientation.x - Angle::DegToRad(1.0f)))
-			item->Pose.Orientation.SetX(item->Pose.Orientation.x - Angle::DegToRad(1.0f));
+			item->Pose.Orientation.x = item->Pose.Orientation.x - Angle::DegToRad(1.0f);
 		else if (angle > Angle::Normalize(item->Pose.Orientation.x + Angle::DegToRad(1.0f)))
-			item->Pose.Orientation.SetX(item->Pose.Orientation.x + Angle::DegToRad(1.0f));
+			item->Pose.Orientation.x = item->Pose.Orientation.x + Angle::DegToRad(1.0f);
 		else
-			item->Pose.Orientation.SetX(angle);
+			item->Pose.Orientation.x = angle;
 	}
 	else if (LOT->IsJumping)
 	{

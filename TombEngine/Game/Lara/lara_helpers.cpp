@@ -466,17 +466,17 @@ void UpdateLaraSubsuitAngles(ItemInfo* item)
 
 	if (lara->Control.Subsuit.DXRot != 0)
 	{
-		float rotation = lara->Control.Subsuit.DXRot / 8;
+		float rotation = lara->Control.Subsuit.DXRot / 8.0f;
 		if (rotation < Angle::DegToRad(-2.0f))
 			rotation = Angle::DegToRad(-2.0f);
 		else if (rotation > Angle::DegToRad(2.0f))
 			rotation = Angle::DegToRad(2.0f);
 
-		item->Pose.Orientation.SetX(item->Pose.Orientation.x + rotation);
+		item->Pose.Orientation.x += rotation;
 	}
 
-	lara->Control.Subsuit.Velocity[0] += abs(lara->Control.Subsuit.XRot / 8);
-	lara->Control.Subsuit.Velocity[1] += abs(lara->Control.Subsuit.XRot / 8);
+	lara->Control.Subsuit.Velocity[0] += abs(lara->Control.Subsuit.XRot / 8.0f);
+	lara->Control.Subsuit.Velocity[1] += abs(lara->Control.Subsuit.XRot / 8.0f);
 
 	if (lara->Control.TurnRate.y > 0)
 		lara->Control.Subsuit.Velocity[0] += abs(lara->Control.TurnRate.y) * 2;
@@ -869,7 +869,7 @@ void SetLaraSwimDiveAnimation(ItemInfo* item)
 	SetAnimation(item, LA_ONWATER_DIVE);
 	item->Animation.TargetState = LS_UNDERWATER_SWIM_FORWARD;
 	item->Animation.VerticalVelocity = LARA_SWIM_VELOCITY_MAX * 0.4f;
-	item->Pose.Orientation.SetX(Angle::DegToRad(-45.0f));
+	item->Pose.Orientation.x = Angle::DegToRad(-45.0f);
 	lara->Control.WaterStatus = WaterStatus::Underwater;
 }
 
@@ -880,9 +880,9 @@ void ResetLaraTurnRate(ItemInfo* item, bool divesuit)
 
 	// Reset x axis turn rate.
 	if (abs(lara->Control.TurnRate.x) > Angle::DegToRad(2.0f))
-		lara->Control.TurnRate.SetX(Angle::InterpolateConstant(lara->Control.TurnRate.x, 0.0f, Angle::DegToRad(2.0f)));
+		lara->Control.TurnRate.x = Angle::InterpolateConstant(lara->Control.TurnRate.x, 0.0f, Angle::DegToRad(2.0f));
 	else
-		lara->Control.TurnRate.SetX(Angle::InterpolateConstant(lara->Control.TurnRate.x, 0.0f, Angle::DegToRad(0.5f)));
+		lara->Control.TurnRate.x = Angle::InterpolateConstant(lara->Control.TurnRate.x, 0.0f, Angle::DegToRad(0.5f));
 
 	// Ease rotation near poles.
 	if (item->Pose.Orientation.x >= Angle::DegToRad(80.0f) && lara->Control.TurnRate.x > 0.0f ||
@@ -890,11 +890,11 @@ void ResetLaraTurnRate(ItemInfo* item, bool divesuit)
 	{
 		int sign = copysign(1, lara->Control.TurnRate.x);
 
-		item->Pose.Orientation.SetX(
-			item->Pose.Orientation.x + std::min(abs(lara->Control.TurnRate.x), (Angle::DegToRad(90.0f) - abs(item->Pose.Orientation.x)) / 3) * sign);
+		item->Pose.Orientation.x = 
+			item->Pose.Orientation.x + std::min(abs(lara->Control.TurnRate.x), (Angle::DegToRad(90.0f) - abs(item->Pose.Orientation.x)) / 3.0f) * sign;
 	}
 	else
-		item->Pose.Orientation.SetX(item->Pose.Orientation.x + lara->Control.TurnRate.x);
+		item->Pose.Orientation.x += lara->Control.TurnRate.x;
 
 	// Reset y axis turn rate.
 	if (abs(lara->Control.TurnRate.y) > Angle::DegToRad(2.0f) && !divesuit)
@@ -902,7 +902,7 @@ void ResetLaraTurnRate(ItemInfo* item, bool divesuit)
 	else
 		lara->Control.TurnRate.SetY(Angle::InterpolateConstant(lara->Control.TurnRate.y, 0.0f, Angle::DegToRad(0.5f)));
 
-	item->Pose.Orientation.SetY(item->Pose.Orientation.y + lara->Control.TurnRate.y);
+	item->Pose.Orientation.y += lara->Control.TurnRate.y;
 
 	// Nothing uses z axis turn rate at this point; keep it at zero.
 	lara->Control.TurnRate.z = 0.0f;
@@ -911,10 +911,10 @@ void ResetLaraTurnRate(ItemInfo* item, bool divesuit)
 void ResetLaraLean(ItemInfo* item, float alpha, bool resetRoll, bool resetPitch)
 {
 	if (resetPitch)
-		item->Pose.Orientation.SetX(Angle::InterpolateLinear(item->Pose.Orientation.x, 0.0f, alpha, Angle::DegToRad(0.1f)));
+		item->Pose.Orientation.x = Angle::InterpolateLinear(item->Pose.Orientation.x, 0.0f, alpha, Angle::DegToRad(0.1f));
 
 	if (resetRoll)
-		item->Pose.Orientation.SetZ(Angle::InterpolateLinear(item->Pose.Orientation.z, 0.0f, alpha, Angle::DegToRad(0.1f)));
+		item->Pose.Orientation.z = Angle::InterpolateLinear(item->Pose.Orientation.z, 0.0f, alpha, Angle::DegToRad(0.1f));
 }
 
 void ResetLaraFlex(ItemInfo* item, float alpha)

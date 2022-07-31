@@ -328,7 +328,7 @@ void PickupCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 	{
 		if (lara->Control.WaterStatus == WaterStatus::Underwater)
 		{
-			item->Pose.Orientation.SetX(Angle::DegToRad(-25.0f));
+			item->Pose.Orientation.x = Angle::DegToRad(-25.0f);
 
 			if (TrInput & IN_ACTION && 
 				item->ObjectNumber != ID_BURNING_TORCH_ITEM && 

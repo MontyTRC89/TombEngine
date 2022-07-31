@@ -1071,9 +1071,9 @@ void UpdateGunShells()
 				gs->fallspeed += 6;
 			}
 
-			gs->pos.Orientation.SetX(gs->pos.Orientation.x + (gs->speed >> 1 + 7) * Angle::DegToRad(1.0f));
-			gs->pos.Orientation.SetY(gs->pos.Orientation.y + gs->speed * Angle::DegToRad(1.0f));
-			gs->pos.Orientation.SetZ(gs->pos.Orientation.z + Angle::DegToRad(23.0f));
+			gs->pos.Orientation.x += Angle::ShrtToRad(gs->speed >> 1 + 7) * Angle::DegToRad(1.0f);
+			gs->pos.Orientation.y += Angle::ShrtToRad(gs->speed) * Angle::DegToRad(1.0f);
+			gs->pos.Orientation.z += Angle::DegToRad(23.0f);
 
 			gs->pos.Position.x += gs->speed * sin(gs->dirXrot);
 			gs->pos.Position.y += gs->fallspeed;

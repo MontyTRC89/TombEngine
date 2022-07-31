@@ -267,7 +267,7 @@ void CutsceneRopeControl(short itemNumber)
 	int dz = (pos2.z - pos1.z) * (pos2.z - pos1.z);
 
 	ropeItem->ItemFlags[1] = ((sqrt(dx + dy + dz) * 2) + sqrt(dx + dy + dz)) * 2;
-	ropeItem->Pose.Orientation.SetX(Angle::DegToRad(26.0f));
+	ropeItem->Pose.Orientation.x = Angle::DegToRad(26.0f);
 }
 
 void HybridCollision(short itemNumber, ItemInfo* laraitem, CollisionInfo* coll) 

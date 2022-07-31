@@ -815,14 +815,14 @@ namespace TEN::Entities::TR4
 			if (horseItem && item->ItemFlags[1])
 			{
 				if (abs(xRot - item->Pose.Orientation.x) < Angle::DegToRad(1.4f))
-					item->Pose.Orientation.SetX(xRot);
+					item->Pose.Orientation.x = xRot;
 				else if (xRot <= item->Pose.Orientation.x)
 				{
 					if (xRot < item->Pose.Orientation.x)
-						item->Pose.Orientation.SetX(item->Pose.Orientation.x - Angle::DegToRad(1.4f));
+						item->Pose.Orientation.x -= Angle::DegToRad(1.4f);
 				}
 				else
-					item->Pose.Orientation.SetX(item->Pose.Orientation.x + Angle::DegToRad(1.4f));
+					item->Pose.Orientation.x += Angle::DegToRad(1.4f);
 
 				horseItem->Pose = item->Pose;
 

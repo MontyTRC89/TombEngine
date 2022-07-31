@@ -205,7 +205,7 @@ namespace TEN::Entities::Generic
 
 		if (item->Animation.VerticalVelocity)
 		{
-			item->Pose.Orientation.SetX(item->Pose.Orientation.x - Angle::DegToRad(5.0f));
+			item->Pose.Orientation.x = item->Pose.Orientation.x - Angle::DegToRad(5.0f);
 			item->Pose.Orientation.SetZ(item->Pose.Orientation.z + Angle::DegToRad(5.0f));
 		}
 		else if (!item->Animation.Velocity)

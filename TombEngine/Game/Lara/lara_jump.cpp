@@ -608,7 +608,7 @@ void lara_as_jump_up(ItemInfo* item, CollisionInfo* coll)
 	if (item->Animation.Velocity < 0)
 	{
 		// TODO: Holding BACK + LEFT/RIGHT results in Lara flexing more.
-		item->Pose.Orientation.SetX(item->Pose.Orientation.x + std::min(LARA_LEAN_RATE / 3, abs(Angle::DegToRad(item->Animation.Velocity) - item->Pose.Orientation.x) / 3));
+		item->Pose.Orientation.x += std::min(LARA_LEAN_RATE / 3, abs(Angle::DegToRad(item->Animation.Velocity) - item->Pose.Orientation.x) / 3);
 		lara->ExtraHeadRot.SetY(lara->ExtraHeadRot.y + (Angle::DegToRad(10.0f) - item->Pose.Orientation.z) / 3);
 	}
 

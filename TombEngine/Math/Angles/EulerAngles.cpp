@@ -146,14 +146,9 @@
 
 	void EulerAngles::Set(float xAngle, float yAngle, float zAngle)
 	{
-		this->SetX(xAngle);
+		this->x = Angle::Normalize(xAngle);
 		this->SetY(yAngle);
 		this->SetZ(zAngle);
-	}
-
-	void EulerAngles::SetX(float angle)
-	{
-		this->x = Angle::Normalize(angle);
 	}
 
 	void EulerAngles::SetY(float angle)

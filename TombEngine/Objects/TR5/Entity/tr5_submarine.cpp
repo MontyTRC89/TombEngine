@@ -366,7 +366,7 @@ void ChaffFlareControl(short itemNumber)
 	
 	if (item->Animation.VerticalVelocity)
 	{
-		item->Pose.Orientation.SetX(item->Pose.Orientation.x + Angle::DegToRad(3.0f));
+		item->Pose.Orientation.x = item->Pose.Orientation.x + Angle::DegToRad(3.0f);
 		item->Pose.Orientation.SetZ(item->Pose.Orientation.z + Angle::DegToRad(5.0f));
 	}
 
@@ -512,7 +512,7 @@ void TorpedoControl(short itemNumber)
 			dry = Angle::DegToRad(2.8f);
 
 		item->Pose.Orientation.SetY(item->Pose.Orientation.y + dry);
-		item->Pose.Orientation.SetX(item->Pose.Orientation.x + drx);
+		item->Pose.Orientation.x = item->Pose.Orientation.x + drx;
 	}
 
 	int x = item->Pose.Position.x;

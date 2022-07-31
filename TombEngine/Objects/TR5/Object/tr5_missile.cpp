@@ -32,7 +32,7 @@ void MissileControl(short itemNumber)
 		{
 			if (fx->fallspeed < 512)
 				fx->fallspeed += 36;
-			fx->pos.Orientation.SetX(fx->pos.Orientation.x - fx->fallspeed);
+			fx->pos.Orientation.x = fx->pos.Orientation.x - fx->fallspeed;
 		}
 	}
 	else
@@ -87,7 +87,7 @@ void MissileControl(short itemNumber)
 			else
 				dx = dh;
 
-			fx->pos.Orientation.SetX(fx->pos.Orientation.x + dx);
+			fx->pos.Orientation.x = fx->pos.Orientation.x + dx;
 			fx->pos.Orientation.SetY(fx->pos.Orientation.y + dy);
 		}
 		

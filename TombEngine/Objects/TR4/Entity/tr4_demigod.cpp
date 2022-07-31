@@ -157,10 +157,10 @@ namespace TEN::Entities::TR4
 			fx->pos.Position.y = pose->Position.y - (GetRandomControl() & 0x3F) - 32;
 			fx->pos.Position.z = pose->Position.z;
 
-			fx->pos.Orientation.SetX(pose->Orientation.x);
+			fx->pos.Orientation.x = pose->Orientation.x;
 
 			if (flags < 4)
-				fx->pos.Orientation.SetY(pose->Orientation.y);
+				fx->pos.Orientation.y = pose->Orientation.y;
 			else
 				fx->pos.Orientation.SetY(pose->Orientation.y + (GetRandomControl() & 0x7FF) - Angle::DegToRad(5.6f));
 

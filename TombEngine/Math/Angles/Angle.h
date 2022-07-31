@@ -27,8 +27,6 @@
 		// Converters
 		static float DegToRad(float degrees);
 		static float RadToDeg(float radians);
-
-		// Temporary legacy short angle form support for particularly cryptic code
 		static float ShrtToRad(short shortForm);
 		static short DegToShrt(float degrees);
 		static short RadToShrt(float radians);

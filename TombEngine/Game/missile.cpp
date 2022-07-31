@@ -29,12 +29,12 @@ void ShootAtLara(FX_INFO *fx)
 	y += bounds->Y2 + (bounds->Y1 - bounds->Y2) * 0.75f;
 
 	int distance = sqrt(pow(x, 2) + pow(z, 2));
-	fx->pos.Orientation.SetX(-atan2(distance, y));
+	fx->pos.Orientation.x = -atan2(distance, y);
 	fx->pos.Orientation.SetY(atan2(z, x));
 
 	// Random scatter (only a little bit else it's too hard to avoid).
-	fx->pos.Orientation.SetX(fx->pos.Orientation.x + (GetRandomControl() - 0x4000) / 0x40);
-	fx->pos.Orientation.SetY(fx->pos.Orientation.y + (GetRandomControl() - 0x4000) / 0x40);
+	fx->pos.Orientation.x += Angle::ShrtToRad((GetRandomControl() - 0x4000) / 0x40);
+	fx->pos.Orientation.y += Angle::ShrtToRad((GetRandomControl() - 0x4000) / 0x40);
 }
 
 void ControlMissile(short fxNumber)
@@ -43,7 +43,7 @@ void ControlMissile(short fxNumber)
 
 	if (fx->objectNumber == ID_SCUBA_HARPOON && !TestEnvironment(ENV_FLAG_WATER, fx->roomNumber) && fx->pos.Orientation.x > -0x3000)
 	{
-		fx->pos.Orientation.SetX(fx->pos.Orientation.x - Angle::DegToRad(1.0f));
+		fx->pos.Orientation.x -= Angle::DegToRad(1.0f);
 	}
 
 	fx->pos.Position.y += fx->speed * sin(-fx->pos.Orientation.x);

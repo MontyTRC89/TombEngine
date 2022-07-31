@@ -25,7 +25,7 @@ using namespace TEN::Input;
 void lara_as_surface_dive(ItemInfo* item, CollisionInfo* coll)
 {
 	if (TrInput & IN_FORWARD)
-		item->Pose.Orientation.SetX(Angle::Normalize(item->Pose.Orientation.x - Angle::DegToRad(1.0f)));
+		item->Pose.Orientation.x -= Angle::DegToRad(1.0f);
 }
 
 // State:		LS_ONWATER_DIVE (35)

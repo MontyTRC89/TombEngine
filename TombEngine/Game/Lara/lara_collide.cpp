@@ -522,13 +522,13 @@ void LaraSwimCollision(ItemInfo* item, CollisionInfo* coll)
 			if (item->Pose.Orientation.x >= Angle::DegToRad(-25.0f))
 			{
 				if (item->Pose.Orientation.x > Angle::DegToRad(5.0f))
-					item->Pose.Orientation.SetX(item->Pose.Orientation.x + Angle::DegToRad(0.5f));
+					item->Pose.Orientation.x += Angle::DegToRad(0.5f);
 				else if (item->Pose.Orientation.x < Angle::DegToRad(-5.0f))
-					item->Pose.Orientation.SetX(item->Pose.Orientation.x - Angle::DegToRad(0.5f));
+					item->Pose.Orientation.x -= Angle::DegToRad(0.5f);
 				else if (item->Pose.Orientation.x > 0)
-					item->Pose.Orientation.SetX(item->Pose.Orientation.x + Angle::DegToRad(0.25f));
+					item->Pose.Orientation.x += Angle::DegToRad(0.25f);
 				else if (item->Pose.Orientation.x < 0)
-					item->Pose.Orientation.SetX(item->Pose.Orientation.x - Angle::DegToRad(0.25));
+					item->Pose.Orientation.x -= Angle::DegToRad(0.25);
 				else
 				{
 					item->Animation.VerticalVelocity = 0;
@@ -537,13 +537,13 @@ void LaraSwimCollision(ItemInfo* item, CollisionInfo* coll)
 			}
 			else
 			{
-				item->Pose.Orientation.SetX(item->Pose.Orientation.x - Angle::DegToRad(1.0f));
+				item->Pose.Orientation.x = item->Pose.Orientation.x - Angle::DegToRad(1.0f);
 				flag = 1;
 			}
 		}
 		else
 		{
-			item->Pose.Orientation.SetX(item->Pose.Orientation.x + Angle::DegToRad(1.0f));
+			item->Pose.Orientation.x = item->Pose.Orientation.x + Angle::DegToRad(1.0f);
 			flag = 1;
 		}
 
@@ -561,7 +561,7 @@ void LaraSwimCollision(ItemInfo* item, CollisionInfo* coll)
 	case CT_TOP:
 		if (item->Pose.Orientation.x >= Angle::DegToRad(-45.0f))
 		{
-			item->Pose.Orientation.SetX(item->Pose.Orientation.x - Angle::DegToRad(1.0f));
+			item->Pose.Orientation.x -= Angle::DegToRad(1.0f);
 			flag = 1;
 		}
 
@@ -592,7 +592,7 @@ void LaraSwimCollision(ItemInfo* item, CollisionInfo* coll)
 	if (coll->Middle.Floor < 0 && coll->Middle.Floor != NO_HEIGHT)
 	{
 		flag = 1;
-		item->Pose.Orientation.SetX(item->Pose.Orientation.x + Angle::DegToRad(1.0f));
+		item->Pose.Orientation.x += Angle::DegToRad(1.0f);
 		item->Pose.Position.y += coll->Middle.Floor;
 	}
 
@@ -660,14 +660,14 @@ void LaraWaterCurrent(ItemInfo* item, CollisionInfo* coll)
 	if (coll->CollisionType == CT_FRONT)
 	{
 		if (item->Pose.Orientation.x > Angle::DegToRad(35.0f))
-			item->Pose.Orientation.SetX(item->Pose.Orientation.x + Angle::DegToRad(1.0f));
+			item->Pose.Orientation.x = item->Pose.Orientation.x + Angle::DegToRad(1.0f);
 		else if (item->Pose.Orientation.x < Angle::DegToRad(-35.0f))
-			item->Pose.Orientation.SetX(item->Pose.Orientation.x - Angle::DegToRad(1.0f));
+			item->Pose.Orientation.x = item->Pose.Orientation.x - Angle::DegToRad(1.0f);
 		else
 			item->Animation.VerticalVelocity = 0;
 	}
 	else if (coll->CollisionType == CT_TOP)
-		item->Pose.Orientation.SetX(item->Pose.Orientation.x - Angle::DegToRad(1.0f));
+		item->Pose.Orientation.x -= Angle::DegToRad(1.0f);
 	else if (coll->CollisionType == CT_TOP_FRONT)
 		item->Animation.VerticalVelocity = 0;
 	else if (coll->CollisionType == CT_LEFT)

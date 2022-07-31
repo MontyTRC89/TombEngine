@@ -857,7 +857,7 @@ void CalculateItemRotationToSurface(ItemInfo* item, float radiusDivisor, float x
 		return;
 
 	// NOTE: float(atan2()) is required, else warning about double !
-	item->Pose.Orientation.SetX(Angle::DegToRad(float(atan2(frontHDif, 2 * radiusZ)) / RADIAN) + xOffset);
+	item->Pose.Orientation.x = Angle::DegToRad(float(atan2(frontHDif, 2 * radiusZ)) / RADIAN) + xOffset;
 	item->Pose.Orientation.SetZ(Angle::DegToRad(float(atan2(sideHDif, 2 * radiusX)) / RADIAN) + zOffset);
 }
 

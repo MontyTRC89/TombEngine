@@ -67,7 +67,7 @@ namespace TEN::Entities::TR4
 			locust->on = true;
 			//locust->target = target != nullptr ? target : nullptr;
 			locust->pos.Position = end;
-			locust->pos.Orientation.SetX((GetRandomControl() & 0x3FF) + angles.x - Angle::DegToRad(2.8));
+			locust->pos.Orientation.x = Angle::ShrtToRad(GetRandomControl() & 0x3FF) + angles.x - Angle::DegToRad(2.8);
 			locust->pos.Orientation.SetY((GetRandomControl() & 0x7FF) + angles.y - Angle::DegToRad(5.6f));
 			locust->roomNumber = item->RoomNumber;
 			locust->randomRotation = (GetRandomControl() & 0x1F) + 0x10;
@@ -192,8 +192,8 @@ namespace TEN::Entities::TR4
 					if (shiftXrot > random || shiftXrot < -random)
 						shiftXrot = -random;
 
-					locust->pos.Orientation.SetX(locust->pos.Orientation.x + shiftXrot);
-					locust->pos.Orientation.SetY(locust->pos.Orientation.y + shiftYrot);
+					locust->pos.Orientation.x += shiftXrot;
+					locust->pos.Orientation.y += shiftYrot;
 				}
 
 				locust->pos.Position.x += locust->randomRotation * cos(locust->pos.Orientation.x) * sin(locust->pos.Orientation.y);

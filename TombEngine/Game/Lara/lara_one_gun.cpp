@@ -510,10 +510,10 @@ void HarpoonBoltControl(short itemNumber)
 		item->Pose.Orientation.SetZ(item->Pose.Orientation.z + Angle::DegToRad(35.0f));
 		if (!TestEnvironment(ENV_FLAG_WATER, item->RoomNumber))
 		{
-			item->Pose.Orientation.SetX(item->Pose.Orientation.x - Angle::DegToRad(1.0f));
+			item->Pose.Orientation.x -= Angle::DegToRad(1.0f);
 
 			if (item->Pose.Orientation.x < Angle::DegToRad(-90.0f))
-				item->Pose.Orientation.SetX(Angle::DegToRad(-90.0f));
+				item->Pose.Orientation.x = Angle::DegToRad(-90.0f);
 
 			aboveWater = true;
 			item->Animation.Velocity = HARPOON_VELOCITY * cos(item->Pose.Orientation.x);
@@ -771,8 +771,8 @@ void GrenadeControl(short itemNumber)
 					
 					InitialiseItem(newGrenadeItemNumber);
 					
-					newGrenade->Pose.Orientation.SetX((GetRandomControl() & 0x3FFF) + Angle::DegToRad(45.0f));
-					newGrenade->Pose.Orientation.SetY(GetRandomControl() * 2);
+					newGrenade->Pose.Orientation.x = Angle::ShrtToRad(GetRandomControl() & 0x3FFF) + Angle::DegToRad(45.0f);
+					newGrenade->Pose.Orientation.y = Angle::ShrtToRad(GetRandomControl() * 2);
 					newGrenade->Pose.Orientation.z = 0.0f;
 					newGrenade->Animation.Velocity = 64;
 					newGrenade->Animation.VerticalVelocity = -64 * sin(newGrenade->Pose.Orientation.x);
@@ -817,11 +817,11 @@ void GrenadeControl(short itemNumber)
 
 		if (item->Animation.Velocity)
 		{
-			item->Pose.Orientation.SetZ(item->Pose.Orientation.z + (((item->Animation.Velocity / 16) + 3) * Angle::DegToRad(1.0f)));
+			item->Pose.Orientation.z += (((item->Animation.Velocity / 16) + 3) * Angle::DegToRad(1.0f));
 			if (item->Animation.RequiredState)
-				item->Pose.Orientation.SetY(item->Pose.Orientation.y + (((item->Animation.Velocity / 4) + 3) * Angle::DegToRad(1.0f)));
+				item->Pose.Orientation.y += (((item->Animation.Velocity / 4) + 3) * Angle::DegToRad(1.0f));
 			else
-				item->Pose.Orientation.SetX(item->Pose.Orientation.x + (((item->Animation.Velocity / 4) + 3) * Angle::DegToRad(1.0f)));
+				item->Pose.Orientation.x += (((item->Animation.Velocity / 4) + 3) * Angle::DegToRad(1.0f));
 		}
 	}
 	else
@@ -832,11 +832,11 @@ void GrenadeControl(short itemNumber)
 
 		if (item->Animation.Velocity)
 		{
-			item->Pose.Orientation.SetZ( item->Pose.Orientation.z + (((item->Animation.Velocity / 4) + 7) * Angle::DegToRad(1.0f)));
+			item->Pose.Orientation.z += (((item->Animation.Velocity / 4) + 7) * Angle::DegToRad(1.0f));
 			if (item->Animation.RequiredState)
-				item->Pose.Orientation.SetY(item->Pose.Orientation.y + (((item->Animation.Velocity / 2) + 7) * Angle::DegToRad(1.0f)));
+				item->Pose.Orientation.y += (((item->Animation.Velocity / 2) + 7) * Angle::DegToRad(1.0f));
 			else
-				item->Pose.Orientation.SetX(item->Pose.Orientation.x + (((item->Animation.Velocity / 2) + 7) * Angle::DegToRad(1.0f)));
+				item->Pose.Orientation.x += (((item->Animation.Velocity / 2) + 7) * Angle::DegToRad(1.0f));
 		}
 	}
 

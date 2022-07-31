@@ -192,9 +192,9 @@ namespace TEN::Entities::TR4
 				{
 					// Beetle has hit a wall a high step.
 					if (angle <= 0)
-						beetle->Pose.Orientation.SetY(beetle->Pose.Orientation.y - Angle::DegToRad(90.0f));
+						beetle->Pose.Orientation.y -= Angle::DegToRad(90.0f);
 					else
-						beetle->Pose.Orientation.SetY(beetle->Pose.Orientation.y + Angle::DegToRad(90.0f));
+						beetle->Pose.Orientation.y += Angle::DegToRad(90.0f);
 
 					beetle->Pose.Position = oldPos;
 					beetle->Pose.Orientation.x = 0.0f;
@@ -220,7 +220,7 @@ namespace TEN::Entities::TR4
 					NextBeetle = 0;
 				}
 				else
-					beetle->Pose.Orientation.SetX(-64 * beetle->VerticalVelocity);
+					beetle->Pose.Orientation.x = Angle::ShrtToRad(-64 * beetle->VerticalVelocity);
 			}
 		}
 	}

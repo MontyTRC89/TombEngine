@@ -87,8 +87,8 @@ void TriggerLittleBat(ItemInfo* item)
 		auto* bat = &Bats[batNumber];
 
 		bat->Pose.Position = item->Pose.Position;
-		bat->Pose.Orientation.SetX(Angle::ShrtToRad((GetRandomControl() & 0x3FF) - 512));
-		bat->Pose.Orientation.SetY(Angle::ShrtToRad(GetRandomControl() & 0x7FF) + item->Pose.Orientation.y + Angle::DegToRad(-180.0f) - Angle::DegToRad(5.6f));
+		bat->Pose.Orientation.x = Angle::ShrtToRad((GetRandomControl() & 0x3FF) - 512);
+		bat->Pose.Orientation.y = Angle::ShrtToRad(GetRandomControl() & 0x7FF) + item->Pose.Orientation.y + Angle::DegToRad(-180.0f) - Angle::DegToRad(5.6f);
 		bat->RoomNumber = item->RoomNumber;
 		bat->On = true;
 		bat->Flags = 0;
@@ -189,8 +189,8 @@ void UpdateBats()
 			else if (yAngle > Velocity)
 				yAngle = Velocity;
 
-			bat->Pose.Orientation.SetY(bat->Pose.Orientation.y + yAngle);
-			bat->Pose.Orientation.SetX(bat->Pose.Orientation.x + xAngle);
+			bat->Pose.Orientation.y += yAngle;
+			bat->Pose.Orientation.x += xAngle;
 		}
 
 		int sp = bat->Velocity * cos(bat->Pose.Orientation.x);

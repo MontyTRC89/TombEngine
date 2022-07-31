@@ -323,8 +323,8 @@ void FloorShake(ItemInfo* item)
 
 void Turn180(ItemInfo* item)
 {
-	item->Pose.Orientation.SetY(item->Pose.Orientation.y - Angle::DegToRad(180.0f));
-	item->Pose.Orientation.SetX(-item->Pose.Orientation.x);
+	item->Pose.Orientation.y -= Angle::DegToRad(180.0f);
+	item->Pose.Orientation.x = -item->Pose.Orientation.x;
 }
 
 void FinishLevel(ItemInfo* item)

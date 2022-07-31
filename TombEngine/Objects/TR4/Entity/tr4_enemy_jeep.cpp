@@ -32,7 +32,7 @@ namespace TEN::Entities::TR4
 
 			InitialiseItem(grenadeItemNumber);
 
-		grenadeItem->Pose.Orientation.SetX(item->Pose.Orientation.x);
+		grenadeItem->Pose.Orientation.x = item->Pose.Orientation.x;
 		grenadeItem->Pose.Orientation.SetY(item->Pose.Orientation.y + Angle::DegToRad(-180.0f));
 		grenadeItem->Pose.Orientation.z = 0.0f;
 
@@ -328,11 +328,11 @@ namespace TEN::Entities::TR4
 				item->ItemFlags[2] = 0;
 
 		if (abs(xRot - item->Pose.Orientation.x) < Angle::DegToRad(1.4f))
-			item->Pose.Orientation.SetX(xRot);
+			item->Pose.Orientation.x = xRot;
 		else if (xRot < item->Pose.Orientation.x)
-			item->Pose.Orientation.SetX(item->Pose.Orientation.x - Angle::DegToRad(1.4f));
+			item->Pose.Orientation.x -= Angle::DegToRad(1.4f);
 		else 
-			item->Pose.Orientation.SetX(item->Pose.Orientation.x + Angle::DegToRad(1.4f));
+			item->Pose.Orientation.x += Angle::DegToRad(1.4f);
 
 		if (abs(zRot - item->Pose.Orientation.z) < Angle::DegToRad(1.4f))
 			item->Pose.Orientation.SetZ(zRot);

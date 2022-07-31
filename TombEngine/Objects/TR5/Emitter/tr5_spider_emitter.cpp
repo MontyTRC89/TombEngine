@@ -56,7 +56,7 @@ void InitialiseSpiders(short itemNumber)
 
 	short flags = item->TriggerFlags / -24;
 
-	item->Pose.Orientation.SetX(Angle::DegToRad(45.0f));
+	item->Pose.Orientation.x = Angle::DegToRad(45.0f);
 	item->ItemFlags[1] = flags & 2;
 	item->ItemFlags[2] = flags & 4;
 	item->ItemFlags[0] = flags & 1;
@@ -193,7 +193,7 @@ void UpdateSpiders()
 								NextSpider = 0;
 							}
 							else
-								spider->Pose.Orientation.SetX(Angle::ShrtToRad(-128 * spider->VerticalVelocity));
+								spider->Pose.Orientation.x = Angle::ShrtToRad(-128 * spider->VerticalVelocity);
 						}
 						else
 						{
@@ -206,7 +206,7 @@ void UpdateSpiders()
 					{
 						spider->Pose.Position = oldPos;
 						spider->Pose.Position.y -= 8;
-						spider->Pose.Orientation.SetX(Angle::DegToRad(78.75f));
+						spider->Pose.Orientation.x = Angle::DegToRad(78.75f);
 						spider->VerticalVelocity = 0;
 
 						if (!(GetRandomControl() & 0x1F))

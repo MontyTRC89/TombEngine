@@ -69,7 +69,7 @@ void TrainControl(short itemNumber)
 	if (probedRoomNumber != item->RoomNumber)
 		ItemNewRoom(itemNumber, probedRoomNumber);
 
-	item->Pose.Orientation.SetX(Angle::ShrtToRad(-(rh - floorHeight) * 2));
+	item->Pose.Orientation.x = Angle::ShrtToRad(-(rh - floorHeight) * 2);
 
 	TriggerDynamicLight(item->Pose.Position.x + SECTOR(3) * sinY, item->Pose.Position.y, item->Pose.Position.z + SECTOR(3) * cosY, 16, 31, 31, 31);
 

@@ -103,7 +103,7 @@
 
 	float Angle::RadToDeg(float radians)
 	{
-		return fmod((Normalize(radians) * (180.0f / PI)) + 360.0f, 360.0f);
+		return fmod((radians * (180.0f / PI)) + 360.0f, 360.0f);
 	}
 
 	float Angle::ShrtToRad(short shortForm)

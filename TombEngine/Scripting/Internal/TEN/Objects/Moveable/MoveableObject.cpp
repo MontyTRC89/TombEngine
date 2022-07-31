@@ -512,9 +512,9 @@ Rotation Moveable::GetRot() const
 
 void Moveable::SetRot(Rotation const& rot)
 {
-	m_item->Pose.Orientation.SetX(Angle::DegToRad(rot.x));
-	m_item->Pose.Orientation.SetY(Angle::DegToRad(rot.y));
-	m_item->Pose.Orientation.SetZ(Angle::DegToRad(rot.z));
+	m_item->Pose.Orientation.x = Angle::DegToRad(rot.x);
+	m_item->Pose.Orientation.y = Angle::DegToRad(rot.y);
+	m_item->Pose.Orientation.z = Angle::DegToRad(rot.z);
 }
 
 short Moveable::GetHP() const

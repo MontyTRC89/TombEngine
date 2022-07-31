@@ -504,21 +504,21 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 					if (item->Animation.ActiveState == LS_SWAN_DIVE)
 					{
 						SetAnimation(item, LA_SWANDIVE_DIVE);
-						item->Pose.Orientation.SetX(Angle::DegToRad(-45.0f));
+						item->Pose.Orientation.x = Angle::DegToRad(-45.0f);
 						item->Animation.VerticalVelocity *= 2;
 						lara->Control.HandStatus = HandStatus::Free;
 					}
 					else if (item->Animation.ActiveState == LS_FREEFALL_DIVE)
 					{
 						SetAnimation(item, LA_SWANDIVE_DIVE);
-						item->Pose.Orientation.SetX(Angle::DegToRad(-85.0f));
+						item->Pose.Orientation.x = Angle::DegToRad(-85.0f);
 						item->Animation.VerticalVelocity *= 2;
 						lara->Control.HandStatus = HandStatus::Free;
 					}
 					else
 					{
 						SetAnimation(item, LA_FREEFALL_DIVE);
-						item->Pose.Orientation.SetX(Angle::DegToRad(-45.0f));
+						item->Pose.Orientation.x = Angle::DegToRad(-45.0f);
 						item->Animation.VerticalVelocity = item->Animation.VerticalVelocity / 2 * 3;
 					}
 
@@ -591,7 +591,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 			{
 				SetAnimation(item, LA_UNDERWATER_RESURFACE);
 				//ResetLaraLean(item);
-				item->Pose.Orientation.SetX(item->Pose.Orientation.x - Angle::DegToRad(90.0f));
+				item->Pose.Orientation.x -= Angle::DegToRad(90.0f);
 				ResetLaraFlex(item);
 				item->Pose.Position.y = waterHeight + 1;
 				item->Animation.VerticalVelocity = 0;
@@ -952,9 +952,9 @@ void LaraUnderwater(ItemInfo* item, CollisionInfo* coll)
 
 	// Clamp x axis rotation.
 	if (item->Pose.Orientation.x < Angle::DegToRad(-90.0f))
-		item->Pose.Orientation.SetX(Angle::DegToRad(-90.0f));
+		item->Pose.Orientation.x = Angle::DegToRad(-90.0f);
 	else if (item->Pose.Orientation.x > Angle::DegToRad(90.0f))
-		item->Pose.Orientation.SetX(Angle::DegToRad(90.0f));
+		item->Pose.Orientation.x = Angle::DegToRad(90.0f);
 
 	if (level->GetLaraType() == LaraType::Divesuit)
 	{

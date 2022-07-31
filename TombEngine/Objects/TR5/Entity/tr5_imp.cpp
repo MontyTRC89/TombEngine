@@ -83,7 +83,7 @@ static void ImpThrowStones(ItemInfo* item)
 	if (distance < 8)
 		distance = 8;
 
-	angles.SetX(angles.x + GetRandomControl() % (distance / 2) - (distance / 4));
+	angles.x = angles.x + GetRandomControl() % (distance / 2) - (distance / 4);
 	angles.SetY(angles.y + GetRandomControl() % (distance / 4) - (distance / 8));
 	
 	short fxNumber = CreateNewEffect(item->RoomNumber);

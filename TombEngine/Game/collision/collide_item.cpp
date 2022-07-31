@@ -589,11 +589,11 @@ bool Move3DPosTo3DPos(PHD_3DPOS* src, PHD_3DPOS* dest, int velocity, float angle
 
 	float deltaAngle = Angle::Normalize(dest->Orientation.x - src->Orientation.x);
 	if (deltaAngle > angleAdd)
-		src->Orientation.SetX(src->Orientation.x + angleAdd);
+		src->Orientation.x = src->Orientation.x + angleAdd;
 	else if (deltaAngle < -angleAdd)
-		src->Orientation.SetX(src->Orientation.x - angleAdd);
+		src->Orientation.x = src->Orientation.x - angleAdd;
 	else
-		src->Orientation.SetX(dest->Orientation.x);
+		src->Orientation.x = dest->Orientation.x;
 
 	deltaAngle = dest->Orientation.y - src->Orientation.y;
 	if (deltaAngle > angleAdd)

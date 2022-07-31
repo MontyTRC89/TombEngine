@@ -77,12 +77,12 @@ void AutoGunsControl(short itemNumber)
 			if (los)
 			{
 				angles = EulerAngles::OrientBetweenPoints(Vector3(pos1.x, pos1.y, pos1.z), Vector3(pos2.x, pos2.y, pos2.z));
-				angles.SetY(angles.y - item->Pose.Orientation.y);
+				angles.y -= item->Pose.Orientation.y;
 			}
 			else
 			{
-				angles.SetX(item->ItemFlags[1]);
-				angles.SetY(item->ItemFlags[0]);
+				angles.x = item->ItemFlags[1];
+				angles.y = item->ItemFlags[0];
 			}
 
 			// TODO: Short to float conversion

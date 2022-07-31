@@ -20,9 +20,9 @@ void lara_as_swimcheat(ItemInfo* item, CollisionInfo* coll)
 	auto* lara = GetLaraInfo(item);
 
 	if (TrInput & IN_FORWARD)
-		item->Pose.Orientation.SetX(item->Pose.Orientation.x - Angle::DegToRad(3.0f));
+		item->Pose.Orientation.x -= Angle::DegToRad(3.0f);
 	else if (TrInput & IN_BACK)
-		item->Pose.Orientation.SetX(item->Pose.Orientation.x + Angle::DegToRad(3.0f));
+		item->Pose.Orientation.x += Angle::DegToRad(3.0f);
 
 	if (TrInput & IN_LEFT)
 		ModulateLaraTurnRateY(item, Angle::DegToRad(3.4f), 0, Angle::DegToRad(6.0f));
@@ -33,7 +33,7 @@ void lara_as_swimcheat(ItemInfo* item, CollisionInfo* coll)
 		TriggerDynamicLight(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, 31, 150, 150, 150);
 
 	if (TrInput & IN_OPTION)
-		lara->Control.TurnRate.SetY(Angle::DegToRad(-12.0f));
+		lara->Control.TurnRate.y = Angle::DegToRad(-12.0f);
 
 	if (TrInput & IN_JUMP)
 	{

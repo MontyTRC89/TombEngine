@@ -24,23 +24,23 @@ void ControlBodyPart(short fxNumber)
 	if (fx->counter <= 0)
 	{
 		if (fx->speed)
-			fx->pos.Orientation.x += 4 * fx->fallspeed;
+			fx->pos.Orientation.x += Angle::ShrtToRad(4 * fx->fallspeed);
 
 		fx->fallspeed += 6;
 	}
 	else
 	{
 		int modulus = 62 - fx->counter;
-		int random = modulus <= 1 ? 0 : 2 * GetRandomControl() % modulus;
+		float random = Angle::ShrtToRad((modulus <= 1) ? 0 : (2 * GetRandomControl() % modulus));
 		if (fxNumber & 1)
 		{
-			fx->pos.Orientation.SetZ(fx->pos.Orientation.z - random);
-			fx->pos.Orientation.SetX(fx->pos.Orientation.x + random);
+			fx->pos.Orientation.z -= random;
+			fx->pos.Orientation.x += random;
 		}
 		else
 		{
-			fx->pos.Orientation.SetZ(fx->pos.Orientation.z + random);
-			fx->pos.Orientation.SetX(fx->pos.Orientation.x - random);
+			fx->pos.Orientation.z += random;
+			fx->pos.Orientation.x -= random;
 		}
 
 		if (--fx->counter < 8)

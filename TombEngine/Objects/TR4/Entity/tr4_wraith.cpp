@@ -127,7 +127,7 @@ namespace TEN::Entities::TR4
 				else
 				{
 					item->ItemFlags[3] += velocity;
-					item->Pose.Orientation.SetX(item->Pose.Orientation.x + item->ItemFlags[3]);
+					item->Pose.Orientation.x += item->ItemFlags[3];
 				}
 			}
 			else if (item->ItemFlags[3] >= 0)
@@ -135,11 +135,11 @@ namespace TEN::Entities::TR4
 			else
 			{
 				item->ItemFlags[3] -= velocity;
-				item->Pose.Orientation.SetX(item->Pose.Orientation.x + item->ItemFlags[3]);
+				item->Pose.Orientation.x += item->ItemFlags[3];
 			}
 		}
 		else
-			item->Pose.Orientation.SetX(item->Pose.Orientation.x + angleV);
+			item->Pose.Orientation.x += angleV;
 
 		auto probe = GetCollision(item);
 
