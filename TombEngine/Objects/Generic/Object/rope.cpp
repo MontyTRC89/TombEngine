@@ -755,6 +755,6 @@ namespace TEN::Entities::Generic
 		item->Pose.Position.y += -112 * rotMatrix.m[1][2];
 		item->Pose.Position.z += -112 * rotMatrix.m[2][2];
 
-		item->Pose.Orientation.Set(angle[0], angle[1], angle[2]);
+		item->Pose.Orientation = EulerAngles(angle[0], angle[1], angle[2]);
 	}
 }

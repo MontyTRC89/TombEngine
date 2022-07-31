@@ -286,7 +286,7 @@ void FireShotgun(ItemInfo* laraItem)
 
 	if (!lara->LeftArm.Locked)
 	{
-		armOrient.Set(
+		armOrient = EulerAngles(
 			lara->ExtraTorsoRot.x + lara->LeftArm.Orientation.x,
 			lara->ExtraTorsoRot.y + (lara->LeftArm.Orientation.y + laraItem->Pose.Orientation.y),
 			0.0f
@@ -1649,7 +1649,7 @@ void FireHK(ItemInfo* laraItem, int mode)
 
 	if (!lara->LeftArm.Locked)
 	{
-		angles.Set(
+		angles = EulerAngles(
 			lara->ExtraTorsoRot.x + lara->LeftArm.Orientation.x,
 			lara->ExtraTorsoRot.y + lara->LeftArm.Orientation.y + laraItem->Pose.Orientation.y,
 			0.0f

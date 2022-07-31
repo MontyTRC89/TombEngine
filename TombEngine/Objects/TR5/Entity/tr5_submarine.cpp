@@ -151,7 +151,7 @@ static void SubmarineAttack(ItemInfo* item)
 
 		InitialiseItem(itemNumber);
 
-		torpedoItem->Pose.Orientation.Set(0.0f, item->Pose.Orientation.y, 0.0f);
+		torpedoItem->Pose.Orientation = EulerAngles(0.0f, item->Pose.Orientation.y, 0.0f);
 		torpedoItem->Animation.Velocity = 0;
 		torpedoItem->Animation.VerticalVelocity = 0;
 		torpedoItem->ItemFlags[0] = -1;

@@ -38,13 +38,9 @@
 
 		static EulerAngles OrientBetweenPoints(Vector3 origin, Vector3 target);
 
-		// Getters
 		Vector3 GetDirectionVector();
 
-		// TODO: Roll back OOy set methods.
-		// Setters
-		void Set(EulerAngles orient);
-		void Set(float xAngle, float yAngle, float zAngle);
+		// TODO: Remove.
 		void SetY(float angle = 0.0f);
 
 		// Operators

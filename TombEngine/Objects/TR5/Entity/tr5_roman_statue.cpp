@@ -68,7 +68,7 @@ static void RomanStatueHitEffect(ItemInfo* item, Vector3Int* pos, int joint)
 			fx->pos.Position.y = pos->y;
 			fx->pos.Position.z = pos->z;
 			fx->roomNumber = item->RoomNumber;
-			fx->pos.Orientation.Set(0.0f, Angle::ShrtToRad(GetRandomControl() * 2), 0.0f);
+			fx->pos.Orientation = EulerAngles(0.0f, Angle::ShrtToRad(GetRandomControl() * 2), 0.0f);
 			fx->speed = 1;
 			fx->fallspeed = 0;
 			fx->objectNumber = ID_BODY_PART;
@@ -230,7 +230,7 @@ static void RomanStatueAttack(PHD_3DPOS* pos, short roomNumber, short count)
 		fx->pos.Position.x = pos->Position.x;
 		fx->pos.Position.y = pos->Position.y;
 		fx->pos.Position.z = pos->Position.z;
-		fx->pos.Orientation.Set(pos->Orientation.x, pos->Orientation.y, 0.0f);
+		fx->pos.Orientation = EulerAngles(pos->Orientation.x, pos->Orientation.y, 0.0f);
 		fx->roomNumber = roomNumber;
 		fx->counter = 16 * count + 15;
 		fx->flag1 = 1;

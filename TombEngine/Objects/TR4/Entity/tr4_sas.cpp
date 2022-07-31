@@ -582,7 +582,11 @@ namespace TEN::Entities::TR4
 
 			InitialiseItem(itemNumber);
 
-			grenadeItem->Pose.Orientation.Set(angle1 + item->Pose.Orientation.x, angle2 + item->Pose.Orientation.y, 0.0f);
+			grenadeItem->Pose.Orientation = EulerAngles(
+				item->Pose.Orientation.x + angle1,
+				item->Pose.Orientation.y + angle2,
+				0.0f
+			);
 
 			if (GetRandomControl() & 3)
 				grenadeItem->ItemFlags[0] = (int)GrenadeType::Normal;

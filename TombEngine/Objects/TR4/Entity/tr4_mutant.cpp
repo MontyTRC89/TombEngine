@@ -70,7 +70,7 @@ namespace TEN::Entities::TR4
 			fx->pos.Position.x = src->Position.x;
 			fx->pos.Position.y = src->Position.y - (GetRandomControl() & 0x3F) - 32;
 			fx->pos.Position.z = src->Position.z;
-			fx->pos.Orientation.Set(src->Orientation.x, src->Orientation.y, 0.0f);
+			fx->pos.Orientation = EulerAngles(src->Orientation.x, src->Orientation.y, 0.0f);
 			fx->roomNumber = roomNumber;
 			fx->counter = 16 * counter + 15;
 			fx->objectNumber = ID_ENERGY_BUBBLES;

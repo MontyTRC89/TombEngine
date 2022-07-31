@@ -14,19 +14,23 @@
 
 	EulerAngles::EulerAngles(float xAngle, float yAngle, float zAngle)
 	{
-		this->Set(xAngle, yAngle, zAngle);
+		this->x = xAngle;
+		this->y = yAngle;
+		this->z = zAngle;
 	}
 
 	// TODO
 	EulerAngles::EulerAngles(Vector3 directionVector)
 	{
 		directionVector.Normalize();
-		this->Set(0.0f, 0.0f, 0.0f);
+		*this = EulerAngles::Zero;
 	}
 
 	void EulerAngles::Normalize()
 	{
-		this->Set(x, y, z);
+		this->x = Angle::Normalize(x);
+		this->y = Angle::Normalize(y);
+		this->z = Angle::Normalize(z);
 	}
 
 	EulerAngles EulerAngles::Normalize(EulerAngles orient)
@@ -139,18 +143,6 @@
 		);
 	}
 
-	void EulerAngles::Set(EulerAngles orient)
-	{
-		*this = orient;
-	}
-
-	void EulerAngles::Set(float xAngle, float yAngle, float zAngle)
-	{
-		this->x = Angle::Normalize(xAngle);
-		this->y = Angle::Normalize(yAngle);
-		this->z = Angle::Normalize(zAngle);
-	}
-
 	void EulerAngles::SetY(float angle)
 	{
 		this->y = Angle::Normalize(angle);
@@ -201,31 +193,41 @@
 	
 	EulerAngles& EulerAngles::operator +=(EulerAngles orient)
 	{
-		this->Set(x + orient.x, y + orient.y, z + orient.z);
+		this->x += orient.x;
+		this->y += orient.y;
+		this->z += orient.z;
 		return *this;
 	}
 
 	EulerAngles& EulerAngles::operator -=(EulerAngles orient)
 	{
-		this->Set(x - orient.x, y - orient.y, z - orient.z);
+		this->x -= orient.x;
+		this->y -= orient.y;
+		this->z -= orient.z;
 		return *this;
 	}
 
 	EulerAngles& EulerAngles::operator *=(EulerAngles orient)
 	{
-		this->Set(x * orient.x, y * orient.y, z * orient.z);
+		this->x *= orient.x;
+		this->y *= orient.y;
+		this->z *= orient.z;
 		return *this;
 	}
 
 	EulerAngles& EulerAngles::operator *=(float value)
 	{
-		this->Set(x * value, y * value, z * value);
+		this->x *= value;
+		this->y *= value;
+		this->z *= value;
 		return *this;
 	}
 
 	EulerAngles& EulerAngles::operator /=(float value)
 	{
-		this->Set(x / value, y / value, z / value);
+		this->x /= value;
+		this->y /= value;
+		this->z /= value;
 		return *this;
 	}
 //}

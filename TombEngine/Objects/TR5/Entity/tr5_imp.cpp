@@ -92,7 +92,7 @@ static void ImpThrowStones(ItemInfo* item)
 		auto* fx = &EffectList[fxNumber];
 
 		fx->pos.Position = pos1;
-		fx->pos.Orientation.Set((angles.x + distance) / 2, angles.y, 0.0f);
+		fx->pos.Orientation = EulerAngles((angles.x + distance) / 2, angles.y, 0.0f);
 		fx->roomNumber = item->RoomNumber;
 		fx->speed = 4 * sqrt(distance);
 

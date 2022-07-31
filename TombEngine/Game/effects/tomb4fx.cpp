@@ -989,7 +989,7 @@ void TriggerGunShell(short hand, short objNum, LaraWeaponType weaponType)
 	gshell->pos.Position.x = pos.x;
 	gshell->pos.Position.y = pos.y;
 	gshell->pos.Position.z = pos.z;
-	gshell->pos.Orientation.Set(0.0f, 0.0f, Angle::ShrtToRad(GetRandomControl()));
+	gshell->pos.Orientation = EulerAngles(0.0f, 0.0f, Angle::ShrtToRad(GetRandomControl()));
 	gshell->roomNumber = LaraItem->RoomNumber;
 	gshell->speed = (GetRandomControl() & 0x1F) + 16;
 	gshell->fallspeed = -48 - (GetRandomControl() & 7);

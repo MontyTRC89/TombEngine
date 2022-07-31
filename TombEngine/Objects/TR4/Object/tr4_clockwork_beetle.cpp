@@ -320,7 +320,7 @@ void UseClockworkBeetle(short flag)
 			item->Pose.Position = LaraItem->Pose.Position;
 
 			InitialiseItem(itemNumber);
-			item->Pose.Orientation.Set(0.0f, LaraItem->Pose.Orientation.y, 0.0f);
+			item->Pose.Orientation = EulerAngles(0.0f, LaraItem->Pose.Orientation.y, 0.0f);
 
 			if (Lara.Inventory.BeetleLife)
 				item->ItemFlags[0] = GetCollision(item).Block->Flags.MarkBeetle;

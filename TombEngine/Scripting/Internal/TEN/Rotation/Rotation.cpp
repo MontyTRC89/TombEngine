@@ -48,7 +48,7 @@ Rotation::Rotation(float aX, float aY, float aZ)
 
 void Rotation::StoreInPHDPos(EulerAngles& orient)
 {
-	orient.Set(x, y, z);
+	orient = EulerAngles(x, y, z);
 }
 
 Rotation::Rotation(EulerAngles orient)

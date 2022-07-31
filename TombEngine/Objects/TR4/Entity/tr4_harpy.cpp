@@ -81,7 +81,7 @@ static void TriggerHarpyMissile(PHD_3DPOS* pos, short roomNumber, int count)
 		fx->pos.Position.x = pos->Position.x;
 		fx->pos.Position.y = pos->Position.y - (GetRandomControl() & 0x3F) - 32;
 		fx->pos.Position.z = pos->Position.z;
-		fx->pos.Orientation.Set(pos->Orientation.x, pos->Orientation.y, 0.0f);
+		fx->pos.Orientation = EulerAngles(pos->Orientation.x, pos->Orientation.y, 0.0f);
 		fx->roomNumber = roomNumber;
 		fx->counter = 2 * GetRandomControl() + -32768;
 		fx->objectNumber = ID_ENERGY_BUBBLES;

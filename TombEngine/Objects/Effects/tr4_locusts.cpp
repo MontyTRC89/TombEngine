@@ -41,7 +41,7 @@ namespace TEN::Entities::TR4
 			if (item->ObjectNumber == ID_LOCUSTS_EMITTER)
 			{
 				end = item->Pose.Position;
-				angles.Set(
+				angles = EulerAngles(
 					0.0f,
 					item->Pose.Orientation.y - Angle::DegToRad(180.0f),
 					0.0f
