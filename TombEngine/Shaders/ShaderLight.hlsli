@@ -136,8 +136,14 @@ float3 DoShadowLight(float3 pos, float3 n, ShaderLight light)
 		return float3(0, 0, 0);
 	else
 	{
+		lightVec = normalize(lightVec);
+		float d = saturate(dot(n, lightVec));
 		float attenuation = ((radius - distance) / radius);
-		return (color * intensity * attenuation) * 2.0f;
+
+		float absolute = color * intensity * attenuation;
+		float directional = absolute * d;
+
+		return ((absolute * 0.33f) + (directional * 0.66f)) * 2.0f;
 	}
 }
 
