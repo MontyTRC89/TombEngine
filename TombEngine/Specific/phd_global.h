@@ -5,8 +5,6 @@
 #include "Math/Vector2i.h"
 #include "Math/Vector3i.h"
 
-using namespace TEN::Math;
-
 struct RendererRectangle
 {
 	int left;
