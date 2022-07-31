@@ -59,7 +59,7 @@ void KnifeControl(short fxNumber)
 	if (probe.RoomNumber != fx->roomNumber)
 		EffectNewRoom(fxNumber, probe.RoomNumber);
 
-	fx->pos.Orientation.SetZ(fx->pos.Orientation.z + Angle::DegToRad(30.0f));
+	fx->pos.Orientation.z += Angle::DegToRad(30.0f);
 
 	if (ItemNearLara(&fx->pos, 200))
 	{

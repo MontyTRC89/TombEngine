@@ -147,18 +147,13 @@
 	void EulerAngles::Set(float xAngle, float yAngle, float zAngle)
 	{
 		this->x = Angle::Normalize(xAngle);
-		this->SetY(yAngle);
-		this->SetZ(zAngle);
+		this->y = Angle::Normalize(yAngle);
+		this->z = Angle::Normalize(zAngle);
 	}
 
 	void EulerAngles::SetY(float angle)
 	{
 		this->y = Angle::Normalize(angle);
-	}
-
-	void EulerAngles::SetZ(float angle)
-	{
-		this->z = Angle::Normalize(angle);
 	}
 
 	bool EulerAngles::operator ==(EulerAngles orient)

@@ -507,7 +507,7 @@ void HarpoonBoltControl(short itemNumber)
 	// Update speed and check if above water
 	if (item->HitPoints == HARPOON_TIME)
 	{
-		item->Pose.Orientation.SetZ(item->Pose.Orientation.z + Angle::DegToRad(35.0f));
+		item->Pose.Orientation.z += Angle::DegToRad(35.0f);
 		if (!TestEnvironment(ENV_FLAG_WATER, item->RoomNumber))
 		{
 			item->Pose.Orientation.x -= Angle::DegToRad(1.0f);
@@ -1154,7 +1154,7 @@ void RocketControl(short itemNumber)
 				item->Animation.Velocity = ROCKET_VELOCITY / 4;
 		}
 
-		item->Pose.Orientation.SetZ(item->Pose.Orientation.z + (((item->Animation.Velocity / 8) + 3) * Angle::DegToRad(1.0f)));
+		item->Pose.Orientation.z += ((item->Animation.Velocity / 8) + 3) * Angle::DegToRad(1.0f);
 		abovewater = false;
 	}
 	else
@@ -1162,7 +1162,7 @@ void RocketControl(short itemNumber)
 		if (item->Animation.Velocity < ROCKET_VELOCITY)
 			item->Animation.Velocity += (item->Animation.Velocity / 4) + 4;
 
-		item->Pose.Orientation.SetZ(item->Pose.Orientation.z + (((item->Animation.Velocity / 4) + 7) * Angle::DegToRad(1.0f)));
+		item->Pose.Orientation.z += ((item->Animation.Velocity / 4) + 7) * Angle::DegToRad(1.0f);
 		abovewater = true;
 	}
 

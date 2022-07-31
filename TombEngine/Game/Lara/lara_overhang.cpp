@@ -336,7 +336,7 @@ void lara_col_slopeclimb(ItemInfo* item, CollisionInfo* coll)
 	// Engage shimmy mode if LEFT/LSTEP or RIGHT/RSTEP are pressed.
 	if (TrInput & IN_LEFT || TrInput & IN_RIGHT)
 	{
-		lara->NextCornerPos.Orientation.SetZ((item->Animation.AnimNumber == LA_OVERHANG_IDLE_LEFT) ? true : false); // HACK.
+		lara->NextCornerPos.Orientation.z = (item->Animation.AnimNumber == LA_OVERHANG_IDLE_LEFT) ? true : false; // HACK.
 		SetAnimation(item, item->Animation.AnimNumber == LA_OVERHANG_IDLE_LEFT ? LA_OVERHANG_IDLE_2_HANG_LEFT : LA_OVERHANG_IDLE_2_HANG_RIGHT);
 		return;
 	}
@@ -1063,7 +1063,7 @@ void SlopeMonkeyExtra(ItemInfo* item, CollisionInfo* coll)
 
 			if (SlopeCheck(probeNow.CeilingTilt, slopeData.Goal) || bridge >= 0)
 			{
-				lara->NextCornerPos.Orientation.SetZ(AlignToGrab(item));
+				lara->NextCornerPos.Orientation.z = AlignToGrab(item);
 
 				int ceiling = GetCollision(probeNow.Block, item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z).Position.Ceiling;
 				item->Pose.Position.y = ceiling + HEIGHT_ADJUST;

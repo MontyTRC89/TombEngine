@@ -447,12 +447,9 @@ bool MoveLaraPosition(Vector3Int* vec, ItemInfo* item, ItemInfo* laraItem)
 	auto* lara = GetLaraInfo(laraItem);
 
 	auto dest = PHD_3DPOS(item->Pose.Orientation);
-	dest.Orientation.SetY(item->Pose.Orientation.y);
-	dest.Orientation.SetZ(item->Pose.Orientation.z);
+	auto pos = vec->ToVector3();
 
-	Vector3 pos = Vector3(vec->x, vec->y, vec->z);
-
-	Matrix matrix = Matrix::CreateFromYawPitchRoll(
+	auto matrix = Matrix::CreateFromYawPitchRoll(
 		item->Pose.Orientation.y,
 		item->Pose.Orientation.x,
 		item->Pose.Orientation.z
@@ -589,9 +586,9 @@ bool Move3DPosTo3DPos(PHD_3DPOS* src, PHD_3DPOS* dest, int velocity, float angle
 
 	float deltaAngle = Angle::Normalize(dest->Orientation.x - src->Orientation.x);
 	if (deltaAngle > angleAdd)
-		src->Orientation.x = src->Orientation.x + angleAdd;
+		src->Orientation.x += angleAdd;
 	else if (deltaAngle < -angleAdd)
-		src->Orientation.x = src->Orientation.x - angleAdd;
+		src->Orientation.x -= angleAdd;
 	else
 		src->Orientation.x = dest->Orientation.x;
 
@@ -605,11 +602,11 @@ bool Move3DPosTo3DPos(PHD_3DPOS* src, PHD_3DPOS* dest, int velocity, float angle
 
 	deltaAngle = dest->Orientation.z - src->Orientation.z;
 	if (deltaAngle > angleAdd)
-		src->Orientation.SetZ(src->Orientation.z + angleAdd);
+		src->Orientation.z += angleAdd;
 	else if (deltaAngle < -angleAdd)
-		src->Orientation.SetZ(src->Orientation.z - angleAdd);
+		src->Orientation.z -= angleAdd;
 	else
-		src->Orientation.SetZ(dest->Orientation.z);
+		src->Orientation.z = dest->Orientation.z;
 
 	return (src->Position == dest->Position && src->Orientation == dest->Orientation);
 }

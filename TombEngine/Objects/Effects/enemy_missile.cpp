@@ -191,9 +191,9 @@ namespace TEN::Entities::Effects
 			fx->pos.Orientation.x += dx;
 		}
 
-		fx->pos.Orientation.SetZ(fx->pos.Orientation.z + 16 * fx->speed);
+		fx->pos.Orientation.z += Angle::ShrtToRad(16 * fx->speed);
 		if (fx->flag1 == 6)
-			fx->pos.Orientation.SetZ(fx->pos.Orientation.z + 16 * fx->speed);
+			fx->pos.Orientation.z += Angle::ShrtToRad(16 * fx->speed);
 
 		int oldX = fx->pos.Position.x;
 		int oldY = fx->pos.Position.y;

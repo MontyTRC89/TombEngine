@@ -23,7 +23,7 @@ void MissileControl(short itemNumber)
 	auto* fx = &EffectList[itemNumber];
 	if (fx->flag1 == 2)
 	{
-		fx->pos.Orientation.SetZ(fx->pos.Orientation.z + 16 * fx->speed);
+		fx->pos.Orientation.z += Angle::ShrtToRad(16 * fx->speed);
 
 		if (fx->speed > 64)
 			fx->speed -= 4;
@@ -91,10 +91,10 @@ void MissileControl(short itemNumber)
 			fx->pos.Orientation.SetY(fx->pos.Orientation.y + dy);
 		}
 		
-		fx->pos.Orientation.SetZ(fx->pos.Orientation.z + 16 * fx->speed);
+		fx->pos.Orientation.z += Angle::ShrtToRad(16 * fx->speed);
 
 		if (!fx->flag1)
-			fx->pos.Orientation.SetZ(fx->pos.Orientation.z + 16 * fx->speed);
+			fx->pos.Orientation.z += Angle::ShrtToRad(16 * fx->speed);
 	}
 
 	int x = fx->pos.Position.x;

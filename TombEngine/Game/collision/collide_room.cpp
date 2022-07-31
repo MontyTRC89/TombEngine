@@ -858,7 +858,7 @@ void CalculateItemRotationToSurface(ItemInfo* item, float radiusDivisor, float x
 
 	// NOTE: float(atan2()) is required, else warning about double !
 	item->Pose.Orientation.x = Angle::DegToRad(float(atan2(frontHDif, 2 * radiusZ)) / RADIAN) + xOffset;
-	item->Pose.Orientation.SetZ(Angle::DegToRad(float(atan2(sideHDif, 2 * radiusX)) / RADIAN) + zOffset);
+	item->Pose.Orientation.z = Angle::DegToRad(float(atan2(sideHDif, 2 * radiusX)) / RADIAN) + zOffset;
 }
 
 int GetQuadrant(float angle)

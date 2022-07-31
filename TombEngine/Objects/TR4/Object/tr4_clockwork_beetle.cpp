@@ -31,7 +31,7 @@ void ClockworkBeetleControl(short itemNumber)
 			beetle->Pose.Position = pos;
 			beetle->Status = ITEM_ACTIVE;
 			beetle->Pose.Orientation.SetY(LaraItem->Pose.Orientation.y);
-			beetle->Pose.Orientation.SetZ(Angle::DegToRad(-70.0f));
+			beetle->Pose.Orientation.z = Angle::DegToRad(-70.0f);
 			return;
 		}
 
@@ -80,7 +80,7 @@ void ClockworkBeetleControl(short itemNumber)
 
 	if (beetle->ItemFlags[0])
 	{
-		beetle->Pose.Orientation.SetZ(Angle::DegToRad(22.5f) * sin(Angle::DegToRad(22.5f) * (GlobalCounter & 0xF)));
+		beetle->Pose.Orientation.z = Angle::DegToRad(22.5f) * sin(Angle::DegToRad(22.5f) * (GlobalCounter & 0xF));
 
 		switch (beetle->ItemFlags[2])
 		{
@@ -254,7 +254,7 @@ void ClockworkBeetleControl(short itemNumber)
 	}
 	else
 	{
-		beetle->Pose.Orientation.SetZ(Angle::DegToRad(45.0f) * sin(Angle::DegToRad(45.0f) * (GlobalCounter & 0x7)));
+		beetle->Pose.Orientation.z = Angle::DegToRad(45.0f) * sin(Angle::DegToRad(45.0f) * (GlobalCounter & 0x7));
 
 		if (beetle->ItemFlags[3])
 			beetle->ItemFlags[3]--;
@@ -279,7 +279,7 @@ void ClockworkBeetleControl(short itemNumber)
 		}
 		else
 		{
-			beetle->Pose.Orientation.SetZ(beetle->Pose.Orientation.z * 2);
+			beetle->Pose.Orientation.z *= 2.0f;
 			int val = (150 - beetle->ItemFlags[3]) >> 1;
 			beetle->Pose.Orientation.SetY(Angle::ShrtToRad(Angle::RadToShrt(beetle->Pose.Orientation.y) + val << 7));
 

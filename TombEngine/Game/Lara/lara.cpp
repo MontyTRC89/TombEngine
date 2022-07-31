@@ -959,9 +959,9 @@ void LaraUnderwater(ItemInfo* item, CollisionInfo* coll)
 	if (level->GetLaraType() == LaraType::Divesuit)
 	{
 		if (item->Pose.Orientation.z > Angle::DegToRad(45.0f))
-			item->Pose.Orientation.SetZ(Angle::DegToRad(45.0f));
+			item->Pose.Orientation.z = Angle::DegToRad(45.0f);
 		else if (item->Pose.Orientation.z < Angle::DegToRad(-45.0f))
-			item->Pose.Orientation.SetZ(Angle::DegToRad(-45.0f));
+			item->Pose.Orientation.z = Angle::DegToRad(-45.0f);
 	}
 	else
 	{

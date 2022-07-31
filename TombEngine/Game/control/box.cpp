@@ -414,7 +414,7 @@ void CreatureTilt(ItemInfo* item, float angle)
 	if (absRot < Angle::DegToRad(15.0f) || absRot > Angle::DegToRad(30.0f))
 		angle /= 2;
 	
-	item->Pose.Orientation.SetZ(item->Pose.Orientation.z + angle);
+	item->Pose.Orientation.z += angle;
 }
 
 float CreatureTurn(ItemInfo* item, float maxTurn)

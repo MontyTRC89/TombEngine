@@ -5,7 +5,7 @@
 	class EulerAngles
 	{
 	public:
-		// Normalized angle components in radians
+		// Normalized radian components
 		float x = 0.0f;
 		float y = 0.0f;
 		float z = 0.0f;
@@ -46,7 +46,6 @@
 		void Set(EulerAngles orient);
 		void Set(float xAngle, float yAngle, float zAngle);
 		void SetY(float angle = 0.0f);
-		void SetZ(float angle = 0.0f);
 
 		// Operators
 		bool		 operator ==(EulerAngles orient);

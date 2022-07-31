@@ -228,8 +228,8 @@ void DoLaraTightropeLean(ItemInfo* item)
 {
 	auto* lara = GetLaraInfo(item);
 
-	item->Pose.Orientation.SetZ(lara->Control.Tightrope.Balance / 4);
-	lara->ExtraTorsoRot.SetZ(lara->Control.Tightrope.Balance + Angle::DegToRad(180.0f));
+	item->Pose.Orientation.z =lara->Control.Tightrope.Balance / 4.0f;
+	lara->ExtraTorsoRot.z = lara->Control.Tightrope.Balance + Angle::DegToRad(180.0f);
 }
 
 void DoLaraTightropeBalanceRegen(ItemInfo* item)
@@ -520,7 +520,7 @@ void OldDoLaraLean(ItemInfo* item, CollisionInfo* coll, float maxAngle, float ra
 		return;
 
 	maxAngle = (coll->CollisionType == CT_LEFT || coll->CollisionType == CT_RIGHT) ? (maxAngle * 0.6f) : maxAngle;
-	item->Pose.Orientation.SetZ(Angle::InterpolateConstantEaseOut(item->Pose.Orientation.z, maxAngle, rate, 0.4f, Angle::DegToRad(0.1f)));
+	item->Pose.Orientation.z = Angle::InterpolateConstantEaseOut(item->Pose.Orientation.z, maxAngle, rate, 0.4f, Angle::DegToRad(0.1f));
 }
 
 void ModulateLaraCrawlFlex(ItemInfo* item, float baseRate, float maxAngle)
@@ -531,7 +531,7 @@ void ModulateLaraCrawlFlex(ItemInfo* item, float baseRate, float maxAngle)
 		return;
 
 	// TODO: Adapt this.
-	//lara->ExtraTorsoRot.SetZ(Angle::InterpolateConstantEaseOut(lara->ExtraTorsoRot.z, maxAngle, rate, 0.25f / 2, Angle::DegToRad(0.1f)));
+	//lara->ExtraTorsoRot.z = Angle::InterpolateConstantEaseOut(lara->ExtraTorsoRot.z, maxAngle, rate, 0.25f / 2, Angle::DegToRad(0.1f)));
 
 	float axisCoeff = AxisMap[InputAxis::MoveHorizontal];
 	int sign = copysign(1, axisCoeff);

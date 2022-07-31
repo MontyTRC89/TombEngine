@@ -1753,11 +1753,11 @@ bool SaveGame::Load(int slot)
 	Lara.Control.Weapon.UziRight = s->lara()->control()->weapon()->uzi_right();
 	Lara.ExtraAnim = s->lara()->extra_anim();
 	Lara.ExtraHeadRot.x = s->lara()->extra_head_rot()->x();
-	Lara.ExtraHeadRot.SetY(s->lara()->extra_head_rot()->y());
-	Lara.ExtraHeadRot.SetZ(s->lara()->extra_head_rot()->z());
-	Lara.ExtraTorsoRot.SetZ(s->lara()->extra_torso_rot()->x());
-	Lara.ExtraTorsoRot.SetY(s->lara()->extra_torso_rot()->y());
-	Lara.ExtraTorsoRot.SetZ(s->lara()->extra_torso_rot()->z());
+	Lara.ExtraHeadRot.y = s->lara()->extra_head_rot()->y();
+	Lara.ExtraHeadRot.z = s->lara()->extra_head_rot()->z();
+	Lara.ExtraTorsoRot.z = s->lara()->extra_torso_rot()->x();
+	Lara.ExtraTorsoRot.y = s->lara()->extra_torso_rot()->y();
+	Lara.ExtraTorsoRot.z = s->lara()->extra_torso_rot()->z();
 	Lara.ExtraVelocity.x = s->lara()->extra_velocity()->x();
 	Lara.ExtraVelocity.y = s->lara()->extra_velocity()->y();
 	Lara.ExtraVelocity.z = s->lara()->extra_velocity()->z();

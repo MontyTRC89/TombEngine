@@ -335,11 +335,11 @@ namespace TEN::Entities::TR4
 			item->Pose.Orientation.x += Angle::DegToRad(1.4f);
 
 		if (abs(zRot - item->Pose.Orientation.z) < Angle::DegToRad(1.4f))
-			item->Pose.Orientation.SetZ(zRot);
+			item->Pose.Orientation.z = zRot;
 		else if (zRot < item->Pose.Orientation.z)
-			item->Pose.Orientation.SetZ(item->Pose.Orientation.x - Angle::DegToRad(1.4f));
+			item->Pose.Orientation.z -= Angle::DegToRad(1.4f);
 		else
-			item->Pose.Orientation.SetZ(item->Pose.Orientation.x + Angle::DegToRad(1.4f));
+			item->Pose.Orientation.z += Angle::DegToRad(1.4f);
 
 			item->ItemFlags[0] += -2 - xRot / 512;
 			if (item->ItemFlags[0] < 0)

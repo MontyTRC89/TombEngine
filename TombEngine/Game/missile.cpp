@@ -117,7 +117,7 @@ void ControlMissile(short fxNumber)
 		KillEffect(fx_number);
 	}
 	else if (fx->objectNumber == KNIFE)
-		fx->pos.Orientation.SetZ(.Orientation.z + 30 * ONE_DEGREE;*/
+		fx->pos.Orientation.z = .Orientation.z + 30 * ONE_DEGREE;*/
 }
 
 void ControlNatlaGun(short fxNumber)

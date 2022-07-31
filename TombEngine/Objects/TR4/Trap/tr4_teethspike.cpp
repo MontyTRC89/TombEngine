@@ -60,7 +60,7 @@ namespace TEN::Entities::TR4
 		{
 			angle = item->TriggerFlags & 7;
 			item->Pose.Position.x += SPxzoffs[angle];
-			item->Pose.Orientation.SetZ(rotations[angle]);
+			item->Pose.Orientation.z = rotations[angle];
 		}
 
 		item->ItemFlags[0] = 1024;
