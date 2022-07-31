@@ -183,7 +183,7 @@ void DoLaraMonkeyStep(ItemInfo* item, CollisionInfo* coll)
 
 void DoLaraCrawlToHangSnap(ItemInfo* item, CollisionInfo* coll)
 {
-	coll->Setup.ForwardAngle = Angle::Normalize(item->Pose.Orientation.GetY() + Angle::DegToRad(180.0f));
+	coll->Setup.ForwardAngle = Angle::Normalize(item->Pose.Orientation.y + Angle::DegToRad(180.0f));
 	GetCollisionInfo(coll, item);
 
 	SnapItemToLedge(item, coll);
@@ -192,8 +192,8 @@ void DoLaraCrawlToHangSnap(ItemInfo* item, CollisionInfo* coll)
 	// Bridges behave differently.
 	if (coll->Middle.Bridge < 0)
 	{
-		TranslateItem(item, item->Pose.Orientation.GetY(), -LARA_RADIUS_CRAWL);
-		item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + Angle::DegToRad(180.0f));
+		TranslateItem(item, item->Pose.Orientation.y, -LARA_RADIUS_CRAWL);
+		item->Pose.Orientation.SetY(item->Pose.Orientation.y + Angle::DegToRad(180.0f));
 	}
 }
 
@@ -472,16 +472,16 @@ void UpdateLaraSubsuitAngles(ItemInfo* item)
 		else if (rotation > Angle::DegToRad(2.0f))
 			rotation = Angle::DegToRad(2.0f);
 
-		item->Pose.Orientation.SetX(item->Pose.Orientation.GetX() + rotation);
+		item->Pose.Orientation.SetX(item->Pose.Orientation.x + rotation);
 	}
 
 	lara->Control.Subsuit.Velocity[0] += abs(lara->Control.Subsuit.XRot / 8);
 	lara->Control.Subsuit.Velocity[1] += abs(lara->Control.Subsuit.XRot / 8);
 
-	if (lara->Control.TurnRate.GetY() > 0)
-		lara->Control.Subsuit.Velocity[0] += abs(lara->Control.TurnRate.GetY()) * 2;
-	else if (lara->Control.TurnRate.GetY() < 0)
-		lara->Control.Subsuit.Velocity[1] += abs(lara->Control.TurnRate.GetY()) * 2;
+	if (lara->Control.TurnRate.y > 0)
+		lara->Control.Subsuit.Velocity[0] += abs(lara->Control.TurnRate.y) * 2;
+	else if (lara->Control.TurnRate.y < 0)
+		lara->Control.Subsuit.Velocity[1] += abs(lara->Control.TurnRate.y) * 2;
 
 	if (lara->Control.Subsuit.Velocity[0] > SECTOR(1.5f))
 		lara->Control.Subsuit.Velocity[0] = SECTOR(1.5f);
@@ -520,7 +520,7 @@ void OldDoLaraLean(ItemInfo* item, CollisionInfo* coll, float maxAngle, float ra
 		return;
 
 	maxAngle = (coll->CollisionType == CT_LEFT || coll->CollisionType == CT_RIGHT) ? (maxAngle * 0.6f) : maxAngle;
-	item->Pose.Orientation.SetZ(Angle::InterpolateConstantEaseOut(item->Pose.Orientation.GetZ(), maxAngle, rate, 0.4f, Angle::DegToRad(0.1f)));
+	item->Pose.Orientation.SetZ(Angle::InterpolateConstantEaseOut(item->Pose.Orientation.z, maxAngle, rate, 0.4f, Angle::DegToRad(0.1f)));
 }
 
 void ModulateLaraCrawlFlex(ItemInfo* item, float baseRate, float maxAngle)
@@ -531,7 +531,7 @@ void ModulateLaraCrawlFlex(ItemInfo* item, float baseRate, float maxAngle)
 		return;
 
 	// TODO: Adapt this.
-	//lara->ExtraTorsoRot.SetZ(Angle::InterpolateConstantEaseOut(lara->ExtraTorsoRot.GetZ(), maxAngle, rate, 0.25f / 2, Angle::DegToRad(0.1f)));
+	//lara->ExtraTorsoRot.SetZ(Angle::InterpolateConstantEaseOut(lara->ExtraTorsoRot.z, maxAngle, rate, 0.25f / 2, Angle::DegToRad(0.1f)));
 
 	float axisCoeff = AxisMap[InputAxis::MoveHorizontal];
 	int sign = copysign(1, axisCoeff);
@@ -614,7 +614,7 @@ void SetLaraRunJumpQueue(ItemInfo* item, CollisionInfo* coll)
 
 	int y = item->Pose.Position.y;
 	int distance = SECTOR(1);
-	auto probe = GetCollision(item, item->Pose.Orientation.GetY(), distance, -coll->Setup.Height);
+	auto probe = GetCollision(item, item->Pose.Orientation.y, distance, -coll->Setup.Height);
 
 	if ((TestLaraRunJumpForward(item, coll) ||													// Area close ahead is permissive...
 		(probe.Position.Ceiling - y) < -(coll->Setup.Height + (LARA_HEADROOM * 0.8f)) ||		// OR ceiling height far ahead is permissive
@@ -633,7 +633,7 @@ void SetLaraVault(ItemInfo* item, CollisionInfo* coll, VaultTestResult vaultResu
 
 	lara->ProjectedFloorHeight = vaultResult.Height;
 	lara->Control.HandStatus = vaultResult.SetBusyHands ? HandStatus::Busy : lara->Control.HandStatus;
-	lara->Control.TurnRate.SetY();
+	lara->Control.TurnRate.y = 0.0f;
 
 	if (vaultResult.SnapToLedge)
 	{
@@ -666,7 +666,7 @@ void SetContextWaterClimbOut(ItemInfo* item, CollisionInfo* coll, WaterClimbOutT
 	item->Animation.VerticalVelocity = 0;
 	lara->ProjectedFloorHeight = climbOutContext.Height;
 	lara->TargetOrientation = EulerAngles(0.0f, coll->NearestLedgeAngle, 0.0f);
-	lara->Control.TurnRate.SetY();
+	lara->Control.TurnRate.y = 0.0f;
 	lara->Control.HandStatus = HandStatus::Busy;
 	lara->Control.WaterStatus = WaterStatus::Dry;
 }
@@ -739,7 +739,7 @@ void SetLaraSlideAnimation(ItemInfo* item, CollisionInfo* coll)
 	else if (coll->FloorTilt.y < -2 && -coll->FloorTilt.y > abs(coll->FloorTilt.x))
 		angle = Angle::DegToRad(0.0f);
 
-	float delta = Angle::Normalize(angle - item->Pose.Orientation.GetY());
+	float delta = Angle::Normalize(angle - item->Pose.Orientation.y);
 
 	ShiftItem(item, coll);
 
@@ -857,7 +857,7 @@ void SetLaraCornerAnimation(ItemInfo* item, CollisionInfo* coll, bool flip)
 			SetAnimation(item, LA_HANG_IDLE);
 
 		item->Pose.Position = lara->NextCornerPos.Position;
-		item->Pose.Orientation.SetY(lara->NextCornerPos.Orientation.GetY());
+		item->Pose.Orientation.SetY(lara->NextCornerPos.Orientation.y);
 		coll->Setup.OldPosition = lara->NextCornerPos.Position;
 	}
 }
@@ -879,42 +879,42 @@ void ResetLaraTurnRate(ItemInfo* item, bool divesuit)
 	auto* lara = GetLaraInfo(item);
 
 	// Reset x axis turn rate.
-	if (abs(lara->Control.TurnRate.GetX()) > Angle::DegToRad(2.0f))
-		lara->Control.TurnRate.SetX(Angle::InterpolateConstant(lara->Control.TurnRate.GetX(), 0.0f, Angle::DegToRad(2.0f)));
+	if (abs(lara->Control.TurnRate.x) > Angle::DegToRad(2.0f))
+		lara->Control.TurnRate.SetX(Angle::InterpolateConstant(lara->Control.TurnRate.x, 0.0f, Angle::DegToRad(2.0f)));
 	else
-		lara->Control.TurnRate.SetX(Angle::InterpolateConstant(lara->Control.TurnRate.GetX(), 0.0f, Angle::DegToRad(0.5f)));
+		lara->Control.TurnRate.SetX(Angle::InterpolateConstant(lara->Control.TurnRate.x, 0.0f, Angle::DegToRad(0.5f)));
 
 	// Ease rotation near poles.
-	if (item->Pose.Orientation.GetX() >= Angle::DegToRad(80.0f) && lara->Control.TurnRate.GetX() > 0.0f ||
-		item->Pose.Orientation.GetX() <= Angle::DegToRad(80.0f) && lara->Control.TurnRate.GetX() < 0.0f)
+	if (item->Pose.Orientation.x >= Angle::DegToRad(80.0f) && lara->Control.TurnRate.x > 0.0f ||
+		item->Pose.Orientation.x <= Angle::DegToRad(80.0f) && lara->Control.TurnRate.x < 0.0f)
 	{
-		int sign = copysign(1, lara->Control.TurnRate.GetX());
+		int sign = copysign(1, lara->Control.TurnRate.x);
 
 		item->Pose.Orientation.SetX(
-			item->Pose.Orientation.GetX() + std::min(abs(lara->Control.TurnRate.GetX()), (Angle::DegToRad(90.0f) - abs(item->Pose.Orientation.GetX())) / 3) * sign);
+			item->Pose.Orientation.x + std::min(abs(lara->Control.TurnRate.x), (Angle::DegToRad(90.0f) - abs(item->Pose.Orientation.x)) / 3) * sign);
 	}
 	else
-		item->Pose.Orientation.SetX(item->Pose.Orientation.GetX() + lara->Control.TurnRate.GetX());
+		item->Pose.Orientation.SetX(item->Pose.Orientation.x + lara->Control.TurnRate.x);
 
 	// Reset y axis turn rate.
-	if (abs(lara->Control.TurnRate.GetY()) > Angle::DegToRad(2.0f) && !divesuit)
-		lara->Control.TurnRate.SetY(Angle::InterpolateConstant(lara->Control.TurnRate.GetY(), 0.0f, Angle::DegToRad(2.0f)));
+	if (abs(lara->Control.TurnRate.y) > Angle::DegToRad(2.0f) && !divesuit)
+		lara->Control.TurnRate.SetY(Angle::InterpolateConstant(lara->Control.TurnRate.y, 0.0f, Angle::DegToRad(2.0f)));
 	else
-		lara->Control.TurnRate.SetY(Angle::InterpolateConstant(lara->Control.TurnRate.GetY(), 0.0f, Angle::DegToRad(0.5f)));
+		lara->Control.TurnRate.SetY(Angle::InterpolateConstant(lara->Control.TurnRate.y, 0.0f, Angle::DegToRad(0.5f)));
 
-	item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + lara->Control.TurnRate.GetY());
+	item->Pose.Orientation.SetY(item->Pose.Orientation.y + lara->Control.TurnRate.y);
 
 	// Nothing uses z axis turn rate at this point; keep it at zero.
-	lara->Control.TurnRate.SetZ();
+	lara->Control.TurnRate.z = 0.0f;
 }
 
 void ResetLaraLean(ItemInfo* item, float alpha, bool resetRoll, bool resetPitch)
 {
 	if (resetPitch)
-		item->Pose.Orientation.SetX(Angle::InterpolateLinear(item->Pose.Orientation.GetX(), 0.0f, alpha, Angle::DegToRad(0.1f)));
+		item->Pose.Orientation.SetX(Angle::InterpolateLinear(item->Pose.Orientation.x, 0.0f, alpha, Angle::DegToRad(0.1f)));
 
 	if (resetRoll)
-		item->Pose.Orientation.SetZ(Angle::InterpolateLinear(item->Pose.Orientation.GetZ(), 0.0f, alpha, Angle::DegToRad(0.1f)));
+		item->Pose.Orientation.SetZ(Angle::InterpolateLinear(item->Pose.Orientation.z, 0.0f, alpha, Angle::DegToRad(0.1f)));
 }
 
 void ResetLaraFlex(ItemInfo* item, float alpha)

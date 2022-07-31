@@ -141,7 +141,7 @@ namespace TEN::Entities::TR4
 							}
 
 							item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-							item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + AI.angle);
+							item->Pose.Orientation.SetY(item->Pose.Orientation.y + AI.angle);
 						}
 					}
 					else
@@ -149,7 +149,7 @@ namespace TEN::Entities::TR4
 						item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + MUMMY_ANIM_COLLAPSE_START;
 						item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 						item->Animation.ActiveState = MUMMY_STATE_COLLAPSE;
-						item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + AI.angle);
+						item->Pose.Orientation.SetY(item->Pose.Orientation.y + AI.angle);
 						creature->MaxTurn = 0;
 					}
 				}
@@ -272,12 +272,12 @@ namespace TEN::Entities::TR4
 			if (abs(AI.angle) >= Angle::DegToRad(7.0f))
 			{
 				if (AI.angle >= 0)
-					item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + Angle::DegToRad(7.0f));
+					item->Pose.Orientation.SetY(item->Pose.Orientation.y + Angle::DegToRad(7.0f));
 				else
-					item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() - Angle::DegToRad(7.0f));
+					item->Pose.Orientation.SetY(item->Pose.Orientation.y - Angle::DegToRad(7.0f));
 			}
 			else
-				item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + AI.angle);
+				item->Pose.Orientation.SetY(item->Pose.Orientation.y + AI.angle);
 
 				if (!creature->Flags)
 				{

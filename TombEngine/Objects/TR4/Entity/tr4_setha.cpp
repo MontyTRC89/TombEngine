@@ -44,8 +44,8 @@ namespace TEN::Entities::TR4
 		int y = item->Pose.Position.y;
 		int z = item->Pose.Position.z;
 
-	int dx = 870 * sin(item->Pose.Orientation.GetY());
-	int dz = 870 * cos(item->Pose.Orientation.GetY());
+	int dx = 870 * sin(item->Pose.Orientation.y);
+	int dz = 870 * cos(item->Pose.Orientation.y);
 
 		int ceiling = GetCollision(x, y, z, item->RoomNumber).Position.Ceiling;
 

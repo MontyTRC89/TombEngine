@@ -591,7 +591,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 			{
 				SetAnimation(item, LA_UNDERWATER_RESURFACE);
 				//ResetLaraLean(item);
-				item->Pose.Orientation.SetX(item->Pose.Orientation.GetX() - Angle::DegToRad(90.0f));
+				item->Pose.Orientation.SetX(item->Pose.Orientation.x - Angle::DegToRad(90.0f));
 				ResetLaraFlex(item);
 				item->Pose.Position.y = waterHeight + 1;
 				item->Animation.VerticalVelocity = 0;
@@ -951,16 +951,16 @@ void LaraUnderwater(ItemInfo* item, CollisionInfo* coll)
 		ResetLaraLean(item, 8.0f, true, false);
 
 	// Clamp x axis rotation.
-	if (item->Pose.Orientation.GetX() < Angle::DegToRad(-90.0f))
+	if (item->Pose.Orientation.x < Angle::DegToRad(-90.0f))
 		item->Pose.Orientation.SetX(Angle::DegToRad(-90.0f));
-	else if (item->Pose.Orientation.GetX() > Angle::DegToRad(90.0f))
+	else if (item->Pose.Orientation.x > Angle::DegToRad(90.0f))
 		item->Pose.Orientation.SetX(Angle::DegToRad(90.0f));
 
 	if (level->GetLaraType() == LaraType::Divesuit)
 	{
-		if (item->Pose.Orientation.GetZ() > Angle::DegToRad(45.0f))
+		if (item->Pose.Orientation.z > Angle::DegToRad(45.0f))
 			item->Pose.Orientation.SetZ(Angle::DegToRad(45.0f));
-		else if (item->Pose.Orientation.GetZ() < Angle::DegToRad(-45.0f))
+		else if (item->Pose.Orientation.z < Angle::DegToRad(-45.0f))
 			item->Pose.Orientation.SetZ(Angle::DegToRad(-45.0f));
 	}
 	else
@@ -1010,8 +1010,8 @@ void LaraCheat(ItemInfo* item, CollisionInfo* coll)
 		else
 		{
 			SetAnimation(item, LA_STAND_SOLID);
-			item->Pose.Orientation.SetX();
-			item->Pose.Orientation.SetZ();
+			item->Pose.Orientation.x = 0.0f;
+			item->Pose.Orientation.z = 0.0f;
 			ResetLaraFlex(item);
 			lara->Control.WaterStatus = WaterStatus::Dry;
 		}

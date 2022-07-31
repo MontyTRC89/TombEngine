@@ -88,12 +88,12 @@ namespace TEN::Entities::TR4
 				{
 					if (item->Animation.ActiveState == BBEETLE_STATE_DEATH_END)
 					{
-						item->Pose.Orientation.SetX();
+						item->Pose.Orientation.x = 0.0f;
 						item->Pose.Position.y = item->Floor;
 					}
 					else
 					{
-						item->Pose.Orientation.SetX();
+						item->Pose.Orientation.x = 0.0f;
 						item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + BBEETLE_ANIM_DEATH_START;
 						item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 						item->Animation.ActiveState = BBEETLE_STATE_DEATH_START;
@@ -110,7 +110,7 @@ namespace TEN::Entities::TR4
 				}
 			}
 
-			item->Pose.Orientation.SetX();
+			item->Pose.Orientation.x = 0.0f;
 		}
 		else
 		{

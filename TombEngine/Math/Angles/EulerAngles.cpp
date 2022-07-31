@@ -139,21 +139,6 @@
 		);
 	}
 
-	float EulerAngles::GetX()
-	{
-		return x;
-	}
-
-	float EulerAngles::GetY()
-	{
-		return y;
-	}
-
-	float EulerAngles::GetZ()
-	{
-		return z;
-	}
-
 	void EulerAngles::Set(EulerAngles orient)
 	{
 		*this = orient;
@@ -216,6 +201,14 @@
 		return EulerAngles(x / value, y / value, z / value);
 	}
 
+	EulerAngles& EulerAngles::operator =(EulerAngles orient)
+	{
+		this->x = orient.x;
+		this->y = orient.y;
+		this->z = orient.z;
+		return *this;
+	}
+	
 	EulerAngles& EulerAngles::operator +=(EulerAngles orient)
 	{
 		this->Set(x + orient.x, y + orient.y, z + orient.z);

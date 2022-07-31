@@ -87,12 +87,12 @@ namespace TEN::Entities::TR1
 
 		if (creature->Flags & APE_FLAG_TURN_LEFT)
 		{
-			item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() - Angle::DegToRad(90.0f));
+			item->Pose.Orientation.SetY(item->Pose.Orientation.y - Angle::DegToRad(90.0f));
 			creature->Flags -= APE_FLAG_TURN_LEFT;
 		}
 		else if (item->Flags & APE_FLAG_TURN_RIGHT)
 		{
-			item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + Angle::DegToRad(90.0f));
+			item->Pose.Orientation.SetY(item->Pose.Orientation.y + Angle::DegToRad(90.0f));
 			creature->Flags -= APE_FLAG_TURN_RIGHT;
 		}
 
@@ -128,7 +128,7 @@ namespace TEN::Entities::TR1
 			if (xx < xFloor)
 			{
 				item->Pose.Position.z = (xFloor * SECTOR(1)) - SHIFT;
-				item->Pose.Orientation.SetY();
+				item->Pose.Orientation.y = 0.0f;
 			}
 			else
 			{
@@ -203,7 +203,7 @@ namespace TEN::Entities::TR1
 				}
 				else if (item->Flags & APE_FLAG_TURN_RIGHT)
 				{
-					item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + Angle::DegToRad(90.0f));
+					item->Pose.Orientation.SetY(item->Pose.Orientation.y + Angle::DegToRad(90.0f));
 					creatureInfo->Flags -= APE_FLAG_TURN_RIGHT;
 				}
 

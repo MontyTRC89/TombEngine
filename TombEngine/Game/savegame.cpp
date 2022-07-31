@@ -197,19 +197,19 @@ bool SaveGame::Save(int slot)
 	auto wetOffset = fbb.CreateVector(wet);
 
 	Save::Vector3 nextCornerPos = Save::Vector3(Lara.NextCornerPos.Position.x, Lara.NextCornerPos.Position.y, Lara.NextCornerPos.Position.z);
-	Save::Vector3 nextCornerRot = Save::Vector3(Lara.NextCornerPos.Orientation.GetX(), Lara.NextCornerPos.Orientation.GetY(), Lara.NextCornerPos.Orientation.GetZ());
+	Save::Vector3 nextCornerRot = Save::Vector3(Lara.NextCornerPos.Orientation.x, Lara.NextCornerPos.Orientation.y, Lara.NextCornerPos.Orientation.z);
 
-	Save::Vector3 leftArmRotation = Save::Vector3(Lara.LeftArm.Orientation.GetX(), Lara.LeftArm.Orientation.GetY(), Lara.LeftArm.Orientation.GetZ());
-	Save::Vector3 rightArmRotation = Save::Vector3(Lara.RightArm.Orientation.GetX(), Lara.RightArm.Orientation.GetY(), Lara.RightArm.Orientation.GetZ());
+	Save::Vector3 leftArmRotation = Save::Vector3(Lara.LeftArm.Orientation.x, Lara.LeftArm.Orientation.y, Lara.LeftArm.Orientation.z);
+	Save::Vector3 rightArmRotation = Save::Vector3(Lara.RightArm.Orientation.x, Lara.RightArm.Orientation.y, Lara.RightArm.Orientation.z);
 	
-	Save::Vector3 extraHeadRot = Save::Vector3(Lara.ExtraHeadRot.GetX(), Lara.ExtraHeadRot.GetY(), Lara.ExtraHeadRot.GetZ());
-	Save::Vector3 extraTorsoRot = Save::Vector3(Lara.ExtraTorsoRot.GetX(), Lara.ExtraTorsoRot.GetY(), Lara.ExtraTorsoRot.GetZ());
+	Save::Vector3 extraHeadRot = Save::Vector3(Lara.ExtraHeadRot.x, Lara.ExtraHeadRot.y, Lara.ExtraHeadRot.z);
+	Save::Vector3 extraTorsoRot = Save::Vector3(Lara.ExtraTorsoRot.x, Lara.ExtraTorsoRot.y, Lara.ExtraTorsoRot.z);
 	Save::Vector3 extraVelocity = Save::Vector3(Lara.ExtraVelocity.x, Lara.ExtraVelocity.y, Lara.ExtraVelocity.z);
 	Save::Vector3 waterCurrentPull = Save::Vector3(Lara.WaterCurrentPull.x, Lara.WaterCurrentPull.y, Lara.WaterCurrentPull.z);
 
 	std::vector<int> laraTargetAngles{};
-	laraTargetAngles.push_back(Lara.TargetArmOrient.GetY());
-	laraTargetAngles.push_back(Lara.TargetArmOrient.GetX());
+	laraTargetAngles.push_back(Lara.TargetArmOrient.y);
+	laraTargetAngles.push_back(Lara.TargetArmOrient.x);
 	auto laraTargetAnglesOffset = fbb.CreateVector(laraTargetAngles);
 
 	std::vector<int> subsuitVelocity{};
@@ -339,7 +339,7 @@ bool SaveGame::Save(int slot)
 
 	Save::LaraControlDataBuilder control{ fbb };
 	control.add_move_angle(Lara.Control.MoveAngle);
-	control.add_turn_rate(Lara.Control.TurnRate.GetY());
+	control.add_turn_rate(Lara.Control.TurnRate.y);
 	control.add_calculated_jump_velocity(Lara.Control.CalculatedJumpVelocity);
 	control.add_jump_direction((int)Lara.Control.JumpDirection);
 	control.add_hand_status((int)Lara.Control.HandStatus);
@@ -418,7 +418,7 @@ bool SaveGame::Save(int slot)
 	lara.add_projected_floor_height(Lara.ProjectedFloorHeight);
 	lara.add_right_arm(rightArmOffset);
 	lara.add_sprint_energy(Lara.SprintEnergy);
-	lara.add_target_facing_angle(Lara.TargetOrientation.GetY());
+	lara.add_target_facing_angle(Lara.TargetOrientation.y);
 	lara.add_target_arm_angles(laraTargetAnglesOffset);
 	lara.add_target_entity_number(Lara.TargetEntity - g_Level.Items.data());
 	lara.add_torch(torchOffset);
@@ -596,9 +596,9 @@ bool SaveGame::Save(int slot)
 			(int32_t)itemToSerialize.Pose.Position.x,
 			(int32_t)itemToSerialize.Pose.Position.y,
 			(int32_t)itemToSerialize.Pose.Position.z,
-			(int32_t)itemToSerialize.Pose.Orientation.GetX(),
-			(int32_t)itemToSerialize.Pose.Orientation.GetY(),
-			(int32_t)itemToSerialize.Pose.Orientation.GetZ());
+			(int32_t)itemToSerialize.Pose.Orientation.x,
+			(int32_t)itemToSerialize.Pose.Orientation.y,
+			(int32_t)itemToSerialize.Pose.Orientation.z);
 
 		Save::Vector4 color = Save::Vector4(
 			itemToSerialize.Color.x,
@@ -872,9 +872,9 @@ bool SaveGame::Save(int slot)
 		batInfo.add_x(bat->Pose.Position.x);
 		batInfo.add_y(bat->Pose.Position.y);
 		batInfo.add_z(bat->Pose.Position.z);
-		batInfo.add_x_rot(bat->Pose.Orientation.GetX());
-		batInfo.add_y_rot(bat->Pose.Orientation.GetY());
-		batInfo.add_z_rot(bat->Pose.Orientation.GetZ());
+		batInfo.add_x_rot(bat->Pose.Orientation.x);
+		batInfo.add_y_rot(bat->Pose.Orientation.y);
+		batInfo.add_z_rot(bat->Pose.Orientation.z);
 
 		bats.push_back(batInfo.Finish());
 	}
@@ -893,9 +893,9 @@ bool SaveGame::Save(int slot)
 		spiderInfo.add_x(spider->Pose.Position.x);
 		spiderInfo.add_y(spider->Pose.Position.y);
 		spiderInfo.add_z(spider->Pose.Position.z);
-		spiderInfo.add_x_rot(spider->Pose.Orientation.GetX());
-		spiderInfo.add_y_rot(spider->Pose.Orientation.GetY());
-		spiderInfo.add_z_rot(spider->Pose.Orientation.GetZ());
+		spiderInfo.add_x_rot(spider->Pose.Orientation.x);
+		spiderInfo.add_y_rot(spider->Pose.Orientation.y);
+		spiderInfo.add_z_rot(spider->Pose.Orientation.z);
 
 		spiders.push_back(spiderInfo.Finish());
 	}
@@ -914,9 +914,9 @@ bool SaveGame::Save(int slot)
 		ratInfo.add_x(rat->Pose.Position.x);
 		ratInfo.add_y(rat->Pose.Position.y);
 		ratInfo.add_z(rat->Pose.Position.z);
-		ratInfo.add_x_rot(rat->Pose.Orientation.GetX());
-		ratInfo.add_y_rot(rat->Pose.Orientation.GetY());
-		ratInfo.add_z_rot(rat->Pose.Orientation.GetZ());
+		ratInfo.add_x_rot(rat->Pose.Orientation.x);
+		ratInfo.add_y_rot(rat->Pose.Orientation.y);
+		ratInfo.add_z_rot(rat->Pose.Orientation.z);
 
 		rats.push_back(ratInfo.Finish());
 	}
@@ -935,9 +935,9 @@ bool SaveGame::Save(int slot)
 		scarabInfo.add_x(beetle->Pose.Position.x);
 		scarabInfo.add_y(beetle->Pose.Position.y);
 		scarabInfo.add_z(beetle->Pose.Position.z);
-		scarabInfo.add_x_rot(beetle->Pose.Orientation.GetX());
-		scarabInfo.add_y_rot(beetle->Pose.Orientation.GetY());
-		scarabInfo.add_z_rot(beetle->Pose.Orientation.GetZ());
+		scarabInfo.add_x_rot(beetle->Pose.Orientation.x);
+		scarabInfo.add_y_rot(beetle->Pose.Orientation.y);
+		scarabInfo.add_z_rot(beetle->Pose.Orientation.z);
 
 		scarabs.push_back(scarabInfo.Finish());
 	}
@@ -1333,7 +1333,7 @@ bool SaveGame::Load(int slot)
 			Lara.ItemNumber = i;
 			LaraItem = item;
 			LaraItem->Location.roomNumber = savedItem->room_number();
-			LaraItem->Location.yNumber = item->Pose.Orientation.GetY();
+			LaraItem->Location.yNumber = item->Pose.Orientation.y;
 			LaraItem->Data = &Lara;
 		}
 

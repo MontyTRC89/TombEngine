@@ -71,11 +71,11 @@ void LittleRatsControl(short itemNumber)
 				else
 				{
 					rat->VerticalVelocity = 0;
-					rat->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + (GetRandomControl() & 0x3FFF) - Angle::DegToRad(45.0f));
+					rat->Pose.Orientation.SetY(item->Pose.Orientation.y + (GetRandomControl() & 0x3FFF) - Angle::DegToRad(45.0f));
 				}
 
-				rat->Pose.Orientation.SetX();
-				rat->Pose.Orientation.SetZ();
+				rat->Pose.Orientation.x = 0.0f;
+				rat->Pose.Orientation.z = 0.0f;
 				rat->On = true;
 				rat->Velocity = (GetRandomControl() & 31) + 1;
 				rat->Flags = GetRandomControl() & 30;
@@ -112,14 +112,14 @@ void InitialiseLittleRats(short itemNumber)
 		return;
 	}
 
-	if (item->Pose.Orientation.GetY() > Angle::DegToRad(-157.5f) && item->Pose.Orientation.GetY() < Angle::DegToRad(-22.5f))
+	if (item->Pose.Orientation.y > Angle::DegToRad(-157.5f) && item->Pose.Orientation.y < Angle::DegToRad(-22.5f))
 		item->Pose.Position.x += CLICK(2);
-	else if (item->Pose.Orientation.GetY() > Angle::DegToRad(22.5f) && item->Pose.Orientation.GetY() < Angle::DegToRad(157.5f))
+	else if (item->Pose.Orientation.y > Angle::DegToRad(22.5f) && item->Pose.Orientation.y < Angle::DegToRad(157.5f))
 		item->Pose.Position.x -= CLICK(2);
 
-	if (item->Pose.Orientation.GetY() > Angle::DegToRad(-45.0f) && item->Pose.Orientation.GetY() < Angle::DegToRad(45.0f))
+	if (item->Pose.Orientation.y > Angle::DegToRad(-45.0f) && item->Pose.Orientation.y < Angle::DegToRad(45.0f))
 		item->Pose.Position.z -= CLICK(2);
-	else if (item->Pose.Orientation.GetY() < Angle::DegToRad(-112.5f) || item->Pose.Orientation.GetY() > Angle::DegToRad(112.5f))
+	else if (item->Pose.Orientation.y < Angle::DegToRad(-112.5f) || item->Pose.Orientation.y > Angle::DegToRad(112.5f))
 		item->Pose.Position.z += CLICK(2);
 
 	ClearRats();
@@ -137,9 +137,9 @@ void UpdateRats()
 			{
 				auto oldPos = rat->Pose.Position;
 
-				rat->Pose.Position.x += rat->Velocity * sin(rat->Pose.Orientation.GetY());
+				rat->Pose.Position.x += rat->Velocity * sin(rat->Pose.Orientation.y);
 				rat->Pose.Position.y += rat->VerticalVelocity;
-				rat->Pose.Position.z += rat->Velocity * cos(rat->Pose.Orientation.GetY());
+				rat->Pose.Position.z += rat->Velocity * cos(rat->Pose.Orientation.y);
 
 				rat->VerticalVelocity += GRAVITY;
 
@@ -147,9 +147,9 @@ void UpdateRats()
 
 				float angle;
 				if (rat->Flags >= 170)
-					angle = rat->Pose.Orientation.GetY() - atan2(dPos.z, dPos.x);
+					angle = rat->Pose.Orientation.y - atan2(dPos.z, dPos.x);
 				else
-					angle = atan2(dPos.z, dPos.x) - rat->Pose.Orientation.GetY();
+					angle = atan2(dPos.z, dPos.x) - rat->Pose.Orientation.y;
 
 				if (abs(dPos.x) < 85 && abs(dPos.y) < 85 && abs(dPos.z) < 85)
 				{
@@ -164,9 +164,9 @@ void UpdateRats()
 					if (abs(dPos.z) + abs(dPos.x) <= SECTOR(1))
 					{
 						if (rat->Velocity & 1)
-							rat->Pose.Orientation.SetY(rat->Pose.Orientation.GetY() + Angle::DegToRad(2.8f));
+							rat->Pose.Orientation.SetY(rat->Pose.Orientation.y + Angle::DegToRad(2.8f));
 						else
-							rat->Pose.Orientation.SetY(rat->Pose.Orientation.GetY() - Angle::DegToRad(2.8f));
+							rat->Pose.Orientation.SetY(rat->Pose.Orientation.y - Angle::DegToRad(2.8f));
 						rat->Velocity = 48 - (abs(angle) / Angle::DegToRad(5.6f));
 					}
 					else
@@ -177,12 +177,12 @@ void UpdateRats()
 						if (abs(angle) >= Angle::DegToRad(11.25f))
 						{
 							if (angle >= 0)
-								rat->Pose.Orientation.SetY(rat->Pose.Orientation.GetY() + Angle::DegToRad(5.6f));
+								rat->Pose.Orientation.SetY(rat->Pose.Orientation.y + Angle::DegToRad(5.6f));
 							else
-								rat->Pose.Orientation.SetY(rat->Pose.Orientation.GetY() - Angle::DegToRad(5.6f));
+								rat->Pose.Orientation.SetY(rat->Pose.Orientation.y - Angle::DegToRad(5.6f));
 						}
 						else
-							rat->Pose.Orientation.SetY(rat->Pose.Orientation.GetY() + 8 * (Wibble - i));
+							rat->Pose.Orientation.SetY(rat->Pose.Orientation.y + 8 * (Wibble - i));
 					}
 				}
 
@@ -203,9 +203,9 @@ void UpdateRats()
 					}
 
 					if (angle <= 0)
-						rat->Pose.Orientation.SetY(rat->Pose.Orientation.GetY() - Angle::DegToRad(90.0f));
+						rat->Pose.Orientation.SetY(rat->Pose.Orientation.y - Angle::DegToRad(90.0f));
 					else
-						rat->Pose.Orientation.SetY(rat->Pose.Orientation.GetY() + Angle::DegToRad(90.0f));
+						rat->Pose.Orientation.SetY(rat->Pose.Orientation.y + Angle::DegToRad(90.0f));
 
 					// reset rat to old Poseition and disable fall
 					rat->Pose.Position = oldPos;

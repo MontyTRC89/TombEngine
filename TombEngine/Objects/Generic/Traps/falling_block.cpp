@@ -108,7 +108,7 @@ void FallingBlockControl(short itemNumber)
 					item->ItemFlags[0] = FALLINGBLOCK_DELAY;
 
 				// Convert object to shatter item
-				ShatterItem.yRot = item->Pose.Orientation.GetY();
+				ShatterItem.yRot = item->Pose.Orientation.y;
 				ShatterItem.meshIndex = Objects[item->ObjectNumber].meshIndex;
 				ShatterItem.sphere.x = item->Pose.Position.x;
 				ShatterItem.sphere.y = item->Pose.Position.y - STEP_SIZE; // So debris won't spawn below floor

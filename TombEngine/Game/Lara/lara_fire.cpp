@@ -741,20 +741,20 @@ void HitTarget(ItemInfo* laraItem, ItemInfo* target, GameVector* hitPos, int dam
 				{
 					// Baddy2 gun hitting sword
 					SoundEffect(SFX_TR4_BADDY_SWORD_RICOCHET, &target->Pose);
-					TriggerRicochetSpark(hitPos, laraItem->Pose.Orientation.GetY(), 3, 0);
+					TriggerRicochetSpark(hitPos, laraItem->Pose.Orientation.y, 3, 0);
 					return;
 				}
 				else
-					DoBloodSplat(hitPos->x, hitPos->y, hitPos->z, (GetRandomControl() & 3) + 3, target->Pose.Orientation.GetY(), target->RoomNumber);
+					DoBloodSplat(hitPos->x, hitPos->y, hitPos->z, (GetRandomControl() & 3) + 3, target->Pose.Orientation.y, target->RoomNumber);
 
 				break;
 
 			case HIT_RICOCHET:
-				TriggerRicochetSpark(hitPos, laraItem->Pose.Orientation.GetY(), 3, 0);
+				TriggerRicochetSpark(hitPos, laraItem->Pose.Orientation.y, 3, 0);
 				break;
 
 			case HIT_SMOKE:
-				TriggerRicochetSpark(hitPos, laraItem->Pose.Orientation.GetY(), 3, -5);
+				TriggerRicochetSpark(hitPos, laraItem->Pose.Orientation.y, 3, -5);
 
 				if (target->ObjectNumber == ID_ROMAN_GOD1 ||
 					target->ObjectNumber == ID_ROMAN_GOD2)
@@ -801,16 +801,16 @@ FireWeaponType FireWeapon(LaraWeaponType weaponType, ItemInfo* target, ItemInfo*
 	auto pos = Vector3Int(src->Pose.Position.x, muzzleOffset.y, src->Pose.Position.z);
 
 	auto wobbleOrient = EulerAngles(
-		armOrient.GetX() + Angle::ShrtToRad((GetRandomControl() - Angle::DegToShrt(90.0f)) * weapon->ShotAccuracy / 65536),
-		armOrient.GetY() + Angle::ShrtToRad((GetRandomControl() - Angle::DegToShrt(90.0f)) * weapon->ShotAccuracy / 65536),
+		armOrient.x + Angle::ShrtToRad((GetRandomControl() - Angle::DegToShrt(90.0f)) * weapon->ShotAccuracy / 65536),
+		armOrient.y + Angle::ShrtToRad((GetRandomControl() - Angle::DegToShrt(90.0f)) * weapon->ShotAccuracy / 65536),
 		0.0f
 	);
 
 	// Calculate ray from orientation angles
 	auto direction = Vector3(
-		sin(wobbleOrient.GetY()) * cos(wobbleOrient.GetX()),
-		-sin(wobbleOrient.GetX()),
-		cos(wobbleOrient.GetY()) * cos(wobbleOrient.GetX())
+		sin(wobbleOrient.y) * cos(wobbleOrient.x),
+		-sin(wobbleOrient.x),
+		cos(wobbleOrient.y) * cos(wobbleOrient.x)
 	);
 	direction.Normalize();
 
@@ -914,8 +914,8 @@ void FindTargetPoint(ItemInfo* item, GameVector* target)
 	int y = (int) bounds->Y1 + (bounds->Y2 - bounds->Y1) / 3;
 	int z = (int)(bounds->Z1 + bounds->Z2) / 2;
 
-	float c = cos(item->Pose.Orientation.GetY());
-	float s = sin(item->Pose.Orientation.GetY());
+	float c = cos(item->Pose.Orientation.y);
+	float s = sin(item->Pose.Orientation.y);
 
 	target->x = item->Pose.Position.x + c * x + s * z;
 	target->y = item->Pose.Position.y + y;
@@ -950,17 +950,17 @@ void LaraTargetInfo(ItemInfo* laraItem, WeaponInfo* weaponInfo)
 	auto angles = EulerAngles::OrientBetweenPoints(Vector3(src.x, src.y, src.z), Vector3(targetPoint.x, targetPoint.y, targetPoint.z));
 
 	angles.Set(
-		angles.GetX() - laraItem->Pose.Orientation.GetX(),
-		angles.GetY() - laraItem->Pose.Orientation.GetY(),
+		angles.x - laraItem->Pose.Orientation.x,
+		angles.y - laraItem->Pose.Orientation.y,
 		0.0f
 	);
 
 	if (LOS(&src, &targetPoint))
 	{
-		if (angles.GetY() >= weaponInfo->LockAngles[0] &&
-			angles.GetY() <= weaponInfo->LockAngles[1] &&
-			angles.GetX() >= weaponInfo->LockAngles[2] &&
-			angles.GetX() <= weaponInfo->LockAngles[3])
+		if (angles.y >= weaponInfo->LockAngles[0] &&
+			angles.y <= weaponInfo->LockAngles[1] &&
+			angles.x >= weaponInfo->LockAngles[2] &&
+			angles.x <= weaponInfo->LockAngles[3])
 		{
 			lara->LeftArm.Locked = true;
 			lara->RightArm.Locked = true;
@@ -969,10 +969,10 @@ void LaraTargetInfo(ItemInfo* laraItem, WeaponInfo* weaponInfo)
 		{
 			if (lara->LeftArm.Locked)
 			{
-				if (angles.GetY() < weaponInfo->LeftAngles[0] ||
-					angles.GetY() > weaponInfo->LeftAngles[1] ||
-					angles.GetX() < weaponInfo->LeftAngles[2] ||
-					angles.GetX() > weaponInfo->LeftAngles[3])
+				if (angles.y < weaponInfo->LeftAngles[0] ||
+					angles.y > weaponInfo->LeftAngles[1] ||
+					angles.x < weaponInfo->LeftAngles[2] ||
+					angles.x > weaponInfo->LeftAngles[3])
 				{
 					lara->LeftArm.Locked = false;
 				}
@@ -980,10 +980,10 @@ void LaraTargetInfo(ItemInfo* laraItem, WeaponInfo* weaponInfo)
 
 			if (lara->RightArm.Locked)
 			{
-				if (angles.GetY() < weaponInfo->RightAngles[0] ||
-					angles.GetY() > weaponInfo->RightAngles[1] ||
-					angles.GetX() < weaponInfo->RightAngles[2] ||
-					angles.GetX() > weaponInfo->RightAngles[3])
+				if (angles.y < weaponInfo->RightAngles[0] ||
+					angles.y > weaponInfo->RightAngles[1] ||
+					angles.x < weaponInfo->RightAngles[2] ||
+					angles.x > weaponInfo->RightAngles[3])
 				{
 					lara->RightArm.Locked = false;
 				}
@@ -1051,21 +1051,21 @@ void LaraGetNewTarget(ItemInfo* laraItem, WeaponInfo* weaponInfo)
 							auto angles = EulerAngles::OrientBetweenPoints(Vector3(src.x, src.y, src.z), Vector3(target.x, target.y, target.z));
 
 							angles.Set(
-								angles.GetX() - (laraItem->Pose.Orientation.GetX() + lara->ExtraTorsoRot.GetX()),
-								angles.GetY() - (laraItem->Pose.Orientation.GetY() + lara->ExtraTorsoRot.GetY()),
+								angles.x - (laraItem->Pose.Orientation.x + lara->ExtraTorsoRot.x),
+								angles.y - (laraItem->Pose.Orientation.y + lara->ExtraTorsoRot.y),
 								0.0f
 							);
 
-							if (angles.GetY() >= weaponInfo->LockAngles[0] && angles.GetY() <= weaponInfo->LockAngles[1] &&
-								angles.GetX() >= weaponInfo->LockAngles[2] && angles.GetX() <= weaponInfo->LockAngles[3])
+							if (angles.y >= weaponInfo->LockAngles[0] && angles.y <= weaponInfo->LockAngles[1] &&
+								angles.x >= weaponInfo->LockAngles[2] && angles.x <= weaponInfo->LockAngles[3])
 							{
 								TargetList[targets] = item;
 								++targets;
-								if (abs(angles.GetY()) < Angle::Normalize(bestYrot + Angle::DegToRad(15.0f)) &&
+								if (abs(angles.y) < Angle::Normalize(bestYrot + Angle::DegToRad(15.0f)) &&
 									distance < bestDistance)
 								{
 									bestDistance = distance;
-									bestYrot = abs(angles.GetY());
+									bestYrot = abs(angles.y);
 									bestItem = item;
 								}
 							}

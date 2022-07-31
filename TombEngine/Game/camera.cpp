@@ -156,10 +156,10 @@ void MoveCamera(GameVector* ideal, int speed)
 		speed = 1;
 
 	if (OldCam.pos.Orientation != LaraItem->Pose.Orientation ||
-		OldCam.pos2.Orientation.GetX() != Lara.ExtraHeadRot.GetX() ||
-		OldCam.pos2.Orientation.GetY() != Lara.ExtraHeadRot.GetY() ||
-		OldCam.pos2.Position.x != Lara.ExtraTorsoRot.GetX() ||
-		OldCam.pos2.Position.y != Lara.ExtraTorsoRot.GetY() ||
+		OldCam.pos2.Orientation.x != Lara.ExtraHeadRot.x ||
+		OldCam.pos2.Orientation.y != Lara.ExtraHeadRot.y ||
+		OldCam.pos2.Position.x != Lara.ExtraTorsoRot.x ||
+		OldCam.pos2.Position.y != Lara.ExtraTorsoRot.y ||
 		OldCam.pos.Position != LaraItem->Pose.Position ||
 		OldCam.ActiveState != LaraItem->Animation.ActiveState ||
 		OldCam.TargetState != LaraItem->Animation.TargetState ||
@@ -174,10 +174,10 @@ void MoveCamera(GameVector* ideal, int speed)
 		BinocularOn)
 	{
 		OldCam.pos.Orientation = LaraItem->Pose.Orientation;
-		OldCam.pos2.Orientation.SetX(Lara.ExtraHeadRot.GetX());
-		OldCam.pos2.Orientation.SetY(Lara.ExtraHeadRot.GetY());
-		OldCam.pos2.Position.x = Lara.ExtraTorsoRot.GetX();
-		OldCam.pos2.Position.y = Lara.ExtraTorsoRot.GetY();
+		OldCam.pos2.Orientation.SetX(Lara.ExtraHeadRot.x);
+		OldCam.pos2.Orientation.SetY(Lara.ExtraHeadRot.y);
+		OldCam.pos2.Position.x = Lara.ExtraTorsoRot.x;
+		OldCam.pos2.Position.y = Lara.ExtraTorsoRot.y;
 		OldCam.pos.Position = LaraItem->Pose.Position;
 		OldCam.ActiveState = LaraItem->Animation.ActiveState;
 		OldCam.TargetState = LaraItem->Animation.TargetState;
@@ -324,7 +324,7 @@ void ChaseCamera(ItemInfo* item)
 	if (!Camera.targetElevation)
 		Camera.targetElevation = Angle::DegToRad(-10.0f);
 
-	Camera.targetElevation += item->Pose.Orientation.GetX();
+	Camera.targetElevation += item->Pose.Orientation.x;
 	UpdateCameraElevation();
 
 	// Clamp x rotation.
@@ -467,7 +467,7 @@ void UpdateCameraElevation()
 		Camera.actualAngle = Camera.targetAngle + atan2(pos.z, pos.x);
 	}
 	else
-		Camera.actualAngle = LaraItem->Pose.Orientation.GetY() + Camera.targetAngle;
+		Camera.actualAngle = LaraItem->Pose.Orientation.y + Camera.targetAngle;
 
 	Camera.actualElevation += (Camera.targetElevation - Camera.actualElevation) / 8;
 }
@@ -481,13 +481,13 @@ void CombatCamera(ItemInfo* item)
 
 	if (lara->TargetEntity)
 	{
-		Camera.targetAngle = lara->TargetArmOrient.GetY();
-		Camera.targetElevation = lara->TargetArmOrient.GetX() + item->Pose.Orientation.GetX();
+		Camera.targetAngle = lara->TargetArmOrient.y;
+		Camera.targetElevation = lara->TargetArmOrient.x + item->Pose.Orientation.x;
 	}
 	else
 	{
-		Camera.targetAngle = lara->ExtraHeadRot.GetY() + lara->ExtraTorsoRot.GetY();
-		Camera.targetElevation = lara->ExtraHeadRot.GetX() + lara->ExtraTorsoRot.GetX() + item->Pose.Orientation.GetX() - Angle::DegToRad(15.0f);
+		Camera.targetAngle = lara->ExtraHeadRot.y + lara->ExtraTorsoRot.y;
+		Camera.targetElevation = lara->ExtraHeadRot.x + lara->ExtraTorsoRot.x + item->Pose.Orientation.x - Angle::DegToRad(15.0f);
 	}
 
 	auto probe = GetCollision(Camera.target.x, Camera.target.y + CLICK(1), Camera.target.z, Camera.target.roomNumber);
@@ -805,28 +805,28 @@ void LookCamera(ItemInfo* item)
 	auto oldTorsoRot = lara->ExtraTorsoRot;
 
 	lara->ExtraTorsoRot = EulerAngles::Zero;
-	lara->ExtraHeadRot.SetX(lara->ExtraHeadRot.GetX() * 2);
-	lara->ExtraHeadRot.SetY(lara->ExtraHeadRot.GetY() * 2);
+	lara->ExtraHeadRot.SetX(lara->ExtraHeadRot.x * 2);
+	lara->ExtraHeadRot.SetY(lara->ExtraHeadRot.y * 2);
 
 	// Clamp head rotation.
-	if (lara->ExtraHeadRot.GetX() > Angle::DegToRad(55.0f))
+	if (lara->ExtraHeadRot.x > Angle::DegToRad(55.0f))
 		lara->ExtraHeadRot.SetX(Angle::DegToRad(55.0f));
-	else if (lara->ExtraHeadRot.GetX() < Angle::DegToRad(-75.0f))
+	else if (lara->ExtraHeadRot.x < Angle::DegToRad(-75.0f))
 		lara->ExtraHeadRot.SetX(Angle::DegToRad(-75.0f));
-	if (lara->ExtraHeadRot.GetY() < Angle::DegToRad(-80.0f))
+	if (lara->ExtraHeadRot.y < Angle::DegToRad(-80.0f))
 		lara->ExtraHeadRot.SetY(Angle::DegToRad(-80.0f));
-	else if (lara->ExtraHeadRot.GetY() > Angle::DegToRad(80.0f))
+	else if (lara->ExtraHeadRot.y > Angle::DegToRad(80.0f))
 		lara->ExtraHeadRot.SetY(Angle::DegToRad(80.0f));
 
 	// Prevent following of breathing motion.
-	if (abs(Angle::Normalize(lara->ExtraHeadRot.GetX() - OldCam.pos.Orientation.GetX())) >= Angle::DegToRad(0.09f))
-		OldCam.pos.Orientation.SetX((lara->ExtraHeadRot.GetX() + OldCam.pos.Orientation.GetX()) / 2);
+	if (abs(Angle::Normalize(lara->ExtraHeadRot.x - OldCam.pos.Orientation.x)) >= Angle::DegToRad(0.09f))
+		OldCam.pos.Orientation.SetX((lara->ExtraHeadRot.x + OldCam.pos.Orientation.x) / 2);
 	else
-		OldCam.pos.Orientation.SetX(lara->ExtraHeadRot.GetX());
-	if (abs(Angle::Normalize(lara->ExtraHeadRot.GetY() - OldCam.pos.Orientation.GetY())) >= Angle::DegToRad(0.09f))
-		OldCam.pos.Orientation.SetY((lara->ExtraHeadRot.GetY() + OldCam.pos.Orientation.GetY()) / 2);
+		OldCam.pos.Orientation.SetX(lara->ExtraHeadRot.x);
+	if (abs(Angle::Normalize(lara->ExtraHeadRot.y - OldCam.pos.Orientation.y)) >= Angle::DegToRad(0.09f))
+		OldCam.pos.Orientation.SetY((lara->ExtraHeadRot.y + OldCam.pos.Orientation.y) / 2);
 	else
-		OldCam.pos.Orientation.SetY(lara->ExtraHeadRot.GetY());
+		OldCam.pos.Orientation.SetY(lara->ExtraHeadRot.y);
 
 	auto pos = Vector3Int(0, CLICK(0.25f) / 4, CLICK(0.25f));
 	GetLaraJointPosition(&pos, LM_HEAD);
@@ -914,8 +914,8 @@ void LookCamera(ItemInfo* item)
 
 	 auto ideal = GameVector(x, y, z, roomNumber);
 
-	if (OldCam.pos.Orientation.GetX() == lara->ExtraHeadRot.GetX() &&
-		OldCam.pos.Orientation.GetY() == lara->ExtraHeadRot.GetY() &&
+	if (OldCam.pos.Orientation.x == lara->ExtraHeadRot.x &&
+		OldCam.pos.Orientation.y == lara->ExtraHeadRot.y &&
 		OldCam.pos.Position == item->Pose.Position &&
 		OldCam.ActiveState == item->Animation.ActiveState &&
 		OldCam.TargetState == item->Animation.TargetState &&
@@ -928,8 +928,8 @@ void LookCamera(ItemInfo* item)
 	}
 	else
 	{
-		OldCam.pos.Orientation.SetX(lara->ExtraHeadRot.GetX());
-		OldCam.pos.Orientation.SetY(lara->ExtraHeadRot.GetY());
+		OldCam.pos.Orientation.SetX(lara->ExtraHeadRot.x);
+		OldCam.pos.Orientation.SetY(lara->ExtraHeadRot.y);
 		OldCam.pos.Position = item->Pose.Position;
 		OldCam.ActiveState = item->Animation.ActiveState;
 		OldCam.TargetState = item->Animation.TargetState;
@@ -1041,7 +1041,7 @@ void LookCamera(ItemInfo* item)
 
 	if (Camera.mikeAtLara)
 	{
-		Camera.actualAngle = Angle::Normalize(item->Pose.Orientation.GetY() + lara->ExtraHeadRot.GetY() + lara->ExtraTorsoRot.GetY());
+		Camera.actualAngle = Angle::Normalize(item->Pose.Orientation.y + lara->ExtraHeadRot.y + lara->ExtraTorsoRot.y);
 		Camera.mikePos.x = item->Pose.Position.x;
 		Camera.mikePos.y = item->Pose.Position.y;
 		Camera.mikePos.z = item->Pose.Position.z;
@@ -1231,8 +1231,8 @@ void BinocularCamera(ItemInfo* item)
 	item->MeshBits = NO_JOINT_BITS;
 	AlterFOV(7 * (Angle::DegToRad(11.5f) - BinocularRange));
 
-	float headXRot = lara->ExtraHeadRot.GetX() * 2;
-	float headYRot = lara->ExtraHeadRot.GetY();
+	float headXRot = lara->ExtraHeadRot.x * 2;
+	float headYRot = lara->ExtraHeadRot.y;
 
 	if (headXRot > Angle::DegToRad(75.0f))
 		headXRot = Angle::DegToRad(75.0f);
@@ -1261,9 +1261,9 @@ void BinocularCamera(ItemInfo* item)
 
 	int l = SECTOR(20.25f) * cos(headXRot);
 
-	int tx = x + l * sin(item->Pose.Orientation.GetY() + headYRot);
+	int tx = x + l * sin(item->Pose.Orientation.y + headYRot);
 	int ty = y - SECTOR(20.25f) * sin(headXRot);
-	int tz = z + l * cos(item->Pose.Orientation.GetY() + headYRot);
+	int tz = z + l * cos(item->Pose.Orientation.y + headYRot);
 
 	if (Camera.oldType == CameraType::Fixed)
 	{
@@ -1303,7 +1303,7 @@ void BinocularCamera(ItemInfo* item)
 
 	if (Camera.mikeAtLara)
 	{
-		Camera.actualAngle = Angle::Normalize(item->Pose.Orientation.GetY() + lara->ExtraHeadRot.GetY() + lara->ExtraTorsoRot.GetY());
+		Camera.actualAngle = Angle::Normalize(item->Pose.Orientation.y + lara->ExtraHeadRot.y + lara->ExtraTorsoRot.y);
 		Camera.mikePos = item->Pose.Position;
 	}
 	else
@@ -1452,7 +1452,7 @@ void CalculateCamera()
 			auto dx = Camera.item->Pose.Position.x - item->Pose.Position.x;
 			auto dz = Camera.item->Pose.Position.z - item->Pose.Position.z;
 			int shift = sqrt(pow(dx, 2) + pow(dz, 2));
-			float angle = atan2(dz, dx) - item->Pose.Orientation.GetY();
+			float angle = atan2(dz, dx) - item->Pose.Orientation.y;
 			float tilt = atan2(shift, y - (bounds->Y1 + bounds->Y2) / 2 - Camera.item->Pose.Position.y);
 			bounds = GetBoundsAccurate(Camera.item);
 			angle /= 2;
@@ -1460,23 +1460,23 @@ void CalculateCamera()
 
 			if (angle > Angle::DegToRad(-50.0f) && angle < Angle::DegToRad(50.0f) && tilt > Angle::DegToRad(-85.0f) && tilt < Angle::DegToRad(85.0f))
 			{
-				float change = angle - Lara.ExtraHeadRot.GetY();
+				float change = angle - Lara.ExtraHeadRot.y;
 				if (change > Angle::DegToRad(4.0f))
-					Lara.ExtraHeadRot.SetY(Lara.ExtraHeadRot.GetY() + Angle::DegToRad(4.0f));
+					Lara.ExtraHeadRot.SetY(Lara.ExtraHeadRot.y + Angle::DegToRad(4.0f));
 				else if (change < Angle::DegToRad(-4.0f))
-					Lara.ExtraHeadRot.SetY(Lara.ExtraHeadRot.GetY() - Angle::DegToRad(4.0f));
+					Lara.ExtraHeadRot.SetY(Lara.ExtraHeadRot.y - Angle::DegToRad(4.0f));
 				else
-					Lara.ExtraHeadRot.SetY(Lara.ExtraHeadRot.GetY() + change);
-				Lara.ExtraTorsoRot.SetY(Lara.ExtraHeadRot.GetY());
+					Lara.ExtraHeadRot.SetY(Lara.ExtraHeadRot.y + change);
+				Lara.ExtraTorsoRot.SetY(Lara.ExtraHeadRot.y);
 
-				change = tilt - Lara.ExtraHeadRot.GetX();
+				change = tilt - Lara.ExtraHeadRot.x;
 				if (change > Angle::DegToRad(4.0f))
-					Lara.ExtraHeadRot.SetX(Lara.ExtraHeadRot.GetX() + Angle::DegToRad(4.0f));
+					Lara.ExtraHeadRot.SetX(Lara.ExtraHeadRot.x + Angle::DegToRad(4.0f));
 				else if (change < Angle::DegToRad(-4.0f))
-					Lara.ExtraHeadRot.SetX(Lara.ExtraHeadRot.GetX() - Angle::DegToRad(4.0f));
+					Lara.ExtraHeadRot.SetX(Lara.ExtraHeadRot.x - Angle::DegToRad(4.0f));
 				else
-					Lara.ExtraHeadRot.SetX(Lara.ExtraHeadRot.GetX() + change);
-				Lara.ExtraTorsoRot.SetX(Lara.ExtraHeadRot.GetX());
+					Lara.ExtraHeadRot.SetX(Lara.ExtraHeadRot.x + change);
+				Lara.ExtraTorsoRot.SetX(Lara.ExtraHeadRot.x);
 
 				Camera.type = CameraType::Look;
 				Camera.item->LookedAt = 1;
@@ -1601,23 +1601,23 @@ void LookLeftRight(ItemInfo* item)
 	if (TrInput & IN_LEFT)
 	{
 		TrInput &= ~IN_LEFT;
-		if (lara->ExtraHeadRot.GetY() > Angle::DegToRad(-44.0f))
+		if (lara->ExtraHeadRot.y > Angle::DegToRad(-44.0f))
 		{
 			if (BinocularRange)
-				lara->ExtraHeadRot.SetY(lara->ExtraHeadRot.GetY() + Angle::DegToRad(2.0f) * (BinocularRange - Angle::DegToRad(10.0f)) / Angle::DegToRad(8.5f));
+				lara->ExtraHeadRot.SetY(lara->ExtraHeadRot.y + Angle::DegToRad(2.0f) * (BinocularRange - Angle::DegToRad(10.0f)) / Angle::DegToRad(8.5f));
 			else
-				lara->ExtraHeadRot.SetY(lara->ExtraHeadRot.GetY() - Angle::DegToRad(2.0f));
+				lara->ExtraHeadRot.SetY(lara->ExtraHeadRot.y - Angle::DegToRad(2.0f));
 		}
 	}
 	else if (TrInput & IN_RIGHT)
 	{
 		TrInput &= ~IN_RIGHT;
-		if (lara->ExtraHeadRot.GetY() < Angle::DegToRad(44.0f))
+		if (lara->ExtraHeadRot.y < Angle::DegToRad(44.0f))
 		{
 			if (BinocularRange)
-				lara->ExtraHeadRot.SetY(lara->ExtraHeadRot.GetY() + Angle::DegToRad(2.0f) * (Angle::DegToRad(10.0f) - BinocularRange) / Angle::DegToRad(8.5f));
+				lara->ExtraHeadRot.SetY(lara->ExtraHeadRot.y + Angle::DegToRad(2.0f) * (Angle::DegToRad(10.0f) - BinocularRange) / Angle::DegToRad(8.5f));
 			else
-				lara->ExtraHeadRot.SetY(lara->ExtraHeadRot.GetY() + Angle::DegToRad(2.0f));
+				lara->ExtraHeadRot.SetY(lara->ExtraHeadRot.y + Angle::DegToRad(2.0f));
 		}
 	}
 
@@ -1626,7 +1626,7 @@ void LookLeftRight(ItemInfo* item)
 		!lara->LeftArm.Locked &&
 		!lara->RightArm.Locked)
 	{
-		lara->ExtraTorsoRot.SetY(lara->ExtraHeadRot.GetY());
+		lara->ExtraTorsoRot.SetY(lara->ExtraHeadRot.y);
 	}
 }
 
@@ -1638,23 +1638,23 @@ void LookUpDown(ItemInfo* item)
 	if (TrInput & IN_FORWARD)
 	{
 		TrInput &= ~IN_FORWARD;
-		if (lara->ExtraHeadRot.GetX() > Angle::DegToRad(-35.0f))
+		if (lara->ExtraHeadRot.x > Angle::DegToRad(-35.0f))
 		{
 			if (BinocularRange)
-				lara->ExtraHeadRot.SetX(lara->ExtraHeadRot.GetX() + Angle::DegToRad(2.0f) * (BinocularRange - Angle::DegToRad(10.0f)) / Angle::DegToRad(17.0f));
+				lara->ExtraHeadRot.SetX(lara->ExtraHeadRot.x + Angle::DegToRad(2.0f) * (BinocularRange - Angle::DegToRad(10.0f)) / Angle::DegToRad(17.0f));
 			else
-				lara->ExtraHeadRot.SetX(lara->ExtraHeadRot.GetX() - Angle::DegToRad(2.0f));
+				lara->ExtraHeadRot.SetX(lara->ExtraHeadRot.x - Angle::DegToRad(2.0f));
 		}
 	}
 	else if (TrInput & IN_BACK)
 	{
 		TrInput &= ~IN_BACK;
-		if (lara->ExtraHeadRot.GetX() < Angle::DegToRad(30.0f))
+		if (lara->ExtraHeadRot.x < Angle::DegToRad(30.0f))
 		{
 			if (BinocularRange)
-				lara->ExtraHeadRot.SetX(lara->ExtraHeadRot.GetX() + Angle::DegToRad(2.0f) * (Angle::DegToRad(10.0f) - BinocularRange) / Angle::DegToRad(17.0f));
+				lara->ExtraHeadRot.SetX(lara->ExtraHeadRot.x + Angle::DegToRad(2.0f) * (Angle::DegToRad(10.0f) - BinocularRange) / Angle::DegToRad(17.0f));
 			else
-				lara->ExtraHeadRot.SetX(lara->ExtraHeadRot.GetX() + Angle::DegToRad(2.0f));
+				lara->ExtraHeadRot.SetX(lara->ExtraHeadRot.x + Angle::DegToRad(2.0f));
 		}
 	}
 
@@ -1663,7 +1663,7 @@ void LookUpDown(ItemInfo* item)
 		!lara->LeftArm.Locked &&
 		!lara->RightArm.Locked)
 	{
-		lara->ExtraTorsoRot.SetX(lara->ExtraHeadRot.GetX());
+		lara->ExtraTorsoRot.SetX(lara->ExtraHeadRot.x);
 	}
 }
 
@@ -1684,12 +1684,12 @@ void ResetLook(ItemInfo* item)
 		}
 		else
 		{
-			if (!lara->ExtraHeadRot.GetX())
-				lara->ExtraTorsoRot.SetX();
-			if (!lara->ExtraHeadRot.GetY())
-				lara->ExtraTorsoRot.SetY();
-			if (!lara->ExtraHeadRot.GetZ())
-				lara->ExtraTorsoRot.SetZ();
+			if (!lara->ExtraHeadRot.x)
+				lara->ExtraTorsoRot.x = 0.0f;
+			if (!lara->ExtraHeadRot.y)
+				lara->ExtraTorsoRot.y = 0.0f;
+			if (!lara->ExtraHeadRot.z)
+				lara->ExtraTorsoRot.z = 0.0f;
 		}
 	}
 }
@@ -1705,8 +1705,8 @@ void ItemPushCamera(BOUNDING_BOX* bounds, PHD_3DPOS* pos, int radius)
 {
 	int dx = Camera.pos.x - pos->Position.x;
 	int dz = Camera.pos.z - pos->Position.z;
-	float sinY = sin(pos->Orientation.GetY());
-	float cosY = cos(pos->Orientation.GetY());
+	float sinY = sin(pos->Orientation.y);
+	float cosY = cos(pos->Orientation.y);
 	auto x = dx * cosY - dz * sinY;
 	auto z = dx * sinY + dz * cosY;
 

@@ -43,7 +43,7 @@ void InitialiseLarson(short itemNumber)
 		return;
 
 	item->ItemFlags[3] = item->TriggerFlags;
-	float rotY = item->Pose.Orientation.GetY();
+	float rotY = item->Pose.Orientation.y;
 
 	if (rotY > Angle::DegToRad(22.5f) && rotY < Angle::DegToRad(157.5f))
 		item->Pose.Position.x += STEPUP_HEIGHT;
@@ -178,13 +178,13 @@ void LarsonControl(short itemNumber)
 					if (abs(info.angle) >= Angle::DegToRad(2))
 					{
 						if (info.angle > 0)
-							item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + Angle::DegToRad(2.0f));
+							item->Pose.Orientation.SetY(item->Pose.Orientation.y + Angle::DegToRad(2.0f));
 						else
-							item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() - Angle::DegToRad(2.0f));
+							item->Pose.Orientation.SetY(item->Pose.Orientation.y - Angle::DegToRad(2.0f));
 					}
 					else
 					{
-						item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + info.angle);
+						item->Pose.Orientation.SetY(item->Pose.Orientation.y + info.angle);
 					}
 				}
 				else
@@ -279,13 +279,13 @@ void LarsonControl(short itemNumber)
 			if (abs(info.angle) >= Angle::DegToRad(2))
 			{
 				if (info.angle > 0)
-					item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + Angle::DegToRad(2.0f));
+					item->Pose.Orientation.SetY(item->Pose.Orientation.y + Angle::DegToRad(2.0f));
 				else
-					item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() - Angle::DegToRad(2.0f));
+					item->Pose.Orientation.SetY(item->Pose.Orientation.y - Angle::DegToRad(2.0f));
 			}
 			else
 			{
-				item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + info.angle);
+				item->Pose.Orientation.SetY(item->Pose.Orientation.y + info.angle);
 			}
 
 			if (Targetable(item, &info))
@@ -323,13 +323,13 @@ void LarsonControl(short itemNumber)
 			if (abs(info.angle) >= Angle::DegToRad(2))
 			{
 				if (info.angle > 0)
-					item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + Angle::DegToRad(2.0f));
+					item->Pose.Orientation.SetY(item->Pose.Orientation.y + Angle::DegToRad(2.0f));
 				else
-					item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() - Angle::DegToRad(2.0f));
+					item->Pose.Orientation.SetY(item->Pose.Orientation.y - Angle::DegToRad(2.0f));
 			}
 			else
 			{
-				item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + info.angle);
+				item->Pose.Orientation.SetY(item->Pose.Orientation.y + info.angle);
 			}
 			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase)
 			{

@@ -281,16 +281,16 @@ void RollingBallControl(short itemNumber)
 	if (item->ItemFlags[1] || item->ItemFlags[0])
 		angle = atan2(item->ItemFlags[1], item->ItemFlags[0]);
 	else
-		angle = item->Pose.Orientation.GetY();
+		angle = item->Pose.Orientation.y;
 
-	if (item->Pose.Orientation.GetY() != angle)
+	if (item->Pose.Orientation.y != angle)
 	{
-		/*if (((angle - item->Pose.Orientation.GetY()) & 0x7fff) >= 512)
+		/*if (((angle - item->Pose.Orientation.y) & 0x7fff) >= 512)
 		{
-			if (angle <= item->Pose.Orientation.GetY() || angle - item->Pose.Orientation.GetY() >= Angle::DegToRad(180.0f))
-				item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() - CLICK(2));
+			if (angle <= item->Pose.Orientation.y || angle - item->Pose.Orientation.y >= Angle::DegToRad(180.0f))
+				item->Pose.Orientation.SetY(item->Pose.Orientation.y - CLICK(2));
 			else
-				item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + CLICK(2));
+				item->Pose.Orientation.SetY(item->Pose.Orientation.y + CLICK(2));
 		}
 		else*/
 			item->Pose.Orientation.SetY(angle);
@@ -329,7 +329,7 @@ void ClassicRollingBallCollision(short itemNum, ItemInfo* lara, CollisionInfo* c
 			x = item->Pose.Position.x + ((x * 512) / d);
 			y = item->Pose.Position.y - 512 + ((y * 512) / d);
 			z = item->Pose.Position.z + ((z * 512) / d);
-			DoBloodSplat(x, y, z, item->Animation.Velocity, item->Pose.Orientation.GetY(), item->RoomNumber);
+			DoBloodSplat(x, y, z, item->Animation.Velocity, item->Pose.Orientation.y, item->RoomNumber);
 		}
 		else
 		{
@@ -337,9 +337,9 @@ void ClassicRollingBallCollision(short itemNum, ItemInfo* lara, CollisionInfo* c
 			if (lara->HitPoints > 0)
 			{
 				lara->HitPoints = -1;//?
-				lara->Pose.Orientation.SetY(item->Pose.Orientation.GetY());
+				lara->Pose.Orientation.SetY(item->Pose.Orientation.y);
 				lara->Pose.Position.z = 0;
-				lara->Pose.Orientation.SetZ();	
+				lara->Pose.Orientation.z = 0.0f;	
 
 				lara->Animation.AnimNumber = LA_BOULDER_DEATH;
 				lara->Animation.FrameNumber = g_Level.Anims[lara->Animation.AnimNumber].frameBase;
@@ -354,7 +354,7 @@ void ClassicRollingBallCollision(short itemNum, ItemInfo* lara, CollisionInfo* c
 					int x = lara->Pose.Position.x + (GetRandomControl() - Angle::DegToRad(180.0f) / 256);
 					int y = lara->Pose.Position.y - (GetRandomControl() / 64);
 					int z = lara->Pose.Position.z + (GetRandomControl() - Angle::DegToRad(180.0f) / 256);
-					short d = ((GetRandomControl() - Angle::DegToRad(180) / 8) + item->Pose.Orientation.GetY());
+					short d = ((GetRandomControl() - Angle::DegToRad(180) / 8) + item->Pose.Orientation.y);
 					DoBloodSplat(x, y, z, (short)(item->Animation.Velocity * 2), d, item->RoomNumber);
 				}
 			}
@@ -434,8 +434,8 @@ void ClassicRollingBallControl(short itemNum)
 			ydist = 1024;
 		}
 
-		x = item->Pose.Position.x + dist * sin(item->Pose.Orientation.GetY());
-		z = item->Pose.Position.z + dist * cos(item->Pose.Orientation.GetY());
+		x = item->Pose.Position.x + dist * sin(item->Pose.Orientation.y);
+		z = item->Pose.Position.z + dist * cos(item->Pose.Orientation.y);
 
 		floor = GetFloor(x, item->Pose.Position.y, z, &roomNum);
 		y1 = GetFloorHeight(floor, x, item->Pose.Position.y, z);

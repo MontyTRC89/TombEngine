@@ -26,11 +26,11 @@ namespace TEN::Entities::Traps
 			int oldX = item->Pose.Position.x;
 			int oldZ = item->Pose.Position.z - 1000;
 
-			int velocity = item->Animation.Velocity * cos(item->Pose.Orientation.GetX());
+			int velocity = item->Animation.Velocity * cos(item->Pose.Orientation.x);
 
-			item->Pose.Position.x += velocity * sin(item->Pose.Orientation.GetY());
-			item->Pose.Position.y -= item->Animation.Velocity * sin(item->Pose.Orientation.GetX());
-			item->Pose.Position.z += velocity * cos(item->Pose.Orientation.GetY());
+			item->Pose.Position.x += velocity * sin(item->Pose.Orientation.y);
+			item->Pose.Position.y -= item->Animation.Velocity * sin(item->Pose.Orientation.x);
+			item->Pose.Position.z += velocity * cos(item->Pose.Orientation.y);
 
 			short roomNumber = item->RoomNumber;
 			FloorInfo* floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNumber);
@@ -78,7 +78,7 @@ namespace TEN::Entities::Traps
 			int x = 0;
 			int z = 0;
 
-			/*switch (item->Pose.Orientation.GetY())
+			/*switch (item->Pose.Orientation.y)
 			{
 			case 0:
 				z = WALL_SIZE / 2;
@@ -103,8 +103,8 @@ namespace TEN::Entities::Traps
 
 			InitialiseItem(dartItemNumber);
 
-			dartItem->Pose.Orientation.SetX();
-			dartItem->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + Angle::DegToRad(-180.0f));
+			dartItem->Pose.Orientation.x = 0.0f;
+			dartItem->Pose.Orientation.SetY(item->Pose.Orientation.y + Angle::DegToRad(-180.0f));
 			dartItem->Animation.Velocity = 256;
 
 			int xf = 0;

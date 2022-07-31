@@ -108,10 +108,10 @@ void ControlWaterfall(short itemNumber)
 		if (!(Wibble & 0xC))
 		{
 			TriggerWaterfallMist(
-				item->Pose.Position.x + 68 * sin(item->Pose.Orientation.GetY()),
+				item->Pose.Position.x + 68 * sin(item->Pose.Orientation.y),
 				item->Pose.Position.y,
-				item->Pose.Position.z + 68 * cos(item->Pose.Orientation.GetY()),
-				item->Pose.Orientation.GetY() / 16);
+				item->Pose.Position.z + 68 * cos(item->Pose.Orientation.y),
+				item->Pose.Orientation.y / 16);
 		}
 
 		SoundEffect(SFX_TR4_WATERFALL_LOOP, &item->Pose);
@@ -135,7 +135,7 @@ void TightropeCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* col
 		   laraItem->Animation.TargetState != LS_TIGHTROPE_DISMOUNT &&
 		   !laraInfo->Control.Tightrope.CanDismount)
 		{
-			if (tightropeItem->Pose.Orientation.GetY() == laraItem->Pose.Orientation.GetY())
+			if (tightropeItem->Pose.Orientation.y == laraItem->Pose.Orientation.y)
 			{
 				if (abs(tightropeItem->Pose.Position.x - laraItem->Pose.Position.x) + abs(tightropeItem->Pose.Position.z - laraItem->Pose.Position.z) < 640)
 					laraInfo->Control.Tightrope.CanDismount = true;
@@ -147,7 +147,7 @@ void TightropeCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* col
 		   laraItem->Animation.TargetState != LS_TIGHTROPE_DISMOUNT &&
 		   !laraInfo->Control.Tightrope.Off)
 		{
-			if (item->Pose.Orientation.GetY() == laraItem->Pose.Orientation.GetY())
+			if (item->Pose.Orientation.y == laraItem->Pose.Orientation.y)
 			{
 				if (abs(item->Pose.Position.x - laraItem->Pose.Position.x) + abs(item->Pose.Position.z - laraItem->Pose.Position.z) < 640)
 					laraInfo->tightRopeOff = true;
@@ -157,7 +157,7 @@ void TightropeCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* col
 	}
 	else
 	{
-		tightropeItem->Pose.Orientation.SetY(tightropeItem->Pose.Orientation.GetY() + Angle::DegToRad(-180.0f));
+		tightropeItem->Pose.Orientation.SetY(tightropeItem->Pose.Orientation.y + Angle::DegToRad(-180.0f));
 
 		if (TestLaraPosition(&TightRopeBounds, tightropeItem, laraItem))
 		{
@@ -182,14 +182,14 @@ void TightropeCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* col
 			else
 				laraInfo->InteractedItem = itemNumber;
 
-			tightropeItem->Pose.Orientation.SetY(tightropeItem->Pose.Orientation.GetY() + Angle::DegToRad(-180.0f));
+			tightropeItem->Pose.Orientation.SetY(tightropeItem->Pose.Orientation.y + Angle::DegToRad(-180.0f));
 		}
 		else
 		{
 			if (laraInfo->Control.IsMoving && laraInfo->InteractedItem == itemNumber)
 				laraInfo->Control.IsMoving = false;
 
-			tightropeItem->Pose.Orientation.SetY(tightropeItem->Pose.Orientation.GetY() + Angle::DegToRad(-180.0f));
+			tightropeItem->Pose.Orientation.SetY(tightropeItem->Pose.Orientation.y + Angle::DegToRad(-180.0f));
 		}
 	}
 }
@@ -207,9 +207,9 @@ void HorizontalBarCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo*
 		int test2 = 0;
 		if (!test1)
 		{
-			barItem->Pose.Orientation.SetY(barItem->Pose.Orientation.GetY() + Angle::DegToRad(-180.0f));
+			barItem->Pose.Orientation.SetY(barItem->Pose.Orientation.y + Angle::DegToRad(-180.0f));
 			test2 = TestLaraPosition(&ParallelBarsBounds, barItem, laraItem);
-			barItem->Pose.Orientation.SetY(barItem->Pose.Orientation.GetY() + Angle::DegToRad(-180.0f));
+			barItem->Pose.Orientation.SetY(barItem->Pose.Orientation.y + Angle::DegToRad(-180.0f));
 		}
 
 		if (test1 || test2)
@@ -223,9 +223,9 @@ void HorizontalBarCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo*
 			ResetLaraFlex(barItem);
 
 			if (test1)
-				laraItem->Pose.Orientation.SetY(barItem->Pose.Orientation.GetY());
+				laraItem->Pose.Orientation.SetY(barItem->Pose.Orientation.y);
 			else
-				laraItem->Pose.Orientation.SetY(barItem->Pose.Orientation.GetY() + Angle::DegToRad(-180.0f));
+				laraItem->Pose.Orientation.SetY(barItem->Pose.Orientation.y + Angle::DegToRad(-180.0f));
 
 			Vector3Int pos1 = { 0, -128, 512 };
 			GetLaraJointPosition(&pos1, LM_LHAND);
@@ -233,7 +233,7 @@ void HorizontalBarCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo*
 			Vector3Int pos2 = { 0, -128, 512 };
 			GetLaraJointPosition(&pos2, LM_RHAND);
 		
-			/*if (laraItem->Pose.Orientation.GetY()& 0x4000)
+			/*if (laraItem->Pose.Orientation.y& 0x4000)
 				laraItem->Pose.Position.x += barItem->Pose.Position.x - ((pos1.x + pos2.x) >> 1);
 			else*/
 				laraItem->Pose.Position.z += barItem->Pose.Position.z - ((pos1.z + pos2.z) / 2);
@@ -287,16 +287,16 @@ void InitialiseTightrope(short itemNumber)
 {
 	auto* tightropeItem = &g_Level.Items[itemNumber];
 
-	if (tightropeItem->Pose.Orientation.GetY() > 0)
+	if (tightropeItem->Pose.Orientation.y > 0)
 	{
-		if (tightropeItem->Pose.Orientation.GetY() == Angle::DegToRad(90.0f))
+		if (tightropeItem->Pose.Orientation.y == Angle::DegToRad(90.0f))
 			tightropeItem->Pose.Position.x -= 256;
 	}
-	else if (tightropeItem->Pose.Orientation.GetY())
+	else if (tightropeItem->Pose.Orientation.y)
 	{
-		if (tightropeItem->Pose.Orientation.GetY() == Angle::DegToRad(-180.0f))
+		if (tightropeItem->Pose.Orientation.y == Angle::DegToRad(-180.0f))
 			tightropeItem->Pose.Position.z += CLICK(1);
-		else if (tightropeItem->Pose.Orientation.GetY() == Angle::DegToRad(-90.0f))
+		else if (tightropeItem->Pose.Orientation.y == Angle::DegToRad(-90.0f))
 			tightropeItem->Pose.Position.x += CLICK(1);
 	}
 	else

@@ -182,7 +182,7 @@ namespace TEN::Entities::TR4
 				int dx = LaraItem->Pose.Position.x - item->Pose.Position.x;
 				int dz = LaraItem->Pose.Position.z - item->Pose.Position.z;
 				float angle = atan2(dx, dz);
-				laraAI.angle = angle - item->Pose.Orientation.GetY();
+				laraAI.angle = angle - item->Pose.Orientation.y;
 				laraAI.distance = pow(dx, 2) + pow(dz, 2);
 			}
 
@@ -289,12 +289,12 @@ namespace TEN::Entities::TR4
 				if (abs(AI.angle) >= 910)
 				{
 					if (AI.angle >= 0)
-						item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + Angle::DegToRad(5.0f));
+						item->Pose.Orientation.SetY(item->Pose.Orientation.y + Angle::DegToRad(5.0f));
 					else
-						item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() - Angle::DegToRad(5.0f));
+						item->Pose.Orientation.SetY(item->Pose.Orientation.y - Angle::DegToRad(5.0f));
 				}
 				else
-					item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + AI.angle);
+					item->Pose.Orientation.SetY(item->Pose.Orientation.y + AI.angle);
 
 				if (!(creature->Flags & 1) && item->Animation.FrameNumber > (g_Level.Anims[item->Animation.AnimNumber].frameBase + 7) &&
 					item->TestBits(JointBitType::Touch, AhmetSwipeAttackLeftJoints))
@@ -321,12 +321,12 @@ namespace TEN::Entities::TR4
 					if (abs(AI.angle) >= Angle::DegToRad(5.0f))
 					{
 						if (AI.angle >= 0)
-							item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + Angle::DegToRad(5.0f));
+							item->Pose.Orientation.SetY(item->Pose.Orientation.y + Angle::DegToRad(5.0f));
 						else
-							item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() - Angle::DegToRad(5.0f));
+							item->Pose.Orientation.SetY(item->Pose.Orientation.y - Angle::DegToRad(5.0f));
 					}
 					else
-						item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + AI.angle);
+						item->Pose.Orientation.SetY(item->Pose.Orientation.y + AI.angle);
 				}
 				else
 				{
@@ -352,12 +352,12 @@ namespace TEN::Entities::TR4
 					if (abs(AI.angle) >= Angle::DegToRad(5.0f))
 					{
 						if (AI.angle >= 0)
-							item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + Angle::DegToRad(5.0f));
+							item->Pose.Orientation.SetY(item->Pose.Orientation.y + Angle::DegToRad(5.0f));
 						else
-							item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() - Angle::DegToRad(5.0f));
+							item->Pose.Orientation.SetY(item->Pose.Orientation.y - Angle::DegToRad(5.0f));
 					}
 					else
-						item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + AI.angle);
+						item->Pose.Orientation.SetY(item->Pose.Orientation.y + AI.angle);
 				}
 				else
 				{

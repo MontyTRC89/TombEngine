@@ -232,8 +232,8 @@ namespace TEN::Entities::Effects
 
 				if (item->TriggerFlags == 2)
 				{
-					item->Pose.Position.x += sin(item->Pose.Orientation.GetY() - Angle::DegToRad(180)) * (CLICK(1) / FPS);
-					item->Pose.Position.z += cos(item->Pose.Orientation.GetY() - Angle::DegToRad(180)) * (CLICK(1) / FPS);
+					item->Pose.Position.x += sin(item->Pose.Orientation.y - Angle::DegToRad(180)) * (CLICK(1) / FPS);
+					item->Pose.Position.z += cos(item->Pose.Orientation.y - Angle::DegToRad(180)) * (CLICK(1) / FPS);
 
 					auto probe = GetCollision(item);
 					
@@ -379,7 +379,7 @@ namespace TEN::Entities::Effects
 
 			/*if (((-item->TriggerFlags) & 7) == 7)
 			{
-				switch (item->Pose.Orientation.GetY())
+				switch (item->Pose.Orientation.y)
 				{
 				case 0:
 					item->Pose.Position.z += 512;
@@ -409,7 +409,7 @@ namespace TEN::Entities::Effects
 
 		if (item->TriggerFlags != 123)
 		{
-			/*switch (item->Pose.Orientation.GetY())
+			/*switch (item->Pose.Orientation.y)
 			{
 			case 0:
 				if (item->TriggerFlags == 2)
@@ -487,9 +487,9 @@ namespace TEN::Entities::Effects
 				{
 					if (item->TriggerFlags == 2 || item->TriggerFlags == 4)
 					{
-						dest.x = item->Pose.Position.x + 2048 * sin(item->Pose.Orientation.GetY() + Angle::DegToRad(180));
+						dest.x = item->Pose.Position.x + 2048 * sin(item->Pose.Orientation.y + Angle::DegToRad(180));
 						dest.y = item->Pose.Position.y;
-						dest.z = item->Pose.Position.z + 2048 * cos(item->Pose.Orientation.GetY() + Angle::DegToRad(180));
+						dest.z = item->Pose.Position.z + 2048 * cos(item->Pose.Orientation.y + Angle::DegToRad(180));
 
 						if (GetRandomControl() & 3)
 						{
@@ -693,7 +693,7 @@ namespace TEN::Entities::Effects
 				break;
 			}
 
-			float oldYrot = item->Pose.Orientation.GetY();
+			float oldYrot = item->Pose.Orientation.y;
 			item->Pose.Orientation.y = laraItem->Pose.Orientation.y;
 
 			if (TestLaraPosition(&FireBounds, item, laraItem))

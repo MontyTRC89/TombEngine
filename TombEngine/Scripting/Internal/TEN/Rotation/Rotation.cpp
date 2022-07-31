@@ -53,9 +53,9 @@ void Rotation::StoreInPHDPos(EulerAngles& orient)
 
 Rotation::Rotation(EulerAngles orient)
 {
-	x = orient.GetX();
-	y = orient.GetY();
-	z = orient.GetZ();
+	x = orient.x;
+	y = orient.y;
+	z = orient.z;
 }
 
 /***

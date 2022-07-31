@@ -68,14 +68,14 @@ void InitialiseSpiders(short itemNumber)
 		return;
 	}
 
-	if (item->Pose.Orientation.GetY() > Angle::DegToRad(-157.5f) && item->Pose.Orientation.GetY() < Angle::DegToRad(-22.5f))
+	if (item->Pose.Orientation.y > Angle::DegToRad(-157.5f) && item->Pose.Orientation.y < Angle::DegToRad(-22.5f))
 		item->Pose.Position.x += CLICK(2);
-	else if (item->Pose.Orientation.GetY() > Angle::DegToRad(22.5f) && item->Pose.Orientation.GetY() < Angle::DegToRad(157.5f))
+	else if (item->Pose.Orientation.y > Angle::DegToRad(22.5f) && item->Pose.Orientation.y < Angle::DegToRad(157.5f))
 		item->Pose.Position.x -= CLICK(2);
 
-	if (item->Pose.Orientation.GetY() > Angle::DegToRad(-45.0f) && item->Pose.Orientation.GetY() < Angle::DegToRad(45.0f))
+	if (item->Pose.Orientation.y > Angle::DegToRad(-45.0f) && item->Pose.Orientation.y < Angle::DegToRad(45.0f))
 		item->Pose.Position.z -= CLICK(2);
-	else if (item->Pose.Orientation.GetY() < Angle::DegToRad(-112.5f) || item->Pose.Orientation.GetY() > Angle::DegToRad(112.5f))
+	else if (item->Pose.Orientation.y < Angle::DegToRad(-112.5f) || item->Pose.Orientation.y > Angle::DegToRad(112.5f))
 		item->Pose.Position.z += CLICK(2);
 
 	ClearSpiders();
@@ -109,12 +109,12 @@ void SpidersEmitterControl(short itemNumber)
 				}
 				else
 				{
-					spider->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + (GetRandomControl() & 0x3FFF) - Angle::DegToRad(45.0f));
+					spider->Pose.Orientation.SetY(item->Pose.Orientation.y + (GetRandomControl() & 0x3FFF) - Angle::DegToRad(45.0f));
 					spider->VerticalVelocity = 0;
 				}
 
-				spider->Pose.Orientation.SetX();
-				spider->Pose.Orientation.SetZ();
+				spider->Pose.Orientation.x = 0.0f;
+				spider->Pose.Orientation.z = 0.0f;
 				spider->On = true;
 				spider->Flags = 0;
 				spider->Velocity = (GetRandomControl() & 0x1F) + 1;
@@ -135,14 +135,14 @@ void UpdateSpiders()
 			{
 				auto oldPos = spider->Pose.Position;
 
-				spider->Pose.Position.x += spider->Velocity * sin(spider->Pose.Orientation.GetY());
+				spider->Pose.Position.x += spider->Velocity * sin(spider->Pose.Orientation.y);
 				spider->Pose.Position.y += spider->VerticalVelocity;
-				spider->Pose.Position.z += spider->Velocity * cos(spider->Pose.Orientation.GetY());
+				spider->Pose.Position.z += spider->Velocity * cos(spider->Pose.Orientation.y);
 				spider->VerticalVelocity += GRAVITY;
 
 				auto dPos = LaraItem->Pose.Position - spider->Pose.Position;
 
-				float angle = atan2(dPos.z, dPos.x) - spider->Pose.Orientation.GetY();
+				float angle = atan2(dPos.z, dPos.x) - spider->Pose.Orientation.y;
 
 				if (abs(dPos.x) < 85 && abs(dPos.y) < 85 && abs(dPos.z) < 85)
 				{
@@ -155,9 +155,9 @@ void UpdateSpiders()
 					if (abs(dPos.x) + abs(dPos.z) <= CLICK(3))
 					{
 						if (spider->Velocity & 1)
-							spider->Pose.Orientation.SetY(spider->Pose.Orientation.GetY() + Angle::DegToRad(2.8f));
+							spider->Pose.Orientation.SetY(spider->Pose.Orientation.y + Angle::DegToRad(2.8f));
 						else
-							spider->Pose.Orientation.SetY(spider->Pose.Orientation.GetY() - Angle::DegToRad(2.8f));
+							spider->Pose.Orientation.SetY(spider->Pose.Orientation.y - Angle::DegToRad(2.8f));
 
 						spider->Velocity = 48 - (abs(angle) / Angle::DegToRad(5.6f));
 					}
@@ -169,12 +169,12 @@ void UpdateSpiders()
 						if (abs(angle) >= Angle::DegToRad(11.25f))
 						{
 							if (angle >= 0)
-								spider->Pose.Orientation.SetY(spider->Pose.Orientation.GetY() + Angle::DegToRad(5.6f));
+								spider->Pose.Orientation.SetY(spider->Pose.Orientation.y + Angle::DegToRad(5.6f));
 							else
-								spider->Pose.Orientation.SetY(spider->Pose.Orientation.GetY() - Angle::DegToRad(5.6f));
+								spider->Pose.Orientation.SetY(spider->Pose.Orientation.y - Angle::DegToRad(5.6f));
 						}
 						else
-							spider->Pose.Orientation.SetY(spider->Pose.Orientation.GetY() + 8 * (Wibble - i));
+							spider->Pose.Orientation.SetY(spider->Pose.Orientation.y + 8 * (Wibble - i));
 					}
 				}
 
@@ -210,15 +210,15 @@ void UpdateSpiders()
 						spider->VerticalVelocity = 0;
 
 						if (!(GetRandomControl() & 0x1F))
-							spider->Pose.Orientation.SetY(spider->Pose.Orientation.GetY() + Angle::DegToRad(-180.0f));
+							spider->Pose.Orientation.SetY(spider->Pose.Orientation.y + Angle::DegToRad(-180.0f));
 					}
 				}
 				else
 				{
 					if (angle <= 0)
-						spider->Pose.Orientation.SetY(spider->Pose.Orientation.GetY() - Angle::DegToRad(90.0f));
+						spider->Pose.Orientation.SetY(spider->Pose.Orientation.y - Angle::DegToRad(90.0f));
 					else
-						spider->Pose.Orientation.SetY(spider->Pose.Orientation.GetY() + Angle::DegToRad(90.0f));
+						spider->Pose.Orientation.SetY(spider->Pose.Orientation.y + Angle::DegToRad(90.0f));
 
 					spider->Pose.Position = oldPos;
 					spider->VerticalVelocity = 0;
@@ -227,7 +227,7 @@ void UpdateSpiders()
 				if (spider->Pose.Position.y < g_Level.Rooms[spider->RoomNumber].maxceiling + 50)
 				{
 					spider->Pose.Position.y = g_Level.Rooms[spider->RoomNumber].maxceiling + 50;
-					spider->Pose.Orientation.SetY(spider->Pose.Orientation.GetY() + Angle::DegToRad(-180.0f));
+					spider->Pose.Orientation.SetY(spider->Pose.Orientation.y + Angle::DegToRad(-180.0f));
 					spider->VerticalVelocity = 1;
 				}
 

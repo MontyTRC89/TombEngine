@@ -41,7 +41,7 @@ namespace TEN::Renderer
 			for (auto fx : room->EffectsToDraw)
 			{
 				Matrix translation = Matrix::CreateTranslation(fx->Effect->pos.Position.x, fx->Effect->pos.Position.y, fx->Effect->pos.Position.z);
-				Matrix rotation = Matrix::CreateFromYawPitchRoll(fx->Effect->pos.Orientation.GetY(), fx->Effect->pos.Orientation.GetX(), fx->Effect->pos.Orientation.GetZ());
+				Matrix rotation = Matrix::CreateFromYawPitchRoll(fx->Effect->pos.Orientation.y, fx->Effect->pos.Orientation.x, fx->Effect->pos.Orientation.z);
 				fx->World = rotation * translation;
 			}
 		}
@@ -445,7 +445,7 @@ namespace TEN::Renderer
 		else
 			world = Matrix::Identity * local;
 
-		world = Matrix::CreateFromYawPitchRoll(nativeItem->Pose.Orientation.GetY(), nativeItem->Pose.Orientation.GetX(), nativeItem->Pose.Orientation.GetZ()) * world;
+		world = Matrix::CreateFromYawPitchRoll(nativeItem->Pose.Orientation.y, nativeItem->Pose.Orientation.x, nativeItem->Pose.Orientation.z) * world;
 
 		short objNum = nativeItem->ObjectNumber;
 		if (objNum == ID_LARA) objNum = ID_LARA_SKIN;

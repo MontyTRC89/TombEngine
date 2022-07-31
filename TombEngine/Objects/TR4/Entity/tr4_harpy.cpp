@@ -81,7 +81,7 @@ static void TriggerHarpyMissile(PHD_3DPOS* pos, short roomNumber, int count)
 		fx->pos.Position.x = pos->Position.x;
 		fx->pos.Position.y = pos->Position.y - (GetRandomControl() & 0x3F) - 32;
 		fx->pos.Position.z = pos->Position.z;
-		fx->pos.Orientation.Set(pos->Orientation.GetX(), pos->Orientation.GetY(), 0.0f);
+		fx->pos.Orientation.Set(pos->Orientation.x, pos->Orientation.y, 0.0f);
 		fx->roomNumber = roomNumber;
 		fx->counter = 2 * GetRandomControl() + -32768;
 		fx->objectNumber = ID_ENERGY_BUBBLES;
@@ -284,11 +284,11 @@ static void TriggerHarpyMissile(PHD_3DPOS* pos, short roomNumber, int count)
 					if (state == HARPY_STATE_IDLE)
 					{
 						item->Pose.Position.y = item->Floor;
-						item->Pose.Orientation.SetX();
+						item->Pose.Orientation.x = 0.0f;
 					}
 					else
 					{
-						item->Pose.Orientation.SetX();
+						item->Pose.Orientation.x = 0.0f;
 						item->Animation.AnimNumber = object->animIndex + 5;
 						item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 						item->Animation.ActiveState = HARPY_STATE_DEATH_START;
@@ -317,7 +317,7 @@ static void TriggerHarpyMissile(PHD_3DPOS* pos, short roomNumber, int count)
 				item->Animation.VerticalVelocity = 0;
 			}
 
-		item->Pose.Orientation.SetX();
+		item->Pose.Orientation.x = 0.0f;
 	}
 	else
 	{

@@ -189,8 +189,8 @@ namespace TEN::Entities::TR4
 		int x = item->Pose.Position.x;
 		int z = item->Pose.Position.z;
 
-	int dx = 808 * sin(item->Pose.Orientation.GetY());
-	int dz = 808 * cos(item->Pose.Orientation.GetY());
+	int dx = 808 * sin(item->Pose.Orientation.y);
+	int dz = 808 * cos(item->Pose.Orientation.y);
 
 		x += dx;
 		z += dz;
@@ -324,7 +324,7 @@ namespace TEN::Entities::TR4
 	{
 		dx = LaraItem->Pose.Position.x - item->Pose.Position.x;
 		dz = LaraItem->Pose.Position.z - item->Pose.Position.z;
-		laraAI.angle = atan2(dz, dx) - item->Pose.Orientation.GetY();
+		laraAI.angle = atan2(dz, dx) - item->Pose.Orientation.y;
 
 		laraAI.ahead = true;
 		if (laraAI.angle <= Angle::DegToRad(-90) || laraAI.angle >= Angle::DegToRad(90.0f))
@@ -752,7 +752,7 @@ namespace TEN::Entities::TR4
 		if (item->ItemFlags[2] == 0)
 			ClampRotation(&item->Pose, laraAI.angle, Angle::DegToRad(2.8f));
 		else
-			ClampRotation(&item->Pose, enemy->Pose.Orientation.GetY() - item->Pose.Orientation.GetY(), Angle::DegToRad(2.8f));
+			ClampRotation(&item->Pose, enemy->Pose.Orientation.y - item->Pose.Orientation.y, Angle::DegToRad(2.8f));
 		
 		break;
 

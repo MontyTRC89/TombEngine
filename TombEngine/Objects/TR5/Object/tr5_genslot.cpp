@@ -78,7 +78,7 @@ void InitialiseGenSlot4(short itemNumber)
 
 	HIWORD(v1) = HIWORD(items);
 	item = &g_Level.Items[itemNumber];
-	LOWORD(v1) = item->pos.Orientation.GetY();
+	LOWORD(v1) = item->pos.Orientation.y;
 	v3 = item->pos.Position.x;
 	v4 = 2 * ((v1 >> 3) & 0x1FFE);
 	v5 = 5 * *(__int16*)((char*)rcossin_tbl + v4);
@@ -91,7 +91,7 @@ void InitialiseGenSlot4(short itemNumber)
 	LOBYTE(v6) = (item->pos.Position.x + (v5 << 11 >> 14)) >> 9;
 	BYTE1(v6) = v7 >> 9;
 
-	item->itemFlags[1] = item->pos.Position.x + 2560 * sin(item->pos.Orientation.GetY()) >> W2V_SHIFT;
+	item->itemFlags[1] = item->pos.Position.x + 2560 * sin(item->pos.Orientation.y) >> W2V_SHIFT;
 	item->itemFlags[3] = 0;
 	item->triggerFlags = 0;*/
 }

@@ -112,7 +112,7 @@ void lara_col_crouch_idle(ItemInfo* item, CollisionInfo* coll)
 	item->Animation.IsAirborne = false;
 	lara->Control.KeepLow = TestLaraKeepLow(item, coll);
 	lara->Control.IsLow = true;
-	lara->Control.MoveAngle = item->Pose.Orientation.GetY();
+	lara->Control.MoveAngle = item->Pose.Orientation.y;
 	lara->ExtraTorsoRot = EulerAngles::Zero;
 	coll->Setup.Height = LARA_HEIGHT_CRAWL;
 	coll->Setup.ForwardAngle = item->Pose.Orientation.y;
@@ -175,7 +175,7 @@ void lara_col_crouch_roll(ItemInfo* item, CollisionInfo* coll)
 	item->Animation.IsAirborne = false;
 	lara->Control.KeepLow = TestLaraKeepLow(item, coll);
 	lara->Control.IsLow = true;
-	lara->Control.MoveAngle = item->Pose.Orientation.GetY();
+	lara->Control.MoveAngle = item->Pose.Orientation.y;
 	coll->Setup.Height = LARA_HEIGHT_CRAWL;
 	coll->Setup.LowerFloorBound = CRAWL_STEPUP_HEIGHT;
 	coll->Setup.UpperFloorBound = -CRAWL_STEPUP_HEIGHT;
@@ -475,9 +475,9 @@ void lara_col_crawl_idle(ItemInfo* item, CollisionInfo* coll)
 	item->Animation.IsAirborne = false;
 	lara->Control.KeepLow = TestLaraKeepLow(item, coll);
 	lara->Control.IsLow = true;
-	lara->Control.MoveAngle = item->Pose.Orientation.GetY();
-	lara->ExtraTorsoRot.SetX();
-	lara->ExtraTorsoRot.SetY();
+	lara->Control.MoveAngle = item->Pose.Orientation.y;
+	lara->ExtraTorsoRot.x = 0.0f;
+	lara->ExtraTorsoRot.y = 0.0f;
 	coll->Setup.ForwardAngle = lara->Control.MoveAngle;
 	coll->Setup.Radius = LARA_RADIUS_CRAWL;
 	coll->Setup.Height = LARA_HEIGHT_CRAWL;
@@ -564,9 +564,9 @@ void lara_col_crawl_forward(ItemInfo* item, CollisionInfo* coll)
 	item->Animation.IsAirborne = false;
 	lara->Control.KeepLow = TestLaraKeepLow(item, coll);
 	lara->Control.IsLow = true;
-	lara->Control.MoveAngle = item->Pose.Orientation.GetY();
-	lara->ExtraTorsoRot.SetX();
-	lara->ExtraTorsoRot.SetY();
+	lara->Control.MoveAngle = item->Pose.Orientation.y;
+	lara->ExtraTorsoRot.x = 0.0f;
+	lara->ExtraTorsoRot.y = 0.0f;
 	coll->Setup.Radius = LARA_RADIUS_CRAWL;
 	coll->Setup.Height = LARA_HEIGHT_CRAWL;
 	coll->Setup.LowerFloorBound = CRAWL_STEPUP_HEIGHT;
@@ -652,7 +652,7 @@ void lara_col_crawl_back(ItemInfo* item, CollisionInfo* coll)
 	item->Animation.IsAirborne = false;
 	lara->Control.KeepLow = TestLaraKeepLow(item, coll);
 	lara->Control.IsLow = true;
-	lara->Control.MoveAngle = Angle::Normalize(item->Pose.Orientation.GetY() + Angle::DegToRad(180.0f));
+	lara->Control.MoveAngle = Angle::Normalize(item->Pose.Orientation.y + Angle::DegToRad(180.0f));
 	coll->Setup.Radius = LARA_RADIUS_CRAWL;
 	coll->Setup.Height = LARA_HEIGHT_CRAWL;
 	coll->Setup.LowerFloorBound = CRAWL_STEPUP_HEIGHT;
@@ -844,14 +844,14 @@ void lara_col_crawl_to_hang(ItemInfo* item, CollisionInfo* coll)
 
 	if (item->Animation.AnimNumber == LA_CRAWL_TO_HANG_END)
 	{
-		lara->Control.MoveAngle = item->Pose.Orientation.GetY();
+		lara->Control.MoveAngle = item->Pose.Orientation.y;
 		coll->Setup.Height = LARA_HEIGHT_STRETCH;
 		coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 		coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
 		coll->Setup.LowerCeilingBound = BAD_JUMP_CEILING;
 		coll->Setup.ForwardAngle = lara->Control.MoveAngle;
 
-		TranslateItem(item, item->Pose.Orientation.GetY(), -CLICK(1));
+		TranslateItem(item, item->Pose.Orientation.y, -CLICK(1));
 		GetCollisionInfo(coll, item);
 		SnapItemToLedge(item, coll);
 		SetAnimation(item, LA_REACH_TO_HANG, 12);

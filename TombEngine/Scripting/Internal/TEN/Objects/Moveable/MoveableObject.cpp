@@ -504,9 +504,9 @@ void Moveable::SetPos(Vec3 const& pos)
 Rotation Moveable::GetRot() const
 {
 	return {
-		Angle::RadToDeg(m_item->Pose.Orientation.GetX()),
-		Angle::RadToDeg(m_item->Pose.Orientation.GetY()),
-		Angle::RadToDeg(m_item->Pose.Orientation.GetZ())
+		Angle::RadToDeg(m_item->Pose.Orientation.x),
+		Angle::RadToDeg(m_item->Pose.Orientation.y),
+		Angle::RadToDeg(m_item->Pose.Orientation.z)
 	};
 }
 

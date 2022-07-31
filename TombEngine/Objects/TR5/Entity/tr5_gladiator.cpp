@@ -90,7 +90,7 @@ void ControlGladiator(short itemNumber)
 			int dx = LaraItem->Pose.Position.x - item->Pose.Position.x;
 			int dz = LaraItem->Pose.Position.z - item->Pose.Position.z;
 			
-			rot = atan2(dz, dx) - item->Pose.Orientation.GetY();
+			rot = atan2(dz, dx) - item->Pose.Orientation.y;
 			if (rot <= Angle::DegToRad(-90.0f) || rot >= Angle::DegToRad(90.0f))
 				unknown = false;
 
@@ -298,12 +298,12 @@ void ControlGladiator(short itemNumber)
 			if (abs(AI.angle) >= Angle::DegToRad(7.0f))
 			{
 				if (AI.angle >= 0)
-					item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + Angle::DegToRad(7.0f));
+					item->Pose.Orientation.SetY(item->Pose.Orientation.y + Angle::DegToRad(7.0f));
 				else
-					item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() - Angle::DegToRad(7.0f));
+					item->Pose.Orientation.SetY(item->Pose.Orientation.y - Angle::DegToRad(7.0f));
 			}
 			else
-				item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + AI.angle);
+				item->Pose.Orientation.SetY(item->Pose.Orientation.y + AI.angle);
 
 			if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 10)
 			{

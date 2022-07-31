@@ -66,7 +66,7 @@ bool ShotLara(ItemInfo* item, AI_INFO* AI, BITE_INFO* gun, short extraRotation, 
 
 				Vector3Int pos = { 0, 0, 0 };
 				GetJointAbsPosition(enemy, &pos, random);
-				DoBloodSplat(pos.x, pos.y, pos.z, (GetRandomControl() & 3) + 4, enemy->Pose.Orientation.GetY(), enemy->RoomNumber);
+				DoBloodSplat(pos.x, pos.y, pos.z, (GetRandomControl() & 3) + 4, enemy->Pose.Orientation.y, enemy->RoomNumber);
 			}
 		}
 	}

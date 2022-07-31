@@ -57,7 +57,7 @@ void HammerControl(short itemNumber)
                         v17 = *(_WORD*)(Items + 2 * v16 + 12) == 165;
                         currentItem = (ItemInfo_OK*)(Items + 2 * v16);
                         if (v17
-                            && currentItem->pos.Orientation.GetY() == -16384
+                            && currentItem->pos.Orientation.y == -16384
                             && *(_WORD*)(Items + 5622 * (signed __int16)currentItem->itemFlags[0] + 78) == 0x4000
                             && !*(_WORD*)(Items + 5622 * (signed __int16)currentItem->itemFlags[1] + 78))
                         {

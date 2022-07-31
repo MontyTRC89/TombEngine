@@ -79,9 +79,9 @@ namespace TEN::Entities::TR4
 		auto* creature = GetCreatureInfo(item);
 		auto* object = &Objects[item->ObjectNumber];
 
-	int x = item->Pose.Position.x + 614 * sin(item->Pose.Orientation.GetY());
+	int x = item->Pose.Position.x + 614 * sin(item->Pose.Orientation.y);
 	int y = item->Pose.Position.y;
-	int z = item->Pose.Position.z + 614 * cos(item->Pose.Orientation.GetY());
+	int z = item->Pose.Position.z + 614 * cos(item->Pose.Orientation.y);
 
 		auto probe = GetCollision(x, y, z, item->RoomNumber);
 
@@ -110,9 +110,9 @@ namespace TEN::Entities::TR4
 			}
 		}
 
-	x = item->Pose.Position.x - 614 * sin(item->Pose.Orientation.GetY());
+	x = item->Pose.Position.x - 614 * sin(item->Pose.Orientation.y);
 	y = item->Pose.Position.y;
-	z = item->Pose.Position.z - 614 * cos(item->Pose.Orientation.GetY());
+	z = item->Pose.Position.z - 614 * cos(item->Pose.Orientation.y);
 
 		int height2 = GetCollision(x, y, z, item->RoomNumber).Position.Floor;
 

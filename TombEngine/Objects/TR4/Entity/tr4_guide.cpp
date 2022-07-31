@@ -115,7 +115,7 @@ namespace TEN::Entities::TR4
 		int dx = LaraItem->Pose.Position.x - item->Pose.Position.x;
 		int dz = LaraItem->Pose.Position.z - item->Pose.Position.z;
 
-	laraAI.angle = atan2(dz, dx) - item->Pose.Orientation.GetY();
+	laraAI.angle = atan2(dz, dx) - item->Pose.Orientation.y;
 
 	laraAI.ahead = true;
 	if (laraAI.angle <= Angle::DegToRad(-90.0f) || laraAI.angle >= Angle::DegToRad(90.0f))
@@ -525,7 +525,7 @@ namespace TEN::Entities::TR4
 			creature->MaxTurn = 0;
 
 		if (laraAI.angle < -256)
-			item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() - 399);
+			item->Pose.Orientation.SetY(item->Pose.Orientation.y - 399);
 
 			break;
 
@@ -542,12 +542,12 @@ namespace TEN::Entities::TR4
 		if (abs(AI.angle) >= Angle::DegToRad(7.0f))
 		{
 			if (AI.angle < 0)
-				item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + Angle::DegToRad(7.0f));
+				item->Pose.Orientation.SetY(item->Pose.Orientation.y + Angle::DegToRad(7.0f));
 			else
-				item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() - Angle::DegToRad(7.0f));
+				item->Pose.Orientation.SetY(item->Pose.Orientation.y - Angle::DegToRad(7.0f));
 		}
 		else
-			item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + AI.angle);
+			item->Pose.Orientation.SetY(item->Pose.Orientation.y + AI.angle);
 
 			if (!creature->Flags)
 			{
@@ -588,7 +588,7 @@ namespace TEN::Entities::TR4
 			creature->MaxTurn = 0;
 
 		if (laraAI.angle > 256)
-			item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + 399);
+			item->Pose.Orientation.SetY(item->Pose.Orientation.y + 399);
 
 			break;
 
@@ -596,9 +596,9 @@ namespace TEN::Entities::TR4
 	case 43:
 		if (enemy)
 		{
-			short deltaAngle = enemy->Pose.Orientation.GetY() - item->Pose.Orientation.GetY();
+			short deltaAngle = enemy->Pose.Orientation.y - item->Pose.Orientation.y;
 			if (deltaAngle < Angle::DegToRad(-2.0f))
-				item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() - Angle::DegToRad(2.0f));
+				item->Pose.Orientation.SetY(item->Pose.Orientation.y - Angle::DegToRad(2.0f));
 			else if (deltaAngle > Angle::DegToRad(2.0f))
 				item->Pose.Orientation.SetY(Angle::DegToRad(2.0f));
 		}
@@ -778,7 +778,7 @@ namespace TEN::Entities::TR4
 	case 41:
 	case 42:
 		creature->MaxTurn = 0;
-		MoveCreature3DPos(&item->Pose, &enemy->Pose, 15, enemy->Pose.Orientation.GetY() - item->Pose.Orientation.GetY(), Angle::DegToRad(10.0f));
+		MoveCreature3DPos(&item->Pose, &enemy->Pose, 15, enemy->Pose.Orientation.y - item->Pose.Orientation.y, Angle::DegToRad(10.0f));
 
 		default:
 			break;

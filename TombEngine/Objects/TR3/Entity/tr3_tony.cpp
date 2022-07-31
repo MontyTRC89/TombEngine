@@ -674,7 +674,7 @@ namespace TEN::Entities::TR3
 				torsoY = AI.angle;
 
 				if ((item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase) == 28)
-					TriggerFireBall(item, T_ZAPP, NULL, item->RoomNumber, item->Pose.Orientation.GetY(), 0);
+					TriggerFireBall(item, T_ZAPP, NULL, item->RoomNumber, item->Pose.Orientation.y, 0);
 
 				break;
 

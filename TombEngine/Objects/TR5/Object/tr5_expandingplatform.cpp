@@ -50,25 +50,25 @@ bool IsOnExpandingPlatform(int itemNumber, int x, int z)
 	auto bounds = GetBoundsAccurate(item);
 	auto halfWidth = abs(bounds->Z2 - bounds->Z1) / 2;
 
-	if (item->Pose.Orientation.GetY() == Angle::DegToRad(90.0f))
+	if (item->Pose.Orientation.y == Angle::DegToRad(90.0f))
 	{
 		int xBorder = item->Pose.Position.x + halfWidth - SECTOR(1) * item->ItemFlags[1] / 4096;
 		if (x < xBorder || zb != itemzb || xb != itemxb)
 			return false;
 	}
-	else if (item->Pose.Orientation.GetY() == Angle::DegToRad(270.0f))
+	else if (item->Pose.Orientation.y == Angle::DegToRad(270.0f))
 	{
 		int xBorder = item->Pose.Position.x - halfWidth + SECTOR(1) * item->ItemFlags[1] / 4096;
 		if (x > xBorder || zb != itemzb || xb != itemxb)
 			return false;
 	}
-	else if (item->Pose.Orientation.GetY() == 0)
+	else if (item->Pose.Orientation.y == 0)
 	{
 		int zBorder = item->Pose.Position.z + halfWidth - SECTOR(1) * item->ItemFlags[1] / 4096;
 		if (z < zBorder || zb != itemzb || xb != itemxb)
 			return false;
 	}
-	else if (item->Pose.Orientation.GetY() == Angle::DegToRad(180.0f))
+	else if (item->Pose.Orientation.y == Angle::DegToRad(180.0f))
 	{
 		int zBorder = item->Pose.Position.z - halfWidth + SECTOR(1) * item->ItemFlags[1] / 4096;
 		if (z > zBorder || zb != itemzb || xb != itemxb)
@@ -99,28 +99,28 @@ bool IsInFrontOfExpandingPlatform(int itemNumber, int x, int y, int z, int margi
 	int itemxb = item->Pose.Position.x / SECTOR(1);
 	int itemzb = item->Pose.Position.z / SECTOR(1);
 
-	if (item->Pose.Orientation.GetY() == Angle::DegToRad(90))
+	if (item->Pose.Orientation.y == Angle::DegToRad(90))
 	{
 		int xBorder = item->Pose.Position.x + halfWidth - margin - SECTOR(1) * item->ItemFlags[1] / 4096;
 		int xBorder2 = item->Pose.Position.x + halfWidth;
 		if (x < xBorder || zb != itemzb || x > xBorder2)
 			return false;
 	}
-	else if (item->Pose.Orientation.GetY() == Angle::DegToRad(270))
+	else if (item->Pose.Orientation.y == Angle::DegToRad(270))
 	{
 		int xBorder = item->Pose.Position.x - halfWidth + margin + SECTOR(1) * item->ItemFlags[1] / 4096;
 		int xBorder2 = item->Pose.Position.x - halfWidth;
 		if (x > xBorder || zb != itemzb || x < xBorder2)
 			return false;
 	}
-	else if (item->Pose.Orientation.GetY() == 0)
+	else if (item->Pose.Orientation.y == 0)
 	{
 		int zBorder = item->Pose.Position.z + halfWidth - margin - SECTOR(1) * item->ItemFlags[1] / 4096;
 		int zBorder2 = item->Pose.Position.z + halfWidth;
 		if (z < zBorder || xb != itemxb || z > zBorder2)
 			return false;
 	}
-	else if (item->Pose.Orientation.GetY() == Angle::DegToRad(180))
+	else if (item->Pose.Orientation.y == Angle::DegToRad(180))
 	{
 		int zBorder = item->Pose.Position.z - halfWidth + margin + SECTOR(1) * item->ItemFlags[1] / 4096;
 		int zBorder2 = item->Pose.Position.z - halfWidth;
@@ -135,7 +135,7 @@ void ShiftLaraOnPlatform(short itemNumber, bool isExpanding)
 {
 	auto* item = &g_Level.Items[itemNumber];
 
-	float angle = item->Pose.Orientation.GetY();
+	float angle = item->Pose.Orientation.y;
 	int xShift = 0;
 	int zShift = 0;
 
@@ -285,10 +285,10 @@ void ExpandingPlatformUpdateMutators(short itemNumber)
 
 	// Update bone mutators
 	float zTranslate = 0.0f;
-	if (item->Pose.Orientation.GetY() == 0)   zTranslate =  width  - offset;
-	if (item->Pose.Orientation.GetY() == Angle::DegToRad(90.0f))  zTranslate = -offset + width;
-	if (item->Pose.Orientation.GetY() == Angle::DegToRad(180.0f)) zTranslate = -offset + width;
-	if (item->Pose.Orientation.GetY() == Angle::DegToRad(270.0f)) zTranslate =  width  - offset;
+	if (item->Pose.Orientation.y == 0)   zTranslate =  width  - offset;
+	if (item->Pose.Orientation.y == Angle::DegToRad(90.0f))  zTranslate = -offset + width;
+	if (item->Pose.Orientation.y == Angle::DegToRad(180.0f)) zTranslate = -offset + width;
+	if (item->Pose.Orientation.y == Angle::DegToRad(270.0f)) zTranslate =  width  - offset;
 
 	for (int i = 0; i < item->Animation.Mutator.size(); i++)
 	{

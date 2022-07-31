@@ -112,8 +112,8 @@ void AnimatePistols(ItemInfo* laraItem, LaraWeaponType weaponType)
 				if (weaponType != LaraWeaponType::Revolver)
 				{
 					auto rightArmOrient = EulerAngles(
-						lara->RightArm.Orientation.GetX(),
-						lara->RightArm.Orientation.GetY() + laraItem->Pose.Orientation.GetY(),
+						lara->RightArm.Orientation.x,
+						lara->RightArm.Orientation.y + laraItem->Pose.Orientation.y,
 						0.0f
 					);
 
@@ -195,8 +195,8 @@ void AnimatePistols(ItemInfo* laraItem, LaraWeaponType weaponType)
 			if (TrInput & IN_ACTION)
 			{
 				auto leftArmOrient = EulerAngles(
-					lara->LeftArm.Orientation.GetX(),
-					lara->LeftArm.Orientation.GetY() + laraItem->Pose.Orientation.GetY(),
+					lara->LeftArm.Orientation.x,
+					lara->LeftArm.Orientation.y + laraItem->Pose.Orientation.y,
 					0.0f
 				);
 

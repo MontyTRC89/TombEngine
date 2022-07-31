@@ -37,8 +37,8 @@ void FlareControl(short itemNumber)
 	}
 	else
 	{
-		flareItem->Pose.Orientation.SetX();
-		flareItem->Pose.Orientation.SetZ();
+		flareItem->Pose.Orientation.x = 0.0f;
+		flareItem->Pose.Orientation.z = 0.0f;
 	}
 
 	auto velocity = Vector3Int(
@@ -315,9 +315,9 @@ void CreateFlare(ItemInfo* laraItem, GAME_OBJECT_ID objectNumber, bool thrown)
 		else
 		{
 			if (thrown)
-				flareItem->Pose.Orientation.SetY(laraItem->Pose.Orientation.GetY());
+				flareItem->Pose.Orientation.SetY(laraItem->Pose.Orientation.y);
 			else
-				flareItem->Pose.Orientation.SetY(laraItem->Pose.Orientation.GetY() - Angle::DegToRad(45.0f));
+				flareItem->Pose.Orientation.SetY(laraItem->Pose.Orientation.y - Angle::DegToRad(45.0f));
 
 			flareItem->RoomNumber = laraItem->RoomNumber;
 		}

@@ -205,7 +205,7 @@ void lara_col_monkey_forward(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->Control.MoveAngle = item->Pose.Orientation.GetY();
+	lara->Control.MoveAngle = item->Pose.Orientation.y;
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = 0;
 	coll->Setup.LowerCeilingBound = CLICK(1.25f);
@@ -276,7 +276,7 @@ void lara_col_monkey_back(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->Control.MoveAngle = Angle::Normalize(item->Pose.Orientation.GetY() + Angle::DegToRad(180.0f));
+	lara->Control.MoveAngle = Angle::Normalize(item->Pose.Orientation.y + Angle::DegToRad(180.0f));
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = 0;
 	coll->Setup.LowerCeilingBound = CLICK(1.25f);
@@ -350,7 +350,7 @@ void lara_col_monkey_shimmy_left(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->Control.MoveAngle = Angle::Normalize(item->Pose.Orientation.GetY() - Angle::DegToRad(90.0f));
+	lara->Control.MoveAngle = Angle::Normalize(item->Pose.Orientation.y - Angle::DegToRad(90.0f));
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = 0;
 	coll->Setup.LowerCeilingBound = CLICK(0.5f);
@@ -424,7 +424,7 @@ void lara_col_monkey_shimmy_right(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->Control.MoveAngle = Angle::Normalize(item->Pose.Orientation.GetY() + Angle::DegToRad(90.0f));
+	lara->Control.MoveAngle = Angle::Normalize(item->Pose.Orientation.y + Angle::DegToRad(90.0f));
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = 0;
 	coll->Setup.LowerCeilingBound = CLICK(0.5f);

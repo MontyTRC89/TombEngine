@@ -83,8 +83,8 @@ static void ImpThrowStones(ItemInfo* item)
 	if (distance < 8)
 		distance = 8;
 
-	angles.SetX(angles.GetX() + GetRandomControl() % (distance / 2) - (distance / 4));
-	angles.SetY(angles.GetY() + GetRandomControl() % (distance / 4) - (distance / 8));
+	angles.SetX(angles.x + GetRandomControl() % (distance / 2) - (distance / 4));
+	angles.SetY(angles.y + GetRandomControl() % (distance / 4) - (distance / 8));
 	
 	short fxNumber = CreateNewEffect(item->RoomNumber);
 	if (fxNumber != NO_ITEM)
@@ -92,7 +92,7 @@ static void ImpThrowStones(ItemInfo* item)
 		auto* fx = &EffectList[fxNumber];
 
 		fx->pos.Position = pos1;
-		fx->pos.Orientation.Set((angles.GetX() + distance) / 2, angles.GetY(), 0.0f);
+		fx->pos.Orientation.Set((angles.x + distance) / 2, angles.y, 0.0f);
 		fx->roomNumber = item->RoomNumber;
 		fx->speed = 4 * sqrt(distance);
 
@@ -137,7 +137,7 @@ void ImpControl(short itemNumber)
 			if (creature->Enemy == LaraItem)
 				angle2 = AI.angle;
 			else
-				angle2 = atan2(LaraItem->Pose.Position.z - item->Pose.Position.z, LaraItem->Pose.Position.x - item->Pose.Position.x) - item->Pose.Orientation.GetY();
+				angle2 = atan2(LaraItem->Pose.Position.z - item->Pose.Position.z, LaraItem->Pose.Position.x - item->Pose.Position.x) - item->Pose.Orientation.y;
 
 			int d1 = item->Pose.Position.y - LaraItem->Pose.Position.y + CLICK(1.5f);
 
@@ -280,12 +280,12 @@ void ImpControl(short itemNumber)
 			if (abs(angle2) >= Angle::DegToRad(2.0f))
 			{
 				if (angle2 >= 0)
-					item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + Angle::DegToRad(2.0f));
+					item->Pose.Orientation.SetY(item->Pose.Orientation.y + Angle::DegToRad(2.0f));
 				else
-					item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() - Angle::DegToRad(2.0f));
+					item->Pose.Orientation.SetY(item->Pose.Orientation.y - Angle::DegToRad(2.0f));
 			}
 			else
-				item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + angle2);
+				item->Pose.Orientation.SetY(item->Pose.Orientation.y + angle2);
 		}
 
 		CreatureTilt(item, 0);

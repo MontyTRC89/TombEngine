@@ -43,8 +43,8 @@ namespace TEN::Entities::Generic
 			laraItem->Animation.AnimNumber == LA_STAND_IDLE || laraInfo->Control.IsMoving &&
 			laraInfo->InteractedItem == itemNumber)
 		{
-			short rot = poleItem->Pose.Orientation.GetY();
-			poleItem->Pose.Orientation.SetY(laraItem->Pose.Orientation.GetY());
+			short rot = poleItem->Pose.Orientation.y;
+			poleItem->Pose.Orientation.SetY(laraItem->Pose.Orientation.y);
 
 			if (TestLaraPosition(&PoleBounds, poleItem, laraItem))
 			{
@@ -84,8 +84,8 @@ namespace TEN::Entities::Generic
 			{
 				if (TestCollision(poleItem, laraItem))
 				{
-					short rot = poleItem->Pose.Orientation.GetY();
-					poleItem->Pose.Orientation.SetY(laraItem->Pose.Orientation.GetY());
+					short rot = poleItem->Pose.Orientation.y;
+					poleItem->Pose.Orientation.SetY(laraItem->Pose.Orientation.y);
 					if (laraItem->Animation.ActiveState == LS_REACH)
 					{
 						PolePosR.y = laraItem->Pose.Position.y - poleItem->Pose.Position.y + 10;

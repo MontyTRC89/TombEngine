@@ -6,9 +6,9 @@
 	{
 	public:
 		// Normalized angle components in radians
-		float x;
-		float y;
-		float z;
+		float x = 0.0f;
+		float y = 0.0f;
+		float z = 0.0f;
 
 		static const EulerAngles Zero;
 
@@ -38,14 +38,10 @@
 
 		static EulerAngles OrientBetweenPoints(Vector3 origin, Vector3 target);
 
-		// TODO: Roll back OOy get/set methods and use a strong typedef to define angles.
-
 		// Getters
 		Vector3 GetDirectionVector();
-		float GetX();
-		float GetY();
-		float GetZ();
 
+		// TODO: Roll back OOy set methods.
 		// Setters
 		void Set(EulerAngles orient);
 		void Set(float xAngle, float yAngle, float zAngle);
@@ -61,6 +57,7 @@
 		EulerAngles  operator *(EulerAngles orient);
 		EulerAngles  operator *(float value);
 		EulerAngles	 operator /(float value);
+		EulerAngles& operator =(EulerAngles orient);
 		EulerAngles& operator +=(EulerAngles orient);
 		EulerAngles& operator -=(EulerAngles orient);
 		EulerAngles& operator *=(EulerAngles orient);

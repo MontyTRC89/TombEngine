@@ -32,14 +32,6 @@
 		return (x != vector.x || y != vector.y || z != vector.z);
 	}
 
-	Vector3Int Vector3Int::operator =(Vector3Int vector)
-	{
-		this->x = vector.x;
-		this->y = vector.y;
-		this->z = vector.z;
-		return *this;
-	}
-
 	Vector3Int Vector3Int::operator +(Vector3Int vector)
 	{
 		return Vector3Int(x + vector.x, y + vector.y, z + vector.z);
@@ -63,6 +55,14 @@
 	Vector3Int Vector3Int::operator /(float value)
 	{
 		return Vector3Int((int)round(x / value), (int)round(y / value), (int)round(z / value));
+	}
+
+	Vector3Int& Vector3Int::operator =(Vector3Int vector)
+	{
+		this->x = vector.x;
+		this->y = vector.y;
+		this->z = vector.z;
+		return *this;
 	}
 
 	Vector3Int& Vector3Int::operator +=(Vector3Int vector)

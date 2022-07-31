@@ -67,7 +67,7 @@ static void HydraBubblesAttack(PHD_3DPOS* pos, short roomNumber, int count)
 		fx->pos.Position.x = pos->Position.x;
 		fx->pos.Position.y = pos->Position.y - (GetRandomControl() & 0x3F) - 32;
 		fx->pos.Position.z = pos->Position.z;
-		fx->pos.Orientation.Set(pos->Orientation.GetX(), pos->Orientation.GetY(), 0.0f);
+		fx->pos.Orientation.Set(pos->Orientation.x, pos->Orientation.y, 0.0f);
 		fx->roomNumber = roomNumber;
 		fx->counter = 16 * count + 15;
 		fx->flag1 = 0;
@@ -194,12 +194,12 @@ void HydraControl(short itemNumber)
 			if (abs(AI.angle) >= Angle::DegToRad(1.0f))
 			{
 				if (AI.angle > 0)
-					item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + Angle::DegToRad(1.0f));
+					item->Pose.Orientation.SetY(item->Pose.Orientation.y + Angle::DegToRad(1.0f));
 				else
-					item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() - Angle::DegToRad(1.0f));
+					item->Pose.Orientation.SetY(item->Pose.Orientation.y - Angle::DegToRad(1.0f));
 			}
 			else
-				item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + AI.angle);
+				item->Pose.Orientation.SetY(item->Pose.Orientation.y + AI.angle);
 
 			if (item->TriggerFlags == 1)
 				tilt = Angle::DegToRad(-2.8f);

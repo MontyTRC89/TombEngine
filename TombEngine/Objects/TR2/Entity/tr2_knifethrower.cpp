@@ -42,10 +42,10 @@ void KnifeControl(short fxNumber)
 	else
 		fx->counter--;
 
-	int speed = fx->speed * cos(fx->pos.Orientation.GetX());
-	fx->pos.Position.z += speed * cos(fx->pos.Orientation.GetY());
-	fx->pos.Position.x += speed * sin(fx->pos.Orientation.GetY());
-	fx->pos.Position.y += fx->speed * sin(-fx->pos.Orientation.GetX());
+	int speed = fx->speed * cos(fx->pos.Orientation.x);
+	fx->pos.Position.z += speed * cos(fx->pos.Orientation.y);
+	fx->pos.Position.x += speed * sin(fx->pos.Orientation.y);
+	fx->pos.Position.y += fx->speed * sin(-fx->pos.Orientation.x);
 
 	auto probe = GetCollision(fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z, fx->roomNumber);
 
@@ -59,18 +59,18 @@ void KnifeControl(short fxNumber)
 	if (probe.RoomNumber != fx->roomNumber)
 		EffectNewRoom(fxNumber, probe.RoomNumber);
 
-	fx->pos.Orientation.SetZ(fx->pos.Orientation.GetZ() + Angle::DegToRad(30.0f));
+	fx->pos.Orientation.SetZ(fx->pos.Orientation.z + Angle::DegToRad(30.0f));
 
 	if (ItemNearLara(&fx->pos, 200))
 	{
 		DoDamage(LaraItem, 50);
 
-		fx->pos.Orientation.SetY(LaraItem->Pose.Orientation.GetY());
+		fx->pos.Orientation.SetY(LaraItem->Pose.Orientation.y);
 		fx->speed = LaraItem->Animation.Velocity;
 		fx->frameNumber = fx->counter = 0;
 
 		SoundEffect(SFX_TR2_CRUNCH2, &fx->pos);
-		DoBloodSplat(fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z, 80, fx->pos.Orientation.GetY(), fx->roomNumber);
+		DoBloodSplat(fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z, 80, fx->pos.Orientation.y, fx->roomNumber);
 		KillEffect(fxNumber);
 	}
 }

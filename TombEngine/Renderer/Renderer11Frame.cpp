@@ -352,7 +352,7 @@ namespace TEN::Renderer
 
 			newItem->ItemNumber = itemNum;
 			newItem->Translation = Matrix::CreateTranslation(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z);
-			newItem->Rotation = Matrix::CreateFromYawPitchRoll(item->Pose.Orientation.GetY(), item->Pose.Orientation.GetX(), item->Pose.Orientation.GetZ());
+			newItem->Rotation = Matrix::CreateFromYawPitchRoll(item->Pose.Orientation.y, item->Pose.Orientation.x, item->Pose.Orientation.z);
 			newItem->Scale = Matrix::CreateScale(1.0f);
 			newItem->World = newItem->Rotation * newItem->Translation;
 
@@ -663,7 +663,7 @@ namespace TEN::Renderer
 
 			newEffect->Effect = fx;
 			newEffect->Id = fxNum;
-			newEffect->World = Matrix::CreateFromYawPitchRoll(fx->pos.Orientation.GetY(), fx->pos.Position.x, fx->pos.Position.z) * Matrix::CreateTranslation(fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z);
+			newEffect->World = Matrix::CreateFromYawPitchRoll(fx->pos.Orientation.y, fx->pos.Position.x, fx->pos.Position.z) * Matrix::CreateTranslation(fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z);
 			newEffect->Mesh = GetMesh(obj->nmeshes ? obj->meshIndex : fx->frameNumber);
 
 			CollectLightsForEffect(fx->roomNumber, newEffect);

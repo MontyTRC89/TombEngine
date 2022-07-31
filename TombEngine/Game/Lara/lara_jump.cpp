@@ -111,7 +111,7 @@ void lara_col_jump_forward(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->Control.MoveAngle = (item->Animation.Velocity > 0) ? item->Pose.Orientation.GetY() : Angle::Normalize(item->Pose.Orientation.GetY() + Angle::DegToRad(180.0f));
+	lara->Control.MoveAngle = (item->Animation.Velocity > 0) ? item->Pose.Orientation.y : Angle::Normalize(item->Pose.Orientation.y + Angle::DegToRad(180.0f));
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
 	coll->Setup.LowerCeilingBound = BAD_JUMP_CEILING;
@@ -121,7 +121,7 @@ void lara_col_jump_forward(ItemInfo* item, CollisionInfo* coll)
 	LaraDeflectEdgeJump(item, coll);
 
 	// TODO: Why??
-	lara->Control.MoveAngle = (item->Animation.Velocity < 0) ? item->Pose.Orientation.GetY() : lara->Control.MoveAngle;
+	lara->Control.MoveAngle = (item->Animation.Velocity < 0) ? item->Pose.Orientation.y : lara->Control.MoveAngle;
 }
 
 // State:		LS_FREEFALL (9)
@@ -228,7 +228,7 @@ void lara_col_reach(ItemInfo* item, CollisionInfo* coll)
 	if (lara->Control.Rope.Ptr == -1)
 		item->Animation.IsAirborne = true;
 
-	lara->Control.MoveAngle = item->Pose.Orientation.GetY();
+	lara->Control.MoveAngle = item->Pose.Orientation.y;
 	coll->Setup.Height = LARA_HEIGHT;
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = 0;
@@ -323,7 +323,7 @@ void lara_col_jump_prepare(ItemInfo* item, CollisionInfo* coll)
 
 	bool isSwamp = TestEnvironment(ENV_FLAG_SWAMP, item);
 
-	lara->Control.MoveAngle = item->Pose.Orientation.GetY();
+	lara->Control.MoveAngle = item->Pose.Orientation.y;
 	switch (lara->Control.JumpDirection)
 	{
 	case JumpDirection::Back:
@@ -435,7 +435,7 @@ void lara_as_jump_back(ItemInfo* item, CollisionInfo* coll)
 // Control:		lara_as_jump_back()
 void lara_col_jump_back(ItemInfo* item, CollisionInfo* coll)
 {
-	LaraJumpCollision(item, coll, Angle::Normalize(item->Pose.Orientation.GetY() + Angle::DegToRad(180.0f)));
+	LaraJumpCollision(item, coll, Angle::Normalize(item->Pose.Orientation.y + Angle::DegToRad(180.0f)));
 }
 
 // State:		LS_JUMP_RIGHT (26)
@@ -492,7 +492,7 @@ void lara_as_jump_right(ItemInfo* item, CollisionInfo* coll)
 // Control:		lara_as_jump_right()
 void lara_col_jump_right(ItemInfo* item, CollisionInfo* coll)
 {
-	LaraJumpCollision(item, coll, Angle::Normalize(item->Pose.Orientation.GetY() + Angle::DegToRad(90.0f)));
+	LaraJumpCollision(item, coll, Angle::Normalize(item->Pose.Orientation.y + Angle::DegToRad(90.0f)));
 }
 
 // State:		LS_JUMP_LEFT (27)
@@ -549,7 +549,7 @@ void lara_as_jump_left(ItemInfo* item, CollisionInfo* coll)
 // Control:		lara_as_jump_left()
 void lara_col_jump_left(ItemInfo* item, CollisionInfo* coll)
 {
-	LaraJumpCollision(item, coll, Angle::Normalize(item->Pose.Orientation.GetY() - Angle::DegToRad(90.0f)));
+	LaraJumpCollision(item, coll, Angle::Normalize(item->Pose.Orientation.y - Angle::DegToRad(90.0f)));
 }
 
 // State:		LS_JUMP_UP (28)
@@ -608,8 +608,8 @@ void lara_as_jump_up(ItemInfo* item, CollisionInfo* coll)
 	if (item->Animation.Velocity < 0)
 	{
 		// TODO: Holding BACK + LEFT/RIGHT results in Lara flexing more.
-		item->Pose.Orientation.SetX(item->Pose.Orientation.GetX() + std::min(LARA_LEAN_RATE / 3, abs(Angle::DegToRad(item->Animation.Velocity) - item->Pose.Orientation.GetX()) / 3));
-		lara->ExtraHeadRot.SetY(lara->ExtraHeadRot.GetY() + (Angle::DegToRad(10.0f) - item->Pose.Orientation.GetZ()) / 3);
+		item->Pose.Orientation.SetX(item->Pose.Orientation.x + std::min(LARA_LEAN_RATE / 3, abs(Angle::DegToRad(item->Animation.Velocity) - item->Pose.Orientation.x) / 3));
+		lara->ExtraHeadRot.SetY(lara->ExtraHeadRot.y + (Angle::DegToRad(10.0f) - item->Pose.Orientation.z) / 3);
 	}
 
 	item->Animation.TargetState = LS_JUMP_UP;
@@ -621,7 +621,7 @@ void lara_col_jump_up(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->Control.MoveAngle = item->Pose.Orientation.GetY();
+	lara->Control.MoveAngle = item->Pose.Orientation.y;
 	coll->Setup.Height = LARA_HEIGHT_STRETCH;
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;

@@ -284,8 +284,8 @@ namespace TEN::Entities::TR4
 			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 			item->Animation.TargetState = BADDY_STATE_CLIMB_4_STEPS;
 			item->Animation.ActiveState = BADDY_STATE_CLIMB_4_STEPS;
-			item->Pose.Position.x += sin(item->Pose.Orientation.GetY()) * CLICK(4);
-			item->Pose.Position.z += cos(item->Pose.Orientation.GetY()) * CLICK(4);
+			item->Pose.Position.x += sin(item->Pose.Orientation.y) * CLICK(4);
+			item->Pose.Position.z += cos(item->Pose.Orientation.y) * CLICK(4);
 			return;
 		}
 
@@ -296,8 +296,8 @@ namespace TEN::Entities::TR4
 			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 			item->Animation.TargetState = BADDY_STATE_CROUCH;
 			item->Animation.ActiveState = BADDY_STATE_CROUCH;
-			item->Pose.Position.x += sin(item->Pose.Orientation.GetY()) * CLICK(4);
-			item->Pose.Position.z += cos(item->Pose.Orientation.GetY()) * CLICK(4);
+			item->Pose.Position.x += sin(item->Pose.Orientation.y) * CLICK(4);
+			item->Pose.Position.z += cos(item->Pose.Orientation.y) * CLICK(4);
 			item->ItemFlags[3] = ocb;
 			return;
 		}
@@ -351,8 +351,8 @@ namespace TEN::Entities::TR4
 		int y = item->Pose.Position.y;
 		int z = item->Pose.Position.z;
 
-		int dx = 942 * sin(item->Pose.Orientation.GetY());
-		int dz = 942 * cos(item->Pose.Orientation.GetY());
+		int dx = 942 * sin(item->Pose.Orientation.y);
+		int dz = 942 * cos(item->Pose.Orientation.y);
 
 		x += dx;
 		z += dz;
@@ -533,7 +533,7 @@ namespace TEN::Entities::TR4
 			{
 				dx = LaraItem->Pose.Position.x - item->Pose.Position.x;
 				dz = LaraItem->Pose.Position.z - item->Pose.Position.z;
-				laraAI.angle = atan2(dz, dx) - item->Pose.Orientation.GetY();
+				laraAI.angle = atan2(dz, dx) - item->Pose.Orientation.y;
 				laraAI.ahead = true;
 
 				if (laraAI.angle <= Angle::DegToRad(-90.0f) || laraAI.angle >= Angle::DegToRad(90.0f))
@@ -576,16 +576,16 @@ namespace TEN::Entities::TR4
 			}
 			else
 			{
-				dx = 942 * sin(item->Pose.Orientation.GetY() + Angle::DegToRad(45.0f));
-				dz = 942 * cos(item->Pose.Orientation.GetY() + Angle::DegToRad(45.0f));
+				dx = 942 * sin(item->Pose.Orientation.y + Angle::DegToRad(45.0f));
+				dz = 942 * cos(item->Pose.Orientation.y + Angle::DegToRad(45.0f));
 
 				x = item->Pose.Position.x + dx;
 				y = item->Pose.Position.y;
 				z = item->Pose.Position.z + dz;
 				int height4 = GetCollision(x, y, z, item->RoomNumber).Position.Floor;
 
-				dx = 942 * sin(item->Pose.Orientation.GetY() + Angle::DegToRad(78.75f));
-				dz = 942 * cos(item->Pose.Orientation.GetY() + Angle::DegToRad(78.75f));
+				dx = 942 * sin(item->Pose.Orientation.y + Angle::DegToRad(78.75f));
+				dz = 942 * cos(item->Pose.Orientation.y + Angle::DegToRad(78.75f));
 
 				x = item->Pose.Position.x + dx;
 				y = item->Pose.Position.y;
@@ -601,16 +601,16 @@ namespace TEN::Entities::TR4
 						jump = false;
 				}
 
-				dx = 942 * sin(item->Pose.Orientation.GetY() - Angle::DegToRad(45.0f));
-				dz = 942 * cos(item->Pose.Orientation.GetY() - Angle::DegToRad(45.0f));
+				dx = 942 * sin(item->Pose.Orientation.y - Angle::DegToRad(45.0f));
+				dz = 942 * cos(item->Pose.Orientation.y - Angle::DegToRad(45.0f));
 
 				x = item->Pose.Position.x + dx;
 				y = item->Pose.Position.y;
 				z = item->Pose.Position.z + dz;
 				int height6 = GetCollision(x, y, z, item->RoomNumber).Position.Floor;
 
-				dx = 942 * sin(item->Pose.Orientation.GetY() - Angle::DegToRad(78.75f));
-				dz = 942 * cos(item->Pose.Orientation.GetY() - Angle::DegToRad(78.75f));
+				dx = 942 * sin(item->Pose.Orientation.y - Angle::DegToRad(78.75f));
+				dz = 942 * cos(item->Pose.Orientation.y - Angle::DegToRad(78.75f));
 
 				x = item->Pose.Position.x + dx;
 				y = item->Pose.Position.y;
@@ -921,12 +921,12 @@ namespace TEN::Entities::TR4
 					if (abs(AI.angle) >= Angle::DegToRad(7.0f))
 					{
 						if (AI.angle >= 0)
-							item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + Angle::DegToRad(7.0f));
+							item->Pose.Orientation.SetY(item->Pose.Orientation.y + Angle::DegToRad(7.0f));
 						else
-							item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() - Angle::DegToRad(7.0f));
+							item->Pose.Orientation.SetY(item->Pose.Orientation.y - Angle::DegToRad(7.0f));
 					}
 					else
-						item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + AI.angle);
+						item->Pose.Orientation.SetY(item->Pose.Orientation.y + AI.angle);
 				}
 
 				if (!currentCreature->Flags)
@@ -940,7 +940,7 @@ namespace TEN::Entities::TR4
 								item,
 								&BaddySwordBite,
 								10,
-								item->Pose.Orientation.GetY(),
+								item->Pose.Orientation.y,
 								DoBloodSplat);
 
 							DoDamage(creature->Enemy, 120);

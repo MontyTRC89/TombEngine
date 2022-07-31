@@ -102,14 +102,14 @@ void lara_col_turn_switch(ItemInfo* item, CollisionInfo* coll)
 	{
 		if (item->Animation.AnimNumber == LA_TURNSWITCH_PUSH_COUNTER_CLOCKWISE_CONTINUE)
 		{
-			item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() - Angle::DegToRad(90.0f));
+			item->Pose.Orientation.SetY(item->Pose.Orientation.y - Angle::DegToRad(90.0f));
 			item->Animation.AnimNumber = LA_TURNSWITCH_PUSH_COUNTER_CLOCKWISE_END;
 			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 		}
 
 		if (item->Animation.AnimNumber == LA_TURNSWITCH_PUSH_CLOCKWISE_CONTINUE)
 		{
-			item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + Angle::DegToRad(90.0f));
+			item->Pose.Orientation.SetY(item->Pose.Orientation.y + Angle::DegToRad(90.0f));
 			item->Animation.AnimNumber = LA_TURNSWITCH_PUSH_CLOCKWISE_END;
 			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 		}
@@ -282,7 +282,7 @@ void lara_as_horizontal_bar_leap(ItemInfo* item, CollisionInfo* coll)
 	if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase)
 	{
 		int distance;
-		if (item->Pose.Orientation.GetY() == barItem->Pose.Orientation.GetY()) // Check
+		if (item->Pose.Orientation.y == barItem->Pose.Orientation.y) // Check
 			distance = (barItem->TriggerFlags / 100) - 2;
 		else
 			distance = (barItem->TriggerFlags % 100) - 2;
@@ -294,9 +294,9 @@ void lara_as_horizontal_bar_leap(ItemInfo* item, CollisionInfo* coll)
 	if (TestLastFrame(item))
 	{
 		SetAnimation(item, LA_REACH);
-		item->Pose.Position.x += 700 * sin(item->Pose.Orientation.GetY());
+		item->Pose.Position.x += 700 * sin(item->Pose.Orientation.y);
 		item->Pose.Position.y -= 361;
-		item->Pose.Position.z += 700 * cos(item->Pose.Orientation.GetY());
+		item->Pose.Position.z += 700 * cos(item->Pose.Orientation.y);
 	}
 }
 
@@ -345,8 +345,8 @@ void lara_as_tightrope_dismount(ItemInfo* item, CollisionInfo* coll)
 	if (item->Animation.AnimNumber == LA_TIGHTROPE_END &&
 		TestLastFrame(item))
 	{
-		item->Pose.Orientation.SetY();
-		lara->ExtraTorsoRot.SetZ();
+		item->Pose.Orientation.y = 0.0f;
+		lara->ExtraTorsoRot.z = 0.0f;
 	}
 }
 
@@ -649,7 +649,7 @@ void lara_col_rope_swing(ItemInfo* item, CollisionInfo* coll)
 
 			ApplyVelocityToRope(
 				lara->Control.Rope.Segment - 2,
-				item->Pose.Orientation.GetY() + (lara->Control.Rope.Direction ? 0 : Angle::DegToRad(180.0f)),
+				item->Pose.Orientation.y + (lara->Control.Rope.Direction ? 0 : Angle::DegToRad(180.0f)),
 				velocity >> 5);
 		}
 
@@ -683,7 +683,7 @@ void lara_col_rope_swing(ItemInfo* item, CollisionInfo* coll)
 			JumpOffRope(item);
 	}
 	else if (item->Animation.FrameNumber == g_Level.Anims[LA_ROPE_IDLE_TO_SWING].frameBase + 15)
-		ApplyVelocityToRope(lara->Control.Rope.Segment, item->Pose.Orientation.GetY(), 128);
+		ApplyVelocityToRope(lara->Control.Rope.Segment, item->Pose.Orientation.y, 128);
 }
 
 // State:	LS_ROPE_UP (112)
@@ -791,8 +791,8 @@ void lara_as_pole_idle(ItemInfo* item, CollisionInfo* coll)
 		item->Animation.TargetState = LS_FREEFALL;
 
 		// TODO: This shouldn't be required, but the set position command doesn't move Lara correctly.
-		item->Pose.Position.x -= sin(item->Pose.Orientation.GetY()) * 64;
-		item->Pose.Position.z -= cos(item->Pose.Orientation.GetY()) * 64;
+		item->Pose.Position.x -= sin(item->Pose.Orientation.y) * 64;
+		item->Pose.Position.z -= cos(item->Pose.Orientation.y) * 64;
 	}
 }
 
@@ -802,7 +802,7 @@ void lara_col_pole_idle(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->Control.MoveAngle = item->Pose.Orientation.GetY();
+	lara->Control.MoveAngle = item->Pose.Orientation.y;
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
 	coll->Setup.LowerCeilingBound = BAD_JUMP_CEILING;
@@ -911,7 +911,7 @@ void lara_col_pole_down(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->Control.MoveAngle = item->Pose.Orientation.GetY();
+	lara->Control.MoveAngle = item->Pose.Orientation.y;
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
 	coll->Setup.LowerCeilingBound = 0;

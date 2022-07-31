@@ -25,7 +25,7 @@ using namespace TEN::Input;
 void lara_as_surface_dive(ItemInfo* item, CollisionInfo* coll)
 {
 	if (TrInput & IN_FORWARD)
-		item->Pose.Orientation.SetX(Angle::Normalize(item->Pose.Orientation.GetX() - Angle::DegToRad(1.0f)));
+		item->Pose.Orientation.SetX(Angle::Normalize(item->Pose.Orientation.x - Angle::DegToRad(1.0f)));
 }
 
 // State:		LS_ONWATER_DIVE (35)
@@ -109,7 +109,7 @@ void lara_col_surface_idle(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->Control.MoveAngle = item->Pose.Orientation.GetY();
+	lara->Control.MoveAngle = item->Pose.Orientation.y;
 	LaraSurfaceCollision(item, coll);
 }
 
@@ -169,7 +169,7 @@ void lara_col_surface_swim_forward(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->Control.MoveAngle = item->Pose.Orientation.GetY();
+	lara->Control.MoveAngle = item->Pose.Orientation.y;
 	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
 	LaraSurfaceCollision(item, coll);
 
@@ -218,7 +218,7 @@ void lara_col_surface_swim_left(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->Control.MoveAngle = item->Pose.Orientation.GetY() - Angle::DegToRad(90.0f);
+	lara->Control.MoveAngle = item->Pose.Orientation.y - Angle::DegToRad(90.0f);
 	LaraSurfaceCollision(item, coll);
 }
 
@@ -263,7 +263,7 @@ void lara_col_surface_swim_right(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->Control.MoveAngle = item->Pose.Orientation.GetY() + Angle::DegToRad(90.0f);
+	lara->Control.MoveAngle = item->Pose.Orientation.y + Angle::DegToRad(90.0f);
 	LaraSurfaceCollision(item, coll);
 }
 
@@ -305,7 +305,7 @@ void lara_col_surface_swim_back(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->Control.MoveAngle = item->Pose.Orientation.GetY() + Angle::DegToRad(180.0f);
+	lara->Control.MoveAngle = item->Pose.Orientation.y + Angle::DegToRad(180.0f);
 	LaraSurfaceCollision(item, coll);
 }
 

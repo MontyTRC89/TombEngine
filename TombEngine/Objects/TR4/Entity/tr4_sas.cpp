@@ -149,7 +149,7 @@ namespace TEN::Entities::TR4
 			{
 				int dx = LaraItem->Pose.Position.x - item->Pose.Position.x;
 				int dz = LaraItem->Pose.Position.z - item->Pose.Position.z;
-				int ang = atan2(dz, dx) - item->Pose.Orientation.GetY();
+				int ang = atan2(dz, dx) - item->Pose.Orientation.y;
 				distance = pow(dx, 2) + pow(dz, 2);
 			}
 
@@ -180,24 +180,24 @@ namespace TEN::Entities::TR4
 					if (abs(AI.angle) >= Angle::DegToRad(10.0f))
 					{
 						if (AI.angle >= 0)
-							item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + Angle::DegToRad(10.0f));
+							item->Pose.Orientation.SetY(item->Pose.Orientation.y + Angle::DegToRad(10.0f));
 						else
-							item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() - Angle::DegToRad(10.0f));
+							item->Pose.Orientation.SetY(item->Pose.Orientation.y - Angle::DegToRad(10.0f));
 					}
 					else
-						item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + AI.angle);
+						item->Pose.Orientation.SetY(item->Pose.Orientation.y + AI.angle);
 				}
 				else if (item->AIBits & MODIFY || Lara.Vehicle != NO_ITEM)
 				{
 					if (abs(AI.angle) >= Angle::DegToRad(2.0f))
 					{
 						if (AI.angle >= 0)
-							item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + Angle::DegToRad(2.0f));
+							item->Pose.Orientation.SetY(item->Pose.Orientation.y + Angle::DegToRad(2.0f));
 						else
-							item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() - Angle::DegToRad(2.0f));
+							item->Pose.Orientation.SetY(item->Pose.Orientation.y - Angle::DegToRad(2.0f));
 					}
 					else
-						item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + AI.angle);
+						item->Pose.Orientation.SetY(item->Pose.Orientation.y + AI.angle);
 				}
 
 				if (item->AIBits & GUARD)
@@ -582,7 +582,7 @@ namespace TEN::Entities::TR4
 
 			InitialiseItem(itemNumber);
 
-			grenadeItem->Pose.Orientation.Set(angle1 + item->Pose.Orientation.GetX(), angle2 + item->Pose.Orientation.GetY(), 0.0f);
+			grenadeItem->Pose.Orientation.Set(angle1 + item->Pose.Orientation.x, angle2 + item->Pose.Orientation.y, 0.0f);
 
 			if (GetRandomControl() & 3)
 				grenadeItem->ItemFlags[0] = (int)GrenadeType::Normal;
@@ -658,9 +658,9 @@ namespace TEN::Entities::TR4
 			{
 				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameEnd)
 				{
-					int x = laraItem->Pose.Position.x - 512 * sin(laraItem->Pose.Orientation.GetY());
+					int x = laraItem->Pose.Position.x - 512 * sin(laraItem->Pose.Orientation.y);
 					int y = laraItem->Pose.Position.y;
-					int z = laraItem->Pose.Position.z - 512 * cos(laraItem->Pose.Orientation.GetY());
+					int z = laraItem->Pose.Position.z - 512 * cos(laraItem->Pose.Orientation.y);
 
 					TestTriggers(x, y, z, laraItem->RoomNumber, true);
 
@@ -680,7 +680,7 @@ namespace TEN::Entities::TR4
 					laraItem->Animation.AnimNumber = LA_DRAG_BODY;
 					laraItem->Animation.ActiveState = LS_MISC_CONTROL;
 					laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
-					laraItem->Pose.Orientation.SetY(item->Pose.Orientation.GetY());
+					laraItem->Pose.Orientation.SetY(item->Pose.Orientation.y);
 					ResetLaraFlex(laraItem);
 					Lara.Control.IsMoving = false;
 					Lara.Control.HandStatus = HandStatus::Busy;

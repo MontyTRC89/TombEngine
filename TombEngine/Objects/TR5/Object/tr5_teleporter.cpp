@@ -197,7 +197,7 @@ void ControlTeleporter(short itemNumber)
 		Camera.fixedCamera = true;
 		LaraItem->Pose.Position.x = item->Pose.Position.x;
 		LaraItem->Pose.Position.z = item->Pose.Position.z;
-		LaraItem->Pose.Orientation.SetY(item->Pose.Orientation.GetY() - Angle::DegToRad(180.0f));
+		LaraItem->Pose.Orientation.SetY(item->Pose.Orientation.y - Angle::DegToRad(180.0f));
 
 		short roomNumber = item->RoomNumber;
 		FloorInfo* floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNumber);

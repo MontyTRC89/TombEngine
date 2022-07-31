@@ -70,7 +70,7 @@ namespace TEN::Entities::TR4
 			fx->pos.Position.x = src->Position.x;
 			fx->pos.Position.y = src->Position.y - (GetRandomControl() & 0x3F) - 32;
 			fx->pos.Position.z = src->Position.z;
-			fx->pos.Orientation.Set(src->Orientation.GetX(), src->Orientation.GetY(), 0.0f);
+			fx->pos.Orientation.Set(src->Orientation.x, src->Orientation.y, 0.0f);
 			fx->roomNumber = roomNumber;
 			fx->counter = 16 * counter + 15;
 			fx->objectNumber = ID_ENERGY_BUBBLES;
@@ -138,11 +138,11 @@ namespace TEN::Entities::TR4
 		switch (rotationType)
 		{
 		case MissileRotationType::Left:
-			src->Orientation.SetY(src->Orientation.GetY() - GetRandomControl() % 0x2000);
+			src->Orientation.SetY(src->Orientation.y - GetRandomControl() % 0x2000);
 			break;
 
 		case MissileRotationType::Right:
-			src->Orientation.SetY(src->Orientation.GetY() + GetRandomControl() % 0x2000);
+			src->Orientation.SetY(src->Orientation.y + GetRandomControl() % 0x2000);
 			break;
 		}
 
@@ -170,7 +170,7 @@ namespace TEN::Entities::TR4
 	{
 		if (creature->Enemy == nullptr)
 		{
-			headAngle = item->Pose.Orientation.GetY();
+			headAngle = item->Pose.Orientation.y;
 			return;
 		}
 
@@ -180,7 +180,7 @@ namespace TEN::Entities::TR4
 
 		int x = enemy->Pose.Position.x - pos.x;
 		int z = enemy->Pose.Position.z - pos.z;
-		headAngle = (atan2(z, x) - item->Pose.Orientation.GetY()) / 2;
+		headAngle = (atan2(z, x) - item->Pose.Orientation.y) / 2;
 	}
 
 	static void GetTargetPosition(ItemInfo* item, PHD_3DPOS* target)
@@ -198,7 +198,7 @@ namespace TEN::Entities::TR4
 
 	static void MoveItemFront(ItemInfo* item, int distance)
 	{
-		switch ((int)Angle::RadToDeg(item->Pose.Orientation.GetY()))
+		switch ((int)Angle::RadToDeg(item->Pose.Orientation.y))
 		{
 		case C_NORTH:
 			item->Pose.Position.z += distance;
@@ -220,7 +220,7 @@ namespace TEN::Entities::TR4
 
 	static void MoveItemBack(ItemInfo* item, int distance)
 	{
-		switch ((int)Angle::RadToDeg(item->Pose.Orientation.GetY()))
+		switch ((int)Angle::RadToDeg(item->Pose.Orientation.y))
 		{
 		case C_NORTH:
 			item->Pose.Position.z -= distance;

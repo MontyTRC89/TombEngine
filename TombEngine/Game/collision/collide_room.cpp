@@ -49,7 +49,7 @@ void SnapItemToGrid(ItemInfo* item, CollisionInfo* coll)
 {
 	SnapItemToLedge(item, coll);
 
-	int direction = (unsigned short)(item->Pose.Orientation.GetY() + Angle::DegToRad(45.0f)) / Angle::DegToRad(90.0f);
+	int direction = (unsigned short)(item->Pose.Orientation.y + Angle::DegToRad(45.0f)) / Angle::DegToRad(90.0f);
 
 	switch (direction)
 	{
@@ -837,8 +837,8 @@ void CalculateItemRotationToSurface(ItemInfo* item, float radiusDivisor, float x
 	auto radiusZ = bounds->Z2 / radiusDivisor; // Need divide in any case else it's too much !
 
 	auto ratioXZ = radiusZ / radiusX;
-	auto frontX = sin(item->Pose.Orientation.GetY()) * radiusZ;
-	auto frontZ = cos(item->Pose.Orientation.GetY()) * radiusZ;
+	auto frontX = sin(item->Pose.Orientation.y) * radiusZ;
+	auto frontZ = cos(item->Pose.Orientation.y) * radiusZ;
 	auto leftX  = -frontZ * ratioXZ;
 	auto leftZ  =  frontX * ratioXZ;
 	auto rightX =  frontZ * ratioXZ;

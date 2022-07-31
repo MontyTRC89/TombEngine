@@ -285,7 +285,7 @@ namespace TEN::Renderer
 			for (int i = 0; i < hairsObj.BindPoseTransforms.size(); i++)
 			{
 				auto* hairs = &Hairs[0][i];
-				Matrix world = Matrix::CreateFromYawPitchRoll(hairs->Pose.Orientation.GetY(), hairs->Pose.Orientation.GetX(), 0) *
+				Matrix world = Matrix::CreateFromYawPitchRoll(hairs->Pose.Orientation.y, hairs->Pose.Orientation.x, 0) *
 					Matrix::CreateTranslation(hairs->Pose.Position.x, hairs->Pose.Position.y, hairs->Pose.Position.z);
 				m_stItem.BonesMatrices[i + 1] = world;
 				m_stItem.BoneLightModes[i] = LIGHT_MODES::LIGHT_MODE_DYNAMIC;
@@ -337,8 +337,8 @@ namespace TEN::Renderer
 
 				Matrix translation = Matrix::CreateTranslation(gunshell->pos.Position.x, gunshell->pos.Position.y,
 															   gunshell->pos.Position.z);
-				Matrix rotation = Matrix::CreateFromYawPitchRoll(gunshell->pos.Orientation.GetY(), gunshell->pos.Orientation.GetX(),
-																 gunshell->pos.Orientation.GetZ());
+				Matrix rotation = Matrix::CreateFromYawPitchRoll(gunshell->pos.Orientation.y, gunshell->pos.Orientation.x,
+																 gunshell->pos.Orientation.z);
 				Matrix world = rotation * translation;
 
 				m_stStatic.World = world;
@@ -519,7 +519,7 @@ namespace TEN::Renderer
 				if (spider->on)
 				{
 					XMMATRIXTranslation(&m_tempTranslation, spider->pos.Position.x, spider->pos.Position.y, spider->pos.Position.z);
-					XMMATRIXRotationYawPitchRoll(&m_tempRotation, spider->pos.Orientation.GetY(), spider->pos.Orientation.GetX(), spider->pos.Orientation.GetZ());
+					XMMATRIXRotationYawPitchRoll(&m_tempRotation, spider->pos.Orientation.y, spider->pos.Orientation.x, spider->pos.Orientation.z);
 					XMMATRIXMultiply(&m_tempWorld, &m_tempRotation, &m_tempTranslation);
 					effect->SetMatrix(effect->GetParameterByName(nullptr, "World"), &m_tempWorld);
 
@@ -567,8 +567,8 @@ namespace TEN::Renderer
 				{
 					RendererMesh* mesh = GetMesh(Objects[ID_RATS_EMITTER].meshIndex + (rand() % 8));
 					Matrix translation = Matrix::CreateTranslation(rat->Pose.Position.x, rat->Pose.Position.y, rat->Pose.Position.z);
-					Matrix rotation = Matrix::CreateFromYawPitchRoll(rat->Pose.Orientation.GetY(), rat->Pose.Orientation.GetX(),
-																	 rat->Pose.Orientation.GetZ());
+					Matrix rotation = Matrix::CreateFromYawPitchRoll(rat->Pose.Orientation.y, rat->Pose.Orientation.x,
+																	 rat->Pose.Orientation.z);
 					Matrix world = rotation * translation;
 
 					m_stItem.World = world;
@@ -628,7 +628,7 @@ namespace TEN::Renderer
 					{
 						Matrix translation = Matrix::CreateTranslation(bat->Pose.Position.x, bat->Pose.Position.y, bat->Pose.Position.z);
 						Matrix rotation = Matrix::CreateFromYawPitchRoll(
-							bat->Pose.Orientation.GetY(), bat->Pose.Orientation.GetX(), bat->Pose.Orientation.GetZ());
+							bat->Pose.Orientation.y, bat->Pose.Orientation.x, bat->Pose.Orientation.z);
 						Matrix world = rotation * translation;
 
 						m_stItem.World = world;
@@ -674,8 +674,8 @@ namespace TEN::Renderer
 					RendererMesh* mesh = GetMesh(Objects[ID_LITTLE_BEETLE].meshIndex + ((Wibble >> 2) % 2));
 					Matrix translation =
 						Matrix::CreateTranslation(beetle->Pose.Position.x, beetle->Pose.Position.y, beetle->Pose.Position.z);
-					Matrix rotation = Matrix::CreateFromYawPitchRoll(beetle->Pose.Orientation.GetY(), beetle->Pose.Orientation.GetX(),
-																	 beetle->Pose.Orientation.GetZ());
+					Matrix rotation = Matrix::CreateFromYawPitchRoll(beetle->Pose.Orientation.y, beetle->Pose.Orientation.x,
+																	 beetle->Pose.Orientation.z);
 					Matrix world = rotation * translation;
 
 					m_stItem.World = world;
@@ -728,8 +728,8 @@ namespace TEN::Renderer
 					RendererMesh* mesh = GetMesh(Objects[ID_LOCUSTS].meshIndex + (-locust->counter & 3));
 					Matrix translation =
 						Matrix::CreateTranslation(locust->pos.Position.x, locust->pos.Position.y, locust->pos.Position.z);
-					Matrix rotation = Matrix::CreateFromYawPitchRoll(locust->pos.Orientation.GetY(), locust->pos.Orientation.GetX(),
-																	 locust->pos.Orientation.GetZ());
+					Matrix rotation = Matrix::CreateFromYawPitchRoll(locust->pos.Orientation.y, locust->pos.Orientation.x,
+																	 locust->pos.Orientation.z);
 					Matrix world = rotation * translation;
 
 					m_stItem.World = world;
@@ -1783,12 +1783,12 @@ namespace TEN::Renderer
 			nativeItem->Pose.Position.y,
 			nativeItem->Pose.Position.z);
 
-		float speed = (-96 * cos(nativeItem->Pose.Orientation.GetX()));
+		float speed = (-96 * cos(nativeItem->Pose.Orientation.x));
 
 		Vector3 end = Vector3(
-			nativeItem->Pose.Position.x + speed * sin(nativeItem->Pose.Orientation.GetY()),
-			nativeItem->Pose.Position.y + 96 * sin(nativeItem->Pose.Orientation.GetX()),
-			nativeItem->Pose.Position.z + speed * cos(nativeItem->Pose.Orientation.GetY()));
+			nativeItem->Pose.Position.x + speed * sin(nativeItem->Pose.Orientation.y),
+			nativeItem->Pose.Position.y + 96 * sin(nativeItem->Pose.Orientation.x),
+			nativeItem->Pose.Position.z + speed * cos(nativeItem->Pose.Orientation.y));
 
 		AddLine3D(start, end, Vector4(30 / 255.0f, 30 / 255.0f, 30 / 255.0f, 0.5f));
 	}

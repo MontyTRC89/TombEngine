@@ -77,7 +77,7 @@ void AutoGunsControl(short itemNumber)
 			if (los)
 			{
 				angles = EulerAngles::OrientBetweenPoints(Vector3(pos1.x, pos1.y, pos1.z), Vector3(pos2.x, pos2.y, pos2.z));
-				angles.SetY(angles.GetY() - item->Pose.Orientation.GetY());
+				angles.SetY(angles.y - item->Pose.Orientation.y);
 			}
 			else
 			{
@@ -87,8 +87,8 @@ void AutoGunsControl(short itemNumber)
 
 			// TODO: Short to float conversion
 			short angle1, angle2;
-			InterpolateAngle(angles.GetX(), &item->ItemFlags[1], &angle2, 4);
-			InterpolateAngle(angles.GetY(), item->ItemFlags, &angle1, 4);
+			InterpolateAngle(angles.x, &item->ItemFlags[1], &angle2, 4);
+			InterpolateAngle(angles.y, item->ItemFlags, &angle1, 4);
 
 			data[0] = item->ItemFlags[0];
 			data[1] = item->ItemFlags[1];

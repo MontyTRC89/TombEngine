@@ -76,7 +76,7 @@ namespace TEN::Entities::TR4
         if (item->ItemFlags[1] < item->ItemFlags[3])
             item->ItemFlags[1] += 3;
 
-        item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + item->ItemFlags[0]);
+        item->Pose.Orientation.SetY(item->Pose.Orientation.y + item->ItemFlags[0]);
 
 		// Update bone mutators
 		if (item->ItemFlags[1])

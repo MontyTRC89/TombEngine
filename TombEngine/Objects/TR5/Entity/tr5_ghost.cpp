@@ -50,12 +50,12 @@ void InvisibleGhostControl(short itemNumber)
 	if (abs(AI.angle) >= Angle::DegToRad(3.0f))
 	{
 		if (AI.angle > 0)
-			item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + Angle::DegToRad(3.0f));
+			item->Pose.Orientation.SetY(item->Pose.Orientation.y + Angle::DegToRad(3.0f));
 		else
-			item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() - Angle::DegToRad(3.0f));
+			item->Pose.Orientation.SetY(item->Pose.Orientation.y - Angle::DegToRad(3.0f));
 	}
 	else
-		item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + AI.angle);
+		item->Pose.Orientation.SetY(item->Pose.Orientation.y + AI.angle);
 
 	if (AI.ahead)
 	{

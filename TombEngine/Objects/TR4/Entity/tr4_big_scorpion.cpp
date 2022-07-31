@@ -286,12 +286,12 @@ namespace TEN::Entities::TR4
 				if (abs(AI.angle) >= Angle::DegToRad(2.0f))
 				{
 					if (AI.angle >= 0)
-						item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + Angle::DegToRad(2.0f));
+						item->Pose.Orientation.SetY(item->Pose.Orientation.y + Angle::DegToRad(2.0f));
 					else
-						item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() - Angle::DegToRad(2.0f));
+						item->Pose.Orientation.SetY(item->Pose.Orientation.y - Angle::DegToRad(2.0f));
 				}
 				else
-					item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + AI.angle);
+					item->Pose.Orientation.SetY(item->Pose.Orientation.y + AI.angle);
 
 				if (creature->Flags)
 					break;
@@ -313,7 +313,7 @@ namespace TEN::Entities::TR4
 						item,
 						&BigScorpionBite1,
 						10,
-						item->Pose.Orientation.GetY() - Angle::DegToRad(180.0f),
+						item->Pose.Orientation.y - Angle::DegToRad(180.0f),
 						DoBloodSplat);
 				}
 				else if (item->TestBits(JointBitType::Touch, BigScorpionAttackJoints))
@@ -328,7 +328,7 @@ namespace TEN::Entities::TR4
 							item,
 							&BigScorpionBite1,
 							10,
-							item->Pose.Orientation.GetY() - Angle::DegToRad(180.0f),
+							item->Pose.Orientation.y - Angle::DegToRad(180.0f),
 							DoBloodSplat);
 					}
 					else
@@ -337,7 +337,7 @@ namespace TEN::Entities::TR4
 							item,
 							&BigScorpionBite2,
 							10,
-							item->Pose.Orientation.GetY() - Angle::DegToRad(180.0f),
+							item->Pose.Orientation.y - Angle::DegToRad(180.0f),
 							DoBloodSplat);
 					}
 
@@ -373,24 +373,24 @@ namespace TEN::Entities::TR4
 			}
 		}
 
-		if ((angle1 - item->Pose.Orientation.GetX()) < Angle::DegToRad(1.4f))
+		if ((angle1 - item->Pose.Orientation.x) < Angle::DegToRad(1.4f))
 			item->Pose.Orientation.SetX(Angle::DegToRad(1.4f));
 		else
 		{
-			if (angle1 <= item->Pose.Orientation.GetX())
-				item->Pose.Orientation.SetX(item->Pose.Orientation.GetX() - Angle::DegToRad(1.4f));
+			if (angle1 <= item->Pose.Orientation.x)
+				item->Pose.Orientation.SetX(item->Pose.Orientation.x - Angle::DegToRad(1.4f));
 			else
-				item->Pose.Orientation.SetX(item->Pose.Orientation.GetX() + Angle::DegToRad(1.4f));
+				item->Pose.Orientation.SetX(item->Pose.Orientation.x + Angle::DegToRad(1.4f));
 		}
 
-		if ((angle2 - item->Pose.Orientation.GetZ()) < Angle::DegToRad(1.4f))
+		if ((angle2 - item->Pose.Orientation.z) < Angle::DegToRad(1.4f))
 			item->Pose.Orientation.SetZ(Angle::DegToRad(1.4f));
 		else
 		{
-			if (angle2 <= item->Pose.Orientation.GetZ())
-				item->Pose.Orientation.SetZ(item->Pose.Orientation.GetZ() - Angle::DegToRad(1.4f));
+			if (angle2 <= item->Pose.Orientation.z)
+				item->Pose.Orientation.SetZ(item->Pose.Orientation.z - Angle::DegToRad(1.4f));
 			else
-				item->Pose.Orientation.SetZ(item->Pose.Orientation.GetZ() + Angle::DegToRad(1.4f));
+				item->Pose.Orientation.SetZ(item->Pose.Orientation.z + Angle::DegToRad(1.4f));
 		}
 
 		if (!CutSeqNum)

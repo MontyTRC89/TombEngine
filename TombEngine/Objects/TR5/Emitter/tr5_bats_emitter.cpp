@@ -17,13 +17,13 @@ void InitialiseLittleBats(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
 
-	if (item->Pose.Orientation.GetY() == 0)
+	if (item->Pose.Orientation.y == 0)
 		item->Pose.Position.z += CLICK(2);
-	else if (item->Pose.Orientation.GetY() == Angle::DegToRad(-180.0f))
+	else if (item->Pose.Orientation.y == Angle::DegToRad(-180.0f))
 		item->Pose.Position.z -= CLICK(2);
-	else if (item->Pose.Orientation.GetY() == Angle::DegToRad(-90.0f))
+	else if (item->Pose.Orientation.y == Angle::DegToRad(-90.0f))
 		item->Pose.Position.x -= CLICK(2);
-	else if (item->Pose.Orientation.GetY() == Angle::DegToRad(90.0f))
+	else if (item->Pose.Orientation.y == Angle::DegToRad(90.0f))
 		item->Pose.Position.x += CLICK(2);
 
 	if (Objects[ID_BATS_EMITTER].loaded)
@@ -88,7 +88,7 @@ void TriggerLittleBat(ItemInfo* item)
 
 		bat->Pose.Position = item->Pose.Position;
 		bat->Pose.Orientation.SetX(Angle::ShrtToRad((GetRandomControl() & 0x3FF) - 512));
-		bat->Pose.Orientation.SetY(Angle::ShrtToRad(GetRandomControl() & 0x7FF) + item->Pose.Orientation.GetY() + Angle::DegToRad(-180.0f) - Angle::DegToRad(5.6f));
+		bat->Pose.Orientation.SetY(Angle::ShrtToRad(GetRandomControl() & 0x7FF) + item->Pose.Orientation.y + Angle::DegToRad(-180.0f) - Angle::DegToRad(5.6f));
 		bat->RoomNumber = item->RoomNumber;
 		bat->On = true;
 		bat->Flags = 0;
@@ -176,8 +176,8 @@ void UpdateBats()
 		{
 			short Velocity = bat->Velocity * 128;
 
-			float xAngle = Angle::Normalize(abs(angles.GetX() - bat->Pose.Orientation.GetX()) / 8);
-			float yAngle = Angle::Normalize(abs(angles.GetY() - bat->Pose.Orientation.GetY()) / 8);
+			float xAngle = Angle::Normalize(abs(angles.x - bat->Pose.Orientation.x) / 8);
+			float yAngle = Angle::Normalize(abs(angles.y - bat->Pose.Orientation.y) / 8);
 
 			if (xAngle < -Velocity)
 				xAngle = -Velocity;
@@ -189,15 +189,15 @@ void UpdateBats()
 			else if (yAngle > Velocity)
 				yAngle = Velocity;
 
-			bat->Pose.Orientation.SetY(bat->Pose.Orientation.GetY() + yAngle);
-			bat->Pose.Orientation.SetX(bat->Pose.Orientation.GetX() + xAngle);
+			bat->Pose.Orientation.SetY(bat->Pose.Orientation.y + yAngle);
+			bat->Pose.Orientation.SetX(bat->Pose.Orientation.x + xAngle);
 		}
 
-		int sp = bat->Velocity * cos(bat->Pose.Orientation.GetX());
+		int sp = bat->Velocity * cos(bat->Pose.Orientation.x);
 
-		bat->Pose.Position.x += sp * sin(bat->Pose.Orientation.GetY());
-		bat->Pose.Position.y += bat->Velocity * sin(-bat->Pose.Orientation.GetX());
-		bat->Pose.Position.z += sp * cos(bat->Pose.Orientation.GetY());
+		bat->Pose.Position.x += sp * sin(bat->Pose.Orientation.y);
+		bat->Pose.Position.y += bat->Velocity * sin(-bat->Pose.Orientation.x);
+		bat->Pose.Position.z += sp * cos(bat->Pose.Orientation.y);
 
 		if ((i % 2) == 0 &&
 			bat->Pose.Position.x > x1 &&

@@ -684,7 +684,7 @@ bool Sound_UpdateEffectPosition(int index, PHD_3DPOS *position, bool force)
 			SoundSlot[index].Origin.z = position->Position.z;
 
 			auto pos = BASS_3DVECTOR(position->Position.x, position->Position.y, position->Position.z);
-			auto rot = BASS_3DVECTOR(position->Orientation.GetX(), position->Orientation.GetY(), position->Orientation.GetZ());
+			auto rot = BASS_3DVECTOR(position->Orientation.x, position->Orientation.y, position->Orientation.z);
 			BASS_ChannelSet3DPosition(SoundSlot[index].Channel, &pos, &rot, NULL);
 			BASS_Apply3D();
 		}

@@ -855,11 +855,11 @@ void TriggerSuperJetFlame(ItemInfo* item, int yvel, int deadly)
 		sptr->xVel = (GetRandomControl() & 0xFF) - 128;
 		sptr->zVel = (GetRandomControl() & 0xFF) - 128;
 
-		if (item->Pose.Orientation.GetY() == 0)
+		if (item->Pose.Orientation.y == 0)
 			sptr->zVel = -(size - (size >> 2));
-		else if (item->Pose.Orientation.GetY() == Angle::DegToRad(90.0f))
+		else if (item->Pose.Orientation.y == Angle::DegToRad(90.0f))
 			sptr->xVel = -(size - (size >> 2));
-		else if (item->Pose.Orientation.GetY() == Angle::DegToRad(-180.0f))
+		else if (item->Pose.Orientation.y == Angle::DegToRad(-180.0f))
 			sptr->zVel = size - (size >> 2);
 		else
 			sptr->xVel = size - (size >> 2);
@@ -1095,10 +1095,10 @@ void ControlWaterfallMist(short itemNumber) // ControlWaterfallMist
 {
 	auto* item = &g_Level.Items[itemNumber];
 
-	int x = item->Pose.Position.x - sin(item->Pose.Orientation.GetY() + Angle::DegToRad(180.0f)) * CLICK(2) + sin(item->Pose.Orientation.GetY() - Angle::DegToRad(90.0f)) * CLICK(1);
-	int z = item->Pose.Position.z - cos(item->Pose.Orientation.GetY() + Angle::DegToRad(180.0f)) * CLICK(2) + cos(item->Pose.Orientation.GetY() - Angle::DegToRad(90.0f)) * CLICK(1);
+	int x = item->Pose.Position.x - sin(item->Pose.Orientation.y + Angle::DegToRad(180.0f)) * CLICK(2) + sin(item->Pose.Orientation.y - Angle::DegToRad(90.0f)) * CLICK(1);
+	int z = item->Pose.Position.z - cos(item->Pose.Orientation.y + Angle::DegToRad(180.0f)) * CLICK(2) + cos(item->Pose.Orientation.y - Angle::DegToRad(90.0f)) * CLICK(1);
 
-	TriggerWaterfallMist(x, item->Pose.Position.y, z, item->Pose.Orientation.GetY() + Angle::DegToRad(180.0f));
+	TriggerWaterfallMist(x, item->Pose.Position.y, z, item->Pose.Orientation.y + Angle::DegToRad(180.0f));
 	SoundEffect(SFX_TR4_WATERFALL_LOOP, &item->Pose);
 }
 

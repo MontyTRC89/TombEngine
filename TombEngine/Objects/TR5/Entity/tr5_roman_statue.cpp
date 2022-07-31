@@ -230,7 +230,7 @@ static void RomanStatueAttack(PHD_3DPOS* pos, short roomNumber, short count)
 		fx->pos.Position.x = pos->Position.x;
 		fx->pos.Position.y = pos->Position.y;
 		fx->pos.Position.z = pos->Position.z;
-		fx->pos.Orientation.Set(pos->Orientation.GetX(), pos->Orientation.GetY(), 0.0f);
+		fx->pos.Orientation.Set(pos->Orientation.x, pos->Orientation.y, 0.0f);
 		fx->roomNumber = roomNumber;
 		fx->counter = 16 * count + 15;
 		fx->flag1 = 1;
@@ -285,8 +285,8 @@ void InitialiseRomanStatue(short itemNumber)
 	item->Animation.ActiveState = 13;
 	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 	item->Status = ITEM_NOT_ACTIVE;
-	item->Pose.Position.x += 486 * sin(item->Pose.Orientation.GetY() + Angle::DegToRad(90.0f));
-	item->Pose.Position.z += 486 * cos(item->Pose.Orientation.GetY() + Angle::DegToRad(90.0f));
+	item->Pose.Position.x += 486 * sin(item->Pose.Orientation.y + Angle::DegToRad(90.0f));
+	item->Pose.Position.z += 486 * cos(item->Pose.Orientation.y + Angle::DegToRad(90.0f));
 
 	ZeroMemory(&RomanStatueData, sizeof(RomanStatueInfo));
 }
@@ -522,7 +522,7 @@ void RomanStatueControl(short itemNumber)
 				if (item->TriggerFlags)
 				{
 					/*RomanStatueData.energyArcs[i] = TriggerEnergyArc(
-						(Vector3Int*)& dest.Orientation.GetX(),
+						(Vector3Int*)& dest.Orientation.x,
 						(Vector3Int*)& dest,
 						(GetRandomControl() & 0x3F) + 16,
 						(color >> 1) | ((color | 0x180000) << 8),
@@ -559,12 +559,12 @@ void RomanStatueControl(short itemNumber)
 			if (abs(AI.angle) >= Angle::DegToRad(2.0f))
 			{
 				if (AI.angle >= 0)
-					item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + Angle::DegToRad(2.0f));
+					item->Pose.Orientation.SetY(item->Pose.Orientation.y + Angle::DegToRad(2.0f));
 				else
-					item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() - Angle::DegToRad(2.0f));
+					item->Pose.Orientation.SetY(item->Pose.Orientation.y - Angle::DegToRad(2.0f));
 			}
 			else
-				item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + AI.angle);
+				item->Pose.Orientation.SetY(item->Pose.Orientation.y + AI.angle);
 
 			if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 10)
 			{
@@ -654,12 +654,12 @@ void RomanStatueControl(short itemNumber)
 				if (abs(AI.angle) >= Angle::DegToRad(2.0f))
 				{
 					if (AI.angle > 0)
-						item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + Angle::DegToRad(2.0f));
+						item->Pose.Orientation.SetY(item->Pose.Orientation.y + Angle::DegToRad(2.0f));
 					else
-						item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() - Angle::DegToRad(2.0f));
+						item->Pose.Orientation.SetY(item->Pose.Orientation.y - Angle::DegToRad(2.0f));
 				}
 				else
-					item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + AI.angle);
+					item->Pose.Orientation.SetY(item->Pose.Orientation.y + AI.angle);
 			}
 
 			if (AI.distance < pow(SECTOR(1), 2))
@@ -695,12 +695,12 @@ void RomanStatueControl(short itemNumber)
 			creature->Flags = 0;
 
 			if (AI.angle > 0)
-				item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() - Angle::DegToRad(2.0f));
+				item->Pose.Orientation.SetY(item->Pose.Orientation.y - Angle::DegToRad(2.0f));
 			else
-				item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + Angle::DegToRad(2.0f));
+				item->Pose.Orientation.SetY(item->Pose.Orientation.y + Angle::DegToRad(2.0f));
 
 			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameEnd)
-				item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + Angle::DegToRad(-180.0f));
+				item->Pose.Orientation.SetY(item->Pose.Orientation.y + Angle::DegToRad(-180.0f));
 		
 			break;
 

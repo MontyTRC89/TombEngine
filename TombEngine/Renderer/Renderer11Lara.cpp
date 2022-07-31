@@ -95,14 +95,14 @@ void Renderer11::UpdateLaraAnimations(bool force)
 
 	// Lara world matrix
 	translation = Matrix::CreateTranslation(LaraItem->Pose.Position.x, LaraItem->Pose.Position.y, LaraItem->Pose.Position.z);
-	rotation = Matrix::CreateFromYawPitchRoll(LaraItem->Pose.Orientation.GetY(), LaraItem->Pose.Orientation.GetX(), LaraItem->Pose.Orientation.GetZ());
+	rotation = Matrix::CreateFromYawPitchRoll(LaraItem->Pose.Orientation.y, LaraItem->Pose.Orientation.x, LaraItem->Pose.Orientation.z);
 
 	m_LaraWorldMatrix = rotation * translation;
 	item->World = m_LaraWorldMatrix;
 
 	// Update first Lara's animations
-	laraObj.LinearizedBones[LM_TORSO]->ExtraRotation = Vector3(Lara.ExtraTorsoRot.GetX(), Lara.ExtraTorsoRot.GetY(), Lara.ExtraTorsoRot.GetZ());
-	laraObj.LinearizedBones[LM_HEAD]->ExtraRotation = Vector3(Lara.ExtraHeadRot.GetX(), Lara.ExtraHeadRot.GetY(), Lara.ExtraHeadRot.GetZ());
+	laraObj.LinearizedBones[LM_TORSO]->ExtraRotation = Vector3(Lara.ExtraTorsoRot.x, Lara.ExtraTorsoRot.y, Lara.ExtraTorsoRot.z);
+	laraObj.LinearizedBones[LM_HEAD]->ExtraRotation = Vector3(Lara.ExtraHeadRot.x, Lara.ExtraHeadRot.y, Lara.ExtraHeadRot.z);
 
 	// First calculate matrices for legs, hips, head and torso
 	int mask = MESH_BITS(LM_HIPS) | MESH_BITS(LM_LTHIGH) | MESH_BITS(LM_LSHIN) | MESH_BITS(LM_LFOOT) | MESH_BITS(LM_RTHIGH) | MESH_BITS(LM_RSHIN) | MESH_BITS(LM_RFOOT) | MESH_BITS(LM_TORSO) | MESH_BITS(LM_HEAD);
@@ -127,12 +127,12 @@ void Renderer11::UpdateLaraAnimations(bool force)
 		// While handling weapon some extra rotation could be applied to arms
 		if (Lara.Control.Weapon.GunType == LaraWeaponType::Pistol || Lara.Control.Weapon.GunType == LaraWeaponType::Uzi)
 		{
-			laraObj.LinearizedBones[LM_LINARM]->ExtraRotation += Vector3(Lara.LeftArm.Orientation.GetX()), Lara.LeftArm.Orientation.GetY(), Lara.LeftArm.Orientation.GetZ();
-			laraObj.LinearizedBones[LM_RINARM]->ExtraRotation += Vector3(Lara.RightArm.Orientation.GetX()), Lara.RightArm.Orientation.GetY(), Lara.RightArm.Orientation.GetZ();
+			laraObj.LinearizedBones[LM_LINARM]->ExtraRotation += Vector3(Lara.LeftArm.Orientation.x), Lara.LeftArm.Orientation.y, Lara.LeftArm.Orientation.z;
+			laraObj.LinearizedBones[LM_RINARM]->ExtraRotation += Vector3(Lara.RightArm.Orientation.x), Lara.RightArm.Orientation.y, Lara.RightArm.Orientation.z;
 		}
 		else
 		{
-			laraObj.LinearizedBones[LM_RINARM]->ExtraRotation += Vector3(Lara.RightArm.Orientation.GetX(), Lara.RightArm.Orientation.GetY(), Lara.RightArm.Orientation.GetZ());
+			laraObj.LinearizedBones[LM_RINARM]->ExtraRotation += Vector3(Lara.RightArm.Orientation.x, Lara.RightArm.Orientation.y, Lara.RightArm.Orientation.z);
 			laraObj.LinearizedBones[LM_LINARM]->ExtraRotation = laraObj.LinearizedBones[LM_RINARM]->ExtraRotation;
 		}
 
@@ -327,7 +327,7 @@ void TEN::Renderer::Renderer11::DrawLara(bool shadowMap, RenderView& view, bool 
 		for (int i = 0; i < hairsObj.BindPoseTransforms.size(); i++)
 		{
 			auto* hairs = &Hairs[0][i];
-			Matrix world = Matrix::CreateFromYawPitchRoll(hairs->Pose.Orientation.GetY(), hairs->Pose.Orientation.GetX(), hairs->Pose.Orientation.GetZ()) * Matrix::CreateTranslation(hairs->Pose.Position.x, hairs->Pose.Position.y, hairs->Pose.Position.z);
+			Matrix world = Matrix::CreateFromYawPitchRoll(hairs->Pose.Orientation.y, hairs->Pose.Orientation.x, hairs->Pose.Orientation.z) * Matrix::CreateTranslation(hairs->Pose.Position.x, hairs->Pose.Position.y, hairs->Pose.Position.z);
 			m_stItem.BonesMatrices[i + 1] = world;
 			m_stItem.BoneLightModes[i] = LIGHT_MODES::LIGHT_MODE_DYNAMIC;
 		}

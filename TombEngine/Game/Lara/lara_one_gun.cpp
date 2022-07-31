@@ -279,16 +279,16 @@ void FireShotgun(ItemInfo* laraItem)
 	auto* lara = GetLaraInfo(laraItem);
 
 	auto armOrient = EulerAngles(
-		lara->LeftArm.Orientation.GetX(),
-		lara->LeftArm.Orientation.GetY() + laraItem->Pose.Orientation.GetY(),
+		lara->LeftArm.Orientation.x,
+		lara->LeftArm.Orientation.y + laraItem->Pose.Orientation.y,
 		0.0f
 	);
 
 	if (!lara->LeftArm.Locked)
 	{
 		armOrient.Set(
-			lara->ExtraTorsoRot.GetX() + lara->LeftArm.Orientation.GetX(),
-			lara->ExtraTorsoRot.GetY() + (lara->LeftArm.Orientation.GetY() + laraItem->Pose.Orientation.GetY()),
+			lara->ExtraTorsoRot.x + lara->LeftArm.Orientation.x,
+			lara->ExtraTorsoRot.y + (lara->LeftArm.Orientation.y + laraItem->Pose.Orientation.y),
 			0.0f
 		);
 	}
@@ -298,8 +298,8 @@ void FireShotgun(ItemInfo* laraItem)
 	for (int i = 0; i < 6; i++)
 	{
 		auto wobbleArmOrient = EulerAngles(
-			armOrient.GetX() + value * Angle::ShrtToRad(GetRandomControl() - Angle::DegToShrt(90.0f)) / Angle::DegToRad(360.0f),
-			armOrient.GetY() + value * Angle::ShrtToRad(GetRandomControl() - Angle::DegToShrt(90.0f)) / Angle::DegToRad(360.0f),
+			armOrient.x + value * Angle::ShrtToRad(GetRandomControl() - Angle::DegToShrt(90.0f)) / Angle::DegToRad(360.0f),
+			armOrient.y + value * Angle::ShrtToRad(GetRandomControl() - Angle::DegToShrt(90.0f)) / Angle::DegToRad(360.0f),
 			0.0f
 		);
 
@@ -482,9 +482,9 @@ void FireHarpoon(ItemInfo* laraItem)
 		if (!lara->LeftArm.Locked)
 			item->Pose.Orientation += lara->ExtraTorsoRot;
 
-		item->Pose.Orientation.SetZ();
-		item->Animation.Velocity = HARPOON_VELOCITY * cos(item->Pose.Orientation.GetX());
-		item->Animation.VerticalVelocity = -HARPOON_VELOCITY * sin(item->Pose.Orientation.GetX());
+		item->Pose.Orientation.z = 0.0f;
+		item->Animation.Velocity = HARPOON_VELOCITY * cos(item->Pose.Orientation.x);
+		item->Animation.VerticalVelocity = -HARPOON_VELOCITY * sin(item->Pose.Orientation.x);
 		item->HitPoints = HARPOON_TIME;
 
 		Rumble(0.2f, 0.1f);
@@ -507,17 +507,17 @@ void HarpoonBoltControl(short itemNumber)
 	// Update speed and check if above water
 	if (item->HitPoints == HARPOON_TIME)
 	{
-		item->Pose.Orientation.SetZ(item->Pose.Orientation.GetZ() + Angle::DegToRad(35.0f));
+		item->Pose.Orientation.SetZ(item->Pose.Orientation.z + Angle::DegToRad(35.0f));
 		if (!TestEnvironment(ENV_FLAG_WATER, item->RoomNumber))
 		{
-			item->Pose.Orientation.SetX(item->Pose.Orientation.GetX() - Angle::DegToRad(1.0f));
+			item->Pose.Orientation.SetX(item->Pose.Orientation.x - Angle::DegToRad(1.0f));
 
-			if (item->Pose.Orientation.GetX() < Angle::DegToRad(-90.0f))
+			if (item->Pose.Orientation.x < Angle::DegToRad(-90.0f))
 				item->Pose.Orientation.SetX(Angle::DegToRad(-90.0f));
 
 			aboveWater = true;
-			item->Animation.Velocity = HARPOON_VELOCITY * cos(item->Pose.Orientation.GetX());
-			item->Animation.VerticalVelocity = -HARPOON_VELOCITY * sin(item->Pose.Orientation.GetX());
+			item->Animation.Velocity = HARPOON_VELOCITY * cos(item->Pose.Orientation.x);
+			item->Animation.VerticalVelocity = -HARPOON_VELOCITY * sin(item->Pose.Orientation.x);
 		}
 		else
 		{
@@ -527,8 +527,8 @@ void HarpoonBoltControl(short itemNumber)
 			
 			TriggerRocketSmoke(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, 64);
 			aboveWater = false;
-			item->Animation.Velocity = HARPOON_VELOCITY * cos(item->Pose.Orientation.GetX()) / 2;
-			item->Animation.VerticalVelocity = -HARPOON_VELOCITY * sin(item->Pose.Orientation.GetX()) / 2;
+			item->Animation.Velocity = HARPOON_VELOCITY * cos(item->Pose.Orientation.x) / 2;
+			item->Animation.VerticalVelocity = -HARPOON_VELOCITY * sin(item->Pose.Orientation.x) / 2;
 		}
 
 		TranslateItem(item, item->Pose.Orientation, item->Animation.Velocity);
@@ -615,7 +615,7 @@ void HarpoonBoltControl(short itemNumber)
 				if (currentMesh->HitPoints <= 0)
 				{
 					TriggerExplosionSparks(currentMesh->pos.Position.x, currentMesh->pos.Position.y, currentMesh->pos.Position.z, 3, -2, 0, item->RoomNumber);
-					auto pos = PHD_3DPOS(currentMesh->pos.Position.x, currentMesh->pos.Position.y - 128, currentMesh->pos.Position.z, 0, currentMesh->pos.Orientation.GetY(), 0);
+					auto pos = PHD_3DPOS(currentMesh->pos.Position.x, currentMesh->pos.Position.y - 128, currentMesh->pos.Position.z, 0, currentMesh->pos.Orientation.y, 0);
 					TriggerShockwave(&pos, 40, 176, 64, 0, 96, 128, 16, 0, 0);
 					ShatterObject(nullptr, currentMesh, -128, item->RoomNumber, 0);
 					SmashedMeshRoom[SmashedMeshCount] = item->RoomNumber;
@@ -699,11 +699,11 @@ void FireGrenade(ItemInfo* laraItem)
 		if (!lara->LeftArm.Locked)
 			item->Pose.Orientation += lara->ExtraTorsoRot;
 
-		item->Pose.Orientation.SetZ();
+		item->Pose.Orientation.z = 0.0f;
 		item->Animation.Velocity = GRENADE_VELOCITY;
-		item->Animation.VerticalVelocity = -CLICK(2) * sin(item->Pose.Orientation.GetX());
-		item->Animation.ActiveState = item->Pose.Orientation.GetX();
-		item->Animation.TargetState = item->Pose.Orientation.GetY();
+		item->Animation.VerticalVelocity = -CLICK(2) * sin(item->Pose.Orientation.x);
+		item->Animation.ActiveState = item->Pose.Orientation.x;
+		item->Animation.TargetState = item->Pose.Orientation.y;
 		item->Animation.RequiredState = 0;
 		item->HitPoints = GRENADE_TIME;
 		item->ItemFlags[0] = (int)WeaponAmmoType::Ammo2;
@@ -773,11 +773,11 @@ void GrenadeControl(short itemNumber)
 					
 					newGrenade->Pose.Orientation.SetX((GetRandomControl() & 0x3FFF) + Angle::DegToRad(45.0f));
 					newGrenade->Pose.Orientation.SetY(GetRandomControl() * 2);
-					newGrenade->Pose.Orientation.SetZ();
+					newGrenade->Pose.Orientation.z = 0.0f;
 					newGrenade->Animation.Velocity = 64;
-					newGrenade->Animation.VerticalVelocity = -64 * sin(newGrenade->Pose.Orientation.GetX());
-					newGrenade->Animation.ActiveState = newGrenade->Pose.Orientation.GetX();
-					newGrenade->Animation.TargetState = newGrenade->Pose.Orientation.GetY();
+					newGrenade->Animation.VerticalVelocity = -64 * sin(newGrenade->Pose.Orientation.x);
+					newGrenade->Animation.ActiveState = newGrenade->Pose.Orientation.x;
+					newGrenade->Animation.TargetState = newGrenade->Pose.Orientation.y;
 					newGrenade->Animation.RequiredState = 0;
 					
 					AddActiveItem(newGrenadeItemNumber);
@@ -817,11 +817,11 @@ void GrenadeControl(short itemNumber)
 
 		if (item->Animation.Velocity)
 		{
-			item->Pose.Orientation.SetZ(item->Pose.Orientation.GetZ() + (((item->Animation.Velocity / 16) + 3) * Angle::DegToRad(1.0f)));
+			item->Pose.Orientation.SetZ(item->Pose.Orientation.z + (((item->Animation.Velocity / 16) + 3) * Angle::DegToRad(1.0f)));
 			if (item->Animation.RequiredState)
-				item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + (((item->Animation.Velocity / 4) + 3) * Angle::DegToRad(1.0f)));
+				item->Pose.Orientation.SetY(item->Pose.Orientation.y + (((item->Animation.Velocity / 4) + 3) * Angle::DegToRad(1.0f)));
 			else
-				item->Pose.Orientation.SetX(item->Pose.Orientation.GetX() + (((item->Animation.Velocity / 4) + 3) * Angle::DegToRad(1.0f)));
+				item->Pose.Orientation.SetX(item->Pose.Orientation.x + (((item->Animation.Velocity / 4) + 3) * Angle::DegToRad(1.0f)));
 		}
 	}
 	else
@@ -832,11 +832,11 @@ void GrenadeControl(short itemNumber)
 
 		if (item->Animation.Velocity)
 		{
-			item->Pose.Orientation.SetZ( item->Pose.Orientation.GetZ() + (((item->Animation.Velocity / 4) + 7) * Angle::DegToRad(1.0f)));
+			item->Pose.Orientation.SetZ( item->Pose.Orientation.z + (((item->Animation.Velocity / 4) + 7) * Angle::DegToRad(1.0f)));
 			if (item->Animation.RequiredState)
-				item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + (((item->Animation.Velocity / 2) + 7) * Angle::DegToRad(1.0f)));
+				item->Pose.Orientation.SetY(item->Pose.Orientation.y + (((item->Animation.Velocity / 2) + 7) * Angle::DegToRad(1.0f)));
 			else
-				item->Pose.Orientation.SetX(item->Pose.Orientation.GetX() + (((item->Animation.Velocity / 2) + 7) * Angle::DegToRad(1.0f)));
+				item->Pose.Orientation.SetX(item->Pose.Orientation.x + (((item->Animation.Velocity / 2) + 7) * Angle::DegToRad(1.0f)));
 		}
 	}
 
@@ -844,9 +844,9 @@ void GrenadeControl(short itemNumber)
 	if (item->Animation.Velocity && aboveWater)
 	{
 		Matrix world = Matrix::CreateFromYawPitchRoll(
-			item->Pose.Orientation.GetY() - Angle::DegToRad(180.0f),
-			item->Pose.Orientation.GetX(),
-			item->Pose.Orientation.GetZ()
+			item->Pose.Orientation.y - Angle::DegToRad(180.0f),
+			item->Pose.Orientation.x,
+			item->Pose.Orientation.z
 		) * Matrix::CreateTranslation(0, 0, -64);
 
 		int wx = world.Translation().x;
@@ -878,12 +878,12 @@ void GrenadeControl(short itemNumber)
 	else
 	{
 		// Do grenade's physics
-		float sYrot = item->Pose.Orientation.GetY();
+		float sYrot = item->Pose.Orientation.y;
 		item->Pose.Orientation.y = item->Animation.TargetState;
 
 		DoProjectileDynamics(itemNumber, oldPos.x, oldPos.y, oldPos.z, velocity.x, velocity.y, velocity.z);
 
-		item->Animation.TargetState = item->Pose.Orientation.GetY();
+		item->Animation.TargetState = item->Pose.Orientation.y;
 		item->Pose.Orientation.SetY(sYrot);
 	}
 
@@ -999,7 +999,7 @@ void GrenadeControl(short itemNumber)
 							if (currentMesh->HitPoints <= 0)
 							{
 								TriggerExplosionSparks(currentMesh->pos.Position.x, currentMesh->pos.Position.y, currentMesh->pos.Position.z, 3, -2, 0, item->RoomNumber);
-								auto pos = PHD_3DPOS(currentMesh->pos.Position.x, currentMesh->pos.Position.y - 128, currentMesh->pos.Position.z, 0, currentMesh->pos.Orientation.GetY(), 0);
+								auto pos = PHD_3DPOS(currentMesh->pos.Position.x, currentMesh->pos.Position.y - 128, currentMesh->pos.Position.z, 0, currentMesh->pos.Orientation.y, 0);
 								TriggerShockwave(&pos, 40, 176, 64, 0, 96, 128, 16, 0, 0);
 								ShatterObject(nullptr, currentMesh, -128, item->RoomNumber, 0);
 								SmashedMeshRoom[SmashedMeshCount] = item->RoomNumber;
@@ -1118,7 +1118,7 @@ void FireRocket(ItemInfo* laraItem)
 		if (!lara->LeftArm.Locked)
 			item->Pose.Orientation += lara->ExtraTorsoRot;
 
-		item->Pose.Orientation.SetZ();
+		item->Pose.Orientation.z = 0.0f;
 		item->Animation.Velocity = 512 >> 5;
 		item->ItemFlags[0] = 0;
 
@@ -1154,7 +1154,7 @@ void RocketControl(short itemNumber)
 				item->Animation.Velocity = ROCKET_VELOCITY / 4;
 		}
 
-		item->Pose.Orientation.SetZ(item->Pose.Orientation.GetZ() + (((item->Animation.Velocity / 8) + 3) * Angle::DegToRad(1.0f)));
+		item->Pose.Orientation.SetZ(item->Pose.Orientation.z + (((item->Animation.Velocity / 8) + 3) * Angle::DegToRad(1.0f)));
 		abovewater = false;
 	}
 	else
@@ -1162,7 +1162,7 @@ void RocketControl(short itemNumber)
 		if (item->Animation.Velocity < ROCKET_VELOCITY)
 			item->Animation.Velocity += (item->Animation.Velocity / 4) + 4;
 
-		item->Pose.Orientation.SetZ(item->Pose.Orientation.GetZ() + (((item->Animation.Velocity / 4) + 7) * Angle::DegToRad(1.0f)));
+		item->Pose.Orientation.SetZ(item->Pose.Orientation.z + (((item->Animation.Velocity / 4) + 7) * Angle::DegToRad(1.0f)));
 		abovewater = true;
 	}
 
@@ -1170,9 +1170,9 @@ void RocketControl(short itemNumber)
 
 	// Calculate offset in rocket direction for fire and smoke sparks
 	Matrix world = Matrix::CreateFromYawPitchRoll(
-		item->Pose.Orientation.GetY() - Angle::DegToRad(180.0f),
-		item->Pose.Orientation.GetX(),
-		item->Pose.Orientation.GetZ()
+		item->Pose.Orientation.y - Angle::DegToRad(180.0f),
+		item->Pose.Orientation.x,
+		item->Pose.Orientation.z
 	) * Matrix::CreateTranslation(0, 0, -64);
 
 	int wx = world.Translation().x;
@@ -1422,7 +1422,7 @@ void FireCrossBowFromLaserSight(ItemInfo* laraItem, GameVector* src, GameVector*
 
 	auto angles = EulerAngles::OrientBetweenPoints(Vector3(src->x, src->y, src->z), Vector3(target->x, target->y, target->z));
 
-	auto boltPose = PHD_3DPOS(src->x, src->y, src->z, angles.GetX(), angles.GetY(), angles.GetZ());
+	auto boltPose = PHD_3DPOS(src->x, src->y, src->z, angles.x, angles.y, angles.z);
 	FireCrossbow(laraItem, &boltPose);
 }
 
@@ -1650,8 +1650,8 @@ void FireHK(ItemInfo* laraItem, int mode)
 	if (!lara->LeftArm.Locked)
 	{
 		angles.Set(
-			lara->ExtraTorsoRot.GetX() + lara->LeftArm.Orientation.GetX(),
-			lara->ExtraTorsoRot.GetY() + lara->LeftArm.Orientation.GetY() + laraItem->Pose.Orientation.GetY(),
+			lara->ExtraTorsoRot.x + lara->LeftArm.Orientation.x,
+			lara->ExtraTorsoRot.y + lara->LeftArm.Orientation.y + laraItem->Pose.Orientation.y,
 			0.0f
 		);
 	}

@@ -43,7 +43,7 @@ namespace TEN::Entities::TR4
 				end = item->Pose.Position;
 				angles.Set(
 					0.0f,
-					item->Pose.Orientation.GetY() - Angle::DegToRad(180.0f),
+					item->Pose.Orientation.y - Angle::DegToRad(180.0f),
 					0.0f
 				);
 			}
@@ -67,8 +67,8 @@ namespace TEN::Entities::TR4
 			locust->on = true;
 			//locust->target = target != nullptr ? target : nullptr;
 			locust->pos.Position = end;
-			locust->pos.Orientation.SetX((GetRandomControl() & 0x3FF) + angles.GetX() - Angle::DegToRad(2.8));
-			locust->pos.Orientation.SetY((GetRandomControl() & 0x7FF) + angles.GetY() - Angle::DegToRad(5.6f));
+			locust->pos.Orientation.SetX((GetRandomControl() & 0x3FF) + angles.x - Angle::DegToRad(2.8));
+			locust->pos.Orientation.SetY((GetRandomControl() & 0x7FF) + angles.y - Angle::DegToRad(5.6f));
 			locust->roomNumber = item->RoomNumber;
 			locust->randomRotation = (GetRandomControl() & 0x1F) + 0x10;
 			locust->escapeXrot = ((GetRandomControl() & 0x7) + 0xF) * 20;
@@ -81,16 +81,16 @@ namespace TEN::Entities::TR4
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		if (item->Pose.Orientation.GetY() > 0)
+		if (item->Pose.Orientation.y > 0)
 		{
-			if (item->Pose.Orientation.GetY() == Angle::DegToRad(90.0f))
+			if (item->Pose.Orientation.y == Angle::DegToRad(90.0f))
 				item->Pose.Position.x += CLICK(2);
 		}
-		else if (item->Pose.Orientation.GetY() < 0)
+		else if (item->Pose.Orientation.y < 0)
 		{
-			if (item->Pose.Orientation.GetY() == Angle::DegToRad(-180.0f))
+			if (item->Pose.Orientation.y == Angle::DegToRad(-180.0f))
 				item->Pose.Position.z -= CLICK(2);
-			else if (item->Pose.Orientation.GetY() == Angle::DegToRad(-90.0f))
+			else if (item->Pose.Orientation.y == Angle::DegToRad(-90.0f))
 				item->Pose.Position.x -= CLICK(2);
 		}
 		else
@@ -173,15 +173,15 @@ namespace TEN::Entities::TR4
 					float resultYrot, resultXrot;
 					int shiftYrot, shiftXrot;
 					int random = locust->randomRotation * 128;
-					resultYrot = Angle::Normalize(angles.GetY() - locust->pos.Orientation.GetY());
+					resultYrot = Angle::Normalize(angles.y - locust->pos.Orientation.y);
 
 					if (abs(resultYrot) > Angle::DegToRad(180.0f))
-						resultYrot = locust->pos.Orientation.GetY() - angles.GetY();
+						resultYrot = locust->pos.Orientation.y - angles.y;
 
-					resultXrot = Angle::Normalize(angles.GetX() - locust->pos.Orientation.GetX());
+					resultXrot = Angle::Normalize(angles.x - locust->pos.Orientation.x);
 
 					if (abs(resultXrot) > Angle::DegToRad(180.0f))
-						resultXrot = locust->pos.Orientation.GetX() - angles.GetY();
+						resultXrot = locust->pos.Orientation.x - angles.y;
 
 					shiftXrot = resultXrot / 8;
 					shiftYrot = resultYrot / 8;
@@ -192,8 +192,8 @@ namespace TEN::Entities::TR4
 					if (shiftXrot > random || shiftXrot < -random)
 						shiftXrot = -random;
 
-					locust->pos.Orientation.SetX(locust->pos.Orientation.GetX() + shiftXrot);
-					locust->pos.Orientation.SetY(locust->pos.Orientation.GetY() + shiftYrot);
+					locust->pos.Orientation.SetX(locust->pos.Orientation.x + shiftXrot);
+					locust->pos.Orientation.SetY(locust->pos.Orientation.y + shiftYrot);
 				}
 
 				locust->pos.Position.x += locust->randomRotation * cos(locust->pos.Orientation.x) * sin(locust->pos.Orientation.y);

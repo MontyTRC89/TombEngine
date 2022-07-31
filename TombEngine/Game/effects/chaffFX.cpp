@@ -49,7 +49,7 @@ void TriggerChaffEffects(ItemInfo* item, int age)
 {
 	Matrix world
 		= Matrix::CreateTranslation(-6, 6, 32)
-		* Matrix::CreateFromYawPitchRoll(item->Pose.Orientation.GetY(), item->Pose.Orientation.GetX(), item->Pose.Orientation.GetZ());
+		* Matrix::CreateFromYawPitchRoll(item->Pose.Orientation.y, item->Pose.Orientation.x, item->Pose.Orientation.z);
 
 	auto pos = Vector3Int(
 		item->Pose.Position.x + world.Translation().x,
@@ -60,7 +60,7 @@ void TriggerChaffEffects(ItemInfo* item, int age)
 	world
 		= Matrix::CreateTranslation(-6, 6, 32)
 		* Matrix::CreateTranslation((GetRandomDraw() & 127) - 64, (GetRandomDraw() & 127) - 64, (GetRandomDraw() & 511) + 512)
-		* Matrix::CreateFromYawPitchRoll(item->Pose.Orientation.GetY(), item->Pose.Orientation.GetX(), item->Pose.Orientation.GetZ());
+		* Matrix::CreateFromYawPitchRoll(item->Pose.Orientation.y, item->Pose.Orientation.x, item->Pose.Orientation.z);
 
 	Vector3Int vel = Vector3Int(
 		world.Translation().x,

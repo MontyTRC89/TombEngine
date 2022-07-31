@@ -151,7 +151,7 @@ static void SubmarineAttack(ItemInfo* item)
 
 		InitialiseItem(itemNumber);
 
-		torpedoItem->Pose.Orientation.Set(0.0f, item->Pose.Orientation.GetY(), 0.0f);
+		torpedoItem->Pose.Orientation.Set(0.0f, item->Pose.Orientation.y, 0.0f);
 		torpedoItem->Animation.Velocity = 0;
 		torpedoItem->Animation.VerticalVelocity = 0;
 		torpedoItem->ItemFlags[0] = -1;
@@ -205,7 +205,7 @@ void SubmarineControl(short itemNumber)
 		int dx = LaraItem->Pose.Position.x - item->Pose.Position.x;
 		int dz = LaraItem->Pose.Position.z - item->Pose.Position.z;
 
-		laraInfo.angle = atan2(dz, dx) - item->Pose.Orientation.GetY();
+		laraInfo.angle = atan2(dz, dx) - item->Pose.Orientation.y;
 		laraInfo.distance = pow(dx, 2) + pow(dz, 2);
 		laraInfo.ahead = true;
 	}
@@ -263,12 +263,12 @@ void SubmarineControl(short itemNumber)
 			if (abs(laraInfo.angle) >= Angle::DegToRad(2.0f))
 			{
 				if (laraInfo.angle >= 0)
-					item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + Angle::DegToRad(2.0f));
+					item->Pose.Orientation.SetY(item->Pose.Orientation.y + Angle::DegToRad(2.0f));
 				else
-					item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() - Angle::DegToRad(2.0f));
+					item->Pose.Orientation.SetY(item->Pose.Orientation.y - Angle::DegToRad(2.0f));
 			}
 			else
-				item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + laraInfo.angle);
+				item->Pose.Orientation.SetY(item->Pose.Orientation.y + laraInfo.angle);
 		}
 	}
 	else
@@ -366,12 +366,12 @@ void ChaffFlareControl(short itemNumber)
 	
 	if (item->Animation.VerticalVelocity)
 	{
-		item->Pose.Orientation.SetX(item->Pose.Orientation.GetX() + Angle::DegToRad(3.0f));
-		item->Pose.Orientation.SetZ(item->Pose.Orientation.GetZ() + Angle::DegToRad(5.0f));
+		item->Pose.Orientation.SetX(item->Pose.Orientation.x + Angle::DegToRad(3.0f));
+		item->Pose.Orientation.SetZ(item->Pose.Orientation.z + Angle::DegToRad(5.0f));
 	}
 
-	int dx = item->Animation.Velocity * sin(item->Pose.Orientation.GetY());
-	int dz = item->Animation.Velocity * cos(item->Pose.Orientation.GetY());
+	int dx = item->Animation.Velocity * sin(item->Pose.Orientation.y);
+	int dz = item->Animation.Velocity * cos(item->Pose.Orientation.y);
 
 	item->Pose.Position.x += dx;
 	item->Pose.Position.z += dz;
@@ -484,11 +484,11 @@ void TorpedoControl(short itemNumber)
 
 	if (item->ItemFlags[1] - 1 < 60)
 	{
-		float dry = Angle::Normalize(angles.GetY() - item->Pose.Orientation.GetY());
+		float dry = Angle::Normalize(angles.y - item->Pose.Orientation.y);
 		if (abs(dry) > Angle::DegToRad(180.0f))
 			dry = -dry;
 
-		float drx = Angle::Normalize(angles.GetX() - item->Pose.Orientation.GetX());
+		float drx = Angle::Normalize(angles.x - item->Pose.Orientation.x);
 		if (abs(drx) > Angle::DegToRad(180.0f))
 			drx = -drx;
 
@@ -511,21 +511,21 @@ void TorpedoControl(short itemNumber)
 		else
 			dry = Angle::DegToRad(2.8f);
 
-		item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + dry);
-		item->Pose.Orientation.SetX(item->Pose.Orientation.GetX() + drx);
+		item->Pose.Orientation.SetY(item->Pose.Orientation.y + dry);
+		item->Pose.Orientation.SetX(item->Pose.Orientation.x + drx);
 	}
 
 	int x = item->Pose.Position.x;
 	int y = item->Pose.Position.y;
 	int z = item->Pose.Position.z;
 
-	item->Pose.Orientation.SetZ(item->Pose.Orientation.GetZ() + Angle::DegToRad(0.09f) * item->Animation.Velocity);
+	item->Pose.Orientation.SetZ(item->Pose.Orientation.z + Angle::DegToRad(0.09f) * item->Animation.Velocity);
 
-	int c = item->Animation.Velocity * cos(item->Pose.Orientation.GetX());
+	int c = item->Animation.Velocity * cos(item->Pose.Orientation.x);
 
-	item->Pose.Position.x += c * sin(item->Pose.Orientation.GetY());
-	item->Pose.Position.y += item->Animation.Velocity * sin(-item->Pose.Orientation.GetX());
-	item->Pose.Position.z += c * cos(item->Pose.Orientation.GetY());
+	item->Pose.Position.x += c * sin(item->Pose.Orientation.y);
+	item->Pose.Position.y += item->Animation.Velocity * sin(-item->Pose.Orientation.x);
+	item->Pose.Position.z += c * cos(item->Pose.Orientation.y);
 
 	auto probe = GetCollision(item);
 

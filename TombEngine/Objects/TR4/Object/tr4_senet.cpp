@@ -432,7 +432,7 @@ void GameSticksCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* co
 		Lara.Control.HandStatus == HandStatus::Free &&
 		!item->Active || Lara.Control.IsMoving && Lara.InteractedItem == itemNumber)
 	{
-		laraItem->Pose.Orientation.SetY(laraItem->Pose.Orientation.GetY() + Angle::DegToRad(180.0f));
+		laraItem->Pose.Orientation.SetY(laraItem->Pose.Orientation.y + Angle::DegToRad(180.0f));
 
 		if (TestLaraPosition(&GameStixBounds, item, laraItem))
 		{
@@ -446,14 +446,14 @@ void GameSticksCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* co
 				Lara.Control.HandStatus = HandStatus::Busy;
 				item->Status = ITEM_ACTIVE;
 				AddActiveItem(itemNumber);
-				laraItem->Pose.Orientation.SetY(laraItem->Pose.Orientation.GetY() + Angle::DegToRad(180.0f));
+				laraItem->Pose.Orientation.SetY(laraItem->Pose.Orientation.y + Angle::DegToRad(180.0f));
 				return;
 			}
 
 			Lara.InteractedItem = itemNumber;
 		}
 
-		laraItem->Pose.Orientation.SetY(laraItem->Pose.Orientation.GetY() + Angle::DegToRad(180.0f));
+		laraItem->Pose.Orientation.SetY(laraItem->Pose.Orientation.y + Angle::DegToRad(180.0f));
 	}
 	else
 		ObjectCollision(itemNumber, laraItem, coll);
@@ -465,13 +465,13 @@ void ControlGodHead(short itemNumber)
 
 	if (TriggerActive(item))
 	{
-		if (item->Pose.Orientation.GetY() == 0)
+		if (item->Pose.Orientation.y == 0)
 			item->Pose.Position.z &= ~1023;
-		else if (item->Pose.Orientation.GetY() == 0x4000)
+		else if (item->Pose.Orientation.y == 0x4000)
 			item->Pose.Position.x &= ~1023;
-		else if (item->Pose.Orientation.GetY() == -0x4000)
+		else if (item->Pose.Orientation.y == -0x4000)
 			item->Pose.Position.x |= 1023;
-		else if (item->Pose.Orientation.GetY() == -0x8000)
+		else if (item->Pose.Orientation.y == -0x8000)
 			item->Pose.Position.z |= 1023;
 
 		if (item->ItemFlags[0])

@@ -108,8 +108,8 @@ void ControlDeathSlide(short itemNumber)
 		if (zipLineItem->Animation.VerticalVelocity < 100)
 			zipLineItem->Animation.VerticalVelocity += 5;
 
-		float sinY = sin(zipLineItem->Pose.Orientation.GetY());
-		float cosY = cos(zipLineItem->Pose.Orientation.GetY());
+		float sinY = sin(zipLineItem->Pose.Orientation.y);
+		float cosY = cos(zipLineItem->Pose.Orientation.y);
 
 		zipLineItem->Pose.Position.z += zipLineItem->Animation.VerticalVelocity * cosY;
 		zipLineItem->Pose.Position.x += zipLineItem->Animation.VerticalVelocity * sinY;

@@ -366,12 +366,12 @@ void lara_as_climb_idle(ItemInfo* item, CollisionInfo* coll)
 	if (TrInput & IN_LEFT || TrInput & IN_LSTEP)
 	{
 		item->Animation.TargetState = LS_LADDER_LEFT;
-		lara->Control.MoveAngle = Angle::Normalize(item->Pose.Orientation.GetY() - Angle::DegToRad(90.0f));
+		lara->Control.MoveAngle = Angle::Normalize(item->Pose.Orientation.y - Angle::DegToRad(90.0f));
 	}
 	else if (TrInput & IN_RIGHT || TrInput & IN_RSTEP)
 	{
 		item->Animation.TargetState = LS_LADDER_RIGHT;
-		lara->Control.MoveAngle = Angle::Normalize(item->Pose.Orientation.GetY() + Angle::DegToRad(90.0f));
+		lara->Control.MoveAngle = Angle::Normalize(item->Pose.Orientation.y + Angle::DegToRad(90.0f));
 	}
 	else if (TrInput & IN_JUMP)
 	{
@@ -379,7 +379,7 @@ void lara_as_climb_idle(ItemInfo* item, CollisionInfo* coll)
 		{
 			item->Animation.TargetState = LS_JUMP_BACK;
 			lara->Control.HandStatus = HandStatus::Free;
-			lara->Control.MoveAngle = Angle::Normalize(item->Pose.Orientation.GetY() + Angle::DegToRad(180.0f));
+			lara->Control.MoveAngle = Angle::Normalize(item->Pose.Orientation.y + Angle::DegToRad(180.0f));
 		}
 	}
 
@@ -394,7 +394,7 @@ void lara_as_climb_stepoff_left(ItemInfo* item, CollisionInfo* coll)
 	Camera.targetAngle = Angle::DegToRad(-60.0f);
 	Camera.targetElevation = Angle::DegToRad(-15.0f);
 
-	item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() - Angle::DegToRad(90.0f));
+	item->Pose.Orientation.SetY(item->Pose.Orientation.y - Angle::DegToRad(90.0f));
 }
 
 void lara_as_climb_stepoff_right(ItemInfo* item, CollisionInfo* coll)
@@ -404,7 +404,7 @@ void lara_as_climb_stepoff_right(ItemInfo* item, CollisionInfo* coll)
 	Camera.targetAngle = Angle::DegToRad(60.0f);
 	Camera.targetElevation = Angle::DegToRad(-15.0f);
 
-	item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + Angle::DegToRad(90.0f));
+	item->Pose.Orientation.SetY(item->Pose.Orientation.y + Angle::DegToRad(90.0f));
 }
 
 // --------
@@ -461,7 +461,7 @@ int LaraTestClimbPos(ItemInfo* item, int front, int right, int origin, int heigh
 	int xFront = 0;
 	int zFront = 0;
 
-	switch (GetQuadrant(item->Pose.Orientation.GetY()))
+	switch (GetQuadrant(item->Pose.Orientation.y))
 	{
 	case NORTH:
 		x = right;
@@ -537,8 +537,8 @@ void LaraDoClimbLeftRight(ItemInfo* item, CollisionInfo* coll, int result, int s
 	if (TrInput & IN_LEFT)
 	{
 		short troomnumber = item->RoomNumber;
-		int dx = int(sin(item->Pose.Orientation.GetY() - Angle::DegToRad(90.0f)) * 10);
-		int dz = int(cos(item->Pose.Orientation.GetY() - Angle::DegToRad(90.0f)) * 10);
+		int dx = int(sin(item->Pose.Orientation.y - Angle::DegToRad(90.0f)) * 10);
+		int dz = int(cos(item->Pose.Orientation.y - Angle::DegToRad(90.0f)) * 10);
 		int height = GetFloorHeight(GetFloor(item->Pose.Position.x + dx, item->Pose.Position.y, item->Pose.Position.z + dz, &troomnumber),
 			item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z) - item->Pose.Position.y;
 		if (height < CLICK(1.5f)) // LADDER dismounts (left/right)
@@ -550,8 +550,8 @@ void LaraDoClimbLeftRight(ItemInfo* item, CollisionInfo* coll, int result, int s
 	else if (TrInput & IN_RIGHT)
 	{
 		short troomnumber = item->RoomNumber;
-		int dx = int(sin(item->Pose.Orientation.GetY() + Angle::DegToRad(90.0f)) * 10);
-		int dz = int(cos(item->Pose.Orientation.GetY() + Angle::DegToRad(90.0f)) * 10);
+		int dx = int(sin(item->Pose.Orientation.y + Angle::DegToRad(90.0f)) * 10);
+		int dz = int(cos(item->Pose.Orientation.y + Angle::DegToRad(90.0f)) * 10);
 		int height = GetFloorHeight(GetFloor(item->Pose.Position.x + dx, item->Pose.Position.y, item->Pose.Position.z + dz, &troomnumber),
 			item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z) - item->Pose.Position.y;
 
@@ -609,7 +609,7 @@ int LaraClimbRightCornerTest(ItemInfo* item, CollisionInfo* coll)
 	auto oldPose = item->Pose;
 	float oldMoveAngle = lara->Control.MoveAngle;
 
-	int quadrant = GetQuadrant(item->Pose.Orientation.GetY());
+	int quadrant = GetQuadrant(item->Pose.Orientation.y);
 	int x, z;
 
 	if (quadrant && quadrant != SOUTH)
@@ -630,9 +630,9 @@ int LaraClimbRightCornerTest(ItemInfo* item, CollisionInfo* coll)
 		lara->NextCornerPos.Position.x = item->Pose.Position.x = x;
 		lara->NextCornerPos.Position.y = item->Pose.Position.y;
 		lara->NextCornerPos.Position.z = item->Pose.Position.z = z;
-		lara->NextCornerPos.Orientation.SetY(item->Pose.Orientation.GetY() + Angle::DegToRad(90.0f));
-		lara->Control.MoveAngle = lara->NextCornerPos.Orientation.GetY();
-		item->Pose.Orientation.SetY(lara->NextCornerPos.Orientation.GetY());
+		lara->NextCornerPos.Orientation.SetY(item->Pose.Orientation.y + Angle::DegToRad(90.0f));
+		lara->Control.MoveAngle = lara->NextCornerPos.Orientation.y;
+		item->Pose.Orientation.SetY(lara->NextCornerPos.Orientation.y);
 
 		result = LaraTestClimbPos(item, coll->Setup.Radius, coll->Setup.Radius + LADDER_TEST_DISTANCE, -CLICK(2), CLICK(2), &shift);
 		item->ItemFlags[3] = result;
@@ -673,9 +673,9 @@ int LaraClimbRightCornerTest(ItemInfo* item, CollisionInfo* coll)
 			lara->NextCornerPos.Position.x = item->Pose.Position.x = x;
 			lara->NextCornerPos.Position.y = item->Pose.Position.y;
 			lara->NextCornerPos.Position.z = item->Pose.Position.z = z;
-			lara->NextCornerPos.Orientation.SetY(item->Pose.Orientation.GetY() - Angle::DegToRad(90.0f));
-			lara->Control.MoveAngle = lara->NextCornerPos.Orientation.GetY();
-			item->Pose.Orientation.SetY(lara->NextCornerPos.Orientation.GetY());
+			lara->NextCornerPos.Orientation.SetY(item->Pose.Orientation.y - Angle::DegToRad(90.0f));
+			lara->Control.MoveAngle = lara->NextCornerPos.Orientation.y;
+			item->Pose.Orientation.SetY(lara->NextCornerPos.Orientation.y);
 
 			result = LaraTestClimbPos(item, coll->Setup.Radius, coll->Setup.Radius + LADDER_TEST_DISTANCE, -CLICK(2), CLICK(2), &shift);
 			item->ItemFlags[3] = result;
@@ -702,7 +702,7 @@ int LaraClimbLeftCornerTest(ItemInfo* item, CollisionInfo* coll)
 	auto oldPose = item->Pose;
 	float oldOrient = lara->Control.MoveAngle;
 
-	int quadrant = GetQuadrant(item->Pose.Orientation.GetY());
+	int quadrant = GetQuadrant(item->Pose.Orientation.y);
 	int x, z;
 
 	if (quadrant && quadrant != SOUTH)
@@ -723,9 +723,9 @@ int LaraClimbLeftCornerTest(ItemInfo* item, CollisionInfo* coll)
 		lara->NextCornerPos.Position.x = item->Pose.Position.x = x;
 		lara->NextCornerPos.Position.y = item->Pose.Position.y;
 		lara->NextCornerPos.Position.z = item->Pose.Position.z = z;
-		lara->NextCornerPos.Orientation.SetY(item->Pose.Orientation.GetY() - Angle::DegToRad(90.0f));
-		lara->Control.MoveAngle = lara->NextCornerPos.Orientation.GetY();
-		item->Pose.Orientation.SetY(lara->NextCornerPos.Orientation.GetY());
+		lara->NextCornerPos.Orientation.SetY(item->Pose.Orientation.y - Angle::DegToRad(90.0f));
+		lara->Control.MoveAngle = lara->NextCornerPos.Orientation.y;
+		item->Pose.Orientation.SetY(lara->NextCornerPos.Orientation.y);
 
 		result = LaraTestClimbPos(item, coll->Setup.Radius, -coll->Setup.Radius - LADDER_TEST_DISTANCE, -CLICK(2), CLICK(2), &shift);
 		item->ItemFlags[3] = result;
@@ -765,9 +765,9 @@ int LaraClimbLeftCornerTest(ItemInfo* item, CollisionInfo* coll)
 			lara->NextCornerPos.Position.x = item->Pose.Position.x = x;
 			lara->NextCornerPos.Position.y = item->Pose.Position.y;
 			lara->NextCornerPos.Position.z = item->Pose.Position.z = z;
-			lara->NextCornerPos.Orientation.SetY(item->Pose.Orientation.GetY() + Angle::DegToRad(90.0f));
-			lara->Control.MoveAngle = lara->NextCornerPos.Orientation.GetY();
-			item->Pose.Orientation.SetY(lara->NextCornerPos.Orientation.GetY());
+			lara->NextCornerPos.Orientation.SetY(item->Pose.Orientation.y + Angle::DegToRad(90.0f));
+			lara->Control.MoveAngle = lara->NextCornerPos.Orientation.y;
+			item->Pose.Orientation.SetY(lara->NextCornerPos.Orientation.y);
 
 			item->ItemFlags[3] = LaraTestClimbPos(item, coll->Setup.Radius, -coll->Setup.Radius - LADDER_TEST_DISTANCE, -CLICK(2), CLICK(2), &shift);
 			result = item->ItemFlags[3] != 0;
@@ -900,7 +900,7 @@ int LaraTestClimbUpPos(ItemInfo* item, int front, int right, int* shift, int* le
 	int xFront = 0;
 	int zFront = 0;
 
-	switch (GetQuadrant(item->Pose.Orientation.GetY()))
+	switch (GetQuadrant(item->Pose.Orientation.y))
 	{
 	case NORTH:
 		x = item->Pose.Position.x + right;

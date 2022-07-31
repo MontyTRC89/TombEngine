@@ -288,7 +288,7 @@ namespace TEN::Entities::TR4
 				int dx = LaraItem->Pose.Position.x - item->Pose.Position.x;
 				int dz = LaraItem->Pose.Position.z - item->Pose.Position.z;
 
-			laraAI.angle = atan2(dx, dz) - item->Pose.Orientation.GetY();
+			laraAI.angle = atan2(dx, dz) - item->Pose.Orientation.y;
 			laraAI.distance = pow(dx, 2) + pow(dz, 2);
 
 				if (creature->Enemy == nullptr || creature->Enemy == LaraItem)
@@ -539,12 +539,12 @@ namespace TEN::Entities::TR4
 			if (abs(AI.angle) >= BABOON_ATTACK_ANGLE)
 			{
 				if (AI.angle >= 0)
-					item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + BABOON_ATTACK_ANGLE);
+					item->Pose.Orientation.SetY(item->Pose.Orientation.y + BABOON_ATTACK_ANGLE);
 				else
-					item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() - BABOON_ATTACK_ANGLE);
+					item->Pose.Orientation.SetY(item->Pose.Orientation.y - BABOON_ATTACK_ANGLE);
 			}
 			else
-				item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + AI.angle);
+				item->Pose.Orientation.SetY(item->Pose.Orientation.y + AI.angle);
 
 				if (creature->Flags == 0 &&
 					(item->TestBits(JointBitType::Touch, BaboonAttackJoints) ||

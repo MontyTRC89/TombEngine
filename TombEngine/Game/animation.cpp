@@ -43,7 +43,7 @@ void AnimateLara(ItemInfo* item)
 				switch (*(cmd++))
 				{
 				case COMMAND_MOVE_ORIGIN:
-					TranslateItem(item, item->Pose.Orientation.GetY(), cmd[2], cmd[1], cmd[0]);
+					TranslateItem(item, item->Pose.Orientation.y, cmd[2], cmd[1], cmd[0]);
 					UpdateItemRoom(item, -LARA_HEIGHT / 2, -cmd[0], -cmd[2]);
 					cmd += 3;
 					break;
@@ -238,7 +238,7 @@ void AnimateItem(ItemInfo* item)
 				switch (*(cmd++))
 				{
 				case COMMAND_MOVE_ORIGIN:
-					TranslateItem(item, item->Pose.Orientation.GetY(), cmd[2], cmd[1], cmd[0]);
+					TranslateItem(item, item->Pose.Orientation.y, cmd[2], cmd[1], cmd[0]);
 					cmd += 3;
 					break;
 
@@ -372,7 +372,7 @@ void AnimateItem(ItemInfo* item)
 		lateral >>= 16;
 	}
 
-	TranslateItem(item, item->Pose.Orientation.GetY(), item->Animation.Velocity, 0, lateral);
+	TranslateItem(item, item->Pose.Orientation.y, item->Animation.Velocity, 0, lateral);
 
 	// Update matrices.
 	short itemNumber = item - g_Level.Items.data();
@@ -598,10 +598,10 @@ void ClampRotation(PHD_3DPOS* pose, float angle, float rotation)
 	if (angle <= rotation)
 	{
 		if (angle >= -rotation)
-			pose->Orientation.SetY(pose->Orientation.GetY() + angle);
+			pose->Orientation.SetY(pose->Orientation.y + angle);
 		else
-			pose->Orientation.SetY(pose->Orientation.GetY() - angle);
+			pose->Orientation.SetY(pose->Orientation.y - angle);
 	}
 	else
-		pose->Orientation.SetY(pose->Orientation.GetY() - angle);
+		pose->Orientation.SetY(pose->Orientation.y - angle);
 }

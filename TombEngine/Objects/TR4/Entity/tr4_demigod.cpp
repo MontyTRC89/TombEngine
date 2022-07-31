@@ -157,14 +157,14 @@ namespace TEN::Entities::TR4
 			fx->pos.Position.y = pose->Position.y - (GetRandomControl() & 0x3F) - 32;
 			fx->pos.Position.z = pose->Position.z;
 
-			fx->pos.Orientation.SetX(pose->Orientation.GetX());
+			fx->pos.Orientation.SetX(pose->Orientation.x);
 
 			if (flags < 4)
-				fx->pos.Orientation.SetY(pose->Orientation.GetY());
+				fx->pos.Orientation.SetY(pose->Orientation.y);
 			else
-				fx->pos.Orientation.SetY(pose->Orientation.GetY() + (GetRandomControl() & 0x7FF) - Angle::DegToRad(5.6f));
+				fx->pos.Orientation.SetY(pose->Orientation.y + (GetRandomControl() & 0x7FF) - Angle::DegToRad(5.6f));
 
-			fx->pos.Orientation.SetZ();
+			fx->pos.Orientation.z = 0.0f;
 
 			fx->roomNumber = roomNumber;
 			fx->counter = 2 * GetRandomControl() + Angle::DegToRad(-180.0f);
@@ -394,7 +394,7 @@ namespace TEN::Entities::TR4
 			{
 				dx = LaraItem->Pose.Position.x - item->Pose.Position.x;
 				dz = LaraItem->Pose.Position.z - item->Pose.Position.z;
-				laraAI.angle = atan2(dz, dx) - item->Pose.Orientation.GetY();
+				laraAI.angle = atan2(dz, dx) - item->Pose.Orientation.y;
 				laraAI.xAngle = 0;
 
 				laraAI.ahead = true;
@@ -571,11 +571,11 @@ namespace TEN::Entities::TR4
 				if (item->Animation.AnimNumber == Objects[item->ObjectNumber].animIndex + DEMIGOD2_ANIM_AIM)
 				{
 					if (AI.angle >= Angle::DegToRad(7.0f))
-						item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + Angle::DegToRad(7.0f));
+						item->Pose.Orientation.SetY(item->Pose.Orientation.y + Angle::DegToRad(7.0f));
 					else if (AI.angle <= Angle::DegToRad(-7))
-						item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + Angle::DegToRad(-7.0f));
+						item->Pose.Orientation.SetY(item->Pose.Orientation.y + Angle::DegToRad(-7.0f));
 					else
-						item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + AI.angle);
+						item->Pose.Orientation.SetY(item->Pose.Orientation.y + AI.angle);
 				}
 
 				if (Targetable(item, &AI) || creature->Flags)
@@ -635,11 +635,11 @@ namespace TEN::Entities::TR4
 				if (item->Animation.AnimNumber == Objects[(signed short)item->ObjectNumber].animIndex + DEMIGOD2_ANIM_AIM)
 				{
 					if (AI.angle >= Angle::DegToRad(7.0f))
-						item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + Angle::DegToRad(7.0f));
+						item->Pose.Orientation.SetY(item->Pose.Orientation.y + Angle::DegToRad(7.0f));
 					else if (AI.angle <= Angle::DegToRad(-7.0f))
-						item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + Angle::DegToRad(-7.0f));
+						item->Pose.Orientation.SetY(item->Pose.Orientation.y + Angle::DegToRad(-7.0f));
 					else
-						item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + AI.angle);
+						item->Pose.Orientation.SetY(item->Pose.Orientation.y + AI.angle);
 				}
 
 				if (Targetable(item, &AI) || creature->Flags)
@@ -661,11 +661,11 @@ namespace TEN::Entities::TR4
 				joint0 = 0;
 
 				if (AI.angle >= Angle::DegToRad(7.0f))
-					item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + Angle::DegToRad(7.0f));
+					item->Pose.Orientation.SetY(item->Pose.Orientation.y + Angle::DegToRad(7.0f));
 				else if (AI.angle <= Angle::DegToRad(-7.0f))
-					item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + Angle::DegToRad(-7.0f));
+					item->Pose.Orientation.SetY(item->Pose.Orientation.y + Angle::DegToRad(-7.0f));
 				else
-					item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + AI.angle);
+					item->Pose.Orientation.SetY(item->Pose.Orientation.y + AI.angle);
 
 				if (AI.distance >= pow(SECTOR(3), 2) ||
 					!AI.bite &&

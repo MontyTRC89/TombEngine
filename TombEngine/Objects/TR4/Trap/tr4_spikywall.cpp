@@ -15,8 +15,8 @@ void ControlSpikyWall(short itemNumber)
 	// Move wall.
 	if (TriggerActive(item) && item->Status != ITEM_DEACTIVATED)
 	{
-		int x = item->Pose.Position.x + sin(item->Pose.Orientation.GetY());
-		int z = item->Pose.Position.z + cos(item->Pose.Orientation.GetY());
+		int x = item->Pose.Position.x + sin(item->Pose.Orientation.y);
+		int z = item->Pose.Position.z + cos(item->Pose.Orientation.y);
 		auto probe = GetCollision(x, item->Pose.Position.y, z, item->RoomNumber);
 
 		if (probe.Position.Floor != item->Pose.Position.y)

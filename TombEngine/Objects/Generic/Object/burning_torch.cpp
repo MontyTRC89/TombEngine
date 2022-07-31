@@ -205,19 +205,19 @@ namespace TEN::Entities::Generic
 
 		if (item->Animation.VerticalVelocity)
 		{
-			item->Pose.Orientation.SetX(item->Pose.Orientation.GetX() - Angle::DegToRad(5.0f));
-			item->Pose.Orientation.SetZ(item->Pose.Orientation.GetZ() + Angle::DegToRad(5.0f));
+			item->Pose.Orientation.SetX(item->Pose.Orientation.x - Angle::DegToRad(5.0f));
+			item->Pose.Orientation.SetZ(item->Pose.Orientation.z + Angle::DegToRad(5.0f));
 		}
 		else if (!item->Animation.Velocity)
 		{
-			item->Pose.Orientation.SetX();
-			item->Pose.Orientation.SetZ();
+			item->Pose.Orientation.x = 0.0f;
+			item->Pose.Orientation.z = 0.0f;
 		}
 
 		auto velocity = Vector3Int(
-			item->Animation.Velocity * sin(item->Pose.Orientation.GetY()),
+			item->Animation.Velocity * sin(item->Pose.Orientation.y),
 			item->Animation.VerticalVelocity,
-			item->Animation.Velocity * cos(item->Pose.Orientation.GetY())
+			item->Animation.Velocity * cos(item->Pose.Orientation.y)
 		);
 
 		auto oldPos = item->Pose.Position;
@@ -318,7 +318,7 @@ namespace TEN::Entities::Generic
 		}
 		else
 		{
-			float rot = torchItem->Pose.Orientation.GetY();
+			float rot = torchItem->Pose.Orientation.y;
 
 			switch (torchItem->ObjectNumber)
 			{
@@ -350,7 +350,7 @@ namespace TEN::Entities::Generic
 				break;
 			}
 
-			torchItem->Pose.Orientation.SetY(laraItem->Pose.Orientation.GetY());
+			torchItem->Pose.Orientation.SetY(laraItem->Pose.Orientation.y);
 
 			if (TestLaraPosition(&FireBounds, torchItem, laraItem))
 			{

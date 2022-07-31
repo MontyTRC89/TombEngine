@@ -132,7 +132,7 @@ void PushableBlockControl(short itemNumber)
 
 	Vector3Int pos = { 0, 0, 0 };
 
-	short quadrant = (unsigned short)(LaraItem->Pose.Orientation.GetY() + Angle::DegToRad(45.0f)) / Angle::DegToRad(90.0f);
+	short quadrant = (unsigned short)(LaraItem->Pose.Orientation.y + Angle::DegToRad(45.0f)) / Angle::DegToRad(90.0f);
 
 	int x, z;
 	int blockHeight = GetStackHeight(item);
@@ -407,7 +407,7 @@ void PushableBlockCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo*
 			return;
 		}
 
-		int quadrant = GetQuadrant(LaraItem->Pose.Orientation.GetY());
+		int quadrant = GetQuadrant(LaraItem->Pose.Orientation.y);
 
 		bool quadrantDisabled = false;
 		switch (quadrant)
@@ -473,12 +473,12 @@ void PushableBlockCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo*
 		PushableBlockBounds.boundingBox.Z1 = bounds->Z1 - 200;
 		PushableBlockBounds.boundingBox.Z2 = 0;
 
-		float rot = pushableItem->Pose.Orientation.GetY();
-		//pushableItem->Pose.Orientation.SetY((laraItem->Pose.Orientation.GetY() + Angle::DegToRad(45.0f)) & 0xC000;
+		float rot = pushableItem->Pose.Orientation.y;
+		//pushableItem->Pose.Orientation.SetY((laraItem->Pose.Orientation.y + Angle::DegToRad(45.0f)) & 0xC000;
 
 		if (TestLaraPosition(&PushableBlockBounds, pushableItem, laraItem))
 		{
-			unsigned short quadrant = GetQuadrant(pushableItem->Pose.Orientation.GetY());
+			unsigned short quadrant = GetQuadrant(pushableItem->Pose.Orientation.y);
 			if (quadrant & 1)
 				PushableBlockPos.z = bounds->X1 - 35;
 			else

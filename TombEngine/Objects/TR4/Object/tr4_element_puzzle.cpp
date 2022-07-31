@@ -187,8 +187,8 @@ namespace TEN::Entities::TR4
             ElementPuzzleBounds.boundingBox.Z1 = box->Z1 - 200;
             ElementPuzzleBounds.boundingBox.Z2 = box->Z2 + 200;
 
-            float oldRot = puzzleItem->Pose.Orientation.GetY();
-            puzzleItem->Pose.Orientation.SetY(laraItem->Pose.Orientation.GetY());
+            float oldRot = puzzleItem->Pose.Orientation.y;
+            puzzleItem->Pose.Orientation.SetY(laraItem->Pose.Orientation.y);
 
             if (TestLaraPosition(&ElementPuzzleBounds, puzzleItem, laraItem))
             {
@@ -265,8 +265,8 @@ namespace TEN::Entities::TR4
                 ElementPuzzleBounds.boundingBox.Z1 = box->Z1 - 200;
                 ElementPuzzleBounds.boundingBox.Z2 = box->Z2 + 200;
 
-                float oldRot = puzzleItem->Pose.Orientation.GetY();
-                puzzleItem->Pose.Orientation.SetY(laraItem->Pose.Orientation.GetY());
+                float oldRot = puzzleItem->Pose.Orientation.y;
+                puzzleItem->Pose.Orientation.SetY(laraItem->Pose.Orientation.y);
 
                 if (TestLaraPosition(&ElementPuzzleBounds, puzzleItem, laraItem))
                 {

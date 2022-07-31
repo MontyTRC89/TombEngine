@@ -34,13 +34,13 @@ void ControlBodyPart(short fxNumber)
 		int random = modulus <= 1 ? 0 : 2 * GetRandomControl() % modulus;
 		if (fxNumber & 1)
 		{
-			fx->pos.Orientation.SetZ(fx->pos.Orientation.GetZ() - random);
-			fx->pos.Orientation.SetX(fx->pos.Orientation.GetX() + random);
+			fx->pos.Orientation.SetZ(fx->pos.Orientation.z - random);
+			fx->pos.Orientation.SetX(fx->pos.Orientation.x + random);
 		}
 		else
 		{
-			fx->pos.Orientation.SetZ(fx->pos.Orientation.GetZ() + random);
-			fx->pos.Orientation.SetX(fx->pos.Orientation.GetX() - random);
+			fx->pos.Orientation.SetZ(fx->pos.Orientation.z + random);
+			fx->pos.Orientation.SetX(fx->pos.Orientation.x - random);
 		}
 
 		if (--fx->counter < 8)
@@ -112,7 +112,7 @@ void ControlBodyPart(short fxNumber)
 			}
 			else
 			{
-				fx->pos.Orientation.SetY(fx->pos.Orientation.GetY() + Angle::DegToRad(-180.0f));
+				fx->pos.Orientation.SetY(fx->pos.Orientation.y + Angle::DegToRad(-180.0f));
 				fx->pos.Position.x = x;
 				fx->pos.Position.z = z;
 			}

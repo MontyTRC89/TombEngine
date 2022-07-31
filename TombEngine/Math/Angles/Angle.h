@@ -10,7 +10,7 @@
 	class Angle
 	{
 	private:
-		float Component;
+		float Component = 0.0f;
 
 	public:
 		// Utilities

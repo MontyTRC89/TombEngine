@@ -13,8 +13,8 @@ namespace TEN::Entities::TR4
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		int dx = sin(item->Pose.Orientation.GetY() + Angle::DegToRad(90.0f)) * SECTOR(0.5f);
-		int dz = cos(item->Pose.Orientation.GetY() + Angle::DegToRad(90.0f)) * SECTOR(0.5f);
+		int dx = sin(item->Pose.Orientation.y + Angle::DegToRad(90.0f)) * SECTOR(0.5f);
+		int dz = cos(item->Pose.Orientation.y + Angle::DegToRad(90.0f)) * SECTOR(0.5f);
 
 		item->Pose.Position.x += dx;
 		item->Pose.Position.z += dz;
@@ -32,9 +32,9 @@ namespace TEN::Entities::TR4
 		SoundEffect(SFX_TR4_METAL_SCRAPE_LOOP1, &item->Pose);
 		SoundEffect(SFX_TR4_METAL_SCRAPE_LOOP2, &item->Pose);
 
-		item->Pose.Position.x = (item->ItemFlags[0] * 256) + 4608 * cos(item->TriggerFlags) * sin(item->Pose.Orientation.GetY());
+		item->Pose.Position.x = (item->ItemFlags[0] * 256) + 4608 * cos(item->TriggerFlags) * sin(item->Pose.Orientation.y);
 		item->Pose.Position.y = (item->ItemFlags[1] * 256) - 4608 * sin(item->TriggerFlags);
-		item->Pose.Position.z = (item->ItemFlags[2] * 256) + 4608 * cos(item->TriggerFlags) * cos(item->Pose.Orientation.GetY());
+		item->Pose.Position.z = (item->ItemFlags[2] * 256) + 4608 * cos(item->TriggerFlags) * cos(item->Pose.Orientation.y);
 
 		item->TriggerFlags += 170;
 

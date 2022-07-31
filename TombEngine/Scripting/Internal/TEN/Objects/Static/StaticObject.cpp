@@ -99,9 +99,9 @@ void Static::SetPos(Vec3 const& pos)
 Rotation Static::GetRot() const
 {
 	return {
-		Angle::RadToDeg(m_mesh.pos.Orientation.GetX()),
-		Angle::RadToDeg(m_mesh.pos.Orientation.GetY()),
-		Angle::RadToDeg(m_mesh.pos.Orientation.GetZ())
+		Angle::RadToDeg(m_mesh.pos.Orientation.x),
+		Angle::RadToDeg(m_mesh.pos.Orientation.y),
+		Angle::RadToDeg(m_mesh.pos.Orientation.z)
 	};
 }
 

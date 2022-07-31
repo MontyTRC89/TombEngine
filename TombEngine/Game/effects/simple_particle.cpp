@@ -22,7 +22,7 @@ namespace TEN::Effects
 
 	void TriggerSnowmobileSnow(ItemInfo* snowMobile)
 	{
-		float angle = snowMobile->Pose.Orientation.GetY();
+		float angle = snowMobile->Pose.Orientation.y;
 		const float angleVariation = GenerateFloat(-10, 10) * RADIAN;
 		float x = std::sin(angle + angleVariation);
 		float z = std::cos(angle + angleVariation);
@@ -45,7 +45,7 @@ namespace TEN::Effects
 		for (float i = -0.5; i < 1; i += 1)
 		{
 			float size = GenerateFloat(96, 128);
-			float angle = boat->Pose.Orientation.GetY();
+			float angle = boat->Pose.Orientation.y;
 			float angleVariation = i*2*10 * RADIAN;
 			float y = float(boat->Pose.Position.y) - size / 2 + offset.y;
 			float x = std::sin(angle + angleVariation);

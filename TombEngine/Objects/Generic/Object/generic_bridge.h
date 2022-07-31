@@ -17,7 +17,7 @@ std::optional<int> BridgeFloor(short itemNumber, int x, int y, int z)
 
 	if (bboxHeight.has_value() && tilt != 0)
 	{
-		const auto height = item->Pose.Position.y + tilt * (GetOffset(item->Pose.Orientation.GetY(), x, z) / 4 + SECTOR(1) / 8);
+		const auto height = item->Pose.Position.y + tilt * (GetOffset(item->Pose.Orientation.y, x, z) / 4 + SECTOR(1) / 8);
 		return std::optional{ height };
 	}
 
@@ -32,7 +32,7 @@ std::optional<int> BridgeCeiling(short itemNumber, int x, int y, int z)
 
 	if (bboxHeight.has_value() && tilt != 0)
 	{
-		const auto height = item->Pose.Position.y + tilt * (GetOffset(item->Pose.Orientation.GetY(), x, z) / 4 + SECTOR(1) / 8);
+		const auto height = item->Pose.Position.y + tilt * (GetOffset(item->Pose.Orientation.y, x, z) / 4 + SECTOR(1) / 8);
 		return std::optional{ height + CLICK(1) }; // To be customized with Lua
 	}
 	return bboxHeight;

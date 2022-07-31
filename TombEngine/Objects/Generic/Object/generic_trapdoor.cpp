@@ -64,9 +64,9 @@ void CeilingTrapDoorCollision(short itemNumber, ItemInfo* laraItem, CollisionInf
 	bool itemIsAbove = trapDoorItem->Pose.Position.y <= laraItem->Pose.Position.y - LARA_HEIGHT + LARA_HEADROOM;
 
 	bool result = TestLaraPosition(&CeilingTrapDoorBounds, trapDoorItem, laraItem);
-	laraItem->Pose.Orientation.SetY(laraItem->Pose.Orientation.GetY() + Angle::DegToRad(180.0f));
+	laraItem->Pose.Orientation.SetY(laraItem->Pose.Orientation.y + Angle::DegToRad(180.0f));
 	bool result2 = TestLaraPosition(&CeilingTrapDoorBounds, trapDoorItem, laraItem);
-	laraItem->Pose.Orientation.SetY(laraItem->Pose.Orientation.GetY() + Angle::DegToRad(180.0f));
+	laraItem->Pose.Orientation.SetY(laraItem->Pose.Orientation.y + Angle::DegToRad(180.0f));
 
 	if (TrInput & IN_ACTION &&
 		laraItem->Animation.ActiveState == LS_JUMP_UP &&
@@ -78,7 +78,7 @@ void CeilingTrapDoorCollision(short itemNumber, ItemInfo* laraItem, CollisionInf
 	{
 		AlignLaraPosition(&CeilingTrapDoorPos, trapDoorItem, laraItem);
 		if (result2)
-			laraItem->Pose.Orientation.SetY(laraItem->Pose.Orientation.GetY() + Angle::DegToRad(180.0f));
+			laraItem->Pose.Orientation.SetY(laraItem->Pose.Orientation.y + Angle::DegToRad(180.0f));
 		
 		ResetLaraFlex(laraItem);
 		laraItem->Animation.VerticalVelocity = 0;
@@ -92,9 +92,9 @@ void CeilingTrapDoorCollision(short itemNumber, ItemInfo* laraItem, CollisionInf
 		trapDoorItem->Animation.TargetState = 1;
 
 		UseForcedFixedCamera = 1;
-		ForcedFixedCamera.x = trapDoorItem->Pose.Position.x - sin(trapDoorItem->Pose.Orientation.GetY()) * SECTOR(1);
+		ForcedFixedCamera.x = trapDoorItem->Pose.Position.x - sin(trapDoorItem->Pose.Orientation.y) * SECTOR(1);
 		ForcedFixedCamera.y = trapDoorItem->Pose.Position.y + SECTOR(1);
-		ForcedFixedCamera.z = trapDoorItem->Pose.Position.z - cos(trapDoorItem->Pose.Orientation.GetY()) * SECTOR(1);
+		ForcedFixedCamera.z = trapDoorItem->Pose.Position.z - cos(trapDoorItem->Pose.Orientation.y) * SECTOR(1);
 		ForcedFixedCamera.roomNumber = trapDoorItem->RoomNumber;
 	}
 	else
@@ -137,13 +137,13 @@ void FloorTrapDoorCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo*
 				trapDoorItem->Animation.TargetState = 1;
 
 				UseForcedFixedCamera = 1;
-				ForcedFixedCamera.x = trapDoorItem->Pose.Position.x - sin(trapDoorItem->Pose.Orientation.GetY()) * 2048;
+				ForcedFixedCamera.x = trapDoorItem->Pose.Position.x - sin(trapDoorItem->Pose.Orientation.y) * 2048;
 				ForcedFixedCamera.y = trapDoorItem->Pose.Position.y - 2048;
 
 				if (ForcedFixedCamera.y < g_Level.Rooms[trapDoorItem->RoomNumber].maxceiling)
 					ForcedFixedCamera.y = g_Level.Rooms[trapDoorItem->RoomNumber].maxceiling;
 
-				ForcedFixedCamera.z = trapDoorItem->Pose.Position.z - cos(trapDoorItem->Pose.Orientation.GetY()) * 2048;
+				ForcedFixedCamera.z = trapDoorItem->Pose.Position.z - cos(trapDoorItem->Pose.Orientation.y) * 2048;
 				ForcedFixedCamera.roomNumber = trapDoorItem->RoomNumber;
 			}
 			else
