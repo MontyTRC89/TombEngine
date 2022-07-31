@@ -459,8 +459,6 @@ namespace TEN::Renderer
 		RendererRoom& room = m_rooms[roomNumber];
 		ROOM_INFO* nativeRoom = &g_Level.Rooms[room.RoomNumber];
 
-		auto roomsToCheck = GetRoomList(roomNumber);
-
 		RendererLight* brightestLight = nullptr;
 		float brightest = 0.0f;
 
@@ -487,7 +485,7 @@ namespace TEN::Renderer
 		}
 
 		// Check current room and also neighbour rooms
-		for (auto roomToCheck : roomsToCheck)
+		for (int roomToCheck : room.Neighbors)
 		{
 			RendererRoom& currentRoom = m_rooms[roomToCheck];
 			int numLights = currentRoom.Lights.size();
