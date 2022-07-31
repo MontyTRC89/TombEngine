@@ -31,7 +31,7 @@ template <typename ... Ts> using TypeOrNil = std::variant<Ts..., sol::nil_t, sol
 
 // To be used with TypeOrNil to fill arguments with default values if said arguments weren't given by the script.
 #define USE_IF_HAVE(Type, ifThere, ifNotThere) \
-std::holds_alternative<Type>(ifThere) ? std::get<Type>(ifThere) : ifNotThere
+(std::holds_alternative<Type>(ifThere) ? std::get<Type>(ifThere) : ifNotThere)
 
 
 sol::table MakeSpecialTableBase(sol::state* state, std::string const& name);
