@@ -4,7 +4,6 @@
 #include "ScriptAssert.h"
 #include "Game/savegame.h"
 #include "Sound/sound.h"
-#include "Specific/setup.h"
 #include "ReservedScriptNames.h"
 #include "Game/effects/lightning.h"
 #include "ScriptUtil.h"
