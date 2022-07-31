@@ -63,6 +63,7 @@ sol::object GetVariable(sol::table tab, sol::object key)
 
 LogicHandler::LogicHandler(sol::state* lua, sol::table & parent) : m_handler{ lua }
 {
+	m_handler.GetState()->set_function("print", &LogicHandler::LogPrint, this);
 	ResetScripts(true);
 }
 
@@ -102,6 +103,20 @@ bool LogicHandler::SetLevelFunc(sol::table tab, std::string const& luaName, sol:
 		return ScriptAssert(false, error);
 	}
 	return true;
+}
+
+
+void LogicHandler::LogPrint(sol::variadic_args va)
+{
+	std::string str;
+	for (auto v : va)
+	{
+		sol::object o = v;
+		auto strPart = (*m_handler.GetState())["tostring"](o).get<std::string>();
+		str += strPart;
+		str += "\t";
+	}
+	TENLog(str);
 }
 
 void LogicHandler::ResetScripts(bool clearGameVars)
