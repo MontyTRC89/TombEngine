@@ -109,9 +109,8 @@ bool LogicHandler::SetLevelFunc(sol::table tab, std::string const& luaName, sol:
 void LogicHandler::LogPrint(sol::variadic_args va)
 {
 	std::string str;
-	for (auto const & v : va)
+	for (sol::object const & o : va)
 	{
-		sol::object o = v;
 		auto strPart = (*m_handler.GetState())["tostring"](o).get<std::string>();
 		str += strPart;
 		str += "\t";
