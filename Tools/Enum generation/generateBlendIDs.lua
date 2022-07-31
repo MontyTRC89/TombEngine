@@ -1,6 +1,6 @@
 local generateheader = require("generateheader")
 
-local enumName = "Misc.BlendID"
+local enumName = "Effects.BlendID"
 local enumIncludes = [==[
 #include "Renderer11Enums.h"
 #include <unordered_map>
