@@ -15,7 +15,7 @@
 #include "Sound/sound.h"
 #include "Specific/setup.h"
 #include "Game/effects/lightning.h"
-#include "Misc/BlendIDs.h"
+#include "Effects/BlendIDs.h"
 #include "ReservedScriptNames.h"
 
 /***
