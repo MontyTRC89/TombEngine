@@ -67,31 +67,41 @@
 
 	Vector3Int& Vector3Int::operator +=(Vector3Int vector)
 	{
-		*this = *this + vector;
+		this->x += vector.x;
+		this->y += vector.y;
+		this->z += vector.z;
 		return *this;
 	}
 
 	Vector3Int& Vector3Int::operator -=(Vector3Int vector)
 	{
-		*this = *this - vector;
+		this->x -= vector.x;
+		this->y -= vector.y;
+		this->z -= vector.z;
 		return *this;
 	}
 
 	Vector3Int& Vector3Int::operator *=(Vector3Int vector)
 	{
-		*this = *this * vector;
+		this->x *= vector.x;
+		this->y *= vector.y;
+		this->z *= vector.z;
 		return *this;
 	}
 
 	Vector3Int& Vector3Int::operator *=(float value)
 	{
-		*this = *this * value;
+		this->x *= value;
+		this->y *= value;
+		this->z *= value;
 		return *this;
 	}
 
 	Vector3Int& Vector3Int::operator /=(float value)
 	{
-		*this = *this / value;
+		this->x /= value;
+		this->y /= value;
+		this->z /= value;
 		return *this;
 	}
 //}
