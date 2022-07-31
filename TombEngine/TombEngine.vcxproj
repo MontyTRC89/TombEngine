@@ -221,6 +221,7 @@ CALL gen.bat</Command>
     <ClInclude Include="Scripting\Internal\ScriptAssert.h" />
     <ClInclude Include="Scripting\Internal\ScriptUtil.h" />
     <ClInclude Include="Scripting\Internal\TEN\Color\Color.h" />
+    <ClInclude Include="Scripting\Internal\TEN\Effects\BlendIDs.h" />
     <ClInclude Include="Scripting\Internal\TEN\Effects\EffectsFunctions.h" />
     <ClInclude Include="Scripting\Internal\TEN\Flow\Animations\Animations.h" />
     <ClInclude Include="Scripting\Internal\TEN\Flow\FlowHandler.h" />
@@ -232,7 +233,6 @@ CALL gen.bat</Command>
     <ClInclude Include="Scripting\Internal\TEN\Flow\SkyLayer\SkyLayer.h" />
     <ClInclude Include="Scripting\Internal\TEN\Inventory\InventoryHandler.h" />
     <ClInclude Include="Scripting\Internal\TEN\Logic\LogicHandler.h" />
-    <ClInclude Include="Scripting\Internal\TEN\Misc\BlendIDs.h" />
     <ClInclude Include="Scripting\Internal\TEN\Misc\Miscellanous.h" />
     <ClInclude Include="Scripting\Internal\TEN\Objects\AIObject\AIObject.h" />
     <ClInclude Include="Scripting\Internal\TEN\Objects\Camera\CameraObject.h" />

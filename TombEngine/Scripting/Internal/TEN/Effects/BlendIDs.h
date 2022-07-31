@@ -1,6 +1,6 @@
 #pragma once
 
-// Last generated on 27/7/2022.
+// Last generated on 31/7/2022.
 
 #include "Renderer11Enums.h"
 #include <unordered_map>
@@ -8,11 +8,11 @@
 
 /***
 Constants for blend mode IDs.
-@enum Misc.BlendID
+@enum Effects.BlendID
 @pragma nostrip
 */
 
-/*** Misc.BlendID constants.
+/*** Effects.BlendID constants.
 
 The following constants are inside BlendID.
 
@@ -35,7 +35,7 @@ The following constants are inside BlendID.
 */
 
 
-static const std::unordered_map<std::string, BLEND_MODES> kBlendIDs {
+static const std::unordered_map<std::string, BLEND_MODES> kBlendIDs{
 	{"OPAQUE", BLENDMODE_OPAQUE},
 	{"ALPHATEST", BLENDMODE_ALPHATEST},
 	{"ADDITIVE", BLENDMODE_ADDITIVE},
