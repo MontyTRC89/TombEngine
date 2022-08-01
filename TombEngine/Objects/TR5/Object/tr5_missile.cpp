@@ -32,7 +32,7 @@ void MissileControl(short itemNumber)
 		{
 			if (fx->fallspeed < 512)
 				fx->fallspeed += 36;
-			fx->pos.Orientation.x = fx->pos.Orientation.x - fx->fallspeed;
+			fx->pos.Orientation.x = fx->pos.Orientation.x - Angle::ShrtToRad(fx->fallspeed);
 		}
 	}
 	else

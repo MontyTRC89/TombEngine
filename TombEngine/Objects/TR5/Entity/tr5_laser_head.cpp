@@ -236,7 +236,7 @@ void LaserHeadControl(short itemNumber)
 
 			if (!(GlobalCounter & 7))
 			{
-				item->ItemFlags[3] = item->Pose.Orientation.y + (GetRandomControl() & 0x3FFF) - 4096;
+				item->ItemFlags[3] = item->Pose.Orientation.y + Angle::ShrtToRad(GetRandomControl() & 0x3FFF) - Angle::DegToRad(22.5f);
 				item->TriggerFlags = (GetRandomControl() & 0x1000) - 2048;
 			}
 
@@ -326,7 +326,7 @@ void LaserHeadControl(short itemNumber)
 						float xRot = (GetRandomControl() / 4) - 4096;
 						float yRot;
 						if (condition)
-							yRot = item->Pose.Orientation.y + (GetRandomControl() & 0x3FFF) + Angle::DegToRad(135.0f);
+							yRot = item->Pose.Orientation.y + Angle::ShrtToRad(GetRandomControl() & 0x3FFF) + Angle::DegToRad(135.0f);
 						else
 							yRot = 2 * GetRandomControl();
 						int v = ((GetRandomControl() & 0x1FFF) + 8192);
@@ -665,8 +665,8 @@ void LaserHeadControl(short itemNumber)
 
 			item->Animation.Velocity = 3;
 			item->ItemFlags[0] = 3;
-			item->ItemFlags[3] = item->Pose.Orientation.y + (GetRandomControl() & 0x1000) - 2048;
-			item->TriggerFlags = item->Pose.Orientation.x + (GetRandomControl() & 0x1000) - 2048;
+			item->ItemFlags[3] = item->Pose.Orientation.y + Angle::ShrtToRad(GetRandomControl() & 0x1000) - Angle::DegToRad(11.25f);
+			item->TriggerFlags = item->Pose.Orientation.x + Angle::ShrtToRad(GetRandomControl() & 0x1000) - Angle::DegToRad(11.25f);
 		}
 	}
 }

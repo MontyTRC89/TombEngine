@@ -413,6 +413,14 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
+	auto someAngle = Angle(9.0f);
+
+	someAngle += Angle::DegToRad(9);
+
+	float aFloat = 9.0f;
+	aFloat += someAngle;
+	aFloat + someAngle;
+
 	if (lara->Control.Weapon.HasFired)
 	{
 		AlertNearbyGuards(item);

@@ -73,9 +73,9 @@ void StrobeLightControl(short itemNumber)
 			12);
 
 		TriggerDynamicLight(
-			item->Pose.Position.x + 256 * sin(item->Pose.Orientation.y + 22528),
+			item->Pose.Position.x + 256 * sin(item->Pose.Orientation.y + Angle::DegToRad(123.8f)),
 			item->Pose.Position.y - 768,
-			item->Pose.Position.z + 256 * cos(item->Pose.Orientation.y + 22528),
+			item->Pose.Position.z + 256 * cos(item->Pose.Orientation.y + Angle::DegToRad(123.8f)),
 			8,
 			r, g, b);
 	}

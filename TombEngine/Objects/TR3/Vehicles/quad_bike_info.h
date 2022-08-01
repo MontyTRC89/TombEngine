@@ -7,7 +7,7 @@ namespace TEN::Entities::Vehicles
 		short TurnRate = 0;
 		short FrontRot = 0;
 		short RearRot = 0;
-		short MomentumAngle = 0;
+		float MomentumAngle = 0;
 		short ExtraRotation = 0;
 
 		int Velocity = 0;

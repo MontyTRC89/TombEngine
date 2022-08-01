@@ -13,7 +13,10 @@
 		float Component = 0.0f;
 
 	public:
+		Angle(float radians);
+
 		// Utilities
+		void Normalize();
 		static float Normalize(float angle);
 		static bool  Compare(float angle0, float angle1, float epsilon = 0.0f);
 		static float ShortestAngularDistance(float angleFrom, float angleTo);
@@ -30,6 +33,25 @@
 		static float ShrtToRad(short shortForm);
 		static short DegToShrt(float degrees);
 		static short RadToShrt(float radians);
+
+		// Operators
+		// TODO: Temporary. A strong typedef with templated overloaded operators would be the proper way.
+		operator float() const;
+		Angle operator ==(float value);
+		Angle operator !=(float value);
+		Angle operator +(float value);
+		Angle operator -(float value);
+		Angle operator *(float value);
+		Angle operator *(int value);
+		Angle operator /(float value);
+		Angle operator /(int value);
+		Angle& operator =(float value);
+		Angle& operator +=(float value);
+		Angle& operator -=(float value);
+		Angle& operator *=(float value);
+		Angle& operator *=(int value);
+		Angle& operator /=(float value);
+		Angle& operator /=(int value);
 
 	private:
 		// Utilities

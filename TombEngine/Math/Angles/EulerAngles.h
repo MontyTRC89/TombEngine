@@ -1,4 +1,5 @@
 #pragma once
+#include "Math/Angles/Angle.h"
 
 //namespace TEN::Math::Angles
 //{
@@ -6,9 +7,9 @@
 	{
 	public:
 		// Normalized radian components
-		float x = 0.0f;
-		float y = 0.0f;
-		float z = 0.0f;
+		Angle x = 0.0f;
+		Angle y = 0.0f;
+		Angle z = 0.0f;
 
 		static const EulerAngles Zero;
 

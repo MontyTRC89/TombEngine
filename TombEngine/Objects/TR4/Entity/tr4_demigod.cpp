@@ -162,7 +162,7 @@ namespace TEN::Entities::TR4
 			if (flags < 4)
 				fx->pos.Orientation.y = pose->Orientation.y;
 			else
-				fx->pos.Orientation.SetY(pose->Orientation.y + (GetRandomControl() & 0x7FF) - Angle::DegToRad(5.6f));
+				fx->pos.Orientation.SetY(pose->Orientation.y + Angle::ShrtToRad(GetRandomControl() & 0x7FF) - Angle::DegToRad(5.6f));
 
 			fx->pos.Orientation.z = 0.0f;
 

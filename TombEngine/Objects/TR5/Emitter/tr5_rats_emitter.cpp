@@ -71,7 +71,7 @@ void LittleRatsControl(short itemNumber)
 				else
 				{
 					rat->VerticalVelocity = 0;
-					rat->Pose.Orientation.SetY(item->Pose.Orientation.y + (GetRandomControl() & 0x3FFF) - Angle::DegToRad(45.0f));
+					rat->Pose.Orientation.y += Angle::ShrtToRad(GetRandomControl() & 0x3FFF) - Angle::DegToRad(45.0f);
 				}
 
 				rat->Pose.Orientation.x = 0.0f;
@@ -147,7 +147,7 @@ void UpdateRats()
 
 				float angle;
 				if (rat->Flags >= 170)
-					angle = rat->Pose.Orientation.y - atan2(dPos.z, dPos.x);
+					angle = rat->Pose.Orientation.y - atan2f(dPos.z, dPos.x);
 				else
 					angle = atan2(dPos.z, dPos.x) - rat->Pose.Orientation.y;
 
@@ -182,7 +182,7 @@ void UpdateRats()
 								rat->Pose.Orientation.SetY(rat->Pose.Orientation.y - Angle::DegToRad(5.6f));
 						}
 						else
-							rat->Pose.Orientation.SetY(rat->Pose.Orientation.y + 8 * (Wibble - i));
+							rat->Pose.Orientation.y += Angle::ShrtToRad((Wibble - i) * 8);
 					}
 				}
 

@@ -74,7 +74,7 @@ namespace TEN::Entities::TR4
 					}
 					else
 					{
-						beetle->Pose.Orientation.SetY(item->Pose.Orientation.y + (GetRandomControl() & 0x3FFF) - Angle::DegToRad(45.0f));
+						beetle->Pose.Orientation.y += Angle::ShrtToRad(GetRandomControl() & 0x3FFF) - Angle::DegToRad(45.0f);
 						beetle->VerticalVelocity = 0;
 					}
 
@@ -182,7 +182,7 @@ namespace TEN::Entities::TR4
 								beetle->Pose.Orientation.SetY(beetle->Pose.Orientation.y - Angle::DegToRad(5.6f));
 						}
 						else
-							beetle->Pose.Orientation.SetY(beetle->Pose.Orientation.y + 8 * (Wibble - i));
+							beetle->Pose.Orientation.y += Angle::ShrtToRad((Wibble - i) * 8);
 					}
 				}
 

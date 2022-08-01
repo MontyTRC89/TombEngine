@@ -62,7 +62,7 @@ bool IsOnExpandingPlatform(int itemNumber, int x, int z)
 		if (x > xBorder || zb != itemzb || xb != itemxb)
 			return false;
 	}
-	else if (item->Pose.Orientation.y == 0)
+	else if (item->Pose.Orientation.y == 0.0f)
 	{
 		int zBorder = item->Pose.Position.z + halfWidth - SECTOR(1) * item->ItemFlags[1] / 4096;
 		if (z < zBorder || zb != itemzb || xb != itemxb)
@@ -113,7 +113,7 @@ bool IsInFrontOfExpandingPlatform(int itemNumber, int x, int y, int z, int margi
 		if (x > xBorder || zb != itemzb || x < xBorder2)
 			return false;
 	}
-	else if (item->Pose.Orientation.y == 0)
+	else if (item->Pose.Orientation.y == 0.0f)
 	{
 		int zBorder = item->Pose.Position.z + halfWidth - margin - SECTOR(1) * item->ItemFlags[1] / 4096;
 		int zBorder2 = item->Pose.Position.z + halfWidth;
@@ -285,7 +285,7 @@ void ExpandingPlatformUpdateMutators(short itemNumber)
 
 	// Update bone mutators
 	float zTranslate = 0.0f;
-	if (item->Pose.Orientation.y == 0)   zTranslate =  width  - offset;
+	if (item->Pose.Orientation.y == 0.0f)   zTranslate =  width  - offset;
 	if (item->Pose.Orientation.y == Angle::DegToRad(90.0f))  zTranslate = -offset + width;
 	if (item->Pose.Orientation.y == Angle::DegToRad(180.0f)) zTranslate = -offset + width;
 	if (item->Pose.Orientation.y == Angle::DegToRad(270.0f)) zTranslate =  width  - offset;

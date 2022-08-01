@@ -17,7 +17,7 @@ void InitialiseLittleBats(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
 
-	if (item->Pose.Orientation.y == 0)
+	if (item->Pose.Orientation.y == 0.0f)
 		item->Pose.Position.z += CLICK(2);
 	else if (item->Pose.Orientation.y == Angle::DegToRad(-180.0f))
 		item->Pose.Position.z -= CLICK(2);

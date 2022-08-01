@@ -973,7 +973,7 @@ namespace TEN::Entities::Vehicles
 			height < prop.y &&
 			height != NO_HEIGHT)
 		{
-			TriggerRubberBoatMist(prop.x, prop.y, prop.z, abs(rBoatItem->Animation.Velocity), rBoatItem->Pose.Orientation.y + 0x8000, 0);
+			TriggerRubberBoatMist(prop.x, prop.y, prop.z, abs(rBoatItem->Animation.Velocity), rBoatItem->Pose.Orientation.y + Angle::DegToRad(180.0f), 0);
 			if ((GetRandomControl() & 1) == 0)
 			{
 				PHD_3DPOS pos;
@@ -999,8 +999,9 @@ namespace TEN::Entities::Vehicles
 
 				long cnt = (GetRandomControl() & 3) + 3;
 				for (;cnt>0;cnt--)
-					TriggerRubberBoatMist(prop.x, prop.y, prop.z, ((GetRandomControl() & 15) + 96) * 16, rBoatItem->Pose.Orientation.y + 0x4000 + GetRandomControl(), 1);
+					TriggerRubberBoatMist(prop.x, prop.y, prop.z, ((GetRandomControl() & 15) + 96) * 16, rBoatItem->Pose.Orientation.y + Angle::DegToRad(90.0f) + Angle::ShrtToRad(GetRandomControl()), 1);
 			}
 		}
 	}
 }
+	

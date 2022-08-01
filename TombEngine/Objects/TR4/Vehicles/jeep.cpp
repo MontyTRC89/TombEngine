@@ -1414,7 +1414,7 @@ namespace TEN::Entities::Vehicles
 
 		int oldY = jeepItem->Pose.Position.y;
 		jeepItem->Animation.VerticalVelocity = DoJeepDynamics(laraItem, floorHeight, jeepItem->Animation.VerticalVelocity, &jeepItem->Pose.Position.y, 0);
-		jeep->Velocity = DoVehicleWaterMovement(jeepItem, laraItem, jeep->Velocity, JEEP_FRONT, &jeep->TurnRate);
+		//jeep->Velocity = DoVehicleWaterMovement(jeepItem, laraItem, jeep->Velocity, JEEP_FRONT, &jeep->TurnRate); // TODO
 
 		short xRot;
 		floorHeight = (fl.y + fr.y) / 2;
@@ -1504,10 +1504,10 @@ namespace TEN::Entities::Vehicles
 					JeepSmokeStart++;
 				}
 
-				TriggerJeepExhaustSmoke(pos.x, pos.y, pos.z, jeepItem->Pose.Orientation.y + -32768, speed, 0);
+				TriggerJeepExhaustSmoke(pos.x, pos.y, pos.z, jeepItem->Pose.Orientation.y - Angle::DegToRad(180.0f), speed, 0);
 			}
 			else if (jeepItem->Animation.Velocity < 64)
-				TriggerJeepExhaustSmoke(pos.x, pos.y, pos.z, jeepItem->Pose.Orientation.y - 32768, 64 - jeepItem->Animation.Velocity, 1);
+				TriggerJeepExhaustSmoke(pos.x, pos.y, pos.z, jeepItem->Pose.Orientation.y - Angle::DegToRad(180.0f), 64 - jeepItem->Animation.Velocity, 1);
 		}
 
 		return JeepCheckGetOff(laraItem);

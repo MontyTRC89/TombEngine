@@ -6,10 +6,10 @@ namespace TEN::Entities::Vehicles
 	{
 		int Velocity = 0;
 
-		short TurnRate = 0;
-		short MomentumAngle = 0;
-		short ExtraRotation = 0;
-		short WallShiftRotation = 0;
+		float TurnRate = 0;
+		float MomentumAngle = 0;
+		float ExtraRotation = 0;
+		float WallShiftRotation = 0;
 
 		int Revs = 0;
 		int EngineRevs = 0;

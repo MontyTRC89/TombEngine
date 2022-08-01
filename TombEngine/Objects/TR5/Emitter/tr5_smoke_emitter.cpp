@@ -40,7 +40,7 @@ void InitialiseSmokeEmitter(short itemNumber)
 		}
 		else
 		{
-			if (item->Pose.Orientation.y == 0)
+			if (item->Pose.Orientation.y == 0.0f)
 				item->Pose.Position.z += CLICK(1);
 			else if (item->Pose.Orientation.y == Angle::DegToRad(-180.0f))
 				item->Pose.Position.z -= CLICK(1);

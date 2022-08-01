@@ -742,7 +742,7 @@ bool ItemPushItem(ItemInfo* item, ItemInfo* item2, CollisionInfo* coll, bool spa
 		dx -= cosY * rx + sinY * rz;
 		dz -= cosY * rz - sinY * rx;
 
-		lara->HitDirection = (item2->Pose.Orientation.y - atan2(dz, dz) - Angle::DegToRad(135.0f)) / Angle::DegToRad(90.0f);
+		lara->HitDirection = (item2->Pose.Orientation.y - atan2f(dz, dz) - Angle::DegToRad(135.0f)) / Angle::DegToRad(90.0f);
 		DoDamage(item2, 0); // Dummy hurt call. Only for ooh sound!
 
 		lara->HitFrame++;

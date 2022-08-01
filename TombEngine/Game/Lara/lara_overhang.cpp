@@ -89,7 +89,7 @@ short FindBridge(int tiltGrade, short orient, Vector3Int& pos, int* returnHeight
 		if (bridgeItem->ObjectNumber != bridgeSlot)
 			continue;
 
-		short orientDelta = (short)(bridgeItem->Pose.Orientation.y - orient);
+		short orientDelta = (short)(bridgeItem->Pose.Orientation.y - Angle::ShrtToRad(orient));
 
 		bool orientCheck = false;
 		if (orientDelta == Angle::DegToRad(90.0f))

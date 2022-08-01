@@ -855,7 +855,7 @@ void TriggerSuperJetFlame(ItemInfo* item, int yvel, int deadly)
 		sptr->xVel = (GetRandomControl() & 0xFF) - 128;
 		sptr->zVel = (GetRandomControl() & 0xFF) - 128;
 
-		if (item->Pose.Orientation.y == 0)
+		if (item->Pose.Orientation.y == 0.0f)
 			sptr->zVel = -(size - (size >> 2));
 		else if (item->Pose.Orientation.y == Angle::DegToRad(90.0f))
 			sptr->xVel = -(size - (size >> 2));

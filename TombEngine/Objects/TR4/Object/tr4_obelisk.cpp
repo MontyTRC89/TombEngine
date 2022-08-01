@@ -214,7 +214,7 @@ void ObeliskControl(short itemNumber)
 					currentItem->ItemFlags[1] =
 						(item->Pose.Orientation.y != Angle::DegToRad(-90.0f) ||
 							g_Level.Items[item->ItemFlags[0]].Pose.Orientation.y != Angle::DegToRad(90.0f) ||
-							g_Level.Items[item->ItemFlags[1]].Pose.Orientation.y != 0 ? 0 : 1) ^ 1;
+							g_Level.Items[item->ItemFlags[1]].Pose.Orientation.y != 0.0f ? 0 : 1) ^ 1;
 
 					break;
 				}

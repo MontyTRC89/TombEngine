@@ -109,7 +109,7 @@ void SpidersEmitterControl(short itemNumber)
 				}
 				else
 				{
-					spider->Pose.Orientation.SetY(item->Pose.Orientation.y + (GetRandomControl() & 0x3FFF) - Angle::DegToRad(45.0f));
+					spider->Pose.Orientation.y += Angle::ShrtToRad(GetRandomControl() & 0x3FFF) - Angle::DegToRad(45.0f);
 					spider->VerticalVelocity = 0;
 				}
 
@@ -174,7 +174,7 @@ void UpdateSpiders()
 								spider->Pose.Orientation.SetY(spider->Pose.Orientation.y - Angle::DegToRad(5.6f));
 						}
 						else
-							spider->Pose.Orientation.SetY(spider->Pose.Orientation.y + 8 * (Wibble - i));
+							spider->Pose.Orientation.y += Angle::ShrtToRad((Wibble - i) * 8);
 					}
 				}
 

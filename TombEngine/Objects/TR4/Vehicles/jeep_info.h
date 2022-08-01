@@ -7,14 +7,14 @@ namespace TEN::Entities::Vehicles
 		int Velocity = 0;
 		int CameraElevation = 0;
 
-		short TurnRate = 0;
-		short MomentumAngle = 0;
-		short ExtraRotation = 0;
-		short ExtraRotationDrift = 0;
-		short FrontRightWheelRotation = 0;
-		short FrontLeftWheelRotation = 0;
-		short BackRightWheelRotation = 0;
-		short BackLeftWheelRotation = 0;
+		float TurnRate = 0;
+		float MomentumAngle = 0;
+		float ExtraRotation = 0;
+		float ExtraRotationDrift = 0;
+		float FrontRightWheelRotation = 0;
+		float FrontLeftWheelRotation = 0;
+		float BackRightWheelRotation = 0;
+		float BackLeftWheelRotation = 0;
 
 		int Revs = 0;
 		short EngineRevs = 0;

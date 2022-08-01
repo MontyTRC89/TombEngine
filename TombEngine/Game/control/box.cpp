@@ -26,7 +26,7 @@
 #define ATTACK_RANGE pow(SECTOR(3), 2)
 #define ESCAPE_CHANCE  0x800
 #define RECOVER_CHANCE 0x100
-#define BIFF_AVOID_TURN 1536
+#define BIFF_AVOID_TURN Angle::DegToRad(8.45f)
 #define FEELER_DISTANCE CLICK(2)
 #define FEELER_ANGLE Angle::DegToRad(45.0f)
 
@@ -1127,7 +1127,7 @@ int StalkBox(ItemInfo* item, ItemInfo* enemy, int boxNumber)
 	if (x > xRange || x < -xRange || z > zRange || z < -zRange)
 		return false;
 
-	int enemyQuad = (enemy->Pose.Orientation.y / Angle::DegToRad(90.0f)) + 2;
+	int enemyQuad = (enemy->Pose.Orientation.y / Angle::DegToRad(90.0f)) + 2.0f;
 	
 	int boxQuad;
 	if (z > 0)
@@ -1356,7 +1356,7 @@ void FindAITarget(CreatureInfo* creature, short objectNumber)
 	{
 		if (targetItem->ObjectNumber == objectNumber && targetItem->RoomNumber != NO_ROOM)
 		{
-			if (SameZone(creature, targetItem) && targetItem->Pose.Orientation.y == item->ItemFlags[3])
+			if (SameZone(creature, targetItem) && targetItem->Pose.Orientation.y == Angle::ShrtToRad(item->ItemFlags[3]))
 			{
 				creature->Enemy = targetItem;
 				break;

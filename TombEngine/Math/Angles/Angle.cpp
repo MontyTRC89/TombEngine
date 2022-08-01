@@ -5,6 +5,16 @@
 
 //namespace TEN::Math::Angles
 //{
+	Angle::Angle(float radians)
+	{
+		this->Component = Normalize(radians);
+	}
+
+	void Angle::Normalize()
+	{
+		this->Component = Normalize(Component);
+	}
+
 	float Angle::Normalize(float angle)
 	{
 		if (angle < -PI || angle > PI)
@@ -98,7 +108,7 @@
 
 	float Angle::DegToRad(float degrees)
 	{
-		return Normalize(degrees * (PI / 180.0f));
+		return Normalize(degrees * (PI / 180.0f)); // dont normalise
 	}
 
 	float Angle::RadToDeg(float radians)
@@ -108,7 +118,7 @@
 
 	float Angle::ShrtToRad(short shortForm)
 	{
-		return Normalize(shortForm * ((360.0f / (USHRT_MAX + 1)) * (PI / 180.0f)));
+		return Normalize(shortForm * ((360.0f / (USHRT_MAX + 1)) * (PI / 180.0f))); // dont normalise
 	}
 
 	short Angle::DegToShrt(float degrees)
@@ -119,6 +129,100 @@
 	short Angle::RadToShrt(float radians)
 	{
 		return (short)round((radians / (PI / 180.0f)) * ((USHRT_MAX + 1) / 360.0f));
+	}
+
+	Angle::operator float() const
+	{
+		return Component;
+	}
+
+	Angle Angle::operator ==(float value)
+	{
+		return (Component == value);
+	}
+	
+	Angle Angle::operator !=(float value)
+	{
+		return (Component != value);
+	}
+	
+	Angle Angle::operator +(float value)
+	{
+		return Angle(Component + value);
+	}
+	
+	Angle Angle::operator -(float value)
+	{
+		return Angle(Component - value);
+	}
+	
+	Angle Angle::operator *(float value)
+	{
+		return Angle(Component * value);
+	}
+	
+	Angle Angle::operator *(int value)
+	{
+		return Angle(Component * value);
+	}
+	
+	Angle Angle::operator /(float value)
+	{
+		return Angle(Component / value);
+	}
+	
+	Angle Angle::operator /(int value)
+	{
+		return Angle(Component / value);
+	}
+
+	Angle& Angle::operator =(float value)
+	{
+		this->Component = value;
+		this->Normalize();
+		return *this;
+	}
+	
+	Angle& Angle::operator +=(float value)
+	{
+		this->Component += value;
+		this->Normalize();
+		return *this;
+	}
+	
+	Angle& Angle::operator -=(float value)
+	{
+		this->Component -= value;
+		this->Normalize();
+		return *this;
+	}
+	
+	Angle& Angle::operator *=(float value)
+	{
+		this->Component *= value;
+		this->Normalize();
+		return *this;
+	}
+	
+	Angle& Angle::operator *=(int value)
+	{
+		this->Component *= value;
+		this->Normalize();
+		return *this;
+	}
+	
+	Angle& Angle::operator /=(float value)
+	{
+		this->Component /= value;
+		this->Normalize();
+		return *this;
+	}
+	
+	Angle& Angle::operator /=(int value)
+	{
+		this->Component *= value;
+		this->Normalize();
+		return *this;
 	}
 
 	float Angle::ClampAlpha(float value)

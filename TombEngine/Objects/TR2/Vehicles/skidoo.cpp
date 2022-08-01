@@ -434,8 +434,9 @@ namespace TEN::Entities::Vehicles
 			if (TrInput & IN_LOOK && skidooItem->Animation.Velocity == 0)
 				LookUpDown(laraItem);
 
-			if (TrInput & (VEHICLE_IN_LEFT | VEHICLE_IN_RIGHT))
-				ModulateVehicleTurnRateY(&skidoo->TurnRate, SKIDOO_TURN_RATE_ACCEL, -SKIDOO_TURN_RATE_MAX, SKIDOO_TURN_RATE_MAX);
+			// TODO
+			//if (TrInput & (VEHICLE_IN_LEFT | VEHICLE_IN_RIGHT))
+				//ModulateVehicleTurnRateY(&skidoo->TurnRate, SKIDOO_TURN_RATE_ACCEL, -SKIDOO_TURN_RATE_MAX, SKIDOO_TURN_RATE_MAX);
 
 			if (TrInput & VEHICLE_IN_REVERSE)
 			{
@@ -848,7 +849,7 @@ namespace TEN::Entities::Vehicles
 
 		auto oldPos = skidooItem->Pose.Position;
 
-		short rotation;
+		float rotation;
 
 		if (skidooItem->Pose.Position.y > (skidooItem->Floor - CLICK(1)))
 		{

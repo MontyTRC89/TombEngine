@@ -517,7 +517,7 @@ namespace TEN::Entities::Vehicles
 			if (!(TrInput & VEHICLE_IN_ACCELERATE) && quadBike->Velocity > 0)
 				momentum += momentum / 4;
 
-			short rot = quadBikeItem->Pose.Orientation.y - quadBike->MomentumAngle;
+			float rot = quadBikeItem->Pose.Orientation.y - quadBike->MomentumAngle;
 			if (rot < -QBIKE_MOMENTUM_TURN_RATE_MAX)
 			{
 				if (rot < -QBIKE_MOMENTUM_TURN_RATE_MAX2)
@@ -1237,7 +1237,7 @@ namespace TEN::Entities::Vehicles
 				pos.y = QuadBikeEffectsPositions[i].y;
 				pos.z = QuadBikeEffectsPositions[i].z;
 				GetJointAbsPosition(quadBikeItem, &pos, QuadBikeEffectsPositions[i].meshNum);
-				angle = quadBikeItem->Pose.Orientation.y + ((i == 0) ? 0x9000 : 0x7000);
+				angle = quadBikeItem->Pose.Orientation.y + ((i == 0) ? Angle::DegToRad(202.45f) : Angle::DegToRad(157.55f));
 				if (quadBikeItem->Animation.Velocity > 32)
 				{
 					if (quadBikeItem->Animation.Velocity < 64)

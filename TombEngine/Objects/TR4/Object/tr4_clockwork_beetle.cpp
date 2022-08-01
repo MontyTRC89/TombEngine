@@ -211,7 +211,7 @@ void ClockworkBeetleControl(short itemNumber)
 			float rotation = Angle::ShortestAngularDistance(beetle->ItemFlags[1], beetle->Pose.Orientation.y);
 
 			if (abs(rotation) > Angle::DegToRad(180.0f))
-				rotation = beetle->Pose.Orientation.y - beetle->ItemFlags[1];
+				rotation = beetle->Pose.Orientation.y - Angle::ShrtToRad(beetle->ItemFlags[1]);
 
 			if (abs(rotation) < Angle::DegToRad(1.4f))
 			{
@@ -268,7 +268,7 @@ void ClockworkBeetleControl(short itemNumber)
 			else
 				val = 150 - beetle->ItemFlags[3];
 
-			beetle->Pose.Orientation.SetY(beetle->Pose.Orientation.y + 32 * val);
+			beetle->Pose.Orientation.SetY(beetle->Pose.Orientation.y + Angle::ShrtToRad(32 * val));
 			val >>= 1;
 
 			if (flag && beetle->ItemFlags[3] > 30 && val)
@@ -367,7 +367,7 @@ void UseClockworkBeetle(short flag)
 						}
 					}
 
-					item->ItemFlags[1] = item2->Pose.Orientation.y + 0x8000;
+					item->ItemFlags[1] = item2->Pose.Orientation.y + Angle::DegToRad(180.0f);
 
 					if (item2->ItemFlags[0])
 						item->ItemFlags[0] = 0;

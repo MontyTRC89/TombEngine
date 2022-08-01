@@ -63,7 +63,7 @@ namespace TEN::Entities::Doors
 		int xOffset = 0;
 		int zOffset = 0;
 
-		if (doorItem->Pose.Orientation.y == 0)
+		if (doorItem->Pose.Orientation.y == 0.0f)
 			zOffset = -SECTOR(1);
 		else if (doorItem->Pose.Orientation.y == Angle::DegToRad(180.0f))
 			zOffset = SECTOR(1);

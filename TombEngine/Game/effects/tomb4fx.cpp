@@ -1002,8 +1002,8 @@ void TriggerGunShell(short hand, short objNum, LaraWeaponType weaponType)
 			gshell->dirXrot = Lara.LeftArm.Orientation.y
 				+ Lara.ExtraTorsoRot.y
 				+ LaraItem->Pose.Orientation.y
-				- (GetRandomControl() & 0xFFF)
-				+ 10240;
+				- Angle::ShrtToRad(GetRandomControl() & 0xFFF)
+				+ Angle::DegToRad(56.25f);
 			gshell->pos.Orientation.SetY(gshell->pos.Orientation.y + Lara.LeftArm.Orientation.y
 				+ Lara.ExtraTorsoRot.y 
 				+ LaraItem->Pose.Orientation.y);
@@ -1014,16 +1014,16 @@ void TriggerGunShell(short hand, short objNum, LaraWeaponType weaponType)
 		{
 			gshell->dirXrot = Lara.LeftArm.Orientation.y
 				+ LaraItem->Pose.Orientation.y
-				- (GetRandomControl() & 0xFFF) 
-				+ 18432;
+				- Angle::ShrtToRad(GetRandomControl() & 0xFFF)
+				+ Angle::DegToRad(101.25f);
 		}
 	}
 	else
 	{
 		gshell->dirXrot = Lara.LeftArm.Orientation.y
 			+ LaraItem->Pose.Orientation.y
-			+ (GetRandomControl() & 0xFFF) 
-			- 18432;
+			+ Angle::ShrtToRad(GetRandomControl() & 0xFFF)
+			- Angle::DegToRad(101.25f);
 	}
 
 	if (LaraItem->MeshBits)

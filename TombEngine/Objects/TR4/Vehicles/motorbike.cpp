@@ -543,7 +543,7 @@ namespace TEN::Entities::Vehicles
 		Vector3Int frontLeft, backLeft, mtf, mtb, backRight;
 		Vector3Int moved;
 		int floorHeight, collide, speed, newSpeed;
-		short momentum = 0, rotation;
+		float momentum = 0, rotation;
 
 		motorbike->DisableDismount = false;
 
@@ -1254,7 +1254,8 @@ namespace TEN::Entities::Vehicles
 
 		int newY = motorbikeItem->Pose.Position.y;
 		motorbikeItem->Animation.VerticalVelocity = DoMotorBikeDynamics(probe.Position.Floor, motorbikeItem->Animation.VerticalVelocity, &motorbikeItem->Pose.Position.y, 0);
-		motorbike->Velocity = DoVehicleWaterMovement(motorbikeItem, laraItem, motorbike->Velocity, MOTORBIKE_RADIUS, &motorbike->TurnRate);
+		//motorbike->Velocity = DoVehicleWaterMovement(motorbikeItem, laraItem, motorbike->Velocity, MOTORBIKE_RADIUS, &motorbike->TurnRate);
+		// TODO
 
 		int r1 = (frontRight.y + frontLeft.y) / 2;
 		int r2 = (frontRight.y + frontLeft.y) / 2;

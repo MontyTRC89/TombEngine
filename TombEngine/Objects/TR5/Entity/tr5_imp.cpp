@@ -83,8 +83,8 @@ static void ImpThrowStones(ItemInfo* item)
 	if (distance < 8)
 		distance = 8;
 
-	angles.x = angles.x + GetRandomControl() % (distance / 2) - (distance / 4);
-	angles.SetY(angles.y + GetRandomControl() % (distance / 4) - (distance / 8));
+	angles.x = angles.x + Angle::ShrtToRad(GetRandomControl() % (distance / 2) - (distance / 4));
+	angles.SetY(angles.y + Angle::ShrtToRad(GetRandomControl() % (distance / 4) - (distance / 8)));
 	
 	short fxNumber = CreateNewEffect(item->RoomNumber);
 	if (fxNumber != NO_ITEM)
@@ -92,7 +92,7 @@ static void ImpThrowStones(ItemInfo* item)
 		auto* fx = &EffectList[fxNumber];
 
 		fx->pos.Position = pos1;
-		fx->pos.Orientation = EulerAngles((angles.x + distance) / 2, angles.y, 0.0f);
+		fx->pos.Orientation = EulerAngles((angles.x + Angle::ShrtToRad(distance)) / 2, angles.y, 0.0f);
 		fx->roomNumber = item->RoomNumber;
 		fx->speed = 4 * sqrt(distance);
 

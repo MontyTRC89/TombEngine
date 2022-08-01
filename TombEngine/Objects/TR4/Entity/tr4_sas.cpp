@@ -583,8 +583,8 @@ namespace TEN::Entities::TR4
 			InitialiseItem(itemNumber);
 
 			grenadeItem->Pose.Orientation = EulerAngles(
-				item->Pose.Orientation.x + angle1,
-				item->Pose.Orientation.y + angle2,
+				item->Pose.Orientation.x + Angle::ShrtToRad(angle1),
+				item->Pose.Orientation.y + Angle::ShrtToRad(angle2),
 				0.0f
 			);
 

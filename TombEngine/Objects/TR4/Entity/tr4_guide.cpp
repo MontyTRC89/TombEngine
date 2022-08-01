@@ -525,7 +525,7 @@ namespace TEN::Entities::TR4
 			creature->MaxTurn = 0;
 
 		if (laraAI.angle < -256)
-			item->Pose.Orientation.SetY(item->Pose.Orientation.y - 399);
+			item->Pose.Orientation.SetY(item->Pose.Orientation.y - Angle::DegToRad(2.2f));
 
 			break;
 
@@ -588,7 +588,7 @@ namespace TEN::Entities::TR4
 			creature->MaxTurn = 0;
 
 		if (laraAI.angle > 256)
-			item->Pose.Orientation.SetY(item->Pose.Orientation.y + 399);
+			item->Pose.Orientation.SetY(item->Pose.Orientation.y + Angle::DegToRad(2.2f));
 
 			break;
 

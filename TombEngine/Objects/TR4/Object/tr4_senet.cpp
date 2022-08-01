@@ -465,13 +465,13 @@ void ControlGodHead(short itemNumber)
 
 	if (TriggerActive(item))
 	{
-		if (item->Pose.Orientation.y == 0)
+		if (item->Pose.Orientation.y == 0.0f)
 			item->Pose.Position.z &= ~1023;
-		else if (item->Pose.Orientation.y == 0x4000)
+		else if (item->Pose.Orientation.y == Angle::DegToRad(90.0f))
 			item->Pose.Position.x &= ~1023;
-		else if (item->Pose.Orientation.y == -0x4000)
+		else if (item->Pose.Orientation.y == -Angle::DegToRad(90.0f))
 			item->Pose.Position.x |= 1023;
-		else if (item->Pose.Orientation.y == -0x8000)
+		else if (item->Pose.Orientation.y == -Angle::DegToRad(180.0f))
 			item->Pose.Position.z |= 1023;
 
 		if (item->ItemFlags[0])
