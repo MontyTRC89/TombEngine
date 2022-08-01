@@ -177,7 +177,7 @@ void LoadObjects()
 	{
 		MESH mesh;
 
-		mesh.lightMode = ReadInt8();
+		mesh.lightMode = (LIGHT_MODES)ReadInt8();
 
 		mesh.sphere.Center.x = ReadFloat();
 		mesh.sphere.Center.y = ReadFloat();
@@ -205,7 +205,7 @@ void LoadObjects()
 			BUCKET bucket;
 
 			bucket.texture = ReadInt32();
-			bucket.blendMode = ReadInt8();
+			bucket.blendMode = (BLEND_MODES)ReadInt8();
 			bucket.animated = ReadInt8();
 			bucket.numQuads = 0;
 			bucket.numTriangles = 0;
@@ -596,7 +596,7 @@ void ReadRooms()
 			BUCKET bucket;
 
 			bucket.texture = ReadInt32();
-			bucket.blendMode = ReadInt8();
+			bucket.blendMode = (BLEND_MODES)ReadInt8();
 			bucket.animated = ReadInt8();
 			bucket.numQuads = 0;
 			bucket.numTriangles = 0;
@@ -842,7 +842,6 @@ void FreeLevel()
 	g_Level.SpritesTextures.resize(0);
 	g_Level.AnimatedTexturesSequences.resize(0);
 	g_Level.Rooms.resize(0);
-	g_Level.ObjectTextures.resize(0);
 	g_Level.Bones.resize(0);
 	g_Level.Meshes.resize(0);
 	MoveablesIds.resize(0);
@@ -945,6 +944,8 @@ void LoadAnimatedTextures()
 
 void LoadTextureInfos()
 {
+	// TODO: THIS FUNCTION IS DUMMY!!!! REMOVE IT WHEN TE FORMAT IS CHANGED! -- Lwmte 31.07.22
+
 	ReadInt32(); // TEX/0
 
 	int numObjectTextures = ReadInt32();
@@ -952,19 +953,17 @@ void LoadTextureInfos()
 
 	for (int i = 0; i < numObjectTextures; i++)
 	{
-		OBJECT_TEXTURE texture;
-		texture.attribute = ReadInt32();
-		texture.tileAndFlag = ReadInt32();
-		texture.newFlags = ReadInt32();
+		ReadInt32();
+		ReadInt32();
+		ReadInt32();
 
 		for (int j = 0; j < 4; j++)
 		{
-			texture.vertices[j].x = ReadFloat();
-			texture.vertices[j].y = ReadFloat();
+			ReadFloat();
+			ReadFloat();
 		}
 
-		texture.destination = ReadInt32();
-		g_Level.ObjectTextures.push_back(texture);
+		ReadInt32();
 	}
 }
 
@@ -1146,19 +1145,20 @@ unsigned int _stdcall LoadLevel(void* data)
 		LoadSamples();
 		g_Renderer.UpdateProgress(80);
 
-		TENLog("Preparing renderer...", LogLevel::Info);
-		
-		g_Renderer.UpdateProgress(90);
-		g_Renderer.PrepareDataForTheRenderer();
-
 		TENLog("Initializing level...", LogLevel::Info);
 
 		// Initialise the game
 		InitialiseGameFlags();
 		InitialiseLara(!(InitialiseGame || CurrentLevel == 1));
+		InitializeNeighborRoomList();
 		GetCarriedItems();
 		GetAIPickups();
 		g_GameScriptEntities->AssignLara();
+		g_Renderer.UpdateProgress(90);
+
+		TENLog("Preparing renderer...", LogLevel::Info);
+
+		g_Renderer.PrepareDataForTheRenderer();
 
 		TENLog("Level loading complete.", LogLevel::Info);
 

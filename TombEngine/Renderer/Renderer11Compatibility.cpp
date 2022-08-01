@@ -158,11 +158,13 @@ namespace TEN::Renderer
 			ROOM_INFO& room = g_Level.Rooms[i];
 
 			RendererRoom* r = &m_rooms[i];
+
 			r->RoomNumber = i;
 			r->AmbientLight = Vector4(room.ambient.x, room.ambient.y, room.ambient.z, 1.0f);
 			r->ItemsToDraw.reserve(MAX_ITEMS_DRAW);
 			r->EffectsToDraw.reserve(MAX_ITEMS_DRAW);
 			r->TransparentFacesToDraw.reserve(MAX_TRANSPARENT_FACES_PER_ROOM);
+			r->Neighbors = room.neighbors;
 
 			if (room.mesh.size() > 0)
 				r->StaticsToDraw.reserve(room.mesh.size());
@@ -267,10 +269,6 @@ namespace TEN::Renderer
 					RendererLight* light = &r->Lights[l];
 					ROOM_LIGHT* oldLight = &room.lights[l];
 
-					// Monty's temp variables for sorting
-					light->LocalIntensity = 0;
-					light->Distance = 0;
-
 					if (oldLight->type == LIGHT_TYPES::LIGHT_TYPE_SUN)
 					{
 						light->Color = Vector3(oldLight->r, oldLight->g, oldLight->b) * oldLight->intensity;
@@ -312,6 +310,12 @@ namespace TEN::Renderer
 						light->CastShadows = oldLight->castShadows;
 						light->Type = LIGHT_TYPE_SPOT;
 					}
+
+					// Monty's temp variables for sorting
+					light->LocalIntensity = 0;
+					light->Distance = 0;
+					light->RoomNumber = i;
+					light->AffectNeighbourRooms = light->Type != LIGHT_TYPES::LIGHT_TYPE_SUN;
 
 					oldLight++;
 				}
@@ -363,8 +367,6 @@ namespace TEN::Renderer
 		moveablesVertices.resize(totalVertices);
 		moveablesIndices.resize(totalIndices);
 
-	
-
 		lastVertex = 0;
 		lastIndex = 0;
 		for (int i = 0; i < MoveablesIds.size(); i++)
@@ -377,7 +379,8 @@ namespace TEN::Renderer
 				m_moveableObjects[MoveablesIds[i]] = RendererObject();
 				RendererObject &moveable = *m_moveableObjects[MoveablesIds[i]];
 				moveable.Id = MoveablesIds[i];
-				moveable.DoNotDraw = (obj->drawRoutine == NULL);
+				moveable.DoNotDraw = (obj->drawRoutine == nullptr);
+				moveable.ShadowType = obj->shadowType;
 
 				for (int j = 0; j < obj->nmeshes; j++)
 				{
@@ -722,26 +725,7 @@ namespace TEN::Renderer
 				m_spriteSequences[MoveablesIds[i]] = sequence;
 			}
 		}
-		/*
-		for (int i = 0; i < 6; i++)
-		{
-			if (Objects[ID_WATERFALL1 + i].loaded)
-			{
-				// Get the first textured bucket
-				RendererBucket *bucket = NULL;
-				for (int j = 0; j < NUM_BUCKETS; j++)
-					if (m_moveableObjects[ID_WATERFALL1 + i]->ObjectMeshes[0]->buckets[j].Polygons.size() > 0)
-						bucket = &m_moveableObjects[ID_WATERFALL1 + i]->ObjectMeshes[0]->buckets[j];
 
-				if (bucket == NULL)
-					continue;
-
-				OBJECT_TEXTURE *texture = &g_Level.ObjectTextures[bucket->Polygons[0].TextureId];
-				WaterfallTextures[i] = texture;
-				WaterfallY[i] = texture->vertices[0].y;
-			}
-		}
-		*/
 		return true;
 	}
 

@@ -4,6 +4,8 @@
 #include "./VertexEffects.hlsli"
 #include "./VertexInput.hlsli"
 #include "./AlphaTestBuffer.hlsli"
+#include "./AnimatedTextures.hlsli"
+#include "./Shadows.hlsli"
 
 #define MAX_BONES 32
 
@@ -12,6 +14,7 @@ cbuffer ItemBuffer : register(b1)
 	float4x4 World;
 	float4x4 Bones[MAX_BONES];
 	float4 ItemPosition;
+	float4 Color;
 	float4 AmbientLight;
 	int4 BoneLightModes[MAX_BONES / 4];
 };
@@ -69,6 +72,7 @@ PixelShaderInput VS(VertexShaderInput input)
 	
 	output.Position = mul(mul(float4(pos, 1.0f), world), ViewProjection);
 	output.Color = float4(col, input.Color.w);
+	output.Color *= Color;
 
 	// Apply distance fog
 	float d = distance(CamPositionWS.xyz, worldPosition);
@@ -86,6 +90,10 @@ PixelShaderInput VS(VertexShaderInput input)
 PixelShaderOutput PS(PixelShaderInput input)
 {
 	PixelShaderOutput output;
+
+	if (Type == 1)
+		input.UV = CalculateUVRotate(input.UV, 0);
+
 	float4 tex = Texture.Sample(Sampler, input.UV);	
     DoAlphaTest(tex);
 
@@ -95,7 +103,7 @@ PixelShaderOutput PS(PixelShaderInput input)
 
 	float3 color = (BoneLightModes[input.Bone / 4][input.Bone % 4] == 0) ?
 		CombineLights(AmbientLight.xyz, input.Color.xyz, tex.xyz, input.WorldPosition, normal, input.Sheen) :
-		StaticLight(AmbientLight.xyz, input.Color.xyz, tex.xyz);
+		StaticLight(input.Color.xyz, tex.xyz);
 
 	output.Color = saturate(float4(color, tex.w));
 
