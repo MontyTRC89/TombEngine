@@ -447,7 +447,7 @@ bool TestLaraNearClimbableWall(ItemInfo* item, FloorInfo* floor)
 	if (floor == nullptr)
 		floor = GetCollision(item).BottomBlock;
 
-	return ((1 << (GetQuadrant(item->Pose.Orientation.y) + 8)) & GetClimbFlags(floor));
+	return ((256 << (GetQuadrant(item->Pose.Orientation.y))) & GetClimbFlags(floor));
 }
 
 bool TestLaraHangOnClimbableWall(ItemInfo* item, CollisionInfo* coll)
@@ -1111,86 +1111,106 @@ void GetTightropeFallOff(ItemInfo* item, int regularity)
 }
 #endif
 
-bool IsStandingWeapon(ItemInfo* item, LaraWeaponType weaponType)
+// TODO: Organise all of this properly. -- Sezz 2022.07.28
+bool CheckLaraState(LaraState state, std::vector<LaraState> stateList)
 {
-	auto* lara = GetLaraInfo(item);
-
-	if (weaponType == LaraWeaponType::Shotgun ||
-		weaponType == LaraWeaponType::HK ||
-		weaponType == LaraWeaponType::Crossbow ||
-		weaponType == LaraWeaponType::Torch ||
-		weaponType == LaraWeaponType::GrenadeLauncher ||
-		weaponType == LaraWeaponType::HarpoonGun ||
-		weaponType == LaraWeaponType::RocketLauncher||
-		weaponType == LaraWeaponType::Snowmobile ||
-		lara->Weapons[(int)weaponType].HasLasersight)
+	for (auto listedState : stateList)
 	{
-		return true;
+		if (state == listedState)
+			return true;
 	}
 
 	return false;
 }
+
+bool CheckLaraWeaponType(LaraWeaponType weaponType, std::vector<LaraWeaponType> weaponTypeList)
+{
+	for (auto listedWeaponType : weaponTypeList)
+	{
+		if (weaponType == listedWeaponType)
+			return true;
+	}
+
+	return false;
+}
+
+static std::vector<LaraWeaponType> StandingWeaponTypes
+{
+	LaraWeaponType::Shotgun,
+	LaraWeaponType::HK,
+	LaraWeaponType::Crossbow,
+	LaraWeaponType::Torch,
+	LaraWeaponType::GrenadeLauncher,
+	LaraWeaponType::HarpoonGun,
+	LaraWeaponType::RocketLauncher,
+	LaraWeaponType::Snowmobile
+};
+
+bool IsStandingWeapon(ItemInfo* item, LaraWeaponType weaponType)
+{
+	return (CheckLaraWeaponType(weaponType, StandingWeaponTypes) || GetLaraInfo(item)->Weapons[(int)weaponType].HasLasersight);
+}
+
+static std::vector<LaraState> VaultStates
+{
+	LS_VAULT,
+	LS_VAULT_2_STEPS,
+	LS_VAULT_3_STEPS,
+	LS_VAULT_1_STEP_CROUCH,
+	LS_VAULT_2_STEPS_CROUCH,
+	LS_VAULT_3_STEPS_CROUCH,
+	LS_AUTO_JUMP
+};
 
 bool IsVaultState(LaraState state)
 {
-	if (state == LS_VAULT ||
-		state == LS_VAULT_2_STEPS ||
-		state == LS_VAULT_3_STEPS ||
-		state == LS_VAULT_1_STEP_CROUCH ||
-		state == LS_VAULT_2_STEPS_CROUCH ||
-		state == LS_VAULT_3_STEPS_CROUCH ||
-		state == LS_AUTO_JUMP)
-	{
-		return true;
-	}
-
-	return false;
+	return CheckLaraState(state, VaultStates);
 }
+
+static std::vector<LaraState> JumpStates
+{
+	LS_JUMP_FORWARD,
+	LS_JUMP_BACK,
+	LS_JUMP_LEFT,
+	LS_JUMP_RIGHT,
+	LS_JUMP_UP,
+	LS_FALL_BACK,
+	LS_REACH,
+	LS_SWAN_DIVE,
+	LS_FREEFALL_DIVE,
+	LS_FREEFALL
+};
 
 bool IsJumpState(LaraState state)
 {
-	if (state == LS_JUMP_FORWARD ||
-		state == LS_JUMP_BACK ||
-		state == LS_JUMP_LEFT ||
-		state == LS_JUMP_RIGHT ||
-		state == LS_JUMP_UP ||
-		state == LS_FALL_BACK ||
-		state == LS_REACH ||
-		state == LS_SWAN_DIVE ||
-		state == LS_FREEFALL_DIVE ||
-		state == LS_FREEFALL)
-	{
-		return true;
-	}
-
-	return false;
+	return CheckLaraState(state, JumpStates);
 }
+
+static std::vector<LaraState> RunningJumpQueuableStates
+{
+	LS_RUN_FORWARD,
+	LS_SPRINT,
+	LS_STEP_UP,
+	LS_STEP_DOWN
+};
 
 bool IsRunJumpQueueableState(LaraState state)
 {
-	if (state == LS_RUN_FORWARD ||
-		state == LS_SPRINT ||
-		state == LS_STEP_UP ||
-		state == LS_STEP_DOWN)
-	{
-		return true;
-	}
-
-	return false;
+	return CheckLaraState(state, RunningJumpQueuableStates);
 }
+
+static std::vector<LaraState> RunningJumpTimerStates
+{
+	LS_WALK_FORWARD,
+	LS_RUN_FORWARD,
+	LS_SPRINT,
+	LS_SPRINT_DIVE,
+	LS_JUMP_FORWARD
+};
 
 bool IsRunJumpCountableState(LaraState state)
 {
-	if (state == LS_WALK_FORWARD ||
-		state == LS_RUN_FORWARD ||
-		state == LS_SPRINT ||
-		state == LS_SPRINT_DIVE ||
-		state == LS_JUMP_FORWARD)
-	{
-		return true;
-	}
-
-	return false;
+	return CheckLaraState(state, RunningJumpTimerStates);
 }
 
 bool TestLaraPose(ItemInfo* item, CollisionInfo* coll)
@@ -1224,12 +1244,31 @@ bool TestLaraKeepLow(ItemInfo* item, CollisionInfo* coll)
 
 	auto probeFront = GetCollision(item, item->Pose.Orientation.y, radius, -coll->Setup.Height);
 	auto probeBack = GetCollision(item, item->Pose.Orientation.y + ANGLE(180.0f), radius, -coll->Setup.Height);
-	auto probeMiddle = GetCollision(item);
+	auto probeMiddle = GetCollision(item, 0.0f, 0.0f, -LARA_HEIGHT / 2);
 
-	if (abs(probeFront.Position.Ceiling - probeFront.Position.Floor) < LARA_HEIGHT ||	// Front is not a clamp.
-		abs(probeBack.Position.Ceiling - probeBack.Position.Floor) < LARA_HEIGHT ||		// Back is not a clamp.
-		abs(probeMiddle.Position.Ceiling - probeMiddle.Position.Floor) < LARA_HEIGHT ||	// Middle is not a clamp.
-		abs(coll->Middle.Ceiling - LARA_HEIGHT_CRAWL) < LARA_HEIGHT)					// TEMP: Consider statics overhead detected by GetCollisionInfo().
+	// Assess middle.
+	if (abs(probeMiddle.Position.Ceiling - probeMiddle.Position.Floor) < LARA_HEIGHT ||	// Middle space is low enough.
+		abs(coll->Middle.Ceiling - LARA_HEIGHT_CRAWL) < LARA_HEIGHT)					// Consider statics overhead detected by GetCollisionInfo().
+	{
+		return true;
+	}
+
+	// TODO: Check whether < or <= and > or >=.
+
+	// Assess front.
+	if (abs(probeFront.Position.Ceiling - probeFront.Position.Floor) < LARA_HEIGHT &&		// Front space is low enough.
+		abs(probeFront.Position.Ceiling - probeFront.Position.Floor) > LARA_HEIGHT_CRAWL && // Front space not a clamp.
+		abs(probeFront.Position.Floor - probeMiddle.Position.Floor) <= (CLICK(1) - 1) &&	// Front is withing upper/lower floor bounds.
+		probeFront.Position.Floor != NO_HEIGHT)
+	{
+		return true;
+	}
+
+	// Assess back.
+	if (abs(probeBack.Position.Ceiling - probeBack.Position.Floor) < LARA_HEIGHT &&		  // Back space is low enough.
+		abs(probeBack.Position.Ceiling - probeBack.Position.Floor) > LARA_HEIGHT_CRAWL && // Back space not a clamp.
+		abs(probeBack.Position.Floor - probeMiddle.Position.Floor) <= (CLICK(1) - 1) &&	  // Back is withing upper/lower floor bounds.
+		probeBack.Position.Floor != NO_HEIGHT)
 	{
 		return true;
 	}

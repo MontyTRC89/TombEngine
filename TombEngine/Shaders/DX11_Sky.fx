@@ -5,7 +5,7 @@
 cbuffer StaticMatrixBuffer : register(b8)
 {
 	float4x4 World;
-	float4 StaticPosition;
+	float4 Position;
 	float4 Color;
 };
 

@@ -68,6 +68,12 @@ enum SHADOW_MODES
 	SHADOW_ALL
 };
 
+enum LIGHT_MODES
+{
+	LIGHT_MODE_DYNAMIC,
+	LIGHT_MODE_STATIC
+};
+
 enum DEPTH_STATES
 {
 	DEPTH_STATE_WRITE_ZBUFFER = 0,
@@ -209,7 +215,7 @@ constexpr auto FADE_FRAMES_COUNT = 16;
 constexpr auto FADE_FACTOR = 0.0625f;
 
 constexpr auto NUM_LIGHTS_PER_BUFFER = 48;
-constexpr auto MAX_LIGHTS_PER_ITEM = 48;
+constexpr auto MAX_LIGHTS_PER_ITEM = 8;
 constexpr auto MAX_LIGHTS = 100;
 constexpr auto AMBIENT_LIGHT_INTERPOLATION_STEPS = 8;
 constexpr auto MAX_DYNAMIC_SHADOWS = 1;
@@ -234,3 +240,6 @@ constexpr auto HUD_ZERO_Y = -REFERENCE_RES_HEIGHT;
 constexpr auto UNDERWATER_FOG_MIN_DISTANCE = 4;
 constexpr auto UNDERWATER_FOG_MAX_DISTANCE = 30;
 constexpr auto MAX_ROOM_BOUNDS = 256;
+
+constexpr auto MIN_FAR_VIEW = 3200.0f;
+constexpr auto DEFAULT_FAR_VIEW = 102400.0f;

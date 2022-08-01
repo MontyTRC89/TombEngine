@@ -1,17 +1,12 @@
 #include "./CameraMatrixBuffer.hlsli"
 #include "./VertexInput.hlsli"
+#include "./VertexEffects.hlsli"
 #include "./Math.hlsli"
 #include "./ShaderLight.hlsli"
 #include "./AlphaTestBuffer.hlsli"
-#define SHADOW_INTENSITY (0.55f)
-#define INV_SHADOW_INTENSITY (1.0f-SHADOW_INTENSITY)
 
-cbuffer LightsBuffer : register(b2)
-{
-	ShaderLight Lights[MAX_LIGHTS];
-	int NumLights;
-	float3 Padding;
-};
+#define SHADOW_INTENSITY (0.55f)
+#define INV_SHADOW_INTENSITY (1.0f - SHADOW_INTENSITY)
 
 struct Sphere
 {
@@ -22,7 +17,6 @@ struct Sphere
 cbuffer MiscBuffer : register(b3)
 {
 	int Caustics;
-
 };
 
 cbuffer ShadowLightBuffer : register(b4)
@@ -38,7 +32,7 @@ cbuffer ShadowLightBuffer : register(b4)
 cbuffer RoomBuffer : register(b5)
 {
 	float4 AmbientColor;
-	int Water;
+	uint Water;
 };
 
 struct AnimatedFrameUV
@@ -79,38 +73,27 @@ SamplerComparisonState ShadowMapSampler : register(s3);
 
 struct PixelShaderOutput
 {
-	float4 Color: SV_Target0;
-	float4 Depth: SV_Target1;
+	float4 Color: SV_TARGET0;
+	float4 Depth: SV_TARGET1;
 };
 
 PixelShaderInput VS(VertexShaderInput input)
 {
 	PixelShaderInput output;
-	float3 pos = input.Position;
-	float4 col = input.Color;
-	
+
 	// Setting effect weight on TE side prevents portal vertices from moving.
 	// Here we just read weight and decide if we should apply refraction or movement effect.
 	float weight = input.Effects.z;
-	
-	// Wibble effect returns different value depending on vertex hash and frame number.
-	// In theory, hash could be affected by WaterScheme value from room.
-	float wibble = sin((((Frame + input.Hash) % 64) / 64.0) * (PI2)); // sin from -1 to 1 with a period of 64 frames
-	
-	// Glow
-	if (input.Effects.x > 0.0f)
-	{
-		float intensity = input.Effects.x * lerp(-0.5f, 1.0f, wibble * 0.5f + 0.5f);
-		col = saturate(col + float4(intensity, intensity, intensity, 0));
-	}
-	
-	// Movement
-	if (input.Effects.y > 0.0f)
-        pos.y += wibble * input.Effects.y * weight * 128.0f; // 128 units offset to top and bottom (256 total)
+
+	// Calculate vertex effects
+	float wibble = Wibble(input.Effects.xyz, input.Hash);
+	float3 pos = Move(input.Position, input.Effects.xyz * weight, wibble);
+	float3 col = Glow(input.Color.xyz, input.Effects.xyz, wibble);
 
 	// Refraction
 	float4 screenPos = mul(float4(pos, 1.0f), ViewProjection);
 	float2 clipPos = screenPos.xy / screenPos.w;
+
 	if (CameraUnderwater != Water)
 	{
 		float factor = (Frame + clipPos.x * 320);
@@ -122,12 +105,12 @@ PixelShaderInput VS(VertexShaderInput input)
 	
 	output.Position = screenPos;
 	output.Normal = input.Normal;
-	output.Color = col;
+	output.Color = float4(col, input.Color.w);
 	output.PositionCopy = screenPos;
 
 #ifdef ANIMATED
 	float speed = fps / 30.0f;
-	int frame = (int)(Frame * speed) % numAnimFrames;
+	int frame = (int)(Frame * speed + input.AnimationFrameOffset) % numAnimFrames;
 	switch (input.PolyIndex) {
 	case 0:
 		output.UV = AnimFrames[frame].topLeft;
@@ -144,16 +127,15 @@ PixelShaderInput VS(VertexShaderInput input)
 	}
 #else
 	output.UV = input.UV;
-
 #endif
 	
 	output.WorldPosition = input.Position.xyz;
 
-	float3x3 TBN = float3x3(input.Tangent, input.Bitangent, input.Normal);
+    float3x3 TBN = float3x3(input.Tangent, cross(input.Normal,input.Tangent), input.Normal);
 	output.TBN = TBN;
 
 	// Apply distance fog
-	float4 d = length(CamPositionWS - output.WorldPosition);
+	float d = length(CamPositionWS.xyz - output.WorldPosition);
 	if (FogMaxDistance == 0)
 		output.Fog = 1;
 	else
@@ -287,7 +269,6 @@ void doBlobShadows(float3 worldPos, inout float3 lighting)
     }
     shadowFactor = saturate(shadowFactor);
     lighting *= saturate((shadowFactor+SHADOW_INTENSITY));
-
 }
 
 void doSpotLightShadow(float3 worldPos,inout float3 lighting)
@@ -319,7 +300,8 @@ void doSpotLightShadow(float3 worldPos,inout float3 lighting)
     float angleFactor = min(max(sin(lightClipSpace.x * PI)*1.2, 0), 1);
     lighting *= saturate((shadowFactor + SHADOW_INTENSITY) + (pow(distanceFactor, 4) * (1 - angleFactor) * INV_SHADOW_INTENSITY));
 }
-PixelShaderOutput PS(PixelShaderInput input) : SV_TARGET
+
+PixelShaderOutput PS(PixelShaderInput input)
 {
 	PixelShaderOutput output;
 
@@ -329,7 +311,7 @@ PixelShaderOutput PS(PixelShaderInput input) : SV_TARGET
 
 	float3 Normal = NormalTexture.Sample(Sampler,input.UV).rgb;
 	Normal = Normal * 2 - 1;
-	Normal = normalize(mul(Normal,input.TBN));
+	Normal = normalize(mul(Normal, input.TBN));
 
 	float3 lighting = input.Color.xyz;
 	bool doLights = true;
@@ -352,7 +334,7 @@ PixelShaderOutput PS(PixelShaderInput input) : SV_TARGET
 
 	if (doLights)
 	{
-		for (uint i = 0; i < NumLights; i++)
+		for (int i = 0; i < NumLights; i++)
 		{
 			float3 lightPos = Lights[i].Position.xyz;
 			float3 color = Lights[i].Color.xyz;
@@ -395,17 +377,17 @@ PixelShaderOutput PS(PixelShaderInput input) : SV_TARGET
 		float3 yaxis = CausticsTexture.Sample(Sampler, p.xz).xyz;  
 		float3 zaxis = CausticsTexture.Sample(Sampler, p.xy).xyz;  
 
-		lighting += float4((xaxis * blending.x + yaxis * blending.y + zaxis * blending.z).xyz, 0.0f) * attenuation * 2.0f;
+		lighting += float3((xaxis * blending.x + yaxis * blending.y + zaxis * blending.z).xyz) * attenuation * 2.0f;
 	}
 	
-	output.Color.xyz = output.Color.xyz * lighting;
+	output.Color.xyz = saturate(output.Color.xyz * lighting);
 
 	output.Depth = output.Color.w > 0.0f ?
 		float4(input.PositionCopy.z / input.PositionCopy.w, 0.0f, 0.0f, 1.0f) :
 		float4(0.0f, 0.0f, 0.0f, 0.0f);
 
 	if (FogMaxDistance != 0)
-		output.Color.xyz = lerp(output.Color.xyz, FogColor, input.Fog);
+		output.Color.xyz = lerp(output.Color.xyz, FogColor.xyz, input.Fog);
 
 	return output;
 }

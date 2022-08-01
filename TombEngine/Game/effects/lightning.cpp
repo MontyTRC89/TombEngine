@@ -285,7 +285,7 @@ namespace TEN::Effects::Lightning
 		}*/
 	}
 
-	long LSpline(int x, int* knots, int nk)
+	int LSpline(int x, int* knots, int nk)
 	{
 		int* k;
 		int c1, c2, c3, ret, span;
@@ -299,11 +299,12 @@ namespace TEN::Effects::Lightning
 		x -= 65536 * span;
 		k = &knots[3 * span];
 		c1 = k[3] + (k[3] >> 1) - (k[6] >> 1) - k[6] + (k[9] >> 1) + ((-k[0] - 1) >> 1);
-		ret = (long long) c1 * x >> 16;
+		ret = (long long)c1 * x >> 16;
 		c2 = ret + 2 * k[6] - 2 * k[3] - (k[3] >> 1) - (k[9] >> 1) + k[0];
-		ret = (long long) c2 * x >> 16;
+		ret = (long long)c2 * x >> 16;
 		c3 = ret + (k[6] >> 1) + ((-k[0] - 1) >> 1);
-		ret = (long long) c3 * x >> 16;
+		ret = (long long)c3 * x >> 16;
+
 		return ret + k[3];
 	}
 

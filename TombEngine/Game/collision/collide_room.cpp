@@ -954,6 +954,11 @@ short GetNearestLedgeAngle(ItemInfo* item, CollisionInfo* coll, float& distance)
 			auto floorHeight   = GetFloorHeight(ROOM_VECTOR{ block->Room, y }, ffpX, ffpZ).value_or(NO_HEIGHT);
 			auto ceilingHeight = GetCeilingHeight(ROOM_VECTOR{ block->Room, y }, ffpX, ffpZ).value_or(NO_HEIGHT);
 
+			// If probe landed inside wall (i.e. both floor/ceiling heights are NO_HEIGHT), make a fake
+			// ledge for algorithm to further succeed.
+			if (floorHeight == NO_HEIGHT && ceilingHeight == NO_HEIGHT)
+				floorHeight = y - CLICK(4);
+
 			// If ceiling height tests lower than Y value, it means ceiling
 			// ledge is in front and we should use it instead of floor.
 			bool useCeilingLedge = ceilingHeight > y;
@@ -1306,6 +1311,7 @@ int GetWaterDepth(int x, int y, int z, short roomNumber)
 		while (floor->RoomBelow(x, y, z).value_or(NO_ROOM) != NO_ROOM)
 		{
 			room = &g_Level.Rooms[floor->RoomBelow(x, y, z).value_or(floor->Room)];
+
 			if (TestEnvironment(ENV_FLAG_WATER, room) ||
 				TestEnvironment(ENV_FLAG_SWAMP, room))
 			{
