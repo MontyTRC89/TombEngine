@@ -76,7 +76,7 @@ void AutoGunsControl(short itemNumber)
 			// FIXME:
 			if (los)
 			{
-				angles = GetOrientBetweenPoints(Vector3(pos1.x, pos1.y, pos1.z), Vector3(pos2.x, pos2.y, pos2.z));
+				angles = GetOrientTowardPoint(Vector3(pos1.x, pos1.y, pos1.z), Vector3(pos2.x, pos2.y, pos2.z));
 				angles.y -= item->Pose.Orientation.y;
 			}
 			else

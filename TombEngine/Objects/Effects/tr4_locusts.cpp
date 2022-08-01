@@ -58,7 +58,7 @@ namespace TEN::Entities::TR4
 				end.y = -128;
 				end.z = 288;
 				GetJointAbsPosition(item, &end, 9);
-				angles = GetOrientBetweenPoints(start.ToVector3(), end.ToVector3());
+				angles = GetOrientTowardPoint(start.ToVector3(), end.ToVector3());
 			}
 
 			// NOTE: this is not present in original TR4 code
@@ -145,7 +145,7 @@ namespace TEN::Entities::TR4
 					locust->escapeZrot = (GetRandomControl() & 0x7F) - 64;
 				}
 
-				auto angles = GetOrientBetweenPoints(
+				auto angles = GetOrientTowardPoint(
 					locust->pos.Position.ToVector3(),
 					Vector3(
 						LaraItem->Pose.Position.x + (locust->escapeXrot * 8),

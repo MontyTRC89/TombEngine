@@ -6,7 +6,7 @@
 
 //namespace TEN::Math::Geometry
 //{
-	EulerAngles GetOrientBetweenPoints(Vector3 origin, Vector3 target)
+	EulerAngles GetOrientTowardPoint(Vector3 origin, Vector3 target)
 	{
 		auto direction = target - origin;
 		auto yOrient = Angle(atan2(direction.x, direction.z));
@@ -21,7 +21,7 @@
 
 	float GetDeltaHeading(Vector3 origin, Vector3 target, float heading)
 	{
-		auto difference = GetOrientBetweenPoints(origin, target).y;
+		auto difference = GetOrientTowardPoint(origin, target).y;
 		return Angle::GetShortestAngularDistance(heading, difference + Angle::DegToRad(90.0f));
 	}
 //}

@@ -310,7 +310,7 @@ namespace TEN::Entities::TR3
 			pos2.z *= 2;
 			GetJointAbsPosition(item, &pos2, TribesmanDartBite2.meshNum);
 
-			auto angles = GetOrientBetweenPoints(pos1.ToVector3(), pos2.ToVector3());
+			auto angles = GetOrientTowardPoint(pos1.ToVector3(), pos2.ToVector3());
 
 			dartItem->Pose.Position = pos1;
 

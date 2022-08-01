@@ -47,7 +47,7 @@ namespace TEN::Entities::Vehicles
 		bool hasInputAction = TrInput & IN_ACTION;
 
 		short deltaHeadingAngle = vehicleItem->Pose.Orientation.y - laraItem->Pose.Orientation.y;
-		short angleBetweenPositions = vehicleItem->Pose.Orientation.y - GetOrientBetweenPoints(laraItem->Pose.Position, vehicleItem->Pose.Position).y;
+		short angleBetweenPositions = vehicleItem->Pose.Orientation.y - GetOrientTowardPoint(laraItem->Pose.Position, vehicleItem->Pose.Position).y;
 		bool onCorrectSide = abs(deltaHeadingAngle - angleBetweenPositions) < Angle::DegToRad(45.0f);
 
 		// Assess mount types allowed for vehicle.

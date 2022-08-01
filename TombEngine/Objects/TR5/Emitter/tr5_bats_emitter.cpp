@@ -144,7 +144,7 @@ void UpdateBats()
 			bat->ZTarget = (GetRandomControl() & 0x7F) - 64;
 		}
 
-		auto angles = GetOrientBetweenPoints(
+		auto angles = GetOrientTowardPoint(
 			bat->Pose.Position.ToVector3(),
 			Vector3(
 				LaraItem->Pose.Position.x + (bat->XTarget * 8),

@@ -225,7 +225,7 @@ static void TriggerHarpyMissile(PHD_3DPOS* pos, short roomNumber, int count)
 
 			auto pose = PHD_3DPOS(pos1);
 
-			auto angles = GetOrientBetweenPoints(pos1.ToVector3(), pos3.ToVector3());
+			auto angles = GetOrientTowardPoint(pos1.ToVector3(), pos3.ToVector3());
 			pose.Orientation = angles;
 			TriggerHarpyMissile(&pose, item->RoomNumber, 2);
 		}
@@ -237,7 +237,7 @@ static void TriggerHarpyMissile(PHD_3DPOS* pos, short roomNumber, int count)
 
 			auto pos = PHD_3DPOS(pos1.x, pos1.y, pos1.z);
 
-			auto angles = GetOrientBetweenPoints(pos1.ToVector3(), pos3.ToVector3());
+			auto angles = GetOrientTowardPoint(pos1.ToVector3(), pos3.ToVector3());
 			pos.Orientation = angles;
 			TriggerHarpyMissile(&pos, item->RoomNumber, 2);
 		}

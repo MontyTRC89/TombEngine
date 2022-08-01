@@ -470,7 +470,7 @@ void TorpedoControl(short itemNumber)
 		}
 	}
 
-	auto angles = GetOrientBetweenPoints(item->Pose.Position.ToVector3(), pos.ToVector3());
+	auto angles = GetOrientTowardPoint(item->Pose.Position.ToVector3(), pos.ToVector3());
 
 	if (item->Animation.Velocity >= 48)
 	{

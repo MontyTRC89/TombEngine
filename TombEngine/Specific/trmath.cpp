@@ -39,7 +39,7 @@ EulerAngles GetVectorAngles(int x, int y, int z)
 	);
 }
 
-EulerAngles GetOrientBetweenPoints(Vector3Int origin, Vector3Int target)
+EulerAngles GetOrientTowardPoint(Vector3Int origin, Vector3Int target)
 {
 	return GetVectorAngles(target.x - origin.x, target.y - origin.y, target.z - origin.z);
 }
