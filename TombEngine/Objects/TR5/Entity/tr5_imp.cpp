@@ -77,7 +77,7 @@ static void ImpThrowStones(ItemInfo* item)
 	int dy = pos1.y - pos2.y;
 	int dz = pos1.z - pos2.z;
 
-	auto angles = EulerAngles::OrientBetweenPoints(pos1.ToVector3(), pos2.ToVector3());
+	auto angles = GetOrientBetweenPoints(pos1.ToVector3(), pos2.ToVector3());
 	
 	int distance = sqrt(pow(dx, 2) + pow(dy, 2) + pow(dz, 2));
 	if (distance < 8)

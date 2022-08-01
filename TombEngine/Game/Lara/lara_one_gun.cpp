@@ -1420,7 +1420,7 @@ void FireCrossBowFromLaserSight(ItemInfo* laraItem, GameVector* src, GameVector*
 	target->x |= 512;
 	target->z |= 512;*/
 
-	auto angles = EulerAngles::OrientBetweenPoints(Vector3(src->x, src->y, src->z), Vector3(target->x, target->y, target->z));
+	auto angles = GetOrientBetweenPoints(Vector3(src->x, src->y, src->z), Vector3(target->x, target->y, target->z));
 
 	auto boltPose = PHD_3DPOS(src->x, src->y, src->z, angles.x, angles.y, angles.z);
 	FireCrossbow(laraItem, &boltPose);

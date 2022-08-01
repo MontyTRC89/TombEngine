@@ -133,7 +133,7 @@ namespace TEN::Entities::Effects
 	{
 		auto* fx = &EffectList[fxNum];
 
-		auto angles = EulerAngles::OrientBetweenPoints(Vector3(fx->pos.Position.x, fx->pos.Position.y - CLICK(1), fx->pos.Position.z), LaraItem->Pose.Position.ToVector3());
+		auto angles = GetOrientBetweenPoints(Vector3(fx->pos.Position.x, fx->pos.Position.y - CLICK(1), fx->pos.Position.z), LaraItem->Pose.Position.ToVector3());
 
 		float maxRotation = 0;
 		int maxVelocity = 0;

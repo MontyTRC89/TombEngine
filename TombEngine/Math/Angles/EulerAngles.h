@@ -7,7 +7,7 @@
 	{
 	public:
 		// TODO: Remove.
-		void SetY(float angle = 0.0f);
+		void SetY(float angle = 0.0f) {};
 
 		// Normalized angle components (stored as radians)
 		Angle x = 0.0f;
@@ -23,7 +23,7 @@
 
 		// Utilities
 		static bool Compare(EulerAngles euler0, EulerAngles euler1, float epsilon = 0.0f);
-		static EulerAngles ShortestAngularDistance(EulerAngles eulerFrom, EulerAngles eulerTo);
+		static EulerAngles GetShortestAngularDistance(EulerAngles eulerFrom, EulerAngles eulerTo);
 		Vector3 GetDirectionVector();
 
 		void InterpolateLinear(EulerAngles eulerTo, float alpha = 1.0f, float epsilon = 0.0f);
@@ -34,8 +34,6 @@
 
 		void InterpolateConstantEaseOut(EulerAngles eulerTo, float rate, float alpha = 1.0f, float epsilon = 0.0f);
 		static EulerAngles InterpolateConstantEaseOut(EulerAngles eulerFrom, EulerAngles eulerTo, float rate, float alpha = 1.0f, float epsilon = 0.0f);
-
-		static EulerAngles OrientBetweenPoints(Vector3 origin, Vector3 target);
 
 		// Operators
 		bool		 operator ==(EulerAngles euler);

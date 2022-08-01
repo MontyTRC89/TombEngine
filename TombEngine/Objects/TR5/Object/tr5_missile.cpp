@@ -37,7 +37,7 @@ void MissileControl(short itemNumber)
 	}
 	else
 	{
-		auto angles = EulerAngles::OrientBetweenPoints(
+		auto angles = GetOrientBetweenPoints(
 			Vector3(
 				fx->pos.Position.x,
 				fx->pos.Position.y - CLICK(1),

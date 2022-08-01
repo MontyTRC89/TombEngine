@@ -21,8 +21,8 @@
 		void Compare(Angle angle, float epsilon = 0.0f);
 		static bool Compare(float angle0, float angle1, float epsilon = 0.0f);
 
-		void ShortestAngularDistance(Angle angleTo);
-		static float ShortestAngularDistance(float angleFrom, float angleTo);
+		void GetShortestAngularDistance(Angle angleTo);
+		static float GetShortestAngularDistance(float angleFrom, float angleTo);
 
 		void InterpolateLinear(Angle angleTo, float alpha = 1.0f, float epsilon = 0.0f);
 		static float InterpolateLinear(float angleFrom, float angleTo, float alpha = 1.0f, float epsilon = 0.0f);
@@ -32,10 +32,6 @@
 
 		void InterpolateConstantEaseOut(Angle angleTo, float rate, float alpha = 1.0f, float epsilon = 0.0f);
 		static float InterpolateConstantEaseOut(float angleFrom, float angleTo, float rate, float alpha = 1.0f, float epsilon = 0.0f);
-
-		static float OrientBetweenPoints(Vector3 point0, Vector3 point1);
-
-		static float DeltaHeading(Vector3 origin, Vector3 target, float heading); // TODO: I don't even know what this does.
 
 		// Converters
 		static float DegToRad(float degrees);
@@ -66,8 +62,8 @@
 	private:
 		// Utilities
 		void Normalize();
-		static float Normalize(float angle);
-		static float ClampAlpha(float value);
-		static float ClampEpsilon(float value);
+		static float Normalize(float radians);
+		static float ClampAlpha(float alpha);
+		static float ClampEpsilon(float epsilon);
 	};
 //}

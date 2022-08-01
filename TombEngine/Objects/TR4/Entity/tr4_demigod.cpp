@@ -191,7 +191,7 @@ namespace TEN::Entities::TR4
 				auto pos2 = Vector3Int(-900, 96, 0);
 				GetJointAbsPosition(item, &pos2, 16);
 
-				auto angles = EulerAngles::OrientBetweenPoints(pos1.ToVector3(), pos2.ToVector3());
+				auto angles = GetOrientBetweenPoints(pos1.ToVector3(), pos2.ToVector3());
 				auto pose = PHD_3DPOS(pos1, angles);
 				if (item->ObjectNumber == ID_DEMIGOD3)
 					TriggerDemigodMissile(&pose, item->RoomNumber, 3);
@@ -209,7 +209,7 @@ namespace TEN::Entities::TR4
 				auto pos2 = Vector3Int(-900, 96, 0);
 				GetJointAbsPosition(item, &pos2, 16);
 
-				auto angles = EulerAngles::OrientBetweenPoints(pos1.ToVector3(), pos2.ToVector3());
+				auto angles = GetOrientBetweenPoints(pos1.ToVector3(), pos2.ToVector3());
 				auto pose = PHD_3DPOS(pos1, angles);
 				if (item->ObjectNumber == ID_DEMIGOD3)
 					TriggerDemigodMissile(&pose, item->RoomNumber, 3);
@@ -237,7 +237,7 @@ namespace TEN::Entities::TR4
 					GetJointAbsPosition(item, &pos2, 17);
 				}
 
-				auto angles = EulerAngles::OrientBetweenPoints(pos1.ToVector3(), pos2.ToVector3());
+				auto angles = GetOrientBetweenPoints(pos1.ToVector3(), pos2.ToVector3());
 				auto pose = PHD_3DPOS(pos1, angles);
 				TriggerDemigodMissile(&pose, item->RoomNumber, 4);
 			}

@@ -12,7 +12,7 @@
 
 	Angle Angle::FromDeg(float degrees)
 	{
-		return Angle(DegToRad(degrees));
+		return Angle(Normalize(DegToRad(degrees)));
 	}
 
 	void Angle::Compare(Angle angle, float epsilon)
@@ -24,19 +24,19 @@
 	{
 		epsilon = ClampEpsilon(epsilon);
 
-		float difference = ShortestAngularDistance(angle0, angle1);
+		float difference = GetShortestAngularDistance(angle0, angle1);
 		if (abs(difference) <= epsilon)
 			return true;
 
 		return false;
 	}
 
-	void Angle::ShortestAngularDistance(Angle angleTo)
+	void Angle::GetShortestAngularDistance(Angle angleTo)
 	{
-		this->Value = ShortestAngularDistance(*this, angleTo);
+		this->Value = GetShortestAngularDistance(*this, angleTo);
 	}
 	
-	float Angle::ShortestAngularDistance(float angleFrom, float angleTo)
+	float Angle::GetShortestAngularDistance(float angleFrom, float angleTo)
 	{
 		return Normalize(angleTo - angleFrom);
 	}
@@ -53,7 +53,7 @@
 
 		if (!Compare(angleFrom, angleTo, epsilon))
 		{
-			float difference = ShortestAngularDistance(angleFrom, angleTo);
+			float difference = GetShortestAngularDistance(angleFrom, angleTo);
 			return (angleFrom + (difference * alpha));
 		}
 
@@ -71,7 +71,7 @@
 
 		if (!Compare(angleFrom, angleTo, rate))
 		{
-			int sign = copysign(1, ShortestAngularDistance(angleFrom, angleTo));
+			int sign = copysign(1, GetShortestAngularDistance(angleFrom, angleTo));
 			return (angleFrom + (rate * sign));
 		}
 
@@ -93,29 +93,17 @@
 		{
 			if (!Compare(angleFrom, angleTo, rate))
 			{
-				int sign = copysign(1, ShortestAngularDistance(angleFrom, angleTo));
+				int sign = copysign(1, GetShortestAngularDistance(angleFrom, angleTo));
 				return (angleFrom + (rate * sign));
 			}
 			else
 			{
-				float difference = ShortestAngularDistance(angleFrom, angleTo);
+				float difference = GetShortestAngularDistance(angleFrom, angleTo);
 				return (angleFrom + (difference * alpha));
 			}
 		}
 
 		return angleTo;
-	}
-
-	float Angle::OrientBetweenPoints(Vector3 point0, Vector3 point1)
-	{
-		auto direction = point1 - point0;
-		return atan2(direction.x, direction.z);
-	}
-
-	float Angle::DeltaHeading(Vector3 origin, Vector3 target, float heading)
-	{
-		float difference = OrientBetweenPoints(origin, target);
-		return ShortestAngularDistance(heading, difference + DegToRad(90.0f));
 	}
 
 	float Angle::DegToRad(float degrees)
@@ -242,26 +230,26 @@
 		this->Value = Normalize(Value);
 	}
 
-	float Angle::Normalize(float angle)
+	float Angle::Normalize(float radians)
 	{
-		if (angle < -PI || angle > PI)
-			return atan2(sin(angle), cos(angle));
+		if (radians < -PI || radians > PI)
+			return atan2(sin(radians), cos(radians));
 
-		return angle;
+		return radians;
 
 		// Alternative (faster?) method:
-		/*return (angle > 0) ?
-			fmod(angle + PI, PI * 2) - PI :
-			fmod(angle - PI, PI * 2) + PI;*/
+		/*return (radians > 0) ?
+			fmod(radians + PI, PI * 2) - PI :
+			fmod(radians - PI, PI * 2) + PI;*/
 	}
 
-	float Angle::ClampAlpha(float value)
+	float Angle::ClampAlpha(float alpha)
 	{
-		return ((abs(value) > 1.0f) ? 1.0f : abs(value));
+		return ((abs(alpha) > 1.0f) ? 1.0f : abs(alpha));
 	}
 
-	float Angle::ClampEpsilon(float value)
+	float Angle::ClampEpsilon(float epsilon)
 	{
-		return abs(Normalize(value));
+		return abs(Normalize(epsilon));
 	}
 //}

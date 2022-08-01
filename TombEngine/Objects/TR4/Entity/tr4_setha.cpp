@@ -601,7 +601,7 @@ namespace TEN::Entities::TR4
 				auto pos = Vector3Int(SethaAttack1.x, SethaAttack1.y * 2, SethaAttack1.z);
 				GetJointAbsPosition(item, &pos, SethaAttack1.meshNum);
 
-				auto angles = EulerAngles::OrientBetweenPoints(pos1.ToVector3(), pos.ToVector3());
+				auto angles = GetOrientBetweenPoints(pos1.ToVector3(), pos.ToVector3());
 				auto attackPose = PHD_3DPOS(pos1, angles);
 				SethaThrowAttack(&attackPose, item->RoomNumber, 0);
 			}
@@ -610,7 +610,7 @@ namespace TEN::Entities::TR4
 				auto pos = Vector3Int(SethaAttack2.x, SethaAttack2.y * 2, SethaAttack2.z);
 				GetJointAbsPosition(item, &pos, SethaAttack2.meshNum);
 
-				auto angles = EulerAngles::OrientBetweenPoints(pos2.ToVector3(), pos.ToVector3());
+				auto angles = GetOrientBetweenPoints(pos2.ToVector3(), pos.ToVector3());
 				auto attackPose = PHD_3DPOS(pos2, angles);
 				SethaThrowAttack(&attackPose, item->RoomNumber, 0);
 			}
@@ -638,14 +638,14 @@ namespace TEN::Entities::TR4
 					auto pos = Vector3Int(SethaAttack1.x, SethaAttack1.y * 2, SethaAttack1.z);
 					GetJointAbsPosition(item, &pos, SethaAttack1.meshNum);
 
-					auto angles = EulerAngles::OrientBetweenPoints(pos1.ToVector3(), pos.ToVector3());
+					auto angles = GetOrientBetweenPoints(pos1.ToVector3(), pos.ToVector3());
 					auto attackPose = PHD_3DPOS(pos1, angles);
 					SethaThrowAttack(&attackPose, item->RoomNumber, 0);
 
 					pos = Vector3Int(SethaAttack2.x, SethaAttack2.y * 2, SethaAttack2.z);
 					GetJointAbsPosition(item, &pos, SethaAttack2.meshNum);
 
-					angles = EulerAngles::OrientBetweenPoints(pos2.ToVector3(), pos.ToVector3());
+					angles = GetOrientBetweenPoints(pos2.ToVector3(), pos.ToVector3());
 					attackPose = PHD_3DPOS(pos2, angles);
 					SethaThrowAttack(&attackPose, item->RoomNumber, 0);
 				}
@@ -707,7 +707,7 @@ namespace TEN::Entities::TR4
 				auto pos = Vector3Int(SethaAttack1.x, SethaAttack1.y * 2, SethaAttack1.z);
 				GetJointAbsPosition(item, &pos, SethaAttack1.meshNum);
 
-				auto angles = EulerAngles::OrientBetweenPoints(pos1.ToVector3(), pos.ToVector3());
+				auto angles = GetOrientBetweenPoints(pos1.ToVector3(), pos.ToVector3());
 				auto attackPose = PHD_3DPOS(pos1, angles);
 				SethaThrowAttack(&attackPose, item->RoomNumber, 0);
 			}

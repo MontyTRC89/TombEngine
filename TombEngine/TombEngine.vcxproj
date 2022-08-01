@@ -177,6 +177,7 @@ CALL gen.bat</Command>
     <ClInclude Include="Game\Lara\PlayerContext.h" />
     <ClInclude Include="Game\Lara\PlayerContextStructs.h" />
     <ClInclude Include="Math\Angles\EulerAngles.h" />
+    <ClInclude Include="Math\Geometry.h" />
     <ClInclude Include="Math\PoseData.h" />
     <ClInclude Include="Math\Vector2i.h" />
     <ClInclude Include="Math\Vector3i.h" />
@@ -634,6 +635,7 @@ CALL gen.bat</Command>
     <ClCompile Include="Game\pickup\pickup_weapon.cpp" />
     <ClCompile Include="Game\room.cpp" />
     <ClCompile Include="Math\Angles\EulerAngles.cpp" />
+    <ClCompile Include="Math\Geometry.cpp" />
     <ClCompile Include="Math\PoseData.cpp" />
     <ClCompile Include="Math\Vector2i.cpp" />
     <ClCompile Include="Math\Vector3i.cpp" />

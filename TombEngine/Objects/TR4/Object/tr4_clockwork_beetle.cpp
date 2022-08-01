@@ -208,7 +208,7 @@ void ClockworkBeetleControl(short itemNumber)
 
 		case 2:
 		{
-			float rotation = Angle::ShortestAngularDistance(beetle->ItemFlags[1], beetle->Pose.Orientation.y);
+			float rotation = Angle::GetShortestAngularDistance(beetle->ItemFlags[1], beetle->Pose.Orientation.y);
 
 			if (abs(rotation) > Angle::DegToRad(180.0f))
 				rotation = beetle->Pose.Orientation.y - Angle::ShrtToRad(beetle->ItemFlags[1]);

@@ -3,8 +3,6 @@
 
 #include "Math/Angles/Angle.h"
 
-void EulerAngles::SetY(float angle) {}
-
 //namespace TEN::Math::Angles
 //{
 	EulerAngles const EulerAngles::Zero = EulerAngles(0.0f, 0.0f, 0.0f);
@@ -40,7 +38,7 @@ void EulerAngles::SetY(float angle) {}
 		return false;
 	}
 
-	EulerAngles EulerAngles::ShortestAngularDistance(EulerAngles eulerFrom, EulerAngles eulerTo)
+	EulerAngles EulerAngles::GetShortestAngularDistance(EulerAngles eulerFrom, EulerAngles eulerTo)
 	{
 		return (eulerTo - eulerFrom);
 	}
@@ -91,20 +89,6 @@ void EulerAngles::SetY(float angle) {}
 			Angle::InterpolateConstantEaseOut(eulerFrom.y, eulerTo.y, rate, alpha, epsilon),
 			Angle::InterpolateConstantEaseOut(eulerFrom.z, eulerTo.z, rate, alpha, epsilon)
 		);
-	}
-
-	// TODO: This is a geometry function and it doesn't belong in this class. Also name should be GetOrientTowardPoint().
-	EulerAngles EulerAngles::OrientBetweenPoints(Vector3 origin, Vector3 target)
-	{
-		auto direction = target - origin;
-		auto yOrient = Angle(atan2(direction.x, direction.z));
-
-		auto vector = direction;
-		auto matrix = Matrix::CreateRotationY(-yOrient);
-		Vector3::Transform(vector, matrix, vector);
-
-		auto xOrient = Angle(-atan2(direction.y, vector.z));
-		return EulerAngles(xOrient, yOrient, 0.0f);
 	}
 
 	Vector3 EulerAngles::GetDirectionVector()

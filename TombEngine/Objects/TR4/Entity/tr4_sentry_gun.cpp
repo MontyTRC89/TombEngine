@@ -69,7 +69,7 @@ namespace TEN::Entities::TR4
 
 				item->Pose.Position.y += CLICK(2);
 
-				float deltaAngle = Angle::ShortestAngularDistance(AI.angle, creature->JointRotation[0]);
+				float deltaAngle = Angle::GetShortestAngularDistance(AI.angle, creature->JointRotation[0]);
 
 				AI.ahead = true;
 				if (deltaAngle <= Angle::DegToRad(-90.0f) || deltaAngle >= Angle::DegToRad(90.0f))

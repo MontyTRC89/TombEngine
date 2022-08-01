@@ -427,7 +427,7 @@ namespace TEN::Entities::Vehicles
 				break;
 			}
 
-			angle = Angle::RadToShrt(Angle::OrientBetweenPoints(minecartItem->Pose.Position.ToVector3(), Vector3(minecart->TurnX, 0.0f, minecart->TurnZ))) & 0x3fff;
+			angle = Angle::RadToShrt(GetOrientBetweenPoints(minecartItem->Pose.Position.ToVector3(), Vector3(minecart->TurnX, 0.0f, minecart->TurnZ)).y) & 0x3fff;
 
 			if (rotation < 4)
 			{

@@ -380,7 +380,7 @@ void LaserHeadControl(short itemNumber)
 			}
 
 			// TODO: Short to float conversion
-			auto angles = EulerAngles::OrientBetweenPoints(Vector3(src.x, src.y, src.z), LaserHeadData.target.ToVector3());
+			auto angles = GetOrientBetweenPoints(Vector3(src.x, src.y, src.z), LaserHeadData.target.ToVector3());
 			//InterpolateAngle(angles[0], &item->Pose.Orientation.y, &LaserHeadData.yRot, LaserHeadData.byte1);
 			//InterpolateAngle(angles[1] + 3328, &item->Pose.Orientation.x, &LaserHeadData.xRot, LaserHeadData.byte1);
 
