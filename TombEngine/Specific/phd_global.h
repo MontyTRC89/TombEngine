@@ -41,6 +41,13 @@ struct Vector3Int
 		this->z = z;
 	}
 
+	Vector3Int(Vector3 v)
+	{
+		this->x = int(v.x);
+		this->y = int(v.y);
+		this->z = int(v.z);
+	}
+
 	Vector3 ToVector3()
 	{
 		return Vector3(x, y, z);
@@ -138,13 +145,6 @@ struct Vector3Shrt
 		this->x = x;
 		this->y = y;
 		this->z = z;
-	}
-
-	Vector3Int(Vector3 v)
-	{
-		this->x = int(v.x);
-		this->y = int(v.y);
-		this->z = int(v.z);
 	}
 
 	Vector3 ToVector3()
