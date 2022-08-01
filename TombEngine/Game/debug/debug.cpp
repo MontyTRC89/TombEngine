@@ -11,14 +11,10 @@ void InitTENLog()
 	auto file_sink = std::make_shared<spdlog::sinks::basic_file_sink_mt>("Logs/TENLog.txt", true);
 
 	std::shared_ptr<spdlog::logger> logger;
-	if constexpr (DebugBuild)
-	{
-		// Set the file and console log targets
-		auto console_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
-		logger = std::make_shared<spdlog::logger>(std::string{ "multi_sink" }, spdlog::sinks_init_list{file_sink, console_sink });
-	}
-	else
-		logger = std::make_shared<spdlog::logger>(std::string{ "multi_sink" }, file_sink);
+
+	// Set the file and console log targets
+	auto console_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
+	logger = std::make_shared<spdlog::logger>(std::string{ "multi_sink" }, spdlog::sinks_init_list{ file_sink, console_sink });
 	
 	spdlog::initialize_logger(logger);
     logger->set_level(spdlog::level::info);

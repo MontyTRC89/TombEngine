@@ -1215,6 +1215,7 @@ namespace TEN::Entities::Vehicles
 		else
 		{
 			motorbikeItem->ClearBits(JointBitType::Mesh, MotorbikeHeadLightJoints);
+			motorbikeItem->ClearBits(JointBitType::Mesh, MotorbikeBrakeLightJoints);
 
 			drive = -1;
 			collide = 0;

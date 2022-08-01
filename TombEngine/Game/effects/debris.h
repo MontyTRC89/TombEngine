@@ -63,6 +63,7 @@ struct DebrisFragment
 	float angularDrag;
 	float friction;
 	float restitution;
+	Vector4 color;
 	uint32_t roomNumber;
 	uint32_t numBounces;
 	bool active;

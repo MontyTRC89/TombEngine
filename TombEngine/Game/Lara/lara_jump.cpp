@@ -130,6 +130,8 @@ void lara_as_freefall(ItemInfo* item, CollisionInfo* coll)
 {
 	item->Animation.Velocity = item->Animation.Velocity * 0.95f;
 
+	ModulateLaraTurnRateY(item, 0, 0, 0);
+
 	if (item->Animation.VerticalVelocity == LARA_DEATH_VELOCITY &&
 		item->HitPoints > 0)
 	{
@@ -803,6 +805,8 @@ void lara_as_freefall_dive(ItemInfo* item, CollisionInfo* coll)
 	item->Animation.Velocity = item->Animation.Velocity * 0.95f;
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpasm = false;
+
+	ModulateLaraTurnRateY(item, 0, 0, 0);
 
 	if (item->HitPoints <= 0)
 	{

@@ -31,12 +31,11 @@ PixelShaderInput VS(VertexShaderInput input)
 	output.Normal = (mul(float4(input.Normal, 0.0f), World).xyz);
 	output.Color = input.Color;
 	output.UV = input.UV;
-	output.WorldPosition = (mul(float4(input.Position, 1.0f), World));
+	output.WorldPosition = (mul(float4(input.Position, 1.0f), World).xyz);
     output.Sheen = input.Effects.w;
 	return output;
 }
 
-[earlydepthstencil]
 float4 PS(PixelShaderInput input) : SV_TARGET
 {
 	float4 output = Texture.Sample(Sampler, input.UV);
