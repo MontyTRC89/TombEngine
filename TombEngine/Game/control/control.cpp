@@ -97,7 +97,7 @@ short NextFxFree;
 int DrawPhase()
 {
 	g_Renderer.Draw();
-	Camera.numberFrames = g_Renderer.SyncRenderer();
+	Camera.numberFrames = g_Renderer.Synchronize();
 	return Camera.numberFrames;
 }
 
@@ -115,7 +115,9 @@ GameStatus ControlPhase(int numFrames, int demoMode)
 
 	g_GameStringsHandler->ProcessDisplayStrings(DELTA_TIME);
 	
+	bool firstTime = true;
 	static int framesCount = 0;
+
 	for (framesCount += numFrames; framesCount > 0; framesCount -= 2)
 	{
 		GlobalCounter++;
@@ -184,7 +186,7 @@ GameStatus ControlPhase(int numFrames, int demoMode)
 		while (g_Gui.GetInventoryMode() == InventoryMode::Pause)
 		{
 			g_Gui.DrawInventory();
-			g_Renderer.SyncRenderer();
+			g_Renderer.Synchronize();
 
 			if (g_Gui.DoPauseMenu() == InventoryResult::ExitToTitle)
 				return GameStatus::ExitToTitle;
@@ -333,7 +335,6 @@ GameStatus ControlPhase(int numFrames, int demoMode)
 		UpdateShockwaves();
 		UpdateBeetleSwarm();
 		UpdateLocusts();
-		AnimateWaterfalls();
 
 		// Rumble screen (like in submarine level of TRC)
 		if (level->Rumble)
@@ -350,6 +351,13 @@ GameStatus ControlPhase(int numFrames, int demoMode)
 		// Update timers
 		HealthBarTimer--;
 		GameTimer++;
+
+		// Add renderer objects on the first processed frame
+		if (firstTime)
+		{
+			g_Renderer.Lock();
+			firstTime = false;
+		}
 	}
 
 	return GameStatus::None;
@@ -416,7 +424,7 @@ GameStatus DoTitle(int index, std::string const& ambient)
 			g_GameScript->InitCallbacks();
 			g_GameStringsHandler->SetCallbackDrawString([](std::string const key, D3DCOLOR col, int x, int y, int flags)
 			{
-				g_Renderer.DrawString(float(x)/float(g_Configuration.Width) * REFERENCE_RES_WIDTH, float(y)/float(g_Configuration.Height) * REFERENCE_RES_HEIGHT, key.c_str(), col, flags);
+				g_Renderer.AddString(float(x)/float(g_Configuration.Width) * REFERENCE_RES_WIDTH, float(y)/float(g_Configuration.Height) * REFERENCE_RES_HEIGHT, key.c_str(), col, flags);
 			});
 		}
 
@@ -467,7 +475,7 @@ GameStatus DoTitle(int index, std::string const& ambient)
 			if (status != InventoryResult::None)
 				break;
 
-			Camera.numberFrames = g_Renderer.SyncRenderer();
+			Camera.numberFrames = g_Renderer.Synchronize();
 			frames = Camera.numberFrames;
 			ControlPhase(frames, 0);
 		}
@@ -520,7 +528,7 @@ GameStatus DoLevel(int index, std::string const& ambient, bool loadFromSavegame)
 		g_GameScript->InitCallbacks();
 		g_GameStringsHandler->SetCallbackDrawString([](std::string const key, D3DCOLOR col, int x, int y, int flags)
 		{
-			g_Renderer.DrawString(float(x)/float(g_Configuration.Width) * REFERENCE_RES_WIDTH, float(y)/float(g_Configuration.Height) * REFERENCE_RES_HEIGHT, key.c_str(), col, flags);
+			g_Renderer.AddString(float(x)/float(g_Configuration.Width) * REFERENCE_RES_WIDTH, float(y)/float(g_Configuration.Height) * REFERENCE_RES_HEIGHT, key.c_str(), col, flags);
 		});
 	}
 
@@ -701,6 +709,7 @@ bool ExplodeItemNode(ItemInfo *item, int node, int noXZVel, int bits)
 		ShatterItem.sphere.x = CreatureSpheres[node].x;
 		ShatterItem.sphere.y = CreatureSpheres[node].y;
 		ShatterItem.sphere.z = CreatureSpheres[node].z;
+		ShatterItem.color = item->Color;
 		ShatterItem.flags = item->ObjectNumber == ID_CROSSBOW_BOLT ? 0x400 : 0;
 		ShatterImpactData.impactDirection = Vector3(0, -1, 0);
 		ShatterImpactData.impactLocation = {(float)ShatterItem.sphere.x, (float)ShatterItem.sphere.y, (float)ShatterItem.sphere.z};

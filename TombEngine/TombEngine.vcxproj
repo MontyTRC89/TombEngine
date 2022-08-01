@@ -932,6 +932,7 @@ CALL gen.bat</Command>
     <None Include="Resources.aps" />
     <None Include="RuleSet.ruleset" />
     <None Include="Shaders\AlphaTestBuffer.hlsli" />
+    <None Include="Shaders\AnimatedTextures.hlsli" />
     <None Include="Shaders\CameraMatrixBuffer.hlsli">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
@@ -945,6 +946,7 @@ CALL gen.bat</Command>
     <None Include="Shaders\Math.hlsli">
       <DeploymentContent>true</DeploymentContent>
     </None>
+    <None Include="Shaders\Shadows.hlsli" />
     <None Include="Shaders\VertexEffects.hlsli" />
     <None Include="Shaders\VertexInput.hlsli">
       <DeploymentContent>true</DeploymentContent>
