@@ -8,7 +8,7 @@
 --	end
 --	
 --	LevelFuncs.TriggerTimer = function(obj) 
---		local myTimer = Timer.Create("my_timer", 5.0, false, "FinishTimer", Lara:GetHP(), "Well done!")
+--		local myTimer = Timer.Create("my_timer", 5.0, false, true, "FinishTimer", Lara:GetHP(), "Well done!")
 --		myTimer:Start()
 --	end
 --
@@ -22,15 +22,20 @@ LevelVars.__TEN_timer = {timers = {}}
 
 local Timer
 
+local unpausedColor = Color(255, 255, 255)
+local pausedColor = Color(255, 255, 0)
+local str = TEN.Strings.DisplayString("TIMER", 0, 0, unpausedColor, false, {TEN.Strings.DisplayStringOption.CENTER, TEN.Strings.DisplayStringOption.SHADOW} )
+
 Timer = {
 	--- Create (but do not start) a new timer.
 	-- @string name A label to give this timer; used to retrieve the timer later
 	-- @number totalTime The duration of the timer, in seconds
 	-- @bool loop if true, the timer will start again immediately after the time has elapsed
+	-- @bool showString if true, the remaining time, rounded up, will show at the bottom of the screen. __At any given time, only one timer can show its remaining time__.
 	-- @string func The name of the LevelFunc member to call when the time is up
 	-- @param funcArgs the arguments with which the above function will be called
 	-- @return The timer in its paused state
-	Create = function(name, totalTime, loop, func, ...)
+	Create = function(name, totalTime, loop, showString, func, ...)
 		local obj = {}
 		local mt = {}
 		mt.__index = Timer
@@ -40,12 +45,14 @@ Timer = {
 		LevelVars.__TEN_timer.timers[name] ={} 
 		local thisTimer = LevelVars.__TEN_timer.timers[name]
 		thisTimer.name = name
+		thisTimer.showString = showString
 		thisTimer.totalTime = totalTime
 		thisTimer.remainingTime = totalTime
-		thisTimer.func = func -- todo save name?
+		thisTimer.func = func
 		thisTimer.funcArgs = {...}
 		thisTimer.loop = loop
 		thisTimer.active = false
+		thisTimer.paused = true
 		return obj
 	end;
 
@@ -74,22 +81,38 @@ Timer = {
 		thisTimer.funcArgs = {...}
 	end,
 
-	--- Begin or unpause a timer.
+	--- Begin or unpause a timer. If showing the remaining time on-screen, its color will be set to white.
 	-- @param t the timer in question
 	Start = function(t)
 		local thisTimer = LevelVars.__TEN_timer.timers[t.name]
 		if not thisTimer.active then
 			thisTimer.active = true
 		end
+
+		LevelVars.__TEN_timer.timers[t.name].paused = false
+
+		if thisTimer.showString then
+			str:SetColor(unpausedColor)
+		end
 	end;
 
-	--- Pause the timer
+	--- Pause the timer. If showing the remaining time on-screen, its color will be set to yellow.
 	-- @param t the timer in question
 	Pause = function(t)
-		LevelVars.__TEN_timer.timers[t.name].active = false
+		local thisTimer = LevelVars.__TEN_timer.timers[t.name]
+		thisTimer.paused = true
+		if thisTimer.showString then
+			str:SetColor(pausedColor)
+		end
 	end,
 
-	--- Get the remaining time for a timer
+	--- Stop the timer.
+	-- @param t the timer in question
+	Stop = function(t)
+		LevelVars.__TEN_timer.timers[t.name].active = false
+	end,
+	
+	--- Get the remaining time for a timer.
 	-- @param t the timer in question
 	-- @return the time in seconds remaining on the clock
 	GetRemainingTime = function(t)
@@ -103,7 +126,7 @@ Timer = {
 		LevelVars.__TEN_timer.timers[t.name].remainingTime = remainingTime
 	end,
 
-	--- Get the total time for a timer
+	--- Get the total time for a timer.
 	-- This is the amount of time the timer will start with, as well as when starting a new loop
 	-- @param t the timer in question
 	-- @return the timer's total time
@@ -129,27 +152,35 @@ Timer = {
 	-- Should be called in LevelFuncs.OnControlPhase
 	-- @number dt The time in seconds since the last frame
 	UpdateAll = function(dt)
-		for k, t in pairs(LevelVars.__TEN_timer.timers) do
+		for _, t in pairs(LevelVars.__TEN_timer.timers) do
 			Timer.Update(t, dt)
 		end
 	end;
 
 	Update = function(t, dt)
 		if t.active then
-			t.remainingTime = t.remainingTime - dt
+			if not t.paused then
+				t.remainingTime = t.remainingTime - dt
 
-			if t.remainingTime <= 0 then
-				LevelFuncs[t.func](table.unpack(t.funcArgs))
+				if t.remainingTime <= 0 then
+					LevelFuncs[t.func](table.unpack(t.funcArgs))
 
-				local timeCarryOver = t.remainingTime
-
-				if not t.loop then
-					t.active = false
-					timeCarryOver = 0
+					if not t.loop then
+						t.active = false
+					else
+						t.remainingTime = t.remainingTime + t.totalTime
+					end
 				end
-
-				t.remainingTime = t.totalTime + timeCarryOver
 			end
+
+			if t.showString then
+				TEN.Strings.HideString(str)
+				str:SetKey(tostring(math.ceil(t.remainingTime)))
+				local myX, myY = PercentToScreen(50, 90)
+				str:SetPosition(myX, myY)
+				TEN.Strings.ShowString(str, 1)
+			end
+
 		end
 	end;
 

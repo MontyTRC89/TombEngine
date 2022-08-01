@@ -99,7 +99,7 @@ LevelFuncs.FinishTimer = <span class="keyword">function</span>(healthWhenStarted
 <span class="keyword">end</span>
 
 LevelFuncs.TriggerTimer = <span class="keyword">function</span>(obj)
-    <span class="keyword">local</span> myTimer = Timer.Create(<span class="string">"my_timer"</span>, <span class="number">5.0</span>, <span class="keyword">false</span>, <span class="string">"FinishTimer"</span>, Lara:GetHP(), <span class="string">"Well done!"</span>)
+    <span class="keyword">local</span> myTimer = Timer.Create(<span class="string">"my_timer"</span>, <span class="number">5.0</span>, <span class="keyword">false</span>, <span class="keyword">true</span>, <span class="string">"FinishTimer"</span>, Lara:GetHP(), <span class="string">"Well done!"</span>)
     myTimer:Start()
 <span class="keyword">end</span>
 
@@ -114,7 +114,7 @@ LevelFuncs.OnControlPhase = <span class="keyword">function</span>(dt)
 <h2><a href="#Functions">Functions</a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" ><a href="#Create">Create(name, totalTime, loop, func, funcArgs)</a></td>
+	<td class="name" ><a href="#Create">Create(name, totalTime, loop, showString, func, funcArgs)</a></td>
 	<td class="summary">Create (but do not start) a new timer.</td>
 	</tr>
 	<tr>
@@ -131,11 +131,15 @@ LevelFuncs.OnControlPhase = <span class="keyword">function</span>(dt)
 	</tr>
 	<tr>
 	<td class="name" ><a href="#Pause">Pause(t)</a></td>
-	<td class="summary">Pause the timer</td>
+	<td class="summary">Pause the timer.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Stop">Stop(t)</a></td>
+	<td class="summary">Stop the timer.</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#GetRemainingTime">GetRemainingTime(t)</a></td>
-	<td class="summary">Get the remaining time for a timer</td>
+	<td class="summary">Get the remaining time for a timer.</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#SetRemainingTime">SetRemainingTime(t, remainingTime)</a></td>
@@ -143,8 +147,7 @@ LevelFuncs.OnControlPhase = <span class="keyword">function</span>(dt)
 	</tr>
 	<tr>
 	<td class="name" ><a href="#GetTotalTime">GetTotalTime(t)</a></td>
-	<td class="summary">Get the total time for a timer
- This is the amount of time the timer will start with, as well as when starting a new loop</td>
+	<td class="summary">Get the total time for a timer.</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#SetTotalTime">SetTotalTime(t, totalTime)</a></td>
@@ -169,7 +172,7 @@ LevelFuncs.OnControlPhase = <span class="keyword">function</span>(dt)
     <dl class="function">
     <dt>
     <a name = "Create"></a>
-    <strong>Create(name, totalTime, loop, func, funcArgs)</strong>
+    <strong>Create(name, totalTime, loop, showString, func, funcArgs)</strong>
     </dt>
     <dd>
     Create (but do not start) a new timer.
@@ -188,6 +191,10 @@ LevelFuncs.OnControlPhase = <span class="keyword">function</span>(dt)
         <li><span class="parameter">loop</span>
             <span class="types"><span class="type">bool</span></span>
          if true, the timer will start again immediately after the time has elapsed
+        </li>
+        <li><span class="parameter">showString</span>
+            <span class="types"><span class="type">bool</span></span>
+         if true, the remaining time, rounded up, will show at the bottom of the screen. <strong>At any given time, only one timer can show its remaining time</strong>.
         </li>
         <li><span class="parameter">func</span>
             <span class="types"><a class="type" href="https://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
@@ -266,7 +273,7 @@ LevelFuncs.OnControlPhase = <span class="keyword">function</span>(dt)
     <strong>Start(t)</strong>
     </dt>
     <dd>
-    Begin or unpause a timer.
+    Begin or unpause a timer.  If showing the remaining time on-screen, its color will be set to white.
 
 
     <h3>Parameters:</h3>
@@ -286,7 +293,27 @@ LevelFuncs.OnControlPhase = <span class="keyword">function</span>(dt)
     <strong>Pause(t)</strong>
     </dt>
     <dd>
-    Pause the timer
+    Pause the timer.  If showing the remaining time on-screen, its color will be set to yellow.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">t</span>
+         the timer in question
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Stop"></a>
+    <strong>Stop(t)</strong>
+    </dt>
+    <dd>
+    Stop the timer.
 
 
     <h3>Parameters:</h3>
@@ -306,7 +333,7 @@ LevelFuncs.OnControlPhase = <span class="keyword">function</span>(dt)
     <strong>GetRemainingTime(t)</strong>
     </dt>
     <dd>
-    Get the remaining time for a timer
+    Get the remaining time for a timer.
 
 
     <h3>Parameters:</h3>
@@ -355,7 +382,7 @@ LevelFuncs.OnControlPhase = <span class="keyword">function</span>(dt)
     <strong>GetTotalTime(t)</strong>
     </dt>
     <dd>
-    Get the total time for a timer
+    Get the total time for a timer.
  This is the amount of time the timer will start with, as well as when starting a new loop
 
 
@@ -453,7 +480,7 @@ LevelFuncs.OnControlPhase = <span class="keyword">function</span>(dt)
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
-<i style="float:right;">Last updated 2022-07-31 20:38:24 </i>
+<i style="float:right;">Last updated 2022-08-01 20:38:26 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>
