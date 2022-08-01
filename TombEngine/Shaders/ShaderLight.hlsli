@@ -105,18 +105,20 @@ float3 DoPointLight(float3 pos, float3 n, ShaderLight light)
 	float3 lightPos = light.Position.xyz;
 	float3 color = light.Color.xyz;
 	float intensity = saturate(light.Intensity);
-	float radius = light.Out;
 
 	float3 lightVec = (lightPos - pos);
 	float distance = length(lightVec);
 
-	if (distance > radius)
+	if (distance > light.Out)
 		return float3(0, 0, 0);
 	else
 	{
 		lightVec = normalize(lightVec);
 		float d = saturate(dot(n, lightVec));
-		float attenuation = ((radius - distance) / radius);
+
+		float attenuation = 1.0f;
+		if (distance > light.In)
+			attenuation = 1.0f - saturate((distance - light.In) / (light.Out - light.In));
 
 		return saturate(color * intensity * attenuation * d);
 	}
@@ -127,18 +129,20 @@ float3 DoShadowLight(float3 pos, float3 n, ShaderLight light)
 	float3 lightPos = light.Position.xyz;
 	float3 color = light.Color.xyz;
 	float intensity = light.Intensity;
-	float radius = light.Out;
 
 	float3 lightVec = (lightPos - pos);
 	float distance = length(lightVec);
 
-	if (distance > radius)
+	if (distance > light.Out)
 		return float3(0, 0, 0);
 	else
 	{
 		lightVec = normalize(lightVec);
 		float d = saturate(dot(n, lightVec));
-		float attenuation = ((radius - distance) / radius);
+
+		float attenuation = 1.0f;
+		if (distance > light.In)
+			attenuation = 1.0f - saturate((distance - light.In) / (light.Out - light.In));
 
 		float absolute = color * intensity * attenuation;
 		float directional = absolute * d;
