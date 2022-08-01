@@ -6,7 +6,10 @@
 	class EulerAngles
 	{
 	public:
-		// Normalized radian components
+		// TODO: Remove.
+		void SetY(float angle = 0.0f);
+
+		// Normalized angle components (stored as radians)
 		Angle x = 0.0f;
 		Angle y = 0.0f;
 		Angle z = 0.0f;
@@ -19,43 +22,33 @@
 		EulerAngles(Vector3 directionVector);
 
 		// Utilities
-		void Normalize();
-		static EulerAngles Normalize(EulerAngles orient);
+		static bool Compare(EulerAngles euler0, EulerAngles euler1, float epsilon = 0.0f);
+		static EulerAngles ShortestAngularDistance(EulerAngles eulerFrom, EulerAngles eulerTo);
+		Vector3 GetDirectionVector();
 
-		bool Compare(EulerAngles orient, float epsilon = 0.0f);
-		static bool Compare(EulerAngles orient0, EulerAngles orient1, float epsilon = 0.0f);
+		void InterpolateLinear(EulerAngles eulerTo, float alpha = 1.0f, float epsilon = 0.0f);
+		static EulerAngles InterpolateLinear(EulerAngles eulerFrom, EulerAngles eulerTo, float alpha = 1.0f, float epsilon = 0.0f);
 
-		EulerAngles ShortestAngularDistance(EulerAngles orientTo);
-		static EulerAngles ShortestAngularDistance(EulerAngles orientFrom, EulerAngles orientTo);
+		void InterpolateConstant(EulerAngles eulerTo, float rate);
+		static EulerAngles InterpolateConstant(EulerAngles eulerFrom, EulerAngles eulerTo, float rate);
 
-		void InterpolateLinear(EulerAngles orientTo, float alpha = 1.0f, float epsilon = 0.0f);
-		static EulerAngles InterpolateLinear(EulerAngles orientFrom, EulerAngles orientTo, float alpha = 1.0f, float epsilon = 0.0f);
-
-		void InterpolateConstant(EulerAngles orientTo, float rate);
-		static EulerAngles InterpolateConstant(EulerAngles orientFrom, EulerAngles orientTo, float rate);
-
-		void InterpolateConstantEaseOut(EulerAngles orientTo, float rate, float alpha = 1.0f, float epsilon = 0.0f);
-		static EulerAngles InterpolateConstantEaseOut(EulerAngles orientFrom, EulerAngles orientTo, float rate, float alpha = 1.0f, float epsilon = 0.0f);
+		void InterpolateConstantEaseOut(EulerAngles eulerTo, float rate, float alpha = 1.0f, float epsilon = 0.0f);
+		static EulerAngles InterpolateConstantEaseOut(EulerAngles eulerFrom, EulerAngles eulerTo, float rate, float alpha = 1.0f, float epsilon = 0.0f);
 
 		static EulerAngles OrientBetweenPoints(Vector3 origin, Vector3 target);
 
-		Vector3 GetDirectionVector();
-
-		// TODO: Remove.
-		void SetY(float angle = 0.0f);
-
 		// Operators
-		bool		 operator ==(EulerAngles orient);
-		bool		 operator !=(EulerAngles orient);
-		EulerAngles  operator +(EulerAngles orient);
-		EulerAngles  operator -(EulerAngles orient);
-		EulerAngles  operator *(EulerAngles orient);
+		bool		 operator ==(EulerAngles euler);
+		bool		 operator !=(EulerAngles euler);
+		EulerAngles  operator +(EulerAngles euler);
+		EulerAngles  operator -(EulerAngles euler);
+		EulerAngles  operator *(EulerAngles euler);
 		EulerAngles  operator *(float value);
 		EulerAngles	 operator /(float value);
-		EulerAngles& operator =(EulerAngles orient);
-		EulerAngles& operator +=(EulerAngles orient);
-		EulerAngles& operator -=(EulerAngles orient);
-		EulerAngles& operator *=(EulerAngles orient);
+		EulerAngles& operator =(EulerAngles euler);
+		EulerAngles& operator +=(EulerAngles euler);
+		EulerAngles& operator -=(EulerAngles euler);
+		EulerAngles& operator *=(EulerAngles euler);
 		EulerAngles& operator *=(float value);
 		EulerAngles& operator /=(float value);
 	};

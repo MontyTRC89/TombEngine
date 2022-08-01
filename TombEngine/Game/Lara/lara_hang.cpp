@@ -172,11 +172,11 @@ void lara_col_shimmy_left(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->Control.MoveAngle = Angle::Normalize(item->Pose.Orientation.y - Angle::DegToRad(90.0f));
+	lara->Control.MoveAngle = item->Pose.Orientation.y - Angle::DegToRad(90.0f);
 	coll->Setup.Radius = LARA_RADIUS;
 
 	TestLaraHang(item, coll);
-	lara->Control.MoveAngle = Angle::Normalize(item->Pose.Orientation.y - Angle::DegToRad(90.0f));
+	lara->Control.MoveAngle = item->Pose.Orientation.y - Angle::DegToRad(90.0f);
 }
 
 // State:		LS_SHIMMY_RIGHT (31)
@@ -216,11 +216,11 @@ void lara_col_shimmy_right(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->Control.MoveAngle = Angle::Normalize(item->Pose.Orientation.y + Angle::DegToRad(90.0f));
+	lara->Control.MoveAngle = item->Pose.Orientation.y + Angle::DegToRad(90.0f);
 	coll->Setup.Radius = LARA_RADIUS;
 
 	TestLaraHang(item, coll);
-	lara->Control.MoveAngle = Angle::Normalize(item->Pose.Orientation.y + Angle::DegToRad(90.0f));
+	lara->Control.MoveAngle = item->Pose.Orientation.y + Angle::DegToRad(90.0f);
 }
 
 // State:		LS_SHIMMY_OUTER_LEFT (107), LS_SHIMMY_OUTER_RIGHT (108), LS_SHIMMY_INNER_LEFT (109), LS_SHIMMY_INNER_RIGHT (110)

@@ -1061,7 +1061,7 @@ void LaraGetNewTarget(ItemInfo* laraItem, WeaponInfo* weaponInfo)
 							{
 								TargetList[targets] = item;
 								++targets;
-								if (abs(angles.y) < Angle::Normalize(bestYrot + Angle::DegToRad(15.0f)) &&
+								if (abs(angles.y) < (bestYrot + Angle::DegToRad(15.0f)) &&
 									distance < bestDistance)
 								{
 									bestDistance = distance;

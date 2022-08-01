@@ -183,7 +183,7 @@ void DoLaraMonkeyStep(ItemInfo* item, CollisionInfo* coll)
 
 void DoLaraCrawlToHangSnap(ItemInfo* item, CollisionInfo* coll)
 {
-	coll->Setup.ForwardAngle = Angle::Normalize(item->Pose.Orientation.y + Angle::DegToRad(180.0f));
+	coll->Setup.ForwardAngle = item->Pose.Orientation.y + Angle::DegToRad(180.0f);
 	GetCollisionInfo(coll, item);
 
 	SnapItemToLedge(item, coll);
@@ -193,7 +193,7 @@ void DoLaraCrawlToHangSnap(ItemInfo* item, CollisionInfo* coll)
 	if (coll->Middle.Bridge < 0)
 	{
 		TranslateItem(item, item->Pose.Orientation.y, -LARA_RADIUS_CRAWL);
-		item->Pose.Orientation.SetY(item->Pose.Orientation.y + Angle::DegToRad(180.0f));
+		item->Pose.Orientation.y += Angle::DegToRad(180.0f);
 	}
 }
 
@@ -739,7 +739,7 @@ void SetLaraSlideAnimation(ItemInfo* item, CollisionInfo* coll)
 	else if (coll->FloorTilt.y < -2 && -coll->FloorTilt.y > abs(coll->FloorTilt.x))
 		angle = Angle::DegToRad(0.0f);
 
-	float delta = Angle::Normalize(angle - item->Pose.Orientation.y);
+	float delta = angle - item->Pose.Orientation.y;
 
 	ShiftItem(item, coll);
 

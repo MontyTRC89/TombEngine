@@ -465,7 +465,7 @@ namespace TEN::Entities::Generic
 
 		if (Lara.Control.Rope.Direction)
 		{
-			if (item->Pose.Orientation.x > 0 && Angle::Normalize(item->Pose.Orientation.x - Lara.Control.Rope.LastX) < Angle::DegToRad(-0.55))
+			if (item->Pose.Orientation.x > 0 && item->Pose.Orientation.x - Lara.Control.Rope.LastX < Angle::DegToRad(-0.55))
 			{
 				Lara.Control.Rope.ArcFront = Lara.Control.Rope.LastX;
 				Lara.Control.Rope.Direction = 0;
@@ -496,7 +496,7 @@ namespace TEN::Entities::Generic
 		}
 		else
 		{
-			if (item->Pose.Orientation.x < 0 && Angle::Normalize(item->Pose.Orientation.x - Lara.Control.Rope.LastX) < Angle::DegToRad(0.55))
+			if (item->Pose.Orientation.x < 0 && item->Pose.Orientation.x - Lara.Control.Rope.LastX < Angle::DegToRad(0.55))
 			{
 				Lara.Control.Rope.ArcBack = Lara.Control.Rope.LastX;
 				Lara.Control.Rope.Direction = 1;

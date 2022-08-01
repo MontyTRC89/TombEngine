@@ -107,7 +107,7 @@ bool LaraDeflectEdgeJump(ItemInfo* item, CollisionInfo* coll)
 		break;
 
 	case CT_CLAMP:
-		TranslateItem(item, Angle::Normalize(item->Pose.Orientation.y + Angle::DegToRad(180.0f)), CLICK(1.5f), 0, 0);
+		TranslateItem(item, item->Pose.Orientation.y + Angle::DegToRad(180.0f), CLICK(1.5f), 0, 0);
 		item->Animation.Velocity = 0;
 		coll->Middle.Floor = 0;
 
@@ -146,7 +146,7 @@ void LaraSlideEdgeJump(ItemInfo* item, CollisionInfo* coll)
 		break;
 
 	case CT_CLAMP:
-		TranslateItem(item, Angle::Normalize(item->Pose.Orientation.y + Angle::DegToRad(180.0f)), CLICK(1.5f), 0, 0);
+		TranslateItem(item, item->Pose.Orientation.y + Angle::DegToRad(180.0f), CLICK(1.5f), 0, 0);
 		item->Animation.Velocity = 0;
 		coll->Middle.Floor = 0;
 
@@ -481,8 +481,8 @@ void LaraSwimCollision(ItemInfo* item, CollisionInfo* coll)
 	if (item->Pose.Orientation.x < Angle::DegToRad(-90.0f) ||
 		item->Pose.Orientation.x > Angle::DegToRad(90.0f))
 	{
-		lara->Control.MoveAngle = Angle::Normalize(item->Pose.Orientation.y + Angle::DegToRad(180.0f));
-		coll->Setup.ForwardAngle = Angle::Normalize(item->Pose.Orientation.y - Angle::DegToRad(180.0f));
+		lara->Control.MoveAngle = item->Pose.Orientation.y + Angle::DegToRad(180.0f);
+		coll->Setup.ForwardAngle = item->Pose.Orientation.y - Angle::DegToRad(180.0f);
 	}
 	else
 	{
@@ -503,11 +503,11 @@ void LaraSwimCollision(ItemInfo* item, CollisionInfo* coll)
 	GetCollisionInfo(coll, item, Vector3Int(0, height / 2, 0));
 
 	auto c1 = *coll;
-	c1.Setup.ForwardAngle = Angle::Normalize(c1.Setup.ForwardAngle + Angle::DegToRad(45.0f));
+	c1.Setup.ForwardAngle = c1.Setup.ForwardAngle + Angle::DegToRad(45.0f);
 	GetCollisionInfo(&c1, item, Vector3Int(0, height / 2, 0));
 
 	auto c2 = *coll;
-	c2.Setup.ForwardAngle = Angle::Normalize(c2.Setup.ForwardAngle - Angle::DegToRad(45.0f));
+	c2.Setup.ForwardAngle = c2.Setup.ForwardAngle - Angle::DegToRad(45.0f);
 	GetCollisionInfo(&c2, item, Vector3Int(0, height / 2, 0));
 
 	ShiftItem(item, coll);

@@ -94,7 +94,7 @@ bool TestValidLedge(ItemInfo* item, CollisionInfo* coll, bool ignoreHeadroom, bo
 
 bool TestValidLedgeAngle(ItemInfo* item, CollisionInfo* coll)
 {
-	return (abs(Angle::Normalize(coll->NearestLedgeAngle - item->Pose.Orientation.y)) <= LARA_GRAB_THRESHOLD);
+	return (abs(coll->NearestLedgeAngle - item->Pose.Orientation.y) <= LARA_GRAB_THRESHOLD);
 }
 
 bool TestLaraHang(ItemInfo* item, CollisionInfo* coll)
@@ -2026,8 +2026,8 @@ bool TestLaraLadderShimmyUp(ItemInfo* item, CollisionInfo* coll)
 	auto* lara = GetLaraInfo(item);
 
 	int y = item->Pose.Position.y - LARA_HEIGHT_STRETCH;
-	auto probeLeft = GetCollision(item, Angle::Normalize(item->Pose.Orientation.y - Angle::DegToRad(90.0f)), coll->Setup.Radius);
-	auto probeRight = GetCollision(item, Angle::Normalize(item->Pose.Orientation.y + Angle::DegToRad(90.0f)), coll->Setup.Radius);
+	auto probeLeft = GetCollision(item, item->Pose.Orientation.y - Angle::DegToRad(90.0f), coll->Setup.Radius);
+	auto probeRight = GetCollision(item, item->Pose.Orientation.y + Angle::DegToRad(90.0f), coll->Setup.Radius);
 	auto probeMiddle = GetCollision(item);
 
 	if (lara->Control.CanClimbLadder &&

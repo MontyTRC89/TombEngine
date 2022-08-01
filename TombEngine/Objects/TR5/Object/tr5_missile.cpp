@@ -61,12 +61,12 @@ void MissileControl(short itemNumber)
 			if (fx->flag1 == 0 || fx->flag1 == 1)
 				fx->speed++;
 
-			float dy = Angle::Normalize(angles.y - fx->pos.Orientation.y);
+			float dy = angles.y - fx->pos.Orientation.y;
 			if (abs(dy) > Angle::DegToRad(180.0f))
 				dy = -dy;
 			dy /= 8;
 
-			float dx = Angle::Normalize(angles.x - fx->pos.Orientation.x);
+			float dx = angles.x - fx->pos.Orientation.x;
 			if (abs(dx) > Angle::DegToRad(180.0f))
 				dx = -dx;
 			dx /= 8;

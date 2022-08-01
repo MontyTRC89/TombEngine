@@ -176,8 +176,8 @@ void UpdateBats()
 		{
 			short Velocity = bat->Velocity * 128;
 
-			float xAngle = Angle::Normalize(abs(angles.x - bat->Pose.Orientation.x) / 8);
-			float yAngle = Angle::Normalize(abs(angles.y - bat->Pose.Orientation.y) / 8);
+			float xAngle = abs(angles.x - bat->Pose.Orientation.x) / 8;
+			float yAngle = abs(angles.y - bat->Pose.Orientation.y) / 8;
 
 			if (xAngle < -Velocity)
 				xAngle = -Velocity;

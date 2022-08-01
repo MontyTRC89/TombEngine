@@ -484,11 +484,11 @@ void TorpedoControl(short itemNumber)
 
 	if (item->ItemFlags[1] - 1 < 60)
 	{
-		float dry = Angle::Normalize(angles.y - item->Pose.Orientation.y);
+		float dry = angles.y - item->Pose.Orientation.y;
 		if (abs(dry) > Angle::DegToRad(180.0f))
 			dry = -dry;
 
-		float drx = Angle::Normalize(angles.x - item->Pose.Orientation.x);
+		float drx = angles.x - item->Pose.Orientation.x;
 		if (abs(drx) > Angle::DegToRad(180.0f))
 			drx = -drx;
 

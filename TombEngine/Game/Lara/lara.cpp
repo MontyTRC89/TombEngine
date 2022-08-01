@@ -409,17 +409,14 @@ function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] =
 	lara_col_crawl_turn_180,//172
 };
 
+void sample(Angle input)
+{
+	return;
+}
+
 void LaraControl(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
-
-	auto someAngle = Angle(9.0f);
-
-	someAngle += Angle::DegToRad(9);
-
-	float aFloat = 9.0f;
-	aFloat += someAngle;
-	aFloat + someAngle;
 
 	if (lara->Control.Weapon.HasFired)
 	{

@@ -819,11 +819,11 @@ void LookCamera(ItemInfo* item)
 		lara->ExtraHeadRot.y = Angle::DegToRad(80.0f);
 
 	// Prevent following of breathing motion.
-	if (abs(Angle::Normalize(lara->ExtraHeadRot.x - OldCam.pos.Orientation.x)) >= Angle::DegToRad(0.09f))
+	if (abs(lara->ExtraHeadRot.x - OldCam.pos.Orientation.x) >= Angle::DegToRad(0.09f))
 		OldCam.pos.Orientation.x = (lara->ExtraHeadRot.x + OldCam.pos.Orientation.x) / 2.0f;
 	else
 		OldCam.pos.Orientation.x = lara->ExtraHeadRot.x;
-	if (abs(Angle::Normalize(lara->ExtraHeadRot.y - OldCam.pos.Orientation.y)) >= Angle::DegToRad(0.09f))
+	if (abs(lara->ExtraHeadRot.y - OldCam.pos.Orientation.y) >= Angle::DegToRad(0.09f))
 		OldCam.pos.Orientation.y = (lara->ExtraHeadRot.y + OldCam.pos.Orientation.y) / 2.0f;
 	else
 		OldCam.pos.Orientation.SetY(lara->ExtraHeadRot.y);
@@ -1041,7 +1041,7 @@ void LookCamera(ItemInfo* item)
 
 	if (Camera.mikeAtLara)
 	{
-		Camera.actualAngle = Angle::Normalize(item->Pose.Orientation.y + lara->ExtraHeadRot.y + lara->ExtraTorsoRot.y);
+		Camera.actualAngle = item->Pose.Orientation.y + lara->ExtraHeadRot.y + lara->ExtraTorsoRot.y;
 		Camera.mikePos.x = item->Pose.Position.x;
 		Camera.mikePos.y = item->Pose.Position.y;
 		Camera.mikePos.z = item->Pose.Position.z;
@@ -1303,7 +1303,7 @@ void BinocularCamera(ItemInfo* item)
 
 	if (Camera.mikeAtLara)
 	{
-		Camera.actualAngle = Angle::Normalize(item->Pose.Orientation.y + lara->ExtraHeadRot.y + lara->ExtraTorsoRot.y);
+		Camera.actualAngle = item->Pose.Orientation.y + lara->ExtraHeadRot.y + lara->ExtraTorsoRot.y;
 		Camera.mikePos = item->Pose.Position;
 	}
 	else

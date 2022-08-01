@@ -366,12 +366,12 @@ void lara_as_climb_idle(ItemInfo* item, CollisionInfo* coll)
 	if (TrInput & IN_LEFT || TrInput & IN_LSTEP)
 	{
 		item->Animation.TargetState = LS_LADDER_LEFT;
-		lara->Control.MoveAngle = Angle::Normalize(item->Pose.Orientation.y - Angle::DegToRad(90.0f));
+		lara->Control.MoveAngle = item->Pose.Orientation.y - Angle::DegToRad(90.0f);
 	}
 	else if (TrInput & IN_RIGHT || TrInput & IN_RSTEP)
 	{
 		item->Animation.TargetState = LS_LADDER_RIGHT;
-		lara->Control.MoveAngle = Angle::Normalize(item->Pose.Orientation.y + Angle::DegToRad(90.0f));
+		lara->Control.MoveAngle = item->Pose.Orientation.y + Angle::DegToRad(90.0f);
 	}
 	else if (TrInput & IN_JUMP)
 	{
@@ -379,7 +379,7 @@ void lara_as_climb_idle(ItemInfo* item, CollisionInfo* coll)
 		{
 			item->Animation.TargetState = LS_JUMP_BACK;
 			lara->Control.HandStatus = HandStatus::Free;
-			lara->Control.MoveAngle = Angle::Normalize(item->Pose.Orientation.y + Angle::DegToRad(180.0f));
+			lara->Control.MoveAngle = item->Pose.Orientation.y + Angle::DegToRad(180.0f);
 		}
 	}
 

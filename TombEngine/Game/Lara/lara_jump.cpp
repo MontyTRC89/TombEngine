@@ -111,7 +111,7 @@ void lara_col_jump_forward(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->Control.MoveAngle = (item->Animation.Velocity > 0) ? item->Pose.Orientation.y : Angle::Normalize(item->Pose.Orientation.y + Angle::DegToRad(180.0f));
+	lara->Control.MoveAngle = (item->Animation.Velocity > 0) ? item->Pose.Orientation.y : item->Pose.Orientation.y + Angle::DegToRad(180.0f);
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
 	coll->Setup.LowerCeilingBound = BAD_JUMP_CEILING;
@@ -435,7 +435,7 @@ void lara_as_jump_back(ItemInfo* item, CollisionInfo* coll)
 // Control:		lara_as_jump_back()
 void lara_col_jump_back(ItemInfo* item, CollisionInfo* coll)
 {
-	LaraJumpCollision(item, coll, Angle::Normalize(item->Pose.Orientation.y + Angle::DegToRad(180.0f)));
+	LaraJumpCollision(item, coll, item->Pose.Orientation.y + Angle::DegToRad(180.0f));
 }
 
 // State:		LS_JUMP_RIGHT (26)
@@ -492,7 +492,7 @@ void lara_as_jump_right(ItemInfo* item, CollisionInfo* coll)
 // Control:		lara_as_jump_right()
 void lara_col_jump_right(ItemInfo* item, CollisionInfo* coll)
 {
-	LaraJumpCollision(item, coll, Angle::Normalize(item->Pose.Orientation.y + Angle::DegToRad(90.0f)));
+	LaraJumpCollision(item, coll, item->Pose.Orientation.y + Angle::DegToRad(90.0f));
 }
 
 // State:		LS_JUMP_LEFT (27)
@@ -549,7 +549,7 @@ void lara_as_jump_left(ItemInfo* item, CollisionInfo* coll)
 // Control:		lara_as_jump_left()
 void lara_col_jump_left(ItemInfo* item, CollisionInfo* coll)
 {
-	LaraJumpCollision(item, coll, Angle::Normalize(item->Pose.Orientation.y - Angle::DegToRad(90.0f)));
+	LaraJumpCollision(item, coll, item->Pose.Orientation.y - Angle::DegToRad(90.0f));
 }
 
 // State:		LS_JUMP_UP (28)
@@ -626,7 +626,7 @@ void lara_col_jump_up(ItemInfo* item, CollisionInfo* coll)
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
 	coll->Setup.LowerCeilingBound = BAD_JUMP_CEILING;
-	coll->Setup.ForwardAngle = (item->Animation.Velocity >= 0) ? lara->Control.MoveAngle : Angle::Normalize(lara->Control.MoveAngle + Angle::DegToRad(180.0f));
+	coll->Setup.ForwardAngle = (item->Animation.Velocity >= 0) ? lara->Control.MoveAngle : lara->Control.MoveAngle + Angle::DegToRad(180.0f);
 	coll->Setup.Mode = CollisionProbeMode::FreeForward;
 	GetCollisionInfo(coll, item);
 

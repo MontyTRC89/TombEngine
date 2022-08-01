@@ -385,13 +385,13 @@ void CreatureJoint(ItemInfo* item, short joint, float required)
 
 	auto* creature = GetCreatureInfo(item);
 
-	float change = Angle::Normalize(required - creature->JointRotation[joint]);
+	float change = required - creature->JointRotation[joint];
 	if (change > Angle::DegToRad(3.0f))
 		change = Angle::DegToRad(3.0f);
 	else if (change < Angle::DegToRad(-3.0f))
 		change = Angle::DegToRad(-3.0f);
 
-	creature->JointRotation[joint] = Angle::Normalize(creature->JointRotation[joint] + change);
+	creature->JointRotation[joint] = creature->JointRotation[joint] + change;
 
 	if (creature->JointRotation[joint] > Angle::DegToRad(70.0f))
 		creature->JointRotation[joint] = Angle::DegToRad(70.0f);
@@ -401,7 +401,7 @@ void CreatureJoint(ItemInfo* item, short joint, float required)
 
 void CreatureTilt(ItemInfo* item, float angle)
 {
-	angle = Angle::Normalize((angle * 4) - item->Pose.Orientation.z);
+	angle = (angle * 4) - item->Pose.Orientation.z;
 
 	if (angle < Angle::DegToRad(-3.0f))
 		angle = Angle::DegToRad(-3.0f);
@@ -424,7 +424,7 @@ float CreatureTurn(ItemInfo* item, float maxTurn)
 
 	auto* creature = GetCreatureInfo(item);
 	auto direction = creature->Target - item->Pose.Position;
-	float turnAngle = Angle::Normalize(atan2(direction.z, direction.x) - item->Pose.Orientation.y);
+	float turnAngle = atan2(direction.z, direction.x) - item->Pose.Orientation.y;
 
 	int range = item->Animation.Velocity * (Angle::DegToRad(90.0f) / maxTurn);
 	int distance = pow(direction.x, 2) + pow(direction.z, 2);
@@ -437,7 +437,7 @@ float CreatureTurn(ItemInfo* item, float maxTurn)
 	else if (turnAngle < -maxTurn)
 		turnAngle = -maxTurn;
 
-	item->Pose.Orientation.SetY(item->Pose.Orientation.y + turnAngle);
+	item->Pose.Orientation.y += turnAngle;
 	return turnAngle;
 }
 
@@ -713,9 +713,9 @@ int CreatureAnimation(short itemNumber, float angle, float tilt)
 		else if (angle > Angle::DegToRad(20.0f))
 			angle = Angle::DegToRad(20.0f);
 
-		if (angle < Angle::Normalize(item->Pose.Orientation.x - Angle::DegToRad(1.0f)))
+		if (angle < (item->Pose.Orientation.x - Angle::DegToRad(1.0f)))
 			item->Pose.Orientation.x = item->Pose.Orientation.x - Angle::DegToRad(1.0f);
-		else if (angle > Angle::Normalize(item->Pose.Orientation.x + Angle::DegToRad(1.0f)))
+		else if (angle > (item->Pose.Orientation.x + Angle::DegToRad(1.0f)))
 			item->Pose.Orientation.x = item->Pose.Orientation.x + Angle::DegToRad(1.0f);
 		else
 			item->Pose.Orientation.x = angle;
@@ -1520,8 +1520,8 @@ void CreatureAIInfo(ItemInfo* item, AI_INFO* AI)
 			AI->distance = AI->verticalDistance = INT_MAX;
 	}
 
-	AI->angle = Angle::Normalize(angle - item->Pose.Orientation.y);
-	AI->enemyFacing = Angle::Normalize(Angle::DegToRad(180.0f) + angle - enemy->Pose.Orientation.y);
+	AI->angle = angle - item->Pose.Orientation.y;
+	AI->enemyFacing = Angle::DegToRad(180.0f) + angle - enemy->Pose.Orientation.y;
 
 	vector.x = abs(vector.x);
 	vector.z = abs(vector.z);

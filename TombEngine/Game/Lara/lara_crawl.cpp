@@ -652,7 +652,7 @@ void lara_col_crawl_back(ItemInfo* item, CollisionInfo* coll)
 	item->Animation.IsAirborne = false;
 	lara->Control.KeepLow = TestLaraKeepLow(item, coll);
 	lara->Control.IsLow = true;
-	lara->Control.MoveAngle = Angle::Normalize(item->Pose.Orientation.y + Angle::DegToRad(180.0f));
+	lara->Control.MoveAngle = item->Pose.Orientation.y + Angle::DegToRad(180.0f);
 	coll->Setup.Radius = LARA_RADIUS_CRAWL;
 	coll->Setup.Height = LARA_HEIGHT_CRAWL;
 	coll->Setup.LowerFloorBound = CRAWL_STEPUP_HEIGHT;

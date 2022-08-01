@@ -173,12 +173,12 @@ namespace TEN::Entities::TR4
 					float resultYrot, resultXrot;
 					int shiftYrot, shiftXrot;
 					int random = locust->randomRotation * 128;
-					resultYrot = Angle::Normalize(angles.y - locust->pos.Orientation.y);
+					resultYrot = angles.y - locust->pos.Orientation.y;
 
 					if (abs(resultYrot) > Angle::DegToRad(180.0f))
 						resultYrot = locust->pos.Orientation.y - angles.y;
 
-					resultXrot = Angle::Normalize(angles.x - locust->pos.Orientation.x);
+					resultXrot = angles.x - locust->pos.Orientation.x;
 
 					if (abs(resultXrot) > Angle::DegToRad(180.0f))
 						resultXrot = locust->pos.Orientation.x - angles.y;

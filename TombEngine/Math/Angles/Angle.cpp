@@ -7,25 +7,17 @@
 //{
 	Angle::Angle(float radians)
 	{
-		this->Component = Normalize(radians);
+		this->Value = Normalize(radians);
 	}
 
-	void Angle::Normalize()
+	Angle Angle::FromDeg(float degrees)
 	{
-		this->Component = Normalize(Component);
+		return Angle(DegToRad(degrees));
 	}
 
-	float Angle::Normalize(float angle)
+	void Angle::Compare(Angle angle, float epsilon)
 	{
-		if (angle < -PI || angle > PI)
-			return atan2(sin(angle), cos(angle));
-
-		return angle;
-
-		// Alternative (faster?) method:
-		/*return (angle > 0) ?
-			fmod(angle + PI, PI * 2) - PI :
-			fmod(angle - PI, PI * 2) + PI;*/
+		this->Value = Compare(*this, angle, epsilon);
 	}
 
 	bool Angle::Compare(float angle0, float angle1, float epsilon)
@@ -39,11 +31,21 @@
 		return false;
 	}
 
+	void Angle::ShortestAngularDistance(Angle angleTo)
+	{
+		this->Value = ShortestAngularDistance(*this, angleTo);
+	}
+	
 	float Angle::ShortestAngularDistance(float angleFrom, float angleTo)
 	{
 		return Normalize(angleTo - angleFrom);
 	}
 
+	void Angle::InterpolateLinear(Angle angleTo, float alpha, float epsilon)
+	{
+		this->Value = InterpolateLinear(*this, angleTo, alpha, epsilon);
+	}
+	
 	float Angle::InterpolateLinear(float angleFrom, float angleTo, float alpha, float epsilon)
 	{
 		alpha = ClampAlpha(alpha);
@@ -58,6 +60,11 @@
 		return angleTo;
 	}
 
+	void Angle::InterpolateConstant(Angle angleTo, float rate)
+	{
+		this->Value = InterpolateConstant(*this, angleTo, rate);
+	}
+	
 	float Angle::InterpolateConstant(float angleFrom, float angleTo, float rate)
 	{
 		rate = ClampEpsilon(rate);
@@ -69,6 +76,11 @@
 		}
 
 		return angleTo;
+	}
+
+	void Angle::InterpolateConstantEaseOut(Angle angleTo, float rate, float alpha, float epsilon)
+	{
+		this->Value = InterpolateConstantEaseOut(*this, angleTo, rate, alpha, epsilon);
 	}
 
 	float Angle::InterpolateConstantEaseOut(float angleFrom, float angleTo, float rate, float alpha, float epsilon)
@@ -108,7 +120,7 @@
 
 	float Angle::DegToRad(float degrees)
 	{
-		return Normalize(degrees * (PI / 180.0f)); // dont normalise
+		return (degrees * (PI / 180.0f));
 	}
 
 	float Angle::RadToDeg(float radians)
@@ -118,7 +130,7 @@
 
 	float Angle::ShrtToRad(short shortForm)
 	{
-		return Normalize(shortForm * ((360.0f / (USHRT_MAX + 1)) * (PI / 180.0f))); // dont normalise
+		return (shortForm * ((360.0f / (USHRT_MAX + 1)) * (PI / 180.0f)));
 	}
 
 	short Angle::DegToShrt(float degrees)
@@ -133,96 +145,114 @@
 
 	Angle::operator float() const
 	{
-		return Component;
+		return Value;
 	}
 
-	Angle Angle::operator ==(float value)
+	bool Angle::operator ==(float value)
 	{
-		return (Component == value);
+		return (Value == value);
 	}
 	
-	Angle Angle::operator !=(float value)
+	bool Angle::operator !=(float value)
 	{
-		return (Component != value);
+		return (Value != value);
 	}
 	
 	Angle Angle::operator +(float value)
 	{
-		return Angle(Component + value);
+		return Angle(Value + value);
 	}
 	
 	Angle Angle::operator -(float value)
 	{
-		return Angle(Component - value);
+		return Angle(Value - value);
 	}
 	
 	Angle Angle::operator *(float value)
 	{
-		return Angle(Component * value);
+		return Angle(Value * value);
 	}
 	
 	Angle Angle::operator *(int value)
 	{
-		return Angle(Component * value);
+		return Angle(Value * value);
 	}
 	
 	Angle Angle::operator /(float value)
 	{
-		return Angle(Component / value);
+		return Angle(Value / value);
 	}
 	
 	Angle Angle::operator /(int value)
 	{
-		return Angle(Component / value);
+		return Angle(Value / value);
 	}
 
 	Angle& Angle::operator =(float value)
 	{
-		this->Component = value;
+		this->Value = value;
 		this->Normalize();
 		return *this;
 	}
 	
 	Angle& Angle::operator +=(float value)
 	{
-		this->Component += value;
+		this->Value += value;
 		this->Normalize();
 		return *this;
 	}
 	
 	Angle& Angle::operator -=(float value)
 	{
-		this->Component -= value;
+		this->Value -= value;
 		this->Normalize();
 		return *this;
 	}
 	
 	Angle& Angle::operator *=(float value)
 	{
-		this->Component *= value;
+		this->Value *= value;
 		this->Normalize();
 		return *this;
 	}
 	
 	Angle& Angle::operator *=(int value)
 	{
-		this->Component *= value;
+		this->Value *= value;
 		this->Normalize();
 		return *this;
 	}
 	
 	Angle& Angle::operator /=(float value)
 	{
-		this->Component /= value;
+		this->Value /= value;
 		this->Normalize();
 		return *this;
 	}
 	
 	Angle& Angle::operator /=(int value)
 	{
-		this->Component *= value;
+		this->Value *= value;
 		this->Normalize();
 		return *this;
+	}
+
+	void Angle::Normalize()
+	{
+		this->Value = Normalize(Value);
+	}
+
+	float Angle::Normalize(float angle)
+	{
+		if (angle < -PI || angle > PI)
+			return atan2(sin(angle), cos(angle));
+
+		return angle;
+
+		// Alternative (faster?) method:
+		/*return (angle > 0) ?
+			fmod(angle + PI, PI * 2) - PI :
+			fmod(angle - PI, PI * 2) + PI;*/
 	}
 
 	float Angle::ClampAlpha(float value)

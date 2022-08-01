@@ -3,6 +3,8 @@
 
 #include "Math/Angles/Angle.h"
 
+void EulerAngles::SetY(float angle) {}
+
 //namespace TEN::Math::Angles
 //{
 	EulerAngles const EulerAngles::Zero = EulerAngles(0.0f, 0.0f, 0.0f);
@@ -26,29 +28,11 @@
 		*this = EulerAngles::Zero;
 	}
 
-	void EulerAngles::Normalize()
+	bool EulerAngles::Compare(EulerAngles euler0, EulerAngles euler1, float epsilon)
 	{
-		this->x = Angle::Normalize(x);
-		this->y = Angle::Normalize(y);
-		this->z = Angle::Normalize(z);
-	}
-
-	EulerAngles EulerAngles::Normalize(EulerAngles orient)
-	{
-		orient.Normalize();
-		return orient;
-	}
-
-	bool EulerAngles::Compare(EulerAngles orient, float epsilon)
-	{
-		return Compare(*this, orient, epsilon);
-	}
-
-	bool EulerAngles::Compare(EulerAngles orient0, EulerAngles orient1, float epsilon)
-	{
-		if (Angle::Compare(orient0.x, orient1.x, epsilon) &&
-			Angle::Compare(orient0.y, orient1.y, epsilon) &&
-			Angle::Compare(orient0.z, orient1.z, epsilon))
+		if (Angle::Compare(euler0.x, euler1.x, epsilon) &&
+			Angle::Compare(euler0.y, euler1.y, epsilon) &&
+			Angle::Compare(euler0.z, euler1.z, epsilon))
 		{
 			return true;
 		}
@@ -56,61 +40,56 @@
 		return false;
 	}
 
-	EulerAngles EulerAngles::ShortestAngularDistance(EulerAngles orientTo)
+	EulerAngles EulerAngles::ShortestAngularDistance(EulerAngles eulerFrom, EulerAngles eulerTo)
 	{
-		return (orientTo - *this);
+		return (eulerTo - eulerFrom);
 	}
 
-	EulerAngles EulerAngles::ShortestAngularDistance(EulerAngles orientFrom, EulerAngles orientTo)
+	void EulerAngles::InterpolateLinear(EulerAngles eulerTo, float alpha, float epsilon)
 	{
-		return (orientTo - orientFrom);
+		this->x.InterpolateLinear(eulerTo.x, alpha, epsilon);
+		this->y.InterpolateLinear(eulerTo.y, alpha, epsilon);
+		this->z.InterpolateLinear(eulerTo.z, alpha, epsilon);
 	}
 
-	void EulerAngles::InterpolateLinear(EulerAngles orientTo, float alpha, float epsilon)
-	{
-		this->x = Angle::InterpolateLinear(x, orientTo.x, alpha, epsilon);
-		this->y = Angle::InterpolateLinear(y, orientTo.y, alpha, epsilon);
-		this->z = Angle::InterpolateLinear(z, orientTo.z, alpha, epsilon);
-	}
-
-	EulerAngles EulerAngles::InterpolateLinear(EulerAngles orientFrom, EulerAngles orientTo, float alpha, float epsilon)
+	EulerAngles EulerAngles::InterpolateLinear(EulerAngles eulerFrom, EulerAngles eulerTo, float alpha, float epsilon)
 	{
 		return EulerAngles(
-			Angle::InterpolateLinear(orientFrom.x, orientTo.x, alpha, epsilon),
-			Angle::InterpolateLinear(orientFrom.y, orientTo.y, alpha, epsilon),
-			Angle::InterpolateLinear(orientFrom.z, orientTo.z, alpha, epsilon)
+			Angle::InterpolateLinear(eulerFrom.x, eulerTo.x, alpha, epsilon),
+			Angle::InterpolateLinear(eulerFrom.y, eulerTo.y, alpha, epsilon),
+			Angle::InterpolateLinear(eulerFrom.z, eulerTo.z, alpha, epsilon)
 		);
 	}
 
-	void EulerAngles::InterpolateConstant(EulerAngles orientTo, float rate)
+	void EulerAngles::InterpolateConstant(EulerAngles eulerTo, float rate)
 	{
-		this->x = Angle::InterpolateConstant(x, orientTo.x, rate);
-		this->y = Angle::InterpolateConstant(y, orientTo.y, rate);
-		this->z = Angle::InterpolateConstant(z, orientTo.z, rate);
+		this->x.InterpolateConstant(eulerTo.x, rate);
+		this->y.InterpolateConstant(eulerTo.y, rate);
+		this->z.InterpolateConstant(eulerTo.z, rate);
 	}
 
-	EulerAngles EulerAngles::InterpolateConstant(EulerAngles orientFrom, EulerAngles orientTo, float rate)
+	EulerAngles EulerAngles::InterpolateConstant(EulerAngles eulerFrom, EulerAngles eulerTo, float rate)
 	{
 		return EulerAngles(
-			Angle::InterpolateConstant(orientFrom.x, orientTo.x, rate),
-			Angle::InterpolateConstant(orientFrom.y, orientTo.y, rate),
-			Angle::InterpolateConstant(orientFrom.z, orientTo.z, rate)
+			Angle::InterpolateConstant(eulerFrom.x, eulerTo.x, rate),
+			Angle::InterpolateConstant(eulerFrom.y, eulerTo.y, rate),
+			Angle::InterpolateConstant(eulerFrom.z, eulerTo.z, rate)
 		);
 	}
 
-	void EulerAngles::InterpolateConstantEaseOut(EulerAngles orientTo, float rate, float alpha, float epsilon)
+	void EulerAngles::InterpolateConstantEaseOut(EulerAngles eulerTo, float rate, float alpha, float epsilon)
 	{
-		this->x = Angle::InterpolateConstantEaseOut(x, orientTo.x, rate, alpha, epsilon);
-		this->y = Angle::InterpolateConstantEaseOut(y, orientTo.y, rate, alpha, epsilon);
-		this->z = Angle::InterpolateConstantEaseOut(z, orientTo.z, rate, alpha, epsilon);
+		this->x.InterpolateConstantEaseOut(eulerTo.x, alpha, epsilon);
+		this->y.InterpolateConstantEaseOut(eulerTo.y, alpha, epsilon);
+		this->z.InterpolateConstantEaseOut(eulerTo.z, alpha, epsilon);
 	}
 
-	EulerAngles EulerAngles::InterpolateConstantEaseOut(EulerAngles orientFrom, EulerAngles orientTo, float rate, float alpha, float epsilon)
+	EulerAngles EulerAngles::InterpolateConstantEaseOut(EulerAngles eulerFrom, EulerAngles eulerTo, float rate, float alpha, float epsilon)
 	{
 		return EulerAngles(
-			Angle::InterpolateConstantEaseOut(orientFrom.x, orientTo.x, rate, alpha, epsilon),
-			Angle::InterpolateConstantEaseOut(orientFrom.y, orientTo.y, rate, alpha, epsilon),
-			Angle::InterpolateConstantEaseOut(orientFrom.z, orientTo.z, rate, alpha, epsilon)
+			Angle::InterpolateConstantEaseOut(eulerFrom.x, eulerTo.x, rate, alpha, epsilon),
+			Angle::InterpolateConstantEaseOut(eulerFrom.y, eulerTo.y, rate, alpha, epsilon),
+			Angle::InterpolateConstantEaseOut(eulerFrom.z, eulerTo.z, rate, alpha, epsilon)
 		);
 	}
 
@@ -118,13 +97,13 @@
 	EulerAngles EulerAngles::OrientBetweenPoints(Vector3 origin, Vector3 target)
 	{
 		auto direction = target - origin;
-		float yOrient = atan2(direction.x, direction.z);
+		auto yOrient = Angle(atan2(direction.x, direction.z));
 
 		auto vector = direction;
 		auto matrix = Matrix::CreateRotationY(-yOrient);
 		Vector3::Transform(vector, matrix, vector);
 
-		float xOrient = -atan2(direction.y, vector.z);
+		auto xOrient = Angle(-atan2(direction.y, vector.z));
 		return EulerAngles(xOrient, yOrient, 0.0f);
 	}
 
@@ -143,34 +122,29 @@
 		);
 	}
 
-	void EulerAngles::SetY(float angle)
+	bool EulerAngles::operator ==(EulerAngles euler)
 	{
-		this->y = Angle::Normalize(angle);
+		return (x == euler.x && y == euler.y && z == euler.z);
 	}
 
-	bool EulerAngles::operator ==(EulerAngles orient)
+	bool EulerAngles::operator !=(EulerAngles euler)
 	{
-		return (x == orient.x && y == orient.y && z == orient.z);
+		return (x != euler.x || y != euler.y || z != euler.z);
 	}
 
-	bool EulerAngles::operator !=(EulerAngles orient)
+	EulerAngles EulerAngles::operator +(EulerAngles euler)
 	{
-		return (x != orient.x || y != orient.y || z != orient.z);
+		return EulerAngles(x + euler.x, y + euler.y, z + euler.z);
 	}
 
-	EulerAngles EulerAngles::operator +(EulerAngles orient)
+	EulerAngles EulerAngles::operator -(EulerAngles euler)
 	{
-		return EulerAngles(x + orient.x, y + orient.y, z + orient.z);
+		return EulerAngles(x - euler.x, y - euler.y, z - euler.z);
 	}
 
-	EulerAngles EulerAngles::operator -(EulerAngles orient)
+	EulerAngles EulerAngles::operator *(EulerAngles euler)
 	{
-		return EulerAngles(x - orient.x, y - orient.y, z - orient.z);
-	}
-
-	EulerAngles EulerAngles::operator *(EulerAngles orient)
-	{
-		return EulerAngles(x * orient.x, y * orient.y, z * orient.z);
+		return EulerAngles(x * euler.x, y * euler.y, z * euler.z);
 	}
 
 	EulerAngles EulerAngles::operator *(float value)
@@ -183,35 +157,35 @@
 		return EulerAngles(x / value, y / value, z / value);
 	}
 
-	EulerAngles& EulerAngles::operator =(EulerAngles orient)
+	EulerAngles& EulerAngles::operator =(EulerAngles euler)
 	{
-		this->x = orient.x;
-		this->y = orient.y;
-		this->z = orient.z;
+		this->x = euler.x;
+		this->y = euler.y;
+		this->z = euler.z;
 		return *this;
 	}
 	
-	EulerAngles& EulerAngles::operator +=(EulerAngles orient)
+	EulerAngles& EulerAngles::operator +=(EulerAngles euler)
 	{
-		this->x += orient.x;
-		this->y += orient.y;
-		this->z += orient.z;
+		this->x += euler.x;
+		this->y += euler.y;
+		this->z += euler.z;
 		return *this;
 	}
 
-	EulerAngles& EulerAngles::operator -=(EulerAngles orient)
+	EulerAngles& EulerAngles::operator -=(EulerAngles euler)
 	{
-		this->x -= orient.x;
-		this->y -= orient.y;
-		this->z -= orient.z;
+		this->x -= euler.x;
+		this->y -= euler.y;
+		this->z -= euler.z;
 		return *this;
 	}
 
-	EulerAngles& EulerAngles::operator *=(EulerAngles orient)
+	EulerAngles& EulerAngles::operator *=(EulerAngles euler)
 	{
-		this->x *= orient.x;
-		this->y *= orient.y;
-		this->z *= orient.z;
+		this->x *= euler.x;
+		this->y *= euler.y;
+		this->z *= euler.z;
 		return *this;
 	}
 

@@ -584,7 +584,7 @@ bool Move3DPosTo3DPos(PHD_3DPOS* src, PHD_3DPOS* dest, int velocity, float angle
 		Lara.Control.Count.PositionAdjust = 0;
 	}
 
-	float deltaAngle = Angle::Normalize(dest->Orientation.x - src->Orientation.x);
+	float deltaAngle = dest->Orientation.x - src->Orientation.x;
 	if (deltaAngle > angleAdd)
 		src->Orientation.x += angleAdd;
 	else if (deltaAngle < -angleAdd)
