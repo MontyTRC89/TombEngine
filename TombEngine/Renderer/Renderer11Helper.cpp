@@ -9,14 +9,13 @@
 #include "Game/Lara/lara.h"
 #include "Game/collision/sphere.h"
 #include "Flow/ScriptInterfaceFlowHandler.h"
-#include "Renderer\RenderView\RenderView.h"
+#include "Renderer/RenderView/RenderView.h"
 #include "Objects/TR3/Vehicles/quad_bike.h"
 #include "Objects/TR3/Vehicles/rubber_boat.h"
 #include "Objects/TR3/Vehicles/upv.h"
 #include "Objects/TR3/Vehicles/big_gun.h"
 #include "Objects/TR4/Vehicles/jeep.h"
 #include "Objects/TR4/Vehicles/motorbike.h"
-#include <algorithm>
 #include "Game/itemdata/creature_info.h"
 #include "Objects/TR3/Vehicles/quad_bike_info.h"
 #include "Objects/TR4/Vehicles/jeep_info.h"
@@ -25,6 +24,7 @@
 #include "Objects/TR3/Vehicles/upv_info.h"
 #include "Objects/TR3/Vehicles/big_gun_info.h"
 #include "Game/items.h"
+#include <algorithm>
 
 extern GameConfiguration g_Configuration;
 extern ScriptInterfaceFlowHandler *g_GameFlow;
@@ -52,7 +52,7 @@ namespace TEN::Renderer
 		static std::vector<int> boneIndexList;
 		boneIndexList.clear();
 		
-		RendererBone *Bones[32] = {};
+		RendererBone *Bones[MAX_BONES] = {};
 		int nextBone = 0;
 
 		Matrix rotation;
@@ -359,9 +359,12 @@ namespace TEN::Renderer
 		return (!m_windowed);
 	}
 
-	void Renderer11::UpdateCameraMatrices(CAMERA_INFO *cam, float roll, float fov)
+	void Renderer11::UpdateCameraMatrices(CAMERA_INFO *cam, float roll, float fov, float farView)
 	{
-		gameCamera = RenderView(cam, roll, fov, 32, 102400, g_Configuration.Width, g_Configuration.Height);
+		if (farView < MIN_FAR_VIEW)
+			farView = DEFAULT_FAR_VIEW;
+
+		gameCamera = RenderView(cam, roll, fov, 32, farView, g_Configuration.Width, g_Configuration.Height);
 	}
 
 	bool Renderer11::SphereBoxIntersection(Vector3 boxMin, Vector3 boxMax, Vector3 sphereCentre, float sphereRadius)

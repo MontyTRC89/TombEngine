@@ -10,6 +10,7 @@
 #include "Game/gui.h"
 #include "Vec3/Vec3.h"
 #include "Objects/ScriptInterfaceObjectsHandler.h"
+#include "Specific/trutils.h"
 
 /***
 Functions for use in Flow.lua, settings.lua and strings.lua
@@ -170,10 +171,10 @@ void FlowHandler::SetTitleScreenImagePath(std::string const& path)
 	TitleScreenImagePath = path;
 }
 
-void FlowHandler::SetGameFarView(byte val)
+void FlowHandler::SetGameFarView(short val)
 {
 	bool cond = val <= 127 && val >= 1;
-	std::string msg{ "Game far view value must be in the range [1, 127]." };
+	std::string msg{ "Game far view value must be in the range [1, 255]." };
 	if (!ScriptAssert(cond, msg))
 	{
 		ScriptWarn("Setting game far view to 32.");
@@ -220,14 +221,11 @@ int FlowHandler::GetLevelNumber(std::string const& fileName)
 	if (fileName.empty())
 		return -1;
 
-	auto lcFilename = fileName;
-	std::transform(lcFilename.begin(), lcFilename.end(), lcFilename.begin(), [](unsigned char c) { return std::tolower(c); });
+	auto lcFilename = TEN::Utils::ToLower(fileName);
 
 	for (int i = 0; i < Levels.size(); i++)
 	{
-		auto level = this->GetLevel(i)->FileName;
-		std::transform(level.begin(), level.end(), level.begin(), [](unsigned char c) { return std::tolower(c); });
-
+		auto level = TEN::Utils::ToLower(this->GetLevel(i)->FileName);
 		if (level == lcFilename && std::filesystem::exists(fileName))
 			return i;
 	}
@@ -308,17 +306,16 @@ bool FlowHandler::DoFlow()
 
 			// Load level
 			CurrentLevel = header.Level;
+			GameTimer = header.Timer;
 			loadFromSavegame = true;
 
 			break;
 		case GameStatus::LevelComplete:
 			if (LevelComplete >= Levels.size())
-			{
-				// TODO: final credits
-				CurrentLevel = 0;
-			}
+				CurrentLevel = 0; // TODO: final credits
 			else
-				CurrentLevel++;
+				CurrentLevel = LevelComplete;
+			LevelComplete = 0;
 			break;
 		}
 	}
@@ -330,4 +327,9 @@ bool FlowHandler::DoFlow()
 bool FlowHandler::CanPlayAnyLevel() const
 {
 	return PlayAnyLevel;
+}
+
+short FlowHandler::GetGameFarView() const
+{
+	return GameFarView;
 }
