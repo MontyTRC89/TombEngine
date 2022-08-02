@@ -143,6 +143,7 @@ static constexpr char ScriptReserved_FadeIn[]						= "FadeIn";
 static constexpr char ScriptReserved_FadeOut[]						= "FadeOut";
 static constexpr char ScriptReserved_SetCineBars[]					= "SetCineBars";
 static constexpr char ScriptReserved_SetFOV[]						= "SetFOV";
+static constexpr char ScriptReserved_GetFOV[]						= "GetFOV";
 
 static constexpr char ScriptReserved_KeyHeld[]						= "KeyHeld";
 static constexpr char ScriptReserved_KeyHit[]						= "KeyHit";
