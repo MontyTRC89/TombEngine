@@ -180,24 +180,24 @@ namespace TEN::Entities::TR4
 					if (abs(AI.angle) >= Angle::DegToRad(10.0f))
 					{
 						if (AI.angle >= 0)
-							item->Pose.Orientation.SetY(item->Pose.Orientation.y + Angle::DegToRad(10.0f));
+							item->Pose.Orientation.y += Angle::DegToRad(10.0f);
 						else
-							item->Pose.Orientation.SetY(item->Pose.Orientation.y - Angle::DegToRad(10.0f));
+							item->Pose.Orientation.y -= Angle::DegToRad(10.0f);
 					}
 					else
-						item->Pose.Orientation.SetY(item->Pose.Orientation.y + AI.angle);
+						item->Pose.Orientation.y += AI.angle;
 				}
 				else if (item->AIBits & MODIFY || Lara.Vehicle != NO_ITEM)
 				{
 					if (abs(AI.angle) >= Angle::DegToRad(2.0f))
 					{
 						if (AI.angle >= 0)
-							item->Pose.Orientation.SetY(item->Pose.Orientation.y + Angle::DegToRad(2.0f));
+							item->Pose.Orientation.y += Angle::DegToRad(2.0f);
 						else
-							item->Pose.Orientation.SetY(item->Pose.Orientation.y - Angle::DegToRad(2.0f));
+							item->Pose.Orientation.y -= Angle::DegToRad(2.0f);
 					}
 					else
-						item->Pose.Orientation.SetY(item->Pose.Orientation.y + AI.angle);
+						item->Pose.Orientation.y += AI.angle;
 				}
 
 				if (item->AIBits & GUARD)
@@ -684,7 +684,7 @@ namespace TEN::Entities::TR4
 					laraItem->Animation.AnimNumber = LA_DRAG_BODY;
 					laraItem->Animation.ActiveState = LS_MISC_CONTROL;
 					laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
-					laraItem->Pose.Orientation.SetY(item->Pose.Orientation.y);
+					laraItem->Pose.Orientation.y = item->Pose.Orientation.y;
 					ResetLaraFlex(laraItem);
 					Lara.Control.IsMoving = false;
 					Lara.Control.HandStatus = HandStatus::Busy;

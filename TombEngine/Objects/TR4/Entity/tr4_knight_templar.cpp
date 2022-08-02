@@ -165,12 +165,12 @@ namespace TEN::Entities::TR4
 			if (abs(AI.angle) >= Angle::DegToRad(1.0f))
 			{
 				if (AI.angle >= 0)
-					item->Pose.Orientation.SetY(item->Pose.Orientation.y + Angle::DegToRad(1.0f));
+					item->Pose.Orientation.y += Angle::DegToRad(1.0f);
 				else
-					item->Pose.Orientation.SetY(item->Pose.Orientation.y - Angle::DegToRad(1.0f));
+					item->Pose.Orientation.y -= Angle::DegToRad(1.0f);
 			}
 			else
-				item->Pose.Orientation.SetY(item->Pose.Orientation.y + AI.angle);
+				item->Pose.Orientation.y += AI.angle;
 
 			frameNumber = item->Animation.FrameNumber;
 			frameBase = g_Level.Anims[item->Animation.AnimNumber].frameBase;
@@ -230,12 +230,12 @@ namespace TEN::Entities::TR4
 			if (abs(AI.angle) >= Angle::DegToRad(1.0f))
 			{
 				if (AI.angle >= 0)
-					item->Pose.Orientation.SetY(item->Pose.Orientation.y + Angle::DegToRad(1.0f));
+					item->Pose.Orientation.y += Angle::DegToRad(1.0f);
 				else
-					item->Pose.Orientation.SetY(item->Pose.Orientation.y - Angle::DegToRad(1.0f));
+					item->Pose.Orientation.y -= Angle::DegToRad(1.0f);
 			}
 			else
-				item->Pose.Orientation.SetY(item->Pose.Orientation.y + AI.angle);
+				item->Pose.Orientation.y += AI.angle;
 
 			if (item->HitStatus)
 			{

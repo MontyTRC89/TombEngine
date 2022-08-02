@@ -157,7 +157,7 @@ void TightropeCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* col
 	}
 	else
 	{
-		tightropeItem->Pose.Orientation.SetY(tightropeItem->Pose.Orientation.y + Angle::DegToRad(-180.0f));
+		tightropeItem->Pose.Orientation.y += Angle::DegToRad(-180.0f);
 
 		if (TestLaraPosition(&TightRopeBounds, tightropeItem, laraItem))
 		{
@@ -182,14 +182,14 @@ void TightropeCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* col
 			else
 				laraInfo->InteractedItem = itemNumber;
 
-			tightropeItem->Pose.Orientation.SetY(tightropeItem->Pose.Orientation.y + Angle::DegToRad(-180.0f));
+			tightropeItem->Pose.Orientation.y += Angle::DegToRad(-180.0f);
 		}
 		else
 		{
 			if (laraInfo->Control.IsMoving && laraInfo->InteractedItem == itemNumber)
 				laraInfo->Control.IsMoving = false;
 
-			tightropeItem->Pose.Orientation.SetY(tightropeItem->Pose.Orientation.y + Angle::DegToRad(-180.0f));
+			tightropeItem->Pose.Orientation.y += Angle::DegToRad(-180.0f);
 		}
 	}
 }
@@ -207,9 +207,9 @@ void HorizontalBarCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo*
 		int test2 = 0;
 		if (!test1)
 		{
-			barItem->Pose.Orientation.SetY(barItem->Pose.Orientation.y + Angle::DegToRad(-180.0f));
+			barItem->Pose.Orientation.y += Angle::DegToRad(-180.0f);
 			test2 = TestLaraPosition(&ParallelBarsBounds, barItem, laraItem);
-			barItem->Pose.Orientation.SetY(barItem->Pose.Orientation.y + Angle::DegToRad(-180.0f));
+			barItem->Pose.Orientation.y += Angle::DegToRad(-180.0f);
 		}
 
 		if (test1 || test2)
@@ -223,9 +223,9 @@ void HorizontalBarCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo*
 			ResetLaraFlex(barItem);
 
 			if (test1)
-				laraItem->Pose.Orientation.SetY(barItem->Pose.Orientation.y);
+				laraItem->Pose.Orientation.y = barItem->Pose.Orientation.y;
 			else
-				laraItem->Pose.Orientation.SetY(barItem->Pose.Orientation.y + Angle::DegToRad(-180.0f));
+				laraItem->Pose.Orientation.y = barItem->Pose.Orientation.y + Angle::DegToRad(-180.0f);
 
 			Vector3Int pos1 = { 0, -128, 512 };
 			GetLaraJointPosition(&pos1, LM_LHAND);

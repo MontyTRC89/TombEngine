@@ -298,12 +298,12 @@ void ControlGladiator(short itemNumber)
 			if (abs(AI.angle) >= Angle::DegToRad(7.0f))
 			{
 				if (AI.angle >= 0)
-					item->Pose.Orientation.SetY(item->Pose.Orientation.y + Angle::DegToRad(7.0f));
+					item->Pose.Orientation.y += Angle::DegToRad(7.0f);
 				else
-					item->Pose.Orientation.SetY(item->Pose.Orientation.y - Angle::DegToRad(7.0f));
+					item->Pose.Orientation.y -= Angle::DegToRad(7.0f);
 			}
 			else
-				item->Pose.Orientation.SetY(item->Pose.Orientation.y + AI.angle);
+				item->Pose.Orientation.y += AI.angle;
 
 			if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 10)
 			{

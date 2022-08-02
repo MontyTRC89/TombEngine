@@ -288,12 +288,12 @@ void RollingBallControl(short itemNumber)
 		/*if (((angle - item->Pose.Orientation.y) & 0x7fff) >= 512)
 		{
 			if (angle <= item->Pose.Orientation.y || angle - item->Pose.Orientation.y >= Angle::DegToRad(180.0f))
-				item->Pose.Orientation.SetY(item->Pose.Orientation.y - CLICK(2));
+				item->Pose.Orientation.y -= CLICK(2));
 			else
-				item->Pose.Orientation.SetY(item->Pose.Orientation.y + CLICK(2));
+				item->Pose.Orientation.y += CLICK(2));
 		}
 		else*/
-			item->Pose.Orientation.SetY(angle);
+			item->Pose.Orientation.y = angle;
 	}
 
 	item->Pose.Orientation.x -= ((abs(item->ItemFlags[0]) + abs(item->ItemFlags[1])) / 2) / vDivider;
@@ -337,7 +337,7 @@ void ClassicRollingBallCollision(short itemNum, ItemInfo* lara, CollisionInfo* c
 			if (lara->HitPoints > 0)
 			{
 				lara->HitPoints = -1;//?
-				lara->Pose.Orientation.SetY(item->Pose.Orientation.y);
+				lara->Pose.Orientation.y = item->Pose.Orientation.y;
 				lara->Pose.Position.z = 0;
 				lara->Pose.Orientation.z = 0.0f;	
 

@@ -100,13 +100,13 @@ void PuzzleHoleCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* co
 					if (g_Gui.IsObjectInInventory(receptableItem->ObjectNumber - (ID_PUZZLE_HOLE1 - ID_PUZZLE_ITEM1)))
 						g_Gui.SetEnterInventory(receptableItem->ObjectNumber - (ID_PUZZLE_HOLE1 - ID_PUZZLE_ITEM1));
 
-					receptableItem->Pose.Orientation.SetY(oldYrot);
+					receptableItem->Pose.Orientation.y = oldYrot;
 					return;
 				}
 
 				if (g_Gui.GetInventoryItemChosen() != receptableItem->ObjectNumber - (ID_PUZZLE_HOLE1 - ID_PUZZLE_ITEM1))
 				{
-					receptableItem->Pose.Orientation.SetY(oldYrot);
+					receptableItem->Pose.Orientation.y = oldYrot;
 					return;
 				}
 			}
@@ -118,7 +118,7 @@ void PuzzleHoleCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* co
 				{
 					laraInfo->InteractedItem = itemNumber;
 					g_Gui.SetInventoryItemChosen(NO_ITEM);
-					receptableItem->Pose.Orientation.SetY(oldYrot);
+					receptableItem->Pose.Orientation.y = oldYrot;
 					return;
 				}
 			}
@@ -146,7 +146,7 @@ void PuzzleHoleCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* co
 			laraInfo->Control.IsMoving = false;
 			laraInfo->Control.HandStatus = HandStatus::Busy;
 			laraInfo->InteractedItem = itemNumber;
-			receptableItem->Pose.Orientation.SetY(oldYrot);
+			receptableItem->Pose.Orientation.y = oldYrot;
 			receptableItem->Flags |= TRIGGERED;
 			return;
 		}
@@ -160,7 +160,7 @@ void PuzzleHoleCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* co
 			}
 		}
 
-		receptableItem->Pose.Orientation.SetY(oldYrot);
+		receptableItem->Pose.Orientation.y = oldYrot;
 	}
 	else
 	{

@@ -883,8 +883,8 @@ void GrenadeControl(short itemNumber)
 
 		DoProjectileDynamics(itemNumber, oldPos.x, oldPos.y, oldPos.z, velocity.x, velocity.y, velocity.z);
 
-		item->Animation.TargetState = item->Pose.Orientation.y;
-		item->Pose.Orientation.SetY(sYrot);
+		item->Animation.TargetState = Angle::RadToShrt(item->Pose.Orientation.y);
+		item->Pose.Orientation.y = sYrot;
 	}
 
 	short probedRoomNumber = GetCollision(item).RoomNumber;

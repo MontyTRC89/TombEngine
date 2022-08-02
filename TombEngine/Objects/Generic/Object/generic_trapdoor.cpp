@@ -64,9 +64,9 @@ void CeilingTrapDoorCollision(short itemNumber, ItemInfo* laraItem, CollisionInf
 	bool itemIsAbove = trapDoorItem->Pose.Position.y <= laraItem->Pose.Position.y - LARA_HEIGHT + LARA_HEADROOM;
 
 	bool result = TestLaraPosition(&CeilingTrapDoorBounds, trapDoorItem, laraItem);
-	laraItem->Pose.Orientation.SetY(laraItem->Pose.Orientation.y + Angle::DegToRad(180.0f));
+	laraItem->Pose.Orientation.y += Angle::DegToRad(180.0f);
 	bool result2 = TestLaraPosition(&CeilingTrapDoorBounds, trapDoorItem, laraItem);
-	laraItem->Pose.Orientation.SetY(laraItem->Pose.Orientation.y + Angle::DegToRad(180.0f));
+	laraItem->Pose.Orientation.y += Angle::DegToRad(180.0f);
 
 	if (TrInput & IN_ACTION &&
 		laraItem->Animation.ActiveState == LS_JUMP_UP &&
@@ -78,7 +78,7 @@ void CeilingTrapDoorCollision(short itemNumber, ItemInfo* laraItem, CollisionInf
 	{
 		AlignLaraPosition(&CeilingTrapDoorPos, trapDoorItem, laraItem);
 		if (result2)
-			laraItem->Pose.Orientation.SetY(laraItem->Pose.Orientation.y + Angle::DegToRad(180.0f));
+			laraItem->Pose.Orientation.y += Angle::DegToRad(180.0f);
 		
 		ResetLaraFlex(laraItem);
 		laraItem->Animation.VerticalVelocity = 0;

@@ -67,5 +67,5 @@ void SpinningBladeControl(short itemNumber)
 		ItemNewRoom(itemNumber, probe.RoomNumber);
 
 	if (spinning && item->Animation.ActiveState == 1)
-		item->Pose.Orientation.SetY(item->Pose.Orientation.y + Angle::DegToRad(-180.0f));
+		item->Pose.Orientation.y += Angle::DegToRad(-180.0f);
 }

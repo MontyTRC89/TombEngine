@@ -394,7 +394,7 @@ void lara_as_climb_stepoff_left(ItemInfo* item, CollisionInfo* coll)
 	Camera.targetAngle = Angle::DegToRad(-60.0f);
 	Camera.targetElevation = Angle::DegToRad(-15.0f);
 
-	item->Pose.Orientation.SetY(item->Pose.Orientation.y - Angle::DegToRad(90.0f));
+	item->Pose.Orientation.y -= Angle::DegToRad(90.0f);
 }
 
 void lara_as_climb_stepoff_right(ItemInfo* item, CollisionInfo* coll)
@@ -404,7 +404,7 @@ void lara_as_climb_stepoff_right(ItemInfo* item, CollisionInfo* coll)
 	Camera.targetAngle = Angle::DegToRad(60.0f);
 	Camera.targetElevation = Angle::DegToRad(-15.0f);
 
-	item->Pose.Orientation.SetY(item->Pose.Orientation.y + Angle::DegToRad(90.0f));
+	item->Pose.Orientation.y += Angle::DegToRad(90.0f);
 }
 
 // --------
@@ -630,9 +630,9 @@ int LaraClimbRightCornerTest(ItemInfo* item, CollisionInfo* coll)
 		lara->NextCornerPos.Position.x = item->Pose.Position.x = x;
 		lara->NextCornerPos.Position.y = item->Pose.Position.y;
 		lara->NextCornerPos.Position.z = item->Pose.Position.z = z;
-		lara->NextCornerPos.Orientation.SetY(item->Pose.Orientation.y + Angle::DegToRad(90.0f));
+		lara->NextCornerPos.Orientation.y = item->Pose.Orientation.y + Angle::DegToRad(90.0f);
 		lara->Control.MoveAngle = lara->NextCornerPos.Orientation.y;
-		item->Pose.Orientation.SetY(lara->NextCornerPos.Orientation.y);
+		item->Pose.Orientation.y = lara->NextCornerPos.Orientation.y;
 
 		result = LaraTestClimbPos(item, coll->Setup.Radius, coll->Setup.Radius + LADDER_TEST_DISTANCE, -CLICK(2), CLICK(2), &shift);
 		item->ItemFlags[3] = result;
@@ -673,9 +673,9 @@ int LaraClimbRightCornerTest(ItemInfo* item, CollisionInfo* coll)
 			lara->NextCornerPos.Position.x = item->Pose.Position.x = x;
 			lara->NextCornerPos.Position.y = item->Pose.Position.y;
 			lara->NextCornerPos.Position.z = item->Pose.Position.z = z;
-			lara->NextCornerPos.Orientation.SetY(item->Pose.Orientation.y - Angle::DegToRad(90.0f));
+			lara->NextCornerPos.Orientation.y = item->Pose.Orientation.y - Angle::DegToRad(90.0f);
 			lara->Control.MoveAngle = lara->NextCornerPos.Orientation.y;
-			item->Pose.Orientation.SetY(lara->NextCornerPos.Orientation.y);
+			item->Pose.Orientation.y = lara->NextCornerPos.Orientation.y;
 
 			result = LaraTestClimbPos(item, coll->Setup.Radius, coll->Setup.Radius + LADDER_TEST_DISTANCE, -CLICK(2), CLICK(2), &shift);
 			item->ItemFlags[3] = result;
@@ -723,9 +723,9 @@ int LaraClimbLeftCornerTest(ItemInfo* item, CollisionInfo* coll)
 		lara->NextCornerPos.Position.x = item->Pose.Position.x = x;
 		lara->NextCornerPos.Position.y = item->Pose.Position.y;
 		lara->NextCornerPos.Position.z = item->Pose.Position.z = z;
-		lara->NextCornerPos.Orientation.SetY(item->Pose.Orientation.y - Angle::DegToRad(90.0f));
+		lara->NextCornerPos.Orientation.y = item->Pose.Orientation.y - Angle::DegToRad(90.0f);
 		lara->Control.MoveAngle = lara->NextCornerPos.Orientation.y;
-		item->Pose.Orientation.SetY(lara->NextCornerPos.Orientation.y);
+		item->Pose.Orientation.y = lara->NextCornerPos.Orientation.y;
 
 		result = LaraTestClimbPos(item, coll->Setup.Radius, -coll->Setup.Radius - LADDER_TEST_DISTANCE, -CLICK(2), CLICK(2), &shift);
 		item->ItemFlags[3] = result;
@@ -765,9 +765,9 @@ int LaraClimbLeftCornerTest(ItemInfo* item, CollisionInfo* coll)
 			lara->NextCornerPos.Position.x = item->Pose.Position.x = x;
 			lara->NextCornerPos.Position.y = item->Pose.Position.y;
 			lara->NextCornerPos.Position.z = item->Pose.Position.z = z;
-			lara->NextCornerPos.Orientation.SetY(item->Pose.Orientation.y + Angle::DegToRad(90.0f));
+			lara->NextCornerPos.Orientation.y = item->Pose.Orientation.y + Angle::DegToRad(90.0f);
 			lara->Control.MoveAngle = lara->NextCornerPos.Orientation.y;
-			item->Pose.Orientation.SetY(lara->NextCornerPos.Orientation.y);
+			item->Pose.Orientation.y = lara->NextCornerPos.Orientation.y;
 
 			item->ItemFlags[3] = LaraTestClimbPos(item, coll->Setup.Radius, -coll->Setup.Radius - LADDER_TEST_DISTANCE, -CLICK(2), CLICK(2), &shift);
 			result = item->ItemFlags[3] != 0;

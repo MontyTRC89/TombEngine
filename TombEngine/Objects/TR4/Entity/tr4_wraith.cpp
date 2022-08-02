@@ -104,7 +104,7 @@ namespace TEN::Entities::TR4
 				else
 				{
 					item->ItemFlags[2] += velocity;
-					item->Pose.Orientation.SetY(item->Pose.Orientation.y + Angle::ShrtToRad(item->ItemFlags[2]));
+					item->Pose.Orientation.y += Angle::ShrtToRad(item->ItemFlags[2]);
 				}
 			}
 			else if (item->ItemFlags[2] >= 0)
@@ -112,11 +112,11 @@ namespace TEN::Entities::TR4
 			else
 			{
 				item->ItemFlags[2] -= velocity;
-				item->Pose.Orientation.SetY(item->Pose.Orientation.y + Angle::ShrtToRad(item->ItemFlags[2]));
+				item->Pose.Orientation.y += Angle::ShrtToRad(item->ItemFlags[2]);
 			}
 		}
 		else
-			item->Pose.Orientation.SetY(item->Pose.Orientation.y + angleH);
+			item->Pose.Orientation.y += angleH;
 
 		if (abs(angleV) >= item->ItemFlags[3] || angleV > 0 != item->ItemFlags[3] > 0)
 		{

@@ -189,8 +189,8 @@ void AlignToEdge(ItemInfo* item, short edgeDist)
 		edgeDist = WALL_MASK;
 
 	// Align to closest cardinal facing.
-	item->Pose.Orientation.SetY(item->Pose.Orientation.y + Angle::DegToRad(45.0f));
-	item->Pose.Orientation.SetY(Angle::RadToShrt(item->Pose.Orientation.y) & Angle::DegToShrt(270.0f)); // TODO
+	item->Pose.Orientation.y += Angle::DegToRad(45.0f);
+	item->Pose.Orientation.y = Angle::RadToShrt(item->Pose.Orientation.y) & Angle::DegToShrt(270.0f);
 
 	// Align to faced edge.
 	switch (Angle::RadToShrt(item->Pose.Orientation.y))
@@ -222,8 +222,8 @@ bool AlignToGrab(ItemInfo* item)
 {
 	bool legLeft = false;
 
-	item->Pose.Orientation.SetY(item->Pose.Orientation.y + Angle::DegToRad(45.0f));
-	item->Pose.Orientation.SetY(Angle::RadToShrt(item->Pose.Orientation.y) & Angle::DegToShrt(270.0f)); // TODO
+	item->Pose.Orientation.y += Angle::DegToRad(45.0f);
+	item->Pose.Orientation.y = Angle::RadToShrt(item->Pose.Orientation.y) & Angle::DegToShrt(270.0f);
 
 	switch (Angle::RadToShrt(item->Pose.Orientation.y))
 	{

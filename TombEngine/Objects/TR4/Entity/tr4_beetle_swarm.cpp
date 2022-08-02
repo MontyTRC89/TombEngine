@@ -69,7 +69,7 @@ namespace TEN::Entities::TR4
 
 					if (item->ItemFlags[0])
 					{
-						beetle->Pose.Orientation.SetY(2 * GetRandomControl());
+						beetle->Pose.Orientation.y = Angle::ShrtToRad(GetRandomControl() * 2);
 						beetle->VerticalVelocity= -16 - (GetRandomControl() & 0x1F);
 					}
 					else
@@ -161,9 +161,9 @@ namespace TEN::Entities::TR4
 					if (abs(dx) + abs(dz) <= SECTOR(1))
 					{
 						if (beetle->Velocity & 1)
-							beetle->Pose.Orientation.SetY(beetle->Pose.Orientation.y + Angle::DegToRad(2.8f));
+							beetle->Pose.Orientation.y += Angle::DegToRad(2.8f);
 						else
-							beetle->Pose.Orientation.SetY(beetle->Pose.Orientation.y - Angle::DegToRad(2.8f));
+							beetle->Pose.Orientation.y -= Angle::DegToRad(2.8f);
 
 						beetle->Velocity = 48 - Lara.Torch.IsLit * 64 - (abs(angle) / 128);
 						if (beetle->Velocity < -16)
@@ -177,9 +177,9 @@ namespace TEN::Entities::TR4
 						if (abs(angle) >= Angle::DegToRad(22.5f))
 						{
 							if (angle >= 0)
-								beetle->Pose.Orientation.SetY(beetle->Pose.Orientation.y + Angle::DegToRad(5.6f));
+								beetle->Pose.Orientation.y += Angle::DegToRad(5.6f);
 							else
-								beetle->Pose.Orientation.SetY(beetle->Pose.Orientation.y - Angle::DegToRad(5.6f));
+								beetle->Pose.Orientation.y -= Angle::DegToRad(5.6f);
 						}
 						else
 							beetle->Pose.Orientation.y += Angle::ShrtToRad((Wibble - i) * 8);

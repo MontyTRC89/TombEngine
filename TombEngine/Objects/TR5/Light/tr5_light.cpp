@@ -57,7 +57,7 @@ void StrobeLightControl(short itemNumber)
 
 	if (TriggerActive(item))
 	{
-		item->Pose.Orientation.SetY(item->Pose.Orientation.y + Angle::DegToRad(16.0f));
+		item->Pose.Orientation.y += Angle::DegToRad(16.0f);
 
 		byte r = 8 * (item->TriggerFlags & 0x1F);
 		byte g = (item->TriggerFlags / 4) & 0xF8;

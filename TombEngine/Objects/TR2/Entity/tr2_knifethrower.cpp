@@ -65,7 +65,7 @@ void KnifeControl(short fxNumber)
 	{
 		DoDamage(LaraItem, 50);
 
-		fx->pos.Orientation.SetY(LaraItem->Pose.Orientation.y);
+		fx->pos.Orientation.y = LaraItem->Pose.Orientation.y;
 		fx->speed = LaraItem->Animation.Velocity;
 		fx->frameNumber = fx->counter = 0;
 

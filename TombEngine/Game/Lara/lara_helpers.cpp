@@ -749,7 +749,7 @@ void SetLaraSlideAnimation(ItemInfo* item, CollisionInfo* coll)
 			return;
 
 		SetAnimation(item, LA_SLIDE_BACK_START);
-		item->Pose.Orientation.SetY(angle + Angle::DegToRad(180.0f));
+		item->Pose.Orientation.y = angle + Angle::DegToRad(180.0f);
 	}
 	else
 	{
@@ -757,7 +757,7 @@ void SetLaraSlideAnimation(ItemInfo* item, CollisionInfo* coll)
 			return;
 
 		SetAnimation(item, LA_SLIDE_FORWARD);
-		item->Pose.Orientation.SetY(angle);
+		item->Pose.Orientation.y = angle;
 	}
 
 	LaraSnapToHeight(item, coll);
@@ -857,7 +857,7 @@ void SetLaraCornerAnimation(ItemInfo* item, CollisionInfo* coll, bool flip)
 			SetAnimation(item, LA_HANG_IDLE);
 
 		item->Pose.Position = lara->NextCornerPos.Position;
-		item->Pose.Orientation.SetY(lara->NextCornerPos.Orientation.y);
+		item->Pose.Orientation.y = lara->NextCornerPos.Orientation.y;
 		coll->Setup.OldPosition = lara->NextCornerPos.Position;
 	}
 }
@@ -898,9 +898,9 @@ void ResetLaraTurnRate(ItemInfo* item, bool divesuit)
 
 	// Reset y axis turn rate.
 	if (abs(lara->Control.TurnRate.y) > Angle::DegToRad(2.0f) && !divesuit)
-		lara->Control.TurnRate.SetY(Angle::InterpolateConstant(lara->Control.TurnRate.y, 0.0f, Angle::DegToRad(2.0f)));
+		lara->Control.TurnRate.y = Angle::InterpolateConstant(lara->Control.TurnRate.y, 0.0f, Angle::DegToRad(2.0f));
 	else
-		lara->Control.TurnRate.SetY(Angle::InterpolateConstant(lara->Control.TurnRate.y, 0.0f, Angle::DegToRad(0.5f)));
+		lara->Control.TurnRate.y = Angle::InterpolateConstant(lara->Control.TurnRate.y, 0.0f, Angle::DegToRad(0.5f));
 
 	item->Pose.Orientation.y += lara->Control.TurnRate.y;
 

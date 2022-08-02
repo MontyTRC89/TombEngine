@@ -138,11 +138,11 @@ namespace TEN::Entities::TR4
 		switch (rotationType)
 		{
 		case MissileRotationType::Left:
-			src->Orientation.SetY(src->Orientation.y - std::fmod(Angle::ShrtToRad(GetRandomControl()), Angle::DegToRad(45.0f)));
+			src->Orientation.y = src->Orientation.y - std::fmod(Angle::ShrtToRad(GetRandomControl()), Angle::DegToRad(45.0f));
 			break;
 
 		case MissileRotationType::Right:
-			src->Orientation.SetY(src->Orientation.y + std::fmod(Angle::ShrtToRad(GetRandomControl()), Angle::DegToRad(45.0f)));
+			src->Orientation.y = src->Orientation.y + std::fmod(Angle::ShrtToRad(GetRandomControl()), Angle::DegToRad(45.0f));
 			break;
 		}
 

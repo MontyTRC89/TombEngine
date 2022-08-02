@@ -263,12 +263,12 @@ void SubmarineControl(short itemNumber)
 			if (abs(laraInfo.angle) >= Angle::DegToRad(2.0f))
 			{
 				if (laraInfo.angle >= 0)
-					item->Pose.Orientation.SetY(item->Pose.Orientation.y + Angle::DegToRad(2.0f));
+					item->Pose.Orientation.y += Angle::DegToRad(2.0f);
 				else
-					item->Pose.Orientation.SetY(item->Pose.Orientation.y - Angle::DegToRad(2.0f));
+					item->Pose.Orientation.y -= Angle::DegToRad(2.0f);
 			}
 			else
-				item->Pose.Orientation.SetY(item->Pose.Orientation.y + laraInfo.angle);
+				item->Pose.Orientation.y += laraInfo.angle;
 		}
 	}
 	else

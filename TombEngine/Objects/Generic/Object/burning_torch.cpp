@@ -350,7 +350,7 @@ namespace TEN::Entities::Generic
 				break;
 			}
 
-			torchItem->Pose.Orientation.SetY(laraItem->Pose.Orientation.y);
+			torchItem->Pose.Orientation.y = laraItem->Pose.Orientation.y;
 
 			if (TestLaraPosition(&FireBounds, torchItem, laraItem))
 			{
@@ -370,7 +370,7 @@ namespace TEN::Entities::Generic
 				laraInfo->InteractedItem = itemNumber;
 			}
 
-			torchItem->Pose.Orientation.SetY(rot);
+			torchItem->Pose.Orientation.y = rot;
 		}
 		if (laraItem->Animation.ActiveState == LS_MISC_CONTROL &&
 			laraInfo->InteractedItem == itemNumber &&

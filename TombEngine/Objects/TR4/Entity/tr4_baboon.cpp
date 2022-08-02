@@ -539,12 +539,12 @@ namespace TEN::Entities::TR4
 			if (abs(AI.angle) >= BABOON_ATTACK_ANGLE)
 			{
 				if (AI.angle >= 0)
-					item->Pose.Orientation.SetY(item->Pose.Orientation.y + BABOON_ATTACK_ANGLE);
+					item->Pose.Orientation.y += BABOON_ATTACK_ANGLE;
 				else
-					item->Pose.Orientation.SetY(item->Pose.Orientation.y - BABOON_ATTACK_ANGLE);
+					item->Pose.Orientation.y -= BABOON_ATTACK_ANGLE;
 			}
 			else
-				item->Pose.Orientation.SetY(item->Pose.Orientation.y + AI.angle);
+				item->Pose.Orientation.y += AI.angle;
 
 				if (creature->Flags == 0 &&
 					(item->TestBits(JointBitType::Touch, BaboonAttackJoints) ||

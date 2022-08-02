@@ -87,14 +87,14 @@ void MissileControl(short itemNumber)
 			else
 				dx = dh;
 
-			fx->pos.Orientation.x = fx->pos.Orientation.x + dx;
-			fx->pos.Orientation.SetY(fx->pos.Orientation.y + dy);
+			fx->pos.Orientation.x += dx;
+			fx->pos.Orientation.y += dy;
 		}
 		
-		fx->pos.Orientation.z += Angle::ShrtToRad(16 * fx->speed);
+		fx->pos.Orientation.z += Angle::ShrtToRad(fx->speed * 16);
 
 		if (!fx->flag1)
-			fx->pos.Orientation.z += Angle::ShrtToRad(16 * fx->speed);
+			fx->pos.Orientation.z += Angle::ShrtToRad(fx->speed * 16);
 	}
 
 	int x = fx->pos.Position.x;

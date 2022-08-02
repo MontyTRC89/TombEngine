@@ -54,7 +54,7 @@ namespace TEN::Entities::Switches
 			laraInfo->Control.IsMoving && laraInfo->InteractedItem == itemNumber)
 		{
 			short oldYrot = switchItem->Pose.Orientation.y;
-			switchItem->Pose.Orientation.SetY(laraItem->Pose.Orientation.y);
+			switchItem->Pose.Orientation.y = laraItem->Pose.Orientation.y;
 			if (TestLaraPosition(&PulleyBounds, switchItem, laraItem))
 			{
 				if (switchItem->ItemFlags[1])
@@ -75,7 +75,7 @@ namespace TEN::Entities::Switches
 
 					AddActiveItem(itemNumber);
 
-					switchItem->Pose.Orientation.SetY(oldYrot);
+					switchItem->Pose.Orientation.y = oldYrot;
 					switchItem->Status = ITEM_ACTIVE;
 
 					laraInfo->Control.IsMoving = false;
@@ -86,7 +86,7 @@ namespace TEN::Entities::Switches
 				else
 					laraInfo->InteractedItem = itemNumber;
 				
-				switchItem->Pose.Orientation.SetY(oldYrot);
+				switchItem->Pose.Orientation.y = oldYrot;
 			}
 			else
 			{
@@ -96,7 +96,7 @@ namespace TEN::Entities::Switches
 					laraInfo->Control.HandStatus = HandStatus::Free;
 				}
 
-				switchItem->Pose.Orientation.SetY(oldYrot);
+				switchItem->Pose.Orientation.y = oldYrot;
 			}
 		}
 		else if (laraItem->Animation.ActiveState != LS_PULLEY)

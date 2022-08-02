@@ -134,11 +134,11 @@ void ControlChef(short itemNumber)
 			creature->MaxTurn = 0;
 
 			if (AI.angle > 0)
-				item->Pose.Orientation.SetY(item->Pose.Orientation.y - Angle::DegToRad(2.0f));
+				item->Pose.Orientation.y -= Angle::DegToRad(2.0f);
 			else
-				item->Pose.Orientation.SetY(item->Pose.Orientation.y + Angle::DegToRad(2.0f));
+				item->Pose.Orientation.y += Angle::DegToRad(2.0f);
 			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameEnd)
-				item->Pose.Orientation.SetY(item->Pose.Orientation.y + Angle::DegToRad(-180.0f));
+				item->Pose.Orientation.y += Angle::DegToRad(-180.0f);
 
 			break;
 
@@ -148,12 +148,12 @@ void ControlChef(short itemNumber)
 			if (abs(AI.angle) >= Angle::DegToRad(2.0f))
 			{
 				if (AI.angle > 0)
-					item->Pose.Orientation.SetY(item->Pose.Orientation.y + Angle::DegToRad(2.0f));
+					item->Pose.Orientation.y += Angle::DegToRad(2.0f);
 				else
-					item->Pose.Orientation.SetY(item->Pose.Orientation.y - Angle::DegToRad(2.0f));
+					item->Pose.Orientation.y -= Angle::DegToRad(2.0f);
 			}
 			else
-				item->Pose.Orientation.SetY(item->Pose.Orientation.y + AI.angle);
+				item->Pose.Orientation.y += AI.angle;
 
 			if (!creature->Flags)
 			{

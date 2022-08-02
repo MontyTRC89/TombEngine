@@ -84,7 +84,7 @@ static void ImpThrowStones(ItemInfo* item)
 		distance = 8;
 
 	angles.x = angles.x + Angle::ShrtToRad(GetRandomControl() % (distance / 2) - (distance / 4));
-	angles.SetY(angles.y + Angle::ShrtToRad(GetRandomControl() % (distance / 4) - (distance / 8)));
+	angles.y = angles.y + Angle::ShrtToRad(GetRandomControl() % (distance / 4) - (distance / 8));
 	
 	short fxNumber = CreateNewEffect(item->RoomNumber);
 	if (fxNumber != NO_ITEM)
@@ -280,12 +280,12 @@ void ImpControl(short itemNumber)
 			if (abs(angle2) >= Angle::DegToRad(2.0f))
 			{
 				if (angle2 >= 0)
-					item->Pose.Orientation.SetY(item->Pose.Orientation.y + Angle::DegToRad(2.0f));
+					item->Pose.Orientation.y += Angle::DegToRad(2.0f);
 				else
-					item->Pose.Orientation.SetY(item->Pose.Orientation.y - Angle::DegToRad(2.0f));
+					item->Pose.Orientation.y -= Angle::DegToRad(2.0f);
 			}
 			else
-				item->Pose.Orientation.SetY(item->Pose.Orientation.y + angle2);
+				item->Pose.Orientation.y += angle2;
 		}
 
 		CreatureTilt(item, 0);

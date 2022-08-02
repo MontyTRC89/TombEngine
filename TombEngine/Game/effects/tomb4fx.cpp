@@ -1004,9 +1004,9 @@ void TriggerGunShell(short hand, short objNum, LaraWeaponType weaponType)
 				+ LaraItem->Pose.Orientation.y
 				- Angle::ShrtToRad(GetRandomControl() & 0xFFF)
 				+ Angle::DegToRad(56.25f);
-			gshell->pos.Orientation.SetY(gshell->pos.Orientation.y + Lara.LeftArm.Orientation.y
+			gshell->pos.Orientation.y = gshell->pos.Orientation.y + Lara.LeftArm.Orientation.y
 				+ Lara.ExtraTorsoRot.y 
-				+ LaraItem->Pose.Orientation.y);
+				+ LaraItem->Pose.Orientation.y;
 			if (gshell->speed < 24)
 				gshell->speed += 24;
 		}

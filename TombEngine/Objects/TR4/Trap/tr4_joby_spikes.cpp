@@ -19,7 +19,7 @@ namespace TEN::Entities::TR4
 		for (int i = 0; i < item->Animation.Mutator.size(); i++)
 			item->Animation.Mutator[i].Scale.y = 0.0f;
 
-        item->Pose.Orientation.SetY(GetRandomControl() * 1024);
+        item->Pose.Orientation.y = Angle::ShrtToRad(GetRandomControl() * 1024);
         item->ItemFlags[2] = GetRandomControl() & 1;
 
         auto probe = GetCollision(item);
@@ -76,7 +76,7 @@ namespace TEN::Entities::TR4
         if (item->ItemFlags[1] < item->ItemFlags[3])
             item->ItemFlags[1] += 3;
 
-        item->Pose.Orientation.SetY(item->Pose.Orientation.y + Angle::ShrtToRad(item->ItemFlags[0]));
+        item->Pose.Orientation.y += Angle::ShrtToRad(item->ItemFlags[0]);
 
 		// Update bone mutators
 		if (item->ItemFlags[1])

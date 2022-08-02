@@ -1737,7 +1737,7 @@ bool SaveGame::Load(int slot)
 	Lara.Control.CanLook = s->lara()->control()->can_look();
 	Lara.Control.MoveAngle = s->lara()->control()->move_angle();
 	Lara.Control.RunJumpQueued = s->lara()->control()->run_jump_queued();
-	Lara.Control.TurnRate.SetY(s->lara()->control()->turn_rate());
+	Lara.Control.TurnRate.y = s->lara()->control()->turn_rate();
 	Lara.Control.Locked = s->lara()->control()->locked();
 	Lara.Control.HandStatus = (HandStatus)s->lara()->control()->hand_status();
 	Lara.Control.Weapon.GunType = (LaraWeaponType)s->lara()->control()->weapon()->gun_type();

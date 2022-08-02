@@ -188,7 +188,7 @@ namespace TEN::Entities::TR4
             ElementPuzzleBounds.boundingBox.Z2 = box->Z2 + 200;
 
             float oldRot = puzzleItem->Pose.Orientation.y;
-            puzzleItem->Pose.Orientation.SetY(laraItem->Pose.Orientation.y);
+            puzzleItem->Pose.Orientation.y = laraItem->Pose.Orientation.y;
 
             if (TestLaraPosition(&ElementPuzzleBounds, puzzleItem, laraItem))
             {
@@ -206,7 +206,7 @@ namespace TEN::Entities::TR4
                         puzzleItem->MeshBits = 48;
                         TestTriggers(puzzleItem, true, puzzleItem->Flags & IFLAG_ACTIVATION_MASK);
                         puzzleItem->ItemFlags[0] = 1;
-                        puzzleItem->Pose.Orientation.SetY(oldRot);
+                        puzzleItem->Pose.Orientation.y = oldRot;
                         return;
                     }
 
@@ -215,7 +215,7 @@ namespace TEN::Entities::TR4
                         puzzleItem->MeshBits = 3;
                         laraInfo->Inventory.Pickups[1]--;
                         puzzleItem->ItemFlags[0] = 1;
-                        puzzleItem->Pose.Orientation.SetY(oldRot);
+                        puzzleItem->Pose.Orientation.y = oldRot;
                         return;
                     }
 
@@ -226,7 +226,7 @@ namespace TEN::Entities::TR4
                 }
             }
 
-            puzzleItem->Pose.Orientation.SetY(oldRot);
+            puzzleItem->Pose.Orientation.y = oldRot;
         }
         else
         {
@@ -266,7 +266,7 @@ namespace TEN::Entities::TR4
                 ElementPuzzleBounds.boundingBox.Z2 = box->Z2 + 200;
 
                 float oldRot = puzzleItem->Pose.Orientation.y;
-                puzzleItem->Pose.Orientation.SetY(laraItem->Pose.Orientation.y);
+                puzzleItem->Pose.Orientation.y = laraItem->Pose.Orientation.y;
 
                 if (TestLaraPosition(&ElementPuzzleBounds, puzzleItem, laraItem))
                 {
@@ -278,7 +278,7 @@ namespace TEN::Entities::TR4
                     puzzleItem->ItemFlags[0] = 2;
                 }
 
-                puzzleItem->Pose.Orientation.SetY(oldRot);
+                puzzleItem->Pose.Orientation.y = oldRot;
             }
         }
     }

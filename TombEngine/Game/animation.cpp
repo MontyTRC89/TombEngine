@@ -598,10 +598,10 @@ void ClampRotation(PHD_3DPOS* pose, float angle, float rotation)
 	if (angle <= rotation)
 	{
 		if (angle >= -rotation)
-			pose->Orientation.SetY(pose->Orientation.y + angle);
+			pose->Orientation.y += angle;
 		else
-			pose->Orientation.SetY(pose->Orientation.y - angle);
+			pose->Orientation.y -= angle;
 	}
 	else
-		pose->Orientation.SetY(pose->Orientation.y - angle);
+		pose->Orientation.y -= angle;
 }

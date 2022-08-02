@@ -826,7 +826,7 @@ void LookCamera(ItemInfo* item)
 	if (abs(lara->ExtraHeadRot.y - OldCam.pos.Orientation.y) >= Angle::DegToRad(0.09f))
 		OldCam.pos.Orientation.y = (lara->ExtraHeadRot.y + OldCam.pos.Orientation.y) / 2.0f;
 	else
-		OldCam.pos.Orientation.SetY(lara->ExtraHeadRot.y);
+		OldCam.pos.Orientation.y = lara->ExtraHeadRot.y;
 
 	auto pos = Vector3Int(0, CLICK(0.25f) / 4, CLICK(0.25f));
 	GetLaraJointPosition(&pos, LM_HEAD);
@@ -929,7 +929,7 @@ void LookCamera(ItemInfo* item)
 	else
 	{
 		OldCam.pos.Orientation.x = lara->ExtraHeadRot.x;
-		OldCam.pos.Orientation.SetY(lara->ExtraHeadRot.y);
+		OldCam.pos.Orientation.y = lara->ExtraHeadRot.y;
 		OldCam.pos.Position = item->Pose.Position;
 		OldCam.ActiveState = item->Animation.ActiveState;
 		OldCam.TargetState = item->Animation.TargetState;
@@ -1462,12 +1462,12 @@ void CalculateCamera()
 			{
 				float change = angle - Lara.ExtraHeadRot.y;
 				if (change > Angle::DegToRad(4.0f))
-					Lara.ExtraHeadRot.SetY(Lara.ExtraHeadRot.y + Angle::DegToRad(4.0f));
+					Lara.ExtraHeadRot.y += Angle::DegToRad(4.0f);
 				else if (change < Angle::DegToRad(-4.0f))
-					Lara.ExtraHeadRot.SetY(Lara.ExtraHeadRot.y - Angle::DegToRad(4.0f));
+					Lara.ExtraHeadRot.y -= Angle::DegToRad(4.0f);
 				else
-					Lara.ExtraHeadRot.SetY(Lara.ExtraHeadRot.y + change);
-				Lara.ExtraTorsoRot.SetY(Lara.ExtraHeadRot.y);
+					Lara.ExtraHeadRot.y += change;
+				Lara.ExtraTorsoRot.y = Lara.ExtraHeadRot.y;
 
 				change = tilt - Lara.ExtraHeadRot.x;
 				if (change > Angle::DegToRad(4.0f))
@@ -1604,9 +1604,9 @@ void LookLeftRight(ItemInfo* item)
 		if (lara->ExtraHeadRot.y > Angle::DegToRad(-44.0f))
 		{
 			if (BinocularRange)
-				lara->ExtraHeadRot.SetY(lara->ExtraHeadRot.y + Angle::DegToRad(2.0f) * (BinocularRange - Angle::DegToRad(10.0f)) / Angle::DegToRad(8.5f));
+				lara->ExtraHeadRot.y += Angle::DegToRad(2.0f) * (BinocularRange - Angle::DegToRad(10.0f)) / Angle::DegToRad(8.5f);
 			else
-				lara->ExtraHeadRot.SetY(lara->ExtraHeadRot.y - Angle::DegToRad(2.0f));
+				lara->ExtraHeadRot.y -= Angle::DegToRad(2.0f);
 		}
 	}
 	else if (TrInput & IN_RIGHT)
@@ -1615,9 +1615,9 @@ void LookLeftRight(ItemInfo* item)
 		if (lara->ExtraHeadRot.y < Angle::DegToRad(44.0f))
 		{
 			if (BinocularRange)
-				lara->ExtraHeadRot.SetY(lara->ExtraHeadRot.y + Angle::DegToRad(2.0f) * (Angle::DegToRad(10.0f) - BinocularRange) / Angle::DegToRad(8.5f));
+				lara->ExtraHeadRot.y += Angle::DegToRad(2.0f) * (Angle::DegToRad(10.0f) - BinocularRange) / Angle::DegToRad(8.5f);
 			else
-				lara->ExtraHeadRot.SetY(lara->ExtraHeadRot.y + Angle::DegToRad(2.0f));
+				lara->ExtraHeadRot.y += Angle::DegToRad(2.0f);
 		}
 	}
 
@@ -1626,7 +1626,7 @@ void LookLeftRight(ItemInfo* item)
 		!lara->LeftArm.Locked &&
 		!lara->RightArm.Locked)
 	{
-		lara->ExtraTorsoRot.SetY(lara->ExtraHeadRot.y);
+		lara->ExtraTorsoRot.y = lara->ExtraHeadRot.y;
 	}
 }
 
@@ -1641,9 +1641,9 @@ void LookUpDown(ItemInfo* item)
 		if (lara->ExtraHeadRot.x > Angle::DegToRad(-35.0f))
 		{
 			if (BinocularRange)
-				lara->ExtraHeadRot.x = lara->ExtraHeadRot.x + Angle::DegToRad(2.0f) * (BinocularRange - Angle::DegToRad(10.0f)) / Angle::DegToRad(17.0f);
+				lara->ExtraHeadRot.x += Angle::DegToRad(2.0f) * (BinocularRange - Angle::DegToRad(10.0f)) / Angle::DegToRad(17.0f);
 			else
-				lara->ExtraHeadRot.x = lara->ExtraHeadRot.x - Angle::DegToRad(2.0f);
+				lara->ExtraHeadRot.x -= Angle::DegToRad(2.0f);
 		}
 	}
 	else if (TrInput & IN_BACK)
@@ -1652,9 +1652,9 @@ void LookUpDown(ItemInfo* item)
 		if (lara->ExtraHeadRot.x < Angle::DegToRad(30.0f))
 		{
 			if (BinocularRange)
-				lara->ExtraHeadRot.x = lara->ExtraHeadRot.x + Angle::DegToRad(2.0f) * (Angle::DegToRad(10.0f) - BinocularRange) / Angle::DegToRad(17.0f);
+				lara->ExtraHeadRot.x += Angle::DegToRad(2.0f) * (Angle::DegToRad(10.0f) - BinocularRange) / Angle::DegToRad(17.0f);
 			else
-				lara->ExtraHeadRot.x = lara->ExtraHeadRot.x + Angle::DegToRad(2.0f);
+				lara->ExtraHeadRot.x += Angle::DegToRad(2.0f);
 		}
 	}
 

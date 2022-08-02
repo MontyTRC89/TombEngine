@@ -56,7 +56,7 @@ namespace TEN::Entities::Switches
 		{
 			if (switchItem->Animation.ActiveState == SWITCH_ON)
 			{
-				laraItem->Pose.Orientation.SetY(laraItem->Pose.Orientation.y + Angle::DegToRad(180.0f));
+				laraItem->Pose.Orientation.y += Angle::DegToRad(180.0f);
 
 				if (TestLaraPosition(&CrowbarBounds2, switchItem, laraItem))
 				{
@@ -83,7 +83,7 @@ namespace TEN::Entities::Switches
 					laraInfo->Control.HandStatus = HandStatus::Free;
 				}
 
-				laraItem->Pose.Orientation.SetY(laraItem->Pose.Orientation.y + Angle::DegToRad(180.0f));
+				laraItem->Pose.Orientation.y += Angle::DegToRad(180.0f);
 			}
 			else
 			{

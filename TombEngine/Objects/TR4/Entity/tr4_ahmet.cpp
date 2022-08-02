@@ -289,12 +289,12 @@ namespace TEN::Entities::TR4
 				if (abs(AI.angle) >= 910)
 				{
 					if (AI.angle >= 0)
-						item->Pose.Orientation.SetY(item->Pose.Orientation.y + Angle::DegToRad(5.0f));
+						item->Pose.Orientation.y += Angle::DegToRad(5.0f);
 					else
-						item->Pose.Orientation.SetY(item->Pose.Orientation.y - Angle::DegToRad(5.0f));
+						item->Pose.Orientation.y -= Angle::DegToRad(5.0f);
 				}
 				else
-					item->Pose.Orientation.SetY(item->Pose.Orientation.y + AI.angle);
+					item->Pose.Orientation.y += AI.angle;
 
 				if (!(creature->Flags & 1) && item->Animation.FrameNumber > (g_Level.Anims[item->Animation.AnimNumber].frameBase + 7) &&
 					item->TestBits(JointBitType::Touch, AhmetSwipeAttackLeftJoints))
@@ -321,12 +321,12 @@ namespace TEN::Entities::TR4
 					if (abs(AI.angle) >= Angle::DegToRad(5.0f))
 					{
 						if (AI.angle >= 0)
-							item->Pose.Orientation.SetY(item->Pose.Orientation.y + Angle::DegToRad(5.0f));
+							item->Pose.Orientation.y += Angle::DegToRad(5.0f);
 						else
-							item->Pose.Orientation.SetY(item->Pose.Orientation.y - Angle::DegToRad(5.0f));
+							item->Pose.Orientation.y -= Angle::DegToRad(5.0f);
 					}
 					else
-						item->Pose.Orientation.SetY(item->Pose.Orientation.y + AI.angle);
+						item->Pose.Orientation.y += AI.angle;
 				}
 				else
 				{
@@ -352,12 +352,12 @@ namespace TEN::Entities::TR4
 					if (abs(AI.angle) >= Angle::DegToRad(5.0f))
 					{
 						if (AI.angle >= 0)
-							item->Pose.Orientation.SetY(item->Pose.Orientation.y + Angle::DegToRad(5.0f));
+							item->Pose.Orientation.y += Angle::DegToRad(5.0f);
 						else
-							item->Pose.Orientation.SetY(item->Pose.Orientation.y - Angle::DegToRad(5.0f));
+							item->Pose.Orientation.y -= Angle::DegToRad(5.0f);
 					}
 					else
-						item->Pose.Orientation.SetY(item->Pose.Orientation.y + AI.angle);
+						item->Pose.Orientation.y += AI.angle;
 				}
 				else
 				{

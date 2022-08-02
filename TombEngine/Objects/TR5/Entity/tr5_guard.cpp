@@ -322,13 +322,13 @@ void GuardControl(short itemNumber)
 			{
 				item->Animation.AnimNumber = animIndex + ANIMATION_GUARD_DEATH2;
 				item->Animation.ActiveState = GUARD_STATE_DEATH_2;
-				item->Pose.Orientation.SetY(item->Pose.Orientation.y + laraAI.angle + Angle::DegToRad(-180.0f));
+				item->Pose.Orientation.y += laraAI.angle + Angle::DegToRad(-180.0f);
 			}
 			else
 			{
 				item->Animation.AnimNumber = animIndex + ANIMATION_GUARD_DEATH1;
 				item->Animation.ActiveState = GUARD_STATE_DEATH_1;
-				item->Pose.Orientation.SetY(item->Pose.Orientation.y + laraAI.angle);
+				item->Pose.Orientation.y += laraAI.angle;
 			}
 
 			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
@@ -504,12 +504,12 @@ void GuardControl(short itemNumber)
 			creature->Flags = 0;
 
 			if (AI.angle >= 0)
-				item->Pose.Orientation.SetY(item->Pose.Orientation.y - Angle::DegToRad(2.0f));
+				item->Pose.Orientation.y -= Angle::DegToRad(2.0f);
 			else
-				item->Pose.Orientation.SetY(item->Pose.Orientation.y + Angle::DegToRad(2.0f));
+				item->Pose.Orientation.y += Angle::DegToRad(2.0f);
 
 			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameEnd)
-				item->Pose.Orientation.SetY(item->Pose.Orientation.y + Angle::DegToRad(-180.0f));
+				item->Pose.Orientation.y += Angle::DegToRad(-180.0f);
 
 			break;
 
@@ -523,12 +523,12 @@ void GuardControl(short itemNumber)
 			if (abs(AI.angle) >= Angle::DegToRad(2.0f))
 			{
 				if (AI.angle >= 0)
-					item->Pose.Orientation.SetY(item->Pose.Orientation.y + Angle::DegToRad(2.0f));
+					item->Pose.Orientation.y += Angle::DegToRad(2.0f);
 				else
-					item->Pose.Orientation.SetY(item->Pose.Orientation.y - Angle::DegToRad(2.0f));
+					item->Pose.Orientation.y -= Angle::DegToRad(2.0f);
 			}
 			else
-				item->Pose.Orientation.SetY(item->Pose.Orientation.y + AI.angle);
+				item->Pose.Orientation.y += AI.angle;
 
 			if (item->Animation.ActiveState == GUARD_STATE_FIRE_FAST)
 			{
@@ -574,12 +574,12 @@ void GuardControl(short itemNumber)
 			if (abs(AI.angle) >= Angle::DegToRad(2.0f))
 			{
 				if (AI.angle >= 0)
-					item->Pose.Orientation.SetY(item->Pose.Orientation.y + Angle::DegToRad(2.0f));
+					item->Pose.Orientation.y += Angle::DegToRad(2.0f);
 				else
-					item->Pose.Orientation.SetY(item->Pose.Orientation.y - Angle::DegToRad(2.0f));
+					item->Pose.Orientation.y -= Angle::DegToRad(2.0f);
 			}
 			else
-				item->Pose.Orientation.SetY(item->Pose.Orientation.y + AI.angle);
+				item->Pose.Orientation.y += AI.angle;
 
 			if (!Targetable(item, &AI))
 				item->Animation.TargetState = GUARD_STATE_IDLE;
@@ -688,12 +688,12 @@ void GuardControl(short itemNumber)
 			if (abs(AI.angle) >= Angle::DegToRad(2.0f))
 			{
 				//if ((AI.angle & 0x8000) == 0)
-				//	item->Pose.Orientation.SetY(.Orientation.y + Angle::DegToRad(2.0f);
+				//	item->Pose.Orientation.y += Angle::DegToRad(2.0f);
 				//else
-					item->Pose.Orientation.SetY(item->Pose.Orientation.y - Angle::DegToRad(2.0f));
+					item->Pose.Orientation.y -= Angle::DegToRad(2.0f);
 			}
 			else
-				item->Pose.Orientation.SetY(item->Pose.Orientation.y + AI.angle);
+				item->Pose.Orientation.y += AI.angle;
 			
 			break;
 
@@ -744,7 +744,7 @@ void GuardControl(short itemNumber)
 				currentItem->MeshBits = -3;
 			}
 			else if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameEnd)
-				item->Pose.Orientation.SetY(item->Pose.Orientation.y - Angle::DegToRad(90.0f));
+				item->Pose.Orientation.y -= Angle::DegToRad(90.0f);
 			
 			break;
 
@@ -809,7 +809,7 @@ void GuardControl(short itemNumber)
 				currentItem->MeshBits = 0x1FFF;
 				item->Pose.Position.x = currentItem->Pose.Position.x - CLICK(1);
 				item->Pose.Position.z = currentItem->Pose.Position.z + CLICK(0.5f);
-				item->Pose.Orientation.SetY(currentItem->Pose.Orientation.y);
+				item->Pose.Orientation.y = currentItem->Pose.Orientation.y;
 				item->MeshSwapBits = 1024;
 			}
 			else
@@ -1278,15 +1278,15 @@ void Mafia2Control(short itemNumber)
 			creature->MaxTurn = 0;
 
 			if (AI.angle >= 0)
-				item->Pose.Orientation.SetY(item->Pose.Orientation.y - Angle::DegToRad(2.0f));
+				item->Pose.Orientation.y -= Angle::DegToRad(2.0f);
 			else
-				item->Pose.Orientation.SetY(item->Pose.Orientation.y + Angle::DegToRad(2.0f));
+				item->Pose.Orientation.y += Angle::DegToRad(2.0f);
 
 			if (item->Animation.FrameNumber != g_Level.Anims[item->Animation.AnimNumber].frameBase + 16 ||
 				item->MeshSwapBits != 9216)
 			{
 				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameEnd)
-					item->Pose.Orientation.SetY(item->Pose.Orientation.y + Angle::DegToRad(-180.0f));
+					item->Pose.Orientation.y += Angle::DegToRad(-180.0f);
 			}
 			else
 				item->MeshSwapBits = 128;
@@ -1304,12 +1304,12 @@ void Mafia2Control(short itemNumber)
 			if (abs(AI.angle) >= Angle::DegToRad(2.0f))
 			{
 				if (AI.angle >= 0)
-					item->Pose.Orientation.SetY(item->Pose.Orientation.y + Angle::DegToRad(2.0f));
+					item->Pose.Orientation.y += Angle::DegToRad(2.0f);
 				else
-					item->Pose.Orientation.SetY(item->Pose.Orientation.y - Angle::DegToRad(2.0f));
+					item->Pose.Orientation.y -= Angle::DegToRad(2.0f);
 			}
 			else
-				item->Pose.Orientation.SetY(item->Pose.Orientation.y + AI.angle);
+				item->Pose.Orientation.y += AI.angle;
 			
 			if (!creature->Flags)
 			{
@@ -1332,12 +1332,12 @@ void Mafia2Control(short itemNumber)
 			if (abs(AI.angle) >= Angle::DegToRad(2.0f))
 			{
 				if (AI.angle >= 0)
-					item->Pose.Orientation.SetY(item->Pose.Orientation.y + Angle::DegToRad(2.0f));
+					item->Pose.Orientation.y += Angle::DegToRad(2.0f);
 				else
-					item->Pose.Orientation.SetY(item->Pose.Orientation.y - Angle::DegToRad(2.0f));
+					item->Pose.Orientation.y -= Angle::DegToRad(2.0f);
 			}
 			else
-				item->Pose.Orientation.SetY(item->Pose.Orientation.y + AI.angle);
+				item->Pose.Orientation.y += AI.angle;
 
 			if (Targetable(item, &AI))
 				item->Animation.TargetState = MAFIA2_STATE_FIRE;
@@ -1418,9 +1418,9 @@ void Mafia2Control(short itemNumber)
 			creature->MaxTurn = 0;
 
 			if (AI.angle >= 0)
-				item->Pose.Orientation.SetY(item->Pose.Orientation.y + Angle::DegToRad(2.0f));
+				item->Pose.Orientation.y += Angle::DegToRad(2.0f);
 			else
-				item->Pose.Orientation.SetY(item->Pose.Orientation.y - Angle::DegToRad(2.0f));
+				item->Pose.Orientation.y -= Angle::DegToRad(2.0f);
 
 			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + 16 &&
 				item->MeshSwapBits == 9216)
@@ -1443,13 +1443,13 @@ void Mafia2Control(short itemNumber)
 			{
 				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 16;
 				item->Animation.ActiveState = MAFIA2_STATE_DEATH_2;
-				item->Pose.Orientation.SetY(item->Pose.Orientation.y + AI.angle - Angle::DegToRad(18.0f));
+				item->Pose.Orientation.y += AI.angle - Angle::DegToRad(18.0f);
 			}
 			else
 			{
 				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 11;
 				item->Animation.ActiveState = MAFIA2_STATE_DEATH_1;
-				item->Pose.Orientation.SetY(item->Pose.Orientation.y + AI.angle);
+				item->Pose.Orientation.y += AI.angle;
 			}
 
 			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;

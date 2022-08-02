@@ -715,7 +715,7 @@ namespace TEN::Entities::Effects
 				Lara.InteractedItem = itemNumber;
 			}
 
-			item->Pose.Orientation.SetY(oldYrot);
+			item->Pose.Orientation.y = oldYrot;
 		}
 
 		if (Lara.InteractedItem == itemNumber &&

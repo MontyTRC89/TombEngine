@@ -33,7 +33,7 @@ namespace TEN::Entities::TR4
 			InitialiseItem(grenadeItemNumber);
 
 		grenadeItem->Pose.Orientation.x = item->Pose.Orientation.x;
-		grenadeItem->Pose.Orientation.SetY(item->Pose.Orientation.y + Angle::DegToRad(-180.0f));
+		grenadeItem->Pose.Orientation.y = item->Pose.Orientation.y + Angle::DegToRad(-180.0f);
 		grenadeItem->Pose.Orientation.z = 0.0f;
 
 		grenadeItem->Pose.Position.x = item->Pose.Position.x + SECTOR(1)* sin(grenadeItem->Pose.Orientation.y);
@@ -100,14 +100,14 @@ namespace TEN::Entities::TR4
 		{
 			item->Pose.Position.x += dz / 64;
 			item->Pose.Position.z += dx / 64;
-			item->Pose.Orientation.SetY(item->Pose.Orientation.y + Angle::DegToRad(2.0f));
+			item->Pose.Orientation.y += Angle::DegToRad(2.0f);
 			height1 = y;
 		}
 
 		int height2 = GetCollision(x + dz, y, z - dx, item->RoomNumber).Position.Floor;
 		if (abs(item->Pose.Position.y - height2) > CLICK(3))
 		{
-			item->Pose.Orientation.SetY(item->Pose.Orientation.y - Angle::DegToRad(2.0f));
+			item->Pose.Orientation.y -= Angle::DegToRad(2.0f);
 			item->Pose.Position.x -= dz / 64;
 			item->Pose.Position.z += dx / 64;
 			height2 = y;
@@ -309,7 +309,7 @@ namespace TEN::Entities::TR4
 					target->Pose.Position.x = aiObject->x;
 					target->Pose.Position.y = aiObject->y;
 					target->Pose.Position.z = aiObject->z;
-					target->Pose.Orientation.SetY(aiObject->yRot);
+					target->Pose.Orientation.y = aiObject->yRot;
 					target->Flags = aiObject->flags;
 					target->TriggerFlags = aiObject->triggerFlags;
 					target->BoxNumber = aiObject->boxNumber;

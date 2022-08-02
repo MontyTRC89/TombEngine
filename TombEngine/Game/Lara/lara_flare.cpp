@@ -315,9 +315,9 @@ void CreateFlare(ItemInfo* laraItem, GAME_OBJECT_ID objectNumber, bool thrown)
 		else
 		{
 			if (thrown)
-				flareItem->Pose.Orientation.SetY(laraItem->Pose.Orientation.y);
+				flareItem->Pose.Orientation.y = laraItem->Pose.Orientation.y;
 			else
-				flareItem->Pose.Orientation.SetY(laraItem->Pose.Orientation.y - Angle::DegToRad(45.0f));
+				flareItem->Pose.Orientation.y = laraItem->Pose.Orientation.y - Angle::DegToRad(45.0f);
 
 			flareItem->RoomNumber = laraItem->RoomNumber;
 		}

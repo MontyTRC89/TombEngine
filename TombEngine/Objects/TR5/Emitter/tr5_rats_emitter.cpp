@@ -65,7 +65,7 @@ void LittleRatsControl(short itemNumber)
 
 				if (item->ItemFlags[0])
 				{
-					rat->Pose.Orientation.SetY(2 * GetRandomControl()); // TODO: Short to float conversion.
+					rat->Pose.Orientation.y = Angle::ShrtToRad(GetRandomControl() * 2);
 					rat->VerticalVelocity = -16 - (GetRandomControl() & 31);
 				}
 				else
@@ -164,9 +164,9 @@ void UpdateRats()
 					if (abs(dPos.z) + abs(dPos.x) <= SECTOR(1))
 					{
 						if (rat->Velocity & 1)
-							rat->Pose.Orientation.SetY(rat->Pose.Orientation.y + Angle::DegToRad(2.8f));
+							rat->Pose.Orientation.y += Angle::DegToRad(2.8f);
 						else
-							rat->Pose.Orientation.SetY(rat->Pose.Orientation.y - Angle::DegToRad(2.8f));
+							rat->Pose.Orientation.y -= Angle::DegToRad(2.8f);
 						rat->Velocity = 48 - (abs(angle) / Angle::DegToRad(5.6f));
 					}
 					else
@@ -177,9 +177,9 @@ void UpdateRats()
 						if (abs(angle) >= Angle::DegToRad(11.25f))
 						{
 							if (angle >= 0)
-								rat->Pose.Orientation.SetY(rat->Pose.Orientation.y + Angle::DegToRad(5.6f));
+								rat->Pose.Orientation.y += Angle::DegToRad(5.6f);
 							else
-								rat->Pose.Orientation.SetY(rat->Pose.Orientation.y - Angle::DegToRad(5.6f));
+								rat->Pose.Orientation.y -= Angle::DegToRad(5.6f);
 						}
 						else
 							rat->Pose.Orientation.y += Angle::ShrtToRad((Wibble - i) * 8);
@@ -203,9 +203,9 @@ void UpdateRats()
 					}
 
 					if (angle <= 0)
-						rat->Pose.Orientation.SetY(rat->Pose.Orientation.y - Angle::DegToRad(90.0f));
+						rat->Pose.Orientation.y -= Angle::DegToRad(90.0f);
 					else
-						rat->Pose.Orientation.SetY(rat->Pose.Orientation.y + Angle::DegToRad(90.0f));
+						rat->Pose.Orientation.y += Angle::DegToRad(90.0f);
 
 					// reset rat to old Poseition and disable fall
 					rat->Pose.Position = oldPos;

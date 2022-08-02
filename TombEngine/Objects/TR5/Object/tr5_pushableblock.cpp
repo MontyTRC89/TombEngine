@@ -474,7 +474,7 @@ void PushableBlockCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo*
 		PushableBlockBounds.boundingBox.Z2 = 0;
 
 		float rot = pushableItem->Pose.Orientation.y;
-		//pushableItem->Pose.Orientation.SetY((laraItem->Pose.Orientation.y + Angle::DegToRad(45.0f)) & 0xC000;
+		//pushableItem->Pose.Orientation.y = (laraItem->Pose.Orientation.y + Angle::DegToRad(45.0f)) & 0xC000;
 
 		if (TestLaraPosition(&PushableBlockBounds, pushableItem, laraItem))
 		{
@@ -497,7 +497,7 @@ void PushableBlockCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo*
 				laraInfo->Control.IsMoving = false;
 				laraInfo->Control.HandStatus = HandStatus::Busy;
 				laraInfo->NextCornerPos.Position.x = itemNumber;
-				pushableItem->Pose.Orientation.SetY(rot);
+				pushableItem->Pose.Orientation.y = rot;
 			}
 			else
 			{
@@ -510,12 +510,12 @@ void PushableBlockCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo*
 					laraInfo->Control.IsMoving = false;
 					laraInfo->Control.HandStatus = HandStatus::Busy;
 					laraInfo->NextCornerPos.Position.x = itemNumber;
-					pushableItem->Pose.Orientation.SetY(rot);
+					pushableItem->Pose.Orientation.y = rot;
 				}
 				else
 				{
 					laraInfo->InteractedItem = itemNumber;
-					pushableItem->Pose.Orientation.SetY(rot);
+					pushableItem->Pose.Orientation.y = rot;
 				}
 			}
 		}
@@ -527,7 +527,7 @@ void PushableBlockCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo*
 				laraInfo->Control.HandStatus = HandStatus::Free;
 			}
 
-			pushableItem->Pose.Orientation.SetY(rot);
+			pushableItem->Pose.Orientation.y = rot;
 		}
 	}
 }

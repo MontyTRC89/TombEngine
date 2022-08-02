@@ -169,7 +169,7 @@ void ObeliskControl(short itemNumber)
 
 		if (item->Animation.AnimNumber == obj->animIndex + 2)
 		{
-			item->Pose.Orientation.SetY(item->Pose.Orientation.y - Angle::DegToRad(90.0f));
+			item->Pose.Orientation.y -= Angle::DegToRad(90.0f);
 
 			if (TrInput & IN_ACTION)
 			{
@@ -182,7 +182,7 @@ void ObeliskControl(short itemNumber)
 
 		if (item->Animation.AnimNumber == obj->animIndex + 6)
 		{
-			item->Pose.Orientation.SetY(item->Pose.Orientation.y + Angle::DegToRad(90.0f));
+			item->Pose.Orientation.y += Angle::DegToRad(90.0f);
 
 			if (!(TrInput & IN_ACTION))
 			{

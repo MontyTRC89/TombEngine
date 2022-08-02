@@ -162,7 +162,7 @@ namespace TEN::Entities::TR4
 			if (flags < 4)
 				fx->pos.Orientation.y = pose->Orientation.y;
 			else
-				fx->pos.Orientation.SetY(pose->Orientation.y + Angle::ShrtToRad(GetRandomControl() & 0x7FF) - Angle::DegToRad(5.6f));
+				fx->pos.Orientation.y = pose->Orientation.y + Angle::ShrtToRad(GetRandomControl() & 0x7FF) - Angle::DegToRad(5.6f);
 
 			fx->pos.Orientation.z = 0.0f;
 
@@ -571,11 +571,11 @@ namespace TEN::Entities::TR4
 				if (item->Animation.AnimNumber == Objects[item->ObjectNumber].animIndex + DEMIGOD2_ANIM_AIM)
 				{
 					if (AI.angle >= Angle::DegToRad(7.0f))
-						item->Pose.Orientation.SetY(item->Pose.Orientation.y + Angle::DegToRad(7.0f));
+						item->Pose.Orientation.y += Angle::DegToRad(7.0f);
 					else if (AI.angle <= Angle::DegToRad(-7))
-						item->Pose.Orientation.SetY(item->Pose.Orientation.y + Angle::DegToRad(-7.0f));
+						item->Pose.Orientation.y += Angle::DegToRad(-7.0f);
 					else
-						item->Pose.Orientation.SetY(item->Pose.Orientation.y + AI.angle);
+						item->Pose.Orientation.y += AI.angle;
 				}
 
 				if (Targetable(item, &AI) || creature->Flags)
@@ -635,11 +635,11 @@ namespace TEN::Entities::TR4
 				if (item->Animation.AnimNumber == Objects[(signed short)item->ObjectNumber].animIndex + DEMIGOD2_ANIM_AIM)
 				{
 					if (AI.angle >= Angle::DegToRad(7.0f))
-						item->Pose.Orientation.SetY(item->Pose.Orientation.y + Angle::DegToRad(7.0f));
+						item->Pose.Orientation.y += Angle::DegToRad(7.0f);
 					else if (AI.angle <= Angle::DegToRad(-7.0f))
-						item->Pose.Orientation.SetY(item->Pose.Orientation.y + Angle::DegToRad(-7.0f));
+						item->Pose.Orientation.y += Angle::DegToRad(-7.0f);
 					else
-						item->Pose.Orientation.SetY(item->Pose.Orientation.y + AI.angle);
+						item->Pose.Orientation.y += AI.angle;
 				}
 
 				if (Targetable(item, &AI) || creature->Flags)
@@ -661,11 +661,11 @@ namespace TEN::Entities::TR4
 				joint0 = 0;
 
 				if (AI.angle >= Angle::DegToRad(7.0f))
-					item->Pose.Orientation.SetY(item->Pose.Orientation.y + Angle::DegToRad(7.0f));
+					item->Pose.Orientation.y += Angle::DegToRad(7.0f);
 				else if (AI.angle <= Angle::DegToRad(-7.0f))
-					item->Pose.Orientation.SetY(item->Pose.Orientation.y + Angle::DegToRad(-7.0f));
+					item->Pose.Orientation.y += Angle::DegToRad(-7.0f);
 				else
-					item->Pose.Orientation.SetY(item->Pose.Orientation.y + AI.angle);
+					item->Pose.Orientation.y += AI.angle;
 
 				if (AI.distance >= pow(SECTOR(3), 2) ||
 					!AI.bite &&

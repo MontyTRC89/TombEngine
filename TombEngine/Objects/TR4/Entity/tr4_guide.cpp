@@ -525,7 +525,7 @@ namespace TEN::Entities::TR4
 			creature->MaxTurn = 0;
 
 		if (laraAI.angle < -256)
-			item->Pose.Orientation.SetY(item->Pose.Orientation.y - Angle::DegToRad(2.2f));
+			item->Pose.Orientation.y -= Angle::DegToRad(2.2f);
 
 			break;
 
@@ -542,12 +542,12 @@ namespace TEN::Entities::TR4
 		if (abs(AI.angle) >= Angle::DegToRad(7.0f))
 		{
 			if (AI.angle < 0)
-				item->Pose.Orientation.SetY(item->Pose.Orientation.y + Angle::DegToRad(7.0f));
+				item->Pose.Orientation.y += Angle::DegToRad(7.0f);
 			else
-				item->Pose.Orientation.SetY(item->Pose.Orientation.y - Angle::DegToRad(7.0f));
+				item->Pose.Orientation.y -= Angle::DegToRad(7.0f);
 		}
 		else
-			item->Pose.Orientation.SetY(item->Pose.Orientation.y + AI.angle);
+			item->Pose.Orientation.y += AI.angle;
 
 			if (!creature->Flags)
 			{
@@ -588,7 +588,7 @@ namespace TEN::Entities::TR4
 			creature->MaxTurn = 0;
 
 		if (laraAI.angle > 256)
-			item->Pose.Orientation.SetY(item->Pose.Orientation.y + Angle::DegToRad(2.2f));
+			item->Pose.Orientation.y += Angle::DegToRad(2.2f);
 
 			break;
 
@@ -598,9 +598,9 @@ namespace TEN::Entities::TR4
 		{
 			short deltaAngle = enemy->Pose.Orientation.y - item->Pose.Orientation.y;
 			if (deltaAngle < Angle::DegToRad(-2.0f))
-				item->Pose.Orientation.SetY(item->Pose.Orientation.y - Angle::DegToRad(2.0f));
+				item->Pose.Orientation.y -= Angle::DegToRad(2.0f);
 			else if (deltaAngle > Angle::DegToRad(2.0f))
-				item->Pose.Orientation.SetY(Angle::DegToRad(2.0f));
+				item->Pose.Orientation.y = Angle::DegToRad(2.0f);
 		}
 
 			if (item->Animation.RequiredState == 43)

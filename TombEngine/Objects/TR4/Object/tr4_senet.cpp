@@ -432,7 +432,7 @@ void GameSticksCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* co
 		Lara.Control.HandStatus == HandStatus::Free &&
 		!item->Active || Lara.Control.IsMoving && Lara.InteractedItem == itemNumber)
 	{
-		laraItem->Pose.Orientation.SetY(laraItem->Pose.Orientation.y + Angle::DegToRad(180.0f));
+		laraItem->Pose.Orientation.y += Angle::DegToRad(180.0f);
 
 		if (TestLaraPosition(&GameStixBounds, item, laraItem))
 		{
@@ -446,14 +446,14 @@ void GameSticksCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* co
 				Lara.Control.HandStatus = HandStatus::Busy;
 				item->Status = ITEM_ACTIVE;
 				AddActiveItem(itemNumber);
-				laraItem->Pose.Orientation.SetY(laraItem->Pose.Orientation.y + Angle::DegToRad(180.0f));
+				laraItem->Pose.Orientation.y += Angle::DegToRad(180.0f);
 				return;
 			}
 
 			Lara.InteractedItem = itemNumber;
 		}
 
-		laraItem->Pose.Orientation.SetY(laraItem->Pose.Orientation.y + Angle::DegToRad(180.0f));
+		laraItem->Pose.Orientation.y += Angle::DegToRad(180.0f);
 	}
 	else
 		ObjectCollision(itemNumber, laraItem, coll);

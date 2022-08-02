@@ -121,12 +121,12 @@ bool MoveCreature3DPos(PHD_3DPOS* origin, PHD_3DPOS* target, int velocity, float
 	if (angleDif <= angleAdd)
 	{
 		if (angleDif >= -angleAdd)
-			origin->Orientation.SetY(target->Orientation.y);
+			origin->Orientation.y = target->Orientation.y;
 		else
-			origin->Orientation.SetY(origin->Orientation.y - angleAdd);
+			origin->Orientation.y = origin->Orientation.y - angleAdd;
 	}
 	else
-		origin->Orientation.SetY(origin->Orientation.y + angleAdd);
+		origin->Orientation.y = origin->Orientation.y + angleAdd;
 
 	if (origin->Position == target->Position &&
 		origin->Orientation.y == target->Orientation.y)
@@ -141,17 +141,17 @@ void CreatureYRot2(PHD_3DPOS* srcPos, float angle, float angleAdd)
 {
 	if (angleAdd < angle)
 	{
-		srcPos->Orientation.SetY(srcPos->Orientation.y + angleAdd);
+		srcPos->Orientation.y += angleAdd;
 		return;
 	} 
 
 	if (angle < -angleAdd)
 	{
-		srcPos->Orientation.SetY(srcPos->Orientation.y - angleAdd);
+		srcPos->Orientation.y -= angleAdd;
 		return;
 	} 
 
-	srcPos->Orientation.SetY(srcPos->Orientation.y + angle);
+	srcPos->Orientation.y += angle;
 }
 
 bool SameZone(CreatureInfo* creature, ItemInfo* target)
@@ -625,7 +625,7 @@ int CreatureAnimation(short itemNumber, float angle, float tilt)
 	if (shiftX || shiftZ)
 	{
 		floor = GetFloor(item->Pose.Position.x, y, item->Pose.Position.z, &roomNumber);
-		item->Pose.Orientation.SetY(item->Pose.Orientation.y + angle);
+		item->Pose.Orientation.y += angle;
 
 		if (tilt)
 			CreatureTilt(item, (tilt * 2));
@@ -640,11 +640,11 @@ int CreatureAnimation(short itemNumber, float angle, float tilt)
 	if (biffAngle)
 	{
 		if (abs(biffAngle) < BIFF_AVOID_TURN)
-			item->Pose.Orientation.SetY(item->Pose.Orientation.y - BIFF_AVOID_TURN);
+			item->Pose.Orientation.y -= BIFF_AVOID_TURN;
 		else if (biffAngle > 0)
-			item->Pose.Orientation.SetY(item->Pose.Orientation.y - BIFF_AVOID_TURN);
+			item->Pose.Orientation.y -= BIFF_AVOID_TURN;
 		else
-			item->Pose.Orientation.SetY(item->Pose.Orientation.y + BIFF_AVOID_TURN);
+			item->Pose.Orientation.y += BIFF_AVOID_TURN;
 
 		return true;
 	}
@@ -1202,12 +1202,12 @@ int CreatureVault(short itemNumber, float angle, int vault, int shift)
 		if (xBlock < newXblock)
 		{
 			item->Pose.Position.x = (newXblock * SECTOR(1)) - shift;
-			item->Pose.Orientation.SetY(Angle::DegToRad(90.0f));
+			item->Pose.Orientation.y = Angle::DegToRad(90.0f);
 		}
 		else
 		{
 			item->Pose.Position.x = (xBlock * SECTOR(1)) + shift;
-			item->Pose.Orientation.SetY(Angle::DegToRad(-90.0f));
+			item->Pose.Orientation.y = Angle::DegToRad(-90.0f);
 		}
 	}
 	else if (xBlock == newXblock)
@@ -1220,7 +1220,7 @@ int CreatureVault(short itemNumber, float angle, int vault, int shift)
 		else
 		{
 			item->Pose.Position.z = (zBlock * SECTOR(1)) + shift;
-			item->Pose.Orientation.SetY(Angle::DegToRad(-180.0f));
+			item->Pose.Orientation.y = Angle::DegToRad(-180.0f);
 		}
 	}
 
@@ -1409,7 +1409,7 @@ void FindAITargetObject(CreatureInfo* creature, short objectNumber)
 			aiItem->Pose.Position.x = foundObject->x;
 			aiItem->Pose.Position.y = foundObject->y;
 			aiItem->Pose.Position.z = foundObject->z;
-			aiItem->Pose.Orientation.SetY(foundObject->yRot);
+			aiItem->Pose.Orientation.y = foundObject->yRot;
 			aiItem->Flags = foundObject->flags;
 			aiItem->TriggerFlags = foundObject->triggerFlags;
 			aiItem->BoxNumber = foundObject->boxNumber;

@@ -146,7 +146,7 @@ void LoadItems()
 			item->Pose.Position.x = ReadInt32();
 			item->Pose.Position.y = ReadInt32();
 			item->Pose.Position.z = ReadInt32();
-			item->Pose.Orientation.SetY(Angle::ShrtToRad(ReadInt16())); // TODO
+			item->Pose.Orientation.y = Angle::ShrtToRad(ReadInt16());
 			item->Color = ReadVector4();
 			item->TriggerFlags = ReadInt16();
 			item->Flags = ReadInt16();
@@ -745,7 +745,7 @@ void ReadRooms()
 			mesh.pos.Position.y = ReadInt32();
 			mesh.pos.Position.z = ReadInt32();
 			mesh.pos.Orientation.x = 0.0f;
-			mesh.pos.Orientation.SetY(Angle::ShrtToRad(ReadUInt16()));
+			mesh.pos.Orientation.y = Angle::ShrtToRad(ReadUInt16());
 			mesh.pos.Orientation.z = 0.0f;
 			mesh.flags = ReadUInt16();
 			mesh.color = ReadVector4();

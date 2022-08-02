@@ -30,7 +30,7 @@ void ShootAtLara(FX_INFO *fx)
 
 	int distance = sqrt(pow(x, 2) + pow(z, 2));
 	fx->pos.Orientation.x = -atan2(distance, y);
-	fx->pos.Orientation.SetY(atan2(z, x));
+	fx->pos.Orientation.y = atan2(z, x);
 
 	// Random scatter (only a little bit else it's too hard to avoid).
 	fx->pos.Orientation.x += Angle::ShrtToRad((GetRandomControl() - 0x4000) / 0x40);
@@ -102,7 +102,7 @@ void ControlMissile(short fxNumber)
 
 		LaraItem->HitStatus = 1;
 
-		fx->pos.Orientation.SetY(LaraItem->Pose.Orientation.y);
+		fx->pos.Orientation.y = LaraItem->Pose.Orientation.y;
 		fx->speed = LaraItem->Animation.Velocity;
 		fx->frameNumber = fx->counter = 0;
 	}
@@ -153,7 +153,7 @@ void ControlNatlaGun(short fxNumber)
 			fxNew->pos.Position.x = x;
 			fxNew->pos.Position.y = y;
 			fxNew->pos.Position.z = z;
-			fxNew->pos.Orientation.SetY(fx->pos.Orientation.y);
+			fxNew->pos.Orientation.y = fx->pos.Orientation.y;
 			fxNew->roomNumber = probe.RoomNumber;
 			fxNew->speed = fx->speed;
 			fxNew->frameNumber = 0;

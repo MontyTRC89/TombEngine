@@ -310,7 +310,7 @@ void DragonControl(short backItemNumber)
 		switch (item->Animation.ActiveState)
 		{
 		case DRAGON_STATE_IDLE:
-			item->Pose.Orientation.SetY(item->Pose.Orientation.y - angle);
+			item->Pose.Orientation.y -= angle;
 
 			if (!ahead)
 			{
@@ -387,19 +387,19 @@ void DragonControl(short backItemNumber)
 			break;
 
 		case DRAGON_STATE_TURN_LEFT:
-			item->Pose.Orientation.SetY(item->Pose.Orientation.y + -(Angle::DegToRad(1.0f) - angle));
+			item->Pose.Orientation.y += -(Angle::DegToRad(1.0f) - angle);
 			creature->Flags = 0;
 
 			break;
 
 		case DRAGON_STATE_TURN_RIGHT:
-			item->Pose.Orientation.SetY(item->Pose.Orientation.y + (Angle::DegToRad(1.0f) - angle));
+			item->Pose.Orientation.y += (Angle::DegToRad(1.0f) - angle);
 			creature->Flags = 0;
 
 			break;
 
 		case DRAGON_STATE_AIM_1:
-			item->Pose.Orientation.SetY(item->Pose.Orientation.y - angle);
+			item->Pose.Orientation.y -= angle;
 
 			if (AI.ahead)
 				head = -AI.angle;
@@ -418,7 +418,7 @@ void DragonControl(short backItemNumber)
 			break;
 
 		case DRAGON_STATE_FIRE_1:
-			item->Pose.Orientation.SetY(item->Pose.Orientation.y - angle);
+			item->Pose.Orientation.y -= angle;
 
 			if (AI.ahead)
 				head = -AI.angle;
@@ -467,7 +467,7 @@ void InitialiseBartoli(short itemNumber)
 		back->Pose.Position.x = item->Pose.Position.x;
 		back->Pose.Position.y = item->Pose.Position.y;
 		back->Pose.Position.z = item->Pose.Position.z;
-		back->Pose.Orientation.SetY(item->Pose.Orientation.y);
+		back->Pose.Orientation.y = item->Pose.Orientation.y;
 		back->RoomNumber = item->RoomNumber;
 		back->Status = ITEM_INVISIBLE;
 		back->Color = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
@@ -483,7 +483,7 @@ void InitialiseBartoli(short itemNumber)
 		front->Pose.Position.x = item->Pose.Position.x;
 		front->Pose.Position.y = item->Pose.Position.y;
 		front->Pose.Position.z = item->Pose.Position.z;
-		front->Pose.Orientation.SetY(item->Pose.Orientation.y);
+		front->Pose.Orientation.y = item->Pose.Orientation.y;
 		front->RoomNumber = item->RoomNumber;
 		front->Status = ITEM_INVISIBLE;
 		front->Color = Vector4(0.5f, 0.5f, 0.5f, 1.0f);

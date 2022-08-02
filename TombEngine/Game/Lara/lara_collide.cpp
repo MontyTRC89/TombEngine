@@ -45,12 +45,12 @@ bool LaraDeflectEdge(ItemInfo* item, CollisionInfo* coll)
 	if (coll->CollisionType == CT_LEFT)
 	{
 		ShiftItem(item, coll);
-		item->Pose.Orientation.SetY(item->Pose.Orientation.y + Angle::DegToRad(coll->DiagonalStepAtLeft() ? DEFLECT_DIAGONAL_ANGLE : DEFLECT_STRAIGHT_ANGLE));
+		item->Pose.Orientation.y += Angle::DegToRad(coll->DiagonalStepAtLeft() ? DEFLECT_DIAGONAL_ANGLE : DEFLECT_STRAIGHT_ANGLE);
 	}
 	else if (coll->CollisionType == CT_RIGHT)
 	{
 		ShiftItem(item, coll);
-		item->Pose.Orientation.SetY(item->Pose.Orientation.y - Angle::DegToRad(coll->DiagonalStepAtRight() ? DEFLECT_DIAGONAL_ANGLE : DEFLECT_STRAIGHT_ANGLE));
+		item->Pose.Orientation.y -= Angle::DegToRad(coll->DiagonalStepAtRight() ? DEFLECT_DIAGONAL_ANGLE : DEFLECT_STRAIGHT_ANGLE);
 	}
 
 	return false;
@@ -92,11 +92,11 @@ bool LaraDeflectEdgeJump(ItemInfo* item, CollisionInfo* coll)
 	switch (coll->CollisionType)
 	{
 	case CT_LEFT:
-		item->Pose.Orientation.SetY(item->Pose.Orientation.y + Angle::DegToRad(DEFLECT_STRAIGHT_ANGLE));
+		item->Pose.Orientation.y += Angle::DegToRad(DEFLECT_STRAIGHT_ANGLE);
 		break;
 
 	case CT_RIGHT:
-		item->Pose.Orientation.SetY(item->Pose.Orientation.y - Angle::DegToRad(DEFLECT_STRAIGHT_ANGLE));
+		item->Pose.Orientation.y -= Angle::DegToRad(DEFLECT_STRAIGHT_ANGLE);
 		break;
 
 	case CT_TOP:
@@ -127,11 +127,11 @@ void LaraSlideEdgeJump(ItemInfo* item, CollisionInfo* coll)
 	switch (coll->CollisionType)
 	{
 	case CT_LEFT:
-		item->Pose.Orientation.SetY(item->Pose.Orientation.y + Angle::DegToRad(DEFLECT_STRAIGHT_ANGLE));
+		item->Pose.Orientation.y += Angle::DegToRad(DEFLECT_STRAIGHT_ANGLE);
 		break;
 
 	case CT_RIGHT:
-		item->Pose.Orientation.SetY(item->Pose.Orientation.y - Angle::DegToRad(DEFLECT_STRAIGHT_ANGLE));
+		item->Pose.Orientation.y -= Angle::DegToRad(DEFLECT_STRAIGHT_ANGLE);
 		break;
 
 	case CT_FRONT:
@@ -178,12 +178,12 @@ bool LaraDeflectEdgeCrawl(ItemInfo* item, CollisionInfo* coll)
 	if (coll->CollisionType == CT_LEFT)
 	{
 		ShiftItem(item, coll);
-		item->Pose.Orientation.SetY(item->Pose.Orientation.y + Angle::DegToRad(coll->DiagonalStepAtLeft() ? DEFLECT_DIAGONAL_ANGLE_CRAWL : DEFLECT_STRAIGHT_ANGLE_CRAWL));
+		item->Pose.Orientation.y += Angle::DegToRad(coll->DiagonalStepAtLeft() ? DEFLECT_DIAGONAL_ANGLE_CRAWL : DEFLECT_STRAIGHT_ANGLE_CRAWL);
 	}
 	else if (coll->CollisionType == CT_RIGHT)
 	{
 		ShiftItem(item, coll);
-		item->Pose.Orientation.SetY(item->Pose.Orientation.y - Angle::DegToRad(coll->DiagonalStepAtRight() ? DEFLECT_DIAGONAL_ANGLE_CRAWL : DEFLECT_STRAIGHT_ANGLE_CRAWL));
+		item->Pose.Orientation.y -= Angle::DegToRad(coll->DiagonalStepAtRight() ? DEFLECT_DIAGONAL_ANGLE_CRAWL : DEFLECT_STRAIGHT_ANGLE_CRAWL);
 	}
 
 	return false;
@@ -215,12 +215,12 @@ bool LaraDeflectEdgeMonkey(ItemInfo* item, CollisionInfo* coll)
 	if (coll->CollisionType == CT_LEFT)
 	{
 		ShiftItem(item, coll);
-		item->Pose.Orientation.SetY(item->Pose.Orientation.y + Angle::DegToRad(coll->DiagonalStepAtLeft() ? DEFLECT_DIAGONAL_ANGLE : DEFLECT_STRAIGHT_ANGLE));
+		item->Pose.Orientation.y += Angle::DegToRad(coll->DiagonalStepAtLeft() ? DEFLECT_DIAGONAL_ANGLE : DEFLECT_STRAIGHT_ANGLE);
 	}
 	else if (coll->CollisionType == CT_RIGHT)
 	{
 		ShiftItem(item, coll);
-		item->Pose.Orientation.SetY(item->Pose.Orientation.y - Angle::DegToRad(coll->DiagonalStepAtRight() ? DEFLECT_DIAGONAL_ANGLE : DEFLECT_STRAIGHT_ANGLE));
+		item->Pose.Orientation.y -= Angle::DegToRad(coll->DiagonalStepAtRight() ? DEFLECT_DIAGONAL_ANGLE : DEFLECT_STRAIGHT_ANGLE);
 	}
 
 	return false;
@@ -462,9 +462,9 @@ void LaraSurfaceCollision(ItemInfo* item, CollisionInfo* coll)
 		item->Pose.Position = coll->Setup.OldPosition;
 	}
 	else if (coll->CollisionType == CT_LEFT)
-		item->Pose.Orientation.SetY(item->Pose.Orientation.y + Angle::DegToRad(5.0f));
+		item->Pose.Orientation.y += Angle::DegToRad(5.0f);
 	else if (coll->CollisionType == CT_RIGHT)
-		item->Pose.Orientation.SetY(item->Pose.Orientation.y - Angle::DegToRad(5.0f));
+		item->Pose.Orientation.y -= Angle::DegToRad(5.0f);
 
 	if ((GetWaterHeight(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, item->RoomNumber) - item->Pose.Position.y) > -100)
 		TestLaraWaterStepOut(item, coll);
@@ -548,13 +548,13 @@ void LaraSwimCollision(ItemInfo* item, CollisionInfo* coll)
 		}
 
 		if (c1.CollisionType == CT_LEFT)
-			item->Pose.Orientation.SetY(item->Pose.Orientation.y + Angle::DegToRad(2.0f));
+			item->Pose.Orientation.y += Angle::DegToRad(2.0f);
 		else if (c1.CollisionType == CT_RIGHT)
-			item->Pose.Orientation.SetY(item->Pose.Orientation.y - Angle::DegToRad(2.0f));
+			item->Pose.Orientation.y -= Angle::DegToRad(2.0f);
 		else if (c2.CollisionType == CT_LEFT)
-			item->Pose.Orientation.SetY(item->Pose.Orientation.y + Angle::DegToRad(2.0f));
+			item->Pose.Orientation.y += Angle::DegToRad(2.0f);
 		else if (c2.CollisionType == CT_RIGHT)
-			item->Pose.Orientation.SetY(item->Pose.Orientation.y - Angle::DegToRad(2.0f));
+			item->Pose.Orientation.y -= Angle::DegToRad(2.0f);
 
 		break;
 
@@ -573,12 +573,12 @@ void LaraSwimCollision(ItemInfo* item, CollisionInfo* coll)
 		break;
 
 	case CT_LEFT:
-		item->Pose.Orientation.SetY(item->Pose.Orientation.y + Angle::DegToRad(2.0f));
+		item->Pose.Orientation.y += Angle::DegToRad(2.0f);
 		flag = 1;
 		break;
 
 	case CT_RIGHT:
-		item->Pose.Orientation.SetY(item->Pose.Orientation.y - Angle::DegToRad(2.0f));
+		item->Pose.Orientation.y -= Angle::DegToRad(2.0f);
 		flag = 1;
 		break;
 
@@ -671,9 +671,9 @@ void LaraWaterCurrent(ItemInfo* item, CollisionInfo* coll)
 	else if (coll->CollisionType == CT_TOP_FRONT)
 		item->Animation.VerticalVelocity = 0;
 	else if (coll->CollisionType == CT_LEFT)
-		item->Pose.Orientation.SetY(item->Pose.Orientation.y + Angle::DegToRad(5.0f));
+		item->Pose.Orientation.y += Angle::DegToRad(5.0f);
 	else if (coll->CollisionType == CT_RIGHT)
-		item->Pose.Orientation.SetY(item->Pose.Orientation.y - Angle::DegToRad(5.0f));
+		item->Pose.Orientation.y -= Angle::DegToRad(5.0f);
 
 	if (coll->Middle.Floor < 0 && coll->Middle.Floor != NO_HEIGHT)
 		item->Pose.Position.y += coll->Middle.Floor;

@@ -474,7 +474,7 @@ CornerType TestLaraHangCorner(ItemInfo* item, CollisionInfo* coll, float testAng
 			GetCollision(item, item->Pose.Orientation.y, coll->Setup.Radius + 16, -(coll->Setup.Height + CLICK(0.5f))).Position.Floor + abs(bounds->Y1),
 			item->Pose.Position.z
 		);
-		lara->NextCornerPos.Orientation.SetY(item->Pose.Orientation.y);
+		lara->NextCornerPos.Orientation.y = item->Pose.Orientation.y;
 		lara->Control.MoveAngle = item->Pose.Orientation.y;
 
 		item->Pose = cornerResult.ProbeResult;
@@ -531,7 +531,7 @@ CornerType TestLaraHangCorner(ItemInfo* item, CollisionInfo* coll, float testAng
 		lara->NextCornerPos.Position.x = item->Pose.Position.x;
 		lara->NextCornerPos.Position.y = GetCollision(item, item->Pose.Orientation.y, coll->Setup.Radius * 2, -(abs(bounds->Y1) + LARA_HEADROOM)).Position.Floor + abs(bounds->Y1);
 		lara->NextCornerPos.Position.z = item->Pose.Position.z;
-		lara->NextCornerPos.Orientation.SetY(item->Pose.Orientation.y);
+		lara->NextCornerPos.Orientation.y = item->Pose.Orientation.y;
 		lara->Control.MoveAngle = item->Pose.Orientation.y;
 
 		item->Pose = cornerResult.ProbeResult;
@@ -608,7 +608,7 @@ CornerTestResult TestItemAtNextCornerPosition(ItemInfo* item, CollisionInfo* col
 
 		// Virtually rotate item to new angle
 		short newAngle = pos[i].Orientation.y - Angle::DegToRad(turnAngle);
-		pos[i].Orientation.SetY(newAngle);
+		pos[i].Orientation.y = newAngle;
 
 		// Snap to nearest ledge, if any.
 		item->Pose = pos[i];

@@ -53,7 +53,7 @@ void InitialiseHydra(short itemNumber)
 	if (item->TriggerFlags == 2)
 		item->Pose.Position.z -= CLICK(1.5f);
 
-	item->Pose.Orientation.SetY(Angle::DegToRad(90.0f));
+	item->Pose.Orientation.y = Angle::DegToRad(90.0f);
 	item->Pose.Position.x -= CLICK(1);
 }
 
@@ -194,12 +194,12 @@ void HydraControl(short itemNumber)
 			if (abs(AI.angle) >= Angle::DegToRad(1.0f))
 			{
 				if (AI.angle > 0)
-					item->Pose.Orientation.SetY(item->Pose.Orientation.y + Angle::DegToRad(1.0f));
+					item->Pose.Orientation.y += Angle::DegToRad(1.0f);
 				else
-					item->Pose.Orientation.SetY(item->Pose.Orientation.y - Angle::DegToRad(1.0f));
+					item->Pose.Orientation.y -= Angle::DegToRad(1.0f);
 			}
 			else
-				item->Pose.Orientation.SetY(item->Pose.Orientation.y + AI.angle);
+				item->Pose.Orientation.y += AI.angle;
 
 			if (item->TriggerFlags == 1)
 				tilt = Angle::DegToRad(-2.8f);
