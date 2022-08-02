@@ -6,7 +6,7 @@
 #include "Math/Vector3i.h"
 
 //namespace TEN::Math::Geometry
-//{
+	//{
 	Vector3 TranslatePoint(Vector3 point, float angle, float forward, float up, float right)
 	{
 		if (forward == 0.0f && up == 0.0f && right == 0.0f)
@@ -24,6 +24,23 @@
 	Vector3Int TranslatePoint(Vector3Int point, float angle, float forward, float up, float right)
 	{
 		auto newPoint = TranslatePoint(point.ToVector3(), angle, forward, up, right);
+
+		return Vector3Int(
+			(int)round(newPoint.x),
+			(int)round(newPoint.y),
+			(int)round(newPoint.z)
+		);
+	}
+
+	Vector3 TranslatePoint(Vector3 point, Vector3 direction, float distance)
+	{
+		point += direction * distance;
+		return point;
+	}
+	
+	Vector3Int TranslatePoint(Vector3Int point, Vector3 direction, float distance)
+	{
+		auto newPoint = TranslatePoint(point.ToVector3(), direction, distance);
 		return Vector3Int(
 			(int)round(newPoint.x),
 			(int)round(newPoint.y),
@@ -81,9 +98,9 @@
 		);
 	}
 
-	EulerAngles GetOrientTowardPoint(Vector3 point, Vector3 target)
+	EulerAngles GetOrientTowardPoint(Vector3 origin, Vector3 target)
 	{
-		auto direction = target - point;
+		auto direction = target - origin;
 		auto yOrient = Angle(atan2(direction.x, direction.z));
 
 		auto vector = direction;
@@ -94,9 +111,39 @@
 		return EulerAngles(xOrient, yOrient, 0.0f);
 	}
 
-	float GetDeltaHeading(Vector3 point, Vector3 target, float heading)
+	float GetDeltaHeading(Vector3 origin, Vector3 target, float heading)
 	{
-		auto difference = GetOrientTowardPoint(point, target).y;
+		auto difference = GetOrientTowardPoint(origin, target).y;
 		return Angle::GetShortestAngularDistance(heading, difference + Angle::DegToRad(90.0f));
+	}
+
+	bool IsPointOnLeft(Vector3 origin, Vector3 refPoint, Vector3 target)
+	{
+		auto refDirection = refPoint - origin;
+		refDirection.y = 0.0f;
+
+		auto normal = Vector3(refDirection.z, 0.0f, -refDirection.x);
+		auto targetDirection = target - origin;
+
+		float dot = normal.Dot(targetDirection);
+		if (dot > 0.0f)
+			return true;
+		else
+			return false;
+	}
+
+	bool IsPointOnLeft(Vector3 origin, EulerAngles orient, Vector3 target)
+	{
+		float sinY = sin(orient.y);
+		float cosY = cos(orient.y);
+
+		auto normal = Vector3(cosY, 0.0f, -sinY);
+		auto difference = origin - target;
+
+		float dot = normal.Dot(difference);
+		if (dot >= 0.0f)
+			return false;
+		else
+			return true;
 	}
 //}
