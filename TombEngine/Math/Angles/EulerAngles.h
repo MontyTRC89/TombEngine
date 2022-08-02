@@ -6,9 +6,6 @@
 	class EulerAngles
 	{
 	public:
-		// TODO: Remove.
-		void SetY(float angle = 0.0f) {};
-
 		// Normalized angle components (stored as radians)
 		Angle x = 0.0f;
 		Angle y = 0.0f;
