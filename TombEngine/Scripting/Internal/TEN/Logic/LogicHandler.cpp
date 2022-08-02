@@ -382,26 +382,6 @@ void LogicHandler::ExecuteFunction(std::string const& name, TEN::Control::Volume
 	}
 }
 
-void LogicHandler::ExecuteFunction(std::string const& name, TEN::Control::Volumes::VolumeTriggerer triggerer, std::string const& parameter)
-{
-	sol::protected_function_result r;
-	sol::protected_function func = (*m_handler.GetState())["LevelFuncs"][name.c_str()];
-	if (std::holds_alternative<short>(triggerer))
-	{
-		r = func(parameter, std::make_unique<Moveable>(std::get<short>(triggerer), true));
-	}
-	else
-	{
-		r = func(parameter);
-	}
-
-	if (!r.valid())
-	{
-		sol::error err = r;
-		ScriptAssertF(false, "Could not execute function {}: {}", name, err.what());
-	}
-}
-
 static void doCallback(sol::protected_function const & func, std::optional<float> dt = std::nullopt)  {
 	auto r = dt.has_value() ? func(dt) : func();
 

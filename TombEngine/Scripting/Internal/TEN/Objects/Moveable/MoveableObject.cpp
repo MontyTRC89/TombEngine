@@ -153,45 +153,6 @@ void Moveable::Register(sol::table & parent)
 // @function Moveable:MakeInvisible
 	ScriptReserved_MakeInvisible, &Moveable::MakeInvisible,
 
-/// Make the item not targetable by Lara.
-// @function Moveable:MakeNotTargetable
-// @tparam boolean value, true to make him not targetable, false to make him targetable again, Default is true.
-ScriptReserved_MakeNotTargetable, & Moveable::MakeNotTargetable,
-
-/// Make the actor moves through its AI_Follow path till the indicated value.
-// @function Moveable:DoGoToNode
-// @tparam short value, the ocb number of the AI_Follow object where this actor must go.
-ScriptReserved_DoGoToNode, & Moveable::DoGoToNode,
-
-/// Make the actor moves directly to the indicated AI_Follow object, ignoring the other nodes before.
-// @function Moveable:DoGoDirectlyToNode
-// @tparam short value, the ocb number of the AI_Follow object where this actor must go.
-ScriptReserved_DoGoDirectlyToNode, & Moveable::DoGoDirectlyToNode,
-
-/// Make the actor moves to the AI_Follow object with the next ocb value
-// @function Moveable:DoGoNextNode
-ScriptReserved_DoGoNextNode, & Moveable::DoGoNextNode,
-
-/// Make the guide follow his own path goal, instead of follow the communal path moved with flipeffect 30. Set to false to reactivate classic behaviour.
-// @function Moveable:DoNewBehaviour
-// @tparam boolean value, true activate or deactivate the new behaviour. Default is true.
-ScriptReserved_DoNewBehaviour, & Moveable::DoNewBehaviour,
-
-/// Make the guide to wait for Lara to be near before to activate a heavy trigger action.
-// @function Moveable:DoWaitForLara
-// @tparam boolean value, true to make it wait, false to make it continue with no wait. Default is true.
-ScriptReserved_DoWaitForLara, & Moveable::DoWaitForLara,
-
-/// Make the guide to run instead of walk.
-// @function Moveable:DoRunDefault
-// @tparam boolean value, true to make it run to the next AI node, false to restore the original behaviour. Default is false.
-ScriptReserved_DoRunDefault, & Moveable::DoRunDefault,
-
-/// The next time the guide reads an inscription, it will activate his scared routine.
-// @function Moveable:DoScareGuide
-// @tparam boolean value, true to activate the order, flase to cancel it. Default is true.
-ScriptReserved_DoScareGuide, & Moveable::DoScareGuide,
-
 /// Get the status of object.
 // possible values:
 // 0 - not active
@@ -297,6 +258,11 @@ ScriptReserved_DoScareGuide, & Moveable::DoScareGuide,
 // @tparam int HP the amount of HP to give the moveable
 	ScriptReserved_SetHP, &Moveable::SetHP,
 
+/// Get HP definded for that object type (hit points/health points) (Read Only).
+// @function Moveable:GetSlotHP
+// @tparam int ID of the moveable slot type.
+ScriptReserved_GetSlotHP, & Moveable::GetSlotHP,
+
 /// Get OCB (object code bit) of the moveable
 // @function Moveable:GetOCB
 // @treturn int the moveable's current OCB value
@@ -307,15 +273,15 @@ ScriptReserved_DoScareGuide, & Moveable::DoScareGuide,
 // @tparam int OCB the new value for the moveable's OCB
 	ScriptReserved_SetOCB, &Moveable::SetOCB,
 
-/// Get ItemFlag[x] (object code bit) of the moveable
-// @function Moveable:GetItemFlag
-// @treturn short value from the moveable's ItemFlag[x]
-ScriptReserved_GetItemFlag, & Moveable::GetItemFlag,
+/// Get ItemFlags[x] (object code bit) of the moveable
+// @function Moveable:GetItemFlags
+// @treturn short value from the moveable's ItemFlags[x]
+ScriptReserved_GetItemFlags, & Moveable::GetItemFlags,
 
-/// Set ItemFlag[x] (object code bit) of the moveable
-// @function Moveable:SetItemFlag
-// @tparam short value to store in the moveable's ItemFlag[x]
-ScriptReserved_SetItemFlag, & Moveable::SetItemFlag,
+/// Set ItemFlags[x] (object code bit) of the moveable
+// @function Moveable:SetItemFlags
+// @tparam short value to store in the moveable's ItemFlags[x]
+ScriptReserved_SetItemFlags, & Moveable::SetItemFlags,
 
 /// Get the moveable's color
 // @function Moveable:GetColor
@@ -579,8 +545,11 @@ void Moveable::SetHP(short hp)
 		ScriptAssert(false, "Invalid HP value: " + std::to_string(hp));
 		if (hp < 0)
 		{
-			hp = 0;
-			ScriptWarn("Setting HP to 0.");
+			if (hp != NOT_TARGETABLE)
+			{
+				hp = 0;
+				ScriptWarn("Setting HP to 0.");
+			}
 		}
 		else if (hp > Objects[m_item->ObjectNumber].HitPoints)
 		{
@@ -590,6 +559,11 @@ void Moveable::SetHP(short hp)
 	}
 
 	m_item->HitPoints = hp;
+}
+
+short Moveable::GetSlotHP() const
+{
+	return (Objects[m_item->ObjectNumber].HitPoints);
 }
 
 short Moveable::GetOCB() const
@@ -602,12 +576,12 @@ void Moveable::SetOCB(short ocb)
 	m_item->TriggerFlags = ocb;
 }
 
-short Moveable::GetItemFlag(int index) const
+short Moveable::GetItemFlags(int index) const
 {
 	return m_item->ItemFlags[index];
 }
 
-void Moveable::SetItemFlag(short value, int index)
+void Moveable::SetItemFlags(short value, int index)
 {
 	m_item->ItemFlags[index] = value;
 }
@@ -798,146 +772,6 @@ void Moveable::MakeInvisible()
 		}
 	}
 	dynamic_cast<ObjectsHandler*>(g_GameScriptEntities)->TryRemoveColliding(m_num);
-}
-
-void Moveable::MakeNotTargetable(bool isNotTargetable)
-{
-	if (isNotTargetable)
-		m_item->HitPoints = NOT_TARGETABLE;
-	else
-		m_item->HitPoints = Objects[m_item->ObjectNumber].HitPoints;
-}
-
-void Moveable::DoGoToNode(short nodeId)
-{
-	GAME_OBJECT_ID objId = m_item->ObjectNumber;
-	switch (objId)
-	{
-		case ID_GUIDE:
-			m_item:DoNewBehaviour();
-			if (nodeId <= m_item->ItemFlags[4])
-			{
-				m_item->ItemFlags[3] = nodeId;
-				m_item->ItemFlags[2] |= (1 << 3);	//turn on bit 3 for flag_RetryNodeSearch
-			}
-			m_item->ItemFlags[4] = nodeId;
-			break;
-		default:
-			std::string InfoStr = "The Lua function DoGoToNode hasn't got actions for the object " + m_item->LuaName + ".";
-			TENLog(InfoStr, LogLevel::Warning, LogConfig::All);
-			break;
-	}
-}
-
-void Moveable::DoGoDirectlyToNode(short nodeId)
-{
-	GAME_OBJECT_ID objId = m_item->ObjectNumber;
-	switch (objId)
-	{
-		case ID_GUIDE:
-			m_item:DoNewBehaviour();
-			m_item->ItemFlags[2] |= (1 << 3);	//turn on bit 3 for flag_RetryNodeSearch
-			m_item->ItemFlags[3] = nodeId;
-			m_item->ItemFlags[4] = nodeId;
-			break;
-		default:
-			std::string InfoStr = "The Lua function DoGoDirectlyToNode hasn't got actions for the object " + m_item->LuaName + ".";
-			TENLog(InfoStr, LogLevel::Warning, LogConfig::All);
-			break;
-	}
-}
-
-void Moveable::DoGoNextNode()
-{
-	GAME_OBJECT_ID objId = m_item->ObjectNumber;
-	switch (objId)
-	{
-		case ID_GUIDE:
-			m_item:DoNewBehaviour();
-			m_item->ItemFlags[4] ++;
-			break;
-		default:
-			std::string InfoStr = "The Lua function DoGoNextNode hasn't got actions for the object " + m_item->LuaName + ".";
-			TENLog(InfoStr, LogLevel::Warning, LogConfig::All);
-			break;
-	}
-}
-
-void Moveable::DoNewBehaviour(bool isNewBehaviour)
-{
-	GAME_OBJECT_ID objId = m_item->ObjectNumber;
-	switch (objId)
-	{
-	case ID_GUIDE:
-		if (isNewBehaviour)
-		{
-			m_item->ItemFlags[2] |= (1 << 0);	//turn on bit 0 for flag_NewlBehaviour
-		}else{
-			m_item->ItemFlags[2] &= ~(1 << 0);	//turn off bit 0 for flag_NewlBehaviour
-		}
-		break;
-	default:
-		std::string InfoStr = "The Lua function DoNewBehaviour hasn't got actions for the object " + m_item->LuaName + ".";
-		TENLog(InfoStr, LogLevel::Warning, LogConfig::All);
-		break;
-	}
-}
-
-void Moveable::DoWaitForLara(bool isWaitForLara)
-{
-	GAME_OBJECT_ID objId = m_item->ObjectNumber;
-	switch (objId)
-	{
-		case ID_GUIDE:
-			if (isWaitForLara)
-			{
-				m_item->ItemFlags[2] &= ~(1 << 1);	//turn off bit 1 for flag_IgnoreLaraDistance
-			}else{
-				m_item->ItemFlags[2] |= (1 << 1);	//turn on bit 1 for flag_IgnoreLaraDistance
-			}
-			break;
-		default:
-			std::string InfoStr = "The Lua function DoWaitForLara hasn't got actions for the object " + m_item->LuaName + ".";
-			TENLog(InfoStr, LogLevel::Warning, LogConfig::All);
-			break;
-	}
-}
-
-void Moveable::DoRunDefault(bool isRunDefault)
-{
-	GAME_OBJECT_ID objId = m_item->ObjectNumber;
-	switch (objId)
-	{
-		case ID_GUIDE:
-			if (isRunDefault)
-			{
-				m_item->ItemFlags[2] |= (1 << 2);	//turn on bit 2 for flag_RunDefault
-			}else{
-				m_item->ItemFlags[2] &= ~(1 << 2);	//turn off bit 2 for flag_RunDefault
-			}
-			break;
-		default:
-			std::string InfoStr = "The Lua function DoRunDefault hasn't got actions for the object " + m_item->LuaName + ".";
-			TENLog(InfoStr, LogLevel::Warning, LogConfig::All);
-			break;
-	}
-}
-
-void Moveable::DoScareGuide(bool isScaryInscription)
-{
-	if (m_item->ObjectNumber != ID_GUIDE)
-	{
-		std::string InfoStr = "The Lua function DoScareGuide hasn't got actions for the object " + m_item->LuaName + ",  it only works for GUIDE objects.";
-		TENLog(InfoStr, LogLevel::Warning, LogConfig::All);
-		return;
-	}
-
-	if (isScaryInscription)
-	{
-		m_item->ItemFlags[2] |= (1 << 4);	//turn on bit 4 for flag_ScaryInscription
-	}else{
-		m_item->ItemFlags[2] &= ~(1 << 4);	//turn off bit 4 for flag_ScaryInscription
-	}
 }
 
 void Moveable::Invalidate()

@@ -56,8 +56,6 @@ public:
 
 	void								ExecuteFunction(std::string const& luaFuncName, short idOne, short idTwo) override;
 	void								ExecuteFunction(std::string const & name, TEN::Control::Volumes::VolumeTriggerer) override;
-	void								ExecuteFunction(std::string const& name, TEN::Control::Volumes::VolumeTriggerer, std::string const& parameter) override;
-	
 
 	void								GetVariables(std::vector<SavedVar>& vars) override;
 	void								ResetVariables();
