@@ -31,12 +31,7 @@ BoundingOrientedBox TO_DX_BBOX(PHD_3DPOS pos, BOUNDING_BOX* box);
 
 const Vector3 GetRandomVector();
 const Vector3 GetRandomVectorInCone(const Vector3& direction,const float angleDegrees);
-EulerAngles GetVectorAngles(int x, int y, int z);
-EulerAngles GetOrientTowardPoint(Vector3Int origin, Vector3Int target);
 void phd_RotBoundingBoxNoPersp(PHD_3DPOS* pos, BOUNDING_BOX* bounds, BOUNDING_BOX* tbounds);
-int phd_Distance(PHD_3DPOS* first, PHD_3DPOS* second);
-
-void InterpolateAngle(short angle, short* rotation, short* outAngle, int shift);
 
 constexpr auto FP_SHIFT = 16;
 constexpr auto FP_ONE = (1 << FP_SHIFT);

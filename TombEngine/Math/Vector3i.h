@@ -13,6 +13,8 @@
 		Vector3Int();
 		Vector3Int(int x, int y, int z);
 
+		static float Distance(Vector3Int origin, Vector3Int target);
+
 		Vector3 ToVector3();
 
 		bool		operator ==(Vector3Int vector);

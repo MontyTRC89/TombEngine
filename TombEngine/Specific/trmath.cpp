@@ -24,31 +24,6 @@ const Vector3 GetRandomVectorInCone(const Vector3& direction, const float angleD
 	return result;
 }
 
-EulerAngles GetVectorAngles(int x, int y, int z)
-{
-	const float angle = atan2(x, z);
-
-	auto vector = Vector3(x, y, z);
-	const auto matrix = Matrix::CreateRotationY(-angle);
-	Vector3::Transform(vector, matrix, vector);
-
-	return EulerAngles(
-		-atan2(y, vector.z),
-		angle,
-		0.0f
-	);
-}
-
-EulerAngles GetOrientTowardPoint(Vector3Int origin, Vector3Int target)
-{
-	return GetVectorAngles(target.x - origin.x, target.y - origin.y, target.z - origin.z);
-}
-
-int phd_Distance(PHD_3DPOS* first, PHD_3DPOS* second)
-{
-	return (int)round(Vector3::Distance(first->Position.ToVector3(), second->Position.ToVector3()));
-}
-
 void phd_RotBoundingBoxNoPersp(PHD_3DPOS* pos, BOUNDING_BOX* bounds, BOUNDING_BOX* tbounds)
 {
 	auto world = Matrix::CreateFromYawPitchRoll(
@@ -69,21 +44,6 @@ void phd_RotBoundingBoxNoPersp(PHD_3DPOS* pos, BOUNDING_BOX* bounds, BOUNDING_BO
 	tbounds->Y2 = bMax.y;
 	tbounds->Z1 = bMin.z;
 	tbounds->Z2 = bMax.z;
-}
-
-void InterpolateAngle(short angle, short* rotation, short* outAngle, int shift)
-{
-	int deltaAngle = angle - *rotation;
-
-	if (deltaAngle < Angle::DegToRad(-180.0f))
-		deltaAngle += Angle::DegToRad(360.0f);
-	else if (deltaAngle > Angle::DegToRad(180.0f))
-		deltaAngle -= Angle::DegToRad(360.0f);
-
-	if (outAngle)
-		*outAngle = static_cast<short>(deltaAngle);
-
-	*rotation += static_cast<short>(deltaAngle >> shift);
 }
 
 BoundingOrientedBox TO_DX_BBOX(PHD_3DPOS pos, BOUNDING_BOX* box)

@@ -87,8 +87,8 @@ void AutoGunsControl(short itemNumber)
 
 			// TODO: Short to float conversion
 			short angle1, angle2;
-			InterpolateAngle(angles.x, &item->ItemFlags[1], &angle2, 4);
-			InterpolateAngle(angles.y, item->ItemFlags, &angle1, 4);
+			//InterpolateAngle(angles.x, &item->ItemFlags[1], &angle2, 4);
+			//InterpolateAngle(angles.y, item->ItemFlags, &angle1, 4);
 
 			data[0] = item->ItemFlags[0];
 			data[1] = item->ItemFlags[1];

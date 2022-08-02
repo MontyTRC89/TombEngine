@@ -6,7 +6,7 @@
 #include "Math/Vector3i.h"
 
 //namespace TEN::Math::Geometry
-	//{
+//{
 	Vector3 TranslatePoint(Vector3 point, float angle, float forward, float up, float right)
 	{
 		if (forward == 0.0f && up == 0.0f && right == 0.0f)
@@ -74,7 +74,7 @@
 		);
 	}
 
-	Vector3 TranslatePoint(Vector3 point, Vector3 target, float distance)
+	/*Vector3 TranslatePoint(Vector3 point, Vector3 target, float distance)
 	{
 		if (distance == 0.0f)
 			return point;
@@ -96,7 +96,7 @@
 			(int)round(newPoint.y),
 			(int)round(newPoint.z)
 		);
-	}
+	}*/
 
 	EulerAngles GetOrientTowardPoint(Vector3 origin, Vector3 target)
 	{

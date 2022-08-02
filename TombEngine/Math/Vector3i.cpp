@@ -17,6 +17,11 @@
 		this->z = z;
 	}
 
+	float Vector3Int::Distance(Vector3Int origin, Vector3Int target)
+	{
+		return Vector3::Distance(origin.ToVector3(), target.ToVector3());
+	}
+
 	Vector3 Vector3Int::ToVector3()
 	{
 		return Vector3(x, y, z);

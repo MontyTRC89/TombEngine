@@ -323,7 +323,7 @@ void TestForObjectOnLedge(ItemInfo* item, CollisionInfo* coll)
 					continue;
 				}
 
-				if (phd_Distance(&item->Pose, &item2->Pose) < COLLISION_CHECK_DISTANCE)
+				if (Vector3Int::Distance(item->Pose.Position, item2->Pose.Position) < COLLISION_CHECK_DISTANCE)
 				{
 					auto box = TO_DX_BBOX(item2->Pose, GetBoundsAccurate(item2));
 					float distance;
@@ -345,7 +345,7 @@ void TestForObjectOnLedge(ItemInfo* item, CollisionInfo* coll)
 				if (!(mesh->flags & StaticMeshFlags::SM_VISIBLE))
 					continue;
 
-				if (phd_Distance(&item->Pose, &mesh->pos) < COLLISION_CHECK_DISTANCE)
+				if (Vector3Int::Distance(item->Pose.Position, mesh->pos.Position) < COLLISION_CHECK_DISTANCE)
 				{
 					auto box = TO_DX_BBOX(mesh->pos, &StaticObjects[mesh->staticNumber].collisionBox);
 					float dist;
@@ -870,7 +870,7 @@ void CollideSolidStatics(ItemInfo* item, CollisionInfo* coll)
 			// Only process meshes which are visible and solid
 			if ((mesh->flags & StaticMeshFlags::SM_VISIBLE) && (mesh->flags & StaticMeshFlags::SM_SOLID))
 			{
-				if (phd_Distance(&item->Pose, &mesh->pos) < COLLISION_CHECK_DISTANCE)
+				if (Vector3Int::Distance(item->Pose.Position, mesh->pos.Position) < COLLISION_CHECK_DISTANCE)
 				{
 					auto staticInfo = &StaticObjects[mesh->staticNumber];
 					if (CollideSolidBounds(item, staticInfo->collisionBox, mesh->pos, coll))
@@ -1751,7 +1751,7 @@ void DoObjectCollision(ItemInfo* laraItem, CollisionInfo* coll)
 			if (object->collision == nullptr)
 				continue;
 
-			if (phd_Distance(&item->Pose, &laraItem->Pose) >= COLLISION_CHECK_DISTANCE)
+			if (Vector3Int::Distance(item->Pose.Position, laraItem->Pose.Position) >= COLLISION_CHECK_DISTANCE)
 				continue;
 
 			if (playerCollision)
@@ -1816,7 +1816,7 @@ void DoObjectCollision(ItemInfo* laraItem, CollisionInfo* coll)
 			if (playerCollision && (mesh->flags & StaticMeshFlags::SM_SOLID))
 				continue;
 
-			if (phd_Distance(&mesh->pos, &laraItem->Pose) >= COLLISION_CHECK_DISTANCE)
+			if (Vector3Int::Distance(mesh->pos.Position, laraItem->Pose.Position) >= COLLISION_CHECK_DISTANCE)
 				continue;
 
 			if (!TestBoundsCollideStatic(laraItem, mesh, coll->Setup.Radius))

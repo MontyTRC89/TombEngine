@@ -11,8 +11,8 @@ struct Vector3Int;
 	Vector3Int TranslatePoint(Vector3Int point, Vector3 direction, float distance);
 	Vector3	   TranslatePoint(Vector3 point, EulerAngles orient, float distance);
 	Vector3Int TranslatePoint(Vector3Int point, EulerAngles orient, float distance);
-	Vector3	   TranslatePoint(Vector3 point, Vector3 target, float distance);
-	Vector3Int TranslatePoint(Vector3Int point, Vector3Int target, float distance);
+	/*Vector3	   TranslatePoint(Vector3 point, Vector3 target, float distance);
+	Vector3Int TranslatePoint(Vector3Int point, Vector3Int target, float distance);*/
 
 	EulerAngles GetOrientTowardPoint(Vector3 origin, Vector3 target);
 	float		GetDeltaHeading(Vector3 origin, Vector3 target, float heading);
