@@ -28,7 +28,7 @@ void MissileControl(short itemNumber)
 		if (fx->speed > 64)
 			fx->speed -= 4;
 
-		if (fx->pos.Orientation.x > -12288)
+		if (fx->pos.Orientation.x > Angle::DegToRad(-67.5f))
 		{
 			if (fx->fallspeed < 512)
 				fx->fallspeed += 36;

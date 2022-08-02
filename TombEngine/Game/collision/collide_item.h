@@ -19,12 +19,12 @@ extern MESH_INFO* CollidedMeshes[MAX_COLLIDED_OBJECTS];
 struct OBJECT_COLLISION_BOUNDS
 {
 	BOUNDING_BOX boundingBox;
-	short rotX1;
-	short rotX2;
-	short rotY1;
-	short rotY2;
-	short rotZ1;
-	short rotZ2;
+	float rotX1;
+	float rotX2;
+	float rotY1;
+	float rotY2;
+	float rotZ1;
+	float rotZ2;
 };
 
 void GenericSphereBoxCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);

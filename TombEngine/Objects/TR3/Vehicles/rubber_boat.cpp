@@ -380,14 +380,14 @@ namespace TEN::Entities::Vehicles
 
 		int slip = RBOAT_SIDE_SLIP * sin(rBoatItem->Pose.Orientation.z);
 		if (!slip && rBoatItem->Pose.Orientation.z)
-			slip = (rBoatItem->Pose.Orientation.z > 0) ? 1 : -1;
+			slip = (rBoatItem->Pose.Orientation.z > 0.0f) ? 1 : -1;
 
 		rBoatItem->Pose.Position.z -= slip * sin(rBoatItem->Pose.Orientation.y);
 		rBoatItem->Pose.Position.x += slip * cos(rBoatItem->Pose.Orientation.y);
 
 		slip = RBOAT_SLIP * sin(rBoatItem->Pose.Orientation.x);
 		if (!slip && rBoatItem->Pose.Orientation.x)
-			slip = (rBoatItem->Pose.Orientation.x > 0) ? 1 : -1;
+			slip = (rBoatItem->Pose.Orientation.x > 0.0f) ? 1 : -1;
 
 		rBoatItem->Pose.Position.z -= slip * cos(rBoatItem->Pose.Orientation.y);
 		rBoatItem->Pose.Position.x -= slip * sin(rBoatItem->Pose.Orientation.y);

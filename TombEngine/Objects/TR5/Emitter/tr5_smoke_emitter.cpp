@@ -12,7 +12,7 @@ void InitialiseSmokeEmitter(short itemNumber)
 
 	if (item->TriggerFlags == 111)
 	{
-		if (item->Pose.Orientation.y > 0)
+		if (item->Pose.Orientation.y > 0.0f)
 		{
 			if (item->Pose.Orientation.y == Angle::DegToRad(90.0f))
 				item->Pose.Position.x += CLICK(2);
@@ -33,7 +33,7 @@ void InitialiseSmokeEmitter(short itemNumber)
 	{
 		item->ItemFlags[0] = item->TriggerFlags / 16;
 
-		if (item->Pose.Orientation.y > 0)
+		if (item->Pose.Orientation.y > 0.0f)
 		{
 			if (item->Pose.Orientation.y == Angle::DegToRad(90.0f))
 				item->Pose.Position.x += CLICK(1);

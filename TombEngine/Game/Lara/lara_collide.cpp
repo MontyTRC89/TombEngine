@@ -525,9 +525,9 @@ void LaraSwimCollision(ItemInfo* item, CollisionInfo* coll)
 					item->Pose.Orientation.x += Angle::DegToRad(0.5f);
 				else if (item->Pose.Orientation.x < Angle::DegToRad(-5.0f))
 					item->Pose.Orientation.x -= Angle::DegToRad(0.5f);
-				else if (item->Pose.Orientation.x > 0)
+				else if (item->Pose.Orientation.x > 0.0f)
 					item->Pose.Orientation.x += Angle::DegToRad(0.25f);
-				else if (item->Pose.Orientation.x < 0)
+				else if (item->Pose.Orientation.x < 0.0f)
 					item->Pose.Orientation.x -= Angle::DegToRad(0.25);
 				else
 				{

@@ -461,13 +461,13 @@ namespace TEN::Entities::Vehicles
 
 		int slip = SPEEDBOAT_SLIP_SIDE * sin(speedboatItem->Pose.Orientation.z);
 		if (!slip && speedboatItem->Pose.Orientation.z)
-			slip = (speedboatItem->Pose.Orientation.z > 0) ? 1 : -1;
+			slip = (speedboatItem->Pose.Orientation.z > 0.0f) ? 1 : -1;
 		speedboatItem->Pose.Position.x += slip * sin(speedboatItem->Pose.Orientation.y);
 		speedboatItem->Pose.Position.z -= slip * cos(speedboatItem->Pose.Orientation.y);
 
 		slip = SPEEDBOAT_SLIP * sin(speedboatItem->Pose.Orientation.x);
 		if (!slip && speedboatItem->Pose.Orientation.x)
-			slip = (speedboatItem->Pose.Orientation.x > 0) ? 1 : -1;
+			slip = (speedboatItem->Pose.Orientation.x > 0.0f) ? 1 : -1;
 		speedboatItem->Pose.Position.x -= slip * sin(speedboatItem->Pose.Orientation.y);
 		speedboatItem->Pose.Position.z -= slip * cos(speedboatItem->Pose.Orientation.y);
 

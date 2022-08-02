@@ -41,7 +41,7 @@ void ControlMissile(short fxNumber)
 {
 	auto* fx = &EffectList[fxNumber];
 
-	if (fx->objectNumber == ID_SCUBA_HARPOON && !TestEnvironment(ENV_FLAG_WATER, fx->roomNumber) && fx->pos.Orientation.x > -0x3000)
+	if (fx->objectNumber == ID_SCUBA_HARPOON && !TestEnvironment(ENV_FLAG_WATER, fx->roomNumber) && fx->pos.Orientation.x > Angle::DegToRad(-6.75f))
 	{
 		fx->pos.Orientation.x -= Angle::DegToRad(1.0f);
 	}

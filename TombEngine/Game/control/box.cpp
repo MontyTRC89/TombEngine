@@ -337,7 +337,7 @@ void CreatureUnderwater(ItemInfo* item, int depth)
 
 		if (item->Pose.Orientation.x > Angle::DegToRad(2.0f))
 			item->Pose.Orientation.x = item->Pose.Orientation.x - Angle::DegToRad(2.0f);
-		else if (item->Pose.Orientation.x > 0)
+		else if (item->Pose.Orientation.x > 0.0f)
 			item->Pose.Orientation.x = 0.0f;
 	}
 }

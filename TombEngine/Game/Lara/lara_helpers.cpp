@@ -478,9 +478,9 @@ void UpdateLaraSubsuitAngles(ItemInfo* item)
 	lara->Control.Subsuit.Velocity[0] += abs(lara->Control.Subsuit.XRot / 8.0f);
 	lara->Control.Subsuit.Velocity[1] += abs(lara->Control.Subsuit.XRot / 8.0f);
 
-	if (lara->Control.TurnRate.y > 0)
+	if (lara->Control.TurnRate.y > 0.0f)
 		lara->Control.Subsuit.Velocity[0] += abs(lara->Control.TurnRate.y) * 2;
-	else if (lara->Control.TurnRate.y < 0)
+	else if (lara->Control.TurnRate.y < 0.0f)
 		lara->Control.Subsuit.Velocity[1] += abs(lara->Control.TurnRate.y) * 2;
 
 	if (lara->Control.Subsuit.Velocity[0] > SECTOR(1.5f))

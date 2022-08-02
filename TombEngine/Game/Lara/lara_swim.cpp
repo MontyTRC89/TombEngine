@@ -162,7 +162,7 @@ void lara_as_underwater_death(ItemInfo* item, CollisionInfo* coll)
 	if (item->Pose.Orientation.x < Angle::DegToRad(-2.0f) ||
 		item->Pose.Orientation.x > Angle::DegToRad(2.0f))
 	{
-		if (item->Pose.Orientation.x >= 0)
+		if (item->Pose.Orientation.x >= 0.0f)
 			item->Pose.Orientation.x -= Angle::DegToRad(2.0f);
 		else
 			item->Pose.Orientation.x += Angle::DegToRad(2.0f);

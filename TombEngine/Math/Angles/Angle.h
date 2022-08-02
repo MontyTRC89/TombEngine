@@ -3,6 +3,12 @@
 // TODOs:
 // - Strong typedef for Angle class component (use this library? https://www.foonathan.net/2016/10/strong-typedefs/).
 // - Make TEN::Math::Angles namespace for all angle-related classes and potential utility functions.
+// - >=, <=, >, < operators are messed up.
+// - Handy conversion to range [0, PI] for very specific </>/<=/>= comparisons.
+// - Figure out best constructor setup.
+// - Names for everything.
+// - Documentation for every function.
+// - Optimisations.
 
 //namespace TEN::Math::Angles
 //{
@@ -45,6 +51,10 @@
 		operator float() const;
 		bool   operator ==(float value);
 		bool   operator !=(float value);
+		/*bool   operator >=(float value);
+		bool   operator <=(float value);
+		bool   operator >(float value);*/
+		bool   operator <(float value);
 		Angle  operator +(float value);
 		Angle  operator -(float value);
 		Angle  operator *(float value);

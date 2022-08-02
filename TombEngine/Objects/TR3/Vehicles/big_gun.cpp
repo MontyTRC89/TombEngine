@@ -205,7 +205,7 @@ namespace TEN::Entities::Vehicles
 
 				if (TrInput & VEHICLE_IN_UP)
 				{
-					if (bigGun->TurnRate.x < 0)
+					if (bigGun->TurnRate.x < 0.0f)
 						bigGun->TurnRate.x /= 2;
 
 					bigGun->TurnRate.x += BGUN_TURN_RATE_ACCEL;
@@ -214,7 +214,7 @@ namespace TEN::Entities::Vehicles
 				}
 				else if (TrInput & VEHICLE_IN_DOWN)
 				{
-					if (bigGun->TurnRate.x > 0)
+					if (bigGun->TurnRate.x > 0.0f)
 						bigGun->TurnRate.x /= 2;
 
 					bigGun->TurnRate.x -= BGUN_TURN_RATE_ACCEL;
@@ -230,7 +230,7 @@ namespace TEN::Entities::Vehicles
 
 				if (TrInput & VEHICLE_IN_LEFT)
 				{
-					if (bigGun->TurnRate.y > 0)
+					if (bigGun->TurnRate.y > 0.0f)
 						bigGun->TurnRate.y /= 2;
 
 					bigGun->TurnRate.y -= BGUN_TURN_RATE_ACCEL;
@@ -239,7 +239,7 @@ namespace TEN::Entities::Vehicles
 				}
 				else if (TrInput & VEHICLE_IN_RIGHT)
 				{
-					if (bigGun->TurnRate.y < 0)
+					if (bigGun->TurnRate.y < 0.0f)
 						bigGun->TurnRate.y /= 2;
 
 					bigGun->TurnRate.y += BGUN_TURN_RATE_ACCEL;
@@ -277,9 +277,9 @@ namespace TEN::Entities::Vehicles
 				bigGun->IsBarrelRotating = false;
 				bigGun->Flags = BGUN_FLAG_DISMOUNT;
 			}
-			else if (bigGun->Rotation.x > 0)
+			else if (bigGun->Rotation.x > 0.0f)
 				bigGun->Rotation.x -= BGUN_X_ORIENT_STEP;
-			else if (bigGun->Rotation.x < 0)
+			else if (bigGun->Rotation.x < 0.0f)
 				bigGun->Rotation.x += BGUN_X_ORIENT_STEP;
 
 			bigGun->XOrientFrame = (int)round((bigGun->Rotation.x + BGUN_X_ORIENT_MAX) / BGUN_X_ORIENT_STEP);

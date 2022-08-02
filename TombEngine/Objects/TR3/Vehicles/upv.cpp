@@ -487,7 +487,7 @@ namespace TEN::Entities::Vehicles
 
 		coll->Setup.OldPosition = UPVItem->Pose.Position;
 
-		if ((UPVItem->Pose.Orientation.x >= -(SHRT_MAX / 2 + 1)) && (UPVItem->Pose.Orientation.x <= (SHRT_MAX / 2 + 1)))
+		if ((UPVItem->Pose.Orientation.x >= Angle::ShrtToRad(-(SHRT_MAX / 2 + 1))) && (UPVItem->Pose.Orientation.x <= Angle::ShrtToRad(SHRT_MAX / 2 + 1)))
 		{
 			lara->Control.MoveAngle = UPVItem->Pose.Orientation.y;
 			coll->Setup.ForwardAngle = lara->Control.MoveAngle;
@@ -795,7 +795,7 @@ namespace TEN::Entities::Vehicles
 			else
 			{
 				UPV->TurnRate.x -= UPV_X_TURN_RATE_ACCEL;
-				if (UPVItem->Pose.Orientation.x < 0)
+				if (UPVItem->Pose.Orientation.x < 0.0f)
 					UPVItem->Pose.Orientation.x = 0;
 			}
 
@@ -849,29 +849,29 @@ namespace TEN::Entities::Vehicles
 		else if (UPV->Velocity < -UPV_VELOCITY_MAX)
 			UPV->Velocity = -UPV_VELOCITY_MAX;
 
-		if (UPV->TurnRate.x > 0)
+		if (UPV->TurnRate.x > 0.0f)
 		{
 			UPV->TurnRate.x -= UPV_X_TURN_RATE_FRICTION_DECEL;
-			if (UPV->TurnRate.x < 0)
+			if (UPV->TurnRate.x < 0.0f)
 				UPV->TurnRate.x = 0;
 		}
-		else if (UPV->TurnRate.x < 0)
+		else if (UPV->TurnRate.x < 0.0f)
 		{
 			UPV->TurnRate.x += UPV_X_TURN_RATE_FRICTION_DECEL;
-			if (UPV->TurnRate.x > 0)
+			if (UPV->TurnRate.x > 0.0f)
 				UPV->TurnRate.x = 0;
 		}
 
-		if (UPV->TurnRate.y > 0)
+		if (UPV->TurnRate.y > 0.0f)
 		{
 			UPV->TurnRate.y -= UPV_Y_TURN_RATE_FRICTION_DECEL;
-			if (UPV->TurnRate.y < 0)
+			if (UPV->TurnRate.y < 0.0f)
 				UPV->TurnRate.y = 0;
 		}
-		else if (UPV->TurnRate.y < 0)
+		else if (UPV->TurnRate.y < 0.0f)
 		{
 			UPV->TurnRate.y += UPV_Y_TURN_RATE_FRICTION_DECEL;
-			if (UPV->TurnRate.y > 0)
+			if (UPV->TurnRate.y > 0.0f)
 				UPV->TurnRate.y = 0;
 		}
 	}

@@ -287,7 +287,7 @@ void InitialiseTightrope(short itemNumber)
 {
 	auto* tightropeItem = &g_Level.Items[itemNumber];
 
-	if (tightropeItem->Pose.Orientation.y > 0)
+	if (tightropeItem->Pose.Orientation.y > 0.0f)
 	{
 		if (tightropeItem->Pose.Orientation.y == Angle::DegToRad(90.0f))
 			tightropeItem->Pose.Position.x -= 256;
