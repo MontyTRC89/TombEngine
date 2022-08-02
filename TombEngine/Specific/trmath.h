@@ -1,6 +1,8 @@
 #pragma once
 #include "Specific/phd_global.h"
 
+constexpr auto FPS = 30;
+
 constexpr auto PI = 3.14159265358979323846f;
 constexpr auto RADIAN = 0.01745329252f;
 constexpr auto ONE_DEGREE = 182;
@@ -69,11 +71,14 @@ Vector3Int* FP_Normalise(Vector3Int* v);
 
 const float Lerp(float v0, float v1, float t);
 const float Smoothstep(float edge0, float edge1, float x);
-const float Luma(Vector3 color);
+const float Smoothstep(float x);
+const float Luma(Vector3& color);
+const Vector3 Screen(Vector3& ambient, Vector3& tint);
+const Vector4 Screen(Vector4& ambient, Vector4& tint);
 
-Vector3 TranslateVector(Vector3 vector, short angle, float forward, float up = 0.0f, float right = 0.0f);
-Vector3Int TranslateVector(Vector3Int vector, short angle, float forward, float up = 0.0f, float right = 0.0f);
-Vector3 TranslateVector(Vector3 vector, Vector3Shrt orient, float distance);
-Vector3Int TranslateVector(Vector3Int vector, Vector3Shrt orient, float distance);
-Vector3 TranslateVector(Vector3 vector, Vector3 target, float distance);
-Vector3Int TranslateVector(Vector3Int vector, Vector3Int target, float distance);
+Vector3 TranslateVector(Vector3& vector, short angle, float forward, float up = 0.0f, float right = 0.0f);
+Vector3Int TranslateVector(Vector3Int& vector, short angle, float forward, float up = 0.0f, float right = 0.0f);
+Vector3 TranslateVector(Vector3& vector, Vector3Shrt& orient, float distance);
+Vector3Int TranslateVector(Vector3Int& vector, Vector3Shrt& orient, float distance);
+Vector3 TranslateVector(Vector3& vector, Vector3& target, float distance);
+Vector3Int TranslateVector(Vector3Int& vector, Vector3Int& target, float distance);

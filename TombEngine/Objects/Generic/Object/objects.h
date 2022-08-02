@@ -10,7 +10,6 @@ void SmashObject(short itemNumber);
 void SmashObjectControl(short itemNumber);
 void ControlAnimatingSlots(short itemNumber);
 void ControlTriggerTriggerer(short itemNumber);
-void AnimateWaterfalls();
 void ControlWaterfall(short itemNumber);
 void TightropeCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);
 void HorizontalBarCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);
