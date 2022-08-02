@@ -91,7 +91,12 @@
 		);
 	}
 
-	Vector3 EulerAngles::GetDirectionVector()
+	Quaternion EulerAngles::ToQuaternion()
+	{
+		return Quaternion::CreateFromYawPitchRoll(y, x, z);
+	}
+
+	Vector3 EulerAngles::ToDirectionVector()
 	{
 		float sinX = sin(x);
 		float cosX = cos(x);

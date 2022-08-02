@@ -21,7 +21,6 @@
 		// Utilities
 		static bool Compare(EulerAngles euler0, EulerAngles euler1, float epsilon = 0.0f);
 		static EulerAngles GetShortestAngularDistance(EulerAngles eulerFrom, EulerAngles eulerTo);
-		Vector3 GetDirectionVector();
 
 		void InterpolateLinear(EulerAngles eulerTo, float alpha = 1.0f, float epsilon = 0.0f);
 		static EulerAngles InterpolateLinear(EulerAngles eulerFrom, EulerAngles eulerTo, float alpha = 1.0f, float epsilon = 0.0f);
@@ -31,6 +30,9 @@
 
 		void InterpolateConstantEaseOut(EulerAngles eulerTo, float rate, float alpha = 1.0f, float epsilon = 0.0f);
 		static EulerAngles InterpolateConstantEaseOut(EulerAngles eulerFrom, EulerAngles eulerTo, float rate, float alpha = 1.0f, float epsilon = 0.0f);
+
+		Quaternion ToQuaternion();
+		Vector3	   ToDirectionVector();
 
 		// Operators
 		bool		 operator ==(EulerAngles euler);
