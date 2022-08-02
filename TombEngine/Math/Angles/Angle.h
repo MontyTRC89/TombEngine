@@ -53,8 +53,8 @@
 		bool   operator !=(float value);
 		/*bool   operator >=(float value);
 		bool   operator <=(float value);
-		bool   operator >(float value);*/
-		bool   operator <(float value);
+		bool   operator >(float value);
+		bool   operator <(float value);*/
 		Angle  operator +(float value);
 		Angle  operator -(float value);
 		Angle  operator *(float value);

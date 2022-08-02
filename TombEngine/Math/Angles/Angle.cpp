@@ -159,12 +159,12 @@
 	bool Angle::operator >(float value)
 	{
 		return (RadToDeg(Value) > Normalize(value));
-	}*/
+	}
 	
 	bool Angle::operator <(float value)
 	{
 		return (RadToDeg(Value) < Normalize(value));
-	}
+	}*/
 	
 	Angle Angle::operator +(float value)
 	{

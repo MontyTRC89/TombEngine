@@ -133,7 +133,7 @@ CollisionResult GetCollision(ItemInfo* item, float angle, float forward, float u
 		item->Location :
 		ROOM_VECTOR{ GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &tempRoomNumber)->Room, item->Pose.Position.y };
 
-	auto point = TranslateVector(item->Pose.Position, angle, forward, up, right);
+	auto point = TranslatePoint(item->Pose.Position, angle, forward, up, right);
 	int adjacentRoomNumber = GetRoom(location, item->Pose.Position.x, point.y, item->Pose.Position.z).roomNumber;
 	return GetCollision(point.x, point.y, point.z, adjacentRoomNumber);
 }
@@ -144,7 +144,7 @@ CollisionResult GetCollision(Vector3Int pos, int roomNumber, float angle, float 
 	short tempRoomNumber = roomNumber;
 	auto location = ROOM_VECTOR{ GetFloor(pos.x, pos.y, pos.z, &tempRoomNumber)->Room, pos.y };
 
-	auto point = TranslateVector(pos, angle, forward, up, right);
+	auto point = TranslatePoint(pos, angle, forward, up, right);
 	int adjacentRoomNumber = GetRoom(location, pos.x, point.y, pos.z).roomNumber;
 	return GetCollision(point.x, point.y, point.z, adjacentRoomNumber);
 }

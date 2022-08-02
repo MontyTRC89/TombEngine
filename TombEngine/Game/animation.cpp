@@ -422,12 +422,12 @@ bool TestLastFrame(ItemInfo* item, int animNumber)
 
 void TranslateItem(ItemInfo* item, float angle, float forward, float vertical, float lateral)
 {
-	item->Pose.Position = TranslateVector(item->Pose.Position, angle, forward, vertical, lateral);
+	item->Pose.Position = TranslatePoint(item->Pose.Position, angle, forward, vertical, lateral);
 }
 
 void TranslateItem(ItemInfo* item, EulerAngles orient, float distance)
 {
-	item->Pose.Position = TranslateVector(item->Pose.Position, orient, distance);
+	item->Pose.Position = TranslatePoint(item->Pose.Position, orient, distance);
 }
 
 void SetAnimation(ItemInfo* item, int animIndex, int frameToStart)

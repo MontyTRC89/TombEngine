@@ -58,10 +58,3 @@ Vector3Int* FP_Normalise(Vector3Int* v);
 const float Lerp(float v0, float v1, float t);
 const float Smoothstep(float edge0, float edge1, float x);
 const float Luma(Vector3 color);
-
-Vector3 TranslateVector(Vector3 vector, float angle, float forward, float up = 0.0f, float right = 0.0f);
-Vector3Int TranslateVector(Vector3Int vector, float angle, float forward, float up = 0.0f, float right = 0.0f);
-Vector3 TranslateVector(Vector3 vector, EulerAngles orient, float distance);
-Vector3Int TranslateVector(Vector3Int vector, EulerAngles orient, float distance);
-Vector3 TranslateVector(Vector3 vector, Vector3 target, float distance);
-Vector3Int TranslateVector(Vector3Int vector, Vector3Int target, float distance);
