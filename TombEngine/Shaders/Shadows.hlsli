@@ -160,7 +160,7 @@ void DoSpotLightShadow(float3 worldPos, inout float3 lighting)
         lightClipSpace.z >= 0.0f && lightClipSpace.z <= 1.0f)
     {
         lightClipSpace.x = lightClipSpace.x / 2 + 0.5;
-        lightClipSpace.y = lightClipSpace.y / -2 + 0.5;
+        lightClipSpace.y = 1 - (lightClipSpace.y / 2 + 0.5);
         float sum = 0;
         float x, y;
         //perform PCF filtering on a 4 x 4 texel neighborhood
@@ -175,7 +175,8 @@ void DoSpotLightShadow(float3 worldPos, inout float3 lighting)
         shadowFactor = sum / 16.0;
     }
     float distanceFactor = saturate(((distance(worldPos, Light.Position)) / (Light.Out)));
-    //Fade out at the borders of the sampled texture
-    float angleFactor = min(max(sin(lightClipSpace.x * PI) * 1.2, 0), 1);
-    lighting *= saturate((shadowFactor + SHADOW_INTENSITY) + (pow(distanceFactor, 4) * (1 - angleFactor) * INV_SHADOW_INTENSITY));
+    //Fade out towards the borders of the sampled texture
+    float angleFactor = saturate(distance(lightClipSpace.xy, float2(0.5, 0.5))*2);
+    
+    lighting *= saturate((shadowFactor + SHADOW_INTENSITY) + (pow(distanceFactor, 4) * (angleFactor) * INV_SHADOW_INTENSITY));
 }
