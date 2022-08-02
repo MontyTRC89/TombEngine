@@ -30,25 +30,6 @@ namespace TEN::Entities::TR4
 		GUIDE_STATE_READ_INSCRIPTION = 39
 	};
 
-	///ITEMFLAGS
-	//----------
-	//ItemFlags[1] Torch status (Original)
-	//	0 - Hasn't got a torch,		(in this state, the guide will go progressing nodes, ignoring the Goal Node, till it finds one with the pick torch action).
-	//	1 - Has picked a torch,		(in this state, the guide will stop and ignite his torch with a lighter).
-	//	2 - Has a working torch,	(in this state, the guide will work as normal).
-	//
-	//ItemFlags[2] Behaviour flags (TEN)
-	//	0 - Acts like the original TR4, he uses the global Lara.Location as goal, and wait for Lara before to do special actions
-	//	1 - He uses its own Goal variable stored in ItemFlags[4], and wait for Lara before to do special actions
-	//	2 - He uses its own Goal variable stored in ItemFlags[4], and don't wait for Lara before to do special actions
-	//
-	//ItemFlags[3] Personal CurrentNode Variable (Original)
-	//
-	//ItemFlags[4] Personal GoalNode Variable (TEN)
-	//
-	//ItemFlags[0], [5], [6] and [7] Are unused.
-	//----------
-
 	// TODO
 	enum GuideAnim
 	{
@@ -215,15 +196,14 @@ namespace TEN::Entities::TR4
 		Vector3Int pos1;
 		int frameNumber;
 		short random;
-
-		
-		bool flag_NewlBehaviour			= ((item->ItemFlags[2] & (1 << 0)) != 0) ? true : false;
+				
+		bool flag_NewBehaviour			= ((item->ItemFlags[2] & (1 << 0)) != 0) ? true : false;
 		bool flag_IgnoreLaraDistance	= ((item->ItemFlags[2] & (1 << 1)) != 0) ? true : false;
 		bool flag_RunDefault			= ((item->ItemFlags[2] & (1 << 2)) != 0) ? true : false;
 		bool flag_RetryNodeSearch		= ((item->ItemFlags[2] & (1 << 3)) != 0) ? true : false;
 		bool flag_ScaryInscription		= ((item->ItemFlags[2] & (1 << 4)) != 0) ? true : false;
 
-		short GoalNode = (flag_NewlBehaviour) ? item->ItemFlags[4] : Lara.Location;
+		short GoalNode = (flag_NewBehaviour) ? item->ItemFlags[4] : Lara.Location;
 
 		if (flag_RetryNodeSearch)
 		{
@@ -272,7 +252,9 @@ namespace TEN::Entities::TR4
 						if ((flag_RunDefault) && AI.distance > pow(SECTOR(3), 2))
 						{
 							item->Animation.TargetState = GUIDE_STATE_RUN;
-						}else{
+						}
+						else
+						{
 							item->Animation.TargetState = GUIDE_STATE_WALK;
 						}
 				}
