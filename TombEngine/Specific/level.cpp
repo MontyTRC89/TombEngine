@@ -791,23 +791,7 @@ void ReadRooms()
 			numBytes = ReadInt8();
 			ReadBytes(buffer, numBytes);
 			volume.OnLeave = std::string(buffer, buffer + numBytes);
-
-			std::string temporalParameter;
-			numBytes = ReadInt8();
-			ReadBytes(buffer, numBytes);
-			temporalParameter = std::string(buffer, buffer + numBytes);
-			volume.ParamOnEnter = (temporalParameter.empty()) ? "nil" : temporalParameter;
-
-			numBytes = ReadInt8();
-			ReadBytes(buffer, numBytes);
-			temporalParameter = std::string(buffer, buffer + numBytes);
-			volume.ParamOnInside = (temporalParameter.empty()) ? "nil" : temporalParameter;
-
-			numBytes = ReadInt8();
-			ReadBytes(buffer, numBytes);
-			temporalParameter = std::string(buffer, buffer + numBytes);
-			volume.ParamOnLeave = (temporalParameter.empty()) ? "nil" : temporalParameter;
-
+			
 			volume.OneShot = ReadInt8();
 			volume.Status = TriggerStatus::Outside;
 

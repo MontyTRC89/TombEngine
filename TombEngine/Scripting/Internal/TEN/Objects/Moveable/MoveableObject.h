@@ -58,14 +58,16 @@ public:
 	[[nodiscard]] short GetHP() const;
 	void SetHP(short hp);
 
+	[[nodiscard]] short GetSlotHP() const;
+
 	[[nodiscard]] short GetOCB() const;
 	void SetOCB(short ocb);
 
 	[[nodiscard]] aiBitsType GetAIBits() const;
 	void SetAIBits(aiBitsType const & bits);
 
-	[[nodiscard]] short GetItemFlag(int index = 0) const;
-	void SetItemFlag(short value, int index = 0);
+	[[nodiscard]] short GetItemFlags(int index = 0) const;
+	void SetItemFlags(short value, int index = 0);
 
 	[[nodiscard]] bool GetHitStatus() const;
 
@@ -78,15 +80,6 @@ public:
 	void EnableItem();
 	void DisableItem();
 	void MakeInvisible();
-	void MakeNotTargetable(bool isNotTargetable = true);
-
-	void DoGoToNode(short nodeId);
-	void DoGoDirectlyToNode(short nodeId);
-	void DoGoNextNode();
-	void DoNewBehaviour( bool isNewBehaviour = true);
-	void DoWaitForLara( bool isWaitForLara = true);
-	void DoRunDefault( bool isRunDefault = false);
-	void DoScareGuide(bool isScaryInscription = true);
 
 	[[nodiscard]] std::string GetOnHit() const;
 	void SetOnHit(std::string const &);
