@@ -111,9 +111,11 @@ void DoPointLightShadow(float3 worldPos, inout float3 lighting)
         {
             lightClipSpace.x = lightClipSpace.x / 2 + 0.5;
             lightClipSpace.y = lightClipSpace.y / -2 + 0.5;
+
             float sum = 0;
             float x, y;
-            //perform PCF filtering on a 4 x 4 texel neighborhood
+
+            // Perform PCF filtering on a 4 x 4 texel neighborhood
             // what about borders of cubemap?
             for (y = -1.5; y <= 1.5; y += 1.0)
             {
@@ -124,7 +126,6 @@ void DoPointLightShadow(float3 worldPos, inout float3 lighting)
             }
 
             shadowFactor = sum / 16.0;
-
         }
     }
     float distanceFactor = saturate(((distance(worldPos, Light.Position)) / (Light.Out)));
@@ -159,11 +160,13 @@ void DoSpotLightShadow(float3 worldPos, inout float3 lighting)
         lightClipSpace.y >= -1.0f && lightClipSpace.y <= 1.0f &&
         lightClipSpace.z >= 0.0f && lightClipSpace.z <= 1.0f)
     {
-        lightClipSpace.x = lightClipSpace.x / 2 + 0.5;
-        lightClipSpace.y = 1 - (lightClipSpace.y / 2 + 0.5);
+        lightClipSpace.x = lightClipSpace.x / 2 + 0.5f;
+        lightClipSpace.y = 1 - (lightClipSpace.y / 2 + 0.5f);
+
         float sum = 0;
         float x, y;
-        //perform PCF filtering on a 4 x 4 texel neighborhood
+
+        // Perform PCF filtering on a 4 x 4 texel neighborhood
         for (y = -1.5; y <= 1.5; y += 1.0)
         {
             for (x = -1.5; x <= 1.5; x += 1.0)
@@ -174,9 +177,10 @@ void DoSpotLightShadow(float3 worldPos, inout float3 lighting)
 
         shadowFactor = sum / 16.0;
     }
+
     float distanceFactor = saturate(((distance(worldPos, Light.Position)) / (Light.Out)));
     //Fade out towards the borders of the sampled texture
-    float angleFactor = saturate(distance(lightClipSpace.xy, float2(0.5, 0.5))*2);
+    float angleFactor = saturate(distance(lightClipSpace.xy, float2(0.5f, 0.5f)) * 2);
     
     lighting *= saturate((shadowFactor + SHADOW_INTENSITY) + (pow(distanceFactor, 4) * (angleFactor) * INV_SHADOW_INTENSITY));
 }
