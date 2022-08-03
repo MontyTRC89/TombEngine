@@ -25,8 +25,8 @@ namespace TEN::Entities::TR4
 	constexpr auto BIG_SCORPION_ATTACK_DAMAGE = 120;
 	constexpr auto BIG_SCORPION_TROOP_ATTACK_DAMAGE = 15;
 	constexpr auto BIG_SCORPION_STINGER_POISON_POTENCY = 8;
-
-	constexpr auto BIG_SCORPION_ATTACK_RANGE = SECTOR(1.35);
+	constexpr auto BIG_SCORPION_ATTACK_RANGE = int(SQUARE(SECTOR(1.35f)));
+	constexpr auto BIG_SCORPION_RUN_RANGE = int(SQUARE(SECTOR(2.0f)));
 
 	enum BigScorpionState
 	{
@@ -56,9 +56,7 @@ namespace TEN::Entities::TR4
 	void InitialiseScorpion(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
-
-		ClearItem(itemNumber);
-
+		InitialiseCreature(itemNumber);
 		if (item->TriggerFlags == 1)
 		{
 			item->Animation.TargetState = BSCORPION_STATE_KILL_TROOP;
@@ -71,7 +69,6 @@ namespace TEN::Entities::TR4
 			item->Animation.ActiveState = BSCORPION_STATE_IDLE;
 			item->Animation.AnimNumber = Objects[ID_BIG_SCORPION].animIndex + BSCORPION_ANIM_IDLE;
 		}
-
 		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 	}
 
@@ -82,62 +79,16 @@ namespace TEN::Entities::TR4
 
 		auto* item = &g_Level.Items[itemNumber];
 		auto* creature = GetCreatureInfo(item);
-
 		short angle = 0;
-		short head = 0;
-		short neck = 0;
-		short tilt = 0;
-		short joint0 = 0;
-		short joint1 = 0;
-		short joint2 = 0;
-		short joint3 = 0;
-
-		int x = item->Pose.Position.x + SECTOR(0.68f) * phd_sin(item->Pose.Orientation.y);
-		int z = item->Pose.Position.z + SECTOR(0.68f) * phd_cos(item->Pose.Orientation.y);
-
-		auto probe = GetCollision(x, item->Pose.Position.y, z, item->RoomNumber);
-		int height1 = probe.Position.Floor;
-		if (abs(item->Pose.Position.y - height1) > CLICK(2))
-			probe.Position.Floor = item->Pose.Position.y;
-
-		x = item->Pose.Position.x - SECTOR(0.68f) * phd_sin(item->Pose.Orientation.y);
-		z = item->Pose.Position.z - SECTOR(0.68f) * phd_cos(item->Pose.Orientation.y);
-
-		probe = GetCollision(x, item->Pose.Position.y, z, probe.RoomNumber);
-		int height2 = probe.Position.Floor;
-		if (abs(item->Pose.Position.y - height2) > CLICK(2))
-			height2 = item->Pose.Position.y;
-
-		short angle1 = phd_atan(SECTOR(1.34), height2 - height1);
-
-		x = item->Pose.Position.x - SECTOR(0.68f) * phd_sin(item->Pose.Orientation.y);
-		z = item->Pose.Position.z + SECTOR(0.68f) * phd_cos(item->Pose.Orientation.y);
-
-		probe = GetCollision(x, item->Pose.Position.y, z, probe.RoomNumber);
-		int height3 = probe.Position.Floor;
-		if (abs(item->Pose.Position.y - height3) > CLICK(2))
-			height3 = item->Pose.Position.y;
-
-		x = item->Pose.Position.x + SECTOR(0.68f) * phd_sin(item->Pose.Orientation.y);
-		z = item->Pose.Position.z - SECTOR(0.68f) * phd_cos(item->Pose.Orientation.y);
-
-		probe = GetCollision(x, item->Pose.Position.y, z, probe.RoomNumber);
-		int height4 = probe.Position.Floor;
-		if (abs(item->Pose.Position.y - height4) > CLICK(2))
-			height4 = item->Pose.Position.y;
-
-		short angle2 = phd_atan(SECTOR(1.34), height4 - height3);
-
+		
 		if (item->HitPoints <= 0)
 		{
 			item->HitPoints = 0;
 			if (item->Animation.ActiveState != BSCORPION_STATE_DEATH)
 			{
-				if (item->TriggerFlags > 0 &&
-					item->TriggerFlags < 7)
+				if (item->TriggerFlags > 0 && item->TriggerFlags < 7)
 				{
 					CutSeqNum = 4;
-
 					item->Animation.AnimNumber = Objects[item->Animation.AnimNumber].animIndex + BSCORPION_ANIM_DEATH;
 					item->Animation.ActiveState = BSCORPION_STATE_DEATH;
 					item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
@@ -173,11 +124,8 @@ namespace TEN::Entities::TR4
 				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameEnd - 1;
 				item->Status = ITEM_INVISIBLE;
 			}
-			else if (item->Animation.ActiveState == BSCORPION_STATE_DEATH)
-			{
-				if (item->Status == ITEM_INVISIBLE)
-					item->Status = ITEM_ACTIVE;
-			}
+			else if (item->Animation.ActiveState == BSCORPION_STATE_DEATH && item->Status == ITEM_INVISIBLE)
+				item->Status = ITEM_ACTIVE;
 		}
 		else
 		{
@@ -195,11 +143,9 @@ namespace TEN::Entities::TR4
 					for (int i = 0; i < ActiveCreatures.size(); i++)
 					{
 						auto* currentCreatureInfo = ActiveCreatures[i];
-
 						if (currentCreatureInfo->ItemNumber != NO_ITEM && currentCreatureInfo->ItemNumber != itemNumber)
 						{
 							auto* currentItem = &g_Level.Items[currentCreatureInfo->ItemNumber];
-
 							if (currentItem->ObjectNumber != ID_LARA)
 							{
 								if (currentItem->ObjectNumber != ID_BIG_SCORPION &&
@@ -208,9 +154,7 @@ namespace TEN::Entities::TR4
 									int dx = currentItem->Pose.Position.x - item->Pose.Position.x;
 									int dy = currentItem->Pose.Position.y - item->Pose.Position.y;
 									int dz = currentItem->Pose.Position.z - item->Pose.Position.z;
-
-									int distance = pow(dx, 2) + pow(dy, 2) + pow(dz, 2);
-
+									int distance = SQUARE(dx) + SQUARE(dy) + SQUARE(dz);
 									if (distance < minDistance)
 									{
 										minDistance = distance;
@@ -225,10 +169,8 @@ namespace TEN::Entities::TR4
 
 			AI_INFO AI;
 			CreatureAIInfo(item, &AI);
-
 			GetCreatureMood(item, &AI, VIOLENT);
 			CreatureMood(item, &AI, VIOLENT);
-
 			angle = CreatureTurn(item, creature->MaxTurn);
 
 			switch (item->Animation.ActiveState)
@@ -237,7 +179,7 @@ namespace TEN::Entities::TR4
 				creature->MaxTurn = 0;
 				creature->Flags = 0;
 
-				if (AI.distance > pow(BIG_SCORPION_ATTACK_RANGE, 2))
+				if (AI.distance > BIG_SCORPION_ATTACK_RANGE)
 				{
 					item->Animation.TargetState = BSCORPION_STATE_WALK_FORWARD;
 					break;
@@ -246,13 +188,9 @@ namespace TEN::Entities::TR4
 				if (AI.bite)
 				{
 					creature->MaxTurn = ANGLE(2.0f);
-
-					if (GetRandomControl() & 1 || //If random conditional, OR, troop is almost dying... choose the pincers attack.
-						creature->Enemy->HitPoints <= 15 &&
-						creature->Enemy->ObjectNumber == ID_TROOPS)
-					{
+					//If random conditional, OR, troop is almost dying... choose the pincers attack.
+					if (GetRandomControl() & 1 || (creature->Enemy != NULL && creature->Enemy->HitPoints <= 15 && creature->Enemy->ObjectNumber == ID_TROOPS))
 						item->Animation.TargetState = BSCORPION_STATE_PINCER_ATTACK;
-					}
 					else
 						item->Animation.TargetState = BSCORPION_STATE_STINGER_ATTACK;
 				}
@@ -264,19 +202,17 @@ namespace TEN::Entities::TR4
 			case BSCORPION_STATE_WALK_FORWARD:
 				creature->MaxTurn = ANGLE(2.0f);
 
-				if (AI.distance < pow(BIG_SCORPION_ATTACK_RANGE, 2))
+				if (AI.distance < BIG_SCORPION_ATTACK_RANGE)
 					item->Animation.TargetState = BSCORPION_STATE_IDLE;
-				else if (AI.distance > pow(853, 2))
+				else if (AI.distance > BIG_SCORPION_RUN_RANGE)
 					item->Animation.TargetState = BSCORPION_STATE_RUN_FORWARD;
-
 				break;
 
 			case BSCORPION_STATE_RUN_FORWARD:
 				creature->MaxTurn = ANGLE(3.0f);
 
-				if (AI.distance < pow(BIG_SCORPION_ATTACK_RANGE, 2))
+				if (AI.distance < BIG_SCORPION_ATTACK_RANGE)
 					item->Animation.TargetState = BSCORPION_STATE_IDLE;
-
 				break;
 
 			case BSCORPION_STATE_PINCER_ATTACK:
@@ -293,28 +229,14 @@ namespace TEN::Entities::TR4
 				else
 					item->Pose.Orientation.y += AI.angle;
 
-				if (creature->Flags)
+				if (creature->Flags != 0)
 					break;
 
-				if (creature->Enemy && !creature->Enemy->IsLara() &&
-					AI.distance < pow(1365, 2))
+				if (creature->Enemy && !creature->Enemy->IsLara() && AI.distance < BIG_SCORPION_ATTACK_RANGE)
 				{
 					DoDamage(creature->Enemy, BIG_SCORPION_TROOP_ATTACK_DAMAGE);
-
-					if (creature->Enemy->HitPoints <= 0)
-					{
-						item->Animation.TargetState = BSCORPION_STATE_KILL;
-						creature->MaxTurn = 0;
-					}
-
+					CreatureEffect2(item, &BigScorpionBite1, 10, item->Pose.Orientation.y - ANGLE(180.0f), DoBloodSplat);
 					creature->Flags = 1;
-
-					CreatureEffect2(
-						item,
-						&BigScorpionBite1,
-						10,
-						item->Pose.Orientation.y - ANGLE(180.0f),
-						DoBloodSplat);
 				}
 				else if (item->TestBits(JointBitType::Touch, BigScorpionAttackJoints))
 				{
@@ -323,49 +245,19 @@ namespace TEN::Entities::TR4
 					if (item->Animation.ActiveState == BSCORPION_STATE_STINGER_ATTACK)
 					{
 						Lara.PoisonPotency += BIG_SCORPION_STINGER_POISON_POTENCY;
-
-						CreatureEffect2(
-							item,
-							&BigScorpionBite1,
-							10,
-							item->Pose.Orientation.y - ANGLE(180.0f),
-							DoBloodSplat);
+						CreatureEffect2(item, &BigScorpionBite1, 10, item->Pose.Orientation.y - ANGLE(180.0f), DoBloodSplat);
 					}
 					else
-					{
-						CreatureEffect2(
-							item,
-							&BigScorpionBite2,
-							10,
-							item->Pose.Orientation.y - ANGLE(180.0f),
-							DoBloodSplat);
-					}
+						CreatureEffect2(item, &BigScorpionBite2, 10, item->Pose.Orientation.y - ANGLE(180.0f), DoBloodSplat);
 
 					creature->Flags = 1;
-					if (LaraItem->HitPoints <= 0)
-					{
-						CreatureKill(item, 6, 7, 442);
-						creature->MaxTurn = 0;
-						return;
-					}
 				}
-
 				break;
 
 			case BSCORPION_STATE_KILL_TROOP:
 				creature->MaxTurn = 0;
-
 				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameEnd)
 					item->TriggerFlags++;
-
-				if (creature->Enemy &&
-					creature->Enemy->HitPoints <= 0 ||
-					item->TriggerFlags > 6)
-				{
-					item->Animation.TargetState = BSCORPION_STATE_KILL;
-					creature->Enemy->HitPoints = 0;
-				}
-
 				break;
 
 			default:
@@ -373,27 +265,15 @@ namespace TEN::Entities::TR4
 			}
 		}
 
-		if ((angle1 - item->Pose.Orientation.x) < ANGLE(1.4f))
-			item->Pose.Orientation.x = ANGLE(1.4f);
-		else
+		if ((creature->Enemy != NULL && creature->Enemy->HitPoints <= 0) || item->TriggerFlags > 6)
 		{
-			if (angle1 <= item->Pose.Orientation.x)
-				item->Pose.Orientation.x -= ANGLE(1.4f);
-			else
-				item->Pose.Orientation.x += ANGLE(1.4f);
-		}
-
-		if ((angle2 - item->Pose.Orientation.z) < ANGLE(1.4f))
-			item->Pose.Orientation.z = ANGLE(1.4f);
-		else
-		{
-			if (angle2 <= item->Pose.Orientation.z)
-				item->Pose.Orientation.z -= ANGLE(1.4f);
-			else
-				item->Pose.Orientation.z += ANGLE(1.4f);
+			//CreatureKill(item, BSCORPION_ANIM_KILL, BSCORPION_STATE_KILL, 0);
+			item->Animation.TargetState = BSCORPION_STATE_IDLE; // TODO: Allow scorpion to do the this kill animation -- TokyoSU, 3/8/2022
+			creature->MaxTurn = 0;
 		}
 
 		if (!CutSeqNum)
 			CreatureAnimation(itemNumber, angle, 0);
+		CalculateItemRotationToSurface(item, 5.0f);
 	}
 }

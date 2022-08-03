@@ -751,7 +751,7 @@ enum GAME_OBJECT_ID : short
 	ID_SMOKE_EMITTER_WHITE = 1020,
 	ID_SMOKE_EMITTER_BLACK,
 	ID_SMOKE_EMITTER,
-	ID_LOCUST_EMITTER,              // TODO: not used anywhere (there is ID_LOCUSTS_EMITTER instead !)
+	ID_LOCUST_EMITTER,              // TODO: not used anywhere (there is ID_LOCUSTS_EMITTER instead !) -- TokyoSU, 3/8/2022
 	ID_EARTHQUAKE,
 	ID_BUBBLES,						// TR4 - OK
 	ID_WATERFALLMIST,
