@@ -10,4 +10,29 @@ namespace TEN::Control::Volumes
 		short,
 		MESH_INFO*,
 		CAMERA_INFO *>;
+
+	enum class VolumeEventMode
+	{
+		LevelScript,
+		Constructor
+	};
+
+	struct VolumeEvent
+	{
+		VolumeEventMode Mode;
+		std::string Function;
+		std::string Argument;
+
+		int CallCounter;
+	};
+
+	struct VolumeEventSet
+	{
+		std::string Name;
+		int Activators;
+
+		VolumeEvent OnEnter;
+		VolumeEvent OnLeave;
+		VolumeEvent OnInside;
+	};
 };

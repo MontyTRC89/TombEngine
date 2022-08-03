@@ -387,6 +387,12 @@ table Pendulum {
 	node: int32;
 }
 
+table EventSetCallCounters {
+	on_enter: int32;
+	on_inside: int32;
+	on_leave: int32;
+}
+
 struct KeyValPair {
 	key: uint32;
 	val: uint32;
@@ -478,6 +484,7 @@ table SaveGame {
 	rope: Rope;
 	pendulum: Pendulum;
 	alternate_pendulum: Pendulum;
+	call_counters: [EventSetCallCounters];
 	script_vars: UnionVec;
 	}
 
