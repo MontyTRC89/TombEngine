@@ -15,7 +15,6 @@ struct Vector3Int;
 	Vector3Int TranslatePoint(Vector3Int point, Vector3Int target, float distance);*/
 
 	EulerAngles GetOrientTowardPoint(Vector3 origin, Vector3 target);
-	float		GetDeltaHeading(Vector3 origin, Vector3 target, float heading);
 
 	bool IsPointOnLeft(Vector3 origin, Vector3 refPoint, Vector3 target);
 	bool IsPointOnLeft(Vector3 origin, EulerAngles orient, Vector3 target);

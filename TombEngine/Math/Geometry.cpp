@@ -111,12 +111,6 @@
 		return EulerAngles(xOrient, yOrient, 0.0f);
 	}
 
-	float GetDeltaHeading(Vector3 origin, Vector3 target, float heading)
-	{
-		auto difference = GetOrientTowardPoint(origin, target).y;
-		return Angle::GetShortestAngularDistance(heading, difference + Angle::DegToRad(90.0f));
-	}
-
 	bool IsPointOnLeft(Vector3 origin, Vector3 refPoint, Vector3 target)
 	{
 		auto refDirection = refPoint - origin;
