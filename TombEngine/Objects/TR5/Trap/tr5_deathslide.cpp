@@ -1,6 +1,6 @@
 #include "framework.h"
 #include "tr5_deathslide.h"
-#include "Specific/input.h"
+#include "Specific/Input/Input.h"
 #include "Specific/trmath.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"

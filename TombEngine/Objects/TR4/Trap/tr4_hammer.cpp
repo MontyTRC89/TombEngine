@@ -9,7 +9,7 @@
 #include "Game/effects/effects.h"
 #include "Game/effects/tomb4fx.h"
 #include "Objects/Generic/Switches/switch.h"
-#include "Specific/input.h"
+#include "Specific/Input/Input.h"
 
 void HammerControl(short itemNumber)
 {

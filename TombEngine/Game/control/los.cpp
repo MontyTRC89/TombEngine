@@ -12,7 +12,7 @@
 #include "Objects/Generic/Switches/switch.h"
 #include "ScriptInterfaceGame.h"
 #include "Sound/sound.h"
-#include "Specific/input.h"
+#include "Specific/Input/Input.h"
 #include "Specific/setup.h"
 
 #include "Objects/ScriptInterfaceObjectsHandler.h"

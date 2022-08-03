@@ -1,5 +1,5 @@
 #pragma once
-#include "Specific/InputBinding.h"
+#include "Specific/Input/InputBinding.h"
 
 using std::vector;
 

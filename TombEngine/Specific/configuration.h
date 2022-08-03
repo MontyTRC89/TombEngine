@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Specific/input.h"
+#include "Specific/Input/Input.h"
 #include "Specific/trmath.h"
 
 #define REGKEY_ROOT						"Software\\TombEngine\\TombEngine"

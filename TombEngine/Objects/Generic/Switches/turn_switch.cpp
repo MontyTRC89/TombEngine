@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "Objects/Generic/Switches/turn_switch.h"
 #include "Game/control/control.h"
-#include "Specific/input.h"
+#include "Specific/Input/Input.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Sound/sound.h"

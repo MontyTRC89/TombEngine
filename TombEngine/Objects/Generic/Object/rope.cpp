@@ -4,7 +4,7 @@
 #include "Game/control/box.h"
 #include "Game/items.h"
 #include "Game/control/lot.h"
-#include "Specific/input.h"
+#include "Specific/Input/Input.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_struct.h"
 #include "Game/Lara/lara.h"

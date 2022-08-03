@@ -24,7 +24,7 @@
 #include "Objects/TR4/Object/tr4_clockwork_beetle.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
-#include "Specific/input.h"
+#include "Specific/Input/Input.h"
 #include "Specific/phd_global.h"
 #include "Specific/setup.h"
 

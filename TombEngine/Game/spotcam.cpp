@@ -9,7 +9,7 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
-#include "Specific/input.h"
+#include "Specific/Input/Input.h"
 
 using namespace TEN::Input;
 using namespace TEN::Renderer;

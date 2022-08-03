@@ -13,7 +13,7 @@
 #include "Game/Lara/lara_one_gun.h"
 #include "Game/itemdata/creature_info.h"
 #include "Game/collision/collide_item.h"
-#include "Specific/input.h"
+#include "Specific/Input/Input.h"
 #include "Specific/setup.h"
 #include "Specific/level.h"
 

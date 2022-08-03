@@ -23,7 +23,7 @@
 #include "Sound/sound.h"
 #include "Specific/configuration.h"
 #include "Specific/setup.h"
-#include "Specific/input.h"
+#include "Specific/Input/Input.h"
 #include "Specific/level.h"
 
 #include "ScriptInterfaceGame.h"

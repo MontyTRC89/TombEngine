@@ -23,7 +23,7 @@
 #include "Objects/Generic/Switches/generic_switch.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
-#include "Specific/input.h"
+#include "Specific/Input/Input.h"
 #include "Sound/sound.h"
 
 using namespace TEN::Input;

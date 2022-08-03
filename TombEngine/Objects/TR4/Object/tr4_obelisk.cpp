@@ -7,7 +7,7 @@
 #include "Sound/sound.h"
 #include "Game/Lara/lara.h"
 #include "Game/effects/effects.h"
-#include "Specific/input.h"
+#include "Specific/Input/Input.h"
 #include "Game/animation.h"
 #include "Game/effects/lightning.h"
 

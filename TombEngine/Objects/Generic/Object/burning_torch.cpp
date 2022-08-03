@@ -6,7 +6,7 @@
 #include "Game/animation.h"
 #include "Game/items.h"
 #include "Specific/level.h"
-#include "Specific/input.h"
+#include "Specific/Input/Input.h"
 #include "Sound/sound.h"
 #include "Objects/Effects/flame_emitters.h"
 #include "Game/effects/effects.h"

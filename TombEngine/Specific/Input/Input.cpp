@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "Specific/input.h"
+#include "Specific/Input/Input.h"
 
 #include <OISException.h>
 #include <OISForceFeedback.h>

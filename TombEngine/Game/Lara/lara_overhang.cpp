@@ -10,7 +10,7 @@
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_tests.h"
 #include "Game/items.h"
-#include "Specific/input.h"
+#include "Specific/Input/Input.h"
 #include "Specific/setup.h"
 #include "Flow/ScriptInterfaceFlowHandler.h"
 #include "Specific/level.h"

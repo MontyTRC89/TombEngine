@@ -7,7 +7,7 @@
 #include "Game/Lara/lara.h"
 #include "Scripting/Include/ScriptInterfaceGame.h"
 #include "Sound/sound.h"
-#include "Specific/input.h"
+#include "Specific/Input/Input.h"
 #include "Specific/level.h"
 #include "Specific/prng.h"
 #include "Specific/setup.h"

@@ -15,7 +15,7 @@
 #include "Game/Lara/lara_one_gun.h"
 #include "Game/effects/simple_particle.h"
 #include "Objects/TR2/Vehicles/skidoo_info.h"
-#include "Specific/input.h"
+#include "Specific/Input/Input.h"
 #include "Specific/level.h"
 #include "Specific/prng.h"
 #include "Specific/setup.h"

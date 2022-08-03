@@ -6,7 +6,7 @@
 #include "Game/items.h"
 #include "Game/control/lot.h"
 #include "Game/gui.h"
-#include "Specific/input.h"
+#include "Specific/Input/Input.h"
 #include "Game/pickup/pickup.h"
 #include "Sound/sound.h"
 #include "Game/animation.h"

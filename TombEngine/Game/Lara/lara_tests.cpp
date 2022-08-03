@@ -15,7 +15,7 @@
 #include "Game/Lara/lara_monkey.h"
 #include "Renderer/Renderer11.h"
 #include "Flow/ScriptInterfaceFlowHandler.h"
-#include "Specific/input.h"
+#include "Specific/Input/Input.h"
 #include "Specific/level.h"
 
 using namespace TEN::Input;

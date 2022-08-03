@@ -3,7 +3,7 @@
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Game/collision/floordata.h"
-#include "Specific/input.h"
+#include "Specific/Input/Input.h"
 #include "Game/camera.h"
 #include "Game/control/control.h"
 #include "Specific/level.h"

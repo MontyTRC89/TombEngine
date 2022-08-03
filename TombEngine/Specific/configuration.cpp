@@ -6,7 +6,7 @@
 #include "Renderer/Renderer11.h"
 #include "LanguageScript.h"
 #include "Flow/ScriptInterfaceFlowHandler.h"
-#include "Specific/input.h"
+#include "Specific/Input/Input.h"
 #include "Specific/winmain.h"
 #include "Sound/sound.h"
 

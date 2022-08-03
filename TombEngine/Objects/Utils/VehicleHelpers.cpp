@@ -10,7 +10,7 @@
 #include "Game/Lara/lara_struct.h"
 #include "Game/room.h"
 #include "Sound/sound.h"
-#include "Specific/input.h"
+#include "Specific/Input/Input.h"
 #include "Specific/prng.h"
 
 using namespace TEN::Input;

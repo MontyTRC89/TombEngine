@@ -12,7 +12,7 @@
 #include "Game/effects/tomb4fx.h"
 #include "Game/Lara/lara_flare.h"
 #include "Game/effects/simple_particle.h"
-#include "Specific/input.h"
+#include "Specific/Input/Input.h"
 #include "Specific/setup.h"
 #include "Specific/level.h"
 #include "Sound/sound.h"

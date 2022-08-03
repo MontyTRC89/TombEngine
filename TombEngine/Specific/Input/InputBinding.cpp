@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "Specific/InputBinding.h"
+#include "Specific/Input/InputBinding.h"
 
 #include <ois/OISKeyboard.h>
 

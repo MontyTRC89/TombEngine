@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "tr5_crowdove_switch.h"
 #include "Game/control/control.h"
-#include "Specific/input.h"
+#include "Specific/Input/Input.h"
 #include "Specific/level.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"

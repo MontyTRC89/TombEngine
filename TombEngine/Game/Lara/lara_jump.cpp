@@ -12,7 +12,7 @@
 #include "Game/Lara/lara_slide.h"
 #include "Flow/ScriptInterfaceFlowHandler.h"
 #include "Sound/sound.h"
-#include "Specific/input.h"
+#include "Specific/Input/Input.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
 

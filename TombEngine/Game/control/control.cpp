@@ -41,7 +41,7 @@
 #include "Objects/TR5/Emitter/tr5_spider_emitter.h"
 #include "Sound/sound.h"
 #include "Specific/clock.h"
-#include "Specific/input.h"
+#include "Specific/Input/Input.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
 #include "Specific/prng.h"
