@@ -183,7 +183,7 @@ namespace TEN::Renderer
 					RenderTargetCube::forwardVectors[step] * SECTOR(10),
 					RenderTargetCube::upVectors[step]);
 
-				projection = Matrix::CreatePerspectiveFieldOfView(90.0f, 1.0f, 16.0f, shadowLight->Out);
+				projection = Matrix::CreatePerspectiveFieldOfView(90.0f * PI / 180.0f, 1.0f, 16.0f, shadowLight->Out);
 
 			}
 			else if (shadowLight->Type == LIGHT_TYPE_SPOT) 
@@ -192,7 +192,9 @@ namespace TEN::Renderer
 					shadowLight->Position - shadowLight->Direction * SECTOR(10),
 					Vector3(0.0f, -1.0f, 0.0f));
 
-				projection = Matrix::CreatePerspectiveFieldOfView(shadowLight->OutRange, 1.0f, 16.0f, shadowLight->Out);
+				// Vertex lighting fades out in 1024-steps. increase angle artificially for a bigger blend radius.
+				float projectionAngle = shadowLight->OutRange * 1.5f * (PI / 180.0f); 
+				projection = Matrix::CreatePerspectiveFieldOfView(projectionAngle, 1.0f, 16.0f, shadowLight->Out);
 			}
 
 			CCameraMatrixBuffer shadowProjection;
