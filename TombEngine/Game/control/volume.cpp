@@ -15,7 +15,6 @@ using TEN::Renderer::g_Renderer;
 
 namespace TEN::Control::Volumes
 {
-
 	constexpr auto CAM_SIZE = 32;
 
 	int CurrentCollidedVolume;
@@ -30,7 +29,12 @@ namespace TEN::Control::Volumes
 		{
 			auto* volume = &room->triggerVolumes[i];
 
-			if ((volume->Activators & activatorType) != activatorType)
+			if (volume->EventSetIndex == NO_EVENT_SET)
+				continue;
+
+			auto* set = &g_Level.EventSets[volume->EventSetIndex];
+
+			if ((set->Activators & activatorType) != activatorType)
 				continue;
 
 			bool contains = false;
@@ -57,14 +61,22 @@ namespace TEN::Control::Volumes
 				if (volume->Status == TriggerStatus::Outside)
 				{
 					volume->Status = TriggerStatus::Entering;
-					if (!volume->OnEnter.empty())
-						g_GameScript->ExecuteFunction(volume->OnEnter, triggerer);
+					if (!set->OnEnter.Function.empty() && set->OnEnter.CallCounter != 0)
+					{
+						g_GameScript->ExecuteFunction(set->OnEnter.Function, triggerer);
+						if (set->OnEnter.CallCounter != NO_CALL_COUNTER)
+							set->OnEnter.CallCounter--;
+					}
 				}
 				else
 				{
 					volume->Status = TriggerStatus::Inside;
-					if (!volume->OnInside.empty())
-						g_GameScript->ExecuteFunction(volume->OnInside, triggerer);
+					if (!set->OnInside.Function.empty() && set->OnInside.CallCounter != 0)
+					{
+						g_GameScript->ExecuteFunction(set->OnInside.Function, triggerer);
+						if (set->OnInside.CallCounter != NO_CALL_COUNTER)
+							set->OnInside.CallCounter--;
+					}
 				}
 			}
 			else
@@ -72,8 +84,12 @@ namespace TEN::Control::Volumes
 				if (volume->Status == TriggerStatus::Inside)
 				{
 					volume->Status = TriggerStatus::Leaving;
-					if (!volume->OnLeave.empty())
-						g_GameScript->ExecuteFunction(volume->OnLeave, triggerer);
+					if (!set->OnLeave.Function.empty() && set->OnLeave.CallCounter != 0)
+					{
+						g_GameScript->ExecuteFunction(set->OnLeave.Function, triggerer);
+						if (set->OnLeave.CallCounter != NO_CALL_COUNTER)
+							set->OnLeave.CallCounter--;
+					}
 				}
 				else
 					volume->Status = TriggerStatus::Outside;

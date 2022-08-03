@@ -691,12 +691,10 @@ bool SaveGame::Save(int slot)
 
 	auto serializedItemsOffset = fbb.CreateVector(serializedItems);
 
-
-	std::vector<flatbuffers::Offset<Save::FXInfo>> serializedEffects{};
-
 	// TODO: In future, we should save only active FX, not whole array.
 	// This may come together with Monty's branch merge -- Lwmte, 10.07.22
 
+	std::vector<flatbuffers::Offset<Save::FXInfo>> serializedEffects{};
 	for (auto& effectToSerialize : EffectList)
 	{
 		Save::FXInfoBuilder serializedEffect{ fbb };
@@ -718,8 +716,23 @@ bool SaveGame::Save(int slot)
 		auto serializedEffectOffset = serializedEffect.Finish();
 		serializedEffects.push_back(serializedEffectOffset);
 	}
-
 	auto serializedEffectsOffset = fbb.CreateVector(serializedEffects);
+
+	// Event set call counters
+
+	std::vector<flatbuffers::Offset<Save::EventSetCallCounters>> serializedEventSetCallCounters{};
+	for (auto& set : g_Level.EventSets)
+	{
+		Save::EventSetCallCountersBuilder serializedEventSetCallCounter{ fbb };
+
+		serializedEventSetCallCounter.add_on_enter(set.OnEnter.CallCounter);
+		serializedEventSetCallCounter.add_on_inside(set.OnInside.CallCounter);
+		serializedEventSetCallCounter.add_on_leave(set.OnLeave.CallCounter);
+
+		auto serializedEventSetCallCounterOffset = serializedEventSetCallCounter.Finish();
+		serializedEventSetCallCounters.push_back(serializedEventSetCallCounterOffset);
+	}
+	auto serializedEventSetCallCountersOffset = fbb.CreateVector(serializedEventSetCallCounters);
 
 	// Soundtrack playheads
 	auto bgmTrackData = GetSoundTrackNameAndPosition(SoundTrackType::BGM);
@@ -1144,6 +1157,7 @@ bool SaveGame::Save(int slot)
 	sgb.add_scarabs(scarabsOffset);
 	sgb.add_sinks(sinksOffset);
 	sgb.add_flyby_cameras(flybyCamerasOffset);
+	sgb.add_call_counters(serializedEventSetCallCountersOffset);
 
 	if (Lara.Control.Rope.Ptr != -1)
 	{
@@ -1151,7 +1165,6 @@ bool SaveGame::Save(int slot)
 		sgb.add_pendulum(pendulumOffset);
 		sgb.add_alternate_pendulum(alternatePendulumOffset);
 	}
-
 
 	sgb.add_script_vars(unionVecOffset);
 
@@ -1651,7 +1664,19 @@ bool SaveGame::Load(int slot)
 		fx.flag2 = fx_saved->flag2();
 	}
 
-	JustLoaded = 1;	
+	if (g_Level.EventSets.size() == s->call_counters()->size())
+	{
+		for (int i = 0; i < s->call_counters()->size(); ++i)
+		{
+			auto cc_saved = s->call_counters()->Get(i);
+
+			g_Level.EventSets[i].OnEnter.CallCounter = cc_saved->on_enter();
+			g_Level.EventSets[i].OnInside.CallCounter = cc_saved->on_inside();
+			g_Level.EventSets[i].OnLeave.CallCounter = cc_saved->on_leave();
+		}
+	}
+
+	JustLoaded = true;	
 
 	// Lara
 	ZeroMemory(Lara.Inventory.Puzzles, NUM_PUZZLES * sizeof(int));
