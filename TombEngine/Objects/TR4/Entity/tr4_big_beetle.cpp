@@ -19,9 +19,8 @@ namespace TEN::Entities::TR4
 	const vector<int> BigBeetleAttackJoints = { 5, 6 };
 
 	constexpr auto BIG_BEETLE_ATTACK_DAMAGE = 50;
-
-	constexpr auto BIG_BEETLE_ATTACK_RANGE = CLICK(1);
-	constexpr auto BIG_BEETLE_AWARE_RANGE = CLICK(3);
+	constexpr auto BIG_BEETLE_ATTACK_RANGE = SQUARE(CLICK(1));
+	constexpr auto BIG_BEETLE_AWARE_RANGE = SQUARE(SECTOR(9));
 
 	enum BigBeetleState
 	{
@@ -61,9 +60,7 @@ namespace TEN::Entities::TR4
 	void InitialiseBigBeetle(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
-
-		ClearItem(itemNumber);
-
+		InitialiseCreature(itemNumber);
 		item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + BBEETLE_ANIM_IDLE;
 		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 		item->Animation.ActiveState = BBEETLE_STATE_IDLE;
@@ -77,7 +74,6 @@ namespace TEN::Entities::TR4
 
 		auto* item = &g_Level.Items[itemNumber];
 		auto* creature = GetCreatureInfo(item);
-
 		short angle = 0;
 
 		if (item->HitPoints <= 0)
@@ -116,37 +112,23 @@ namespace TEN::Entities::TR4
 		{
 			AI_INFO AI;
 			CreatureAIInfo(item, &AI);
-
 			GetCreatureMood(item, &AI, VIOLENT);
-
 			if (creature->Flags)
 				creature->Mood = MoodType::Escape;
-
 			CreatureMood(item, &AI, VIOLENT);
-
 			angle = CreatureTurn(item, creature->MaxTurn);
 
-			if (item->HitStatus ||
-				AI.distance > pow(BIG_BEETLE_AWARE_RANGE, 2) ||
-				!(GetRandomControl() & 0x7F))
-			{
+			if (item->HitStatus || AI.distance >= BIG_BEETLE_AWARE_RANGE || !(GetRandomControl() & 0x7F))
 				creature->Flags = 0;
-			}
 
 			switch (item->Animation.ActiveState)
 			{
 			case BBEETLE_STATE_IDLE:
-				item->Pose.Position.y = item->Floor;
 				creature->MaxTurn = ANGLE(1.0f);
+				item->Pose.Position.y = item->Floor;
 
-				if (item->HitStatus ||
-					item->AIBits == MODIFY ||
-					creature->HurtByLara ||
-					AI.distance < pow(BIG_BEETLE_AWARE_RANGE, 2))
-				{
+				if (item->HitStatus || item->AIBits == MODIFY || creature->HurtByLara || AI.distance < BIG_BEETLE_AWARE_RANGE)
 					item->Animation.TargetState = BBEETLE_STATE_TAKE_OFF;
-				}
-
 				break;
 
 			case BBEETLE_STATE_FLY_FORWARD:
@@ -154,12 +136,8 @@ namespace TEN::Entities::TR4
 
 				if (item->Animation.RequiredState)
 					item->Animation.TargetState = item->Animation.RequiredState;
-				else if (AI.ahead)
-				{
-					if (AI.distance < pow(BIG_BEETLE_ATTACK_RANGE, 2))
-						item->Animation.TargetState = BBEETLE_STATE_FLY_IDLE;
-				}
-
+				else if (AI.ahead && AI.distance < BIG_BEETLE_ATTACK_RANGE)
+					item->Animation.TargetState = BBEETLE_STATE_FLY_IDLE;
 				break;
 
 			case BBEETLE_STATE_ATTACK:
@@ -167,10 +145,15 @@ namespace TEN::Entities::TR4
 
 				if (AI.ahead)
 				{
-					if (AI.distance < pow(BIG_BEETLE_ATTACK_RANGE, 2))
+					if (AI.distance < BIG_BEETLE_ATTACK_RANGE)
 						item->Animation.TargetState = BBEETLE_STATE_ATTACK;
+					else
+					{
+						item->Animation.RequiredState = BBEETLE_STATE_FLY_FORWARD;
+						item->Animation.TargetState = BBEETLE_STATE_FLY_IDLE;
+					}
 				}
-				else if (AI.distance < pow(BIG_BEETLE_ATTACK_RANGE, 2))
+				else if (AI.distance < BIG_BEETLE_ATTACK_RANGE)
 					item->Animation.TargetState = BBEETLE_STATE_FLY_IDLE;
 				else
 				{
@@ -178,31 +161,19 @@ namespace TEN::Entities::TR4
 					item->Animation.TargetState = BBEETLE_STATE_FLY_IDLE;
 				}
 
-				if (!creature->Flags)
+				if (!creature->Flags && item->TestBits(JointBitType::Touch, BigBeetleAttackJoints))
 				{
-					if (item->TestBits(JointBitType::Touch, BigBeetleAttackJoints))
-					{
-						DoDamage(creature->Enemy, BIG_BEETLE_ATTACK_DAMAGE);
-
-						CreatureEffect2(
-							item,
-							&BigBeetleBite,
-							5,
-							-1,
-							DoBloodSplat);
-						creature->Flags = 1;
-					}
+					CreatureEffect2(item, &BigBeetleBite, 5, -1, DoBloodSplat);
+					DoDamage(creature->Enemy, BIG_BEETLE_ATTACK_DAMAGE);
+					creature->Flags = 1;
 				}
-
 				break;
 
 			case BBEETLE_STATE_LAND:
 				creature->Flags = 0;
-
 				item->Pose.Position.y += 51;
 				if (item->Pose.Position.y > item->Floor)
 					item->Pose.Position.y = item->Floor;
-
 				break;
 
 			case BBEETLE_STATE_FLY_IDLE:
@@ -210,24 +181,20 @@ namespace TEN::Entities::TR4
 
 				if (item->Animation.RequiredState)
 					item->Animation.TargetState = item->Animation.RequiredState;
-				else if (!item->HitStatus && item->AIBits != MODIFY && GetRandomControl() >= 384 &&
-					((creature->Mood != MoodType::Bored && GetRandomControl() >= 128) ||
-						creature->HurtByLara || item->AIBits == MODIFY))
+				else if (!item->HitStatus && item->AIBits != MODIFY && GetRandomControl() >= 384 && ((creature->Mood != MoodType::Bored && GetRandomControl() >= 128) || creature->HurtByLara || item->AIBits == MODIFY))
 				{
 					if (AI.ahead)
 					{
-						if (AI.distance < pow(BIG_BEETLE_ATTACK_RANGE, 2) && !creature->Flags)
+						if (AI.distance < BIG_BEETLE_ATTACK_RANGE && !creature->Flags)
 							item->Animation.TargetState = BBEETLE_STATE_ATTACK;
 					}
 				}
 				else
 					item->Animation.TargetState = BBEETLE_STATE_FLY_FORWARD;
-
 				break;
 
 			default:
 				break;
-
 			}
 		}
 
