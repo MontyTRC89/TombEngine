@@ -24,7 +24,6 @@
 	Vector3Int TranslatePoint(Vector3Int point, float angle, float forward, float up, float right)
 	{
 		auto newPoint = TranslatePoint(point.ToVector3(), angle, forward, up, right);
-
 		return Vector3Int(
 			(int)round(newPoint.x),
 			(int)round(newPoint.y),
@@ -34,6 +33,7 @@
 
 	Vector3 TranslatePoint(Vector3 point, Vector3 direction, float distance)
 	{
+		direction.Normalize();
 		point += direction * distance;
 		return point;
 	}
