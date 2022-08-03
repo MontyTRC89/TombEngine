@@ -108,7 +108,7 @@
 
 	float Angle::DegToRad(float degrees)
 	{
-		return (degrees * (PI / 180.0f));
+		return (degrees * RADIAN);
 	}
 
 	float Angle::RadToDeg(float radians)
@@ -118,7 +118,7 @@
 
 	float Angle::ShrtToRad(short shortForm)
 	{
-		return (shortForm * ((360.0f / (USHRT_MAX + 1)) * (PI / 180.0f)));
+		return (shortForm * ((360.0f / (USHRT_MAX + 1)) * RADIAN));
 	}
 
 	short Angle::DegToShrt(float degrees)
@@ -128,7 +128,7 @@
 
 	short Angle::RadToShrt(float radians)
 	{
-		return (short)round((radians / (PI / 180.0f)) * ((USHRT_MAX + 1) / 360.0f));
+		return (short)round((radians / RADIAN) * ((USHRT_MAX + 1) / 360.0f));
 	}
 
 	Angle::operator float() const
