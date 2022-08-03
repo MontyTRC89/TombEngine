@@ -777,24 +777,9 @@ void ReadRooms()
 			volume.Scale.y = ReadFloat();
 			volume.Scale.z = ReadFloat();
 
-			volume.Activators = ReadInt32();
+			volume.EventSetIndex = ReadInt32();
 
-			byte numBytes = ReadInt8();
-			char buffer[255];
-			ReadBytes(buffer, numBytes);
-			volume.OnEnter = std::string(buffer, buffer+numBytes);
-
-			numBytes = ReadInt8();
-			ReadBytes(buffer, numBytes);
-			volume.OnInside = std::string(buffer, buffer+numBytes);
-
-			numBytes = ReadInt8();
-			ReadBytes(buffer, numBytes);
-			volume.OnLeave = std::string(buffer, buffer+numBytes);
-
-			volume.OneShot = ReadInt8();
 			volume.Status = TriggerStatus::Outside;
-
 			volume.Box    = BoundingOrientedBox(volume.Position, volume.Scale, volume.Rotation);
 			volume.Sphere = BoundingSphere(volume.Position, volume.Scale.x);
 
@@ -860,7 +845,7 @@ void FreeLevel()
 	g_Level.Sinks.resize(0);
 	g_Level.SoundSources.resize(0);
 	g_Level.AIObjects.resize(0);
-	g_Level.LuaFunctionNames.resize(0);
+	g_Level.EventSets.resize(0);
 	g_Level.Items.resize(0);
 
 	for (int i = 0; i < 2; i++)
@@ -968,13 +953,35 @@ void LoadAIObjects()
 	}
 }
 
-void LoadLuaFunctionNames()
+void LoadEventSets()
 {
-	TENLog("Parsing Lua function names... ", LogLevel::Info);
+	int eventSetCount = ReadInt32();
+	TENLog("Num level sets: " + std::to_string(eventSetCount), LogLevel::Info);
 
-	int luaFunctionsCount = ReadInt32();
-	for (int i = 0; i < luaFunctionsCount; i++)
-		g_Level.LuaFunctionNames.push_back(ReadString());
+	for (int i = 0; i < eventSetCount; i++)
+	{
+		auto eventSet = VolumeEventSet();
+
+		eventSet.Name = ReadString();
+		eventSet.Activators = ReadInt32();
+
+		eventSet.OnEnter.Mode = (VolumeEventMode)ReadInt32();
+		eventSet.OnEnter.Function = ReadString();
+		eventSet.OnEnter.Argument = ReadString();
+		eventSet.OnEnter.CallCounter = ReadInt32();
+
+		eventSet.OnInside.Mode = (VolumeEventMode)ReadInt32();
+		eventSet.OnInside.Function = ReadString();
+		eventSet.OnInside.Argument = ReadString();
+		eventSet.OnInside.CallCounter = ReadInt32();
+
+		eventSet.OnLeave.Mode = (VolumeEventMode)ReadInt32();
+		eventSet.OnLeave.Function = ReadString();
+		eventSet.OnLeave.Argument = ReadString();
+		eventSet.OnLeave.CallCounter = ReadInt32();
+
+		g_Level.EventSets.push_back(eventSet);
+	}
 }
 
 FILE* FileOpen(const char* fileName)
@@ -1111,7 +1118,7 @@ unsigned int _stdcall LoadLevel(void* data)
 		LoadItems();
 		LoadAIObjects();
 
-		LoadLuaFunctionNames();
+		LoadEventSets();
 
 		LoadSamples();
 		g_Renderer.UpdateProgress(80);
