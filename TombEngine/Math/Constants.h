@@ -11,6 +11,7 @@
 
 	constexpr inline auto BLOCK_UNIT	 = 1024;
 	constexpr inline auto QTR_BLOCK_UNIT = BLOCK_UNIT / 4;
-	constexpr inline auto BLOCK			 = [](auto x) { return int(BLOCK_UNIT * x); };
-	constexpr inline auto QTR_BLOCK		 = [](auto x) { return int(QTR_BLOCK_UNIT * x); };
+
+	constexpr inline auto BLOCK		= [](auto x) { return int(BLOCK_UNIT * x); };
+	constexpr inline auto QTR_BLOCK	= [](auto x) { return int(QTR_BLOCK_UNIT * x); };
 //}

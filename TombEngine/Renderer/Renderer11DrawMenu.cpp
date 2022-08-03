@@ -895,12 +895,11 @@ namespace TEN::Renderer
 				break;
 
 			case RENDERER_DEBUG_PAGE::DIMENSION_STATS:
-				PrintDebugMessage("Lara Location: %d %d", LaraItem->Location.roomNumber, LaraItem->Location.yNumber);
-				PrintDebugMessage("Lara RoomNumber: %d", LaraItem->RoomNumber);
-				PrintDebugMessage("LaraItem BoxNumber: %d",/* canJump: %d, canLongJump: %d, canMonkey: %d,*/
-					LaraItem->BoxNumber);
 				PrintDebugMessage("Lara Pos: %d %d %d", LaraItem->Pose.Position.x, LaraItem->Pose.Position.y, LaraItem->Pose.Position.z);
-				PrintDebugMessage("Lara Rot: %d %d %d", LaraItem->Pose.Orientation.x, LaraItem->Pose.Orientation.y, LaraItem->Pose.Orientation.z);
+				PrintDebugMessage("Lara Orient (Rad): %.3f %.3f %.3f", (float)LaraItem->Pose.Orientation.x, (float)LaraItem->Pose.Orientation.y, (float)LaraItem->Pose.Orientation.z);
+				PrintDebugMessage("Lara Orient (Deg): %.3f %.3f %.3f", Angle::RadToDeg(LaraItem->Pose.Orientation.x), Angle::RadToDeg(LaraItem->Pose.Orientation.y), Angle::RadToDeg(LaraItem->Pose.Orientation.z));
+				PrintDebugMessage("Lara RoomNumber: %d", LaraItem->RoomNumber);
+				PrintDebugMessage("LaraItem BoxNumber: %d",	LaraItem->BoxNumber);
 				PrintDebugMessage("Lara WaterSurfaceDist: %d", Lara.WaterSurfaceDist);
 				PrintDebugMessage("Room: %d %d %d %d", r->x, r->z, r->x + r->xSize * SECTOR(1),
 					r->z + r->zSize * SECTOR(1));
@@ -915,13 +914,11 @@ namespace TEN::Renderer
 				PrintDebugMessage("Lara FrameNumber: %d", LaraItem->Animation.FrameNumber);
 				PrintDebugMessage("Lara ActiveState: %d", LaraItem->Animation.ActiveState);
 				PrintDebugMessage("Lara TargetState: %d", LaraItem->Animation.TargetState);
-				PrintDebugMessage("Lara Velocity, VerticalVelocity, LateralVelocity: %d %d %d", LaraItem->Animation.Velocity, LaraItem->Animation.VerticalVelocity, LaraItem->Animation.LateralVelocity);
+				PrintDebugMessage("Lara Velocities: %d %d %d", LaraItem->Animation.Velocity, LaraItem->Animation.VerticalVelocity, LaraItem->Animation.LateralVelocity);
 				PrintDebugMessage("Lara ExtraVelocity.x, y, z: %d %d %d", Lara.ExtraVelocity.x, Lara.ExtraVelocity.y, Lara.ExtraVelocity.z);
-				PrintDebugMessage("Lara WaterStatus: %d", Lara.Control.WaterStatus);
-				PrintDebugMessage("Lara IsMoving: %d", Lara.Control.IsMoving);
 				PrintDebugMessage("Lara HandStatus: %d", Lara.Control.HandStatus);
+				PrintDebugMessage("Lara WaterStatus: %d", Lara.Control.WaterStatus);
 				PrintDebugMessage("Lara IsAirborne: %d", LaraItem->Animation.IsAirborne);
-				PrintDebugMessage("Lara CanClimbLadder: %d", Lara.Control.CanClimbLadder);
 				break;
 
 			case RENDERER_DEBUG_PAGE::LOGIC_STATS:
