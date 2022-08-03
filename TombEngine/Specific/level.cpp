@@ -937,9 +937,6 @@ void LoadAnimatedTextures()
 
 		g_Level.AnimatedTexturesSequences.push_back(sequence);
 	}
-
-	// Unused for now
-	int nAnimUVRanges = ReadInt8();
 }
 
 void LoadAIObjects()
