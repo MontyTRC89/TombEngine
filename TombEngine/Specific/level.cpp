@@ -335,8 +335,6 @@ void LoadObjects()
 		Objects[objNum].frameBase = ReadInt32();
 		Objects[objNum].animIndex = ReadInt32();
 
-		ReadInt16();
-
 		Objects[objNum].loaded = true;
 	}
 
@@ -416,11 +414,7 @@ void LoadCameras()
 		sink.z = ReadInt32();
 		sink.strength = ReadInt32();
 		sink.boxIndex = ReadInt32();
-
-		byte numBytes = ReadInt8();
-		char buffer[255];
-		ReadBytes(buffer, numBytes);
-		sink.luaName = std::string(buffer, buffer+numBytes);
+		sink.luaName = ReadString();
 
 		g_GameScriptEntities->AddName(sink.luaName, sink);
 	}
@@ -884,11 +878,7 @@ void LoadSoundSources()
 		source.z = ReadInt32();
 		source.soundId = ReadInt32();
 		source.flags = ReadInt32();
-
-		byte numBytes = ReadInt8();
-		char buffer[255];
-		ReadBytes(buffer, numBytes);
-		source.luaName = std::string(buffer, buffer+numBytes);
+		source.luaName = ReadString();
 
 		g_GameScriptEntities->AddName(source.luaName, source);
 	}
@@ -943,11 +933,7 @@ void LoadAIObjects()
 		obj.flags = ReadInt16();
 		obj.yRot = ReadInt16();
 		obj.boxNumber = ReadInt32();
-
-		byte numBytes = ReadInt8();
-		char buffer[255];
-		ReadBytes(buffer, numBytes);
-		obj.luaName = std::string(buffer, buffer+numBytes);
+		obj.luaName = ReadString();
 
 		g_GameScriptEntities->AddName(obj.luaName, obj);
 	}
