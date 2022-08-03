@@ -17,10 +17,10 @@ namespace TEN::Entities::TR4
 {
 	BITE_INFO BigBeetleBite = { 0, 0, 0, 12 };
 	const vector<int> BigBeetleAttackJoints = { 5, 6 };
-
+	
 	constexpr auto BIG_BEETLE_ATTACK_DAMAGE = 50;
 	constexpr auto BIG_BEETLE_ATTACK_RANGE = SQUARE(CLICK(1));
-	constexpr auto BIG_BEETLE_AWARE_RANGE = SQUARE(SECTOR(9));
+	constexpr auto BIG_BEETLE_AWARE_RANGE = int(SQUARE(CLICK(12.0f)));
 
 	enum BigBeetleState
 	{

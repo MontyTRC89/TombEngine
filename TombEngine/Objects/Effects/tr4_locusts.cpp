@@ -144,7 +144,7 @@ namespace TEN::Entities::TR4
 					LaraItem->Pose.Position.y - locust->escapeYrot - locust->pos.Position.y,
 					LaraItem->Pose.Position.z + 8 * locust->escapeZrot - locust->pos.Position.z);
 
-				int distance = pow(LaraItem->Pose.Position.z - locust->pos.Position.z, 2) + pow(LaraItem->Pose.Position.x - locust->pos.Position.x, 2);
+				int distance = SQUARE(LaraItem->Pose.Position.z - locust->pos.Position.z) + SQUARE(LaraItem->Pose.Position.x - locust->pos.Position.x);
 				int square = int(sqrt(distance)) / 8;
 				if (square <= 128)
 				{
