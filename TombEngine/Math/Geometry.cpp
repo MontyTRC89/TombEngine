@@ -114,7 +114,6 @@
 	bool IsPointOnLeft(Vector3 origin, Vector3 refPoint, Vector3 target)
 	{
 		auto refDirection = refPoint - origin;
-		refDirection.y = 0.0f;
 
 		auto normal = Vector3(refDirection.z, 0.0f, -refDirection.x);
 		auto targetDirection = target - origin;
@@ -122,8 +121,8 @@
 		float dot = normal.Dot(targetDirection);
 		if (dot > 0.0f)
 			return true;
-		else
-			return false;
+		
+		return false;
 	}
 
 	bool IsPointOnLeft(Vector3 origin, EulerAngles orient, Vector3 target)
@@ -137,7 +136,7 @@
 		float dot = normal.Dot(difference);
 		if (dot >= 0.0f)
 			return false;
-		else
-			return true;
+		
+		return true;
 	}
 //}

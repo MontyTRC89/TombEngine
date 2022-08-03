@@ -19,11 +19,15 @@
 		this->z = zAngle;
 	}
 
-	// TODO
+	// TODO: Check.
 	EulerAngles::EulerAngles(Vector3 directionVector)
 	{
 		directionVector.Normalize();
-		*this = EulerAngles::Zero;
+		*this = EulerAngles(
+			atan2(directionVector.y, directionVector.x),
+			-asin(directionVector.z),
+			0.0f
+		);
 	}
 
 	bool EulerAngles::Compare(EulerAngles euler0, EulerAngles euler1, float epsilon)
