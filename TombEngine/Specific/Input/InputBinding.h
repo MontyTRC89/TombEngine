@@ -12,6 +12,9 @@ namespace TEN::Input
 	// Contains multiple BINDINGS which may be composed of multiple KEY MAPPINGS.
 	class InputBinding
 	{
+	private:
+		array<array<int, MAX_KEY_MAPPINGS>, MAX_BINDINGS> Bindings;
+
 	public:
 		InputBinding();
 
@@ -20,8 +23,6 @@ namespace TEN::Input
 		void Clear(int bindingIndex);
 
 	private:
-		array<array<int, MAX_KEY_MAPPINGS>, MAX_BINDINGS> Bindings;
-
 		void Initialize();
 		bool IsIndexWithinRange(int bindingIndex);
 	};
