@@ -942,31 +942,6 @@ void LoadAnimatedTextures()
 	int nAnimUVRanges = ReadInt8();
 }
 
-void LoadTextureInfos()
-{
-	// TODO: THIS FUNCTION IS DUMMY!!!! REMOVE IT WHEN TE FORMAT IS CHANGED! -- Lwmte 31.07.22
-
-	ReadInt32(); // TEX/0
-
-	int numObjectTextures = ReadInt32();
-	TENLog("Num texinfos: " + std::to_string(numObjectTextures), LogLevel::Info);
-
-	for (int i = 0; i < numObjectTextures; i++)
-	{
-		ReadInt32();
-		ReadInt32();
-		ReadInt32();
-
-		for (int j = 0; j < 4; j++)
-		{
-			ReadFloat();
-			ReadFloat();
-		}
-
-		ReadInt32();
-	}
-}
-
 void LoadAIObjects()
 {
 	int nAIObjects = ReadInt32();
@@ -1134,7 +1109,6 @@ unsigned int _stdcall LoadLevel(void* data)
 		//InitialiseLOTarray(true);
 
 		LoadAnimatedTextures();
-		LoadTextureInfos();
 		g_Renderer.UpdateProgress(70);
 
 		LoadItems();

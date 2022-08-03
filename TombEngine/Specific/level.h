@@ -149,7 +149,6 @@ void LoadBoxes();
 void LoadSamples();
 void LoadSoundSources();
 void LoadAnimatedTextures();
-void LoadTextureInfos();
 void LoadAIObjects();
 
 void InitialiseLara(int restore);
