@@ -5,7 +5,7 @@ local EventSequence
 LevelVars.__TEN_eventSequence = {sequences = {}}
 
 EventSequence = {
-	Create = function(name, ...)
+	Create = function(name, showString, ...)
 		local obj = {}
 		local mt = {}
 		mt.__index = EventSequence
@@ -56,6 +56,7 @@ EventSequence = {
 				-- final timer
 				LevelFuncs[funcName] = function(...)
 					LevelFuncs[func](...)
+					Timer.Get(timerName):Stop()
 					thisES.currentTimer = 1
 				end
 			end
@@ -73,6 +74,28 @@ EventSequence = {
 
 		return obj
 	end;
+
+	Get = function(name)
+		if LevelVars.__TEN_eventSequence.sequences[name] then
+			local obj = {}
+			local mt = {}
+			mt.__index = EventSequence
+			setmetatable(obj, mt)
+			obj.name = name
+			return obj
+		end
+		return nil
+	end,
+
+	Pause = function(t)
+		local thisES = LevelVars.__TEN_eventSequence.sequences[t.name]
+		Timer.Get(thisES.timers[thisES.currentTimer]):Pause()
+	end,
+
+	Stop = function(t)
+		local thisES = LevelVars.__TEN_eventSequence.sequences[t.name]
+		Timer.Get(thisES.timers[thisES.currentTimer]):Stop()
+	end,
 
 	Start = function(t)
 		local thisES = LevelVars.__TEN_eventSequence.sequences[t.name]
