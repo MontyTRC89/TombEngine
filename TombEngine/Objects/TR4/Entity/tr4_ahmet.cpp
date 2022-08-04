@@ -21,12 +21,6 @@ using std::vector;
 
 namespace TEN::Entities::TR4
 {
-	const vector<int> AhmetSwipeAttackLeftJoints  = { 14, 15, 16, 17 };
-	const vector<int> AhmetSwipeAttackRightJoints = { 20, 21, 22, 23 };
-	const auto AhmetBiteLeft  = BiteInfo(Vector3::Zero, 16);
-	const auto AhmetBiteRight = BiteInfo(Vector3::Zero, 22);
-	const auto AhmetBiteJaw	  = BiteInfo(Vector3::Zero, 11);
-
 	constexpr auto AHMET_SWIPE_ATTACK_DAMAGE = 80;
 	constexpr auto AHMET_BITE_ATTACK_DAMAGE	 = 120;
 
@@ -39,6 +33,12 @@ namespace TEN::Entities::TR4
 	#define AHMET_RUN_FORWARD_TURN_ANGLE  ANGLE(8.0f)
 	#define AHMET_VIEW_ANGLE			  ANGLE(45.0f)
 	#define AHMET_ENEMY_ANGLE			  ANGLE(90.0f)
+	
+	const vector<int> AhmetSwipeAttackLeftJoints  = { 14, 15, 16, 17 };
+	const vector<int> AhmetSwipeAttackRightJoints = { 20, 21, 22, 23 };
+	const auto AhmetBiteLeft  = BiteInfo(Vector3::Zero, 16);
+	const auto AhmetBiteRight = BiteInfo(Vector3::Zero, 22);
+	const auto AhmetBiteJaw	  = BiteInfo(Vector3::Zero, 11);
 
 	enum AhmetState
 	{

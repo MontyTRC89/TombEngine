@@ -1,3 +1,6 @@
 #pragma once
 
-void SilencerControl(short itemNumber);
+namespace TEN::Entities::TR2
+{
+	void SilencerControl(short itemNumber);
+}

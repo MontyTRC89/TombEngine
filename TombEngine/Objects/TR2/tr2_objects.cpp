@@ -35,6 +35,8 @@
 #include "Specific/setup.h"
 #include "Specific/level.h"
 
+using namespace TEN::Entities::TR2;
+
 static void StartEntity(ObjectInfo* obj)
 {
 	obj = &Objects[ID_SHARK];

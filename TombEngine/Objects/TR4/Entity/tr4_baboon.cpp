@@ -19,13 +19,6 @@ using std::vector;
 
 namespace TEN::Entities::TR4
 {
-	BaboonRespawner BaboonRespawn;
-
-	const vector<int> BaboonAttackJoints	  = { 11, 12 };
-	const vector<int> BaboonAttackRightJoints = { 1, 2, 3, 5, 8, 9 };
-	const vector<int> BaboonJumpAttackJoints  = { 3, 4, 8 };
-	const auto BaboonBite = BiteInfo(Vector3(10.0f, 10.0f, 11.0f), 4);
-
 	constexpr auto BABOON_ATTACK_DAMAGE = 70;
 
 	constexpr auto BABOON_ATTACK_RANGE		  = SQUARE(SECTOR(0.34f));
@@ -44,6 +37,12 @@ namespace TEN::Entities::TR4
 	#define BABOON_RUN_FORWARD_TURN_ANGLE  ANGLE(11.0f)
 
 	#define BABOON_STATE_WALK_ANIM 14 // TODO: What is this?
+
+	BaboonRespawner BaboonRespawn;
+	const vector<int> BaboonAttackJoints	  = { 11, 12 };
+	const vector<int> BaboonAttackRightJoints = { 1, 2, 3, 5, 8, 9 };
+	const vector<int> BaboonJumpAttackJoints  = { 3, 4, 8 };
+	const auto BaboonBite = BiteInfo(Vector3(10.0f, 10.0f, 11.0f), 4);
 
 	enum BaboonState
 	{
