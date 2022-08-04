@@ -457,7 +457,7 @@ namespace TEN::Entities::TR4
 			}
 			else
 			{
-				if (creature->Enemy && creature->Enemy->HitPoints > 0 && AI.distance < pow(1024, 2) && !(creature->Enemy->IsLara()) &&
+				if (creature->Enemy && creature->Enemy->HitPoints > 0 && AI.distance < pow(1024, 2) && !creature->Enemy->IsLara() &&
 					creature->Enemy->ObjectNumber != ID_AI_FOLLOW)
 				{
 					if (AI.bite)
