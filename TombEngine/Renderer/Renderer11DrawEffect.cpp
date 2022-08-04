@@ -270,7 +270,10 @@ namespace TEN::Renderer
 						}
 					}
 
-					AddSpriteBillboard(&m_sprites[particle->spriteIndex],
+					// Don't allow sprites out of bounds
+					int spriteIndex = std::clamp(int(particle->spriteIndex), 0, int(m_sprites.size()));
+
+					AddSpriteBillboard(&m_sprites[spriteIndex],
 						pos,
 						Vector4(particle->r / 255.0f, particle->g / 255.0f, particle->b / 255.0f, 1.0f),
 						TO_RAD(particle->rotAng << 4), particle->scalar,
@@ -861,7 +864,7 @@ namespace TEN::Renderer
 				face.info.world = spriteMatrix;
 				face.info.blendMode = spr.BlendMode;
 
-				RendererRoom& room = m_rooms[GetRoomNumberForSpriteTest(spr.pos)];
+				RendererRoom& room = m_rooms[FindRoomNumber(Vector3Int(spr.pos))];
 				room.TransparentFacesToDraw.push_back(face);
 			}
 			else

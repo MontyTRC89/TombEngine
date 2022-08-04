@@ -995,7 +995,7 @@ static void StartObject(ObjectInfo *obj)
 		obj->saveFlags = true;
 	}
 
-	obj = &Objects[ID_SMOKE_EMITTER];
+	obj = &Objects[ID_STEAM_EMITTER];
 	if (obj->loaded)
 	{
 		obj->initialise = InitialiseSmokeEmitter;

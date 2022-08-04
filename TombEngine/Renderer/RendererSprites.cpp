@@ -4,22 +4,6 @@
 
 namespace TEN::Renderer 
 {
-	short Renderer11::GetRoomNumberForSpriteTest(Vector3 position)
-	{
-		for (int i = 0; i < g_Level.Rooms.size(); i++)
-		{
-			ROOM_INFO* room = &g_Level.Rooms[i];
-			if (position.x >= room->x && position.x <= room->x + (room->xSize - 1) * WALL_SIZE &&
-				position.y >= room->maxceiling && position.y <= room->minfloor &&
-				position.z >= room->z && position.z <= room->z + (room->zSize - 1) * WALL_SIZE)
-			{
-				return i;
-			}
-		}
-
-		return 0;
-	}
-
 	void Renderer11::AddSpriteBillboard(RendererSprite* sprite, Vector3 pos, Vector4 color, float rotation, float scale, Vector2 size, BLEND_MODES blendMode, RenderView& view)
 	{
 		if (m_Locked)
