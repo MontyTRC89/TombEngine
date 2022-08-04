@@ -12,13 +12,13 @@ local ItemAction = Flow.ItemAction
 
 Flow.SetIntroImagePath("Screens\\Main.png")
 Flow.SetTitleScreenImagePath("Screens\\Title.jpg")
-Flow.SetFarView(80)
+Flow.SetFarView(20)
 
 -- Title level
 
 title = Level.new()
 
-title.ambientTrack = "108_A8_Coastal"
+title.ambientTrack = "108"
 title.levelFile = "Data\\title.ten"
 title.scriptFile = "Scripts\\title.lua"
 title.loadScreenFile = "Screens\\Main.png"
@@ -28,16 +28,17 @@ Flow.AddLevel(title)
 -- First test level
 test = Level.new()
 
-test.nameKey = "level_andrea1"
-test.scriptFile = "Scripts\\andrea1.lua"
-test.ambientTrack = "108_A8_Coastal"
-test.levelFile = "Data\\andrea1.ten"
+test.nameKey = "level_test"
+test.scriptFile = "Scripts\\TestLevel.lua"
+test.ambientTrack = "108"
+test.levelFile = "Data\\TestLevel.ten"
 test.loadScreenFile = "Screens\\rome.jpg"
 test.weather = 0
 test.weatherStrength = 1
 test.horizon = true
-test.farView = 80
+test.farView = 20
 test.layer1 = Flow.SkyLayer.new(Color.new(255, 0, 0), 15)
+test.fog = Flow.Fog.new(Color.new(0, 0, 0), 12, 20)
 
 test.objects = {
 	InventoryItem.new(
