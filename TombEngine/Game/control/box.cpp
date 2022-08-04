@@ -788,18 +788,16 @@ void CreatureSwitchRoom(short itemNumber)
 		item->RoomNumber).RoomNumber;
 
 	if (roomNumber != item->RoomNumber)
-	{
 		ItemNewRoom(itemNumber, roomNumber);
 
-		if (!Objects[item->ObjectNumber].waterCreature &&
-			TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, &g_Level.Rooms[roomNumber]))
-		{
-			auto bounds = GetBoundsAccurate(item);
-			auto height = item->Pose.Position.y - GetWaterHeight(item);
+	if (!Objects[item->ObjectNumber].waterCreature &&
+		TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, &g_Level.Rooms[roomNumber]))
+	{
+		auto bounds = GetBoundsAccurate(item);
+		auto height = item->Pose.Position.y - GetWaterHeight(item);
 
-			if (abs(bounds->Y1 + bounds->Y2) < height)
-				DoDamage(item, INT_MAX);
-		}
+		if (abs(bounds->Y1 + bounds->Y2) < height)
+			DoDamage(item, INT_MAX);
 	}
 }
 
