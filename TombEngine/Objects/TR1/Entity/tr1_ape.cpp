@@ -17,8 +17,8 @@ namespace TEN::Entities::TR1
 {
 	constexpr auto APE_ATTACK_DAMAGE = 200;
 
-	constexpr auto APE_ATTACK_RANGE = SECTOR(0.42f);
-	constexpr auto APE_PANIC_RANGE	= SECTOR(2);
+	constexpr auto APE_ATTACK_RANGE = SQUARE(SECTOR(0.42f));
+	constexpr auto APE_PANIC_RANGE	= SQUARE(SECTOR(2));
 
 	constexpr auto APE_JUMP_CHANCE		   = 0xa0;
 	constexpr auto APE_POUND_CHEST_CHANCE  = APE_JUMP_CHANCE + 0xA0;
@@ -188,7 +188,7 @@ namespace TEN::Entities::TR1
 
 			angle = CreatureTurn(item, creatureInfo->MaxTurn);
 
-			if (item->HitStatus || AI.distance < pow(APE_PANIC_RANGE, 2))
+			if (item->HitStatus || AI.distance < APE_PANIC_RANGE)
 				creatureInfo->Flags |= APE_FLAG_ATTACK;
 
 			short random;
@@ -203,13 +203,13 @@ namespace TEN::Entities::TR1
 				}
 				else if (item->Flags & APE_FLAG_TURN_RIGHT)
 				{
-					item->Pose.Orientation.y += ANGLE(90);
+					item->Pose.Orientation.y += ANGLE(90.0f);
 					creatureInfo->Flags -= APE_FLAG_TURN_RIGHT;
 				}
 
 				if (item->Animation.RequiredState)
 					item->Animation.TargetState = item->Animation.RequiredState;
-				else if (AI.bite && AI.distance < pow(APE_ATTACK_RANGE, 2))
+				else if (AI.bite && AI.distance < APE_ATTACK_RANGE)
 					item->Animation.TargetState = APE_STATE_ATTACK;
 				else if (!(creatureInfo->Flags & APE_FLAG_ATTACK) &&
 					AI.zoneNumber == AI.enemyZone && AI.ahead)
@@ -240,7 +240,7 @@ namespace TEN::Entities::TR1
 			case APE_STATE_RUN_FORWARD:
 				creatureInfo->MaxTurn = APE_RUN_TURN_RATE_MAX;
 
-				if (creatureInfo->Flags == 0 &&
+				if (creatureInfo->Flags == NULL &&
 					AI.angle > -APE_DISPLAY_ANGLE &&
 					AI.angle < APE_DISPLAY_ANGLE)
 				{

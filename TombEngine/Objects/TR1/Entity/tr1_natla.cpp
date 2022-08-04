@@ -14,8 +14,7 @@
 
 namespace TEN::Entities::TR1
 {
-	BiteInfo NatlaGunBite = { 5, 220, 7, 4 };
-
+	// TODO: Organise.
 	#define NATLA_NEAR_DEATH 200
 	#define NATLA_FLYMODE 0x8000
 	#define NATLA_TIMER   0x7fff
@@ -25,6 +24,8 @@ namespace TEN::Entities::TR1
 	#define NATLA_LAND_CHANCE 0x100
 	#define NATLA_DEATH_TIME (FPS * 16)	// 16 seconds.
 	#define NATLA_SHOT_DAMAGE 100
+
+	const auto NatlaGunBite = BiteInfo(Vector3(5.0f, 220.0f, 7.0f), 4);
 
 	enum NatlaState
 	{
@@ -107,7 +108,7 @@ namespace TEN::Entities::TR1
 
 				if (timer >= 20)
 				{
-					short FXNumber = CreatureEffect(item, &NatlaGunBite, ShardGun);
+					short FXNumber = CreatureEffect(item, NatlaGunBite, ShardGun);
 					if (FXNumber != NO_ITEM)
 					{
 						auto* fx = &EffectList[FXNumber];
@@ -125,7 +126,7 @@ namespace TEN::Entities::TR1
 
 				if (timer >= 20)
 				{
-					short FXNumber = CreatureEffect(item, &NatlaGunBite, ShardGun);
+					short FXNumber = CreatureEffect(item, NatlaGunBite, ShardGun);
 					if (FXNumber != NO_ITEM)
 					{
 						auto* fx = &EffectList[FXNumber];
@@ -238,7 +239,7 @@ namespace TEN::Entities::TR1
 
 				if (timer >= 30)
 				{
-					short FXNumber = CreatureEffect(item, &NatlaGunBite, BombGun);
+					short FXNumber = CreatureEffect(item, NatlaGunBite, BombGun);
 					if (FXNumber != NO_ITEM)
 					{
 						auto* fx = &EffectList[FXNumber];
@@ -264,15 +265,15 @@ namespace TEN::Entities::TR1
 			case NATLA_STATE_SHOOT:
 				if (!item->Animation.RequiredState)
 				{
-					short FXNumber = CreatureEffect(item, &NatlaGunBite, BombGun);
+					short FXNumber = CreatureEffect(item, NatlaGunBite, BombGun);
 					if (FXNumber != NO_ITEM)
 						gun = EffectList[FXNumber].pos.Orientation.x;
 
-					FXNumber = CreatureEffect(item, &NatlaGunBite, BombGun);
+					FXNumber = CreatureEffect(item, NatlaGunBite, BombGun);
 					if (FXNumber != NO_ITEM)
 						EffectList[FXNumber].pos.Orientation.y += (short)((GetRandomControl() - 0x4000) / 4);
 
-					FXNumber = CreatureEffect(item, &NatlaGunBite, BombGun);
+					FXNumber = CreatureEffect(item, NatlaGunBite, BombGun);
 					if (FXNumber != NO_ITEM)
 						EffectList[FXNumber].pos.Orientation.y += (short)((GetRandomControl() - 0x4000) / 4);
 
