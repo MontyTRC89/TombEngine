@@ -25,6 +25,7 @@
 #include "Sound/sound.h"
 #include "Specific/input.h"
 #include "Specific/setup.h"
+#include "Specific/trutils.h"
 
 using TEN::Renderer::g_Renderer;
 using std::vector;
@@ -1075,7 +1076,7 @@ unsigned int _stdcall LoadLevel(void* data)
 			throw std::exception((std::string("Unable to read level file: ") + filename).c_str());
 
 		char header[4];
-		byte version[4];
+		unsigned char version[4];
 		int compressedSize;
 		int uncompressedSize;
 		int systemHash;
@@ -1089,7 +1090,17 @@ unsigned int _stdcall LoadLevel(void* data)
 		if (std::string(header) != "TEN")
 			throw std::invalid_argument("Level file header is not valid! Must be TEN. Probably old level version?");
 		else
-			TENLog("Tomb Editor compiler version: " + std::to_string(version[0]) + "." + std::to_string(version[1]) + "." + std::to_string(version[2]), LogLevel::Info);
+			TENLog("Level compiler version: " + std::to_string(version[0]) + "." + std::to_string(version[1]) + "." + std::to_string(version[2]), LogLevel::Info);
+
+		auto assemblyVersion = TEN::Utils::GetProductOrFileVersion(true);
+		for (int i = 0; i < assemblyVersion.size(); i++)
+		{
+			if (assemblyVersion[i] != version[i])
+			{
+				TENLog("Level compiler version does not match with TEN version. Errors or crashes may be possible.", LogLevel::Warning);
+				break;
+			}
+		}
 
 		// Check system name hash and reset it if it's valid (because we use build & play feature only once)
 		if (SystemNameHash != 0 && SystemNameHash != systemHash)
