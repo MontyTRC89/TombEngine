@@ -1,4 +1,7 @@
 #pragma once
 
-void InitialiseInvisibleGhost(short itemNumber);
-void InvisibleGhostControl(short itemNumber);
+namespace TEN::Entities::TR5
+{
+	void InitialiseInvisibleGhost(short itemNumber);
+	void InvisibleGhostControl(short itemNumber);
+}

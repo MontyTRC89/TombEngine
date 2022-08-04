@@ -1,4 +1,7 @@
 #pragma once
 
-void InitialiseLaserHead(short itemNumber);
-void LaserHeadControl(short itemNumber);
+namespace TEN::Entities::TR5
+{
+	void InitialiseLaserHead(short itemNumber);
+	void LaserHeadControl(short itemNumber);
+}
