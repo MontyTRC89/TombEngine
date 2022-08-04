@@ -244,7 +244,7 @@ void Renderer11::UpdateLaraAnimations(bool force)
 	m_items[Lara.ItemNumber].DoneAnimations = true;
 }
 
-void TEN::Renderer::Renderer11::DrawLara(bool shadowMap, RenderView& view, bool transparent)
+void TEN::Renderer::Renderer11::DrawLara(RenderView& view, bool transparent)
 {
 	// Don't draw Lara if binoculars or sniper
 	if (BinocularRange || SpotcamOverlay || SpotcamDontDrawLara || CurrentLevel == 0)
@@ -264,17 +264,9 @@ void TEN::Renderer::Renderer11::DrawLara(bool shadowMap, RenderView& view, bool 
 	m_context->IASetInputLayout(m_inputLayout.Get());
 	m_context->IASetIndexBuffer(m_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
-	// Set shaders
-	if (shadowMap)
-	{
-		m_context->VSSetShader(m_vsShadowMap.Get(), nullptr, 0);
-		m_context->PSSetShader(m_psShadowMap.Get(), nullptr, 0);
-	}
-	else
-	{
-		m_context->VSSetShader(m_vsItems.Get(), nullptr, 0);
-		m_context->PSSetShader(m_psItems.Get(), nullptr, 0);
-	}
+
+	m_context->VSSetShader(m_vsItems.Get(), nullptr, 0);
+	m_context->PSSetShader(m_psItems.Get(), nullptr, 0);
 
 	// Set texture
 	BindTexture(TEXTURE_COLOR_MAP, &std::get<0>(m_moveablesTextures[0]), SAMPLER_LINEAR_CLAMP);
@@ -284,10 +276,12 @@ void TEN::Renderer::Renderer11::DrawLara(bool shadowMap, RenderView& view, bool 
 
 	RendererObject& laraObj = *m_moveableObjects[ID_LARA];
 	RendererObject& laraSkin = *m_moveableObjects[ID_LARA_SKIN];
+
 	RendererRoom* room = &m_rooms[LaraItem->RoomNumber];
+	RendererItem* item = &m_items[Lara.ItemNumber];
 
 	m_stItem.World = m_LaraWorldMatrix;
-	m_stItem.Position = Vector4(LaraItem->Pose.Position.x, LaraItem->Pose.Position.y, LaraItem->Pose.Position.z, 1.0f);
+	m_stItem.Color = item->Color;
 	m_stItem.AmbientLight = item->AmbientLight;
 	memcpy(m_stItem.BonesMatrices, laraObj.AnimationTransforms.data(), sizeof(Matrix) * MAX_BONES);
 	for (int k = 0; k < laraSkin.ObjectMeshes.size(); k++)
@@ -297,8 +291,7 @@ void TEN::Renderer::Renderer11::DrawLara(bool shadowMap, RenderView& view, bool 
 	BindConstantBufferVS(CB_ITEM, m_cbItem.get());
 	BindConstantBufferPS(CB_ITEM, m_cbItem.get());
 
-	if (!shadowMap)
-		BindLights(item->LightsToDraw);
+	BindLights(item->LightsToDraw, item->RoomNumber, item->PrevRoomNumber, item->LightFade);
 
 	for (int k = 0; k < laraSkin.ObjectMeshes.size(); k++)
 	{

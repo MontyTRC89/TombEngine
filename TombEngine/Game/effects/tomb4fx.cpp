@@ -439,6 +439,7 @@ void UpdateFireSparks()
 
 			if (spark->flags & SP_ROTATE)
 				spark->rotAng = (spark->rotAng + spark->rotAdd) & 0xFFF;
+
 			float alpha = fmin(1, fmax(0, 1 - (spark->life / (float)spark->sLife)));
 			int sprite = (int)Lerp(Objects[ID_FIRE_SPRITES].meshIndex, Objects[ID_FIRE_SPRITES].meshIndex + (-Objects[ID_FIRE_SPRITES].nmeshes) - 1, alpha);
 			spark->def = sprite;
@@ -997,6 +998,7 @@ void TriggerGunShell(short hand, short objNum, LaraWeaponType weaponType)
 	gshell->fallspeed = -48 - (GetRandomControl() & 7);
 	gshell->objectNumber = objNum;
 	gshell->counter = (GetRandomControl() & 0x1F) + 60;
+
 	if (hand)
 	{
 		if (weaponType == LaraWeaponType::Shotgun)
