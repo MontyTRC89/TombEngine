@@ -30,7 +30,7 @@ namespace TEN::Entities::TR4
 
 	#define MUMMY_WALK_TURN_ANGLE ANGLE(7.0f)
 
-	enum MymmyState
+	enum MummyState
 	{
 		MUMMY_STATE_INACTIVE_ARMS_CROSSED = 0,
 		MUMMY_STATE_IDLE = 1,
@@ -78,6 +78,7 @@ namespace TEN::Entities::TR4
 
 		if (item->TriggerFlags == 2)
 		{
+			SetAnimation(item, MUMMY_ANIM_COLLAPSE_END);
 			item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + MUMMY_ANIM_COLLAPSE_END;
 			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 			item->Animation.TargetState = MUMMY_INACTIVE_STATE_LYING_DOWN;
@@ -178,7 +179,7 @@ namespace TEN::Entities::TR4
 			{
 			case MUMMY_STATE_IDLE:
 				creature->MaxTurn = 0;
-				creature->Flags = 0;
+				creature->Flags = NULL;
 
 				if (AI.distance <= MUMMY_IDLE_SWIPE_ATTACK_RANGE ||
 					AI.distance >= MUMMY_AWARE_RANGE)
@@ -207,7 +208,7 @@ namespace TEN::Entities::TR4
 					creature->MaxTurn = 0;
 
 					if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameEnd)
-						item->TriggerFlags = 0;
+						item->TriggerFlags = NULL;
 				}
 				else
 				{
@@ -226,7 +227,7 @@ namespace TEN::Entities::TR4
 
 			case MUMMY_STATE_WALK_FORWARD_ARMS_UP:
 				creature->MaxTurn = MUMMY_WALK_TURN_ANGLE;
-				creature->Flags = 0;
+				creature->Flags = NULL;
 
 				if (AI.distance < MUMMY_IDLE_SWIPE_ATTACK_RANGE)
 				{
