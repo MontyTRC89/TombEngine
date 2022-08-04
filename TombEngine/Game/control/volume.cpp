@@ -73,7 +73,7 @@ namespace TEN::Control::Volumes
 					volume->Status = TriggerStatus::Inside;
 					if (!set->OnInside.Function.empty() && set->OnInside.CallCounter != 0)
 					{
-						g_GameScript->ExecuteFunction(set->OnInside.Function, triggerer, set->OnEnter.Argument);
+						g_GameScript->ExecuteFunction(set->OnInside.Function, triggerer, set->OnInside.Argument);
 						if (set->OnInside.CallCounter != NO_CALL_COUNTER)
 							set->OnInside.CallCounter--;
 					}
@@ -86,7 +86,7 @@ namespace TEN::Control::Volumes
 					volume->Status = TriggerStatus::Leaving;
 					if (!set->OnLeave.Function.empty() && set->OnLeave.CallCounter != 0)
 					{
-						g_GameScript->ExecuteFunction(set->OnLeave.Function, triggerer, set->OnEnter.Argument);
+						g_GameScript->ExecuteFunction(set->OnLeave.Function, triggerer, set->OnLeave.Argument);
 						if (set->OnLeave.CallCounter != NO_CALL_COUNTER)
 							set->OnLeave.CallCounter--;
 					}
