@@ -1,33 +1,35 @@
 #include "framework.h"
-#include "tr4_harpy.h"
-#include "Game/people.h"
-#include "Game/control/box.h"
-#include "Game/effects/effects.h"
-#include "Game/items.h"
+#include "Objects/TR4/Entity/tr4_harpy.h"
+
 #include "Game/animation.h"
-#include "Specific/setup.h"
-#include "Game/control/lot.h"
-#include "Game/misc.h"
-#include "Specific/level.h"
-#include "Game/Lara/lara.h"
-#include "Game/itemdata/creature_info.h"
+#include "Game/control/box.h"
 #include "Game/control/control.h"
+#include "Game/control/lot.h"
+#include "Game/effects/effects.h"
+#include "Game/itemdata/creature_info.h"
+#include "Game/items.h"
+#include "Game/Lara/lara.h"
+#include "Game/misc.h"
+#include "Game/people.h"
 #include "Renderer/Renderer11Enums.h"
+#include "Specific/level.h"
+#include "Specific/setup.h"
+#include <Game/Lara/lara_helpers.h>
 
 using std::vector;
 
 namespace TEN::Entities::TR4
 {
-	BITE_INFO HarpyBite1 = { 0, 0, 0, 4 };
-	BITE_INFO HarpyBite2 = { 0, 0, 0, 2 };
-	BITE_INFO HarpyBite3 = { 0, 0, 0, 21 };
-	BITE_INFO HarpyAttack1 = { 0, 128, 0, 2 };
-	BITE_INFO HarpyAttack2 = { 0, 128, 0, 4 };
-	const vector<int> HarpySwoopAttackJoints = { 2, 4 };
+	const vector<int> HarpySwoopAttackJoints   = { 2, 4 };
 	const vector<int> HarpyStingerAttackJoints = { 20, 21 };
+	const auto HarpyBite1	= BITE_INFO(Vector3::Zero, 4);
+	const auto HarpyBite2	= BITE_INFO(Vector3::Zero, 2);
+	const auto HarpyBite3	= BITE_INFO(Vector3::Zero, 21);
+	const auto HarpyAttack1 = BITE_INFO(0, 128, 0, 2);
+	const auto HarpyAttack2 = BITE_INFO(0, 128, 0, 4);
 
-	constexpr auto HARPY_STINGER_ATTACK_DAMAGE = 100;
-	constexpr auto HARPY_SWOOP_ATTACK_DAMAGE = 10;
+	constexpr auto HARPY_STINGER_ATTACK_DAMAGE	= 100;
+	constexpr auto HARPY_SWOOP_ATTACK_DAMAGE	= 10;
 	constexpr auto HARPY_STINGER_POISON_POTENCY = 8;
 
 	enum HarpyState
@@ -517,23 +519,9 @@ namespace TEN::Entities::TR4
 					DoDamage(creature->Enemy, HARPY_SWOOP_ATTACK_DAMAGE);
 
 					if (item->TouchBits & 0x10)
-					{
-						CreatureEffect2(
-							item,
-							&HarpyBite1,
-							5,
-							-1,
-							DoBloodSplat);
-					}
+						CreatureEffect2(item, HarpyBite1, 5, -1, DoBloodSplat);
 					else
-					{
-						CreatureEffect2(
-							item,
-							&HarpyBite2,
-							5,
-							-1,
-							DoBloodSplat);
-					}
+						CreatureEffect2(item, HarpyBite2, 5, -1, DoBloodSplat);
 				}
 
 				break;
@@ -547,17 +535,11 @@ namespace TEN::Entities::TR4
 						abs(creature->Enemy->Pose.Position.y - item->Pose.Position.y) <= SECTOR(1) &&
 						AI.distance < pow(SECTOR(2), 2)))
 				{
+					if (creature->Enemy->IsLara())
+						GetLaraInfo(creature->Enemy)->PoisonPotency += HARPY_STINGER_POISON_POTENCY;
+
 					DoDamage(creature->Enemy, HARPY_STINGER_ATTACK_DAMAGE);
-
-					CreatureEffect2(
-						item,
-						&HarpyBite3,
-						10,
-						-1,
-						DoBloodSplat);
-
-					if (creature->Enemy == LaraItem)
-						Lara.PoisonPotency += HARPY_STINGER_POISON_POTENCY;
+					CreatureEffect2(item, HarpyBite3, 10, -1, DoBloodSplat);
 
 					creature->Flags = 1;
 				}
