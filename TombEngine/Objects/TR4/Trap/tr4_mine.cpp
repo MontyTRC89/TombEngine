@@ -3,6 +3,7 @@
 #include "Specific/level.h"
 #include "Game/collision/sphere.h"
 #include "Sound/sound.h"
+#include "Game/effects/debris.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/tomb4fx.h"
 #include "Game/effects/weather.h"
