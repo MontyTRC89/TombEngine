@@ -592,14 +592,6 @@ namespace TEN::Renderer
 		if (BinocularRange > 0)
 			return true;
 
-		Matrix world;
-		Matrix translation;
-		Matrix rotation;
-
-		RendererObject& laraObj = *m_moveableObjects[ID_LARA];
-		RendererObject& laraSkin = *m_moveableObjects[ID_LARA_SKIN];
-
-		ObjectInfo* obj = &Objects[0];
 		RendererRoom const & room = m_rooms[LaraItem->RoomNumber];
 		RendererItem* item = &m_items[Lara.ItemNumber];
 
@@ -614,7 +606,6 @@ namespace TEN::Renderer
 		short rotationX = 0;
 
 		SetBlendMode(BLENDMODE_ADDITIVE);
-
 		SetAlphaTest(ALPHA_TEST_GREATER_THAN, ALPHA_TEST_THRESHOLD);
 
 		if (Lara.Control.Weapon.GunType != LaraWeaponType::Flare &&
@@ -673,13 +664,15 @@ namespace TEN::Renderer
 				BindTexture(TEXTURE_COLOR_MAP, &std::get<0>(m_moveablesTextures[flashBucket.Texture]), SAMPLER_ANISOTROPIC_CLAMP);
 
 				Matrix offset = Matrix::CreateTranslation(0, length, zOffset);
-				Matrix rotation2 = Matrix::CreateRotationX(TO_RAD(rotationX));
+				Matrix rotation = Matrix::CreateRotationX(TO_RAD(rotationX));
+
+				Matrix world;
 
 				if (Lara.LeftArm.GunFlash)
 				{
-					world = laraObj.AnimationTransforms[LM_LHAND] * item->World;
+					world = item->AnimationTransforms[LM_LHAND] * item->World;
 					world = offset * world;
-					world = rotation2 * world;
+					world = rotation * world;
 
 					m_stStatic.World = world;
 					m_cbStatic.updateData(m_stStatic, m_context.Get());
@@ -690,9 +683,9 @@ namespace TEN::Renderer
 
 				if (Lara.RightArm.GunFlash)
 				{
-					world = laraObj.AnimationTransforms[LM_RHAND] * item->World;
+					world = item->AnimationTransforms[LM_RHAND] * item->World;
 					world = offset * world;
-					world = rotation2 * world;
+					world = rotation * world;
 
 					m_stStatic.World = world;
 					m_cbStatic.updateData(m_stStatic, m_context.Get());
@@ -1080,7 +1073,6 @@ namespace TEN::Renderer
 		RendererRoom const& room = m_rooms[effect->RoomNumber];
 
 		m_stStatic.World = effect->World;
-		m_stStatic.Position = Vector4(effect->Position.x, effect->Position.y, effect->Position.z, 1.0f);
 		m_stStatic.Color = Vector4::One;
 		m_stStatic.AmbientLight = room.AmbientLight;
 		m_stStatic.LightMode = LIGHT_MODES::LIGHT_MODE_DYNAMIC;
