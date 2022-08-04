@@ -18,6 +18,7 @@
 #include "LanguageScript.h"
 #include "ScriptInterfaceState.h"
 #include "ScriptInterfaceLevel.h"
+using namespace TEN::Utils;
 
 using namespace TEN::Renderer;
 using namespace TEN::Input;
@@ -263,6 +264,14 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	// Initialise logging
 	InitTENLog();
 
+	// Indicate version
+	auto ver = GetProductOrFileVersion(false);
+	auto windowName = (std::string("Starting TombEngine version ") +
+					   std::to_string(ver[0]) + "." +
+					   std::to_string(ver[1]) + "." +
+					   std::to_string(ver[2]));
+	TENLog(windowName, LogLevel::Info);
+
 	// Collect numbered tracks
 	EnumerateLegacyTracks();
 
@@ -356,7 +365,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	// Register window handle
 	if (!App.WindowHandle)
 	{
-		TENLog("Unable To Create Window" + std::to_string(GetLastError()), LogLevel::Error);
+		TENLog("Unable To Create Window. Error: " + std::to_string(GetLastError()), LogLevel::Error);
 		return false;
 	}
 	else
