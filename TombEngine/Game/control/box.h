@@ -1,10 +1,10 @@
 #pragma once
-#include "Specific/phd_global.h"
 #include "Specific/level.h"
+#include "Specific/phd_global.h"
 
-struct ItemInfo;
 struct BITE_INFO;
 struct CreatureInfo;
+struct ItemInfo;
 struct LOTInfo;
 
 enum TARGET_TYPE
@@ -95,24 +95,41 @@ struct OVERLAP
 
 struct BITE_INFO
 {
-	int	x;
-	int	y;
-	int	z;
-	int	meshNum;
+	// TODO: Remove these in favour of the Vector3. -- Sezz
+	int	x = 0;
+	int	y = 0;
+	int	z = 0;
+
+	Vector3 Position = Vector3::Zero;
+	int		meshNum	 = 0;
 
 	BITE_INFO()
 	{
 		this->x = 0;
 		this->y = 0;
 		this->z = 0;
+
+		this->Position = Vector3::Zero;
 		this->meshNum = 0;
 	}
 
-	BITE_INFO(int xpos, int ypos, int zpos, int meshNumber)
+	BITE_INFO(Vector3 pos, int meshNumber)
 	{
-		this->x = xpos;
-		this->y = ypos;
-		this->z = zpos;
+		this->x = pos.x;
+		this->y = pos.y;
+		this->z = pos.z;
+
+		this->Position = pos;
+		this->meshNum = meshNumber;
+	}
+
+	BITE_INFO(float xPos, float yPos, float zPos, int meshNumber)
+	{
+		this->x = xPos;
+		this->y = yPos;
+		this->z = zPos;
+
+		this->Position = Vector3(xPos, yPos, zPos);
 		this->meshNum = meshNumber;
 	}
 };
@@ -146,8 +163,8 @@ constexpr auto CLIP_BOTTOM = 0x8;
 constexpr auto SECONDARY_CLIP = 0x10;
 constexpr auto ALL_CLIP = (CLIP_LEFT | CLIP_RIGHT | CLIP_TOP | CLIP_BOTTOM);
 
-void GetCreatureMood(ItemInfo* item, AI_INFO* AI, int violent);
-void CreatureMood(ItemInfo* item, AI_INFO* AI, int violent);
+void GetCreatureMood(ItemInfo* item, AI_INFO* AI, bool isViolent);
+void CreatureMood(ItemInfo* item, AI_INFO* AI, bool isViolent);
 void FindAITargetObject(CreatureInfo* creature, short objectNumber);
 void GetAITarget(CreatureInfo* creature);
 int CreatureVault(short itemNumber, short angle, int vault, int shift);
@@ -160,7 +177,9 @@ short AIGuard(CreatureInfo* creature);
 void AlertNearbyGuards(ItemInfo* item);
 void AlertAllGuards(short itemNumber);
 void CreatureKill(ItemInfo* item, int killAnim, int killState, int laraKillState);
+short CreatureEffect2(ItemInfo* item, BITE_INFO bite, short damage, short angle, std::function<CreatureEffectFunction> func);
 short CreatureEffect2(ItemInfo* item, BITE_INFO* bite, short damage, short angle, std::function<CreatureEffectFunction> func);
+short CreatureEffect(ItemInfo* item, BITE_INFO bite, std::function<CreatureEffectFunction> func);
 short CreatureEffect(ItemInfo* item, BITE_INFO* bite, std::function<CreatureEffectFunction> func);
 void CreatureUnderwater(ItemInfo* item, int depth);
 void CreatureFloat(short itemNumber);
@@ -183,7 +202,6 @@ TARGET_TYPE CalculateTarget(Vector3Int* target, ItemInfo* item, LOTInfo* LOT);
 int CreatureAnimation(short itemNumber, short angle, short tilt);
 void AdjustStopperFlag(ItemInfo* item, int direction, bool set);
 void InitialiseItemBoxData();
-
 
 void DrawBox(int boxIndex, Vector3 color);
 void DrawNearbyPathfinding(int boxIndex);
