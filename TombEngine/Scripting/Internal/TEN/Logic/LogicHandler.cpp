@@ -4,7 +4,6 @@
 #include "ScriptAssert.h"
 #include "Game/savegame.h"
 #include "Sound/sound.h"
-#include "Specific/setup.h"
 #include "ReservedScriptNames.h"
 #include "Game/effects/lightning.h"
 #include "ScriptUtil.h"
@@ -63,6 +62,7 @@ sol::object GetVariable(sol::table tab, sol::object key)
 
 LogicHandler::LogicHandler(sol::state* lua, sol::table & parent) : m_handler{ lua }
 {
+	m_handler.GetState()->set_function("print", &LogicHandler::LogPrint, this);
 	ResetScripts(true);
 }
 
@@ -104,9 +104,28 @@ bool LogicHandler::SetLevelFunc(sol::table tab, std::string const& luaName, sol:
 	return true;
 }
 
+
+void LogicHandler::LogPrint(sol::variadic_args va)
+{
+	std::string str;
+	for (sol::object const & o : va)
+	{
+		auto strPart = (*m_handler.GetState())["tostring"](o).get<std::string>();
+		str += strPart;
+		str += "\t";
+	}
+	TENLog(str);
+}
+
 void LogicHandler::ResetScripts(bool clearGameVars)
 {
 	FreeLevelScripts();
+
+	auto currentPackage = m_handler.GetState()->get<sol::table>("package");
+	auto currentLoaded = currentPackage.get<sol::table>("loaded");
+
+	for(auto & [first, second] : currentLoaded)
+		currentLoaded[first] = sol::nil;
 
 	if(clearGameVars)
 		ResetGameTables();
