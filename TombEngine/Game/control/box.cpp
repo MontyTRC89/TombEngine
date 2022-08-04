@@ -296,6 +296,15 @@ void CreatureKill(ItemInfo* item, int killAnim, int killState, int laraKillState
 	*/
 }
 
+short CreatureEffect2(ItemInfo* item, BITE_INFO bite, short damage, short angle, std::function<CreatureEffectFunction> func)
+{
+	auto pos = Vector3Int(bite.x, bite.y, bite.z);
+	GetJointAbsPosition(item, &pos, bite.meshNum);
+
+	return func(pos.x, pos.y, pos.z, damage, angle, item->RoomNumber);
+}
+
+// TODO: Replace with above version.
 short CreatureEffect2(ItemInfo* item, BITE_INFO* bite, short damage, short angle, std::function<CreatureEffectFunction> func)
 {
 	auto pos = Vector3Int(bite->x, bite->y, bite->z);
@@ -304,6 +313,15 @@ short CreatureEffect2(ItemInfo* item, BITE_INFO* bite, short damage, short angle
 	return func(pos.x, pos.y, pos.z, damage, angle, item->RoomNumber);
 }
 
+short CreatureEffect(ItemInfo* item, BITE_INFO bite, std::function<CreatureEffectFunction> func)
+{
+	auto pos = Vector3Int(bite.x, bite.y, bite.z);
+	GetJointAbsPosition(item, &pos, bite.meshNum);
+
+	return func(pos.x, pos.y, pos.z, item->Animation.Velocity, item->Pose.Orientation.y, item->RoomNumber);
+}
+
+// TODO: Replace with above version.
 short CreatureEffect(ItemInfo* item, BITE_INFO* bite, std::function<CreatureEffectFunction> func)
 {
 	auto pos = Vector3Int(bite->x, bite->y, bite->z);
@@ -1550,7 +1568,7 @@ void CreatureAIInfo(ItemInfo* item, AI_INFO* AI)
 	AI->bite = (AI->ahead && enemy->HitPoints > 0 && abs(enemy->Pose.Position.y - item->Pose.Position.y) <= CLICK(2));
 }
 
-void CreatureMood(ItemInfo* item, AI_INFO* AI, int violent)
+void CreatureMood(ItemInfo* item, AI_INFO* AI, bool isViolent)
 {
 	if (!item->Data)
 		return;
@@ -1598,7 +1616,7 @@ void CreatureMood(ItemInfo* item, AI_INFO* AI, int violent)
 			{
 				if (EscapeBox(item, enemy, boxNumber))
 					TargetBox(LOT, boxNumber);
-				else if (AI->zoneNumber == AI->enemyZone && StalkBox(item, enemy, boxNumber) && !violent)
+				else if (AI->zoneNumber == AI->enemyZone && StalkBox(item, enemy, boxNumber) && !isViolent)
 				{
 					TargetBox(LOT, boxNumber);
 					creature->Mood = MoodType::Stalk;
@@ -1700,7 +1718,7 @@ void CreatureMood(ItemInfo* item, AI_INFO* AI, int violent)
 	}
 }
 
-void GetCreatureMood(ItemInfo* item, AI_INFO* AI, int isViolent)
+void GetCreatureMood(ItemInfo* item, AI_INFO* AI, bool isViolent)
 {
 	if (!item->Data)
 		return;

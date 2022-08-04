@@ -8,8 +8,8 @@
 #include "Game/items.h"
 #include "Renderer/Renderer11.h"
 
-using namespace TEN::Renderer;
 using namespace TEN::Floordata;
+using namespace TEN::Renderer;
 
 byte FlipStatus = 0;
 int FlipStats[MAX_FLIPMAP];
@@ -142,7 +142,13 @@ int IsRoomOutside(int x, int y, int z)
 			if (y < probe.Position.Ceiling)
 				return NO_ROOM;
 
-			return ((room->flags & (ENV_FLAG_WIND | ENV_FLAG_WATER)) != 0 ? probe.RoomNumber : NO_ROOM);
+			if (TestEnvironmentFlags(ENV_FLAG_WATER, room->flags) ||
+				TestEnvironmentFlags(ENV_FLAG_WIND, room->flags))
+			{
+				return probe.RoomNumber;
+			}
+
+			return NO_ROOM;
 		}
 	}
 
@@ -163,10 +169,11 @@ FloorInfo* GetSector(ROOM_INFO* room, int x, int z)
 
 bool IsPointInRoom(PHD_3DPOS const& pos, int roomNumber)
 {
+	auto* room = &g_Level.Rooms[roomNumber];
+
 	int x = pos.Position.x;
 	int y = pos.Position.y;
 	int z = pos.Position.z;
-	auto* room = &g_Level.Rooms[roomNumber];
 	int xSector = (x - room->x) / SECTOR(1);
 	int zSector = (z - room->z) / SECTOR(1);
 
@@ -183,38 +190,39 @@ bool IsPointInRoom(PHD_3DPOS const& pos, int roomNumber)
 PHD_3DPOS GetRoomCenter(int roomNumber)
 {
 	auto* room = &g_Level.Rooms[roomNumber];
-	auto halfLength = SECTOR(room->xSize)/2;
-	auto halfDepth = SECTOR(room->zSize)/2;
-	auto halfHeight = (room->maxceiling - room->minfloor) / 2;
+	int halfLength = SECTOR(room->xSize)/2;
+	int halfDepth = SECTOR(room->zSize)/2;
+	int halfHeight = (room->maxceiling - room->minfloor) / 2;
 
-	PHD_3DPOS center;
-	center.Position.x = room->x + halfLength;
-	center.Position.y = room->minfloor + halfHeight;
-	center.Position.z = room->z + halfDepth;
+	auto center = PHD_3DPOS(
+		room->x + halfLength,
+		room->minfloor + halfHeight,
+		room->z + halfDepth
+	);
 	return center;
 }
 
 std::set<int> GetRoomList(int roomNumber)
 {
-	std::set<int> result;
+	std::set<int> roomNumberList;
 
 	if (g_Level.Rooms.size() <= roomNumber)
-		return result;
+		return roomNumberList;
 
-	result.insert(roomNumber);
+	roomNumberList.insert(roomNumber);
 
 	auto* room = &g_Level.Rooms[roomNumber];
-	for (int i = 0; i < room->doors.size(); i++)
-		result.insert(room->doors[i].room);
+	for (size_t i = 0; i < room->doors.size(); i++)
+		roomNumberList.insert(room->doors[i].room);
 
-	for (auto i : result)
+	for (auto roomNumber : roomNumberList)
 	{
-		room = &g_Level.Rooms[i];
-		for (int j = 0; j < room->doors.size(); j++)
-			result.insert(room->doors[j].room);
+		room = &g_Level.Rooms[roomNumber];
+		for (size_t j = 0; j < room->doors.size(); j++)
+			roomNumberList.insert(room->doors[j].room);
 	}
 
-	return result;
+	return roomNumberList;
 }
 
 void InitializeNeighborRoomList()
