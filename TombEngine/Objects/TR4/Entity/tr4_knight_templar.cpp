@@ -1,23 +1,24 @@
 #include "framework.h"
-#include "tr4_knight_templar.h"
-#include "Game/items.h"
-#include "Game/control/box.h"
-#include "Game/effects/effects.h"
-#include "Game/effects/debris.h"
-#include "Specific/setup.h"
-#include "Specific/level.h"
+#include "Objects/TR4/Entity/tr4_knight_templar.h"
+
 #include "Game/animation.h"
+#include "Game/control/box.h"
+#include "Game/effects/debris.h"
+#include "Game/effects/effects.h"
+#include "Game/itemdata/creature_info.h"
+#include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
 #include "Sound/sound.h"
-#include "Game/itemdata/creature_info.h"
+#include "Specific/level.h"
+#include "Specific/setup.h"
 
 using std::vector;
 
 namespace TEN::Entities::TR4
 {
-	BITE_INFO KnightTemplarBite = { 0, 0, 0, 11 };
 	const vector<int> KnightTemplarSwordAttackJoints = { 10, 11 };
+	const auto KnightTemplarBite = BITE_INFO(Vector3::Zero, 11);
 
 	constexpr auto KNIGHT_TEMPLAR_SWORD_ATTACK_DAMAGE = 120;
 
@@ -59,7 +60,6 @@ namespace TEN::Entities::TR4
 		auto* item = &g_Level.Items[itemNumber];
 
 		ClearItem(itemNumber);
-
 		item->Animation.AnimNumber = Objects[ID_KNIGHT_TEMPLAR].animIndex + KTEMPLAR_ANIM_IDLE;
 		item->Animation.TargetState = KTEMPLAR_STATE_IDLE;
 		item->Animation.ActiveState = KTEMPLAR_STATE_IDLE;
@@ -210,16 +210,9 @@ namespace TEN::Entities::TR4
 				{
 					if (item->TestBits(JointBitType::Touch, KnightTemplarSwordAttackJoints))
 					{
-						CreatureEffect2(
-							item,
-							&KnightTemplarBite,
-							20,
-							-1,
-							DoBloodSplat);
-
-						creature->Flags = 1;
-
 						DoDamage(creature->Enemy, KNIGHT_TEMPLAR_SWORD_ATTACK_DAMAGE);
+						CreatureEffect2(item, KnightTemplarBite, 20, -1, DoBloodSplat);
+						creature->Flags = 1;
 					}
 				}
 			}

@@ -9,12 +9,12 @@
 #include "Game/itemdata/creature_info.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
+#include "Game/Lara/lara_helpers.h"
 #include "Game/misc.h"
 #include "Game/people.h"
 #include "Renderer/Renderer11Enums.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
-#include <Game/Lara/lara_helpers.h>
 
 using std::vector;
 
