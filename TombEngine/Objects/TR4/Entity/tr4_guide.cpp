@@ -250,7 +250,7 @@ namespace TEN::Entities::TR4
 						if (AI.bite)
 							item->Animation.TargetState = GUIDE_STATE_TORCH_ATTACK;
 					}
-					else if (!(enemy->IsLara()) || AI.distance > pow(SECTOR(2), 2))
+					else if (!enemy->IsLara() || AI.distance > pow(SECTOR(2), 2))
 						item->Animation.TargetState = GUIDE_STATE_WALK;
 				}
 				else
