@@ -158,7 +158,7 @@ namespace TEN::Entities::TR4
 							if (currentItem->ObjectNumber != ID_LARA)
 							{
 								if (currentItem->ObjectNumber != ID_BIG_SCORPION &&
-									(!(currentItem->IsLara()) || creature->HurtByLara))
+									(currentItem != LaraItem || creature->HurtByLara))
 								{
 									int dx = currentItem->Pose.Position.x - item->Pose.Position.x;
 									int dy = currentItem->Pose.Position.y - item->Pose.Position.y;

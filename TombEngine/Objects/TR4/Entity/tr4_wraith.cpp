@@ -62,7 +62,7 @@ namespace TEN::Entities::TR4
 		int dy;
 		int distance;
 
-		if (target->IsLara() || target->ObjectNumber == ID_ANIMATING10)
+		if (target == LaraItem || target->ObjectNumber == ID_ANIMATING10)
 		{
 			x = target->Pose.Position.x - item->Pose.Position.x;
 			y = target->Pose.Position.y;

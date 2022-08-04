@@ -123,7 +123,7 @@ namespace TEN::Entities::TR4
 			CreatureAIInfo(item, &AI);
 
 			int distance;
-			if (creature->Enemy->IsLara())
+			if (creature->Enemy == LaraItem)
 			{
 				distance = AI.distance;
 			}
