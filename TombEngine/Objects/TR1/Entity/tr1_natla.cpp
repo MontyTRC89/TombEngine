@@ -2,8 +2,8 @@
 #include "Objects/TR1/Entity/tr1_natla.h"
 
 #include "Game/control/box.h"
-#include "Game/itemdata/creature_info.h"
 #include "Game/effects/effects.h"
+#include "Game/itemdata/creature_info.h"
 #include "Game/items.h"
 #include "Game/misc.h"
 #include "Game/missile.h"
