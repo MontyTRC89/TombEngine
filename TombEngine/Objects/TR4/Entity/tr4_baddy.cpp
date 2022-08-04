@@ -523,7 +523,7 @@ namespace TEN::Entities::TR4
 			CreatureAIInfo(item, &AI);
 
 			AI_INFO laraAI;
-			if (currentCreature->Enemy == LaraItem)
+			if (currentCreature->Enemy->IsLara())
 			{
 				laraAI.angle = AI.angle;
 				laraAI.ahead = AI.ahead;

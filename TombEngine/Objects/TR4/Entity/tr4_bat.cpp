@@ -109,7 +109,7 @@ namespace TEN::Entities::TR4
 				if (!creature->Flags)
 				{
 					if (item->TouchBits ||
-						(creature->Enemy != LaraItem &&
+						(!(creature->Enemy->IsLara()) &&
 						AI.distance < BAT_ATTACK_RANGE && AI.ahead &&
 						abs(item->Pose.Position.y - creature->Enemy->Pose.Position.y) < BAT_UNFURL_HEIGHT_RANGE))
 					{
@@ -121,7 +121,7 @@ namespace TEN::Entities::TR4
 
 			case BAT_STATE_ATTACK:
 				if (!creature->Flags &&
-					(item->TouchBits || creature->Enemy != LaraItem) &&
+					(item->TouchBits || !(creature->Enemy->IsLara())) &&
 					AI.distance < BAT_ATTACK_RANGE && AI.ahead &&
 					abs(item->Pose.Position.y - creature->Enemy->Pose.Position.y) < BAT_UNFURL_HEIGHT_RANGE)
 				{
