@@ -20,9 +20,8 @@ using namespace TEN::Effects::Lara;
 
 namespace TEN::Entities::TR4
 {
-	constexpr auto WRAITH_COUNT = 8;
-
-	auto WraithVelocity = 64;
+	constexpr auto WRAITH_COUNT	   = 8;
+	constexpr auto WRAITH_VELOCITY = 64;
 
 	void InitialiseWraith(short itemNumber)
 	{
@@ -31,7 +30,7 @@ namespace TEN::Entities::TR4
 		item->Data = WraithInfo();
 		auto* wraith = (WraithInfo*)item->Data;
 
-		item->Animation.Velocity = WraithVelocity;
+		item->Animation.Velocity = WRAITH_VELOCITY;
 		item->ItemFlags[0] = 0;
 		item->ItemFlags[6] = 0;
 
@@ -93,7 +92,7 @@ namespace TEN::Entities::TR4
 
 		angleV -= item->Pose.Orientation.x;
 
-		int velocity = (WraithVelocity / item->Animation.Velocity) * 8;
+		int velocity = (WRAITH_VELOCITY / item->Animation.Velocity) * 8;
 
 		if (abs(angleH) >= item->ItemFlags[2] || angleH > 0 != item->ItemFlags[2] > 0)
 		{
@@ -221,7 +220,7 @@ namespace TEN::Entities::TR4
 		{
 			if (Wibble & 16)
 			{
-				if (item->Animation.Velocity < WraithVelocity)
+				if (item->Animation.Velocity < WRAITH_VELOCITY)
 					item->Animation.Velocity++;
 				
 				if (item->ItemFlags[6])

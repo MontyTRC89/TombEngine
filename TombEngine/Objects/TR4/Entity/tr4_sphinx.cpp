@@ -17,13 +17,13 @@ using std::vector;
 
 namespace TEN::Entities::TR4
 {
-	const vector<int> SphinxAttackJoints = { 6 };
-	const auto SphinxBite = BiteInfo(Vector3::Zero, 6);
-
 	constexpr auto SPHINX_ATTACK_DAMAGE = 200;
 
 	#define SPHINX_WALK_TURN_ANGLE ANGLE(3.0f)
 	#define SPHINX_RUN_TURN_ANGLE  ANGLE(0.33f)
+
+	const vector<int> SphinxAttackJoints = { 6 };
+	const auto SphinxBite = BiteInfo(Vector3::Zero, 6);
 
 	enum SphinxState
 	{

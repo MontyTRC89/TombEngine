@@ -15,16 +15,16 @@ using std::vector;
 
 namespace TEN::Entities::TR4
 {
-	const vector<int> DogJumpAttackJoints = { 3, 6, 9, 10, 13, 14 };
-	const vector<int> DogBiteAttackJoints = { 3, 6 };
-	const auto DogBite = BiteInfo(Vector3(0.0f, 0.0f, 100.0f), 3.0f);
-
 	constexpr auto DOG_BITE_ATTACK_DAMAGE = 10;
 	constexpr auto DOG_JUMP_ATTACK_DAMAGE = 20;
 
 	constexpr auto DOG_BITE_ATTACK_RANGE  = SQUARE(SECTOR(0.55));
 	constexpr auto DOG_JUMP_ATTACK_RANGE  = SQUARE(SECTOR(1));
 	
+	const vector<int> DogJumpAttackJoints = { 3, 6, 9, 10, 13, 14 };
+	const vector<int> DogBiteAttackJoints = { 3, 6 };
+	const auto DogBite = BiteInfo(Vector3(0.0f, 0.0f, 100.0f), 3.0f);
+
 	enum DogState
 	{
 		DOG_STATE_NONE = 0,

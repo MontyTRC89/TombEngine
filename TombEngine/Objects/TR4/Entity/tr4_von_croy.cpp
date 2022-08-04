@@ -17,12 +17,12 @@ using std::vector;
 
 namespace TEN::Entities::TR4
 {
-	bool VonCroyPassedWaypoints[128];
+	#define VON_CROY_FLAG_JUMP 6
 
 	const vector<int> VonCroyKnifeSwapJoints = { 7, 18 };
 	const auto VonCroyBite = BiteInfo(Vector3(0.0f, 35.0f, 130.0f), 18);
 
-	#define VON_CROY_FLAG_JUMP 6
+	bool VonCroyPassedWaypoints[128];
 
 	enum VonCroyState
 	{

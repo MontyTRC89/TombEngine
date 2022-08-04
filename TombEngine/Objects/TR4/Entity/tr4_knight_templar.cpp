@@ -17,13 +17,13 @@ using std::vector;
 
 namespace TEN::Entities::TR4
 {
-	const vector<int> KnightTemplarSwordAttackJoints = { 10, 11 };
-	const auto KnightTemplarBite = BiteInfo(Vector3::Zero, 11);
-
 	constexpr auto KNIGHT_TEMPLAR_SWORD_ATTACK_DAMAGE = 120;
 
 	#define KNIGHT_TEMPLAR_IDLE_TURN_ANGLE ANGLE(2.0f)
 	#define KNIGHT_TEMPLAR_WALK_TURN_ANGLE ANGLE(7.0f)
+
+	const vector<int> KnightTemplarSwordAttackJoints = { 10, 11 };
+	const auto KnightTemplarBite = BiteInfo(Vector3::Zero, 11);
 
 	enum KnightTemplarState
 	{
