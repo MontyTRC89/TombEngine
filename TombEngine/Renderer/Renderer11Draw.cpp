@@ -2215,8 +2215,6 @@ namespace TEN::Renderer
 		m_context->VSSetShader(m_vsSky.Get(), nullptr, 0);
 		m_context->PSSetShader(m_psSky.Get(), nullptr, 0);
 
-		SetAlphaTest(ALPHA_TEST_NONE, 1.0f);
-
 		BindTexture(TEXTURE_COLOR_MAP, &m_skyTexture, SAMPLER_ANISOTROPIC_CLAMP);
 
 		m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -2234,6 +2232,7 @@ namespace TEN::Renderer
 
 			m_stStatic.World = (rotation * translation);
 			m_stStatic.Color = weather.SkyColor();
+			m_stStatic.AmbientLight = Vector4::One;
 			m_stStatic.LightMode = LIGHT_MODES::LIGHT_MODE_STATIC;
 
 			m_cbStatic.updateData(m_stStatic, m_context.Get());
@@ -2258,6 +2257,7 @@ namespace TEN::Renderer
 
 			m_stStatic.World = Matrix::CreateTranslation(Camera.pos.x, Camera.pos.y, Camera.pos.z);
 			m_stStatic.Color = Vector4::One;
+			m_stStatic.AmbientLight = Vector4::One;
 			m_stStatic.LightMode = LIGHT_MODES::LIGHT_MODE_STATIC;
 
 			m_cbStatic.updateData(m_stStatic, m_context.Get());
@@ -2279,6 +2279,7 @@ namespace TEN::Renderer
 					            SAMPLER_NONE);
 
 					SetBlendMode(bucket.BlendMode);
+					SetAlphaTest(bucket.BlendMode == BLEND_MODES::BLENDMODE_ALPHATEST ? ALPHA_TEST_GREATER_THAN : ALPHA_TEST_NONE, ALPHA_TEST_THRESHOLD);
 
 					// Draw vertices
 					DrawIndexedTriangles(bucket.NumIndices, bucket.StartIndex, 0);
