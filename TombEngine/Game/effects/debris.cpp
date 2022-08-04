@@ -34,6 +34,7 @@ bool ExplodeItemNode(ItemInfo* item, int node, int noXZVel, int bits)
 		ShatterItem.sphere.x = CreatureSpheres[node].x;
 		ShatterItem.sphere.y = CreatureSpheres[node].y;
 		ShatterItem.sphere.z = CreatureSpheres[node].z;
+		ShatterItem.color = item->Color;
 		ShatterItem.flags = item->ObjectNumber == ID_CROSSBOW_BOLT ? 0x400 : 0;
 		ShatterImpactData.impactDirection = Vector3(0, -1, 0);
 		ShatterImpactData.impactLocation = { (float)ShatterItem.sphere.x, (float)ShatterItem.sphere.y, (float)ShatterItem.sphere.z };
