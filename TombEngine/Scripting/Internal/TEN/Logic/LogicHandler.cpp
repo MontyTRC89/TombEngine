@@ -382,7 +382,8 @@ void LogicHandler::ExecuteFunction(std::string const& name, TEN::Control::Volume
 	}
 }
 
-static void doCallback(sol::protected_function const & func, std::optional<float> dt = std::nullopt)  {
+static void doCallback(sol::protected_function const & func, std::optional<float> dt = std::nullopt)
+{
 	auto r = dt.has_value() ? func(dt) : func();
 
 	if (!r.valid())
