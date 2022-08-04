@@ -13,7 +13,6 @@ cbuffer ItemBuffer : register(b1)
 {
 	float4x4 World;
 	float4x4 Bones[MAX_BONES];
-	float4 ItemPosition;
 	float4 Color;
 	float4 AmbientLight;
 	int4 BoneLightModes[MAX_BONES / 4];
