@@ -1,6 +1,7 @@
 #include "framework.h"
 #include "Objects/TR5/tr5_objects.h"
-/// entities
+
+/// Entities
 #include "tr5_autoguns.h"	  // OK
 #include "tr5_brownbeast.h"	  // OK
 #include "tr5_chef.h"		  // OK
@@ -21,12 +22,14 @@
 #include "tr5_roman_statue.h" // OK
 #include "tr5_submarine.h"	  // OK
 #include "tr5_willowwisp.h"	  // OK
-/// emitter
+
+/// Emitters
 #include "Objects/TR5/Emitter/tr5_rats_emitter.h"
 #include "Objects/TR5/Emitter/tr5_bats_emitter.h"
 #include "Objects/TR5/Emitter/tr5_spider_emitter.h"
 #include "tr5_smoke_emitter.h"
-/// objects
+
+/// Objects
 #include "Objects/TR5/Object/tr5_pushableblock.h"
 #include "tr5_twoblockplatform.h"
 #include "tr5_raisingcog.h"
@@ -38,7 +41,8 @@
 #include "tr5_highobject.h"
 #include "tr5_missile.h"
 #include "tr5_genslot.h"
-/// traps
+
+/// Traps
 #include "tr5_ventilator.h"
 #include "tr5_deathslide.h"
 #include "Objects/Effects/tr5_electricity.h"
@@ -46,7 +50,8 @@
 #include "tr5_fallingceiling.h"
 #include "tr5_rollingball.h"
 #include "tr5_explosion.h"
-/// switch
+
+/// Switches
 #include "tr5_crowdove_switch.h"
 
 /// shatter
@@ -65,6 +70,7 @@
 #include "Objects/Utils/object_helper.h"
 #include "Game/itemdata/creature_info.h"
 #include "Game/control/box.h"
+
 using namespace TEN::Entities::TR5;
 
 static void StartEntity(ObjectInfo *obj)
