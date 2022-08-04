@@ -66,6 +66,9 @@ namespace TEN::Renderer
 				{
 					for (auto i = 0; i < sphereMeshes.size(); i++)
 					{
+						if (!nativeItem.TestBits(JointBitType::Mesh, sphereMeshes[i]))
+							continue;
+
 						MESH& m = g_Level.Meshes[Lara.MeshPtrs[sphereMeshes[i]]];
 						Vector3Int pos = { (int)m.sphere.Center.x, (int)m.sphere.Center.y, (int)m.sphere.Center.z };
 
