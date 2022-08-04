@@ -15,7 +15,7 @@
 
 namespace TEN::Entities::TR3
 {
-	BITE_INFO ScubaGunBite = { 17, 164, 44, 18 };
+	BiteInfo ScubaGunBite = { 17, 164, 44, 18 };
 
 	// TODO
 	enum ScubaDiverState

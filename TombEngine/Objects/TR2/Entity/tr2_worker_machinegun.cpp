@@ -11,7 +11,7 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-BITE_INFO WorkerMachineGunBite = { 0, 308, 32, 9 };
+BiteInfo WorkerMachineGunBite = { 0, 308, 32, 9 };
 
 void InitialiseWorkerMachineGun(short itemNumber)
 {

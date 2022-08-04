@@ -12,8 +12,8 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-BITE_INFO SpearBiteLeft = { 0, 0, 920, 11 };
-BITE_INFO SpearBiteRight = { 0, 0, 920, 18 };
+BiteInfo SpearBiteLeft = { 0, 0, 920, 11 };
+BiteInfo SpearBiteRight = { 0, 0, 920, 18 };
 
 // TODO
 enum SpearGuardianState

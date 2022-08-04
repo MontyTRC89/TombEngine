@@ -13,7 +13,7 @@
 #include "Sound/sound.h"
 #include "Specific/level.h"
 
-BITE_INFO SwordBite = { 0, 37, 550, 15 };
+BiteInfo SwordBite = { 0, 37, 550, 15 };
 
 void InitialiseSwordGuardian(short itemNumber)
 {

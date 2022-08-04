@@ -12,7 +12,7 @@
 #include "Game/misc.h"
 
 static BYTE DogAnims[] = { 20, 21, 22, 20 };
-static BITE_INFO DogBite = { 0, 0, 100, 3 };
+static BiteInfo DogBite = { 0, 0, 100, 3 };
 
 void InitialiseTr5Dog(short itemNumber)
 {

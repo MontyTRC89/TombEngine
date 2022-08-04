@@ -10,7 +10,7 @@
 #include "Sound/sound.h"
 #include "Game/itemdata/creature_info.h"
 
-BITE_INFO InvisibleGhostBite = { 0, 0, 0, 17 };
+BiteInfo InvisibleGhostBite = { 0, 0, 0, 17 };
 
 void InitialiseInvisibleGhost(short itemNumber)
 {

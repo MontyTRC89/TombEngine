@@ -15,7 +15,7 @@ using std::vector;
 
 namespace TEN::Entities::TR3
 {
-	BITE_INFO CobraBite = { 0, 0, 0, 13 };
+	BiteInfo CobraBite = { 0, 0, 0, 13 };
 	const vector<int> CobraAttackJoints = { 13 };
 
 	constexpr auto COBRA_BITE_ATTACK_DAMAGE = 80;

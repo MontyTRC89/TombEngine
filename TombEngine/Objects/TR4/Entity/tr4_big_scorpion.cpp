@@ -21,8 +21,8 @@ namespace TEN::Entities::TR4
 	int CutSeqNum;
 
 	const vector<int> BigScorpionAttackJoints = { 8, 20, 21, 23, 24 };
-	const auto BigScorpionBite1 = BITE_INFO(Vector3::Zero, 8);
-	const auto BigScorpionBite2 = BITE_INFO(Vector3::Zero, 23);
+	const auto BigScorpionBite1 = BiteInfo(Vector3::Zero, 8);
+	const auto BigScorpionBite2 = BiteInfo(Vector3::Zero, 23);
 
 	constexpr auto BIG_SCORPION_ATTACK_DAMAGE		   = 120;
 	constexpr auto BIG_SCORPION_TROOP_ATTACK_DAMAGE	   = 15;

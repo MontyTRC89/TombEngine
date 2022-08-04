@@ -24,7 +24,7 @@ namespace TEN::Entities::TR4
 	const vector<int> BaboonAttackJoints	  = { 11, 12 };
 	const vector<int> BaboonAttackRightJoints = { 1, 2, 3, 5, 8, 9 };
 	const vector<int> BaboonJumpAttackJoints  = { 3, 4, 8 };
-	const auto BaboonBite = BITE_INFO(Vector3(10.0f, 10.0f, 11.0f), 4);
+	const auto BaboonBite = BiteInfo(Vector3(10.0f, 10.0f, 11.0f), 4);
 
 	constexpr auto BABOON_ATTACK_DAMAGE = 70;
 

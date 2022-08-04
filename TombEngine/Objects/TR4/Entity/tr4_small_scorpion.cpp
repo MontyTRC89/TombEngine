@@ -15,8 +15,8 @@ using std::vector;
 
 namespace TEN::Entities::TR4
 {
-	BITE_INFO SmallScorpionBiteInfo1 = { 0, 0, 0, 0 };
-	BITE_INFO SmallScorpionBiteInfo2 = { 0, 0, 0, 23 };
+	BiteInfo SmallScorpionBiteInfo1 = { 0, 0, 0, 0 };
+	BiteInfo SmallScorpionBiteInfo2 = { 0, 0, 0, 23 };
 	const vector<int> SmallScorpionAttackJoints = { 8, 22, 23, 25, 26 };
 
 	constexpr auto SMALL_SCORPION_PINCER_ATTACK_DAMAGE = 50;
@@ -168,7 +168,7 @@ namespace TEN::Entities::TR4
 							item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].frameBase + 32)
 						{
 							short rotation;
-							BITE_INFO* biteInfo;
+							BiteInfo* biteInfo;
 
 							// Pincer attack
 							if (item->Animation.ActiveState == SSCORPION_STATE_ATTACK_1)

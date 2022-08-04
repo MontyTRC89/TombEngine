@@ -10,7 +10,7 @@
 #include "Game/items.h"
 #include "Game/misc.h"
 
-BITE_INFO DobermanBite = { 0, 30, 141, 20 };
+BiteInfo DobermanBite = { 0, 30, 141, 20 };
 
 enum DobermanState 
 {

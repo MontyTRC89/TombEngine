@@ -15,7 +15,7 @@ using std::vector;
 
 namespace TEN::Entities::TR3
 {
-	BITE_INFO TigerBite = { 19, -13, 3, 26 };
+	BiteInfo TigerBite = { 19, -13, 3, 26 };
 	const vector<int> TigerAttackJoints = { 14, 15, 16, 18, 19, 20, 21, 22, 23, 24, 25, 26 };
 
 	constexpr auto TIGER_ATTACK_DAMAGE = 90;

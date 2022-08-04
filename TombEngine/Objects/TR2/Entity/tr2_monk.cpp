@@ -13,7 +13,7 @@
 
 bool MonksAttackLara;
 
-BITE_INFO MonkBite = { -23,16,265, 14 };
+BiteInfo MonkBite = { -23,16,265, 14 };
 
 // TODO
 enum MonkState

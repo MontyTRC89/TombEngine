@@ -11,7 +11,7 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-BITE_INFO SharkBite = { 17, -22, 344, 12 };
+BiteInfo SharkBite = { 17, -22, 344, 12 };
 
 void SharkControl(short itemNumber)
 {

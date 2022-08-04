@@ -19,7 +19,7 @@
 using namespace TEN::Effects::Lara;
 using namespace TEN::Effects::Lightning;
 
-BITE_INFO CyborgGunBite = { 0, 300, 64, 7 };
+BiteInfo CyborgGunBite = { 0, 300, 64, 7 };
 byte HitmanJoints[12] = { 15, 14, 13, 6, 5, 12, 7, 4, 10, 11, 19 };
 
 enum CyborgState

@@ -15,9 +15,9 @@
 #include "Sound/sound.h"
 #include "Game/itemdata/creature_info.h"
 
-BITE_INFO SwatGunBite = { 80, 200, 13, 0 };
-BITE_INFO SniperGunBite = { 0, 480, 110, 13 };
-BITE_INFO ArmedMafia2GunBite = { -50, 220, 60, 13 };
+BiteInfo SwatGunBite = { 80, 200, 13, 0 };
+BiteInfo SniperGunBite = { 0, 480, 110, 13 };
+BiteInfo ArmedMafia2GunBite = { -50, 220, 60, 13 };
 
 enum GuardState
 {

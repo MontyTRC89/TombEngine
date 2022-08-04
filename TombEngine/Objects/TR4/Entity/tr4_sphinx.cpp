@@ -16,7 +16,7 @@ using std::vector;
 
 namespace TEN::Entities::TR4
 {
-	BITE_INFO SphinxBiteInfo = { 0, 0, 0, 6 };
+	BiteInfo SphinxBiteInfo = { 0, 0, 0, 6 };
 	const vector<int> SphinxAttackJoints = { 6 };
 
 	constexpr auto SPHINX_ATTACK_DAMAGE = 200;

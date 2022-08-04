@@ -17,7 +17,7 @@
 
 namespace TEN::Entities::TR4
 {
-	BITE_INFO SentryGunBite = { 0, 0, 0, 8 };
+	BiteInfo SentryGunBite = { 0, 0, 0, 8 };
 	auto SentryGunFlameOffset = Vector3Int(-140, 0, 0);
 
 	void InitialiseSentryGun(short itemNum)

@@ -12,7 +12,7 @@
 #include "Sound/sound.h"
 #include "Game/itemdata/creature_info.h"
 
-BITE_INFO ChefBite = { 0, 200, 0 ,13 };
+BiteInfo ChefBite = { 0, 200, 0 ,13 };
 
 // TODO
 enum ChefState

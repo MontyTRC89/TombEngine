@@ -14,7 +14,7 @@
 
 using namespace TEN::Entities::Generic;
 
-BITE_INFO ImpBite = { 0, 100, 0, 9 };
+BiteInfo ImpBite = { 0, 100, 0, 9 };
 
 enum ImpState
 {

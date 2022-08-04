@@ -18,7 +18,7 @@
 
 namespace TEN::Entities::TR3
 {
-	BITE_INFO MPGunBite = { 0, 160, 40, 13 };
+	BiteInfo MPGunBite = { 0, 160, 40, 13 };
 
 	enum MPGunState
 	{

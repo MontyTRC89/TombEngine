@@ -19,8 +19,8 @@ using std::vector;
 
 namespace TEN::Entities::TR3
 {
-	BITE_INFO ShivaBiteLeft = { 0, 0, 920, 13 };
-	BITE_INFO ShivaBiteRight = { 0, 0, 920, 22 };
+	BiteInfo ShivaBiteLeft = { 0, 0, 920, 13 };
+	BiteInfo ShivaBiteRight = { 0, 0, 920, 22 };
 	const vector<int> ShivaAttackLeftJoints = { 10, 13 };
 	const vector<int> ShivaAttackRightJoints = { 22, 25 };
 

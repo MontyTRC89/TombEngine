@@ -41,7 +41,7 @@ extern RIPPLE_STRUCT Ripples[MAX_RIPPLES];
 
 // TODO: EnemyBites must be eradicated and kept directly in object structs or passed to gunflash functions!
 
-BITE_INFO EnemyBites[12] =
+BiteInfo EnemyBites[12] =
 {
 	{ 20, -95, 240, 13 },
 	{ 48, 0, 180, -11 },
@@ -743,7 +743,7 @@ namespace TEN::Renderer
 				
 				SetAlphaTest(ALPHA_TEST_GREATER_THAN, ALPHA_TEST_THRESHOLD);
 
-				BITE_INFO* bites[2] = {
+				BiteInfo* bites[2] = {
 					&EnemyBites[obj->biteOffset],
 					&EnemyBites[obj->biteOffset + 1]
 				};

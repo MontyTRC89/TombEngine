@@ -20,8 +20,8 @@ using std::vector;
 
 namespace TEN::Entities::TR1
 {
-	BITE_INFO CentaurRocketBite = { 11, 415, 41, 13 };
-	BITE_INFO CentaurRearBite = { 50, 30, 0, 5 };
+	BiteInfo CentaurRocketBite = { 11, 415, 41, 13 };
+	BiteInfo CentaurRearBite = { 50, 30, 0, 5 };
 	const vector<int> CentaurAttackJoints = { 0, 3, 4, 7, 8, 16, 17 };
 
 	constexpr auto CENTAUR_REAR_DAMAGE = 200;

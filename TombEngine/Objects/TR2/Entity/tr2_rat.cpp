@@ -11,7 +11,7 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-BITE_INFO RatBite = { 0, 0, 57, 2 };
+BiteInfo RatBite = { 0, 0, 57, 2 };
 
 // TODO
 enum RatState

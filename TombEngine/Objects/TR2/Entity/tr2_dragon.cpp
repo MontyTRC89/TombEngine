@@ -19,7 +19,7 @@
 
 using namespace TEN::Input;
 
-BITE_INFO DragonMouthBite = { 35, 171, 1168, 12 };
+BiteInfo DragonMouthBite = { 35, 171, 1168, 12 };
 
 #define DRAGON_SWIPE_DAMAGE 250
 #define DRAGON_TOUCH_DAMAGE 10

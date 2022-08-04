@@ -16,7 +16,7 @@ using std::vector;
 namespace TEN::Entities::TR4
 {
 	const vector<int> HammerheadBiteAttackJoints = { 10, 12, 13 };
-	const auto HammerheadBite = BITE_INFO(Vector3::Zero, 12);
+	const auto HammerheadBite = BiteInfo(Vector3::Zero, 12);
 
 	constexpr auto HAMMERHEAD_BITE_ATTACK_DAMAGE = 120;
 
