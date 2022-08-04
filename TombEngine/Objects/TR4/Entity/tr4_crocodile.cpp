@@ -18,9 +18,6 @@ using std::vector;
 
 namespace TEN::Entities::TR4
 {
-	const vector<int> CrocodileBiteAttackJoints = { 8, 9 };
-	const auto CrocodileBite = BiteInfo(Vector3(0.0f, -100.0f, 500.0f), 9);
-
 	constexpr auto CROC_ATTACK_DAMAGE = 120;
 	constexpr auto CROC_SWIM_SPEED	  = 16;
 
@@ -33,6 +30,9 @@ namespace TEN::Entities::TR4
 	#define CROC_STATE_WALK_FORWARD_ANGLE ANGLE(3.0f)
 	#define CROC_SWIM_ANGLE ANGLE(3.0f)
 	#define CROC_STATE_RUN_FORWARD_ANGLE ANGLE(5.0f)
+
+	const vector<int> CrocodileBiteAttackJoints = { 8, 9 };
+	const auto CrocodileBite = BiteInfo(Vector3(0.0f, -100.0f, 500.0f), 9);
 
 	enum CrocodileState
 	{

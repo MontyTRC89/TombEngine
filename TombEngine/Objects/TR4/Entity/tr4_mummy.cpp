@@ -15,10 +15,6 @@ using std::vector;
 
 namespace TEN::Entities::TR4
 {
-	const vector<int> MummyAttackJoints { 11, 14 };
-	const auto MummyBite1 = BiteInfo(Vector3::Zero, 11);
-	const auto MummyBite2 = BiteInfo(Vector3::Zero, 14);
-
 	constexpr auto MUMMY_ATTACK_DAMAGE = 100;
 
 	constexpr auto MUMMY_IDLE_SWIPE_ATTACK_RANGE = SQUARE(SECTOR(0.5f));
@@ -29,6 +25,10 @@ namespace TEN::Entities::TR4
 	constexpr auto MUMMY_AWARE_RANGE			 = SQUARE(SECTOR(7));
 
 	#define MUMMY_WALK_TURN_ANGLE ANGLE(7.0f)
+
+	const vector<int> MummyAttackJoints { 11, 14 };
+	const auto MummyBite1 = BiteInfo(Vector3::Zero, 11);
+	const auto MummyBite2 = BiteInfo(Vector3::Zero, 14);
 
 	enum MummyState
 	{

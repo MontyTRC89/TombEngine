@@ -20,6 +20,10 @@ using std::vector;
 
 namespace TEN::Entities::TR4
 {
+	constexpr auto HARPY_STINGER_ATTACK_DAMAGE	= 100;
+	constexpr auto HARPY_SWOOP_ATTACK_DAMAGE	= 10;
+	constexpr auto HARPY_STINGER_POISON_POTENCY = 8;
+
 	const vector<int> HarpySwoopAttackJoints   = { 2, 4 };
 	const vector<int> HarpyStingerAttackJoints = { 20, 21 };
 	const auto HarpyBite1	= BiteInfo(Vector3::Zero, 4);
@@ -27,10 +31,6 @@ namespace TEN::Entities::TR4
 	const auto HarpyBite3	= BiteInfo(Vector3::Zero, 21);
 	const auto HarpyAttack1 = BiteInfo(0, 128, 0, 2);
 	const auto HarpyAttack2 = BiteInfo(0, 128, 0, 4);
-
-	constexpr auto HARPY_STINGER_ATTACK_DAMAGE	= 100;
-	constexpr auto HARPY_SWOOP_ATTACK_DAMAGE	= 10;
-	constexpr auto HARPY_STINGER_POISON_POTENCY = 8;
 
 	enum HarpyState
 	{

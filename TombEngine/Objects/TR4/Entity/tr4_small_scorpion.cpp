@@ -16,15 +16,15 @@ using std::vector;
 
 namespace TEN::Entities::TR4
 {
-	const vector<int> SmallScorpionAttackJoints = { 8, 22, 23, 25, 26 };
-	const auto SmallScorpionBite1 = BiteInfo(Vector3::Zero, 0);
-	const auto SmallScorpionBite2 = BiteInfo(Vector3::Zero, 23);
-
-	constexpr auto SMALL_SCORPION_PINCER_ATTACK_DAMAGE = 50;
-	constexpr auto SMALL_SCORPION_STINGER_ATTACK_DAMAGE = 20;
+	constexpr auto SMALL_SCORPION_PINCER_ATTACK_DAMAGE	 = 50;
+	constexpr auto SMALL_SCORPION_STINGER_ATTACK_DAMAGE	 = 20;
 	constexpr auto SMALL_SCORPION_STINGER_POISON_POTENCY = 2;
 
 	constexpr auto SMALL_SCORPION_ATTACK_RANGE = SQUARE(SECTOR(0.31));
+
+	const vector<int> SmallScorpionAttackJoints = { 8, 22, 23, 25, 26 };
+	const auto SmallScorpionBite1 = BiteInfo(Vector3::Zero, 0);
+	const auto SmallScorpionBite2 = BiteInfo(Vector3::Zero, 23);
 
 	enum SmallScorionState
 	{

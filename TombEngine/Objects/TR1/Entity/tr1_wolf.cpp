@@ -15,24 +15,24 @@ using std::vector;
 
 namespace TEN::Entities::TR1
 {
-	BiteInfo WolfBite = { 0, -14, 174, 6 };
-	const vector<int> WolfAttackJoints = { 0, 1, 2, 3, 6, 8, 9, 10, 12, 13, 14 };
-
-	constexpr auto WOLF_BITE_DAMAGE = 100;
+	constexpr auto WOLF_BITE_DAMAGE	 = 100;
 	constexpr auto WOLF_LUNGE_DAMAGE = 50;
 
-	constexpr auto WOLF_ATTACK_RANGE = SECTOR(1.5f);
-	constexpr auto WOLF_STALK_RANGE = SECTOR(2);
+	constexpr auto WOLF_ATTACK_RANGE = SQUARE(SECTOR(1.5f));
+	constexpr auto WOLF_STALK_RANGE	 = SQUARE(SECTOR(2));
 
-	constexpr auto WOLF_WAKE_CHANCE = 0x20;
+	constexpr auto WOLF_WAKE_CHANCE	 = 0x20;
 	constexpr auto WOLF_SLEEP_CHANCE = 0x20;
-	constexpr auto WOLF_HOWL_CHANCE = 0x180;
+	constexpr auto WOLF_HOWL_CHANCE  = 0x180;
 
 	constexpr auto WOLF_SLEEP_FRAME = 96;
 
 	#define WOLF_WALK_TURN_ANGLE ANGLE(2.0f)
 	#define WOLF_RUN_TURN_ANGLE ANGLE(5.0f)
 	#define WOLF_STALK_TURN_ANGLE ANGLE(2.0f)
+
+	const vector<int> WolfAttackJoints = { 0, 1, 2, 3, 6, 8, 9, 10, 12, 13, 14 };
+	const auto WolfBite = BiteInfo(Vector3(0.0f, -14.0f, 174.0f), 6);
 
 	enum WolfState
 	{
@@ -188,9 +188,9 @@ namespace TEN::Entities::TR1
 				creature->MaxTurn = WOLF_RUN_TURN_ANGLE;
 				tilt = angle;
 
-				if (AI.ahead && AI.distance < pow(WOLF_ATTACK_RANGE, 2))
+				if (AI.ahead && AI.distance < WOLF_ATTACK_RANGE)
 				{
-					if (AI.distance > (pow(WOLF_ATTACK_RANGE, 2) / 2) &&
+					if (AI.distance > (WOLF_ATTACK_RANGE / 2) &&
 						(AI.enemyFacing > FRONT_ARC || AI.enemyFacing < -FRONT_ARC))
 					{
 						item->Animation.RequiredState = WOLF_STATE_STALK;
@@ -202,7 +202,8 @@ namespace TEN::Entities::TR1
 						item->Animation.RequiredState = WOLF_STATE_NONE;
 					}
 				}
-				else if (creature->Mood == MoodType::Stalk && AI.distance < pow(WOLF_STALK_RANGE, 2))
+				else if (creature->Mood == MoodType::Stalk &&
+					AI.distance < WOLF_STALK_RANGE)
 				{
 					item->Animation.RequiredState = WOLF_STATE_STALK;
 					item->Animation.TargetState = WOLF_STATE_CROUCH;
@@ -215,11 +216,12 @@ namespace TEN::Entities::TR1
 			case WOLF_STATE_ATTACK:
 				tilt = angle;
 
-				if (!item->Animation.RequiredState && item->TestBits(JointBitType::Touch, WolfAttackJoints))
+				if (!item->Animation.RequiredState &&
+					item->TestBits(JointBitType::Touch, WolfAttackJoints))
 				{
-					CreatureEffect(item, &WolfBite, DoBloodSplat);
-					DoDamage(creature->Enemy, WOLF_LUNGE_DAMAGE);
 					item->Animation.RequiredState = WOLF_STATE_RUN;
+					DoDamage(creature->Enemy, WOLF_LUNGE_DAMAGE);
+					CreatureEffect(item, WolfBite, DoBloodSplat);
 				}
 
 				item->Animation.TargetState = WOLF_STATE_RUN;
@@ -229,9 +231,9 @@ namespace TEN::Entities::TR1
 				if (AI.ahead && !item->Animation.RequiredState &&
 					item->TestBits(JointBitType::Touch, WolfAttackJoints))
 				{
-					CreatureEffect(item, &WolfBite, DoBloodSplat);
-					DoDamage(creature->Enemy, WOLF_BITE_DAMAGE);
 					item->Animation.RequiredState = WOLF_STATE_CROUCH;
+					DoDamage(creature->Enemy, WOLF_BITE_DAMAGE);
+					CreatureEffect(item, WolfBite, DoBloodSplat);
 				}
 
 				break;
