@@ -17,7 +17,7 @@ using std::vector;
 namespace TEN::Entities::TR4
 {
 	const vector<int> BigBeetleAttackJoints = { 5, 6 };
-	const auto BigBeetleBite = BITE_INFO(Vector3::Zero, 12);
+	const auto BigBeetleBite = BiteInfo(Vector3::Zero, 12);
 
 	constexpr auto BIG_BEETLE_ATTACK_DAMAGE = 50;
 

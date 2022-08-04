@@ -15,8 +15,8 @@
 #include "Specific/setup.h"
 #include "Sound/sound.h"
 
-BITE_INFO KnifeBiteLeft = { 0, 0, 0, 5 };
-BITE_INFO KnifeBiteRight = { 0, 0, 0, 8 };
+BiteInfo KnifeBiteLeft = { 0, 0, 0, 5 };
+BiteInfo KnifeBiteRight = { 0, 0, 0, 8 };
 
 // TODO
 enum KnifeThrowerState

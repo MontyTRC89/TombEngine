@@ -18,7 +18,7 @@ using std::vector;
 namespace TEN::Entities::TR4
 {
 	const vector<int> KnightTemplarSwordAttackJoints = { 10, 11 };
-	const auto KnightTemplarBite = BITE_INFO(Vector3::Zero, 11);
+	const auto KnightTemplarBite = BiteInfo(Vector3::Zero, 11);
 
 	constexpr auto KNIGHT_TEMPLAR_SWORD_ATTACK_DAMAGE = 120;
 

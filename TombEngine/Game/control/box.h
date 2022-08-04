@@ -2,7 +2,7 @@
 #include "Specific/level.h"
 #include "Specific/phd_global.h"
 
-struct BITE_INFO;
+struct BiteInfo;
 struct CreatureInfo;
 struct ItemInfo;
 struct LOTInfo;
@@ -93,7 +93,7 @@ struct OVERLAP
 	int flags;
 };
 
-struct BITE_INFO
+struct BiteInfo
 {
 	// TODO: Remove these in favour of the Vector3. -- Sezz
 	int	x = 0;
@@ -103,7 +103,7 @@ struct BITE_INFO
 	Vector3 Position = Vector3::Zero;
 	int		meshNum	 = 0;
 
-	BITE_INFO()
+	BiteInfo()
 	{
 		this->x = 0;
 		this->y = 0;
@@ -113,7 +113,7 @@ struct BITE_INFO
 		this->meshNum = 0;
 	}
 
-	BITE_INFO(Vector3 pos, int meshNumber)
+	BiteInfo(Vector3 pos, int meshNumber)
 	{
 		this->x = pos.x;
 		this->y = pos.y;
@@ -123,7 +123,7 @@ struct BITE_INFO
 		this->meshNum = meshNumber;
 	}
 
-	BITE_INFO(float xPos, float yPos, float zPos, int meshNumber)
+	BiteInfo(float xPos, float yPos, float zPos, int meshNumber)
 	{
 		this->x = xPos;
 		this->y = yPos;
@@ -177,10 +177,10 @@ short AIGuard(CreatureInfo* creature);
 void AlertNearbyGuards(ItemInfo* item);
 void AlertAllGuards(short itemNumber);
 void CreatureKill(ItemInfo* item, int killAnim, int killState, int laraKillState);
-short CreatureEffect2(ItemInfo* item, BITE_INFO bite, short damage, short angle, std::function<CreatureEffectFunction> func);
-short CreatureEffect2(ItemInfo* item, BITE_INFO* bite, short damage, short angle, std::function<CreatureEffectFunction> func);
-short CreatureEffect(ItemInfo* item, BITE_INFO bite, std::function<CreatureEffectFunction> func);
-short CreatureEffect(ItemInfo* item, BITE_INFO* bite, std::function<CreatureEffectFunction> func);
+short CreatureEffect2(ItemInfo* item, BiteInfo bite, short damage, short angle, std::function<CreatureEffectFunction> func);
+short CreatureEffect2(ItemInfo* item, BiteInfo* bite, short damage, short angle, std::function<CreatureEffectFunction> func);
+short CreatureEffect(ItemInfo* item, BiteInfo bite, std::function<CreatureEffectFunction> func);
+short CreatureEffect(ItemInfo* item, BiteInfo* bite, std::function<CreatureEffectFunction> func);
 void CreatureUnderwater(ItemInfo* item, int depth);
 void CreatureFloat(short itemNumber);
 void CreatureJoint(ItemInfo* item, short joint, short required);

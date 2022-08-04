@@ -21,7 +21,7 @@ using std::vector;
 
 namespace TEN::Entities::TR4
 {
-	BITE_INFO SkeletonBite = { 0, -16, 200, 11 };
+	BiteInfo SkeletonBite = { 0, -16, 200, 11 };
 	const vector<int> SkeletonSwordAttackJoints = { 15, 16 };
 
 	constexpr auto SKELETON_ATTACK_DAMAGE = 80;

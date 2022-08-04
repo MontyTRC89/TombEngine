@@ -16,7 +16,7 @@
 #include "Specific/level.h"
 #include "Specific/trmath.h"
 
-BITE_INFO WorkerFlamethrowerBite = { 0, 250, 32, 9 };
+BiteInfo WorkerFlamethrowerBite = { 0, 250, 32, 9 };
 Vector3Int WorkerFlamethrowerOffset = { 0, 140, 0 };
 
 // TODO

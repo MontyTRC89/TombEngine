@@ -17,7 +17,7 @@
 
 namespace TEN::Entities::TR4
 {
-	BITE_INFO TroopsBite1 = { 0, 300, 64, 7 };
+	BiteInfo TroopsBite1 = { 0, 300, 64, 7 };
 
 	enum TroopState
 	{

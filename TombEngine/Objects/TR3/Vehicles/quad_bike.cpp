@@ -27,7 +27,7 @@ using namespace TEN::Math::Random;
 
 namespace TEN::Entities::Vehicles
 {
-	BITE_INFO QuadBikeEffectsPositions[6] =
+	BiteInfo QuadBikeEffectsPositions[6] =
 	{
 		{ -56, -32, -380, 0	},
 		{ 56, -32, -380, 0 },

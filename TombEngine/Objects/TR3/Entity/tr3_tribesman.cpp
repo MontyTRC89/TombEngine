@@ -20,9 +20,9 @@ using namespace TEN::Entities::Traps;
 
 namespace TEN::Entities::TR3
 {
-	BITE_INFO TribesmanAxeBite = { 0, 16, 265, 13 };
-	BITE_INFO TribesmanDartBite1 = { 0, 0, -200, 13 };
-	BITE_INFO TribesmanDartBite2 = { 8, 40, -248, 13 };
+	BiteInfo TribesmanAxeBite = { 0, 16, 265, 13 };
+	BiteInfo TribesmanDartBite1 = { 0, 0, -200, 13 };
+	BiteInfo TribesmanDartBite2 = { 8, 40, -248, 13 };
 	const vector<int> TribesmanAxeAttackJoints = { 13 };
 	const vector<int> TribesmanDartAttackJoints = { 10, 13 }; // TODO: Check.
 

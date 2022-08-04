@@ -39,8 +39,8 @@ enum SkidooManAnim
 #define SMAN_TARGET_ANGLE ANGLE(15.0f)
 #define SMAN_WAIT_RANGE pow(SECTOR(4), 2)
 
-BITE_INFO SkidooBiteLeft = { 240, -190, 540, 0 };
-BITE_INFO SkidooBiteRight = { -240, -190, 540, 0 };
+BiteInfo SkidooBiteLeft = { 240, -190, 540, 0 };
+BiteInfo SkidooBiteRight = { -240, -190, 540, 0 };
 
 void InitialiseSkidooMan(short itemNumber)
 {

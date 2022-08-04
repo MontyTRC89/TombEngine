@@ -16,7 +16,7 @@ using std::vector;
 
 namespace TEN::Entities::TR3
 {
-	BITE_INFO CivvyBite = { 0, 0, 0, 13 };
+	BiteInfo CivvyBite = { 0, 0, 0, 13 };
 	const vector<int> CivvyAttackJoints = { 10, 13 };
 
 	constexpr auto CIVVY_ATTACK_DAMAGE = 40;

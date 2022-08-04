@@ -11,7 +11,7 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-BITE_INFO WorkerShotgunBite = { 0, 281, 40, 9 };
+BiteInfo WorkerShotgunBite = { 0, 281, 40, 9 };
 
 // TODO
 enum ShotgunWorkerState
@@ -25,7 +25,7 @@ enum ShotgunWorkerAnim
 
 };
 
-static void ShotLaraWithShotgun(ItemInfo* item, AI_INFO* info, BITE_INFO* bite, short angleY, int damage)
+static void ShotLaraWithShotgun(ItemInfo* item, AI_INFO* info, BiteInfo* bite, short angleY, int damage)
 {
 	ShotLara(item, info, bite, angleY, damage);
 	ShotLara(item, info, bite, angleY, damage);

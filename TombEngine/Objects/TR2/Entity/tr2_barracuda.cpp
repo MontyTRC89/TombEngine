@@ -10,7 +10,7 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-BITE_INFO BarracudaBite = { 2, -60, 121, 7 };
+BiteInfo BarracudaBite = { 2, -60, 121, 7 };
 
 // TODO
 enum BarracudaState

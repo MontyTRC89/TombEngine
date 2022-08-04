@@ -16,7 +16,7 @@ using std::vector;
 
 namespace TEN::Entities::TR1
 {
-	BITE_INFO BigRatBite = { 0, -11, 108, 3 };
+	BiteInfo BigRatBite = { 0, -11, 108, 3 };
 	const vector<int> BigRatAttackJoints = { 0, 1, 2, 3, 7, 8, 24, 25 };
 
 	constexpr auto BIG_RAT_BITE_DAMAGE = 20;

@@ -17,13 +17,13 @@
 
 namespace TEN::Entities::TR4
 {
-	const auto HorsemanBite1 = BITE_INFO(Vector3::Zero, 6);
-	const auto HorsemanBite2 = BITE_INFO(Vector3::Zero, 14);
-	const auto HorsemanBite3 = BITE_INFO(Vector3::Zero, 10);
+	const auto HorsemanBite1 = BiteInfo(Vector3::Zero, 6);
+	const auto HorsemanBite2 = BiteInfo(Vector3::Zero, 14);
+	const auto HorsemanBite3 = BiteInfo(Vector3::Zero, 10);
 
-	const auto HorseBite1 = BITE_INFO(Vector3::Zero, 13);
-	const auto HorseBite2 = BITE_INFO(Vector3::Zero, 17);
-	const auto HorseBite3 = BITE_INFO(Vector3::Zero, 19);
+	const auto HorseBite1 = BiteInfo(Vector3::Zero, 13);
+	const auto HorseBite2 = BiteInfo(Vector3::Zero, 17);
+	const auto HorseBite3 = BiteInfo(Vector3::Zero, 19);
 
 	enum HorsemanState
 	{

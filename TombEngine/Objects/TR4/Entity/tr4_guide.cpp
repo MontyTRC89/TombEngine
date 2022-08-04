@@ -15,8 +15,8 @@
 
 namespace TEN::Entities::TR4
 {
-	BITE_INFO GuideBite1 = { 0, 20, 180, 18 };
-	BITE_INFO GuideBite2 = { 30, 80, 50, 15 };
+	BiteInfo GuideBite1 = { 0, 20, 180, 18 };
+	BiteInfo GuideBite2 = { 30, 80, 50, 15 };
 
 	enum GuideState
 	{

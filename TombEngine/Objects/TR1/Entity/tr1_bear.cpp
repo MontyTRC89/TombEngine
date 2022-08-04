@@ -15,7 +15,7 @@ using std::vector;
 
 namespace TEN::Entities::TR1
 {
-	BITE_INFO BearBite = { 0, 96, 335, 14 };
+	BiteInfo BearBite = { 0, 96, 335, 14 };
 	const vector<int> BearAttackJoints = { 2, 3, 5, 6, 14, 17 };
 
 	constexpr auto BEAR_RUN_DAMAGE = 3;

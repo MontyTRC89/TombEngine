@@ -12,8 +12,8 @@
 #include "Game/itemdata/creature_info.h"
 #include "Game/control/control.h"
 
-BITE_INFO LionBite1 = { -2, -10, 250, 21 };
-BITE_INFO LionBite2 = { -2, -10, 132, 21 };
+BiteInfo LionBite1 = { -2, -10, 250, 21 };
+BiteInfo LionBite2 = { -2, -10, 132, 21 };
 
 void InitialiseLion(short itemNumber)
 {
