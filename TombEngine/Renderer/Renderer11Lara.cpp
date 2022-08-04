@@ -271,7 +271,6 @@ void TEN::Renderer::Renderer11::DrawLara(RenderView& view, bool transparent)
 	RendererItem* item = &m_items[Lara.ItemNumber];
 
 	m_stItem.World = m_LaraWorldMatrix;
-	m_stItem.Position = Vector4(LaraItem->Pose.Position.x, LaraItem->Pose.Position.y, LaraItem->Pose.Position.z, 1.0f);
 	m_stItem.Color = item->Color;
 	m_stItem.AmbientLight = item->AmbientLight;
 	memcpy(m_stItem.BonesMatrices, laraObj.AnimationTransforms.data(), sizeof(Matrix) * MAX_BONES);
