@@ -352,7 +352,7 @@ namespace TEN::Entities::TR4
 			AI_INFO AI;
 			CreatureAIInfo(item, &AI);
 
-			if (!(creature->Enemy->IsLara()))
+			if (creature->Enemy != LaraItem)
 				phd_atan(LaraItem->Pose.Position.z - item->Pose.Position.z, LaraItem->Pose.Position.x - item->Pose.Position.x);
 
 			GetCreatureMood(item, &AI, VIOLENT);
@@ -405,7 +405,7 @@ namespace TEN::Entities::TR4
 					}
 				}
 
-				if (!(creature->Enemy->IsLara()) ||
+				if (creature->Enemy != LaraItem ||
 					!Targetable(item, &AI) ||
 					AI.distance <= pow(SECTOR(3.5f), 2) ||
 					!(GetRandomControl() & 1))
@@ -556,7 +556,7 @@ namespace TEN::Entities::TR4
 						-1,
 						DoBloodSplat);
 
-					if (creature->Enemy->IsLara())
+					if (creature->Enemy == LaraItem)
 						Lara.PoisonPotency += HARPY_STINGER_POISON_POTENCY;
 
 					creature->Flags = 1;
