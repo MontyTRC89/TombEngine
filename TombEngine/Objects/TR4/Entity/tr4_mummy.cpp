@@ -19,7 +19,7 @@ namespace TEN::Entities::TR4
 	const auto MummyBite1 = BITE_INFO(Vector3::Zero, 11);
 	const auto MummyBite2 = BITE_INFO(Vector3::Zero, 14);
 
-	constexpr auto MUMY_ATTACK_DAMAGE = 100;
+	constexpr auto MUMMY_ATTACK_DAMAGE = 100;
 
 	constexpr auto MUMMY_IDLE_SWIPE_ATTACK_RANGE = SQUARE(SECTOR(0.5f));
 	constexpr auto MUMMY_WALK_SWIPE_ATTACK_RANGE = SQUARE(SECTOR(0.67f));
@@ -291,7 +291,7 @@ namespace TEN::Entities::TR4
 						if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase &&
 							item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].frameEnd)
 						{
-							DoDamage(creature->Enemy, MUMY_ATTACK_DAMAGE);
+							DoDamage(creature->Enemy, MUMMY_ATTACK_DAMAGE);
 
 							if (item->Animation.AnimNumber == Objects[item->ObjectNumber].animIndex + MUMMY_ANIM_IDLE_SWIPE_ATTACK_LEFT)
 								CreatureEffect2(item, MummyBite1, 5, -1, DoBloodSplat);
