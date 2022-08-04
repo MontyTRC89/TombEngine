@@ -2,6 +2,7 @@
 #include "Objects/Generic/Switches/switch.h"
 #include "Game/items.h"
 #include "Game/control/lot.h"
+#include "Game/effects/debris.h"
 #include "Objects/Generic/Object/objects.h"
 #include "Game/Lara/lara.h"
 #include "Game/animation.h"
