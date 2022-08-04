@@ -19,10 +19,10 @@ namespace TEN::Entities::TR4
 {
 	bool VonCroyPassedWaypoints[128];
 
-	BiteInfo VonCroyBite = { 0, 35, 130, 18 };
-	vector<int> VonCroyKnifeSwapJoints = { 7, 18 };
+	const vector<int> VonCroyKnifeSwapJoints = { 7, 18 };
+	const auto VonCroyBite = BiteInfo(Vector3(0.0f, 35.0f, 130.0f), 18);
 
-	#define VON_CROY_FLAG_JUMP		6
+	#define VON_CROY_FLAG_JUMP 6
 
 	enum VonCroyState
 	{
@@ -734,7 +734,7 @@ namespace TEN::Entities::TR4
 						abs(item->Pose.Position.z - enemy->Pose.Position.z) < CLICK(2))
 					{
 						DoDamage(enemy, 40);
-						CreatureEffect2(item, &VonCroyBite, 2, -1, DoBloodSplat);
+						CreatureEffect2(item, VonCroyBite, 2, -1, DoBloodSplat);
 						creature->Flags = 1;
 
 						if (enemy->HitPoints <= 0)
@@ -802,7 +802,7 @@ namespace TEN::Entities::TR4
 							abs(item->Pose.Position.z - enemy->Pose.Position.z) < CLICK(2))
 						{
 							DoDamage(enemy, 20);
-							CreatureEffect2(item, &VonCroyBite, 2, -1, DoBloodSplat);
+							CreatureEffect2(item, VonCroyBite, 2, -1, DoBloodSplat);
 							creature->Flags = 1;
 
 							if (enemy->HitPoints <= 0)
