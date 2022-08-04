@@ -160,7 +160,7 @@ namespace TEN::Entities::TR4
 						if (currentItem->ObjectNumber != ID_LARA)
 						{
 							if (currentItem->ObjectNumber != ID_TROOPS &&
-								(!(currentItem->IsLara()) || creature->HurtByLara))
+								(!currentItem->IsLara() || creature->HurtByLara))
 							{
 								dx = currentItem->Pose.Position.x - item->Pose.Position.x;
 								dy = currentItem->Pose.Position.y - item->Pose.Position.y;
