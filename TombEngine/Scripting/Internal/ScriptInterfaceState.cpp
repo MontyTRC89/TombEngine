@@ -7,6 +7,7 @@
 #include "Inventory/InventoryHandler.h"
 #include "ReservedScriptNames.h"
 #include "Misc/Miscellanous.h"
+#include "Effects/EffectsFunctions.h"
 
 static sol::state s_solState;
 static sol::table s_rootTable;
@@ -38,7 +39,7 @@ ScriptInterfaceStringsHandler* ScriptInterfaceState::CreateStringsHandler()
 
 void ScriptInterfaceState::Init()
 {
-	s_solState.open_libraries(sol::lib::base, sol::lib::math, sol::lib::package, sol::lib::coroutine);
+	s_solState.open_libraries(sol::lib::base, sol::lib::math, sol::lib::package, sol::lib::coroutine, sol::lib::table, sol::lib::string, sol::lib::debug);
 	s_solState.script("package.path=\"Scripts/?.lua\"");
 	s_solState.set_exception_handler(lua_exception_handler);
 
@@ -48,5 +49,6 @@ void ScriptInterfaceState::Init()
 	// Misc handlers not assigned above
 	InventoryHandler::Register(&s_solState, s_rootTable);
 	Misc::Register(&s_solState, s_rootTable);
+	Effects::Register(&s_solState, s_rootTable);
 }
 
