@@ -1,28 +1,29 @@
 #include "framework.h"
-#include "tr4_sphinx.h"
+#include "Objects/TR4/Entity/tr4_sphinx.h"
+
 #include "Game/collision/collide_room.h"
-#include "Game/effects/debris.h"
-#include "Game/items.h"
 #include "Game/control/box.h"
+#include "Game/effects/debris.h"
 #include "Game/effects/effects.h"
-#include "Specific/setup.h"
-#include "Specific/level.h"
-#include "Game/Lara/lara.h"
-#include "Sound/sound.h"
 #include "Game/itemdata/creature_info.h"
+#include "Game/items.h"
+#include "Game/Lara/lara.h"
 #include "Game/misc.h"
+#include "Sound/sound.h"
+#include "Specific/level.h"
+#include "Specific/setup.h"
 
 using std::vector;
 
 namespace TEN::Entities::TR4
 {
-	BiteInfo SphinxBiteInfo = { 0, 0, 0, 6 };
 	const vector<int> SphinxAttackJoints = { 6 };
+	const auto SphinxBite = BiteInfo(Vector3::Zero, 6);
 
 	constexpr auto SPHINX_ATTACK_DAMAGE = 200;
 
 	#define SPHINX_WALK_TURN_ANGLE ANGLE(3.0f)
-	#define SPHINX_RUN_TURN_ANGLE ANGLE(0.33f)
+	#define SPHINX_RUN_TURN_ANGLE  ANGLE(0.33f)
 
 	enum SphinxState
 	{
@@ -185,15 +186,9 @@ namespace TEN::Entities::TR4
 			{
 				if (item->TestBits(JointBitType::Touch, SphinxAttackJoints))
 				{
-					CreatureEffect2(
-						item,
-						&SphinxBiteInfo,
-						20,
-						-1,
-						DoBloodSplat);
-					creature->Flags = 1;
-
 					DoDamage(creature->Enemy, SPHINX_ATTACK_DAMAGE);
+					CreatureEffect2(item, SphinxBite, 20, -1, DoBloodSplat);
+					creature->Flags = 1;
 				}
 			}
 
@@ -232,14 +227,8 @@ namespace TEN::Entities::TR4
 
 				if (item->TestBits(JointBitType::Touch, SphinxAttackJoints))
 				{
-					CreatureEffect2(
-						item,
-						&SphinxBiteInfo,
-						50,
-						-1,
-						DoBloodSplat);
-
 					DoDamage(creature->Enemy, INT_MAX);
+					CreatureEffect2(item, SphinxBite, 50, -1, DoBloodSplat);
 				}
 			}
 
