@@ -1817,13 +1817,13 @@ static bool CheckItemCollideCamera(ItemInfo* item)
 std::vector<short> FillCollideableItemList()
 {
 	std::vector<short> itemList;
-	auto roomList = GetRoomList(Camera.pos.roomNumber);
+	auto& roomList = g_Level.Rooms[Camera.pos.roomNumber].neighbors;
 
 	for (short i = 0; i < g_Level.NumItems; i++)
 	{
 		auto item = &g_Level.Items[i];
 
-		if (!roomList.count(item->RoomNumber))
+		if (std::find(roomList.begin(), roomList.end(), item->RoomNumber) == roomList.end())
 			continue;
 
 		if (!CheckItemCollideCamera(&g_Level.Items[i]))
@@ -1868,7 +1868,7 @@ static bool CheckStaticCollideCamera(MESH_INFO* mesh)
 std::vector<MESH_INFO*> FillCollideableStaticsList()
 {
 	std::vector<MESH_INFO*> staticList;
-	auto roomList = GetRoomList(Camera.pos.roomNumber);
+	auto& roomList = g_Level.Rooms[Camera.pos.roomNumber].neighbors;
 
 	for (auto i : roomList)
 	{

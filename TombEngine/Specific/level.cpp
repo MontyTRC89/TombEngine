@@ -25,6 +25,7 @@
 #include "Sound/sound.h"
 #include "Specific/input.h"
 #include "Specific/setup.h"
+#include "Specific/trutils.h"
 
 using TEN::Renderer::g_Renderer;
 using std::vector;
@@ -177,7 +178,7 @@ void LoadObjects()
 	{
 		MESH mesh;
 
-		mesh.lightMode = ReadInt8();
+		mesh.lightMode = (LIGHT_MODES)ReadInt8();
 
 		mesh.sphere.Center.x = ReadFloat();
 		mesh.sphere.Center.y = ReadFloat();
@@ -205,7 +206,7 @@ void LoadObjects()
 			BUCKET bucket;
 
 			bucket.texture = ReadInt32();
-			bucket.blendMode = ReadInt8();
+			bucket.blendMode = (BLEND_MODES)ReadInt8();
 			bucket.animated = ReadInt8();
 			bucket.numQuads = 0;
 			bucket.numTriangles = 0;
@@ -596,7 +597,7 @@ void ReadRooms()
 			BUCKET bucket;
 
 			bucket.texture = ReadInt32();
-			bucket.blendMode = ReadInt8();
+			bucket.blendMode = (BLEND_MODES)ReadInt8();
 			bucket.animated = ReadInt8();
 			bucket.numQuads = 0;
 			bucket.numTriangles = 0;
@@ -842,7 +843,6 @@ void FreeLevel()
 	g_Level.SpritesTextures.resize(0);
 	g_Level.AnimatedTexturesSequences.resize(0);
 	g_Level.Rooms.resize(0);
-	g_Level.ObjectTextures.resize(0);
 	g_Level.Bones.resize(0);
 	g_Level.Meshes.resize(0);
 	MoveablesIds.resize(0);
@@ -945,6 +945,8 @@ void LoadAnimatedTextures()
 
 void LoadTextureInfos()
 {
+	// TODO: THIS FUNCTION IS DUMMY!!!! REMOVE IT WHEN TE FORMAT IS CHANGED! -- Lwmte 31.07.22
+
 	ReadInt32(); // TEX/0
 
 	int numObjectTextures = ReadInt32();
@@ -952,19 +954,17 @@ void LoadTextureInfos()
 
 	for (int i = 0; i < numObjectTextures; i++)
 	{
-		OBJECT_TEXTURE texture;
-		texture.attribute = ReadInt32();
-		texture.tileAndFlag = ReadInt32();
-		texture.newFlags = ReadInt32();
+		ReadInt32();
+		ReadInt32();
+		ReadInt32();
 
 		for (int j = 0; j < 4; j++)
 		{
-			texture.vertices[j].x = ReadFloat();
-			texture.vertices[j].y = ReadFloat();
+			ReadFloat();
+			ReadFloat();
 		}
 
-		texture.destination = ReadInt32();
-		g_Level.ObjectTextures.push_back(texture);
+		ReadInt32();
 	}
 }
 
@@ -1076,7 +1076,7 @@ unsigned int _stdcall LoadLevel(void* data)
 			throw std::exception((std::string("Unable to read level file: ") + filename).c_str());
 
 		char header[4];
-		byte version[4];
+		unsigned char version[4];
 		int compressedSize;
 		int uncompressedSize;
 		int systemHash;
@@ -1090,7 +1090,17 @@ unsigned int _stdcall LoadLevel(void* data)
 		if (std::string(header) != "TEN")
 			throw std::invalid_argument("Level file header is not valid! Must be TEN. Probably old level version?");
 		else
-			TENLog("Tomb Editor compiler version: " + std::to_string(version[0]) + "." + std::to_string(version[1]) + "." + std::to_string(version[2]), LogLevel::Info);
+			TENLog("Level compiler version: " + std::to_string(version[0]) + "." + std::to_string(version[1]) + "." + std::to_string(version[2]), LogLevel::Info);
+
+		auto assemblyVersion = TEN::Utils::GetProductOrFileVersion(true);
+		for (int i = 0; i < assemblyVersion.size(); i++)
+		{
+			if (assemblyVersion[i] != version[i])
+			{
+				TENLog("Level compiler version does not match with TEN version. Errors or crashes may be possible.", LogLevel::Warning);
+				break;
+			}
+		}
 
 		// Check system name hash and reset it if it's valid (because we use build & play feature only once)
 		if (SystemNameHash != 0 && SystemNameHash != systemHash)
@@ -1146,19 +1156,20 @@ unsigned int _stdcall LoadLevel(void* data)
 		LoadSamples();
 		g_Renderer.UpdateProgress(80);
 
-		TENLog("Preparing renderer...", LogLevel::Info);
-		
-		g_Renderer.UpdateProgress(90);
-		g_Renderer.PrepareDataForTheRenderer();
-
 		TENLog("Initializing level...", LogLevel::Info);
 
 		// Initialise the game
 		InitialiseGameFlags();
 		InitialiseLara(!(InitialiseGame || CurrentLevel == 1));
+		InitializeNeighborRoomList();
 		GetCarriedItems();
 		GetAIPickups();
 		g_GameScriptEntities->AssignLara();
+		g_Renderer.UpdateProgress(90);
+
+		TENLog("Preparing renderer...", LogLevel::Info);
+
+		g_Renderer.PrepareDataForTheRenderer();
 
 		TENLog("Level loading complete.", LogLevel::Info);
 
