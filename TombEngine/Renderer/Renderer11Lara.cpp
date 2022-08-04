@@ -278,7 +278,6 @@ void TEN::Renderer::Renderer11::DrawLara(RenderView& view, bool transparent)
 	RendererObject& laraSkin = *m_moveableObjects[ID_LARA_SKIN];
 
 	RendererRoom* room = &m_rooms[LaraItem->RoomNumber];
-	RendererItem* item = &m_items[Lara.ItemNumber];
 
 	m_stItem.World = m_LaraWorldMatrix;
 	m_stItem.Color = item->Color;
