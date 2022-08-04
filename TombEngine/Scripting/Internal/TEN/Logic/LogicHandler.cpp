@@ -362,17 +362,17 @@ void LogicHandler::ExecuteFunction(std::string const& luaFuncName, short idOne, 
 	}
 }
 
-void LogicHandler::ExecuteFunction(std::string const& name, TEN::Control::Volumes::VolumeTriggerer triggerer)
+void LogicHandler::ExecuteFunction(std::string const& name, TEN::Control::Volumes::VolumeTriggerer triggerer, std::string const& arguments)
 {
 	sol::protected_function_result r;
 	sol::protected_function func = (*m_handler.GetState())["LevelFuncs"][name.c_str()];
 	if (std::holds_alternative<short>(triggerer))
 	{
-		r = func(std::make_unique<Moveable>(std::get<short>(triggerer), true));
+		r = func(std::make_unique<Moveable>(std::get<short>(triggerer), true), arguments);
 	}
 	else
 	{
-		r = func();
+		r = func(arguments);
 	}
 
 	if (!r.valid())
