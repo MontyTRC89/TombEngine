@@ -1,27 +1,29 @@
 #include "framework.h"
-#include "tr4_dog.h"
+#include "Objects/TR4/Entity/tr4_dog.h"
+
 #include "Game/control/box.h"
-#include "Game/effects/effects.h"
-#include "Specific/setup.h"
-#include "Specific/level.h"
-#include "Game/Lara/lara.h"
-#include "Game/itemdata/creature_info.h"
 #include "Game/control/control.h"
+#include "Game/effects/effects.h"
+#include "Game/itemdata/creature_info.h"
 #include "Game/items.h"
+#include "Game/Lara/lara.h"
 #include "Game/misc.h"
+#include "Specific/level.h"
+#include "Specific/setup.h"
 
 using std::vector;
 
 namespace TEN::Entities::TR4
 {
-	BITE_INFO DogBite = { 0, 0, 100, 3 };
 	const vector<int> DogJumpAttackJoints = { 3, 6, 9, 10, 13, 14 };
 	const vector<int> DogBiteAttackJoints = { 3, 6 };
+	const auto DogBite = BITE_INFO(Vector3(0.0f, 0.0f, 100.0f), 3.0f);
 
 	constexpr auto DOG_BITE_ATTACK_DAMAGE = 10;
 	constexpr auto DOG_JUMP_ATTACK_DAMAGE = 20;
-	constexpr auto DOG_BITE_ATTACK_RANGE = SECTOR(0.55);
-	constexpr auto DOG_JUMP_ATTACK_RANGE = SECTOR(1);
+
+	constexpr auto DOG_BITE_ATTACK_RANGE  = SQUARE(SECTOR(0.55));
+	constexpr auto DOG_JUMP_ATTACK_RANGE  = SQUARE(SECTOR(1));
 	
 	enum DogState
 	{
@@ -299,7 +301,7 @@ namespace TEN::Entities::TR4
 				}
 				else if (creature->Mood != MoodType::Bored)
 				{
-					if (AI.bite && AI.distance < pow(DOG_JUMP_ATTACK_RANGE, 2))
+					if (AI.bite && AI.distance < DOG_JUMP_ATTACK_RANGE)
 						item->Animation.TargetState = DOG_STATE_JUMP_ATTACK;
 					else if (AI.distance < pow(SECTOR(1.5f), 2))
 					{
@@ -319,7 +321,7 @@ namespace TEN::Entities::TR4
 				{
 					if (creature->Mood == MoodType::Escape)
 						item->Animation.TargetState = DOG_STATE_RUN_FORWARD;
-					else if (AI.bite && AI.distance < pow(DOG_BITE_ATTACK_RANGE, 2))
+					else if (AI.bite && AI.distance < DOG_BITE_ATTACK_RANGE)
 					{
 						item->Animation.TargetState = DOG_STATE_BITE_ATTACK;
 						item->Animation.RequiredState = DOG_STATE_STALK;
@@ -339,7 +341,7 @@ namespace TEN::Entities::TR4
 					frame <= 14)
 				{
 					DoDamage(creature->Enemy, DOG_JUMP_ATTACK_DAMAGE);
-					CreatureEffect2(item, &DogBite, 2, -1, DoBloodSplat);
+					CreatureEffect2(item, DogBite, 2, -1, DoBloodSplat);
 				}
 
 				item->Animation.TargetState = DOG_STATE_RUN_FORWARD;
@@ -359,7 +361,7 @@ namespace TEN::Entities::TR4
 						frame <= 25))
 				{
 					DoDamage(creature->Enemy, DOG_BITE_ATTACK_DAMAGE);
-					CreatureEffect2(item, &DogBite, 2, -1, DoBloodSplat);
+					CreatureEffect2(item, DogBite, 2, -1, DoBloodSplat);
 				}
 
 				break;
