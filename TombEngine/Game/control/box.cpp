@@ -8,14 +8,15 @@
 #include "Game/control/control.h"
 #include "Game/control/lot.h"
 #include "Game/effects/tomb4fx.h"
+#include "Game/itemdata/creature_info.h"
 #include "Game/Lara/lara.h"
+#include "Game/Lara/lara_helpers.h"
 #include "Game/items.h"
 #include "Game/misc.h"
 #include "Game/room.h"
 #include "Specific/setup.h"
 #include "Specific/trmath.h"
 #include "Objects/objectslist.h"
-#include "Game/itemdata/creature_info.h"
 #include "Objects/TR5/Object/tr5_pushableblock.h"
 #include "Renderer/Renderer11.h"
 
@@ -1460,6 +1461,7 @@ void CreatureAIInfo(ItemInfo* item, AI_INFO* AI)
 	auto* creature = GetCreatureInfo(item);
 	auto* object = &Objects[item->ObjectNumber];
 
+	// TODO
 	auto* enemy = creature->Enemy;
 	if (!enemy)
 	{
@@ -1556,8 +1558,11 @@ void CreatureAIInfo(ItemInfo* item, AI_INFO* AI)
 	vector.z = abs(vector.z);
 
 	// Makes Lara smaller.
-	if (enemy == LaraItem && ((LaraInfo*)enemy)->Control.IsLow)
-		vector.y -= STEPUP_HEIGHT;
+	if (enemy->IsLara())
+	{
+		if (GetLaraInfo(enemy)->Control.IsLow)
+			vector.y -= STEPUP_HEIGHT;
+	}
 
 	if (vector.x > vector.z)
 		AI->xAngle = phd_atan(vector.x + (vector.z >> 1), vector.y);
