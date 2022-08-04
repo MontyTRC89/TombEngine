@@ -10,8 +10,8 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-BITE_INFO BirdMonsterBiteLeft = { 0, 224, 0, 19 };
-BITE_INFO BirdMonsterBiteRight = { 0, 224, 0, 22 };
+BiteInfo BirdMonsterBiteLeft = { 0, 224, 0, 19 };
+BiteInfo BirdMonsterBiteRight = { 0, 224, 0, 22 };
 
 // TODO
 enum BirdMonsterState

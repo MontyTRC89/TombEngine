@@ -15,7 +15,7 @@ using std::vector;
 
 namespace TEN::Entities::TR1
 {
-	BITE_INFO ApeBite = { 0, -19, 75, 15 };
+	BiteInfo ApeBite = { 0, -19, 75, 15 };
 	const vector<int> ApeAttackJoints = { 8, 9, 10, 11, 12, 13, 14, 15 };
 
 	constexpr auto APE_ATTACK_DAMAGE = 200;

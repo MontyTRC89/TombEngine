@@ -16,8 +16,8 @@ using std::vector;
 namespace TEN::Entities::TR4
 {
 	const vector<int> MummyAttackJoints { 11, 14 };
-	const auto MummyBite1 = BITE_INFO(Vector3::Zero, 11);
-	const auto MummyBite2 = BITE_INFO(Vector3::Zero, 14);
+	const auto MummyBite1 = BiteInfo(Vector3::Zero, 11);
+	const auto MummyBite2 = BiteInfo(Vector3::Zero, 14);
 
 	constexpr auto MUMMY_ATTACK_DAMAGE = 100;
 

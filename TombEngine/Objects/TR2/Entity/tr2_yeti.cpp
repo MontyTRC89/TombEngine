@@ -11,8 +11,8 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-BITE_INFO YetiBiteRight = { 12, 101, 19, 10 };
-BITE_INFO YetiBiteLeft = { 12, 101, 19, 13 };
+BiteInfo YetiBiteRight = { 12, 101, 19, 10 };
+BiteInfo YetiBiteLeft = { 12, 101, 19, 13 };
 
 // TODO
 enum YetiState

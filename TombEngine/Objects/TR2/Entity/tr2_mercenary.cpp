@@ -11,8 +11,8 @@
 #include "Specific/setup.h"
 #include "Specific/trmath.h"
 
-BITE_INFO MercenaryUziBite = { 0, 150, 19, 17 };
-BITE_INFO MercenaryAutoPistolBite = { 0, 230, 9, 17 };
+BiteInfo MercenaryUziBite = { 0, 150, 19, 17 };
+BiteInfo MercenaryAutoPistolBite = { 0, 230, 9, 17 };
 
 // TODO
 enum MercenaryState

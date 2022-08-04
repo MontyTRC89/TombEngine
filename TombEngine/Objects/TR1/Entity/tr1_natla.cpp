@@ -14,7 +14,7 @@
 
 namespace TEN::Entities::TR1
 {
-	BITE_INFO NatlaGunBite = { 5, 220, 7, 4 };
+	BiteInfo NatlaGunBite = { 5, 220, 7, 4 };
 
 	#define NATLA_NEAR_DEATH 200
 	#define NATLA_FLYMODE 0x8000

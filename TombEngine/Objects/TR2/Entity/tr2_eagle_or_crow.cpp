@@ -10,8 +10,8 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-BITE_INFO EagleBite = { 15, 46, 21, 6 };
-BITE_INFO CrowBite = { 2, 10, 60, 14 };
+BiteInfo EagleBite = { 15, 46, 21, 6 };
+BiteInfo CrowBite = { 2, 10, 60, 14 };
 
 // TODO
 enum EagleState

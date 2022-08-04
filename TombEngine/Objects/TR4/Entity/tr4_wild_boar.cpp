@@ -13,7 +13,7 @@
 
 namespace TEN::Entities::TR4
 {
-	BITE_INFO WildBoatBiteInfo = { 0, 0, 0, 14 };
+	BiteInfo WildBoatBiteInfo = { 0, 0, 0, 14 };
 
 	constexpr auto WILD_BOAR_ATTACK_DAMAGE = 30;
 

@@ -12,7 +12,7 @@
 #include "Game/misc.h"
 #include "Sound/sound.h"
 
-bool ShotLara(ItemInfo* item, AI_INFO* AI, BITE_INFO* gun, short extraRotation, int damage) 
+bool ShotLara(ItemInfo* item, AI_INFO* AI, BiteInfo* gun, short extraRotation, int damage) 
 {
 	auto* creature = GetCreatureInfo(item);
 	auto* enemy = creature->Enemy;

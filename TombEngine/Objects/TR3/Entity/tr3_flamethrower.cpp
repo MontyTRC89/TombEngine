@@ -18,7 +18,7 @@
 
 namespace TEN::Entities::TR3
 {
-	BITE_INFO FlamethrowerBite = { 0, 340, 64, 7 };
+	BiteInfo FlamethrowerBite = { 0, 340, 64, 7 };
 	Vector3Int FlamethrowerOffset = { 0, 340, 0 };
 
 	// TODO

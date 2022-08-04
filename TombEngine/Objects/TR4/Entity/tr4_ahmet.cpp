@@ -23,9 +23,9 @@ namespace TEN::Entities::TR4
 {
 	const vector<int> AhmetSwipeAttackLeftJoints  = { 14, 15, 16, 17 };
 	const vector<int> AhmetSwipeAttackRightJoints = { 20, 21, 22, 23 };
-	const auto AhmetBiteLeft  = BITE_INFO(Vector3::Zero, 16);
-	const auto AhmetBiteRight = BITE_INFO(Vector3::Zero, 22);
-	const auto AhmetBiteJaw	  = BITE_INFO(Vector3::Zero, 11);
+	const auto AhmetBiteLeft  = BiteInfo(Vector3::Zero, 16);
+	const auto AhmetBiteRight = BiteInfo(Vector3::Zero, 22);
+	const auto AhmetBiteJaw	  = BiteInfo(Vector3::Zero, 11);
 
 	constexpr auto AHMET_SWIPE_ATTACK_DAMAGE = 80;
 	constexpr auto AHMET_BITE_ATTACK_DAMAGE	 = 120;

@@ -16,7 +16,7 @@ using std::vector;
 
 namespace TEN::Entities::TR3
 {
-	BITE_INFO RaptorBite = { 0, 66, 318, 22 };
+	BiteInfo RaptorBite = { 0, 66, 318, 22 };
 	const vector<int> RaptorAttackJoints = { 10, 11, 12, 13, 14, 16, 17, 18, 19, 20, 21, 22, 23 };
 
 	constexpr auto RAPTOR_ATTACK_DAMAGE = 100;

@@ -13,7 +13,7 @@
 #include "Game/itemdata/creature_info.h"
 #include "Game/animation.h"
 
-BITE_INFO GladiatorBite = { 0, 0, 0, 16 };
+BiteInfo GladiatorBite = { 0, 0, 0, 16 };
 
 // TODO
 enum GladiatorState

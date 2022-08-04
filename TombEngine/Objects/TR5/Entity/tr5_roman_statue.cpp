@@ -26,7 +26,7 @@ struct RomanStatueInfo
 };
 
 RomanStatueInfo RomanStatueData;
-BITE_INFO RomanStatueBite{ 0, 0, 0, 15 };
+BiteInfo RomanStatueBite{ 0, 0, 0, 15 };
 
 // TODO
 enum RomanStatueState

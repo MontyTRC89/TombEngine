@@ -21,7 +21,7 @@ using namespace TEN::Input;
 
 namespace TEN::Entities::TR4
 {
-	BITE_INFO SASGunBite = { 0, 300, 64, 7 };
+	BiteInfo SASGunBite = { 0, 300, 64, 7 };
 
 	auto SASDragBodyPosition = Vector3Int(0, 0, -460);
 	OBJECT_COLLISION_BOUNDS SASDragBodyBounds =

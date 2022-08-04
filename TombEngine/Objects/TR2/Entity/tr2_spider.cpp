@@ -14,7 +14,7 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-BITE_INFO SpiderBite = { 0, 0, 41, 1 };
+BiteInfo SpiderBite = { 0, 0, 41, 1 };
 
 static void S_SpiderBite(ItemInfo* item)
 {

@@ -15,7 +15,7 @@ using std::vector;
 
 namespace TEN::Entities::TR1
 {
-	BITE_INFO WolfBite = { 0, -14, 174, 6 };
+	BiteInfo WolfBite = { 0, -14, 174, 6 };
 	const vector<int> WolfAttackJoints = { 0, 1, 2, 3, 6, 8, 9, 10, 12, 13, 14 };
 
 	constexpr auto WOLF_BITE_DAMAGE = 100;

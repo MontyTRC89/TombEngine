@@ -19,7 +19,7 @@ namespace TEN::Entities::TR4
 {
 	bool VonCroyPassedWaypoints[128];
 
-	BITE_INFO VonCroyBite = { 0, 35, 130, 18 };
+	BiteInfo VonCroyBite = { 0, 35, 130, 18 };
 	vector<int> VonCroyKnifeSwapJoints = { 7, 18 };
 
 	#define VON_CROY_FLAG_JUMP		6

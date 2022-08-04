@@ -10,7 +10,7 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-BITE_INFO SilencerGunBite = { 3, 331, 56, 10 };
+BiteInfo SilencerGunBite = { 3, 331, 56, 10 };
 
 // TODO
 enum SilencerState

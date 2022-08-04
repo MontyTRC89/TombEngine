@@ -15,10 +15,10 @@
 
 namespace TEN::Entities::TR4
 {
-	BITE_INFO SethaBite1 = { 0, 220, 50, 17 };
-	BITE_INFO SethaBite2 = { 0, 220, 50, 13 };
-	BITE_INFO SethaAttack1 = { -16, 200, 32, 13 };
-	BITE_INFO SethaAttack2 = { 16, 200, 32, 17 };
+	BiteInfo SethaBite1 = { 0, 220, 50, 17 };
+	BiteInfo SethaBite2 = { 0, 220, 50, 13 };
+	BiteInfo SethaAttack1 = { -16, 200, 32, 13 };
+	BiteInfo SethaAttack2 = { 16, 200, 32, 17 };
 
 	void InitialiseSetha(short itemNumber)
 	{

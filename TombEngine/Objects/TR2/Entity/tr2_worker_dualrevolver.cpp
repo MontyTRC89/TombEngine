@@ -10,8 +10,8 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-BITE_INFO WorkerDualGunBiteLeft = { -2, 275, 23, 6 };
-BITE_INFO WorkerDualGunBiteRight = { 2, 275, 23, 10 };
+BiteInfo WorkerDualGunBiteLeft = { -2, 275, 23, 6 };
+BiteInfo WorkerDualGunBiteRight = { 2, 275, 23, 10 };
 
 // TODO
 enum WorkerDualGunState

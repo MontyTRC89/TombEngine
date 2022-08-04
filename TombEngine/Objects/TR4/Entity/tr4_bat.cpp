@@ -14,7 +14,7 @@
 
 namespace TEN::Entities::TR4
 {
-	const auto BatBite = BITE_INFO(Vector3(0.0f, 16.0f, 45.0f), 4);
+	const auto BatBite = BiteInfo(Vector3(0.0f, 16.0f, 45.0f), 4);
 
 	constexpr auto BAT_DAMAGE = 50;
 

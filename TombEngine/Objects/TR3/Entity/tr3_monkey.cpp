@@ -16,7 +16,7 @@ using std::vector;
 
 namespace TEN::Entities::TR3
 {
-	BITE_INFO MonkeyBite = { 10, 10, 11, 13 };
+	BiteInfo MonkeyBite = { 10, 10, 11, 13 };
 	const vector<int> MonkeyAttackJoints = { 10, 13 };
 
 	void InitialiseMonkey(short itemNumber)

@@ -51,8 +51,8 @@ ID_BADDY2
 
 namespace TEN::Entities::TR4
 {
-	BITE_INFO BaddyGunBite = { 0, -16, 200, 11 };
-	BITE_INFO BaddySwordBite = { 0, 0, 0, 15 };
+	BiteInfo BaddyGunBite = { 0, -16, 200, 11 };
+	BiteInfo BaddySwordBite = { 0, 0, 0, 15 };
 	const std::vector<int> BaddySwordAttackJoints = { 14, 15, 16 };
 
 	#define BADDY_USE_UZI	24

@@ -24,9 +24,9 @@
 
 #define TR5_LARSON_MIN_HP 40
 
-BITE_INFO LarsonGun = { -55, 200, 5, 14 };
-BITE_INFO PierreGun1 = { 60, 200, 0, 11 };
-BITE_INFO PierreGun2 = { -57, 200, 0, 14 };
+BiteInfo LarsonGun = { -55, 200, 5, 14 };
+BiteInfo PierreGun1 = { 60, 200, 0, 11 };
+BiteInfo PierreGun2 = { -57, 200, 0, 14 };
 
 void InitialiseLarson(short itemNum)
 {
