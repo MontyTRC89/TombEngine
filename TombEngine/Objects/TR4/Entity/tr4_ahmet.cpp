@@ -158,7 +158,7 @@ namespace TEN::Entities::TR4
 			AI_INFO AI, laraAI;
 			CreatureAIInfo(item, &AI);
 
-			if (creature->Enemy == LaraItem)
+			if (creature->Enemy->IsLara())
 			{
 				laraAI.angle = AI.angle;
 				laraAI.distance = AI.distance;
@@ -175,7 +175,7 @@ namespace TEN::Entities::TR4
 			CreatureMood(item, &AI, VIOLENT);
 
 			angle = CreatureTurn(item, creature->MaxTurn);
-			//creature->Enemy = LaraItem; // no need for that since CreatureAIInfo() set it !
+			//creature->Enemy = LaraItem; // No need since CreatureAIInfo() set it. -- TokyoSU
 
 			if (laraAI.distance < AHMET_AWARE_RANGE ||
 				item->HitStatus || TargetVisible(item, &laraAI))
