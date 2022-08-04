@@ -302,7 +302,7 @@ namespace TEN::Renderer
 		m_stPostProcessBuffer.ViewportWidth = m_screenWidth;
 		m_stPostProcessBuffer.ViewportHeight = m_screenHeight;
 		m_stPostProcessBuffer.ScreenFadeFactor = ScreenFadeCurrent;
-		m_stPostProcessBuffer.CinematicBarsHeight = CinematicBarsHeight;
+		m_stPostProcessBuffer.CinematicBarsHeight = Smoothstep(CinematicBarsHeight) * SPOTCAM_CINEMATIC_BARS_HEIGHT;
 		m_cbPostProcessBuffer.updateData(m_stPostProcessBuffer, m_context.Get());
 		BindConstantBufferPS(CB_POSTPROCESS, m_cbPostProcessBuffer.get());
 

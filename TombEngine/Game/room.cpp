@@ -226,3 +226,17 @@ std::set<int> GetRoomList(int roomNumber)
 
 	return result;
 }
+
+void InitializeNeighborRoomList()
+{
+	for (size_t i = 0; i < g_Level.Rooms.size(); i++)
+	{
+		auto* room = &g_Level.Rooms[i];
+
+		room->neighbors.clear();
+
+		auto roomList = GetRoomList(i);
+		for (int n : roomList)
+			room->neighbors.push_back(n);
+	}
+}
