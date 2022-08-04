@@ -3,6 +3,7 @@
 
 #include <process.h>
 #include <zlib.h>
+
 #include "Game/animation.h"
 #include "Game/animation.h"
 #include "Game/camera.h"
@@ -16,8 +17,8 @@
 #include "Game/pickup/pickup.h"
 #include "Game/savegame.h"
 #include "Game/spotcam.h"
-#include "Renderer/Renderer11.h"
 #include "Objects/Generic/Doors/generic_doors.h"
+#include "Renderer/Renderer11.h"
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Scripting/Include/Objects/ScriptInterfaceObjectsHandler.h"
 #include "Scripting/Include/ScriptInterfaceGame.h"
@@ -27,11 +28,11 @@
 #include "Specific/setup.h"
 
 using TEN::Renderer::g_Renderer;
-using std::vector;
 using std::string;
+using std::vector;
 
-using namespace TEN::Input;
 using namespace TEN::Entities::Doors;
+using namespace TEN::Input;
 
 uintptr_t hLoadLevel;
 unsigned int ThreadId;
