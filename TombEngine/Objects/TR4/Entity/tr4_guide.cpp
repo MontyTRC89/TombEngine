@@ -250,7 +250,7 @@ namespace TEN::Entities::TR4
 						if (AI.bite)
 							item->Animation.TargetState = GUIDE_STATE_TORCH_ATTACK;
 					}
-					else if (enemy != LaraItem || AI.distance > pow(SECTOR(2), 2))
+					else if (!enemy->IsLara() || AI.distance > pow(SECTOR(2), 2))
 						item->Animation.TargetState = GUIDE_STATE_WALK;
 				}
 				else
@@ -368,7 +368,7 @@ namespace TEN::Entities::TR4
 						AI.distance >= pow(SECTOR(1.5f), 2) &&
 						(item->MeshSwapBits & 0x40000 || AI.distance >= pow(SECTOR(3), 2)))
 					{
-						if (creature->Enemy == LaraItem)
+						if (creature->Enemy->IsLara())
 						{
 							if (AI.distance >= pow(SECTOR(2), 2))
 							{

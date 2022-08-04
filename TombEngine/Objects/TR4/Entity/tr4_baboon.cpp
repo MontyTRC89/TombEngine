@@ -294,7 +294,7 @@ namespace TEN::Entities::TR4
 				laraAI.angle = phd_atan(dx, dz) - item->Pose.Orientation.y;
 				laraAI.distance = pow(dx, 2) + pow(dz, 2);
 
-				if (creature->Enemy == nullptr || creature->Enemy == LaraItem)
+				if (creature->Enemy == nullptr || creature->Enemy->IsLara())
 					creature->Enemy = nullptr;
 			}
 			else
@@ -308,7 +308,7 @@ namespace TEN::Entities::TR4
 			CreatureMood(item, &AI, true);
 			angle = CreatureTurn(item, creature->MaxTurn);
 
-			if (creature->Enemy != nullptr && creature->Enemy != LaraItem && creature->Enemy->ObjectNumber == ID_AI_FOLLOW)
+			if (creature->Enemy != nullptr && !creature->Enemy->IsLara() && creature->Enemy->ObjectNumber == ID_AI_FOLLOW)
 			{
 				if (creature->ReachedGoal &&
 					abs(item->Pose.Position.x - creature->Enemy->Pose.Position.x) < CLICK(1) &&
