@@ -1,4 +1,7 @@
 #pragma once
 
-void SmallSpiderControl(short itemNumber);
-void BigSpiderControl(short itemNumber);
+namespace TEN::Entities::TR2
+{
+	void SmallSpiderControl(short itemNumber);
+	void BigSpiderControl(short itemNumber);
+}

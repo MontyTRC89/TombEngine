@@ -14,8 +14,6 @@
 
 namespace TEN::Entities::TR4
 {
-	const auto BatBite = BiteInfo(Vector3(0.0f, 16.0f, 45.0f), 4);
-
 	constexpr auto BAT_DAMAGE = 50;
 
 	constexpr auto BAT_UNFURL_HEIGHT_RANGE = SECTOR(0.87f);
@@ -23,6 +21,8 @@ namespace TEN::Entities::TR4
 	constexpr auto BAT_AWARE_RANGE		   = SQUARE(SECTOR(5));
 
 	#define BAT_ANGLE ANGLE(20.0f)
+
+	const auto BatBite = BiteInfo(Vector3(0.0f, 16.0f, 45.0f), 4);
 
 	enum BatState
 	{
