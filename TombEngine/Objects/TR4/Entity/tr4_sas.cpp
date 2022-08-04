@@ -139,7 +139,7 @@ namespace TEN::Entities::TR4
 
 			int distance = 0;
 			int angle = 0;
-			if (creature->Enemy == LaraItem)
+			if (creature->Enemy->IsLara())
 			{
 				angle = AI.angle;
 				distance = AI.distance;
@@ -152,13 +152,13 @@ namespace TEN::Entities::TR4
 				distance = pow(dx, 2) + pow(dz, 2);
 			}
 
-			GetCreatureMood(item, &AI, creature->Enemy != LaraItem);
+			GetCreatureMood(item, &AI, !creature->Enemy->IsLara());
 
 			// Vehicle handling
 			if (Lara.Vehicle != NO_ITEM && AI.bite)
 				creature->Mood = MoodType::Escape;
 
-			CreatureMood(item, &AI, creature->Enemy != LaraItem);
+			CreatureMood(item, &AI, !creature->Enemy->IsLara());
 			angle = CreatureTurn(item, creature->MaxTurn);
 
 			if (item->HitStatus)

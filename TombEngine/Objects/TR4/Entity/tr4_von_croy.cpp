@@ -318,7 +318,7 @@ namespace TEN::Entities::TR4
 		CreatureMood(item, &AI, VIOLENT);
 
 		AI_INFO laraAI;
-		if (creature->Enemy == LaraItem)
+		if (creature->Enemy->IsLara())
 			memcpy(&laraAI, &AI, sizeof(AI_INFO));
 		else
 		{
@@ -457,7 +457,7 @@ namespace TEN::Entities::TR4
 			}
 			else
 			{
-				if (creature->Enemy && creature->Enemy->HitPoints > 0 && AI.distance < pow(1024, 2) && creature->Enemy != LaraItem &&
+				if (creature->Enemy && creature->Enemy->HitPoints > 0 && AI.distance < pow(1024, 2) && !creature->Enemy->IsLara() &&
 					creature->Enemy->ObjectNumber != ID_AI_FOLLOW)
 				{
 					if (AI.bite)
@@ -523,7 +523,7 @@ namespace TEN::Entities::TR4
 					if (!foundTarget || AI.distance >= pow(SECTOR(1.5f), 2) &&
 						(item->TestBits(JointBitType::MeshSwap, 18) || AI.distance >= pow(SECTOR(3), 2)))
 					{
-						if (creature->Enemy == LaraItem)
+						if (creature->Enemy->IsLara())
 						{
 							if (AI.distance >= pow(SECTOR(2), 2))
 							{

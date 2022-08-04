@@ -160,7 +160,7 @@ namespace TEN::Entities::TR4
 						if (currentItem->ObjectNumber != ID_LARA)
 						{
 							if (currentItem->ObjectNumber != ID_TROOPS &&
-								(currentItem != LaraItem || creature->HurtByLara))
+								(!currentItem->IsLara() || creature->HurtByLara))
 							{
 								dx = currentItem->Pose.Position.x - item->Pose.Position.x;
 								dy = currentItem->Pose.Position.y - item->Pose.Position.y;
@@ -186,7 +186,7 @@ namespace TEN::Entities::TR4
 			CreatureAIInfo(item, &AI);
 
 			int distance = 0;
-			if (creature->Enemy == LaraItem)
+			if (creature->Enemy->IsLara())
 			{
 				distance = AI.distance;
 				rot = AI.angle;
@@ -199,7 +199,7 @@ namespace TEN::Entities::TR4
 				rot = phd_atan(dz, dx) - item->Pose.Orientation.y;
 			}
 
-			if (!creature->HurtByLara && creature->Enemy == LaraItem)
+			if (!creature->HurtByLara && creature->Enemy->IsLara())
 				creature->Enemy = nullptr;
 
 			GetCreatureMood(item, &AI, TIMID);
