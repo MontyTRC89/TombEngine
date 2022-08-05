@@ -877,9 +877,7 @@ namespace TEN::Entities::Vehicles
 
 	void MinecartToEntityCollision(ItemInfo* minecartItem, ItemInfo* laraItem)
 	{
-		auto roomsList = GetRoomList(minecartItem->RoomNumber);
-
-		for (auto i : roomsList)
+		for (auto i : g_Level.Rooms[minecartItem->RoomNumber].neighbors)
 		{
 			short itemNumber = g_Level.Rooms[i].itemNumber;
 

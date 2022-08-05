@@ -823,17 +823,9 @@ namespace TEN::Entities::Vehicles
 
 	void KayakToEntityCollision(ItemInfo* kayakItem, ItemInfo* laraItem)
 	{
-		short roomsToCheck[128];
-		short numRoomsToCheck = 0;
-		roomsToCheck[numRoomsToCheck++] = kayakItem->RoomNumber;
-
-		auto* room = &g_Level.Rooms[kayakItem->RoomNumber];
-		for (int i = 0; i < room->doors.size(); i++)
-			roomsToCheck[numRoomsToCheck++] = room->doors[i].room;
-
-		for (int i = 0; i < numRoomsToCheck; i++)
+		for (auto i : g_Level.Rooms[kayakItem->RoomNumber].neighbors)
 		{
-			short itemNumber = g_Level.Rooms[roomsToCheck[i]].itemNumber;
+			short itemNumber = g_Level.Rooms[i].itemNumber;
 
 			while (itemNumber != NO_ITEM)
 			{
