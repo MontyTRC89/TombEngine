@@ -107,11 +107,11 @@ static void StartEntity(ObjectInfo* obj)
 	{
 		obj->initialise = InitialiseCreature;
 		obj->collision = CreatureCollision;
-		obj->hitEffect = HIT_BLOOD;
 		obj->control = NatlaControl;
 		obj->shadowType = ShadowMode::All;
 		obj->HitPoints = 400;
 		obj->radius = 204;
+		obj->hitEffect = HIT_BLOOD;
 		obj->intelligent = true;
 		obj->saveAnim = true;
 		obj->saveFlags = true;
