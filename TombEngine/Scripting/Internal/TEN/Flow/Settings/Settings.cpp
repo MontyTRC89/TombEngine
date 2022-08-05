@@ -13,15 +13,6 @@ void Settings::Register(sol::table & parent)
 		sol::constructors<Settings()>(),
 		sol::call_constructor, sol::constructors<Settings>(),
 
-		"screenWidth", &Settings::ScreenWidth,
-		"screenHeight", &Settings::ScreenHeight,
-		"enableDynamicShadows", &Settings::EnableDynamicShadows,
-		"windowed", &Settings::Windowed,
-		"enableWaterCaustics", &Settings::EnableWaterCaustics,
-		"drawingDistance", &Settings::DrawingDistance,
-		"showRendererSteps", &Settings::ShowRendererSteps,
-		"showDebugInfo", &Settings::ShowDebugInfo,
-
 /*** How should the application respond to script errors?
 Must be one of the following:
 `ErrorMode.TERMINATE` - print to the log file and terminate the application when any script error is hit.

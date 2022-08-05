@@ -337,11 +337,13 @@ namespace TEN::Gui
 				CurrentSettings.Configuration.Windowed = !CurrentSettings.Configuration.Windowed;
 				break;
 
-			case 2:
-				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
-				CurrentSettings.Configuration.ShadowMode--;
-				if (CurrentSettings.Configuration.ShadowMode < SHADOW_NONE) CurrentSettings.Configuration.ShadowMode = SHADOW_ALL;
-				break;
+		case 2:
+			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
+			if (CurrentSettings.Configuration.ShadowType == ShadowMode::None)
+				CurrentSettings.Configuration.ShadowType = ShadowMode::All;
+			else
+				CurrentSettings.Configuration.ShadowType = ShadowMode(int(CurrentSettings.Configuration.ShadowType) - 1);
+			break;
 
 			case 3:
 				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
@@ -363,7 +365,6 @@ namespace TEN::Gui
 				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 				if (CurrentSettings.SelectedScreenResolution < g_Configuration.SupportedScreenResolutions.size() - 1)
 					CurrentSettings.SelectedScreenResolution++;
-
 				break;
 
 			case 1:
@@ -371,13 +372,13 @@ namespace TEN::Gui
 				CurrentSettings.Configuration.Windowed = !CurrentSettings.Configuration.Windowed;
 				break;
 
-			case 2:
-				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
-				CurrentSettings.Configuration.ShadowMode++;
-				if (CurrentSettings.Configuration.ShadowMode > SHADOW_ALL)
-					CurrentSettings.Configuration.ShadowMode = SHADOW_NONE;
-
-				break;
+		case 2:
+			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
+			if (CurrentSettings.Configuration.ShadowType == ShadowMode::All)
+				CurrentSettings.Configuration.ShadowType = ShadowMode::None;
+			else
+				CurrentSettings.Configuration.ShadowType = ShadowMode(int(CurrentSettings.Configuration.ShadowType) + 1);
+			break;
 
 			case 3:
 				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
@@ -500,12 +501,12 @@ namespace TEN::Gui
 				if (fromPauseMenu)
 				{
 					g_Renderer.RenderInventory();
-					Camera.numberFrames = g_Renderer.SyncRenderer();
+					Camera.numberFrames = g_Renderer.Synchronize();
 				}
 				else
 				{
 					g_Renderer.RenderTitle();
-					Camera.numberFrames = g_Renderer.SyncRenderer();
+					Camera.numberFrames = g_Renderer.Synchronize();
 					int numFrames = Camera.numberFrames;
 					ControlPhase(numFrames, 0);
 				}
@@ -1866,9 +1867,9 @@ namespace TEN::Gui
 	{
 		auto* lara = GetLaraInfo(item);
 
-		if (Rings[(int)RingTypes::Ammo]->RingActive)
-		{
-			g_Renderer.DrawString(PHD_CENTER_X, PHD_CENTER_Y, g_GameFlow->GetString(OptionStrings[5]), PRINTSTRING_COLOR_WHITE, PRINTSTRING_BLINK | PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
+	if (Rings[(int)RingTypes::Ammo]->RingActive)
+	{
+		g_Renderer.AddString(PHD_CENTER_X, PHD_CENTER_Y, g_GameFlow->GetString(OptionStrings[5]), PRINTSTRING_COLOR_WHITE, PRINTSTRING_BLINK | PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
 
 			if (Rings[(int)RingTypes::Inventory]->ObjectListMovement)
 				return;
@@ -2065,12 +2066,12 @@ namespace TEN::Gui
 				{
 					if (i == CurrentSelectedOption)
 					{
-						g_Renderer.DrawString(PHD_CENTER_X, yPos, CurrentOptions[i].Text, PRINTSTRING_COLOR_WHITE, PRINTSTRING_BLINK | PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
+						g_Renderer.AddString(PHD_CENTER_Y, yPos, CurrentOptions[i].Text, PRINTSTRING_COLOR_WHITE, PRINTSTRING_BLINK | PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
 						yPos += LINE_HEIGHT;
 					}
 					else
 					{
-						g_Renderer.DrawString(PHD_CENTER_X, yPos, CurrentOptions[i].Text, PRINTSTRING_COLOR_WHITE, PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
+						g_Renderer.AddString(PHD_CENTER_X, yPos, CurrentOptions[i].Text, PRINTSTRING_COLOR_WHITE, PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
 						yPos += LINE_HEIGHT;
 					}
 				}
@@ -2353,7 +2354,7 @@ namespace TEN::Gui
 						sprintf(&invTextBuffer[0], "%d x %s", AmmoObjectList[n].Amount, g_GameFlow->GetString(InventoryObjectTable[AmmoObjectList[n].InventoryItem].ObjectName));
 
 					if (AmmoSelectorFadeVal)
-						g_Renderer.DrawString(PHD_CENTER_X, 380, &invTextBuffer[0], PRINTSTRING_COLOR_YELLOW, PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
+						g_Renderer.AddString(PHD_CENTER_X, 380, &invTextBuffer[0], PRINTSTRING_COLOR_YELLOW, PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
 
 				
 					if (n == *CurrentAmmoType)
@@ -2654,7 +2655,7 @@ namespace TEN::Gui
 					else
 						objectMeUp = int(PHD_CENTER_Y + (REFERENCE_RES_HEIGHT + 1) * 0.0625 * 2.0);
 
-					g_Renderer.DrawString(PHD_CENTER_X, objectMeUp, textBufferMe, PRINTSTRING_COLOR_YELLOW, PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
+					g_Renderer.AddString(PHD_CENTER_X, objectMeUp, textBufferMe, PRINTSTRING_COLOR_YELLOW, PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
 				}
 
 				if (!i && !Rings[ringIndex]->ObjectListMovement)
@@ -2882,7 +2883,7 @@ namespace TEN::Gui
 
 		SetEnterInventory(NO_ITEM);
 
-		Camera.numberFrames = g_Renderer.SyncRenderer();
+		Camera.numberFrames = g_Renderer.Synchronize();
 
 		LastInvItem = Rings[(int)RingTypes::Inventory]->CurrentObjectList[Rings[(int)RingTypes::Inventory]->CurrentObjectInList].InventoryItem;
 		UpdateWeaponStatus(item);

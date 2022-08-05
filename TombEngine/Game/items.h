@@ -129,6 +129,7 @@ struct ItemInfo
 	bool TestBits(JointBitType type, int jointIndex);
 
 	bool IsLara();
+	bool IsCreature();
 };
 
 void EffectNewRoom(short fxNumber, short roomNumber);

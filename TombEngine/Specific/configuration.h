@@ -2,6 +2,7 @@
 
 #include "Specific/Input/Input.h"
 #include "Specific/trmath.h"
+#include "Renderer/Renderer11Enums.h"
 
 #define REGKEY_ROOT						"Software\\TombEngine\\TombEngine"
 
@@ -39,7 +40,7 @@ struct GameConfiguration
 
 	bool EnableCaustics;
 	bool EnableVolumetricFog;
-	int ShadowMode;
+	ShadowMode ShadowType;
 	int ShadowMapSize = 1024;
 	int ShadowMaxBlobs = 16;
 

@@ -1139,7 +1139,7 @@ local strings = {
 		"",
 		""
 	},
-	level_andrea1 = {
+	level_test = {
 		"Our test level",
 		"",
 		"",
