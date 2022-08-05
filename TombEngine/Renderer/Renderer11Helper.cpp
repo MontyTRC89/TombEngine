@@ -389,6 +389,9 @@ namespace TEN::Renderer
 
 	void Renderer11::GetLaraAbsBonePosition(Vector3 *pos, int joint)
 	{
+		if (joint >= MAX_BONES)
+			joint = 0;
+
 		Matrix world = m_moveableObjects[ID_LARA]->AnimationTransforms[joint];
 		world = world * m_LaraWorldMatrix;
 		*pos = Vector3::Transform(*pos, world);
@@ -411,6 +414,9 @@ namespace TEN::Renderer
 			else
 				UpdateItemAnimations(itemNumber, false);
 		}
+
+		if (joint >= MAX_BONES)
+			joint = 0;
 
 		Matrix world = rendererItem->AnimationTransforms[joint] * rendererItem->World;
 		*pos = Vector3::Transform(*pos, world);

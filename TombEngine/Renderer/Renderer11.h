@@ -558,7 +558,6 @@ namespace TEN::Renderer
 		void AddSprite3D(RendererSprite* sprite, Vector3 vtx1, Vector3 vtx2, Vector3 vtx3, Vector3 vtx4, Vector4 color,
 		                 float rotation, float scale, Vector2 size, BLEND_MODES blendMode, RenderView& view);
 
-		short GetRoomNumberForSpriteTest(Vector3 position);
 		RendererMesh* GetMesh(int meshIndex);
 		Texture2D CreateDefaultNormalTexture();
 
