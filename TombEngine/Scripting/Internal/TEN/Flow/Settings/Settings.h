@@ -15,15 +15,6 @@ namespace sol {
 
 struct Settings
 {
-	int ScreenWidth;
-	int ScreenHeight;
-	bool EnableLoadSave;
-	bool EnableDynamicShadows;
-	bool EnableWaterCaustics;
-	bool Windowed;
-	int DrawingDistance;
-	bool ShowRendererSteps;
-	bool ShowDebugInfo;
 	ErrorMode ErrorMode;
 
 	static void Register(sol::table & parent);
