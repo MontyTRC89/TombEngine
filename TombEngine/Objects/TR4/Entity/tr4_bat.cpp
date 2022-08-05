@@ -1,27 +1,28 @@
 #include "framework.h"
-#include "tr4_bat.h"
+#include "Objects/TR4/Entity/tr4_bat.h"
+
 #include "Game/control/box.h"
 #include "Game/control/control.h"
 #include "Game/effects/effects.h"
 #include "Game/misc.h"
 #include "Game/Lara/lara.h"
 #include "Game/control/lot.h"
-#include "Specific/setup.h"
-#include "Specific/trmath.h"
 #include "Game/itemdata/creature_info.h"
 #include "Game/items.h"
+#include "Specific/setup.h"
+#include "Specific/trmath.h"
 
 namespace TEN::Entities::TR4
 {
-	static BITE_INFO BatBite = { 0, 16, 45, 4 };
-
 	constexpr auto BAT_DAMAGE = 50;
 
 	constexpr auto BAT_UNFURL_HEIGHT_RANGE = SECTOR(0.87f);
-	constexpr auto BAT_ATTACK_RANGE = CLICK(1);
-	constexpr auto BAT_AWARE_RANGE = SECTOR(5);
+	constexpr auto BAT_ATTACK_RANGE		   = SQUARE(CLICK(1));
+	constexpr auto BAT_AWARE_RANGE		   = SQUARE(SECTOR(5));
 
 	#define BAT_ANGLE ANGLE(20.0f)
+
+	const auto BatBite = BiteInfo(Vector3(0.0f, 16.0f, 45.0f), 4);
 
 	enum BatState
 	{
@@ -96,20 +97,20 @@ namespace TEN::Entities::TR4
 			switch (item->Animation.ActiveState)
 			{
 			case BAT_STATE_IDLE:
-				if (AI.distance < pow(BAT_AWARE_RANGE , 2)|| item->HitStatus || creature->HurtByLara)
+				if (AI.distance < BAT_AWARE_RANGE || item->HitStatus || creature->HurtByLara)
 					item->Animation.TargetState = BAT_STATE_DROP_FROM_CEILING;
 
 				break;
 
 			case BAT_STATE_FLY:
-				if (AI.distance < pow(BAT_ATTACK_RANGE, 2) || !(GetRandomControl() & 0x3F))
+				if (AI.distance < BAT_ATTACK_RANGE || !(GetRandomControl() & 0x3F))
 					creature->Flags = 0;
 
 				if (!creature->Flags)
 				{
 					if (item->TouchBits ||
-						(creature->Enemy != LaraItem &&
-						AI.distance < pow(BAT_ATTACK_RANGE, 2) && AI.ahead &&
+						(!creature->Enemy->IsLara() &&
+						AI.distance < BAT_ATTACK_RANGE && AI.ahead &&
 						abs(item->Pose.Position.y - creature->Enemy->Pose.Position.y) < BAT_UNFURL_HEIGHT_RANGE))
 					{
 						item->Animation.TargetState = BAT_STATE_ATTACK;
@@ -120,11 +121,11 @@ namespace TEN::Entities::TR4
 
 			case BAT_STATE_ATTACK:
 				if (!creature->Flags &&
-					(item->TouchBits || creature->Enemy != LaraItem) &&
-					AI.distance < pow(BAT_ATTACK_RANGE, 2) && AI.ahead &&
+					(item->TouchBits || !creature->Enemy->IsLara()) &&
+					AI.distance < BAT_ATTACK_RANGE && AI.ahead &&
 					abs(item->Pose.Position.y - creature->Enemy->Pose.Position.y) < BAT_UNFURL_HEIGHT_RANGE)
 				{
-					CreatureEffect(item, &BatBite, DoBloodSplat);
+					CreatureEffect(item, BatBite, DoBloodSplat);
 					DoDamage(creature->Enemy, BAT_DAMAGE);
 
 					creature->Flags = 1;

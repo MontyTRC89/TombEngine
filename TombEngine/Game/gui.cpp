@@ -790,8 +790,10 @@ void GuiController::HandleDisplaySettingsInput(bool pause)
 
 		case 2:
 			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
-			CurrentSettings.conf.ShadowMode--;
-			if (CurrentSettings.conf.ShadowMode < SHADOW_NONE) CurrentSettings.conf.ShadowMode = SHADOW_ALL;
+			if (CurrentSettings.conf.ShadowType == ShadowMode::None)
+				CurrentSettings.conf.ShadowType = ShadowMode::All;
+			else
+				CurrentSettings.conf.ShadowType = ShadowMode(int(CurrentSettings.conf.ShadowType) - 1);
 			break;
 
 		case 3:
@@ -823,8 +825,10 @@ void GuiController::HandleDisplaySettingsInput(bool pause)
 
 		case 2:
 			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
-			CurrentSettings.conf.ShadowMode++;
-			if (CurrentSettings.conf.ShadowMode > SHADOW_ALL) CurrentSettings.conf.ShadowMode = SHADOW_NONE;
+			if (CurrentSettings.conf.ShadowType == ShadowMode::All)
+				CurrentSettings.conf.ShadowType = ShadowMode::None;
+			else
+				CurrentSettings.conf.ShadowType = ShadowMode(int(CurrentSettings.conf.ShadowType) + 1);
 			break;
 
 		case 3:
@@ -951,12 +955,12 @@ void GuiController::HandleControlSettingsInput(bool pause)
 			if (pause)
 			{
 				g_Renderer.RenderInventory();
-				Camera.numberFrames = g_Renderer.SyncRenderer();
+				Camera.numberFrames = g_Renderer.Synchronize();
 			}
 			else
 			{
 				g_Renderer.RenderTitle();
-				Camera.numberFrames = g_Renderer.SyncRenderer();
+				Camera.numberFrames = g_Renderer.Synchronize();
 				int nframes = Camera.numberFrames;
 				ControlPhase(nframes, 0);
 			}
@@ -1092,7 +1096,7 @@ void GuiController::HandleOtherSettingsInput(bool pause)
 		}
 	}
 
-	if (goLeft)
+	if (dbLeft)
 	{
 		switch (selected_option)
 		{
@@ -1130,7 +1134,7 @@ void GuiController::HandleOtherSettingsInput(bool pause)
 		}
 	}
 
-	if (goRight)
+	if (dbRight)
 	{
 		switch (selected_option)
 		{
@@ -2295,7 +2299,7 @@ void GuiController::DoInventory()
 
 	if (rings[(int)RingTypes::Ammo]->ringactive)
 	{
-		g_Renderer.DrawString(phd_centerx, phd_centery, g_GameFlow->GetString(optmessages[5]), PRINTSTRING_COLOR_WHITE, PRINTSTRING_BLINK | PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
+		g_Renderer.AddString(phd_centerx, phd_centery, g_GameFlow->GetString(optmessages[5]), PRINTSTRING_COLOR_WHITE, PRINTSTRING_BLINK | PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
 
 		if (rings[(int)RingTypes::Inventory]->objlistmovement)
 			return;
@@ -2487,12 +2491,12 @@ void GuiController::DoInventory()
 			{
 				if (i == current_selected_option)
 				{
-					g_Renderer.DrawString(phd_centerx, ypos, current_options[i].text, PRINTSTRING_COLOR_WHITE, PRINTSTRING_BLINK | PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
+					g_Renderer.AddString(phd_centerx, ypos, current_options[i].text, PRINTSTRING_COLOR_WHITE, PRINTSTRING_BLINK | PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
 					ypos += line_height;
 				}
 				else
 				{
-					g_Renderer.DrawString(phd_centerx, ypos, current_options[i].text, PRINTSTRING_COLOR_WHITE, PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
+					g_Renderer.AddString(phd_centerx, ypos, current_options[i].text, PRINTSTRING_COLOR_WHITE, PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
 					ypos += line_height;
 				}
 			}
@@ -2757,7 +2761,7 @@ void GuiController::DrawAmmoSelector()
 					sprintf(&invTextBuffer[0], "%d x %s", ammo_object_list[n].amount, g_GameFlow->GetString(inventry_objects_list[ammo_object_list[n].invitem].objname));
 
 				if (ammo_selector_fade_val)
-					g_Renderer.DrawString(phd_centerx, 380, &invTextBuffer[0], PRINTSTRING_COLOR_YELLOW, PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
+					g_Renderer.AddString(phd_centerx, 380, &invTextBuffer[0], PRINTSTRING_COLOR_YELLOW, PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
 
 				
 				if (n == *current_ammo_type)
@@ -3013,11 +3017,11 @@ void GuiController::DrawCurrentObjectList(int ringnum)
 							nummeup = count;
 							break;
 
-						case ID_ROCKET_LAUNCHER_ITEM:
+						case ID_ROCKET_LAUNCHER_AMMO_ITEM:
 							nummeup = Lara.Weapons[(int)LaraWeaponType::RocketLauncher].Ammo[(int)WeaponAmmoType::Ammo1].getCount();
 							break;
 
-						case ID_HARPOON_ITEM:
+						case ID_HARPOON_AMMO_ITEM:
 							nummeup = Lara.Weapons[(int)LaraWeaponType::HarpoonGun].Ammo[(int)WeaponAmmoType::Ammo1].getCount();
 							break;
 
@@ -3062,7 +3066,7 @@ void GuiController::DrawCurrentObjectList(int ringnum)
 				else
 					objmeup = (int)(phd_centery + (REFERENCE_RES_HEIGHT + 1) * 0.0625 * 2.0);
 
-				g_Renderer.DrawString(phd_centerx, objmeup, textbufme, PRINTSTRING_COLOR_YELLOW, PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
+				g_Renderer.AddString(phd_centerx, objmeup, textbufme, PRINTSTRING_COLOR_YELLOW, PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
 			}
 
 			if (!i && !rings[ringnum]->objlistmovement)
@@ -3285,7 +3289,7 @@ bool GuiController::CallInventory(bool reset_mode)
 
 		SetEnterInventory(NO_ITEM);
 
-		Camera.numberFrames = g_Renderer.SyncRenderer();
+		Camera.numberFrames = g_Renderer.Synchronize();
 	}
 
 	lastInvItem = rings[(int)RingTypes::Inventory]->current_object_list[rings[(int)RingTypes::Inventory]->curobjinlist].invitem;

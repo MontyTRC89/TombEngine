@@ -392,7 +392,7 @@ void InitialiseObjects()
 		obj->drawRoutine = DrawAnimatingItem;
 		obj->pivotLength = 0;
 		obj->radius = DEFAULT_RADIUS;
-		obj->castsShadow = false;
+		obj->shadowType = ShadowMode::None;
 		obj->HitPoints = NOT_TARGETABLE;
 		obj->hitEffect = HIT_NONE;
 		obj->explodableMeshbits = 0;

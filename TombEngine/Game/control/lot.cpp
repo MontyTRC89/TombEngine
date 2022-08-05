@@ -100,15 +100,15 @@ int EnableEntityAI(short itemNum, int always, bool makeTarget)
 void DisableEntityAI(short itemNumber)
 {
 	ItemInfo* item = &g_Level.Items[itemNumber];
-	CreatureInfo* creature = (CreatureInfo*)item->Data;
-	
-	if (creature)
-	{
-		creature->ItemNumber = NO_ITEM;
-		KillItem(creature->AITargetNumber);
-		ActiveCreatures.erase(std::find(ActiveCreatures.begin(), ActiveCreatures.end(), creature));
-		item->Data = nullptr;
-	}
+
+	if (!item->IsCreature())
+		return;
+
+	auto* creature = (CreatureInfo*)item->Data;
+	creature->ItemNumber = NO_ITEM;
+	KillItem(creature->AITargetNumber);
+	ActiveCreatures.erase(std::find(ActiveCreatures.begin(), ActiveCreatures.end(), creature));
+	item->Data = nullptr;
 }
 
 void InitialiseSlot(short itemNum, short slot, bool makeTarget)
@@ -158,22 +158,22 @@ void InitialiseSlot(short itemNum, short slot, bool makeTarget)
 	{
 		default:
 		case ZONE_NULL:
-		    creature->LOT.Step = SECTOR(1) - CLICK(3);
-			creature->LOT.Drop = -(SECTOR(1) - CLICK(3));
+		    creature->LOT.Step = CLICK(1);
+			creature->LOT.Drop = -CLICK(1);
 			obj->zoneType = ZONE_BASIC; // only entity that use CreatureActive() will reach InitialiseSlot() !
 			break;
 
 		case ZONE_SKELLY:
 			// Can jump
-			creature->LOT.Step = SECTOR(1) - CLICK(3);
-			creature->LOT.Drop = -(SECTOR(1) - CLICK(3));
+			creature->LOT.Step = CLICK(1);
+			creature->LOT.Drop = -CLICK(1);
 			creature->LOT.CanJump = true;
 			creature->LOT.Zone = ZONE_SKELLY;
 			break;
 
 		case ZONE_BASIC:
-			creature->LOT.Step = SECTOR(1) - CLICK(3);
-			creature->LOT.Drop = -(SECTOR(1) - CLICK(3));
+			creature->LOT.Step = CLICK(1);
+			creature->LOT.Drop = -CLICK(1);
 			creature->LOT.Zone = ZONE_BASIC;
 			break;
 
@@ -206,7 +206,6 @@ void InitialiseSlot(short itemNum, short slot, bool makeTarget)
 			{
 				creature->LOT.Fly = DEFAULT_SWIM_UPDOWN_SPEED;
 			}
-
 			break;
 
 		case ZONE_HUMAN_CLASSIC:
@@ -235,8 +234,8 @@ void InitialiseSlot(short itemNum, short slot, bool makeTarget)
 
 		case ZONE_HUMAN_LONGJUMP_AND_MONKEY:
 			// Can climb, jump, monkey, long jump
-			creature->LOT.Step = 1792;
-			creature->LOT.Drop = -1792;
+			creature->LOT.Step = SECTOR(1) + CLICK(3);
+			creature->LOT.Drop = -(SECTOR(1) + CLICK(3));
 			creature->LOT.CanJump = true;
 			creature->LOT.CanMonkey = true;
 			creature->LOT.Zone = ZONE_VON_CROY;
@@ -254,7 +253,7 @@ void InitialiseSlot(short itemNum, short slot, bool makeTarget)
 			break;
 
 		case ZONE_SOPHIALEE:
-			creature->LOT.Step = CLICK(4);
+			creature->LOT.Step = SECTOR(1);
 			creature->LOT.Drop = -CLICK(3);
 			creature->LOT.Zone = ZONE_HUMAN_CLASSIC;
 			break;

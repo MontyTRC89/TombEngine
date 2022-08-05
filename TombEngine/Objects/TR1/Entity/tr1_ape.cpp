@@ -5,9 +5,9 @@
 #include "Game/control/control.h"
 #include "Game/effects/effects.h"
 #include "Game/items.h"
+#include "Game/Lara/lara.h"
 #include "Game/misc.h"
 #include "Game/people.h"
-#include "Game/Lara/lara.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
@@ -15,23 +15,23 @@ using std::vector;
 
 namespace TEN::Entities::TR1
 {
-	BITE_INFO ApeBite = { 0, -19, 75, 15 };
-	const vector<int> ApeAttackJoints = { 8, 9, 10, 11, 12, 13, 14, 15 };
-
 	constexpr auto APE_ATTACK_DAMAGE = 200;
 
-	constexpr auto APE_ATTACK_RANGE = SECTOR(0.42f);
-	constexpr auto APE_PANIC_RANGE = SECTOR(2);
+	constexpr auto APE_ATTACK_RANGE = SQUARE(SECTOR(0.42f));
+	constexpr auto APE_PANIC_RANGE	= SQUARE(SECTOR(2));
 
-	constexpr auto APE_JUMP_CHANCE = 0xa0;
-	constexpr auto APE_POUND_CHEST_CHANCE = APE_JUMP_CHANCE + 0xA0;
+	constexpr auto APE_JUMP_CHANCE		   = 0xa0;
+	constexpr auto APE_POUND_CHEST_CHANCE  = APE_JUMP_CHANCE + 0xA0;
 	constexpr auto APE_POUND_GROUND_CHANCE = APE_POUND_CHEST_CHANCE + 0xA0;
-	constexpr auto APE_RUN_LEFT_CHANCE = APE_POUND_GROUND_CHANCE + 0xA0;
+	constexpr auto APE_RUN_LEFT_CHANCE	   = APE_POUND_GROUND_CHANCE + 0xA0;
 
 	constexpr auto SHIFT = 75;
 
 	#define APE_RUN_TURN_RATE_MAX ANGLE(5.0f)
-	#define APE_DISPLAY_ANGLE ANGLE(45.0f)
+	#define APE_DISPLAY_ANGLE	  ANGLE(45.0f)
+
+	const vector<int> ApeAttackJoints = { 8, 9, 10, 11, 12, 13, 14, 15 };
+	const auto ApeBite = BiteInfo(Vector3(0.0f, -19.0f, 75.0f), 15);
 
 	enum ApeState
 	{
@@ -188,7 +188,7 @@ namespace TEN::Entities::TR1
 
 			angle = CreatureTurn(item, creatureInfo->MaxTurn);
 
-			if (item->HitStatus || AI.distance < pow(APE_PANIC_RANGE, 2))
+			if (item->HitStatus || AI.distance < APE_PANIC_RANGE)
 				creatureInfo->Flags |= APE_FLAG_ATTACK;
 
 			short random;
@@ -203,13 +203,13 @@ namespace TEN::Entities::TR1
 				}
 				else if (item->Flags & APE_FLAG_TURN_RIGHT)
 				{
-					item->Pose.Orientation.y += ANGLE(90);
+					item->Pose.Orientation.y += ANGLE(90.0f);
 					creatureInfo->Flags -= APE_FLAG_TURN_RIGHT;
 				}
 
 				if (item->Animation.RequiredState)
 					item->Animation.TargetState = item->Animation.RequiredState;
-				else if (AI.bite && AI.distance < pow(APE_ATTACK_RANGE, 2))
+				else if (AI.bite && AI.distance < APE_ATTACK_RANGE)
 					item->Animation.TargetState = APE_STATE_ATTACK;
 				else if (!(creatureInfo->Flags & APE_FLAG_ATTACK) &&
 					AI.zoneNumber == AI.enemyZone && AI.ahead)
@@ -240,7 +240,7 @@ namespace TEN::Entities::TR1
 			case APE_STATE_RUN_FORWARD:
 				creatureInfo->MaxTurn = APE_RUN_TURN_RATE_MAX;
 
-				if (creatureInfo->Flags == 0 &&
+				if (creatureInfo->Flags == NULL &&
 					AI.angle > -APE_DISPLAY_ANGLE &&
 					AI.angle < APE_DISPLAY_ANGLE)
 				{
@@ -297,9 +297,9 @@ namespace TEN::Entities::TR1
 				if (!item->Animation.RequiredState &&
 					item->TestBits(JointBitType::Touch, ApeAttackJoints))
 				{
-					CreatureEffect(item, &ApeBite, DoBloodSplat);
 					item->Animation.RequiredState = APE_STATE_IDLE;
 					DoDamage(creatureInfo->Enemy, APE_ATTACK_DAMAGE);
+					CreatureEffect(item, ApeBite, DoBloodSplat);
 				}
 
 				break;

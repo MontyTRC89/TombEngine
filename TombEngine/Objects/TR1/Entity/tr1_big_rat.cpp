@@ -16,24 +16,24 @@ using std::vector;
 
 namespace TEN::Entities::TR1
 {
-	BITE_INFO BigRatBite = { 0, -11, 108, 3 };
-	const vector<int> BigRatAttackJoints = { 0, 1, 2, 3, 7, 8, 24, 25 };
-
-	constexpr auto BIG_RAT_BITE_DAMAGE = 20;
+	constexpr auto BIG_RAT_BITE_DAMAGE	 = 20;
 	constexpr auto BIG_RAT_CHARGE_DAMAGE = 25;
 
 	constexpr auto DEFAULT_SWIM_UPDOWN_SPEED = 32;
 
-	constexpr auto BIG_RAT_ALERT_RANGE = SECTOR(1.5f);
-	constexpr auto BIG_RAT_VISIBILITY_RANGE = SECTOR(5);
-	constexpr auto BIG_RAT_BITE_RANGE = SECTOR(0.34f);
-	constexpr auto BIG_RAT_CHARGE_RANGE = SECTOR(0.5f);
-	constexpr auto BIG_RAT_WATER_BITE_RANGE = SECTOR(0.3f);
+	constexpr auto BIG_RAT_ALERT_RANGE		= SQUARE(SECTOR(1.5f));
+	constexpr auto BIG_RAT_VISIBILITY_RANGE = SQUARE(SECTOR(5));
+	constexpr auto BIG_RAT_BITE_RANGE		= SQUARE(SECTOR(0.34f));
+	constexpr auto BIG_RAT_CHARGE_RANGE		= SQUARE(SECTOR(0.5f));
+	constexpr auto BIG_RAT_WATER_BITE_RANGE = SQUARE(SECTOR(0.3f));
 
 	constexpr auto BIG_RAT_POSE_CHANCE = 0x100;
 
-	#define BIG_RAT_RUN_TURN_ANGLE ANGLE(6.0f)
+	#define BIG_RAT_RUN_TURN_ANGLE	ANGLE(6.0f)
 	#define BIG_RAT_SWIM_TURN_ANGLE ANGLE(3.0f)
+
+	const vector<int> BigRatAttackJoints = { 0, 1, 2, 3, 7, 8, 24, 25 };
+	const auto BigRatBite = BiteInfo(Vector3(0.0f, -11.0f, 108.0f), 3);
 
 	enum BigRatState
 	{
@@ -167,8 +167,8 @@ namespace TEN::Entities::TR1
 			else if (creature->HurtByLara)
 				creature->Enemy = LaraItem;
 
-			if ((item->HitStatus || AI.distance < pow(BIG_RAT_ALERT_RANGE, 2)) ||
-				(TargetVisible(item, &AI) && AI.distance < pow(BIG_RAT_VISIBILITY_RANGE, 2)))
+			if ((item->HitStatus || AI.distance < BIG_RAT_ALERT_RANGE) ||
+				(TargetVisible(item, &AI) && AI.distance < BIG_RAT_VISIBILITY_RANGE))
 			{
 				if (!creature->Alerted)
 					creature->Alerted = true;
@@ -181,7 +181,7 @@ namespace TEN::Entities::TR1
 			case BIG_RAT_STATE_IDLE:
 				if (item->Animation.RequiredState)
 					item->Animation.TargetState = item->Animation.RequiredState;
-				else if (AI.bite && AI.distance < pow(BIG_RAT_BITE_RANGE, 2))
+				else if (AI.bite && AI.distance < BIG_RAT_BITE_RANGE)
 					item->Animation.TargetState = BIG_RAT_STATE_BITE_ATTACK;
 				else
 					item->Animation.TargetState = BIG_RAT_STATE_RUN;
@@ -200,7 +200,7 @@ namespace TEN::Entities::TR1
 
 				if (AI.ahead && item->TestBits(JointBitType::Touch, BigRatAttackJoints))
 					item->Animation.TargetState = BIG_RAT_STATE_IDLE;
-				else if (AI.bite && AI.distance < pow(BIG_RAT_CHARGE_RANGE, 2))
+				else if (AI.bite && AI.distance < BIG_RAT_CHARGE_RANGE)
 					item->Animation.TargetState = BIG_RAT_STATE_CHARGE_ATTACK;
 				else if (AI.ahead && GetRandomControl() < BIG_RAT_POSE_CHANCE)
 				{
@@ -214,8 +214,8 @@ namespace TEN::Entities::TR1
 				if (!item->Animation.RequiredState && AI.ahead &&
 					item->TestBits(JointBitType::Touch, BigRatAttackJoints))
 				{
-					CreatureEffect(item, &BigRatBite, DoBloodSplat);
 					DoDamage(creature->Enemy, BIG_RAT_BITE_DAMAGE);
+					CreatureEffect(item, BigRatBite, DoBloodSplat);
 					item->Animation.RequiredState = BIG_RAT_STATE_IDLE;
 				}
 
@@ -225,8 +225,8 @@ namespace TEN::Entities::TR1
 				if (!item->Animation.RequiredState && AI.ahead &&
 					item->TestBits(JointBitType::Touch, BigRatAttackJoints))
 				{
-					CreatureEffect(item, &BigRatBite, DoBloodSplat);
 					DoDamage(creature->Enemy, BIG_RAT_CHARGE_DAMAGE);
+					CreatureEffect(item, BigRatBite, DoBloodSplat);
 					item->Animation.RequiredState = BIG_RAT_STATE_RUN;
 				}
 
@@ -257,8 +257,8 @@ namespace TEN::Entities::TR1
 				if (!item->Animation.RequiredState && AI.ahead &&
 					item->TestBits(JointBitType::Touch, BigRatAttackJoints))
 				{
-					CreatureEffect(item, &BigRatBite, DoBloodSplat);
 					DoDamage(creature->Enemy, BIG_RAT_BITE_DAMAGE);
+					CreatureEffect(item, BigRatBite, DoBloodSplat);
 				}
 
 				item->Animation.TargetState = BIG_RAT_STATE_SWIM;

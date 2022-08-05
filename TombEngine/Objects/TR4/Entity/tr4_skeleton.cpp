@@ -1,51 +1,48 @@
 #include "framework.h"
-#include "tr4_skeleton.h"
-#include "Game/items.h"
-#include "Game/control/box.h"
-#include "Game/people.h"
-#include "Game/effects/effects.h"
-#include "Game/effects/debris.h"
-#include "Game/control/lot.h"
-#include "Game/Lara/lara.h"
-#include "Sound/sound.h"
-#include "Specific/setup.h"
-#include "Game/effects/tomb4fx.h"
-#include "Specific/level.h"
+#include "Objects/TR4/Entity/tr4_skeleton.h"
+
 #include "Game/animation.h"
-#include "Game/itemdata/creature_info.h"
-#include "Game/collision/floordata.h"
 #include "Game/collision/collide_room.h"
+#include "Game/collision/floordata.h"
+#include "Game/control/box.h"
+#include "Game/control/lot.h"
+#include "Game/effects/debris.h"
+#include "Game/effects/effects.h"
+#include "Game/effects/tomb4fx.h"
+#include "Game/itemdata/creature_info.h"
+#include "Game/items.h"
+#include "Game/Lara/lara.h"
 #include "Game/misc.h"
+#include "Game/people.h"
+#include "Sound/sound.h"
+#include "Specific/level.h"
+#include "Specific/setup.h"
 
 using std::vector;
 
 namespace TEN::Entities::TR4
 {
-	BITE_INFO SkeletonBite = { 0, -16, 200, 11 };
-	const vector<int> SkeletonSwordAttackJoints = { 15, 16 };
-
 	constexpr auto SKELETON_ATTACK_DAMAGE = 80;
+
+	const auto SkeletonBite = BiteInfo(Vector3(0.0f, -16.0f, 200.0f), 11);
+	const vector<int> SkeletonSwordAttackJoints = { 15, 16 };
 
 	enum SkeletonState
 	{
 		SKELETON_STATE_SUBTERRANEAN = 0,
 		SKELETON_STATE_IDLE = 1,
-
 		SKELETON_STATE_AVOID_ATTACK_1 = 5,
 		SKELETON_STATE_AVOID_ATTACK_2 = 6,
 		SKELETON_STATE_USE_SHIELD = 7,
 		SKELETON_STATE_ATTACK_1 = 8,
 		SKELETON_STATE_ATTACK_2 = 9,
 		SKELETON_STATE_ATTACK_3 = 10,
-
 		SKELETON_STATE_HURT_BY_SHOTGUN_1 = 12,
 		SKELETON_STATE_HURT_BY_SHOTGUN_2 = 13,
-
 		SKELETON_STATE_JUMP_LEFT = 19,
 		SKELETON_STATE_JUMP_RIGHT = 20,
 		SKELETON_STATE_JUMP_FORWARD_1_BLOCK = 21,
 		SKELETON_STATE_JUMP_FORWARD_2_BLOCKS = 22,
-
 		SKELETON_STATE_JUMP_LIE_DOWN = 25
 	};
 
@@ -55,10 +52,8 @@ namespace TEN::Entities::TR4
 		SKELETON_ANIM_UPRIGHT_IDLE = 1,
 		SKELETON_ANIM_UPRIGHT_IDLE_TO_IDLE = 2,
 		SKELETON_ANIM_IDLE = 3,
-
 		SKELETON_ANIM_SWORD_ATTACK_LEFT = 12,
 		SKELETON_ANIM_SWORD_ATTACK_RIGHT = 13,
-
 		SKELETON_ANIM_JUMP_LEFT_START = 34,
 		SKELETON_ANIM_JUMP_LEFT_CONTINUE = 35,
 		SKELETON_ANIM_JUMP_LEFT_END = 36,
@@ -69,9 +64,7 @@ namespace TEN::Entities::TR4
 		SKELETON_ANIM_JUMP_FORWARD_CONTINUE_1_BLOCK = 41,
 		SKELETON_ANIM_JUMP_FORWARD_CONTINUE_2_BLOCKS = 42,
 		SKELETON_ANIM_JUMP_FORWARD_END = 43,
-
-		SKELETON_ANIM_LAYING_DOWN = 46,
-
+		SKELETON_ANIM_LAYING_DOWN = 46
 	};
 
 	void InitialiseSkeleton(short itemNumber)
@@ -266,7 +259,7 @@ namespace TEN::Entities::TR4
 		else
 		{
 			AI_INFO laraAI;
-			if (creature->Enemy == LaraItem)
+			if (creature->Enemy->IsLara())
 			{
 				laraAI.distance = AI.distance;
 				laraAI.angle = AI.angle;
@@ -367,7 +360,7 @@ namespace TEN::Entities::TR4
 			case 2:
 				creature->MaxTurn = (creature->Mood != MoodType::Escape) ? ANGLE(2.0f) : 0;
 				creature->LOT.IsJumping = false;
-				creature->Flags = 0;
+				creature->Flags = NULL;
 
 				if (item->AIBits & GUARD ||
 					!(GetRandomControl() & 0x1F) &&
@@ -487,7 +480,7 @@ namespace TEN::Entities::TR4
 			case 15:
 				creature->MaxTurn = (creature->Mood != MoodType::Bored) ? ANGLE(6.0f) : ANGLE(2.0f);
 				creature->LOT.IsJumping = false;
-				creature->Flags = 0;
+				creature->Flags = NULL;
 
 				if (item->AIBits & PATROL1)
 					item->Animation.TargetState = 15;
@@ -593,8 +586,8 @@ namespace TEN::Entities::TR4
 				{
 					if (item->TestBits(JointBitType::Touch, SkeletonSwordAttackJoints))
 					{
-						CreatureEffect2(item, &SkeletonBite, 15, -1, DoBloodSplat);
 						DoDamage(creature->Enemy, SKELETON_ATTACK_DAMAGE);
+						CreatureEffect2(item, SkeletonBite, 15, -1, DoBloodSplat);
 						SoundEffect(SFX_TR4_LARA_THUD, &item->Pose);
 						creature->Flags = 1;
 					}
@@ -645,12 +638,13 @@ namespace TEN::Entities::TR4
 							}
 						}
 					}
+
 					if (!creature->Flags)
 					{
 						if (item->TestBits(JointBitType::Touch, SkeletonSwordAttackJoints))
 						{
-							CreatureEffect2(item, &SkeletonBite, 10, item->Pose.Orientation.y, DoBloodSplat);
 							DoDamage(creature->Enemy, SKELETON_ATTACK_DAMAGE);
+							CreatureEffect2(item, SkeletonBite, 10, item->Pose.Orientation.y, DoBloodSplat);
 							SoundEffect(SFX_TR4_LARA_THUD, &item->Pose);
 							creature->Flags = 1;
 						}

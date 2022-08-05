@@ -103,9 +103,7 @@ bool GetCollidedObjects(ItemInfo* collidingItem, int radius, bool onlyVisible, I
 	short numMeshes = 0;
 
 	// Collect all the rooms where to check
-	auto roomsArray = GetRoomList(collidingItem->RoomNumber);
-
-	for (auto i : roomsArray)
+	for (auto i : g_Level.Rooms[collidingItem->RoomNumber].neighbors)
 	{
 		auto* room = &g_Level.Rooms[i];
 
@@ -309,7 +307,7 @@ void TestForObjectOnLedge(ItemInfo* item, CollisionInfo* coll)
 
 		// g_Renderer.AddDebugSphere(origin, 16, Vector4::One, RENDERER_DEBUG_PAGE::DIMENSION_STATS);
 
-		for (auto i : GetRoomList(item->RoomNumber))
+		for (auto i : g_Level.Rooms[item->RoomNumber].neighbors)
 		{
 			short itemNumber = g_Level.Rooms[i].itemNumber;
 			while (itemNumber != NO_ITEM)
@@ -408,7 +406,7 @@ bool TestLaraPosition(OBJECT_COLLISION_BOUNDS* bounds, ItemInfo* item, ItemInfo*
 	return true;
 }
 
-void AlignLaraPosition(Vector3Int* vec, ItemInfo* item, ItemInfo* laraItem)
+bool AlignLaraPosition(Vector3Int* vec, ItemInfo* item, ItemInfo* laraItem)
 {
 	laraItem->Pose.Orientation = item->Pose.Orientation;
 
@@ -419,10 +417,25 @@ void AlignLaraPosition(Vector3Int* vec, ItemInfo* item, ItemInfo* laraItem)
 	);
 
 	Vector3 pos = Vector3::Transform(Vector3(vec->x, vec->y, vec->z), matrix);
+	Vector3 newPos = item->Pose.Position.ToVector3() + pos;
 
-	laraItem->Pose.Position.x = item->Pose.Position.x + pos.x;
-	laraItem->Pose.Position.y = item->Pose.Position.y + pos.y;
-	laraItem->Pose.Position.z = item->Pose.Position.z + pos.z;
+	int height = GetCollision(newPos.x, newPos.y, newPos.z, laraItem->RoomNumber).Position.Floor;
+	if (abs(height - laraItem->Pose.Position.y) <= CLICK(2))
+	{
+		laraItem->Pose.Position.x = newPos.x;
+		laraItem->Pose.Position.y = newPos.y;
+		laraItem->Pose.Position.z = newPos.z;
+		return true;
+	}
+
+	auto* lara = GetLaraInfo(laraItem);
+	if (lara->Control.IsMoving)
+	{
+		lara->Control.IsMoving = false;
+		lara->Control.HandStatus = HandStatus::Free;
+	}
+
+	return false;
 }
 
 bool MoveLaraPosition(Vector3Int* vec, ItemInfo* item, ItemInfo* laraItem)
@@ -845,7 +858,7 @@ void CollideSolidStatics(ItemInfo* item, CollisionInfo* coll)
 {
 	coll->HitTallObject = false;
 
-	for (auto i : GetRoomList(item->RoomNumber))
+	for (auto i : g_Level.Rooms[item->RoomNumber].neighbors)
 	{
 		for (int j = 0; j < g_Level.Rooms[i].mesh.size(); j++)
 		{
@@ -1710,7 +1723,7 @@ void DoObjectCollision(ItemInfo* laraItem, CollisionInfo* coll)
 	if (Objects[laraItem->ObjectNumber].intelligent)
 		return;
 
-	for (auto i : GetRoomList(laraItem->RoomNumber))
+	for (auto i : g_Level.Rooms[laraItem->RoomNumber].neighbors)
 	{
 		int nextItem = g_Level.Rooms[i].itemNumber;
 		while (nextItem != NO_ITEM)

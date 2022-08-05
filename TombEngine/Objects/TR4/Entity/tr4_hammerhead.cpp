@@ -1,23 +1,24 @@
 #include "framework.h"
-#include "tr4_hammerhead.h"
+#include "Objects/TR4/Entity/tr4_hammerhead.h"
+
+#include "Game/animation.h"
 #include "Game/control/box.h"
 #include "Game/effects/effects.h"
-#include "Game/items.h"
-#include "Specific/setup.h"
-#include "Specific/level.h"
-#include "Game/Lara/lara.h"
-#include "Game/animation.h"
 #include "Game/itemdata/creature_info.h"
+#include "Game/items.h"
+#include "Game/Lara/lara.h"
 #include "Game/misc.h"
+#include "Specific/level.h"
+#include "Specific/setup.h"
 
 using std::vector;
 
 namespace TEN::Entities::TR4
 {
-	BITE_INFO HammerheadBite = { 0, 0, 0, 12 };
-	const vector<int> HammerheadBiteAttackJoints = { 10, 12, 13 };
-
 	constexpr auto HAMMERHEAD_BITE_ATTACK_DAMAGE = 120;
+
+	const vector<int> HammerheadBiteAttackJoints = { 10, 12, 13 };
+	const auto HammerheadBite = BiteInfo(Vector3::Zero, 12);
 
 	enum HammerheadState
 	{
@@ -123,7 +124,7 @@ namespace TEN::Entities::TR4
 						if (item->TestBits(JointBitType::Touch, HammerheadBiteAttackJoints))
 						{
 							DoDamage(creature->Enemy, HAMMERHEAD_BITE_ATTACK_DAMAGE);
-							CreatureEffect(item, &HammerheadBite, DoBloodSplat);
+							CreatureEffect(item, HammerheadBite, DoBloodSplat);
 							creature->Flags = 1;
 						}
 					}

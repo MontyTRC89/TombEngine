@@ -97,18 +97,9 @@ struct ROOM_INFO
 	int z;
 	int minfloor;
 	int maxceiling;
-	std::vector<Vector3> positions;
-	std::vector<Vector3> normals;
-	std::vector<Vector3> colors;
-	std::vector<Vector3> effects;
-	std::vector<BUCKET> buckets;
-	std::vector<ROOM_DOOR> doors;
 	int xSize;
 	int zSize;
-	std::vector<FloorInfo> floor;
 	Vector3 ambient;
-	std::vector<ROOM_LIGHT> lights;
-	std::vector<MESH_INFO> mesh;
 	int flippedRoom;
 	int flags;
 	int meshEffect;
@@ -117,7 +108,20 @@ struct ROOM_INFO
 	short itemNumber;
 	short fxNumber;
 	bool boundActive;
+
+	std::vector<FloorInfo> floor;
+	std::vector<ROOM_LIGHT> lights;
+	std::vector<MESH_INFO> mesh;
 	std::vector<TriggerVolume> triggerVolumes;
+
+	std::vector<Vector3> positions;
+	std::vector<Vector3> normals;
+	std::vector<Vector3> colors;
+	std::vector<Vector3> effects;
+	std::vector<BUCKET> buckets;
+	std::vector<ROOM_DOOR> doors;
+
+	std::vector<int> neighbors; // TODO: Move to level struct
 };
 
 constexpr auto NUM_ROOMS = 1024;
@@ -133,9 +137,11 @@ void DoFlipMap(short group);
 void AddRoomFlipItems(ROOM_INFO* room);
 void RemoveRoomFlipItems(ROOM_INFO* room);
 bool IsObjectInRoom(short roomNumber, short objectNumber);
-bool IsPointInRoom(PHD_3DPOS const& pos, int roomNumber);
-PHD_3DPOS GetRoomCenter(int roomNumber);
+bool IsPointInRoom(Vector3Int pos, int roomNumber);
+int FindRoomNumber(Vector3Int pos);
+Vector3Int GetRoomCenter(int roomNumber);
 int IsRoomOutside(int x, int y, int z);
 std::set<int> GetRoomList(int roomNumber);
+void InitializeNeighborRoomList();
 
 FloorInfo* GetSector(ROOM_INFO* room, int x, int z);

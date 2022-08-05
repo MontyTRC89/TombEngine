@@ -17,12 +17,12 @@ using std::vector;
 
 namespace TEN::Entities::TR4
 {
+	#define VON_CROY_FLAG_JUMP 6
+
+	const vector<int> VonCroyKnifeSwapJoints = { 7, 18 };
+	const auto VonCroyBite = BiteInfo(Vector3(0.0f, 35.0f, 130.0f), 18);
+
 	bool VonCroyPassedWaypoints[128];
-
-	BITE_INFO VonCroyBite = { 0, 35, 130, 18 };
-	vector<int> VonCroyKnifeSwapJoints = { 7, 18 };
-
-	#define VON_CROY_FLAG_JUMP		6
 
 	enum VonCroyState
 	{
@@ -318,7 +318,7 @@ namespace TEN::Entities::TR4
 		CreatureMood(item, &AI, VIOLENT);
 
 		AI_INFO laraAI;
-		if (creature->Enemy == LaraItem)
+		if (creature->Enemy->IsLara())
 			memcpy(&laraAI, &AI, sizeof(AI_INFO));
 		else
 		{
@@ -457,7 +457,7 @@ namespace TEN::Entities::TR4
 			}
 			else
 			{
-				if (creature->Enemy && creature->Enemy->HitPoints > 0 && AI.distance < pow(1024, 2) && creature->Enemy != LaraItem &&
+				if (creature->Enemy && creature->Enemy->HitPoints > 0 && AI.distance < pow(1024, 2) && !creature->Enemy->IsLara() &&
 					creature->Enemy->ObjectNumber != ID_AI_FOLLOW)
 				{
 					if (AI.bite)
@@ -523,7 +523,7 @@ namespace TEN::Entities::TR4
 					if (!foundTarget || AI.distance >= pow(SECTOR(1.5f), 2) &&
 						(item->TestBits(JointBitType::MeshSwap, 18) || AI.distance >= pow(SECTOR(3), 2)))
 					{
-						if (creature->Enemy == LaraItem)
+						if (creature->Enemy->IsLara())
 						{
 							if (AI.distance >= pow(SECTOR(2), 2))
 							{
@@ -734,7 +734,7 @@ namespace TEN::Entities::TR4
 						abs(item->Pose.Position.z - enemy->Pose.Position.z) < CLICK(2))
 					{
 						DoDamage(enemy, 40);
-						CreatureEffect2(item, &VonCroyBite, 2, -1, DoBloodSplat);
+						CreatureEffect2(item, VonCroyBite, 2, -1, DoBloodSplat);
 						creature->Flags = 1;
 
 						if (enemy->HitPoints <= 0)
@@ -802,7 +802,7 @@ namespace TEN::Entities::TR4
 							abs(item->Pose.Position.z - enemy->Pose.Position.z) < CLICK(2))
 						{
 							DoDamage(enemy, 20);
-							CreatureEffect2(item, &VonCroyBite, 2, -1, DoBloodSplat);
+							CreatureEffect2(item, VonCroyBite, 2, -1, DoBloodSplat);
 							creature->Flags = 1;
 
 							if (enemy->HitPoints <= 0)

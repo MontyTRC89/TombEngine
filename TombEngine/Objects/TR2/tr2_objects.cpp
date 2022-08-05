@@ -35,6 +35,8 @@
 #include "Specific/setup.h"
 #include "Specific/level.h"
 
+using namespace TEN::Entities::TR2;
+
 static void StartEntity(ObjectInfo* obj)
 {
 	obj = &Objects[ID_SHARK];
@@ -42,7 +44,7 @@ static void StartEntity(ObjectInfo* obj)
 	{
 		obj->control = SharkControl;
 		obj->collision = CreatureCollision;
-		obj->castsShadow = true;
+		obj->shadowType = ShadowMode::All;
 		obj->HitPoints = 30;
 		obj->hitEffect = HIT_BLOOD;
 		obj->pivotLength = 200;
@@ -63,7 +65,7 @@ static void StartEntity(ObjectInfo* obj)
 	{
 		obj->control = BarracudaControl;
 		obj->collision = CreatureCollision;
-		obj->castsShadow = true;
+		obj->shadowType = ShadowMode::All;
 		obj->HitPoints = 12;
 		obj->hitEffect = HIT_BLOOD;
 		obj->pivotLength = 200;
@@ -85,7 +87,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->initialise = InitialiseEagle;
 		obj->control = EagleControl;
 		obj->collision = CreatureCollision;
-		obj->castsShadow = true;
+		obj->shadowType = ShadowMode::All;
 		obj->HitPoints = 20;
 		obj->hitEffect = HIT_BLOOD;
 		obj->radius = 204;
@@ -104,7 +106,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->initialise = InitialiseEagle;
 		obj->control = EagleControl;
 		obj->collision = CreatureCollision;
-		obj->castsShadow = true;
+		obj->shadowType = ShadowMode::All;
 		obj->HitPoints = 15;
 		obj->hitEffect = HIT_BLOOD;
 		obj->radius = 204;
@@ -124,7 +126,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->collision = CreatureCollision;
 		obj->HitPoints = 5;
 		obj->hitEffect = HIT_BLOOD;
-		obj->castsShadow = true;
+		obj->shadowType = ShadowMode::All;
 		obj->pivotLength = 50;
 		obj->radius = 204;
 		obj->intelligent = true;
@@ -142,7 +144,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->control = YetiControl;
 		obj->HitPoints = 30;
 		obj->hitEffect = HIT_BLOOD;
-		obj->castsShadow = true;
+		obj->shadowType = ShadowMode::All;
 		obj->radius = 128;
 		obj->pivotLength = 100;
 		obj->intelligent = true;
@@ -161,7 +163,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->initialise = InitialiseCreature;
 		obj->collision = CreatureCollision;
 		obj->control = SilencerControl;
-		obj->castsShadow = true;
+		obj->shadowType = ShadowMode::All;
 		obj->HitPoints = 25;
 		obj->hitEffect = HIT_BLOOD;
 		obj->biteOffset = 0;
@@ -192,7 +194,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->initialise = InitialiseCreature;
 		obj->collision = CreatureCollision;
 		obj->control = SilencerControl;
-		obj->castsShadow = true;
+		obj->shadowType = ShadowMode::All;
 		obj->HitPoints = 25;
 		obj->hitEffect = HIT_BLOOD;
 		obj->biteOffset = 0;
@@ -223,7 +225,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->initialise = InitialiseCreature;
 		obj->collision = CreatureCollision;
 		obj->control = SilencerControl;
-		obj->castsShadow = true;
+		obj->shadowType = ShadowMode::All;
 		obj->HitPoints = 25;
 		obj->hitEffect = HIT_BLOOD;
 		obj->biteOffset = 0;
@@ -245,7 +247,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->initialise = InitialiseWorkerShotgun;
 		obj->collision = CreatureCollision;
 		obj->control = WorkerShotgunControl;
-		obj->castsShadow = true;
+		obj->shadowType = ShadowMode::All;
 		obj->HitPoints = 25;
 		obj->hitEffect = HIT_BLOOD;
 		obj->pivotLength = 50;
@@ -266,7 +268,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->initialise = InitialiseWorkerMachineGun;
 		obj->collision = CreatureCollision;
 		obj->control = WorkerMachineGunControl;
-		obj->castsShadow = true;
+		obj->shadowType = ShadowMode::All;
 		obj->HitPoints = 20;
 		obj->hitEffect = HIT_BLOOD;
 		obj->pivotLength = 50;
@@ -287,7 +289,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->initialise = InitialiseCreature;
 		obj->collision = CreatureCollision;
 		obj->control = SmallSpiderControl;
-		obj->castsShadow = true;
+		obj->shadowType = ShadowMode::All;
 		obj->HitPoints = 5;
 		obj->hitEffect = HIT_SMOKE;
 		obj->pivotLength = 0;
@@ -305,7 +307,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->initialise = InitialiseCreature;
 		obj->collision = CreatureCollision;
 		obj->control = BigSpiderControl;
-		obj->castsShadow = true;
+		obj->shadowType = ShadowMode::All;
 		obj->HitPoints = 40;
 		obj->hitEffect = HIT_SMOKE;
 		obj->pivotLength = 0;
@@ -323,7 +325,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->initialise = InitialiseCreature;
 		obj->collision = CreatureCollision;
 		obj->control = WorkerDualGunControl;
-		obj->castsShadow = true;
+		obj->shadowType = ShadowMode::All;
 		obj->HitPoints = 150;
 		obj->hitEffect = HIT_BLOOD;
 		obj->pivotLength = 0;
@@ -343,7 +345,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->initialise = InitialiseCreature;
 		obj->collision = CreatureCollision;
 		obj->control = BirdMonsterControl;
-		obj->castsShadow = true;
+		obj->shadowType = ShadowMode::All;
 		obj->HitPoints = 200;
 		obj->hitEffect = HIT_BLOOD;
 		obj->pivotLength = 0;
@@ -362,7 +364,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->initialise = InitialiseWorkerFlamethrower;
 		obj->collision = CreatureCollision;
 		obj->control = WorkerFlamethrower;
-		obj->castsShadow = true;
+		obj->shadowType = ShadowMode::All;
 		obj->HitPoints = 20;
 		obj->hitEffect = HIT_BLOOD;
 		obj->pivotLength = 0;
@@ -382,7 +384,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->initialise = InitialiseCreature;
 		obj->collision = CreatureCollision;
 		obj->control = KnifeThrowerControl;
-		obj->castsShadow = true;
+		obj->shadowType = ShadowMode::All;
 		obj->HitPoints = 60;
 		obj->hitEffect = HIT_BLOOD;
 		obj->pivotLength = 50;
@@ -407,7 +409,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->initialise = InitialiseCreature;
 		obj->collision = CreatureCollision;
 		obj->control = MercenaryUziControl;
-		obj->castsShadow = true;
+		obj->shadowType = ShadowMode::All;
 		obj->HitPoints = 45;
 		obj->hitEffect = HIT_BLOOD;
 		obj->pivotLength = 0;
@@ -427,7 +429,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->initialise = InitialiseCreature;
 		obj->collision = CreatureCollision;
 		obj->control = MercenaryAutoPistolControl;
-		obj->castsShadow = true;
+		obj->shadowType = ShadowMode::All;
 		obj->HitPoints = 50;
 		obj->hitEffect = HIT_BLOOD;
 		obj->pivotLength = 0;
@@ -457,7 +459,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->initialise = InitialiseCreature;
 		obj->collision = CreatureCollision;
 		obj->control = MercenaryAutoPistolControl;
-		obj->castsShadow = true;
+		obj->shadowType = ShadowMode::All;
 		obj->HitPoints = 50;
 		obj->hitEffect = HIT_BLOOD;
 		obj->pivotLength = 0;
@@ -477,7 +479,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->initialise = InitialiseCreature;
 		obj->collision = CreatureCollision;
 		obj->control = MonkControl;
-		obj->castsShadow = true;
+		obj->shadowType = ShadowMode::All;
 		obj->HitPoints = 50;
 		obj->hitEffect = HIT_BLOOD;
 		obj->pivotLength = 0;
@@ -496,7 +498,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->initialise = InitialiseCreature;
 		obj->collision = CreatureCollision;
 		obj->control = MonkControl;
-		obj->castsShadow = true;
+		obj->shadowType = ShadowMode::All;
 		obj->HitPoints = 50;
 		obj->hitEffect = HIT_BLOOD;
 		obj->pivotLength = 0;
@@ -516,7 +518,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->collision = CreatureCollision;
 		obj->control = SwordGuardianControl;
 		//obj->drawRoutine = DrawStatue;
-		obj->castsShadow = true;
+		obj->shadowType = ShadowMode::All;
 		obj->HitPoints = 80;
 		obj->hitEffect = HIT_BLOOD;
 		obj->pivotLength = 0;
@@ -539,7 +541,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->collision = CreatureCollision;
 		obj->control = SpearGuardianControl;
 		//obj->drawRoutine = DrawStatue;
-		obj->castsShadow = true;
+		obj->shadowType = ShadowMode::All;
 		obj->HitPoints = 100;
 		obj->hitEffect = HIT_BLOOD;
 		obj->pivotLength = 0;
@@ -603,7 +605,7 @@ static void StartEntity(ObjectInfo* obj)
 	{
 		obj->collision = SkidooManCollision;
 		//obj->drawRoutine = DrawSkidoo; // TODO: recreate renderer for skidoo
-		obj->castsShadow = true;
+		obj->shadowType = ShadowMode::All;
 		obj->HitPoints = 100;
 		obj->hitEffect = HIT_BLOOD;
 		obj->pivotLength = 0;
@@ -669,7 +671,7 @@ static void StartVehicles(ObjectInfo* obj)
 		obj->saveFlags = true;
 		obj->savePosition = true;
 		obj->hitEffect = HIT_RICOCHET;
-		obj->castsShadow = true;
+		obj->shadowType = ShadowMode::Lara;
 	}
 
 	obj = &Objects[ID_SNOWMOBILE];
@@ -682,7 +684,7 @@ static void StartVehicles(ObjectInfo* obj)
 		obj->saveFlags = true;
 		obj->savePosition = true;
 		obj->hitEffect = HIT_RICOCHET;
-		obj->castsShadow = true;
+		obj->shadowType = ShadowMode::Lara;
 	}
 }
 

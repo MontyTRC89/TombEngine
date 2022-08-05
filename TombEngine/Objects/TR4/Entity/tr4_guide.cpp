@@ -1,22 +1,23 @@
 #include "framework.h"
-#include "tr4_guide.h"
-#include "Game/items.h"
+#include "Objects/TR4/Entity/tr4_guide.h"
+
+#include "Game/animation.h"
 #include "Game/control/box.h"
 #include "Game/control/lot.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/tomb4fx.h"
-#include "Specific/setup.h"
-#include "Specific/level.h"
-#include "Game/animation.h"
+#include "Game/itemdata/creature_info.h"
+#include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
 #include "Sound/sound.h"
-#include "Game/itemdata/creature_info.h"
+#include "Specific/level.h"
+#include "Specific/setup.h"
 
 namespace TEN::Entities::TR4
 {
-	BITE_INFO GuideBite1 = { 0, 20, 180, 18 };
-	BITE_INFO GuideBite2 = { 30, 80, 50, 15 };
+	const auto GuideBite1 = BiteInfo(Vector3(0.0f, 20.0f, 180.0f), 18);
+	const auto GuideBite2 = BiteInfo(Vector3(30.0f, 80.0f, 50.0f), 15);
 
 	enum GuideState
 	{
@@ -26,7 +27,7 @@ namespace TEN::Entities::TR4
 		GUIDE_STATE_IGNITE_TORCH = 11,
 		GUIDE_STATE_LOOK_BACK = 22,
 		GUIDE_STATE_TORCH_ATTACK = 31,
-		GUIDE_STATE_PICKUP_TORCH = 37
+		GUIDE_STATE_PICK_UP_TORCH = 37
 	};
 
 	// TODO
@@ -250,7 +251,7 @@ namespace TEN::Entities::TR4
 						if (AI.bite)
 							item->Animation.TargetState = GUIDE_STATE_TORCH_ATTACK;
 					}
-					else if (enemy != LaraItem || AI.distance > pow(SECTOR(2), 2))
+					else if (!enemy->IsLara() || AI.distance > pow(SECTOR(2), 2))
 						item->Animation.TargetState = GUIDE_STATE_WALK;
 				}
 				else
@@ -274,8 +275,8 @@ namespace TEN::Entities::TR4
 							break;
 
 						case 0x20:
-							item->Animation.TargetState = GUIDE_STATE_PICKUP_TORCH;
-							item->Animation.RequiredState = GUIDE_STATE_PICKUP_TORCH;
+							item->Animation.TargetState = GUIDE_STATE_PICK_UP_TORCH;
+							item->Animation.RequiredState = GUIDE_STATE_PICK_UP_TORCH;
 							break;
 
 						case 0x28:
@@ -368,7 +369,7 @@ namespace TEN::Entities::TR4
 						AI.distance >= pow(SECTOR(1.5f), 2) &&
 						(item->MeshSwapBits & 0x40000 || AI.distance >= pow(SECTOR(3), 2)))
 					{
-						if (creature->Enemy == LaraItem)
+						if (creature->Enemy->IsLara())
 						{
 							if (AI.distance >= pow(SECTOR(2), 2))
 							{
@@ -565,18 +566,11 @@ namespace TEN::Entities::TR4
 							dz < CLICK(2))
 						{
 							DoDamage(enemy, 20);
+							CreatureEffect2(item, GuideBite1, 8, -1, DoBloodSplat);
+							creature->Flags = 1;
 
 							if (enemy->HitPoints <= 0)
 								item->AIBits = FOLLOW;
-
-							creature->Flags = 1;
-
-							CreatureEffect2(
-								item,
-								&GuideBite1,
-								8,
-								-1,
-								DoBloodSplat);
 						}
 					}
 				}
@@ -623,11 +617,10 @@ namespace TEN::Entities::TR4
 
 			break;
 
-		case GUIDE_STATE_PICKUP_TORCH:
+		case GUIDE_STATE_PICK_UP_TORCH:
 			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase)
 			{
 				someFlag = true;
-
 				item->Pose = enemy->Pose;
 			}
 			else if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + 35)

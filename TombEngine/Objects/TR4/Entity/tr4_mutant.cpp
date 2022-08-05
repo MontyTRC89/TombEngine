@@ -1,24 +1,25 @@
 #include "framework.h"
 #include "Objects/TR4/Entity/tr4_mutant.h"
-#include "Objects/Effects/tr4_locusts.h"
-#include "Game/effects/effects.h"
-#include "Game/misc.h"
-#include "Game/Lara/lara.h"
-#include "Specific/setup.h"
-#include "Game/collision/sphere.h"
-#include "Objects/objectslist.h"
-#include "Specific/trmath.h"
-#include "Game/itemdata/creature_info.h"
-#include "Game/control/control.h"
+
 #include "Game/animation.h"
+#include "Game/collision/sphere.h"
+#include "Game/control/control.h"
+#include "Game/effects/effects.h"
+#include "Game/itemdata/creature_info.h"
 #include "Game/items.h"
+#include "Game/Lara/lara.h"
+#include "Game/misc.h"
+#include "Objects/Effects/tr4_locusts.h"
+#include "Objects/objectslist.h"
 #include "Renderer/Renderer11Enums.h"
+#include "Specific/setup.h"
+#include "Specific/trmath.h"
 
 namespace TEN::Entities::TR4
 {
-	#define MUTANT_PROJECTILE_ATTACK_RANGE pow(SECTOR(10), 2)
-	#define MUTANT_LOCUST_ATTACK_1_RANGE pow(SECTOR(15), 2)
-	#define MUTANT_LOCUST_ATTACK_2_RANGE pow(SECTOR(30), 2)
+	constexpr auto MUTANT_PROJECTILE_ATTACK_RANGE = SQUARE(SECTOR(10));
+	constexpr auto MUTANT_LOCUST_ATTACK_1_RANGE	  = SQUARE(SECTOR(15));
+	constexpr auto MUTANT_LOCUST_ATTACK_2_RANGE   = SQUARE(SECTOR(30));
 
 	enum MutantState
 	{

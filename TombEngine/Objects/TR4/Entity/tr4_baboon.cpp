@@ -1,9 +1,9 @@
 #include "framework.h"
-#include "tr4_baboon.h"
+#include "Objects/TR4/Entity/tr4_baboon.h"
+
 #include "Game/collision/collide_room.h"
 #include "Game/control/box.h"
 #include "Game/control/lot.h"
-#include "Specific/setup.h"
 #include "Game/control/control.h"
 #include "Game/misc.h"
 #include "Game/Lara/lara.h"
@@ -12,36 +12,38 @@
 #include "Game/effects/tomb4fx.h"
 #include "Game/itemdata/creature_info.h"
 #include "Game/items.h"
+#include "Specific/setup.h"
 
-using std::vector;
 using namespace TEN::Effects::Environment;
+using std::vector;
 
 namespace TEN::Entities::TR4
 {
-	BaboonRespawner BaboonRespawn;
-	BITE_INFO BaboonBite = { 10, 10, 11, 4 };
-	const vector<int> BaboonAttackJoints = { 11, 12 };
-	const vector<int> BaboonAttackRightJoints = { 1, 2, 3, 5, 8, 9 };
-	const vector<int> BaboonJumpAttackJoints = { 3, 4, 8 };
-
 	constexpr auto BABOON_ATTACK_DAMAGE = 70;
 
-	constexpr auto BABOON_ATTACK_RANGE = SECTOR(0.34f);
-	constexpr auto BABOON_ATTACK_READY_RANGE = SECTOR(0.67f);
-	constexpr auto BABOON_JUMP_ATTACK_2_RANGE = SECTOR(0.67f);
-	constexpr auto BABOON_IDLE_RANGE = SECTOR(1);
-	constexpr auto BABOON_ROLL_FORWARD_RANGE = SECTOR(1);
-	constexpr auto BABOON_FOLLOW_RANGE = SECTOR(2);
+	constexpr auto BABOON_ATTACK_RANGE		  = SQUARE(SECTOR(0.34f));
+	constexpr auto BABOON_ATTACK_READY_RANGE  = SQUARE(SECTOR(0.67f));
+	constexpr auto BABOON_JUMP_ATTACK_2_RANGE = SQUARE(SECTOR(0.67f));
+	constexpr auto BABOON_IDLE_RANGE		  = SQUARE(SECTOR(1));
+	constexpr auto BABOON_ROLL_FORWARD_RANGE  = SQUARE(SECTOR(1));
+	constexpr auto BABOON_FOLLOW_RANGE		  = SQUARE(SECTOR(2));
 
-	constexpr auto NO_BABOON = -1;
-	constexpr auto NO_BABOON_COUNT = -2;
+	constexpr auto NO_BABOON			   = -1;
+	constexpr auto NO_BABOON_COUNT		   = -2;
 	constexpr auto NO_CROWBAR_SWITCH_FOUND = -1;
 
-	#define BABOON_ATTACK_ANGLE ANGLE(7.0f)
+	#define BABOON_ATTACK_ANGLE			   ANGLE(7.0f)
 	#define BABOON_WALK_FORWARD_TURN_ANGLE ANGLE(7.0f)
-	#define BABOON_RUN_FORWARD_TURN_ANGLE ANGLE(11.0f)
+	#define BABOON_RUN_FORWARD_TURN_ANGLE  ANGLE(11.0f)
 
 	#define BABOON_STATE_WALK_ANIM 14 // TODO: What is this?
+
+	const vector<int> BaboonAttackJoints	  = { 11, 12 };
+	const vector<int> BaboonAttackRightJoints = { 1, 2, 3, 5, 8, 9 };
+	const vector<int> BaboonJumpAttackJoints  = { 3, 4, 8 };
+	const auto BaboonBite = BiteInfo(Vector3(10.0f, 10.0f, 11.0f), 4);
+
+	BaboonRespawner BaboonRespawn;
 
 	enum BaboonState
 	{
@@ -128,13 +130,13 @@ namespace TEN::Entities::TR4
 
 	void BaboonDieEffect(ItemInfo* item)
 	{
-		auto pos = PHD_3DPOS(item->Pose.Position.x, item->Pose.Position.y - CLICK(0.5f), item->Pose.Position.z);
+		auto pose = PHD_3DPOS(item->Pose.Position.x, item->Pose.Position.y - CLICK(0.5f), item->Pose.Position.z);
 
 		// Trigger shockwave effect.
-		TriggerBaboonShockwave(pos, ANGLE(0.0f));
-		TriggerBaboonShockwave(pos, ANGLE(45.0f));
-		TriggerBaboonShockwave(pos, ANGLE(90.0f));
-		TriggerBaboonShockwave(pos, ANGLE(135.0f));
+		TriggerBaboonShockwave(pose, ANGLE(0.0f));
+		TriggerBaboonShockwave(pose, ANGLE(45.0f));
+		TriggerBaboonShockwave(pose, ANGLE(90.0f));
+		TriggerBaboonShockwave(pose, ANGLE(135.0f));
 
 		// Trigger flash screen.
 		Weather.Flash(255, 64, 0, 0.03f);
@@ -145,22 +147,23 @@ namespace TEN::Entities::TR4
 		auto* item = &g_Level.Items[itemNumber];
 
 		DoDamage(item, INT_MAX);
-		RemoveActiveItem(itemNumber);	// Remove it from the active item list.
+		RemoveActiveItem(itemNumber); // Remove it from the active item list.
 
 		item->Flags = IFLAG_CLEAR_BODY;
-		item->AfterDeath = 128;				// Disappear.
-		item->Status = ITEM_DEACTIVATED;	// Don't trigger again.
+		item->AfterDeath = 128;			 // Disappear.
+		item->Status = ITEM_DEACTIVATED; // Don't trigger again.
 
 		if (remove)
 			item->ItemFlags[0] = NO_BABOON;
 
-		DisableEntityAI(itemNumber);	// Deactivate AI to prevent crash.
+		DisableEntityAI(itemNumber); // Deactivate AI to prevent crash.
 	}
 
 	static bool CheckRespawnedBaboon(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
-		if (item->ItemFlags[0] == NO_BABOON)	// NORMAL/INV for now.
+
+		if (item->ItemFlags[0] == NO_BABOON) // NORMAL/INV for now.
 		{
 			KillRespawnedBaboon(itemNumber);
 			return false;
@@ -204,9 +207,9 @@ namespace TEN::Entities::TR4
 		item->HitPoints = object->HitPoints;
 
 		RemoveActiveItem(itemNumber);
-		item->Flags = NULL;
-		item->AfterDeath = 0;
 		item->Status = ITEM_INVISIBLE;
+		item->AfterDeath = 0;
+		item->Flags = NULL;
 
 		DisableEntityAI(itemNumber);
 		if (item->ObjectNumber == ID_BABOON_NORMAL)
@@ -233,9 +236,9 @@ namespace TEN::Entities::TR4
 
 	void InitialiseBaboon(short itemNumber)
 	{
-		InitialiseCreature(itemNumber);
-
 		auto* item = &g_Level.Items[itemNumber];
+
+		InitialiseCreature(itemNumber);
 
 		item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + BABOON_ANIM_SIT_IDLE;
 		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
@@ -291,7 +294,7 @@ namespace TEN::Entities::TR4
 				laraAI.angle = phd_atan(dx, dz) - item->Pose.Orientation.y;
 				laraAI.distance = pow(dx, 2) + pow(dz, 2);
 
-				if (creature->Enemy == nullptr || creature->Enemy == LaraItem)
+				if (creature->Enemy == nullptr || creature->Enemy->IsLara())
 					creature->Enemy = nullptr;
 			}
 			else
@@ -301,11 +304,11 @@ namespace TEN::Entities::TR4
 				creature->Enemy = LaraItem;
 			}
 
-			GetCreatureMood(item, &AI, TRUE);
-			CreatureMood(item, &AI, TRUE);
+			GetCreatureMood(item, &AI, true);
+			CreatureMood(item, &AI, true);
 			angle = CreatureTurn(item, creature->MaxTurn);
 
-			if (creature->Enemy != nullptr && creature->Enemy != LaraItem && creature->Enemy->ObjectNumber == ID_AI_FOLLOW)
+			if (creature->Enemy != nullptr && !creature->Enemy->IsLara() && creature->Enemy->ObjectNumber == ID_AI_FOLLOW)
 			{
 				if (creature->ReachedGoal &&
 					abs(item->Pose.Position.x - creature->Enemy->Pose.Position.x) < CLICK(1) &&
@@ -354,18 +357,18 @@ namespace TEN::Entities::TR4
 				}
 				else if (creature->Mood == MoodType::Attack)
 				{
-					if (!(item->AIBits & FOLLOW) || (!item->Animation.IsAirborne && AI.distance <= pow(BABOON_ROLL_FORWARD_RANGE, 2)))
+					if (!(item->AIBits & FOLLOW) || (!item->Animation.IsAirborne && AI.distance <= BABOON_ROLL_FORWARD_RANGE))
 					{
-						if (AI.bite && AI.distance < pow(BABOON_ATTACK_RANGE, 2))
+						if (AI.bite && AI.distance < BABOON_ATTACK_RANGE)
 						{
 							if (LaraItem->Pose.Position.y >= item->Pose.Position.y)
 								item->Animation.TargetState = BABOON_STATE_SWIPE_ATTACK;
 							else
 								item->Animation.TargetState = BABOON_STATE_JUMP_ATTACK_1;
 						}
-						else if (AI.bite && AI.distance < pow(BABOON_JUMP_ATTACK_2_RANGE, 2))
+						else if (AI.bite && AI.distance < BABOON_JUMP_ATTACK_2_RANGE)
 							item->Animation.TargetState = BABOON_STATE_JUMP_ATTACK_2;
-						else if (AI.bite && AI.distance < pow(BABOON_ROLL_FORWARD_RANGE, 2))
+						else if (AI.bite && AI.distance < BABOON_ROLL_FORWARD_RANGE)
 							item->Animation.TargetState = BABOON_STATE_RUN_FORWARD_ROLL;
 						else
 							item->Animation.TargetState = BABOON_STATE_RUN_FORWARD;
@@ -421,7 +424,7 @@ namespace TEN::Entities::TR4
 						else if (GetRandomControl() & 0x1000 || item->AIBits & FOLLOW)
 							item->Animation.TargetState = BABOON_STATE_WALK_FORWARD;
 					}
-					else if ((item->AIBits & FOLLOW) && AI.distance > pow(BABOON_IDLE_RANGE, 2))
+					else if ((item->AIBits & FOLLOW) && AI.distance > BABOON_IDLE_RANGE)
 					{
 						if (item->Animation.RequiredState)
 							item->Animation.TargetState = item->Animation.RequiredState;
@@ -452,7 +455,7 @@ namespace TEN::Entities::TR4
 					item->Animation.TargetState = BABOON_STATE_RUN_FORWARD;
 				else if (creature->Mood == MoodType::Attack)
 				{
-					if (AI.bite && AI.distance < pow(BABOON_ATTACK_READY_RANGE, 2))
+					if (AI.bite && AI.distance < BABOON_ATTACK_READY_RANGE)
 						item->Animation.TargetState = BABOON_STATE_IDLE;
 				}
 				else if (GetRandomControl() < 256)
@@ -471,13 +474,13 @@ namespace TEN::Entities::TR4
 					if (AI.ahead && Lara.TargetEntity != item)
 						item->Animation.TargetState = BABOON_STATE_IDLE;
 				}
-				else if (item->AIBits & FOLLOW && (item->Animation.IsAirborne || AI.distance > pow(BABOON_FOLLOW_RANGE, 2)))
+				else if (item->AIBits & FOLLOW && (item->Animation.IsAirborne || AI.distance > BABOON_FOLLOW_RANGE))
 					item->Animation.TargetState = BABOON_STATE_IDLE;
 				else if (creature->Mood == MoodType::Attack)
 				{
-					if (AI.distance < pow(BABOON_ATTACK_READY_RANGE, 2))
+					if (AI.distance < BABOON_ATTACK_READY_RANGE)
 						item->Animation.TargetState = BABOON_STATE_IDLE;
-					else if (AI.bite && AI.distance < pow(BABOON_ROLL_FORWARD_RANGE, 2))
+					else if (AI.bite && AI.distance < BABOON_ROLL_FORWARD_RANGE)
 						item->Animation.TargetState = BABOON_STATE_RUN_FORWARD_ROLL;
 				}
 				else
@@ -551,7 +554,7 @@ namespace TEN::Entities::TR4
 					 item->TestBits(JointBitType::Touch, BaboonAttackRightJoints) ||
 					 item->TestBits(JointBitType::Touch, BaboonJumpAttackJoints)))
 				{
-					CreatureEffect2(item, &BaboonBite, 10, -1, DoBloodSplat);
+					CreatureEffect2(item, BaboonBite, 10, -1, DoBloodSplat);
 					DoDamage(creature->Enemy, BABOON_ATTACK_DAMAGE);
 					creature->Flags = 1;
 				}
