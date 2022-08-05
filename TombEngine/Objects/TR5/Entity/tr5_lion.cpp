@@ -1,31 +1,29 @@
 #include "framework.h"
-#include "tr5_lion.h"
+#include "Objects/TR5/Entity/tr5_lion.h"
 
-#include "Game/items.h"
-#include "Game/effects/effects.h"
 #include "Game/control/box.h"
+#include "Game/control/control.h"
+#include "Game/effects/effects.h"
 #include "Game/effects/tomb4fx.h"
-#include "Specific/setup.h"
-#include "Specific/level.h"
+#include "Game/itemdata/creature_info.h"
+#include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
-#include "Game/itemdata/creature_info.h"
-#include "Game/control/control.h"
+#include "Specific/level.h"
+#include "Specific/setup.h"
 
 namespace TEN::Entities::TR5
 {
-	BiteInfo LionBite1 = { -2, -10, 250, 21 };
-	BiteInfo LionBite2 = { -2, -10, 132, 21 };
+	const auto LionBite1 = BiteInfo(Vector3(2.0f, -10.0f, 250.0f), 21);
+	const auto LionBite2 = BiteInfo(Vector3(-2.0f, -10.0f, 132.0f), 21);
 
 	void InitialiseLion(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
 		ClearItem(itemNumber);
-
-		item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex;
-		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-		item->Animation.TargetState = 1;
+		SetAnimation(item, 0);
+		item->Animation.TargetState = 1; // Check.
 		item->Animation.ActiveState = 1;
 	}
 
@@ -49,8 +47,8 @@ namespace TEN::Entities::TR5
 				if (item->Animation.ActiveState != 5)
 				{
 					item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + (GetRandomControl() & 1) + 7;
-					item->Animation.ActiveState = 5;
 					item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+					item->Animation.ActiveState = 5;
 				}
 			}
 			else
@@ -110,8 +108,8 @@ namespace TEN::Entities::TR5
 					{
 						if (GetRandomControl() < 128)
 						{
-							item->Animation.RequiredState = 6;
 							item->Animation.TargetState = 1;
+							item->Animation.RequiredState = 6;
 						}
 					}
 					else
@@ -133,8 +131,8 @@ namespace TEN::Entities::TR5
 						{
 							if (GetRandomControl() < 128)
 							{
-								item->Animation.RequiredState = 6;
 								item->Animation.TargetState = 1;
+								item->Animation.RequiredState = 6;
 							}
 						}
 					}
@@ -144,11 +142,12 @@ namespace TEN::Entities::TR5
 					break;
 
 				case 4:
-					if (!item->Animation.RequiredState && item->TouchBits & 0x200048)
+					if (!item->Animation.RequiredState &&
+						item->TouchBits & 0x200048)
 					{
-						DoDamage(creature->Enemy, 200);
-						CreatureEffect2(item, &LionBite1, 10, item->Pose.Orientation.y, DoBloodSplat);
 						item->Animation.RequiredState = 1;
+						DoDamage(creature->Enemy, 200);
+						CreatureEffect2(item, LionBite1, 10, item->Pose.Orientation.y, DoBloodSplat);
 					}
 
 					break;
@@ -156,11 +155,12 @@ namespace TEN::Entities::TR5
 				case 7:
 					creature->MaxTurn = ANGLE(1.0f);
 
-					if (!item->Animation.RequiredState && item->TouchBits & 0x200048)
+					if (!item->Animation.RequiredState &&
+						item->TouchBits & 0x200048)
 					{
-						DoDamage(creature->Enemy, 60);
-						CreatureEffect2(item, &LionBite2, 10, item->Pose.Orientation.y, DoBloodSplat);
 						item->Animation.RequiredState = 1;
+						DoDamage(creature->Enemy, 60);
+						CreatureEffect2(item, LionBite2, 10, item->Pose.Orientation.y, DoBloodSplat);
 					}
 
 					break;

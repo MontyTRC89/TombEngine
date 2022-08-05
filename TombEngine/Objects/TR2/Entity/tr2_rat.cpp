@@ -13,7 +13,7 @@
 
 namespace TEN::Entities::TR2
 {
-	BiteInfo RatBite = { 0, 0, 57, 2 };
+	const auto RatBite = BiteInfo(Vector3(0.0f, 0.0f, 57.0f), 2);
 
 	// TODO
 	enum RatState
@@ -112,9 +112,9 @@ namespace TEN::Entities::TR2
 			case 5:
 				if (!item->Animation.RequiredState && item->TouchBits & 0x7F)
 				{
-					CreatureEffect(item, &RatBite, DoBloodSplat);
-					DoDamage(info->Enemy, 20);
 					item->Animation.RequiredState = 2;
+					DoDamage(info->Enemy, 20);
+					CreatureEffect(item, RatBite, DoBloodSplat);
 				}
 
 				break;

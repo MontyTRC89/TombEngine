@@ -21,29 +21,40 @@ using namespace TEN::Input;
 
 namespace TEN::Entities::TR2
 {
-	BiteInfo DragonMouthBite = { 35, 171, 1168, 12 };
+	const auto DragonMouthBite = BiteInfo(Vector3(35.0f, 171.0f, 1168.0f), 12);
 
-#define DRAGON_SWIPE_DAMAGE 250
-#define DRAGON_TOUCH_DAMAGE 10
-#define DRAGON_LIVE_TIME (30 * 11)
-#define DRAGON_ALMOST_LIVE 100
-#define DRAGON_STATE_WALK_TURN ANGLE(2.0f)
-#define DRAGON_NEED_TURN ANGLE(1.0f)
-#define DRAGON_TURN_TURN ANGLE(1.0f)
-#define DRAGON_CLOSE_RANGE pow(SECTOR(3), 2)
-#define DRAGON_STATE_IDLE_RANGE pow(SECTOR(6), 2)
-#define DRAGON_FLAME_SPEED 200
-#define DRAGON_TOUCH_R 0x0fe
-#define DRAGON_TOUCH_L 0x7f000000
-#define BOOM_TIME 130
-#define BOOM_TIME_MIDDLE 140
-#define BOOM_TIME_END 150
-#define BARTOLI_RANGE SECTOR(9)
-#define DRAGON_CLOSE 900
-#define DRAGON_FAR 2300
-#define DRAGON_MID ((DRAGON_CLOSE + DRAGON_FAR) / 2)
-#define DRAGON_LCOL -CLICK(2)
-#define DRAGON_RCOL CLICK(2)
+	constexpr auto DRAGON_SWIPE_ATTACK_DAMAGE = 250;
+	constexpr auto DRAGON_TOUCH_DAMAGE		  = 10;
+
+
+
+	// TODO: Organise.
+	#define DRAGON_SWIPE_DAMAGE 250
+	#define DRAGON_TOUCH_DAMAGE 10
+
+	#define DRAGON_LIVE_TIME (30 * 11)
+	#define DRAGON_CLOSE_RANGE pow(SECTOR(3), 2)
+	#define DRAGON_STATE_IDLE_RANGE pow(SECTOR(6), 2)
+	#define DRAGON_FLAME_SPEED 200
+
+	#define DRAGON_TOUCH_R 0x0fe
+	#define DRAGON_TOUCH_L 0x7f000000
+
+	#define DRAGON_ALMOST_LIVE 100
+	#define BOOM_TIME 130
+	#define BOOM_TIME_MIDDLE 140
+	#define BOOM_TIME_END 150
+
+	#define BARTOLI_RANGE SECTOR(9)
+	#define DRAGON_CLOSE 900
+	#define DRAGON_FAR 2300
+	#define DRAGON_MID ((DRAGON_CLOSE + DRAGON_FAR) / 2)
+	#define DRAGON_LCOL -CLICK(2)
+	#define DRAGON_RCOL CLICK(2)
+
+	#define DRAGON_STATE_WALK_TURN ANGLE(2.0f)
+	#define DRAGON_NEED_TURN ANGLE(1.0f)
+	#define DRAGON_TURN_TURN ANGLE(1.0f)
 
 	enum DragonState
 	{
@@ -432,7 +443,7 @@ namespace TEN::Entities::TR2
 				if (creature->Flags)
 				{
 					if (AI.ahead)
-						CreatureEffect(item, &DragonMouthBite, DragonFire);
+						CreatureEffect(item, DragonMouthBite, DragonFire);
 					creature->Flags--;
 				}
 				else
