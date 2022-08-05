@@ -171,15 +171,12 @@ bool IsPointInRoom(Vector3Int pos, int roomNumber)
 {
 	auto* room = &g_Level.Rooms[roomNumber];
 
-	int x = pos.x;
-	int y = pos.y;
-	int z = pos.z;
-	int xSector = (x - room->x) / SECTOR(1);
-	int zSector = (z - room->z) / SECTOR(1);
+	int xSector = (pos.x - room->x) / SECTOR(1);
+	int zSector = (pos.z - room->z) / SECTOR(1);
 
-	if ((xSector >= 0 && xSector <= room->xSize - 1) &&
-		(zSector >= 0 && zSector <= room->zSize - 1) &&
-		(y <= room->minfloor && y >= room->maxceiling))	 // up is negative y axis, hence y should be "less" than floor
+	if ((xSector >= 0 && xSector <= (room->xSize - 1)) &&
+		(zSector >= 0 && zSector <= (room->zSize - 1)) &&
+		(pos.y <= room->minfloor && pos.y >= room->maxceiling)) // Up is -y, hence y should be "less" than floor.
 	{
 		return true;
 	}
@@ -225,7 +222,7 @@ std::set<int> GetRoomList(int roomNumber)
 	for (size_t i = 0; i < room->doors.size(); i++)
 		roomNumberList.insert(room->doors[i].room);
 
-	for (auto roomNumber : roomNumberList)
+	for (int roomNumber : roomNumberList)
 	{
 		room = &g_Level.Rooms[roomNumber];
 		for (size_t j = 0; j < room->doors.size(); j++)
@@ -243,8 +240,8 @@ void InitializeNeighborRoomList()
 
 		room->neighbors.clear();
 
-		auto roomList = GetRoomList(i);
-		for (int n : roomList)
-			room->neighbors.push_back(n);
+		auto roomNumberList = GetRoomList(i);
+		for (int roomNumber : roomNumberList)
+			room->neighbors.push_back(roomNumber);
 	}
 }

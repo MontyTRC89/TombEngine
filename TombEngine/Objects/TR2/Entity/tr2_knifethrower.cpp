@@ -17,8 +17,8 @@
 
 namespace TEN::Entities::TR2
 {
-	BiteInfo KnifeBiteLeft = { 0, 0, 0, 5 };
-	BiteInfo KnifeBiteRight = { 0, 0, 0, 8 };
+	const auto KnifeBiteLeft  = BiteInfo(Vector3::Zero, 5);
+	const auto KnifeBiteRight = BiteInfo(Vector3::Zero, 8);
 
 	// TODO
 	enum KnifeThrowerState
@@ -232,7 +232,7 @@ namespace TEN::Entities::TR2
 
 				if (!creature->Flags)
 				{
-					CreatureEffect(item, &KnifeBiteLeft, ThrowKnife);
+					CreatureEffect(item, KnifeBiteLeft, ThrowKnife);
 					creature->Flags = 1;
 				}
 
@@ -244,7 +244,7 @@ namespace TEN::Entities::TR2
 
 				if (!creature->Flags)
 				{
-					CreatureEffect(item, &KnifeBiteRight, ThrowKnife);
+					CreatureEffect(item, KnifeBiteRight, ThrowKnife);
 					creature->Flags = 1;
 				}
 
@@ -256,8 +256,8 @@ namespace TEN::Entities::TR2
 
 				if (!creature->Flags)
 				{
-					CreatureEffect(item, &KnifeBiteLeft, ThrowKnife);
-					CreatureEffect(item, &KnifeBiteRight, ThrowKnife);
+					CreatureEffect(item, KnifeBiteLeft, ThrowKnife);
+					CreatureEffect(item, KnifeBiteRight, ThrowKnife);
 					creature->Flags = 1;
 				}
 

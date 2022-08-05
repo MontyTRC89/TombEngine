@@ -1,20 +1,23 @@
 #include "framework.h"
-#include "tr5_brownbeast.h"
-#include "Game/items.h"
+#include "Objects/TR5/Entity/tr5_brownbeast.h"
+
 #include "Game/control/box.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/tomb4fx.h"
+#include "Game/itemdata/creature_info.h"
+#include "Game/items.h"
+#include "Game/misc.h"
+#include "Game/Lara/lara.h"
+#include "Sound/sound.h"
 #include "Specific/setup.h"
 #include "Specific/level.h"
-#include "Game/Lara/lara.h"
-#include "Game/misc.h"
-#include "Sound/sound.h"
-#include "Game/itemdata/creature_info.h"
 
 namespace TEN::Entities::TR5
 {
-	BiteInfo BrownBeastBite1 = { 0, 0, 0, 16 };
-	BiteInfo BrownBeastBite2 = { 0, 0, 0, 22 };
+	constexpr auto BROWN_BEAST_ATTACK_DAMAGE = 150;
+
+	const auto BrownBeastBite1 = BiteInfo(Vector3::Zero, 16);
+	const auto BrownBeastBite2 = BiteInfo(Vector3::Zero, 22);
 
 	// TODO
 	enum BrownBeastState
@@ -144,8 +147,8 @@ namespace TEN::Entities::TR5
 						if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 19 &&
 							item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].frameBase + 25)
 						{
-							DoDamage(creature->Enemy, 150);
-							CreatureEffect2(item, &BrownBeastBite1, 20, item->Pose.Orientation.y, DoBloodSplat);
+							DoDamage(creature->Enemy, BROWN_BEAST_ATTACK_DAMAGE);
+							CreatureEffect2(item, BrownBeastBite1, 20, item->Pose.Orientation.y, DoBloodSplat);
 							creature->Flags |= 1;
 							break;
 						}
@@ -156,8 +159,8 @@ namespace TEN::Entities::TR5
 						if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 6 &&
 							item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].frameBase + 16)
 						{
-							DoDamage(creature->Enemy, 150);
-							CreatureEffect2(item, &BrownBeastBite1, 20, item->Pose.Orientation.y, DoBloodSplat);
+							DoDamage(creature->Enemy, BROWN_BEAST_ATTACK_DAMAGE);
+							CreatureEffect2(item, BrownBeastBite1, 20, item->Pose.Orientation.y, DoBloodSplat);
 							creature->Flags |= 1;
 							break;
 						}
@@ -172,8 +175,8 @@ namespace TEN::Entities::TR5
 					if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 13 &&
 						item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].frameBase + 20)
 					{
-						DoDamage(creature->Enemy, 150);
-						CreatureEffect2(item, &BrownBeastBite2, 20, item->Pose.Orientation.y, DoBloodSplat);
+						DoDamage(creature->Enemy, BROWN_BEAST_ATTACK_DAMAGE);
+						CreatureEffect2(item, BrownBeastBite2, 20, item->Pose.Orientation.y, DoBloodSplat);
 						creature->Flags |= 2;
 						break;
 					}
@@ -184,8 +187,8 @@ namespace TEN::Entities::TR5
 					if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 33 &&
 						item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].frameBase + 43)
 					{
-						DoDamage(creature->Enemy, 150);
-						CreatureEffect2(item, &BrownBeastBite2, 20, item->Pose.Orientation.y, DoBloodSplat);
+						DoDamage(creature->Enemy, BROWN_BEAST_ATTACK_DAMAGE);
+						CreatureEffect2(item, BrownBeastBite2, 20, item->Pose.Orientation.y, DoBloodSplat);
 						creature->Flags |= 2;
 						break;
 					}

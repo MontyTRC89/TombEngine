@@ -12,8 +12,8 @@
 
 namespace TEN::Entities::TR2
 {
-	BiteInfo BirdMonsterBiteLeft = { 0, 224, 0, 19 };
-	BiteInfo BirdMonsterBiteRight = { 0, 224, 0, 22 };
+	const auto BirdMonsterBiteLeft = BiteInfo(Vector3(0.0f, 224.0f, 0.0f), 19);
+	const auto BirdMonsterBiteRight = BiteInfo(Vector3(0.0f, 224.0f, 0.0f), 22);
 
 	// TODO
 	enum BirdMonsterState
@@ -140,14 +140,14 @@ namespace TEN::Entities::TR2
 			case 7:
 				if (!(creature->Flags & 1) && item->TouchBits & 0x600000)
 				{
-					CreatureEffect(item, &BirdMonsterBiteRight, DoBloodSplat);
+					CreatureEffect(item, BirdMonsterBiteRight, DoBloodSplat);
 					DoDamage(creature->Enemy, 200);
 					creature->Flags |= 1;
 				}
 
 				if (!(creature->Flags & 2) && item->TouchBits & 0x0C0000)
 				{
-					CreatureEffect(item, &BirdMonsterBiteLeft, DoBloodSplat);
+					CreatureEffect(item, BirdMonsterBiteLeft, DoBloodSplat);
 					DoDamage(creature->Enemy, 200);
 					creature->Flags |= 2;
 				}

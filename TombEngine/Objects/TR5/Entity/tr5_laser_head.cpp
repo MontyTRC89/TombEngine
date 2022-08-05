@@ -35,9 +35,15 @@ namespace TEN::Entities::TR5
 
 	LaserHeadStruct LaserHeadData;
 
-	auto LaserHeadBasePosition = Vector3Int(0, -640, 0);
-	Vector3Int GuardianChargePositions[4] = { Vector3Int(-188, -832, 440), Vector3Int(188, -832, -440), Vector3Int(440, -832, 188), Vector3Int(-440, -832, -188) };
 	int GuardianMeshes[5] = { 1, 2 };
+	auto LaserHeadBasePosition = Vector3Int(0, -640, 0);
+	Vector3Int GuardianChargePositions[4] =
+	{
+		Vector3Int(-188, -832, 440),
+		Vector3Int(188, -832, -440),
+		Vector3Int(440, -832, 188),
+		Vector3Int(-440, -832, -188)
+	};
 
 	static void TriggerLaserHeadSparks(Vector3Int* pos, int count, byte r, byte g, byte b, int unk)
 	{
