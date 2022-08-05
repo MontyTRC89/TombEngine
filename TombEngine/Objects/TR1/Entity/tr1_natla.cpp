@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "tr1_natla.h"
+#include "Objects/TR1/Entity/tr1_natla.h"
 
 #include "Game/control/box.h"
 #include "Game/effects/effects.h"

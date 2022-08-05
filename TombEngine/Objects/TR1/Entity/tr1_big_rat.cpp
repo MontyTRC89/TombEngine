@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "tr1_big_rat.h"
+#include "Objects/TR1/Entity/tr1_big_rat.h"
 
 #include "Game/collision/collide_room.h"
 #include "Game/control/box.h"
