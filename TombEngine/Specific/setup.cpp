@@ -338,16 +338,6 @@ void TrapObjects()
 		obj->usingDrawAnimatingItem = false;
 	}
 
-	obj = &Objects[ID_WRECKING_BALL];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialiseWreckingBall;
-		obj->collision = WreckingBallCollision;
-		obj->control = WreckingBallControl;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-		obj->savePosition = true;
-	}
 }
 
 void InitialiseSpecialEffects()
