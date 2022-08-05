@@ -1,6 +1,7 @@
 #pragma once
 #include "Objects/objectslist.h"
 #include "Specific/phd_global.h"
+#include "Specific/level.h"
 #include "Renderer/Renderer11Enums.h"
 
 struct ItemInfo;
@@ -68,6 +69,12 @@ struct ObjectInfo
 	bool isPuzzleHole;
 	int meshSwapSlot;
 	DWORD explodableMeshbits;
+
+	// Use ROT_X/Y/Z to allow bone to be rotated with CreatureJoint()
+	void setBoneRotation(int boneID, int flags)
+	{
+		g_Level.Bones[boneIndex + boneID * 4] |= flags;
+	}
 };
 
 struct STATIC_INFO
