@@ -19,7 +19,7 @@ namespace TEN::Entities::TR5
 	constexpr auto LION_POUNCE_ATTACK_DAMAGE = 200;
 	constexpr auto LION_BITE_ATTACK_DAMAGE	 = 60;
 
-	constexpr auto LION_POUNCE_ATACK_RANGE = SQUARE(SECTOR(1));
+	constexpr auto LION_POUNCE_ATTACK_RANGE = SQUARE(SECTOR(1));
 
 	const vector<int> LionAttackJoints = { 3, 6, 21 };
 	const auto LionBite1 = BiteInfo(Vector3(2.0f, -10.0f, 250.0f), 21);
@@ -125,7 +125,7 @@ namespace TEN::Entities::TR5
 							break;
 						}
 
-						if (AI.distance < LION_POUNCE_ATACK_RANGE)
+						if (AI.distance < LION_POUNCE_ATTACK_RANGE)
 						{
 							item->Animation.TargetState = LION_STATE_POUNCE_ATTACK;
 							break;
@@ -157,7 +157,7 @@ namespace TEN::Entities::TR5
 
 					if (creature->Mood != MoodType::Bored)
 					{
-						if (AI.ahead && AI.distance < LION_POUNCE_ATACK_RANGE)
+						if (AI.ahead && AI.distance < LION_POUNCE_ATTACK_RANGE)
 							item->Animation.TargetState = LION_STATE_IDLE;
 						else if (item->TestBits(JointBitType::Touch, LionAttackJoints) && AI.ahead)
 							item->Animation.TargetState = LION_STATE_IDLE;
