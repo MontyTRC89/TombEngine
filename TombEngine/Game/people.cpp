@@ -102,60 +102,85 @@ short GunShot(int x, int y, int z, short velocity, short yRot, short roomNumber)
 	return -1;
 }
 
-bool Targetable(ItemInfo* item, AI_INFO* AI) 
+static bool TargetableIntern(ItemInfo* item, CreatureInfo* creature, AI_INFO* AI)
 {
-	auto* creature = GetCreatureInfo(item);
-	auto* enemy = creature->Enemy;
-
-	if (enemy == NULL || enemy->HitPoints <= 0 || !AI->ahead || AI->distance >= pow(MAX_VISIBILITY_DISTANCE, 2))
+	// check if the current item is a creature (only creature can use Targetable() !)
+	// also check if target is ahead or is at a visible distance !
+	if (!item->IsCreature() || !AI->ahead || AI->distance >= SQUARE(MAX_VISIBILITY_DISTANCE))
 		return false;
 
-	if (!enemy->Data.is<CreatureInfo>() && !enemy->IsLara())
-		return false;
+	auto* enemy = creature != nullptr ? creature->Enemy : GetCreatureInfo(item)->Enemy;
+	if (enemy != NULL) // check if enemy is alive else not targetable !
+	{
+		// if enemy is not creature or lara  or if the target is already dead, then not targetable !
+		if ((!enemy->IsCreature() && !enemy->IsLara()) || enemy->HitPoints <= 0)
+			return false;
 
-	auto* bounds = (BOUNDING_BOX*)GetBestFrame(item);
+		GameVector start;
+		GameVector target;
+		auto& bounds = GetBestFrame(item)->boundingBox;
+		auto& boundsTarget = GetBestFrame(enemy)->boundingBox;
 
-	GameVector start;
-	start.x = item->Pose.Position.x;
-	start.y = (item->ObjectNumber == ID_SNIPER) ? (item->Pose.Position.y - CLICK(3)) : (item->Pose.Position.y + ((bounds->Y2 + 3 * bounds->Y1) / 4));
-	start.z = item->Pose.Position.z;
-	start.roomNumber = item->RoomNumber;
+		start.x = item->Pose.Position.x;
+		start.y = (item->ObjectNumber == ID_SNIPER) ? (item->Pose.Position.y - CLICK(3)) : (item->Pose.Position.y + ((bounds.Y2 + 3 * bounds.Y1) / 4));
+		start.z = item->Pose.Position.z;
+		start.roomNumber = item->RoomNumber;
 
-	bounds = (BOUNDING_BOX*)GetBestFrame(enemy);
+		target.x = enemy->Pose.Position.x;
+		target.y = enemy->Pose.Position.y + ((boundsTarget.Y2 + 3 * boundsTarget.Y1) / 4);
+		target.z = enemy->Pose.Position.z;
+		target.roomNumber = enemy->RoomNumber; // NOTE: why do this line not existed ? TokyoSU, 5/8/2022
 
-	GameVector target;
-	target.x = enemy->Pose.Position.x;
-	target.y = enemy->Pose.Position.y + ((bounds->Y2 + 3 * bounds->Y1) / 4);
-	target.z = enemy->Pose.Position.z;
-
-	return LOS(&start, &target);
+		return LOS(&start, &target);
+	}
+	return false;
 }
 
-bool TargetVisible(ItemInfo* item, AI_INFO* AI) 
+bool Targetable(ItemInfo* item, AI_INFO* AI)
 {
-	auto* creature = GetCreatureInfo(item);
-	auto* enemy = creature->Enemy;
+	return TargetableIntern(item, nullptr, AI);
+}
 
-	if (enemy != NULL)
+bool Targetable(ItemInfo* item, CreatureInfo* creature, AI_INFO* AI)
+{
+	return TargetableIntern(item, creature, AI);
+}
+
+static bool TargetVisibleIntern(ItemInfo* item, CreatureInfo* creature, AI_INFO* AI, float maxAngle)
+{
+	if (item->IsCreature())
 	{
-		short angle = AI->angle - creature->JointRotation[2];
-		if (enemy->HitPoints != 0 && angle > -ANGLE(45.0f) && angle < ANGLE(45.0f) && AI->distance < pow(MAX_VISIBILITY_DISTANCE, 2))
+		auto* enemy = creature != nullptr ? creature->Enemy : GetCreatureInfo(item)->Enemy;
+		if (enemy != NULL)
 		{
-			GameVector start;
-			start.x = item->Pose.Position.x;
-			start.y = item->Pose.Position.y - CLICK(3);
-			start.z = item->Pose.Position.z;
-			start.roomNumber = item->RoomNumber;
+			short angle = AI->angle - creature->JointRotation[2];
+			if (enemy->HitPoints != 0 && angle > -ANGLE(maxAngle) && angle < ANGLE(maxAngle) && AI->distance < SQUARE(MAX_VISIBILITY_DISTANCE))
+			{
+				GameVector start;
+				start.x = item->Pose.Position.x;
+				start.y = item->Pose.Position.y - CLICK(3);
+				start.z = item->Pose.Position.z;
+				start.roomNumber = item->RoomNumber;
 
-			GameVector target;
-			target.x = enemy->Pose.Position.x;
-			auto* bounds = (BOUNDING_BOX*)GetBestFrame(enemy);
-			target.y = enemy->Pose.Position.y + ((((bounds->Y1 * 2) + bounds->Y1) + bounds->Y2) / 4);
-			target.z = enemy->Pose.Position.z;
+				GameVector target;
+				auto& bounds = GetBestFrame(enemy)->boundingBox;
+				target.x = enemy->Pose.Position.x;
+				target.y = enemy->Pose.Position.y + ((((bounds.Y1 * 2) + bounds.Y1) + bounds.Y2) / 4);
+				target.z = enemy->Pose.Position.z;
 
-			return LOS(&start, &target);
+				return LOS(&start, &target);
+			}
 		}
 	}
-
 	return false;
+}
+
+bool TargetVisible(ItemInfo* item, AI_INFO* AI, float maxAngle)
+{
+	return TargetVisibleIntern(item, nullptr, AI, maxAngle);
+}
+
+bool TargetVisible(ItemInfo* item, CreatureInfo* creature, AI_INFO* AI, float maxAngle)
+{
+	return TargetVisibleIntern(item, creature, AI, maxAngle);
 }
