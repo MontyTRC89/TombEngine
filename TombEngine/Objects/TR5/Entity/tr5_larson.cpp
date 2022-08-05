@@ -145,8 +145,8 @@ namespace TEN::Entities::TR5
 				creature->flags = 0;
 			}*/
 
-			GetCreatureMood(item, &info, VIOLENT);
-			CreatureMood(item, &info, VIOLENT);
+			GetCreatureMood(item, &info, true);
+			CreatureMood(item, &info, true);
 
 			if (info.distance < SQUARE(2048)
 				&& LaraItem->Animation.Velocity > 20

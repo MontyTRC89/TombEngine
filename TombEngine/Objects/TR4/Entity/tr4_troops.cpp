@@ -202,8 +202,8 @@ namespace TEN::Entities::TR4
 			if (!creature->HurtByLara && creature->Enemy->IsLara())
 				creature->Enemy = nullptr;
 
-			GetCreatureMood(item, &AI, TIMID);
-			CreatureMood(item, &AI, TIMID);
+			GetCreatureMood(item, &AI, false);
+			CreatureMood(item, &AI, false);
 
 			// Vehicle handling
 			if (Lara.Vehicle != NO_ITEM && AI.bite)

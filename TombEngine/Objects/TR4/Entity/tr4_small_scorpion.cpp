@@ -100,8 +100,8 @@ namespace TEN::Entities::TR4
 			AI_INFO AI;
 			CreatureAIInfo(item, &AI);
 
-			GetCreatureMood(item, &AI, VIOLENT);
-			CreatureMood(item, &AI, VIOLENT);
+			GetCreatureMood(item, &AI, true);
+			CreatureMood(item, &AI, true);
 
 			angle = CreatureTurn(item, creature->MaxTurn);
 

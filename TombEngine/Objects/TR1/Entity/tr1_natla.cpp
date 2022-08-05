@@ -72,8 +72,8 @@ namespace TEN::Entities::TR1
 			if (AI.ahead)
 				head = AI.angle;
 
-			GetCreatureMood(item, &AI, VIOLENT);
-			CreatureMood(item, &AI, VIOLENT);
+			GetCreatureMood(item, &AI, true);
+			CreatureMood(item, &AI, true);
 
 			angle = CreatureTurn(item, NATLA_RUN_TURN);
 			shoot = (AI.angle > -NATLA_FIRE_ARC && AI.angle < NATLA_FIRE_ARC&& Targetable(item, &AI));
@@ -184,7 +184,7 @@ namespace TEN::Entities::TR1
 					creature->Flags -= NATLA_FLYMODE;
 
 				if (!(creature->Flags & NATLA_FLYMODE))
-					CreatureMood(item, &AI, VIOLENT);
+					CreatureMood(item, &AI, true);
 
 				creature->LOT.Step = SECTOR(20);
 				creature->LOT.Drop = -SECTOR(20);
@@ -199,7 +199,7 @@ namespace TEN::Entities::TR1
 				head = AI.angle;
 
 			if (item->Animation.ActiveState != NATLA_STATE_FLY || (creature->Flags & NATLA_FLYMODE))
-				CreatureMood(item, &AI, TIMID);
+				CreatureMood(item, &AI, false);
 
 			item->Pose.Orientation.y -= facing;
 			angle = CreatureTurn(item, NATLA_FLY_TURN);

@@ -190,8 +190,8 @@ namespace TEN::Entities::TR5
 			AI_INFO AI;
 			CreatureAIInfo(item, &AI);
 
-			GetCreatureMood(item, &AI, VIOLENT);
-			CreatureMood(item, &AI, VIOLENT);
+			GetCreatureMood(item, &AI, true);
+			CreatureMood(item, &AI, true);
 
 			if (item->Animation.ActiveState != 5 &&
 				item->Animation.ActiveState != 10 &&

@@ -272,12 +272,12 @@ namespace TEN::Entities::TR4
 				laraAI.distance = pow(dx, 2) + pow(dz, 2);
 			}
 
-			GetCreatureMood(item, &AI, VIOLENT);
+			GetCreatureMood(item, &AI, true);
 
 			if (!(item->MeshBits & 0x200))
 				creature->Mood = MoodType::Escape;
 
-			CreatureMood(item, &AI, VIOLENT);
+			CreatureMood(item, &AI, true);
 
 			angle = CreatureTurn(item, creature->MaxTurn);
 

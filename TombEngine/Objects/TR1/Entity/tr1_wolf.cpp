@@ -94,8 +94,8 @@ namespace TEN::Entities::TR1
 			if (AI.ahead)
 				head = AI.angle;
 
-			GetCreatureMood(item, &AI, TIMID);
-			CreatureMood(item, &AI, TIMID);
+			GetCreatureMood(item, &AI, false);
+			CreatureMood(item, &AI, false);
 
 			if (item->Animation.ActiveState != WOLF_STATE_SLEEP)
 				angle = CreatureTurn(item, creature->MaxTurn);
