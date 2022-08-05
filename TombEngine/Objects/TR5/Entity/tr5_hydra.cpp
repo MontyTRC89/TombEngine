@@ -21,15 +21,15 @@ namespace TEN::Entities::TR5
 	// TODO
 	enum HydraState
 	{
-		HYDRA_STATE_STOP = 0,
-		HYDRA_STATE_BITE_ATTACK1 = 1,
+		HYDRA_STATE_IDLE = 0,
+		HYDRA_STATE_BITE_ATTACK_1 = 1,
 		HYDRA_STATE_AIM = 2,
 
 		HYDRA_STATE_HURT = 4,
 
-		HYDRA_STATE_BITE_ATTACK2 = 7,
-		HYDRA_STATE_BITE_ATTACK3 = 8,
-		HYDRA_STATE_BITE_ATTACK4 = 9,
+		HYDRA_STATE_BITE_ATTACK_2 = 7,
+		HYDRA_STATE_BITE_ATTACK_3 = 8,
+		HYDRA_STATE_BITE_ATTACK_4 = 9,
 
 		HYDRA_STATE_DEATH = 11
 	};
@@ -48,8 +48,8 @@ namespace TEN::Entities::TR5
 
 		item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex;
 		item->Animation.FrameNumber = 30 * item->TriggerFlags + g_Level.Anims[item->Animation.AnimNumber].frameBase;
-		item->Animation.TargetState = HYDRA_STATE_STOP;
-		item->Animation.ActiveState = HYDRA_STATE_STOP;
+		item->Animation.TargetState = HYDRA_STATE_IDLE;
+		item->Animation.ActiveState = HYDRA_STATE_IDLE;
 
 		if (item->TriggerFlags == 1)
 			item->Pose.Position.z += CLICK(1.5f);
@@ -227,7 +227,7 @@ namespace TEN::Entities::TR5
 
 			switch (item->Animation.ActiveState)
 			{
-			case HYDRA_STATE_STOP:
+			case HYDRA_STATE_IDLE:
 				creature->MaxTurn = ANGLE(1.0f);
 				creature->Flags = 0;
 
@@ -244,17 +244,17 @@ namespace TEN::Entities::TR5
 							item->Animation.TargetState = HYDRA_STATE_AIM;
 					}
 					else
-						item->Animation.TargetState = HYDRA_STATE_BITE_ATTACK1;
+						item->Animation.TargetState = HYDRA_STATE_BITE_ATTACK_1;
 				}
 				else
 					item->Animation.TargetState = 6;
 
 				break;
 
-			case HYDRA_STATE_BITE_ATTACK1:
-			case HYDRA_STATE_BITE_ATTACK2:
-			case HYDRA_STATE_BITE_ATTACK3:
-			case HYDRA_STATE_BITE_ATTACK4:
+			case HYDRA_STATE_BITE_ATTACK_1:
+			case HYDRA_STATE_BITE_ATTACK_2:
+			case HYDRA_STATE_BITE_ATTACK_3:
+			case HYDRA_STATE_BITE_ATTACK_4:
 				creature->MaxTurn = 0;
 
 				if (creature->Flags == 0)
