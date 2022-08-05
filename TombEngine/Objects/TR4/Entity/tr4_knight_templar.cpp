@@ -19,8 +19,8 @@ namespace TEN::Entities::TR4
 {
 	constexpr auto KNIGHT_TEMPLAR_SWORD_ATTACK_DAMAGE = 120;
 
-	#define KNIGHT_TEMPLAR_IDLE_TURN_ANGLE ANGLE(2.0f)
-	#define KNIGHT_TEMPLAR_WALK_TURN_ANGLE ANGLE(7.0f)
+	#define KTEMPLAR_IDLE_TURN_RATE_MAX ANGLE(2.0f)
+	#define KTEMPLAR_WALK_TURN_RATE_MAX ANGLE(7.0f)
 
 	const vector<int> KnightTemplarSwordAttackJoints = { 10, 11 };
 	const auto KnightTemplarBite = BiteInfo(Vector3::Zero, 11);
@@ -77,9 +77,9 @@ namespace TEN::Entities::TR4
 		auto* object = &Objects[item->ObjectNumber];
 
 		if (item->Animation.AnimNumber == object->animIndex ||
-			item->Animation.AnimNumber - object->animIndex == KTEMPLAR_ANIM_WALK_FORWARD_RIGHT_1 ||
-			item->Animation.AnimNumber - object->animIndex == KTEMPLAR_ANIM_WALK_FORWARD_LEFT_2 ||
-			item->Animation.AnimNumber - object->animIndex == KTEMPLAR_ANIM_WALK_FORWARD_RIGHT_2)
+			(item->Animation.AnimNumber - object->animIndex) == KTEMPLAR_ANIM_WALK_FORWARD_RIGHT_1 ||
+			(item->Animation.AnimNumber - object->animIndex) == KTEMPLAR_ANIM_WALK_FORWARD_LEFT_2 ||
+			(item->Animation.AnimNumber - object->animIndex) == KTEMPLAR_ANIM_WALK_FORWARD_RIGHT_2)
 		{
 			if (GetRandomControl() & 1)
 			{
@@ -132,8 +132,8 @@ namespace TEN::Entities::TR4
 		{
 		case KTEMPLAR_STATE_IDLE:
 			item->Animation.TargetState = KTEMPLAR_STATE_WALK_FORWARD;
-			creature->MaxTurn = KNIGHT_TEMPLAR_IDLE_TURN_ANGLE;
-			creature->Flags = 0;
+			creature->MaxTurn = KTEMPLAR_IDLE_TURN_RATE_MAX;
+			creature->Flags = NULL;
 
 			if (AI.distance > pow(SECTOR(0.67f), 2))
 			{
@@ -150,7 +150,7 @@ namespace TEN::Entities::TR4
 			break;
 
 		case KTEMPLAR_STATE_WALK_FORWARD:
-			creature->MaxTurn = KNIGHT_TEMPLAR_WALK_TURN_ANGLE;
+			creature->MaxTurn = KTEMPLAR_WALK_TURN_RATE_MAX;
 
 			if (Lara.TargetEntity == item || AI.distance <= pow(SECTOR(0.67f), 2))
 				item->Animation.TargetState = KTEMPLAR_STATE_IDLE;

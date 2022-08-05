@@ -16,9 +16,6 @@ using std::vector;
 
 namespace TEN::Entities::TR3
 {
-	BiteInfo CivvyBite = { 0, 0, 0, 13 };
-	const vector<int> CivvyAttackJoints = { 10, 13 };
-
 	constexpr auto CIVVY_ATTACK_DAMAGE = 40;
 	constexpr auto CIVVY_SWIPE_DAMAGE = 50;
 
@@ -37,10 +34,8 @@ namespace TEN::Entities::TR3
 	#define CIVVY_STATE_WALK_FORWARD_TURN_ANGLE ANGLE(5.0f)
 	#define CIVVY_STATE_RUN_FORWARD_TURN_ANGLE ANGLE(6.0f)
 
-	#define CIVVY_CLIMB1_ANIM 28
-	#define CIVVY_CLIMB2_ANIM 29
-	#define CIVVY_CLIMB3_ANIM 27
-	#define CIVVY_FALL3_ANIM  30
+	const vector<int> CivvyAttackJoints = { 10, 13 };
+	const auto CivvyBite = BiteInfo(Vector3::Zero, 13);
 
 	// TODO
 	enum CivvyState
@@ -70,6 +65,10 @@ namespace TEN::Entities::TR3
 		CIVVY_ANIM_IDLE = 6,
 
 		CIVVY_ANIM_DEATH = 26,
+		CIVVY_CLIMB3_ANIM = 27,
+		CIVVY_CLIMB1_ANIM = 28,
+		CIVVY_CLIMB2_ANIM = 29,
+		CIVVY_FALL3_ANIM = 30
 	};
 
 	void InitialiseCivvy(short itemNumber)
@@ -77,10 +76,7 @@ namespace TEN::Entities::TR3
 		auto* item = &g_Level.Items[itemNumber];
 
 		InitialiseCreature(itemNumber);
-
-		item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + CIVVY_ANIM_IDLE;
-		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-		item->Animation.ActiveState = item->Animation.TargetState = CIVVY_STATE_IDLE;
+		SetAnimation(item, CIVVY_ANIM_IDLE);
 	}
 
 	void CivvyControl(short itemNumber)
@@ -99,17 +95,15 @@ namespace TEN::Entities::TR3
 
 		if (item->BoxNumber != NO_BOX && (g_Level.Boxes[item->BoxNumber].flags & BLOCKED))
 		{
-			DoLotsOfBlood(item->Pose.Position.x, item->Pose.Position.y - (GetRandomControl() & 255) - 32, item->Pose.Position.z, (GetRandomControl() & 127) + 128, GetRandomControl() << 1, item->RoomNumber, 3);
 			DoDamage(item, 20);
+			DoLotsOfBlood(item->Pose.Position.x, item->Pose.Position.y - (GetRandomControl() & 255) - 32, item->Pose.Position.z, (GetRandomControl() & 127) + 128, GetRandomControl() << 1, item->RoomNumber, 3);
 		}
 
 		if (item->HitPoints <= 0)
 		{
 			if (item->Animation.ActiveState != CIVVY_DEATH)
 			{
-				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + CIVVY_ANIM_DEATH;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-				item->Animation.ActiveState = CIVVY_DEATH;
+				SetAnimation(item, CIVVY_ANIM_DEATH);
 				creature->LOT.Step = CLICK(1);
 			}
 		}
@@ -174,9 +168,9 @@ namespace TEN::Entities::TR3
 				}
 
 			case CIVVY_STATE_IDLE:
-				creature->MaxTurn = 0;
-				creature->Flags = 0;
 				head = laraAiInfo.angle;
+				creature->MaxTurn = 0;
+				creature->Flags = NULL;
 
 				if (item->AIBits & GUARD)
 				{
@@ -229,8 +223,8 @@ namespace TEN::Entities::TR3
 
 				if (item->AIBits & PATROL1)
 				{
-					item->Animation.TargetState = CIVVY_STATE_WALK_FORWARD;
 					head = 0;
+					item->Animation.TargetState = CIVVY_STATE_WALK_FORWARD;
 				}
 				else if (creature->Mood == MoodType::Escape)
 					item->Animation.TargetState = CIVVY_STATE_RUN_FORWARD;
@@ -289,7 +283,7 @@ namespace TEN::Entities::TR3
 				else
 					item->Animation.TargetState = CIVVY_STATE_IDLE;
 
-				creature->Flags = 0;
+				creature->Flags = NULL;
 				break;
 
 			case CIVVY_AIM1:
@@ -306,12 +300,12 @@ namespace TEN::Entities::TR3
 				else
 					item->Animation.TargetState = CIVVY_STATE_IDLE;
 
-				creature->Flags = 0;
+				creature->Flags = NULL;
 				break;
 
 			case CIVVY_AIM2:
 				creature->MaxTurn = CIVVY_STATE_WALK_FORWARD_TURN_ANGLE;
-				creature->Flags = 0;
+				creature->Flags = NULL;
 
 				if (AI.ahead)
 				{
@@ -337,7 +331,7 @@ namespace TEN::Entities::TR3
 
 				if (!creature->Flags && item->TestBits(JointBitType::Touch, CivvyAttackJoints))
 				{
-					CreatureEffect(item, &CivvyBite, DoBloodSplat);
+					CreatureEffect(item, CivvyBite, DoBloodSplat);
 					DoDamage(creature->Enemy, CIVVY_ATTACK_DAMAGE);
 					SoundEffect(SFX_TR4_LARA_THUD, &item->Pose);
 					creature->Flags = 1;
@@ -356,7 +350,7 @@ namespace TEN::Entities::TR3
 
 				if (!creature->Flags && item->TestBits(JointBitType::Touch, CivvyAttackJoints))
 				{
-					CreatureEffect(item, &CivvyBite, DoBloodSplat);
+					CreatureEffect(item, CivvyBite, DoBloodSplat);
 					DoDamage(creature->Enemy, CIVVY_ATTACK_DAMAGE);
 					SoundEffect(SFX_TR4_LARA_THUD, &item->Pose);
 					creature->Flags = 1;
@@ -378,8 +372,8 @@ namespace TEN::Entities::TR3
 
 				if (creature->Flags != 2 && item->TestBits(JointBitType::Touch, CivvyAttackJoints))
 				{
-					CreatureEffect(item, &CivvyBite, DoBloodSplat);
 					DoDamage(creature->Enemy, CIVVY_SWIPE_DAMAGE);
+					CreatureEffect(item, CivvyBite, DoBloodSplat);
 					SoundEffect(SFX_TR4_LARA_THUD, &item->Pose);
 					creature->Flags = 2;
 				}
@@ -398,31 +392,23 @@ namespace TEN::Entities::TR3
 			switch (CreatureVault(itemNumber, angle, 2, CIVVY_VAULT_SHIFT))
 			{
 			case 2:
+				SetAnimation(item, CIVVY_CLIMB1_ANIM);
 				creature->MaxTurn = 0;
-				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + CIVVY_CLIMB1_ANIM;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-				item->Animation.ActiveState = CIVVY_CLIMB1;
 				break;
 
 			case 3:
+				SetAnimation(item, CIVVY_CLIMB2_ANIM);
 				creature->MaxTurn = 0;
-				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + CIVVY_CLIMB2_ANIM;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-				item->Animation.ActiveState = CIVVY_CLIMB2;
 				break;
 
 			case 4:
+				SetAnimation(item, CIVVY_CLIMB3_ANIM);
 				creature->MaxTurn = 0;
-				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + CIVVY_CLIMB3_ANIM;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-				item->Animation.ActiveState = CIVVY_CLIMB3;
 				break;
 
 			case -4:
+				SetAnimation(item, CIVVY_FALL3_ANIM);
 				creature->MaxTurn = 0;
-				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + CIVVY_FALL3_ANIM;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-				item->Animation.ActiveState = CIVVY_FALL3;
 				break;
 			}
 		}
