@@ -193,7 +193,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->savePosition = true;
 		obj->zoneType = ZONE_FLYER;
 		obj->setBoneRotation(1, ROT_Y); // torso
-		obj->setBoneRotation(3, ROT_Y); // head
+		obj->setBoneRotation(2, ROT_Y); // head
 	}
 
 }
