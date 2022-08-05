@@ -456,7 +456,6 @@ void CalculateSpotCameras()
 		CurrentSplinePosition += cspeed;
 
 	bool lookPressed = (TrInput & IN_LOOK) != 0;
-	int fuck = TrInput;
 
 	if (!lookPressed)
 		SpotCamFirstLook = false;
