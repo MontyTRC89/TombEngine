@@ -1,6 +1,7 @@
 #include "framework.h"
 #include "tr4_horseman.h"
 #include "Game/items.h"
+#include "Game/effects/debris.h"
 #include "Game/effects/effects.h"
 #include "Specific/setup.h"
 #include "Specific/level.h"

@@ -6,6 +6,7 @@
 #include "Specific/prng.h"
 #include "Specific/setup.h"
 #include "Specific/trmath.h"
+#include <Game/effects/tomb4fx.h>
 
 using std::vector;
 using namespace TEN::Renderer;
@@ -17,6 +18,34 @@ short SmashedMeshCount;
 MESH_INFO* SmashedMesh[32];
 short SmashedMeshRoom[32];
 vector<DebrisFragment> DebrisFragments = vector<DebrisFragment>(MAX_DEBRIS);
+
+bool ExplodeItemNode(ItemInfo* item, int node, int noXZVel, int bits)
+{
+	if (1 << node & item->MeshBits)
+	{
+		int number = bits;
+		if (number == BODY_EXPLODE)
+			number = -64;
+
+		GetSpheres(item, CreatureSpheres, SPHERES_SPACE_WORLD | SPHERES_SPACE_BONE_ORIGIN, Matrix::Identity);
+		ShatterItem.yRot = item->Pose.Orientation.y;
+		ShatterItem.bit = 1 << node;
+		ShatterItem.meshIndex = Objects[item->ObjectNumber].meshIndex + node;
+		ShatterItem.sphere.x = CreatureSpheres[node].x;
+		ShatterItem.sphere.y = CreatureSpheres[node].y;
+		ShatterItem.sphere.z = CreatureSpheres[node].z;
+		ShatterItem.color = item->Color;
+		ShatterItem.flags = item->ObjectNumber == ID_CROSSBOW_BOLT ? 0x400 : 0;
+		ShatterImpactData.impactDirection = Vector3(0, -1, 0);
+		ShatterImpactData.impactLocation = { (float)ShatterItem.sphere.x, (float)ShatterItem.sphere.y, (float)ShatterItem.sphere.z };
+		ShatterObject(&ShatterItem, NULL, number, item->RoomNumber, noXZVel);
+		item->MeshBits &= ~ShatterItem.bit;
+
+		return true;
+	}
+
+	return false;
+}
 
 DebrisFragment* GetFreeDebrisFragment()
 {
@@ -33,7 +62,6 @@ DebrisFragment* GetFreeDebrisFragment()
 void ShatterObject(SHATTER_ITEM* item, MESH_INFO* mesh, int num, short roomNumber, int noZXVel)
 {
 	int meshIndex = 0;
-	MESH* fragmentsMesh;
 	short yRot = 0;
 	Vector3 pos;
 	bool isStatic;
@@ -53,7 +81,7 @@ void ShatterObject(SHATTER_ITEM* item, MESH_INFO* mesh, int num, short roomNumbe
 		pos = Vector3(item->sphere.x, item->sphere.y, item->sphere.z);
 	}
 
-	fragmentsMesh = &g_Level.Meshes[meshIndex];
+	auto fragmentsMesh = &g_Level.Meshes[meshIndex];
 
 	for (auto& renderBucket : fragmentsMesh->buckets)
 	{
@@ -85,57 +113,66 @@ void ShatterObject(SHATTER_ITEM* item, MESH_INFO* mesh, int num, short roomNumbe
 			{
 				DebrisFragment* fragment = GetFreeDebrisFragment();
 
-				if (!fragment->active)
-				{
-					Matrix rotationMatrix = Matrix::CreateFromYawPitchRoll(yRot, 0, 0);
+				if (!fragment)
+					break;
 
-					Vector3 pos1 = fragmentsMesh->positions[poly->indices[indices[j * 3 + 0]]];
-					Vector3 pos2 = fragmentsMesh->positions[poly->indices[indices[j * 3 + 1]]];
-					Vector3 pos3 = fragmentsMesh->positions[poly->indices[indices[j * 3 + 2]]];
+				Matrix rotationMatrix = Matrix::CreateFromYawPitchRoll(yRot, 0.0f, 0.0f);
 
-					Vector2 uv1 = poly->textureCoordinates[indices[j * 3 + 0]];
-					Vector2 uv2 = poly->textureCoordinates[indices[j * 3 + 1]];
-					Vector2 uv3 = poly->textureCoordinates[indices[j * 3 + 2]];
+				Vector3 pos1 = fragmentsMesh->positions[poly->indices[indices[j * 3 + 0]]];
+				Vector3 pos2 = fragmentsMesh->positions[poly->indices[indices[j * 3 + 1]]];
+				Vector3 pos3 = fragmentsMesh->positions[poly->indices[indices[j * 3 + 2]]];
 
-					Vector3 normal1 = poly->normals[indices[j * 3 + 0]];
-					Vector3 normal2 = poly->normals[indices[j * 3 + 1]];
-					Vector3 normal3 = poly->normals[indices[j * 3 + 2]];
+				Vector2 uv1 = poly->textureCoordinates[indices[j * 3 + 0]];
+				Vector2 uv2 = poly->textureCoordinates[indices[j * 3 + 1]];
+				Vector2 uv3 = poly->textureCoordinates[indices[j * 3 + 2]];
 
-					//Take the average of all 3 local positions
-					Vector3 localPos = (pos1 + pos2 + pos3) / 3;
-					Vector3 worldPos = Vector3::Transform(localPos, rotationMatrix);
+				Vector3 normal1 = poly->normals[indices[j * 3 + 0]];
+				Vector3 normal2 = poly->normals[indices[j * 3 + 1]];
+				Vector3 normal3 = poly->normals[indices[j * 3 + 2]];
 
-					fragment->worldPosition = worldPos + pos;
+				Vector3 color1 = fragmentsMesh->colors[poly->indices[indices[j * 3 + 0]]];
+				Vector3 color2 = fragmentsMesh->colors[poly->indices[indices[j * 3 + 1]]];
+				Vector3 color3 = fragmentsMesh->colors[poly->indices[indices[j * 3 + 2]]];
 
-					fragment->mesh.Positions[0] = pos1 - localPos;
-					fragment->mesh.Positions[1] = pos2 - localPos;
-					fragment->mesh.Positions[2] = pos3 - localPos;
+				//Take the average of all 3 local positions
+				Vector3 localPos = (pos1 + pos2 + pos3) / 3;
+				Vector3 worldPos = Vector3::Transform(localPos, rotationMatrix);
 
-					fragment->mesh.TextureCoordinates[0] = uv1;
-					fragment->mesh.TextureCoordinates[1] = uv2;
-					fragment->mesh.TextureCoordinates[2] = uv3;
+				fragment->worldPosition = worldPos + pos;
 
-					fragment->mesh.Normals[0] = normal1;
-					fragment->mesh.Normals[1] = normal2;
-					fragment->mesh.Normals[2] = normal3;
+				fragment->mesh.Positions[0] = pos1 - localPos;
+				fragment->mesh.Positions[1] = pos2 - localPos;
+				fragment->mesh.Positions[2] = pos3 - localPos;
 
-					fragment->mesh.blendMode = BLENDMODE_OPAQUE;
-					fragment->mesh.tex = renderBucket.texture;
+				fragment->mesh.TextureCoordinates[0] = uv1;
+				fragment->mesh.TextureCoordinates[1] = uv2;
+				fragment->mesh.TextureCoordinates[2] = uv3;
 
-					fragment->isStatic = isStatic;
-					fragment->active = true;
-					fragment->terminalVelocity = 1024;
-					fragment->gravity = Vector3(0, 7, 0);
-					fragment->restitution = 0.6f;
-					fragment->friction = 0.6f;
-					fragment->linearDrag = .99f;
-					fragment->angularVelocity = Vector3(GenerateFloat(-1, 1) * 0.39, GenerateFloat(-1, 1) * 0.39, GenerateFloat(-1, 1) * 0.39);
-					fragment->angularDrag = GenerateFloat(0.9f, 0.999f);
-					fragment->velocity = CalculateFragmentImpactVelocity(fragment->worldPosition, ShatterImpactData.impactDirection, ShatterImpactData.impactLocation);
-					fragment->roomNumber = roomNumber;
-					fragment->numBounces = 0;
-					fragment->color = isStatic ? mesh->color : Vector4::One; // FIXME: SHATTER_ITEM must be refactored! -- Lwmte, 15.07.22
-				}
+				fragment->mesh.Normals[0] = normal1;
+				fragment->mesh.Normals[1] = normal2;
+				fragment->mesh.Normals[2] = normal3;
+
+				fragment->mesh.Colors[0] = Vector4(color1.x, color1.y, color1.z, 1.0f);
+				fragment->mesh.Colors[1] = Vector4(color2.x, color2.y, color2.z, 1.0f);
+				fragment->mesh.Colors[2] = Vector4(color3.x, color3.y, color3.z, 1.0f);
+
+				fragment->mesh.blendMode = renderBucket.blendMode;
+				fragment->mesh.tex = renderBucket.texture;
+
+				fragment->isStatic = isStatic;
+				fragment->active = true;
+				fragment->terminalVelocity = 1024;
+				fragment->gravity = Vector3(0, 7, 0);
+				fragment->restitution = 0.6f;
+				fragment->friction = 0.6f;
+				fragment->linearDrag = .99f;
+				fragment->angularVelocity = Vector3(GenerateFloat(-1, 1) * 0.39, GenerateFloat(-1, 1) * 0.39, GenerateFloat(-1, 1) * 0.39);
+				fragment->angularDrag = GenerateFloat(0.9f, 0.999f);
+				fragment->velocity = CalculateFragmentImpactVelocity(fragment->worldPosition, ShatterImpactData.impactDirection, ShatterImpactData.impactLocation);
+				fragment->roomNumber = roomNumber;
+				fragment->numBounces = 0;
+				fragment->color = isStatic ? mesh->color : item->color;
+				fragment->lightMode = fragmentsMesh->lightMode;
 			}
 		}
 	}
@@ -193,7 +230,10 @@ void UpdateDebris()
 			{
 				auto roomNumber = floor->RoomBelow(deb.worldPosition.x, deb.worldPosition.y, deb.worldPosition.z).value_or(NO_ROOM);
 				if (roomNumber != NO_ROOM)
+				{
 					deb.roomNumber = roomNumber;
+					continue;
+				}
 
 				if (deb.numBounces > 3)
 				{

@@ -10,6 +10,7 @@
 #include "Specific/input.h"
 #include "Game/animation.h"
 #include "Game/effects/lightning.h"
+#include "Game/effects/debris.h"
 
 using namespace TEN::Input;
 using namespace TEN::Effects::Lightning;

@@ -100,15 +100,15 @@ int EnableEntityAI(short itemNum, int always, bool makeTarget)
 void DisableEntityAI(short itemNumber)
 {
 	ItemInfo* item = &g_Level.Items[itemNumber];
-	CreatureInfo* creature = (CreatureInfo*)item->Data;
-	
-	if (creature)
-	{
-		creature->ItemNumber = NO_ITEM;
-		KillItem(creature->AITargetNumber);
-		ActiveCreatures.erase(std::find(ActiveCreatures.begin(), ActiveCreatures.end(), creature));
-		item->Data = nullptr;
-	}
+
+	if (!item->IsCreature())
+		return;
+
+	auto* creature = (CreatureInfo*)item->Data;
+	creature->ItemNumber = NO_ITEM;
+	KillItem(creature->AITargetNumber);
+	ActiveCreatures.erase(std::find(ActiveCreatures.begin(), ActiveCreatures.end(), creature));
+	item->Data = nullptr;
 }
 
 void InitialiseSlot(short itemNum, short slot, bool makeTarget)

@@ -461,15 +461,9 @@ int CreatureAnimation(short itemNumber, float angle, float tilt)
 		boxHeight = item->Floor;
 
 	auto oldPos = item->Pose.Position;
-	
-	if (!Objects[item->ObjectNumber].waterCreature)
-	{
-		auto roomNumber = GetCollision(item).RoomNumber;
-		if (roomNumber != item->RoomNumber)
-			ItemNewRoom(itemNumber, roomNumber);
-	}
 
 	AnimateItem(item);
+
 	if (item->Status == ITEM_DEACTIVATED)
 	{
 		CreatureDie(itemNumber, false);
@@ -768,32 +762,32 @@ int CreatureAnimation(short itemNumber, float angle, float tilt)
 		item->Pose.Orientation.x = 0.0f;
 	}
 
-	if (!Objects[item->ObjectNumber].waterCreature)
-	{
-		auto roomNumber = GetCollision(item->Pose.Position.x, 
-										item->Pose.Position.y - CLICK(2), 
-										item->Pose.Position.z,
-										item->RoomNumber).RoomNumber;
-
-		if (roomNumber != item->RoomNumber)
-			ItemNewRoom(itemNumber, roomNumber);
-
-		if (TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, &g_Level.Rooms[roomNumber]))
-		{
-			auto bounds = GetBoundsAccurate(item);
-			auto height = item->Pose.Position.y - GetWaterHeight(item);
-
-			if (abs(bounds->Y1 + bounds->Y2) < height)
-				DoDamage(item, INT_MAX);
-		}
-	}
-
-	roomNumber = item->RoomNumber;
-	GetFloor(item->Pose.Position.x, item->Pose.Position.y - CLICK(2), item->Pose.Position.z, &roomNumber);
-	if (item->RoomNumber != roomNumber)
-		ItemNewRoom(itemNumber, roomNumber);
+	CreatureSwitchRoom(itemNumber);
 
 	return true;
+}
+
+void CreatureSwitchRoom(short itemNumber)
+{
+	auto* item = &g_Level.Items[itemNumber];
+
+	auto roomNumber = GetCollision(item->Pose.Position.x,
+		item->Pose.Position.y - CLICK(2),
+		item->Pose.Position.z,
+		item->RoomNumber).RoomNumber;
+
+	if (roomNumber != item->RoomNumber)
+		ItemNewRoom(itemNumber, roomNumber);
+
+	if (!Objects[item->ObjectNumber].waterCreature &&
+		TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, &g_Level.Rooms[roomNumber]))
+	{
+		auto bounds = GetBoundsAccurate(item);
+		auto height = item->Pose.Position.y - GetWaterHeight(item);
+
+		if (abs(bounds->Y1 + bounds->Y2) < height)
+			DoDamage(item, INT_MAX);
+	}
 }
 
 void CreatureDie(short itemNumber, bool explode)

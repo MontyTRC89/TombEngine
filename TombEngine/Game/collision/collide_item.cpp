@@ -103,9 +103,7 @@ bool GetCollidedObjects(ItemInfo* collidingItem, int radius, bool onlyVisible, I
 	short numMeshes = 0;
 
 	// Collect all the rooms where to check
-	auto roomsArray = GetRoomList(collidingItem->RoomNumber);
-
-	for (auto i : roomsArray)
+	for (auto i : g_Level.Rooms[collidingItem->RoomNumber].neighbors)
 	{
 		auto* room = &g_Level.Rooms[i];
 
@@ -309,7 +307,7 @@ void TestForObjectOnLedge(ItemInfo* item, CollisionInfo* coll)
 
 		// g_Renderer.AddDebugSphere(origin, 16, Vector4::One, RENDERER_DEBUG_PAGE::DIMENSION_STATS);
 
-		for (auto i : GetRoomList(item->RoomNumber))
+		for (auto i : g_Level.Rooms[item->RoomNumber].neighbors)
 		{
 			short itemNumber = g_Level.Rooms[i].itemNumber;
 			while (itemNumber != NO_ITEM)
@@ -861,7 +859,7 @@ void CollideSolidStatics(ItemInfo* item, CollisionInfo* coll)
 {
 	coll->HitTallObject = false;
 
-	for (auto i : GetRoomList(item->RoomNumber))
+	for (auto i : g_Level.Rooms[item->RoomNumber].neighbors)
 	{
 		for (int j = 0; j < g_Level.Rooms[i].mesh.size(); j++)
 		{
@@ -1726,7 +1724,7 @@ void DoObjectCollision(ItemInfo* laraItem, CollisionInfo* coll)
 	if (Objects[laraItem->ObjectNumber].intelligent)
 		return;
 
-	for (auto i : GetRoomList(laraItem->RoomNumber))
+	for (auto i : g_Level.Rooms[laraItem->RoomNumber].neighbors)
 	{
 		int nextItem = g_Level.Rooms[i].itemNumber;
 		while (nextItem != NO_ITEM)

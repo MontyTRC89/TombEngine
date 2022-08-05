@@ -2,6 +2,8 @@
 
 #include "Game/items.h"
 #include "Game/control/lot.h"
+#include "Game/effects/debris.h"
+#include "Game/Lara/lara_helpers.h"
 #include "Objects/objectslist.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
@@ -88,8 +90,6 @@ most can just be ignored (see usage).
 		)
 	*/
 
-#define USE_IF_HAVE(Type, ifThere, ifNotThere) \
-std::holds_alternative<Type>(ifThere) ? std::get<Type>(ifThere) : ifNotThere
 
 static std::unique_ptr<Moveable> Create(
 	GAME_OBJECT_ID objID,
@@ -109,7 +109,6 @@ static std::unique_ptr<Moveable> Create(
 
 	if (ScriptAssert(ptr->SetName(name), "Could not set name for Moveable; returning an invalid object."))
 	{
-
 		ItemInfo* item = &g_Level.Items[num];
 		ptr->SetPos(pos);
 		ptr->SetRot(USE_IF_HAVE(Rotation, rot, Rotation{}));
@@ -135,7 +134,7 @@ static std::unique_ptr<Moveable> Create(
 void Moveable::Register(sol::table & parent)
 {
 	parent.new_usertype<Moveable>(LUA_CLASS_NAME,
-		ScriptReserved_new, Create,
+		ScriptReserved_New, Create,
 		sol::call_constructor, Create,
 		sol::meta_function::index, index_error,
 		sol::meta_function::new_index, newindex_error,
@@ -153,12 +152,20 @@ void Moveable::Register(sol::table & parent)
 // @function Moveable:MakeInvisible
 	ScriptReserved_MakeInvisible, &Moveable::MakeInvisible,
 
+/// Explode item. This also kills and disables item.
+// @function Moveable:Explode
+	ScriptReserved_Explode, &Moveable::Explode,
+
+/// Shatter item. This also kills and disables item.
+// @function Moveable:Shatter
+	ScriptReserved_Shatter, &Moveable::Shatter,
+
 /// Get the status of object.
 // possible values:
-// 0 - not active
-// 1 - active
-// 2 - deactivated
-// 3 - invisible
+// <br />0 - not active 
+// <br />1 - active 
+// <br />2 - deactivated 
+// <br />3 - invisible
 // @function Moveable:GetStatus
 // @treturn int a number representing the status of the object
 	ScriptReserved_GetStatus, &Moveable::GetStatus,
@@ -220,15 +227,28 @@ void Moveable::Register(sol::table & parent)
 // shiva:SetObjectID(TEN.Objects.ObjID.BIGMEDI_ITEM)
 	ScriptReserved_SetObjectID, &Moveable::SetObjectID,
 
+/// Retrieve the index of the current state.
+// This corresponds to the number shown in the item's state ID field in WadTool.
+// @function Moveable:GetState
+// @treturn int the index of the active state
+	ScriptReserved_GetStateNumber, &Moveable::GetStateNumber,
+
+/// Set the object's state to the one specified by the given index.
+// Performs no bounds checking. *Ensure the number given is correct, else
+// object may end up in corrupted animation state.*
+// @function Moveable:SetState
+// @tparam int index the index of the desired state 
+	ScriptReserved_SetStateNumber, &Moveable::SetStateNumber,
+
 /// Retrieve the index of the current animation.
 // This corresponds to the number shown in the item's animation list in WadTool.
 // @function Moveable:GetAnim
 // @treturn int the index of the active animation
 	ScriptReserved_GetAnimNumber, &Moveable::GetAnimNumber,
 
-/// Set the opject's animation to the one specified by the given index.
+/// Set the object's animation to the one specified by the given index.
 // Performs no bounds checking. *Ensure the number given is correct, else
-// the program is likely to crash with an unhelpful error message.*
+// object may end up in corrupted animation state.*
 // @function Moveable:SetAnim
 // @tparam int index the index of the desired anim 
 	ScriptReserved_SetAnimNumber, &Moveable::SetAnimNumber,
@@ -303,6 +323,54 @@ void Moveable::Register(sol::table & parent)
 // sas:SetAIBits({1, 0, 0, 0, 0, 0})
 	ScriptReserved_SetAIBits, &Moveable::SetAIBits,
 
+/// Get state of specified mesh visibility of object
+// Returns true if specified mesh is visible on an object, and false
+// if it is not visible.
+// @function Moveable:MeshIsVisible
+// @tparam int index of a mesh
+// @treturn bool visibility status
+	ScriptReserved_MeshIsVisible, &Moveable::MeshIsVisible,
+			
+/// Makes specified mesh visible
+// Use this to show specified mesh of an object.
+// @function Moveable:ShowMesh
+// @tparam int index of a mesh
+	ScriptReserved_ShowMesh, &Moveable::ShowMesh,
+			
+/// Makes specified mesh invisible
+// Use this to hide specified mesh of an object.
+// @function Moveable:HideMesh
+// @tparam int index of a mesh
+	ScriptReserved_HideMesh, &Moveable::HideMesh,
+			
+/// Shatters specified mesh and makes it invisible
+// Note that you can re-enable mesh later by using ShowMesh().
+// @function Moveable:ShatterMesh
+// @tparam int index of a mesh
+	ScriptReserved_ShatterMesh, &Moveable::ShatterMesh,
+
+/// Get state of specified mesh swap of object
+// Returns true if specified mesh is swapped on an object, and false
+// if it is not swapped.
+// @function Moveable:MeshIsSwapped
+// @tparam int index of a mesh
+// @treturn bool mesh swap status
+	ScriptReserved_MeshIsSwapped, &Moveable::MeshIsSwapped,
+			
+/// Set state of specified mesh swap of object
+// Use this to swap specified mesh of an object.
+// @function Moveable:SwapMesh
+// @tparam int index of a mesh
+// @tparam int index of a slot to get meshswap from
+// @tparam int (optional) index of a mesh from meshswap slot to use
+	ScriptReserved_SwapMesh, &Moveable::SwapMesh,
+			
+/// Set state of specified mesh swap of object
+// Use this to bring back original unswapped mesh
+// @function Moveable:UnswapMesh
+// @tparam int index of a mesh to unswap
+	ScriptReserved_UnswapMesh, &Moveable::UnswapMesh,
+
 /// Get the hit status of the object
 // @function Moveable:GetHitStatus
 // @treturn bool true if the moveable was hit by something in the last gameplay frame, false otherwise 
@@ -333,6 +401,11 @@ void Moveable::Register(sol::table & parent)
 // @treturn Vec3 a copy of the moveable's position
 	ScriptReserved_GetPosition, & Moveable::GetPos,
 
+/// Get the object's joint position
+// @function Moveable:GetJointPosition
+// @treturn Vec3 a copy of the moveable's position
+	ScriptReserved_GetJointPosition, & Moveable::GetJointPos,
+
 /// Set the moveable's position
 // If you are moving a moveable whose behaviour involves knowledge of room geometry,
 // (e.g. a BADDY1, which uses it for pathfinding), then you *must* use this in conjunction
@@ -351,7 +424,7 @@ void Moveable::Register(sol::table & parent)
 // @tparam Rotation rotation The moveable's new rotation
 	ScriptReserved_SetRotation, &Moveable::SetRot,
 
-/// Set the moveable's name (its unique string identifier)
+/// Get the moveable's name (its unique string identifier)
 // e.g. "door\_back\_room" or "cracked\_greek\_statue"
 // This corresponds with the "Lua Name" field in an object's properties in Tomb Editor.
 // @function Moveable:GetName
@@ -379,16 +452,14 @@ void Moveable::Register(sol::table & parent)
 
 void Moveable::Init()
 {
-	bool cond = IsPointInRoom(m_item->Pose, m_item->RoomNumber);
+	bool cond = IsPointInRoom(m_item->Pose.Position, m_item->RoomNumber);
 	std::string err{ "Position of item \"{}\" does not match its room ID." };
 	if (!ScriptAssertF(cond, err, m_item->LuaName))
 	{
 		ScriptWarn("Resetting to the center of the room.");
-		PHD_3DPOS center = GetRoomCenter(m_item->RoomNumber);
+		auto center = GetRoomCenter(m_item->RoomNumber);
 		// reset position but not rotation
-		m_item->Pose.Position.x = center.Position.x;
-		m_item->Pose.Position.y = center.Position.y;
-		m_item->Pose.Position.z = center.Position.z;
+		m_item->Pose.Position = center;
 	}
 	InitialiseItem(m_num);
 	m_initialised = true;
@@ -403,7 +474,6 @@ void Moveable::SetObjectID(GAME_OBJECT_ID id)
 {
 	m_item->ObjectNumber = id;
 }
-
 
 void Moveable::SetOnHit(std::string const & cbName)
 {
@@ -497,6 +567,14 @@ void Moveable::SetPos(Vec3 const& pos)
 	pos.StoreInPHDPos(m_item->Pose);
 }
 
+Vec3 Moveable::GetJointPos(int jointIndex) const
+{
+	Vector3Int result = {};
+	GetJointAbsPosition(m_item, &result, jointIndex);
+
+	return Vec3(result.x, result.y, result.z);
+}
+
 // This does not guarantee that the returned value will be identical
 // to a value written in via SetRot - only that the angle measures
 // will be mathematically equal
@@ -586,6 +664,16 @@ void Moveable::SetAIBits(aiBitsType const & bits)
 	}
 }
 
+int Moveable::GetStateNumber() const
+{
+	return m_item->Animation.ActiveState;
+}
+
+void Moveable::SetStateNumber(int stateNumber)
+{
+	m_item->Animation.TargetState = stateNumber;
+}
+
 int Moveable::GetAnimNumber() const
 {
 	return m_item->Animation.AnimNumber - Objects[m_item->ObjectNumber].animIndex;
@@ -593,15 +681,13 @@ int Moveable::GetAnimNumber() const
 
 void Moveable::SetAnimNumber(int animNumber)
 {
-	//TODO fixme: we need bounds checking with an error message once it's in the level file format
-	m_item->Animation.AnimNumber = animNumber +  Objects[m_item->ObjectNumber].animIndex;
+	SetAnimation(m_item, animNumber);
 }
 
 int Moveable::GetFrameNumber() const
 {
 	return m_item->Animation.FrameNumber - g_Level.Anims[m_item->Animation.AnimNumber].frameBase;
 }
-
 
 void Moveable::SetFrameNumber(int frameNumber)
 {
@@ -661,6 +747,103 @@ short Moveable::GetStatus() const
 	return m_item->Status;
 }
 
+bool Moveable::MeshIsVisible(int meshId) const
+{
+	if (!MeshExists(meshId))
+		return false;
+
+	return m_item->TestBits(JointBitType::Mesh, meshId);
+}
+
+void Moveable::ShowMesh(int meshId)
+{
+	if (!MeshExists(meshId))
+		return;
+
+	m_item->SetBits(JointBitType::Mesh, meshId);
+}
+
+void Moveable::HideMesh(int meshId)
+{
+	if (!MeshExists(meshId))
+		return;
+
+	m_item->ClearBits(JointBitType::Mesh, meshId); 
+}
+
+void Moveable::ShatterMesh(int meshId)
+{
+	if (!MeshExists(meshId))
+		return;
+
+	ExplodeItemNode(m_item, meshId, 0, 128);
+}
+
+bool Moveable::MeshIsSwapped(int meshId) const
+{
+	if (!MeshExists(meshId))
+		return false;
+
+	return m_item->TestBits(JointBitType::MeshSwap, meshId);
+}
+
+void Moveable::SwapMesh(int meshId, int swapSlotId, sol::optional<int> swapMeshIndex)
+{
+	if (!MeshExists(meshId))
+		return;
+
+	if (!swapMeshIndex.has_value())
+		 swapMeshIndex = meshId;
+
+	// TODO: After beta, we should refactor whole meshswap workflow,
+	// because currently Lara and other objects use different convention -- Lwmte, 09.07.22
+
+	if (m_item->IsLara())
+	{
+		if (swapSlotId <= -1)
+			return;
+
+		auto* lara = GetLaraInfo(m_item);
+
+		if (swapSlotId >= ID_NUMBER_OBJECTS || !Objects[swapSlotId].loaded)
+		{
+			TENLog("Specified slot does not exist in level!", LogLevel::Error);
+			return;
+		}
+
+		if (swapMeshIndex.value() >= Objects[swapSlotId].nmeshes)
+		{
+			TENLog("Specified meshswap index does not exist in meshswap slot!", LogLevel::Error);
+			return;
+		}
+
+		lara->MeshPtrs[meshId] = Objects[swapSlotId].meshIndex + swapMeshIndex.value();
+	}
+	else
+		m_item->SetBits(JointBitType::MeshSwap, meshId);
+}
+
+void Moveable::UnswapMesh(int meshId)
+{
+	if (!MeshExists(meshId))
+		return;
+
+	if (m_item->IsLara())
+	{
+		auto* lara = GetLaraInfo(m_item);
+
+		if (meshId >= NUM_LARA_MESHES)
+		{
+			TENLog("Specified mesh index does not exist!", LogLevel::Error);
+			return;
+		}
+
+		lara->MeshPtrs[meshId] = Objects[ID_LARA_SKIN].meshIndex + meshId;
+	}
+	else
+		m_item->ClearBits(JointBitType::MeshSwap, meshId);
+}
+
 void Moveable::EnableItem()
 {
 	if (!m_item->Active)
@@ -699,30 +882,50 @@ void Moveable::EnableItem()
 
 void Moveable::DisableItem()
 {
-	if (m_item->Active)
+	if (!m_item->Active)
+		return;
+
+	m_item->Flags &= ~IFLAG_ACTIVATION_MASK;
+	if (Objects[m_item->ObjectNumber].intelligent)
 	{
-		m_item->Flags &= ~IFLAG_ACTIVATION_MASK;
-		if (Objects[m_item->ObjectNumber].intelligent)
-		{
-			if (m_item->Status == ITEM_ACTIVE)
-			{
-				m_item->TouchBits = NO_JOINT_BITS;
-				m_item->Status = ITEM_DEACTIVATED;
-				RemoveActiveItem(m_num);
-				DisableEntityAI(m_num);
-			}
-		}
-		else
+		if (m_item->Status == ITEM_ACTIVE)
 		{
 			m_item->TouchBits = NO_JOINT_BITS;
-			RemoveActiveItem(m_num);
 			m_item->Status = ITEM_DEACTIVATED;
+			RemoveActiveItem(m_num);
+			DisableEntityAI(m_num);
 		}
-
-		// Try add colliding in case the item went from invisible -> deactivated
-		if (m_num > NO_ITEM)
-			dynamic_cast<ObjectsHandler*>(g_GameScriptEntities)->TryAddColliding(m_num);
 	}
+	else
+	{
+		m_item->TouchBits = NO_JOINT_BITS;
+		RemoveActiveItem(m_num);
+		m_item->Status = ITEM_DEACTIVATED;
+	}
+
+	// Try add colliding in case the item went from invisible -> deactivated
+	if (m_num > NO_ITEM)
+		dynamic_cast<ObjectsHandler*>(g_GameScriptEntities)->TryAddColliding(m_num);
+}
+
+void Moveable::Explode()
+{
+	if (!m_item->Active && !m_item->IsLara())
+		return;
+
+	CreatureDie(m_num, true);
+}
+
+void Moveable::Shatter()
+{
+	if (!m_item->Active && !m_item->IsLara())
+		return;
+
+	m_item->Flags |= IFLAG_KILLED | IFLAG_INVISIBLE;
+	for (int i = 0; i < Objects[m_item->ObjectNumber].nmeshes; i++)
+		ExplodeItemNode(m_item, i, 0, 128);
+
+	CreatureDie(m_num, false);
 }
 
 void Moveable::MakeInvisible()
@@ -755,7 +958,8 @@ bool Moveable::GetValid() const
 
 void Moveable::Destroy()
 {
-	if (m_num > NO_ITEM) {
+	if (m_num > NO_ITEM) 
+	{
 		dynamic_cast<ObjectsHandler*>(g_GameScriptEntities)->RemoveMoveableFromMap(m_item, this);
 		s_callbackRemoveName(m_item->LuaName);
 		KillItem(m_num);
@@ -764,3 +968,13 @@ void Moveable::Destroy()
 	Invalidate();
 }
 
+bool Moveable::MeshExists(int index) const
+{
+	if (index < 0 || index >= Objects[m_item->ObjectNumber].nmeshes)
+	{
+		ScriptAssertF(false, "Mesh index {} does not exist in moveable '{}'", index, m_item->LuaName);
+		return false;
+	}
+
+	return true;
+}

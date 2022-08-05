@@ -72,6 +72,7 @@ extern float CinematicBarsSpeed;
 
 void LookAt(CAMERA_INFO* cam, float roll);
 void AlterFOV(float value);
+short GetCurrentFOV();
 void InitialiseCamera();
 void MoveCamera(GameVector* ideal, int speed);
 void ChaseCamera(ItemInfo* item);

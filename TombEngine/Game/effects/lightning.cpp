@@ -45,6 +45,7 @@ namespace TEN::Effects::Lightning
 
 			if (arc->life > 0)
 			{
+				// If/when this behaviour is changed, please modify AddLightningArc accordingly
 				arc->life -= 2;
 				if (arc->life)
 				{
@@ -68,7 +69,7 @@ namespace TEN::Effects::Lightning
 		}
 	}
 
-	void TriggerLightning(Vector3Int* src, Vector3Int* dest, char amplitude, byte r, byte g, byte b, byte life, char flags, char width, char segments)
+	void TriggerLightning(Vector3Int* src, Vector3Int* dest, unsigned char amplitude, unsigned char r, unsigned char g, unsigned char b, unsigned char life, char flags, char width, char segments)
 	{
 		LIGHTNING_INFO arc;
 
@@ -80,16 +81,16 @@ namespace TEN::Effects::Lightning
 		arc.pos3.y = (src->y + 3 * dest->y) >> 2;
 		arc.pos3.z = (src->z + 3 * dest->z) >> 2;
 		arc.pos4 = *dest;
+		arc.flags = flags;
 
 		for (int i = 0; i < 9; i++)
 		{
 			if (arc.flags & 2 || i < 6)
-				arc.interpolation[i] = ((byte)(GetRandomControl() % amplitude) - (byte)(amplitude >> 1));
+				arc.interpolation[i] = ((unsigned char)(GetRandomControl() % amplitude) - (unsigned char)(amplitude >> 1));
 			else
 				arc.interpolation[i] = 0;
 		}
 
-		arc.flags = flags;
 		arc.r = r;
 		arc.g = g;
 		arc.b = b;

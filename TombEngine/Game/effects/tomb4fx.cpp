@@ -6,6 +6,7 @@
 #include "Game/collision/floordata.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/bubble.h"
+#include "Game/effects/debris.h"
 #include "Game/effects/drip.h"
 #include "Game/effects/smoke.h"
 #include "Game/effects/weather.h"
@@ -995,6 +996,7 @@ void TriggerGunShell(short hand, short objNum, LaraWeaponType weaponType)
 	gshell->fallspeed = -48 - (GetRandomControl() & 7);
 	gshell->objectNumber = objNum;
 	gshell->counter = (GetRandomControl() & 0x1F) + 60;
+
 	if (hand)
 	{
 		if (weaponType == LaraWeaponType::Shotgun)
@@ -1442,7 +1444,12 @@ void ExplodeVehicle(ItemInfo* laraItem, ItemInfo* vehicle)
 void ExplodingDeath(short itemNumber, short flags)
 {
 	ItemInfo* item = &g_Level.Items[itemNumber];
-	ObjectInfo* obj = &Objects[item->ObjectNumber];
+	
+	ObjectInfo* obj;
+	if (item->IsLara() && Objects[ID_LARA_SKIN].loaded)
+		obj = &Objects[ID_LARA_SKIN];
+	else
+		obj = &Objects[item->ObjectNumber];
 
 	ANIM_FRAME* frame = GetBestFrame(item);
 	
@@ -1501,6 +1508,10 @@ void ExplodingDeath(short itemNumber, short flags)
 				fx->flag2 = flags;
 				fx->frameNumber = obj->meshIndex + i;
 			}
+		}
+		else
+		{
+			ExplodeItemNode(item, i, 0, 128);
 		}
 	}
 }

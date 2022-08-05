@@ -1,0 +1,248 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<head>
+    <title>TombEngine Lua API</title>
+    <link rel="stylesheet" href="ldoc.css" type="text/css" />
+</head>
+<body>
+
+<div id="container">
+
+<div id="product">
+	<div id="product_logo"></div>
+	<div id="product_name"><big><b></b></big></div>
+	<div id="product_description"></div>
+</div> <!-- id="product" -->
+
+
+<div id="main">
+
+
+<!-- Menu -->
+
+<div id="navigation">
+<br/>
+<h1>TombEngine</h1>
+
+
+
+
+<h2>1 Modules</h2>
+<ul class="nowrap">
+  <li><a href="1 modules/Effects.html">Effects</a></li>
+  <li><a href="1 modules/Flow.html">Flow</a></li>
+  <li><a href="1 modules/Inventory.html">Inventory</a></li>
+  <li><a href="1 modules/Logic.html">Logic</a></li>
+  <li><a href="1 modules/Misc.html">Misc</a></li>
+  <li><a href="1 modules/Objects.html">Objects</a></li>
+  <li><a href="1 modules/Strings.html">Strings</a></li>
+</ul>
+<h2>2 Classes</h2>
+<ul class="nowrap">
+  <li><a href="2 classes/Flow.Animations.html">Flow.Animations</a></li>
+  <li><a href="2 classes/Flow.Fog.html">Flow.Fog</a></li>
+  <li><a href="2 classes/Flow.InventoryItem.html">Flow.InventoryItem</a></li>
+  <li><a href="2 classes/Flow.Level.html">Flow.Level</a></li>
+  <li><a href="2 classes/Flow.Mirror.html">Flow.Mirror</a></li>
+  <li><a href="2 classes/Flow.Settings.html">Flow.Settings</a></li>
+  <li><a href="2 classes/Flow.SkyLayer.html">Flow.SkyLayer</a></li>
+  <li><a href="2 classes/Objects.AIObject.html">Objects.AIObject</a></li>
+  <li><a href="2 classes/Objects.Camera.html">Objects.Camera</a></li>
+  <li><a href="2 classes/Objects.Moveable.html">Objects.Moveable</a></li>
+  <li><a href="2 classes/Objects.Sink.html">Objects.Sink</a></li>
+  <li><a href="2 classes/Objects.SoundSource.html">Objects.SoundSource</a></li>
+  <li><a href="2 classes/Objects.Static.html">Objects.Static</a></li>
+  <li><a href="2 classes/Strings.DisplayString.html">Strings.DisplayString</a></li>
+</ul>
+<h2>3 Primitive Classes</h2>
+<ul class="nowrap">
+  <li><a href="3 primitive classes/Color.html">Color</a></li>
+  <li><a href="3 primitive classes/Rotation.html">Rotation</a></li>
+  <li><a href="3 primitive classes/Vec3.html">Vec3</a></li>
+</ul>
+<h2>4 Enums</h2>
+<ul class="nowrap">
+  <li><a href="4 enums/Flow.InvID.html">Flow.InvID</a></li>
+  <li><a href="4 enums/Effects.BlendID.html">Effects.BlendID</a></li>
+  <li><a href="4 enums/Objects.ObjID.html">Objects.ObjID</a></li>
+</ul>
+<h2>5 Lua utility modules</h2>
+<ul class="nowrap">
+  <li><a href="5 lua utility modules/Timer.html">Timer</a></li>
+  <li><a href="5 lua utility modules/Util.html">Util</a></li>
+</ul>
+
+</div>
+
+<div id="content">
+
+
+  <h2>TombEngine scripting interface</h2>
+  <p>Welcome to the TombEngine scripting API. This is a work in progress and some information might be wrong or outdated. Please also note that this is primarily a reference document, not a tutorial, so expect descriptions to be fairly sparse. At the time of writing, there is a tutorial describing the basics of Lua, as well as a number of example scripts, on the wiki at https://github.com/MontyTRC89/TombEngine/wiki.</p>
+<h4>Module Hierarchy (boring but important)</h4>
+<p>Other than the "special tables" (GameVars, LevelVars and LevelFuncs), every module described herein is held in a master table called TEN.
+For example, to call GetMoveableByName, you would have to do:</p>
+<pre><code>local door = TEN.Objects.GetMoveableByName("door_type4_14")
+</code></pre>
+<p>To save on typing, you can put the following at the start of a Lua file:</p>
+<pre><code>local Util = require("Util")
+Util.ShortenTENCalls()
+</code></pre>
+<p>This will put the modules and classes in the global table. In other words, it means you can do the following:</p>
+<pre><code>local door = GetMoveableByName("door_type4_14")
+</code></pre>
+
+<h4>Always check logs/TENLog.txt</h4>
+<p>If you are scripting levels, TombEngine will often crash, even if <code>errorMode</code> (see Flow.Settings) is set to <code>ErrorMode.WARN</code> or <code>ErrorMode.SILENT</code>.</p>
+
+<p>This might get annoying, but it's on purpose. If your Lua script contains a syntax error (e.g. you're missing <code>end</code> at the end of a function), the Lua interpreter will not be able to continue running the script. If it tried to keep running, you'd probably see some pretty strange behaviour, and would possibly get a crash regardless.</p>
+
+<p>If this happens, check <strong>logs/TENLog.txt</strong> and look for an error message with the word "unrecoverable".</p>
+
+<p>Enjoy.</p>
+
+<p>- <em>squidshire</em></p>
+
+<h2>1 Modules</h2>
+<table class="module_list">
+	<tr>
+		<td class="name"  ><a href="1 modules/Effects.html">Effects</a></td>
+		<td class="summary">Functions to generate effects.</td>
+	</tr>
+	<tr>
+		<td class="name"  ><a href="1 modules/Flow.html">Flow</a></td>
+		<td class="summary">Functions for use in Flow.lua, settings.lua and strings.lua</td>
+	</tr>
+	<tr>
+		<td class="name"  ><a href="1 modules/Inventory.html">Inventory</a></td>
+		<td class="summary">Inventory manipulation</td>
+	</tr>
+	<tr>
+		<td class="name"  ><a href="1 modules/Logic.html">Logic</a></td>
+		<td class="summary">Saving data, triggering functions, and callbacks for level-specific scripts.</td>
+	</tr>
+	<tr>
+		<td class="name"  ><a href="1 modules/Misc.html">Misc</a></td>
+		<td class="summary">Functions that don't fit in the other modules.</td>
+	</tr>
+	<tr>
+		<td class="name"  ><a href="1 modules/Objects.html">Objects</a></td>
+		<td class="summary">Moveables, statics, cameras, and so on.</td>
+	</tr>
+	<tr>
+		<td class="name"  ><a href="1 modules/Strings.html">Strings</a></td>
+		<td class="summary">On-screen strings.</td>
+	</tr>
+</table>
+<h2>2 Classes</h2>
+<table class="module_list">
+	<tr>
+		<td class="name"  ><a href="2 classes/Flow.Animations.html">Flow.Animations</a></td>
+		<td class="summary">New custom animations which Lara can perform.</td>
+	</tr>
+	<tr>
+		<td class="name"  ><a href="2 classes/Flow.Fog.html">Flow.Fog</a></td>
+		<td class="summary">Fog</td>
+	</tr>
+	<tr>
+		<td class="name"  ><a href="2 classes/Flow.InventoryItem.html">Flow.InventoryItem</a></td>
+		<td class="summary">Represents the properties of an object as it appears in the inventory.</td>
+	</tr>
+	<tr>
+		<td class="name"  ><a href="2 classes/Flow.Level.html">Flow.Level</a></td>
+		<td class="summary">Stores level metadata.</td>
+	</tr>
+	<tr>
+		<td class="name"  ><a href="2 classes/Flow.Mirror.html">Flow.Mirror</a></td>
+		<td class="summary">A mirror effect.</td>
+	</tr>
+	<tr>
+		<td class="name"  ><a href="2 classes/Flow.Settings.html">Flow.Settings</a></td>
+		<td class="summary">Settings that will be run on game startup.</td>
+	</tr>
+	<tr>
+		<td class="name"  ><a href="2 classes/Flow.SkyLayer.html">Flow.SkyLayer</a></td>
+		<td class="summary">Describes a layer of moving clouds.</td>
+	</tr>
+	<tr>
+		<td class="name"  ><a href="2 classes/Objects.AIObject.html">Objects.AIObject</a></td>
+		<td class="summary">AI object</td>
+	</tr>
+	<tr>
+		<td class="name"  ><a href="2 classes/Objects.Camera.html">Objects.Camera</a></td>
+		<td class="summary">Basic cameras that can point at Lara or at a CAMERA_TARGET.</td>
+	</tr>
+	<tr>
+		<td class="name"  ><a href="2 classes/Objects.Moveable.html">Objects.Moveable</a></td>
+		<td class="summary">Represents any object inside the game world.</td>
+	</tr>
+	<tr>
+		<td class="name"  ><a href="2 classes/Objects.Sink.html">Objects.Sink</a></td>
+		<td class="summary">Sink</td>
+	</tr>
+	<tr>
+		<td class="name"  ><a href="2 classes/Objects.SoundSource.html">Objects.SoundSource</a></td>
+		<td class="summary">Sound source</td>
+	</tr>
+	<tr>
+		<td class="name"  ><a href="2 classes/Objects.Static.html">Objects.Static</a></td>
+		<td class="summary">Statics</td>
+	</tr>
+	<tr>
+		<td class="name"  ><a href="2 classes/Strings.DisplayString.html">Strings.DisplayString</a></td>
+		<td class="summary">A string appearing on the screen.</td>
+	</tr>
+</table>
+<h2>3 Primitive Classes</h2>
+<table class="module_list">
+	<tr>
+		<td class="name"  ><a href="3 primitive classes/Color.html">Color</a></td>
+		<td class="summary">An RGBA or RGB color.</td>
+	</tr>
+	<tr>
+		<td class="name"  ><a href="3 primitive classes/Rotation.html">Rotation</a></td>
+		<td class="summary">Represents a rotation.</td>
+	</tr>
+	<tr>
+		<td class="name"  ><a href="3 primitive classes/Vec3.html">Vec3</a></td>
+		<td class="summary">Represents a 3-dimensional vector.</td>
+	</tr>
+</table>
+<h2>4 Enums</h2>
+<table class="module_list">
+	<tr>
+		<td class="name"  ><a href="4 enums/Flow.InvID.html">Flow.InvID</a></td>
+		<td class="summary">Constants for items that can be used with GetItem and SetItem.</td>
+	</tr>
+	<tr>
+		<td class="name"  ><a href="4 enums/Effects.BlendID.html">Effects.BlendID</a></td>
+		<td class="summary">Constants for blend mode IDs.</td>
+	</tr>
+	<tr>
+		<td class="name"  ><a href="4 enums/Objects.ObjID.html">Objects.ObjID</a></td>
+		<td class="summary">Constants for object IDs.</td>
+	</tr>
+</table>
+<h2>5 Lua utility modules</h2>
+<table class="module_list">
+	<tr>
+		<td class="name"  ><a href="5 lua utility modules/Timer.html">Timer</a></td>
+		<td class="summary">Basic timer - after a specified number of seconds, the specified thing happens.</td>
+	</tr>
+	<tr>
+		<td class="name"  ><a href="5 lua utility modules/Util.html">Util</a></td>
+		<td class="summary">Misc Util functions</td>
+	</tr>
+</table>
+
+</div> <!-- id="content" -->
+</div> <!-- id="main" -->
+<div id="about">
+<i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
+<i style="float:right;">Last updated 2022-07-31 20:38:24 </i>
+</div> <!-- id="about" -->
+</div> <!-- id="container" -->
+</body>
+</html>

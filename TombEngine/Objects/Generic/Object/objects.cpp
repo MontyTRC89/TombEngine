@@ -64,37 +64,6 @@ void ControlTriggerTriggerer(short itemNumber)
 	}
 }
 
-void AnimateWaterfalls()
-{
-	return;
-
-	lastWaterfallY = (lastWaterfallY - 7) & 0x3F;
-	float y = lastWaterfallY * 0.00390625f;
-
-	for (int i = 0; i < 6; i++)
-	{
-		if (Objects[ID_WATERFALL1 + i].loaded)
-		{
-			OBJECT_TEXTURE* texture = WaterfallTextures[i];
-
-			texture->vertices[0].y = y + WaterfallY[i];
-			texture->vertices[1].y = y + WaterfallY[i];
-			texture->vertices[2].y = y + WaterfallY[i] + 0.24609375f;
-			texture->vertices[3].y = y + WaterfallY[i] + 0.24609375f;
-
-			if (i < 5)
-			{
-				texture++;
-
-				texture->vertices[0].y = y + WaterfallY[i];
-				texture->vertices[1].y = y + WaterfallY[i];
-				texture->vertices[2].y = y + WaterfallY[i] + 0.24609375f;
-				texture->vertices[3].y = y + WaterfallY[i] + 0.24609375f;
-			}
-		}
-	}
-}
-
 void ControlWaterfall(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];

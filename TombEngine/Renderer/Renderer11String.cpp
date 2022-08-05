@@ -4,8 +4,11 @@
 
 namespace TEN::Renderer 
 {
-	void Renderer11::DrawString(int x, int y, const char* string, D3DCOLOR color, int flags)
+	void Renderer11::AddString(int x, int y, const char* string, D3DCOLOR color, int flags)
 	{
+		if (m_Locked)
+			return;
+
 		if (string == NULL)
 			return;
 

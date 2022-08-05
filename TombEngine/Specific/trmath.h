@@ -1,6 +1,8 @@
 #pragma once
 #include "Specific/phd_global.h"
 
+constexpr auto FPS = 30;
+
 constexpr auto PI = 3.14159265358979323846f;
 constexpr auto RADIAN = 0.01745329252f;
 constexpr auto ONE_DEGREE = 182;
@@ -52,4 +54,7 @@ Vector3Int* FP_Normalise(Vector3Int* v);
 
 const float Lerp(float v0, float v1, float t);
 const float Smoothstep(float edge0, float edge1, float x);
-const float Luma(Vector3 color);
+const float Smoothstep(float x);
+const float Luma(Vector3& color);
+const Vector3 Screen(Vector3& ambient, Vector3& tint);
+const Vector4 Screen(Vector4& ambient, Vector4& tint);

@@ -6,6 +6,7 @@
 #include "Game/animation.h"
 #include "Sound/sound.h"
 #include "Game/collision/collide_room.h"
+#include "Game/effects/debris.h"
 
 void ClockworkBeetleControl(short itemNumber)
 {
