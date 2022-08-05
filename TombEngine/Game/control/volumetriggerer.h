@@ -9,7 +9,7 @@ namespace TEN::Control::Volumes
 	using VolumeTriggerer = std::variant<
 		short,
 		MESH_INFO*,
-		CAMERA_INFO *>;
+		CAMERA_INFO*>;
 
 	enum class VolumeEventMode
 	{

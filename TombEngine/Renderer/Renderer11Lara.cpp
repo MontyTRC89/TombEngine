@@ -247,7 +247,7 @@ void Renderer11::UpdateLaraAnimations(bool force)
 void TEN::Renderer::Renderer11::DrawLara(RenderView& view, bool transparent)
 {
 	// Don't draw Lara if binoculars or sniper
-	if (BinocularRange || SpotcamOverlay || SpotcamDontDrawLara || CurrentLevel == 0)
+	if (BinocularRange || SpotcamDontDrawLara || CurrentLevel == 0)
 		return;
 
 	RendererItem* item = &m_items[Lara.ItemNumber];
