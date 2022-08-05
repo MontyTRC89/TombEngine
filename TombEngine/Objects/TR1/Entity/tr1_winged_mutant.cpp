@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "tr1_winged_mutant.h"
+#include "Objects/TR1/Entity/tr1_winged_mutant.h"
 
 #include "Game/control/box.h"
 #include "Game/effects/effects.h"
@@ -70,7 +70,7 @@ namespace TEN::Entities::TR1
 	static void WingedInitOCB(ItemInfo* item, CreatureInfo* creature)
 	{
 		if (item->TriggerFlags != 0)
-			printf("TriggerFlags: %d\n", item->TriggerFlags);
+			TENLog(std::string("TriggerFlags: ") + std::to_string(item->TriggerFlags));
 		if (item->TriggerFlags & WING_START_FLYING)
 		{
 			SwitchPathfinding(creature, WING_FLYING);
@@ -124,7 +124,6 @@ namespace TEN::Entities::TR1
 			AI_INFO AI;
 			SwitchPathfinding(creature, item->ItemFlags[0] ? WING_FLYING : WING_GROUND);
 			CreatureAIInfo(item, &AI);
-
 
 			if (AI.ahead)
 				angle = AI.angle;
