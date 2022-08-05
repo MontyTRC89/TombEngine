@@ -9,8 +9,10 @@
 #include "Game/misc.h"
 #include "Game/people.h"
 #include "Specific/level.h"
+#include "Specific/prng.h"
 #include "Specific/setup.h"
 
+using namespace TEN::Math::Random;
 using std::vector;
 
 namespace TEN::Entities::TR1
@@ -20,7 +22,7 @@ namespace TEN::Entities::TR1
 	constexpr auto APE_ATTACK_RANGE = SQUARE(SECTOR(0.42f));
 	constexpr auto APE_PANIC_RANGE	= SQUARE(SECTOR(2));
 
-	constexpr auto APE_JUMP_CHANCE		   = 0xa0;
+	constexpr auto APE_JUMP_CHANCE		   = 0xA0;
 	constexpr auto APE_POUND_CHEST_CHANCE  = APE_JUMP_CHANCE + 0xA0;
 	constexpr auto APE_POUND_GROUND_CHANCE = APE_POUND_CHEST_CHANCE + 0xA0;
 	constexpr auto APE_RUN_LEFT_CHANCE	   = APE_POUND_GROUND_CHANCE + 0xA0;
@@ -72,6 +74,8 @@ namespace TEN::Entities::TR1
 		APE_ANIM_IDLE_TO_RUN_RIGHT = 18,
 		APE_ANIM_VAULT = 19
 	};
+
+	const std::array ApeDeathAnims = { APE_ANIM_DEATH_1, APE_ANIM_DEATH_2 };
 
 	enum ApeFlags
 	{
@@ -160,7 +164,7 @@ namespace TEN::Entities::TR1
 		if (item->HitPoints <= 0)
 		{
 			if (item->Animation.ActiveState != APE_STATE_DEATH)
-				SetAnimation(item, APE_ANIM_DEATH_1 + (short)(GetRandomControl() / 0x4000));
+				SetAnimation(item, ApeDeathAnims[GenerateInt(0, ApeDeathAnims.size() - 1)]);
 		}
 		else
 		{

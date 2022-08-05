@@ -90,9 +90,7 @@ namespace TEN::Entities::TR4
 					}
 					else
 					{
-						item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + BBEETLE_ANIM_DEATH_START;
-						item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-						item->Animation.ActiveState = BBEETLE_STATE_DEATH_START;
+						SetAnimation(item, BBEETLE_ANIM_DEATH_START);
 						item->Animation.IsAirborne = true;
 						item->Animation.Velocity = 0;
 						item->Pose.Orientation.x = 0;
