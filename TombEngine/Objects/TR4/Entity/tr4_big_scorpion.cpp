@@ -63,18 +63,9 @@ namespace TEN::Entities::TR4
 		InitialiseCreature(itemNumber);
 
 		if (item->TriggerFlags == 1)
-		{
-			item->Animation.TargetState = BSCORPION_STATE_KILL_TROOP;
-			item->Animation.ActiveState = BSCORPION_STATE_KILL_TROOP;
-			item->Animation.AnimNumber = Objects[ID_BIG_SCORPION].animIndex + BSCORPION_ANIM_KILL_TROOP;
-		}
+			SetAnimation(item, BSCORPION_ANIM_KILL_TROOP);
 		else
-		{
-			item->Animation.TargetState = BSCORPION_STATE_IDLE;
-			item->Animation.ActiveState = BSCORPION_STATE_IDLE;
-			item->Animation.AnimNumber = Objects[ID_BIG_SCORPION].animIndex + BSCORPION_ANIM_IDLE;
-		}
-		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			SetAnimation(item, BSCORPION_ANIM_IDLE);
 	}
 
 	void ScorpionControl(short itemNumber)
@@ -95,9 +86,7 @@ namespace TEN::Entities::TR4
 				if (item->TriggerFlags > 0 && item->TriggerFlags < 7)
 				{
 					CutSeqNum = 4;
-					item->Animation.AnimNumber = Objects[item->Animation.AnimNumber].animIndex + BSCORPION_ANIM_DEATH;
-					item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-					item->Animation.ActiveState = BSCORPION_STATE_DEATH;
+					SetAnimation(item, BSCORPION_ANIM_DEATH);
 					item->Status = ITEM_INVISIBLE;
 					creature->MaxTurn = 0;
 
@@ -120,9 +109,7 @@ namespace TEN::Entities::TR4
 				}
 				else if (item->Animation.ActiveState != BSCORPION_STATE_DEATH && item->Animation.ActiveState != BSCORPION_STATE_KILL)
 				{
-					item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + BSCORPION_ANIM_DEATH;
-					item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-					item->Animation.ActiveState = BSCORPION_STATE_DEATH;
+					SetAnimation(item, BSCORPION_ANIM_DEATH);
 				}
 			}
 			else if (CutSeqNum == 4)
@@ -290,7 +277,7 @@ namespace TEN::Entities::TR4
 		if ((creature->Enemy != NULL && creature->Enemy->HitPoints <= 0) ||
 			item->TriggerFlags > 6)
 		{
-			// TODO: Allow scorpion to do the the kill animation. -- TokyoSU, 3/8/2022
+			// TODO: Allow scorpion to do the kill animation. -- TokyoSU, 3/8/2022
 			//CreatureKill(item, BSCORPION_ANIM_KILL, BSCORPION_STATE_KILL, 0);
 			item->Animation.TargetState = BSCORPION_STATE_IDLE;
 			creature->MaxTurn = 0;

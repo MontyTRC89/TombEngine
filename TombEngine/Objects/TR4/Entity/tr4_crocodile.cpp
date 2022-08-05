@@ -80,19 +80,9 @@ namespace TEN::Entities::TR4
 		InitialiseCreature(itemNumber);
 
 		if (TestEnvironment(ENV_FLAG_WATER, item))
-		{
-			item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + CROC_ANIM_SWIM_FORWARD;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-			item->Animation.ActiveState = CROC_STATE_SWIM_FORWARD;
-			item->Animation.TargetState = CROC_STATE_SWIM_FORWARD;
-		}
+			SetAnimation(item, CROC_ANIM_SWIM_FORWARD);
 		else
-		{
-			item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-			item->Animation.ActiveState = CROC_STATE_IDLE;
-			item->Animation.TargetState = CROC_STATE_IDLE;
-		}
+			SetAnimation(item, CROC_ANIM_IDLE);
 	}
 
 	static bool IsCrocodileInWater(ItemInfo* item)
@@ -139,19 +129,11 @@ namespace TEN::Entities::TR4
 			{
 				if (TestEnvironment(ENV_FLAG_WATER, item))
 				{
-					item->Animation.AnimNumber = object->animIndex + CROC_ANIM_WATER_DEATH;
-					item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-					item->Animation.ActiveState = CROC_STATE_WATER_DEATH;
-					item->Animation.TargetState = CROC_STATE_WATER_DEATH;
+					SetAnimation(item, CROC_ANIM_WATER_DEATH);
 					item->HitPoints = NOT_TARGETABLE;
 				}
 				else
-				{
-					item->Animation.AnimNumber = object->animIndex + CROC_ANIM_LAND_DEATH;
-					item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-					item->Animation.ActiveState = CROC_STATE_DEATH;
-					item->Animation.TargetState = CROC_STATE_DEATH;
-				}
+					SetAnimation(item, CROC_ANIM_LAND_DEATH);
 			}
 
 			if (TestEnvironment(ENV_FLAG_WATER, item))
@@ -280,10 +262,7 @@ namespace TEN::Entities::TR4
 				// Water to land transition.
 				if (!IsCrocodileInWater(item))
 				{
-					item->Animation.AnimNumber = object->animIndex + CROC_ANIM_WATER_TO_LAND;
-					item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-					item->Animation.ActiveState = CROC_STATE_WALK_FORWARD;
-					item->Animation.TargetState = CROC_STATE_WALK_FORWARD;
+					SetAnimation(item, CROC_ANIM_WATER_TO_LAND);
 					break;
 				}
 
