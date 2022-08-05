@@ -21,6 +21,7 @@ namespace TEN::Entities::TR1
 	constexpr auto NATLA_LAND_CHANCE = 0x100;
 	constexpr auto NATLA_DEATH_TIME = (FPS * 16);	// 16 seconds.
 	constexpr auto NATLA_SHOT_DAMAGE = 100;
+	constexpr auto NATLA_GUN_VELOCITY = 400;
 
 	#define NATLA_TURN_NEAR_DEATH_SPEED ANGLE(6.0f)
 	#define NATLA_TURN_SPEED ANGLE(5.0f)

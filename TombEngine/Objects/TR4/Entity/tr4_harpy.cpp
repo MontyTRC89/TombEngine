@@ -24,13 +24,13 @@ namespace TEN::Entities::TR4
 	constexpr auto HARPY_SWOOP_ATTACK_DAMAGE	= 10;
 	constexpr auto HARPY_STINGER_POISON_POTENCY = 8;
 
-	const vector<int> HarpySwoopAttackJoints   = { 2, 4 };
-	const vector<int> HarpyStingerAttackJoints = { 20, 21 };
 	const auto HarpyBite1	= BiteInfo(Vector3::Zero, 4);
 	const auto HarpyBite2	= BiteInfo(Vector3::Zero, 2);
-	const auto HarpyBite3	= BiteInfo(Vector3::Zero, 21);
-	const auto HarpyAttack1 = BiteInfo(0, 128, 0, 2);
-	const auto HarpyAttack2 = BiteInfo(0, 128, 0, 4);
+	const auto HarpyBite3	= BiteInfo(Vector3::Zero, 15);
+	const auto HarpyAttack1 = BiteInfo(Vector3(0.0f, 128.0f, 0.0f), 2);
+	const auto HarpyAttack2 = BiteInfo(Vector3(0.0f, 128.0f, 0.0f), 4);
+	const vector<int> HarpySwoopAttackJoints = { HarpyBite2.meshNum, HarpyBite1.meshNum, HarpyBite3.meshNum };
+	const vector<int> HarpyStingerAttackJoints = { HarpyAttack1.meshNum, HarpyAttack2.meshNum };
 
 	enum HarpyState
 	{
@@ -73,7 +73,7 @@ namespace TEN::Entities::TR4
 		HARPY_ANIM_GLIDE = 18
 	};
 
-	static void TriggerHarpyMissile(PHD_3DPOS* pose, short roomNumber, int count)
+	static void TriggerHarpyMissile(PHD_3DPOS* pose, short roomNumber, short mesh)
 	{
 		short fxNumber = CreateNewEffect(roomNumber);
 		if (fxNumber != -1)
@@ -87,20 +87,19 @@ namespace TEN::Entities::TR4
 			fx->pos.Orientation.y = pose->Orientation.y;
 			fx->pos.Orientation.z = 0;
 			fx->roomNumber = roomNumber;
-			fx->counter = 2 * GetRandomControl() + -32768;
+			fx->counter = short(2 * GetRandomControl() + 0x8000);
 			fx->objectNumber = ID_ENERGY_BUBBLES;
 			fx->speed = (GetRandomControl() & 0x1F) + 96;
-			fx->flag1 = count;
-			fx->frameNumber = Objects[fx->objectNumber].meshIndex + 2 * count;
+			fx->flag1 = mesh;
+			fx->frameNumber = Objects[fx->objectNumber].meshIndex + mesh * 2;
 		}
 	}
 
-	static void TriggerHarpyFlame(short itemNumber, byte number, int size)
+	static void TriggerHarpyFlame(short itemNumber, ItemInfo* target, byte nodeNumber, short size)
 	{
 		auto* item = &g_Level.Items[itemNumber];
-
-		int dx = LaraItem->Pose.Position.x - item->Pose.Position.x;
-		int dz = LaraItem->Pose.Position.z - item->Pose.Position.z;
+		int dx = target->Pose.Position.x - item->Pose.Position.x;
+		int dz = target->Pose.Position.z - item->Pose.Position.z;
 
 		if (dx >= -SECTOR(16) && dx <= SECTOR(16) &&
 			dz >= -SECTOR(16) && dz <= SECTOR(16))
@@ -120,11 +119,11 @@ namespace TEN::Entities::TR4
 			spark->x = (GetRandomControl() & 0xF) - 8;
 			spark->y = 0;
 			spark->z = (GetRandomControl() & 0xF) - 8;
-			spark->xVel = (byte)GetRandomControl() - 128;
+			spark->xVel = (GetRandomControl() & 0xFF) - 128;
 			spark->yVel = 0;
-			spark->zVel = (byte)GetRandomControl() - 128;
+			spark->zVel = (GetRandomControl() & 0xFF) - 128;
 			spark->friction = 5;
-			spark->flags = 4762;
+			spark->flags = SP_SCALE | SP_ROTATE | SP_ITEM | SP_EXPDEF | SP_NODEATTACH;
 			spark->rotAng = GetRandomControl() & 0xFFF;
 
 			if (GetRandomControl() & 1)
@@ -134,18 +133,18 @@ namespace TEN::Entities::TR4
 
 			spark->maxYvel = 0;
 			spark->gravity = (GetRandomControl() & 0x1F) + 16;
-			spark->fxObj = itemNumber;
-			spark->nodeNumber = number;
+			spark->fxObj = byte(itemNumber);
+			spark->nodeNumber = nodeNumber;
 			spark->scalar = 2;
 			spark->sSize = spark->size = GetRandomControl() & 0xF + size;
 			spark->dSize = spark->size / 8;
 		}
 	}
 
-	static void TriggerHarpySparks(int x, int y, int z, int xv, int yv, int zv)
+	static void TriggerHarpySparks(ItemInfo* target, int x, int y, int z, short xv, short yv, short zv)
 	{
-		int dx = LaraItem->Pose.Position.x - x;
-		int dz = LaraItem->Pose.Position.z - z;
+		int dx = target->Pose.Position.x - x;
+		int dz = target->Pose.Position.z - z;
 
 		if (dx >= -SECTOR(16) && dx <= SECTOR(16) &&
 			dz >= -SECTOR(16) && dz <= SECTOR(16))
@@ -161,10 +160,10 @@ namespace TEN::Entities::TR4
 			spark->life = 16;
 			spark->sLife = 16;
 			spark->colFadeSpeed = 4;
-			spark->y = y;
 			spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
 			spark->fadeToBlack = 4;
 			spark->x = x;
+			spark->y = y;
 			spark->z = z;
 			spark->xVel = xv;
 			spark->yVel = yv;
@@ -179,15 +178,14 @@ namespace TEN::Entities::TR4
 		}
 	}
 
-	static void DoHarpyEffects(ItemInfo* item, short itemNumber)
+	static void DoHarpyEffects(ItemInfo* item, CreatureInfo* creature, short itemNumber)
 	{
 		item->ItemFlags[0]++;
 
-		auto pos1 = Vector3Int(HarpyAttack1.x, HarpyAttack1.y, HarpyAttack1.z);
-		GetJointAbsPosition(item, &pos1, HarpyAttack1.meshNum);
-
-		auto pos2 = Vector3Int(HarpyAttack2.x, HarpyAttack2.y, HarpyAttack2.z);
-		GetJointAbsPosition(item, &pos2, HarpyAttack2.meshNum);
+		auto rh = Vector3Int(HarpyAttack1.x, HarpyAttack1.y, HarpyAttack1.z);
+		GetJointAbsPosition(item, &rh, HarpyAttack1.meshNum);
+		auto lr = Vector3Int(HarpyAttack2.x, HarpyAttack2.y, HarpyAttack2.z);
+		GetJointAbsPosition(item, &lr, HarpyAttack2.meshNum);
 
 		if (item->ItemFlags[0] >= 24 &&
 			item->ItemFlags[0] <= 47 &&
@@ -195,17 +193,17 @@ namespace TEN::Entities::TR4
 		{
 			for (int i = 0; i < 2; i++)
 			{
-				int dx = (GetRandomControl() & 0x7FF) + pos1.x - 1024;
-				int dy = (GetRandomControl() & 0x7FF) + pos1.y - 1024;
-				int dz = (GetRandomControl() & 0x7FF) + pos1.z - 1024;
+				int dx = (GetRandomControl() & 0x7FF) + rh.x - 1024;
+				int dy = (GetRandomControl() & 0x7FF) + rh.y - 1024;
+				int dz = (GetRandomControl() & 0x7FF) + rh.z - 1024;
 
-				TriggerHarpySparks(dx, dy, dz, 8 * (pos1.x - dx), 8 * (pos1.y - dy), 8 * (pos1.z - dz));
+				TriggerHarpySparks(creature->Enemy, dx, dy, dz, 8 * (rh.x - dx), 8 * (rh.y - dy), 8 * (rh.z - dz));
 
-				dx = (GetRandomControl() & 0x7FF) + pos2.x - 1024;
-				dy = (GetRandomControl() & 0x7FF) + pos2.y - 1024;
-				dz = (GetRandomControl() & 0x7FF) + pos2.z - 1024;
+				dx = (GetRandomControl() & 0x7FF) + lr.x - 1024;
+				dy = (GetRandomControl() & 0x7FF) + lr.y - 1024;
+				dz = (GetRandomControl() & 0x7FF) + lr.z - 1024;
 
-				TriggerHarpySparks(dx, dy, dz, 8 * (pos2.x - dx), 8 * (pos2.y - dy), 8 * (pos2.z - dz));
+				TriggerHarpySparks(creature->Enemy, dx, dy, dz, 8 * (lr.x - dx), 8 * (lr.y - dy), 8 * (lr.z - dz));
 			}
 		}
 
@@ -215,9 +213,9 @@ namespace TEN::Entities::TR4
 		if (something < 80)
 		{
 			if ((Wibble & 0xF) == 8)
-				TriggerHarpyFlame(itemNumber, 4, something);
+				TriggerHarpyFlame(itemNumber, creature->Enemy, 4, something);
 			else if (!(Wibble & 0xF))
-				TriggerHarpyFlame(itemNumber, 5, something);
+				TriggerHarpyFlame(itemNumber, creature->Enemy, 5, something);
 		}
 
 		if (item->ItemFlags[0] >= 61)
@@ -227,8 +225,8 @@ namespace TEN::Entities::TR4
 				auto pos3 = Vector3Int(HarpyAttack1.x, HarpyAttack1.y * 2, HarpyAttack1.z);
 				GetJointAbsPosition(item, &pos3, HarpyAttack1.meshNum);
 
-				auto angles = GetVectorAngles(pos3.x - pos1.x, pos3.y - pos1.y, pos3.z - pos1.z);
-				auto pose = PHD_3DPOS(pos1, angles);
+				auto angles = GetVectorAngles(pos3.x - rh.x, pos3.y - rh.y, pos3.z - rh.z);
+				auto pose = PHD_3DPOS(rh, angles);
 				TriggerHarpyMissile(&pose, item->RoomNumber, 2);
 			}
 
@@ -237,8 +235,8 @@ namespace TEN::Entities::TR4
 				auto pos3 = Vector3Int(HarpyAttack2.x, HarpyAttack2.y * 2, HarpyAttack2.z);
 				GetJointAbsPosition(item, &pos3, HarpyAttack2.meshNum);
 
-				auto angles = GetVectorAngles(pos3.x - pos1.x, pos3.y - pos1.y, pos3.z - pos1.z);
-				auto pose = PHD_3DPOS(pos1, angles);
+				auto angles = GetVectorAngles(pos3.x - rh.x, pos3.y - rh.y, pos3.z - rh.z);
+				auto pose = PHD_3DPOS(rh, angles);
 				TriggerHarpyMissile(&pose, item->RoomNumber, 2);
 			}
 		}
@@ -247,20 +245,18 @@ namespace TEN::Entities::TR4
 	void InitialiseHarpy(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
-
-		ClearItem(itemNumber);
+		InitialiseCreature(itemNumber);
 		SetAnimation(item, HARPY_ANIM_IDLE);
 	}
 
 	void HarpyControl(short itemNumber)
 	{
-		auto* item = &g_Level.Items[itemNumber];
-
 		if (!CreatureActive(itemNumber))
 			return;
 
-		auto* creature = GetCreatureInfo(item);
+		auto* item = &g_Level.Items[itemNumber];
 		auto* object = &Objects[item->ObjectNumber];
+		auto* creature = GetCreatureInfo(item);
 
 		short angle = 0;
 		short joint0 = 0;
@@ -541,7 +537,7 @@ namespace TEN::Entities::TR4
 				break;
 
 			case HARPY_STATE_FLAME_ATTACK:
-				DoHarpyEffects(item, itemNumber);
+				DoHarpyEffects(item, creature, itemNumber);
 				break;
 
 			case HARPY_STATE_FLY_BACK:

@@ -11,6 +11,7 @@
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_one_gun.h"
 #include "Game/misc.h"
+#include "Game/missile.h"
 #include "Game/people.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
@@ -23,7 +24,7 @@ namespace TEN::Entities::TR1
 	constexpr auto CENTAUR_REAR_DAMAGE = 200;
 	constexpr auto CENTAUR_REAR_RANGE = SECTOR(1.5f);
 	constexpr auto CENTAUR_REAR_CHANCE = 0x60;
-	constexpr auto CENTAUR_PROJECTILE_SPEED = CLICK(1);
+	constexpr auto CENTAUR_BOMB_VELOCITY = 20;
 
 	#define CENTAUR_TURN_ANGLE ANGLE(4.0f)
 
@@ -48,135 +49,13 @@ namespace TEN::Entities::TR1
 		CENTAUR_ANIM_DEATH = 8,
 	};
 
-	void ControlCentaurBomb(short itemNumber)
-	{
-		auto* item = &g_Level.Items[itemNumber];
-
-		bool aboveWater = false;
-		auto oldPos = item->Pose.Position;
-
-		item->Pose.Orientation.z += ANGLE(35.0f);
-		if (!TestEnvironment(ENV_FLAG_WATER, item->RoomNumber))
-		{
-			item->Pose.Orientation.x -= ANGLE(1.0f);
-			if (item->Pose.Orientation.x < -ANGLE(90.0f))
-				item->Pose.Orientation.x = -ANGLE(90.0f);
-
-			item->Animation.Velocity = CENTAUR_PROJECTILE_SPEED * phd_cos(item->Pose.Orientation.x);
-			item->Animation.VerticalVelocity = -CENTAUR_PROJECTILE_SPEED * phd_sin(item->Pose.Orientation.x);
-			aboveWater = true;
-		}
-		else
-		{
-			item->Animation.VerticalVelocity += 3;
-			aboveWater = true;
-
-			if (item->Animation.Velocity)
-			{
-				item->Pose.Orientation.z += ((item->Animation.Velocity / 4) + 7) * ANGLE(1.0f);
-
-				if (item->Animation.RequiredState)
-					item->Pose.Orientation.y += ((item->Animation.Velocity / 2) + 7) * ANGLE(1.0f);
-				else
-					item->Pose.Orientation.x += ((item->Animation.Velocity / 2) + 7) * ANGLE(1.0f);
-			}
-		}
-
-		TranslateItem(item, item->Pose.Orientation, item->Animation.Velocity);
-
-		auto probe = GetCollision(item);
-
-		if (probe.Position.Floor < item->Pose.Position.y ||
-			probe.Position.Ceiling > item->Pose.Position.y)
-		{
-			item->Pose.Position = oldPos;
-
-			if (TestEnvironment(ENV_FLAG_WATER, item->RoomNumber))
-				TriggerUnderwaterExplosion(item, 0);
-			else
-			{
-				item->Pose.Position.y -= CLICK(0.5f);
-				TriggerShockwave(&item->Pose, 48, 304, 96, 0, 96, 128, 24, 0, 0);
-
-				TriggerExplosionSparks(oldPos.x, oldPos.y, oldPos.z, 3, -2, 0, item->RoomNumber);
-				for (int x = 0; x < 2; x++)
-					TriggerExplosionSparks(oldPos.x, oldPos.y, oldPos.z, 3, -1, 0, item->RoomNumber);
-			}
-
-			return;
-		}
-
-		if (item->RoomNumber != probe.RoomNumber)
-			ItemNewRoom(itemNumber, probe.RoomNumber);
-
-		if (TestEnvironment(ENV_FLAG_WATER, item->RoomNumber) && aboveWater)
-			SetupRipple(item->Pose.Position.x, g_Level.Rooms[item->RoomNumber].minfloor, item->Pose.Position.z, (GetRandomControl() & 7) + 8, 0);
-
-		GetCollidedObjects(item, HARPOON_HIT_RADIUS, true, &CollidedItems[0], &CollidedMeshes[0], 0);
-
-		if (!CollidedItems[0] && !CollidedMeshes[0])
-			return;
-
-		if (CollidedItems[0])
-		{
-			auto* currentItem = CollidedItems[0];
-
-			int k = 0;
-			do
-			{
-				auto* currentObject = &Objects[currentItem->ObjectNumber];
-
-				if (currentItem->Status == ITEM_ACTIVE &&
-					currentObject->intelligent && !currentObject->undead &&
-					currentObject->collision)
-				{
-					DoExplosiveDamageOnBaddy(LaraItem, currentItem, item, LaraWeaponType::Crossbow);
-				}
-
-				k++;
-				currentItem = CollidedItems[k];
-
-			} while (currentItem);
-		}
-	}
-
-	static void RocketGun(ItemInfo* centaurItem)
-	{
-		short itemNumber;
-		itemNumber = CreateItem();
-
-		if (itemNumber != NO_ITEM)
-		{
-			auto* projectileItem = &g_Level.Items[itemNumber];
-
-			projectileItem->ObjectNumber = ID_PROJ_BOMB;
-			projectileItem->Color = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
-			projectileItem->RoomNumber = centaurItem->RoomNumber;
-
-			auto pos = Vector3Int(11, 415, 41);
-			GetJointAbsPosition(centaurItem, &pos, 13);
-
-			projectileItem->Pose.Position = pos;
-			InitialiseItem(itemNumber);
-
-			projectileItem->Pose.Orientation = Vector3Shrt(0, centaurItem->Pose.Orientation.y, 0 );
-
-			projectileItem->Animation.Velocity = CENTAUR_PROJECTILE_SPEED * phd_cos(projectileItem->Pose.Orientation.x);
-			projectileItem->Animation.VerticalVelocity = -CENTAUR_PROJECTILE_SPEED * phd_cos(projectileItem->Pose.Orientation.x);
-			projectileItem->ItemFlags[0] = 1;
-
-			AddActiveItem(itemNumber);
-		}
-	}
-
 	void CentaurControl(short itemNumber)
 	{
-		auto* item = &g_Level.Items[itemNumber];
-		auto* creature = GetCreatureInfo(item);
-
 		if (!CreatureActive(itemNumber))
 			return;
 
+		auto* item = &g_Level.Items[itemNumber];
+		auto* creature = GetCreatureInfo(item);
 		short head = 0;
 		short angle = 0;
 
@@ -249,7 +128,7 @@ namespace TEN::Entities::TR1
 				if (!item->Animation.RequiredState)
 				{
 					item->Animation.RequiredState = CENTAUR_STATE_AIM;
-					RocketGun(item);
+					CreatureEffect2(item, CentaurRocketBite, CENTAUR_BOMB_VELOCITY, head, BombGun);
 				}
 
 				break;

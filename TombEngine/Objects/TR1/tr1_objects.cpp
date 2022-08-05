@@ -5,6 +5,7 @@
 #include "Game/control/box.h"
 #include "Game/collision/collide_item.h"
 #include "Game/itemdata/creature_info.h"
+#include "Game/missile.h"
 #include "Specific/setup.h"
 #include "Specific/level.h"
 
@@ -192,8 +193,8 @@ static void StartEntity(ObjectInfo* obj)
 		obj->saveHitpoints = true;
 		obj->savePosition = true;
 		obj->zoneType = ZONE_FLYER;
-		obj->setBoneRotation(1, ROT_Y); // torso
-		obj->setBoneRotation(2, ROT_Y); // head
+		obj->SetBoneRotation(1, ROT_Y); // torso
+		obj->SetBoneRotation(2, ROT_Y); // head
 	}
 
 }
@@ -216,7 +217,9 @@ static void StartTrap(ObjectInfo* obj)
 
 static void StartProjectiles(ObjectInfo* obj)
 {
-	InitProjectile(obj, ControlCentaurBomb, ID_PROJ_BOMB);
+	InitProjectile(obj, ControlMissile, ID_PROJ_SHARD);
+	InitProjectile(obj, ControlMissile, ID_PROJ_NATLA);
+	InitProjectile(obj, ControlMissile, ID_PROJ_BOMB);
 }
 
 static ObjectInfo* objToInit;
