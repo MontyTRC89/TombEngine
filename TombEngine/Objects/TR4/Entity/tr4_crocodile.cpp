@@ -19,13 +19,14 @@ using std::vector;
 namespace TEN::Entities::TR4
 {
 	constexpr auto CROC_ATTACK_DAMAGE = 120;
-	constexpr auto CROC_SWIM_SPEED	  = 16;
 
 	constexpr auto CROC_ALERT_RANGE		 = SQUARE(SECTOR(1.5f));
 	constexpr auto CROC_VISIBILITY_RANGE = SQUARE(SECTOR(5));
 	constexpr auto CROC_STATE_RUN_RANGE  = SQUARE(SECTOR(1));
 	constexpr auto CROC_MAXRUN_RANGE	 = SQUARE(SECTOR(1.5f));
 	constexpr auto CROC_ATTACK_RANGE	 = SQUARE(CLICK(3)); // NOTE: It's CLICK(3) in TR4, but the crocodile does not go near Lara to do damage in certain cases.
+
+	constexpr auto CROC_SWIM_SPEED	  = 16;
 
 	#define CROC_STATE_WALK_FORWARD_ANGLE ANGLE(3.0f)
 	#define CROC_SWIM_ANGLE ANGLE(3.0f)
