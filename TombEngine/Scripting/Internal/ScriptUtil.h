@@ -11,6 +11,7 @@
 	ScriptAssert(false, err);\
 }
 
+
 // Helper type to allow us to more easily specify "give a value of type X or just give nil" parameters.
 // Sol doesn't (at the time of writing) have any mechanisms to do this kind of optional argument without
 // drawbacks, or at least no mechanisms that I could find.
@@ -27,6 +28,11 @@
 // 
 // This alias is an effort to avoid the above problems.
 template <typename ... Ts> using TypeOrNil = std::variant<Ts..., sol::nil_t, sol::object>;
+
+// To be used with TypeOrNil to fill arguments with default values if said arguments weren't given by the script.
+#define USE_IF_HAVE(Type, ifThere, ifNotThere) \
+(std::holds_alternative<Type>(ifThere) ? std::get<Type>(ifThere) : ifNotThere)
+
 
 sol::table MakeSpecialTableBase(sol::state* state, std::string const& name);
 

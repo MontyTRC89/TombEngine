@@ -1,0 +1,487 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<head>
+    <title>TombEngine Lua API</title>
+    <link rel="stylesheet" href="../ldoc.css" type="text/css" />
+</head>
+<body>
+
+<div id="container">
+
+<div id="product">
+	<div id="product_logo"></div>
+	<div id="product_name"><big><b></b></big></div>
+	<div id="product_description"></div>
+</div> <!-- id="product" -->
+
+
+<div id="main">
+
+
+<!-- Menu -->
+
+<div id="navigation">
+<br/>
+<h1>TombEngine</h1>
+
+<ul>
+  <li><a href="../index.html">Index</a></li>
+</ul>
+
+<h2>Contents</h2>
+<ul>
+<li><a href="#Functions">Functions</a></li>
+</ul>
+
+
+<h2>5 Lua utility modules</h2>
+<ul class="nowrap">
+  <li><strong>Timer</strong></li>
+  <li><a href="../5 lua utility modules/Util.html">Util</a></li>
+</ul>
+<h2>1 Modules</h2>
+<ul class="nowrap">
+  <li><a href="../1 modules/Effects.html">Effects</a></li>
+  <li><a href="../1 modules/Flow.html">Flow</a></li>
+  <li><a href="../1 modules/Inventory.html">Inventory</a></li>
+  <li><a href="../1 modules/Logic.html">Logic</a></li>
+  <li><a href="../1 modules/Misc.html">Misc</a></li>
+  <li><a href="../1 modules/Objects.html">Objects</a></li>
+  <li><a href="../1 modules/Strings.html">Strings</a></li>
+</ul>
+<h2>2 Classes</h2>
+<ul class="nowrap">
+  <li><a href="../2 classes/Flow.Animations.html">Flow.Animations</a></li>
+  <li><a href="../2 classes/Flow.Fog.html">Flow.Fog</a></li>
+  <li><a href="../2 classes/Flow.InventoryItem.html">Flow.InventoryItem</a></li>
+  <li><a href="../2 classes/Flow.Level.html">Flow.Level</a></li>
+  <li><a href="../2 classes/Flow.Mirror.html">Flow.Mirror</a></li>
+  <li><a href="../2 classes/Flow.Settings.html">Flow.Settings</a></li>
+  <li><a href="../2 classes/Flow.SkyLayer.html">Flow.SkyLayer</a></li>
+  <li><a href="../2 classes/Objects.AIObject.html">Objects.AIObject</a></li>
+  <li><a href="../2 classes/Objects.Camera.html">Objects.Camera</a></li>
+  <li><a href="../2 classes/Objects.Moveable.html">Objects.Moveable</a></li>
+  <li><a href="../2 classes/Objects.Sink.html">Objects.Sink</a></li>
+  <li><a href="../2 classes/Objects.SoundSource.html">Objects.SoundSource</a></li>
+  <li><a href="../2 classes/Objects.Static.html">Objects.Static</a></li>
+  <li><a href="../2 classes/Strings.DisplayString.html">Strings.DisplayString</a></li>
+</ul>
+<h2>3 Primitive Classes</h2>
+<ul class="nowrap">
+  <li><a href="../3 primitive classes/Color.html">Color</a></li>
+  <li><a href="../3 primitive classes/Rotation.html">Rotation</a></li>
+  <li><a href="../3 primitive classes/Vec3.html">Vec3</a></li>
+</ul>
+<h2>4 Enums</h2>
+<ul class="nowrap">
+  <li><a href="../4 enums/Flow.InvID.html">Flow.InvID</a></li>
+  <li><a href="../4 enums/Effects.BlendID.html">Effects.BlendID</a></li>
+  <li><a href="../4 enums/Objects.ObjID.html">Objects.ObjID</a></li>
+</ul>
+
+</div>
+
+<div id="content">
+
+<h1>Lua utility module <code>Timer</code></h1>
+<p>Basic timer - after a specified number of seconds, the specified thing happens.</p>
+<p>
+
+<p> Usage:</p>
+
+<pre>
+<span class="keyword">local</span> Timer = <span class="global">require</span>(<span class="string">"Timer"</span>)
+
+LevelFuncs.FinishTimer = <span class="keyword">function</span>(healthWhenStarted, victoryMessage)
+    DoSomething(healthWhenStarted, victoryMessage)
+<span class="keyword">end</span>
+
+LevelFuncs.TriggerTimer = <span class="keyword">function</span>(obj)
+    <span class="keyword">local</span> myTimer = Timer.Create(<span class="string">"my_timer"</span>, <span class="number">5.0</span>, <span class="keyword">false</span>, <span class="keyword">true</span>, <span class="string">"FinishTimer"</span>, Lara:GetHP(), <span class="string">"Well done!"</span>)
+    myTimer:Start()
+<span class="keyword">end</span>
+
+LevelFuncs.OnControlPhase = <span class="keyword">function</span>(dt)
+    Timer.UpdateAll(dt)
+<span class="keyword">end</span>
+</pre>
+
+</p>
+
+
+<h2><a href="#Functions">Functions</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" ><a href="#Create">Create(name, totalTime, loop, showString, func, funcArgs)</a></td>
+	<td class="summary">Create (but do not start) a new timer.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Get">Get(name)</a></td>
+	<td class="summary">Get a timer by its name.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#SetFunction">SetFunction(t, func, funcArgs)</a></td>
+	<td class="summary">Give the timer a new function and args</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Start">Start(t)</a></td>
+	<td class="summary">Begin or unpause a timer.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Pause">Pause(t)</a></td>
+	<td class="summary">Pause the timer.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Stop">Stop(t)</a></td>
+	<td class="summary">Stop the timer.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#GetRemainingTime">GetRemainingTime(t)</a></td>
+	<td class="summary">Get the remaining time for a timer.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#SetRemainingTime">SetRemainingTime(t, remainingTime)</a></td>
+	<td class="summary">Set the remaining time for a timer</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#GetTotalTime">GetTotalTime(t)</a></td>
+	<td class="summary">Get the total time for a timer.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#SetTotalTime">SetTotalTime(t, totalTime)</a></td>
+	<td class="summary">Set the total time for a timer</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#SetLooping">SetLooping(t, looping)</a></td>
+	<td class="summary">Set whether or not the timer loops</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#UpdateAll">UpdateAll(dt)</a></td>
+	<td class="summary">Update all active timers.</td>
+	</tr>
+</table>
+
+<br/>
+<br/>
+
+
+    <h2 class="section-header "><a name="Functions"></a>Functions</h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "Create"></a>
+    <strong>Create(name, totalTime, loop, showString, func, funcArgs)</strong>
+    </dt>
+    <dd>
+    Create (but do not start) a new timer.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">name</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
+         A label to give this timer; used to retrieve the timer later
+        </li>
+        <li><span class="parameter">totalTime</span>
+            <span class="types"><span class="type">number</span></span>
+         The duration of the timer, in seconds
+        </li>
+        <li><span class="parameter">loop</span>
+            <span class="types"><span class="type">bool</span></span>
+         if true, the timer will start again immediately after the time has elapsed
+        </li>
+        <li><span class="parameter">showString</span>
+            <span class="types"><span class="type">bool</span></span>
+         if true, the remaining time, rounded up, will show at the bottom of the screen. <strong>At any given time, only one timer can show its remaining time</strong>.
+        </li>
+        <li><span class="parameter">func</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
+         The name of the LevelFunc member to call when the time is up
+        </li>
+        <li><span class="parameter">funcArgs</span>
+         the arguments with which the above function will be called
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        The timer in its paused state
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Get"></a>
+    <strong>Get(name)</strong>
+    </dt>
+    <dd>
+    Get a timer by its name.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">name</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
+         The label that was given to the timer when it was created
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        The timer
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "SetFunction"></a>
+    <strong>SetFunction(t, func, funcArgs)</strong>
+    </dt>
+    <dd>
+    Give the timer a new function and args
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">t</span>
+         the timer in question
+        </li>
+        <li><span class="parameter">func</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
+         The name of the LevelFunc member to call when the time is up
+        </li>
+        <li><span class="parameter">funcArgs</span>
+         the arguments with which the above function will be called
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Start"></a>
+    <strong>Start(t)</strong>
+    </dt>
+    <dd>
+    Begin or unpause a timer.  If showing the remaining time on-screen, its color will be set to white.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">t</span>
+         the timer in question
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Pause"></a>
+    <strong>Pause(t)</strong>
+    </dt>
+    <dd>
+    Pause the timer.  If showing the remaining time on-screen, its color will be set to yellow.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">t</span>
+         the timer in question
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Stop"></a>
+    <strong>Stop(t)</strong>
+    </dt>
+    <dd>
+    Stop the timer.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">t</span>
+         the timer in question
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "GetRemainingTime"></a>
+    <strong>GetRemainingTime(t)</strong>
+    </dt>
+    <dd>
+    Get the remaining time for a timer.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">t</span>
+         the timer in question
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        the time in seconds remaining on the clock
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "SetRemainingTime"></a>
+    <strong>SetRemainingTime(t, remainingTime)</strong>
+    </dt>
+    <dd>
+    Set the remaining time for a timer
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">t</span>
+         the timer in question
+        </li>
+        <li><span class="parameter">remainingTime</span>
+            <span class="types"><span class="type">number</span></span>
+         the new time remaining for the timer
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "GetTotalTime"></a>
+    <strong>GetTotalTime(t)</strong>
+    </dt>
+    <dd>
+    Get the total time for a timer.
+ This is the amount of time the timer will start with, as well as when starting a new loop
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">t</span>
+         the timer in question
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        the timer's total time
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "SetTotalTime"></a>
+    <strong>SetTotalTime(t, totalTime)</strong>
+    </dt>
+    <dd>
+    Set the total time for a timer
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">t</span>
+         the timer in question
+        </li>
+        <li><span class="parameter">totalTime</span>
+            <span class="types"><span class="type">number</span></span>
+         timer's new total time
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "SetLooping"></a>
+    <strong>SetLooping(t, looping)</strong>
+    </dt>
+    <dd>
+    Set whether or not the timer loops
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">t</span>
+         the timer in question
+        </li>
+        <li><span class="parameter">looping</span>
+            <span class="types"><span class="type">bool</span></span>
+         whether or not the timer loops
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "UpdateAll"></a>
+    <strong>UpdateAll(dt)</strong>
+    </dt>
+    <dd>
+    Update all active timers.
+ Should be called in LevelFuncs.OnControlPhase
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">dt</span>
+            <span class="types"><span class="type">number</span></span>
+         The time in seconds since the last frame
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+</dl>
+
+
+</div> <!-- id="content" -->
+</div> <!-- id="main" -->
+<div id="about">
+<i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
+<i style="float:right;">Last updated 2022-08-01 20:38:26 </i>
+</div> <!-- id="about" -->
+</div> <!-- id="container" -->
+</body>
+</html>
