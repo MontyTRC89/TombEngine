@@ -55,11 +55,7 @@ namespace TEN::Entities::TR4
 		auto* item = &g_Level.Items[itemNumber];
 
 		InitialiseCreature(itemNumber);
-
-		item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + BAT_ANIM_IDLE;
-		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-		item->Animation.ActiveState = BAT_STATE_IDLE;
-		item->Animation.TargetState = BAT_STATE_IDLE;
+		SetAnimation(item, BAT_ANIM_IDLE);
 	}
 
 	void BatControl(short itemNumber)
@@ -125,9 +121,8 @@ namespace TEN::Entities::TR4
 					AI.distance < BAT_ATTACK_RANGE && AI.ahead &&
 					abs(item->Pose.Position.y - creature->Enemy->Pose.Position.y) < BAT_UNFURL_HEIGHT_RANGE)
 				{
-					CreatureEffect(item, BatBite, DoBloodSplat);
 					DoDamage(creature->Enemy, BAT_DAMAGE);
-
+					CreatureEffect(item, BatBite, DoBloodSplat);
 					creature->Flags = 1;
 				}
 				else
@@ -140,12 +135,7 @@ namespace TEN::Entities::TR4
 			}
 		}
 		else if (item->Animation.ActiveState == BAT_STATE_ATTACK)
-		{
-			item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + BAT_ANIM_FLY;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-			item->Animation.ActiveState = BAT_STATE_FLY;
-			item->Animation.TargetState = BAT_STATE_FLY;
-		}
+			SetAnimation(item, BAT_ANIM_FLY);
 		else
 		{
 			if (item->Pose.Position.y >= item->Floor)
@@ -155,14 +145,9 @@ namespace TEN::Entities::TR4
 				item->Pose.Position.y = item->Floor;
 			}
 			else
-			{
-				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + BAT_ANIM_DEATH_FALL;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-				item->Animation.ActiveState = BAT_STATE_DEATH_FALL;
-				item->Animation.TargetState = BAT_STATE_DEATH_FALL;
+				SetAnimation(item, BAT_ANIM_DEATH_FALL);
 				item->Animation.IsAirborne = true;
 				item->Animation.Velocity = 0;
-			}
 		}
 
 		CreatureAnimation(itemNumber, angle, 0);

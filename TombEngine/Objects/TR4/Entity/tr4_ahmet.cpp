@@ -286,16 +286,16 @@ namespace TEN::Entities::TR4
 					item->Animation.FrameNumber > (g_Level.Anims[item->Animation.AnimNumber].frameBase + 7) &&
 					item->TestBits(JointBitType::Touch, AhmetSwipeAttackLeftJoints))
 				{
-					CreatureEffect2(item, AhmetBiteLeft, 10, -1, DoBloodSplat);
 					DoDamage(creature->Enemy, AHMET_SWIPE_ATTACK_DAMAGE);
+					CreatureEffect2(item, AhmetBiteLeft, 10, -1, DoBloodSplat);
 					creature->Flags |= 1;
 				}
 				else if (!(creature->Flags & 2) &&
 					item->Animation.FrameNumber > (g_Level.Anims[item->Animation.AnimNumber].frameBase + 32) &&
 					item->TestBits(JointBitType::Touch, AhmetSwipeAttackRightJoints))
 				{
-					CreatureEffect2(item, AhmetBiteRight, 10, -1, DoBloodSplat);
 					DoDamage(creature->Enemy, AHMET_SWIPE_ATTACK_DAMAGE);
+					CreatureEffect2(item, AhmetBiteRight, 10, -1, DoBloodSplat);
 					creature->Flags |= 2;
 				}
 
@@ -323,8 +323,8 @@ namespace TEN::Entities::TR4
 					{
 						if (item->Animation.FrameNumber > (g_Level.Anims[item->Animation.AnimNumber].frameBase + 11) && item->TestBits(JointBitType::Touch, AhmetSwipeAttackLeftJoints))
 						{
-							CreatureEffect2(item, AhmetBiteJaw, 10, -1, DoBloodSplat);
 							DoDamage(creature->Enemy, AHMET_BITE_ATTACK_DAMAGE);
+							CreatureEffect2(item, AhmetBiteJaw, 10, -1, DoBloodSplat);
 							creature->Flags |= 1;
 						}
 					}
@@ -351,14 +351,14 @@ namespace TEN::Entities::TR4
 				{
 					if (!(creature->Flags & 1) && item->Animation.FrameNumber > (g_Level.Anims[item->Animation.AnimNumber].frameBase + 14) && item->TestBits(JointBitType::Touch, AhmetSwipeAttackLeftJoints))
 					{
-						CreatureEffect2(item, AhmetBiteLeft, 10, -1, DoBloodSplat);
 						DoDamage(creature->Enemy, AHMET_SWIPE_ATTACK_DAMAGE);
+						CreatureEffect2(item, AhmetBiteLeft, 10, -1, DoBloodSplat);
 						creature->Flags |= 1;
 					}
 					else if (!(creature->Flags & 2) && item->Animation.FrameNumber > (g_Level.Anims[item->Animation.AnimNumber].frameBase + 22) && item->TestBits(JointBitType::Touch, AhmetSwipeAttackRightJoints))
 					{
-						CreatureEffect2(item, AhmetBiteRight, 10, -1, DoBloodSplat);
 						DoDamage(creature->Enemy, AHMET_SWIPE_ATTACK_DAMAGE);
+						CreatureEffect2(item, AhmetBiteRight, 10, -1, DoBloodSplat);
 						creature->Flags |= 2;
 					}
 				}
