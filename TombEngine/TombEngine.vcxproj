@@ -223,6 +223,8 @@ CALL gen.bat</Command>
     <ClInclude Include="Scripting\Internal\ScriptAssert.h" />
     <ClInclude Include="Scripting\Internal\ScriptUtil.h" />
     <ClInclude Include="Scripting\Internal\TEN\Color\Color.h" />
+    <ClInclude Include="Scripting\Internal\TEN\Effects\BlendIDs.h" />
+    <ClInclude Include="Scripting\Internal\TEN\Effects\EffectsFunctions.h" />
     <ClInclude Include="Scripting\Internal\TEN\Flow\Animations\Animations.h" />
     <ClInclude Include="Scripting\Internal\TEN\Flow\FlowHandler.h" />
     <ClInclude Include="Scripting\Internal\TEN\Flow\Fog\Fog.h" />
@@ -642,6 +644,7 @@ CALL gen.bat</Command>
     <ClCompile Include="Scripting\Internal\ScriptInterfaceState.cpp" />
     <ClCompile Include="Scripting\Internal\ScriptUtil.cpp" />
     <ClCompile Include="Scripting\Internal\TEN\Color\Color.cpp" />
+    <ClCompile Include="Scripting\Internal\TEN\Effects\EffectsFunctions.cpp" />
     <ClCompile Include="Scripting\Internal\TEN\Flow\Animations\Animations.cpp" />
     <ClCompile Include="Scripting\Internal\TEN\Flow\FlowHandler.cpp" />
     <ClCompile Include="Scripting\Internal\TEN\Flow\Fog\Fog.cpp" />
