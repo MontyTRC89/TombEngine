@@ -297,21 +297,21 @@ void CreatureKill(ItemInfo* item, int killAnim, int killState, int laraKillState
 	*/
 }
 
-short CreatureEffect2(ItemInfo* item, BiteInfo bite, short damage, short angle, std::function<CreatureEffectFunction> func)
+short CreatureEffect2(ItemInfo* item, BiteInfo bite, short velocity, short angle, std::function<CreatureEffectFunction> func)
 {
 	auto pos = Vector3Int(bite.x, bite.y, bite.z);
 	GetJointAbsPosition(item, &pos, bite.meshNum);
 
-	return func(pos.x, pos.y, pos.z, damage, angle, item->RoomNumber);
+	return func(pos.x, pos.y, pos.z, velocity, angle, item->RoomNumber);
 }
 
 // TODO: Replace with above version.
-short CreatureEffect2(ItemInfo* item, BiteInfo* bite, short damage, short angle, std::function<CreatureEffectFunction> func)
+short CreatureEffect2(ItemInfo* item, BiteInfo* bite, short velocity, short angle, std::function<CreatureEffectFunction> func)
 {
 	auto pos = Vector3Int(bite->x, bite->y, bite->z);
 	GetJointAbsPosition(item, &pos, bite->meshNum);
 
-	return func(pos.x, pos.y, pos.z, damage, angle, item->RoomNumber);
+	return func(pos.x, pos.y, pos.z, velocity, angle, item->RoomNumber);
 }
 
 short CreatureEffect(ItemInfo* item, BiteInfo bite, std::function<CreatureEffectFunction> func)
