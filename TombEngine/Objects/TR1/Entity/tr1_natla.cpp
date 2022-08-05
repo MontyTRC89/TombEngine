@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "Objects/TR1/Entity/tr1_natla.h"
+#include "tr1_natla.h"
 
 #include "Game/control/box.h"
 #include "Game/effects/effects.h"
@@ -15,15 +15,12 @@
 namespace TEN::Entities::TR1
 {
 	// TODO: Organise.
-	#define NATLA_NEAR_DEATH 200
-	#define NATLA_FLYMODE 0x8000
-	#define NATLA_TIMER   0x7fff
-	#define NATLA_FIRE_ARC ANGLE(30.0f)
-	#define NATLA_FLY_TURN ANGLE(5.0f)
-	#define NATLA_RUN_TURN ANGLE(6.0f)
-	#define NATLA_LAND_CHANCE 0x100
-	#define NATLA_DEATH_TIME (FPS * 16)	// 16 seconds.
-	#define NATLA_SHOT_DAMAGE 100
+	constexpr auto NATLA_NEAR_DEATH = 200;
+	constexpr auto NATLA_FLYMODE = 0x8000;
+	constexpr auto NATLA_TIMER = 0x7FFF;
+	constexpr auto NATLA_LAND_CHANCE = 0x100;
+	constexpr auto NATLA_DEATH_TIME = (FPS * 16);	// 16 seconds.
+	constexpr auto NATLA_SHOT_DAMAGE = 100;
 
 	const auto NatlaGunBite = BiteInfo(Vector3(5.0f, 220.0f, 7.0f), 4);
 
@@ -75,8 +72,8 @@ namespace TEN::Entities::TR1
 			GetCreatureMood(item, &AI, true);
 			CreatureMood(item, &AI, true);
 
-			angle = CreatureTurn(item, NATLA_RUN_TURN);
-			shoot = (AI.angle > -NATLA_FIRE_ARC && AI.angle < NATLA_FIRE_ARC&& Targetable(item, &AI));
+			angle = CreatureTurn(item, ANGLE(6.0f));
+			shoot = (AI.angle > -ANGLE(30.0f) && AI.angle < ANGLE(30.0f) && Targetable(item, &AI));
 
 			if (facing)
 			{
@@ -176,7 +173,7 @@ namespace TEN::Entities::TR1
 			creature->LOT.Fly = NO_FLYING;
 			CreatureAIInfo(item, &AI);
 
-			shoot = (AI.angle > -NATLA_FIRE_ARC && AI.angle < NATLA_FIRE_ARC&& Targetable(item, &AI));
+			shoot = (AI.angle > -ANGLE(30.0f) && AI.angle < ANGLE(30.0f) && Targetable(item, &AI));
 
 			if (item->Animation.ActiveState == NATLA_STATE_FLY && (creature->Flags & NATLA_FLYMODE))
 			{
@@ -202,14 +199,14 @@ namespace TEN::Entities::TR1
 				CreatureMood(item, &AI, false);
 
 			item->Pose.Orientation.y -= facing;
-			angle = CreatureTurn(item, NATLA_FLY_TURN);
+			angle = CreatureTurn(item, ANGLE(5.0f));
 
 			if (item->Animation.ActiveState == NATLA_STATE_FLY)
 			{
-				if (AI.angle > NATLA_FLY_TURN)
-					facing += NATLA_FLY_TURN;
-				else if (AI.angle < -NATLA_FLY_TURN)
-					facing -= NATLA_FLY_TURN;
+				if (AI.angle > ANGLE(5.0f))
+					facing += ANGLE(5.0f);
+				else if (AI.angle < -ANGLE(5.0f))
+					facing -= ANGLE(5.0f);
 				else
 					facing += AI.angle;
 
