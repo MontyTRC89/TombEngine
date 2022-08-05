@@ -27,6 +27,7 @@
 #include "Objects/Utils/object_helper.h"
 #include "Specific/level.h"
 
+using namespace TEN::Entities;
 using namespace TEN::Entities::Switches;
 
 ObjectInfo Objects[ID_NUMBER_OBJECTS];
