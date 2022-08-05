@@ -1,0 +1,364 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<head>
+    <title>TombEngine Lua API</title>
+    <link rel="stylesheet" href="../ldoc.css" type="text/css" />
+</head>
+<body>
+
+<div id="container">
+
+<div id="product">
+	<div id="product_logo"></div>
+	<div id="product_name"><big><b></b></big></div>
+	<div id="product_description"></div>
+</div> <!-- id="product" -->
+
+
+<div id="main">
+
+
+<!-- Menu -->
+
+<div id="navigation">
+<br/>
+<h1>TombEngine</h1>
+
+<ul>
+  <li><a href="../index.html">Index</a></li>
+</ul>
+
+<h2>Contents</h2>
+<ul>
+<li><a href="#InvID_constants">InvID constants </a></li>
+</ul>
+
+
+<h2>4 Enums</h2>
+<ul class="nowrap">
+  <li><strong>Flow.InvID</strong></li>
+  <li><a href="../4 enums/Effects.BlendID.html">Effects.BlendID</a></li>
+  <li><a href="../4 enums/Objects.ObjID.html">Objects.ObjID</a></li>
+</ul>
+<h2>1 Modules</h2>
+<ul class="nowrap">
+  <li><a href="../1 modules/Effects.html">Effects</a></li>
+  <li><a href="../1 modules/Flow.html">Flow</a></li>
+  <li><a href="../1 modules/Inventory.html">Inventory</a></li>
+  <li><a href="../1 modules/Logic.html">Logic</a></li>
+  <li><a href="../1 modules/Misc.html">Misc</a></li>
+  <li><a href="../1 modules/Objects.html">Objects</a></li>
+  <li><a href="../1 modules/Strings.html">Strings</a></li>
+</ul>
+<h2>2 Classes</h2>
+<ul class="nowrap">
+  <li><a href="../2 classes/Flow.Animations.html">Flow.Animations</a></li>
+  <li><a href="../2 classes/Flow.Fog.html">Flow.Fog</a></li>
+  <li><a href="../2 classes/Flow.InventoryItem.html">Flow.InventoryItem</a></li>
+  <li><a href="../2 classes/Flow.Level.html">Flow.Level</a></li>
+  <li><a href="../2 classes/Flow.Mirror.html">Flow.Mirror</a></li>
+  <li><a href="../2 classes/Flow.Settings.html">Flow.Settings</a></li>
+  <li><a href="../2 classes/Flow.SkyLayer.html">Flow.SkyLayer</a></li>
+  <li><a href="../2 classes/Objects.AIObject.html">Objects.AIObject</a></li>
+  <li><a href="../2 classes/Objects.Camera.html">Objects.Camera</a></li>
+  <li><a href="../2 classes/Objects.Moveable.html">Objects.Moveable</a></li>
+  <li><a href="../2 classes/Objects.Sink.html">Objects.Sink</a></li>
+  <li><a href="../2 classes/Objects.SoundSource.html">Objects.SoundSource</a></li>
+  <li><a href="../2 classes/Objects.Static.html">Objects.Static</a></li>
+  <li><a href="../2 classes/Strings.DisplayString.html">Strings.DisplayString</a></li>
+</ul>
+<h2>3 Primitive Classes</h2>
+<ul class="nowrap">
+  <li><a href="../3 primitive classes/Color.html">Color</a></li>
+  <li><a href="../3 primitive classes/Rotation.html">Rotation</a></li>
+  <li><a href="../3 primitive classes/Vec3.html">Vec3</a></li>
+</ul>
+<h2>5 Lua utility modules</h2>
+<ul class="nowrap">
+  <li><a href="../5 lua utility modules/Timer.html">Timer</a></li>
+  <li><a href="../5 lua utility modules/Util.html">Util</a></li>
+</ul>
+
+</div>
+
+<div id="content">
+
+<h1>Enum <code>Flow.InvID</code></h1>
+<p>Constants for items that can be used with GetItem and SetItem.</p>
+<p>
+
+</p>
+
+
+<h2><a href="#InvID_constants">InvID constants </a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" ><a href="#CONSTANT_STRING_HERE">CONSTANT_STRING_HERE</a></td>
+	<td class="summary">Table of constants to use with GetItem and SetItem.</td>
+	</tr>
+</table>
+
+<br/>
+<br/>
+
+
+    <h2 class="section-header has-description"><a name="InvID_constants"></a>InvID constants </h2>
+
+          <div class="section-description">
+
+
+
+<p>The following constants are inside InvID.</p>
+
+<pre><code>PISTOLS_ITEM
+PISTOLS_AMMO_ITEM
+UZI_ITEM
+UZI_AMMO_ITEM
+SHOTGUN_ITEM
+SHOTGUN_AMMO1_ITEM
+SHOTGUN_AMMO2_ITEM
+REVOLVER_ITEM
+REVOLVER_AMMO_ITEM
+CROSSBOW_ITEM
+CROSSBOW_AMMO1_ITEM
+CROSSBOW_AMMO2_ITEM
+CROSSBOW_AMMO3_ITEM
+HK_ITEM
+HK_AMMO_ITEM
+GRENADE_GUN_ITEM
+GRENADE_AMMO1_ITEM
+GRENADE_AMMO2_ITEM
+GRENADE_AMMO3_ITEM
+HARPOON_ITEM
+HARPOON_AMMO_ITEM
+ROCKET_LAUNCHER_ITEM
+ROCKET_LAUNCHER_AMMO_ITEM
+LASERSIGHT_ITEM
+SILENCER_ITEM
+BIGMEDI_ITEM
+SMALLMEDI_ITEM
+BINOCULARS_ITEM
+FLARE_INV_ITEM
+TIMEX_ITEM
+PC_LOAD_INV_ITEM
+PC_LOAD_SAVE_ITEM
+BURNING_TORCH_ITEM
+CROWBAR_ITEM
+DIARY_ITEM
+COMPASS_ITEM
+CLOCKWORK_BEETLE
+CLOCKWORK_BEETLE_COMBO1
+CLOCKWORK_BEETLE_COMBO2
+WATERSKIN1_EMPTY
+WATERSKIN1_1
+WATERSKIN1_2
+WATERSKIN1_3
+WATERSKIN2_EMPTY
+WATERSKIN2_1
+WATERSKIN2_2
+WATERSKIN2_3
+WATERSKIN2_4
+WATERSKIN2_5
+OPEN_DIARY_ITEM
+GOLDROSE_ITEM
+PUZZLE_ITEM1
+PUZZLE_ITEM2
+PUZZLE_ITEM3
+PUZZLE_ITEM4
+PUZZLE_ITEM5
+PUZZLE_ITEM6
+PUZZLE_ITEM7
+PUZZLE_ITEM8
+PUZZLE_ITEM9
+PUZZLE_ITEM10
+PUZZLE_ITEM11
+PUZZLE_ITEM12
+PUZZLE_ITEM13
+PUZZLE_ITEM14
+PUZZLE_ITEM15
+PUZZLE_ITEM16
+PUZZLE_ITEM1_COMBO1
+PUZZLE_ITEM1_COMBO2
+PUZZLE_ITEM2_COMBO1
+PUZZLE_ITEM2_COMBO2
+PUZZLE_ITEM3_COMBO1
+PUZZLE_ITEM3_COMBO2
+PUZZLE_ITEM4_COMBO1
+PUZZLE_ITEM4_COMBO2
+PUZZLE_ITEM5_COMBO1
+PUZZLE_ITEM5_COMBO2
+PUZZLE_ITEM6_COMBO1
+PUZZLE_ITEM6_COMBO2
+PUZZLE_ITEM7_COMBO1
+PUZZLE_ITEM7_COMBO2
+PUZZLE_ITEM8_COMBO1
+PUZZLE_ITEM8_COMBO2
+PUZZLE_ITEM9_COMBO1
+PUZZLE_ITEM9_COMBO2
+PUZZLE_ITEM10_COMBO1
+PUZZLE_ITEM10_COMBO2
+PUZZLE_ITEM11_COMBO1
+PUZZLE_ITEM11_COMBO2
+PUZZLE_ITEM12_COMBO1
+PUZZLE_ITEM12_COMBO2
+PUZZLE_ITEM13_COMBO1
+PUZZLE_ITEM13_COMBO2
+PUZZLE_ITEM14_COMBO1
+PUZZLE_ITEM14_COMBO2
+PUZZLE_ITEM15_COMBO1
+PUZZLE_ITEM15_COMBO2
+PUZZLE_ITEM16_COMBO1
+PUZZLE_ITEM16_COMBO2
+KEY_ITEM1
+KEY_ITEM2
+KEY_ITEM3
+KEY_ITEM4
+KEY_ITEM5
+KEY_ITEM6
+KEY_ITEM7
+KEY_ITEM8
+KEY_ITEM9
+KEY_ITEM10
+KEY_ITEM11
+KEY_ITEM12
+KEY_ITEM13
+KEY_ITEM14
+KEY_ITEM15
+KEY_ITEM16
+KEY_ITEM1_COMBO1
+KEY_ITEM1_COMBO2
+KEY_ITEM2_COMBO1
+KEY_ITEM2_COMBO2
+KEY_ITEM3_COMBO1
+KEY_ITEM3_COMBO2
+KEY_ITEM4_COMBO1
+KEY_ITEM4_COMBO2
+KEY_ITEM5_COMBO1
+KEY_ITEM5_COMBO2
+KEY_ITEM6_COMBO1
+KEY_ITEM6_COMBO2
+KEY_ITEM7_COMBO1
+KEY_ITEM7_COMBO2
+KEY_ITEM8_COMBO1
+KEY_ITEM8_COMBO2
+KEY_ITEM9_COMBO1
+KEY_ITEM9_COMBO2
+KEY_ITEM10_COMBO1
+KEY_ITEM10_COMBO2
+KEY_ITEM11_COMBO1
+KEY_ITEM11_COMBO2
+KEY_ITEM12_COMBO1
+KEY_ITEM12_COMBO2
+KEY_ITEM13_COMBO1
+KEY_ITEM13_COMBO2
+KEY_ITEM14_COMBO1
+KEY_ITEM14_COMBO2
+KEY_ITEM15_COMBO1
+KEY_ITEM15_COMBO2
+KEY_ITEM16_COMBO1
+KEY_ITEM16_COMBO2
+PICKUP_ITEM1
+PICKUP_ITEM2
+PICKUP_ITEM3
+PICKUP_ITEM4
+PICKUP_ITEM5
+PICKUP_ITEM6
+PICKUP_ITEM7
+PICKUP_ITEM8
+PICKUP_ITEM9
+PICKUP_ITEM10
+PICKUP_ITEM11
+PICKUP_ITEM12
+PICKUP_ITEM13
+PICKUP_ITEM14
+PICKUP_ITEM15
+PICKUP_ITEM16
+PICKUP_ITEM1_COMBO1
+PICKUP_ITEM1_COMBO2
+PICKUP_ITEM2_COMBO1
+PICKUP_ITEM2_COMBO2
+PICKUP_ITEM3_COMBO1
+PICKUP_ITEM3_COMBO2
+PICKUP_ITEM4_COMBO1
+PICKUP_ITEM4_COMBO2
+PICKUP_ITEM5_COMBO1
+PICKUP_ITEM5_COMBO2
+PICKUP_ITEM6_COMBO1
+PICKUP_ITEM6_COMBO2
+PICKUP_ITEM7_COMBO1
+PICKUP_ITEM7_COMBO2
+PICKUP_ITEM8_COMBO1
+PICKUP_ITEM8_COMBO2
+PICKUP_ITEM9_COMBO1
+PICKUP_ITEM9_COMBO2
+PICKUP_ITEM10_COMBO1
+PICKUP_ITEM10_COMBO2
+PICKUP_ITEM11_COMBO1
+PICKUP_ITEM11_COMBO2
+PICKUP_ITEM12_COMBO1
+PICKUP_ITEM12_COMBO2
+PICKUP_ITEM13_COMBO1
+PICKUP_ITEM13_COMBO2
+PICKUP_ITEM14_COMBO1
+PICKUP_ITEM14_COMBO2
+PICKUP_ITEM15_COMBO1
+PICKUP_ITEM15_COMBO2
+PICKUP_ITEM16_COMBO1
+PICKUP_ITEM16_COMBO2
+EXAMINE_ITEM1
+EXAMINE_ITEM2
+EXAMINE_ITEM3
+EXAMINE_ITEM4
+EXAMINE_ITEM5
+EXAMINE_ITEM6
+EXAMINE_ITEM7
+EXAMINE_ITEM8
+EXAMINE_ITEM1_COMBO1
+EXAMINE_ITEM1_COMBO2
+EXAMINE_ITEM2_COMBO1
+EXAMINE_ITEM2_COMBO2
+EXAMINE_ITEM3_COMBO1
+EXAMINE_ITEM3_COMBO2
+EXAMINE_ITEM4_COMBO1
+EXAMINE_ITEM4_COMBO2
+EXAMINE_ITEM5_COMBO1
+EXAMINE_ITEM5_COMBO2
+EXAMINE_ITEM6_COMBO1
+EXAMINE_ITEM6_COMBO2
+EXAMINE_ITEM7_COMBO1
+EXAMINE_ITEM7_COMBO2
+EXAMINE_ITEM8_COMBO1
+EXAMINE_ITEM8_COMBO2
+</code></pre>
+
+
+          </div>
+    <dl class="function">
+    <dt>
+    <a name = "CONSTANT_STRING_HERE"></a>
+    <strong>CONSTANT_STRING_HERE</strong>
+    </dt>
+    <dd>
+    Table of constants to use with GetItem and SetItem.
+
+
+
+
+
+
+
+</dd>
+</dl>
+
+
+</div> <!-- id="content" -->
+</div> <!-- id="main" -->
+<div id="about">
+<i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
+<i style="float:right;">Last updated 2022-07-31 20:38:24 </i>
+</div> <!-- id="about" -->
+</div> <!-- id="container" -->
+</body>
+</html>

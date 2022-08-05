@@ -167,13 +167,13 @@ FloorInfo* GetSector(ROOM_INFO* room, int x, int z)
 	return &room->floor[index];
 }
 
-bool IsPointInRoom(PHD_3DPOS const& pos, int roomNumber)
+bool IsPointInRoom(Vector3Int pos, int roomNumber)
 {
 	auto* room = &g_Level.Rooms[roomNumber];
 
-	int x = pos.Position.x;
-	int y = pos.Position.y;
-	int z = pos.Position.z;
+	int x = pos.x;
+	int y = pos.y;
+	int z = pos.z;
 	int xSector = (x - room->x) / SECTOR(1);
 	int zSector = (z - room->z) / SECTOR(1);
 
@@ -187,14 +187,24 @@ bool IsPointInRoom(PHD_3DPOS const& pos, int roomNumber)
 	return false;
 }
 
-PHD_3DPOS GetRoomCenter(int roomNumber)
+int FindRoomNumber(Vector3Int position)
+{
+	for (int i = 0; i < g_Level.Rooms.size(); i++)
+		if (IsPointInRoom(position, i))
+			return i;
+
+	return 0;
+}
+
+Vector3Int GetRoomCenter(int roomNumber)
 {
 	auto* room = &g_Level.Rooms[roomNumber];
-	int halfLength = SECTOR(room->xSize)/2;
-	int halfDepth = SECTOR(room->zSize)/2;
-	int halfHeight = (room->maxceiling - room->minfloor) / 2;
 
-	auto center = PHD_3DPOS(
+	auto halfLength = SECTOR(room->xSize) / 2;
+	auto halfDepth = SECTOR(room->zSize) / 2;
+	auto halfHeight = (room->maxceiling - room->minfloor) / 2;
+
+	auto center = Vector3Int(
 		room->x + halfLength,
 		room->minfloor + halfHeight,
 		room->z + halfDepth

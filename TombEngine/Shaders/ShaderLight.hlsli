@@ -144,7 +144,7 @@ float3 DoShadowLight(float3 pos, float3 n, ShaderLight light)
 		if (distance > light.In)
 			attenuation = 1.0f - saturate((distance - light.In) / (light.Out - light.In));
 
-		float absolute = color * intensity * attenuation;
+		float absolute = float3(color * intensity * attenuation);
 		float directional = absolute * d;
 
 		return ((absolute * 0.33f) + (directional * 0.66f)) * 2.0f;
