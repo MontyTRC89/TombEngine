@@ -15,11 +15,20 @@
 #include "Specific/level.h"
 #include "Specific/trmath.h"
 
+using std::vector;
+
 namespace TEN::Entities::TR1
 {
 	constexpr auto WING_FLY_SPEED = CLICK(1) / 8;
 	constexpr auto WING_PUNCH_DAMAGE = 150;
 	constexpr auto WING_JUMP_DAMAGE = 100;
+	constexpr auto WING_FLY_MODE = 0; // itemFlags[0]
+	constexpr auto WING_BULLET_MODE = 1; // itemFlags[1]
+	constexpr auto WING_WALK_RANGE = SQUARE(SECTOR(4.5f));
+	constexpr auto WING_ATTACK3_RANGE = SQUARE(CLICK(1.172f));
+	constexpr auto WING_ATTACK2_RANGE = SQUARE(CLICK(2.344f));
+	constexpr auto WING_ATTACK1_RANGE = SQUARE(SECTOR(2.5f));
+	constexpr auto WING_ATTACK_RANGE = SQUARE(SECTOR(3.75f));
 
 	#define WING_WALK_TURN ANGLE(2.0f)
 	#define WING_RUN_TURN ANGLE(6.0f)
@@ -27,6 +36,7 @@ namespace TEN::Entities::TR1
 	const auto WingMutantBite = BiteInfo(Vector3(-27.0f, 98.0f, 0.0f), 10);
 	const auto WingMutantRocket = BiteInfo(Vector3(51.0f, 213.0f, 0.0f), 14);
 	const auto WingMutantShard = BiteInfo(Vector3(-35.0f, 269.0f, 0.0f), 9);
+	const vector<int> WingMutantJoints = { 9, 10, 14 };
 
 	enum WingedMutantState
 	{
@@ -90,6 +100,13 @@ namespace TEN::Entities::TR1
 		WING_START_MUMMY = 2
 	};
 
+	enum WingMutantBulletType
+	{
+		WING_BULLET_NONE,
+		WING_BULLET_DART,
+		WING_BULLET_EXPLODE
+	};
+
 	static void SwitchPathfinding(CreatureInfo* creature, WingMutantPaths path)
 	{
 		switch (path)
@@ -113,14 +130,14 @@ namespace TEN::Entities::TR1
 		{
 			SwitchPathfinding(creature, WING_FLYING);
 			SetAnimation(item, AWING_FLY);
-			item->ItemFlags[0] = TRUE;
+			item->ItemFlags[WING_FLY_MODE] = TRUE;
 			item->TriggerFlags = 0;
 		}
 		else if (item->TriggerFlags == WING_START_MUMMY)
 		{
 			SwitchPathfinding(creature, WING_GROUND);
 			SetAnimation(item, AWING_MUMMY);
-			item->ItemFlags[0] = FALSE;
+			item->ItemFlags[WING_FLY_MODE] = FALSE;
 			item->TriggerFlags = 0;
 		}
 	}
@@ -129,8 +146,9 @@ namespace TEN::Entities::TR1
 	void InitialiseWingedMutant(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
-		item->ItemFlags[0] = FALSE; // define flying mode ! (true: fly)
 		InitialiseCreature(itemNumber);
+		item->ItemFlags[WING_FLY_MODE] = FALSE; // define flying mode (TRUE = fly)
+		item->ItemFlags[WING_BULLET_MODE] = WING_BULLET_NONE; // define bullet that the entity shoot (there are 2)
 		SetAnimation(item, AWING_STOP);
 	}
 
@@ -150,25 +168,39 @@ namespace TEN::Entities::TR1
 
 		if (item->HitPoints <= 0)
 		{
-			ExplodingDeath(itemNumber, BODY_EXPLODE);
-			SoundEffect(SFX_TR1_ATLANTEAN_DEATH, &item->Pose);
-			DisableEntityAI(itemNumber);
-			KillItem(itemNumber);
-			item->Status = ITEM_DEACTIVATED;
+			CreatureDie(itemNumber, true);
+			SoundEffect(SFX_TR1_ATLANTEAN_EXPLODE, &item->Pose);
 			return;
 		}
 		else
 		{
 			AI_INFO AI;
-			SwitchPathfinding(creature, item->ItemFlags[0] ? WING_FLYING : WING_GROUND);
+			SwitchPathfinding(creature, item->ItemFlags[WING_FLY_MODE] ? WING_FLYING : WING_GROUND);
 			CreatureAIInfo(item, &AI);
 
 			if (AI.ahead)
 				head = AI.angle;
 
-			GetCreatureMood(item, &AI, item->ItemFlags[0]); // true = FLY = AGGRESIVE !
-			CreatureMood(item, &AI, item->ItemFlags[0]);
+			GetCreatureMood(item, &AI, item->ItemFlags[WING_FLY_MODE]); // true = FLY = AGGRESIVE !
+			CreatureMood(item, &AI, item->ItemFlags[WING_FLY_MODE]);
 			angle = CreatureTurn(item, creature->MaxTurn);
+
+			bool shoot1 = false;
+			bool shoot2 = false;
+			if (item->ObjectNumber != ID_MUTANT &&
+				Targetable(item, creature, &AI) &&
+			   (AI.zoneNumber != AI.enemyZone || AI.distance > WING_ATTACK_RANGE))
+			{
+				if (AI.angle > 0 && AI.angle < ANGLE(45.0f))
+					shoot1 = true;
+				else if (AI.angle < 0 && angle > -ANGLE(45.0f))
+					shoot2 = true;
+			}
+			else // if not targetable:
+			{
+				shoot1 = false;
+				shoot2 = false;
+			}
 
 			switch (item->Animation.ActiveState)
 			{
@@ -177,12 +209,93 @@ namespace TEN::Entities::TR1
 					item->Animation.TargetState = WING_STOP;
 				break;
 
+			case WING_STOP:
+				item->ItemFlags[WING_BULLET_MODE] = WING_BULLET_NONE;
 
+				if (item->ItemFlags[WING_FLY_MODE] == TRUE)
+					item->Animation.TargetState = WING_FLY;
+				else if (item->TestBits(JointBitType::Touch, WingMutantJoints[1]))
+					item->Animation.TargetState = WING_ATTACK3;
+				else if (AI.bite && AI.distance < WING_ATTACK3_RANGE)
+					item->Animation.TargetState = WING_ATTACK3;
+				else if (AI.bite && AI.distance < WING_ATTACK1_RANGE)
+					item->Animation.TargetState = WING_ATTACK1;
+				else if (shoot1)
+					item->Animation.TargetState = WING_AIM1;
+				else if (shoot2)
+					item->Animation.TargetState = WING_AIM2;
+				else if (creature->Mood == MoodType::Bored ||
+					(creature->Mood == MoodType::Stalk && AI.distance < WING_WALK_RANGE))
+					item->Animation.TargetState = WING_POSE;
+				else
+					item->Animation.TargetState = WING_RUN;
+				break;
+
+			case WING_POSE:
+				head = 0; // pose have custom animation for the head !
+				if (shoot1 || shoot2 || item->ItemFlags[WING_FLY_MODE] == TRUE)
+					item->Animation.TargetState = WING_STOP;
+
+				break;
+
+			case WING_WALK:
+
+				break;
+
+			case WING_RUN:
+
+				break;
+
+			case WING_ATTACK1:
+
+				break;
+
+			case WING_ATTACK2:
+
+				break;
+
+			case WING_ATTACK3:
+
+				break;
+
+			case WING_AIM1:
+				item->ItemFlags[WING_BULLET_MODE] = WING_BULLET_DART;
+				if (shoot1)
+					item->Animation.TargetState = WING_SHOOT;
+				else
+					item->Animation.TargetState = WING_STOP;
+				break;
+
+			case WING_AIM2:
+				item->ItemFlags[WING_BULLET_MODE] = WING_BULLET_EXPLODE;
+				if (shoot2)
+					item->Animation.TargetState = WING_SHOOT;
+				else
+					item->Animation.TargetState = WING_STOP;
+				break;
+
+			case WING_SHOOT:
+				switch (item->ItemFlags[WING_BULLET_MODE])
+				{
+				case WING_BULLET_DART:
+					CreatureEffect2(item, WingMutantShard, 10, 0, ShardGun);
+					break;
+				case WING_BULLET_EXPLODE:
+					CreatureEffect2(item, WingMutantShard, 10, 0, BombGun);
+					break;
+				}
+				item->ItemFlags[WING_BULLET_MODE] = WING_BULLET_NONE;
+				break;
+
+			case WING_FLY:
+				if (item->ItemFlags[WING_FLY_MODE] == TRUE && item->Pose.Position.y == item->Floor)
+					item->Animation.TargetState = WING_STOP; // switch to ground mode
+				break;
 			}
 		}
 
-		CreatureJoint(item, 0, -head);
-		CreatureJoint(item, 1, torso);
+		CreatureJoint(item, 0, torso);
+		CreatureJoint(item, 1, head);
 		CreatureAnimation(itemNumber, angle, 0);
 	}
 }
