@@ -192,8 +192,8 @@ static void StartEntity(ObjectInfo* obj)
 		obj->saveHitpoints = true;
 		obj->savePosition = true;
 		obj->zoneType = ZONE_FLYER;
-		g_Level.Bones[obj->boneIndex] |= ROT_Y;
-		g_Level.Bones[obj->boneIndex + 8] |= ROT_Y;
+		obj->setBoneRotation(1, ROT_Y); // torso
+		obj->setBoneRotation(3, ROT_Y); // head
 	}
 
 }

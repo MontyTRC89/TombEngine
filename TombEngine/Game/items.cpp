@@ -122,8 +122,6 @@ bool ItemInfo::IsCreature()
 void ClearItem(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
-	auto* room = &g_Level.Rooms[item->RoomNumber];
-
 	item->Collidable = true;
 	item->Data = nullptr;
 	item->StartPose = item->Pose;

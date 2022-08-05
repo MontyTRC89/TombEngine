@@ -21,9 +21,7 @@ using std::vector;
 namespace TEN::Entities::TR1
 {
 	constexpr auto CENTAUR_REAR_DAMAGE = 200;
-
 	constexpr auto CENTAUR_REAR_RANGE = SECTOR(1.5f);
-
 	constexpr auto CENTAUR_REAR_CHANCE = 0x60;
 	constexpr auto CENTAUR_PROJECTILE_SPEED = CLICK(1);
 

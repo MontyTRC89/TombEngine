@@ -18,19 +18,15 @@ namespace TEN::Entities::TR5
 {
 	BiteInfo HydraBite = { 0, 0, 0, 11 };
 
-	// TODO
 	enum HydraState
 	{
 		HYDRA_STATE_IDLE = 0,
 		HYDRA_STATE_BITE_ATTACK_1 = 1,
 		HYDRA_STATE_AIM = 2,
-
 		HYDRA_STATE_HURT = 4,
-
 		HYDRA_STATE_BITE_ATTACK_2 = 7,
 		HYDRA_STATE_BITE_ATTACK_3 = 8,
 		HYDRA_STATE_BITE_ATTACK_4 = 9,
-
 		HYDRA_STATE_DEATH = 11
 	};
 
@@ -44,17 +40,12 @@ namespace TEN::Entities::TR5
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		ClearItem(itemNumber);
-
-		item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex;
-		item->Animation.FrameNumber = 30 * item->TriggerFlags + g_Level.Anims[item->Animation.AnimNumber].frameBase;
-		item->Animation.TargetState = HYDRA_STATE_IDLE;
-		item->Animation.ActiveState = HYDRA_STATE_IDLE;
+		InitialiseCreature(itemNumber);
+		SetAnimation(item, 0);
 
 		if (item->TriggerFlags == 1)
 			item->Pose.Position.z += CLICK(1.5f);
-
-		if (item->TriggerFlags == 2)
+		else if (item->TriggerFlags == 2)
 			item->Pose.Position.z -= CLICK(1.5f);
 
 		item->Pose.Orientation.y = ANGLE(90.0f);
