@@ -197,6 +197,7 @@ CALL gen.bat</Command>
     <ClInclude Include="Game\Lara\lara_slide.h" />
     <ClInclude Include="Game\Lara\lara_struct.h" />
     <ClInclude Include="Game\Lara\lara_tests.h" />
+    <ClInclude Include="Objects\TR5\Trap\tr5_wreckingball.h" />
     <ClInclude Include="Objects\Utils\VehicleHelpers.h" />
     <ClInclude Include="Renderer\ConstantBuffers\AlphaTestBuffer.h" />
     <ClInclude Include="Renderer\ConstantBuffers\PostProcessBuffer.h" />
@@ -567,7 +568,6 @@ CALL gen.bat</Command>
     <ClInclude Include="Objects\Generic\Switches\switch.h" />
     <ClInclude Include="CustomObjects\tiger.h" />
     <ClInclude Include="Game\effects\tomb4fx.h" />
-    <ClInclude Include="Objects\Generic\Traps\traps.h" />
     <ClInclude Include="Objects\objectslist.h" />
     <ClInclude Include="Game\memory\malloc.h" />
     <ClInclude Include="Specific\input.h" />
@@ -636,6 +636,7 @@ CALL gen.bat</Command>
     <ClCompile Include="Objects\Effects\flame_emitters.cpp" />
     <ClCompile Include="Game\effects\lara_fx.cpp" />
     <ClCompile Include="Objects\Generic\Traps\dart_emitter.cpp" />
+    <ClCompile Include="Objects\TR5\Trap\tr5_wreckingball.cpp" />
     <ClCompile Include="Objects\Utils\VehicleHelpers.cpp" />
     <ClCompile Include="Renderer\Renderer11DrawMenu.cpp" />
     <ClCompile Include="Renderer\Texture2DArray\Texture2DArray.cpp" />
@@ -906,7 +907,6 @@ CALL gen.bat</Command>
     <ClCompile Include="Game\spotcam.cpp" />
     <ClCompile Include="Objects\Generic\Switches\switch.cpp" />
     <ClCompile Include="Game\effects\tomb4fx.cpp" />
-    <ClCompile Include="Objects\Generic\Traps\traps.cpp" />
     <ClCompile Include="Objects\TR4\Entity\tr4_baddy.cpp" />
     <ClCompile Include="Objects\TR4\Vehicles\motorbike.cpp" />
     <ClCompile Include="Objects\TR4\Entity\tr4_mummy.cpp" />
