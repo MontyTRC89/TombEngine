@@ -138,8 +138,8 @@ struct BiteInfo
 
 constexpr auto BOX_BLOCKED = (1 << 14); // unpassable for other enemies, always set for movable blocks & closed doors
 constexpr auto BOX_LAST = (1 << 15); // unpassable by large enemies (T-Rex, Centaur, etc), always set behind doors
-constexpr auto TIMID = 0;
-constexpr auto VIOLENT = 1;
+
+
 constexpr auto REVERSE = 0x4000;
 constexpr auto BLOCKABLE = 0x8000;
 constexpr auto BLOCKED = 0x4000;

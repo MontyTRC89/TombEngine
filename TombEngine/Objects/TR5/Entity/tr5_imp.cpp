@@ -162,12 +162,12 @@ namespace TEN::Entities::TR5
 
 				AI.xAngle = phd_atan(d2, d1);
 
-				GetCreatureMood(item, &AI, VIOLENT);
+				GetCreatureMood(item, &AI, true);
 
 				if (item->Animation.ActiveState == IMP_STATE_SCARED)
 					creature->Mood = MoodType::Escape;
 
-				CreatureMood(item, &AI, VIOLENT);
+				CreatureMood(item, &AI, true);
 
 				angle1 = CreatureTurn(item, creature->MaxTurn);
 				joint0 = AI.xAngle / 2;

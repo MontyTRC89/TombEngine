@@ -79,18 +79,18 @@ namespace TEN::Entities::TR4
 			else
 				creature->Enemy = LaraItem;
 
-			// NOTE: Changed from TIMID to VIOLENT, otherwise the bat seems to ignore Lara. 
-			// I feel fine with bat always VIOLENT,
+			// NOTE: Changed from false to true, otherwise the bat seems to ignore Lara. 
+			// I feel fine with bat always true,
 			// but I will also inspect GetCreatureMood and CreatureMood functions for bugs. @TokyoSU
 
 			AI_INFO AI;
 			CreatureAIInfo(item, &AI);
-			GetCreatureMood(item, &AI, VIOLENT);
+			GetCreatureMood(item, &AI, true);
 
 			if (creature->Flags)
 				creature->Mood = MoodType::Escape;
 
-			CreatureMood(item, &AI, VIOLENT);
+			CreatureMood(item, &AI, true);
 
 			angle = CreatureTurn(item, BAT_ANGLE);
 

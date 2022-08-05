@@ -88,25 +88,25 @@ namespace TEN::Entities::TR1
 		if (creature->Flags & APE_FLAG_TURN_LEFT)
 		{
 			item->Pose.Orientation.y -= ANGLE(90.0f);
-			creature->Flags -= APE_FLAG_TURN_LEFT;
+			creature->Flags &= ~APE_FLAG_TURN_LEFT;
 		}
 		else if (item->Flags & APE_FLAG_TURN_RIGHT)
 		{
 			item->Pose.Orientation.y += ANGLE(90.0f);
-			creature->Flags -= APE_FLAG_TURN_RIGHT;
+			creature->Flags &= ~APE_FLAG_TURN_RIGHT;
 		}
 
-		long long xx = item->Pose.Position.z / SECTOR(1);
-		long long yy = item->Pose.Position.x / SECTOR(1);
-		long long y = item->Pose.Position.y;
+		int xx = item->Pose.Position.z / SECTOR(1);
+		int yy = item->Pose.Position.x / SECTOR(1);
+		int y = item->Pose.Position.y;
 
 		CreatureAnimation(itemNumber, angle, 0);
 
 		if (item->Pose.Position.y > (y - CLICK(1.5f)))
 			return;
 
-		long long xFloor = item->Pose.Position.z / SECTOR(1);
-		long long yFloor = item->Pose.Position.x / SECTOR(1);
+		int xFloor = item->Pose.Position.z / SECTOR(1);
+		int yFloor = item->Pose.Position.x / SECTOR(1);
 		if (xx == xFloor)
 		{
 			if (yy == yFloor)
@@ -141,18 +141,9 @@ namespace TEN::Entities::TR1
 			// diagonal
 		}
 
-		switch (CreatureVault(itemNumber, angle, 2, SHIFT))
-		{
-		case 2:
-			item->Pose.Position.y = y;
-			item->Animation.AnimNumber = Objects[ID_APE].animIndex + APE_ANIM_VAULT;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-			item->Animation.ActiveState = APE_STATE_VAULT;
-			break;
-
-		default:
-			return;
-		}
+		item->Pose.Position.y = y;
+		if (CreatureVault(itemNumber, angle, 2, SHIFT) == 2)
+			SetAnimation(item, APE_ANIM_VAULT);
 	}
 
 	void ApeControl(short itemNumber)
@@ -169,11 +160,7 @@ namespace TEN::Entities::TR1
 		if (item->HitPoints <= 0)
 		{
 			if (item->Animation.ActiveState != APE_STATE_DEATH)
-			{
-				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + APE_ANIM_DEATH_1 + (short)(GetRandomControl() / 0x4000);
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-				item->Animation.ActiveState = APE_STATE_DEATH;
-			}
+				SetAnimation(item, APE_ANIM_DEATH_1 + (short)(GetRandomControl() / 0x4000));
 		}
 		else
 		{
@@ -183,8 +170,8 @@ namespace TEN::Entities::TR1
 			if (AI.ahead)
 				head = AI.angle;
 
-			GetCreatureMood(item, &AI, TIMID);
-			CreatureMood(item, &AI, TIMID);
+			GetCreatureMood(item, &AI, false);
+			CreatureMood(item, &AI, false);
 
 			angle = CreatureTurn(item, creatureInfo->MaxTurn);
 

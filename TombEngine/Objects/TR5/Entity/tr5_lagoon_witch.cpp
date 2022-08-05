@@ -85,8 +85,8 @@ namespace TEN::Entities::TR5
 			//if (creature->enemy != LaraItem)
 			//	phd_atan(lara_item->pos.z_pos - item->pos.z_pos, lara_item->pos.x_pos - item->pos.x_pos);
 
-			GetCreatureMood(item, &AI, VIOLENT);
-			CreatureMood(item, &AI, VIOLENT);
+			GetCreatureMood(item, &AI, true);
+			CreatureMood(item, &AI, true);
 
 			angle = CreatureTurn(item, creature->MaxTurn);
 

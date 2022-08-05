@@ -128,8 +128,8 @@ namespace TEN::Entities::TR3
 				AI.xAngle -= 0x800;
 			}
 
-			GetCreatureMood(item, &AI, VIOLENT);
-			CreatureMood(item, &AI, VIOLENT);
+			GetCreatureMood(item, &AI, true);
+			CreatureMood(item, &AI, true);
 
 			angle = CreatureTurn(item, creature->MaxTurn);
 

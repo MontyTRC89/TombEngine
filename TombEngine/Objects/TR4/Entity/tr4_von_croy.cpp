@@ -314,8 +314,8 @@ namespace TEN::Entities::TR4
 		else
 			CreatureAIInfo(item, &AI);
 
-		GetCreatureMood(item, &AI, VIOLENT);
-		CreatureMood(item, &AI, VIOLENT);
+		GetCreatureMood(item, &AI, true);
+		CreatureMood(item, &AI, true);
 
 		AI_INFO laraAI;
 		if (creature->Enemy->IsLara())

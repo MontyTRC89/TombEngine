@@ -61,8 +61,8 @@ namespace TEN::Entities::TR2
 			if (!MonksAttackLara && creature->Enemy == LaraItem)
 				creature->Enemy = NULL;
 
-			GetCreatureMood(item, &AI, VIOLENT);
-			CreatureMood(item, &AI, VIOLENT);
+			GetCreatureMood(item, &AI, true);
+			CreatureMood(item, &AI, true);
 			angle = CreatureTurn(item, creature->MaxTurn);
 
 			if (AI.ahead)

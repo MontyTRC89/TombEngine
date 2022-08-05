@@ -171,8 +171,8 @@ namespace TEN::Entities::TR4
 				laraAI.distance = SQUARE(dx) + SQUARE(dz);
 			}
 
-			GetCreatureMood(item, &AI, VIOLENT);
-			CreatureMood(item, &AI, VIOLENT);
+			GetCreatureMood(item, &AI, true);
+			CreatureMood(item, &AI, true);
 
 			angle = CreatureTurn(item, creature->MaxTurn);
 			//creature->Enemy = LaraItem; // No need since CreatureAIInfo() set it. -- TokyoSU

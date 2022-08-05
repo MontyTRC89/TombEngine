@@ -133,8 +133,8 @@ namespace TEN::Entities::TR1
 			if (AI.ahead)
 				head = AI.angle;
 
-			GetCreatureMood(item, &AI, VIOLENT);
-			CreatureMood(item, &AI, VIOLENT);
+			GetCreatureMood(item, &AI, true);
+			CreatureMood(item, &AI, true);
 
 			angle = CreatureTurn(item, creature->MaxTurn);
 

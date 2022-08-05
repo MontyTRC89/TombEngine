@@ -86,8 +86,8 @@ namespace TEN::Entities::TR1
 			if (AI.ahead)
 				head = AI.angle;
 
-			GetCreatureMood(item, &AI, VIOLENT);
-			CreatureMood(item, &AI, VIOLENT);
+			GetCreatureMood(item, &AI, true);
+			CreatureMood(item, &AI, true);
 
 			angle = (short)phd_atan(creature->Target.z - item->Pose.Position.z, creature->Target.x - item->Pose.Position.x) - item->Pose.Orientation.y;
 

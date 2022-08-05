@@ -92,8 +92,8 @@ namespace TEN::Entities::TR5
 				if (AI.ahead)
 					joint = AI.angle;
 
-				GetCreatureMood(item, &AI, TIMID);
-				CreatureMood(item, &AI, TIMID);
+				GetCreatureMood(item, &AI, false);
+				CreatureMood(item, &AI, false);
 
 				angle = CreatureTurn(item, creature->MaxTurn);
 

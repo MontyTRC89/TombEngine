@@ -113,12 +113,12 @@ namespace TEN::Entities::TR4
 			AI_INFO AI;
 			CreatureAIInfo(item, &AI);
 
-			GetCreatureMood(item, &AI, VIOLENT);
+			GetCreatureMood(item, &AI, true);
 
 			if (item->Flags)
 				creature->Mood = MoodType::Escape;
 
-			CreatureMood(item, &AI, VIOLENT);
+			CreatureMood(item, &AI, true);
 
 			angle = CreatureTurn(item, creature->MaxTurn);
 

@@ -38,8 +38,8 @@ namespace TEN::Entities::TR5
 			AI_INFO AI;
 			CreatureAIInfo(item, &AI);
 
-			GetCreatureMood(item, &AI, TIMID);
-			CreatureMood(item, &AI, TIMID);
+			GetCreatureMood(item, &AI, false);
+			CreatureMood(item, &AI, false);
 
 			short angle = CreatureTurn(item, ANGLE(2.0f));
 

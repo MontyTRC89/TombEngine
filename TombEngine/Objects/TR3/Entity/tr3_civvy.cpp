@@ -137,7 +137,7 @@ namespace TEN::Entities::TR3
 				laraAiInfo.distance = pow(laraDx, 2) + pow(laraDz, 2);
 			}
 
-			GetCreatureMood(item, &AI, VIOLENT);
+			GetCreatureMood(item, &AI, true);
 
 			if (creature->Enemy == LaraItem &&
 				AI.distance > pow(CIVVY_ESCAPE_RANGE, 2) &&
@@ -147,7 +147,7 @@ namespace TEN::Entities::TR3
 				creature->Mood = MoodType::Escape;
 			}
 
-			CreatureMood(item, &AI, VIOLENT);
+			CreatureMood(item, &AI, true);
 
 			angle = CreatureTurn(item, creature->MaxTurn);
 

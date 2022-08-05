@@ -56,8 +56,8 @@ namespace TEN::Entities::TR2
 			if (AI.ahead)
 				head = AI.angle;
 
-			GetCreatureMood(item, &AI, TIMID);
-			CreatureMood(item, &AI, TIMID);
+			GetCreatureMood(item, &AI, false);
+			CreatureMood(item, &AI, false);
 
 			angle = CreatureTurn(item, ANGLE(6.0f));
 
