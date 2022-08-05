@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "tr1_doppelganger.h"
+#include "Objects/TR1/Entity/tr1_doppelganger.h"
 
 #include "Game/animation.h"
 #include "Game/collision/collide_room.h"
