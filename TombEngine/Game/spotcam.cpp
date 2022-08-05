@@ -566,7 +566,7 @@ void CalculateSpotCameras()
 					int sp2 = 0;
 					if (SpotCam[CurrentSplineCamera].flags & SCF_CUT_TO_CAM)
 					{
-						cn = (SpotCam[CurrentSplineCamera].timer & 0xF) + FirstCamera;
+						cn = FirstCamera + SpotCam[CurrentSplineCamera].timer;
 
 						CameraXposition[1] = SpotCam[cn].x;
 						CameraYposition[1] = SpotCam[cn].y;
