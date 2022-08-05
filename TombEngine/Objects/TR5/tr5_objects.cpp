@@ -50,8 +50,9 @@
 #include "tr5_fallingceiling.h"
 #include "tr5_rollingball.h"
 #include "tr5_explosion.h"
+#include "tr5_wreckingball.h"
 
-/// Switches
+// Switches
 #include "tr5_crowdove_switch.h"
 
 /// shatter
@@ -1201,6 +1202,17 @@ static void StartSwitch(ObjectInfo *obj)
 		obj->saveFlags = true;
 		obj->saveAnim = true;
 		obj->saveMesh = true;
+	}
+
+	obj = &Objects[ID_WRECKING_BALL];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseWreckingBall;
+		obj->collision = WreckingBallCollision;
+		obj->control = WreckingBallControl;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+		obj->savePosition = true;
 	}
 }
 
