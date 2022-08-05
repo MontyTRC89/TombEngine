@@ -12,7 +12,7 @@
 
 namespace TEN::Entities::TR2
 {
-	BiteInfo BarracudaBite = { 2, -60, 121, 7 };
+	const auto BarracudaBite = BiteInfo(Vector3(2.0f, -60.0f, 121.0f), 7);
 
 	// TODO
 	enum BarracudaState
@@ -89,7 +89,7 @@ namespace TEN::Entities::TR2
 
 			case 3:
 				creature->MaxTurn = ANGLE(4.0f);
-				creature->Flags = 0;
+				creature->Flags = NULL;
 
 				if (creature->Mood == MoodType::Bored)
 					item->Animation.TargetState = 2;
@@ -109,8 +109,8 @@ namespace TEN::Entities::TR2
 
 				if (!creature->Flags && (item->TouchBits & 0xE0))
 				{
-					CreatureEffect(item, &BarracudaBite, DoBloodSplat);
 					DoDamage(creature->Enemy, 100);
+					CreatureEffect(item, BarracudaBite, DoBloodSplat);
 					creature->Flags = 1;
 				}
 

@@ -13,9 +13,9 @@
 
 namespace TEN::Entities::TR2
 {
-	bool MonksAttackLara;
+	const auto MonkBite = BiteInfo(Vector3(-23.0f, 16.0f, 265.0f), 14);
 
-	BiteInfo MonkBite = { -23,16,265, 14 };
+	bool MonksAttackLara;
 
 	// TODO
 	enum MonkState
@@ -198,9 +198,9 @@ namespace TEN::Entities::TR2
 					if (!(creature->Flags & 0xF000) && item->TouchBits & 0x4000)
 					{
 						creature->Flags |= 0x1000;
-						SoundEffect(SFX_TR2_CRUNCH1, &item->Pose);
-						CreatureEffect(item, &MonkBite, DoBloodSplat);
 						DoDamage(enemy, 150);
+						CreatureEffect(item, MonkBite, DoBloodSplat);
+						SoundEffect(SFX_TR2_CRUNCH1, &item->Pose);
 					}
 				}
 				else
@@ -212,8 +212,8 @@ namespace TEN::Entities::TR2
 							abs(enemy->Pose.Position.z - item->Pose.Position.z) < CLICK(2))
 						{
 							creature->Flags |= 0x1000;
-							SoundEffect(SFX_TR2_CRUNCH1, &item->Pose);
 							DoDamage(enemy, 5);
+							SoundEffect(SFX_TR2_CRUNCH1, &item->Pose);
 						}
 					}
 				}

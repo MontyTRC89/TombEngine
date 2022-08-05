@@ -13,8 +13,8 @@
 
 namespace TEN::Entities::TR2
 {
-	BiteInfo MercenaryUziBite = { 0, 150, 19, 17 };
-	BiteInfo MercenaryAutoPistolBite = { 0, 230, 9, 17 };
+	auto MercenaryUziBite = BiteInfo(Vector3(0.0f, 150.0f, 19.0f), 17);
+	auto MercenaryAutoPistolBite = BiteInfo(Vector3(0.0f, 230.0f, 9.0f), 17);
 
 	// TODO
 	enum MercenaryState

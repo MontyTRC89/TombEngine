@@ -12,8 +12,8 @@
 
 namespace TEN::Entities::TR2
 {
-	BiteInfo EagleBite = { 15, 46, 21, 6 };
-	BiteInfo CrowBite = { 2, 10, 60, 14 };
+	const auto EagleBite = BiteInfo(Vector3(15.0f, 46.0f, 21.0f), 6);
+	const auto CrowBite	 = BiteInfo(Vector3(2.0f, 10.0f, 60.0f), 14);
 
 	// TODO
 	enum EagleState
@@ -151,9 +151,9 @@ namespace TEN::Entities::TR2
 					DoDamage(creature->Enemy, 20);
 
 					if (item->ObjectNumber == ID_CROW)
-						CreatureEffect(item, &CrowBite, DoBloodSplat);
+						CreatureEffect(item, CrowBite, DoBloodSplat);
 					else
-						CreatureEffect(item, &EagleBite, DoBloodSplat);
+						CreatureEffect(item, EagleBite, DoBloodSplat);
 
 					creature->Flags = 1;
 				}
