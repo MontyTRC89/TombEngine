@@ -66,6 +66,9 @@ namespace TEN::Renderer
 				{
 					for (auto i = 0; i < sphereMeshes.size(); i++)
 					{
+						if (!nativeItem.TestBits(JointBitType::Mesh, sphereMeshes[i]))
+							continue;
+
 						MESH& m = g_Level.Meshes[Lara.MeshPtrs[sphereMeshes[i]]];
 						Vector3Int pos = { (int)m.sphere.Center.x, (int)m.sphere.Center.y, (int)m.sphere.Center.z };
 
@@ -183,7 +186,7 @@ namespace TEN::Renderer
 					RenderTargetCube::forwardVectors[step] * SECTOR(10),
 					RenderTargetCube::upVectors[step]);
 
-				projection = Matrix::CreatePerspectiveFieldOfView(90.0f, 1.0f, 16.0f, shadowLight->Out);
+				projection = Matrix::CreatePerspectiveFieldOfView(90.0f * PI / 180.0f, 1.0f, 16.0f, shadowLight->Out);
 
 			}
 			else if (shadowLight->Type == LIGHT_TYPE_SPOT) 
@@ -192,7 +195,9 @@ namespace TEN::Renderer
 					shadowLight->Position - shadowLight->Direction * SECTOR(10),
 					Vector3(0.0f, -1.0f, 0.0f));
 
-				projection = Matrix::CreatePerspectiveFieldOfView(shadowLight->OutRange, 1.0f, 16.0f, shadowLight->Out);
+				// Vertex lighting fades out in 1024-steps. increase angle artificially for a bigger blend radius.
+				float projectionAngle = shadowLight->OutRange * 1.5f * (PI / 180.0f); 
+				projection = Matrix::CreatePerspectiveFieldOfView(projectionAngle, 1.0f, 16.0f, shadowLight->Out);
 			}
 
 			CCameraMatrixBuffer shadowProjection;
@@ -209,7 +214,6 @@ namespace TEN::Renderer
 			RendererRoom& room = m_rooms[item->RoomNumber];
 
 			m_stItem.World = item->World;
-			m_stItem.Position = Vector4(item->Position.x, item->Position.y, item->Position.z, 1.0f);
 			m_stItem.Color = item->Color;
 			m_stItem.AmbientLight = item->AmbientLight;
 			memcpy(m_stItem.BonesMatrices, item->AnimationTransforms, sizeof(Matrix) * MAX_BONES);
@@ -327,9 +331,7 @@ namespace TEN::Renderer
 			Matrix rotation = Matrix::CreateFromYawPitchRoll(TO_RAD(gunshell->pos.Orientation.y), TO_RAD(gunshell->pos.Orientation.x),
 																TO_RAD(gunshell->pos.Orientation.z));
 			Matrix world = rotation * translation;
-
 			m_stStatic.World = world;
-			m_stStatic.Position = Vector4(gunshell->pos.Position.x, gunshell->pos.Position.y, gunshell->pos.Position.z, 1.0f);
 
 			m_cbStatic.updateData(m_stStatic, m_context.Get());
 			BindConstantBufferVS(CB_STATIC, m_cbStatic.get());
@@ -558,7 +560,6 @@ namespace TEN::Renderer
 					Matrix world = rotation * translation;
 
 					m_stStatic.World = world;
-					m_stStatic.Position = Vector4(rat->Pose.Position.x, rat->Pose.Position.y, rat->Pose.Position.z, 1.0f);
 					m_stStatic.Color = Vector4::One;
 					m_stStatic.AmbientLight = m_rooms[rat->RoomNumber].AmbientLight;
 					m_cbStatic.updateData(m_stStatic, m_context.Get());
@@ -617,7 +618,6 @@ namespace TEN::Renderer
 						Matrix world = rotation * translation;
 
 						m_stStatic.World = world;
-						m_stStatic.Position = Vector4(bat->Pose.Position.x, bat->Pose.Position.y, bat->Pose.Position.z, 1.0f);
 						m_stStatic.Color = Vector4::One;
 						m_stStatic.AmbientLight = m_rooms[bat->RoomNumber].AmbientLight;
 						m_cbStatic.updateData(m_stStatic, m_context.Get());
@@ -662,7 +662,6 @@ namespace TEN::Renderer
 					Matrix world = rotation * translation;
 
 					m_stStatic.World = world;
-					m_stStatic.Position = Vector4(beetle->Pose.Position.x, beetle->Pose.Position.y, beetle->Pose.Position.z, 1.0f);
 					m_stStatic.Color = Vector4::One;
 					m_stStatic.AmbientLight = m_rooms[beetle->RoomNumber].AmbientLight;
 					m_cbStatic.updateData(m_stStatic, m_context.Get());
@@ -714,7 +713,6 @@ namespace TEN::Renderer
 					Matrix world = rotation * translation;
 
 					m_stStatic.World = world;
-					m_stStatic.Position = Vector4(locust->pos.Position.x, locust->pos.Position.y, locust->pos.Position.z, 1.0f);
 					m_stStatic.Color = Vector4::One;
 					m_stStatic.AmbientLight = m_rooms[locust->roomNumber].AmbientLight;
 					m_cbStatic.updateData(m_stStatic, m_context.Get());
@@ -1390,7 +1388,6 @@ namespace TEN::Renderer
 		            SAMPLER_NONE);
 
 		m_stStatic.World = info->world;
-		m_stStatic.Position = Vector4(info->position.x, info->position.y, info->position.z, 1.0f);
 		m_stStatic.Color = info->color;
 		m_stStatic.AmbientLight = info->room->AmbientLight;
 		m_stStatic.LightMode = m_staticObjects[info->staticMesh->ObjectNumber]->ObjectMeshes[0]->LightMode;
@@ -1725,7 +1722,6 @@ namespace TEN::Renderer
 
 		// Bind item main properties
 		m_stItem.World = item->World;
-		m_stItem.Position = Vector4(item->Position.x, item->Position.y, item->Position.z, 1.0f);
 		m_stItem.Color = item->Color;
 		m_stItem.AmbientLight = item->AmbientLight;
 		memcpy(m_stItem.BonesMatrices, item->AnimationTransforms, sizeof(Matrix) * MAX_BONES);
@@ -1780,7 +1776,6 @@ namespace TEN::Renderer
 		m_context->PSSetShader(m_psItems.Get(), nullptr, 0);
 
 		m_stItem.World = info->item->World;
-		m_stItem.Position = Vector4(info->position.x, info->position.y, info->position.z, 1.0f);
 		m_stItem.Color = info->color;
 		m_stItem.AmbientLight = info->item->AmbientLight;
 		memcpy(m_stItem.BonesMatrices, info->item->AnimationTransforms, sizeof(Matrix) * MAX_BONES);
@@ -1845,6 +1840,11 @@ namespace TEN::Renderer
 
 	void Renderer11::DrawStatics(RenderView& view, bool transparent)
 	{
+		// Static mesh shader is used for all forthcoming renderer routines, so we
+		// must assign it before any early exits.
+		m_context->VSSetShader(m_vsStatics.Get(), nullptr, 0);
+		m_context->PSSetShader(m_psStatics.Get(), nullptr, 0);
+
 		// If no static textures are loaded, don't draw anything.
 		if (m_staticsTextures.size() == 0)
 			return;
@@ -1857,10 +1857,6 @@ namespace TEN::Renderer
 		m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		m_context->IASetInputLayout(m_inputLayout.Get());
 		m_context->IASetIndexBuffer(m_staticsIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
-
-		// Static mesh shader is used for all forthcoming renderer routines
-		m_context->VSSetShader(m_vsStatics.Get(), nullptr, 0);
-		m_context->PSSetShader(m_psStatics.Get(), nullptr, 0);
 
 		Vector3 cameraPosition = Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z);
 
@@ -1916,7 +1912,6 @@ namespace TEN::Renderer
 						else
 						{
 							m_stStatic.World = msh.World;
-							m_stStatic.Position = Vector4(msh.Position.x, msh.Position.y, msh.Position.z, 1.0f);
 							m_stStatic.Color = msh.Color;
 							m_stStatic.AmbientLight = room->AmbientLight;
 							m_stStatic.LightMode = mesh->LightMode;
@@ -2223,8 +2218,6 @@ namespace TEN::Renderer
 		m_context->VSSetShader(m_vsSky.Get(), nullptr, 0);
 		m_context->PSSetShader(m_psSky.Get(), nullptr, 0);
 
-		SetAlphaTest(ALPHA_TEST_NONE, 1.0f);
-
 		BindTexture(TEXTURE_COLOR_MAP, &m_skyTexture, SAMPLER_ANISOTROPIC_CLAMP);
 
 		m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -2242,6 +2235,7 @@ namespace TEN::Renderer
 
 			m_stStatic.World = (rotation * translation);
 			m_stStatic.Color = weather.SkyColor();
+			m_stStatic.AmbientLight = Vector4::One;
 			m_stStatic.LightMode = LIGHT_MODES::LIGHT_MODE_STATIC;
 
 			m_cbStatic.updateData(m_stStatic, m_context.Get());
@@ -2265,8 +2259,8 @@ namespace TEN::Renderer
 			RendererObject& moveableObj = *m_moveableObjects[ID_HORIZON];
 
 			m_stStatic.World = Matrix::CreateTranslation(Camera.pos.x, Camera.pos.y, Camera.pos.z);
-			m_stStatic.Position = Vector4::Zero;
 			m_stStatic.Color = Vector4::One;
+			m_stStatic.AmbientLight = Vector4::One;
 			m_stStatic.LightMode = LIGHT_MODES::LIGHT_MODE_STATIC;
 
 			m_cbStatic.updateData(m_stStatic, m_context.Get());
@@ -2288,6 +2282,7 @@ namespace TEN::Renderer
 					            SAMPLER_NONE);
 
 					SetBlendMode(bucket.BlendMode);
+					SetAlphaTest(bucket.BlendMode == BLEND_MODES::BLENDMODE_ALPHATEST ? ALPHA_TEST_GREATER_THAN : ALPHA_TEST_NONE, ALPHA_TEST_THRESHOLD);
 
 					// Draw vertices
 					DrawIndexedTriangles(bucket.NumIndices, bucket.StartIndex, 0);

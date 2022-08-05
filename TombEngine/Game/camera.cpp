@@ -107,6 +107,11 @@ void AlterFOV(int value)
 	PhdPerspective = g_Configuration.Width / 2 * phd_cos(CurrentFOV / 2) / phd_sin(CurrentFOV / 2);
 }
 
+short GetCurrentFOV()
+{
+	return CurrentFOV;
+}
+
 inline void RumbleFromBounce()
 {
 	Rumble(std::clamp((float)abs(Camera.bounce) / 70.0f, 0.0f, 0.8f), 0.2f);

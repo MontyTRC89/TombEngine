@@ -111,9 +111,11 @@ void DoPointLightShadow(float3 worldPos, inout float3 lighting)
         {
             lightClipSpace.x = lightClipSpace.x / 2 + 0.5;
             lightClipSpace.y = lightClipSpace.y / -2 + 0.5;
+
             float sum = 0;
             float x, y;
-            //perform PCF filtering on a 4 x 4 texel neighborhood
+
+            // Perform PCF filtering on a 4 x 4 texel neighborhood
             // what about borders of cubemap?
             for (y = -1.5; y <= 1.5; y += 1.0)
             {
@@ -124,7 +126,6 @@ void DoPointLightShadow(float3 worldPos, inout float3 lighting)
             }
 
             shadowFactor = sum / 16.0;
-
         }
     }
     float distanceFactor = saturate(((distance(worldPos, Light.Position)) / (Light.Out)));
@@ -154,28 +155,32 @@ void DoSpotLightShadow(float3 worldPos, inout float3 lighting)
 {
     float4 lightClipSpace = mul(float4(worldPos, 1.0f), LightViewProjections[0]);
     lightClipSpace.xyz /= lightClipSpace.w;
+    float2 shadowUV = lightClipSpace.xy * 0.5f + 0.5f;
+    shadowUV.y = (1 - shadowUV.y);
     float shadowFactor = 1.0f;
     if (lightClipSpace.x >= -1.0f && lightClipSpace.x <= 1.0f &&
         lightClipSpace.y >= -1.0f && lightClipSpace.y <= 1.0f &&
         lightClipSpace.z >= 0.0f && lightClipSpace.z <= 1.0f)
     {
-        lightClipSpace.x = lightClipSpace.x / 2 + 0.5;
-        lightClipSpace.y = lightClipSpace.y / -2 + 0.5;
         float sum = 0;
         float x, y;
         //perform PCF filtering on a 4 x 4 texel neighborhood
+        
         for (y = -1.5; y <= 1.5; y += 1.0)
         {
             for (x = -1.5; x <= 1.5; x += 1.0)
             {
-                sum += ShadowMap.SampleCmpLevelZero(ShadowMapSampler, float3(lightClipSpace.xy + TexOffset(x, y), 0), lightClipSpace.z);
+                sum += ShadowMap.SampleCmpLevelZero(ShadowMapSampler, float3(shadowUV.xy + TexOffset(x, y), 0), lightClipSpace.z);
             }
         }
-
+        
         shadowFactor = sum / 16.0;
+        
     }
-    float distanceFactor = saturate(((distance(worldPos, Light.Position)) / (Light.Out)));
-    //Fade out at the borders of the sampled texture
-    float angleFactor = min(max(sin(lightClipSpace.x * PI) * 1.2, 0), 1);
-    lighting *= saturate((shadowFactor + SHADOW_INTENSITY) + (pow(distanceFactor, 4) * (1 - angleFactor) * INV_SHADOW_INTENSITY));
+    // Fade out towards the borders of the sampled texture
+    // for that we simply compare the distance between the shadow texture UV coordinate we sampled and the center (0.5,0.5) of the shadow texture
+    // use pow to "boost" the shadow intensity towards the center
+    float angleFactor = saturate(pow(distance(shadowUV.xy, 0.5f) * 2,2.2f));
+    
+    lighting *= saturate((shadowFactor + SHADOW_INTENSITY) + ((angleFactor) * INV_SHADOW_INTENSITY));
 }

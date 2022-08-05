@@ -210,7 +210,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->savePosition = true;
 	}
 
-	obj = &Objects[ID_FLAMETHROWER_GOON];
+	obj = &Objects[ID_FLAMETHROWER_BADDY];
 	if (obj->loaded)
 	{
 		obj->control = FlameThrowerControl;

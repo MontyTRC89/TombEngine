@@ -246,6 +246,16 @@ void Renderer11::UpdateLaraAnimations(bool force)
 
 void TEN::Renderer::Renderer11::DrawLara(RenderView& view, bool transparent)
 {
+	// Don't draw Lara if binoculars or sniper
+	if (BinocularRange || SpotcamOverlay || SpotcamDontDrawLara || CurrentLevel == 0)
+		return;
+
+	RendererItem* item = &m_items[Lara.ItemNumber];
+	ItemInfo* nativeItem = &g_Level.Items[item->ItemNumber];
+
+	if (nativeItem->Flags & IFLAG_INVISIBLE)
+		return;
+
 	UINT stride = sizeof(RendererVertex);
 	UINT offset = 0;
 
@@ -268,10 +278,8 @@ void TEN::Renderer::Renderer11::DrawLara(RenderView& view, bool transparent)
 	RendererObject& laraSkin = *m_moveableObjects[ID_LARA_SKIN];
 
 	RendererRoom* room = &m_rooms[LaraItem->RoomNumber];
-	RendererItem* item = &m_items[Lara.ItemNumber];
 
 	m_stItem.World = m_LaraWorldMatrix;
-	m_stItem.Position = Vector4(LaraItem->Pose.Position.x, LaraItem->Pose.Position.y, LaraItem->Pose.Position.z, 1.0f);
 	m_stItem.Color = item->Color;
 	m_stItem.AmbientLight = item->AmbientLight;
 	memcpy(m_stItem.BonesMatrices, laraObj.AnimationTransforms.data(), sizeof(Matrix) * MAX_BONES);
@@ -286,6 +294,9 @@ void TEN::Renderer::Renderer11::DrawLara(RenderView& view, bool transparent)
 
 	for (int k = 0; k < laraSkin.ObjectMeshes.size(); k++)
 	{
+		if (!nativeItem->TestBits(JointBitType::Mesh, k))
+			continue;
+
 		RendererMesh *mesh = GetMesh(Lara.MeshPtrs[k]);
 		DrawMoveableMesh(item, mesh, room, k, transparent);
 	}
