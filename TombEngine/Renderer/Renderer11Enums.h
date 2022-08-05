@@ -1,4 +1,5 @@
 #pragma once
+#include "Specific/trmath.h"
 
 enum RENDERER_BUCKETS
 {
@@ -61,11 +62,11 @@ enum CULL_MODES
 	CULL_MODE_UNSET = -1
 };
 
-enum SHADOW_MODES
+enum class ShadowMode
 {
-	SHADOW_NONE,
-	SHADOW_LARA,
-	SHADOW_ALL
+	None,
+	Lara,
+	All
 };
 
 enum LIGHT_MODES
@@ -217,9 +218,11 @@ constexpr auto FADE_FACTOR = 0.0625f;
 constexpr auto NUM_LIGHTS_PER_BUFFER = 48;
 constexpr auto MAX_LIGHTS_PER_ITEM = 8;
 constexpr auto MAX_LIGHTS = 100;
-constexpr auto AMBIENT_LIGHT_INTERPOLATION_STEPS = 8;
+constexpr auto AMBIENT_LIGHT_INTERPOLATION_STEP = 1.0f / 10.0f;
 constexpr auto MAX_DYNAMIC_SHADOWS = 1;
 constexpr auto MAX_DYNAMIC_LIGHTS = 1024;
+constexpr auto ITEM_LIGHT_COLLECTION_RADIUS = SECTOR(1);
+constexpr auto CAMERA_LIGHT_COLLECTION_RADIUS = SECTOR(4);
 
 constexpr auto MAX_TRANSPARENT_FACES = 16384;
 constexpr auto MAX_TRANSPARENT_VERTICES = (MAX_TRANSPARENT_FACES * 6);

@@ -40,4 +40,63 @@ namespace TEN::Utils
 
 		return strings;
 	}
+
+    std::vector<unsigned short> GetProductOrFileVersion(bool productVersion)
+    {
+        char fileName[UCHAR_MAX] = {};
+
+        if (!GetModuleFileNameA(nullptr, fileName, UCHAR_MAX))
+        {
+            TENLog("Can't get current assembly filename", LogLevel::Error);
+            return {};
+        }
+
+        int size = GetFileVersionInfoSizeA(fileName, NULL);
+
+        if (!size)
+        {
+            TENLog("GetFileVersionInfoSizeA failed", LogLevel::Error);
+            return {};
+        }
+        std::unique_ptr<unsigned char> buffer(new unsigned char[size]);
+
+        // Load the version info
+        if (!GetFileVersionInfoA(fileName, 0, size, buffer.get()))
+        {
+            TENLog("GetFileVersionInfoA failed", LogLevel::Error);
+            return {};
+        }
+
+        VS_FIXEDFILEINFO* info;
+        unsigned int info_size;
+
+        if (!VerQueryValueA(buffer.get(), "\\", (void**)&info, &info_size))
+        {
+            TENLog("VerQueryValueA failed", LogLevel::Error);
+            return {};
+        }
+
+        if (info_size != sizeof(VS_FIXEDFILEINFO))
+        {
+            TENLog("VerQueryValueA returned wrong size for VS_FIXEDFILEINFO", LogLevel::Error);
+            return {};
+        }
+
+        if (productVersion)
+            return
+            {
+                HIWORD(info->dwProductVersionMS),
+                LOWORD(info->dwProductVersionMS),
+                HIWORD(info->dwProductVersionLS),
+                LOWORD(info->dwProductVersionLS)
+            };
+        else
+            return
+            {
+                HIWORD(info->dwFileVersionMS),
+                LOWORD(info->dwFileVersionMS),
+                HIWORD(info->dwFileVersionLS),
+                LOWORD(info->dwFileVersionLS)
+            };
+    }
 }

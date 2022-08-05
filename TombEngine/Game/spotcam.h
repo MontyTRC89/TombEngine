@@ -1,9 +1,10 @@
 #pragma once
 #include "Specific/phd_global.h"
+#include "Specific/trmath.h"
 
 constexpr auto MAX_SPOTCAMS = 256;
-constexpr auto SPOTCAM_CINEMATIC_BARS_HEIGHT = 16.0f / 256.0f;
-constexpr auto SPOTCAM_CINEMATIC_BARS_SPEED = 1.0f / 256.0f;
+constexpr auto SPOTCAM_CINEMATIC_BARS_HEIGHT = 1.0f / 16.0f;
+constexpr auto SPOTCAM_CINEMATIC_BARS_SPEED = 1.0f / FPS;
 
 struct QUAKE_CAMERA
 {
