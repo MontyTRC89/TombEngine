@@ -191,9 +191,8 @@ namespace TEN::Entities::TR4
 		auto* item = &g_Level.Items[itemNumber];
 		auto* object = &Objects[ID_HORSE];
 
-		item->Animation.AnimNumber = object->animIndex + HORSE_ANIM_IDLE;
-		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-		item->Animation.ActiveState = HORSEMAN_STATE_MOUNTED_RUN_FORWARD;
+		SetAnimation(item, HORSE_ANIM_IDLE);
+		item->Animation.ActiveState = HORSEMAN_STATE_MOUNTED_RUN_FORWARD; // TODO: Check if needed. -- Sezz
 		item->Animation.TargetState = HORSEMAN_STATE_MOUNTED_RUN_FORWARD;
 	}
 
@@ -203,11 +202,7 @@ namespace TEN::Entities::TR4
 		auto* object = &Objects[ID_HORSEMAN];
 
 		ClearItem(itemNumber);
-
-		item->Animation.AnimNumber = object->animIndex + HORSEMAN_ANIM_IDLE;
-		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-		item->Animation.ActiveState = HORSEMAN_STATE_IDLE;
-		item->Animation.TargetState = HORSEMAN_STATE_IDLE;
+		SetAnimation(item, HORSEMAN_ANIM_IDLE);
 		item->ItemFlags[0] = NO_ITEM; // No horse yet.
 	}
 

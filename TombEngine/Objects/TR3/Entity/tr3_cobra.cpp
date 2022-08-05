@@ -15,19 +15,19 @@ using std::vector;
 
 namespace TEN::Entities::TR3
 {
-	BiteInfo CobraBite = { 0, 0, 0, 13 };
-	const vector<int> CobraAttackJoints = { 13 };
+	constexpr auto COBRA_BITE_ATTACK_DAMAGE	 = 80;
+	constexpr auto COBRA_BITE_POISON_POTENCY = 8;
 
-	constexpr auto COBRA_BITE_ATTACK_DAMAGE = 80;
-	constexpr auto COBRA_BITE_POISON_POTENCY = 1;
+	constexpr auto COBRA_ATTACK_RANGE = SQUARE(SECTOR(1));
+	constexpr auto COBRA_AWARE_RANGE  = SQUARE(SECTOR(1.5f));
+	constexpr auto COBRA_SLEEP_RANGE  = SQUARE(SECTOR(2.5f));
 
-	constexpr auto COBRA_ATTACK_RANGE = SECTOR(1);
-	constexpr auto COBRA_AWARE_RANGE = SECTOR(1.5f);
-	constexpr auto COBRA_SLEEP_RANGE = SECTOR(2.5f);
+	constexpr auto PLAYER_DISTURB_VELOCITY = 15;
 
 	constexpr auto COBRA_SLEEP_FRAME = 45;
 
-	constexpr auto PLAYER_DISTURB_VELOCITY = 15;
+	const vector<int> CobraAttackJoints = { 13 };
+	const auto CobraBite = BiteInfo(Vector3::Zero, 13);
 
 	enum CobraState
 	{
@@ -108,12 +108,14 @@ namespace TEN::Entities::TR3
 			switch (item->Animation.ActiveState)
 			{
 			case COBRA_STATE_IDLE:
-				info->Flags = 0;
+				info->Flags = NULL;
 
-				if (AI.distance > pow(COBRA_SLEEP_RANGE, 2))
+				if (AI.distance > COBRA_SLEEP_RANGE)
 					item->Animation.TargetState = COBRA_STATE_SLEEP;
 				else if (LaraItem->HitPoints > 0 &&
-					((AI.ahead && AI.distance < pow(COBRA_ATTACK_RANGE, 2)) || item->HitStatus || LaraItem->Animation.Velocity > PLAYER_DISTURB_VELOCITY))
+					((AI.ahead && AI.distance < COBRA_ATTACK_RANGE) ||
+						item->HitStatus ||
+						LaraItem->Animation.Velocity > PLAYER_DISTURB_VELOCITY))
 				{
 					item->Animation.TargetState = COBRA_STATE_ATTACK;
 				}
@@ -121,14 +123,16 @@ namespace TEN::Entities::TR3
 				break;
 
 			case COBRA_STATE_SLEEP:
-				info->Flags = 0;
+				info->Flags = NULL;
 
 				if (item->HitPoints != NOT_TARGETABLE)
 				{
 					item->HitPoints = NOT_TARGETABLE;
 					item->ItemFlags[2] = item->HitPoints;
 				}
-				if (AI.distance < pow(COBRA_AWARE_RANGE, 2) && LaraItem->HitPoints > 0)
+
+				if (AI.distance < COBRA_AWARE_RANGE &&
+					LaraItem->HitPoints > 0)
 				{
 					item->Animation.TargetState = COBRA_STATE_WAKE_UP;
 					item->HitPoints = item->ItemFlags[2];
@@ -139,8 +143,8 @@ namespace TEN::Entities::TR3
 			case COBRA_STATE_ATTACK:
 				if (info->Flags != 1 && item->TestBits(JointBitType::Touch, CobraAttackJoints))
 				{
-					CreatureEffect(item, &CobraBite, DoBloodSplat);
 					DoDamage(info->Enemy, COBRA_BITE_ATTACK_DAMAGE);
+					CreatureEffect(item, CobraBite, DoBloodSplat);
 					info->Flags = 1;
 
 					if (info->Enemy->IsLara())

@@ -24,9 +24,9 @@ namespace TEN::Entities::TR1
 	#define WING_WALK_TURN ANGLE(2.0f)
 	#define WING_RUN_TURN ANGLE(6.0f)
 
-	const auto WingMutantBite = BiteInfo(-27, 98, 0, 10);
-	const auto WingMutantRocket = BiteInfo(51, 213, 0, 14);
-	const auto WingMutantShard = BiteInfo(-35, 269, 0, 9);
+	const auto WingMutantBite = BiteInfo(Vector3(-27.0f, 98.0f, 0.0f), 10);
+	const auto WingMutantRocket = BiteInfo(Vector3(51.0f, 213.0f, 0.0f), 14);
+	const auto WingMutantShard = BiteInfo(Vector3(-35.0f, 269.0f, 0.0f), 9);
 
 	enum WingedMutantState
 	{

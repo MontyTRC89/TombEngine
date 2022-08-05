@@ -40,7 +40,7 @@ namespace TEN::Entities::TR4
 		MUMMY_STATE_RECOIL = 5,
 		MUMMY_STATE_ARMS_UP_RECOIL = 6,
 		MUMMY_STATE_COLLAPSE = 7,
-		MUMMY_INACTIVE_STATE_LYING_DOWN = 8,
+		MUMMY_STATE_INACTIVE_LYING_DOWN = 8,
 		MUMMY_STATE_COLLAPSED_TO_IDLE = 9,
 		MUMMY_STATE_IDLE_SWIPE_ATTACK = 10
 	};
@@ -79,17 +79,14 @@ namespace TEN::Entities::TR4
 		if (item->TriggerFlags == 2)
 		{
 			SetAnimation(item, MUMMY_ANIM_COLLAPSE_END);
-			item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + MUMMY_ANIM_COLLAPSE_END;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-			item->Animation.TargetState = MUMMY_INACTIVE_STATE_LYING_DOWN;
-			item->Animation.ActiveState = MUMMY_INACTIVE_STATE_LYING_DOWN;
+			item->Animation.TargetState = MUMMY_STATE_INACTIVE_LYING_DOWN; // TODO: Check if needed. -- Sezz
+			item->Animation.ActiveState = MUMMY_STATE_INACTIVE_LYING_DOWN;
 			item->Status -= ITEM_INVISIBLE;
 		}
 		else
 		{
-			item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + MUMMY_ANIM_ARMS_CROSSED;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-			item->Animation.TargetState = MUMMY_STATE_INACTIVE_ARMS_CROSSED;
+			SetAnimation(item, MUMMY_ANIM_ARMS_CROSSED);
+			item->Animation.TargetState = MUMMY_STATE_INACTIVE_ARMS_CROSSED; // TODO: Check if needed. -- Sezz
 			item->Animation.ActiveState = MUMMY_STATE_INACTIVE_ARMS_CROSSED;
 		}
 	}
@@ -152,9 +149,7 @@ namespace TEN::Entities::TR4
 					}
 					else
 					{
-						item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + MUMMY_ANIM_COLLAPSE_START;
-						item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-						item->Animation.ActiveState = MUMMY_STATE_COLLAPSE;
+						SetAnimation(item, MUMMY_ANIM_COLLAPSE_START);
 						item->Pose.Orientation.y += AI.angle;
 						creature->MaxTurn = 0;
 					}
@@ -256,7 +251,7 @@ namespace TEN::Entities::TR4
 
 				break;
 
-			case MUMMY_INACTIVE_STATE_LYING_DOWN:
+			case MUMMY_STATE_INACTIVE_LYING_DOWN:
 				item->HitPoints = 0;
 				creature->MaxTurn = 0;
 				joint0 = 0;

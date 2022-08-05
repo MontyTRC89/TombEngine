@@ -249,11 +249,7 @@ namespace TEN::Entities::TR4
 		auto* item = &g_Level.Items[itemNumber];
 
 		ClearItem(itemNumber);
-
-		item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + HARPY_ANIM_IDLE;
-		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-		item->Animation.ActiveState = HARPY_STATE_IDLE;
-		item->Animation.TargetState = HARPY_STATE_IDLE;
+		SetAnimation(item, HARPY_ANIM_IDLE);
 	}
 
 	void HarpyControl(short itemNumber)
@@ -288,12 +284,10 @@ namespace TEN::Entities::TR4
 					}
 					else
 					{
-						item->Pose.Orientation.x = 0;
-						item->Animation.AnimNumber = object->animIndex + 5;
-						item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-						item->Animation.ActiveState = HARPY_STATE_DEATH_START;
+						SetAnimation(item, HARPY_ANIM_DEATH_START);
 						item->Animation.IsAirborne = true;
 						item->Animation.Velocity = 0;
+						item->Pose.Orientation.x = 0;
 					}
 
 					CreatureTilt(item, 0);
@@ -311,10 +305,10 @@ namespace TEN::Entities::TR4
 
 			if (item->Pose.Position.y >= item->Floor)
 			{
-				item->Pose.Position.y = item->Floor;
 				item->Animation.TargetState = HARPY_STATE_DEATH_END;
 				item->Animation.IsAirborne = false;
 				item->Animation.VerticalVelocity = 0;
+				item->Pose.Position.y = item->Floor;
 			}
 
 			item->Pose.Orientation.x = 0;
