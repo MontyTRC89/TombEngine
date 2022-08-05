@@ -196,8 +196,8 @@ namespace TEN::Entities::TR5
 		AI_INFO AI, laraInfo;
 		CreatureAIInfo(item, &AI);
 
-		GetCreatureMood(item, &AI, VIOLENT);
-		CreatureMood(item, &AI, VIOLENT);
+		GetCreatureMood(item, &AI, true);
+		CreatureMood(item, &AI, true);
 
 		short angle = CreatureTurn(item, creature->MaxTurn);
 

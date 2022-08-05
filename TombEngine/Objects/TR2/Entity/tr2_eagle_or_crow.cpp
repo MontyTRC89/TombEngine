@@ -95,8 +95,8 @@ namespace TEN::Entities::TR2
 			AI_INFO AI;
 			CreatureAIInfo(item, &AI);
 
-			GetCreatureMood(item, &AI, VIOLENT);
-			CreatureMood(item, &AI, TIMID);
+			GetCreatureMood(item, &AI, true);
+			CreatureMood(item, &AI, false);
 
 			angle = CreatureTurn(item, ANGLE(3.0f));
 

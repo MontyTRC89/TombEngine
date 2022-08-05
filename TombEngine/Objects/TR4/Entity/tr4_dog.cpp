@@ -143,8 +143,8 @@ namespace TEN::Entities::TR4
 				joint1 = AI.angle;
 			}
 
-			GetCreatureMood(item, &AI, VIOLENT);
-			CreatureMood(item, &AI, VIOLENT);
+			GetCreatureMood(item, &AI, true);
+			CreatureMood(item, &AI, true);
 
 			if (creature->Mood == MoodType::Bored)
 				creature->MaxTurn /= 2;

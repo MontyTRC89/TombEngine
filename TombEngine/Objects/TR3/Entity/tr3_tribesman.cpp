@@ -86,7 +86,7 @@ namespace TEN::Entities::TR3
 			AI_INFO AI;
 			CreatureAIInfo(item, &AI);
 
-			GetCreatureMood(item, &AI, VIOLENT);
+			GetCreatureMood(item, &AI, true);
 
 			if (creature->Enemy == LaraItem &&
 				creature->HurtByLara && AI.distance > pow(SECTOR(3), 2) &&
@@ -95,7 +95,7 @@ namespace TEN::Entities::TR3
 				creature->Mood = MoodType::Escape;
 			}
 
-			CreatureMood(item, &AI, VIOLENT);
+			CreatureMood(item, &AI, true);
 
 			angle = CreatureTurn(item, creature->MaxTurn);
 
@@ -367,12 +367,12 @@ namespace TEN::Entities::TR3
 			AI_INFO AI;
 			CreatureAIInfo(item, &AI);
 
-			GetCreatureMood(item, &AI, (AI.zoneNumber == AI.enemyZone ? VIOLENT : TIMID));
+			GetCreatureMood(item, &AI, (AI.zoneNumber == AI.enemyZone ? true : false));
 
 			if (item->HitStatus && Lara.PoisonPotency && creature->Mood == MoodType::Bored)
 				creature->Mood = MoodType::Escape;
 
-			CreatureMood(item, &AI, TIMID);
+			CreatureMood(item, &AI, false);
 
 			angle = CreatureTurn(item, creature->Mood == MoodType::Bored ? ANGLE(2.0f) : creature->MaxTurn);
 			if (AI.ahead)

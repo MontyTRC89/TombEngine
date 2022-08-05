@@ -289,8 +289,8 @@ namespace TEN::Entities::TR4
 		MutantAIFix(item, &AI);
 
 		RotateHeadToTarget(item, creature, 9, headY);
-		GetCreatureMood(item, &AI, VIOLENT);
-		CreatureMood(item, &AI, VIOLENT);
+		GetCreatureMood(item, &AI, true);
+		CreatureMood(item, &AI, true);
 
 		creature->MaxTurn = 0;
 		angle = CreatureTurn(item, 0);

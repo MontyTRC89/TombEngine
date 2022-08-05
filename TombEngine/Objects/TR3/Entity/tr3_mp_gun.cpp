@@ -156,8 +156,8 @@ namespace TEN::Entities::TR3
 				laraAI.distance = pow(dx, 2) + pow(dz, 2);
 			}
 
-			GetCreatureMood(item, &AI, creature->Enemy != LaraItem ? VIOLENT : TIMID);
-			CreatureMood(item, &AI, creature->Enemy != LaraItem ? VIOLENT : TIMID);
+			GetCreatureMood(item, &AI, creature->Enemy != LaraItem ? true : false);
+			CreatureMood(item, &AI, creature->Enemy != LaraItem ? true : false);
 
 			angle = CreatureTurn(item, creature->MaxTurn);
 
