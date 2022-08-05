@@ -70,7 +70,7 @@ namespace TEN::Entities::TR4
 		DOG_ANIM_STALK_IDLE_TO_IDLE = 24
 	};
 
-	int DeathAnims[] = { DOG_ANIM_DEATH_1, DOG_ANIM_DEATH_2, DOG_ANIM_DEATH_3, DOG_ANIM_DEATH_1 };
+	int DogDeathAnims[] = { DOG_ANIM_DEATH_1, DOG_ANIM_DEATH_2, DOG_ANIM_DEATH_3, DOG_ANIM_DEATH_1 };
 
 	void InitialiseTr4Dog(short itemNumber)
 	{
@@ -109,7 +109,7 @@ namespace TEN::Entities::TR4
 				item->HitPoints = object->HitPoints;
 			else if (item->Animation.ActiveState != DOG_STATE_DEATH)
 			{
-				item->Animation.AnimNumber = object->animIndex + DeathAnims[GetRandomControl() & 3];
+				item->Animation.AnimNumber = object->animIndex + DogDeathAnims[GetRandomControl() & 3];
 				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 				item->Animation.ActiveState = DOG_STATE_DEATH;
 			}
