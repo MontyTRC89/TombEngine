@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "Objects/TR1/Entity/tr1_bear.h"
+#include "tr1_bear.h"
 
 #include "Game/control/box.h"
 #include "Game/control/control.h"
