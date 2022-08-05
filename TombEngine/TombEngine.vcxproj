@@ -182,6 +182,7 @@ CALL gen.bat</Command>
     <ClInclude Include="Objects\Effects\flame_emitters.h" />
     <ClInclude Include="Game\effects\lara_fx.h" />
     <ClInclude Include="Objects\Generic\Traps\dart_emitter.h" />
+    <ClInclude Include="Objects\TR1\Entity\tr1_winged_mutant.h" />
     <ClInclude Include="Objects\TR2\Vehicles\speedboat_info.h" />
     <ClInclude Include="Game\itemdata\creature_info.h" />
     <ClInclude Include="Game\itemdata\itemdata.h" />
@@ -636,6 +637,7 @@ CALL gen.bat</Command>
     <ClCompile Include="Objects\Effects\flame_emitters.cpp" />
     <ClCompile Include="Game\effects\lara_fx.cpp" />
     <ClCompile Include="Objects\Generic\Traps\dart_emitter.cpp" />
+    <ClCompile Include="Objects\TR1\Entity\tr1_winged_mutant.cpp" />
     <ClCompile Include="Objects\TR5\Trap\tr5_wreckingball.cpp" />
     <ClCompile Include="Objects\Utils\VehicleHelpers.cpp" />
     <ClCompile Include="Renderer\Renderer11DrawMenu.cpp" />

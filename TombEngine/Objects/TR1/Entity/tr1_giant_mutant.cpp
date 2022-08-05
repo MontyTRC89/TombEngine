@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "Objects/TR1/Entity/tr1_giant_mutant.h"
+#include "tr1_giant_mutant.h"
 
 #include "Game/animation.h"
 #include "Game/camera.h"

@@ -17,6 +17,7 @@
 #include "Objects/TR1/Entity/tr1_wolf.h" // OK
 #include "Objects/TR1/Entity/tr1_big_rat.h" // OK
 #include "Objects/TR1/Entity/tr1_centaur.h"
+#include "Objects/TR1/Entity/tr1_winged_mutant.h"
 #include "Objects/Utils/object_helper.h"
 
 using namespace TEN::Entities::TR1;
@@ -173,6 +174,28 @@ static void StartEntity(ObjectInfo* obj)
 		obj->savePosition = obj->saveHitpoints = obj->saveAnim = obj->saveFlags = 1;
 		g_Level.Bones[obj->boneIndex + 10 * 4] |= ROT_Y | ROT_X;
 	}
+
+	obj = &Objects[ID_WINGED_MUMMY];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseWingedMutant;
+		obj->control = WingedMutantControl;
+		obj->collision = CreatureCollision;
+		obj->shadowType = ShadowMode::All;
+		obj->hitEffect = HIT_BLOOD;
+		obj->pivotLength = 150;
+		obj->radius = WALL_SIZE / 3;
+		obj->HitPoints = 1; // 50
+		obj->intelligent = true;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+		obj->saveHitpoints = true;
+		obj->savePosition = true;
+		obj->zoneType = ZONE_FLYER;
+		g_Level.Bones[obj->boneIndex] |= ROT_Y;
+		g_Level.Bones[obj->boneIndex + 8] |= ROT_Y;
+	}
+
 }
 
 static void StartObject(ObjectInfo* obj)
