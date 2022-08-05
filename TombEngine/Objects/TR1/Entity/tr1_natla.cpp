@@ -22,6 +22,11 @@ namespace TEN::Entities::TR1
 	constexpr auto NATLA_DEATH_TIME = (FPS * 16);	// 16 seconds.
 	constexpr auto NATLA_SHOT_DAMAGE = 100;
 
+	#define NATLA_TURN_NEAR_DEATH_SPEED ANGLE(6.0f)
+	#define NATLA_TURN_SPEED ANGLE(5.0f)
+	#define NATLA_FLY_ANGLE_SPEED ANGLE(5.0f)
+	#define NATLA_SHOOT_ANGLE ANGLE(30.0f)
+
 	const auto NatlaGunBite = BiteInfo(Vector3(5.0f, 220.0f, 7.0f), 4);
 
 	enum NatlaState
@@ -72,8 +77,8 @@ namespace TEN::Entities::TR1
 			GetCreatureMood(item, &AI, true);
 			CreatureMood(item, &AI, true);
 
-			angle = CreatureTurn(item, ANGLE(6.0f));
-			shoot = (AI.angle > -ANGLE(30.0f) && AI.angle < ANGLE(30.0f) && Targetable(item, &AI));
+			angle = CreatureTurn(item, NATLA_TURN_NEAR_DEATH_SPEED);
+			shoot = (AI.angle > -NATLA_SHOOT_ANGLE && AI.angle < NATLA_SHOOT_ANGLE&& Targetable(item, &AI));
 
 			if (facing)
 			{
@@ -173,7 +178,7 @@ namespace TEN::Entities::TR1
 			creature->LOT.Fly = NO_FLYING;
 			CreatureAIInfo(item, &AI);
 
-			shoot = (AI.angle > -ANGLE(30.0f) && AI.angle < ANGLE(30.0f) && Targetable(item, &AI));
+			shoot = (AI.angle > -NATLA_SHOOT_ANGLE && AI.angle < NATLA_SHOOT_ANGLE&& Targetable(item, &AI));
 
 			if (item->Animation.ActiveState == NATLA_STATE_FLY && (creature->Flags & NATLA_FLYMODE))
 			{
@@ -199,14 +204,14 @@ namespace TEN::Entities::TR1
 				CreatureMood(item, &AI, false);
 
 			item->Pose.Orientation.y -= facing;
-			angle = CreatureTurn(item, ANGLE(5.0f));
+			angle = CreatureTurn(item, NATLA_TURN_SPEED);
 
 			if (item->Animation.ActiveState == NATLA_STATE_FLY)
 			{
-				if (AI.angle > ANGLE(5.0f))
-					facing += ANGLE(5.0f);
-				else if (AI.angle < -ANGLE(5.0f))
-					facing -= ANGLE(5.0f);
+				if (AI.angle > NATLA_FLY_ANGLE_SPEED)
+					facing += NATLA_FLY_ANGLE_SPEED;
+				else if (AI.angle < -NATLA_FLY_ANGLE_SPEED)
+					facing -= NATLA_FLY_ANGLE_SPEED;
 				else
 					facing += AI.angle;
 
