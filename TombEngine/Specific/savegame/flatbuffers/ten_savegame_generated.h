@@ -125,6 +125,10 @@ struct Pendulum;
 struct PendulumBuilder;
 struct PendulumT;
 
+struct EventSetCallCounters;
+struct EventSetCallCountersBuilder;
+struct EventSetCallCountersT;
+
 struct KeyValPair;
 
 struct ScriptTable;
@@ -5408,6 +5412,86 @@ struct Pendulum::Traits {
 
 flatbuffers::Offset<Pendulum> CreatePendulum(flatbuffers::FlatBufferBuilder &_fbb, const PendulumT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
 
+struct EventSetCallCountersT : public flatbuffers::NativeTable {
+  typedef EventSetCallCounters TableType;
+  int32_t on_enter = 0;
+  int32_t on_inside = 0;
+  int32_t on_leave = 0;
+};
+
+struct EventSetCallCounters FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef EventSetCallCountersT NativeTableType;
+  typedef EventSetCallCountersBuilder Builder;
+  struct Traits;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_ON_ENTER = 4,
+    VT_ON_INSIDE = 6,
+    VT_ON_LEAVE = 8
+  };
+  int32_t on_enter() const {
+    return GetField<int32_t>(VT_ON_ENTER, 0);
+  }
+  int32_t on_inside() const {
+    return GetField<int32_t>(VT_ON_INSIDE, 0);
+  }
+  int32_t on_leave() const {
+    return GetField<int32_t>(VT_ON_LEAVE, 0);
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<int32_t>(verifier, VT_ON_ENTER) &&
+           VerifyField<int32_t>(verifier, VT_ON_INSIDE) &&
+           VerifyField<int32_t>(verifier, VT_ON_LEAVE) &&
+           verifier.EndTable();
+  }
+  EventSetCallCountersT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(EventSetCallCountersT *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static flatbuffers::Offset<EventSetCallCounters> Pack(flatbuffers::FlatBufferBuilder &_fbb, const EventSetCallCountersT* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+};
+
+struct EventSetCallCountersBuilder {
+  typedef EventSetCallCounters Table;
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_on_enter(int32_t on_enter) {
+    fbb_.AddElement<int32_t>(EventSetCallCounters::VT_ON_ENTER, on_enter, 0);
+  }
+  void add_on_inside(int32_t on_inside) {
+    fbb_.AddElement<int32_t>(EventSetCallCounters::VT_ON_INSIDE, on_inside, 0);
+  }
+  void add_on_leave(int32_t on_leave) {
+    fbb_.AddElement<int32_t>(EventSetCallCounters::VT_ON_LEAVE, on_leave, 0);
+  }
+  explicit EventSetCallCountersBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  flatbuffers::Offset<EventSetCallCounters> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<EventSetCallCounters>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<EventSetCallCounters> CreateEventSetCallCounters(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    int32_t on_enter = 0,
+    int32_t on_inside = 0,
+    int32_t on_leave = 0) {
+  EventSetCallCountersBuilder builder_(_fbb);
+  builder_.add_on_leave(on_leave);
+  builder_.add_on_inside(on_inside);
+  builder_.add_on_enter(on_enter);
+  return builder_.Finish();
+}
+
+struct EventSetCallCounters::Traits {
+  using type = EventSetCallCounters;
+  static auto constexpr Create = CreateEventSetCallCounters;
+};
+
+flatbuffers::Offset<EventSetCallCounters> CreateEventSetCallCounters(flatbuffers::FlatBufferBuilder &_fbb, const EventSetCallCountersT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
 struct ScriptTableT : public flatbuffers::NativeTable {
   typedef ScriptTable TableType;
   std::vector<TEN::Save::KeyValPair> keys_vals{};
@@ -6145,6 +6229,7 @@ struct SaveGameT : public flatbuffers::NativeTable {
   std::unique_ptr<TEN::Save::RopeT> rope{};
   std::unique_ptr<TEN::Save::PendulumT> pendulum{};
   std::unique_ptr<TEN::Save::PendulumT> alternate_pendulum{};
+  std::vector<std::unique_ptr<TEN::Save::EventSetCallCountersT>> call_counters{};
   std::unique_ptr<TEN::Save::UnionVecT> script_vars{};
 };
 
@@ -6186,7 +6271,8 @@ struct SaveGame FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     VT_ROPE = 64,
     VT_PENDULUM = 66,
     VT_ALTERNATE_PENDULUM = 68,
-    VT_SCRIPT_VARS = 70
+    VT_CALL_COUNTERS = 70,
+    VT_SCRIPT_VARS = 72
   };
   const TEN::Save::SaveGameHeader *header() const {
     return GetPointer<const TEN::Save::SaveGameHeader *>(VT_HEADER);
@@ -6287,6 +6373,9 @@ struct SaveGame FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   const TEN::Save::Pendulum *alternate_pendulum() const {
     return GetPointer<const TEN::Save::Pendulum *>(VT_ALTERNATE_PENDULUM);
   }
+  const flatbuffers::Vector<flatbuffers::Offset<TEN::Save::EventSetCallCounters>> *call_counters() const {
+    return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<TEN::Save::EventSetCallCounters>> *>(VT_CALL_COUNTERS);
+  }
   const TEN::Save::UnionVec *script_vars() const {
     return GetPointer<const TEN::Save::UnionVec *>(VT_SCRIPT_VARS);
   }
@@ -6360,6 +6449,9 @@ struct SaveGame FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            verifier.VerifyTable(pendulum()) &&
            VerifyOffset(verifier, VT_ALTERNATE_PENDULUM) &&
            verifier.VerifyTable(alternate_pendulum()) &&
+           VerifyOffset(verifier, VT_CALL_COUNTERS) &&
+           verifier.VerifyVector(call_counters()) &&
+           verifier.VerifyVectorOfTables(call_counters()) &&
            VerifyOffset(verifier, VT_SCRIPT_VARS) &&
            verifier.VerifyTable(script_vars()) &&
            verifier.EndTable();
@@ -6472,6 +6564,9 @@ struct SaveGameBuilder {
   void add_alternate_pendulum(flatbuffers::Offset<TEN::Save::Pendulum> alternate_pendulum) {
     fbb_.AddOffset(SaveGame::VT_ALTERNATE_PENDULUM, alternate_pendulum);
   }
+  void add_call_counters(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<TEN::Save::EventSetCallCounters>>> call_counters) {
+    fbb_.AddOffset(SaveGame::VT_CALL_COUNTERS, call_counters);
+  }
   void add_script_vars(flatbuffers::Offset<TEN::Save::UnionVec> script_vars) {
     fbb_.AddOffset(SaveGame::VT_SCRIPT_VARS, script_vars);
   }
@@ -6521,11 +6616,13 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGame(
     flatbuffers::Offset<TEN::Save::Rope> rope = 0,
     flatbuffers::Offset<TEN::Save::Pendulum> pendulum = 0,
     flatbuffers::Offset<TEN::Save::Pendulum> alternate_pendulum = 0,
+    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<TEN::Save::EventSetCallCounters>>> call_counters = 0,
     flatbuffers::Offset<TEN::Save::UnionVec> script_vars = 0) {
   SaveGameBuilder builder_(_fbb);
   builder_.add_oneshot_position(oneshot_position);
   builder_.add_ambient_position(ambient_position);
   builder_.add_script_vars(script_vars);
+  builder_.add_call_counters(call_counters);
   builder_.add_alternate_pendulum(alternate_pendulum);
   builder_.add_pendulum(pendulum);
   builder_.add_rope(rope);
@@ -6600,6 +6697,7 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGameDirect(
     flatbuffers::Offset<TEN::Save::Rope> rope = 0,
     flatbuffers::Offset<TEN::Save::Pendulum> pendulum = 0,
     flatbuffers::Offset<TEN::Save::Pendulum> alternate_pendulum = 0,
+    const std::vector<flatbuffers::Offset<TEN::Save::EventSetCallCounters>> *call_counters = nullptr,
     flatbuffers::Offset<TEN::Save::UnionVec> script_vars = 0) {
   auto items__ = items ? _fbb.CreateVector<flatbuffers::Offset<TEN::Save::Item>>(*items) : 0;
   auto room_items__ = room_items ? _fbb.CreateVector<int32_t>(*room_items) : 0;
@@ -6618,6 +6716,7 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGameDirect(
   auto ambient_track__ = ambient_track ? _fbb.CreateString(ambient_track) : 0;
   auto oneshot_track__ = oneshot_track ? _fbb.CreateString(oneshot_track) : 0;
   auto cd_flags__ = cd_flags ? _fbb.CreateVector<int32_t>(*cd_flags) : 0;
+  auto call_counters__ = call_counters ? _fbb.CreateVector<flatbuffers::Offset<TEN::Save::EventSetCallCounters>>(*call_counters) : 0;
   return TEN::Save::CreateSaveGame(
       _fbb,
       header,
@@ -6653,6 +6752,7 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGameDirect(
       rope,
       pendulum,
       alternate_pendulum,
+      call_counters__,
       script_vars);
 }
 
@@ -8178,6 +8278,38 @@ inline flatbuffers::Offset<Pendulum> CreatePendulum(flatbuffers::FlatBufferBuild
       _node);
 }
 
+inline EventSetCallCountersT *EventSetCallCounters::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = std::make_unique<EventSetCallCountersT>();
+  UnPackTo(_o.get(), _resolver);
+  return _o.release();
+}
+
+inline void EventSetCallCounters::UnPackTo(EventSetCallCountersT *_o, const flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = on_enter(); _o->on_enter = _e; }
+  { auto _e = on_inside(); _o->on_inside = _e; }
+  { auto _e = on_leave(); _o->on_leave = _e; }
+}
+
+inline flatbuffers::Offset<EventSetCallCounters> EventSetCallCounters::Pack(flatbuffers::FlatBufferBuilder &_fbb, const EventSetCallCountersT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateEventSetCallCounters(_fbb, _o, _rehasher);
+}
+
+inline flatbuffers::Offset<EventSetCallCounters> CreateEventSetCallCounters(flatbuffers::FlatBufferBuilder &_fbb, const EventSetCallCountersT *_o, const flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const EventSetCallCountersT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _on_enter = _o->on_enter;
+  auto _on_inside = _o->on_inside;
+  auto _on_leave = _o->on_leave;
+  return TEN::Save::CreateEventSetCallCounters(
+      _fbb,
+      _on_enter,
+      _on_inside,
+      _on_leave);
+}
+
 inline ScriptTableT *ScriptTable::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
   auto _o = std::make_unique<ScriptTableT>();
   UnPackTo(_o.get(), _resolver);
@@ -8470,6 +8602,7 @@ inline void SaveGame::UnPackTo(SaveGameT *_o, const flatbuffers::resolver_functi
   { auto _e = rope(); if (_e) _o->rope = std::unique_ptr<TEN::Save::RopeT>(_e->UnPack(_resolver)); }
   { auto _e = pendulum(); if (_e) _o->pendulum = std::unique_ptr<TEN::Save::PendulumT>(_e->UnPack(_resolver)); }
   { auto _e = alternate_pendulum(); if (_e) _o->alternate_pendulum = std::unique_ptr<TEN::Save::PendulumT>(_e->UnPack(_resolver)); }
+  { auto _e = call_counters(); if (_e) { _o->call_counters.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->call_counters[_i] = std::unique_ptr<TEN::Save::EventSetCallCountersT>(_e->Get(_i)->UnPack(_resolver)); } } }
   { auto _e = script_vars(); if (_e) _o->script_vars = std::unique_ptr<TEN::Save::UnionVecT>(_e->UnPack(_resolver)); }
 }
 
@@ -8514,6 +8647,7 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGame(flatbuffers::FlatBufferBuild
   auto _rope = _o->rope ? CreateRope(_fbb, _o->rope.get(), _rehasher) : 0;
   auto _pendulum = _o->pendulum ? CreatePendulum(_fbb, _o->pendulum.get(), _rehasher) : 0;
   auto _alternate_pendulum = _o->alternate_pendulum ? CreatePendulum(_fbb, _o->alternate_pendulum.get(), _rehasher) : 0;
+  auto _call_counters = _fbb.CreateVector<flatbuffers::Offset<TEN::Save::EventSetCallCounters>> (_o->call_counters.size(), [](size_t i, _VectorArgs *__va) { return CreateEventSetCallCounters(*__va->__fbb, __va->__o->call_counters[i].get(), __va->__rehasher); }, &_va );
   auto _script_vars = _o->script_vars ? CreateUnionVec(_fbb, _o->script_vars.get(), _rehasher) : 0;
   return TEN::Save::CreateSaveGame(
       _fbb,
@@ -8550,6 +8684,7 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGame(flatbuffers::FlatBufferBuild
       _rope,
       _pendulum,
       _alternate_pendulum,
+      _call_counters,
       _script_vars);
 }
 
