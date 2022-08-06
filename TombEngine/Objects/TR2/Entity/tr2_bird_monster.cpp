@@ -24,8 +24,8 @@ namespace TEN::Entities::TR2
 
 	const auto BirdMonsterBiteLeft	= BiteInfo(Vector3(0.0f, 224.0f, 0.0f), 19);
 	const auto BirdMonsterBiteRight = BiteInfo(Vector3(0.0f, 224.0f, 0.0f), 22);
-	const vector<int> BirdMonsterLeftBite  = { 18, 19 };
-	const vector<int> BirdMonsterRightBite = { 21, 22 };
+	const vector<int> BirdMonsterAttackLeftJoints  = { 18, 19 };
+	const vector<int> BirdMonsterAttackRightJoints = { 21, 22 };
 
 	enum BirdMonsterState
 	{
@@ -181,7 +181,7 @@ namespace TEN::Entities::TR2
 			case BMONSTER_STATE_CRUSH_ATTACK_CONTINUE:
 			case BMONSTER_STATE_PUNCH_ATTACK_LEFT_CONTINUE:
 				if (!(creature->Flags & 1) &&
-					item->TestBits(JointBitType::Touch, BirdMonsterRightBite))
+					item->TestBits(JointBitType::Touch, BirdMonsterAttackRightJoints))
 				{
 					DoDamage(creature->Enemy, BIRD_MONSTER_ATTACK_DAMAGE);
 					CreatureEffect(item, BirdMonsterBiteRight, DoBloodSplat);
@@ -189,7 +189,7 @@ namespace TEN::Entities::TR2
 				}
 
 				if (!(creature->Flags & 2) &&
-					item->TestBits(JointBitType::Touch, BirdMonsterLeftBite))
+					item->TestBits(JointBitType::Touch, BirdMonsterAttackLeftJoints))
 				{
 					DoDamage(creature->Enemy, BIRD_MONSTER_ATTACK_DAMAGE);
 					CreatureEffect(item, BirdMonsterBiteLeft, DoBloodSplat);
