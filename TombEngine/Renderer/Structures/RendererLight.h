@@ -15,6 +15,7 @@ namespace TEN::Renderer
 		float InRange;
 		float OutRange;
 
+		int RoomNumber;
 		float LocalIntensity;
 		float Distance;
 		bool AffectNeighbourRooms;
