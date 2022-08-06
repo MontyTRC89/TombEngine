@@ -4,6 +4,16 @@ local EventSequence
 
 LevelVars.__TEN_eventSequence = {sequences = {}}
 
+LevelFuncs.__TEN_eventSequence_callNext = function(sequenceName, nextTimerName, func, ...)
+	local thisES = LevelVars.__TEN_eventSequence.sequences[sequenceName]
+	LevelFuncs[func](...)
+
+	thisES.currentTimer = thisES.currentTimer + 1
+	if thisES.currentTimer <= #thisES.timers then
+		Timer.Get(nextTimerName):Start()
+	end
+end
+
 EventSequence = {
 	Create = function(name, showString, ...)
 		local obj = {}
@@ -13,7 +23,7 @@ EventSequence = {
 
 		obj.name = name
 
-		LevelVars.__TEN_eventSequence.sequences[name] ={} 
+		LevelVars.__TEN_eventSequence.sequences[name] = {} 
 		local thisES = LevelVars.__TEN_eventSequence.sequences[name]
 		thisES.name = name
 		thisES.timesFuncsAndArgs = {...}
@@ -44,29 +54,15 @@ EventSequence = {
 				func = table.remove(funcAndArgs, 1)
 			end
 
-			if nextTimer < #tfa then
-				-- This function must start next timer 
-				-- AND do its function
-				LevelFuncs[funcName] = function(...)
-					LevelFuncs[func](...)
-					Timer.Get(nextTimerName):Start()
-					thisES.currentTimer = timerIndex + 1
-				end
-			else
-				-- final timer
-				LevelFuncs[funcName] = function(...)
-					LevelFuncs[func](...)
-					Timer.Get(timerName):Stop()
-					thisES.currentTimer = 1
-				end
-			end
-
 			local thisTimer = Timer.Create(timerName,
 						tfa[i], -- time
 						false,
 						showString,
-						funcName,
-						funcAndArgs -- now with func removed
+						"__TEN_eventSequence_callNext",
+						name,
+						nextTimerName,
+						func,
+						table.unpack(funcAndArgs) -- now with func removed
 						)
 
 			thisES.timers[timerIndex] = timerName
