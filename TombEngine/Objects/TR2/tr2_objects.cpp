@@ -1,9 +1,15 @@
 #include "framework.h"
 #include "Objects/TR2/tr2_objects.h"
 
-/// entities
+#include "Game/collision/collide_item.h"
+#include "Game/control/box.h"
+#include "Game/itemdata/creature_info.h"
+#include "Specific/level.h"
+#include "Specific/setup.h"
+
+// Entities
 #include "Objects/TR2/Entity/tr2_barracuda.h" // OK
-#include "Objects/TR2/Entity/tr2_birdmonster.h" // OK
+#include "Objects/TR2/Entity/tr2_bird_monster.h" // OK
 #include "Objects/TR2/Entity/tr2_dragon.h" // OK
 #include "Objects/TR2/Entity/tr2_eagle_or_crow.h" // OK
 #include "Objects/TR2/Entity/tr2_knifethrower.h" // OK
@@ -21,19 +27,15 @@
 #include "Objects/TR2/Entity/tr2_worker_machinegun.h" // OK
 #include "Objects/TR2/Entity/tr2_worker_shotgun.h" // OK
 #include "Objects/TR2/Entity/tr2_yeti.h" // OK
-/// trap
+
+// Traps
 #include "Objects/TR2/Trap/tr2_spinningblade.h"
 #include "Objects/TR2/Trap/tr2_springboard.h"
 #include "Objects/TR2/Trap/tr2_killerstatue.h"
-/// vehicles
+
+// Vehicles
 #include "Objects/TR2/Vehicles/speedboat.h"
 #include "Objects/TR2/Vehicles/skidoo.h"
-/// necessary import
-#include "Game/control/box.h"
-#include "Game/collision/collide_item.h"
-#include "Game/itemdata/creature_info.h"
-#include "Specific/setup.h"
-#include "Specific/level.h"
 
 using namespace TEN::Entities::TR2;
 
