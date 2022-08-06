@@ -1,0 +1,11 @@
+Version 1.0.1
+=============
+
+- Fixed rope transparency.
+- Fixed incorrect polerope grabbing.
+
+
+Version 1.0
+===========
+
+First beta release.
