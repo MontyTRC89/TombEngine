@@ -1,0 +1,1494 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<head>
+    <title>TombEngine Lua API</title>
+    <link rel="stylesheet" href="../ldoc.css" type="text/css" />
+</head>
+<body>
+
+<div id="container">
+
+<div id="product">
+	<div id="product_logo"></div>
+	<div id="product_name"><big><b></b></big></div>
+	<div id="product_description"></div>
+</div> <!-- id="product" -->
+
+
+<div id="main">
+
+
+<!-- Menu -->
+
+<div id="navigation">
+<br/>
+<h1>TombEngine</h1>
+
+<ul>
+  <li><a href="../index.html">Index</a></li>
+</ul>
+
+<h2>Contents</h2>
+<ul>
+<li><a href="#Functions">Functions</a></li>
+</ul>
+
+
+<h2>2 Classes</h2>
+<ul class="nowrap">
+  <li><a href="../2 classes/Flow.Animations.html">Flow.Animations</a></li>
+  <li><a href="../2 classes/Flow.Fog.html">Flow.Fog</a></li>
+  <li><a href="../2 classes/Flow.InventoryItem.html">Flow.InventoryItem</a></li>
+  <li><a href="../2 classes/Flow.Level.html">Flow.Level</a></li>
+  <li><a href="../2 classes/Flow.Mirror.html">Flow.Mirror</a></li>
+  <li><a href="../2 classes/Flow.Settings.html">Flow.Settings</a></li>
+  <li><a href="../2 classes/Flow.SkyLayer.html">Flow.SkyLayer</a></li>
+  <li><a href="../2 classes/Objects.AIObject.html">Objects.AIObject</a></li>
+  <li><a href="../2 classes/Objects.Camera.html">Objects.Camera</a></li>
+  <li><strong>Objects.Moveable</strong></li>
+  <li><a href="../2 classes/Objects.Sink.html">Objects.Sink</a></li>
+  <li><a href="../2 classes/Objects.SoundSource.html">Objects.SoundSource</a></li>
+  <li><a href="../2 classes/Objects.Static.html">Objects.Static</a></li>
+  <li><a href="../2 classes/Strings.DisplayString.html">Strings.DisplayString</a></li>
+</ul>
+<h2>1 Modules</h2>
+<ul class="nowrap">
+  <li><a href="../1 modules/Effects.html">Effects</a></li>
+  <li><a href="../1 modules/Flow.html">Flow</a></li>
+  <li><a href="../1 modules/Inventory.html">Inventory</a></li>
+  <li><a href="../1 modules/Logic.html">Logic</a></li>
+  <li><a href="../1 modules/Misc.html">Misc</a></li>
+  <li><a href="../1 modules/Objects.html">Objects</a></li>
+  <li><a href="../1 modules/Strings.html">Strings</a></li>
+</ul>
+<h2>3 Primitive Classes</h2>
+<ul class="nowrap">
+  <li><a href="../3 primitive classes/Color.html">Color</a></li>
+  <li><a href="../3 primitive classes/Rotation.html">Rotation</a></li>
+  <li><a href="../3 primitive classes/Vec3.html">Vec3</a></li>
+</ul>
+<h2>4 Enums</h2>
+<ul class="nowrap">
+  <li><a href="../4 enums/Flow.InvID.html">Flow.InvID</a></li>
+  <li><a href="../4 enums/Effects.BlendID.html">Effects.BlendID</a></li>
+  <li><a href="../4 enums/Objects.ObjID.html">Objects.ObjID</a></li>
+</ul>
+<h2>5 Lua utility modules</h2>
+<ul class="nowrap">
+  <li><a href="../5 lua utility modules/Timer.html">Timer</a></li>
+  <li><a href="../5 lua utility modules/Util.html">Util</a></li>
+</ul>
+
+</div>
+
+<div id="content">
+
+<h1>Class <code>Objects.Moveable</code></h1>
+<p>Represents any object inside the game world.</p>
+<p>Examples include traps, enemies, doors,
+pickups, and Lara herself.</p>
+
+
+<h2><a href="#Functions">Functions</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" ><a href="#Moveable">Moveable(object, name, position, rotation, room, animNumber, frameNumber, hp, OCB, AIBits)</a></td>
+	<td class="summary">For more information on each parameter, see the
+associated getters and setters.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Moveable:EnableItem">Moveable:EnableItem()</a></td>
+	<td class="summary">Enable the item, as if a trigger for it had been stepped on.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Moveable:DisableItem">Moveable:DisableItem()</a></td>
+	<td class="summary">Disable the item</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Moveable:MakeInvisible">Moveable:MakeInvisible()</a></td>
+	<td class="summary">Make the item invisible.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Moveable:Explode">Moveable:Explode()</a></td>
+	<td class="summary">Explode item.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Moveable:Shatter">Moveable:Shatter()</a></td>
+	<td class="summary">Shatter item.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Moveable:GetStatus">Moveable:GetStatus()</a></td>
+	<td class="summary">Get the status of object.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Moveable:SetOnHit">Moveable:SetOnHit(name)</a></td>
+	<td class="summary">Set the name of the function to be called when the moveable is shot by Lara
+ Note that this will be triggered twice when shot with both pistols at once.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Moveable:GetOnHit">Moveable:GetOnHit()</a></td>
+	<td class="summary">Get the name of the function called when this moveable is shot</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Moveable:SetOnCollidedWithObject">Moveable:SetOnCollidedWithObject(name)</a></td>
+	<td class="summary">Set the name of the function called when this moveable collides with another moveable</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Moveable:GetOnCollidedWithObject">Moveable:GetOnCollidedWithObject()</a></td>
+	<td class="summary">Get the name of the function called when this moveable collides with another moveable</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Moveable:SetOnCollidedWithRoom">Moveable:SetOnCollidedWithRoom(name)</a></td>
+	<td class="summary">Set the name of the function called when this moveable collides with room geometry (e.g.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Moveable:GetOnCollidedWithRoom">Moveable:GetOnCollidedWithRoom()</a></td>
+	<td class="summary">Get the name of the function called when this moveable collides with room geometry (e.g.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Moveable:SetOnKilled">Moveable:SetOnKilled(callback)</a></td>
+	<td class="summary">Set the name of the function to be called when the moveable is destroyed/killed</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Moveable:GetOnKilled">Moveable:GetOnKilled()</a></td>
+	<td class="summary">Get the name of the function called when this moveable is killed</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Moveable:GetObjectID">Moveable:GetObjectID()</a></td>
+	<td class="summary">Retrieve the object ID</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Moveable:SetObjectID">Moveable:SetObjectID(ID)</a></td>
+	<td class="summary">Change the object's ID.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Moveable:GetState">Moveable:GetState()</a></td>
+	<td class="summary">Retrieve the index of the current state.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Moveable:SetState">Moveable:SetState(index)</a></td>
+	<td class="summary">Set the object's state to the one specified by the given index.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Moveable:GetAnim">Moveable:GetAnim()</a></td>
+	<td class="summary">Retrieve the index of the current animation.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Moveable:SetAnim">Moveable:SetAnim(index)</a></td>
+	<td class="summary">Set the object's animation to the one specified by the given index.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Moveable:GetFrame">Moveable:GetFrame()</a></td>
+	<td class="summary">Retrieve frame number.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Moveable:SetFrame">Moveable:SetFrame(frame)</a></td>
+	<td class="summary">Set frame number.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Moveable:GetHP">Moveable:GetHP()</a></td>
+	<td class="summary">Get current HP (hit points/health points)</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Moveable:SetHP">Moveable:SetHP(HP)</a></td>
+	<td class="summary">Set current HP (hit points/health points)</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Moveable:GetOCB">Moveable:GetOCB()</a></td>
+	<td class="summary">Get OCB (object code bit) of the moveable</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Moveable:SetOCB">Moveable:SetOCB(OCB)</a></td>
+	<td class="summary">Set OCB (object code bit) of the moveable</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Moveable:GetColor">Moveable:GetColor()</a></td>
+	<td class="summary">Get the moveable's color</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Moveable:SetColor">Moveable:SetColor(color)</a></td>
+	<td class="summary">Set the moveable's color</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Moveable:GetAIBits">Moveable:GetAIBits()</a></td>
+	<td class="summary">Get AIBits of object
+ This will return a table with six values, each corresponding to
+ an active behaviour.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Moveable:SetAIBits">Moveable:SetAIBits(bits)</a></td>
+	<td class="summary">Set AIBits of object
+ Use this to force a moveable into a certain AI mode or modes, as if a certain nullmesh
+ (or more than one) had suddenly spawned beneath their feet.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Moveable:MeshIsVisible">Moveable:MeshIsVisible(index)</a></td>
+	<td class="summary">Get state of specified mesh visibility of object
+ Returns true if specified mesh is visible on an object, and false
+ if it is not visible.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Moveable:ShowMesh">Moveable:ShowMesh(index)</a></td>
+	<td class="summary">Makes specified mesh visible
+ Use this to show specified mesh of an object.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Moveable:HideMesh">Moveable:HideMesh(index)</a></td>
+	<td class="summary">Makes specified mesh invisible
+ Use this to hide specified mesh of an object.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Moveable:ShatterMesh">Moveable:ShatterMesh(index)</a></td>
+	<td class="summary">Shatters specified mesh and makes it invisible
+ Note that you can re-enable mesh later by using ShowMesh().</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Moveable:MeshIsSwapped">Moveable:MeshIsSwapped(index)</a></td>
+	<td class="summary">Get state of specified mesh swap of object
+ Returns true if specified mesh is swapped on an object, and false
+ if it is not swapped.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Moveable:SwapMesh">Moveable:SwapMesh(index, index, optional)</a></td>
+	<td class="summary">Set state of specified mesh swap of object
+ Use this to swap specified mesh of an object.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Moveable:UnswapMesh">Moveable:UnswapMesh(index)</a></td>
+	<td class="summary">Set state of specified mesh swap of object
+ Use this to bring back original unswapped mesh</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Moveable:GetHitStatus">Moveable:GetHitStatus()</a></td>
+	<td class="summary">Get the hit status of the object</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Moveable:GetActive">Moveable:GetActive()</a></td>
+	<td class="summary">Determine whether the moveable is active or not</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Moveable:GetRoom">Moveable:GetRoom()</a></td>
+	<td class="summary">Get the current room of the object</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Moveable:SetRoom">Moveable:SetRoom(ID)</a></td>
+	<td class="summary">Set room of object
+ This is used in conjunction with SetPosition to teleport an item to a new room.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Moveable:GetPosition">Moveable:GetPosition()</a></td>
+	<td class="summary">Get the object's position</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Moveable:GetJointPosition">Moveable:GetJointPosition()</a></td>
+	<td class="summary">Get the object's joint position</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Moveable:SetPosition">Moveable:SetPosition(position)</a></td>
+	<td class="summary">Set the moveable's position
+ If you are moving a moveable whose behaviour involves knowledge of room geometry,
+ (e.g.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Moveable:GetRotation">Moveable:GetRotation()</a></td>
+	<td class="summary">Get the moveable's rotation</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Moveable:SetRotation">Moveable:SetRotation(rotation)</a></td>
+	<td class="summary">Set the moveable's rotation</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Moveable:GetName">Moveable:GetName()</a></td>
+	<td class="summary">Get the moveable's name (its unique string identifier)
+ e.g.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Moveable:SetName">Moveable:SetName(string)</a></td>
+	<td class="summary">Set the moveable's name (its unique string identifier)
+ e.g.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Moveable:GetValid">Moveable:GetValid()</a></td>
+	<td class="summary">Test if the object is in a valid state (i.e.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Moveable:Destroy">Moveable:Destroy()</a></td>
+	<td class="summary">Destroy the moveable.</td>
+	</tr>
+</table>
+
+<br/>
+<br/>
+
+
+    <h2 class="section-header "><a name="Functions"></a>Functions</h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "Moveable"></a>
+    <strong>Moveable(object, name, position, rotation, room, animNumber, frameNumber, hp, OCB, AIBits)</strong>
+    </dt>
+    <dd>
+    For more information on each parameter, see the
+associated getters and setters.  If you do not know what to set for these,
+most can just be ignored (see usage).
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">object</span>
+            <span class="types"><span class="type">ObjID</span></span>
+         ID
+        </li>
+        <li><span class="parameter">name</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
+         Lua name of the item
+        </li>
+        <li><span class="parameter">position</span>
+            <span class="types"><span class="type">Vec3</span></span>
+         position in level
+        </li>
+        <li><span class="parameter">rotation</span>
+            <span class="types"><span class="type">Rotation</span></span>
+         rotation about x, y, and z axes (default Rotation(0, 0, 0))
+        </li>
+        <li><span class="parameter">room</span>
+            <span class="types"><span class="type">int</span></span>
+         room ID item is in
+        </li>
+        <li><span class="parameter">animNumber</span>
+            <span class="types"><span class="type">int</span></span>
+         anim number (default 0)
+        </li>
+        <li><span class="parameter">frameNumber</span>
+            <span class="types"><span class="type">int</span></span>
+         frame number (default 0)
+        </li>
+        <li><span class="parameter">hp</span>
+            <span class="types"><span class="type">int</span></span>
+         HP of item (default 10)
+        </li>
+        <li><span class="parameter">OCB</span>
+            <span class="types"><span class="type">int</span></span>
+         ocb of item (default 0)
+        </li>
+        <li><span class="parameter">AIBits</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.1/manual.html#5.5">table</a></span>
+         table with AI bits (default {0,0,0,0,0,0})
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        reference to new Moveable object
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="keyword">local</span> item = Moveable(
+	TEN.ObjID.PISTOLS_ITEM, <span class="comment">-- object id
+</span>	<span class="string">"test"</span>, <span class="comment">-- name
+</span>	Vec3(<span class="number">18907</span>, <span class="number">0</span>, <span class="number">21201</span>),
+	Rotation(<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>),
+	<span class="number">0</span>, <span class="comment">-- room
+</span>	)</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "Moveable:EnableItem"></a>
+    <strong>Moveable:EnableItem()</strong>
+    </dt>
+    <dd>
+    Enable the item, as if a trigger for it had been stepped on.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Moveable:DisableItem"></a>
+    <strong>Moveable:DisableItem()</strong>
+    </dt>
+    <dd>
+    Disable the item
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Moveable:MakeInvisible"></a>
+    <strong>Moveable:MakeInvisible()</strong>
+    </dt>
+    <dd>
+    Make the item invisible.  Use EnableItem to make it visible again.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Moveable:Explode"></a>
+    <strong>Moveable:Explode()</strong>
+    </dt>
+    <dd>
+    Explode item.  This also kills and disables item.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Moveable:Shatter"></a>
+    <strong>Moveable:Shatter()</strong>
+    </dt>
+    <dd>
+    Shatter item.  This also kills and disables item.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Moveable:GetStatus"></a>
+    <strong>Moveable:GetStatus()</strong>
+    </dt>
+    <dd>
+    Get the status of object.
+ possible values:
+ <br />0 - not active
+ <br />1 - active
+ <br />2 - deactivated
+ <br />3 - invisible
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">int</span></span>
+        a number representing the status of the object
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Moveable:SetOnHit"></a>
+    <strong>Moveable:SetOnHit(name)</strong>
+    </dt>
+    <dd>
+    Set the name of the function to be called when the moveable is shot by Lara
+ Note that this will be triggered twice when shot with both pistols at once.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">name</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
+         of callback function to be called
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Moveable:GetOnHit"></a>
+    <strong>Moveable:GetOnHit()</strong>
+    </dt>
+    <dd>
+    Get the name of the function called when this moveable is shot
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="https://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
+        name of the function
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Moveable:SetOnCollidedWithObject"></a>
+    <strong>Moveable:SetOnCollidedWithObject(name)</strong>
+    </dt>
+    <dd>
+    Set the name of the function called when this moveable collides with another moveable
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">name</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
+         of callback function to be called
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Moveable:GetOnCollidedWithObject"></a>
+    <strong>Moveable:GetOnCollidedWithObject()</strong>
+    </dt>
+    <dd>
+    Get the name of the function called when this moveable collides with another moveable
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="https://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
+        name of the function
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Moveable:SetOnCollidedWithRoom"></a>
+    <strong>Moveable:SetOnCollidedWithRoom(name)</strong>
+    </dt>
+    <dd>
+    Set the name of the function called when this moveable collides with room geometry (e.g.  a wall or floor)
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">name</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
+         of callback function to be called
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Moveable:GetOnCollidedWithRoom"></a>
+    <strong>Moveable:GetOnCollidedWithRoom()</strong>
+    </dt>
+    <dd>
+    Get the name of the function called when this moveable collides with room geometry (e.g.  a wall or floor)
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="https://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
+        name of the function
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Moveable:SetOnKilled"></a>
+    <strong>Moveable:SetOnKilled(callback)</strong>
+    </dt>
+    <dd>
+    Set the name of the function to be called when the moveable is destroyed/killed
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">callback</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
+         name of function to be called
+        </li>
+    </ul>
+
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">LevelFuncs.baddyKilled = <span class="keyword">function</span>(theBaddy) <span class="global">print</span>(<span class="string">"You killed a baddy!"</span>) <span class="keyword">end</span>
+baddy:SetOnKilled(<span class="string">"baddyKilled"</span>)</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "Moveable:GetOnKilled"></a>
+    <strong>Moveable:GetOnKilled()</strong>
+    </dt>
+    <dd>
+    Get the name of the function called when this moveable is killed
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="https://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
+        name of the function
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Moveable:GetObjectID"></a>
+    <strong>Moveable:GetObjectID()</strong>
+    </dt>
+    <dd>
+    Retrieve the object ID
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">int</span></span>
+        a number representing the ID of the object
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Moveable:SetObjectID"></a>
+    <strong>Moveable:SetObjectID(ID)</strong>
+    </dt>
+    <dd>
+    Change the object's ID.  This will literally change the object.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">ID</span>
+            <span class="types"><span class="type">ObjectID</span></span>
+         the new ID
+        </li>
+    </ul>
+
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">shiva = TEN.Objects.GetMoveableByName(<span class="string">"shiva_60"</span>)
+shiva:SetObjectID(TEN.Objects.ObjID.BIGMEDI_ITEM)</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "Moveable:GetState"></a>
+    <strong>Moveable:GetState()</strong>
+    </dt>
+    <dd>
+    Retrieve the index of the current state.
+ This corresponds to the number shown in the item's state ID field in WadTool.
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">int</span></span>
+        the index of the active state
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Moveable:SetState"></a>
+    <strong>Moveable:SetState(index)</strong>
+    </dt>
+    <dd>
+    Set the object's state to the one specified by the given index.
+ Performs no bounds checking. <em>Ensure the number given is correct, else
+ object may end up in corrupted animation state.</em>
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">index</span>
+            <span class="types"><span class="type">int</span></span>
+         the index of the desired state
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Moveable:GetAnim"></a>
+    <strong>Moveable:GetAnim()</strong>
+    </dt>
+    <dd>
+    Retrieve the index of the current animation.
+ This corresponds to the number shown in the item's animation list in WadTool.
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">int</span></span>
+        the index of the active animation
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Moveable:SetAnim"></a>
+    <strong>Moveable:SetAnim(index)</strong>
+    </dt>
+    <dd>
+    Set the object's animation to the one specified by the given index.
+ Performs no bounds checking. <em>Ensure the number given is correct, else
+ object may end up in corrupted animation state.</em>
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">index</span>
+            <span class="types"><span class="type">int</span></span>
+         the index of the desired anim
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Moveable:GetFrame"></a>
+    <strong>Moveable:GetFrame()</strong>
+    </dt>
+    <dd>
+    Retrieve frame number.
+ This is the current frame of the object's active animation.
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">int</span></span>
+        the current frame of the active animation
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Moveable:SetFrame"></a>
+    <strong>Moveable:SetFrame(frame)</strong>
+    </dt>
+    <dd>
+    Set frame number.
+ This will move the animation to the given frame.
+ The number of frames in an animation can be seen under the heading "End frame" in
+ the WadTool animation editor. If the animation has no frames, the only valid argument
+ is -1.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">frame</span>
+            <span class="types"><span class="type">int</span></span>
+         the new frame number
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Moveable:GetHP"></a>
+    <strong>Moveable:GetHP()</strong>
+    </dt>
+    <dd>
+    Get current HP (hit points/health points)
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">int</span></span>
+        the amount of HP the moveable currently has
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Moveable:SetHP"></a>
+    <strong>Moveable:SetHP(HP)</strong>
+    </dt>
+    <dd>
+    Set current HP (hit points/health points)
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">HP</span>
+            <span class="types"><span class="type">int</span></span>
+         the amount of HP to give the moveable
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Moveable:GetOCB"></a>
+    <strong>Moveable:GetOCB()</strong>
+    </dt>
+    <dd>
+    Get OCB (object code bit) of the moveable
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">int</span></span>
+        the moveable's current OCB value
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Moveable:SetOCB"></a>
+    <strong>Moveable:SetOCB(OCB)</strong>
+    </dt>
+    <dd>
+    Set OCB (object code bit) of the moveable
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">OCB</span>
+            <span class="types"><span class="type">int</span></span>
+         the new value for the moveable's OCB
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Moveable:GetColor"></a>
+    <strong>Moveable:GetColor()</strong>
+    </dt>
+    <dd>
+    Get the moveable's color
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">Color</span></span>
+        a copy of the moveable's color
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Moveable:SetColor"></a>
+    <strong>Moveable:SetColor(color)</strong>
+    </dt>
+    <dd>
+    Set the moveable's color
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">color</span>
+            <span class="types"><span class="type">Color</span></span>
+         the new color of the moveable
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Moveable:GetAIBits"></a>
+    <strong>Moveable:GetAIBits()</strong>
+    </dt>
+    <dd>
+    Get AIBits of object
+ This will return a table with six values, each corresponding to
+ an active behaviour.  If the object is in a certain AI mode, the table will
+ have a <em>1</em> in the corresponding cell. Otherwise, the cell will hold
+ a <em>0</em>.
+ 1 - guard
+ 2 - ambush
+ 3 - patrol 1
+ 4 - modify
+ 5 - follow
+ 6 - patrol 2
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="https://www.lua.org/manual/5.1/manual.html#5.5">table</a></span>
+        a table of AI bits
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Moveable:SetAIBits"></a>
+    <strong>Moveable:SetAIBits(bits)</strong>
+    </dt>
+    <dd>
+    Set AIBits of object
+ Use this to force a moveable into a certain AI mode or modes, as if a certain nullmesh
+ (or more than one) had suddenly spawned beneath their feet.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">bits</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.1/manual.html#5.5">table</a></span>
+         the table of AI bits
+        </li>
+    </ul>
+
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="keyword">local</span> sas = TEN.Objects.GetMoveableByName(<span class="string">"sas_enemy"</span>)
+sas:SetAIBits({<span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>})</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "Moveable:MeshIsVisible"></a>
+    <strong>Moveable:MeshIsVisible(index)</strong>
+    </dt>
+    <dd>
+    Get state of specified mesh visibility of object
+ Returns true if specified mesh is visible on an object, and false
+ if it is not visible.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">index</span>
+            <span class="types"><span class="type">int</span></span>
+         of a mesh
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">bool</span></span>
+        visibility status
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Moveable:ShowMesh"></a>
+    <strong>Moveable:ShowMesh(index)</strong>
+    </dt>
+    <dd>
+    Makes specified mesh visible
+ Use this to show specified mesh of an object.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">index</span>
+            <span class="types"><span class="type">int</span></span>
+         of a mesh
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Moveable:HideMesh"></a>
+    <strong>Moveable:HideMesh(index)</strong>
+    </dt>
+    <dd>
+    Makes specified mesh invisible
+ Use this to hide specified mesh of an object.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">index</span>
+            <span class="types"><span class="type">int</span></span>
+         of a mesh
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Moveable:ShatterMesh"></a>
+    <strong>Moveable:ShatterMesh(index)</strong>
+    </dt>
+    <dd>
+    Shatters specified mesh and makes it invisible
+ Note that you can re-enable mesh later by using ShowMesh().
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">index</span>
+            <span class="types"><span class="type">int</span></span>
+         of a mesh
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Moveable:MeshIsSwapped"></a>
+    <strong>Moveable:MeshIsSwapped(index)</strong>
+    </dt>
+    <dd>
+    Get state of specified mesh swap of object
+ Returns true if specified mesh is swapped on an object, and false
+ if it is not swapped.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">index</span>
+            <span class="types"><span class="type">int</span></span>
+         of a mesh
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">bool</span></span>
+        mesh swap status
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Moveable:SwapMesh"></a>
+    <strong>Moveable:SwapMesh(index, index, optional)</strong>
+    </dt>
+    <dd>
+    Set state of specified mesh swap of object
+ Use this to swap specified mesh of an object.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">index</span>
+            <span class="types"><span class="type">int</span></span>
+         of a slot to get meshswap from
+        </li>
+        <li><span class="parameter">index</span>
+            <span class="types"><span class="type">int</span></span>
+         of a slot to get meshswap from
+        </li>
+        <li><span class="parameter">optional</span>
+            <span class="types"><span class="type">int</span></span>
+        ) index of a mesh from meshswap slot to use
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Moveable:UnswapMesh"></a>
+    <strong>Moveable:UnswapMesh(index)</strong>
+    </dt>
+    <dd>
+    Set state of specified mesh swap of object
+ Use this to bring back original unswapped mesh
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">index</span>
+            <span class="types"><span class="type">int</span></span>
+         of a mesh to unswap
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Moveable:GetHitStatus"></a>
+    <strong>Moveable:GetHitStatus()</strong>
+    </dt>
+    <dd>
+    Get the hit status of the object
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">bool</span></span>
+        true if the moveable was hit by something in the last gameplay frame, false otherwise
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Moveable:GetActive"></a>
+    <strong>Moveable:GetActive()</strong>
+    </dt>
+    <dd>
+    Determine whether the moveable is active or not
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">bool</span></span>
+        true if the moveable is active
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Moveable:GetRoom"></a>
+    <strong>Moveable:GetRoom()</strong>
+    </dt>
+    <dd>
+    Get the current room of the object
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">int</span></span>
+        number representing the current room of the object
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Moveable:SetRoom"></a>
+    <strong>Moveable:SetRoom(ID)</strong>
+    </dt>
+    <dd>
+    Set room of object
+ This is used in conjunction with SetPosition to teleport an item to a new room.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">ID</span>
+            <span class="types"><span class="type">int</span></span>
+         the ID of the new room
+        </li>
+    </ul>
+
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="keyword">local</span> sas = TEN.Objects.GetMoveableByName(<span class="string">"sas_enemy"</span>)
+sas:SetRoom(destinationRoom)
+sas:SetPosition(destinationPosition)</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "Moveable:GetPosition"></a>
+    <strong>Moveable:GetPosition()</strong>
+    </dt>
+    <dd>
+    Get the object's position
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">Vec3</span></span>
+        a copy of the moveable's position
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Moveable:GetJointPosition"></a>
+    <strong>Moveable:GetJointPosition()</strong>
+    </dt>
+    <dd>
+    Get the object's joint position
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">Vec3</span></span>
+        a copy of the moveable's position
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Moveable:SetPosition"></a>
+    <strong>Moveable:SetPosition(position)</strong>
+    </dt>
+    <dd>
+    Set the moveable's position
+ If you are moving a moveable whose behaviour involves knowledge of room geometry,
+ (e.g.  a BADDY1, which uses it for pathfinding), then you <em>must</em> use this in conjunction
+ with <a href="../2 classes/Objects.Moveable.html#Moveable:SetRoom">Moveable:SetRoom</a>. Otherwise, said moveable will not behave correctly.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">position</span>
+            <span class="types"><span class="type">Vec3</span></span>
+         the new position of the moveable
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Moveable:GetRotation"></a>
+    <strong>Moveable:GetRotation()</strong>
+    </dt>
+    <dd>
+    Get the moveable's rotation
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">Rotation</span></span>
+        a copy of the moveable's rotation
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Moveable:SetRotation"></a>
+    <strong>Moveable:SetRotation(rotation)</strong>
+    </dt>
+    <dd>
+    Set the moveable's rotation
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">rotation</span>
+            <span class="types"><span class="type">Rotation</span></span>
+         The moveable's new rotation
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Moveable:GetName"></a>
+    <strong>Moveable:GetName()</strong>
+    </dt>
+    <dd>
+    Get the moveable's name (its unique string identifier)
+ e.g.  "door_back_room" or "cracked_greek_statue"
+ This corresponds with the "Lua Name" field in an object's properties in Tomb Editor.
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="https://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
+        the moveable's name
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Moveable:SetName"></a>
+    <strong>Moveable:SetName(string)</strong>
+    </dt>
+    <dd>
+    Set the moveable's name (its unique string identifier)
+ e.g.  "door_back_room" or "cracked_greek_statue"
+ It cannot be blank and cannot share a name with any existing object.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">string</span>
+            <span class="types"><span class="type">name</span></span>
+         the new moveable's name
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">bool</span></span>
+        true if we successfully set the name, false otherwise (e.g. if another object has the name already)
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Moveable:GetValid"></a>
+    <strong>Moveable:GetValid()</strong>
+    </dt>
+    <dd>
+    Test if the object is in a valid state (i.e.  has not been destroyed through Lua or killed by Lara).
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">valid</span></span>
+        bool true if the object is still not destroyed
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Moveable:Destroy"></a>
+    <strong>Moveable:Destroy()</strong>
+    </dt>
+    <dd>
+    Destroy the moveable.  This will mean it can no longer be used, except to re-initialise it with another object.
+
+
+
+
+
+
+
+</dd>
+</dl>
+
+
+</div> <!-- id="content" -->
+</div> <!-- id="main" -->
+<div id="about">
+<i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
+<i style="float:right;">Last updated 2022-07-31 20:38:24 </i>
+</div> <!-- id="about" -->
+</div> <!-- id="container" -->
+</body>
+</html>

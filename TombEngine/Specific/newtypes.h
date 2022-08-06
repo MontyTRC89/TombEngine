@@ -1,5 +1,6 @@
 #pragma once
 #include "framework.h"
+#include "Renderer/Renderer11Enums.h"
 
 struct ROOM_VECTOR 
 {
@@ -23,7 +24,7 @@ struct POLYGON
 struct BUCKET
 {
 	int texture;
-	byte blendMode;
+	BLEND_MODES blendMode;
 	bool animated;
 	int numQuads;
 	int numTriangles;

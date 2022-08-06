@@ -11,6 +11,7 @@ struct alignas(16) CShadowLightBuffer
 	Matrix LightViewProjections[6];
 	int CastShadows;
 	int NumSpheres;
-	int padding[2];
+	int ShadowMapSize;
+	int padding;
 	Sphere Spheres[16];
 };

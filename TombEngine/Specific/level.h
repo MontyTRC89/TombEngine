@@ -1,5 +1,6 @@
 #pragma once
 #include "Game/animation.h"
+#include "Game/control/volumetriggerer.h"
 #include "Game/items.h"
 #include "Game/room.h"
 #include "Specific/IO/ChunkId.h"
@@ -13,26 +14,13 @@
 
 #define MAX_ZONES 6
 
+using namespace TEN::Control::Volumes;
+
 struct ChunkId;
 struct LEB128;
 struct SampleInfo;
 struct BOX_INFO;
 struct OVERLAP;
-
-struct OBJECT_TEXTURE_VERT
-{
-	float x;
-	float y;
-};
-
-struct OBJECT_TEXTURE
-{
-	int attribute;
-	int tileAndFlag;
-	int newFlags;
-	struct OBJECT_TEXTURE_VERT vertices[4];
-	int destination;
-};
 
 struct TEXTURE
 {
@@ -91,7 +79,7 @@ struct SPRITE
 
 struct MESH
 {
-	byte LightMode;
+	LIGHT_MODES lightMode;
 	BoundingSphere sphere;
 	std::vector<Vector3> positions;
 	std::vector<Vector3> normals;
@@ -118,7 +106,6 @@ struct LEVEL
 	std::vector<RANGE_STRUCT> Ranges;
 	std::vector<short> Commands;
 	std::vector<ANIM_FRAME> Frames;
-	std::vector<OBJECT_TEXTURE> ObjectTextures;
 	std::vector<ItemInfo> Items;
 	std::vector<AI_OBJECT> AIObjects;
 	std::vector<SPRITE> Sprites;
@@ -131,7 +118,7 @@ struct LEVEL
 	std::vector<short> SoundMap;
 	std::vector<SampleInfo> SoundDetails;
 	std::vector<ANIMATED_TEXTURES_SEQUENCE> AnimatedTexturesSequences;
-	std::vector<std::string> LuaFunctionNames;
+	std::vector<VolumeEventSet> EventSets;
 	int NumItems;
 	int NumSpritesSequences;
 };
@@ -159,7 +146,6 @@ void LoadBoxes();
 void LoadSamples();
 void LoadSoundSources();
 void LoadAnimatedTextures();
-void LoadTextureInfos();
 void LoadAIObjects();
 
 void InitialiseLara(int restore);

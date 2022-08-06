@@ -45,8 +45,6 @@ constexpr int MAX_ROOMS = 1024;
 constexpr int WIBBLE_SPEED = 4;
 constexpr int WIBBLE_MAX = UCHAR_MAX - WIBBLE_SPEED + 1;
 
-constexpr auto FPS = 30;
-
 extern int GameTimer;
 extern int RumbleTimer;
 extern int GlobalCounter;
@@ -84,7 +82,6 @@ int GetRandomDraw();
 void KillMoveItems();
 void KillMoveEffects();
 void UpdateShatters();
-bool ExplodeItemNode(ItemInfo* item, int node, int noXZVel, int bits);
 
 void CleanUp();
 

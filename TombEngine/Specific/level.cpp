@@ -25,6 +25,7 @@
 #include "Sound/sound.h"
 #include "Specific/input.h"
 #include "Specific/setup.h"
+#include "Specific/trutils.h"
 
 using TEN::Renderer::g_Renderer;
 using std::vector;
@@ -177,7 +178,7 @@ void LoadObjects()
 	{
 		MESH mesh;
 
-		mesh.LightMode = ReadInt8();
+		mesh.lightMode = (LIGHT_MODES)ReadInt8();
 
 		mesh.sphere.Center.x = ReadFloat();
 		mesh.sphere.Center.y = ReadFloat();
@@ -205,7 +206,7 @@ void LoadObjects()
 			BUCKET bucket;
 
 			bucket.texture = ReadInt32();
-			bucket.blendMode = ReadInt8();
+			bucket.blendMode = (BLEND_MODES)ReadInt8();
 			bucket.animated = ReadInt8();
 			bucket.numQuads = 0;
 			bucket.numTriangles = 0;
@@ -335,8 +336,6 @@ void LoadObjects()
 		Objects[objNum].frameBase = ReadInt32();
 		Objects[objNum].animIndex = ReadInt32();
 
-		ReadInt16();
-
 		Objects[objNum].loaded = true;
 	}
 
@@ -416,11 +415,7 @@ void LoadCameras()
 		sink.z = ReadInt32();
 		sink.strength = ReadInt32();
 		sink.boxIndex = ReadInt32();
-
-		byte numBytes = ReadInt8();
-		char buffer[255];
-		ReadBytes(buffer, numBytes);
-		sink.luaName = std::string(buffer, buffer+numBytes);
+		sink.luaName = ReadString();
 
 		g_GameScriptEntities->AddName(sink.luaName, sink);
 	}
@@ -596,7 +591,7 @@ void ReadRooms()
 			BUCKET bucket;
 
 			bucket.texture = ReadInt32();
-			bucket.blendMode = ReadInt8();
+			bucket.blendMode = (BLEND_MODES)ReadInt8();
 			bucket.animated = ReadInt8();
 			bucket.numQuads = 0;
 			bucket.numTriangles = 0;
@@ -777,24 +772,9 @@ void ReadRooms()
 			volume.Scale.y = ReadFloat();
 			volume.Scale.z = ReadFloat();
 
-			volume.Activators = ReadInt32();
+			volume.EventSetIndex = ReadInt32();
 
-			byte numBytes = ReadInt8();
-			char buffer[255];
-			ReadBytes(buffer, numBytes);
-			volume.OnEnter = std::string(buffer, buffer + numBytes);
-
-			numBytes = ReadInt8();
-			ReadBytes(buffer, numBytes);
-			volume.OnInside = std::string(buffer, buffer + numBytes);
-
-			numBytes = ReadInt8();
-			ReadBytes(buffer, numBytes);
-			volume.OnLeave = std::string(buffer, buffer + numBytes);
-			
-			volume.OneShot = ReadInt8();
 			volume.Status = TriggerStatus::Outside;
-
 			volume.Box    = BoundingOrientedBox(volume.Position, volume.Scale, volume.Rotation);
 			volume.Sphere = BoundingSphere(volume.Position, volume.Scale.x);
 
@@ -842,7 +822,6 @@ void FreeLevel()
 	g_Level.SpritesTextures.resize(0);
 	g_Level.AnimatedTexturesSequences.resize(0);
 	g_Level.Rooms.resize(0);
-	g_Level.ObjectTextures.resize(0);
 	g_Level.Bones.resize(0);
 	g_Level.Meshes.resize(0);
 	MoveablesIds.resize(0);
@@ -861,7 +840,7 @@ void FreeLevel()
 	g_Level.Sinks.resize(0);
 	g_Level.SoundSources.resize(0);
 	g_Level.AIObjects.resize(0);
-	g_Level.LuaFunctionNames.resize(0);
+	g_Level.EventSets.resize(0);
 	g_Level.Items.resize(0);
 
 	for (int i = 0; i < 2; i++)
@@ -900,11 +879,7 @@ void LoadSoundSources()
 		source.z = ReadInt32();
 		source.soundId = ReadInt32();
 		source.flags = ReadInt32();
-
-		byte numBytes = ReadInt8();
-		char buffer[255];
-		ReadBytes(buffer, numBytes);
-		source.luaName = std::string(buffer, buffer+numBytes);
+		source.luaName = ReadString();
 
 		g_GameScriptEntities->AddName(source.luaName, source);
 	}
@@ -938,34 +913,6 @@ void LoadAnimatedTextures()
 
 		g_Level.AnimatedTexturesSequences.push_back(sequence);
 	}
-
-	// Unused for now
-	int nAnimUVRanges = ReadInt8();
-}
-
-void LoadTextureInfos()
-{
-	ReadInt32(); // TEX/0
-
-	int numObjectTextures = ReadInt32();
-	TENLog("Num texinfos: " + std::to_string(numObjectTextures), LogLevel::Info);
-
-	for (int i = 0; i < numObjectTextures; i++)
-	{
-		OBJECT_TEXTURE texture;
-		texture.attribute = ReadInt32();
-		texture.tileAndFlag = ReadInt32();
-		texture.newFlags = ReadInt32();
-
-		for (int j = 0; j < 4; j++)
-		{
-			texture.vertices[j].x = ReadFloat();
-			texture.vertices[j].y = ReadFloat();
-		}
-
-		texture.destination = ReadInt32();
-		g_Level.ObjectTextures.push_back(texture);
-	}
 }
 
 void LoadAIObjects()
@@ -987,23 +934,41 @@ void LoadAIObjects()
 		obj.flags = ReadInt16();
 		obj.yRot = ReadInt16();
 		obj.boxNumber = ReadInt32();
-
-		byte numBytes = ReadInt8();
-		char buffer[255];
-		ReadBytes(buffer, numBytes);
-		obj.luaName = std::string(buffer, buffer+numBytes);
+		obj.luaName = ReadString();
 
 		g_GameScriptEntities->AddName(obj.luaName, obj);
 	}
 }
 
-void LoadLuaFunctionNames()
+void LoadEventSets()
 {
-	TENLog("Parsing Lua function names... ", LogLevel::Info);
+	int eventSetCount = ReadInt32();
+	TENLog("Num level sets: " + std::to_string(eventSetCount), LogLevel::Info);
 
-	int luaFunctionsCount = ReadInt32();
-	for (int i = 0; i < luaFunctionsCount; i++)
-		g_Level.LuaFunctionNames.push_back(ReadString());
+	for (int i = 0; i < eventSetCount; i++)
+	{
+		auto eventSet = VolumeEventSet();
+
+		eventSet.Name = ReadString();
+		eventSet.Activators = ReadInt32();
+
+		eventSet.OnEnter.Mode = (VolumeEventMode)ReadInt32();
+		eventSet.OnEnter.Function = ReadString();
+		eventSet.OnEnter.Argument = ReadString();
+		eventSet.OnEnter.CallCounter = ReadInt32();
+
+		eventSet.OnInside.Mode = (VolumeEventMode)ReadInt32();
+		eventSet.OnInside.Function = ReadString();
+		eventSet.OnInside.Argument = ReadString();
+		eventSet.OnInside.CallCounter = ReadInt32();
+
+		eventSet.OnLeave.Mode = (VolumeEventMode)ReadInt32();
+		eventSet.OnLeave.Function = ReadString();
+		eventSet.OnLeave.Argument = ReadString();
+		eventSet.OnLeave.CallCounter = ReadInt32();
+
+		g_Level.EventSets.push_back(eventSet);
+	}
 }
 
 FILE* FileOpen(const char* fileName)
@@ -1076,7 +1041,7 @@ unsigned int _stdcall LoadLevel(void* data)
 			throw std::exception((std::string("Unable to read level file: ") + filename).c_str());
 
 		char header[4];
-		byte version[4];
+		unsigned char version[4];
 		int compressedSize;
 		int uncompressedSize;
 		int systemHash;
@@ -1090,7 +1055,17 @@ unsigned int _stdcall LoadLevel(void* data)
 		if (std::string(header) != "TEN")
 			throw std::invalid_argument("Level file header is not valid! Must be TEN. Probably old level version?");
 		else
-			TENLog("Tomb Editor compiler version: " + std::to_string(version[0]) + "." + std::to_string(version[1]) + "." + std::to_string(version[2]), LogLevel::Info);
+			TENLog("Level compiler version: " + std::to_string(version[0]) + "." + std::to_string(version[1]) + "." + std::to_string(version[2]), LogLevel::Info);
+
+		auto assemblyVersion = TEN::Utils::GetProductOrFileVersion(true);
+		for (int i = 0; i < assemblyVersion.size(); i++)
+		{
+			if (assemblyVersion[i] != version[i])
+			{
+				TENLog("Level compiler version does not match with TEN version. Errors or crashes may be possible.", LogLevel::Warning);
+				break;
+			}
+		}
 
 		// Check system name hash and reset it if it's valid (because we use build & play feature only once)
 		if (SystemNameHash != 0 && SystemNameHash != systemHash)
@@ -1135,30 +1110,30 @@ unsigned int _stdcall LoadLevel(void* data)
 		//InitialiseLOTarray(true);
 
 		LoadAnimatedTextures();
-		LoadTextureInfos();
 		g_Renderer.UpdateProgress(70);
 
 		LoadItems();
 		LoadAIObjects();
 
-		LoadLuaFunctionNames();
+		LoadEventSets();
 
 		LoadSamples();
 		g_Renderer.UpdateProgress(80);
-
-		TENLog("Preparing renderer...", LogLevel::Info);
-		
-		g_Renderer.UpdateProgress(90);
-		g_Renderer.PrepareDataForTheRenderer();
 
 		TENLog("Initializing level...", LogLevel::Info);
 
 		// Initialise the game
 		InitialiseGameFlags();
 		InitialiseLara(!(InitialiseGame || CurrentLevel == 1));
+		InitializeNeighborRoomList();
 		GetCarriedItems();
 		GetAIPickups();
 		g_GameScriptEntities->AssignLara();
+		g_Renderer.UpdateProgress(90);
+
+		TENLog("Preparing renderer...", LogLevel::Info);
+
+		g_Renderer.PrepareDataForTheRenderer();
 
 		TENLog("Level loading complete.", LogLevel::Info);
 

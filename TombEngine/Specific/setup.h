@@ -1,6 +1,7 @@
 #pragma once
 #include "Objects/objectslist.h"
 #include "Specific/phd_global.h"
+#include "Renderer/Renderer11Enums.h"
 
 struct ItemInfo;
 struct CollisionInfo;
@@ -47,7 +48,7 @@ struct ObjectInfo
 	short HitPoints; 
 	short pivotLength; 
 	short radius; 
-	bool castsShadow; 
+	ShadowMode shadowType;
 	short biteOffset; 
 	bool loaded;
 	bool intelligent;
@@ -63,7 +64,6 @@ struct ObjectInfo
 	bool undead;
 	bool saveMesh;
 	bool friendly;
-	bool castShadows;
 	bool isPickup;
 	bool isPuzzleHole;
 	int meshSwapSlot;

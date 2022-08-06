@@ -6,15 +6,18 @@ namespace TEN::Renderer
 	struct RendererLight
 	{
 		Vector3 Position;
-		int Type;
+		unsigned int Type;
 		Vector3 Color;
-		float LocalIntensity;
-		Vector3 Direction;
-		float Distance;
 		float Intensity;
+		Vector3 Direction;
 		float In;
 		float Out;
-		float Range;
+		float InRange;
+		float OutRange;
+
+		int RoomNumber;
+		float LocalIntensity;
+		float Distance;
 		bool AffectNeighbourRooms;
 		bool CastShadows;
 	};

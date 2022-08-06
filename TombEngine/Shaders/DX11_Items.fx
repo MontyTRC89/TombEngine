@@ -1,46 +1,41 @@
 #include "./Math.hlsli"
 #include "./CameraMatrixBuffer.hlsli"
 #include "./ShaderLight.hlsli"
+#include "./VertexEffects.hlsli"
 #include "./VertexInput.hlsli"
 #include "./AlphaTestBuffer.hlsli"
+#include "./AnimatedTextures.hlsli"
+#include "./Shadows.hlsli"
+
+#define MAX_BONES 32
 
 cbuffer ItemBuffer : register(b1) 
 {
 	float4x4 World;
-	float4x4 Bones[32];
-	float4 ItemPosition;
+	float4x4 Bones[MAX_BONES];
+	float4 Color;
 	float4 AmbientLight;
-};
-
-cbuffer LightsBuffer : register(b2)
-{
-	ShaderLight Lights[MAX_LIGHTS];
-	int NumLights;
-	float3 CameraPosition;
-};
-
-cbuffer MiscBuffer : register(b3)
-{
-	int Caustics;
+	int4 BoneLightModes[MAX_BONES / 4];
 };
 
 struct PixelShaderInput
 {
 	float4 Position: SV_POSITION;
 	float3 Normal: NORMAL;
-	float3 WorldPosition : POSITION;
+	float3 WorldPosition: POSITION;
 	float2 UV: TEXCOORD;
 	float4 Color: COLOR;
-	float Sheen : SHEEN;
-	float3x3 TBN : TBN;
-	float Fog : FOG;
-	float4 PositionCopy : TEXCOORD2;
+	float Sheen: SHEEN;
+	float3x3 TBN: TBN;
+	float Fog: FOG;
+	float4 PositionCopy: TEXCOORD2;
+	uint Bone: BONE;
 };
 
 struct PixelShaderOutput
 {
-	float4 Color: SV_Target0;
-	float4 Depth: SV_Target1;
+	float4 Color: SV_TARGET0;
+	float4 Depth: SV_TARGET1;
 };
 
 Texture2D Texture : register(t0);
@@ -56,46 +51,30 @@ PixelShaderInput VS(VertexShaderInput input)
 
 	float4x4 world = mul(Bones[input.Bone], World);
 
-	float3 Normal = (mul(float4(input.Normal, 0.0f), world).xyz);
-	float3 WorldPosition = (mul(float4(input.Position, 1.0f), world));
+	float3 normal = (mul(float4(input.Normal, 0.0f), world).xyz);
+	float3 worldPosition = (mul(float4(input.Position, 1.0f), world).xyz);
 
-	output.Normal = Normal;
+	output.Normal = normal;
 	output.UV = input.UV;
-	output.WorldPosition = WorldPosition;
+	output.WorldPosition = worldPosition;
 	
 	float3 Tangent = mul(float4(input.Tangent, 0), world).xyz;
-	float3 Bitangent = mul(float4(input.Bitangent, 0), world).xyz;
-	float3x3 TBN = float3x3(Tangent, Bitangent, Normal);
+    float3 Bitangent = cross(normal, Tangent);
+	float3x3 TBN = float3x3(Tangent, Bitangent, normal);
 
 	output.TBN = transpose(TBN);
-	
-	float3 pos = input.Position;
-	float4 col = input.Color;
-	
-	// Setting effect weight on TE side prevents portal vertices from moving.
-	// Here we just read weight and decide if we should apply refraction or movement effect.
-	float weight = input.Effects.z;
-	
-	// Wibble effect returns different value depending on vertex hash and frame number.
-	// In theory, hash could be affected by WaterScheme value from room.
-	float wibble = sin((((Frame + input.Hash) % 256) / 256.0) * (PI2)); // sin from -1 to 1 with a period of 64 frames
-	
-	// Glow
-	if (input.Effects.x > 0.0f)
-	{
-		float intensity = input.Effects.x * lerp(-0.5f, 1.0f, wibble * 0.5f + 0.5f);
-		col = saturate(col + float4(intensity, intensity, intensity, 0));
-	}
 
-	// Movement
-	if (input.Effects.y > 0.0f)
-        pos.y += wibble * input.Effects.y * weight * 128.0f; // 128 units offset to top and bottom (256 total)
+	// Calculate vertex effects
+	float wibble = Wibble(input.Effects.xyz, input.Hash);
+	float3 pos = Move(input.Position, input.Effects.xyz, wibble);
+	float3 col = Glow(input.Color.xyz, input.Effects.xyz, wibble);
 	
 	output.Position = mul(mul(float4(pos, 1.0f), world), ViewProjection);
-	output.Color = col;
+	output.Color = float4(col, input.Color.w);
+	output.Color *= Color;
 
 	// Apply distance fog
-	float d = distance(CamPositionWS.xyz,WorldPosition);
+	float d = distance(CamPositionWS.xyz, worldPosition);
 	if (FogMaxDistance == 0)
 		output.Fog = 1;
 	else
@@ -103,62 +82,36 @@ PixelShaderInput VS(VertexShaderInput input)
 	
 	output.PositionCopy = output.Position;
     output.Sheen = input.Effects.w;
+	output.Bone = input.Bone;
 	return output;
 }
 
-PixelShaderOutput PS(PixelShaderInput input) : SV_TARGET
+PixelShaderOutput PS(PixelShaderInput input)
 {
 	PixelShaderOutput output;
-	float4 tex = Texture.Sample(Sampler, input.UV);
-	
+
+	if (Type == 1)
+		input.UV = CalculateUVRotate(input.UV, 0);
+
+	float4 tex = Texture.Sample(Sampler, input.UV);	
     DoAlphaTest(tex);
-    float3 ambient = AmbientLight.xyz * tex.xyz;
 
 	float3 normal = NormalTexture.Sample(Sampler, input.UV).rgb;
 	normal = normal * 2 - 1;
 	normal = normalize(mul(input.TBN, normal));
 
-	float3 diffuse = 0;
-    float3 spec = 0;
-	
-	for (int i = 0; i < NumLights; i++)
-	{
-		int lightType = Lights[i].Type;
+	float3 color = (BoneLightModes[input.Bone / 4][input.Bone % 4] == 0) ?
+		CombineLights(AmbientLight.xyz, input.Color.xyz, tex.xyz, input.WorldPosition, normal, input.Sheen) :
+		StaticLight(input.Color.xyz, tex.xyz);
 
-		if (lightType == LT_POINT || lightType == LT_SHADOW)
-		{
-            diffuse += DoPointLight(input.WorldPosition, normal, Lights[i]);
-            spec += DoSpecularPoint(input.WorldPosition, normal, Lights[i], input.Sheen);
+	output.Color = saturate(float4(color, tex.w));
 
-        }
-		else if (lightType == LT_SUN)
-		{
-            diffuse += DoDirectionalLight(input.WorldPosition, normal, Lights[i]);
-            spec += DoSpecularSun(normal, Lights[i], input.Sheen);
-
-		}
-		else if (lightType == LT_SPOT)
-		{
-            diffuse += DoSpotLight(input.WorldPosition, normal, Lights[i]);
-            spec += DoSpecularSpot(input.WorldPosition, normal, Lights[i], input.Sheen);
-
-		}
-	}
-	
-    diffuse.xyz *= tex.xyz;
 	output.Depth = tex.w > 0.0f ?
 		float4(input.PositionCopy.z / input.PositionCopy.w, 0.0f, 0.0f, 1.0f) :
 		float4(0.0f, 0.0f, 0.0f, 0.0f);
-		
-    output.Color = float4(ambient + diffuse + spec, tex.w);
-	
-	float3 colorMul = min(input.Color.xyz, 1.0f); 
-	output.Color.xyz *= colorMul.xyz;
 	
 	if (FogMaxDistance != 0)
-	{
 		output.Color.xyz = lerp(output.Color.xyz, FogColor.xyz, input.Fog);
-	}
 	
 	return output;
 }

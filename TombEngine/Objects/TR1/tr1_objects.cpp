@@ -29,7 +29,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->initialise = InitialiseWolf;
 		obj->control = WolfControl;
 		obj->collision = CreatureCollision;
-		obj->castsShadow = true;
+		obj->shadowType = ShadowMode::All;
 		obj->HitPoints = 6;
 		obj->hitEffect = HIT_BLOOD;
 		obj->pivotLength = 375;
@@ -49,7 +49,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->initialise = InitialiseCreature;
 		obj->control = BearControl;
 		obj->collision = CreatureCollision;
-		obj->castsShadow = true;
+		obj->shadowType = ShadowMode::All;
 		obj->HitPoints = 20;
 		obj->hitEffect = HIT_BLOOD;
 		obj->pivotLength = 500;
@@ -70,7 +70,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->collision = CreatureCollision;
 		obj->HitPoints = 22;
 		obj->hitEffect = HIT_BLOOD;
-		obj->castsShadow = true;
+		obj->shadowType = ShadowMode::All;
 		obj->pivotLength = 250;
 		obj->radius = 340;
 		obj->intelligent = true;
@@ -87,7 +87,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->initialise = InitialiseBigRat;
 		obj->control = BigRatControl;
 		obj->collision = CreatureCollision;
-		obj->castsShadow = true;
+		obj->shadowType = ShadowMode::All;
 		obj->HitPoints = 5;
 		obj->hitEffect = HIT_BLOOD;
 		obj->pivotLength = 200;
@@ -109,7 +109,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->collision = CreatureCollision;
 		obj->hitEffect = HIT_BLOOD;
 		obj->control = NatlaControl;
-		obj->castsShadow = true;
+		obj->shadowType = ShadowMode::All;
 		obj->HitPoints = 400;
 		obj->radius = 204;
 		obj->intelligent = true;
@@ -126,7 +126,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->initialise = InitialiseCreature;
 		obj->collision = CreatureCollision;
 		obj->control = GiantMutantControl;
-		obj->castsShadow = true;
+		obj->shadowType = ShadowMode::All;
 		obj->HitPoints = 500;
 		obj->hitEffect = HIT_BLOOD;
 		obj->radius = 341;
@@ -148,7 +148,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->collision = CreatureCollision;
 		obj->control = DoppelgangerControl;
 		//obj->drawRoutine = DrawEvilLara;
-		obj->castsShadow = true;
+		obj->shadowType = ShadowMode::All;
 		obj->HitPoints = 1000;
 		obj->hitEffect = HIT_BLOOD;
 		obj->radius = 102;
@@ -164,7 +164,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->initialise = InitialiseCreature;
 		obj->control = CentaurControl;
 		obj->collision = CreatureCollision;
-		obj->castsShadow = true;
+		obj->shadowType = ShadowMode::All;
 		obj->HitPoints = 120;
 		obj->hitEffect = HIT_BLOOD;
 		obj->pivotLength = 400;
