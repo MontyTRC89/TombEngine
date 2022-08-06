@@ -10,20 +10,22 @@
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
 #include "Specific/level.h"
+#include "Specific/prng.h"
 #include "Specific/setup.h"
 
+using namespace TEN::Math::Random;
 using std::vector;
 
 namespace TEN::Entities::TR3
 {
-	BiteInfo RaptorBite = { 0, 66, 318, 22 };
-	const vector<int> RaptorAttackJoints = { 10, 11, 12, 13, 14, 16, 17, 18, 19, 20, 21, 22, 23 };
-
 	constexpr auto RAPTOR_ATTACK_DAMAGE = 100;
 
-	#define RAPTOR_WALK_TURN_ANGLE ANGLE(2.0f)
-	#define RAPTOR_RUN_TURN_ANGLE ANGLE(2.0f)
-	#define RAPTOR_ATTACK_TURN_ANGLE ANGLE(2.0f)
+	#define RAPTOR_WALK_TURN_RATE_MAX	ANGLE(2.0f)
+	#define RAPTOR_RUN_TURN_RATE_MAX	ANGLE(2.0f)
+	#define RAPTOR_ATTACK_TURN_RATE_MAX ANGLE(2.0f)
+
+	BiteInfo RaptorBite = { 0, 66, 318, 22 };
+	const vector<int> RaptorAttackJoints = { 10, 11, 12, 13, 14, 16, 17, 18, 19, 20, 21, 22, 23 };
 
 	enum RaptorState
 	{
@@ -56,6 +58,8 @@ namespace TEN::Entities::TR3
 		RAPTOR_ANIM_BITE_ATTACK = 13
 	};
 
+	const std::array RaptorDeathAnims = { RAPTOR_ANIM_DEATH_1, RAPTOR_ANIM_DEATH_2, };
+
 	void RaptorControl(short itemNumber)
 	{
 		if (!CreatureActive(itemNumber))
@@ -72,15 +76,7 @@ namespace TEN::Entities::TR3
 		if (item->HitPoints <= 0)
 		{
 			if (item->Animation.ActiveState != RAPTOR_STATE_DEATH)
-			{
-				if (GetRandomControl() > 0x4000)
-					item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + RAPTOR_ANIM_DEATH_1;
-				else
-					item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + RAPTOR_ANIM_DEATH_2;
-
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-				item->Animation.ActiveState = RAPTOR_STATE_DEATH;
-			}
+				SetAnimation(item, RaptorDeathAnims[GenerateInt(0, RaptorDeathAnims.size() - 1)]);
 		}
 		else
 		{
@@ -171,7 +167,7 @@ namespace TEN::Entities::TR3
 				break;
 
 			case RAPTOR_STATE_WALK_FORWARD:
-				creature->MaxTurn = RAPTOR_WALK_TURN_ANGLE;
+				creature->MaxTurn = RAPTOR_WALK_TURN_RATE_MAX;
 				creature->Flags &= ~1;
 
 				if (creature->Mood != MoodType::Bored)
@@ -186,7 +182,7 @@ namespace TEN::Entities::TR3
 				break;
 
 			case RAPTOR_STATE_RUN_FORWARD:
-				creature->MaxTurn = RAPTOR_RUN_TURN_ANGLE;
+				creature->MaxTurn = RAPTOR_RUN_TURN_RATE_MAX;
 				creature->Flags &= ~1;
 				tilt = angle;
 
@@ -219,7 +215,7 @@ namespace TEN::Entities::TR3
 				break;
 
 			case RAPTOR_STATE_JUMP_ATTACK:
-				creature->MaxTurn = RAPTOR_ATTACK_TURN_ANGLE;
+				creature->MaxTurn = RAPTOR_ATTACK_TURN_RATE_MAX;
 				tilt = angle;
 
 				if (creature->Enemy->IsLara())
@@ -258,7 +254,7 @@ namespace TEN::Entities::TR3
 				break;
 
 			case RAPTOR_STATE_BITE_ATTACK:
-				creature->MaxTurn = RAPTOR_ATTACK_TURN_ANGLE;
+				creature->MaxTurn = RAPTOR_ATTACK_TURN_RATE_MAX;
 				tilt = angle;
 
 				if (creature->Enemy->IsLara())
@@ -297,7 +293,7 @@ namespace TEN::Entities::TR3
 				break;
 
 			case RAPTOR_STATE_RUN_BITE_ATTACK:
-				creature->MaxTurn = RAPTOR_ATTACK_TURN_ANGLE;
+				creature->MaxTurn = RAPTOR_ATTACK_TURN_RATE_MAX;
 				tilt = angle;
 
 				if (creature->Enemy->IsLara())

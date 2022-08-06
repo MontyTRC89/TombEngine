@@ -29,11 +29,11 @@ namespace TEN::Entities::TR1
 
 	constexpr auto BIG_RAT_POSE_CHANCE = 0x100;
 
-	#define BIG_RAT_RUN_TURN_ANGLE	ANGLE(6.0f)
-	#define BIG_RAT_SWIM_TURN_ANGLE ANGLE(3.0f)
+	#define BIG_RAT_RUN_TURN_RATE_MAX  ANGLE(6.0f)
+	#define BIG_RAT_SWIM_TURN_RATE_MAX ANGLE(3.0f)
 
-	const vector<int> BigRatAttackJoints = { 0, 1, 2, 3, 7, 8, 24, 25 };
 	const auto BigRatBite = BiteInfo(Vector3(0.0f, -11.0f, 108.0f), 3);
+	const vector<int> BigRatAttackJoints = { 0, 1, 2, 3, 7, 8, 24, 25 };
 
 	enum BigRatState
 	{
@@ -189,7 +189,7 @@ namespace TEN::Entities::TR1
 				break;
 
 			case BIG_RAT_STATE_RUN:
-				creature->MaxTurn = BIG_RAT_RUN_TURN_ANGLE;
+				creature->MaxTurn = BIG_RAT_RUN_TURN_RATE_MAX;
 
 				if (RatIsInWater(item))
 				{
@@ -239,7 +239,7 @@ namespace TEN::Entities::TR1
 				break;
 
 			case BIG_RAT_STATE_SWIM:
-				creature->MaxTurn = BIG_RAT_SWIM_TURN_ANGLE;
+				creature->MaxTurn = BIG_RAT_SWIM_TURN_RATE_MAX;
 
 				if (!RatIsInWater(item))
 				{
