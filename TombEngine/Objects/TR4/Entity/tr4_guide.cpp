@@ -23,17 +23,94 @@ namespace TEN::Entities::TR4
 		GUIDE_STATE_IDLE = 1,
 		GUIDE_STATE_WALK = 2,
 		GUIDE_STATE_RUN = 3,
+		GUIDE_STATE_CHECKING_GROUND = 7,
 		GUIDE_STATE_IGNITE_TORCH = 11,
-		GUIDE_STATE_LOOK_BACK = 22,
-		GUIDE_STATE_TORCH_ATTACK = 31,
+		GUIDE_STATE_TURNING_LEFT = 22,
+		GUIDE_STATE_ATTACK_LOW = 31,
+		GUIDE_STATE_ACTION_CANDLES = 32,
+		GUIDE_STATE_TURNING_RIGHT = 35,
+		GUIDE_STATE_CROUCH = 36,
 		GUIDE_STATE_PICKUP_TORCH = 37,
-		GUIDE_STATE_READ_INSCRIPTION = 39
+		GUIDE_STATE_LIGHTING_TORCHES = 38,
+		GUIDE_STATE_READ_INSCRIPTION = 39,
+		GUIDE_STATE_WALK_NO_TORCH = 40,
+		GUIDE_STATE_CORRECT_POSITION_FRONT = 41,
+		GUIDE_STATE_CORRECT_POSITION_BACK = 42,
+		GUIDE_STATE_CROUCH_ACTIVATE_TRAP = 43
 	};
 
-	// TODO
 	enum GuideAnim
 	{
-
+		GUIDE_ANIM_WALK = 0,
+		GUIDE_ANIM_RUN = 1,
+		//2,
+		//3,
+		GUIDE_ANIM_IDLE = 4,
+		//5,
+		//6,
+		//7,
+		//8,
+		//9,
+		//10,
+		//11,
+		GUIDE_ANIM_CHECK_GROUND = 12,
+		GUIDE_ANIM_WALK_IDLE_RIGHT = 13,
+		GUIDE_ANIM_IDLE_RUN = 14,
+		GUIDE_ANIM_RUN_IDLE = 15,
+		GUIDE_ANIM_WALK_RUN = 16,
+		GUIDE_ANIM_RUN_WALK = 17,
+		//18,
+		//19,
+		//20,
+		//21,
+		//22,
+		//23,
+		//24,
+		//25,
+		GUIDE_ANIM_TURN_LEFT = 26,
+		//27,
+		//28,
+		//29,
+		GUIDE_ANIM_USE_LIGHTER  = 30,
+		GUIDE_ANIM_COME_SIGNAL = 31,
+		//32,
+		//33,
+		//34,
+		//35,
+		//36,
+		//37,
+		//38,
+		//39,
+		//40,
+		//41,
+		//42,
+		//43,
+		GUIDE_ANIM_ATTACK = 44,
+		//45,
+		//46,
+		GUIDE_ANIM_IDLE_LIGHTING_CANDLE = 47,
+		GUIDE_ANIM_LIGHTING_CANDLE = 48,
+		GUIDE_ANIM_LIGHTING_TORCH_CANDLE = 49,
+		//50,
+		//51,
+		//52,
+		//53,
+		//54,
+		//55,
+		GUIDE_ANIM_TURN_RIGHT = 56,
+		GUIDE_ANIM_IDLE_CROUCH = 57,
+		GUIDE_ANIM_CROUCH = 58,
+		GUIDE_ANIM_CROUCH_IDLE = 59,
+		GUIDE_ANIM_GRAB_TORCH = 60,
+		GUIDE_ANIM_LIGHTING_TORCH = 61,
+		GUIDE_ANIM_READ_INSCRIPTION = 62,
+		GUIDE_ANIM_WALK_NO_TORCH = 63,
+		GUIDE_ANIM_IDLE_WALK_NO_TORCH = 64,
+		GUIDE_ANIM_WALK_NO_TORCH_IDLE = 65,
+		GUIDE_ANIM_CORRECT_POSITION_FRONT = 66,
+		GUIDE_ANIM_CORRECT_POSITION_BACK = 67,
+		GUIDE_ANIM_WALK_IDLE_LEFT = 68,
+		GUIDE_ANIM_CROUCH_ACTIVATING_TRAP = 69
 	};
 
 	void InitialiseGuide(short itemNumber)
@@ -42,7 +119,7 @@ namespace TEN::Entities::TR4
 
 		ClearItem(itemNumber);
 
-		item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 4;
+		item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + GUIDE_ANIM_IDLE;
 		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 		item->Animation.TargetState = GUIDE_STATE_IDLE;
 		item->Animation.ActiveState = GUIDE_STATE_IDLE;
@@ -84,7 +161,7 @@ namespace TEN::Entities::TR4
 				192 - ((random >> 6) & 0x1F),
 				random & 0x3F);
 
-			if (item->Animation.AnimNumber == object->animIndex + 61)
+			if (item->Animation.AnimNumber == object->animIndex + GUIDE_ANIM_LIGHTING_TORCH)
 			{
 				if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 32 &&
 					item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].frameBase + 42)
@@ -137,7 +214,7 @@ namespace TEN::Entities::TR4
 
 
 		if (item->Animation.ActiveState < 4 ||
-			item->Animation.ActiveState == GUIDE_STATE_TORCH_ATTACK)
+			item->Animation.ActiveState == GUIDE_STATE_ATTACK_LOW)
 		{
 			int minDistance = 0x7FFFFFFF;
 
@@ -242,11 +319,11 @@ namespace TEN::Entities::TR4
 				if (!creature->ReachedGoal || foundEnemy)
 				{
 					if (item->MeshSwapBits == 0x40000)
-						item->Animation.TargetState = 40;
+						item->Animation.TargetState = GUIDE_STATE_WALK_NO_TORCH;
 					else if (foundEnemy && AI.distance < pow(SECTOR(1), 2))
 					{
 						if (AI.bite)
-							item->Animation.TargetState = GUIDE_STATE_TORCH_ATTACK;
+							item->Animation.TargetState = GUIDE_STATE_ATTACK_LOW;
 					}
 					else if (enemy != LaraItem || AI.distance > pow(SECTOR(2), 2))
 						if ((flag_RunDefault) && AI.distance > pow(SECTOR(3), 2))
@@ -273,9 +350,9 @@ namespace TEN::Entities::TR4
 					{
 						switch (enemy->Flags)
 						{
-						case 0x02: //Action Switch on Wall torch
-							item->Animation.TargetState = 38;
-							item->Animation.RequiredState = 38;
+						case 0x02: //Action Lit Flames
+							item->Animation.TargetState = GUIDE_STATE_LIGHTING_TORCHES;
+							item->Animation.RequiredState = GUIDE_STATE_LIGHTING_TORCHES;
 							break;
 
 						case 0x20: //Action Pickup Torch
@@ -292,21 +369,20 @@ namespace TEN::Entities::TR4
 
 							break;
 
-						case 0x10: //Action Crouch and Trigger activation
+						case 0x10: //Action Ignite Pool
 							if (laraAI.distance < pow(SECTOR(2), 2) || flag_IgnoreLaraDistance)
 							{
-								// Ignite torch
-								item->Animation.TargetState = 36;
-								item->Animation.RequiredState = 36;
+								item->Animation.TargetState = GUIDE_STATE_CROUCH;
+								item->Animation.RequiredState = GUIDE_STATE_CROUCH;
 							}
 
 							break;
 
-						case 0x04: //Action Crouch and Trap activation
+						case 0x04: //Action Trap activation
 							if (laraAI.distance < pow(SECTOR(2), 2) || flag_IgnoreLaraDistance)
 							{
-								item->Animation.TargetState = 36;
-								item->Animation.RequiredState = 43;
+								item->Animation.TargetState = GUIDE_STATE_CROUCH;
+								item->Animation.RequiredState = GUIDE_STATE_CROUCH_ACTIVATE_TRAP;
 							}
 
 							break;
@@ -321,7 +397,7 @@ namespace TEN::Entities::TR4
 					else
 					{
 						creature->MaxTurn = 0;
-						item->Animation.RequiredState = 42 - (AI.ahead != 0);
+						item->Animation.RequiredState = GUIDE_STATE_CORRECT_POSITION_BACK - (AI.ahead != 0);
 					}
 				}
 			}
@@ -521,7 +597,7 @@ namespace TEN::Entities::TR4
 
 			break;
 
-		case GUIDE_STATE_LOOK_BACK:
+		case GUIDE_STATE_TURNING_LEFT:
 			creature->MaxTurn = 0;
 
 			if (laraAI.angle < -256)
@@ -529,7 +605,7 @@ namespace TEN::Entities::TR4
 
 			break;
 
-		case GUIDE_STATE_TORCH_ATTACK:
+		case GUIDE_STATE_ATTACK_LOW:
 			creature->MaxTurn = 0;
 
 			if (AI.ahead)
@@ -584,7 +660,7 @@ namespace TEN::Entities::TR4
 
 			break;
 
-		case 35:
+		case GUIDE_STATE_TURNING_RIGHT:
 			creature->MaxTurn = 0;
 
 			if (laraAI.angle > 256)
@@ -592,8 +668,8 @@ namespace TEN::Entities::TR4
 
 			break;
 
-		case 36:
-		case 43:
+		case GUIDE_STATE_CROUCH:
+		case GUIDE_STATE_CROUCH_ACTIVATE_TRAP:
 			if (enemy)
 			{
 				short deltaAngle = enemy->Pose.Orientation.y - item->Pose.Orientation.y;
@@ -603,11 +679,11 @@ namespace TEN::Entities::TR4
 					item->Pose.Orientation.y = ANGLE(2.0f);
 			}
 
-			if (item->Animation.RequiredState == 43)
-				item->Animation.TargetState = 43;
+			if (item->Animation.RequiredState == GUIDE_STATE_CROUCH_ACTIVATE_TRAP)
+				item->Animation.TargetState = GUIDE_STATE_CROUCH_ACTIVATE_TRAP;
 			else
 			{
-				if (item->Animation.AnimNumber != object->animIndex + 57 &&
+				if (item->Animation.AnimNumber != object->animIndex + GUIDE_ANIM_IDLE_CROUCH &&
 					item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameEnd - 20)
 				{
 					TestTriggers(item, true);
@@ -669,7 +745,7 @@ namespace TEN::Entities::TR4
 
 			break;
 
-		case 38:
+		case GUIDE_STATE_LIGHTING_TORCHES:
 			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase)
 				item->Pose.Position = enemy->Pose.Position;
 			else
@@ -737,7 +813,7 @@ namespace TEN::Entities::TR4
 
 			break;
 
-		case 40:
+		case GUIDE_STATE_WALK_NO_TORCH:
 			creature->LOT.IsJumping;
 			creature->MaxTurn = ANGLE(7.0f);
 
@@ -780,8 +856,8 @@ namespace TEN::Entities::TR4
 
 			break;
 
-		case 41:
-		case 42:
+		case GUIDE_STATE_CORRECT_POSITION_FRONT:
+		case GUIDE_STATE_CORRECT_POSITION_BACK:
 			creature->MaxTurn = 0;
 			MoveCreature3DPos(&item->Pose, &enemy->Pose, 15, enemy->Pose.Orientation.y - item->Pose.Orientation.y, ANGLE(10.0f));
 
