@@ -7,6 +7,8 @@
 #include "Game/control/box.h"
 #include "Game/control/flipeffect.h"
 #include "Game/control/lot.h"
+#include "Game/control/volume.h"
+#include "Game/control/volumetriggerer.h"
 #include "Game/effects/lara_fx.h"
 #include "Game/effects/effects.h"
 #include "Game/items.h"
@@ -32,7 +34,7 @@
 #include "effects/effects.h"
 #include "Objects/ScriptInterfaceObjectsHandler.h"
 
-
+using namespace TEN::Control::Volumes;
 using namespace TEN::Effects::Lara;
 using namespace TEN::Entities::Switches;
 using namespace TEN::Entities::TR4;
@@ -795,8 +797,9 @@ bool SaveGame::Save(int slot)
 	}
 	auto flybyCamerasOffset = fbb.CreateVector(flybyCameras);
 
-	// Static meshes
+	// Static meshes and volume states
 	std::vector<flatbuffers::Offset<Save::StaticMeshInfo>> staticMeshes;
+	std::vector<flatbuffers::Offset<Save::VolumeState>> volumeStates;
 	for (int i = 0; i < g_Level.Rooms.size(); i++)
 	{
 		auto* room = &g_Level.Rooms[i];
@@ -804,17 +807,61 @@ bool SaveGame::Save(int slot)
 		for (int j = 0; j < room->mesh.size(); j++)
 		{
 			Save::StaticMeshInfoBuilder staticMesh{ fbb };
+
+			staticMesh.add_position(&Save::Vector3(room->mesh[j].pos.Position.x,
+												   room->mesh[j].pos.Position.y,
+												   room->mesh[j].pos.Position.z));
+
+			staticMesh.add_rotation(&Save::Vector3(room->mesh[j].pos.Orientation.x,
+												   room->mesh[j].pos.Orientation.y,
+												   room->mesh[j].pos.Orientation.z));
+
 			staticMesh.add_color(&Save::Vector4(room->mesh[j].color.x,
 												room->mesh[j].color.y,
 												room->mesh[j].color.z,
 												room->mesh[j].color.w));
+
 			staticMesh.add_flags(room->mesh[j].flags);
 			staticMesh.add_hit_points(room->mesh[j].HitPoints);
 			staticMesh.add_room_number(i);
+			staticMesh.add_number(j);
 			staticMeshes.push_back(staticMesh.Finish());
+		}
+
+		for (int j = 0; j < room->triggerVolumes.size(); j++)
+		{
+			Save::VolumeStateBuilder volumeState{ fbb };
+
+			auto& volume = room->triggerVolumes[j];
+
+			volumeState.add_room_number(i);
+			volumeState.add_number(j);
+
+			volumeState.add_position(&Save::Vector3(volume.Position.x,
+													volume.Position.y,
+													volume.Position.z));
+
+			volumeState.add_rotation(&Save::Vector4(volume.Rotation.x,
+													volume.Rotation.y,
+													volume.Rotation.z,
+													volume.Rotation.w));
+
+			volumeState.add_scale(&Save::Vector3(volume.Scale.x,
+												 volume.Scale.y,
+												 volume.Scale.z));
+
+			int triggerer = -1;
+			if (std::holds_alternative<short>(volume.Triggerer))
+				triggerer = std::get<short>(volume.Triggerer);
+
+			volumeState.add_triggerer(triggerer);
+			volumeState.add_state((int)volume.Status);
+			volumeState.add_timeout((int)volume.Timeout);
+			volumeStates.push_back(volumeState.Finish());
 		}
 	}
 	auto staticMeshesOffset = fbb.CreateVector(staticMeshes);
+	auto volumeStatesOffset = fbb.CreateVector(volumeStates);
 
 	// Particles
 	std::vector<flatbuffers::Offset<Save::ParticleInfo>> particles;
@@ -1149,6 +1196,7 @@ bool SaveGame::Save(int slot)
 	sgb.add_flip_status(FlipStatus);
 	sgb.add_flip_timer(0);
 	sgb.add_static_meshes(staticMeshesOffset);
+	sgb.add_volume_states(volumeStatesOffset);
 	sgb.add_fixed_cameras(camerasOffset);
 	sgb.add_particles(particleOffset);
 	sgb.add_bats(batsOffset);
@@ -1248,25 +1296,61 @@ bool SaveGame::Load(int slot)
 	{
 		auto staticMesh = s->static_meshes()->Get(i);
 		auto room = &g_Level.Rooms[staticMesh->room_number()];
+		int number = staticMesh->number();
 
-		if (i >= room->mesh.size())
-			break;
+		room->mesh[number].pos.Position = Vector3Int(staticMesh->position()->x(),
+													 staticMesh->position()->y(),
+													 staticMesh->position()->z());
 
-		room->mesh[i].color = Vector4(staticMesh->color()->x(), 
-									  staticMesh->color()->y(), 
-									  staticMesh->color()->z(),
-									  staticMesh->color()->w());
+		room->mesh[number].pos.Orientation = Vector3Shrt(short(staticMesh->rotation()->x()),
+														 short(staticMesh->rotation()->y()),
+														 short(staticMesh->rotation()->z()));
 
-		room->mesh[i].flags = staticMesh->flags();
-		room->mesh[i].HitPoints = staticMesh->hit_points();
+		room->mesh[number].color = Vector4(staticMesh->color()->x(),
+									       staticMesh->color()->y(), 
+									       staticMesh->color()->z(),
+									       staticMesh->color()->w());
+
+		room->mesh[number].flags = staticMesh->flags();
+		room->mesh[number].HitPoints = staticMesh->hit_points();
 		
-		if (!room->mesh[i].flags)
+		if (!room->mesh[number].flags)
 		{
 			short roomNumber = staticMesh->room_number();
-			FloorInfo* floor = GetFloor(room->mesh[i].pos.Position.x, room->mesh[i].pos.Position.y, room->mesh[i].pos.Position.z, &roomNumber);
-			TestTriggers(room->mesh[i].pos.Position.x, room->mesh[i].pos.Position.y, room->mesh[i].pos.Position.z, staticMesh->room_number(), true, 0);
+			FloorInfo* floor = GetFloor(room->mesh[number].pos.Position.x, room->mesh[number].pos.Position.y, room->mesh[number].pos.Position.z, &roomNumber);
+			TestTriggers(room->mesh[number].pos.Position.x, room->mesh[number].pos.Position.y, room->mesh[number].pos.Position.z, staticMesh->room_number(), true, 0);
 			floor->Stopper = false;
 		}
+	}
+
+	// Volumes
+	for (int i = 0; i < s->volume_states()->size(); i++)
+	{
+		auto volume = s->volume_states()->Get(i);
+		auto room = &g_Level.Rooms[volume->room_number()];
+		int number = volume->number();
+
+		room->triggerVolumes[number].Position = Vector3(volume->position()->x(),
+													    volume->position()->y(),
+													    volume->position()->z());
+
+		room->triggerVolumes[number].Rotation = Vector4(volume->rotation()->x(),
+														volume->rotation()->y(),
+														volume->rotation()->z(),
+														volume->rotation()->w());
+
+		room->triggerVolumes[number].Scale = Vector3(volume->scale()->x(),
+													 volume->scale()->y(),
+													 volume->scale()->z());
+
+		int triggerer = volume->triggerer();
+		if (triggerer >= 0)
+			room->triggerVolumes[number].Triggerer = short(triggerer);
+		else
+			room->triggerVolumes[number].Triggerer = nullptr;
+
+		room->triggerVolumes[number].Status = TriggerStatus(volume->state());
+		room->triggerVolumes[number].Timeout = volume->timeout();
 	}
 
 	// Cameras 
