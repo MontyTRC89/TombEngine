@@ -43,15 +43,17 @@ namespace TEN::Renderer
 		m_spritesTextures.resize(0);
 		m_animatedTextures.resize(0);
 		m_animatedTextureSets.resize(0);
-		for (auto& mesh : m_meshes) {
+
+		for (auto& mesh : m_meshes)
 			delete mesh;
-		}
 		m_meshes.resize(0);
+
 		for (auto& item : m_items)
 		{
-			item.PreviousRoomNumber = NO_ROOM;
-			item.CurrentRoomNumber = NO_ROOM;
+			item.PrevRoomNumber = NO_ROOM;
+			item.RoomNumber = NO_ROOM;
 			item.ItemNumber = NO_ITEM;
+			item.LightsToDraw.clear();
 		}
 	}
 
@@ -62,7 +64,12 @@ namespace TEN::Renderer
 		gameCamera.clear();
 	}
 
-	int Renderer11::SyncRenderer()
+	void Renderer11::Lock()
+	{
+		m_Locked = true;
+	}
+
+	int Renderer11::Synchronize()
 	{
 		// Sync the renderer
 		int nf = Sync();
@@ -313,6 +320,43 @@ namespace TEN::Renderer
 		}
 
 		m_context->PSSetSamplers(registerType, 1, &samplerState);
+	}
+
+	void Renderer11::BindLights(std::vector<RendererLight*>& lights)
+	{
+		BindLights(lights, NO_ROOM, NO_ROOM, 1.0f);
+	}
+
+	void Renderer11::BindLights(std::vector<RendererLight*>& lights, int roomNumber, int prevRoomNumber, float fade)
+	{
+		int numLights = 0;
+		for (int i = 0; i < lights.size(); i++)
+		{
+			float fadedCoeff = 1.0f;
+
+			// Interpolate lights which don't affect neighbor rooms
+			if (!lights[i]->AffectNeighbourRooms && roomNumber != NO_ROOM && lights[i]->RoomNumber != NO_ROOM)
+			{
+				if (lights[i]->RoomNumber == roomNumber)
+					fadedCoeff = fade;
+				else if (lights[i]->RoomNumber == prevRoomNumber)
+					fadedCoeff = 1.0f - fade;
+				else
+					continue;
+			}
+
+			if (fadedCoeff == 0.0f)
+				continue;
+
+			memcpy(&m_stLights.Lights[numLights], lights[i], sizeof(ShaderLight));
+			m_stLights.Lights[numLights].Intensity *= fadedCoeff;
+			numLights++;
+		}
+
+		m_stLights.NumLights = numLights;
+		m_cbLights.updateData(m_stLights, m_context.Get());
+		BindConstantBufferPS(CB_LIGHTS, m_cbLights.get());
+		BindConstantBufferVS(CB_LIGHTS, m_cbLights.get());
 	}
 
 	void Renderer11::BindConstantBufferVS(CONSTANT_BUFFERS constantBufferType, ID3D11Buffer** buffer)

@@ -1311,6 +1311,7 @@ int GetWaterDepth(int x, int y, int z, short roomNumber)
 		while (floor->RoomBelow(x, y, z).value_or(NO_ROOM) != NO_ROOM)
 		{
 			room = &g_Level.Rooms[floor->RoomBelow(x, y, z).value_or(floor->Room)];
+
 			if (TestEnvironment(ENV_FLAG_WATER, room) ||
 				TestEnvironment(ENV_FLAG_SWAMP, room))
 			{

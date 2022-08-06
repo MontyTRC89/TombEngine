@@ -3,6 +3,7 @@
 
 #include "Game/collision/collide_room.h"
 #include "Game/control/control.h"
+#include "Game/control/volume.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_collide.h"
@@ -26,6 +27,7 @@
 
 using namespace TEN::Renderer;
 using namespace TEN::Input;
+using namespace TEN::Control::Volumes;
 
 // -----------------------------
 // HELPER FUNCTIONS
@@ -77,6 +79,8 @@ bool HandleLaraVehicle(ItemInfo* item, CollisionInfo* coll)
 
 	if (lara->Vehicle != NO_ITEM)
 	{
+		TestVolumes(lara->Vehicle);
+
 		switch (g_Level.Items[lara->Vehicle].ObjectNumber)
 		{
 		case ID_QUAD:
@@ -345,7 +349,7 @@ short ModulateLaraTurnRate(short turnRate, short accelRate, short minTurnRate, s
 
 	short newTurnRate = (turnRate + (accelRate * sign)) * sign;
 	newTurnRate = std::clamp(newTurnRate, minTurnRateNormalized, maxTurnRateNormalized);
-	return newTurnRate * sign;
+	return (newTurnRate * sign);
 }
 
 // TODO: Make these two functions methods of LaraInfo someday. @Sezz 2022.06.26

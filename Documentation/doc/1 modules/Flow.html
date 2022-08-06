@@ -1,0 +1,387 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<head>
+    <title>TombEngine Lua API</title>
+    <link rel="stylesheet" href="../ldoc.css" type="text/css" />
+</head>
+<body>
+
+<div id="container">
+
+<div id="product">
+	<div id="product_logo"></div>
+	<div id="product_name"><big><b></b></big></div>
+	<div id="product_description"></div>
+</div> <!-- id="product" -->
+
+
+<div id="main">
+
+
+<!-- Menu -->
+
+<div id="navigation">
+<br/>
+<h1>TombEngine</h1>
+
+<ul>
+  <li><a href="../index.html">Index</a></li>
+</ul>
+
+<h2>Contents</h2>
+<ul>
+<li><a href="#gameflow_lua">gameflow.lua </a></li>
+<li><a href="#settings_lua">settings.lua </a></li>
+<li><a href="#strings_lua">strings.lua </a></li>
+</ul>
+
+
+<h2>1 Modules</h2>
+<ul class="nowrap">
+  <li><a href="../1 modules/Effects.html">Effects</a></li>
+  <li><strong>Flow</strong></li>
+  <li><a href="../1 modules/Inventory.html">Inventory</a></li>
+  <li><a href="../1 modules/Logic.html">Logic</a></li>
+  <li><a href="../1 modules/Misc.html">Misc</a></li>
+  <li><a href="../1 modules/Objects.html">Objects</a></li>
+  <li><a href="../1 modules/Strings.html">Strings</a></li>
+</ul>
+<h2>2 Classes</h2>
+<ul class="nowrap">
+  <li><a href="../2 classes/Flow.Animations.html">Flow.Animations</a></li>
+  <li><a href="../2 classes/Flow.Fog.html">Flow.Fog</a></li>
+  <li><a href="../2 classes/Flow.InventoryItem.html">Flow.InventoryItem</a></li>
+  <li><a href="../2 classes/Flow.Level.html">Flow.Level</a></li>
+  <li><a href="../2 classes/Flow.Mirror.html">Flow.Mirror</a></li>
+  <li><a href="../2 classes/Flow.Settings.html">Flow.Settings</a></li>
+  <li><a href="../2 classes/Flow.SkyLayer.html">Flow.SkyLayer</a></li>
+  <li><a href="../2 classes/Objects.AIObject.html">Objects.AIObject</a></li>
+  <li><a href="../2 classes/Objects.Camera.html">Objects.Camera</a></li>
+  <li><a href="../2 classes/Objects.Moveable.html">Objects.Moveable</a></li>
+  <li><a href="../2 classes/Objects.Sink.html">Objects.Sink</a></li>
+  <li><a href="../2 classes/Objects.SoundSource.html">Objects.SoundSource</a></li>
+  <li><a href="../2 classes/Objects.Static.html">Objects.Static</a></li>
+  <li><a href="../2 classes/Strings.DisplayString.html">Strings.DisplayString</a></li>
+</ul>
+<h2>3 Primitive Classes</h2>
+<ul class="nowrap">
+  <li><a href="../3 primitive classes/Color.html">Color</a></li>
+  <li><a href="../3 primitive classes/Rotation.html">Rotation</a></li>
+  <li><a href="../3 primitive classes/Vec3.html">Vec3</a></li>
+</ul>
+<h2>4 Enums</h2>
+<ul class="nowrap">
+  <li><a href="../4 enums/Flow.InvID.html">Flow.InvID</a></li>
+  <li><a href="../4 enums/Effects.BlendID.html">Effects.BlendID</a></li>
+  <li><a href="../4 enums/Objects.ObjID.html">Objects.ObjID</a></li>
+</ul>
+<h2>5 Lua utility modules</h2>
+<ul class="nowrap">
+  <li><a href="../5 lua utility modules/Timer.html">Timer</a></li>
+  <li><a href="../5 lua utility modules/Util.html">Util</a></li>
+</ul>
+
+</div>
+
+<div id="content">
+
+<h1>Table <code>Flow</code></h1>
+<p>Functions for use in Flow.lua, settings.lua and strings.lua</p>
+<p>
+
+</p>
+
+
+<h2><a href="#gameflow_lua">gameflow.lua </a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" ><a href="#AddLevel">AddLevel(level)</a></td>
+	<td class="summary">Add a level to the Flow.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#SetIntroImagePath">SetIntroImagePath(path)</a></td>
+	<td class="summary">Image to show when loading the game.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#SetTitleScreenImagePath">SetTitleScreenImagePath(path)</a></td>
+	<td class="summary">Image to show in the background of the title screen.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#SetFarView">SetFarView(farview)</a></td>
+	<td class="summary">Maximum draw distance.</td>
+	</tr>
+</table>
+<h2><a href="#settings_lua">settings.lua </a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" ><a href="#SetSettings">SetSettings(settings)</a></td>
+	<td class="summary">
+
+</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#SetAnimations">SetAnimations(animations)</a></td>
+	<td class="summary">
+
+</td>
+	</tr>
+</table>
+<h2><a href="#strings_lua">strings.lua </a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" ><a href="#SetStrings">SetStrings(table)</a></td>
+	<td class="summary">Set string variable keys and their translations.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#GetString">GetString(string)</a></td>
+	<td class="summary">Get translated string</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#SetLanguageNames">SetLanguageNames(table)</a></td>
+	<td class="summary">Set language names for translations.</td>
+	</tr>
+</table>
+
+<br/>
+<br/>
+
+
+    <h2 class="section-header has-description"><a name="gameflow_lua"></a>gameflow.lua </h2>
+
+          <div class="section-description">
+          These functions are called in gameflow.lua, a file loosely equivalent to winroomedit's SCRIPT.DAT.
+They handle a game's 'metadata'; i.e., things such as level titles, loading screen paths, and default
+ambient tracks.
+          </div>
+    <dl class="function">
+    <dt>
+    <a name = "AddLevel"></a>
+    <strong>AddLevel(level)</strong>
+    </dt>
+    <dd>
+    Add a level to the Flow.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">level</span>
+            <span class="types"><span class="type">Level</span></span>
+         a level object
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "SetIntroImagePath"></a>
+    <strong>SetIntroImagePath(path)</strong>
+    </dt>
+    <dd>
+    Image to show when loading the game.
+Must be a .jpg or .png image.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">path</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
+         the path to the image, relative to the TombEngine exe
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "SetTitleScreenImagePath"></a>
+    <strong>SetTitleScreenImagePath(path)</strong>
+    </dt>
+    <dd>
+    Image to show in the background of the title screen.
+Must be a .jpg or .png image.
+<strong>(not yet implemented)</strong>
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">path</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
+         the path to the image, relative to the TombEngine exe
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "SetFarView"></a>
+    <strong>SetFarView(farview)</strong>
+    </dt>
+    <dd>
+    Maximum draw distance.
+The maximum draw distance, in sectors (blocks), of any level in the game.
+This is equivalent to TRNG's WorldFarView variable.
+<strong>(not yet implemented)</strong>
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">farview</span>
+            <span class="types"><span class="type">byte</span></span>
+         Number of sectors. Must be in the range [1, 127].
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+</dl>
+    <h2 class="section-header has-description"><a name="settings_lua"></a>settings.lua </h2>
+
+          <div class="section-description">
+          These functions are called in settings.lua, a file which holds your local settings.
+settings.lua shouldn't be bundled with any finished levels/games.
+          </div>
+    <dl class="function">
+    <dt>
+    <a name = "SetSettings"></a>
+    <strong>SetSettings(settings)</strong>
+    </dt>
+    <dd>
+
+
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">settings</span>
+            <span class="types"><span class="type">Settings</span></span>
+         a settings object
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "SetAnimations"></a>
+    <strong>SetAnimations(animations)</strong>
+    </dt>
+    <dd>
+
+
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">animations</span>
+            <span class="types"><span class="type">Animations</span></span>
+         an animations object
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+</dl>
+    <h2 class="section-header has-description"><a name="strings_lua"></a>strings.lua </h2>
+
+          <div class="section-description">
+
+These functions used in strings.lua, which is generated by TombIDE.
+You will not need to call them manually.
+          </div>
+    <dl class="function">
+    <dt>
+    <a name = "SetStrings"></a>
+    <strong>SetStrings(table)</strong>
+    </dt>
+    <dd>
+    Set string variable keys and their translations.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">table</span>
+            <span class="types"><span class="type">tab</span></span>
+         array-style table with strings
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "GetString"></a>
+    <strong>GetString(string)</strong>
+    </dt>
+    <dd>
+    Get translated string
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">string</span>
+            <span class="types"><span class="type">key</span></span>
+         key for translated string
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "SetLanguageNames"></a>
+    <strong>SetLanguageNames(table)</strong>
+    </dt>
+    <dd>
+    Set language names for translations.
+Specify which translations in the strings table correspond to which languages.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">table</span>
+            <span class="types"><span class="type">tab</span></span>
+         array-style table with language names
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+</dl>
+
+
+</div> <!-- id="content" -->
+</div> <!-- id="main" -->
+<div id="about">
+<i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
+<i style="float:right;">Last updated 2022-07-31 20:38:24 </i>
+</div> <!-- id="about" -->
+</div> <!-- id="container" -->
+</body>
+</html>

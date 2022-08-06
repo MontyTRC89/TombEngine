@@ -1,0 +1,285 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<head>
+    <title>TombEngine Lua API</title>
+    <link rel="stylesheet" href="../ldoc.css" type="text/css" />
+</head>
+<body>
+
+<div id="container">
+
+<div id="product">
+	<div id="product_logo"></div>
+	<div id="product_name"><big><b></b></big></div>
+	<div id="product_description"></div>
+</div> <!-- id="product" -->
+
+
+<div id="main">
+
+
+<!-- Menu -->
+
+<div id="navigation">
+<br/>
+<h1>TombEngine</h1>
+
+<ul>
+  <li><a href="../index.html">Index</a></li>
+</ul>
+
+<h2>Contents</h2>
+<ul>
+<li><a href="#Special_objects">Special objects </a></li>
+<li><a href="#Special_tables">Special tables </a></li>
+</ul>
+
+
+<h2>1 Modules</h2>
+<ul class="nowrap">
+  <li><a href="../1 modules/Effects.html">Effects</a></li>
+  <li><a href="../1 modules/Flow.html">Flow</a></li>
+  <li><a href="../1 modules/Inventory.html">Inventory</a></li>
+  <li><strong>Logic</strong></li>
+  <li><a href="../1 modules/Misc.html">Misc</a></li>
+  <li><a href="../1 modules/Objects.html">Objects</a></li>
+  <li><a href="../1 modules/Strings.html">Strings</a></li>
+</ul>
+<h2>2 Classes</h2>
+<ul class="nowrap">
+  <li><a href="../2 classes/Flow.Animations.html">Flow.Animations</a></li>
+  <li><a href="../2 classes/Flow.Fog.html">Flow.Fog</a></li>
+  <li><a href="../2 classes/Flow.InventoryItem.html">Flow.InventoryItem</a></li>
+  <li><a href="../2 classes/Flow.Level.html">Flow.Level</a></li>
+  <li><a href="../2 classes/Flow.Mirror.html">Flow.Mirror</a></li>
+  <li><a href="../2 classes/Flow.Settings.html">Flow.Settings</a></li>
+  <li><a href="../2 classes/Flow.SkyLayer.html">Flow.SkyLayer</a></li>
+  <li><a href="../2 classes/Objects.AIObject.html">Objects.AIObject</a></li>
+  <li><a href="../2 classes/Objects.Camera.html">Objects.Camera</a></li>
+  <li><a href="../2 classes/Objects.Moveable.html">Objects.Moveable</a></li>
+  <li><a href="../2 classes/Objects.Sink.html">Objects.Sink</a></li>
+  <li><a href="../2 classes/Objects.SoundSource.html">Objects.SoundSource</a></li>
+  <li><a href="../2 classes/Objects.Static.html">Objects.Static</a></li>
+  <li><a href="../2 classes/Strings.DisplayString.html">Strings.DisplayString</a></li>
+</ul>
+<h2>3 Primitive Classes</h2>
+<ul class="nowrap">
+  <li><a href="../3 primitive classes/Color.html">Color</a></li>
+  <li><a href="../3 primitive classes/Rotation.html">Rotation</a></li>
+  <li><a href="../3 primitive classes/Vec3.html">Vec3</a></li>
+</ul>
+<h2>4 Enums</h2>
+<ul class="nowrap">
+  <li><a href="../4 enums/Flow.InvID.html">Flow.InvID</a></li>
+  <li><a href="../4 enums/Effects.BlendID.html">Effects.BlendID</a></li>
+  <li><a href="../4 enums/Objects.ObjID.html">Objects.ObjID</a></li>
+</ul>
+<h2>5 Lua utility modules</h2>
+<ul class="nowrap">
+  <li><a href="../5 lua utility modules/Timer.html">Timer</a></li>
+  <li><a href="../5 lua utility modules/Util.html">Util</a></li>
+</ul>
+
+</div>
+
+<div id="content">
+
+<h1>Table <code>Logic</code></h1>
+<p>Saving data, triggering functions, and callbacks for level-specific scripts.</p>
+<p>
+
+</p>
+
+
+<h2><a href="#Special_objects">Special objects </a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" ><a href="#Lara">Lara</a></td>
+	<td class="summary">A <a href="../2 classes/Objects.Moveable.html#">Objects.Moveable</a> representing Lara herself.</td>
+	</tr>
+</table>
+<h2><a href="#Special_tables">Special tables </a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" ><a href="#LevelVars">LevelVars</a></td>
+	<td class="summary">A table with level-specific data which will be saved and loaded.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#GameVars">GameVars</a></td>
+	<td class="summary">A table with game data which will be saved and loaded.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#LevelFuncs">LevelFuncs</a></td>
+	<td class="summary">A table with level-specific functions.</td>
+	</tr>
+</table>
+
+<br/>
+<br/>
+
+
+    <h2 class="section-header "><a name="Special_objects"></a>Special objects </h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "Lara"></a>
+    <strong>Lara</strong>
+    </dt>
+    <dd>
+    A <a href="../2 classes/Objects.Moveable.html#">Objects.Moveable</a> representing Lara herself.
+
+
+
+
+
+
+
+</dd>
+</dl>
+    <h2 class="section-header has-description"><a name="Special_tables"></a>Special tables </h2>
+
+          <div class="section-description">
+          TombEngine uses the following tables for specific things.
+          </div>
+    <dl class="function">
+    <dt>
+    <a name = "LevelVars"></a>
+    <strong>LevelVars</strong>
+    </dt>
+    <dd>
+    A table with level-specific data which will be saved and loaded.
+This is for level-specific information that you want to store in saved games.</p>
+
+<p>For example, you may have a level with a custom puzzle where Lara has
+to kill exactly seven enemies to open a door to a secret. You could use
+the following line each time an enemy is killed:</p>
+
+<pre><code>LevelVars.enemiesKilled = LevelVars.enemiesKilled + 1
+</code></pre>
+
+<p>If the player saves the level after killing three, saves, and then reloads the save
+some time later, the values <code>3</code> will be put back into <code>LevelVars.enemiesKilled.</code></p>
+
+<p><strong>This table is emptied when a level is finished.</strong> If the player needs to be able
+to return to the level (like in the Karnak and Alexandria levels in <em>The Last Revelation</em>),
+you will need to use the <a href="../1 modules/Logic.html#GameVars">GameVars</a> table, below.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "GameVars"></a>
+    <strong>GameVars</strong>
+    </dt>
+    <dd>
+    A table with game data which will be saved and loaded.
+This is for information not specific to any level, but which concerns your whole
+levelset or game, that you want to store in saved games.</p>
+
+<p>For example, you may wish to have a final boss say a specific voice line based on
+a choice the player made in a previous level. In the level with the choice, you could
+write:</p>
+
+<pre><code>GameVars.playerSnoopedInDrawers = true
+</code></pre>
+
+<p>And in the script file for the level with the boss, you could write:</p>
+
+<pre><code>if GameVars.playerSnoopedInDrawers then
+    PlayAudioTrack("how_dare_you.wav")
+end
+</code></pre>
+
+<p>Unlike <a href="../1 modules/Logic.html#LevelVars">LevelVars</a>, this table will remain intact for the entirety of the game.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "LevelFuncs"></a>
+    <strong>LevelFuncs</strong>
+    </dt>
+    <dd>
+
+<p>A table with level-specific functions. </p>
+
+<p>This serves two purposes: it holds the level callbacks (listed below) as well as
+any trigger functions you might have specified. For example, if you give a trigger
+a Lua name of "my_trigger" in Tomb Editor, you will have to implement it as a member
+of this table:</p>
+
+<pre><code>LevelFuncs.my_trigger = function()
+    -- implementation goes here
+end
+</code></pre>
+
+<p>The following are the level callbacks. They are optional; if your level has no special
+behaviour for a particular scenario, you do not need to implement the function. For
+example, if your level does not need any special initialisation when it is loaded,
+you can just leave out <code>LevelFuncs.OnStart</code>.</p>
+
+<p><strong>The order of loading is as follows:</strong></p>
+
+<ol>
+    <li>The level data itself is loaded.</li>
+    <li>The level script itself is run (i.e. any code you put outside the <a href="../1 modules/Logic.html#LevelFuncs">LevelFuncs</a> callbacks is executed).</li>
+    <li>Save data is loaded, if saving from a saved game (will empty <a href="../1 modules/Logic.html#LevelVars">LevelVars</a> and <a href="../1 modules/Logic.html#GameVars">GameVars</a> and repopulate them with what they contained when the game was saved).</li>
+    <li>If loading from a save, <code>OnLoaded</code> will be called. Otherwise, <code>OnStart</code> will be called.</li>
+    <li>The control loop, in which <code>OnControlPhase</code> will be called once per frame, begins.</li>
+</ol>
+
+
+
+
+    <h3>Fields:</h3>
+    <ul>
+        <li><span class="parameter">OnStart</span>
+            <span class="types"><span class="type">function</span></span>
+         Will be called when a level is entered by completing a previous level or by selecting it in the menu. Will not be called when loaded from a saved game.
+        </li>
+        <li><span class="parameter">OnLoad</span>
+            <span class="types"><span class="type">function</span></span>
+         Will be called when a saved game is loaded
+        </li>
+        <li><span class="parameter">OnControlPhase</span>
+            <span class="types"><span class="type">function(float)</span></span>
+         Will be called during the game's update loop,
+and provides the delta time (a float representing game time since last call) via its argument.
+        </li>
+        <li><span class="parameter">OnSave</span>
+            <span class="types"><span class="type">function</span></span>
+         Will be called when the player saves the game
+        </li>
+        <li><span class="parameter">OnEnd</span>
+            <span class="types"><span class="type">function</span></span>
+         Will be called when leaving a level. This includes finishing it, exiting to the menu, or loading a save in a different level.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+</dl>
+
+
+</div> <!-- id="content" -->
+</div> <!-- id="main" -->
+<div id="about">
+<i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
+<i style="float:right;">Last updated 2022-07-31 20:38:24 </i>
+</div> <!-- id="about" -->
+</div> <!-- id="container" -->
+</body>
+</html>

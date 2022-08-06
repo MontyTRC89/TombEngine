@@ -1,8 +1,8 @@
 #pragma once
 #include "Game/control/control.h"
 
-struct ItemInfo;
 struct CollisionInfo;
+struct ItemInfo;
 struct Vector3Int;
 enum GAME_OBJECT_ID : short;
 

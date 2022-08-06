@@ -25,7 +25,6 @@ float HealthBar = OldHitPoints;
 float MutateAmount = 0;
 int FlashState = 0;
 int FlashCount = 0;
-int PoisonFlag = 0;
 extern RendererHUDBar* g_HealthBar;
 extern RendererHUDBar* g_DashBar;
 extern RendererHUDBar* g_AirBar;
@@ -145,9 +144,6 @@ void UpdateHealthBar(ItemInfo* item, int flash)
 		else
 			DrawHealthBarOverlay(item, HealthBar / LARA_HEALTH_MAX);
 	}
-
-	if (PoisonFlag)
-		PoisonFlag--;
 }
 
 void DrawAirBar(float value)

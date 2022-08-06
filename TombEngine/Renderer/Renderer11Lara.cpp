@@ -244,10 +244,16 @@ void Renderer11::UpdateLaraAnimations(bool force)
 	m_items[Lara.ItemNumber].DoneAnimations = true;
 }
 
-void TEN::Renderer::Renderer11::DrawLara(bool shadowMap, RenderView& view, bool transparent)
+void TEN::Renderer::Renderer11::DrawLara(RenderView& view, bool transparent)
 {
 	// Don't draw Lara if binoculars or sniper
-	if (BinocularRange || SpotcamOverlay || SpotcamDontDrawLara || CurrentLevel == 0)
+	if (BinocularRange || SpotcamDontDrawLara || CurrentLevel == 0)
+		return;
+
+	RendererItem* item = &m_items[Lara.ItemNumber];
+	ItemInfo* nativeItem = &g_Level.Items[item->ItemNumber];
+
+	if (nativeItem->Flags & IFLAG_INVISIBLE)
 		return;
 
 	UINT stride = sizeof(RendererVertex);
@@ -258,19 +264,9 @@ void TEN::Renderer::Renderer11::DrawLara(bool shadowMap, RenderView& view, bool 
 	m_context->IASetInputLayout(m_inputLayout.Get());
 	m_context->IASetIndexBuffer(m_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
-	RendererItem* item = &m_items[Lara.ItemNumber];
 
-	// Set shaders
-	if (shadowMap)
-	{
-		m_context->VSSetShader(m_vsShadowMap.Get(), NULL, 0);
-		m_context->PSSetShader(m_psShadowMap.Get(), NULL, 0);
-	}
-	else
-	{
-		m_context->VSSetShader(m_vsItems.Get(), NULL, 0);
-		m_context->PSSetShader(m_psItems.Get(), NULL, 0);
-	}
+	m_context->VSSetShader(m_vsItems.Get(), nullptr, 0);
+	m_context->PSSetShader(m_psItems.Get(), nullptr, 0);
 
 	// Set texture
 	BindTexture(TEXTURE_COLOR_MAP, &std::get<0>(m_moveablesTextures[0]), SAMPLER_LINEAR_CLAMP);
@@ -280,33 +276,29 @@ void TEN::Renderer::Renderer11::DrawLara(bool shadowMap, RenderView& view, bool 
 
 	RendererObject& laraObj = *m_moveableObjects[ID_LARA];
 	RendererObject& laraSkin = *m_moveableObjects[ID_LARA_SKIN];
+
 	RendererRoom* room = &m_rooms[LaraItem->RoomNumber];
 
 	m_stItem.World = m_LaraWorldMatrix;
-	m_stItem.Position = Vector4(LaraItem->Pose.Position.x, LaraItem->Pose.Position.y, LaraItem->Pose.Position.z, 1.0f);
+	m_stItem.Color = item->Color;
 	m_stItem.AmbientLight = item->AmbientLight;
-	memcpy(m_stItem.BonesMatrices, laraObj.AnimationTransforms.data(), sizeof(Matrix) * 32);
+	memcpy(m_stItem.BonesMatrices, laraObj.AnimationTransforms.data(), sizeof(Matrix) * MAX_BONES);
+	for (int k = 0; k < laraSkin.ObjectMeshes.size(); k++)
+		m_stItem.BoneLightModes[k] = GetMesh(Lara.MeshPtrs[k])->LightMode;
+
 	m_cbItem.updateData(m_stItem, m_context.Get());
 	BindConstantBufferVS(CB_ITEM, m_cbItem.get());
 	BindConstantBufferPS(CB_ITEM, m_cbItem.get());
 
-	if (!shadowMap)
-	{
-		m_stLights.NumLights = item->LightsToDraw.size();
-
-		for (int j = 0; j < item->LightsToDraw.size(); j++)
-			memcpy(&m_stLights.Lights[j], item->LightsToDraw[j], sizeof(ShaderLight));
-
-		m_cbLights.updateData(m_stLights, m_context.Get());
-		BindConstantBufferPS(CB_LIGHTS, m_cbLights.get());
-	}
+	BindLights(item->LightsToDraw, item->RoomNumber, item->PrevRoomNumber, item->LightFade);
 
 	for (int k = 0; k < laraSkin.ObjectMeshes.size(); k++)
 	{
-		
+		if (!nativeItem->TestBits(JointBitType::Mesh, k))
+			continue;
+
 		RendererMesh *mesh = GetMesh(Lara.MeshPtrs[k]);
 		DrawMoveableMesh(item, mesh, room, k, transparent);
-
 	}
 
 	DrawLaraHolsters(transparent);
@@ -329,16 +321,17 @@ void TEN::Renderer::Renderer11::DrawLara(bool shadowMap, RenderView& view, bool 
 
 		// First matrix is Lara's head matrix, then all 6 hairs matrices. Bones are adjusted at load time for accounting this.
 		m_stItem.World = Matrix::Identity;
-		Matrix matrices[7];
-		matrices[0] = laraObj.AnimationTransforms[LM_HEAD] * m_LaraWorldMatrix;
+		m_stItem.BonesMatrices[0] = laraObj.AnimationTransforms[LM_HEAD] * m_LaraWorldMatrix;
+
 		for (int i = 0; i < hairsObj.BindPoseTransforms.size(); i++)
 		{
-			HAIR_STRUCT* hairs = &Hairs[0][i];
-			Matrix world = Matrix::CreateFromYawPitchRoll(TO_RAD(hairs->pos.Orientation.y), TO_RAD(hairs->pos.Orientation.x), 0) * Matrix::CreateTranslation(hairs->pos.Position.x, hairs->pos.Position.y, hairs->pos.Position.z);
-			matrices[i + 1] = world;
+			auto* hairs = &Hairs[0][i];
+			Matrix world = Matrix::CreateFromYawPitchRoll(TO_RAD(hairs->pos.Orientation.y), TO_RAD(hairs->pos.Orientation.x), 0) *
+				Matrix::CreateTranslation(hairs->pos.Position.x, hairs->pos.Position.y, hairs->pos.Position.z);
+			m_stItem.BonesMatrices[i + 1] = world;
+			m_stItem.BoneLightModes[i] = LIGHT_MODES::LIGHT_MODE_DYNAMIC;
 		}
 
-		memcpy(m_stItem.BonesMatrices, matrices, sizeof(Matrix) * 7);
 		m_cbItem.updateData(m_stItem, m_context.Get());
 		BindConstantBufferVS(CB_ITEM, m_cbItem.get());
 		BindConstantBufferPS(CB_ITEM, m_cbItem.get());
