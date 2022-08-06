@@ -17,65 +17,9 @@ using namespace TEN::Floordata;
 using namespace TEN::Input;
 using namespace TEN::Math::Random;
 
-void ItemInfo::SetBits(JointBitType type, std::vector<int> jointIndices)
-{
-	for (int i = 0; i < jointIndices.size(); i++)
-	{
-		unsigned int jointBit = unsigned int(1) << jointIndices[i];
-
-		switch (type)
-		{
-		case JointBitType::Touch:
-			this->TouchBits |= jointBit;
-			break;
-
-		case JointBitType::Mesh:
-			this->MeshBits |= jointBit;
-			break;
-
-		case JointBitType::MeshSwap:
-			this->MeshSwapBits |= jointBit;
-			break;
-		}
-	}
-}
-
-void ItemInfo::SetBits(JointBitType type, int jointIndex)
-{
-	return SetBits(type, std::vector{ jointIndex });
-}
-
-void ItemInfo::ClearBits(JointBitType type, std::vector<int> jointIndices)
-{
-	for (int i = 0; i < jointIndices.size(); i++)
-	{
-		unsigned int jointBit = unsigned int(1) << jointIndices[i];
-
-		switch (type)
-		{
-		case JointBitType::Touch:
-			this->TouchBits &= ~jointBit;
-			break;
-
-		case JointBitType::Mesh:
-			this->MeshBits &= ~jointBit;
-			break;
-
-		case JointBitType::MeshSwap:
-			this->MeshSwapBits &= ~jointBit;
-			break;
-		}
-	}
-}
-
-void ItemInfo::ClearBits(JointBitType type, int jointIndex)
-{
-	return ClearBits(type, std::vector{ jointIndex });
-}
-
 bool ItemInfo::TestBits(JointBitType type, std::vector<int> jointIndices)
 {
-	for (int i = 0; i < jointIndices.size(); i++)
+	for (size_t i = 0; i < jointIndices.size(); i++)
 	{
 		unsigned int jointBit = unsigned int(1) << jointIndices[i];
 
@@ -109,9 +53,65 @@ bool ItemInfo::TestBits(JointBitType type, int jointIndex)
 	return TestBits(type, std::vector{ jointIndex });
 }
 
+void ItemInfo::SetBits(JointBitType type, std::vector<int> jointIndices)
+{
+	for (size_t i = 0; i < jointIndices.size(); i++)
+	{
+		unsigned int jointBit = unsigned int(1) << jointIndices[i];
+
+		switch (type)
+		{
+		case JointBitType::Touch:
+			this->TouchBits |= jointBit;
+			break;
+
+		case JointBitType::Mesh:
+			this->MeshBits |= jointBit;
+			break;
+
+		case JointBitType::MeshSwap:
+			this->MeshSwapBits |= jointBit;
+			break;
+		}
+	}
+}
+
+void ItemInfo::SetBits(JointBitType type, int jointIndex)
+{
+	return SetBits(type, std::vector{ jointIndex });
+}
+
+void ItemInfo::ClearBits(JointBitType type, std::vector<int> jointIndices)
+{
+	for (size_t i = 0; i < jointIndices.size(); i++)
+	{
+		unsigned int jointBit = unsigned int(1) << jointIndices[i];
+
+		switch (type)
+		{
+		case JointBitType::Touch:
+			this->TouchBits &= ~jointBit;
+			break;
+
+		case JointBitType::Mesh:
+			this->MeshBits &= ~jointBit;
+			break;
+
+		case JointBitType::MeshSwap:
+			this->MeshSwapBits &= ~jointBit;
+			break;
+		}
+	}
+}
+
+void ItemInfo::ClearBits(JointBitType type, int jointIndex)
+{
+	return ClearBits(type, std::vector{ jointIndex });
+}
+
 bool ItemInfo::TestOcb(short ocbFlags)
 {
-	return TriggerFlags & ocbFlags;
+	return ((TriggerFlags & ocbFlags) == ocbFlags);
 }
 
 void ItemInfo::RemoveOcb(short ocbFlags)
@@ -121,20 +121,22 @@ void ItemInfo::RemoveOcb(short ocbFlags)
 
 void ItemInfo::ClearAllOcb()
 {
-	TriggerFlags = 0;
+	TriggerFlags = NULL;
 }
 
 bool ItemInfo::TestFlags(short id, short value)
 {
 	if (id < 0 || id > 7)
 		return false;
-	return ItemFlags[id] == value;
+
+	return (ItemFlags[id] == value);
 }
 
 void ItemInfo::SetFlags(short id, short value)
 {
 	if (id < 0 || id > 7)
 		return;
+
 	ItemFlags[id] = value;
 }
 
