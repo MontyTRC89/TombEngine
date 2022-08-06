@@ -27,12 +27,12 @@ namespace TEN::Entities::TR1
 
 	constexpr auto WOLF_SLEEP_FRAME = 96;
 
-	#define WOLF_WALK_TURN_ANGLE ANGLE(2.0f)
-	#define WOLF_RUN_TURN_ANGLE ANGLE(5.0f)
-	#define WOLF_STALK_TURN_ANGLE ANGLE(2.0f)
+	#define WOLF_WALK_TURN_RATE_MAX	 ANGLE(2.0f)
+	#define WOLF_RUN_TURN_RATE_MAX	 ANGLE(5.0f)
+	#define WOLF_STALK_TURN_RATE_MAX ANGLE(2.0f)
 
-	const vector<int> WolfAttackJoints = { 0, 1, 2, 3, 6, 8, 9, 10, 12, 13, 14 };
 	const auto WolfBite = BiteInfo(Vector3(0.0f, -14.0f, 174.0f), 6);
+	const vector<int> WolfAttackJoints = { 0, 1, 2, 3, 6, 8, 9, 10, 12, 13, 14 };
 
 	enum WolfState
 	{
@@ -126,7 +126,7 @@ namespace TEN::Entities::TR1
 				break;
 
 			case WOLF_STATE_WALK:
-				creature->MaxTurn = WOLF_WALK_TURN_ANGLE;
+				creature->MaxTurn = WOLF_WALK_TURN_RATE_MAX;
 
 				if (creature->Mood != MoodType::Bored)
 				{
@@ -158,7 +158,7 @@ namespace TEN::Entities::TR1
 				break;
 
 			case WOLF_STATE_STALK:
-				creature->MaxTurn = WOLF_STALK_TURN_ANGLE;
+				creature->MaxTurn = WOLF_STALK_TURN_RATE_MAX;
 
 				if (creature->Mood == MoodType::Escape)
 					item->Animation.TargetState = WOLF_STATE_RUN;
@@ -185,7 +185,7 @@ namespace TEN::Entities::TR1
 				break;
 
 			case WOLF_STATE_RUN:
-				creature->MaxTurn = WOLF_RUN_TURN_ANGLE;
+				creature->MaxTurn = WOLF_RUN_TURN_RATE_MAX;
 				tilt = angle;
 
 				if (AI.ahead && AI.distance < WOLF_ATTACK_RANGE)

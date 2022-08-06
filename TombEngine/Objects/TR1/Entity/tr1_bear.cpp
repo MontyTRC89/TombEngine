@@ -32,8 +32,8 @@ namespace TEN::Entities::TR1
 	#define BEAR_WALK_TURN_RATE_MAX ANGLE(2.0f)
 	#define BEAR_RUN_TURN_RATE_MAX	ANGLE(5.0f)
 
-	const vector<int> BearAttackJoints = { 2, 3, 5, 6, 14, 17 };
 	const auto BearBite = BiteInfo(Vector3(0.0f, 96.0f, 335.0f), 14);
+	const vector<int> BearAttackJoints = { 2, 3, 5, 6, 14, 17 };
 
 	enum BearState
 	{

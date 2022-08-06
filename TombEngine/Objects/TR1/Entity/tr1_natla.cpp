@@ -15,12 +15,12 @@
 namespace TEN::Entities::TR1
 {
 	// TODO: Organise.
+	constexpr auto NATLA_SHOT_DAMAGE = 100;
 	constexpr auto NATLA_NEAR_DEATH = 200;
+	constexpr auto NATLA_DEATH_TIME = (FPS * 16); // 16 seconds.
 	constexpr auto NATLA_FLYMODE = 0x8000;
 	constexpr auto NATLA_TIMER = 0x7FFF;
 	constexpr auto NATLA_LAND_CHANCE = 0x100;
-	constexpr auto NATLA_DEATH_TIME = (FPS * 16);	// 16 seconds.
-	constexpr auto NATLA_SHOT_DAMAGE = 100;
 	constexpr auto NATLA_GUN_VELOCITY = 400;
 
 	#define NATLA_TURN_NEAR_DEATH_SPEED ANGLE(6.0f)

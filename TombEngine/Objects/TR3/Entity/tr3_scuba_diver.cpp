@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "Objects/TR3/Entity/tr3_scuba.h"
+#include "Objects/TR3/Entity/tr3_scuba_diver.h"
 
 #include "Game/collision/collide_room.h"
 #include "Game/control/box.h"
