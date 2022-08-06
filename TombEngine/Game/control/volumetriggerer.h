@@ -7,6 +7,7 @@ struct CAMERA_INFO;
 namespace TEN::Control::Volumes
 {
 	using VolumeTriggerer = std::variant<
+		std::nullptr_t,
 		short,
 		MESH_INFO*,
 		CAMERA_INFO*>;

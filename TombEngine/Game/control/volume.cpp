@@ -36,6 +36,21 @@ namespace TEN::Control::Volumes
 
 			if ((set->Activators & activatorType) != activatorType)
 				continue;
+			
+			// Determine what to do if volume is busy with another triggerer
+			if (!std::holds_alternative<nullptr_t>(volume->Triggerer) && volume->Triggerer != triggerer)
+			{
+				if (GameTimer - volume->LastActivityTimestamp > VOLUME_BUSY_TIMEOUT)
+				{
+					// We are past the busy timeout, reset current triggerer and volume status.
+					volume->Triggerer = nullptr;
+					volume->Status = TriggerStatus::Outside;
+				}
+				else
+					// We are in the same frame, triggerer is busy, leave it alone.
+					continue;
+			}
+
 
 			bool contains = false;
 
@@ -60,6 +75,8 @@ namespace TEN::Control::Volumes
 
 				if (volume->Status == TriggerStatus::Outside)
 				{
+					volume->Triggerer = triggerer;
+					volume->LastActivityTimestamp = GameTimer;
 					volume->Status = TriggerStatus::Entering;
 					if (!set->OnEnter.Function.empty() && set->OnEnter.CallCounter != 0)
 					{
@@ -83,6 +100,7 @@ namespace TEN::Control::Volumes
 			{
 				if (volume->Status == TriggerStatus::Inside)
 				{
+					volume->Triggerer = nullptr;
 					volume->Status = TriggerStatus::Leaving;
 					if (!set->OnLeave.Function.empty() && set->OnLeave.CallCounter != 0)
 					{
