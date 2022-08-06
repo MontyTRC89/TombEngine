@@ -47,15 +47,16 @@ public:
 
 	void								FreeLevelScripts() override;
 
-	bool								SetLevelFunc(sol::table tab, std::string const& luaName, sol::object obj);
+	void								LogPrint(sol::variadic_args va);
+	bool								SetLevelFunc(sol::table tab, std::string const& luaName, sol::object value);
 	void								ResetScripts(bool clearGameVars) override;
 
 	sol::protected_function				GetLevelFunc(sol::table tab, std::string const& luaName);
 
 	void								ExecuteScriptFile(const std::string& luaFilename) override;
-	void								ExecuteFunction(std::string const & name, TEN::Control::Volumes::VolumeTriggerer) override;
+	void								ExecuteFunction(std::string const& name, TEN::Control::Volumes::VolumeTriggerer, std::string const& arguments) override;
 
-	void								ExecuteFunction(std::string const& luaFuncName, short idOne, short idTwo) override;
+	void								ExecuteFunction(std::string const& name, short idOne, short idTwo) override;
 
 	void								GetVariables(std::vector<SavedVar>& vars) override;
 	void								ResetVariables();

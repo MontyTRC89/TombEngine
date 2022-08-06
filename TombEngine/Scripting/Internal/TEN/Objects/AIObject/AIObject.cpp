@@ -81,7 +81,7 @@ void AIObject::Register(sol::table & parent)
 		// For example, you could have a pair of AI_GUARD objects, and change one or the other two
 		// AI_PATROL_1 based on whether the player has a certain item or not.
 		// @function AIObject:SetObjectID
-		// @tparam ObjectID ID the new ID 
+		// @tparam ObjID ID the new ID 
 		// @usage
 		// aiObj = TEN.Objects.GetMoveableByName("ai_guard_sphinx_room")
 		// aiObj:SetObjectID(TEN.Objects.ObjID.AI_PATROL1)

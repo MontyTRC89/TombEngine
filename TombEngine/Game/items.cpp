@@ -114,6 +114,11 @@ bool ItemInfo::IsLara()
 	return this->Data.is<LaraInfo*>();
 }
 
+bool ItemInfo::IsCreature()
+{
+	return this->Data.is<CreatureInfo>();
+}
+
 void ClearItem(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
