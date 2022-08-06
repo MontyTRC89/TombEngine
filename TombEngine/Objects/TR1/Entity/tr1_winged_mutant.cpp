@@ -23,11 +23,11 @@ namespace TEN::Entities::TR1
 	constexpr auto WINGED_MUTANT_RUN_JUMP_ATTACK_DAMAGE	 = 100;
 	constexpr auto WINGED_MUTANT_SWIPE_ATTACK_DAMAGE	 = 200;
 
-	constexpr auto WINGED_MUTANT_WALK_RANGE		= SQUARE(SECTOR(4.5f));
-	constexpr auto WINGED_MUTANT_ATTACK_3_RANGE = SQUARE(CLICK(1.17f));
-	constexpr auto WINGED_MUTANT_ATTACK_2_RANGE = SQUARE(CLICK(2.34f));
-	constexpr auto WINGED_MUTANT_ATTACK_1_RANGE = SQUARE(SECTOR(2.5f));
-	constexpr auto WINGED_MUTANT_ATTACK_RANGE   = SQUARE(SECTOR(3.75f));
+	constexpr auto WINGED_MUTANT_WALK_RANGE				= SQUARE(SECTOR(4.5f));
+	constexpr auto WINGED_MUTANT_SWIPE_ATTACK_RANGE		= SQUARE(CLICK(1.17f));
+	constexpr auto WINGED_MUTANT_RUN_JUMP_ATTACK_RANGE	= SQUARE(CLICK(2.34f));
+	constexpr auto WINGED_MUTANT_IDLE_JUMP_ATTACK_RANGE = SQUARE(SECTOR(2.5f));
+	constexpr auto WINGED_MUTANT_ATTACK_RANGE			= SQUARE(SECTOR(3.75f));
 
 	constexpr auto WINGED_MUTANT_POSE_CHANCE   = 85;
 	constexpr auto WINGED_MUTANT_UNPOSE_CHANCE = 200;
@@ -287,9 +287,9 @@ namespace TEN::Entities::TR1
 					item->Animation.TargetState = WMUTANT_STATE_FLY;
 				else if (item->TestBits(JointBitType::Touch, WingedMutantJoints[1]))
 					item->Animation.TargetState = WMUTANT_STATE_SWIPE_ATTACK;
-				else if (AI.bite && AI.distance < WINGED_MUTANT_ATTACK_3_RANGE)
+				else if (AI.bite && AI.distance < WINGED_MUTANT_SWIPE_ATTACK_RANGE)
 					item->Animation.TargetState = WMUTANT_STATE_SWIPE_ATTACK;
-				else if (AI.bite && AI.distance < WINGED_MUTANT_ATTACK_1_RANGE)
+				else if (AI.bite && AI.distance < WINGED_MUTANT_IDLE_JUMP_ATTACK_RANGE)
 					item->Animation.TargetState = WMUTANT_STATE_IDLE_JUMP_ATTACK;
 				else if (shoot1)
 					item->Animation.TargetState = WMUTANT_STATE_AIM_DART;
@@ -360,11 +360,9 @@ namespace TEN::Entities::TR1
 					item->Animation.TargetState = WMUTANT_STATE_IDLE;
 				else if (item->TestBits(JointBitType::Touch, WingedMutantJoints[1]))
 					item->Animation.TargetState = WMUTANT_STATE_IDLE;
-				else if (AI.bite && AI.distance < WINGED_MUTANT_ATTACK_1_RANGE)
+				else if (AI.bite && AI.distance < WINGED_MUTANT_IDLE_JUMP_ATTACK_RANGE)
 					item->Animation.TargetState = WMUTANT_STATE_IDLE_JUMP_ATTACK;
-				else if (AI.bite && AI.distance < WINGED_MUTANT_ATTACK_2_RANGE)
-					item->Animation.TargetState = WMUTANT_STATE_RUN_JUMP_ATTACK;
-				else if (AI.ahead && AI.distance < WINGED_MUTANT_ATTACK_2_RANGE)
+				else if (AI.bite && AI.distance < WINGED_MUTANT_RUN_JUMP_ATTACK_RANGE)
 					item->Animation.TargetState = WMUTANT_STATE_RUN_JUMP_ATTACK;
 				else if (shoot1 || shoot2)
 					item->Animation.TargetState = WMUTANT_STATE_IDLE;
