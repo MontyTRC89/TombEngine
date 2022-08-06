@@ -78,7 +78,7 @@ void Vec3::StoreInGameVector(GameVector& pos) const
 }
 
 
-/***
+/*** Metafunction; use tostring(myVector)
 @tparam Vec3 Vec3 this Vec3
 @treturn string A string showing the x, y, and z values of the Vec3
 @function __tostring

@@ -45,6 +45,8 @@ public:
 		// to the main table will go through to the metatable (and thus the
 		// container's members)
 		m_lua->safe_script(mt + ".__index = " + mt);
+		
+		m_lua->safe_script(mt + ".__type = \"readonly\"");
 
 		// Don't allow the table to have new elements put into it
 		m_lua->safe_script(mt + ".__newindex = function() error('" + tableName + " is read-only') end");

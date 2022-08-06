@@ -1,63 +1,79 @@
 #include "framework.h"
 #include "Renderer/Renderer11.h"
+#include "Specific/trutils.h"
 
 namespace TEN::Renderer 
 {
-	void Renderer11::DrawString(int x, int y, const char* string, D3DCOLOR color, int flags)
+	void Renderer11::AddString(int x, int y, const char* string, D3DCOLOR color, int flags)
 	{
+		if (m_Locked)
+			return;
+
 		if (string == NULL)
 			return;
 
 		float factorX = m_screenWidth / REFERENCE_RES_WIDTH;
 		float factorY = m_screenHeight / REFERENCE_RES_HEIGHT;
 		float UIScale = m_screenWidth > m_screenHeight ? factorY : factorX;
-		float fontScale = REFERENCE_FONT_SIZE / m_gameFont->GetLineSpacing();
+		float fontSpacing = m_gameFont->GetLineSpacing();
+		float fontScale   = REFERENCE_FONT_SIZE / fontSpacing;
 
-		// Convert the string to wstring
-		int sizeNeeded = MultiByteToWideChar(CP_UTF8, 0, string, strlen(string), NULL, 0);
-		std::wstring wstr(sizeNeeded, 0);
-		MultiByteToWideChar(CP_UTF8, 0, string, strlen(string), &wstr[0], sizeNeeded);
+		float currentY = 0;
 
-		// Prepare the structure for the renderer
-		RendererStringToDraw str;
-		str.String = wstr;
-		str.Flags = flags;
-		str.X = 0;
-		str.Y = 0;
-		str.Color = Vector3((color >> 16) & 0xFF, (color >> 8) & 0xFF, color & 0xFF);
-		str.Scale = UIScale * fontScale;
+		auto lines = TEN::Utils::SplitString(string);
 
-		// Measure the string
-		Vector2 size = m_gameFont->MeasureString(wstr.c_str());
-		float width = size.x * str.Scale;
-
-		str.X = (flags & PRINTSTRING_CENTER) ? (float)x * factorX - (width / 2.0f) : (float)x * factorX;
-		str.Y = y * UIScale;
-
-		if (flags & PRINTSTRING_BLINK)
+		for (auto line : lines)
 		{
-			str.Color = Vector3(m_blinkColorValue, m_blinkColorValue, m_blinkColorValue);
+			auto cLine = line.c_str();
 
-			if (!m_blinkUpdated)
+			// Convert the string to wstring
+			int sizeNeeded = MultiByteToWideChar(CP_UTF8, 0, cLine, line.size(), NULL, 0);
+			std::wstring wstr(sizeNeeded, 0);
+			MultiByteToWideChar(CP_UTF8, 0, cLine, strlen(cLine), &wstr[0], sizeNeeded);
+
+			// Prepare the structure for the renderer
+			RendererStringToDraw str;
+			str.String = wstr;
+			str.Flags = flags;
+			str.X = 0;
+			str.Y = 0;
+			str.Color = Vector3((color >> 16) & 0xFF, (color >> 8) & 0xFF, color & 0xFF);
+			str.Scale = UIScale * fontScale;
+
+			// Measure the string
+			Vector2 size = m_gameFont->MeasureString(wstr.c_str());
+			float width = size.x * str.Scale;
+
+			str.X = (flags & PRINTSTRING_CENTER) ? (float)x * factorX - (width / 2.0f) : (float)x * factorX;
+			str.Y = y * UIScale + currentY;
+
+			if (flags & PRINTSTRING_BLINK)
 			{
-				m_blinkColorValue += m_blinkColorDirection * 16;
-				m_blinkUpdated = true;
+				str.Color = Vector3(m_blinkColorValue, m_blinkColorValue, m_blinkColorValue);
 
-				if (m_blinkColorValue < 0)
+				if (!m_blinkUpdated)
 				{
-					m_blinkColorValue = 0;
-					m_blinkColorDirection = 1;
-				}
+					m_blinkColorValue += m_blinkColorDirection * 16;
+					m_blinkUpdated = true;
 
-				if (m_blinkColorValue > 255)
-				{
-					m_blinkColorValue = 255;
-					m_blinkColorDirection = -1;
+					if (m_blinkColorValue < 0)
+					{
+						m_blinkColorValue = 0;
+						m_blinkColorDirection = 1;
+					}
+
+					if (m_blinkColorValue > 255)
+					{
+						m_blinkColorValue = 255;
+						m_blinkColorDirection = -1;
+					}
 				}
 			}
-		}
 
-		m_strings.push_back(str);
+			m_strings.push_back(str);
+
+			currentY += fontSpacing * 1.1f;
+		}
 	}
 
 	void Renderer11::DrawAllStrings()
