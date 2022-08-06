@@ -109,6 +109,35 @@ bool ItemInfo::TestBits(JointBitType type, int jointIndex)
 	return TestBits(type, std::vector{ jointIndex });
 }
 
+bool ItemInfo::TestOcb(short ocbFlags)
+{
+	return TriggerFlags & ocbFlags;
+}
+
+void ItemInfo::RemoveOcb(short ocbFlags)
+{
+	TriggerFlags &= ~ocbFlags;
+}
+
+void ItemInfo::ClearAllOcb()
+{
+	TriggerFlags = 0;
+}
+
+bool ItemInfo::TestFlags(short id, short value)
+{
+	if (id < 0 || id > 7)
+		return false;
+	return ItemFlags[id] == value;
+}
+
+void ItemInfo::SetFlags(short id, short value)
+{
+	if (id < 0 || id > 7)
+		return;
+	ItemFlags[id] = value;
+}
+
 bool ItemInfo::IsLara()
 {
 	return this->Data.is<LaraInfo*>();

@@ -128,6 +128,13 @@ struct ItemInfo
 	bool TestBits(JointBitType type, std::vector<int> jointIndices);
 	bool TestBits(JointBitType type, int jointIndex);
 
+	bool TestOcb(short ocbFlags);
+	void RemoveOcb(short ocbFlags);
+	void ClearAllOcb();
+
+	bool TestFlags(short id, short value);
+	void SetFlags(short id, short value);
+
 	bool IsLara();
 	bool IsCreature();
 };
