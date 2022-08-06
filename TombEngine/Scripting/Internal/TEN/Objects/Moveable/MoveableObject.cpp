@@ -293,15 +293,15 @@ ScriptReserved_GetSlotHP, & Moveable::GetSlotHP,
 // @tparam int OCB the new value for the moveable's OCB
 	ScriptReserved_SetOCB, &Moveable::SetOCB,
 
-/// Get ItemFlags[x] (object code bit) of the moveable
+/// Get the value stored in ItemFlags[x] (x is the value of the parameter)
 // @function Moveable:GetItemFlags
-// @treturn short value from the moveable's ItemFlags[x]
-ScriptReserved_GetItemFlags, & Moveable::GetItemFlags,
+// @treturn short id of the ItemFlags array
+	ScriptReserved_GetItemFlags, & Moveable::GetItemFlags,
 
-/// Set ItemFlags[x] (object code bit) of the moveable
+/// Stores the value of the first parameter in the ItemFlags[x] (x is the value of the second parameter)
 // @function Moveable:SetItemFlags
-// @tparam short value to store in the moveable's ItemFlags[x]
-ScriptReserved_SetItemFlags, & Moveable::SetItemFlags,
+// @tparam short value to store in the moveable's ItemFlags[x], short id of ItemFlags array to store the value.
+	ScriptReserved_SetItemFlags, & Moveable::SetItemFlags,
 
 /// Get the moveable's color
 // @function Moveable:GetColor
