@@ -141,11 +141,11 @@ void Moveable::Register(sol::table & parent)
 		sol::meta_function::equal_to, std::equal_to<Moveable const>(),
 
 /// Enable the item, as if a trigger for it had been stepped on.
-// @function Moveable:Enable
+// @function Moveable:EnableItem
 	ScriptReserved_Enable, &Moveable::EnableItem,
 
 /// Disable the item
-// @function Moveable:Disable
+// @function Moveable:DisableItem
 	ScriptReserved_Disable, &Moveable::DisableItem,
 
 /// Make the item invisible. Use EnableItem to make it visible again.
