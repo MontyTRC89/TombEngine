@@ -177,7 +177,7 @@ namespace TEN::Entities::TR1
 		}
 
 		// remove these ocb, we dont need it anymore !
-		if (item->TestOcb(WMUTANT_OCB_NO_WINGS))       item->RemoveOcb(WMUTANT_OCB_NO_WINGS);
+		if (item->TestOcb(WMUTANT_OCB_START_AERIAL))   item->RemoveOcb(WMUTANT_OCB_START_AERIAL);
 		if (item->TestOcb(WMUTANT_OCB_START_INACTIVE)) item->RemoveOcb(WMUTANT_OCB_START_INACTIVE);
 		if (item->TestOcb(WMUTANT_OCB_START_POSE))     item->RemoveOcb(WMUTANT_OCB_START_POSE);
 	}
@@ -193,20 +193,22 @@ namespace TEN::Entities::TR1
 
 		if (item->TestOcb(WMUTANT_OCB_NO_WINGS))
 		{
-			item->MeshBits = 0xFFE07FFF;
 			item->SetFlags(WMUTANT_CONF_CAN_FLY, FALSE);
-			item->RemoveOcb(WMUTANT_OCB_NO_WINGS);
+			item->MeshBits = 0xFFE07FFF;
 		}
+		else
+		{
+			item->SetFlags(WMUTANT_CONF_CAN_FLY, TRUE);
+		}
+
 		if (item->TestOcb(WMUTANT_OCB_DISABLE_BOMB_WEAPON))
-		{
 			item->SetFlags(WMUTANT_CONF_DISABLE_BOMB_WEAPON, TRUE);
-			item->RemoveOcb(WMUTANT_OCB_DISABLE_BOMB_WEAPON);
-		}
 		if (item->TestOcb(WMUTANT_OCB_DISABLE_DART_WEAPON))
-		{
 			item->SetFlags(WMUTANT_CONF_DISABLE_BOMB_WEAPON, TRUE);
-			item->RemoveOcb(WMUTANT_OCB_DISABLE_DART_WEAPON);
-		}
+
+		if (item->TestOcb(WMUTANT_OCB_DISABLE_BOMB_WEAPON)) item->RemoveOcb(WMUTANT_OCB_DISABLE_BOMB_WEAPON);
+		if (item->TestOcb(WMUTANT_OCB_DISABLE_DART_WEAPON)) item->RemoveOcb(WMUTANT_OCB_DISABLE_DART_WEAPON);
+		if (item->TestOcb(WMUTANT_OCB_NO_WINGS))            item->RemoveOcb(WMUTANT_OCB_NO_WINGS);
 	}
 
 	void WingedMutantControl(short itemNumber)
@@ -315,7 +317,7 @@ namespace TEN::Entities::TR1
 			case WMUTANT_STATE_POSE:
 				head = 0; // Pose has an animation for the head.
 				creature->MaxTurn = 0;
-				head = 0; // pose have custom animation for the head !
+
 				if (shootType != WMUTANT_PROJ_NONE || (flyStatus && flyEnabled))
 					item->Animation.TargetState = WMUTANT_STATE_IDLE;
 				else if (creature->Mood == MoodType::Stalk)
