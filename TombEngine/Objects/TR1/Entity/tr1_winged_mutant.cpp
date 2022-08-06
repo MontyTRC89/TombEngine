@@ -38,8 +38,8 @@ namespace TEN::Entities::TR1
 	constexpr auto WINGED_MUTANT_FLY_MODE	 = 0; // itemFlags[0]
 	constexpr auto WINGED_MUTANT_BULLET_MODE = 1; // itemFlags[1]
 
-	#define WMUTANT_STATE_WALK_FORWARD_TURN ANGLE(2.0f)
-	#define WMUTANT_STATE_RUN_FORWARD_TURN	ANGLE(6.0f)
+	#define WINGED_MUTANT_WALK_FORWARD_TURN_RATE_MAX ANGLE(2.0f)
+	#define WINGED_MUTANT_RUN_FORWARD_TURN_RATE_MAX	 ANGLE(6.0f)
 
 	const auto WingedMutantBite		  = BiteInfo(Vector3(-27.0f, 98.0f, 0.0f), 10);
 	const auto WingedMutantRocketBite = BiteInfo(Vector3(51.0f, 213.0f, 0.0f), 14);
@@ -336,7 +336,7 @@ namespace TEN::Entities::TR1
 				break;
 
 			case WMUTANT_STATE_WALK_FORWARD:
-				creature->MaxTurn = WMUTANT_STATE_WALK_FORWARD_TURN;
+				creature->MaxTurn = WINGED_MUTANT_WALK_FORWARD_TURN_RATE_MAX;
 
 				if (shoot1 || shoot2 || IsFlyEnabled(item))
 					item->Animation.TargetState = WMUTANT_STATE_IDLE;
@@ -354,7 +354,7 @@ namespace TEN::Entities::TR1
 				break;
 
 			case WMUTANT_STATE_RUN_FORWARD:
-				creature->MaxTurn = WMUTANT_STATE_RUN_FORWARD_TURN;
+				creature->MaxTurn = WINGED_MUTANT_RUN_FORWARD_TURN_RATE_MAX;
 
 				if (IsFlyEnabled(item))
 					item->Animation.TargetState = WMUTANT_STATE_IDLE;

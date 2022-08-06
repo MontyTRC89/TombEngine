@@ -1,7 +1,13 @@
 #include "framework.h"
 #include "Objects/TR3/tr3_objects.h"
 
-/// entities
+#include "Game/collision/collide_item.h"
+#include "Game/control/box.h"
+#include "Game/itemdata/creature_info.h"
+#include "Specific/level.h"
+#include "Specific/setup.h"
+
+// Entities
 #include "Objects/TR3/Entity/tr3_civvy.h" // OK
 #include "Objects/TR3/Entity/tr3_cobra.h" // OK
 #include "Objects/TR3/Entity/tr3_fish_emitter.h" // OK
@@ -17,21 +23,17 @@
 #include "Objects/TR3/Entity/tr3_tony.h" // OK
 #include "Objects/TR3/Entity/tr3_trex.h" // OK
 #include "Objects/TR3/Entity/tr3_tribesman.h" // OK
-/// traps
+
+// Traps
 #include "Objects/TR3/Trap/train.h"
-/// vehicles
+
+// Vehicles
 #include "Objects/TR3/Vehicles/big_gun.h"
 #include "Objects/TR3/Vehicles/kayak.h"
 #include "Objects/TR3/Vehicles/minecart.h"
 #include "Objects/TR3/Vehicles/quad_bike.h"
 #include "Objects/TR3/Vehicles/upv.h"
 #include "Objects/TR3/Vehicles/rubber_boat.h"
-/// necessary import
-#include "Game/control/box.h"
-#include "Game/collision/collide_item.h"
-#include "Game/itemdata/creature_info.h"
-#include "Specific/setup.h"
-#include "Specific/level.h"
 
 using namespace TEN::Entities::TR3;
 
