@@ -397,7 +397,7 @@ CALL gen.bat</Command>
     <ClInclude Include="Objects\TR3\Entity\tr3_mp_gun.h" />
     <ClInclude Include="Objects\TR3\Entity\tr3_mp_stick.h" />
     <ClInclude Include="Objects\TR3\Entity\tr3_raptor.h" />
-    <ClInclude Include="Objects\TR3\Entity\tr3_scuba.h" />
+    <ClInclude Include="Objects\TR3\Entity\tr3_scuba_diver.h" />
     <ClInclude Include="Objects\TR3\Entity\tr3_shiva.h" />
     <ClInclude Include="Objects\TR3\Entity\tr3_sophia.h" />
     <ClInclude Include="Objects\TR3\Entity\tr3_tiger.h" />
@@ -914,7 +914,7 @@ CALL gen.bat</Command>
     <ClCompile Include="Objects\TR4\Entity\tr4_mummy.cpp" />
     <ClCompile Include="Objects\TR3\Vehicles\quad_bike.cpp" />
     <ClCompile Include="Objects\TR4\Entity\tr4_sas.cpp" />
-    <ClCompile Include="Objects\TR3\Entity\tr3_scuba.cpp" />
+    <ClCompile Include="Objects\TR3\Entity\tr3_scuba_diver.cpp" />
     <ClCompile Include="Objects\TR4\Entity\tr4_skeleton.cpp" />
     <ClCompile Include="Objects\TR3\Entity\tr3_tribesman.cpp" />
     <ClCompile Include="Specific\configuration.cpp" />

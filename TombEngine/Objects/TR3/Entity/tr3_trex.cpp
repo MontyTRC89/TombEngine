@@ -25,7 +25,7 @@ namespace TEN::Entities::TR3
 		TREX_STATE_IDLE = 1,
 		TREX_STATE_WALK_FORWARD = 2,
 		TREX_STATE_RUN_FORWARD = 3,
-		// 4? Perhaps it was used as a hacky way of storing the index for Lara's trex death animation. @Sezz 2022.05.24
+		// No state 4.
 		TREX_STATE_DEATH = 5,
 		TREX_STATE_ROAR = 6,
 		TREX_STATE_ATTACK = 7,

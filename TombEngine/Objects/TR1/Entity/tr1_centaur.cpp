@@ -21,16 +21,16 @@ using std::vector;
 
 namespace TEN::Entities::TR1
 {
-	constexpr auto CENTAUR_REAR_DAMAGE = 200;
-	constexpr auto CENTAUR_REAR_RANGE = SECTOR(1.5f);
-	constexpr auto CENTAUR_REAR_CHANCE = 0x60;
+	constexpr auto CENTAUR_REAR_DAMAGE	 = 200;
+	constexpr auto CENTAUR_REAR_RANGE	 = SECTOR(1.5f);
+	constexpr auto CENTAUR_REAR_CHANCE	 = 0x60;
 	constexpr auto CENTAUR_BOMB_VELOCITY = 20;
 
-	#define CENTAUR_TURN_ANGLE ANGLE(4.0f)
+	#define CENTAUR_TURN_RATE_MAX ANGLE(4.0f)
 
-	const vector<int> CentaurAttackJoints = { 0, 3, 4, 7, 8, 16, 17 };
 	const auto CentaurRocketBite = BiteInfo(Vector3(11.0f, 415.0f, 41.0f), 13);
 	const auto CentaurRearBite = BiteInfo(Vector3(50.0f, 30.0f, 0.0f), 5);
+	const vector<int> CentaurAttackJoints = { 0, 3, 4, 7, 8, 16, 17 };
 
 	enum CentaurState
 	{
@@ -78,7 +78,7 @@ namespace TEN::Entities::TR1
 
 			CreatureMood(item, &AI, true);
 
-			angle = CreatureTurn(item, CENTAUR_TURN_ANGLE);
+			angle = CreatureTurn(item, CENTAUR_TURN_RATE_MAX);
 
 			switch (item->Animation.ActiveState)
 			{

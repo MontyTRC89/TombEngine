@@ -10,21 +10,64 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
+using std::vector;
+
 namespace TEN::Entities::TR2
 {
-	const auto BirdMonsterBiteLeft = BiteInfo(Vector3(0.0f, 224.0f, 0.0f), 19);
+	constexpr auto BIRD_MONSTER_ATTACK_DAMAGE = 200;
+	constexpr auto BIRD_MONSTER_SLAM_CRUSH_ATTACK_RANGE = SQUARE(SECTOR(1));
+	constexpr auto BIRD_MONSTER_PUNCH_ATTACK_RANGE		= SQUARE(SECTOR(2));
+
+	#define BIRD_MONSTER_WALK_TURN_RATE_MAX ANGLE(4.0f)
+
+	const vector<int> BirdMonsterLeftBite	= { 18, 19 };
+	const vector<int> BirdMonsterRightBite  = { 21, 22 };
+	const auto BirdMonsterBiteLeft	= BiteInfo(Vector3(0.0f, 224.0f, 0.0f), 19);
 	const auto BirdMonsterBiteRight = BiteInfo(Vector3(0.0f, 224.0f, 0.0f), 22);
 
-	// TODO
 	enum BirdMonsterState
 	{
-
+		BMONSTER_STATE_NONE = 0,
+		BMONSTER_STATE_IDLE = 1,
+		BMONSTER_STATE_WALK_FORWARD = 2,
+		BMONSTER_STATE_SLAM_ATTACK_START = 3,
+		BMONSTER_STATE_SLAM_ATTACK_CONTINUE = 4,
+		BMONSTER_STATE_PUNCH_ATTACK_START = 5,
+		BMONSTER_STATE_PUNCH_ATTACK_RIGHT_CONTINUE = 6,
+		BMONSTER_STATE_PUNCH_ATTACK_LEFT_CONTINUE = 7,
+		BMONSTER_STATE_ROAR = 8,
+		BMONSTER_STATE_DEATH = 9,
+		BMONSTER_STATE_CRUSH_ATTACK_START = 10,
+		BMONSTER_STATE_CRUSH_ATTACK_CONTINUE = 11
 	};
 
-	// TODO
 	enum BirdMonsterAnim
 	{
-
+		BMONSTER_ANIM_IDLE = 0,
+		BMONSTER_ANIM_IDLE_TO_WALK_FORWARD = 1,
+		BMONSTER_ANIM_WALK_FORWARD = 2,
+		BMONSTER_ANIM_WALK_FORWARD_TO_IDLE_LEFT = 3,
+		BMONSTER_ANIM_WALK_FORWARD_TO_IDLE_RIGHT = 4,
+		BMONSTER_ANIM_SLAM_ATTACK_START = 5,
+		BMONSTER_ANIM_SLAM_ATTACK_CANCEL = 6,
+		BMONSTER_ANIM_SLAM_ATTACK_CONTINUE = 7,
+		BMONSTER_ANIM_SLAM_ATTACK_END = 8,
+		BMONSTER_ANIM_PUNCH_ATTACK_RIGHT_START = 9,
+		BMONSTER_ANIM_PUNCH_ATTACK_RIGHT_CANCEL = 10,
+		BMONSTER_ANIM_PUNCH_ATTACK_RIGHT_CONTINUE = 11,
+		BMONSTER_ANIM_PUNCH_ATTACK_RIGHT_END = 12,
+		BMONSTER_ANIM_PUNCH_ATTACK_LEFT_START = 13,
+		BMONSTER_ANIM_PUNCH_ATTACK_LEFT_CANCEL = 14,
+		BMONSTER_ANIM_PUNCH_ATTACK_LEFT_CONTINUE = 15,
+		BMONSTER_ANIM_PUNCH_ATTACK_LEFT_END = 16,
+		BMONSTER_ANIM_ROAR_START = 17,
+		BMONSTER_ANIM_ROAR_CONTINUE = 18,
+		BMONSTER_ANIM_ROAR_END = 19,
+		BMONSTER_ANIM_DEATH = 20,
+		BMONSTER_ANIM_CRUSH_ATTACK_START = 21,
+		BMONSTER_ANIM_CRUSH_ATTACK_CANCEL = 22,
+		BMONSTER_ANIM_CRUSH_ATTACK_CONTINUE = 23,
+		BMONSTER_ANIM_CRUSH_ATTACK_END = 24
 	};
 
 	void BirdMonsterControl(short itemNumber)
@@ -40,12 +83,8 @@ namespace TEN::Entities::TR2
 
 		if (item->HitPoints <= 0)
 		{
-			if (item->Animation.ActiveState != 9)
-			{
-				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 20;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-				item->Animation.ActiveState = 9;
-			}
+			if (item->Animation.ActiveState != BMONSTER_STATE_DEATH)
+				SetAnimation(item, BMONSTER_ANIM_DEATH);
 		}
 		else
 		{
@@ -61,94 +100,97 @@ namespace TEN::Entities::TR2
 
 			switch (item->Animation.ActiveState)
 			{
-			case 1:
+			case BMONSTER_STATE_IDLE:
 				creature->MaxTurn = 0;
 
-				if (AI.ahead && AI.distance < pow(SECTOR(1), 2))
+				if (AI.ahead && AI.distance < BIRD_MONSTER_SLAM_CRUSH_ATTACK_RANGE)
 				{
 					if (GetRandomControl() < 0x4000)
-						item->Animation.TargetState = 3;
+						item->Animation.TargetState = BMONSTER_STATE_SLAM_ATTACK_START;
 					else
-						item->Animation.TargetState = 10;
+						item->Animation.TargetState = BMONSTER_STATE_CRUSH_ATTACK_START;
 				}
-				else if (AI.ahead && (creature->Mood == MoodType::Bored || creature->Mood == MoodType::Stalk))
+				else if (AI.ahead &&
+					(creature->Mood == MoodType::Bored || creature->Mood == MoodType::Stalk))
 				{
 					if (AI.zoneNumber != AI.enemyZone)
 					{
-						item->Animation.TargetState = 2;
+						item->Animation.TargetState = BMONSTER_STATE_WALK_FORWARD;
 						creature->Mood = MoodType::Escape;
 					}
 					else
-						item->Animation.TargetState = 8;
+						item->Animation.TargetState = BMONSTER_STATE_ROAR;
 				}
 				else
-					item->Animation.TargetState = 2;
+					item->Animation.TargetState = BMONSTER_STATE_WALK_FORWARD;
 
 				break;
 
-			case 8:
+			case BMONSTER_STATE_ROAR:
 				creature->MaxTurn = 0;
 
 				if (creature->Mood != MoodType::Bored || !AI.ahead)
-					item->Animation.TargetState = 1;
+					item->Animation.TargetState = BMONSTER_STATE_IDLE;
 
 				break;
 
-			case 2:
-				creature->MaxTurn = ANGLE(4.0f);
+			case BMONSTER_STATE_WALK_FORWARD:
+				creature->MaxTurn = BIRD_MONSTER_WALK_TURN_RATE_MAX;
 
-				if (AI.ahead && AI.distance < pow(SECTOR(2), 2))
-					item->Animation.TargetState = 5;
+				if (AI.ahead && AI.distance < BIRD_MONSTER_PUNCH_ATTACK_RANGE)
+					item->Animation.TargetState = BMONSTER_STATE_PUNCH_ATTACK_START;
 				else if ((creature->Mood == MoodType::Bored || creature->Mood == MoodType::Stalk) && AI.ahead)
-					item->Animation.TargetState = 1;
+					item->Animation.TargetState = BMONSTER_STATE_IDLE;
 
 				break;
 
-			case 3:
-				creature->Flags = 0;
+			case BMONSTER_STATE_SLAM_ATTACK_START:
+				creature->Flags = NULL;
 
-				if (AI.ahead && AI.distance < pow(SECTOR(1), 2))
-					item->Animation.TargetState = 4;
+				if (AI.ahead && AI.distance < BIRD_MONSTER_SLAM_CRUSH_ATTACK_RANGE)
+					item->Animation.TargetState = BMONSTER_STATE_SLAM_ATTACK_CONTINUE;
 				else
-					item->Animation.TargetState = 1;
+					item->Animation.TargetState = BMONSTER_STATE_IDLE;
 
 				break;
 
-			case 5:
-				creature->Flags = 0;
+			case BMONSTER_STATE_PUNCH_ATTACK_START:
+				creature->Flags = NULL;
 
-				if (AI.ahead && AI.distance < pow(SECTOR(2), 2))
-					item->Animation.TargetState = 6;
+				if (AI.ahead && AI.distance < BIRD_MONSTER_PUNCH_ATTACK_RANGE)
+					item->Animation.TargetState = BMONSTER_STATE_PUNCH_ATTACK_RIGHT_CONTINUE;
 				else
-					item->Animation.TargetState = 1;
+					item->Animation.TargetState = BMONSTER_STATE_IDLE;
 
 				break;
 
-			case 10:
-				creature->Flags = 0;
+			case BMONSTER_STATE_CRUSH_ATTACK_START:
+				creature->Flags = NULL;
 
-				if (AI.ahead && AI.distance < pow(SECTOR(1), 2))
-					item->Animation.TargetState = 11;
+				if (AI.ahead && AI.distance < BIRD_MONSTER_SLAM_CRUSH_ATTACK_RANGE)
+					item->Animation.TargetState = BMONSTER_STATE_CRUSH_ATTACK_CONTINUE;
 				else
-					item->Animation.TargetState = 1;
+					item->Animation.TargetState = BMONSTER_STATE_IDLE;
 
 				break;
 
-			case 4:
-			case 6:
-			case 11:
-			case 7:
-				if (!(creature->Flags & 1) && item->TouchBits & 0x600000)
+			case BMONSTER_STATE_SLAM_ATTACK_CONTINUE:
+			case BMONSTER_STATE_PUNCH_ATTACK_RIGHT_CONTINUE:
+			case BMONSTER_STATE_CRUSH_ATTACK_CONTINUE:
+			case BMONSTER_STATE_PUNCH_ATTACK_LEFT_CONTINUE:
+				if (!(creature->Flags & 1) &&
+					item->TestBits(JointBitType::Touch, BirdMonsterRightBite))
 				{
+					DoDamage(creature->Enemy, BIRD_MONSTER_ATTACK_DAMAGE);
 					CreatureEffect(item, BirdMonsterBiteRight, DoBloodSplat);
-					DoDamage(creature->Enemy, 200);
 					creature->Flags |= 1;
 				}
 
-				if (!(creature->Flags & 2) && item->TouchBits & 0x0C0000)
+				if (!(creature->Flags & 2) &&
+					item->TestBits(JointBitType::Touch, BirdMonsterLeftBite))
 				{
+					DoDamage(creature->Enemy, BIRD_MONSTER_ATTACK_DAMAGE);
 					CreatureEffect(item, BirdMonsterBiteLeft, DoBloodSplat);
-					DoDamage(creature->Enemy, 200);
 					creature->Flags |= 2;
 				}
 
