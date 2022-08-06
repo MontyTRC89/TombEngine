@@ -462,6 +462,8 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 	bool isWater = TestEnvironment(ENV_FLAG_WATER, item);
 	bool isSwamp = TestEnvironment(ENV_FLAG_SWAMP, item);
 
+	bool isWaterOnHeadspace = false;
+
 	int waterDepth = GetWaterDepth(item);
 	int waterHeight = GetWaterHeight(item);
 
@@ -475,7 +477,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 	if (lara->Vehicle == NO_ITEM)
 		WadeSplash(item, waterHeight, waterDepth);
 
-	if (lara->Vehicle == NO_ITEM && lara->ExtraAnim == -1)
+	if (lara->Vehicle == NO_ITEM && lara->ExtraAnim == NO_ITEM)
 	{
 		switch (lara->Control.WaterStatus)
 		{
@@ -553,14 +555,15 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 			break;
 
 		case WaterStatus::Underwater:
-			if (isWater ||
-				waterDepth == DEEP_WATER || abs(heightFromWater) >= CLICK(1) ||
-				item->Animation.AnimNumber == LA_UNDERWATER_RESURFACE ||
-				item->Animation.AnimNumber == LA_ONWATER_DIVE)
+			isWaterOnHeadspace = TestEnvironment(ENV_FLAG_WATER, item->Pose.Position.x, item->Pose.Position.y - CLICK(1), item->Pose.Position.z,
+					 GetCollision(item->Pose.Position.x, item->Pose.Position.y - CLICK(1), item->Pose.Position.z, item->RoomNumber).RoomNumber);
+
+			if (waterDepth == NO_HEIGHT || abs(heightFromWater) >= CLICK(1) || isWaterOnHeadspace ||
+				item->Animation.AnimNumber == LA_UNDERWATER_RESURFACE || item->Animation.AnimNumber == LA_ONWATER_DIVE)
 			{
 				if (!isWater)
 				{
-					if (waterDepth == DEEP_WATER || abs(heightFromWater) >= CLICK(1))
+					if (waterDepth == NO_HEIGHT || abs(heightFromWater) >= CLICK(1))
 					{
 						SetAnimation(item, LA_FALL_START);
 						ResetLaraLean(item);
@@ -779,7 +782,7 @@ void LaraAboveWater(ItemInfo* item, CollisionInfo* coll)
 
 	AnimateLara(item);
 
-	if (lara->ExtraAnim == -1)
+	if (lara->ExtraAnim == NO_ITEM)
 	{
 		// Check for collision with items.
 		DoObjectCollision(item, coll);

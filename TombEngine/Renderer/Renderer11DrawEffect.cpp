@@ -270,7 +270,10 @@ namespace TEN::Renderer
 						}
 					}
 
-					AddSpriteBillboard(&m_sprites[particle->spriteIndex],
+					// Don't allow sprites out of bounds
+					int spriteIndex = std::clamp(int(particle->spriteIndex), 0, int(m_sprites.size()));
+
+					AddSpriteBillboard(&m_sprites[spriteIndex],
 						pos,
 						Vector4(particle->r / 255.0f, particle->g / 255.0f, particle->b / 255.0f, 1.0f),
 						TO_RAD(particle->rotAng << 4), particle->scalar,
@@ -592,32 +595,20 @@ namespace TEN::Renderer
 		if (BinocularRange > 0)
 			return true;
 
-		Matrix world;
-		Matrix translation;
-		Matrix rotation;
-
-		RendererObject& laraObj = *m_moveableObjects[ID_LARA];
-		RendererObject& laraSkin = *m_moveableObjects[ID_LARA_SKIN];
-
-		ObjectInfo* obj = &Objects[0];
 		RendererRoom const & room = m_rooms[LaraItem->RoomNumber];
 		RendererItem* item = &m_items[Lara.ItemNumber];
 
-		m_stItem.AmbientLight = room.AmbientLight;
-		memcpy(m_stItem.BonesMatrices, &Matrix::Identity, sizeof(Matrix));
+		m_stStatic.Color = Vector4::One;
+		m_stStatic.AmbientLight = room.AmbientLight;
+		m_stStatic.LightMode = LIGHT_MODES::LIGHT_MODE_STATIC;
 
-		m_stLights.NumLights = item->LightsToDraw.size();
-		for (int j = 0; j < item->LightsToDraw.size(); j++)
-			memcpy(&m_stLights.Lights[j], item->LightsToDraw[j], sizeof(ShaderLight));
-		m_cbLights.updateData(m_stLights, m_context.Get());
-		BindConstantBufferPS(CB_LIGHTS, m_cbLights.get());
+		BindLights(item->LightsToDraw); // FIXME: Is it really needed for gunflashes? -- Lwmte, 15.07.22
 
 		short length = 0;
 		short zOffset = 0;
 		short rotationX = 0;
 
 		SetBlendMode(BLENDMODE_ADDITIVE);
-
 		SetAlphaTest(ALPHA_TEST_GREATER_THAN, ALPHA_TEST_THRESHOLD);
 
 		if (Lara.Control.Weapon.GunType != LaraWeaponType::Flare &&
@@ -665,41 +656,45 @@ namespace TEN::Renderer
 			RendererObject& flashMoveable = *m_moveableObjects[gunflash];
 			RendererMesh* flashMesh = flashMoveable.ObjectMeshes[0];
 
-			for (auto& flashBucket : flashMesh->buckets) 
+			for (auto& flashBucket : flashMesh->Buckets) 
 			{
 				if (flashBucket.BlendMode == BLENDMODE_OPAQUE)
 					continue;
 
-				if (flashBucket.Polygons.size() > 0) 
+				if (flashBucket.Polygons.size() == 0)
+					continue;
+
+				BindTexture(TEXTURE_COLOR_MAP, &std::get<0>(m_moveablesTextures[flashBucket.Texture]), SAMPLER_ANISOTROPIC_CLAMP);
+
+				Matrix offset = Matrix::CreateTranslation(0, length, zOffset);
+				Matrix rotation = Matrix::CreateRotationX(TO_RAD(rotationX));
+
+				Matrix world;
+
+				if (Lara.LeftArm.GunFlash)
 				{
-					Matrix offset = Matrix::CreateTranslation(0, length, zOffset);
-					Matrix rotation2 = Matrix::CreateRotationX(TO_RAD(rotationX));
+					world = item->AnimationTransforms[LM_LHAND] * item->World;
+					world = offset * world;
+					world = rotation * world;
 
-					if (Lara.LeftArm.GunFlash)
-					{
-						world = laraObj.AnimationTransforms[LM_LHAND] * m_LaraWorldMatrix;
-						world = offset * world;
-						world = rotation2 * world;
+					m_stStatic.World = world;
+					m_cbStatic.updateData(m_stStatic, m_context.Get());
+					BindConstantBufferVS(CB_STATIC, m_cbStatic.get());
 
-						m_stItem.World = world;
-						m_cbItem.updateData(m_stItem, m_context.Get());
-						BindConstantBufferVS(CB_ITEM, m_cbItem.get());
+					DrawIndexedTriangles(flashBucket.NumIndices, flashBucket.StartIndex, 0);
+				}
 
-						DrawIndexedTriangles(flashBucket.NumIndices, flashBucket.StartIndex, 0);
-					}
+				if (Lara.RightArm.GunFlash)
+				{
+					world = item->AnimationTransforms[LM_RHAND] * item->World;
+					world = offset * world;
+					world = rotation * world;
 
-					if (Lara.RightArm.GunFlash)
-					{
-						world = laraObj.AnimationTransforms[LM_RHAND] * m_LaraWorldMatrix;
-						world = offset * world;
-						world = rotation2 * world;
+					m_stStatic.World = world;
+					m_cbStatic.updateData(m_stStatic, m_context.Get());
+					BindConstantBufferVS(CB_STATIC, m_cbStatic.get());
 
-						m_stItem.World = world;
-						m_cbItem.updateData(m_stItem, m_context.Get());
-						BindConstantBufferVS(CB_ITEM, m_cbItem.get());
-
-						DrawIndexedTriangles(flashBucket.NumIndices, flashBucket.StartIndex, 0);
-					}
+					DrawIndexedTriangles(flashBucket.NumIndices, flashBucket.StartIndex, 0);
 				}
 			}
 		}
@@ -734,14 +729,11 @@ namespace TEN::Renderer
 				RendererRoom const& room = m_rooms[nativeItem->RoomNumber];
 				RendererObject& flashMoveable = *m_moveableObjects[ID_GUN_FLASH];
 
-				m_stItem.AmbientLight = room.AmbientLight;
-				memcpy(m_stItem.BonesMatrices, &Matrix::Identity, sizeof(Matrix));
+				m_stStatic.Color = Vector4::One;
+				m_stStatic.AmbientLight = room.AmbientLight;
+				m_stStatic.LightMode = LIGHT_MODES::LIGHT_MODE_STATIC;
 
-				m_stLights.NumLights = item->LightsToDraw.size();
-				for (int j = 0; j < item->LightsToDraw.size(); j++)
-					memcpy(&m_stLights.Lights[j], item->LightsToDraw[j], sizeof(ShaderLight));
-				m_cbLights.updateData(m_stLights, m_context.Get());
-				BindConstantBufferPS(CB_LIGHTS, m_cbLights.get());
+				BindLights(item->LightsToDraw); // FIXME: Is it really needed for gunflashes? -- Lwmte, 15.07.22
 
 				SetBlendMode(BLENDMODE_ADDITIVE);
 				
@@ -760,28 +752,30 @@ namespace TEN::Renderer
 
 					RendererMesh* flashMesh = flashMoveable.ObjectMeshes[0];
 
-					for (auto& flashBucket : flashMesh->buckets)
+					for (auto& flashBucket : flashMesh->Buckets)
 					{
 						if (flashBucket.BlendMode == BLENDMODE_OPAQUE)
 							continue;
 
-						if (flashBucket.Polygons.size() > 0)
-						{
-							Matrix offset = Matrix::CreateTranslation(bites[k]->x, bites[k]->y, bites[k]->z);
-							Matrix rotationX = Matrix::CreateRotationX(TO_RAD(ANGLE(270.0f)));
-							Matrix rotationZ = Matrix::CreateRotationZ(TO_RAD(2 * GetRandomControl()));
+						if (flashBucket.Polygons.size() == 0)
+							continue;
 
-							Matrix world = item->AnimationTransforms[joint] * item->World;
-							world = rotationX * world;
-							world = offset * world;
-							world = rotationZ * world;
+						BindTexture(TEXTURE_COLOR_MAP, &std::get<0>(m_moveablesTextures[flashBucket.Texture]), SAMPLER_ANISOTROPIC_CLAMP);
 
-							m_stItem.World = world;
-							m_cbItem.updateData(m_stItem, m_context.Get());
-							BindConstantBufferVS(CB_ITEM, m_cbItem.get());
+						Matrix offset = Matrix::CreateTranslation(bites[k]->x, bites[k]->y, bites[k]->z);
+						Matrix rotationX = Matrix::CreateRotationX(TO_RAD(ANGLE(270.0f)));
+						Matrix rotationZ = Matrix::CreateRotationZ(TO_RAD(2 * GetRandomControl()));
 
-							DrawIndexedTriangles(flashBucket.NumIndices, flashBucket.StartIndex, 0);
-						}
+						Matrix world = item->AnimationTransforms[joint] * item->World;
+						world = rotationX * world;
+						world = offset * world;
+						world = rotationZ * world;
+
+						m_stStatic.World = world;
+						m_cbStatic.updateData(m_stStatic, m_context.Get());
+						BindConstantBufferVS(CB_STATIC, m_cbStatic.get());
+
+						DrawIndexedTriangles(flashBucket.NumIndices, flashBucket.StartIndex, 0);
 					}
 				}
 			}
@@ -870,7 +864,7 @@ namespace TEN::Renderer
 				face.info.world = spriteMatrix;
 				face.info.blendMode = spr.BlendMode;
 
-				RendererRoom& room = m_rooms[GetRoomNumberForSpriteTest(spr.pos)];
+				RendererRoom& room = m_rooms[FindRoomNumber(Vector3Int(spr.pos))];
 				room.TransparentFacesToDraw.push_back(face);
 			}
 			else
@@ -1079,22 +1073,17 @@ namespace TEN::Renderer
 		int firstBucket = (transparent ? 2 : 0);
 		int lastBucket = (transparent ? 4 : 2);
 
-		RendererRoom const & room = m_rooms[effect->Effect->roomNumber];
-		//RendererObject * moveableObj = m_moveableObjects[effect->Effect->objectNumber];
+		RendererRoom const& room = m_rooms[effect->RoomNumber];
 
-		m_stItem.World = effect->World;
-		m_stItem.Position = Vector4(effect->Effect->pos.Position.x, effect->Effect->pos.Position.y, effect->Effect->pos.Position.z, 1.0f);
-		m_stItem.AmbientLight = room.AmbientLight;
-		Matrix matrices[1] = { Matrix::Identity };
-		memcpy(m_stItem.BonesMatrices, matrices, sizeof(Matrix));
-		m_cbItem.updateData(m_stItem, m_context.Get());
-		BindConstantBufferVS(CB_ITEM, m_cbItem.get());
+		m_stStatic.World = effect->World;
+		m_stStatic.Color = Vector4::One;
+		m_stStatic.AmbientLight = room.AmbientLight;
+		m_stStatic.LightMode = LIGHT_MODES::LIGHT_MODE_DYNAMIC;
+		m_cbStatic.updateData(m_stStatic, m_context.Get());
+		BindConstantBufferVS(CB_STATIC, m_cbStatic.get());
+		BindConstantBufferPS(CB_STATIC, m_cbStatic.get());
 
-		m_stLights.NumLights = effect->Lights.size();
-		for (int j = 0; j < effect->Lights.size(); j++)
-			memcpy(&m_stLights.Lights[j], effect->Lights[j], sizeof(ShaderLight));
-		m_cbLights.updateData(m_stLights, m_context.Get());
-		BindConstantBufferPS(CB_LIGHTS, m_cbLights.get());
+		BindLights(effect->LightsToDraw);
 
 		if (transparent)
 		{
@@ -1106,13 +1095,24 @@ namespace TEN::Renderer
 		}
 
 		RendererMesh* mesh = effect->Mesh;
+		BLEND_MODES lastBlendMode = BLEND_MODES::BLENDMODE_UNSET;
 
-		for (auto& bucket : mesh->buckets) 
+		for (auto& bucket : mesh->Buckets) 
 		{
 			if (bucket.NumVertices == 0)
 				continue;
-			if (transparent && bucket.BlendMode == BLENDMODE_OPAQUE)
+
+			if (!((bucket.BlendMode == BLENDMODE_OPAQUE || bucket.BlendMode == BLENDMODE_ALPHATEST) ^ transparent))
 				continue;
+
+			BindTexture(TEXTURE_COLOR_MAP, &std::get<0>(m_moveablesTextures[bucket.Texture]), SAMPLER_ANISOTROPIC_CLAMP);
+			BindTexture(TEXTURE_NORMAL_MAP, &std::get<1>(m_moveablesTextures[bucket.Texture]), SAMPLER_NONE);
+
+			if (lastBlendMode != bucket.BlendMode)
+			{
+				lastBlendMode = bucket.BlendMode;
+				SetBlendMode(lastBlendMode);
+			}
 
 			// Draw vertices
 			DrawIndexedTriangles(bucket.NumIndices, bucket.StartIndex, 0);
@@ -1137,8 +1137,8 @@ namespace TEN::Renderer
 		{
 			for (auto effect : room->EffectsToDraw)
 			{
-				RendererRoom const& room = m_rooms[effect->Effect->roomNumber];
-				ObjectInfo* obj = &Objects[effect->Effect->objectNumber];
+				RendererRoom const& room = m_rooms[effect->RoomNumber];
+				ObjectInfo* obj = &Objects[effect->ObjectNumber];
 
 				if (obj->drawRoutine && obj->loaded)
 					DrawEffect(view, effect, transparent);
@@ -1151,17 +1151,20 @@ namespace TEN::Renderer
 		extern vector<DebrisFragment> DebrisFragments;
 		vector<RendererVertex> vertices;
 
+		BLEND_MODES lastBlendMode = BLEND_MODES::BLENDMODE_UNSET;
+
 		for (auto deb = DebrisFragments.begin(); deb != DebrisFragments.end(); deb++)
 		{
 			if (deb->active) 
 			{
+				if (!((deb->mesh.blendMode == BLENDMODE_OPAQUE || deb->mesh.blendMode == BLENDMODE_ALPHATEST) ^ transparent))
+					continue;
+
 				Matrix translation = Matrix::CreateTranslation(deb->worldPosition.x, deb->worldPosition.y, deb->worldPosition.z);
 				Matrix rotation = Matrix::CreateFromQuaternion(deb->rotation);
 				Matrix world = rotation * translation;
 
 				m_primitiveBatch->Begin();
-				m_context->VSSetShader(m_vsStatics.Get(), NULL, 0);
-				m_context->PSSetShader(m_psStatics.Get(), NULL, 0);
 
 				if (deb->isStatic) 
 				{
@@ -1182,7 +1185,10 @@ namespace TEN::Renderer
 				}
 
 				m_stStatic.World = world;
-				m_stStatic.Color = Vector4::One;
+				m_stStatic.Color = deb->color;
+				m_stStatic.AmbientLight = m_rooms[deb->roomNumber].AmbientLight;
+				m_stStatic.LightMode = deb->lightMode;
+
 				m_cbStatic.updateData(m_stStatic, m_context.Get());
 				BindConstantBufferVS(CB_STATIC, m_cbStatic.get());
 
@@ -1190,19 +1196,25 @@ namespace TEN::Renderer
 				vtx0.Position = deb->mesh.Positions[0];
 				vtx0.UV = deb->mesh.TextureCoordinates[0];
 				vtx0.Normal = deb->mesh.Normals[0];
-				vtx0.Color = m_rooms[deb->roomNumber].AmbientLight;
+				vtx0.Color = deb->mesh.Colors[0];
 
 				RendererVertex vtx1;
 				vtx1.Position = deb->mesh.Positions[1];
 				vtx1.UV = deb->mesh.TextureCoordinates[1];
 				vtx1.Normal = deb->mesh.Normals[1];
-				vtx1.Color = m_rooms[deb->roomNumber].AmbientLight;
+				vtx1.Color = deb->mesh.Colors[1];
 
 				RendererVertex vtx2;
 				vtx2.Position = deb->mesh.Positions[2];
 				vtx2.UV = deb->mesh.TextureCoordinates[2];
 				vtx2.Normal = deb->mesh.Normals[2];
-				vtx2.Color = m_rooms[deb->roomNumber].AmbientLight;
+				vtx2.Color = deb->mesh.Colors[2];
+
+				if (lastBlendMode != deb->mesh.blendMode)
+				{
+					lastBlendMode = deb->mesh.blendMode;
+					SetBlendMode(lastBlendMode);
+				}
 
 				SetCullMode(CULL_MODE_NONE);
 				m_primitiveBatch->DrawTriangle(vtx0, vtx1, vtx2);
@@ -1285,56 +1297,5 @@ namespace TEN::Renderer
 			if(!s.active) continue;
 			AddSpriteBillboard(&m_sprites[Objects[s.sequence].meshIndex + s.sprite], s.worldPosition, Vector4(1, 1, 1, 1), 0, 1.0f, { s.size, s.size / 2 }, BLENDMODE_ALPHABLEND,view);
 		}
-	}
-
-	DebrisFragment* getNewDebrisFragment()
-	{
-		return nullptr;
-
-		/*DebrisFragment* fragment = GetFreeDebrisFragment();
-		if (!fragment)
-		{
-			return nullptr;
-		}
-
-		if (!fragment->active)
-		{
-			Matrix rotationMatrix = Matrix::CreateFromYawPitchRoll(TO_RAD(yRot), 0, 0);
-			RendererVertex vtx0 = meshVertices.at(renderBucket.Indices[i]);
-			RendererVertex vtx1 = meshVertices.at(renderBucket.Indices[i + 1]);
-			RendererVertex vtx2 = meshVertices.at(renderBucket.Indices[i + 2]);
-
-			//Take the average of all 3 local positions
-			Vector3 localPos = (vtx0.Position + vtx1.Position + vtx2.Position) / 3;
-			vtx0.Position -= localPos;
-			vtx1.Position -= localPos;
-			vtx2.Position -= localPos;
-
-			Vector3 worldPos = Vector3::Transform(localPos, rotationMatrix);
-			fragment->worldPosition = worldPos + pos;
-			fragment->mesh.vertices[0] = vtx0;
-			fragment->mesh.vertices[1] = vtx1;
-			fragment->mesh.vertices[2] = vtx2;
-			fragment->mesh.blendMode = renderBucket.BlendMode;
-			fragment->mesh.tex = renderBucket.Texture;
-			fragment->isStatic = isStatic;
-			fragment->active = true;
-			fragment->terminalVelocity = 1024;
-			fragment->gravity = Vector3(0, 7, 0);
-			fragment->restitution = 0.6f;
-			fragment->friction = 0.6f;
-			fragment->linearDrag = .99f;
-			fragment->angularVelocity = Vector3(GenerateFloat(-1, 1) * 0.39, GenerateFloat(-1, 1) * 0.39, GenerateFloat(-1, 1) * 0.39);
-			fragment->angularDrag = GenerateFloat(0.9f, 0.999f);
-			fragment->velocity = CalculateFragmentImpactVelocity(fragment->worldPosition, ShatterImpactData.impactDirection, ShatterImpactData.impactLocation);
-			fragment->roomNumber = roomNumber;
-			fragment->numBounces = 0;
-
-			return fragment;
-		}
-		else
-		{
-			return nullptr;
-		}*/
 	}
 }

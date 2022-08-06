@@ -1,15 +1,10 @@
 #pragma once
 #include "Specific/phd_global.h"
+#include "Specific/trmath.h"
 
 constexpr auto MAX_SPOTCAMS = 256;
-constexpr auto SPOTCAM_CINEMATIC_BARS_HEIGHT = 16.0f / 256.0f;
-constexpr auto SPOTCAM_CINEMATIC_BARS_SPEED = 1.0f / 256.0f;
-
-struct QUAKE_CAMERA
-{
-	GameVector spos;
-	GameVector epos;
-};
+constexpr auto SPOTCAM_CINEMATIC_BARS_HEIGHT = 1.0f / 16.0f;
+constexpr auto SPOTCAM_CINEMATIC_BARS_SPEED = 1.0f / FPS;
 
 struct SPOTCAM
 {
@@ -33,7 +28,7 @@ struct SPOTCAM
 enum SPOTCAM_FLAGS
 {
 	SCF_CUT_PAN = (1 << 0),					 // 0x0001   cut without panning smoothly
-	SCF_UNUSED = (1 << 1),				     // 0x0002
+	SCF_OVERLAY = (1 << 1),				     // 0x0002	 TODO: add vignette
 	SCF_LOOP_SEQUENCE = (1 << 2),			 // 0x0004
 	SCF_TRACKING_CAM = (1 << 3),			 // 0x0008
 	SCF_HIDE_LARA = (1 << 4),				 // 0x0010
@@ -51,14 +46,14 @@ enum SPOTCAM_FLAGS
 };
 
 extern SPOTCAM SpotCam[MAX_SPOTCAMS];
-extern byte SpotCamRemap[MAX_SPOTCAMS];
-extern byte CameraCnt[MAX_SPOTCAMS];
+extern int SpotCamRemap[MAX_SPOTCAMS];
+extern int CameraCnt[MAX_SPOTCAMS];
 extern int LastSpotCamSequence;
 extern int NumberSpotcams;
-extern int UseSpotCam;
-extern int SpotcamDontDrawLara;
-extern int SpotcamOverlay;
-extern int TrackCameraInit;
+extern bool UseSpotCam;
+extern bool SpotcamDontDrawLara;
+extern bool SpotcamOverlay;
+extern bool TrackCameraInit;
 
 void ClearSpotCamSequences();
 void InitSpotCamSequences();

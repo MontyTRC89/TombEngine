@@ -442,17 +442,33 @@ namespace TEN::Input
 	{
 		// Switch debug pages
 
-		static int debugTimeout = 0;
+		static bool rawDebounce1 = false;
 		if (KeyMap[KC_F10] || KeyMap[KC_F11])
 		{
-			if (debugTimeout == 0)
+			if (!rawDebounce1)
 			{
-				debugTimeout = 1;
+				rawDebounce1 = true;
 				g_Renderer.SwitchDebugPage(KeyMap[KC_F10]);
 			}
 		}
 		else
-			debugTimeout = 0;
+			rawDebounce1 = false;
+
+		// Toggle full screen
+
+		static bool rawDebounce2 = false;
+		if ((KeyMap[KC_LMENU] || KeyMap[KC_RMENU]) && KeyMap[KC_RETURN])
+		{
+			if (!rawDebounce2)
+			{
+				rawDebounce2 = true;
+				g_Configuration.Windowed = !g_Configuration.Windowed;
+				SaveConfiguration();
+				g_Renderer.ToggleFullScreen();
+			}
+		}
+		else
+			rawDebounce2 = false;
 
 		// Handle flares
 

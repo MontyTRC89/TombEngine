@@ -80,10 +80,13 @@ namespace TEN::Renderer
 
 	struct RendererStatic
 	{
-		int Id;
-		short RoomIndex;
-		MESH_INFO* Mesh;
+		int ObjectNumber;
+		int RoomNumber;
+		Vector3 Position;
 		Matrix World;
+		Vector4 Color;
+		Vector4 AmbientLight;
+		std::vector<RendererLight*> LightsToDraw;
 	};
 
 	struct RendererRoomNode
@@ -95,34 +98,39 @@ namespace TEN::Renderer
 
 	struct RendererItem
 	{
-		short ItemNumber;
+		int ItemNumber;
+		int ObjectNumber;
 		bool DoneAnimations;
+		Vector3 Position;
 		Matrix World;
 		Matrix Translation;
 		Matrix Rotation;
 		Matrix Scale;
-		Matrix AnimationTransforms[32];
-		std::vector<RendererLight*> LightsToDraw;
-		int PreviousRoomNumber = NO_ROOM;
-		int CurrentRoomNumber = NO_ROOM;
+		Matrix AnimationTransforms[MAX_BONES];
+		int RoomNumber = NO_ROOM;
+		int PrevRoomNumber = NO_ROOM;
+		Vector4 Color;
 		Vector4 AmbientLight;
-		int AmbientLightSteps;
+		std::vector<RendererLight*> LightsToDraw;
+		float LightFade;
 	};
 
 	struct RendererMesh
 	{
+		LIGHT_MODES LightMode;
 		BoundingSphere Sphere;
-		std::vector<RendererBucket> buckets;
+		std::vector<RendererBucket> Buckets;
 		std::vector<Vector3> Positions;
 	};
 
 	struct RendererEffect
 	{
-		int Id;
-		FX_INFO* Effect;
+		int ObjectNumber;
+		int RoomNumber;
+		Vector3 Position;
 		Matrix World;
 		RendererMesh* Mesh;
-		std::vector<RendererLight*> Lights;
+		std::vector<RendererLight*> LightsToDraw;
 	};
 
 	struct RendererObject
@@ -135,6 +143,7 @@ namespace TEN::Renderer
 		std::vector<Matrix> BindPoseTransforms;
 		std::vector<RendererBone*> LinearizedBones;
 		bool DoNotDraw;
+		ShadowMode ShadowType;
 		bool HasDataInBucket[NUM_BUCKETS];
 		bool HasDataInAnimatedBucket[NUM_BUCKETS];
 
@@ -194,9 +203,9 @@ namespace TEN::Renderer
 
 	struct RendererLine3D
 	{
-		Vector3 start;
-		Vector3 end;
-		Vector4 color;
+		Vector3 Start;
+		Vector3 End;
+		Vector4 Color;
 	};
 
 	struct RendererLine2D
@@ -402,6 +411,9 @@ namespace TEN::Renderer
 		int m_screenHeight;
 		bool m_windowed;
 
+		// A flag to prevent extra renderer object addition
+		bool m_Locked = false;
+		
 		// Misc
 		int m_pickupRotation = 0;
 
@@ -417,10 +429,13 @@ namespace TEN::Renderer
 		short m_boundList[MAX_ROOM_BOUNDS];
 		short m_boundStart = 0;
 		short m_boundEnd = 1;
+		float m_farView = DEFAULT_FAR_VIEW;
 		RendererRectangle m_outsideClip;
 
 		// Private functions
 		void BindTexture(TEXTURE_REGISTERS registerType, TextureBase* texture, SAMPLER_STATES samplerType);
+		void BindLights(std::vector<RendererLight*>& lights);
+		void BindLights(std::vector<RendererLight*>& lights, int roomNumber, int prevRoomNumber, float fade);
 		void BindRenderTargetAsTexture(TEXTURE_REGISTERS registerType, RenderTarget2D* target, SAMPLER_STATES samplerType);
 		void BindConstantBufferVS(CONSTANT_BUFFERS constantBufferType, ID3D11Buffer** buffer);
 		void BindConstantBufferPS(CONSTANT_BUFFERS constantBufferType, ID3D11Buffer** buffer);
@@ -435,16 +450,18 @@ namespace TEN::Renderer
 		void CollectRooms(RenderView& renderView, bool onlyRooms);
 		void CollectItems(short roomNumber, RenderView& renderView);
 		void CollectStatics(short roomNumber, RenderView& renderView);
-		void CollectLightsForEffect(short roomNumber, RendererEffect* effect, RenderView& renderView);
-		void CollectLightsForItem(short roomNumber, RendererItem* item, RenderView& renderView);
+		void CollectLights(Vector3 position, float radius, int roomNumber, int prevRoomNumber, bool prioritizeShadowLight, std::vector<RendererLight*>& lights);
+		void CollectLightsForItem(RendererItem* item);
+		void CollectLightsForEffect(short roomNumber, RendererEffect* effect);
 		void CollectLightsForRoom(short roomNumber, RenderView& renderView);
-		void CollectEffects(short roomNumber, RenderView& renderView);
+		void CollectLightsForCamera();
+		void CalculateLightFades(RendererItem* item);
+		void CollectEffects(short roomNumber);
 		void ClearScene();
 		void ClearSceneItems();
 		void ClearDynamicLights();
-		void ClearShadowMap(RenderView& view);
+		void ClearShadowMap();
 		void UpdateItemAnimations(RenderView& view);
-		void UpdateEffects(RenderView& view);
 		bool PrintDebugMessage(int x, int y, int alpha, byte r, byte g, byte b, LPCSTR Message);
 
 		void InitialiseScreen(int w, int h, bool windowed, HWND handle, bool reset);
@@ -460,10 +477,11 @@ namespace TEN::Renderer
 		void DrawItems(RenderView& view, bool transparent);
 		void DrawItemsTransparent(RendererTransparentFaceInfo* info, RenderView& view);
 		void DrawAnimatingItem(RendererItem* item, RenderView& view, bool transparent);
+		void DrawWaterfalls(RendererItem* item, RenderView& view, int fps, bool transparent);
 		void DrawBaddyGunflashes(RenderView& view);
 		void DrawStatics(RenderView& view, bool transparent);
 		void DrawDarts(RendererItem* item, RenderView& view);
-		void DrawLara(bool shadowMap, RenderView& view, bool transparent);
+		void DrawLara(RenderView& view, bool transparent);
 		void DrawFires(RenderView& view);
 		void DrawParticles(RenderView& view);
 		void DrawSmokes(RenderView& view);
@@ -517,7 +535,8 @@ namespace TEN::Renderer
 		void RenderNewInventory();
 		void RenderToCubemap(const RenderTargetCube& dest, const Vector3& pos, int roomNumber); 
 		void RenderBlobShadows(RenderView& renderView);
-		void RenderShadowMap(RenderView& view);
+		void RenderShadowMap(RendererItem* item, RenderView& view);
+		void RenderItemShadows(RenderView& renderView);
 
 		void SetBlendMode(BLEND_MODES blendMode, bool force = false);
 		void SetDepthState(DEPTH_STATES depthState, bool force = false);
@@ -539,7 +558,6 @@ namespace TEN::Renderer
 		void AddSprite3D(RendererSprite* sprite, Vector3 vtx1, Vector3 vtx2, Vector3 vtx3, Vector3 vtx4, Vector4 color,
 		                 float rotation, float scale, Vector2 size, BLEND_MODES blendMode, RenderView& view);
 
-		short GetRoomNumberForSpriteTest(Vector3 position);
 		RendererMesh* GetMesh(int meshIndex);
 		Texture2D CreateDefaultNormalTexture();
 
@@ -585,6 +603,7 @@ namespace TEN::Renderer
 		void Create();
 		void Initialise(int w, int h, bool windowed, HWND handle);
 		void Draw();
+		void Lock();
 		bool PrepareDataForTheRenderer();
 		void UpdateCameraMatrices(CAMERA_INFO* cam, float roll, float fov, float farView);
 		void RenderSimpleScene(ID3D11RenderTargetView* target, ID3D11DepthStencilView* depthTarget, RenderView& view);
@@ -596,14 +615,14 @@ namespace TEN::Renderer
 		void DrawDebugInfo(RenderView& view);
 		void SwitchDebugPage(bool back);
 		void DrawPickup(short objectNum);
-		int  SyncRenderer();
-		void DrawString(int x, int y, const char* string, D3DCOLOR color, int flags);
+		int  Synchronize();
+		void AddString(int x, int y, const char* string, D3DCOLOR color, int flags);
 		void FreeRendererData();
 		void AddDynamicLight(int x, int y, int z, short falloff, byte r, byte g, byte b);
 		void RenderLoadingScreen(float percentage);
 		void UpdateProgress(float value);
 		void GetLaraBonePosition(Vector3* pos, int bone);
-		void ToggleFullScreen();
+		void ToggleFullScreen(bool force = false);
 		bool IsFullsScreen();
 		void RenderTitleImage();
 		void AddLine2D(int x1, int y1, int x2, int y2, byte r, byte g, byte b, byte a);

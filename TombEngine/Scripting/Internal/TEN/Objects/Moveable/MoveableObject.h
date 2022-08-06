@@ -41,10 +41,14 @@ public:
 	void Destroy();
 
 	[[nodiscard]] Vec3 GetPos() const;
+	[[nodiscard]] Vec3 GetJointPos(int index) const;
 	void SetPos(Vec3 const& pos);
 
 	[[nodiscard]] Rotation GetRot() const;
 	void SetRot(Rotation const& rot);
+
+	[[nodiscard]] int GetStateNumber() const;
+	void SetStateNumber(int stateNumber);
 
 	[[nodiscard]] int GetAnimNumber() const;
 	void SetAnimNumber(int animNumber);
@@ -69,6 +73,15 @@ public:
 	[[nodiscard]] short GetItemFlags(int index = 0) const;
 	void SetItemFlags(short value, int index = 0);
 
+	[[nodiscard]] bool MeshIsVisible(int meshId) const;
+	void ShowMesh(int meshId);
+	void HideMesh(int meshId);
+	void ShatterMesh(int meshId);
+
+	[[nodiscard]] bool MeshIsSwapped(int meshId) const;
+	void SwapMesh(int meshId, int swapSlotId, sol::optional<int> swapMeshIndex);
+	void UnswapMesh(int meshId);
+
 	[[nodiscard]] bool GetHitStatus() const;
 
 	[[nodiscard]] bool GetActive() const;
@@ -80,6 +93,8 @@ public:
 	void EnableItem();
 	void DisableItem();
 	void MakeInvisible();
+	void Explode();
+	void Shatter();
 
 	[[nodiscard]] std::string GetOnHit() const;
 	void SetOnHit(std::string const &);
@@ -99,4 +114,6 @@ private:
 	ItemInfo* m_item;
 	short m_num;
 	bool m_initialised;
+
+	bool MeshExists(int number) const;
 };
