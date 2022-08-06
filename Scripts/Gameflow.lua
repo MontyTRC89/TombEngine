@@ -12,8 +12,10 @@ local InvID = Flow.InvID
 local RotationAxis = Flow.RotationAxis
 local ItemAction = Flow.ItemAction
 
-Flow.SetIntroImagePath("Screens\\Main.png")
-Flow.SetTitleScreenImagePath("Screens\\Title.jpg")
+-- These variables are unused for now.
+
+Flow.SetIntroImagePath("Screens\\main.jpg")
+Flow.SetTitleScreenImagePath("Screens\\main.jpg")
 
 -- Flow.SetFarView sets global far view distance in blocks.
 -- It will be overwritten by level.farView value, if it is specified.
