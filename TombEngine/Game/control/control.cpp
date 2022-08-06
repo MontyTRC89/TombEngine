@@ -644,6 +644,8 @@ void UpdateShatters()
 			SmashedMesh[SmashedMeshCount]->pos.Position.z,
 			SmashedMeshRoom[SmashedMeshCount], true);
 
+		TestVolumes(SmashedMeshRoom[SmashedMeshCount], SmashedMesh[SmashedMeshCount]);
+
 		floor->Stopper = false;
 		SmashedMesh[SmashedMeshCount] = 0;
 	} while (SmashedMeshCount != 0);

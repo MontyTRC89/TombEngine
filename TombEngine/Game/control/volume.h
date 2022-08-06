@@ -4,6 +4,13 @@
 #include "Specific/setup.h"
 #include "Renderer/Renderer11.h"
 
+constexpr auto NO_EVENT_SET = -1;
+constexpr auto NO_CALL_COUNTER = -1;
+
+constexpr auto VOLUME_BUSY_TIMEOUT = 10;
+
+using namespace TEN::Control::Volumes;
+
 enum class TriggerStatus
 {
 	Outside,
@@ -32,21 +39,18 @@ enum TriggerVolumeActivators
 struct TriggerVolume
 {
 	TriggerVolumeType Type;
+	int EventSetIndex;
 
 	Vector3 Position;
 	Quaternion Rotation;
 	Vector3 Scale;	// x used as radius if type is TriggerVolumeType::Sphere.
 
-	std::string OnEnter;
-	std::string OnInside;
-	std::string OnLeave;
-
-	int Activators;
-	bool OneShot;
-
-	TriggerStatus Status;
 	BoundingOrientedBox Box;
 	BoundingSphere Sphere;
+
+	TriggerStatus Status = TriggerStatus::Outside;
+	VolumeTriggerer Triggerer = nullptr;
+	int LastActivityTimestamp = 0;
 };
 
 namespace TEN::Control::Volumes
