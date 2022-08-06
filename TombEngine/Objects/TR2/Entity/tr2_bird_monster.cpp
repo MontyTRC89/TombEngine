@@ -20,10 +20,10 @@ namespace TEN::Entities::TR2
 
 	#define BIRD_MONSTER_WALK_TURN_RATE_MAX ANGLE(4.0f)
 
-	const vector<int> BirdMonsterLeftBite	= { 18, 19 };
-	const vector<int> BirdMonsterRightBite  = { 21, 22 };
 	const auto BirdMonsterBiteLeft	= BiteInfo(Vector3(0.0f, 224.0f, 0.0f), 19);
 	const auto BirdMonsterBiteRight = BiteInfo(Vector3(0.0f, 224.0f, 0.0f), 22);
+	const vector<int> BirdMonsterLeftBite  = { 18, 19 };
+	const vector<int> BirdMonsterRightBite = { 21, 22 };
 
 	enum BirdMonsterState
 	{
