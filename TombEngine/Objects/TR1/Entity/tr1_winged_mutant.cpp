@@ -1,16 +1,16 @@
 #include "framework.h"
 #include "Objects/TR1/Entity/tr1_winged_mutant.h"
 
-#include "Game/control/box.h"
-#include "Game/effects/effects.h"
-#include "Game/itemdata/creature_info.h"
 #include "Game/collision/collide_room.h"
-#include "Game/items.h"
+#include "Game/control/box.h"
+#include "Game/control/lot.h"
+#include "Game/effects/effects.h"
 #include "Game/effects/tomb4fx.h"
+#include "Game/itemdata/creature_info.h"
+#include "Game/items.h"
 #include "Game/misc.h"
 #include "Game/missile.h"
 #include "Game/people.h"
-#include "Game/control/lot.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
 #include "Specific/trmath.h"
@@ -19,133 +19,139 @@ using std::vector;
 
 namespace TEN::Entities::TR1
 {
-	constexpr auto WING_FLY_SPEED = CLICK(1) / 8;
 	constexpr auto WING_CHARGE_DAMAGE = 100;
-	constexpr auto WING_LUNGE_DAMAGE = 150;
-	constexpr auto WING_PUNCH_DAMAGE = 200;
-	constexpr auto WING_PART_DAMAGE = 100;
-	constexpr auto WING_POSE_CHANCE = 85;
-	constexpr auto WING_UNPOSE_CHANCE = 200;
-	constexpr auto WING_FLY_MODE = 0; // itemFlags[0]
-	constexpr auto WING_BULLET_MODE = 1; // itemFlags[1]
-	constexpr auto WING_WALK_RANGE = SQUARE(SECTOR(4.5f));
-	constexpr auto WING_ATTACK3_RANGE = SQUARE(CLICK(1.172f));
-	constexpr auto WING_ATTACK2_RANGE = SQUARE(CLICK(2.344f));
-	constexpr auto WING_ATTACK1_RANGE = SQUARE(SECTOR(2.5f));
-	constexpr auto WING_ATTACK_RANGE = SQUARE(SECTOR(3.75f));
-	constexpr auto WING_SHARD_VELOCITY = 250;
-	constexpr auto WING_BOMB_VELOCITY = 220;
+	constexpr auto WING_LUNGE_DAMAGE  = 150;
+	constexpr auto WING_PUNCH_DAMAGE  = 200;
+	constexpr auto WING_PART_DAMAGE	  = 100;
 
-	#define WING_WALK_TURN ANGLE(2.0f)
-	#define WING_RUN_TURN ANGLE(6.0f)
+	constexpr auto WING_MUTANT_WALK_RANGE	  = SQUARE(SECTOR(4.5f));
+	constexpr auto WING_MUTANT_ATTACK_3_RANGE = SQUARE(CLICK(1.17f));
+	constexpr auto WING_MUTANT_ATTACK_2_RANGE = SQUARE(CLICK(2.34f));
+	constexpr auto WING_MUTANT_ATTACK_1_RANGE = SQUARE(SECTOR(2.5f));
+	constexpr auto WING_MUTANT_ATTACK_RANGE   = SQUARE(SECTOR(3.75f));
 
-	const auto WingMutantBite = BiteInfo(Vector3(-27.0f, 98.0f, 0.0f), 10);
+	constexpr auto WING_MUTANT_POSE_CHANCE	 = 85;
+	constexpr auto WING_MUTANT_UNPOSE_CHANCE = 200;
+
+	constexpr auto WING_MUTANT_FLY_VELOCITY	  = CLICK(1) / 8;
+	constexpr auto WING_MUTANT_SHARD_VELOCITY = 250;
+	constexpr auto WING_MUTANT_BOMB_VELOCITY  = 220;
+	constexpr auto WING_MUTANT_FLY_MODE	   = 0; // itemFlags[0]
+	constexpr auto WING_MUTANT_BULLET_MODE = 1; // itemFlags[1]
+
+	#define WMUTANT_STATE_WALK_FORWARD_TURN ANGLE(2.0f)
+	#define WMUTANT_STATE_RUN_FORWARD_TURN	ANGLE(6.0f)
+
+	const auto WingMutantBite	= BiteInfo(Vector3(-27.0f, 98.0f, 0.0f), 10);
 	const auto WingMutantRocket = BiteInfo(Vector3(51.0f, 213.0f, 0.0f), 14);
-	const auto WingMutantShard = BiteInfo(Vector3(-35.0f, 269.0f, 0.0f), 9);
+	const auto WingMutantShard	= BiteInfo(Vector3(-35.0f, 269.0f, 0.0f), 9);
 	const vector<int> WingMutantJoints = { WingMutantShard.meshNum, WingMutantBite.meshNum, WingMutantRocket.meshNum };
 
-	enum WingedMutantState
+	enum WingMutantState
 	{
-		WING_EMPTY = 0,
-		WING_STOP = 1,
-		WING_WALK = 2,
-		WING_RUN = 3,
-		WING_ATTACK1 = 4,
-		WING_DEATH = 5,
-		WING_POSE = 6,
-		WING_ATTACK2 = 7,
-		WING_ATTACK3 = 8,
-		WING_AIM1 = 9,
-		WING_AIM2 = 10,
-		WING_SHOOT = 11,
-		WING_MUMMY = 12,
-		WING_FLY = 13,
+		WMUTANT_STATE_NONE = 0,
+		WMUTANT_STATE_IDLE = 1,
+		WMUTANT_STATE_WALK_FORWARD = 2,
+		WMUTANT_STATE_RUN_FORWARD = 3,
+		WMUTANT_STATE_ATTACK_1 = 4,
+		WMUTANT_STATE_DEATH = 5,
+		WMUTANT_STATE_POSE = 6,
+		WMUTANT_STATE_ATTACK_2 = 7,
+		WMUTANT_STATE_ATTACK_3 = 8,
+		WMUTANT_STATE_AIM_1 = 9,
+		WMUTANT_STATE_AIM_2 = 10,
+		WMUTANT_STATE_SHOOT = 11,
+		WMUTANT_STATE_MUMMY = 12,
+		WMUTANT_STATE_FLY = 13,
 	};
 
-	enum WingedMutantAnims : int
+	enum WingMutantAnim
 	{
-		AWING_MUMMY = 0,
-		AWING_MUMMY_TO_STOP,
-		AWING_STOP,
-		AWING_STOP_TO_RUN,
-		AWING_RUN,
-		AWING_STOP_TO_ATTACK_JUMP,
-		AWING_ATTACK_JUMP,
-		AWING_STOP_TO_POSE,
-		AWING_POSE,
-		AWING_POSE_TO_STOP,
-		AWING_POSE_TO_WALK,
-		AWING_WALK,
-		AWING_WALK_TO_STOP,
-		AWING_WALK_TO_POSE,
-		AWING_RUN_ATTACK_JUMP,
-		AWING_STOP_TO_AIM1,
-		AWING_AIM1,
-		AWING_SHOOT1, // DART
-		AWING_AIM1_TO_STOP,
-		AWING_STOP_TO_AIM2,
-		AWING_SHOOT2, // EXPLODE SPHERE
-		AWING_RUN_TO_STOP,
-		AWING_AIM2_TO_STOP,
-		AWING_STOP_TO_FLY,
-		AWING_FLY,
-		AWING_FLY_TO_STOP,
-		AWING_ATTACK // normal attack (directly to stop)
+		WMUTANT_ANIM_MUMMY = 0,
+		WMUTANT_ANIM_MUMMY_TO_STOP = 1,
+		WMUTANT_ANIM_IDLE = 2,
+		WMUTANT_ANIM_IDLE_TO_RUN = 3,
+		WMUTANT_ANIM_RUN = 4,
+		WMUTANT_ANIM_IDLE_TO_ATTACK_JUMP = 5,
+		WMUTANT_ANIM_ATTACK_JUMP,
+		WMUTANT_ANIM_IDLE_TO_POSE,
+		WMUTANT_ANIM_POSE,
+		WMUTANT_ANIM_POSE_TO_STOP,
+		WMUTANT_ANIM_POSE_TO_WALK,
+		WMUTANT_ANIM_WALK,
+		WMUTANT_ANIM_WALK_TO_STOP,
+		WMUTANT_ANIM_WALK_TO_POSE,
+		WMUTANT_ANIM_RUN_ATTACK_JUMP,
+		WMUTANT_ANIM_IDLE_TO_AIM1,
+		WMUTANT_ANIM_AIM1,
+		WMUTANT_ANIM_SHOOT1, // DART
+		WMUTANT_ANIM_AIM1_TO_STOP,
+		WMUTANT_ANIM_IDLE_TO_AIM2,
+		WMUTANT_ANIM_SHOOT2, // BOMB
+		WMUTANT_ANIM_RUN_TO_STOP,
+		WMUTANT_ANIM_AIM2_TO_STOP,
+		WMUTANT_ANIM_IDLE_TO_FLY,
+		WMUTANT_ANIM_FLY,
+		WMUTANT_ANIM_FLY_TO_STOP,
+		WMUTANT_ANIM_ATTACK // Normal attack (directly to idle)
 	};
 
-	enum class WingMutantPaths // used to define pathfinding type
+	// Defines pathfinding type.
+	enum class WingMutantPaths
 	{
-		WING_GROUND = 1,
-		WING_FLYING = 2
+		Ground = 1,
+		Flying = 2
 	};
 
-	enum class WingMutantOcb // NOTE: originally wing mutant don't have ocb, i've added it ! TokyoSU, 5/8/2022
+	// NOTE: Originally, winged mutants did not have OCB. -- TokyoSU 5/8/2022
+	enum class WingMutantOcb
 	{
-		WING_START_NORMAL = 0,
-		WING_START_FLYING = 1,
-		WING_START_MUMMY = 2
+		StartNormal = 0,
+		StartFlying = 1,
+		StartMummy	= 2
 	};
 
 	enum class WingMutantBulletType
 	{
-		WING_BULLET_NONE,
-		WING_BULLET_DART,
-		WING_BULLET_EXPLODE
+		None,
+		Dart,
+		Bomb
 	};
 
 	static bool IsFlyEnabled(ItemInfo* item)
 	{
-		return item->ItemFlags[WING_FLY_MODE] == TRUE;
+		return item->ItemFlags[WING_MUTANT_FLY_MODE] == true;
 	}
 
 	static void SetFlyMode(ItemInfo* item, bool enabled)
 	{
-		item->ItemFlags[WING_FLY_MODE] = int(enabled);
+		item->ItemFlags[WING_MUTANT_FLY_MODE] = (int)enabled;
 	}
 
 	static WingMutantBulletType GetWeaponType(ItemInfo* item)
 	{
-		return static_cast<WingMutantBulletType>(item->ItemFlags[WING_BULLET_MODE]);
+		return static_cast<WingMutantBulletType>(item->ItemFlags[WING_MUTANT_BULLET_MODE]);
 	}
 
 	static void SetWeaponType(ItemInfo* item, WingMutantBulletType type)
 	{
-		item->ItemFlags[WING_BULLET_MODE] = static_cast<int>(type);
+		item->ItemFlags[WING_MUTANT_BULLET_MODE] = (int)type;
 	}
 
 	static void SwitchPathfinding(CreatureInfo* creature, WingMutantPaths path)
 	{
 		switch (path)
 		{
-		case WingMutantPaths::WING_GROUND:
+		case WingMutantPaths::Ground:
 			creature->LOT.Step = CLICK(1);
 			creature->LOT.Drop = -CLICK(1);
 			creature->LOT.Fly = NO_FLYING;
 			break;
-		case WingMutantPaths::WING_FLYING:
+
+		case WingMutantPaths::Flying:
 			creature->LOT.Step = SECTOR(30);
 			creature->LOT.Drop = -SECTOR(30);
-			creature->LOT.Fly = WING_FLY_SPEED;
+			creature->LOT.Fly = WING_MUTANT_FLY_VELOCITY;
 			break;
 		}
 	}
@@ -154,29 +160,31 @@ namespace TEN::Entities::TR1
 	{
 		switch ((WingMutantOcb)item->TriggerFlags)
 		{
-		case WingMutantOcb::WING_START_FLYING:
-			SwitchPathfinding(creature, WingMutantPaths::WING_FLYING);
-			SetAnimation(item, AWING_FLY);
+		case WingMutantOcb::StartFlying:
+			SetAnimation(item, WMUTANT_ANIM_FLY);
+			SwitchPathfinding(creature, WingMutantPaths::Flying);
 			SetFlyMode(item, true);
 			item->TriggerFlags = 0;
 			break;
-		case WingMutantOcb::WING_START_MUMMY:
-			SwitchPathfinding(creature, WingMutantPaths::WING_GROUND);
-			SetAnimation(item, AWING_MUMMY);
+
+		case WingMutantOcb::StartMummy:
+			SetAnimation(item, WMUTANT_ANIM_MUMMY);
+			SwitchPathfinding(creature, WingMutantPaths::Ground);
 			SetFlyMode(item, false);
 			item->TriggerFlags = 0;
 			break;
 		}
 	}
 
-	// NOTE: not exist in the original game ! TokyoSU, 5/8/2022
+	// NOTE: Doesn't exist in the original game. -- TokyoSU 5/8/2022
 	void InitialiseWingedMutant(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
+
 		InitialiseCreature(itemNumber);
-		SetFlyMode(item, false); // define flying mode (TRUE = fly)
-		SetWeaponType(item, WingMutantBulletType::WING_BULLET_NONE); // define bullet that the entity shoot (there are 2)
-		SetAnimation(item, AWING_STOP);
+		SetFlyMode(item, false); // Define flying mode (TRUE = fly)
+		SetWeaponType(item, WingMutantBulletType::None); // Define bullet type the entity shoots (two types).
+		SetAnimation(item, WMUTANT_ANIM_IDLE);
 	}
 
 	// item->ItemFlags[0] will serve as fly detection
@@ -187,8 +195,9 @@ namespace TEN::Entities::TR1
 
 		auto* item = &g_Level.Items[itemNumber];
 		auto* creature = GetCreatureInfo(item);
+
 		short head = 0;
-		short torso = 0; // only when shooting !
+		short torso = 0; // Only when shooting.
 		short angle = 0;
 
 		WingedInitOCB(item, creature);
@@ -202,7 +211,7 @@ namespace TEN::Entities::TR1
 		else
 		{
 			AI_INFO AI;
-			SwitchPathfinding(creature, WingMutantPaths::WING_GROUND);
+			SwitchPathfinding(creature, WingMutantPaths::Ground);
 			CreatureAIInfo(item, &AI);
 
 			if (AI.ahead)
@@ -213,7 +222,7 @@ namespace TEN::Entities::TR1
 				torso = 0;
 			}
 
-			GetCreatureMood(item, &AI, IsFlyEnabled(item)); // true = FLY = AGGRESIVE !
+			GetCreatureMood(item, &AI, IsFlyEnabled(item)); // true = FLY = AGGRESIVE
 			CreatureMood(item, &AI, IsFlyEnabled(item));
 			angle = CreatureTurn(item, creature->MaxTurn);
 
@@ -222,7 +231,7 @@ namespace TEN::Entities::TR1
 
 			if (item->ObjectNumber == ID_WINGED_MUMMY)
 			{
-				if (item->Animation.ActiveState == WING_FLY)
+				if (item->Animation.ActiveState == WMUTANT_STATE_FLY)
 				{
 					if (IsFlyEnabled(item) &&
 						creature->Mood != MoodType::Escape &&
@@ -231,7 +240,7 @@ namespace TEN::Entities::TR1
 						SetFlyMode(item, false);
 					}
 
-					SwitchPathfinding(creature, WingMutantPaths::WING_FLYING);
+					SwitchPathfinding(creature, WingMutantPaths::Flying);
 					CreatureAIInfo(item, &AI);
 				}
 				else if ((AI.zoneNumber != AI.enemyZone &&
@@ -247,185 +256,196 @@ namespace TEN::Entities::TR1
 
 			if (item->ObjectNumber != ID_MUTANT &&
 				Targetable(item, creature, &AI) &&
-			   (AI.zoneNumber != AI.enemyZone || AI.distance > WING_ATTACK_RANGE))
+			   (AI.zoneNumber != AI.enemyZone || AI.distance > WING_MUTANT_ATTACK_RANGE))
 			{
 				if (AI.angle > 0 && AI.angle < ANGLE(45.0f))
 					shoot1 = true;
 				else if (AI.angle < 0 && angle > -ANGLE(45.0f))
 					shoot2 = true;
 			}
-			else // if not targetable:
+			// Not targetable.
+			else
 			{
 				shoot1 = false;
 				shoot2 = false;
 			}
 
-			switch ((WingedMutantState)item->Animation.ActiveState)
+			switch ((WingMutantState)item->Animation.ActiveState)
 			{
-			case WING_MUMMY:
+			case WMUTANT_STATE_MUMMY:
 				creature->MaxTurn = 0;
 				if (TargetVisible(item, creature, &AI) || creature->HurtByLara)
-					item->Animation.TargetState = WING_STOP;
+					item->Animation.TargetState = WMUTANT_STATE_IDLE;
 
 				break;
 
-			case WING_STOP:
+			case WMUTANT_STATE_IDLE:
 				torso = 0;
 				creature->MaxTurn = 0;
-				SetWeaponType(item, WingMutantBulletType::WING_BULLET_NONE);
+				SetWeaponType(item, WingMutantBulletType::None);
 
 				if (IsFlyEnabled(item))
-					item->Animation.TargetState = WING_FLY;
+					item->Animation.TargetState = WMUTANT_STATE_FLY;
 				else if (item->TestBits(JointBitType::Touch, WingMutantJoints[1]))
-					item->Animation.TargetState = WING_ATTACK3;
-				else if (AI.bite && AI.distance < WING_ATTACK3_RANGE)
-					item->Animation.TargetState = WING_ATTACK3;
-				else if (AI.bite && AI.distance < WING_ATTACK1_RANGE)
-					item->Animation.TargetState = WING_ATTACK1;
+					item->Animation.TargetState = WMUTANT_STATE_ATTACK_3;
+				else if (AI.bite && AI.distance < WING_MUTANT_ATTACK_3_RANGE)
+					item->Animation.TargetState = WMUTANT_STATE_ATTACK_3;
+				else if (AI.bite && AI.distance < WING_MUTANT_ATTACK_1_RANGE)
+					item->Animation.TargetState = WMUTANT_STATE_ATTACK_1;
 				else if (shoot1)
-					item->Animation.TargetState = WING_AIM1;
+					item->Animation.TargetState = WMUTANT_STATE_AIM_1;
 				else if (shoot2)
-					item->Animation.TargetState = WING_AIM2;
+					item->Animation.TargetState = WMUTANT_STATE_AIM_2;
 				else if (creature->Mood == MoodType::Bored ||
-					(creature->Mood == MoodType::Stalk && AI.distance < WING_WALK_RANGE))
-					item->Animation.TargetState = WING_POSE;
+					(creature->Mood == MoodType::Stalk && AI.distance < WING_MUTANT_WALK_RANGE))
+					item->Animation.TargetState = WMUTANT_STATE_POSE;
 				else
-					item->Animation.TargetState = WING_RUN;
+					item->Animation.TargetState = WMUTANT_STATE_RUN_FORWARD;
 
 				break;
 
-			case WING_POSE:
+			case WMUTANT_STATE_POSE:
+				head = 0; // Pose has a custom animation for the head.
 				creature->MaxTurn = 0;
-				head = 0; // pose have custom animation for the head !
+
 				if (shoot1 || shoot2 || IsFlyEnabled(item))
-					item->Animation.TargetState = WING_STOP;
+					item->Animation.TargetState = WMUTANT_STATE_IDLE;
 				else if (creature->Mood == MoodType::Stalk)
 				{
-					if (AI.distance < WING_WALK_RANGE)
+					if (AI.distance < WING_MUTANT_WALK_RANGE)
 					{
 						if (AI.zoneNumber == AI.enemyZone ||
-							GetRandomControl() < WING_UNPOSE_CHANCE)
-							item->Animation.TargetState = WING_WALK;
+							GetRandomControl() < WING_MUTANT_UNPOSE_CHANCE)
+							item->Animation.TargetState = WMUTANT_STATE_WALK_FORWARD;
 					}
 					else
-						item->Animation.TargetState = WING_STOP;
+						item->Animation.TargetState = WMUTANT_STATE_IDLE;
 				}
 				else if (creature->Mood == MoodType::Bored &&
-					GetRandomControl() < WING_UNPOSE_CHANCE)
-					item->Animation.TargetState = WING_WALK;
+					GetRandomControl() < WING_MUTANT_UNPOSE_CHANCE)
+					item->Animation.TargetState = WMUTANT_STATE_WALK_FORWARD;
 				else if (creature->Mood == MoodType::Attack ||
 					creature->Mood == MoodType::Escape)
-					item->Animation.TargetState = WING_STOP;
+					item->Animation.TargetState = WMUTANT_STATE_IDLE;
 
 				break;
 
-			case WING_WALK:
-				creature->MaxTurn = WING_WALK_TURN;
+			case WMUTANT_STATE_WALK_FORWARD:
+				creature->MaxTurn = WMUTANT_STATE_WALK_FORWARD_TURN;
+
 				if (shoot1 || shoot2 || IsFlyEnabled(item))
-					item->Animation.TargetState = WING_STOP;
+					item->Animation.TargetState = WMUTANT_STATE_IDLE;
 				else if (creature->Mood == MoodType::Attack || creature->Mood == MoodType::Escape)
-					item->Animation.TargetState = WING_STOP;
+					item->Animation.TargetState = WMUTANT_STATE_IDLE;
 				else if (creature->Mood == MoodType::Bored ||
 					(creature->Mood == MoodType::Stalk && AI.zoneNumber != AI.enemyZone))
 				{
-					if (GetRandomControl() < WING_POSE_CHANCE)
-						item->Animation.TargetState = WING_POSE;
+					if (GetRandomControl() < WING_MUTANT_POSE_CHANCE)
+						item->Animation.TargetState = WMUTANT_STATE_POSE;
 				}
-				else if (creature->Mood == MoodType::Stalk && AI.distance > WING_WALK_RANGE)
-					item->Animation.TargetState = WING_STOP;
+				else if (creature->Mood == MoodType::Stalk && AI.distance > WING_MUTANT_WALK_RANGE)
+					item->Animation.TargetState = WMUTANT_STATE_IDLE;
 
 				break;
 
-			case WING_RUN:
-				creature->MaxTurn = WING_RUN_TURN;
+			case WMUTANT_STATE_RUN_FORWARD:
+				creature->MaxTurn = WMUTANT_STATE_RUN_FORWARD_TURN;
+
 				if (IsFlyEnabled(item))
-					item->Animation.TargetState = WING_STOP;
+					item->Animation.TargetState = WMUTANT_STATE_IDLE;
 				else if (item->TestBits(JointBitType::Touch, WingMutantJoints[1]))
-					item->Animation.TargetState = WING_STOP;
-				else if (AI.bite && AI.distance < WING_ATTACK1_RANGE)
-					item->Animation.TargetState = WING_ATTACK1;
-				else if (AI.bite && AI.distance < WING_ATTACK2_RANGE)
-					item->Animation.TargetState = WING_ATTACK2;
-				else if (AI.ahead && AI.distance < WING_ATTACK2_RANGE)
-					item->Animation.TargetState = WING_ATTACK2;
+					item->Animation.TargetState = WMUTANT_STATE_IDLE;
+				else if (AI.bite && AI.distance < WING_MUTANT_ATTACK_1_RANGE)
+					item->Animation.TargetState = WMUTANT_STATE_ATTACK_1;
+				else if (AI.bite && AI.distance < WING_MUTANT_ATTACK_2_RANGE)
+					item->Animation.TargetState = WMUTANT_STATE_ATTACK_2;
+				else if (AI.ahead && AI.distance < WING_MUTANT_ATTACK_2_RANGE)
+					item->Animation.TargetState = WMUTANT_STATE_ATTACK_2;
 				else if (shoot1 || shoot2)
-					item->Animation.TargetState = WING_STOP;
+					item->Animation.TargetState = WMUTANT_STATE_IDLE;
 				else if (creature->Mood == MoodType::Bored ||
-					(creature->Mood == MoodType::Stalk && AI.distance < WING_WALK_RANGE))
+					(creature->Mood == MoodType::Stalk && AI.distance < WING_MUTANT_WALK_RANGE))
 				{
-					item->Animation.TargetState = WING_STOP;
+					item->Animation.TargetState = WMUTANT_STATE_IDLE;
 				}
 
 				break;
 
-			case WING_ATTACK1:
-				if (item->Animation.RequiredState == WING_EMPTY && item->TestBits(JointBitType::Touch, WingMutantJoints[1]))
+			case WMUTANT_STATE_ATTACK_1:
+				if (item->Animation.RequiredState == WMUTANT_STATE_NONE && item->TestBits(JointBitType::Touch, WingMutantJoints[1]))
 				{
-					CreatureEffect(item, WingMutantBite, DoBloodSplat);
 					DoDamage(creature->Enemy, WING_LUNGE_DAMAGE);
-					item->Animation.TargetState = WING_STOP;
+					CreatureEffect(item, WingMutantBite, DoBloodSplat);
+					item->Animation.TargetState = WMUTANT_STATE_IDLE;
 				}
+
 				break;
 
-			case WING_ATTACK2:
-				if (item->Animation.RequiredState == WING_EMPTY && item->TestBits(JointBitType::Touch, WingMutantJoints[1]))
+			case WMUTANT_STATE_ATTACK_2:
+				if (item->Animation.RequiredState == WMUTANT_STATE_NONE && item->TestBits(JointBitType::Touch, WingMutantJoints[1]))
 				{
-					CreatureEffect(item, WingMutantBite, DoBloodSplat);
 					DoDamage(creature->Enemy, WING_CHARGE_DAMAGE);
-					item->Animation.TargetState = WING_RUN;
-				}
-				break;
-
-			case WING_ATTACK3:
-				if (item->Animation.RequiredState == WING_EMPTY && item->TestBits(JointBitType::Touch, WingMutantJoints[1]))
-				{
 					CreatureEffect(item, WingMutantBite, DoBloodSplat);
-					DoDamage(creature->Enemy, WING_PUNCH_DAMAGE);
-					item->Animation.TargetState = WING_STOP;
+					item->Animation.TargetState = WMUTANT_STATE_RUN_FORWARD;
 				}
+
 				break;
 
-			case WING_AIM1:
+			case WMUTANT_STATE_ATTACK_3:
+				if (item->Animation.RequiredState == WMUTANT_STATE_NONE && item->TestBits(JointBitType::Touch, WingMutantJoints[1]))
+				{
+					DoDamage(creature->Enemy, WING_PUNCH_DAMAGE);
+					CreatureEffect(item, WingMutantBite, DoBloodSplat);
+					item->Animation.TargetState = WMUTANT_STATE_IDLE;
+				}
+
+				break;
+
+			case WMUTANT_STATE_AIM_1:
 				torso = AI.angle / 2;
 				creature->MaxTurn = 0;
-				SetWeaponType(item, WingMutantBulletType::WING_BULLET_DART);
+				SetWeaponType(item, WingMutantBulletType::Dart);
+
 				if (shoot1)
-					item->Animation.TargetState = WING_SHOOT;
+					item->Animation.TargetState = WMUTANT_STATE_SHOOT;
 				else
-					item->Animation.TargetState = WING_STOP;
+					item->Animation.TargetState = WMUTANT_STATE_IDLE;
 
 				break;
 
-			case WING_AIM2:
+			case WMUTANT_STATE_AIM_2:
 				torso = AI.angle / 2;
 				creature->MaxTurn = 0;
-				SetWeaponType(item, WingMutantBulletType::WING_BULLET_EXPLODE);
+
+				SetWeaponType(item, WingMutantBulletType::Bomb);
 				if (shoot2)
-					item->Animation.TargetState = WING_SHOOT;
+					item->Animation.TargetState = WMUTANT_STATE_SHOOT;
 				else
-					item->Animation.TargetState = WING_STOP;
+					item->Animation.TargetState = WMUTANT_STATE_IDLE;
 
 				break;
 
-			case WING_SHOOT:
+			case WMUTANT_STATE_SHOOT:
 				torso = AI.angle / 2;
 				creature->MaxTurn = 0;
+
 				switch (GetWeaponType(item))
 				{
-				case WingMutantBulletType::WING_BULLET_DART:
-					CreatureEffect2(item, WingMutantShard, WING_SHARD_VELOCITY, torso, ShardGun);
+				case WingMutantBulletType::Dart:
+					CreatureEffect2(item, WingMutantShard, WING_MUTANT_SHARD_VELOCITY, torso, ShardGun);
 					break;
-				case WingMutantBulletType::WING_BULLET_EXPLODE:
-					CreatureEffect2(item, WingMutantRocket, WING_BOMB_VELOCITY, torso, BombGun);
+
+				case WingMutantBulletType::Bomb:
+					CreatureEffect2(item, WingMutantRocket, WING_MUTANT_BOMB_VELOCITY, torso, BombGun);
 					break;
 				}
-				SetWeaponType(item, WingMutantBulletType::WING_BULLET_NONE); // reset weapon type since it shooted !
 
+				SetWeaponType(item, WingMutantBulletType::None); // Reset weapon type since it has shot.
 				break;
 
-			case WING_FLY:
+			case WMUTANT_STATE_FLY:
 				if (!IsFlyEnabled(item) && item->Pose.Position.y == item->Floor)
-					item->Animation.TargetState = WING_STOP; // switch to ground mode
+					item->Animation.TargetState = WMUTANT_STATE_IDLE; // Switch to ground mode.
 
 				break;
 			}

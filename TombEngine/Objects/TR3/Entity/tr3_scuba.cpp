@@ -15,7 +15,11 @@
 
 namespace TEN::Entities::TR3
 {
-	BiteInfo ScubaGunBite = { 17, 164, 44, 18 };
+	constexpr auto SCUBA_ATTACK_DAMAGE = 50;
+
+	#define SCUBA_SWIM_TURN_RATE_MAX ANGLE(3.0f)
+
+	const auto ScubaGunBite = BiteInfo(Vector3(17.0f, 164.0f, 44.0f), 18);
 
 	// TODO
 	enum ScubaDiverState
@@ -29,7 +33,7 @@ namespace TEN::Entities::TR3
 
 	};
 
-	static void ShootHarpoon(ItemInfo* item, int x, int y, int z, short velocity, short yRot, short roomNumber)
+	static void ShootHarpoon(ItemInfo* item, Vector3Int pos, short velocity, short yRot, short roomNumber)
 	{
 		short harpoonItemNumber = CreateItem();
 		if (harpoonItemNumber != NO_ITEM)
@@ -38,16 +42,13 @@ namespace TEN::Entities::TR3
 
 			harpoonItem->ObjectNumber = ID_SCUBA_HARPOON;
 			harpoonItem->RoomNumber = item->RoomNumber;
-
-			harpoonItem->Pose.Position.x = x;
-			harpoonItem->Pose.Position.y = y;
-			harpoonItem->Pose.Position.z = z;
+			harpoonItem->Pose.Position = pos;
 
 			InitialiseItem(harpoonItemNumber);
 
+			harpoonItem->Animation.Velocity = 150;
 			harpoonItem->Pose.Orientation.x = 0;
 			harpoonItem->Pose.Orientation.y = yRot;
-			harpoonItem->Animation.Velocity = 150;
 
 			AddActiveItem(harpoonItemNumber);
 			harpoonItem->Status = ITEM_ACTIVE;
@@ -58,10 +59,10 @@ namespace TEN::Entities::TR3
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		if (item->TouchBits)
+		if (item->TouchBits != NULL)
 		{
+			DoDamage(LaraItem, SCUBA_ATTACK_DAMAGE);
 			DoBloodSplat(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, (GetRandomControl() & 3) + 4, LaraItem->Pose.Orientation.y, LaraItem->RoomNumber);
-			DoDamage(LaraItem, 50);
 			KillItem(itemNumber);
 		}
 		else
@@ -70,6 +71,7 @@ namespace TEN::Entities::TR3
 			int oz = item->Pose.Position.z;
 
 			int velocity = item->Animation.Velocity * phd_cos(item->Pose.Orientation.x);
+
 			item->Pose.Position.z += velocity * phd_cos(item->Pose.Orientation.y);
 			item->Pose.Position.x += velocity * phd_sin(item->Pose.Orientation.y);
 			item->Pose.Position.y += -item->Animation.Velocity * phd_sin(item->Pose.Orientation.x);
@@ -135,11 +137,7 @@ namespace TEN::Entities::TR3
 
 				shoot = LOS(&start, &target);
 				if (shoot)
-				{
-					creature->Target.x = LaraItem->Pose.Position.x;
-					creature->Target.y = LaraItem->Pose.Position.y;
-					creature->Target.z = LaraItem->Pose.Position.z;
-				}
+					creature->Target = LaraItem->Pose.Position;
 
 				if (AI.angle < -ANGLE(45.0f) || AI.angle > ANGLE(45.0f))
 					shoot = false;
@@ -166,7 +164,8 @@ namespace TEN::Entities::TR3
 			switch (item->Animation.ActiveState)
 			{
 			case 1:
-				creature->MaxTurn = ANGLE(3.0f);
+				creature->MaxTurn = SCUBA_SWIM_TURN_RATE_MAX;
+
 				if (shoot)
 					neck = -AI.angle;
 
@@ -186,7 +185,8 @@ namespace TEN::Entities::TR3
 					neck = -AI.angle;
 
 				if (!shoot || creature->Mood == MoodType::Escape ||
-					(creature->Target.y < waterHeight && item->Pose.Position.y < waterHeight + creature->LOT.Fly))
+					(creature->Target.y < waterHeight &&
+						item->Pose.Position.y < (waterHeight + creature->LOT.Fly)))
 				{
 					item->Animation.TargetState = 1;
 				}
@@ -201,7 +201,7 @@ namespace TEN::Entities::TR3
 
 				if (!creature->Flags)
 				{
-					ShootHarpoon(item, item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, item->Animation.Velocity, item->Pose.Orientation.y, item->RoomNumber);
+					ShootHarpoon(item, item->Pose.Position, item->Animation.Velocity, item->Pose.Orientation.y, item->RoomNumber);
 					creature->Flags = 1;
 				}
 
@@ -209,7 +209,7 @@ namespace TEN::Entities::TR3
 
 
 			case 2:
-				creature->MaxTurn = ANGLE(3.0f);
+				creature->MaxTurn = SCUBA_SWIM_TURN_RATE_MAX;
 
 				if (shoot)
 					head = AI.angle;
@@ -242,7 +242,7 @@ namespace TEN::Entities::TR3
 
 				if (!creature->Flags)
 				{
-					ShootHarpoon(item, item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, item->Animation.Velocity, item->Pose.Orientation.y, item->RoomNumber);
+					ShootHarpoon(item, item->Pose.Position, item->Animation.Velocity, item->Pose.Orientation.y, item->RoomNumber);
 					creature->Flags = 1;
 				}
 

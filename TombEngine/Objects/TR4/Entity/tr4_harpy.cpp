@@ -29,7 +29,7 @@ namespace TEN::Entities::TR4
 	const auto HarpyBite3	= BiteInfo(Vector3::Zero, 15);
 	const auto HarpyAttack1 = BiteInfo(Vector3(0.0f, 128.0f, 0.0f), 2);
 	const auto HarpyAttack2 = BiteInfo(Vector3(0.0f, 128.0f, 0.0f), 4);
-	const vector<int> HarpySwoopAttackJoints = { HarpyBite2.meshNum, HarpyBite1.meshNum, HarpyBite3.meshNum };
+	const vector<int> HarpySwoopAttackJoints   = { HarpyBite2.meshNum, HarpyBite1.meshNum, HarpyBite3.meshNum };
 	const vector<int> HarpyStingerAttackJoints = { HarpyAttack1.meshNum, HarpyAttack2.meshNum };
 
 	enum HarpyState
@@ -530,7 +530,6 @@ namespace TEN::Entities::TR4
 
 					DoDamage(creature->Enemy, HARPY_STINGER_ATTACK_DAMAGE);
 					CreatureEffect2(item, HarpyBite3, 10, -1, DoBloodSplat);
-
 					creature->Flags = 1;
 				}
 
