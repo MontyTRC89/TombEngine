@@ -10,12 +10,19 @@ LevelFuncs.__TEN_eventSequence_callNext = function(sequenceName, nextTimerName, 
 
 	thisES.currentTimer = thisES.currentTimer + 1
 	if thisES.currentTimer <= #thisES.timers then
-		Timer.Get(nextTimerName):Start()
+		local theTimer = Timer.Get(nextTimerName)
+		theTimer:SetRemainingTime(theTimer:GetTotalTime())
+		theTimer:Start()
+	elseif thisES.loop then
+		local theTimer = Timer.Get(thisES.firstTimerName)
+		theTimer:SetRemainingTime(theTimer:GetTotalTime())
+		theTimer:Start()
+		thisES.currentTimer = 1
 	end
 end
 
 EventSequence = {
-	Create = function(name, showString, ...)
+	Create = function(name, loop, showString, ...)
 		local obj = {}
 		local mt = {}
 		mt.__index = EventSequence
@@ -27,6 +34,7 @@ EventSequence = {
 		local thisES = LevelVars.__TEN_eventSequence.sequences[name]
 		thisES.name = name
 		thisES.timesFuncsAndArgs = {...}
+		thisES.loop = loop
 		
 		local tfa = thisES.timesFuncsAndArgs
 		thisES.timers = {}
@@ -44,6 +52,10 @@ EventSequence = {
 
 			local funcAndArgs = tfa[i+1]
 			local func
+
+			if i == 1 then
+				thisES.firstTimerName = timerName
+			end
 
 			if type(funcAndArgs) == "string" then
 				-- we only have a function
