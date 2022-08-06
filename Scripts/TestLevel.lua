@@ -17,13 +17,13 @@ LevelFuncs.PrintText = function(Triggerer, Argument)
 end
 
 
--- Another example function which emits rotating electric halo around Lara, when
--- action key is pressed.
+-- Another example function which emits rotating electric halo around object,
+-- which triggered it.
 
 local currentX = 0.0
 local currentY = 0.0
 
-LevelFuncs.OnControlPhase = function() 
+LevelFuncs.EmitHaloOnActionPush = function(Triggerer) 
     
 	-- This is a list of all possible keys which can be checked for their pushed/not pushed state.
 	-- Later we will move them to separate internal file or make them internal TEN constants.
@@ -49,20 +49,38 @@ LevelFuncs.OnControlPhase = function()
         StepRight = 16
     }
 	
-	-- Your Lara in your level should have Lua name "lara".
+	-- First argument which is passed to function that is triggered from TE volumes is
+	-- always an object which triggered it (except cases when triggerer is static mesh or
+	-- flyby camera). We can directly use Triggerer argument to get some properties from
+	-- it. In this case, we get position of a root joint (in case of Lara, it is her hips).
+	
+    local pos = Triggerer:GetJointPosition(0)
 
-    local pos = GetMoveableByName("lara"):GetJointPosition(0)
-
+	-- math.random() is an internal Lua method which returns a value between 2 specified limits,
+	-- in our case something between 200 and 255. We use it to vary halo intensity a bit.
+	
     local color = math.random(200, 255)
+	
+    local velocity = Vec3(0, 0, 0) -- No velocity	
+	
+	-- Again, we can use velocity to get some value between 60 and 80 to vary rotation rate of
+	-- a spawned halo particle.
+	
+    local rot = math.random(60, 80)
 
-    local vel = Vec3(0, 0, 0)
-    local rot = math.random(60, 80) * math.random(-1, 1)
+	-- circleLength is standard mathematical constant for circle length which is later used to
+	-- get sin/cos value to rotate light and particle around an object.
 
     local circleLength = 3.14 * 2.0
     
+	-- Progress currentX and currentY variables to change current X and Y positions of the halo.
+	
     currentX = currentX + 0.2
     currentY = currentY + 0.1
     
+	-- Here we clamp currentX and currentY values to max circle length, because sin/cos operations
+	-- can't operate out of circle length range.
+	
     if (currentX > circleLength) then
         currentX = currentX - circleLength;
     end
@@ -71,23 +89,29 @@ LevelFuncs.OnControlPhase = function()
         currentY = currentY - circleLength;
     end
     
-    local partX = math.cos(currentX) * 256
-    local partZ = math.sin(currentX) * 256
+	local horizontalAmplitude = 384  -- 3 clicks height, where effect wanders about.
+	local haloRotationDistance = 256 -- rotate on distance 2 clicks around object.
+	
+	-- Calculate relative offset of a halo using simple sin/cos functions.
+	
+    local offsetX = math.cos(currentX) * haloRotationDistance
+    local offsetZ = math.sin(currentX) * haloRotationDistance
     
-    local partY = math.sin(currentY) * 384
+    local offsetY = math.sin(currentY) * horizontalAmplitude
     
-    pos.x = pos.x + partX
-    pos.y = pos.y + partY
-    pos.z = pos.z + partZ
-    
-    if (KeyIsHit(Keys.Action)) then
-        Misc.PlaySound(198, pos)
-		Misc.Vibrate(0.5, 0.1)
-    end
-    
-    if (KeyIsHeld(Keys.Action)) then
-        Misc.PlaySound(197, pos)
-        Effects.EmitParticle(pos, vel, 5, 1, rot, Color.new(color * 0.5, color * 0.5, color), Color.new(color * 0.2, color * 0.1, color), 2, 16, 64, 32, false, false)
-        Effects.EmitLight(pos, Color.new(color * 0.5, color * 0.5, color), 7)
-    end
+	-- Add relative offsets to joint position.
+	
+    pos.x = pos.x + offsetX
+    pos.y = pos.y + offsetY
+    pos.z = pos.z + offsetZ
+	
+	-- Play electrical sound.
+	
+	Misc.PlaySound(197, pos)
+	
+	-- Emit particle and light. Look into manual for list of arguments.
+	
+    Effects.EmitParticle(pos, velocity, 2, 1, rot, Color.new(color * 0.5, color * 0.5, color), Color.new(color * 0.2, color * 0.1, color), 2, 16, 64, 1, false, false)
+    Effects.EmitLight(pos, Color.new(color * 0.5, color * 0.5, color), 7)
+	
 end
