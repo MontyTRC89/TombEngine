@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "Objects/TR2/Entity/tr2_birdmonster.h"
+#include "Objects/TR2/Entity/tr2_bird_monster.h"
 
 #include "Game/control/box.h"
 #include "Game/control/control.h"
