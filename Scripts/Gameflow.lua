@@ -71,7 +71,6 @@ test.objects = {
 		-1,
 		ItemAction.USE
 	),
-	myObj, 
 	InventoryItem.new(
 		"tut1_ba_cartouche2",
 		InvID.PUZZLE_ITEM3_COMBO2,
