@@ -42,6 +42,7 @@ void ControlMissile(short fxNumber)
 {
 	auto* fx = &EffectList[fxNumber]; // TODO: add fx->target (ItemInfo* target) to get the actual target (if it was really it)
 	auto isUnderwater = TestEnvironment(ENV_FLAG_WATER, fx->roomNumber);
+	auto soundFxType = isUnderwater ? SoundEnvironment::Water : SoundEnvironment::Land;
 
 	if (fx->objectNumber == ID_SCUBA_HARPOON && isUnderwater && fx->pos.Orientation.x > -0x3000)
 		fx->pos.Orientation.x -= ANGLE(1.0f);
@@ -63,11 +64,11 @@ void ControlMissile(short fxNumber)
 			fx->objectNumber == ID_SCUBA_HARPOON ||
 			fx->objectNumber == ID_PROJ_SHARD)
 		{
-			SoundEffect((fx->objectNumber == ID_SCUBA_HARPOON) ? SFX_TR4_WEAPON_RICOCHET : SFX_TR2_CIRCLE_BLADE_HIT, &fx->pos);
+			SoundEffect((fx->objectNumber == ID_SCUBA_HARPOON) ? SFX_TR4_WEAPON_RICOCHET : SFX_TR2_CIRCLE_BLADE_HIT, &fx->pos, soundFxType);
 		}
 		else if (fx->objectNumber == ID_PROJ_BOMB)
 		{
-			SoundEffect(SFX_TR1_ATLANTEAN_EXPLODE, &fx->pos, isUnderwater ? SoundEnvironment::Water : SoundEnvironment::Land);
+			SoundEffect(SFX_TR1_ATLANTEAN_EXPLODE, &fx->pos, soundFxType);
 			TriggerExplosionSparks(fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z, NULL, false, isUnderwater, fx->roomNumber);
 		}
 
@@ -91,7 +92,7 @@ void ControlMissile(short fxNumber)
 			else if (fx->objectNumber == ID_PROJ_SHARD)
 			{
 				TriggerBlood(fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z, NULL, 10);
-				SoundEffect(SFX_TR4_BLOOD_LOOP, &fx->pos, isUnderwater ? SoundEnvironment::Water : SoundEnvironment::Land);
+				SoundEffect(SFX_TR4_BLOOD_LOOP, &fx->pos, soundFxType);
 				DoDamage(LaraItem, MUTANT_SHARD_DAMAGE);
 				KillEffect(fxNumber);
 			}
