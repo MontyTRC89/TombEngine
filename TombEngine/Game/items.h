@@ -121,12 +121,12 @@ struct ItemInfo
 	std::string LuaCallbackOnCollidedWithObjectName;
 	std::string LuaCallbackOnCollidedWithRoomName;
 
+	bool TestBits(JointBitType type, std::vector<int> jointIndices);
+	bool TestBits(JointBitType type, int jointIndex);
 	void SetBits(JointBitType type, std::vector<int> jointIndices);
 	void SetBits(JointBitType type, int jointIndex);
 	void ClearBits(JointBitType type, std::vector<int> jointIndices);
 	void ClearBits(JointBitType type, int jointIndex);
-	bool TestBits(JointBitType type, std::vector<int> jointIndices);
-	bool TestBits(JointBitType type, int jointIndex);
 
 	bool TestOcb(short ocbFlags);
 	void RemoveOcb(short ocbFlags);

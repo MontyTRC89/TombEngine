@@ -8,8 +8,10 @@
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
 #include "Specific/level.h"
+#include "Specific/prng.h"
 #include "Specific/setup.h"
 
+using namespace TEN::Math::Random;
 using std::vector;
 
 namespace TEN::Entities::TR2
@@ -105,7 +107,7 @@ namespace TEN::Entities::TR2
 
 				if (AI.ahead && AI.distance < BIRD_MONSTER_SLAM_CRUSH_ATTACK_RANGE)
 				{
-					if (GetRandomControl() < 0x4000)
+					if (TestProbability(0.5f))
 						item->Animation.TargetState = BMONSTER_STATE_SLAM_ATTACK_START;
 					else
 						item->Animation.TargetState = BMONSTER_STATE_CRUSH_ATTACK_START;
