@@ -19,9 +19,9 @@ using std::vector;
 
 namespace TEN::Entities::TR1
 {
-	constexpr auto WING_IDLE_JUMP_ATTACK_DAMAGE = 150;
-	constexpr auto WING_RUN_JUMP_ATTACK_DAMAGE	= 100;
-	constexpr auto WING_SWIPE_ATTACK_DAMAGE		= 200;
+	constexpr auto WINGED_MUTANT_IDLE_JUMP_ATTACK_DAMAGE = 150;
+	constexpr auto WINGED_MUTANT_RUN_JUMP_ATTACK_DAMAGE	 = 100;
+	constexpr auto WINGED_MUTANT_SWIPE_ATTACK_DAMAGE	 = 200;
 
 	constexpr auto WINGED_MUTANT_WALK_RANGE		= SQUARE(SECTOR(4.5f));
 	constexpr auto WINGED_MUTANT_ATTACK_3_RANGE = SQUARE(CLICK(1.17f));
@@ -380,7 +380,7 @@ namespace TEN::Entities::TR1
 				if (item->Animation.RequiredState == WMUTANT_STATE_NONE &&
 					item->TestBits(JointBitType::Touch, WingedMutantJoints[1]))
 				{
-					DoDamage(creature->Enemy, WING_IDLE_JUMP_ATTACK_DAMAGE);
+					DoDamage(creature->Enemy, WINGED_MUTANT_IDLE_JUMP_ATTACK_DAMAGE);
 					CreatureEffect(item, WingedMutantBite, DoBloodSplat);
 					item->Animation.TargetState = WMUTANT_STATE_IDLE;
 				}
@@ -391,7 +391,7 @@ namespace TEN::Entities::TR1
 				if (item->Animation.RequiredState == WMUTANT_STATE_NONE &&
 					item->TestBits(JointBitType::Touch, WingedMutantJoints[1]))
 				{
-					DoDamage(creature->Enemy, WING_RUN_JUMP_ATTACK_DAMAGE);
+					DoDamage(creature->Enemy, WINGED_MUTANT_RUN_JUMP_ATTACK_DAMAGE);
 					CreatureEffect(item, WingedMutantBite, DoBloodSplat);
 					item->Animation.TargetState = WMUTANT_STATE_RUN_FORWARD;
 				}
@@ -402,7 +402,7 @@ namespace TEN::Entities::TR1
 				if (item->Animation.RequiredState == WMUTANT_STATE_NONE &&
 					item->TestBits(JointBitType::Touch, WingedMutantJoints[1]))
 				{
-					DoDamage(creature->Enemy, WING_SWIPE_ATTACK_DAMAGE);
+					DoDamage(creature->Enemy, WINGED_MUTANT_SWIPE_ATTACK_DAMAGE);
 					CreatureEffect(item, WingedMutantBite, DoBloodSplat);
 					item->Animation.TargetState = WMUTANT_STATE_IDLE;
 				}
