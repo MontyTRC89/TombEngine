@@ -368,7 +368,7 @@ CALL gen.bat</Command>
     <ClInclude Include="Objects\TR1\Entity\tr1_giant_mutant.h" />
     <ClInclude Include="Objects\TR1\Entity\tr1_wolf.h" />
     <ClInclude Include="Objects\TR2\Entity\tr2_barracuda.h" />
-    <ClInclude Include="Objects\TR2\Entity\tr2_birdmonster.h" />
+    <ClInclude Include="Objects\TR2\Entity\tr2_bird_monster.h" />
     <ClInclude Include="Objects\TR2\Entity\tr2_dragon.h" />
     <ClInclude Include="Objects\TR2\Entity\tr2_eagle_or_crow.h" />
     <ClInclude Include="Objects\TR2\Entity\tr2_knifethrower.h" />
@@ -827,7 +827,7 @@ CALL gen.bat</Command>
     <ClCompile Include="Objects\TR1\Entity\tr1_bear.cpp" />
     <ClCompile Include="Objects\TR1\Entity\tr1_wolf.cpp" />
     <ClCompile Include="Objects\TR2\Entity\tr2_barracuda.cpp" />
-    <ClCompile Include="Objects\TR2\Entity\tr2_birdmonster.cpp" />
+    <ClCompile Include="Objects\TR2\Entity\tr2_bird_monster.cpp" />
     <ClCompile Include="Objects\TR2\Entity\tr2_rat.cpp" />
     <ClCompile Include="Objects\TR2\Entity\tr2_shark.cpp" />
     <ClCompile Include="Objects\TR2\Entity\tr2_silencer.cpp" />
