@@ -321,6 +321,7 @@ void TEN::Renderer::Renderer11::InitialiseScreen(int w, int h, bool windowed, HW
 
 void TEN::Renderer::Renderer11::Create()
 {
+	TENLog("Creating DX11 renderer device...", LogLevel::Info);
 
 	D3D_FEATURE_LEVEL levels[] = { D3D_FEATURE_LEVEL_10_1 }; 
 	D3D_FEATURE_LEVEL featureLevel;
