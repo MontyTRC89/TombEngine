@@ -7,6 +7,10 @@
 constexpr auto NO_EVENT_SET = -1;
 constexpr auto NO_CALL_COUNTER = -1;
 
+constexpr auto VOLUME_BUSY_TIMEOUT = 10;
+
+using namespace TEN::Control::Volumes;
+
 enum class TriggerStatus
 {
 	Outside,
@@ -44,7 +48,9 @@ struct TriggerVolume
 	BoundingOrientedBox Box;
 	BoundingSphere Sphere;
 
-	TriggerStatus Status;
+	TriggerStatus Status = TriggerStatus::Outside;
+	VolumeTriggerer Triggerer = nullptr;
+	int LastActivityTimestamp = 0;
 };
 
 namespace TEN::Control::Volumes
