@@ -3,7 +3,7 @@ Version 1.0.1
 
 - Fixed rope transparency.
 - Fixed incorrect polerope grabbing.
-
+- Fixed camera behaviour with pushable blocks.
 
 Version 1.0
 ===========
