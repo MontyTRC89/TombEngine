@@ -3,7 +3,7 @@ Version 1.0.1
 
 - Fixed rope transparency.
 - Fixed incorrect polerope grabbing.
-
+- Fixed minecart unduck on inclines.
 
 Version 1.0
 ===========
