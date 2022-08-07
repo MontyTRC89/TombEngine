@@ -251,8 +251,7 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer11::DrawPostprocess(ID3D11RenderTargetView* target, ID3D11DepthStencilView* depthTarget,
-		RenderView& view)
+	void Renderer11::DrawPostprocess(ID3D11RenderTargetView* target, ID3D11DepthStencilView* depthTarget, RenderView& view)
 	{
 		SetBlendMode(BLENDMODE_OPAQUE);
 		SetCullMode(CULL_MODE_CCW);
