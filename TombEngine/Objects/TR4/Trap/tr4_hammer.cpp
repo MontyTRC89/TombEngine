@@ -15,16 +15,18 @@
 
 namespace TEN::Entities::TR4
 {
-    //TODO
+
     enum HammerState
     {
-
+        HAMMER_STATE_NONE = 0,
+        HAMMER_STATE_IDLE = 1,
+        HAMMER_STATE_ACTIVE = 2,
     };
 
-    //TODO
     enum HammerAnim
     {
-
+        HAMMER_ANIM_NOT_ACTIVED = 0,
+        HAMMER_ANIM_ACTIVATED = 1
     };
 
 
@@ -50,7 +52,7 @@ namespace TEN::Entities::TR4
             else
                 *(long*)&item->ItemFlags[0] = 0;
         }
-        else if (item->Animation.ActiveState == 1 && item->Animation.TargetState == 1)
+        else if (item->Animation.ActiveState == HAMMER_STATE_IDLE && item->Animation.TargetState == HAMMER_STATE_IDLE)
         {
             if (item->ItemFlags[2])
             {
@@ -68,14 +70,14 @@ namespace TEN::Entities::TR4
             {
                 item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 1;
                 item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-                item->Animation.ActiveState = 2;
-                item->Animation.TargetState = 2;
+                item->Animation.ActiveState = HAMMER_STATE_ACTIVE;
+                item->Animation.TargetState = HAMMER_STATE_ACTIVE;
                 item->ItemFlags[2] = 60;
             }
         }
         else
         {
-            item->Animation.TargetState = 1;
+            item->Animation.TargetState = HAMMER_STATE_IDLE;
 
             if (frameNumber < 52)
                 *(long*)&item->ItemFlags[0] = 0x7E0;
