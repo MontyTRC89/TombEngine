@@ -45,22 +45,23 @@ float4 Antialias(PixelShaderInput input)
 
 	float2 dir;
 	dir.x = -((lumaNW + lumaNE) - (lumaSW + lumaSE));
-	dir.y = ((lumaNW + lumaSW) - (lumaNE + lumaSE));
+	dir.y =  ((lumaNW + lumaSW) - (lumaNE + lumaSE));
 
 	float dirReduce = max(
 		(lumaNW + lumaNE + lumaSW + lumaSE) * (0.25f * FXAA_REDUCE_MUL), FXAA_REDUCE_MIN);
 
 	float rcpDirMin = 1.0f / (min(abs(dir.x), abs(dir.y)) + dirReduce);
 
-	dir = min(float2(FXAA_SPAN_MAX, FXAA_SPAN_MAX),
-		max(float2(-FXAA_SPAN_MAX, -FXAA_SPAN_MAX), dir * rcpDirMin)) * add;
+	dir = min(float2( FXAA_SPAN_MAX,  FXAA_SPAN_MAX),
+		  max(float2(-FXAA_SPAN_MAX, -FXAA_SPAN_MAX), dir * rcpDirMin)) * add;
 
-	float3 rgbA = (1.0f / 2.0f) * (Texture.Sample(Sampler, input.UV + dir * (1.0f / 3.0f - 0.5f)) +
-		Texture.Sample(Sampler, input.UV + dir * (2.0f / 2.0f - 0.5f)));
+	float3 rgbA = (1.0f / 2.0f) * 
+		(Texture.Sample(Sampler, input.UV + dir * (1.0f / 3.0f - 0.5f)) +
+		 Texture.Sample(Sampler, input.UV + dir * (2.0f / 2.0f - 0.5f)));
 
 	float3 rgbB = rgbA * (1.0f / 2.0f) + (1.0f / 4.0f) *
 		(Texture.Sample(Sampler, input.UV + dir * (0.0f / 3.0f - 0.5f)) +
-			Texture.Sample(Sampler, input.UV + dir * (3.0f / 3.0f - 0.5f)));
+		 Texture.Sample(Sampler, input.UV + dir * (3.0f / 3.0f - 0.5f)));
 
 	float lumaB = Luma(rgbB);
 
