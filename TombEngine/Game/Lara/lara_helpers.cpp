@@ -4,6 +4,7 @@
 #include "Flow/ScriptInterfaceFlowHandler.h"
 #include "Game/collision/collide_room.h"
 #include "Game/control/control.h"
+#include "Game/control/volume.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_collide.h"
@@ -24,6 +25,7 @@
 #include "Objects/TR4/Vehicles/jeep.h"
 #include "Objects/TR4/Vehicles/motorbike.h"
 
+using namespace TEN::Control::Volumes;
 using namespace TEN::Input;
 using namespace TEN::Renderer;
 
@@ -77,6 +79,8 @@ bool HandleLaraVehicle(ItemInfo* item, CollisionInfo* coll)
 
 	if (lara->Vehicle != NO_ITEM)
 	{
+		TestVolumes(lara->Vehicle);
+
 		switch (g_Level.Items[lara->Vehicle].ObjectNumber)
 		{
 		case ID_QUAD:

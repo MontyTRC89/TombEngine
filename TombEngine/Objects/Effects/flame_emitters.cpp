@@ -13,10 +13,10 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Sound/sound.h"
+#include "Specific/Input/Input.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
 #include "Specific/trmath.h"
-#include "input.h"
 
 using namespace TEN::Input;
 using namespace TEN::Effects::Lara;
