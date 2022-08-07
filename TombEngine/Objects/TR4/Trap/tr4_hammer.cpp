@@ -13,6 +13,13 @@
 #include "Specific/input.h"
 #include <Game/effects/debris.h>
 
+constexpr auto RIGHT_HAMMER_BITS = ((1 << 5) | (1 << 6) | (1 << 7));
+constexpr auto LEFT_HAMMER_BITS = ((1 << 8) | (1 << 9) | (1 << 10));
+constexpr auto HAMMER_HIT_DAMAGE = 150;
+constexpr auto HAMMER_OCB4_INTERVAL = 60;
+constexpr auto HAMMER_HIT_FRAME = 8;        //frame the hammer explodes pushables
+constexpr auto HAMMER_CLOSED_FRAME = 52;    //frame the hammer is fully closed
+
 namespace TEN::Entities::TR4
 {
 
@@ -29,13 +36,15 @@ namespace TEN::Entities::TR4
         HAMMER_ANIM_ACTIVATED = 1
     };
 
+    //ItemFlags[0] | ItemFlags[1] = hurtful bits.
+    //ItemFlags[2] = Timer. (X amount of frames before triggering again)
+    //ItemFlags[3] = Famage dealt to Lara at touch, per frame.
 
     void HammerControl(short itemNumber)
     {
         auto* item = &g_Level.Items[itemNumber];
-
         int frameNumber = item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase;
-        item->ItemFlags[3] = 150;
+        item->ItemFlags[3] = HAMMER_HIT_DAMAGE;
 
         if (!TriggerActive(item))
         {
@@ -47,8 +56,8 @@ namespace TEN::Entities::TR4
 
         if (!item->TriggerFlags)
         {
-            if (frameNumber < 52)
-                *(long*)&item->ItemFlags[0] = 0xE0;
+            if (frameNumber < HAMMER_CLOSED_FRAME)
+                *(long*)&item->ItemFlags[0] = RIGHT_HAMMER_BITS;
             else
                 *(long*)&item->ItemFlags[0] = 0;
         }
@@ -68,23 +77,23 @@ namespace TEN::Entities::TR4
             }
             else
             {
-                item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 1;
+                item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + HAMMER_ANIM_ACTIVATED;
                 item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
                 item->Animation.ActiveState = HAMMER_STATE_ACTIVE;
                 item->Animation.TargetState = HAMMER_STATE_ACTIVE;
-                item->ItemFlags[2] = 60;
+                item->ItemFlags[2] = HAMMER_OCB4_INTERVAL;
             }
         }
         else
         {
             item->Animation.TargetState = HAMMER_STATE_IDLE;
 
-            if (frameNumber < 52)
-                *(long*)&item->ItemFlags[0] = 0x7E0;
+            if (frameNumber < HAMMER_CLOSED_FRAME)
+                *(long*)&item->ItemFlags[0] = RIGHT_HAMMER_BITS | LEFT_HAMMER_BITS;
             else
                 *(long*)&item->ItemFlags[0] = 0;
 
-            if (frameNumber == 8)
+            if (frameNumber == HAMMER_HIT_FRAME)
             {
                 if (item->TriggerFlags == 2)
                 {
@@ -164,7 +173,7 @@ namespace TEN::Entities::TR4
                     }
                 }
             }
-            else if (frameNumber > 52 && item->TriggerFlags == 2)
+            else if (frameNumber > HAMMER_CLOSED_FRAME && item->TriggerFlags == 2)
                 item->Flags &= ~CODE_BITS;
         }
 
