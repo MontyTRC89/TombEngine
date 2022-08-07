@@ -27,7 +27,7 @@ void HammerControl(short itemNumber)
 
     if (!TriggerActive(item))
     {
-        *(long*)&item->ItemFlags[0] = 0;
+        item->ItemFlags[0] = 0;
         return;
     }
 
@@ -72,9 +72,9 @@ void HammerControl(short itemNumber)
         item->Animation.TargetState = 1;
 
         if (frameNumber < 52)
-            *(long*)&item->ItemFlags[0] = 0x7E0;
+            item->ItemFlags[0] = 0x7E0;
         else
-            *(long*)&item->ItemFlags[0] = 0;
+            item->ItemFlags[0] = 0;
         /*
         if (frame == 8)
         {
