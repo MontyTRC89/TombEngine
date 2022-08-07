@@ -369,29 +369,29 @@ void LogicHandler::ExecuteScriptFile(const std::string & luaFilename)
 	m_handler.ExecuteScript(luaFilename);
 }
 
-void LogicHandler::ExecuteFunction(std::string const& luaFuncName, short idOne, short idTwo) 
+void LogicHandler::ExecuteFunction(std::string const& name, short idOne, short idTwo) 
 {
 	sol::protected_function_result r;
-	sol::protected_function func = (*m_handler.GetState())["LevelFuncs"][luaFuncName.c_str()];
+	sol::protected_function func = (*m_handler.GetState())["LevelFuncs"][name.c_str()];
 	r = func(std::make_unique<Moveable>(idOne), std::make_unique<Moveable>(idTwo));
 	if (!r.valid())
 	{
 		sol::error err = r;
-		ScriptAssertF(false, "Could not execute function {}: {}", luaFuncName, err.what());
+		ScriptAssertF(false, "Could not execute function {}: {}", name, err.what());
 	}
 }
 
-void LogicHandler::ExecuteFunction(std::string const& name, TEN::Control::Volumes::VolumeTriggerer triggerer)
+void LogicHandler::ExecuteFunction(std::string const& name, TEN::Control::Volumes::VolumeTriggerer triggerer, std::string const& arguments)
 {
 	sol::protected_function_result r;
 	sol::protected_function func = (*m_handler.GetState())["LevelFuncs"][name.c_str()];
 	if (std::holds_alternative<short>(triggerer))
 	{
-		r = func(std::make_unique<Moveable>(std::get<short>(triggerer), true));
+		r = func(std::make_unique<Moveable>(std::get<short>(triggerer), true), arguments);
 	}
 	else
 	{
-		r = func();
+		r = func(nullptr, arguments);
 	}
 
 	if (!r.valid())
@@ -401,7 +401,8 @@ void LogicHandler::ExecuteFunction(std::string const& name, TEN::Control::Volume
 	}
 }
 
-static void doCallback(sol::protected_function const & func, std::optional<float> dt = std::nullopt)  {
+static void doCallback(sol::protected_function const & func, std::optional<float> dt = std::nullopt)
+{
 	auto r = dt.has_value() ? func(dt) : func();
 
 	if (!r.valid())
