@@ -22,11 +22,11 @@ void InitTENLog()
 	logger->set_pattern("[%Y-%b-%d %T] [%^%l%$] %v");
 }
 
-void TENLog(std::string_view str, LogLevel level, LogConfig config)
+void TENLog(std::string_view str, LogLevel level, LogConfig config, bool allowSpam)
 {
 	static std::string lastString = {};
 
-	if (lastString == str)
+	if (lastString == str && !allowSpam)
 		return;
 
 	if constexpr (!DebugBuild)
