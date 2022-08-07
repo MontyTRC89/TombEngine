@@ -25,7 +25,7 @@ namespace TEN::Entities::TR4
 
     enum HammerAnim
     {
-        HAMMER_ANIM_NOT_ACTIVED = 0,
+        HAMMER_ANIM_NOT_ACTIVATED = 0,
         HAMMER_ANIM_ACTIVATED = 1
     };
 
