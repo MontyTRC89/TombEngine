@@ -803,7 +803,7 @@ void GuiController::HandleDisplaySettingsInput(bool pause)
 
 		case 4:
 			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
-			CurrentSettings.conf.EnableVolumetricFog = !CurrentSettings.conf.EnableVolumetricFog;
+			CurrentSettings.conf.EnableAntialiasing = !CurrentSettings.conf.EnableAntialiasing;
 			break;
 		}
 	}
@@ -838,7 +838,7 @@ void GuiController::HandleDisplaySettingsInput(bool pause)
 
 		case 4:
 			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
-			CurrentSettings.conf.EnableVolumetricFog = !CurrentSettings.conf.EnableVolumetricFog;
+			CurrentSettings.conf.EnableAntialiasing = !CurrentSettings.conf.EnableAntialiasing;
 			break;
 		}
 	}

@@ -149,9 +149,9 @@ namespace TEN::Renderer
 			AddString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().conf.EnableCaustics), PRINTSTRING_COLOR_WHITE, SF(title_option == 3));
 			GetNextLinePosition(&y);
 
-			// Enable volumetric fog
-			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_VOLUMETRIC_FOG), PRINTSTRING_COLOR_ORANGE, SF(title_option == 4));
-			AddString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().conf.EnableVolumetricFog), PRINTSTRING_COLOR_WHITE, SF(title_option == 4));
+			// Enable antialiasing
+			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_ANTIALIASING), PRINTSTRING_COLOR_ORANGE, SF(title_option == 4));
+			AddString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().conf.EnableAntialiasing), PRINTSTRING_COLOR_WHITE, SF(title_option == 4));
 			GetNextBlockPosition(&y);
 
 			// Apply

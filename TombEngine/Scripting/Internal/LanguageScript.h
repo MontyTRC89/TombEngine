@@ -68,6 +68,7 @@
 #define STRING_SHADOWS_NONE				"none"
 #define STRING_CAUSTICS					"caustics"
 #define STRING_VOLUMETRIC_FOG			"volumetric_fog"
+#define STRING_ANTIALIASING				"antialiasing"
 #define STRING_APPLY					"apply"
 #define STRING_BACK						"back"
 #define STRING_SOUND					"sound"

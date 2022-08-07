@@ -1565,7 +1565,7 @@ namespace TEN::Renderer
 
 		DrawDebugInfo(view);
 		DrawAllStrings();
-		DrawFadeAndBars(target, depthTarget, view);
+		DrawPostprocess(target, depthTarget, view);
 
 		ClearScene();
 	}

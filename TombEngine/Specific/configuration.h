@@ -13,7 +13,7 @@
 #define REGKEY_SHADOW_MAP				"ShadowMap"
 #define REGKEY_SHADOW_BLOBS				"ShadowBlobs"
 #define REGKEY_CAUSTICS					"Caustics"
-#define REGKEY_VOLUMETRIC_FOG			"VolumetricFog"
+#define REGKEY_ANTIALIASING				"Antialiasing"
 
 #define REGKEY_SOUND_DEVICE				"SoundDevice"
 #define REGKEY_ENABLE_SOUND				"EnableSound"
@@ -39,7 +39,7 @@ struct GameConfiguration
 	int SfxVolume;
 
 	bool EnableCaustics;
-	bool EnableVolumetricFog;
+	bool EnableAntialiasing;
 	ShadowMode ShadowType;
 	int ShadowMapSize = 1024;
 	int ShadowMaxBlobs = 16;

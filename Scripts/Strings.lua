@@ -1109,6 +1109,16 @@ local strings = {
 		"",
 		""
 	},
+	antialiasing = {
+		"Antialiasing",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		""
+	},
 	waiting_for_key = {
 		"Waiting For Key",
 		"",
