@@ -18,7 +18,6 @@
 #define IDC_BILINEAR                    1032
 #define IDC_CAUSTICS                    1032
 #define IDC_TEXRESTXT                   1033
-#define IDC_LOWTEXT                     1034
 #define IDC_ANTIALIASING                1034
 #define IDC_LOWBUMP                     1035
 #define IDC_BUMPMAP                     1036

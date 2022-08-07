@@ -101,6 +101,27 @@ namespace TEN::Renderer
 		auto* shadowMode = g_Gui.GetCurrentSettings().conf.ShadowType != ShadowMode::None ? 
 			(g_Gui.GetCurrentSettings().conf.ShadowType == ShadowMode::Lara ? STRING_SHADOWS_PLAYER : STRING_SHADOWS_ALL) : STRING_SHADOWS_NONE;
 
+		const char* antialiasMode;
+		switch (g_Gui.GetCurrentSettings().conf.Antialiasing)
+		{
+			default:
+			case AntialiasingMode::None:
+				antialiasMode = STRING_ANTIALIASING_NONE;
+				break;
+
+			case AntialiasingMode::Low:
+				antialiasMode = STRING_ANTIALIASING_LOW;
+				break;
+
+			case AntialiasingMode::Medium:
+				antialiasMode = STRING_ANTIALIASING_MEDIUM;
+				break;
+
+			case AntialiasingMode::High:
+				antialiasMode = STRING_ANTIALIASING_HIGH;
+				break;
+		}
+
 		switch (menu)
 		{
 		case Menu::Options:
@@ -151,7 +172,7 @@ namespace TEN::Renderer
 
 			// Enable antialiasing
 			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_ANTIALIASING), PRINTSTRING_COLOR_ORANGE, SF(title_option == 4));
-			AddString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().conf.EnableAntialiasing), PRINTSTRING_COLOR_WHITE, SF(title_option == 4));
+			AddString(MenuRightSideEntry, y, g_GameFlow->GetString(antialiasMode), PRINTSTRING_COLOR_WHITE, SF(title_option == 4));
 			GetNextBlockPosition(&y);
 
 			// Apply
@@ -468,6 +489,7 @@ namespace TEN::Renderer
 		g_Gui.DrawAmmoSelector();
 		g_Gui.FadeAmmoSelector();
 		g_Gui.DrawCompass();
+
 		DrawAllStrings();
 	}
 

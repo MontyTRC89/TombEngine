@@ -298,7 +298,7 @@ namespace TEN::Renderer
 		m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		m_context->IASetInputLayout(m_inputLayout.Get());
 
-		m_stPostProcessBuffer.FXAA = (int)g_Configuration.EnableAntialiasing;
+		m_stPostProcessBuffer.FXAA = g_Configuration.Antialiasing == AntialiasingMode::Low ? 1 : 0;
 		m_stPostProcessBuffer.ViewportWidth = m_screenWidth;
 		m_stPostProcessBuffer.ViewportHeight = m_screenHeight;
 		m_stPostProcessBuffer.ScreenFadeFactor = ScreenFadeCurrent;
