@@ -81,7 +81,6 @@ namespace TEN::Input
 	RumbleData rumbleData = {};
 
 	// Globals
-	vector<InputBinding> BindingMap;
 	vector<InputAction>	 ActionMap;
 	vector<bool>		 KeyMap;
 	vector<float>		 AxisMap;
@@ -179,23 +178,8 @@ namespace TEN::Input
 			}
 		}
 
-		// Initialise binding and action maps.
-		// TODO: Binding map isn't hooked up yet. Might never be. It's not that great. -- Sezz 2022.07.27
 		for (size_t i = 0; i < (int)ActionID::Count; i++)
-		{
-			auto bindingObject = InputBinding();
-
-			// Define default bindings of key mappings for the given action's binding object.
-			for (size_t j = 0; j < NUM_DEFAULT_BINDINGS; j++)
-			{
-				array<int, MAX_KEY_MAPPINGS> defaultBinding;
-				defaultBinding = { DefaultBindings[j], KC_UNASSIGNED,  KC_UNASSIGNED,  KC_UNASSIGNED }; // TODO: Hardcoded array size here.
-				bindingObject.Set(j, defaultBinding);
-			}
-
-			BindingMap.push_back(bindingObject);
 			ActionMap.push_back(InputAction((ActionID)i));
-		}
 	}
 
 	void DeInitialiseInput()

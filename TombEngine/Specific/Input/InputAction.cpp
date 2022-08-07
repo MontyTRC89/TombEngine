@@ -4,7 +4,6 @@
 #include "Game/control/control.h"
 #include "Renderer/Renderer11.h"
 #include "Specific/clock.h"
-#include "Specific/Input/InputBinding.h"
 
 using TEN::Renderer::g_Renderer;
 

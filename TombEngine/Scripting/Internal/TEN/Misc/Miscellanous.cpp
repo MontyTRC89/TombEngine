@@ -1,16 +1,17 @@
 #include "framework.h"
-#include "ReservedScriptNames.h"
-#include "ScriptUtil.h"
-#include "Vec3/Vec3.h"
+
 #include "Game/camera.h"
 #include "Game/collision/collide_room.h"
 #include "Game/control/los.h"
-#include "Game/effects/tomb4fx.h"
 #include "Game/effects/explosion.h"
+#include "Game/effects/tomb4fx.h"
 #include "Game/effects/weather.h"
+#include "ReservedScriptNames.h"
+#include "ScriptUtil.h"
 #include "Sound/sound.h"
 #include "Specific/configuration.h"
 #include "Specific/Input/Input.h"
+#include "Vec3/Vec3.h"
 
 /***
 Functions that don't fit in the other modules.
