@@ -37,10 +37,9 @@ void MissileControl(short itemNumber)
 	}
 	else
 	{
-		auto angles = GetVectorAngles(
-			LaraItem->Pose.Position.x - fx->pos.Position.x,
-			LaraItem->Pose.Position.y - fx->pos.Position.y - CLICK(1),
-			LaraItem->Pose.Position.z - fx->pos.Position.z);
+		auto angles = GetOrientTowardPoint(
+			Vector3(fx->pos.Position.x, fx->pos.Position.y - CLICK(1), fx->pos.Position.z),
+			LaraItem->Pose.Position.ToVector3());
 
 		int dh;
 		if (fx->flag1)

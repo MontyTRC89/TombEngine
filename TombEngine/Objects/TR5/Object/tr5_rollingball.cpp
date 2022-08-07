@@ -54,7 +54,7 @@ void RollingBallControl(short itemNumber)
 	item->Pose.Position.x += item->ItemFlags[0] / hDivider;
 	item->Pose.Position.y += item->Animation.VerticalVelocity / vDivider;
 	item->Pose.Position.z += item->ItemFlags[1] / hDivider;
-	item->Animation.Velocity = phd_Distance(&item->Pose, &oldPos);
+	item->Animation.Velocity = Vector3Int::Distance(item->Pose.Position, oldPos.Position);
 
 	int dh = GetCollision(item).Position.Floor - CLICK(2);
 

@@ -729,7 +729,7 @@ void RomanStatueControl(short itemNumber)
 				pos2 = Vector3Int(-48, 48, 450);
 				GetJointAbsPosition(item, &pos2, 14);
 
-				auto angles = GetVectorAngles(pos1.x - pos2.x, pos1.y - pos2.y, pos1.z - pos2.z);
+				auto angles = GetOrientTowardPoint(pos2.ToVector3(), pos1.ToVector3());
 				auto attackPos = PHD_3DPOS(pos2, angles);
 
 				short roomNumber = item->RoomNumber;

@@ -1,9 +1,5 @@
 #include "framework.h"
-#include "phd_global.h"
-
-const Vector2Int Vector2Int::Zero = Vector2Int(0, 0);
-const Vector3Int Vector3Int::Zero = Vector3Int(0, 0, 0);
-const Vector3Shrt Vector3Shrt::Zero = Vector3Shrt(0, 0, 0);
+#include "Specific/phd_global.h"
 
 BOUNDING_BOX operator+(BOUNDING_BOX const & box, PHD_3DPOS const & vec)
 {

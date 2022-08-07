@@ -379,7 +379,9 @@ void LaserHeadControl(short itemNumber)
 				}
 			}
 
-			auto angles = GetVectorAngles(LaserHeadData.target.x - src.x, LaserHeadData.target.y - src.y, LaserHeadData.target.z - src.z);
+			auto angles = GetOrientTowardPoint(
+				Vector3(src.x, src.y, src.z),
+				LaserHeadData.target.ToVector3());
 			InterpolateAngle(angles.x + 3328, &item->Pose.Orientation.x, &LaserHeadData.xRot, LaserHeadData.byte1);
 			InterpolateAngle(angles.y, &item->Pose.Orientation.y, &LaserHeadData.yRot, LaserHeadData.byte1);
 

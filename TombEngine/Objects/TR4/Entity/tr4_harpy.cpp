@@ -225,7 +225,7 @@ namespace TEN::Entities::TR4
 				auto pos3 = Vector3Int(HarpyAttack1.x, HarpyAttack1.y * 2, HarpyAttack1.z);
 				GetJointAbsPosition(item, &pos3, HarpyAttack1.meshNum);
 
-				auto angles = GetVectorAngles(pos3.x - pos1.x, pos3.y - pos1.y, pos3.z - pos1.z);
+				auto angles = GetOrientTowardPoint(pos1.ToVector3(), pos2.ToVector3());
 				auto pose = PHD_3DPOS(pos1, angles);
 				TriggerHarpyMissile(&pose, item->RoomNumber, 2);
 			}
@@ -235,7 +235,7 @@ namespace TEN::Entities::TR4
 				auto pos3 = Vector3Int(HarpyAttack2.x, HarpyAttack2.y * 2, HarpyAttack2.z);
 				GetJointAbsPosition(item, &pos3, HarpyAttack2.meshNum);
 
-				auto angles = GetVectorAngles(pos3.x - pos1.x, pos3.y - pos1.y, pos3.z - pos1.z);
+				auto angles = GetOrientTowardPoint(pos1.ToVector3(), pos2.ToVector3());
 				auto pose = PHD_3DPOS(pos1, angles);
 				TriggerHarpyMissile(&pose, item->RoomNumber, 2);
 			}

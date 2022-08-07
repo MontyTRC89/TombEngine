@@ -67,17 +67,17 @@ void InitialiseImp(short itemNumber)
 
 static void ImpThrowStones(ItemInfo* item)
 {
-	auto pos1 = Vector3Int();
+	auto pos1 = Vector3Int::Zero;
 	GetJointAbsPosition(item, &pos1, 9);
 
-	auto pos2 = Vector3Int();
+	auto pos2 = Vector3Int::Zero;
 	GetLaraJointPosition(&pos2, LM_HEAD);
 
 	int dx = pos1.x - pos2.x;
 	int dy = pos1.y - pos2.y;
 	int dz = pos1.z - pos2.z;
 
-	auto angles = GetVectorAngles(pos2.x - pos1.x, pos2.y - pos1.y, pos2.z - pos1.z);
+	auto angles = GetOrientTowardPoint(pos1.ToVector3(), pos2.ToVector3());
 	
 	int distance = sqrt(pow(dx, 2) + pow(dy, 2) + pow(dz, 2));
 	if (distance < 8)

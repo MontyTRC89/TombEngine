@@ -329,7 +329,7 @@ void HydraControl(short itemNumber)
 				auto pos2 = Vector3Int(0, 144, 40);
 				GetJointAbsPosition(item, &pos2, 10);
 
-				auto angles = GetVectorAngles(pos1.x - pos2.x, pos1.y - pos2.y, pos1.z - pos2.z);
+				auto angles = GetOrientTowardPoint(pos2.ToVector3(), pos1.ToVector3());
 				auto pos = PHD_3DPOS(pos1, angles);
 				roomNumber = item->RoomNumber;
 				GetFloor(pos2.x, pos2.y, pos2.z, &roomNumber);

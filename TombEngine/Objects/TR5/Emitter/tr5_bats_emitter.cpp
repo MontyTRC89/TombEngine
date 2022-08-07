@@ -146,10 +146,13 @@ void UpdateBats()
 			bat->ZTarget = (GetRandomControl() & 0x7F) - 64;
 		}
 
-		auto angles = GetVectorAngles(
-			LaraItem->Pose.Position.x + 8 * bat->XTarget - bat->Pose.Position.x,
-			LaraItem->Pose.Position.y - bat->LaraTarget - bat->Pose.Position.y,
-			LaraItem->Pose.Position.z + 8 * bat->ZTarget - bat->Pose.Position.z);
+		auto angles = GetOrientTowardPoint(
+			bat->Pose.Position.ToVector3(),
+			Vector3(
+				LaraItem->Pose.Position.x + bat->XTarget * 8,
+				LaraItem->Pose.Position.y - bat->LaraTarget,
+				LaraItem->Pose.Position.z + bat->ZTarget * 8
+			));
 
 		int x = LaraItem->Pose.Position.x - bat->Pose.Position.x;
 		int z = LaraItem->Pose.Position.z - bat->Pose.Position.z;

@@ -43,10 +43,7 @@ const Vector3 GetRandomVector();
 const Vector3 GetRandomVectorInCone(const Vector3& direction,const float angleDegrees);
 int mGetAngle(int x1, int y1, int x2, int y2);
 int phd_atan(int dz, int dx);
-Vector3Shrt GetVectorAngles(int x, int y, int z);
-Vector3Shrt GetOrientBetweenPoints(Vector3Int origin, Vector3Int target);
 void phd_RotBoundingBoxNoPersp(PHD_3DPOS* pos, BOUNDING_BOX* bounds, BOUNDING_BOX* tbounds);
-int phd_Distance(PHD_3DPOS* first, PHD_3DPOS* second);
 
 void InterpolateAngle(short angle, short* rotation, short* outAngle, int shift);
 void GetMatrixFromTrAngle(Matrix* matrix, short* framePtr, int index);
@@ -74,10 +71,3 @@ const float Smoothstep(float x);
 const float Luma(Vector3& color);
 const Vector3 Screen(Vector3& ambient, Vector3& tint);
 const Vector4 Screen(Vector4& ambient, Vector4& tint);
-
-Vector3 TranslateVector(Vector3& vector, short angle, float forward, float up = 0.0f, float right = 0.0f);
-Vector3Int TranslateVector(Vector3Int& vector, short angle, float forward, float up = 0.0f, float right = 0.0f);
-Vector3 TranslateVector(Vector3& vector, Vector3Shrt& orient, float distance);
-Vector3Int TranslateVector(Vector3Int& vector, Vector3Shrt& orient, float distance);
-Vector3 TranslateVector(Vector3& vector, Vector3& target, float distance);
-Vector3Int TranslateVector(Vector3Int& vector, Vector3Int& target, float distance);

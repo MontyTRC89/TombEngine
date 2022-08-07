@@ -57,7 +57,9 @@ namespace TEN::Entities::TR4
 				end.y = -128;
 				end.z = 288;
 				GetJointAbsPosition(item, &end, 9);
-				angles = GetVectorAngles(end.x - start.x, end.y - start.y, end.z - start.z);
+				angles = GetOrientTowardPoint(
+					Vector3(start.x, start.y, start.z),
+					Vector3(end.x, end.y, end.z));
 			}
 
 			// NOTE: this is not present in original TR4 code
@@ -144,10 +146,13 @@ namespace TEN::Entities::TR4
 					locust->escapeZrot = (GetRandomControl() & 0x7F) - 64;
 				}
 
-				auto angles = GetVectorAngles(
-					LaraItem->Pose.Position.x + 8 * locust->escapeXrot - locust->pos.Position.x,
-					LaraItem->Pose.Position.y - locust->escapeYrot - locust->pos.Position.y,
-					LaraItem->Pose.Position.z + 8 * locust->escapeZrot - locust->pos.Position.z);
+				auto angles = GetOrientTowardPoint(
+					locust->pos.Position.ToVector3(),
+					Vector3(
+						LaraItem->Pose.Position.x + locust->escapeXrot * 8,
+						LaraItem->Pose.Position.y - locust->escapeYrot,
+						LaraItem->Pose.Position.z + locust->escapeZrot * 8
+					));
 
 				int distance = pow(LaraItem->Pose.Position.z - locust->pos.Position.z, 2) + pow(LaraItem->Pose.Position.x - locust->pos.Position.x, 2);
 				int square = int(sqrt(distance)) / 8;
