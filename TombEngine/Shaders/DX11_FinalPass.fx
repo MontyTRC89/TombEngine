@@ -1,4 +1,5 @@
 #include "./VertexInput.hlsli"
+#include "./Math.hlsli"
 
 #define FXAA_SPAN_MAX	8.0
 #define FXAA_REDUCE_MUL 1.0/8.0
@@ -31,14 +32,13 @@ float4 Antialias(PixelShaderInput input)
 	float3 rgbNE = Texture.Sample(Sampler, input.UV + float2(add.x, -add.y));
 	float3 rgbSW = Texture.Sample(Sampler, input.UV + float2(-add.x, add.y));
 	float3 rgbSE = Texture.Sample(Sampler, input.UV + float2(add.x, add.y));
-	float3 rgbM = Texture.Sample(Sampler, input.UV);
+	float3 rgbM  = Texture.Sample(Sampler, input.UV);
 
-	float3 luma = float3(0.299f, 0.587f, 0.114f);
-	float  lumaNW = dot(rgbNW, luma);
-	float  lumaNE = dot(rgbNE, luma);
-	float  lumaSW = dot(rgbSW, luma);
-	float  lumaSE = dot(rgbSE, luma);
-	float  lumaM = dot(rgbM, luma);
+	float lumaNW = Luma(rgbNW);
+	float lumaNE = Luma(rgbNE);
+	float lumaSW = Luma(rgbSW);
+	float lumaSE = Luma(rgbSE);
+	float lumaM  = Luma(rgbM);
 
 	float lumaMin = min(lumaM, min(min(lumaNW, lumaNE), min(lumaSW, lumaSE)));
 	float lumaMax = max(lumaM, max(max(lumaNW, lumaNE), max(lumaSW, lumaSE)));
@@ -62,7 +62,7 @@ float4 Antialias(PixelShaderInput input)
 		(Texture.Sample(Sampler, input.UV + dir * (0.0f / 3.0f - 0.5f)) +
 			Texture.Sample(Sampler, input.UV + dir * (3.0f / 3.0f - 0.5f)));
 
-	float lumaB = dot(rgbB, luma);
+	float lumaB = Luma(rgbB);
 
 	if ((lumaB < lumaMin) || (lumaB > lumaMax))
 		return float4(rgbA, 1.0f);
