@@ -1550,6 +1550,8 @@ namespace TEN::Renderer
 
 		DrawTransparentFaces(view);
 
+		DrawPostprocess(target, depthTarget, view);
+
 		// Draw GUI stuff at the end
 		DrawLines2D();
 
@@ -1565,7 +1567,6 @@ namespace TEN::Renderer
 
 		DrawDebugInfo(view);
 		DrawAllStrings();
-		DrawPostprocess(target, depthTarget, view);
 
 		ClearScene();
 	}
