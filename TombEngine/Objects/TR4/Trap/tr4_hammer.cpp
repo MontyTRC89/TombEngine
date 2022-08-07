@@ -1,6 +1,7 @@
 #include "framework.h"
 #include "tr4_element_puzzle.h"
 #include "Specific/level.h"
+#include "Specific/setup.h"
 #include "Game/control/control.h"
 #include "Sound/sound.h"
 #include "Game/animation.h"
@@ -11,8 +12,82 @@
 #include "Objects/Generic/Switches/switch.h"
 #include "Specific/input.h"
 
+
 void HammerControl(short itemNumber)
 {
+
+    auto* item = &g_Level.Items[itemNumber];
+    auto* item2 = &g_Level.Items[itemNumber];
+
+    long hammerTouched;
+    short frame, targetItem;
+
+    int frameNumber = item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase;
+    item->ItemFlags[3] = 150;
+
+    if (!TriggerActive(item))
+    {
+        *(long*)&item->ItemFlags[0] = 0;
+        return;
+    }
+
+    hammerTouched = 0;
+
+    if (!item->TriggerFlags)
+    {
+        if (frameNumber < 52)
+            *(long*)&item->ItemFlags = 0xE0;
+        else
+            *(long*)&item->ItemFlags = 0;
+    }
+    else if (item->Animation.ActiveState == 1 && item->Animation.TargetState == 1)
+    {
+        if (item->ItemFlags[2])
+        {
+            if (item->TriggerFlags == 3)
+            {
+                //item->flags &= ~IFL_CODEBITS; - I am not sure what this is Kubsy 07/08/2022
+                item->ItemFlags[2] = 0;
+            }
+            else if (item->TriggerFlags == 4)
+            {
+                item->ItemFlags[2]--;
+            }
+            else
+            {
+                item->ItemFlags[2] = 0;
+            }
+        }
+        else
+        {
+            item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 1;
+            item->Animation.FrameNumber = Objects[item->ObjectNumber].frameBase;
+            item->Animation.ActiveState = 2;
+            item->Animation.TargetState = 2;
+            item->ItemFlags[2] = 60;
+        }
+    }
+    else
+    {
+        item->Animation.TargetState = 1;
+
+        if (frameNumber < 52)
+            *(long*)&item->ItemFlags[0] = 0x7E0;
+        else
+            *(long*)&item->ItemFlags[0] = 0;
+        /*
+        if (frame == 8)
+        {
+            if (item->TriggerFlags == 2)
+            {
+                for (auto* targetItem = &g_Level.Rooms[item->RoomNumber].itemNumber; //targetItem != NO_ITEM; targetItem = item2->NextItem)
+                {
+                    return;
+                }
+            };
+        }
+    }
+    */
     /*ItemInfo* item = &g_Level.Items[itemNumber];
 
     item->itemFlags[3] = 150;
