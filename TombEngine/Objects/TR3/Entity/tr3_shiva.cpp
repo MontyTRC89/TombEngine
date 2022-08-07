@@ -10,11 +10,13 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
+#include "Renderer/Renderer11Enums.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
+#include "Specific/prng.h"
 #include "Specific/setup.h"
-#include "Renderer/Renderer11Enums.h"
 
+using namespace TEN::Math::Random;
 using std::vector;
 
 namespace TEN::Entities::TR3
@@ -305,8 +307,7 @@ namespace TEN::Entities::TR3
 				}
 				else if (shiva->Mood == MoodType::Bored)
 				{
-					int random = GetRandomControl();
-					if (random < 0x400)
+					if (TestProbability(0.0325f))
 						item->Animation.TargetState = SHIVA_STATE_WALK_FORWARD;
 				}
 				else if (AI.bite && AI.distance < pow(SECTOR(1.25f), 2))

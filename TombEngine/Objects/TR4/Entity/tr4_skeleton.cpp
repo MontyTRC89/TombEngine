@@ -16,8 +16,10 @@
 #include "Game/people.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
+#include "Specific/prng.h"
 #include "Specific/setup.h"
 
+using namespace TEN::Math::Random;
 using std::vector;
 
 namespace TEN::Entities::TR4
@@ -369,7 +371,7 @@ namespace TEN::Entities::TR4
 				{
 					if (!(GetRandomControl() & 0x3F))
 					{
-						if (GetRandomControl() & 1)
+						if (TestProbability(0.5f))
 							item->Animation.TargetState = 3;
 						else
 							item->Animation.TargetState = 4;
@@ -439,7 +441,7 @@ namespace TEN::Entities::TR4
 						else if (Lara.TargetEntity == item &&
 							laraAI.angle &&
 							laraAI.distance < pow(SECTOR(2), 2) &&
-							GetRandomControl() & 1 &&
+							TestProbability(0.5f) &&
 							(Lara.Control.Weapon.GunType == LaraWeaponType::Shotgun || !(GetRandomControl() & 0xF)) &&
 							item->MeshBits == -1)
 						{
@@ -449,7 +451,7 @@ namespace TEN::Entities::TR4
 						{
 							if (GetRandomControl() & 3 && LaraItem->HitPoints > 0)
 							{
-								if (GetRandomControl() & 1)
+								if (TestProbability(0.5f))
 									item->Animation.TargetState = SKELETON_STATE_ATTACK_1;
 								else
 									item->Animation.TargetState = SKELETON_STATE_ATTACK_2;
@@ -459,7 +461,7 @@ namespace TEN::Entities::TR4
 						}
 						else if (item->HitStatus || item->Animation.RequiredState)
 						{
-							if (GetRandomControl() & 1)
+							if (TestProbability(0.5f))
 							{
 								item->Animation.TargetState = SKELETON_STATE_AVOID_ATTACK_1;
 								item->Animation.RequiredState = item->Animation.TargetState;
@@ -487,7 +489,7 @@ namespace TEN::Entities::TR4
 				else if (item->HitStatus)
 				{
 					item->Animation.TargetState = 2;
-					if (GetRandomControl() & 1)
+					if (TestProbability(0.5f))
 						item->Animation.RequiredState = 5;
 					else
 						item->Animation.RequiredState = 6;

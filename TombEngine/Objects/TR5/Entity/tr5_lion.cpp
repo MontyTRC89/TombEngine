@@ -10,8 +10,10 @@
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
 #include "Specific/level.h"
+#include "Specific/prng.h"
 #include "Specific/setup.h"
 
+using namespace TEN::Math::Random;
 using std::vector;
 
 namespace TEN::Entities::TR5
@@ -54,7 +56,7 @@ namespace TEN::Entities::TR5
 		LION_ANIM_ROAR = 12
 	};
 
-	int LionDeathAnims[] = { LION_ANIM_DEATH_1, LION_ANIM_DEATH_2 };
+	const std::array LionDeathAnims = { LION_ANIM_DEATH_1, LION_ANIM_DEATH_2 };
 
 	void InitialiseLion(short itemNumber)
 	{
@@ -82,7 +84,7 @@ namespace TEN::Entities::TR5
 				item->HitPoints = 0;
 
 				if (item->Animation.ActiveState != LION_STATE_DEATH)
-					SetAnimation(item, LionDeathAnims[GetRandomControl() & 1]);
+					SetAnimation(item, LionDeathAnims[GenerateInt(0, LionDeathAnims.size() - 1)]);
 			}
 			else
 			{
@@ -140,7 +142,7 @@ namespace TEN::Entities::TR5
 
 					if (creature->Mood == MoodType::Bored)
 					{
-						if (GetRandomControl() < 128)
+						if (TestProbability(0.004f))
 						{
 							item->Animation.TargetState = LION_STATE_IDLE;
 							item->Animation.RequiredState = LION_STATE_ROAR;
@@ -163,7 +165,7 @@ namespace TEN::Entities::TR5
 							item->Animation.TargetState = LION_STATE_IDLE;
 						else if (creature->Mood != MoodType::Escape)
 						{
-							if (GetRandomControl() < 128)
+							if (TestProbability(0.004f))
 							{
 								item->Animation.TargetState = LION_STATE_IDLE;
 								item->Animation.RequiredState = LION_STATE_ROAR;

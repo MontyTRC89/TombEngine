@@ -165,8 +165,11 @@ namespace TEN::Entities::TR4
 		case SPHINX_STATE_WALK_FORWARD:
 			creature->MaxTurn = SPHINX_WALK_TURN_ANGLE;
 
-			if (AI.distance > pow(SECTOR(1), 2) && abs(AI.angle) <= ANGLE(2.8f) || item->Animation.RequiredState == SPHINX_STATE_RUN_FORWARD)
+			if (AI.distance > pow(SECTOR(1), 2) && abs(AI.angle) <= ANGLE(2.8f) ||
+				item->Animation.RequiredState == SPHINX_STATE_RUN_FORWARD)
+			{
 				item->Animation.TargetState = SPHINX_STATE_RUN_FORWARD;
+			}
 			else if (AI.distance < pow(SECTOR(2), 2) && item->Animation.TargetState != SPHINX_STATE_RUN_FORWARD)
 			{
 				if (height2 <= (item->Pose.Position.y + CLICK(1)) &&

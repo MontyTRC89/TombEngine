@@ -12,8 +12,10 @@
 #include "Game/misc.h"
 #include "Game/people.h"
 #include "Specific/level.h"
+#include "Specific/prng.h"
 #include "Specific/setup.h"
 
+using namespace TEN::Math::Random;
 using std::vector;
 
 namespace TEN::Entities::TR4
@@ -176,11 +178,11 @@ namespace TEN::Entities::TR4
 
 					if (!(GetRandomControl() & 0x1F))
 					{
-						if (GetRandomControl() & 1)
+						if (TestProbability(0.5f))
 							item->ItemFlags[1] = 0;
 						else
 						{
-							if (GetRandomControl() & 1)
+							if (TestProbability(0.5f))
 								item->ItemFlags[1] = 12;
 							else
 								item->ItemFlags[1] = -12;
