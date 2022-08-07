@@ -171,7 +171,7 @@ void lara_as_pushable_push(ItemInfo* item, CollisionInfo* coll)
 	Camera.targetAngle = ANGLE(35.0f);
 	Camera.targetElevation = -ANGLE(25.0f);
 	Camera.flags = CF_FOLLOW_CENTER;
-	Camera.laraNode = LM_TORSO;
+//	Camera.laraNode = LM_TORSO;	//commented, Troye Aug. 7th 2022
 }
 
 // State:		LS_PUSHABLE_PULL (37)
@@ -186,7 +186,7 @@ void lara_as_pushable_pull(ItemInfo* item, CollisionInfo* coll)
 	Camera.targetAngle = ANGLE(35.0f);
 	Camera.targetElevation = -ANGLE(25.0f);
 	Camera.flags = CF_FOLLOW_CENTER;
-	Camera.laraNode = LM_TORSO;
+//	Camera.laraNode = LM_TORSO;	//commented, Troye Aug. 7th 2022
 }
 
 // State:		LS_PUSHABLE_GRAB (38)

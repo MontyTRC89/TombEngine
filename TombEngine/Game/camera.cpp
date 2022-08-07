@@ -142,7 +142,7 @@ void InitialiseCamera()
 	Camera.numberFrames = 1;
 	Camera.type = CameraType::Chase;
 	Camera.speed = 1;
-	Camera.flags = CF_FOLLOW_CENTER;
+	Camera.flags = CF_NONE;
 	Camera.bounce = 0;
 	Camera.number = -1;
 	Camera.fixedCamera = false;
@@ -1544,20 +1544,22 @@ void CalculateCamera()
 		Camera.target.roomNumber = item->RoomNumber;
 		Camera.target.y = y;
 
-		auto shift = (bounds->X1 + bounds->X2 + bounds->Z1 + bounds->Z2) / 4;
-		x = item->Pose.Position.x + shift * phd_sin(item->Pose.Orientation.y);
-		z = item->Pose.Position.z + shift * phd_cos(item->Pose.Orientation.y);
+		x = item->Pose.Position.x;
+		z = item->Pose.Position.z;
+
+		if (Camera.flags == CF_FOLLOW_CENTER)	//Troye Aug. 7th 2022
+		{
+			auto shift = (bounds->Z1 + bounds->Z2) / 2;
+			x += shift * phd_sin(item->Pose.Orientation.y);
+			z += shift * phd_cos(item->Pose.Orientation.y);
+		}
 
 		Camera.target.x = x;
 		Camera.target.z = z;
 
-		if (item->ObjectNumber == ID_LARA)
-		{
+		if (item->ObjectNumber == ID_LARA && Camera.flags != CF_FOLLOW_CENTER)
+			//CF_FOLLOW_CENTER sets target on the item, ConfirmCameraTargetPos overrides this target, hence the flag check. Troye Aug. 7th 2022
 			ConfirmCameraTargetPos();
-			x = Camera.target.x;
-			y = Camera.target.y;
-			z = Camera.target.z;
-		}
 
 		if (fixedCamera == Camera.fixedCamera)
 		{
