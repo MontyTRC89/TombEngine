@@ -15,6 +15,19 @@
 
 namespace TEN::Entities::TR4
 {
+    //TODO
+    enum HammerState
+    {
+
+    };
+
+    //TODO
+    enum HammerAnim
+    {
+
+    };
+
+
     void HammerControl(short itemNumber)
     {
         auto* item = &g_Level.Items[itemNumber];
@@ -82,8 +95,8 @@ namespace TEN::Entities::TR4
                         {
                             target = &g_Level.Items[targetItem];
 
-                            if (target->ObjectNumber == ID_OBELISK && target->Pose.Orientation.y == -0x4000 &&
-                                g_Level.Items[target->ItemFlags[0]].Pose.Orientation.y == 0x4000 &&
+                            if (target->ObjectNumber == ID_OBELISK && target->Pose.Orientation.y == -ANGLE(270) &&
+                                g_Level.Items[target->ItemFlags[0]].Pose.Orientation.y == ANGLE(90) &&
                                 g_Level.Items[target->ItemFlags[1]].Pose.Orientation.y == 0)
                             {
                                 target->Flags |= CODE_BITS;
