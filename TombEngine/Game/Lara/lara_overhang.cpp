@@ -445,7 +445,7 @@ void lara_as_slopeclimb(ItemInfo* item, CollisionInfo* coll)
 	else
 		item->Pose.Orientation.x++;
 
-	Camera.flags = 1;
+	Camera.flags = CF_FOLLOW_CENTER;
 
 	if (Camera.type != CameraType::Chase)
 		return;
@@ -464,7 +464,7 @@ void lara_as_slopefall(ItemInfo* item, CollisionInfo* coll)
 	else
 		item->Pose.Orientation.x++;
 
-	Camera.flags = 1;
+	Camera.flags = CF_FOLLOW_CENTER;
 
 	if (Camera.type != CameraType::Chase)
 		return;
@@ -629,7 +629,7 @@ void lara_as_slopeclimbup(ItemInfo* item, CollisionInfo* coll)
 	else
 		item->Pose.Orientation.x++;
 
-	Camera.flags = 1;
+	Camera.flags = CF_FOLLOW_CENTER;
 
 	if (Camera.type != CameraType::Chase)
 		return; // If camera mode isn't chase (0) then don't change camera angles.
@@ -660,7 +660,7 @@ void lara_as_slopeclimbdown(ItemInfo* item, CollisionInfo* coll)
 	else
 		item->Pose.Orientation.x++;
 
-	Camera.flags = 1;
+	Camera.flags = CF_FOLLOW_CENTER;
 
 	if (Camera.type != CameraType::Chase)
 		return;
@@ -695,7 +695,7 @@ void lara_as_sclimbstart(ItemInfo* item, CollisionInfo* coll)
 		if (frac > 1.0f)
 			frac = 1.0f;
 
-		Camera.flags = 1;
+		Camera.flags = CF_FOLLOW_CENTER;
 
 		int distance = TestLaraWall(item, 0, SECTOR(1.5f), 0) ? SECTOR(1) : CLICK(6.5f);
 
@@ -717,7 +717,7 @@ void lara_as_sclimbstart(ItemInfo* item, CollisionInfo* coll)
 	}
 	else// if (item->animNumber == LA_OVERHANG_MONKEY_SLOPE_CONCAVE)
 	{
-		//Camera.flags = 1;
+		//Camera.flags = CF_FOLLOW_CENTER;
 		Camera.targetElevation = -ANGLE(11.25f);
 		Camera.targetDistance = CLICK(6.5f);
 		Camera.speed = 15;
@@ -736,7 +736,7 @@ void lara_as_sclimbstop(ItemInfo* item, CollisionInfo* coll)
 	// Following camera effect during the slope to underlying monkey transition.
 	if (item->Animation.AnimNumber == LA_OVERHANG_SLOPE_MONKEY_CONVEX)
 	{
-		Camera.flags = 1;
+		Camera.flags = CF_FOLLOW_CENTER;
 		Camera.targetDistance = CLICK(6.5f);
 		Camera.targetElevation = ANGLE(11.25f);
 		Camera.targetspeed = 15;
@@ -751,7 +751,7 @@ void lara_as_sclimbstop(ItemInfo* item, CollisionInfo* coll)
 		if (frac > 1.0f)
 			frac = 1.0f;
 
-		Camera.flags = 1;
+		Camera.flags = CF_FOLLOW_CENTER;
 
 		if (item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].frameEnd)
 		{
