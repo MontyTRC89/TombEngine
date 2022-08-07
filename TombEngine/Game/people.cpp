@@ -177,7 +177,7 @@ static bool TargetVisibleIntern(ItemInfo* item, CreatureInfo* creature, AI_INFO*
 
 bool TargetVisible(ItemInfo* item, AI_INFO* AI, float maxAngle)
 {
-	return TargetVisibleIntern(item, nullptr, AI, maxAngle);
+	return TargetVisibleIntern(item, GetCreatureInfo(item), AI, maxAngle);
 }
 
 bool TargetVisible(ItemInfo* item, CreatureInfo* creature, AI_INFO* AI, float maxAngle)
