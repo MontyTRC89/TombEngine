@@ -1557,7 +1557,7 @@ void CalculateCamera()
 		Camera.target.x = x;
 		Camera.target.z = z;
 
-		if (item->ObjectNumber == ID_LARA && Camera.flags != CF_FOLLOW_CENTER)
+		if (item->IsLara() && Camera.flags != CF_FOLLOW_CENTER)
 			//CF_FOLLOW_CENTER sets target on the item, ConfirmCameraTargetPos overrides this target, hence the flag check. Troye Aug. 7th 2022
 			ConfirmCameraTargetPos();
 
