@@ -54,7 +54,7 @@ namespace TEN::Entities::TR4
             else
             {
                 item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 1;
-                item->Animation.FrameNumber = Objects[item->ObjectNumber].frameBase;
+                item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
                 item->Animation.ActiveState = 2;
                 item->Animation.TargetState = 2;
                 item->ItemFlags[2] = 60;
@@ -132,11 +132,11 @@ namespace TEN::Entities::TR4
                             {
                                 target = &g_Level.Items[targetItem];
 
+                                //changed to take all puzzle items, keys and their combos. Original is hardcoded to a few slots. -Troye
                                 if ((target->ObjectNumber >= ID_PUZZLE_ITEM1 && target->ObjectNumber <= ID_PUZZLE_ITEM16) ||
                                     (target->ObjectNumber >= ID_PUZZLE_ITEM1_COMBO1 && target->ObjectNumber <= ID_PUZZLE_ITEM16_COMBO2) ||
                                     (target->ObjectNumber >= ID_KEY_ITEM1 && target->ObjectNumber <= ID_KEY_ITEM16) ||
                                     (target->ObjectNumber >= ID_KEY_ITEM1_COMBO1 && target->ObjectNumber <= ID_KEY_ITEM16_COMBO2))
-                                    //Troye Aug. 7th 2022, changed to take all puzzle items, keys and their combos. original is hardcoded to a few slots..
                                 {
                                     if (item->Pose.Position.x == target->Pose.Position.x &&
                                         item->Pose.Position.z == target->Pose.Position.z)
