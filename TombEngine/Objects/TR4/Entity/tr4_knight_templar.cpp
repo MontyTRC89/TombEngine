@@ -11,8 +11,10 @@
 #include "Game/misc.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
+#include "Specific/prng.h"
 #include "Specific/setup.h"
 
+using namespace TEN::Math::Random;
 using std::vector;
 
 namespace TEN::Entities::TR4
@@ -81,7 +83,7 @@ namespace TEN::Entities::TR4
 			(item->Animation.AnimNumber - object->animIndex) == KTEMPLAR_ANIM_WALK_FORWARD_LEFT_2 ||
 			(item->Animation.AnimNumber - object->animIndex) == KTEMPLAR_ANIM_WALK_FORWARD_RIGHT_2)
 		{
-			if (GetRandomControl() & 1)
+			if (TestProbability(0.5f))
 			{
 				auto pos = Vector3Int(0, 48, 448);
 				GetJointAbsPosition(item, &pos, 10);
@@ -140,9 +142,9 @@ namespace TEN::Entities::TR4
 				if (Lara.TargetEntity == item)
 					item->Animation.TargetState = KTEMPLAR_STATE_SHIELD;
 			}
-			else if (GetRandomControl() & 1)
+			else if (TestProbability(0.5f))
 				item->Animation.TargetState = KTEMPLAR_STATE_SWORD_ATTACK_2;
-			else if (GetRandomControl() & 1)
+			else if (TestProbability(0.5f))
 				item->Animation.TargetState = KTEMPLAR_STATE_SWORD_ATTACK_1;
 			else
 				item->Animation.TargetState = KTEMPLAR_STATE_SWORD_ATTACK_3;
@@ -232,7 +234,7 @@ namespace TEN::Entities::TR4
 
 			if (item->HitStatus)
 			{
-				if (GetRandomControl() & 1)
+				if (TestProbability(0.5f))
 					item->Animation.TargetState = KTEMPLAR_STATE_SHIELD_HIT_1;
 				else
 					item->Animation.TargetState = KTEMPLAR_STATE_SHIELD_HIT_2;

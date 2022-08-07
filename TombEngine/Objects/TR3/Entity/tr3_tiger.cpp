@@ -9,16 +9,18 @@
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
 #include "Specific/level.h"
+#include "Specific/prng.h"
 #include "Specific/setup.h"
 
+using namespace TEN::Math::Random;
 using std::vector;
 
 namespace TEN::Entities::TR3
 {
-	BiteInfo TigerBite = { 19, -13, 3, 26 };
-	const vector<int> TigerAttackJoints = { 14, 15, 16, 18, 19, 20, 21, 22, 23, 24, 25, 26 };
-
 	constexpr auto TIGER_ATTACK_DAMAGE = 90;
+
+	const auto TigerBite = BiteInfo(Vector3(19.0f, -13.0f, 3.0f), 26);
+	const vector<int> TigerAttackJoints = { 14, 15, 16, 18, 19, 20, 21, 22, 23, 24, 25, 26 };
 
 	// TODO
 	enum TigerState
@@ -85,10 +87,9 @@ namespace TEN::Entities::TR3
 				}
 				else if (info->Mood == MoodType::Bored)
 				{
-					short random = GetRandomControl();
-					if (random < 0x60)
+					if (TestProbability(0.003f))
 						item->Animation.TargetState = 5;
-					else if (random < 0x460)
+					else if (TestProbability(0.035f))
 						item->Animation.TargetState = 2;
 				}
 				else if (AI.bite && AI.distance < pow(340, 2))
@@ -100,7 +101,7 @@ namespace TEN::Entities::TR3
 				}
 				else if (item->Animation.RequiredState)
 					item->Animation.TargetState = item->Animation.RequiredState;
-				else if (info->Mood != MoodType::Attack && GetRandomControl() < 0x60)
+				else if (info->Mood != MoodType::Attack && TestProbability(0.003f))
 					item->Animation.TargetState = 5;
 				else
 					item->Animation.TargetState = 3;
@@ -112,7 +113,7 @@ namespace TEN::Entities::TR3
 
 				if (info->Mood == MoodType::Escape || info->Mood == MoodType::Attack)
 					item->Animation.TargetState = 3;
-				else if (GetRandomControl() < 0x60)
+				else if (TestProbability(0.003f))
 				{
 					item->Animation.TargetState = 1;
 					item->Animation.RequiredState = 5;
@@ -134,10 +135,10 @@ namespace TEN::Entities::TR3
 					else
 						item->Animation.TargetState = 7;
 				}
-				else if (info->Mood != MoodType::Attack && GetRandomControl() < 0x60)
+				else if (info->Mood != MoodType::Attack && TestProbability(0.003f))
 				{
-					item->Animation.RequiredState = 5;
 					item->Animation.TargetState = 1;
+					item->Animation.RequiredState = 5;
 				}
 				else if (info->Mood == MoodType::Escape && Lara.TargetEntity != item && AI.ahead)
 					item->Animation.TargetState = 1;
@@ -150,8 +151,8 @@ namespace TEN::Entities::TR3
 			case 8:
 				if (!info->Flags && item->TestBits(JointBitType::Touch, TigerAttackJoints))
 				{
-					CreatureEffect(item, &TigerBite, DoBloodSplat);
 					DoDamage(info->Enemy, TIGER_ATTACK_DAMAGE);
+					CreatureEffect(item, TigerBite, DoBloodSplat);
 					info->Flags = 1;
 				}
 

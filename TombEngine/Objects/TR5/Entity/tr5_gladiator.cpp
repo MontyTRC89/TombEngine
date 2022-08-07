@@ -12,8 +12,10 @@
 #include "Game/misc.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
+#include "Specific/prng.h"
 #include "Specific/setup.h"
 
+using namespace TEN::Math::Random;
 using std::vector;
 
 namespace TEN::Entities::TR5
@@ -191,7 +193,7 @@ namespace TEN::Entities::TR5
 
 						if (Lara.TargetEntity == item &&
 							unknown && distance < pow(SECTOR(1.5f), 2) &&
-							GetRandomControl() & 1 &&
+							TestProbability(0.5f) &&
 							(Lara.Control.Weapon.GunType == LaraWeaponType::Shotgun || !(GetRandomControl() & 0xF)) &&
 							item->MeshBits == -1)
 						{
@@ -201,7 +203,7 @@ namespace TEN::Entities::TR5
 
 						if (AI.bite && AI.distance < pow(819, 2))
 						{
-							if (GetRandomControl() & 1)
+							if (TestProbability(0.5f))
 								item->Animation.TargetState = GLADIATOR_STATE_SWORD_ATTACK_1;
 							else
 								item->Animation.TargetState = GLADIATOR_STATE_SWORD_ATTACK_2;

@@ -10,8 +10,10 @@
 #include "Game/Lara/lara_helpers.h"
 #include "Game/misc.h"
 #include "Specific/level.h"
+#include "Specific/prng.h"
 #include "Specific/setup.h"
 
+using namespace TEN::Math::Random;
 using std::vector;
 
 namespace TEN::Entities::TR4
@@ -116,7 +118,7 @@ namespace TEN::Entities::TR4
 				else if (AI.bite)
 				{
 					creature->MaxTurn = ANGLE(6.0f);
-					if (GetRandomControl() & 1)
+					if (TestProbability(0.5f))
 						item->Animation.TargetState = SSCORPION_STATE_ATTACK_1;
 					else
 						item->Animation.TargetState = SSCORPION_STATE_ATTACK_2;
