@@ -26,8 +26,8 @@ namespace TEN::Entities::TR3
 
 	constexpr auto COBRA_SLEEP_FRAME = 45;
 
-	const vector<int> CobraAttackJoints = { 13 };
 	const auto CobraBite = BiteInfo(Vector3::Zero, 13);
+	const vector<int> CobraAttackJoints = { 13 };
 
 	enum CobraState
 	{
@@ -52,11 +52,7 @@ namespace TEN::Entities::TR3
 		auto* item = &g_Level.Items[itemNumber];
 
 		ClearItem(itemNumber);
-
-		item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + COBRA_ANIM_IDLE_TO_SLEEP;
-		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase + COBRA_SLEEP_FRAME;
-		item->Animation.ActiveState = COBRA_STATE_SLEEP; 
-		item->Animation.TargetState = COBRA_STATE_SLEEP;
+		SetAnimation(item, COBRA_ANIM_IDLE_TO_SLEEP, COBRA_SLEEP_FRAME);
 		item->ItemFlags[2] = item->HitStatus;
 	}
 
@@ -75,11 +71,7 @@ namespace TEN::Entities::TR3
 		if (item->HitPoints <= 0 && item->HitPoints != NOT_TARGETABLE)
 		{
 			if (item->Animation.ActiveState != COBRA_STATE_DEATH)
-			{
-				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + COBRA_ANIM_DEATH;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-				item->Animation.ActiveState = COBRA_STATE_DEATH;
-			}
+				SetAnimation(item, COBRA_ANIM_DEATH);
 		}
 		else
 		{
@@ -141,7 +133,8 @@ namespace TEN::Entities::TR3
 				break;
 
 			case COBRA_STATE_ATTACK:
-				if (info->Flags != 1 && item->TestBits(JointBitType::Touch, CobraAttackJoints))
+				if (info->Flags != 1 &&
+					item->TestBits(JointBitType::Touch, CobraAttackJoints))
 				{
 					DoDamage(info->Enemy, COBRA_BITE_ATTACK_DAMAGE);
 					CreatureEffect(item, CobraBite, DoBloodSplat);

@@ -13,7 +13,10 @@
 #include "Game/animation.h"
 #include "Game/misc.h"
 #include "Specific/level.h"
+#include "Specific/prng.h"
 #include "Specific/setup.h"
+
+using namespace TEN::Math::Random;
 
 namespace TEN::Entities::TR4
 {
@@ -257,7 +260,7 @@ namespace TEN::Entities::TR4
 				{
 					if (AI.distance < pow(SECTOR(3), 2) || AI.zoneNumber != AI.enemyZone)
 					{
-						if (GetRandomControl() >= 16384)
+						if (TestProbability(0.5f))
 							item->Animation.TargetState = TROOP_STATE_AIM_3;
 						else
 							item->Animation.TargetState = TROOP_STATE_AIM_1;

@@ -10,7 +10,10 @@
 #include "Game/Lara/lara.h"
 #include "Sound/sound.h"
 #include "Specific/setup.h"
+#include "Specific/prng.h"
 #include "Specific/level.h"
+
+using namespace TEN::Math::Random;
 
 namespace TEN::Entities::TR5
 {
@@ -100,12 +103,12 @@ namespace TEN::Entities::TR5
 				{
 					if (distance <= pow(SECTOR(1), 2))
 					{
-						if (GetRandomControl() & 1)
+						if (TestProbability(0.5f))
 							item->Animation.TargetState = 4;
 						else
 							item->Animation.TargetState = 6;
 					}
-					else if (GetRandomControl() & 1)
+					else if (TestProbability(0.5f))
 						item->Animation.TargetState = 2;
 					else
 						item->Animation.TargetState = 3;

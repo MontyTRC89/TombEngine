@@ -12,8 +12,10 @@
 #include "Game/Lara/lara_helpers.h"
 #include "Game/misc.h"
 #include "Specific/level.h"
+#include "Specific/prng.h"
 #include "Specific/setup.h"
 
+using namespace TEN::Math::Random;
 using std::vector;
 
 namespace TEN::Entities::TR4
@@ -187,8 +189,8 @@ namespace TEN::Entities::TR4
 					creature->MaxTurn = ANGLE(2.0f);
 
 					// If chanced upon or the troop is close to death, do pincer attack.
-					if (GetRandomControl() & 1 ||
-						(creature->Enemy != NULL && creature->Enemy->HitPoints <= 15 && creature->Enemy->ObjectNumber == ID_TROOPS))
+					if (TestProbability(0.5f) ||
+						(creature->Enemy != nullptr && creature->Enemy->HitPoints <= 15 && creature->Enemy->ObjectNumber == ID_TROOPS))
 					{
 						item->Animation.TargetState = BSCORPION_STATE_PINCER_ATTACK;
 					}
@@ -274,7 +276,7 @@ namespace TEN::Entities::TR4
 			}
 		}
 
-		if ((creature->Enemy != NULL && creature->Enemy->HitPoints <= 0) ||
+		if ((creature->Enemy != nullptr && creature->Enemy->HitPoints <= 0) ||
 			item->TriggerFlags > 6)
 		{
 			// TODO: Allow scorpion to do the kill animation. -- TokyoSU, 3/8/2022
