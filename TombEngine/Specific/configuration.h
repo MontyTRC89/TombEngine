@@ -39,7 +39,6 @@ struct GameConfiguration
 	int SfxVolume;
 
 	bool EnableCaustics;
-	bool EnableVolumetricFog;
 	AntialiasingMode Antialiasing;
 	ShadowMode ShadowType;
 	int ShadowMapSize = 1024;
