@@ -145,8 +145,8 @@ static constexpr char ScriptReserved_SetCineBars[]					= "SetCineBars";
 static constexpr char ScriptReserved_SetFOV[]						= "SetFOV";
 static constexpr char ScriptReserved_GetFOV[]						= "GetFOV";
 
-static constexpr char ScriptReserved_KeyHeld[]						= "KeyHeld";
-static constexpr char ScriptReserved_KeyHit[]						= "KeyHit";
+static constexpr char ScriptReserved_KeyIsHeld[]					= "KeyIsHeld";
+static constexpr char ScriptReserved_KeyIsHit[]						= "KeyIsHit";
 static constexpr char ScriptReserved_KeyPush[]						= "KeyPush";
 static constexpr char ScriptReserved_KeyClear[]						= "KeyClear";
 
