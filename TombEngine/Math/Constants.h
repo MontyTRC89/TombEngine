@@ -12,6 +12,7 @@
 	constexpr inline auto SQRT_2   = 1.41421356237309504880168872420969807856967187537694L;
 
 	constexpr inline auto SQUARE = [](auto x) { return (x * x); };
+	constexpr inline auto CUBE	 = [](auto x) { return (x * x * x); };
 
 	// World constants
 	constexpr inline auto BLOCK_UNIT = 1024;
