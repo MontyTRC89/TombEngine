@@ -40,7 +40,7 @@ void TENLog(std::string_view str, LogLevel level, LogConfig config, bool allowSp
 	{
 	case LogLevel::Error:
 		logger->error(str);
-	break;
+		break;
 	case LogLevel::Warning:
 		logger->warn(str);
 		break;
