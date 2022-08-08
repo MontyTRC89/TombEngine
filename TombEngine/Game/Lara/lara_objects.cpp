@@ -171,7 +171,6 @@ void lara_as_pushable_push(ItemInfo* item, CollisionInfo* coll)
 	Camera.targetAngle = Angle::DegToRad(35.0f);
 	Camera.targetElevation = Angle::DegToRad(-25.0f);
 	Camera.flags = CF_FOLLOW_CENTER;
-	Camera.laraNode = LM_TORSO;
 }
 
 // State:		LS_PUSHABLE_PULL (37)
@@ -186,7 +185,6 @@ void lara_as_pushable_pull(ItemInfo* item, CollisionInfo* coll)
 	Camera.targetAngle = Angle::DegToRad(35.0f);
 	Camera.targetElevation = Angle::DegToRad(-25.0f);
 	Camera.flags = CF_FOLLOW_CENTER;
-	Camera.laraNode = LM_TORSO;
 }
 
 // State:		LS_PUSHABLE_GRAB (38)

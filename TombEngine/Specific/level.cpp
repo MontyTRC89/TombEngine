@@ -335,8 +335,6 @@ void LoadObjects()
 		Objects[objNum].frameBase = ReadInt32();
 		Objects[objNum].animIndex = ReadInt32();
 
-		ReadInt16();
-
 		Objects[objNum].loaded = true;
 	}
 
@@ -416,11 +414,7 @@ void LoadCameras()
 		sink.z = ReadInt32();
 		sink.strength = ReadInt32();
 		sink.boxIndex = ReadInt32();
-
-		byte numBytes = ReadInt8();
-		char buffer[255];
-		ReadBytes(buffer, numBytes);
-		sink.luaName = std::string(buffer, buffer+numBytes);
+		sink.luaName = ReadString();
 
 		g_GameScriptEntities->AddName(sink.luaName, sink);
 	}
@@ -777,24 +771,9 @@ void ReadRooms()
 			volume.Scale.y = ReadFloat();
 			volume.Scale.z = ReadFloat();
 
-			volume.Activators = ReadInt32();
+			volume.EventSetIndex = ReadInt32();
 
-			byte numBytes = ReadInt8();
-			char buffer[255];
-			ReadBytes(buffer, numBytes);
-			volume.OnEnter = std::string(buffer, buffer+numBytes);
-
-			numBytes = ReadInt8();
-			ReadBytes(buffer, numBytes);
-			volume.OnInside = std::string(buffer, buffer+numBytes);
-
-			numBytes = ReadInt8();
-			ReadBytes(buffer, numBytes);
-			volume.OnLeave = std::string(buffer, buffer+numBytes);
-
-			volume.OneShot = ReadInt8();
 			volume.Status = TriggerStatus::Outside;
-
 			volume.Box    = BoundingOrientedBox(volume.Position, volume.Scale, volume.Rotation);
 			volume.Sphere = BoundingSphere(volume.Position, volume.Scale.x);
 
@@ -860,7 +839,7 @@ void FreeLevel()
 	g_Level.Sinks.resize(0);
 	g_Level.SoundSources.resize(0);
 	g_Level.AIObjects.resize(0);
-	g_Level.LuaFunctionNames.resize(0);
+	g_Level.EventSets.resize(0);
 	g_Level.Items.resize(0);
 
 	for (int i = 0; i < 2; i++)
@@ -899,11 +878,7 @@ void LoadSoundSources()
 		source.z = ReadInt32();
 		source.soundId = ReadInt32();
 		source.flags = ReadInt32();
-
-		byte numBytes = ReadInt8();
-		char buffer[255];
-		ReadBytes(buffer, numBytes);
-		source.luaName = std::string(buffer, buffer+numBytes);
+		source.luaName = ReadString();
 
 		g_GameScriptEntities->AddName(source.luaName, source);
 	}
@@ -937,34 +912,6 @@ void LoadAnimatedTextures()
 
 		g_Level.AnimatedTexturesSequences.push_back(sequence);
 	}
-
-	// Unused for now
-	int nAnimUVRanges = ReadInt8();
-}
-
-void LoadTextureInfos()
-{
-	// TODO: THIS FUNCTION IS DUMMY!!!! REMOVE IT WHEN TE FORMAT IS CHANGED! -- Lwmte 31.07.22
-
-	ReadInt32(); // TEX/0
-
-	int numObjectTextures = ReadInt32();
-	TENLog("Num texinfos: " + std::to_string(numObjectTextures), LogLevel::Info);
-
-	for (int i = 0; i < numObjectTextures; i++)
-	{
-		ReadInt32();
-		ReadInt32();
-		ReadInt32();
-
-		for (int j = 0; j < 4; j++)
-		{
-			ReadFloat();
-			ReadFloat();
-		}
-
-		ReadInt32();
-	}
 }
 
 void LoadAIObjects()
@@ -986,23 +933,41 @@ void LoadAIObjects()
 		obj.flags = ReadInt16();
 		obj.yRot = Angle::ShrtToRad(ReadInt16()); // TODO
 		obj.boxNumber = ReadInt32();
-
-		byte numBytes = ReadInt8();
-		char buffer[255];
-		ReadBytes(buffer, numBytes);
-		obj.luaName = std::string(buffer, buffer+numBytes);
+		obj.luaName = ReadString();
 
 		g_GameScriptEntities->AddName(obj.luaName, obj);
 	}
 }
 
-void LoadLuaFunctionNames()
+void LoadEventSets()
 {
-	TENLog("Parsing Lua function names... ", LogLevel::Info);
+	int eventSetCount = ReadInt32();
+	TENLog("Num level sets: " + std::to_string(eventSetCount), LogLevel::Info);
 
-	int luaFunctionsCount = ReadInt32();
-	for (int i = 0; i < luaFunctionsCount; i++)
-		g_Level.LuaFunctionNames.push_back(ReadString());
+	for (int i = 0; i < eventSetCount; i++)
+	{
+		auto eventSet = VolumeEventSet();
+
+		eventSet.Name = ReadString();
+		eventSet.Activators = ReadInt32();
+
+		eventSet.OnEnter.Mode = (VolumeEventMode)ReadInt32();
+		eventSet.OnEnter.Function = ReadString();
+		eventSet.OnEnter.Argument = ReadString();
+		eventSet.OnEnter.CallCounter = ReadInt32();
+
+		eventSet.OnInside.Mode = (VolumeEventMode)ReadInt32();
+		eventSet.OnInside.Function = ReadString();
+		eventSet.OnInside.Argument = ReadString();
+		eventSet.OnInside.CallCounter = ReadInt32();
+
+		eventSet.OnLeave.Mode = (VolumeEventMode)ReadInt32();
+		eventSet.OnLeave.Function = ReadString();
+		eventSet.OnLeave.Argument = ReadString();
+		eventSet.OnLeave.CallCounter = ReadInt32();
+
+		g_Level.EventSets.push_back(eventSet);
+	}
 }
 
 FILE* FileOpen(const char* fileName)
@@ -1144,13 +1109,12 @@ unsigned int _stdcall LoadLevel(void* data)
 		//InitialiseLOTarray(true);
 
 		LoadAnimatedTextures();
-		LoadTextureInfos();
 		g_Renderer.UpdateProgress(70);
 
 		LoadItems();
 		LoadAIObjects();
 
-		LoadLuaFunctionNames();
+		LoadEventSets();
 
 		LoadSamples();
 		g_Renderer.UpdateProgress(80);

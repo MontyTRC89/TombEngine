@@ -69,9 +69,9 @@ namespace TEN::Entities::TR3
 		Lara.Control.HandStatus = HandStatus::Busy;
 		Lara.Control.Weapon.GunType = LaraWeaponType::None;
 
-		Camera.flags = 1;
+		Camera.flags = CF_FOLLOW_CENTER;
 		Camera.targetAngle = Angle::DegToRad(170.0f);
-		Camera.targetElevation = -Angle::DegToRad(25.0f);
+		Camera.targetElevation = Angle::DegToRad(-25.0f);
 	}
 
 	void TRexControl(short itemNumber)

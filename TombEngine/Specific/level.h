@@ -1,5 +1,6 @@
 #pragma once
 #include "Game/animation.h"
+#include "Game/control/volumetriggerer.h"
 #include "Game/items.h"
 #include "Game/room.h"
 #include "Specific/IO/ChunkId.h"
@@ -13,17 +14,13 @@
 
 #define MAX_ZONES 6
 
+using namespace TEN::Control::Volumes;
+
 struct ChunkId;
 struct LEB128;
 struct SampleInfo;
 struct BOX_INFO;
 struct OVERLAP;
-
-struct OBJECT_TEXTURE_VERT
-{
-	float x;
-	float y;
-};
 
 struct TEXTURE
 {
@@ -121,7 +118,7 @@ struct LEVEL
 	std::vector<short> SoundMap;
 	std::vector<SampleInfo> SoundDetails;
 	std::vector<ANIMATED_TEXTURES_SEQUENCE> AnimatedTexturesSequences;
-	std::vector<std::string> LuaFunctionNames;
+	std::vector<VolumeEventSet> EventSets;
 	int NumItems;
 	int NumSpritesSequences;
 };
@@ -149,7 +146,6 @@ void LoadBoxes();
 void LoadSamples();
 void LoadSoundSources();
 void LoadAnimatedTextures();
-void LoadTextureInfos();
 void LoadAIObjects();
 
 void InitialiseLara(int restore);

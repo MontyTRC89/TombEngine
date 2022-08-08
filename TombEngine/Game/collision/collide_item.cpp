@@ -422,7 +422,7 @@ bool AlignLaraPosition(Vector3Int* vec, ItemInfo* item, ItemInfo* laraItem)
 	Vector3 newPos = item->Pose.Position.ToVector3() + pos;
 
 	int height = GetCollision(newPos.x, newPos.y, newPos.z, laraItem->RoomNumber).Position.Floor;
-	if (abs(height - laraItem->Pose.Position.y) <= CLICK(2))
+	if ((laraItem->Pose.Position.y - height) <= CLICK(2))
 	{
 		laraItem->Pose.Position.x = newPos.x;
 		laraItem->Pose.Position.y = newPos.y;

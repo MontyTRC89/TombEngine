@@ -403,7 +403,7 @@ namespace TEN::Renderer
 						1.0f,
 						{ 32,
 						Vector3::Distance(pos1, pos2) },
-						BLENDMODE_OPAQUE,
+						BLENDMODE_ALPHABLEND,
 						d, view);
 				}
 			}
