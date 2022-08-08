@@ -260,7 +260,16 @@ bool FlowHandler::DoFlow()
 
 		if (CurrentLevel == 0)
 		{
-			status = DoTitle(0, level->AmbientTrack);
+			try
+			{
+				status = DoTitle(0, level->AmbientTrack);
+			}
+			catch (TENScriptException const& e)
+			{
+				std::string msg = std::string{ "An unrecoverable error occurred in " } + __func__ + ": " + e.what();
+				TENLog(msg, LogLevel::Error, LogConfig::All);
+				throw;
+			}
 		}
 		else
 		{
@@ -284,7 +293,16 @@ bool FlowHandler::DoFlow()
 				}
 			}
 
-			status = DoLevel(CurrentLevel, level->AmbientTrack, loadFromSavegame);
+			try
+			{
+				status = DoLevel(CurrentLevel, level->AmbientTrack, loadFromSavegame);
+			}
+			catch (TENScriptException const& e) 
+			{
+				std::string msg = std::string{ "An unrecoverable error occurred in " } + __func__ + ": " + e.what();
+				TENLog(msg, LogLevel::Error, LogConfig::All);
+				status = GameStatus::ExitToTitle;
+			}
 			loadFromSavegame = false;
 		}
 
