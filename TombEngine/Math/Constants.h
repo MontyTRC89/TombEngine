@@ -11,7 +11,7 @@ namespace TEN::Math
 	constexpr inline auto RADIAN   = PI / 180;
 	constexpr inline auto SQRT_2   = 1.41421356237309504880168872420969807856967187537694L;
 
-	constexpr inline auto SQUARE = [](auto x) { return int(x * x); };
+	constexpr inline auto SQUARE = [](auto x) { return (x * x); };
 
 	// TEN constants
 	constexpr inline auto BLOCK_UNIT = 1024;
