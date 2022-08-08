@@ -911,6 +911,7 @@ enum class BurnType
 
 enum class HandStatus
 {
+	None,
 	Free,
 	Busy,
 	WeaponDraw,
@@ -921,6 +922,7 @@ enum class HandStatus
 
 enum class WaterStatus
 {
+	None,
 	Dry,
 	Wade,
 	TreadWater,
@@ -1243,10 +1245,10 @@ struct LaraControlData
 	short TurnRate = 0;
 	int	  CalculatedJumpVelocity = 0;
 
-	HandStatus	  HandStatus;
-	WaterStatus	  WaterStatus;
-	JumpDirection JumpDirection;
-	LaraCountData Count;
+	HandStatus	  HandStatus	= HandStatus::None;
+	WaterStatus	  WaterStatus	= WaterStatus::None;
+	JumpDirection JumpDirection = JumpDirection::None;
+	LaraCountData Count			= {};
 
 	LookControlData		 Look	   = {};
 	WeaponControlData	 Weapon	   = {};
