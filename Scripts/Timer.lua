@@ -39,7 +39,8 @@ Timer = {
 	--- Create (but do not start) a new timer.
 	--
 	-- You have the option of displaying the remaining time on the clock. Timer format details:
-	--	-- deciseconds are 1/10th of a second
+	--
+	-- -- deciseconds are 1/10th of a second
 	--	
 	--	-- mins:secs
 	--	local myTimeFormat1 = {minutes = true, seconds = true, deciseconds = false}
