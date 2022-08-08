@@ -1153,6 +1153,7 @@ unsigned int _stdcall LoadLevel(void* data)
 
 		TENLog("Error while loading level: " + std::string(ex.what()), LogLevel::Error);
 		LoadedSuccessfully = false;
+		SystemNameHash = 0;
 	}
 
 	if (dataPtr)
