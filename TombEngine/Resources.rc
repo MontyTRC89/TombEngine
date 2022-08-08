@@ -48,7 +48,7 @@ BEGIN
             VALUE "LegalCopyright", "Copyright (C) 2022"
             VALUE "OriginalFilename", "TombEngine.exe"
             VALUE "ProductName", "Tomb Engine"
-            VALUE "ProductVersion", "1.0.0.0"
+            VALUE "ProductVersion", "1.5.1.0"
         END
     END
     BLOCK "VarFileInfo"

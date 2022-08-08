@@ -125,12 +125,12 @@ namespace Misc
 		SoundEffect(id, p.has_value() ? &PHD_3DPOS(p.value().x, p.value().y, p.value().z) : nullptr, SoundEnvironment::Always);
 	}
 
-	static bool KeyHeld(int actionIndex)
+	static bool KeyIsHeld(int actionIndex)
 	{
 		return (TrInput & (1 << actionIndex)) != 0;
 	}
 
-	static bool KeyHit(int actionIndex)
+	static bool KeyIsHit(int actionIndex)
 	{
 		return (DbInput & (1 << actionIndex)) != 0;
 	}
@@ -229,14 +229,14 @@ namespace Misc
 		table_misc.set_function(ScriptReserved_PlaySound, &PlaySoundEffect);
 
 		/// Check if particular action key is held
-		//@function KeyHeld
+		//@function KeyIsHeld
 		//@tparam int action mapping index to check
-		table_misc.set_function(ScriptReserved_KeyHeld, &KeyHeld);
+		table_misc.set_function(ScriptReserved_KeyIsHeld, &KeyIsHeld);
 
 		/// Check if particular action key was hit (once)
-		//@function KeyHit
+		//@function KeyIsHit
 		//@tparam int action mapping index to check
-		table_misc.set_function(ScriptReserved_KeyHit, &KeyHit);
+		table_misc.set_function(ScriptReserved_KeyIsHit, &KeyIsHit);
 
 		/// Emulate pushing of a certain action key
 		//@function KeyPush
