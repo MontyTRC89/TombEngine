@@ -5,6 +5,8 @@ Version 1.0.1
 - Fixed incorrect polerope grabbing.
 - Fixed camera behaviour with pushable blocks.
 - Fixed minecart unduck on inclines.
+- Fixed quadbike dismount with jump key and allow to shoot big gun with action key.
+- Prevent title music audio from starting in a random place.
 
 Version 1.0
 ===========
