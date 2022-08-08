@@ -3,7 +3,7 @@
 <html>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 <head>
-    <title>TombEngine Lua API</title>
+    <title>TombEngine 1.0.1 Lua API</title>
     <link rel="stylesheet" href="../ldoc.css" type="text/css" />
 </head>
 <body>
@@ -89,17 +89,26 @@
 <p>Basic timer - after a specified number of seconds, the specified thing happens.</p>
 <p>
 
-<p> Usage:</p>
+<p> Example usage:</p>
 
 <pre>
 <span class="keyword">local</span> Timer = <span class="global">require</span>(<span class="string">"Timer"</span>)
 
-LevelFuncs.FinishTimer = <span class="keyword">function</span>(healthWhenStarted, victoryMessage)
-    DoSomething(healthWhenStarted, victoryMessage)
+<span class="comment">-- This will be called when the timer runs out
+</span>LevelFuncs.FinishTimer = <span class="keyword">function</span>(healthWhenStarted, victoryMessage)
+    <span class="comment">-- Open a door, display a message, make an explosion... whatever you wish
+</span>    DoSomething(healthWhenStarted, victoryMessage)
 <span class="keyword">end</span>
 
-LevelFuncs.TriggerTimer = <span class="keyword">function</span>(obj)
-    <span class="keyword">local</span> myTimer = Timer.Create(<span class="string">"my_timer"</span>, <span class="number">5.0</span>, <span class="keyword">false</span>, <span class="keyword">true</span>, <span class="string">"FinishTimer"</span>, Lara:GetHP(), <span class="string">"Well done!"</span>)
+<span class="comment">-- This function triggers the timer
+</span>LevelFuncs.TriggerTimer = <span class="keyword">function</span>(obj)
+    <span class="keyword">local</span> myTimer = Timer.Create(<span class="string">"my_timer"</span>,
+        <span class="number">5.0</span>,
+        <span class="keyword">false</span>,
+        {minutes = <span class="keyword">false</span>, seconds = <span class="keyword">true</span>, deciseconds = <span class="keyword">true</span>},
+        <span class="string">"FinishTimer"</span>,
+        Lara:GetHP(),
+        <span class="string">"Well done!"</span>)
     myTimer:Start()
 <span class="keyword">end</span>
 
@@ -114,7 +123,7 @@ LevelFuncs.OnControlPhase = <span class="keyword">function</span>(dt)
 <h2><a href="#Functions">Functions</a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" ><a href="#Create">Create(name, totalTime, loop, showString, func, funcArgs)</a></td>
+	<td class="name" ><a href="#Create">Create(name, totalTime, loop, timerFormat, func[, ...])</a></td>
 	<td class="summary">Create (but do not start) a new timer.</td>
 	</tr>
 	<tr>
@@ -136,6 +145,14 @@ LevelFuncs.OnControlPhase = <span class="keyword">function</span>(dt)
 	<tr>
 	<td class="name" ><a href="#Stop">Stop(t)</a></td>
 	<td class="summary">Stop the timer.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#IsActive">IsActive(t)</a></td>
+	<td class="summary">Get whether or not the timer is active</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#IsPaused">IsPaused(t)</a></td>
+	<td class="summary">Get whether or not the timer is paused</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#GetRemainingTime">GetRemainingTime(t)</a></td>
@@ -172,10 +189,30 @@ LevelFuncs.OnControlPhase = <span class="keyword">function</span>(dt)
     <dl class="function">
     <dt>
     <a name = "Create"></a>
-    <strong>Create(name, totalTime, loop, showString, func, funcArgs)</strong>
+    <strong>Create(name, totalTime, loop, timerFormat, func[, ...])</strong>
     </dt>
     <dd>
-    Create (but do not start) a new timer.
+    Create (but do not start) a new timer. </p>
+
+<p> You have the option of displaying the remaining time on the clock. Timer format details:</p>
+<pre><code>-- deciseconds are 1/10th of a second
+
+-- mins:secs
+local myTimeFormat1 = {minutes = true, seconds = true, deciseconds = false}
+
+-- also mins:secs
+local myTimeFormat2 = {minutes = true, seconds = true}
+
+-- secs:decisecs
+local myTimeFormat3 = {seconds = true, deciseconds = true}
+
+-- secs; also what is printed if you pass true instead of a table
+local myTimeFormat4 = {seconds = true}
+</code></pre>
+
+<p><strong>At any given time, only one timer can show its countdown</strong>.</p>
+
+<p>Use this sparingly; in the classics, timed challenges did not have visible countdowns. For shorter timers, the gameplay benefit from showing the remaining time might not be necessary, and could interfere with the atmosphere of the level.
 
 
     <h3>Parameters:</h3>
@@ -192,16 +229,17 @@ LevelFuncs.OnControlPhase = <span class="keyword">function</span>(dt)
             <span class="types"><span class="type">bool</span></span>
          if true, the timer will start again immediately after the time has elapsed
         </li>
-        <li><span class="parameter">showString</span>
-            <span class="types"><span class="type">bool</span></span>
-         if true, the remaining time, rounded up, will show at the bottom of the screen. <strong>At any given time, only one timer can show its remaining time</strong>.
+        <li><span class="parameter">timerFormat</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.1/manual.html#5.5">table</a> or <span class="type">bool</span></span>
+         If a table is given, the remaining time will be shown as a string, formatted according to the values in the table. If true, the remaining seconds, rounded up, will show at the bottom of the screen. If false, the remaining time will not be shown on screen.
         </li>
         <li><span class="parameter">func</span>
             <span class="types"><a class="type" href="https://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
-         The name of the LevelFunc member to call when the time is up
+         The name of the LevelFunc member to call when the time is upssss
         </li>
-        <li><span class="parameter">funcArgs</span>
-         the arguments with which the above function will be called
+        <li><span class="parameter">...</span>
+         a variable number of arguments with which the above function will be called
+         (<em>optional</em>)
         </li>
     </ul>
 
@@ -323,6 +361,56 @@ LevelFuncs.OnControlPhase = <span class="keyword">function</span>(dt)
         </li>
     </ul>
 
+
+
+
+
+</dd>
+    <dt>
+    <a name = "IsActive"></a>
+    <strong>IsActive(t)</strong>
+    </dt>
+    <dd>
+    Get whether or not the timer is active
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">t</span>
+         the timer in question
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        true if the timer is active, false if otherwise
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "IsPaused"></a>
+    <strong>IsPaused(t)</strong>
+    </dt>
+    <dd>
+    Get whether or not the timer is paused
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">t</span>
+         the timer in question
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        true if the timer is paused, false if otherwise
+    </ol>
 
 
 
@@ -479,8 +567,8 @@ LevelFuncs.OnControlPhase = <span class="keyword">function</span>(dt)
 </div> <!-- id="content" -->
 </div> <!-- id="main" -->
 <div id="about">
-<i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
-<i style="float:right;">Last updated 2022-08-01 20:38:26 </i>
+<i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.0.1</a></i>
+<i style="float:right;">Last updated 2022-08-08 21:38:19 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>
