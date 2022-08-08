@@ -31,23 +31,6 @@
 		);
 	}
 
-	Vector3 TranslatePoint(Vector3 point, Vector3 direction, float distance)
-	{
-		direction.Normalize();
-		point += direction * distance;
-		return point;
-	}
-
-	Vector3Int TranslatePoint(Vector3Int point, Vector3 direction, float distance)
-	{
-		auto newPoint = TranslatePoint(point.ToVector3(), direction, distance);
-		return Vector3Int(
-			(int)round(newPoint.x),
-			(int)round(newPoint.y),
-			(int)round(newPoint.z)
-		);
-	}
-
 	Vector3 TranslatePoint(Vector3 point, Vector3Shrt orient, float distance)
 	{
 		if (distance == 0.0f)
@@ -67,6 +50,23 @@
 	Vector3Int TranslatePoint(Vector3Int point, Vector3Shrt orient, float distance)
 	{
 		auto newPoint = TranslatePoint(point.ToVector3(), orient, distance);
+		return Vector3Int(
+			(int)round(newPoint.x),
+			(int)round(newPoint.y),
+			(int)round(newPoint.z)
+		);
+	}
+
+	Vector3 TranslatePoint(Vector3 point, Vector3 direction, float distance)
+	{
+		direction.Normalize();
+		point += direction * distance;
+		return point;
+	}
+
+	Vector3Int TranslatePoint(Vector3Int point, Vector3 direction, float distance)
+	{
+		auto newPoint = TranslatePoint(point.ToVector3(), direction, distance);
 		return Vector3Int(
 			(int)round(newPoint.x),
 			(int)round(newPoint.y),
