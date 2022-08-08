@@ -638,6 +638,7 @@ CALL gen.bat</Command>
     <ClCompile Include="Math\Containers\Vector3s.cpp" />
     <ClCompile Include="Math\Geometry.cpp" />
     <ClCompile Include="Math\Containers\PoseData.cpp" />
+    <ClCompile Include="Math\Math.cpp" />
     <ClCompile Include="Math\Random.cpp" />
     <ClCompile Include="Math\Containers\Vector2i.cpp" />
     <ClCompile Include="Math\Containers\Vector3i.cpp" />

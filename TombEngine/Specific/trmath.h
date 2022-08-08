@@ -1,10 +1,9 @@
 #pragma once
+#include "Math/Math.h"
 #include "Specific/phd_global.h"
 
 constexpr auto FPS = 30;
 
-constexpr auto PI = 3.14159265358979323846f;
-constexpr auto RADIAN = 0.01745329252f;
 constexpr auto ONE_DEGREE = 182;
 constexpr auto PREDICTIVE_SCALE_FACTOR = 14;
 constexpr auto WALL_SIZE = 1024;
@@ -18,11 +17,8 @@ constexpr auto WADE_DEPTH = STEPUP_HEIGHT;
 constexpr auto SHALLOW_WATER_START_LEVEL = STEP_SIZE / 4;
 constexpr auto BAD_JUMP_CEILING = ((STEP_SIZE * 3) / 4);
 constexpr auto SLOPE_DIFFERENCE = 60;
-constexpr auto NO_HEIGHT  = INT_MIN + UCHAR_MAX;
-constexpr auto MAX_HEIGHT = INT_MIN + 1; // Add 1 to prevent issue with sign changes
 constexpr auto DEEP_WATER = INT_MAX - 1; // Subtract 1 to prevent issue with sign changes
 
-constexpr auto SQUARE = [](auto x) { return x * x; };
 constexpr auto CLICK = [](auto x) { return STEP_SIZE * x; };
 constexpr auto SECTOR = [](auto x) { return WALL_SIZE * x; };
 constexpr auto MESH_BITS = [](auto x) { return 1 << x; };
@@ -64,10 +60,3 @@ Vector3Int* FP_Normalise(Vector3Int* v);
 
 #define	MULFP(a,b)		(int)((((__int64)a*(__int64)b))>>16)
 #define DIVFP(a,b)		(int)(((a)/(b>>8))<<8)
-
-const float Lerp(float v0, float v1, float t);
-const float Smoothstep(float edge0, float edge1, float x);
-const float Smoothstep(float x);
-const float Luma(Vector3& color);
-const Vector3 Screen(Vector3& ambient, Vector3& tint);
-const Vector4 Screen(Vector4& ambient, Vector4& tint);

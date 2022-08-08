@@ -1,8 +1,8 @@
 #pragma once
 #include <climits>
 
-namespace TEN::Math
-{
+//namespace TEN::Math
+//{
 	// Math constants
 	constexpr inline auto PI	   = 3.14159265358979323846264338327950288419716939937510L;
 	constexpr inline auto PI_MUL_2 = PI * 2;
@@ -13,11 +13,11 @@ namespace TEN::Math
 
 	constexpr inline auto SQUARE = [](auto x) { return (x * x); };
 
-	// TEN constants
+	// World constants
 	constexpr inline auto BLOCK_UNIT = 1024;
 	constexpr inline auto NO_HEIGHT	 = INT_MIN + UCHAR_MAX;
 	constexpr inline auto MAX_HEIGHT = INT_MIN + 1;
 
 	constexpr inline auto BLOCK		= [](auto x) { return int(BLOCK_UNIT * x); };
 	constexpr inline auto QTR_BLOCK = [](auto x) { return int((BLOCK_UNIT / 4) * x); };
-}
+//}
