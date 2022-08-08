@@ -519,6 +519,7 @@ GameStatus DoLevel(int index, std::string const& ambient, bool loadFromSavegame)
 	InitialisePickupDisplay();
 	InitialiseCamera();
 
+	g_GameStringsHandler->ClearDisplayStrings();
 	g_GameScript->ResetScripts(loadFromSavegame);
 
 	// Run the level script
