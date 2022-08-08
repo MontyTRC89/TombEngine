@@ -9,6 +9,9 @@ new_type("tenclass", "2 Classes", true)
 new_type("tenprimitive", "3 Primitive Classes", true)
 new_type("enum", "4 Enums", true)
 new_type("luautil", "5 Lua utility modules", true)
+
+not_luadoc = true
+
 version = "1.0.1"
 project = "TombEngine"
 title = "TombEngine " .. version .. " Lua API"
