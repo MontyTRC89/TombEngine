@@ -34,8 +34,8 @@ void ShootAtLara(FX_INFO *fx)
 	fx->pos.Orientation.y = phd_atan(z, x);
 
 	// Random scatter (only a little bit else it's too hard to avoid).
-	fx->pos.Orientation.x += (GetRandomControl() - 0x4000) / 0x40;
-	fx->pos.Orientation.y += (GetRandomControl() - 0x4000) / 0x40;
+	fx->pos.Orientation.x += (GetRandomControl() - ANGLE(90.0f)) / 64;
+	fx->pos.Orientation.y += (GetRandomControl() - ANGLE(90.0f)) / 64;
 }
 
 void ControlMissile(short fxNumber)
@@ -44,8 +44,11 @@ void ControlMissile(short fxNumber)
 	auto isUnderwater = TestEnvironment(ENV_FLAG_WATER, fx->roomNumber);
 	auto soundFxType = isUnderwater ? SoundEnvironment::Water : SoundEnvironment::Land;
 
-	if (fx->objectNumber == ID_SCUBA_HARPOON && isUnderwater && fx->pos.Orientation.x > -0x3000)
+	if (fx->objectNumber == ID_SCUBA_HARPOON && isUnderwater
+		&& fx->pos.Orientation.x > ANGLE(-67.5f))
+	{
 		fx->pos.Orientation.x -= ANGLE(1.0f);
+	}
 
 	int velocity = fx->speed * phd_cos(fx->pos.Orientation.x);
 	fx->pos.Position.z += velocity * phd_cos(fx->pos.Orientation.y);
