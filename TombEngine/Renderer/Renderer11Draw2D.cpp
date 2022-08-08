@@ -251,8 +251,7 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer11::DrawFadeAndBars(ID3D11RenderTargetView* target, ID3D11DepthStencilView* depthTarget,
-		RenderView& view)
+	void Renderer11::DrawPostprocess(ID3D11RenderTargetView* target, ID3D11DepthStencilView* depthTarget, RenderView& view)
 	{
 		SetBlendMode(BLENDMODE_OPAQUE);
 		SetCullMode(CULL_MODE_CCW);
@@ -299,6 +298,7 @@ namespace TEN::Renderer
 		m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		m_context->IASetInputLayout(m_inputLayout.Get());
 
+		m_stPostProcessBuffer.FXAA = g_Configuration.Antialiasing == AntialiasingMode::Low ? 1 : 0;
 		m_stPostProcessBuffer.ViewportWidth = m_screenWidth;
 		m_stPostProcessBuffer.ViewportHeight = m_screenHeight;
 		m_stPostProcessBuffer.ScreenFadeFactor = ScreenFadeCurrent;
