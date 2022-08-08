@@ -322,7 +322,7 @@ namespace TEN::Entities::TR4
 			{
 				if (!creature->ReachedGoal || foundEnemy)
 				{
-					if (item->TestBits(JointBitType::MeshSwap, GuideSwapJoint_Right_Hand))
+					if (item->MeshSwapBits == 0x40000)
 						item->Animation.TargetState = GUIDE_STATE_WALK_NO_TORCH;
 					else if (foundEnemy && AI.distance < pow(SECTOR(1), 2))
 					{
