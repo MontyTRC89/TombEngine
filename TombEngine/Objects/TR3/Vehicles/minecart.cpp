@@ -324,7 +324,7 @@ namespace TEN::Entities::Vehicles
 				}
 			}
 
-			if (minecart->Velocity >= MINECART_VELOCITY_MIN)
+			if (minecart->Velocity > 0)
 			{
 				if (TrInput & MINECART_IN_DUCK)
 					laraItem->Animation.TargetState = MINECART_STATE_DUCK;

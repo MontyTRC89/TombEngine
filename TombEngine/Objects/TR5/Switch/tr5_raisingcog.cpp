@@ -92,7 +92,7 @@ void RaisingCogControl(short itemNumber)
 				if (!item->ItemFlags[2])
 				{
 					InitialiseSpotCam(item->ItemFlags[2]);
-					UseSpotCam = 1;
+					UseSpotCam = true;
 				}
 
 				int flags = 0;
