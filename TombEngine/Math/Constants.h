@@ -19,6 +19,7 @@
 	constexpr inline auto NO_HEIGHT	 = INT_MIN + UCHAR_MAX;
 	constexpr inline auto MAX_HEIGHT = INT_MIN + 1;
 
-	constexpr inline auto BLOCK		= [](auto x) { return int(BLOCK_UNIT * x); };
-	constexpr inline auto QTR_BLOCK = [](auto x) { return int((BLOCK_UNIT / 4) * x); };
+	constexpr inline auto BLOCK			= [](auto x) { return (int)round(BLOCK_UNIT * x); };
+	constexpr inline auto QTR_BLOCK		= [](auto x) { return (int)round((BLOCK_UNIT / 4) * x); };
+	constexpr inline auto OFFSET_RADIUS = [](auto x) { return (int)round((x * SQRT_2) + 4); };
 //}

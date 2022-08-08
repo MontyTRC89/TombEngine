@@ -22,7 +22,6 @@ constexpr auto DEEP_WATER = INT_MAX - 1; // Subtract 1 to prevent issue with sig
 constexpr auto CLICK = [](auto x) { return STEP_SIZE * x; };
 constexpr auto SECTOR = [](auto x) { return WALL_SIZE * x; };
 constexpr auto MESH_BITS = [](auto x) { return 1 << x; };
-constexpr auto OFFSET_RADIUS = [](auto x) { return round(x * sqrt(2) + 4); };
 
 short ANGLE(float angle);
 short FROM_DEGREES(float angle);
