@@ -407,14 +407,15 @@ GameStatus DoTitle(int index, std::string const& ambient)
 
 	InventoryResult inventoryResult;
 
+	g_GameStringsHandler->ClearDisplayStrings();
+	g_GameScript->ResetScripts(true);
+
 	if (g_GameFlow->TitleType == TITLE_TYPE::FLYBY)
 	{
 		// Initialise items, effects, lots, camera
 		InitialiseFXArray(true);
 		InitialisePickupDisplay();
 		InitialiseCamera();
-
-		g_GameScript->ResetScripts(true);
 
 		// Run the level script
 		ScriptInterfaceLevel* level = g_GameFlow->GetLevel(index);
