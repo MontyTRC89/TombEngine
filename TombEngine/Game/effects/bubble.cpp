@@ -6,7 +6,7 @@
 #include "Objects/objectslist.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
-#include "Specific/prng.h"
+#include "Math/Random.h"
 #include "Specific/trmath.h"
 
 using std::vector;

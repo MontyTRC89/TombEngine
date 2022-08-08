@@ -17,7 +17,7 @@
 #include "Specific/input.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
-#include "Specific/prng.h"
+#include "Math/Random.h"
 
 using namespace TEN::Effects::Spark;
 using namespace TEN::Input;

@@ -13,10 +13,10 @@
 #include "Game/effects/tomb4fx.h"
 #include "Game/effects/simple_particle.h"
 #include "Game/room.h"
+#include "Math/Random.h"
 #include "Renderer/Renderer11.h"
 #include "Sound/sound.h"
 #include "Specific/trmath.h"
-#include "Specific/prng.h"
 #include "ScriptInterfaceGame.h"
 #include "Specific/setup.h"
 

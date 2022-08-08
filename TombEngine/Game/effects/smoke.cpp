@@ -9,7 +9,7 @@
 #include "Game/Lara/lara.h"
 #include "Game/room.h"
 #include "Specific/level.h"
-#include "Specific/prng.h"
+#include "Math/Random.h"
 #include "Specific/setup.h"
 #include "Specific/trmath.h"
 

@@ -2,7 +2,7 @@
 #include "Specific/trmath.h"
 
 #include <cmath>
-#include "Specific/prng.h"
+#include "Math/Random.h"
 
 using namespace TEN::Math::Random;
 

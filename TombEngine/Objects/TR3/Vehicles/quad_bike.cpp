@@ -19,7 +19,7 @@
 #include "Specific/level.h"
 #include "Specific/input.h"
 #include "Specific/setup.h"
-#include "Specific/prng.h"
+#include "Math/Random.h"
 #include "Game/effects/simple_particle.h"
 
 using namespace TEN::Input;

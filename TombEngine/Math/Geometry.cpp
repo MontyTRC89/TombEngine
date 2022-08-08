@@ -1,8 +1,8 @@
 #include "framework.h"
 #include "Math/Geometry.h"
 
-#include "Math/Angles/Vector3s.h"
-#include "Math/Vector3i.h"
+#include "Math/Containers/Vector3i.h"
+#include "Math/Containers/Vector3s.h"
 #include "Specific/trmath.h"
 
 //namespace TEN::Math::Geometry

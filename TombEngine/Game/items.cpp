@@ -5,13 +5,13 @@
 #include "Game/collision/floordata.h"
 #include "Game/effects/effects.h"
 #include "Game/Lara/lara.h"
-#include "ScriptInterfaceGame.h"
-#include "Specific/setup.h"
-#include "Specific/level.h"
-#include "Specific/input.h"
+#include "Math/Random.h"
 #include "Objects/ScriptInterfaceObjectsHandler.h"
+#include "ScriptInterfaceGame.h"
+#include "Specific/input.h"
+#include "Specific/level.h"
+#include "Specific/setup.h"
 #include "Sound/sound.h"
-#include "Specific/prng.h"
 
 using namespace TEN::Floordata;
 using namespace TEN::Input;

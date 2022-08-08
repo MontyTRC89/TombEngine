@@ -1,9 +1,6 @@
 #pragma once
-#include "Math/Angles/Vector3s.h"
-#include "Math/Vector3i.h"
-
-//using namespace TEN::Math;
-//using namespace TEN::Math::Angles;
+#include "Math/Containers/Vector3i.h"
+#include "Math/Containers/Vector3s.h"
 
 //namespace TEN::Math
 //{

@@ -16,7 +16,7 @@
 #include "Game/health.h"
 #include "Game/camera.h"
 #include "Game/animation.h"
-#include "Specific/prng.h"
+#include "Math/Random.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
 #include "Sound/sound.h"

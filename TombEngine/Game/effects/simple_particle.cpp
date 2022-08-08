@@ -4,7 +4,7 @@
 #include "Game/items.h"
 #include "Specific/trmath.h"
 #include "Specific/setup.h"
-#include "Specific/prng.h"
+#include "Math/Random.h"
 
 using namespace TEN::Math::Random;
 

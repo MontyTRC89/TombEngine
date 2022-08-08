@@ -4,7 +4,7 @@
 
 #include <array>
 #include "Specific/trmath.h"
-#include "Specific/prng.h"
+#include "Math/Random.h"
 
 using namespace DirectX::SimpleMath;
 using namespace TEN::Math::Random;

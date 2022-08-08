@@ -19,7 +19,7 @@
 #include "Objects/TR4/Vehicles/jeep_info.h"
 #include "Objects/Utils/VehicleHelpers.h"
 #include "Renderer/Renderer11Enums.h"
-#include "Specific/prng.h"
+#include "Math/Random.h"
 
 using namespace TEN::Input;
 using std::vector;

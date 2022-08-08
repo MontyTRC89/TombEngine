@@ -17,7 +17,7 @@
 #include "Sound/sound.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
-#include "Specific/prng.h"
+#include "Math/Random.h"
 #include "Specific/trmath.h"
 #include "Flow/ScriptInterfaceFlowHandler.h"
 #include "Renderer/Renderer11.h"

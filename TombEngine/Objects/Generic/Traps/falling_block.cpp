@@ -8,7 +8,7 @@
 #include "Specific/setup.h"
 #include "Game/room.h"
 #include "Sound/sound.h"
-#include "Specific/prng.h"
+#include "Math/Random.h"
 
 using namespace TEN::Floordata;
 using namespace TEN::Math::Random;

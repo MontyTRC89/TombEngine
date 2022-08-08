@@ -11,7 +11,7 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Specific/level.h"
-#include "Specific/prng.h"
+#include "Math/Random.h"
 #include "Specific/setup.h"
 #include "Renderer/Renderer11Enums.h"
 #include "Sound/sound.h"

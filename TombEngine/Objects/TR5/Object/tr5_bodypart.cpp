@@ -7,7 +7,7 @@
 #include "Game/collision/collide_room.h"
 #include "Game/items.h"
 #include "Game/effects/tomb4fx.h"
-#include "Specific/prng.h"
+#include "Math/Random.h"
 
 using namespace TEN::Math::Random;
 

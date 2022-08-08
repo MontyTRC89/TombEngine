@@ -17,7 +17,7 @@
 #include "Objects/TR2/Vehicles/skidoo_info.h"
 #include "Specific/input.h"
 #include "Specific/level.h"
-#include "Specific/prng.h"
+#include "Math/Random.h"
 #include "Specific/setup.h"
 #include "Sound/sound.h"
 
