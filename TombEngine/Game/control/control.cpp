@@ -366,33 +366,24 @@ GameStatus ControlPhase(int numFrames, int demoMode)
 
 unsigned CALLBACK GameMain(void *)
 {
-	try 
-	{
-		TENLog("Starting GameMain...", LogLevel::Info);
+	TENLog("Starting GameMain...", LogLevel::Info);
 
-		TimeInit();
+	TimeInit();
 
-		if (g_GameFlow->IntroImagePath.empty())
-			throw TENScriptException("Intro image path is not set.");
+	if (g_GameFlow->IntroImagePath.empty())
+		throw TENScriptException("Intro image path is not set.");
 
-		// Do a fixed time title image
-		g_Renderer.RenderTitleImage();
+	// Do a fixed time title image
+	g_Renderer.RenderTitleImage();
 
-		// Execute the LUA gameflow and play the game
-		g_GameFlow->DoFlow();
+	// Execute the LUA gameflow and play the game
+	g_GameFlow->DoFlow();
 
-		DoTheGame = false;
+	DoTheGame = false;
 
-		// Finish the thread
-		PostMessage(WindowsHandle, WM_CLOSE, NULL, NULL);
-		EndThread();
-	}
-	catch (TENScriptException const& e) 
-	{
-		std::string msg = std::string{ "An unrecoverable error occurred in " } + __func__ + ": " + e.what();
-		TENLog(msg, LogLevel::Error, LogConfig::All);
-		throw;
-	}
+	// Finish the thread
+	PostMessage(WindowsHandle, WM_CLOSE, NULL, NULL);
+	EndThread();
 
 	return true;
 }
