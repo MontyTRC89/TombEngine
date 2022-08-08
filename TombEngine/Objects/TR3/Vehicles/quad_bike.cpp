@@ -962,7 +962,7 @@ namespace TEN::Entities::Vehicles
 			}
 
 			// Driving back / braking.
-			if (TrInput & (VEHICLE_IN_REVERSE | VEHICLE_IN_BRAKE))
+			if (TrInput & VEHICLE_IN_REVERSE)
 			{
 				if (TrInput & VEHICLE_IN_SPEED &&
 					(quadBike->CanStartDrift || quadBike->DriftStarting))
