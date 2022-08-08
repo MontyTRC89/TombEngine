@@ -95,6 +95,9 @@ void DoLookAround(ItemInfo* item, bool invertVerticalAxis)
 {
 	auto* lara = GetLaraInfo(item);
 
+	// Clear directional inputs.
+	TrInput &= ~IN_DIRECTION;
+	
 	Camera.type = CameraType::Look;
 
 	// Define angle constants.
@@ -114,39 +117,24 @@ void DoLookAround(ItemInfo* item, bool invertVerticalAxis)
 	int hSign = std::copysign(1, hAxisCoeff);
 	int vSign = std::copysign(1, vAxisCoeff);
 
-	// Look horizontally.
-	if (TrInput & (IN_LEFT | IN_RIGHT))
+	// Modulate look orientation.
+	if (BinocularRange)
 	{
-		TrInput &= (TrInput & IN_LEFT)	? ~IN_LEFT	: NULL;
-		TrInput &= (TrInput & IN_RIGHT) ? ~IN_RIGHT : NULL;
-
-		// Modulate look orientation.
-		if (BinocularRange)
-			lara->Control.Look.Orientation.y += (lookCamTurnRate * (BinocularRange - ANGLE(10.0f)) / ANGLE(8.5f)) * hAxisCoeff;
-		else
-			lara->Control.Look.Orientation.y += lookCamTurnRate * hAxisCoeff;
-
-		// Clamp look orientation.
-		if (abs(lara->Control.Look.Orientation.y) > hConstraintAngle)
-			lara->Control.Look.Orientation.y = hConstraintAngle * hSign;
+		lara->Control.Look.Orientation.x += (lookCamTurnRate * (BinocularRange - ANGLE(10.0f)) / ANGLE(17.0f)) * vAxisCoeff;
+		lara->Control.Look.Orientation.y += (lookCamTurnRate * (BinocularRange - ANGLE(10.0f)) / ANGLE(8.5f)) * hAxisCoeff;
+	}
+	else
+	{
+		lara->Control.Look.Orientation.x += lookCamTurnRate * vAxisCoeff;
+		lara->Control.Look.Orientation.y += lookCamTurnRate * hAxisCoeff;
 	}
 
-	// Look vertically.
-	if (TrInput & (IN_FORWARD | IN_BACK))
-	{
-		TrInput &= (TrInput & IN_FORWARD) ? ~IN_FORWARD : NULL;
-		TrInput &= (TrInput & IN_BACK)	  ? ~IN_BACK	: NULL;
+	// Clamp look orientation.
+	if (abs(lara->Control.Look.Orientation.x) > vConstraintAngle)
+		lara->Control.Look.Orientation.x = vConstraintAngle * vSign;
 
-		// Modulate look orientation.
-		if (BinocularRange)
-			lara->Control.Look.Orientation.x += (lookCamTurnRate * (BinocularRange - ANGLE(10.0f)) / ANGLE(17.0f)) * vAxisCoeff;
-		else
-			lara->Control.Look.Orientation.x += lookCamTurnRate * vAxisCoeff;
-
-		// Clamp look orientation.
-		if (abs(lara->Control.Look.Orientation.x) > vConstraintAngle)
-			lara->Control.Look.Orientation.x = vConstraintAngle * vSign;
-	}
+	if (abs(lara->Control.Look.Orientation.y) > hConstraintAngle)
+		lara->Control.Look.Orientation.y = hConstraintAngle * hSign;
 
 	// Visually adapt head orientation.
 	//lara->ExtraHeadRot = lara->Control.Look.Orientation / 2;
@@ -200,7 +188,7 @@ void LookCamera(ItemInfo* item)
 
 	// Define landmarks.
 	auto pivot = TranslateVector(item->Pose.Position, item->Pose.Orientation.y, CLICK(0.25f), -LaraCollision.Setup.Height);
-	auto cameraPos = TranslateVector(pivot, orient, -Camera.targetDistance * 0.5f);
+	auto cameraPos = TranslateVector(pivot, orient, -std::max(Camera.targetDistance * 0.5f, SECTOR(0.5f)));
 	auto lookAtPos = TranslateVector(pivot, orient, CLICK(0.5f));
 
 	// Determine steps to farthest position.
@@ -238,7 +226,7 @@ void LookCamera(ItemInfo* item)
 	// Set mike position.
 	if (Camera.mikeAtLara)
 	{
-		Camera.actualAngle = item->Pose.Orientation.y + lara->Control.Look.Orientation.y;
+		Camera.actualAngle = orient.y;
 		Camera.mikePos = item->Pose.Position;
 	}
 	else
@@ -258,7 +246,7 @@ void LookAt(CAMERA_INFO* cam, short roll)
 {
 	Vector3 position = Vector3(cam->pos.x, cam->pos.y, cam->pos.z);
 	Vector3 target = Vector3(cam->target.x, cam->target.y, cam->target.z);
-	Vector3 up = Vector3(0.0f, -1.0f, 0.0f);
+	Vector3 up = Vector3::Down;
 	float fov = TO_RAD(CurrentFOV / 1.333333f);
 	float r = TO_RAD(roll);
 
@@ -283,7 +271,6 @@ inline void RumbleFromBounce()
 {
 	Rumble(std::clamp((float)abs(Camera.bounce) / 70.0f, 0.0f, 0.8f), 0.2f);
 }
-
 
 void InitialiseCamera()
 {
