@@ -2,8 +2,8 @@
 #include "./Math.hlsli"
 
 #define FXAA_SPAN_MAX	8.0
-#define FXAA_REDUCE_MUL 1.0/8.0
-#define FXAA_REDUCE_MIN 1.0/128.0
+#define FXAA_REDUCE_MUL 1.0/4.0
+#define FXAA_REDUCE_MIN 1.0/64.0
 
 cbuffer PostProcessBuffer : register(b7)
 {
@@ -85,6 +85,7 @@ PixelShaderInput VS(VertexShaderInput input)
 float4 PS(PixelShaderInput input) : SV_TARGET
 {
 	float4 output = FXAA ? Antialias(input) : Texture.Sample(Sampler, input.UV);
+
 	float3 colorMul = min(input.Color.xyz, 1.0f);
 
 	float y = input.Position.y / ViewportHeight;
