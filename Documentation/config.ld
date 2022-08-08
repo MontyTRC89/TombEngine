@@ -12,7 +12,7 @@ new_type("luautil", "5 Lua utility modules", true)
 
 not_luadoc = true
 
-version = "1.0.1"
+local version = "1.0.1"
 project = "TombEngine"
 title = "TombEngine " .. version .. " Lua API"
 description = "TombEngine " .. version .. " scripting interface"
@@ -28,7 +28,7 @@ This will put the modules and classes in the global table. In other words, it me
 	local door = GetMoveableByName("door_type4_14")
 
 ####Always check logs/TENLog.txt
-If you are scripting levels, TombEngine will often crash, even if `errorMode` (see Flow.Settings) is set to `ErrorMode.WARN` or `ErrorMode.SILENT`.
+If you are scripting levels, TombEngine will often kick you back to the title screen, even if `errorMode` (see Flow.Settings) is set to `ErrorMode.WARN` or `ErrorMode.SILENT`.
 
 This might get annoying, but it's on purpose. If your Lua script contains a syntax error (e.g. you're missing `end` at the end of a function), the Lua interpreter will not be able to continue running the script. If it tried to keep running, you'd probably see some pretty strange behaviour, and would possibly get a crash regardless.
 
@@ -38,10 +38,11 @@ Enjoy.
 
 \- _squidshire_
 ]]
+
 style = true
 wrap = true
 template = true
-format = 'markdown'
+format='markdown'
 no_space_before_args = true
 
 custom_display_name_handler = function(item, default_handler)
