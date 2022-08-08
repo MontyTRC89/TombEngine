@@ -9,9 +9,10 @@ new_type("tenclass", "2 Classes", true)
 new_type("tenprimitive", "3 Primitive Classes", true)
 new_type("enum", "4 Enums", true)
 new_type("luautil", "5 Lua utility modules", true)
+version = "1.0.1"
 project = "TombEngine"
-title = "TombEngine Lua API"
-description = "TombEngine scripting interface"
+title = "TombEngine " .. version .. " Lua API"
+description = "TombEngine " .. version .. " scripting interface"
 full_description = [[Welcome to the TombEngine scripting API. This is a work in progress and some information might be wrong or outdated. Please also note that this is primarily a reference document, not a tutorial, so expect descriptions to be fairly sparse. At the time of writing, there is a tutorial describing the basics of Lua, as well as a number of example scripts, on the wiki at https://github.com/MontyTRC89/TombEngine/wiki.
 ####Module Hierarchy (boring but important)
 Other than the "special tables" (GameVars, LevelVars and LevelFuncs), every module described herein is held in a master table called TEN.
