@@ -275,9 +275,12 @@ table Sink {
 }
 
 table StaticMeshInfo {
+	number: int32;
+	room_number: int32;
+	position: Vector3;
+	rotation: Vector3;
 	color: Vector4;
 	hit_points: int32;
-	room_number: int32;
 	flags: int32;
 }
 
@@ -387,6 +390,23 @@ table Pendulum {
 	node: int32;
 }
 
+table EventSetCallCounters {
+	on_enter: int32;
+	on_inside: int32;
+	on_leave: int32;
+}
+
+table VolumeState {
+	number: int32;
+	room_number: int32;
+	position: Vector3;
+	rotation: Vector4;
+	scale: Vector3;
+	state: int32;
+	triggerer: int32;
+	timeout: int32;
+}
+
 struct KeyValPair {
 	key: uint32;
 	val: uint32;
@@ -478,6 +498,8 @@ table SaveGame {
 	rope: Rope;
 	pendulum: Pendulum;
 	alternate_pendulum: Pendulum;
+	volume_states: [VolumeState];
+	call_counters: [EventSetCallCounters];
 	script_vars: UnionVec;
 	}
 

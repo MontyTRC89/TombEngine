@@ -17,9 +17,9 @@ using namespace TEN::Control::Volumes;
 
 constexpr auto MAX_CAMERA = 18;
 
-int TrackCameraInit;
+bool TrackCameraInit;
 int SpotcamTimer;
-int SpotcamPaused;
+bool SpotcamPaused;
 int SpotcamLoopCnt;
 int CameraFade;
 Vector3Int LaraFixedPosition;
@@ -41,7 +41,6 @@ int CameraZtarget[MAX_CAMERA];
 int CameraRoll[MAX_CAMERA];
 int CameraFOV[MAX_CAMERA];
 int CameraSpeed[MAX_CAMERA];
-QUAKE_CAMERA QuakeCam;
 int SplineFromCamera;
 bool SpotCamFirstLook;
 short CurrentSplineCamera;
@@ -50,13 +49,14 @@ int LaraHealth;
 int LaraAir;
 int CurrentSpotcamSequence;
 SPOTCAM SpotCam[MAX_SPOTCAMS];
-byte SpotCamRemap[MAX_SPOTCAMS];
-byte CameraCnt[MAX_SPOTCAMS];
+int SpotCamRemap[MAX_SPOTCAMS];
+int CameraCnt[MAX_SPOTCAMS];
 int NumberSpotcams;
-int CheckTrigger = 0;
-int UseSpotCam = 0;
-int SpotcamDontDrawLara;
-int SpotcamOverlay;
+
+bool CheckTrigger = false;
+bool UseSpotCam = false;
+bool SpotcamDontDrawLara = false;
+bool SpotcamOverlay = false;
 
 void ClearSpotCamSequences()
 {
@@ -206,7 +206,6 @@ void InitialiseSpotCam(short Sequence)
 			}
 		}
 
-		//loc_379F8
 		CameraXposition[CurrentCameraCnt + 2] = SpotCam[LastCamera].x;
 		CameraYposition[CurrentCameraCnt + 2] = SpotCam[LastCamera].y;
 		CameraZposition[CurrentCameraCnt + 2] = SpotCam[LastCamera].z;
@@ -219,7 +218,6 @@ void InitialiseSpotCam(short Sequence)
 	}
 	else
 	{
-		//loc_37AA8
 		int sp = 0;
 		if ((spotcam->flags & SCF_CUT_PAN))
 		{
@@ -241,7 +239,6 @@ void InitialiseSpotCam(short Sequence)
 				if (LastCamera < CurrentSplineCamera)
 					cn = FirstCamera;
 
-				//loc_37B74
 				CameraXposition[sp + 2] = SpotCam[cn].x;
 				CameraYposition[sp + 2] = SpotCam[cn].y;
 				CameraZposition[sp + 2] = SpotCam[cn].z;
@@ -265,12 +262,6 @@ void InitialiseSpotCam(short Sequence)
 
 			if (spotcam->flags & SCF_HIDE_LARA)
 				SpotcamDontDrawLara = true;
-			else
-			{
-				QuakeCam.spos.boxNumber = 0;
-				return;
-			}
-
 		}
 		else
 		{
@@ -329,8 +320,6 @@ void InitialiseSpotCam(short Sequence)
 
 	if (spotcam->flags & SCF_HIDE_LARA)
 		SpotcamDontDrawLara = true;
-
-	QuakeCam.spos.boxNumber = 0;
 }
 
 void CalculateSpotCameras()
@@ -392,12 +381,14 @@ void CalculateSpotCameras()
 	if ((SpotCam[CurrentSplineCamera].flags & SCF_SCREEN_FADE_IN) &&
 		CameraFade != CurrentSplineCamera)
 	{
+		SetScreenFadeIn(FADE_SCREEN_SPEED);
 		CameraFade = CurrentSplineCamera;
 	}
 
 	if ((SpotCam[CurrentSplineCamera].flags & SCF_SCREEN_FADE_OUT) &&
 		CameraFade != CurrentSplineCamera)
 	{
+		SetScreenFadeOut(FADE_SCREEN_SPEED);
 		CameraFade = CurrentSplineCamera;
 	}
 
@@ -464,11 +455,12 @@ void CalculateSpotCameras()
 	else if (!SpotcamTimer)
 		CurrentSplinePosition += cspeed;
 
-	if (!(TrInput & IN_LOOK))
+	bool lookPressed = (TrInput & IN_LOOK) != 0;
+
+	if (!lookPressed)
 		SpotCamFirstLook = false;
 
-	if (s->flags & SCF_DISABLE_BREAKOUT ||
-		!(TrInput & IN_LOOK))
+	if ((s->flags & SCF_DISABLE_BREAKOUT) || !lookPressed)
 	{
 		Camera.pos.x = cpx;
 		Camera.pos.y = cpy;
@@ -498,27 +490,16 @@ void CalculateSpotCameras()
 
 		AlterFOV(cfov);
 
-		// WTF?
-		if (QuakeCam.spos.boxNumber != 0)
-		{
-			dx = (Camera.pos.x - QuakeCam.epos.x);
-			dy = (Camera.pos.y - QuakeCam.epos.y);
-			dz = (Camera.pos.z - QuakeCam.epos.z);
-
-			if (sqrt(SQUARE(dx) * SQUARE(dy) * SQUARE(dz)) < QuakeCam.epos.boxNumber)
-			{
-				dz = QuakeCam.spos.roomNumber + (((QuakeCam.epos.roomNumber - QuakeCam.spos.roomNumber) * -QuakeCam.epos.boxNumber) / QuakeCam.epos.boxNumber) >> 1;
-				dy = QuakeCam.spos.roomNumber + (((QuakeCam.epos.roomNumber - QuakeCam.spos.roomNumber) * -QuakeCam.epos.boxNumber) / QuakeCam.epos.boxNumber);
-				if (dy > 0)
-				{
-					Camera.pos.x += (GetRandomControl() / dy) - dz;
-					Camera.pos.y += (GetRandomControl() / dy) - dz;
-					Camera.pos.z += (GetRandomControl() / dy) - dz;
-				}
-			}
-		}
-
 		LookAt(&Camera, croll);
+
+		if (SpotCam[CurrentSplineCamera].flags & SCF_OVERLAY)
+			SpotcamOverlay = true;
+
+		if (SpotCam[CurrentSplineCamera].flags & SCF_HIDE_LARA)
+			SpotcamDontDrawLara = true;
+
+		if (SpotCam[CurrentSplineCamera].flags & SCF_ACTIVATE_HEAVY_TRIGGERS)
+			CheckTrigger = true;
 
 		if (CheckTrigger)
 		{
@@ -541,7 +522,9 @@ void CalculateSpotCameras()
 		}
 
 		if (s->flags & SCF_TRACKING_CAM)
+		{
 			TrackCameraInit = true;
+		}
 		else if (CurrentSplinePosition > 0x10000 - cspeed)
 		{
 			if (SpotCam[CurrentSplineCamera].timer > 0 &&
@@ -550,49 +533,7 @@ void CalculateSpotCameras()
 				if (!SpotcamTimer && !SpotcamPaused)
 					SpotcamTimer = SpotCam[CurrentSplineCamera].timer >> 3;
 			}
-			else if (SpotCam[CurrentSplineCamera].timer < 0)
-				SpotcamOverlay = 1; // Negative timer = sniper mode?
-
-			if (SpotCam[CurrentSplineCamera].flags & SCF_HIDE_LARA)
-				SpotcamDontDrawLara = true;
-
-			if (SpotCam[CurrentSplineCamera].flags & SCF_ACTIVATE_HEAVY_TRIGGERS)
-				CheckTrigger = true;
-
-			/* // Weird code which possibly did some shaking over the course of camera
-			if (SpotCam[CurrentSplineCamera].flags & SCF_STOP_MOVEMENT)
-			{
-				if (QuakeCam.spos.boxNumber == 0 || SpotCam[CurrentSplineCamera].timer != -1)
-				{
-					QuakeCam.spos.x = SpotCam[CurrentSplineCamera].x;
-					QuakeCam.spos.y = SpotCam[CurrentSplineCamera].y;
-					QuakeCam.spos.z = SpotCam[CurrentSplineCamera].z;
-
-					if (SpotCam[CurrentSplineCamera].timer != -1)
-					{
-						QuakeCam.spos.roomNumber = SpotCam[CurrentSplineCamera].timer << 3;
-					}
-					else
-					{
-						QuakeCam.spos.roomNumber = 0;
-					}
-					QuakeCam.spos.boxNumber = 1;
-					QuakeCam.epos.x = SpotCam[CurrentSplineCamera + 1].x;
-					QuakeCam.epos.y = SpotCam[CurrentSplineCamera + 1].y;
-					QuakeCam.epos.z = SpotCam[CurrentSplineCamera + 1].z;
-
-					if (SpotCam[CurrentSplineCamera + 1].timer != -1)
-						QuakeCam.epos.roomNumber = SpotCam[CurrentSplineCamera + 1].timer << 3;
-					else
-						QuakeCam.epos.roomNumber = 0;
-
-					QuakeCam.epos.boxNumber = sqrt(((QuakeCam.spos.x - QuakeCam.epos.x) * (QuakeCam.spos.x - QuakeCam.epos.x)) + ((QuakeCam.spos.y - QuakeCam.epos.y) * (QuakeCam.spos.y - QuakeCam.epos.y) + ((QuakeCam.spos.z - QuakeCam.epos.z) * (QuakeCam.spos.z - QuakeCam.epos.z))));
-				}
-				else
-					QuakeCam.spos.boxNumber = 0;
-			}
-			*/
-
+			
 			if (!SpotcamTimer)
 			{
 				CurrentSplinePosition = 0;
@@ -625,7 +566,7 @@ void CalculateSpotCameras()
 					int sp2 = 0;
 					if (SpotCam[CurrentSplineCamera].flags & SCF_CUT_TO_CAM)
 					{
-						cn = (SpotCam[CurrentSplineCamera].timer & 0xF) + FirstCamera;
+						cn = FirstCamera + SpotCam[CurrentSplineCamera].timer;
 
 						CameraXposition[1] = SpotCam[cn].x;
 						CameraYposition[1] = SpotCam[cn].y;
@@ -718,9 +659,9 @@ void CalculateSpotCameras()
 
 					SetCinematicBars(0.0f, SPOTCAM_CINEMATIC_BARS_SPEED);
 
-					UseSpotCam = 0;
+					UseSpotCam = false;
 					Lara.Control.Locked = false;
-					CheckTrigger = 0;
+					CheckTrigger = false;
 					Camera.oldType = CameraType::Fixed;
 					Camera.type = CameraType::Chase;
 					Camera.speed = 1;
@@ -835,6 +776,7 @@ void CalculateSpotCameras()
 	}
 	else
 	{
+		SetScreenFadeIn(FADE_SCREEN_SPEED);
 		SetCinematicBars(0.0f, SPOTCAM_CINEMATIC_BARS_SPEED);
 		UseSpotCam = false;
 		Lara.Control.Locked = false;
