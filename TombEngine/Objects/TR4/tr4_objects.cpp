@@ -43,6 +43,7 @@
 #include "tr4_von_croy.h"
 #include "tr4_hammerhead.h"
 #include "tr4_dog.h"
+#include "tr4_hammer.h"
 
 // Objects
 #include "tr4_sarcophagus.h"
@@ -1183,6 +1184,15 @@ namespace TEN::Entities
 			obj->initialise = InitialiseTeethSpikes;
 			obj->control = ControlTeethSpikes;
 			obj->saveFlags = 1;
+		}
+
+		obj = &Objects[ID_HAMMER];
+		if (obj->loaded)
+		{
+			obj->control = HammerControl;
+			obj->collision = GenericSphereBoxCollision;
+			obj->saveFlags = 1;
+			obj->saveAnim = 1;
 		}
 	}
 
