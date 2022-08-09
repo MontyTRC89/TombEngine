@@ -9,6 +9,10 @@ Version 1.0.1
 - Fixed minecart unduck on inclines.
 - Fixed quadbike dismount with jump key and allow to shoot big gun with action key.
 - Prevent title music audio from starting in a random place.
+- Timer.Create now lets you choose the units to display remaining time.
+- Fatal script errors now boot you to the title (it will crash if the title itself has these errors).
+- SetFarView has been removed, and Flow.Level.farView is now uncapped.
+- DisplayString text will now be cleared when a level is exited or reloaded.
 
 Version 1.0
 ===========
