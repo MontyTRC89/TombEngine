@@ -159,7 +159,7 @@ void Level::SetLevelFarView(short val)
 	const short min = std::ceil(MIN_FAR_VIEW / SECTOR(1));
 	bool cond = val >= min;
 
-	std::string msg{ "levelFarView value must be 4 or greater." };
+	std::string msg{ "farView value must be 4 or greater." };
 	if (!ScriptAssert(cond, msg))
 	{
 		// Will be set to default by the renderer
