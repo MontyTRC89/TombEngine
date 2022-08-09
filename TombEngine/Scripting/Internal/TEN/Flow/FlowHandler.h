@@ -27,7 +27,6 @@ public:
 	bool							PlayAnyLevel{ true };
 	bool							FlyCheat{ true };
 	bool							DebugMode{ false };
-	short							GameFarView{ 0 };
 
 	// New animation flag table
 	Animations			Anims{};
