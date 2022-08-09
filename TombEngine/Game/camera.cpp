@@ -31,13 +31,14 @@ constexpr auto COLL_CANCEL_THRESHOLD  = SECTOR(2);
 constexpr auto COLL_DISCARD_THRESHOLD = CLICK(0.5f);
 constexpr auto CAMERA_RADIUS          = CLICK(1);
 
-constexpr auto LOOKCAM_VERTICAL_CONSTRAINT_ANGLE   = 70.0f;
-constexpr auto LOOKCAM_HORIZONTAL_CONSTRAINT_ANGLE = 90.0f;
-constexpr auto LOOKCAM_TURN_RATE_ACCEL			   = 1.0f;
-constexpr auto LOOKCAM_TURN_RATE_MAX			   = 4.0f;
+#define LOOKCAM_VERTICAL_CONSTRAINT_ANGLE	ANGLE(70.0f)
+#define LOOKCAM_VERTICAL_CONSTRAINT_ANGLE   ANGLE(70.0f)
+#define LOOKCAM_HORIZONTAL_CONSTRAINT_ANGLE ANGLE(90.0f)
+#define LOOKCAM_TURN_RATE_ACCEL			    ANGLE(1.0f)
+#define LOOKCAM_TURN_RATE_MAX			    ANGLE(4.0f)
 
-constexpr auto THUMBCAM_VERTICAL_CONSTRAINT_ANGLE   = 120.0f;
-constexpr auto THUMBCAM_HORIZONTAL_CONSTRAINT_ANGLE = 80.0f;
+#define THUMBCAM_VERTICAL_CONSTRAINT_ANGLE   ANGLE(120.0f)
+#define THUMBCAM_HORIZONTAL_CONSTRAINT_ANGLE ANGLE(80.0f)
 
 struct OLD_CAMERA
 {
@@ -107,11 +108,6 @@ void DoLookAround(ItemInfo* item, bool invertVerticalAxis)
 	
 	Camera.type = CameraType::Look;
 
-	// Define angle constants.
-	const short vConstraintAngle	 = ANGLE(LOOKCAM_VERTICAL_CONSTRAINT_ANGLE);
-	const short hConstraintAngle	 = ANGLE(LOOKCAM_HORIZONTAL_CONSTRAINT_ANGLE);
-	const short lookCamTurnRateAccel = ANGLE(LOOKCAM_TURN_RATE_ACCEL);
-
 	// Determine axis coefficients.
 	float vAxisCoeff = 0.0f;
 	if (lara->Control.Look.Mode == LookMode::Vertical || lara->Control.Look.Mode == LookMode::Unrestrained)
@@ -122,28 +118,27 @@ void DoLookAround(ItemInfo* item, bool invertVerticalAxis)
 		hAxisCoeff = AxisMap[InputAxis::MoveHorizontal];
 
 	// Modulate turn rate.
-	short lookCamTurnRateMax = ANGLE(LOOKCAM_TURN_RATE_MAX);
+	short turnRateMax = LOOKCAM_TURN_RATE_MAX;
 	if (BinocularRange)
-		lookCamTurnRateMax *= (BinocularRange - ANGLE(10.0f)) / ANGLE(17.0f);
+		turnRateMax *= (BinocularRange - ANGLE(10.0f)) / ANGLE(17.0f);
 
-	lara->Control.Look.TurnRate.x = ModulateLaraTurnRate(lara->Control.Look.TurnRate.x, lookCamTurnRateAccel, 0, lookCamTurnRateMax, vAxisCoeff, invertVerticalAxis);
-	lara->Control.Look.TurnRate.y = ModulateLaraTurnRate(lara->Control.Look.TurnRate.y, lookCamTurnRateAccel, 0, lookCamTurnRateMax, hAxisCoeff, false);
+	lara->Control.Look.TurnRate.x = ModulateLaraTurnRate(lara->Control.Look.TurnRate.x, LOOKCAM_TURN_RATE_ACCEL, 0, turnRateMax, vAxisCoeff, invertVerticalAxis);
+	lara->Control.Look.TurnRate.y = ModulateLaraTurnRate(lara->Control.Look.TurnRate.y, LOOKCAM_TURN_RATE_ACCEL, 0, turnRateMax, hAxisCoeff, false);
 
 	// Apply turn rate.
 	lara->Control.Look.Orientation += lara->Control.Look.TurnRate;
-	lara->Control.Look.Orientation.x = std::clamp<short>(lara->Control.Look.Orientation.x, -vConstraintAngle, vConstraintAngle);
-	lara->Control.Look.Orientation.y = std::clamp<short>(lara->Control.Look.Orientation.y, -hConstraintAngle, hConstraintAngle);
+	lara->Control.Look.Orientation.x = std::clamp<short>(lara->Control.Look.Orientation.x, -LOOKCAM_VERTICAL_CONSTRAINT_ANGLE, LOOKCAM_VERTICAL_CONSTRAINT_ANGLE);
+	lara->Control.Look.Orientation.y = std::clamp<short>(lara->Control.Look.Orientation.y, -LOOKCAM_HORIZONTAL_CONSTRAINT_ANGLE, LOOKCAM_HORIZONTAL_CONSTRAINT_ANGLE);
 
 	// Visually adapt head orientation.
-	//lara->ExtraHeadRot = lara->Control.Look.Orientation / 2;
+	lara->ExtraHeadRot = lara->Control.Look.Orientation / 2;
 
 	// Visually adapt torso orientation.
 	if (lara->Control.HandStatus != HandStatus::Busy &&
-		lara->Vehicle == NO_ITEM &&
-		!lara->LeftArm.Locked &&
-		!lara->RightArm.Locked)
+		!lara->LeftArm.Locked && !lara->RightArm.Locked &&
+		lara->Vehicle == NO_ITEM)
 	{
-		//lara->ExtraTorsoRot = lara->ExtraHeadRot;
+		lara->ExtraTorsoRot = lara->ExtraHeadRot;
 	}
 
 	// Debug
@@ -166,8 +161,8 @@ void DoThumbstickCamera()
 		float hAxisCoeff = AxisMap[InputAxis::CameraHorizontal];
 		float vAxisCoeff = AxisMap[InputAxis::CameraVertical];
 
-		Camera.targetAngle = ANGLE(THUMBCAM_VERTICAL_CONSTRAINT_ANGLE * hAxisCoeff);
-		Camera.targetElevation = ANGLE(-10.0f + (THUMBCAM_HORIZONTAL_CONSTRAINT_ANGLE * hAxisCoeff));
+		Camera.targetAngle = THUMBCAM_VERTICAL_CONSTRAINT_ANGLE * hAxisCoeff;
+		Camera.targetElevation = ANGLE(-10.0f) + (THUMBCAM_HORIZONTAL_CONSTRAINT_ANGLE * hAxisCoeff);
 	}
 }
 
