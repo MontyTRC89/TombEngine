@@ -4,8 +4,8 @@
 #include "Game/animation.h"
 #include "Game/collision/collide_room.h"
 #include "Game/control/los.h"
-#include "Game/effects/effects.h"
 #include "Game/effects/debris.h"
+#include "Game/effects/effects.h"
 #include "Game/effects/weather.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
@@ -22,9 +22,9 @@
 
 using TEN::Renderer::g_Renderer;
 
-using namespace TEN::Input;
-using namespace TEN::Entities::Generic;
 using namespace TEN::Effects::Environment;
+using namespace TEN::Entities::Generic;
+using namespace TEN::Input;
 
 constexpr auto COLL_CHECK_THRESHOLD   = SECTOR(4);
 constexpr auto COLL_CANCEL_THRESHOLD  = SECTOR(2);
@@ -33,7 +33,8 @@ constexpr auto CAMERA_RADIUS          = CLICK(1);
 
 constexpr auto LOOKCAM_VERTICAL_CONSTRAINT_ANGLE   = 70.0f;
 constexpr auto LOOKCAM_HORIZONTAL_CONSTRAINT_ANGLE = 90.0f;
-constexpr auto LOOKCAM_TURN_RATE				   = 4.0f;
+constexpr auto LOOKCAM_TURN_RATE_ACCEL			   = 1.0f;
+constexpr auto LOOKCAM_TURN_RATE_MAX			   = 4.0f;
 
 constexpr auto THUMBCAM_VERTICAL_CONSTRAINT_ANGLE   = 120.0f;
 constexpr auto THUMBCAM_HORIZONTAL_CONSTRAINT_ANGLE = 80.0f;
@@ -107,40 +108,31 @@ void DoLookAround(ItemInfo* item, bool invertVerticalAxis)
 	Camera.type = CameraType::Look;
 
 	// Define angle constants.
-	const short vConstraintAngle = ANGLE(LOOKCAM_VERTICAL_CONSTRAINT_ANGLE);
-	const short hConstraintAngle = ANGLE(LOOKCAM_HORIZONTAL_CONSTRAINT_ANGLE);
-	const short lookCamTurnRate	 = ANGLE(LOOKCAM_TURN_RATE);
+	const short vConstraintAngle	 = ANGLE(LOOKCAM_VERTICAL_CONSTRAINT_ANGLE);
+	const short hConstraintAngle	 = ANGLE(LOOKCAM_HORIZONTAL_CONSTRAINT_ANGLE);
+	const short lookCamTurnRateAccel = ANGLE(LOOKCAM_TURN_RATE_ACCEL);
 
 	// Determine axis coefficients.
 	float vAxisCoeff = 0.0f;
 	if (lara->Control.Look.Mode == LookMode::Vertical || lara->Control.Look.Mode == LookMode::Unrestrained)
-		vAxisCoeff = AxisMap[InputAxis::MoveVertical] * (invertVerticalAxis ? -1 : 1);
+		vAxisCoeff = AxisMap[InputAxis::MoveVertical];
 
 	float hAxisCoeff = 0.0f;
 	if (lara->Control.Look.Mode == LookMode::Horizontal || lara->Control.Look.Mode == LookMode::Unrestrained)
 		hAxisCoeff = AxisMap[InputAxis::MoveHorizontal];
 
-	int vSign = std::copysign(1, vAxisCoeff);
-	int hSign = std::copysign(1, hAxisCoeff);
-
-	// Modulate look orientation.
+	// Modulate turn rate.
+	short lookCamTurnRateMax = ANGLE(LOOKCAM_TURN_RATE_MAX);
 	if (BinocularRange)
-	{
-		lara->Control.Look.Orientation.x += (lookCamTurnRate * (BinocularRange - ANGLE(10.0f)) / ANGLE(17.0f)) * vAxisCoeff;
-		lara->Control.Look.Orientation.y += (lookCamTurnRate * (BinocularRange - ANGLE(10.0f)) / ANGLE(8.5f)) * hAxisCoeff;
-	}
-	else
-	{
-		lara->Control.Look.Orientation.x += lookCamTurnRate * vAxisCoeff;
-		lara->Control.Look.Orientation.y += lookCamTurnRate * hAxisCoeff;
-	}
+		lookCamTurnRateMax *= (BinocularRange - ANGLE(10.0f)) / ANGLE(17.0f);
 
-	// Clamp look orientation.
-	if (abs(lara->Control.Look.Orientation.x) > vConstraintAngle)
-		lara->Control.Look.Orientation.x = vConstraintAngle * vSign;
+	lara->Control.Look.TurnRate.x = ModulateLaraTurnRate(lara->Control.Look.TurnRate.x, lookCamTurnRateAccel, 0, lookCamTurnRateMax, vAxisCoeff, invertVerticalAxis);
+	lara->Control.Look.TurnRate.y = ModulateLaraTurnRate(lara->Control.Look.TurnRate.y, lookCamTurnRateAccel, 0, lookCamTurnRateMax, hAxisCoeff, false);
 
-	if (abs(lara->Control.Look.Orientation.y) > hConstraintAngle)
-		lara->Control.Look.Orientation.y = hConstraintAngle * hSign;
+	// Apply turn rate.
+	lara->Control.Look.Orientation += lara->Control.Look.TurnRate;
+	lara->Control.Look.Orientation.x = std::clamp<short>(lara->Control.Look.Orientation.x, -vConstraintAngle, vConstraintAngle);
+	lara->Control.Look.Orientation.y = std::clamp<short>(lara->Control.Look.Orientation.y, -hConstraintAngle, hConstraintAngle);
 
 	// Visually adapt head orientation.
 	//lara->ExtraHeadRot = lara->Control.Look.Orientation / 2;
@@ -198,7 +190,7 @@ void LookCamera(ItemInfo* item)
 	auto lookAtPos = TranslateVector(pivot, orient, CLICK(0.5f));
 
 	// Determine steps to farthest position.
-	const size_t numSteps = 8;
+	const unsigned int numSteps = 8;
 	auto directionalIncrement = (pivot - cameraPos) / numSteps;
 
 	// Determine best position.
