@@ -31,12 +31,12 @@ constexpr auto COLL_CANCEL_THRESHOLD  = SECTOR(2);
 constexpr auto COLL_DISCARD_THRESHOLD = CLICK(0.5f);
 constexpr auto CAMERA_RADIUS          = CLICK(1);
 
-constexpr auto LOOKCAM_HORIZONTAL_CONSTRAINT_ANGLE = 90.0f;
 constexpr auto LOOKCAM_VERTICAL_CONSTRAINT_ANGLE   = 70.0f;
+constexpr auto LOOKCAM_HORIZONTAL_CONSTRAINT_ANGLE = 90.0f;
 constexpr auto LOOKCAM_TURN_RATE				   = 4.0f;
 
-constexpr auto THUMBCAM_HORIZONTAL_CONSTRAINT_ANGLE = 80.0f;
 constexpr auto THUMBCAM_VERTICAL_CONSTRAINT_ANGLE   = 120.0f;
+constexpr auto THUMBCAM_HORIZONTAL_CONSTRAINT_ANGLE = 80.0f;
 
 struct OLD_CAMERA
 {
@@ -101,21 +101,21 @@ void DoLookAround(ItemInfo* item, bool invertVerticalAxis)
 	Camera.type = CameraType::Look;
 
 	// Define angle constants.
-	const short hConstraintAngle = ANGLE(LOOKCAM_HORIZONTAL_CONSTRAINT_ANGLE);
 	const short vConstraintAngle = ANGLE(LOOKCAM_VERTICAL_CONSTRAINT_ANGLE);
+	const short hConstraintAngle = ANGLE(LOOKCAM_HORIZONTAL_CONSTRAINT_ANGLE);
 	const short lookCamTurnRate	 = ANGLE(LOOKCAM_TURN_RATE);
 
 	// Determine axis coefficients.
-	float hAxisCoeff = 0.0f;
-	if (lara->Control.Look.Mode == LookMode::Horizontal || lara->Control.Look.Mode == LookMode::Unrestrained)
-		hAxisCoeff = AxisMap[InputAxis::MoveHorizontal];
-
 	float vAxisCoeff = 0.0f;
 	if (lara->Control.Look.Mode == LookMode::Vertical || lara->Control.Look.Mode == LookMode::Unrestrained)
 		vAxisCoeff = AxisMap[InputAxis::MoveVertical] * (invertVerticalAxis ? -1.0f : 1.0f);
 
-	int hSign = std::copysign(1, hAxisCoeff);
+	float hAxisCoeff = 0.0f;
+	if (lara->Control.Look.Mode == LookMode::Horizontal || lara->Control.Look.Mode == LookMode::Unrestrained)
+		hAxisCoeff = AxisMap[InputAxis::MoveHorizontal];
+
 	int vSign = std::copysign(1, vAxisCoeff);
+	int hSign = std::copysign(1, hAxisCoeff);
 
 	// Modulate look orientation.
 	if (BinocularRange)
