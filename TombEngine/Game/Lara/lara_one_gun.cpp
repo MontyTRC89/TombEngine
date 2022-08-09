@@ -61,7 +61,7 @@ void AnimateShotgun(ItemInfo* laraItem, LaraWeaponType weaponType)
 	}
 
 	auto* item = &g_Level.Items[lara->Control.Weapon.WeaponItem];
-	bool running = (weaponType == LaraWeaponType::HK && laraItem->Animation.Velocity != 0);
+	bool running = (weaponType == LaraWeaponType::HK && laraItem->Animation.Velocity != 0.0f);
 	
 	static bool reloadHarpoonGun = false;
 	reloadHarpoonGun = (lara->Weapons[(int)weaponType].Ammo->hasInfinite() || weaponType != LaraWeaponType::HarpoonGun) ? false : reloadHarpoonGun;
@@ -781,8 +781,8 @@ void GrenadeControl(short itemNumber)
 					newGrenade->Pose.Orientation.x = (GetRandomControl() & 0x3FFF) + ANGLE(45);
 					newGrenade->Pose.Orientation.y = GetRandomControl() * 2;
 					newGrenade->Pose.Orientation.z = 0;
-					newGrenade->Animation.Velocity = 64;
-					newGrenade->Animation.VerticalVelocity = -64 * phd_sin(newGrenade->Pose.Orientation.x);
+					newGrenade->Animation.Velocity = 64.0f;
+					newGrenade->Animation.VerticalVelocity = -64.0f * phd_sin(newGrenade->Pose.Orientation.x);
 					newGrenade->Animation.ActiveState = newGrenade->Pose.Orientation.x;
 					newGrenade->Animation.TargetState = newGrenade->Pose.Orientation.y;
 					newGrenade->Animation.RequiredState = 0;
@@ -819,31 +819,31 @@ void GrenadeControl(short itemNumber)
 	{
 		aboveWater = false;
 		someFlag = false;
-		item->Animation.VerticalVelocity += (5 - item->Animation.VerticalVelocity) / 2;
-		item->Animation.Velocity -= item->Animation.Velocity / 4;
+		item->Animation.VerticalVelocity += (5.0f - item->Animation.VerticalVelocity) / 2.0f;
+		item->Animation.Velocity -= item->Animation.Velocity / 4.0f;
 
 		if (item->Animation.Velocity)
 		{
-			item->Pose.Orientation.z += (((item->Animation.Velocity / 16) + 3) * ANGLE(1.0f));
+			item->Pose.Orientation.z += (short((item->Animation.Velocity / 16.0f) + 3.0f) * ANGLE(1.0f));
 			if (item->Animation.RequiredState)
-				item->Pose.Orientation.y += (((item->Animation.Velocity / 4) + 3) * ANGLE(1.0f));
+				item->Pose.Orientation.y += (short((item->Animation.Velocity / 4.0f) + 3.0f) * ANGLE(1.0f));
 			else
-				item->Pose.Orientation.x += (((item->Animation.Velocity / 4) + 3) * ANGLE(1.0f));
+				item->Pose.Orientation.x += (short((item->Animation.Velocity / 4.0f) + 3.0f) * ANGLE(1.0f));
 		}
 	}
 	else
 	{
 		aboveWater = true;
 		someFlag = true;
-		item->Animation.VerticalVelocity += 3;
+		item->Animation.VerticalVelocity += 3.0f;
 
 		if (item->Animation.Velocity)
 		{
-			item->Pose.Orientation.z += (((item->Animation.Velocity / 4) + 7) * ANGLE(1.0f));
+			item->Pose.Orientation.z += (short((item->Animation.Velocity / 4.0f) + 7.0f) * ANGLE(1.0f));
 			if (item->Animation.RequiredState)
-				item->Pose.Orientation.y += (((item->Animation.Velocity / 2) + 7) * ANGLE(1.0f));
+				item->Pose.Orientation.y += (short((item->Animation.Velocity / 2.0f) + 7.0f) * ANGLE(1.0f));
 			else
-				item->Pose.Orientation.x += (((item->Animation.Velocity / 2) + 7) * ANGLE(1.0f));
+				item->Pose.Orientation.x += (short((item->Animation.Velocity / 2.0f) + 7.0f) * ANGLE(1.0f));
 		}
 	}
 
@@ -1104,7 +1104,7 @@ void FireRocket(ItemInfo* laraItem)
 		item->Pose.Position.y = y = jointPos.y;
 		item->Pose.Position.z = z = jointPos.z;
 
-		jointPos = { 0, 2004, 72 };
+		jointPos = Vector3Int(0, 2004, 72);
 		GetLaraJointPosition(&jointPos, LM_RHAND);
 
 		lara->LeftArm.GunSmoke = 32;
@@ -1112,7 +1112,7 @@ void FireRocket(ItemInfo* laraItem)
 		for (int i = 0; i < 5; i++)
 			TriggerGunSmoke(x, y, z, jointPos.x - x, jointPos.y - y, jointPos.z - z, 1, LaraWeaponType::RocketLauncher, lara->LeftArm.GunSmoke);
 
-		jointPos = { 0, -256, 0 };
+		jointPos = Vector3Int(0, -256, 0);
 		GetLaraJointPosition(&jointPos, LM_RHAND);
 
 		for (int i = 0; i < 10; i++)
@@ -1131,7 +1131,7 @@ void FireRocket(ItemInfo* laraItem)
 			item->Pose.Orientation.y += lara->ExtraTorsoRot.y;
 		}
 
-		item->Animation.Velocity = 512 >> 5;
+		item->Animation.Velocity = 512.0f / 32.0f;
 		item->ItemFlags[0] = 0;
 
 		AddActiveItem(itemNumber);
@@ -1156,25 +1156,25 @@ void RocketControl(short itemNumber)
 	bool abovewater = false;
 	if (TestEnvironment(ENV_FLAG_WATER, item->RoomNumber))
 	{
-		if (item->Animation.Velocity > (ROCKET_VELOCITY / 4))
-			item->Animation.Velocity -= item->Animation.Velocity / 4;
+		if (item->Animation.Velocity > (ROCKET_VELOCITY / 4.0f))
+			item->Animation.Velocity -= item->Animation.Velocity / 4.0f;
 		else
 		{
-			item->Animation.Velocity += (item->Animation.Velocity / 4) + 4;
+			item->Animation.Velocity += (item->Animation.Velocity / 4.0f) + 4.0f;
 
-			if (item->Animation.Velocity > (ROCKET_VELOCITY / 4))
-				item->Animation.Velocity = ROCKET_VELOCITY / 4;
+			if (item->Animation.Velocity > (ROCKET_VELOCITY / 4.0f))
+				item->Animation.Velocity = ROCKET_VELOCITY / 4.0f;
 		}
 
-		item->Pose.Orientation.z += (((item->Animation.Velocity / 8) + 3) * ANGLE(1.0f));
+		item->Pose.Orientation.z += (short((item->Animation.Velocity / 8.0f) + 3.0f) * ANGLE(1.0f));
 		abovewater = false;
 	}
 	else
 	{
 		if (item->Animation.Velocity < ROCKET_VELOCITY)
-			item->Animation.Velocity += (item->Animation.Velocity / 4) + 4;
+			item->Animation.Velocity += (item->Animation.Velocity / 4.0f) + 4.0f;
 
-		item->Pose.Orientation.z += (((item->Animation.Velocity / 4) + 7) * ANGLE(1.0f));
+		item->Pose.Orientation.z += (short((item->Animation.Velocity / 4.0f) + 7.0f) * ANGLE(1.0f));
 		abovewater = true;
 	}
 
@@ -1202,7 +1202,7 @@ void RocketControl(short itemNumber)
 	// If underwater generate bubbles
 	if (TestEnvironment(ENV_FLAG_WATER, item->RoomNumber))
 	{
-		Vector3Int pos = { wx + item->Pose.Position.x, wy + item->Pose.Position.y, wz + item->Pose.Position.z };
+		auto pos = Vector3Int(wx + item->Pose.Position.x, wy + item->Pose.Position.y, wz + item->Pose.Position.z);
 		CreateBubble(&pos, item->RoomNumber, 4, 8, 0, 0, 0, 0);
 	}
 
@@ -1418,7 +1418,7 @@ void FireCrossbow(ItemInfo* laraItem, PHD_3DPOS* pos)
 			}
 		}
 
-		item->Animation.Velocity = 512;
+		item->Animation.Velocity = 512.0f;
 
 		AddActiveItem(itemNumber);
 
@@ -1461,8 +1461,8 @@ void CrossbowBoltControl(short itemNumber)
 	{
 		auto bubblePos = item->Pose.Position;
 
-		if (item->Animation.Velocity > 64)
-			item->Animation.Velocity -= item->Animation.Velocity / 16;
+		if (item->Animation.Velocity > 64.0f)
+			item->Animation.Velocity -= item->Animation.Velocity / 16.0f;
 
 		if (GlobalCounter & 1)
 			CreateBubble(&bubblePos, item->RoomNumber, 4, 7, 0, 0, 0, 0);
