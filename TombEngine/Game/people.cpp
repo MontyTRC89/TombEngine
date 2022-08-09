@@ -91,8 +91,9 @@ short GunMiss(int x, int y, int z, short velocity, short yRot, short roomNumber)
 
 short GunHit(int x, int y, int z, short velocity, short yRot, short roomNumber)
 {
-	Vector3Int pos = { 0, 0, 0 };
+	auto pos = Vector3Int::Zero;
 	GetLaraJointPosition(&pos, (25 * GetRandomControl()) >> 15);
+
 	DoBloodSplat(pos.x, pos.y, pos.z, (GetRandomControl() & 3) + 3, LaraItem->Pose.Orientation.y, LaraItem->RoomNumber);
 	return GunShot(x, y, z, velocity, yRot, roomNumber);
 }
@@ -102,48 +103,42 @@ short GunShot(int x, int y, int z, short velocity, short yRot, short roomNumber)
 	return -1;
 }
 
-static bool TargetableIntern(ItemInfo* item, CreatureInfo* creature, AI_INFO* AI)
+bool Targetable(ItemInfo* item, CreatureInfo* creature, AI_INFO* AI)
 {
-	// check if the current item is a creature (only creature can use Targetable() !)
-	// also check if target is ahead or is at a visible distance !
+	// Check if entity is a creature (only creatures can use Targetable()).
+	// and whether target is ahead or at a visible distance.
 	if (!item->IsCreature() || !AI->ahead || AI->distance >= SQUARE(MAX_VISIBILITY_DISTANCE))
 		return false;
 
-	auto* enemy = creature != nullptr ? creature->Enemy : GetCreatureInfo(item)->Enemy;
-	if (enemy != NULL) // check if enemy is alive else not targetable !
-	{
-		// if enemy is not creature or lara  or if the target is already dead, then not targetable !
-		if ((!enemy->IsCreature() && !enemy->IsLara()) || enemy->HitPoints <= 0)
-			return false;
+	auto* enemy = (creature != nullptr) ? creature->Enemy : GetCreatureInfo(item)->Enemy;
+	if (enemy == nullptr)
+		return false;
 
-		GameVector start;
-		GameVector target;
-		auto& bounds = GetBestFrame(item)->boundingBox;
-		auto& boundsTarget = GetBestFrame(enemy)->boundingBox;
+	// Check if enemy is not a creature or Lara, or target is already dead.
+	if ((!enemy->IsCreature() && !enemy->IsLara()) || enemy->HitPoints <= 0)
+		return false;
 
-		start.x = item->Pose.Position.x;
-		start.y = (item->ObjectNumber == ID_SNIPER) ? (item->Pose.Position.y - CLICK(3)) : (item->Pose.Position.y + ((bounds.Y2 + 3 * bounds.Y1) / 4));
-		start.z = item->Pose.Position.z;
-		start.roomNumber = item->RoomNumber;
+	GameVector start;
+	GameVector target;
+	auto& bounds = GetBestFrame(item)->boundingBox;
+	auto& boundsTarget = GetBestFrame(enemy)->boundingBox;
 
-		target.x = enemy->Pose.Position.x;
-		target.y = enemy->Pose.Position.y + ((boundsTarget.Y2 + 3 * boundsTarget.Y1) / 4);
-		target.z = enemy->Pose.Position.z;
-		target.roomNumber = enemy->RoomNumber; // NOTE: why do this line not existed ? TokyoSU, 5/8/2022
+	start.x = item->Pose.Position.x;
+	start.y = (item->ObjectNumber == ID_SNIPER) ? (item->Pose.Position.y - CLICK(3)) : (item->Pose.Position.y + ((bounds.Y2 + 3 * bounds.Y1) / 4));
+	start.z = item->Pose.Position.z;
+	start.roomNumber = item->RoomNumber;
 
-		return LOS(&start, &target);
-	}
-	return false;
+	target.x = enemy->Pose.Position.x;
+	target.y = enemy->Pose.Position.y + ((boundsTarget.Y2 + 3 * boundsTarget.Y1) / 4);
+	target.z = enemy->Pose.Position.z;
+	target.roomNumber = enemy->RoomNumber; // NOTE: why do this line not existed ? TokyoSU, 5/8/2022
+
+	return LOS(&start, &target);
 }
 
 bool Targetable(ItemInfo* item, AI_INFO* AI)
 {
-	return TargetableIntern(item, nullptr, AI);
-}
-
-bool Targetable(ItemInfo* item, CreatureInfo* creature, AI_INFO* AI)
-{
-	return TargetableIntern(item, creature, AI);
+	return Targetable(item, nullptr, AI);
 }
 
 static bool TargetVisibleIntern(ItemInfo* item, CreatureInfo* creature, AI_INFO* AI, float maxAngle)
@@ -177,7 +172,7 @@ static bool TargetVisibleIntern(ItemInfo* item, CreatureInfo* creature, AI_INFO*
 
 bool TargetVisible(ItemInfo* item, AI_INFO* AI, float maxAngle)
 {
-	return TargetVisibleIntern(item, nullptr, AI, maxAngle);
+	return TargetVisibleIntern(item, GetCreatureInfo(item), AI, maxAngle);
 }
 
 bool TargetVisible(ItemInfo* item, CreatureInfo* creature, AI_INFO* AI, float maxAngle)
