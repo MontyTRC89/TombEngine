@@ -97,6 +97,8 @@ void DoLookAround(ItemInfo* item, bool invertVerticalAxis)
 {
 	auto* lara = GetLaraInfo(item);
 
+	Camera.type = CameraType::Look;
+
 	// Clear directional inputs.
 	if (lara->Control.Look.Mode == LookMode::Vertical ||
 		lara->Control.Look.Mode == LookMode::Unrestrained)
@@ -106,8 +108,6 @@ void DoLookAround(ItemInfo* item, bool invertVerticalAxis)
 	else
 		TrInput &= ~(IN_LEFT | IN_RIGHT);
 	
-	Camera.type = CameraType::Look;
-
 	// Determine axis coefficients.
 	float vAxisCoeff = 0.0f;
 	if (lara->Control.Look.Mode == LookMode::Vertical || lara->Control.Look.Mode == LookMode::Unrestrained)
@@ -117,7 +117,7 @@ void DoLookAround(ItemInfo* item, bool invertVerticalAxis)
 	if (lara->Control.Look.Mode == LookMode::Horizontal || lara->Control.Look.Mode == LookMode::Unrestrained)
 		hAxisCoeff = AxisMap[InputAxis::MoveHorizontal];
 
-	// Modulate turn rate.
+	// Modulate turn rates.
 	short turnRateMax = LOOKCAM_TURN_RATE_MAX;
 	if (BinocularRange)
 		turnRateMax *= (BinocularRange - ANGLE(10.0f)) / ANGLE(17.0f);
@@ -125,15 +125,14 @@ void DoLookAround(ItemInfo* item, bool invertVerticalAxis)
 	lara->Control.Look.TurnRate.x = ModulateLaraTurnRate(lara->Control.Look.TurnRate.x, LOOKCAM_TURN_RATE_ACCEL, 0, turnRateMax, vAxisCoeff, invertVerticalAxis);
 	lara->Control.Look.TurnRate.y = ModulateLaraTurnRate(lara->Control.Look.TurnRate.y, LOOKCAM_TURN_RATE_ACCEL, 0, turnRateMax, hAxisCoeff, false);
 
-	// Apply turn rate.
+	// Apply turn rates.
 	lara->Control.Look.Orientation += lara->Control.Look.TurnRate;
 	lara->Control.Look.Orientation.x = std::clamp<short>(lara->Control.Look.Orientation.x, -LOOKCAM_VERTICAL_CONSTRAINT_ANGLE, LOOKCAM_VERTICAL_CONSTRAINT_ANGLE);
 	lara->Control.Look.Orientation.y = std::clamp<short>(lara->Control.Look.Orientation.y, -LOOKCAM_HORIZONTAL_CONSTRAINT_ANGLE, LOOKCAM_HORIZONTAL_CONSTRAINT_ANGLE);
 
-	// Visually adapt head orientation.
+	// Visually adapt head and torso orientations.
 	lara->ExtraHeadRot = lara->Control.Look.Orientation / 2;
 
-	// Visually adapt torso orientation.
 	if (lara->Control.HandStatus != HandStatus::Busy &&
 		!lara->LeftArm.Locked && !lara->RightArm.Locked &&
 		lara->Vehicle == NO_ITEM)
