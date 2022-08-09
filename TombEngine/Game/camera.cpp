@@ -292,7 +292,7 @@ void InitialiseCamera()
 	Camera.pos.roomNumber = LaraItem->RoomNumber;
 
 	Camera.targetDistance = SECTOR(1.5f);
-	Camera.item = NULL;
+	Camera.item = nullptr;
 	Camera.numberFrames = 1;
 	Camera.type = CameraType::Chase;
 	Camera.speed = 1;
