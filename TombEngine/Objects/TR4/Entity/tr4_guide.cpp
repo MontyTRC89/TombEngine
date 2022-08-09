@@ -268,8 +268,6 @@ namespace TEN::Entities::TR4
 			creature->Enemy = nullptr;
 		}
 
-		TENLog("Guide state:" + std::to_string(item->Animation.ActiveState), LogLevel::Info);
-
 		switch (item->Animation.ActiveState)
 		{
 		case GUIDE_STATE_IDLE:
