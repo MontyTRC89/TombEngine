@@ -933,8 +933,8 @@ enum class WaterStatus
 enum class LookMode
 {
 	None,
-	Horizontal,
 	Vertical,
+	Horizontal,
 	Unrestrained
 };
 
@@ -1164,18 +1164,18 @@ struct LaraInventoryData
 
 struct LaraCountData
 {
-	unsigned int Pose;
-	unsigned int PositionAdjust;
-	unsigned int Run;
-	unsigned int Death;
-	unsigned int NoCheat;
+	unsigned int Pose			= 0;
+	unsigned int PositionAdjust = 0;
+	unsigned int Run			= 0;
+	unsigned int Death			= 0;
+	unsigned int NoCheat		= 0;
 };
 
 struct LookControlData
 {
 	LookMode	Mode		= LookMode::None;
-	Vector3Shrt Orientation = Vector3Shrt::Zero;
 	Vector3Shrt	TurnRate	= Vector3Shrt::Zero;
+	Vector3Shrt Orientation = Vector3Shrt::Zero;
 };
 
 struct WeaponControlData

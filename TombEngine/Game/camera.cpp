@@ -99,23 +99,20 @@ void DoLookAround(ItemInfo* item, bool invertVerticalAxis)
 
 	Camera.type = CameraType::Look;
 
-	// Clear directional inputs.
-	if (lara->Control.Look.Mode == LookMode::Vertical ||
-		lara->Control.Look.Mode == LookMode::Unrestrained)
-	{
-		TrInput &= ~IN_DIRECTION;
-	}
-	else
-		TrInput &= ~(IN_LEFT | IN_RIGHT);
-	
 	// Determine axis coefficients.
 	float vAxisCoeff = 0.0f;
-	if (lara->Control.Look.Mode == LookMode::Vertical || lara->Control.Look.Mode == LookMode::Unrestrained)
+	if (TrInput & (IN_FORWARD | IN_BACK) &&
+		(lara->Control.Look.Mode == LookMode::Vertical || lara->Control.Look.Mode == LookMode::Unrestrained))
+	{
 		vAxisCoeff = AxisMap[InputAxis::MoveVertical];
+	}
 
 	float hAxisCoeff = 0.0f;
-	if (lara->Control.Look.Mode == LookMode::Horizontal || lara->Control.Look.Mode == LookMode::Unrestrained)
+	if (TrInput & (IN_LEFT | IN_RIGHT) &&
+		(lara->Control.Look.Mode == LookMode::Horizontal || lara->Control.Look.Mode == LookMode::Unrestrained))
+	{
 		hAxisCoeff = AxisMap[InputAxis::MoveHorizontal];
+	}
 
 	// Modulate turn rates.
 	short turnRateMax = LOOKCAM_TURN_RATE_MAX;
@@ -139,6 +136,15 @@ void DoLookAround(ItemInfo* item, bool invertVerticalAxis)
 	{
 		lara->ExtraTorsoRot = lara->ExtraHeadRot;
 	}
+
+	// Clear directional inputs.
+	if (lara->Control.Look.Mode == LookMode::Vertical ||
+		lara->Control.Look.Mode == LookMode::Unrestrained)
+	{
+		TrInput &= ~IN_DIRECTION;
+	}
+	else
+		TrInput &= ~(IN_LEFT | IN_RIGHT);
 
 	// Debug
 	g_Renderer.PrintDebugMessage("LookMode.x: %d", (int)lara->Control.Look.Mode);

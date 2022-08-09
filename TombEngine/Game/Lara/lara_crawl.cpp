@@ -149,7 +149,7 @@ void lara_as_crouch_roll(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->Control.CanLook = false;
+	lara->Control.Look.Mode = LookMode::Horizontal;
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpasm = false;
 	Camera.targetDistance = SECTOR(1);
@@ -328,6 +328,7 @@ void lara_as_crouch_turn_180(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
+	lara->Control.Look.Mode = LookMode::None;
 	coll->Setup.EnableSpasm = false;
 	Camera.targetDistance = SECTOR(1);
 
@@ -507,6 +508,7 @@ void lara_as_crawl_forward(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
+	lara->Control.Look.Mode = LookMode::Horizontal;
 	lara->Control.HandStatus = HandStatus::Busy;
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpasm = false;
@@ -600,7 +602,7 @@ void lara_as_crawl_back(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->Control.CanLook = false;
+	lara->Control.Look.Mode = LookMode::Horizontal;
 	lara->Control.HandStatus = HandStatus::Busy;
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpasm = false;
@@ -686,6 +688,7 @@ void lara_as_crawl_turn_left(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
+	lara->Control.Look.Mode = LookMode::Vertical;
 	lara->Control.HandStatus = HandStatus::Busy;
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpasm = false;
@@ -745,6 +748,7 @@ void lara_as_crawl_turn_right(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
+	lara->Control.Look.Mode = LookMode::Vertical;
 	lara->Control.HandStatus = HandStatus::Busy;
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpasm = false;
@@ -804,6 +808,7 @@ void lara_as_crawl_turn_180(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
+	lara->Control.Look.Mode = LookMode::None;
 	coll->Setup.EnableSpasm = false;
 	Camera.targetDistance = SECTOR(1);
 
