@@ -34,19 +34,16 @@ using std::string;
 using namespace TEN::Input;
 using namespace TEN::Entities::Doors;
 
-uintptr_t hLoadLevel;
-unsigned int ThreadId;
 char* LevelDataPtr;
 bool IsLevelLoading;
 bool LoadedSuccessfully;
 vector<int> MoveablesIds;
 vector<int> StaticObjectsIds;
-ChunkReader* g_levelChunkIO;
 LEVEL g_Level;
 
-short ReadInt8()
+unsigned char ReadUInt8()
 {
-	byte value = *(byte*)LevelDataPtr;
+	unsigned char value = *(unsigned char*)LevelDataPtr;
 	LevelDataPtr += 1;
 	return value;
 }
@@ -106,22 +103,54 @@ Vector4 ReadVector4()
 	return value;
 }
 
+bool ReadBool()
+{
+	return bool(ReadUInt8());
+}
+
 void ReadBytes(void* dest, int count)
 {
 	memcpy(dest, LevelDataPtr, count);
 	LevelDataPtr += count;
 }
 
+long long ReadLEB128(bool sign)
+{
+	long long result = 0;
+	int currentShift = 0;
+
+	unsigned char currentByte;
+	do
+	{
+		currentByte = ReadUInt8();
+
+		result |= (long long)(currentByte & 0x7F) << currentShift;
+		currentShift += 7;
+	} while ((currentByte & 0x80) != 0);
+
+	if (sign) // Sign extend
+	{
+		int shift = 64 - currentShift;
+		if (shift > 0)
+			result = (long long)(result << shift) >> shift;
+	}
+
+	return result;
+}
+
 std::string ReadString()
 {
-	byte numBytes = ReadInt8(); // FIXME: incorrect, should be read in LEB128 format
+	auto numBytes = ReadLEB128(false);
 
 	if (!numBytes)
 		return std::string();
-
-	char buffer[255];
-	ReadBytes(buffer, numBytes);
-	return std::string(buffer, buffer + numBytes);
+	else
+	{
+		auto newPtr = LevelDataPtr + numBytes;
+		auto result = std::string(LevelDataPtr, newPtr);
+		LevelDataPtr = newPtr;
+		return result;
+	}
 }
 
 void LoadItems()
@@ -178,7 +207,7 @@ void LoadObjects()
 	{
 		MESH mesh;
 
-		mesh.lightMode = (LIGHT_MODES)ReadInt8();
+		mesh.lightMode = (LIGHT_MODES)ReadUInt8();
 
 		mesh.sphere.Center.x = ReadFloat();
 		mesh.sphere.Center.y = ReadFloat();
@@ -206,8 +235,8 @@ void LoadObjects()
 			BUCKET bucket;
 
 			bucket.texture = ReadInt32();
-			bucket.blendMode = (BLEND_MODES)ReadInt8();
-			bucket.animated = ReadInt8();
+			bucket.blendMode = (BLEND_MODES)ReadUInt8();
+			bucket.animated = ReadBool();
 			bucket.numQuads = 0;
 			bucket.numTriangles = 0;
 
@@ -442,7 +471,7 @@ void LoadTextures()
 		texture.colorMapData.resize(size);
 		ReadBytes(texture.colorMapData.data(), size);
 		
-		byte hasNormalMap = ReadInt8();
+		bool hasNormalMap = ReadBool();
 		if (hasNormalMap)
 		{
 			size = ReadInt32();
@@ -468,7 +497,7 @@ void LoadTextures()
 		texture.colorMapData.resize(size);
 		ReadBytes(texture.colorMapData.data(), size);
 
-		bool hasNormalMap = ReadInt8();
+		bool hasNormalMap = ReadBool();
 		if (hasNormalMap)
 		{
 			size = ReadInt32();
@@ -494,7 +523,7 @@ void LoadTextures()
 		texture.colorMapData.resize(size);
 		ReadBytes(texture.colorMapData.data(), size);
 
-		bool hasNormalMap = ReadInt8();
+		bool hasNormalMap = ReadBool();
 		if (hasNormalMap)
 		{
 			size = ReadInt32();
@@ -520,7 +549,7 @@ void LoadTextures()
 		texture.colorMapData.resize(size);
 		ReadBytes(texture.colorMapData.data(), size);
 
-		bool hasNormalMap = ReadInt8();
+		bool hasNormalMap = ReadBool();
 		if (hasNormalMap)
 		{
 			size = ReadInt32();
@@ -591,8 +620,8 @@ void ReadRooms()
 			BUCKET bucket;
 
 			bucket.texture = ReadInt32();
-			bucket.blendMode = (BLEND_MODES)ReadInt8();
-			bucket.animated = ReadInt8();
+			bucket.blendMode = (BLEND_MODES)ReadUInt8();
+			bucket.animated = ReadBool();
 			bucket.numQuads = 0;
 			bucket.numTriangles = 0;
 
@@ -687,15 +716,15 @@ void ReadRooms()
 			floor.CeilingCollision.Planes[1].z = ReadFloat();
 			floor.WallPortal = ReadInt32();
 
-			floor.Flags.Death = ReadInt8();
-			floor.Flags.Monkeyswing = ReadInt8();
-			floor.Flags.ClimbNorth = ReadInt8();
-			floor.Flags.ClimbSouth = ReadInt8();
-			floor.Flags.ClimbEast = ReadInt8();
-			floor.Flags.ClimbWest = ReadInt8();
-			floor.Flags.MarkTriggerer = ReadInt8();
+			floor.Flags.Death = ReadBool();
+			floor.Flags.Monkeyswing = ReadBool();
+			floor.Flags.ClimbNorth = ReadBool();
+			floor.Flags.ClimbSouth = ReadBool();
+			floor.Flags.ClimbEast = ReadBool();
+			floor.Flags.ClimbWest = ReadBool();
+			floor.Flags.MarkTriggerer = ReadBool();
 			floor.Flags.MarkTriggererActive = 0; // TODO: IT NEEDS TO BE WRITTEN/READ FROM SAVEGAMES!
-			floor.Flags.MarkBeetle = ReadInt8();
+			floor.Flags.MarkBeetle = ReadBool();
 
 			floor.Room = i;
 
@@ -726,8 +755,8 @@ void ReadRooms()
 			light.out = ReadFloat();
 			light.length = ReadFloat();
 			light.cutoff = ReadFloat();
-			light.type = ReadInt8();
-			light.castShadows = ReadInt8();
+			light.type = ReadUInt8();
+			light.castShadows = ReadBool();
 
 			room.lights.push_back(light);
 		}
@@ -1057,14 +1086,12 @@ unsigned int _stdcall LoadLevel(void* data)
 		else
 			TENLog("Level compiler version: " + std::to_string(version[0]) + "." + std::to_string(version[1]) + "." + std::to_string(version[2]), LogLevel::Info);
 
+		// Check if level version is higher than engine version
 		auto assemblyVersion = TEN::Utils::GetProductOrFileVersion(true);
 		for (int i = 0; i < assemblyVersion.size(); i++)
 		{
-			if (assemblyVersion[i] != version[i])
-			{
-				TENLog("Level compiler version does not match with TEN version. Errors or crashes may be possible.", LogLevel::Warning);
-				break;
-			}
+			if (assemblyVersion[i] < version[i])
+				throw std::exception("Level version is higher than TEN version. Please update TEN.");
 		}
 
 		// Check system name hash and reset it if it's valid (because we use build & play feature only once)
@@ -1255,13 +1282,14 @@ int LoadLevelFile(int levelIndex)
 	
 	// Loading level is done is two threads, one for loading level and one for drawing loading screen
 	IsLevelLoading = true;
-	hLoadLevel = _beginthreadex(
+
+	_beginthreadex(
 		nullptr,
 		0, 
 		LoadLevel, 
 		reinterpret_cast<void*>(levelIndex), 
 		0, 
-		&ThreadId);
+		NULL);
 
 	while (IsLevelLoading);
 
