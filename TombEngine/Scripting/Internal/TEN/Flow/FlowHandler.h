@@ -51,8 +51,6 @@ public:
 	int					GetNumLevels() const;
 	void				SetIntroImagePath(std::string const& path);
 	void				SetTitleScreenImagePath(std::string const& path);
-	void				SetGameFarView(short val);
-	short				GetGameFarView() const;
 	bool				IsFlyCheatEnabled() const;
 	bool				CanPlayAnyLevel() const;
 
