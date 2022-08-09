@@ -444,7 +444,7 @@ void PlaySoundTrack(std::string track, SoundTrackType mode, QWORD position)
 	// BGM tracks are crossfaded, and additionally shuffled a bit to make things more natural.
 	// Think everybody are fed up with same start-up sounds of Caves ambience...
 
-	if (crossfade)
+	if (crossfade && BASS_ChannelIsActive(BASS_Soundtrack[(int)SoundTrackType::BGM].Channel))
 	{		
 		// Crossfade...
 		BASS_ChannelSetAttribute(stream, BASS_ATTRIB_VOL, 0.0f);
