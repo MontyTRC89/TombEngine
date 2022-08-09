@@ -96,7 +96,13 @@ void DoLookAround(ItemInfo* item, bool invertVerticalAxis)
 	auto* lara = GetLaraInfo(item);
 
 	// Clear directional inputs.
-	TrInput &= ~IN_DIRECTION;
+	if (lara->Control.Look.Mode == LookMode::Vertical ||
+		lara->Control.Look.Mode == LookMode::Unrestrained)
+	{
+		TrInput &= ~IN_DIRECTION;
+	}
+	else
+		TrInput &= ~(IN_LEFT | IN_RIGHT);
 	
 	Camera.type = CameraType::Look;
 
