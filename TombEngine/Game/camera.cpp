@@ -108,7 +108,7 @@ void DoLookAround(ItemInfo* item, bool invertVerticalAxis)
 	// Determine axis coefficients.
 	float vAxisCoeff = 0.0f;
 	if (lara->Control.Look.Mode == LookMode::Vertical || lara->Control.Look.Mode == LookMode::Unrestrained)
-		vAxisCoeff = AxisMap[InputAxis::MoveVertical] * (invertVerticalAxis ? -1.0f : 1.0f);
+		vAxisCoeff = AxisMap[InputAxis::MoveVertical] * (invertVerticalAxis ? -1 : 1);
 
 	float hAxisCoeff = 0.0f;
 	if (lara->Control.Look.Mode == LookMode::Horizontal || lara->Control.Look.Mode == LookMode::Unrestrained)
