@@ -114,8 +114,8 @@ bool Targetable(ItemInfo* item, CreatureInfo* creature, AI_INFO* AI)
 	if (enemy == nullptr)
 		return false;
 
-	// Check if enemy is not a creature or Lara, or target is already dead.
-	if ((!enemy->IsCreature() && !enemy->IsLara()) || enemy->HitPoints <= 0)
+	// NOTE: we need at last creature or lara so || is required, it can't be both !
+	if ((!enemy->IsCreature() || !enemy->IsLara()) || enemy->HitPoints <= 0)
 		return false;
 
 	GameVector start;
@@ -141,41 +141,44 @@ bool Targetable(ItemInfo* item, AI_INFO* AI)
 	return Targetable(item, nullptr, AI);
 }
 
-static bool TargetVisibleIntern(ItemInfo* item, CreatureInfo* creature, AI_INFO* AI, float maxAngle)
-{
-	if (item->IsCreature())
-	{
-		auto* enemy = creature != nullptr ? creature->Enemy : GetCreatureInfo(item)->Enemy;
-		if (enemy != NULL)
-		{
-			short angle = AI->angle - creature->JointRotation[2];
-			if (enemy->HitPoints != 0 && angle > -ANGLE(maxAngle) && angle < ANGLE(maxAngle) && AI->distance < SQUARE(MAX_VISIBILITY_DISTANCE))
-			{
-				GameVector start;
-				start.x = item->Pose.Position.x;
-				start.y = item->Pose.Position.y - CLICK(3);
-				start.z = item->Pose.Position.z;
-				start.roomNumber = item->RoomNumber;
-
-				GameVector target;
-				auto& bounds = GetBestFrame(enemy)->boundingBox;
-				target.x = enemy->Pose.Position.x;
-				target.y = enemy->Pose.Position.y + ((((bounds.Y1 * 2) + bounds.Y1) + bounds.Y2) / 4);
-				target.z = enemy->Pose.Position.z;
-
-				return LOS(&start, &target);
-			}
-		}
-	}
-	return false;
-}
-
 bool TargetVisible(ItemInfo* item, AI_INFO* AI, float maxAngle)
 {
-	return TargetVisibleIntern(item, GetCreatureInfo(item), AI, maxAngle);
+	return TargetVisible(item, nullptr, AI, maxAngle);
 }
 
 bool TargetVisible(ItemInfo* item, CreatureInfo* creature, AI_INFO* AI, float maxAngle)
 {
-	return TargetVisibleIntern(item, creature, AI, maxAngle);
+	if (!item->IsCreature() || AI->distance >= SQUARE(MAX_VISIBILITY_DISTANCE))
+		return false;
+
+	auto* creatureInfo = (creature != nullptr) ? creature : GetCreatureInfo(item);
+	// NOTE: normally, it will always pass here (since we call GetCreatureInfo())
+	// But just in case we check it, since GetCreatureInfo() not check for nullptr !
+	if (creatureInfo == nullptr)
+		return false;
+	auto* enemy = creatureInfo->Enemy;
+	if (enemy == nullptr || enemy->HitPoints == 0)
+		return false;
+
+	short angle = AI->angle - creatureInfo->JointRotation[2];
+	if (angle > -ANGLE(maxAngle) && angle < ANGLE(maxAngle))
+	{
+		GameVector start;
+		GameVector target;
+		auto& bounds = GetBestFrame(enemy)->boundingBox;
+
+		start.x = item->Pose.Position.x;
+		start.y = item->Pose.Position.y - CLICK(3);
+		start.z = item->Pose.Position.z;
+		start.roomNumber = item->RoomNumber;
+
+		target.x = enemy->Pose.Position.x;
+		target.y = enemy->Pose.Position.y + ((((bounds.Y1 * 2) + bounds.Y1) + bounds.Y2) / 4);
+		target.z = enemy->Pose.Position.z;
+		target.roomNumber = enemy->RoomNumber; // NOTE: why do this line not existed ? TokyoSU, 10/8/2022
+
+		return LOS(&start, &target);
+	}
+
+	return false;
 }
