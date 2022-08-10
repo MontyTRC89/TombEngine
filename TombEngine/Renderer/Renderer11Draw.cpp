@@ -357,56 +357,54 @@ namespace TEN::Renderer
 
 	void Renderer11::DrawRopes(RenderView& view)
 	{
-		for (int n = 0; n < Ropes.size(); n++)
+		for (auto& rope : Ropes)
 		{
-			ROPE_STRUCT* rope = &Ropes[n];
+			if (!rope.active)
+				continue;
 
-			if (rope->active)
+			Matrix world = Matrix::CreateTranslation(
+				rope.position.x,
+				rope.position.y,
+				rope.position.z
+			);
+
+			Vector3 absolute[24];
+
+			for (int n = 0; n < ROPE_SEGMENTS; n++)
 			{
-				Matrix world = Matrix::CreateTranslation(
-					rope->position.x,
-					rope->position.y,
-					rope->position.z
-				);
+				Vector3Int* s = &rope.meshSegment[n];
+				Vector3 t;
+				Vector3 output;
 
-				Vector3 absolute[24];
+				t.x = s->x >> FP_SHIFT;
+				t.y = s->y >> FP_SHIFT;
+				t.z = s->z >> FP_SHIFT;
 
-				for (int n = 0; n < ROPE_SEGMENTS; n++)
-				{
-					Vector3Int* s = &rope->meshSegment[n];
-					Vector3 t;
-					Vector3 output;
+				output = Vector3::Transform(t, world);
 
-					t.x = s->x >> FP_SHIFT;
-					t.y = s->y >> FP_SHIFT;
-					t.z = s->z >> FP_SHIFT;
+				Vector3 absolutePosition = Vector3(output.x, output.y, output.z);
+				absolute[n] = absolutePosition;
+			}
 
-					output = Vector3::Transform(t, world);
+			for (int n = 0; n < ROPE_SEGMENTS - 1; n++)
+			{
+				Vector3 pos1 = Vector3(absolute[n].x, absolute[n].y, absolute[n].z);
+				Vector3 pos2 = Vector3(absolute[n + 1].x, absolute[n + 1].y, absolute[n + 1].z);
 
-					Vector3 absolutePosition = Vector3(output.x, output.y, output.z);
-					absolute[n] = absolutePosition;
-				}
+				Vector3 d = pos2 - pos1;
+				d.Normalize();
 
-				for (int n = 0; n < ROPE_SEGMENTS - 1; n++)
-				{
-					Vector3 pos1 = Vector3(absolute[n].x, absolute[n].y, absolute[n].z);
-					Vector3 pos2 = Vector3(absolute[n + 1].x, absolute[n + 1].y, absolute[n + 1].z);
+				Vector3 c = (pos1 + pos2) / 2.0f;
 
-					Vector3 d = pos2 - pos1;
-					d.Normalize();
-
-					Vector3 c = (pos1 + pos2) / 2.0f;
-
-					AddSpriteBillboardConstrained(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_EMPTY1],
-						c,
-						m_rooms[rope->room].AmbientLight,
-						(PI / 2),
-						1.0f,
-						{ 32,
-						Vector3::Distance(pos1, pos2) },
-						BLENDMODE_ALPHABLEND,
-						d, view);
-				}
+				AddSpriteBillboardConstrained(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_EMPTY1],
+					c,
+					m_rooms[rope.room].AmbientLight,
+					(PI / 2),
+					1.0f,
+					{ 32,
+					Vector3::Distance(pos1, pos2) },
+					BLENDMODE_ALPHATEST,
+					d, view);
 			}
 		}
 	}
@@ -1550,6 +1548,8 @@ namespace TEN::Renderer
 
 		DrawTransparentFaces(view);
 
+		DrawPostprocess(target, depthTarget, view);
+
 		// Draw GUI stuff at the end
 		DrawLines2D();
 
@@ -1565,7 +1565,6 @@ namespace TEN::Renderer
 
 		DrawDebugInfo(view);
 		DrawAllStrings();
-		DrawFadeAndBars(target, depthTarget, view);
 
 		ClearScene();
 	}

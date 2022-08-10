@@ -69,6 +69,14 @@ enum class ShadowMode
 	All
 };
 
+enum class AntialiasingMode
+{
+	None,
+	Low,
+	Medium,
+	High
+};
+
 enum LIGHT_MODES
 {
 	LIGHT_MODE_DYNAMIC,
@@ -228,7 +236,7 @@ constexpr auto MAX_TRANSPARENT_FACES = 16384;
 constexpr auto MAX_TRANSPARENT_VERTICES = (MAX_TRANSPARENT_FACES * 6);
 constexpr auto MAX_TRANSPARENT_FACES_PER_ROOM = 16384;
 constexpr auto TRANSPARENT_BUCKET_SIZE = (3840 * 16);
-constexpr auto ALPHA_TEST_THRESHOLD = 0.5f;
+constexpr auto ALPHA_TEST_THRESHOLD = 0.05f;
 constexpr auto FAST_ALPHA_BLEND_THRESHOLD = 0.5f;
 
 constexpr auto MAX_BONES = 32;

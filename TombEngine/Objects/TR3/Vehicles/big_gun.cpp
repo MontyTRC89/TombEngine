@@ -194,7 +194,7 @@ namespace TEN::Entities::Vehicles
 				bigGun->Flags = BGUN_FLAG_AUTO_ROT;
 			else
 			{
-				if (TrInput & VEHICLE_IN_FIRE && !bigGun->FireCount)
+				if (TrInput & (VEHICLE_IN_ACCELERATE | VEHICLE_IN_FIRE) && !bigGun->FireCount)
 				{
 					BigGunFire(bigGunItem, laraItem);
 					bigGun->FireCount = BGUN_RECOIL_TIME;
