@@ -820,13 +820,8 @@ namespace TEN::Renderer
 
 		m_context->VSSetShader(m_vsSprites.Get(), NULL, 0);
 		m_context->PSSetShader(m_psSprites.Get(), NULL, 0);
-		BindConstantBufferVS(CB_SPRITE, m_cbSprite.get());
 
-		UINT stride = sizeof(RendererVertex);
-		UINT offset = 0;
-		m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
-		m_context->IASetInputLayout(m_inputLayout.Get());
-		m_context->IASetVertexBuffers(0, 1, quadVertexBuffer.GetAddressOf(), &stride, &offset);
+		BindConstantBufferVS(CB_SPRITE, m_cbSprite.get());
 
 		std::sort(
 			view.spritesToDraw.begin(),
@@ -870,9 +865,8 @@ namespace TEN::Renderer
 				spriteMatrix = Matrix::Identity;
 			}
 
-			if (DoesBlendModeRequireSorting(spr.BlendMode))
+			if (DoesBlendModeRequireSorting(spr.BlendMode)) // Collect sprites
 			{
-				// Collect sprites
 				int distance = (spr.pos - Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z)).Length();
 				RendererTransparentFace face;
 				face.type = RendererTransparentFaceType::TRANSPARENT_FACE_SPRITE;
@@ -884,11 +878,16 @@ namespace TEN::Renderer
 				RendererRoom& room = m_rooms[FindRoomNumber(Vector3Int(spr.pos))];
 				room.TransparentFacesToDraw.push_back(face);
 			}
-			else
+			else // Draw sprites immediately
 			{
-				// Draw sprites immediately
-				SetBlendMode(spr.BlendMode);
+				// Set up vertex buffer and parameters
+				UINT stride = sizeof(RendererVertex);
+				UINT offset = 0;
+				m_context->IASetInputLayout(m_inputLayout.Get());
+				m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+				m_context->IASetVertexBuffers(0, 1, quadVertexBuffer.GetAddressOf(), &stride, &offset);
 
+				SetBlendMode(spr.BlendMode);
 				BindTexture(TEXTURE_COLOR_MAP, spr.Sprite->Texture, SAMPLER_LINEAR_CLAMP);
 
 				Matrix scale = Matrix::CreateScale((spr.Width) * spr.Scale, (spr.Height) * spr.Scale, spr.Scale);
