@@ -1133,8 +1133,8 @@ short GetNearestLedgeAngle(ItemInfo* item, CollisionInfo* coll, float& distance)
 				// Remember distance to the closest plane with same angle (it happens sometimes with bridges)
 				float dist1 = FLT_MAX;
 				float dist2 = FLT_MAX;
-				auto r1 = originRay.Intersects(closestPlane[p], dist1);
-				auto r2 = originRay.Intersects(closestPlane[firstEqualAngle], dist2);
+				bool r1 = originRay.Intersects(closestPlane[p], dist1);
+				bool r2 = originRay.Intersects(closestPlane[firstEqualAngle], dist2);
 
 				finalDistance[h] = (dist1 > dist2 && r2) ? dist2 : (r1 ? dist1 : dist2);
 				finalResult[h] = result[p];
