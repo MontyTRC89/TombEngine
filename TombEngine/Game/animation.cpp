@@ -171,9 +171,8 @@ void AnimateLara(ItemInfo* item)
 		else
 		{
 			// TODO: Prep. for later velocity calculation refactor. This one will need a closer look.
-			//item->Animation.Velocity -= anim->VelocityStart + (((anim->VelocityEnd - anim->VelocityStart) / frameCount) * currentFrame);
+			//item->Animation.Velocity += (anim->VelocityEnd - anim->VelocityStart) / frameCount;
 
-			float velocity = anim->VelocityStart + anim->VelocityAccel * (item->Animation.FrameNumber - (anim->frameBase - 1));
 			item->Animation.Velocity += anim->VelocityAccel;
 			item->Animation.VerticalVelocity += item->Animation.VerticalVelocity >= 128.0f ? 1.0f : GRAVITY;
 			item->Pose.Position.y += item->Animation.VerticalVelocity;
