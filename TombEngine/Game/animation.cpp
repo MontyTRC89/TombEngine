@@ -395,14 +395,19 @@ bool TestLastFrame(ItemInfo* item, int animNumber)
 	return (item->Animation.FrameNumber >= anim->frameEnd);
 }
 
-void TranslateItem(ItemInfo* item, short angle, float forward, float vertical, float lateral)
+void TranslateItem(ItemInfo* item, short angle, float forward, float down, float right)
 {
-	item->Pose.Position = TranslateVector(item->Pose.Position, angle, forward, vertical, lateral);
+	item->Pose.Position = TranslateVector(item->Pose.Position, angle, forward, down, right);
 }
 
 void TranslateItem(ItemInfo* item, Vector3Shrt orient, float distance)
 {
 	item->Pose.Position = TranslateVector(item->Pose.Position, orient, distance);
+}
+
+void TranslateItem(ItemInfo* item, Vector3 direction, float distance)
+{
+	item->Pose.Position = TranslateVector(item->Pose.Position, direction, distance);
 }
 
 void SetAnimation(ItemInfo* item, int animIndex, int frameToStart)
