@@ -13,18 +13,38 @@
 
 namespace TEN::Entities::TR2
 {
+	constexpr auto RAT_DAMAGE = 20;
+	constexpr auto RAT_ATTACK_RANGE = SQUARE(CLICK(0.7f));
+	constexpr auto RAT_WAIT1_CHANCE = 1280;
+	constexpr auto RAT_WAIT2_CHANCE = RAT_WAIT1_CHANCE * 2;
+
 	const auto RatBite = BiteInfo(Vector3(0.0f, 0.0f, 57.0f), 2);
 
-	// TODO
+	#define RAT_TURN_RATE_MAX ANGLE(6.0f)
+
 	enum RatState
 	{
-
+		RAT_STATE_NONE = 0,
+		RAT_STATE_WALK,
+		RAT_STATE_IDLE,
+		RAT_STATE_SQUEAK,
+		RAT_STATE_ATTACK1,
+		RAT_STATE_ATTACK2,
+		RAT_STATE_DEATH
 	};
 
-	// TODO
 	enum RatAnim
 	{
-
+		RAT_ANIM_IDLE = 0,
+		RAT_ANIM_IDLE_TO_WALK,
+		RAT_ANIM_WALK,
+		RAT_ANIM_WALK_TO_IDLE,
+		RAT_ANIM_SQUEAK,
+		RAT_ANIM_IDLE_TO_ATTACK1,
+		RAT_ANIM_ATTACK1,
+		RAT_ANIM_ATTACK1_TO_IDLE,
+		RAT_ANIM_ATTACK2,
+		RAT_ANIM_DEATH
 	};
 
 	void RatControl(short itemNumber)
@@ -33,20 +53,16 @@ namespace TEN::Entities::TR2
 			return;
 
 		auto* item = &g_Level.Items[itemNumber];
-		auto* info = GetCreatureInfo(item);
+		auto* creature = GetCreatureInfo(item);
 
+		int random = 0;
 		short head = 0;
 		short angle = 0;
-		short random = 0;
 
 		if (item->HitPoints <= 0)
 		{
-			if (item->Animation.ActiveState != 6)
-			{
-				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 9;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-				item->Animation.ActiveState = 6;
-			}
+			if (item->Animation.ActiveState != RAT_STATE_DEATH)
+				SetAnimation(item, RAT_ANIM_DEATH);
 		}
 		else
 		{
@@ -59,69 +75,70 @@ namespace TEN::Entities::TR2
 			GetCreatureMood(item, &AI, false);
 			CreatureMood(item, &AI, false);
 
-			angle = CreatureTurn(item, ANGLE(6.0f));
+			angle = CreatureTurn(item, RAT_TURN_RATE_MAX);
 
 			switch (item->Animation.ActiveState)
 			{
-			case 4:
-				if (info->Mood == MoodType::Bored || info->Mood == MoodType::Stalk)
+			case RAT_STATE_ATTACK1:
+				if (creature->Mood == MoodType::Bored || creature->Mood == MoodType::Stalk)
 				{
-					short random = (short)GetRandomControl();
-					if (random < 0x500)
-						item->Animation.RequiredState = 3;
-					else if (random > 0xA00)
-						item->Animation.RequiredState = 1;
+					random = GetRandomControl();
+					if (random < RAT_WAIT1_CHANCE)
+						item->Animation.RequiredState = RAT_STATE_SQUEAK;
+					else if (random > RAT_WAIT2_CHANCE)
+						item->Animation.RequiredState = RAT_STATE_WALK;
 				}
-				else if (AI.distance < pow(340, 2))
-					item->Animation.RequiredState = 5;
+				else if (AI.distance < RAT_ATTACK_RANGE)
+					item->Animation.RequiredState = RAT_STATE_ATTACK2;
 				else
-					item->Animation.RequiredState = 1;
+					item->Animation.RequiredState = RAT_STATE_WALK;
 
 				if (item->Animation.RequiredState)
-					item->Animation.TargetState = 2;
+					item->Animation.TargetState = RAT_STATE_IDLE;
 
 				break;
 
-			case 2:
-				info->MaxTurn = 0;
+			case RAT_STATE_IDLE:
+				creature->MaxTurn = 0;
 
 				if (item->Animation.RequiredState)
 					item->Animation.TargetState = item->Animation.RequiredState;
 
 				break;
 
-			case 1:
-				info->MaxTurn = ANGLE(6.0f);
+			case RAT_STATE_WALK:
+				creature->MaxTurn = RAT_TURN_RATE_MAX;
 
-				if (info->Mood == MoodType::Bored || info->Mood == MoodType::Stalk)
+				if (creature->Mood == MoodType::Bored || creature->Mood == MoodType::Stalk)
 				{
-					random = (short)GetRandomControl();
-					if (random < 0x500)
+					random = GetRandomControl();
+					if (random < RAT_WAIT1_CHANCE)
 					{
-						item->Animation.RequiredState = 3;
-						item->Animation.TargetState = 2;
+						item->Animation.RequiredState = RAT_STATE_SQUEAK;
+						item->Animation.TargetState = RAT_STATE_IDLE;
 					}
-					else if (random < 0xA00)
-						item->Animation.TargetState = 2;
+					else if (random < RAT_WAIT2_CHANCE)
+						item->Animation.TargetState = RAT_STATE_IDLE;
 				}
-				else if (AI.ahead && AI.distance < pow(340, 2))
-					item->Animation.TargetState = 2;
+				else if (AI.ahead && AI.distance < RAT_ATTACK_RANGE)
+					item->Animation.TargetState = RAT_STATE_IDLE;
 
 				break;
 
-			case 5:
-				if (!item->Animation.RequiredState && item->TouchBits & 0x7F)
+			case RAT_STATE_ATTACK2:
+				if (!item->Animation.RequiredState && item->TestBits(JointBitType::Touch, RatBite.meshNum))
 				{
-					item->Animation.RequiredState = 2;
-					DoDamage(info->Enemy, 20);
+					DoDamage(creature->Enemy, RAT_DAMAGE);
 					CreatureEffect(item, RatBite, DoBloodSplat);
+					item->Animation.RequiredState = RAT_STATE_IDLE;
 				}
 
 				break;
 
-			case 3:
-				if (GetRandomControl() < 0x500)
-					item->Animation.TargetState = 2;
+			case RAT_STATE_SQUEAK:
+				creature->MaxTurn = 0;
+				if (GetRandomControl() < RAT_WAIT1_CHANCE)
+					item->Animation.TargetState = RAT_STATE_IDLE;
 
 				break;
 			}
