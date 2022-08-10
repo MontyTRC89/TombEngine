@@ -57,7 +57,7 @@ table FXInfo {
 	fall_speed: int32;
 	frame_number: int32;
 	counter : int32;
-	shade: int32;
+	color: Vector4;
 	flag1: int32;
 	flag2: int32;
 }

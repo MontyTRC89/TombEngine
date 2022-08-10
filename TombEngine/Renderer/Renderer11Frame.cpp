@@ -728,6 +728,8 @@ namespace TEN::Renderer
 			newEffect->ObjectNumber = fx->objectNumber;
 			newEffect->RoomNumber = fx->roomNumber;
 			newEffect->Position = fx->pos.Position.ToVector3();
+			newEffect->AmbientLight = room.AmbientLight;
+			newEffect->Color = fx->color;
 			newEffect->World = rotation * translation;
 			newEffect->Mesh = GetMesh(obj->nmeshes ? obj->meshIndex : fx->frameNumber);
 

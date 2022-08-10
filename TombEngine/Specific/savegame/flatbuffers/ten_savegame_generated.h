@@ -1142,7 +1142,7 @@ struct FXInfoT : public flatbuffers::NativeTable {
   int32_t fall_speed = 0;
   int32_t frame_number = 0;
   int32_t counter = 0;
-  int32_t shade = 0;
+  std::unique_ptr<TEN::Save::Vector4> color{};
   int32_t flag1 = 0;
   int32_t flag2 = 0;
 };
@@ -1161,7 +1161,7 @@ struct FXInfo FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     VT_FALL_SPEED = 16,
     VT_FRAME_NUMBER = 18,
     VT_COUNTER = 20,
-    VT_SHADE = 22,
+    VT_COLOR = 22,
     VT_FLAG1 = 24,
     VT_FLAG2 = 26
   };
@@ -1192,8 +1192,8 @@ struct FXInfo FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   int32_t counter() const {
     return GetField<int32_t>(VT_COUNTER, 0);
   }
-  int32_t shade() const {
-    return GetField<int32_t>(VT_SHADE, 0);
+  const TEN::Save::Vector4 *color() const {
+    return GetStruct<const TEN::Save::Vector4 *>(VT_COLOR);
   }
   int32_t flag1() const {
     return GetField<int32_t>(VT_FLAG1, 0);
@@ -1212,7 +1212,7 @@ struct FXInfo FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyField<int32_t>(verifier, VT_FALL_SPEED) &&
            VerifyField<int32_t>(verifier, VT_FRAME_NUMBER) &&
            VerifyField<int32_t>(verifier, VT_COUNTER) &&
-           VerifyField<int32_t>(verifier, VT_SHADE) &&
+           VerifyField<TEN::Save::Vector4>(verifier, VT_COLOR) &&
            VerifyField<int32_t>(verifier, VT_FLAG1) &&
            VerifyField<int32_t>(verifier, VT_FLAG2) &&
            verifier.EndTable();
@@ -1253,8 +1253,8 @@ struct FXInfoBuilder {
   void add_counter(int32_t counter) {
     fbb_.AddElement<int32_t>(FXInfo::VT_COUNTER, counter, 0);
   }
-  void add_shade(int32_t shade) {
-    fbb_.AddElement<int32_t>(FXInfo::VT_SHADE, shade, 0);
+  void add_color(const TEN::Save::Vector4 *color) {
+    fbb_.AddStruct(FXInfo::VT_COLOR, color);
   }
   void add_flag1(int32_t flag1) {
     fbb_.AddElement<int32_t>(FXInfo::VT_FLAG1, flag1, 0);
@@ -1284,13 +1284,13 @@ inline flatbuffers::Offset<FXInfo> CreateFXInfo(
     int32_t fall_speed = 0,
     int32_t frame_number = 0,
     int32_t counter = 0,
-    int32_t shade = 0,
+    const TEN::Save::Vector4 *color = 0,
     int32_t flag1 = 0,
     int32_t flag2 = 0) {
   FXInfoBuilder builder_(_fbb);
   builder_.add_flag2(flag2);
   builder_.add_flag1(flag1);
-  builder_.add_shade(shade);
+  builder_.add_color(color);
   builder_.add_counter(counter);
   builder_.add_frame_number(frame_number);
   builder_.add_fall_speed(fall_speed);
@@ -7107,7 +7107,7 @@ inline void FXInfo::UnPackTo(FXInfoT *_o, const flatbuffers::resolver_function_t
   { auto _e = fall_speed(); _o->fall_speed = _e; }
   { auto _e = frame_number(); _o->frame_number = _e; }
   { auto _e = counter(); _o->counter = _e; }
-  { auto _e = shade(); _o->shade = _e; }
+  { auto _e = color(); if (_e) _o->color = std::unique_ptr<TEN::Save::Vector4>(new TEN::Save::Vector4(*_e)); }
   { auto _e = flag1(); _o->flag1 = _e; }
   { auto _e = flag2(); _o->flag2 = _e; }
 }
@@ -7129,7 +7129,7 @@ inline flatbuffers::Offset<FXInfo> CreateFXInfo(flatbuffers::FlatBufferBuilder &
   auto _fall_speed = _o->fall_speed;
   auto _frame_number = _o->frame_number;
   auto _counter = _o->counter;
-  auto _shade = _o->shade;
+  auto _color = _o->color ? _o->color.get() : 0;
   auto _flag1 = _o->flag1;
   auto _flag2 = _o->flag2;
   return TEN::Save::CreateFXInfo(
@@ -7143,7 +7143,7 @@ inline flatbuffers::Offset<FXInfo> CreateFXInfo(flatbuffers::FlatBufferBuilder &
       _fall_speed,
       _frame_number,
       _counter,
-      _shade,
+      _color,
       _flag1,
       _flag2);
 }
