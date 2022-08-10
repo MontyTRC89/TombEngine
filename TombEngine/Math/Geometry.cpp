@@ -7,23 +7,23 @@
 
 //namespace TEN::Math::Geometry
 //{
-	Vector3 TranslatePoint(Vector3 point, short angle, float forward, float up, float right)
+	Vector3 TranslatePoint(Vector3& point, short angle, float forward, float down, float right)
 	{
-		if (forward == 0.0f && up == 0.0f && right == 0.0f)
+		if (forward == 0.0f && down == 0.0f && right == 0.0f)
 			return point;
 
 		float sinAngle = phd_sin(angle);
 		float cosAngle = phd_cos(angle);
 
 		point.x += (forward * sinAngle) + (right * cosAngle);
-		point.y += up;
+		point.y += down;
 		point.z += (forward * cosAngle) - (right * sinAngle);
 		return point;
 	}
 
-	Vector3Int TranslatePoint(Vector3Int point, short angle, float forward, float up, float right)
+	Vector3Int TranslatePoint(Vector3Int& point, short angle, float forward, float down, float right)
 	{
-		auto newPoint = TranslatePoint(point.ToVector3(), angle, forward, up, right);
+		auto newPoint = TranslatePoint(point.ToVector3(), angle, forward, down, right);
 		return Vector3Int(
 			(int)round(newPoint.x),
 			(int)round(newPoint.y),
@@ -31,7 +31,7 @@
 		);
 	}
 
-	Vector3 TranslatePoint(Vector3 point, Vector3Shrt orient, float distance)
+	Vector3 TranslatePoint(Vector3& point, Vector3Shrt& orient, float distance)
 	{
 		if (distance == 0.0f)
 			return point;
@@ -47,7 +47,7 @@
 		return point;
 	}
 
-	Vector3Int TranslatePoint(Vector3Int point, Vector3Shrt orient, float distance)
+	Vector3Int TranslatePoint(Vector3Int& point, Vector3Shrt& orient, float distance)
 	{
 		auto newPoint = TranslatePoint(point.ToVector3(), orient, distance);
 		return Vector3Int(
@@ -57,14 +57,14 @@
 		);
 	}
 
-	Vector3 TranslatePoint(Vector3 point, Vector3 direction, float distance)
+	Vector3 TranslatePoint(Vector3& point, Vector3& direction, float distance)
 	{
 		direction.Normalize();
 		point += direction * distance;
 		return point;
 	}
 
-	Vector3Int TranslatePoint(Vector3Int point, Vector3 direction, float distance)
+	Vector3Int TranslatePoint(Vector3Int& point, Vector3& direction, float distance)
 	{
 		auto newPoint = TranslatePoint(point.ToVector3(), direction, distance);
 		return Vector3Int(
