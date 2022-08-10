@@ -78,14 +78,14 @@ bool ShotLara(ItemInfo* item, AI_INFO* AI, BiteInfo* gun, short extraRotation, i
 
 short GunMiss(int x, int y, int z, short velocity, short yRot, short roomNumber)
 {
-	GameVector pos;
-	pos.x = LaraItem->Pose.Position.x + ((GetRandomControl() - 0x4000) << 9) / 0x7FFF;
-	pos.y = LaraItem->Floor;
-	pos.z = LaraItem->Pose.Position.z + ((GetRandomControl() - 0x4000) << 9) / 0x7FFF;
-	pos.roomNumber = LaraItem->RoomNumber;
+	auto pos = GameVector(
+		LaraItem->Pose.Position.x + ((GetRandomControl() - 0x4000) << 9) / 0x7FFF,
+		LaraItem->Floor,
+		LaraItem->Pose.Position.z + ((GetRandomControl() - 0x4000) << 9) / 0x7FFF,
+		LaraItem->RoomNumber
+	);
 
 	Richochet((PHD_3DPOS*)&pos);
-
 	return GunShot(x, y, z, velocity, yRot, roomNumber);
 }
 
@@ -114,7 +114,7 @@ bool Targetable(ItemInfo* item, CreatureInfo* creature, AI_INFO* AI)
 	if (enemy == nullptr)
 		return false;
 
-	// NOTE: we need at last creature or lara so || is required, it can't be both !
+	// NOTE: Creature OR lara; can't be both.
 	if ((!enemy->IsCreature() || !enemy->IsLara()) || enemy->HitPoints <= 0)
 		return false;
 
@@ -151,11 +151,11 @@ bool TargetVisible(ItemInfo* item, CreatureInfo* creature, AI_INFO* AI, float ma
 	if (!item->IsCreature() || AI->distance >= SQUARE(MAX_VISIBILITY_DISTANCE))
 		return false;
 
+	// Check just in case.
 	auto* creatureInfo = (creature != nullptr) ? creature : GetCreatureInfo(item);
-	// NOTE: normally, it will always pass here (since we call GetCreatureInfo())
-	// But just in case we check it, since GetCreatureInfo() not check for nullptr !
 	if (creatureInfo == nullptr)
 		return false;
+
 	auto* enemy = creatureInfo->Enemy;
 	if (enemy == nullptr || enemy->HitPoints == 0)
 		return false;
@@ -175,7 +175,7 @@ bool TargetVisible(ItemInfo* item, CreatureInfo* creature, AI_INFO* AI, float ma
 		target.x = enemy->Pose.Position.x;
 		target.y = enemy->Pose.Position.y + ((((bounds.Y1 * 2) + bounds.Y1) + bounds.Y2) / 4);
 		target.z = enemy->Pose.Position.z;
-		target.roomNumber = enemy->RoomNumber; // NOTE: why do this line not existed ? TokyoSU, 10/8/2022
+		target.roomNumber = enemy->RoomNumber; // TODO: Check why this line didn't exist before. -- TokyoSU, 10/8/2022
 
 		return LOS(&start, &target);
 	}
