@@ -2,14 +2,12 @@
 #include "Game/animation.h"
 
 #include "Game/camera.h"
-#include "Game/control/flipeffect.h"
 #include "Game/collision/collide_room.h"
+#include "Game/control/flipeffect.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
-
 #include "Objects/Generic/Object/rope.h"
-
 #include "Renderer/Renderer11.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
@@ -176,8 +174,7 @@ void AnimateLara(ItemInfo* item)
 			//item->Animation.Velocity -= anim->VelocityStart + (((anim->VelocityEnd - anim->VelocityStart) / frameCount) * currentFrame);
 
 			float velocity = anim->VelocityStart + anim->VelocityAccel * (item->Animation.FrameNumber - (anim->frameBase - 1));
-			item->Animation.Velocity -= velocity;
-			item->Animation.Velocity += velocity + anim->VelocityAccel;
+			item->Animation.Velocity += anim->VelocityAccel;
 			item->Animation.VerticalVelocity += item->Animation.VerticalVelocity >= 128.0f ? 1.0f : GRAVITY;
 			item->Pose.Position.y += item->Animation.VerticalVelocity;
 		}
@@ -201,7 +198,6 @@ void AnimateLara(ItemInfo* item)
 	if (lara->Control.Rope.Ptr != -1)
 		DelAlignLaraToRope(item);
 
-	// NOTE: In case problems arise, simply floor each velocity argument.
 	if (!lara->Control.IsMoving)
 		TranslateItem(item, lara->Control.MoveAngle, item->Animation.Velocity, 0.0f, item->Animation.LateralVelocity);
 
@@ -367,7 +363,6 @@ void AnimateItem(ItemInfo* item)
 		item->Animation.LateralVelocity = anim->LateralVelocityStart + (anim->LateralVelocityAccel * (item->Animation.FrameNumber - anim->frameBase));
 	}
 	
-	// NOTE: In case problems arise, simply floor each velocity argument.
 	TranslateItem(item, item->Pose.Orientation.y, item->Animation.Velocity, 0.0f, item->Animation.LateralVelocity);
 
 	// Update matrices.
