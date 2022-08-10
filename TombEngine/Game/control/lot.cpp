@@ -5,6 +5,7 @@
 #include "Game/camera.h"
 #include "Game/itemdata/creature_info.h"
 #include "Game/items.h"
+#include "Game/misc.h"
 #include "Game/Lara/lara.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
@@ -18,7 +19,7 @@ std::vector<CreatureInfo*> ActiveCreatures;
 void InitialiseLOTarray(int itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
-	auto* creature = (CreatureInfo*)item->Data;
+	auto* creature = GetCreatureInfo(item);
 
 	if(!creature->LOT.Initialised)
 	{
@@ -31,7 +32,7 @@ int EnableEntityAI(short itemNum, int always, bool makeTarget)
 {
 	ItemInfo* item = &g_Level.Items[itemNum];
 
-	if (item->Data.is<CreatureInfo>())
+	if (item->IsCreature())
 		return true;
 	   	
 	/*
@@ -99,12 +100,12 @@ int EnableEntityAI(short itemNum, int always, bool makeTarget)
 
 void DisableEntityAI(short itemNumber)
 {
-	ItemInfo* item = &g_Level.Items[itemNumber];
+	auto* item = &g_Level.Items[itemNumber];
 
 	if (!item->IsCreature())
 		return;
 
-	auto* creature = (CreatureInfo*)item->Data;
+	auto* creature = GetCreatureInfo(item);
 	creature->ItemNumber = NO_ITEM;
 	KillItem(creature->AITargetNumber);
 	ActiveCreatures.erase(std::find(ActiveCreatures.begin(), ActiveCreatures.end(), creature));
@@ -113,11 +114,11 @@ void DisableEntityAI(short itemNumber)
 
 void InitialiseSlot(short itemNum, short slot, bool makeTarget)
 {
-	ItemInfo* item = &g_Level.Items[itemNum];
-	ObjectInfo* obj = &Objects[item->ObjectNumber];
+	auto* item = &g_Level.Items[itemNum];
+	auto* obj = &Objects[item->ObjectNumber];
 
 	item->Data = CreatureInfo();
-	CreatureInfo* creature = item->Data;
+	auto* creature = GetCreatureInfo(item);
 	InitialiseLOTarray(itemNum);
 	creature->ItemNumber = itemNum;
 	creature->Mood = MoodType::Bored;
@@ -195,7 +196,6 @@ void InitialiseSlot(short itemNum, short slot, bool makeTarget)
 			{
 				creature->LOT.Fly = DEFAULT_SWIM_UPDOWN_SPEED / 2; // is more slow than the other underwater entity
 				creature->LOT.IsAmphibious = true; // crocodile can walk and swim.
-				creature->LOT.Zone = ZONE_FLYER;
 			}
 			else if (item->ObjectNumber == ID_BIG_RAT)
 			{
@@ -252,6 +252,11 @@ void InitialiseSlot(short itemNum, short slot, bool makeTarget)
 			creature->LOT.Zone = ZONE_BASIC;
 			break;
 
+		case ZONE_APE:
+			creature->LOT.Step = CLICK(2);
+			creature->LOT.Drop = -SECTOR(1);
+			break;
+
 		case ZONE_SOPHIALEE:
 			creature->LOT.Step = SECTOR(1);
 			creature->LOT.Drop = -CLICK(3);
@@ -268,9 +273,8 @@ void InitialiseSlot(short itemNum, short slot, bool makeTarget)
 
 void SetBaddyTarget(short itemNum, short target)
 {
-	ItemInfo* item = &g_Level.Items[itemNum];
-
-	CreatureInfo* creature = item->Data;
+	auto* item = &g_Level.Items[itemNum];
+	auto* creature = GetCreatureInfo(item);
 
 	creature->AITargetNumber = target;
 
@@ -288,7 +292,7 @@ void ClearLOT(LOTInfo* LOT)
 	LOT->TargetBox = NO_BOX;
 	LOT->RequiredBox = NO_BOX;
 
-	BOX_NODE* node = LOT->Node.data();
+	auto* node = LOT->Node.data();
 	for(auto& node : LOT->Node) 
 	{
 		node.exitBox = NO_BOX;
@@ -299,8 +303,8 @@ void ClearLOT(LOTInfo* LOT)
 
 void CreateZone(ItemInfo* item)
 {
-	CreatureInfo* creature = (CreatureInfo*)item->Data;
-	ROOM_INFO* r = &g_Level.Rooms[item->RoomNumber];
+	auto* creature = GetCreatureInfo(item);
+	auto* r = &g_Level.Rooms[item->RoomNumber];
 
 	item->BoxNumber = GetSector(r, item->Pose.Position.x - r->x, item->Pose.Position.z - r->z)->Box;
 
@@ -324,7 +328,7 @@ void CreateZone(ItemInfo* item)
 		int zoneNumber = zone[item->BoxNumber];
 		int flippedZoneNumber = flippedZone[item->BoxNumber];
 
-		BOX_NODE* node = creature->LOT.Node.data();
+		auto* node = creature->LOT.Node.data();
 		creature->LOT.ZoneCount = 0;
 
 		for (int i = 0; i < g_Level.Boxes.size(); i++)

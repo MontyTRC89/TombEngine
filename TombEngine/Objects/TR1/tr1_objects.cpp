@@ -41,8 +41,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->saveHitpoints = true;
 		obj->saveAnim = true;
 		obj->saveFlags = true;
-
-		g_Level.Bones[obj->boneIndex + 2 * 4] |= ROT_Y;
+		obj->SetBoneRotation(2, ROT_Y); // head
 	}
 
 	obj = &Objects[ID_BEAR];
@@ -61,8 +60,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->saveHitpoints = true;
 		obj->saveAnim = true;
 		obj->saveFlags = true;
-
-		g_Level.Bones[obj->boneIndex + 13 * 4] |= ROT_Y;
+		obj->SetBoneRotation(13, ROT_Y); // head
 	}
 
 	obj = &Objects[ID_APE];
@@ -101,7 +99,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->saveFlags = true;
 		obj->waterCreature = true;
 		obj->zoneType = ZONE_WATER;
-		g_Level.Bones[obj->boneIndex + 4] |= ROT_Y;
+		obj->SetBoneRotation(1, ROT_Y); // head
 	}
 
 	obj = &Objects[ID_NATLA];
@@ -119,7 +117,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->saveFlags = true;
 		obj->savePosition = true;
 		obj->saveHitpoints = true;
-		g_Level.Bones[obj->boneIndex + 2 * 4] |= (ROT_Z | ROT_X);
+		obj->SetBoneRotation(2, ROT_X|ROT_Z);
 	}
 
 	obj = &Objects[ID_GIANT_MUTANT];
@@ -137,7 +135,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->saveFlags = true;
 		obj->savePosition = true;
 		obj->saveHitpoints = true;
-		g_Level.Bones[obj->boneIndex + 1 * 4] |= ROT_Y;
+		obj->SetBoneRotation(1, ROT_Y);
 	}
 
 	obj = &Objects[ID_LARA_DOPPELGANGER];
@@ -171,9 +169,13 @@ static void StartEntity(ObjectInfo* obj)
 		obj->hitEffect = HIT_BLOOD;
 		obj->pivotLength = 400;
 		obj->radius = WALL_SIZE / 3;
-		obj->intelligent = 1;
-		obj->savePosition = obj->saveHitpoints = obj->saveAnim = obj->saveFlags = 1;
-		g_Level.Bones[obj->boneIndex + 10 * 4] |= ROT_Y | ROT_X;
+		obj->intelligent = true;
+		obj->savePosition = true;
+		obj->saveHitpoints = true;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+		obj->zoneType = ZONE_BLOCKABLE;
+		obj->SetBoneRotation(10, ROT_X|ROT_Y);
 	}
 
 	obj = &Objects[ID_WINGED_MUMMY];
