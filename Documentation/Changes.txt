@@ -2,6 +2,7 @@ Version 1.0.1
 =============
 
 - Added antialiasing support.
+- Fixed some issues with shimmying between diagonal ledges and walls.
 - Fixed rope transparency.
 - Fixed incorrect polerope grabbing.
 - Fixed camera behaviour with pushable blocks.
