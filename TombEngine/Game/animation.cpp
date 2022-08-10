@@ -145,7 +145,7 @@ void AnimateLara(ItemInfo* item)
 		}
 	}
 
-	int frameCount = std::max(anim->frameEnd - anim->frameBase, 1); // HACK: Count 0 frames as 1.
+	int frameCount = (anim->frameEnd - anim->frameBase) + 1;
 	int currentFrame = item->Animation.FrameNumber - anim->frameBase;
 
 	if (item->Animation.IsAirborne)
@@ -333,7 +333,7 @@ void AnimateItem(ItemInfo* item)
 		}
 	}
 
-	int frameCount = std::max(anim->frameEnd - anim->frameBase, 1); // HACK: Count 0 frames as 1.
+	int frameCount = (anim->frameEnd - anim->frameBase) + 1;
 	int currentFrame = item->Animation.FrameNumber - anim->frameBase;
 
 	if (item->Animation.IsAirborne)
