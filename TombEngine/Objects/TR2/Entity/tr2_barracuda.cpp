@@ -10,20 +10,48 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
+using std::vector;
+
 namespace TEN::Entities::TR2
 {
-	const auto BarracudaBite = BiteInfo(Vector3(2.0f, -60.0f, 121.0f), 7);
+	constexpr auto BARRACUDA_ATTACK_DAMAGE = 100;
 
-	// TODO
+	const auto BarracudaBite = BiteInfo(Vector3(2.0f, -60.0f, 121.0f), 7);
+	const vector<int> BarracudaAttackJoints = { 5, 6, 7 };
+
 	enum BarracudaState
 	{
-
+		BARRACUDA_STATE_NONE = 0,
+		BARRACUDA_STATE_IDLE = 1,
+		BARRACUDA_STATE_SWIM_SLOW = 2,
+		BARRACUDA_STATE_SWIM_FAST = 3,
+		BARRACUDA_STATE_IDLE_ATTACK = 4,
+		BARRACUDA_STATE_SWIM_FAST_ATTACK = 5,
+		BARRACUDA_STATE_DEATH = 6,
 	};
 
-	// TODO
 	enum BarracudaAnim
 	{
-
+		BARRACUDA_ANIM_SWIM_FAST_ATTACK_LEFT_END = 0,
+		BARRACUDA_ANIM_SWIM_FAST_ATTACK_RIGHT_END = 1,
+		BARRACUDA_ANIM_IDLE_ATTACK_END = 2,
+		BARRACUDA_ANIM_IDLE_ATTACK_CONTINUE = 3,
+		BARRACUDA_ANIM_SWIM_FAST_ATTACK_LEFT_CONTINUE = 4,
+		BARRACUDA_ANIM_SWIM_FAST_ATTACK_RIGHT_CONTINUE = 5,
+		BARRACUDA_ANIM_DEATH_START = 6,
+		BARRACUDA_ANIM_DEATH_END = 7,
+		BARRACUDA_ANIM_IDLE_ATTACK_START = 8,
+		BARRACUDA_ANIM_IDLE_TO_SWIM_SLOW = 9,
+		BARRACUDA_ANIM_IDLE_TO_SWIM_FAST = 10,
+		BARRACUDA_ANIM_IDLE = 11,
+		BARRACUDA_ANIM_SWIM_SLOW = 12,
+		BARRACUDA_ANIM_SWIM_FAST = 13,
+		BARRACUDA_ANIM_SWIM_SLOW_TO_IDLE = 13,
+		BARRACUDA_ANIM_SWIM_SLOW_TO_FAST = 14,
+		BARRACUDA_ANIM_SWIM_FAST_ATTACK_LEFT_START = 16,
+		BARRACUDA_ANIM_SWIM_FAST_ATTACK_RIGHT_START = 17,
+		BARRACUDA_ANIM_SWIM_FAST_TO_IDLE = 18,
+		BARRACUDA_ANIM_SWIM_FAST_TO_SLOW = 19
 	};
 
 	void BarracudaControl(short itemNumber)
@@ -39,11 +67,11 @@ namespace TEN::Entities::TR2
 
 		if (item->HitPoints <= 0)
 		{
-			if (item->Animation.ActiveState != 6)
+			if (item->Animation.ActiveState != BARRACUDA_STATE_DEATH)
 			{
-				item->Animation.AnimNumber = Objects[ID_BARRACUDA].animIndex + 6;
+				item->Animation.AnimNumber = Objects[ID_BARRACUDA].animIndex + BARRACUDA_ANIM_DEATH_START;
 				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-				item->Animation.ActiveState = 6;
+				item->Animation.ActiveState = BARRACUDA_STATE_DEATH;
 			}
 
 			CreatureFloat(itemNumber);
@@ -61,55 +89,56 @@ namespace TEN::Entities::TR2
 
 			switch (item->Animation.ActiveState)
 			{
-			case 1:
-				creature->Flags = 0;
+			case BARRACUDA_STATE_IDLE:
+				creature->Flags = NULL;
 
 				if (creature->Mood == MoodType::Bored)
-					item->Animation.TargetState = 2;
+					item->Animation.TargetState = BARRACUDA_STATE_SWIM_SLOW;
 				else if (AI.ahead && AI.distance < pow(680, 2))
-					item->Animation.TargetState = 4;
+					item->Animation.TargetState = BARRACUDA_STATE_IDLE_ATTACK;
 				else if (creature->Mood == MoodType::Stalk)
-					item->Animation.TargetState = 2;
+					item->Animation.TargetState = BARRACUDA_STATE_SWIM_SLOW;
 				else
-					item->Animation.TargetState = 3;
+					item->Animation.TargetState = BARRACUDA_STATE_SWIM_FAST;
 
 				break;
 
-			case 2:
+			case BARRACUDA_STATE_SWIM_SLOW:
 				creature->MaxTurn = ANGLE(2.0f);
 
 				if (creature->Mood == MoodType::Bored)
 					break;
-				else if (AI.ahead && (item->TouchBits & 0xE0))
-					item->Animation.TargetState = 1;
+				else if (AI.ahead && item->TestBits(JointBitType::Touch, BarracudaAttackJoints))
+					item->Animation.TargetState = BARRACUDA_STATE_IDLE;
 				else if (creature->Mood != MoodType::Stalk)
-					item->Animation.TargetState = 3;
+					item->Animation.TargetState = BARRACUDA_STATE_SWIM_FAST;
 
 				break;
 
-			case 3:
+			case BARRACUDA_STATE_SWIM_FAST:
 				creature->MaxTurn = ANGLE(4.0f);
 				creature->Flags = NULL;
 
 				if (creature->Mood == MoodType::Bored)
-					item->Animation.TargetState = 2;
+					item->Animation.TargetState = BARRACUDA_STATE_SWIM_SLOW;
 				else if (AI.ahead && AI.distance < pow(340, 2))
-					item->Animation.TargetState = 5;
+					item->Animation.TargetState = BARRACUDA_STATE_SWIM_FAST_ATTACK;
 				else if (AI.ahead && AI.distance < pow(680, 2))
-					item->Animation.TargetState = 1;
+					item->Animation.TargetState = BARRACUDA_STATE_IDLE;
 				else if (creature->Mood == MoodType::Stalk)
-					item->Animation.TargetState = 2;
+					item->Animation.TargetState = BARRACUDA_STATE_SWIM_SLOW;
 
 				break;
 
-			case 4:
-			case 5:
+			case BARRACUDA_STATE_IDLE_ATTACK:
+			case BARRACUDA_STATE_SWIM_FAST_ATTACK:
 				if (AI.ahead)
 					head = AI.angle;
 
-				if (!creature->Flags && (item->TouchBits & 0xE0))
+				if (item->TestBits(JointBitType::Touch, BarracudaAttackJoints) &&
+					!creature->Flags)
 				{
-					DoDamage(creature->Enemy, 100);
+					DoDamage(creature->Enemy, BARRACUDA_ATTACK_DAMAGE);
 					CreatureEffect(item, BarracudaBite, DoBloodSplat);
 					creature->Flags = 1;
 				}
