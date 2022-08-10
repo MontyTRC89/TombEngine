@@ -15,6 +15,8 @@ using std::vector;
 namespace TEN::Entities::TR2
 {
 	constexpr auto BARRACUDA_ATTACK_DAMAGE = 100;
+	constexpr auto BARRACUDA_IDLE_ATTACK_RANGE		= SQUARE(SECTOR(0.67f));
+	constexpr auto BARRACUDA_SWIM_FAST_ATTACK_RANGE = SQUARE(SECTOR(0.34f));
 
 	const auto BarracudaBite = BiteInfo(Vector3(2.0f, -60.0f, 121.0f), 7);
 	const vector<int> BarracudaAttackJoints = { 5, 6, 7 };
@@ -94,7 +96,7 @@ namespace TEN::Entities::TR2
 
 				if (creature->Mood == MoodType::Bored)
 					item->Animation.TargetState = BARRACUDA_STATE_SWIM_SLOW;
-				else if (AI.ahead && AI.distance < pow(680, 2))
+				else if (AI.ahead && AI.distance < BARRACUDA_IDLE_ATTACK_RANGE)
 					item->Animation.TargetState = BARRACUDA_STATE_IDLE_ATTACK;
 				else if (creature->Mood == MoodType::Stalk)
 					item->Animation.TargetState = BARRACUDA_STATE_SWIM_SLOW;
@@ -121,9 +123,9 @@ namespace TEN::Entities::TR2
 
 				if (creature->Mood == MoodType::Bored)
 					item->Animation.TargetState = BARRACUDA_STATE_SWIM_SLOW;
-				else if (AI.ahead && AI.distance < pow(340, 2))
+				else if (AI.ahead && AI.distance < BARRACUDA_SWIM_FAST_ATTACK_RANGE)
 					item->Animation.TargetState = BARRACUDA_STATE_SWIM_FAST_ATTACK;
-				else if (AI.ahead && AI.distance < pow(680, 2))
+				else if (AI.ahead && AI.distance < BARRACUDA_IDLE_ATTACK_RANGE)
 					item->Animation.TargetState = BARRACUDA_STATE_IDLE;
 				else if (creature->Mood == MoodType::Stalk)
 					item->Animation.TargetState = BARRACUDA_STATE_SWIM_SLOW;
