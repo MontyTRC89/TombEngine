@@ -137,7 +137,7 @@ void InitialiseLaraAnims(ItemInfo* item)
 	if (TestEnvironment(ENV_FLAG_WATER, item))
 	{
 		lara->Control.WaterStatus = WaterStatus::Underwater;
-		item->Animation.VerticalVelocity = 0;
+		item->Animation.Velocity.y = 0;
 		SetAnimation(item, LA_UNDERWATER_IDLE);
 	}
 	else

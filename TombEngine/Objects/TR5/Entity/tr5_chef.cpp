@@ -120,7 +120,7 @@ void ControlChef(short itemNumber)
 				AI.distance < pow(SECTOR(1.5f), 2) &&
 				(item->TouchBits ||
 					item->HitStatus ||
-					LaraItem->Animation.Velocity > 15 ||
+					LaraItem->Animation.Velocity.z > 15 ||
 					TargetVisible(item, &aiLaraInfo)))
 			{
 				item->Animation.TargetState = CHEF_STATE_TURN_180;

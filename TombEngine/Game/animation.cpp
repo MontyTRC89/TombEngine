@@ -47,12 +47,12 @@ void AnimateLara(ItemInfo* item)
 					break;
 
 				case COMMAND_JUMP_VELOCITY:
-					item->Animation.VerticalVelocity = *(cmd++);
-					item->Animation.Velocity = *(cmd++);
+					item->Animation.Velocity.y = *(cmd++);
+					item->Animation.Velocity.z = *(cmd++);
 					item->Animation.IsAirborne = true;
 					if (lara->Control.CalculatedJumpVelocity)
 					{
-						item->Animation.VerticalVelocity = lara->Control.CalculatedJumpVelocity;
+						item->Animation.Velocity.y = lara->Control.CalculatedJumpVelocity;
 						lara->Control.CalculatedJumpVelocity = 0;
 					}
 
@@ -152,43 +152,43 @@ void AnimateLara(ItemInfo* item)
 	{
 		if (TestEnvironment(ENV_FLAG_SWAMP, item))
 		{
-			item->Animation.Velocity -= item->Animation.Velocity / 8.0f;
-			if (abs(item->Animation.Velocity) < 8.0f)
+			item->Animation.Velocity.z -= item->Animation.Velocity.z / 8.0f;
+			if (abs(item->Animation.Velocity.z) < 8.0f)
 			{
 				item->Animation.IsAirborne = false;
-				item->Animation.Velocity = 0.0f;
+				item->Animation.Velocity.z = 0.0f;
 			}
 
-			if (item->Animation.VerticalVelocity > 128.0f)
-				item->Animation.VerticalVelocity /= 2.0f;
-			item->Animation.VerticalVelocity -= item->Animation.VerticalVelocity / 4.0f;
+			if (item->Animation.Velocity.y > 128.0f)
+				item->Animation.Velocity.y /= 2.0f;
+			item->Animation.Velocity.y -= item->Animation.Velocity.y / 4.0f;
 
-			if (item->Animation.VerticalVelocity < 4.0f)
-				item->Animation.VerticalVelocity = 4.0f;
-			item->Pose.Position.y += item->Animation.VerticalVelocity;
+			if (item->Animation.Velocity.y < 4.0f)
+				item->Animation.Velocity.y = 4.0f;
+			item->Pose.Position.y += item->Animation.Velocity.y;
 		}
 		else
 		{
-			item->Animation.Velocity += (anim->VelocityEnd - anim->VelocityStart) / frameCount;
-			item->Animation.VerticalVelocity += item->Animation.VerticalVelocity >= 128.0f ? 1.0f : GRAVITY;
-			item->Pose.Position.y += item->Animation.VerticalVelocity;
+			item->Animation.Velocity.z += (anim->VelocityEnd.z - anim->VelocityStart.z) / frameCount;
+			item->Animation.Velocity.y += item->Animation.Velocity.y >= 128.0f ? 1.0f : GRAVITY;
+			item->Pose.Position.y += item->Animation.Velocity.y;
 		}
 	}
 	else
 	{
 		if (lara->Control.WaterStatus == WaterStatus::Wade && TestEnvironment(ENV_FLAG_SWAMP, item))
-			item->Animation.Velocity = (anim->VelocityStart / 2.0f) + ((((anim->VelocityEnd - anim->VelocityStart) / frameCount) * currentFrame) / 4.0f);
+			item->Animation.Velocity.z = (anim->VelocityStart.z / 2.0f) + ((((anim->VelocityEnd.z - anim->VelocityStart.z) / frameCount) * currentFrame) / 4.0f);
 		else
-			item->Animation.Velocity = anim->VelocityStart + (((anim->VelocityEnd - anim->VelocityStart) / frameCount) * currentFrame);
+			item->Animation.Velocity.z = anim->VelocityStart.z + (((anim->VelocityEnd.z - anim->VelocityStart.z) / frameCount) * currentFrame);
 	}
 
-	item->Animation.LateralVelocity = anim->LateralVelocityStart + (((anim->LateralVelocityEnd - anim->LateralVelocityStart) / frameCount) * currentFrame);
+	item->Animation.Velocity.x = anim->VelocityStart.x + (((anim->VelocityEnd.x - anim->VelocityStart.x) / frameCount) * currentFrame);
 
 	if (lara->Control.Rope.Ptr != -1)
 		DelAlignLaraToRope(item);
 
 	if (!lara->Control.IsMoving)
-		TranslateItem(item, lara->Control.MoveAngle, item->Animation.Velocity, 0.0f, item->Animation.LateralVelocity);
+		TranslateItem(item, lara->Control.MoveAngle, item->Animation.Velocity.z, 0.0f, item->Animation.Velocity.x);
 
 	// Update matrices
 	g_Renderer.UpdateLaraAnimations(true);
@@ -226,8 +226,8 @@ void AnimateItem(ItemInfo* item)
 					break;
 
 				case COMMAND_JUMP_VELOCITY:
-					item->Animation.VerticalVelocity = *(cmd++);
-					item->Animation.Velocity = *(cmd++);
+					item->Animation.Velocity.y = *(cmd++);
+					item->Animation.Velocity.z = *(cmd++);
 					item->Animation.IsAirborne = true;
 					break;
 
@@ -338,16 +338,16 @@ void AnimateItem(ItemInfo* item)
 
 	if (item->Animation.IsAirborne)
 	{
-		item->Animation.VerticalVelocity += (item->Animation.VerticalVelocity >= 128.0f) ? 1.0f : 6.0f;
-		item->Pose.Position.y += item->Animation.VerticalVelocity;
+		item->Animation.Velocity.y += (item->Animation.Velocity.y >= 128.0f) ? 1.0f : 6.0f;
+		item->Pose.Position.y += item->Animation.Velocity.y;
 	}
 	else
 	{
-		item->Animation.Velocity = anim->VelocityStart + (((anim->VelocityEnd - anim->VelocityStart) / frameCount) * currentFrame);
-		item->Animation.LateralVelocity = anim->LateralVelocityStart + (((anim->LateralVelocityEnd - anim->LateralVelocityStart) / frameCount) * currentFrame);
+		item->Animation.Velocity.z = anim->VelocityStart.z + (((anim->VelocityEnd.z - anim->VelocityStart.z) / frameCount) * currentFrame);
+		item->Animation.Velocity.x = anim->VelocityStart.x + (((anim->VelocityEnd.x - anim->VelocityStart.x) / frameCount) * currentFrame);
 	}
 	
-	TranslateItem(item, item->Pose.Orientation.y, item->Animation.Velocity, 0.0f, item->Animation.LateralVelocity);
+	TranslateItem(item, item->Pose.Orientation.y, item->Animation.Velocity.z, 0.0f, item->Animation.Velocity.x);
 
 	// Update matrices.
 	short itemNumber = item - g_Level.Items.data();
