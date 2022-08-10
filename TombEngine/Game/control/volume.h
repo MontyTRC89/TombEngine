@@ -37,6 +37,7 @@ enum TriggerVolumeActivators
 struct TriggerVolume
 {
 	TriggerVolumeType Type;
+	std::string LuaName;
 	int EventSetIndex;
 
 	Vector3 Position;
