@@ -60,6 +60,8 @@ float4 PS(PixelShaderInput input) : SV_TARGET
 {
 	float4 output = Texture.Sample(Sampler, input.UV) * input.Color;
 
+	DoAlphaTest(output);
+
 	float particleDepth = input.PositionCopy.z / input.PositionCopy.w;
 	input.PositionCopy.xy /= input.PositionCopy.w;
 	float2 texCoord = 0.5f * (float2(input.PositionCopy.x, -input.PositionCopy.y) + 1);
