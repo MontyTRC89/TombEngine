@@ -76,8 +76,9 @@ void AnimateItem(ItemInfo* item);
 bool HasStateDispatch(ItemInfo* item, int targetState = -1);
 bool TestLastFrame(ItemInfo* item, int animNumber = -1);
 
-void TranslateItem(ItemInfo* item, short angle, float forward, float vertical = 0.0f, float lateral = 0.0f);
+void TranslateItem(ItemInfo* item, short angle, float forward, float down = 0.0f, float right = 0.0f);
 void TranslateItem(ItemInfo* item, Vector3Shrt orient, float distance);
+void TranslateItem(ItemInfo* item, Vector3 direction, float distance);
 void SetAnimation(ItemInfo* item, int animIndex, int frameToStart = 0);
 
 int GetCurrentRelativeFrameNumber(ItemInfo* item);
