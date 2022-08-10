@@ -145,9 +145,8 @@ void AnimateLara(ItemInfo* item)
 		}
 	}
 
-	// TODO: Prep. for later velocity calculation refactor. @Sezz 2022.07.21
-	/*int frameCount = anim->frameEnd - anim->frameBase;
-	int currentFrame = item->Animation.FrameNumber - anim->frameBase;*/
+	int frameCount = std::max(anim->frameEnd - anim->frameBase, 1); // HACK: Count 0 frames as 1.
+	int currentFrame = item->Animation.FrameNumber - anim->frameBase;
 
 	if (item->Animation.IsAirborne)
 	{
@@ -170,29 +169,20 @@ void AnimateLara(ItemInfo* item)
 		}
 		else
 		{
-			// TODO: Prep. for later velocity calculation refactor. This one will need a closer look.
-			//item->Animation.Velocity += (anim->VelocityEnd - anim->VelocityStart) / frameCount;
-
-			item->Animation.Velocity += anim->VelocityAccel;
+			item->Animation.Velocity += (anim->VelocityEnd - anim->VelocityStart) / frameCount;
 			item->Animation.VerticalVelocity += item->Animation.VerticalVelocity >= 128.0f ? 1.0f : GRAVITY;
 			item->Pose.Position.y += item->Animation.VerticalVelocity;
 		}
 	}
 	else
 	{
-		// TODO: Prep. for later velocity calculation refactor.
-		/*if (lara->Control.WaterStatus == WaterStatus::Wade && TestEnvironment(ENV_FLAG_SWAMP, item))
+		if (lara->Control.WaterStatus == WaterStatus::Wade && TestEnvironment(ENV_FLAG_SWAMP, item))
 			item->Animation.Velocity = (anim->VelocityStart / 2.0f) + ((((anim->VelocityEnd - anim->VelocityStart) / frameCount) * currentFrame) / 4.0f);
 		else
-			item->Animation.Velocity = anim->VelocityStart + (((anim->VelocityEnd - anim->VelocityStart) / frameCount) * currentFrame);*/
-	
-		if (lara->Control.WaterStatus == WaterStatus::Wade && TestEnvironment(ENV_FLAG_SWAMP, item))
-			item->Animation.Velocity = (anim->VelocityStart / 2.0f) + (anim->VelocityAccel * (item->Animation.FrameNumber - anim->frameBase)) / 4.0f;
-		else
-			item->Animation.Velocity = anim->VelocityStart + (anim->VelocityAccel * (item->Animation.FrameNumber - anim->frameBase));
+			item->Animation.Velocity = anim->VelocityStart + (((anim->VelocityEnd - anim->VelocityStart) / frameCount) * currentFrame);
 	}
 
-	item->Animation.LateralVelocity = anim->LateralVelocityStart + (anim->LateralVelocityAccel * (item->Animation.FrameNumber - anim->frameBase));
+	item->Animation.LateralVelocity = anim->LateralVelocityStart + (((anim->LateralVelocityEnd - anim->LateralVelocityStart) / frameCount) * currentFrame);
 
 	if (lara->Control.Rope.Ptr != -1)
 		DelAlignLaraToRope(item);
@@ -343,9 +333,8 @@ void AnimateItem(ItemInfo* item)
 		}
 	}
 
-	// TODO: Prep. for later velocity calculation refactor.
-	/*int frameCount = anim->frameEnd - anim->frameBase;
-	int currentFrame = item->Animation.FrameNumber - anim->frameBase;*/
+	int frameCount = std::max(anim->frameEnd - anim->frameBase, 1); // HACK: Count 0 frames as 1.
+	int currentFrame = item->Animation.FrameNumber - anim->frameBase;
 
 	if (item->Animation.IsAirborne)
 	{
@@ -354,12 +343,8 @@ void AnimateItem(ItemInfo* item)
 	}
 	else
 	{
-		// TODO: Prep. for later velocity calculation refactor.
-		/*item->Animation.Velocity = anim->VelocityStart + (((anim->VelocityEnd - anim->VelocityStart) / frameCount) * currentFrame);
-		item->Animation.LateralVelocity = anim->LateralVelocityStart + (((anim->LateralVelocityEnd - anim->LateralVelocityStart) / frameCount) * currentFrame);*/
-	
-		item->Animation.Velocity = anim->VelocityStart + (anim->VelocityAccel * (item->Animation.FrameNumber - anim->frameBase));
-		item->Animation.LateralVelocity = anim->LateralVelocityStart + (anim->LateralVelocityAccel * (item->Animation.FrameNumber - anim->frameBase));
+		item->Animation.Velocity = anim->VelocityStart + (((anim->VelocityEnd - anim->VelocityStart) / frameCount) * currentFrame);
+		item->Animation.LateralVelocity = anim->LateralVelocityStart + (((anim->LateralVelocityEnd - anim->LateralVelocityStart) / frameCount) * currentFrame);
 	}
 	
 	TranslateItem(item, item->Pose.Orientation.y, item->Animation.Velocity, 0.0f, item->Animation.LateralVelocity);

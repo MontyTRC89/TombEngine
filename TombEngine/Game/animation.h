@@ -36,9 +36,9 @@ struct ANIM_STRUCT
 	int ActiveState;
 
 	float VelocityStart;
-	float VelocityAccel;
+	float VelocityEnd;
 	float LateralVelocityStart;
-	float LateralVelocityAccel;
+	float LateralVelocityEnd;
 
 	int frameBase;
 	int frameEnd;
