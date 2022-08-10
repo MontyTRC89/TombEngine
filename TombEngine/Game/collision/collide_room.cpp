@@ -946,6 +946,12 @@ short GetNearestLedgeAngle(ItemInfo* item, CollisionInfo* coll, float& distance)
 			auto ffpX = eX + frontFloorProbeOffset * s;
 			auto ffpZ = eZ + frontFloorProbeOffset * c;
 
+			// Calculate block min/max points to filter out out-of-bounds checks.
+			float minX = floor(ffpX / WALL_SIZE) * WALL_SIZE - 1.0f;
+			float minZ = floor(ffpZ / WALL_SIZE) * WALL_SIZE - 1.0f;
+			float maxX =  ceil(ffpX / WALL_SIZE) * WALL_SIZE + 1.0f;
+			float maxZ =  ceil(ffpZ / WALL_SIZE) * WALL_SIZE + 1.0f;
+
 			// Get front floor block
 			auto room = GetRoom(item->Location, ffpX, y, ffpZ).roomNumber;
 			auto block = GetCollision(ffpX, y, ffpZ, room).Block;
@@ -1072,6 +1078,11 @@ short GetNearestLedgeAngle(ItemInfo* item, CollisionInfo* coll, float& distance)
 					if (!ray.Intersects(plane[i], distance))
 						continue;
 
+					// Intersection point is out of block bounds, discard
+					auto cPoint = ray.position + ray.direction * distance;
+					if (cPoint.x < minX || cPoint.x > maxX || cPoint.z < minZ || cPoint.z > maxZ)
+						continue;
+
 					// Process plane intersection only if distance is smaller
 					// than already found minimum
 					if (distance < closestDistance[p])
@@ -1131,16 +1142,41 @@ short GetNearestLedgeAngle(ItemInfo* item, CollisionInfo* coll, float& distance)
 			}
 		}
 
-		// Store first result in case all 3 results are different (no priority) or prioritized result if long-distance misfire occured
+		// A case when all 3 results are different (no priority) or prioritized result 
+		// is a long-distance misfire
+
 		if (finalDistance[h] == FLT_MAX || finalDistance[h] > WALL_SIZE / 2)
 		{
-			finalDistance[h] = closestDistance[0];
-			finalResult[h] = result[0];
+			// Prioritize angle which is similar to coll setup's forward angle.
+			// This helps to solve some borderline cases with diagonal shimmying,
+			// when centerpoint probe lands exactly on a block which has no 
+			// diagonal split. If no angle similarity exists, just use centerpoint angle.
+
+			auto itr = std::find(result, result + 3, coll->Setup.ForwardAngle);
+			int prioritizedAngle = (itr != std::end(result)) ? std::distance(result, itr) : 0;
+
+			finalDistance[h] = closestDistance[prioritizedAngle];
+			finalResult[h] = result[prioritizedAngle];
 		}
 	}
 
+	int usedProbe = 0; // 0 = upper probe
+
 	// Return upper probe result in case it returned lower distance or has hit a bridge.
-	auto usedProbe = ((finalDistance[0] < finalDistance[1]) || hitBridge) ? 0 : 1;
+	// For unique case when both distances are equal, again make a comparison to current
+	// forward angle and return prioritized result.
+
+	if (!hitBridge)
+	{
+		if (floor(finalDistance[0]) == floor(finalDistance[1]))
+		{
+			auto itr = std::find(finalDistance, finalDistance + 2, coll->Setup.ForwardAngle);
+			usedProbe = (itr != std::end(finalDistance)) ? std::distance(finalDistance, itr) : 0;
+		}
+		else if (finalDistance[1] < finalDistance[0])
+			usedProbe = 1;
+	}
+
 	distance = finalDistance[usedProbe] - (coll->Setup.Radius - frontalOffset);
 	return finalResult[usedProbe];
 }
