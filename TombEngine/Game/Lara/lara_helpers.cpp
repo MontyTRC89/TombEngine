@@ -382,9 +382,9 @@ void ModulateLaraSwimTurnRates(ItemInfo* item, CollisionInfo* coll)
 		ModulateLaraTurnRateX(item, 0, 0, 0);*/
 
 	if (TrInput & IN_FORWARD)
-		item->Pose.Orientation.x -= ANGLE(3.0f);
+		item->Pose.Orientation.x -= ANGLE(2.75f);
 	else if (TrInput & IN_BACK)
-		item->Pose.Orientation.x += ANGLE(3.0f);
+		item->Pose.Orientation.x += ANGLE(2.75f);
 
 	if (TrInput & (IN_LEFT | IN_RIGHT))
 	{
