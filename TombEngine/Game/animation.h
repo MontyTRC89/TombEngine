@@ -35,10 +35,8 @@ struct ANIM_STRUCT
 	int Interpolation;
 	int ActiveState;
 
-	float VelocityStart;
-	float VelocityEnd;
-	float LateralVelocityStart;
-	float LateralVelocityEnd;
+	Vector3 VelocityStart = Vector3::Zero;
+	Vector3 VelocityEnd	  = Vector3::Zero;
 
 	int frameBase;
 	int frameEnd;
@@ -64,11 +62,11 @@ enum ANIMCOMMAND_TYPES
 
 struct BoneMutator
 {
-	Vector3 Scale    = Vector3::One;
 	Vector3 Offset   = Vector3::Zero;
 	Vector3 Rotation = Vector3::Zero;
+	Vector3 Scale    = Vector3::One;
 
-	bool IsEmpty() { return (Scale == Vector3::One) && (Offset == Vector3::Zero) && (Rotation == Vector3::Zero); };
+	bool IsEmpty() { return  (Offset == Vector3::Zero) && (Rotation == Vector3::Zero) && (Scale == Vector3::One); };
 };
 
 void AnimateLara(ItemInfo* item);

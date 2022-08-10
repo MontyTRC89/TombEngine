@@ -1,8 +1,8 @@
 #pragma once
-
 #include <cstdint>
 #include <string>
 #include <vector>
+
 #include "Game/animation.h"
 #include "Game/itemdata/itemdata.h"
 #include "Specific/newtypes.h"
@@ -61,17 +61,15 @@ enum class JointBitType
 
 struct EntityAnimationData
 {
-	int AnimNumber;
-	int FrameNumber;
-	int ActiveState;
-	int TargetState;
-	int RequiredState; // TODO: Phase out this weird feature.
+	int AnimNumber	  = -1;
+	int FrameNumber	  = -1;
+	int ActiveState	  = -1;
+	int TargetState	  = -1;
+	int RequiredState = -1; // TODO: Phase out this weird feature.
 
-	bool IsAirborne;
-	float Velocity;
-	float VerticalVelocity;
-	float LateralVelocity;
-	std::vector<BoneMutator> Mutator;
+	bool IsAirborne	= false;
+	Vector3 Velocity = Vector3::Zero; // +X is right, -Y is up, +Z is forward.
+	std::vector<BoneMutator> Mutator = {};
 };
 
 //todo we need to find good "default states" for a lot of these - squidshire 25/05/2022

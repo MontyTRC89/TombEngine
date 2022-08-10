@@ -706,8 +706,8 @@ namespace TEN::Entities::TR4
 						!Lara.Location)
 					{
 						SetAnimation(LaraItem, LA_FALL_START);
-						LaraItem->Animation.Velocity = 2;
-						LaraItem->Animation.VerticalVelocity = 1;
+						LaraItem->Animation.Velocity.z = 2;
+						LaraItem->Animation.Velocity.y = 1;
 
 						ResetLaraFlex(LaraItem);
 						LaraItem->HitStatus = true;

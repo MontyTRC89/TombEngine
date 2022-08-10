@@ -345,7 +345,7 @@ void PickupCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 							getThisItemPlease = itemNumber;
 							laraItem->Animation.AnimNumber = LA_UNDERWATER_PICKUP_FLARE;
 							laraItem->Animation.ActiveState = LS_PICKUP_FLARE;
-							laraItem->Animation.VerticalVelocity = 0;
+							laraItem->Animation.Velocity.y = 0;
 						}
 						else
 						{
@@ -773,8 +773,8 @@ void PickupControl(short itemNumber)
 	switch (triggerFlags)
 	{
 	case 5:
-		item->Animation.VerticalVelocity += 6;
-		item->Pose.Position.y += item->Animation.VerticalVelocity;
+		item->Animation.Velocity.y += 6;
+		item->Pose.Position.y += item->Animation.Velocity.y;
 		
 		roomNumber = item->RoomNumber;
 		GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNumber);
@@ -782,10 +782,10 @@ void PickupControl(short itemNumber)
 		if (item->Pose.Position.y > item->ItemFlags[0])
 		{
 			item->Pose.Position.y = item->ItemFlags[0];
-			if (item->Animation.VerticalVelocity <= 64)
+			if (item->Animation.Velocity.y <= 64)
 				item->TriggerFlags &= 0xC0;
 			else
-				item->Animation.VerticalVelocity = -item->Animation.VerticalVelocity / 4;
+				item->Animation.Velocity.y = -item->Animation.Velocity.y / 4;
 		}
 
 		if (item->RoomNumber != roomNumber)
