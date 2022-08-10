@@ -294,9 +294,9 @@ void LoadObjects()
 		anim->Interpolation = ReadInt32();
 		anim->ActiveState = ReadInt32();
 		anim->VelocityStart = ReadFloat();
-		anim->VelocityAccel = ReadFloat();
+		anim->VelocityEnd = ReadFloat();
 		anim->LateralVelocityStart = ReadFloat();
-		anim->LateralVelocityAccel = ReadFloat();
+		anim->LateralVelocityEnd = ReadFloat();
 		anim->frameBase = ReadInt32();
 		anim->frameEnd = ReadInt32();
 		anim->jumpAnimNum = ReadInt32();
