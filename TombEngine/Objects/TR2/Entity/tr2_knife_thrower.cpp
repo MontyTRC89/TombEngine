@@ -1,9 +1,9 @@
 #include "framework.h"
-#include "Objects/TR2/Entity/tr2_knifethrower.h"
+#include "Objects/TR2/Entity/tr2_knife_thrower.h"
 
-#include "Game/collision/floordata.h"
 #include "Game/collision/collide_item.h"
 #include "Game/collision/collide_room.h"
+#include "Game/collision/floordata.h"
 #include "Game/control/box.h"
 #include "Game/effects/effects.h"
 #include "Game/itemdata/creature_info.h"
@@ -11,25 +11,62 @@
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
 #include "Game/people.h"
-#include "Specific/level.h"
-#include "Specific/setup.h"
 #include "Sound/sound.h"
+#include "Specific/level.h"
+#include "Specific/prng.h"
+#include "Specific/setup.h"
 
+using namespace TEN::Math::Random;
 namespace TEN::Entities::TR2
 {
+	constexpr auto KNIFE_PROJECTILE_DAMAGE = 50;
+
+	// TODO: Ranges.
+
 	const auto KnifeBiteLeft  = BiteInfo(Vector3::Zero, 5);
 	const auto KnifeBiteRight = BiteInfo(Vector3::Zero, 8);
 
-	// TODO
 	enum KnifeThrowerState
 	{
-
+		KTHROWER_STATE_NONE = 0,
+		KTHROWER_STATE_IDLE = 1,
+		KTHROWER_STATE_WALK_FORWARD = 2,
+		KTHROWER_STATE_RUN_FORWARD = 3,
+		KTHROWER_STATE_WALK_KNIFE_ATTACK_LEFT_START = 4,
+		KTHROWER_STATE_WALK_KNIFE_ATTACK_LEFT_CONTINUE = 5,
+		KTHROWER_STATE_WALK_KNIFE_ATTACK_RIGHT_START = 6,
+		KTHROWER_STATE_WALK_KNIFE_ATTACK_RIGHT_CONTINUE = 7,
+		KTHROWER_STATE_IDLE_KNIFE_ATTACK_START = 8,
+		KTHROWER_STATE_IDLE_KNIFE_ATTACK_CONTINUE = 9,
+		KTHROWER_STATE_DEATH = 10
 	};
 
-	// TODO
 	enum KnifeThrowerAnim
 	{
-
+		KTHROWER_ANIM_IDLE = 0,
+		KTHROWER_ANIM_WALK_KNIFE_ATTACK_LEFT_START = 1,
+		KTHROWER_ANIM_WALK_KNIFE_ATTACK_LEFT_CANCEL = 2,
+		KTHROWER_ANIM_WALK_KNIFE_ATTACK_RIGHT_START = 3,
+		KTHROWER_ANIM_WALK_KNIFE_ATTACK_RIGHT_CANCEL = 4,
+		KTHROWER_ANIM_IDLE_KNIFE_ATTACK_START = 5,
+		KTHROWER_ANIM_RUN_FORWARD_TO_IDLE = 6,
+		KTHROWER_ANIM_RUN_FORWARD_TO_WALK_FORWARD = 7,
+		KTHROWER_ANIM_RUN_FORWARD = 8,
+		KTHROWER_ANIM_WALK_KNIFE_ATTACK_LEFT_CONTINUE = 9,
+		KTHROWER_ANIM_WALK_KNIFE_ATTACK_RIGHT_CONTINUE = 10,
+		KTHROWER_ANIM_IDLE_KNIFE_ATTACK_CONTINUE = 11,
+		KTHROWER_ANIM_WALK_KNIFE_ATTACK_LEFT_END = 12,
+		KTHROWER_ANIM_IDLE_KNIFE_ATTACK_END_TO_IDLE = 13,
+		KTHROWER_ANIM_IDLE_KNIFE_ATTACK_END_TO_START = 14,
+		KTHROWER_ANIM_IDLE_TO_RUN_FORWARD = 15,
+		KTHROWER_ANIM_IDLE_TO_WALK_FORWARD = 16,
+		KTHROWER_ANIM_WALK_FORWARD = 17,
+		KTHROWER_ANIM_WALK_FORWARD_TO_RUN_FORWARD = 18,
+		KTHROWER_ANIM_WALK_FORWARD_TO_IDLE_START = 19,
+		KTHROWER_ANIM_WALK_FORWARD_TO_IDLE_END = 20,
+		KTHROWER_ANIM_WALK_KNIFE_ATTACK_RIGHT_END = 21,
+		KTHROWER_ANIM_IDLE_KNIFE_ATTACK_CANCEL = 22,
+		KTHROWER_ANIM_DEATH = 23
 	};
 
 	void KnifeControl(short fxNumber)
@@ -65,7 +102,7 @@ namespace TEN::Entities::TR2
 
 		if (ItemNearLara(&fx->pos, 200))
 		{
-			DoDamage(LaraItem, 50);
+			DoDamage(LaraItem, KNIFE_PROJECTILE_DAMAGE);
 
 			fx->pos.Orientation.y = LaraItem->Pose.Orientation.y;
 			fx->speed = LaraItem->Animation.Velocity;
@@ -77,7 +114,7 @@ namespace TEN::Entities::TR2
 		}
 	}
 
-	static short ThrowKnife(int x, int y, int z, short velocity, short yRot, short roomNumber)
+	short ThrowKnife(int x, int y, int z, short velocity, short yRot, short roomNumber)
 	{
 		short fxNumber = 0;
 		// TODO: add fx parameters
@@ -96,12 +133,8 @@ namespace TEN::Entities::TR2
 
 		if (item->HitPoints <= 0)
 		{
-			if (item->Animation.ActiveState != 10)
-			{
-				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 23;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-				item->Animation.ActiveState = 10;
-			}
+			if (item->Animation.ActiveState != KTHROWER_STATE_DEATH)
+				SetAnimation(item, KTHROWER_ANIM_DEATH);
 		}
 		else
 		{
@@ -115,56 +148,56 @@ namespace TEN::Entities::TR2
 
 			switch (item->Animation.ActiveState)
 			{
-			case 1:
+			case KTHROWER_STATE_IDLE:
 				creature->MaxTurn = 0;
 
 				if (AI.ahead)
 					head = AI.angle;
 
 				if (creature->Mood == MoodType::Escape)
-					item->Animation.TargetState = 3;
+					item->Animation.TargetState = KTHROWER_STATE_RUN_FORWARD;
 				else if (Targetable(item, &AI))
-					item->Animation.TargetState = 8;
+					item->Animation.TargetState = KTHROWER_STATE_IDLE_KNIFE_ATTACK_START;
 				else if (creature->Mood == MoodType::Bored)
 				{
 					if (!AI.ahead || AI.distance > pow(SECTOR(6), 2))
-						item->Animation.TargetState = 2;
+						item->Animation.TargetState = KTHROWER_STATE_WALK_FORWARD;
 				}
 				else if (AI.ahead && AI.distance < pow(SECTOR(4), 2))
-					item->Animation.TargetState = 2;
+					item->Animation.TargetState = KTHROWER_STATE_WALK_FORWARD;
 				else
-					item->Animation.TargetState = 3;
+					item->Animation.TargetState = KTHROWER_STATE_RUN_FORWARD;
 
 				break;
 
-			case 2:
+			case KTHROWER_STATE_WALK_FORWARD:
 				creature->MaxTurn = ANGLE(3.0f);
 
 				if (AI.ahead)
 					head = AI.angle;
 
 				if (creature->Mood == MoodType::Escape)
-					item->Animation.TargetState = 3;
+					item->Animation.TargetState = KTHROWER_STATE_RUN_FORWARD;
 				else if (Targetable(item, &AI))
 				{
 					if (AI.distance < pow(SECTOR(2.5f), 2) || AI.zoneNumber != AI.enemyZone)
-						item->Animation.TargetState = 1;
-					else if (GetRandomControl() < 0x4000)
-						item->Animation.TargetState = 4;
+						item->Animation.TargetState = KTHROWER_STATE_IDLE;
+					else if (TestProbability(0.5f))
+						item->Animation.TargetState = KTHROWER_STATE_WALK_KNIFE_ATTACK_LEFT_START;
 					else
-						item->Animation.TargetState = 6;
+						item->Animation.TargetState = KTHROWER_STATE_WALK_KNIFE_ATTACK_RIGHT_START;
 				}
 				else if (creature->Mood == MoodType::Bored)
 				{
 					if (AI.ahead && AI.distance < pow(SECTOR(6), 2))
-						item->Animation.TargetState = 1;
+						item->Animation.TargetState = KTHROWER_STATE_IDLE;
 				}
 				else if (!AI.ahead || AI.distance > pow(SECTOR(4), 2))
-					item->Animation.TargetState = 3;
+					item->Animation.TargetState = KTHROWER_STATE_RUN_FORWARD;
 
 				break;
 
-			case 3:
+			case KTHROWER_STATE_RUN_FORWARD:
 				tilt = angle / 3;
 				creature->MaxTurn = ANGLE(6.0f);
 
@@ -172,61 +205,59 @@ namespace TEN::Entities::TR2
 					head = AI.angle;
 
 				if (Targetable(item, &AI))
-				{
-					item->Animation.TargetState = 2;
-				}
+					item->Animation.TargetState = KTHROWER_STATE_WALK_FORWARD;
 				else if (creature->Mood == MoodType::Bored)
 				{
 					if (AI.ahead && AI.distance < pow(SECTOR(6), 2))
-						item->Animation.TargetState = 1;
+						item->Animation.TargetState = KTHROWER_STATE_IDLE;
 					else
-						item->Animation.TargetState = 2;
+						item->Animation.TargetState = KTHROWER_STATE_WALK_FORWARD;
 				}
 				else if (AI.ahead && AI.distance < pow(SECTOR(4), 2))
-					item->Animation.TargetState = 2;
+					item->Animation.TargetState = KTHROWER_STATE_WALK_FORWARD;
 
 				break;
 
-			case 4:
-				creature->Flags = 0;
+			case KTHROWER_STATE_WALK_KNIFE_ATTACK_LEFT_START:
+				creature->Flags = NULL;
 
 				if (AI.ahead)
 					torso = AI.angle;
 
 				if (Targetable(item, &AI))
-					item->Animation.TargetState = 5;
+					item->Animation.TargetState = KTHROWER_STATE_WALK_KNIFE_ATTACK_LEFT_CONTINUE;
 				else
-					item->Animation.TargetState = 2;
+					item->Animation.TargetState = KTHROWER_STATE_WALK_FORWARD;
 
 				break;
 
-			case 6:
-				creature->Flags = 0;
+			case KTHROWER_STATE_WALK_KNIFE_ATTACK_RIGHT_START:
+				creature->Flags = NULL;
 
 				if (AI.ahead)
 					torso = AI.angle;
 
 				if (Targetable(item, &AI))
-					item->Animation.TargetState = 7;
+					item->Animation.TargetState = KTHROWER_STATE_WALK_KNIFE_ATTACK_RIGHT_CONTINUE;
 				else
-					item->Animation.TargetState = 2;
+					item->Animation.TargetState = KTHROWER_STATE_WALK_FORWARD;
 
 				break;
 
-			case 8:
-				creature->Flags = 0;
+			case KTHROWER_STATE_IDLE_KNIFE_ATTACK_START:
+				creature->Flags = NULL;
 
 				if (AI.ahead)
 					torso = AI.angle;
 
 				if (Targetable(item, &AI))
-					item->Animation.TargetState = 9;
+					item->Animation.TargetState = KTHROWER_STATE_IDLE_KNIFE_ATTACK_CONTINUE;
 				else
-					item->Animation.TargetState = 1;
+					item->Animation.TargetState = KTHROWER_STATE_IDLE;
 
 				break;
 
-			case 5:
+			case KTHROWER_STATE_WALK_KNIFE_ATTACK_LEFT_CONTINUE:
 				if (AI.ahead)
 					torso = AI.angle;
 
@@ -238,7 +269,7 @@ namespace TEN::Entities::TR2
 
 				break;
 
-			case 7:
+			case KTHROWER_STATE_WALK_KNIFE_ATTACK_RIGHT_CONTINUE:
 				if (AI.ahead)
 					torso = AI.angle;
 
@@ -250,7 +281,7 @@ namespace TEN::Entities::TR2
 
 				break;
 
-			case 9:
+			case KTHROWER_STATE_IDLE_KNIFE_ATTACK_CONTINUE:
 				if (AI.ahead)
 					torso = AI.angle;
 

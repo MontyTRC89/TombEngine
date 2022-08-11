@@ -371,7 +371,7 @@ CALL gen.bat</Command>
     <ClInclude Include="Objects\TR2\Entity\tr2_bird_monster.h" />
     <ClInclude Include="Objects\TR2\Entity\tr2_dragon.h" />
     <ClInclude Include="Objects\TR2\Entity\tr2_eagle_or_crow.h" />
-    <ClInclude Include="Objects\TR2\Entity\tr2_knifethrower.h" />
+    <ClInclude Include="Objects\TR2\Entity\tr2_knife_thrower.h" />
     <ClInclude Include="Objects\TR2\Entity\tr2_mercenary.h" />
     <ClInclude Include="Objects\TR2\Entity\tr2_monk.h" />
     <ClInclude Include="Objects\TR2\Entity\tr2_rat.h" />
@@ -815,7 +815,7 @@ CALL gen.bat</Command>
     <ClCompile Include="Objects\TR3\Vehicles\big_gun.cpp" />
     <ClCompile Include="Objects\TR4\Vehicles\jeep.cpp" />
     <ClCompile Include="Objects\TR3\Vehicles\kayak.cpp" />
-    <ClCompile Include="Objects\TR2\Entity\tr2_knifethrower.cpp" />
+    <ClCompile Include="Objects\TR2\Entity\tr2_knife_thrower.cpp" />
     <ClCompile Include="Objects\TR2\Entity\tr2_mercenary.cpp" />
     <ClCompile Include="Objects\TR3\Vehicles\minecart.cpp" />
     <ClCompile Include="Objects\TR2\Entity\tr2_monk.cpp" />

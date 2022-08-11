@@ -7,12 +7,12 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-// Entities
+// Creatures
 #include "Objects/TR2/Entity/tr2_barracuda.h" // OK
 #include "Objects/TR2/Entity/tr2_bird_monster.h" // OK
 #include "Objects/TR2/Entity/tr2_dragon.h" // OK
 #include "Objects/TR2/Entity/tr2_eagle_or_crow.h" // OK
-#include "Objects/TR2/Entity/tr2_knifethrower.h" // OK
+#include "Objects/TR2/Entity/tr2_knife_thrower.h" // OK
 #include "Objects/TR2/Entity/tr2_mercenary.h" // OK
 #include "Objects/TR2/Entity/tr2_monk.h" // OK
 #include "Objects/TR2/Entity/tr2_rat.h" // OK
