@@ -9,42 +9,47 @@
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
 #include "Specific/level.h"
+#include "Specific/prng.h"
 #include "Specific/setup.h"
+
+using namespace TEN::Math::Random;
 
 namespace TEN::Entities::TR2
 {
-	constexpr auto RAT_DAMAGE = 20;
+	constexpr auto RAT_ATTACK_DAMAGE = 20;
 	constexpr auto RAT_ATTACK_RANGE = SQUARE(CLICK(0.7f));
-	constexpr auto RAT_WAIT1_CHANCE = 1280;
-	constexpr auto RAT_WAIT2_CHANCE = RAT_WAIT1_CHANCE * 2;
 
-	const auto RatBite = BiteInfo(Vector3(0.0f, 0.0f, 57.0f), 2);
+	constexpr auto RAT_SQUEAK_CHANCE = 0.04;
+	constexpr auto RAT_IDLE_CHANCE	 = 0.08;
+	constexpr auto RAT_WALK_CHANCE	 = 0.92;
 
 	#define RAT_TURN_RATE_MAX ANGLE(6.0f)
+
+	const auto RatBite = BiteInfo(Vector3(0.0f, 0.0f, 57.0f), 2);
 
 	enum RatState
 	{
 		RAT_STATE_NONE = 0,
-		RAT_STATE_WALK,
-		RAT_STATE_IDLE,
-		RAT_STATE_SQUEAK,
-		RAT_STATE_ATTACK1,
-		RAT_STATE_ATTACK2,
-		RAT_STATE_DEATH
+		RAT_STATE_WALK_FORWARD = 1,
+		RAT_STATE_IDLE = 2,
+		RAT_STATE_SQUEAK = 3,
+		RAT_STATE_BITE_ATTACK = 4,
+		RAT_STATE_POUNCE_ATTACK = 5,
+		RAT_STATE_DEATH = 6
 	};
 
 	enum RatAnim
 	{
 		RAT_ANIM_IDLE = 0,
-		RAT_ANIM_IDLE_TO_WALK,
-		RAT_ANIM_WALK,
-		RAT_ANIM_WALK_TO_IDLE,
-		RAT_ANIM_SQUEAK,
-		RAT_ANIM_IDLE_TO_ATTACK1,
-		RAT_ANIM_ATTACK1,
-		RAT_ANIM_ATTACK1_TO_IDLE,
-		RAT_ANIM_ATTACK2,
-		RAT_ANIM_DEATH
+		RAT_ANIM_IDLE_TO_WALK_FORWARD = 1,
+		RAT_ANIM_WALK_FORWARD = 2,
+		RAT_ANIM_WALK_FORWARD_TO_IDLE = 3,
+		RAT_ANIM_SQUEAK = 4,
+		RAT_ANIM_BITE_ATTACK_START = 5,
+		RAT_ANIM_BITE_ATTACK_CONTINUE = 6,
+		RAT_ANIM_BITE_ATTACK_END = 7,
+		RAT_ANIM_POUNCE_ATTACK = 8,
+		RAT_ANIM_DEATH = 9
 	};
 
 	void RatControl(short itemNumber)
@@ -55,7 +60,6 @@ namespace TEN::Entities::TR2
 		auto* item = &g_Level.Items[itemNumber];
 		auto* creature = GetCreatureInfo(item);
 
-		int random = 0;
 		short head = 0;
 		short angle = 0;
 
@@ -79,19 +83,19 @@ namespace TEN::Entities::TR2
 
 			switch (item->Animation.ActiveState)
 			{
-			case RAT_STATE_ATTACK1:
-				if (creature->Mood == MoodType::Bored || creature->Mood == MoodType::Stalk)
+			case RAT_STATE_BITE_ATTACK:
+				if (creature->Mood == MoodType::Bored ||
+					creature->Mood == MoodType::Stalk)
 				{
-					random = GetRandomControl();
-					if (random < RAT_WAIT1_CHANCE)
+					if (TestProbability(RAT_SQUEAK_CHANCE))
 						item->Animation.RequiredState = RAT_STATE_SQUEAK;
-					else if (random > RAT_WAIT2_CHANCE)
-						item->Animation.RequiredState = RAT_STATE_WALK;
+					else if (TestProbability(RAT_WALK_CHANCE))
+						item->Animation.RequiredState = RAT_STATE_WALK_FORWARD;
 				}
 				else if (AI.distance < RAT_ATTACK_RANGE)
-					item->Animation.RequiredState = RAT_STATE_ATTACK2;
+					item->Animation.RequiredState = RAT_STATE_POUNCE_ATTACK;
 				else
-					item->Animation.RequiredState = RAT_STATE_WALK;
+					item->Animation.RequiredState = RAT_STATE_WALK_FORWARD;
 
 				if (item->Animation.RequiredState)
 					item->Animation.TargetState = RAT_STATE_IDLE;
@@ -106,18 +110,17 @@ namespace TEN::Entities::TR2
 
 				break;
 
-			case RAT_STATE_WALK:
+			case RAT_STATE_WALK_FORWARD:
 				creature->MaxTurn = RAT_TURN_RATE_MAX;
 
 				if (creature->Mood == MoodType::Bored || creature->Mood == MoodType::Stalk)
 				{
-					random = GetRandomControl();
-					if (random < RAT_WAIT1_CHANCE)
+					if (TestProbability(RAT_SQUEAK_CHANCE))
 					{
-						item->Animation.RequiredState = RAT_STATE_SQUEAK;
 						item->Animation.TargetState = RAT_STATE_IDLE;
+						item->Animation.RequiredState = RAT_STATE_SQUEAK;
 					}
-					else if (random < RAT_WAIT2_CHANCE)
+					else if (TestProbability(RAT_IDLE_CHANCE))
 						item->Animation.TargetState = RAT_STATE_IDLE;
 				}
 				else if (AI.ahead && AI.distance < RAT_ATTACK_RANGE)
@@ -125,19 +128,21 @@ namespace TEN::Entities::TR2
 
 				break;
 
-			case RAT_STATE_ATTACK2:
-				if (!item->Animation.RequiredState && item->TestBits(JointBitType::Touch, RatBite.meshNum))
+			case RAT_STATE_POUNCE_ATTACK:
+				if (!item->Animation.RequiredState &&
+					item->TestBits(JointBitType::Touch, RatBite.meshNum))
 				{
-					DoDamage(creature->Enemy, RAT_DAMAGE);
-					CreatureEffect(item, RatBite, DoBloodSplat);
 					item->Animation.RequiredState = RAT_STATE_IDLE;
+					DoDamage(creature->Enemy, RAT_ATTACK_DAMAGE);
+					CreatureEffect(item, RatBite, DoBloodSplat);
 				}
 
 				break;
 
 			case RAT_STATE_SQUEAK:
 				creature->MaxTurn = 0;
-				if (GetRandomControl() < RAT_WAIT1_CHANCE)
+
+				if (TestProbability(RAT_SQUEAK_CHANCE))
 					item->Animation.TargetState = RAT_STATE_IDLE;
 
 				break;
