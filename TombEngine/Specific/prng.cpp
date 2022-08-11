@@ -17,13 +17,13 @@ namespace TEN::Math::Random
 		return ((high - low) * Engine() / Engine.max() + low);
 	}
 
-	bool TestProbability(float chance)
+	bool TestProbability(float probability)
 	{
-		chance = std::clamp(chance, 0.0f, 1.0f);
+		probability = std::clamp(probability, 0.0f, 1.0f);
 
-		if (chance == 1.0f)
+		if (probability == 1.0f)
 			return true;
 		else
-			return (GenerateFloat(0.0f, 1.0f) < chance);
+			return (GenerateFloat(0.0f, 1.0f) < probability);
 	}
 }
