@@ -101,7 +101,9 @@ void FallingBlockControl(short itemNumber)
 
 			item->ItemFlags[0]++;
 
-			if (GetDistanceToFloor(itemNumber) >= 0)
+			int DistanceToFLoor = GetCollision(item).Position.Floor - item->Pose.Position.y;
+
+			if (DistanceToFLoor > 0)
 			{
 				// If crumbled before actual delay (e.g. too low position), force delay to be correct
 				if (item->ItemFlags[0] < FALLINGBLOCK_DELAY)
