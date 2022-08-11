@@ -4,17 +4,20 @@
 #include "Game/control/box.h"
 #include "Game/control/control.h"
 #include "Game/effects/effects.h"
-#include "Game/items.h"
 #include "Game/itemdata/creature_info.h"
+#include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
 #include "Specific/level.h"
+#include "Specific/prng.h"
 #include "Specific/setup.h"
+
+using namespace TEN::Math::Random;
 
 namespace TEN::Entities::TR2
 {
-	BiteInfo YetiBiteRight = { 12, 101, 19, 10 };
-	BiteInfo YetiBiteLeft = { 12, 101, 19, 13 };
+	const auto YetiBiteLeft = BiteInfo(Vector3(12.0f, 101.0f, 19.0f), 13);
+	const auto YetiBiteRight = BiteInfo(Vector3(12.0f, 101.0f, 19.0f), 10);
 
 	// TODO
 	enum YetiState
@@ -33,10 +36,7 @@ namespace TEN::Entities::TR2
 		auto* item = &g_Level.Items[itemNumber];
 
 		ClearItem(itemNumber);
-
-		item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 19;
-		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-		item->Animation.ActiveState = g_Level.Anims[item->Animation.AnimNumber].ActiveState;
+		SetAnimation(item, 19);
 	}
 
 	void YetiControl(short itemNumber)
@@ -47,7 +47,7 @@ namespace TEN::Entities::TR2
 		auto* item = &g_Level.Items[itemNumber];
 		auto* info = GetCreatureInfo(item);
 
-		bool laraAlive = LaraItem->HitPoints > 0;
+		bool isLaraAlive = LaraItem->HitPoints > 0;
 
 		short angle = 0;
 		short torso = 0;
@@ -77,7 +77,7 @@ namespace TEN::Entities::TR2
 			{
 			case 2:
 				info->MaxTurn = 0;
-				info->Flags = 0;
+				info->Flags = NULL;
 
 				if (AI.ahead)
 					head = AI.angle;
@@ -88,14 +88,14 @@ namespace TEN::Entities::TR2
 					item->Animation.TargetState = item->Animation.RequiredState;
 				else if (info->Mood == MoodType::Bored)
 				{
-					if (GetRandomControl() < 0x100 || !laraAlive)
+					if (TestProbability(0.008f) || !isLaraAlive)
 						item->Animation.TargetState = 7;
-					else if (GetRandomControl() < 0x200)
+					else if (TestProbability(0.015f))
 						item->Animation.TargetState = 9;
-					else if (GetRandomControl() < 0x300)
+					else if (TestProbability(0.025f))
 						item->Animation.TargetState = 3;
 				}
-				else if (AI.ahead && AI.distance < pow(SECTOR(0.5f), 2) && GetRandomControl() < 0x4000)
+				else if (AI.ahead && AI.distance < pow(SECTOR(0.5f), 2) && TestProbability(0.5f))
 					item->Animation.TargetState = 4;
 				else if (AI.ahead && AI.distance < pow(CLICK(1), 2))
 					item->Animation.TargetState = 5;
@@ -114,20 +114,20 @@ namespace TEN::Entities::TR2
 					item->Animation.TargetState = 2;
 				else if (info->Mood == MoodType::Bored)
 				{
-					if (laraAlive)
+					if (isLaraAlive)
 					{
-						if (GetRandomControl() < 0x100)
+						if (TestProbability(0.008f))
 							item->Animation.TargetState = 2;
-						else if (GetRandomControl() < 0x200)
+						else if (TestProbability(0.015f))
 							item->Animation.TargetState = 9;
-						else if (GetRandomControl() < 0x300)
+						else if (TestProbability(0.025f))
 						{
 							item->Animation.TargetState = 2;
 							item->Animation.RequiredState = 3;
 						}
 					}
 				}
-				else if (GetRandomControl() < 0x200)
+				else if (TestProbability(0.015f))
 					item->Animation.TargetState = 2;
 
 				break;
@@ -140,17 +140,17 @@ namespace TEN::Entities::TR2
 					item->Animation.TargetState = 2;
 				else if (info->Mood == MoodType::Bored)
 				{
-					if (GetRandomControl() < 0x100 || !laraAlive)
+					if (TestProbability(0.008f) || !isLaraAlive)
 						item->Animation.TargetState = 7;
-					else if (GetRandomControl() < 0x200)
+					else if (TestProbability(0.015f))
 						item->Animation.TargetState = 2;
-					else if (GetRandomControl() < 0x300)
+					else if (TestProbability(0.025f))
 					{
 						item->Animation.TargetState = 2;
 						item->Animation.RequiredState = 3;
 					}
 				}
-				else if (GetRandomControl() < 0x200)
+				else if (TestProbability(0.015f))
 					item->Animation.TargetState = 2;
 
 				break;
@@ -165,17 +165,17 @@ namespace TEN::Entities::TR2
 					item->Animation.TargetState = 1;
 				else if (info->Mood == MoodType::Bored)
 				{
-					if (GetRandomControl() < 0x100 || !laraAlive)
+					if (TestProbability(0.008f) || !isLaraAlive)
 					{
 						item->Animation.TargetState = 2;
 						item->Animation.RequiredState = 7;
 					}
-					else if (GetRandomControl() < 0x200)
+					else if (TestProbability(0.015f))
 					{
 						item->Animation.TargetState = 2;
 						item->Animation.RequiredState = 9;
 					}
-					else if (GetRandomControl() < 0x300)
+					else if (TestProbability(0.025f))
 						item->Animation.TargetState = 2;
 				}
 				else if (info->Mood == MoodType::Attack)
@@ -189,9 +189,9 @@ namespace TEN::Entities::TR2
 				break;
 
 			case 1:
-				info->MaxTurn = ANGLE(6.0f);
 				tilt = angle / 4;
-				info->Flags = 0;
+				info->MaxTurn = ANGLE(6.0f);
+				info->Flags = NULL;
 
 				if (AI.ahead)
 					head = AI.angle;
@@ -213,9 +213,10 @@ namespace TEN::Entities::TR2
 				if (AI.ahead)
 					torso = AI.angle;
 
-				if (!info->Flags && item->TouchBits & 0x1400)
+				if (!info->Flags &&
+					item->TouchBits & 0x1400)
 				{
-					CreatureEffect(item, &YetiBiteRight, DoBloodSplat);
+					CreatureEffect(item, YetiBiteRight, DoBloodSplat);
 					DoDamage(info->Enemy, 100);
 					info->Flags = 1;
 				}
@@ -228,12 +229,13 @@ namespace TEN::Entities::TR2
 				if (AI.ahead)
 					torso = AI.angle;
 
-				if (!info->Flags && item->TouchBits & (0x0700 | 0x1400))
+				if (!info->Flags &&
+					item->TouchBits & (0x0700 | 0x1400))
 				{
 					if (item->TouchBits & 0x0700)
-						CreatureEffect(item, &YetiBiteLeft, DoBloodSplat);
+						CreatureEffect(item, YetiBiteLeft, DoBloodSplat);
 					if (item->TouchBits & 0x1400)
-						CreatureEffect(item, &YetiBiteRight, DoBloodSplat);
+						CreatureEffect(item, YetiBiteRight, DoBloodSplat);
 
 					DoDamage(info->Enemy, 150);
 					info->Flags = 1;
@@ -245,12 +247,13 @@ namespace TEN::Entities::TR2
 				if (AI.ahead)
 					torso = AI.angle;
 
-				if (!info->Flags && item->TouchBits & (0x0700 | 0x1400))
+				if (!info->Flags &&
+					item->TouchBits & (0x0700 | 0x1400))
 				{
 					if (item->TouchBits & 0x0700)
-						CreatureEffect(item, &YetiBiteLeft, DoBloodSplat);
+						CreatureEffect(item, YetiBiteLeft, DoBloodSplat);
 					if (item->TouchBits & 0x1400)
-						CreatureEffect(item, &YetiBiteRight, DoBloodSplat);
+						CreatureEffect(item, YetiBiteRight, DoBloodSplat);
 
 					DoDamage(info->Enemy, 200);
 					info->Flags = 1;
@@ -267,7 +270,7 @@ namespace TEN::Entities::TR2
 			}
 		}
 
-		if (!laraAlive)
+		if (!isLaraAlive)
 		{
 			info->MaxTurn = 0;
 			CreatureKill(item, 31, 14, 103);
@@ -308,8 +311,6 @@ namespace TEN::Entities::TR2
 			}
 		}
 		else
-		{
 			CreatureAnimation(itemNumber, angle, tilt);
-		}
 	}
 }
