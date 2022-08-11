@@ -113,7 +113,8 @@ namespace TEN::Entities::TR2
 			case RAT_STATE_WALK_FORWARD:
 				creature->MaxTurn = RAT_TURN_RATE_MAX;
 
-				if (creature->Mood == MoodType::Bored || creature->Mood == MoodType::Stalk)
+				if (creature->Mood == MoodType::Bored ||
+					creature->Mood == MoodType::Stalk)
 				{
 					if (TestProbability(RAT_SQUEAK_CHANCE))
 					{
