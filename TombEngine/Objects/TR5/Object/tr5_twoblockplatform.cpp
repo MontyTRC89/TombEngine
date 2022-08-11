@@ -32,6 +32,10 @@ void TwoBlocksPlatformControl(short itemNumber)
 			if (item->Pose.Position.y > (item->ItemFlags[0] - 16 * (int) (item->TriggerFlags & 0xFFFFFFF0)))
 				item->Pose.Position.y -= item->TriggerFlags & 0xF;
 
+			int DistanceToPortal = *&g_Level.Rooms[item->RoomNumber].maxceiling - item->Pose.Position.y;
+			if (DistanceToPortal < 16)
+				UpdateBridgeItem(itemNumber);
+
 			auto probe = GetCollision(item);
 
 			item->Floor = probe.Position.Floor;
