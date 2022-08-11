@@ -19,9 +19,9 @@ namespace TEN::Entities::TR2
 	constexpr auto RAT_ATTACK_DAMAGE = 20;
 	constexpr auto RAT_ATTACK_RANGE = SQUARE(CLICK(0.7f));
 
-	constexpr auto RAT_SQUEAK_CHANCE = 0.04;
-	constexpr auto RAT_IDLE_CHANCE	 = 0.08;
-	constexpr auto RAT_WALK_CHANCE	 = 0.92;
+	constexpr auto RAT_SQUEAK_CHANCE = 0.04f;
+	constexpr auto RAT_IDLE_CHANCE	 = 0.08f;
+	constexpr auto RAT_WALK_CHANCE	 = 0.92f;
 
 	#define RAT_TURN_RATE_MAX ANGLE(6.0f)
 
