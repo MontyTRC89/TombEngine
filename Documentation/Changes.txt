@@ -10,6 +10,7 @@ Version 1.0.1
 - Fixed quadbike dismount with jump key and allow to shoot big gun with action key.
 - Fixed static meshes having wrong colors on savegame reload.
 - Prevent title music audio from starting in a random place.
+- Update harpoon speed on room change.
 
 Version 1.0
 ===========
