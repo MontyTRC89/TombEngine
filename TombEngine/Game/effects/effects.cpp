@@ -1390,52 +1390,6 @@ void TriggerRocketFire(int x, int y, int z)
 
 void TriggerRocketSmoke(int x, int y, int z, int bodyPart)
 {
-	/*auto* sptr = GetFreeParticle();
-
-	sptr->on = true;
-	sptr->sR = 0;
-	sptr->sG = 0;
-	sptr->sB = 0;
-
-	sptr->dR = 64 + bodyPart;
-	sptr->dG = 64 + bodyPart;
-	sptr->dB = 64 + bodyPart;
-
-	sptr->colFadeSpeed = 4 + (GetRandomControl() & 3);
-	sptr->fadeToBlack = 12;
-	sptr->sLife = sptr->life = (GetRandomControl() & 3) + 20;
-	sptr->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
-	sptr->extras = 0;
-	sptr->dynamic = -1;
-
-	sptr->x = x + ((GetRandomControl() & 15) - 8);
-	sptr->y = y + ((GetRandomControl() & 15) - 8);
-	sptr->z = z + ((GetRandomControl() & 15) - 8);
-	sptr->xVel = ((GetRandomControl() & 255) - 128);
-	sptr->yVel = -(GetRandomControl() & 3) - 4;
-	sptr->zVel = ((GetRandomControl() & 255) - 128);
-	sptr->friction = 4;
-
-	if (GetRandomControl() & 1)
-	{
-		sptr->flags = SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF;
-		sptr->rotAng = GetRandomControl() & 4095;
-		if (GetRandomControl() & 1)
-			sptr->rotAdd = -(GetRandomControl() & 15) - 16;
-		else
-			sptr->rotAdd = (GetRandomControl() & 15) + 16;
-	}
-	else
-		sptr->flags = SP_SCALE | SP_DEF | SP_EXPDEF;
-
-	// TODO: right sprite
-	sptr->def = Objects[ID_DEFAULT_SPRITES].meshIndex;
-	sptr->scalar = 15;
-	sptr->gravity = -(GetRandomControl() & 3) - 4;
-	sptr->maxYvel = -(GetRandomControl() & 3) - 4;
-
-	int size = (GetRandomControl() & 7) + 32;
-	sptr->size = sptr->sSize = size >> 2;*/
 	TEN::Effects::Smoke::TriggerRocketSmoke(x, y, z, 0);
 }
 
