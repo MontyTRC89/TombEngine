@@ -17,6 +17,7 @@
 #include "Specific/setup.h"
 
 using namespace TEN::Math::Random;
+
 namespace TEN::Entities::TR2
 {
 	constexpr auto KNIFE_PROJECTILE_DAMAGE = 50;

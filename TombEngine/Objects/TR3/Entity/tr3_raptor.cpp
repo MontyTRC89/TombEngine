@@ -86,21 +86,21 @@ namespace TEN::Entities::TR3
 		}
 		else
 		{
-			if (creature->Enemy == nullptr || !(GetRandomControl() & 0x7F))
+			if (creature->Enemy == nullptr || !(GetRandomControl() & 0x7F)) // TODO: Probability is 0.004f or 0.996f?
 			{
 				ItemInfo* nearestItem = nullptr;
 				int minDistance = INT_MAX;
 
 				for (int i = 0; i < ActiveCreatures.size(); i++)
 				{
-					auto* currentCreatureInfo = ActiveCreatures[i];
-					if (currentCreatureInfo->ItemNumber == NO_ITEM || currentCreatureInfo->ItemNumber == itemNumber)
+					auto* currentCreature = ActiveCreatures[i];
+					if (currentCreature->ItemNumber == NO_ITEM || currentCreature->ItemNumber == itemNumber)
 					{
-						currentCreatureInfo++;
+						currentCreature++;
 						continue;
 					}
 
-					auto* targetItem = &g_Level.Items[currentCreatureInfo->ItemNumber];
+					auto* targetItem = &g_Level.Items[currentCreature->ItemNumber];
 
 					int x = (targetItem->Pose.Position.x - item->Pose.Position.x) / 64;
 					int y = (targetItem->Pose.Position.y - item->Pose.Position.y) / 64;
@@ -113,7 +113,7 @@ namespace TEN::Entities::TR3
 						minDistance = distance;
 					}
 
-					currentCreatureInfo++;
+					currentCreature++;
 				}
 
 				if (nearestItem != nullptr &&
@@ -170,8 +170,11 @@ namespace TEN::Entities::TR3
 				}
 				else if (AI.bite && AI.distance < pow(SECTOR(1.5f), 2))
 					item->Animation.TargetState = RAPTOR_STATE_JUMP_ATTACK;
-				else if (creature->Mood == MoodType::Escape && Lara.TargetEntity != item && AI.ahead && !item->HitStatus)
+				else if (creature->Mood == MoodType::Escape &&
+					Lara.TargetEntity != item && AI.ahead && !item->HitStatus)
+				{
 					item->Animation.TargetState = RAPTOR_STATE_IDLE;
+				}
 				else if (creature->Mood == MoodType::Bored)
 					item->Animation.TargetState = RAPTOR_STATE_WALK_FORWARD;
 				else
@@ -237,7 +240,8 @@ namespace TEN::Entities::TR3
 
 				if (creature->Enemy->IsLara())
 				{
-					if (!(creature->Flags & 1) && item->TestBits(JointBitType::Touch, RaptorAttackJoints))
+					if (!(creature->Flags & 1) &&
+						item->TestBits(JointBitType::Touch, RaptorAttackJoints))
 					{
 						DoDamage(creature->Enemy, RAPTOR_ATTACK_DAMAGE);
 						CreatureEffect(item, RaptorBite, DoBloodSplat);
@@ -251,7 +255,7 @@ namespace TEN::Entities::TR3
 				}
 				else
 				{
-					if (!(creature->Flags & 1) && creature->Enemy)
+					if (!(creature->Flags & 1) && creature->Enemy != nullptr)
 					{
 						auto direction = creature->Enemy->Pose.Position - item->Pose.Position;
 						if (abs(direction.x) < SECTOR(0.5f) &&
