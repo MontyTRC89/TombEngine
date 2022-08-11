@@ -816,7 +816,6 @@ namespace TEN::Renderer
 
 		SetDepthState(DEPTH_STATE_READ_ONLY_ZBUFFER);
 		SetCullMode(CULL_MODE_NONE);
-		SetAlphaTest(ALPHA_TEST_GREATER_THAN, ALPHA_TEST_THRESHOLD, true);
 
 		m_context->VSSetShader(m_vsSprites.Get(), NULL, 0);
 		m_context->PSSetShader(m_psSprites.Get(), NULL, 0);
@@ -889,6 +888,11 @@ namespace TEN::Renderer
 
 				SetBlendMode(spr.BlendMode);
 				BindTexture(TEXTURE_COLOR_MAP, spr.Sprite->Texture, SAMPLER_LINEAR_CLAMP);
+
+				if (spr.BlendMode == BLEND_MODES::BLENDMODE_ALPHATEST)
+					SetAlphaTest(ALPHA_TEST_GREATER_THAN, ALPHA_TEST_THRESHOLD, true);
+				else
+					SetAlphaTest(ALPHA_TEST_NONE, 0);
 
 				Matrix scale = Matrix::CreateScale((spr.Width) * spr.Scale, (spr.Height) * spr.Scale, spr.Scale);
 				
