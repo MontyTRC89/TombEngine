@@ -359,11 +359,11 @@ void KillEffect(short fxNumber)
 			NextFxActive = fx->nextActive;
 		else
 		{
-			for (short linknum = NextFxActive; linknum != NO_ITEM; linknum = EffectList[linknum].nextActive)
+			for (short linkNumber = NextFxActive; linkNumber != NO_ITEM; linkNumber = EffectList[linkNumber].nextActive)
 			{
-				if (EffectList[linknum].nextActive == fxNumber)
+				if (EffectList[linkNumber].nextActive == fxNumber)
 				{
-					EffectList[linknum].nextActive = fx->nextActive;
+					EffectList[linkNumber].nextActive = fx->nextActive;
 					break;
 				}
 			}
@@ -373,11 +373,11 @@ void KillEffect(short fxNumber)
 			g_Level.Rooms[fx->roomNumber].fxNumber = fx->nextFx;
 		else
 		{
-			for (short linknum = g_Level.Rooms[fx->roomNumber].fxNumber; linknum != NO_ITEM; linknum = EffectList[linknum].nextFx)
+			for (short linkNumber = g_Level.Rooms[fx->roomNumber].fxNumber; linkNumber != NO_ITEM; linkNumber = EffectList[linkNumber].nextFx)
 			{
-				if (EffectList[linknum].nextFx == fxNumber)
+				if (EffectList[linkNumber].nextFx == fxNumber)
 				{
-					EffectList[linknum].nextFx = fx->nextFx;
+					EffectList[linkNumber].nextFx = fx->nextFx;
 					break;
 				}
 			}
@@ -388,7 +388,7 @@ void KillEffect(short fxNumber)
 	}
 }
 
-short CreateNewEffect(short roomNum) 
+short CreateNewEffect(short roomNumber) 
 {
 	short fxNumber = NextFxFree;
 
@@ -397,8 +397,9 @@ short CreateNewEffect(short roomNum)
 		auto* fx = &EffectList[NextFxFree];
 		NextFxFree = fx->nextFx;
 
-		auto* room = &g_Level.Rooms[roomNum];
-		fx->roomNumber = roomNum;
+		auto* room = &g_Level.Rooms[roomNumber];
+
+		fx->roomNumber = roomNumber;
 		fx->nextFx = room->fxNumber;
 		room->fxNumber = fxNumber;
 		fx->nextActive = NextFxActive;
