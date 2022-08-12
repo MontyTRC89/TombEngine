@@ -172,7 +172,7 @@ namespace TEN::Entities::TR3
 			case CIVVY_STATE_IDLE:
 				head = laraAiInfo.angle;
 				creature->MaxTurn = 0;
-				creature->Flags = NULL;
+				creature->Flags = 0;
 
 				if (item->AIBits & GUARD)
 				{
@@ -285,7 +285,7 @@ namespace TEN::Entities::TR3
 				else
 					item->Animation.TargetState = CIVVY_STATE_IDLE;
 
-				creature->Flags = NULL;
+				creature->Flags = 0;
 				break;
 
 			case CIVVY_AIM1:
@@ -302,12 +302,12 @@ namespace TEN::Entities::TR3
 				else
 					item->Animation.TargetState = CIVVY_STATE_IDLE;
 
-				creature->Flags = NULL;
+				creature->Flags = 0;
 				break;
 
 			case CIVVY_AIM2:
 				creature->MaxTurn = CIVVY_WALK_TURN_RATE_MAX;
-				creature->Flags = NULL;
+				creature->Flags = 0;
 
 				if (AI.ahead)
 				{

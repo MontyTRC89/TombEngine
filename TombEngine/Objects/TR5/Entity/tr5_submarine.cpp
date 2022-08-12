@@ -358,7 +358,7 @@ namespace TEN::Entities::TR5
 
 				item->ItemFlags[3]++;
 				creature->ReachedGoal = false;
-				creature->Enemy = NULL;
+				creature->Enemy = nullptr;
 			}
 		}
 

@@ -231,7 +231,7 @@ namespace TEN::Entities::TR1
 			case APE_STATE_RUN_FORWARD:
 				creatureInfo->MaxTurn = APE_RUN_TURN_RATE_MAX;
 
-				if (creatureInfo->Flags == NULL &&
+				if (creatureInfo->Flags == 0 &&
 					AI.angle > -APE_DISPLAY_ANGLE &&
 					AI.angle < APE_DISPLAY_ANGLE)
 				{

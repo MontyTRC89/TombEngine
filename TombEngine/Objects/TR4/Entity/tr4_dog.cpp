@@ -241,7 +241,7 @@ namespace TEN::Entities::TR4
 					}
 
 					creature->MaxTurn = ANGLE(1.0f);
-					creature->Flags = NULL;
+					creature->Flags = 0;
 
 					if (TestProbability(0.008f))
 					{
@@ -250,7 +250,7 @@ namespace TEN::Entities::TR4
 							if (item->Animation.ActiveState == DOG_STATE_IDLE)
 							{
 								item->Animation.TargetState = DOG_STATE_SLEEP;
-								creature->Flags = NULL;
+								creature->Flags = 0;
 								break;
 							}
 						}

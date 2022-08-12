@@ -59,7 +59,7 @@ namespace TEN::Entities::TR2
 			CreatureAIInfo(item, &AI);
 
 			if (!MonksAttackLara && creature->Enemy == LaraItem)
-				creature->Enemy = NULL;
+				creature->Enemy = nullptr;
 
 			GetCreatureMood(item, &AI, true);
 			CreatureMood(item, &AI, true);

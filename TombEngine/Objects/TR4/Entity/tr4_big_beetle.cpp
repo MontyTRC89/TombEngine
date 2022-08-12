@@ -124,7 +124,7 @@ namespace TEN::Entities::TR4
 			if (item->HitStatus || AI.distance > BIG_BEETLE_AWARE_RANGE ||
 				TestProbability(0.008f))
 			{
-				creature->Flags = NULL;
+				creature->Flags = 0;
 			}
 
 			switch (item->Animation.ActiveState)
