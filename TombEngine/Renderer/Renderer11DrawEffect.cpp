@@ -808,8 +808,19 @@ namespace TEN::Renderer
 	void Renderer11::DrawSprites(RenderView& view)
 	{
 		const int numSpritesToDraw = view.spritesToDraw.size();
+
+		if (numSpritesToDraw == 0)
+			return;
 		
 		BindRenderTargetAsTexture(TEXTURE_DEPTH_MAP, &m_depthMap, SAMPLER_LINEAR_CLAMP);
+
+		SetDepthState(DEPTH_STATE_READ_ONLY_ZBUFFER);
+		SetCullMode(CULL_MODE_NONE);
+
+		m_context->VSSetShader(m_vsSprites.Get(), NULL, 0);
+		m_context->PSSetShader(m_psSprites.Get(), NULL, 0);
+
+		BindConstantBufferVS(CB_SPRITE, m_cbSprite.get());
 
 		std::sort(
 			view.spritesToDraw.begin(),
@@ -853,9 +864,8 @@ namespace TEN::Renderer
 				spriteMatrix = Matrix::Identity;
 			}
 
-			if (DoesBlendModeRequireSorting(spr.BlendMode))
+			if (DoesBlendModeRequireSorting(spr.BlendMode)) // Collect sprites
 			{
-				// Collect sprites
 				int distance = (spr.pos - Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z)).Length();
 				RendererTransparentFace face;
 				face.type = RendererTransparentFaceType::TRANSPARENT_FACE_SPRITE;
@@ -867,36 +877,31 @@ namespace TEN::Renderer
 				RendererRoom& room = m_rooms[FindRoomNumber(Vector3Int(spr.pos.x, spr.pos.y, spr.pos.z))];
 				room.TransparentFacesToDraw.push_back(face);
 			}
-			else
+			else // Draw sprites immediately
 			{
-				// Draw sprites immediately
-				SetBlendMode(spr.BlendMode);
+				// Set up vertex buffer and parameters
+				UINT stride = sizeof(RendererVertex);
+				UINT offset = 0;
+				m_context->IASetInputLayout(m_inputLayout.Get());
+				m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+				m_context->IASetVertexBuffers(0, 1, quadVertexBuffer.GetAddressOf(), &stride, &offset);
 
+				SetBlendMode(spr.BlendMode);
 				BindTexture(TEXTURE_COLOR_MAP, spr.Sprite->Texture, SAMPLER_LINEAR_CLAMP);
+
+				if (spr.BlendMode == BLEND_MODES::BLENDMODE_ALPHATEST)
+					SetAlphaTest(ALPHA_TEST_GREATER_THAN, ALPHA_TEST_THRESHOLD, true);
+				else
+					SetAlphaTest(ALPHA_TEST_NONE, 0);
 
 				Matrix scale = Matrix::CreateScale((spr.Width) * spr.Scale, (spr.Height) * spr.Scale, spr.Scale);
 				
 				if (spr.Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_BILLBOARD) 
 				{
-					UINT stride = sizeof(RendererVertex);
-					UINT offset = 0;
-
-					SetDepthState(DEPTH_STATE_READ_ONLY_ZBUFFER);
-					SetCullMode(CULL_MODE_NONE);
-					SetAlphaTest(ALPHA_TEST_GREATER_THAN, ALPHA_TEST_THRESHOLD);
-
-					m_context->VSSetShader(m_vsSprites.Get(), NULL, 0);
-					m_context->PSSetShader(m_psSprites.Get(), NULL, 0);
-
-					m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
-					m_context->IASetInputLayout(m_inputLayout.Get());
-					m_context->IASetVertexBuffers(0, 1, quadVertexBuffer.GetAddressOf(), &stride, &offset);
-					
 					m_stSprite.billboardMatrix = spriteMatrix;
 					m_stSprite.color = spr.color;
 					m_stSprite.isBillboard = true;
 					m_cbSprite.updateData(m_stSprite, m_context.Get());
-					BindConstantBufferVS(CB_SPRITE, m_cbSprite.get());
 
 					m_context->Draw(4, 0);
 					m_numDrawCalls++;
@@ -906,26 +911,10 @@ namespace TEN::Renderer
 				}
 				else if (spr.Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_BILLBOARD_CUSTOM) 
 				{
-					UINT stride = sizeof(RendererVertex);
-					UINT offset = 0;
-
-					SetDepthState(DEPTH_STATE_READ_ONLY_ZBUFFER);
-					SetCullMode(CULL_MODE_NONE);
-
-					m_context->VSSetShader(m_vsSprites.Get(), NULL, 0);
-					m_context->PSSetShader(m_psSprites.Get(), NULL, 0);
-
-					SetAlphaTest(ALPHA_TEST_GREATER_THAN, ALPHA_TEST_THRESHOLD);
-
-					m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
-					m_context->IASetInputLayout(m_inputLayout.Get());
-					m_context->IASetVertexBuffers(0, 1, quadVertexBuffer.GetAddressOf(), &stride, &offset);
-					
 					m_stSprite.billboardMatrix = spriteMatrix;
 					m_stSprite.color = spr.color;
 					m_stSprite.isBillboard = true;
 					m_cbSprite.updateData(m_stSprite, m_context.Get());
-					BindConstantBufferVS(CB_SPRITE, m_cbSprite.get());
 
 					m_context->Draw(4, 0);
 					m_numDrawCalls++;
@@ -935,25 +924,10 @@ namespace TEN::Renderer
 				}
 				else if (spr.Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_BILLBOARD_LOOKAT)
 				{
-					UINT stride = sizeof(RendererVertex);
-					UINT offset = 0;
-					SetDepthState(DEPTH_STATE_READ_ONLY_ZBUFFER);
-					SetCullMode(CULL_MODE_NONE);
-
-					m_context->VSSetShader(m_vsSprites.Get(), NULL, 0);
-					m_context->PSSetShader(m_psSprites.Get(), NULL, 0);
-
-					SetAlphaTest(ALPHA_TEST_GREATER_THAN, ALPHA_TEST_THRESHOLD);
-
-					m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
-					m_context->IASetInputLayout(m_inputLayout.Get());
-					m_context->IASetVertexBuffers(0, 1, quadVertexBuffer.GetAddressOf(), &stride, &offset);
-					
 					m_stSprite.billboardMatrix = spriteMatrix;
 					m_stSprite.color = spr.color;
 					m_stSprite.isBillboard = true;
 					m_cbSprite.updateData(m_stSprite, m_context.Get());
-					BindConstantBufferVS(CB_SPRITE, m_cbSprite.get());
 
 					m_context->Draw(4, 0);
 					m_numDrawCalls++;
@@ -963,19 +937,6 @@ namespace TEN::Renderer
 				}
 				else if (spr.Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_3D) 
 				{
-					UINT stride = sizeof(RendererVertex);
-					UINT offset = 0;
-					SetDepthState(DEPTH_STATE_READ_ONLY_ZBUFFER);
-					SetCullMode(CULL_MODE_NONE);
-
-					m_context->VSSetShader(m_vsSprites.Get(), NULL, 0);
-					m_context->PSSetShader(m_psSprites.Get(), NULL, 0);
-
-					SetAlphaTest(ALPHA_TEST_GREATER_THAN, ALPHA_TEST_THRESHOLD);
-
-					m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
-					m_context->IASetInputLayout(m_inputLayout.Get());
-					m_context->IASetVertexBuffers(0, 1, quadVertexBuffer.GetAddressOf(), &stride, &offset);
 					Vector3 p0t = spr.vtx1;
 					Vector3 p1t = spr.vtx2;
 					Vector3 p2t = spr.vtx3;
@@ -1016,7 +977,6 @@ namespace TEN::Renderer
 					m_stSprite.color = spr.color;
 					m_stSprite.isBillboard = false;
 					m_cbSprite.updateData(m_stSprite, m_context.Get());
-					BindConstantBufferVS(CB_SPRITE, m_cbSprite.get());
 
 					m_primitiveBatch->Begin();
 					m_primitiveBatch->DrawTriangle(v0, v1, v3);

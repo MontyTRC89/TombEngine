@@ -4,6 +4,7 @@
 #include "Game/camera.h"
 #include "Game/control/control.h"
 #include "Game/Lara/lara.h"
+#include "Game/Lara/lara_helpers.h"
 #include "Specific/setup.h"
 #include "Sound/sound.h"
 #include "Game/effects/effects.h"
@@ -19,11 +20,14 @@ void RollingBallCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* c
 {
 	auto* ballItem = &g_Level.Items[itemNumber];
 
-	if (TestBoundsCollide(ballItem, laraItem, coll->Setup.Radius))
+	if (TestBoundsCollide(ballItem, laraItem, coll->Setup.Radius) && 
+		TestCollision(ballItem, laraItem))
 	{
-		if (TestCollision(ballItem, laraItem))
+		if (TriggerActive(ballItem) && (ballItem->ItemFlags[0] || ballItem->Animation.VerticalVelocity))
 		{
-			if (TriggerActive(ballItem) && (ballItem->ItemFlags[0] || ballItem->Animation.VerticalVelocity))
+			if (laraItem->Animation.IsAirborne || TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, laraItem))
+				laraItem->HitPoints = 0;
+			else
 			{
 				laraItem->Animation.AnimNumber = LA_BOULDER_DEATH;
 				laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
@@ -31,9 +35,9 @@ void RollingBallCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* c
 				laraItem->Animation.ActiveState = LS_DEATH;
 				laraItem->Animation.IsAirborne = false;
 			}
-			else
-				ObjectCollision(itemNumber, laraItem, coll);
 		}
+		else
+			ObjectCollision(itemNumber, laraItem, coll);
 	}
 }
 
