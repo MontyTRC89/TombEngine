@@ -23,9 +23,9 @@ namespace TEN::Entities::TR4
 	constexpr auto DOG_BITE_ATTACK_RANGE = SQUARE(SECTOR(0.55));
 	constexpr auto DOG_JUMP_ATTACK_RANGE = SQUARE(SECTOR(1));
 	
+	const auto DogBite = BiteInfo(Vector3(0.0f, 0.0f, 100.0f), 3.0f);
 	const vector<int> DogJumpAttackJoints = { 3, 6, 9, 10, 13, 14 };
 	const vector<int> DogBiteAttackJoints = { 3, 6 };
-	const auto DogBite = BiteInfo(Vector3(0.0f, 0.0f, 100.0f), 3.0f);
 
 	enum DogState
 	{
@@ -153,7 +153,6 @@ namespace TEN::Entities::TR4
 				item->AIBits &= ~MODIFY;
 			}
 
-			short random = GetRandomControl();
 			int frame = item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase;
 
 			switch (item->Animation.ActiveState)
@@ -170,7 +169,7 @@ namespace TEN::Entities::TR4
 					creature->Flags++;
 					creature->MaxTurn = 0;
 
-					if (creature->Flags > 300 && random < 128)
+					if (creature->Flags > 300 && TestProbability(0.004f))
 						item->Animation.TargetState = DOG_STATE_IDLE;
 				}
 
@@ -191,7 +190,7 @@ namespace TEN::Entities::TR4
 				{
 					joint1 = AIGuard(creature);
 
-					if (GetRandomControl() & 0xFF)
+					if (TestProbability(0.996f))
 						break;
 
 					if (item->Animation.ActiveState == DOG_STATE_IDLE)
@@ -202,7 +201,8 @@ namespace TEN::Entities::TR4
 				}
 				else
 				{
-					if (item->Animation.ActiveState == DOG_STATE_STALK_IDLE && random < 128)
+					if (item->Animation.ActiveState == DOG_STATE_STALK_IDLE &&
+						TestProbability(0.004f))
 					{
 						item->Animation.TargetState = DOG_STATE_IDLE;
 						break;
@@ -243,7 +243,7 @@ namespace TEN::Entities::TR4
 					creature->MaxTurn = ANGLE(1.0f);
 					creature->Flags = NULL;
 
-					if (random < 256)
+					if (TestProbability(0.008f))
 					{
 						if (item->AIBits & MODIFY)
 						{
@@ -256,9 +256,9 @@ namespace TEN::Entities::TR4
 						}
 					}
 
-					if (random >= 4096)
+					if (TestProbability(0.875f))
 					{
-						if (!(random & 0x1F))
+						if (TestProbability(0.03f))
 							item->Animation.TargetState = DOG_STATE_HOWL;
 
 						break;
@@ -279,7 +279,7 @@ namespace TEN::Entities::TR4
 
 				if (item->AIBits & PATROL1)
 					item->Animation.TargetState = DOG_STATE_WALK_FORWARD;
-				else if (creature->Mood == MoodType::Bored && random < 256)
+				else if (creature->Mood == MoodType::Bored && TestProbability(0.008f))
 					item->Animation.TargetState = DOG_STATE_IDLE;
 				else
 					item->Animation.TargetState = DOG_STATE_STALK;

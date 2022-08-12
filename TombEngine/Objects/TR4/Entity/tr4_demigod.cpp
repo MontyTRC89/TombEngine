@@ -15,7 +15,10 @@
 #include "Game/people.h"
 #include "Renderer/Renderer11Enums.h"
 #include "Specific/level.h"
+#include "Specific/prng.h"
 #include "Specific/setup.h"
+
+using namespace TEN::Math::Random;
 
 namespace TEN::Entities::TR4
 {
@@ -133,7 +136,7 @@ namespace TEN::Entities::TR4
 			spark->flags = 602;
 			spark->rotAng = GetRandomControl() & 0xFFF;
 
-			if (GetRandomControl() & 1)
+			if (TestProbability(0.5f))
 				spark->rotAdd = -32 - (GetRandomControl() & 0x1F);
 			else
 				spark->rotAdd = (GetRandomControl() & 0x1F) + 32;
@@ -271,12 +274,12 @@ namespace TEN::Entities::TR4
 				spark->zVel = (byte)(GetRandomControl() + 256) * phd_cos(angle);
 				spark->friction = 9;
 
-				if (GetRandomControl() & 1)
+				if (TestProbability(0.5f))
 				{
 					spark->flags = 16;
 					spark->rotAng = GetRandomControl() & 0xFFF;
 
-					if (GetRandomControl() & 1)
+					if (TestProbability(0.5f))
 						spark->rotAdd = -64 - (GetRandomControl() & 0x3F);
 					else
 						spark->rotAdd = (GetRandomControl() & 0x3F) + 64;
@@ -477,7 +480,8 @@ namespace TEN::Entities::TR4
 						break;
 					}
 
-					if (AI.distance <= pow(SECTOR(2), 2) || AI.distance >= pow(SECTOR(5), 2))
+					if (AI.distance <= pow(SECTOR(2), 2) ||
+						AI.distance >= pow(SECTOR(5), 2))
 					{
 						item->Animation.TargetState = DEMIGOD_STATE_WALK_FORWARD;
 						break;
@@ -485,7 +489,7 @@ namespace TEN::Entities::TR4
 
 					if (item->ObjectNumber == ID_DEMIGOD3)
 					{
-						if (!(GetRandomControl() & 3))
+						if (TestProbability(0.25f))
 						{
 							item->Animation.TargetState = DEMIGOD3_STATE_RADIAL_AIM;
 							break;
