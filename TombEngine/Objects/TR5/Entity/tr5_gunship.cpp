@@ -82,7 +82,7 @@ namespace TEN::Entities::TR5
 				return AnimateItem(item);
 
 			Vector3Int hitPos;
-			MESH_INFO* hitMesh = NULL;
+			MESH_INFO* hitMesh = nullptr;
 			int objOnLos = ObjectOnLOS2(&start, &end, &hitPos, &hitMesh, GAME_OBJECT_ID::ID_LARA);
 
 			if (objOnLos == NO_LOS_ITEM || objOnLos < 0)

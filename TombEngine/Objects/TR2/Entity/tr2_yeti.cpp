@@ -77,7 +77,7 @@ namespace TEN::Entities::TR2
 			{
 			case 2:
 				info->MaxTurn = 0;
-				info->Flags = NULL;
+				info->Flags = 0;
 
 				if (AI.ahead)
 					head = AI.angle;
@@ -191,7 +191,7 @@ namespace TEN::Entities::TR2
 			case 1:
 				tilt = angle / 4;
 				info->MaxTurn = ANGLE(6.0f);
-				info->Flags = NULL;
+				info->Flags = 0;
 
 				if (AI.ahead)
 					head = AI.angle;

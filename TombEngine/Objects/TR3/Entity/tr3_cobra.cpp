@@ -116,7 +116,7 @@ namespace TEN::Entities::TR3
 			switch (item->Animation.ActiveState)
 			{
 			case COBRA_STATE_IDLE:
-				creature->Flags = NULL;
+				creature->Flags = 0;
 
 				if (AI.distance > COBRA_SLEEP_RANGE)
 				{
@@ -132,7 +132,7 @@ namespace TEN::Entities::TR3
 				break;
 
 			case COBRA_STATE_SLEEP:
-				creature->Flags = NULL;
+				creature->Flags = 0;
 
 				if (item->HitPoints != NOT_TARGETABLE)
 				{

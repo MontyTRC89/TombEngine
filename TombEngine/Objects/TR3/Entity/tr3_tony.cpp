@@ -439,7 +439,7 @@ namespace TEN::Entities::TR3
 					type = T_ROCKZAPPDEBRIS;
 
 				for (int x = 0; x < j; x++)
-					TriggerFireBall(NULL, type, &pos, fx->roomNumber, fx->pos.Orientation.y, 32 + (x * 4));
+					TriggerFireBall(nullptr, type, &pos, fx->roomNumber, fx->pos.Orientation.y, 32 + (x * 4));
 
 				if (fx->flag1 == T_ROCKZAPPL || fx->flag1 == T_ROCKZAPPR)
 				{
@@ -450,7 +450,7 @@ namespace TEN::Entities::TR3
 					pos.z = LaraItem->Pose.Position.z + (GetRandomControl() & 1023) - CLICK(2);
 
 					TriggerExplosionSparks(pos.x, pos.y, pos.z, 3, -2, 0, probe.RoomNumber);
-					TriggerFireBall(NULL, T_DROPPER, &pos, probe.RoomNumber, 0, 0);
+					TriggerFireBall(nullptr, T_DROPPER, &pos, probe.RoomNumber, 0, 0);
 				}
 			}
 
@@ -662,8 +662,8 @@ namespace TEN::Entities::TR3
 
 				if (item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase == 40)
 				{
-					TriggerFireBall(item, T_ROCKZAPPL, NULL, item->RoomNumber, 0, 0);
-					TriggerFireBall(item, T_ROCKZAPPR, NULL, item->RoomNumber, 0, 0);
+					TriggerFireBall(item, T_ROCKZAPPL, nullptr, item->RoomNumber, 0, 0);
+					TriggerFireBall(item, T_ROCKZAPPR, nullptr, item->RoomNumber, 0, 0);
 				}
 
 				break;
@@ -674,7 +674,7 @@ namespace TEN::Entities::TR3
 				torsoY = AI.angle;
 
 				if ((item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase) == 28)
-					TriggerFireBall(item, T_ZAPP, NULL, item->RoomNumber, item->Pose.Orientation.y, 0);
+					TriggerFireBall(item, T_ZAPP, nullptr, item->RoomNumber, item->Pose.Orientation.y, 0);
 
 				break;
 

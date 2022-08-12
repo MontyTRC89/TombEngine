@@ -208,7 +208,7 @@ namespace TEN::Entities::TR4
 		RemoveActiveItem(itemNumber);
 		item->Status = ITEM_INVISIBLE;
 		item->AfterDeath = 0;
-		item->Flags = NULL;
+		item->Flags = 0;
 
 		DisableEntityAI(itemNumber);
 
@@ -321,7 +321,7 @@ namespace TEN::Entities::TR4
 			{
 			case BABOON_STATE_IDLE:
 				creature->MaxTurn = 0;
-				creature->Flags = NULL;
+				creature->Flags = 0;
 
 				if (item->AIBits & GUARD)
 				{
@@ -379,7 +379,7 @@ namespace TEN::Entities::TR4
 
 			case BABOON_STATE_SIT_IDLE:
 				creature->MaxTurn = 0;
-				creature->Flags = NULL;
+				creature->Flags = 0;
 
 				if (item->AIBits & GUARD)
 				{
@@ -538,7 +538,7 @@ namespace TEN::Entities::TR4
 				else
 					item->Pose.Orientation.y += AI.angle;
 
-				if (creature->Flags == NULL &&
+				if (creature->Flags == 0 &&
 					(item->TestBits(JointBitType::Touch, BaboonAttackJoints) ||
 					 item->TestBits(JointBitType::Touch, BaboonAttackRightJoints) ||
 					 item->TestBits(JointBitType::Touch, BaboonJumpAttackJoints)))

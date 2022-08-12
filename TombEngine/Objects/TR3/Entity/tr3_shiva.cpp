@@ -255,7 +255,7 @@ namespace TEN::Entities::TR3
 
 				if (!shiva->Flags)
 				{
-					if (item->MeshBits == NULL)
+					if (!item->MeshBits)
 						effectMesh = 0;
 
 					item->MeshBits = (item->MeshBits * 2) + 1;
@@ -292,7 +292,7 @@ namespace TEN::Entities::TR3
 				}
 
 				if (shiva->Flags == 1)
-					shiva->Flags = NULL;
+					shiva->Flags = 0;
 
 				if (shiva->Mood == MoodType::Escape)
 				{
@@ -313,12 +313,12 @@ namespace TEN::Entities::TR3
 				else if (AI.bite && AI.distance < pow(SECTOR(1.25f), 2))
 				{
 					item->Animation.TargetState = SHIVA_STATE_GRAB_ATTACK;
-					shiva->Flags = NULL;
+					shiva->Flags = 0;
 				}
 				else if (AI.bite && AI.distance < pow(SECTOR(4) / 3, 2))
 				{
 					item->Animation.TargetState = SHIVA_STATE_DOWNWARD_ATTACK;
-					shiva->Flags = NULL;
+					shiva->Flags = 0;
 				}
 				else if (item->HitStatus && AI.ahead)
 				{
@@ -345,7 +345,7 @@ namespace TEN::Entities::TR3
 					!AI.ahead)
 				{
 					item->Animation.TargetState = SHIVA_STATE_IDLE;
-					shiva->Flags = NULL;
+					shiva->Flags = 0;
 				}
 				else if (shiva->Flags)
 					item->Animation.TargetState = SHIVA_STATE_GUARD_IDLE;
@@ -372,7 +372,7 @@ namespace TEN::Entities::TR3
 				else if (AI.bite && AI.distance < pow(SECTOR(4) / 3, 2))
 				{
 					item->Animation.TargetState = SHIVA_STATE_IDLE;
-					shiva->Flags = NULL;
+					shiva->Flags = 0;
 				}
 				else if (item->HitStatus)
 				{
@@ -396,7 +396,7 @@ namespace TEN::Entities::TR3
 						!shiva->Flags))
 				{
 					item->Animation.TargetState = SHIVA_STATE_WALK_FORWARD;
-					shiva->Flags = NULL;
+					shiva->Flags = 0;
 				}
 				else if (shiva->Flags)
 					item->Animation.TargetState = SHIVA_STATE_WALK_FORWARD_GUARDING;

@@ -56,8 +56,6 @@ void Level::Register(sol::table & parent)
 /// (@{Flow.Fog}) omni fog RGB color and distance.
 // As seen in TR4's Desert Railroad.
 // If not provided, distance fog will be black.
-//
-// __(not yet implemented)__
 //@mem fog
 		"fog", &Level::Fog,
 
@@ -117,15 +115,6 @@ e.g. `myLevel.laraType = LaraType.Divesuit`
 //@mem mirror
 		"mirror", &Level::Mirror,
 
-/*** (byte) The maximum draw distance for level.
-Given in sectors (blocks).
-Must be in the range [1, 255], and equal to or less than the value passed to SetGameFarView.
-
-This is equivalent to TRNG's LevelFarView variable.
-
-__(not yet implemented)__
-@mem farView
-*/
 		"farView", sol::property(&Level::SetLevelFarView),
 
 /*** (bool) Enable unlimited oxygen supply when in water.
@@ -156,14 +145,25 @@ void Level::SetWeatherStrength(float val)
 	}
 }
 
+/*** (int) The maximum draw distance for level.
+Given in sectors (blocks).
+Must be at least 4.
+
+This is equivalent to TRNG's LevelFarView variable.
+
+@mem farView
+*/
 void Level::SetLevelFarView(short val)
 {
-	bool cond = val <= 255 && val >= 1;
-	std::string msg{ "levelFarView value must be in the range [1, 127]." };
+	static_assert(MIN_FAR_VIEW == 3200.0f, "Please update the comment, docs, and warning message if this number changes.");
+	const short min = std::ceil(MIN_FAR_VIEW / SECTOR(1));
+	bool cond = val >= min;
+
+	std::string msg{ "farView value must be 4 or greater." };
 	if (!ScriptAssert(cond, msg))
 	{
-		ScriptWarn("Setting levelFarView view to 32.");
-		LevelFarView = 32;
+		// Will be set to default by the renderer
+		LevelFarView = 0;
 	}
 	else
 	{

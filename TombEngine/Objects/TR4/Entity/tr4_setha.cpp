@@ -98,7 +98,7 @@ namespace TEN::Entities::TR4
 			{
 			case 1:
 				creature->LOT.IsJumping = false;
-				creature->Flags = NULL;
+				creature->Flags = 0;
 
 				if (item->Animation.RequiredState)
 				{
