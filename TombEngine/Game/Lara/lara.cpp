@@ -579,8 +579,8 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 						ResetLaraLean(item);
 						ResetLaraFlex(item);
 						item->Animation.IsAirborne = true;
+						item->Animation.Velocity.z = item->Animation.Velocity.y / 4.0f;
 						item->Animation.Velocity.y = 0.0f;
-						item->Animation.Velocity.z = item->Animation.Velocity.y / 4;
 						lara->Control.WaterStatus = WaterStatus::Dry;
 					}
 					else
