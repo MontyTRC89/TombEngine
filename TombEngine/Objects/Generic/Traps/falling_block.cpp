@@ -97,33 +97,31 @@ void FallingBlockControl(short itemNumber)
 
 					item->Pose.Position.y += item->ItemFlags[1];
 				}
+
+				if (GetDistanceToFloor(itemNumber) >= 0)
+				{
+					// If crumbled before actual delay (e.g. too low position), force delay to be correct
+					if (item->ItemFlags[0] < FALLINGBLOCK_DELAY)
+						item->ItemFlags[0] = FALLINGBLOCK_DELAY;
+
+					// Convert object to shatter item
+					ShatterItem.yRot = item->Pose.Orientation.y;
+					ShatterItem.meshIndex = Objects[item->ObjectNumber].meshIndex;
+					ShatterItem.color = item->Color;
+					ShatterItem.sphere.x = item->Pose.Position.x;
+					ShatterItem.sphere.y = item->Pose.Position.y - STEP_SIZE; // So debris won't spawn below floor
+					ShatterItem.sphere.z = item->Pose.Position.z;
+					ShatterItem.bit = 0;
+					ShatterImpactData.impactDirection = Vector3(0, -(float)item->ItemFlags[1] / (float)FALLINGBLOCK_MAX_SPEED, 0);
+					ShatterImpactData.impactLocation = { (float)ShatterItem.sphere.x, (float)ShatterItem.sphere.y, (float)ShatterItem.sphere.z };
+					ShatterObject(&ShatterItem, nullptr, 0, item->RoomNumber, false);
+
+					SoundEffect(SFX_TR4_ROCK_FALL_LAND, &item->Pose);
+					KillItem(itemNumber);
+				}
 			}
 
 			item->ItemFlags[0]++;
-
-			int DistanceToFLoor = GetCollision(item).Position.Floor - item->Pose.Position.y;
-
-			if (DistanceToFLoor > 0)
-			{
-				// If crumbled before actual delay (e.g. too low position), force delay to be correct
-				if (item->ItemFlags[0] < FALLINGBLOCK_DELAY)
-					item->ItemFlags[0] = FALLINGBLOCK_DELAY;
-
-				// Convert object to shatter item
-				ShatterItem.yRot = item->Pose.Orientation.y;
-				ShatterItem.meshIndex = Objects[item->ObjectNumber].meshIndex;
-				ShatterItem.color = item->Color;
-				ShatterItem.sphere.x = item->Pose.Position.x;
-				ShatterItem.sphere.y = item->Pose.Position.y - STEP_SIZE; // So debris won't spawn below floor
-				ShatterItem.sphere.z = item->Pose.Position.z;
-				ShatterItem.bit = 0;
-				ShatterImpactData.impactDirection = Vector3(0, -(float)item->ItemFlags[1] / (float)FALLINGBLOCK_MAX_SPEED, 0);
-				ShatterImpactData.impactLocation = { (float)ShatterItem.sphere.x, (float)ShatterItem.sphere.y, (float)ShatterItem.sphere.z };
-				ShatterObject(&ShatterItem, nullptr, 0, item->RoomNumber, false);
-
-				SoundEffect(SFX_TR4_ROCK_FALL_LAND, &item->Pose);
-				KillItem(itemNumber);
-			}
 		}
 		else
 		{
