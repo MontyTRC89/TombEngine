@@ -178,7 +178,7 @@ short ShardGun(int x, int y, int z, short velocity, short yRot, short roomNumber
 		fx->speed = SHARD_VELOCITY;
 		fx->frameNumber = 0;
 		fx->objectNumber = ID_PROJ_SHARD;
-		fx->shade = 14 * 256;
+		fx->color = Vector4::One;
 		ShootAtLara(fx);
 	}
 
@@ -201,7 +201,7 @@ short BombGun(int x, int y, int z, short velocity, short yRot, short roomNumber)
 		fx->speed = ROCKET_VELOCITY;
 		fx->frameNumber = 0;
 		fx->objectNumber = ID_PROJ_BOMB;
-		fx->shade = 16 * 256;
+		fx->color = Vector4::One;
 		ShootAtLara(fx);
 	}
 
@@ -224,7 +224,7 @@ short NatlaGun(int x, int y, int z, short velocity, short yRot, short roomNumber
 		fx->speed = NATLA_GUN_VELOCITY;
 		fx->frameNumber = 0;
 		fx->objectNumber = ID_PROJ_NATLA;
-		fx->shade = 16 * 256;
+		fx->color = Vector4::One;
 		ShootAtLara(fx);
 	}
 

@@ -1043,30 +1043,25 @@ unsigned int _stdcall LoadLevel(void* data)
 {
 	const int levelIndex = reinterpret_cast<int>(data);
 
-	char filename[80];
 	ScriptInterfaceLevel* level = g_GameFlow->GetLevel(levelIndex);
-	strcpy_s(filename, level->FileName.c_str());
 
-	TENLog("Loading level file: " + std::string(filename), LogLevel::Info);
+	TENLog("Loading level file: " + level->FileName, LogLevel::Info);
 
 	LevelDataPtr = nullptr;
 	FILE* filePtr = nullptr;
 	char* dataPtr = nullptr;
 
-	wchar_t loadscreenFileName[80];
-	std::mbstowcs(loadscreenFileName, level->LoadScreenFileName.c_str(), 80);
-	std::wstring loadScreenFile = std::wstring(loadscreenFileName);
-	g_Renderer.SetLoadingScreen(loadScreenFile);
+	g_Renderer.SetLoadingScreen(TEN::Utils::FromChar(level->LoadScreenFileName.c_str()));
 
 	SetScreenFadeIn(FADE_SCREEN_SPEED);
 	g_Renderer.UpdateProgress(0);
 
 	try
 	{
-		filePtr = FileOpen(filename);
+		filePtr = FileOpen(level->FileName.c_str());
 
 		if (!filePtr)
-			throw std::exception((std::string("Unable to read level file: ") + filename).c_str());
+			throw std::exception((std::string("Unable to read level file: ") + level->FileName).c_str());
 
 		char header[4];
 		unsigned char version[4];
