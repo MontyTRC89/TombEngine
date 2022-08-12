@@ -10,12 +10,6 @@
 
 enum GAME_OBJECT_ID : short;
 
-// used by fx->shade !
-#define RGB555(r, g, b) ((r << 7) & 0x7C00 | (g << 2) & 0x3E0 | (b >> 3) & 0x1F)
-#define WHITE555 RGB555(255, 255, 255)
-#define GRAY555  RGB555(128, 128, 128)
-#define BLACK555 RGB555(  0,   0,   0)
-
 constexpr auto NO_ITEM = -1;
 constexpr auto NOT_TARGETABLE = -16384;
 constexpr auto NUM_ITEMS = 1024;
