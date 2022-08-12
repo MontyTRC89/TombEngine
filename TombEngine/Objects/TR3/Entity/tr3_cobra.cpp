@@ -65,8 +65,6 @@ namespace TEN::Entities::TR3
 		auto* item = &g_Level.Items[itemNumber];
 		auto* info = GetCreatureInfo(item);
 
-		int h = GetBoundsAccurate(item)->Height();
-
 		short head = 0;
 		short angle = 0;
 		short tilt = 0;
