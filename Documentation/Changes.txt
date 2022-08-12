@@ -14,6 +14,11 @@ Version 1.0.1
 - Fixed ripples not appearing on water connections higher than room bottom.
 - Prevent title music audio from starting in a random place.
 - Update harpoon speed on room change.
+- Timer.Create now lets you choose the units to display remaining time.
+- Fatal script errors now boot you to the title (it will crash if the title itself has these errors).
+- SetFarView has been removed, and Flow.Level.farView is now uncapped.
+- DisplayString text will now be cleared when a level is exited or reloaded.
+- EventSequence.lua has been added and documented.
 
 Version 1.0
 ===========

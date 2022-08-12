@@ -3,9 +3,17 @@
 local Util = require("Util")
 Util.ShortenTENCalls()
 
+-- Called when entering a level, not called when loading from a save
+LevelFuncs.OnStart = function() end
+
+-- Called only when loading from a save
 LevelFuncs.OnLoad = function() end
+
 LevelFuncs.OnSave = function() end
-LevelFuncs.OnControlPhase = function() end
+
+-- dt stands for "delta time", and holds the time in seconds since the last call to OnControlPhase
+LevelFuncs.OnControlPhase = function(dt) end
+
 LevelFuncs.OnEnd = function() end
 
 -- An example function which prints a string and leaves it on screen for 1 second.
