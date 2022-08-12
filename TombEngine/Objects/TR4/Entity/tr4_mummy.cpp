@@ -9,8 +9,10 @@
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
 #include "Specific/level.h"
+#include "Specific/prng.h"
 #include "Specific/setup.h"
 
+using namespace TEN::Math::Random;
 using std::vector;
 
 namespace TEN::Entities::TR4
@@ -26,9 +28,9 @@ namespace TEN::Entities::TR4
 
 	#define MUMMY_WALK_TURN_ANGLE ANGLE(7.0f)
 
-	const vector<int> MummyAttackJoints { 11, 14 };
 	const auto MummyBite1 = BiteInfo(Vector3::Zero, 11);
 	const auto MummyBite2 = BiteInfo(Vector3::Zero, 14);
+	const vector<int> MummyAttackJoints { 11, 14 };
 
 	enum MummyState
 	{
@@ -121,12 +123,12 @@ namespace TEN::Entities::TR4
 					item->Animation.ActiveState != MUMMY_ANIM_WALK_FORWARD_ARMS_UP_TO_WALK_FORWARD_LEFT &&
 					item->Animation.ActiveState != MUMMY_ANIM_IDLE_TO_WALK_FORWARD)
 				{
-					if (GetRandomControl() & 3 ||
+					if (TestProbability(0.75f) ||
 						Lara.Control.Weapon.GunType != LaraWeaponType::Shotgun &&
 						Lara.Control.Weapon.GunType != LaraWeaponType::HK &&
 						Lara.Control.Weapon.GunType != LaraWeaponType::Revolver)
 					{
-						if (!(GetRandomControl() & 7) ||
+						if (TestProbability(0.125f) ||
 							Lara.Control.Weapon.GunType == LaraWeaponType::Shotgun ||
 							Lara.Control.Weapon.GunType == LaraWeaponType::HK ||
 							Lara.Control.Weapon.GunType == LaraWeaponType::Revolver)
@@ -258,7 +260,7 @@ namespace TEN::Entities::TR4
 				joint1 = 0;
 				joint2 = 0;
 
-				if (AI.distance < MUMMY_ACTIVATE_RANGE || !(GetRandomControl() & 0x7F))
+				if (AI.distance < MUMMY_ACTIVATE_RANGE || TestProbability(0.008f))
 				{
 					item->Animation.TargetState = MUMMY_STATE_COLLAPSED_TO_IDLE;
 					item->HitPoints = Objects[item->ObjectNumber].HitPoints;

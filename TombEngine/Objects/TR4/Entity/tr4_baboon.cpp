@@ -12,8 +12,10 @@
 #include "Game/effects/tomb4fx.h"
 #include "Game/itemdata/creature_info.h"
 #include "Game/items.h"
+#include "Specific/prng.h"
 #include "Specific/setup.h"
 
+using namespace TEN::Math::Random;
 using namespace TEN::Effects::Environment;
 using std::vector;
 
@@ -38,10 +40,10 @@ namespace TEN::Entities::TR4
 
 	#define BABOON_STATE_WALK_ANIM 14 // TODO: What is this?
 
+	const auto BaboonBite = BiteInfo(Vector3(10.0f, 10.0f, 11.0f), 4);
 	const vector<int> BaboonAttackJoints	  = { 11, 12 };
 	const vector<int> BaboonAttackRightJoints = { 1, 2, 3, 5, 8, 9 };
 	const vector<int> BaboonJumpAttackJoints  = { 3, 4, 8 };
-	const auto BaboonBite = BiteInfo(Vector3(10.0f, 10.0f, 11.0f), 4);
 
 	BaboonRespawner BaboonRespawn;
 
@@ -319,14 +321,14 @@ namespace TEN::Entities::TR4
 			{
 			case BABOON_STATE_IDLE:
 				creature->MaxTurn = 0;
-				creature->Flags = 0;
+				creature->Flags = NULL;
 
 				if (item->AIBits & GUARD)
 				{
 					AIGuard(creature);
-					if (!(GetRandomControl() & 0xF))
+					if (TestProbability(0.06f))
 					{
-						if (GetRandomControl() & 1)
+						if (TestProbability(0.5f))
 							item->Animation.TargetState = BABOON_STATE_HIT_GROUND;
 						else
 							item->Animation.TargetState = BABOON_STATE_SIT_IDLE;
@@ -361,30 +363,31 @@ namespace TEN::Entities::TR4
 					}
 					else if (item->Animation.RequiredState)
 						item->Animation.TargetState = item->Animation.RequiredState;
-					else if (GetRandomControl() & 1)
+					else if (TestProbability(0.5f))
 						item->Animation.TargetState = BABOON_STATE_SIT_IDLE;
 				}
 				else if (item->Animation.RequiredState)
 					item->Animation.TargetState = item->Animation.RequiredState;
-				else if (!(GetRandomControl() & 3))
+				else if (TestProbability(0.25f))
 					item->Animation.TargetState = BABOON_STATE_WALK_FORWARD;
-				else if (!(GetRandomControl() & 1))
+				else if (TestProbability(0.5f))
 					item->Animation.TargetState = BABOON_STATE_RUN_FORWARD_ROLL;
-				else if (GetRandomControl() & 4)
+				else if (TestProbability(0.5f))
 					item->Animation.TargetState = BABOON_STATE_HIT_GROUND;
 
 				break;
 
 			case BABOON_STATE_SIT_IDLE:
 				creature->MaxTurn = 0;
-				creature->Flags = 0;
+				creature->Flags = NULL;
 
 				if (item->AIBits & GUARD)
 				{
 					AIGuard(creature);
-					if (GetRandomControl() & 0xF)
+
+					if (TestProbability(0.94f))
 						item->Animation.TargetState = BABOON_STATE_EAT;
-					else if (GetRandomControl() & 0xA)
+					else if (TestProbability(0.75f))
 						item->Animation.TargetState = BABOON_STATE_SIT_SCRATCH;
 				}
 				else if (item->AIBits & PATROL1)
@@ -393,21 +396,21 @@ namespace TEN::Entities::TR4
 				{
 					if (creature->Mood == MoodType::Bored)
 					{
-						// NOTE: It's not true to the original functionality, but to avoid repetitive actions, I gave
-						// the SIT_IDLE state a higher chance of occurring. The EAT state was also added here. @TokyoSU
+						// NOTE: It's not true to the original functionality, but to avoid repetitive actions,
+						// the SIT_IDLE state was given a higher chance of occurring. The EAT state was also added here. -- TokyoSU
 
 						if (item->Animation.RequiredState)
 							item->Animation.TargetState = item->Animation.RequiredState;
-						else if (GetRandomControl() & 0x10)
+						else if (TestProbability(0.5f))
 							item->Animation.TargetState = BABOON_STATE_SIT_IDLE;
-						else if (GetRandomControl() & 0x500)
+						else if (TestProbability(0.75f))
 						{
-							if (GetRandomControl() & 0x200)
+							if (TestProbability(0.5f))
 								item->Animation.TargetState = BABOON_STATE_SIT_SCRATCH;
-							else if (GetRandomControl() & 0x250)
+							else if (TestProbability(0.87f))
 								item->Animation.TargetState = BABOON_STATE_EAT;
 						}
-						else if (GetRandomControl() & 0x1000 || item->AIBits & FOLLOW)
+						else if (TestProbability(0.5f) || item->AIBits & FOLLOW)
 							item->Animation.TargetState = BABOON_STATE_WALK_FORWARD;
 					}
 					else if ((item->AIBits & FOLLOW) && AI.distance > BABOON_IDLE_RANGE)
@@ -434,7 +437,7 @@ namespace TEN::Entities::TR4
 				{
 					if (item->AIBits & FOLLOW)
 						item->Animation.TargetState = BABOON_STATE_WALK_FORWARD;
-					else if (GetRandomControl() < 256)
+					else if (TestProbability(0.008f))
 						item->Animation.TargetState = BABOON_STATE_SIT_IDLE;
 				}
 				else if (creature->Mood == MoodType::Escape)
@@ -444,7 +447,7 @@ namespace TEN::Entities::TR4
 					if (AI.bite && AI.distance < BABOON_ATTACK_READY_RANGE)
 						item->Animation.TargetState = BABOON_STATE_IDLE;
 				}
-				else if (GetRandomControl() < 256)
+				else if (TestProbability(0.008f))
 					item->Animation.TargetState = BABOON_STATE_SIT_IDLE;
 
 				break;
