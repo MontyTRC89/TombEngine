@@ -2280,8 +2280,9 @@ namespace TEN::Renderer
 					BindTexture(TEXTURE_NORMAL_MAP, &std::get<1>(m_moveablesTextures[bucket.Texture]),
 					            SAMPLER_NONE);
 
-					SetBlendMode(bucket.BlendMode);
-					SetAlphaTest(bucket.BlendMode == BLEND_MODES::BLENDMODE_ALPHATEST ? ALPHA_TEST_GREATER_THAN : ALPHA_TEST_NONE, ALPHA_TEST_THRESHOLD);
+					// Always render horizon as alpha-blended surface
+					SetBlendMode(bucket.BlendMode == BLEND_MODES::BLENDMODE_ALPHATEST ? BLEND_MODES::BLENDMODE_ALPHABLEND : bucket.BlendMode);
+					SetAlphaTest(ALPHA_TEST_NONE, ALPHA_TEST_THRESHOLD);
 
 					// Draw vertices
 					DrawIndexedTriangles(bucket.NumIndices, bucket.StartIndex, 0);

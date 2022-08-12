@@ -504,7 +504,6 @@ void HarpoonBoltControl(short itemNumber)
 
 	// Store old position for later
 	auto oldPos = item->Pose.Position;
-	short roomNumber = item->RoomNumber;
 	bool aboveWater = false;
 
 	// Update speed and check if above water
@@ -525,10 +524,9 @@ void HarpoonBoltControl(short itemNumber)
 		else
 		{
 			// Create bubbles
-			if ((Wibble & 15) == 0)
-				CreateBubble((Vector3Int*)&item->Pose, item->RoomNumber, 0, 0, BUBBLE_FLAG_CLUMP | BUBBLE_FLAG_HIGH_AMPLITUDE, 0, 0, 0); // CHECK
+			if (Wibble & 4)
+				CreateBubble((Vector3Int*)&item->Pose, item->RoomNumber, 0, 0, BUBBLE_FLAG_CLUMP | BUBBLE_FLAG_HIGH_AMPLITUDE, 0, 0, 0);
 			
-			TriggerRocketSmoke(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, 64);
 			item->Animation.Velocity.y = -HARPOON_VELOCITY * phd_sin(item->Pose.Orientation.x) / 2;
 			item->Animation.Velocity.z = HARPOON_VELOCITY * phd_cos(item->Pose.Orientation.x) / 2;
 			aboveWater = false;
@@ -561,8 +559,8 @@ void HarpoonBoltControl(short itemNumber)
 	}
 
 	// Has harpoon changed room?
-	if (item->RoomNumber != roomNumber)
-		ItemNewRoom(itemNumber, roomNumber);
+	if (item->RoomNumber != probe.RoomNumber)
+		ItemNewRoom(itemNumber, probe.RoomNumber);
 
 	// If now in water and before in land, add a ripple
 	if (TestEnvironment(ENV_FLAG_WATER, item) && aboveWater)
