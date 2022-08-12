@@ -111,7 +111,7 @@ namespace TEN::Entities::TR4
 			{
 			case SSCORPION_STATE_IDLE:
 				creature->MaxTurn = 0;
-				creature->Flags = NULL;
+				creature->Flags = 0;
 
 				if (AI.distance > SMALL_SCORPION_ATTACK_RANGE)
 					item->Animation.TargetState = SSCORPION_STATE_WALK;

@@ -64,7 +64,7 @@ namespace TEN::Entities::TR3
 			else
 			{
 				int minDistance = 0x7FFFFFFF;
-				creature->Enemy = NULL;
+				creature->Enemy = nullptr;
 
 				for (int i = 0; i < ActiveCreatures.size(); i++)
 				{
@@ -110,7 +110,7 @@ namespace TEN::Entities::TR3
 			CreatureAIInfo(item, &AI);
 
 			if (!creature->HurtByLara && creature->Enemy == LaraItem)
-				creature->Enemy = NULL;
+				creature->Enemy = nullptr;
 
 			AI_INFO laraAI;
 			if (creature->Enemy == LaraItem)
@@ -263,7 +263,7 @@ namespace TEN::Entities::TR3
 					item->Animation.TargetState = 14;
 				else if (AI.bite && AI.distance < pow(682, 2))
 					item->Animation.TargetState = 2;
-				else if (AI.distance < pow(682, 2) && creature->Enemy != LaraItem && creature->Enemy != NULL &&
+				else if (AI.distance < pow(682, 2) && creature->Enemy != LaraItem && creature->Enemy != nullptr &&
 					creature->Enemy->ObjectNumber != ID_AI_PATROL1 && creature->Enemy->ObjectNumber != ID_AI_PATROL2 &&
 					abs(item->Pose.Position.y - creature->Enemy->Pose.Position.y) < 256)
 				{
@@ -279,7 +279,7 @@ namespace TEN::Entities::TR3
 			case 5:
 				creature->ReachedGoal = true;
 
-				if (creature->Enemy == NULL)
+				if (creature->Enemy == nullptr)
 					break;
 				else if ((creature->Enemy->ObjectNumber == ID_SMALLMEDI_ITEM ||
 					creature->Enemy->ObjectNumber == ID_KEY_ITEM4) &&
@@ -288,7 +288,9 @@ namespace TEN::Entities::TR3
 					if (creature->Enemy->RoomNumber == NO_ROOM ||
 						creature->Enemy->Status == ITEM_INVISIBLE ||
 						creature->Enemy->Flags & -32768)
-						creature->Enemy = NULL;
+					{
+						creature->Enemy = nullptr;
+					}
 					else
 					{
 						item->CarriedItem = creature->Enemy - g_Level.Items.data();
@@ -304,10 +306,10 @@ namespace TEN::Entities::TR3
 
 							auto* target = &g_Level.Items[currentCreature->ItemNumber];
 							if (currentCreature->Enemy == creature->Enemy)
-								currentCreature->Enemy = NULL;
+								currentCreature->Enemy = nullptr;
 						}
 
-						creature->Enemy = NULL;
+						creature->Enemy = nullptr;
 
 						if (item->AIBits != MODIFY)
 						{
@@ -330,7 +332,7 @@ namespace TEN::Entities::TR3
 					item->CarriedItem = NO_ITEM;
 
 					carriedItem->AIBits = GUARD;
-					creature->Enemy = NULL;
+					creature->Enemy = nullptr;
 				}
 				else
 				{

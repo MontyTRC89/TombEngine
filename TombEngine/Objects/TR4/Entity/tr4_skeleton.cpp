@@ -362,7 +362,7 @@ namespace TEN::Entities::TR4
 			case 2:
 				creature->MaxTurn = (creature->Mood != MoodType::Escape) ? ANGLE(2.0f) : 0;
 				creature->LOT.IsJumping = false;
-				creature->Flags = NULL;
+				creature->Flags = 0;
 
 				if (item->AIBits & GUARD ||
 					TestProbability(0.03f) &&
@@ -482,7 +482,7 @@ namespace TEN::Entities::TR4
 			case 15:
 				creature->MaxTurn = (creature->Mood != MoodType::Bored) ? ANGLE(6.0f) : ANGLE(2.0f);
 				creature->LOT.IsJumping = false;
-				creature->Flags = NULL;
+				creature->Flags = 0;
 
 				if (item->AIBits & PATROL1)
 					item->Animation.TargetState = 15;

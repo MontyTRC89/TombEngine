@@ -220,7 +220,7 @@ namespace TEN::Entities::TR2
 				break;
 
 			case KTHROWER_STATE_WALK_KNIFE_ATTACK_LEFT_START:
-				creature->Flags = NULL;
+				creature->Flags = 0;
 
 				if (AI.ahead)
 					torso = AI.angle;
@@ -233,7 +233,7 @@ namespace TEN::Entities::TR2
 				break;
 
 			case KTHROWER_STATE_WALK_KNIFE_ATTACK_RIGHT_START:
-				creature->Flags = NULL;
+				creature->Flags = 0;
 
 				if (AI.ahead)
 					torso = AI.angle;
@@ -246,7 +246,7 @@ namespace TEN::Entities::TR2
 				break;
 
 			case KTHROWER_STATE_IDLE_KNIFE_ATTACK_START:
-				creature->Flags = NULL;
+				creature->Flags = 0;
 
 				if (AI.ahead)
 					torso = AI.angle;
