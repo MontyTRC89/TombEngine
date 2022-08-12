@@ -6,7 +6,10 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Specific/level.h"
+#include "Specific/prng.h"
 #include "Specific/setup.h"
+
+using namespace TEN::Math::Random;
 
 namespace TEN::Entities::TR4
 {
@@ -46,7 +49,7 @@ namespace TEN::Entities::TR4
 		{
 			int state = 0;
 
-			if (GetRandomControl() & 3)
+			if (TestProbability(0.75f))
 				state = (GetRandomControl() & 1) + 1;
 			else
 				state = 3 * (GetRandomControl() & 1);

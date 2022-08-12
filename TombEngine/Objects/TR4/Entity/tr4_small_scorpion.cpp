@@ -24,9 +24,9 @@ namespace TEN::Entities::TR4
 
 	constexpr auto SMALL_SCORPION_ATTACK_RANGE = SQUARE(SECTOR(0.31));
 
-	const vector<int> SmallScorpionAttackJoints = { 8, 22, 23, 25, 26 };
 	const auto SmallScorpionBite1 = BiteInfo(Vector3::Zero, 0);
 	const auto SmallScorpionBite2 = BiteInfo(Vector3::Zero, 23);
+	const vector<int> SmallScorpionAttackJoints = { 8, 22, 23, 25, 26 };
 
 	enum SmallScorionState
 	{

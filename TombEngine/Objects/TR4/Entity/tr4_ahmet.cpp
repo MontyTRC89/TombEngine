@@ -17,8 +17,8 @@
 #include "Specific/prng.h"
 #include "Specific/setup.h"
 
-using namespace TEN::Math::Random;
 using namespace TEN::Effects::Environment;
+using namespace TEN::Math::Random;
 using std::vector;
 
 namespace TEN::Entities::TR4

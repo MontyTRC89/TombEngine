@@ -19,11 +19,11 @@ namespace TEN::Math::Random
 
 	bool TestProbability(float probability)
 	{
-		probability = std::clamp(probability, 0.0f, 1.0f);
-
-		if (probability == 1.0f)
+		if (probability <= 0.0f)
+			return false;
+		else if (probability >= 1.0f)
 			return true;
-		else
-			return (GenerateFloat(0.0f, 1.0f) < probability);
+		
+		return (GenerateFloat(0.0f, 1.0f) < probability);
 	}
 }
