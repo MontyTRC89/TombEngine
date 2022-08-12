@@ -363,10 +363,8 @@ namespace TEN::Renderer
 			if (obj.ShadowType == ShadowMode::None)
 			{
 				auto bounds = TO_DX_BBOX(item->Pose, GetBoundsAccurate(item));
-				Vector3 min = bounds.Center - bounds.Extents;
-				Vector3 max = bounds.Center + bounds.Extents;
-
-				if (!renderView.camera.frustum.AABBInFrustum(min, max))
+				auto length = Vector3(bounds.Extents).Length();
+				if (!renderView.camera.frustum.SphereInFrustum(bounds.Center, length))
 					continue;
 			}
 
@@ -419,10 +417,8 @@ namespace TEN::Renderer
 
 			auto stat = &StaticObjects[mesh->staticNumber];
 			auto bounds = TO_DX_BBOX(mesh->pos, &stat->visibilityBox);
-			Vector3 min = bounds.Center - bounds.Extents;
-			Vector3 max = bounds.Center + bounds.Extents;
-
-			if (!renderView.camera.frustum.AABBInFrustum(min, max))
+			auto length = Vector3(bounds.Extents).Length();
+			if (!renderView.camera.frustum.SphereInFrustum(bounds.Center, length))
 				continue;
 
 			std::vector<RendererLight*> lights;
