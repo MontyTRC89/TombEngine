@@ -1455,9 +1455,9 @@ void CreatureAIInfo(ItemInfo* item, AI_INFO* AI)
 	auto* creature = GetCreatureInfo(item);
 	auto* object = &Objects[item->ObjectNumber];
 
-	// TODO
+	// TODO: Deal with LaraItem global.
 	auto* enemy = creature->Enemy;
-	if (!enemy)
+	if (enemy == nullptr)
 	{
 		enemy = LaraItem;
 		creature->Enemy = LaraItem;
