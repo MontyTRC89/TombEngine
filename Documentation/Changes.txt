@@ -17,6 +17,7 @@ Version 1.0.1
 - Clear locusts and other swarm enemies on level reload.
 - Prevent title music audio from starting in a random place.
 - Update harpoon speed on room change.
+- Enable second sky layer rendering.
 - Timer.Create now lets you choose the units to display remaining time.
 - Fatal script errors now boot you to the title (it will crash if the title itself has these errors).
 - SetFarView has been removed, and Flow.Level.farView is now uncapped.
