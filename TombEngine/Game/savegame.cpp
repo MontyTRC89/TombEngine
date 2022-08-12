@@ -236,17 +236,6 @@ bool SaveGame::Save(int slot)
 		wet.push_back(Lara.Wet[i] == 1);
 	auto wetOffset = fbb.CreateVector(wet);
 
-	Save::Vector3 nextCornerPos = FromVector3(Lara.NextCornerPos.Position);
-	Save::Vector3 nextCornerRot = FromVector3(Lara.NextCornerPos.Orientation);
-
-	Save::Vector3 leftArmRotation = FromVector3(Lara.LeftArm.Orientation);
-	Save::Vector3 rightArmRotation = FromVector3(Lara.RightArm.Orientation);
-	
-	Save::Vector3 extraHeadRot = FromVector3(Lara.ExtraHeadRot);
-	Save::Vector3 extraTorsoRot = FromVector3(Lara.ExtraTorsoRot);
-	Save::Vector3 extraVelocity = FromVector3(Lara.ExtraVelocity);
-	Save::Vector3 waterCurrentPull = FromVector3(Lara.WaterCurrentPull);
-
 	std::vector<int> laraTargetAngles{};
 	laraTargetAngles.push_back(Lara.TargetArmOrient.y);
 	laraTargetAngles.push_back(Lara.TargetArmOrient.x);
@@ -270,7 +259,7 @@ bool SaveGame::Save(int slot)
 	leftArm.add_frame_base(Lara.LeftArm.FrameBase);
 	leftArm.add_frame_number(Lara.LeftArm.FrameNumber);
 	leftArm.add_locked(Lara.LeftArm.Locked);
-	leftArm.add_rotation(&leftArmRotation);
+	leftArm.add_rotation(&FromVector3(Lara.LeftArm.Orientation));
 	auto leftArmOffset = leftArm.Finish();
 
 	Save::ArmInfoBuilder rightArm{ fbb };
@@ -280,7 +269,7 @@ bool SaveGame::Save(int slot)
 	rightArm.add_frame_base(Lara.RightArm.FrameBase);
 	rightArm.add_frame_number(Lara.RightArm.FrameNumber);
 	rightArm.add_locked(Lara.RightArm.Locked);
-	rightArm.add_rotation(&rightArmRotation);
+	rightArm.add_rotation(&FromVector3(Lara.RightArm.Orientation));
 	auto rightArmOffset = rightArm.Finish();
 
 	Save::FlareDataBuilder flare{ fbb };
@@ -437,12 +426,11 @@ bool SaveGame::Save(int slot)
 	lara.add_burn_blue(Lara.BurnBlue);
 	lara.add_burn_smoke(Lara.BurnSmoke);
 	lara.add_control(controlOffset);
-	lara.add_next_corner_position(&nextCornerPos);
-	lara.add_next_corner_rotation(&nextCornerRot);
+	lara.add_next_corner_pose(&FromPHD(Lara.NextCornerPos));
 	lara.add_extra_anim(Lara.ExtraAnim);
-	lara.add_extra_head_rot(&extraHeadRot);
-	lara.add_extra_torso_rot(&extraTorsoRot);
-	lara.add_extra_velocity(&extraVelocity);
+	lara.add_extra_head_rot(&FromVector3(Lara.ExtraHeadRot));
+	lara.add_extra_torso_rot(&FromVector3(Lara.ExtraTorsoRot));
+	lara.add_extra_velocity(&FromVector3(Lara.ExtraVelocity));
 	lara.add_flare(flareOffset);
 	lara.add_highest_location(Lara.HighestLocation);
 	lara.add_hit_direction(Lara.HitDirection);
@@ -464,7 +452,7 @@ bool SaveGame::Save(int slot)
 	lara.add_torch(torchOffset);
 	lara.add_vehicle(Lara.Vehicle);
 	lara.add_water_current_active(Lara.WaterCurrentActive);
-	lara.add_water_current_pull(&waterCurrentPull);
+	lara.add_water_current_pull(&FromVector3(Lara.WaterCurrentPull));
 	lara.add_water_surface_dist(Lara.WaterSurfaceDist);
 	lara.add_weapons(carriedWeaponsOffset);
 	lara.add_wet(wetOffset);
@@ -626,9 +614,6 @@ bool SaveGame::Save(int slot)
 			intOffset = ib.Finish();
 		}
 
-		Save::Position position = FromPHD(itemToSerialize.Pose);
-		Save::Vector4 color = FromVector4(itemToSerialize.Color);
-
 		Save::ItemBuilder serializedItem{ fbb };
 
 		serializedItem.add_next_item(itemToSerialize.NextItem);
@@ -647,12 +632,12 @@ bool SaveGame::Save(int slot)
 		serializedItem.add_item_flags(itemFlagsOffset);
 		serializedItem.add_mesh_bits(itemToSerialize.MeshBits);
 		serializedItem.add_object_id(itemToSerialize.ObjectNumber);
-		serializedItem.add_position(&position);
+		serializedItem.add_pose(&FromPHD(itemToSerialize.Pose));
 		serializedItem.add_required_state(itemToSerialize.Animation.RequiredState);
 		serializedItem.add_room_number(itemToSerialize.RoomNumber);
 		serializedItem.add_velocity(itemToSerialize.Animation.Velocity);
 		serializedItem.add_timer(itemToSerialize.Timer);
-		serializedItem.add_color(&color);
+		serializedItem.add_color(&FromVector4(itemToSerialize.Color));
 		serializedItem.add_touch_bits(itemToSerialize.TouchBits);
 		serializedItem.add_trigger_flags(itemToSerialize.TriggerFlags);
 		serializedItem.add_triggered((itemToSerialize.Flags & (TRIGGERED | CODE_BITS | ONESHOT)) != 0);
@@ -723,9 +708,8 @@ bool SaveGame::Save(int slot)
 	for (auto& effectToSerialize : EffectList)
 	{
 		Save::FXInfoBuilder serializedEffect{ fbb };
-		auto savedPos = FromPHD(effectToSerialize.pos);
 
-		serializedEffect.add_pos(&savedPos);
+		serializedEffect.add_pose(&FromPHD(effectToSerialize.pos));
 		serializedEffect.add_room_number(effectToSerialize.roomNumber);
 		serializedEffect.add_object_number(effectToSerialize.objectNumber);
 		serializedEffect.add_next_fx(effectToSerialize.nextFx);
@@ -831,8 +815,7 @@ bool SaveGame::Save(int slot)
 		{
 			Save::StaticMeshInfoBuilder staticMesh{ fbb };
 
-			staticMesh.add_position(&FromVector3(room->mesh[j].pos.Position));
-			staticMesh.add_rotation(&FromVector3(room->mesh[j].pos.Orientation));
+			staticMesh.add_pose(&FromPHD(room->mesh[j].pos));
 			staticMesh.add_color(&FromVector4(room->mesh[j].color));
 
 			staticMesh.add_flags(room->mesh[j].flags);
@@ -921,86 +904,66 @@ bool SaveGame::Save(int slot)
 	}
 	auto particleOffset = fbb.CreateVector(particles);
 
-	// Particle enemies
-	std::vector<flatbuffers::Offset<Save::BatInfo>> bats;
+	// Swarm enemies
+	std::vector<flatbuffers::Offset<Save::SwarmObjectInfo>> bats;
 	for (int i = 0; i < NUM_BATS; i++)
 	{
 		auto* bat = &Bats[i];
 
-		Save::BatInfoBuilder batInfo{ fbb };
+		Save::SwarmObjectInfoBuilder batInfo{ fbb };
 
-		batInfo.add_counter(bat->Counter);
+		batInfo.add_flags(bat->Counter);
 		batInfo.add_on(bat->On);
 		batInfo.add_room_number(bat->RoomNumber);
-		batInfo.add_x(bat->Pose.Position.x);
-		batInfo.add_y(bat->Pose.Position.y);
-		batInfo.add_z(bat->Pose.Position.z);
-		batInfo.add_x_rot(bat->Pose.Orientation.x);
-		batInfo.add_y_rot(bat->Pose.Orientation.y);
-		batInfo.add_z_rot(bat->Pose.Orientation.z);
+		batInfo.add_pose(&FromPHD(bat->Pose));
 
 		bats.push_back(batInfo.Finish());
 	}
 	auto batsOffset = fbb.CreateVector(bats);
 
-	std::vector<flatbuffers::Offset<Save::SpiderInfo>> spiders;
+	std::vector<flatbuffers::Offset<Save::SwarmObjectInfo>> spiders;
 	for (int i = 0; i < NUM_SPIDERS; i++)
 	{
 		auto* spider = &Spiders[i];
 
-		Save::SpiderInfoBuilder spiderInfo{ fbb };
+		Save::SwarmObjectInfoBuilder spiderInfo{ fbb };
 
 		spiderInfo.add_flags(spider->Flags);
 		spiderInfo.add_on(spider->On);
 		spiderInfo.add_room_number(spider->RoomNumber);
-		spiderInfo.add_x(spider->Pose.Position.x);
-		spiderInfo.add_y(spider->Pose.Position.y);
-		spiderInfo.add_z(spider->Pose.Position.z);
-		spiderInfo.add_x_rot(spider->Pose.Orientation.x);
-		spiderInfo.add_y_rot(spider->Pose.Orientation.y);
-		spiderInfo.add_z_rot(spider->Pose.Orientation.z);
+		spiderInfo.add_pose(&FromPHD(spider->Pose));
 
 		spiders.push_back(spiderInfo.Finish());
 	}
 	auto spidersOffset = fbb.CreateVector(spiders);
 
-	std::vector<flatbuffers::Offset<Save::RatInfo>> rats;
+	std::vector<flatbuffers::Offset<Save::SwarmObjectInfo>> rats;
 	for (int i = 0; i < NUM_RATS; i++)
 	{
 		auto* rat = &Rats[i];
 
-		Save::RatInfoBuilder ratInfo{ fbb };
+		Save::SwarmObjectInfoBuilder ratInfo{ fbb };
 
 		ratInfo.add_flags(rat->Flags);
 		ratInfo.add_on(rat->On);
 		ratInfo.add_room_number(rat->RoomNumber);
-		ratInfo.add_x(rat->Pose.Position.x);
-		ratInfo.add_y(rat->Pose.Position.y);
-		ratInfo.add_z(rat->Pose.Position.z);
-		ratInfo.add_x_rot(rat->Pose.Orientation.x);
-		ratInfo.add_y_rot(rat->Pose.Orientation.y);
-		ratInfo.add_z_rot(rat->Pose.Orientation.z);
+		ratInfo.add_pose(&FromPHD(rat->Pose));
 
 		rats.push_back(ratInfo.Finish());
 	}
 	auto ratsOffset = fbb.CreateVector(rats);
 
-	std::vector<flatbuffers::Offset<Save::ScarabInfo>> scarabs;
+	std::vector<flatbuffers::Offset<Save::SwarmObjectInfo>> scarabs;
 	for (int i = 0; i < NUM_BATS; i++)
 	{
 		auto* beetle = &BeetleSwarm[i];
 
-		Save::ScarabInfoBuilder scarabInfo{ fbb };
+		Save::SwarmObjectInfoBuilder scarabInfo{ fbb };
 
 		scarabInfo.add_flags(beetle->Flags);
 		scarabInfo.add_on(beetle->On);
 		scarabInfo.add_room_number(beetle->RoomNumber);
-		scarabInfo.add_x(beetle->Pose.Position.x);
-		scarabInfo.add_y(beetle->Pose.Position.y);
-		scarabInfo.add_z(beetle->Pose.Position.z);
-		scarabInfo.add_x_rot(beetle->Pose.Orientation.x);
-		scarabInfo.add_y_rot(beetle->Pose.Orientation.y);
-		scarabInfo.add_z_rot(beetle->Pose.Orientation.z);
+		scarabInfo.add_pose(&FromPHD(beetle->Pose));
 
 		scarabs.push_back(scarabInfo.Finish());
 	}
@@ -1273,8 +1236,7 @@ bool SaveGame::Load(int slot)
 		auto room = &g_Level.Rooms[staticMesh->room_number()];
 		int number = staticMesh->number();
 
-		room->mesh[number].pos.Position = ToVector3Int(staticMesh->position());
-		room->mesh[number].pos.Orientation = ToVector3Shrt(staticMesh->rotation());
+		room->mesh[number].pos = ToPHD(staticMesh->pose());
 		room->mesh[number].color = ToVector4(staticMesh->color());
 
 		room->mesh[number].flags = staticMesh->flags();
@@ -1367,13 +1329,7 @@ bool SaveGame::Load(int slot)
 
 		g_GameScriptEntities->TryAddColliding(i);
 
-		item->Pose.Position.x = savedItem->position()->x_pos();
-		item->Pose.Position.y = savedItem->position()->y_pos();
-		item->Pose.Position.z = savedItem->position()->z_pos();
-		item->Pose.Orientation.x = savedItem->position()->x_rot();
-		item->Pose.Orientation.y = savedItem->position()->y_rot();
-		item->Pose.Orientation.z = savedItem->position()->z_rot();
-
+		item->Pose = ToPHD(savedItem->pose());
 		item->RoomNumber = savedItem->room_number();
 
 		item->Animation.Velocity = savedItem->velocity();
@@ -1545,12 +1501,7 @@ bool SaveGame::Load(int slot)
 			kayak->FrontVerticalVelocity = savedKayak->front_vertical_velocity();
 			kayak->LeftRightPaddleCount = savedKayak->left_right_count();
 			kayak->LeftVerticalVelocity = savedKayak->left_vertical_velocity();
-			kayak->OldPose.Position.x = savedKayak->old_pos()->x_pos();
-			kayak->OldPose.Position.y = savedKayak->old_pos()->y_pos();
-			kayak->OldPose.Position.z = savedKayak->old_pos()->z_pos();
-			kayak->OldPose.Orientation.x = savedKayak->old_pos()->x_rot();
-			kayak->OldPose.Orientation.y = savedKayak->old_pos()->y_rot();
-			kayak->OldPose.Orientation.z = savedKayak->old_pos()->z_rot();
+			kayak->OldPose = ToPHD(savedKayak->old_pos());
 			kayak->RightVerticalVelocity = savedKayak->right_vertical_velocity();
 			kayak->TrueWater = savedKayak->true_water();
 			kayak->Turn = savedKayak->turn();
@@ -1623,14 +1574,9 @@ bool SaveGame::Load(int slot)
 		auto* bat = &Bats[i];
 
 		bat->On = batInfo->on();
-		bat->Counter = batInfo->counter();
+		bat->Counter = batInfo->flags();
 		bat->RoomNumber = batInfo->room_number();
-		bat->Pose.Position.x = batInfo->x();
-		bat->Pose.Position.y = batInfo->y();
-		bat->Pose.Position.z = batInfo->z();
-		bat->Pose.Orientation.x = batInfo->x_rot();
-		bat->Pose.Orientation.y = batInfo->y_rot();
-		bat->Pose.Orientation.z = batInfo->z_rot();
+		bat->Pose = ToPHD(batInfo->pose());
 	}
 
 	for (int i = 0; i < s->rats()->size(); i++)
@@ -1641,12 +1587,7 @@ bool SaveGame::Load(int slot)
 		rat->On = ratInfo->on();
 		rat->Flags = ratInfo->flags();
 		rat->RoomNumber = ratInfo->room_number();
-		rat->Pose.Position.x = ratInfo->x();
-		rat->Pose.Position.y = ratInfo->y();
-		rat->Pose.Position.z = ratInfo->z();
-		rat->Pose.Orientation.x = ratInfo->x_rot();
-		rat->Pose.Orientation.y = ratInfo->y_rot();
-		rat->Pose.Orientation.z = ratInfo->z_rot();
+		rat->Pose = ToPHD(ratInfo->pose());
 	}
 
 	for (int i = 0; i < s->spiders()->size(); i++)
@@ -1657,28 +1598,18 @@ bool SaveGame::Load(int slot)
 		spider->On = spiderInfo->on();
 		spider->Flags = spiderInfo->flags();
 		spider->RoomNumber = spiderInfo->room_number();
-		spider->Pose.Position.x = spiderInfo->x();
-		spider->Pose.Position.y = spiderInfo->y();
-		spider->Pose.Position.z = spiderInfo->z();
-		spider->Pose.Orientation.x = spiderInfo->x_rot();
-		spider->Pose.Orientation.y = spiderInfo->y_rot();
-		spider->Pose.Orientation.z = spiderInfo->z_rot();
+		spider->Pose = ToPHD(spiderInfo->pose());
 	}
 
 	for (int i = 0; i < s->scarabs()->size(); i++)
 	{
 		auto beetleInfo = s->scarabs()->Get(i);
-		auto* Beetle = &BeetleSwarm[i];
+		auto* beetle = &BeetleSwarm[i];
 
-		Beetle->On = beetleInfo->on();
-		Beetle->Flags = beetleInfo->flags();
-		Beetle->RoomNumber = beetleInfo->room_number();
-		Beetle->Pose.Position.x = beetleInfo->x();
-		Beetle->Pose.Position.y = beetleInfo->y();
-		Beetle->Pose.Position.z = beetleInfo->z();
-		Beetle->Pose.Orientation.x = beetleInfo->x_rot();
-		Beetle->Pose.Orientation.y = beetleInfo->y_rot();
-		Beetle->Pose.Orientation.z = beetleInfo->z_rot();
+		beetle->On = beetleInfo->on();
+		beetle->Flags = beetleInfo->flags();
+		beetle->RoomNumber = beetleInfo->room_number();
+		beetle->Pose = ToPHD(beetleInfo->pose());
 	}
 
 	NextFxFree = s->next_fx_free();
@@ -1688,7 +1619,7 @@ bool SaveGame::Load(int slot)
 	{
 		auto& fx = EffectList[i];
 		auto fx_saved = s->fxinfos()->Get(i);
-		fx.pos = ToPHD(fx_saved->pos());
+		fx.pos = ToPHD(fx_saved->pose());
 		fx.roomNumber = fx_saved->room_number();
 		fx.objectNumber = fx_saved->object_number();
 		fx.nextFx = fx_saved->next_fx();
@@ -1855,18 +1786,10 @@ bool SaveGame::Load(int slot)
 	Lara.LeftArm.FrameBase = s->lara()->left_arm()->frame_base();
 	Lara.LeftArm.FrameNumber = s->lara()->left_arm()->frame_number();
 	Lara.LeftArm.Locked = s->lara()->left_arm()->locked();
-	Lara.LeftArm.Orientation.x = s->lara()->left_arm()->rotation()->x();
-	Lara.LeftArm.Orientation.y = s->lara()->left_arm()->rotation()->y();
-	Lara.LeftArm.Orientation.z = s->lara()->left_arm()->rotation()->z();
+	Lara.LeftArm.Orientation = ToVector3Shrt(s->lara()->left_arm()->rotation());
 	Lara.Location = s->lara()->location();
 	Lara.LocationPad = s->lara()->location_pad();
-	Lara.NextCornerPos = PHD_3DPOS(
-		s->lara()->next_corner_position()->x(),
-		s->lara()->next_corner_position()->y(),
-		s->lara()->next_corner_position()->z(),
-		s->lara()->next_corner_rotation()->x(),
-		s->lara()->next_corner_rotation()->y(),
-		s->lara()->next_corner_rotation()->z());
+	Lara.NextCornerPos = ToPHD(s->lara()->next_corner_pose());
 	Lara.PoisonPotency = s->lara()->poison_potency();
 	Lara.ProjectedFloorHeight = s->lara()->projected_floor_height();
 	Lara.RightArm.AnimNumber = s->lara()->right_arm()->anim_number();
@@ -1875,9 +1798,7 @@ bool SaveGame::Load(int slot)
 	Lara.RightArm.FrameBase = s->lara()->right_arm()->frame_base();
 	Lara.RightArm.FrameNumber = s->lara()->right_arm()->frame_number();
 	Lara.RightArm.Locked = s->lara()->right_arm()->locked();
-	Lara.RightArm.Orientation.x = s->lara()->right_arm()->rotation()->x();
-	Lara.RightArm.Orientation.y = s->lara()->right_arm()->rotation()->y();
-	Lara.RightArm.Orientation.z = s->lara()->right_arm()->rotation()->z();
+	Lara.RightArm.Orientation = ToVector3Shrt(s->lara()->right_arm()->rotation());
 	Lara.Torch.IsLit = s->lara()->torch()->is_lit();
 	Lara.Torch.State = (TorchState)s->lara()->torch()->state();
 	Lara.Control.Rope.Segment = s->lara()->control()->rope()->segment();
