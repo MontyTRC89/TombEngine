@@ -1,8 +1,8 @@
 #pragma once
-
 #include <cstdint>
 #include <string>
 #include <vector>
+
 #include "Game/animation.h"
 #include "Game/itemdata/itemdata.h"
 #include "Specific/newtypes.h"
@@ -50,7 +50,7 @@ enum ItemFlags
 };
 
 constexpr unsigned int ALL_JOINT_BITS = UINT_MAX;
-constexpr unsigned int NO_JOINT_BITS  = 0;
+constexpr unsigned int NO_JOINT_BITS  = NULL;
 
 enum class JointBitType
 {

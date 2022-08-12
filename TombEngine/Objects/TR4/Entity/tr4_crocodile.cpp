@@ -158,7 +158,8 @@ namespace TEN::Entities::TR4
 			angle = CreatureTurn(item, creature->MaxTurn);
 			boneAngle = angle * 4;
 
-			if ((item->HitStatus || AI.distance < CROC_ALERT_RANGE) || (TargetVisible(item, &AI) && AI.distance < CROC_VISIBILITY_RANGE))
+			if ((item->HitStatus || AI.distance < CROC_ALERT_RANGE) ||
+				(TargetVisible(item, &AI) && AI.distance < CROC_VISIBILITY_RANGE))
 			{
 				if (!creature->Alerted)
 					creature->Alerted = true;
@@ -176,7 +177,7 @@ namespace TEN::Entities::TR4
 					item->Animation.TargetState = CROC_STATE_IDLE;
 					item->ItemFlags[0] += item->ItemFlags[1];
 
-					if (!(GetRandomControl() & 0x1F))
+					if (TestProbability(0.03f))
 					{
 						if (TestProbability(0.5f))
 							item->ItemFlags[1] = 0;

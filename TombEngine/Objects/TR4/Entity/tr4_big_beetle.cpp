@@ -9,9 +9,11 @@
 #include "Game/misc.h"
 #include "Game/people.h"
 #include "Specific/level.h"
+#include "Specific/prng.h"
 #include "Specific/setup.h"
 #include "Specific/trmath.h"
 
+using namespace TEN::Math::Random;
 using std::vector;
 
 namespace TEN::Entities::TR4
@@ -120,9 +122,9 @@ namespace TEN::Entities::TR4
 			angle = CreatureTurn(item, creature->MaxTurn);
 
 			if (item->HitStatus || AI.distance > BIG_BEETLE_AWARE_RANGE ||
-				!(GetRandomControl() & 0x7F))
+				TestProbability(0.008f))
 			{
-				creature->Flags = 0;
+				creature->Flags = NULL;
 			}
 
 			switch (item->Animation.ActiveState)
@@ -197,8 +199,8 @@ namespace TEN::Entities::TR4
 				if (item->Animation.RequiredState)
 					item->Animation.TargetState = item->Animation.RequiredState;
 				else if (!item->HitStatus && item->AIBits != MODIFY &&
-					GetRandomControl() >= 384 &&
-					((creature->Mood != MoodType::Bored && GetRandomControl() >= 128) ||
+					TestProbability(0.99f) &&
+					((creature->Mood != MoodType::Bored && TestProbability(0.996)) ||
 						creature->HurtByLara || item->AIBits == MODIFY))
 				{
 					if (AI.ahead)
