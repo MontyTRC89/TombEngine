@@ -820,31 +820,29 @@ namespace TEN::Renderer
 
 	void Renderer11::RenderLoadingScreen(float percentage)
 	{
-		// Bind the back buffer
-		m_context->OMSetRenderTargets(1, &m_backBufferRTV, m_depthStencilView);
-		m_context->RSSetViewports(1, &m_viewport);
-		ResetScissor();
+		// Set basic render states
+		SetBlendMode(BLENDMODE_OPAQUE);
+		SetCullMode(CULL_MODE_CCW);
 
 		do
 		{
+			// Clear screen
+			m_context->ClearRenderTargetView(m_backBufferRTV, Colors::Black);
+			m_context->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+
+			// Bind the back buffer
+			m_context->OMSetRenderTargets(1, &m_backBufferRTV, m_depthStencilView);
+			m_context->RSSetViewports(1, &m_viewport);
+			ResetScissor();
+
+			// Draw the full screen background
 			if (loadingScreenTexture.Texture)
-			{
-				// Set basic render states
-				SetBlendMode(BLENDMODE_OPAQUE);
-				SetCullMode(CULL_MODE_CCW);
-
-				// Clear screen
-				m_context->ClearRenderTargetView(m_backBufferRTV, Colors::Black);
-				m_context->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
-
-				// Draw the full screen background
 				DrawFullScreenQuad(
 					loadingScreenTexture.ShaderResourceView.Get(),
 					Vector3(ScreenFadeCurrent, ScreenFadeCurrent, ScreenFadeCurrent));
-				m_context->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
-			}
 
-			DrawLoadingBar(percentage);
+			if (ScreenFadeCurrent && percentage > 0.0f && percentage < 100.0f)
+				DrawLoadingBar(percentage);
 
 			m_swapChain->Present(0, 0);
 			m_context->ClearState();
