@@ -1,20 +1,21 @@
 #include "framework.h"
-#include "tr4_wraith.h"
-#include "Specific/level.h"
-#include "Game/effects/effects.h"
-#include "Game/room.h"
-#include "Game/control/flipeffect.h"
-#include "Objects/objectslist.h"
-#include "Specific/trmath.h"
-#include "Sound/sound.h"
+#include "Objects/TR4/Entity/tr4_wraith.h"
+
 #include "Game/collision/collide_room.h"
-#include "Game/Lara/lara.h"
-#include "Objects/Generic/Traps/traps.h"
-#include "Game/people.h"
-#include "Game/effects/tomb4fx.h"
-#include "Objects/TR4/Entity/tr4_wraith_info.h"
+#include "Game/control/flipeffect.h"
+#include "Game/effects/effects.h"
 #include "Game/effects/lara_fx.h"
+#include "Game/effects/tomb4fx.h"
 #include "Game/items.h"
+#include "Game/Lara/lara.h"
+#include "Game/people.h"
+#include "Game/room.h"
+#include "Objects/Generic/Traps/traps.h"
+#include "Objects/TR4/Entity/tr4_wraith_info.h"
+#include "Objects/objectslist.h"
+#include "Sound/sound.h"
+#include "Specific/level.h"
+#include "Specific/trmath.h"
 
 using namespace TEN::Effects::Lara;
 
@@ -453,7 +454,8 @@ namespace TEN::Entities::TR4
 			dB = 24;
 			dG = (GetRandomControl() & 0x1F) + 64;
 		}
-		else if (objectNumber == ID_WRAITH2) {
+		else if (objectNumber == ID_WRAITH2)
+		{
 			sB = (GetRandomControl() & 0x1F) + -128;
 			sR = 24;
 			sG = (GetRandomControl() & 0x1F) + -128;
@@ -461,7 +463,8 @@ namespace TEN::Entities::TR4
 			dR = 24;
 			dG = (GetRandomControl() & 0x1F) + 64;
 		}
-		else {
+		else
+		{
 			color = (GetRandomControl() & 0x1F) + 64;
 			dG = color;
 			dR = color;

@@ -10,7 +10,10 @@
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
 #include "Specific/level.h"
+#include "Specific/prng.h"
 #include "Specific/setup.h"
+
+using namespace TEN::Math::Random;
 
 namespace TEN::Entities::TR4
 {
@@ -135,7 +138,7 @@ namespace TEN::Entities::TR4
 
 				if (AI.ahead && AI.distance || item->Flags)
 					item->Animation.TargetState = BOAR_STATE_RUN_FORWARD;
-				else if (GetRandomControl() & 0x7F)
+				else if (TestProbability(0.992f))
 				{
 					joint1 = AIGuard(creature) / 2;
 					joint3 = joint1;
@@ -150,7 +153,7 @@ namespace TEN::Entities::TR4
 
 				if (AI.ahead && AI.distance)
 					item->Animation.TargetState = BOAR_STATE_IDLE;
-				else if (!(GetRandomControl() & 0x7F))
+				else if (TestProbability(0.008f))
 					item->Animation.TargetState = BOAR_STATE_IDLE;
 
 				break;

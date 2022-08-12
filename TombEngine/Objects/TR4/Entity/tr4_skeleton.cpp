@@ -26,8 +26,8 @@ namespace TEN::Entities::TR4
 {
 	constexpr auto SKELETON_ATTACK_DAMAGE = 80;
 
-	const vector<int> SkeletonSwordAttackJoints = { 15, 16 };
 	const auto SkeletonBite = BiteInfo(Vector3(0.0f, -16.0f, 200.0f), 11);
+	const vector<int> SkeletonSwordAttackJoints = { 15, 16 };
 
 	enum SkeletonState
 	{
@@ -150,7 +150,7 @@ namespace TEN::Entities::TR4
 			spark->flags = 26;
 			spark->rotAng = GetRandomControl() & 0xFFF;
 
-			if (GetRandomControl() & 1)
+			if (TestProbability(0.5f))
 				spark->rotAdd = -16 - (GetRandomControl() & 0xF);
 			else
 				spark->rotAdd = (GetRandomControl() & 0xF) + 16;
@@ -354,7 +354,7 @@ namespace TEN::Entities::TR4
 			switch (item->Animation.ActiveState)
 			{
 			case SKELETON_STATE_IDLE:
-				if (!(GetRandomControl() & 0xF))
+				if (TestProbability(0.06f))
 					item->Animation.TargetState = 2;
 				
 				break;
@@ -365,11 +365,11 @@ namespace TEN::Entities::TR4
 				creature->Flags = NULL;
 
 				if (item->AIBits & GUARD ||
-					!(GetRandomControl() & 0x1F) &&
+					TestProbability(0.03f) &&
 					(AI.distance > pow(SECTOR(1), 2) ||
 						creature->Mood != MoodType::Attack))
 				{
-					if (!(GetRandomControl() & 0x3F))
+					if (TestProbability(0.0155f))
 					{
 						if (TestProbability(0.5f))
 							item->Animation.TargetState = 3;
@@ -435,21 +435,21 @@ namespace TEN::Entities::TR4
 						{
 							if (item->Animation.RequiredState)
 								item->Animation.TargetState = item->Animation.RequiredState;
-							else if (!(GetRandomControl() & 0x3F))
+							else if (TestProbability(0.0155f))
 								item->Animation.TargetState = 15;
 						}
 						else if (Lara.TargetEntity == item &&
 							laraAI.angle &&
 							laraAI.distance < pow(SECTOR(2), 2) &&
 							TestProbability(0.5f) &&
-							(Lara.Control.Weapon.GunType == LaraWeaponType::Shotgun || !(GetRandomControl() & 0xF)) &&
+							(Lara.Control.Weapon.GunType == LaraWeaponType::Shotgun || TestProbability(0.06f)) &&
 							item->MeshBits == -1)
 						{
 							item->Animation.TargetState = SKELETON_STATE_USE_SHIELD;
 						}
 						else if (AI.bite && AI.distance < pow(682, 2))
 						{
-							if (GetRandomControl() & 3 && LaraItem->HitPoints > 0)
+							if (TestProbability(0.75f) && LaraItem->HitPoints > 0)
 							{
 								if (TestProbability(0.5f))
 									item->Animation.TargetState = SKELETON_STATE_ATTACK_1;
@@ -520,7 +520,7 @@ namespace TEN::Entities::TR4
 						else
 							item->Animation.TargetState = 2;
 					}
-					else if (!(GetRandomControl() & 0x3F))
+					else if (TestProbability(0.0155f))
 						item->Animation.TargetState = 2;
 				}
 
@@ -594,7 +594,7 @@ namespace TEN::Entities::TR4
 						creature->Flags = 1;
 					}
 				}
-				if (!(GetRandomControl() & 0x3F) || LaraItem->HitPoints <= 0)
+				if (TestProbability(0.0155f) || LaraItem->HitPoints <= 0)
 					item->Animation.TargetState = 11;
 				
 				break;
@@ -658,9 +658,10 @@ namespace TEN::Entities::TR4
 			case SKELETON_STATE_USE_SHIELD:
 				if (item->HitStatus)
 				{
-					if (item->MeshBits == -1 && laraAI.angle && Lara.Control.Weapon.GunType == LaraWeaponType::Shotgun)
+					if (item->MeshBits == -1 && laraAI.angle &&
+						Lara.Control.Weapon.GunType == LaraWeaponType::Shotgun)
 					{
-						if (GetRandomControl() & 3)
+						if (TestProbability(0.75f))
 							item->Animation.TargetState = 17;
 						else
 							ExplodeItemNode(item, 11, 1, -24);
@@ -668,7 +669,7 @@ namespace TEN::Entities::TR4
 					else
 						item->Animation.TargetState = 2;
 				}
-				else if (Lara.TargetEntity != item || item->MeshBits != -1 || Lara.Control.Weapon.GunType != LaraWeaponType::Shotgun || !(GetRandomControl() & 0x7F))
+				else if (Lara.TargetEntity != item || item->MeshBits != -1 || Lara.Control.Weapon.GunType != LaraWeaponType::Shotgun || TestProbability(0.008f))
 					item->Animation.TargetState = 2;
 				
 				break;
@@ -728,7 +729,7 @@ namespace TEN::Entities::TR4
 
 				if (GetCollision(item).Position.Floor <= (item->Pose.Position.y + SECTOR(1)))
 				{
-					if (!(GetRandomControl() & 0x1F))
+					if (TestProbability(0.03f))
 						item->Animation.TargetState = 14;
 				}
 				else

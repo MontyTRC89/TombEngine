@@ -14,8 +14,10 @@
 #include "Game/people.h"
 #include "Renderer/Renderer11Enums.h"
 #include "Specific/level.h"
+#include "Specific/prng.h"
 #include "Specific/setup.h"
 
+using namespace TEN::Math::Random;
 using std::vector;
 
 namespace TEN::Entities::TR4
@@ -126,7 +128,7 @@ namespace TEN::Entities::TR4
 			spark->flags = SP_SCALE | SP_ROTATE | SP_ITEM | SP_EXPDEF | SP_NODEATTACH;
 			spark->rotAng = GetRandomControl() & 0xFFF;
 
-			if (GetRandomControl() & 1)
+			if (TestProbability(0.5f))
 				spark->rotAdd = -32 - (GetRandomControl() & 0x1F);
 			else
 				spark->rotAdd = (GetRandomControl() & 0x1F) + 32;
@@ -400,7 +402,7 @@ namespace TEN::Entities::TR4
 				if (creature->Enemy != LaraItem ||
 					!Targetable(item, &AI) ||
 					AI.distance <= pow(SECTOR(3.5f), 2) ||
-					!(GetRandomControl() & 1))
+					TestProbability(0.5f))
 				{
 					item->Animation.TargetState = HARPY_STATE_FLY_FORWARD;
 					break;
@@ -436,7 +438,7 @@ namespace TEN::Entities::TR4
 						if (AI.ahead &&
 							AI.distance >= pow(SECTOR(2), 2) &&
 							AI.distance > pow(SECTOR(3.5f), 2) &&
-							GetRandomControl() & 1)
+							TestProbability(0.5f))
 						{
 							item->Animation.TargetState = HARPY_STATE_FLAME_ATTACK;
 							item->ItemFlags[0] = 0;
@@ -450,7 +452,7 @@ namespace TEN::Entities::TR4
 					break;
 				}
 
-				if (GetRandomControl() & 1)
+				if (TestProbability(0.5f))
 				{
 					item->Animation.TargetState = HARPY_STATE_FLY_FORWARD_SPIN;
 					break;
@@ -465,7 +467,8 @@ namespace TEN::Entities::TR4
 				if (AI.distance >= pow(341, 2))
 				{
 					if (AI.ahead && AI.distance >= pow(SECTOR(2), 2) &&
-						AI.distance > pow(SECTOR(3.5f), 2) && GetRandomControl() & 1)
+						AI.distance > pow(SECTOR(3.5f), 2) &&
+						TestProbability(0.5f))
 					{
 						item->Animation.TargetState = HARPY_STATE_FLAME_ATTACK;
 						item->ItemFlags[0] = 0;
@@ -545,7 +548,7 @@ namespace TEN::Entities::TR4
 					item->Animation.TargetState = HARPY_STATE_FLY_FORWARD;
 					item->Animation.RequiredState = HARPY_STATE_FLAME_ATTACK;
 				}
-				else if (GetRandomControl() & 1)
+				else if (TestProbability(0.5f))
 					item->Animation.TargetState = HARPY_STATE_IDLE;
 
 				break;
