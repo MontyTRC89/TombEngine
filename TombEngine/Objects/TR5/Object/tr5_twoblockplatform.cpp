@@ -29,11 +29,16 @@ void TwoBlocksPlatformControl(short itemNumber)
 	{
 		if (item->TriggerFlags)
 		{
-			if (item->Pose.Position.y > (item->ItemFlags[0] - 16 * (int) (item->TriggerFlags & 0xFFFFFFF0)))
-				item->Pose.Position.y -= item->TriggerFlags & 0xF;
+			int goalHeight = (item->ItemFlags[0] - 16 * (int)(item->TriggerFlags & 0xFFFFFFF0));
+			int speed = item->TriggerFlags & 0xF;
+
+			if (item->Pose.Position.y > goalHeight)
+				item->Pose.Position.y -= speed;
+			else
+				return;
 
 			int DistanceToPortal = *&g_Level.Rooms[item->RoomNumber].maxceiling - item->Pose.Position.y;
-			if (DistanceToPortal < 16)
+			if (DistanceToPortal <= speed)
 				UpdateBridgeItem(itemNumber);
 
 			auto probe = GetCollision(item);
