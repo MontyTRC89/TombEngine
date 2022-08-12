@@ -27,7 +27,6 @@ public:
 	bool							PlayAnyLevel{ true };
 	bool							FlyCheat{ true };
 	bool							DebugMode{ false };
-	short							GameFarView{ 0 };
 
 	// New animation flag table
 	Animations			Anims{};
@@ -51,8 +50,6 @@ public:
 	int					GetNumLevels() const;
 	void				SetIntroImagePath(std::string const& path);
 	void				SetTitleScreenImagePath(std::string const& path);
-	void				SetGameFarView(short val);
-	short				GetGameFarView() const;
 	bool				IsFlyCheatEnabled() const;
 	bool				CanPlayAnyLevel() const;
 
