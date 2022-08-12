@@ -22,8 +22,8 @@ namespace TEN::Entities::TR4
 	#define SPHINX_WALK_TURN_ANGLE ANGLE(3.0f)
 	#define SPHINX_RUN_TURN_ANGLE  ANGLE(0.33f)
 
-	const vector<int> SphinxAttackJoints = { 6 };
 	const auto SphinxBite = BiteInfo(Vector3::Zero, 6);
+	const vector<int> SphinxAttackJoints = { 6 };
 
 	enum SphinxState
 	{
@@ -146,6 +146,7 @@ namespace TEN::Entities::TR4
 			if (AI.distance < pow(SECTOR(1), 2) || item->TriggerFlags)
 				item->Animation.TargetState = SPHINX_STATE_SLEEP_TO_IDLE;
 
+			// TODO: Use TestProbability().
 			if (GetRandomControl() == 0)
 				item->Animation.TargetState = SPHINX_STATE_REST_ALERTED;
 
@@ -157,6 +158,7 @@ namespace TEN::Entities::TR4
 			if (AI.distance < pow(SECTOR(1), 2) || item->TriggerFlags)
 				item->Animation.TargetState = SPHINX_STATE_SLEEP_TO_IDLE;
 
+			// TODO: Use TestProbability().
 			if (GetRandomControl() == 0)
 				item->Animation.TargetState = SPHINX_STATE_REST;
 

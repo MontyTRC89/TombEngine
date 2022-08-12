@@ -14,7 +14,7 @@
 
 bool ShotLara(ItemInfo* item, AI_INFO* AI, BiteInfo gun, short extraRotation, int damage)
 {
-	ShotLara(item, AI, &gun, extraRotation, damage);
+	return ShotLara(item, AI, &gun, extraRotation, damage);
 }
 
 // TODO: Replace with above version.

@@ -1,43 +1,42 @@
 #include "framework.h"
-#include "tr4_sentry_gun.h"
-#include "Game/control/box.h"
-#include "Game/effects/effects.h"
-#include "Game/items.h"
-#include "Game/gui.h"
-#include "Specific/level.h"
-#include "Game/control/lot.h"
-#include "Game/effects/tomb4fx.h"
-#include "Game/people.h"
-#include "Sound/sound.h"
-#include "Specific/trmath.h"
-#include "Objects/objectslist.h"
-#include "Game/itemdata/creature_info.h"
+#include "Objects/TR4/Entity/tr4_sentry_gun.h"
+
 #include "Game/animation.h"
+#include "Game/control/box.h"
+#include "Game/control/lot.h"
+#include "Game/effects/effects.h"
+#include "Game/effects/tomb4fx.h"
+#include "Game/gui.h"
+#include "Game/itemdata/creature_info.h"
+#include "Game/items.h"
 #include "Game/misc.h"
+#include "Game/people.h"
+#include "Objects/objectslist.h"
+#include "Sound/sound.h"
+#include "Specific/level.h"
+#include "Specific/trmath.h"
 
 namespace TEN::Entities::TR4
 {
-	auto SentryGunBite = BiteInfo(Vector3::Zero, 8);
-	auto SentryGunFlameOffset = Vector3Int(-140, 0, 0);
+	const auto SentryGunFlameOffset = Vector3Int(-140, 0, 0);
+	const auto SentryGunBite = BiteInfo(Vector3::Zero, 8);
 
-	void InitialiseSentryGun(short itemNum)
+	void InitialiseSentryGun(short itemNumber)
 	{
-		auto* item = &g_Level.Items[itemNum];
+		auto* item = &g_Level.Items[itemNumber];
 
-		ClearItem(itemNum);
-
+		ClearItem(itemNumber);
 		item->ItemFlags[0] = 0;
 		item->ItemFlags[1] = 768;
 		item->ItemFlags[2] = 0;
 	}
 
-	void SentryGunControl(short itemNum)
+	void SentryGunControl(short itemNumber)
 	{
-		auto* item = &g_Level.Items[itemNum];
-
-		if (!CreatureActive(itemNum))
+		if (!CreatureActive(itemNumber))
 			return;
 
+		auto* item = &g_Level.Items[itemNumber];
 		auto* creature = GetCreatureInfo(item);
 
 		int c = 0;
@@ -45,12 +44,14 @@ namespace TEN::Entities::TR4
 		if (!creature)
 			return;
 
-		if (item->TestBits(JointBitType::Mesh, 6)) // Was fuel can exploded?
+		// Was fuel can exploded?
+		if (item->TestBits(JointBitType::Mesh, 6))
 		{
 			if (item->ItemFlags[0])
 			{
 				auto pos = Vector3Int(SentryGunBite.x, SentryGunBite.y, SentryGunBite.z);
 				GetJointAbsPosition(item, &pos, SentryGunBite.meshNum);
+
 				TriggerDynamicLight(pos.x, pos.y, pos.z, 4 * item->ItemFlags[0] + 12, 24, 16, 4);
 				item->ItemFlags[0]--;
 			}
@@ -84,7 +85,7 @@ namespace TEN::Entities::TR4
 							if (AI.distance <= pow(SECTOR(2), 2))
 							{
 								// Throw fire
-								ThrowFire(itemNum, 7, SentryGunFlameOffset, SentryGunFlameOffset);
+								ThrowFire(itemNumber, 7, SentryGunFlameOffset, SentryGunFlameOffset);
 								c = phd_sin((GlobalCounter & 0x1F) * 2048) * 4096;
 							}
 							else
@@ -93,7 +94,7 @@ namespace TEN::Entities::TR4
 								c = 0;
 								item->ItemFlags[0] = 2;
 
-								ShotLara(item, &AI, &SentryGunBite, creature->JointRotation[0], 5);
+								ShotLara(item, &AI, SentryGunBite, creature->JointRotation[0], 5);
 								SoundEffect(SFX_TR4_AUTOGUNS, &item->Pose);
 
 								item->ItemFlags[2] += 256;
@@ -139,9 +140,9 @@ namespace TEN::Entities::TR4
 		}
 		else
 		{
-			ExplodingDeath(itemNum, BODY_EXPLODE | BODY_NO_BOUNCE);
-			DisableEntityAI(itemNum);
-			KillItem(itemNum);
+			ExplodingDeath(itemNumber, BODY_EXPLODE | BODY_NO_BOUNCE);
+			DisableEntityAI(itemNumber);
+			KillItem(itemNumber);
 
 			item->Flags |= 1u;
 			item->Status = ITEM_DEACTIVATED;

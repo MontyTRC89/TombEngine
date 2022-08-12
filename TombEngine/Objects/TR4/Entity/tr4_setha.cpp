@@ -11,8 +11,11 @@
 #include "Game/misc.h"
 #include "Game/people.h"
 #include "Specific/level.h"
+#include "Specific/prng.h"
 #include "Specific/setup.h"
 #include "Specific/trmath.h"
+
+using namespace TEN::Math::Random;
 
 namespace TEN::Entities::TR4
 {
@@ -26,7 +29,6 @@ namespace TEN::Entities::TR4
 		auto* item = &g_Level.Items[itemNumber];
 
 		ClearItem(itemNumber);
-
 		item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 4;
 		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 		item->Animation.ActiveState = 12;
@@ -112,7 +114,7 @@ namespace TEN::Entities::TR4
 				{
 					if (AI.distance < pow(SECTOR(2.5f), 2) &&
 						AI.ahead &&
-						GetRandomControl() & 1 &&
+						TestProbability(0.5f) &&
 						Targetable(item, &AI))
 					{
 						item->Animation.TargetState = 11;
@@ -123,7 +125,7 @@ namespace TEN::Entities::TR4
 						ceiling < (item->Pose.Position.y - SECTOR(1.75f)) &&
 						height4 != NO_HEIGHT &&
 						height4 > (item->Pose.Position.y - SECTOR(1)) &&
-						GetRandomControl() & 1)
+						TestProbability(0.5f))
 					{
 						item->Pose.Position.y -= SECTOR(1.5f);
 						if (Targetable(item, &AI))
@@ -263,7 +265,7 @@ namespace TEN::Entities::TR4
 				if (item->Animation.AnimNumber == Objects[item->Animation.AnimNumber].animIndex + 17 &&
 					item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameEnd)
 				{
-					if (GetRandomControl() & 1)
+					if (TestProbability(0.5f))
 						item->Animation.RequiredState = 10;
 				}
 
@@ -481,7 +483,7 @@ namespace TEN::Entities::TR4
 			spark->flags = SP_NODEATTACH | SP_EXPDEF | SP_ITEM | SP_ROTATE | SP_SCALE | SP_DEF;
 			spark->rotAng = GetRandomControl() & 0xFFF;
 
-			if (GetRandomControl() & 1)
+			if (TestProbability(0.5f))
 				spark->rotAdd = -32 - (GetRandomControl() & 0x1F);
 			else
 				spark->rotAdd = (GetRandomControl() & 0x1F) + 32;
