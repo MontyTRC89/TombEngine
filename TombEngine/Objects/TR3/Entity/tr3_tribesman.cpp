@@ -147,7 +147,7 @@ namespace TEN::Entities::TR3
 			{
 			case TRIBESMAN_STATE_CROUCH_IDLE:
 				creature->MaxTurn = ANGLE(4.0f);
-				creature->Flags = NULL;
+				creature->Flags = 0;
 
 				if (creature->Mood == MoodType::Bored)
 				{
@@ -186,7 +186,7 @@ namespace TEN::Entities::TR3
 
 			case TRIBESMAN_STATE_IDLE:
 				creature->MaxTurn = ANGLE(4.0f);
-				creature->Flags = NULL;
+				creature->Flags = 0;
 
 				if (creature->Mood == MoodType::Bored)
 				{
@@ -219,7 +219,7 @@ namespace TEN::Entities::TR3
 			case TRIBESMAN_STATE_WALK_FORWARD:
 				tilt = angle / 8;
 				creature->MaxTurn = ANGLE(9.0f);
-				creature->Flags = NULL;
+				creature->Flags = 0;
 
 				if (creature->Mood == MoodType::Bored)
 				{
@@ -250,7 +250,7 @@ namespace TEN::Entities::TR3
 			case TRIBESMAN_STATE_RUN_FORWARD:
 				tilt = angle / 4;
 				creature->MaxTurn = ANGLE(6.0f);
-				creature->Flags = NULL;
+				creature->Flags = 0;
 
 				if (creature->Mood == MoodType::Bored)
 				{

@@ -103,7 +103,7 @@ namespace TEN::Entities::TR4
 
 			case BAT_STATE_FLY:
 				if (AI.distance < BAT_ATTACK_RANGE || TestProbability(0.015f))
-					creature->Flags = NULL;
+					creature->Flags = 0;
 
 				if (!creature->Flags)
 				{

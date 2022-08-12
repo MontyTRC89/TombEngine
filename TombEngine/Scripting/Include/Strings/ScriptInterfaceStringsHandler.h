@@ -10,6 +10,7 @@ class ScriptInterfaceStringsHandler {
 public:
 	virtual ~ScriptInterfaceStringsHandler() = default;
 	virtual void ProcessDisplayStrings(float dt) = 0;
+	virtual void ClearDisplayStrings() = 0;
 	virtual void SetCallbackDrawString(CallbackDrawString) = 0;
 };
 

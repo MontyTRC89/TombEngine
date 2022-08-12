@@ -16,6 +16,7 @@ public:
 	StringsHandler(sol::state* lua, sol::table & parent);
 	void								SetCallbackDrawString(CallbackDrawString cb) override;
 	void								ProcessDisplayStrings(float dt) override;
+	void								ClearDisplayStrings() override;
 	bool								SetDisplayString(DisplayStringIDType id, UserDisplayString const& ds);
 
 	std::optional<std::reference_wrapper<UserDisplayString>>	GetDisplayString(DisplayStringIDType id);

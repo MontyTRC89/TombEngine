@@ -945,13 +945,13 @@ namespace TEN::Entities::TR4
 				}
 
 				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameEnd - 1)
-					currentCreature->Flags = NULL;
+					currentCreature->Flags = 0;
 
 				break;
 
 			case BADDY_STATE_MONKEY_IDLE:
 				currentCreature->MaxTurn = 0;
-				currentCreature->Flags = NULL;
+				currentCreature->Flags = 0;
 				joint1 = 0;
 				joint2 = 0;
 
@@ -987,7 +987,7 @@ namespace TEN::Entities::TR4
 				currentCreature->MaxTurn = ANGLE(7.0f);
 				currentCreature->LOT.IsJumping = true;
 				currentCreature->LOT.IsMonkeying = true;
-				currentCreature->Flags = NULL;
+				currentCreature->Flags = 0;
 				joint1 = 0;
 				joint2 = 0;
 
