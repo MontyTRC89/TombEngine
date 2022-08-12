@@ -21,7 +21,7 @@ enum class LogConfig
 	All
 };
 
-void TENLog(std::string_view str, LogLevel level = LogLevel::Info, LogConfig config = LogConfig::All);
+void TENLog(std::string_view str, LogLevel level = LogLevel::Info, LogConfig config = LogConfig::All, bool allowSpam = false);
 void ShutdownTENLog();
 void InitTENLog();
 
