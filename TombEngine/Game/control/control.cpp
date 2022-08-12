@@ -718,6 +718,9 @@ void CleanUp()
 	DisableBubbles();
 	DisableDebris();
 
+	// Clear swarm enemies
+	ClearSwarmEnemies(nullptr);
+
 	// Clear soundtrack masks
 	ClearSoundTrackMasks();
 }
