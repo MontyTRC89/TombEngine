@@ -17,8 +17,8 @@ using std::vector;
 
 namespace TEN::Entities::TR3
 {
-	BITE_INFO MPStickBite1 = { 247, 10, 11, 13 };
-	BITE_INFO MPStickBite2 = { 0, 0, 100, 6 };
+	BiteInfo MPStickBite1 = { 247, 10, 11, 13 };
+	BiteInfo MPStickBite2 = { 0, 0, 100, 6 };
 	const vector<int> MPStickPunchAttackJoints = { 10, 13 };
 	const vector<int> MPStickKickAttackJoints = { 5, 6 };
 
@@ -148,8 +148,8 @@ namespace TEN::Entities::TR3
 				laraAI.distance = pow(dx, 2) + pow(dz, 2);
 			}
 
-			GetCreatureMood(item, &AI, VIOLENT);
-			CreatureMood(item, &AI, VIOLENT);
+			GetCreatureMood(item, &AI, true);
+			CreatureMood(item, &AI, true);
 
 			angle = CreatureTurn(item, creature->MaxTurn);
 

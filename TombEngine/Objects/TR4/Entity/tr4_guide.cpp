@@ -20,8 +20,8 @@ namespace TEN::Entities::TR4
 {
 	constexpr auto GUIDE_ATTACK_DAMAGE = 20;
 
-	BITE_INFO GuideBite1 = { 0, 20, 180, 18 };
-	BITE_INFO GuideBite2 = { 30, 80, 50, 15 };
+	const auto GuideBite1 = BiteInfo(Vector3(0.0f, 20.0f, 180.0f), 18);
+	const auto GuideBite2 = BiteInfo(Vector3(30.0f, 80.0f, 50.0f), 15);
 	const vector<int> GuideLeftFingerSwapJoints = { 15 };
 	const vector<int> GuideRightHandSwapJoints	= { 18 };
 	const vector<int> GuideHeadSwapJoints		= { 21 };
@@ -238,8 +238,8 @@ namespace TEN::Entities::TR4
 
 		CreatureAIInfo(item, &AI);
 
-		GetCreatureMood(item, &AI, VIOLENT);
-		CreatureMood(item, &AI, VIOLENT);
+		GetCreatureMood(item, &AI, true);
+		CreatureMood(item, &AI, true);
 
 		angle = CreatureTurn(item, creature->MaxTurn);
 
@@ -303,7 +303,7 @@ namespace TEN::Entities::TR4
 						if (AI.bite)
 							item->Animation.TargetState = GUIDE_STATE_ATTACK_LOW;
 					}
-					else if (enemy != LaraItem || AI.distance > pow(SECTOR(2), 2))
+					else if (!enemy->IsLara() || AI.distance > pow(SECTOR(2), 2))
 						if (flagRunDefault && AI.distance > pow(SECTOR(3), 2))
 							item->Animation.TargetState = GUIDE_STATE_RUN_FORWARD;
 						else
@@ -424,7 +424,7 @@ namespace TEN::Entities::TR4
 						AI.distance >= pow(SECTOR(1.5f), 2) &&
 						(item->TestBits(JointBitType::MeshSwap, GuideRightHandSwapJoints) || AI.distance >= pow(SECTOR(3), 2)))
 					{
-						if (creature->Enemy == LaraItem)
+						if (creature->Enemy->IsLara())
 						{
 							if (AI.distance >= pow(SECTOR(2), 2))
 							{
@@ -613,7 +613,7 @@ namespace TEN::Entities::TR4
 							dz < CLICK(2))
 						{
 							DoDamage(enemy, GUIDE_ATTACK_DAMAGE);
-							CreatureEffect2(item, &GuideBite1, 8, -1, DoBloodSplat);
+							CreatureEffect2(item, GuideBite1, 8, -1, DoBloodSplat);
 							creature->Flags = 1;
 
 							if (enemy->HitPoints <= 0)
@@ -742,7 +742,7 @@ namespace TEN::Entities::TR4
 		case GUIDE_STATE_READ_INSCRIPTION:
 			if (item->Animation.FrameNumber >= g_Level.Anims[item->Animation.AnimNumber].frameBase + 20)
 			{
-				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + 20)
+				if (item->Animation.FrameNumber == (g_Level.Anims[item->Animation.AnimNumber].frameBase + 20))
 				{
 					item->Animation.TargetState = GUIDE_STATE_IDLE;
 

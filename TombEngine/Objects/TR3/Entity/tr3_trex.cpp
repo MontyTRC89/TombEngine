@@ -9,15 +9,17 @@
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
 #include "Specific/level.h"
+#include "Specific/prng.h"
 #include "Specific/setup.h"
 
+using namespace TEN::Math::Random;
 using std::vector;
 
 namespace TEN::Entities::TR3
 {
-	const vector<int> TRexAttackJoints = { 12, 13 };
+	constexpr auto LARA_ANIM_TREX_DEATH_ANIM = 4;
 
-	#define LARA_ANIM_TREX_DEATH 4
+	const vector<int> TRexAttackJoints = { 12, 13 };
 
 	enum TRexState
 	{
@@ -25,7 +27,7 @@ namespace TEN::Entities::TR3
 		TREX_STATE_IDLE = 1,
 		TREX_STATE_WALK_FORWARD = 2,
 		TREX_STATE_RUN_FORWARD = 3,
-		// 4? Perhaps it was used as a hacky way of storing the index for Lara's trex death animation. @Sezz 2022.05.24
+		// No state 4.
 		TREX_STATE_DEATH = 5,
 		TREX_STATE_ROAR = 6,
 		TREX_STATE_ATTACK = 7,
@@ -59,7 +61,7 @@ namespace TEN::Entities::TR3
 		laraItem->Pose.Orientation = Vector3Shrt(0, tRexItem->Pose.Orientation.y, 0);
 		laraItem->Animation.IsAirborne = false;
 
-		laraItem->Animation.AnimNumber = Objects[ID_LARA_EXTRA_ANIMS].animIndex + LARA_ANIM_TREX_DEATH;
+		laraItem->Animation.AnimNumber = Objects[ID_LARA_EXTRA_ANIMS].animIndex + LARA_ANIM_TREX_DEATH_ANIM;
 		laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
 		laraItem->Animation.ActiveState = LS_DEATH;
 		laraItem->Animation.TargetState = LS_DEATH;
@@ -69,7 +71,7 @@ namespace TEN::Entities::TR3
 		Lara.Control.HandStatus = HandStatus::Busy;
 		Lara.Control.Weapon.GunType = LaraWeaponType::None;
 
-		Camera.flags = 1;
+		Camera.flags = CF_FOLLOW_CENTER;
 		Camera.targetAngle = ANGLE(170.0f);
 		Camera.targetElevation = -ANGLE(25.0f);
 	}
@@ -100,8 +102,8 @@ namespace TEN::Entities::TR3
 			if (AI.ahead)
 				head = AI.angle;
 
-			GetCreatureMood(item, &AI, VIOLENT);
-			CreatureMood(item, &AI, VIOLENT);
+			GetCreatureMood(item, &AI, true);
+			CreatureMood(item, &AI, true);
 
 			angle = CreatureTurn(item, info->MaxTurn);
 
@@ -136,7 +138,7 @@ namespace TEN::Entities::TR3
 
 				if (info->Mood != MoodType::Bored || !info->Flags)
 					item->Animation.TargetState = TREX_STATE_IDLE;
-				else if (AI.ahead && GetRandomControl() < 0x200)
+				else if (AI.ahead && TestProbability(0.015f))
 				{
 					item->Animation.RequiredState = TREX_STATE_ROAR;
 					item->Animation.TargetState = TREX_STATE_IDLE;
@@ -151,7 +153,8 @@ namespace TEN::Entities::TR3
 					item->Animation.TargetState = TREX_STATE_IDLE;
 				else if (info->Flags)
 					item->Animation.TargetState = TREX_STATE_IDLE;
-				else if (info->Mood != MoodType::Escape && AI.ahead && GetRandomControl() < 0x200)
+				else if (info->Mood != MoodType::Escape &&
+					AI.ahead && TestProbability(0.015f))
 				{
 					item->Animation.RequiredState = TREX_STATE_ROAR;
 					item->Animation.TargetState = TREX_STATE_IDLE;

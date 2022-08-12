@@ -1,31 +1,38 @@
 #include "framework.h"
-#include "tr4_mummy.h"
+#include "Objects/TR4/Entity/tr4_mummy.h"
+
+#include "Game/control/box.h"
+#include "Game/control/control.h"
+#include "Game/effects/effects.h"
+#include "Game/itemdata/creature_info.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
-#include "Game/control/box.h"
-#include "Game/effects/effects.h"
-#include "Specific/setup.h"
-#include "Game/control/control.h"
-#include "Specific/level.h"
-#include "Game/itemdata/creature_info.h"
 #include "Game/misc.h"
+#include "Specific/level.h"
+#include "Specific/prng.h"
+#include "Specific/setup.h"
+
+using namespace TEN::Math::Random;
+using std::vector;
 
 namespace TEN::Entities::TR4
 {
-	BITE_INFO MummyBite1 = { 0, 0, 0, 11 };
-	BITE_INFO MummyBite2 = { 0, 0, 0, 14 };
-	const std::vector<int> MummyAttackJoints { 11, 14 };
+	constexpr auto MUMMY_ATTACK_DAMAGE = 100;
 
-	constexpr auto MUMMY_IDLE_SWIPE_ATTACK_RANGE = SECTOR(0.5f);
-	constexpr auto MUMMY_WALK_FORWARD_SWIPE_ATTACK_RANGE = SECTOR(0.67f);
-	constexpr auto MUMMY_ACTIVATE_RANGE = SECTOR(1);
-	constexpr auto MUMMY_RECOIL_RANGE = SECTOR(3);
-	constexpr auto MUMMY_ARMS_UP_RANGE = SECTOR(3);
-	constexpr auto MUMMY_AWARE_RANGE = SECTOR(7);
+	constexpr auto MUMMY_IDLE_SWIPE_ATTACK_RANGE = SQUARE(SECTOR(0.5f));
+	constexpr auto MUMMY_WALK_SWIPE_ATTACK_RANGE = SQUARE(SECTOR(0.67f));
+	constexpr auto MUMMY_ACTIVATE_RANGE			 = SQUARE(SECTOR(1));
+	constexpr auto MUMMY_RECOIL_RANGE			 = SQUARE(SECTOR(3));
+	constexpr auto MUMMY_ARMS_UP_RANGE			 = SQUARE(SECTOR(3));
+	constexpr auto MUMMY_AWARE_RANGE			 = SQUARE(SECTOR(7));
 
 	#define MUMMY_WALK_TURN_ANGLE ANGLE(7.0f)
 
-	enum MymmyState
+	const auto MummyBite1 = BiteInfo(Vector3::Zero, 11);
+	const auto MummyBite2 = BiteInfo(Vector3::Zero, 14);
+	const vector<int> MummyAttackJoints { 11, 14 };
+
+	enum MummyState
 	{
 		MUMMY_STATE_INACTIVE_ARMS_CROSSED = 0,
 		MUMMY_STATE_IDLE = 1,
@@ -35,7 +42,7 @@ namespace TEN::Entities::TR4
 		MUMMY_STATE_RECOIL = 5,
 		MUMMY_STATE_ARMS_UP_RECOIL = 6,
 		MUMMY_STATE_COLLAPSE = 7,
-		MUMMY_INACTIVE_STATE_LYING_DOWN = 8,
+		MUMMY_STATE_INACTIVE_LYING_DOWN = 8,
 		MUMMY_STATE_COLLAPSED_TO_IDLE = 9,
 		MUMMY_STATE_IDLE_SWIPE_ATTACK = 10
 	};
@@ -73,17 +80,15 @@ namespace TEN::Entities::TR4
 
 		if (item->TriggerFlags == 2)
 		{
-			item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + MUMMY_ANIM_COLLAPSE_END;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-			item->Animation.TargetState = MUMMY_INACTIVE_STATE_LYING_DOWN;
-			item->Animation.ActiveState = MUMMY_INACTIVE_STATE_LYING_DOWN;
+			SetAnimation(item, MUMMY_ANIM_COLLAPSE_END);
+			item->Animation.TargetState = MUMMY_STATE_INACTIVE_LYING_DOWN; // TODO: Check if needed. -- Sezz
+			item->Animation.ActiveState = MUMMY_STATE_INACTIVE_LYING_DOWN;
 			item->Status -= ITEM_INVISIBLE;
 		}
 		else
 		{
-			item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + MUMMY_ANIM_ARMS_CROSSED;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-			item->Animation.TargetState = MUMMY_STATE_INACTIVE_ARMS_CROSSED;
+			SetAnimation(item, MUMMY_ANIM_ARMS_CROSSED);
+			item->Animation.TargetState = MUMMY_STATE_INACTIVE_ARMS_CROSSED; // TODO: Check if needed. -- Sezz
 			item->Animation.ActiveState = MUMMY_STATE_INACTIVE_ARMS_CROSSED;
 		}
 	}
@@ -112,18 +117,18 @@ namespace TEN::Entities::TR4
 
 		if (item->HitStatus)
 		{
-			if (AI.distance < pow(MUMMY_RECOIL_RANGE, 2))
+			if (AI.distance < MUMMY_RECOIL_RANGE)
 			{
 				if (item->Animation.ActiveState != MUMMY_ANIM_IDLE_TO_WALK_FORWARD_ARMS_UP &&
 					item->Animation.ActiveState != MUMMY_ANIM_WALK_FORWARD_ARMS_UP_TO_WALK_FORWARD_LEFT &&
 					item->Animation.ActiveState != MUMMY_ANIM_IDLE_TO_WALK_FORWARD)
 				{
-					if (GetRandomControl() & 3 ||
+					if (TestProbability(0.75f) ||
 						Lara.Control.Weapon.GunType != LaraWeaponType::Shotgun &&
 						Lara.Control.Weapon.GunType != LaraWeaponType::HK &&
 						Lara.Control.Weapon.GunType != LaraWeaponType::Revolver)
 					{
-						if (!(GetRandomControl() & 7) ||
+						if (TestProbability(0.125f) ||
 							Lara.Control.Weapon.GunType == LaraWeaponType::Shotgun ||
 							Lara.Control.Weapon.GunType == LaraWeaponType::HK ||
 							Lara.Control.Weapon.GunType == LaraWeaponType::Revolver)
@@ -146,9 +151,7 @@ namespace TEN::Entities::TR4
 					}
 					else
 					{
-						item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + MUMMY_ANIM_COLLAPSE_START;
-						item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-						item->Animation.ActiveState = MUMMY_STATE_COLLAPSE;
+						SetAnimation(item, MUMMY_ANIM_COLLAPSE_START);
 						item->Pose.Orientation.y += AI.angle;
 						creature->MaxTurn = 0;
 					}
@@ -157,8 +160,8 @@ namespace TEN::Entities::TR4
 		}
 		else
 		{
-			GetCreatureMood(item, &AI, VIOLENT);
-			CreatureMood(item, &AI, VIOLENT);
+			GetCreatureMood(item, &AI, true);
+			CreatureMood(item, &AI, true);
 
 			angle = CreatureTurn(item, creature->MaxTurn);
 
@@ -173,12 +176,12 @@ namespace TEN::Entities::TR4
 			{
 			case MUMMY_STATE_IDLE:
 				creature->MaxTurn = 0;
-				creature->Flags = 0;
+				creature->Flags = NULL;
 
-				if (AI.distance <= pow(MUMMY_IDLE_SWIPE_ATTACK_RANGE, 2) ||
-					AI.distance >= pow(MUMMY_AWARE_RANGE, 2))
+				if (AI.distance <= MUMMY_IDLE_SWIPE_ATTACK_RANGE ||
+					AI.distance >= MUMMY_AWARE_RANGE)
 				{
-					if (AI.distance - pow(MUMMY_IDLE_SWIPE_ATTACK_RANGE, 2) <= 0)
+					if (AI.distance - MUMMY_IDLE_SWIPE_ATTACK_RANGE <= 0)
 						item->Animation.TargetState = MUMMY_STATE_IDLE_SWIPE_ATTACK;
 					else
 					{
@@ -202,15 +205,15 @@ namespace TEN::Entities::TR4
 					creature->MaxTurn = 0;
 
 					if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameEnd)
-						item->TriggerFlags = 0;
+						item->TriggerFlags = NULL;
 				}
 				else
 				{
 					creature->MaxTurn = MUMMY_WALK_TURN_ANGLE;
 
-					if (AI.distance >= pow(MUMMY_ARMS_UP_RANGE, 2))
+					if (AI.distance >= MUMMY_ARMS_UP_RANGE)
 					{
-						if (AI.distance > pow(MUMMY_AWARE_RANGE, 2))
+						if (AI.distance > MUMMY_AWARE_RANGE)
 							item->Animation.TargetState = MUMMY_STATE_IDLE;
 					}
 					else
@@ -221,23 +224,23 @@ namespace TEN::Entities::TR4
 
 			case MUMMY_STATE_WALK_FORWARD_ARMS_UP:
 				creature->MaxTurn = MUMMY_WALK_TURN_ANGLE;
-				creature->Flags = 0;
+				creature->Flags = NULL;
 
-				if (AI.distance < pow(MUMMY_IDLE_SWIPE_ATTACK_RANGE, 2))
+				if (AI.distance < MUMMY_IDLE_SWIPE_ATTACK_RANGE)
 				{
 					item->Animation.TargetState = MUMMY_STATE_IDLE;
 					break;
 				}
 
-				if (AI.distance > pow(MUMMY_ARMS_UP_RANGE, 2) && AI.distance < pow(MUMMY_AWARE_RANGE, 2))
+				if (AI.distance > MUMMY_ARMS_UP_RANGE && AI.distance < MUMMY_AWARE_RANGE)
 				{
 					item->Animation.TargetState = MUMMY_STATE_WALK_FORWARD;
 					break;
 				}
 
-				if (AI.distance <= pow(MUMMY_WALK_FORWARD_SWIPE_ATTACK_RANGE, 2))
+				if (AI.distance <= MUMMY_WALK_SWIPE_ATTACK_RANGE)
 					item->Animation.TargetState = MUMMY_STATE_WALK_FORWARD_SWIPE_ATTACK;
-				else if (AI.distance > pow(MUMMY_AWARE_RANGE, 2))
+				else if (AI.distance > MUMMY_AWARE_RANGE)
 					item->Animation.TargetState = MUMMY_STATE_IDLE;
 
 				break;
@@ -245,19 +248,19 @@ namespace TEN::Entities::TR4
 			case MUMMY_STATE_INACTIVE_ARMS_CROSSED:
 				creature->MaxTurn = 0;
 
-				if (AI.distance < pow(MUMMY_ACTIVATE_RANGE, 2) || item->TriggerFlags > -1)
+				if (AI.distance < MUMMY_ACTIVATE_RANGE || item->TriggerFlags > -1)
 					item->Animation.TargetState = MUMMY_STATE_WALK_FORWARD;
 
 				break;
 
-			case MUMMY_INACTIVE_STATE_LYING_DOWN:
+			case MUMMY_STATE_INACTIVE_LYING_DOWN:
 				item->HitPoints = 0;
 				creature->MaxTurn = 0;
 				joint0 = 0;
 				joint1 = 0;
 				joint2 = 0;
 
-				if (AI.distance < pow(MUMMY_ACTIVATE_RANGE, 2) || !(GetRandomControl() & 0x7F))
+				if (AI.distance < MUMMY_ACTIVATE_RANGE || TestProbability(0.008f))
 				{
 					item->Animation.TargetState = MUMMY_STATE_COLLAPSED_TO_IDLE;
 					item->HitPoints = Objects[item->ObjectNumber].HitPoints;
@@ -286,26 +289,12 @@ namespace TEN::Entities::TR4
 						if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase &&
 							item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].frameEnd)
 						{
-							DoDamage(creature->Enemy, 100);
+							DoDamage(creature->Enemy, MUMMY_ATTACK_DAMAGE);
 
 							if (item->Animation.AnimNumber == Objects[item->ObjectNumber].animIndex + MUMMY_ANIM_IDLE_SWIPE_ATTACK_LEFT)
-							{
-								CreatureEffect2(
-									item,
-									&MummyBite1,
-									5,
-									-1,
-									DoBloodSplat);
-							}
+								CreatureEffect2(item, MummyBite1, 5, -1, DoBloodSplat);
 							else
-							{
-								CreatureEffect2(
-									item,
-									&MummyBite2,
-									5,
-									-1,
-									DoBloodSplat);
-							}
+								CreatureEffect2(item, MummyBite2, 5, -1, DoBloodSplat);
 
 							creature->Flags = 1;
 						}

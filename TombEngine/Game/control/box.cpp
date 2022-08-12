@@ -8,14 +8,15 @@
 #include "Game/control/control.h"
 #include "Game/control/lot.h"
 #include "Game/effects/tomb4fx.h"
+#include "Game/itemdata/creature_info.h"
 #include "Game/Lara/lara.h"
+#include "Game/Lara/lara_helpers.h"
 #include "Game/items.h"
 #include "Game/misc.h"
 #include "Game/room.h"
 #include "Specific/setup.h"
 #include "Specific/trmath.h"
 #include "Objects/objectslist.h"
-#include "Game/itemdata/creature_info.h"
 #include "Objects/TR5/Object/tr5_pushableblock.h"
 #include "Renderer/Renderer11.h"
 
@@ -296,15 +297,33 @@ void CreatureKill(ItemInfo* item, int killAnim, int killState, int laraKillState
 	*/
 }
 
-short CreatureEffect2(ItemInfo* item, BITE_INFO* bite, short damage, short angle, std::function<CreatureEffectFunction> func)
+short CreatureEffect2(ItemInfo* item, BiteInfo bite, short velocity, short angle, std::function<CreatureEffectFunction> func)
+{
+	auto pos = Vector3Int(bite.x, bite.y, bite.z);
+	GetJointAbsPosition(item, &pos, bite.meshNum);
+
+	return func(pos.x, pos.y, pos.z, velocity, angle, item->RoomNumber);
+}
+
+// TODO: Replace with above version.
+short CreatureEffect2(ItemInfo* item, BiteInfo* bite, short velocity, short angle, std::function<CreatureEffectFunction> func)
 {
 	auto pos = Vector3Int(bite->x, bite->y, bite->z);
 	GetJointAbsPosition(item, &pos, bite->meshNum);
 
-	return func(pos.x, pos.y, pos.z, damage, angle, item->RoomNumber);
+	return func(pos.x, pos.y, pos.z, velocity, angle, item->RoomNumber);
 }
 
-short CreatureEffect(ItemInfo* item, BITE_INFO* bite, std::function<CreatureEffectFunction> func)
+short CreatureEffect(ItemInfo* item, BiteInfo bite, std::function<CreatureEffectFunction> func)
+{
+	auto pos = Vector3Int(bite.x, bite.y, bite.z);
+	GetJointAbsPosition(item, &pos, bite.meshNum);
+
+	return func(pos.x, pos.y, pos.z, item->Animation.Velocity, item->Pose.Orientation.y, item->RoomNumber);
+}
+
+// TODO: Replace with above version.
+short CreatureEffect(ItemInfo* item, BiteInfo* bite, std::function<CreatureEffectFunction> func)
 {
 	auto pos = Vector3Int(bite->x, bite->y, bite->z);
 	GetJointAbsPosition(item, &pos, bite->meshNum);
@@ -1436,6 +1455,7 @@ void CreatureAIInfo(ItemInfo* item, AI_INFO* AI)
 	auto* creature = GetCreatureInfo(item);
 	auto* object = &Objects[item->ObjectNumber];
 
+	// TODO
 	auto* enemy = creature->Enemy;
 	if (!enemy)
 	{
@@ -1475,7 +1495,7 @@ void CreatureAIInfo(ItemInfo* item, AI_INFO* AI)
 		auto probe = GetCollision(floor, enemy->Pose.Position.x, enemy->Pose.Position.y, enemy->Pose.Position.z);
 		auto bounds = GetBoundsAccurate(item);
 
-		reachable = abs(enemy->Pose.Position.y - probe.Position.Floor) < abs(bounds->Y2 - bounds->Y1);
+		reachable = abs(enemy->Pose.Position.y - probe.Position.Floor) < bounds->Height();
 	}
 
 	if (floor && reachable)
@@ -1532,8 +1552,11 @@ void CreatureAIInfo(ItemInfo* item, AI_INFO* AI)
 	vector.z = abs(vector.z);
 
 	// Makes Lara smaller.
-	if (enemy == LaraItem && ((LaraInfo*)enemy)->Control.IsLow)
-		vector.y -= STEPUP_HEIGHT;
+	if (enemy->IsLara())
+	{
+		if (GetLaraInfo(enemy)->Control.IsLow)
+			vector.y -= STEPUP_HEIGHT;
+	}
 
 	if (vector.x > vector.z)
 		AI->xAngle = phd_atan(vector.x + (vector.z >> 1), vector.y);
@@ -1544,7 +1567,7 @@ void CreatureAIInfo(ItemInfo* item, AI_INFO* AI)
 	AI->bite = (AI->ahead && enemy->HitPoints > 0 && abs(enemy->Pose.Position.y - item->Pose.Position.y) <= CLICK(2));
 }
 
-void CreatureMood(ItemInfo* item, AI_INFO* AI, int violent)
+void CreatureMood(ItemInfo* item, AI_INFO* AI, bool isViolent)
 {
 	if (!item->Data)
 		return;
@@ -1592,7 +1615,7 @@ void CreatureMood(ItemInfo* item, AI_INFO* AI, int violent)
 			{
 				if (EscapeBox(item, enemy, boxNumber))
 					TargetBox(LOT, boxNumber);
-				else if (AI->zoneNumber == AI->enemyZone && StalkBox(item, enemy, boxNumber) && !violent)
+				else if (AI->zoneNumber == AI->enemyZone && StalkBox(item, enemy, boxNumber) && !isViolent)
 				{
 					TargetBox(LOT, boxNumber);
 					creature->Mood = MoodType::Stalk;
@@ -1694,7 +1717,7 @@ void CreatureMood(ItemInfo* item, AI_INFO* AI, int violent)
 	}
 }
 
-void GetCreatureMood(ItemInfo* item, AI_INFO* AI, int isViolent)
+void GetCreatureMood(ItemInfo* item, AI_INFO* AI, bool isViolent)
 {
 	if (!item->Data)
 		return;

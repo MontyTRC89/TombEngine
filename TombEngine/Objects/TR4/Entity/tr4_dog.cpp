@@ -1,28 +1,32 @@
 #include "framework.h"
-#include "tr4_dog.h"
-#include "Game/control/box.h"
-#include "Game/effects/effects.h"
-#include "Specific/setup.h"
-#include "Specific/level.h"
-#include "Game/Lara/lara.h"
-#include "Game/itemdata/creature_info.h"
-#include "Game/control/control.h"
-#include "Game/items.h"
-#include "Game/misc.h"
+#include "Objects/TR4/Entity/tr4_dog.h"
 
+#include "Game/control/box.h"
+#include "Game/control/control.h"
+#include "Game/effects/effects.h"
+#include "Game/itemdata/creature_info.h"
+#include "Game/items.h"
+#include "Game/Lara/lara.h"
+#include "Game/misc.h"
+#include "Specific/level.h"
+#include "Specific/prng.h"
+#include "Specific/setup.h"
+
+using namespace TEN::Math::Random;
 using std::vector;
 
 namespace TEN::Entities::TR4
 {
-	BITE_INFO DogBite = { 0, 0, 100, 3 };
+	constexpr auto DOG_BITE_ATTACK_DAMAGE = 10;
+	constexpr auto DOG_JUMP_ATTACK_DAMAGE = 20;
+
+	constexpr auto DOG_BITE_ATTACK_RANGE = SQUARE(SECTOR(0.55));
+	constexpr auto DOG_JUMP_ATTACK_RANGE = SQUARE(SECTOR(1));
+	
+	const auto DogBite = BiteInfo(Vector3(0.0f, 0.0f, 100.0f), 3.0f);
 	const vector<int> DogJumpAttackJoints = { 3, 6, 9, 10, 13, 14 };
 	const vector<int> DogBiteAttackJoints = { 3, 6 };
 
-	constexpr auto DOG_BITE_ATTACK_DAMAGE = 10;
-	constexpr auto DOG_JUMP_ATTACK_DAMAGE = 20;
-	constexpr auto DOG_BITE_ATTACK_RANGE = SECTOR(0.55);
-	constexpr auto DOG_JUMP_ATTACK_RANGE = SECTOR(1);
-	
 	enum DogState
 	{
 		DOG_STATE_NONE = 0,
@@ -34,7 +38,7 @@ namespace TEN::Entities::TR4
 		DOG_STATE_HOWL = 7,
 		DOG_STATE_SLEEP = 8,
 		DOG_STATE_STALK_IDLE = 9,
-		DOG_STATE_RUN_FORWARD_RIGHT = 10,	// Unused.
+		DOG_STATE_RUN_FORWARD_RIGHT = 10, // Unused.
 		DOG_STATE_DEATH = 11,
 		DOG_STATE_BITE_ATTACK = 12
 	};
@@ -59,7 +63,7 @@ namespace TEN::Entities::TR4
 		DOG_ANIM_RUN_FORWARD_TO_STALK_IDLE = 15,
 		DOG_ANIM_HOWL = 16,
 		DOG_ANIM_IDLE_TO_STALK_IDLE = 17,
-		DOG_ANIM_RUN_FORWARD_RIGHT = 18,	// Unused.
+		DOG_ANIM_RUN_FORWARD_RIGHT = 18, // Unused.
 		DOG_ANIM_WALK_FORWARD_TO_IDLE = 19,
 		DOG_ANIM_DEATH_1 = 20,
 		DOG_ANIM_DEATH_2 = 21,
@@ -68,23 +72,20 @@ namespace TEN::Entities::TR4
 		DOG_ANIM_STALK_IDLE_TO_IDLE = 24
 	};
 
-	int DeathAnims[] = { DOG_ANIM_DEATH_1, DOG_ANIM_DEATH_2, DOG_ANIM_DEATH_3, DOG_ANIM_DEATH_1 };
+	const std::array DogDeathAnims = { DOG_ANIM_DEATH_1, DOG_ANIM_DEATH_2, DOG_ANIM_DEATH_3 };
 
 	void InitialiseTr4Dog(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		item->Animation.ActiveState = DOG_STATE_IDLE;
-		item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + DOG_ANIM_IDLE;
-
 		// OCB 1 makes the dog sitting down until fired
 		if (item->TriggerFlags)
 		{
-			item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + DOG_ANIM_AWAKEN;
+			SetAnimation(item, DOG_ANIM_AWAKEN);
 			item->Status -= ITEM_INVISIBLE;
 		}
-
-		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+		else
+			SetAnimation(item, DOG_ANIM_IDLE);
 	}
 
 	void Tr4DogControl(short itemNumber)
@@ -106,11 +107,7 @@ namespace TEN::Entities::TR4
 			if (item->Animation.AnimNumber == object->animIndex + 1)
 				item->HitPoints = object->HitPoints;
 			else if (item->Animation.ActiveState != DOG_STATE_DEATH)
-			{
-				item->Animation.AnimNumber = object->animIndex + DeathAnims[GetRandomControl() & 3];
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-				item->Animation.ActiveState = DOG_STATE_DEATH;
-			}
+				SetAnimation(item, DogDeathAnims[GenerateInt(0, DogDeathAnims.size() - 1)]);
 		}
 		else
 		{
@@ -123,7 +120,7 @@ namespace TEN::Entities::TR4
 			CreatureAIInfo(item, &AI);
 
 			int distance;
-			if (creature->Enemy == LaraItem)
+			if (creature->Enemy->IsLara())
 			{
 				distance = AI.distance;
 			}
@@ -141,8 +138,8 @@ namespace TEN::Entities::TR4
 				joint1 = AI.angle;
 			}
 
-			GetCreatureMood(item, &AI, VIOLENT);
-			CreatureMood(item, &AI, VIOLENT);
+			GetCreatureMood(item, &AI, true);
+			CreatureMood(item, &AI, true);
 
 			if (creature->Mood == MoodType::Bored)
 				creature->MaxTurn /= 2;
@@ -156,7 +153,6 @@ namespace TEN::Entities::TR4
 				item->AIBits &= ~MODIFY;
 			}
 
-			short random = GetRandomControl();
 			int frame = item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase;
 
 			switch (item->Animation.ActiveState)
@@ -173,7 +169,7 @@ namespace TEN::Entities::TR4
 					creature->Flags++;
 					creature->MaxTurn = 0;
 
-					if (creature->Flags > 300 && random < 128)
+					if (creature->Flags > 300 && TestProbability(0.004f))
 						item->Animation.TargetState = DOG_STATE_IDLE;
 				}
 
@@ -194,7 +190,7 @@ namespace TEN::Entities::TR4
 				{
 					joint1 = AIGuard(creature);
 
-					if (GetRandomControl() & 0xFF)
+					if (TestProbability(0.996f))
 						break;
 
 					if (item->Animation.ActiveState == DOG_STATE_IDLE)
@@ -205,7 +201,8 @@ namespace TEN::Entities::TR4
 				}
 				else
 				{
-					if (item->Animation.ActiveState == DOG_STATE_STALK_IDLE && random < 128)
+					if (item->Animation.ActiveState == DOG_STATE_STALK_IDLE &&
+						TestProbability(0.004f))
 					{
 						item->Animation.TargetState = DOG_STATE_IDLE;
 						break;
@@ -243,25 +240,25 @@ namespace TEN::Entities::TR4
 						break;
 					}
 
-					creature->Flags = 0;
 					creature->MaxTurn = ANGLE(1.0f);
+					creature->Flags = NULL;
 
-					if (random < 256)
+					if (TestProbability(0.008f))
 					{
 						if (item->AIBits & MODIFY)
 						{
 							if (item->Animation.ActiveState == DOG_STATE_IDLE)
 							{
 								item->Animation.TargetState = DOG_STATE_SLEEP;
-								creature->Flags = 0;
+								creature->Flags = NULL;
 								break;
 							}
 						}
 					}
 
-					if (random >= 4096)
+					if (TestProbability(0.875f))
 					{
-						if (!(random & 0x1F))
+						if (TestProbability(0.03f))
 							item->Animation.TargetState = DOG_STATE_HOWL;
 
 						break;
@@ -282,7 +279,7 @@ namespace TEN::Entities::TR4
 
 				if (item->AIBits & PATROL1)
 					item->Animation.TargetState = DOG_STATE_WALK_FORWARD;
-				else if (creature->Mood == MoodType::Bored && random < 256)
+				else if (creature->Mood == MoodType::Bored && TestProbability(0.008f))
 					item->Animation.TargetState = DOG_STATE_IDLE;
 				else
 					item->Animation.TargetState = DOG_STATE_STALK;
@@ -299,7 +296,7 @@ namespace TEN::Entities::TR4
 				}
 				else if (creature->Mood != MoodType::Bored)
 				{
-					if (AI.bite && AI.distance < pow(DOG_JUMP_ATTACK_RANGE, 2))
+					if (AI.bite && AI.distance < DOG_JUMP_ATTACK_RANGE)
 						item->Animation.TargetState = DOG_STATE_JUMP_ATTACK;
 					else if (AI.distance < pow(SECTOR(1.5f), 2))
 					{
@@ -319,7 +316,7 @@ namespace TEN::Entities::TR4
 				{
 					if (creature->Mood == MoodType::Escape)
 						item->Animation.TargetState = DOG_STATE_RUN_FORWARD;
-					else if (AI.bite && AI.distance < pow(DOG_BITE_ATTACK_RANGE, 2))
+					else if (AI.bite && AI.distance < DOG_BITE_ATTACK_RANGE)
 					{
 						item->Animation.TargetState = DOG_STATE_BITE_ATTACK;
 						item->Animation.RequiredState = DOG_STATE_STALK;
@@ -333,13 +330,11 @@ namespace TEN::Entities::TR4
 				break;
 
 			case DOG_STATE_JUMP_ATTACK:
-				if (AI.bite &&
-					item->TestBits(JointBitType::Touch, DogJumpAttackJoints) &&
-					frame >= 4 &&
-					frame <= 14)
+				if (AI.bite && item->TestBits(JointBitType::Touch, DogJumpAttackJoints) &&
+					frame >= 4 && frame <= 14)
 				{
 					DoDamage(creature->Enemy, DOG_JUMP_ATTACK_DAMAGE);
-					CreatureEffect2(item, &DogBite, 2, -1, DoBloodSplat);
+					CreatureEffect2(item, DogBite, 2, -1, DoBloodSplat);
 				}
 
 				item->Animation.TargetState = DOG_STATE_RUN_FORWARD;
@@ -351,15 +346,11 @@ namespace TEN::Entities::TR4
 				break;
 
 			case DOG_STATE_BITE_ATTACK:
-				if (AI.bite &&
-					item->TestBits(JointBitType::Touch, DogBiteAttackJoints) &&
-					(frame >= 9 &&
-						frame <= 12 ||
-						frame >= 22 &&
-						frame <= 25))
+				if (AI.bite && item->TestBits(JointBitType::Touch, DogBiteAttackJoints) &&
+					((frame >= 9 && frame <= 12) || (frame >= 22 && frame <= 25)))
 				{
 					DoDamage(creature->Enemy, DOG_BITE_ATTACK_DAMAGE);
-					CreatureEffect2(item, &DogBite, 2, -1, DoBloodSplat);
+					CreatureEffect2(item, DogBite, 2, -1, DoBloodSplat);
 				}
 
 				break;

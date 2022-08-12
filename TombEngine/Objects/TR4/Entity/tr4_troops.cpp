@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "tr4_troops.h"
+#include "Objects/TR4/Entity/tr4_troops.h"
 
 #include "Game/control/box.h"
 #include "Game/control/lot.h"
@@ -13,11 +13,14 @@
 #include "Game/animation.h"
 #include "Game/misc.h"
 #include "Specific/level.h"
+#include "Specific/prng.h"
 #include "Specific/setup.h"
+
+using namespace TEN::Math::Random;
 
 namespace TEN::Entities::TR4
 {
-	BITE_INFO TroopsBite1 = { 0, 300, 64, 7 };
+	const auto TroopsBite1 = BiteInfo(Vector3(0.0f, 300.0f, 64.0f), 7);
 
 	enum TroopState
 	{
@@ -160,7 +163,7 @@ namespace TEN::Entities::TR4
 						if (currentItem->ObjectNumber != ID_LARA)
 						{
 							if (currentItem->ObjectNumber != ID_TROOPS &&
-								(currentItem != LaraItem || creature->HurtByLara))
+								(!currentItem->IsLara() || creature->HurtByLara))
 							{
 								dx = currentItem->Pose.Position.x - item->Pose.Position.x;
 								dy = currentItem->Pose.Position.y - item->Pose.Position.y;
@@ -186,7 +189,7 @@ namespace TEN::Entities::TR4
 			CreatureAIInfo(item, &AI);
 
 			int distance = 0;
-			if (creature->Enemy == LaraItem)
+			if (creature->Enemy->IsLara())
 			{
 				distance = AI.distance;
 				rot = AI.angle;
@@ -199,11 +202,11 @@ namespace TEN::Entities::TR4
 				rot = phd_atan(dz, dx) - item->Pose.Orientation.y;
 			}
 
-			if (!creature->HurtByLara && creature->Enemy == LaraItem)
+			if (!creature->HurtByLara && creature->Enemy->IsLara())
 				creature->Enemy = nullptr;
 
-			GetCreatureMood(item, &AI, TIMID);
-			CreatureMood(item, &AI, TIMID);
+			GetCreatureMood(item, &AI, false);
+			CreatureMood(item, &AI, false);
 
 			// Vehicle handling
 			if (Lara.Vehicle != NO_ITEM && AI.bite)
@@ -238,6 +241,7 @@ namespace TEN::Entities::TR4
 				{
 					joint2 = AIGuard(creature);
 
+					// TODO: Use TestProbability().
 					if (!GetRandomControl())
 					{
 						if (item->Animation.ActiveState == TROOP_STATE_IDLE)
@@ -257,7 +261,7 @@ namespace TEN::Entities::TR4
 				{
 					if (AI.distance < pow(SECTOR(3), 2) || AI.zoneNumber != AI.enemyZone)
 					{
-						if (GetRandomControl() >= 16384)
+						if (TestProbability(0.5f))
 							item->Animation.TargetState = TROOP_STATE_AIM_3;
 						else
 							item->Animation.TargetState = TROOP_STATE_AIM_1;
@@ -356,6 +360,7 @@ namespace TEN::Entities::TR4
 
 				if (item->AIBits & GUARD)
 				{
+					// TODO: Use TestProbability().
 					joint2 = AIGuard(creature);
 					if (!GetRandomControl())
 						item->Animation.TargetState = TROOP_STATE_IDLE;
@@ -380,7 +385,7 @@ namespace TEN::Entities::TR4
 				else
 				{
 					creature->FiredWeapon = 1;
-					ShotLara(item, &AI, &TroopsBite1, joint0, 23);
+					ShotLara(item, &AI, TroopsBite1, joint0, 23);
 					creature->Flags = 5;
 				}
 
@@ -439,7 +444,7 @@ namespace TEN::Entities::TR4
 				else
 				{
 					creature->FiredWeapon = 1;
-					ShotLara(item, &AI, &TroopsBite1, joint0, 23);
+					ShotLara(item, &AI, TroopsBite1, joint0, 23);
 					creature->Flags = 5;
 				}
 
@@ -450,7 +455,7 @@ namespace TEN::Entities::TR4
 				break;
 
 			case TROOP_STATE_FLASHED:
-				if (!FlashGrenadeAftershockTimer && !(GetRandomControl() & 0x7F))
+				if (!FlashGrenadeAftershockTimer && TestProbability(0.008f))
 					item->Animation.TargetState = TROOP_STATE_GUARD;
 
 				break;
