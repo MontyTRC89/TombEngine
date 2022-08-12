@@ -220,7 +220,7 @@ namespace TEN::Entities::TR5
 			case GLADIATOR_STATE_WALK_FORWARD:
 				joint2 = rot;
 				creature->MaxTurn = creature->Mood != MoodType::Bored ? ANGLE(7.0f) : ANGLE(2.0f);
-				creature->Flags = NULL;
+				creature->Flags = 0;
 
 				if (item->AIBits & PATROL1)
 				{

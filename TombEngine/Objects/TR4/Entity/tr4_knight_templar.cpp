@@ -135,7 +135,7 @@ namespace TEN::Entities::TR4
 		case KTEMPLAR_STATE_IDLE:
 			item->Animation.TargetState = KTEMPLAR_STATE_WALK_FORWARD;
 			creature->MaxTurn = KTEMPLAR_IDLE_TURN_RATE_MAX;
-			creature->Flags = NULL;
+			creature->Flags = 0;
 
 			if (AI.distance > pow(SECTOR(0.67f), 2))
 			{

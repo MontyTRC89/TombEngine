@@ -147,7 +147,7 @@ namespace TEN::Entities::TR2
 				break;
 
 			case BMONSTER_STATE_SLAM_ATTACK_START:
-				creature->Flags = NULL;
+				creature->Flags = 0;
 
 				if (AI.ahead && AI.distance < BIRD_MONSTER_SLAM_CRUSH_ATTACK_RANGE)
 					item->Animation.TargetState = BMONSTER_STATE_SLAM_ATTACK_CONTINUE;
@@ -157,7 +157,7 @@ namespace TEN::Entities::TR2
 				break;
 
 			case BMONSTER_STATE_PUNCH_ATTACK_START:
-				creature->Flags = NULL;
+				creature->Flags = 0;
 
 				if (AI.ahead && AI.distance < BIRD_MONSTER_PUNCH_ATTACK_RANGE)
 					item->Animation.TargetState = BMONSTER_STATE_PUNCH_ATTACK_RIGHT_CONTINUE;
@@ -167,7 +167,7 @@ namespace TEN::Entities::TR2
 				break;
 
 			case BMONSTER_STATE_CRUSH_ATTACK_START:
-				creature->Flags = NULL;
+				creature->Flags = 0;
 
 				if (AI.ahead && AI.distance < BIRD_MONSTER_SLAM_CRUSH_ATTACK_RANGE)
 					item->Animation.TargetState = BMONSTER_STATE_CRUSH_ATTACK_CONTINUE;

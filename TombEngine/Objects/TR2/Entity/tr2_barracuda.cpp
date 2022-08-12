@@ -92,7 +92,7 @@ namespace TEN::Entities::TR2
 			switch (item->Animation.ActiveState)
 			{
 			case BARRACUDA_STATE_IDLE:
-				creature->Flags = NULL;
+				creature->Flags = 0;
 
 				if (creature->Mood == MoodType::Bored)
 					item->Animation.TargetState = BARRACUDA_STATE_SWIM_SLOW;
@@ -119,7 +119,7 @@ namespace TEN::Entities::TR2
 
 			case BARRACUDA_STATE_SWIM_FAST:
 				creature->MaxTurn = ANGLE(4.0f);
-				creature->Flags = NULL;
+				creature->Flags = 0;
 
 				if (creature->Mood == MoodType::Bored)
 					item->Animation.TargetState = BARRACUDA_STATE_SWIM_SLOW;

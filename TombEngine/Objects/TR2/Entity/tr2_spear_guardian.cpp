@@ -85,7 +85,7 @@ namespace TEN::Entities::TR2
 
 			if (!item->MeshBits)
 			{
-				SoundEffect(SFX_TR4_EXPLOSION1, NULL);
+				SoundEffect(SFX_TR4_EXPLOSION1, nullptr);
 				// TODO: exploding death
 			}
 
