@@ -12,6 +12,7 @@ Version 1.0.1
 - Fixed rollingball incorrectly killing Lara in water and in jump.
 - Fixed resurfacing on underwater death.
 - Fixed ripples not appearing on water connections higher than room bottom.
+- Fixed crashes when loading image files are missing.
 - Prevent title music audio from starting in a random place.
 - Update harpoon speed on room change.
 - Timer.Create now lets you choose the units to display remaining time.
