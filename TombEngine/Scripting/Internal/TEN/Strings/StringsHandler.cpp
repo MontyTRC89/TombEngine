@@ -88,7 +88,7 @@ void StringsHandler::ProcessDisplayStrings(float dt)
 	while (it != std::end(m_userDisplayStrings))
 	{
 		auto& str = it->second;
-		bool endOfLife = (0.0f >= str.m_timeRemaining);
+		bool endOfLife = 0.0f >= str.m_timeRemaining;
 		if (str.m_deleteWhenZero && endOfLife)
 		{
 			ScriptAssertF(!str.m_isInfinite, "The infinite string {} (key \"{}\") went out of scope without being hidden.", it->first, str.m_key);
@@ -115,4 +115,10 @@ void StringsHandler::ProcessDisplayStrings(float dt)
 		}
 	}
 }
+
+void StringsHandler::ClearDisplayStrings()
+{
+	m_userDisplayStrings.clear();
+}
+
 
