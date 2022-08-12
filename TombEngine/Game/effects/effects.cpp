@@ -1214,19 +1214,11 @@ void SetupRipple(int x, int y, int z, int size, int flags)
 
 void WadeSplash(ItemInfo* item, int wh, int wd)
 {
-	short roomNumber = item->RoomNumber;
-	GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNumber);
-
-	auto* room = &g_Level.Rooms[roomNumber];
-	if (!TestEnvironment(ENV_FLAG_WATER, room))
-		return;
-
-	short roomNumber2 = item->RoomNumber;
-	GetFloor(item->Pose.Position.x, room->y - 128, item->Pose.Position.z, &roomNumber2);
-
-	auto* room2 = &g_Level.Rooms[roomNumber2];
-
-	if (TestEnvironment(ENV_FLAG_WATER, room2))
+	auto probe1 = GetCollision(item);
+	auto probe2 = GetCollision(probe1.Block, item->Pose.Position.x, probe1.Position.Ceiling, item->Pose.Position.z);
+	
+	if (!TestEnvironment(ENV_FLAG_WATER, probe1.RoomNumber) ||
+		 TestEnvironment(ENV_FLAG_WATER, probe1.RoomNumber) == TestEnvironment(ENV_FLAG_WATER, probe2.RoomNumber))
 		return;
 
 	auto* frame = GetBestFrame(item);
@@ -1256,7 +1248,7 @@ void WadeSplash(ItemInfo* item, int wh, int wd)
 		SplashSetup.z = item->Pose.Position.z;
 		SplashSetup.innerRadius = 16;
 		SplashSetup.splashPower = item->Animation.Velocity;
-		SetupSplash(&SplashSetup, roomNumber);
+		SetupSplash(&SplashSetup, probe1.RoomNumber);
 		SplashCount = 16;
 	}
 }
