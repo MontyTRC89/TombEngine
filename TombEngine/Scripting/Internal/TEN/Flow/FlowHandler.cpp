@@ -244,8 +244,9 @@ bool FlowHandler::DoFlow()
 			}
 			catch (TENScriptException const& e)
 			{
-				std::string msg = std::string{ "An unrecoverable error occurred in " } + __func__ + ": " + e.what();
+				std::string msg = std::string{ "A Lua error occurred while running the title level; " } + __func__ + ": " + e.what();
 				TENLog(msg, LogLevel::Error, LogConfig::All);
+				ShutdownTENLog();
 				throw;
 			}
 		}
@@ -277,7 +278,7 @@ bool FlowHandler::DoFlow()
 			}
 			catch (TENScriptException const& e) 
 			{
-				std::string msg = std::string{ "An unrecoverable error occurred in " } + __func__ + ": " + e.what();
+				std::string msg = std::string{ "A Lua error occurred while running a level; " } + __func__ + ": " + e.what();
 				TENLog(msg, LogLevel::Error, LogConfig::All);
 				status = GameStatus::ExitToTitle;
 			}

@@ -290,7 +290,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	}
 	catch (TENScriptException const& e)
 	{
-		std::string msg = std::string{ "An unrecoverable error occurred in " } + __func__ + ": " + e.what();
+		std::string msg = std::string{ "A Lua error occurred while setting up scripts; " } + __func__ + ": " + e.what();
 		TENLog(msg, LogLevel::Error, LogConfig::All);
 		ShutdownTENLog();
 		return 0;
