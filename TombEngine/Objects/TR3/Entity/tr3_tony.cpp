@@ -97,7 +97,7 @@ namespace TEN::Entities::TR3
 			fx->pos.Orientation.z = 0;
 			fx->objectNumber = ID_TONY_BOSS_FLAME;
 			fx->speed = flame.speed;
-			fx->shade = 0;
+			fx->color = Vector4::Zero;
 			fx->flag1 = flame.type;
 			fx->flag2 = (GetRandomControl() & 3) + 1;
 
