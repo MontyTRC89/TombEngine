@@ -147,6 +147,9 @@ namespace TEN::Renderer
 				totalIndices += bucket.numQuads * 6 + bucket.numTriangles * 3;
 			}
 
+		if (!totalVertices || !totalIndices)
+			throw std::exception("Level has no textured room geometry.");
+
 		roomsVertices.resize(totalVertices);
 		roomsIndices.resize(totalIndices);
 

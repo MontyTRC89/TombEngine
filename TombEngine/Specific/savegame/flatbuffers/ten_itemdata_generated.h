@@ -559,9 +559,9 @@ struct Position::Traits {
 
 FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(4) Vector3 FLATBUFFERS_FINAL_CLASS {
  private:
-  int32_t x_;
-  int32_t y_;
-  int32_t z_;
+  float x_;
+  float y_;
+  float z_;
 
  public:
   struct Traits;
@@ -570,18 +570,18 @@ FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(4) Vector3 FLATBUFFERS_FINAL_CLASS {
         y_(0),
         z_(0) {
   }
-  Vector3(int32_t _x, int32_t _y, int32_t _z)
+  Vector3(float _x, float _y, float _z)
       : x_(flatbuffers::EndianScalar(_x)),
         y_(flatbuffers::EndianScalar(_y)),
         z_(flatbuffers::EndianScalar(_z)) {
   }
-  int32_t x() const {
+  float x() const {
     return flatbuffers::EndianScalar(x_);
   }
-  int32_t y() const {
+  float y() const {
     return flatbuffers::EndianScalar(y_);
   }
-  int32_t z() const {
+  float z() const {
     return flatbuffers::EndianScalar(z_);
   }
 };
@@ -593,10 +593,10 @@ struct Vector3::Traits {
 
 FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(4) Vector4 FLATBUFFERS_FINAL_CLASS {
  private:
-  int32_t x_;
-  int32_t y_;
-  int32_t z_;
-  int32_t w_;
+  float x_;
+  float y_;
+  float z_;
+  float w_;
 
  public:
   struct Traits;
@@ -606,22 +606,22 @@ FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(4) Vector4 FLATBUFFERS_FINAL_CLASS {
         z_(0),
         w_(0) {
   }
-  Vector4(int32_t _x, int32_t _y, int32_t _z, int32_t _w)
+  Vector4(float _x, float _y, float _z, float _w)
       : x_(flatbuffers::EndianScalar(_x)),
         y_(flatbuffers::EndianScalar(_y)),
         z_(flatbuffers::EndianScalar(_z)),
         w_(flatbuffers::EndianScalar(_w)) {
   }
-  int32_t x() const {
+  float x() const {
     return flatbuffers::EndianScalar(x_);
   }
-  int32_t y() const {
+  float y() const {
     return flatbuffers::EndianScalar(y_);
   }
-  int32_t z() const {
+  float z() const {
     return flatbuffers::EndianScalar(z_);
   }
-  int32_t w() const {
+  float w() const {
     return flatbuffers::EndianScalar(w_);
   }
 };
