@@ -1,4 +1,7 @@
 #pragma once
 
-void InitialiseYeti(short itemNumber);
-void YetiControl(short itemNumber);
+namespace TEN::Entities::TR2
+{
+	void InitialiseYeti(short itemNumber);
+	void YetiControl(short itemNumber);
+}

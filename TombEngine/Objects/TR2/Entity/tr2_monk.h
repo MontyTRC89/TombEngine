@@ -1,3 +1,6 @@
 #pragma once
 
-void MonkControl(short itemNumber);
+namespace TEN::Entities::TR2
+{
+	void MonkControl(short itemNumber);
+}

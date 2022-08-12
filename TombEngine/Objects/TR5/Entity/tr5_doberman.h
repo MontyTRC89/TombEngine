@@ -1,4 +1,7 @@
 #pragma once
 
-void InitialiseDoberman(short itemNumber);
-void DobermanControl(short itemNumber);
+namespace TEN::Entities::TR5
+{
+	void InitialiseDoberman(short itemNumber);
+	void DobermanControl(short itemNumber);
+}

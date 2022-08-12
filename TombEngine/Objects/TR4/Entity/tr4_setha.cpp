@@ -1,31 +1,34 @@
 #include "framework.h"
-#include "tr4_setha.h"
-#include "Game/items.h"
-#include "Game/effects/effects.h"
-#include "Specific/setup.h"
-#include "Specific/level.h"
+#include "Objects/TR4/Entity/tr4_setha.h"
+
+#include "Game/animation.h"
 #include "Game/collision/collide_room.h"
 #include "Game/control/control.h"
-#include "Specific/trmath.h"
-#include "Game/Lara/lara.h"
-#include "Game/people.h"
+#include "Game/effects/effects.h"
 #include "Game/itemdata/creature_info.h"
-#include "Game/animation.h"
+#include "Game/items.h"
+#include "Game/Lara/lara.h"
 #include "Game/misc.h"
+#include "Game/people.h"
+#include "Specific/level.h"
+#include "Specific/prng.h"
+#include "Specific/setup.h"
+#include "Specific/trmath.h"
+
+using namespace TEN::Math::Random;
 
 namespace TEN::Entities::TR4
 {
-	BITE_INFO SethaBite1 = { 0, 220, 50, 17 };
-	BITE_INFO SethaBite2 = { 0, 220, 50, 13 };
-	BITE_INFO SethaAttack1 = { -16, 200, 32, 13 };
-	BITE_INFO SethaAttack2 = { 16, 200, 32, 17 };
+	const auto SethaBite1	= BiteInfo(Vector3(0.0f, 220.0f, 50.0f), 17);
+	const auto SethaBite2	= BiteInfo(Vector3(0.0f, 220.0f, 50.0f), 13);
+	const auto SethaAttack1 = BiteInfo(Vector3(-16.0f, 200.0f, 32.0f), 13);
+	const auto SethaAttack2 = BiteInfo(Vector3(16.0f, 200.0f, 32.0f), 17);
 
 	void InitialiseSetha(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
 		ClearItem(itemNumber);
-
 		item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 4;
 		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 		item->Animation.ActiveState = 12;
@@ -86,8 +89,8 @@ namespace TEN::Entities::TR4
 
 			CreatureAIInfo(item, &AI);
 
-			GetCreatureMood(item, &AI, VIOLENT);
-			CreatureMood(item, &AI, VIOLENT);
+			GetCreatureMood(item, &AI, true);
+			CreatureMood(item, &AI, true);
 
 			angle = CreatureTurn(item, creature->MaxTurn);
 
@@ -95,7 +98,7 @@ namespace TEN::Entities::TR4
 			{
 			case 1:
 				creature->LOT.IsJumping = false;
-				creature->Flags = 0;
+				creature->Flags = NULL;
 
 				if (item->Animation.RequiredState)
 				{
@@ -111,7 +114,7 @@ namespace TEN::Entities::TR4
 				{
 					if (AI.distance < pow(SECTOR(2.5f), 2) &&
 						AI.ahead &&
-						GetRandomControl() & 1 &&
+						TestProbability(0.5f) &&
 						Targetable(item, &AI))
 					{
 						item->Animation.TargetState = 11;
@@ -122,7 +125,7 @@ namespace TEN::Entities::TR4
 						ceiling < (item->Pose.Position.y - SECTOR(1.75f)) &&
 						height4 != NO_HEIGHT &&
 						height4 > (item->Pose.Position.y - SECTOR(1)) &&
-						GetRandomControl() & 1)
+						TestProbability(0.5f))
 					{
 						item->Pose.Position.y -= SECTOR(1.5f);
 						if (Targetable(item, &AI))
@@ -237,24 +240,14 @@ namespace TEN::Entities::TR4
 							if (item->TouchBits & 0xE000)
 							{
 								DoDamage(creature->Enemy, 200);
-								CreatureEffect2(
-									item,
-									&SethaBite1,
-									25,
-									-1,
-									DoBloodSplat);
+								CreatureEffect2(item, SethaBite1, 25, -1, DoBloodSplat);
 								creature->Flags = 1;
 							}
 
 							if (item->TouchBits & 0xE0000)
 							{
 								DoDamage(creature->Enemy, 200);
-								CreatureEffect2(
-									item,
-									&SethaBite2,
-									25,
-									-1,
-									DoBloodSplat);
+								CreatureEffect2(item, SethaBite2, 25, -1, DoBloodSplat);
 								creature->Flags = 1;
 							}
 						}
@@ -272,7 +265,7 @@ namespace TEN::Entities::TR4
 				if (item->Animation.AnimNumber == Objects[item->Animation.AnimNumber].animIndex + 17 &&
 					item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameEnd)
 				{
-					if (GetRandomControl() & 1)
+					if (TestProbability(0.5f))
 						item->Animation.RequiredState = 10;
 				}
 
@@ -299,12 +292,7 @@ namespace TEN::Entities::TR4
 							item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].frameBase + 26)
 						{
 							DoDamage(creature->Enemy, 250);
-							CreatureEffect2(
-								item,
-								&SethaBite1,
-								25,
-								-1,
-								DoBloodSplat);
+							CreatureEffect2(item, SethaBite1, 25, -1, DoBloodSplat);
 							creature->Flags = 1;
 						}
 					}
@@ -495,7 +483,7 @@ namespace TEN::Entities::TR4
 			spark->flags = SP_NODEATTACH | SP_EXPDEF | SP_ITEM | SP_ROTATE | SP_SCALE | SP_DEF;
 			spark->rotAng = GetRandomControl() & 0xFFF;
 
-			if (GetRandomControl() & 1)
+			if (TestProbability(0.5f))
 				spark->rotAdd = -32 - (GetRandomControl() & 0x1F);
 			else
 				spark->rotAdd = (GetRandomControl() & 0x1F) + 32;

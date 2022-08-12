@@ -27,7 +27,7 @@ using namespace TEN::Math::Random;
 
 namespace TEN::Entities::Vehicles
 {
-	BITE_INFO QuadBikeEffectsPositions[6] =
+	BiteInfo QuadBikeEffectsPositions[6] =
 	{
 		{ -56, -32, -380, 0	},
 		{ 56, -32, -380, 0 },
@@ -959,7 +959,7 @@ namespace TEN::Entities::Vehicles
 			}
 
 			// Driving back / braking.
-			if (TrInput & (VEHICLE_IN_REVERSE | VEHICLE_IN_BRAKE))
+			if (TrInput & VEHICLE_IN_REVERSE)
 			{
 				if (TrInput & VEHICLE_IN_SPEED &&
 					(quadBike->CanStartDrift || quadBike->DriftStarting))
