@@ -363,33 +363,24 @@ GameStatus ControlPhase(int numFrames, int demoMode)
 
 unsigned CALLBACK GameMain(void *)
 {
-	try 
-	{
-		TENLog("Starting GameMain...", LogLevel::Info);
+	TENLog("Starting GameMain...", LogLevel::Info);
 
-		TimeInit();
+	TimeInit();
 
-		if (g_GameFlow->IntroImagePath.empty())
-			throw TENScriptException("Intro image path is not set.");
+	if (g_GameFlow->IntroImagePath.empty())
+		throw TENScriptException("Intro image path is not set.");
 
-		// Do a fixed time title image
-		g_Renderer.RenderTitleImage();
+	// Do a fixed time title image
+	g_Renderer.RenderTitleImage();
 
-		// Execute the LUA gameflow and play the game
-		g_GameFlow->DoFlow();
+	// Execute the LUA gameflow and play the game
+	g_GameFlow->DoFlow();
 
-		DoTheGame = false;
+	DoTheGame = false;
 
-		// Finish the thread
-		PostMessage(WindowsHandle, WM_CLOSE, NULL, NULL);
-		EndThread();
-	}
-	catch (TENScriptException const& e) 
-	{
-		std::string msg = std::string{ "An unrecoverable error occurred in " } + __func__ + ": " + e.what();
-		TENLog(msg, LogLevel::Error, LogConfig::All);
-		throw;
-	}
+	// Finish the thread
+	PostMessage(WindowsHandle, WM_CLOSE, NULL, NULL);
+	EndThread();
 
 	return true;
 }
@@ -404,14 +395,15 @@ GameStatus DoTitle(int index, std::string const& ambient)
 
 	InventoryResult inventoryResult;
 
+	g_GameStringsHandler->ClearDisplayStrings();
+	g_GameScript->ResetScripts(true);
+
 	if (g_GameFlow->TitleType == TITLE_TYPE::FLYBY)
 	{
 		// Initialise items, effects, lots, camera
 		InitialiseFXArray(true);
 		InitialisePickupDisplay();
 		InitialiseCamera();
-
-		g_GameScript->ResetScripts(true);
 
 		// Run the level script
 		ScriptInterfaceLevel* level = g_GameFlow->GetLevel(index);
@@ -515,6 +507,7 @@ GameStatus DoLevel(int index, std::string const& ambient, bool loadFromSavegame)
 	InitialisePickupDisplay();
 	InitialiseCamera();
 
+	g_GameStringsHandler->ClearDisplayStrings();
 	g_GameScript->ResetScripts(loadFromSavegame);
 
 	// Run the level script

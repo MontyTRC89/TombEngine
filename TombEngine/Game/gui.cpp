@@ -339,10 +339,12 @@ namespace TEN::Gui
 
 		case 2:
 			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
+
 			if (CurrentSettings.Configuration.ShadowType == ShadowMode::None)
 				CurrentSettings.Configuration.ShadowType = ShadowMode::All;
 			else
 				CurrentSettings.Configuration.ShadowType = ShadowMode(int(CurrentSettings.Configuration.ShadowType) - 1);
+
 			break;
 
 			case 3:
@@ -352,7 +354,12 @@ namespace TEN::Gui
 
 			case 4:
 				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
-				CurrentSettings.Configuration.EnableVolumetricFog = !CurrentSettings.Configuration.EnableVolumetricFog;
+
+				if (CurrentSettings.Configuration.Antialiasing == AntialiasingMode::None)
+					CurrentSettings.Configuration.Antialiasing = AntialiasingMode::High;
+				else
+					CurrentSettings.Configuration.Antialiasing = AntialiasingMode(int(CurrentSettings.Configuration.Antialiasing) - 1);
+
 				break;
 			}
 		}
@@ -387,7 +394,12 @@ namespace TEN::Gui
 
 			case 4:
 				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
-				CurrentSettings.Configuration.EnableVolumetricFog = !CurrentSettings.Configuration.EnableVolumetricFog;
+
+				if (CurrentSettings.Configuration.Antialiasing == AntialiasingMode::High)
+					CurrentSettings.conf.Antialiasing = AntialiasingMode::None;
+				else
+					CurrentSettings.Configuration.Antialiasing = AntialiasingMode(int(CurrentSettings.Configuration.Antialiasing) + 1);
+
 				break;
 			}
 		}

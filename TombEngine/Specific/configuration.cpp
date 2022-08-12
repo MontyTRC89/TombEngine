@@ -78,7 +78,7 @@ BOOL CALLBACK DialogProc(HWND handle, UINT msg, WPARAM wParam, LPARAM lParam)
 		SendMessageA(GetDlgItem(handle, IDC_GROUP_RENDER_OPTIONS), WM_SETTEXT, 0, (LPARAM)g_GameFlow->GetString(STRING_RENDER_OPTIONS));
 		SendMessageA(GetDlgItem(handle, IDC_SHADOWS), WM_SETTEXT, 0, (LPARAM)g_GameFlow->GetString(STRING_SHADOWS));
 		SendMessageA(GetDlgItem(handle, IDC_CAUSTICS), WM_SETTEXT, 0, (LPARAM)g_GameFlow->GetString(STRING_CAUSTICS));
-		SendMessageA(GetDlgItem(handle, IDC_VOLUMETRIC_FOG), WM_SETTEXT, 0, (LPARAM)g_GameFlow->GetString(STRING_VOLUMETRIC_FOG));
+		SendMessageA(GetDlgItem(handle, IDC_ANTIALIASING), WM_SETTEXT, 0, (LPARAM)g_GameFlow->GetString(STRING_ANTIALIASING));
 
 		LoadResolutionsInCombobox(handle);
 		LoadSoundDevicesInCombobox(handle);
@@ -86,8 +86,8 @@ BOOL CALLBACK DialogProc(HWND handle, UINT msg, WPARAM wParam, LPARAM lParam)
 		// Set some default values
 		g_Configuration.AutoTarget = true;
 
-		g_Configuration.EnableVolumetricFog = true;
-		SendDlgItemMessage(handle, IDC_VOLUMETRIC_FOG, BM_SETCHECK, 1, 0);
+		g_Configuration.Antialiasing = AntialiasingMode::Low;
+		SendDlgItemMessage(handle, IDC_ANTIALIASING, BM_SETCHECK, 1, 0);
 
 		g_Configuration.ShadowType = ShadowMode::Lara;
 		SendDlgItemMessage(handle, IDC_SHADOWS, BM_SETCHECK, 1, 0);
@@ -116,7 +116,7 @@ BOOL CALLBACK DialogProc(HWND handle, UINT msg, WPARAM wParam, LPARAM lParam)
 				g_Configuration.Windowed = (SendDlgItemMessage(handle, IDC_WINDOWED, BM_GETCHECK, 0, 0));
 				g_Configuration.ShadowType = (ShadowMode)(SendDlgItemMessage(handle, IDC_SHADOWS, BM_GETCHECK, 0, 0));
 				g_Configuration.EnableCaustics = (SendDlgItemMessage(handle, IDC_CAUSTICS, BM_GETCHECK, 0, 0));
-				g_Configuration.EnableVolumetricFog = (SendDlgItemMessage(handle, IDC_VOLUMETRIC_FOG, BM_GETCHECK, 0, 0));
+				g_Configuration.Antialiasing = (AntialiasingMode)(SendDlgItemMessage(handle, IDC_ANTIALIASING, BM_GETCHECK, 0, 0));
 				g_Configuration.EnableSound = (SendDlgItemMessage(handle, IDC_ENABLE_SOUNDS, BM_GETCHECK, 0, 0));
 				selectedMode = (SendDlgItemMessage(handle, IDC_RESOLUTION, CB_GETCURSEL, 0, 0));
 				mode = g_Configuration.SupportedScreenResolutions[selectedMode];
@@ -210,7 +210,7 @@ bool SaveConfiguration()
 		return false;
 	}
 
-	if (SetBoolRegKey(rootKey, REGKEY_VOLUMETRIC_FOG, g_Configuration.EnableVolumetricFog) != ERROR_SUCCESS)
+	if (SetDWORDRegKey(rootKey, REGKEY_ANTIALIASING, DWORD(g_Configuration.Antialiasing)) != ERROR_SUCCESS)
 	{
 		RegCloseKey(rootKey);
 		return false;
@@ -299,7 +299,7 @@ void InitDefaultConfiguration()
 	g_Configuration.EnableCaustics = true;
 	g_Configuration.ShadowType = ShadowMode::Lara;
 	g_Configuration.EnableSound = true;
-	g_Configuration.EnableVolumetricFog = true;
+	g_Configuration.Antialiasing = AntialiasingMode::Low;
 	g_Configuration.MusicVolume = 100;
 	g_Configuration.SfxVolume = 100;
 	g_Configuration.Width = currentScreenResolution.x;
@@ -345,8 +345,8 @@ bool LoadConfiguration()
 		return false;
 	}
 
-	bool volumetricFog = false;
-	if (GetBoolRegKey(rootKey, REGKEY_VOLUMETRIC_FOG, &volumetricFog, true) != ERROR_SUCCESS)
+	DWORD antialiasing = 1;
+	if (GetDWORDRegKey(rootKey, REGKEY_ANTIALIASING, &antialiasing, true) != ERROR_SUCCESS)
 	{
 		RegCloseKey(rootKey);
 		return false;
@@ -452,7 +452,7 @@ bool LoadConfiguration()
 	g_Configuration.ShadowType = ShadowMode(shadowMode);
 	g_Configuration.ShadowMaxBlobs = shadowBlobs;
 	g_Configuration.EnableCaustics = caustics;
-	g_Configuration.EnableVolumetricFog = volumetricFog;
+	g_Configuration.Antialiasing = AntialiasingMode(antialiasing);
 	g_Configuration.ShadowMapSize = shadowMapSize;
 
 	g_Configuration.EnableSound = enableSound;

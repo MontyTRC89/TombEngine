@@ -555,6 +555,16 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 			break;
 
 		case WaterStatus::Underwater:
+
+			// Disable potential Lara resurfacing if her health is zero or below.
+			// For some reason, originals worked without this condition, but TEN does not. -- Lwmte, 11.08.22
+
+			if (item->HitPoints <= 0)
+				break;
+
+			// Determine if Lara's head is above water surface. This is needed to prevent
+			// pre-TR5 bug where Lara would keep submerged until her root mesh (butt) is above water level.
+
 			isWaterOnHeadspace = TestEnvironment(ENV_FLAG_WATER, item->Pose.Position.x, item->Pose.Position.y - CLICK(1), item->Pose.Position.z,
 					 GetCollision(item->Pose.Position.x, item->Pose.Position.y - CLICK(1), item->Pose.Position.z, item->RoomNumber).RoomNumber);
 

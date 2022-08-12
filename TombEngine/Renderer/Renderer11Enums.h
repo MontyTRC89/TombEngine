@@ -69,6 +69,14 @@ enum class ShadowMode
 	All
 };
 
+enum class AntialiasingMode
+{
+	None,
+	Low,
+	Medium,
+	High
+};
+
 enum LIGHT_MODES
 {
 	LIGHT_MODE_DYNAMIC,
