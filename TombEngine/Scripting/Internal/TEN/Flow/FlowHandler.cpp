@@ -61,15 +61,6 @@ __(not yet implemented)__
 */
 	table_flow.set_function(ScriptReserved_SetTitleScreenImagePath, &FlowHandler::SetTitleScreenImagePath, this);
 
-/*** Maximum draw distance.
-The maximum draw distance, in sectors (blocks), of any level in the game.
-This is equivalent to TRNG's WorldFarView variable.
-__(not yet implemented)__
-@function SetFarView
-@tparam byte farview Number of sectors. Must be in the range [1, 127].
-*/
-	table_flow.set_function(ScriptReserved_SetFarView, &FlowHandler::SetGameFarView, this);
-
 /*** settings.lua.
 These functions are called in settings.lua, a file which holds your local settings.
 settings.lua shouldn't be bundled with any finished levels/games.
@@ -171,19 +162,6 @@ void FlowHandler::SetTitleScreenImagePath(std::string const& path)
 	TitleScreenImagePath = path;
 }
 
-void FlowHandler::SetGameFarView(short val)
-{
-	bool cond = val <= 127 && val >= 1;
-	std::string msg{ "Game far view value must be in the range [1, 255]." };
-	if (!ScriptAssert(cond, msg))
-	{
-		ScriptWarn("Setting game far view to 32.");
-		GameFarView = 32;
-	}
-	else
-		GameFarView = val;
-}
-
 void FlowHandler::LoadFlowScript()
 {
 	m_handler.ExecuteScript("Scripts/Gameflow.lua");
@@ -260,7 +238,16 @@ bool FlowHandler::DoFlow()
 
 		if (CurrentLevel == 0)
 		{
-			status = DoTitle(0, level->AmbientTrack);
+			try
+			{
+				status = DoTitle(0, level->AmbientTrack);
+			}
+			catch (TENScriptException const& e)
+			{
+				std::string msg = std::string{ "An unrecoverable error occurred in " } + __func__ + ": " + e.what();
+				TENLog(msg, LogLevel::Error, LogConfig::All);
+				throw;
+			}
 		}
 		else
 		{
@@ -284,7 +271,16 @@ bool FlowHandler::DoFlow()
 				}
 			}
 
-			status = DoLevel(CurrentLevel, level->AmbientTrack, loadFromSavegame);
+			try
+			{
+				status = DoLevel(CurrentLevel, level->AmbientTrack, loadFromSavegame);
+			}
+			catch (TENScriptException const& e) 
+			{
+				std::string msg = std::string{ "An unrecoverable error occurred in " } + __func__ + ": " + e.what();
+				TENLog(msg, LogLevel::Error, LogConfig::All);
+				status = GameStatus::ExitToTitle;
+			}
 			loadFromSavegame = false;
 		}
 
@@ -329,7 +325,3 @@ bool FlowHandler::CanPlayAnyLevel() const
 	return PlayAnyLevel;
 }
 
-short FlowHandler::GetGameFarView() const
-{
-	return GameFarView;
-}
