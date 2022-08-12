@@ -9,6 +9,7 @@ Version 1.0.1
 - Fixed camera behaviour with pushable blocks.
 - Fixed minecart unduck on inclines.
 - Fixed quadbike dismount with jump key and allow to shoot big gun with action key.
+- Fixed rollingball incorrectly killing Lara in water and in jump.
 - Fixed resurfacing on underwater death.
 - Fixed ripples not appearing on water connections higher than room bottom.
 - Prevent title music audio from starting in a random place.
