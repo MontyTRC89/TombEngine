@@ -114,7 +114,7 @@ void LogicHandler::LogPrint(sol::variadic_args va)
 		str += strPart;
 		str += "\t";
 	}
-	TENLog(str);
+	TENLog(str, LogLevel::Info, LogConfig::All, true);
 }
 
 void LogicHandler::ResetScripts(bool clearGameVars)
