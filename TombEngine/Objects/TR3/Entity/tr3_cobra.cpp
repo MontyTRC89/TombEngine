@@ -63,7 +63,7 @@ namespace TEN::Entities::TR3
 			return;
 
 		auto* item = &g_Level.Items[itemNumber];
-		auto* info = GetCreatureInfo(item);
+		auto* creature = GetCreatureInfo(item);
 
 		short head = 0;
 		short angle = 0;
@@ -86,21 +86,21 @@ namespace TEN::Entities::TR3
 
 			bool enemyMoving  = false;
 			bool enemyVisible = false;
-			if (info->Enemy && (GlobalCounter & 2))
+			if (creature->Enemy && (GlobalCounter & 2))
 			{
-				auto src = GameVector(info->Enemy->Pose.Position, info->Enemy->RoomNumber);
+				auto src = GameVector(creature->Enemy->Pose.Position, creature->Enemy->RoomNumber);
 				auto dest = GameVector(item->Pose.Position, item->RoomNumber);
 				enemyVisible = LOS(&src, &dest);
 
-				enemyMoving = info->Enemy->Animation.Velocity > PLAYER_DISTURB_VELOCITY ||
-							  abs(info->Enemy->Animation.VerticalVelocity) > PLAYER_DISTURB_VELOCITY;
+				enemyMoving = creature->Enemy->Animation.Velocity > PLAYER_DISTURB_VELOCITY ||
+							  abs(creature->Enemy->Animation.VerticalVelocity) > PLAYER_DISTURB_VELOCITY;
 			}
 
 			if (enemyVisible && item->Animation.ActiveState != COBRA_STATE_SLEEP)
 			{
-				info->Target.x = info->Enemy->Pose.Position.x;
-				info->Target.z = info->Enemy->Pose.Position.z;
-				angle = CreatureTurn(item, info->MaxTurn);
+				creature->Target.x = creature->Enemy->Pose.Position.x;
+				creature->Target.z = creature->Enemy->Pose.Position.z;
+				angle = CreatureTurn(item, creature->MaxTurn);
 
 				if (AI.ahead)
 					head = AI.angle;
@@ -116,13 +116,13 @@ namespace TEN::Entities::TR3
 			switch (item->Animation.ActiveState)
 			{
 			case COBRA_STATE_IDLE:
-				info->Flags = NULL;
+				creature->Flags = NULL;
 
 				if (AI.distance > COBRA_SLEEP_RANGE)
 				{
 					item->Animation.TargetState = COBRA_STATE_SLEEP;
 				}
-				else if (info->Enemy->HitPoints > 0 && enemyVisible &&
+				else if (creature->Enemy->HitPoints > 0 && enemyVisible &&
 						((AI.ahead && AI.distance < COBRA_ATTACK_RANGE && AI.verticalDistance <= GetBoundsAccurate(item)->Height()) ||
 						item->HitStatus || enemyMoving))
 				{
@@ -132,7 +132,7 @@ namespace TEN::Entities::TR3
 				break;
 
 			case COBRA_STATE_SLEEP:
-				info->Flags = NULL;
+				creature->Flags = NULL;
 
 				if (item->HitPoints != NOT_TARGETABLE)
 				{
@@ -140,7 +140,7 @@ namespace TEN::Entities::TR3
 					item->HitPoints = NOT_TARGETABLE;
 				}
 
-				if (AI.distance < COBRA_AWARE_RANGE && info->Enemy->HitPoints > 0)
+				if (AI.distance < COBRA_AWARE_RANGE && creature->Enemy->HitPoints > 0)
 				{
 					item->Animation.TargetState = COBRA_STATE_WAKE_UP;
 					item->HitPoints = item->ItemFlags[2];
@@ -149,15 +149,15 @@ namespace TEN::Entities::TR3
 				break;
 
 			case COBRA_STATE_ATTACK:
-				if (info->Flags != 1 &&
+				if (creature->Flags != 1 &&
 					item->TestBits(JointBitType::Touch, CobraAttackJoints))
 				{
-					DoDamage(info->Enemy, COBRA_BITE_ATTACK_DAMAGE);
+					DoDamage(creature->Enemy, COBRA_BITE_ATTACK_DAMAGE);
 					CreatureEffect(item, CobraBite, DoBloodSplat);
-					info->Flags = 1;
+					creature->Flags = 1;
 
-					if (info->Enemy->IsLara())
-						GetLaraInfo(info->Enemy)->PoisonPotency += COBRA_BITE_POISON_POTENCY;
+					if (creature->Enemy->IsLara())
+						GetLaraInfo(creature->Enemy)->PoisonPotency += COBRA_BITE_POISON_POTENCY;
 				}
 
 				break;
