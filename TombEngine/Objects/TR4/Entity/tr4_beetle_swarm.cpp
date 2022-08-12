@@ -93,7 +93,7 @@ namespace TEN::Entities::TR4
 					beetle->Pose.Orientation.z = 0;
 					beetle->On = true;
 					beetle->Velocity = (GetRandomControl() & 0x1F) + 1;
-					beetle->Flags = NULL;
+					beetle->Flags = 0;
 				}
 			}
 		}

@@ -372,7 +372,7 @@ namespace TEN::Entities::TR4
 			creature->LOT.IsMonkeying = false;
 			creature->LOT.IsJumping = false;
 			creature->MaxTurn = 0;
-			creature->Flags = NULL;
+			creature->Flags = 0;
 			joint3 = AI.angle / 2;
 
 			if (AI.ahead && item->AIBits & FOLLOW)
@@ -463,7 +463,7 @@ namespace TEN::Entities::TR4
 			creature->MaxTurn = ANGLE(7.0f);
 			creature->LOT.IsMonkeying = false;
 			creature->LOT.IsJumping = false;
-			creature->Flags = NULL;
+			creature->Flags = 0;
 
 			if (laraAI.ahead)
 				joint3 = laraAI.angle;

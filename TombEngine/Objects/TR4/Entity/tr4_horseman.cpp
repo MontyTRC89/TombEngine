@@ -394,7 +394,7 @@ namespace TEN::Entities::TR4
 						creature->ReachedGoal)
 					{
 						creature->Enemy = LaraItem;
-						creature->Flags = NULL;
+						creature->Flags = 0;
 
 						if (laraAI.angle > -ANGLE(45.0f) &&
 							laraAI.angle < ANGLE(45.0f))
@@ -472,7 +472,7 @@ namespace TEN::Entities::TR4
 					item->Animation.TargetState = HORSEMAN_STATE_MOUNTED_RUN_FORWARD;
 					creature->ReachedGoal = false;
 					creature->Enemy = LaraItem;
-					creature->Flags = NULL;
+					creature->Flags = 0;
 
 					horseItem->Animation.TargetState = HORSEMAN_STATE_MOUNTED_WALK_FORWARD;
 				}
@@ -489,13 +489,13 @@ namespace TEN::Entities::TR4
 					item->ItemFlags[3] = -(item->ItemFlags[3] != 1) + 2;
 				}
 				else
-					creature->Flags = NULL;
+					creature->Flags = 0;
 
 				if (item->Animation.RequiredState)
 				{
 					item->Animation.TargetState = HORSEMAN_STATE_MOUNTED_RUN_FORWARD;
 					horseItem->Animation.TargetState = HORSEMAN_STATE_MOUNTED_WALK_FORWARD;
-					horseItem->Flags = NULL;
+					horseItem->Flags = 0;
 				}
 				else if (creature->ReachedGoal ||
 					!horseItem->Flags &&
@@ -509,13 +509,13 @@ namespace TEN::Entities::TR4
 					if (creature->ReachedGoal)
 						item->Animation.RequiredState = HORSEMAN_STATE_MOUNTED_SPRINT;
 					
-					horseItem->Flags = NULL;
+					horseItem->Flags = 0;
 				}
 				else
 				{
 					item->Animation.TargetState = HORSEMAN_STATE_MOUNTED_RUN_FORWARD;
 					horseItem->Animation.TargetState = HORSEMAN_STATE_MOUNTED_WALK_FORWARD;
-					horseItem->Flags = NULL;
+					horseItem->Flags = 0;
 				}
 
 				break;
@@ -578,7 +578,7 @@ namespace TEN::Entities::TR4
 
 			case HORSEMAN_STATE_IDLE:
 				creature->MaxTurn = 0;
-				creature->Flags = NULL;
+				creature->Flags = 0;
 
 				if (!item->AIBits || item->ItemFlags[3])
 				{
@@ -596,7 +596,7 @@ namespace TEN::Entities::TR4
 
 			case HORSEMAN_STATE_WALK_FORWARD:
 				creature->MaxTurn = ANGLE(3.0f);
-				creature->Flags = NULL;
+				creature->Flags = 0;
 
 				if (creature->ReachedGoal)
 				{
@@ -726,7 +726,7 @@ namespace TEN::Entities::TR4
 				{
 					creature->ReachedGoal = false;
 					creature->Enemy = LaraItem;
-					creature->Flags = NULL;
+					creature->Flags = 0;
 				}
 				else if (!AI.ahead)
 				{

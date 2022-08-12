@@ -154,7 +154,7 @@ namespace TEN::Entities::TR4
 		}
 		else
 		{
-			if (item->AIBits != NULL) // Does this entity have AI object? NOTE: Previous one checked "& ALL_AIOBJ" -- TokyoSU, 3/8/2022
+			if (item->AIBits != 0) // Does this entity have AI object? NOTE: Previous one checked "& ALL_AIOBJ" -- TokyoSU, 3/8/2022
 				GetAITarget(creature);
 
 			AI_INFO AI, laraAI;

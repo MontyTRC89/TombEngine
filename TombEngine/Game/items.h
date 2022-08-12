@@ -50,7 +50,7 @@ enum ItemFlags
 };
 
 constexpr unsigned int ALL_JOINT_BITS = UINT_MAX;
-constexpr unsigned int NO_JOINT_BITS  = NULL;
+constexpr unsigned int NO_JOINT_BITS  = 0;
 
 enum class JointBitType
 {

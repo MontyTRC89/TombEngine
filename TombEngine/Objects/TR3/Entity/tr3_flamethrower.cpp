@@ -78,9 +78,9 @@ namespace TEN::Entities::TR3
 				creature->Enemy = LaraItem;
 			else
 			{
-				creature->Enemy = NULL;
+				creature->Enemy = nullptr;
 
-				ItemInfo* target = NULL;
+				ItemInfo* target = nullptr;
 				int minDistance = INT_MAX;
 
 				for (int i = 0; i < ActiveCreatures.size(); i++)
@@ -115,7 +115,7 @@ namespace TEN::Entities::TR3
 				laraAI.distance = AI.distance;
 
 				if (!creature->HurtByLara)
-					creature->Enemy = NULL;
+					creature->Enemy = nullptr;
 			}
 			else
 			{

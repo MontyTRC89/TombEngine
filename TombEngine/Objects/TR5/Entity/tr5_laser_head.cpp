@@ -439,8 +439,8 @@ namespace TEN::Entities::TR5
 						{
 							if (arc)
 							{
-								LaserHeadData.fireArcs[0] = NULL;
-								LaserHeadData.fireArcs[1] = NULL;
+								LaserHeadData.fireArcs[0] = nullptr;
+								LaserHeadData.fireArcs[1] = nullptr;
 							}
 
 							item->ItemFlags[0] = 1;
@@ -472,7 +472,7 @@ namespace TEN::Entities::TR5
 									dest.z = src.z + c * phd_cos(item->Pose.Orientation.y);
 
 									if (item->ItemFlags[3] != 90 &&
-										LaserHeadData.fireArcs[i] != NULL)
+										LaserHeadData.fireArcs[i] != nullptr)
 									{
 										// Eye is aready firing
 										SoundEffect(SFX_TR5_GOD_HEAD_LASER_LOOPS, &item->Pose);
@@ -590,7 +590,7 @@ namespace TEN::Entities::TR5
 									if (LaserHeadData.fireArcs[i])
 									{
 										LaserHeadData.fireArcs[i]->life = 0;
-										LaserHeadData.fireArcs[i] = NULL;
+										LaserHeadData.fireArcs[i] = nullptr;
 									}
 								}
 							}
@@ -667,8 +667,8 @@ namespace TEN::Entities::TR5
 				if (LaserHeadData.fireArcs[1])
 					LaserHeadData.fireArcs[1]->life = 2;
 
-				LaserHeadData.fireArcs[0] = NULL;
-				LaserHeadData.fireArcs[1] = NULL;
+				LaserHeadData.fireArcs[0] = nullptr;
+				LaserHeadData.fireArcs[1] = nullptr;
 
 				item->Animation.Velocity = 3;
 				item->ItemFlags[0] = 3;

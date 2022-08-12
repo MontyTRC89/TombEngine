@@ -110,14 +110,14 @@ namespace TEN::Entities::TR1
 			case BEAR_STATE_IDLE:
 			{
 				item->Animation.TargetState = BEAR_STATE_DEATH;
-				creature->Flags = NULL;
+				creature->Flags = 0;
 				break;
 			}
 			case BEAR_STATE_DEATH:
 			{
 				if (creature->Flags && item->TestBits(JointBitType::Touch, BearAttackJoints))
 				{
-					creature->Flags = NULL;
+					creature->Flags = 0;
 					DoDamage(creature->Enemy, BEAR_SLAM_DAMAGE);
 				}
 

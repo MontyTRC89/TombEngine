@@ -100,7 +100,7 @@ namespace TEN::Entities::TR2
 	{
 
 		auto* riderItem = &g_Level.Items[riderItemNumber];
-		if (riderItem->Data == NULL)
+		if (riderItem->Data == nullptr)
 		{
 			TENLog("Rider data does not contain the skidoo itemNumber!", LogLevel::Error);
 			return;
@@ -111,7 +111,7 @@ namespace TEN::Entities::TR2
 
 		if (!item->Data)
 		{
-			EnableEntityAI(itemNumber, TRUE);
+			EnableEntityAI(itemNumber, true);
 			item->Status = ITEM_ACTIVE;
 		}
 
@@ -124,9 +124,7 @@ namespace TEN::Entities::TR2
 		{
 			if (riderItem->Animation.ActiveState != SMAN_STATE_DEATH)
 			{
-				riderItem->Pose.Position.x = item->Pose.Position.x;
-				riderItem->Pose.Position.y = item->Pose.Position.y;
-				riderItem->Pose.Position.z = item->Pose.Position.z;
+				riderItem->Pose.Position = item->Pose.Position;
 				riderItem->Pose.Orientation.y = item->Pose.Orientation.y;
 				riderItem->RoomNumber = item->RoomNumber;
 
@@ -135,7 +133,7 @@ namespace TEN::Entities::TR2
 				riderItem->Animation.ActiveState = SMAN_STATE_DEATH;
 
 				if (Lara.TargetEntity == item)
-					Lara.TargetEntity = NULL;
+					Lara.TargetEntity = nullptr;
 			}
 			else
 				AnimateItem(riderItem);

@@ -17,10 +17,6 @@ local ItemAction = Flow.ItemAction
 Flow.SetIntroImagePath("Screens\\main.jpg")
 Flow.SetTitleScreenImagePath("Screens\\main.jpg")
 
--- Flow.SetFarView sets global far view distance in blocks.
--- It will be overwritten by level.farView value, if it is specified.
-
-Flow.SetFarView(20)
 
 --------------------------------------------------
 
@@ -71,7 +67,6 @@ test.objects = {
 		-1,
 		ItemAction.USE
 	),
-	myObj, 
 	InventoryItem.new(
 		"tut1_ba_cartouche2",
 		InvID.PUZZLE_ITEM3_COMBO2,
