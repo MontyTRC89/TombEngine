@@ -254,11 +254,11 @@ namespace TEN::Entities::TR4
 		int frameNumber;
 		short random;
 				
-		bool flagNewBehaviour		= ((item->ItemFlags[2] & (1 << 0)) != NULL);
-		bool flagIgnoreLaraDistance = ((item->ItemFlags[2] & (1 << 1)) != NULL);
-		bool flagRunDefault			= ((item->ItemFlags[2] & (1 << 2)) != NULL);
-		bool flagRetryNodeSearch	= ((item->ItemFlags[2] & (1 << 3)) != NULL);
-		bool flagScaryInscription	= ((item->ItemFlags[2] & (1 << 4)) != NULL);
+		bool flagNewBehaviour		= ((item->ItemFlags[2] & (1 << 0)) != 0);
+		bool flagIgnoreLaraDistance = ((item->ItemFlags[2] & (1 << 1)) != 0);
+		bool flagRunDefault			= ((item->ItemFlags[2] & (1 << 2)) != 0);
+		bool flagRetryNodeSearch	= ((item->ItemFlags[2] & (1 << 3)) != 0);
+		bool flagScaryInscription	= ((item->ItemFlags[2] & (1 << 4)) != 0);
 
 		short goalNode = (flagNewBehaviour) ? item->ItemFlags[4] : Lara.Location;
 
@@ -272,7 +272,7 @@ namespace TEN::Entities::TR4
 		{
 		case GUIDE_STATE_IDLE:
 			creature->MaxTurn = 0;
-			creature->Flags = NULL;
+			creature->Flags = 0;
 			creature->LOT.IsJumping = false;
 			joint2 = AI.angle / 2;
 
