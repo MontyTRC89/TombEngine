@@ -12,7 +12,7 @@ using std::vector;
 
 CreatureInfo* GetCreatureInfo(ItemInfo* item)
 {
-    return (CreatureInfo*)item->Data;
+    return static_cast<CreatureInfo*>(item->Data);
 }
 
 void TargetNearestEntity(ItemInfo* item, CreatureInfo* creature)
@@ -33,7 +33,7 @@ void TargetNearestEntity(ItemInfo* item, CreatureInfo* creature)
 			int y = target->Pose.Position.y - item->Pose.Position.y;
 			int z = target->Pose.Position.z - item->Pose.Position.z;
 
-			int distance = pow(x, 2) + pow(y, 2) + pow(z, 2);
+			int distance = SQUARE(x) + SQUARE(y) + SQUARE(z);
 			if (distance < bestDistance)
 			{
 				creature->Enemy = target;

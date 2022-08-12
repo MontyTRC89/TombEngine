@@ -2,8 +2,8 @@
 #include "Objects/TR1/Entity/tr1_natla.h"
 
 #include "Game/control/box.h"
-#include "Game/itemdata/creature_info.h"
 #include "Game/effects/effects.h"
+#include "Game/itemdata/creature_info.h"
 #include "Game/items.h"
 #include "Game/misc.h"
 #include "Game/missile.h"
@@ -14,17 +14,21 @@
 
 namespace TEN::Entities::TR1
 {
-	BITE_INFO NatlaGunBite = { 5, 220, 7, 4 };
+	// TODO: Organise.
+	constexpr auto NATLA_SHOT_DAMAGE = 100;
+	constexpr auto NATLA_NEAR_DEATH = 200;
+	constexpr auto NATLA_DEATH_TIME = (FPS * 16); // 16 seconds.
+	constexpr auto NATLA_FLYMODE = 0x8000;
+	constexpr auto NATLA_TIMER = 0x7FFF;
+	constexpr auto NATLA_LAND_CHANCE = 0x100;
+	constexpr auto NATLA_GUN_VELOCITY = 400;
 
-	#define NATLA_NEAR_DEATH 200
-	#define NATLA_FLYMODE 0x8000
-	#define NATLA_TIMER   0x7fff
-	#define NATLA_FIRE_ARC ANGLE(30.0f)
-	#define NATLA_FLY_TURN ANGLE(5.0f)
-	#define NATLA_RUN_TURN ANGLE(6.0f)
-	#define NATLA_LAND_CHANCE 0x100
-	#define NATLA_DEATH_TIME (FPS * 16)	// 16 seconds.
-	#define NATLA_SHOT_DAMAGE 100
+	#define NATLA_TURN_NEAR_DEATH_SPEED ANGLE(6.0f)
+	#define NATLA_TURN_SPEED ANGLE(5.0f)
+	#define NATLA_FLY_ANGLE_SPEED ANGLE(5.0f)
+	#define NATLA_SHOOT_ANGLE ANGLE(30.0f)
+
+	const auto NatlaGunBite = BiteInfo(Vector3(5.0f, 220.0f, 7.0f), 4);
 
 	enum NatlaState
 	{
@@ -71,11 +75,11 @@ namespace TEN::Entities::TR1
 			if (AI.ahead)
 				head = AI.angle;
 
-			GetCreatureMood(item, &AI, VIOLENT);
-			CreatureMood(item, &AI, VIOLENT);
+			GetCreatureMood(item, &AI, true);
+			CreatureMood(item, &AI, true);
 
-			angle = CreatureTurn(item, NATLA_RUN_TURN);
-			shoot = (AI.angle > -NATLA_FIRE_ARC && AI.angle < NATLA_FIRE_ARC&& Targetable(item, &AI));
+			angle = CreatureTurn(item, NATLA_TURN_NEAR_DEATH_SPEED);
+			shoot = (AI.angle > -NATLA_SHOOT_ANGLE && AI.angle < NATLA_SHOOT_ANGLE&& Targetable(item, &AI));
 
 			if (facing)
 			{
@@ -107,7 +111,7 @@ namespace TEN::Entities::TR1
 
 				if (timer >= 20)
 				{
-					short FXNumber = CreatureEffect(item, &NatlaGunBite, ShardGun);
+					short FXNumber = CreatureEffect(item, NatlaGunBite, ShardGun);
 					if (FXNumber != NO_ITEM)
 					{
 						auto* fx = &EffectList[FXNumber];
@@ -125,7 +129,7 @@ namespace TEN::Entities::TR1
 
 				if (timer >= 20)
 				{
-					short FXNumber = CreatureEffect(item, &NatlaGunBite, ShardGun);
+					short FXNumber = CreatureEffect(item, NatlaGunBite, ShardGun);
 					if (FXNumber != NO_ITEM)
 					{
 						auto* fx = &EffectList[FXNumber];
@@ -175,7 +179,7 @@ namespace TEN::Entities::TR1
 			creature->LOT.Fly = NO_FLYING;
 			CreatureAIInfo(item, &AI);
 
-			shoot = (AI.angle > -NATLA_FIRE_ARC && AI.angle < NATLA_FIRE_ARC&& Targetable(item, &AI));
+			shoot = (AI.angle > -NATLA_SHOOT_ANGLE && AI.angle < NATLA_SHOOT_ANGLE&& Targetable(item, &AI));
 
 			if (item->Animation.ActiveState == NATLA_STATE_FLY && (creature->Flags & NATLA_FLYMODE))
 			{
@@ -183,7 +187,7 @@ namespace TEN::Entities::TR1
 					creature->Flags -= NATLA_FLYMODE;
 
 				if (!(creature->Flags & NATLA_FLYMODE))
-					CreatureMood(item, &AI, VIOLENT);
+					CreatureMood(item, &AI, true);
 
 				creature->LOT.Step = SECTOR(20);
 				creature->LOT.Drop = -SECTOR(20);
@@ -198,17 +202,17 @@ namespace TEN::Entities::TR1
 				head = AI.angle;
 
 			if (item->Animation.ActiveState != NATLA_STATE_FLY || (creature->Flags & NATLA_FLYMODE))
-				CreatureMood(item, &AI, TIMID);
+				CreatureMood(item, &AI, false);
 
 			item->Pose.Orientation.y -= facing;
-			angle = CreatureTurn(item, NATLA_FLY_TURN);
+			angle = CreatureTurn(item, NATLA_TURN_SPEED);
 
 			if (item->Animation.ActiveState == NATLA_STATE_FLY)
 			{
-				if (AI.angle > NATLA_FLY_TURN)
-					facing += NATLA_FLY_TURN;
-				else if (AI.angle < -NATLA_FLY_TURN)
-					facing -= NATLA_FLY_TURN;
+				if (AI.angle > NATLA_FLY_ANGLE_SPEED)
+					facing += NATLA_FLY_ANGLE_SPEED;
+				else if (AI.angle < -NATLA_FLY_ANGLE_SPEED)
+					facing -= NATLA_FLY_ANGLE_SPEED;
 				else
 					facing += AI.angle;
 
@@ -238,7 +242,7 @@ namespace TEN::Entities::TR1
 
 				if (timer >= 30)
 				{
-					short FXNumber = CreatureEffect(item, &NatlaGunBite, BombGun);
+					short FXNumber = CreatureEffect(item, NatlaGunBite, BombGun);
 					if (FXNumber != NO_ITEM)
 					{
 						auto* fx = &EffectList[FXNumber];
@@ -264,15 +268,15 @@ namespace TEN::Entities::TR1
 			case NATLA_STATE_SHOOT:
 				if (!item->Animation.RequiredState)
 				{
-					short FXNumber = CreatureEffect(item, &NatlaGunBite, BombGun);
+					short FXNumber = CreatureEffect(item, NatlaGunBite, BombGun);
 					if (FXNumber != NO_ITEM)
 						gun = EffectList[FXNumber].pos.Orientation.x;
 
-					FXNumber = CreatureEffect(item, &NatlaGunBite, BombGun);
+					FXNumber = CreatureEffect(item, NatlaGunBite, BombGun);
 					if (FXNumber != NO_ITEM)
 						EffectList[FXNumber].pos.Orientation.y += (short)((GetRandomControl() - 0x4000) / 4);
 
-					FXNumber = CreatureEffect(item, &NatlaGunBite, BombGun);
+					FXNumber = CreatureEffect(item, NatlaGunBite, BombGun);
 					if (FXNumber != NO_ITEM)
 						EffectList[FXNumber].pos.Orientation.y += (short)((GetRandomControl() - 0x4000) / 4);
 

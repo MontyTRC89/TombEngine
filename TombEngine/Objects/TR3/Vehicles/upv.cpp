@@ -35,7 +35,7 @@ using std::vector;
 
 namespace TEN::Entities::Vehicles
 {
-	BITE_INFO UPVBites[6] =
+	BiteInfo UPVBites[6] =
 	{
 		{ 0, 0, 0, 3 },
 		{ 0, 96, 256, 0 },

@@ -1109,6 +1109,46 @@ local strings = {
 		"",
 		""
 	},
+	antialiasing = {
+		"Antialiasing",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		""
+	},
+	low = {
+		"Low",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		""
+	},
+	medium = {
+		"Medium",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		""
+	},
+	high = {
+		"High",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		""
+	},
 	waiting_for_key = {
 		"Waiting For Key",
 		"",

@@ -1,8 +1,8 @@
 #pragma once
-
 #include <cstdint>
 #include <string>
 #include <vector>
+
 #include "Game/animation.h"
 #include "Game/itemdata/itemdata.h"
 #include "Specific/newtypes.h"
@@ -50,7 +50,7 @@ enum ItemFlags
 };
 
 constexpr unsigned int ALL_JOINT_BITS = UINT_MAX;
-constexpr unsigned int NO_JOINT_BITS  = 0;
+constexpr unsigned int NO_JOINT_BITS  = NULL;
 
 enum class JointBitType
 {
@@ -121,12 +121,19 @@ struct ItemInfo
 	std::string LuaCallbackOnCollidedWithObjectName;
 	std::string LuaCallbackOnCollidedWithRoomName;
 
+	bool TestBits(JointBitType type, std::vector<int> jointIndices);
+	bool TestBits(JointBitType type, int jointIndex);
 	void SetBits(JointBitType type, std::vector<int> jointIndices);
 	void SetBits(JointBitType type, int jointIndex);
 	void ClearBits(JointBitType type, std::vector<int> jointIndices);
 	void ClearBits(JointBitType type, int jointIndex);
-	bool TestBits(JointBitType type, std::vector<int> jointIndices);
-	bool TestBits(JointBitType type, int jointIndex);
+
+	bool TestOcb(short ocbFlags);
+	void RemoveOcb(short ocbFlags);
+	void ClearAllOcb();
+
+	bool TestFlags(short id, short value);
+	void SetFlags(short id, short value);
 
 	bool IsLara();
 	bool IsCreature();
