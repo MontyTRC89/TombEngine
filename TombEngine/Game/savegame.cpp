@@ -430,7 +430,6 @@ bool SaveGame::Save(int slot)
 	lara.add_extra_anim(Lara.ExtraAnim);
 	lara.add_extra_head_rot(&FromVector3(Lara.ExtraHeadRot));
 	lara.add_extra_torso_rot(&FromVector3(Lara.ExtraTorsoRot));
-	lara.add_extra_velocity(&FromVector3(Lara.ExtraVelocity));
 	lara.add_flare(flareOffset);
 	lara.add_highest_location(Lara.HighestLocation);
 	lara.add_hit_direction(Lara.HitDirection);
@@ -1750,9 +1749,6 @@ bool SaveGame::Load(int slot)
 	Lara.ExtraTorsoRot.z = s->lara()->extra_torso_rot()->x();
 	Lara.ExtraTorsoRot.y = s->lara()->extra_torso_rot()->y();
 	Lara.ExtraTorsoRot.z = s->lara()->extra_torso_rot()->z();
-	Lara.ExtraVelocity.x = s->lara()->extra_velocity()->x();
-	Lara.ExtraVelocity.y = s->lara()->extra_velocity()->y();
-	Lara.ExtraVelocity.z = s->lara()->extra_velocity()->z();
 	Lara.WaterCurrentActive = s->lara()->water_current_active();
 	Lara.WaterCurrentPull.x = s->lara()->water_current_pull()->x();
 	Lara.WaterCurrentPull.y = s->lara()->water_current_pull()->y();

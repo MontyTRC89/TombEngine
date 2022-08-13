@@ -1455,8 +1455,8 @@ int GetWaterHeight(ItemInfo* item)
 
 short GetSurfaceSteepnessAngle(float xTilt, float zTilt)
 {
-	short stepAngleIncrement = ANGLE(45.0f) / 4;
-	return (short)sqrt(pow(xTilt * stepAngleIncrement, 2) + pow(zTilt * stepAngleIncrement, 2));
+	short qtrBlockAngleIncrement = ANGLE(45.0f) / 4;
+	return (short)sqrt(pow(xTilt * qtrBlockAngleIncrement, 2) + pow(zTilt * qtrBlockAngleIncrement, 2));
 }
 
 short GetSurfaceAspectAngle(float xTilt, float zTilt)

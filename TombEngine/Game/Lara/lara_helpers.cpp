@@ -548,11 +548,11 @@ void ModulateLaraSlideVelocity(ItemInfo* item, CollisionInfo* coll)
 
 		g_Renderer.PrintDebugMessage("%d", slideVelocity);
 
-		lara->ExtraVelocity.x += slideVelocity;
-		lara->ExtraVelocity.y += slideVelocity * phd_sin(steepness);
+		//lara->ExtraVelocity.x += slideVelocity;
+		//lara->ExtraVelocity.y += slideVelocity * phd_sin(steepness);
 	}
-	else
-		lara->ExtraVelocity.x += minVelocity;
+	//else
+		//lara->ExtraVelocity.x += minVelocity;
 }
 
 void SetLaraJumpDirection(ItemInfo* item, CollisionInfo* coll)
