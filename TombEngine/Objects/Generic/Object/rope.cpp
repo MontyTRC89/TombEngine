@@ -174,7 +174,7 @@ namespace TEN::Entities::Generic
 			laraInfo->Control.HandStatus == HandStatus::Free &&
 			(laraItem->Animation.ActiveState == LS_REACH || laraItem->Animation.ActiveState == LS_JUMP_UP) &&
 			laraItem->Animation.IsAirborne &&
-			laraItem->Animation.VerticalVelocity > 0&&
+			laraItem->Animation.VerticalVelocity > 0 &&
 			rope->active)
 		{
 			auto* frame = GetBoundsAccurate(laraItem);
@@ -606,13 +606,17 @@ namespace TEN::Entities::Generic
 		coll->Setup.ForwardAngle = lara->Control.Rope.Direction ? item->Pose.Orientation.y : -item->Pose.Orientation.y;
 		GetCollisionInfo(coll, item);
 
-		bool stumble = testForStumble && (coll->CollisionType != CollisionType::CT_NONE || coll->HitStatic);
+		bool stumble = testForStumble &&
+			((coll->CollisionType != CollisionType::CT_NONE && 
+			  coll->CollisionType != CollisionType::CT_TOP  &&
+			  coll->CollisionType != CollisionType::CT_TOP_FRONT) || 
+			  coll->HitStatic);
 
 		if (stumble || 
 			TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, item->RoomNumber) ||
 			TestEnvironment(RoomEnvFlags::ENV_FLAG_SWAMP, item->RoomNumber))
 		{
-			item->Pose.Position = coll->Setup.OldPosition;
+			ShiftItem(item, coll);
 			FallFromRope(item, stumble);
 			return true;
 		}
