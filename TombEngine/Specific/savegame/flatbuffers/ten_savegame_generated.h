@@ -3289,7 +3289,6 @@ struct LaraT : public flatbuffers::NativeTable {
   std::unique_ptr<TEN::Save::TorchDataT> torch{};
   std::unique_ptr<TEN::Save::Vector3> extra_head_rot{};
   std::unique_ptr<TEN::Save::Vector3> extra_torso_rot{};
-  std::unique_ptr<TEN::Save::Vector3> extra_velocity{};
   int32_t water_current_active = 0;
   std::unique_ptr<TEN::Save::Vector3> water_current_pull{};
   std::unique_ptr<TEN::Save::ArmInfoT> left_arm{};
@@ -3333,35 +3332,34 @@ struct Lara FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     VT_TORCH = 14,
     VT_EXTRA_HEAD_ROT = 16,
     VT_EXTRA_TORSO_ROT = 18,
-    VT_EXTRA_VELOCITY = 20,
-    VT_WATER_CURRENT_ACTIVE = 22,
-    VT_WATER_CURRENT_PULL = 24,
-    VT_LEFT_ARM = 26,
-    VT_RIGHT_ARM = 28,
-    VT_TARGET_ARM_ANGLES = 30,
-    VT_TARGET_ENTITY_NUMBER = 32,
-    VT_AIR = 34,
-    VT_SPRINT_ENERGY = 36,
-    VT_POISON_POTENCY = 38,
-    VT_VEHICLE = 40,
-    VT_EXTRA_ANIM = 42,
-    VT_HIT_FRAME = 44,
-    VT_HIT_DIRECTION = 46,
-    VT_PROJECTED_FLOOR_HEIGHT = 48,
-    VT_TARGET_FACING_ANGLE = 50,
-    VT_WATER_SURFACE_DIST = 52,
-    VT_INTERACTED_ITEM = 54,
-    VT_NEXT_CORNER_POSE = 56,
-    VT_BURN_TYPE = 58,
-    VT_BURN_COUNT = 60,
-    VT_BURN = 62,
-    VT_BURN_BLUE = 64,
-    VT_BURN_SMOKE = 66,
-    VT_WET = 68,
-    VT_MESH_PTRS = 70,
-    VT_LOCATION = 72,
-    VT_HIGHEST_LOCATION = 74,
-    VT_LOCATION_PAD = 76
+    VT_WATER_CURRENT_ACTIVE = 20,
+    VT_WATER_CURRENT_PULL = 22,
+    VT_LEFT_ARM = 24,
+    VT_RIGHT_ARM = 26,
+    VT_TARGET_ARM_ANGLES = 28,
+    VT_TARGET_ENTITY_NUMBER = 30,
+    VT_AIR = 32,
+    VT_SPRINT_ENERGY = 34,
+    VT_POISON_POTENCY = 36,
+    VT_VEHICLE = 38,
+    VT_EXTRA_ANIM = 40,
+    VT_HIT_FRAME = 42,
+    VT_HIT_DIRECTION = 44,
+    VT_PROJECTED_FLOOR_HEIGHT = 46,
+    VT_TARGET_FACING_ANGLE = 48,
+    VT_WATER_SURFACE_DIST = 50,
+    VT_INTERACTED_ITEM = 52,
+    VT_NEXT_CORNER_POSE = 54,
+    VT_BURN_TYPE = 56,
+    VT_BURN_COUNT = 58,
+    VT_BURN = 60,
+    VT_BURN_BLUE = 62,
+    VT_BURN_SMOKE = 64,
+    VT_WET = 66,
+    VT_MESH_PTRS = 68,
+    VT_LOCATION = 70,
+    VT_HIGHEST_LOCATION = 72,
+    VT_LOCATION_PAD = 74
   };
   int32_t item_number() const {
     return GetField<int32_t>(VT_ITEM_NUMBER, 0);
@@ -3386,9 +3384,6 @@ struct Lara FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   }
   const TEN::Save::Vector3 *extra_torso_rot() const {
     return GetStruct<const TEN::Save::Vector3 *>(VT_EXTRA_TORSO_ROT);
-  }
-  const TEN::Save::Vector3 *extra_velocity() const {
-    return GetStruct<const TEN::Save::Vector3 *>(VT_EXTRA_VELOCITY);
   }
   int32_t water_current_active() const {
     return GetField<int32_t>(VT_WATER_CURRENT_ACTIVE, 0);
@@ -3490,7 +3485,6 @@ struct Lara FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            verifier.VerifyTable(torch()) &&
            VerifyField<TEN::Save::Vector3>(verifier, VT_EXTRA_HEAD_ROT) &&
            VerifyField<TEN::Save::Vector3>(verifier, VT_EXTRA_TORSO_ROT) &&
-           VerifyField<TEN::Save::Vector3>(verifier, VT_EXTRA_VELOCITY) &&
            VerifyField<int32_t>(verifier, VT_WATER_CURRENT_ACTIVE) &&
            VerifyField<TEN::Save::Vector3>(verifier, VT_WATER_CURRENT_PULL) &&
            VerifyOffset(verifier, VT_LEFT_ARM) &&
@@ -3558,9 +3552,6 @@ struct LaraBuilder {
   }
   void add_extra_torso_rot(const TEN::Save::Vector3 *extra_torso_rot) {
     fbb_.AddStruct(Lara::VT_EXTRA_TORSO_ROT, extra_torso_rot);
-  }
-  void add_extra_velocity(const TEN::Save::Vector3 *extra_velocity) {
-    fbb_.AddStruct(Lara::VT_EXTRA_VELOCITY, extra_velocity);
   }
   void add_water_current_active(int32_t water_current_active) {
     fbb_.AddElement<int32_t>(Lara::VT_WATER_CURRENT_ACTIVE, water_current_active, 0);
@@ -3667,7 +3658,6 @@ inline flatbuffers::Offset<Lara> CreateLara(
     flatbuffers::Offset<TEN::Save::TorchData> torch = 0,
     const TEN::Save::Vector3 *extra_head_rot = 0,
     const TEN::Save::Vector3 *extra_torso_rot = 0,
-    const TEN::Save::Vector3 *extra_velocity = 0,
     int32_t water_current_active = 0,
     const TEN::Save::Vector3 *water_current_pull = 0,
     flatbuffers::Offset<TEN::Save::ArmInfo> left_arm = 0,
@@ -3723,7 +3713,6 @@ inline flatbuffers::Offset<Lara> CreateLara(
   builder_.add_left_arm(left_arm);
   builder_.add_water_current_pull(water_current_pull);
   builder_.add_water_current_active(water_current_active);
-  builder_.add_extra_velocity(extra_velocity);
   builder_.add_extra_torso_rot(extra_torso_rot);
   builder_.add_extra_head_rot(extra_head_rot);
   builder_.add_torch(torch);
@@ -3752,7 +3741,6 @@ inline flatbuffers::Offset<Lara> CreateLaraDirect(
     flatbuffers::Offset<TEN::Save::TorchData> torch = 0,
     const TEN::Save::Vector3 *extra_head_rot = 0,
     const TEN::Save::Vector3 *extra_torso_rot = 0,
-    const TEN::Save::Vector3 *extra_velocity = 0,
     int32_t water_current_active = 0,
     const TEN::Save::Vector3 *water_current_pull = 0,
     flatbuffers::Offset<TEN::Save::ArmInfo> left_arm = 0,
@@ -3795,7 +3783,6 @@ inline flatbuffers::Offset<Lara> CreateLaraDirect(
       torch,
       extra_head_rot,
       extra_torso_rot,
-      extra_velocity,
       water_current_active,
       water_current_pull,
       left_arm,
@@ -7288,7 +7275,6 @@ inline void Lara::UnPackTo(LaraT *_o, const flatbuffers::resolver_function_t *_r
   { auto _e = torch(); if (_e) _o->torch = std::unique_ptr<TEN::Save::TorchDataT>(_e->UnPack(_resolver)); }
   { auto _e = extra_head_rot(); if (_e) _o->extra_head_rot = std::unique_ptr<TEN::Save::Vector3>(new TEN::Save::Vector3(*_e)); }
   { auto _e = extra_torso_rot(); if (_e) _o->extra_torso_rot = std::unique_ptr<TEN::Save::Vector3>(new TEN::Save::Vector3(*_e)); }
-  { auto _e = extra_velocity(); if (_e) _o->extra_velocity = std::unique_ptr<TEN::Save::Vector3>(new TEN::Save::Vector3(*_e)); }
   { auto _e = water_current_active(); _o->water_current_active = _e; }
   { auto _e = water_current_pull(); if (_e) _o->water_current_pull = std::unique_ptr<TEN::Save::Vector3>(new TEN::Save::Vector3(*_e)); }
   { auto _e = left_arm(); if (_e) _o->left_arm = std::unique_ptr<TEN::Save::ArmInfoT>(_e->UnPack(_resolver)); }
@@ -7335,7 +7321,6 @@ inline flatbuffers::Offset<Lara> CreateLara(flatbuffers::FlatBufferBuilder &_fbb
   auto _torch = _o->torch ? CreateTorchData(_fbb, _o->torch.get(), _rehasher) : 0;
   auto _extra_head_rot = _o->extra_head_rot ? _o->extra_head_rot.get() : 0;
   auto _extra_torso_rot = _o->extra_torso_rot ? _o->extra_torso_rot.get() : 0;
-  auto _extra_velocity = _o->extra_velocity ? _o->extra_velocity.get() : 0;
   auto _water_current_active = _o->water_current_active;
   auto _water_current_pull = _o->water_current_pull ? _o->water_current_pull.get() : 0;
   auto _left_arm = _o->left_arm ? CreateArmInfo(_fbb, _o->left_arm.get(), _rehasher) : 0;
@@ -7374,7 +7359,6 @@ inline flatbuffers::Offset<Lara> CreateLara(flatbuffers::FlatBufferBuilder &_fbb
       _torch,
       _extra_head_rot,
       _extra_torso_rot,
-      _extra_velocity,
       _water_current_active,
       _water_current_pull,
       _left_arm,
