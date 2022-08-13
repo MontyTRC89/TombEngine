@@ -2718,10 +2718,9 @@ namespace TEN::Gui
 						Rings[ringIndex]->CurrentObjectList[n].Bright = 32;
 				}
 
-				int x, y, y2;
-				x = 400 + xOffset + i * OBJLIST_SPACING;
-				y = 150;
-				y2 = 480; // Combine.
+				int x = 400 + xOffset + i * OBJLIST_SPACING;
+				int y = 150;
+				int y2 = 480; // Combine.
 				short obj = ConvertInventoryItemToObject(Rings[ringIndex]->CurrentObjectList[n].InventoryItem);
 				float scaler = InventoryObjectTable[Rings[ringIndex]->CurrentObjectList[n].InventoryItem].Scale1;
 				g_Renderer.DrawObjectOn2DPosition(x, ringIndex == (int)RingTypes::Inventory ? y : y2, obj, XRot, YRot, ZRot, scaler);
@@ -2818,7 +2817,7 @@ namespace TEN::Gui
 		bool exitLoop = false;
 		while (!exitLoop)
 		{
-			OBJLIST_SPACING = PHD_CENTER_X >> 1;
+			OBJLIST_SPACING = PHD_CENTER_X / 2;
 
 			if (CompassNeedleAngle != 1024)
 				CompassNeedleAngle -= 32;
