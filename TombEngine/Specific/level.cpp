@@ -12,6 +12,7 @@
 #include "Game/control/lot.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
+#include "Game/Lara/lara_initialise.h"
 #include "Game/misc.h"
 #include "Game/pickup/pickup.h"
 #include "Game/savegame.h"
