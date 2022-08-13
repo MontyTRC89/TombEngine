@@ -2070,7 +2070,7 @@ namespace TEN::Gui
 			if (n == 1)
 				yPos += LINE_HEIGHT;
 			else if (n == 2)
-				yPos += LINE_HEIGHT >> 1;
+				yPos += LINE_HEIGHT / 2;
 
 			if (n > 0)
 			{
@@ -2319,7 +2319,7 @@ namespace TEN::Gui
 		if (!AmmoSelectorFlag)
 			return;
 	
-		int xPos = (2 * PHD_CENTER_X - OBJLIST_SPACING) >> 1;
+		int xPos = (2 * PHD_CENTER_X - OBJLIST_SPACING) / 2;
 
 		if (NumAmmoSlots == 2)
 			xPos -= OBJLIST_SPACING / 2;
