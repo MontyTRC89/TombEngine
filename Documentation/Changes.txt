@@ -16,6 +16,7 @@ Version 1.0.1
 - Fixed crashes when loading image files are missing.
 - Clear locusts and other swarm enemies on level reload.
 - Prevent title music audio from starting in a random place.
+- Don't stumble into room geometry on idle or climb up/down rope animations.
 - Update harpoon speed on room change.
 - Enable second sky layer rendering.
 - Preserve inventory and flare on level jumps.
