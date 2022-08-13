@@ -374,7 +374,7 @@ short CreateNewEffect(short roomNum)
 		room->fxNumber = fxNumber;
 		fx->nextActive = NextFxActive;
 		NextFxActive = fxNumber;
-		fx->shade = GRAY555;
+		fx->color = Vector4::One;
 	}
 
 	return fxNumber;

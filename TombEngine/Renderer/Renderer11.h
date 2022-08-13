@@ -131,6 +131,8 @@ namespace TEN::Renderer
 		int RoomNumber;
 		Vector3 Position;
 		Matrix World;
+		Vector4 Color;
+		Vector4 AmbientLight;
 		RendererMesh* Mesh;
 		std::vector<RendererLight*> LightsToDraw;
 	};
