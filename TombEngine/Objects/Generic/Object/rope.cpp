@@ -606,7 +606,7 @@ namespace TEN::Entities::Generic
 		}
 	}
 
-	bool RopeSwingCollision(ItemInfo* item, CollisionInfo* coll)
+	bool RopeSwingCollision(ItemInfo* item, CollisionInfo* coll, bool testForStumble)
 	{
 		auto* lara = GetLaraInfo(item);
 
@@ -614,7 +614,7 @@ namespace TEN::Entities::Generic
 		coll->Setup.ForwardAngle = lara->Control.Rope.Direction ? item->Pose.Orientation.y : -item->Pose.Orientation.y;
 		GetCollisionInfo(coll, item);
 
-		bool stumble = (coll->CollisionType != CollisionType::CT_NONE || coll->HitStatic);
+		bool stumble = testForStumble && (coll->CollisionType != CollisionType::CT_NONE || coll->HitStatic);
 
 		if (stumble || 
 			TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, item->RoomNumber) ||
