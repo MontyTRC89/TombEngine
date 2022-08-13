@@ -503,21 +503,21 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 					if (item->Animation.ActiveState == LS_SWAN_DIVE)
 					{
 						SetAnimation(item, LA_SWANDIVE_DIVE);
-						item->Animation.Velocity.y *= 2.0f;
+						item->Animation.Velocity.y /= 2.0f;
 						item->Pose.Orientation.x = -ANGLE(45.0f);
 						lara->Control.HandStatus = HandStatus::Free;
 					}
 					else if (item->Animation.ActiveState == LS_FREEFALL_DIVE)
 					{
 						SetAnimation(item, LA_SWANDIVE_DIVE);
-						item->Animation.Velocity.y *= 2.0f;
+						item->Animation.Velocity.y /= 2.0f;
 						item->Pose.Orientation.x = -ANGLE(85.0f);
 						lara->Control.HandStatus = HandStatus::Free;
 					}
 					else
 					{
 						SetAnimation(item, LA_FREEFALL_DIVE);
-						item->Animation.Velocity.y = (item->Animation.Velocity.y / 2.0f) * 3.0f;
+						item->Animation.Velocity.y = (item->Animation.Velocity.y / 8.0f) * 3.0f;
 						item->Pose.Orientation.x = -ANGLE(45.0f);
 					}
 
