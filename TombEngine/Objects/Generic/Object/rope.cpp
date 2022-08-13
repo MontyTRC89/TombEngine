@@ -63,15 +63,11 @@ namespace TEN::Entities::Generic
 		else
 			rope->coiled = 0;
 
-		int l = 0;
-		int sum = 0;
-		int il = 3145728;
-
 		for (int i = 0; i < ROPE_SEGMENTS; ++i)
 		{
-			rope->segment[i].x = (int64_t)sum * pos2->x >> FP_SHIFT;
-			rope->segment[i].y = (int64_t)sum * pos2->x >> FP_SHIFT;
-			rope->segment[i].z = (int64_t)sum * pos2->z >> FP_SHIFT;
+			rope->segment[i].x = (long long)(rope->segmentLength * i) * pos2->x >> FP_SHIFT;
+			rope->segment[i].y = (long long)(rope->segmentLength * i) * pos2->y >> FP_SHIFT;
+			rope->segment[i].z = (long long)(rope->segmentLength * i) * pos2->z >> FP_SHIFT;
 
 			rope->velocity[i].x = 0;
 			rope->velocity[i].y = 0;
@@ -79,17 +75,13 @@ namespace TEN::Entities::Generic
 
 			if (item->TriggerFlags == -1)
 			{
-				rope->segment[i].x = l;
+				rope->segment[i].x = 1024 * i;
 				rope->segment[i].y >>= 4;
 
 				rope->velocity[i].x = 16384;
-				rope->velocity[i].y = il;
+				rope->velocity[i].y = 131072 * (ROPE_SEGMENTS - i);
 				rope->velocity[i].z = 16384;
 			}
-
-			l += 1024;
-			sum += rope->segmentLength;
-			il -= 131072;
 		}
 
 		rope->active = 0;
