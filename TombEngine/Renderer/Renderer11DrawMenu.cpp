@@ -103,7 +103,7 @@ namespace TEN::Renderer
 			(g_Gui.GetCurrentSettings().Configuration.ShadowType == ShadowMode::Lara ? STRING_SHADOWS_PLAYER : STRING_SHADOWS_ALL) : STRING_SHADOWS_NONE;
 
 		const char* antialiasMode;
-		switch (g_Gui.GetCurrentSettings().conf.Antialiasing)
+		switch (g_Gui.GetCurrentSettings().Configuration.Antialiasing)
 		{
 			default:
 			case AntialiasingMode::None:

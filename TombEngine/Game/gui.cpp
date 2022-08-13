@@ -396,7 +396,7 @@ namespace TEN::Gui
 				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 
 				if (CurrentSettings.Configuration.Antialiasing == AntialiasingMode::High)
-					CurrentSettings.conf.Antialiasing = AntialiasingMode::None;
+					CurrentSettings.Configuration.Antialiasing = AntialiasingMode::None;
 				else
 					CurrentSettings.Configuration.Antialiasing = AntialiasingMode(int(CurrentSettings.Configuration.Antialiasing) + 1);
 
@@ -2891,11 +2891,11 @@ namespace TEN::Gui
 
 			if (UseItem && NoAction())
 				exitLoop = true;
+
+			SetEnterInventory(NO_ITEM);
+
+			Camera.numberFrames = g_Renderer.Synchronize();
 		}
-
-		SetEnterInventory(NO_ITEM);
-
-		Camera.numberFrames = g_Renderer.Synchronize();
 
 		LastInvItem = Rings[(int)RingTypes::Inventory]->CurrentObjectList[Rings[(int)RingTypes::Inventory]->CurrentObjectInList].InventoryItem;
 		UpdateWeaponStatus(item);
