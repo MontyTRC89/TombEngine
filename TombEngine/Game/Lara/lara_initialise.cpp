@@ -154,15 +154,9 @@ void InitialiseLaraLevelJump(short itemNum, LaraInfo* lBackup)
 	auto* item = &g_Level.Items[itemNum];
 	auto* lara = GetLaraInfo(item);
 
-	// Restore inventory
-	lara->Inventory.HasBinoculars = lBackup->Inventory.HasBinoculars;
-	lara->Inventory.HasCrowbar = lBackup->Inventory.HasCrowbar;
-	lara->Inventory.HasLasersight = lBackup->Inventory.HasLasersight;
-	lara->Inventory.HasSilencer = lBackup->Inventory.HasSilencer;
-	lara->Inventory.TotalSmallMedipacks = lBackup->Inventory.TotalSmallMedipacks;
-	lara->Inventory.TotalLargeMedipacks = lBackup->Inventory.TotalLargeMedipacks;
-	lara->Inventory.TotalFlares = lBackup->Inventory.TotalFlares;
-	lara->Inventory.TotalSecrets = lBackup->Inventory.TotalSecrets;
+	// Restore inventory.
+	// It restores even puzzle/key items, to reset them, a ResetHub analog must be made.
+	lara->Inventory = lBackup->Inventory;
 	memcpy(&lara->Weapons, &lBackup->Weapons, sizeof(CarriedWeaponInfo) * int(LaraWeaponType::NumWeapons));
 
 	// If no flare present, quit
