@@ -25,51 +25,6 @@ struct RendererRectangle
 	}
 };
 
-struct GameVector
-{
-	int x;
-	int y;
-	int z;
-	int boxNumber;
-	short roomNumber;
-
-	GameVector()
-	{
-		this->x = 0;
-		this->y = 0;
-		this->z = 0;
-		this->roomNumber = 0;
-		this->boxNumber = 0;
-	}
-
-	GameVector(int xpos, int ypos, int zpos)
-	{
-		this->x = xpos;
-		this->y = ypos;
-		this->z = zpos;
-		this->roomNumber = 0;
-		this->boxNumber = 0;
-	}
-
-	GameVector(int xpos, int ypos, int zpos, short roomNumber)
-	{
-		this->x = xpos;
-		this->y = ypos;
-		this->z = zpos;
-		this->roomNumber = roomNumber;
-		this->boxNumber = 0;
-	}
-
-	GameVector(int xpos, int ypos, int zpos, short roomNumber, short boxNumber)
-	{
-		this->x = xpos;
-		this->y = ypos;
-		this->z = zpos;
-		this->roomNumber = roomNumber;
-		this->boxNumber = boxNumber;
-	}
-};
-
 struct LEVEL_CAMERA_INFO
 {
 	int x;
