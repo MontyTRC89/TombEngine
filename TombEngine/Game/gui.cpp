@@ -1879,9 +1879,9 @@ namespace TEN::Gui
 	{
 		auto* lara = GetLaraInfo(item);
 
-	if (Rings[(int)RingTypes::Ammo]->RingActive)
-	{
-		g_Renderer.AddString(PHD_CENTER_X, PHD_CENTER_Y, g_GameFlow->GetString(OptionStrings[5]), PRINTSTRING_COLOR_WHITE, PRINTSTRING_BLINK | PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
+		if (Rings[(int)RingTypes::Ammo]->RingActive)
+		{
+			g_Renderer.AddString(PHD_CENTER_X, PHD_CENTER_Y, g_GameFlow->GetString(OptionStrings[5]), PRINTSTRING_COLOR_WHITE, PRINTSTRING_BLINK | PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
 
 			if (Rings[(int)RingTypes::Inventory]->ObjectListMovement)
 				return;
@@ -2387,7 +2387,7 @@ namespace TEN::Gui
 		auto* lara = GetLaraInfo(item);
 
 		char textBufferMe[128];
-		unsigned short XRot, YRot, ZRot;
+		unsigned short xRot, yRot, zRot;
 
 		if (Rings[ringIndex]->CurrentObjectList <= 0)
 			return;
@@ -2688,9 +2688,9 @@ namespace TEN::Gui
 					SpinBack(&Rings[ringIndex]->CurrentObjectList[n].ZRot);
 				}
 
-				XRot = Rings[ringIndex]->CurrentObjectList[n].XRot;
-				YRot = Rings[ringIndex]->CurrentObjectList[n].YRot;
-				ZRot = Rings[ringIndex]->CurrentObjectList[n].ZRot;
+				xRot = Rings[ringIndex]->CurrentObjectList[n].XRot;
+				yRot = Rings[ringIndex]->CurrentObjectList[n].YRot;
+				zRot = Rings[ringIndex]->CurrentObjectList[n].ZRot;
 
 				int activeNum = 0;
 				if (Rings[ringIndex]->ObjectListMovement)
@@ -2723,7 +2723,7 @@ namespace TEN::Gui
 				int y2 = 480; // Combine.
 				short obj = ConvertInventoryItemToObject(Rings[ringIndex]->CurrentObjectList[n].InventoryItem);
 				float scaler = InventoryObjectTable[Rings[ringIndex]->CurrentObjectList[n].InventoryItem].Scale1;
-				g_Renderer.DrawObjectOn2DPosition(x, ringIndex == (int)RingTypes::Inventory ? y : y2, obj, XRot, YRot, ZRot, scaler);
+				g_Renderer.DrawObjectOn2DPosition(x, ringIndex == (int)RingTypes::Inventory ? y : y2, obj, xRot, yRot, zRot, scaler);
 
 				if (++n >= Rings[ringIndex]->NumObjectsInList)
 					n = 0;
