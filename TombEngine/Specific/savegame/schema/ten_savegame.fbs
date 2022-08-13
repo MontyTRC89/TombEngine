@@ -230,7 +230,6 @@ table Lara {
 	torch: TorchData;
 	extra_head_rot: Vector3;
 	extra_torso_rot: Vector3;
-	extra_velocity: Vector3;
 	water_current_active: int32;
 	water_current_pull: Vector3;
 	left_arm: ArmInfo;
