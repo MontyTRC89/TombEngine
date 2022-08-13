@@ -2484,7 +2484,7 @@ bool TestLaraSlideJump(ItemInfo* item, CollisionInfo* coll)
 		auto probe = GetCollision(item);
 
 		short direction = GetLaraSlideDirection(item, coll);
-		short steepness = GetSurfaceSteepnessAngle(probe.FloorTilt.x, probe.FloorTilt.y);
+		short steepness = GetSurfaceSteepnessAngle(probe.FloorTilt);
 		return (abs((short)(coll->Setup.ForwardAngle - direction)) <= abs(steepness));
 	}
 

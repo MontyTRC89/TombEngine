@@ -12,8 +12,10 @@ struct Vector3Shrt;
 	Vector3	   TranslatePoint(Vector3& point, Vector3& direction, float distance);
 	Vector3Int TranslatePoint(Vector3Int& point, Vector3& direction, float distance);
 
+	short		GetSurfaceSteepnessAngle(Vector2 tilt);
+	short		GetSurfaceAspectAngle(Vector2 tilt);
 	Vector3Shrt GetOrientTowardPoint(Vector3 origin, Vector3 target);
-
+	
 	bool IsPointOnLeft(Vector3 origin, Vector3 refPoint, Vector3 target);
 	bool IsPointOnLeft(Vector3 origin, Vector3Shrt orient, Vector3 target);
 //}

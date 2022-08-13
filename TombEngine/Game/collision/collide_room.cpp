@@ -1453,17 +1453,6 @@ int GetWaterHeight(ItemInfo* item)
 	return GetWaterHeight(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, item->RoomNumber);
 }
 
-short GetSurfaceSteepnessAngle(float xTilt, float zTilt)
-{
-	short stepAngleIncrement = ANGLE(45.0f) / 4;
-	return (short)sqrt(pow(xTilt * stepAngleIncrement, 2) + pow(zTilt * stepAngleIncrement, 2));
-}
-
-short GetSurfaceAspectAngle(float xTilt, float zTilt)
-{
-	return (short)phd_atan(-zTilt, -xTilt);
-}
-
 bool TestEnvironment(RoomEnvFlags environmentType, int x, int y, int z, int roomNumber)
 {
 	return TestEnvironment(environmentType, GetCollision(x, y, z, roomNumber).RoomNumber);
