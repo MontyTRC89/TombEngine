@@ -63,9 +63,7 @@ namespace TEN::Entities::TR2
 		short torsoX = 0;
 		short torsoY = 0;
 
-		pos.x = WorkerFlamethrowerBite.x;
-		pos.y = WorkerFlamethrowerBite.y;
-		pos.z = WorkerFlamethrowerBite.z;
+		pos = Vector3Int(WorkerFlamethrowerBite.Position);
 		GetJointAbsPosition(item, &pos, WorkerFlamethrowerBite.meshNum);
 
 		if (item->HitPoints <= 0)

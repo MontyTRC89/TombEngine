@@ -526,10 +526,10 @@ namespace TEN::Entities::TR4
 
 		item->ItemFlags[0]++;
 
-		auto pos1 = Vector3Int(SethaAttack1.x, SethaAttack1.y, SethaAttack1.z);
+		auto pos1 = Vector3Int(SethaAttack1.Position);
 		GetJointAbsPosition(item, &pos1, SethaAttack1.meshNum);
 
-		auto pos2 = Vector3Int(SethaAttack2.x, SethaAttack2.y, SethaAttack2.z);
+		auto pos2 = Vector3Int(SethaAttack2.Position);
 		GetJointAbsPosition(item, &pos2, SethaAttack2.meshNum);
 
 		int size;
@@ -586,7 +586,8 @@ namespace TEN::Entities::TR4
 
 			if (item->ItemFlags[0] >= 96 && item->ItemFlags[0] <= 99)
 			{
-				auto pos = Vector3Int(SethaAttack1.x, SethaAttack1.y * 2, SethaAttack1.z);
+				auto pos = Vector3Int(SethaAttack1.Position);
+				pos.y *= 2;
 				GetJointAbsPosition(item, &pos, SethaAttack1.meshNum);
 
 				auto angles = GetVectorAngles(pos.x - pos1.x, pos.y - pos1.y, pos.z - pos1.z);
@@ -595,7 +596,8 @@ namespace TEN::Entities::TR4
 			}
 			else if (item->ItemFlags[0] >= 122 && item->ItemFlags[0] <= 125)
 			{
-				auto pos = Vector3Int(SethaAttack2.x, SethaAttack2.y * 2, SethaAttack2.z);
+				auto pos = Vector3Int(SethaAttack2.Position);
+				pos.y *= 2;
 				GetJointAbsPosition(item, &pos, SethaAttack2.meshNum);
 
 				auto angles = GetVectorAngles(pos.x - pos2.x, pos.y - pos2.y, pos.z - pos2.z);
@@ -623,14 +625,16 @@ namespace TEN::Entities::TR4
 			{
 				if (Wibble & 4)
 				{
-					auto pos = Vector3Int(SethaAttack1.x, SethaAttack1.y * 2, SethaAttack1.z);
+					auto pos = Vector3Int(SethaAttack1.Position);
+					pos.y *= 2;
 					GetJointAbsPosition(item, &pos, SethaAttack1.meshNum);
 
 					auto angles = GetVectorAngles(pos.x - pos1.x, pos.y - pos1.y, pos.z - pos1.z);
 					auto attackPose = PHD_3DPOS(pos1, angles);
 					SethaThrowAttack(&attackPose, item->RoomNumber, 0);
 
-					pos = Vector3Int(SethaAttack2.x, SethaAttack2.y * 2, SethaAttack2.z);
+					pos = Vector3Int(SethaAttack2.Position);
+					pos.y *= 2;
 					GetJointAbsPosition(item, &pos, SethaAttack2.meshNum);
 
 					angles = GetVectorAngles(pos.x - pos2.x, pos.y - pos2.y, pos.z - pos2.z);
@@ -692,7 +696,8 @@ namespace TEN::Entities::TR4
 
 			if (item->ItemFlags[0] == 102)
 			{
-				auto pos = Vector3Int(SethaAttack1.x, SethaAttack1.y * 2, SethaAttack1.z);
+				auto pos = Vector3Int(SethaAttack1.Position);
+				pos.y *= 2;
 				GetJointAbsPosition(item, &pos, SethaAttack1.meshNum);
 
 				auto angles = GetVectorAngles(pos.x - pos1.x, pos.y - pos1.y, pos.z - pos1.z);
