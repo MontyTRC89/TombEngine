@@ -95,8 +95,8 @@ namespace TEN::Entities::TR1
 				!LaraItem->Animation.IsAirborne)
 			{
 				SetAnimation(item, LA_JUMP_WALL_SMASH_START);
-				item->Animation.Velocity = 0;
-				item->Animation.VerticalVelocity = 0;
+				item->Animation.Velocity.z = 0;
+				item->Animation.Velocity.y = 0;
 				item->Animation.IsAirborne = true;
 				item->Data = -1;
 				item->Pose.Position.y += 50;
@@ -114,7 +114,7 @@ namespace TEN::Entities::TR1
 				item->Pose.Position.y = item->Floor;
 				TestTriggers(item, true);
 
-				item->Animation.VerticalVelocity = 0;
+				item->Animation.Velocity.y = 0;
 				item->Animation.IsAirborne = false;
 				item->Animation.TargetState = LS_DEATH;
 				item->Animation.RequiredState = LS_DEATH;

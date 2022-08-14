@@ -361,7 +361,7 @@ namespace TEN::Entities::TR3
 			InitialiseItem(dartItemNumber);
 
 			dartItem->Pose.Orientation = angles;
-			dartItem->Animation.Velocity = CLICK(1);
+			dartItem->Animation.Velocity.z = CLICK(1);
 
 			AddActiveItem(dartItemNumber);
 

@@ -465,7 +465,7 @@ namespace TEN::Entities::TR4
 
 				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + 20)
 				{
-					if (!creature->Enemy->Animation.Velocity)
+					if (!creature->Enemy->Animation.Velocity.z)
 					{
 						angle1 += (GetRandomControl() & 0x1FF) - 256;
 						angle2 += (GetRandomControl() & 0x1FF) - 256;
@@ -596,8 +596,8 @@ namespace TEN::Entities::TR4
 			grenadeItem->Animation.ActiveState = grenadeItem->Pose.Orientation.x;
 			grenadeItem->Animation.TargetState = grenadeItem->Pose.Orientation.y;
 			grenadeItem->Animation.RequiredState = 0;
-			grenadeItem->Animation.Velocity = 128;
-			grenadeItem->Animation.VerticalVelocity = -128 * phd_sin(grenadeItem->Pose.Orientation.x);
+			grenadeItem->Animation.Velocity.z = 128;
+			grenadeItem->Animation.Velocity.y = -128 * phd_sin(grenadeItem->Pose.Orientation.x);
 			grenadeItem->HitPoints = 120;
 			grenadeItem->ItemFlags[2] = 1;
 
