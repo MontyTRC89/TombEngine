@@ -800,7 +800,7 @@ void ReadRooms()
 			volume.Scale.y = ReadFloat();
 			volume.Scale.z = ReadFloat();
 
-			//volume.LuaName = ReadString(); // TODO: Uncomment when lua API for volumes is implemented -- Lwmte, 09.08.22
+			volume.LuaName = ReadString();
 			volume.EventSetIndex = ReadInt32();
 
 			volume.Status = TriggerStatus::Outside;
