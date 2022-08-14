@@ -174,7 +174,7 @@ namespace TEN::Entities::Generic
 			laraInfo->Control.HandStatus == HandStatus::Free &&
 			(laraItem->Animation.ActiveState == LS_REACH || laraItem->Animation.ActiveState == LS_JUMP_UP) &&
 			laraItem->Animation.IsAirborne &&
-			laraItem->Animation.VerticalVelocity > 0 &&
+			laraItem->Animation.Velocity.y > 0.0f &&
 			rope->active)
 		{
 			auto* frame = GetBoundsAccurate(laraItem);
@@ -202,7 +202,7 @@ namespace TEN::Entities::Generic
 				}
 
 				laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
-				laraItem->Animation.VerticalVelocity = 0;
+				laraItem->Animation.Velocity.y = 0;
 				laraItem->Animation.IsAirborne = false;
 
 				laraInfo->Control.HandStatus = HandStatus::Busy;
@@ -216,7 +216,7 @@ namespace TEN::Entities::Generic
 				CurrentPendulum.velocity.y = 0;
 				CurrentPendulum.velocity.z = 0;
 
-				ApplyVelocityToRope(segment, laraItem->Pose.Orientation.y, 16 * laraItem->Animation.Velocity);
+				ApplyVelocityToRope(segment, laraItem->Pose.Orientation.y, 16 * laraItem->Animation.Velocity.z);
 			}
 		}
 	}
@@ -630,13 +630,13 @@ namespace TEN::Entities::Generic
 		{
 			if (item->Pose.Orientation.x >= 0)
 			{
-				item->Animation.VerticalVelocity = -112;
-				item->Animation.Velocity = item->Pose.Orientation.x / 128;
+				item->Animation.Velocity.y = -112;
+				item->Animation.Velocity.z = item->Pose.Orientation.x / 128;
 			}
 			else
 			{
-				item->Animation.Velocity = 0;
-				item->Animation.VerticalVelocity = -20;
+				item->Animation.Velocity.z = 0;
+				item->Animation.Velocity.y = -20;
 			}
 
 			item->Pose.Orientation.x = 0;
@@ -660,13 +660,13 @@ namespace TEN::Entities::Generic
 
 	void FallFromRope(ItemInfo* item, bool stumble)
 	{
-		item->Animation.Velocity = abs(CurrentPendulum.velocity.x >> FP_SHIFT) + abs(CurrentPendulum.velocity.z >> FP_SHIFT) >> 1;
+		item->Animation.Velocity.z = abs(CurrentPendulum.velocity.x >> FP_SHIFT) + abs(CurrentPendulum.velocity.z >> FP_SHIFT) >> 1;
 		item->Pose.Orientation.x = 0;
 		item->Pose.Position.y += 320;
 
 		SetAnimation(item, stumble ? LA_JUMP_WALL_SMASH_START : LA_FALL_START);
 
-		item->Animation.VerticalVelocity = 0;
+		item->Animation.Velocity.y = 0;
 		item->Animation.IsAirborne = true;
 
 		auto* lara = GetLaraInfo(item);
@@ -675,7 +675,7 @@ namespace TEN::Entities::Generic
 
 		if (stumble)
 		{
-			item->Animation.Velocity = -item->Animation.Velocity;
+			item->Animation.Velocity.z = -item->Animation.Velocity.z;
 			DoDamage(item, 0);
 		}
 	}

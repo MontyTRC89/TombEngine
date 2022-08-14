@@ -113,7 +113,7 @@ namespace TEN::Entities::TR4
 					laraItem->Animation.AnimNumber = LA_MINE_DEATH;
 					laraItem->Animation.FrameNumber = g_Level.Anims[mineItem->Animation.AnimNumber].frameBase;
 					laraItem->Animation.ActiveState = LS_DEATH;
-					laraItem->Animation.Velocity = 0;
+					laraItem->Animation.Velocity.z = 0;
 
 					SoundEffect(SFX_TR4_MINE_EXPLOSION_OVERLAY, &mineItem->Pose);
 				}
