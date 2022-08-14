@@ -189,7 +189,12 @@ namespace TEN::Entities::TR2
 				}
 
 				if (Targetable(item, &AI))
-					item->Animation.TargetState = (item->Animation.ActiveState == 8) ? 4 : 10;
+				{
+					if (item->Animation.ActiveState == 8)
+						item->Animation.TargetState = 4;
+					else
+						item->Animation.TargetState = 10;
+				}
 
 				break;
 
