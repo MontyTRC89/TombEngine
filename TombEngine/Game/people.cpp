@@ -66,7 +66,6 @@ bool ShotLara(ItemInfo* item, AI_INFO* AI, BiteInfo* gun, short extraRotation, i
 				enemy->HitStatus = true;
 				enemy->HitPoints += damage / -10;
 
-				// TODO: Use TestProbability().
 				int random = GetRandomControl() & 0xF;
 				if (random > 14)
 					random = 0;
