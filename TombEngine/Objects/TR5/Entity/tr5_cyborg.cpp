@@ -16,12 +16,12 @@
 #include "Game/effects/lightning.h"
 #include "Game/effects/lara_fx.h"
 
-namespace TEN::Entities::TR5
-{
 	using namespace TEN::Effects::Lara;
 	using namespace TEN::Effects::Lightning;
 
-	BiteInfo CyborgGunBite = { 0, 300, 64, 7 };
+namespace TEN::Entities::TR5
+{
+	const auto CyborgGunBite = BiteInfo(Vector3(0.0f, 300.0f, 64.0f), 7);
 	byte HitmanJoints[12] = { 15, 14, 13, 6, 5, 12, 7, 4, 10, 11, 19 };
 
 	enum CyborgState
@@ -596,7 +596,7 @@ namespace TEN::Entities::TR5
 						((byte)item->Animation.FrameNumber - (byte)g_Level.Anims[item->Animation.AnimNumber].frameBase) & 1)
 					{
 						creature->FiredWeapon = 1;
-						ShotLara(item, &AI, &CyborgGunBite, joint0, 12);
+						ShotLara(item, &AI, CyborgGunBite, joint0, 12);
 					}
 
 					break;

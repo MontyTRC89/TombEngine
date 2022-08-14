@@ -13,7 +13,7 @@
 
 namespace TEN::Entities::TR5
 {
-	BiteInfo LagoonWitchBite = { 0, 0, 0, 7 };
+	const auto LagoonWitchBite = BiteInfo(Vector3::Zero, 7);
 
 	enum LagoonWitchState
 	{
@@ -130,7 +130,7 @@ namespace TEN::Entities::TR5
 					item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 29)
 				{
 					DoDamage(creature->Enemy, 100);
-					CreatureEffect2(item, &LagoonWitchBite, 10, item->Pose.Orientation.y, DoBloodSplat);
+					CreatureEffect2(item, LagoonWitchBite, 10, item->Pose.Orientation.y, DoBloodSplat);
 					creature->Flags = WITCH_STATE_SWIM;
 				}
 

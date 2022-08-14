@@ -13,8 +13,8 @@
 
 namespace TEN::Entities::TR2
 {
-	auto MercenaryUziBite = BiteInfo(Vector3(0.0f, 150.0f, 19.0f), 17);
-	auto MercenaryAutoPistolBite = BiteInfo(Vector3(0.0f, 230.0f, 9.0f), 17);
+	const auto MercenaryUziBite		   = BiteInfo(Vector3(0.0f, 150.0f, 19.0f), 17);
+	const auto MercenaryAutoPistolBite = BiteInfo(Vector3(0.0f, 230.0f, 9.0f), 17);
 
 	// TODO
 	enum MercenaryState
@@ -165,7 +165,7 @@ namespace TEN::Entities::TR2
 					torsoY = AI.angle;
 				}
 
-				if (!ShotLara(item, &AI, &MercenaryUziBite, torsoY, 8))
+				if (!ShotLara(item, &AI, MercenaryUziBite, torsoY, 8))
 					item->Animation.TargetState = 1;
 
 				if (AI.distance < pow(SECTOR(2), 2))
@@ -181,7 +181,7 @@ namespace TEN::Entities::TR2
 					torsoY = AI.angle;
 				}
 
-				if (!ShotLara(item, &AI, &MercenaryUziBite, torsoY, 8))
+				if (!ShotLara(item, &AI, MercenaryUziBite, torsoY, 8))
 					item->Animation.TargetState = 1;
 
 				if (AI.distance < pow(SECTOR(2), 2))
@@ -339,7 +339,7 @@ namespace TEN::Entities::TR2
 						if (GetRandomControl() < 0x2000)
 							item->Animation.TargetState = 2;
 
-						ShotLara(item, &AI, &MercenaryAutoPistolBite, torsoY, 50);
+						ShotLara(item, &AI, MercenaryAutoPistolBite, torsoY, 50);
 						creature->Flags = 1;
 					}
 				}
@@ -359,7 +359,7 @@ namespace TEN::Entities::TR2
 
 					if (creature->Flags != 1)
 					{
-						if (!ShotLara(item, &AI, &MercenaryAutoPistolBite, torsoY, 50))
+						if (!ShotLara(item, &AI, MercenaryAutoPistolBite, torsoY, 50))
 							item->Animation.TargetState = 3;
 
 						creature->Flags = 1;
@@ -397,7 +397,7 @@ namespace TEN::Entities::TR2
 
 					if (creature->Flags != 2)
 					{
-						if (!ShotLara(item, &AI, &MercenaryAutoPistolBite, torsoY, 50))
+						if (!ShotLara(item, &AI, MercenaryAutoPistolBite, torsoY, 50))
 							item->Animation.TargetState = 3;
 
 						creature->Flags = 2;
