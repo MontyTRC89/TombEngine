@@ -14,6 +14,7 @@ Version 1.0.1
 - Fix resurfacing on underwater death.
 - Fix ripples not appearing on water connections higher than room bottom.
 - Fix several problems with ropes (stumbling, rope length, etc).
+- Fix several problems with teeth spikes.
 - Fix crashes when loading image files are missing.
 - Clear locusts and other swarm enemies on level reload.
 - Prevent title music audio from starting in a random place.
