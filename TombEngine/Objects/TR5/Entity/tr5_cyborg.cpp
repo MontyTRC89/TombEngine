@@ -223,7 +223,7 @@ namespace TEN::Entities::TR5
 
 			if (creature->FiredWeapon)
 			{
-				Vector3Int pos = { CyborgGunBite.x, CyborgGunBite.y, CyborgGunBite.z };
+				auto pos = Vector3Int(CyborgGunBite.Position);
 				GetJointAbsPosition(item, &pos, CyborgGunBite.meshNum);
 
 				TriggerDynamicLight(pos.x, pos.y, pos.z, 2 * creature->FiredWeapon + 10, 192, 128, 32);

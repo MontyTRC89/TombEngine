@@ -762,7 +762,7 @@ namespace TEN::Renderer
 
 						BindTexture(TEXTURE_COLOR_MAP, &std::get<0>(m_moveablesTextures[flashBucket.Texture]), SAMPLER_ANISOTROPIC_CLAMP);
 
-						Matrix offset = Matrix::CreateTranslation(bites[k]->x, bites[k]->y, bites[k]->z);
+						Matrix offset = Matrix::CreateTranslation(bites[k]->Position);
 						Matrix rotationX = Matrix::CreateRotationX(TO_RAD(ANGLE(270.0f)));
 						Matrix rotationZ = Matrix::CreateRotationZ(TO_RAD(2 * GetRandomControl()));
 

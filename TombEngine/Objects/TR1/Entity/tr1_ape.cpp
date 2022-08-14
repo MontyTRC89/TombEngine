@@ -79,8 +79,8 @@ namespace TEN::Entities::TR1
 
 	enum ApeFlags
 	{
-		APE_FLAG_ATTACK = (1 << 0),
-		APE_FLAG_TURN_LEFT = (1 << 1),
+		APE_FLAG_ATTACK		= (1 << 0),
+		APE_FLAG_TURN_LEFT	= (1 << 1),
 		APE_FLAG_TURN_RIGHT = (1 << 2)
 	};
 
@@ -231,7 +231,7 @@ namespace TEN::Entities::TR1
 			case APE_STATE_RUN_FORWARD:
 				creatureInfo->MaxTurn = APE_RUN_TURN_RATE_MAX;
 
-				if (creatureInfo->Flags == 0 &&
+				if (!creatureInfo->Flags &&
 					AI.angle > -APE_DISPLAY_ANGLE &&
 					AI.angle < APE_DISPLAY_ANGLE)
 				{
