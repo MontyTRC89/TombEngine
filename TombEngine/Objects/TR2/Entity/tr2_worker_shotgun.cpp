@@ -13,7 +13,7 @@
 
 namespace TEN::Entities::TR2
 {
-	BiteInfo WorkerShotgunBite = { 0, 281, 40, 9 };
+	const auto WorkerShotgunBite = BiteInfo(Vector3(0.0f, 281.0f, 40.0f), 9);
 
 	// TODO
 	enum ShotgunWorkerState
@@ -27,7 +27,7 @@ namespace TEN::Entities::TR2
 
 	};
 
-	static void ShotLaraWithShotgun(ItemInfo* item, AI_INFO* info, BiteInfo* bite, short angleY, int damage)
+	void ShotLaraWithShotgun(ItemInfo* item, AI_INFO* info, BiteInfo bite, short angleY, int damage)
 	{
 		ShotLara(item, info, bite, angleY, damage);
 		ShotLara(item, info, bite, angleY, damage);
@@ -57,12 +57,12 @@ namespace TEN::Entities::TR2
 		auto* item = &g_Level.Items[itemNumber];
 		auto* creature = GetCreatureInfo(item);
 
+		short tilt = 0;
 		short angle = 0;
 		short headX = 0;
 		short headY = 0;
 		short torsoX = 0;
 		short torsoY = 0;
-		short tilt = 0;
 
 		if (item->HitPoints <= 0)
 		{
@@ -96,18 +96,21 @@ namespace TEN::Entities::TR2
 				}
 
 				if (creature->Mood == MoodType::Escape)
-				{
 					item->Animation.TargetState = 5;
-				}
 				else if (Targetable(item, &AI))
 				{
-					if (AI.distance <= pow(SECTOR(3), 2) || AI.zoneNumber != AI.enemyZone)
+					if (AI.distance < pow(SECTOR(3), 2) || AI.zoneNumber != AI.enemyZone)
 						item->Animation.TargetState = (GetRandomControl() >= 0x4000) ? 9 : 8;
 					else
 						item->Animation.TargetState = 1;
 				}
 				else if (creature->Mood == MoodType::Attack || !AI.ahead)
-					item->Animation.TargetState = (AI.distance <= pow(SECTOR(2), 2)) ? 1 : 5;
+				{
+					if (AI.distance <= pow(SECTOR(2), 2))
+						item->Animation.TargetState = 1;
+					else
+						item->Animation.TargetState = 5;
+				}
 				else
 					item->Animation.TargetState = 3;
 
@@ -156,8 +159,8 @@ namespace TEN::Entities::TR2
 				break;
 
 			case 5:
-				creature->MaxTurn = 910;
 				tilt = angle / 2;
+				creature->MaxTurn = 910;
 
 				if (AI.ahead)
 				{
@@ -200,7 +203,7 @@ namespace TEN::Entities::TR2
 
 				if (!creature->Flags)
 				{
-					ShotLaraWithShotgun(item, &AI, &WorkerShotgunBite, torsoY, 25);
+					ShotLaraWithShotgun(item, &AI, WorkerShotgunBite, torsoY, 25);
 					creature->FiredWeapon = 2;
 					creature->Flags = 1;
 				}
@@ -222,7 +225,7 @@ namespace TEN::Entities::TR2
 
 				if (!creature->Flags)
 				{
-					ShotLaraWithShotgun(item, &AI, &WorkerShotgunBite, torsoY, 25);
+					ShotLaraWithShotgun(item, &AI, WorkerShotgunBite, torsoY, 25);
 					creature->FiredWeapon = 2;
 					creature->Flags = 1;
 				}
