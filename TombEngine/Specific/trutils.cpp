@@ -11,11 +11,18 @@ namespace TEN::Utils
 		return source;
 	}
 
-	std::string FromWchar(wchar_t* source)
+	std::string FromWchar(const wchar_t* source)
 	{
 		std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> converter;
 		return converter.to_bytes(std::wstring(source));
 	}
+
+    std::wstring FromChar(const char* source)
+    {
+        wchar_t buffer[UCHAR_MAX];
+        std::mbstowcs(buffer, source, UCHAR_MAX);
+        return std::wstring(buffer);
+    }
 
 	std::vector<std::string> SplitString(const std::string& source)
 	{

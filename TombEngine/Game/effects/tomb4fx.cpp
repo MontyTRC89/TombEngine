@@ -1506,7 +1506,7 @@ void ExplodingDeath(short itemNumber, short flags)
 				}
 
 				fx->objectNumber = ID_BODY_PART;
-				fx->shade = 16912;
+				fx->color = item->Color;
 				fx->flag2 = flags;
 				fx->frameNumber = obj->meshIndex + i;
 			}
