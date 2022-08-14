@@ -16,7 +16,9 @@ local version = "1.0.1"
 project = "TombEngine"
 title = "TombEngine " .. version .. " Lua API"
 description = "TombEngine " .. version .. " scripting interface"
-full_description = [[Welcome to the TombEngine scripting API. This is a work in progress and some information might be wrong or outdated. Please also note that this is primarily a reference document, not a tutorial, so expect descriptions to be fairly sparse. At the time of writing, there is a tutorial describing the basics of Lua, as well as a number of example scripts, on the wiki at https://github.com/MontyTRC89/TombEngine/wiki.
+full_description = [[Welcome to the TombEngine scripting API. This is a work in progress and some information might be wrong or outdated. Please also note that this is primarily a reference document, not a tutorial, so expect descriptions to be fairly sparse.
+
+At the time of writing, there is a tutorial describing the basics of Lua, as well as a number of example scripts, on the wiki <a href="https://github.com/Stranger1992/Tomb-Engine-Demo-Levels/wiki">here</a>.
 ####Module Hierarchy (boring but important)
 Other than the "special tables" (GameVars, LevelVars and LevelFuncs), every module described herein is held in a master table called TEN.
 For example, to call GetMoveableByName, you would have to do:
