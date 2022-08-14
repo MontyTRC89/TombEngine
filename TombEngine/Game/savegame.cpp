@@ -614,7 +614,6 @@ bool SaveGame::Save(int slot)
 		}
 
 		Save::ItemBuilder serializedItem{ fbb };
-
 		serializedItem.add_next_item(itemToSerialize.NextItem);
 		serializedItem.add_next_item_active(itemToSerialize.NextActive);
 		serializedItem.add_anim_number(itemToSerialize.Animation.AnimNumber - obj->animIndex);
@@ -622,7 +621,6 @@ bool SaveGame::Save(int slot)
 		serializedItem.add_box_number(itemToSerialize.BoxNumber);
 		serializedItem.add_carried_item(itemToSerialize.CarriedItem);
 		serializedItem.add_active_state(itemToSerialize.Animation.ActiveState);
-		serializedItem.add_vertical_velocity(itemToSerialize.Animation.Velocity.y);
 		serializedItem.add_flags(itemToSerialize.Flags);
 		serializedItem.add_floor(itemToSerialize.Floor);
 		serializedItem.add_frame_number(itemToSerialize.Animation.FrameNumber);
@@ -634,7 +632,7 @@ bool SaveGame::Save(int slot)
 		serializedItem.add_pose(&FromPHD(itemToSerialize.Pose));
 		serializedItem.add_required_state(itemToSerialize.Animation.RequiredState);
 		serializedItem.add_room_number(itemToSerialize.RoomNumber);
-		serializedItem.add_velocity(itemToSerialize.Animation.Velocity.z);
+		serializedItem.add_velocity(&FromVector3(itemToSerialize.Animation.Velocity));
 		serializedItem.add_timer(itemToSerialize.Timer);
 		serializedItem.add_color(&FromVector4(itemToSerialize.Color));
 		serializedItem.add_touch_bits(itemToSerialize.TouchBits);
@@ -1331,8 +1329,7 @@ bool SaveGame::Load(int slot)
 		item->Pose = ToPHD(savedItem->pose());
 		item->RoomNumber = savedItem->room_number();
 
-		item->Animation.Velocity.z = savedItem->velocity();
-		item->Animation.Velocity.y = savedItem->vertical_velocity();
+		item->Animation.Velocity = ToVector3(savedItem->velocity());
 
 		if (item->ObjectNumber == ID_LARA && !dynamicItem)
 		{
