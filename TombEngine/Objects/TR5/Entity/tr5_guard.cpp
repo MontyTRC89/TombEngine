@@ -287,7 +287,7 @@ namespace TEN::Entities::TR5
 		{
 			creature->FiredWeapon--;
 
-			auto pos = Vector3Int(SwatGunBite.x, SwatGunBite.y, SwatGunBite.z);
+			auto pos = Vector3Int(SwatGunBite.Position);
 			GetJointAbsPosition(item, &pos, SwatGunBite.meshNum);
 
 			TriggerDynamicLight(pos.x, pos.y, pos.z, 2 * creature->FiredWeapon + 10, 192, 128, 32);
@@ -996,7 +996,7 @@ namespace TEN::Entities::TR5
 
 		if (creature->FiredWeapon)
 		{
-			auto pos = Vector3Int(SniperGunBite.x, SniperGunBite.y, SniperGunBite.z);
+			auto pos = Vector3Int(SniperGunBite.Position);
 			GetJointAbsPosition(item, &pos, SniperGunBite.meshNum);
 
 			TriggerDynamicLight(pos.x, pos.y, pos.z, 2 * creature->FiredWeapon + 10, 192, 128, 32);
@@ -1155,7 +1155,7 @@ namespace TEN::Entities::TR5
 
 		if (creature->FiredWeapon)
 		{
-			auto pos = Vector3Int(ArmedMafia2GunBite.x, ArmedMafia2GunBite.y, ArmedMafia2GunBite.z);
+			auto pos = Vector3Int(ArmedMafia2GunBite.Position);
 			GetJointAbsPosition(item, &pos, ArmedMafia2GunBite.meshNum);
 
 			TriggerDynamicLight(pos.x, pos.y, pos.z, 4 * creature->FiredWeapon + 8, 24, 16, 4);
