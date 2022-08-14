@@ -89,15 +89,10 @@ namespace TEN::Entities::TR5
 		// Fire weapon effects
 		if (creature->FiredWeapon)
 		{
-			Vector3Int pos;
-
-			pos.x = LarsonGun.x;
-			pos.y = LarsonGun.y;
-			pos.z = LarsonGun.z;
-
+			auto pos = Vector3Int(LarsonGun.Position);
 			GetJointAbsPosition(item, &pos, LarsonGun.meshNum);
-			TriggerDynamicLight(pos.x, pos.y, pos.z, 2 * creature->FiredWeapon + 10, 192, 128, 32);
 
+			TriggerDynamicLight(pos.x, pos.y, pos.z, 2 * creature->FiredWeapon + 10, 192, 128, 32);
 			creature->FiredWeapon--;
 		}
 
