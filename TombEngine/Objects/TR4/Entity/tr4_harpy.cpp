@@ -184,9 +184,9 @@ namespace TEN::Entities::TR4
 	{
 		item->ItemFlags[0]++;
 
-		auto rh = Vector3Int(HarpyAttack1.x, HarpyAttack1.y, HarpyAttack1.z);
+		auto rh = Vector3Int(HarpyAttack1.Position);
 		GetJointAbsPosition(item, &rh, HarpyAttack1.meshNum);
-		auto lr = Vector3Int(HarpyAttack2.x, HarpyAttack2.y, HarpyAttack2.z);
+		auto lr = Vector3Int(HarpyAttack2.Position);
 		GetJointAbsPosition(item, &lr, HarpyAttack2.meshNum);
 
 		if (item->ItemFlags[0] >= 24 &&
@@ -224,7 +224,8 @@ namespace TEN::Entities::TR4
 		{
 			if (item->ItemFlags[0] <= 65 && GlobalCounter & 1)
 			{
-				auto pos3 = Vector3Int(HarpyAttack1.x, HarpyAttack1.y * 2, HarpyAttack1.z);
+				auto pos3 = Vector3Int(HarpyAttack1.Position);
+				pos3.y *= 2;
 				GetJointAbsPosition(item, &pos3, HarpyAttack1.meshNum);
 
 				auto angles = GetVectorAngles(pos3.x - rh.x, pos3.y - rh.y, pos3.z - rh.z);
@@ -234,7 +235,8 @@ namespace TEN::Entities::TR4
 
 			if (item->ItemFlags[0] >= 61 && item->ItemFlags[0] <= 65 && !(GlobalCounter & 1))
 			{
-				auto pos3 = Vector3Int(HarpyAttack2.x, HarpyAttack2.y * 2, HarpyAttack2.z);
+				auto pos3 = Vector3Int(HarpyAttack2.Position);
+				pos3.y *= 2;
 				GetJointAbsPosition(item, &pos3, HarpyAttack2.meshNum);
 
 				auto angles = GetVectorAngles(pos3.x - rh.x, pos3.y - rh.y, pos3.z - rh.z);

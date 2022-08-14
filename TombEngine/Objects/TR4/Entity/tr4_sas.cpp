@@ -565,7 +565,7 @@ namespace TEN::Entities::TR4
 			grenadeItem->ObjectNumber = ID_GRENADE;
 			grenadeItem->RoomNumber = item->RoomNumber;
 
-			auto pos = Vector3Int(SASGunBite.x, SASGunBite.y, SASGunBite.z);
+			auto pos = Vector3Int(SASGunBite.Position);
 			GetJointAbsPosition(item, &pos, SASGunBite.meshNum);
 
 			grenadeItem->Pose.Position = pos;
