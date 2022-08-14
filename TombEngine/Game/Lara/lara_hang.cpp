@@ -48,7 +48,7 @@ void lara_col_hang(ItemInfo* item, CollisionInfo* coll)
 	auto* lara = GetLaraInfo(item);
 
 	item->Animation.IsAirborne = false;
-	item->Animation.VerticalVelocity = 0;
+	item->Animation.Velocity.y = 0;
 
 	if (item->Animation.AnimNumber == LA_REACH_TO_HANG ||
 		item->Animation.AnimNumber == LA_HANG_IDLE)

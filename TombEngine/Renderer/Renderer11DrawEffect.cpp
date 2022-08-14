@@ -1036,8 +1036,8 @@ namespace TEN::Renderer
 		RendererRoom const& room = m_rooms[effect->RoomNumber];
 
 		m_stStatic.World = effect->World;
-		m_stStatic.Color = Vector4::One;
-		m_stStatic.AmbientLight = room.AmbientLight;
+		m_stStatic.Color = effect->Color;
+		m_stStatic.AmbientLight = effect->AmbientLight;
 		m_stStatic.LightMode = LIGHT_MODES::LIGHT_MODE_DYNAMIC;
 		m_cbStatic.updateData(m_stStatic, m_context.Get());
 		BindConstantBufferVS(CB_STATIC, m_cbStatic.get());

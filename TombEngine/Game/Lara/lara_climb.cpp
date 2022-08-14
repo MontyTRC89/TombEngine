@@ -988,7 +988,7 @@ bool LaraCheckForLetGo(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	item->Animation.VerticalVelocity = 0;
+	item->Animation.Velocity.y = 0;
 	item->Animation.IsAirborne = false;
 
 	if (TrInput & IN_ACTION && item->HitPoints > 0 || item->Animation.AnimNumber == LA_ONWATER_TO_LADDER) // Can't let go on this anim
@@ -998,8 +998,8 @@ bool LaraCheckForLetGo(ItemInfo* item, CollisionInfo* coll)
 
 	SetAnimation(item, LA_FALL_START);
 
-	item->Animation.Velocity = 2;
-	item->Animation.VerticalVelocity = 1;
+	item->Animation.Velocity.z = 2;
+	item->Animation.Velocity.y = 1;
 	item->Animation.IsAirborne = true;
 	lara->Control.HandStatus = HandStatus::Free;
 	return true;

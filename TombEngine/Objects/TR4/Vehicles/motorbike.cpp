@@ -410,7 +410,7 @@ namespace TEN::Entities::Vehicles
 			auto pos = Vector3Int(56, -144, -500);
 			GetJointAbsPosition(motorbikeItem, &pos, 0);
 
-			int speed = motorbikeItem->Animation.Velocity;
+			int speed = motorbikeItem->Animation.Velocity.z;
 			if (speed > 32 && speed < 64)
 			{
 				TriggerMotorbikeExhaustSmoke(pos.x, pos.y, pos.z, motorbikeItem->Pose.Orientation.y - ANGLE(180.0f), 64 - speed, true);
@@ -613,9 +613,9 @@ namespace TEN::Entities::Vehicles
 
 		floorHeight = GetCollision(motorbikeItem).Position.Floor;
 		if (motorbikeItem->Pose.Position.y >= floorHeight)
-			speed = motorbikeItem->Animation.Velocity * phd_cos(motorbikeItem->Pose.Orientation.x);
+			speed = motorbikeItem->Animation.Velocity.z * phd_cos(motorbikeItem->Pose.Orientation.x);
 		else
-			speed = motorbikeItem->Animation.Velocity;
+			speed = motorbikeItem->Animation.Velocity.z;
 
 		TranslateItem(motorbikeItem, motorbike->MomentumAngle, speed);
 
@@ -897,7 +897,7 @@ namespace TEN::Entities::Vehicles
 					{
 						laraItem->Animation.TargetState = MOTORBIKE_STATE_LANDING;
 
-						int fallSpeedDamage = motorbikeItem->Animation.VerticalVelocity - 140;
+						int fallSpeedDamage = motorbikeItem->Animation.Velocity.y - 140;
 						if (fallSpeedDamage > 0)
 						{
 							if (fallSpeedDamage <= 100)
@@ -906,7 +906,7 @@ namespace TEN::Entities::Vehicles
 								DoDamage(laraItem, LARA_HEALTH_MAX);
 						}
 					}
-					else if (motorbikeItem->Animation.VerticalVelocity > 220)
+					else if (motorbikeItem->Animation.Velocity.y > 220)
 						motorbike->Flags |= MOTORBIKE_FLAG_FALLING;
 
 					break;
@@ -1130,7 +1130,7 @@ namespace TEN::Entities::Vehicles
 				}
 			}
 
-			motorbikeItem->Animation.Velocity = motorbike->Velocity / VEHICLE_VELOCITY_SCALE;
+			motorbikeItem->Animation.Velocity.z = motorbike->Velocity / VEHICLE_VELOCITY_SCALE;
 
 			if (motorbike->EngineRevs > MOTORBIKE_ACCEL_MAX)
 				motorbike->EngineRevs = (GetRandomControl() & 0x1FF) + 0xBF00;
@@ -1255,7 +1255,7 @@ namespace TEN::Entities::Vehicles
 		motorbike->RightWheelsRotation -= rotation;
 
 		int newY = motorbikeItem->Pose.Position.y;
-		motorbikeItem->Animation.VerticalVelocity = DoMotorBikeDynamics(probe.Position.Floor, motorbikeItem->Animation.VerticalVelocity, &motorbikeItem->Pose.Position.y, 0);
+		motorbikeItem->Animation.Velocity.y = DoMotorBikeDynamics(probe.Position.Floor, motorbikeItem->Animation.Velocity.y, &motorbikeItem->Pose.Position.y, 0);
 		motorbike->Velocity = DoVehicleWaterMovement(motorbikeItem, laraItem, motorbike->Velocity, MOTORBIKE_RADIUS, &motorbike->TurnRate);
 
 		int r1 = (frontRight.y + frontLeft.y) / 2;

@@ -2,18 +2,25 @@ Version 1.0.1
 =============
 
 - Added antialiasing support.
-- Fixed some issues with shimmying between diagonal ledges and walls.
-- Fixed rope transparency.
-- Fixed objects disappearing under certain angles at the edges of the screen.
-- Fixed incorrect polerope grabbing.
-- Fixed camera behaviour with pushable blocks.
-- Fixed minecart unduck on inclines.
-- Fixed quadbike dismount with jump key and allow to shoot big gun with action key.
-- Fixed rollingball incorrectly killing Lara in water and in jump.
-- Fixed resurfacing on underwater death.
-- Fixed ripples not appearing on water connections higher than room bottom.
+- Fix some issues with shimmying between diagonal ledges and walls.
+- Fix rope transparency.
+- Fix objects disappearing under certain angles at the edges of the screen.
+- Fix incorrect polerope and jumpswitch grabbing.
+- Fix camera behaviour with pushable blocks.
+- Fix minecart unduck on inclines.
+- Fix quadbike dismount with jump key and allow to shoot big gun with action key.
+- Fix static meshes having wrong colors on savegame reload.
+- Fix rollingball incorrectly killing Lara in water and in jump.
+- Fix resurfacing on underwater death.
+- Fix ripples not appearing on water connections higher than room bottom.
+- Fix several problems with ropes (stumbling, rope length, etc).
+- Fix several problems with teeth spikes.
+- Fix crashes when loading image files are missing.
+- Clear locusts and other swarm enemies on level reload.
 - Prevent title music audio from starting in a random place.
 - Update harpoon speed on room change.
+- Enable second sky layer rendering.
+- Preserve inventory and flare on level jumps.
 - Timer.Create now lets you choose the units to display remaining time.
 - Fatal script errors now boot you to the title (it will crash if the title itself has these errors).
 - SetFarView has been removed, and Flow.Level.farView is now uncapped.
