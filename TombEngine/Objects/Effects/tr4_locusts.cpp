@@ -15,7 +15,7 @@ namespace TEN::Entities::TR4
 {
 	LOCUST_INFO Locusts[MAX_LOCUSTS];
 
-	int CreateLocust(void)
+	int CreateLocust()
 	{
 		for (int i = 0; i < MAX_LOCUSTS; i++)
 		{
@@ -112,7 +112,7 @@ namespace TEN::Entities::TR4
 		}
 	}
 
-	void UpdateLocusts(void)
+	void UpdateLocusts()
 	{
 		for (int i = 0; i < MAX_LOCUSTS; i++)
 		{
@@ -203,7 +203,13 @@ namespace TEN::Entities::TR4
 		}
 	}
 
-	void DrawLocust(void)
+	void ClearLocusts()
+	{
+		for (int i = 0; i < MAX_LOCUSTS; i++)
+			Locusts[i].on = false;
+	}
+
+	void DrawLocust()
 	{
 		// TODO: no render for the locusts !
 	}
