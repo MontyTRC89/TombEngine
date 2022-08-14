@@ -106,7 +106,7 @@ namespace TEN::Entities::TR2
 			DoDamage(LaraItem, KNIFE_PROJECTILE_DAMAGE);
 
 			fx->pos.Orientation.y = LaraItem->Pose.Orientation.y;
-			fx->speed = LaraItem->Animation.Velocity;
+			fx->speed = LaraItem->Animation.Velocity.z;
 			fx->frameNumber = fx->counter = 0;
 
 			DoBloodSplat(fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z, 80, fx->pos.Orientation.y, fx->roomNumber);

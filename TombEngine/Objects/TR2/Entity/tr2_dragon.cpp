@@ -120,8 +120,8 @@ namespace TEN::Entities::TR2
 			explosionItem->Pose.Orientation.y = 0;
 			explosionItem->Pose.Orientation.x = 0;
 			explosionItem->Pose.Orientation.z = 0;
-			explosionItem->Animation.Velocity = 0;
-			explosionItem->Animation.VerticalVelocity = 0;
+			explosionItem->Animation.Velocity.z = 0;
+			explosionItem->Animation.Velocity.y = 0;
 
 			InitialiseItem(ExplosionIndex);
 			AddActiveItem(ExplosionIndex);
@@ -208,8 +208,8 @@ namespace TEN::Entities::TR2
 
 					laraItem->Pose = item->Pose;
 					laraItem->Animation.IsAirborne = false;
-					laraItem->Animation.Velocity = 0;
-					laraItem->Animation.VerticalVelocity = 0;
+					laraItem->Animation.Velocity.z = 0;
+					laraItem->Animation.Velocity.y = 0;
 
 					if (item->RoomNumber != laraItem->RoomNumber)
 						ItemNewRoom(Lara.ItemNumber, item->RoomNumber);

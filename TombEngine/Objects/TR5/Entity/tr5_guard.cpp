@@ -382,7 +382,7 @@ namespace TEN::Entities::TR5
 			angle = CreatureTurn(item, creature->MaxTurn);
 			creature->Enemy = LaraItem;
 
-			if ((laraAI.distance < pow(SECTOR(2), 2) && LaraItem->Animation.Velocity > 20) ||
+			if ((laraAI.distance < pow(SECTOR(2), 2) && LaraItem->Animation.Velocity.z > 20) ||
 				item->HitStatus ||
 				TargetVisible(item, &laraAI))
 			{
@@ -754,7 +754,7 @@ namespace TEN::Entities::TR5
 				joint2 = 0;
 
 				if (!item->HitStatus &&
-					LaraItem->Animation.Velocity < 40 &&
+					LaraItem->Animation.Velocity.z < 40 &&
 					!Lara.Control.Weapon.HasFired)
 				{
 					creature->Alerted = false;
@@ -1193,7 +1193,7 @@ namespace TEN::Entities::TR5
 			creature->Enemy = LaraItem;
 			angle = CreatureTurn(item, creature->MaxTurn);
 
-			if ((laraAI.distance < pow(SECTOR(2), 2) && LaraItem->Animation.Velocity > 20) ||
+			if ((laraAI.distance < pow(SECTOR(2), 2) && LaraItem->Animation.Velocity.z > 20) ||
 				item->HitStatus ||
 				TargetVisible(item, &laraAI))
 			{

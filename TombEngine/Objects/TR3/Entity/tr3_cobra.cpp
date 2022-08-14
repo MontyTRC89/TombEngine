@@ -92,8 +92,8 @@ namespace TEN::Entities::TR3
 				auto dest = GameVector(item->Pose.Position, item->RoomNumber);
 				enemyVisible = LOS(&src, &dest);
 
-				enemyMoving = creature->Enemy->Animation.Velocity > PLAYER_DISTURB_VELOCITY ||
-							  abs(creature->Enemy->Animation.VerticalVelocity) > PLAYER_DISTURB_VELOCITY;
+				enemyMoving = creature->Enemy->Animation.Velocity.z > PLAYER_DISTURB_VELOCITY ||
+							  abs(creature->Enemy->Animation.Velocity.y) > PLAYER_DISTURB_VELOCITY;
 			}
 
 			if (enemyVisible && item->Animation.ActiveState != COBRA_STATE_SLEEP)
