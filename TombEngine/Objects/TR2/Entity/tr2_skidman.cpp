@@ -19,6 +19,13 @@
 
 namespace TEN::Entities::TR2
 {
+	#define SMAN_MIN_TURN (ANGLE(2.0f))
+	#define SMAN_TARGET_ANGLE ANGLE(15.0f)
+	#define SMAN_WAIT_RANGE pow(SECTOR(4), 2)
+
+	const auto SkidooBiteLeft  = BiteInfo(Vector3(240.0f, -190.0f, 540.0f), 0);
+	const auto SkidooBiteRight = BiteInfo(Vector3(-240.0f, -190.0f, 540.0f), 0);
+
 	enum SnowmobileManState
 	{
 		SMAN_STATE_NONE = 0,
@@ -36,13 +43,6 @@ namespace TEN::Entities::TR2
 	{
 		SMAN_ANIM_DEATH = 10
 	};
-
-#define SMAN_MIN_TURN (ANGLE(2.0f))
-#define SMAN_TARGET_ANGLE ANGLE(15.0f)
-#define SMAN_WAIT_RANGE pow(SECTOR(4), 2)
-
-	BiteInfo SkidooBiteLeft = { 240, -190, 540, 0 };
-	BiteInfo SkidooBiteRight = { -240, -190, 540, 0 };
 
 	void InitialiseSkidooMan(short itemNumber)
 	{
@@ -201,7 +201,7 @@ namespace TEN::Entities::TR2
 			{
 				damage = (Lara.Vehicle != NO_ITEM) ? 10 : 50;
 
-				if (ShotLara(item, &AI, &SkidooBiteLeft, 0, damage) + ShotLara(item, &AI, &SkidooBiteRight, 0, damage))
+				if (ShotLara(item, &AI, SkidooBiteLeft, 0, damage) + ShotLara(item, &AI, SkidooBiteRight, 0, damage))
 					creatureInfo->Flags = 5;
 			}
 

@@ -20,6 +20,8 @@ using namespace TEN::Effects::Lightning;
 
 namespace TEN::Entities::TR5
 {
+	const auto RomanStatueBite = BiteInfo(Vector3::Zero, 15);
+
 	struct RomanStatueInfo
 	{
 		Vector3Int Position;
@@ -28,7 +30,6 @@ namespace TEN::Entities::TR5
 	};
 
 	RomanStatueInfo RomanStatueData;
-	BiteInfo RomanStatueBite{ 0, 0, 0, 15 };
 
 	// TODO
 	enum RomanStatueState
@@ -608,7 +609,7 @@ namespace TEN::Entities::TR5
 						if (item->TouchBits & 0xC000)
 						{
 							DoDamage(creature->Enemy, 200);
-							CreatureEffect2(item, &RomanStatueBite, 20, item->Pose.Orientation.y, DoBloodSplat);
+							CreatureEffect2(item, RomanStatueBite, 20, item->Pose.Orientation.y, DoBloodSplat);
 							SoundEffect(SFX_TR4_LARA_THUD, &item->Pose);
 							creature->Flags = 1;
 						}

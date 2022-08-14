@@ -26,9 +26,9 @@ namespace TEN::Entities::TR5
 
 #define TR5_LARSON_MIN_HP 40
 
-	BiteInfo LarsonGun = { -55, 200, 5, 14 };
-	BiteInfo PierreGun1 = { 60, 200, 0, 11 };
-	BiteInfo PierreGun2 = { -57, 200, 0, 14 };
+	const auto LarsonGun  = BiteInfo(Vector3(-55, 200, 5), 14);
+	const auto PierreGun1 = BiteInfo(Vector3(60, 200, 0), 11);
+	const auto PierreGun2 = BiteInfo(Vector3(-57, 200, 0), 14);
 
 	void InitialiseLarson(short itemNum)
 	{
@@ -345,12 +345,12 @@ namespace TEN::Entities::TR5
 				{
 					if (item->ObjectNumber == ID_PIERRE)
 					{
-						ShotLara(item, &info, &PierreGun1, joint0, 20);
-						ShotLara(item, &info, &PierreGun2, joint0, 20);
+						ShotLara(item, &info, PierreGun1, joint0, 20);
+						ShotLara(item, &info, PierreGun2, joint0, 20);
 					}
 					else
 					{
-						ShotLara(item, &info, &LarsonGun, joint0, 20);
+						ShotLara(item, &info, LarsonGun, joint0, 20);
 					}
 					creature->FiredWeapon = 2;
 				}

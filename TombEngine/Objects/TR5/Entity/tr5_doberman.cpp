@@ -12,7 +12,7 @@
 
 namespace TEN::Entities::TR5
 {
-	BiteInfo DobermanBite = { 0, 30, 141, 20 };
+	const auto DobermanBite = BiteInfo(Vector3(0.0f, 30.0f, 141.0f), 20);
 
 	enum DobermanState
 	{
@@ -206,7 +206,7 @@ namespace TEN::Entities::TR5
 						item->TouchBits & 0x122000)
 					{
 						DoDamage(creature->Enemy, 30);
-						CreatureEffect(item, &DobermanBite, DoBloodSplat);
+						CreatureEffect(item, DobermanBite, DoBloodSplat);
 						creature->Flags = 1;
 					}
 
@@ -221,7 +221,7 @@ namespace TEN::Entities::TR5
 					if (creature->Flags != 2 && item->TouchBits & 0x122000)
 					{
 						DoDamage(creature->Enemy, 80);
-						CreatureEffect(item, &DobermanBite, DoBloodSplat);
+						CreatureEffect(item, DobermanBite, DoBloodSplat);
 						creature->Flags = 2;
 					}
 
@@ -241,7 +241,7 @@ namespace TEN::Entities::TR5
 					if (creature->Flags != 3 && item->TouchBits & 0x122000)
 					{
 						DoDamage(creature->Enemy, 50);
-						CreatureEffect(item, &DobermanBite, DoBloodSplat);
+						CreatureEffect(item, DobermanBite, DoBloodSplat);
 						creature->Flags = 3;
 					}
 					if (AI.distance < pow(341, 2))
