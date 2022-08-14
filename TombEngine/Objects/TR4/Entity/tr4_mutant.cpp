@@ -303,14 +303,11 @@ namespace TEN::Entities::TR4
 		case MUTANT_STATE_IDLE:
 			if (AI.ahead)
 			{
-				// TODO: Use TestProbability() here.
-				int random = GetRandomControl() & 31;
-
-				if ((random > 0 && random < 10) && AI.distance <= MUTANT_PROJECTILE_ATTACK_RANGE)
+				if (TestProbability(0.28f) && AI.distance <= MUTANT_PROJECTILE_ATTACK_RANGE)
 					item->Animation.TargetState = MUTANT_STATE_PROJECTILE_ATTACK;
-				else if ((random > 10 && random < 20) && AI.distance <= MUTANT_LOCUST_ATTACK_1_RANGE)
+				else if (TestProbability(0.28f) && AI.distance <= MUTANT_LOCUST_ATTACK_1_RANGE)
 					item->Animation.TargetState = MUTANT_STATE_LOCUST_ATTACK_1;
-				else if ((random > 20 && random < 30) && AI.distance <= MUTANT_LOCUST_ATTACK_2_RANGE)
+				else if (TestProbability(0.28f) && AI.distance <= MUTANT_LOCUST_ATTACK_2_RANGE)
 					item->Animation.TargetState = MUTANT_STATE_LOCUST_ATTACK_2;
 			}
 

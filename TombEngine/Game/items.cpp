@@ -487,8 +487,8 @@ void InitialiseItem(short itemNumber)
 	item->Pose.Orientation.z = 0;
 	item->Pose.Orientation.x = 0;
 
-	item->Animation.VerticalVelocity = 0;
-	item->Animation.Velocity = 0;
+	item->Animation.Velocity.y = 0;
+	item->Animation.Velocity.z = 0;
 
 	item->ItemFlags[3] = 0;
 	item->ItemFlags[2] = 0;

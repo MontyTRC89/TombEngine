@@ -18,8 +18,8 @@
 
 namespace TEN::Entities::TR2
 {
-	BiteInfo WorkerFlamethrowerBite = { 0, 250, 32, 9 };
-	Vector3Int WorkerFlamethrowerOffset = { 0, 140, 0 };
+	const auto WorkerFlamethrowerOffset = Vector3Int(0, 140, 0);
+	const auto WorkerFlamethrowerBite = BiteInfo(Vector3(0.0f, 250.0f, 32.0f), 9);
 
 	// TODO
 	enum WorkerFlamethrowerState

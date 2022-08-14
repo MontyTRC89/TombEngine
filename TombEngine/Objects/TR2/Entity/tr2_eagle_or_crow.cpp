@@ -65,7 +65,7 @@ namespace TEN::Entities::TR2
 				if (item->Pose.Position.y > item->Floor)
 				{
 					item->Pose.Position.y = item->Floor;
-					item->Animation.VerticalVelocity = 0;
+					item->Animation.Velocity.y = 0;
 					item->Animation.IsAirborne = false;
 					item->Animation.TargetState = 5;
 				}
@@ -84,7 +84,7 @@ namespace TEN::Entities::TR2
 
 				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 				item->Animation.ActiveState = 4;
-				item->Animation.Velocity = 0;
+				item->Animation.Velocity.z = 0;
 				item->Animation.IsAirborne = true;
 				break;
 			}

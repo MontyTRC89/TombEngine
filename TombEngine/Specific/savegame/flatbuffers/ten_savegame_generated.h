@@ -381,18 +381,18 @@ struct KeyValPair::Traits {
 
 struct ItemT : public flatbuffers::NativeTable {
   typedef Item TableType;
+  int32_t active_state = 0;
+  int32_t anim_number = 0;
+  int32_t frame_number = 0;
+  bool is_airborne = false;
+  int32_t required_state = 0;
+  int32_t target_state = 0;
+  std::unique_ptr<TEN::Save::Vector3> velocity{};
   int32_t floor = 0;
   int32_t touch_bits = 0;
   int32_t mesh_bits = 0;
   int32_t object_id = 0;
-  int32_t active_state = 0;
-  int32_t target_state = 0;
-  int32_t required_state = 0;
-  int32_t anim_number = 0;
-  int32_t frame_number = 0;
   int32_t room_number = 0;
-  int32_t velocity = 0;
-  int32_t vertical_velocity = 0;
   int32_t hit_points = 0;
   int32_t box_number = 0;
   int32_t timer = 0;
@@ -408,7 +408,6 @@ struct ItemT : public flatbuffers::NativeTable {
   bool triggered = false;
   bool active = false;
   int32_t status = 0;
-  bool is_airborne = false;
   bool hit_stauts = false;
   bool collidable = false;
   bool looked_at = false;
@@ -427,18 +426,18 @@ struct Item FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   typedef ItemBuilder Builder;
   struct Traits;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
-    VT_FLOOR = 4,
-    VT_TOUCH_BITS = 6,
-    VT_MESH_BITS = 8,
-    VT_OBJECT_ID = 10,
-    VT_ACTIVE_STATE = 12,
+    VT_ACTIVE_STATE = 4,
+    VT_ANIM_NUMBER = 6,
+    VT_FRAME_NUMBER = 8,
+    VT_IS_AIRBORNE = 10,
+    VT_REQUIRED_STATE = 12,
     VT_TARGET_STATE = 14,
-    VT_REQUIRED_STATE = 16,
-    VT_ANIM_NUMBER = 18,
-    VT_FRAME_NUMBER = 20,
-    VT_ROOM_NUMBER = 22,
-    VT_VELOCITY = 24,
-    VT_VERTICAL_VELOCITY = 26,
+    VT_VELOCITY = 16,
+    VT_FLOOR = 18,
+    VT_TOUCH_BITS = 20,
+    VT_MESH_BITS = 22,
+    VT_OBJECT_ID = 24,
+    VT_ROOM_NUMBER = 26,
     VT_HIT_POINTS = 28,
     VT_BOX_NUMBER = 30,
     VT_TIMER = 32,
@@ -454,20 +453,40 @@ struct Item FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     VT_TRIGGERED = 52,
     VT_ACTIVE = 54,
     VT_STATUS = 56,
-    VT_IS_AIRBORNE = 58,
-    VT_HIT_STAUTS = 60,
-    VT_COLLIDABLE = 62,
-    VT_LOOKED_AT = 64,
-    VT_AI_BITS = 66,
-    VT_SWAP_MESH_FLAGS = 68,
-    VT_DATA_TYPE = 70,
-    VT_DATA = 72,
-    VT_LUA_NAME = 74,
-    VT_LUA_ON_KILLED_NAME = 76,
-    VT_LUA_ON_HIT_NAME = 78,
-    VT_LUA_ON_COLLIDED_WITH_OBJECT_NAME = 80,
-    VT_LUA_ON_COLLIDED_WITH_ROOM_NAME = 82
+    VT_HIT_STAUTS = 58,
+    VT_COLLIDABLE = 60,
+    VT_LOOKED_AT = 62,
+    VT_AI_BITS = 64,
+    VT_SWAP_MESH_FLAGS = 66,
+    VT_DATA_TYPE = 68,
+    VT_DATA = 70,
+    VT_LUA_NAME = 72,
+    VT_LUA_ON_KILLED_NAME = 74,
+    VT_LUA_ON_HIT_NAME = 76,
+    VT_LUA_ON_COLLIDED_WITH_OBJECT_NAME = 78,
+    VT_LUA_ON_COLLIDED_WITH_ROOM_NAME = 80
   };
+  int32_t active_state() const {
+    return GetField<int32_t>(VT_ACTIVE_STATE, 0);
+  }
+  int32_t anim_number() const {
+    return GetField<int32_t>(VT_ANIM_NUMBER, 0);
+  }
+  int32_t frame_number() const {
+    return GetField<int32_t>(VT_FRAME_NUMBER, 0);
+  }
+  bool is_airborne() const {
+    return GetField<uint8_t>(VT_IS_AIRBORNE, 0) != 0;
+  }
+  int32_t required_state() const {
+    return GetField<int32_t>(VT_REQUIRED_STATE, 0);
+  }
+  int32_t target_state() const {
+    return GetField<int32_t>(VT_TARGET_STATE, 0);
+  }
+  const TEN::Save::Vector3 *velocity() const {
+    return GetStruct<const TEN::Save::Vector3 *>(VT_VELOCITY);
+  }
   int32_t floor() const {
     return GetField<int32_t>(VT_FLOOR, 0);
   }
@@ -480,29 +499,8 @@ struct Item FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   int32_t object_id() const {
     return GetField<int32_t>(VT_OBJECT_ID, 0);
   }
-  int32_t active_state() const {
-    return GetField<int32_t>(VT_ACTIVE_STATE, 0);
-  }
-  int32_t target_state() const {
-    return GetField<int32_t>(VT_TARGET_STATE, 0);
-  }
-  int32_t required_state() const {
-    return GetField<int32_t>(VT_REQUIRED_STATE, 0);
-  }
-  int32_t anim_number() const {
-    return GetField<int32_t>(VT_ANIM_NUMBER, 0);
-  }
-  int32_t frame_number() const {
-    return GetField<int32_t>(VT_FRAME_NUMBER, 0);
-  }
   int32_t room_number() const {
     return GetField<int32_t>(VT_ROOM_NUMBER, 0);
-  }
-  int32_t velocity() const {
-    return GetField<int32_t>(VT_VELOCITY, 0);
-  }
-  int32_t vertical_velocity() const {
-    return GetField<int32_t>(VT_VERTICAL_VELOCITY, 0);
   }
   int32_t hit_points() const {
     return GetField<int32_t>(VT_HIT_POINTS, 0);
@@ -548,9 +546,6 @@ struct Item FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   }
   int32_t status() const {
     return GetField<int32_t>(VT_STATUS, 0);
-  }
-  bool is_airborne() const {
-    return GetField<uint8_t>(VT_IS_AIRBORNE, 0) != 0;
   }
   bool hit_stauts() const {
     return GetField<uint8_t>(VT_HIT_STAUTS, 0) != 0;
@@ -657,18 +652,18 @@ struct Item FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
+           VerifyField<int32_t>(verifier, VT_ACTIVE_STATE) &&
+           VerifyField<int32_t>(verifier, VT_ANIM_NUMBER) &&
+           VerifyField<int32_t>(verifier, VT_FRAME_NUMBER) &&
+           VerifyField<uint8_t>(verifier, VT_IS_AIRBORNE) &&
+           VerifyField<int32_t>(verifier, VT_REQUIRED_STATE) &&
+           VerifyField<int32_t>(verifier, VT_TARGET_STATE) &&
+           VerifyField<TEN::Save::Vector3>(verifier, VT_VELOCITY) &&
            VerifyField<int32_t>(verifier, VT_FLOOR) &&
            VerifyField<int32_t>(verifier, VT_TOUCH_BITS) &&
            VerifyField<int32_t>(verifier, VT_MESH_BITS) &&
            VerifyField<int32_t>(verifier, VT_OBJECT_ID) &&
-           VerifyField<int32_t>(verifier, VT_ACTIVE_STATE) &&
-           VerifyField<int32_t>(verifier, VT_TARGET_STATE) &&
-           VerifyField<int32_t>(verifier, VT_REQUIRED_STATE) &&
-           VerifyField<int32_t>(verifier, VT_ANIM_NUMBER) &&
-           VerifyField<int32_t>(verifier, VT_FRAME_NUMBER) &&
            VerifyField<int32_t>(verifier, VT_ROOM_NUMBER) &&
-           VerifyField<int32_t>(verifier, VT_VELOCITY) &&
-           VerifyField<int32_t>(verifier, VT_VERTICAL_VELOCITY) &&
            VerifyField<int32_t>(verifier, VT_HIT_POINTS) &&
            VerifyField<int32_t>(verifier, VT_BOX_NUMBER) &&
            VerifyField<int32_t>(verifier, VT_TIMER) &&
@@ -685,7 +680,6 @@ struct Item FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyField<uint8_t>(verifier, VT_TRIGGERED) &&
            VerifyField<uint8_t>(verifier, VT_ACTIVE) &&
            VerifyField<int32_t>(verifier, VT_STATUS) &&
-           VerifyField<uint8_t>(verifier, VT_IS_AIRBORNE) &&
            VerifyField<uint8_t>(verifier, VT_HIT_STAUTS) &&
            VerifyField<uint8_t>(verifier, VT_COLLIDABLE) &&
            VerifyField<uint8_t>(verifier, VT_LOOKED_AT) &&
@@ -803,6 +797,27 @@ struct ItemBuilder {
   typedef Item Table;
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
+  void add_active_state(int32_t active_state) {
+    fbb_.AddElement<int32_t>(Item::VT_ACTIVE_STATE, active_state, 0);
+  }
+  void add_anim_number(int32_t anim_number) {
+    fbb_.AddElement<int32_t>(Item::VT_ANIM_NUMBER, anim_number, 0);
+  }
+  void add_frame_number(int32_t frame_number) {
+    fbb_.AddElement<int32_t>(Item::VT_FRAME_NUMBER, frame_number, 0);
+  }
+  void add_is_airborne(bool is_airborne) {
+    fbb_.AddElement<uint8_t>(Item::VT_IS_AIRBORNE, static_cast<uint8_t>(is_airborne), 0);
+  }
+  void add_required_state(int32_t required_state) {
+    fbb_.AddElement<int32_t>(Item::VT_REQUIRED_STATE, required_state, 0);
+  }
+  void add_target_state(int32_t target_state) {
+    fbb_.AddElement<int32_t>(Item::VT_TARGET_STATE, target_state, 0);
+  }
+  void add_velocity(const TEN::Save::Vector3 *velocity) {
+    fbb_.AddStruct(Item::VT_VELOCITY, velocity);
+  }
   void add_floor(int32_t floor) {
     fbb_.AddElement<int32_t>(Item::VT_FLOOR, floor, 0);
   }
@@ -815,29 +830,8 @@ struct ItemBuilder {
   void add_object_id(int32_t object_id) {
     fbb_.AddElement<int32_t>(Item::VT_OBJECT_ID, object_id, 0);
   }
-  void add_active_state(int32_t active_state) {
-    fbb_.AddElement<int32_t>(Item::VT_ACTIVE_STATE, active_state, 0);
-  }
-  void add_target_state(int32_t target_state) {
-    fbb_.AddElement<int32_t>(Item::VT_TARGET_STATE, target_state, 0);
-  }
-  void add_required_state(int32_t required_state) {
-    fbb_.AddElement<int32_t>(Item::VT_REQUIRED_STATE, required_state, 0);
-  }
-  void add_anim_number(int32_t anim_number) {
-    fbb_.AddElement<int32_t>(Item::VT_ANIM_NUMBER, anim_number, 0);
-  }
-  void add_frame_number(int32_t frame_number) {
-    fbb_.AddElement<int32_t>(Item::VT_FRAME_NUMBER, frame_number, 0);
-  }
   void add_room_number(int32_t room_number) {
     fbb_.AddElement<int32_t>(Item::VT_ROOM_NUMBER, room_number, 0);
-  }
-  void add_velocity(int32_t velocity) {
-    fbb_.AddElement<int32_t>(Item::VT_VELOCITY, velocity, 0);
-  }
-  void add_vertical_velocity(int32_t vertical_velocity) {
-    fbb_.AddElement<int32_t>(Item::VT_VERTICAL_VELOCITY, vertical_velocity, 0);
   }
   void add_hit_points(int32_t hit_points) {
     fbb_.AddElement<int32_t>(Item::VT_HIT_POINTS, hit_points, 0);
@@ -883,9 +877,6 @@ struct ItemBuilder {
   }
   void add_status(int32_t status) {
     fbb_.AddElement<int32_t>(Item::VT_STATUS, status, 0);
-  }
-  void add_is_airborne(bool is_airborne) {
-    fbb_.AddElement<uint8_t>(Item::VT_IS_AIRBORNE, static_cast<uint8_t>(is_airborne), 0);
   }
   void add_hit_stauts(bool hit_stauts) {
     fbb_.AddElement<uint8_t>(Item::VT_HIT_STAUTS, static_cast<uint8_t>(hit_stauts), 0);
@@ -936,18 +927,18 @@ struct ItemBuilder {
 
 inline flatbuffers::Offset<Item> CreateItem(
     flatbuffers::FlatBufferBuilder &_fbb,
+    int32_t active_state = 0,
+    int32_t anim_number = 0,
+    int32_t frame_number = 0,
+    bool is_airborne = false,
+    int32_t required_state = 0,
+    int32_t target_state = 0,
+    const TEN::Save::Vector3 *velocity = 0,
     int32_t floor = 0,
     int32_t touch_bits = 0,
     int32_t mesh_bits = 0,
     int32_t object_id = 0,
-    int32_t active_state = 0,
-    int32_t target_state = 0,
-    int32_t required_state = 0,
-    int32_t anim_number = 0,
-    int32_t frame_number = 0,
     int32_t room_number = 0,
-    int32_t velocity = 0,
-    int32_t vertical_velocity = 0,
     int32_t hit_points = 0,
     int32_t box_number = 0,
     int32_t timer = 0,
@@ -963,7 +954,6 @@ inline flatbuffers::Offset<Item> CreateItem(
     bool triggered = false,
     bool active = false,
     int32_t status = 0,
-    bool is_airborne = false,
     bool hit_stauts = false,
     bool collidable = false,
     bool looked_at = false,
@@ -998,25 +988,24 @@ inline flatbuffers::Offset<Item> CreateItem(
   builder_.add_timer(timer);
   builder_.add_box_number(box_number);
   builder_.add_hit_points(hit_points);
-  builder_.add_vertical_velocity(vertical_velocity);
-  builder_.add_velocity(velocity);
   builder_.add_room_number(room_number);
-  builder_.add_frame_number(frame_number);
-  builder_.add_anim_number(anim_number);
-  builder_.add_required_state(required_state);
-  builder_.add_target_state(target_state);
-  builder_.add_active_state(active_state);
   builder_.add_object_id(object_id);
   builder_.add_mesh_bits(mesh_bits);
   builder_.add_touch_bits(touch_bits);
   builder_.add_floor(floor);
+  builder_.add_velocity(velocity);
+  builder_.add_target_state(target_state);
+  builder_.add_required_state(required_state);
+  builder_.add_frame_number(frame_number);
+  builder_.add_anim_number(anim_number);
+  builder_.add_active_state(active_state);
   builder_.add_data_type(data_type);
   builder_.add_looked_at(looked_at);
   builder_.add_collidable(collidable);
   builder_.add_hit_stauts(hit_stauts);
-  builder_.add_is_airborne(is_airborne);
   builder_.add_active(active);
   builder_.add_triggered(triggered);
+  builder_.add_is_airborne(is_airborne);
   return builder_.Finish();
 }
 
@@ -1027,18 +1016,18 @@ struct Item::Traits {
 
 inline flatbuffers::Offset<Item> CreateItemDirect(
     flatbuffers::FlatBufferBuilder &_fbb,
+    int32_t active_state = 0,
+    int32_t anim_number = 0,
+    int32_t frame_number = 0,
+    bool is_airborne = false,
+    int32_t required_state = 0,
+    int32_t target_state = 0,
+    const TEN::Save::Vector3 *velocity = 0,
     int32_t floor = 0,
     int32_t touch_bits = 0,
     int32_t mesh_bits = 0,
     int32_t object_id = 0,
-    int32_t active_state = 0,
-    int32_t target_state = 0,
-    int32_t required_state = 0,
-    int32_t anim_number = 0,
-    int32_t frame_number = 0,
     int32_t room_number = 0,
-    int32_t velocity = 0,
-    int32_t vertical_velocity = 0,
     int32_t hit_points = 0,
     int32_t box_number = 0,
     int32_t timer = 0,
@@ -1054,7 +1043,6 @@ inline flatbuffers::Offset<Item> CreateItemDirect(
     bool triggered = false,
     bool active = false,
     int32_t status = 0,
-    bool is_airborne = false,
     bool hit_stauts = false,
     bool collidable = false,
     bool looked_at = false,
@@ -1075,18 +1063,18 @@ inline flatbuffers::Offset<Item> CreateItemDirect(
   auto lua_on_collided_with_room_name__ = lua_on_collided_with_room_name ? _fbb.CreateString(lua_on_collided_with_room_name) : 0;
   return TEN::Save::CreateItem(
       _fbb,
+      active_state,
+      anim_number,
+      frame_number,
+      is_airborne,
+      required_state,
+      target_state,
+      velocity,
       floor,
       touch_bits,
       mesh_bits,
       object_id,
-      active_state,
-      target_state,
-      required_state,
-      anim_number,
-      frame_number,
       room_number,
-      velocity,
-      vertical_velocity,
       hit_points,
       box_number,
       timer,
@@ -1102,7 +1090,6 @@ inline flatbuffers::Offset<Item> CreateItemDirect(
       triggered,
       active,
       status,
-      is_airborne,
       hit_stauts,
       collidable,
       looked_at,
@@ -3289,7 +3276,6 @@ struct LaraT : public flatbuffers::NativeTable {
   std::unique_ptr<TEN::Save::TorchDataT> torch{};
   std::unique_ptr<TEN::Save::Vector3> extra_head_rot{};
   std::unique_ptr<TEN::Save::Vector3> extra_torso_rot{};
-  std::unique_ptr<TEN::Save::Vector3> extra_velocity{};
   int32_t water_current_active = 0;
   std::unique_ptr<TEN::Save::Vector3> water_current_pull{};
   std::unique_ptr<TEN::Save::ArmInfoT> left_arm{};
@@ -3333,35 +3319,34 @@ struct Lara FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     VT_TORCH = 14,
     VT_EXTRA_HEAD_ROT = 16,
     VT_EXTRA_TORSO_ROT = 18,
-    VT_EXTRA_VELOCITY = 20,
-    VT_WATER_CURRENT_ACTIVE = 22,
-    VT_WATER_CURRENT_PULL = 24,
-    VT_LEFT_ARM = 26,
-    VT_RIGHT_ARM = 28,
-    VT_TARGET_ARM_ANGLES = 30,
-    VT_TARGET_ENTITY_NUMBER = 32,
-    VT_AIR = 34,
-    VT_SPRINT_ENERGY = 36,
-    VT_POISON_POTENCY = 38,
-    VT_VEHICLE = 40,
-    VT_EXTRA_ANIM = 42,
-    VT_HIT_FRAME = 44,
-    VT_HIT_DIRECTION = 46,
-    VT_PROJECTED_FLOOR_HEIGHT = 48,
-    VT_TARGET_FACING_ANGLE = 50,
-    VT_WATER_SURFACE_DIST = 52,
-    VT_INTERACTED_ITEM = 54,
-    VT_NEXT_CORNER_POSE = 56,
-    VT_BURN_TYPE = 58,
-    VT_BURN_COUNT = 60,
-    VT_BURN = 62,
-    VT_BURN_BLUE = 64,
-    VT_BURN_SMOKE = 66,
-    VT_WET = 68,
-    VT_MESH_PTRS = 70,
-    VT_LOCATION = 72,
-    VT_HIGHEST_LOCATION = 74,
-    VT_LOCATION_PAD = 76
+    VT_WATER_CURRENT_ACTIVE = 20,
+    VT_WATER_CURRENT_PULL = 22,
+    VT_LEFT_ARM = 24,
+    VT_RIGHT_ARM = 26,
+    VT_TARGET_ARM_ANGLES = 28,
+    VT_TARGET_ENTITY_NUMBER = 30,
+    VT_AIR = 32,
+    VT_SPRINT_ENERGY = 34,
+    VT_POISON_POTENCY = 36,
+    VT_VEHICLE = 38,
+    VT_EXTRA_ANIM = 40,
+    VT_HIT_FRAME = 42,
+    VT_HIT_DIRECTION = 44,
+    VT_PROJECTED_FLOOR_HEIGHT = 46,
+    VT_TARGET_FACING_ANGLE = 48,
+    VT_WATER_SURFACE_DIST = 50,
+    VT_INTERACTED_ITEM = 52,
+    VT_NEXT_CORNER_POSE = 54,
+    VT_BURN_TYPE = 56,
+    VT_BURN_COUNT = 58,
+    VT_BURN = 60,
+    VT_BURN_BLUE = 62,
+    VT_BURN_SMOKE = 64,
+    VT_WET = 66,
+    VT_MESH_PTRS = 68,
+    VT_LOCATION = 70,
+    VT_HIGHEST_LOCATION = 72,
+    VT_LOCATION_PAD = 74
   };
   int32_t item_number() const {
     return GetField<int32_t>(VT_ITEM_NUMBER, 0);
@@ -3386,9 +3371,6 @@ struct Lara FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   }
   const TEN::Save::Vector3 *extra_torso_rot() const {
     return GetStruct<const TEN::Save::Vector3 *>(VT_EXTRA_TORSO_ROT);
-  }
-  const TEN::Save::Vector3 *extra_velocity() const {
-    return GetStruct<const TEN::Save::Vector3 *>(VT_EXTRA_VELOCITY);
   }
   int32_t water_current_active() const {
     return GetField<int32_t>(VT_WATER_CURRENT_ACTIVE, 0);
@@ -3490,7 +3472,6 @@ struct Lara FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            verifier.VerifyTable(torch()) &&
            VerifyField<TEN::Save::Vector3>(verifier, VT_EXTRA_HEAD_ROT) &&
            VerifyField<TEN::Save::Vector3>(verifier, VT_EXTRA_TORSO_ROT) &&
-           VerifyField<TEN::Save::Vector3>(verifier, VT_EXTRA_VELOCITY) &&
            VerifyField<int32_t>(verifier, VT_WATER_CURRENT_ACTIVE) &&
            VerifyField<TEN::Save::Vector3>(verifier, VT_WATER_CURRENT_PULL) &&
            VerifyOffset(verifier, VT_LEFT_ARM) &&
@@ -3558,9 +3539,6 @@ struct LaraBuilder {
   }
   void add_extra_torso_rot(const TEN::Save::Vector3 *extra_torso_rot) {
     fbb_.AddStruct(Lara::VT_EXTRA_TORSO_ROT, extra_torso_rot);
-  }
-  void add_extra_velocity(const TEN::Save::Vector3 *extra_velocity) {
-    fbb_.AddStruct(Lara::VT_EXTRA_VELOCITY, extra_velocity);
   }
   void add_water_current_active(int32_t water_current_active) {
     fbb_.AddElement<int32_t>(Lara::VT_WATER_CURRENT_ACTIVE, water_current_active, 0);
@@ -3667,7 +3645,6 @@ inline flatbuffers::Offset<Lara> CreateLara(
     flatbuffers::Offset<TEN::Save::TorchData> torch = 0,
     const TEN::Save::Vector3 *extra_head_rot = 0,
     const TEN::Save::Vector3 *extra_torso_rot = 0,
-    const TEN::Save::Vector3 *extra_velocity = 0,
     int32_t water_current_active = 0,
     const TEN::Save::Vector3 *water_current_pull = 0,
     flatbuffers::Offset<TEN::Save::ArmInfo> left_arm = 0,
@@ -3723,7 +3700,6 @@ inline flatbuffers::Offset<Lara> CreateLara(
   builder_.add_left_arm(left_arm);
   builder_.add_water_current_pull(water_current_pull);
   builder_.add_water_current_active(water_current_active);
-  builder_.add_extra_velocity(extra_velocity);
   builder_.add_extra_torso_rot(extra_torso_rot);
   builder_.add_extra_head_rot(extra_head_rot);
   builder_.add_torch(torch);
@@ -3752,7 +3728,6 @@ inline flatbuffers::Offset<Lara> CreateLaraDirect(
     flatbuffers::Offset<TEN::Save::TorchData> torch = 0,
     const TEN::Save::Vector3 *extra_head_rot = 0,
     const TEN::Save::Vector3 *extra_torso_rot = 0,
-    const TEN::Save::Vector3 *extra_velocity = 0,
     int32_t water_current_active = 0,
     const TEN::Save::Vector3 *water_current_pull = 0,
     flatbuffers::Offset<TEN::Save::ArmInfo> left_arm = 0,
@@ -3795,7 +3770,6 @@ inline flatbuffers::Offset<Lara> CreateLaraDirect(
       torch,
       extra_head_rot,
       extra_torso_rot,
-      extra_velocity,
       water_current_active,
       water_current_pull,
       left_arm,
@@ -6426,18 +6400,18 @@ inline ItemT *Item::UnPack(const flatbuffers::resolver_function_t *_resolver) co
 inline void Item::UnPackTo(ItemT *_o, const flatbuffers::resolver_function_t *_resolver) const {
   (void)_o;
   (void)_resolver;
+  { auto _e = active_state(); _o->active_state = _e; }
+  { auto _e = anim_number(); _o->anim_number = _e; }
+  { auto _e = frame_number(); _o->frame_number = _e; }
+  { auto _e = is_airborne(); _o->is_airborne = _e; }
+  { auto _e = required_state(); _o->required_state = _e; }
+  { auto _e = target_state(); _o->target_state = _e; }
+  { auto _e = velocity(); if (_e) _o->velocity = std::unique_ptr<TEN::Save::Vector3>(new TEN::Save::Vector3(*_e)); }
   { auto _e = floor(); _o->floor = _e; }
   { auto _e = touch_bits(); _o->touch_bits = _e; }
   { auto _e = mesh_bits(); _o->mesh_bits = _e; }
   { auto _e = object_id(); _o->object_id = _e; }
-  { auto _e = active_state(); _o->active_state = _e; }
-  { auto _e = target_state(); _o->target_state = _e; }
-  { auto _e = required_state(); _o->required_state = _e; }
-  { auto _e = anim_number(); _o->anim_number = _e; }
-  { auto _e = frame_number(); _o->frame_number = _e; }
   { auto _e = room_number(); _o->room_number = _e; }
-  { auto _e = velocity(); _o->velocity = _e; }
-  { auto _e = vertical_velocity(); _o->vertical_velocity = _e; }
   { auto _e = hit_points(); _o->hit_points = _e; }
   { auto _e = box_number(); _o->box_number = _e; }
   { auto _e = timer(); _o->timer = _e; }
@@ -6453,7 +6427,6 @@ inline void Item::UnPackTo(ItemT *_o, const flatbuffers::resolver_function_t *_r
   { auto _e = triggered(); _o->triggered = _e; }
   { auto _e = active(); _o->active = _e; }
   { auto _e = status(); _o->status = _e; }
-  { auto _e = is_airborne(); _o->is_airborne = _e; }
   { auto _e = hit_stauts(); _o->hit_stauts = _e; }
   { auto _e = collidable(); _o->collidable = _e; }
   { auto _e = looked_at(); _o->looked_at = _e; }
@@ -6476,18 +6449,18 @@ inline flatbuffers::Offset<Item> CreateItem(flatbuffers::FlatBufferBuilder &_fbb
   (void)_rehasher;
   (void)_o;
   struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const ItemT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _active_state = _o->active_state;
+  auto _anim_number = _o->anim_number;
+  auto _frame_number = _o->frame_number;
+  auto _is_airborne = _o->is_airborne;
+  auto _required_state = _o->required_state;
+  auto _target_state = _o->target_state;
+  auto _velocity = _o->velocity ? _o->velocity.get() : 0;
   auto _floor = _o->floor;
   auto _touch_bits = _o->touch_bits;
   auto _mesh_bits = _o->mesh_bits;
   auto _object_id = _o->object_id;
-  auto _active_state = _o->active_state;
-  auto _target_state = _o->target_state;
-  auto _required_state = _o->required_state;
-  auto _anim_number = _o->anim_number;
-  auto _frame_number = _o->frame_number;
   auto _room_number = _o->room_number;
-  auto _velocity = _o->velocity;
-  auto _vertical_velocity = _o->vertical_velocity;
   auto _hit_points = _o->hit_points;
   auto _box_number = _o->box_number;
   auto _timer = _o->timer;
@@ -6503,7 +6476,6 @@ inline flatbuffers::Offset<Item> CreateItem(flatbuffers::FlatBufferBuilder &_fbb
   auto _triggered = _o->triggered;
   auto _active = _o->active;
   auto _status = _o->status;
-  auto _is_airborne = _o->is_airborne;
   auto _hit_stauts = _o->hit_stauts;
   auto _collidable = _o->collidable;
   auto _looked_at = _o->looked_at;
@@ -6518,18 +6490,18 @@ inline flatbuffers::Offset<Item> CreateItem(flatbuffers::FlatBufferBuilder &_fbb
   auto _lua_on_collided_with_room_name = _o->lua_on_collided_with_room_name.empty() ? _fbb.CreateSharedString("") : _fbb.CreateString(_o->lua_on_collided_with_room_name);
   return TEN::Save::CreateItem(
       _fbb,
+      _active_state,
+      _anim_number,
+      _frame_number,
+      _is_airborne,
+      _required_state,
+      _target_state,
+      _velocity,
       _floor,
       _touch_bits,
       _mesh_bits,
       _object_id,
-      _active_state,
-      _target_state,
-      _required_state,
-      _anim_number,
-      _frame_number,
       _room_number,
-      _velocity,
-      _vertical_velocity,
       _hit_points,
       _box_number,
       _timer,
@@ -6545,7 +6517,6 @@ inline flatbuffers::Offset<Item> CreateItem(flatbuffers::FlatBufferBuilder &_fbb
       _triggered,
       _active,
       _status,
-      _is_airborne,
       _hit_stauts,
       _collidable,
       _looked_at,
@@ -7288,7 +7259,6 @@ inline void Lara::UnPackTo(LaraT *_o, const flatbuffers::resolver_function_t *_r
   { auto _e = torch(); if (_e) _o->torch = std::unique_ptr<TEN::Save::TorchDataT>(_e->UnPack(_resolver)); }
   { auto _e = extra_head_rot(); if (_e) _o->extra_head_rot = std::unique_ptr<TEN::Save::Vector3>(new TEN::Save::Vector3(*_e)); }
   { auto _e = extra_torso_rot(); if (_e) _o->extra_torso_rot = std::unique_ptr<TEN::Save::Vector3>(new TEN::Save::Vector3(*_e)); }
-  { auto _e = extra_velocity(); if (_e) _o->extra_velocity = std::unique_ptr<TEN::Save::Vector3>(new TEN::Save::Vector3(*_e)); }
   { auto _e = water_current_active(); _o->water_current_active = _e; }
   { auto _e = water_current_pull(); if (_e) _o->water_current_pull = std::unique_ptr<TEN::Save::Vector3>(new TEN::Save::Vector3(*_e)); }
   { auto _e = left_arm(); if (_e) _o->left_arm = std::unique_ptr<TEN::Save::ArmInfoT>(_e->UnPack(_resolver)); }
@@ -7335,7 +7305,6 @@ inline flatbuffers::Offset<Lara> CreateLara(flatbuffers::FlatBufferBuilder &_fbb
   auto _torch = _o->torch ? CreateTorchData(_fbb, _o->torch.get(), _rehasher) : 0;
   auto _extra_head_rot = _o->extra_head_rot ? _o->extra_head_rot.get() : 0;
   auto _extra_torso_rot = _o->extra_torso_rot ? _o->extra_torso_rot.get() : 0;
-  auto _extra_velocity = _o->extra_velocity ? _o->extra_velocity.get() : 0;
   auto _water_current_active = _o->water_current_active;
   auto _water_current_pull = _o->water_current_pull ? _o->water_current_pull.get() : 0;
   auto _left_arm = _o->left_arm ? CreateArmInfo(_fbb, _o->left_arm.get(), _rehasher) : 0;
@@ -7374,7 +7343,6 @@ inline flatbuffers::Offset<Lara> CreateLara(flatbuffers::FlatBufferBuilder &_fbb
       _torch,
       _extra_head_rot,
       _extra_torso_rot,
-      _extra_velocity,
       _water_current_active,
       _water_current_pull,
       _left_arm,
