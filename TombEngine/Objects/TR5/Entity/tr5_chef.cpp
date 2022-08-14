@@ -14,7 +14,7 @@
 
 namespace TEN::Entities::TR5
 {
-	BiteInfo ChefBite = { 0, 200, 0 ,13 };
+	const auto ChefBite = BiteInfo(Vector3(0.0f, 200.0f, 0.0f), 13);
 
 	// TODO
 	enum ChefState
@@ -164,7 +164,7 @@ namespace TEN::Entities::TR5
 						if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 10)
 						{
 							DoDamage(creature->Enemy, 80);
-							CreatureEffect2(item, &ChefBite, 20, item->Pose.Orientation.y, DoBloodSplat);
+							CreatureEffect2(item, ChefBite, 20, item->Pose.Orientation.y, DoBloodSplat);
 							SoundEffect(SFX_TR4_LARA_THUD, &item->Pose);
 							creature->Flags = 1;
 						}

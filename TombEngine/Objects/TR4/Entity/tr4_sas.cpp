@@ -24,7 +24,7 @@ using namespace TEN::Math::Random;
 
 namespace TEN::Entities::TR4
 {
-	BiteInfo SASGunBite = { 0, 300, 64, 7 };
+	const auto SASGunBite = BiteInfo(Vector3(0.0f, 300.0f, 64.0f), 7);
 
 	auto SASDragBodyPosition = Vector3Int(0, 0, -460);
 	OBJECT_COLLISION_BOUNDS SASDragBodyBounds =
@@ -123,7 +123,7 @@ namespace TEN::Entities::TR4
 		// Handle SAS firing.
 		if (creature->FiredWeapon)
 		{
-			auto pos = Vector3Int(SASGunBite.x, SASGunBite.y, SASGunBite.z);
+			auto pos = Vector3Int(SASGunBite.Position);
 			GetJointAbsPosition(item, &pos, SASGunBite.meshNum);
 
 			TriggerDynamicLight(pos.x, pos.y, pos.z, 10, 24, 16, 4);
@@ -510,7 +510,7 @@ namespace TEN::Entities::TR4
 					creature->Flags -= 1;
 				else
 				{
-					ShotLara(item, &AI, &SASGunBite, joint0, 15);
+					ShotLara(item, &AI, SASGunBite, joint0, 15);
 					creature->Flags = 5;
 					creature->FiredWeapon = 3;
 				}

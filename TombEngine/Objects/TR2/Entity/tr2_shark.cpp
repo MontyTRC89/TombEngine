@@ -13,7 +13,7 @@
 
 namespace TEN::Entities::TR2
 {
-	BiteInfo SharkBite = { 17, -22, 344, 12 };
+	const auto SharkBite = BiteInfo(Vector3(17.0f, -22.0f, 344.0f), 12);
 
 	void SharkControl(short itemNumber)
 	{
@@ -97,7 +97,7 @@ namespace TEN::Entities::TR2
 
 				if (!info->Flags && item->TouchBits & 0x3400)
 				{
-					CreatureEffect(item, &SharkBite, DoBloodSplat);
+					CreatureEffect(item, SharkBite, DoBloodSplat);
 					DoDamage(info->Enemy, 400);
 					info->Flags = 1;
 				}

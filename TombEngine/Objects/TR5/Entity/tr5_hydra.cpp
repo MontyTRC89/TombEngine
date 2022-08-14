@@ -16,7 +16,7 @@
 
 namespace TEN::Entities::TR5
 {
-	BiteInfo HydraBite = { 0, 0, 0, 11 };
+	const auto HydraBite = BiteInfo(Vector3::Zero, 11);
 
 	enum HydraState
 	{
@@ -253,7 +253,7 @@ namespace TEN::Entities::TR5
 					if (item->TouchBits & 0x400)
 					{
 						DoDamage(creature->Enemy, 120);
-						CreatureEffect2(item, &HydraBite, 10, item->Pose.Orientation.y, DoBloodSplat);
+						CreatureEffect2(item, HydraBite, 10, item->Pose.Orientation.y, DoBloodSplat);
 						creature->Flags = 1;
 					}
 
@@ -269,7 +269,7 @@ namespace TEN::Entities::TR5
 						{
 							item->Animation.TargetState = HYDRA_STATE_HURT;
 							DoDamage(item, damage);
-							CreatureEffect2(item, &HydraBite, 10 * damage, item->Pose.Orientation.y, DoBloodSplat);
+							CreatureEffect2(item, HydraBite, 10 * damage, item->Pose.Orientation.y, DoBloodSplat);
 						}
 					}
 				}
@@ -294,7 +294,7 @@ namespace TEN::Entities::TR5
 					{
 						item->Animation.TargetState = 4;
 						DoDamage(item, damage);
-						CreatureEffect2(item, &HydraBite, 10 * damage, item->Pose.Orientation.y, DoBloodSplat);
+						CreatureEffect2(item, HydraBite, 10 * damage, item->Pose.Orientation.y, DoBloodSplat);
 					}
 				}
 
