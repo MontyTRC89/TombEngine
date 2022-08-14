@@ -47,7 +47,7 @@ void WreckingBallCollision(short itemNumber, ItemInfo* l, CollisionInfo* coll)
 		y = l->Pose.Position.y;
 		z = l->Pose.Position.z;
 		test = (x & 1023) > 256 && (x & 1023) < 768 && (z & 1023) > 256 && (z & 1023) < 768;
-		damage = item->Animation.VerticalVelocity > 0 ? 96 : 0;
+		damage = item->Animation.Velocity.y > 0 ? 96 : 0;
 		if (ItemPushItem(item, l, coll, coll->Setup.EnableSpasm, 1))
 		{
 			if (test)
@@ -225,28 +225,28 @@ void WreckingBallControl(short itemNumber)
 		{
 			SoundEffect(SFX_TR5_BASE_CLAW_DROP, &item->Pose);
 			++item->ItemFlags[1];
-			item->Animation.VerticalVelocity = 6;
-			item->Pose.Position.y += item->Animation.VerticalVelocity;
+			item->Animation.Velocity.y = 6;
+			item->Pose.Position.y += item->Animation.Velocity.y;
 		}
 	}
 	else if (item->ItemFlags[1] == 2)
 	{
-		item->Animation.VerticalVelocity += 24;
-		item->Pose.Position.y += item->Animation.VerticalVelocity;
+		item->Animation.Velocity.y += 24;
+		item->Pose.Position.y += item->Animation.Velocity.y;
 		room = item->RoomNumber;
 		height = GetFloorHeight(GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &room), item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z);
 		if (height < item->Pose.Position.y)
 		{
 			item->Pose.Position.y = height;
-			if (item->Animation.VerticalVelocity > 48)
+			if (item->Animation.Velocity.y > 48)
 			{
 				BounceCamera(item, 64, 8192);
-				item->Animation.VerticalVelocity = -item->Animation.VerticalVelocity >> 3;
+				item->Animation.Velocity.y = -item->Animation.Velocity.y / 8;
 			}
 			else
 			{
 				++item->ItemFlags[1];
-				item->Animation.VerticalVelocity = 0;
+				item->Animation.Velocity.y = 0;
 			}
 		}
 		else if (height - item->Pose.Position.y < 1536 && item->Animation.ActiveState)
@@ -256,23 +256,23 @@ void WreckingBallControl(short itemNumber)
 	}
 	else if (item->ItemFlags[1] == 3)
 	{
-		item->Animation.VerticalVelocity -= 3;
-		item->Pose.Position.y += item->Animation.VerticalVelocity;
+		item->Animation.Velocity.y -= 3;
+		item->Pose.Position.y += item->Animation.Velocity.y;
 		if (item->Pose.Position.y < item2->Pose.Position.y + 1644)
 		{
 			StopSoundEffect(SFX_TR5_BASE_CLAW_WINCH_UP_LOOP);
 			item->ItemFlags[0] = 1;
 			item->Pose.Position.y = item2->Pose.Position.y + 1644;
-			if (item->Animation.VerticalVelocity < -32)
+			if (item->Animation.Velocity.y < -32)
 			{
 				SoundEffect(SFX_TR5_BASE_CLAW_TOP_IMPACT, &item->Pose, SoundEnvironment::Land, 1.0f, 0.5f);
-				item->Animation.VerticalVelocity = -item->Animation.VerticalVelocity >> 3;
+				item->Animation.Velocity.y = -item->Animation.Velocity.y / 8;
 				BounceCamera(item, 16, 8192);
 			}
 			else
 			{
 				item->ItemFlags[1] = -1;
-				item->Animation.VerticalVelocity = 0;
+				item->Animation.Velocity.y = 0;
 				item->ItemFlags[0] = 0;
 			}
 		}

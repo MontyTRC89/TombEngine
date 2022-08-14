@@ -132,7 +132,7 @@ namespace TEN::Entities::TR4
 					(item->TriggerFlags & 7) > 2 &&
 					(item->TriggerFlags & 7) < 6)
 				{
-					if (LaraItem->Animation.VerticalVelocity > 6 ||
+					if (LaraItem->Animation.Velocity.y > 6 ||
 						item->ItemFlags[0] > 1024)
 					{
 						LaraItem->HitPoints = -1;
