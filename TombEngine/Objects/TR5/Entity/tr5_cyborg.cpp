@@ -335,7 +335,7 @@ namespace TEN::Entities::TR5
 				angle = CreatureTurn(item, creature->MaxTurn);
 
 				if (laraAI.distance < pow(SECTOR(2), 2) &&
-					LaraItem->Animation.Velocity> 20 ||
+					LaraItem->Animation.Velocity.z > 20 ||
 					item->HitStatus ||
 					TargetVisible(item, &laraAI))
 				{

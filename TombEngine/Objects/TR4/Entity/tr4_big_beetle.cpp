@@ -94,7 +94,7 @@ namespace TEN::Entities::TR4
 					{
 						SetAnimation(item, BBEETLE_ANIM_DEATH_START);
 						item->Animation.IsAirborne = true;
-						item->Animation.Velocity = 0;
+						item->Animation.Velocity.z = 0;
 						item->Pose.Orientation.x = 0;
 					}
 				}
@@ -102,7 +102,7 @@ namespace TEN::Entities::TR4
 				{
 					item->Animation.TargetState = BBEETLE_STATE_DEATH_END;
 					item->Animation.IsAirborne = false;
-					item->Animation.VerticalVelocity = 0;
+					item->Animation.Velocity.y = 0;
 					item->Pose.Position.y = item->Floor;
 				}
 			}

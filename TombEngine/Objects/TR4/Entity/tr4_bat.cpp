@@ -150,7 +150,7 @@ namespace TEN::Entities::TR4
 			else
 				SetAnimation(item, BAT_ANIM_DEATH_FALL);
 				item->Animation.IsAirborne = true;
-				item->Animation.Velocity = 0;
+				item->Animation.Velocity.z = 0;
 		}
 
 		CreatureAnimation(itemNumber, angle, 0);

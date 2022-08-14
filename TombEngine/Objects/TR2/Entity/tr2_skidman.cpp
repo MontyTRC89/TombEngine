@@ -84,13 +84,13 @@ namespace TEN::Entities::TR2
 
 		if (coll->Setup.EnableObjectPush)
 		{
-			if (item->Animation.Velocity > 0)
+			if (item->Animation.Velocity.z > 0)
 				ItemPushItem(item, laraItem, coll, coll->Setup.EnableSpasm, 0);
 			else
 				ItemPushItem(item, laraItem, coll, 0, 0);
 		}
 
-		if (Lara.Vehicle == NO_ITEM && item->Animation.Velocity > 0)
+		if (Lara.Vehicle == NO_ITEM && item->Animation.Velocity.z > 0)
 		{
 			DoDamage(laraItem, 100);
 		}
@@ -221,7 +221,7 @@ namespace TEN::Entities::TR2
 		{
 			creatureInfo->JointRotation[0] = (creatureInfo->JointRotation[0] == 1) ? 2 : 1;
 			DoSnowEffect(item);
-			SoundEffect(SFX_TR2_VEHICLE_SNOWMOBILE_IDLE, &item->Pose, SoundEnvironment::Land, 0.5f + item->Animation.Velocity / 100.0f); // SKIDOO_MAX_VELOCITY.  TODO: Check actual sound!
+			SoundEffect(SFX_TR2_VEHICLE_SNOWMOBILE_IDLE, &item->Pose, SoundEnvironment::Land, 0.5f + item->Animation.Velocity.z / 100.0f); // SKIDOO_MAX_VELOCITY.  TODO: Check actual sound!
 		}
 
 		CreatureAnimation(itemNumber, angle, 0);
@@ -240,8 +240,8 @@ namespace TEN::Entities::TR2
 			riderItem->Animation.FrameNumber = item->Animation.FrameNumber + (g_Level.Anims[riderItem->Animation.AnimNumber].frameBase - g_Level.Anims[item->Animation.AnimNumber].frameBase);
 		}
 		else if (riderItem->Status == ITEM_DEACTIVATED &&
-			item->Animation.Velocity == 0 &&
-			item->Animation.VerticalVelocity == 0)
+			item->Animation.Velocity.z == 0 &&
+			item->Animation.Velocity.y == 0)
 		{
 			RemoveActiveItem(riderItemNumber);
 			riderItem->Collidable = false;

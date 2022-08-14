@@ -1266,7 +1266,7 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 			else
 				item->Pose.Orientation.y = ANGLE(180.0f) - item->Pose.Orientation.y;
 
-			item->Animation.Velocity /= 2;
+			item->Animation.Velocity.z /= 2;
 
 			// Put item back in its last position.
 			item->Pose.Position.x = x;
@@ -1278,7 +1278,7 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 		{
 			// Need to know which direction the slope is.
 
-			item->Animation.Velocity -= (item->Animation.Velocity / 4);
+			item->Animation.Velocity.z -= (item->Animation.Velocity.z / 4);
 
 			// Hit angle = ANGLE(90.0f)
 			if (collResult.FloorTilt.x < 0 && ((abs(collResult.FloorTilt.x)) - (abs(collResult.FloorTilt.y)) >= 2))
@@ -1286,14 +1286,14 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 				if (((unsigned short)item->Pose.Orientation.y) > ANGLE(180.0f))
 				{
 					item->Pose.Orientation.y = ANGLE(90.0f) + (ANGLE(270.0f) - (unsigned short)item->Pose.Orientation.y - 1);
-					if (item->Animation.VerticalVelocity > 0)
-						item->Animation.VerticalVelocity = -item->Animation.VerticalVelocity / 2;
+					if (item->Animation.Velocity.y > 0)
+						item->Animation.Velocity.y = -item->Animation.Velocity.y / 2;
 				}
 				else
 				{
-					if (item->Animation.Velocity < 32)
+					if (item->Animation.Velocity.z < 32)
 					{
-						item->Animation.Velocity -= collResult.FloorTilt.x * 2;
+						item->Animation.Velocity.z -= collResult.FloorTilt.x * 2;
 						if ((unsigned short)item->Pose.Orientation.y > ANGLE(90.0f) && (unsigned short)item->Pose.Orientation.y < ANGLE(270.0f))
 						{
 							item->Pose.Orientation.y -= ANGLE(22.5f);
@@ -1308,10 +1308,10 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 						}
 					}
 
-					if (item->Animation.VerticalVelocity > 0)
-						item->Animation.VerticalVelocity = -item->Animation.VerticalVelocity / 2;
+					if (item->Animation.Velocity.y > 0)
+						item->Animation.Velocity.y = -item->Animation.Velocity.y / 2;
 					else
-						item->Animation.VerticalVelocity = 0;
+						item->Animation.Velocity.y = 0;
 				}
 			}
 			// Hit angle = ANGLE(270.0f)
@@ -1320,14 +1320,14 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 				if (((unsigned short)item->Pose.Orientation.y) < ANGLE(180.0f))
 				{
 					item->Pose.Orientation.y = ANGLE(270.0f) + (ANGLE(90.0f) - (unsigned short)item->Pose.Orientation.y - 1);
-					if (item->Animation.VerticalVelocity > 0)
-						item->Animation.VerticalVelocity = -item->Animation.VerticalVelocity / 2;
+					if (item->Animation.Velocity.y > 0)
+						item->Animation.Velocity.y = -item->Animation.Velocity.y / 2;
 				}
 				else
 				{
-					if (item->Animation.Velocity < 32)
+					if (item->Animation.Velocity.z < 32)
 					{
-						item->Animation.Velocity += collResult.FloorTilt.x * 2;
+						item->Animation.Velocity.z += collResult.FloorTilt.x * 2;
 						if ((unsigned short)item->Pose.Orientation.y > ANGLE(270.0f) || (unsigned short)item->Pose.Orientation.y < ANGLE(90.0f))
 						{
 							item->Pose.Orientation.y -= ANGLE(22.5f);
@@ -1342,10 +1342,10 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 						}
 					}
 
-					if (item->Animation.VerticalVelocity > 0)
-						item->Animation.VerticalVelocity = -item->Animation.VerticalVelocity / 2;
+					if (item->Animation.Velocity.y > 0)
+						item->Animation.Velocity.y = -item->Animation.Velocity.y / 2;
 					else
-						item->Animation.VerticalVelocity = 0;
+						item->Animation.Velocity.y = 0;
 				}
 			}
 			// Hit angle = 0
@@ -1354,14 +1354,14 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 				if (((unsigned short)item->Pose.Orientation.y) > ANGLE(90.0f) && ((unsigned short)item->Pose.Orientation.y) < ANGLE(270.0f))
 				{
 					item->Pose.Orientation.y = ANGLE(180.0f) - item->Pose.Orientation.y - 1;
-					if (item->Animation.VerticalVelocity > 0)
-						item->Animation.VerticalVelocity = -item->Animation.VerticalVelocity / 2;
+					if (item->Animation.Velocity.y > 0)
+						item->Animation.Velocity.y = -item->Animation.Velocity.y / 2;
 				}
 				else
 				{
-					if (item->Animation.Velocity < 32)
+					if (item->Animation.Velocity.z < 32)
 					{
-						item->Animation.Velocity -= collResult.FloorTilt.y * 2;
+						item->Animation.Velocity.z -= collResult.FloorTilt.y * 2;
 
 						if ((unsigned short)item->Pose.Orientation.y < ANGLE(180.0f))
 						{
@@ -1377,10 +1377,10 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 						}
 					}
 
-					if (item->Animation.VerticalVelocity > 0)
-						item->Animation.VerticalVelocity = -item->Animation.VerticalVelocity / 2;
+					if (item->Animation.Velocity.y > 0)
+						item->Animation.Velocity.y = -item->Animation.Velocity.y / 2;
 					else
-						item->Animation.VerticalVelocity = 0;
+						item->Animation.Velocity.y = 0;
 				}
 			}
 			// Hit angle = ANGLE(180.0f)
@@ -1389,14 +1389,14 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 				if (((unsigned short)item->Pose.Orientation.y) > ANGLE(270.0f) || ((unsigned short)item->Pose.Orientation.y) < ANGLE(90.0f))
 				{
 					item->Pose.Orientation.y = ANGLE(180.0f) - item->Pose.Orientation.y - 1;
-					if (item->Animation.VerticalVelocity > 0)
-						item->Animation.VerticalVelocity = -item->Animation.VerticalVelocity / 2;
+					if (item->Animation.Velocity.y > 0)
+						item->Animation.Velocity.y = -item->Animation.Velocity.y / 2;
 				}
 				else
 				{
-					if (item->Animation.Velocity < 32)
+					if (item->Animation.Velocity.z < 32)
 					{
-						item->Animation.Velocity += collResult.FloorTilt.y * 2;
+						item->Animation.Velocity.z += collResult.FloorTilt.y * 2;
 
 						if ((unsigned short)item->Pose.Orientation.y > ANGLE(180.0f))
 						{
@@ -1412,10 +1412,10 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 						}
 					}
 
-					if (item->Animation.VerticalVelocity > 0)
-						item->Animation.VerticalVelocity = -item->Animation.VerticalVelocity / 2;
+					if (item->Animation.Velocity.y > 0)
+						item->Animation.Velocity.y = -item->Animation.Velocity.y / 2;
 					else
-						item->Animation.VerticalVelocity = 0;
+						item->Animation.Velocity.y = 0;
 				}
 			}
 			else if (collResult.FloorTilt.x < 0 && collResult.FloorTilt.y < 0)	// Hit angle = 0x2000
@@ -1423,14 +1423,14 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 				if (((unsigned short)item->Pose.Orientation.y) > ANGLE(135.0f) && ((unsigned short)item->Pose.Orientation.y) < ANGLE(315.0f))
 				{
 					item->Pose.Orientation.y = ANGLE(45.0f) + (ANGLE(225.0f) - (unsigned short)item->Pose.Orientation.y - 1);
-					if (item->Animation.VerticalVelocity > 0)
-						item->Animation.VerticalVelocity = -item->Animation.VerticalVelocity / 2;
+					if (item->Animation.Velocity.y > 0)
+						item->Animation.Velocity.y = -item->Animation.Velocity.y / 2;
 				}
 				else
 				{
-					if (item->Animation.Velocity < 32)
+					if (item->Animation.Velocity.z < 32)
 					{
-						item->Animation.Velocity += -collResult.FloorTilt.x + -collResult.FloorTilt.y;
+						item->Animation.Velocity.z += -collResult.FloorTilt.x + -collResult.FloorTilt.y;
 						if ((unsigned short)item->Pose.Orientation.y > ANGLE(45.0f) && (unsigned short)item->Pose.Orientation.y < ANGLE(225.0f))
 						{
 							item->Pose.Orientation.y -= ANGLE(22.5f);
@@ -1445,10 +1445,10 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 						}
 					}
 
-					if (item->Animation.VerticalVelocity > 0)
-						item->Animation.VerticalVelocity = -item->Animation.VerticalVelocity / 2;
+					if (item->Animation.Velocity.y > 0)
+						item->Animation.Velocity.y = -item->Animation.Velocity.y / 2;
 					else
-						item->Animation.VerticalVelocity = 0;
+						item->Animation.Velocity.y = 0;
 				}
 			}
 			// Hit angle = ANGLE(135.0f)
@@ -1457,14 +1457,14 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 				if (((unsigned short)item->Pose.Orientation.y) > ANGLE(225.0f) || ((unsigned short)item->Pose.Orientation.y) < ANGLE(45.0f))
 				{
 					item->Pose.Orientation.y = ANGLE(135.0f) + (ANGLE(315.0f) - (unsigned short)item->Pose.Orientation.y - 1);
-					if (item->Animation.VerticalVelocity > 0)
-						item->Animation.VerticalVelocity = -item->Animation.VerticalVelocity / 2;
+					if (item->Animation.Velocity.y > 0)
+						item->Animation.Velocity.y = -item->Animation.Velocity.y / 2;
 				}
 				else
 				{
-					if (item->Animation.Velocity < 32)
+					if (item->Animation.Velocity.z < 32)
 					{
-						item->Animation.Velocity += (-collResult.FloorTilt.x) + collResult.FloorTilt.y;
+						item->Animation.Velocity.z += (-collResult.FloorTilt.x) + collResult.FloorTilt.y;
 						if ((unsigned short)item->Pose.Orientation.y < ANGLE(315.0f) && (unsigned short)item->Pose.Orientation.y > ANGLE(135.0f))
 						{
 							item->Pose.Orientation.y -= ANGLE(22.5f);
@@ -1479,10 +1479,10 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 						}
 					}
 
-					if (item->Animation.VerticalVelocity > 0)
-						item->Animation.VerticalVelocity = -item->Animation.VerticalVelocity / 2;
+					if (item->Animation.Velocity.y > 0)
+						item->Animation.Velocity.y = -item->Animation.Velocity.y / 2;
 					else
-						item->Animation.VerticalVelocity = 0;
+						item->Animation.Velocity.y = 0;
 				}
 			}
 			// Hit angle = ANGLE(225.5f)
@@ -1491,14 +1491,14 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 				if (((unsigned short)item->Pose.Orientation.y) > ANGLE(315.0f) || ((unsigned short)item->Pose.Orientation.y) < ANGLE(135.0f))
 				{
 					item->Pose.Orientation.y = ANGLE(225.5f) + (ANGLE(45.0f) - (unsigned short)item->Pose.Orientation.y - 1);
-					if (item->Animation.VerticalVelocity > 0)
-						item->Animation.VerticalVelocity = -item->Animation.VerticalVelocity / 2;
+					if (item->Animation.Velocity.y > 0)
+						item->Animation.Velocity.y = -item->Animation.Velocity.y / 2;
 				}
 				else
 				{
-					if (item->Animation.Velocity < 32)
+					if (item->Animation.Velocity.z < 32)
 					{
-						item->Animation.Velocity += collResult.FloorTilt.x + collResult.FloorTilt.y;
+						item->Animation.Velocity.z += collResult.FloorTilt.x + collResult.FloorTilt.y;
 						if ((unsigned short)item->Pose.Orientation.y < ANGLE(45.0f) || (unsigned short)item->Pose.Orientation.y > ANGLE(225.5f))
 						{
 							item->Pose.Orientation.y -= ANGLE(22.5f);
@@ -1513,10 +1513,10 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 						}
 					}
 
-					if (item->Animation.VerticalVelocity > 0)
-						item->Animation.VerticalVelocity = -item->Animation.VerticalVelocity / 2;
+					if (item->Animation.Velocity.y > 0)
+						item->Animation.Velocity.y = -item->Animation.Velocity.y / 2;
 					else
-						item->Animation.VerticalVelocity = 0;
+						item->Animation.Velocity.y = 0;
 				}
 			}
 			// Hit angle = ANGLE(315.0f)
@@ -1525,14 +1525,14 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 				if (((unsigned short)item->Pose.Orientation.y) > ANGLE(45.0f) && ((unsigned short)item->Pose.Orientation.y) < ANGLE(225.5f))
 				{
 					item->Pose.Orientation.y = ANGLE(315.0f) + (ANGLE(135.0f)- (unsigned short)item->Pose.Orientation.y - 1);
-					if (item->Animation.VerticalVelocity > 0)
-						item->Animation.VerticalVelocity = -item->Animation.VerticalVelocity / 2;
+					if (item->Animation.Velocity.y > 0)
+						item->Animation.Velocity.y = -item->Animation.Velocity.y / 2;
 				}
 				else
 				{
-					if (item->Animation.Velocity < 32)
+					if (item->Animation.Velocity.z < 32)
 					{
-						item->Animation.Velocity += collResult.FloorTilt.x + (-collResult.FloorTilt.y);
+						item->Animation.Velocity.z += collResult.FloorTilt.x + (-collResult.FloorTilt.y);
 						if ((unsigned short)item->Pose.Orientation.y < ANGLE(135.0f) || (unsigned short)item->Pose.Orientation.y > ANGLE(315.0f))
 						{
 							item->Pose.Orientation.y -= ANGLE(22.5f);
@@ -1547,10 +1547,10 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 						}
 					}
 
-					if (item->Animation.VerticalVelocity > 0)
-						item->Animation.VerticalVelocity = -(item->Animation.VerticalVelocity / 2);
+					if (item->Animation.Velocity.y > 0)
+						item->Animation.Velocity.y = -(item->Animation.Velocity.y / 2);
 					else
-						item->Animation.VerticalVelocity = 0;
+						item->Animation.Velocity.y = 0;
 				}
 			}
 
@@ -1562,34 +1562,34 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 		else
 		{
 			// Hit the floor; bounce and slow down.
-			if (item->Animation.VerticalVelocity > 0)
+			if (item->Animation.Velocity.y > 0)
 			{
-				if (item->Animation.VerticalVelocity > 16)
+				if (item->Animation.Velocity.y > 16)
 				{
 					if (item->ObjectNumber == ID_GRENADE)
-						item->Animation.VerticalVelocity = -(item->Animation.VerticalVelocity - (item->Animation.VerticalVelocity / 2));
+						item->Animation.Velocity.y = -(item->Animation.Velocity.y - (item->Animation.Velocity.y / 2));
 					else
 					{
-						item->Animation.VerticalVelocity = -(item->Animation.VerticalVelocity / 2);
-						if (item->Animation.VerticalVelocity < -100)
-							item->Animation.VerticalVelocity = -100;
+						item->Animation.Velocity.y = -(item->Animation.Velocity.y / 2);
+						if (item->Animation.Velocity.y < -100)
+							item->Animation.Velocity.y = -100;
 					}
 				}
 				else
 				{
 					// Roll on floor.
-					item->Animation.VerticalVelocity = 0;
+					item->Animation.Velocity.y = 0;
 					if (item->ObjectNumber == ID_GRENADE)
 					{
 						item->Animation.RequiredState = 1;
 						item->Pose.Orientation.x = 0;
-						item->Animation.Velocity--;
+						item->Animation.Velocity.z--;
 					}
 					else
-						item->Animation.Velocity -= 3;
+						item->Animation.Velocity.z -= 3;
 
-					if (item->Animation.Velocity < 0)
-						item->Animation.Velocity = 0;
+					if (item->Animation.Velocity.z < 0)
+						item->Animation.Velocity.z = 0;
 				}
 			}
 
@@ -1613,34 +1613,34 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 			if (item->Pose.Position.y >= oldCollResult.Position.Floor)
 			{
 				// Hit the floor; bounce and slow down.
-				if (item->Animation.VerticalVelocity > 0)
+				if (item->Animation.Velocity.y > 0)
 				{
-					if (item->Animation.VerticalVelocity > 16)
+					if (item->Animation.Velocity.y > 16)
 					{
 						if (item->ObjectNumber == ID_GRENADE)
-							item->Animation.VerticalVelocity = -(item->Animation.VerticalVelocity - (item->Animation.VerticalVelocity / 2));
+							item->Animation.Velocity.y = -(item->Animation.Velocity.y - (item->Animation.Velocity.y / 2));
 						else
 						{
-							item->Animation.VerticalVelocity = -(item->Animation.VerticalVelocity / 4);
-							if (item->Animation.VerticalVelocity < -100)
-								item->Animation.VerticalVelocity = -100;
+							item->Animation.Velocity.y = -(item->Animation.Velocity.y / 4);
+							if (item->Animation.Velocity.y < -100)
+								item->Animation.Velocity.y = -100;
 						}
 					}
 					else
 					{
 						// Roll on floor.
-						item->Animation.VerticalVelocity = 0;
+						item->Animation.Velocity.y = 0;
 						if (item->ObjectNumber == ID_GRENADE)
 						{
 							item->Animation.RequiredState = 1;
 							item->Pose.Orientation.x = 0;
-							item->Animation.Velocity--;
+							item->Animation.Velocity.z--;
 						}
 						else
-							item->Animation.Velocity -= 3;
+							item->Animation.Velocity.z -= 3;
 
-						if (item->Animation.Velocity < 0)
-							item->Animation.Velocity = 0;
+						if (item->Animation.Velocity.z < 0)
+							item->Animation.Velocity.z = 0;
 					}
 				}
 
@@ -1673,9 +1673,9 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 						item->Pose.Orientation.y = 0x8000 - item->Pose.Orientation.y;
 
 					if (item->ObjectNumber == ID_GRENADE)
-						item->Animation.Velocity -= item->Animation.Velocity / 8;
+						item->Animation.Velocity.z -= item->Animation.Velocity.z / 8;
 					else
-						item->Animation.Velocity /= 2;
+						item->Animation.Velocity.z /= 2;
 
 					// Put item back in its last position.
 					item->Pose.Position.x = x;
@@ -1685,8 +1685,8 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 				else
 					item->Pose.Position.y = collResult.Position.Ceiling;
 
-				if (item->Animation.VerticalVelocity < 0)
-					item->Animation.VerticalVelocity = -item->Animation.VerticalVelocity;
+				if (item->Animation.Velocity.y < 0)
+					item->Animation.Velocity.y = -item->Animation.Velocity.y;
 			}
 		}
 	}
@@ -1778,7 +1778,7 @@ void DoObjectCollision(ItemInfo* laraItem, CollisionInfo* coll)
 					if (item->HitPoints <= 0 || item->HitPoints == NOT_TARGETABLE)
 						continue;
 
-					if (harmless || abs(laraItem->Animation.Velocity) < VEHICLE_COLLISION_TERMINAL_VELOCITY)
+					if (harmless || abs(laraItem->Animation.Velocity.z) < VEHICLE_COLLISION_TERMINAL_VELOCITY)
 					{
 						// If vehicle is harmless or speed is too low, just push the enemy.
 						ItemPushItem(laraItem, item, coll, false, 0);
@@ -1791,7 +1791,7 @@ void DoObjectCollision(ItemInfo* laraItem, CollisionInfo* coll)
 						DoLotsOfBlood(item->Pose.Position.x,
 							laraItem->Pose.Position.y - CLICK(1),
 							item->Pose.Position.z,
-							laraItem->Animation.Velocity,
+							laraItem->Animation.Velocity.z,
 							laraItem->Pose.Orientation.y,
 							item->RoomNumber, 3);
 					}
@@ -1823,7 +1823,7 @@ void DoObjectCollision(ItemInfo* laraItem, CollisionInfo* coll)
 
 			// HACK: Shatter statics only by non-harmless vehicles.
 			if (!playerCollision && 
-				!harmless && abs(laraItem->Animation.Velocity) > VEHICLE_COLLISION_TERMINAL_VELOCITY &&
+				!harmless && abs(laraItem->Animation.Velocity.z) > VEHICLE_COLLISION_TERMINAL_VELOCITY &&
 				StaticObjects[mesh->staticNumber].shatterType != SHT_NONE)
 			{
 				SoundEffect(GetShatterSound(mesh->staticNumber), (PHD_3DPOS*)mesh);
