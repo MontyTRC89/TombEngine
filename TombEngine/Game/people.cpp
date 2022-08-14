@@ -48,12 +48,12 @@ bool ShotLara(ItemInfo* item, AI_INFO* AI, BiteInfo* gun, short extraRotation, i
 
 	if (damage)
 	{
-		if (enemy == LaraItem)
+		if (enemy->IsLara())
 		{
 			if (hit)
 			{
+				DoDamage(enemy, damage);
 				CreatureEffect(item, gun, &GunHit);
-				DoDamage(LaraItem, damage);
 			}
 			else if (targetable)
 				CreatureEffect(item, gun, &GunMiss);
@@ -66,12 +66,14 @@ bool ShotLara(ItemInfo* item, AI_INFO* AI, BiteInfo* gun, short extraRotation, i
 				enemy->HitStatus = true;
 				enemy->HitPoints += damage / -10;
 
+				// TODO: Use TestProbability().
 				int random = GetRandomControl() & 0xF;
 				if (random > 14)
 					random = 0;
 
-				Vector3Int pos = { 0, 0, 0 };
+				auto pos = Vector3Int::Zero;
 				GetJointAbsPosition(enemy, &pos, random);
+
 				DoBloodSplat(pos.x, pos.y, pos.z, (GetRandomControl() & 3) + 4, enemy->Pose.Orientation.y, enemy->RoomNumber);
 			}
 		}
@@ -109,42 +111,39 @@ short GunShot(int x, int y, int z, short velocity, short yRot, short roomNumber)
 	return -1;
 }
 
-bool Targetable(ItemInfo* item, CreatureInfo* creature, AI_INFO* AI)
+bool Targetable(ItemInfo* item, AI_INFO* AI)
 {
-	// Check if entity is a creature (only creatures can use Targetable()).
-	// and whether target is ahead or at a visible distance.
+	// Discard it entity is not a creature (only creatures can use Targetable())
+	// or if the target is not visible.
 	if (!item->IsCreature() || !AI->ahead || AI->distance >= SQUARE(MAX_VISIBILITY_DISTANCE))
 		return false;
 
-	auto* enemy = (creature != nullptr) ? creature->Enemy : GetCreatureInfo(item)->Enemy;
-	if (enemy == nullptr)
+	auto* creature = GetCreatureInfo(item);
+	auto* enemy = creature->Enemy;
+
+	if (creature->Enemy == nullptr)
 		return false;
 
-	// NOTE: Creature OR lara; can't be both.
-	if ((!enemy->IsCreature() || !enemy->IsLara()) || enemy->HitPoints <= 0)
+	// Only Lara or a creature may be targeted.
+	if ((!enemy->IsCreature() && !enemy->IsLara()) || enemy->HitPoints <= 0)
 		return false;
 
-	GameVector start;
-	GameVector target;
 	auto& bounds = GetBestFrame(item)->boundingBox;
 	auto& boundsTarget = GetBestFrame(enemy)->boundingBox;
 
-	start.x = item->Pose.Position.x;
-	start.y = (item->ObjectNumber == ID_SNIPER) ? (item->Pose.Position.y - CLICK(3)) : (item->Pose.Position.y + ((bounds.Y2 + 3 * bounds.Y1) / 4));
-	start.z = item->Pose.Position.z;
-	start.roomNumber = item->RoomNumber;
-
-	target.x = enemy->Pose.Position.x;
-	target.y = enemy->Pose.Position.y + ((boundsTarget.Y2 + 3 * boundsTarget.Y1) / 4);
-	target.z = enemy->Pose.Position.z;
-	target.roomNumber = enemy->RoomNumber; // NOTE: why do this line not existed ? TokyoSU, 5/8/2022
-
-	return LOS(&start, &target);
-}
-
-bool Targetable(ItemInfo* item, AI_INFO* AI)
-{
-	return Targetable(item, nullptr, AI);
+	auto origin = GameVector(
+		item->Pose.Position.x,
+		(item->ObjectNumber == ID_SNIPER) ? (item->Pose.Position.y - CLICK(3)) : (item->Pose.Position.y + ((bounds.Y2 + 3 * bounds.Y1) / 4)),
+		item->Pose.Position.z,
+		item->RoomNumber
+	);
+	auto target = GameVector(
+		enemy->Pose.Position.x,
+		enemy->Pose.Position.y + ((boundsTarget.Y2 + 3 * boundsTarget.Y1) / 4),
+		enemy->Pose.Position.z,
+		enemy->RoomNumber // TODO: Check why this line didn't exist in the first place. -- TokyoSU 2022.08.05
+	);
+	return LOS(&origin, &target);
 }
 
 bool TargetVisible(ItemInfo* item, AI_INFO* AI, float maxAngle)

@@ -127,7 +127,7 @@ namespace TEN::Entities::TR1
 		WMUTANT_CONF_DISABLE_BOMB_WEAPON
 	};
 
-	static void SwitchPathfinding(CreatureInfo* creature, WingedMutantPathFinding path)
+	void SwitchPathfinding(CreatureInfo* creature, WingedMutantPathFinding path)
 	{
 		switch (path)
 		{
@@ -145,9 +145,9 @@ namespace TEN::Entities::TR1
 		}
 	}
 
-	static WingedMutantProjectileType CanTargetLara(ItemInfo* item, CreatureInfo* creature, AI_INFO* AI)
+	WingedMutantProjectileType CanTargetLara(ItemInfo* item, CreatureInfo* creature, AI_INFO* AI)
 	{
-		if (Targetable(item, creature, AI) &&  (AI->zoneNumber != AI->enemyZone || AI->distance > WINGED_MUTANT_ATTACK_RANGE))
+		if (Targetable(item, AI) &&  (AI->zoneNumber != AI->enemyZone || AI->distance > WINGED_MUTANT_ATTACK_RANGE))
 		{
 			if ((AI->angle > 0 && AI->angle < ANGLE(45.0f)) &&
 				item->TestFlags(WMUTANT_OCB_DISABLE_DART_WEAPON, false))
@@ -165,7 +165,7 @@ namespace TEN::Entities::TR1
 		return WMUTANT_PROJ_NONE;
 	}
 
-	static void WingedInitOCB(ItemInfo* item, CreatureInfo* creature)
+	void WingedInitOCB(ItemInfo* item, CreatureInfo* creature)
 	{
 		if (item->TestOcb(WMUTANT_OCB_START_AERIAL))
 		{
