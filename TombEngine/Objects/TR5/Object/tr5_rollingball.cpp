@@ -23,7 +23,7 @@ void RollingBallCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* c
 	if (TestBoundsCollide(ballItem, laraItem, coll->Setup.Radius) && 
 		TestCollision(ballItem, laraItem))
 	{
-		if (TriggerActive(ballItem) && (ballItem->ItemFlags[0] || ballItem->Animation.VerticalVelocity))
+		if (TriggerActive(ballItem) && (ballItem->ItemFlags[0] || ballItem->Animation.Velocity.y))
 		{
 			if (laraItem->Animation.IsAirborne || TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, laraItem))
 				laraItem->HitPoints = 0;
@@ -54,17 +54,17 @@ void RollingBallControl(short itemNumber)
 	int hDivider = isWater ? 64 : 32;
 	int vDivider = isWater ? 3 : 1;
 
-	item->Animation.VerticalVelocity += GRAVITY;
+	item->Animation.Velocity.y += GRAVITY;
 	item->Pose.Position.x += item->ItemFlags[0] / hDivider;
-	item->Pose.Position.y += item->Animation.VerticalVelocity / vDivider;
+	item->Pose.Position.y += item->Animation.Velocity.y / vDivider;
 	item->Pose.Position.z += item->ItemFlags[1] / hDivider;
-	item->Animation.Velocity = Vector3Int::Distance(item->Pose.Position, oldPos.Position);
+	item->Animation.Velocity.z = Vector3Int::Distance(item->Pose.Position, oldPos.Position);
 
 	int dh = GetCollision(item).Position.Floor - CLICK(2);
 
 	if (item->Pose.Position.y > dh)
 	{
-		if (abs(item->Animation.VerticalVelocity) > 16)
+		if (abs(item->Animation.Velocity.y) > 16)
 		{
 			int distance = sqrt(
 				pow(Camera.pos.x - item->Pose.Position.x, 2) +
@@ -73,7 +73,7 @@ void RollingBallControl(short itemNumber)
 
 			if (distance < 16384)
 			{
-				Camera.bounce = -(((16384 - distance) * abs(item->Animation.VerticalVelocity)) / 16384);
+				Camera.bounce = -(((16384 - distance) * abs(item->Animation.Velocity.y)) / 16384);
 				SoundEffect(SFX_TR4_BOULDER_FALL, &item->Pose);
 			}
 		}
@@ -81,15 +81,15 @@ void RollingBallControl(short itemNumber)
 		if ((item->Pose.Position.y - dh) < CLICK(2))
 			item->Pose.Position.y = dh;
 
-		if (item->Animation.VerticalVelocity <= 64)
+		if (item->Animation.Velocity.y <= 64)
 		{
-			if (abs(item->Animation.Velocity) <= CLICK(2) || (GetRandomControl() & 0x1F))
-				item->Animation.VerticalVelocity = 0;
+			if (abs(item->Animation.Velocity.z) <= CLICK(2) || (GetRandomControl() & 0x1F))
+				item->Animation.Velocity.y = 0;
 			else
-				item->Animation.VerticalVelocity = -(short)(GetRandomControl() % (item->Animation.Velocity / 8));
+				item->Animation.Velocity.y = -(GetRandomControl() % int(round(item->Animation.Velocity.z) / 8.0f));
 		}
 		else
-			item->Animation.VerticalVelocity = -(short)(item->Animation.VerticalVelocity / 4);
+			item->Animation.Velocity.y = -item->Animation.Velocity.y / 4.0f;
 	}
 
 	int frontX = item->Pose.Position.x;
@@ -262,7 +262,7 @@ void RollingBallControl(short itemNumber)
 			SplashSetup.y = waterHeight - 1;
 			SplashSetup.x = item->Pose.Position.x;
 			SplashSetup.z = item->Pose.Position.z;
-			SplashSetup.splashPower = item->Animation.VerticalVelocity * 4;
+			SplashSetup.splashPower = item->Animation.Velocity.y * 4;
 			SplashSetup.innerRadius = 160;
 			SetupSplash(&SplashSetup, roomNumber);
 		}
@@ -333,7 +333,7 @@ void ClassicRollingBallCollision(short itemNum, ItemInfo* lara, CollisionInfo* c
 			x = item->Pose.Position.x + ((x * 512) / d);
 			y = item->Pose.Position.y - 512 + ((y * 512) / d);
 			z = item->Pose.Position.z + ((z * 512) / d);
-			DoBloodSplat(x, y, z, item->Animation.Velocity, item->Pose.Orientation.y, item->RoomNumber);
+			DoBloodSplat(x, y, z, item->Animation.Velocity.z, item->Pose.Orientation.y, item->RoomNumber);
 		}
 		else
 		{
@@ -359,7 +359,7 @@ void ClassicRollingBallCollision(short itemNum, ItemInfo* lara, CollisionInfo* c
 					int y = lara->Pose.Position.y - (GetRandomControl() / 64);
 					int z = lara->Pose.Position.z + (GetRandomControl() - ANGLE(180.0f) / 256);
 					short d = ((GetRandomControl() - ANGLE(180) / 8) + item->Pose.Orientation.y);
-					DoBloodSplat(x, y, z, (short)(item->Animation.Velocity * 2), d, item->RoomNumber);
+					DoBloodSplat(x, y, z, (short)(item->Animation.Velocity.z * 2), d, item->RoomNumber);
 				}
 			}
 		}
@@ -392,7 +392,7 @@ void ClassicRollingBallControl(short itemNum)
 			if (!item->Animation.IsAirborne)
 			{
 				item->Animation.IsAirborne = 1;
-				item->Animation.VerticalVelocity = -10;
+				item->Animation.Velocity.y = -10;
 			}
 		}
 		else if (item->Animation.ActiveState == 0)
@@ -413,7 +413,7 @@ void ClassicRollingBallControl(short itemNum)
 		if (item->Pose.Position.y >= (int)floor - 256)
 		{
 			item->Animation.IsAirborne = false;
-			item->Animation.VerticalVelocity = 0;
+			item->Animation.Velocity.y = 0;
 			item->Pose.Position.y = item->Floor;
 			SoundEffect(SFX_TR4_ROLLING_BALL, &item->Pose);
 			dist = sqrt((SQUARE(Camera.mikePos.x - item->Pose.Position.x)) + (SQUARE(Camera.mikePos.z - item->Pose.Position.z)));
@@ -455,8 +455,8 @@ void ClassicRollingBallControl(short itemNum)
 			item->Pose.Position.y = item->Floor;
 			item->Pose.Position.x = oldx;
 			item->Pose.Position.z = oldz;
-			item->Animation.Velocity = 0;
-			item->Animation.VerticalVelocity = 0;
+			item->Animation.Velocity.z = 0;
+			item->Animation.Velocity.y = 0;
 			item->TouchBits = NO_JOINT_BITS;
 		}
 	}

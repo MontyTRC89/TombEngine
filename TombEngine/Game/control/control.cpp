@@ -370,11 +370,12 @@ unsigned CALLBACK GameMain(void *)
 
 	TimeInit();
 
-	if (g_GameFlow->IntroImagePath.empty())
-		throw TENScriptException("Intro image path is not set.");
-
 	// Do a fixed time title image
-	g_Renderer.RenderTitleImage();
+	if (g_GameFlow->IntroImagePath.empty())
+		TENLog("Intro image path is not set.", LogLevel::Warning);
+	else
+		g_Renderer.RenderTitleImage();
+
 
 	// Execute the LUA gameflow and play the game
 	g_GameFlow->DoFlow();
@@ -716,6 +717,9 @@ void CleanUp()
 	DisableDripParticles();
 	DisableBubbles();
 	DisableDebris();
+
+	// Clear swarm enemies
+	ClearSwarmEnemies(nullptr);
 
 	// Clear soundtrack masks
 	ClearSoundTrackMasks();

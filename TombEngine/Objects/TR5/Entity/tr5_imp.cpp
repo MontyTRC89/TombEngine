@@ -107,7 +107,7 @@ static void ImpThrowStones(ItemInfo* item)
 		fx->fallspeed = 0;
 		fxNumber = Objects[ID_IMP_ROCK].meshIndex + (GetRandomControl() & 7);
 		fx->objectNumber = ID_IMP_ROCK;
-		fx->shade = 16912;
+		fx->color = Vector4::One;
 		fx->counter = 0;
 		fx->frameNumber = fxNumber;
 		fx->flag1 = 2;

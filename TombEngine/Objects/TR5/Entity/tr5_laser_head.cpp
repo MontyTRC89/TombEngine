@@ -231,8 +231,8 @@ void LaserHeadControl(short itemNumber)
 				}
 			}
 
-			item->Pose.Position.y = item->ItemFlags[1] - (192 - item->Animation.Velocity) * phd_sin(item->ItemFlags[2]);
-			item->ItemFlags[2] += ONE_DEGREE * item->Animation.Velocity;
+			item->Pose.Position.y = item->ItemFlags[1] - (192 - item->Animation.Velocity.z) * phd_sin(item->ItemFlags[2]);
+			item->ItemFlags[2] += ONE_DEGREE * item->Animation.Velocity.z;
 
 			if (!(GlobalCounter & 7))
 			{
@@ -244,8 +244,8 @@ void LaserHeadControl(short itemNumber)
 			InterpolateAngle(item->TriggerFlags, &item->Pose.Orientation.x, 0, 2);
 
 			// Final death
-			item->Animation.Velocity++;
-			if (item->Animation.Velocity > 136)
+			item->Animation.Velocity.z++;
+			if (item->Animation.Velocity.z > 136)
 			{
 				ExplodeItemNode(&g_Level.Items[creature->BaseItem], 0, 0, 128);
 				KillItem(creature->BaseItem);
@@ -392,7 +392,7 @@ void LaserHeadControl(short itemNumber)
 					if (!(GetRandomControl() & 0x1F) &&
 						abs(LaserHeadData.xRot) < ANGLE(5.6f) &&
 						abs(LaserHeadData.yRot) < ANGLE(5.6f) &&
-						!LaraItem->Animation.VerticalVelocity ||
+						!LaraItem->Animation.Velocity.y ||
 						!(GetRandomControl() & 0x1FF))
 					{
 						item->ItemFlags[0]++;
@@ -619,12 +619,12 @@ void LaserHeadControl(short itemNumber)
 			}
 			else
 			{
-				item->Animation.VerticalVelocity += 3;
+				item->Animation.Velocity.y += 3;
 
-				if (item->Animation.VerticalVelocity > 32)
-					item->Animation.VerticalVelocity = 32;
+				if (item->Animation.Velocity.y > 32)
+					item->Animation.Velocity.y = 32;
 
-				item->Pose.Position.y -= item->Animation.VerticalVelocity;
+				item->Pose.Position.y -= item->Animation.Velocity.y;
 			}
 		}
 		else if (!(GlobalCounter & 7))
@@ -664,7 +664,7 @@ void LaserHeadControl(short itemNumber)
 			LaserHeadData.fireArcs[0] = NULL;
 			LaserHeadData.fireArcs[1] = NULL;
 
-			item->Animation.Velocity = 3;
+			item->Animation.Velocity.z = 3;
 			item->ItemFlags[0] = 3;
 			item->ItemFlags[3] = item->Pose.Orientation.y + (GetRandomControl() & 0x1000) - 2048;
 			item->TriggerFlags = item->Pose.Orientation.x + (GetRandomControl() & 0x1000) - 2048;

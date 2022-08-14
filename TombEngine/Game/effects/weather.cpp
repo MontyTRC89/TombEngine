@@ -106,39 +106,24 @@ namespace TEN::Effects::Environment
 
 	void EnvironmentController::UpdateSky(ScriptInterfaceLevel* level)
 	{
-		if (level->GetSkyLayerEnabled(0))
+		for (int i = 0; i < 2; i++)
 		{
-			SkyPosition1 += level->GetSkyLayerSpeed(0);
-			if (SkyPosition1 <= SKY_POSITION_LIMIT)
-			{
-				if (SkyPosition1 < 0)
-					SkyPosition1 += SKY_POSITION_LIMIT;
-			}
-			else
-			{
-				SkyPosition1 -= SKY_POSITION_LIMIT;
-			}
-		}
+			if (!level->GetSkyLayerEnabled(i))
+				continue;
 
-		if (level->GetSkyLayerEnabled(1))
-		{
-			SkyPosition2 += level->GetSkyLayerSpeed(1);
-			if (SkyPosition2 <= SKY_POSITION_LIMIT)
+			SkyCurrentPosition[i] += level->GetSkyLayerSpeed(i);
+			if (SkyCurrentPosition[i] <= SKY_POSITION_LIMIT)
 			{
-				if (SkyPosition2 < 0)
-					SkyPosition2 += SKY_POSITION_LIMIT;
+				if (SkyCurrentPosition[i] < 0)
+					SkyCurrentPosition[i] += SKY_POSITION_LIMIT;
 			}
 			else
-			{
-				SkyPosition2 -= SKY_POSITION_LIMIT;
-			}
+				SkyCurrentPosition[i] -= SKY_POSITION_LIMIT;
 		}
 	}
 
 	void EnvironmentController::UpdateStorm(ScriptInterfaceLevel* level)
 	{
-		auto color = Vector4(level->GetSkyLayerColor(0).GetR() / 255.0f, level->GetSkyLayerColor(0).GetG() / 255.0f, level->GetSkyLayerColor(0).GetB() / 255.0f, 1.0f);
-
 		if (level->HasStorm())
 		{
 			if (StormCount || StormRand)
@@ -154,16 +139,26 @@ namespace TEN::Effects::Environment
 				StormCount = (rand() & 0x1F) + 16;
 				StormTimer = (rand() & 3) + 12;
 			}
-
-			auto flashBrightness = StormSkyColor / 255.0f;
-			auto r = std::clamp(color.x + flashBrightness, 0.0f, 1.0f);
-			auto g = std::clamp(color.y + flashBrightness, 0.0f, 1.0f);
-			auto b = std::clamp(color.z + flashBrightness, 0.0f, 1.0f);
-
-			SkyCurrentColor = Vector4(r, g, b, color.w);
 		}
-		else
-			SkyCurrentColor = color;
+
+		for (int i = 0; i < 2; i++)
+		{
+			auto color = Vector4(level->GetSkyLayerColor(i).GetR() / 255.0f, 
+								 level->GetSkyLayerColor(i).GetG() / 255.0f,
+								 level->GetSkyLayerColor(i).GetB() / 255.0f, 1.0f);
+
+			if (level->HasStorm())
+			{
+				auto flashBrightness = StormSkyColor / 255.0f;
+				auto r = std::clamp(color.x + flashBrightness, 0.0f, 1.0f);
+				auto g = std::clamp(color.y + flashBrightness, 0.0f, 1.0f);
+				auto b = std::clamp(color.z + flashBrightness, 0.0f, 1.0f);
+
+				SkyCurrentColor[i] = Vector4(r, g, b, color.w);
+			}
+			else
+				SkyCurrentColor[i] = color;
+		}
 	}
 
 	void EnvironmentController::UpdateLightning()
