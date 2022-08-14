@@ -16,7 +16,7 @@ using namespace TEN::Entities::Generic;
 
 namespace TEN::Entities::TR5
 {
-	BiteInfo ImpBite = { 0, 100, 0, 9 };
+	const auto ImpBite = BiteInfo(Vector3(0.0f, 100.0f, 0.0f), 9);
 
 	enum ImpState
 	{
@@ -243,7 +243,7 @@ namespace TEN::Entities::TR5
 						item->TouchBits & 0x280)
 					{
 						DoDamage(creature->Enemy, 3);
-						CreatureEffect2(item, &ImpBite, 10, item->Pose.Orientation.y, DoBloodSplat);
+						CreatureEffect2(item, ImpBite, 10, item->Pose.Orientation.y, DoBloodSplat);
 					}
 
 					break;

@@ -270,7 +270,7 @@ namespace TEN::Entities::TR4
 
                 if (TestLaraPosition(&ElementPuzzleBounds, puzzleItem, laraItem))
                 {
-                    laraItem->Animation.AnimNumber = (abs(puzzleItem->Pose.Position.y - laraItem->Pose.Position.y) >> 8) + LA_TORCH_LIGHT_3;
+                    laraItem->Animation.AnimNumber = (abs(puzzleItem->Pose.Position.y- laraItem->Pose.Position.y) >> 8) + LA_TORCH_LIGHT_3;
                     laraItem->Animation.FrameNumber = g_Level.Anims[puzzleItem->Animation.AnimNumber].frameBase;
                     laraItem->Animation.ActiveState = LS_MISC_CONTROL;
                     laraInfo->Flare.ControlLeft = false;

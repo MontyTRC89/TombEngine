@@ -445,7 +445,7 @@ namespace TEN::Entities::TR4
 				if (item->Pose.Position.y >= item->Floor)
 				{
 					item->Pose.Position.y = item->Floor;
-					item->Animation.VerticalVelocity = 0;
+					item->Animation.Velocity.y = 0;
 					item->Animation.IsAirborne = false;
 				}
 
@@ -462,7 +462,7 @@ namespace TEN::Entities::TR4
 				if (item->Pose.Position.y >= item->Floor)
 				{
 					item->Pose.Position.y = item->Floor;
-					item->Animation.VerticalVelocity = 0;
+					item->Animation.Velocity.y = 0;
 					item->Animation.IsAirborne = false;
 					item->Animation.TargetState = BADDY_STATE_FREEFALL_LAND_DEATH;
 				}
@@ -479,7 +479,7 @@ namespace TEN::Entities::TR4
 				item->Animation.AnimNumber = Objects[objectNumber].animIndex + BADDY_ANIM_MONKEY_TO_FREEFALL;
 				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 				item->Animation.ActiveState = BADDY_STATE_MONKEY_TO_FREEFALL;
-				item->Animation.Velocity = 0;
+				item->Animation.Velocity.z = 0;
 				break;
 
 			default:
@@ -1028,8 +1028,8 @@ namespace TEN::Entities::TR4
 					{
 						SetAnimation(LaraItem, LA_JUMP_UP);
 						LaraItem->Animation.IsAirborne = true;
-						LaraItem->Animation.VerticalVelocity = 2;
-						LaraItem->Animation.VerticalVelocity = 1;
+						LaraItem->Animation.Velocity.y = 2;
+						LaraItem->Animation.Velocity.y = 1;
 						LaraItem->Pose.Position.y += CLICK(0.75f);
 						Lara.Control.HandStatus = HandStatus::Free;
 						currentCreature->Flags = 1;

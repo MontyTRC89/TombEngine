@@ -17,9 +17,9 @@
 
 namespace TEN::Entities::TR5
 {
-	BiteInfo SwatGunBite = { 80, 200, 13, 0 };
-	BiteInfo SniperGunBite = { 0, 480, 110, 13 };
-	BiteInfo ArmedMafia2GunBite = { -50, 220, 60, 13 };
+	const auto SwatGunBite		  = BiteInfo(Vector3(80.0f, 200.0f, 13.0f), 0);
+	const auto SniperGunBite	  = BiteInfo(Vector3(0.0f, 480.0f, 110.0f), 13);
+	const auto ArmedMafia2GunBite = BiteInfo(Vector3(-50.0f, 220.0f, 60.0f), 13);
 
 	enum GuardState
 	{
@@ -382,7 +382,7 @@ namespace TEN::Entities::TR5
 			angle = CreatureTurn(item, creature->MaxTurn);
 			creature->Enemy = LaraItem;
 
-			if ((laraAI.distance < pow(SECTOR(2), 2) && LaraItem->Animation.Velocity > 20) ||
+			if ((laraAI.distance < pow(SECTOR(2), 2) && LaraItem->Animation.Velocity.z > 20) ||
 				item->HitStatus ||
 				TargetVisible(item, &laraAI))
 			{
@@ -550,9 +550,9 @@ namespace TEN::Entities::TR5
 					creature->Flags = 1;
 
 					if (item->Animation.ActiveState == GUARD_STATE_FIRE_SINGLE)
-						ShotLara(item, &AI, &SwatGunBite, joint0, 30);
+						ShotLara(item, &AI, SwatGunBite, joint0, 30);
 					else
-						ShotLara(item, &AI, &SwatGunBite, joint0, 10);
+						ShotLara(item, &AI, SwatGunBite, joint0, 10);
 				
 					// TODO: just for testing energy arcs
 					/*pos1.x = SwatGunBite.x;
@@ -754,7 +754,7 @@ namespace TEN::Entities::TR5
 				joint2 = 0;
 
 				if (!item->HitStatus &&
-					LaraItem->Animation.Velocity < 40 &&
+					LaraItem->Animation.Velocity.z < 40 &&
 					!Lara.Control.Weapon.HasFired)
 				{
 					creature->Alerted = false;
@@ -1056,7 +1056,7 @@ namespace TEN::Entities::TR5
 			case SNIPER_STATE_FIRE:
 				if (!creature->Flags)
 				{
-					ShotLara(item, &AI, &SniperGunBite, joint0, 100);
+					ShotLara(item, &AI, SniperGunBite, joint0, 100);
 					creature->FiredWeapon = 2;
 					creature->Flags = 1;
 				}
@@ -1193,7 +1193,7 @@ namespace TEN::Entities::TR5
 			creature->Enemy = LaraItem;
 			angle = CreatureTurn(item, creature->MaxTurn);
 
-			if ((laraAI.distance < pow(SECTOR(2), 2) && LaraItem->Animation.Velocity > 20) ||
+			if ((laraAI.distance < pow(SECTOR(2), 2) && LaraItem->Animation.Velocity.z > 20) ||
 				item->HitStatus ||
 				TargetVisible(item, &laraAI))
 			{
@@ -1315,7 +1315,7 @@ namespace TEN::Entities::TR5
 			
 				if (!creature->Flags)
 				{
-					ShotLara(item, &AI, &ArmedMafia2GunBite, laraAI.angle / 2, 35);
+					ShotLara(item, &AI, ArmedMafia2GunBite, laraAI.angle / 2, 35);
 					creature->Flags = 1;
 					creature->FiredWeapon = 2;
 				}

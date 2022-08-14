@@ -15,7 +15,7 @@
 
 namespace TEN::Entities::TR2
 {
-	BiteInfo SwordBite = { 0, 37, 550, 15 };
+	const auto SwordBite = BiteInfo(Vector3(0.0f, 37.0f, 550.0f), 15);
 
 	void InitialiseSwordGuardian(short itemNumber)
 	{
@@ -212,7 +212,7 @@ namespace TEN::Entities::TR2
 
 				if (!creature->Flags && (item->TouchBits & 0xC000))
 				{
-					CreatureEffect(item, &SwordBite, DoBloodSplat);
+					CreatureEffect(item, SwordBite, DoBloodSplat);
 					DoDamage(creature->Enemy, 300);
 					creature->Flags = 1;
 				}

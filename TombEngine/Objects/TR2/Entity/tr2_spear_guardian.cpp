@@ -14,8 +14,8 @@
 
 namespace TEN::Entities::TR2
 {
-	BiteInfo SpearBiteLeft = { 0, 0, 920, 11 };
-	BiteInfo SpearBiteRight = { 0, 0, 920, 18 };
+	const auto SpearBiteLeft  = BiteInfo(Vector3(0.0f, 0.0f, 920.0f), 11);
+	const auto SpearBiteRight = BiteInfo(Vector3(0.0f, 0.0f, 920.0f), 18);
 
 	// TODO
 	enum SpearGuardianState
@@ -36,7 +36,7 @@ namespace TEN::Entities::TR2
 		if (!(creature->Flags & 1) && item->TouchBits & 0x40000)
 		{
 			DoDamage(creature->Enemy, damage);
-			CreatureEffect(item, &SpearBiteRight, DoBloodSplat);
+			CreatureEffect(item, SpearBiteRight, DoBloodSplat);
 			creature->Flags |= 1;
 			SoundEffect(SFX_TR2_CRUNCH2, &item->Pose);
 		}
@@ -44,7 +44,7 @@ namespace TEN::Entities::TR2
 		if (!(creature->Flags & 2) && item->TouchBits & 0x800)
 		{
 			DoDamage(creature->Enemy, damage);
-			CreatureEffect(item, &SpearBiteLeft, DoBloodSplat);
+			CreatureEffect(item, SpearBiteLeft, DoBloodSplat);
 			creature->Flags |= 2;
 			SoundEffect(SFX_TR2_CRUNCH2, &item->Pose);
 		}
