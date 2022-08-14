@@ -2,6 +2,7 @@
 #include "Renderer/Renderer11.h"
 #include "Game/animation.h"
 #include "Game/camera.h"
+#include "Game/collision/sphere.h"
 #include "Game/effects/effects.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
@@ -362,9 +363,17 @@ namespace TEN::Renderer
 
 			if (obj.ShadowType == ShadowMode::None)
 			{
-				auto bounds = TO_DX_BBOX(item->Pose, GetBoundsAccurate(item));
-				auto length = Vector3(bounds.Extents).Length();
-				if (!renderView.camera.frustum.SphereInFrustum(bounds.Center, length))
+				// Get all spheres and check if frustum intersects any of them.
+				static BoundingSphere spheres[MAX_BONES];
+				int cnt = GetSpheres(itemNum, spheres, SPHERES_SPACE_WORLD, Matrix::Identity);
+
+				bool inFrustum = false;
+				for (int i = 0; !inFrustum, i < cnt; i++)
+					// Blow up sphere radius by half for cases of too small calculated spheres.
+					if (renderView.camera.frustum.SphereInFrustum(spheres[i].Center, spheres[i].Radius * 1.5f))
+						inFrustum = true;
+				
+				if (!inFrustum)
 					continue;
 			}
 
@@ -724,6 +733,8 @@ namespace TEN::Renderer
 			newEffect->ObjectNumber = fx->objectNumber;
 			newEffect->RoomNumber = fx->roomNumber;
 			newEffect->Position = fx->pos.Position.ToVector3();
+			newEffect->AmbientLight = room.AmbientLight;
+			newEffect->Color = fx->color;
 			newEffect->World = rotation * translation;
 			newEffect->Mesh = GetMesh(obj->nmeshes ? obj->meshIndex : fx->frameNumber);
 
