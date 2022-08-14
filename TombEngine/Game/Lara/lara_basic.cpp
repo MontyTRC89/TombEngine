@@ -180,7 +180,7 @@ void lara_col_walk_forward(ItemInfo* item, CollisionInfo* coll)
 
 	lara->Control.MoveAngle = item->Pose.Orientation.y;
 	item->Animation.IsAirborne = false;
-	item->Animation.VerticalVelocity = 0;
+	item->Animation.Velocity.y = 0;
 	coll->Setup.LowerFloorBound = STEPUP_HEIGHT;
 	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
 	coll->Setup.LowerCeilingBound = 0;
@@ -311,7 +311,7 @@ void lara_col_run_forward(ItemInfo* item, CollisionInfo* coll)
 
 	lara->Control.MoveAngle = item->Pose.Orientation.y;
 	item->Animation.IsAirborne = false;
-	item->Animation.VerticalVelocity = 0;
+	item->Animation.Velocity.y = 0;
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
 	coll->Setup.LowerCeilingBound = 0;
@@ -688,8 +688,8 @@ void lara_col_idle(ItemInfo* item, CollisionInfo* coll)
 	bool isSwamp = TestEnvironment(ENV_FLAG_SWAMP, item);
 
 	item->Animation.IsAirborne = false;
-	item->Animation.VerticalVelocity = 0;
-	lara->Control.MoveAngle = (item->Animation.Velocity >= 0) ? item->Pose.Orientation.y : (item->Pose.Orientation.y + ANGLE(180.0f));
+	item->Animation.Velocity.y = 0;
+	lara->Control.MoveAngle = (item->Animation.Velocity.z >= 0) ? item->Pose.Orientation.y : (item->Pose.Orientation.y + ANGLE(180.0f));
 	coll->Setup.LowerFloorBound = isSwamp ? NO_LOWER_BOUND : STEPUP_HEIGHT;
 	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
 	coll->Setup.LowerCeilingBound = 0;
@@ -791,7 +791,7 @@ void lara_col_run_back(ItemInfo* item, CollisionInfo* coll)
 	auto* lara = GetLaraInfo(item);
 
 	lara->Control.MoveAngle = item->Pose.Orientation.y + ANGLE(180.0f);
-	item->Animation.VerticalVelocity = 0;
+	item->Animation.Velocity.y = 0;
 	item->Animation.IsAirborne = false;
 	coll->Setup.BlockFloorSlopeDown = true;
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
@@ -1475,7 +1475,7 @@ void lara_col_walk_back(ItemInfo* item, CollisionInfo* coll)
 
 	lara->Control.MoveAngle = item->Pose.Orientation.y + ANGLE(180.0f);
 	item->Animation.IsAirborne = false;
-	item->Animation.VerticalVelocity = 0;
+	item->Animation.Velocity.y = 0;
 	coll->Setup.LowerFloorBound = (lara->Control.WaterStatus == WaterStatus::Wade) ? NO_LOWER_BOUND : STEPUP_HEIGHT;
 	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
 	coll->Setup.LowerCeilingBound = 0;
@@ -1810,7 +1810,7 @@ void lara_col_step_right(ItemInfo* item, CollisionInfo* coll)
 
 	lara->Control.MoveAngle = item->Pose.Orientation.y + ANGLE(90.0f);
 	item->Animation.IsAirborne = false;
-	item->Animation.VerticalVelocity = 0;
+	item->Animation.Velocity.y = 0;
 	coll->Setup.LowerFloorBound = (lara->Control.WaterStatus == WaterStatus::Wade) ? NO_LOWER_BOUND : CLICK(0.8f);
 	coll->Setup.UpperFloorBound = -CLICK(0.8f);
 	coll->Setup.LowerCeilingBound = 0;
@@ -1901,7 +1901,7 @@ void lara_col_step_left(ItemInfo* item, CollisionInfo* coll)
 
 	lara->Control.MoveAngle = item->Pose.Orientation.y - ANGLE(90.0f);
 	item->Animation.IsAirborne = false;
-	item->Animation.VerticalVelocity = 0;
+	item->Animation.Velocity.y = 0;
 	coll->Setup.LowerFloorBound = (lara->Control.WaterStatus == WaterStatus::Wade) ? NO_LOWER_BOUND : CLICK(0.8f);
 	coll->Setup.UpperFloorBound = -CLICK(0.8f);
 	coll->Setup.LowerCeilingBound = 0;
@@ -1973,7 +1973,7 @@ void lara_col_roll_back(ItemInfo* item, CollisionInfo* coll)
 
 	lara->Control.MoveAngle = item->Pose.Orientation.y + ANGLE(180.0f);
 	item->Animation.IsAirborne = false;
-	item->Animation.VerticalVelocity = 0;
+	item->Animation.Velocity.y = 0;
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
 	coll->Setup.LowerCeilingBound = 0;
@@ -2043,7 +2043,7 @@ void lara_col_roll_forward(ItemInfo* item, CollisionInfo* coll)
 
 	lara->Control.MoveAngle = item->Pose.Orientation.y;
 	item->Animation.IsAirborne = false;
-	item->Animation.VerticalVelocity = 0;
+	item->Animation.Velocity.y = 0;
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
 	coll->Setup.LowerCeilingBound = 0;
@@ -2373,7 +2373,7 @@ void lara_col_sprint_dive(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->Control.MoveAngle = (item->Animation.Velocity >= 0) ? item->Pose.Orientation.y : item->Pose.Orientation.y + ANGLE(180.0f);
+	lara->Control.MoveAngle = (item->Animation.Velocity.z >= 0) ? item->Pose.Orientation.y : item->Pose.Orientation.y + ANGLE(180.0f);
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
 	coll->Setup.LowerCeilingBound = BAD_JUMP_CEILING;
@@ -2389,7 +2389,7 @@ void lara_col_sprint_dive(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (item->Animation.Velocity < 0)
+	if (item->Animation.Velocity.z < 0)
 		lara->Control.MoveAngle = item->Pose.Orientation.y; // ???
 
 	ShiftItem(item, coll);
