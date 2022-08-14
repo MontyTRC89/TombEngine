@@ -1,6 +1,6 @@
 #include "framework.h"
 #include "Specific/trmath.h"
-
+#include "Specific/prng.h"
 #include <cmath>
 
 #include "Specific/prng.h"
