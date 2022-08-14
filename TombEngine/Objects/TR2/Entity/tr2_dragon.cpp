@@ -245,7 +245,7 @@ namespace TEN::Entities::TR2
 	void DragonControl(short backItemNumber)
 	{
 		auto* back = &g_Level.Items[backItemNumber];
-		if (back->Data != nullptr && back->ObjectNumber == ID_DRAGON_FRONT)
+		if (back->Data && back->ObjectNumber == ID_DRAGON_FRONT)
 			return;
 
 		short itemNumber = (short)back->Data;

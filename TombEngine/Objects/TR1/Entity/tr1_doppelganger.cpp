@@ -59,7 +59,7 @@ namespace TEN::Entities::TR1
 
 		auto* reference = FindReference(item, ID_BACON_REFERENCE);
 
-		if (item->Data == nullptr)
+		if (item->Data)
 		{
 			Vector3Int pos;
 			if (reference == nullptr)
