@@ -102,7 +102,7 @@ void ControlMissile(short fxNumber)
 
 			LaraItem->HitStatus = 1; // TODO: Make ControlMissile() not use LaraItem global. -- TokyoSU, 5/8/2022
 			fx->pos.Orientation.y = LaraItem->Pose.Orientation.y;
-			fx->speed = LaraItem->Animation.Velocity;
+			fx->speed = LaraItem->Animation.Velocity.z;
 			fx->frameNumber = fx->counter = 0;
 		}
 	}

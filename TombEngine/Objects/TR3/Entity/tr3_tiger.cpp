@@ -130,7 +130,7 @@ namespace TEN::Entities::TR3
 					item->Animation.TargetState = 1;
 				else if (AI.bite && AI.distance < pow(SECTOR(1.5f), 2))
 				{
-					if (LaraItem->Animation.Velocity == 0)
+					if (LaraItem->Animation.Velocity.z == 0)
 						item->Animation.TargetState = 1;
 					else
 						item->Animation.TargetState = 7;

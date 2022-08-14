@@ -12,8 +12,8 @@
 
 namespace TEN::Entities::TR2
 {
-	BiteInfo WorkerDualGunBiteLeft = { -2, 275, 23, 6 };
-	BiteInfo WorkerDualGunBiteRight = { 2, 275, 23, 10 };
+	const auto WorkerDualGunBiteLeft  = BiteInfo(Vector3(-2.0f, 275.0f, 23.0f), 6);
+	const auto WorkerDualGunBiteRight = BiteInfo(Vector3(2.0f, 275.0f, 23.0f), 10);
 
 	// TODO
 	enum WorkerDualGunState
@@ -231,7 +231,7 @@ namespace TEN::Entities::TR2
 
 				if (!creature->Flags)
 				{
-					ShotLara(item, &AI, &WorkerDualGunBiteLeft, torsoY, 50);
+					ShotLara(item, &AI, WorkerDualGunBiteLeft, torsoY, 50);
 					creature->Flags = 1;
 				}
 
@@ -246,7 +246,7 @@ namespace TEN::Entities::TR2
 
 				if (!creature->Flags)
 				{
-					ShotLara(item, &AI, &WorkerDualGunBiteRight, torsoY, 50);
+					ShotLara(item, &AI, WorkerDualGunBiteRight, torsoY, 50);
 					creature->Flags = 1;
 				}
 
@@ -277,8 +277,8 @@ namespace TEN::Entities::TR2
 
 				if (!creature->Flags)
 				{
-					ShotLara(item, &AI, &WorkerDualGunBiteLeft, torsoY, 50);
-					ShotLara(item, &AI, &WorkerDualGunBiteRight, torsoY, 50);
+					ShotLara(item, &AI, WorkerDualGunBiteLeft, torsoY, 50);
+					ShotLara(item, &AI, WorkerDualGunBiteRight, torsoY, 50);
 					creature->Flags = 1;
 				}
 

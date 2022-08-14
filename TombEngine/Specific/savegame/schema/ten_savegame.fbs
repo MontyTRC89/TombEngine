@@ -1,45 +1,46 @@
 include "ten_itemdata.fbs";
 namespace TEN.Save;
+
 struct RoomVector {
-    room: uint32;
-    y_location: uint32;
+	room: uint32;
+	y_location: uint32;
 }
 
 table Item {
-    floor: int;
-    touch_bits: int32;
-    mesh_bits: int32;
-    object_id: int32;
-    active_state: int32;
-    target_state: int32;
-    required_state: int32;
-    anim_number: int32;
-    frame_number: int32;
-    room_number: int32;
-    velocity: int32;
-    vertical_velocity: int32;
-    hit_points: int32;
-    box_number: int32;
-    timer: int32;
+	active_state: int32;
+	anim_number: int32;
+	frame_number: int32;
+	is_airborne: bool;
+	required_state: int32;
+	target_state: int32;
+	velocity: Vector3;
+
+	floor: int;
+	touch_bits: int32;
+	mesh_bits: int32;
+	object_id: int32;
+	room_number: int32;
+	hit_points: int32;
+	box_number: int32;
+	timer: int32;
 	color: Vector4;
-    flags: int32;
-    trigger_flags: int32;
-    carried_item: int32;
-    after_death: int32;
-    item_flags: [int32];
+	flags: int32;
+	trigger_flags: int32;
+	carried_item: int32;
+	after_death: int32;
+	item_flags: [int32];
 	pose: Position;
 	next_item: int32;
 	next_item_active: int32;
 	triggered: bool;
 	active: bool;
 	status: int32;
-	is_airborne: bool;
 	hit_stauts: bool;
 	collidable: bool;
 	looked_at: bool;
 	ai_bits: int32;
 	swap_mesh_flags: int32;
-    data: TEN.Save.ItemData;
+	data: TEN.Save.ItemData;
 	lua_name: string;
 	lua_on_killed_name: string;
 	lua_on_hit_name: string;
@@ -230,7 +231,6 @@ table Lara {
 	torch: TorchData;
 	extra_head_rot: Vector3;
 	extra_torso_rot: Vector3;
-	extra_velocity: Vector3;
 	water_current_active: int32;
 	water_current_pull: Vector3;
 	left_arm: ArmInfo;

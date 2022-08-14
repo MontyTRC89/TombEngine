@@ -12,7 +12,7 @@
 
 namespace TEN::Entities::TR2
 {
-	BiteInfo SilencerGunBite = { 3, 331, 56, 10 };
+	const auto SilencerGunBite = BiteInfo(Vector3(3.0f, 331.0f, 56.0f), 10);
 
 	// TODO
 	enum SilencerState
@@ -233,7 +233,7 @@ namespace TEN::Entities::TR2
 
 				if (!info->Flags)
 				{
-					ShotLara(item, &AI, &SilencerGunBite, torsoY, 50);
+					ShotLara(item, &AI, SilencerGunBite, torsoY, 50);
 					info->Flags = 1;
 				}
 
@@ -252,7 +252,7 @@ namespace TEN::Entities::TR2
 
 				if (!item->Animation.RequiredState)
 				{
-					if (!ShotLara(item, &AI, &SilencerGunBite, torsoY, 50))
+					if (!ShotLara(item, &AI, SilencerGunBite, torsoY, 50))
 						item->Animation.TargetState = 2;
 
 					item->Animation.RequiredState = 9;

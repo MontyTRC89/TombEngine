@@ -19,6 +19,13 @@
 
 namespace TEN::Entities::TR2
 {
+	#define SMAN_MIN_TURN (ANGLE(2.0f))
+	#define SMAN_TARGET_ANGLE ANGLE(15.0f)
+	#define SMAN_WAIT_RANGE pow(SECTOR(4), 2)
+
+	const auto SkidooBiteLeft  = BiteInfo(Vector3(240.0f, -190.0f, 540.0f), 0);
+	const auto SkidooBiteRight = BiteInfo(Vector3(-240.0f, -190.0f, 540.0f), 0);
+
 	enum SnowmobileManState
 	{
 		SMAN_STATE_NONE = 0,
@@ -36,13 +43,6 @@ namespace TEN::Entities::TR2
 	{
 		SMAN_ANIM_DEATH = 10
 	};
-
-#define SMAN_MIN_TURN (ANGLE(2.0f))
-#define SMAN_TARGET_ANGLE ANGLE(15.0f)
-#define SMAN_WAIT_RANGE pow(SECTOR(4), 2)
-
-	BiteInfo SkidooBiteLeft = { 240, -190, 540, 0 };
-	BiteInfo SkidooBiteRight = { -240, -190, 540, 0 };
 
 	void InitialiseSkidooMan(short itemNumber)
 	{
@@ -84,13 +84,13 @@ namespace TEN::Entities::TR2
 
 		if (coll->Setup.EnableObjectPush)
 		{
-			if (item->Animation.Velocity > 0)
+			if (item->Animation.Velocity.z > 0)
 				ItemPushItem(item, laraItem, coll, coll->Setup.EnableSpasm, 0);
 			else
 				ItemPushItem(item, laraItem, coll, 0, 0);
 		}
 
-		if (Lara.Vehicle == NO_ITEM && item->Animation.Velocity > 0)
+		if (Lara.Vehicle == NO_ITEM && item->Animation.Velocity.z > 0)
 		{
 			DoDamage(laraItem, 100);
 		}
@@ -100,7 +100,7 @@ namespace TEN::Entities::TR2
 	{
 
 		auto* riderItem = &g_Level.Items[riderItemNumber];
-		if (riderItem->Data == nullptr)
+		if (!riderItem->Data)
 		{
 			TENLog("Rider data does not contain the skidoo itemNumber!", LogLevel::Error);
 			return;
@@ -201,7 +201,7 @@ namespace TEN::Entities::TR2
 			{
 				damage = (Lara.Vehicle != NO_ITEM) ? 10 : 50;
 
-				if (ShotLara(item, &AI, &SkidooBiteLeft, 0, damage) + ShotLara(item, &AI, &SkidooBiteRight, 0, damage))
+				if (ShotLara(item, &AI, SkidooBiteLeft, 0, damage) + ShotLara(item, &AI, SkidooBiteRight, 0, damage))
 					creatureInfo->Flags = 5;
 			}
 
@@ -221,7 +221,7 @@ namespace TEN::Entities::TR2
 		{
 			creatureInfo->JointRotation[0] = (creatureInfo->JointRotation[0] == 1) ? 2 : 1;
 			DoSnowEffect(item);
-			SoundEffect(SFX_TR2_VEHICLE_SNOWMOBILE_IDLE, &item->Pose, SoundEnvironment::Land, 0.5f + item->Animation.Velocity / 100.0f); // SKIDOO_MAX_VELOCITY.  TODO: Check actual sound!
+			SoundEffect(SFX_TR2_VEHICLE_SNOWMOBILE_IDLE, &item->Pose, SoundEnvironment::Land, 0.5f + item->Animation.Velocity.z / 100.0f); // SKIDOO_MAX_VELOCITY.  TODO: Check actual sound!
 		}
 
 		CreatureAnimation(itemNumber, angle, 0);
@@ -240,8 +240,8 @@ namespace TEN::Entities::TR2
 			riderItem->Animation.FrameNumber = item->Animation.FrameNumber + (g_Level.Anims[riderItem->Animation.AnimNumber].frameBase - g_Level.Anims[item->Animation.AnimNumber].frameBase);
 		}
 		else if (riderItem->Status == ITEM_DEACTIVATED &&
-			item->Animation.Velocity == 0 &&
-			item->Animation.VerticalVelocity == 0)
+			item->Animation.Velocity.z == 0 &&
+			item->Animation.Velocity.y == 0)
 		{
 			RemoveActiveItem(riderItemNumber);
 			riderItem->Collidable = false;

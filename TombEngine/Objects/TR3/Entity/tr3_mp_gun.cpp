@@ -18,7 +18,7 @@
 
 namespace TEN::Entities::TR3
 {
-	BiteInfo MPGunBite = { 0, 160, 40, 13 };
+	const auto MPGunBite = BiteInfo(Vector3(0.0f, 160.0f, 40.0f), 13);
 
 	enum MPGunState
 	{
@@ -102,7 +102,7 @@ namespace TEN::Entities::TR3
 					{
 						head = AI.angle;
 						torsoY = AI.angle;
-						ShotLara(item, &AI, &MPGunBite, torsoY, 32);
+						ShotLara(item, &AI, MPGunBite, torsoY, 32);
 						SoundEffect(SFX_TR3_OIL_SMG_FIRE, &item->Pose, SoundEnvironment::Land, 1.0f, 0.7f);
 						creature->FiredWeapon = 1;
 					}
@@ -312,7 +312,7 @@ namespace TEN::Entities::TR3
 				if (item->Animation.AnimNumber == Objects[ID_MP_WITH_GUN].animIndex + 12 ||
 					(item->Animation.AnimNumber == Objects[ID_MP_WITH_GUN].animIndex + 1 && item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + 10))
 				{
-					if (!ShotLara(item, &AI, &MPGunBite, torsoY, 32))
+					if (!ShotLara(item, &AI, MPGunBite, torsoY, 32))
 						item->Animation.RequiredState = MPGUN_STATE_WAIT;
 				}
 				else if (item->HitStatus && !(GetRandomControl() & 0x3) && cover)
@@ -344,7 +344,7 @@ namespace TEN::Entities::TR3
 
 				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase)
 				{
-					if (!ShotLara(item, &AI, &MPGunBite, torsoY, 32))
+					if (!ShotLara(item, &AI, MPGunBite, torsoY, 32))
 						item->Animation.TargetState = MPGUN_STATE_WAIT;
 				}
 				else if (item->HitStatus && !(GetRandomControl() & 0x3) && cover)
@@ -366,7 +366,7 @@ namespace TEN::Entities::TR3
 				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase ||
 					item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + 11)
 				{
-					if (!ShotLara(item, &AI, &MPGunBite, torsoY, 32))
+					if (!ShotLara(item, &AI, MPGunBite, torsoY, 32))
 						item->Animation.TargetState = MPGUN_STATE_WAIT;
 				}
 				else if (item->HitStatus && !(GetRandomControl() & 0x3) && cover)
@@ -387,7 +387,7 @@ namespace TEN::Entities::TR3
 				if ((item->Animation.AnimNumber == Objects[ID_MP_WITH_GUN].animIndex + 18 && item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + 17) ||
 					(item->Animation.AnimNumber == Objects[ID_MP_WITH_GUN].animIndex + 19 && item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + 6))
 				{
-					if (!ShotLara(item, &AI, &MPGunBite, torsoY, 32))
+					if (!ShotLara(item, &AI, MPGunBite, torsoY, 32))
 						item->Animation.RequiredState = MPGUN_STATE_WALK;
 				}
 				else if (item->HitStatus && !(GetRandomControl() & 0x3) && cover)
@@ -414,7 +414,7 @@ namespace TEN::Entities::TR3
 
 				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + 16)
 				{
-					if (!ShotLara(item, &AI, &MPGunBite, torsoY, 32))
+					if (!ShotLara(item, &AI, MPGunBite, torsoY, 32))
 						item->Animation.TargetState = MPGUN_STATE_WALK;
 				}
 
@@ -457,7 +457,7 @@ namespace TEN::Entities::TR3
 
 				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase)
 				{
-					if (!ShotLara(item, &AI, &MPGunBite, torsoY, 32) || !(GetRandomControl() & 0x7))
+					if (!ShotLara(item, &AI, MPGunBite, torsoY, 32) || !(GetRandomControl() & 0x7))
 						item->Animation.TargetState = MPGUN_STATE_CROUCHED;
 				}
 
