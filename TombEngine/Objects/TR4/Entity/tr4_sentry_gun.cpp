@@ -49,7 +49,7 @@ namespace TEN::Entities::TR4
 		{
 			if (item->ItemFlags[0])
 			{
-				auto pos = Vector3Int(SentryGunBite.x, SentryGunBite.y, SentryGunBite.z);
+				auto pos = Vector3Int(SentryGunBite.Position);
 				GetJointAbsPosition(item, &pos, SentryGunBite.meshNum);
 
 				TriggerDynamicLight(pos.x, pos.y, pos.z, 4 * item->ItemFlags[0] + 12, 24, 16, 4);
