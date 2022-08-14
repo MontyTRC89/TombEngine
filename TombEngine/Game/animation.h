@@ -32,14 +32,16 @@ struct RANGE_STRUCT
 struct ANIM_STRUCT
 {
 	int framePtr;
-	int interpolation;
+	int Interpolation;
 	int ActiveState;
-	int velocity;
-	int acceleration;
-	int Xvelocity;
-	int Xacceleration;
+
+	// CONVENTION: +X is right, +Y is down, +Z is forward.
+	Vector3 VelocityStart = Vector3::Zero;
+	Vector3 VelocityEnd	  = Vector3::Zero;
+
 	int frameBase;
 	int frameEnd;
+
 	int jumpAnimNum;
 	int jumpFrameNum;
 	int numberChanges;
@@ -59,13 +61,13 @@ enum ANIMCOMMAND_TYPES
 	COMMAND_EFFECT
 };
 
-struct BONE_MUTATOR
+struct BoneMutator
 {
-	Vector3 Scale    = Vector3::One;
 	Vector3 Offset   = Vector3::Zero;
 	Vector3 Rotation = Vector3::Zero;
+	Vector3 Scale    = Vector3::One;
 
-	bool IsEmpty() { return (Scale == Vector3::One) && (Offset == Vector3::Zero) && (Rotation == Vector3::Zero); };
+	bool IsEmpty() { return  (Offset == Vector3::Zero) && (Rotation == Vector3::Zero) && (Scale == Vector3::One); };
 };
 
 void AnimateLara(ItemInfo* item);
@@ -74,8 +76,9 @@ void AnimateItem(ItemInfo* item);
 bool HasStateDispatch(ItemInfo* item, int targetState = -1);
 bool TestLastFrame(ItemInfo* item, int animNumber = -1);
 
-void TranslateItem(ItemInfo* item, short angle, float forward, float vertical = 0.0f, float lateral = 0.0f);
+void TranslateItem(ItemInfo* item, short angle, float forward, float down = 0.0f, float right = 0.0f);
 void TranslateItem(ItemInfo* item, Vector3Shrt orient, float distance);
+void TranslateItem(ItemInfo* item, Vector3 direction, float distance);
 void SetAnimation(ItemInfo* item, int animIndex, int frameToStart = 0);
 
 int GetCurrentRelativeFrameNumber(ItemInfo* item);

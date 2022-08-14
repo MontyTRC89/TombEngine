@@ -373,7 +373,7 @@ void EnumerateLegacyTracks()
 	}
 	else
 	{
-		TENLog("Folder \"" + dir.string() + "\" does not exist. ", LogLevel::Error, LogConfig::All);
+		TENLog("Folder \"" + dir.string() + "\" does not exist. ", LogLevel::Warning, LogConfig::All);
 	}
 
 }
