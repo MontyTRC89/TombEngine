@@ -5,7 +5,7 @@ Version 1.0.1
 - Fix some issues with shimmying between diagonal ledges and walls.
 - Fix rope transparency.
 - Fix objects disappearing under certain angles at the edges of the screen.
-- Fix incorrect polerope grabbing.
+- Fix incorrect polerope and jumpswitch grabbing.
 - Fix camera behaviour with pushable blocks.
 - Fix minecart unduck on inclines.
 - Fix quadbike dismount with jump key and allow to shoot big gun with action key.
