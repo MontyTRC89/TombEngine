@@ -997,7 +997,7 @@ void LaraCheat(ItemInfo* item, CollisionInfo* coll)
 			lara->Control.WaterStatus = WaterStatus::Dry;
 		}
 
-		LaraInitialiseMeshes(item);
+		InitialiseLaraMeshes(item);
 		item->HitPoints = LARA_HEALTH_MAX;
 		lara->Control.HandStatus = HandStatus::Free;
 	}
