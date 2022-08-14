@@ -42,6 +42,7 @@ struct ROOM_LIGHT
 struct MESH_INFO
 {
 	PHD_3DPOS pos;
+	float scale;
 	short staticNumber;
 	short flags;
 	Vector4 color;

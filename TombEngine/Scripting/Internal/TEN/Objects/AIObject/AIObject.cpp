@@ -91,14 +91,14 @@ void AIObject::Register(sol::table & parent)
 
 Vec3 AIObject::GetPos() const
 {
-	return Vec3{ m_aiObject.x, m_aiObject.y, m_aiObject.z };
+	return Vec3{ m_aiObject.pos.Position.x, m_aiObject.pos.Position.y, m_aiObject.pos.Position.z };
 }
 
 void AIObject::SetPos(Vec3 const& pos)
 {
-	m_aiObject.x = pos.x;
-	m_aiObject.y = pos.y;
-	m_aiObject.z = pos.z;
+	m_aiObject.pos.Position.x = pos.x;
+	m_aiObject.pos.Position.y = pos.y;
+	m_aiObject.pos.Position.z = pos.z;
 }
 
 GAME_OBJECT_ID AIObject::GetObjectID() const
@@ -113,12 +113,12 @@ void AIObject::SetObjectID(GAME_OBJECT_ID objNum)
 
 short AIObject::GetYRot() const
 {
-	return m_aiObject.yRot;
+	return m_aiObject.pos.Orientation.y;
 }
 
 void AIObject::SetYRot(short yRot)
 {
-	m_aiObject.yRot = yRot;
+	m_aiObject.pos.Orientation.y = yRot;
 }
 
 std::string AIObject::GetName() const
