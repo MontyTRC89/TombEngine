@@ -100,7 +100,7 @@ namespace TEN::Entities::TR2
 	{
 
 		auto* riderItem = &g_Level.Items[riderItemNumber];
-		if (riderItem->Data == nullptr)
+		if (riderItem->Data)
 		{
 			TENLog("Rider data does not contain the skidoo itemNumber!", LogLevel::Error);
 			return;
