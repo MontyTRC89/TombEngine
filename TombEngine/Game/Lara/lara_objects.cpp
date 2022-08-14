@@ -285,8 +285,8 @@ void lara_as_horizontal_bar_leap(ItemInfo* item, CollisionInfo* coll)
 		else
 			distance = (barItem->TriggerFlags % 100) - 2;
 
-		item->Animation.Velocity = (20 * distance) + 58;
-		item->Animation.VerticalVelocity = -(20 * distance + 64);
+		item->Animation.Velocity.z = (20 * distance) + 58;
+		item->Animation.Velocity.y = -(20 * distance + 64);
 	}
 
 	if (TestLastFrame(item))
@@ -400,7 +400,7 @@ void lara_as_tightrope_fall(ItemInfo* item, CollisionInfo* coll)
 		else if (item->Animation.AnimNumber == LA_TIGHTROPE_FALL_RIGHT)
 			TranslateItem(item, coll->Setup.ForwardAngle + ANGLE(90.0f), CLICK(1));
 
-		item->Animation.VerticalVelocity = 10;
+		item->Animation.Velocity.y = 10;
 	}
 }
 
@@ -491,7 +491,7 @@ void lara_as_tightrope_fall(ItemInfo* item, CollisionInfo* coll)
 			item->Animation.AnimNumber = LA_FREEFALL;
 			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 
-			item->Animation.VerticalVelocity = 81;
+			item->Animation.Velocity.y = 81;
 			Camera.targetspeed = 16;
 		}
 	}
@@ -598,7 +598,7 @@ void lara_col_rope_idle(ItemInfo* item, CollisionInfo* coll)
 	if (TrInput & IN_ACTION)
 	{
 		UpdateRopeSwing(item);
-		RopeSwingCollision(item, coll);
+		RopeSwingCollision(item, coll, false);
 
 		if (TrInput & IN_SPRINT)
 		{
@@ -632,7 +632,7 @@ void lara_col_rope_swing(ItemInfo* item, CollisionInfo* coll)
 	Camera.targetDistance = SECTOR(2);
 
 	UpdateRopeSwing(item);
-	RopeSwingCollision(item, coll);
+	RopeSwingCollision(item, coll, true);
 
 	if (item->Animation.AnimNumber == LA_ROPE_SWING)
 	{
@@ -896,7 +896,7 @@ void lara_as_pole_down(ItemInfo* item, CollisionInfo* coll)
 		}
 
 		item->Animation.TargetState = LS_POLE_IDLE;
-		item->Animation.VerticalVelocity = 0;
+		item->Animation.Velocity.y = 0;
 		return;
 	}
 
@@ -921,20 +921,20 @@ void lara_col_pole_down(ItemInfo* item, CollisionInfo* coll)
 	// TODO: Pitch modulation might be a fun idea.
 
 	if (item->Animation.AnimNumber == LA_POLE_DOWN_END)
-		item->Animation.VerticalVelocity -= 8;
+		item->Animation.Velocity.y -= 8;
 	else
-		item->Animation.VerticalVelocity += 1;
+		item->Animation.Velocity.y += 1;
 
-	if (item->Animation.VerticalVelocity < 0)
-		item->Animation.VerticalVelocity = 0;
-	else if (item->Animation.VerticalVelocity > 64)
-		item->Animation.VerticalVelocity = 64;
+	if (item->Animation.Velocity.y < 0)
+		item->Animation.Velocity.y = 0;
+	else if (item->Animation.Velocity.y > 64)
+		item->Animation.Velocity.y = 64;
 	
 	// TODO: Do something about that ugly snap at the bottom.
-	if ((coll->Middle.Floor + item->Animation.VerticalVelocity) < 0)
+	if ((coll->Middle.Floor + item->Animation.Velocity.y) < 0)
 		item->Pose.Position.y += coll->Middle.Floor;
 	else if (TestLaraPoleCollision(item, coll, false))
-		item->Pose.Position.y += item->Animation.VerticalVelocity;
+		item->Pose.Position.y += item->Animation.Velocity.y;
 }
 
 // State:		LS_POLE_TURN_CLOCKWISE (102)
@@ -1058,8 +1058,8 @@ void lara_as_zip_line(ItemInfo* item, CollisionInfo* coll)
 		item->Animation.TargetState = LS_JUMP_FORWARD;
 		AnimateLara(item);
 
-		item->Animation.Velocity = 100;
-		item->Animation.VerticalVelocity = 40;
+		item->Animation.Velocity.z = 100;
+		item->Animation.Velocity.y = 40;
 		item->Animation.IsAirborne = true;
 		lara->Control.MoveAngle = item->Pose.Orientation.y;
 	}

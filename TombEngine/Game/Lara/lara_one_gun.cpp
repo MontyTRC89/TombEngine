@@ -61,7 +61,7 @@ void AnimateShotgun(ItemInfo* laraItem, LaraWeaponType weaponType)
 	}
 
 	auto* item = &g_Level.Items[lara->Control.Weapon.WeaponItem];
-	bool running = (weaponType == LaraWeaponType::HK && laraItem->Animation.Velocity != 0);
+	bool running = (weaponType == LaraWeaponType::HK && laraItem->Animation.Velocity.z != 0.0f);
 	
 	static bool reloadHarpoonGun = false;
 	reloadHarpoonGun = (lara->Weapons[(int)weaponType].Ammo->HasInfinite() || weaponType != LaraWeaponType::HarpoonGun) ? false : reloadHarpoonGun;
@@ -486,8 +486,8 @@ void FireHarpoon(ItemInfo* laraItem)
 		}
 
 		item->Pose.Orientation.z = 0;
-		item->Animation.Velocity = HARPOON_VELOCITY * phd_cos(item->Pose.Orientation.x);
-		item->Animation.VerticalVelocity = -HARPOON_VELOCITY * phd_sin(item->Pose.Orientation.x);
+		item->Animation.Velocity.z = HARPOON_VELOCITY * phd_cos(item->Pose.Orientation.x);
+		item->Animation.Velocity.y = -HARPOON_VELOCITY * phd_sin(item->Pose.Orientation.x);
 		item->HitPoints = HARPOON_TIME;
 
 		Rumble(0.2f, 0.1f);
@@ -517,8 +517,8 @@ void HarpoonBoltControl(short itemNumber)
 			if (item->Pose.Orientation.x < -ANGLE(90.0f))
 				item->Pose.Orientation.x = -ANGLE(90.0f);
 
-			item->Animation.VerticalVelocity = -HARPOON_VELOCITY * phd_sin(item->Pose.Orientation.x);
-			item->Animation.Velocity = HARPOON_VELOCITY * phd_cos(item->Pose.Orientation.x);
+			item->Animation.Velocity.y = -HARPOON_VELOCITY * phd_sin(item->Pose.Orientation.x);
+			item->Animation.Velocity.z = HARPOON_VELOCITY * phd_cos(item->Pose.Orientation.x);
 			aboveWater = true;
 		}
 		else
@@ -527,12 +527,12 @@ void HarpoonBoltControl(short itemNumber)
 			if (Wibble & 4)
 				CreateBubble((Vector3Int*)&item->Pose, item->RoomNumber, 0, 0, BUBBLE_FLAG_CLUMP | BUBBLE_FLAG_HIGH_AMPLITUDE, 0, 0, 0);
 			
-			item->Animation.VerticalVelocity = -HARPOON_VELOCITY * phd_sin(item->Pose.Orientation.x) / 2;
-			item->Animation.Velocity = HARPOON_VELOCITY * phd_cos(item->Pose.Orientation.x) / 2;
+			item->Animation.Velocity.y = -HARPOON_VELOCITY * phd_sin(item->Pose.Orientation.x) / 2;
+			item->Animation.Velocity.z = HARPOON_VELOCITY * phd_cos(item->Pose.Orientation.x) / 2;
 			aboveWater = false;
 		}
 
-		TranslateItem(item, item->Pose.Orientation, item->Animation.Velocity);
+		TranslateItem(item, item->Pose.Orientation, item->Animation.Velocity.z);
 	}
 	else
 	{
@@ -705,8 +705,8 @@ void FireGrenade(ItemInfo* laraItem)
 			item->Pose.Orientation.y += lara->ExtraTorsoRot.y;
 		}
 
-		item->Animation.Velocity = GRENADE_VELOCITY;
-		item->Animation.VerticalVelocity = -CLICK(2) * phd_sin(item->Pose.Orientation.x);
+		item->Animation.Velocity.z = GRENADE_VELOCITY;
+		item->Animation.Velocity.y = -CLICK(2) * phd_sin(item->Pose.Orientation.x);
 		item->Animation.ActiveState = item->Pose.Orientation.x;
 		item->Animation.TargetState = item->Pose.Orientation.y;
 		item->Animation.RequiredState = 0;
@@ -779,8 +779,8 @@ void GrenadeControl(short itemNumber)
 					newGrenade->Pose.Orientation.x = (GetRandomControl() & 0x3FFF) + ANGLE(45);
 					newGrenade->Pose.Orientation.y = GetRandomControl() * 2;
 					newGrenade->Pose.Orientation.z = 0;
-					newGrenade->Animation.Velocity = 64;
-					newGrenade->Animation.VerticalVelocity = -64 * phd_sin(newGrenade->Pose.Orientation.x);
+					newGrenade->Animation.Velocity.z = 64.0f;
+					newGrenade->Animation.Velocity.y = -64.0f * phd_sin(newGrenade->Pose.Orientation.x);
 					newGrenade->Animation.ActiveState = newGrenade->Pose.Orientation.x;
 					newGrenade->Animation.TargetState = newGrenade->Pose.Orientation.y;
 					newGrenade->Animation.RequiredState = 0;
@@ -817,36 +817,36 @@ void GrenadeControl(short itemNumber)
 	{
 		aboveWater = false;
 		someFlag = false;
-		item->Animation.VerticalVelocity += (5 - item->Animation.VerticalVelocity) >> 1;
-		item->Animation.Velocity -= item->Animation.Velocity >> 2;
+		item->Animation.Velocity.y += (5.0f - item->Animation.Velocity.y) / 2.0f;
+		item->Animation.Velocity.z -= item->Animation.Velocity.z / 4.0f;
 
-		if (item->Animation.Velocity)
+		if (item->Animation.Velocity.z)
 		{
-			item->Pose.Orientation.z += (((item->Animation.Velocity >> 4) + 3) * ANGLE(1.0f));
+			item->Pose.Orientation.z += (short((item->Animation.Velocity.z / 16.0f) + 3.0f) * ANGLE(1.0f));
 			if (item->Animation.RequiredState)
-				item->Pose.Orientation.y += (((item->Animation.Velocity >> 2) + 3) * ANGLE(1.0f));
+				item->Pose.Orientation.y += (short((item->Animation.Velocity.z / 4.0f) + 3.0f) * ANGLE(1.0f));
 			else
-				item->Pose.Orientation.x += (((item->Animation.Velocity >> 2) + 3) * ANGLE(1.0f));
+				item->Pose.Orientation.x += (short((item->Animation.Velocity.z / 4.0f) + 3.0f) * ANGLE(1.0f));
 		}
 	}
 	else
 	{
 		aboveWater = true;
 		someFlag = true;
-		item->Animation.VerticalVelocity += 3;
+		item->Animation.Velocity.y += 3.0f;
 
-		if (item->Animation.Velocity)
+		if (item->Animation.Velocity.z)
 		{
-			item->Pose.Orientation.z += (((item->Animation.Velocity >> 2) + 7) * ANGLE(1.0f));
+			item->Pose.Orientation.z += (short((item->Animation.Velocity.z / 4.0f) + 7.0f) * ANGLE(1.0f));
 			if (item->Animation.RequiredState)
-				item->Pose.Orientation.y += (((item->Animation.Velocity >> 1) + 7) * ANGLE(1.0f));
+				item->Pose.Orientation.y += (short((item->Animation.Velocity.z / 2.0f) + 7.0f) * ANGLE(1.0f));
 			else
-				item->Pose.Orientation.x += (((item->Animation.Velocity >> 1) + 7) * ANGLE(1.0f));
+				item->Pose.Orientation.x += (short((item->Animation.Velocity.z / 2.0f) + 7.0f) * ANGLE(1.0f));
 		}
 	}
 
 	// Trigger fire and smoke sparks in the direction of motion
-	if (item->Animation.Velocity && aboveWater)
+	if (item->Animation.Velocity.z && aboveWater)
 	{
 		Matrix world = Matrix::CreateFromYawPitchRoll(
 			TO_RAD(item->Pose.Orientation.y - ANGLE(180.0f)),
@@ -864,9 +864,9 @@ void GrenadeControl(short itemNumber)
 
 	// Update grenade position
 	auto velocity = Vector3Int(
-		item->Animation.Velocity * phd_sin(item->Animation.TargetState),
-		item->Animation.VerticalVelocity,
-		item->Animation.Velocity * phd_cos(item->Animation.TargetState)
+		item->Animation.Velocity.z * phd_sin(item->Animation.TargetState),
+		item->Animation.Velocity.y,
+		item->Animation.Velocity.z * phd_cos(item->Animation.TargetState)
 	);
 	item->Pose.Position += velocity;
 
@@ -1102,7 +1102,7 @@ void FireRocket(ItemInfo* laraItem)
 		item->Pose.Position.y = y = jointPos.y;
 		item->Pose.Position.z = z = jointPos.z;
 
-		jointPos = { 0, 2004, 72 };
+		jointPos = Vector3Int(0, 2004, 72);
 		GetLaraJointPosition(&jointPos, LM_RHAND);
 
 		lara->LeftArm.GunSmoke = 32;
@@ -1110,7 +1110,7 @@ void FireRocket(ItemInfo* laraItem)
 		for (int i = 0; i < 5; i++)
 			TriggerGunSmoke(x, y, z, jointPos.x - x, jointPos.y - y, jointPos.z - z, 1, LaraWeaponType::RocketLauncher, lara->LeftArm.GunSmoke);
 
-		jointPos = { 0, -256, 0 };
+		jointPos = Vector3Int(0, -256, 0);
 		GetLaraJointPosition(&jointPos, LM_RHAND);
 
 		for (int i = 0; i < 10; i++)
@@ -1129,7 +1129,7 @@ void FireRocket(ItemInfo* laraItem)
 			item->Pose.Orientation.y += lara->ExtraTorsoRot.y;
 		}
 
-		item->Animation.Velocity = 512 >> 5;
+		item->Animation.Velocity.z = 512.0f / 32.0f;
 		item->ItemFlags[0] = 0;
 
 		AddActiveItem(itemNumber);
@@ -1154,25 +1154,25 @@ void RocketControl(short itemNumber)
 	bool abovewater = false;
 	if (TestEnvironment(ENV_FLAG_WATER, item->RoomNumber))
 	{
-		if (item->Animation.Velocity > (ROCKET_VELOCITY / 4))
-			item->Animation.Velocity -= item->Animation.Velocity / 4;
+		if (item->Animation.Velocity.z > (ROCKET_VELOCITY / 4.0f))
+			item->Animation.Velocity.z -= item->Animation.Velocity.z / 4.0f;
 		else
 		{
-			item->Animation.Velocity += (item->Animation.Velocity / 4) + 4;
+			item->Animation.Velocity.z += (item->Animation.Velocity.z / 4.0f) + 4.0f;
 
-			if (item->Animation.Velocity > (ROCKET_VELOCITY / 4))
-				item->Animation.Velocity = ROCKET_VELOCITY / 4;
+			if (item->Animation.Velocity.z > (ROCKET_VELOCITY / 4.0f))
+				item->Animation.Velocity.z = ROCKET_VELOCITY / 4.0f;
 		}
 
-		item->Pose.Orientation.z += (((item->Animation.Velocity / 8) + 3) * ANGLE(1.0f));
+		item->Pose.Orientation.z += (short((item->Animation.Velocity.z / 8.0f) + 3.0f) * ANGLE(1.0f));
 		abovewater = false;
 	}
 	else
 	{
-		if (item->Animation.Velocity < ROCKET_VELOCITY)
-			item->Animation.Velocity += (item->Animation.Velocity / 4) + 4;
+		if (item->Animation.Velocity.z < ROCKET_VELOCITY)
+			item->Animation.Velocity.z += (item->Animation.Velocity.z / 4.0f) + 4.0f;
 
-		item->Pose.Orientation.z += (((item->Animation.Velocity / 4) + 7) * ANGLE(1.0f));
+		item->Pose.Orientation.z += (short((item->Animation.Velocity.z / 4.0f) + 7.0f) * ANGLE(1.0f));
 		abovewater = true;
 	}
 
@@ -1200,14 +1200,14 @@ void RocketControl(short itemNumber)
 	// If underwater generate bubbles
 	if (TestEnvironment(ENV_FLAG_WATER, item->RoomNumber))
 	{
-		Vector3Int pos = { wx + item->Pose.Position.x, wy + item->Pose.Position.y, wz + item->Pose.Position.z };
+		auto pos = Vector3Int(wx + item->Pose.Position.x, wy + item->Pose.Position.y, wz + item->Pose.Position.z);
 		CreateBubble(&pos, item->RoomNumber, 4, 8, 0, 0, 0, 0);
 	}
 
 	// Update rocket's position
-	short speed = item->Animation.Velocity * phd_cos(item->Pose.Orientation.x);
+	short speed = item->Animation.Velocity.z * phd_cos(item->Pose.Orientation.x);
 	item->Pose.Position.x += speed * phd_sin(item->Pose.Orientation.y);
-	item->Pose.Position.y += -item->Animation.Velocity * phd_sin(item->Pose.Orientation.x);
+	item->Pose.Position.y += -item->Animation.Velocity.z * phd_sin(item->Pose.Orientation.x);
 	item->Pose.Position.z += speed * phd_cos(item->Pose.Orientation.y);
 
 	bool explode = false;
@@ -1416,7 +1416,7 @@ void FireCrossbow(ItemInfo* laraItem, PHD_3DPOS* pos)
 			}
 		}
 
-		item->Animation.Velocity = 512;
+		item->Animation.Velocity.z = 512.0f;
 
 		AddActiveItem(itemNumber);
 
@@ -1459,8 +1459,8 @@ void CrossbowBoltControl(short itemNumber)
 	{
 		auto bubblePos = item->Pose.Position;
 
-		if (item->Animation.Velocity > 64)
-			item->Animation.Velocity -= (item->Animation.Velocity >> 4);
+		if (item->Animation.Velocity.z > 64.0f)
+			item->Animation.Velocity.z -= item->Animation.Velocity.z / 16.0f;
 
 		if (GlobalCounter & 1)
 			CreateBubble(&bubblePos, item->RoomNumber, 4, 7, 0, 0, 0, 0);
@@ -1470,7 +1470,7 @@ void CrossbowBoltControl(short itemNumber)
 	else
 		aboveWater = true;
 
-	TranslateItem(item, item->Pose.Orientation, item->Animation.Velocity);
+	TranslateItem(item, item->Pose.Orientation, item->Animation.Velocity.z);
 
 	auto probe = GetCollision(item);
 

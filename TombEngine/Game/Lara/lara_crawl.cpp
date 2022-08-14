@@ -108,7 +108,7 @@ void lara_col_crouch_idle(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	item->Animation.VerticalVelocity = 0;
+	item->Animation.Velocity.y = 0;
 	item->Animation.IsAirborne = false;
 	lara->Control.KeepLow = TestLaraKeepLow(item, coll);
 	lara->Control.IsLow = true;
@@ -171,7 +171,7 @@ void lara_col_crouch_roll(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	item->Animation.VerticalVelocity = 0;
+	item->Animation.Velocity.y = 0;
 	item->Animation.IsAirborne = false;
 	lara->Control.KeepLow = TestLaraKeepLow(item, coll);
 	lara->Control.IsLow = true;
@@ -193,7 +193,7 @@ void lara_col_crouch_roll(ItemInfo* item, CollisionInfo* coll)
 	{
 		SetLaraFallAnimation(item);
 		lara->Control.HandStatus = HandStatus::Free;
-		item->Animation.Velocity /= 3;				// Truncate speed to prevent flying off.
+		item->Animation.Velocity.z /= 3;				// Truncate speed to prevent flying off.
 		return;
 	}
 
@@ -471,7 +471,7 @@ void lara_col_crawl_idle(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	item->Animation.VerticalVelocity = 0;
+	item->Animation.Velocity.y = 0;
 	item->Animation.IsAirborne = false;
 	lara->Control.KeepLow = TestLaraKeepLow(item, coll);
 	lara->Control.IsLow = true;
@@ -560,7 +560,7 @@ void lara_col_crawl_forward(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	item->Animation.VerticalVelocity = 0;
+	item->Animation.Velocity.y = 0;
 	item->Animation.IsAirborne = false;
 	lara->Control.KeepLow = TestLaraKeepLow(item, coll);
 	lara->Control.IsLow = true;
@@ -648,7 +648,7 @@ void lara_col_crawl_back(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	item->Animation.VerticalVelocity = 0;
+	item->Animation.Velocity.y = 0;
 	item->Animation.IsAirborne = false;
 	lara->Control.KeepLow = TestLaraKeepLow(item, coll);
 	lara->Control.IsLow = true;
@@ -860,7 +860,7 @@ void lara_col_crawl_to_hang(ItemInfo* item, CollisionInfo* coll)
 		lara->Control.HandStatus = HandStatus::Busy;
 		item->Pose.Position.y += coll->Front.Floor - GetBoundsAccurate(item)->Y1 - 20;
 		item->Animation.IsAirborne = true;
-		item->Animation.Velocity = 2;
-		item->Animation.VerticalVelocity = 1;
+		item->Animation.Velocity.z = 2;
+		item->Animation.Velocity.y = 1;
 	}
 }

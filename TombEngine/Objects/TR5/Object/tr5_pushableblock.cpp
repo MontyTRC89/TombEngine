@@ -151,15 +151,15 @@ void PushableBlockControl(short itemNumber)
 	{
 		int floorHeight = GetCollision(item->Pose.Position.x, item->Pose.Position.y + 10, item->Pose.Position.z, item->RoomNumber).Position.Floor;
 
-		if (item->Pose.Position.y < (floorHeight - item->Animation.VerticalVelocity))
+		if (item->Pose.Position.y < (floorHeight - item->Animation.Velocity.y))
 		{
-			if ((item->Animation.VerticalVelocity + info->gravity) < 128)
-				item->Animation.VerticalVelocity += info->gravity;
+			if ((item->Animation.Velocity.y + info->gravity) < 128)
+				item->Animation.Velocity.y += info->gravity;
 			else
-				item->Animation.VerticalVelocity++;
-			item->Pose.Position.y += item->Animation.VerticalVelocity;
+				item->Animation.Velocity.y++;
+			item->Pose.Position.y += item->Animation.Velocity.y;
 
-			MoveStackY(itemNumber, item->Animation.VerticalVelocity);
+			MoveStackY(itemNumber, item->Animation.Velocity.y);
 		}
 		else
 		{
@@ -167,10 +167,10 @@ void PushableBlockControl(short itemNumber)
 			int relY = floorHeight - item->Pose.Position.y;
 			item->Pose.Position.y = floorHeight;
 
-			if (item->Animation.VerticalVelocity >= 96)
+			if (item->Animation.Velocity.y >= 96)
 				FloorShake(item);
 
-			item->Animation.VerticalVelocity = 0;
+			item->Animation.Velocity.y = 0;
 			SoundEffect(info->fallSound, &item->Pose, SoundEnvironment::Always);
 
 			MoveStackY(itemNumber, relY);

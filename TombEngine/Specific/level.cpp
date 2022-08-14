@@ -12,6 +12,7 @@
 #include "Game/control/lot.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
+#include "Game/Lara/lara_initialise.h"
 #include "Game/misc.h"
 #include "Game/pickup/pickup.h"
 #include "Game/savegame.h"
@@ -288,15 +289,13 @@ void LoadObjects()
 	g_Level.Anims.resize(numAnimations);
 	for (int i = 0; i < numAnimations; i++)
 	{
-		ANIM_STRUCT* anim = &g_Level.Anims[i];
+		auto* anim = &g_Level.Anims[i];
 
 		anim->framePtr = ReadInt32();
-		anim->interpolation = ReadInt32();
+		anim->Interpolation = ReadInt32();
 		anim->ActiveState = ReadInt32();
-		anim->velocity = ReadFloat();
-		anim->acceleration = ReadFloat();
-		anim->Xvelocity = ReadFloat();
-		anim->Xacceleration = ReadFloat();
+		anim->VelocityStart = ReadVector3();
+		anim->VelocityEnd = ReadVector3();
 		anim->frameBase = ReadInt32();
 		anim->frameEnd = ReadInt32();
 		anim->jumpAnimNum = ReadInt32();
@@ -801,7 +800,7 @@ void ReadRooms()
 			volume.Scale.y = ReadFloat();
 			volume.Scale.z = ReadFloat();
 
-			//volume.LuaName = ReadString(); // TODO: Uncomment when lua API for volumes is implemented -- Lwmte, 09.08.22
+			volume.LuaName = ReadString();
 			volume.EventSetIndex = ReadInt32();
 
 			volume.Status = TriggerStatus::Outside;

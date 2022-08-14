@@ -56,8 +56,8 @@ namespace TEN::Entities::Vehicles
 			switch (mountType)
 			{
 			case VehicleMountType::LevelStart:
-				if (!laraItem->Animation.Velocity &&
-					!laraItem->Animation.VerticalVelocity &&
+				if (!laraItem->Animation.Velocity.z &&
+					!laraItem->Animation.Velocity.y &&
 					laraItem->Pose.Position == vehicleItem->Pose.Position)
 				{
 					break;
@@ -111,7 +111,7 @@ namespace TEN::Entities::Vehicles
 
 			case VehicleMountType::Jump:
 				if (laraItem->Animation.IsAirborne &&
-					laraItem->Animation.VerticalVelocity > 0 &&
+					laraItem->Animation.Velocity.y > 0 &&
 					laraItem->Pose.Position.y < vehicleItem->Pose.Position.y)
 				{
 					break;

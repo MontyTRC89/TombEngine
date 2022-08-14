@@ -75,7 +75,7 @@ namespace TEN::Entities::Generic
 		else if (TrInput & IN_ACTION && isLara &&
 			     laraInfo->Control.HandStatus == HandStatus::Free && 
 				 laraItem->Animation.IsAirborne && 
-				 laraItem->Animation.VerticalVelocity > (int)laraInfo->Control.HandStatus &&	// ?????
+				 laraItem->Animation.Velocity.y > (int)laraInfo->Control.HandStatus &&	// ?????
 				 laraItem->Animation.ActiveState == LS_REACH || laraItem->Animation.ActiveState == LS_JUMP_UP)
 		{
 			if (TestBoundsCollide(poleItem, laraItem, 100) &&
@@ -102,7 +102,7 @@ namespace TEN::Entities::Generic
 					}
 
 					laraItem->Animation.ActiveState = LS_POLE_IDLE;
-					laraItem->Animation.VerticalVelocity = 0;
+					laraItem->Animation.Velocity.y = 0;
 					laraItem->Animation.IsAirborne = false;
 					laraInfo->Control.HandStatus = HandStatus::Busy;
 					poleItem->Pose.Orientation.y = rot;

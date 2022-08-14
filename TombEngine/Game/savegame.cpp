@@ -429,7 +429,6 @@ bool SaveGame::Save(int slot)
 	lara.add_extra_anim(Lara.ExtraAnim);
 	lara.add_extra_head_rot(&FromVector3(Lara.ExtraHeadRot));
 	lara.add_extra_torso_rot(&FromVector3(Lara.ExtraTorsoRot));
-	lara.add_extra_velocity(&FromVector3(Lara.ExtraVelocity));
 	lara.add_flare(flareOffset);
 	lara.add_highest_location(Lara.HighestLocation);
 	lara.add_hit_direction(Lara.HitDirection);
@@ -614,7 +613,6 @@ bool SaveGame::Save(int slot)
 		}
 
 		Save::ItemBuilder serializedItem{ fbb };
-
 		serializedItem.add_next_item(itemToSerialize.NextItem);
 		serializedItem.add_next_item_active(itemToSerialize.NextActive);
 		serializedItem.add_anim_number(itemToSerialize.Animation.AnimNumber - obj->animIndex);
@@ -622,7 +620,6 @@ bool SaveGame::Save(int slot)
 		serializedItem.add_box_number(itemToSerialize.BoxNumber);
 		serializedItem.add_carried_item(itemToSerialize.CarriedItem);
 		serializedItem.add_active_state(itemToSerialize.Animation.ActiveState);
-		serializedItem.add_vertical_velocity(itemToSerialize.Animation.VerticalVelocity);
 		serializedItem.add_flags(itemToSerialize.Flags);
 		serializedItem.add_floor(itemToSerialize.Floor);
 		serializedItem.add_frame_number(itemToSerialize.Animation.FrameNumber);
@@ -634,7 +631,7 @@ bool SaveGame::Save(int slot)
 		serializedItem.add_pose(&FromPHD(itemToSerialize.Pose));
 		serializedItem.add_required_state(itemToSerialize.Animation.RequiredState);
 		serializedItem.add_room_number(itemToSerialize.RoomNumber);
-		serializedItem.add_velocity(itemToSerialize.Animation.Velocity);
+		serializedItem.add_velocity(&FromVector3(itemToSerialize.Animation.Velocity));
 		serializedItem.add_timer(itemToSerialize.Timer);
 		serializedItem.add_color(&FromVector4(itemToSerialize.Color));
 		serializedItem.add_touch_bits(itemToSerialize.TouchBits);
@@ -1331,8 +1328,7 @@ bool SaveGame::Load(int slot)
 		item->Pose = ToPHD(savedItem->pose());
 		item->RoomNumber = savedItem->room_number();
 
-		item->Animation.Velocity = savedItem->velocity();
-		item->Animation.VerticalVelocity = savedItem->vertical_velocity();
+		item->Animation.Velocity = ToVector3(savedItem->velocity());
 
 		if (item->ObjectNumber == ID_LARA && !dynamicItem)
 		{
@@ -1748,9 +1744,6 @@ bool SaveGame::Load(int slot)
 	Lara.ExtraTorsoRot.z = s->lara()->extra_torso_rot()->x();
 	Lara.ExtraTorsoRot.y = s->lara()->extra_torso_rot()->y();
 	Lara.ExtraTorsoRot.z = s->lara()->extra_torso_rot()->z();
-	Lara.ExtraVelocity.x = s->lara()->extra_velocity()->x();
-	Lara.ExtraVelocity.y = s->lara()->extra_velocity()->y();
-	Lara.ExtraVelocity.z = s->lara()->extra_velocity()->z();
 	Lara.WaterCurrentActive = s->lara()->water_current_active();
 	Lara.WaterCurrentPull.x = s->lara()->water_current_pull()->x();
 	Lara.WaterCurrentPull.y = s->lara()->water_current_pull()->y();

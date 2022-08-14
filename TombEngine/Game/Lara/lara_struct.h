@@ -1260,7 +1260,6 @@ struct LaraInfo
 
 	Vector3Shrt ExtraHeadRot;
 	Vector3Shrt ExtraTorsoRot;
-	Vector3Int ExtraVelocity;
 	short WaterCurrentActive;
 	Vector3Int WaterCurrentPull;
 

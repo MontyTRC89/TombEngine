@@ -83,8 +83,8 @@ struct STATIC_INFO
 #define MAX_STATICS 1000
 constexpr auto SF_NO_COLLISION = 0x01;
 constexpr auto SF_SHATTERABLE = 0x02;
-constexpr auto GRAVITY = 6;
-constexpr auto SWAMP_GRAVITY = GRAVITY / 3;
+constexpr auto GRAVITY = 6.0f;
+constexpr auto SWAMP_GRAVITY = GRAVITY / 3.0f;
 
 extern ObjectInfo Objects[ID_NUMBER_OBJECTS];
 extern STATIC_INFO StaticObjects[MAX_STATICS];

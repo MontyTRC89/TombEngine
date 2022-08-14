@@ -40,16 +40,16 @@ void lara_as_swimcheat(ItemInfo* item, CollisionInfo* coll)
 
 	if (TrInput & IN_JUMP)
 	{
-		item->Animation.VerticalVelocity += LARA_SWIM_VELOCITY_ACCEL * 2;
-		if (item->Animation.VerticalVelocity > LARA_SWIM_VELOCITY_MAX * 2)
-			item->Animation.VerticalVelocity = LARA_SWIM_VELOCITY_MAX * 2;
+		item->Animation.Velocity.y += LARA_SWIM_VELOCITY_ACCEL * 2;
+		if (item->Animation.Velocity.y > LARA_SWIM_VELOCITY_MAX * 2)
+			item->Animation.Velocity.y = LARA_SWIM_VELOCITY_MAX * 2;
 	}
 	else
 	{
-		if (item->Animation.VerticalVelocity >= LARA_SWIM_VELOCITY_ACCEL)
-			item->Animation.VerticalVelocity -= item->Animation.VerticalVelocity / 8;
+		if (item->Animation.Velocity.y >= LARA_SWIM_VELOCITY_ACCEL)
+			item->Animation.Velocity.y -= item->Animation.Velocity.y / 8;
 		else
-			item->Animation.VerticalVelocity = 0;
+			item->Animation.Velocity.y = 0;
 	}
 }
 
@@ -73,7 +73,7 @@ void LaraCheatyBits(ItemInfo* item)
 				{
 					SetAnimation(item, LA_DOZY);
 					item->Animation.IsAirborne = false;
-					item->Animation.VerticalVelocity = 30;
+					item->Animation.Velocity.y = 30;
 					item->Pose.Orientation.x = ANGLE(30.0f);
 					item->HitPoints = LARA_HEALTH_MAX;
 
