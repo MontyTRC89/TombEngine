@@ -1390,7 +1390,7 @@ void FindAITargetObject(CreatureInfo* creature, short objectNumber)
 				item->BoxNumber = GetSector(room, item->Pose.Position.x - room->x, item->Pose.Position.z - room->z)->Box;
 
 				room = &g_Level.Rooms[aiObject->roomNumber];
-				aiObject->boxNumber = GetSector(room, aiObject->x - room->x, aiObject->z - room->z)->Box;
+				aiObject->boxNumber = GetSector(room, aiObject->pos.Position.x - room->x, aiObject->pos.Position.z - room->z)->Box;
 
 				if (item->BoxNumber == NO_BOX || aiObject->boxNumber == NO_BOX)
 					return;
@@ -1411,10 +1411,10 @@ void FindAITargetObject(CreatureInfo* creature, short objectNumber)
 
 			aiItem->ObjectNumber = foundObject->objectNumber;
 			aiItem->RoomNumber = foundObject->roomNumber;
-			aiItem->Pose.Position.x = foundObject->x;
-			aiItem->Pose.Position.y = foundObject->y;
-			aiItem->Pose.Position.z = foundObject->z;
-			aiItem->Pose.Orientation.y = foundObject->yRot;
+			aiItem->Pose.Position.x = foundObject->pos.Position.x;
+			aiItem->Pose.Position.y = foundObject->pos.Position.y;
+			aiItem->Pose.Position.z = foundObject->pos.Position.z;
+			aiItem->Pose.Orientation.y = foundObject->pos.Orientation.y;
 			aiItem->Flags = foundObject->flags;
 			aiItem->TriggerFlags = foundObject->triggerFlags;
 			aiItem->BoxNumber = foundObject->boxNumber;

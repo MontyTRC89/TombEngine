@@ -179,6 +179,8 @@ void LoadItems()
 			item->Pose.Position.y = ReadInt32();
 			item->Pose.Position.z = ReadInt32();
 			item->Pose.Orientation.y = ReadInt16();
+			item->Pose.Orientation.x = ReadInt16();
+			item->Pose.Orientation.z = ReadInt16();
 			item->Color = ReadVector4();
 			item->TriggerFlags = ReadInt16();
 			item->Flags = ReadInt16();
@@ -768,9 +770,10 @@ void ReadRooms()
 			mesh.pos.Position.x = ReadInt32();
 			mesh.pos.Position.y = ReadInt32();
 			mesh.pos.Position.z = ReadInt32();
-			mesh.pos.Orientation.x = 0;
 			mesh.pos.Orientation.y = ReadUInt16();
-			mesh.pos.Orientation.z = 0;
+			mesh.pos.Orientation.x = ReadUInt16();
+			mesh.pos.Orientation.z = ReadUInt16();
+			mesh.scale = ReadFloat();
 			mesh.flags = ReadUInt16();
 			mesh.color = ReadVector4();
 			mesh.staticNumber = ReadUInt16();
@@ -800,7 +803,7 @@ void ReadRooms()
 			volume.Scale.y = ReadFloat();
 			volume.Scale.z = ReadFloat();
 
-			//volume.LuaName = ReadString(); // TODO: Uncomment when lua API for volumes is implemented -- Lwmte, 09.08.22
+			volume.LuaName = ReadString();
 			volume.EventSetIndex = ReadInt32();
 
 			volume.Status = TriggerStatus::Outside;
@@ -956,12 +959,14 @@ void LoadAIObjects()
 
 		obj.objectNumber = (GAME_OBJECT_ID)ReadInt16();
 		obj.roomNumber = ReadInt16();
-		obj.x = ReadInt32();
-		obj.y = ReadInt32();
-		obj.z = ReadInt32();
+		obj.pos.Position.x = ReadInt32();
+		obj.pos.Position.y = ReadInt32();
+		obj.pos.Position.z = ReadInt32();
+		obj.pos.Orientation.y = ReadInt16();
+		obj.pos.Orientation.x = ReadInt16();
+		obj.pos.Orientation.z = ReadInt16();
 		obj.triggerFlags = ReadInt16();
 		obj.flags = ReadInt16();
-		obj.yRot = ReadInt16();
 		obj.boxNumber = ReadInt32();
 		obj.luaName = ReadString();
 
@@ -1378,8 +1383,8 @@ void GetAIPickups()
 			{
 				auto* object = &g_Level.AIObjects[number];
 
-				if (abs(object->x - item->Pose.Position.x) < CLICK(2) &&
-					abs(object->z - item->Pose.Position.z) < CLICK(2) &&
+				if (abs(object->pos.Position.x - item->Pose.Position.x) < CLICK(2) &&
+					abs(object->pos.Position.z - item->Pose.Position.z) < CLICK(2) &&
 					object->roomNumber == item->RoomNumber &&
 					object->objectNumber < ID_AI_PATROL2)
 				{
