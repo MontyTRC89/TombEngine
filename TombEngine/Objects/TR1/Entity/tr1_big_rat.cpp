@@ -81,8 +81,10 @@ namespace TEN::Entities::TR1
 			SetAnimation(item, BIG_RAT_ANIM_IDLE);
 	}
 
-	int RatIsInWater(ItemInfo* item, CreatureInfo* creature)
+	int GetRatWaterHeight(ItemInfo* item)
 	{
+		auto* creature = GetCreatureInfo(item);
+
 		auto probe = GetCollision(item);
 		int waterDepth = GetWaterSurface(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, probe.RoomNumber);
 
@@ -111,7 +113,7 @@ namespace TEN::Entities::TR1
 		auto* item = &g_Level.Items[itemNumber];
 		auto* creature = GetCreatureInfo(item);
 
-		int waterHeight = RatIsInWater(item, creature);
+		int waterHeight = GetRatWaterHeight(item);
 		short head = 0;
 		short angle = 0;
 		bool isOnWater = waterHeight != NO_HEIGHT;
