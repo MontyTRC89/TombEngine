@@ -31,7 +31,7 @@ namespace TEN::Entities::TR4
 		item->ItemFlags[2] = 0;
 	}
 
-	bool TestBoundsCollideTeethSpikes(ItemInfo* item, ItemInfo* collidingItem)
+	ContainmentType TestBoundsCollideTeethSpikes(ItemInfo* item, ItemInfo* collidingItem)
 	{
 		// Get both teeth spikes and colliding item bounds
 		auto spikeBox = TO_DX_BBOX(item->Pose, GetBoundsAccurate(item));
@@ -40,7 +40,7 @@ namespace TEN::Entities::TR4
 		// Make intersection a bit more forgiving by reducing spike bounds a bit
 		spikeBox.Extents = spikeBox.Extents * 0.95f;
 
-		return spikeBox.Intersects(itemBox);
+		return spikeBox.Contains(itemBox);
 	}
 
 	void ControlTeethSpikes(short itemNumber)
@@ -63,7 +63,9 @@ namespace TEN::Entities::TR4
 
 			item->Status = ITEM_ACTIVE;
 
-			if (LaraItem->Animation.ActiveState != LS_DEATH && TestBoundsCollideTeethSpikes(item, LaraItem))
+			auto intersection = TestBoundsCollideTeethSpikes(item, LaraItem);
+
+			if (LaraItem->Animation.ActiveState != LS_DEATH && intersection != ContainmentType::DISJOINT)
 			{
 				// Calculate teeth spikes angle to the horizon. If angle is upwards, impale Lara.
 				auto normal = Vector3::Transform(Vector3::UnitY, Matrix::CreateFromYawPitchRoll(
@@ -140,8 +142,9 @@ namespace TEN::Entities::TR4
 				if (LaraItem->HitPoints <= 0 && Lara.Vehicle == NO_ITEM)
 				{
 					int heightFromFloor = GetCollision(LaraItem).Position.Floor - LaraItem->Pose.Position.y;
-					if (item->Pose.Position.y >= LaraItem->Pose.Position.y &&
-						heightFromFloor < CLICK(1))
+
+					if (item->Pose.Position.y >= LaraItem->Pose.Position.y && heightFromFloor < CLICK(1) && 
+						intersection == ContainmentType::CONTAINS)
 					{
 						SetAnimation(LaraItem, LA_SPIKE_DEATH);
 						LaraItem->Animation.IsAirborne = false;
@@ -157,7 +160,7 @@ namespace TEN::Entities::TR4
 				if (item->ItemFlags[0] <= 1024)
 				{
 					item->ItemFlags[0] = 0;
-					if (item->TriggerFlags != 1 && item->TriggerFlags != 2 && LaraItem->HitPoints > 0)
+					if (item->TriggerFlags != 1 && LaraItem->HitPoints > 0)
 					{
 						int customInterval = item->TriggerFlags;
 						item->ItemFlags[2] = customInterval ? customInterval : TEETH_SPIKES_DEFAULT_INTERVAL;
