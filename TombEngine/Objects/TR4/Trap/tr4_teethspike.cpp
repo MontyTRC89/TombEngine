@@ -157,9 +157,9 @@ namespace TEN::Entities::TR4
 				if (item->ItemFlags[0] <= 1024)
 				{
 					item->ItemFlags[0] = 0;
-					if (item->TriggerFlags != 1 && LaraItem->HitPoints > 0)
+					if (item->TriggerFlags != 1 && item->TriggerFlags != 2 && LaraItem->HitPoints > 0)
 					{
-						int customInterval = item->TriggerFlags >> 2;
+						int customInterval = item->TriggerFlags;
 						item->ItemFlags[2] = customInterval ? customInterval : TEETH_SPIKES_DEFAULT_INTERVAL;
 					}
 				}
