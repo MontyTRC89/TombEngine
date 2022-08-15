@@ -64,7 +64,7 @@ namespace TEN::Entities::TR4
 		{
 			// Get current item bounds and radius
 			auto* bounds = (BOUNDING_BOX*)GetBestFrame(item);
-			int radius = std::max(abs(bounds->X2 - bounds->X1), abs(bounds->Z2 - bounds->Z1));
+			int radius = std::max(abs(bounds->X2 - bounds->X1), abs(bounds->Z2 - bounds->Z1)) / 2;
 
 			// Play sound if spikes are emerging. Ignore for constantly sticked out ones.
 			if (item->ItemFlags[0] == 1024 && item->TriggerFlags != 1)
