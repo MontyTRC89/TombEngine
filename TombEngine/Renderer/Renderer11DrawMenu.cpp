@@ -1,17 +1,18 @@
 #include "framework.h"
 #include "Renderer/Renderer11.h"
-#include "Specific/configuration.h"
 #include "Game/savegame.h"
 #include "Game/health.h"
 #include "Game/animation.h"
 #include "Game/gui.h"
 #include "Game/Lara/lara.h"
+#include "Game/control/control.h"
+#include "Game/control/volume.h"
+#include "Scripting/Internal/TEN/Flow//Level/FlowLevel.h"
+#include "Specific/configuration.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
-#include "Game/control/control.h"
-#include "Scripting/Internal/TEN/Flow//Level/FlowLevel.h"
+#include "Specific/trutils.h"
 #include "Specific/winmain.h"
-#include "Game/control/volume.h"
 
 using namespace TEN::Input;
 
@@ -631,36 +632,31 @@ namespace TEN::Renderer
 
 	void Renderer11::RenderTitleImage()
 	{
-		wchar_t introFileChars[255];
-
-		std::mbstowcs(introFileChars, g_GameFlow->IntroImagePath.c_str(), 255);
-		std::wstring titleStringFileName(introFileChars);
 		Texture2D texture;
-		SetTextureOrDefault(texture, titleStringFileName);
+		SetTextureOrDefault(texture, TEN::Utils::FromChar(g_GameFlow->IntroImagePath.c_str()));
 
-		float currentFade = 0;
-		while (currentFade <= 1.0f)
-		{
-			DrawFullScreenImage(texture.ShaderResourceView.Get(), currentFade, m_backBufferRTV, m_depthStencilView);
-			Synchronize();
-			currentFade += FADE_FACTOR;
-			m_swapChain->Present(0, 0);
-		}
+		if (!texture.Texture)
+			return;
 
-		for (int i = 0; i < 20; i++)
-		{
-			DrawFullScreenImage(texture.ShaderResourceView.Get(), 1.0f, m_backBufferRTV, m_depthStencilView);
-			Synchronize();
-			m_swapChain->Present(0, 0);
-		}
+		int timeout = 20;
+		float currentFade = FADE_FACTOR;
 
-		currentFade = 1.0f;
-		while (currentFade >= 0.0f)
+		while (timeout || currentFade > 0.0f)
 		{
-			DrawFullScreenImage(texture.ShaderResourceView.Get(), currentFade, m_backBufferRTV, m_depthStencilView);
+			if (timeout)
+			{
+				if (currentFade < 1.0f)
+					currentFade = std::clamp(currentFade += FADE_FACTOR, 0.0f, 1.0f);
+				else
+					timeout--;
+			}
+			else
+				currentFade = std::clamp(currentFade -= FADE_FACTOR, 0.0f, 1.0f);
+
+			DrawFullScreenImage(texture.ShaderResourceView.Get(), Smoothstep(currentFade), m_backBufferRTV, m_depthStencilView);
 			Synchronize();
-			currentFade -= FADE_FACTOR;
 			m_swapChain->Present(0, 0);
+			m_context->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 		}
 	}
 
@@ -824,12 +820,12 @@ namespace TEN::Renderer
 
 	void Renderer11::RenderLoadingScreen(float percentage)
 	{
+		// Set basic render states
+		SetBlendMode(BLENDMODE_OPAQUE);
+		SetCullMode(CULL_MODE_CCW);
+
 		do
 		{
-			// Set basic render states
-			SetBlendMode(BLENDMODE_OPAQUE);
-			SetCullMode(CULL_MODE_CCW);
-
 			// Clear screen
 			m_context->ClearRenderTargetView(m_backBufferRTV, Colors::Black);
 			m_context->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
@@ -840,12 +836,13 @@ namespace TEN::Renderer
 			ResetScissor();
 
 			// Draw the full screen background
-			DrawFullScreenQuad(
-				loadingScreenTexture.ShaderResourceView.Get(),
-				Vector3(ScreenFadeCurrent, ScreenFadeCurrent, ScreenFadeCurrent));
-			m_context->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+			if (loadingScreenTexture.Texture)
+				DrawFullScreenQuad(
+					loadingScreenTexture.ShaderResourceView.Get(),
+					Vector3(ScreenFadeCurrent, ScreenFadeCurrent, ScreenFadeCurrent));
 
-			DrawLoadingBar(percentage);
+			if (ScreenFadeCurrent && percentage > 0.0f && percentage < 100.0f)
+				DrawLoadingBar(percentage);
 
 			m_swapChain->Present(0, 0);
 			m_context->ClearState();
@@ -938,8 +935,7 @@ namespace TEN::Renderer
 				PrintDebugMessage("Lara FrameNumber: %d", LaraItem->Animation.FrameNumber);
 				PrintDebugMessage("Lara ActiveState: %d", LaraItem->Animation.ActiveState);
 				PrintDebugMessage("Lara TargetState: %d", LaraItem->Animation.TargetState);
-				PrintDebugMessage("Lara Velocity, VerticalVelocity, LateralVelocity: %d %d %d", LaraItem->Animation.Velocity, LaraItem->Animation.VerticalVelocity, LaraItem->Animation.LateralVelocity);
-				PrintDebugMessage("Lara ExtraVelocity.x, y, z: %d %d %d", Lara.ExtraVelocity.x, Lara.ExtraVelocity.y, Lara.ExtraVelocity.z);
+				PrintDebugMessage("Lara Velocities: %.3f %.3f %.3f", LaraItem->Animation.Velocity.z, LaraItem->Animation.Velocity.y, LaraItem->Animation.Velocity.x);
 				PrintDebugMessage("Lara WaterStatus: %d", Lara.Control.WaterStatus);
 				PrintDebugMessage("Lara IsMoving: %d", Lara.Control.IsMoving);
 				PrintDebugMessage("Lara HandStatus: %d", Lara.Control.HandStatus);

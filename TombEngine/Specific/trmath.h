@@ -76,9 +76,9 @@ const float Luma(Vector3& color);
 const Vector3 Screen(Vector3& ambient, Vector3& tint);
 const Vector4 Screen(Vector4& ambient, Vector4& tint);
 
-Vector3 TranslateVector(Vector3& vector, short angle, float forward, float up = 0.0f, float right = 0.0f);
-Vector3Int TranslateVector(Vector3Int& vector, short angle, float forward, float up = 0.0f, float right = 0.0f);
+Vector3 TranslateVector(Vector3& vector, short angle, float forward, float down = 0.0f, float right = 0.0f);
+Vector3Int TranslateVector(Vector3Int& vector, short angle, float forward, float down = 0.0f, float right = 0.0f);
 Vector3 TranslateVector(Vector3& vector, Vector3Shrt& orient, float distance);
 Vector3Int TranslateVector(Vector3Int& vector, Vector3Shrt& orient, float distance);
-Vector3 TranslateVector(Vector3& vector, Vector3& target, float distance);
-Vector3Int TranslateVector(Vector3Int& vector, Vector3Int& target, float distance);
+Vector3 TranslateVector(Vector3& vector, Vector3& direction, float distance);
+Vector3Int TranslateVector(Vector3Int& vector, Vector3& direction, float distance);

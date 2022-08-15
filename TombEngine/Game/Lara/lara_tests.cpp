@@ -218,7 +218,7 @@ bool TestLaraHang(ItemInfo* item, CollisionInfo* coll)
 				coll->Middle.Ceiling < 0 && coll->CollisionType == CT_FRONT && !coll->HitStatic &&
 				abs(verticalShift) < SLOPE_DIFFERENCE && TestValidLedgeAngle(item, coll))
 			{
-				if (item->Animation.Velocity != 0)
+				if (item->Animation.Velocity.z != 0)
 					SnapItemToLedge(item, coll);
 
 				item->Pose.Position.y += verticalShift;
@@ -352,7 +352,7 @@ bool TestLaraHangOnClimbableWall(ItemInfo* item, CollisionInfo* coll)
 	if (!lara->Control.CanClimbLadder)
 		return false;
 
-	if (item->Animation.VerticalVelocity < 0)
+	if (item->Animation.Velocity.y < 0)
 		return false;
 
 	// HACK: Climb wall tests are highly fragile and depend on quadrant shifts.
@@ -800,8 +800,8 @@ bool TestLaraWaterStepOut(ItemInfo* item, CollisionInfo* coll)
 	UpdateItemRoom(item, -(STEPUP_HEIGHT - 3));
 
 	item->Animation.IsAirborne = false;
-	item->Animation.Velocity = 0;
-	item->Animation.VerticalVelocity = 0;
+	item->Animation.Velocity.z = 0;
+	item->Animation.Velocity.y = 0;
 	item->Pose.Orientation.x = 0;
 	item->Pose.Orientation.z = 0;
 	lara->Control.WaterStatus = WaterStatus::Wade;
@@ -867,8 +867,8 @@ bool TestLaraLadderClimbOut(ItemInfo* item, CollisionInfo* coll) // NEW function
 	AnimateLara(item);
 
 	item->Animation.IsAirborne = false;
-	item->Animation.Velocity = 0;
-	item->Animation.VerticalVelocity = 0;
+	item->Animation.Velocity.z = 0;
+	item->Animation.Velocity.y = 0;
 	item->Pose.Position.y -= 10; // Otherwise she falls back into the water.
 	item->Pose.Orientation = Vector3Shrt(0, facing, 0);
 	lara->Control.TurnRate.y = 0;
@@ -886,7 +886,7 @@ void TestLaraWaterDepth(ItemInfo* item, CollisionInfo* coll)
 
 	if (waterDepth == NO_HEIGHT)
 	{
-		item->Animation.VerticalVelocity = 0;
+		item->Animation.Velocity.y = 0;
 		item->Pose.Position = coll->Setup.OldPosition;
 	}
 	// Height check was at CLICK(2) before but changed to this 
@@ -899,8 +899,8 @@ void TestLaraWaterDepth(ItemInfo* item, CollisionInfo* coll)
 		item->Pose.Orientation.x = 0;
 		item->Pose.Orientation.z = 0;
 		item->Animation.IsAirborne = false;
-		item->Animation.Velocity = 0;
-		item->Animation.VerticalVelocity = 0;
+		item->Animation.Velocity.z = 0;
+		item->Animation.Velocity.y = 0;
 		lara->Control.WaterStatus = WaterStatus::Wade;
 	}
 }
@@ -1115,8 +1115,8 @@ bool TestLaraLand(ItemInfo* item, CollisionInfo* coll)
 	int heightFromFloor = GetCollision(item).Position.Floor - item->Pose.Position.y;
 
 	if (item->Animation.IsAirborne &&
-		item->Animation.VerticalVelocity >= 0 &&
-		(heightFromFloor <= item->Animation.VerticalVelocity ||
+		item->Animation.Velocity.y >= 0 &&
+		(heightFromFloor <= item->Animation.Velocity.y ||
 			TestEnvironment(ENV_FLAG_SWAMP, item)))
 	{
 		return true;
@@ -1974,20 +1974,20 @@ WaterClimbOutTestResult TestLaraWaterClimbOut(ItemInfo* item, CollisionInfo* col
 LedgeHangTestResult TestLaraLedgeHang(ItemInfo* item, CollisionInfo* coll)
 {
 	int y = item->Pose.Position.y - coll->Setup.Height;
-	auto probeFront = GetCollision(item, item->Pose.Orientation.y, OFFSET_RADIUS(coll->Setup.Radius), -coll->Setup.Height + std::min(item->Animation.VerticalVelocity, 0));
+	auto probeFront = GetCollision(item, item->Pose.Orientation.y, OFFSET_RADIUS(coll->Setup.Radius), -coll->Setup.Height + std::min(item->Animation.Velocity.y, 0.0f));
 	auto probeMiddle = GetCollision(item);
 
 	if (!TestValidLedge(item, coll, true))
 		return LedgeHangTestResult{ false };
 
-	int sign = copysign(1, item->Animation.VerticalVelocity);
+	int sign = copysign(1, item->Animation.Velocity.y);
 	if (
 		// TODO: Will need to modify this when ledge grabs are made to occur from control functions.
-		(probeFront.Position.Floor * sign) >= (y * sign) &&											// Ledge is lower/higher than player's current position.
-		(probeFront.Position.Floor * sign) <= ((y + item->Animation.VerticalVelocity) * sign) &&	// Ledge is higher/lower than player's projected position.
+		(probeFront.Position.Floor * sign) >= (y * sign) &&									// Ledge is lower/higher than player's current position.
+		(probeFront.Position.Floor * sign) <= ((y + item->Animation.Velocity.y) * sign) &&	// Ledge is higher/lower than player's projected position.
 		
-		abs(probeFront.Position.Ceiling - probeFront.Position.Floor) >= CLICK(0.1f) &&				// Adequate hand room.
-		abs(probeFront.Position.Floor - probeMiddle.Position.Floor) >= LARA_HEIGHT_STRETCH)			// Ledge high enough.
+		abs(probeFront.Position.Ceiling - probeFront.Position.Floor) >= CLICK(0.1f) &&		// Adequate hand room.
+		abs(probeFront.Position.Floor - probeMiddle.Position.Floor) >= LARA_HEIGHT_STRETCH) // Ledge high enough.
 	{
 		return LedgeHangTestResult{ true, probeFront.Position.Floor };
 	}

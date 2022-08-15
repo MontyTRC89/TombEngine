@@ -128,7 +128,7 @@ void lara_col_hang_idle(ItemInfo* item, CollisionInfo* coll)
 	auto* lara = GetLaraInfo(item);
 
 	item->Animation.IsAirborne = false;
-	item->Animation.VerticalVelocity = 0;
+	item->Animation.Velocity.y = 0;
 	lara->Control.MoveAngle = item->Pose.Orientation.y;
 	coll->Setup.Mode = CollisionProbeMode::FreeFlat;
 

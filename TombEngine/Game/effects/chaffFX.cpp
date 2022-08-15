@@ -42,7 +42,7 @@ void TriggerChaffEffects(int flareAge)
 	vel.y = vect.y - pos.y;
 	vel.z = vect.z - pos.z;
 
-	TriggerChaffEffects(LaraItem, &pos, &vel, LaraItem->Animation.Velocity, (bool)(g_Level.Rooms[LaraItem->RoomNumber].flags & ENV_FLAG_WATER), flareAge);
+	TriggerChaffEffects(LaraItem, &pos, &vel, LaraItem->Animation.Velocity.z, (bool)(g_Level.Rooms[LaraItem->RoomNumber].flags & ENV_FLAG_WATER), flareAge);
 }
 
 void TriggerChaffEffects(ItemInfo* Item, int age)
@@ -66,7 +66,7 @@ void TriggerChaffEffects(ItemInfo* Item, int age)
 	vel.y = world.Translation().y;
 	vel.z = world.Translation().z;
 
-	TriggerChaffEffects(Item, &pos, &vel, Item->Animation.Velocity, (bool)(g_Level.Rooms[Item->RoomNumber].flags & ENV_FLAG_WATER), age);
+	TriggerChaffEffects(Item, &pos, &vel, Item->Animation.Velocity.z, (bool)(g_Level.Rooms[Item->RoomNumber].flags & ENV_FLAG_WATER), age);
 }
 
 void TriggerChaffEffects(ItemInfo* item, Vector3Int* pos, Vector3Int* vel, int speed, bool isUnderwater, int age)

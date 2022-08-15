@@ -2,14 +2,12 @@
 #include "Game/animation.h"
 
 #include "Game/camera.h"
-#include "Game/control/flipeffect.h"
 #include "Game/collision/collide_room.h"
+#include "Game/control/flipeffect.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
-
 #include "Objects/Generic/Object/rope.h"
-
 #include "Renderer/Renderer11.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
@@ -50,12 +48,12 @@ void AnimateLara(ItemInfo* item)
 
 				case COMMAND_JUMP_VELOCITY:
 					item->Animation.IsAirborne = true;
-					item->Animation.VerticalVelocity = *(cmd++);
-					item->Animation.Velocity = *(cmd++);
+					item->Animation.Velocity.y = *(cmd++);
+					item->Animation.Velocity.z = *(cmd++);
 
 					if (lara->Control.CalculatedJumpVelocity)
 					{
-						item->Animation.VerticalVelocity = lara->Control.CalculatedJumpVelocity;
+						item->Animation.Velocity.y = lara->Control.CalculatedJumpVelocity;
 						lara->Control.CalculatedJumpVelocity = 0;
 					}
 
@@ -64,6 +62,7 @@ void AnimateLara(ItemInfo* item)
 				case COMMAND_ATTACK_READY:
 					if (lara->Control.HandStatus != HandStatus::Special)
 						lara->Control.HandStatus = HandStatus::Free;
+
 					break;
 
 				case COMMAND_SOUND_FX:
@@ -147,65 +146,50 @@ void AnimateLara(ItemInfo* item)
 		}
 	}
 
-	int lateral = anim->Xvelocity;
-	if (anim->Xacceleration)
-		lateral += anim->Xacceleration * (item->Animation.FrameNumber - anim->frameBase);
-	item->Animation.LateralVelocity = lateral >>= 16;
+	int frameCount = (anim->frameEnd - anim->frameBase) + 1;
+	int currentFrame = item->Animation.FrameNumber - anim->frameBase;
 
 	if (item->Animation.IsAirborne)
 	{
 		if (TestEnvironment(ENV_FLAG_SWAMP, item))
 		{
-			item->Animation.Velocity -= item->Animation.Velocity >> 3;
-			if (abs(item->Animation.Velocity) < 8)
+			item->Animation.Velocity.z -= item->Animation.Velocity.z / 8.0f;
+			if (abs(item->Animation.Velocity.z) < 8.0f)
 			{
 				item->Animation.IsAirborne = false;
-				item->Animation.Velocity = 0;
+				item->Animation.Velocity.z = 0.0f;
 			}
 
-			if (item->Animation.VerticalVelocity > 128)
-				item->Animation.VerticalVelocity /= 2;
-			item->Animation.VerticalVelocity -= item->Animation.VerticalVelocity / 4;
+			if (item->Animation.Velocity.y > 128.0f)
+				item->Animation.Velocity.y /= 2.0f;
+			item->Animation.Velocity.y -= item->Animation.Velocity.y / 4.0f;
 
-			if (item->Animation.VerticalVelocity < 4)
-				item->Animation.VerticalVelocity = 4;
-			item->Pose.Position.y += item->Animation.VerticalVelocity;
+			if (item->Animation.Velocity.y < 4.0f)
+				item->Animation.Velocity.y = 4.0f;
+			item->Pose.Position.y += item->Animation.Velocity.y;
 		}
 		else
 		{
-			int velocity = (anim->velocity + anim->acceleration * (item->Animation.FrameNumber - anim->frameBase - 1));
-			item->Animation.Velocity -= velocity >> 16;
-			item->Animation.Velocity += (velocity + anim->acceleration) >> 16;
-			item->Animation.VerticalVelocity += (item->Animation.VerticalVelocity >= 128 ? 1 : GRAVITY);
-			item->Pose.Position.y += item->Animation.VerticalVelocity;
+			item->Animation.Velocity.z += (anim->VelocityEnd.z - anim->VelocityStart.z) / frameCount;
+			item->Animation.Velocity.y += item->Animation.Velocity.y >= 128.0f ? 1.0f : GRAVITY;
+			item->Pose.Position.y += item->Animation.Velocity.y;
 		}
 	}
 	else
 	{
-		int velocity;
-
 		if (lara->Control.WaterStatus == WaterStatus::Wade && TestEnvironment(ENV_FLAG_SWAMP, item))
-		{
-			velocity = (anim->velocity >> 1);
-			if (anim->acceleration)
-				velocity += (anim->acceleration * (item->Animation.FrameNumber - anim->frameBase)) >> 2;
-		}
+			item->Animation.Velocity.z = (anim->VelocityStart.z / 2.0f) + ((((anim->VelocityEnd.z - anim->VelocityStart.z) / frameCount) * currentFrame) / 4.0f);
 		else
-		{
-			velocity = anim->velocity;
-			if (anim->acceleration)
-				velocity += anim->acceleration * (item->Animation.FrameNumber - anim->frameBase);
-		}
-
-		item->Animation.Velocity = velocity >> 16;
-		item->Pose.Position.y += lara->ExtraVelocity.y;
+			item->Animation.Velocity.z = anim->VelocityStart.z + (((anim->VelocityEnd.z - anim->VelocityStart.z) / frameCount) * currentFrame);
 	}
+
+	item->Animation.Velocity.x = anim->VelocityStart.x + (((anim->VelocityEnd.x - anim->VelocityStart.x) / frameCount) * currentFrame);
 
 	if (lara->Control.Rope.Ptr != -1)
 		DelAlignLaraToRope(item);
 
 	if (!lara->Control.IsMoving)
-		TranslateItem(item, lara->Control.MoveAngle, item->Animation.Velocity + lara->ExtraVelocity.x, 0, item->Animation.LateralVelocity + lara->ExtraVelocity.z);
+		TranslateItem(item, lara->Control.MoveAngle, item->Animation.Velocity.z, 0.0f, item->Animation.Velocity.x);
 
 	// Update matrices
 	g_Renderer.UpdateLaraAnimations(true);
@@ -243,8 +227,8 @@ void AnimateItem(ItemInfo* item)
 					break;
 
 				case COMMAND_JUMP_VELOCITY:
-					item->Animation.VerticalVelocity = *(cmd++);
-					item->Animation.Velocity = *(cmd++);
+					item->Animation.Velocity.y = *(cmd++);
+					item->Animation.Velocity.z = *(cmd++);
 					item->Animation.IsAirborne = true;
 					break;
 
@@ -350,29 +334,21 @@ void AnimateItem(ItemInfo* item)
 		}
 	}
 
-	int lateral = 0;
+	int frameCount = (anim->frameEnd - anim->frameBase) + 1;
+	int currentFrame = item->Animation.FrameNumber - anim->frameBase;
 
 	if (item->Animation.IsAirborne)
 	{
-		item->Animation.VerticalVelocity += (item->Animation.VerticalVelocity >= 128 ? 1 : 6);
-		item->Pose.Position.y += item->Animation.VerticalVelocity;
+		item->Animation.Velocity.y += (item->Animation.Velocity.y >= 128.0f) ? 1.0f : 6.0f;
+		item->Pose.Position.y += item->Animation.Velocity.y;
 	}
 	else
 	{
-		int velocity = anim->velocity;
-		if (anim->acceleration)
-			velocity += anim->acceleration * (item->Animation.FrameNumber - anim->frameBase);
-
-		item->Animation.Velocity = velocity >> 16;
-
-		lateral = anim->Xvelocity;
-		if (anim->Xacceleration)
-			lateral += anim->Xacceleration * (item->Animation.FrameNumber - anim->frameBase);
-
-		lateral >>= 16;
+		item->Animation.Velocity.z = anim->VelocityStart.z + (((anim->VelocityEnd.z - anim->VelocityStart.z) / frameCount) * currentFrame);
+		item->Animation.Velocity.x = anim->VelocityStart.x + (((anim->VelocityEnd.x - anim->VelocityStart.x) / frameCount) * currentFrame);
 	}
 	
-	TranslateItem(item, item->Pose.Orientation.y, item->Animation.Velocity, 0, lateral);
+	TranslateItem(item, item->Pose.Orientation.y, item->Animation.Velocity.z, 0.0f, item->Animation.Velocity.x);
 
 	// Update matrices.
 	short itemNumber = item - g_Level.Items.data();
@@ -420,14 +396,19 @@ bool TestLastFrame(ItemInfo* item, int animNumber)
 	return (item->Animation.FrameNumber >= anim->frameEnd);
 }
 
-void TranslateItem(ItemInfo* item, short angle, float forward, float vertical, float lateral)
+void TranslateItem(ItemInfo* item, short angle, float forward, float down, float right)
 {
-	item->Pose.Position = TranslateVector(item->Pose.Position, angle, forward, vertical, lateral);
+	item->Pose.Position = TranslateVector(item->Pose.Position, angle, forward, down, right);
 }
 
 void TranslateItem(ItemInfo* item, Vector3Shrt orient, float distance)
 {
 	item->Pose.Position = TranslateVector(item->Pose.Position, orient, distance);
+}
+
+void TranslateItem(ItemInfo* item, Vector3 direction, float distance)
+{
+	item->Pose.Position = TranslateVector(item->Pose.Position, direction, distance);
 }
 
 void SetAnimation(ItemInfo* item, int animIndex, int frameToStart)
@@ -518,7 +499,7 @@ int GetFrame(ItemInfo* item, ANIM_FRAME* framePtr[], int* rate)
 	int frame = item->Animation.FrameNumber;
 	auto* anim = &g_Level.Anims[item->Animation.AnimNumber];
 	framePtr[0] = framePtr[1] = &g_Level.Frames[anim->framePtr];
-	int rate2 = *rate = anim->interpolation & 0x00ff;
+	int rate2 = *rate = anim->Interpolation & 0x00ff;
 	frame -= anim->frameBase; 
 
 	int first = frame / rate2;

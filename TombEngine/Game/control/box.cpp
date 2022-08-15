@@ -266,8 +266,8 @@ void CreatureKill(ItemInfo* item, int killAnim, int killState, int laraKillState
 
 	LaraItem->Pose = item->Pose;
 	LaraItem->Animation.IsAirborne = false;
-	LaraItem->Animation.Velocity = 0;
-	LaraItem->Animation.VerticalVelocity = 0;
+	LaraItem->Animation.Velocity.z = 0;
+	LaraItem->Animation.Velocity.y = 0;
 
 	if (item->RoomNumber != LaraItem->RoomNumber)
 		ItemNewRoom(Lara.ItemNumber, item->RoomNumber);
@@ -309,7 +309,7 @@ short CreatureEffect(ItemInfo* item, BITE_INFO* bite, std::function<CreatureEffe
 	auto pos = Vector3Int(bite->x, bite->y, bite->z);
 	GetJointAbsPosition(item, &pos, bite->meshNum);
 
-	return func(pos.x, pos.y, pos.z, item->Animation.Velocity, item->Pose.Orientation.y, item->RoomNumber);
+	return func(pos.x, pos.y, pos.z, item->Animation.Velocity.z, item->Pose.Orientation.y, item->RoomNumber);
 }
 
 void CreatureUnderwater(ItemInfo* item, int depth)
@@ -428,7 +428,7 @@ short CreatureTurn(ItemInfo* item, short maxTurn)
 	int x = creature->Target.x - item->Pose.Position.x;
 	int z = creature->Target.z - item->Pose.Position.z;
 	angle = phd_atan(z, x) - item->Pose.Orientation.y;
-	int range = (item->Animation.Velocity * 16384) / maxTurn;
+	int range = (item->Animation.Velocity.z * 16384) / maxTurn;
 	int distance = pow(x, 2) + pow(z, 2);
 
 	if (angle > FRONT_ARC || angle < -FRONT_ARC && distance < pow(range, 2))
@@ -629,7 +629,7 @@ int CreatureAnimation(short itemNumber, short angle, short tilt)
 	}
 
 	short biffAngle;
-	if (item->ObjectNumber != ID_TYRANNOSAUR && item->Animation.Velocity && item->HitPoints > 0)
+	if (item->ObjectNumber != ID_TYRANNOSAUR && item->Animation.Velocity.z && item->HitPoints > 0)
 		biffAngle = CreatureCreature(itemNumber);
 	else
 		biffAngle = 0;
@@ -704,7 +704,7 @@ int CreatureAnimation(short itemNumber, short angle, short tilt)
 		floor = GetFloor(item->Pose.Position.x, y, item->Pose.Position.z, &roomNumber);
 		item->Floor = GetFloorHeight(floor, item->Pose.Position.x, y, item->Pose.Position.z);
  
-		angle = (item->Animation.Velocity) ? phd_atan(item->Animation.Velocity, -dy) : 0;
+		angle = (item->Animation.Velocity.z) ? phd_atan(item->Animation.Velocity.z, -dy) : 0;
 		if (angle < -ANGLE(20.0f))
 			angle = -ANGLE(20.0f);
 		else if (angle > ANGLE(20.0f))
@@ -1490,13 +1490,13 @@ void CreatureAIInfo(ItemInfo* item, AI_INFO* AI)
 
 	if (enemy == LaraItem)
 	{
-		vector.x = enemy->Pose.Position.x + enemy->Animation.Velocity * PREDICTIVE_SCALE_FACTOR * phd_sin(Lara.Control.MoveAngle) - item->Pose.Position.x - object->pivotLength * phd_sin(item->Pose.Orientation.y);
-		vector.z = enemy->Pose.Position.z + enemy->Animation.Velocity * PREDICTIVE_SCALE_FACTOR * phd_cos(Lara.Control.MoveAngle) - item->Pose.Position.z - object->pivotLength * phd_cos(item->Pose.Orientation.y);
+		vector.x = enemy->Pose.Position.x + enemy->Animation.Velocity.z * PREDICTIVE_SCALE_FACTOR * phd_sin(Lara.Control.MoveAngle) - item->Pose.Position.x - object->pivotLength * phd_sin(item->Pose.Orientation.y);
+		vector.z = enemy->Pose.Position.z + enemy->Animation.Velocity.z * PREDICTIVE_SCALE_FACTOR * phd_cos(Lara.Control.MoveAngle) - item->Pose.Position.z - object->pivotLength * phd_cos(item->Pose.Orientation.y);
 	}
 	else
 	{
-		vector.x = enemy->Pose.Position.x + enemy->Animation.Velocity * PREDICTIVE_SCALE_FACTOR * phd_sin(enemy->Pose.Orientation.y) - item->Pose.Position.x - object->pivotLength * phd_sin(item->Pose.Orientation.y);
-		vector.z = enemy->Pose.Position.z + enemy->Animation.Velocity * PREDICTIVE_SCALE_FACTOR * phd_cos(enemy->Pose.Orientation.y) - item->Pose.Position.z - object->pivotLength * phd_cos(item->Pose.Orientation.y);
+		vector.x = enemy->Pose.Position.x + enemy->Animation.Velocity.z * PREDICTIVE_SCALE_FACTOR * phd_sin(enemy->Pose.Orientation.y) - item->Pose.Position.x - object->pivotLength * phd_sin(item->Pose.Orientation.y);
+		vector.z = enemy->Pose.Position.z + enemy->Animation.Velocity.z * PREDICTIVE_SCALE_FACTOR * phd_cos(enemy->Pose.Orientation.y) - item->Pose.Position.z - object->pivotLength * phd_cos(item->Pose.Orientation.y);
 	}
 
 	vector.y = item->Pose.Position.y - enemy->Pose.Position.y;

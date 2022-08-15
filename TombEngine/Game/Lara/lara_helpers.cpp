@@ -62,7 +62,7 @@ void HandleLaraMovementParameters(ItemInfo* item, CollisionInfo* coll)
 
 	// Reset crawl flex.
 	if (!(TrInput & IN_LOOK) && coll->Setup.Height > LARA_HEIGHT - LARA_HEADROOM &&	// HACK
-		(!item->Animation.Velocity || (item->Animation.Velocity && !(TrInput & (IN_LEFT | IN_RIGHT)))))
+		(!item->Animation.Velocity.z || (item->Animation.Velocity.z && !(TrInput & (IN_LEFT | IN_RIGHT)))))
 	{
 		ResetLaraFlex(item, 12.0f);
 	}
@@ -163,7 +163,7 @@ void EaseOutLaraHeight(ItemInfo* item, int height)
 
 	// Translate Lara to new height.
 	static constexpr int rate = 50;
-	int threshold = std::max(abs(item->Animation.Velocity) * 1.5f, CLICK(0.25f) / 4);
+	int threshold = std::max(abs(item->Animation.Velocity.z) * 1.5f, CLICK(0.25f) / 4);
 	int sign = std::copysign(1, height);
 
 	if (TestEnvironment(ENV_FLAG_SWAMP, item) && height > 0)
@@ -292,17 +292,17 @@ void DoLaraTightropeBalanceRegen(ItemInfo* item)
 
 void DoLaraFallDamage(ItemInfo* item)
 {
-	if (item->Animation.VerticalVelocity >= LARA_DAMAGE_VELOCITY)
+	if (item->Animation.Velocity.y >= LARA_DAMAGE_VELOCITY)
 	{
-		if (item->Animation.VerticalVelocity >= LARA_DEATH_VELOCITY)
+		if (item->Animation.Velocity.y >= LARA_DEATH_VELOCITY)
 			item->HitPoints = 0;
 		else USE_FEATURE_IF_CPP20([[likely]])
 		{
-			float base = item->Animation.VerticalVelocity - (LARA_DAMAGE_VELOCITY - 1);
+			float base = item->Animation.Velocity.y - (LARA_DAMAGE_VELOCITY - 1);
 			item->HitPoints -= LARA_HEALTH_MAX * (pow(base, 2) / 196);
 		}
 
-		float rumblePower = ((float)item->Animation.VerticalVelocity / (float)LARA_DEATH_VELOCITY) * 0.7f;
+		float rumblePower = ((float)item->Animation.Velocity.y / (float)LARA_DEATH_VELOCITY) * 0.7f;
 		Rumble(rumblePower, 0.3f);
 	}
 }
@@ -472,8 +472,8 @@ void UpdateLaraSubsuitAngles(ItemInfo* item)
 		lara->Control.Subsuit.VerticalVelocity = ceil((15 / 16) * lara->Control.Subsuit.VerticalVelocity - 1);
 	}
 
-	lara->Control.Subsuit.Velocity[0] = -4 * item->Animation.VerticalVelocity;
-	lara->Control.Subsuit.Velocity[1] = -4 * item->Animation.VerticalVelocity;
+	lara->Control.Subsuit.Velocity[0] = -4 * item->Animation.Velocity.y;
+	lara->Control.Subsuit.Velocity[1] = -4 * item->Animation.Velocity.y;
 
 	if (lara->Control.Subsuit.XRot >= lara->Control.Subsuit.DXRot)
 	{
@@ -533,7 +533,7 @@ void UpdateLaraSubsuitAngles(ItemInfo* item)
 
 void ModulateLaraLean(ItemInfo* item, CollisionInfo* coll, short baseRate, short maxAngle)
 {
-	if (!item->Animation.Velocity)
+	if (!item->Animation.Velocity.z)
 		return;
 
 	float axisCoeff = AxisMap[InputAxis::MoveHorizontal];
@@ -550,7 +550,7 @@ void ModulateLaraCrawlFlex(ItemInfo* item, short baseRate, short maxAngle)
 {
 	auto* lara = GetLaraInfo(item);
 
-	if (!item->Animation.Velocity)
+	if (!item->Animation.Velocity.z)
 		return;
 
 	float axisCoeff = AxisMap[InputAxis::MoveHorizontal];
@@ -589,11 +589,11 @@ void ModulateLaraSlideVelocity(ItemInfo* item, CollisionInfo* coll)
 
 		g_Renderer.PrintDebugMessage("%d", slideVelocity);
 
-		lara->ExtraVelocity.x += slideVelocity;
-		lara->ExtraVelocity.y += slideVelocity * phd_sin(steepness);
+		//lara->ExtraVelocity.x += slideVelocity;
+		//lara->ExtraVelocity.y += slideVelocity * phd_sin(steepness);
 	}
-	else
-		lara->ExtraVelocity.x += minVelocity;
+	//else
+		//lara->ExtraVelocity.x += minVelocity;
 }
 
 void SetLaraJumpDirection(ItemInfo* item, CollisionInfo* coll)
@@ -682,8 +682,8 @@ void SetContextWaterClimbOut(ItemInfo* item, CollisionInfo* coll, WaterClimbOutT
 
 	item->Animation.ActiveState = LS_ONWATER_EXIT;
 	item->Animation.IsAirborne = false;
-	item->Animation.Velocity = 0;
-	item->Animation.VerticalVelocity = 0;
+	item->Animation.Velocity.z = 0;
+	item->Animation.Velocity.y = 0;
 	lara->ProjectedFloorHeight = climbOutContext.Height;
 	lara->TargetOrientation = Vector3Shrt(0, coll->NearestLedgeAngle, 0);
 	lara->Control.TurnRate.y = 0;
@@ -694,8 +694,8 @@ void SetContextWaterClimbOut(ItemInfo* item, CollisionInfo* coll, WaterClimbOutT
 void SetLaraLand(ItemInfo* item, CollisionInfo* coll)
 {
 	//item->IsAirborne = false; // TODO: Removing this avoids an unusual landing bug Core had worked around in an obscure way. I hope to find a proper solution. @Sezz 2022.02.18
-	item->Animation.Velocity = 0;
-	item->Animation.VerticalVelocity = 0;
+	item->Animation.Velocity.z = 0;
+	item->Animation.Velocity.y = 0;
 
 	LaraSnapToHeight(item, coll);
 }
@@ -704,14 +704,14 @@ void SetLaraFallAnimation(ItemInfo* item)
 {
 	SetAnimation(item, LA_FALL_START);
 	item->Animation.IsAirborne = true;
-	item->Animation.VerticalVelocity = 0;
+	item->Animation.Velocity.y = 0;
 }
 
 void SetLaraFallBackAnimation(ItemInfo* item)
 {
 	SetAnimation(item, LA_FALL_BACK);
 	item->Animation.IsAirborne = true;
-	item->Animation.VerticalVelocity = 0;
+	item->Animation.Velocity.y = 0;
 }
 
 void SetLaraMonkeyFallAnimation(ItemInfo* item)
@@ -729,8 +729,8 @@ void SetLaraMonkeyRelease(ItemInfo* item)
 	auto* lara = GetLaraInfo(item);
 
 	item->Animation.IsAirborne = true;
-	item->Animation.Velocity = 2;
-	item->Animation.VerticalVelocity = 1;
+	item->Animation.Velocity.z = 2;
+	item->Animation.Velocity.y = 1;
 	lara->Control.TurnRate.y = 0;
 	lara->Control.HandStatus = HandStatus::Free;
 }
@@ -826,8 +826,8 @@ void SetLaraHang(ItemInfo* item)
 
 	ResetLaraFlex(item);
 	item->Animation.IsAirborne = false;
-	item->Animation.Velocity = 0;
-	item->Animation.VerticalVelocity = 0;
+	item->Animation.Velocity.z = 0;
+	item->Animation.Velocity.y = 0;
 	lara->Control.HandStatus = HandStatus::Busy;
 	lara->ExtraTorsoRot = Vector3Shrt();
 }
@@ -848,8 +848,8 @@ void SetLaraHangReleaseAnimation(ItemInfo* item)
 	}
 
 	item->Animation.IsAirborne = true;
-	item->Animation.Velocity = 2;
-	item->Animation.VerticalVelocity = 1;
+	item->Animation.Velocity.z = 2;
+	item->Animation.Velocity.y = 1;
 	lara->Control.HandStatus = HandStatus::Free;
 }
 
@@ -861,8 +861,8 @@ void SetLaraCornerAnimation(ItemInfo* item, CollisionInfo* coll, bool flip)
 	{
 		SetAnimation(item, LA_FALL_START);
 		item->Animation.IsAirborne = true;
-		item->Animation.Velocity = 2;
-		item->Animation.VerticalVelocity = 1;
+		item->Animation.Velocity.z = 2;
+		item->Animation.Velocity.y = 1;
 		item->Pose.Position.y += CLICK(1);
 		item->Pose.Orientation.y += lara->NextCornerPos.Orientation.y / 2;
 		lara->Control.HandStatus = HandStatus::Free;
@@ -888,7 +888,7 @@ void SetLaraSwimDiveAnimation(ItemInfo* item)
 
 	SetAnimation(item, LA_ONWATER_DIVE);
 	item->Animation.TargetState = LS_UNDERWATER_SWIM_FORWARD;
-	item->Animation.VerticalVelocity = LARA_SWIM_VELOCITY_MAX * 0.4f;
+	item->Animation.Velocity.y = LARA_SWIM_VELOCITY_MAX * 0.4f;
 	item->Pose.Orientation.x = -ANGLE(45.0f);
 	lara->Control.WaterStatus = WaterStatus::Underwater;
 }

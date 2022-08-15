@@ -75,7 +75,7 @@ namespace TEN::Entities::Switches
 				{
 					if (MoveLaraPosition(&UnderwaterSwitchPos, switchItem, laraItem))
 					{
-						laraItem->Animation.VerticalVelocity = 0;
+						laraItem->Animation.Velocity.y = 0;
 						laraItem->Animation.TargetState = LS_SWITCH_DOWN;
 
 						do
@@ -136,7 +136,7 @@ namespace TEN::Entities::Switches
 			if (flag)
 			{
 				SetAnimation(laraItem, LA_UNDERWATER_CEILING_SWITCH_PULL);
-				laraItem->Animation.VerticalVelocity = 0;
+				laraItem->Animation.Velocity.y = 0;
 				lara->Control.IsMoving = false;
 				lara->Control.HandStatus = HandStatus::Busy;
 				switchItem->Animation.TargetState = SWITCH_ON;
