@@ -1,45 +1,46 @@
 include "ten_itemdata.fbs";
 namespace TEN.Save;
+
 struct RoomVector {
-    room: uint32;
-    y_location: uint32;
+	room: uint32;
+	y_location: uint32;
 }
 
 table Item {
-    floor: int;
-    touch_bits: int32;
-    mesh_bits: int32;
-    object_id: int32;
-    active_state: int32;
-    target_state: int32;
-    required_state: int32;
-    anim_number: int32;
-    frame_number: int32;
-    room_number: int32;
-    velocity: int32;
-    vertical_velocity: int32;
-    hit_points: int32;
-    box_number: int32;
-    timer: int32;
+	active_state: int32;
+	anim_number: int32;
+	frame_number: int32;
+	is_airborne: bool;
+	required_state: int32;
+	target_state: int32;
+	velocity: Vector3;
+
+	floor: int;
+	touch_bits: int32;
+	mesh_bits: int32;
+	object_id: int32;
+	room_number: int32;
+	hit_points: int32;
+	box_number: int32;
+	timer: int32;
 	color: Vector4;
-    flags: int32;
-    trigger_flags: int32;
-    carried_item: int32;
-    after_death: int32;
-    item_flags: [int32];
-	position: Position;
+	flags: int32;
+	trigger_flags: int32;
+	carried_item: int32;
+	after_death: int32;
+	item_flags: [int32];
+	pose: Position;
 	next_item: int32;
 	next_item_active: int32;
 	triggered: bool;
 	active: bool;
 	status: int32;
-	is_airborne: bool;
 	hit_stauts: bool;
 	collidable: bool;
 	looked_at: bool;
 	ai_bits: int32;
 	swap_mesh_flags: int32;
-    data: TEN.Save.ItemData;
+	data: TEN.Save.ItemData;
 	lua_name: string;
 	lua_on_killed_name: string;
 	lua_on_hit_name: string;
@@ -48,7 +49,7 @@ table Item {
 }
 
 table FXInfo {
-	pos : Position;
+	pose : Position;
 	room_number: int32;
 	object_number: int32;
 	next_fx: int32;
@@ -57,7 +58,7 @@ table FXInfo {
 	fall_speed: int32;
 	frame_number: int32;
 	counter : int32;
-	shade: int32;
+	color: Vector4;
 	flag1: int32;
 	flag2: int32;
 }
@@ -230,7 +231,6 @@ table Lara {
 	torch: TorchData;
 	extra_head_rot: Vector3;
 	extra_torso_rot: Vector3;
-	extra_velocity: Vector3;
 	water_current_active: int32;
 	water_current_pull: Vector3;
 	left_arm: ArmInfo;
@@ -248,8 +248,7 @@ table Lara {
 	target_facing_angle: int32;
 	water_surface_dist: int32;
 	interacted_item: int32;
-	next_corner_position: Vector3;
-	next_corner_rotation: Vector3;
+	next_corner_pose: Position;
 	burn_type: int32;
 	burn_count: uint32;
 	burn: bool;
@@ -277,8 +276,7 @@ table Sink {
 table StaticMeshInfo {
 	number: int32;
 	room_number: int32;
-	position: Vector3;
-	rotation: Vector3;
+	pose: Position;
 	color: Vector4;
 	hit_points: int32;
 	flags: int32;
@@ -324,52 +322,11 @@ table ParticleInfo {
 	node_number: int32;
 }
 
-table RatInfo {
+table SwarmObjectInfo {
 	on: bool;
-	x: int32;
-	y: int32;
-	z: int32;
-	x_rot: int32;
-	y_rot: int32;
-	z_rot: int32;
+	pose: Position;
 	room_number: int32;
 	flags: int32;
-}
-
-table SpiderInfo {
-	on: bool;
-	x: int32;
-	y: int32;
-	z: int32;
-	x_rot: int32;
-	y_rot: int32;
-	z_rot: int32;
-	room_number: int32;
-	flags: int32;
-}
-
-table ScarabInfo {
-	on: bool;
-	x: int32;
-	y: int32;
-	z: int32;
-	x_rot: int32;
-	y_rot: int32;
-	z_rot: int32;
-	room_number: int32;
-	flags: int32;
-}
-
-table BatInfo {
-	on: bool;
-	x: int32;
-	y: int32;
-	z: int32;
-	x_rot: int32;
-	y_rot: int32;
-	z_rot: int32;
-	room_number: int32;
-	counter: int32;
 }
 
 table Rope {
@@ -481,10 +438,10 @@ table SaveGame {
 	static_meshes: [StaticMeshInfo];
 	flyby_cameras: [FlyByCamera];
 	particles: [ParticleInfo];
-	rats: [RatInfo];
-	spiders: [SpiderInfo];
-	scarabs: [ScarabInfo];
-	bats: [BatInfo];
+	rats: [SwarmObjectInfo];
+	spiders: [SwarmObjectInfo];
+	scarabs: [SwarmObjectInfo];
+	bats: [SwarmObjectInfo];
 	flip_maps: [int32];
 	flip_stats: [int32];
 	flip_effect: int32;

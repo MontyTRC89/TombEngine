@@ -1,20 +1,14 @@
 #pragma once
-
 #include <cstdint>
 #include <string>
 #include <vector>
+
 #include "Game/animation.h"
 #include "Game/itemdata/itemdata.h"
 #include "Specific/newtypes.h"
 #include "Specific/phd_global.h"
 
 enum GAME_OBJECT_ID : short;
-
-// used by fx->shade !
-#define RGB555(r, g, b) ((r << 7) & 0x7C00 | (g << 2) & 0x3E0 | (b >> 3) & 0x1F)
-#define WHITE555 RGB555(255, 255, 255)
-#define GRAY555  RGB555(128, 128, 128)
-#define BLACK555 RGB555(  0,   0,   0)
 
 constexpr auto NO_ITEM = -1;
 constexpr auto NOT_TARGETABLE = -16384;
@@ -61,17 +55,15 @@ enum class JointBitType
 
 struct EntityAnimationData
 {
-	int AnimNumber;
-	int FrameNumber;
-	int ActiveState;
-	int TargetState;
-	int RequiredState; // TODO: Phase out this weird feature.
+	int AnimNumber	  = -1;
+	int FrameNumber	  = -1;
+	int ActiveState	  = -1;
+	int TargetState	  = -1;
+	int RequiredState = -1; // TODO: Phase out this weird feature.
 
-	bool IsAirborne;
-	int Velocity;
-	int VerticalVelocity;
-	int LateralVelocity;
-	std::vector<BONE_MUTATOR> Mutator;
+	bool IsAirborne	= false;
+	Vector3 Velocity = Vector3::Zero; // CONVENTION: +X is right, +Y is down, +Z is forward.
+	std::vector<BoneMutator> Mutator = {};
 };
 
 //todo we need to find good "default states" for a lot of these - squidshire 25/05/2022

@@ -4,15 +4,20 @@
 #include "Game/health.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
+#include "Game/Lara/lara_flare.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_tests.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-void InitialiseLara(int restore)
+void InitialiseLara(bool restore)
 {
 	if (Lara.ItemNumber == NO_ITEM)
 		return;
+
+	LaraInfo lBackup = {};
+	if (restore)
+		memcpy(&lBackup, &Lara, sizeof(LaraInfo));
 
 	short itemNumber = Lara.ItemNumber;
 
@@ -20,11 +25,6 @@ void InitialiseLara(int restore)
 	LaraItem->Collidable = false;
 	LaraItem->Location.roomNumber = LaraItem->RoomNumber;
 	LaraItem->Location.yNumber = LaraItem->Pose.Position.y;
-
-	LaraInfo backup = {};
-
-	if (restore)
-		memcpy(&backup, &Lara, sizeof(LaraInfo));
 
 	ZeroMemory(&Lara, sizeof(LaraInfo));
 
@@ -55,7 +55,7 @@ void InitialiseLara(int restore)
 
 	Lara.Control.Weapon.LastGunType = Lara.Control.Weapon.GunType = Lara.Control.Weapon.RequestGunType = weapon;
 
-	LaraInitialiseMeshes(LaraItem);
+	InitialiseLaraMeshes(LaraItem);
 
 	if (weapon == LaraWeaponType::Pistol)
 	{
@@ -86,20 +86,16 @@ void InitialiseLara(int restore)
 
 	Lara.Inventory.HasBinoculars = true;
 
-	if (!restore)
-	{
-		if (Objects[ID_FLARE_INV_ITEM].loaded)
-			Lara.Inventory.TotalFlares = 3;
-
-		Lara.Inventory.TotalSmallMedipacks = 3;
-		Lara.Inventory.TotalLargeMedipacks = 1;
-	}
+	if (restore)
+		InitialiseLaraLevelJump(itemNumber, &lBackup);
+	else
+		InitialiseLaraDefaultInventory();
 
 	InitialiseLaraAnims(LaraItem);
 	Lara.Inventory.BeetleLife = 3;
 }
 
-void LaraInitialiseMeshes(ItemInfo* item)
+void InitialiseLaraMeshes(ItemInfo* item)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -137,7 +133,7 @@ void InitialiseLaraAnims(ItemInfo* item)
 	if (TestEnvironment(ENV_FLAG_WATER, item))
 	{
 		lara->Control.WaterStatus = WaterStatus::Underwater;
-		item->Animation.VerticalVelocity = 0;
+		item->Animation.Velocity.y = 0;
 		SetAnimation(item, LA_UNDERWATER_IDLE);
 	}
 	else
@@ -151,4 +147,39 @@ void InitialiseLaraLoad(short itemNum)
 {
 	Lara.ItemNumber = itemNum;
 	LaraItem = &g_Level.Items[itemNum];
+}
+
+void InitialiseLaraLevelJump(short itemNum, LaraInfo* lBackup)
+{
+	auto* item = &g_Level.Items[itemNum];
+	auto* lara = GetLaraInfo(item);
+
+	// Restore inventory.
+	// It restores even puzzle/key items, to reset them, a ResetHub analog must be made.
+	lara->Inventory = lBackup->Inventory;
+	memcpy(&lara->Weapons, &lBackup->Weapons, sizeof(CarriedWeaponInfo) * int(LaraWeaponType::NumWeapons));
+
+	// If no flare present, quit
+	if (lBackup->Control.Weapon.GunType != LaraWeaponType::Flare)
+		return;
+
+	// Restore flare
+	lara->LeftArm = lBackup->LeftArm;
+	lara->RightArm = lBackup->RightArm;
+	lara->Control.HandStatus = lBackup->Control.HandStatus;
+	lara->Control.Weapon = lBackup->Control.Weapon;
+	lara->Flare = lBackup->Flare;
+	DrawFlareMeshes(item);
+}
+
+void InitialiseLaraDefaultInventory()
+{
+	if (Objects[ID_FLARE_INV_ITEM].loaded)
+		Lara.Inventory.TotalFlares = 3;
+
+	if (Objects[ID_SMALLMEDI_ITEM].loaded)
+		Lara.Inventory.TotalSmallMedipacks = 3;
+
+	if (Objects[ID_BIGMEDI_ITEM].loaded)
+		Lara.Inventory.TotalLargeMedipacks = 1;
 }

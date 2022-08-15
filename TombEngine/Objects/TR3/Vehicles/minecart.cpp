@@ -477,7 +477,7 @@ namespace TEN::Entities::Vehicles
 				laraItem->Animation.FrameNumber == GetFrameNumber(minecartItem, 34) + 28)
 			{
 				laraItem->Animation.FrameNumber = GetFrameNumber(minecartItem, 34) + 28;
-				minecartItem->Animation.Velocity = 0;
+				minecartItem->Animation.Velocity.z = 0;
 				minecart->Velocity = 0.0f;
 				minecart->Flags = (minecart->Flags & ~MINECART_FLAG_CONTROL) | MINECART_FLAG_NO_ANIM;
 			}
@@ -504,7 +504,7 @@ namespace TEN::Entities::Vehicles
 				laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
 				laraItem->Animation.ActiveState = MINECART_STATE_TURN_DEATH;
 				laraItem->Animation.TargetState = MINECART_STATE_TURN_DEATH;
-				minecartItem->Animation.Velocity = 0;
+				minecartItem->Animation.Velocity.z = 0;
 				minecart->Velocity = 0.0f;
 				minecart->Flags = (minecart->Flags & ~MINECART_FLAG_CONTROL) | MINECART_FLAG_STOPPED | MINECART_FLAG_DEAD;
 				return;
@@ -524,7 +524,7 @@ namespace TEN::Entities::Vehicles
 				laraItem->Animation.ActiveState = MINECART_STATE_WALL_DEATH;
 				laraItem->Animation.TargetState = MINECART_STATE_WALL_DEATH;
 				laraItem->HitPoints = -1;
-				minecartItem->Animation.Velocity = 0;
+				minecartItem->Animation.Velocity.z = 0;
 				minecart->Velocity = 0.0f;
 				minecart->Flags = (minecart->Flags & ~MINECART_FLAG_CONTROL) | (MINECART_FLAG_STOPPED | MINECART_FLAG_DEAD);
 				return;
@@ -547,7 +547,7 @@ namespace TEN::Entities::Vehicles
 						laraItem->Pose.Position.x,
 						laraItem->Pose.Position.y - CLICK(3),
 						laraItem->Pose.Position.z,
-						minecartItem->Animation.Velocity,
+						minecartItem->Animation.Velocity.z,
 						minecartItem->Pose.Orientation.y,
 						laraItem->RoomNumber,
 						3);
@@ -583,7 +583,7 @@ namespace TEN::Entities::Vehicles
 		{
 			if (minecart->Velocity < MINECART_STOP_VELOCITY_MAX)
 			{
-				minecartItem->Animation.Velocity = 0;
+				minecartItem->Animation.Velocity.z = 0;
 				minecart->Velocity = 0.0f;
 				minecart->Flags |= MINECART_FLAG_STOPPED | MINECART_FLAG_CONTROL;
 				return;
@@ -667,11 +667,11 @@ namespace TEN::Entities::Vehicles
 			minecart->Velocity = MINECART_VELOCITY_MIN;
 
 		minecart->Velocity -=( minecart->Gradient * 4) / VEHICLE_VELOCITY_SCALE;
-		minecartItem->Animation.Velocity = (int)round(minecart->Velocity);
+		minecartItem->Animation.Velocity.z = (int)round(minecart->Velocity);
 
-		if (minecartItem->Animation.Velocity < MINECART_ANIM_VELOCITY_MIN)
+		if (minecartItem->Animation.Velocity.z < MINECART_ANIM_VELOCITY_MIN)
 		{
-			minecartItem->Animation.Velocity = MINECART_ANIM_VELOCITY_MIN;
+			minecartItem->Animation.Velocity.z = MINECART_ANIM_VELOCITY_MIN;
 			StopSoundEffect(SFX_TR3_VEHICLE_MINECART_TRACK_LOOP);
 
 			if (minecart->VerticalVelocity)
@@ -686,12 +686,12 @@ namespace TEN::Entities::Vehicles
 			if (minecart->VerticalVelocity)
 				StopSoundEffect(SFX_TR3_VEHICLE_MINECART_TRACK_LOOP);
 			else
-				SoundEffect(SFX_TR3_VEHICLE_MINECART_TRACK_LOOP, &minecartItem->Pose, SoundEnvironment::Land, 1.0f + ((float)minecartItem->Animation.Velocity / SECTOR(8))); // TODO: check actual sound!
+				SoundEffect(SFX_TR3_VEHICLE_MINECART_TRACK_LOOP, &minecartItem->Pose, SoundEnvironment::Land, 1.0f + ((float)minecartItem->Animation.Velocity.z / SECTOR(8))); // TODO: check actual sound!
 		}
 
 		if (minecart->Flags & (MINECART_FLAG_TURNING_LEFT | MINECART_FLAG_TURNING_RIGHT))
 		{
-			minecart->TurnLen += minecartItem->Animation.Velocity * 3;
+			minecart->TurnLen += minecartItem->Animation.Velocity.z * 3;
 			if (minecart->TurnLen > ANGLE(90.0f))
 			{
 				if (minecart->Flags & MINECART_FLAG_TURNING_LEFT)
@@ -756,7 +756,7 @@ namespace TEN::Entities::Vehicles
 			}
 		}
 		else
-			TranslateItem(minecartItem, minecartItem->Pose.Orientation.y, minecartItem->Animation.Velocity);
+			TranslateItem(minecartItem, minecartItem->Pose.Orientation.y, minecartItem->Animation.Velocity.z);
 
 		minecart->FloorHeightMiddle = GetVehicleCollision(minecartItem, 0, 0, true).Floor;
 
@@ -792,9 +792,9 @@ namespace TEN::Entities::Vehicles
 		{
 			short val = minecartItem->Pose.Orientation.y & 16383;
 			if (minecart->Flags & MINECART_FLAG_TURNING_RIGHT)
-				minecartItem->Pose.Orientation.z = -(val * minecartItem->Animation.Velocity) / 512;
+				minecartItem->Pose.Orientation.z = -(val * minecartItem->Animation.Velocity.z) / 512;
 			else
-				minecartItem->Pose.Orientation.z = ((ANGLE(90.0f) - val) * minecartItem->Animation.Velocity) / 512;
+				minecartItem->Pose.Orientation.z = ((ANGLE(90.0f) - val) * minecartItem->Animation.Velocity.z) / 512;
 		}
 		else
 			minecartItem->Pose.Orientation.z -= minecartItem->Pose.Orientation.z / 8;

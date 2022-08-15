@@ -49,7 +49,7 @@ struct FX_INFO
 	short fallspeed;
 	int frameNumber;
 	short counter;
-	short shade;
+	Vector4 color;
 	short flag1;
 	short flag2;
 };

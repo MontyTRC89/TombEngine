@@ -239,14 +239,14 @@ namespace TEN::Entities::Vehicles
 		jeep->BackLeftWheelRotation -= wheelRot;
 
 		// TODO: Check.
-		/*if ((jeepItem->Pose.Position.y + jeepItem->Animation.VerticalVelocity) > (floorHeight - 32))
+		/*if ((jeepItem->Pose.Position.y + jeepItem->Animation.Velocity.y) > (floorHeight - 32))
 		{
-			if (jeepItem->Animation.VerticalVelocity > 150)
-				laraItem->HitPoints += 150 - jeepItem->Animation.VerticalVelocity;
+			if (jeepItem->Animation.Velocity.y > 150)
+				laraItem->HitPoints += 150 - jeepItem->Animation.Velocity.y;
 		}*/
 
 		int prevYPos = jeepItem->Pose.Position.y;
-		jeepItem->Animation.VerticalVelocity = DoVehicleDynamics(floorHeight, jeepItem->Animation.VerticalVelocity, JEEP_BOUNCE_MIN, JEEP_KICK_MAX, &jeepItem->Pose.Position.y, 1.5f);
+		jeepItem->Animation.Velocity.y = DoVehicleDynamics(floorHeight, jeepItem->Animation.Velocity.y, JEEP_BOUNCE_MIN, JEEP_KICK_MAX, &jeepItem->Pose.Position.y, 1.5f);
 		jeep->Velocity = DoVehicleWaterMovement(jeepItem, laraItem, jeep->Velocity, JEEP_FRONT, &jeep->TurnRate);
 
 		floorHeight = (pointFrontLeft.Position.y + pointFrontRight.Position.y) / 2;
@@ -322,7 +322,7 @@ namespace TEN::Entities::Vehicles
 			auto pos = Vector3Int(90, 0, -500);
 			GetJointAbsPosition(jeepItem, &pos, 11);
 
-			if (jeepItem->Animation.Velocity <= 32)
+			if (jeepItem->Animation.Velocity.z <= 32)
 			{
 				if (jeep->SmokeStart >= 16)
 				{
@@ -339,8 +339,8 @@ namespace TEN::Entities::Vehicles
 
 				TriggerJeepExhaustSmokeEffect(pos.x, pos.y, pos.z, jeepItem->Pose.Orientation.y + -ANGLE(180.0f), speed, 0);
 			}
-			else if (jeepItem->Animation.Velocity < 64)
-				TriggerJeepExhaustSmokeEffect(pos.x, pos.y, pos.z, jeepItem->Pose.Orientation.y - ANGLE(180.0f), 64 - jeepItem->Animation.Velocity, 1);
+			else if (jeepItem->Animation.Velocity.z < 64)
+				TriggerJeepExhaustSmokeEffect(pos.x, pos.y, pos.z, jeepItem->Pose.Orientation.y - ANGLE(180.0f), 64 - jeepItem->Animation.Velocity.z, 1);
 		}
 
 		return DoJeepDismount(laraItem);
@@ -436,7 +436,7 @@ namespace TEN::Entities::Vehicles
 			else
 				jeep->Velocity = 0;
 
-			jeepItem->Animation.Velocity = jeep->Velocity / VEHICLE_VELOCITY_SCALE;
+			jeepItem->Animation.Velocity.z = jeep->Velocity / VEHICLE_VELOCITY_SCALE;
 			if (jeep->EngineRevs > 0xC000)
 				jeep->EngineRevs = (GetRandomControl() & 0x1FF) + 48896;
 
@@ -738,7 +738,7 @@ namespace TEN::Entities::Vehicles
 			case JEEP_STATE_LEAP:
 				if (jeepItem->Pose.Position.y == jeepItem->Floor)
 					laraItem->Animation.TargetState = JEEP_STATE_LAND;
-				else if (jeepItem->Animation.VerticalVelocity > JEEP_DEATH_VERTICAL_VELOCITY_MIN)
+				else if (jeepItem->Animation.Velocity.y > JEEP_DEATH_VERTICAL_VELOCITY_MIN)
 					jeep->Flags |= JEEP_FLAG_FALLING;
 
 				break;
@@ -1087,7 +1087,7 @@ namespace TEN::Entities::Vehicles
 				if (rotation < -ANGLE(75.0f))
 				{
 					jeepItem->Pose.Position.y -= 41;
-					jeepItem->Animation.VerticalVelocity = -6 - (GetRandomControl() & 3);
+					jeepItem->Animation.Velocity.y = -6 - (GetRandomControl() & 3);
 					jeep->TurnRate = 0;
 					jeep->Velocity -= jeep->Velocity / 8;
 				}
@@ -1102,7 +1102,7 @@ namespace TEN::Entities::Vehicles
 				if (rotation > ANGLE(75.0f))
 				{
 					jeepItem->Pose.Position.y -= 41;
-					jeepItem->Animation.VerticalVelocity = -6 - (GetRandomControl() & 3);
+					jeepItem->Animation.Velocity.y = -6 - (GetRandomControl() & 3);
 					jeep->TurnRate = 0;
 					jeep->Velocity -= (jeep->Velocity / 8);
 				}
@@ -1122,9 +1122,9 @@ namespace TEN::Entities::Vehicles
 
 		short speed;
 		if (jeepItem->Pose.Position.y < height)
-			speed = jeepItem->Animation.Velocity;
+			speed = jeepItem->Animation.Velocity.z;
 		else
-			speed = jeepItem->Animation.Velocity * phd_cos(jeepItem->Pose.Orientation.x);
+			speed = jeepItem->Animation.Velocity.z * phd_cos(jeepItem->Pose.Orientation.x);
 
 		TranslateItem(jeepItem, jeep->MomentumAngle, speed);
 	

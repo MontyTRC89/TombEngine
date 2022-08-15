@@ -44,7 +44,7 @@ void FallingCeilingControl(short itemNumber)
 				item->Pose.Position.y = item->Floor;
 				item->Animation.IsAirborne = false;
 				item->Animation.TargetState = 2;
-				item->Animation.VerticalVelocity = 0;
+				item->Animation.Velocity.y = 0;
 			}
 		}
 	}

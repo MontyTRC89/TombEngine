@@ -210,8 +210,8 @@ namespace TEN::Entities::Vehicles
 
 		skidoo->LeftVerticalVelocity = DoVehicleDynamics(heightFrontLeft, skidoo->LeftVerticalVelocity, SKIDOO_BOUNCE, SKIDOO_KICK, &frontLeft.y);
 		skidoo->RightVerticalVelocity = DoVehicleDynamics(heightFrontRight, skidoo->RightVerticalVelocity, SKIDOO_BOUNCE, SKIDOO_KICK, &frontRight.y);
-		skidooItem->Animation.VerticalVelocity = DoVehicleDynamics(height, skidooItem->Animation.VerticalVelocity, SKIDOO_BOUNCE, SKIDOO_KICK, &skidooItem->Pose.Position.y);
-		skidooItem->Animation.Velocity = DoVehicleWaterMovement(skidooItem, laraItem, skidooItem->Animation.Velocity, SKIDOO_RADIUS, &skidoo->TurnRate);
+		skidooItem->Animation.Velocity.y = DoVehicleDynamics(height, skidooItem->Animation.Velocity.y, SKIDOO_BOUNCE, SKIDOO_KICK, &skidooItem->Pose.Position.y);
+		skidooItem->Animation.Velocity.z = DoVehicleWaterMovement(skidooItem, laraItem, skidooItem->Animation.Velocity.z, SKIDOO_RADIUS, &skidoo->TurnRate);
 
 		height = (frontLeft.y + frontRight.y) / 2;
 		short xRot = phd_atan(SKIDOO_FRONT, skidooItem->Pose.Position.y - height);
@@ -276,11 +276,11 @@ namespace TEN::Entities::Vehicles
 			skidooItem->Animation.FrameNumber = g_Level.Anims[skidooItem->Animation.AnimNumber].frameBase;
 		}
 
-		if (skidooItem->Animation.Velocity && skidooItem->Floor == skidooItem->Pose.Position.y)
+		if (skidooItem->Animation.Velocity.z && skidooItem->Floor == skidooItem->Pose.Position.y)
 		{
 			TriggerSkidooSnowEffect(skidooItem);
 
-			if (skidooItem->Animation.Velocity < 50)
+			if (skidooItem->Animation.Velocity.z < 50)
 				TriggerSkidooSnowEffect(skidooItem);
 		}
 
@@ -332,7 +332,7 @@ namespace TEN::Entities::Vehicles
 			skidooItem->Pose.Orientation.y += skidoo->TurnRate + skidoo->ExtraRotation;
 
 		// Translate vehicle according to momentum angle.
-		TranslateItem(skidooItem, skidoo->MomentumAngle, skidooItem->Animation.Velocity);
+		TranslateItem(skidooItem, skidoo->MomentumAngle, skidooItem->Animation.Velocity.z);
 
 		// Apply slip. TODO: Determine what "slip" is exactly.
 		int slip = SKIDOO_SLIP * phd_sin(skidooItem->Pose.Orientation.x);
@@ -387,7 +387,7 @@ namespace TEN::Entities::Vehicles
 		auto impactDirection = GetVehicleImpactDirection(skidooItem, moved);
 		if (impactDirection != VehicleImpactDirection::None)
 		{
-			skidooItem->Animation.Velocity = 0;
+			skidooItem->Animation.Velocity.z = 0;
 
 			/*int newVelocity = (skidooItem->Pose.Position.z - prevPos.z) * phd_cos(skidoo->MomentumAngle) + (skidooItem->Pose.Position.x - prevPos.x) * phd_sin(skidoo->MomentumAngle);
 			if (skidooItem->Animation.Velocity > (SKIDOO_NORMAL_VELOCITY_MAX + SKIDOO_VELOCITY_ACCEL) &&
@@ -416,9 +416,9 @@ namespace TEN::Entities::Vehicles
 
 		if (skidooItem->Pose.Position.y >= (height - SKIDOO_STEP_HEIGHT))
 		{
-			*pitch = skidooItem->Animation.Velocity + (height - skidooItem->Pose.Position.y);
+			*pitch = skidooItem->Animation.Velocity.z + (height - skidooItem->Pose.Position.y);
 
-			if (TrInput & IN_LOOK && skidooItem->Animation.Velocity == 0)
+			if (TrInput & IN_LOOK && skidooItem->Animation.Velocity.z == 0)
 				LookUpDown(laraItem);
 
 			if (TrInput & (VEHICLE_IN_LEFT | VEHICLE_IN_RIGHT))
@@ -426,14 +426,14 @@ namespace TEN::Entities::Vehicles
 
 			if (TrInput & VEHICLE_IN_REVERSE)
 			{
-				if (skidooItem->Animation.Velocity > 0)
-					skidooItem->Animation.Velocity -= SKIDOO_VELOCITY_BRAKE_DECEL;
+				if (skidooItem->Animation.Velocity.z > 0)
+					skidooItem->Animation.Velocity.z -= SKIDOO_VELOCITY_BRAKE_DECEL;
 				else
 				{
 					drive = true;
 
-					if (skidooItem->Animation.Velocity > -SKIDOO_REVERSE_VELOCITY_MAX)
-						skidooItem->Animation.Velocity -= SKIDOO_REVERSE_VELOCITY_ACCEL;
+					if (skidooItem->Animation.Velocity.z > -SKIDOO_REVERSE_VELOCITY_MAX)
+						skidooItem->Animation.Velocity.z -= SKIDOO_REVERSE_VELOCITY_ACCEL;
 				}
 			}
 			else if (TrInput & VEHICLE_IN_ACCELERATE)
@@ -448,27 +448,27 @@ namespace TEN::Entities::Vehicles
 				else
 					maxVelocity = SKIDOO_NORMAL_VELOCITY_MAX;
 
-				if (skidooItem->Animation.Velocity < maxVelocity)
-					skidooItem->Animation.Velocity += (SKIDOO_VELOCITY_ACCEL / 2) + (SKIDOO_VELOCITY_ACCEL * (skidooItem->Animation.Velocity / (2 * maxVelocity)));
-				else if (skidooItem->Animation.Velocity > (maxVelocity + SKIDOO_VELOCITY_DECEL))
-					skidooItem->Animation.Velocity -= SKIDOO_VELOCITY_DECEL;
+				if (skidooItem->Animation.Velocity.z < maxVelocity)
+					skidooItem->Animation.Velocity.z += (SKIDOO_VELOCITY_ACCEL / 2) + (SKIDOO_VELOCITY_ACCEL * (skidooItem->Animation.Velocity.z / (2 * maxVelocity)));
+				else if (skidooItem->Animation.Velocity.z > (maxVelocity + SKIDOO_VELOCITY_DECEL))
+					skidooItem->Animation.Velocity.z -= SKIDOO_VELOCITY_DECEL;
 			}
 			else if (TrInput & (VEHICLE_IN_LEFT | VEHICLE_IN_RIGHT) &&
-				skidooItem->Animation.Velocity >= 0 &&
-				skidooItem->Animation.Velocity < SKIDOO_TURN_VELOCITY_MAX)
+				skidooItem->Animation.Velocity.z >= 0 &&
+				skidooItem->Animation.Velocity.z < SKIDOO_TURN_VELOCITY_MAX)
 			{
 				drive = true;
-				skidooItem->Animation.Velocity = SKIDOO_TURN_VELOCITY_MAX;
+				skidooItem->Animation.Velocity.z = SKIDOO_TURN_VELOCITY_MAX;
 			}
-			else if (skidooItem->Animation.Velocity > SKIDOO_VELOCITY_DECEL)
+			else if (skidooItem->Animation.Velocity.z > SKIDOO_VELOCITY_DECEL)
 			{
-				skidooItem->Animation.Velocity -= SKIDOO_VELOCITY_DECEL;
+				skidooItem->Animation.Velocity.z -= SKIDOO_VELOCITY_DECEL;
 
-				if ((GetRandomControl() & 0x7f) < skidooItem->Animation.Velocity)
+				if ((GetRandomControl() & 0x7f) < skidooItem->Animation.Velocity.z)
 					drive = true;
 			}
 			else
-				skidooItem->Animation.Velocity = 0;
+				skidooItem->Animation.Velocity.z = 0;
 		}
 		else if (TrInput & (VEHICLE_IN_ACCELERATE | VEHICLE_IN_REVERSE))
 		{
@@ -485,7 +485,7 @@ namespace TEN::Entities::Vehicles
 
 		if (!isDead &&
 			laraItem->Animation.ActiveState != SKIDOO_STATE_FALL &&
-			skidooItem->Animation.VerticalVelocity > 0 &&
+			skidooItem->Animation.Velocity.y > 0 &&
 			skidooItem->Pose.Position.y != skidooItem->Floor)
 		{
 			laraItem->Animation.AnimNumber = Objects[ID_SNOWMOBILE_LARA_ANIMS].animIndex + SKIDOO_ANIM_LEAP_START;
@@ -495,7 +495,7 @@ namespace TEN::Entities::Vehicles
 		}
 		else if (!isDead && impactDirection != VehicleImpactDirection::None &&
 			laraItem->Animation.ActiveState != SKIDOO_STATE_FALL &&
-			abs(skidooItem->Animation.Velocity) >= SKIDOO_REVERSE_VELOCITY_MAX)
+			abs(skidooItem->Animation.Velocity.z) >= SKIDOO_REVERSE_VELOCITY_MAX)
 		{
 			DoSkidooImpact(skidooItem, laraItem, impactDirection);
 		}
@@ -519,25 +519,25 @@ namespace TEN::Entities::Vehicles
 						TestSkidooDismount(skidooItem, SKIDOO_STATE_DISMOUNT_RIGHT))
 					{
 						laraItem->Animation.TargetState = SKIDOO_STATE_DISMOUNT_RIGHT;
-						skidooItem->Animation.Velocity = 0;
+						skidooItem->Animation.Velocity.z = 0;
 					}
 					else if (TrInput & VEHICLE_IN_LEFT &&
 						TestSkidooDismount(skidooItem, SKIDOO_STATE_DISMOUNT_LEFT))
 					{
 						laraItem->Animation.TargetState = SKIDOO_STATE_DISMOUNT_LEFT;
-						skidooItem->Animation.Velocity = 0;
+						skidooItem->Animation.Velocity.z = 0;
 					}
 				}
 				else if (TrInput & VEHICLE_IN_LEFT)
 				{
-					if (skidooItem->Animation.Velocity >= 0)
+					if (skidooItem->Animation.Velocity.z >= 0)
 						laraItem->Animation.TargetState = SKIDOO_STATE_LEFT;
 					else
 						laraItem->Animation.TargetState = SKIDOO_STATE_RIGHT;
 				}
 				else if (TrInput & VEHICLE_IN_RIGHT)
 				{
-					if (skidooItem->Animation.Velocity >= 0)
+					if (skidooItem->Animation.Velocity.z >= 0)
 						laraItem->Animation.TargetState = SKIDOO_STATE_RIGHT;
 					else
 						laraItem->Animation.TargetState = SKIDOO_STATE_LEFT;
@@ -548,21 +548,21 @@ namespace TEN::Entities::Vehicles
 				break;
 
 			case SKIDOO_STATE_DRIVE:
-				if (!skidooItem->Animation.Velocity)
+				if (!skidooItem->Animation.Velocity.z)
 					laraItem->Animation.TargetState = SKIDOO_STATE_IDLE;
 
 				if (isDead)
 					laraItem->Animation.TargetState = SKIDOO_STATE_DRIVE_DEATH;
 				else if (TrInput & VEHICLE_IN_LEFT)
 				{
-					if (skidooItem->Animation.Velocity >= 0)
+					if (skidooItem->Animation.Velocity.z >= 0)
 						laraItem->Animation.TargetState = SKIDOO_STATE_LEFT;
 					else
 						laraItem->Animation.TargetState = SKIDOO_STATE_RIGHT;
 				}
 				else if (TrInput & VEHICLE_IN_RIGHT)
 				{
-					if (skidooItem->Animation.Velocity >= 0)
+					if (skidooItem->Animation.Velocity.z >= 0)
 						laraItem->Animation.TargetState = SKIDOO_STATE_RIGHT;
 					else
 						laraItem->Animation.TargetState = SKIDOO_STATE_LEFT;
@@ -571,7 +571,7 @@ namespace TEN::Entities::Vehicles
 				break;
 
 			case SKIDOO_STATE_LEFT:
-				if (skidooItem->Animation.Velocity >= 0)
+				if (skidooItem->Animation.Velocity.z >= 0)
 				{
 					if (!(TrInput & VEHICLE_IN_LEFT))
 						laraItem->Animation.TargetState = SKIDOO_STATE_DRIVE;
@@ -585,7 +585,7 @@ namespace TEN::Entities::Vehicles
 				break;
 
 			case SKIDOO_STATE_RIGHT:
-				if (skidooItem->Animation.Velocity >= 0)
+				if (skidooItem->Animation.Velocity.z >= 0)
 				{
 					if (!(TrInput & VEHICLE_IN_RIGHT))
 						laraItem->Animation.TargetState = SKIDOO_STATE_DRIVE;
@@ -599,14 +599,14 @@ namespace TEN::Entities::Vehicles
 				break;
 
 			case SKIDOO_STATE_FALL:
-				if (skidooItem->Animation.VerticalVelocity <= 0 ||
+				if (skidooItem->Animation.Velocity.y <= 0 ||
 					skidoo->LeftVerticalVelocity <= 0 ||
 					skidoo->RightVerticalVelocity <= 0)
 				{
 					laraItem->Animation.TargetState = SKIDOO_STATE_DRIVE;
 					SoundEffect(SFX_TR2_VEHICLE_IMPACT3, &skidooItem->Pose);
 				}
-				else if (skidooItem->Animation.VerticalVelocity > (SKIDOO_DAMAGE_START + SKIDOO_DAMAGE_LENGTH))
+				else if (skidooItem->Animation.Velocity.y > (SKIDOO_DAMAGE_START + SKIDOO_DAMAGE_LENGTH))
 					laraItem->Animation.TargetState = SKIDOO_STATE_DISMOUNT_FALL;
 
 				break;
@@ -716,8 +716,8 @@ namespace TEN::Entities::Vehicles
 				if (skidooItem->Pose.Position.y == skidooItem->Floor)
 				{
 					laraItem->Animation.TargetState = LS_DEATH;
-					laraItem->Animation.Velocity = 0;
-					laraItem->Animation.VerticalVelocity = SKIDOO_DAMAGE_START + SKIDOO_DAMAGE_LENGTH;
+					laraItem->Animation.Velocity.z = 0;
+					laraItem->Animation.Velocity.y = SKIDOO_DAMAGE_START + SKIDOO_DAMAGE_LENGTH;
 					ExplodeVehicle(laraItem, skidooItem);
 				}
 				else
@@ -725,7 +725,7 @@ namespace TEN::Entities::Vehicles
 					laraItem->Animation.TargetState = LS_FREEFALL;
 					laraItem->Pose.Position.y -= 200;
 					laraItem->Animation.Velocity = skidooItem->Animation.Velocity;
-					laraItem->Animation.VerticalVelocity = skidooItem->Animation.VerticalVelocity;
+					laraItem->Animation.Velocity.y = skidooItem->Animation.Velocity.y;
 					SoundEffect(SFX_TR4_LARA_FALL, &laraItem->Pose);
 				}
 

@@ -113,7 +113,7 @@ namespace TEN::Entities::TR3
 				if (AI.distance > pow(COBRA_SLEEP_RANGE, 2))
 					item->Animation.TargetState = COBRA_STATE_SLEEP;
 				else if (LaraItem->HitPoints > 0 &&
-					((AI.ahead && AI.distance < pow(COBRA_ATTACK_RANGE, 2)) || item->HitStatus || LaraItem->Animation.Velocity > PLAYER_DISTURB_VELOCITY))
+					((AI.ahead && AI.distance < pow(COBRA_ATTACK_RANGE, 2)) || item->HitStatus || LaraItem->Animation.Velocity.z > PLAYER_DISTURB_VELOCITY))
 				{
 					item->Animation.TargetState = COBRA_STATE_ATTACK;
 				}

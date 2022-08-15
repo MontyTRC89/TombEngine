@@ -1,8 +1,7 @@
 #include "framework.h"
 #include "Specific/trmath.h"
-
-#include <cmath>
 #include "Specific/prng.h"
+#include <cmath>
 
 using namespace TEN::Math::Random;
 
@@ -325,9 +324,9 @@ const Vector3 Screen(Vector3& ambient, Vector3& tint)
 	return Vector3(R, G, B);
 }
 
-Vector3 TranslateVector(Vector3& vector, short angle, float forward, float up, float right)
+Vector3 TranslateVector(Vector3& vector, short angle, float forward, float down, float right)
 {
-	if (forward == 0.0f && up == 0.0f && right == 0.0f)
+	if (forward == 0.0f && down == 0.0f && right == 0.0f)
 		return vector;
 
 	float sinAngle = phd_sin(angle);
@@ -335,14 +334,14 @@ Vector3 TranslateVector(Vector3& vector, short angle, float forward, float up, f
 
 	return Vector3(
 		vector.x + (forward * sinAngle) + (right * cosAngle),
-		vector.y + up,
+		vector.y + down,
 		vector.z + (forward * cosAngle) - (right * sinAngle)
 	);
 }
 
-Vector3Int TranslateVector(Vector3Int& vector, short angle, float forward, float up, float right)
+Vector3Int TranslateVector(Vector3Int& vector, short angle, float forward, float down, float right)
 {
-	auto newVector = TranslateVector(vector.ToVector3(), angle, forward, up, right);
+	auto newVector = TranslateVector(vector.ToVector3(), angle, forward, down, right);
 	return Vector3Int(
 		(int)round(newVector.x),
 		(int)round(newVector.y),
@@ -377,23 +376,16 @@ Vector3Int TranslateVector(Vector3Int& vector, Vector3Shrt& orient, float distan
 	);
 }
 
-Vector3 TranslateVector(Vector3& vector, Vector3& target, float distance)
+Vector3 TranslateVector(Vector3& vector, Vector3& direction, float distance)
 {
-	if (distance == 0.0f)
-		return vector;
-
-	float distanceBetween = Vector3::Distance(vector, target);
-	if (distance > distanceBetween)
-		return target;
-
-	auto direction = target - vector;
 	direction.Normalize();
-	return (vector + (direction * distance));
+	vector += direction * distance;
+	return vector;
 }
 
-Vector3Int TranslateVector(Vector3Int& vector, Vector3Int& target, float distance)
+Vector3Int TranslateVector(Vector3Int& vector, Vector3& direction, float distance)
 {
-	auto newVector = TranslateVector(vector.ToVector3(), target.ToVector3(), distance);
+	auto newVector = TranslateVector(vector.ToVector3(), direction, distance);
 	return Vector3Int(
 		(int)round(newVector.x),
 		(int)round(newVector.y),
