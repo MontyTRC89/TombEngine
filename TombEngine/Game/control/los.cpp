@@ -315,7 +315,7 @@ int ObjectOnLOS2(GameVector* start, GameVector* end, Vector3Int* vec, MESH_INFO*
 				pos.Position.z = meshp->pos.Position.z;
 				pos.Orientation.y = meshp->pos.Orientation.y;
 
-				if (DoRayBox(start, end, &(StaticObjects[meshp->staticNumber].collisionBox * meshp->scale), &pos, vec, -1 - meshp->staticNumber))
+				if (DoRayBox(start, end, GetBoundsAccurate(meshp, false), &pos, vec, -1 - meshp->staticNumber))
 				{
 					*mesh = meshp;
 					end->roomNumber = LosRooms[r];

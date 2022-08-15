@@ -148,4 +148,5 @@ int IsRoomOutside(int x, int y, int z);
 std::set<int> GetRoomList(int roomNumber);
 void InitializeNeighborRoomList();
 
+BOUNDING_BOX* GetBoundsAccurate(const MESH_INFO* mesh, bool visibility);
 FloorInfo* GetSector(ROOM_INFO* room, int x, int z);
