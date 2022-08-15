@@ -2,6 +2,8 @@ Version 1.0.1
 =============
 
 - Added antialiasing support.
+- Added static mesh scaling support.
+- Added free rotation for teeth spikes instead of using OCB codes.
 - Fix some issues with shimmying between diagonal ledges and walls.
 - Fix rope transparency.
 - Fix objects disappearing under certain angles at the edges of the screen.
