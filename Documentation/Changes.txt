@@ -12,6 +12,7 @@ Version 1.0.1
 - Fix static meshes having wrong colors on savegame reload.
 - Fix rollingball incorrectly killing Lara in water and in jump.
 - Fix resurfacing on underwater death.
+- Fix water to ladder animation not activating in all cases.
 - Fix ripples not appearing on water connections higher than room bottom.
 - Fix several problems with ropes (stumbling, rope length, etc).
 - Fix several problems with teeth spikes.
