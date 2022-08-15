@@ -120,6 +120,10 @@ namespace Misc
 		PlaySoundTrack(trackName, SoundTrackType::BGM);
 	}
 
+		/// Play sound effect
+		//@function PlaySound
+		//@tparam int sound ID to play. Corresponds to the value in the sound XML file or Tomb Editor's "Sound Infos" window.
+		////@tparam[opt] Vec3 position The 3D position of the sound, i.e. where the sound "comes from". If not given, the sound will not be positional.
 	static void PlaySoundEffect(int id, sol::optional<Vec3> p)
 	{
 		SoundEffect(id, p.has_value() ? &PHD_3DPOS(p.value().x, p.value().y, p.value().z) : nullptr, SoundEnvironment::Always);
@@ -222,10 +226,6 @@ namespace Misc
 
 		table_misc.set_function(ScriptReserved_PlayAudioTrack, &PlayAudioTrack);
 
-		/// Play sound effect
-		//@function PlaySound
-		//@tparam int sound ID to play
-		//@tparam Vec3 position
 		table_misc.set_function(ScriptReserved_PlaySound, &PlaySoundEffect);
 
 		/// Check if particular action key is held

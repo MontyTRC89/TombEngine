@@ -124,6 +124,10 @@
 	<td class="summary">Set and play an ambient track</td>
 	</tr>
 	<tr>
+	<td class="name" ><a href="#PlaySound">PlaySound(sound[, position])</a></td>
+	<td class="summary">Play sound effect</td>
+	</tr>
+	<tr>
 	<td class="name" ><a href="#CalculateDistance">CalculateDistance(posA, posB)</a></td>
 	<td class="summary">Calculate the distance between two positions.</td>
 	</tr>
@@ -142,10 +146,6 @@
 	<tr>
 	<td class="name" ><a href="#Vibrate">Vibrate(strength, time)</a></td>
 	<td class="summary">Vibrate gamepad, if possible.</td>
-	</tr>
-	<tr>
-	<td class="name" ><a href="#PlaySound">PlaySound(sound, position)</a></td>
-	<td class="summary">Play sound effect</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#KeyIsHeld">KeyIsHeld(action)</a></td>
@@ -357,6 +357,32 @@ eyes of the creatures would be.
 
 </dd>
     <dt>
+    <a name = "PlaySound"></a>
+    <strong>PlaySound(sound[, position])</strong>
+    </dt>
+    <dd>
+    Play sound effect
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">sound</span>
+            <span class="types"><span class="type">int</span></span>
+         ID to play. Corresponds to the value in the sound XML file or Tomb Editor's "Sound Infos" window.
+        </li>
+        <li><span class="parameter">position</span>
+            <span class="types"><span class="type">Vec3</span></span>
+         The 3D position of the sound, i.e. where the sound "comes from". If not given, the sound will not be positional.
+         (<em>optional</em>)
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
     <a name = "CalculateDistance"></a>
     <strong>CalculateDistance(posA, posB)</strong>
     </dt>
@@ -507,33 +533,6 @@ To be used with <a href="../2 classes/Strings.DisplayString.html#DisplayString:G
         <li><span class="parameter">time</span>
             <span class="types"><span class="type">float</span></span>
          (in seconds, default: 0.3)
-        </li>
-    </ul>
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "PlaySound"></a>
-    <strong>PlaySound(sound, position)</strong>
-    </dt>
-    <dd>
-    Play sound effect
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">sound</span>
-            <span class="types"><span class="type">int</span></span>
-         ID to play
-        </li>
-        <li><span class="parameter">position</span>
-            <span class="types"><span class="type">Vec3</span></span>
-
-
-
         </li>
     </ul>
 
