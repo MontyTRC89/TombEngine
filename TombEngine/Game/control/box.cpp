@@ -2082,14 +2082,13 @@ void InitialiseItemBoxData()
 			if (!(g_Level.Boxes[floor->Box].flags & BLOCKED))
 			{
 				int floorHeight = floor->FloorHeight(mesh.pos.Position.x, mesh.pos.Position.z);
-				auto* staticInfo = &StaticObjects[mesh.staticNumber];
+				auto bbox = GetBoundsAccurate(&mesh, false);
 
-				if (floorHeight <= mesh.pos.Position.y - staticInfo->collisionBox.Y2 + CLICK(2) &&
-					floorHeight < mesh.pos.Position.y - staticInfo->collisionBox.Y1)
+				if (floorHeight <= mesh.pos.Position.y - bbox->Y2 + CLICK(2) &&
+					floorHeight < mesh.pos.Position.y - bbox->Y1)
 				{
-					auto bbox = staticInfo->collisionBox * mesh.scale;
-					if (bbox.X1 == 0 || bbox.X2 == 0 || bbox.Z1 == 0 || bbox.Z2 == 0 ||
-					   ((bbox.X1 < 0) ^ (bbox.X2 < 0)) && ((bbox.Z1 < 0) ^ (bbox.Z2 < 0)))
+					if (bbox->X1 == 0 || bbox->X2 == 0 || bbox->Z1 == 0 || bbox->Z2 == 0 ||
+					   ((bbox->X1 < 0) ^ (bbox->X2 < 0)) && ((bbox->Z1 < 0) ^ (bbox->Z2 < 0)))
 					{
 						floor->Stopper = true;
 					}

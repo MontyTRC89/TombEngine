@@ -811,30 +811,23 @@ BOUNDING_BOX* FindPlinth(ItemInfo* item)
 {
 	auto* room = &g_Level.Rooms[item->RoomNumber];
 	
-	int found = -1;
 	for (int i = 0; i < room->mesh.size(); i++)
 	{
 		auto* mesh = &room->mesh[i];
 
-		if (mesh->flags & StaticMeshFlags::SM_VISIBLE)
-		{
-			if (item->Pose.Position.x == mesh->pos.Position.x && item->Pose.Position.z == mesh->pos.Position.z)
-			{
-				auto* frame = (BOUNDING_BOX*)GetBestFrame(item);
-				auto* staticInfo = &StaticObjects[mesh->staticNumber];
+		if (!(mesh->flags & StaticMeshFlags::SM_VISIBLE))
+			continue;
 
-				if (frame->X1 <= staticInfo->collisionBox.X2 &&
-					frame->X2 >= staticInfo->collisionBox.X1 &&
-					frame->Z1 <= staticInfo->collisionBox.Z2 &&
-					frame->Z2 >= staticInfo->collisionBox.Z1 &&
-					(staticInfo->collisionBox.X1 || staticInfo->collisionBox.X2))
-				{
-					static BOUNDING_BOX result;
-					result = StaticObjects[found].collisionBox * mesh->scale;
-					return &result;
-				}
-			}
-		}
+		if (item->Pose.Position.x != mesh->pos.Position.x || item->Pose.Position.z != mesh->pos.Position.z)
+			continue;
+
+		auto* frame = (BOUNDING_BOX*)GetBestFrame(item);
+		auto* bbox = GetBoundsAccurate(mesh, false);
+
+		if (frame->X1 <= bbox->X2 && frame->X2 >= bbox->X1 &&
+			frame->Z1 <= bbox->Z2 && frame->Z2 >= bbox->Z1 &&
+			(bbox->X1 || bbox->X2))
+			return bbox;
 	}
 
 	if (room->itemNumber == NO_ITEM)
