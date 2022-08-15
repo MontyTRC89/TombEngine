@@ -112,15 +112,15 @@ bool GetCollidedObjects(ItemInfo* collidingItem, int radius, bool onlyVisible, I
 			for (int j = 0; j < room->mesh.size(); j++)
 			{
 				auto* mesh = &room->mesh[j];
-				auto* staticMesh = &StaticObjects[mesh->staticNumber];
+				auto* bbox = GetBoundsAccurate(mesh, false);
 
 				if (!(mesh->flags & StaticMeshFlags::SM_VISIBLE))
 					continue;
 
-				if (collidingItem->Pose.Position.y + radius + CLICK(0.5f) < mesh->pos.Position.y + staticMesh->collisionBox.Y1)
+				if (collidingItem->Pose.Position.y + radius + CLICK(0.5f) < mesh->pos.Position.y + bbox->Y1)
 					continue;
 
-				if (collidingItem->Pose.Position.y > mesh->pos.Position.y + staticMesh->collisionBox.Y2)
+				if (collidingItem->Pose.Position.y > mesh->pos.Position.y + bbox->Y2)
 					continue;
 
 				float s = phd_sin(mesh->pos.Orientation.y);
@@ -128,10 +128,10 @@ bool GetCollidedObjects(ItemInfo* collidingItem, int radius, bool onlyVisible, I
 				float rx = (collidingItem->Pose.Position.x - mesh->pos.Position.x) * c - s * (collidingItem->Pose.Position.z - mesh->pos.Position.z);
 				float rz = (collidingItem->Pose.Position.z - mesh->pos.Position.z) * c + s * (collidingItem->Pose.Position.x - mesh->pos.Position.x);
 
-				if (radius + rx + CLICK(0.5f) < staticMesh->collisionBox.X1 || rx - radius - CLICK(0.5f) > staticMesh->collisionBox.X2)
+				if (radius + rx + CLICK(0.5f) < bbox->X1 || rx - radius - CLICK(0.5f) > bbox->X2)
 					continue;
 
-				if (radius + rz + CLICK(0.5f) < staticMesh->collisionBox.Z1 || rz - radius - CLICK(0.5f) > staticMesh->collisionBox.Z2)
+				if (radius + rz + CLICK(0.5f) < bbox->Z1 || rz - radius - CLICK(0.5f) > bbox->Z2)
 					continue;
 
 				collidedMeshes[numMeshes++] = mesh;
@@ -345,7 +345,7 @@ void TestForObjectOnLedge(ItemInfo* item, CollisionInfo* coll)
 
 				if (phd_Distance(&item->Pose, &mesh->pos) < COLLISION_CHECK_DISTANCE)
 				{
-					auto box = TO_DX_BBOX(mesh->pos, &StaticObjects[mesh->staticNumber].collisionBox);
+					auto box = TO_DX_BBOX(mesh->pos, GetBoundsAccurate(mesh, false));
 					float dist;
 
 					if (box.Intersects(origin, direction, dist) && dist < coll->Setup.Radius * 2)
@@ -640,16 +640,16 @@ bool TestBoundsCollide(ItemInfo* item, ItemInfo* laraItem, int radius)
 
 bool TestBoundsCollideStatic(ItemInfo* item, MESH_INFO* mesh, int radius)
 {
-	auto bounds = StaticObjects[mesh->staticNumber].collisionBox;
+	auto bounds = GetBoundsAccurate(mesh, false);
 
-	if (!(bounds.Z2 != 0 || bounds.Z1 != 0 || bounds.X1 != 0 || bounds.X2 != 0 || bounds.Y1 != 0 || bounds.Y2 != 0))
+	if (!(bounds->Z2 != 0 || bounds->Z1 != 0 || bounds->X1 != 0 || bounds->X2 != 0 || bounds->Y1 != 0 || bounds->Y2 != 0))
 		return false;
 
 	auto* frame = GetBestFrame(item);
-	if (mesh->pos.Position.y + bounds.Y2 <= item->Pose.Position.y + frame->boundingBox.Y1)
+	if (mesh->pos.Position.y + bounds->Y2 <= item->Pose.Position.y + frame->boundingBox.Y1)
 		return false;
 
-	if (mesh->pos.Position.y + bounds.Y1 >= item->Pose.Position.y + frame->boundingBox.Y2)
+	if (mesh->pos.Position.y + bounds->Y1 >= item->Pose.Position.y + frame->boundingBox.Y2)
 		return false;
 
 	float sinY = phd_sin(mesh->pos.Orientation.y);
@@ -660,10 +660,10 @@ bool TestBoundsCollideStatic(ItemInfo* item, MESH_INFO* mesh, int radius)
 	int dx = cosY * x - sinY * z;
 	int dz = cosY * z + sinY * x;
 
-	if (dx <= radius + bounds.X2 &&
-		dx >= bounds.X1 - radius &&
-		dz <= radius + bounds.Z2 &&
-		dz >= bounds.Z1 - radius)
+	if (dx <= radius + bounds->X2 &&
+		dx >= bounds->X1 - radius &&
+		dz <= radius + bounds->Z2 &&
+		dz >= bounds->Z1 - radius)
 	{
 		return true;
 	}
@@ -784,7 +784,7 @@ bool ItemPushItem(ItemInfo* item, ItemInfo* item2, CollisionInfo* coll, bool spa
 
 bool ItemPushStatic(ItemInfo* item, MESH_INFO* mesh, CollisionInfo* coll) // previously ItemPushLaraStatic
 {
-	auto bounds = StaticObjects[mesh->staticNumber].collisionBox;
+	auto bounds = GetBoundsAccurate(mesh, false);
 
 	float sinY = phd_sin(mesh->pos.Orientation.y);
 	float cosY = phd_cos(mesh->pos.Orientation.y);
@@ -793,10 +793,10 @@ bool ItemPushStatic(ItemInfo* item, MESH_INFO* mesh, CollisionInfo* coll) // pre
 	auto dz = item->Pose.Position.z - mesh->pos.Position.z;
 	auto rx = cosY * dx - sinY * dz;
 	auto rz = cosY * dz + sinY * dx;
-	auto minX = bounds.X1 - coll->Setup.Radius;
-	auto maxX = bounds.X2 + coll->Setup.Radius;
-	auto minZ = bounds.Z1 - coll->Setup.Radius;
-	auto maxZ = bounds.Z2 + coll->Setup.Radius;
+	auto minX = bounds->X1 - coll->Setup.Radius;
+	auto maxX = bounds->X2 + coll->Setup.Radius;
+	auto minZ = bounds->Z1 - coll->Setup.Radius;
+	auto maxZ = bounds->Z2 + coll->Setup.Radius;
 
 	if (abs(dx) > SECTOR(4.5f) || abs(dz) > SECTOR(4.5f) ||
 		rx <= minX || rx >= maxX ||
@@ -870,7 +870,7 @@ void CollideSolidStatics(ItemInfo* item, CollisionInfo* coll)
 				if (phd_Distance(&item->Pose, &mesh->pos) < COLLISION_CHECK_DISTANCE)
 				{
 					auto staticInfo = &StaticObjects[mesh->staticNumber];
-					if (CollideSolidBounds(item, staticInfo->collisionBox * mesh->scale, mesh->pos, coll))
+					if (CollideSolidBounds(item, GetBoundsAccurate(mesh, false), mesh->pos, coll))
 						coll->HitStatic = true;
 				}
 			}
@@ -878,12 +878,12 @@ void CollideSolidStatics(ItemInfo* item, CollisionInfo* coll)
 	}
 }
 
-bool CollideSolidBounds(ItemInfo* item, BOUNDING_BOX box, PHD_3DPOS pos, CollisionInfo* coll)
+bool CollideSolidBounds(ItemInfo* item, BOUNDING_BOX* box, PHD_3DPOS pos, CollisionInfo* coll)
 {
 	bool result = false;
 
 	// Get DX static bounds in global coords
-	auto staticBounds = TO_DX_BBOX(pos, &box);
+	auto staticBounds = TO_DX_BBOX(pos, box);
 
 	// Get local TR bounds and DX item bounds in global coords
 	auto itemBBox = GetBoundsAccurate(item);
@@ -1031,12 +1031,12 @@ bool CollideSolidBounds(ItemInfo* item, BOUNDING_BOX box, PHD_3DPOS pos, Collisi
 	auto z = round(distance.x * s + distance.z * c) + pos.Position.z;
 
 	// Determine identity static collision bounds
-	auto XMin = pos.Position.x + box.X1;
-	auto XMax = pos.Position.x + box.X2;
-	auto YMin = pos.Position.y + box.Y1;
-	auto YMax = pos.Position.y + box.Y2;
-	auto ZMin = pos.Position.z + box.Z1;
-	auto ZMax = pos.Position.z + box.Z2;
+	auto XMin = pos.Position.x + box->X1;
+	auto XMax = pos.Position.x + box->X2;
+	auto YMin = pos.Position.y + box->Y1;
+	auto YMax = pos.Position.y + box->Y2;
+	auto ZMin = pos.Position.z + box->Z1;
+	auto ZMax = pos.Position.z + box->Z2;
 
 	// Determine item collision bounds
 	auto inXMin = x + collBox.X1;

@@ -424,8 +424,7 @@ namespace TEN::Renderer
 			if (obj.ObjectMeshes.size() == 0)
 				continue;
 
-			auto stat = &StaticObjects[mesh->staticNumber];
-			auto bounds = TO_DX_BBOX(mesh->pos, &stat->visibilityBox);
+			auto bounds = TO_DX_BBOX(mesh->pos, GetBoundsAccurate(mesh, true));
 			auto length = Vector3(bounds.Extents).Length();
 			if (!renderView.camera.frustum.SphereInFrustum(bounds.Center, length))
 				continue;
