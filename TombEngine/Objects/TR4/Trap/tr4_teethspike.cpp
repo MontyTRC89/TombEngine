@@ -65,8 +65,11 @@ namespace TEN::Entities::TR4
 
 			if (LaraItem->Animation.ActiveState != LS_DEATH && TestBoundsCollideTeethSpikes(item, LaraItem))
 			{
-				Vector3 normal = Vector3::UnitY;
-				normal = normal.Transform(normal, Matrix::CreateFromYawPitchRoll(TO_RAD(item->Pose.Orientation.y), TO_RAD(item->Pose.Orientation.x), TO_RAD(item->Pose.Orientation.z)));
+				// Calculate teeth spikes angle to the horizon. If angle is upwards, impale Lara.
+				auto normal = Vector3::Transform(Vector3::UnitY, Matrix::CreateFromYawPitchRoll(
+					TO_RAD(item->Pose.Orientation.y), 
+					TO_RAD(item->Pose.Orientation.x), 
+					TO_RAD(item->Pose.Orientation.z)));
 				auto dot = Vector3::UnitX.Dot(normal);
 				auto angle = acos(dot / sqrt(normal.LengthSquared() * Vector3::UnitX.LengthSquared()));
 
@@ -75,6 +78,7 @@ namespace TEN::Entities::TR4
 
 				int bloodCount = 0;
 
+				// Spikes are upwards and Lara is flying or spikes just emerged - impale her.
 				if ((item->ItemFlags[0] > 1024 || LaraItem->Animation.IsAirborne) &&
 					(angle > PI * 0.25f && angle < PI * 0.75f))
 				{
@@ -84,26 +88,30 @@ namespace TEN::Entities::TR4
 						bloodCount = 20;
 					}
 				}
+				// Spikes are extending or sticking out constantly (in latter case, only harm her if she runs).
 				else if ((item->TriggerFlags != 1) || LaraItem->Animation.Velocity.z >= 30)
 				{
 					int harm = item->ItemFlags[0] == 1024 ? TEETH_SPIKE_HARM_EMERGING : TEETH_SPIKE_HARM_CONSTANT;
 					DoDamage(LaraItem, harm);
 					bloodCount = (GetRandomControl() & 3) + 2;
 				}
+				// Do nothing, spikes are retracting.
 				else
 					bloodCount = 0;
 
+				int y1, y2;
 				int yTop = laraBounds->Y1 + LaraItem->Pose.Position.y;
 				int yBottom = laraBounds->Y2 + LaraItem->Pose.Position.y;
-				int y1, y2;
-
+				
 				if (angle < PI * 0.125f || angle > PI * 0.825f)
 				{
+					// Spikes are downwards, move blood origin to the top.
 					y1 = -bounds->Y2;
 					y2 = -bounds->Y1;
 				}
 				else
 				{
+					// Spikes are upwards, leave origin as is.
 					y1 = bounds->Y1;
 					y2 = bounds->Y2;
 				}
@@ -115,6 +123,7 @@ namespace TEN::Entities::TR4
 
 				int dy = (abs(yTop - yBottom)) + 1;
 
+				// Increase blood if spikes are kicking from aside.
 				if ((angle > PI * 0.125f && angle < PI * 0.375f) ||
 					(angle > PI * 0.625f && angle < PI * 0.750f))
 				{
