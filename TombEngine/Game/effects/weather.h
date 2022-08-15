@@ -30,10 +30,9 @@ namespace TEN::Effects::Environment
 				EnvironmentController();
 
 				Vector3 Wind() { return Vector3(WindX / 2.0f, 0, WindZ / 2.0f); }
-				Vector3 FlashColor() { return FlashColorBase * sin(FlashProgress * (PI / 2)); }
-				Vector4 SkyColor() { return SkyCurrentColor; }
-				short   SkyLayer1Position() { return SkyPosition1; }
-				short   SkyLayer2Position() { return SkyPosition2; }
+				Vector3 FlashColor() { return FlashColorBase * sin(FlashProgress * PI / 2.0f); }
+				Vector4 SkyColor(int index) { return SkyCurrentColor[std::clamp(index, 0, 1)]; }
+				short   SkyPosition(int index) { return SkyCurrentPosition[std::clamp(index, 0, 1)]; }
 
 				void Flash(int r, int g, int b, float speed);
 				void Update();
@@ -46,9 +45,8 @@ namespace TEN::Effects::Environment
 				std::vector<WeatherParticle> Particles;
 
 				// Sky
-				Vector4 SkyCurrentColor = Vector4::Zero;
-				short   SkyPosition1 = 0;
-				short   SkyPosition2 = 0;
+				Vector4 SkyCurrentColor[2] = {};
+				short   SkyCurrentPosition[2] = {};
 
 				// Wind
 				int WindX = 0;

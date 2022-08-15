@@ -1526,8 +1526,8 @@ void CalculateCamera()
 		if (Camera.flags == CF_FOLLOW_CENTER)	//Troye Aug. 7th 2022
 		{
 			auto shift = (bounds->Z1 + bounds->Z2) / 2;
-			x += shift * phd_sin(item->Pose.Orientation.y);
-			z += shift * phd_cos(item->Pose.Orientation.y);
+			x += shift * sin(item->Pose.Orientation.y);
+			z += shift * cos(item->Pose.Orientation.y);
 		}
 
 		Camera.target.x = x;
@@ -2084,7 +2084,7 @@ void HandleOptics()
 	LaserSight = false;
 	Camera.type = BinocularOldCamera;
 	Camera.bounce = 0;
-	AlterFOV(Angle::DegToRad((80.0f));
+	AlterFOV(Angle::DegToRad(80.0f));
 
 	LaraItem->MeshBits = ALL_JOINT_BITS;
 	Lara.Inventory.IsBusy = false;

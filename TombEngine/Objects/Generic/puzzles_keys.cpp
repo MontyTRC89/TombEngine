@@ -78,8 +78,7 @@ void PuzzleHoleCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* co
 		laraItem->Animation.ActiveState == LS_IDLE &&
 		laraItem->Animation.AnimNumber == LA_STAND_IDLE &&
 		laraInfo->Control.HandStatus == HandStatus::Free &&
-		!BinocularRange &&
-		GetKeyTrigger(&g_Level.Items[itemNumber])) ||
+		!BinocularRange) ||
 		(laraInfo->Control.IsMoving &&
 			laraInfo->InteractedItem == itemNumber))
 	{

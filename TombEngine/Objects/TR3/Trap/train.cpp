@@ -113,8 +113,8 @@ void TrainCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 	// laraItem->Animation.ActiveState = EXTRA_TRAINKILL;
 	// laraItem->Animation.TargetState = EXTRA_TRAINKILL;
 	laraItem->Pose.Orientation.y = trainItem->Pose.Orientation.y;
-	laraItem->Animation.Velocity = 0;
-	laraItem->Animation.VerticalVelocity = 0;
+	laraItem->Animation.Velocity.z = 0;
+	laraItem->Animation.Velocity.y = 0;
 	laraItem->Animation.IsAirborne = false;
 
 	DoDamage(laraItem, INT_MAX);

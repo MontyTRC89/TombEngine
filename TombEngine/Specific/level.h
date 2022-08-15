@@ -148,7 +148,6 @@ void LoadSoundSources();
 void LoadAnimatedTextures();
 void LoadAIObjects();
 
-void InitialiseLara(int restore);
 void GetCarriedItems();
 void GetAIPickups();
 void BuildOutsideRoomsTable();

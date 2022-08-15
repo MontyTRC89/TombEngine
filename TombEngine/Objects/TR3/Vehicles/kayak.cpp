@@ -225,8 +225,8 @@ namespace TEN::Entities::Vehicles
 		laraItem->Pose.Position = kayakItem->Pose.Position;
 		laraItem->Pose.Orientation = EulerAngles(0, kayakItem->Pose.Orientation.y, 0);
 		laraItem->Animation.IsAirborne = false;
-		laraItem->Animation.Velocity = 0;
-		laraItem->Animation.VerticalVelocity = 0;
+		laraItem->Animation.Velocity.z = 0;
+		laraItem->Animation.Velocity.y = 0;
 		lara->Control.WaterStatus = WaterStatus::Dry;
 		kayak->WaterHeight = kayakItem->Pose.Position.y;
 		kayak->Flags = 0;
@@ -258,7 +258,7 @@ namespace TEN::Entities::Vehicles
 		if (waterHeight != NO_HEIGHT)
 		{
 			float angle1, angle2;
-			if (kayakItem->Animation.Velocity < 0)
+			if (kayakItem->Animation.Velocity.z < 0)
 			{
 				if (!rotate)
 				{
@@ -604,8 +604,8 @@ namespace TEN::Entities::Vehicles
 		int leftHeight  = GetVehicleWaterHeight(kayakItem, KAYAK_Z, -KAYAK_X,  false, &leftPos);
 		int rightHeight = GetVehicleWaterHeight(kayakItem, KAYAK_Z, KAYAK_X, false, &rightPos);
 
-		kayakItem->Pose.Position.x += kayakItem->Animation.Velocity * sin(kayakItem->Pose.Orientation.y);
-		kayakItem->Pose.Position.z += kayakItem->Animation.Velocity * cos(kayakItem->Pose.Orientation.y);
+		kayakItem->Pose.Position.x += kayakItem->Animation.Velocity.z * sin(kayakItem->Pose.Orientation.y);
+		kayakItem->Pose.Position.z += kayakItem->Animation.Velocity.z * cos(kayakItem->Pose.Orientation.y);
 		kayakItem->Pose.Orientation.y += kayak->TurnRate;
 
 		KayakDoCurrent(kayakItem, laraItem);
@@ -614,7 +614,7 @@ namespace TEN::Entities::Vehicles
 		kayak->RightVerticalVelocity = KayakDoDynamics(rightHeight, kayak->RightVerticalVelocity, &rightPos.y);
 		kayak->FrontVerticalVelocity = KayakDoDynamics(frontHeight, kayak->FrontVerticalVelocity, &frontPos.y);
 
-		kayakItem->Animation.VerticalVelocity = KayakDoDynamics(kayak->WaterHeight, kayakItem->Animation.VerticalVelocity, &kayakItem->Pose.Position.y);
+		kayakItem->Animation.Velocity.y = KayakDoDynamics(kayak->WaterHeight, kayakItem->Animation.Velocity.y, &kayakItem->Pose.Position.y);
 
 		int height2 = (leftPos.y + rightPos.y) / 2;
 		float x = atan2(1024, kayakItem->Pose.Position.y - frontPos.y);
@@ -1051,13 +1051,13 @@ namespace TEN::Entities::Vehicles
 				GetLaraJointPosition(&vec, LM_HIPS);
 
 				SetAnimation(laraItem, LA_JUMP_FORWARD);
-				laraItem->Animation.IsAirborne = true;
-				laraItem->Animation.Velocity = 40;
-				laraItem->Animation.VerticalVelocity = -50;
 				laraItem->Pose.Position = vec;
 				laraItem->Pose.Orientation.x = 0;
 				laraItem->Pose.Orientation.y = kayakItem->Pose.Orientation.y - Angle::DegToRad(90.0f);
 				laraItem->Pose.Orientation.z = 0;
+				laraItem->Animation.Velocity.z = 40;
+				laraItem->Animation.Velocity.y = -50;
+				laraItem->Animation.IsAirborne = true;
 				lara->Control.HandStatus = HandStatus::Free;
 				lara->Vehicle = NO_ITEM;
 				kayak->LeftRightPaddleCount = 0;
@@ -1078,8 +1078,8 @@ namespace TEN::Entities::Vehicles
 				laraItem->Pose.Orientation.y = kayakItem->Pose.Orientation.y + Angle::DegToRad(90.0f);
 				laraItem->Pose.Orientation.z = 0;
 				laraItem->Animation.IsAirborne = true;
-				laraItem->Animation.Velocity = 40;
-				laraItem->Animation.VerticalVelocity = -50;
+				laraItem->Animation.Velocity.z = 40;
+				laraItem->Animation.Velocity.y = -50;
 				lara->Control.HandStatus = HandStatus::Free;
 				lara->Vehicle = NO_ITEM;
 				kayak->LeftRightPaddleCount = 0;
@@ -1104,7 +1104,7 @@ namespace TEN::Entities::Vehicles
 		else if (kayak->Velocity < -KAYAK_VELOCITY_MAX)
 			kayak->Velocity = -KAYAK_VELOCITY_MAX;
 
-		kayakItem->Animation.Velocity = kayak->Velocity / VEHICLE_VELOCITY_SCALE;
+		kayakItem->Animation.Velocity.z = kayak->Velocity / VEHICLE_VELOCITY_SCALE;
 		
 		if (kayak->TurnRate >= 0)
 		{
@@ -1148,7 +1148,7 @@ namespace TEN::Entities::Vehicles
 						{
 							if (TestBoundsCollide(item, kayakItem, KAYAK_TO_ENTITY_RADIUS))
 							{
-								DoLotsOfBlood(laraItem->Pose.Position.x, laraItem->Pose.Position.y - STEP_SIZE, laraItem->Pose.Position.z, kayakItem->Animation.Velocity, kayakItem->Pose.Orientation.y, laraItem->RoomNumber, 3);
+								DoLotsOfBlood(laraItem->Pose.Position.x, laraItem->Pose.Position.y - STEP_SIZE, laraItem->Pose.Position.z, kayakItem->Animation.Velocity.z, kayakItem->Pose.Orientation.y, laraItem->RoomNumber, 3);
 								DoDamage(laraItem, 5);
 							}
 						}
@@ -1177,8 +1177,8 @@ namespace TEN::Entities::Vehicles
 		laraItem->Animation.ActiveState = 12; // TODO
 		laraItem->Animation.TargetState = 12;
 		laraItem->Animation.IsAirborne = false;
-		laraItem->Animation.Velocity = 0;
-		laraItem->Animation.VerticalVelocity = 0;
+		laraItem->Animation.Velocity.z = 0;
+		laraItem->Animation.Velocity.y = 0;
 		laraItem->HitPoints = -1;
 
 		AnimateItem(laraItem);
@@ -1198,7 +1198,7 @@ namespace TEN::Entities::Vehicles
 		if (TrInput & IN_LOOK)
 			LookUpDown(laraItem);
 
-		int ofs = kayakItem->Animation.VerticalVelocity;
+		int ofs = kayakItem->Animation.Velocity.y;
 
 		KayakUserInput(kayakItem, laraItem);
 		KayakToBackground(kayakItem, laraItem);
@@ -1220,11 +1220,11 @@ namespace TEN::Entities::Vehicles
 			kayak->TrueWater = true;
 		}
 
-		if ((ofs - kayakItem->Animation.VerticalVelocity) > 128 &&
-			kayakItem->Animation.VerticalVelocity == 0 &&
+		if ((ofs - kayakItem->Animation.Velocity.y) > 128 &&
+			kayakItem->Animation.Velocity.y == 0 &&
 			water != NO_HEIGHT)
 		{
-			int damage = ofs - kayakItem->Animation.VerticalVelocity;
+			int damage = ofs - kayakItem->Animation.Velocity.y;
 			if (damage > 160)
 				DoDamage(laraItem, (damage - 160) * 8);
 		}
@@ -1259,7 +1259,7 @@ namespace TEN::Entities::Vehicles
 
 		if (Wibble & 7)
 		{
-			if (!kayak->TrueWater && kayakItem->Animation.VerticalVelocity < 20)
+			if (!kayak->TrueWater && kayakItem->Animation.Velocity.y < 20)
 			{
 				Vector3Int dest;
 				char cnt = 0;
@@ -1280,7 +1280,7 @@ namespace TEN::Entities::Vehicles
 			}
 		}
 
-		if (!kayakItem->Animation.Velocity &&
+		if (!kayakItem->Animation.Velocity.z &&
 			!lara->WaterCurrentPull.x &&
 			!lara->WaterCurrentPull.z)
 		{

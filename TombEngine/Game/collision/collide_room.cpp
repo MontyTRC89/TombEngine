@@ -319,13 +319,13 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, Vector3Int offset, bo
 		tfLocation = GetRoom(item->Location, x, y, z);
 		height = GetFloorHeight(tfLocation, x, z).value_or(NO_HEIGHT);
 
-		tcLocation = GetRoom(item->Location, x, y - item->Animation.VerticalVelocity, z);
+		tcLocation = GetRoom(item->Location, x, y - item->Animation.Velocity.y, z);
 		ceiling = GetCeilingHeight(tcLocation, x, z).value_or(NO_HEIGHT);
 	}
 	else
 	{
 		height = collResult.Position.Floor;
-		ceiling = GetCeiling(collResult.Block, x, y - item->Animation.VerticalVelocity, z);
+		ceiling = GetCeiling(collResult.Block, x, y - item->Animation.Velocity.y, z);
 	}
 	if (height  != NO_HEIGHT) height -= (playerCollision ? yPos : y);
 	if (ceiling != NO_HEIGHT) ceiling -= y;
@@ -355,13 +355,13 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, Vector3Int offset, bo
 		tfLocation = GetRoom(tfLocation, x, y, z);
 		height = GetFloorHeight(tfLocation, x, z).value_or(NO_HEIGHT);
 
-		tcLocation = GetRoom(tcLocation, x, y - item->Animation.VerticalVelocity, z);
+		tcLocation = GetRoom(tcLocation, x, y - item->Animation.Velocity.y, z);
 		ceiling = GetCeilingHeight(tcLocation, x, z).value_or(NO_HEIGHT);
 	}
 	else
 	{
 		height = collResult.Position.Floor;
-		ceiling = GetCeiling(collResult.Block, x, y - item->Animation.VerticalVelocity, z);
+		ceiling = GetCeiling(collResult.Block, x, y - item->Animation.Velocity.y, z);
 	}
 	if (height  != NO_HEIGHT) height -= (playerCollision ? yPos : y);
 	if (ceiling != NO_HEIGHT) ceiling -= y;
@@ -426,13 +426,13 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, Vector3Int offset, bo
 		lrfLocation = GetRoom(item->Location, x, y, z);
 		height = GetFloorHeight(lrfLocation, x, z).value_or(NO_HEIGHT);
 
-		lrcLocation = GetRoom(item->Location, x, y - item->Animation.VerticalVelocity, z);
+		lrcLocation = GetRoom(item->Location, x, y - item->Animation.Velocity.y, z);
 		ceiling = GetCeilingHeight(lrcLocation, x, z).value_or(NO_HEIGHT);
 	}
 	else
 	{
 		height = collResult.Position.Floor;
-		ceiling = GetCeiling(collResult.Block, x, y - item->Animation.VerticalVelocity, z);
+		ceiling = GetCeiling(collResult.Block, x, y - item->Animation.Velocity.y, z);
 	}
 	if (height  != NO_HEIGHT) height -= (playerCollision ? yPos : y);
 	if (ceiling != NO_HEIGHT) ceiling -= y;
@@ -479,13 +479,13 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, Vector3Int offset, bo
 		tfLocation = GetRoom(tfLocation, x, y, z);
 		height = GetFloorHeight(tfLocation, x, z).value_or(NO_HEIGHT);
 
-		tcLocation = GetRoom(tcLocation, x, y - item->Animation.VerticalVelocity, z);
+		tcLocation = GetRoom(tcLocation, x, y - item->Animation.Velocity.y, z);
 		ceiling = GetCeilingHeight(tcLocation, x, z).value_or(NO_HEIGHT);
 	}
 	else
 	{
 		height = collResult.Position.Floor;
-		ceiling = GetCeiling(collResult.Block, x, y - item->Animation.VerticalVelocity, z);
+		ceiling = GetCeiling(collResult.Block, x, y - item->Animation.Velocity.y, z);
 	}
 	if (height  != NO_HEIGHT) height -= (playerCollision ? yPos : y);
 	if (ceiling != NO_HEIGHT) ceiling -= y;
@@ -537,13 +537,13 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, Vector3Int offset, bo
 		lrfLocation = GetRoom(item->Location, x, y, z);
 		height = GetFloorHeight(lrfLocation, x, z).value_or(NO_HEIGHT);
 
-		lrcLocation = GetRoom(item->Location, x, y - item->Animation.VerticalVelocity, z);
+		lrcLocation = GetRoom(item->Location, x, y - item->Animation.Velocity.y, z);
 		ceiling = GetCeilingHeight(lrcLocation, x, z).value_or(NO_HEIGHT);
 	}
 	else
 	{
 		height = collResult.Position.Floor;
-		ceiling = GetCeiling(collResult.Block, x, y - item->Animation.VerticalVelocity, z);
+		ceiling = GetCeiling(collResult.Block, x, y - item->Animation.Velocity.y, z);
 	}
 	if (height  != NO_HEIGHT) height -= (playerCollision ? yPos : y);
 	if (ceiling != NO_HEIGHT) ceiling -= y;
@@ -590,13 +590,13 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, Vector3Int offset, bo
 		tfLocation = GetRoom(tfLocation, x, y, z);
 		height = GetFloorHeight(tfLocation, x, z).value_or(NO_HEIGHT);
 
-		tcLocation = GetRoom(tcLocation, x, y - item->Animation.VerticalVelocity, z);
+		tcLocation = GetRoom(tcLocation, x, y - item->Animation.Velocity.y, z);
 		ceiling = GetCeilingHeight(tcLocation, x, z).value_or(NO_HEIGHT);
 	}
 	else
 	{
 		height = collResult.Position.Floor;
-		ceiling = GetCeiling(collResult.Block, x, y - item->Animation.VerticalVelocity, z);
+		ceiling = GetCeiling(collResult.Block, x, y - item->Animation.Velocity.y, z);
 	}
 	if (height  != NO_HEIGHT) height -= (playerCollision ? yPos : y);
 	if (ceiling != NO_HEIGHT) ceiling -= y;
@@ -717,7 +717,7 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, Vector3Int offset, bo
 		if (coll->TriangleAtLeft() && !coll->MiddleLeft.FloorSlope)
 		{
 			// HACK: Force slight push-out to the left side to avoid stucking
-			TranslateItem(item, coll->Setup.ForwardAngle + Angle::DegToRad(8.0f), item->Animation.Velocity);
+			TranslateItem(item, coll->Setup.ForwardAngle + Angle::DegToRad(8.0f), item->Animation.Velocity.z);
 
 			coll->Shift.x = coll->Setup.OldPosition.x - xPos;
 			coll->Shift.z = coll->Setup.OldPosition.z - zPos;
@@ -769,7 +769,7 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, Vector3Int offset, bo
 		if (coll->TriangleAtRight() && !coll->MiddleRight.FloorSlope)
 		{
 			// HACK: Force slight push-out to the right side to avoid stucking
-			TranslateItem(item, coll->Setup.ForwardAngle - Angle::DegToRad(8.0f), item->Animation.Velocity);
+			TranslateItem(item, coll->Setup.ForwardAngle - Angle::DegToRad(8.0f), item->Animation.Velocity.z);
 
 			coll->Shift.x = coll->Setup.OldPosition.x - xPos;
 			coll->Shift.z = coll->Setup.OldPosition.z - zPos;
@@ -1453,8 +1453,8 @@ int GetWaterHeight(ItemInfo* item)
 
 float GetSurfaceSteepnessAngle(float xTilt, float zTilt)
 {
-	float stepAngleIncrement = Angle::DegToRad(45.0f) / 4;
-	return sqrt(pow(xTilt * stepAngleIncrement, 2) + pow(zTilt * stepAngleIncrement, 2));
+	float qtrBlockAngleIncrement = Angle::DegToRad(45.0f) / 4;
+	return sqrt(pow(xTilt * qtrBlockAngleIncrement, 2) + pow(zTilt * qtrBlockAngleIncrement, 2));
 }
 
 float GetSurfaceAspectAngle(float xTilt, float zTilt)

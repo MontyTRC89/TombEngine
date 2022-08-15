@@ -98,14 +98,14 @@ namespace TEN::Entities::TR4
 						item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 						item->Animation.ActiveState = BBEETLE_STATE_DEATH_START;
 						item->Animation.IsAirborne = true;
-						item->Animation.Velocity = 0;
+						item->Animation.Velocity.z = 0;
 					}
 				}
 				else if (item->Pose.Position.y >= item->Floor)
 				{
 					item->Pose.Position.y = item->Floor;
 					item->Animation.IsAirborne = false;
-					item->Animation.VerticalVelocity = 0;
+					item->Animation.Velocity.y = 0;
 					item->Animation.TargetState = BBEETLE_STATE_DEATH_END;
 				}
 			}

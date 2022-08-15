@@ -160,7 +160,7 @@ namespace TEN::Entities::TR4
 				item->Animation.ActiveState = BAT_STATE_DEATH_FALL;
 				item->Animation.TargetState = BAT_STATE_DEATH_FALL;
 				item->Animation.IsAirborne = true;
-				item->Animation.Velocity = 0;
+				item->Animation.Velocity.z = 0;
 			}
 		}
 

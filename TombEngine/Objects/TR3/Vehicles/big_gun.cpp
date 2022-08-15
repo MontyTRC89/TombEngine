@@ -129,7 +129,7 @@ namespace TEN::Entities::Vehicles
 
 			InitialiseItem(itemNumber);
 
-			projectileItem->Animation.Velocity = 16;
+			projectileItem->Animation.Velocity.z = 16;
 			projectileItem->Pose.Orientation = EulerAngles(
 				-((bigGun->XOrientFrame - 32) * Angle::DegToRad(1.0f)),
 				bigGunItem->Pose.Orientation.y,

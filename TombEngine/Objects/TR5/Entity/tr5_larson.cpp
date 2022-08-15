@@ -139,7 +139,7 @@ void LarsonControl(short itemNumber)
 		CreatureMood(item, &info, VIOLENT);
 
 		if (info.distance < SQUARE(2048) 
-			&& LaraItem->Animation.Velocity > 20
+			&& LaraItem->Animation.Velocity.z > 20
 			|| item->HitStatus
 			|| TargetVisible(item, &info) != 0)
 		{

@@ -2220,27 +2220,28 @@ namespace TEN::Renderer
 
 		SetBlendMode(BLENDMODE_ADDITIVE);
 
-		for (int i = 0; i < 2; i++)
-		{
-			auto weather = TEN::Effects::Environment::Weather;
+		for (int s = 0; s < 2; s++)
+			for (int i = 0; i < 2; i++)
+			{
+				auto weather = TEN::Effects::Environment::Weather;
 
-			Matrix translation = Matrix::CreateTranslation(Camera.pos.x + weather.SkyLayer1Position() - i * 9728.0f,
-														   Camera.pos.y - 1536.0f, Camera.pos.z);
-			Matrix world = rotation * translation;
+				Matrix translation = Matrix::CreateTranslation(Camera.pos.x + weather.SkyPosition(s) - i * 9728.0f,
+															   Camera.pos.y - 1536.0f, Camera.pos.z);
+				Matrix world = rotation * translation;
 
-			m_stStatic.World = (rotation * translation);
-			m_stStatic.Color = weather.SkyColor();
-			m_stStatic.AmbientLight = Vector4::One;
-			m_stStatic.LightMode = LIGHT_MODES::LIGHT_MODE_STATIC;
+				m_stStatic.World = (rotation * translation);
+				m_stStatic.Color = weather.SkyColor(s);
+				m_stStatic.AmbientLight = Vector4::One;
+				m_stStatic.LightMode = LIGHT_MODES::LIGHT_MODE_STATIC;
 
-			m_cbStatic.updateData(m_stStatic, m_context.Get());
-			BindConstantBufferVS(CB_STATIC, m_cbStatic.get());
-			BindConstantBufferPS(CB_STATIC, m_cbStatic.get());
+				m_cbStatic.updateData(m_stStatic, m_context.Get());
+				BindConstantBufferVS(CB_STATIC, m_cbStatic.get());
+				BindConstantBufferPS(CB_STATIC, m_cbStatic.get());
 
-			m_primitiveBatch->Begin();
-			m_primitiveBatch->DrawQuad(vertices[0], vertices[1], vertices[2], vertices[3]);
-			m_primitiveBatch->End();
-		}
+				m_primitiveBatch->Begin();
+				m_primitiveBatch->DrawQuad(vertices[0], vertices[1], vertices[2], vertices[3]);
+				m_primitiveBatch->End();
+			}
 		m_context->ClearDepthStencilView(depthTarget, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1, 0);
 
 		// Draw horizon

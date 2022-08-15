@@ -47,7 +47,7 @@ namespace TEN::Entities::TR3
 
 			harpoonItem->Pose.Orientation.x = 0;
 			harpoonItem->Pose.Orientation.y = yRot;
-			harpoonItem->Animation.Velocity = 150;
+			harpoonItem->Animation.Velocity.z = 150;
 
 			AddActiveItem(harpoonItemNumber);
 			harpoonItem->Status = ITEM_ACTIVE;
@@ -69,10 +69,10 @@ namespace TEN::Entities::TR3
 			int ox = item->Pose.Position.x;
 			int oz = item->Pose.Position.z;
 
-			int velocity = item->Animation.Velocity * cos(item->Pose.Orientation.x);
+			int velocity = item->Animation.Velocity.z * cos(item->Pose.Orientation.x);
 			item->Pose.Position.z += velocity * cos(item->Pose.Orientation.y);
 			item->Pose.Position.x += velocity * sin(item->Pose.Orientation.y);
-			item->Pose.Position.y += -item->Animation.Velocity * sin(item->Pose.Orientation.x);
+			item->Pose.Position.y += -item->Animation.Velocity.z * sin(item->Pose.Orientation.x);
 
 			auto probe = GetCollision(item);
 
@@ -201,7 +201,7 @@ namespace TEN::Entities::TR3
 
 				if (!creature->Flags)
 				{
-					ShootHarpoon(item, item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, item->Animation.Velocity, item->Pose.Orientation.y, item->RoomNumber);
+					ShootHarpoon(item, item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, item->Animation.Velocity.z, item->Pose.Orientation.y, item->RoomNumber);
 					creature->Flags = 1;
 				}
 
@@ -242,7 +242,7 @@ namespace TEN::Entities::TR3
 
 				if (!creature->Flags)
 				{
-					ShootHarpoon(item, item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, item->Animation.Velocity, item->Pose.Orientation.y, item->RoomNumber);
+					ShootHarpoon(item, item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, item->Animation.Velocity.z, item->Pose.Orientation.y, item->RoomNumber);
 					creature->Flags = 1;
 				}
 

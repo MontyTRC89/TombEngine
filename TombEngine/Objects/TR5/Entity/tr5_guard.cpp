@@ -380,7 +380,7 @@ void GuardControl(short itemNumber)
 		angle = CreatureTurn(item, creature->MaxTurn);
 		creature->Enemy = LaraItem;
 
-		if ((laraAI.distance < pow(SECTOR(2), 2) && LaraItem->Animation.Velocity > 20) ||
+		if ((laraAI.distance < pow(SECTOR(2), 2) && LaraItem->Animation.Velocity.z > 20) ||
 			item->HitStatus ||
 			TargetVisible(item, &laraAI))
 		{
@@ -752,7 +752,7 @@ void GuardControl(short itemNumber)
 			joint2 = 0;
 
 			if (!item->HitStatus &&
-				LaraItem->Animation.Velocity < 40 &&
+				LaraItem->Animation.Velocity.z < 40 &&
 				!Lara.Control.Weapon.HasFired)
 			{
 				creature->Alerted = false;
@@ -1191,7 +1191,7 @@ void Mafia2Control(short itemNumber)
 		creature->Enemy = LaraItem;
 		angle = CreatureTurn(item, creature->MaxTurn);
 
-		if ((laraAI.distance < pow(SECTOR(2), 2) && LaraItem->Animation.Velocity > 20) ||
+		if ((laraAI.distance < pow(SECTOR(2), 2) && LaraItem->Animation.Velocity.z > 20) ||
 			item->HitStatus ||
 			TargetVisible(item, &laraAI))
 		{

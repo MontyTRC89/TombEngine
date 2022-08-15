@@ -76,7 +76,7 @@ void lara_as_jump_forward(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (item->Animation.VerticalVelocity >= LARA_FREEFALL_VELOCITY)
+	if (item->Animation.Velocity.y >= LARA_FREEFALL_VELOCITY)
 	{
 		item->Animation.TargetState = LS_FREEFALL;
 		return;
@@ -111,7 +111,7 @@ void lara_col_jump_forward(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->Control.MoveAngle = (item->Animation.Velocity > 0) ? item->Pose.Orientation.y : item->Pose.Orientation.y + Angle::DegToRad(180.0f);
+	lara->Control.MoveAngle = (item->Animation.Velocity.z > 0) ? item->Pose.Orientation.y : item->Pose.Orientation.y + Angle::DegToRad(180.0f);
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
 	coll->Setup.LowerCeilingBound = BAD_JUMP_CEILING;
@@ -121,18 +121,18 @@ void lara_col_jump_forward(ItemInfo* item, CollisionInfo* coll)
 	LaraDeflectEdgeJump(item, coll);
 
 	// TODO: Why??
-	lara->Control.MoveAngle = (item->Animation.Velocity < 0) ? item->Pose.Orientation.y : lara->Control.MoveAngle;
+	lara->Control.MoveAngle = (item->Animation.Velocity.z < 0) ? item->Pose.Orientation.y : lara->Control.MoveAngle;
 }
 
 // State:		LS_FREEFALL (9)
 // Collision:	lara_col_freefall()
 void lara_as_freefall(ItemInfo* item, CollisionInfo* coll)
 {
-	item->Animation.Velocity = item->Animation.Velocity * 0.95f;
+	item->Animation.Velocity.z = item->Animation.Velocity.z * 0.95f;
 
 	ModulateLaraTurnRateY(item, 0, 0, 0);
 
-	if (item->Animation.VerticalVelocity == LARA_DEATH_VELOCITY &&
+	if (item->Animation.Velocity.y == LARA_DEATH_VELOCITY &&
 		item->HitPoints > 0)
 	{
 		SoundEffect(SFX_TR4_LARA_FALL, &item->Pose);
@@ -210,7 +210,7 @@ void lara_as_reach(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (item->Animation.VerticalVelocity >= LARA_FREEFALL_VELOCITY)
+	if (item->Animation.Velocity.y >= LARA_FREEFALL_VELOCITY)
 	{
 		item->Animation.TargetState = LS_FREEFALL;
 		return;
@@ -416,7 +416,7 @@ void lara_as_jump_back(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (item->Animation.VerticalVelocity >= LARA_FREEFALL_VELOCITY)
+	if (item->Animation.Velocity.y >= LARA_FREEFALL_VELOCITY)
 	{
 		item->Animation.TargetState = LS_FREEFALL;
 		return;
@@ -472,7 +472,7 @@ void lara_as_jump_right(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (item->Animation.VerticalVelocity >= LARA_FREEFALL_VELOCITY)
+	if (item->Animation.Velocity.y >= LARA_FREEFALL_VELOCITY)
 	{
 		item->Animation.TargetState = LS_FREEFALL;
 		return;
@@ -529,7 +529,7 @@ void lara_as_jump_left(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (item->Animation.VerticalVelocity >= LARA_FREEFALL_VELOCITY)
+	if (item->Animation.Velocity.y >= LARA_FREEFALL_VELOCITY)
 	{
 		item->Animation.TargetState = LS_FREEFALL;
 		return;
@@ -584,7 +584,7 @@ void lara_as_jump_up(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (item->Animation.VerticalVelocity >= LARA_FREEFALL_VELOCITY)
+	if (item->Animation.Velocity.y >= LARA_FREEFALL_VELOCITY)
 	{
 		item->Animation.TargetState = LS_FREEFALL;
 		return;
@@ -592,23 +592,23 @@ void lara_as_jump_up(ItemInfo* item, CollisionInfo* coll)
 
 	if (TrInput & IN_FORWARD)
 	{
-		item->Animation.Velocity += 2;
-		if (item->Animation.Velocity > 5)
-			item->Animation.Velocity = 5;
+		item->Animation.Velocity.z += 2;
+		if (item->Animation.Velocity.z > 5)
+			item->Animation.Velocity.z = 5;
 	}
 	else if (TrInput & IN_BACK)
 	{
-		item->Animation.Velocity -= 2;
-		if (item->Animation.Velocity < -5)
-			item->Animation.Velocity = -5;
+		item->Animation.Velocity.z -= 2;
+		if (item->Animation.Velocity.z < -5)
+			item->Animation.Velocity.z = -5;
 	}
 	else
-		item->Animation.Velocity = (item->Animation.Velocity < 0) ? -2 : 2;
+		item->Animation.Velocity.z = (item->Animation.Velocity.z < 0) ? -2 : 2;
 
-	if (item->Animation.Velocity < 0)
+	if (item->Animation.Velocity.z < 0)
 	{
 		// TODO: Holding BACK + LEFT/RIGHT results in Lara flexing more.
-		item->Pose.Orientation.x += std::min(LARA_LEAN_RATE / 3, abs(Angle::DegToRad(item->Animation.Velocity) - item->Pose.Orientation.x) / 3);
+		item->Pose.Orientation.x += std::min(LARA_LEAN_RATE / 3, abs(Angle::DegToRad(item->Animation.Velocity.z) - item->Pose.Orientation.x) / 3);
 		lara->ExtraHeadRot.y = lara->ExtraHeadRot.y + (Angle::DegToRad(10.0f) - item->Pose.Orientation.z) / 3.0f;
 	}
 
@@ -626,7 +626,7 @@ void lara_col_jump_up(ItemInfo* item, CollisionInfo* coll)
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
 	coll->Setup.LowerCeilingBound = BAD_JUMP_CEILING;
-	coll->Setup.ForwardAngle = (item->Animation.Velocity >= 0) ? lara->Control.MoveAngle : lara->Control.MoveAngle + Angle::DegToRad(180.0f);
+	coll->Setup.ForwardAngle = (item->Animation.Velocity.z >= 0) ? lara->Control.MoveAngle : lara->Control.MoveAngle + Angle::DegToRad(180.0f);
 	coll->Setup.Mode = CollisionProbeMode::FreeForward;
 	GetCollisionInfo(coll, item);
 
@@ -638,7 +638,7 @@ void lara_col_jump_up(ItemInfo* item, CollisionInfo* coll)
 		coll->CollisionType == CT_TOP_FRONT ||
 		coll->CollisionType == CT_CLAMP)
 	{
-		item->Animation.VerticalVelocity = 1;
+		item->Animation.Velocity.y = 1;
 	}
 
 	ShiftItem(item, coll);
@@ -679,7 +679,7 @@ void lara_as_fall_back(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (item->Animation.VerticalVelocity >= LARA_FREEFALL_VELOCITY)
+	if (item->Animation.Velocity.y >= LARA_FREEFALL_VELOCITY)
 	{
 		item->Animation.TargetState = LS_FREEFALL;
 		return;
@@ -721,7 +721,7 @@ void lara_as_swan_dive(ItemInfo* item, CollisionInfo* coll)
 			SetLaraLand(item, coll);
 		}
 
-		if (item->Animation.VerticalVelocity >= LARA_FREEFALL_VELOCITY)
+		if (item->Animation.Velocity.y >= LARA_FREEFALL_VELOCITY)
 		{
 			item->Animation.TargetState = LS_FREEFALL_DIVE;
 			return;
@@ -758,7 +758,7 @@ void lara_as_swan_dive(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (item->Animation.VerticalVelocity >= LARA_FREEFALL_VELOCITY)
+	if (item->Animation.Velocity.y >= LARA_FREEFALL_VELOCITY)
 	{
 		item->Animation.TargetState = LS_FREEFALL_DIVE;
 		return;
@@ -796,7 +796,7 @@ void lara_col_swan_dive(ItemInfo* item, CollisionInfo* coll)
 // Collision:	lara_col_freefall_dive()
 void lara_as_freefall_dive(ItemInfo* item, CollisionInfo* coll)
 {
-	item->Animation.Velocity = item->Animation.Velocity * 0.95f;
+	item->Animation.Velocity.z = item->Animation.Velocity.z * 0.95f;
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpasm = false;
 
@@ -815,7 +815,7 @@ void lara_as_freefall_dive(ItemInfo* item, CollisionInfo* coll)
 
 	if (TestLaraLand(item, coll))
 	{
-		if (item->Animation.VerticalVelocity >= LARA_DIVE_DEATH_VELOCITY ||
+		if (item->Animation.Velocity.y >= LARA_DIVE_DEATH_VELOCITY ||
 			item->HitPoints <= 0)
 		{
 			item->Animation.TargetState = LS_DEATH;

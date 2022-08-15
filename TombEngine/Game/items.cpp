@@ -374,7 +374,7 @@ short CreateNewEffect(short roomNum)
 		room->fxNumber = fxNumber;
 		fx->nextActive = NextFxActive;
 		NextFxActive = fxNumber;
-		fx->shade = GRAY555;
+		fx->color = Vector4::One;
 	}
 
 	return fxNumber;
@@ -457,8 +457,8 @@ void InitialiseItem(short itemNumber)
 	item->Pose.Orientation.x = 0.0f;
 	item->Pose.Orientation.z = 0.0f;
 
-	item->Animation.VerticalVelocity = 0;
-	item->Animation.Velocity = 0;
+	item->Animation.Velocity.y = 0;
+	item->Animation.Velocity.z = 0;
 
 	item->ItemFlags[3] = 0;
 	item->ItemFlags[2] = 0;

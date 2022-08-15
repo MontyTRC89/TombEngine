@@ -84,7 +84,7 @@ namespace TEN::Entities::Generic
 			}
 			else if (TrInput & IN_DRAW &&
 				!LaraItem->Animation.IsAirborne &&
-				!LaraItem->Animation.VerticalVelocity &&
+				!LaraItem->Animation.Velocity.y &&
 				LaraItem->Animation.ActiveState != LS_JUMP_PREPARE &&
 				LaraItem->Animation.ActiveState != LS_JUMP_UP &&
 				LaraItem->Animation.ActiveState != LS_JUMP_FORWARD &&
@@ -203,21 +203,21 @@ namespace TEN::Entities::Generic
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		if (item->Animation.VerticalVelocity)
+		if (item->Animation.Velocity.y)
 		{
 			item->Pose.Orientation.x -= Angle::DegToRad(5.0f);
 			item->Pose.Orientation.z += Angle::DegToRad(5.0f);
 		}
-		else if (!item->Animation.Velocity)
+		else if (!item->Animation.Velocity.z)
 		{
 			item->Pose.Orientation.x = 0.0f;
 			item->Pose.Orientation.z = 0.0f;
 		}
 
 		auto velocity = Vector3Int(
-			item->Animation.Velocity * sin(item->Pose.Orientation.y),
-			item->Animation.VerticalVelocity,
-			item->Animation.Velocity * cos(item->Pose.Orientation.y)
+			item->Animation.Velocity.z * sin(item->Pose.Orientation.y),
+			item->Animation.Velocity.y,
+			item->Animation.Velocity.z * cos(item->Pose.Orientation.y)
 		);
 
 		auto oldPos = item->Pose.Position;
@@ -226,16 +226,16 @@ namespace TEN::Entities::Generic
 		if (TestEnvironment(ENV_FLAG_WATER, item) ||
 			TestEnvironment(ENV_FLAG_SWAMP, item))
 		{
-			item->Animation.VerticalVelocity += (5 - item->Animation.VerticalVelocity) / 2;
-			item->Animation.Velocity += (5 - item->Animation.Velocity) / 2;
+			item->Animation.Velocity.y += (5 - item->Animation.Velocity.y) / 2;
+			item->Animation.Velocity.z += (5 - item->Animation.Velocity.z) / 2;
 
 			if (item->ItemFlags[3] != 0)
 				item->ItemFlags[3] = 0;
 		}
 		else
-			item->Animation.VerticalVelocity += 6;
+			item->Animation.Velocity.y += 6;
 
-		item->Pose.Position.y += item->Animation.VerticalVelocity;
+		item->Pose.Position.y += item->Animation.Velocity.y;
 		DoProjectileDynamics(itemNumber, oldPos.x, oldPos.y, oldPos.z, velocity.x, velocity.y, velocity.z);
 
 		// Collide with entities.
@@ -255,7 +255,7 @@ namespace TEN::Entities::Generic
 				ItemPushStatic(item, CollidedMeshes[0], &LaraCollision);
 			}
 			
-			item->Animation.Velocity = -int(item->Animation.Velocity / 1.5f);
+			item->Animation.Velocity.z = -int(item->Animation.Velocity.z / 1.5f);
 		}
 
 		if (item->ItemFlags[3])

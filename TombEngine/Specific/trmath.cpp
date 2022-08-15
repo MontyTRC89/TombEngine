@@ -1,8 +1,7 @@
 #include "framework.h"
 #include "Specific/trmath.h"
-
-#include <cmath>
 #include "Specific/prng.h"
+#include <cmath>
 
 using namespace TEN::Math::Random;
 const Vector3 GetRandomVector()

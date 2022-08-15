@@ -1261,7 +1261,6 @@ struct LaraInfo
 	PlayerContext Context;
 	EulerAngles ExtraHeadRot;
 	EulerAngles ExtraTorsoRot;
-	Vector3Int ExtraVelocity;
 	short WaterCurrentActive;
 	Vector3Int WaterCurrentPull;
 

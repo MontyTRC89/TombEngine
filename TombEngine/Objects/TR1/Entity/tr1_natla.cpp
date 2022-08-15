@@ -89,7 +89,7 @@ namespace TEN::Entities::TR1
 				if (item->Pose.Position.y < item->Floor)
 				{
 					item->Animation.IsAirborne = true;
-					item->Animation.Velocity = 0;
+					item->Animation.Velocity.z = 0;
 				}
 				else
 				{

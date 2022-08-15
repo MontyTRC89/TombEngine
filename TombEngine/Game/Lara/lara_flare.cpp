@@ -30,7 +30,7 @@ void FlareControl(short itemNumber)
 		return;
 	}
 
-	if (flareItem->Animation.VerticalVelocity)
+	if (flareItem->Animation.Velocity.y)
 	{
 		flareItem->Pose.Orientation.x -= Angle::DegToRad(5.0f);
 		flareItem->Pose.Orientation.z += Angle::DegToRad(5.0f);
@@ -42,9 +42,9 @@ void FlareControl(short itemNumber)
 	}
 
 	auto velocity = Vector3Int(
-		flareItem->Animation.Velocity * sin(flareItem->Pose.Orientation.y),
-		flareItem->Animation.VerticalVelocity,
-		flareItem->Animation.Velocity * cos(flareItem->Pose.Orientation.y)
+		flareItem->Animation.Velocity.z * sin(flareItem->Pose.Orientation.y),
+		flareItem->Animation.Velocity.y,
+		flareItem->Animation.Velocity.z * cos(flareItem->Pose.Orientation.y)
 	);
 
 	auto oldPos = flareItem->Pose.Position;
@@ -53,20 +53,20 @@ void FlareControl(short itemNumber)
 	if (TestEnvironment(ENV_FLAG_WATER, flareItem) ||
 		TestEnvironment(ENV_FLAG_SWAMP, flareItem))
 	{
-		flareItem->Animation.VerticalVelocity += (5 - flareItem->Animation.VerticalVelocity) / 2;
-		flareItem->Animation.Velocity += (5 - flareItem->Animation.Velocity) / 2;
+		flareItem->Animation.Velocity.y += (5 - flareItem->Animation.Velocity.y) / 2;
+		flareItem->Animation.Velocity.z += (5 - flareItem->Animation.Velocity.z) / 2;
 	}
 	else
-		flareItem->Animation.VerticalVelocity += 6;
+		flareItem->Animation.Velocity.y += 6;
 
-	flareItem->Pose.Position.y += flareItem->Animation.VerticalVelocity;
+	flareItem->Pose.Position.y += flareItem->Animation.Velocity.y;
 	DoProjectileDynamics(itemNumber, oldPos.x, oldPos.y, oldPos.z, velocity.x, velocity.y, velocity.z);
 
 	int& life = flareItem->Data;
 	life &= 0x7FFF;
 	if (life >= FLARE_LIFE_MAX)
 	{
-		if (!flareItem->Animation.VerticalVelocity && !flareItem->Animation.Velocity)
+		if (!flareItem->Animation.Velocity.y && !flareItem->Animation.Velocity.z)
 		{
 			KillItem(itemNumber);
 			return;
@@ -330,17 +330,17 @@ void CreateFlare(ItemInfo* laraItem, GAME_OBJECT_ID objectNumber, bool thrown)
 
 		if (thrown)
 		{
-			flareItem->Animation.Velocity = laraItem->Animation.Velocity + 50;
-			flareItem->Animation.VerticalVelocity = laraItem->Animation.VerticalVelocity - 50;
+			flareItem->Animation.Velocity.z = laraItem->Animation.Velocity.z + 50;
+			flareItem->Animation.Velocity.y = laraItem->Animation.Velocity.y - 50;
 		}
 		else
 		{
-			flareItem->Animation.Velocity = laraItem->Animation.Velocity + 10;
-			flareItem->Animation.VerticalVelocity = laraItem->Animation.VerticalVelocity + 50;
+			flareItem->Animation.Velocity.z = laraItem->Animation.Velocity.z + 10;
+			flareItem->Animation.Velocity.y = laraItem->Animation.Velocity.y + 50;
 		}
 
 		if (landed)
-			flareItem->Animation.Velocity /= 2;
+			flareItem->Animation.Velocity.z /= 2;
 
 		if (objectNumber == ID_FLARE_ITEM)
 		{

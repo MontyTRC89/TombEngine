@@ -105,15 +105,15 @@ void ControlDeathSlide(short itemNumber)
 
 		AnimateItem(zipLineItem);
 
-		if (zipLineItem->Animation.VerticalVelocity < 100)
-			zipLineItem->Animation.VerticalVelocity += 5;
+		if (zipLineItem->Animation.Velocity.y < 100)
+			zipLineItem->Animation.Velocity.y += 5;
 
 		float sinY = sin(zipLineItem->Pose.Orientation.y);
 		float cosY = cos(zipLineItem->Pose.Orientation.y);
 
-		zipLineItem->Pose.Position.z += zipLineItem->Animation.VerticalVelocity * cosY;
-		zipLineItem->Pose.Position.x += zipLineItem->Animation.VerticalVelocity * sinY;
-		zipLineItem->Pose.Position.y += zipLineItem->Animation.VerticalVelocity / 4;
+		zipLineItem->Pose.Position.z += zipLineItem->Animation.Velocity.y * cosY;
+		zipLineItem->Pose.Position.x += zipLineItem->Animation.Velocity.y * sinY;
+		zipLineItem->Pose.Position.y += zipLineItem->Animation.Velocity.y / 4;
 
 		short roomNumber = zipLineItem->RoomNumber;
 		GetFloor(zipLineItem->Pose.Position.x, zipLineItem->Pose.Position.y, zipLineItem->Pose.Position.z, &roomNumber);
@@ -140,8 +140,8 @@ void ControlDeathSlide(short itemNumber)
 				LaraItem->Animation.TargetState = LS_JUMP_FORWARD;
 				AnimateLara(LaraItem);
 				LaraItem->Animation.IsAirborne = true;
-				LaraItem->Animation.Velocity = zipLineItem->Animation.VerticalVelocity;
-				LaraItem->Animation.VerticalVelocity = zipLineItem->Animation.VerticalVelocity / 4;
+				LaraItem->Animation.Velocity.z = zipLineItem->Animation.Velocity.y;
+				LaraItem->Animation.Velocity.y = zipLineItem->Animation.Velocity.y / 4;
 			}
 
 			// Stop

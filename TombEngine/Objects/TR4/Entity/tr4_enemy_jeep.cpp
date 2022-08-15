@@ -48,12 +48,12 @@ namespace TEN::Entities::TR4
 			else
 				grenadeItem->ItemFlags[0] = 2;
 
-		grenadeItem->Animation.ActiveState = grenadeItem->Pose.Orientation.x;
-		grenadeItem->Animation.TargetState = grenadeItem->Pose.Orientation.y;
-		grenadeItem->Animation.RequiredState = 0;
-		grenadeItem->Animation.Velocity = 32;
-		grenadeItem->Animation.VerticalVelocity = -32 * sin(grenadeItem->Pose.Orientation.x);
-		grenadeItem->HitPoints = 120;
+			grenadeItem->Animation.ActiveState = grenadeItem->Pose.Orientation.x;
+			grenadeItem->Animation.TargetState = grenadeItem->Pose.Orientation.y;
+			grenadeItem->Animation.RequiredState = 0;
+			grenadeItem->Animation.Velocity.z = 32;
+			grenadeItem->Animation.Velocity.y = -32 * sin(grenadeItem->Pose.Orientation.x);
+			grenadeItem->HitPoints = 120;
 
 			AddActiveItem(grenadeItemNumber);
 		}
@@ -371,7 +371,7 @@ namespace TEN::Entities::TR4
 			{
 				item->Pose.Position.y = item->Floor;
 				item->Animation.IsAirborne = false;
-				item->Animation.VerticalVelocity = 0;
+				item->Animation.Velocity.y = 0;
 			}
 
 			SoundEffect(SFX_TR4_VEHICLE_JEEP_MOVING, &item->Pose, SoundEnvironment::Land, 1.0f + (float)item->ItemFlags[0] / SECTOR(8)); // TODO: Check actual sound!

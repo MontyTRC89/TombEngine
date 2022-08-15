@@ -1227,7 +1227,7 @@ void WadeSplash(ItemInfo* item, int wh, int wd)
 	if (item->Pose.Position.y + frame->boundingBox.Y2 < wh)
 		return;
 
-	if (item->Animation.VerticalVelocity <= 0 || wd >= 474 || SplashCount != 0)
+	if (item->Animation.Velocity.y <= 0 || wd >= 474 || SplashCount != 0)
 	{
 		if (!(Wibble & 0xF))
 		{
@@ -1246,7 +1246,7 @@ void WadeSplash(ItemInfo* item, int wh, int wd)
 		SplashSetup.x = item->Pose.Position.x;
 		SplashSetup.z = item->Pose.Position.z;
 		SplashSetup.innerRadius = 16;
-		SplashSetup.splashPower = item->Animation.Velocity;
+		SplashSetup.splashPower = item->Animation.Velocity.z;
 		SetupSplash(&SplashSetup, probe1.RoomNumber);
 		SplashCount = 16;
 	}
@@ -1264,7 +1264,7 @@ void Splash(ItemInfo* item)
 		SplashSetup.y = waterHeight - 1;
 		SplashSetup.x = item->Pose.Position.x;
 		SplashSetup.z = item->Pose.Position.z;
-		SplashSetup.splashPower = item->Animation.VerticalVelocity;
+		SplashSetup.splashPower = item->Animation.Velocity.y;
 		SplashSetup.innerRadius = 64;
 		SetupSplash(&SplashSetup, roomNumber);
 	}

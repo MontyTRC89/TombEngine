@@ -32,7 +32,7 @@ bool LaraDeflectEdge(ItemInfo* item, CollisionInfo* coll)
 	{
 		ShiftItem(item, coll);
 		item->Animation.TargetState = LS_IDLE;
-		item->Animation.Velocity = 0;
+		item->Animation.Velocity.z = 0;
 		return true;
 	}
 
@@ -65,25 +65,25 @@ bool LaraDeflectEdgeJump(ItemInfo* item, CollisionInfo* coll)
 
 	if (coll->CollisionType == CT_FRONT || coll->CollisionType == CT_TOP_FRONT)
 	{
-		if (!lara->Control.CanClimbLadder || item->Animation.Velocity != 2)
+		if (!lara->Control.CanClimbLadder || item->Animation.Velocity.z != 2)
 		{
 			if (coll->Middle.Floor <= CLICK(1))
 			{
 				SetAnimation(item, LA_LAND);
 				LaraSnapToHeight(item, coll);
 			}
-			else if (abs(item->Animation.Velocity) > 47)
+			else if (abs(item->Animation.Velocity.z) > 47)
 			{
 				// TODO: Demagic. This is Lara's running velocity. Jumps have a minimum of 50.
 				SetAnimation(item, LA_JUMP_WALL_SMASH_START, 1);
 				Rumble(0.5f, 0.15f);
 			}
 
-			item->Animation.Velocity /= 4;
+			item->Animation.Velocity.z /= 4;
 			lara->Control.MoveAngle += Angle::DegToRad(180.0f);
 
-			if (item->Animation.VerticalVelocity <= 0)
-				item->Animation.VerticalVelocity = 1;
+			if (item->Animation.Velocity.y <= 0)
+				item->Animation.Velocity.y = 1;
 		}
 
 		return true;
@@ -101,18 +101,18 @@ bool LaraDeflectEdgeJump(ItemInfo* item, CollisionInfo* coll)
 
 	case CT_TOP:
 	case CT_TOP_FRONT:
-		if (item->Animation.VerticalVelocity <= 0)
-			item->Animation.VerticalVelocity = 1;
+		if (item->Animation.Velocity.y <= 0)
+			item->Animation.Velocity.y = 1;
 
 		break;
 
 	case CT_CLAMP:
 		TranslateItem(item, item->Pose.Orientation.y + Angle::DegToRad(180.0f), CLICK(1.5f), 0, 0);
-		item->Animation.Velocity = 0;
+		item->Animation.Velocity.z = 0;
 		coll->Middle.Floor = 0;
 
-		if (item->Animation.VerticalVelocity <= 0)
-			item->Animation.VerticalVelocity = 16;
+		if (item->Animation.Velocity.y <= 0)
+			item->Animation.Velocity.y = 16;
 
 		break;
 	}
@@ -135,23 +135,23 @@ void LaraSlideEdgeJump(ItemInfo* item, CollisionInfo* coll)
 		break;
 
 	case CT_FRONT:
-		item->Animation.Velocity = 0;
+		item->Animation.Velocity.z = 0;
 		break;
 
 	case CT_TOP:
 	case CT_TOP_FRONT:
-		if (item->Animation.VerticalVelocity <= 0)
-			item->Animation.VerticalVelocity = 1;
+		if (item->Animation.Velocity.y <= 0)
+			item->Animation.Velocity.y = 1;
 
 		break;
 
 	case CT_CLAMP:
 		TranslateItem(item, item->Pose.Orientation.y + Angle::DegToRad(180.0f), CLICK(1.5f), 0, 0);
-		item->Animation.Velocity = 0;
+		item->Animation.Velocity.z = 0;
 		coll->Middle.Floor = 0;
 
-		if (item->Animation.VerticalVelocity <= 0)
-			item->Animation.VerticalVelocity = 16;
+		if (item->Animation.Velocity.y <= 0)
+			item->Animation.Velocity.y = 16;
 
 		break;
 	}
@@ -164,7 +164,7 @@ bool LaraDeflectEdgeCrawl(ItemInfo* item, CollisionInfo* coll)
 	{
 		ShiftItem(item, coll);
 
-		item->Animation.Velocity = 0;
+		item->Animation.Velocity.z = 0;
 		item->Animation.IsAirborne = false;
 		return true;
 	}
@@ -201,7 +201,7 @@ bool LaraDeflectEdgeMonkey(ItemInfo* item, CollisionInfo* coll)
 		ShiftItem(item, coll);
 
 		item->Animation.TargetState = LS_MONKEY_IDLE;
-		item->Animation.Velocity = 0;
+		item->Animation.Velocity.z = 0;
 		item->Animation.IsAirborne = false;
 		return true;
 	}
@@ -406,7 +406,7 @@ void LaraResetGravityStatus(ItemInfo* item, CollisionInfo* coll)
 	if (coll->Middle.Floor <= STEPUP_HEIGHT)
 	{
 		item->Animation.IsAirborne = false;
-		item->Animation.VerticalVelocity = 0;
+		item->Animation.Velocity.y = 0;
 	}
 }
 
@@ -458,7 +458,7 @@ void LaraSurfaceCollision(ItemInfo* item, CollisionInfo* coll)
 	if (coll->CollisionType & (CT_FRONT | CT_TOP | CT_TOP_FRONT | CT_CLAMP) ||
 		coll->Middle.Floor < 0 && coll->Middle.FloorSlope)
 	{
-		item->Animation.VerticalVelocity = 0;
+		item->Animation.Velocity.y = 0;
 		item->Pose.Position = coll->Setup.OldPosition;
 	}
 	else if (coll->CollisionType == CT_LEFT)
@@ -531,7 +531,7 @@ void LaraSwimCollision(ItemInfo* item, CollisionInfo* coll)
 					item->Pose.Orientation.x -= Angle::DegToRad(0.25);
 				else
 				{
-					item->Animation.VerticalVelocity = 0;
+					item->Animation.Velocity.y = 0;
 					flag = 1;
 				}
 			}
@@ -568,7 +568,7 @@ void LaraSwimCollision(ItemInfo* item, CollisionInfo* coll)
 		break;
 
 	case CT_TOP_FRONT:
-		item->Animation.VerticalVelocity = 0;
+		item->Animation.Velocity.y = 0;
 		flag = 1;
 		break;
 
@@ -584,7 +584,7 @@ void LaraSwimCollision(ItemInfo* item, CollisionInfo* coll)
 
 	case CT_CLAMP:
 		item->Pose.Position = coll->Setup.OldPosition;
-		item->Animation.VerticalVelocity = 0;
+		item->Animation.Velocity.y = 0;
 		flag = 2;
 		break;
 	}
@@ -664,12 +664,12 @@ void LaraWaterCurrent(ItemInfo* item, CollisionInfo* coll)
 		else if (item->Pose.Orientation.x < Angle::DegToRad(-35.0f))
 			item->Pose.Orientation.x = item->Pose.Orientation.x - Angle::DegToRad(1.0f);
 		else
-			item->Animation.VerticalVelocity = 0;
+			item->Animation.Velocity.y = 0;
 	}
 	else if (coll->CollisionType == CT_TOP)
 		item->Pose.Orientation.x -= Angle::DegToRad(1.0f);
 	else if (coll->CollisionType == CT_TOP_FRONT)
-		item->Animation.VerticalVelocity = 0;
+		item->Animation.Velocity.y = 0;
 	else if (coll->CollisionType == CT_LEFT)
 		item->Pose.Orientation.y += Angle::DegToRad(5.0f);
 	else if (coll->CollisionType == CT_RIGHT)
@@ -696,8 +696,8 @@ bool TestLaraHitCeiling(CollisionInfo* coll)
 void SetLaraHitCeiling(ItemInfo* item, CollisionInfo* coll)
 {
 	item->Animation.IsAirborne = false;
-	item->Animation.Velocity = 0;
-	item->Animation.VerticalVelocity = 0;
+	item->Animation.Velocity.z = 0;
+	item->Animation.Velocity.y = 0;
 	item->Pose.Position = coll->Setup.OldPosition;
 }
 

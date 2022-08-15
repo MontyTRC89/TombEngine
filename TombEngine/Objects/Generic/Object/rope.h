@@ -60,5 +60,5 @@ namespace TEN::Entities::Generic
 	void JumpOffRope(ItemInfo* item);
 	void FallFromRope(ItemInfo* item, bool stumble = false);
 	void LaraClimbRope(ItemInfo* item, CollisionInfo* coll);
-	bool RopeSwingCollision(ItemInfo* item, CollisionInfo* coll);
+	bool RopeSwingCollision(ItemInfo* item, CollisionInfo* coll, bool testForStumble);
 }

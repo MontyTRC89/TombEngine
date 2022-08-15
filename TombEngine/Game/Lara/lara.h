@@ -2,11 +2,11 @@
 #include "Game/control/control.h"
 #include "Game/Lara/lara_struct.h"
 
-struct ItemInfo;
 struct CollisionInfo;
+struct ItemInfo;
 
 #define LARA_GRAB_THRESHOLD	Angle::DegToRad(40.0f)
-#define FRONT_ARC			Angle::DegToRad(90.0f)	// TODO: Check use.
+#define FRONT_ARC			Angle::DegToRad(90.0f) // TODO: Check use.
 
 // Lean rates
 #define LARA_LEAN_RATE Angle::DegToRad(1.5f)
@@ -54,32 +54,31 @@ constexpr int LARA_RADIUS			 = 100;
 constexpr int LARA_RADIUS_CRAWL		 = 200;
 constexpr int LARA_RADIUS_UNDERWATER = 300;
 constexpr int LARA_RADIUS_DEATH		 = 400;
-constexpr int LARA_VELOCITY			 = 12;
+constexpr int LARA_VELOCITY			 = 12; // TODO: Float.
 
-// TODO: Convert velocities to floats and eliminate the format conversion that goes on with these values. @Sezz
-constexpr int LARA_SWIM_VELOCITY_ACCEL		  = 2 * 4;
-constexpr int LARA_SWIM_VELOCITY_DECEL		  = 1.5f * 4;
-constexpr int LARA_TREAD_VELOCITY_MAX		  = 17.5f * 4;
-constexpr int LARA_SWIM_VELOCITY_MAX		  = 50 * 4;
-constexpr int LARA_SWIM_INTERTIA_VELOCITY_MIN = 33.5f * 4;
+constexpr auto LARA_FREEFALL_VELOCITY   = 131.0f;
+constexpr auto LARA_DAMAGE_VELOCITY		= 141.0f;
+constexpr auto LARA_DEATH_VELOCITY		= 155.0f;
+constexpr auto LARA_DIVE_DEATH_VELOCITY = 134.0f;
+constexpr auto LARA_TERMINAL_VELOCITY	= CLICK(10);
 
-constexpr int LARA_FREEFALL_VELOCITY   = 131;
-constexpr int LARA_DAMAGE_VELOCITY	   = 141;
-constexpr int LARA_DEATH_VELOCITY	   = 155;
-constexpr int LARA_DIVE_DEATH_VELOCITY = 134;
-constexpr int LARA_TERMINAL_VELOCITY   = CLICK(10);
+constexpr auto LARA_SWIM_VELOCITY_ACCEL		   = 2.0f;
+constexpr auto LARA_SWIM_VELOCITY_DECEL		   = 1.5f;
+constexpr auto LARA_TREAD_VELOCITY_MAX		   = 17.5f;
+constexpr auto LARA_SWIM_VELOCITY_MAX		   = 50.0f;
+constexpr auto LARA_SWIM_INTERTIA_VELOCITY_MIN = 33.5f;
 
 constexpr auto LARA_POSITION_ADJUST_MAX_TIME = FPS * 3;	 // 30 frames * 3 = 3 seconds allowed for position adjustment.
 constexpr auto LARA_POSE_TIME				 = FPS * 30; // 30 frames * 30 = 30 seconds to AFK pose.
 constexpr auto LARA_RUN_JUMP_TIME			 = 22;		 // Frames to count before a running jump is possible.
 constexpr auto LARA_SPRINT_JUMP_TIME		 = 50;		 // Frames to count before a sprint jump is possible.
 
-constexpr float LARA_HEALTH_MAX			= 1000.0f;
-constexpr float LARA_HEALTH_CRITICAL	= LARA_HEALTH_MAX / 4.0f;
-constexpr float LARA_AIR_MAX			= 1800.0f;
-constexpr float LARA_AIR_CRITICAL		= LARA_AIR_MAX / 4.0f;
-constexpr float LARA_SPRINT_ENERGY_MAX  = 120.0f;
-constexpr float LARA_POISON_POTENCY_MAX = 64.0f;
+constexpr auto LARA_HEALTH_MAX		   = 1000.0f;
+constexpr auto LARA_HEALTH_CRITICAL	   = LARA_HEALTH_MAX / 4.0f;
+constexpr auto LARA_AIR_MAX			   = 1800.0f;
+constexpr auto LARA_AIR_CRITICAL	   = LARA_AIR_MAX / 4.0f;
+constexpr auto LARA_SPRINT_ENERGY_MAX  = 120.0f;
+constexpr auto LARA_POISON_POTENCY_MAX = 64.0f;
 
 extern LaraInfo Lara;
 extern ItemInfo* LaraItem;

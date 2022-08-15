@@ -149,7 +149,7 @@ void Renderer11::UpdateLaraAnimations(bool force)
 		case LaraWeaponType::RocketLauncher:
 		case LaraWeaponType::HarpoonGun:
 		{
-			ANIM_FRAME* shotgunFramePtr;
+			ANIM_FRAME* shotgunframePtr;
 
 			// Left arm
 			mask = MESH_BITS(LM_LINARM) | MESH_BITS(LM_LOUTARM) | MESH_BITS(LM_LHAND);
@@ -157,33 +157,33 @@ void Renderer11::UpdateLaraAnimations(bool force)
 			if (shouldAnimateUpperBody(Lara.Control.Weapon.GunType))
 				mask |= MESH_BITS(LM_TORSO) | MESH_BITS(LM_HEAD);
 
-			shotgunFramePtr = &g_Level.Frames[Lara.LeftArm.FrameBase + Lara.LeftArm.FrameNumber];
-			UpdateAnimation(item, laraObj, &shotgunFramePtr, 0, 1, mask);
+			shotgunframePtr = &g_Level.Frames[Lara.LeftArm.FrameBase + Lara.LeftArm.FrameNumber];
+			UpdateAnimation(item, laraObj, &shotgunframePtr, 0, 1, mask);
 
 			// Right arm
 			mask = MESH_BITS(LM_RINARM) | MESH_BITS(LM_ROUTARM) | MESH_BITS(LM_RHAND);
 			if (shouldAnimateUpperBody(Lara.Control.Weapon.GunType))
 				mask |= MESH_BITS(LM_TORSO) | MESH_BITS(LM_HEAD);
 
-			shotgunFramePtr = &g_Level.Frames[Lara.RightArm.FrameBase + Lara.RightArm.FrameNumber];
-			UpdateAnimation(item, laraObj, &shotgunFramePtr, 0, 1, mask);
+			shotgunframePtr = &g_Level.Frames[Lara.RightArm.FrameBase + Lara.RightArm.FrameNumber];
+			UpdateAnimation(item, laraObj, &shotgunframePtr, 0, 1, mask);
 		}
 
 		break;
 
 		case LaraWeaponType::Revolver:
 		{
-			ANIM_FRAME* revolverFramePtr;
+			ANIM_FRAME* revolverframePtr;
 
 			// Left arm
 			mask = MESH_BITS(LM_LINARM) | MESH_BITS(LM_LOUTARM) | MESH_BITS(LM_LHAND);
-			revolverFramePtr = &g_Level.Frames[Lara.LeftArm.FrameBase + Lara.LeftArm.FrameNumber - g_Level.Anims[Lara.LeftArm.AnimNumber].frameBase];
-			UpdateAnimation(item, laraObj, &revolverFramePtr, 0, 1, mask);
+			revolverframePtr = &g_Level.Frames[Lara.LeftArm.FrameBase + Lara.LeftArm.FrameNumber - g_Level.Anims[Lara.LeftArm.AnimNumber].frameBase];
+			UpdateAnimation(item, laraObj, &revolverframePtr, 0, 1, mask);
 
 			// Right arm
 			mask = MESH_BITS(LM_RINARM) | MESH_BITS(LM_ROUTARM) | MESH_BITS(LM_RHAND);
-			revolverFramePtr = &g_Level.Frames[Lara.RightArm.FrameBase + Lara.RightArm.FrameNumber - g_Level.Anims[Lara.RightArm.AnimNumber].frameBase];
-			UpdateAnimation(item, laraObj, &revolverFramePtr, 0, 1, mask);
+			revolverframePtr = &g_Level.Frames[Lara.RightArm.FrameBase + Lara.RightArm.FrameNumber - g_Level.Anims[Lara.RightArm.AnimNumber].frameBase];
+			UpdateAnimation(item, laraObj, &revolverframePtr, 0, 1, mask);
 		}
 
 		break;
@@ -192,21 +192,21 @@ void Renderer11::UpdateLaraAnimations(bool force)
 		case LaraWeaponType::Uzi:
 		default:
 		{
-			ANIM_FRAME* pistolFramePtr;
+			ANIM_FRAME* pistolframePtr;
 
 			// Left arm
 			int upperArmMask = MESH_BITS(LM_LINARM);
 			mask = MESH_BITS(LM_LOUTARM) | MESH_BITS(LM_LHAND);
-			pistolFramePtr = &g_Level.Frames[Lara.LeftArm.FrameBase + Lara.LeftArm.FrameNumber - g_Level.Anims[Lara.LeftArm.AnimNumber].frameBase];
-			UpdateAnimation(item, laraObj, &pistolFramePtr, 0, 1, upperArmMask, true);
-			UpdateAnimation(item, laraObj, &pistolFramePtr, 0, 1, mask);
+			pistolframePtr = &g_Level.Frames[Lara.LeftArm.FrameBase + Lara.LeftArm.FrameNumber - g_Level.Anims[Lara.LeftArm.AnimNumber].frameBase];
+			UpdateAnimation(item, laraObj, &pistolframePtr, 0, 1, upperArmMask, true);
+			UpdateAnimation(item, laraObj, &pistolframePtr, 0, 1, mask);
 
 			// Right arm
 			upperArmMask = MESH_BITS(LM_RINARM);
 			mask = MESH_BITS(LM_ROUTARM) | MESH_BITS(LM_RHAND);
-			pistolFramePtr = &g_Level.Frames[Lara.RightArm.FrameBase + Lara.RightArm.FrameNumber - g_Level.Anims[Lara.RightArm.AnimNumber].frameBase];
-			UpdateAnimation(item, laraObj, &pistolFramePtr, 0, 1, upperArmMask, true);
-			UpdateAnimation(item, laraObj, &pistolFramePtr, 0, 1, mask);
+			pistolframePtr = &g_Level.Frames[Lara.RightArm.FrameBase + Lara.RightArm.FrameNumber - g_Level.Anims[Lara.RightArm.AnimNumber].frameBase];
+			UpdateAnimation(item, laraObj, &pistolframePtr, 0, 1, upperArmMask, true);
+			UpdateAnimation(item, laraObj, &pistolframePtr, 0, 1, mask);
 		}
 
 		break;

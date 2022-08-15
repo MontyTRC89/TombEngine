@@ -12,6 +12,7 @@
 #include "Game/control/lot.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
+#include "Game/Lara/lara_initialise.h"
 #include "Game/misc.h"
 #include "Game/pickup/pickup.h"
 #include "Game/savegame.h"
@@ -290,12 +291,10 @@ void LoadObjects()
 		auto* anim = &g_Level.Anims[i];
 
 		anim->framePtr = ReadInt32();
-		anim->interpolation = ReadInt32();
+		anim->Interpolation = ReadInt32();
 		anim->ActiveState = ReadInt32();
-		anim->velocity = ReadFloat();
-		anim->acceleration = ReadFloat();
-		anim->Xvelocity = ReadFloat();
-		anim->Xacceleration = ReadFloat();
+		anim->VelocityStart = ReadVector3();
+		anim->VelocityEnd = ReadVector3();
 		anim->frameBase = ReadInt32();
 		anim->frameEnd = ReadInt32();
 		anim->jumpAnimNum = ReadInt32();
@@ -800,7 +799,7 @@ void ReadRooms()
 			volume.Scale.y = ReadFloat();
 			volume.Scale.z = ReadFloat();
 
-			//volume.LuaName = ReadString(); // TODO: Uncomment when lua API for volumes is implemented -- Lwmte, 09.08.22
+			volume.LuaName = ReadString();
 			volume.EventSetIndex = ReadInt32();
 
 			volume.Status = TriggerStatus::Outside;
@@ -1044,30 +1043,25 @@ unsigned int _stdcall LoadLevel(void* data)
 {
 	const int levelIndex = reinterpret_cast<int>(data);
 
-	char filename[80];
 	ScriptInterfaceLevel* level = g_GameFlow->GetLevel(levelIndex);
-	strcpy_s(filename, level->FileName.c_str());
 
-	TENLog("Loading level file: " + std::string(filename), LogLevel::Info);
+	TENLog("Loading level file: " + level->FileName, LogLevel::Info);
 
 	LevelDataPtr = nullptr;
 	FILE* filePtr = nullptr;
 	char* dataPtr = nullptr;
 
-	wchar_t loadscreenFileName[80];
-	std::mbstowcs(loadscreenFileName, level->LoadScreenFileName.c_str(), 80);
-	std::wstring loadScreenFile = std::wstring(loadscreenFileName);
-	g_Renderer.SetLoadingScreen(loadScreenFile);
+	g_Renderer.SetLoadingScreen(TEN::Utils::FromChar(level->LoadScreenFileName.c_str()));
 
 	SetScreenFadeIn(FADE_SCREEN_SPEED);
 	g_Renderer.UpdateProgress(0);
 
 	try
 	{
-		filePtr = FileOpen(filename);
+		filePtr = FileOpen(level->FileName.c_str());
 
 		if (!filePtr)
-			throw std::exception((std::string("Unable to read level file: ") + filename).c_str());
+			throw std::exception((std::string("Unable to read level file: ") + level->FileName).c_str());
 
 		char header[4];
 		unsigned char version[4];

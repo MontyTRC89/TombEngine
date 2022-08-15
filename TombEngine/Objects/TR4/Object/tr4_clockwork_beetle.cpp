@@ -55,8 +55,8 @@ void ClockworkBeetleControl(short itemNumber)
 
 	SoundEffect(SFX_TR4_CLOCKWORK_BEETLE_WINDUP, &beetle->Pose);
 
-	beetle->Animation.VerticalVelocity += 12;
-	beetle->Pose.Position.y += beetle->Animation.VerticalVelocity;
+	beetle->Animation.Velocity.y += 12;
+	beetle->Pose.Position.y += beetle->Animation.Velocity.y;
 
 	short roomNumber = beetle->RoomNumber;
 	FloorInfo* floor = GetFloor(beetle->Pose.Position.x, beetle->Pose.Position.y - 20, beetle->Pose.Position.z, &roomNumber);
@@ -66,10 +66,10 @@ void ClockworkBeetleControl(short itemNumber)
 	{
 		beetle->Pose.Position.y = height;
 
-		if (beetle->Animation.VerticalVelocity <= 32)
-			beetle->Animation.VerticalVelocity = 0;
+		if (beetle->Animation.Velocity.y <= 32)
+			beetle->Animation.Velocity.y = 0;
 		else
-			beetle->Animation.VerticalVelocity = -beetle->Animation.VerticalVelocity >> 1;
+			beetle->Animation.Velocity.y = -beetle->Animation.Velocity.y / 2;
 
 		flag = 1;
 	}
@@ -139,22 +139,22 @@ void ClockworkBeetleControl(short itemNumber)
 
 				if (pow(x, 2) + pow(z, 2) >= 0x19000)
 				{
-					if (beetle->Animation.Velocity < 32)
-						beetle->Animation.Velocity++;
+					if (beetle->Animation.Velocity.z < 32)
+						beetle->Animation.Velocity.z++;
 				}
 				else
 				{
-					if (beetle->Animation.Velocity <= 4)
+					if (beetle->Animation.Velocity.z <= 4)
 					{
-						if (beetle->Animation.Velocity < 4)
-							beetle->Animation.Velocity++;
+						if (beetle->Animation.Velocity.z < 4)
+							beetle->Animation.Velocity.z++;
 					}
 					else
-						beetle->Animation.Velocity = beetle->Animation.Velocity - (beetle->ItemFlags[2] == 4) - 1;
+						beetle->Animation.Velocity.z = beetle->Animation.Velocity.z - (beetle->ItemFlags[2] == 4) - 1;
 				}
 
-				beetle->Pose.Position.x += beetle->Animation.Velocity * sin(beetle->Pose.Orientation.y);
-				beetle->Pose.Position.z += beetle->Animation.Velocity * cos(beetle->Pose.Orientation.y);
+				beetle->Pose.Position.x += beetle->Animation.Velocity.z * sin(beetle->Pose.Orientation.y);
+				beetle->Pose.Position.z += beetle->Animation.Velocity.z * cos(beetle->Pose.Orientation.y);
 			}
 			else
 			{
@@ -232,11 +232,11 @@ void ClockworkBeetleControl(short itemNumber)
 
 		case 3:
 		{
-			if (beetle->Animation.Velocity < 32)
-				beetle->Animation.Velocity++;
+			if (beetle->Animation.Velocity.z < 32)
+				beetle->Animation.Velocity.z++;
 
-			beetle->Pose.Position.x += beetle->Animation.Velocity * sin(beetle->Pose.Orientation.y);
-			beetle->Pose.Position.z += beetle->Animation.Velocity * cos(beetle->Pose.Orientation.y);
+			beetle->Pose.Position.x += beetle->Animation.Velocity.z * sin(beetle->Pose.Orientation.y);
+			beetle->Pose.Position.z += beetle->Animation.Velocity.z * cos(beetle->Pose.Orientation.y);
 
 			if (!floor->Flags.MarkBeetle)
 				beetle->ItemFlags[3] = 1;
@@ -274,7 +274,7 @@ void ClockworkBeetleControl(short itemNumber)
 
 			if (flag && beetle->ItemFlags[3] > 30 && val)
 			{
-				beetle->Animation.VerticalVelocity = -((val >> 1) + GetRandomControl() % val);
+				beetle->Animation.Velocity.y = -((val >> 1) + GetRandomControl() % val);
 				return;
 			}
 		}
@@ -286,7 +286,7 @@ void ClockworkBeetleControl(short itemNumber)
 
 			if (flag && val)
 			{
-				beetle->Animation.VerticalVelocity = -((val >> 1) + GetRandomControl() % val);
+				beetle->Animation.Velocity.y = -((val >> 1) + GetRandomControl() % val);
 				return;
 			}
 
@@ -328,7 +328,7 @@ void UseClockworkBeetle(short flag)
 			else
 				item->ItemFlags[0] = 0;
 
-			item->Animation.Velocity = 0;
+			item->Animation.Velocity.z = 0;
 			AddActiveItem(itemNumber);
 
 			if (item->ItemFlags[0])

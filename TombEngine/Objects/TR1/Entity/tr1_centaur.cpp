@@ -65,27 +65,27 @@ namespace TEN::Entities::TR1
 			if (item->Pose.Orientation.x < -Angle::DegToRad(90.0f))
 				item->Pose.Orientation.x = -Angle::DegToRad(90.0f);
 
-			item->Animation.Velocity = CENTAUR_PROJECTILE_SPEED * cos(item->Pose.Orientation.x);
-			item->Animation.VerticalVelocity = -CENTAUR_PROJECTILE_SPEED * sin(item->Pose.Orientation.x);
+			item->Animation.Velocity.z = CENTAUR_PROJECTILE_SPEED * cos(item->Pose.Orientation.x);
+			item->Animation.Velocity.y = -CENTAUR_PROJECTILE_SPEED * sin(item->Pose.Orientation.x);
 			aboveWater = true;
 		}
 		else
 		{
-			item->Animation.VerticalVelocity += 3;
+			item->Animation.Velocity.y += 3;
 			aboveWater = true;
 
-			if (item->Animation.Velocity)
+			if (item->Animation.Velocity.z)
 			{
-				item->Pose.Orientation.z += ((item->Animation.Velocity / 4) + 7) * Angle::DegToRad(1.0f);
+				item->Pose.Orientation.z += ((item->Animation.Velocity.z / 4) + 7) * Angle::DegToRad(1.0f);
 
 				if (item->Animation.RequiredState)
-					item->Pose.Orientation.y += ((item->Animation.Velocity / 2) + 7) * Angle::DegToRad(1.0f);
+					item->Pose.Orientation.y += ((item->Animation.Velocity.z / 2) + 7) * Angle::DegToRad(1.0f);
 				else
-					item->Pose.Orientation.x += ((item->Animation.Velocity / 2) + 7) * Angle::DegToRad(1.0f);
+					item->Pose.Orientation.x += ((item->Animation.Velocity.z / 2) + 7) * Angle::DegToRad(1.0f);
 			}
 		}
 
-		TranslateItem(item, item->Pose.Orientation, item->Animation.Velocity);
+		TranslateItem(item, item->Pose.Orientation, item->Animation.Velocity.z);
 
 		auto probe = GetCollision(item);
 
@@ -164,8 +164,8 @@ namespace TEN::Entities::TR1
 
 			projectileItem->Pose.Orientation = EulerAngles(0.0f, centaurItem->Pose.Orientation.y, 0.0f);
 
-			projectileItem->Animation.Velocity = CENTAUR_PROJECTILE_SPEED * cos(projectileItem->Pose.Orientation.x);
-			projectileItem->Animation.VerticalVelocity = -CENTAUR_PROJECTILE_SPEED * cos(projectileItem->Pose.Orientation.x);
+			projectileItem->Animation.Velocity.z = CENTAUR_PROJECTILE_SPEED * cos(projectileItem->Pose.Orientation.x);
+			projectileItem->Animation.Velocity.y = -CENTAUR_PROJECTILE_SPEED * cos(projectileItem->Pose.Orientation.x);
 			projectileItem->ItemFlags[0] = 1;
 
 			AddActiveItem(itemNumber);

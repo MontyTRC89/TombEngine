@@ -66,7 +66,7 @@ void KnifeControl(short fxNumber)
 		DoDamage(LaraItem, 50);
 
 		fx->pos.Orientation.y = LaraItem->Pose.Orientation.y;
-		fx->speed = LaraItem->Animation.Velocity;
+		fx->speed = LaraItem->Animation.Velocity.z;
 		fx->frameNumber = fx->counter = 0;
 
 		SoundEffect(SFX_TR2_CRUNCH2, &fx->pos);
