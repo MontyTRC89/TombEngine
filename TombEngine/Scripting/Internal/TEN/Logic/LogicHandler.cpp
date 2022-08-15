@@ -131,6 +131,8 @@ void LogicHandler::ResetScripts(bool clearGameVars)
 		ResetGameTables();
 
 	m_handler.ResetGlobals();
+
+	m_handler.GetState()->collect_garbage();
 }
 
 void LogicHandler::FreeLevelScripts()
