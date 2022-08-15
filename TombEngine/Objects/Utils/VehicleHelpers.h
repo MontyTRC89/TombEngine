@@ -17,9 +17,9 @@ using std::vector;
 
 namespace TEN::Entities::Vehicles
 {
-	constexpr auto VEHICLE_VELOCITY_SCALE = 256; // TODO: Deal with this nonsense *immediately* post-beta. @Sezz 2022.06.25
+	constexpr auto VEHICLE_VELOCITY_SCALE = 256; // TODO: Deal with this nonsense *immediately* post-beta. -- Sezz 2022.06.25
 
-	constexpr auto VEHICLE_SINK_VELOCITY		 = 15;
+	constexpr auto VEHICLE_SINK_VELOCITY		 = 15.0f;
 	constexpr auto VEHICLE_WATER_HEIGHT_MAX		 = CLICK(2.5f);
 	constexpr auto VEHICLE_WATER_VELOCITY_COEFF  = 16.0f;
 	constexpr auto VEHICLE_WATER_TURN_RATE_COEFF = 10.0f;
@@ -58,13 +58,13 @@ namespace TEN::Entities::Vehicles
 		Right
 	};
 
-	// Collision struct specific to vehicles. Used to ascertain point/room collision parameters
-	// at wheels and around the base perimeter. Essentially, a pseudo-raycast. May revise later.
+	// Collision struct specific to vehicles. Used to ascertain point probe collision parameters
+	// at wheels and around the base perimeter. Essentially a pseudo-raycast. May revise later.
 	struct VehiclePointCollision
 	{
-		Vector3Int Position;
-		int Floor;
-		int Ceiling;
+		Vector3Int Position = Vector3Int::Zero;
+		int		   Floor	= 0;
+		int		   Ceiling	= 0;
 	};
 
 	//-------------------

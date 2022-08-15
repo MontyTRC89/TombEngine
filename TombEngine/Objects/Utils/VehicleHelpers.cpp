@@ -1,10 +1,10 @@
 #include "framework.h"
 #include "Objects/Utils/VehicleHelpers.h"
 
-#include "Game/effects/simple_particle.h"
-#include "Game/effects/tomb4fx.h"
 #include "Game/collision/collide_item.h"
 #include "Game/collision/sphere.h"
+#include "Game/effects/simple_particle.h"
+#include "Game/effects/tomb4fx.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_flare.h"
 #include "Game/Lara/lara_helpers.h"
