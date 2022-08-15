@@ -1,35 +1,25 @@
 #include "framework.h"
 #include "tr4_teethspike.h"
+
+#include "Game/collision/collide_item.h"
 #include "Game/collision/collide_room.h"
-#include "Game/Lara/lara.h"
-#include "Specific/level.h"
-#include "Sound/sound.h"
 #include "Game/effects/tomb4fx.h"
-#include "Specific/trmath.h"
-#include "Specific/setup.h"
 #include "Game/items.h"
+#include "Game/Lara/lara.h"
+#include "Sound/sound.h"
+#include "Specific/level.h"
+#include "Specific/setup.h"
+#include "Specific/trmath.h"
+#include "Objects/Utils/VehicleHelpers.h"
 
 namespace TEN::Entities::TR4
 {
-	short SPyoffs[8] =
-	{
-		-1024, 0, -512, 0, 0, 0, -512, 0
-	};
-
-	short SPxzoffs[8] =
-	{
-		0, 0, 512, 0, 0, 0, -512, 0
-	};
-
-	short SPDETyoffs[8] =
-	{
-		1024, 512, 512, 512, 0, 512, 512, 512
-	};
+	constexpr auto TEETH_SPIKES_DEFAULT_INTERVAL = 64;
+	constexpr auto TEETH_SPIKE_HARM_CONSTANT = 8;
+	constexpr auto TEETH_SPIKE_HARM_EMERGING = 30;
 
 	void InitialiseTeethSpikes(short itemNumber)
 	{
-		int angle;
-
 		auto* item = &g_Level.Items[itemNumber];
 		item->Status = ITEM_INVISIBLE;
 
@@ -37,75 +27,20 @@ namespace TEN::Entities::TR4
 		for (int i = 0; i < item->Animation.Mutator.size(); i++)
 			item->Animation.Mutator[i].Scale.y = 0.0f;
 
-		short rotations[8] =
-		{
-			ANGLE(180.0f),
-			ANGLE(225.0f),
-			ANGLE(270.0f),
-			ANGLE(315.0f),
-			ANGLE(0.0f),
-			ANGLE(45.0f),
-			ANGLE(90.0f),
-			ANGLE(135.0f)
-		};
-
-		if (item->TriggerFlags & 8)
-		{
-			angle = item->TriggerFlags & 7;
-			item->Pose.Orientation.x = rotations[angle];
-			item->Pose.Orientation.y = ANGLE(90.0f);
-			item->Pose.Position.z -= SPxzoffs[angle];
-		}
-		else
-		{
-			angle = item->TriggerFlags & 7;
-			item->Pose.Position.x += SPxzoffs[angle];
-			item->Pose.Orientation.z = rotations[angle];
-		}
-
 		item->ItemFlags[0] = 1024;
 		item->ItemFlags[2] = 0;
-		item->Pose.Position.y += SPyoffs[angle];
 	}
 
-	bool TestBoundsCollideTeethSpikes(ItemInfo* item)
+	bool TestBoundsCollideTeethSpikes(ItemInfo* item, ItemInfo* collidingItem)
 	{
-		int x;
-		int z;
+		// Get both teeth spikes and colliding item bounds
+		auto spikeBox = TO_DX_BBOX(item->Pose, GetBoundsAccurate(item));
+		auto itemBox = TO_DX_BBOX(collidingItem->Pose, GetBoundsAccurate(collidingItem));
 
-		short angle = item->TriggerFlags & 7;
+		// Make intersection a bit more forgiving by reducing spike bounds a bit
+		spikeBox.Extents = spikeBox.Extents * 0.95f;
 
-		if (item->TriggerFlags & 8)
-		{
-			x = (item->Pose.Position.x & (~1023)) | 512;
-			z = ((item->Pose.Position.z + SPxzoffs[angle]) & (~1023)) | 512;
-		}
-		else
-		{
-			x = ((item->Pose.Position.x - SPxzoffs[angle]) & (~1023)) | 512;
-			z = (item->Pose.Position.z & (~1023)) | 512;
-		}
-
-		int size = (item->TriggerFlags & 1 ? 300 : 480);
-		int y = item->Pose.Position.y + SPDETyoffs[angle];
-
-		auto* frames = GetBestFrame(LaraItem);
-
-		if (LaraItem->Pose.Position.y + frames->boundingBox.Y1 <= y &&
-			LaraItem->Pose.Position.y + frames->boundingBox.Y2 >= y - 900)
-		{
-			if (LaraItem->Pose.Position.x + frames->boundingBox.X1 <= (x + size) &&
-				LaraItem->Pose.Position.x + frames->boundingBox.X2 >= (x - size))
-			{
-				if (LaraItem->Pose.Position.z + frames->boundingBox.Z1 <= (z + size) &&
-					LaraItem->Pose.Position.z + frames->boundingBox.Z2 >= (z - size))
-				{
-					return true;
-				}
-			}
-		}
-
-		return false;
+		return spikeBox.Intersects(itemBox);
 	}
 
 	void ControlTeethSpikes(short itemNumber)
@@ -114,35 +49,41 @@ namespace TEN::Entities::TR4
 
 		if (TriggerActive(item) && item->ItemFlags[2] == 0)
 		{
-			// Just emerging.
-			if (item->ItemFlags[0] == 1024)
+			// Play sound if spikes are emerging. Ignore for constantly sticked out ones.
+			if (item->ItemFlags[0] == 1024 && item->TriggerFlags != 1)
 				SoundEffect(SFX_TR4_TEETH_SPIKES, &item->Pose);
+
+			// Kill enemies
+			item->Animation.Velocity.z = VEHICLE_COLLISION_TERMINAL_VELOCITY;
+			DoVehicleCollision(item, CLICK(1.5f));
 
 			item->Status = ITEM_ACTIVE;
 
-			if (LaraItem->Animation.ActiveState != LS_DEATH &&
-				TestBoundsCollideTeethSpikes(item))
+			if (LaraItem->Animation.ActiveState != LS_DEATH && TestBoundsCollideTeethSpikes(item, LaraItem))
 			{
+				Vector3 normal = Vector3::UnitY;
+				normal = normal.Transform(normal, Matrix::CreateFromYawPitchRoll(TO_RAD(item->Pose.Orientation.y), TO_RAD(item->Pose.Orientation.x), TO_RAD(item->Pose.Orientation.z)));
+				auto dot = Vector3::UnitX.Dot(normal);
+				auto angle = acos(dot / sqrt(normal.LengthSquared() * Vector3::UnitX.LengthSquared()));
+
 				auto* bounds = (BOUNDING_BOX*)GetBestFrame(item);
 				auto* laraBounds = (BOUNDING_BOX*)GetBestFrame(LaraItem);
 
 				int bloodCount = 0;
 
-				if ((item->ItemFlags[0] > 1024 ||
-					LaraItem->Animation.IsAirborne) &&
-					(item->TriggerFlags & 7) > 2 &&
-					(item->TriggerFlags & 7) < 6)
+				if ((item->ItemFlags[0] > 1024 || LaraItem->Animation.IsAirborne) &&
+					(angle > PI * 0.25f && angle < PI * 0.75f))
 				{
-					if (LaraItem->Animation.Velocity.y > 6 ||
-						item->ItemFlags[0] > 1024)
+					if (LaraItem->Animation.Velocity.y > 6 || item->ItemFlags[0] > 1024)
 					{
 						LaraItem->HitPoints = -1;
 						bloodCount = 20;
 					}
 				}
-				else if (LaraItem->Animation.Velocity.z >= 30)
+				else if ((item->TriggerFlags != 1) || LaraItem->Animation.Velocity.z >= 30)
 				{
-					DoDamage(LaraItem, 8);
+					int harm = item->ItemFlags[0] == 1024 ? TEETH_SPIKE_HARM_EMERGING : TEETH_SPIKE_HARM_CONSTANT;
+					DoDamage(LaraItem, harm);
 					bloodCount = (GetRandomControl() & 3) + 2;
 				}
 				else
@@ -152,8 +93,7 @@ namespace TEN::Entities::TR4
 				int yBottom = laraBounds->Y2 + LaraItem->Pose.Position.y;
 				int y1, y2;
 
-				if ((item->TriggerFlags & 15) == 8 ||
-					(item->TriggerFlags & 15) == 0)
+				if (angle < PI * 0.125f || angle > PI * 0.825f)
 				{
 					y1 = -bounds->Y2;
 					y2 = -bounds->Y1;
@@ -168,10 +108,11 @@ namespace TEN::Entities::TR4
 					yTop = y1 + item->Pose.Position.y;
 				if (yBottom > y2 + item->Pose.Position.y)
 					yBottom = y2 + item->Pose.Position.y;	
+
 				int dy = (abs(yTop - yBottom)) + 1;
 
-				if ((item->TriggerFlags & 7) == 2 ||
-					(item->TriggerFlags & 7) == 6)
+				if ((angle > PI * 0.125f && angle < PI * 0.375f) ||
+					(angle > PI * 0.625f && angle < PI * 0.750f))
 				{
 					bloodCount >>= 1;
 				}
@@ -203,8 +144,11 @@ namespace TEN::Entities::TR4
 				if (item->ItemFlags[0] <= 1024)
 				{
 					item->ItemFlags[0] = 0;
-					if ((item->TriggerFlags & 16) == 0 && LaraItem->HitPoints > 0)
-						item->ItemFlags[2] = 64;
+					if (item->TriggerFlags != 1 && LaraItem->HitPoints > 0)
+					{
+						int customInterval = item->TriggerFlags >> 2;
+						item->ItemFlags[2] = customInterval ? customInterval : TEETH_SPIKES_DEFAULT_INTERVAL;
+					}
 				}
 				else
 					item->ItemFlags[0] = -item->ItemFlags[0] >> 1;
@@ -222,7 +166,7 @@ namespace TEN::Entities::TR4
 				item->Status = ITEM_INVISIBLE;
 			}
 
-			if ((item->TriggerFlags & 32) == 0)
+			if (item->TriggerFlags != 2)
 			{
 				if (item->ItemFlags[2])
 					item->ItemFlags[2]--;
