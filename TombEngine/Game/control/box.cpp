@@ -2087,10 +2087,9 @@ void InitialiseItemBoxData()
 				if (floorHeight <= mesh.pos.Position.y - staticInfo->collisionBox.Y2 + CLICK(2) &&
 					floorHeight < mesh.pos.Position.y - staticInfo->collisionBox.Y1)
 				{
-					if (staticInfo->collisionBox.X1 == 0 || staticInfo->collisionBox.X2 == 0 ||
-						staticInfo->collisionBox.Z1 == 0 || staticInfo->collisionBox.Z2 == 0 ||
-						((staticInfo->collisionBox.X1 < 0) ^ (staticInfo->collisionBox.X2 < 0)) &&
-						((staticInfo->collisionBox.Z1 < 0) ^ (staticInfo->collisionBox.Z2 < 0)))
+					auto bbox = staticInfo->collisionBox * mesh.scale;
+					if (bbox.X1 == 0 || bbox.X2 == 0 || bbox.Z1 == 0 || bbox.Z2 == 0 ||
+					   ((bbox.X1 < 0) ^ (bbox.X2 < 0)) && ((bbox.Z1 < 0) ^ (bbox.Z2 < 0)))
 					{
 						floor->Stopper = true;
 					}
