@@ -575,4 +575,5 @@ struct BOUNDING_BOX
 	short Z2;
 };
 
-BOUNDING_BOX operator+(BOUNDING_BOX const& box, PHD_3DPOS const& vec);
+BOUNDING_BOX operator+(const BOUNDING_BOX& box, const PHD_3DPOS& vec);
+BOUNDING_BOX operator*(const BOUNDING_BOX& box, const float scale);

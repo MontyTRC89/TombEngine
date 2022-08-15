@@ -829,18 +829,16 @@ BOUNDING_BOX* FindPlinth(ItemInfo* item)
 					frame->Z2 >= staticInfo->collisionBox.Z1 &&
 					(staticInfo->collisionBox.X1 || staticInfo->collisionBox.X2))
 				{
-					found = mesh->staticNumber;
-					break;
+					static BOUNDING_BOX result;
+					result = StaticObjects[found].collisionBox * mesh->scale;
+					return &result;
 				}
 			}
 		}
 	}
 
-	if (found != -1)
-		return &StaticObjects[found].collisionBox;
-
 	if (room->itemNumber == NO_ITEM)
-		return NULL;
+		return nullptr;
 
 	short itemNumber = room->itemNumber;
 	for (itemNumber = room->itemNumber; itemNumber != NO_ITEM; itemNumber = g_Level.Items[itemNumber].NextItem)
@@ -859,7 +857,7 @@ BOUNDING_BOX* FindPlinth(ItemInfo* item)
 	}
 
 	if (itemNumber == NO_ITEM)
-		return NULL;
+		return nullptr;
 	else
 		return (BOUNDING_BOX*)GetBestFrame(&g_Level.Items[itemNumber]);
 }
