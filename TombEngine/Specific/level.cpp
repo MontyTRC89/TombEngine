@@ -594,6 +594,12 @@ void ReadRooms()
 	for (int i = 0; i < numRooms; i++)
 	{
 		auto & room = g_Level.Rooms.emplace_back();
+		
+		room.name = ReadString();
+		int numTags = ReadInt32();
+		for (int j = 0; j < numTags; j++)
+			room.tags.push_back(ReadString());
+		
 		room.x = ReadInt32();
 		room.y = 0;
 		room.z = ReadInt32();
