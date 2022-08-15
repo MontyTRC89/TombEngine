@@ -1796,7 +1796,7 @@ void DoObjectCollision(ItemInfo* laraItem, CollisionInfo* coll)
 							item->RoomNumber, 3);
 					}
 				}
-				else
+				else if (coll->Setup.EnableObjectPush)
 					ItemPushItem(item, laraItem, coll, false, 1);
 			}
 		}
