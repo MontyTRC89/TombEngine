@@ -22,11 +22,13 @@ public:
 	Static(Static const& other) = delete;
 
 	static void Register(sol::table & parent);
+
 	Rotation GetRot() const;
 	void SetRot(Rotation const& rot);
-
 	Vec3 GetPos() const;
 	void SetPos(Vec3 const & pos);
+	float GetScale() const;
+	void SetScale(float const& scale);
 	std::string GetName() const;
 	void SetName(std::string const & name);
 	int GetSlot() const;
