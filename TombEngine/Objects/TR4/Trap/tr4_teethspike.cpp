@@ -53,6 +53,10 @@ namespace TEN::Entities::TR4
 			if (item->ItemFlags[0] == 1024 && item->TriggerFlags != 1)
 				SoundEffect(SFX_TR4_TEETH_SPIKES, &item->Pose);
 
+			// Immediately set teeth spikes state to sticked out, if flag is set.
+			if (item->TriggerFlags == 1)
+				item->ItemFlags[1] = 5120;
+
 			// Kill enemies
 			item->Animation.Velocity.z = VEHICLE_COLLISION_TERMINAL_VELOCITY;
 			DoVehicleCollision(item, CLICK(1.5f));
