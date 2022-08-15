@@ -79,7 +79,7 @@ namespace TEN::Entities::TR4
 				int bloodCount = 0;
 
 				// Spikes are upwards and Lara is flying or spikes just emerged - impale her.
-				if ((item->ItemFlags[0] > 1024 || LaraItem->Animation.IsAirborne) &&
+				if ((item->ItemFlags[0] >= 1024 || LaraItem->Animation.IsAirborne) &&
 					(angle > PI * 0.25f && angle < PI * 0.75f))
 				{
 					if (LaraItem->Animation.Velocity.y > 6 || item->ItemFlags[0] > 1024)
@@ -172,7 +172,7 @@ namespace TEN::Entities::TR4
 		{
 			item->ItemFlags[0] += (item->ItemFlags[0] >> 3) + 32;
 			item->ItemFlags[1] -= item->ItemFlags[0];
-			if (item->ItemFlags[1] < 0)
+			if (item->ItemFlags[1] <= 0)
 			{
 				item->ItemFlags[0] = 1024;
 				item->ItemFlags[1] = 0;
@@ -189,9 +189,9 @@ namespace TEN::Entities::TR4
 		}
 		else if (!item->Timer)
 		{
-			item->ItemFlags[0] += (item->ItemFlags[0] >> 3) + 32;
 			if (item->ItemFlags[1] > 0)
 			{
+				item->ItemFlags[0] += (item->ItemFlags[0] >> 3) + 32;
 				item->ItemFlags[1] -= item->ItemFlags[0];
 				if (item->ItemFlags[1] < 0)
 					item->ItemFlags[1] = 0;
@@ -199,10 +199,13 @@ namespace TEN::Entities::TR4
 		}
 
 		// Update bone mutators.
-		if (item->ItemFlags[1])
+		for (int i = 0; i < item->Animation.Mutator.size(); i++)
 		{
-			for (int i = 0; i < item->Animation.Mutator.size(); i++)
-				item->Animation.Mutator[i].Scale = Vector3(1.0f, item->ItemFlags[1] / 4096.0f, 1.0f);
+			float scale = (float)item->ItemFlags[1] / 4096.0f;
+			if (scale > 0.0f)
+				item->Animation.Mutator[i].Scale = Vector3(1.0f, scale, 1.0f);
+			else
+				item->Animation.Mutator[i].Scale = Vector3::Zero;
 		}
 	}
 }
