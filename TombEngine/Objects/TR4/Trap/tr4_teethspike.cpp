@@ -15,8 +15,11 @@
 namespace TEN::Entities::TR4
 {
 	constexpr auto TEETH_SPIKES_DEFAULT_INTERVAL = 64;
+
 	constexpr auto TEETH_SPIKE_HARM_CONSTANT = 8;
 	constexpr auto TEETH_SPIKE_HARM_EMERGING = 30;
+
+	constexpr auto TEETH_SPIKE_FORGIVENESS_RATIO = 0.95f;
 
 	void InitialiseTeethSpikes(short itemNumber)
 	{
@@ -38,9 +41,19 @@ namespace TEN::Entities::TR4
 		auto itemBox = TO_DX_BBOX(collidingItem->Pose, GetBoundsAccurate(collidingItem));
 
 		// Make intersection a bit more forgiving by reducing spike bounds a bit
-		spikeBox.Extents = spikeBox.Extents * 0.95f;
+		spikeBox.Extents = spikeBox.Extents * TEETH_SPIKE_FORGIVENESS_RATIO;
 
 		return spikeBox.Contains(itemBox);
+	}
+
+	void DoTeethSpikeCollision(ItemInfo* trapItem, int radius)
+	{
+		CollisionInfo coll = {};
+		coll.Setup.Radius = radius;
+		coll.Setup.OldPosition = trapItem->Pose.Position;
+		coll.Setup.EnableObjectPush = false;
+
+		DoObjectCollision(trapItem, &coll);
 	}
 
 	void ControlTeethSpikes(short itemNumber)
@@ -49,6 +62,10 @@ namespace TEN::Entities::TR4
 
 		if (TriggerActive(item) && item->ItemFlags[2] == 0)
 		{
+			// Get current item bounds and radius
+			auto* bounds = (BOUNDING_BOX*)GetBestFrame(item);
+			int radius = std::max(abs(bounds->X2 - bounds->X1), abs(bounds->Z2 - bounds->Z1));
+
 			// Play sound if spikes are emerging. Ignore for constantly sticked out ones.
 			if (item->ItemFlags[0] == 1024 && item->TriggerFlags != 1)
 				SoundEffect(SFX_TR4_TEETH_SPIKES, &item->Pose);
@@ -59,7 +76,7 @@ namespace TEN::Entities::TR4
 
 			// Kill enemies
 			item->Animation.Velocity.z = VEHICLE_COLLISION_TERMINAL_VELOCITY;
-			DoVehicleCollision(item, CLICK(1.5f));
+			DoTeethSpikeCollision(item, radius * TEETH_SPIKE_FORGIVENESS_RATIO);
 
 			item->Status = ITEM_ACTIVE;
 
@@ -75,7 +92,6 @@ namespace TEN::Entities::TR4
 				auto dot = Vector3::UnitX.Dot(normal);
 				auto angle = acos(dot / sqrt(normal.LengthSquared() * Vector3::UnitX.LengthSquared()));
 
-				auto* bounds = (BOUNDING_BOX*)GetBestFrame(item);
 				auto* laraBounds = (BOUNDING_BOX*)GetBestFrame(LaraItem);
 
 				int bloodCount = 0;
