@@ -45,6 +45,16 @@ namespace TEN::Entities::Vehicles
 	constexpr auto JEEP_IN_TOGGLE_REVERSE = IN_SPRINT;
 	constexpr auto JEEP_IN_TOGGLE_FORWARD = IN_WALK;
 
+	const vector<VehicleMountType> JeepMountTypes =
+	{
+		VehicleMountType::LevelStart,
+		VehicleMountType::Left,
+		VehicleMountType::Right
+	};
+	const vector<int> JeepJoints			  = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 15, 16 };
+	const vector<int> JeepBrakeLightJointsOff = { 15, 16 };
+	const vector<int> JeepBrakeLightJointsOn  = { 17 };
+
 	enum JeepState
 	{
 		JEEP_STATE_IDLE = 0,
@@ -114,16 +124,6 @@ namespace TEN::Entities::Vehicles
 		JEEP_ANIM_BACK_IDLE = 42,
 		JEEP_ANIM_IDLE_FORWARD_LEFT = 43,//aka the opposite of 41. "change to forward gear with the wheels still turned left"
 		JEEP_ANIM_IDLE_FORWARD_RIGHT = 44,//aka the opposite of 42. "change to forward gear with the wheels still turned right"
-	};
-
-	const vector<int> JeepJoints = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 15, 16 };
-	const vector<int> JeepBrakeLightJointsOff = { 15, 16 };
-	const vector<int> JeepBrakeLightJointsOn = { 17 };
-	const vector<VehicleMountType> JeepMountTypes =
-	{
-		VehicleMountType::LevelStart,
-		VehicleMountType::Left,
-		VehicleMountType::Right
 	};
 
 	enum JeepFlags

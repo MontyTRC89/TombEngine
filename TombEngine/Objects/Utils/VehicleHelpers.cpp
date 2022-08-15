@@ -332,7 +332,7 @@ namespace TEN::Entities::Vehicles
 
 	// Motorbike and jeep had the values in their dynamics functions tweaked to make them feel heavier.
 	// Using this unified function, they leap off hills as easily as the older vehicles for now. @Sezz 2022.06.30
-	int DoVehicleDynamics(int height, int verticalVelocity, int minBounce, int maxKick, int* yPos, float weightMult)
+	float DoVehicleDynamics(int height, float verticalVelocity, int minBounce, int maxKick, int* yPos, float weightMult)
 	{
 		// Grounded.
 		if (height > *yPos)
@@ -341,10 +341,10 @@ namespace TEN::Entities::Vehicles
 			if (*yPos > (height - minBounce))
 			{
 				*yPos = height;
-				verticalVelocity = 0;
+				verticalVelocity = 0.0f;
 			}
 			else
-				verticalVelocity += int(round(GRAVITY * weightMult));
+				verticalVelocity += GRAVITY * weightMult;
 		}
 		// Airborne.
 		else
@@ -353,7 +353,7 @@ namespace TEN::Entities::Vehicles
 			if (kick < maxKick)
 				kick = maxKick;
 
-			verticalVelocity += (kick - verticalVelocity) / 8;
+			verticalVelocity += (kick - verticalVelocity) / 8.0f;
 
 			if (*yPos > height)
 				*yPos = height;
@@ -362,7 +362,7 @@ namespace TEN::Entities::Vehicles
 		return verticalVelocity;
 	}
 
-	// Temp scaffolding function. Shifts need a rework.
+	// Temp. scaffolding function. Shifts need a rework.
 	void CalculateVehicleShift(ItemInfo* vehicleItem, short* extraRot, VehiclePointCollision prevPoint, int height, int front, int side, int step, bool clamp)
 	{
 		auto point = GetVehicleCollision(vehicleItem, front, side, clamp);
@@ -476,13 +476,13 @@ namespace TEN::Entities::Vehicles
 		return 0;
 	}
 
-	int DoVehicleWaterMovement(ItemInfo* vehicleItem, ItemInfo* laraItem, int currentVelocity, int radius, short* turnRate)
+	float DoVehicleWaterMovement(ItemInfo* vehicleItem, ItemInfo* laraItem, float currentVelocity, int radius, short* turnRate)
 	{
 		if (TestEnvironment(ENV_FLAG_WATER, vehicleItem) ||
 			TestEnvironment(ENV_FLAG_SWAMP, vehicleItem))
 		{
-			auto waterDepth = (float)GetWaterDepth(vehicleItem);
-			auto waterHeight = vehicleItem->Pose.Position.y - GetWaterHeight(vehicleItem);
+			float waterDepth = (float)GetWaterDepth(vehicleItem);
+			float waterHeight = vehicleItem->Pose.Position.y - GetWaterHeight(vehicleItem);
 
 			// HACK: Sometimes quadbike test position may end up under non-portal ceiling block.
 			// GetWaterDepth returns DEEP_WATER constant in that case, which is too large for our needs.
@@ -493,9 +493,9 @@ namespace TEN::Entities::Vehicles
 			{
 				bool isWater = TestEnvironment(ENV_FLAG_WATER, vehicleItem);
 
-				if (currentVelocity != 0)
+				if (currentVelocity != 0.0f)
 				{
-					auto coeff = isWater ? VEHICLE_WATER_VELOCITY_COEFF : VEHICLE_SWAMP_VELOCITY_COEFF;
+					float coeff = isWater ? VEHICLE_WATER_VELOCITY_COEFF : VEHICLE_SWAMP_VELOCITY_COEFF;
 					currentVelocity -= std::copysign(currentVelocity * ((waterDepth / VEHICLE_WATER_HEIGHT_MAX) / coeff), currentVelocity);
 
 					if (TEN::Math::Random::GenerateInt(0, 32) > 28)
@@ -507,7 +507,7 @@ namespace TEN::Entities::Vehicles
 
 				if (*turnRate)
 				{
-					auto coeff = isWater ? VEHICLE_WATER_TURN_RATE_COEFF : VEHICLE_SWAMP_TURN_RATE_COEFF;
+					float coeff = isWater ? VEHICLE_WATER_TURN_RATE_COEFF : VEHICLE_SWAMP_TURN_RATE_COEFF;
 					*turnRate -= *turnRate * ((waterDepth / VEHICLE_WATER_HEIGHT_MAX) / coeff);
 				}
 			}

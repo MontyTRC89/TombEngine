@@ -82,10 +82,10 @@ namespace TEN::Entities::Vehicles
 	int GetVehicleWaterHeight(ItemInfo* vehicleItem, int forward, int right, bool clamp, Vector3Int* pos);
 
 	void  DoVehicleCollision(ItemInfo* vehicleItem, int radius);
-	int	  DoVehicleDynamics(int height, int verticalVelocity, int minBounce, int maxKick, int* yPos, float weightMult = 1.0f);
+	float DoVehicleDynamics(int height, float verticalVelocity, int minBounce, int maxKick, int* yPos, float weightMult = 1.0f);
 	void  CalculateVehicleShift(ItemInfo* vehcleItem, short* extraRot, VehiclePointCollision prevPoint, int height, int front, int side, int step, bool clamp);
 	short DoVehicleShift(ItemInfo* vehicleItem, Vector3Int pos, Vector3Int oldPos);
-	int   DoVehicleWaterMovement(ItemInfo* vehicleItem, ItemInfo* laraItem, int currentVelocity, int radius, short* turnRate);
+	float DoVehicleWaterMovement(ItemInfo* vehicleItem, ItemInfo* laraItem, float currentVelocity, int radius, short* turnRate);
 	void  DoVehicleFlareDiscard(ItemInfo* laraItem);
 
 	short ModulateVehicleTurnRate(short turnRate, short accelRate, short minTurnRate, short maxTurnRate, float axisCoeff, bool invert);
