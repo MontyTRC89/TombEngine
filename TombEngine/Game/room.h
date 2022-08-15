@@ -110,6 +110,9 @@ struct ROOM_INFO
 	short fxNumber;
 	bool boundActive;
 
+	std::string name;
+	std::vector<std::string> tags;
+
 	std::vector<FloorInfo> floor;
 	std::vector<ROOM_LIGHT> lights;
 	std::vector<MESH_INFO> mesh;
