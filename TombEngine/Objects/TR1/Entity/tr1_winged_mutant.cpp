@@ -294,7 +294,7 @@ namespace TEN::Entities::TR1
 			case WMUTANT_STATE_INACTIVE:
 				creature->MaxTurn = 0;
 
-				if (TargetVisible(item, creature, &AI) || creature->HurtByLara)
+				if (TargetVisible(item, &AI) || creature->HurtByLara)
 					item->Animation.TargetState = WMUTANT_STATE_IDLE;
 
 				break;

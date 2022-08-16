@@ -200,7 +200,7 @@ namespace TEN::Entities::TR4
 					item->Animation.TargetState = item->Animation.RequiredState;
 				else if (!item->HitStatus && item->AIBits != MODIFY &&
 					TestProbability(0.99f) &&
-					((creature->Mood != MoodType::Bored && TestProbability(0.996)) ||
+					((creature->Mood != MoodType::Bored && TestProbability(0.996f)) ||
 						creature->HurtByLara || item->AIBits == MODIFY))
 				{
 					if (AI.ahead)
