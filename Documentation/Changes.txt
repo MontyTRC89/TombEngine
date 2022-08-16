@@ -18,11 +18,12 @@ Version 1.0.1
 - Fix ripples not appearing on water connections higher than room bottom.
 - Fix several problems with ropes (stumbling, rope length, etc).
 - Fix several problems with teeth spikes.
+- Fix falling through twoblock platform on room number change.
+- Fix falling block breaking too early if placed on a vertical portal.
 - Fix crashes when loading image files are missing.
 - Disable trigger check for puzzle holes.
 - Clear locusts and other swarm enemies on level reload.
-- Fix cobra targeting.
-- Enhance cobra AI.
+- Enhance cobra AI and fix targeting.
 - Fully decompile HAMMER object from TR4.
 - Prevent title music audio from starting in a random place.
 - Update harpoon speed on room change.
