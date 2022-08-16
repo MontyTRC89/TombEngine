@@ -1,10 +1,10 @@
 #pragma once
-#include "Specific/phd_global.h"
 #include "Specific/level.h"
+#include "Specific/phd_global.h"
 
-struct ItemInfo;
-struct BITE_INFO;
+struct BiteInfo;
 struct CreatureInfo;
+struct ItemInfo;
 struct LOTInfo;
 
 enum TARGET_TYPE
@@ -93,26 +93,26 @@ struct OVERLAP
 	int flags;
 };
 
-struct BITE_INFO
+struct BiteInfo
 {
-	int	x;
-	int	y;
-	int	z;
-	int	meshNum;
+	Vector3 Position = Vector3::Zero;
+	int		meshNum	 = 0;
 
-	BITE_INFO()
+	BiteInfo()
 	{
-		this->x = 0;
-		this->y = 0;
-		this->z = 0;
+		this->Position = Vector3::Zero;
 		this->meshNum = 0;
 	}
 
-	BITE_INFO(int xpos, int ypos, int zpos, int meshNumber)
+	BiteInfo(Vector3 pos, int meshNumber)
 	{
-		this->x = xpos;
-		this->y = ypos;
-		this->z = zpos;
+		this->Position = pos;
+		this->meshNum = meshNumber;
+	}
+
+	BiteInfo(float xPos, float yPos, float zPos, int meshNumber)
+	{
+		this->Position = Vector3(xPos, yPos, zPos);
 		this->meshNum = meshNumber;
 	}
 };
@@ -121,8 +121,8 @@ struct BITE_INFO
 
 constexpr auto BOX_BLOCKED = (1 << 14); // unpassable for other enemies, always set for movable blocks & closed doors
 constexpr auto BOX_LAST = (1 << 15); // unpassable by large enemies (T-Rex, Centaur, etc), always set behind doors
-constexpr auto TIMID = 0;
-constexpr auto VIOLENT = 1;
+
+
 constexpr auto REVERSE = 0x4000;
 constexpr auto BLOCKABLE = 0x8000;
 constexpr auto BLOCKED = 0x4000;
@@ -146,8 +146,8 @@ constexpr auto CLIP_BOTTOM = 0x8;
 constexpr auto SECONDARY_CLIP = 0x10;
 constexpr auto ALL_CLIP = (CLIP_LEFT | CLIP_RIGHT | CLIP_TOP | CLIP_BOTTOM);
 
-void GetCreatureMood(ItemInfo* item, AI_INFO* AI, int violent);
-void CreatureMood(ItemInfo* item, AI_INFO* AI, int violent);
+void GetCreatureMood(ItemInfo* item, AI_INFO* AI, bool isViolent);
+void CreatureMood(ItemInfo* item, AI_INFO* AI, bool isViolent);
 void FindAITargetObject(CreatureInfo* creature, short objectNumber);
 void GetAITarget(CreatureInfo* creature);
 int CreatureVault(short itemNumber, short angle, int vault, int shift);
@@ -160,8 +160,8 @@ short AIGuard(CreatureInfo* creature);
 void AlertNearbyGuards(ItemInfo* item);
 void AlertAllGuards(short itemNumber);
 void CreatureKill(ItemInfo* item, int killAnim, int killState, int laraKillState);
-short CreatureEffect2(ItemInfo* item, BITE_INFO* bite, short damage, short angle, std::function<CreatureEffectFunction> func);
-short CreatureEffect(ItemInfo* item, BITE_INFO* bite, std::function<CreatureEffectFunction> func);
+short CreatureEffect2(ItemInfo* item, BiteInfo bite, short velocity, short angle, std::function<CreatureEffectFunction> func);
+short CreatureEffect(ItemInfo* item, BiteInfo bite, std::function<CreatureEffectFunction> func);
 void CreatureUnderwater(ItemInfo* item, int depth);
 void CreatureFloat(short itemNumber);
 void CreatureJoint(ItemInfo* item, short joint, short required);
@@ -184,7 +184,6 @@ int CreatureAnimation(short itemNumber, short angle, short tilt);
 void CreatureSwitchRoom(short itemNumber);
 void AdjustStopperFlag(ItemInfo* item, int direction, bool set);
 void InitialiseItemBoxData();
-
 
 void DrawBox(int boxIndex, Vector3 color);
 void DrawNearbyPathfinding(int boxIndex);

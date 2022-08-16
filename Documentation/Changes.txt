@@ -19,6 +19,9 @@ Version 1.0.1
 - Fix crashes when loading image files are missing.
 - Disable trigger check for puzzle holes.
 - Clear locusts and other swarm enemies on level reload.
+- Fix cobra targeting.
+- Enhance cobra AI.
+- Fully decompile HAMMER object from TR4.
 - Prevent title music audio from starting in a random place.
 - Update harpoon speed on room change.
 - Enable second sky layer rendering.
@@ -28,6 +31,7 @@ Version 1.0.1
 - SetFarView has been removed, and Flow.Level.farView is now uncapped.
 - DisplayString text will now be cleared when a level is exited or reloaded.
 - EventSequence.lua has been added and documented.
+
 
 Version 1.0
 ===========

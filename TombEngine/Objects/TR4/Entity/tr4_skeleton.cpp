@@ -1,51 +1,50 @@
 #include "framework.h"
-#include "tr4_skeleton.h"
-#include "Game/items.h"
-#include "Game/control/box.h"
-#include "Game/people.h"
-#include "Game/effects/effects.h"
-#include "Game/effects/debris.h"
-#include "Game/control/lot.h"
-#include "Game/Lara/lara.h"
-#include "Sound/sound.h"
-#include "Specific/setup.h"
-#include "Game/effects/tomb4fx.h"
-#include "Specific/level.h"
-#include "Game/animation.h"
-#include "Game/itemdata/creature_info.h"
-#include "Game/collision/floordata.h"
-#include "Game/collision/collide_room.h"
-#include "Game/misc.h"
+#include "Objects/TR4/Entity/tr4_skeleton.h"
 
+#include "Game/animation.h"
+#include "Game/collision/collide_room.h"
+#include "Game/collision/floordata.h"
+#include "Game/control/box.h"
+#include "Game/control/lot.h"
+#include "Game/effects/debris.h"
+#include "Game/effects/effects.h"
+#include "Game/effects/tomb4fx.h"
+#include "Game/itemdata/creature_info.h"
+#include "Game/items.h"
+#include "Game/Lara/lara.h"
+#include "Game/misc.h"
+#include "Game/people.h"
+#include "Sound/sound.h"
+#include "Specific/level.h"
+#include "Specific/prng.h"
+#include "Specific/setup.h"
+
+using namespace TEN::Math::Random;
 using std::vector;
 
 namespace TEN::Entities::TR4
 {
-	BITE_INFO SkeletonBite = { 0, -16, 200, 11 };
-	const vector<int> SkeletonSwordAttackJoints = { 15, 16 };
-
 	constexpr auto SKELETON_ATTACK_DAMAGE = 80;
+
+	const auto SkeletonBite = BiteInfo(Vector3(0.0f, -16.0f, 200.0f), 11);
+	const vector<int> SkeletonSwordAttackJoints = { 15, 16 };
 
 	enum SkeletonState
 	{
 		SKELETON_STATE_SUBTERRANEAN = 0,
 		SKELETON_STATE_IDLE = 1,
-
 		SKELETON_STATE_AVOID_ATTACK_1 = 5,
 		SKELETON_STATE_AVOID_ATTACK_2 = 6,
 		SKELETON_STATE_USE_SHIELD = 7,
 		SKELETON_STATE_ATTACK_1 = 8,
 		SKELETON_STATE_ATTACK_2 = 9,
 		SKELETON_STATE_ATTACK_3 = 10,
-
 		SKELETON_STATE_HURT_BY_SHOTGUN_1 = 12,
 		SKELETON_STATE_HURT_BY_SHOTGUN_2 = 13,
-
 		SKELETON_STATE_JUMP_LEFT = 19,
 		SKELETON_STATE_JUMP_RIGHT = 20,
 		SKELETON_STATE_JUMP_FORWARD_1_BLOCK = 21,
 		SKELETON_STATE_JUMP_FORWARD_2_BLOCKS = 22,
-
 		SKELETON_STATE_JUMP_LIE_DOWN = 25
 	};
 
@@ -55,10 +54,8 @@ namespace TEN::Entities::TR4
 		SKELETON_ANIM_UPRIGHT_IDLE = 1,
 		SKELETON_ANIM_UPRIGHT_IDLE_TO_IDLE = 2,
 		SKELETON_ANIM_IDLE = 3,
-
 		SKELETON_ANIM_SWORD_ATTACK_LEFT = 12,
 		SKELETON_ANIM_SWORD_ATTACK_RIGHT = 13,
-
 		SKELETON_ANIM_JUMP_LEFT_START = 34,
 		SKELETON_ANIM_JUMP_LEFT_CONTINUE = 35,
 		SKELETON_ANIM_JUMP_LEFT_END = 36,
@@ -69,9 +66,7 @@ namespace TEN::Entities::TR4
 		SKELETON_ANIM_JUMP_FORWARD_CONTINUE_1_BLOCK = 41,
 		SKELETON_ANIM_JUMP_FORWARD_CONTINUE_2_BLOCKS = 42,
 		SKELETON_ANIM_JUMP_FORWARD_END = 43,
-
-		SKELETON_ANIM_LAYING_DOWN = 46,
-
+		SKELETON_ANIM_LAYING_DOWN = 46
 	};
 
 	void InitialiseSkeleton(short itemNumber)
@@ -155,7 +150,7 @@ namespace TEN::Entities::TR4
 			spark->flags = 26;
 			spark->rotAng = GetRandomControl() & 0xFFF;
 
-			if (GetRandomControl() & 1)
+			if (TestProbability(0.5f))
 				spark->rotAdd = -16 - (GetRandomControl() & 0xF);
 			else
 				spark->rotAdd = (GetRandomControl() & 0xF) + 16;
@@ -266,7 +261,7 @@ namespace TEN::Entities::TR4
 		else
 		{
 			AI_INFO laraAI;
-			if (creature->Enemy == LaraItem)
+			if (creature->Enemy->IsLara())
 			{
 				laraAI.distance = AI.distance;
 				laraAI.angle = AI.angle;
@@ -279,12 +274,12 @@ namespace TEN::Entities::TR4
 				laraAI.distance = pow(dx, 2) + pow(dz, 2);
 			}
 
-			GetCreatureMood(item, &AI, VIOLENT);
+			GetCreatureMood(item, &AI, true);
 
 			if (!(item->MeshBits & 0x200))
 				creature->Mood = MoodType::Escape;
 
-			CreatureMood(item, &AI, VIOLENT);
+			CreatureMood(item, &AI, true);
 
 			angle = CreatureTurn(item, creature->MaxTurn);
 
@@ -359,7 +354,7 @@ namespace TEN::Entities::TR4
 			switch (item->Animation.ActiveState)
 			{
 			case SKELETON_STATE_IDLE:
-				if (!(GetRandomControl() & 0xF))
+				if (TestProbability(0.06f))
 					item->Animation.TargetState = 2;
 				
 				break;
@@ -370,13 +365,13 @@ namespace TEN::Entities::TR4
 				creature->Flags = 0;
 
 				if (item->AIBits & GUARD ||
-					!(GetRandomControl() & 0x1F) &&
+					TestProbability(0.03f) &&
 					(AI.distance > pow(SECTOR(1), 2) ||
 						creature->Mood != MoodType::Attack))
 				{
-					if (!(GetRandomControl() & 0x3F))
+					if (TestProbability(0.0155f))
 					{
-						if (GetRandomControl() & 1)
+						if (TestProbability(0.5f))
 							item->Animation.TargetState = 3;
 						else
 							item->Animation.TargetState = 4;
@@ -440,23 +435,23 @@ namespace TEN::Entities::TR4
 						{
 							if (item->Animation.RequiredState)
 								item->Animation.TargetState = item->Animation.RequiredState;
-							else if (!(GetRandomControl() & 0x3F))
+							else if (TestProbability(0.0155f))
 								item->Animation.TargetState = 15;
 						}
 						else if (Lara.TargetEntity == item &&
 							laraAI.angle &&
 							laraAI.distance < pow(SECTOR(2), 2) &&
-							GetRandomControl() & 1 &&
-							(Lara.Control.Weapon.GunType == LaraWeaponType::Shotgun || !(GetRandomControl() & 0xF)) &&
+							TestProbability(0.5f) &&
+							(Lara.Control.Weapon.GunType == LaraWeaponType::Shotgun || TestProbability(0.06f)) &&
 							item->MeshBits == -1)
 						{
 							item->Animation.TargetState = SKELETON_STATE_USE_SHIELD;
 						}
 						else if (AI.bite && AI.distance < pow(682, 2))
 						{
-							if (GetRandomControl() & 3 && LaraItem->HitPoints > 0)
+							if (TestProbability(0.75f) && LaraItem->HitPoints > 0)
 							{
-								if (GetRandomControl() & 1)
+								if (TestProbability(0.5f))
 									item->Animation.TargetState = SKELETON_STATE_ATTACK_1;
 								else
 									item->Animation.TargetState = SKELETON_STATE_ATTACK_2;
@@ -466,7 +461,7 @@ namespace TEN::Entities::TR4
 						}
 						else if (item->HitStatus || item->Animation.RequiredState)
 						{
-							if (GetRandomControl() & 1)
+							if (TestProbability(0.5f))
 							{
 								item->Animation.TargetState = SKELETON_STATE_AVOID_ATTACK_1;
 								item->Animation.RequiredState = item->Animation.TargetState;
@@ -494,7 +489,7 @@ namespace TEN::Entities::TR4
 				else if (item->HitStatus)
 				{
 					item->Animation.TargetState = 2;
-					if (GetRandomControl() & 1)
+					if (TestProbability(0.5f))
 						item->Animation.RequiredState = 5;
 					else
 						item->Animation.RequiredState = 6;
@@ -525,7 +520,7 @@ namespace TEN::Entities::TR4
 						else
 							item->Animation.TargetState = 2;
 					}
-					else if (!(GetRandomControl() & 0x3F))
+					else if (TestProbability(0.0155f))
 						item->Animation.TargetState = 2;
 				}
 
@@ -593,13 +588,13 @@ namespace TEN::Entities::TR4
 				{
 					if (item->TestBits(JointBitType::Touch, SkeletonSwordAttackJoints))
 					{
-						CreatureEffect2(item, &SkeletonBite, 15, -1, DoBloodSplat);
 						DoDamage(creature->Enemy, SKELETON_ATTACK_DAMAGE);
+						CreatureEffect2(item, SkeletonBite, 15, -1, DoBloodSplat);
 						SoundEffect(SFX_TR4_LARA_THUD, &item->Pose);
 						creature->Flags = 1;
 					}
 				}
-				if (!(GetRandomControl() & 0x3F) || LaraItem->HitPoints <= 0)
+				if (TestProbability(0.0155f) || LaraItem->HitPoints <= 0)
 					item->Animation.TargetState = 11;
 				
 				break;
@@ -645,12 +640,13 @@ namespace TEN::Entities::TR4
 							}
 						}
 					}
+
 					if (!creature->Flags)
 					{
 						if (item->TestBits(JointBitType::Touch, SkeletonSwordAttackJoints))
 						{
-							CreatureEffect2(item, &SkeletonBite, 10, item->Pose.Orientation.y, DoBloodSplat);
 							DoDamage(creature->Enemy, SKELETON_ATTACK_DAMAGE);
+							CreatureEffect2(item, SkeletonBite, 10, item->Pose.Orientation.y, DoBloodSplat);
 							SoundEffect(SFX_TR4_LARA_THUD, &item->Pose);
 							creature->Flags = 1;
 						}
@@ -662,9 +658,10 @@ namespace TEN::Entities::TR4
 			case SKELETON_STATE_USE_SHIELD:
 				if (item->HitStatus)
 				{
-					if (item->MeshBits == -1 && laraAI.angle && Lara.Control.Weapon.GunType == LaraWeaponType::Shotgun)
+					if (item->MeshBits == -1 && laraAI.angle &&
+						Lara.Control.Weapon.GunType == LaraWeaponType::Shotgun)
 					{
-						if (GetRandomControl() & 3)
+						if (TestProbability(0.75f))
 							item->Animation.TargetState = 17;
 						else
 							ExplodeItemNode(item, 11, 1, -24);
@@ -672,7 +669,7 @@ namespace TEN::Entities::TR4
 					else
 						item->Animation.TargetState = 2;
 				}
-				else if (Lara.TargetEntity != item || item->MeshBits != -1 || Lara.Control.Weapon.GunType != LaraWeaponType::Shotgun || !(GetRandomControl() & 0x7F))
+				else if (Lara.TargetEntity != item || item->MeshBits != -1 || Lara.Control.Weapon.GunType != LaraWeaponType::Shotgun || TestProbability(0.008f))
 					item->Animation.TargetState = 2;
 				
 				break;
@@ -732,7 +729,7 @@ namespace TEN::Entities::TR4
 
 				if (GetCollision(item).Position.Floor <= (item->Pose.Position.y + SECTOR(1)))
 				{
-					if (!(GetRandomControl() & 0x1F))
+					if (TestProbability(0.03f))
 						item->Animation.TargetState = 14;
 				}
 				else
