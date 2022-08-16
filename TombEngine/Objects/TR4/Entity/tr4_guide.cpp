@@ -14,26 +14,84 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
+using std::vector;
+
 namespace TEN::Entities::TR4
 {
+	constexpr auto GUIDE_ATTACK_DAMAGE = 20;
+
 	const auto GuideBite1 = BiteInfo(Vector3(0.0f, 20.0f, 180.0f), 18);
 	const auto GuideBite2 = BiteInfo(Vector3(30.0f, 80.0f, 50.0f), 15);
+	const vector<int> GuideLeftFingerSwapJoints = { 15 };
+	const vector<int> GuideRightHandSwapJoints	= { 18 };
+	const vector<int> GuideHeadSwapJoints		= { 21 };
 
 	enum GuideState
 	{
+		GUIDE_STATE_NONE = 0,
 		GUIDE_STATE_IDLE = 1,
-		GUIDE_STATE_WALK = 2,
-		GUIDE_STATE_RUN = 3,
+		GUIDE_STATE_WALK_FORWARD = 2,
+		GUIDE_STATE_RUN_FORWARD = 3,
+		// No states 4-5.
+		GUIDE_STATE_CHECK_GROUND = 7,
+		// No states 8-10.
 		GUIDE_STATE_IGNITE_TORCH = 11,
-		GUIDE_STATE_LOOK_BACK = 22,
-		GUIDE_STATE_TORCH_ATTACK = 31,
-		GUIDE_STATE_PICK_UP_TORCH = 37
+		// No states 12-21.
+		GUIDE_STATE_TURN_LEFT = 22,
+		// No states 23-30.
+		GUIDE_STATE_ATTACK_LOW = 31,
+		GUIDE_STATE_ACTION_CANDLES = 32,
+		// No states 33-34.
+		GUIDE_STATE_TURN_RIGHT = 35,
+		GUIDE_STATE_CROUCH = 36,
+		GUIDE_STATE_PICK_UP_TORCH = 37,
+		GUIDE_STATE_LIGHT_TORCHES = 38,
+		GUIDE_STATE_READ_INSCRIPTION = 39,
+		GUIDE_STATE_WALK_FORWARD_NO_TORCH = 40,
+		GUIDE_STATE_ADJUST_POSITION_FRONT = 41,
+		GUIDE_STATE_ADJUST_POSITION_BACK = 42,
+		GUIDE_STATE_ACTIVATE_TRAP_CROUCHING = 43
 	};
 
-	// TODO
 	enum GuideAnim
 	{
-
+		GUIDE_ANIM_WALK_FORWARD = 0,
+		GUIDE_ANIM_RUN = 1,
+		// No anims 2-3.
+		GUIDE_ANIM_IDLE = 4,
+		// No anims 5-11.
+		GUIDE_ANIM_CHECK_GROUND = 12,
+		GUIDE_ANIM_WALK_FORWARD_TO_IDLE_RIGHT = 13,
+		GUIDE_ANIM_IDLE_TO_RUN = 14,
+		GUIDE_ANIM_RUN_TO_IDLE = 15,
+		GUIDE_ANIM_WALK_FORWARD_TO_RUN_FORWARD = 16,
+		GUIDE_ANIM_RUN_FORWARD_TO_WALK_FORWARD = 17,
+		// No anims 18-25.
+		GUIDE_ANIM_TURN_LEFT = 26,
+		// No anims 27-29.
+		GUIDE_ANIM_USE_LIGHTER  = 30,
+		GUIDE_ANIM_COME_SIGNAL = 31,
+		// No anims 32-43.
+		GUIDE_ANIM_ATTACK = 44,
+		// No anims 45-46.
+		GUIDE_ANIM_IDLE_LIGHTING_CANDLE = 47,
+		GUIDE_ANIM_LIGHTING_CANDLE = 48,
+		GUIDE_ANIM_LIGHTING_TORCH_CANDLE = 49,
+		// No anims 55-55.
+		GUIDE_ANIM_TURN_RIGHT = 56,
+		GUIDE_ANIM_IDLE_CROUCH = 57,
+		GUIDE_ANIM_IDLE_TO_CROUCH = 58,
+		GUIDE_ANIM_IDLE_TO_CROUCH_IDLE = 59,
+		GUIDE_ANIM_GRAB_TORCH = 60,
+		GUIDE_ANIM_LIGHTING_TORCH = 61,
+		GUIDE_ANIM_READ_INSCRIPTION = 62,
+		GUIDE_ANIM_WALK_FORWARD_NO_TORCH = 63,
+		GUIDE_ANIM_IDLE_WALK_NO_TORCH = 64,
+		GUIDE_ANIM_WALK_FORWARD_NO_TORCH_IDLE = 65,
+		GUIDE_ANIM_CORRECT_POSITION_FRONT = 66,
+		GUIDE_ANIM_CORRECT_POSITION_BACK = 67,
+		GUIDE_ANIM_WALK_FORWARD_IDLE_LEFT = 68,
+		GUIDE_ANIM_ACTIVATE_TRAP_CROUCHING = 69
 	};
 
 	void InitialiseGuide(short itemNumber)
@@ -41,19 +99,9 @@ namespace TEN::Entities::TR4
 		auto* item = &g_Level.Items[itemNumber];
 
 		ClearItem(itemNumber);
+		SetAnimation(item, GUIDE_ANIM_IDLE);
+		item->SetBits(JointBitType::MeshSwap, GuideRightHandSwapJoints);
 
-		item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 4;
-		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-		item->Animation.TargetState = GUIDE_STATE_IDLE;
-		item->Animation.ActiveState = GUIDE_STATE_IDLE;
-
-		if (Objects[ID_WRAITH1].loaded)
-		{
-			item->MeshSwapBits = NO_JOINT_BITS;
-			item->ItemFlags[1] = 2;
-		}
-		else
-			item->MeshSwapBits = 0x40000;
 	}
 
 	void GuideControl(short itemNumber)
@@ -71,7 +119,7 @@ namespace TEN::Entities::TR4
 		short joint1 = 0;
 		short joint2 = 0;
 
-		// Ignite torch
+		// Ignite torch.
 		if (item->ItemFlags[1] == 2)
 		{
 			auto pos = Vector3Int(GuideBite1.Position);
@@ -88,7 +136,7 @@ namespace TEN::Entities::TR4
 				192 - ((random >> 6) & 0x1F),
 				random & 0x3F);
 
-			if (item->Animation.AnimNumber == object->animIndex + 61)
+			if (item->Animation.AnimNumber == (object->animIndex + GUIDE_ANIM_LIGHTING_TORCH))
 			{
 				if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 32 &&
 					item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].frameBase + 42)
@@ -121,8 +169,11 @@ namespace TEN::Entities::TR4
 			laraAI.ahead = false;
 
 		int distance = 0;
-		if (dz > 32000 || dz < -32000 || dx > 32000 || dx < -32000)
+		if (dx > SECTOR(31.25f) || dx < -SECTOR(31.25f) ||
+			dz > SECTOR(31.25f) || dz < -SECTOR(31.25f))
+		{
 			laraAI.distance = INT_MAX;
+		}
 		else
 			laraAI.distance = pow(dx, 2) + pow(dz, 2);
 
@@ -139,43 +190,43 @@ namespace TEN::Entities::TR4
 
 		ItemInfo* foundEnemy = nullptr;
 
-		if (!Objects[ID_WRAITH1].loaded)
+		if (item->Animation.ActiveState < 4 ||
+			item->Animation.ActiveState == GUIDE_STATE_ATTACK_LOW)
 		{
-			if (item->Animation.ActiveState < 4 ||
-				item->Animation.ActiveState == GUIDE_STATE_TORCH_ATTACK)
+			int minDistance = INT_MAX;
+
+			for (int i = 0; i < ActiveCreatures.size(); i++)
 			{
-				int minDistance = 0x7FFFFFFF;
+				auto* currentCreatureInfo = ActiveCreatures[i];
 
-				for (int i = 0; i < ActiveCreatures.size(); i++)
+				if (currentCreatureInfo->ItemNumber == NO_ITEM ||
+					currentCreatureInfo->ItemNumber == itemNumber)
 				{
-					auto* currentCreatureInfo = ActiveCreatures[i];
+					continue;
+				}
 
-					if (currentCreatureInfo->ItemNumber == NO_ITEM || currentCreatureInfo->ItemNumber == itemNumber)
-						continue;
+				auto* currentItem = &g_Level.Items[currentCreatureInfo->ItemNumber];
 
-					auto* currentItem = &g_Level.Items[currentCreatureInfo->ItemNumber];
+				if (currentItem->ObjectNumber != ID_GUIDE &&
+					abs(currentItem->Pose.Position.y - item->Pose.Position.y) <= 512)
+				{
+					dx = currentItem->Pose.Position.x - item->Pose.Position.x;
+					dy = currentItem->Pose.Position.y - item->Pose.Position.y;
+					dz = currentItem->Pose.Position.z - item->Pose.Position.z;
 
-					if (currentItem->ObjectNumber != ID_GUIDE &&
-						abs(currentItem->Pose.Position.y - item->Pose.Position.y) <= 512)
+					if (dx > 32000 || dx < -32000 || dz > 32000 || dz < -32000)
+						distance = 0x7FFFFFFF;
+					else
+						distance = pow(dx, 2) + pow(dz, 2);
+
+					if (distance < minDistance &&
+						distance < pow(SECTOR(2), 2) &&
+						(abs(dy) < CLICK(1) ||
+							laraAI.distance < pow(SECTOR(2), 2) ||
+							currentItem->ObjectNumber == ID_DOG)) // Here to add more entities as target.
 					{
-						dx = currentItem->Pose.Position.x - item->Pose.Position.x;
-						dy = currentItem->Pose.Position.y - item->Pose.Position.y;
-						dz = currentItem->Pose.Position.z - item->Pose.Position.z;
-
-						if (dx > 32000 || dx < -32000 || dz > 32000 || dz < -32000)
-							distance = 0x7FFFFFFF;
-						else
-							distance = pow(dx, 2) + pow(dz, 2);
-
-						if (distance < minDistance &&
-							distance < pow(SECTOR(2), 2) &&
-							(abs(dy) < CLICK(1) ||
-								laraAI.distance < pow(SECTOR(2), 2) ||
-								currentItem->ObjectNumber == ID_DOG))
-						{
-							foundEnemy = currentItem;
-							minDistance = distance;
-						}
+						foundEnemy = currentItem;
+						minDistance = distance;
 					}
 				}
 			}
@@ -202,8 +253,20 @@ namespace TEN::Entities::TR4
 		Vector3Int pos1;
 		int frameNumber;
 		short random;
+				
+		bool flagNewBehaviour		= ((item->ItemFlags[2] & (1 << 0)) != 0);
+		bool flagIgnoreLaraDistance = ((item->ItemFlags[2] & (1 << 1)) != 0);
+		bool flagRunDefault			= ((item->ItemFlags[2] & (1 << 2)) != 0);
+		bool flagRetryNodeSearch	= ((item->ItemFlags[2] & (1 << 3)) != 0);
+		bool flagScaryInscription	= ((item->ItemFlags[2] & (1 << 4)) != 0);
 
-		TENLog("Guide state:" + std::to_string(item->Animation.ActiveState), LogLevel::Info);
+		short goalNode = (flagNewBehaviour) ? item->ItemFlags[4] : Lara.Location;
+
+		if (flagRetryNodeSearch)
+		{
+			item->ItemFlags[2] &= ~(1 << 3); // Turn off 3rd for flagRetryNodeSearch.
+			creature->Enemy = nullptr;
+		}
 
 		switch (item->Animation.ActiveState)
 		{
@@ -226,31 +289,25 @@ namespace TEN::Entities::TR4
 				joint2 = AI.angle / 2;
 			}
 
-			if (Objects[ID_WRAITH1].loaded)
-			{
-				if (item->ItemFlags[3] == 5)
-					item->Animation.TargetState = GUIDE_STATE_WALK;
-
-				if (item->ItemFlags[3] == 5 || item->ItemFlags[3] == 6)
-					break;
-			}
-
 			if (item->Animation.RequiredState)
 				item->Animation.TargetState = item->Animation.RequiredState;
-			else if (Lara.Location >= item->ItemFlags[3] ||
+			else if (goalNode >= item->ItemFlags[3] ||
 				item->ItemFlags[1] != 2)
 			{
 				if (!creature->ReachedGoal || foundEnemy)
 				{
 					if (item->MeshSwapBits == 0x40000)
-						item->Animation.TargetState = 40;
+						item->Animation.TargetState = GUIDE_STATE_WALK_FORWARD_NO_TORCH;
 					else if (foundEnemy && AI.distance < pow(SECTOR(1), 2))
 					{
 						if (AI.bite)
-							item->Animation.TargetState = GUIDE_STATE_TORCH_ATTACK;
+							item->Animation.TargetState = GUIDE_STATE_ATTACK_LOW;
 					}
 					else if (!enemy->IsLara() || AI.distance > pow(SECTOR(2), 2))
-						item->Animation.TargetState = GUIDE_STATE_WALK;
+						if (flagRunDefault && AI.distance > pow(SECTOR(3), 2))
+							item->Animation.TargetState = GUIDE_STATE_RUN_FORWARD;
+						else
+							item->Animation.TargetState = GUIDE_STATE_WALK_FORWARD;
 				}
 				else
 				{
@@ -267,44 +324,49 @@ namespace TEN::Entities::TR4
 					{
 						switch (enemy->Flags)
 						{
+						// Light flames.
 						case 0x02:
-							item->Animation.TargetState = 38;
-							item->Animation.RequiredState = 38;
+							item->Animation.TargetState = GUIDE_STATE_LIGHT_TORCHES;
+							item->Animation.RequiredState = GUIDE_STATE_LIGHT_TORCHES;
 							break;
 
+						// Pick up torch.
 						case 0x20:
 							item->Animation.TargetState = GUIDE_STATE_PICK_UP_TORCH;
 							item->Animation.RequiredState = GUIDE_STATE_PICK_UP_TORCH;
 							break;
 
+						// Read inscription.
 						case 0x28:
-							if (laraAI.distance < pow(SECTOR(2), 2))
+							if (laraAI.distance < pow(SECTOR(2), 2) || flagIgnoreLaraDistance)
 							{
-								item->Animation.TargetState = 39;
-								item->Animation.RequiredState = 39;
+								item->Animation.TargetState = GUIDE_STATE_READ_INSCRIPTION;
+								item->Animation.RequiredState = GUIDE_STATE_READ_INSCRIPTION;
 							}
 
 							break;
 
+						// Ignite pool.
 						case 0x10:
-							if (laraAI.distance < pow(SECTOR(2), 2))
+							if (laraAI.distance < pow(SECTOR(2), 2) || flagIgnoreLaraDistance)
 							{
-								// Ignite torch
-								item->Animation.TargetState = 36;
-								item->Animation.RequiredState = 36;
+								item->Animation.TargetState = GUIDE_STATE_CROUCH;
+								item->Animation.RequiredState = GUIDE_STATE_CROUCH;
 							}
 
 							break;
 
+						// Activate trap.
 						case 0x04:
-							if (laraAI.distance < pow(SECTOR(2), 2))
+							if (laraAI.distance < pow(SECTOR(2), 2) || flagIgnoreLaraDistance)
 							{
-								item->Animation.TargetState = 36;
-								item->Animation.RequiredState = 43;
+								item->Animation.TargetState = GUIDE_STATE_CROUCH;
+								item->Animation.RequiredState = GUIDE_STATE_ACTIVATE_TRAP_CROUCHING;
 							}
 
 							break;
 
+						// Disappear.
 						case 0x3E:
 							item->Status = ITEM_INVISIBLE;
 							RemoveActiveItem(itemNumber);
@@ -314,8 +376,8 @@ namespace TEN::Entities::TR4
 					}
 					else
 					{
+						item->Animation.RequiredState = GUIDE_STATE_ADJUST_POSITION_BACK - (AI.ahead != 0);
 						creature->MaxTurn = 0;
-						item->Animation.RequiredState = 42 - (AI.ahead != 0);
 					}
 				}
 			}
@@ -324,7 +386,7 @@ namespace TEN::Entities::TR4
 
 			break;
 
-		case GUIDE_STATE_WALK:
+		case GUIDE_STATE_WALK_FORWARD:
 			creature->MaxTurn = ANGLE(7.0f);
 			creature->LOT.IsJumping = false;
 
@@ -336,12 +398,7 @@ namespace TEN::Entities::TR4
 			else
 				joint2 = laraAI.angle;
 
-			if (Objects[ID_WRAITH1].loaded && item->ItemFlags[3] == 5)
-			{
-				item->ItemFlags[3] = 6;
-				item->Animation.TargetState = GUIDE_STATE_IDLE;
-			}
-			else if (item->ItemFlags[1] == 1)
+			if (item->ItemFlags[1] == 1)
 			{
 				item->Animation.TargetState = GUIDE_STATE_IDLE;
 				item->Animation.RequiredState = GUIDE_STATE_IGNITE_TORCH;
@@ -361,26 +418,26 @@ namespace TEN::Entities::TR4
 			}
 			else
 			{
-				if (Lara.Location >= item->ItemFlags[3])
+				if (goalNode >= item->ItemFlags[3])
 				{
 					if (!foundEnemy ||
 						AI.distance >= pow(SECTOR(1.5f), 2) &&
-						(item->MeshSwapBits & 0x40000 || AI.distance >= pow(SECTOR(3), 2)))
+						(item->TestBits(JointBitType::MeshSwap, GuideRightHandSwapJoints) || AI.distance >= pow(SECTOR(3), 2)))
 					{
 						if (creature->Enemy->IsLara())
 						{
 							if (AI.distance >= pow(SECTOR(2), 2))
 							{
 								if (AI.distance > pow(SECTOR(4), 2))
-									item->Animation.TargetState = GUIDE_STATE_RUN;
+									item->Animation.TargetState = GUIDE_STATE_RUN_FORWARD;
 							}
 							else
 								item->Animation.TargetState = GUIDE_STATE_IDLE;
 						}
-						else if (Lara.Location > item->ItemFlags[3] &&
+						else if (goalNode > item->ItemFlags[3] &&
 							laraAI.distance > pow(SECTOR(2), 2))
 						{
-							item->Animation.TargetState = GUIDE_STATE_RUN;
+							item->Animation.TargetState = GUIDE_STATE_RUN_FORWARD;
 						}
 					}
 					else
@@ -392,7 +449,7 @@ namespace TEN::Entities::TR4
 
 			break;
 
-		case GUIDE_STATE_RUN:
+		case GUIDE_STATE_RUN_FORWARD:
 			creature->MaxTurn = ANGLE(11.0f);
 			tilt = angle / 2;
 
@@ -400,7 +457,7 @@ namespace TEN::Entities::TR4
 				joint2 = AI.angle;
 
 			if (AI.distance < pow(SECTOR(2), 2) ||
-				Lara.Location < item->ItemFlags[3])
+				goalNode < item->ItemFlags[3])
 			{
 				item->Animation.TargetState = GUIDE_STATE_IDLE;
 				break;
@@ -421,7 +478,7 @@ namespace TEN::Entities::TR4
 			}
 			else if (foundEnemy &&
 				(AI.distance < pow(SECTOR(1.5f), 2) ||
-					!(item->MeshSwapBits & 0x40000) &&
+					!(item->TestBits(JointBitType::MeshSwap, GuideRightHandSwapJoints)) &&
 					AI.distance < pow(SECTOR(3), 2)))
 			{
 				item->Animation.TargetState = GUIDE_STATE_IDLE;
@@ -431,7 +488,6 @@ namespace TEN::Entities::TR4
 			break;
 
 		case GUIDE_STATE_IGNITE_TORCH:
-			// Ignite torch.
 			pos1 = Vector3Int(GuideBite2.Position);
 			GetJointAbsPosition(item, &pos1, GuideBite2.meshNum);
 
@@ -439,9 +495,9 @@ namespace TEN::Entities::TR4
 			random = GetRandomControl();
 
 			if (frameNumber == 32)
-				item->MeshSwapBits |= 0x8000;
+				item->SetBits(JointBitType::MeshSwap, GuideLeftFingerSwapJoints);
 			else if (frameNumber == 216)
-				item->MeshSwapBits &= 0x7FFF;
+				item->ClearBits(JointBitType::MeshSwap, GuideLeftFingerSwapJoints);
 			else if (frameNumber <= 79 || frameNumber >= 84)
 			{
 				if (frameNumber <= 83 || frameNumber >= 94)
@@ -473,9 +529,7 @@ namespace TEN::Entities::TR4
 					{
 						TriggerMetalSparks(pos1.x, pos1.y, pos1.z, -1, -1, 0, 1);
 						TriggerDynamicLight(
-							pos1.x,
-							pos1.y,
-							pos1.z,
+							pos1.x, pos1.y, pos1.z,
 							10,
 							random & 0x1F,
 							96 - ((random >> 6) & 0x1F),
@@ -504,9 +558,7 @@ namespace TEN::Entities::TR4
 			else
 			{
 				TriggerDynamicLight(
-					pos1.x,
-					pos1.y,
-					pos1.z,
+					pos1.x, pos1.y, pos1.z,
 					10,
 					random & 0x1F,
 					96 - ((random >> 6) & 0x1F),
@@ -517,22 +569,22 @@ namespace TEN::Entities::TR4
 
 			break;
 
-		case GUIDE_STATE_LOOK_BACK:
+		case GUIDE_STATE_TURN_LEFT:
 			creature->MaxTurn = 0;
 
-			if (laraAI.angle < -256)
-				item->Pose.Orientation.y -= 399;
+			if (laraAI.angle < ANGLE(-1.4f))
+				item->Pose.Orientation.y -= ANGLE(2.2f);
 
 			break;
 
-		case GUIDE_STATE_TORCH_ATTACK:
+		case GUIDE_STATE_ATTACK_LOW:
 			creature->MaxTurn = 0;
 
 			if (AI.ahead)
 			{
 				joint0 = AI.angle / 2;
-				joint2 = AI.angle / 2;
 				joint1 = AI.xAngle / 2;
+				joint2 = AI.angle / 2;
 			}
 
 			if (abs(AI.angle) >= ANGLE(7.0f))
@@ -560,7 +612,7 @@ namespace TEN::Entities::TR4
 							dy < CLICK(2) &&
 							dz < CLICK(2))
 						{
-							DoDamage(enemy, 20);
+							DoDamage(enemy, GUIDE_ATTACK_DAMAGE);
 							CreatureEffect2(item, GuideBite1, 8, -1, DoBloodSplat);
 							creature->Flags = 1;
 
@@ -573,17 +625,17 @@ namespace TEN::Entities::TR4
 
 			break;
 
-		case 35:
+		case GUIDE_STATE_TURN_RIGHT:
 			creature->MaxTurn = 0;
 
-			if (laraAI.angle > 256)
-				item->Pose.Orientation.y += 399;
+			if (laraAI.angle > ANGLE(1.4f))
+				item->Pose.Orientation.y += ANGLE(2.2f);
 
 			break;
 
-		case 36:
-		case 43:
-			if (enemy)
+		case GUIDE_STATE_CROUCH:
+		case GUIDE_STATE_ACTIVATE_TRAP_CROUCHING:
+			if (enemy != nullptr)
 			{
 				short deltaAngle = enemy->Pose.Orientation.y - item->Pose.Orientation.y;
 				if (deltaAngle < -ANGLE(2.0f))
@@ -592,20 +644,20 @@ namespace TEN::Entities::TR4
 					item->Pose.Orientation.y = ANGLE(2.0f);
 			}
 
-			if (item->Animation.RequiredState == 43)
-				item->Animation.TargetState = 43;
+			if (item->Animation.RequiredState == GUIDE_STATE_ACTIVATE_TRAP_CROUCHING)
+				item->Animation.TargetState = GUIDE_STATE_ACTIVATE_TRAP_CROUCHING;
 			else
 			{
-				if (item->Animation.AnimNumber != (object->animIndex + 57) &&
+				if (item->Animation.AnimNumber != (object->animIndex + GUIDE_ANIM_IDLE_CROUCH) &&
 					item->Animation.FrameNumber == (g_Level.Anims[item->Animation.AnimNumber].frameEnd - 20))
 				{
 					TestTriggers(item, true);
 
-					creature->ReachedGoal = false;
-					creature->Enemy = nullptr;
+					item->Animation.TargetState = GUIDE_STATE_IDLE;
 					item->AIBits = FOLLOW;
 					item->ItemFlags[3]++;
-					item->Animation.TargetState = GUIDE_STATE_IDLE;
+					creature->ReachedGoal = false;
+					creature->Enemy = nullptr;
 					break;
 				}
 			}
@@ -620,11 +672,11 @@ namespace TEN::Entities::TR4
 			}
 			else if (item->Animation.FrameNumber == (g_Level.Anims[item->Animation.AnimNumber].frameBase + 35))
 			{
-				item->MeshSwapBits &= 0xFFFBFFFF;
+				item->ClearBits(JointBitType::MeshSwap, GuideRightHandSwapJoints);
 
 				auto* room = &g_Level.Rooms[item->RoomNumber];
-				ItemInfo* currentItem = nullptr;
 
+				ItemInfo* currentItem = nullptr;
 				short currentitemNumber = room->itemNumber;
 				while (currentitemNumber != NO_ITEM)
 				{
@@ -657,7 +709,7 @@ namespace TEN::Entities::TR4
 
 			break;
 
-		case 38:
+		case GUIDE_STATE_LIGHT_TORCHES:
 			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase)
 				item->Pose.Position = enemy->Pose.Position;
 			else
@@ -675,9 +727,9 @@ namespace TEN::Entities::TR4
 				}
 				else if (item->Animation.FrameNumber < (g_Level.Anims[item->Animation.AnimNumber].frameBase + 42))
 				{
-					if (enemy->Pose.Orientation.y - item->Pose.Orientation.y <= ANGLE(2.0f))
+					if ((enemy->Pose.Orientation.y - item->Pose.Orientation.y) <= ANGLE(2.0f))
 					{
-						if (enemy->Pose.Orientation.y - item->Pose.Orientation.y < -ANGLE(2.0f))
+						if ((enemy->Pose.Orientation.y - item->Pose.Orientation.y) < -ANGLE(2.0f))
 							item->Pose.Orientation.y -= ANGLE(2.0f);
 					}
 					else
@@ -687,8 +739,8 @@ namespace TEN::Entities::TR4
 
 			break;
 
-		case 39:
-			if (item->Animation.FrameNumber >= (g_Level.Anims[item->Animation.AnimNumber].frameBase + 20))
+		case GUIDE_STATE_READ_INSCRIPTION:
+			if (item->Animation.FrameNumber >= g_Level.Anims[item->Animation.AnimNumber].frameBase + 20)
 			{
 				if (item->Animation.FrameNumber == (g_Level.Anims[item->Animation.AnimNumber].frameBase + 20))
 				{
@@ -704,16 +756,22 @@ namespace TEN::Entities::TR4
 				}
 
 				if (item->Animation.FrameNumber == (g_Level.Anims[item->Animation.AnimNumber].frameBase + 70) &&
-					item->RoomNumber == 70)
+					flagScaryInscription)
 				{
-					item->Animation.RequiredState = GUIDE_STATE_RUN;
-					item->MeshSwapBits |= 0x200000;
+					item->Animation.RequiredState = GUIDE_STATE_RUN_FORWARD;
+					item->SetBits(JointBitType::MeshSwap, GuideHeadSwapJoints);
 					SoundEffect(SFX_TR4_GUIDE_SCARE, &item->Pose);
 				}
+				if (item->Animation.FrameNumber == (g_Level.Anims[item->Animation.AnimNumber].frameBase + 185) &&
+					flagScaryInscription)
+				{
+					item->ItemFlags[2] &= ~(1 << 4); // Turn off 4th bit for flagScaryInscription.
+					item->ClearBits(JointBitType::MeshSwap, GuideHeadSwapJoints);
+				}
 			}
-			else if (enemy->Pose.Orientation.y - item->Pose.Orientation.y <= ANGLE(2.0f))
+			else if ((enemy->Pose.Orientation.y - item->Pose.Orientation.y) <= ANGLE(2.0f))
 			{
-				if (enemy->Pose.Orientation.y - item->Pose.Orientation.y < -ANGLE(2.0f))
+				if ((enemy->Pose.Orientation.y - item->Pose.Orientation.y) < -ANGLE(2.0f))
 					item->Pose.Orientation.y -= ANGLE(2.0f);
 			}
 			else
@@ -721,9 +779,9 @@ namespace TEN::Entities::TR4
 
 			break;
 
-		case 40:
-			creature->LOT.IsJumping;
+		case GUIDE_STATE_WALK_FORWARD_NO_TORCH:
 			creature->MaxTurn = ANGLE(7.0f);
+			creature->LOT.IsJumping;
 
 			if (laraAI.ahead)
 			{
@@ -764,8 +822,8 @@ namespace TEN::Entities::TR4
 
 			break;
 
-		case 41:
-		case 42:
+		case GUIDE_STATE_ADJUST_POSITION_FRONT:
+		case GUIDE_STATE_ADJUST_POSITION_BACK:
 			creature->MaxTurn = 0;
 			MoveCreature3DPos(&item->Pose, &enemy->Pose, 15, enemy->Pose.Orientation.y - item->Pose.Orientation.y, ANGLE(10.0f));
 
