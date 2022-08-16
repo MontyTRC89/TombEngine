@@ -1,8 +1,11 @@
 #pragma once
 
-struct LaserHeadInfo
+namespace TEN::Entities::TR5
 {
-	short BaseItem;
-	short Tentacles[8];
-	short PuzzleItem;
-};
+	struct LaserHeadInfo
+	{
+		short BaseItem;
+		short Tentacles[8];
+		short PuzzleItem;
+	};
+}

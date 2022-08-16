@@ -1,4 +1,7 @@
 #pragma once
 
-void InitialiseAutoGuns(short itemNumber);
-void AutoGunsControl(short itemNumber);
+namespace TEN::Entities::TR5
+{
+	void InitialiseAutoGuns(short itemNumber);
+	void AutoGunsControl(short itemNumber);
+}

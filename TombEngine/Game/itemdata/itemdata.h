@@ -1,22 +1,23 @@
 #pragma once
-#include <variant>
-#include <functional>
 #include <cstddef>
+#include <functional>
 #include <stdexcept>
+#include <variant>
+
 #include "Game/itemdata/creature_info.h"
 #include "Game/itemdata/door_data.h"
 #include "Game/Lara/lara_struct.h"
-#include "Objects/TR2/Vehicles/speedboat_info.h"
 #include "Objects/TR2/Vehicles/skidoo_info.h"
-#include "Objects/TR3/Vehicles/minecart_info.h"
+#include "Objects/TR2/Vehicles/speedboat_info.h"
 #include "Objects/TR3/Vehicles/big_gun_info.h"
 #include "Objects/TR3/Vehicles/kayak_info.h"
+#include "Objects/TR3/Vehicles/minecart_info.h"
 #include "Objects/TR3/Vehicles/quad_bike_info.h"
 #include "Objects/TR3/Vehicles/rubber_boat_info.h"
 #include "Objects/TR3/Vehicles/upv_info.h"
+#include "Objects/TR4/Entity/tr4_wraith_info.h"
 #include "Objects/TR4/Vehicles/jeep_info.h"
 #include "Objects/TR4/Vehicles/motorbike_info.h"
-#include "Objects/TR4/Entity/tr4_wraith_info.h"
 #include "Objects/TR5/Entity/tr5_laserhead_info.h"
 #include "Objects/TR5/Object/tr5_pushableblock_info.h"
 #include "Specific/phd_global.h"
@@ -25,6 +26,7 @@ template<class... Ts> struct visitor : Ts... { using Ts::operator()...; };
 template<class... Ts> visitor(Ts...)->visitor<Ts...>; // line not needed in C++20...
 
 using namespace TEN::Entities::TR4;
+using namespace TEN::Entities::TR5;
 using namespace TEN::Entities::Vehicles;
 
 struct ItemInfo;
