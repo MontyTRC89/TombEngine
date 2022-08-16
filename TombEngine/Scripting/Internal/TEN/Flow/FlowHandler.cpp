@@ -46,6 +46,21 @@ Add a level to the Flow.
 */
 	table_flow.set_function(ScriptReserved_AddLevel, &FlowHandler::AddLevel, this);
 
+/*** GetLevel.
+Returns the level indicated by the parameter id.
+@function GetLevel
+@tparam int id of the level
+@treturn Level the level indicated by the id
+*/
+	table_flow.set_function(ScriptReserved_GetLevel, &FlowHandler::GetLevel, this);
+
+/*** GetCurrentLevel.
+Returns the level that the game control is running in that moment.
+@function GetCurrentLevel
+@treturn Level the current level
+*/
+	table_flow.set_function(ScriptReserved_GetCurrentLevel, &FlowHandler::GetCurrentLevel, this);
+
 /*** Image to show when loading the game.
 Must be a .jpg or .png image.
 @function SetIntroImagePath
@@ -187,6 +202,11 @@ Settings* FlowHandler::GetSettings()
 Level* FlowHandler::GetLevel(int id)
 {
 	return Levels[id];
+}
+
+Level* FlowHandler::GetCurrentLevel()
+{
+	return Levels[CurrentLevel];
 }
 
 int	FlowHandler::GetNumLevels() const
