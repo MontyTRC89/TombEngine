@@ -1,3 +1,6 @@
 #pragma once
 
-void SharkControl(short itemNumber);
+namespace TEN::Entities::TR2
+{
+	void SharkControl(short itemNumber);
+}

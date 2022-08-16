@@ -129,8 +129,7 @@ namespace TEN::Control::Volumes
 
 	void TestVolumes(short roomNumber, MESH_INFO* mesh)
 	{
-		auto* staticInfo = &StaticObjects[mesh->staticNumber];
-		auto bbox = TO_DX_BBOX(mesh->pos, &staticInfo->collisionBox);
+		auto bbox = TO_DX_BBOX(mesh->pos, GetBoundsAccurate(mesh, false));
 
 		TestVolumes(roomNumber, bbox, TriggerVolumeActivators::Static, mesh);
 	}

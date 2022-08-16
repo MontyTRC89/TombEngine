@@ -1,43 +1,46 @@
 #include "framework.h"
-#include "tr4_ahmet.h"
-#include "Game/control/control.h"
+#include "Objects/TR4/Entity/tr4_ahmet.h"
+
 #include "Game/collision/sphere.h"
+#include "Game/control/box.h"
+#include "Game/control/control.h"
+#include "Game/control/lot.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/weather.h"
-#include "Sound/sound.h"
-#include "Specific/setup.h"
-#include "Game/control/box.h"
-#include "Specific/level.h"
-#include "Game/misc.h"
-#include "Game/Lara/lara.h"
-#include "Game/people.h"
-#include "Game/items.h"
-#include "Game/control/lot.h"
 #include "Game/itemdata/creature_info.h"
+#include "Game/items.h"
+#include "Game/Lara/lara.h"
+#include "Game/misc.h"
+#include "Game/people.h"
+#include "Sound/sound.h"
+#include "Specific/level.h"
+#include "Specific/prng.h"
+#include "Specific/setup.h"
 
-using std::vector;
 using namespace TEN::Effects::Environment;
+using namespace TEN::Math::Random;
+using std::vector;
 
 namespace TEN::Entities::TR4
 {
-	BITE_INFO AhmetBiteLeft = { 0, 0, 0, 16 };
-	BITE_INFO AhmetBiteRight = { 0, 0, 0, 22 };
-	BITE_INFO AhmetBiteJaw = { 0, 0, 0, 11 };
-	const vector<int> AhmetSwipeAttackLeftJoints = { 14, 15, 16, 17 };
-	const vector<int> AhmetSwipeAttackRightJoints = { 20, 21, 22, 23 };
-
 	constexpr auto AHMET_SWIPE_ATTACK_DAMAGE = 80;
-	constexpr auto AHMET_BITE_ATTACK_DAMAGE = 120;
+	constexpr auto AHMET_BITE_ATTACK_DAMAGE	 = 120;
 
-	constexpr auto AHMET_ATTACK_RANGE = SECTOR(0.67f);
-	constexpr auto AHMET_AWARE_RANGE = SECTOR(1);
-	constexpr auto AHMET_IDLE_RANGE = SECTOR(1.25f);
-	constexpr auto AHMET_RUN_RANGE = SECTOR(2.5f);
+	constexpr auto AHMET_ATTACK_RANGE = SQUARE(SECTOR(0.67f));
+	constexpr auto AHMET_AWARE_RANGE  = SQUARE(SECTOR(1));
+	constexpr auto AHMET_IDLE_RANGE   = SQUARE(SECTOR(1.25f));
+	constexpr auto AHMET_RUN_RANGE    = SQUARE(SECTOR(2.5f));
 
 	#define AHMET_WALK_FORWARD_TURN_ANGLE ANGLE(5.0f)
-	#define AHMET_RUN_FORWARD_TURN_ANGLE ANGLE(8.0f)
-	#define AHMET_VIEW_ANGLE ANGLE(45.0f)
-	#define AHMET_ENEMY_ANGLE ANGLE(90.0f)
+	#define AHMET_RUN_FORWARD_TURN_ANGLE  ANGLE(8.0f)
+	#define AHMET_VIEW_ANGLE			  ANGLE(45.0f)
+	#define AHMET_ENEMY_ANGLE			  ANGLE(90.0f)
+	
+	const auto AhmetBiteLeft  = BiteInfo(Vector3::Zero, 16);
+	const auto AhmetBiteRight = BiteInfo(Vector3::Zero, 22);
+	const auto AhmetBiteJaw	  = BiteInfo(Vector3::Zero, 11);
+	const vector<int> AhmetSwipeAttackLeftJoints  = { 14, 15, 16, 17 };
+	const vector<int> AhmetSwipeAttackRightJoints = { 20, 21, 22, 23 };
 
 	enum AhmetState
 	{
@@ -76,11 +79,6 @@ namespace TEN::Entities::TR4
 
 	};
 
-	static void AhmetHeavyTriggers(ItemInfo* item)
-	{
-		TestTriggers(item, true);
-	}
-
 	static void TriggerAhmetDeathEffect(ItemInfo* item)
 	{
 		// HACK: Using CreatureSpheres here in release mode results in total mess-up
@@ -93,7 +91,6 @@ namespace TEN::Entities::TR4
 		{
 			int meshCount = GetSpheres(item, spheres, SPHERES_SPACE_WORLD, Matrix::Identity);
 			auto sphere = &spheres[(Wibble / 8) & 1];
-
 			for (int i = meshCount; i > 0; i--, sphere += 2)
 				TriggerFireFlame(sphere->x, sphere->y, sphere->z, -1, 1);
 		}
@@ -102,11 +99,8 @@ namespace TEN::Entities::TR4
 			item->Pose.Position.x,
 			item->Pose.Position.y - CLICK(1),
 			item->Pose.Position.z,
-			13,
-			(GetRandomControl() & 0x3F) - 64,
-			(GetRandomControl() & 0x1F) + 96,
-			0);
-
+			13, (GetRandomControl() & 0x3F) - 64, (GetRandomControl() & 0x1F) + 96, 0
+		);
 		SoundEffect(SFX_TR4_LOOP_FOR_SMALL_FIRES, &item->Pose);
 	}
 
@@ -115,12 +109,9 @@ namespace TEN::Entities::TR4
 		auto* item = &g_Level.Items[itemNumber];
 
 		InitialiseCreature(itemNumber);
-		item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex;
-		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-		item->Animation.TargetState = AHMET_STATE_IDLE;
-		item->Animation.ActiveState = AHMET_STATE_IDLE;
+		SetAnimation(item, AHMET_ANIM_IDLE);
 		item->ItemFlags[0] = item->Pose.Position.x / SECTOR(1);
-		item->ItemFlags[1] = item->Pose.Position.y * 4 / SECTOR(1);
+		item->ItemFlags[1] = (item->Pose.Position.y * 4) / SECTOR(1);
 		item->ItemFlags[2] = item->Pose.Position.z / SECTOR(1);
 	}
 
@@ -130,6 +121,7 @@ namespace TEN::Entities::TR4
 			return;
 
 		auto* item = &g_Level.Items[itemNumber];
+
 		if (item->TriggerFlags == 1)
 		{
 			item->TriggerFlags = 0;
@@ -148,53 +140,47 @@ namespace TEN::Entities::TR4
 				// Don't clear.
 				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameEnd)
 				{
-					item->Collidable = false;
 					item->Animation.FrameNumber = (g_Level.Anims[item->Animation.AnimNumber].frameEnd - 1);
+					item->Collidable = false;
 				}
 			}
 			else
 			{
-				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + AHMET_ANIM_DEATH;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-				item->Animation.ActiveState = AHMET_STATE_DEATH;
-				item->Animation.TargetState = AHMET_STATE_DEATH;
-				Lara.InteractedItem = itemNumber;
+				SetAnimation(item, AHMET_ANIM_DEATH);
+				Lara.InteractedItem = itemNumber; // TODO: Check if it's really required! -- TokyoSU, 3/8/2022
 			}
-
+			
 			TriggerAhmetDeathEffect(item);
 		}
 		else
 		{
-			if (item->AIBits & ALL_AIOBJ)
+			if (item->AIBits != 0) // Does this entity have AI object? NOTE: Previous one checked "& ALL_AIOBJ" -- TokyoSU, 3/8/2022
 				GetAITarget(creature);
 
-			AI_INFO AI;
+			AI_INFO AI, laraAI;
 			CreatureAIInfo(item, &AI);
 
-			AI_INFO laraAI;
-			if (creature->Enemy == LaraItem)
+			if (creature->Enemy->IsLara())
 			{
 				laraAI.angle = AI.angle;
 				laraAI.distance = AI.distance;
 			}
 			else
 			{
-				int dx = LaraItem->Pose.Position.x - item->Pose.Position.x;
+				int dx = LaraItem->Pose.Position.x - item->Pose.Position.x; // TODO: Make ahmet to not use LaraItem global -- TokyoSU, 3/8/2022
 				int dz = LaraItem->Pose.Position.z - item->Pose.Position.z;
-				int angle = phd_atan(dx, dz);
-				laraAI.angle = angle - item->Pose.Orientation.y;
-				laraAI.distance = pow(dx, 2) + pow(dz, 2);
+				laraAI.angle = short(phd_atan(dx, dz)) - item->Pose.Orientation.y;
+				laraAI.distance = SQUARE(dx) + SQUARE(dz);
 			}
 
 			GetCreatureMood(item, &AI, true);
 			CreatureMood(item, &AI, true);
 
 			angle = CreatureTurn(item, creature->MaxTurn);
-			creature->Enemy = LaraItem;
+			//creature->Enemy = LaraItem; // No need since CreatureAIInfo() set it. -- TokyoSU
 
-			if (laraAI.distance < pow(AHMET_AWARE_RANGE, 2) ||
-				item->HitStatus ||
-				TargetVisible(item, &laraAI))
+			if (laraAI.distance < AHMET_AWARE_RANGE ||
+				item->HitStatus || TargetVisible(item, &laraAI))
 			{
 				AlertAllGuards(itemNumber);
 			}
@@ -218,34 +204,32 @@ namespace TEN::Entities::TR4
 					item->Animation.TargetState = AHMET_STATE_WALK_FORWARD;
 					headY = 0;
 				}
-				else if (creature->Mood == MoodType::Attack && creature->Mood != MoodType::Escape)
+				else if (creature->Mood == MoodType::Bored || creature->Mood == MoodType::Escape)
 				{
-					if (AI.bite && AI.distance < pow(AHMET_ATTACK_RANGE, 2))
-						item->Animation.TargetState = AHMET_STATE_SWIPE_ATTACK;
-					else if ((AI.angle >= AHMET_VIEW_ANGLE || AI.angle <= -AHMET_VIEW_ANGLE) || AI.distance >= pow(AHMET_IDLE_RANGE, 2))
-					{
-						if (item->Animation.RequiredState)
-							item->Animation.TargetState = item->Animation.RequiredState;
-						else
-						{
-							if (!AI.ahead || AI.distance >= pow(AHMET_RUN_RANGE, 2))
-								item->Animation.TargetState = AHMET_STATE_RUN_FORWARD;
-							else
-								item->Animation.TargetState = AHMET_STATE_WALK_FORWARD;
-						}
-					}
-					else if (GetRandomControl() & 1)
-						item->Animation.TargetState = AHMET_STATE_JUMP_BITE_ATTACK;
-					else
-						item->Animation.TargetState = AHMET_STATE_JUMP_SWIPE_ATTACK;
-				}
-				else
-				{
-					if (Lara.TargetEntity == item || !AI.ahead)
+					if (Lara.TargetEntity == item || !AI.ahead) // TODO: Make ahmet not use LaraInfo global. -- TokyoSU, 3/8/2022
 						item->Animation.TargetState = AHMET_STATE_RUN_FORWARD;
 					else
 						item->Animation.TargetState = AHMET_STATE_IDLE;
 				}
+				else if (AI.bite && AI.distance < AHMET_ATTACK_RANGE)
+					item->Animation.TargetState = AHMET_STATE_SWIPE_ATTACK;
+				else if ((AI.angle >= AHMET_VIEW_ANGLE || AI.angle <= -AHMET_VIEW_ANGLE) ||
+					AI.distance >= AHMET_IDLE_RANGE)
+				{
+					if (item->Animation.RequiredState)
+						item->Animation.TargetState = item->Animation.RequiredState;
+					else
+					{
+						if (!AI.ahead || AI.distance >= AHMET_RUN_RANGE)
+							item->Animation.TargetState = AHMET_STATE_RUN_FORWARD;
+						else
+							item->Animation.TargetState = AHMET_STATE_WALK_FORWARD;
+					}
+				}
+				else if (TestProbability(0.5f))
+					item->Animation.TargetState = AHMET_STATE_JUMP_BITE_ATTACK;
+				else
+					item->Animation.TargetState = AHMET_STATE_JUMP_SWIPE_ATTACK;
 
 				break;
 
@@ -257,10 +241,14 @@ namespace TEN::Entities::TR4
 					item->Animation.TargetState = AHMET_STATE_WALK_FORWARD;
 					headY = 0;
 				}
-				else if (AI.bite && AI.distance < pow(AHMET_IDLE_RANGE, 2))
+				else if (AI.bite && AI.distance < AHMET_IDLE_RANGE)
 					item->Animation.TargetState = AHMET_STATE_IDLE;
-				else if (creature->Mood == MoodType::Escape || AI.distance > pow(AHMET_RUN_RANGE, 2) || !AI.ahead || (AI.enemyFacing > -AHMET_ENEMY_ANGLE || AI.enemyFacing < AHMET_ENEMY_ANGLE))
+				else if (creature->Mood == MoodType::Escape ||
+					AI.distance > AHMET_RUN_RANGE || !AI.ahead ||
+					(AI.enemyFacing > -AHMET_ENEMY_ANGLE || AI.enemyFacing < AHMET_ENEMY_ANGLE))
+				{
 					item->Animation.TargetState = AHMET_STATE_RUN_FORWARD;
+				}
 				
 				break;
 
@@ -271,11 +259,11 @@ namespace TEN::Entities::TR4
 				if (item->AIBits & GUARD ||
 					((creature->Mood == MoodType::Bored || creature->Mood == MoodType::Escape) &&
 						(Lara.TargetEntity == item && AI.ahead)) ||
-					(AI.bite && AI.distance < pow(AHMET_IDLE_RANGE, 2)))
+					(AI.bite && AI.distance < AHMET_IDLE_RANGE))
 				{
 					item->Animation.TargetState = AHMET_STATE_IDLE;
 				}
-				else if (AI.ahead && AI.distance < pow(AHMET_RUN_RANGE, 2) &&
+				else if (AI.ahead && AI.distance < AHMET_RUN_RANGE &&
 					(AI.enemyFacing < -AHMET_ENEMY_ANGLE || AI.enemyFacing > AHMET_ENEMY_ANGLE))
 				{
 					item->Animation.TargetState = AHMET_STATE_WALK_FORWARD;
@@ -286,7 +274,7 @@ namespace TEN::Entities::TR4
 			case AHMET_STATE_SWIPE_ATTACK:
 				creature->MaxTurn = 0;
 
-				if (abs(AI.angle) >= 910)
+				if (abs(AI.angle) >= ANGLE(5.0f))
 				{
 					if (AI.angle >= 0)
 						item->Pose.Orientation.y += ANGLE(5.0f);
@@ -296,18 +284,20 @@ namespace TEN::Entities::TR4
 				else
 					item->Pose.Orientation.y += AI.angle;
 
-				if (!(creature->Flags & 1) && item->Animation.FrameNumber > (g_Level.Anims[item->Animation.AnimNumber].frameBase + 7) &&
+				if (!(creature->Flags & 1) &&
+					item->Animation.FrameNumber > (g_Level.Anims[item->Animation.AnimNumber].frameBase + 7) &&
 					item->TestBits(JointBitType::Touch, AhmetSwipeAttackLeftJoints))
 				{
-					CreatureEffect2(item, &AhmetBiteLeft, 10, -1, DoBloodSplat);
 					DoDamage(creature->Enemy, AHMET_SWIPE_ATTACK_DAMAGE);
+					CreatureEffect2(item, AhmetBiteLeft, 10, -1, DoBloodSplat);
 					creature->Flags |= 1;
 				}
-				else if (!(creature->Flags & 2) && item->Animation.FrameNumber > (g_Level.Anims[item->Animation.AnimNumber].frameBase + 32) &&
+				else if (!(creature->Flags & 2) &&
+					item->Animation.FrameNumber > (g_Level.Anims[item->Animation.AnimNumber].frameBase + 32) &&
 					item->TestBits(JointBitType::Touch, AhmetSwipeAttackRightJoints))
 				{
-					CreatureEffect2(item, &AhmetBiteRight, 10, -1, DoBloodSplat);
 					DoDamage(creature->Enemy, AHMET_SWIPE_ATTACK_DAMAGE);
+					CreatureEffect2(item, AhmetBiteRight, 10, -1, DoBloodSplat);
 					creature->Flags |= 2;
 				}
 
@@ -316,7 +306,7 @@ namespace TEN::Entities::TR4
 			case AHMET_STATE_JUMP_BITE_ATTACK:
 				creature->MaxTurn = 0;
 
-				if (item->Animation.AnimNumber == Objects[item->ObjectNumber].animIndex + AHMET_ANIM_JUMP_SWIPE_ATTACK_START)
+				if (item->Animation.AnimNumber == (Objects[item->ObjectNumber].animIndex + AHMET_ANIM_JUMP_SWIPE_ATTACK_START))
 				{
 					if (abs(AI.angle) >= ANGLE(5.0f))
 					{
@@ -330,13 +320,13 @@ namespace TEN::Entities::TR4
 				}
 				else
 				{
-					if (!(creature->Flags & 1) && item->Animation.AnimNumber == Objects[item->ObjectNumber].animIndex + AHMET_ANIM_JUMP_BITE_ATTACK_CONTINUE)
+					if (!(creature->Flags & 1) &&
+						item->Animation.AnimNumber == (Objects[item->ObjectNumber].animIndex + AHMET_ANIM_JUMP_BITE_ATTACK_CONTINUE))
 					{
-						if (item->Animation.FrameNumber > (g_Level.Anims[item->Animation.AnimNumber].frameBase + 11) &&
-							item->TestBits(JointBitType::Touch, AhmetSwipeAttackLeftJoints))
+						if (item->Animation.FrameNumber > (g_Level.Anims[item->Animation.AnimNumber].frameBase + 11) && item->TestBits(JointBitType::Touch, AhmetSwipeAttackLeftJoints))
 						{
-							CreatureEffect2(item, &AhmetBiteJaw, 10, -1, DoBloodSplat);
 							DoDamage(creature->Enemy, AHMET_BITE_ATTACK_DAMAGE);
+							CreatureEffect2(item, AhmetBiteJaw, 10, -1, DoBloodSplat);
 							creature->Flags |= 1;
 						}
 					}
@@ -361,20 +351,16 @@ namespace TEN::Entities::TR4
 				}
 				else
 				{
-					if (!(creature->Flags & 1) &&
-						item->Animation.FrameNumber > (g_Level.Anims[item->Animation.AnimNumber].frameBase + 14) &&
-						item->TestBits(JointBitType::Touch, AhmetSwipeAttackLeftJoints))
+					if (!(creature->Flags & 1) && item->Animation.FrameNumber > (g_Level.Anims[item->Animation.AnimNumber].frameBase + 14) && item->TestBits(JointBitType::Touch, AhmetSwipeAttackLeftJoints))
 					{
-						CreatureEffect2(item, &AhmetBiteLeft, 10, -1, DoBloodSplat);
 						DoDamage(creature->Enemy, AHMET_SWIPE_ATTACK_DAMAGE);
+						CreatureEffect2(item, AhmetBiteLeft, 10, -1, DoBloodSplat);
 						creature->Flags |= 1;
 					}
-					else if (!(creature->Flags & 2) &&
-						item->Animation.FrameNumber > (g_Level.Anims[item->Animation.AnimNumber].frameBase + 22) &&
-						item->TestBits(JointBitType::Touch, AhmetSwipeAttackRightJoints))
+					else if (!(creature->Flags & 2) && item->Animation.FrameNumber > (g_Level.Anims[item->Animation.AnimNumber].frameBase + 22) && item->TestBits(JointBitType::Touch, AhmetSwipeAttackRightJoints))
 					{
-						CreatureEffect2(item, &AhmetBiteRight, 10, -1, DoBloodSplat);
 						DoDamage(creature->Enemy, AHMET_SWIPE_ATTACK_DAMAGE);
+						CreatureEffect2(item, AhmetBiteRight, 10, -1, DoBloodSplat);
 						creature->Flags |= 2;
 					}
 				}
@@ -383,9 +369,9 @@ namespace TEN::Entities::TR4
 			}
 		}
 
+		TestTriggers(item, true);
 		CreatureTilt(item, 0);
 		CreatureJoint(item, 0, headY);
-		AhmetHeavyTriggers(item);
 		CreatureAnimation(itemNumber, angle, 0);
 	}
 
@@ -393,8 +379,11 @@ namespace TEN::Entities::TR4
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		if (item->Animation.ActiveState != AHMET_STATE_DEATH || item->Animation.FrameNumber != g_Level.Anims[item->Animation.AnimNumber].frameEnd)
+		if (item->Animation.ActiveState != AHMET_STATE_DEATH ||
+			item->Animation.FrameNumber != g_Level.Anims[item->Animation.AnimNumber].frameEnd)
+		{
 			return false;
+		}
 
 		Weather.Flash(255, 64, 0, 0.03f);
 
@@ -406,21 +395,16 @@ namespace TEN::Entities::TR4
 		if (item->RoomNumber != outsideRoom)
 			ItemNewRoom(itemNumber, outsideRoom);
 
-		item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex;
-		item->Animation.TargetState = AHMET_STATE_IDLE;
-		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-		item->Animation.ActiveState = AHMET_STATE_IDLE;
+		SetAnimation(item, AHMET_ANIM_IDLE);
 		item->HitPoints = Objects[item->ObjectNumber].HitPoints;
-
 		AddActiveItem(itemNumber);
 
-		item->Flags &= 0xFE;
-		item->AfterDeath = 0;
 		item->Status = ITEM_ACTIVE;
 		item->Collidable = true;
+		item->AfterDeath = 0;
+		item->Flags &= ~IFLAG_INVISIBLE;
 
 		EnableEntityAI(itemNumber, true);
-
 		item->TriggerFlags = 1;
 		return true;
 	}
