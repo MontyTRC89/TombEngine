@@ -1,16 +1,17 @@
 #include "framework.h"
-#include "tr5_chef.h"
+#include "Objects/TR5/Entity/tr5_chef.h"
+
 #include "Game/items.h"
 #include "Game/control/box.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/tomb4fx.h"
-#include "Game/people.h"
-#include "Specific/setup.h"
-#include "Specific/level.h"
+#include "Game/itemdata/creature_info.h"
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
+#include "Game/people.h"
 #include "Sound/sound.h"
-#include "Game/itemdata/creature_info.h"
+#include "Specific/level.h"
+#include "Specific/setup.h"
 
 namespace TEN::Entities::TR5
 {

@@ -11,8 +11,10 @@
 #include "Game/people.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
+#include "Specific/prng.h"
 #include "Specific/setup.h"
 
+using namespace TEN::Math::Random;
 using std::vector;
 
 namespace TEN::Entities::TR3
@@ -20,7 +22,7 @@ namespace TEN::Entities::TR3
 	const auto MPStickBite1 = BiteInfo(Vector3(247.0f, 10.0f, 11.0f), 13);
 	const auto MPStickBite2 = BiteInfo(Vector3(0.0f, 0.0f, 100.0f), 6);
 	const vector<int> MPStickPunchAttackJoints = { 10, 13 };
-	const vector<int> MPStickKickAttackJoints = { 5, 6 };
+	const vector<int> MPStickKickAttackJoints  = { 5, 6 };
 
 	enum MPStickState
 	{
@@ -184,7 +186,7 @@ namespace TEN::Entities::TR3
 				if (item->AIBits & GUARD)
 				{
 					head = AIGuard(creature);
-					if (!(GetRandomControl() & 0xFF))
+					if (TestProbability(0.004f))
 					{
 						if (item->Animation.ActiveState == MPSTICK_STATE_STOP)
 							item->Animation.TargetState = MPSTICK_STATE_WAIT;
@@ -240,7 +242,7 @@ namespace TEN::Entities::TR3
 					item->Animation.TargetState = MPSTICK_STATE_RUN;
 				else if (creature->Mood == MoodType::Bored)
 				{
-					if (GetRandomControl() < 0x100)
+					if (TestProbability(0.008f))
 					{
 						item->Animation.RequiredState = MPSTICK_STATE_WAIT;
 						item->Animation.TargetState = MPSTICK_STATE_STOP;
@@ -458,8 +460,8 @@ namespace TEN::Entities::TR3
 					if (creature->Flags != 1 && item->TestBits(JointBitType::Touch, MPStickKickAttackJoints) &&
 						item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 8)
 					{
-						CreatureEffect(item, MPStickBite2, DoBloodSplat);
 						DoDamage(enemy, 150);
+						CreatureEffect(item, MPStickBite2, DoBloodSplat);
 						SoundEffect(SFX_TR4_LARA_THUD, &item->Pose);
 						creature->Flags = 1;
 					}
@@ -473,10 +475,10 @@ namespace TEN::Entities::TR3
 							abs(enemy->Pose.Position.y - item->Pose.Position.y) <= SECTOR(0.25f) &&
 							abs(enemy->Pose.Position.z - item->Pose.Position.z) < SECTOR(0.25f))
 						{
-							creature->Flags = 1;
-							CreatureEffect(item, MPStickBite2, DoBloodSplat);
 							DoDamage(enemy, 9);
+							CreatureEffect(item, MPStickBite2, DoBloodSplat);
 							SoundEffect(SFX_TR4_LARA_THUD, &item->Pose);
+							creature->Flags = 1;
 						}
 					}
 				}

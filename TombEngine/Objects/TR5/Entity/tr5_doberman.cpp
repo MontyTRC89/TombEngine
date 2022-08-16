@@ -1,14 +1,18 @@
 #include "framework.h"
-#include "tr5_doberman.h"
+#include "Objects/TR5/Entity/tr5_doberman.h"
+
 #include "Game/control/box.h"
-#include "Game/effects/effects.h"
-#include "Specific/setup.h"
-#include "Specific/level.h"
-#include "Game/Lara/lara.h"
-#include "Game/itemdata/creature_info.h"
 #include "Game/control/control.h"
+#include "Game/effects/effects.h"
+#include "Game/itemdata/creature_info.h"
 #include "Game/items.h"
+#include "Game/Lara/lara.h"
 #include "Game/misc.h"
+#include "Specific/level.h"
+#include "Specific/prng.h"
+#include "Specific/setup.h"
+
+using namespace TEN::Math::Random;
 
 namespace TEN::Entities::TR5
 {
@@ -106,20 +110,21 @@ namespace TEN::Entities::TR5
 						item->Animation.TargetState = DOBERMAN_STATE_RUN_FORWARD;
 					else
 					{
-						int random = GetRandomControl();
-						if (random < 768)
+						if (TestProbability(0.025f))
 						{
 							item->Animation.RequiredState = DOBERMAN_STATE_STAND_LOW_BITE_ATTACK;
 							item->Animation.TargetState = DOBERMAN_STATE_STOP;
 							break;
 						}
-						if (random < 1536)
+
+						if (TestProbability(0.045f))
 						{
 							item->Animation.RequiredState = DOBERMAN_STATE_SIT_IDLE;
 							item->Animation.TargetState = DOBERMAN_STATE_STOP;
 							break;
 						}
-						if (random < 2816)
+
+						if (TestProbability(0.085f))
 						{
 							item->Animation.TargetState = DOBERMAN_STATE_STOP;
 							break;
@@ -146,6 +151,7 @@ namespace TEN::Entities::TR5
 				case DOBERMAN_STATE_STOP:
 					creature->MaxTurn = 0;
 					creature->Flags = 0;
+
 					if (creature->Mood != MoodType::Bored)
 					{
 						if (creature->Mood != MoodType::Escape &&
@@ -163,12 +169,11 @@ namespace TEN::Entities::TR5
 							item->Animation.TargetState = item->Animation.RequiredState;
 						else
 						{
-							int random = GetRandomControl();
-							if (random >= 768)
+							if (TestProbability(0.975f))
 							{
-								if (random >= 1536)
+								if (TestProbability(0.95f))
 								{
-									if (random < 9728)
+									if (TestProbability(0.3f))
 										item->Animation.TargetState = DOBERMAN_STATE_WALK_FORWARD;
 								}
 								else
@@ -178,22 +183,23 @@ namespace TEN::Entities::TR5
 								item->Animation.TargetState = DOBERMAN_STATE_STAND_LOW_BITE_ATTACK;
 						}
 					}
+
 					break;
 
 				case DOBERMAN_STATE_STAND_LOW_BITE_ATTACK:
-					if (creature->Mood != MoodType::Bored || GetRandomControl() < 1280)
+					if (creature->Mood != MoodType::Bored || TestProbability(0.04f))
 						item->Animation.TargetState = DOBERMAN_STATE_STOP;
 
 					break;
 
 				case DOBERMAN_STATE_SIT_IDLE:
-					if (creature->Mood != MoodType::Bored || GetRandomControl() < 256)
+					if (creature->Mood != MoodType::Bored || TestProbability(0.008f))
 						item->Animation.TargetState = DOBERMAN_STATE_STOP;
 
 					break;
 
 				case DOBERMAN_STATE_STAND_IDLE:
-					if (creature->Mood != MoodType::Bored || GetRandomControl() < 512)
+					if (creature->Mood != MoodType::Bored || TestProbability(0.015f))
 						item->Animation.TargetState = DOBERMAN_STATE_STOP;
 
 					break;
@@ -201,8 +207,7 @@ namespace TEN::Entities::TR5
 				case DOBERMAN_STATE_STAND_HIGH_BITE_ATTACK:
 					creature->MaxTurn = ANGLE(0.5f);
 
-					if (creature->Flags != 1 &&
-						AI.ahead &&
+					if (creature->Flags != 1 && AI.ahead &&
 						item->TouchBits & 0x122000)
 					{
 						DoDamage(creature->Enemy, 30);
@@ -244,6 +249,7 @@ namespace TEN::Entities::TR5
 						CreatureEffect(item, DobermanBite, DoBloodSplat);
 						creature->Flags = 3;
 					}
+
 					if (AI.distance < pow(341, 2))
 						item->Animation.TargetState = DOBERMAN_STATE_STAND_HIGH_BITE_ATTACK;
 

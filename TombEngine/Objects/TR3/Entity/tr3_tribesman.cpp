@@ -280,6 +280,7 @@ namespace TEN::Entities::TR3
 
 			case TRIBESMAN_STATE_AXE_ATTACK_HIGH_START:
 				creature->MaxTurn = ANGLE(4.0f);
+
 				if (AI.bite || AI.distance < pow(682, 2))
 					item->Animation.TargetState = TRIBESMAN_STATE_AXE_ATTACK_HIGH_CONTINUE;
 				else
@@ -452,7 +453,7 @@ namespace TEN::Entities::TR3
 					torsoX = 0;
 					torsoY = 0;
 
-					if (!(GetRandomControl() & 0xFF))
+					if (TestProbability(0.004f))
 						item->Animation.TargetState = TRIBESMAN_STATE_IDLE;
 
 					break;
@@ -493,7 +494,7 @@ namespace TEN::Entities::TR3
 					torsoX = 0;
 					torsoY = 0;
 
-					if (!(GetRandomControl() & 0xFF))
+					if (TestProbability(0.004f))
 						item->Animation.TargetState = TRIBESMAN_STATE_CROUCH_IDLE;
 
 					break;

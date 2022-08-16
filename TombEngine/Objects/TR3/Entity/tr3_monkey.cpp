@@ -10,21 +10,22 @@
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
 #include "Specific/level.h"
+#include "Specific/prng.h"
 #include "Specific/setup.h"
 
+using namespace TEN::Math::Random;
 using std::vector;
 
 namespace TEN::Entities::TR3
 {
-	const vector<int> MonkeyAttackJoints = { 10, 13 };
 	const auto MonkeyBite = BiteInfo(Vector3(10.0f, 10.0f, 11.0f), 13);
+	const vector<int> MonkeyAttackJoints = { 10, 13 };
 
 	void InitialiseMonkey(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
 		ClearItem(itemNumber);
-
 		item->Animation.AnimNumber = Objects[ID_MONKEY].animIndex + 2;
 		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 		item->Animation.ActiveState = 6;
@@ -154,9 +155,9 @@ namespace TEN::Entities::TR3
 				if (item->AIBits & GUARD)
 				{
 					torsoY = AIGuard(creature);
-					if (!(GetRandomControl() & 0xF))
+					if (TestProbability(0.06f))
 					{
-						if (GetRandomControl() & 0x1)
+						if (TestProbability(0.5f))
 							item->Animation.TargetState = 8;
 						else
 							item->Animation.TargetState = 7;
@@ -173,11 +174,11 @@ namespace TEN::Entities::TR3
 				{
 					if (item->Animation.RequiredState)
 						item->Animation.TargetState = item->Animation.RequiredState;
-					else if (!(GetRandomControl() & 0xF))
+					else if (TestProbability(0.06f))
 						item->Animation.TargetState = 2;
-					else if (!(GetRandomControl() & 0xF))
+					else if (TestProbability(0.06f))
 					{
-						if (GetRandomControl() & 0x1)
+						if (TestProbability(0.5f))
 							item->Animation.TargetState = 8;
 						else
 							item->Animation.TargetState = 7;
@@ -210,9 +211,9 @@ namespace TEN::Entities::TR3
 				{
 					torsoY = AIGuard(creature);
 
-					if (!(GetRandomControl() & 15))
+					if (TestProbability(0.06f))
 					{
-						if (GetRandomControl() & 1)
+						if (TestProbability(0.5f))
 							item->Animation.TargetState = 10;
 						else
 							item->Animation.TargetState = 6;
@@ -233,11 +234,11 @@ namespace TEN::Entities::TR3
 				{
 					if (item->Animation.RequiredState)
 						item->Animation.TargetState = item->Animation.RequiredState;
-					else if (!(GetRandomControl() & 15))
+					else if (TestProbability(0.06f))
 						item->Animation.TargetState = 2;
-					else if (!(GetRandomControl() & 15))
+					else if (TestProbability(0.06f))
 					{
-						if (GetRandomControl() & 1)
+						if (TestProbability(0.5f))
 							item->Animation.TargetState = 10;
 						else
 							item->Animation.TargetState = 6;
@@ -361,7 +362,7 @@ namespace TEN::Entities::TR3
 					item->Animation.TargetState = 4;
 				else if (creature->Mood == MoodType::Bored)
 				{
-					if (GetRandomControl() < 256)
+					if (TestProbability(0.008f))
 						item->Animation.TargetState = 6;
 				}
 				else if (AI.bite && AI.distance < pow(682, 2))

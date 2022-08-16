@@ -86,7 +86,7 @@ namespace TEN::Entities::TR3
 		}
 		else
 		{
-			if (creature->Enemy == nullptr || !(GetRandomControl() & 0x7F)) // TODO: Probability is 0.004f or 0.996f?
+			if (creature->Enemy == nullptr || TestProbability(0.008f))
 			{
 				ItemInfo* nearestItem = nullptr;
 				int minDistance = INT_MAX;

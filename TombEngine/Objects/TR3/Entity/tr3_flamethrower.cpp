@@ -14,7 +14,10 @@
 #include "Game/people.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
+#include "Specific/prng.h"
 #include "Specific/setup.h"
+
+using namespace TEN::Math::Random;
 
 namespace TEN::Entities::TR3
 {
@@ -57,9 +60,7 @@ namespace TEN::Entities::TR3
 			TriggerPilotFlame(itemNumber, 9);
 		}
 		else
-		{
 			TriggerDynamicLight(pos.x, pos.y, pos.z, (random & 3) + 10, 31 - ((random / 16) & 3), 24 - ((random / 64) & 3), random & 7);
-		}
 
 		if (item->HitPoints <= 0)
 		{
@@ -154,7 +155,7 @@ namespace TEN::Entities::TR3
 				{
 					head = AIGuard(creature);
 
-					if (!(GetRandomControl() & 0xFF))
+					if (TestProbability(0.008f))
 						item->Animation.TargetState = 4;
 
 					break;
@@ -170,9 +171,9 @@ namespace TEN::Entities::TR3
 					else
 						item->Animation.TargetState = 2;
 				}
-				else if (creature->Mood == MoodType::Bored && AI.ahead && !(GetRandomControl() & 0xFF))
+				else if (creature->Mood == MoodType::Bored && AI.ahead && TestProbability(0.008f))
 					item->Animation.TargetState = 4;
-				else if (creature->Mood == MoodType::Attack || !(GetRandomControl() & 0xFF))
+				else if (creature->Mood == MoodType::Attack || TestProbability(0.008f))
 					item->Animation.TargetState = 2;
 
 				break;
@@ -184,7 +185,7 @@ namespace TEN::Entities::TR3
 				{
 					head = AIGuard(creature);
 
-					if (!(GetRandomControl() & 0xFF))
+					if (TestProbability(0.008f))
 						item->Animation.TargetState = 1;
 
 					break;
@@ -193,7 +194,7 @@ namespace TEN::Entities::TR3
 					AI.distance < pow(SECTOR(4), 2) &&
 					(realEnemy != LaraItem || creature->HurtByLara) ||
 					creature->Mood != MoodType::Bored ||
-					!(GetRandomControl() & 0xFF)))
+					TestProbability(0.008f)))
 				{
 					item->Animation.TargetState = 1;
 				}
