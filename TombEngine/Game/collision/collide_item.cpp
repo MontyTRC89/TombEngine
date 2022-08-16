@@ -945,7 +945,7 @@ bool CollideSolidBounds(ItemInfo* item, BOUNDING_BOX box, PHD_3DPOS pos, Collisi
 	};
 
 	// Determine collision box vertical dimensions
-	auto height = collBox.Y2 - collBox.Y1;
+	auto height = collBox.Height();
 	auto center = item->Pose.Position.y - height / 2;
 
 	// Do a series of angular tests with 90 degree steps to determine top/bottom collision.
@@ -1198,7 +1198,7 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 	auto collResult = GetCollision(item);
 
 	auto* bounds = GetBoundsAccurate(item);
-	int radius = abs(bounds->Y2 - bounds->Y1);
+	int radius = bounds->Height();
 
 	item->Pose.Position.y += radius;
 
@@ -1899,7 +1899,7 @@ void CreatureCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll
 		int rx = (frame->boundingBox.X1 + frame->boundingBox.X2) / 2;
 		int rz = (frame->boundingBox.X2 + frame->boundingBox.Z2) / 2;
 
-		if (frame->boundingBox.Y2 - frame->boundingBox.Y1 > STEP_SIZE)
+		if (frame->boundingBox.Height() > STEP_SIZE)
 		{
 			int angle = (laraItem->Pose.Orientation.y - phd_atan(z - cosY * rx - sinY * rz, x - cosY * rx + sinY * rz) - ANGLE(135.0f)) / ANGLE(90.0f);
 

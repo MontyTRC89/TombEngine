@@ -1,3 +1,6 @@
 #pragma once
 
-void WorkerDualGunControl(short itemNumber);
+namespace TEN::Entities::TR2
+{
+	void WorkerDualGunControl(short itemNumber);
+}

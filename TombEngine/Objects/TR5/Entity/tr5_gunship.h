@@ -1,3 +1,6 @@
 #pragma once
 
-void ControlGunShip(short itemNumber);
+namespace TEN::Entities::TR5
+{
+	void ControlGunShip(short itemNumber);
+}
