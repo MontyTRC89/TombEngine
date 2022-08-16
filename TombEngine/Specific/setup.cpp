@@ -27,6 +27,7 @@
 #include "Objects/Utils/object_helper.h"
 #include "Specific/level.h"
 
+using namespace TEN::Entities;
 using namespace TEN::Entities::Switches;
 
 ObjectInfo Objects[ID_NUMBER_OBJECTS];
@@ -338,16 +339,6 @@ void TrapObjects()
 		obj->usingDrawAnimatingItem = false;
 	}
 
-	obj = &Objects[ID_WRECKING_BALL];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialiseWreckingBall;
-		obj->collision = WreckingBallCollision;
-		obj->control = WreckingBallControl;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-		obj->savePosition = true;
-	}
 }
 
 void InitialiseSpecialEffects()

@@ -1,3 +1,6 @@
 #pragma once
 
-void BarracudaControl(short itemNumber);
+namespace TEN::Entities::TR2
+{
+	void BarracudaControl(short itemNumber);
+}

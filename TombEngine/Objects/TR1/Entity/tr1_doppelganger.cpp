@@ -39,7 +39,7 @@ namespace TEN::Entities::TR1
 		if (!found)
 			itemNumber = NO_ITEM;
 
-		return (itemNumber == NO_ITEM ? NULL : &g_Level.Items[itemNumber]);
+		return (itemNumber == NO_ITEM ? nullptr : &g_Level.Items[itemNumber]);
 	}
 
 	static short GetWeaponDamage(LaraWeaponType weaponType)
@@ -59,7 +59,7 @@ namespace TEN::Entities::TR1
 
 		auto* reference = FindReference(item, ID_BACON_REFERENCE);
 
-		if (item->Data == NULL)
+		if (!item->Data)
 		{
 			Vector3Int pos;
 			if (reference == nullptr)

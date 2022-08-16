@@ -1,28 +1,28 @@
 #include "framework.h"
-#include "tr4_wraith.h"
-#include "Specific/level.h"
-#include "Game/effects/effects.h"
-#include "Game/room.h"
-#include "Game/control/flipeffect.h"
-#include "Objects/objectslist.h"
-#include "Specific/trmath.h"
-#include "Sound/sound.h"
+#include "Objects/TR4/Entity/tr4_wraith.h"
+
 #include "Game/collision/collide_room.h"
-#include "Game/Lara/lara.h"
-#include "Objects/Generic/Traps/traps.h"
-#include "Game/people.h"
-#include "Game/effects/tomb4fx.h"
-#include "Objects/TR4/Entity/tr4_wraith_info.h"
+#include "Game/control/flipeffect.h"
+#include "Game/effects/effects.h"
 #include "Game/effects/lara_fx.h"
+#include "Game/effects/tomb4fx.h"
 #include "Game/items.h"
+#include "Game/Lara/lara.h"
+#include "Game/people.h"
+#include "Game/room.h"
+#include "Objects/Generic/Traps/traps.h"
+#include "Objects/TR4/Entity/tr4_wraith_info.h"
+#include "Objects/objectslist.h"
+#include "Sound/sound.h"
+#include "Specific/level.h"
+#include "Specific/trmath.h"
 
 using namespace TEN::Effects::Lara;
 
 namespace TEN::Entities::TR4
 {
-	constexpr auto WRAITH_COUNT = 8;
-
-	auto WraithVelocity = 64;
+	constexpr auto WRAITH_COUNT	   = 8;
+	constexpr auto WRAITH_VELOCITY = 64;
 
 	void InitialiseWraith(short itemNumber)
 	{
@@ -31,7 +31,7 @@ namespace TEN::Entities::TR4
 		item->Data = WraithInfo();
 		auto* wraith = (WraithInfo*)item->Data;
 
-		item->Animation.Velocity.z = WraithVelocity;
+		item->Animation.Velocity.z = WRAITH_VELOCITY;
 		item->ItemFlags[0] = 0;
 		item->ItemFlags[6] = 0;
 
@@ -62,7 +62,7 @@ namespace TEN::Entities::TR4
 		int dy;
 		int distance;
 
-		if (target == LaraItem || target->ObjectNumber == ID_ANIMATING10)
+		if (target->IsLara() || target->ObjectNumber == ID_ANIMATING10)
 		{
 			x = target->Pose.Position.x - item->Pose.Position.x;
 			y = target->Pose.Position.y;
@@ -93,7 +93,7 @@ namespace TEN::Entities::TR4
 
 		angleV -= item->Pose.Orientation.x;
 
-		int velocity = (WraithVelocity / item->Animation.Velocity.z) * 8;
+		int velocity = (WRAITH_VELOCITY / item->Animation.Velocity.z) * 8;
 
 		if (abs(angleH) >= item->ItemFlags[2] || angleH > 0 != item->ItemFlags[2] > 0)
 		{
@@ -221,7 +221,7 @@ namespace TEN::Entities::TR4
 		{
 			if (Wibble & 16)
 			{
-				if (item->Animation.Velocity.z < WraithVelocity)
+				if (item->Animation.Velocity.z < WRAITH_VELOCITY)
 					item->Animation.Velocity.z++;
 				
 				if (item->ItemFlags[6])
@@ -454,7 +454,8 @@ namespace TEN::Entities::TR4
 			dB = 24;
 			dG = (GetRandomControl() & 0x1F) + 64;
 		}
-		else if (objectNumber == ID_WRAITH2) {
+		else if (objectNumber == ID_WRAITH2)
+		{
 			sB = (GetRandomControl() & 0x1F) + -128;
 			sR = 24;
 			sG = (GetRandomControl() & 0x1F) + -128;
@@ -462,7 +463,8 @@ namespace TEN::Entities::TR4
 			dR = 24;
 			dG = (GetRandomControl() & 0x1F) + 64;
 		}
-		else {
+		else
+		{
 			color = (GetRandomControl() & 0x1F) + 64;
 			dG = color;
 			dR = color;
