@@ -812,6 +812,7 @@ bool SaveGame::Save(int slot)
 			Save::StaticMeshInfoBuilder staticMesh{ fbb };
 
 			staticMesh.add_pose(&FromPHD(room->mesh[j].pos));
+			staticMesh.add_scale(room->mesh[j].scale);
 			staticMesh.add_color(&FromVector4(room->mesh[j].color));
 
 			staticMesh.add_flags(room->mesh[j].flags);
@@ -1233,6 +1234,7 @@ bool SaveGame::Load(int slot)
 		int number = staticMesh->number();
 
 		room->mesh[number].pos = ToPHD(staticMesh->pose());
+		room->mesh[number].scale = staticMesh->scale();
 		room->mesh[number].color = ToVector4(staticMesh->color());
 
 		room->mesh[number].flags = staticMesh->flags();

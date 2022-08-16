@@ -1,363 +1,398 @@
 #include "framework.h"
-#include "tr5_gladiator.h"
-#include "Game/items.h"
+#include "Objects/TR5/Entity/tr5_gladiator.h"
+
+#include "Game/animation.h"
 #include "Game/control/box.h"
 #include "Game/effects/debris.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/tomb4fx.h"
-#include "Specific/setup.h"
-#include "Specific/level.h"
+#include "Game/itemdata/creature_info.h"
+#include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
 #include "Sound/sound.h"
-#include "Game/itemdata/creature_info.h"
-#include "Game/animation.h"
+#include "Specific/level.h"
+#include "Specific/prng.h"
+#include "Specific/setup.h"
 
-BITE_INFO GladiatorBite = { 0, 0, 0, 16 };
+using namespace TEN::Math::Random;
+using std::vector;
 
-// TODO
-enum GladiatorState
+namespace TEN::Entities::TR5
 {
+	constexpr auto GLADIATOR_ATTACK_DAMAGE = 120;
 
-};
+	// TODO: Ranges.
 
-// TODO
-enum GladiatorAnim
-{
+	const vector<int> GladiatorAttackJoints = { 13, 14 };
+	const auto GladiatorBite = BiteInfo(Vector3::Zero, 16);
 
-};
-
-void InitialiseGladiator(short itemNumber)
-{
-    auto* item = &g_Level.Items[itemNumber];
-
-    ClearItem(itemNumber);
-
-    item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex;
-    item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-    item->Animation.TargetState = 1;
-    item->Animation.ActiveState = 1;
-
-    if (item->TriggerFlags == 1)
-        item->MeshSwapBits = ALL_JOINT_BITS;
-}
-
-void ControlGladiator(short itemNumber)
-{
-	if (!CreatureActive(itemNumber))
-		return;
-
-	auto* item = &g_Level.Items[itemNumber];
-	auto* creature = GetCreatureInfo(item);
-
-	short tilt = 0;
-	short angle = 0;
-	short joint0 = 0;
-	short joint1 = 0;
-	short joint2 = 0;
-
-	if (item->HitPoints <= 0)
+	enum GladiatorState
 	{
-		item->HitPoints = 0;
-		if (item->Animation.ActiveState != 6)
-		{
-			item->Animation.AnimNumber = Objects[ID_GLADIATOR].animIndex + 16;
-			item->Animation.ActiveState = 6;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-		}
+		GLADIATOR_STATE_NONE = 0,
+		GLADIATOR_STATE_IDLE = 1,
+		GLADIATOR_STATE_WALK_FORWARD = 2,
+		GLADIATOR_STATE_RUN_FORWARD = 3,
+		GLADIATOR_STATE_GUARD_START = 4,
+		GLADIATOR_STATE_GUARD_CONTINUE = 5,
+		GLADIATOR_STATE_DEATH = 6,
+		GLADIATOR_STATE_SWORD_ATTACK_1 = 8,
+		GLADIATOR_STATE_SWORD_ATTACK_2 = 9,
+		GLADIATOR_STATE_RUN_SWORD_ATTACK = 10,
+		GLADIATOR_STATE_WALK_SWORD_ATTACK = 11
+	};
+
+	enum GladiatorAnim
+	{
+		GLADIATOR_ANIM_IDLE = 0,
+		GLADIATOR_ANIM_IDLE_TO_WALK_FORWARD = 1,
+		GLADIATOR_ANIM_WAK_FORWARD = 2,
+		GLADIATOR_ANIM_WALK_FORWARD_TO_RUN_FORWARD = 3,
+		GLADIATOR_ANIM_RUN_FORWARD = 4,
+		GLADIATOR_ANIM_IDLE_TO_RUN_FORWARD = 5,
+		GLADIATOR_ANIM_WALK_FORWARD_TO_IDLE_LEFT = 6,
+		GLADIATOR_ANIM_WALK_FORWARD_TO_IDLE_RIGHT = 7,
+		GLADIATOR_ANIM_RUN_FORWARD_TO_WALK_FORWARD_LEFT = 8,
+		GLADIATOR_ANIM_RUN_FORWARD_TO_WALK_FORWARD_RIGHT = 9,
+		GLADIATOR_ANIM_RUN_FORWARD_TO_IDLE_LEFT = 10,
+		GLADIATOR_ANIM_RUN_FORWARD_TO_IDLE_RIGHT = 11,
+		GLADIATOR_ANIM_GUARD_START = 12,
+		GLADIATOR_ANIM_GUARD_START_QUICK = 12, // Unused.
+		GLADIATOR_ANIM_GUARD_CONTINUE = 14,
+		GLADIATOR_ANIM_GUAD_END = 15,
+		GLADIATOR_ANIM_DEATH = 16,
+		GLADIATOR_ANIM_SWORD_ATTACK_1 = 17,
+		GLADIATOR_ANIM_SWORD_ATTACK_2_START = 18,
+		GLADIATOR_ANIM_SWORD_ATTACK_2_END = 19,
+		GLADIATOR_ANIM_SWORD_ATTACK_2_END_EARLY = 20, // Unused.
+		GLADIATOR_ANIM_RUN_SWORD_ATTACK = 21,
+		GLADIATOR_ANIM_WALK_SWORD_ATTACK = 22
+	};
+
+	void InitialiseGladiator(short itemNumber)
+	{
+		auto* item = &g_Level.Items[itemNumber];
+
+		ClearItem(itemNumber);
+		SetAnimation(item, GLADIATOR_ANIM_IDLE);
+
+		if (item->TriggerFlags == 1)
+			item->MeshSwapBits = ALL_JOINT_BITS;
 	}
-	else
+
+	void ControlGladiator(short itemNumber)
 	{
-		if (item->AIBits)
-			GetAITarget(creature);
-		else if (creature->HurtByLara)
-			creature->Enemy = LaraItem;
+		if (!CreatureActive(itemNumber))
+			return;
 
-		AI_INFO AI;
-		CreatureAIInfo(item, &AI);
+		auto* item = &g_Level.Items[itemNumber];
+		auto* creature = GetCreatureInfo(item);
 
-		int unknown = true;
-		short rot;
-		int distance;
+		short tilt = 0;
+		short angle = 0;
+		short joint0 = 0;
+		short joint1 = 0;
+		short joint2 = 0;
 
-		if (creature->Enemy == LaraItem)
+		if (item->HitPoints <= 0)
 		{
-			distance = AI.distance;
-			rot = AI.angle;
+			item->HitPoints = 0;
+
+			if (item->Animation.ActiveState != GLADIATOR_STATE_DEATH)
+			{
+				item->Animation.AnimNumber = Objects[ID_GLADIATOR].animIndex + GLADIATOR_ANIM_DEATH;
+				item->Animation.ActiveState = GLADIATOR_STATE_DEATH;
+				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			}
 		}
 		else
 		{
-			int dx = LaraItem->Pose.Position.x - item->Pose.Position.x;
-			int dz = LaraItem->Pose.Position.z - item->Pose.Position.z;
-			
-			rot = phd_atan(dz, dx) - item->Pose.Orientation.y;
-			if (rot <= -ANGLE(90.0f) || rot >= ANGLE(90.0f))
-				unknown = false;
+			if (item->AIBits)
+				GetAITarget(creature);
+			else if (creature->HurtByLara)
+				creature->Enemy = LaraItem;
 
-			distance = pow(dx, 2) + pow(dz, 2);
-		}
+			AI_INFO AI;
+			CreatureAIInfo(item, &AI);
 
-		GetCreatureMood(item, &AI, VIOLENT);
-		CreatureMood(item, &AI, VIOLENT);
+			int unknown = true;
+			short rot;
+			int distance;
 
-		angle = CreatureTurn(item, creature->MaxTurn);
-			
-		if (AI.ahead)
-		{
-			joint0 = AI.angle / 2;
-			joint2 = AI.angle / 2;
-			joint1 = AI.xAngle;
-		}
-
-		switch (item->Animation.ActiveState)
-		{
-		case 1:
-			creature->Flags = 0;
-			joint2 = rot;
-			creature->MaxTurn = (-(int)(creature->Mood != MoodType::Bored)) & 0x16C;
-				
-			if (item->AIBits & GUARD ||
-				!(GetRandomControl() & 0x1F) &&
-				(AI.distance > pow(SECTOR(1), 2) ||
-					creature->Mood != MoodType::Attack))
+			if (creature->Enemy == LaraItem)
 			{
-				joint2 = AIGuard(creature);
-				break;
+				distance = AI.distance;
+				rot = AI.angle;
 			}
-
-			if (item->AIBits & PATROL1)
-				item->Animation.TargetState = 2;
 			else
 			{
-				if (creature->Mood == MoodType::Escape)
-				{
-					if (Lara.TargetEntity != item &&
-						AI.ahead &&
-						!item->HitStatus)
-					{
-						item->Animation.TargetState = 1;
-						break;
-					}
-				}
-				else
-				{
-					if (creature->Mood == MoodType::Bored ||
-						item->AIBits & FOLLOW &&
-						(creature->ReachedGoal ||
-							distance > pow(SECTOR(2), 2)))
-					{
-						if (item->Animation.RequiredState)
-							item->Animation.TargetState = item->Animation.RequiredState;
-						else if (!(GetRandomControl() & 0x3F))
-							item->Animation.TargetState = 2;
-						
-						break;
-					}
-						
-					if (Lara.TargetEntity == item &&
-						unknown &&
-						distance < pow(SECTOR(1.5f), 2) &&
-						GetRandomControl() & 1 &&
-						(Lara.Control.Weapon.GunType == LaraWeaponType::Shotgun ||
-							!(GetRandomControl() & 0xF)) &&
-						item->MeshBits == -1)
-					{
-						item->Animation.TargetState = 4;
-						break;
-					}
-						
-					if (AI.bite && AI.distance < pow(819, 2))
-					{
-						if (GetRandomControl() & 1)
-							item->Animation.TargetState = 8;
-						else
-							item->Animation.TargetState = 9;
+				int dx = LaraItem->Pose.Position.x - item->Pose.Position.x;
+				int dz = LaraItem->Pose.Position.z - item->Pose.Position.z;
 
-						break;
-					}
-				}
+				rot = phd_atan(dz, dx) - item->Pose.Orientation.y;
+				if (rot <= -ANGLE(90.0f) || rot >= ANGLE(90.0f))
+					unknown = false;
 
-				item->Animation.TargetState = 2;
+				distance = pow(dx, 2) + pow(dz, 2);
 			}
 
-			break;
+			GetCreatureMood(item, &AI, true);
+			CreatureMood(item, &AI, true);
 
-		case 2:
-			creature->MaxTurn = creature->Mood != MoodType::Bored ? ANGLE(7.0f) : ANGLE(2.0f);
-			joint2 = rot;
-			creature->Flags = 0;
-
-			if (item->AIBits & PATROL1)
-			{
-				item->Animation.TargetState = 2;
-				joint2 = 0;
-			}
-			else if (creature->Mood == MoodType::Escape)
-				item->Animation.TargetState = 3;
-			else if (creature->Mood != MoodType::Bored)
-			{
-				if (AI.distance < pow(SECTOR(1), 2))
-				{
-					item->Animation.TargetState = 1;
-					break;
-				}
-
-				if (AI.bite && AI.distance < pow(SECTOR(2), 2))
-					item->Animation.TargetState = 11;
-				else if (!AI.ahead || AI.distance > pow(SECTOR(1.5f), 2))
-					item->Animation.TargetState = 3;
-			}
-			else if (!(GetRandomControl() & 0x3F))
-			{
-				item->Animation.TargetState = 1;
-				break;
-			}
-				
-			break;
-
-		case 3:
-			creature->MaxTurn = ANGLE(11.0f);
-			creature->LOT.IsJumping = false;
-			tilt = angle / 2;
+			angle = CreatureTurn(item, creature->MaxTurn);
 
 			if (AI.ahead)
-				joint2 = AI.angle;
-
-			if (item->AIBits & GUARD)
 			{
-				creature->MaxTurn = 0;
-				item->Animation.TargetState = 1;
-				break;
+				joint0 = AI.angle / 2;
+				joint2 = AI.angle / 2;
+				joint1 = AI.xAngle;
 			}
 
-			if (creature->Mood == MoodType::Escape)
+			switch (item->Animation.ActiveState)
 			{
-				if (Lara.TargetEntity != item && AI.ahead)
+			case GLADIATOR_STATE_IDLE:
+				joint2 = rot;
+				creature->MaxTurn = (-(int)(creature->Mood != MoodType::Bored)) & 0x16C;
+				creature->Flags = 0;
+
+				if (item->AIBits & GUARD ||
+					!(GetRandomControl() & 0x1F) &&
+					(AI.distance > pow(SECTOR(1), 2) || creature->Mood != MoodType::Attack))
 				{
-					item->Animation.TargetState = 1;
+					joint2 = AIGuard(creature);
 					break;
 				}
 
-				break;
-			}
-
-			if (item->AIBits & FOLLOW &&
-				(creature->ReachedGoal ||
-					distance > pow(SECTOR(2), 2)))
-			{
-				item->Animation.TargetState = 1;
-				break;
-			}
-
-			if (creature->Mood == MoodType::Bored)
-			{
-				item->Animation.TargetState = 2;
-				break;
-			}
-
-			if (AI.distance < pow(SECTOR(1.5f), 2))
-			{
-				if (AI.bite)
-					item->Animation.TargetState = 10;
+				if (item->AIBits & PATROL1)
+					item->Animation.TargetState = GLADIATOR_STATE_WALK_FORWARD;
 				else
-					item->Animation.TargetState = 2;
-			}
-
-			break;
-
-		case 4:
-			if (item->HitStatus)
-			{
-				if (!unknown)
 				{
-					item->Animation.TargetState = 1;
-					break;
-				}
-			}
-			else if (Lara.TargetEntity != item ||
-				!(GetRandomControl() & 0x7F))
-			{
-				item->Animation.TargetState = 1;
-				break;
-			}
-
-			break;
-
-		case 5:
-			if (Lara.TargetEntity != item)
-				item->Animation.TargetState = 1;
-
-			break;
-
-		case 8:
-		case 9:
-		case 10:
-		case 11:
-			creature->MaxTurn = 0;
-
-			if (abs(AI.angle) >= ANGLE(7.0f))
-			{
-				if (AI.angle >= 0)
-					item->Pose.Orientation.y += ANGLE(7.0f);
-				else
-					item->Pose.Orientation.y -= ANGLE(7.0f);
-			}
-			else
-				item->Pose.Orientation.y += AI.angle;
-
-			if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 10)
-			{
-				auto* room = &g_Level.Rooms[item->RoomNumber];
-
-				auto pos = Vector3Int();
-				GetJointAbsPosition(item, &pos, 16);
-
-				auto* floor = GetSector(room, pos.x - room->x, pos.z - room->z);
-				if (floor->Stopper)
-				{
-					for (int i = 0; i < room->mesh.size(); i++)
+					if (creature->Mood == MoodType::Escape)
 					{
-						auto* mesh = &room->mesh[i];
-
-						if (!((pos.z ^ mesh->pos.Position.z) & 0xFFFFFC00))
+						if (Lara.TargetEntity != item &&
+							AI.ahead && !item->HitStatus)
 						{
-							if (!((pos.x ^ mesh->pos.Position.x) & 0xFFFFFC00))
-							{
-								if (StaticObjects[mesh->staticNumber].shatterType != SHT_NONE)
-								{
-									ShatterObject(0, mesh, -64, LaraItem->RoomNumber, 0);
-									//SoundEffect(ShatterSounds[gfCurrentLevel - 5][*(v28 + 18)], v28);
-									mesh->flags &= ~StaticMeshFlags::SM_VISIBLE;
+							item->Animation.TargetState = GLADIATOR_STATE_IDLE;
+							break;
+						}
+					}
+					else
+					{
+						if (creature->Mood == MoodType::Bored ||
+							item->AIBits & FOLLOW &&
+							(creature->ReachedGoal ||
+								distance > pow(SECTOR(2), 2)))
+						{
+							if (item->Animation.RequiredState)
+								item->Animation.TargetState = item->Animation.RequiredState;
+							else if (!(GetRandomControl() & 0x3F))
+								item->Animation.TargetState = GLADIATOR_STATE_IDLE;
 
-									TestTriggers(pos.x, pos.y, pos.z, item->RoomNumber, true);
+							break;
+						}
+
+						if (Lara.TargetEntity == item &&
+							unknown && distance < pow(SECTOR(1.5f), 2) &&
+							TestProbability(0.5f) &&
+							(Lara.Control.Weapon.GunType == LaraWeaponType::Shotgun || !(GetRandomControl() & 0xF)) &&
+							item->MeshBits == -1)
+						{
+							item->Animation.TargetState = GLADIATOR_STATE_GUARD_START;
+							break;
+						}
+
+						if (AI.bite && AI.distance < pow(819, 2))
+						{
+							if (TestProbability(0.5f))
+								item->Animation.TargetState = GLADIATOR_STATE_SWORD_ATTACK_1;
+							else
+								item->Animation.TargetState = GLADIATOR_STATE_SWORD_ATTACK_2;
+
+							break;
+						}
+					}
+
+					item->Animation.TargetState = GLADIATOR_STATE_WALK_FORWARD;
+				}
+
+				break;
+
+			case GLADIATOR_STATE_WALK_FORWARD:
+				joint2 = rot;
+				creature->MaxTurn = creature->Mood != MoodType::Bored ? ANGLE(7.0f) : ANGLE(2.0f);
+				creature->Flags = 0;
+
+				if (item->AIBits & PATROL1)
+				{
+					joint2 = 0;
+					item->Animation.TargetState = GLADIATOR_STATE_WALK_FORWARD;
+				}
+				else if (creature->Mood == MoodType::Escape)
+					item->Animation.TargetState = GLADIATOR_STATE_RUN_FORWARD;
+				else if (creature->Mood != MoodType::Bored)
+				{
+					if (AI.distance < pow(SECTOR(1), 2))
+					{
+						item->Animation.TargetState = GLADIATOR_STATE_IDLE;
+						break;
+					}
+
+					if (AI.bite && AI.distance < pow(SECTOR(2), 2))
+						item->Animation.TargetState = GLADIATOR_STATE_WALK_SWORD_ATTACK;
+					else if (!AI.ahead || AI.distance > pow(SECTOR(1.5f), 2))
+						item->Animation.TargetState = GLADIATOR_STATE_RUN_FORWARD;
+				}
+				else if (!(GetRandomControl() & 0x3F))
+				{
+					item->Animation.TargetState = GLADIATOR_STATE_IDLE;
+					break;
+				}
+
+				break;
+
+			case GLADIATOR_STATE_RUN_FORWARD:
+				creature->MaxTurn = ANGLE(11.0f);
+				creature->LOT.IsJumping = false;
+				tilt = angle / 2;
+
+				if (AI.ahead)
+					joint2 = AI.angle;
+
+				if (item->AIBits & GUARD)
+				{
+					item->Animation.TargetState = GLADIATOR_STATE_IDLE;
+					creature->MaxTurn = 0;
+					break;
+				}
+
+				if (creature->Mood == MoodType::Escape)
+				{
+					if (Lara.TargetEntity != item && AI.ahead)
+					{
+						item->Animation.TargetState = GLADIATOR_STATE_IDLE;
+						break;
+					}
+
+					break;
+				}
+
+				if (item->AIBits & FOLLOW &&
+					(creature->ReachedGoal || distance > pow(SECTOR(2), 2)))
+				{
+					item->Animation.TargetState = GLADIATOR_STATE_IDLE;
+					break;
+				}
+
+				if (creature->Mood == MoodType::Bored)
+				{
+					item->Animation.TargetState = GLADIATOR_STATE_WALK_FORWARD;
+					break;
+				}
+
+				if (AI.distance < pow(SECTOR(1.5f), 2))
+				{
+					if (AI.bite)
+						item->Animation.TargetState = GLADIATOR_STATE_RUN_SWORD_ATTACK;
+					else
+						item->Animation.TargetState = GLADIATOR_STATE_WALK_FORWARD;
+				}
+
+				break;
+
+			case GLADIATOR_STATE_GUARD_START:
+				if (item->HitStatus)
+				{
+					if (!unknown)
+					{
+						item->Animation.TargetState = GLADIATOR_STATE_IDLE;
+						break;
+					}
+				}
+				else if (Lara.TargetEntity != item ||
+					!(GetRandomControl() & 0x7F))
+				{
+					item->Animation.TargetState = GLADIATOR_STATE_IDLE;
+					break;
+				}
+
+				break;
+
+			case 5:
+				if (Lara.TargetEntity != item)
+					item->Animation.TargetState = GLADIATOR_STATE_IDLE;
+
+				break;
+
+			case GLADIATOR_STATE_SWORD_ATTACK_1:
+			case GLADIATOR_STATE_SWORD_ATTACK_2:
+			case GLADIATOR_STATE_RUN_SWORD_ATTACK:
+			case GLADIATOR_STATE_WALK_SWORD_ATTACK:
+				creature->MaxTurn = 0;
+
+				if (abs(AI.angle) >= ANGLE(7.0f))
+				{
+					if (AI.angle >= 0)
+						item->Pose.Orientation.y += ANGLE(7.0f);
+					else
+						item->Pose.Orientation.y -= ANGLE(7.0f);
+				}
+				else
+					item->Pose.Orientation.y += AI.angle;
+
+				if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 10)
+				{
+					auto* room = &g_Level.Rooms[item->RoomNumber];
+
+					auto pos = Vector3Int();
+					GetJointAbsPosition(item, &pos, 16);
+
+					auto* floor = GetSector(room, pos.x - room->x, pos.z - room->z);
+					if (floor->Stopper)
+					{
+						for (int i = 0; i < room->mesh.size(); i++)
+						{
+							auto* mesh = &room->mesh[i];
+
+							if (!((pos.z ^ mesh->pos.Position.z) & 0xFFFFFC00))
+							{
+								if (!((pos.x ^ mesh->pos.Position.x) & 0xFFFFFC00))
+								{
+									if (StaticObjects[mesh->staticNumber].shatterType != SHT_NONE)
+									{
+										ShatterObject(0, mesh, -64, LaraItem->RoomNumber, 0);
+										//SoundEffect(ShatterSounds[gfCurrentLevel - 5][*(v28 + 18)], v28);
+										mesh->flags &= ~StaticMeshFlags::SM_VISIBLE;
+
+										TestTriggers(pos.x, pos.y, pos.z, item->RoomNumber, true);
+									}
 								}
 							}
 						}
 					}
-				}
 
-				if (!creature->Flags)
-				{
-					if (item->TouchBits & 0x6000)
+					if (!creature->Flags)
 					{
-						DoDamage(creature->Enemy, 120);
-						CreatureEffect2(item, &GladiatorBite, 10, item->Pose.Orientation.y, DoBloodSplat);
-						SoundEffect(SFX_TR4_LARA_THUD, &item->Pose);
-						creature->Flags = 1;
+						if (item->TestBits(JointBitType::Touch, GladiatorAttackJoints))
+						{
+							DoDamage(creature->Enemy, GLADIATOR_ATTACK_DAMAGE);
+							CreatureEffect2(item, GladiatorBite, 10, item->Pose.Orientation.y, DoBloodSplat);
+							SoundEffect(SFX_TR4_LARA_THUD, &item->Pose);
+							creature->Flags = 1;
+						}
 					}
 				}
+
+				break;
+
+			default:
+				break;
 			}
-
-			break;
-
-		default:
-			break;
 		}
-	}
 
-	CreatureTilt(item, tilt);
-	CreatureJoint(item, 0, joint0);
-	CreatureJoint(item, 1, joint1);
-	CreatureJoint(item, 2, joint2);
-	CreatureAnimation(itemNumber, angle, 0);
+		CreatureTilt(item, tilt);
+		CreatureJoint(item, 0, joint0);
+		CreatureJoint(item, 1, joint1);
+		CreatureJoint(item, 2, joint2);
+		CreatureAnimation(itemNumber, angle, 0);
+	}
 }

@@ -17,6 +17,42 @@ using namespace TEN::Floordata;
 using namespace TEN::Input;
 using namespace TEN::Math::Random;
 
+bool ItemInfo::TestBits(JointBitType type, std::vector<int> jointIndices)
+{
+	for (int jointIndex : jointIndices)
+	{
+		unsigned int jointBit = unsigned int(1) << jointIndex;
+
+		switch (type)
+		{
+		case JointBitType::Touch:
+			if ((TouchBits & jointBit) == jointBit)
+				return true;
+
+			break;
+
+		case JointBitType::Mesh:
+			if ((MeshBits & jointBit) == jointBit)
+				return true;
+
+			break;
+
+		case JointBitType::MeshSwap:
+			if ((MeshSwapBits & jointBit) == jointBit)
+				return true;
+
+			break;
+		}
+	}
+
+	return false;
+}
+
+bool ItemInfo::TestBits(JointBitType type, int jointIndex)
+{
+	return TestBits(type, std::vector{ jointIndex });
+}
+
 void ItemInfo::SetBits(JointBitType type, std::vector<int> jointIndices)
 {
 	for (int jointIndex : jointIndices)
@@ -73,40 +109,35 @@ void ItemInfo::ClearBits(JointBitType type, int jointIndex)
 	return ClearBits(type, std::vector{ jointIndex });
 }
 
-bool ItemInfo::TestBits(JointBitType type, std::vector<int> jointIndices)
+bool ItemInfo::TestOcb(short ocbFlags)
 {
-	for (int jointIndex : jointIndices)
-	{
-		unsigned int jointBit = unsigned int(1 << jointIndex);
-
-		switch (type)
-		{
-		case JointBitType::Touch:
-			if ((TouchBits & jointBit) == jointBit)
-				return true;
-
-			break;
-
-		case JointBitType::Mesh:
-			if ((MeshBits & jointBit) == jointBit)
-				return true;
-
-			break;
-
-		case JointBitType::MeshSwap:
-			if ((MeshSwapBits & jointBit) == jointBit)
-				return true;
-
-			break;
-		}
-	}
-
-	return false;
+	return ((TriggerFlags & ocbFlags) == ocbFlags);
 }
 
-bool ItemInfo::TestBits(JointBitType type, int jointIndex)
+void ItemInfo::RemoveOcb(short ocbFlags)
 {
-	return TestBits(type, std::vector{ jointIndex });
+	TriggerFlags &= ~ocbFlags;
+}
+
+void ItemInfo::ClearAllOcb()
+{
+	TriggerFlags = NULL;
+}
+
+bool ItemInfo::TestFlags(short id, short value)
+{
+	if (id < 0 || id > 7)
+		return false;
+
+	return (ItemFlags[id] == value);
+}
+
+void ItemInfo::SetFlags(short id, short value)
+{
+	if (id < 0 || id > 7)
+		return;
+
+	ItemFlags[id] = value;
 }
 
 bool ItemInfo::IsLara()
@@ -122,8 +153,6 @@ bool ItemInfo::IsCreature()
 void ClearItem(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
-	auto* room = &g_Level.Rooms[item->RoomNumber];
-
 	item->Collidable = true;
 	item->Data = nullptr;
 	item->StartPose = item->Pose;
@@ -330,11 +359,11 @@ void KillEffect(short fxNumber)
 			NextFxActive = fx->nextActive;
 		else
 		{
-			for (short linknum = NextFxActive; linknum != NO_ITEM; linknum = EffectList[linknum].nextActive)
+			for (short linkNumber = NextFxActive; linkNumber != NO_ITEM; linkNumber = EffectList[linkNumber].nextActive)
 			{
-				if (EffectList[linknum].nextActive == fxNumber)
+				if (EffectList[linkNumber].nextActive == fxNumber)
 				{
-					EffectList[linknum].nextActive = fx->nextActive;
+					EffectList[linkNumber].nextActive = fx->nextActive;
 					break;
 				}
 			}
@@ -344,11 +373,11 @@ void KillEffect(short fxNumber)
 			g_Level.Rooms[fx->roomNumber].fxNumber = fx->nextFx;
 		else
 		{
-			for (short linknum = g_Level.Rooms[fx->roomNumber].fxNumber; linknum != NO_ITEM; linknum = EffectList[linknum].nextFx)
+			for (short linkNumber = g_Level.Rooms[fx->roomNumber].fxNumber; linkNumber != NO_ITEM; linkNumber = EffectList[linkNumber].nextFx)
 			{
-				if (EffectList[linknum].nextFx == fxNumber)
+				if (EffectList[linkNumber].nextFx == fxNumber)
 				{
-					EffectList[linknum].nextFx = fx->nextFx;
+					EffectList[linkNumber].nextFx = fx->nextFx;
 					break;
 				}
 			}
@@ -359,7 +388,7 @@ void KillEffect(short fxNumber)
 	}
 }
 
-short CreateNewEffect(short roomNum) 
+short CreateNewEffect(short roomNumber) 
 {
 	short fxNumber = NextFxFree;
 
@@ -368,8 +397,9 @@ short CreateNewEffect(short roomNum)
 		auto* fx = &EffectList[NextFxFree];
 		NextFxFree = fx->nextFx;
 
-		auto* room = &g_Level.Rooms[roomNum];
-		fx->roomNumber = roomNum;
+		auto* room = &g_Level.Rooms[roomNumber];
+
+		fx->roomNumber = roomNumber;
 		fx->nextFx = room->fxNumber;
 		room->fxNumber = fxNumber;
 		fx->nextActive = NextFxActive;
@@ -453,9 +483,6 @@ void InitialiseItem(short itemNumber)
 	item->Animation.RequiredState = 0;
 	item->Animation.TargetState = g_Level.Anims[item->Animation.AnimNumber].ActiveState;
 	item->Animation.ActiveState = g_Level.Anims[item->Animation.AnimNumber].ActiveState;
-
-	item->Pose.Orientation.z = 0;
-	item->Pose.Orientation.x = 0;
 
 	item->Animation.Velocity.y = 0;
 	item->Animation.Velocity.z = 0;

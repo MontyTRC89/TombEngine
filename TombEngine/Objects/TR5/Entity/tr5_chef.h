@@ -1,4 +1,7 @@
 #pragma once
 
-void InitialiseChef(short itemNumber);
-void ControlChef(short itemNumber);
+namespace TEN::Entities::TR5
+{
+	void InitialiseChef(short itemNumber);
+	void ControlChef(short itemNumber);
+}

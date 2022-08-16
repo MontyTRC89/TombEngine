@@ -41,7 +41,7 @@ extern RIPPLE_STRUCT Ripples[MAX_RIPPLES];
 
 // TODO: EnemyBites must be eradicated and kept directly in object structs or passed to gunflash functions!
 
-BITE_INFO EnemyBites[12] =
+BiteInfo EnemyBites[12] =
 {
 	{ 20, -95, 240, 13 },
 	{ 48, 0, 180, -11 },
@@ -739,7 +739,7 @@ namespace TEN::Renderer
 				
 				SetAlphaTest(ALPHA_TEST_GREATER_THAN, ALPHA_TEST_THRESHOLD);
 
-				BITE_INFO* bites[2] = {
+				BiteInfo* bites[2] = {
 					&EnemyBites[obj->biteOffset],
 					&EnemyBites[obj->biteOffset + 1]
 				};
@@ -762,7 +762,7 @@ namespace TEN::Renderer
 
 						BindTexture(TEXTURE_COLOR_MAP, &std::get<0>(m_moveablesTextures[flashBucket.Texture]), SAMPLER_ANISOTROPIC_CLAMP);
 
-						Matrix offset = Matrix::CreateTranslation(bites[k]->x, bites[k]->y, bites[k]->z);
+						Matrix offset = Matrix::CreateTranslation(bites[k]->Position);
 						Matrix rotationX = Matrix::CreateRotationX(TO_RAD(ANGLE(270.0f)));
 						Matrix rotationZ = Matrix::CreateRotationZ(TO_RAD(2 * GetRandomControl()));
 

@@ -184,6 +184,7 @@ CALL gen.bat</Command>
     <ClInclude Include="Objects\Effects\flame_emitters.h" />
     <ClInclude Include="Game\effects\lara_fx.h" />
     <ClInclude Include="Objects\Generic\Traps\dart_emitter.h" />
+    <ClInclude Include="Objects\TR1\Entity\tr1_winged_mutant.h" />
     <ClInclude Include="Objects\TR2\Vehicles\speedboat_info.h" />
     <ClInclude Include="Game\itemdata\creature_info.h" />
     <ClInclude Include="Game\itemdata\itemdata.h" />
@@ -199,6 +200,7 @@ CALL gen.bat</Command>
     <ClInclude Include="Game\Lara\lara_slide.h" />
     <ClInclude Include="Game\Lara\lara_struct.h" />
     <ClInclude Include="Game\Lara\lara_tests.h" />
+    <ClInclude Include="Objects\TR5\Trap\tr5_wreckingball.h" />
     <ClInclude Include="Objects\Utils\VehicleHelpers.h" />
     <ClInclude Include="Renderer\ConstantBuffers\AlphaTestBuffer.h" />
     <ClInclude Include="Renderer\ConstantBuffers\PostProcessBuffer.h" />
@@ -368,10 +370,10 @@ CALL gen.bat</Command>
     <ClInclude Include="Objects\TR1\Entity\tr1_giant_mutant.h" />
     <ClInclude Include="Objects\TR1\Entity\tr1_wolf.h" />
     <ClInclude Include="Objects\TR2\Entity\tr2_barracuda.h" />
-    <ClInclude Include="Objects\TR2\Entity\tr2_birdmonster.h" />
+    <ClInclude Include="Objects\TR2\Entity\tr2_bird_monster.h" />
     <ClInclude Include="Objects\TR2\Entity\tr2_dragon.h" />
     <ClInclude Include="Objects\TR2\Entity\tr2_eagle_or_crow.h" />
-    <ClInclude Include="Objects\TR2\Entity\tr2_knifethrower.h" />
+    <ClInclude Include="Objects\TR2\Entity\tr2_knife_thrower.h" />
     <ClInclude Include="Objects\TR2\Entity\tr2_mercenary.h" />
     <ClInclude Include="Objects\TR2\Entity\tr2_monk.h" />
     <ClInclude Include="Objects\TR2\Entity\tr2_rat.h" />
@@ -397,7 +399,7 @@ CALL gen.bat</Command>
     <ClInclude Include="Objects\TR3\Entity\tr3_mp_gun.h" />
     <ClInclude Include="Objects\TR3\Entity\tr3_mp_stick.h" />
     <ClInclude Include="Objects\TR3\Entity\tr3_raptor.h" />
-    <ClInclude Include="Objects\TR3\Entity\tr3_scuba.h" />
+    <ClInclude Include="Objects\TR3\Entity\tr3_scuba_diver.h" />
     <ClInclude Include="Objects\TR3\Entity\tr3_shiva.h" />
     <ClInclude Include="Objects\TR3\Entity\tr3_sophia.h" />
     <ClInclude Include="Objects\TR3\Entity\tr3_tiger.h" />
@@ -569,7 +571,6 @@ CALL gen.bat</Command>
     <ClInclude Include="Objects\Generic\Switches\switch.h" />
     <ClInclude Include="CustomObjects\tiger.h" />
     <ClInclude Include="Game\effects\tomb4fx.h" />
-    <ClInclude Include="Objects\Generic\Traps\traps.h" />
     <ClInclude Include="Objects\objectslist.h" />
     <ClInclude Include="Game\memory\malloc.h" />
     <ClInclude Include="Specific\Input\Input.h" />
@@ -640,6 +641,8 @@ CALL gen.bat</Command>
     <ClCompile Include="Objects\Effects\flame_emitters.cpp" />
     <ClCompile Include="Game\effects\lara_fx.cpp" />
     <ClCompile Include="Objects\Generic\Traps\dart_emitter.cpp" />
+    <ClCompile Include="Objects\TR1\Entity\tr1_winged_mutant.cpp" />
+    <ClCompile Include="Objects\TR5\Trap\tr5_wreckingball.cpp" />
     <ClCompile Include="Objects\Utils\VehicleHelpers.cpp" />
     <ClCompile Include="Renderer\Renderer11DrawMenu.cpp" />
     <ClCompile Include="Renderer\Texture2DArray\Texture2DArray.cpp" />
@@ -816,7 +819,7 @@ CALL gen.bat</Command>
     <ClCompile Include="Objects\TR3\Vehicles\big_gun.cpp" />
     <ClCompile Include="Objects\TR4\Vehicles\jeep.cpp" />
     <ClCompile Include="Objects\TR3\Vehicles\kayak.cpp" />
-    <ClCompile Include="Objects\TR2\Entity\tr2_knifethrower.cpp" />
+    <ClCompile Include="Objects\TR2\Entity\tr2_knife_thrower.cpp" />
     <ClCompile Include="Objects\TR2\Entity\tr2_mercenary.cpp" />
     <ClCompile Include="Objects\TR3\Vehicles\minecart.cpp" />
     <ClCompile Include="Objects\TR2\Entity\tr2_monk.cpp" />
@@ -828,7 +831,7 @@ CALL gen.bat</Command>
     <ClCompile Include="Objects\TR1\Entity\tr1_bear.cpp" />
     <ClCompile Include="Objects\TR1\Entity\tr1_wolf.cpp" />
     <ClCompile Include="Objects\TR2\Entity\tr2_barracuda.cpp" />
-    <ClCompile Include="Objects\TR2\Entity\tr2_birdmonster.cpp" />
+    <ClCompile Include="Objects\TR2\Entity\tr2_bird_monster.cpp" />
     <ClCompile Include="Objects\TR2\Entity\tr2_rat.cpp" />
     <ClCompile Include="Objects\TR2\Entity\tr2_shark.cpp" />
     <ClCompile Include="Objects\TR2\Entity\tr2_silencer.cpp" />
@@ -910,13 +913,12 @@ CALL gen.bat</Command>
     <ClCompile Include="Game\spotcam.cpp" />
     <ClCompile Include="Objects\Generic\Switches\switch.cpp" />
     <ClCompile Include="Game\effects\tomb4fx.cpp" />
-    <ClCompile Include="Objects\Generic\Traps\traps.cpp" />
     <ClCompile Include="Objects\TR4\Entity\tr4_baddy.cpp" />
     <ClCompile Include="Objects\TR4\Vehicles\motorbike.cpp" />
     <ClCompile Include="Objects\TR4\Entity\tr4_mummy.cpp" />
     <ClCompile Include="Objects\TR3\Vehicles\quad_bike.cpp" />
     <ClCompile Include="Objects\TR4\Entity\tr4_sas.cpp" />
-    <ClCompile Include="Objects\TR3\Entity\tr3_scuba.cpp" />
+    <ClCompile Include="Objects\TR3\Entity\tr3_scuba_diver.cpp" />
     <ClCompile Include="Objects\TR4\Entity\tr4_skeleton.cpp" />
     <ClCompile Include="Objects\TR3\Entity\tr3_tribesman.cpp" />
     <ClCompile Include="Specific\configuration.cpp" />

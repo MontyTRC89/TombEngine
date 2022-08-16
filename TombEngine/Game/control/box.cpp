@@ -8,14 +8,15 @@
 #include "Game/control/control.h"
 #include "Game/control/lot.h"
 #include "Game/effects/tomb4fx.h"
+#include "Game/itemdata/creature_info.h"
 #include "Game/Lara/lara.h"
+#include "Game/Lara/lara_helpers.h"
 #include "Game/items.h"
 #include "Game/misc.h"
 #include "Game/room.h"
 #include "Specific/setup.h"
 #include "Specific/trmath.h"
 #include "Objects/objectslist.h"
-#include "Game/itemdata/creature_info.h"
 #include "Objects/TR5/Object/tr5_pushableblock.h"
 #include "Renderer/Renderer11.h"
 
@@ -296,19 +297,17 @@ void CreatureKill(ItemInfo* item, int killAnim, int killState, int laraKillState
 	*/
 }
 
-short CreatureEffect2(ItemInfo* item, BITE_INFO* bite, short damage, short angle, std::function<CreatureEffectFunction> func)
+short CreatureEffect2(ItemInfo* item, BiteInfo bite, short velocity, short angle, std::function<CreatureEffectFunction> func)
 {
-	auto pos = Vector3Int(bite->x, bite->y, bite->z);
-	GetJointAbsPosition(item, &pos, bite->meshNum);
-
-	return func(pos.x, pos.y, pos.z, damage, angle, item->RoomNumber);
+	auto pos = Vector3Int(bite.Position);
+	GetJointAbsPosition(item, &pos, bite.meshNum);
+	return func(pos.x, pos.y, pos.z, velocity, angle, item->RoomNumber);
 }
 
-short CreatureEffect(ItemInfo* item, BITE_INFO* bite, std::function<CreatureEffectFunction> func)
+short CreatureEffect(ItemInfo* item, BiteInfo bite, std::function<CreatureEffectFunction> func)
 {
-	auto pos = Vector3Int(bite->x, bite->y, bite->z);
-	GetJointAbsPosition(item, &pos, bite->meshNum);
-
+	auto pos = Vector3Int(bite.Position);
+	GetJointAbsPosition(item, &pos, bite.meshNum);
 	return func(pos.x, pos.y, pos.z, item->Animation.Velocity.z, item->Pose.Orientation.y, item->RoomNumber);
 }
 
@@ -1390,7 +1389,7 @@ void FindAITargetObject(CreatureInfo* creature, short objectNumber)
 				item->BoxNumber = GetSector(room, item->Pose.Position.x - room->x, item->Pose.Position.z - room->z)->Box;
 
 				room = &g_Level.Rooms[aiObject->roomNumber];
-				aiObject->boxNumber = GetSector(room, aiObject->x - room->x, aiObject->z - room->z)->Box;
+				aiObject->boxNumber = GetSector(room, aiObject->pos.Position.x - room->x, aiObject->pos.Position.z - room->z)->Box;
 
 				if (item->BoxNumber == NO_BOX || aiObject->boxNumber == NO_BOX)
 					return;
@@ -1411,10 +1410,10 @@ void FindAITargetObject(CreatureInfo* creature, short objectNumber)
 
 			aiItem->ObjectNumber = foundObject->objectNumber;
 			aiItem->RoomNumber = foundObject->roomNumber;
-			aiItem->Pose.Position.x = foundObject->x;
-			aiItem->Pose.Position.y = foundObject->y;
-			aiItem->Pose.Position.z = foundObject->z;
-			aiItem->Pose.Orientation.y = foundObject->yRot;
+			aiItem->Pose.Position.x = foundObject->pos.Position.x;
+			aiItem->Pose.Position.y = foundObject->pos.Position.y;
+			aiItem->Pose.Position.z = foundObject->pos.Position.z;
+			aiItem->Pose.Orientation.y = foundObject->pos.Orientation.y;
 			aiItem->Flags = foundObject->flags;
 			aiItem->TriggerFlags = foundObject->triggerFlags;
 			aiItem->BoxNumber = foundObject->boxNumber;
@@ -1436,8 +1435,9 @@ void CreatureAIInfo(ItemInfo* item, AI_INFO* AI)
 	auto* creature = GetCreatureInfo(item);
 	auto* object = &Objects[item->ObjectNumber];
 
+	// TODO: Deal with LaraItem global.
 	auto* enemy = creature->Enemy;
-	if (!enemy)
+	if (enemy == nullptr)
 	{
 		enemy = LaraItem;
 		creature->Enemy = LaraItem;
@@ -1475,7 +1475,7 @@ void CreatureAIInfo(ItemInfo* item, AI_INFO* AI)
 		auto probe = GetCollision(floor, enemy->Pose.Position.x, enemy->Pose.Position.y, enemy->Pose.Position.z);
 		auto bounds = GetBoundsAccurate(item);
 
-		reachable = abs(enemy->Pose.Position.y - probe.Position.Floor) < abs(bounds->Y2 - bounds->Y1);
+		reachable = abs(enemy->Pose.Position.y - probe.Position.Floor) < bounds->Height();
 	}
 
 	if (floor && reachable)
@@ -1532,8 +1532,11 @@ void CreatureAIInfo(ItemInfo* item, AI_INFO* AI)
 	vector.z = abs(vector.z);
 
 	// Makes Lara smaller.
-	if (enemy == LaraItem && ((LaraInfo*)enemy)->Control.IsLow)
-		vector.y -= STEPUP_HEIGHT;
+	if (enemy->IsLara())
+	{
+		if (GetLaraInfo(enemy)->Control.IsLow)
+			vector.y -= STEPUP_HEIGHT;
+	}
 
 	if (vector.x > vector.z)
 		AI->xAngle = phd_atan(vector.x + (vector.z >> 1), vector.y);
@@ -1544,7 +1547,7 @@ void CreatureAIInfo(ItemInfo* item, AI_INFO* AI)
 	AI->bite = (AI->ahead && enemy->HitPoints > 0 && abs(enemy->Pose.Position.y - item->Pose.Position.y) <= CLICK(2));
 }
 
-void CreatureMood(ItemInfo* item, AI_INFO* AI, int violent)
+void CreatureMood(ItemInfo* item, AI_INFO* AI, bool isViolent)
 {
 	if (!item->Data)
 		return;
@@ -1592,7 +1595,7 @@ void CreatureMood(ItemInfo* item, AI_INFO* AI, int violent)
 			{
 				if (EscapeBox(item, enemy, boxNumber))
 					TargetBox(LOT, boxNumber);
-				else if (AI->zoneNumber == AI->enemyZone && StalkBox(item, enemy, boxNumber) && !violent)
+				else if (AI->zoneNumber == AI->enemyZone && StalkBox(item, enemy, boxNumber) && !isViolent)
 				{
 					TargetBox(LOT, boxNumber);
 					creature->Mood = MoodType::Stalk;
@@ -1694,7 +1697,7 @@ void CreatureMood(ItemInfo* item, AI_INFO* AI, int violent)
 	}
 }
 
-void GetCreatureMood(ItemInfo* item, AI_INFO* AI, int isViolent)
+void GetCreatureMood(ItemInfo* item, AI_INFO* AI, bool isViolent)
 {
 	if (!item->Data)
 		return;
@@ -2082,15 +2085,13 @@ void InitialiseItemBoxData()
 			if (!(g_Level.Boxes[floor->Box].flags & BLOCKED))
 			{
 				int floorHeight = floor->FloorHeight(mesh.pos.Position.x, mesh.pos.Position.z);
-				auto* staticInfo = &StaticObjects[mesh.staticNumber];
+				auto bbox = GetBoundsAccurate(&mesh, false);
 
-				if (floorHeight <= mesh.pos.Position.y - staticInfo->collisionBox.Y2 + CLICK(2) &&
-					floorHeight < mesh.pos.Position.y - staticInfo->collisionBox.Y1)
+				if (floorHeight <= mesh.pos.Position.y - bbox->Y2 + CLICK(2) &&
+					floorHeight < mesh.pos.Position.y - bbox->Y1)
 				{
-					if (staticInfo->collisionBox.X1 == 0 || staticInfo->collisionBox.X2 == 0 ||
-						staticInfo->collisionBox.Z1 == 0 || staticInfo->collisionBox.Z2 == 0 ||
-						((staticInfo->collisionBox.X1 < 0) ^ (staticInfo->collisionBox.X2 < 0)) &&
-						((staticInfo->collisionBox.Z1 < 0) ^ (staticInfo->collisionBox.Z2 < 0)))
+					if (bbox->X1 == 0 || bbox->X2 == 0 || bbox->Z1 == 0 || bbox->Z2 == 0 ||
+					   ((bbox->X1 < 0) ^ (bbox->X2 < 0)) && ((bbox->Z1 < 0) ^ (bbox->Z2 < 0)))
 					{
 						floor->Stopper = true;
 					}
