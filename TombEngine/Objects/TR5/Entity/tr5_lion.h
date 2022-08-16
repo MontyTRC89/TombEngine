@@ -1,4 +1,7 @@
 #pragma once
 
-void InitialiseLion(short itemNumber);
-void LionControl(short itemNumber);
+namespace TEN::Entities::TR5
+{
+	void InitialiseLion(short itemNumber);
+	void LionControl(short itemNumber);
+}

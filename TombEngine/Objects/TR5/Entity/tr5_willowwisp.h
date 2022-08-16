@@ -1,3 +1,6 @@
 #pragma once
 
-void InitialiseLightingGuide(short itemNumber);
+namespace TEN::Entities::TR5
+{
+	void InitialiseLightingGuide(short itemNumber);
+}

@@ -1,6 +1,7 @@
 #include "framework.h"
 #include "tr4_element_puzzle.h"
 #include "Specific/level.h"
+#include "Specific/setup.h"
 #include "Game/control/control.h"
 #include "Sound/sound.h"
 #include "Game/animation.h"
@@ -10,152 +11,172 @@
 #include "Game/effects/tomb4fx.h"
 #include "Objects/Generic/Switches/switch.h"
 #include "Specific/input.h"
+#include <Game/effects/debris.h>
 
-void HammerControl(short itemNumber)
+constexpr auto RIGHT_HAMMER_BITS = ((1 << 5) | (1 << 6) | (1 << 7));
+constexpr auto LEFT_HAMMER_BITS = ((1 << 8) | (1 << 9) | (1 << 10));
+constexpr auto HAMMER_HIT_DAMAGE = 150;
+constexpr auto HAMMER_OCB4_INTERVAL = 60;
+constexpr auto HAMMER_HIT_FRAME = 8;        //frame the hammer explodes pushables
+constexpr auto HAMMER_CLOSED_FRAME = 52;    //frame the hammer is fully closed
+
+namespace TEN::Entities::TR4
 {
-    /*ItemInfo* item = &g_Level.Items[itemNumber];
 
-    item->itemFlags[3] = 150;
-
-    if (!TriggerActive(item))
+    enum HammerState
     {
-        *((int*)&item->itemFlags[0]) = 0;
-    }
+        HAMMER_STATE_NONE = 0,
+        HAMMER_STATE_IDLE = 1,
+        HAMMER_STATE_ACTIVE = 2,
+    };
 
-    int frameNumber = item->frameNumber - g_Level.Anims[item->animNumber].frameBase;
-   
-    if (!item->triggerFlags)
+    enum HammerAnim
     {
-        *((int*)&item->itemFlags[0]) = (frameNumber >= 52 ? 0 : 0xE0);
-        AnimateItem((int)item);
-    }
-    else if (item->ActiveState != 1 || item->TargetState != 1)
-    {
-        item->TargetState = 1;
-        *((int*)&item->itemFlags[0]) = (frameNumber >= 52 ? 0 : 0x7E0);
+        HAMMER_ANIM_NOT_ACTIVATED = 0,
+        HAMMER_ANIM_ACTIVATED = 1
+    };
 
-        if (frameNumber == 8)
+    //ItemFlags[0] | ItemFlags[1] = hurtful bits.
+    //ItemFlags[2] = Timer. (X amount of frames before triggering again)
+    //ItemFlags[3] = Famage dealt to Lara at touch, per frame.
+
+    void HammerControl(short itemNumber)
+    {
+        auto* item = &g_Level.Items[itemNumber];
+        int frameNumber = item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase;
+        item->ItemFlags[3] = HAMMER_HIT_DAMAGE;
+
+        if (!TriggerActive(item))
         {
-            if (item->triggerFlags == 2)
+            *(long*)&item->ItemFlags[0] = 0;
+            return;
+        }
+
+        int hammerTouched = 0;
+
+        if (!item->TriggerFlags)
+        {
+            if (frameNumber < HAMMER_CLOSED_FRAME)
+                *(long*)&item->ItemFlags[0] = RIGHT_HAMMER_BITS;
+            else
+                *(long*)&item->ItemFlags[0] = 0;
+        }
+        else if (item->Animation.ActiveState == HAMMER_STATE_IDLE && item->Animation.TargetState == HAMMER_STATE_IDLE)
+        {
+            if (item->ItemFlags[2])
             {
-                ROOM_INFO* room = &g_Level.Rooms[item->roomNumber];
-
-                for (short linknum = room->itemNumber; linknum != NO_ITEM; linknum = g_Level.Items[linknum].nextItem)
+                if (item->TriggerFlags == 3)
                 {
-                    ItemInfo* currentItem = &g_Level.Items[linknum];
-
-                    if (currentItem->objectNumber==ID_OBELISK 
-                        && )
+                    item->Flags &= ~CODE_BITS;
+                    item->ItemFlags[2] = 0;
                 }
-
-                linkNum = *(signed __int16*)(Rooms + 148 * (signed __int16)item->roomNumber + 72);
-                if (linkNum != -1)
-                {
-                    while (1)
-                    {
-                        v16 = 2811 * linkNum;
-                        v17 = *(_WORD*)(Items + 2 * v16 + 12) == 165;
-                        currentItem = (ItemInfo_OK*)(Items + 2 * v16);
-                        if (v17
-                            && currentItem->pos.Orientation.y == -16384
-                            && *(_WORD*)(Items + 5622 * (signed __int16)currentItem->itemFlags[0] + 78) == 0x4000
-                            && !*(_WORD*)(Items + 5622 * (signed __int16)currentItem->itemFlags[1] + 78))
-                        {
-                            break;
-                        }
-                        linkNum = (signed __int16)currentItem->nextItem;
-                        if (linkNum == -1)
-                        {
-                            goto LABEL_40;
-                        }
-                    }
-                    v19 = (signed __int16)currentItem->itemFlags[0];
-                    HIBYTE(currentItem->flags) |= 0x3Eu;
-                    *(_BYTE*)(Items + 5622 * v19 + 41) |= 0x3Eu;
-                    *(_BYTE*)(Items + 5622 * (signed __int16)currentItem->itemFlags[1] + 41) |= 0x3Eu;
-                }
-            LABEL_40:
-                SoundEffect(255, (#64 *) & item->pos);
-                SoundEffect(106, (#64 *) & item->pos);
-                return AnimateItem((int)item);
+                else if (item->TriggerFlags == 4)
+                    item->ItemFlags[2]--;
+                else
+                    item->ItemFlags[2] = 0;
             }
-            v8 = *(signed __int16*)(Rooms + 148 * (signed __int16)item->roomNumber + 72);
-            v20 = Rooms + 148 * (signed __int16)item->roomNumber;
-            if (v8 != -1)
+            else
             {
-                v9 = Items;
-                do
+                item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + HAMMER_ANIM_ACTIVATED;
+                item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+                item->Animation.ActiveState = HAMMER_STATE_ACTIVE;
+                item->Animation.TargetState = HAMMER_STATE_ACTIVE;
+                item->ItemFlags[2] = HAMMER_OCB4_INTERVAL;
+            }
+        }
+        else
+        {
+            item->Animation.TargetState = HAMMER_STATE_IDLE;
+
+            if (frameNumber < HAMMER_CLOSED_FRAME)
+                *(long*)&item->ItemFlags[0] = RIGHT_HAMMER_BITS | LEFT_HAMMER_BITS;
+            else
+                *(long*)&item->ItemFlags[0] = 0;
+
+            if (frameNumber == HAMMER_HIT_FRAME)
+            {
+                if (item->TriggerFlags == 2)
                 {
-                    v10 = *(_WORD*)(5622 * v8 + v9 + 12);
-                    v11 = 5622 * v8 + v9;
-                    if (v10 >= 156
-                        && v10 <= 159
-                        && *(_DWORD*)(v11 + 64) == item->pos.Position.x
-                        && *(_DWORD*)(v11 + 72) == item->pos.Position.z)
+                    short targetItem = g_Level.Rooms[item->RoomNumber].itemNumber;
+
+                    if (targetItem != NO_ITEM)
                     {
-                        ExplodeItemNode(5622 * v8 + v9, 0, 0, 128);
-                        KillItem(v8);
-                        v9 = Items;
-                        v5 = 1;
-                    }
-                    v8 = *(signed __int16*)(5622 * v8 + v9 + 26);
-                } while (v8 != -1);
-                if (v5)
-                {
-                    v12 = *(signed __int16*)(v20 + 72);
-                    if (v12 != -1)
-                    {
-                        do
+                        auto* target = &g_Level.Items[targetItem];
+                        for (; targetItem != NO_ITEM; targetItem = target->NextItem)
                         {
-                            currentItem_1 = (ItemInfo_OK*)(5622 * v12);
-                            v14 = *(WORD*)((char*)&currentItem_1->objectNumber + v9);
-                            if ((v14 == 193 || v14 == 194 || v14 == 179)
-                                && *(_DWORD*)((char*)&currentItem_1->pos.Position.x + v9) == item->pos.Position.x
-                                && *(_DWORD*)((char*)&currentItem_1->pos.Position.z + v9) == item->pos.Position.z)
+                            target = &g_Level.Items[targetItem];
+
+                            if (target->ObjectNumber == ID_OBELISK && target->Pose.Orientation.y == -ANGLE(270) &&
+                                g_Level.Items[target->ItemFlags[0]].Pose.Orientation.y == ANGLE(90) &&
+                                g_Level.Items[target->ItemFlags[1]].Pose.Orientation.y == 0)
                             {
-                                *(DWORD*)((char*)&currentItem_1->MainFlags + v9) &= 0xFFFFFFF9;
-                                v9 = Items;
+                                target->Flags |= CODE_BITS;
+                                g_Level.Items[target->ItemFlags[0]].Flags |= CODE_BITS;
+                                g_Level.Items[target->ItemFlags[1]].Flags |= CODE_BITS;
+                                break;
                             }
-                            v12 = *(signed __int16*)((char*)&currentItem_1->nextItem + v9);
-                        } while (v12 != -1);
-                        return AnimateItem((int)item);
+                        }
+                    }
+
+                    SoundEffect(SFX_TR4_GENERIC_HEAVY_THUD, &item->Pose);
+                    SoundEffect(SFX_TR4_EXPLOSION2, &item->Pose);
+                }
+                else
+                {
+                    short targetItem = g_Level.Rooms[item->RoomNumber].itemNumber;
+
+                    if (targetItem != NO_ITEM)
+                    {
+                        auto* target = &g_Level.Items[targetItem];
+                        for (; targetItem != NO_ITEM; targetItem = target->NextItem)
+                        {
+                            target = &g_Level.Items[targetItem];
+
+                            if (target->ObjectNumber >= ID_PUSHABLE_OBJECT1 && target->ObjectNumber <= ID_PUSHABLE_OBJECT10)
+                            {
+                                if (item->Pose.Position.x == target->Pose.Position.x &&
+                                    item->Pose.Position.z == target->Pose.Position.z)
+                                {
+                                    ExplodeItemNode(target, 0, 0, 128);
+                                    KillItem(targetItem);
+                                    hammerTouched = 1;
+                                }
+                            }
+                        }
+                    }
+
+                    if (hammerTouched)
+                    {
+                        targetItem = g_Level.Rooms[item->RoomNumber].itemNumber;
+
+                        if (targetItem != NO_ITEM)
+                        {
+                            auto* target = &g_Level.Items[targetItem];
+                            for (; targetItem != NO_ITEM; targetItem = target->NextItem)
+                            {
+                                target = &g_Level.Items[targetItem];
+
+                                //changed to take all puzzle items, keys and their combos. Original is hardcoded to a few slots. -Troye
+                                if ((target->ObjectNumber >= ID_PUZZLE_ITEM1 && target->ObjectNumber <= ID_PUZZLE_ITEM16) ||
+                                    (target->ObjectNumber >= ID_PUZZLE_ITEM1_COMBO1 && target->ObjectNumber <= ID_PUZZLE_ITEM16_COMBO2) ||
+                                    (target->ObjectNumber >= ID_KEY_ITEM1 && target->ObjectNumber <= ID_KEY_ITEM16) ||
+                                    (target->ObjectNumber >= ID_KEY_ITEM1_COMBO1 && target->ObjectNumber <= ID_KEY_ITEM16_COMBO2))
+                                {
+                                    if (item->Pose.Position.x == target->Pose.Position.x &&
+                                        item->Pose.Position.z == target->Pose.Position.z)
+                                    {
+                                        target->Status = ITEM_NOT_ACTIVE;
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
+            else if (frameNumber > HAMMER_CLOSED_FRAME && item->TriggerFlags == 2)
+                item->Flags &= ~CODE_BITS;
         }
-        else if (v2 > 52 && item->triggerFlags == 2)
-        {
-            HIBYTE(item->flags) &= 0xC1u;
-            return AnimateItem((int)item);
-        }
-        return AnimateItem((int)item);
+
+        AnimateItem(item);
     }
-    v6 = item->itemFlags[2];
-    if (v6)
-    {
-        if (v4 == 3)
-        {
-            HIBYTE(item->flags) &= 0xC1u;
-        LABEL_8:
-            item->itemFlags[2] = 0;
-            return AnimateItem((int)item);
-        }
-        if (v4 != 4)
-        {
-            goto LABEL_8;
-        }
-        item->itemFlags[2] = v6 - 1;
-        result = AnimateItem((int)item);
-    }
-    else
-    {
-        v7 = Objects[138].animIndex + 1;
-        item->animNumber = Objects[138].animIndex + 1;
-        item->frameNumber = *(_WORD*)(Anims + 40 * v7 + 24);
-        item->TargetState = 2;
-        item->ActiveState = 2;
-        item->itemFlags[2] = 60;
-        result = AnimateItem((int)item);
-    }
-    return result;*/
 }

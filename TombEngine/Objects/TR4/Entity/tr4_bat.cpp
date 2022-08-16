@@ -1,27 +1,31 @@
 #include "framework.h"
-#include "tr4_bat.h"
+#include "Objects/TR4/Entity/tr4_bat.h"
+
 #include "Game/control/box.h"
 #include "Game/control/control.h"
 #include "Game/effects/effects.h"
 #include "Game/misc.h"
 #include "Game/Lara/lara.h"
 #include "Game/control/lot.h"
-#include "Specific/setup.h"
-#include "Specific/trmath.h"
 #include "Game/itemdata/creature_info.h"
 #include "Game/items.h"
+#include "Specific/prng.h"
+#include "Specific/setup.h"
+#include "Specific/trmath.h"
+
+using namespace TEN::Math::Random;
 
 namespace TEN::Entities::TR4
 {
-	static BITE_INFO BatBite = { 0, 16, 45, 4 };
-
-	constexpr auto BAT_DAMAGE = 50;
+	constexpr auto BAT_ATTACK_DAMAGE = 50;
 
 	constexpr auto BAT_UNFURL_HEIGHT_RANGE = SECTOR(0.87f);
-	constexpr auto BAT_ATTACK_RANGE = CLICK(1);
-	constexpr auto BAT_AWARE_RANGE = SECTOR(5);
+	constexpr auto BAT_ATTACK_RANGE		   = SQUARE(CLICK(1));
+	constexpr auto BAT_AWARE_RANGE		   = SQUARE(SECTOR(5));
 
 	#define BAT_ANGLE ANGLE(20.0f)
+
+	const auto BatBite = BiteInfo(Vector3(0.0f, 16.0f, 45.0f), 4);
 
 	enum BatState
 	{
@@ -44,9 +48,9 @@ namespace TEN::Entities::TR4
 		BAT_ANIM_IDLE = 5,
 	};
 
-	static bool isBatCollideTarget(ItemInfo* item)
+	bool IsBatCollideTarget(ItemInfo* item)
 	{
-		return item->TouchBits >= 0;
+		return (item->TouchBits >= 0);
 	}
 
 	void InitialiseBat(short itemNumber)
@@ -54,11 +58,7 @@ namespace TEN::Entities::TR4
 		auto* item = &g_Level.Items[itemNumber];
 
 		InitialiseCreature(itemNumber);
-
-		item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + BAT_ANIM_IDLE;
-		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-		item->Animation.ActiveState = BAT_STATE_IDLE;
-		item->Animation.TargetState = BAT_STATE_IDLE;
+		SetAnimation(item, BAT_ANIM_IDLE);
 	}
 
 	void BatControl(short itemNumber)
@@ -78,38 +78,38 @@ namespace TEN::Entities::TR4
 			else
 				creature->Enemy = LaraItem;
 
-			// NOTE: Changed from TIMID to VIOLENT, otherwise the bat seems to ignore Lara. 
-			// I feel fine with bat always VIOLENT,
+			// NOTE: Changed from false to true, otherwise the bat seems to ignore Lara. 
+			// I feel fine with bat always true,
 			// but I will also inspect GetCreatureMood and CreatureMood functions for bugs. @TokyoSU
 
 			AI_INFO AI;
 			CreatureAIInfo(item, &AI);
-			GetCreatureMood(item, &AI, VIOLENT);
+			GetCreatureMood(item, &AI, true);
 
 			if (creature->Flags)
 				creature->Mood = MoodType::Escape;
 
-			CreatureMood(item, &AI, VIOLENT);
+			CreatureMood(item, &AI, true);
 
 			angle = CreatureTurn(item, BAT_ANGLE);
 
 			switch (item->Animation.ActiveState)
 			{
 			case BAT_STATE_IDLE:
-				if (AI.distance < pow(BAT_AWARE_RANGE , 2)|| item->HitStatus || creature->HurtByLara)
+				if (AI.distance < BAT_AWARE_RANGE || item->HitStatus || creature->HurtByLara)
 					item->Animation.TargetState = BAT_STATE_DROP_FROM_CEILING;
 
 				break;
 
 			case BAT_STATE_FLY:
-				if (AI.distance < pow(BAT_ATTACK_RANGE, 2) || !(GetRandomControl() & 0x3F))
+				if (AI.distance < BAT_ATTACK_RANGE || TestProbability(0.015f))
 					creature->Flags = 0;
 
 				if (!creature->Flags)
 				{
 					if (item->TouchBits ||
-						(creature->Enemy != LaraItem &&
-						AI.distance < pow(BAT_ATTACK_RANGE, 2) && AI.ahead &&
+						(!creature->Enemy->IsLara() &&
+						AI.distance < BAT_ATTACK_RANGE && AI.ahead &&
 						abs(item->Pose.Position.y - creature->Enemy->Pose.Position.y) < BAT_UNFURL_HEIGHT_RANGE))
 					{
 						item->Animation.TargetState = BAT_STATE_ATTACK;
@@ -120,13 +120,12 @@ namespace TEN::Entities::TR4
 
 			case BAT_STATE_ATTACK:
 				if (!creature->Flags &&
-					(item->TouchBits || creature->Enemy != LaraItem) &&
-					AI.distance < pow(BAT_ATTACK_RANGE, 2) && AI.ahead &&
+					(item->TouchBits || !creature->Enemy->IsLara()) &&
+					AI.distance < BAT_ATTACK_RANGE && AI.ahead &&
 					abs(item->Pose.Position.y - creature->Enemy->Pose.Position.y) < BAT_UNFURL_HEIGHT_RANGE)
 				{
-					CreatureEffect(item, &BatBite, DoBloodSplat);
-					DoDamage(creature->Enemy, BAT_DAMAGE);
-
+					DoDamage(creature->Enemy, BAT_ATTACK_DAMAGE);
+					CreatureEffect(item, BatBite, DoBloodSplat);
 					creature->Flags = 1;
 				}
 				else
@@ -139,12 +138,7 @@ namespace TEN::Entities::TR4
 			}
 		}
 		else if (item->Animation.ActiveState == BAT_STATE_ATTACK)
-		{
-			item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + BAT_ANIM_FLY;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-			item->Animation.ActiveState = BAT_STATE_FLY;
-			item->Animation.TargetState = BAT_STATE_FLY;
-		}
+			SetAnimation(item, BAT_ANIM_FLY);
 		else
 		{
 			if (item->Pose.Position.y >= item->Floor)
@@ -154,14 +148,9 @@ namespace TEN::Entities::TR4
 				item->Pose.Position.y = item->Floor;
 			}
 			else
-			{
-				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + BAT_ANIM_DEATH_FALL;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-				item->Animation.ActiveState = BAT_STATE_DEATH_FALL;
-				item->Animation.TargetState = BAT_STATE_DEATH_FALL;
+				SetAnimation(item, BAT_ANIM_DEATH_FALL);
 				item->Animation.IsAirborne = true;
 				item->Animation.Velocity.z = 0;
-			}
 		}
 
 		CreatureAnimation(itemNumber, angle, 0);

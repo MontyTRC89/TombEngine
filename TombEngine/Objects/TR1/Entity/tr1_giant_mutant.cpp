@@ -14,21 +14,27 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
+using std::vector;
+
 namespace TEN::Entities::TR1
 {
-	const std::vector<int> MutantAttackJoints = { 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25 };
-	const std::vector<int> MutantAttackLeftJoints = { 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14 };
-	const std::vector<int> MutantAttackRightJoints = { 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25 };
+	constexpr auto MUTANT_ATTACK_DAMAGE	 = 500;
+	constexpr auto MUTANT_CONTACT_DAMAGE = 6;
+
+	constexpr auto MUTANT_ATTACK_RANGE = SQUARE(SECTOR(2.5f));
+	constexpr auto MUTANT_CLOSE_RANGE  = SQUARE(SECTOR(2.2f));
+
+	constexpr auto MUTANT_ATTACK_1_CHANCE = 0x2AF8;
+	constexpr auto MUTANT_ATTACK_2_CHANCE = 0x55F0;
 
 	#define MUTANT_NEED_TURN ANGLE(45.0f)
 	#define MUTANT_TURN ANGLE(3.0f)
-	#define MUTANT_ATTACK_RANGE pow(2600, 2)
-	#define MUTANT_CLOSE_RANGE pow(2250, 2)
-	#define MUTANT_ATTACK_1_CHANCE 11000
-	#define MUTANT_ATTACK_2_CHANCE 22000
-	#define MUTANT_ATTACK_DAMAGE 500
-	#define MUTANT_TOUCH_DAMAGE 5
-	#define LARA_GIANT_MUTANT_DEATH 6
+
+	#define LARA_GIANT_MUTANT_DEATH 6 // TODO: Not 13? Check this.
+
+	const vector<int> MutantAttackJoints = { 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25 };
+	const vector<int> MutantAttackLeftJoints = { 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14 };
+	const vector<int> MutantAttackRightJoints = { 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25 };
 
 	enum GiantMutantState
 	{
@@ -47,7 +53,7 @@ namespace TEN::Entities::TR1
 	};
 
 	// TODO
-	enum GianMutantAnim
+	enum GiantMutantAnim
 	{
 		MUTANT_ANIM_DEATH = 13,
 	};
@@ -80,14 +86,14 @@ namespace TEN::Entities::TR1
 			if (AI.ahead)
 				head = AI.angle;
 
-			GetCreatureMood(item, &AI, VIOLENT);
-			CreatureMood(item, &AI, VIOLENT);
+			GetCreatureMood(item, &AI, true);
+			CreatureMood(item, &AI, true);
 
 			angle = (short)phd_atan(creature->Target.z - item->Pose.Position.z, creature->Target.x - item->Pose.Position.x) - item->Pose.Orientation.y;
 
 			if (item->TouchBits)
 			{
-				DoDamage(creature->Enemy, MUTANT_TOUCH_DAMAGE);
+				DoDamage(creature->Enemy, MUTANT_CONTACT_DAMAGE);
 			}
 
 			switch (item->Animation.ActiveState)

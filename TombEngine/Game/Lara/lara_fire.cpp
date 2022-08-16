@@ -936,7 +936,7 @@ void FindTargetPoint(ItemInfo* item, GameVector* target)
 {
 	auto* bounds = (BOUNDING_BOX*)GetBestFrame(item);
 	int x = (int)(bounds->X1 + bounds->X2) / 2;
-	int y = (int) bounds->Y1 + (bounds->Y2 - bounds->Y1) / 3;
+	int y = (int) bounds->Y1 + bounds->Height() / 3;
 	int z = (int)(bounds->Z1 + bounds->Z2) / 2;
 
 	float c = phd_cos(item->Pose.Orientation.y);
