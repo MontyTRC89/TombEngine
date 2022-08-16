@@ -42,6 +42,7 @@ struct ROOM_LIGHT
 struct MESH_INFO
 {
 	PHD_3DPOS pos;
+	float scale;
 	short staticNumber;
 	short flags;
 	Vector4 color;
@@ -109,6 +110,9 @@ struct ROOM_INFO
 	short fxNumber;
 	bool boundActive;
 
+	std::string name;
+	std::vector<std::string> tags;
+
 	std::vector<FloorInfo> floor;
 	std::vector<ROOM_LIGHT> lights;
 	std::vector<MESH_INFO> mesh;
@@ -144,4 +148,5 @@ int IsRoomOutside(int x, int y, int z);
 std::set<int> GetRoomList(int roomNumber);
 void InitializeNeighborRoomList();
 
+BOUNDING_BOX* GetBoundsAccurate(const MESH_INFO* mesh, bool visibility);
 FloorInfo* GetSector(ROOM_INFO* room, int x, int z);
