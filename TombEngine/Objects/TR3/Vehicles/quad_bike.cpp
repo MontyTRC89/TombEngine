@@ -27,7 +27,7 @@ using namespace TEN::Math::Random;
 
 namespace TEN::Entities::Vehicles
 {
-	BITE_INFO QuadBikeEffectsPositions[6] =
+	BiteInfo QuadBikeEffectsPositions[6] =
 	{
 		{ -56, -32, -380, 0	},
 		{ 56, -32, -380, 0 },
@@ -1227,16 +1227,14 @@ namespace TEN::Entities::Vehicles
 			laraItem->Animation.ActiveState != QBIKE_STATE_DISMOUNT_RIGHT &&
 			laraItem->Animation.ActiveState != QBIKE_STATE_DISMOUNT_LEFT)
 		{
-			Vector3Int pos;
 			int speed = 0;
 			short angle = 0;
 
 			for (int i = 0; i < 2; i++)
 			{
-				pos.x = QuadBikeEffectsPositions[i].x;
-				pos.y = QuadBikeEffectsPositions[i].y;
-				pos.z = QuadBikeEffectsPositions[i].z;
+				auto pos = Vector3Int(QuadBikeEffectsPositions[i].Position);
 				GetJointAbsPosition(quadBikeItem, &pos, QuadBikeEffectsPositions[i].meshNum);
+
 				angle = quadBikeItem->Pose.Orientation.y + ((i == 0) ? 0x9000 : 0x7000);
 				if (quadBikeItem->Animation.Velocity.z > 32)
 				{
