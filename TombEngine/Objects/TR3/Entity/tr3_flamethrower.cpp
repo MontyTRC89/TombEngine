@@ -18,8 +18,8 @@
 
 namespace TEN::Entities::TR3
 {
-	BITE_INFO FlamethrowerBite = { 0, 340, 64, 7 };
-	Vector3Int FlamethrowerOffset = { 0, 340, 0 };
+	const auto FlamethrowerOffset = Vector3Int(0, 340, 0);
+	const auto FlamethrowerBite = BiteInfo(Vector3(0.0f, 340.0f, 64.0f), 7);
 
 	// TODO
 	enum FlamethrowerState
@@ -47,7 +47,7 @@ namespace TEN::Entities::TR3
 		short tilt = 0;
 		short head = 0;
 
-		Vector3Int pos = { FlamethrowerBite.x, FlamethrowerBite.y, FlamethrowerBite.z };
+		auto pos = Vector3Int(FlamethrowerBite.Position);
 		GetJointAbsPosition(item, &pos, FlamethrowerBite.meshNum);
 
 		int random = GetRandomControl();
@@ -78,9 +78,9 @@ namespace TEN::Entities::TR3
 				creature->Enemy = LaraItem;
 			else
 			{
-				creature->Enemy = NULL;
+				creature->Enemy = nullptr;
 
-				ItemInfo* target = NULL;
+				ItemInfo* target = nullptr;
 				int minDistance = INT_MAX;
 
 				for (int i = 0; i < ActiveCreatures.size(); i++)
@@ -115,7 +115,7 @@ namespace TEN::Entities::TR3
 				laraAI.distance = AI.distance;
 
 				if (!creature->HurtByLara)
-					creature->Enemy = NULL;
+					creature->Enemy = nullptr;
 			}
 			else
 			{
@@ -125,11 +125,11 @@ namespace TEN::Entities::TR3
 				laraAI.angle = phd_atan(dz, dz) - item->Pose.Orientation.y;
 				laraAI.distance = pow(dx, 2) + pow(dz, 2);
 
-				AI.xAngle -= 0x800;
+				AI.xAngle -= ANGLE(11.25f);
 			}
 
-			GetCreatureMood(item, &AI, VIOLENT);
-			CreatureMood(item, &AI, VIOLENT);
+			GetCreatureMood(item, &AI, true);
+			CreatureMood(item, &AI, true);
 
 			angle = CreatureTurn(item, creature->MaxTurn);
 

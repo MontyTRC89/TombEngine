@@ -1,13 +1,13 @@
 #include "framework.h"
-#include "Objects/TR3/Entity/tr3_scuba.h"
+#include "Objects/TR3/Entity/tr3_scuba_diver.h"
 
-#include "Game/items.h"
 #include "Game/collision/collide_room.h"
 #include "Game/control/box.h"
 #include "Game/control/control.h"
 #include "Game/control/los.h"
 #include "Game/effects/effects.h"
 #include "Game/itemdata/creature_info.h"
+#include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
 #include "Specific/level.h"
@@ -15,21 +15,49 @@
 
 namespace TEN::Entities::TR3
 {
-	BITE_INFO ScubaGunBite = { 17, 164, 44, 18 };
+	constexpr auto SCUBA_DIVER_ATTACK_DAMAGE = 50;
 
-	// TODO
+	#define SCUBA_DIVER_SWIM_TURN_RATE_MAX ANGLE(3.0f)
+
+	const auto ScubaGunBite = BiteInfo(Vector3(17.0f, 164.0f, 44.0f), 18);
+
 	enum ScubaDiverState
 	{
-
+		SDIVER_STATE_NONE = 0,
+		SDIVER_STATE_SWIM = 1,
+		SDIVER_STATE_TREAD_WATER_IDLE = 2,
+		SDIVER_STATE_SWIM_SHOOT = 3,
+		SDIVER_STATE_SWIM_AIM = 4,
+		// No state 5.
+		SDIVER_STATE_TREAD_WATER_AIM = 6,
+		SDIVER_STATE_TREAD_WATER_SHOOT = 7,
+		// No state 8.
+		SDIVER_STATE_DEATH = 9
 	};
 
-	// TODO
 	enum ScubaDiverAnim
 	{
-
+		SDIVER_ANIM_SWIM = 0,
+		SDIVER_ANIM_TREAD_WATER_IDLE = 1,
+		SDIVER_ANIM_RESURFACE = 2,
+		SDIVER_ANIM_SWIM_AIM_CONTINUE = 3,
+		SDIVER_ANIM_SWIM_AIM_END = 4,
+		SDIVER_ANIM_SWIM_SHOOT_LEFT = 5,
+		SDIVER_ANIM_SWIM_SHOOT_RIGHT = 6,
+		SDIVER_ANIM_SWIM_AIM_START_LEFT = 7,
+		SDIVER_ANIM_SWIM_AIM_START_RIGHT = 8,
+		SDIVER_ANIM_TREAD_WATER_AIM_CONTINUE = 9,
+		SDIVER_ANIM_TREAD_WATER_AIM_END = 10,
+		SDIVER_ANIM_TREAD_WATER_SHOOT_LEFT = 11,
+		SDIVER_ANIM_TREAD_WATER_SHOOT_RIGHT = 12,
+		SDIVER_STATE_TREAD_WATER_AIM_START_LEFT = 13,
+		SDIVER_STATE_TREAD_WATER_AIM_START_RIGHT = 14,
+		SDIVER_STATE_DIVE = 15,
+		SDIVER_ANIM_DEATH_START = 16,
+		SDIVER_ANIM_DEATH_END = 17
 	};
 
-	static void ShootHarpoon(ItemInfo* item, int x, int y, int z, short velocity, short yRot, short roomNumber)
+	static void ShootHarpoon(ItemInfo* item, Vector3Int pos, short velocity, short yRot, short roomNumber)
 	{
 		short harpoonItemNumber = CreateItem();
 		if (harpoonItemNumber != NO_ITEM)
@@ -38,16 +66,13 @@ namespace TEN::Entities::TR3
 
 			harpoonItem->ObjectNumber = ID_SCUBA_HARPOON;
 			harpoonItem->RoomNumber = item->RoomNumber;
-
-			harpoonItem->Pose.Position.x = x;
-			harpoonItem->Pose.Position.y = y;
-			harpoonItem->Pose.Position.z = z;
+			harpoonItem->Pose.Position = pos;
 
 			InitialiseItem(harpoonItemNumber);
 
+			harpoonItem->Animation.Velocity.z = 150;
 			harpoonItem->Pose.Orientation.x = 0;
 			harpoonItem->Pose.Orientation.y = yRot;
-			harpoonItem->Animation.Velocity.z = 150;
 
 			AddActiveItem(harpoonItemNumber);
 			harpoonItem->Status = ITEM_ACTIVE;
@@ -60,8 +85,8 @@ namespace TEN::Entities::TR3
 
 		if (item->TouchBits)
 		{
+			DoDamage(LaraItem, SCUBA_DIVER_ATTACK_DAMAGE);
 			DoBloodSplat(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, (GetRandomControl() & 3) + 4, LaraItem->Pose.Orientation.y, LaraItem->RoomNumber);
-			DoDamage(LaraItem, 50);
 			KillItem(itemNumber);
 		}
 		else
@@ -70,6 +95,7 @@ namespace TEN::Entities::TR3
 			int oz = item->Pose.Position.z;
 
 			int velocity = item->Animation.Velocity.z * phd_cos(item->Pose.Orientation.x);
+
 			item->Pose.Position.z += velocity * phd_cos(item->Pose.Orientation.y);
 			item->Pose.Position.x += velocity * phd_sin(item->Pose.Orientation.y);
 			item->Pose.Position.y += -item->Animation.Velocity.z * phd_sin(item->Pose.Orientation.x);
@@ -100,12 +126,8 @@ namespace TEN::Entities::TR3
 		int waterHeight;
 		if (item->HitPoints <= 0)
 		{
-			if (item->Animation.ActiveState != 9)
-			{
-				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 16;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-				item->Animation.ActiveState = 9;
-			}
+			if (item->Animation.ActiveState != SDIVER_STATE_DEATH)
+				SetAnimation(item, SDIVER_ANIM_DEATH_START);
 
 			CreatureFloat(itemNumber);
 			return;
@@ -115,134 +137,135 @@ namespace TEN::Entities::TR3
 			AI_INFO AI;
 			CreatureAIInfo(item, &AI);
 
-			GetCreatureMood(item, &AI, TIMID);
-			CreatureMood(item, &AI, TIMID);
+			GetCreatureMood(item, &AI, false);
+			CreatureMood(item, &AI, false);
 
-			GameVector start;
+			GameVector origin;
 			GameVector target;
 			bool shoot = false;
 
 			if (Lara.Control.WaterStatus == WaterStatus::Dry)
 			{
-				start.x = item->Pose.Position.x;
-				start.y = item->Pose.Position.y - CLICK(1);
-				start.z = item->Pose.Position.z;
-				start.roomNumber = item->RoomNumber;
+				origin.x = item->Pose.Position.x;
+				origin.y = item->Pose.Position.y - CLICK(1);
+				origin.z = item->Pose.Position.z;
+				origin.roomNumber = item->RoomNumber;
 
 				target.x = LaraItem->Pose.Position.x;
 				target.y = LaraItem->Pose.Position.y - (LARA_HEIGHT - 150);
 				target.z = LaraItem->Pose.Position.z;
 
-				shoot = LOS(&start, &target);
+				shoot = LOS(&origin, &target);
 				if (shoot)
-				{
-					creature->Target.x = LaraItem->Pose.Position.x;
-					creature->Target.y = LaraItem->Pose.Position.y;
-					creature->Target.z = LaraItem->Pose.Position.z;
-				}
+					creature->Target = LaraItem->Pose.Position;
 
 				if (AI.angle < -ANGLE(45.0f) || AI.angle > ANGLE(45.0f))
 					shoot = false;
 			}
 			else if (AI.angle > -ANGLE(45.0f) && AI.angle < ANGLE(45.0f))
 			{
-				start.x = item->Pose.Position.x;
-				start.y = item->Pose.Position.y;
-				start.z = item->Pose.Position.z;
-				start.roomNumber = item->RoomNumber;
+				origin.x = item->Pose.Position.x;
+				origin.y = item->Pose.Position.y;
+				origin.z = item->Pose.Position.z;
+				origin.roomNumber = item->RoomNumber;
 
 				target.x = LaraItem->Pose.Position.x;
 				target.y = LaraItem->Pose.Position.y;
 				target.z = LaraItem->Pose.Position.z;
 
-				shoot = LOS(&start, &target);
+				shoot = LOS(&origin, &target);
 			}
 			else
 				shoot = false;
 
 			angle = CreatureTurn(item, creature->MaxTurn);
-			waterHeight = GetWaterSurface(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, item->RoomNumber) + WALL_SIZE / 2;
+			waterHeight = GetWaterSurface(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, item->RoomNumber) + SECTOR(0.5f);
 
 			switch (item->Animation.ActiveState)
 			{
-			case 1:
-				creature->MaxTurn = ANGLE(3.0f);
+			case SDIVER_STATE_SWIM:
+				creature->MaxTurn = SCUBA_DIVER_SWIM_TURN_RATE_MAX;
+
 				if (shoot)
 					neck = -AI.angle;
 
-				if (creature->Target.y < waterHeight && item->Pose.Position.y < waterHeight + creature->LOT.Fly)
-					item->Animation.TargetState = 2;
+				if (creature->Target.y < waterHeight &&
+					item->Pose.Position.y < (waterHeight + creature->LOT.Fly))
+				{
+					item->Animation.TargetState = SDIVER_STATE_TREAD_WATER_IDLE;
+				}
 				else if (creature->Mood == MoodType::Escape)
 					break;
 				else if (shoot)
-					item->Animation.TargetState = 4;
+					item->Animation.TargetState = SDIVER_STATE_SWIM_AIM;
 
 				break;
 
-			case 4:
-				creature->Flags = 0;
+			case SDIVER_STATE_SWIM_AIM:
+				creature->Flags = NULL;
 
 				if (shoot)
 					neck = -AI.angle;
 
 				if (!shoot || creature->Mood == MoodType::Escape ||
-					(creature->Target.y < waterHeight && item->Pose.Position.y < waterHeight + creature->LOT.Fly))
+					(creature->Target.y < waterHeight &&
+						item->Pose.Position.y < (waterHeight + creature->LOT.Fly)))
 				{
-					item->Animation.TargetState = 1;
+					item->Animation.TargetState = SDIVER_STATE_SWIM;
 				}
 				else
-					item->Animation.TargetState = 3;
+					item->Animation.TargetState = SDIVER_STATE_SWIM_SHOOT;
 
 				break;
 
-			case 3:
+			case SDIVER_STATE_SWIM_SHOOT:
 				if (shoot)
 					neck = -AI.angle;
 
 				if (!creature->Flags)
 				{
-					ShootHarpoon(item, item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, item->Animation.Velocity.z, item->Pose.Orientation.y, item->RoomNumber);
+					ShootHarpoon(item, item->Pose.Position, item->Animation.Velocity.z, item->Pose.Orientation.y, item->RoomNumber);
 					creature->Flags = 1;
 				}
 
 				break;
 
 
-			case 2:
-				creature->MaxTurn = ANGLE(3.0f);
+			case SDIVER_STATE_TREAD_WATER_IDLE:
+				creature->MaxTurn = SCUBA_DIVER_SWIM_TURN_RATE_MAX;
 
 				if (shoot)
 					head = AI.angle;
 
 				if (creature->Target.y > waterHeight)
-					item->Animation.TargetState = 1;
+					item->Animation.TargetState = SDIVER_STATE_SWIM;
 				else if (creature->Mood == MoodType::Escape)
 					break;
 				else if (shoot)
-					item->Animation.TargetState = 6;
+					item->Animation.TargetState = SDIVER_STATE_TREAD_WATER_AIM;
 
 				break;
 
-			case 6:
+			case SDIVER_STATE_TREAD_WATER_AIM:
 				creature->Flags = 0;
 
 				if (shoot)
 					head = AI.angle;
 
 				if (!shoot || creature->Mood == MoodType::Escape || creature->Target.y > waterHeight)
-					item->Animation.TargetState = 2;
+					item->Animation.TargetState = SDIVER_STATE_TREAD_WATER_IDLE;
 				else
-					item->Animation.TargetState = 7;
+					item->Animation.TargetState = SDIVER_STATE_TREAD_WATER_SHOOT;
 
 				break;
 
-			case 7:
+			case SDIVER_STATE_TREAD_WATER_SHOOT:
 				if (shoot)
 					head = AI.angle;
 
 				if (!creature->Flags)
 				{
-					ShootHarpoon(item, item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, item->Animation.Velocity.z, item->Pose.Orientation.y, item->RoomNumber);
+					ShootHarpoon(item, item->Pose.Position, item->Animation.Velocity.z, item->Pose.Orientation.y, item->RoomNumber);
 					creature->Flags = 1;
 				}
 
@@ -257,9 +280,9 @@ namespace TEN::Entities::TR3
 
 		switch (item->Animation.ActiveState)
 		{
-		case 1:
-		case 4:
-		case 3:
+		case SDIVER_STATE_SWIM:
+		case SDIVER_STATE_SWIM_AIM:
+		case SDIVER_STATE_SWIM_SHOOT:
 			CreatureUnderwater(item, CLICK(2));
 			break;
 
