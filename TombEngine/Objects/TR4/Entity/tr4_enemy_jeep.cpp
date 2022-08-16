@@ -310,10 +310,10 @@ namespace TEN::Entities::TR4
 						creature->Enemy = nullptr;
 						target->ObjectNumber = aiObject->objectNumber;
 						target->RoomNumber = aiObject->roomNumber;
-						target->Pose.Position.x = aiObject->x;
-						target->Pose.Position.y = aiObject->y;
-						target->Pose.Position.z = aiObject->z;
-						target->Pose.Orientation.y = aiObject->yRot;
+						target->Pose.Position.x = aiObject->pos.Position.x;
+						target->Pose.Position.y = aiObject->pos.Position.y;
+						target->Pose.Position.z = aiObject->pos.Position.z;
+						target->Pose.Orientation.y = aiObject->pos.Orientation.y;
 						target->Flags = aiObject->flags;
 						target->TriggerFlags = aiObject->triggerFlags;
 						target->BoxNumber = aiObject->boxNumber;
