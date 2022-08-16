@@ -1,7 +1,7 @@
 #pragma once
 
-struct ItemInfo;
 struct CollisionInfo;
+struct ItemInfo;
 
 // Puzzles
 void PuzzleHoleCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);

@@ -819,7 +819,7 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, Vector3Int offset, bo
 // (int radiusDivide) is for radiusZ, else the MaxZ is too high and cause rotation problem !
 // Dont need to set a value in radiusDivisor if you dont need it (radiusDivisor is set to 1 by default).
 // Warning: dont set it to 0 !!!!
-void CalculateItemRotationToSurface(ItemInfo* item, float radiusDivisor, short xOffset, short zOffset)
+void CalculateItemRotationToSurface(ItemInfo* item, float radiusDivisor, float maxAngle, short xOffset, short zOffset)
 {
 	if (!radiusDivisor)
 	{
@@ -859,8 +859,10 @@ void CalculateItemRotationToSurface(ItemInfo* item, float radiusDivisor, short x
 		return;
 
 	// NOTE: float(atan2()) is required, else warning about double !
-	item->Pose.Orientation.x = ANGLE(float(atan2(frontHDif, 2 * radiusZ)) / RADIAN) + xOffset;
-	item->Pose.Orientation.z = ANGLE(float(atan2(sideHDif, 2 * radiusX)) / RADIAN) + zOffset;
+	short angleX = ANGLE(float(atan2(frontHDif, 2 * radiusZ)) / RADIAN) + xOffset;
+	short angleZ = ANGLE(float(atan2(sideHDif, 2 * radiusX)) / RADIAN) + zOffset;
+	if (abs(angleX) <= ANGLE(maxAngle)) item->Pose.Orientation.x = angleX;
+	if (abs(angleZ) <= ANGLE(maxAngle)) item->Pose.Orientation.z = angleZ;
 }
 
 int GetQuadrant(short angle)
@@ -890,7 +892,7 @@ short GetNearestLedgeAngle(ItemInfo* item, CollisionInfo* coll, float& distance)
 
 	// Determine two Y points to test (lower and higher).
 	// 1/10 headroom crop is needed to avoid possible issues with tight diagonal headrooms.
-	int headroom = abs(bounds->Y2 - bounds->Y1) / 20.0f;
+	int headroom = bounds->Height() / 20.0f;
 	int yPoints[2] = { item->Pose.Position.y + bounds->Y1 + headroom,
 					   item->Pose.Position.y + bounds->Y2 - headroom };
 
