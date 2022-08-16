@@ -141,16 +141,11 @@ bool Targetable(ItemInfo* item, AI_INFO* AI)
 
 bool TargetVisible(ItemInfo* item, AI_INFO* AI, float maxAngle)
 {
-	return TargetVisible(item, nullptr, AI, maxAngle);
-}
-
-bool TargetVisible(ItemInfo* item, CreatureInfo* creature, AI_INFO* AI, float maxAngle)
-{
 	if (!item->IsCreature() || AI->distance >= SQUARE(MAX_VISIBILITY_DISTANCE))
 		return false;
 
 	// Check just in case.
-	auto* creatureInfo = (creature != nullptr) ? creature : GetCreatureInfo(item);
+	auto* creatureInfo = GetCreatureInfo(item);
 	if (creatureInfo == nullptr)
 		return false;
 
