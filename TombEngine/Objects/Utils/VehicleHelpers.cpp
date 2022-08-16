@@ -91,9 +91,8 @@ namespace TEN::Entities::Vehicles
 				continue;
 
 			case VehicleMountType::Front:
-				if (hasInputAction &&
-					deltaHeadingAngle > ANGLE(135.0f) && deltaHeadingAngle < -ANGLE(135.0f) &&
-					onCorrectSide &&
+				if (hasInputAction && onCorrectSide &&
+					deltaHeadingAngle > ANGLE(135.0f) && deltaHeadingAngle < ANGLE(-135.0f) &&
 					!laraItem->Animation.IsAirborne)
 				{
 					break;
@@ -101,9 +100,8 @@ namespace TEN::Entities::Vehicles
 				continue;
 
 			case VehicleMountType::Back:
-				if (hasInputAction &&
+				if (hasInputAction && onCorrectSide &&
 					abs(deltaHeadingAngle) < ANGLE(45.0f) &&
-					onCorrectSide &&
 					!laraItem->Animation.IsAirborne)
 				{
 					break;
@@ -111,9 +109,8 @@ namespace TEN::Entities::Vehicles
 				continue;
 
 			case VehicleMountType::Left:
-				if (hasInputAction &&
-					deltaHeadingAngle > -ANGLE(135.0f) && deltaHeadingAngle < -ANGLE(45.0f) &&
-					onCorrectSide &&
+				if (hasInputAction && onCorrectSide &&
+					deltaHeadingAngle > ANGLE(-135.0f) && deltaHeadingAngle < ANGLE(-45.0f) &&
 					!laraItem->Animation.IsAirborne)
 				{
 					break;
@@ -121,9 +118,8 @@ namespace TEN::Entities::Vehicles
 				continue;
 
 			case VehicleMountType::Right:
-				if (hasInputAction &&
+				if (hasInputAction && onCorrectSide &&
 					deltaHeadingAngle > ANGLE(45.0f) && deltaHeadingAngle < ANGLE(135.0f) &&
-					onCorrectSide &&
 					!laraItem->Animation.IsAirborne)
 				{
 					break;
