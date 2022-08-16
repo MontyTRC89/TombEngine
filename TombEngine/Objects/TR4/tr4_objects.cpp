@@ -551,22 +551,23 @@ namespace TEN::Entities
 			obj->zoneType = ZONE_FLYER;
 		}
 
-		obj = &Objects[ID_GUIDE];
-		if (obj->loaded)
-		{
-			obj->initialise = InitialiseGuide;
-			obj->control = GuideControl;
-			obj->collision = CreatureCollision;
-			obj->shadowType = ShadowMode::All;
-			obj->HitPoints = NOT_TARGETABLE;
-			obj->hitEffect = HIT_BLOOD;
-			obj->pivotLength = 0;
-			obj->radius = 128;
-			obj->intelligent = true;
-			obj->saveHitpoints = true;
-			obj->saveAnim = true;
-			obj->saveFlags = true;
-			obj->zoneType = ZONE_BASIC;
+	obj = &Objects[ID_GUIDE];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseGuide;
+		obj->control = GuideControl;
+		obj->collision = CreatureCollision;
+		obj->shadowType = ShadowMode::All;
+		obj->HitPoints = NOT_TARGETABLE;
+		obj->hitEffect = HIT_BLOOD;
+		obj->pivotLength = 0;
+		obj->radius = 128;
+		obj->intelligent = true;
+		obj->saveHitpoints = true;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+		obj->meshSwapSlot = ID_MESHSWAP2;
+		obj->zoneType = ZONE_BASIC;
 
 			g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_X | ROT_Y;
 			g_Level.Bones[obj->boneIndex + 20 * 4] |= ROT_X | ROT_Y;
