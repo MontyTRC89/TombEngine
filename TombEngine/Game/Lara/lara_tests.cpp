@@ -1004,9 +1004,7 @@ bool TestLaraLadderClimbOut(ItemInfo* item, CollisionInfo* coll) // NEW function
 {
 	auto* lara = GetLaraInfo(item);
 
-	if (!(TrInput & IN_ACTION) ||
-		!lara->Control.CanClimbLadder ||
-		coll->CollisionType != CT_FRONT)
+	if (!(TrInput & IN_ACTION) || !lara->Control.CanClimbLadder || coll->CollisionType != CT_FRONT)
 	{
 		return false;
 	}
@@ -1016,6 +1014,9 @@ bool TestLaraLadderClimbOut(ItemInfo* item, CollisionInfo* coll) // NEW function
 	{
 		return false;
 	}
+
+	// HACK: Reduce probe radius, because free forward probe mode makes ladder tests to fail in some cases.
+	coll->Setup.Radius *= 0.8f; 
 
 	if (!TestLaraClimbIdle(item, coll))
 		return false;

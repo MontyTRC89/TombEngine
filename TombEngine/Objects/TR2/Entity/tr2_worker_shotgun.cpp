@@ -4,6 +4,7 @@
 #include "Game/animation.h"
 #include "Game/control/box.h"
 #include "Game/control/control.h"
+#include "Game/effects/effects.h"
 #include "Game/items.h"
 #include "Game/itemdata/creature_info.h"
 #include "Game/misc.h"
@@ -14,6 +15,8 @@
 namespace TEN::Entities::TR2
 {
 	const auto WorkerShotgunBite = BiteInfo(Vector3(0.0f, 281.0f, 40.0f), 9);
+
+	constexpr auto WORKER_SHOTGUN_NUM_SHOTS = 6;
 
 	// TODO
 	enum ShotgunWorkerState
@@ -29,12 +32,8 @@ namespace TEN::Entities::TR2
 
 	void ShotLaraWithShotgun(ItemInfo* item, AI_INFO* info, BiteInfo bite, short angleY, int damage)
 	{
-		ShotLara(item, info, bite, angleY, damage);
-		ShotLara(item, info, bite, angleY, damage);
-		ShotLara(item, info, bite, angleY, damage);
-		ShotLara(item, info, bite, angleY, damage);
-		ShotLara(item, info, bite, angleY, damage);
-		ShotLara(item, info, bite, angleY, damage);
+		for (int i = 0; i < WORKER_SHOTGUN_NUM_SHOTS; i++)
+			ShotLara(item, info, bite, angleY, damage);
 	}
 
 	void InitialiseWorkerShotgun(short itemNum)
@@ -63,6 +62,14 @@ namespace TEN::Entities::TR2
 		short headY = 0;
 		short torsoX = 0;
 		short torsoY = 0;
+
+		if (creature->FiredWeapon)
+		{
+			auto pos = Vector3Int(WorkerShotgunBite.Position);
+			GetJointAbsPosition(item, &pos, WorkerShotgunBite.meshNum);
+			TriggerDynamicLight(pos.x, pos.y, pos.z, (creature->FiredWeapon * 2) + 4, 24, 16, 4);
+			creature->FiredWeapon--;
+		}
 
 		if (item->HitPoints <= 0)
 		{

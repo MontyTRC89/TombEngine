@@ -117,7 +117,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->saveFlags = true;
 		obj->savePosition = true;
 		obj->saveHitpoints = true;
-		obj->SetBoneRotation(2, ROT_X|ROT_Z);
+		obj->SetBoneRotation(2, ROT_X | ROT_Z);
 	}
 
 	obj = &Objects[ID_GIANT_MUTANT];
@@ -175,7 +175,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->saveAnim = true;
 		obj->saveFlags = true;
 		obj->zoneType = ZONE_BLOCKABLE;
-		obj->SetBoneRotation(10, ROT_X|ROT_Y);
+		obj->SetBoneRotation(10, ROT_X | ROT_Y);
 	}
 
 	obj = &Objects[ID_WINGED_MUMMY];
@@ -188,7 +188,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->hitEffect = HIT_BLOOD;
 		obj->pivotLength = 150;
 		obj->radius = WALL_SIZE / 3;
-		obj->HitPoints = 1; // 50
+		obj->HitPoints = 50;
 		obj->intelligent = true;
 		obj->saveAnim = true;
 		obj->saveFlags = true;
