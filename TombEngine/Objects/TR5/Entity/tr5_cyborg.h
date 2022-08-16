@@ -1,4 +1,7 @@
 #pragma once
 
-void InitialiseCyborg(short itemNumber);
-void CyborgControl(short itemNumber);
+namespace TEN::Entities::TR5
+{
+	void InitialiseCyborg(short itemNumber);
+	void CyborgControl(short itemNumber);
+}

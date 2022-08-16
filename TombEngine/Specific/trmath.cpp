@@ -3,6 +3,8 @@
 #include "Specific/prng.h"
 #include <cmath>
 
+#include "Specific/prng.h"
+
 using namespace TEN::Math::Random;
 
 short ANGLE(float angle)

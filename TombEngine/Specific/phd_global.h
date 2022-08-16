@@ -360,6 +360,15 @@ struct GameVector
 		this->roomNumber = roomNumber;
 		this->boxNumber = boxNumber;
 	}
+
+	GameVector(Vector3Int& pos, short roomNumber)
+	{
+		this->x = pos.x;
+		this->y = pos.y;
+		this->z = pos.z;
+		this->roomNumber = roomNumber;
+		this->boxNumber = 0;
+	}
 };
 
 struct LEVEL_CAMERA_INFO
@@ -578,6 +587,9 @@ struct BOUNDING_BOX
 	short Y2;
 	short Z1;
 	short Z2;
+
+	int Height() { return abs(Y2 - Y1); }
 };
 
-BOUNDING_BOX operator+(BOUNDING_BOX const& box, PHD_3DPOS const& vec);
+BOUNDING_BOX operator+(const BOUNDING_BOX& box, const PHD_3DPOS& vec);
+BOUNDING_BOX operator*(const BOUNDING_BOX& box, const float scale);
