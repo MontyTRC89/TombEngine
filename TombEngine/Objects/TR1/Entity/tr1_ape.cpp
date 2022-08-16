@@ -145,9 +145,11 @@ namespace TEN::Entities::TR1
 			// diagonal
 		}
 
-		item->Pose.Position.y = y;
 		if (CreatureVault(itemNumber, angle, 2, SHIFT) == 2)
+		{
+			item->Pose.Position.y = y;
 			SetAnimation(item, APE_ANIM_VAULT);
+		}
 	}
 
 	void ApeControl(short itemNumber)
