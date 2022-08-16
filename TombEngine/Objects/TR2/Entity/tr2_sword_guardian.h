@@ -1,4 +1,7 @@
 #pragma once
 
-void InitialiseSwordGuardian(short itemNumber);
-void SwordGuardianControl(short itemNumber);
+namespace TEN::Entities::TR2
+{
+	void InitialiseSwordGuardian(short itemNumber);
+	void SwordGuardianControl(short itemNumber);
+}

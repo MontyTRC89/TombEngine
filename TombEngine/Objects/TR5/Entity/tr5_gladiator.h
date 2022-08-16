@@ -1,4 +1,7 @@
 #pragma once
 
-void InitialiseGladiator(short itemNumber);
-void ControlGladiator(short itemNumber);
+namespace TEN::Entities::TR5
+{
+	void InitialiseGladiator(short itemNumber);
+	void ControlGladiator(short itemNumber);
+}

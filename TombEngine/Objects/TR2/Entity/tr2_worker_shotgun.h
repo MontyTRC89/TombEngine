@@ -1,4 +1,7 @@
 #pragma once
 
-void InitialiseWorkerShotgun(short itemNumber);
-void WorkerShotgunControl(short itemNumber);
+namespace TEN::Entities::TR2
+{
+	void InitialiseWorkerShotgun(short itemNumber);
+	void WorkerShotgunControl(short itemNumber);
+}
