@@ -2,6 +2,8 @@ Version 1.0.1
 =============
 
 - Added antialiasing support.
+- Added static mesh scaling support.
+- Added free rotation for teeth spikes instead of using OCB codes.
 - Fix some issues with shimmying between diagonal ledges and walls.
 - Fix rope transparency.
 - Fix objects disappearing under certain angles at the edges of the screen.
@@ -12,12 +14,17 @@ Version 1.0.1
 - Fix static meshes having wrong colors on savegame reload.
 - Fix rollingball incorrectly killing Lara in water and in jump.
 - Fix resurfacing on underwater death.
+- Fix water to ladder animation not activating in all cases.
 - Fix ripples not appearing on water connections higher than room bottom.
 - Fix several problems with ropes (stumbling, rope length, etc).
 - Fix several problems with teeth spikes.
+- Fix falling through twoblock platform on room number change.
+- Fix falling block breaking too early if placed on a vertical portal.
 - Fix crashes when loading image files are missing.
 - Disable trigger check for puzzle holes.
 - Clear locusts and other swarm enemies on level reload.
+- Enhance cobra AI and fix targeting.
+- Fully decompile HAMMER object from TR4.
 - Prevent title music audio from starting in a random place.
 - Update harpoon speed on room change.
 - Enable second sky layer rendering.
@@ -27,6 +34,7 @@ Version 1.0.1
 - SetFarView has been removed, and Flow.Level.farView is now uncapped.
 - DisplayString text will now be cleared when a level is exited or reloaded.
 - EventSequence.lua has been added and documented.
+
 
 Version 1.0
 ===========

@@ -1,3 +1,6 @@
 #pragma once
 
-void RatControl(short itemNumber);
+namespace TEN::Entities::TR2
+{
+	void RatControl(short itemNumber);
+}

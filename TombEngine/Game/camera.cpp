@@ -1854,10 +1854,10 @@ static bool CheckStaticCollideCamera(MESH_INFO* mesh)
 	if (!(mesh->flags & StaticMeshFlags::SM_VISIBLE))
 		return false;
 
-	auto stat = &StaticObjects[mesh->staticNumber];
-	auto extents = Vector3(abs(stat->collisionBox.X1 - stat->collisionBox.X2),
-		abs(stat->collisionBox.Y1 - stat->collisionBox.Y2),
-		abs(stat->collisionBox.Z1 - stat->collisionBox.Z2));
+	auto bounds = GetBoundsAccurate(mesh, false);
+	auto extents = Vector3(abs(bounds->X1 - bounds->X2),
+						   abs(bounds->Y1 - bounds->Y2),
+						   abs(bounds->Z1 - bounds->Z2));
 
 	// Check extents, if any 2 bounds are smaller than threshold, discard.
 	if ((abs(extents.x) < COLL_DISCARD_THRESHOLD && abs(extents.y) < COLL_DISCARD_THRESHOLD) ||
@@ -1929,9 +1929,7 @@ void ItemsCollideCamera()
 	for (int i = 0; i < staticList.size(); i++)
 	{
 		auto mesh = staticList[i];
-		auto stat = &StaticObjects[mesh->staticNumber];
-
-		if (!mesh || !stat)
+		if (!mesh)
 			return;
 
 		auto dx = abs(LaraItem->Pose.Position.x - mesh->pos.Position.x);
@@ -1941,7 +1939,7 @@ void ItemsCollideCamera()
 		if (dx > COLL_CANCEL_THRESHOLD || dz > COLL_CANCEL_THRESHOLD || dy > COLL_CANCEL_THRESHOLD)
 			continue;
 
-		auto bounds = &stat->collisionBox;
+		auto bounds = GetBoundsAccurate(mesh, false);
 		if (TestBoundsCollideCamera(bounds, &mesh->pos, CAMERA_RADIUS))
 			ItemPushCamera(bounds, &mesh->pos, rad);
 
