@@ -83,8 +83,8 @@ namespace TEN::Entities::Vehicles
 			{
 			// TODO: Holding FORWARD the moment a level loads, this mount will fail. Need a better method.
 			case VehicleMountType::LevelStart:
-				if (!laraItem->Animation.Velocity.z &&
-					!laraItem->Animation.Velocity.y &&
+				if (laraItem->Animation.Velocity.y == 0.0f &&
+					laraItem->Animation.Velocity.z == 0.0f &&
 					laraItem->Pose.Position == vehicleItem->Pose.Position)
 				{
 					break;
@@ -133,7 +133,7 @@ namespace TEN::Entities::Vehicles
 
 			case VehicleMountType::Jump:
 				if (laraItem->Animation.IsAirborne &&
-					laraItem->Animation.Velocity.y > 0 &&
+					laraItem->Animation.Velocity.y > 0.0f &&
 					laraItem->Pose.Position.y < vehicleItem->Pose.Position.y)
 				{
 					break;
