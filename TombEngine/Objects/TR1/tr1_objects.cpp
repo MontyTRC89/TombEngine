@@ -188,7 +188,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->hitEffect = HIT_BLOOD;
 		obj->pivotLength = 150;
 		obj->radius = WALL_SIZE / 3;
-		obj->HitPoints = 1; // 50
+		obj->HitPoints = 50;
 		obj->intelligent = true;
 		obj->saveAnim = true;
 		obj->saveFlags = true;
