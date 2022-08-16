@@ -28,7 +28,8 @@ namespace TEN::Entities::TR1
 	constexpr auto BIG_RAT_WATER_BITE_ATTACK_RANGE = SQUARE(SECTOR(0.3f));
 
 	constexpr auto BIG_RAT_REAR_POSE_CHANCE = 0.008f;
-	constexpr auto DEFAULT_SWIM_UP_DOWN_SPEED = 32;
+	constexpr auto BIG_RAT_SWIM_UP_DOWN_SPEED = 32;
+	constexpr auto BIG_RAT_WATER_SURFACE_OFFSET = 10;
 
 	#define BIG_RAT_RUN_TURN_RATE_MAX  ANGLE(6.0f)
 	#define BIG_RAT_SWIM_TURN_RATE_MAX ANGLE(3.0f)
@@ -81,8 +82,10 @@ namespace TEN::Entities::TR1
 			SetAnimation(item, BIG_RAT_ANIM_IDLE);
 	}
 
-	int RatIsInWater(ItemInfo* item, CreatureInfo* creature)
+	int GetRatWaterHeight(ItemInfo* item)
 	{
+		auto* creature = GetCreatureInfo(item);
+
 		auto probe = GetCollision(item);
 		int waterDepth = GetWaterSurface(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, probe.RoomNumber);
 
@@ -90,7 +93,7 @@ namespace TEN::Entities::TR1
 		{
 			creature->LOT.Step = SECTOR(20);
 			creature->LOT.Drop = -SECTOR(20);
-			creature->LOT.Fly = DEFAULT_SWIM_UP_DOWN_SPEED;
+			creature->LOT.Fly = BIG_RAT_SWIM_UP_DOWN_SPEED;
 			return waterDepth;
 		}
 		else
@@ -111,7 +114,7 @@ namespace TEN::Entities::TR1
 		auto* item = &g_Level.Items[itemNumber];
 		auto* creature = GetCreatureInfo(item);
 
-		int waterHeight = RatIsInWater(item, creature);
+		int waterHeight = GetRatWaterHeight(item);
 		short head = 0;
 		short angle = 0;
 		bool isOnWater = waterHeight != NO_HEIGHT;
@@ -237,7 +240,7 @@ namespace TEN::Entities::TR1
 		if (isOnWater)
 		{
 			CreatureUnderwater(item, 0);
-			item->Pose.Position.y = waterHeight - 10;
+			item->Pose.Position.y = waterHeight - BIG_RAT_WATER_SURFACE_OFFSET;
 		}
 		else
 			item->Pose.Position.y = item->Floor;
