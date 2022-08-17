@@ -49,9 +49,9 @@ namespace TEN::Utils
 		return packedBits;
 	}
 
-	void BitField::Set(vector<uint>& indices)
+	void BitField::Set(const vector<uint>& indices)
 	{
-		for (uint& index : indices)
+		for (uint index : indices)
 		{
 			if (index >= Field.size())
 				continue;
@@ -70,9 +70,9 @@ namespace TEN::Utils
 		this->Fill(true);
 	}
 
-	void BitField::Clear(vector<uint>& indices)
+	void BitField::Clear(const vector<uint>& indices)
 	{
-		for (uint& index : indices)
+		for (uint index : indices)
 		{
 			if (index >= Field.size())
 				continue;
@@ -91,9 +91,9 @@ namespace TEN::Utils
 		this->Fill(false);
 	}
 	
-	void BitField::Flip(vector<uint>& indices)
+	void BitField::Flip(const vector<uint>& indices)
 	{
-		for (uint& index : indices)
+		for (uint index : indices)
 		{
 			if (index >= Field.size())
 				continue;
@@ -112,9 +112,9 @@ namespace TEN::Utils
 		this->Field.flip();
 	}
 
-	bool BitField::Test(vector<uint>& indices)
+	bool BitField::Test(const vector<uint>& indices)
 	{
-		for (uint& index : indices)
+		for (uint index : indices)
 		{
 			if (!Field[index])
 				return false;
