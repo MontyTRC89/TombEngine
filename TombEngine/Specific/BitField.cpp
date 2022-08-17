@@ -53,7 +53,7 @@ namespace TEN::Utils
 	{
 		for (uint& index : indices)
 		{
-			if (index > Field.size())
+			if (index >= Field.size())
 				continue;
 
 			this->Field[index] = true;
@@ -74,7 +74,7 @@ namespace TEN::Utils
 	{
 		for (uint& index : indices)
 		{
-			if (index > Field.size())
+			if (index >= Field.size())
 				continue;
 
 			this->Field[index] = false;
@@ -95,7 +95,7 @@ namespace TEN::Utils
 	{
 		for (uint& index : indices)
 		{
-			if (index > Field.size())
+			if (index >= Field.size())
 				continue;
 
 			this->Field[index].flip();
