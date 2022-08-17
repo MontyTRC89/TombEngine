@@ -495,10 +495,10 @@ bool TestLaraHangOnClimbableWall(ItemInfo* item, CollisionInfo* coll)
 			return false;
 	}
 
-	if (LaraTestClimbPos(item, LARA_RADIUS, LARA_RADIUS, bounds->Y1, bounds->Y2 - bounds->Y1, &shift) &&
-		LaraTestClimbPos(item, LARA_RADIUS, -LARA_RADIUS, bounds->Y1, bounds->Y2 - bounds->Y1, &shift))
+	if (LaraTestClimbPos(item, LARA_RADIUS, LARA_RADIUS, bounds->Y1, bounds->Height(), &shift) &&
+		LaraTestClimbPos(item, LARA_RADIUS, -LARA_RADIUS, bounds->Y1, bounds->Height(), &shift))
 	{
-		result = LaraTestClimbPos(item, LARA_RADIUS, 0, bounds->Y1, bounds->Y2 - bounds->Y1, &shift);
+		result = LaraTestClimbPos(item, LARA_RADIUS, 0, bounds->Y1, bounds->Height(), &shift);
 		if (result)
 		{
 			if (result != 1)
@@ -1004,9 +1004,7 @@ bool TestLaraLadderClimbOut(ItemInfo* item, CollisionInfo* coll) // NEW function
 {
 	auto* lara = GetLaraInfo(item);
 
-	if (!(TrInput & IN_ACTION) ||
-		!lara->Control.CanClimbLadder ||
-		coll->CollisionType != CT_FRONT)
+	if (!(TrInput & IN_ACTION) || !lara->Control.CanClimbLadder || coll->CollisionType != CT_FRONT)
 	{
 		return false;
 	}
@@ -1016,6 +1014,9 @@ bool TestLaraLadderClimbOut(ItemInfo* item, CollisionInfo* coll) // NEW function
 	{
 		return false;
 	}
+
+	// HACK: Reduce probe radius, because free forward probe mode makes ladder tests to fail in some cases.
+	coll->Setup.Radius *= 0.8f; 
 
 	if (!TestLaraClimbIdle(item, coll))
 		return false;
@@ -1295,8 +1296,7 @@ bool TestLaraLand(ItemInfo* item, CollisionInfo* coll)
 {
 	int heightFromFloor = GetCollision(item).Position.Floor - item->Pose.Position.y;
 
-	if (item->Animation.IsAirborne &&
-		item->Animation.Velocity.y >= 0 &&
+	if (item->Animation.IsAirborne && item->Animation.Velocity.y >= 0 &&
 		(heightFromFloor <= item->Animation.Velocity.y ||
 			TestEnvironment(ENV_FLAG_SWAMP, item)))
 	{

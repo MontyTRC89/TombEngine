@@ -12,9 +12,14 @@ local InvID = Flow.InvID
 local RotationAxis = Flow.RotationAxis
 local ItemAction = Flow.ItemAction
 
--- These variables are unused for now.
+-- Intro image is a splash screen which appears before actual loading screen.
+-- If you don't want it to appear, just remove this line.
 
 Flow.SetIntroImagePath("Screens\\main.jpg")
+
+-- This image should be used for static title screen background (as in TR1-TR3).
+-- For now it is not implemented.
+
 Flow.SetTitleScreenImagePath("Screens\\main.jpg")
 
 
@@ -38,7 +43,7 @@ Flow.AddLevel(title)
 test = Level.new()
 
 test.nameKey = "level_test"
-test.scriptFile = "Scripts\\TestLevel.lua"
+test.scriptFile = "Scripts\\New_Level.lua"
 test.ambientTrack = "108"
 test.levelFile = "Data\\TestLevel.ten"
 test.loadScreenFile = "Screens\\rome.jpg"

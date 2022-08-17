@@ -1,20 +1,24 @@
 #include "framework.h"
-#include "tr4_enemy_jeep.h"
-#include "Game/items.h"
-#include "Specific/level.h"
+#include "Objects/TR4/Entity/tr4_enemy_jeep.h"
+
+#include "Game/animation.h"
 #include "Game/collision/collide_room.h"
 #include "Game/control/box.h"
-#include "Specific/trmath.h"
-#include "Game/Lara/lara.h"
 #include "Game/control/lot.h"
-#include "Sound/sound.h"
-#include "Game/animation.h"
-#include "Game/itemdata/creature_info.h"
-#include "Specific/setup.h"
 #include "Game/control/trigger.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/tomb4fx.h"
+#include "Game/itemdata/creature_info.h"
+#include "Game/items.h"
+#include "Game/Lara/lara.h"
 #include "Game/misc.h"
+#include "Sound/sound.h"
+#include "Specific/level.h"
+#include "Math/Random.h"
+#include "Specific/setup.h"
+#include "Specific/trmath.h"
+
+using namespace TEN::Math::Random;
 
 namespace TEN::Entities::TR4
 {
@@ -43,7 +47,7 @@ namespace TEN::Entities::TR4
 			for (int i = 0; i < 5; i++)
 				TriggerGunSmoke(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, 0, 0, 0, 1, LaraWeaponType::GrenadeLauncher, 32);
 
-			if (GetRandomControl() & 3)
+			if (TestProbability(0.75f))
 				grenadeItem->ItemFlags[0] = 1;
 			else
 				grenadeItem->ItemFlags[0] = 2;
@@ -306,10 +310,10 @@ namespace TEN::Entities::TR4
 						creature->Enemy = nullptr;
 						target->ObjectNumber = aiObject->objectNumber;
 						target->RoomNumber = aiObject->roomNumber;
-						target->Pose.Position.x = aiObject->x;
-						target->Pose.Position.y = aiObject->y;
-						target->Pose.Position.z = aiObject->z;
-						target->Pose.Orientation.y = aiObject->yRot;
+						target->Pose.Position.x = aiObject->pos.Position.x;
+						target->Pose.Position.y = aiObject->pos.Position.y;
+						target->Pose.Position.z = aiObject->pos.Position.z;
+						target->Pose.Orientation.y = aiObject->pos.Orientation.y;
 						target->Flags = aiObject->flags;
 						target->TriggerFlags = aiObject->triggerFlags;
 						target->BoxNumber = aiObject->boxNumber;

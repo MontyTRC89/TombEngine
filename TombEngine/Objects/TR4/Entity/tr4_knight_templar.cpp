@@ -1,28 +1,31 @@
 #include "framework.h"
-#include "tr4_knight_templar.h"
-#include "Game/items.h"
-#include "Game/control/box.h"
-#include "Game/effects/effects.h"
-#include "Game/effects/debris.h"
-#include "Specific/setup.h"
-#include "Specific/level.h"
+#include "Objects/TR4/Entity/tr4_knight_templar.h"
+
 #include "Game/animation.h"
+#include "Game/control/box.h"
+#include "Game/effects/debris.h"
+#include "Game/effects/effects.h"
+#include "Game/itemdata/creature_info.h"
+#include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
 #include "Sound/sound.h"
-#include "Game/itemdata/creature_info.h"
+#include "Specific/level.h"
+#include "Math/Random.h"
+#include "Specific/setup.h"
 
+using namespace TEN::Math::Random;
 using std::vector;
 
 namespace TEN::Entities::TR4
 {
-	BITE_INFO KnightTemplarBite = { 0, 0, 0, 11 };
-	const vector<int> KnightTemplarSwordAttackJoints = { 10, 11 };
-
 	constexpr auto KNIGHT_TEMPLAR_SWORD_ATTACK_DAMAGE = 120;
 
-	#define KNIGHT_TEMPLAR_IDLE_TURN_ANGLE ANGLE(2.0f)
-	#define KNIGHT_TEMPLAR_WALK_TURN_ANGLE ANGLE(7.0f)
+	#define KTEMPLAR_IDLE_TURN_RATE_MAX ANGLE(2.0f)
+	#define KTEMPLAR_WALK_TURN_RATE_MAX ANGLE(7.0f)
+
+	const auto KnightTemplarBite = BiteInfo(Vector3::Zero, 11);
+	const vector<int> KnightTemplarSwordAttackJoints = { 10, 11 };
 
 	enum KnightTemplarState
 	{
@@ -59,7 +62,6 @@ namespace TEN::Entities::TR4
 		auto* item = &g_Level.Items[itemNumber];
 
 		ClearItem(itemNumber);
-
 		item->Animation.AnimNumber = Objects[ID_KNIGHT_TEMPLAR].animIndex + KTEMPLAR_ANIM_IDLE;
 		item->Animation.TargetState = KTEMPLAR_STATE_IDLE;
 		item->Animation.ActiveState = KTEMPLAR_STATE_IDLE;
@@ -77,11 +79,11 @@ namespace TEN::Entities::TR4
 		auto* object = &Objects[item->ObjectNumber];
 
 		if (item->Animation.AnimNumber == object->animIndex ||
-			item->Animation.AnimNumber - object->animIndex == KTEMPLAR_ANIM_WALK_FORWARD_RIGHT_1 ||
-			item->Animation.AnimNumber - object->animIndex == KTEMPLAR_ANIM_WALK_FORWARD_LEFT_2 ||
-			item->Animation.AnimNumber - object->animIndex == KTEMPLAR_ANIM_WALK_FORWARD_RIGHT_2)
+			(item->Animation.AnimNumber - object->animIndex) == KTEMPLAR_ANIM_WALK_FORWARD_RIGHT_1 ||
+			(item->Animation.AnimNumber - object->animIndex) == KTEMPLAR_ANIM_WALK_FORWARD_LEFT_2 ||
+			(item->Animation.AnimNumber - object->animIndex) == KTEMPLAR_ANIM_WALK_FORWARD_RIGHT_2)
 		{
-			if (GetRandomControl() & 1)
+			if (TestProbability(0.5f))
 			{
 				auto pos = Vector3Int(0, 48, 448);
 				GetJointAbsPosition(item, &pos, 10);
@@ -113,8 +115,8 @@ namespace TEN::Entities::TR4
 		if (creature->Enemy != LaraItem)
 			a = phd_atan(item->Pose.Position.z - LaraItem->Pose.Position.z, item->Pose.Position.x - LaraItem->Pose.Position.x);
 
-		GetCreatureMood(item, &AI, VIOLENT);
-		CreatureMood(item, &AI, VIOLENT);
+		GetCreatureMood(item, &AI, true);
+		CreatureMood(item, &AI, true);
 
 		angle = CreatureTurn(item, creature->MaxTurn);
 
@@ -132,7 +134,7 @@ namespace TEN::Entities::TR4
 		{
 		case KTEMPLAR_STATE_IDLE:
 			item->Animation.TargetState = KTEMPLAR_STATE_WALK_FORWARD;
-			creature->MaxTurn = KNIGHT_TEMPLAR_IDLE_TURN_ANGLE;
+			creature->MaxTurn = KTEMPLAR_IDLE_TURN_RATE_MAX;
 			creature->Flags = 0;
 
 			if (AI.distance > pow(SECTOR(0.67f), 2))
@@ -140,9 +142,9 @@ namespace TEN::Entities::TR4
 				if (Lara.TargetEntity == item)
 					item->Animation.TargetState = KTEMPLAR_STATE_SHIELD;
 			}
-			else if (GetRandomControl() & 1)
+			else if (TestProbability(0.5f))
 				item->Animation.TargetState = KTEMPLAR_STATE_SWORD_ATTACK_2;
-			else if (GetRandomControl() & 1)
+			else if (TestProbability(0.5f))
 				item->Animation.TargetState = KTEMPLAR_STATE_SWORD_ATTACK_1;
 			else
 				item->Animation.TargetState = KTEMPLAR_STATE_SWORD_ATTACK_3;
@@ -150,7 +152,7 @@ namespace TEN::Entities::TR4
 			break;
 
 		case KTEMPLAR_STATE_WALK_FORWARD:
-			creature->MaxTurn = KNIGHT_TEMPLAR_WALK_TURN_ANGLE;
+			creature->MaxTurn = KTEMPLAR_WALK_TURN_RATE_MAX;
 
 			if (Lara.TargetEntity == item || AI.distance <= pow(SECTOR(0.67f), 2))
 				item->Animation.TargetState = KTEMPLAR_STATE_IDLE;
@@ -210,16 +212,9 @@ namespace TEN::Entities::TR4
 				{
 					if (item->TestBits(JointBitType::Touch, KnightTemplarSwordAttackJoints))
 					{
-						CreatureEffect2(
-							item,
-							&KnightTemplarBite,
-							20,
-							-1,
-							DoBloodSplat);
-
-						creature->Flags = 1;
-
 						DoDamage(creature->Enemy, KNIGHT_TEMPLAR_SWORD_ATTACK_DAMAGE);
+						CreatureEffect2(item, KnightTemplarBite, 20, -1, DoBloodSplat);
+						creature->Flags = 1;
 					}
 				}
 			}
@@ -239,7 +234,7 @@ namespace TEN::Entities::TR4
 
 			if (item->HitStatus)
 			{
-				if (GetRandomControl() & 1)
+				if (TestProbability(0.5f))
 					item->Animation.TargetState = KTEMPLAR_STATE_SHIELD_HIT_1;
 				else
 					item->Animation.TargetState = KTEMPLAR_STATE_SHIELD_HIT_2;

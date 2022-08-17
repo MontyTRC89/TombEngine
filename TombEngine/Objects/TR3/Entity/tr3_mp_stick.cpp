@@ -17,8 +17,8 @@ using std::vector;
 
 namespace TEN::Entities::TR3
 {
-	BITE_INFO MPStickBite1 = { 247, 10, 11, 13 };
-	BITE_INFO MPStickBite2 = { 0, 0, 100, 6 };
+	const auto MPStickBite1 = BiteInfo(Vector3(247.0f, 10.0f, 11.0f), 13);
+	const auto MPStickBite2 = BiteInfo(Vector3(0.0f, 0.0f, 100.0f), 6);
 	const vector<int> MPStickPunchAttackJoints = { 10, 13 };
 	const vector<int> MPStickKickAttackJoints = { 5, 6 };
 
@@ -148,8 +148,8 @@ namespace TEN::Entities::TR3
 				laraAI.distance = pow(dx, 2) + pow(dz, 2);
 			}
 
-			GetCreatureMood(item, &AI, VIOLENT);
-			CreatureMood(item, &AI, VIOLENT);
+			GetCreatureMood(item, &AI, true);
+			CreatureMood(item, &AI, true);
 
 			angle = CreatureTurn(item, creature->MaxTurn);
 
@@ -346,7 +346,7 @@ namespace TEN::Entities::TR3
 				{
 					if (!creature->Flags && item->TestBits(JointBitType::Touch, MPStickPunchAttackJoints))
 					{
-						CreatureEffect(item, &MPStickBite1, DoBloodSplat);
+						CreatureEffect(item, MPStickBite1, DoBloodSplat);
 						DoDamage(enemy, 80);
 						SoundEffect(SFX_TR4_LARA_THUD, &item->Pose);
 						creature->Flags = 1;
@@ -361,7 +361,7 @@ namespace TEN::Entities::TR3
 							abs(enemy->Pose.Position.z - item->Pose.Position.z) < SECTOR(0.25f))
 						{
 							creature->Flags = 1;
-							CreatureEffect(item, &MPStickBite1, DoBloodSplat);
+							CreatureEffect(item, MPStickBite1, DoBloodSplat);
 							DoDamage(enemy, 5);
 							SoundEffect(SFX_TR4_LARA_THUD, &item->Pose);
 						}
@@ -383,7 +383,7 @@ namespace TEN::Entities::TR3
 				{
 					if (!creature->Flags && item->TestBits(JointBitType::Touch, MPStickPunchAttackJoints))
 					{
-						CreatureEffect(item, &MPStickBite1, DoBloodSplat);
+						CreatureEffect(item, MPStickBite1, DoBloodSplat);
 						DoDamage(enemy, 80);
 						SoundEffect(SFX_TR4_LARA_THUD, &item->Pose);
 						creature->Flags = 1;
@@ -398,7 +398,7 @@ namespace TEN::Entities::TR3
 							abs(enemy->Pose.Position.z - item->Pose.Position.z) < SECTOR(0.25f))
 						{
 							creature->Flags = 1;
-							CreatureEffect(item, &MPStickBite1, DoBloodSplat);
+							CreatureEffect(item, MPStickBite1, DoBloodSplat);
 							DoDamage(enemy, 5);
 							SoundEffect(SFX_TR4_LARA_THUD, &item->Pose);
 						}
@@ -423,7 +423,7 @@ namespace TEN::Entities::TR3
 				{
 					if (creature->Flags != 2 && item->TestBits(JointBitType::Touch, MPStickPunchAttackJoints))
 					{
-						CreatureEffect(item, &MPStickBite1, DoBloodSplat);
+						CreatureEffect(item, MPStickBite1, DoBloodSplat);
 						DoDamage(enemy, 100);
 						creature->Flags = 2;
 						SoundEffect(70, &item->Pose);
@@ -438,7 +438,7 @@ namespace TEN::Entities::TR3
 							abs(enemy->Pose.Position.z - item->Pose.Position.z) < SECTOR(0.25f))
 						{
 							creature->Flags = 2;
-							CreatureEffect(item, &MPStickBite1, DoBloodSplat);
+							CreatureEffect(item, MPStickBite1, DoBloodSplat);
 							DoDamage(enemy, 6);
 							SoundEffect(SFX_TR4_LARA_THUD, &item->Pose);
 						}
@@ -458,7 +458,7 @@ namespace TEN::Entities::TR3
 					if (creature->Flags != 1 && item->TestBits(JointBitType::Touch, MPStickKickAttackJoints) &&
 						item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 8)
 					{
-						CreatureEffect(item, &MPStickBite2, DoBloodSplat);
+						CreatureEffect(item, MPStickBite2, DoBloodSplat);
 						DoDamage(enemy, 150);
 						SoundEffect(SFX_TR4_LARA_THUD, &item->Pose);
 						creature->Flags = 1;
@@ -474,7 +474,7 @@ namespace TEN::Entities::TR3
 							abs(enemy->Pose.Position.z - item->Pose.Position.z) < SECTOR(0.25f))
 						{
 							creature->Flags = 1;
-							CreatureEffect(item, &MPStickBite2, DoBloodSplat);
+							CreatureEffect(item, MPStickBite2, DoBloodSplat);
 							DoDamage(enemy, 9);
 							SoundEffect(SFX_TR4_LARA_THUD, &item->Pose);
 						}

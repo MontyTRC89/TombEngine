@@ -1,23 +1,27 @@
 #include "framework.h"
-#include "tr4_wild_boar.h"
+#include "Objects/TR4/Entity/tr4_wild_boar.h"
+
 #include "Game/control/box.h"
-#include "Game/items.h"
-#include "Game/effects/effects.h"
-#include "Specific/setup.h"
+#include "Game/control/control.h"
 #include "Game/control/lot.h"
-#include "Specific/level.h"
+#include "Game/effects/effects.h"
+#include "Game/itemdata/creature_info.h"
+#include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
-#include "Game/itemdata/creature_info.h"
-#include "Game/control/control.h"
+#include "Specific/level.h"
+#include "Math/Random.h"
+#include "Specific/setup.h"
+
+using namespace TEN::Math::Random;
 
 namespace TEN::Entities::TR4
 {
-	BITE_INFO WildBoatBiteInfo = { 0, 0, 0, 14 };
-
 	constexpr auto WILD_BOAR_ATTACK_DAMAGE = 30;
 
-	constexpr auto WILD_BOAR_ATTACK_RANGE = CLICK(1);
+	constexpr auto WILD_BOAR_ATTACK_RANGE = SQUARE(CLICK(1));
+
+	const auto WildBoarBite = BiteInfo(Vector3::Zero, 14);
 
 	enum WildBoarState
 	{
@@ -112,12 +116,12 @@ namespace TEN::Entities::TR4
 			AI_INFO AI;
 			CreatureAIInfo(item, &AI);
 
-			GetCreatureMood(item, &AI, VIOLENT);
+			GetCreatureMood(item, &AI, true);
 
 			if (item->Flags)
 				creature->Mood = MoodType::Escape;
 
-			CreatureMood(item, &AI, VIOLENT);
+			CreatureMood(item, &AI, true);
 
 			angle = CreatureTurn(item, creature->MaxTurn);
 
@@ -134,7 +138,7 @@ namespace TEN::Entities::TR4
 
 				if (AI.ahead && AI.distance || item->Flags)
 					item->Animation.TargetState = BOAR_STATE_RUN_FORWARD;
-				else if (GetRandomControl() & 0x7F)
+				else if (TestProbability(0.992f))
 				{
 					joint1 = AIGuard(creature) / 2;
 					joint3 = joint1;
@@ -149,7 +153,7 @@ namespace TEN::Entities::TR4
 
 				if (AI.ahead && AI.distance)
 					item->Animation.TargetState = BOAR_STATE_IDLE;
-				else if (!(GetRandomControl() & 0x7F))
+				else if (TestProbability(0.008f))
 					item->Animation.TargetState = BOAR_STATE_IDLE;
 
 				break;
@@ -167,12 +171,12 @@ namespace TEN::Entities::TR4
 					joint2 = -AI.distance;
 				}
 
-				if (!item->Flags && (AI.distance < pow(WILD_BOAR_ATTACK_RANGE, 2) && AI.bite))
+				if (!item->Flags && (AI.distance < WILD_BOAR_ATTACK_RANGE && AI.bite))
 				{
 					item->Animation.TargetState = BOAR_STATE_ATTACK;
 
 					DoDamage(creature->Enemy, WILD_BOAR_ATTACK_DAMAGE);
-					CreatureEffect2(item, &WildBoatBiteInfo, 3, item->Pose.Orientation.y, DoBloodSplat);
+					CreatureEffect2(item, WildBoarBite, 3, item->Pose.Orientation.y, DoBloodSplat);
 					item->Flags = 1;
 				}
 

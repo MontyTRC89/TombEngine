@@ -152,7 +152,7 @@ void SnapItemToLedge(ItemInfo* item, CollisionInfo* coll, float offsetMultiplier
 void SnapItemToLedge(ItemInfo* item, CollisionInfo* coll, short angle, float offsetMultiplier = 0.0f);
 void SnapItemToGrid(ItemInfo* item, CollisionInfo* coll);
 
-void CalculateItemRotationToSurface(ItemInfo* item, float radiusDivisor = 1.0f, short xOffset = 0, short zOffset = 0);
+void CalculateItemRotationToSurface(ItemInfo* item, float radiusDivisor = 1.0f, float maxAngle = 45.0f, short xOffset = 0, short zOffset = 0);
 
 bool TestEnvironment(RoomEnvFlags environmentType, int x, int y, int z, int roomNumber);
 bool TestEnvironment(RoomEnvFlags environmentType, ItemInfo* item);

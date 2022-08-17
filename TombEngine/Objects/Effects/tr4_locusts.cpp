@@ -72,9 +72,9 @@ namespace TEN::Entities::TR4
 			locust->pos.Orientation.y = (GetRandomControl() & 0x7FF) + angles.y - ANGLE(5.6f);
 			locust->roomNumber = item->RoomNumber;
 			locust->randomRotation = (GetRandomControl() & 0x1F) + 0x10;
-			locust->escapeYrot = (GetRandomControl() & 0x1FF);
-			locust->escapeXrot = ((GetRandomControl() & 0x7) + 0xF) * 20;
-			locust->counter = 0;
+			locust->escapeYrot = GetRandomControl() & 0x1FF;
+			locust->escapeXrot = (GetRandomControl() & 0x1F) + 16;
+			locust->counter = 20 * ((GetRandomControl() & 0x7) + 0xF);
 		}
 	}
 
@@ -122,15 +122,10 @@ namespace TEN::Entities::TR4
 			if (locust->on)
 			{
 				// NOTE: not present in original TR4 code
-				//if (LaraItem == nullptr)
-				//    LaraItem = LaraItem;
-
-				if ((Lara.Control.KeepLow || LaraItem->HitPoints <= 0) &&
-					locust->counter >= 90 &&
-					!(GetRandomControl() & 7))
-				{
+				//if (locust->target == nullptr)
+				//    locust->target = LaraItem;
+				if ((Lara.Burn || LaraItem->HitPoints <= 0) && locust->counter >= 90 && !(GetRandomControl() & 7))
 					locust->counter = 90;
-				}
 
 				locust->counter--;
 				if (locust->counter == 0)
@@ -154,7 +149,7 @@ namespace TEN::Entities::TR4
 						LaraItem->Pose.Position.z + locust->escapeZrot * 8
 					));
 
-				int distance = pow(LaraItem->Pose.Position.z - locust->pos.Position.z, 2) + pow(LaraItem->Pose.Position.x - locust->pos.Position.x, 2);
+				int distance = SQUARE(LaraItem->Pose.Position.z - locust->pos.Position.z) + SQUARE(LaraItem->Pose.Position.x - locust->pos.Position.x);
 				int square = int(sqrt(distance)) / 8;
 				if (square <= 128)
 				{
