@@ -51,7 +51,7 @@ namespace TEN::Utils
 
 	void BitField::Set(const vector<uint>& indices)
 	{
-		for (uint index : indices)
+		for (auto& index : indices)
 		{
 			if (index >= Field.size())
 				continue;
@@ -72,7 +72,7 @@ namespace TEN::Utils
 
 	void BitField::Clear(const vector<uint>& indices)
 	{
-		for (uint index : indices)
+		for (auto& index : indices)
 		{
 			if (index >= Field.size())
 				continue;
@@ -93,7 +93,7 @@ namespace TEN::Utils
 	
 	void BitField::Flip(const vector<uint>& indices)
 	{
-		for (uint index : indices)
+		for (auto& index : indices)
 		{
 			if (index >= Field.size())
 				continue;
@@ -114,7 +114,7 @@ namespace TEN::Utils
 
 	bool BitField::Test(const vector<uint>& indices)
 	{
-		for (uint index : indices)
+		for (auto& index : indices)
 		{
 			if (!Field[index])
 				return false;
