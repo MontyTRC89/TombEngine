@@ -1,3 +1,9 @@
+Version 1.0.2
+=============
+
+* Implement collision between minecart and rollingball
+
+
 Version 1.0.1
 =============
 
