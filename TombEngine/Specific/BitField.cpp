@@ -17,12 +17,12 @@ namespace TEN::Utils
 	// TODO: packedBits as ulong has max size of 64.
 	BitField::BitField(uint size, ulong packedBits)
 	{
+		this->Field.resize(size);
+
 		vector<uint> indices = {};
-		
 		for (size_t i = 0; i < size; i++)
 		{
 			uint bit = uint(1 << i);
-
 			if ((packedBits & bit) == bit)
 				indices.push_back(i);
 		}
