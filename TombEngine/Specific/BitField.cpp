@@ -30,12 +30,12 @@ namespace TEN::Utils
 		this->Set(indices);
 	}
 
-	unsigned int BitField::GetSize()
+	uint BitField::GetSize()
 	{
 		return Field.size();
 	}
 
-	unsigned long BitField::GetPackedBits()
+	ulong BitField::GetPackedBits()
 	{
 		ulong packedBits = 0;
 

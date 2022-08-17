@@ -6,9 +6,6 @@ namespace TEN::Utils
 {
 	class BitField
 	{
-		typedef unsigned int  uint;
-		typedef unsigned long ulong;
-
 	private:
 		vector<bool> Field;
 
@@ -17,8 +14,8 @@ namespace TEN::Utils
 		BitField(uint size);
 		BitField(uint size, ulong packedBits);
 
-		unsigned int  GetSize();
-		unsigned long GetPackedBits();
+		uint  GetSize();
+		ulong GetPackedBits();
 
 		void Set(const vector<uint>& indices);
 		void Set(uint index);
