@@ -1,6 +1,5 @@
 #pragma once
 
-using std::bitset;
 using std::vector;
 
 namespace TEN::Utils

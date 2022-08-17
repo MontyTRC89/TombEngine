@@ -14,7 +14,7 @@ namespace TEN::Utils
 		this->Field.resize(size);
 	}
 
-	// TODO: packedBits as uint has max size of 64.
+	// TODO: packedBits as ulong has max size of 64.
 	BitField::BitField(uint size, ulong packedBits)
 	{
 		vector<uint> indices = {};
@@ -39,7 +39,7 @@ namespace TEN::Utils
 	{
 		ulong packedBits = 0;
 
-		// TODO: uint has max size of 64.
+		// TODO: ulong has max size of 64.
 		for (size_t i = 0; i <= 64; i++)
 		{
 			uint bit = uint(1 << i);
