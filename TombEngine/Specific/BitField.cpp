@@ -5,17 +5,21 @@ using std::vector;
 
 namespace TEN::Utils
 {
-	template <unsigned int MAX>
-	BitField<MAX>::BitField()
+	BitField::BitField()
 	{
 	}
 
-	template <unsigned int MAX>
-	BitField<MAX>::BitField(ulong packedBits)
+	BitField::BitField(uint size)
+	{
+		this->BitSet.resize(size);
+	}
+
+	// TODO: packedBits as uint has max size of 64.
+	BitField::BitField(uint size, ulong packedBits)
 	{
 		vector<uint> indices = {};
 		
-		for (size_t i = 0; i <= MAX; i++)
+		for (size_t i = 0; i <= size; i++)
 		{
 			uint bit = uint(1 << i);
 
@@ -26,117 +30,123 @@ namespace TEN::Utils
 		this->Set(indices);
 	}
 
-	template <unsigned int MAX>
-	void BitField<MAX>::Set(vector<uint>& indices)
+	void BitField::Set(vector<uint>& indices)
 	{
 		for (uint& index : indices)
 		{
-			if (index > MAX)
+			if (index > BitSet.size())
 				continue;
 
-			this->BitSet.set(index);
+			this->BitSet[index] = true;
 		}
 	}
 
-	template <unsigned int MAX>
-	void BitField<MAX>::Set(uint index)
+	void BitField::Set(uint index)
 	{
 		this->Set({ index });
 	}
 
-	template <unsigned int MAX>
-	void BitField<MAX>::SetAll()
+	void BitField::SetAll()
 	{
-		this->BitSet.set();
+		std::fill(this->BitSet.begin(), this->BitSet.end(), true);
 	}
 
-	template <unsigned int MAX>
-	void BitField<MAX>::Clear(vector<uint>& indices)
+	void BitField::Clear(vector<uint>& indices)
 	{
 		for (uint& index : indices)
 		{
-			if (index > MAX)
+			if (index > BitSet.size())
 				continue;
 
-			this->BitSet.reset(index);
+			this->BitSet[index] = false;
 		}
 	}
-
-	template <unsigned int MAX>
-	void BitField<MAX>::Clear(uint index)
+	
+	void BitField::Clear(uint index)
 	{
 		this->Clear({ index });
 	}
 
-	template <unsigned int MAX>
-	void BitField<MAX>::ClearAll()
+	void BitField::ClearAll()
 	{
-		this->BitSet.reset();
+		std::fill(this->BitSet.begin(), this->BitSet.end(), false);
 	}
-
-	template <unsigned int MAX>
-	void BitField<MAX>::Flip(vector<uint>& indices)
+	
+	void BitField::Flip(vector<uint>& indices)
 	{
 		for (uint& index : indices)
 		{
-			if (index > MAX)
+			if (index > BitSet.size())
 				continue;
 
-			this->BitSet.flip(index);
+			this->BitSet[index].flip();
 		}
 	}
-
-	template <unsigned int MAX>
-	void BitField<MAX>::Flip(uint index)
+	
+	void BitField::Flip(uint index)
 	{
 		this->Flip({ index });
 	}
 
-	template <unsigned int MAX>
-	void BitField<MAX>::FlipAll()
+	void BitField::FlipAll()
 	{
 		this->BitSet.flip();
 	}
 
-	template <unsigned int MAX>
-	bool BitField<MAX>::Test(vector<uint>& indices)
+	bool BitField::Test(vector<uint>& indices)
 	{
 		for (uint& index : indices)
 		{
-			if (!BitSet.test(index))
+			if (!BitSet[index])
 				return false;
 		}
 
 		return true;
 	}
 
-	template <unsigned int MAX>
-	bool BitField<MAX>::Test(uint index)
+	bool BitField::Test(uint index)
 	{
-		this->Test({ index });
+		return this->Test({ index });
 	}
 
-	template <unsigned int MAX>
-	bool BitField<MAX>::TestAll()
+	bool BitField::TestAll()
 	{
-		return BitSet.all();
+		for (auto& bit : this->BitSet)
+		{
+			if (!bit)
+				return false;
+		}
+
+		return true;
 	}
 	
-	template <unsigned int MAX>
-	bool BitField<MAX>::TestNone()
+	bool BitField::TestNone()
 	{
-		return BitSet.none();
+		for (auto& bit : this->BitSet)
+		{
+			if (bit)
+				return false;
+		}
+
+		return true;
+	}
+	
+	unsigned int BitField::GetSize()
+	{
+		return BitSet.size();
 	}
 
-	template <unsigned int MAX>
-	unsigned int BitField<MAX>::GetSize()
+	unsigned long BitField::GetPackedBits()
 	{
-		return MAX;
-	}
+		ulong packedBits = 0;
 
-	template <unsigned int MAX>
-	unsigned long BitField<MAX>::GetPackedBits()
-	{
-		return BitSet.to_ulong();
+		// TODO: uint has max size of 64.
+		for (size_t i = 0; i <= 64; i++)
+		{
+			uint bit = uint(1 << i);
+			packedBits |= bit;
+		}
+
+		return packedBits;
 	}
 }

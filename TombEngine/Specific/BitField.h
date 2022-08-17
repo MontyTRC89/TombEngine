@@ -5,18 +5,18 @@ using std::vector;
 
 namespace TEN::Utils
 {
-	template <unsigned int MAX>
 	class BitField
 	{
 		typedef unsigned int  uint;
 		typedef unsigned long ulong;
 
 	private:
-		bitset<MAX> BitSet;
+		vector<bool> BitSet;
 
 	public:
 		BitField();
-		BitField(ulong packedBits);
+		BitField(uint size);
+		BitField(uint size, ulong packedBits);
 
 		void Set(vector<uint>& indices);
 		void Set(uint index);
