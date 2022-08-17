@@ -11,12 +11,15 @@ namespace TEN::Utils
 		typedef unsigned long ulong;
 
 	private:
-		vector<bool> BitSet;
+		vector<bool> Field;
 
 	public:
 		BitField();
 		BitField(uint size);
 		BitField(uint size, ulong packedBits);
+
+		unsigned int  GetSize();
+		unsigned long GetPackedBits();
 
 		void Set(vector<uint>& indices);
 		void Set(uint index);
@@ -33,7 +36,7 @@ namespace TEN::Utils
 		bool TestAll();
 		bool TestNone();
 
-		unsigned int  GetSize();
-		unsigned long GetPackedBits();
+	private:
+		void Fill(bool value);
 	};
 }
