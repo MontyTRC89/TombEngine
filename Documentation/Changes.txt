@@ -1,3 +1,9 @@
+Version 1.0.2
+=============
+
+* Fix zeroed forward velocity upon landing.
+* Adjust max turn rate of idle state.
+
 Version 1.0.1
 =============
 
