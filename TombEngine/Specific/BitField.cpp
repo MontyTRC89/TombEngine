@@ -11,13 +11,13 @@ namespace TEN::Utils
 
 	BitField::BitField(uint size)
 	{
-		this->Field.resize(size);
+		this->Container.resize(size);
 	}
 
 	// TODO: packedBits as ulong has max size of 64.
 	BitField::BitField(uint size, ulong packedBits)
 	{
-		this->Field.resize(size);
+		this->Container.resize(size);
 
 		vector<uint> indices = {};
 		for (size_t i = 0; i < size; i++)
@@ -32,7 +32,7 @@ namespace TEN::Utils
 
 	uint BitField::GetSize()
 	{
-		return Field.size();
+		return Container.size();
 	}
 
 	ulong BitField::GetPackedBits()
@@ -53,10 +53,10 @@ namespace TEN::Utils
 	{
 		for (auto& index : indices)
 		{
-			if (index >= Field.size())
+			if (index >= Container.size())
 				continue;
 
-			this->Field[index] = true;
+			this->Container[index] = true;
 		}
 	}
 
@@ -74,10 +74,10 @@ namespace TEN::Utils
 	{
 		for (auto& index : indices)
 		{
-			if (index >= Field.size())
+			if (index >= Container.size())
 				continue;
 
-			this->Field[index] = false;
+			this->Container[index] = false;
 		}
 	}
 	
@@ -95,10 +95,10 @@ namespace TEN::Utils
 	{
 		for (auto& index : indices)
 		{
-			if (index >= Field.size())
+			if (index >= Container.size())
 				continue;
 
-			this->Field[index].flip();
+			this->Container[index].flip();
 		}
 	}
 	
@@ -109,14 +109,14 @@ namespace TEN::Utils
 
 	void BitField::FlipAll()
 	{
-		this->Field.flip();
+		this->Container.flip();
 	}
 
 	bool BitField::Test(const vector<uint>& indices)
 	{
 		for (auto& index : indices)
 		{
-			if (!Field[index])
+			if (!Container[index])
 				return false;
 		}
 
@@ -130,7 +130,7 @@ namespace TEN::Utils
 
 	bool BitField::TestAll()
 	{
-		for (auto& bit : this->Field)
+		for (auto& bit : this->Container)
 		{
 			if (!bit)
 				return false;
@@ -141,7 +141,7 @@ namespace TEN::Utils
 	
 	bool BitField::TestNone()
 	{
-		for (auto& bit : this->Field)
+		for (auto& bit : this->Container)
 		{
 			if (bit)
 				return false;
@@ -152,6 +152,6 @@ namespace TEN::Utils
 	
 	void BitField::Fill(bool value)
 	{
-		std::fill(this->Field.begin(), this->Field.end(), value);
+		std::fill(this->Container.begin(), this->Container.end(), value);
 	}
 }

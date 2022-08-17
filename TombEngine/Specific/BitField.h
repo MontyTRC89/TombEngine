@@ -7,7 +7,7 @@ namespace TEN::Utils
 	class BitField
 	{
 	private:
-		vector<bool> Field;
+		vector<bool> Container;
 
 	public:
 		BitField();
