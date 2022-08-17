@@ -1461,7 +1461,7 @@ void CalculateCamera()
 	auto* bounds = GetBoundsAccurate(item);
 
 	int x;
-	int y = ((bounds->Y1 + bounds->Y2) / 2) + item->Pose.Position.y - CLICK(1);
+	int y = item->Pose.Position.y + bounds->Y2 + (3 * (bounds->Y1 - bounds->Y2) / 4);
 	int z;
 
 	if (Camera.item)
