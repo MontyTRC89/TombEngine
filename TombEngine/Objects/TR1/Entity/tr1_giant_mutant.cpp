@@ -12,8 +12,10 @@
 #include "Game/misc.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
+#include "Specific/prng.h"
 #include "Specific/setup.h"
 
+using namespace TEN::Math::Random;
 using std::vector;
 
 namespace TEN::Entities::TR1
@@ -24,16 +26,17 @@ namespace TEN::Entities::TR1
 	constexpr auto MUTANT_ATTACK_RANGE = SQUARE(SECTOR(2.5f));
 	constexpr auto MUTANT_CLOSE_RANGE  = SQUARE(SECTOR(2.2f));
 
-	constexpr auto MUTANT_ATTACK_1_CHANCE = 0x2AF8;
-	constexpr auto MUTANT_ATTACK_2_CHANCE = 0x55F0;
+	// TODO: Unused.
+	constexpr auto MUTANT_ATTACK_1_CHANCE = 0.33f;
+	constexpr auto MUTANT_ATTACK_2_CHANCE = 0.67f;
 
 	#define MUTANT_NEED_TURN ANGLE(45.0f)
 	#define MUTANT_TURN ANGLE(3.0f)
 
 	#define LARA_GIANT_MUTANT_DEATH 6 // TODO: Not 13? Check this.
 
-	const vector<int> MutantAttackJoints = { 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25 };
-	const vector<int> MutantAttackLeftJoints = { 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14 };
+	const vector<int> MutantAttackJoints	  = { 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25 };
+	const vector<int> MutantAttackLeftJoint	  = { 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14 };
 	const vector<int> MutantAttackRightJoints = { 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25 };
 
 	enum GiantMutantState
@@ -122,7 +125,7 @@ namespace TEN::Entities::TR1
 						else
 							item->Animation.TargetState = MUTANT_STATE_FORWARD;
 					}
-					else if (GetRandomControl() < 0x4000)
+					else if (TestProbability(0.5f))
 						item->Animation.TargetState = MUTANT_STATE_ATTACK_1;
 					else
 						item->Animation.TargetState = MUTANT_STATE_ATTACK_2;

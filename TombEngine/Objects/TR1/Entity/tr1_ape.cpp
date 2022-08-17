@@ -22,10 +22,10 @@ namespace TEN::Entities::TR1
 	constexpr auto APE_ATTACK_RANGE = SQUARE(SECTOR(0.42f));
 	constexpr auto APE_PANIC_RANGE	= SQUARE(SECTOR(2));
 
-	constexpr auto APE_JUMP_CHANCE		   = 0xA0;
-	constexpr auto APE_POUND_CHEST_CHANCE  = APE_JUMP_CHANCE + 0xA0;
-	constexpr auto APE_POUND_GROUND_CHANCE = APE_POUND_CHEST_CHANCE + 0xA0;
-	constexpr auto APE_RUN_LEFT_CHANCE	   = APE_POUND_GROUND_CHANCE + 0xA0;
+	constexpr auto APE_JUMP_CHANCE		   = 0.005f;
+	constexpr auto APE_POUND_CHEST_CHANCE  = 0.01f;
+	constexpr auto APE_POUND_GROUND_CHANCE = 0.015f;
+	constexpr auto APE_RUN_LEFT_CHANCE	   = 0.02f;
 
 	constexpr auto SHIFT = 75;
 

@@ -10,7 +10,10 @@
 #include "Game/people.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
+#include "Specific/prng.h"
 #include "Specific/trmath.h"
+
+using namespace TEN::Math::Random;
 
 namespace TEN::Entities::TR1
 {
@@ -20,8 +23,9 @@ namespace TEN::Entities::TR1
 	constexpr auto NATLA_DEATH_TIME = (FPS * 16); // 16 seconds.
 	constexpr auto NATLA_FLYMODE = 0x8000;
 	constexpr auto NATLA_TIMER = 0x7FFF;
-	constexpr auto NATLA_LAND_CHANCE = 0x100;
 	constexpr auto NATLA_GUN_VELOCITY = 400;
+
+	constexpr auto NATLA_LAND_CHANCE = 0.008f;
 
 	#define NATLA_TURN_NEAR_DEATH_SPEED ANGLE(6.0f)
 	#define NATLA_TURN_SPEED ANGLE(5.0f)
@@ -183,7 +187,7 @@ namespace TEN::Entities::TR1
 
 			if (item->Animation.ActiveState == NATLA_STATE_FLY && (creature->Flags & NATLA_FLYMODE))
 			{
-				if (creature->Flags & NATLA_FLYMODE && shoot && GetRandomControl() < NATLA_LAND_CHANCE)
+				if (creature->Flags & NATLA_FLYMODE && shoot && TestProbability(NATLA_LAND_CHANCE))
 					creature->Flags -= NATLA_FLYMODE;
 
 				if (!(creature->Flags & NATLA_FLYMODE))

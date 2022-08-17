@@ -15,15 +15,17 @@
 #include "Game/people.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
+#include "Specific/prng.h"
 #include "Specific/setup.h"
 
+using namespace TEN::Math::Random;
 using std::vector;
 
 namespace TEN::Entities::TR1
 {
 	constexpr auto CENTAUR_REAR_DAMAGE	 = 200;
 	constexpr auto CENTAUR_REAR_RANGE	 = SECTOR(1.5f);
-	constexpr auto CENTAUR_REAR_CHANCE	 = 0x60;
+	constexpr auto CENTAUR_REAR_CHANCE	 = 0.003f;
 	constexpr auto CENTAUR_BOMB_VELOCITY = 20;
 
 	#define CENTAUR_TURN_RATE_MAX ANGLE(4.0f)
@@ -98,18 +100,18 @@ namespace TEN::Entities::TR1
 			case CENTAUR_STATE_RUN_FORWARD:
 				if (AI.bite && AI.distance < pow(CENTAUR_REAR_RANGE, 2))
 				{
-					item->Animation.RequiredState = CENTAUR_STATE_WARNING;
 					item->Animation.TargetState = CENTAUR_STATE_IDLE;
+					item->Animation.RequiredState = CENTAUR_STATE_WARNING;
 				}
 				else if (Targetable(item, &AI))
 				{
+					item->Animation.TargetState = CENTAUR_STATE_IDLE;
 					item->Animation.RequiredState = CENTAUR_STATE_AIM;
-					item->Animation.TargetState = CENTAUR_STATE_IDLE;
 				}
-				else if (GetRandomControl() < CENTAUR_REAR_CHANCE)
+				else if (TestProbability(CENTAUR_REAR_CHANCE))
 				{
-					item->Animation.RequiredState = CENTAUR_STATE_WARNING;
 					item->Animation.TargetState = CENTAUR_STATE_IDLE;
+					item->Animation.RequiredState = CENTAUR_STATE_WARNING;
 				}
 
 				break;
@@ -137,8 +139,8 @@ namespace TEN::Entities::TR1
 				if (!item->Animation.RequiredState &&
 					item->TestBits(JointBitType::Touch, CentaurAttackJoints))
 				{
-					CreatureEffect(item, CentaurRearBite, DoBloodSplat);
 					DoDamage(creature->Enemy, CENTAUR_REAR_DAMAGE);
+					CreatureEffect(item, CentaurRearBite, DoBloodSplat);
 					item->Animation.RequiredState = CENTAUR_STATE_IDLE;
 				}
 
