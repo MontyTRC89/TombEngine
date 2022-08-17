@@ -22,10 +22,14 @@ namespace TEN::Entities::TR1
 	constexpr auto APE_ATTACK_RANGE = SQUARE(SECTOR(0.42f));
 	constexpr auto APE_PANIC_RANGE	= SQUARE(SECTOR(2));
 
-	constexpr auto APE_JUMP_CHANCE		   = 0.005f;
-	constexpr auto APE_POUND_CHEST_CHANCE  = 0.01f;
-	constexpr auto APE_POUND_GROUND_CHANCE = 0.015f;
-	constexpr auto APE_RUN_LEFT_CHANCE	   = 0.02f;
+	constexpr auto APE_IDLE_JUMP_CHANCE			= 0.16f;
+	constexpr auto APE_IDLE_POUND_CHEST_CHANCE  = 0.32f;
+	constexpr auto APE_IDLE_POUND_GROUND_CHANCE = 0.47f;
+	constexpr auto APE_IDLE_RUN_LEFT_CHANCE		= 0.63f;
+	constexpr auto APE_RUN_JUMP_CHANCE			= 0.005f;
+	constexpr auto APE_RUN_POUND_CHEST_CHANCE	= 0.01f;
+	constexpr auto APE_RUN_POUND_GROUND_CHANCE	= 0.015f;
+	constexpr auto APE_RUN_RUN_LEFT_CHANCE		= 0.02f;
 
 	constexpr auto SHIFT = 75;
 
@@ -207,14 +211,13 @@ namespace TEN::Entities::TR1
 				else if (!(creatureInfo->Flags & APE_FLAG_ATTACK) &&
 					AI.zoneNumber == AI.enemyZone && AI.ahead)
 				{
-					random = (short)(GetRandomControl() / 32);
-					if (random < APE_JUMP_CHANCE)
+					if (TestProbability(APE_IDLE_JUMP_CHANCE))
 						item->Animation.TargetState = APE_STATE_JUMP;
-					else if (random < APE_POUND_CHEST_CHANCE)
+					else if (TestProbability(APE_IDLE_POUND_CHEST_CHANCE))
 						item->Animation.TargetState = APE_STATE_POUND_CHEST;
-					else if (random < APE_POUND_GROUND_CHANCE)
+					else if (TestProbability(APE_IDLE_POUND_GROUND_CHANCE))
 						item->Animation.TargetState = APE_STATE_POUND_GROUND;
-					else if (random < APE_RUN_LEFT_CHANCE)
+					else if (TestProbability(APE_IDLE_RUN_LEFT_CHANCE))
 					{
 						item->Animation.TargetState = APE_STATE_RUN_LEFT;
 						creatureInfo->MaxTurn = 0;
@@ -246,18 +249,17 @@ namespace TEN::Entities::TR1
 				}
 				else if (creatureInfo->Mood != MoodType::Escape)
 				{
-					random = (short)GetRandomControl();
-					if (random < APE_JUMP_CHANCE)
+					if (TestProbability(APE_RUN_JUMP_CHANCE))
 					{
 						item->Animation.RequiredState = APE_STATE_JUMP;
 						item->Animation.TargetState = APE_STATE_IDLE;
 					}
-					else if (random < APE_POUND_CHEST_CHANCE)
+					else if (TestProbability(APE_RUN_POUND_CHEST_CHANCE))
 					{
 						item->Animation.RequiredState = APE_STATE_POUND_CHEST;
 						item->Animation.TargetState = APE_STATE_IDLE;
 					}
-					else if (random < APE_POUND_GROUND_CHANCE)
+					else if (TestProbability(APE_RUN_POUND_GROUND_CHANCE))
 					{
 						item->Animation.RequiredState = APE_STATE_POUND_GROUND;
 						item->Animation.TargetState = APE_STATE_IDLE;
