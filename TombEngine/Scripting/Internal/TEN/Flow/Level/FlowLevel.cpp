@@ -49,7 +49,6 @@ void Level::Register(sol::table & parent)
 		"layer1", &Level::Layer1,
 
 /// (@{Flow.SkyLayer}) Secondary sky layer
-// __(not yet implemented)__
 //@mem layer2
 		"layer2", &Level::Layer2,
 
@@ -62,13 +61,6 @@ void Level::Register(sol::table & parent)
 /// (bool) Draw sky layer? (default: false)
 //@mem horizon
 		"horizon", &Level::Horizon,
-
-/// (bool) Enable smooth transition from horizon graphic to sky layer.
-// If set to false, there will be a black band between the two.
-//
-// __(not yet implemented)__
-//@mem colAddHorizon
-		"colAddHorizon", &Level::ColAddHorizon,
 
 /// (bool) Enable flickering lightning in the sky.
 // Equivalent to classic TRLE's LIGHTNING setting. As in the TRC Ireland levels.
