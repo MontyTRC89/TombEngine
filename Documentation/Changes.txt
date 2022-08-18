@@ -1,8 +1,9 @@
 Version 1.0.2
 =============
 
-* Implement collision between minecart and rollingball
-
+* Fix zeroed forward velocity upon landing.
+* Adjust max turn rate of idle state.
+* Implement death upon collision between minecart and rolling ball.
 
 Version 1.0.1
 =============
