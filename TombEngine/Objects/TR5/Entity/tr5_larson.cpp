@@ -141,7 +141,7 @@ namespace TEN::Entities::TR5
 			CreatureMood(item, &AI, true);
 
 			if (AI.distance < SQUARE(SECTOR(2)) &&
-				LaraItem->Animation.Velocity > 20 ||
+				LaraItem->Animation.Velocity.z > 20.0f ||
 				item->HitStatus ||
 				TargetVisible(item, &AI) != 0)
 			{

@@ -29,10 +29,10 @@ namespace TEN::Entities::TR3
 	#define SHIVA_WALK_TURN_RATE_MAX   ANGLE(4.0f)
 	#define SHIVA_ATTACK_TURN_RATE_MAX ANGLE(4.0f)
 
-	const vector<int> ShivaAttackLeftJoints	 = { 10, 13 };
-	const vector<int> ShivaAttackRightJoints = { 22, 25 };
 	const auto ShivaBiteLeft  = BiteInfo(Vector3(0.0f, 0.0f, 920.0f), 13);
 	const auto ShivaBiteRight = BiteInfo(Vector3(0.0f, 0.0f, 920.0f), 22);
+	const vector<int> ShivaAttackLeftJoints	 = { 10, 13 };
+	const vector<int> ShivaAttackRightJoints = { 22, 25 };
 
 	enum ShivaState
 	{
@@ -81,7 +81,7 @@ namespace TEN::Entities::TR3
 
 	};
 
-	static void TriggerShivaSmoke(long x, long y, long z, long uw)
+	void TriggerShivaSmoke(long x, long y, long z, long uw)
 	{
 		long dx = LaraItem->Pose.Position.x - x;
 		long dz = LaraItem->Pose.Position.z - z;
@@ -169,7 +169,7 @@ namespace TEN::Entities::TR3
 		sptr->dSize = size;
 	}
 
-	static void ShivaDamage(ItemInfo* item, CreatureInfo* creature, int damage)
+	void ShivaDamage(ItemInfo* item, CreatureInfo* creature, int damage)
 	{
 		if (!(creature->Flags) && item->TestBits(JointBitType::Touch, ShivaAttackRightJoints))
 		{
@@ -451,8 +451,8 @@ namespace TEN::Entities::TR3
 
 			case SHIVA_STATE_KILL:
 				shiva->MaxTurn = 0;
-				extraHeadRot = Vector3Shrt();
-				extraTorsoRot = Vector3Shrt();
+				extraHeadRot = Vector3Shrt::Zero;
+				extraTorsoRot = Vector3Shrt::Zero;
 
 				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + SHIVA_ANIM_WALK_FORWARD_TO_GUARDED_LEFT_1 ||
 					item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + SHIVA_ANIM_WALK_BACK_RIGHT ||
@@ -466,7 +466,7 @@ namespace TEN::Entities::TR3
 			}
 		}
 
-		// Dispatch kill animation
+		// Dispatch kill animation.
 		if (laraAlive && LaraItem->HitPoints <= 0)
 		{
 			item->Animation.TargetState = SHIVA_STATE_KILL;
@@ -474,15 +474,13 @@ namespace TEN::Entities::TR3
 			if (LaraItem->RoomNumber != item->RoomNumber)
 				ItemNewRoom(Lara.ItemNumber, item->RoomNumber);
 
-			LaraItem->Pose.Position = item->Pose.Position;
-			LaraItem->Pose.Orientation = Vector3Shrt(0, item->Pose.Orientation.y, 0);
-			LaraItem->Animation.IsAirborne = false;
-
 			LaraItem->Animation.AnimNumber = Objects[ID_LARA_EXTRA_ANIMS].animIndex + LARA_ANIM_SHIVA_DEATH;
 			LaraItem->Animation.FrameNumber = g_Level.Anims[LaraItem->Animation.AnimNumber].frameBase;
 			LaraItem->Animation.ActiveState = LS_DEATH;
 			LaraItem->Animation.TargetState = LS_DEATH;
-
+			LaraItem->Animation.IsAirborne = false;
+			LaraItem->Pose.Position = item->Pose.Position;
+			LaraItem->Pose.Orientation = Vector3Shrt(0, item->Pose.Orientation.y, 0);
 			LaraItem->HitPoints = NOT_TARGETABLE;
 			Lara.Air = -1;
 			Lara.Control.HandStatus = HandStatus::Special;
