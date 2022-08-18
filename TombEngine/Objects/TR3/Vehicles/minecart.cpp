@@ -325,19 +325,16 @@ namespace TEN::Entities::Vehicles
 								}
 								else if (item->ObjectNumber == ID_ROLLINGBALL)
 								{
-									/*Boulder needs to be stopped some how - Kubsy 17/08/22*/
+									/*code, kill lara and stop both the boulder and the minecart*/
 									auto* minecart = GetMinecartInfo(minecartItem);
-
 									laraItem->Animation.AnimNumber = Objects[ID_MINECART_LARA_ANIMS].animIndex + MINECART_ANIM_WALL_DEATH;
 									laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
 									laraItem->Animation.ActiveState = MINECART_STATE_WALL_DEATH;
 									laraItem->Animation.TargetState = MINECART_STATE_WALL_DEATH;
 									laraItem->HitPoints = -1;
 									minecartItem->Animation.Velocity.z = 0;
-
 									minecart->Velocity = 0;
 									minecart->Flags = (minecart->Flags & ~MINECART_FLAG_CONTROL) | (MINECART_FLAG_STOPPED | MINECART_FLAG_DEAD);
-
 								}
 								else
 								{
