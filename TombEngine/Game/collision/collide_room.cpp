@@ -127,7 +127,7 @@ CollisionResult GetCollision(ItemInfo* item, short angle, float forward, float u
 {
 	short tempRoomNumber = item->RoomNumber;
 
-	// TODO: Find cleaner solution. Constructing a Location for Lara on the spot can result in a stumble when climbing onto thin platforms. -- Sezz 2022.06.14
+	// TODO: Find cleaner solution. Constructing a Location for Lara on the spot can result in a stumble when climbing onto thin platforms. @Sezz 2022.06.14
 	auto location =
 		item->IsLara() ?
 		item->Location :

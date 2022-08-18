@@ -325,8 +325,8 @@ namespace TEN::Entities::Vehicles
 								}
 								else if (item->ObjectNumber == ID_ROLLINGBALL)
 								{
+									/*code, kill lara and stop both the boulder and the minecart*/
 									auto* minecart = GetMinecartInfo(minecartItem);
-
 									laraItem->Animation.AnimNumber = Objects[ID_MINECART_LARA_ANIMS].animIndex + MINECART_ANIM_WALL_DEATH;
 									laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
 									laraItem->Animation.ActiveState = MINECART_STATE_WALL_DEATH;
