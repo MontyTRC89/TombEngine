@@ -1455,15 +1455,15 @@ int GetWaterHeight(ItemInfo* item)
 	return GetWaterHeight(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, item->RoomNumber);
 }
 
-short GetSurfaceSteepnessAngle(float xTilt, float zTilt)
+short GetSurfaceSteepnessAngle(Vector2 tilt)
 {
 	short qtrBlockAngleIncrement = ANGLE(45.0f) / 4;
-	return (short)sqrt(pow(xTilt * qtrBlockAngleIncrement, 2) + pow(zTilt * qtrBlockAngleIncrement, 2));
+	return (short)sqrt(pow(tilt.x * qtrBlockAngleIncrement, 2) + pow(tilt.y * qtrBlockAngleIncrement, 2));
 }
 
-short GetSurfaceAspectAngle(float xTilt, float zTilt)
+short GetSurfaceAspectAngle(Vector2 tilt)
 {
-	return (short)phd_atan(-zTilt, -xTilt);
+	return (short)phd_atan(-tilt.y, -tilt.x);
 }
 
 bool TestEnvironment(RoomEnvFlags environmentType, int x, int y, int z, int roomNumber)

@@ -332,7 +332,7 @@ short GetLaraSlideDirection(ItemInfo* item, CollisionInfo* coll)
 	// Get either:
 	// a) the surface aspect angle (extended slides), or
 	// b) the derived nearest cardinal direction from it (original slides).
-	headingAngle = GetSurfaceAspectAngle(probe.FloorTilt.x, probe.FloorTilt.y);
+	headingAngle = GetSurfaceAspectAngle(probe.FloorTilt);
 	if (g_GameFlow->HasSlideExtended())
 		return headingAngle;
 	else
@@ -539,8 +539,8 @@ void ModulateLaraSlideVelocity(ItemInfo* item, CollisionInfo* coll)
 	{
 		auto probe = GetCollision(item);
 		short minSlideAngle = ANGLE(33.75f);
-		short steepness = GetSurfaceSteepnessAngle(probe.FloorTilt.x, probe.FloorTilt.y);
-		short direction = GetSurfaceAspectAngle(probe.FloorTilt.x, probe.FloorTilt.y);
+		short steepness = GetSurfaceSteepnessAngle(probe.FloorTilt);
+		short direction = GetSurfaceAspectAngle(probe.FloorTilt);
 
 		float velocityMultiplier = 1 / (float)ANGLE(33.75f);
 		int slideVelocity = std::min<int>(minVelocity + 10 * (steepness * velocityMultiplier), LARA_TERMINAL_VELOCITY);
@@ -555,7 +555,25 @@ void ModulateLaraSlideVelocity(ItemInfo* item, CollisionInfo* coll)
 		//lara->ExtraVelocity.x += minVelocity;
 }
 
-void SetLaraJumpDirection(ItemInfo* item, CollisionInfo* coll)
+void AlignLaraToSurface(ItemInfo* item)
+{
+	auto probe = GetCollision(item);
+	short aspectAngle = GetSurfaceAspectAngle(probe.FloorTilt);
+	short steepnessAngle = std::min<short>(GetSurfaceSteepnessAngle(probe.FloorTilt), (ANGLE(45.0f) / 4) * 3);
+
+	short angularDistance = aspectAngle - item->Pose.Orientation.y;
+	float sinAngDist = phd_sin(angularDistance);
+	float cosAngDist = phd_cos(angularDistance);
+
+	auto extraRot = Vector3Shrt(
+		(-steepnessAngle * cosAngDist) - item->Pose.Orientation.x,
+		0,
+		(steepnessAngle * sinAngDist) - item->Pose.Orientation.z
+	);
+	item->Pose.Orientation += extraRot / 6; // TODO: Angle doesn't match because this smoothing method is wrong.
+}
+
+void SetLaraJumpDirection(ItemInfo* item, CollisionInfo* coll) 
 {
 	auto* lara = GetLaraInfo(item);
 
