@@ -131,7 +131,7 @@ namespace TEN::Entities::TR4
 		auto* creature = GetCreatureInfo(item);
 
 		short angle = 0;
-		short headY = 0;
+		auto extraHeadRot = Vector3Shrt::Zero;
 
 		if (item->HitPoints <= 0)
 		{
@@ -186,7 +186,7 @@ namespace TEN::Entities::TR4
 			}
 
 			if (AI.ahead)
-				headY = AI.angle;
+				extraHeadRot.y = AI.angle;
 
 			switch (item->Animation.ActiveState)
 			{
@@ -197,12 +197,12 @@ namespace TEN::Entities::TR4
 				if (item->AIBits & GUARD)
 				{
 					item->Animation.TargetState = AHMET_STATE_IDLE;
-					headY = AIGuard(creature);
+					extraHeadRot.y = AIGuard(creature);
 				}
 				else if (item->AIBits & PATROL1)
 				{
 					item->Animation.TargetState = AHMET_STATE_WALK_FORWARD;
-					headY = 0;
+					extraHeadRot.y = 0;
 				}
 				else if (creature->Mood == MoodType::Bored || creature->Mood == MoodType::Escape)
 				{
@@ -239,7 +239,7 @@ namespace TEN::Entities::TR4
 				if (item->AIBits & PATROL1)
 				{
 					item->Animation.TargetState = AHMET_STATE_WALK_FORWARD;
-					headY = 0;
+					extraHeadRot.y = 0;
 				}
 				else if (AI.bite && AI.distance < AHMET_IDLE_RANGE)
 					item->Animation.TargetState = AHMET_STATE_IDLE;
@@ -371,7 +371,7 @@ namespace TEN::Entities::TR4
 
 		TestTriggers(item, true);
 		CreatureTilt(item, 0);
-		CreatureJoint(item, 0, headY);
+		CreatureJoint(item, 0, extraHeadRot.y);
 		CreatureAnimation(itemNumber, angle, 0);
 	}
 
