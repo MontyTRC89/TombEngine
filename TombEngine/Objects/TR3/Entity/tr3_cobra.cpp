@@ -24,7 +24,6 @@ namespace TEN::Entities::TR3
 	constexpr auto COBRA_SLEEP_RANGE  = SQUARE(SECTOR(2.5f));
 
 	constexpr auto PLAYER_DISTURB_VELOCITY = 15;
-
 	constexpr auto COBRA_SLEEP_FRAME = 45;
 
 	const auto CobraBite = BiteInfo(Vector3::Zero, 13);
@@ -65,9 +64,9 @@ namespace TEN::Entities::TR3
 		auto* item = &g_Level.Items[itemNumber];
 		auto* creature = GetCreatureInfo(item);
 
-		short head = 0;
 		short angle = 0;
 		short tilt = 0;
+		short head = 0;
 
 		if (item->HitPoints <= 0 && item->HitPoints != NOT_TARGETABLE)
 		{

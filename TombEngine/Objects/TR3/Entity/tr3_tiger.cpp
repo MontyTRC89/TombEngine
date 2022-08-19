@@ -18,9 +18,11 @@ using std::vector;
 namespace TEN::Entities::TR3
 {
 	constexpr auto TIGER_ATTACK_DAMAGE = 90;
+
 	constexpr auto TIGER_BITE_ATTACK_RANGE	 = SQUARE(SECTOR(0.33f));
 	constexpr auto TIGER_POUNCE_ATTACK_RANGE = SQUARE(SECTOR(1));
 	constexpr auto TIGER_RUN_ATTACK_RANGE	 = SQUARE(SECTOR(1.5f));
+
 	constexpr auto TIGER_WALK_CHANCE = 0.035f;
 	constexpr auto TIGER_ROAR_CHANCE = 0.003f;
 
@@ -124,8 +126,8 @@ namespace TEN::Entities::TR3
 					item->Animation.TargetState = TIGER_STATE_BITE_ATTACK;
 				else if (AI.bite && AI.distance < TIGER_POUNCE_ATTACK_RANGE)
 				{
-					creature->MaxTurn = TIGER_POUNCE_ATTACK_TURN_RATE_MAX;
 					item->Animation.TargetState = TIGER_STATE_POUNCE_ATTACK;
+					creature->MaxTurn = TIGER_POUNCE_ATTACK_TURN_RATE_MAX;
 				}
 				else if (item->Animation.RequiredState)
 					item->Animation.TargetState = item->Animation.RequiredState;

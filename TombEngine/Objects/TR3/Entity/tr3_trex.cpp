@@ -17,9 +17,14 @@ using std::vector;
 
 namespace TEN::Entities::TR3
 {
+	constexpr auto TREX_ROAR_CHANCE = 0.015f;
+
 	constexpr auto LARA_ANIM_TREX_DEATH_ANIM = 4;
 
 	const vector<int> TRexAttackJoints = { 12, 13 };
+
+	#define TREX_WALK_TURN_RATE_MAX ANGLE(2.0f)
+	#define TREX_RUN_TURN_RATE_MAX	ANGLE(4.0f)
 
 	enum TRexState
 	{
@@ -57,8 +62,9 @@ namespace TEN::Entities::TR3
 		if (laraItem->RoomNumber != tRexItem->RoomNumber)
 			ItemNewRoom(Lara.ItemNumber, tRexItem->RoomNumber);
 
-		laraItem->Pose.Position = tRexItem->Pose.Position;
-		laraItem->Pose.Orientation = Vector3Shrt(0, tRexItem->Pose.Orientation.y, 0);
+		laraItem->Pose = PHD_3DPOS(
+			tRexItem->Pose.Position,
+			Vector3Shrt(0, tRexItem->Pose.Orientation.y, 0));
 		laraItem->Animation.IsAirborne = false;
 
 		laraItem->Animation.AnimNumber = Objects[ID_LARA_EXTRA_ANIMS].animIndex + LARA_ANIM_TREX_DEATH_ANIM;
@@ -82,10 +88,10 @@ namespace TEN::Entities::TR3
 			return;
 
 		auto* item = &g_Level.Items[itemNumber];
-		auto* info = GetCreatureInfo(item);
+		auto* creature = GetCreatureInfo(item);
 
-		short head = 0;
 		short angle = 0;
+		short head = 0;
 
 		if (item->HitPoints <= 0)
 		{
@@ -105,18 +111,18 @@ namespace TEN::Entities::TR3
 			GetCreatureMood(item, &AI, true);
 			CreatureMood(item, &AI, true);
 
-			angle = CreatureTurn(item, info->MaxTurn);
+			angle = CreatureTurn(item, creature->MaxTurn);
 
 			if (item->TouchBits)
 				DoDamage(LaraItem, (item->Animation.ActiveState == TREX_STATE_RUN_FORWARD) ? 10 : 1);
 
-			info->Flags = (info->Mood != MoodType::Escape && !AI.ahead && AI.enemyFacing > -FRONT_ARC && AI.enemyFacing < FRONT_ARC);
+			creature->Flags = (creature->Mood != MoodType::Escape && !AI.ahead && AI.enemyFacing > -FRONT_ARC && AI.enemyFacing < FRONT_ARC);
 
 			if (AI.distance > pow(1500, 2) &&
 				AI.distance < pow(SECTOR(4), 2) &&
-				AI.bite && !info->Flags)
+				AI.bite && !creature->Flags)
 			{
-				info->Flags = 1;
+				creature->Flags = 1;
 			}
 
 			switch (item->Animation.ActiveState)
@@ -126,7 +132,7 @@ namespace TEN::Entities::TR3
 					item->Animation.TargetState = item->Animation.RequiredState;
 				else if (AI.distance < pow(1500, 2) && AI.bite)
 					item->Animation.TargetState = TREX_STATE_ATTACK;
-				else if (info->Mood == MoodType::Bored || info->Flags)
+				else if (creature->Mood == MoodType::Bored || creature->Flags)
 					item->Animation.TargetState = TREX_STATE_WALK_FORWARD;
 				else
 					item->Animation.TargetState = TREX_STATE_RUN_FORWARD;
@@ -134,32 +140,32 @@ namespace TEN::Entities::TR3
 				break;
 
 			case TREX_STATE_WALK_FORWARD:
-				info->MaxTurn = ANGLE(2.0f);
+				creature->MaxTurn = TREX_WALK_TURN_RATE_MAX;
 
-				if (info->Mood != MoodType::Bored || !info->Flags)
+				if (creature->Mood != MoodType::Bored || !creature->Flags)
 					item->Animation.TargetState = TREX_STATE_IDLE;
-				else if (AI.ahead && TestProbability(0.015f))
+				else if (AI.ahead && TestProbability(TREX_ROAR_CHANCE))
 				{
-					item->Animation.RequiredState = TREX_STATE_ROAR;
 					item->Animation.TargetState = TREX_STATE_IDLE;
+					item->Animation.RequiredState = TREX_STATE_ROAR;
 				}
 
 				break;
 
 			case TREX_STATE_RUN_FORWARD:
-				info->MaxTurn = ANGLE(4.0f);
+				creature->MaxTurn = TREX_RUN_TURN_RATE_MAX;
 
 				if (AI.distance < pow(SECTOR(5), 2) && AI.bite)
 					item->Animation.TargetState = TREX_STATE_IDLE;
-				else if (info->Flags)
+				else if (creature->Flags)
 					item->Animation.TargetState = TREX_STATE_IDLE;
-				else if (info->Mood != MoodType::Escape &&
-					AI.ahead && TestProbability(0.015f))
+				else if (creature->Mood != MoodType::Escape &&
+					AI.ahead && TestProbability(TREX_ROAR_CHANCE))
 				{
-					item->Animation.RequiredState = TREX_STATE_ROAR;
 					item->Animation.TargetState = TREX_STATE_IDLE;
+					item->Animation.RequiredState = TREX_STATE_ROAR;
 				}
-				else if (info->Mood == MoodType::Bored)
+				else if (creature->Mood == MoodType::Bored)
 					item->Animation.TargetState = TREX_STATE_IDLE;
 
 				break;
@@ -178,8 +184,8 @@ namespace TEN::Entities::TR3
 			}
 		}
 
-		CreatureJoint(item, 0, (short)(head * 2));
-		info->JointRotation[1] = info->JointRotation[0];
+		CreatureJoint(item, 0, head * 2);
+		creature->JointRotation[1] = creature->JointRotation[0];
 
 		CreatureAnimation(itemNumber, angle, 0);
 

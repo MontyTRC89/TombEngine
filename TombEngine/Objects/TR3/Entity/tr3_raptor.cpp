@@ -19,9 +19,11 @@ using std::vector;
 namespace TEN::Entities::TR3
 {
 	constexpr auto RAPTOR_ATTACK_DAMAGE = 100;
+
 	constexpr auto RAPTOR_BITE_ATTACK_RANGE = SQUARE(585);
 	constexpr auto RAPTOR_JUMP_ATTACK_RANGE = SQUARE(SECTOR(1.5f));
 	constexpr auto RAPTOR_RUN_ATTACK_RANGE	= SQUARE(SECTOR(1.5f));
+
 	constexpr auto RAPTOR_ROAR_CHANCE		   = 0.004f;
 	constexpr auto RAPTOR_SWITCH_TARGET_CHANCE = 0.008f;
 
@@ -79,10 +81,10 @@ namespace TEN::Entities::TR3
 		auto* item = &g_Level.Items[itemNumber];
 		auto* creature = GetCreatureInfo(item);
 
-		short head = 0;
-		short neck = 0;
 		short angle = 0;
 		short tilt = 0;
+		short head = 0;
+		short neck = 0;
 
 		if (item->HitPoints <= 0)
 		{
