@@ -18,11 +18,9 @@ using std::vector;
 namespace TEN::Entities::TR3
 {
 	constexpr auto TIGER_ATTACK_DAMAGE = 90;
-
 	constexpr auto TIGER_BITE_ATTACK_RANGE	 = SQUARE(SECTOR(0.33f));
 	constexpr auto TIGER_POUNCE_ATTACK_RANGE = SQUARE(SECTOR(1));
 	constexpr auto TIGER_RUN_ATTACK_RANGE	 = SQUARE(SECTOR(1.5f));
-
 	constexpr auto TIGER_WALK_CHANCE = 0.035f;
 	constexpr auto TIGER_ROAR_CHANCE = 0.003f;
 
@@ -42,7 +40,7 @@ namespace TEN::Entities::TR3
 		// No state 4.
 		TIGER_STATE_ROAR = 5,
 		TIGER_STATE_BITE_ATTACK = 6,
-		TIGER_STATE_SWIPE_ATTACK = 7,
+		TIGER_STATE_RUN_SWIPE_ATTACK = 7,
 		TIGER_STATE_POUNCE_ATTACK = 8
 	};
 
@@ -50,7 +48,7 @@ namespace TEN::Entities::TR3
 	{
 		TIGER_ANIM_IDLE_TO_RUN_FORWARD = 0,
 		TIGER_ANIM_BITE_ATTACK = 1,
-		TIGER_ANIM_SWIPE_ATTACK = 2,
+		TIGER_ANIM_RUN_SWIPE_ATTACK = 2,
 		TIGER_ANIM_POUNCE_ATTACK_START = 3,
 		TIGER_ANIM_ROAR = 4,
 		TIGER_ANIM_RUN_FORWARD = 5,
@@ -61,6 +59,11 @@ namespace TEN::Entities::TR3
 		TIGER_ANIM_WALK_FORWARD_TO_IDLE = 10,
 		TIGER_ANIM_DEATH = 11,
 		TIGER_ANIM_POUNCE_ATTACK_END = 12
+	};
+
+	enum TigerFlags
+	{
+		TIGER_FLAG_ATTACKING = (1 << 0)
 	};
 
 	void TigerControl(short itemNumber)
@@ -161,7 +164,7 @@ namespace TEN::Entities::TR3
 					if (LaraItem->Animation.Velocity.z == 0.0f)
 						item->Animation.TargetState = TIGER_STATE_IDLE;
 					else
-						item->Animation.TargetState = TIGER_STATE_SWIPE_ATTACK;
+						item->Animation.TargetState = TIGER_STATE_RUN_SWIPE_ATTACK;
 				}
 				else if (creature->Mood != MoodType::Attack && TestProbability(TIGER_ROAR_CHANCE))
 				{
@@ -178,13 +181,13 @@ namespace TEN::Entities::TR3
 				break;
 
 			case TIGER_STATE_BITE_ATTACK:
-			case TIGER_STATE_SWIPE_ATTACK:
+			case TIGER_STATE_RUN_SWIPE_ATTACK:
 			case TIGER_STATE_POUNCE_ATTACK:
 				if (!creature->Flags && item->TestBits(JointBitType::Touch, TigerAttackJoints))
 				{
 					DoDamage(creature->Enemy, TIGER_ATTACK_DAMAGE);
 					CreatureEffect(item, TigerBite, DoBloodSplat);
-					creature->Flags = 1;
+					creature->Flags = TIGER_FLAG_ATTACKING;
 				}
 
 				break;

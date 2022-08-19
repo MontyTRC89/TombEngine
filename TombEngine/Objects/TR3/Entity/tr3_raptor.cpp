@@ -19,6 +19,11 @@ using std::vector;
 namespace TEN::Entities::TR3
 {
 	constexpr auto RAPTOR_ATTACK_DAMAGE = 100;
+	constexpr auto RAPTOR_BITE_ATTACK_RANGE = SQUARE(585);
+	constexpr auto RAPTOR_JUMP_ATTACK_RANGE = SQUARE(SECTOR(1.5f));
+	constexpr auto RAPTOR_RUN_ATTACK_RANGE	= SQUARE(SECTOR(1.5f));
+	constexpr auto RAPTOR_ROAR_CHANCE		   = 0.004f;
+	constexpr auto RAPTOR_SWITCH_TARGET_CHANCE = 0.008f;
 
 	#define RAPTOR_WALK_TURN_RATE_MAX	ANGLE(2.0f)
 	#define RAPTOR_RUN_TURN_RATE_MAX	ANGLE(2.0f)
@@ -86,14 +91,13 @@ namespace TEN::Entities::TR3
 		}
 		else
 		{
-			if (creature->Enemy == nullptr || TestProbability(0.008f))
+			if (creature->Enemy == nullptr || TestProbability(RAPTOR_SWITCH_TARGET_CHANCE))
 			{
 				ItemInfo* nearestItem = nullptr;
 				int minDistance = INT_MAX;
 
-				for (int i = 0; i < ActiveCreatures.size(); i++)
+				for (auto* currentCreature : ActiveCreatures)
 				{
-					auto* currentCreature = ActiveCreatures[i];
 					if (currentCreature->ItemNumber == NO_ITEM || currentCreature->ItemNumber == itemNumber)
 					{
 						currentCreature++;
@@ -106,7 +110,7 @@ namespace TEN::Entities::TR3
 					int y = (targetItem->Pose.Position.y - item->Pose.Position.y) / 64;
 					int z = (targetItem->Pose.Position.z - item->Pose.Position.z) / 64;
 
-					int distance = pow(x, 2) + pow(y, 2) + pow(z, 2);
+					int distance = SQUARE(x) + SQUARE(y) + SQUARE(z);
 					if (distance < minDistance && item->HitPoints > 0)
 					{
 						nearestItem = targetItem;
@@ -118,7 +122,7 @@ namespace TEN::Entities::TR3
 
 				if (nearestItem != nullptr &&
 					(nearestItem->ObjectNumber != ID_RAPTOR ||
-						(TestProbability(0.03f) && minDistance < pow(SECTOR(2), 2))))
+						(TestProbability(0.03f) && minDistance < SQUARE(SECTOR(2)))))
 				{
 					creature->Enemy = nearestItem;
 				}
@@ -127,7 +131,7 @@ namespace TEN::Entities::TR3
 				int y = (LaraItem->Pose.Position.y - item->Pose.Position.y) / 64;
 				int z = (LaraItem->Pose.Position.z - item->Pose.Position.z) / 64;
 
-				int distance = pow(x, 2) + pow(y, 2) + pow(z, 2);
+				int distance = SQUARE(x) + SQUARE(y) + SQUARE(z);
 				if (distance <= minDistance)
 					creature->Enemy = LaraItem;
 			}
@@ -164,11 +168,11 @@ namespace TEN::Entities::TR3
 					item->Animation.TargetState = RAPTOR_STATE_ROAR;
 				}
 				else if (item->TestBits(JointBitType::Touch, RaptorAttackJoints) ||
-					(AI.distance < pow(585, 2) && AI.bite))
+					(AI.distance < RAPTOR_BITE_ATTACK_RANGE && AI.bite))
 				{
 					item->Animation.TargetState = RAPTOR_STATE_BITE_ATTACK;
 				}
-				else if (AI.bite && AI.distance < pow(SECTOR(1.5f), 2))
+				else if (AI.bite && AI.distance < RAPTOR_JUMP_ATTACK_RANGE)
 					item->Animation.TargetState = RAPTOR_STATE_JUMP_ATTACK;
 				else if (creature->Mood == MoodType::Escape &&
 					Lara.TargetEntity != item && AI.ahead && !item->HitStatus)
@@ -188,7 +192,7 @@ namespace TEN::Entities::TR3
 
 				if (creature->Mood != MoodType::Bored)
 					item->Animation.TargetState = RAPTOR_STATE_IDLE;
-				else if (AI.ahead && TestProbability(0.004f))
+				else if (AI.ahead && TestProbability(RAPTOR_ROAR_CHANCE))
 				{
 					item->Animation.TargetState = RAPTOR_STATE_IDLE;
 					item->Animation.RequiredState = RAPTOR_STATE_ROAR;
@@ -210,7 +214,7 @@ namespace TEN::Entities::TR3
 					item->Animation.RequiredState = RAPTOR_STATE_ROAR;
 					creature->Flags &= ~2;
 				}
-				else if (AI.bite && AI.distance < pow(SECTOR(1.5f), 2))
+				else if (AI.bite && AI.distance < RAPTOR_RUN_ATTACK_RANGE)
 				{
 					if (item->Animation.TargetState == RAPTOR_STATE_RUN_FORWARD)
 					{
@@ -221,7 +225,7 @@ namespace TEN::Entities::TR3
 					}
 				}
 				else if (AI.ahead && creature->Mood != MoodType::Escape &&
-					TestProbability(0.004f))
+					TestProbability(RAPTOR_ROAR_CHANCE))
 				{
 					item->Animation.TargetState = RAPTOR_STATE_IDLE;
 					item->Animation.RequiredState = RAPTOR_STATE_ROAR;
