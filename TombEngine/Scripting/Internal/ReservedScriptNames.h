@@ -19,6 +19,7 @@ static constexpr char ScriptReserved_SoundSource[]		= "SoundSource";
 static constexpr char ScriptReserved_AIObject[]			= "AIObject";
 static constexpr char ScriptReserved_DisplayString[]	= "DisplayString";
 static constexpr char ScriptReserved_Vec3[]				= "Vec3";
+static constexpr char ScriptReserved_Rotation[]			= "Rotation";
 
 // Member functions
 static constexpr char ScriptReserved_New[]					= "New";
@@ -92,8 +93,6 @@ static constexpr char ScriptReserved_SetTitleScreenImagePath[]	= "SetTitleScreen
 static constexpr char ScriptReserved_SetFarView[]				= "SetFarView";
 static constexpr char ScriptReserved_SetSettings[]				= "SetSettings";
 static constexpr char ScriptReserved_SetAnimations[]			= "SetAnimations";
-
-// Flow Functions
 static constexpr char ScriptReserved_SetStrings[]			= "SetStrings";
 static constexpr char ScriptReserved_GetString[]			= "GetString";
 static constexpr char ScriptReserved_SetLanguageNames[]		= "SetLanguageNames";
@@ -129,6 +128,9 @@ static constexpr char ScriptReserved_ScreenToPercent[]				= "ScreenToPercent";
 static constexpr char ScriptReserved_PercentToScreen[]				= "PercentToScreen";
 static constexpr char ScriptReserved_HasLineOfSight[]				= "HasLineOfSight";
 
+static constexpr char ScriptReserved_AddCallback[]					= "AddCallback";
+static constexpr char ScriptReserved_RemoveCallback[]				= "RemoveCallback";
+
 static constexpr char ScriptReserved_EmitParticle[]					= "EmitParticle";
 static constexpr char ScriptReserved_EmitLightningArc[]				= "EmitLightningArc";
 static constexpr char ScriptReserved_EmitShockwave[]				= "EmitShockwave";
@@ -154,6 +156,7 @@ static constexpr char ScriptReserved_KeyClear[]						= "KeyClear";
 static constexpr char ScriptReserved_ObjID[]					= "ObjID";
 static constexpr char ScriptReserved_BlendID[]					= "BlendID";
 static constexpr char ScriptReserved_DisplayStringOption[]		= "DisplayStringOption";
+static constexpr char ScriptReserved_CallbackPoint[]			= "CallbackPoint";
 
 static constexpr char ScriptReserved_LevelVars[]	= "LevelVars";
 static constexpr char ScriptReserved_GameVars[]		= "GameVars";

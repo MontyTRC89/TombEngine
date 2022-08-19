@@ -5,28 +5,7 @@
 #include <unordered_set>
 #include "Strings/StringsHandler.h"
 
-struct LuaFunction {
-	std::string Name;
-	std::string Code;
-	bool Executed;
-};
-
-struct GameScriptVector3 {
-	float x;
-	float y;
-	float z;
-};
-
-struct LuaVariable
-{
-	bool IsGlobal;
-	std::string Name;
-	int Type;
-	float FloatValue;
-	int IntValue;
-	std::string StringValue;
-	bool BoolValue;
-};
+enum class CallbackPoint;
 
 class LogicHandler : public ScriptInterfaceGame
 {
@@ -37,6 +16,9 @@ private:
 	sol::protected_function										m_onControlPhase{};
 	sol::protected_function										m_onSave{};
 	sol::protected_function										m_onEnd{};
+
+	std::unordered_set<std::string> m_callbacksPreControl;
+	std::unordered_set<std::string> m_callbacksPostControl;
 
 	void ResetLevelTables();
 	void ResetGameTables();
@@ -49,6 +31,10 @@ public:
 
 	void								LogPrint(sol::variadic_args va);
 	bool								SetLevelFunc(sol::table tab, std::string const& luaName, sol::object value);
+
+	void								AddCallback(CallbackPoint point, std::string const& name);
+	void								RemoveCallback(CallbackPoint point, std::string const & name);
+
 	void								ResetScripts(bool clearGameVars) override;
 
 	sol::protected_function				GetLevelFunc(sol::table tab, std::string const& luaName);
@@ -59,13 +45,17 @@ public:
 	void								ExecuteFunction(std::string const& name, short idOne, short idTwo) override;
 
 	void								GetVariables(std::vector<SavedVar>& vars) override;
+	void								SetVariables(std::vector<SavedVar> const& vars) override;
 	void								ResetVariables();
 
-	void								SetVariables(std::vector<SavedVar> const& vars) override;
+	void								SetCallbackStrings(std::vector<std::string> const& preControl, std::vector<std::string> const& postControl) override;
+	void								GetCallbackStrings(std::vector<std::string>& preControl, std::vector<std::string>& postControl) const override;
+
 	void								InitCallbacks() override;
 	void								OnStart() override;
 	void								OnLoad() override;
 	void								OnControlPhase(float dt) override;
 	void								OnSave() override;
 	void								OnEnd() override;
+
 };

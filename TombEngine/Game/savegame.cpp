@@ -1026,16 +1026,9 @@ bool SaveGame::Save(int slot)
 		alternatePendulumOffset = alternatePendulumInfo.Finish();
 	}
 
-
-	std::vector<flatbuffers::Offset<Save::ScriptTable>> levelTableVec;
-	std::vector<flatbuffers::Offset<flatbuffers::String>> levelStringVec2;
-	
-	//std::vector<savedTable> savedTables;
-	std::vector<std::string> savedStrings;
 	std::vector<SavedVar> savedVars;
 
 	g_GameScript->GetVariables(savedVars);
-
 	
 	std::vector<flatbuffers::Offset<Save::UnionTable>> varsVec;
 	for (auto const& s : savedVars)
@@ -1107,6 +1100,13 @@ bool SaveGame::Save(int slot)
 	uvb.add_members(unionVec);
 	auto unionVecOffset = uvb.Finish();
 
+	std::vector<std::string> callbackVecPreControl;
+	std::vector<std::string> callbackVecPostControl;
+	g_GameScript->GetCallbackStrings(callbackVecPreControl, callbackVecPostControl);
+
+	auto stringsCallbackPreControl = fbb.CreateVectorOfStrings(callbackVecPreControl);
+	auto stringsCallbackPostControl = fbb.CreateVectorOfStrings(callbackVecPostControl);
+
 	Save::SaveGameBuilder sgb{ fbb };
 
 	sgb.add_header(headerOffset);
@@ -1150,6 +1150,8 @@ bool SaveGame::Save(int slot)
 	}
 
 	sgb.add_script_vars(unionVecOffset);
+	sgb.add_callbacks_pre_control(stringsCallbackPreControl);
+	sgb.add_callbacks_post_control(stringsCallbackPostControl);
 
 	auto sg = sgb.Finish();
 	fbb.Finish(sg);
@@ -1926,6 +1928,18 @@ bool SaveGame::Load(int slot)
 	}
 
 	g_GameScript->SetVariables(loadedVars);
+
+	std::vector<std::string> callbacksPreControlVec;
+	auto callbacksPreControlOffsetVec = s->callbacks_pre_control();
+	for (auto const& s : *callbacksPreControlOffsetVec)
+		callbacksPreControlVec.push_back(s->str());
+
+	std::vector<std::string> callbacksPostControlVec;
+	auto callbacksPostControlOffsetVec = s->callbacks_post_control();
+	for (auto const& s : *callbacksPostControlOffsetVec)
+		callbacksPostControlVec.push_back(s->str());
+
+	g_GameScript->SetCallbackStrings(callbacksPreControlVec, callbacksPostControlVec);
 
 	return true;
 }

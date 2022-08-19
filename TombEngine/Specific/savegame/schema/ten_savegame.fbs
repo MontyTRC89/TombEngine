@@ -458,6 +458,8 @@ table SaveGame {
 	volume_states: [VolumeState];
 	call_counters: [EventSetCallCounters];
 	script_vars: UnionVec;
+	callbacks_pre_control: [string];
+	callbacks_post_control: [string];
 	}
 
 root_type TEN.Save.SaveGame;

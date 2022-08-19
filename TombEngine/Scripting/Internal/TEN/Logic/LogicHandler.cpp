@@ -17,6 +17,18 @@ Saving data, triggering functions, and callbacks for level-specific scripts.
 @pragma nostrip
 */
 
+enum class CallbackPoint
+{
+	PreControl,
+	PostControl,
+};
+
+static const std::unordered_map<std::string, CallbackPoint> kCallbackPoints
+{
+	{"PreControlPhase", CallbackPoint::PreControl},
+	{"PostControlPhase", CallbackPoint::PostControl},
+};
+
 void SetVariable(sol::table tab, sol::object key, sol::object value)
 {
 	switch (value.get_type())
@@ -63,6 +75,16 @@ sol::object GetVariable(sol::table tab, sol::object key)
 LogicHandler::LogicHandler(sol::state* lua, sol::table & parent) : m_handler{ lua }
 {
 	m_handler.GetState()->set_function("print", &LogicHandler::LogPrint, this);
+
+	sol::table table_logic{ m_handler.GetState()->lua_state(), sol::create };
+
+	parent.set(ScriptReserved_Logic, table_logic);
+
+	table_logic.set_function(ScriptReserved_AddCallback, &LogicHandler::AddCallback, this);
+	table_logic.set_function(ScriptReserved_RemoveCallback, &LogicHandler::RemoveCallback, this);
+
+	m_handler.MakeReadOnlyTable(table_logic, ScriptReserved_CallbackPoint, kCallbackPoints);
+
 	ResetScripts(true);
 }
 
@@ -71,6 +93,33 @@ void LogicHandler::ResetGameTables()
 	MakeSpecialTable(m_handler.GetState(), ScriptReserved_GameVars, &GetVariable, &SetVariable);
 }
 
+void LogicHandler::AddCallback(CallbackPoint point, std::string const & name)
+{
+	switch(point)
+	{
+	case CallbackPoint::PreControl:
+		m_callbacksPreControl.insert(name);
+		break;
+
+	case CallbackPoint::PostControl:
+		m_callbacksPostControl.insert(name);
+		break;
+	}
+}
+
+void LogicHandler::RemoveCallback(CallbackPoint point, std::string const & name)
+{
+	switch(point)
+	{
+	case CallbackPoint::PreControl:
+		m_callbacksPreControl.erase(name);
+		break;
+
+	case CallbackPoint::PostControl:
+		m_callbacksPostControl.erase(name);
+		break;
+	}
+}
 
 void LogicHandler::ResetLevelTables()
 {
@@ -120,6 +169,9 @@ void LogicHandler::LogPrint(sol::variadic_args va)
 void LogicHandler::ResetScripts(bool clearGameVars)
 {
 	FreeLevelScripts();
+
+	m_callbacksPreControl.clear();
+	m_callbacksPostControl.clear();
 
 	auto currentPackage = m_handler.GetState()->get<sol::table>("package");
 	auto currentLoaded = currentPackage.get<sol::table>("loaded");
@@ -347,6 +399,24 @@ void LogicHandler::GetVariables(std::vector<SavedVar> & vars)
 	populate(tab);
 }
 
+void LogicHandler::GetCallbackStrings(std::vector<std::string>& preControl, std::vector<std::string>& postControl) const
+{
+	for (auto const& s : m_callbacksPreControl)
+		preControl.push_back(s);
+
+	for (auto const& s : m_callbacksPostControl)
+		postControl.push_back(s);
+}
+
+void LogicHandler::SetCallbackStrings(std::vector<std::string> const & preControl, std::vector<std::string> const & postControl)
+{
+	for (auto const& s : preControl)
+		m_callbacksPreControl.insert(s);
+
+	for (auto const& s : postControl)
+		m_callbacksPostControl.insert(s);
+}
+
 template <typename R, char const * S, typename mapType>
 std::unique_ptr<R> GetByName(std::string const & type, std::string const & name, mapType const & map)
 {
@@ -428,9 +498,25 @@ void LogicHandler::OnLoad()
 
 void LogicHandler::OnControlPhase(float dt)
 {
+	sol::table levelFuncs = (*m_handler.GetState())[ScriptReserved_LevelFuncs];
+
+	auto tryCall = [dt, &levelFuncs](std::string const& name)
+	{
+		if (!levelFuncs[name].valid())
+			ScriptAssertF(false, "Callback {} not valid", name);
+		else
+			levelFuncs[name].call(dt);
+	};
+
+	for (auto& name : m_callbacksPreControl)
+		tryCall(name);
+
 	lua_gc(m_handler.GetState()->lua_state(), LUA_GCCOLLECT, 0);
 	if(m_onControlPhase.valid())
 		doCallback(m_onControlPhase, dt);
+
+	for (auto& name : m_callbacksPostControl)
+		tryCall(name);
 }
 
 void LogicHandler::OnSave()
