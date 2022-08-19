@@ -17,6 +17,11 @@ namespace TEN::Math::Random
 		return ((high - low) * Engine() / Engine.max() + low);
 	}
 
+	short GenerateAngle(short low, short high)
+	{
+		return (short)GenerateInt(low, high);
+	}
+
 	bool TestProbability(float probability)
 	{
 		probability = std::clamp(probability, 0.0f, 1.0f);
