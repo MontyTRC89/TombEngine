@@ -25,8 +25,8 @@ enum class CallbackPoint
 
 static const std::unordered_map<std::string, CallbackPoint> kCallbackPoints
 {
-	{"PreControlPhase", CallbackPoint::PreControl},
-	{"PostControlPhase", CallbackPoint::PostControl},
+	{"PRECONTROLPHASE", CallbackPoint::PreControl},
+	{"POSTCONTROLPHASE", CallbackPoint::PostControl},
 };
 
 void SetVariable(sol::table tab, sol::object key, sol::object value)
@@ -93,6 +93,21 @@ void LogicHandler::ResetGameTables()
 	MakeSpecialTable(m_handler.GetState(), ScriptReserved_GameVars, &GetVariable, &SetVariable);
 }
 
+/*** Register a function as a callback.
+Possible values for CallbackPoint:
+	PRECONTROLPHASE -- will be called immediately before OnControlPhase
+	POSTCONTROLPHASE -- will be called immediately after OnControlPhase
+
+The order in which two functions with the same CallbackPoint are called is undefined.
+i.e. if you register `MyFunc` and `MyFunc2` with `PRECONTROLPHASE`, both will be called before `OnControlPhase`, but there is no guarantee whether `MyFunc` will be called before `MyFunc2`, or vice-versa.
+
+@function AddCallback
+@tparam point CallbackPoint When should the callback be called?
+@tparam func string The LevelFuncs function to be called. Will receive as an argument the time in seconds since the last frame.
+@usage
+	LevelFuncs.MyFunc = function(dt) print(dt) end
+	TEN.Logic.AddCallback(TEN.Logic.CallbackPoint.PRECONTROLPHASE, "MyFunc")
+*/
 void LogicHandler::AddCallback(CallbackPoint point, std::string const & name)
 {
 	switch(point)
@@ -107,6 +122,15 @@ void LogicHandler::AddCallback(CallbackPoint point, std::string const & name)
 	}
 }
 
+/*** Deregister a function as a callback.
+Will have no effect if the function was not registered as a callback
+
+@function RemoveCallback
+@tparam point CallbackPoint The callback point the function was registered with. See @{AddCallback}
+@tparam func string The LevelFuncs function to remove.
+@usage
+	TEN.Logic.RemoveCallback(TEN.Logic.CallbackPoint.PRECONTROLPHASE, "MyFunc")
+*/
 void LogicHandler::RemoveCallback(CallbackPoint point, std::string const & name)
 {
 	switch(point)
