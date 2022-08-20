@@ -823,37 +823,27 @@ void CalculateItemRotationToSurface(ItemInfo* item, float zRadiusDivisor, float 
 		return;
 	}
 
-	auto pos = GameVector(item->Pose.Position, item->RoomNumber);
-
 	auto* bounds = GetBoundsAccurate(item);
-	auto radiusX = bounds->X2;
-	auto radiusZ = bounds->Z2 / zRadiusDivisor; // zRadiusDivisor may be used to avoid overshooting in some cases.
+	int xRadius = bounds->X2;
+	int zRadius = bounds->Z2 / zRadiusDivisor; // zRadiusDivisor may be used to avoid overshooting in some cases.
 
-	auto ratioXZ = radiusZ / radiusX;
-	auto frontX = phd_sin(item->Pose.Orientation.y) * radiusZ;
-	auto frontZ = phd_cos(item->Pose.Orientation.y) * radiusZ;
-	auto leftX  = -frontZ * ratioXZ;
-	auto leftZ  =  frontX * ratioXZ;
-	auto rightX =  frontZ * ratioXZ;
-	auto rightZ = -frontX * ratioXZ;
+	int frontHeight = GetCollision(item, item->Pose.Orientation.y, zRadius).Position.Floor;
+	int backHeight	= GetCollision(item, item->Pose.Orientation.y + ANGLE(180.0f), zRadius).Position.Floor;
+	int leftHeight	= GetCollision(item, item->Pose.Orientation.y - ANGLE(90.0f), xRadius).Position.Floor;
+	int rightHeight = GetCollision(item, item->Pose.Orientation.y + ANGLE(90.0f), xRadius).Position.Floor;
 
-	auto frontHeight = GetCollision(pos.x + frontX, pos.y, pos.z + frontZ, pos.roomNumber).Position.Floor;
-	auto backHeight  = GetCollision(pos.x - frontX, pos.y, pos.z - frontZ, pos.roomNumber).Position.Floor;
-	auto leftHeight  = GetCollision(pos.x + leftX,  pos.y, pos.z + leftZ,  pos.roomNumber).Position.Floor;
-	auto rightHeight = GetCollision(pos.x + rightX, pos.y, pos.z + rightZ, pos.roomNumber).Position.Floor;
-
-	auto frontHDif = backHeight  - frontHeight;
-	auto sideHDif  = rightHeight - leftHeight;
+	int xHeightDif = backHeight - frontHeight;
+	int zHeightDif = rightHeight - leftHeight;
 
 	// Don't align if height differences are too significant.
-	if ((abs(frontHDif) > STEPUP_HEIGHT) || (abs(sideHDif) > STEPUP_HEIGHT))
+	if ((abs(xHeightDif) > STEPUP_HEIGHT) || (abs(zHeightDif) > STEPUP_HEIGHT))
 		return;
 
-	short angleX = phd_atan(frontHDif, radiusZ * 2) + xOffset;
+	short angleX = phd_atan(xHeightDif, zRadius * 2) + xOffset;
 	if (abs(angleX) <= ANGLE(maxAngle))
 		item->Pose.Orientation.x = angleX;
 
-	short angleZ = phd_atan(sideHDif, radiusX * 2) + zOffset;
+	short angleZ = phd_atan(zHeightDif, xRadius * 2) + zOffset;
 	if (abs(angleZ) <= ANGLE(maxAngle))
 		item->Pose.Orientation.z = angleZ;
 }
