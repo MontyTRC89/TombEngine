@@ -298,6 +298,9 @@ namespace TEN::Entities::TR4
 		if (!CutSeqNum)
 			CreatureAnimation(itemNumber, angle, 0);
 
-		CalculateItemRotationToSurface(item, 5.0f);
+		auto* object = &Objects[item->ObjectNumber];
+
+		auto radius = Vector2(object->radius, object->radius * 1.33f);
+		AlignEntityToSurface(item, radius);
 	}
 }

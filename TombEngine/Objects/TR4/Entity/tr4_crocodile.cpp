@@ -324,7 +324,12 @@ namespace TEN::Entities::TR4
 
 		CreatureAnimation(itemNumber, angle, 0);
 		if (item->Animation.ActiveState < CROC_STATE_SWIM_FORWARD)
-			CalculateItemRotationToSurface(item, 2.0f);
+		{
+			auto* object = &Objects[item->ObjectNumber];
+
+			auto radius = Vector2(object->radius, object->radius * 1.5f);
+			AlignEntityToSurface(item, radius);
+		}
 
 		if (item->Animation.ActiveState >= CROC_STATE_SWIM_FORWARD && item->Animation.ActiveState <= CROC_STATE_WATER_DEATH)
 			CreatureUnderwater(item, CLICK(1));
