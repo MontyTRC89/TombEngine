@@ -152,7 +152,7 @@ void SnapItemToLedge(ItemInfo* item, CollisionInfo* coll, float offsetMultiplier
 void SnapItemToLedge(ItemInfo* item, CollisionInfo* coll, short angle, float offsetMultiplier = 0.0f);
 void SnapItemToGrid(ItemInfo* item, CollisionInfo* coll);
 
-void AlignEntityToSurface(ItemInfo* item, Vector2 radius, float tiltConstraintAngle = 45.0f, Vector3Shrt orientOffset = Vector3Shrt::Zero);
+void AlignEntityToSurface(ItemInfo* item, Vector2 radius, float tiltConstraintAngle = 45.0f, Vector3Shrt tiltOffset = Vector3Shrt::Zero);
 
 short GetSurfaceAspectAngle(Vector2 tilt);
 short GetSurfaceSteepnessAngle(Vector2 tilt);
