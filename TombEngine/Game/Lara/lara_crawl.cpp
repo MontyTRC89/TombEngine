@@ -864,7 +864,7 @@ void lara_col_crawl_to_hang(ItemInfo* item, CollisionInfo* coll)
 	Camera.targetAngle = 0;
 	Camera.targetDistance = SECTOR(1);
 
-	ResetLaraLean(item, 6);
+	ResetLaraLean(item, 6.0f);
 
 	if (item->Animation.AnimNumber == LA_CRAWL_TO_HANG_END)
 	{

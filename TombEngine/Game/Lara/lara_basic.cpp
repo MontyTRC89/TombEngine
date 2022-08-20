@@ -1330,6 +1330,7 @@ void lara_as_death(ItemInfo* item, CollisionInfo* coll)
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
 
+	AlignLaraToSurface(item);
 	ModulateLaraTurnRateY(item, 0, 0, 0);
 
 	if (BinocularRange)
