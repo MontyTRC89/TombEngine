@@ -815,15 +815,18 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, Vector3Int offset, bo
 	}
 }
 
-void AlignEntityToSurface(ItemInfo* item, Vector2 radius, float tiltConstraintAngle, Vector3Shrt orientOffset)
+void AlignEntityToSurface(ItemInfo* item, Vector2 radius, float tiltConstraintAngle, Vector3Shrt tiltOffset)
 {
-	radius /= 2;
+	// Reduce probe radii for stability.
+	auto halvedRadius = radius / 2;
 
-	int frontHeight = GetCollision(item, item->Pose.Orientation.y, radius.y).Position.Floor;
-	int backHeight	= GetCollision(item, item->Pose.Orientation.y + ANGLE(180.0f), radius.y).Position.Floor;
-	int leftHeight	= GetCollision(item, item->Pose.Orientation.y - ANGLE(90.0f), radius.x).Position.Floor;
-	int rightHeight = GetCollision(item, item->Pose.Orientation.y + ANGLE(90.0f), radius.x).Position.Floor;
+	// Probe heights at points around the entity.
+	int frontHeight = GetCollision(item, item->Pose.Orientation.y, halvedRadius.y).Position.Floor;
+	int backHeight	= GetCollision(item, item->Pose.Orientation.y + ANGLE(180.0f), halvedRadius.y).Position.Floor;
+	int leftHeight	= GetCollision(item, item->Pose.Orientation.y - ANGLE(90.0f), halvedRadius.x).Position.Floor;
+	int rightHeight = GetCollision(item, item->Pose.Orientation.y + ANGLE(90.0f), halvedRadius.x).Position.Floor;
 
+	// Calculate height differences.
 	int forwardHeightDif = backHeight - frontHeight;
 	int lateralHeightDif = rightHeight - leftHeight;
 
@@ -831,13 +834,18 @@ void AlignEntityToSurface(ItemInfo* item, Vector2 radius, float tiltConstraintAn
 	if ((abs(forwardHeightDif) > STEPUP_HEIGHT) || (abs(lateralHeightDif) > STEPUP_HEIGHT))
 		return;
 
-	short xAngle = phd_atan(radius.y * 2, forwardHeightDif) + orientOffset.x;
-	if (abs(xAngle) <= ANGLE(tiltConstraintAngle))
-		item->Pose.Orientation.x = xAngle;
+	// Calculate and apply tilts.
+	auto tiltedOrient = Vector3Shrt(
+		phd_atan(radius.y * 2, forwardHeightDif) + tiltOffset.x,
+		0,
+		phd_atan(radius.x * 2, lateralHeightDif) + tiltOffset.z
+	);
 
-	short zAngle = phd_atan(radius.x * 2, lateralHeightDif) + orientOffset.z;
-	if (abs(zAngle) <= ANGLE(tiltConstraintAngle))
-		item->Pose.Orientation.z = zAngle;
+	if (abs(tiltedOrient.x) <= ANGLE(tiltConstraintAngle))
+		item->Pose.Orientation.x = tiltedOrient.x;
+
+	if (abs(tiltedOrient.z) <= ANGLE(tiltConstraintAngle))
+		item->Pose.Orientation.z = tiltedOrient.z;
 }
 
 int GetQuadrant(short angle)
