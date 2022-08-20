@@ -90,6 +90,9 @@
 <p>Event sequence - a chain of functions to call at specified times, modeled after TRNG's organizers.</p>
 <p>
 
+
+<p> Works atop the Timer, and so is updated automatically pre-OnControlPhase, and saved automatically when the game is saved.</p>
+
 <p> Example usage:</p>
 
 <pre>
@@ -125,11 +128,6 @@ LevelFuncs.SpawnBaddy = <span class="keyword">function</span>(baddy, name, pos)
 
     <span class="comment">-- event sequences are inactive to begin with and so need to be started
 </span>    mySeq:Start()
-<span class="keyword">end</span>
-
-<span class="comment">-- EventSequence runs on Timer, so this call is required
-</span>LevelFuncs.OnControlPhase = <span class="keyword">function</span>(dt)
-    Timer.UpdateAll(dt)
 <span class="keyword">end</span>
 </pre>
 

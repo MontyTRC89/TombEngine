@@ -1,5 +1,8 @@
 -----
 --- Basic timer - after a specified number of seconds, the specified thing happens.
+--
+-- Timers are updated automatically every frame before OnControlPhase.
+--
 -- Example usage:
 --	local Timer = require("Timer")
 --
@@ -21,10 +24,6 @@
 --		myTimer:Start()
 --	end
 --
---	LevelFuncs.OnControlPhase = function(dt)
---		Timer.UpdateAll(dt)
---	end
---
 -- @luautil Timer
 
 LevelVars.__TEN_timer = {timers = {}}
@@ -34,6 +33,7 @@ local Timer
 local unpausedColor = TEN.Color(255, 255, 255)
 local pausedColor = TEN.Color(255, 255, 0)
 local str = TEN.Strings.DisplayString("TIMER", 0, 0, unpausedColor, false, {TEN.Strings.DisplayStringOption.CENTER, TEN.Strings.DisplayStringOption.SHADOW} )
+
 
 Timer = {
 	--- Create (but do not start) a new timer.
@@ -190,13 +190,8 @@ Timer = {
 		end
 	end;
 
-	--- Update all active timers.
-	-- Should be called in LevelFuncs.OnControlPhase
-	-- @number dt The time in seconds since the last frame
 	UpdateAll = function(dt)
-		for _, t in pairs(LevelVars.__TEN_timer.timers) do
-			Timer.Update(t, dt)
-		end
+		print("Timer.UpdateAll is deprecated; timers and event sequences now get updated automatically pre-control phase.")
 	end;
 
 	--- Give the timer a new function and args
@@ -295,6 +290,14 @@ Timer = {
 		LevelVars.__TEN_timer.timers[t.name].loop = looping
 	end;
 }
+
+LevelFuncs.__TEN_timer_updateAll = function(dt) 
+	for _, t in pairs(LevelVars.__TEN_timer.timers) do
+		Timer.Update(t, dt)
+	end
+end
+
+TEN.Logic.AddCallback(TEN.Logic.CallbackPoint.PRECONTROLPHASE, "__TEN_timer_updateAll")
 
 return Timer
 

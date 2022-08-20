@@ -1,5 +1,8 @@
 -----
 --- Event sequence - a chain of functions to call at specified times, modeled after TRNG's organizers.
+--
+-- Works atop the Timer, and so is updated automatically pre-OnControlPhase, and saved automatically when the game is saved.
+--
 -- Example usage:
 --	local EventSequence = require("EventSequence")
 --
@@ -33,11 +36,6 @@
 --
 --		-- event sequences are inactive to begin with and so need to be started
 --		mySeq:Start()
---	end
---
---	-- EventSequence runs on Timer, so this call is required
---	LevelFuncs.OnControlPhase = function(dt)
---		Timer.UpdateAll(dt)
 --	end
 --
 -- @luautil EventSequence

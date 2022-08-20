@@ -90,6 +90,9 @@
 <p>Basic timer - after a specified number of seconds, the specified thing happens.</p>
 <p>
 
+
+<p> Timers are updated automatically every frame before OnControlPhase.</p>
+
 <p> Example usage:</p>
 
 <pre>
@@ -112,10 +115,6 @@
         <span class="string">"Well done!"</span>)
     myTimer:Start()
 <span class="keyword">end</span>
-
-LevelFuncs.OnControlPhase = <span class="keyword">function</span>(dt)
-    Timer.UpdateAll(dt)
-<span class="keyword">end</span>
 </pre>
 
 </p>
@@ -130,10 +129,6 @@ LevelFuncs.OnControlPhase = <span class="keyword">function</span>(dt)
 	<tr>
 	<td class="name" ><a href="#Get">Get(name)</a></td>
 	<td class="summary">Get a timer by its name.</td>
-	</tr>
-	<tr>
-	<td class="name" ><a href="#UpdateAll">UpdateAll(dt)</a></td>
-	<td class="summary">Update all active timers.</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#myTimer:SetFunction">myTimer:SetFunction(func[, ...])</a></td>
@@ -276,28 +271,6 @@ local myTimeFormat4 = {seconds = true}
 
         The timer
     </ol>
-
-
-
-
-</dd>
-    <dt>
-    <a name = "UpdateAll"></a>
-    <strong>UpdateAll(dt)</strong>
-    </dt>
-    <dd>
-    Update all active timers.
- Should be called in LevelFuncs.OnControlPhase
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">dt</span>
-            <span class="types"><span class="type">number</span></span>
-         The time in seconds since the last frame
-        </li>
-    </ul>
-
 
 
 
