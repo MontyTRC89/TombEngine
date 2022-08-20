@@ -815,22 +815,14 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, Vector3Int offset, bo
 	}
 }
 
-void CalculateItemRotationToSurface(ItemInfo* item, float zRadiusDivisor, float maxAngle, short xOffset, short zOffset)
+void AlignEntityToSurface(ItemInfo* item, Vector2 radius, float tiltConstraintAngle, Vector3Shrt orientOffset)
 {
-	if (zRadiusDivisor == 0.0f)
-	{
-		TENLog(std::string("CalculateItemRotationToSurface() attempted division by zero."), LogLevel::Warning);
-		return;
-	}
+	radius *= 0.75f;
 
-	auto* bounds = GetBoundsAccurate(item);
-	int xRadius = bounds->X2;
-	int zRadius = bounds->Z2 / zRadiusDivisor; // zRadiusDivisor may be used to avoid overshooting in some cases.
-
-	int frontHeight = GetCollision(item, item->Pose.Orientation.y, zRadius).Position.Floor;
-	int backHeight	= GetCollision(item, item->Pose.Orientation.y + ANGLE(180.0f), zRadius).Position.Floor;
-	int leftHeight	= GetCollision(item, item->Pose.Orientation.y - ANGLE(90.0f), xRadius).Position.Floor;
-	int rightHeight = GetCollision(item, item->Pose.Orientation.y + ANGLE(90.0f), xRadius).Position.Floor;
+	int frontHeight = GetCollision(item, item->Pose.Orientation.y, radius.y).Position.Floor;
+	int backHeight	= GetCollision(item, item->Pose.Orientation.y + ANGLE(180.0f), radius.y).Position.Floor;
+	int leftHeight	= GetCollision(item, item->Pose.Orientation.y - ANGLE(90.0f), radius.x).Position.Floor;
+	int rightHeight = GetCollision(item, item->Pose.Orientation.y + ANGLE(90.0f), radius.x).Position.Floor;
 
 	int xHeightDif = backHeight - frontHeight;
 	int zHeightDif = rightHeight - leftHeight;
@@ -839,12 +831,12 @@ void CalculateItemRotationToSurface(ItemInfo* item, float zRadiusDivisor, float 
 	if ((abs(xHeightDif) > STEPUP_HEIGHT) || (abs(zHeightDif) > STEPUP_HEIGHT))
 		return;
 
-	short angleX = phd_atan(xHeightDif, zRadius * 2) + xOffset;
-	if (abs(angleX) <= ANGLE(maxAngle))
+	short angleX = phd_atan(xHeightDif, radius.y * 2) + orientOffset.x;
+	if (abs(angleX) <= ANGLE(tiltConstraintAngle))
 		item->Pose.Orientation.x = angleX;
 
-	short angleZ = phd_atan(zHeightDif, xRadius * 2) + zOffset;
-	if (abs(angleZ) <= ANGLE(maxAngle))
+	short angleZ = phd_atan(zHeightDif, radius.x * 2) + orientOffset.z;
+	if (abs(angleZ) <= ANGLE(tiltConstraintAngle))
 		item->Pose.Orientation.z = angleZ;
 }
 
