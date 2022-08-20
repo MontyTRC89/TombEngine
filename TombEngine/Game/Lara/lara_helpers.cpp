@@ -568,10 +568,10 @@ void AlignLaraToSurface(ItemInfo* item)
 	float cosAngDist = phd_cos(angularDistance);
 
 	auto extraRot = Vector3Shrt(
-		(-steepnessAngle * cosAngDist) - item->Pose.Orientation.x,
+		-steepnessAngle * cosAngDist,
 		0,
-		(steepnessAngle * sinAngDist) - item->Pose.Orientation.z
-	);
+		steepnessAngle * sinAngDist
+	) - Vector3Shrt(item->Pose.Orientation.x, 0, item->Pose.Orientation.z);
 	item->Pose.Orientation += extraRot / 6.0f;
 }
 
