@@ -1,33 +1,36 @@
 #include "framework.h"
 #include "Specific/BitField.h"
 
+#include <limits>
+
 using std::vector;
 
 namespace TEN::Utils
 {
+	// TODO: Remove size cap when all conversions are complete.
+	constexpr auto BIT_FIELD_SIZE_MAX = std::numeric_limits<uint>::digits;
+
 	BitField::BitField()
 	{
 	}
 
 	BitField::BitField(uint size)
 	{
+		size = std::min<uint>(size, BIT_FIELD_SIZE_MAX);
 		this->Container.resize(size);
 	}
 
-	// TODO: packedBits as ulong has max size of 64.
-	BitField::BitField(uint size, ulong packedBits)
+	BitField::BitField(uint size, uint packedBits)
 	{
+		size = std::min<uint>(size, BIT_FIELD_SIZE_MAX);
 		this->Container.resize(size);
 
-		vector<uint> indices = {};
 		for (size_t i = 0; i < size; i++)
 		{
 			uint bit = uint(1 << i);
 			if ((packedBits & bit) == bit)
-				indices.push_back(i);
+				this->Container[i] = true;
 		}
-
-		this->Set(indices);
 	}
 
 	uint BitField::GetSize()
@@ -35,15 +38,16 @@ namespace TEN::Utils
 		return Container.size();
 	}
 
-	ulong BitField::GetPackedBits()
+	uint BitField::GetPackedBits()
 	{
-		ulong packedBits = 0;
-
-		// TODO: ulong has max size of 64.
-		for (size_t i = 0; i < 64; i++)
+		uint packedBits = 0;
+		for (size_t i = 0; i < this->GetSize(); i++)
 		{
-			uint bit = uint(1 << i);
-			packedBits |= bit;
+			if (Container[i])
+			{
+				uint bit = uint(1 << i);
+				packedBits |= bit;
+			}
 		}
 
 		return packedBits;
@@ -53,10 +57,8 @@ namespace TEN::Utils
 	{
 		for (auto& index : indices)
 		{
-			if (index >= Container.size())
-				continue;
-
-			this->Container[index] = true;
+			if (index < Container.size())
+				this->Container[index] = true;
 		}
 	}
 
@@ -74,10 +76,8 @@ namespace TEN::Utils
 	{
 		for (auto& index : indices)
 		{
-			if (index >= Container.size())
-				continue;
-
-			this->Container[index] = false;
+			if (index < Container.size())
+				this->Container[index] = false;
 		}
 	}
 	
@@ -95,10 +95,8 @@ namespace TEN::Utils
 	{
 		for (auto& index : indices)
 		{
-			if (index >= Container.size())
-				continue;
-
-			this->Container[index].flip();
+			if (index < Container.size())
+				this->Container[index].flip();
 		}
 	}
 	
@@ -149,7 +147,26 @@ namespace TEN::Utils
 
 		return true;
 	}
-	
+
+	// TODO
+	/*BitField::operator uint() const
+	{
+		return this->GetPackedBits();
+	}*/
+
+	BitField BitField::operator =(uint packedBits)
+	{
+		for (size_t i = 0; i < this->GetSize(); i++)
+		{
+			uint bit = uint(1 << i);
+
+			if ((packedBits & bit) == bit)
+				this->Container[i] = true;
+			else
+				this->Container[i] = false;
+		}
+	}
+
 	void BitField::Fill(bool value)
 	{
 		std::fill(this->Container.begin(), this->Container.end(), value);

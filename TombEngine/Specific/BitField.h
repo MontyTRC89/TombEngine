@@ -10,13 +10,16 @@ namespace TEN::Utils
 		vector<bool> Container;
 
 	public:
+		// Constructors
 		BitField();
 		BitField(uint size);
-		BitField(uint size, ulong packedBits);
+		BitField(uint size, uint packedBits);
 
-		uint  GetSize();
-		ulong GetPackedBits();
+		// Getters
+		uint GetSize();
+		uint GetPackedBits();
 
+		// Setters
 		void Set(const vector<uint>& indices);
 		void Set(uint index);
 		void SetAll();
@@ -27,10 +30,15 @@ namespace TEN::Utils
 		void Flip(uint index);
 		void FlipAll();
 
+		// Inquirers
 		bool Test(const vector<uint>& indices);
 		bool Test(uint index);
 		bool TestAll();
 		bool TestNone();
+
+		// Operators
+		operator uint() const;
+		BitField operator =(uint packedBits);
 
 	private:
 		void Fill(bool value);
