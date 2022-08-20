@@ -1033,29 +1033,38 @@ bool SaveGame::Save(int slot)
 	std::vector<flatbuffers::Offset<Save::UnionTable>> varsVec;
 	for (auto const& s : savedVars)
 	{
-		flatbuffers::Offset<Save::ScriptTable> scriptTableOffset;
-		flatbuffers::Offset<Save::stringTable> strOffset;
-		flatbuffers::Offset<Save::doubleTable> doubleOffset;
-		flatbuffers::Offset<Save::boolTable> boolOffset;
+		auto putDataInVec = [&varsVec, &fbb](Save::VarUnion type, auto const & offsetVar)
+		{
+			Save::UnionTableBuilder ut{ fbb };
+			ut.add_u_type(type);
+			ut.add_u(offsetVar.Union());
+			varsVec.push_back(ut.Finish());
+		};
 
 		if (std::holds_alternative<std::string>(s))
 		{
 			auto strOffset2 = fbb.CreateString(std::get<std::string>(s));
 			Save::stringTableBuilder stb{ fbb };
 			stb.add_str(strOffset2);
-			strOffset = stb.Finish();
+			auto strOffset = stb.Finish();
+
+			putDataInVec(Save::VarUnion::str, strOffset);
 		}
 		else if (std::holds_alternative<double>(s))
 		{
 			Save::doubleTableBuilder dtb{ fbb };
 			dtb.add_scalar(std::get<double>(s));
-			doubleOffset = dtb.Finish();
+			auto doubleOffset = dtb.Finish();
+
+			putDataInVec(Save::VarUnion::num, doubleOffset);
 		}
 		else if (std::holds_alternative<bool>(s))
 		{
 			Save::boolTableBuilder btb{ fbb };
 			btb.add_scalar(std::get<bool>(s));
-			boolOffset = btb.Finish();
+			auto boolOffset = btb.Finish();
+
+			putDataInVec(Save::VarUnion::boolean, boolOffset);
 		}
 		else if (std::holds_alternative<IndexTable>(s))
 		{
@@ -1069,31 +1078,20 @@ bool SaveGame::Save(int slot)
 			auto vecOffset = fbb.CreateVectorOfStructs(keyValVec);
 			Save::ScriptTableBuilder stb{ fbb };
 			stb.add_keys_vals(vecOffset);
-			scriptTableOffset = stb.Finish();
-		}
+			auto scriptTableOffset = stb.Finish();
 
-		Save::UnionTableBuilder ut{ fbb };
-		if (std::holds_alternative<std::string>(s))
-		{
-			ut.add_u_type(Save::VarUnion::str);
-			ut.add_u(strOffset.Union());
+			putDataInVec(Save::VarUnion::tab, scriptTableOffset);
 		}
-		else if (std::holds_alternative<double>(s))
+		else if (std::holds_alternative<Vector3Int>(s))
 		{
-			ut.add_u_type(Save::VarUnion::num);
-			ut.add_u(doubleOffset.Union());
+			Save::vec3TableBuilder vtb{ fbb };
+			Vector3Int data = std::get<Vector3Int>(s);
+			Save::Vector3 saveVec = FromVector3(std::get<Vector3Int>(s));
+			vtb.add_vec(&saveVec);
+			auto vec3Offset = vtb.Finish();
+
+			putDataInVec(Save::VarUnion::vec3, vec3Offset);
 		}
-		else if (std::holds_alternative<bool>(s))
-		{
-			ut.add_u_type(Save::VarUnion::boolean);
-			ut.add_u(boolOffset.Union());
-		}
-		else if (std::holds_alternative<IndexTable>(s))
-		{
-			ut.add_u_type(Save::VarUnion::tab);
-			ut.add_u(scriptTableOffset.Union());
-		}
-		varsVec.push_back(ut.Finish());
 	}
 	auto unionVec = fbb.CreateVector(varsVec);
 	Save::UnionVecBuilder uvb{ fbb };
@@ -1918,11 +1916,15 @@ bool SaveGame::Load(int slot)
 			{
 				auto tab = var->u_as_tab()->keys_vals();
 				auto& loadedTab = loadedVars.emplace_back(IndexTable{});
-				
+
 				for (auto const& p : *tab)
 				{
 					std::get<IndexTable>(loadedTab).push_back(std::make_pair(p->key(), p->val()));
 				}
+			}
+			else if (var->u_type() == Save::VarUnion::vec3)
+			{
+				loadedVars.push_back(ToVector3Int(var->u_as_vec3()->vec()));
 			}
 		}
 	}

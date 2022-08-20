@@ -89,8 +89,6 @@ most can just be ignored (see usage).
 		0, -- room
 		)
 	*/
-
-
 static std::unique_ptr<Moveable> Create(
 	GAME_OBJECT_ID objID,
 	std::string const & name,

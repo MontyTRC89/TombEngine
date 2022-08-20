@@ -19,7 +19,7 @@ using VarSaveType = std::variant<bool, double, std::string>;
 
 using IndexTable = std::vector<std::pair<uint32_t, uint32_t>>;
 
-using SavedVar = std::variant<bool, std::string, double, IndexTable>;
+using SavedVar = std::variant<bool, std::string, double, IndexTable, Vector3Int>;
 
 class ScriptInterfaceGame {
 public:

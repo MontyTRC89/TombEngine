@@ -8,6 +8,7 @@
 #include "Game/effects/lightning.h"
 #include "ScriptUtil.h"
 #include "Objects/Moveable/MoveableObject.h"
+#include "Vec3/Vec3.h"
 
 using namespace TEN::Effects::Lightning;
 
@@ -290,6 +291,11 @@ void LogicHandler::SetVariables(std::vector<SavedVar> const & vars)
 						solTables[i][vars[first]] = vars[second];
 					}
 				}
+				else if (std::holds_alternative<Vector3Int>(vars[second]))
+				{
+					auto theVec = Vec3{ std::get<Vector3Int>(vars[second]) };
+					solTables[i][vars[first]] = theVec;
+				}
 				else
 				{
 					solTables[i][vars[first]] = vars[second];
@@ -322,12 +328,20 @@ void LogicHandler::GetVariables(std::vector<SavedVar> & vars)
 	std::unordered_map<void const*, uint32_t> varsMap;
 	std::unordered_map<double, uint32_t> numMap;
 	std::unordered_map<bool, uint32_t> boolMap;
-	size_t nVars = 0;
-	auto handleNum = [&](double num)
-	{
-		auto [first, second] = numMap.insert(std::pair<double, uint32_t>(num, nVars));
 
-		// true if the var was inserted
+	size_t nVars = 0;
+
+	// The following functions will all try to put their values in a map. If it succeeds
+	// then the value was not already in the map, so we can put it into the var vector.
+	// If it fails, the value is in the map, and thus will also be in the var vector.
+	// We then return the value's position in the var vector.
+
+	// The purpose of this is to only store each value once, and to fill our tables with
+	// indices to the values rather than copies of the values.
+	 auto handleNum = [&](double num)
+	{
+		auto [first, second] = numMap.insert(std::make_pair(num, nVars));
+
 		if (second)
 		{
 			vars.push_back(num);
@@ -339,9 +353,8 @@ void LogicHandler::GetVariables(std::vector<SavedVar> & vars)
 
 	auto handleBool = [&](bool num)
 	{
-		auto [first, second] = boolMap.insert(std::pair<bool, uint32_t>(num, nVars));
+		auto [first, second] = boolMap.insert(std::make_pair(num, nVars));
 
-		// true if the var was inserted
 		if (second)
 		{
 			vars.push_back(num);
@@ -354,9 +367,8 @@ void LogicHandler::GetVariables(std::vector<SavedVar> & vars)
 	auto handleStr = [&](sol::object const& obj)
 	{
 		auto str = obj.as<sol::string_view>();
-		auto [first, second] = varsMap.insert(std::pair<void const*, uint32_t>(str.data(), nVars));
+		auto [first, second] = varsMap.insert(std::make_pair(str.data(), nVars));
 
-		// true if the string was inserted
 		if (second)
 		{
 			vars.push_back(std::string{ str.data() });
@@ -366,11 +378,23 @@ void LogicHandler::GetVariables(std::vector<SavedVar> & vars)
 		return first->second;
 	};
 
+	auto handleVec3 = [&](Vec3 const & vec)
+	{
+		auto [first, second] = varsMap.insert(std::make_pair(&vec, nVars));
+
+		if (second)
+		{
+			vars.push_back(vec);
+			++nVars;
+		}
+
+		return first->second;
+	};
+
 	std::function<uint32_t(sol::table const &)> populate = [&](sol::table const & obj) 
 	{
-		auto [first, second] = varsMap.insert(std::pair<void const*, uint32_t>(obj.pointer(), nVars));
+		auto [first, second] = varsMap.insert(std::make_pair(obj.pointer(), nVars));
 
-		// true if the table was inserted
 		if(second)
 		{
 			++nVars;
@@ -394,24 +418,33 @@ void LogicHandler::GetVariables(std::vector<SavedVar> & vars)
 					ScriptAssert(false, "Tried saving an unsupported type as a key");
 				}
 
+				auto putInVars = [&vars, id, keyIndex](uint32_t valIndex)
+				{
+					std::get<IndexTable>(vars[id]).push_back(std::make_pair(keyIndex, valIndex));
+				};
+
 				uint32_t valIndex = 0;
 				switch (second.get_type())
 				{
 				case sol::type::table:
-					valIndex = populate(second.as<sol::table>());
-					std::get<IndexTable>(vars[id]).push_back(std::make_pair(keyIndex, valIndex));
+					putInVars(populate(second.as<sol::table>()));
 					break;
 				case sol::type::string:
-					valIndex = handleStr(second);
-					std::get<IndexTable>(vars[id]).push_back(std::make_pair(keyIndex, valIndex));
+					putInVars(handleStr(second));
 					break;
 				case sol::type::number:
-					valIndex = handleNum(second.as<double>());
-					std::get<IndexTable>(vars[id]).push_back(std::make_pair(keyIndex, valIndex));
+					putInVars(handleNum(second.as<double>()));
 					break;
 				case sol::type::boolean:
-					valIndex = handleBool(second.as<bool>());
-					std::get<IndexTable>(vars[id]).push_back(std::make_pair(keyIndex, valIndex));
+					putInVars(handleBool(second.as<bool>()));
+					break;
+				case sol::type::userdata:
+				{
+					if(second.is<Vec3>())
+						putInVars(handleVec3(second.as<Vec3>()));
+					else
+						ScriptAssert(false, "Tried saving an unsupported userdata as a value");
+				}
 					break;
 				default:
 					ScriptAssert(false, "Tried saving an unsupported type as a value");

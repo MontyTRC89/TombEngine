@@ -385,11 +385,16 @@ table boolTable {
 	scalar: bool;
 }
 
+table vec3Table {
+	vec: Vector3;
+}
+
 union VarUnion {
 	str: stringTable,
 	tab: ScriptTable,
 	num: doubleTable,
-	boolean: boolTable
+	boolean: boolTable,
+	vec3: vec3Table
 }
 
 table UnionTable{
