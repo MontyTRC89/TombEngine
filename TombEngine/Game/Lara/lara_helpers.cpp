@@ -57,7 +57,7 @@ void HandleLaraMovementParameters(ItemInfo* item, CollisionInfo* coll)
 		lara->Control.RunJumpQueued = false;
 
 	// Reset lean.
-	if (!lara->Control.IsMoving || (lara->Control.IsMoving && !(TrInput & (IN_LEFT | IN_RIGHT))))
+	if ((!lara->Control.IsMoving || (lara->Control.IsMoving && !(TrInput & (IN_LEFT | IN_RIGHT)))) && !lara->Control.IsLow)
 		ResetLaraLean(item, 6.0f);
 
 	// Reset crawl flex.
@@ -71,6 +71,8 @@ void HandleLaraMovementParameters(ItemInfo* item, CollisionInfo* coll)
 	item->Pose.Orientation.y += lara->Control.TurnRate;
 	if (!(TrInput & (IN_LEFT | IN_RIGHT)))
 		lara->Control.TurnRate = 0;
+
+	lara->Control.IsLow = false;
 }
 
 bool HandleLaraVehicle(ItemInfo* item, CollisionInfo* coll)
@@ -559,7 +561,7 @@ void AlignLaraToSurface(ItemInfo* item)
 {
 	auto probe = GetCollision(item);
 	short aspectAngle = GetSurfaceAspectAngle(probe.FloorTilt);
-	short steepnessAngle = std::min<short>(GetSurfaceSteepnessAngle(probe.FloorTilt), (ANGLE(45.0f) / 4) * 3);
+	short steepnessAngle = std::min<short>(GetSurfaceSteepnessAngle(probe.FloorTilt), ANGLE(70.0f));
 
 	short angularDistance = aspectAngle - item->Pose.Orientation.y;
 	float sinAngDist = phd_sin(angularDistance);
@@ -570,7 +572,7 @@ void AlignLaraToSurface(ItemInfo* item)
 		0,
 		(steepnessAngle * sinAngDist) - item->Pose.Orientation.z
 	);
-	item->Pose.Orientation += extraRot / 6; // TODO: Angle doesn't match because this smoothing method is wrong.
+	item->Pose.Orientation += extraRot / 6.0f;
 }
 
 void SetLaraJumpDirection(ItemInfo* item, CollisionInfo* coll) 
