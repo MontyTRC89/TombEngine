@@ -815,28 +815,19 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, Vector3Int offset, bo
 	}
 }
 
-// New function for rotating item along XZ slopes.
-// (int radiusDivide) is for radiusZ, else the MaxZ is too high and cause rotation problem !
-// Dont need to set a value in radiusDivisor if you dont need it (radiusDivisor is set to 1 by default).
-// Warning: dont set it to 0 !!!!
-void CalculateItemRotationToSurface(ItemInfo* item, float radiusDivisor, float maxAngle, short xOffset, short zOffset)
+void CalculateItemRotationToSurface(ItemInfo* item, float zRadiusDivisor, float maxAngle, short xOffset, short zOffset)
 {
-	if (!radiusDivisor)
+	if (zRadiusDivisor == 0.0f)
 	{
-		TENLog(std::string("CalculateItemRotationToSurface() attempted division by zero!"), LogLevel::Warning);
+		TENLog(std::string("CalculateItemRotationToSurface() attempted division by zero."), LogLevel::Warning);
 		return;
 	}
 
-	auto pos = GameVector(
-		item->Pose.Position.x,
-		item->Pose.Position.y,
-		item->Pose.Position.z,
-		item->RoomNumber
-	);
+	auto pos = GameVector(item->Pose.Position, item->RoomNumber);
 
 	auto* bounds = GetBoundsAccurate(item);
 	auto radiusX = bounds->X2;
-	auto radiusZ = bounds->Z2 / radiusDivisor; // Need divide in any case else it's too much !
+	auto radiusZ = bounds->Z2 / zRadiusDivisor; // zRadiusDivisor may be used to avoid overshooting in some cases.
 
 	auto ratioXZ = radiusZ / radiusX;
 	auto frontX = phd_sin(item->Pose.Orientation.y) * radiusZ;
@@ -854,15 +845,17 @@ void CalculateItemRotationToSurface(ItemInfo* item, float radiusDivisor, float m
 	auto frontHDif = backHeight  - frontHeight;
 	auto sideHDif  = rightHeight - leftHeight;
 
-	// Don't align if height differences are too large
+	// Don't align if height differences are too significant.
 	if ((abs(frontHDif) > STEPUP_HEIGHT) || (abs(sideHDif) > STEPUP_HEIGHT))
 		return;
 
-	// NOTE: float(atan2()) is required, else warning about double !
-	short angleX = ANGLE(float(atan2(frontHDif, 2 * radiusZ)) / RADIAN) + xOffset;
-	short angleZ = ANGLE(float(atan2(sideHDif, 2 * radiusX)) / RADIAN) + zOffset;
-	if (abs(angleX) <= ANGLE(maxAngle)) item->Pose.Orientation.x = angleX;
-	if (abs(angleZ) <= ANGLE(maxAngle)) item->Pose.Orientation.z = angleZ;
+	short angleX = phd_atan(frontHDif, radiusZ * 2) + xOffset;
+	if (abs(angleX) <= ANGLE(maxAngle))
+		item->Pose.Orientation.x = angleX;
+
+	short angleZ = phd_atan(sideHDif, radiusX * 2) + zOffset;
+	if (abs(angleZ) <= ANGLE(maxAngle))
+		item->Pose.Orientation.z = angleZ;
 }
 
 int GetQuadrant(short angle)
