@@ -817,27 +817,27 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, Vector3Int offset, bo
 
 void AlignEntityToSurface(ItemInfo* item, Vector2 radius, float tiltConstraintAngle, Vector3Shrt orientOffset)
 {
-	radius *= 0.75f;
+	radius /= 2;
 
 	int frontHeight = GetCollision(item, item->Pose.Orientation.y, radius.y).Position.Floor;
 	int backHeight	= GetCollision(item, item->Pose.Orientation.y + ANGLE(180.0f), radius.y).Position.Floor;
 	int leftHeight	= GetCollision(item, item->Pose.Orientation.y - ANGLE(90.0f), radius.x).Position.Floor;
 	int rightHeight = GetCollision(item, item->Pose.Orientation.y + ANGLE(90.0f), radius.x).Position.Floor;
 
-	int xHeightDif = backHeight - frontHeight;
-	int zHeightDif = rightHeight - leftHeight;
+	int forwardHeightDif = backHeight - frontHeight;
+	int lateralHeightDif = rightHeight - leftHeight;
 
 	// Don't align if height differences are too significant.
-	if ((abs(xHeightDif) > STEPUP_HEIGHT) || (abs(zHeightDif) > STEPUP_HEIGHT))
+	if ((abs(forwardHeightDif) > STEPUP_HEIGHT) || (abs(lateralHeightDif) > STEPUP_HEIGHT))
 		return;
 
-	short angleX = phd_atan(xHeightDif, radius.y * 2) + orientOffset.x;
-	if (abs(angleX) <= ANGLE(tiltConstraintAngle))
-		item->Pose.Orientation.x = angleX;
+	short xAngle = phd_atan(radius.y * 2, forwardHeightDif) + orientOffset.x;
+	if (abs(xAngle) <= ANGLE(tiltConstraintAngle))
+		item->Pose.Orientation.x = xAngle;
 
-	short angleZ = phd_atan(zHeightDif, radius.x * 2) + orientOffset.z;
-	if (abs(angleZ) <= ANGLE(tiltConstraintAngle))
-		item->Pose.Orientation.z = angleZ;
+	short zAngle = phd_atan(radius.x * 2, lateralHeightDif) + orientOffset.z;
+	if (abs(zAngle) <= ANGLE(tiltConstraintAngle))
+		item->Pose.Orientation.z = zAngle;
 }
 
 int GetQuadrant(short angle)
