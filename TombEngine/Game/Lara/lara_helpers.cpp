@@ -57,8 +57,11 @@ void HandleLaraMovementParameters(ItemInfo* item, CollisionInfo* coll)
 		lara->Control.RunJumpQueued = false;
 
 	// Reset lean.
-	if ((!lara->Control.IsMoving || (lara->Control.IsMoving && !(TrInput & (IN_LEFT | IN_RIGHT)))) && !lara->Control.IsLow)
+	if ((!lara->Control.IsMoving || (lara->Control.IsMoving && !(TrInput & (IN_LEFT | IN_RIGHT)))) &&
+		(!lara->Control.IsLow && item->Animation.ActiveState != LS_DEATH)) // HACK: Don't interfere with surface alignment in crouch, crawl, adn death states.
+	{
 		ResetLaraLean(item, 6.0f);
+	}
 
 	// Reset crawl flex.
 	if (!(TrInput & IN_LOOK) && coll->Setup.Height > LARA_HEIGHT - LARA_HEADROOM &&	// HACK
