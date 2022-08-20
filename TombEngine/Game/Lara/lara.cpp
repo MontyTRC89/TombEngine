@@ -457,8 +457,6 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 
 	RumbleLaraHealthCondition(item);
 
-	lara->Control.IsLow = false;
-
 	bool isWater = TestEnvironment(ENV_FLAG_WATER, item);
 	bool isSwamp = TestEnvironment(ENV_FLAG_SWAMP, item);
 
@@ -820,6 +818,8 @@ void LaraWaterSurface(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
+	lara->Control.IsLow = false;
+
 	Camera.targetElevation = -ANGLE(22.0f);
 
 	coll->Setup.Mode = CollisionProbeMode::FreeForward;
@@ -889,6 +889,8 @@ void LaraWaterSurface(ItemInfo* item, CollisionInfo* coll)
 void LaraUnderwater(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
+
+	lara->Control.IsLow = false;
 
 	coll->Setup.Mode = CollisionProbeMode::Quadrants;
 	coll->Setup.Radius = LARA_RADIUS_UNDERWATER;
