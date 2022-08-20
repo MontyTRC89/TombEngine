@@ -76,6 +76,7 @@ namespace TEN::Entities::TR4
 			return;
 
 		auto* item = &g_Level.Items[itemNumber];
+		auto* object = &Objects[item->ObjectNumber];
 		auto* creature = GetCreatureInfo(item);
 
 		short angle = 0;
@@ -297,8 +298,6 @@ namespace TEN::Entities::TR4
 
 		if (!CutSeqNum)
 			CreatureAnimation(itemNumber, angle, 0);
-
-		auto* object = &Objects[item->ObjectNumber];
 
 		auto radius = Vector2(object->radius, object->radius * 1.33f);
 		AlignEntityToSurface(item, radius);
