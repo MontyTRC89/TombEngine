@@ -16,7 +16,7 @@
 using namespace TEN::Math::Random;
 using std::vector;
 
-namespace TEN::Entities::TR5
+namespace TEN::Entities::Creatures::TR5
 {
 	constexpr auto LION_POUNCE_ATTACK_DAMAGE = 200;
 	constexpr auto LION_BITE_ATTACK_DAMAGE	 = 60;

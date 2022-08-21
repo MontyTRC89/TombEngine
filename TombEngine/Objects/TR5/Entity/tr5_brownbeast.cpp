@@ -15,7 +15,7 @@
 
 using namespace TEN::Math::Random;
 
-namespace TEN::Entities::TR5
+namespace TEN::Entities::Creatures::TR5
 {
 	constexpr auto BROWN_BEAST_ATTACK_DAMAGE = 150;
 

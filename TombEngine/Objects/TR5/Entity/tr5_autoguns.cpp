@@ -14,7 +14,7 @@
 
 using namespace TEN::Math::Random;
 
-namespace TEN::Entities::TR5
+namespace TEN::Entities::Creatures::TR5
 {
 	void InitialiseAutoGuns(short itemNumber)
 	{

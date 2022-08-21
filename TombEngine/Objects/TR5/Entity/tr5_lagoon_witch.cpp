@@ -14,7 +14,7 @@
 
 using std::vector;
 
-namespace TEN::Entities::TR5
+namespace TEN::Entities::Creatures::TR5
 {
 	constexpr auto LAGOON_WITCH_ATTACK_DAMAGE = 100;
 

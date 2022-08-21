@@ -22,7 +22,7 @@ namespace TEN::Entities::TR4
 {
 	constexpr auto BIG_SCORPION_ATTACK_DAMAGE		   = 120;
 	constexpr auto BIG_SCORPION_TROOP_ATTACK_DAMAGE	   = 15;
-	constexpr auto BIG_SCORPION_STINGER_POISON_POTENCY = 8;
+	constexpr auto BIG_SCORPION_STINGER_POISON_POTENCY = 16;
 
 	constexpr auto BIG_SCORPION_ATTACK_RANGE = SQUARE(SECTOR(1.35));
 	constexpr auto BIG_SCORPION_RUN_RANGE	 = SQUARE(SECTOR(2));

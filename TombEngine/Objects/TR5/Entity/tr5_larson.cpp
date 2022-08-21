@@ -16,7 +16,7 @@
 
 using namespace TEN::Math::Random;
 
-namespace TEN::Entities::TR5
+namespace TEN::Entities::Creatures::TR5
 {
 	#define STATE_TR5_LARSON_STOP	1
 	#define STATE_TR5_LARSON_WALK	2

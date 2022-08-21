@@ -17,7 +17,7 @@
 
 using namespace TEN::Math::Random;
 
-namespace TEN::Entities::TR5
+namespace TEN::Entities::Creatures::TR5
 {
 	const auto HydraBite = BiteInfo(Vector3::Zero, 11);
 

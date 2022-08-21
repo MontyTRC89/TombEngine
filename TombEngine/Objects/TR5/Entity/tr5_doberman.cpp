@@ -14,7 +14,7 @@
 
 using namespace TEN::Math::Random;
 
-namespace TEN::Entities::TR5
+namespace TEN::Entities::Creatures::TR5
 {
 	const auto DobermanBite = BiteInfo(Vector3(0.0f, 30.0f, 141.0f), 20);
 

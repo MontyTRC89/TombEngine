@@ -13,7 +13,7 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-namespace TEN::Entities::TR5
+namespace TEN::Entities::Creatures::TR5
 {
 	const auto ChefBite = BiteInfo(Vector3(0.0f, 200.0f, 0.0f), 13);
 
