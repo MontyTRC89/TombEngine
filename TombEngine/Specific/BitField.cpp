@@ -126,6 +126,17 @@ namespace TEN::Utils
 		return this->Test({ index });
 	}
 
+	bool BitField::TestAny()
+	{
+		for (auto& bit : this->Container)
+		{
+			if (bit)
+				return true;
+		}
+
+		return false;
+	}
+
 	bool BitField::TestAll()
 	{
 		for (auto& bit : this->Container)
