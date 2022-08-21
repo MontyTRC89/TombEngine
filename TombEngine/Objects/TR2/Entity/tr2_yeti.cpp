@@ -13,11 +13,14 @@
 #include "Specific/setup.h"
 
 using namespace TEN::Math::Random;
+using std::vector;
 
 namespace TEN::Entities::TR2
 {
-	const auto YetiBiteLeft = BiteInfo(Vector3(12.0f, 101.0f, 19.0f), 13);
+	const auto YetiBiteLeft	 = BiteInfo(Vector3(12.0f, 101.0f, 19.0f), 13);
 	const auto YetiBiteRight = BiteInfo(Vector3(12.0f, 101.0f, 19.0f), 10);
+	const vector<int> YetiAttackJoints1 = { 10, 12 }; // TODO: Rename.
+	const vector<int> YetiAttackJoints2 = { 8, 9, 10 };
 
 	// TODO
 	enum YetiState
@@ -50,9 +53,9 @@ namespace TEN::Entities::TR2
 		bool isLaraAlive = LaraItem->HitPoints > 0;
 
 		short angle = 0;
+		short tilt = 0;
 		short torso = 0;
 		short head = 0;
-		short tilt = 0;
 
 		if (item->HitPoints <= 0)
 		{
@@ -213,8 +216,7 @@ namespace TEN::Entities::TR2
 				if (AI.ahead)
 					torso = AI.angle;
 
-				if (!info->Flags &&
-					item->TouchBits & 0x1400)
+				if (!info->Flags && item->TestBits(JointBitType::Touch, YetiAttackJoints1))
 				{
 					CreatureEffect(item, YetiBiteRight, DoBloodSplat);
 					DoDamage(info->Enemy, 100);
@@ -230,11 +232,12 @@ namespace TEN::Entities::TR2
 					torso = AI.angle;
 
 				if (!info->Flags &&
-					item->TouchBits & (0x0700 | 0x1400))
+					(item->TestBits(JointBitType::Touch, YetiAttackJoints1) || item->TestBits(JointBitType::Touch, YetiAttackJoints2)))
 				{
-					if (item->TouchBits & 0x0700)
+					if (item->TestBits(JointBitType::Touch, YetiAttackJoints2))
 						CreatureEffect(item, YetiBiteLeft, DoBloodSplat);
-					if (item->TouchBits & 0x1400)
+
+					if (item->TestBits(JointBitType::Touch, YetiAttackJoints1))
 						CreatureEffect(item, YetiBiteRight, DoBloodSplat);
 
 					DoDamage(info->Enemy, 150);
@@ -248,11 +251,12 @@ namespace TEN::Entities::TR2
 					torso = AI.angle;
 
 				if (!info->Flags &&
-					item->TouchBits & (0x0700 | 0x1400))
+					(item->TestBits(JointBitType::Touch, YetiAttackJoints1) || item->TestBits(JointBitType::Touch, YetiAttackJoints2)))
 				{
-					if (item->TouchBits & 0x0700)
+					if (item->TestBits(JointBitType::Touch, YetiAttackJoints2))
 						CreatureEffect(item, YetiBiteLeft, DoBloodSplat);
-					if (item->TouchBits & 0x1400)
+
+					if (item->TestBits(JointBitType::Touch, YetiAttackJoints1))
 						CreatureEffect(item, YetiBiteRight, DoBloodSplat);
 
 					DoDamage(info->Enemy, 200);

@@ -18,27 +18,22 @@
 #include "Specific/setup.h"
 
 using namespace TEN::Input;
+using std::vector;
 
 namespace TEN::Entities::TR2
 {
-	const auto DragonMouthBite = BiteInfo(Vector3(35.0f, 171.0f, 1168.0f), 12);
-
 	constexpr auto DRAGON_SWIPE_ATTACK_DAMAGE = 250;
-	constexpr auto DRAGON_TOUCH_DAMAGE		  = 10;
+	constexpr auto DRAGON_CONTACT_DAMAGE	  = 10;
 
-
+	const auto DragonMouthBite = BiteInfo(Vector3(35.0f, 171.0f, 1168.0f), 12);
+	const vector<int> DragonSwipeAttackJointsLeft  = { 24, 25, 26, 27, 28, 29, 30 };
+	const vector<int> DragonSwipeAttackJointsRight = { 1, 2, 3, 4, 5, 6, 7 };
 
 	// TODO: Organise.
-	#define DRAGON_SWIPE_DAMAGE 250
-	#define DRAGON_TOUCH_DAMAGE 10
-
 	#define DRAGON_LIVE_TIME (30 * 11)
 	#define DRAGON_CLOSE_RANGE pow(SECTOR(3), 2)
 	#define DRAGON_STATE_IDLE_RANGE pow(SECTOR(6), 2)
 	#define DRAGON_FLAME_SPEED 200
-
-	#define DRAGON_TOUCH_R 0x0fe
-	#define DRAGON_TOUCH_L 0x7f000000
 
 	#define DRAGON_ALMOST_LIVE 100
 	#define BOOM_TIME 130
@@ -255,8 +250,8 @@ namespace TEN::Entities::TR2
 		auto* item = &g_Level.Items[itemNumber];
 		auto* creature = GetCreatureInfo(item);
 
-		short head = 0;
 		short angle = 0;
+		short head = 0;
 
 		bool ahead;
 
@@ -318,9 +313,7 @@ namespace TEN::Entities::TR2
 			ahead = (AI.ahead && AI.distance > DRAGON_CLOSE_RANGE && AI.distance < DRAGON_STATE_IDLE_RANGE);
 
 			if (item->TouchBits)
-			{
-				DoDamage(creature->Enemy, DRAGON_TOUCH_DAMAGE);
-			}
+				DoDamage(creature->Enemy, DRAGON_CONTACT_DAMAGE);
 
 			switch (item->Animation.ActiveState)
 			{
@@ -350,19 +343,19 @@ namespace TEN::Entities::TR2
 				break;
 
 			case DRAGON_STATE_SWIPE_LEFT:
-				if (item->TouchBits & DRAGON_TOUCH_L)
+				if (item->TestBits(JointBitType::Touch, DragonSwipeAttackJointsLeft))
 				{
+					DoDamage(creature->Enemy, DRAGON_SWIPE_ATTACK_DAMAGE);
 					creature->Flags = 0;
-					DoDamage(creature->Enemy, DRAGON_SWIPE_DAMAGE);
 				}
 
 				break;
 
 			case DRAGON_STATE_SWIPE_RIGHT:
-				if (item->TouchBits & DRAGON_TOUCH_R)
+				if (item->TestBits(JointBitType::Touch, DragonSwipeAttackJointsRight))
 				{
+					DoDamage(creature->Enemy, DRAGON_SWIPE_ATTACK_DAMAGE);
 					creature->Flags = 0;
-					DoDamage(creature->Enemy, DRAGON_SWIPE_DAMAGE);
 				}
 
 				break;
@@ -404,13 +397,11 @@ namespace TEN::Entities::TR2
 			case DRAGON_STATE_TURN_LEFT:
 				item->Pose.Orientation.y += -(ANGLE(1.0f) - angle);
 				creature->Flags = 0;
-
 				break;
 
 			case DRAGON_STATE_TURN_RIGHT:
 				item->Pose.Orientation.y += (ANGLE(1.0f) - angle);
 				creature->Flags = 0;
-
 				break;
 
 			case DRAGON_STATE_AIM_1:
@@ -434,11 +425,10 @@ namespace TEN::Entities::TR2
 
 			case DRAGON_STATE_FIRE_1:
 				item->Pose.Orientation.y -= angle;
+				SoundEffect(SFX_TR2_DRAGON_FIRE, &item->Pose);
 
 				if (AI.ahead)
 					head = -AI.angle;
-
-				SoundEffect(SFX_TR2_DRAGON_FIRE, &item->Pose);
 
 				if (creature->Flags)
 				{
@@ -459,12 +449,7 @@ namespace TEN::Entities::TR2
 		back->Animation.ActiveState = item->Animation.ActiveState;
 		back->Animation.AnimNumber = Objects[ID_DRAGON_BACK].animIndex + (item->Animation.AnimNumber - Objects[ID_DRAGON_FRONT].animIndex);
 		back->Animation.FrameNumber = g_Level.Anims[back->Animation.AnimNumber].frameBase + (item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase);
-		back->Pose.Position.x = item->Pose.Position.x;
-		back->Pose.Position.y = item->Pose.Position.y;
-		back->Pose.Position.z = item->Pose.Position.z;
-		back->Pose.Orientation.x = item->Pose.Orientation.x;
-		back->Pose.Orientation.y = item->Pose.Orientation.y;
-		back->Pose.Orientation.z = item->Pose.Orientation.z;
+		back->Pose = item->Pose;
 
 		if (back->RoomNumber != item->RoomNumber)
 			ItemNewRoom(backItemNumber, item->RoomNumber);
@@ -484,9 +469,7 @@ namespace TEN::Entities::TR2
 		{
 			auto* back = &g_Level.Items[backItem];
 			back->ObjectNumber = ID_DRAGON_BACK;
-			back->Pose.Position.x = item->Pose.Position.x;
-			back->Pose.Position.y = item->Pose.Position.y;
-			back->Pose.Position.z = item->Pose.Position.z;
+			back->Pose.Position = item->Pose.Position;
 			back->Pose.Orientation.y = item->Pose.Orientation.y;
 			back->RoomNumber = item->RoomNumber;
 			back->Status = ITEM_INVISIBLE;
@@ -500,9 +483,7 @@ namespace TEN::Entities::TR2
 			auto* front = &g_Level.Items[frontItem];
 
 			front->ObjectNumber = ID_DRAGON_FRONT;
-			front->Pose.Position.x = item->Pose.Position.x;
-			front->Pose.Position.y = item->Pose.Position.y;
-			front->Pose.Position.z = item->Pose.Position.z;
+			front->Pose.Position = item->Pose.Position;
 			front->Pose.Orientation.y = item->Pose.Orientation.y;
 			front->RoomNumber = item->RoomNumber;
 			front->Status = ITEM_INVISIBLE;
