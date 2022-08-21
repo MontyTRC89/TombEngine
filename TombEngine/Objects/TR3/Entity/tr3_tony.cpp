@@ -20,7 +20,7 @@
 
 using namespace TEN::Effects::Lara;
 
-namespace TEN::Entities::TR3
+namespace TEN::Entities::Creatures::TR3
 {
 	static BOSS_STRUCT BossData;
 

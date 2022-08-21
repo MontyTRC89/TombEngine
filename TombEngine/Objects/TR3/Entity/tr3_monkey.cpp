@@ -16,7 +16,7 @@
 using namespace TEN::Math::Random;
 using std::vector;
 
-namespace TEN::Entities::TR3
+namespace TEN::Entities::Creatures::TR3
 {
 	// TODO: Work out damage constants.
 	constexpr auto MONKEY_SWIPE_ATTACK_PLAYER_DAMAGE = 40;

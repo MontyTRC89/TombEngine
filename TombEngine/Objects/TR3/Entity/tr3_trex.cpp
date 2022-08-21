@@ -15,7 +15,7 @@
 using namespace TEN::Math::Random;
 using std::vector;
 
-namespace TEN::Entities::TR3
+namespace TEN::Entities::Creatures::TR3
 {
 	constexpr auto TREX_ROAR_CHANCE = 0.015f;
 

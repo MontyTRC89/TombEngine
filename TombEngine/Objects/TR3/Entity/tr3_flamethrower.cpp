@@ -19,7 +19,7 @@
 
 using namespace TEN::Math::Random;
 
-namespace TEN::Entities::TR3
+namespace TEN::Entities::Creatures::TR3
 {
 	const auto FlamethrowerOffset = Vector3Int(0, 340, 0);
 	const auto FlamethrowerBite = BiteInfo(Vector3(0.0f, 340.0f, 64.0f), 7);

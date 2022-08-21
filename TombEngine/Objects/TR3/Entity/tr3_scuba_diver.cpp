@@ -13,7 +13,7 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-namespace TEN::Entities::TR3
+namespace TEN::Entities::Creatures::TR3
 {
 	constexpr auto SCUBA_DIVER_ATTACK_DAMAGE = 50;
 

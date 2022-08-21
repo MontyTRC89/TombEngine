@@ -19,7 +19,7 @@
 using namespace TEN::Math::Random;
 using std::vector;
 
-namespace TEN::Entities::TR3
+namespace TEN::Entities::Creatures::TR3
 {
 	constexpr auto SHIVA_GRAB_ATTACK_DAMAGE		= 150;
 	constexpr auto SHIVA_DOWNWARD_ATTACK_DAMAGE = 180;

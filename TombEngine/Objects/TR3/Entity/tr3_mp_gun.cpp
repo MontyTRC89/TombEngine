@@ -19,7 +19,7 @@
 
 using namespace TEN::Math::Random;
 
-namespace TEN::Entities::TR3
+namespace TEN::Entities::Creatures::TR3
 {
 	const auto MPGunBite = BiteInfo(Vector3(0.0f, 160.0f, 40.0f), 13);
 

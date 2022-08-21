@@ -35,7 +35,7 @@
 #include "Objects/TR3/Vehicles/upv.h"
 #include "Objects/TR3/Vehicles/rubber_boat.h"
 
-using namespace TEN::Entities::TR3;
+using namespace TEN::Entities::Creatures::TR3;
 
 static void StartEntity(ObjectInfo* obj)
 {
