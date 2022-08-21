@@ -34,7 +34,8 @@ namespace TEN::Utils
 		bool Test(const vector<uint>& indices);
 		bool Test(uint index);
 		bool TestAll();
-		bool TestNone();
+		bool IsFull();
+		bool IsEmpty();
 
 		// Operators
 		operator uint() const;

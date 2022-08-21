@@ -114,11 +114,11 @@ namespace TEN::Utils
 	{
 		for (auto& index : indices)
 		{
-			if (!Container[index])
-				return false;
+			if (Container[index])
+				return true;
 		}
 
-		return true;
+		return false;
 	}
 
 	bool BitField::Test(uint index)
@@ -130,14 +130,25 @@ namespace TEN::Utils
 	{
 		for (auto& bit : this->Container)
 		{
+			if (bit)
+				return true;
+		}
+
+		return false;
+	}
+
+	bool BitField::IsFull()
+	{
+		for (auto& bit : this->Container)
+		{
 			if (!bit)
 				return false;
 		}
 
 		return true;
 	}
-	
-	bool BitField::TestNone()
+
+	bool BitField::IsEmpty()
 	{
 		for (auto& bit : this->Container)
 		{
