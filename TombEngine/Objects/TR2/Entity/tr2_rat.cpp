@@ -14,7 +14,7 @@
 
 using namespace TEN::Math::Random;
 
-namespace TEN::Entities::TR2
+namespace TEN::Entities::Creatures::TR2
 {
 	constexpr auto RAT_ATTACK_DAMAGE = 20;
 	constexpr auto RAT_ATTACK_RANGE = SQUARE(CLICK(0.7f));

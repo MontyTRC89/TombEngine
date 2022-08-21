@@ -14,7 +14,7 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-namespace TEN::Entities::TR2
+namespace TEN::Entities::Creatures::TR2
 {
 	const auto SpiderBite = BiteInfo(Vector3(0.0f, 0.0f, 41.0f), 1);
 

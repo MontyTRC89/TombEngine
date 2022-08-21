@@ -15,7 +15,7 @@
 using namespace TEN::Math::Random;
 using std::vector;
 
-namespace TEN::Entities::TR2
+namespace TEN::Entities::Creatures::TR2
 {
 	const auto YetiBiteLeft	 = BiteInfo(Vector3(12.0f, 101.0f, 19.0f), 13);
 	const auto YetiBiteRight = BiteInfo(Vector3(12.0f, 101.0f, 19.0f), 10);

@@ -12,7 +12,7 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-namespace TEN::Entities::TR2
+namespace TEN::Entities::Creatures::TR2
 {
 	const auto SpearBiteLeft  = BiteInfo(Vector3(0.0f, 0.0f, 920.0f), 11);
 	const auto SpearBiteRight = BiteInfo(Vector3(0.0f, 0.0f, 920.0f), 18);

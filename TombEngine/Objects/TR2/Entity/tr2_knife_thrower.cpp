@@ -18,7 +18,7 @@
 
 using namespace TEN::Math::Random;
 
-namespace TEN::Entities::TR2
+namespace TEN::Entities::Creatures::TR2
 {
 	constexpr auto KNIFE_PROJECTILE_DAMAGE = 50;
 

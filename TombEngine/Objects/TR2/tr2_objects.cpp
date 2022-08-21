@@ -37,7 +37,7 @@
 #include "Objects/TR2/Vehicles/speedboat.h"
 #include "Objects/TR2/Vehicles/skidoo.h"
 
-using namespace TEN::Entities::TR2;
+using namespace TEN::Entities::Creatures::TR2;
 
 static void StartEntity(ObjectInfo* obj)
 {

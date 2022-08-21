@@ -10,7 +10,7 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-namespace TEN::Entities::TR2
+namespace TEN::Entities::Creatures::TR2
 {
 	const auto SilencerGunBite = BiteInfo(Vector3(3.0f, 331.0f, 56.0f), 10);
 

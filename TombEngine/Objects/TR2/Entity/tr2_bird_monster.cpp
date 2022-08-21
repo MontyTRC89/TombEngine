@@ -14,7 +14,7 @@
 using namespace TEN::Math::Random;
 using std::vector;
 
-namespace TEN::Entities::TR2
+namespace TEN::Entities::Creatures::TR2
 {
 	constexpr auto BIRD_MONSTER_ATTACK_DAMAGE = 200;
 	constexpr auto BIRD_MONSTER_SLAM_CRUSH_ATTACK_RANGE = SQUARE(SECTOR(1));

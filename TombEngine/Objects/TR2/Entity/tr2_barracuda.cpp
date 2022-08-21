@@ -12,7 +12,7 @@
 
 using std::vector;
 
-namespace TEN::Entities::TR2
+namespace TEN::Entities::Creatures::TR2
 {
 	constexpr auto BARRACUDA_ATTACK_DAMAGE = 100;
 	constexpr auto BARRACUDA_IDLE_ATTACK_RANGE		= SQUARE(SECTOR(0.67f));

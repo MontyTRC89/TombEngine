@@ -20,7 +20,7 @@
 using namespace TEN::Input;
 using std::vector;
 
-namespace TEN::Entities::TR2
+namespace TEN::Entities::Creatures::TR2
 {
 	constexpr auto DRAGON_SWIPE_ATTACK_DAMAGE = 250;
 	constexpr auto DRAGON_CONTACT_DAMAGE	  = 10;

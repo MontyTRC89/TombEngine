@@ -17,7 +17,7 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-namespace TEN::Entities::TR2
+namespace TEN::Entities::Creatures::TR2
 {
 	#define SMAN_MIN_TURN (ANGLE(2.0f))
 	#define SMAN_TARGET_ANGLE ANGLE(15.0f)

@@ -13,7 +13,7 @@
 #include "Sound/sound.h"
 #include "Specific/level.h"
 
-namespace TEN::Entities::TR2
+namespace TEN::Entities::Creatures::TR2
 {
 	const auto SwordBite = BiteInfo(Vector3(0.0f, 37.0f, 550.0f), 15);
 

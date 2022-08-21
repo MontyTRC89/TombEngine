@@ -11,7 +11,7 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-namespace TEN::Entities::TR2
+namespace TEN::Entities::Creatures::TR2
 {
 	const auto SharkBite = BiteInfo(Vector3(17.0f, -22.0f, 344.0f), 12);
 
