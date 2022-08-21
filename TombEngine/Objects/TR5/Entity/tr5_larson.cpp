@@ -35,15 +35,12 @@ namespace TEN::Entities::TR5
 	const auto PierreGun1 = BiteInfo(Vector3(60.0f, 200.0f, 0.0f), 11);
 	const auto PierreGun2 = BiteInfo(Vector3(-57.0f, 200.0f, 0.0f), 14);
 
-	void InitialiseLarson(short itemNum)
+	void InitialiseLarson(short itemNumber)
 	{
-		auto* item = &g_Level.Items[itemNum];
+		auto* item = &g_Level.Items[itemNumber];
 
-		ClearItem(itemNum);
-		item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex;
-		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-		item->Animation.TargetState = STATE_TR5_LARSON_STOP;
-		item->Animation.ActiveState = STATE_TR5_LARSON_STOP;
+		ClearItem(itemNumber);
+		SetAnimation(item, 0);
 
 		if (!item->TriggerFlags)
 			return;
@@ -66,23 +63,23 @@ namespace TEN::Entities::TR5
 		if (!CreatureActive(itemNumber))
 			return;
 
-		short tilt = 0;
+		auto* item = &g_Level.Items[itemNumber];
+		auto* creature = GetCreatureInfo(item);
+
 		short angle = 0;
+		short tilt = 0;
 		short joint0 = 0;
 		short joint1 = 0;
 		short joint2 = 0;
 
-		auto* item = &g_Level.Items[itemNumber];
-		auto* creature = GetCreatureInfo(item);
-
-		// In Streets of Rome when Larson HP are below 40 he runs way
+		// TODO: When Larson's HP is below 40, he runs away in Streets of Rome. Keeping block commented for reference.
 		/*if (item->HitPoints <= TR5_LARSON_MIN_HP && !(item->flags & IFLAG_INVISIBLE))
 		{
 			item->HitPoints = TR5_LARSON_MIN_HP;
 			creature->flags++;
 		}*/
 
-		// Fire weapon effects
+		// Fire weapon effects.
 		if (creature->FiredWeapon)
 		{
 			auto pos = Vector3Int(LarsonGun.Position);
@@ -96,18 +93,18 @@ namespace TEN::Entities::TR5
 		{
 			if (CurrentLevel == 2)
 			{
-				item->ItemFlags[3] = 1;
 				item->Animation.IsAirborne = false;
-				item->HitStatus = false;
-				item->Collidable = false;
 				item->Status = ITEM_DEACTIVATED;
+				item->Collidable = false;
+				item->HitStatus = false;
+				item->ItemFlags[3] = 1;
 			}
 			else
 			{
 				item->Animation.IsAirborne = false;
-				item->HitStatus = false;
-				item->Collidable = false;
 				item->Status = ITEM_ACTIVE;
+				item->Collidable = false;
+				item->HitStatus = false;
 			}
 
 			item->TriggerFlags = 0;
@@ -126,15 +123,15 @@ namespace TEN::Entities::TR5
 			if (AI.ahead)
 				joint2 = AI.angle;
 
-			// FIXME: this should make Larson running away, but it's broken
+			// FIXME: This should make Larson run away, but it doesn't work.
 			/*if (creature->flags)
 			{
 				item->HitPoints = 60;
 				item->IsAirborne = false;
-				item->hitStatus = false;
-				item->collidable = false;
-				item->status = ITEM_DESACTIVATED;
-				creature->flags = 0;
+				item->HitStatus = false;
+				item->Collidable = false;
+				item->Status = ITEM_DESACTIVATED;
+				creature->Flags = 0;
 			}*/
 
 			GetCreatureMood(item, &AI, true);
@@ -231,8 +228,8 @@ namespace TEN::Entities::TR5
 				break;
 
 			case STATE_TR5_LARSON_RUN:
-				tilt = angle / 2;
 				creature->MaxTurn = ANGLE(11.0f);
+				tilt = angle / 2;
 
 				if (AI.ahead)
 					joint2 = AI.angle;
@@ -259,16 +256,16 @@ namespace TEN::Entities::TR5
 				}
 				else
 				{
-					item->Animation.RequiredState = STATE_TR5_LARSON_IDLE;
 					item->Animation.TargetState = STATE_TR5_LARSON_STOP;
+					item->Animation.RequiredState = STATE_TR5_LARSON_IDLE;
 				}
 
 				break;
 
 			case STATE_TR5_LARSON_AIM:
+				creature->MaxTurn = 0;
 				joint0 = AI.angle / 2;
 				joint2 = AI.angle / 2;
-				creature->MaxTurn = 0;
 
 				if (AI.ahead)
 					joint1 = AI.xAngle;
@@ -311,9 +308,9 @@ namespace TEN::Entities::TR5
 				break;
 
 			case STATE_TR5_LARSON_ATTACK:
+				creature->MaxTurn = 0;
 				joint0 = AI.angle / 2;
 				joint2 = AI.angle / 2;
-				creature->MaxTurn = 0;
 
 				if (AI.ahead)
 					joint1 = AI.xAngle;
@@ -394,12 +391,12 @@ namespace TEN::Entities::TR5
 			{
 				item->TargetState = STATE_TR5_LARSON_STOP;
 				item->RequiredState = STATE_TR5_LARSON_STOP;
-				creature->reachedGoal = false;
+				creature->ReachedGoal = false;
 				item->IsAirborne = false;
-				item->hitStatus = false;
-				item->collidable = false;
-				item->status = ITEM_NOT_ACTIVE;
-				item->triggerFlags = 0;
+				item->HitStatus = false;
+				item->Collidable = false;
+				item->Status = ITEM_NOT_ACTIVE;
+				item->TriggerFlags = 0;
 			}
 			else
 			{

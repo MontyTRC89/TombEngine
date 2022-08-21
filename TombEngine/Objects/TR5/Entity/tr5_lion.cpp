@@ -181,9 +181,9 @@ namespace TEN::Entities::TR5
 					if (!item->Animation.RequiredState &&
 						item->TestBits(JointBitType::Touch, LionAttackJoints))
 					{
-						item->Animation.RequiredState = LION_STATE_IDLE;
 						DoDamage(creature->Enemy, LION_POUNCE_ATTACK_DAMAGE);
 						CreatureEffect2(item, LionBite1, 10, item->Pose.Orientation.y, DoBloodSplat);
+						item->Animation.RequiredState = LION_STATE_IDLE;
 					}
 
 					break;
@@ -194,9 +194,9 @@ namespace TEN::Entities::TR5
 					if (!item->Animation.RequiredState &&
 						item->TestBits(JointBitType::Touch, LionAttackJoints))
 					{
-						item->Animation.RequiredState = LION_STATE_IDLE;
 						DoDamage(creature->Enemy, LION_BITE_ATTACK_DAMAGE);
 						CreatureEffect2(item, LionBite2, 10, item->Pose.Orientation.y, DoBloodSplat);
+						item->Animation.RequiredState = LION_STATE_IDLE;
 					}
 
 					break;

@@ -1084,7 +1084,7 @@ int CreatureActive(short itemNumber)
 	if (item->Flags & IFLAG_KILLED)
 		return false; // Object is already dead
 
-	if (item->Status == ITEM_INVISIBLE || !item->Data.is<CreatureInfo>())
+	if (item->Status == ITEM_INVISIBLE || !item->IsCreature())
 	{
 		if (!EnableEntityAI(itemNumber, 0))
 			return false; // AI couldn't be activated
