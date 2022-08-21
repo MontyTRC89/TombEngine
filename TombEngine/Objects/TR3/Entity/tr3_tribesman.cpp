@@ -105,9 +105,9 @@ namespace TEN::Entities::Creatures::TR3
 		auto* item = &g_Level.Items[itemNumber];
 		auto* creature = GetCreatureInfo(item);
 
-		short head = 0;
 		short angle = 0;
 		short tilt = 0;
+		short head = 0;
 
 		if (item->HitPoints <= 0)
 		{
@@ -217,9 +217,9 @@ namespace TEN::Entities::Creatures::TR3
 				break;
 
 			case TRIBESMAN_STATE_WALK_FORWARD:
-				tilt = angle / 8;
 				creature->MaxTurn = ANGLE(9.0f);
 				creature->Flags = 0;
+				tilt = angle / 8;
 
 				if (creature->Mood == MoodType::Bored)
 				{
@@ -248,9 +248,9 @@ namespace TEN::Entities::Creatures::TR3
 				break;
 
 			case TRIBESMAN_STATE_RUN_FORWARD:
-				tilt = angle / 4;
 				creature->MaxTurn = ANGLE(6.0f);
 				creature->Flags = 0;
+				tilt = angle / 4;
 
 				if (creature->Mood == MoodType::Bored)
 				{
@@ -312,7 +312,7 @@ namespace TEN::Entities::Creatures::TR3
 				}
 				else
 				{
-					if (creature->Enemy)
+					if (creature->Enemy != nullptr)
 					{
 						auto direction = creature->Enemy->Pose.Position - item->Pose.Position;
 						if (abs(direction.x) < SECTOR(0.5f) &&
@@ -387,10 +387,8 @@ namespace TEN::Entities::Creatures::TR3
 
 		short angle = 0;
 		short tilt = 0;
-		short headX = 0;
-		short headY = 0;
-		short torsoX = 0;
-		short torsoY = 0;
+		auto extraHeadRot = Vector3Shrt::Zero;
+		auto extraTorsoRot = Vector3Shrt::Zero;
 
 		if (item->HitPoints <= 0)
 		{
@@ -423,8 +421,8 @@ namespace TEN::Entities::Creatures::TR3
 			angle = CreatureTurn(item, creature->Mood == MoodType::Bored ? ANGLE(2.0f) : creature->MaxTurn);
 			if (AI.ahead)
 			{
-				headY = AI.angle / 2;
-				torsoY = AI.angle / 2;
+				extraHeadRot.y = AI.angle / 2;
+				extraTorsoRot.y = AI.angle / 2;
 			}
 
 			if (item->HitStatus ||
@@ -442,16 +440,16 @@ namespace TEN::Entities::Creatures::TR3
 
 				if (AI.ahead)
 				{
-					torsoY = AI.angle;
-					torsoX = AI.xAngle / 2;
+					extraTorsoRot.x = AI.xAngle / 2;
+					extraTorsoRot.y = AI.angle;
 				}
 
 				if (item->AIBits & GUARD)
 				{
 					creature->MaxTurn = 0;
-					headY = AIGuard(creature);
-					torsoX = 0;
-					torsoY = 0;
+					extraHeadRot.y = AIGuard(creature);
+					extraTorsoRot.x = 0;
+					extraTorsoRot.y = 0;
 
 					if (TestProbability(0.004f))
 						item->Animation.TargetState = TRIBESMAN_STATE_IDLE;
@@ -483,16 +481,16 @@ namespace TEN::Entities::Creatures::TR3
 
 				break;
 
-			case 11:
+			case TRIBESMAN_STATE_IDLE:
 				creature->MaxTurn = ANGLE(2.0f);
 				creature->Flags &= 0x0FFF;
 
 				if (item->AIBits & GUARD)
 				{
 					creature->MaxTurn = 0;
-					headY = AIGuard(creature);
-					torsoX = 0;
-					torsoY = 0;
+					extraHeadRot.y = AIGuard(creature);
+					extraTorsoRot.x = 0;
+					extraTorsoRot.y = 0;
 
 					if (TestProbability(0.004f))
 						item->Animation.TargetState = TRIBESMAN_STATE_CROUCH_IDLE;
@@ -544,7 +542,7 @@ namespace TEN::Entities::Creatures::TR3
 
 				break;
 
-			case 3:
+			case TRIBESMAN_STATE_RUN_FORWARD:
 				creature->MaxTurn = ANGLE(6.0f);
 				creature->Flags &= 0x0FFF;
 				tilt = angle / 4;
@@ -576,8 +574,8 @@ namespace TEN::Entities::Creatures::TR3
 
 				if (AI.ahead)
 				{
-					torsoX = AI.xAngle;
-					torsoY = AI.angle;
+					extraTorsoRot.x = AI.xAngle;
+					extraTorsoRot.y = AI.angle;
 				}
 
 				if (abs(AI.angle) < ANGLE(2.0f))
@@ -628,12 +626,12 @@ namespace TEN::Entities::Creatures::TR3
 
 		CreatureTilt(item, tilt);
 
-		headY -= torsoY;
+		extraHeadRot.y -= extraTorsoRot.y;
 
-		CreatureJoint(item, 0, torsoY);
-		CreatureJoint(item, 1, torsoX);
-		CreatureJoint(item, 2, headY);
-		CreatureJoint(item, 3, headX);
+		CreatureJoint(item, 0, extraTorsoRot.y);
+		CreatureJoint(item, 1, extraTorsoRot.x);
+		CreatureJoint(item, 2, extraHeadRot.y);
+		CreatureJoint(item, 3, extraHeadRot.x);
 
 		CreatureAnimation(itemNumber, angle, 0);
 	}

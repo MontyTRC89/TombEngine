@@ -58,7 +58,6 @@ struct LOTInfo
 	bool IsJumping	  = false;
 	bool IsMonkeying  = false;
 	bool IsAmphibious = false;
-
 };
 
 enum class MoodType 

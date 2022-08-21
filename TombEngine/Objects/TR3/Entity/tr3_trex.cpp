@@ -17,8 +17,9 @@ using std::vector;
 
 namespace TEN::Entities::Creatures::TR3
 {
+	constexpr auto TREX_CONTACT_DAMAGE	   = 1;
+	constexpr auto TREX_RUN_CONTACT_DAMAGE = 10;
 	constexpr auto TREX_ROAR_CHANCE = 0.015f;
-
 	constexpr auto LARA_ANIM_TREX_DEATH_ANIM = 4;
 
 	const vector<int> TRexAttackJoints = { 12, 13 };
@@ -114,7 +115,7 @@ namespace TEN::Entities::Creatures::TR3
 			angle = CreatureTurn(item, creature->MaxTurn);
 
 			if (item->TouchBits)
-				DoDamage(LaraItem, (item->Animation.ActiveState == TREX_STATE_RUN_FORWARD) ? 10 : 1);
+				DoDamage(LaraItem, (item->Animation.ActiveState == TREX_STATE_RUN_FORWARD) ? TREX_RUN_CONTACT_DAMAGE : TREX_CONTACT_DAMAGE);
 
 			creature->Flags = (creature->Mood != MoodType::Escape && !AI.ahead && AI.enemyFacing > -FRONT_ARC && AI.enemyFacing < FRONT_ARC);
 
