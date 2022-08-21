@@ -41,7 +41,7 @@ namespace TEN::Utils
 	uint BitField::GetPackedBits()
 	{
 		uint packedBits = 0;
-		for (size_t i = 0; i < this->GetSize(); i++)
+		for (size_t i = 0; i < Container.size(); i++)
 		{
 			if (Container[i])
 			{
@@ -177,7 +177,7 @@ namespace TEN::Utils
 
 	BitField BitField::operator =(uint packedBits)
 	{
-		for (size_t i = 0; i < this->GetSize(); i++)
+		for (size_t i = 0; i < Container.size(); i++)
 		{
 			uint bit = uint(1 << i);
 
