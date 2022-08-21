@@ -44,32 +44,27 @@ namespace TEN::Entities::Creatures::TR3
 		auto* item = &g_Level.Items[itemNumber];
 		auto* creature = GetCreatureInfo(item);
 
-		short torsoX = 0;
-		short torsoY = 0;
 		short angle = 0;
 		short tilt = 0;
-		short head = 0;
+		auto extraHeadRot = Vector3Shrt::Zero;
+		auto extraTorsoRot = Vector3Shrt::Zero;
 
 		auto pos = Vector3Int(FlamethrowerBite.Position);
 		GetJointAbsPosition(item, &pos, FlamethrowerBite.meshNum);
 
-		int random = GetRandomControl();
+		int randomInt = GetRandomControl();
 		if (item->Animation.ActiveState != 6 && item->Animation.ActiveState != 11)
 		{
-			TriggerDynamicLight(pos.x, pos.y, pos.z, (random & 3) + 6, 24 - ((random / 16) & 3), 16 - ((random / 64) & 3), random & 3);
+			TriggerDynamicLight(pos.x, pos.y, pos.z, (randomInt & 3) + 6, 24 - ((randomInt / 16) & 3), 16 - ((randomInt / 64) & 3), randomInt & 3);
 			TriggerPilotFlame(itemNumber, 9);
 		}
 		else
-			TriggerDynamicLight(pos.x, pos.y, pos.z, (random & 3) + 10, 31 - ((random / 16) & 3), 24 - ((random / 64) & 3), random & 7);
+			TriggerDynamicLight(pos.x, pos.y, pos.z, (randomInt & 3) + 10, 31 - ((randomInt / 16) & 3), 24 - ((randomInt / 64) & 3), randomInt & 7);
 
 		if (item->HitPoints <= 0)
 		{
 			if (item->Animation.ActiveState != 7)
-			{
-				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 19;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-				item->Animation.ActiveState = 7;
-			}
+				SetAnimation(item, 19);
 		}
 		else
 		{
@@ -84,9 +79,8 @@ namespace TEN::Entities::Creatures::TR3
 				ItemInfo* target = nullptr;
 				int minDistance = INT_MAX;
 
-				for (int i = 0; i < ActiveCreatures.size(); i++)
+				for (auto& currentCreature : ActiveCreatures)
 				{
-					auto* currentCreature = ActiveCreatures[i];
 					if (currentCreature->ItemNumber == NO_ITEM || currentCreature->ItemNumber == itemNumber)
 						continue;
 
@@ -149,11 +143,11 @@ namespace TEN::Entities::Creatures::TR3
 			case 1:
 				creature->MaxTurn = 0;
 				creature->Flags = 0;
-				head = laraAI.angle;
+				extraHeadRot.y = laraAI.angle;
 
 				if (item->AIBits & GUARD)
 				{
-					head = AIGuard(creature);
+					extraHeadRot.y = AIGuard(creature);
 
 					if (TestProbability(0.008f))
 						item->Animation.TargetState = 4;
@@ -179,11 +173,11 @@ namespace TEN::Entities::Creatures::TR3
 				break;
 
 			case 4:
-				head = laraAI.angle;
+				extraHeadRot.y = laraAI.angle;
 
 				if (item->AIBits & GUARD)
 				{
-					head = AIGuard(creature);
+					extraHeadRot.y = AIGuard(creature);
 
 					if (TestProbability(0.008f))
 						item->Animation.TargetState = 1;
@@ -202,17 +196,12 @@ namespace TEN::Entities::Creatures::TR3
 				break;
 
 			case 2:
-				creature->Flags = 0;
 				creature->MaxTurn = ANGLE(5.0f);
-				head = laraAI.angle;
+				creature->Flags = 0;
+				extraHeadRot.y = laraAI.angle;
 
 				if (item->AIBits & GUARD)
-				{
-					item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 12;
-					item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-					item->Animation.ActiveState = 1;
-					item->Animation.TargetState = 1;
-				}
+					SetAnimation(item, 12);
 				else if (item->AIBits & PATROL1)
 					item->Animation.TargetState = 2;
 				else if (creature->Mood == MoodType::Escape)
@@ -237,8 +226,8 @@ namespace TEN::Entities::Creatures::TR3
 
 				if (AI.ahead)
 				{
-					torsoX = AI.xAngle;
-					torsoY = AI.angle;
+					extraTorsoRot.x = AI.xAngle;
+					extraTorsoRot.y = AI.angle;
 
 					if (Targetable(item, &AI) &&
 						AI.distance < pow(SECTOR(4), 2) &&
@@ -257,8 +246,8 @@ namespace TEN::Entities::Creatures::TR3
 
 				if (AI.ahead)
 				{
-					torsoX = AI.xAngle;
-					torsoY = AI.angle;
+					extraTorsoRot.x = AI.xAngle;
+					extraTorsoRot.y = AI.angle;
 
 					if (Targetable(item, &AI) &&
 						AI.distance < pow(SECTOR(4), 2) &&
@@ -278,8 +267,8 @@ namespace TEN::Entities::Creatures::TR3
 
 				if (AI.ahead)
 				{
-					torsoX = AI.xAngle;
-					torsoY = AI.angle;
+					extraTorsoRot.x = AI.xAngle;
+					extraTorsoRot.y = AI.angle;
 
 					if (Targetable(item, &AI) &&
 						AI.distance < pow(SECTOR(4), 2) &&
@@ -313,12 +302,12 @@ namespace TEN::Entities::Creatures::TR3
 
 				if (AI.ahead)
 				{
-					torsoX = AI.xAngle;
-					torsoY = AI.angle;
+					extraTorsoRot.x = AI.xAngle;
+					extraTorsoRot.y = AI.angle;
 
 					if (Targetable(item, &AI) &&
 						AI.distance < pow(SECTOR(4), 2) &&
-						(realEnemy != LaraItem || creature->HurtByLara))
+						(!realEnemy->IsLara() || creature->HurtByLara))
 					{
 						item->Animation.TargetState = 6;
 					}
@@ -345,9 +334,9 @@ namespace TEN::Entities::Creatures::TR3
 		}
 
 		CreatureTilt(item, tilt);
-		CreatureJoint(item, 0, torsoY);
-		CreatureJoint(item, 1, torsoX);
-		CreatureJoint(item, 2, head);
+		CreatureJoint(item, 0, extraTorsoRot.y);
+		CreatureJoint(item, 1, extraTorsoRot.x);
+		CreatureJoint(item, 2, extraHeadRot.y);
 
 		CreatureAnimation(itemNumber, angle, 0);
 	}
