@@ -159,11 +159,10 @@ namespace TEN::Utils
 		return true;
 	}
 
-	// TODO
-	/*BitField::operator uint() const
+	BitField::operator uint()
 	{
 		return this->GetPackedBits();
-	}*/
+	}
 
 	BitField BitField::operator =(uint packedBits)
 	{

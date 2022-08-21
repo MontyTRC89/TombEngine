@@ -38,7 +38,7 @@ namespace TEN::Utils
 		bool IsEmpty();
 
 		// Operators
-		operator uint() const;
+		operator uint();
 		BitField operator =(uint packedBits);
 
 	private:
