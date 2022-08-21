@@ -15,7 +15,7 @@
 
 using namespace TEN::Math::Random;
 
-namespace TEN::Entities::TR1
+namespace TEN::Entities::Creatures::TR1
 {
 	// TODO: Organise.
 	constexpr auto NATLA_SHOT_DAMAGE = 100;

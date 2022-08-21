@@ -14,7 +14,7 @@
 // - Bacon Lara cannot be targeted.
 // - Bacon Lara cannot move like Lara.
 
-namespace TEN::Entities::TR1
+namespace TEN::Entities::Creatures::TR1
 {
 	// Original:
 	void InitialiseDoppelganger(short itemNumber)

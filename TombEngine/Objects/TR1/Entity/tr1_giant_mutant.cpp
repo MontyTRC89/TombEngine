@@ -18,7 +18,7 @@
 using namespace TEN::Math::Random;
 using std::vector;
 
-namespace TEN::Entities::TR1
+namespace TEN::Entities::Creatures::TR1
 {
 	constexpr auto MUTANT_ATTACK_DAMAGE	 = 500;
 	constexpr auto MUTANT_CONTACT_DAMAGE = 6;

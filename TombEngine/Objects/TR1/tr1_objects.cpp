@@ -1,7 +1,6 @@
 #include "framework.h"
 #include "Objects/TR1/tr1_objects.h"
 
-/// necessary import
 #include "Game/control/box.h"
 #include "Game/collision/collide_item.h"
 #include "Game/itemdata/creature_info.h"
@@ -9,7 +8,7 @@
 #include "Specific/setup.h"
 #include "Specific/level.h"
 
-/// entities
+// Creatures
 #include "Objects/TR1/Entity/tr1_ape.h" // OK
 #include "Objects/TR1/Entity/tr1_bear.h" // OK
 #include "Objects/TR1/Entity/tr1_doppelganger.h" // OK
@@ -21,7 +20,7 @@
 #include "Objects/TR1/Entity/tr1_winged_mutant.h"
 #include "Objects/Utils/object_helper.h"
 
-using namespace TEN::Entities::TR1;
+using namespace TEN::Entities::Creatures::TR1;
 
 static void StartEntity(ObjectInfo* obj)
 {

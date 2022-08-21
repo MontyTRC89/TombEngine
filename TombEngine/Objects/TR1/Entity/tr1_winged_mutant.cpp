@@ -19,7 +19,7 @@
 using namespace TEN::Math::Random;
 using std::vector;
 
-namespace TEN::Entities::TR1
+namespace TEN::Entities::Creatures::TR1
 {
 	constexpr auto WINGED_MUTANT_IDLE_JUMP_ATTACK_DAMAGE = 150;
 	constexpr auto WINGED_MUTANT_RUN_JUMP_ATTACK_DAMAGE  = 100;

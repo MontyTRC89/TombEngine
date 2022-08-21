@@ -21,7 +21,7 @@
 using namespace TEN::Math::Random;
 using std::vector;
 
-namespace TEN::Entities::TR1
+namespace TEN::Entities::Creatures::TR1
 {
 	constexpr auto CENTAUR_REAR_DAMAGE	 = 200;
 	constexpr auto CENTAUR_REAR_RANGE	 = SECTOR(1.5f);

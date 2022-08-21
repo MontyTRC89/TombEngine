@@ -15,7 +15,7 @@
 using namespace TEN::Math::Random;
 using std::vector;
 
-namespace TEN::Entities::TR1
+namespace TEN::Entities::Creatures::TR1
 {
 	constexpr auto WOLF_BITE_DAMAGE	 = 100;
 	constexpr auto WOLF_LUNGE_DAMAGE = 50;

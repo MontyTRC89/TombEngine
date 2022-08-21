@@ -15,7 +15,7 @@
 using namespace TEN::Math::Random;
 using std::vector;
 
-namespace TEN::Entities::TR1
+namespace TEN::Entities::Creatures::TR1
 {
 	constexpr auto BEAR_RUN_DAMAGE	  = 3;
 	constexpr auto BEAR_ATTACK_DAMAGE = 200;

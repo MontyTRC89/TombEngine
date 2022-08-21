@@ -16,7 +16,7 @@
 using namespace TEN::Math::Random;
 using std::vector;
 
-namespace TEN::Entities::TR1
+namespace TEN::Entities::Creatures::TR1
 {
 	constexpr auto BIG_RAT_BITE_ATTACK_DAMAGE	= 20;
 	constexpr auto BIG_RAT_POUNCE_ATTACK_DAMAGE = 25;
