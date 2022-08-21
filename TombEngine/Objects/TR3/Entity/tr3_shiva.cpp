@@ -208,15 +208,15 @@ namespace TEN::Entities::Creatures::TR3
 			return;
 
 		auto* item = &g_Level.Items[itemNumber];
-		auto* shiva = GetCreatureInfo(item);
+		auto* creature = GetCreatureInfo(item);
 
-		auto pos = Vector3Int(0, 0, 256);
-		bool laraAlive = LaraItem->HitPoints > 0;
+		auto pos = Vector3Int(0, 0, CLICK(1));
+		bool isLaraAlive = LaraItem->HitPoints > 0;
 
-		Vector3Shrt extraHeadRot;
-		Vector3Shrt extraTorsoRot;
 		short angle = 0;
 		short tilt = 0;
+		Vector3Shrt extraHeadRot = Vector3Shrt::Zero;
+		Vector3Shrt extraTorsoRot = Vector3Shrt::Zero;
 
 		if (item->HitPoints <= 0)
 		{
@@ -235,13 +235,13 @@ namespace TEN::Entities::Creatures::TR3
 			GetCreatureMood(item, &AI, true);
 			CreatureMood(item, &AI, true);
 
-			if (shiva->Mood == MoodType::Escape)
+			if (creature->Mood == MoodType::Escape)
 			{
-				shiva->Target.x = LaraItem->Pose.Position.x;
-				shiva->Target.z = LaraItem->Pose.Position.z;
+				creature->Target.x = LaraItem->Pose.Position.x;
+				creature->Target.z = LaraItem->Pose.Position.z;
 			}
 
-			angle = CreatureTurn(item, shiva->MaxTurn);
+			angle = CreatureTurn(item, creature->MaxTurn);
 
 			if (item->Animation.ActiveState != SHIVA_STATE_INACTIVE)
 				item->MeshBits = ALL_JOINT_BITS;
@@ -251,15 +251,15 @@ namespace TEN::Entities::Creatures::TR3
 			switch (item->Animation.ActiveState)
 			{
 			case SHIVA_STATE_INACTIVE:
-				shiva->MaxTurn = 0;
+				creature->MaxTurn = 0;
 
-				if (!shiva->Flags)
+				if (!creature->Flags)
 				{
 					if (!item->MeshBits)
 						effectMesh = 0;
 
 					item->MeshBits = (item->MeshBits * 2) + 1;
-					shiva->Flags = 1;
+					creature->Flags = 1;
 
 					GetJointAbsPosition(item, &pos, effectMesh++);
 					TriggerExplosionSparks(pos.x, pos.y, pos.z, 2, 0, 0, item->RoomNumber);
@@ -267,45 +267,45 @@ namespace TEN::Entities::Creatures::TR3
 
 				}
 				else
-					shiva->Flags--;
+					creature->Flags--;
 
 				if (item->MeshBits == 0x7FFFFFFF)
 				{
 					item->Animation.TargetState = SHIVA_STATE_IDLE;
-					shiva->Flags = -45;
+					creature->Flags = -45;
 					effectMesh = 0;
 				}
 
 				break;
 
 			case SHIVA_STATE_IDLE:
-				shiva->MaxTurn = 0;
+				creature->MaxTurn = 0;
 
 				if (AI.ahead)
 					extraHeadRot.y = AI.angle;
 
-				if (shiva->Flags < 0)
+				if (creature->Flags < 0)
 				{
-					shiva->Flags++;
+					creature->Flags++;
 					TriggerShivaSmoke(item->Pose.Position.x + (GetRandomControl() & 0x5FF) - 0x300, pos.y - (GetRandomControl() & 0x5FF), item->Pose.Position.z + (GetRandomControl() & 0x5FF) - 0x300, 1);
 					break;
 				}
 
-				if (shiva->Flags == 1)
-					shiva->Flags = 0;
+				if (creature->Flags == 1)
+					creature->Flags = 0;
 
-				if (shiva->Mood == MoodType::Escape)
+				if (creature->Mood == MoodType::Escape)
 				{
 					int x = item->Pose.Position.x + SECTOR(1) * phd_sin(item->Pose.Orientation.y + ANGLE(180.0f));
 					int z = item->Pose.Position.z + SECTOR(1) * phd_cos(item->Pose.Orientation.y + ANGLE(180.0f));
 					auto box = GetCollision(x, item->Pose.Position.y, z, item->RoomNumber).BottomBlock->Box;
 
-					if (box != NO_BOX && !(g_Level.Boxes[box].flags & BLOCKABLE) && !shiva->Flags)
+					if (box != NO_BOX && !(g_Level.Boxes[box].flags & BLOCKABLE) && !creature->Flags)
 						item->Animation.TargetState = SHIVA_STATE_WALK_BACK;
 					else
 						item->Animation.TargetState = SHIVA_STATE_GUARD_IDLE;
 				}
-				else if (shiva->Mood == MoodType::Bored)
+				else if (creature->Mood == MoodType::Bored)
 				{
 					if (TestProbability(0.0325f))
 						item->Animation.TargetState = SHIVA_STATE_WALK_FORWARD;
@@ -313,17 +313,17 @@ namespace TEN::Entities::Creatures::TR3
 				else if (AI.bite && AI.distance < pow(SECTOR(1.25f), 2))
 				{
 					item->Animation.TargetState = SHIVA_STATE_GRAB_ATTACK;
-					shiva->Flags = 0;
+					creature->Flags = 0;
 				}
 				else if (AI.bite && AI.distance < pow(SECTOR(4) / 3, 2))
 				{
 					item->Animation.TargetState = SHIVA_STATE_DOWNWARD_ATTACK;
-					shiva->Flags = 0;
+					creature->Flags = 0;
 				}
 				else if (item->HitStatus && AI.ahead)
 				{
 					item->Animation.TargetState = SHIVA_STATE_GUARD_IDLE;
-					shiva->Flags = 4;
+					creature->Flags = 4;
 				}
 				else
 					item->Animation.TargetState = SHIVA_STATE_WALK_FORWARD;
@@ -331,103 +331,103 @@ namespace TEN::Entities::Creatures::TR3
 				break;
 
 			case SHIVA_STATE_GUARD_IDLE:
-				shiva->MaxTurn = 0;
+				creature->MaxTurn = 0;
 
 				if (AI.ahead)
 					extraHeadRot.y = AI.angle;
 
-				if (item->HitStatus || shiva->Mood == MoodType::Escape)
-					shiva->Flags = 4;
+				if (item->HitStatus || creature->Mood == MoodType::Escape)
+					creature->Flags = 4;
 
 				if (AI.bite && AI.distance < pow(SECTOR(4) / 3, 2) ||
 					(item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase &&
-						!shiva->Flags) ||
+						!creature->Flags) ||
 					!AI.ahead)
 				{
 					item->Animation.TargetState = SHIVA_STATE_IDLE;
-					shiva->Flags = 0;
+					creature->Flags = 0;
 				}
-				else if (shiva->Flags)
+				else if (creature->Flags)
 					item->Animation.TargetState = SHIVA_STATE_GUARD_IDLE;
 
 
 				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase &&
-					shiva->Flags > 1)
+					creature->Flags > 1)
 				{
-					shiva->Flags -= 2;
+					creature->Flags -= 2;
 				}
 
 				break;
 
 			case SHIVA_STATE_WALK_FORWARD:
-				shiva->MaxTurn = SHIVA_WALK_TURN_RATE_MAX;
+				creature->MaxTurn = SHIVA_WALK_TURN_RATE_MAX;
 
 				if (AI.ahead)
 					extraHeadRot.y = AI.angle;
 
-				if (shiva->Mood == MoodType::Escape)
+				if (creature->Mood == MoodType::Escape)
 					item->Animation.TargetState = SHIVA_STATE_IDLE;
-				else if (shiva->Mood == MoodType::Bored)
+				else if (creature->Mood == MoodType::Bored)
 					item->Animation.TargetState = SHIVA_STATE_IDLE;
 				else if (AI.bite && AI.distance < pow(SECTOR(4) / 3, 2))
 				{
 					item->Animation.TargetState = SHIVA_STATE_IDLE;
-					shiva->Flags = 0;
+					creature->Flags = 0;
 				}
 				else if (item->HitStatus)
 				{
 					item->Animation.TargetState = SHIVA_STATE_WALK_FORWARD_GUARDING;
-					shiva->Flags = 4;
+					creature->Flags = 4;
 				}
 
 				break;
 
 			case SHIVA_STATE_WALK_FORWARD_GUARDING:
-				shiva->MaxTurn = SHIVA_WALK_TURN_RATE_MAX;
+				creature->MaxTurn = SHIVA_WALK_TURN_RATE_MAX;
 
 				if (AI.ahead)
 					extraHeadRot.y = AI.angle;
 
 				if (item->HitStatus)
-					shiva->Flags = 4;
+					creature->Flags = 4;
 
 				if (AI.bite && AI.distance < pow(SECTOR(1.25f), 2) ||
 					(item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase &&
-						!shiva->Flags))
+						!creature->Flags))
 				{
 					item->Animation.TargetState = SHIVA_STATE_WALK_FORWARD;
-					shiva->Flags = 0;
+					creature->Flags = 0;
 				}
-				else if (shiva->Flags)
+				else if (creature->Flags)
 					item->Animation.TargetState = SHIVA_STATE_WALK_FORWARD_GUARDING;
 
 				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase)
-					shiva->Flags = 0;
+					creature->Flags = 0;
 
 				break;
 
 			case SHIVA_STATE_WALK_BACK:
-				shiva->MaxTurn = SHIVA_WALK_TURN_RATE_MAX;
+				creature->MaxTurn = SHIVA_WALK_TURN_RATE_MAX;
 
 				if (AI.ahead)
 					extraHeadRot.y = AI.angle;
 
 				if (AI.ahead && AI.distance < pow(SECTOR(4) / 3, 2) ||
 					(item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase &&
-						!shiva->Flags))
+						!creature->Flags))
 				{
 					item->Animation.TargetState = SHIVA_STATE_IDLE;
 				}
 				else if (item->HitStatus)
 				{
 					item->Animation.TargetState = SHIVA_STATE_IDLE;
-					shiva->Flags = 4;
+					creature->Flags = 4;
 				}
 
 				break;
 
 			case SHIVA_STATE_GRAB_ATTACK:
-				shiva->MaxTurn = SHIVA_ATTACK_TURN_RATE_MAX;
+				creature->MaxTurn = SHIVA_ATTACK_TURN_RATE_MAX;
 
 				if (AI.ahead)
 				{
@@ -435,22 +435,22 @@ namespace TEN::Entities::Creatures::TR3
 					extraTorsoRot = Vector3Shrt(AI.xAngle, AI.angle, 0);
 				}
 
-				ShivaDamage(item, shiva, SHIVA_GRAB_ATTACK_DAMAGE);
+				ShivaDamage(item, creature, SHIVA_GRAB_ATTACK_DAMAGE);
 				break;
 
 			case SHIVA_STATE_DOWNWARD_ATTACK:
-				shiva->MaxTurn = SHIVA_ATTACK_TURN_RATE_MAX;
+				creature->MaxTurn = SHIVA_ATTACK_TURN_RATE_MAX;
 				extraHeadRot.y = AI.angle;
 				extraTorsoRot.y = AI.angle;
 
 				if (AI.xAngle > 0)
 					extraTorsoRot.x = AI.xAngle;
 
-				ShivaDamage(item, shiva, SHIVA_DOWNWARD_ATTACK_DAMAGE);
+				ShivaDamage(item, creature, SHIVA_DOWNWARD_ATTACK_DAMAGE);
 				break;
 
 			case SHIVA_STATE_KILL:
-				shiva->MaxTurn = 0;
+				creature->MaxTurn = 0;
 				extraHeadRot = Vector3Shrt::Zero;
 				extraTorsoRot = Vector3Shrt::Zero;
 
@@ -467,7 +467,7 @@ namespace TEN::Entities::Creatures::TR3
 		}
 
 		// Dispatch kill animation.
-		if (laraAlive && LaraItem->HitPoints <= 0)
+		if (isLaraAlive && LaraItem->HitPoints <= 0)
 		{
 			item->Animation.TargetState = SHIVA_STATE_KILL;
 

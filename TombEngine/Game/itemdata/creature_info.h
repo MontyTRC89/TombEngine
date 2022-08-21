@@ -15,7 +15,7 @@ struct BOX_NODE
 enum ZoneType : char 
 {
 	ZONE_NULL = -1,  // default zone
-	ZONE_SKELLY = 0,
+	ZONE_SKELLY,
 	ZONE_BASIC,
 	ZONE_FLYER,
 	ZONE_HUMAN_CLASSIC,
@@ -27,8 +27,8 @@ enum ZoneType : char
 	ZONE_HUMAN_JUMP,
 	ZONE_SPIDER,
 	ZONE_BLOCKABLE, // for trex, shiva, etc..
-	ZONE_SOPHIALEE, // dont want sophia to go down again !
-	ZONE_APE,       // only 2 click climb
+	ZONE_SOPHIALEE, // dont want sophia to go down again.
+	ZONE_APE,       // only half block climb
 	ZONE_HUMAN_LONGJUMP_AND_MONKEY,
 };
 
@@ -49,18 +49,19 @@ struct LOTInfo
 	int RequiredBox;
 	short Fly;
 
-	bool CanJump;
-	bool CanMonkey;
-	bool IsJumping;
-	bool IsMonkeying;
-	bool IsAmphibious;
+	bool CanJump = false;
+	bool CanMonkey = false;
+	bool IsJumping = false;
+	bool IsMonkeying = false;
+	bool IsAmphibious = false;
 
-	Vector3Int Target;
-	ZoneType Zone;
+	Vector3Int Target = Vector3Int::Zero;
+	ZoneType Zone = ZoneType::ZONE_NULL;
 };
 
 enum class MoodType 
 {
+	None,
 	Bored,
 	Attack,
 	Escape,
@@ -77,38 +78,36 @@ enum class CreatureAIPriority
 
 struct CreatureInfo 
 {
-	short ItemNumber;
+	short ItemNumber = -1;
 
-	short MaxTurn;
-	short JointRotation[4];
-	bool HeadLeft;
-	bool HeadRight;
+	LOTInfo	   LOT			  = {};
+	MoodType   Mood			  = MoodType::None;
+	ItemInfo*  Enemy		  = nullptr;
+	ItemInfo*  AITarget		  = nullptr;
+	short	   AITargetNumber = -1;
+	Vector3Int Target		  = Vector3Int::Zero;
 
-	bool Patrol;			// Unused?
-	bool Alerted;
-	bool Friendly;
-	bool HurtByLara;
-	bool Poisoned;
-	bool JumpAhead;
-	bool MonkeySwingAhead;
-	bool ReachedGoal;
+	short MaxTurn = 0;
+	short JointRotation[4] = {};
+	bool HeadLeft = false;
+	bool HeadRight = false;
 
+	bool Patrol			  = false; // Unused?
+	bool Alerted		  = false;
+	bool Friendly		  = false;
+	bool HurtByLara		  = false;
+	bool Poisoned		  = false;
+	bool JumpAhead		  = false;
+	bool MonkeySwingAhead = false;
+	bool ReachedGoal	  = false;
+
+	short FiredWeapon;
 	short Tosspad;
 	short LocationAI;
-	short FiredWeapon;
-
-	LOTInfo LOT;
-	MoodType Mood;
-	ItemInfo* Enemy;
-	short AITargetNumber;
-	ItemInfo* AITarget;
-	short Pad;				// Unused?
-	Vector3Int Target;
+	short Flags = 0;
 
 #ifdef CREATURE_AI_PRIORITY_OPTIMIZATION
-	CreatureAIPriority Priority;
-	size_t FramesSinceLOTUpdate;
+	CreatureAIPriority Priority = CreatureAIPriority::None;
+	size_t FramesSinceLOTUpdate = 0;
 #endif
-
-	short Flags;
 };

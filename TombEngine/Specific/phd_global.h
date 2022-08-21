@@ -356,6 +356,15 @@ struct GameVector
 		this->boxNumber = boxNumber;
 	}
 
+	GameVector(Vector3Int& pos)
+	{
+		this->x = pos.x;
+		this->y = pos.y;
+		this->z = pos.z;
+		this->roomNumber = 0;
+		this->boxNumber = 0;
+	}
+
 	GameVector(Vector3Int& pos, short roomNumber)
 	{
 		this->x = pos.x;
