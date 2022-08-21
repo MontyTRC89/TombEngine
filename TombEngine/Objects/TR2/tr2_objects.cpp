@@ -57,7 +57,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->saveHitpoints = true;
 		obj->saveAnim = true;
 		obj->saveFlags = true;
-		obj->zoneType = ZONE_WATER;
+		obj->ZoneType = ZoneType::Water;
 
 		g_Level.Bones[obj->boneIndex + 9 * 4] |= ROT_Y;
 	}
@@ -78,7 +78,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->saveHitpoints = true;
 		obj->saveAnim = true;
 		obj->saveFlags = true;
-		obj->zoneType = ZONE_WATER;
+		obj->ZoneType = ZoneType::Water;
 
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
 	}
@@ -99,7 +99,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->saveAnim = true;
 		obj->saveFlags = true;
 		obj->pivotLength = 0;
-		obj->zoneType = ZONE_FLYER;
+		obj->ZoneType = ZoneType::Flyer;
 	}
 
 	obj = &Objects[ID_CROW];
@@ -118,7 +118,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->saveAnim = true;
 		obj->saveFlags = true;
 		obj->pivotLength = 0;
-		obj->zoneType = ZONE_FLYER;
+		obj->ZoneType = ZoneType::Flyer;
 	}
 
 	obj = &Objects[ID_RAT];
@@ -154,7 +154,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->saveFlags = true;
 		obj->saveHitpoints = true;
 		obj->savePosition = true;
-		obj->zoneType = ZONE_HUMAN_CLASSIC;
+		obj->ZoneType = ZoneType::HumanClassic;
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= (ROT_Y);
 		g_Level.Bones[obj->boneIndex + 14 * 4] |= (ROT_Y);
 	}

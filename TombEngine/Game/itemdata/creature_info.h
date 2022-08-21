@@ -1,6 +1,7 @@
 #pragma once
-#include <vector>
 #include "Specific/phd_global.h"
+
+using std::vector;
 
 struct ItemInfo;
 
@@ -12,34 +13,37 @@ struct BOX_NODE
 	int boxNumber;
 };
 
-enum ZoneType : char 
+enum class ZoneType
 {
-	ZONE_NULL = -1,  // default zone
-	ZONE_SKELLY,
-	ZONE_BASIC,
-	ZONE_FLYER,
-	ZONE_HUMAN_CLASSIC,
-	ZONE_VON_CROY,
-	ZONE_WATER,
-	ZONE_MAX,
-	/// custom zone (using zone above for LOT.zone):
-	ZONE_HUMAN_JUMP_AND_MONKEY,
-	ZONE_HUMAN_JUMP,
-	ZONE_SPIDER,
-	ZONE_BLOCKABLE, // for trex, shiva, etc..
-	ZONE_SOPHIALEE, // dont want sophia to go down again.
-	ZONE_APE,       // only half block climb
-	ZONE_HUMAN_LONGJUMP_AND_MONKEY,
+	None = -1,
+	Skeleton,
+	Basic,
+	Flyer,
+	HumanClassic,
+	VonCroy,
+	Water,
+	Max,
+
+	// Custom zones (above zones are used for LOT.zone):
+	HumanJumpAndMonkey,
+	HumanJump,
+	Spider,
+	Blockable, // For large creatures such as trex and shiva.
+	SophiaLee, // Prevents Sophia from going to lower levels again.
+	Ape,	   // Only 0.5 block climb.
+	HumanLongJumpAndMonkey,
 };
 
 struct LOTInfo 
 {
 	bool Initialised;
 
-	std::vector<BOX_NODE> Node;
+	vector<BOX_NODE> Node;
 	int Head;
 	int Tail;
 
+	ZoneType Zone = ZoneType::None;
+	Vector3Int Target = Vector3Int::Zero;
 	int SearchNumber;
 	int BlockMask;
 	short Step;
@@ -49,14 +53,12 @@ struct LOTInfo
 	int RequiredBox;
 	short Fly;
 
-	bool CanJump = false;
-	bool CanMonkey = false;
-	bool IsJumping = false;
-	bool IsMonkeying = false;
+	bool CanJump	  = false;
+	bool CanMonkey	  = false;
+	bool IsJumping	  = false;
+	bool IsMonkeying  = false;
 	bool IsAmphibious = false;
 
-	Vector3Int Target = Vector3Int::Zero;
-	ZoneType Zone = ZoneType::ZONE_NULL;
 };
 
 enum class MoodType 
@@ -71,9 +73,9 @@ enum class MoodType
 enum class CreatureAIPriority
 {
 	None,
-	High,
+	Low,
 	Medium,
-	Low
+	High
 };
 
 struct CreatureInfo 

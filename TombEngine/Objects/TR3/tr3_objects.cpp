@@ -7,7 +7,7 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-// Entities
+// Creatures
 #include "Objects/TR3/Entity/tr3_civvy.h" // OK
 #include "Objects/TR3/Entity/tr3_cobra.h" // OK
 #include "Objects/TR3/Entity/tr3_fish_emitter.h" // OK
@@ -198,7 +198,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->saveAnim = true;
 		obj->saveFlags = true;
 		obj->pivotLength = 50;
-		obj->zoneType = ZONE_WATER;
+		obj->ZoneType = ZoneType::Water;
 
 		g_Level.Bones[obj->boneIndex + 10 * 4] |= ROT_Y;
 		g_Level.Bones[obj->boneIndex + 14 * 4] |= ROT_Z;
@@ -293,7 +293,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->saveAnim = true;
 		obj->saveFlags = true;
 		obj->pivotLength = 0;
-		obj->zoneType = ZONE_HUMAN_CLASSIC;
+		obj->ZoneType = ZoneType::HumanClassic;
 
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_X;

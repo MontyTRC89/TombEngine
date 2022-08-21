@@ -68,7 +68,7 @@ namespace TEN::Entities::Creatures::TR2
 			creature->LOT.Step = STEP_SIZE;
 			creature->LOT.Drop = -STEP_SIZE;
 			creature->LOT.Fly = NO_FLYING;
-			creature->LOT.Zone = ZONE_BASIC;
+			creature->LOT.Zone = ZoneType::Basic;
 
 			AI_INFO AI;
 			CreatureAIInfo(item, &AI);
@@ -80,7 +80,7 @@ namespace TEN::Entities::Creatures::TR2
 					creature->LOT.Step = WALL_SIZE * 20;
 					creature->LOT.Drop = -WALL_SIZE * 20;
 					creature->LOT.Fly = STEP_SIZE / 4;
-					creature->LOT.Zone = ZONE_FLYER;
+					creature->LOT.Zone = ZoneType::Flyer;
 					CreatureAIInfo(item, &AI);
 				}
 			}

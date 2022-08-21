@@ -9,7 +9,7 @@
 #include "Specific/setup.h"
 #include "Specific/level.h"
 
-// Entities
+// Creatures
 #include "tr4_enemy_jeep.h"
 #include "tr4_ahmet.h" // OK
 #include "tr4_baddy.h" // OK
@@ -100,7 +100,7 @@ namespace TEN::Entities
 			obj->saveHitpoints = true;
 			obj->saveAnim = true;
 			obj->saveFlags = true;
-			obj->zoneType = ZONE_BASIC;
+			obj->ZoneType = ZoneType::Basic;
 		}
 
 		obj = &Objects[ID_BIG_SCORPION];
@@ -119,7 +119,7 @@ namespace TEN::Entities
 			obj->saveHitpoints = true;
 			obj->saveFlags = true;
 			obj->saveAnim = true;
-			obj->zoneType = ZONE_BASIC;
+			obj->ZoneType = ZoneType::Basic;
 		}
 
 		obj = &Objects[ID_HAMMERHEAD];
@@ -139,7 +139,7 @@ namespace TEN::Entities
 			obj->saveAnim = true;
 			obj->saveFlags = true;
 			obj->waterCreature = true;
-			obj->zoneType = ZONE_WATER;
+			obj->ZoneType = ZoneType::Water;
 		}
 
 		obj = &Objects[ID_WILD_BOAR];
@@ -158,7 +158,7 @@ namespace TEN::Entities
 			obj->saveHitpoints = true;
 			obj->saveAnim = true;
 			obj->saveFlags = true;
-			obj->zoneType = ZONE_BASIC;
+			obj->ZoneType = ZoneType::Basic;
 
 			g_Level.Bones[obj->boneIndex + 48 * 4] |= ROT_Z;
 			g_Level.Bones[obj->boneIndex + 48 * 4] |= ROT_Y;
@@ -182,7 +182,7 @@ namespace TEN::Entities
 			obj->saveFlags = true;
 			obj->saveAnim = true;
 			obj->saveHitpoints = true;
-			obj->zoneType = ZONE_BASIC;
+			obj->ZoneType = ZoneType::Basic;
 			g_Level.Bones[obj->boneIndex + 19 * 4] |= ROT_Y;
 		}
 
@@ -202,7 +202,7 @@ namespace TEN::Entities
 			obj->saveHitpoints = true;
 			obj->saveAnim = true;
 			obj->saveFlags = true;
-			obj->zoneType = ZONE_FLYER;
+			obj->ZoneType = ZoneType::Flyer;
 		}
 
 		obj = &Objects[ID_AHMET];
@@ -221,7 +221,7 @@ namespace TEN::Entities
 			obj->saveFlags = true;
 			obj->saveHitpoints = true;
 			obj->savePosition = true;
-			obj->zoneType = ZONE_BASIC;
+			obj->ZoneType = ZoneType::Basic;
 
 			g_Level.Bones[obj->boneIndex + 9 * 4] |= ROT_Y;
 		}
@@ -244,7 +244,7 @@ namespace TEN::Entities
 			obj->saveAnim = true;
 			obj->saveFlags = true;
 			obj->meshSwapSlot = ID_MESHSWAP_BADDY1;
-			obj->zoneType = ZONE_HUMAN_JUMP_AND_MONKEY;
+			obj->ZoneType = ZoneType::HumanJumpAndMonkey;
 
 			g_Level.Bones[obj->boneIndex + 28 * 4] |= ROT_Y;
 			g_Level.Bones[obj->boneIndex + 28 * 4] |= ROT_X;
@@ -270,7 +270,7 @@ namespace TEN::Entities
 			obj->saveAnim = true;
 			obj->saveFlags = true;
 			obj->meshSwapSlot = ID_MESHSWAP_BADDY2;
-			obj->zoneType = ZONE_HUMAN_JUMP_AND_MONKEY;
+			obj->ZoneType = ZoneType::HumanJumpAndMonkey;
 
 			g_Level.Bones[obj->boneIndex + 28 * 4] |= ROT_Y;
 			g_Level.Bones[obj->boneIndex + 28 * 4] |= ROT_X;
@@ -295,7 +295,7 @@ namespace TEN::Entities
 			obj->saveHitpoints = true;
 			obj->saveAnim = true;
 			obj->saveFlags = true;
-			obj->zoneType = ZONE_HUMAN_CLASSIC;
+			obj->ZoneType = ZoneType::HumanClassic;
 
 			g_Level.Bones[obj->boneIndex] |= ROT_Y;
 			g_Level.Bones[obj->boneIndex] |= ROT_X;
@@ -319,7 +319,7 @@ namespace TEN::Entities
 			obj->saveAnim = true;
 			obj->saveFlags = true;
 			obj->undead = true;
-			obj->zoneType = ZONE_BASIC;
+			obj->ZoneType = ZoneType::Basic;
 
 			g_Level.Bones[obj->boneIndex + 7 * 4] |= ROT_Y;
 			g_Level.Bones[obj->boneIndex + 7 * 4] |= ROT_X;
@@ -344,7 +344,7 @@ namespace TEN::Entities
 			obj->saveAnim = true;
 			obj->saveFlags = true;
 			obj->undead = true;
-			obj->zoneType = ZONE_SKELLY;
+			obj->ZoneType = ZoneType::Skeleton;
 		}
 
 		obj = &Objects[ID_KNIGHT_TEMPLAR];
@@ -363,7 +363,7 @@ namespace TEN::Entities
 			obj->saveHitpoints = true;
 			obj->saveFlags = true;
 			obj->saveAnim = true;
-			obj->zoneType = ZONE_BASIC;
+			obj->ZoneType = ZoneType::Basic;
 
 			g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_X | ROT_Y;
 			g_Level.Bones[obj->boneIndex + 7 * 4] |= ROT_Y;
@@ -386,7 +386,7 @@ namespace TEN::Entities
 			obj->saveAnim = true;
 			obj->savePosition = true;
 			obj->undead = false;
-			obj->zoneType = ZONE_FLYER;
+			obj->ZoneType = ZoneType::Flyer;
 		}
 
 		obj = &Objects[ID_SETHA];
@@ -406,7 +406,7 @@ namespace TEN::Entities
 			obj->saveFlags = true;
 			obj->saveAnim = true;
 			obj->undead = true;
-			obj->zoneType = ZONE_BASIC;
+			obj->ZoneType = ZoneType::Basic;
 		}
 
 		obj = &Objects[ID_DEMIGOD1];
@@ -426,7 +426,7 @@ namespace TEN::Entities
 			obj->saveFlags = true;
 			obj->saveAnim = true;
 			obj->undead = true;
-			obj->zoneType = ZONE_BASIC;
+			obj->ZoneType = ZoneType::Basic;
 
 			g_Level.Bones[obj->boneIndex + 4 * 4] |= ROT_X | ROT_Y | ROT_Z;
 			g_Level.Bones[obj->boneIndex + 5 * 4] |= ROT_Y;
@@ -448,7 +448,7 @@ namespace TEN::Entities
 			obj->saveHitpoints = true;
 			obj->saveFlags = true;
 			obj->saveAnim = true;
-			obj->zoneType = ZONE_BASIC;
+			obj->ZoneType = ZoneType::Basic;
 			g_Level.Bones[obj->boneIndex + 4 * 4] |= ROT_X | ROT_Y | ROT_Z;
 			g_Level.Bones[obj->boneIndex + 5 * 4] |= ROT_Y;
 		}
@@ -469,7 +469,7 @@ namespace TEN::Entities
 			obj->saveHitpoints = true;
 			obj->saveFlags = true;
 			obj->saveAnim = true;
-			obj->zoneType = ZONE_BASIC;
+			obj->ZoneType = ZoneType::Basic;
 			g_Level.Bones[obj->boneIndex + 4 * 4] |= ROT_X | ROT_Y | ROT_Z;
 			g_Level.Bones[obj->boneIndex + 5 * 4] |= ROT_Y;
 		}
@@ -483,7 +483,7 @@ namespace TEN::Entities
 			obj->hitEffect = HIT_BLOOD;
 			obj->nonLot = true;
 			obj->savePosition = true;
-			obj->zoneType = ZONE_BASIC;
+			obj->ZoneType = ZoneType::Basic;
 		}
 
 		obj = &Objects[ID_TROOPS];
@@ -502,7 +502,7 @@ namespace TEN::Entities
 			obj->saveHitpoints = true;
 			obj->saveAnim = true;
 			obj->saveFlags = true;
-			obj->zoneType = ZONE_BASIC;
+			obj->ZoneType = ZoneType::Basic;
 
 			g_Level.Bones[obj->boneIndex] |= ROT_X | ROT_Y;
 			g_Level.Bones[obj->boneIndex + 7 * 4] |= ROT_X | ROT_Y;
@@ -525,7 +525,7 @@ namespace TEN::Entities
 			obj->saveAnim = true;
 			obj->saveFlags = true;
 			obj->explodableMeshbits = 64;
-			obj->zoneType = ZONE_BASIC;
+			obj->ZoneType = ZoneType::Basic;
 
 			g_Level.Bones[obj->boneIndex + 0] |= ROT_Y;
 			g_Level.Bones[obj->boneIndex + 1 * 4] |= ROT_X;
@@ -548,7 +548,7 @@ namespace TEN::Entities
 			obj->saveHitpoints = true;
 			obj->saveAnim = true;
 			obj->saveFlags = true;
-			obj->zoneType = ZONE_FLYER;
+			obj->ZoneType = ZoneType::Flyer;
 		}
 
 	obj = &Objects[ID_GUIDE];
@@ -567,7 +567,7 @@ namespace TEN::Entities
 		obj->saveAnim = true;
 		obj->saveFlags = true;
 		obj->meshSwapSlot = ID_MESHSWAP2;
-		obj->zoneType = ZONE_BASIC;
+		obj->ZoneType = ZoneType::Basic;
 
 			g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_X | ROT_Y;
 			g_Level.Bones[obj->boneIndex + 20 * 4] |= ROT_X | ROT_Y;
@@ -589,7 +589,7 @@ namespace TEN::Entities
 			obj->saveAnim = true;
 			obj->saveFlags = true;
 			obj->waterCreature = true;
-			obj->zoneType = ZONE_WATER;
+			obj->ZoneType = ZoneType::Water;
 
 			g_Level.Bones[obj->boneIndex] |= ROT_Y;
 			g_Level.Bones[obj->boneIndex + 7 * 4] |= ROT_Y;
@@ -612,7 +612,7 @@ namespace TEN::Entities
 			obj->saveHitpoints = true;
 			obj->saveAnim = true;
 			obj->saveFlags = true;
-			obj->zoneType = ZONE_BASIC;
+			obj->ZoneType = ZoneType::Basic;
 		}
 
 		obj = &Objects[ID_HORSE];
@@ -642,7 +642,7 @@ namespace TEN::Entities
 			obj->saveFlags = true;
 			obj->savePosition = true;
 			obj->saveMesh = true;
-			obj->zoneType = ZONE_BASIC;
+			obj->ZoneType = ZoneType::Basic;
 		}
 
 		obj = &Objects[ID_BABOON_NORMAL];
@@ -661,7 +661,7 @@ namespace TEN::Entities
 			obj->saveFlags = true;
 			obj->saveHitpoints = true;
 			obj->savePosition = true;
-			obj->zoneType = ZONE_BASIC;
+			obj->ZoneType = ZoneType::Basic;
 		}
 
 		obj = &Objects[ID_BABOON_INV];
@@ -680,7 +680,7 @@ namespace TEN::Entities
 			obj->saveFlags = true;
 			obj->saveHitpoints = true;
 			obj->savePosition = true;
-			obj->zoneType = ZONE_BASIC;
+			obj->ZoneType = ZoneType::Basic;
 
 			if (Objects[ID_BABOON_NORMAL].loaded)
 				Objects[ID_BABOON_INV].animIndex = Objects[ID_BABOON_NORMAL].animIndex;
@@ -702,7 +702,7 @@ namespace TEN::Entities
 			obj->saveFlags = true;
 			obj->saveHitpoints = true;
 			obj->savePosition = true;
-			obj->zoneType = ZONE_BASIC;
+			obj->ZoneType = ZoneType::Basic;
 
 			if (Objects[ID_BABOON_NORMAL].loaded)
 				Objects[ID_BABOON_SILENT].animIndex = Objects[ID_BABOON_NORMAL].animIndex;
@@ -725,7 +725,7 @@ namespace TEN::Entities
 			obj->saveMesh = true;
 			obj->savePosition = true;
 			obj->undead = true;
-			obj->zoneType = ZONE_WATER;
+			obj->ZoneType = ZoneType::Water;
 			g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_Y | ROT_X;
 			g_Level.Bones[obj->boneIndex + 7 * 4] |= ROT_Y | ROT_X;
 		}
@@ -737,7 +737,7 @@ namespace TEN::Entities
 			obj->control = TEN::Entities::TR4::LocustControl;
 			obj->drawRoutine = NULL;
 			obj->saveFlags = true;
-			obj->zoneType = ZONE_BASIC;
+			obj->ZoneType = ZoneType::Basic;
 		}
 
 		obj = &Objects[ID_WRAITH1];
@@ -780,7 +780,7 @@ namespace TEN::Entities
 			obj->control = TEN::Entities::TR4::BeetleSwarmControl;
 			obj->drawRoutine = NULL;
 			obj->saveFlags = true;
-			obj->zoneType = ZONE_BASIC;
+			obj->ZoneType = ZoneType::Basic;
 		}
 
 		obj = &Objects[ID_SAS_DYING];
@@ -793,7 +793,7 @@ namespace TEN::Entities
 			obj->saveFlags = true;
 			obj->savePosition = true;
 			obj->saveAnim = true;
-			obj->zoneType = ZONE_BASIC;
+			obj->ZoneType = ZoneType::Basic;
 		}
 
 		obj = &Objects[ID_SAS_DRAG_BLOKE];
@@ -805,7 +805,7 @@ namespace TEN::Entities
 			obj->saveFlags = true;
 			obj->savePosition = true;
 			obj->saveAnim = true;
-			obj->zoneType = ZONE_BASIC;
+			obj->ZoneType = ZoneType::Basic;
 		}
 
 		obj = &Objects[ID_ENEMY_JEEP];
@@ -823,7 +823,7 @@ namespace TEN::Entities
 			obj->shadowType = ShadowMode::All;
 			obj->radius = 512;
 			obj->HitPoints = 40;
-			obj->zoneType = ZONE_BASIC;
+			obj->ZoneType = ZoneType::Basic;
 
 			g_Level.Bones[obj->boneIndex + 4 * 8] |= ROT_X;
 			g_Level.Bones[obj->boneIndex + 4 * 9] |= ROT_X;
@@ -847,7 +847,7 @@ namespace TEN::Entities
 			obj->savePosition = true;
 			obj->saveHitpoints = true;
 			obj->saveMesh = true;
-			obj->zoneType = ZONE_HUMAN_LONGJUMP_AND_MONKEY;
+			obj->ZoneType = ZoneType::HumanLongJumpAndMonkey;
 
 			g_Level.Bones[obj->boneIndex + 4 * 6] |= ROT_X;
 			g_Level.Bones[obj->boneIndex + 4 * 6] |= ROT_Y;
@@ -1176,7 +1176,7 @@ namespace TEN::Entities
 			obj->saveHitpoints = true;
 			obj->saveFlags = true;
 			obj->saveAnim = true;
-			obj->zoneType = ZONE_BASIC;
+			obj->ZoneType = ZoneType::Basic;
 		}
 
 		obj = &Objects[ID_TEETH_SPIKES];

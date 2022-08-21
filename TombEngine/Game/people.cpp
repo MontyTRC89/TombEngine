@@ -145,32 +145,32 @@ bool TargetVisible(ItemInfo* item, AI_INFO* AI, float maxAngle)
 		return false;
 
 	// Check just in case.
-	auto* creatureInfo = GetCreatureInfo(item);
-	if (creatureInfo == nullptr)
+	auto* creature = GetCreatureInfo(item);
+	if (creature == nullptr)
 		return false;
 
-	auto* enemy = creatureInfo->Enemy;
+	auto* enemy = creature->Enemy;
 	if (enemy == nullptr || enemy->HitPoints == 0)
 		return false;
 
-	short angle = AI->angle - creatureInfo->JointRotation[2];
-	if (angle > -ANGLE(maxAngle) && angle < ANGLE(maxAngle))
+	short angle = AI->angle - creature->JointRotation[2];
+	if (angle > ANGLE(-maxAngle) && angle < ANGLE(maxAngle))
 	{
-		GameVector start;
-		GameVector target;
 		auto& bounds = GetBestFrame(enemy)->boundingBox;
 
-		start.x = item->Pose.Position.x;
-		start.y = item->Pose.Position.y - CLICK(3);
-		start.z = item->Pose.Position.z;
-		start.roomNumber = item->RoomNumber;
-
-		target.x = enemy->Pose.Position.x;
-		target.y = enemy->Pose.Position.y + ((((bounds.Y1 * 2) + bounds.Y1) + bounds.Y2) / 4);
-		target.z = enemy->Pose.Position.z;
-		target.roomNumber = enemy->RoomNumber; // TODO: Check why this line didn't exist before. -- TokyoSU, 10/8/2022
-
-		return LOS(&start, &target);
+		auto origin = GameVector(
+			item->Pose.Position.x,
+			item->Pose.Position.y - CLICK(3),
+			item->Pose.Position.z,
+			item->RoomNumber
+		);
+		auto target = GameVector(
+			enemy->Pose.Position.x,
+			enemy->Pose.Position.y + ((((bounds.Y1 * 2) + bounds.Y1) + bounds.Y2) / 4),
+			enemy->Pose.Position.z,
+			enemy->RoomNumber // TODO: Check why this line didn't exist before. -- TokyoSU, 10/8/2022
+		);
+		return LOS(&origin, &target);
 	}
 
 	return false;

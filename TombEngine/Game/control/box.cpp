@@ -157,7 +157,7 @@ void CreatureYRot2(PHD_3DPOS* srcPos, short angle, short angleAdd)
 
 bool SameZone(CreatureInfo* creature, ItemInfo* target)
 {
-	int* zone = g_Level.Zones[creature->LOT.Zone][FlipStatus].data();
+	int* zone = g_Level.Zones[(int)(int)creature->LOT.Zone][FlipStatus].data();
 	auto* item = &g_Level.Items[creature->ItemNumber];
 
 	auto* room = &g_Level.Rooms[item->RoomNumber];
@@ -455,7 +455,7 @@ int CreatureAnimation(short itemNumber, short angle, short tilt)
 
 	auto* creature = GetCreatureInfo(item);
 	auto* LOT = &creature->LOT;
-	int* zone = g_Level.Zones[LOT->Zone][FlipStatus].data();
+	int* zone = g_Level.Zones[(int)LOT->Zone][FlipStatus].data();
 
 	int boxHeight;
 	if (item->BoxNumber != NO_BOX)
@@ -884,7 +884,7 @@ int ValidBox(ItemInfo* item, short zoneNumber, short boxNumber)
 		return false;
 
 	auto* creature = GetCreatureInfo(item);
-	int* zone = g_Level.Zones[creature->LOT.Zone][FlipStatus].data();
+	int* zone = g_Level.Zones[(int)creature->LOT.Zone][FlipStatus].data();
 	if (creature->LOT.Fly == NO_FLYING && zone[boxNumber] != zoneNumber)
 		return false;
 
@@ -970,7 +970,7 @@ int UpdateLOT(LOTInfo* LOT, int depth)
 
 int SearchLOT(LOTInfo* LOT, int depth)
 {
-	int* zone = g_Level.Zones[LOT->Zone][FlipStatus].data();
+	int* zone = g_Level.Zones[(int)LOT->Zone][FlipStatus].data();
 	int searchZone = zone[LOT->Head];
 
 	if (depth <= 0)
@@ -1375,7 +1375,7 @@ void FindAITargetObject(CreatureInfo* creature, short objectNumber)
 
 			if (aiObject->objectNumber == objectNumber && aiObject->triggerFlags == item->ItemFlags[3] && aiObject->roomNumber != NO_ROOM)
 			{
-				int* zone = g_Level.Zones[creature->LOT.Zone][FlipStatus].data();
+				int* zone = g_Level.Zones[(int)creature->LOT.Zone][FlipStatus].data();
 
 				auto* room = &g_Level.Rooms[item->RoomNumber];
 				item->BoxNumber = GetSector(room, item->Pose.Position.x - room->x, item->Pose.Position.z - room->z)->Box;
@@ -1435,7 +1435,7 @@ void CreatureAIInfo(ItemInfo* item, AI_INFO* AI)
 		creature->Enemy = LaraItem;
 	}
 
-	int* zone = g_Level.Zones[creature->LOT.Zone][FlipStatus].data();
+	int* zone = g_Level.Zones[(int)creature->LOT.Zone][FlipStatus].data();
 
 	auto* room = &g_Level.Rooms[item->RoomNumber];
 	item->BoxNumber = NO_BOX;
@@ -1457,8 +1457,8 @@ void CreatureAIInfo(ItemInfo* item, AI_INFO* AI)
 	// This prevents enemies from running to Lara and attacking nothing when she is hanging or shimmying. -- Lwmte, 27.06.22
 
 	bool reachable = false;
-	if (object->zoneType == ZoneType::ZONE_FLYER ||
-	   (object->zoneType == ZoneType::ZONE_WATER && TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, item->RoomNumber)))
+	if (object->ZoneType == ZoneType::Flyer ||
+	   (object->ZoneType == ZoneType::Water && TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, item->RoomNumber)))
 	{
 		reachable = true; // If NPC is flying or swimming in water, always reach Lara
 	}

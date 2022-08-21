@@ -77,7 +77,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->saveHitpoints = true;
 		obj->saveAnim = true;
 		obj->saveFlags = true;
-		obj->zoneType = ZONE_APE;
+		obj->ZoneType = ZoneType::Ape;
 	}
 
 	obj = &Objects[ID_BIG_RAT];
@@ -97,7 +97,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->saveAnim = true;
 		obj->saveFlags = true;
 		obj->waterCreature = true;
-		obj->zoneType = ZONE_WATER;
+		obj->ZoneType = ZoneType::Water;
 		obj->SetBoneRotation(1, ROT_Y); // head
 	}
 
@@ -173,7 +173,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->saveHitpoints = true;
 		obj->saveAnim = true;
 		obj->saveFlags = true;
-		obj->zoneType = ZONE_BLOCKABLE;
+		obj->ZoneType = ZoneType::Blockable;
 		obj->SetBoneRotation(10, ROT_X | ROT_Y);
 	}
 
@@ -193,7 +193,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->saveFlags = true;
 		obj->saveHitpoints = true;
 		obj->savePosition = true;
-		obj->zoneType = ZONE_FLYER;
+		obj->ZoneType = ZoneType::Flyer;
 		obj->SetBoneRotation(1, ROT_Y); // torso
 		obj->SetBoneRotation(2, ROT_Y); // head
 	}
