@@ -157,7 +157,7 @@ void CreatureYRot2(PHD_3DPOS* srcPos, short angle, short angleAdd)
 
 bool SameZone(CreatureInfo* creature, ItemInfo* target)
 {
-	int* zone = g_Level.Zones[(int)(int)creature->LOT.Zone][FlipStatus].data();
+	int* zone = g_Level.Zones[(int)creature->LOT.Zone][FlipStatus].data();
 	auto* item = &g_Level.Items[creature->ItemNumber];
 
 	auto* room = &g_Level.Rooms[item->RoomNumber];
