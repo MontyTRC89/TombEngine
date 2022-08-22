@@ -67,7 +67,7 @@ static bool TryModifyWeapon(LaraInfo& lara, GAME_OBJECT_ID objectID, int ammoAmo
 	currWeapon.Present = add;
 	if(!add)
 	{
-		if (info.LaraWeaponType == lara.Control.Weapon.GunType)
+		if (info.LaraWeaponType == lara.Control.Weapon.GunType || info.LaraWeaponType == lara.Control.Weapon.LastGunType)
 		{
 			lara.Control.Weapon.RequestGunType = LaraWeaponType::None;
 
