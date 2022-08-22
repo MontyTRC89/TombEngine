@@ -20,6 +20,7 @@
 #include "Flow/ScriptInterfaceFlowHandler.h"
 
 using namespace TEN::Input;
+using namespace TEN::Floordata;
 
 // ------------------------------
 // BASIC MOVEMENT & MISCELLANEOUS
@@ -138,6 +139,8 @@ void lara_as_walk_forward(ItemInfo* item, CollisionInfo* coll)
 		item->Animation.TargetState = LS_DEATH;
 		return;
 	}
+
+	DoLegIK(item, coll, CLICK(1));
 
 	// TODO: Implement item alignment properly someday. @Sezz 2021.11.01
 	if (lara->Control.IsMoving)
@@ -375,6 +378,132 @@ void lara_col_run_forward(ItemInfo* item, CollisionInfo* coll)
 	}
 }
 
+// TODO: See how a height threshold looks on movement anims.
+// TODO: Clamp min/max heights.
+// TODO: Probe for objects.
+// TODO: A nice, light bounce when Lara descends.
+// TODO: Do not touch death floors.
+// TODO: Tilt feet to angle of floor.
+void DoLegIK(ItemInfo* item, CollisionInfo* coll, int threshold)
+{
+	auto* lara = GetLaraInfo(item);
+
+	// FAILURE: Should not use absolute positons of feet. They do not occupy the same x/z space during anims, resulting in oscillation on steps.
+	auto lFootPos = Vector3Int::Zero;
+	auto rFootPos = Vector3Int::Zero;
+	GetLaraJointPosition(&lFootPos, LM_LFOOT);
+	GetLaraJointPosition(&rFootPos, LM_RFOOT);
+	/*auto* lFloorInfo = GetFloor(lPos.x, lPos.y, lPos.z, &item->roomNumber);
+	auto* rFloorInfo = GetFloor(rPos.x, rPos.y, rPos.z, &item->roomNumber);
+	auto lFloor = GetFloorHeight(lFloorInfo, lPos.x, lPos.y, lPos.z);
+	auto rFloor = GetFloorHeight(rFloorInfo, rPos.x, rPos.y, rPos.z);*/
+
+	// TODO: In slow turn anims, it may be appropriate to probe from the player's position insted to keep feet planted on the floor.
+	// TODO: Make radius equivalent to the x/y distance from Lara's centre to the absolute position of each foot.
+
+	// Originally, using constant LARA_RADIUS. Cleaner optics but less accurate.
+	// TODO: Actual distance of feet causes oscillation.
+	// This is wrong. I lose one axis...
+	int lRadius = sqrt(pow(lFootPos.x - item->Pose.Position.x, 2) + pow(lFootPos.y - item->Pose.Position.y, 2));
+	int rRadius = sqrt(pow(rFootPos.x - item->Pose.Position.x, 2) + pow(rFootPos.y - item->Pose.Position.y, 2));
+
+	// More accurate radii. Cause significant oscillation.
+	lRadius = pow(pow(lFootPos.x - item->Pose.Position.x, 2) + pow(lFootPos.z - item->Pose.Position.z, 2) , 0.5);
+	rRadius = pow(pow(rFootPos.x - item->Pose.Position.x, 2) + pow(rFootPos.z - item->Pose.Position.z, 2) , 0.5);
+
+	lRadius = LARA_RADIUS;
+	rRadius = LARA_RADIUS;
+
+	// Originally, using item rotation -/+ ANGLE(90.0f).
+	short lAngle = item->Pose.Orientation.y - phd_atan(lFootPos.z, lFootPos.x);
+	short rAngle = item->Pose.Orientation.y + phd_atan(rFootPos.z, rFootPos.x);
+
+	// Probe left.
+	int lHeight = GetCollision(item, lAngle, lRadius).Position.Floor;
+	lHeight -= item->Pose.Position.y;
+
+	// Probe right.
+	int rHeight = GetCollision(item, rAngle, rRadius).Position.Floor;
+	rHeight -= item->Pose.Position.y;
+
+	int yPosDist = 0;
+	auto lFloor = lHeight;
+	auto rFloor = rHeight;
+
+	// Also check current distances for accuracy?
+
+	// TODO: Fix oscillation.
+
+	// TODO: If one leg is over threshold, but other leg is on a slanted surface, at least descend to that. Or maybe not?
+
+	// Cancel IK.
+	if (lFloor == rFloor ||		   // Both legs would ascend/descend. TODO: There are scenarios where they might not be equal, but IKing would still be inappropriate.
+		abs(lFloor) > threshold || // Left height beyond threshold.
+		abs(rFloor) > threshold || // Right height beyond threshold.
+		lFloor > 0 && rFloor > 0 && lFloor > threshold / 2 && rFloor > threshold / 2)	// test this.
+	{
+		yPosDist = 0;
+		lFloor = 0;
+		rFloor = 0;
+	}
+
+	// Ledge on left; left leg descends.
+	if (abs(lFloor) > 0 && lFloor > rFloor)
+	{
+		yPosDist = lFloor;
+		rFloor -= lFloor;
+		lFloor = 0;
+	}
+	// Ledge on right; right leg descends.
+	else if (abs(rFloor) > 0 && rFloor > lFloor)
+	{
+		yPosDist = rFloor;
+		lFloor -= rFloor;
+		rFloor = 0;
+	}
+	// Otherwise, left/right leg ascends.
+
+	//---
+
+	auto lThighPos = Vector3Int::Zero;
+	auto lShinPos = Vector3Int::Zero;
+	GetLaraJointPosition(&lThighPos, LM_LTHIGH);
+	GetLaraJointPosition(&lShinPos, LM_LSHIN);
+
+	float lThighLength = pow(
+		pow(lShinPos.x - lThighPos.x, 2) +
+		pow(lShinPos.y - lThighPos.y, 2) +
+		pow(lShinPos.z - lThighPos.z, 2),
+		0.5);
+	float lShinLength = pow(
+		pow(lShinPos.x - lFootPos.x, 2) +
+		pow(lShinPos.y - lFootPos.y, 2) +
+		pow(lShinPos.z - lFootPos.z, 2),
+		0.5);
+	float lThighToFootLength = item->Pose.Position.y;
+
+	//---
+
+	// TODO: Proper sin/cos maths. This is poor!
+	float dist = 25.25; // TODO: This is an estimate, and results in slightly inaccurate ascending/descending. What is the actual value and what does it represent?
+	short lThighAngle = -(lFloor / dist * 6.42857); // Float value is 45(degrees) / 7.
+	short lShinAngle = -lThighAngle * 2;
+	short lFootAngle = lThighAngle;
+	short rThighAngle = -(rFloor / dist * 6.42857);
+	short rShinAngle = -rThighAngle * 2;
+	short rFootAngle = rThighAngle;
+
+	// TODO: Use mutators. They currently don't work for this application, as child bones don't inherit position and rotation of parents.
+	int div = 3;
+	lara->yPosOffset += (yPosDist - lara->yPosOffset) / div;
+	lara->lThighXrot += (ANGLE(lThighAngle) - lara->lThighXrot) / div;
+	lara->lShinXrot += (ANGLE(lShinAngle) - lara->lShinXrot) / div;
+	lara->lFootXrot += (ANGLE(lFootAngle) - lara->lFootXrot) / div;
+	lara->rThighXrot += (ANGLE(rThighAngle) - lara->rThighXrot) / div;
+	lara->rShinXrot += (ANGLE(rShinAngle) - lara->rShinXrot) / div;
+	lara->rFootXrot += (ANGLE(rFootAngle) - lara->rFootXrot) / div;
+}
+
 // State:		LS_IDLE (2), LS_SPLAT_SOFT (170)
 // Collision:	lara_col_idle()
 void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
@@ -390,6 +519,8 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 		item->Animation.TargetState = LS_DEATH;
 		return;
 	}
+
+	DoLegIK(item, coll, CLICK(1));
 
 	// Handles waterskin and clockwork beetle.
 	// TODO: Hardcoding.
@@ -844,6 +975,8 @@ void lara_as_turn_right_slow(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
+	DoLegIK(item, coll, CLICK(1));
+
 	if (lara->Control.WaterStatus == WaterStatus::Wade)
 	{
 		if (isSwamp)
@@ -1089,6 +1222,8 @@ void lara_as_turn_left_slow(ItemInfo* item, CollisionInfo* coll)
 		item->Animation.TargetState = LS_DEATH;
 		return;
 	}
+
+	DoLegIK(item, coll, CLICK(1));
 
 	if (lara->Control.WaterStatus == WaterStatus::Wade)
 	{
@@ -1420,6 +1555,8 @@ void lara_as_walk_back(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
+	DoLegIK(item, coll, CLICK(1));
+
 	if (lara->Control.IsMoving)
 		return;
 
@@ -1526,6 +1663,7 @@ void lara_as_turn_right_fast(ItemInfo* item, CollisionInfo* coll)
 	}
 
 	ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, LARA_MED_TURN_RATE_MAX, LARA_FAST_TURN_RATE_MAX);
+	DoLegIK(item, coll, CLICK(1));
 
 	if (TrInput & IN_JUMP)
 	{
@@ -1653,6 +1791,7 @@ void lara_as_turn_left_fast(ItemInfo* item, CollisionInfo* coll)
 	}
 
 	ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, LARA_MED_TURN_RATE_MAX, LARA_FAST_TURN_RATE_MAX);
+	DoLegIK(item, coll, CLICK(1));
 
 	if (TrInput & IN_JUMP)
 	{
@@ -1780,6 +1919,8 @@ void lara_as_step_right(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
+	DoLegIK(item, coll, CLICK(1));
+
 	if (lara->Control.IsMoving)
 		return;
 
@@ -1870,6 +2011,8 @@ void lara_as_step_left(ItemInfo* item, CollisionInfo* coll)
 		item->Animation.TargetState = LS_DEATH;
 		return;
 	}
+
+	DoLegIK(item, coll, CLICK(1));
 
 	if (lara->Control.IsMoving)
 		return;

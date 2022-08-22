@@ -94,7 +94,7 @@ void Renderer11::UpdateLaraAnimations(bool force)
 		laraObj.LinearizedBones[i]->ExtraRotation = Vector3(0.0f, 0.0f, 0.0f);
 
 	// Lara world matrix
-	translation = Matrix::CreateTranslation(LaraItem->Pose.Position.x, LaraItem->Pose.Position.y, LaraItem->Pose.Position.z);
+	translation = Matrix::CreateTranslation(LaraItem->Pose.Position.x, LaraItem->Pose.Position.y + Lara.yPosOffset, LaraItem->Pose.Position.z);
 	rotation = Matrix::CreateFromYawPitchRoll(TO_RAD(LaraItem->Pose.Orientation.y), TO_RAD(LaraItem->Pose.Orientation.x), TO_RAD(LaraItem->Pose.Orientation.z));
 
 	m_LaraWorldMatrix = rotation * translation;
@@ -103,6 +103,17 @@ void Renderer11::UpdateLaraAnimations(bool force)
 	// Update first Lara's animations
 	laraObj.LinearizedBones[LM_TORSO]->ExtraRotation = Vector3(TO_RAD(Lara.ExtraTorsoRot.x), TO_RAD(Lara.ExtraTorsoRot.y), TO_RAD(Lara.ExtraTorsoRot.z));
 	laraObj.LinearizedBones[LM_HEAD]->ExtraRotation = Vector3(TO_RAD(Lara.ExtraHeadRot.x), TO_RAD(Lara.ExtraHeadRot.y), TO_RAD(Lara.ExtraHeadRot.z));
+
+	//---IK testing.
+
+	laraObj.LinearizedBones[LM_LTHIGH]->ExtraRotation = Vector3(TO_RAD(Lara.lThighXrot), 0, 0);
+	laraObj.LinearizedBones[LM_LSHIN]->ExtraRotation = Vector3(TO_RAD(Lara.lShinXrot), 0, 0);
+	laraObj.LinearizedBones[LM_LFOOT]->ExtraRotation = Vector3(TO_RAD(Lara.lFootXrot), 0, 0);
+	laraObj.LinearizedBones[LM_RTHIGH]->ExtraRotation = Vector3(TO_RAD(Lara.rThighXrot), 0, 0);
+	laraObj.LinearizedBones[LM_RSHIN]->ExtraRotation = Vector3(TO_RAD(Lara.rShinXrot), 0, 0);
+	laraObj.LinearizedBones[LM_RFOOT]->ExtraRotation = Vector3(TO_RAD(Lara.rFootXrot), 0, 0);
+
+	//---
 
 	// First calculate matrices for legs, hips, head and torso
 	int mask = MESH_BITS(LM_HIPS) | MESH_BITS(LM_LTHIGH) | MESH_BITS(LM_LSHIN) | MESH_BITS(LM_LFOOT) | MESH_BITS(LM_RTHIGH) | MESH_BITS(LM_RSHIN) | MESH_BITS(LM_RFOOT) | MESH_BITS(LM_TORSO) | MESH_BITS(LM_HEAD);

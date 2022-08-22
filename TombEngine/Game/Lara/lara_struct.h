@@ -1250,6 +1250,18 @@ struct LaraControlData
 
 struct LaraInfo
 {
+	//--- Very rough IK stuff.
+
+	int yPosOffset;
+	short lThighXrot;
+	short lShinXrot;
+	short rThighXrot;
+	short rShinXrot;
+	short lFootXrot;
+	short rFootXrot;
+
+	//---
+
 	short ItemNumber;
 	LaraControlData Control;
 	LaraInventoryData Inventory;
