@@ -30,7 +30,7 @@ static constexpr std::array<WeaponPickupInfo, 9> kWeapons
 		{ ID_UZI_ITEM, ID_UZI_AMMO_ITEM, LaraWeaponType::Uzi, HolsterType::Hips},
 		{ ID_SHOTGUN_ITEM, ID_SHOTGUN_AMMO1_ITEM, LaraWeaponType::Shotgun, HolsterType::Back },
 		{ ID_CROSSBOW_ITEM, ID_CROSSBOW_AMMO1_ITEM, LaraWeaponType::Crossbow, HolsterType::Back},
-		{ ID_REVOLVER_ITEM, ID_REVOLVER_AMMO_ITEM, LaraWeaponType::Revolver, HolsterType::Back},
+		{ ID_REVOLVER_ITEM, ID_REVOLVER_AMMO_ITEM, LaraWeaponType::Revolver, HolsterType::Hips},
 		{ ID_HK_ITEM, ID_HK_AMMO_ITEM, LaraWeaponType::HK, HolsterType::Back},
 		{ ID_GRENADE_GUN_ITEM, ID_GRENADE_AMMO1_ITEM, LaraWeaponType::GrenadeLauncher, HolsterType::Back },
 		{ ID_ROCKET_LAUNCHER_ITEM, ID_ROCKET_LAUNCHER_AMMO_ITEM, LaraWeaponType::RocketLauncher, HolsterType::Back },
