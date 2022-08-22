@@ -571,7 +571,9 @@ void LaraGun(ItemInfo* laraItem)
 		{
 			if (!GetAmmo(laraItem, lara->Control.Weapon.GunType))
 			{
-				lara->Control.Weapon.RequestGunType = Objects[ID_PISTOLS_ITEM].loaded ? LaraWeaponType::Pistol : LaraWeaponType::None;
+				bool hasPistols = lara->Weapons[(int)LaraWeaponType::Pistol].Present && Objects[ID_PISTOLS_ITEM].loaded;
+
+				lara->Control.Weapon.RequestGunType = hasPistols ? LaraWeaponType::Pistol : LaraWeaponType::None;
 				return;
 			}
 		}
@@ -1184,7 +1186,7 @@ HolsterSlot HolsterSlotForWeapon(LaraWeaponType weaponType)
 			return HolsterSlot::Harpoon;
 
 		case LaraWeaponType::Crossbow:
-			return HolsterSlot::Crowssbow;
+			return HolsterSlot::Crossbow;
 
 		case LaraWeaponType::GrenadeLauncher:
 			return HolsterSlot::GrenadeLauncher;

@@ -434,8 +434,12 @@ void UndrawShotgunMeshes(ItemInfo* laraItem, LaraWeaponType weaponType)
 {
 	auto* lara = GetLaraInfo(laraItem);
 
-	lara->Control.Weapon.HolsterInfo.BackHolster = HolsterSlotForWeapon(weaponType);
 	lara->MeshPtrs[LM_RHAND] = Objects[ID_LARA_SKIN].meshIndex + LM_RHAND;
+
+	if (lara->Weapons[(int)weaponType].Present)
+		lara->Control.Weapon.HolsterInfo.BackHolster = HolsterSlotForWeapon(weaponType);
+	else
+		lara->Control.Weapon.HolsterInfo.BackHolster = HolsterSlot::Empty;
 }
 
 void FireHarpoon(ItemInfo* laraItem)
