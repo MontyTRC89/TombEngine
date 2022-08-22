@@ -175,7 +175,7 @@ namespace TEN::Utils
 		return this->GetPackedBits();
 	}
 
-	BitField BitField::operator =(uint packedBits)
+	BitField& BitField::operator =(uint packedBits)
 	{
 		for (size_t i = 0; i < Container.size(); i++)
 		{
@@ -185,9 +185,11 @@ namespace TEN::Utils
 			else
 				this->Container[i] = false;
 		}
+
+		return *this;
 	}
 
-	BitField BitField::operator |=(uint packedBits)
+	BitField& BitField::operator |=(uint packedBits)
 	{
 		for (size_t i = 0; i < Container.size(); i++)
 		{
@@ -195,6 +197,8 @@ namespace TEN::Utils
 			if ((packedBits & bit) == bit)
 				this->Container[i] = true;
 		}
+
+		return *this;
 	}
 	
 	BitField BitField::operator &(uint packedBits)
@@ -210,6 +214,7 @@ namespace TEN::Utils
 		}
 
 		newBitField.Set(indices);
+		return newBitField;
 	}
 
 	void BitField::Fill(bool value)
