@@ -180,12 +180,36 @@ namespace TEN::Utils
 		for (size_t i = 0; i < Container.size(); i++)
 		{
 			uint bit = uint(1 << i);
-
 			if ((packedBits & bit) == bit)
 				this->Container[i] = true;
 			else
 				this->Container[i] = false;
 		}
+	}
+
+	BitField BitField::operator |=(uint packedBits)
+	{
+		for (size_t i = 0; i < Container.size(); i++)
+		{
+			uint bit = uint(1 << i);
+			if ((packedBits & bit) == bit)
+				this->Container[i] = true;
+		}
+	}
+	
+	BitField BitField::operator &(uint packedBits)
+	{
+		BitField newBitField = {};
+		vector<uint> indices = {};
+
+		for (size_t i = 0; i < Container.size(); i++)
+		{
+			uint bit = uint(1 << i);
+			if (Container[i] && (packedBits & bit) == bit)
+				indices.push_back(i);
+		}
+
+		newBitField.Set(indices);
 	}
 
 	void BitField::Fill(bool value)

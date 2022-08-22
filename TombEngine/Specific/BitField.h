@@ -41,6 +41,8 @@ namespace TEN::Utils
 		// Operators
 		operator uint();
 		BitField operator =(uint packedBits);
+		BitField operator |=(uint packedBits);
+		BitField operator &(uint packedBits);
 
 	private:
 		void Fill(bool value);
