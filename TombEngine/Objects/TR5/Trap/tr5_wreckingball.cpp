@@ -12,7 +12,7 @@
 #include "tr5_light.h"
 #include "Game/animation.h"
 #include "Specific/level.h"
-#include "Specific/input.h"
+#include "Specific/Input/Input.h"
 #include "Game/room.h"
 #include "Sound/sound.h"
 

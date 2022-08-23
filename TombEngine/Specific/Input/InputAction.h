@@ -78,7 +78,7 @@ namespace TEN::Input
 		bool IsClicked();
 		bool IsPulsed(float delayInSeconds, float initialDelayInSeconds = 0.0f);
 		bool IsHeld();
-		bool IsReleased(float maxDelayInSeconds = std::numeric_limits<float>::max());
+		bool IsReleased(float maxDelayInSeconds = FLT_MAX);
 
 		ActionID GetID();
 		float GetValue();
