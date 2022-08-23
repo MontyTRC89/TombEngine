@@ -124,11 +124,7 @@ namespace TEN::Entities::Creatures::TR5
 		auto* item = &g_Level.Items[itemNumber];
 
 		ClearItem(itemNumber);
-
-		item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 4;
-		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-		item->Animation.TargetState = CYBORG_STATE_IDLE;
-		item->Animation.ActiveState = CYBORG_STATE_IDLE;
+		SetAnimation(item, CYBORG_ANIM_IDLE);
 	}
 
 	static void TriggerHitmanSparks(int x, int y, int z, short xv, short yv, short zv)
@@ -174,13 +170,13 @@ namespace TEN::Entities::Creatures::TR5
 		if (CreatureActive(itemNumber))
 		{
 			auto* item = &g_Level.Items[itemNumber];
-			auto* creature = GetCreatureInfo(item);
 			auto* object = &Objects[item->ObjectNumber];
+			auto* creature = GetCreatureInfo(item);
 
 			short angle = 0;
-			short joint2 = 0;
-			short joint1 = 0;
 			short joint0 = 0;
+			short joint1 = 0;
+			short joint2 = 0;
 
 			int x = item->Pose.Position.x;
 			int z = item->Pose.Position.z;
