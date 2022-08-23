@@ -11,20 +11,29 @@ Inventory manipulation
 @pragma nostrip
 */
 
+
 namespace InventoryHandler
 {
 	static void InventoryAdd(ItemEnumPair slot, sol::optional<int> count)
 	{
-		// If 0 is passed in, then the amount added will be the default amount
+		// If nil is passed in, then the amount added will be the default amount
 		// for that pickup - i.e. the amount you would get from picking up the
 		// item in-game (e.g. 1 for medipacks, 12 for flares).
-		PickedUpObject(slot.m_pair.first, count.value_or(0));
+
+		//can't use value_or(std::nullopt) here because nullopt isn't an int
+		if (count.has_value())
+			PickedUpObject(slot.m_pair.first, count.value());
+		else
+			PickedUpObject(slot.m_pair.first, std::nullopt);
 	}
 
 	static void InventoryRemove(ItemEnumPair slot, sol::optional<int> count)
 	{
-		// 0 is default for the same reason as in InventoryAdd.
-		RemoveObjectFromInventory(slot.m_pair.first, count.value_or(0));
+		//can't use value_or(std::nullopt) here because nullopt isn't an int
+		if (count.has_value())
+			RemoveObjectFromInventory(slot.m_pair.first, count.value());
+		else
+			RemoveObjectFromInventory(slot.m_pair.first, std::nullopt);
 	}
 
 	static int InventoryGetCount(ItemEnumPair slot)
@@ -34,9 +43,7 @@ namespace InventoryHandler
 
 	static void InventorySetCount(ItemEnumPair slot, int count)
 	{
-		// add the amount we'd need to add to get to count
-		int currAmt = GetInventoryCount(slot.m_pair.first);
-		InventoryAdd(slot, count - currAmt);
+		SetInventoryCount(slot.m_pair.first, count);
 	}
 
 	static void InventoryCombine(int slot1, int slot2)

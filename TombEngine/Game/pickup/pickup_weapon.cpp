@@ -49,7 +49,7 @@ static int GetWeapon(GAME_OBJECT_ID objectID)
 	return -1;
 }
 
-static bool TryModifyWeapon(LaraInfo& lara, GAME_OBJECT_ID objectID, int ammoAmount, bool add)
+bool TryModifyWeapon(LaraInfo& lara, GAME_OBJECT_ID objectID, std::optional<int> count, ModificationType type)
 {
 	int arrayPos = GetArraySlot(kWeapons, objectID);
 	if (-1 == arrayPos)
@@ -63,8 +63,10 @@ static bool TryModifyWeapon(LaraInfo& lara, GAME_OBJECT_ID objectID, int ammoAmo
 
 	if (!currWeapon.Present)
 		currWeapon.SelectedAmmo = WeaponAmmoType::Ammo1;
-	
+
+	bool add = ModificationType::Add == type || ((ModificationType::Set == type) && count != 0);
 	currWeapon.Present = add;
+
 	if(!add)
 	{
 		if (info.LaraWeaponType == lara.Control.Weapon.GunType || info.LaraWeaponType == lara.Control.Weapon.LastGunType)
@@ -94,21 +96,19 @@ static bool TryModifyWeapon(LaraInfo& lara, GAME_OBJECT_ID objectID, int ammoAmo
 		}
 	}
 
-	auto ammoID = info.AmmoID;
-	return add ? TryAddingAmmo(lara, ammoID, ammoAmount) : TryRemovingAmmo(lara, ammoID, ammoAmount);
+	return true;
 }
 
-// Adding a weapon will either give the player the weapon + an amount of ammo, or,
-// if they already have the weapon, simply the ammo.
-bool TryAddingWeapon(LaraInfo& lara, GAME_OBJECT_ID objectID, int amount)
+// Adding a weapon will not give the player any ammo even if they already have the weapon
+bool TryAddingWeapon(LaraInfo& lara, GAME_OBJECT_ID objectID)
 {
-	return TryModifyWeapon(lara, objectID, amount, true);
+	return TryModifyWeapon(lara, objectID, 1, ModificationType::Add);
 }
 
-// Removing a weapon is the reverse of the above; it will remove the weapon (if it's there) and the amount of ammo.
-bool TryRemovingWeapon(LaraInfo& lara, GAME_OBJECT_ID objectID, int amount)
+// Removing a weapon is the reverse of the above; it will remove the weapon (if it's there).
+bool TryRemovingWeapon(LaraInfo& lara, GAME_OBJECT_ID objectID)
 {
-	return TryModifyWeapon(lara, objectID, amount, false);
+	return TryModifyWeapon(lara, objectID, 1, ModificationType::Remove);
 }
 
 std::optional<bool> HasWeapon(LaraInfo& lara, GAME_OBJECT_ID objectID)

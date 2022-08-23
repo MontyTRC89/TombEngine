@@ -11,8 +11,9 @@ extern short RPickups[16];
 extern Vector3Int OldPickupPos;
 
 void InitialisePickup(short itemNumber);
-void PickedUpObject(GAME_OBJECT_ID objectID, int count);
-void RemoveObjectFromInventory(GAME_OBJECT_ID objectID, int count);
+void PickedUpObject(GAME_OBJECT_ID objectID, std::optional<int> count = std::nullopt);
+bool SetInventoryCount(GAME_OBJECT_ID objectID, int count);
+void RemoveObjectFromInventory(GAME_OBJECT_ID objectID, std::optional<int> count = std::nullopt);
 int GetInventoryCount(GAME_OBJECT_ID objectID);
 void CollectCarriedItems(ItemInfo* item);
 void PickupCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);

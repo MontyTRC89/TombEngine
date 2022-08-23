@@ -265,7 +265,7 @@ void AddDisplayPickup(GAME_OBJECT_ID objectNumber)
 	}
 
 	// No free slot found; pickup the object without displaying it.
-	PickedUpObject(objectNumber, 0);
+	PickedUpObject(objectNumber, std::nullopt);
 }
 
 void InitialisePickupDisplay()

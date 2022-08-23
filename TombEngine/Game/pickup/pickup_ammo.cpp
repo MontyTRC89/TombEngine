@@ -34,7 +34,7 @@ static constexpr std::array<AmmoPickupInfo, 14> kAmmo
 	}
 };
 
-static bool TryModifyingAmmo(LaraInfo& lara, GAME_OBJECT_ID objectID, int amount, bool add)
+bool TryModifyingAmmo(LaraInfo& lara, GAME_OBJECT_ID objectID, std::optional<int> amount, ModificationType modType)
 {
 	int arrayPos = GetArraySlot(kAmmo, objectID);
 	if (-1 == arrayPos)
@@ -42,26 +42,41 @@ static bool TryModifyingAmmo(LaraInfo& lara, GAME_OBJECT_ID objectID, int amount
 
 	AmmoPickupInfo info = kAmmo[arrayPos];
 
-	auto currentAmmo = lara.Weapons[(int)info.LaraWeaponType].Ammo[(int)info.AmmoType];
-	if (!currentAmmo.hasInfinite())
+	auto & currentWeapon = lara.Weapons[(int)info.LaraWeaponType];
+	auto & currentAmmo = currentWeapon.Ammo[(int)info.AmmoType];
+
+	switch(modType)
 	{
-		int defaultModify = add ? info.Amount : -info.Amount;
-		int newVal = int{ currentAmmo.getCount() } + (amount ? amount : defaultModify);
-		lara.Weapons[(int)info.LaraWeaponType].Ammo[(int)info.AmmoType] = std::max(0, newVal);
-	}
+	case ModificationType::Set:
+		currentAmmo = amount.value();
+		currentAmmo.setInfinite(amount == -1);
+
+		break;
+
+	default:
+		if (!currentAmmo.hasInfinite())
+		{
+			int defaultModify = modType == ModificationType::Add ? info.Amount : -info.Amount;
+			int newVal = int{ currentAmmo.getCount() } + (amount.has_value() ? amount.value() : defaultModify);
+			currentAmmo = std::max(0, newVal);
+		}
+		break;
+	};
 
 	return true;
 }
 
-// We need the extra bool because amount might be zero to signify the default amount.
-bool TryAddingAmmo(LaraInfo& lara, GAME_OBJECT_ID objectID, int amount)
+bool TryAddingAmmo(LaraInfo& lara, GAME_OBJECT_ID objectID, std::optional<int> amount)
 {
-	return TryModifyingAmmo(lara, objectID, amount, true);
+	return TryModifyingAmmo(lara, objectID, amount, ModificationType::Add);
 }
 
-bool TryRemovingAmmo(LaraInfo& lara, GAME_OBJECT_ID objectID, int amount)
+bool TryRemovingAmmo(LaraInfo& lara, GAME_OBJECT_ID objectID, std::optional<int> amount)
 {	
-	return TryModifyingAmmo(lara, objectID, -amount, false);
+	if (amount.has_value())
+		return TryModifyingAmmo(lara, objectID, -amount.value(), ModificationType::Remove);
+	else
+		return TryModifyingAmmo(lara, objectID, amount, ModificationType::Remove);
 }
 
 std::optional<int> GetAmmoCount(LaraInfo& lara, GAME_OBJECT_ID objectID)
