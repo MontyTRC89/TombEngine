@@ -6,7 +6,7 @@ struct ItemInfo;
 
 namespace TEN::Gui
 {
-	constexpr int MAX_COMBINES = 60;
+	constexpr auto MAX_COMBINES = 60;
 
 	enum InventoryObjectTypes
 	{
@@ -292,7 +292,7 @@ namespace TEN::Gui
 		Vector3Shrt Orientation;
 		unsigned __int64 Options;
 		const char* ObjectName;
-		unsigned int MeshBits;
+		uint MeshBits;
 		short RotFlags;
 	};
 
@@ -306,29 +306,29 @@ namespace TEN::Gui
 
 	struct AmmoList
 	{
-		short	   	   InventoryItem;
-		short	 	   Amount;
-		unsigned short XRot;
-		unsigned short YRot;
-		unsigned short ZRot;
+		short  InventoryItem;
+		short  Amount;
+		ushort XRot;
+		ushort YRot;
+		ushort ZRot;
 	};
 
 	struct AmmoData
 	{
-		unsigned short AmountShotGunAmmo1;
-		unsigned short AmountShotGunAmmo2;
-		unsigned short AmountHKAmmo1;
-		unsigned short AmountCrossBowAmmo1;
-		unsigned short AmountCrossBowAmmo2;
-		unsigned short AmountCrossBowAmmo3;
-		unsigned short AmountGrenadeAmmo1;
-		unsigned short AmountGrenadeAmmo2;
-		unsigned short AmountGrenadeAmmo3;
-		unsigned short AmountRocketsAmmo;
-		unsigned short AmountHarpoonAmmo;
-		unsigned short AmountUziAmmo;
-		unsigned short AmountRevolverAmmo;
-		unsigned short AmountPistolsAmmo;
+		ushort AmountShotGunAmmo1;
+		ushort AmountShotGunAmmo2;
+		ushort AmountHKAmmo1;
+		ushort AmountCrossBowAmmo1;
+		ushort AmountCrossBowAmmo2;
+		ushort AmountCrossBowAmmo3;
+		ushort AmountGrenadeAmmo1;
+		ushort AmountGrenadeAmmo2;
+		ushort AmountGrenadeAmmo3;
+		ushort AmountRocketsAmmo;
+		ushort AmountHarpoonAmmo;
+		ushort AmountUziAmmo;
+		ushort AmountRevolverAmmo;
+		ushort AmountPistolsAmmo;
 		char CurrentPistolsAmmoType;
 		char CurrentUziAmmoType;
 		char CurrentRevolverAmmoType;
