@@ -655,7 +655,7 @@ namespace TEN::Entities::TR4
 
 				if (!creature->Flags)
 				{
-					if (item->TouchBits & 0x4000)
+					if (item->TouchBits & 0x60)
 					{
 						DoDamage(creature->Enemy, 100);
 						CreatureEffect2(item, HorsemanBite2, 3, item->Pose.Orientation.y, DoBloodSplat);
