@@ -115,9 +115,10 @@ namespace TEN::Entities::Creatures::TR1
 		auto* creature = GetCreatureInfo(item);
 
 		int waterHeight = GetRatWaterHeight(item);
-		short head = 0;
-		short angle = 0;
 		bool isOnWater = waterHeight != NO_HEIGHT;
+
+		short angle = 0;
+		short head = 0;
 
 		if (item->HitPoints <= 0)
 		{
@@ -183,9 +184,9 @@ namespace TEN::Entities::Creatures::TR1
 				if (!item->Animation.RequiredState && AI.ahead &&
 					item->TestBits(JointBitType::Touch, BigRatBite.meshNum))
 				{
-					item->Animation.RequiredState = BIG_RAT_STATE_IDLE;
 					DoDamage(creature->Enemy, BIG_RAT_BITE_ATTACK_DAMAGE);
 					CreatureEffect(item, BigRatBite, DoBloodSplat);
+					item->Animation.RequiredState = BIG_RAT_STATE_IDLE;
 				}
 
 				break;
@@ -194,9 +195,9 @@ namespace TEN::Entities::Creatures::TR1
 				if (!item->Animation.RequiredState && AI.ahead &&
 					item->TestBits(JointBitType::Touch, BigRatBite.meshNum))
 				{
-					item->Animation.RequiredState = BIG_RAT_STATE_RUN_FORWARD;
 					DoDamage(creature->Enemy, BIG_RAT_POUNCE_ATTACK_DAMAGE);
 					CreatureEffect(item, BigRatBite, DoBloodSplat);
+					item->Animation.RequiredState = BIG_RAT_STATE_RUN_FORWARD;
 				}
 
 				break;

@@ -23,15 +23,15 @@ using std::vector;
 
 namespace TEN::Entities::Creatures::TR1
 {
-	constexpr auto CENTAUR_REAR_DAMAGE	 = 200;
-	constexpr auto CENTAUR_REAR_RANGE	 = SECTOR(1.5f);
-	constexpr auto CENTAUR_REAR_CHANCE	 = 0.003f;
+	constexpr auto CENTAUR_REAR_DAMAGE = 200;
+	constexpr auto CENTAUR_REAR_RANGE = SECTOR(1.5f);
+	constexpr auto CENTAUR_REAR_CHANCE = 0.003f;
 	constexpr auto CENTAUR_BOMB_VELOCITY = 20;
 
 	#define CENTAUR_TURN_RATE_MAX ANGLE(4.0f)
 
 	const auto CentaurRocketBite = BiteInfo(Vector3(11.0f, 415.0f, 41.0f), 13);
-	const auto CentaurRearBite = BiteInfo(Vector3(50.0f, 30.0f, 0.0f), 5);
+	const auto CentaurRearBite	 = BiteInfo(Vector3(50.0f, 30.0f, 0.0f), 5);
 	const vector<int> CentaurAttackJoints = { 0, 3, 4, 7, 8, 16, 17 };
 
 	enum CentaurState
@@ -58,17 +58,14 @@ namespace TEN::Entities::Creatures::TR1
 
 		auto* item = &g_Level.Items[itemNumber];
 		auto* creature = GetCreatureInfo(item);
-		short head = 0;
+
 		short angle = 0;
+		short head = 0;
 
 		if (item->HitPoints <= 0)
 		{
 			if (item->Animation.ActiveState != CENTAUR_STATE_DEATH)
-			{
-				item->Animation.AnimNumber = Objects[ID_CENTAUR_MUTANT].animIndex + CENTAUR_ANIM_DEATH;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-				item->Animation.ActiveState = CENTAUR_STATE_DEATH;
-			}
+				SetAnimation(item, CENTAUR_ANIM_DEATH);
 		}
 		else
 		{
