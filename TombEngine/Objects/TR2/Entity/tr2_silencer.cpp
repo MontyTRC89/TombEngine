@@ -32,22 +32,17 @@ namespace TEN::Entities::Creatures::TR2
 			return;
 
 		auto* item = &g_Level.Items[itemNumber];
-		auto* info = GetCreatureInfo(item);
+		auto* creature = GetCreatureInfo(item);
 
 		short angle = 0;
-		short torsoX = 0;
-		short torsoY = 0;
-		short head = 0;
 		short tilt = 0;
+		Vector3Shrt extraHeadRot = Vector3Shrt::Zero;
+		Vector3Shrt extraTorsoRot = Vector3Shrt::Zero;
 
 		if (item->HitPoints <= 0)
 		{
 			if (item->Animation.ActiveState != 12 && item->Animation.ActiveState != 13)
-			{
-				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 20;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-				item->Animation.ActiveState = 13;
-			}
+				SetAnimation(item, 20);
 		}
 		else
 		{
@@ -57,14 +52,15 @@ namespace TEN::Entities::Creatures::TR2
 			GetCreatureMood(item, &AI, true);
 			CreatureMood(item, &AI, true);
 
-			angle = CreatureTurn(item, info->MaxTurn);
+			angle = CreatureTurn(item, creature->MaxTurn);
 
 			switch (item->Animation.ActiveState)
 			{
 			case 3:
+				creature->MaxTurn = 0;
+
 				if (AI.ahead)
-					head = AI.angle;
-				info->MaxTurn = 0;
+					extraHeadRot.y = AI.angle;
 
 				if (item->Animation.RequiredState)
 					item->Animation.TargetState = item->Animation.RequiredState;
@@ -72,34 +68,35 @@ namespace TEN::Entities::Creatures::TR2
 				break;
 
 			case 4:
-				if (AI.ahead)
-					head = AI.angle;
-				info->MaxTurn = 0;
+				creature->MaxTurn = 0;
 
-				if (info->Mood == MoodType::Escape)
+				if (AI.ahead)
+					extraHeadRot.y = AI.angle;
+
+				if (creature->Mood == MoodType::Escape)
 				{
-					item->Animation.RequiredState = 2;
 					item->Animation.TargetState = 3;
+					item->Animation.RequiredState = 2;
 				}
 				else
 				{
 					if (Targetable(item, &AI))
 					{
-						item->Animation.RequiredState = (GetRandomControl() >= 0x4000 ? 10 : 6);
 						item->Animation.TargetState = 3;
+						item->Animation.RequiredState = (GetRandomControl() >= 0x4000 ? 10 : 6);
 					}
 
-					if (info->Mood == MoodType::Attack || !AI.ahead)
+					if (creature->Mood == MoodType::Attack || !AI.ahead)
 					{
 						if (AI.distance >= pow(SECTOR(2), 2))
 						{
-							item->Animation.RequiredState = 2;
 							item->Animation.TargetState = 3;
+							item->Animation.RequiredState = 2;
 						}
 						else
 						{
-							item->Animation.RequiredState = 1;
 							item->Animation.TargetState = 3;
+							item->Animation.RequiredState = 1;
 						}
 					}
 					else
@@ -108,14 +105,14 @@ namespace TEN::Entities::Creatures::TR2
 						{
 							if (GetRandomControl() < 2560)
 							{
-								item->Animation.RequiredState = 1;
 								item->Animation.TargetState = 3;
+								item->Animation.RequiredState = 1;
 							}
 						}
 						else
 						{
-							item->Animation.RequiredState = 5;
 							item->Animation.TargetState = 3;
+							item->Animation.RequiredState = 5;
 						}
 					}
 				}
@@ -124,36 +121,36 @@ namespace TEN::Entities::Creatures::TR2
 
 			case 1:
 				if (AI.ahead)
-					head = AI.angle;
+					extraHeadRot.y = AI.angle;
 
-				info->MaxTurn = 910;
+				creature->MaxTurn = 910;
 
-				if (info->Mood == MoodType::Escape)
+				if (creature->Mood == MoodType::Escape)
 					item->Animation.TargetState = 2;
 				else if (Targetable(item, &AI))
 				{
-					item->Animation.RequiredState = (GetRandomControl() >= 0x4000 ? 10 : 6);
 					item->Animation.TargetState = 3;
+					item->Animation.RequiredState = (GetRandomControl() >= 0x4000 ? 10 : 6);
 				}
 				else
 				{
 					if (AI.distance > pow(SECTOR(2), 2) || !AI.ahead)
 						item->Animation.TargetState = 2;
-					if (info->Mood == MoodType::Bored && GetRandomControl() < 0x300)
+					if (creature->Mood == MoodType::Bored && GetRandomControl() < 0x300)
 						item->Animation.TargetState = 3;
 				}
 
 				break;
 
 			case 2:
-				if (AI.ahead)
-					head = AI.angle;
-
-				info->MaxTurn = ANGLE(5.0f);
-				info->Flags = 0;
+				creature->MaxTurn = ANGLE(5.0f);
+				creature->Flags = 0;
 				tilt = angle / 4;
 
-				if (info->Mood == MoodType::Escape)
+				if (AI.ahead)
+					extraHeadRot.y = AI.angle;
+
+				if (creature->Mood == MoodType::Escape)
 				{
 					if (Targetable(item, &AI))
 						item->Animation.TargetState = 9;
@@ -169,7 +166,7 @@ namespace TEN::Entities::Creatures::TR2
 
 					break;
 				}
-				else if (info->Mood == MoodType::Attack)
+				else if (creature->Mood == MoodType::Attack)
 					item->Animation.TargetState = (GetRandomControl() >= 0x4000) ? 3 : 2;
 				else
 					item->Animation.TargetState = 3;
@@ -177,19 +174,19 @@ namespace TEN::Entities::Creatures::TR2
 				break;
 
 			case 5:
-				if (AI.ahead)
-					head = AI.angle;
+				creature->MaxTurn = 0;
 
-				info->MaxTurn = 0;
+				if (AI.ahead)
+					extraHeadRot.y = AI.angle;
 
 				if (Targetable(item, &AI))
 				{
-					item->Animation.RequiredState = 6;
 					item->Animation.TargetState = 3;
+					item->Animation.RequiredState = 6;
 				}
 				else
 				{
-					if (info->Mood == MoodType::Attack || GetRandomControl() < 0x100)
+					if (creature->Mood == MoodType::Attack || GetRandomControl() < 0x100)
 						item->Animation.TargetState = 3;
 					if (!AI.ahead)
 						item->Animation.TargetState = 3;
@@ -199,18 +196,18 @@ namespace TEN::Entities::Creatures::TR2
 
 			case 6:
 			case 10:
-				info->MaxTurn = 0;
-				info->Flags = 0;
+				creature->MaxTurn = 0;
+				creature->Flags = 0;
 
 				if (AI.ahead)
 				{
-					torsoY = AI.angle;
-					torsoX = AI.xAngle;
+					extraTorsoRot.x = AI.xAngle;
+					extraTorsoRot.y = AI.angle;
 				}
 				else
-					head = AI.angle;
+					extraHeadRot.y = AI.angle;
 
-				if (info->Mood == MoodType::Escape)
+				if (creature->Mood == MoodType::Escape)
 					item->Animation.TargetState = 3;
 				else if (Targetable(item, &AI))
 					item->Animation.TargetState = item->Animation.ActiveState != 6 ? 11 : 7;
@@ -221,38 +218,38 @@ namespace TEN::Entities::Creatures::TR2
 
 			case 7:
 			case 11:
-				info->MaxTurn = 0;
+				creature->MaxTurn = 0;
 
 				if (AI.ahead)
 				{
-					torsoY = AI.angle;
-					torsoX = AI.xAngle;
+					extraTorsoRot.x = AI.xAngle;
+					extraTorsoRot.y = AI.angle;
 				}
 				else
-					head = AI.angle;
+					extraHeadRot.y = AI.angle;
 
-				if (!info->Flags)
+				if (!creature->Flags)
 				{
-					ShotLara(item, &AI, SilencerGunBite, torsoY, 50);
-					info->Flags = 1;
+					ShotLara(item, &AI, SilencerGunBite, extraTorsoRot.y, 50);
+					creature->Flags = 1;
 				}
 
 				break;
 
 			case 9:
-				info->MaxTurn = ANGLE(5.0f);
+				creature->MaxTurn = ANGLE(5.0f);
 
 				if (AI.ahead)
 				{
-					torsoY = AI.angle;
-					torsoX = AI.xAngle;
+					extraTorsoRot.x = AI.xAngle;
+					extraTorsoRot.y = AI.angle;
 				}
 				else
-					head = AI.angle;
+					extraHeadRot.y = AI.angle;
 
 				if (!item->Animation.RequiredState)
 				{
-					if (!ShotLara(item, &AI, SilencerGunBite, torsoY, 50))
+					if (!ShotLara(item, &AI, SilencerGunBite, extraTorsoRot.y, 50))
 						item->Animation.TargetState = 2;
 
 					item->Animation.RequiredState = 9;
@@ -263,9 +260,9 @@ namespace TEN::Entities::Creatures::TR2
 		}
 
 		CreatureTilt(item, tilt);
-		CreatureJoint(item, 0, torsoY);
-		CreatureJoint(item, 1, torsoX);
-		CreatureJoint(item, 2, head);
+		CreatureJoint(item, 0, extraTorsoRot.y);
+		CreatureJoint(item, 1, extraTorsoRot.x);
+		CreatureJoint(item, 2, extraHeadRot.y);
 		CreatureAnimation(itemNumber, angle, tilt);
 	}
 }
