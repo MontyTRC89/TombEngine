@@ -633,9 +633,9 @@ namespace TEN::Input
 		ReadKeyboard();
 		ReadGameController();
 
-		// Clear legacy bitfields.
-		DbInput = NULL;
-		TrInput = NULL;
+		// Clear legacy bit fields.
+		DbInput = 0;
+		TrInput = 0;
 
 		// Update action map (mappable actions only).
 		for (size_t i = 0; i < KEY_COUNT; i++)
@@ -645,13 +645,13 @@ namespace TEN::Input
 		HandleLaraHotkeys(LaraItem);
 		SolveActionCollisions();
 
-		// Port actions back to legacy bitfields.
+		// Port actions back to legacy bit fields.
 		for (auto& action : ActionMap)
 		{
 			int actionBit = 1 << (int)action.GetID();
 
-			DbInput |= action.IsClicked() ? actionBit : NULL;
-			TrInput |= action.IsHeld() ? actionBit : NULL;
+			DbInput |= action.IsClicked() ? actionBit : 0;
+			TrInput |= action.IsHeld()	  ? actionBit : 0;
 		}
 
 		// Debug display for FORWARD input.
@@ -664,8 +664,8 @@ namespace TEN::Input
 		for (auto& action : ActionMap)
 			action.Clear();
 
-		DbInput = NULL;
-		TrInput = NULL;
+		DbInput = 0;
+		TrInput = 0;
 	}
 
 	void Rumble(float power, float delayInSeconds, RumbleMode mode)
