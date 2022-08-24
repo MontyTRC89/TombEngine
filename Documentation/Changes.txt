@@ -1,3 +1,12 @@
+Version 1.0.2
+=============
+
+- EventSequence and Timer no longer require you to call Timer.UpdateAll in OnControlPhase.
+- TEN.Logic.AddCallback and TEN.Logic.RemoveCallback have been added.
+- GiveItem, TakeItem, and SetItemCount have been reworked (e.g. SetItemCount with a value of -1 can give infinite ammo/consumables).
+- Removing Pistols with TakeItem and SetItemCount now works correctly.
+- Vec3s can now be saved and loaded in LevelVars and GameVars.
+
 Version 1.0.1
 =============
 
