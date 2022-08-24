@@ -412,7 +412,7 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 			ModulateLaraTurnRateY(item, 0, 0, 0);
 		}
 		else if (IsHeld(In::Left) || IsHeld(In::Right))
-			ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_SLOW_TURN_RATE_MAX);
+			ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_SLOW_MED_TURN_RATE_MAX);
 	}
 
 	if (lara->Control.WaterStatus == WaterStatus::Wade)

@@ -634,10 +634,8 @@ void SetLaraVault(ItemInfo* item, CollisionInfo* coll, VaultTestResult vaultResu
 
 void SetLaraLand(ItemInfo* item, CollisionInfo* coll)
 {
-	//item->IsAirborne = false; // TODO: Removing this avoids an unusual landing bug Core had worked around in an obscure way. I hope to find a proper solution. @Sezz 2022.02.18
-	item->Animation.Velocity.z = 0;
-	item->Animation.Velocity.y = 0;
-
+	//item->IsAirborne = false; // TODO: Removing this avoids an unusual landing bug. I hope to find a proper solution later. -- Sezz 2022.02.18
+	item->Animation.Velocity.y = 0.0f;
 	LaraSnapToHeight(item, coll);
 }
 
