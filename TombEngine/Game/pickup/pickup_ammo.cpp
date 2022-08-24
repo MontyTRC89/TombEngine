@@ -19,8 +19,8 @@ static constexpr std::array<AmmoPickupInfo, 14> kAmmo
 	{
 		{ ID_PISTOLS_AMMO_ITEM, LaraWeaponType::Pistol, WeaponAmmoType::Ammo1, 0 },
 		{ ID_UZI_AMMO_ITEM, LaraWeaponType::Uzi, WeaponAmmoType::Ammo1, 30 },
-		{ ID_SHOTGUN_AMMO1_ITEM, LaraWeaponType::Shotgun, WeaponAmmoType::Ammo1, 36 },
-		{ ID_SHOTGUN_AMMO2_ITEM, LaraWeaponType::Shotgun, WeaponAmmoType::Ammo2, 36 },
+		{ ID_SHOTGUN_AMMO1_ITEM, LaraWeaponType::Shotgun, WeaponAmmoType::Ammo1, 6 },
+		{ ID_SHOTGUN_AMMO2_ITEM, LaraWeaponType::Shotgun, WeaponAmmoType::Ammo2, 6 },
 		{ ID_CROSSBOW_AMMO1_ITEM, LaraWeaponType::Crossbow, WeaponAmmoType::Ammo1, 10 },
 		{ ID_CROSSBOW_AMMO2_ITEM, LaraWeaponType::Crossbow, WeaponAmmoType::Ammo2, 10 },
 		{ ID_CROSSBOW_AMMO3_ITEM, LaraWeaponType::Crossbow, WeaponAmmoType::Ammo3, 10 },
@@ -50,7 +50,6 @@ bool TryModifyingAmmo(LaraInfo& lara, GAME_OBJECT_ID objectID, std::optional<int
 	case ModificationType::Set:
 		currentAmmo = amount.value();
 		currentAmmo.setInfinite(amount == -1);
-
 		break;
 
 	default:
