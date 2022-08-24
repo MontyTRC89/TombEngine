@@ -132,7 +132,6 @@ static std::unique_ptr<Moveable> Create(
 void Moveable::Register(sol::table & parent)
 {
 	parent.new_usertype<Moveable>(LUA_CLASS_NAME,
-		ScriptReserved_New, Create,
 		sol::call_constructor, Create,
 		sol::meta_function::index, index_error,
 		sol::meta_function::new_index, newindex_error,
