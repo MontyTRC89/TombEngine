@@ -53,6 +53,7 @@ bool IsJumpState(LaraState state);
 bool IsRunJumpQueueableState(LaraState state);
 bool IsRunJumpCountableState(LaraState state);
 
+bool TestLaraTurn180(ItemInfo* item, CollisionInfo* coll);
 bool TestLaraPose(ItemInfo* item, CollisionInfo* coll);
 bool TestLaraKeepLow(ItemInfo* item, CollisionInfo* coll);
 bool TestLaraSlide(ItemInfo* item, CollisionInfo* coll);

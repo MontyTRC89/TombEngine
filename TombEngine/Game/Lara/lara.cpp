@@ -73,7 +73,7 @@ function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] =
 	lara_as_turn_right_fast,//20
 	lara_as_step_right,//21
 	lara_as_step_left,//22
-	lara_as_roll_back,
+	lara_as_roll_back,//23
 	lara_as_slide_forward,//24
 	lara_as_jump_back,//25
 	lara_as_jump_right,//26
@@ -227,6 +227,7 @@ function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] =
 	lara_as_idle,//170
 	lara_as_crouch_turn_180,//171
 	lara_as_crawl_turn_180,//172
+	lara_as_idle,//173
 };
 
 function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] =
@@ -404,6 +405,7 @@ function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] =
 	lara_col_idle,//170
 	lara_col_crouch_turn_180,//171
 	lara_col_crawl_turn_180,//172
+	lara_col_idle,//173
 };
 
 void LaraControl(ItemInfo* item, CollisionInfo* coll)
