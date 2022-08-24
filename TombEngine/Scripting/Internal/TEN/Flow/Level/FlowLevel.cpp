@@ -11,7 +11,7 @@ These are things things which aren't present in the compiled level file itself.
 */
 
 /*** Make a new Level object.
-	@function Level.new
+	@function Level
 	@return a Level object
 	*/
 void Level::Register(sol::table & parent)
