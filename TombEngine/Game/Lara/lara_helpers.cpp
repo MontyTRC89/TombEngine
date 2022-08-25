@@ -560,7 +560,7 @@ void ModulateLaraSlideVelocity(ItemInfo* item, CollisionInfo* coll)
 		//lara->ExtraVelocity.x += minVelocity;
 }
 
-void AlignLaraToSurface(ItemInfo* item)
+void AlignLaraToSurface(ItemInfo* item, float alpha)
 {
 	auto probe = GetCollision(item);
 	short aspectAngle = GetSurfaceAspectAngle(probe.FloorTilt);
@@ -575,7 +575,7 @@ void AlignLaraToSurface(ItemInfo* item)
 		0,
 		steepnessAngle * sinAngDist
 	) - Vector3Shrt(item->Pose.Orientation.x, 0, item->Pose.Orientation.z);
-	item->Pose.Orientation += extraRot / 6.0f;
+	item->Pose.Orientation += extraRot * alpha;
 }
 
 void SetLaraJumpDirection(ItemInfo* item, CollisionInfo* coll) 
