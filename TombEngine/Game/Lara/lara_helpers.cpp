@@ -566,9 +566,9 @@ void AlignLaraToSurface(ItemInfo* item, float alpha)
 	short aspectAngle = GetSurfaceAspectAngle(probe.FloorTilt);
 	short steepnessAngle = std::min<short>(GetSurfaceSteepnessAngle(probe.FloorTilt), ANGLE(70.0f));
 
-	short angularDistance = aspectAngle - item->Pose.Orientation.y;
-	float sinAngDist = phd_sin(angularDistance);
-	float cosAngDist = phd_cos(angularDistance);
+	short angDist = GetShortestAngularDistance(item->Pose.Orientation.y, aspectAngle);
+	float sinAngDist = phd_sin(angDist);
+	float cosAngDist = phd_cos(angDist);
 
 	auto extraRot = Vector3Shrt(
 		-steepnessAngle * cosAngDist,
