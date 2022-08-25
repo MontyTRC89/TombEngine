@@ -94,7 +94,7 @@ static std::unique_ptr<Moveable> Create(
 	std::string const & name,
 	Vec3 const & pos,
 	TypeOrNil<Rotation> const & rot,
-	short room,
+	TypeOrNil<short> room,
 	TypeOrNil<int> animNumber,
 	TypeOrNil<int> frameNumber,
 	TypeOrNil<short> hp,
@@ -108,9 +108,15 @@ static std::unique_ptr<Moveable> Create(
 	if (ScriptAssert(ptr->SetName(name), "Could not set name for Moveable; returning an invalid object."))
 	{
 		ItemInfo* item = &g_Level.Items[num];
-		ptr->SetPos(pos);
+		if (std::holds_alternative<short>(room))
+		{
+			ptr->SetPos(pos, false);
+			ptr->SetRoom(std::get<short>(room));
+		}
+		else
+			ptr->SetPos(pos, true);
+
 		ptr->SetRot(USE_IF_HAVE(Rotation, rot, Rotation{}));
-		ptr->SetRoom(room);
 		ptr->SetObjectID(objID);
 		ptr->Init();
 
@@ -378,24 +384,10 @@ void Moveable::Register(sol::table & parent)
 // @treturn bool true if the moveable is active
 	ScriptReserved_GetActive, &Moveable::GetActive,
 
-/// Get the current room of the object
-// @function Moveable:GetRoom
-// @treturn int number representing the current room of the object
 	ScriptReserved_GetRoom, &Moveable::GetRoom,
 
-/// Set room of object 
-// This is used in conjunction with SetPosition to teleport an item to a new room.
-// @function Moveable:SetRoom
-// @tparam int ID the ID of the new room 
-// @usage 
-// local sas = TEN.Objects.GetMoveableByName("sas_enemy")
-// sas:SetRoom(destinationRoom)
-// sas:SetPosition(destinationPosition)
 	ScriptReserved_SetRoom, &Moveable::SetRoom,
 
-/// Get the object's position
-// @function Moveable:GetPosition
-// @treturn Vec3 a copy of the moveable's position
 	ScriptReserved_GetPosition, & Moveable::GetPos,
 
 /// Get the object's joint position
@@ -403,12 +395,6 @@ void Moveable::Register(sol::table & parent)
 // @treturn Vec3 a copy of the moveable's position
 	ScriptReserved_GetJointPosition, & Moveable::GetJointPos,
 
-/// Set the moveable's position
-// If you are moving a moveable whose behaviour involves knowledge of room geometry,
-// (e.g. a BADDY1, which uses it for pathfinding), then you *must* use this in conjunction
-// with @{Moveable:SetRoom}. Otherwise, said moveable will not behave correctly.
-// @function Moveable:SetPosition
-// @tparam Vec3 position the new position of the moveable 
 	ScriptReserved_SetPosition, & Moveable::SetPos,
 
 /// Get the moveable's rotation
@@ -554,17 +540,27 @@ bool Moveable::SetName(std::string const & id)
 	return true;
 }
 
+/// Get the object's position
+// @function Moveable:GetPosition
+// @treturn Vec3 a copy of the moveable's position
 Vec3 Moveable::GetPos() const
 {
 	return Vec3(m_item->Pose);
 }
 
-void Moveable::SetPos(Vec3 const& pos)
+/// Set the moveable's position
+// If you are moving a moveable whose behaviour involves knowledge of room geometry,
+// (e.g. a BADDY1, which uses it for pathfinding), then the second argument should
+// be true (or omitted, as true is the default). Otherwise, said moveable will not behave correctly.
+// @function Moveable:SetPosition
+// @tparam Vec3 position the new position of the moveable 
+// @bool[opt] updateRoom Will room changes be automatically detected? Set to false if you are using overlapping rooms (default: true)
+void Moveable::SetPos(Vec3 const& pos, sol::optional<bool> updateRoom)
 {
 	pos.StoreInPHDPos(m_item->Pose);
 
-	//todo make a non-updating version
-	if(m_initialised)
+	bool willUpdate = !updateRoom.has_value() || updateRoom.value();
+	if(m_initialised && willUpdate)
 		UpdateItemRoom(m_item, pos.y);
 }
 
@@ -722,11 +718,22 @@ bool Moveable::GetHitStatus() const
 	return m_item->HitStatus;
 }
 
+/// Get the current room of the object
+// @function Moveable:GetRoom
+// @treturn int number representing the current room of the object
 short Moveable::GetRoom() const
 {
 	return m_item->RoomNumber;
 }
 
+/// Set room of object 
+// Use this if you are not using SetPosition's automatic room update - for example, when dealing with overlapping rooms.
+// @function Moveable:SetRoom
+// @tparam int ID the ID of the new room 
+// @usage 
+// local sas = TEN.Objects.GetMoveableByName("sas_enemy")
+// sas:SetRoom(destinationRoom)
+// sas:SetPosition(destinationPosition, false)
 void Moveable::SetRoom(short room)
 {	
 	const size_t nRooms = g_Level.Rooms.size();

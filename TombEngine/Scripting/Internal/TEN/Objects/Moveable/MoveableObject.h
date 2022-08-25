@@ -42,7 +42,7 @@ public:
 
 	[[nodiscard]] Vec3 GetPos() const;
 	[[nodiscard]] Vec3 GetJointPos(int index) const;
-	void SetPos(Vec3 const& pos);
+	void SetPos(Vec3 const& pos, sol::optional<bool> updateRoom);
 
 	[[nodiscard]] Rotation GetRot() const;
 	void SetRot(Rotation const& rot);
