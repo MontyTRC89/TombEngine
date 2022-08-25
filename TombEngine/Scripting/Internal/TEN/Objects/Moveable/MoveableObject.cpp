@@ -72,21 +72,19 @@ most can just be ignored (see usage).
 	@tparam ObjID object ID
 	@tparam string name Lua name of the item
 	@tparam Vec3 position position in level
-	@tparam Rotation rotation rotation about x, y, and z axes (default Rotation(0, 0, 0))
-	@tparam int room room ID item is in
-	@tparam int animNumber anim number (default 0)
-	@tparam int frameNumber frame number (default 0)
-	@tparam int hp HP of item (default 10)
-	@tparam int OCB ocb of item (default 0)
-	@tparam table AIBits table with AI bits (default {0,0,0,0,0,0})
+	@tparam[opt] Rotation rotation rotation about x, y, and z axes (default Rotation(0, 0, 0))
+	@int[opt] room room ID item is in (default: calculated automatically)
+	@int[opt=0] animNumber anim number
+	@int[opt=0] frameNumber frame number
+	@int[opt=10] hp HP of item
+	@int[opt=0] OCB ocb of item (default 0)
+	@tparam[opt] table AIBits table with AI bits (default {0,0,0,0,0,0})
 	@return reference to new Moveable object
 	@usage 
 	local item = Moveable(
 		TEN.ObjID.PISTOLS_ITEM, -- object id
 		"test", -- name
-		Vec3(18907, 0, 21201),
-		Rotation(0,0,0),
-		0, -- room
+		Vec3(18907, 0, 21201)
 		)
 	*/
 static std::unique_ptr<Moveable> Create(
