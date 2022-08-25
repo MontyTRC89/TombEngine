@@ -172,6 +172,7 @@ void LoadItems()
 		{
 			ItemInfo* item = &g_Level.Items[i];
 
+			item->VectorIndex = i;
 			item->Data = ITEM_DATA{};
 			item->ObjectNumber = from_underlying(ReadInt16());
 			item->RoomNumber = ReadInt16();

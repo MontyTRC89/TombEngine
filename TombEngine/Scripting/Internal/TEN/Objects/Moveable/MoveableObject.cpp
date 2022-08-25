@@ -562,6 +562,10 @@ Vec3 Moveable::GetPos() const
 void Moveable::SetPos(Vec3 const& pos)
 {
 	pos.StoreInPHDPos(m_item->Pose);
+
+	//todo make a non-updating version
+	if(m_initialised)
+		UpdateItemRoom(m_item, pos.y);
 }
 
 Vec3 Moveable::GetJointPos(int jointIndex) const

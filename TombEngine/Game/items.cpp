@@ -447,6 +447,8 @@ void InitialiseItem(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
 
+	item->VectorIndex = itemNumber;
+
 	item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex;
 	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 
@@ -552,6 +554,7 @@ void InitialiseItemArray(int totalItem)
 	{
 		for(int i = g_Level.NumItems + 1; i < totalItem; i++, item++)
 		{
+			item->VectorIndex = i-1;
 			item->NextItem = i;
 			item->Active = false;
 			item->Data = nullptr;
@@ -616,7 +619,7 @@ void UpdateItemRoom(ItemInfo* item, int height, int xOffset, int zOffset)
 	item->Floor = GetFloorHeight(item->Location, x, z).value_or(NO_HEIGHT);
 
 	if (item->RoomNumber != item->Location.roomNumber)
-		ItemNewRoom(FindItem(item), item->Location.roomNumber);
+		ItemNewRoom(item->VectorIndex, item->Location.roomNumber);
 }
 
 std::vector<int> FindAllItems(short objectNumber)
