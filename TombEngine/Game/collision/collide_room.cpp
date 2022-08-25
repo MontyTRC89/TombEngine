@@ -385,17 +385,17 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, Vector3Int offset, bo
 	if (height != NO_HEIGHT)
 		height -= (doPlayerCollision ? entityPos.y : probePos.y);
 
+	short aspectAngle = GetSurfaceAspectAngle(collResult.FloorTilt);
+
 	if (coll->Setup.BlockFloorSlopeUp && 
 		coll->Front.FloorSlope && 
-		coll->Front.Floor < coll->Middle.Floor && 
-		coll->Front.Floor < 0 &&
-		height < coll->Front.Floor)
+		abs(GetShortestAngularDistance(coll->Setup.ForwardAngle, aspectAngle)) >= ANGLE(90.0f))
 	{
 		coll->Front.Floor = MAX_HEIGHT;
 	}
 	else if (coll->Setup.BlockFloorSlopeDown && 
 			 coll->Front.FloorSlope && 
-			 coll->Front.Floor > coll->Middle.Floor)
+			 abs(GetShortestAngularDistance(coll->Setup.ForwardAngle, aspectAngle)) <= ANGLE(90.0f))
 	{
 		coll->Front.Floor = STOP_SIZE;
 	}
@@ -449,15 +449,17 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, Vector3Int offset, bo
 	coll->MiddleLeft.Floor = height;
 	coll->MiddleLeft.Ceiling = ceiling;
 
-	if (coll->Setup.BlockFloorSlopeUp && 
-		coll->MiddleLeft.FloorSlope && 
-		coll->MiddleLeft.Floor < 0)
+	aspectAngle = GetSurfaceAspectAngle(collResult.FloorTilt);
+
+	if (coll->Setup.BlockFloorSlopeUp &&
+		coll->MiddleLeft.FloorSlope &&
+		abs(GetShortestAngularDistance(coll->Setup.ForwardAngle, aspectAngle)) >= ANGLE(90.0f))
 	{
 		coll->MiddleLeft.Floor = MAX_HEIGHT;
 	}
-	else if (coll->Setup.BlockFloorSlopeDown && 
-			 coll->MiddleLeft.FloorSlope && 
-			 coll->MiddleLeft.Floor > 0)
+	else if (coll->Setup.BlockFloorSlopeDown &&
+			 coll->MiddleLeft.FloorSlope &&
+			 abs(GetShortestAngularDistance(coll->Setup.ForwardAngle, aspectAngle)) <= ANGLE(90.0f))
 	{
 		coll->MiddleLeft.Floor = STOP_SIZE;
 	}
@@ -506,15 +508,17 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, Vector3Int offset, bo
 	coll->FrontLeft.Floor = height;
 	coll->FrontLeft.Ceiling = ceiling;
 
-	if (coll->Setup.BlockFloorSlopeUp && 
-		coll->FrontLeft.FloorSlope && 
-		coll->FrontLeft.Floor < 0)
+	aspectAngle = GetSurfaceAspectAngle(collResult.FloorTilt);
+
+	if (coll->Setup.BlockFloorSlopeUp &&
+		coll->FrontLeft.FloorSlope &&
+		abs(GetShortestAngularDistance(coll->Setup.ForwardAngle, aspectAngle)) >= ANGLE(90.0f))
 	{
 		coll->FrontLeft.Floor = MAX_HEIGHT;
 	}
-	else if (coll->Setup.BlockFloorSlopeDown && 
-			 coll->FrontLeft.FloorSlope && 
-			 coll->FrontLeft.Floor > 0)
+	else if (coll->Setup.BlockFloorSlopeDown &&
+			 coll->FrontLeft.FloorSlope &&
+			 abs(GetShortestAngularDistance(coll->Setup.ForwardAngle, aspectAngle)) <= ANGLE(90.0f))
 	{
 		coll->FrontLeft.Floor = STOP_SIZE;
 	}
@@ -568,15 +572,17 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, Vector3Int offset, bo
 	coll->MiddleRight.Floor = height;
 	coll->MiddleRight.Ceiling = ceiling;
 
-	if (coll->Setup.BlockFloorSlopeUp && 
-		coll->MiddleRight.FloorSlope && 
-		coll->MiddleRight.Floor < 0)
+	aspectAngle = GetSurfaceAspectAngle(collResult.FloorTilt);
+
+	if (coll->Setup.BlockFloorSlopeUp &&
+		coll->MiddleRight.FloorSlope &&
+		abs(GetShortestAngularDistance(coll->Setup.ForwardAngle, aspectAngle)) >= ANGLE(90.0f))
 	{
 		coll->MiddleRight.Floor = MAX_HEIGHT;
 	}
-	else if (coll->Setup.BlockFloorSlopeDown && 
-			 coll->MiddleRight.FloorSlope && 
-			 coll->MiddleRight.Floor > 0)
+	else if (coll->Setup.BlockFloorSlopeDown &&
+			 coll->MiddleRight.FloorSlope &&
+			 abs(GetShortestAngularDistance(coll->Setup.ForwardAngle, aspectAngle)) <= ANGLE(90.0f))
 	{
 		coll->MiddleRight.Floor = STOP_SIZE;
 	}
@@ -625,15 +631,17 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, Vector3Int offset, bo
 	coll->FrontRight.Floor = height;
 	coll->FrontRight.Ceiling = ceiling;
 
-	if (coll->Setup.BlockFloorSlopeUp && 
-		coll->FrontRight.FloorSlope && 
-		coll->FrontRight.Floor < 0)
+	aspectAngle = GetSurfaceAspectAngle(collResult.FloorTilt);
+
+	if (coll->Setup.BlockFloorSlopeUp &&
+		coll->FrontRight.FloorSlope &&
+		abs(GetShortestAngularDistance(coll->Setup.ForwardAngle, aspectAngle)) >= ANGLE(90.0f))
 	{
 		coll->FrontRight.Floor = MAX_HEIGHT;
 	}
-	else if (coll->Setup.BlockFloorSlopeDown && 
-			 coll->FrontRight.FloorSlope && 
-			 coll->FrontRight.Floor > 0)
+	else if (coll->Setup.BlockFloorSlopeDown &&
+			 coll->FrontRight.FloorSlope &&
+			 abs(GetShortestAngularDistance(coll->Setup.ForwardAngle, aspectAngle)) <= ANGLE(90.0f))
 	{
 		coll->FrontRight.Floor = STOP_SIZE;
 	}
