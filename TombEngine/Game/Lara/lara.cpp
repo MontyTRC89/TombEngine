@@ -783,11 +783,9 @@ void LaraAboveWater(ItemInfo* item, CollisionInfo* coll)
 	if (HandleLaraVehicle(item, coll))
 		return;
 
-	HandleLaraMovementParameters(item, coll);
-
 	// Handle current Lara status.
 	lara_control_routines[item->Animation.ActiveState](item, coll);
-
+	HandleLaraMovementParameters(item, coll);
 	AnimateLara(item);
 
 	if (lara->ExtraAnim == NO_ITEM)
