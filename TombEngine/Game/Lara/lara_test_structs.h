@@ -55,13 +55,6 @@ struct WaterClimbOutTestResult
 	LaraState TargetState;
 };
 
-struct JumpTestSetup
-{
-	short Angle;
-	int Distance = int(CLICK(0.85f));
-	bool CheckWadeStatus = true;
-};
-
 struct LedgeHangTestResult
 {
 	bool Success;

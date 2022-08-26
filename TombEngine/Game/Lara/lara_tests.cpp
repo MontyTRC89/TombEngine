@@ -1047,7 +1047,7 @@ bool TestLaraKeepLow(ItemInfo* item, CollisionInfo* coll)
 {
 	// HACK: coll->Setup.Radius is only set to LARA_RADIUS_CRAWL
 	// in the collision function, then reset by LaraAboveWater().
-	// For tests called in control functions, then, it will store the wrong radius. @Sezz 2021.11.05
+	// For tests called in control functions, then, it will store the wrong radius. -- Sezz 2021.11.05
 	int radius = (item->Animation.ActiveState == LS_CROUCH_IDLE ||
 		item->Animation.ActiveState == LS_CROUCH_TURN_LEFT ||
 		item->Animation.ActiveState == LS_CROUCH_TURN_RIGHT)
@@ -2098,130 +2098,6 @@ bool TestLaraHangToStand(ItemInfo* item, CollisionInfo* coll)
 bool TestLaraStandingJump(ItemInfo* item, CollisionInfo* coll)
 {
 	return !TestEnvironment(ENV_FLAG_SWAMP, item);
-}
-
-bool TestLaraJumpTolerance(ItemInfo* item, CollisionInfo* coll, JumpTestSetup testSetup)
-{
-	auto* lara = GetLaraInfo(item);
-
-	int y = item->Pose.Position.y;
-	auto probe = GetCollision(item, testSetup.Angle, testSetup.Distance, -coll->Setup.Height);
-
-	bool isSwamp = TestEnvironment(ENV_FLAG_SWAMP, item);
-	bool isWading = testSetup.CheckWadeStatus ? (lara->Control.WaterStatus == WaterStatus::Wade) : false;
-
-	// Discard walls.
-	if (probe.Position.Floor == NO_HEIGHT)
-		return false;
-
-	// Check for swamp or wade status (if applicable).
-	if (isSwamp || isWading)
-		return false;
-
-	// Assess point/room collision.
-	if (!TestLaraFacingCorner(item, testSetup.Angle, testSetup.Distance) &&					// Avoid jumping through corners.
-		(probe.Position.Floor - y) >= -STEPUP_HEIGHT &&										// Within highest floor bound.
-		((probe.Position.Ceiling - y) < -(coll->Setup.Height + (LARA_HEADROOM * 0.8f)) ||	// Within lowest ceiling bound... 
-			((probe.Position.Ceiling - y) < -coll->Setup.Height &&								// OR ceiling is level with Lara's head
-				(probe.Position.Floor - y) >= CLICK(0.5f))))										// AND there is a drop below.
-	{
-		return true;
-	}
-
-	return false;
-}
-
-bool TestLaraRunJumpForward(ItemInfo* item, CollisionInfo* coll)
-{
-	JumpTestSetup testSetup
-	{
-		item->Pose.Orientation.y,
-		int(CLICK(1.5f))
-	};
-
-	return TestLaraJumpTolerance(item, coll, testSetup);
-}
-
-bool TestLaraJumpForward(ItemInfo* item, CollisionInfo* coll)
-{
-	JumpTestSetup testSetup
-	{
-		item->Pose.Orientation.y
-	};
-
-	return TestLaraJumpTolerance(item, coll, testSetup);
-}
-
-bool TestLaraJumpBack(ItemInfo* item, CollisionInfo* coll)
-{
-	JumpTestSetup testSetup
-	{
-		item->Pose.Orientation.y + ANGLE(180.0f)
-	};
-
-	return TestLaraJumpTolerance(item, coll, testSetup);
-}
-
-bool TestLaraJumpLeft(ItemInfo* item, CollisionInfo* coll)
-{
-	JumpTestSetup testSetup
-	{
-		item->Pose.Orientation.y - ANGLE(90.0f)
-	};
-
-	return TestLaraJumpTolerance(item, coll, testSetup);
-}
-
-bool TestLaraJumpRight(ItemInfo* item, CollisionInfo* coll)
-{
-	JumpTestSetup testSetup
-	{
-		item->Pose.Orientation.y + ANGLE(90.0f)
-	};
-
-	return TestLaraJumpTolerance(item, coll, testSetup);
-}
-
-bool TestLaraJumpUp(ItemInfo* item, CollisionInfo* coll)
-{
-	JumpTestSetup testSetup
-	{
-		0,
-		0,
-		false
-	};
-
-	return TestLaraJumpTolerance(item, coll, testSetup);
-}
-
-bool TestLaraSlideJump(ItemInfo* item, CollisionInfo* coll)
-{
-	return true;
-
-	// TODO: Broken on diagonal slides?
-	if (g_GameFlow->HasSlideExtended())
-	{
-		auto probe = GetCollision(item);
-
-		short direction = GetLaraSlideDirection(item, coll);
-		short steepness = GetSurfaceSteepnessAngle(probe.FloorTilt.x, probe.FloorTilt.y);
-		return (abs((short)(coll->Setup.ForwardAngle - direction)) <= abs(steepness));
-	}
-
-	return true;
-}
-
-bool TestLaraCrawlspaceDive(ItemInfo* item, CollisionInfo* coll)
-{
-	auto probe = GetCollision(item, coll->Setup.ForwardAngle, coll->Setup.Radius, -coll->Setup.Height);
-	
-	if (abs(probe.Position.Ceiling - probe.Position.Floor) < LARA_HEIGHT ||
-		TestLaraKeepLow(item, coll))
-	{
-		return true;
-	}
-
-	return false;
 }
 
 bool TestLaraTightropeDismount(ItemInfo* item, CollisionInfo* coll)

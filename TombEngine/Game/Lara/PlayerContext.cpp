@@ -1,6 +1,7 @@
 #include "framework.h"
 #include "Game/Lara/PlayerContext.h"
 
+#include "Flow/ScriptInterfaceFlowHandler.h"
 #include "Game/collision/collide_room.h"
 #include "Game/control/los.h"
 #include "Game/items.h"
@@ -242,6 +243,77 @@ namespace TEN::Entities::Player
 		return this->TestMonkeyShimmy(true);
 	}
 
+	bool PlayerContext::CanJumpUp()
+	{
+		Context::SetupJump contextSetup =
+		{
+			0,
+			0,
+			false
+		};
+		return TestJumpMovementSetup(contextSetup);
+	}
+
+	bool PlayerContext::CanJumpForward()
+	{
+		return this->TestDirectionalStandingJump(ANGLE(0.0f));
+	}
+
+	bool PlayerContext::CanJumpBackward()
+	{
+		return this->TestDirectionalStandingJump(ANGLE(180.0f));
+	}
+
+	bool PlayerContext::CanJumpLeft()
+	{
+		return this->TestDirectionalStandingJump(ANGLE(-90.0f));
+	}
+
+	bool PlayerContext::CanJumpRight()
+	{
+		return this->TestDirectionalStandingJump(ANGLE(90.0f));
+	}
+
+	bool PlayerContext::CanRunJumpForward()
+	{
+		Context::SetupJump contextSetup
+		{
+			PlayerItemPtr->Pose.Orientation.y,
+			(int)CLICK(1.5f)
+		};
+		return TestJumpMovementSetup(contextSetup);
+	}
+
+	bool PlayerContext::CanSlideJumpForward()
+	{
+		return true;
+
+		// TODO: Broken on diagonal slides?
+		if (g_GameFlow->HasSlideExtended())
+		{
+			auto probe = GetCollision(PlayerItemPtr);
+
+			short directionAngle = GetLaraSlideDirection(PlayerItemPtr, PlayerCollPtr);
+			short steepnessAngle = GetSurfaceSteepnessAngle(probe.FloorTilt.x, probe.FloorTilt.y);
+			return (abs(short(PlayerCollPtr->Setup.ForwardAngle - directionAngle)) <= abs(steepnessAngle));
+		}
+
+		return true;
+	}
+
+	bool PlayerContext::CanCrawlspaceDive()
+	{
+		auto probe = GetCollision(PlayerItemPtr, PlayerCollPtr->Setup.ForwardAngle, PlayerCollPtr->Setup.Radius, -PlayerCollPtr->Setup.Height);
+
+		if (abs(probe.Position.Ceiling - probe.Position.Floor) < LARA_HEIGHT ||
+			TestLaraKeepLow(PlayerItemPtr, PlayerCollPtr))
+		{
+			return true;
+		}
+
+		return false;
+	}
+
 	bool PlayerContext::TestSidestep(bool goingRight)
 	{
 		auto* player = GetLaraInfo(PlayerItemPtr);
@@ -253,7 +325,7 @@ namespace TEN::Entities::Player
 			Context::SetupGroundMovement contextSetup =
 			{
 				PlayerItemPtr->Pose.Orientation.y + (goingRight ? ANGLE(90.0f) : ANGLE(-90.0f)),
-				NO_LOWER_BOUND, int(-CLICK(0.8f)), // Defined by sidestep left/right states.
+				NO_LOWER_BOUND, (int)-CLICK(0.8f), // Upper bound defined by sidestep left/right states.
 				false, false, false
 			};
 			return this->TestGroundMovementSetup(contextSetup);
@@ -263,7 +335,7 @@ namespace TEN::Entities::Player
 			Context::SetupGroundMovement contextSetup =
 			{
 				PlayerItemPtr->Pose.Orientation.y + (goingRight ? ANGLE(90.0f) : ANGLE(-90.0f)),
-				int(CLICK(0.8f)), int(-CLICK(0.8f)) // Defined by sidestep left/right states.
+				(int)CLICK(0.8f), (int)-CLICK(0.8f) // Defined by sidestep left/right states.
 			};
 			return this->TestGroundMovementSetup(contextSetup);
 		}
@@ -277,6 +349,19 @@ namespace TEN::Entities::Player
 			int(CLICK(0.5f)), int(-CLICK(0.5f)) // Defined by monkey shimmy left/right states.
 		};
 		return TestMonkeyMovementSetup(contextSetup);
+	}
+
+	bool PlayerContext::TestDirectionalStandingJump(short angle)
+	{
+		if (TestEnvironment(ENV_FLAG_SWAMP, PlayerItemPtr))
+			return false;
+
+		Context::SetupJump testSetup =
+		{
+			PlayerItemPtr->Pose.Orientation.y + angle,
+			(int)CLICK(0.85f)
+		};
+		return TestJumpMovementSetup(testSetup);
 	}
 
 	bool PlayerContext::TestGroundMovementSetup(Context::SetupGroundMovement contextSetup, bool useCrawlSetup)
@@ -331,11 +416,11 @@ namespace TEN::Entities::Player
 			PlayerItemPtr->RoomNumber
 		);
 
-		// 3. Assess raycast Collision.
+		// 3. Assess raycast collision.
 		if (!LOS(&originA, &targetA) || !LOS(&originB, &targetB))
 			return false;
 
-		// 4. Assess point probe Collision.
+		// 4. Assess point probe collision.
 		if ((probe.Position.Floor - yPos) <= contextSetup.LowerFloorBound &&   // Floor is within lower floor bound.
 			(probe.Position.Floor - yPos) >= contextSetup.UpperFloorBound &&   // Floor is within upper floor bound.
 			(probe.Position.Ceiling - yPos) < -playerHeight &&				   // Ceiling is within lowest ceiling bound (player height).
@@ -392,16 +477,50 @@ namespace TEN::Entities::Player
 			PlayerItemPtr->RoomNumber
 		);
 
-		// 3. Assess raycast PlayerCollPtrision.
+		// 3. Assess raycast collision.
 		if (!LOS(&originA, &targetA) || !LOS(&originB, &targetB))
 			return false;
 
-		// 4. Assess point probe PlayerCollPtrision.
+		// 4. Assess point probe collision.
 		if (probe.BottomBlock->Flags.Monkeyswing &&								    // Ceiling is monkey swing.
 			(probe.Position.Ceiling - yPosTop) <= contextSetup.LowerCeilingBound &&	// Ceiling is within lower ceiling bound.
 			(probe.Position.Ceiling - yPosTop) >= contextSetup.UpperCeilingBound &&	// Ceiling is within upper ceiling bound.
 			(probe.Position.Floor - yPos) > 0 &&									// Floor is within highest floor bound (player base).
 			abs(probe.Position.Ceiling - probe.Position.Floor) > playerHeight)		// Space is not too narrow.
+		{
+			return true;
+		}
+
+		return false;
+	}
+
+	bool PlayerContext::TestJumpMovementSetup(Context::SetupJump contextSetup)
+	{
+		auto* player = GetLaraInfo(PlayerItemPtr);
+
+		int yPos = PlayerItemPtr->Pose.Position.y;
+		auto probe = GetCollision(PlayerItemPtr, contextSetup.Angle, contextSetup.Distance, -PlayerCollPtr->Setup.Height);
+
+		// 1. Check for wall.
+		if (probe.Position.Floor == NO_HEIGHT)
+			return false;
+
+		bool isSwamp = TestEnvironment(ENV_FLAG_SWAMP, PlayerItemPtr);
+		bool isWading = contextSetup.CheckWadeStatus ? (player->Control.WaterStatus == WaterStatus::Wade) : false;
+
+		// 2. Check for swamp or wade status (if applicable).
+		if (isSwamp || isWading)
+			return false;
+
+		// 3. Check for corner.
+		if (TestLaraFacingCorner(PlayerItemPtr, contextSetup.Angle, contextSetup.Distance))
+			return false;
+
+		// 4. Assess point probe collision.
+		if ((probe.Position.Floor - yPos) >= -STEPUP_HEIGHT &&											  // Floor is within highest floor bound.
+			((probe.Position.Ceiling - yPos) < -(PlayerCollPtr->Setup.Height + (LARA_HEADROOM * 0.8f)) || // Ceiling is within lowest ceiling bound... 
+				((probe.Position.Ceiling - yPos) < -PlayerCollPtr->Setup.Height &&								// OR ceiling is level with Lara's head
+					(probe.Position.Floor - yPos) >= CLICK(0.5f))))												// AND there is a drop below.
 		{
 			return true;
 		}

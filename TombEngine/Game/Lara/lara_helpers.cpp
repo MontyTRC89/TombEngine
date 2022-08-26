@@ -601,26 +601,26 @@ void SetLaraJumpDirection(ItemInfo* item, CollisionInfo* coll)
 	auto* lara = GetLaraInfo(item);
 
 	if (TrInput & IN_FORWARD &&
-		TestLaraJumpForward(item, coll))
+		lara->Context.CanJumpForward())
 	{
 		lara->Control.JumpDirection = JumpDirection::Forward;
 	}
 	else if (TrInput & IN_BACK &&
-		TestLaraJumpBack(item, coll))
+		lara->Context.CanJumpBackward())
 	{
 		lara->Control.JumpDirection = JumpDirection::Back;
 	}
 	else if (TrInput & IN_LEFT &&
-		TestLaraJumpLeft(item, coll))
+		lara->Context.CanJumpLeft())
 	{
 		lara->Control.JumpDirection = JumpDirection::Left;
 	}
 	else if (TrInput & IN_RIGHT &&
-		TestLaraJumpRight(item, coll))
+		lara->Context.CanJumpRight())
 	{
 		lara->Control.JumpDirection = JumpDirection::Right;
 	}
-	else if (TestLaraJumpUp(item, coll)) USE_FEATURE_IF_CPP20([[likely]])
+	else if (lara->Context.CanJumpUp()) USE_FEATURE_IF_CPP20([[likely]])
 		lara->Control.JumpDirection = JumpDirection::Up;
 	else
 		lara->Control.JumpDirection = JumpDirection::None;
@@ -636,7 +636,7 @@ void SetLaraRunJumpQueue(ItemInfo* item, CollisionInfo* coll)
 	int distance = SECTOR(1);
 	auto probe = GetCollision(item, item->Pose.Orientation.y, distance, -coll->Setup.Height);
 
-	if ((TestLaraRunJumpForward(item, coll) ||													// Area close ahead is permissive...
+	if ((lara->Context.CanRunJumpForward() ||													// Area close ahead is permissive...
 		(probe.Position.Ceiling - y) < -(coll->Setup.Height + (LARA_HEADROOM * 0.8f)) ||		// OR ceiling height far ahead is permissive
 		(probe.Position.Floor - y) >= CLICK(0.5f)) &&											// OR there is a drop below far ahead.
 		probe.Position.Floor != NO_HEIGHT)

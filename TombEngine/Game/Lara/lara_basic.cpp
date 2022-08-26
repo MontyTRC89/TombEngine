@@ -1,6 +1,7 @@
 #include "framework.h"
 #include "Game/Lara/lara_basic.h"
 
+#include "Flow/ScriptInterfaceFlowHandler.h"
 #include "Game/animation.h"
 #include "Game/camera.h"
 #include "Game/collision/collide_room.h"
@@ -17,7 +18,6 @@
 #include "Specific/input.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
-#include "Flow/ScriptInterfaceFlowHandler.h"
 
 using namespace TEN::Input;
 
@@ -255,7 +255,7 @@ void lara_as_run_forward(ItemInfo* item, CollisionInfo* coll)
 	if (TrInput & IN_JUMP || lara->Control.RunJumpQueued)
 	{
 		if (!(TrInput & IN_SPRINT) && lara->Control.Count.Run >= LARA_RUN_JUMP_TIME &&
-			TestLaraRunJumpForward(item, coll))
+			lara->Context.CanRunJumpForward())
 		{
 			item->Animation.TargetState = LS_JUMP_FORWARD;
 			return;
@@ -1605,7 +1605,7 @@ void lara_as_sprint(ItemInfo* item, CollisionInfo* coll)
 			return;
 		}
 		else if (TrInput & IN_SPRINT && lara->Control.Count.Run >= LARA_SPRINT_JUMP_TIME &&
-			TestLaraRunJumpForward(item, coll) && HasStateDispatch(item, LS_JUMP_FORWARD))
+			lara->Context.CanRunJumpForward() && HasStateDispatch(item, LS_JUMP_FORWARD))
 		{
 			item->Animation.TargetState = LS_JUMP_FORWARD;
 			return;
