@@ -564,7 +564,7 @@ void AlignLaraToSurface(ItemInfo* item, float alpha)
 {
 	auto probe = GetCollision(item);
 	short aspectAngle = GetSurfaceAspectAngle(probe.FloorTilt);
-	short steepnessAngle = std::min<short>(GetSurfaceSteepnessAngle(probe.FloorTilt), ANGLE(70.0f));
+	short steepnessAngle = std::min(GetSurfaceSteepnessAngle(probe.FloorTilt), ANGLE(70.0f));
 
 	short angDist = GetShortestAngularDistance(item->Pose.Orientation.y, aspectAngle);
 	float sinAngDist = phd_sin(angDist);
