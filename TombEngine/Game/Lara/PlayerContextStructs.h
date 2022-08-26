@@ -1,8 +1,8 @@
 #pragma once
 
-namespace TEN::Entities::Player
+namespace TEN::Entities::Player::Context
 {
-	struct ContextSetupGroundMovement
+	struct SetupGroundMovement
 	{
 		short Angle			  = 0;
 		int	  LowerFloorBound = 0;
@@ -12,11 +12,12 @@ namespace TEN::Entities::Player
 		bool  CheckDeathFloor = true;
 	};
 
-	struct ContextSetupMonkeyMovement
+	struct SetupMonkeyMovement
 	{
 		short Angle				= 0;
 		int	  LowerCeilingBound = 0;
 		int   UpperCeilingBound = 0;
 	};
+
 
 }

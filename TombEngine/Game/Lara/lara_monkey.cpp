@@ -75,7 +75,7 @@ void lara_as_monkey_idle(ItemInfo* item, CollisionInfo* coll)
 			item->Animation.TargetState = LS_MONKEY_FORWARD;
 			return;
 		}
-		else if (TrInput & IN_BACK && lara->Context.CanMonkeyBack())
+		else if (TrInput & IN_BACK && lara->Context.CanMonkeyBackward())
 		{
 			item->Animation.TargetState = LS_MONKEY_BACK;
 			return;
@@ -502,7 +502,7 @@ void lara_as_monkey_turn_left(ItemInfo* item, CollisionInfo* coll)
 			item->Animation.TargetState = LS_MONKEY_FORWARD;
 			return;
 		}
-		else if (TrInput & IN_BACK && lara->Context.CanMonkeyBack())
+		else if (TrInput & IN_BACK && lara->Context.CanMonkeyBackward())
 		{
 			item->Animation.TargetState = LS_MONKEY_BACK;
 			return;
@@ -581,7 +581,7 @@ void lara_as_monkey_turn_right(ItemInfo* item, CollisionInfo* coll)
 			item->Animation.TargetState = LS_MONKEY_FORWARD;
 			return;
 		}
-		else if (TrInput & IN_BACK && lara->Context.CanMonkeyBack())
+		else if (TrInput & IN_BACK && lara->Context.CanMonkeyBackward())
 		{
 			item->Animation.TargetState = LS_MONKEY_BACK;
 			return;

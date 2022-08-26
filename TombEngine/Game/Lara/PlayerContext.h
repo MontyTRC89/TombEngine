@@ -16,21 +16,16 @@ namespace TEN::Entities::Player
 		PlayerContext();
 		PlayerContext(ItemInfo* item, CollisionInfo* coll);
 
-		// Basic movement
+		// Basic ground movement
 		bool CanTurnFast();
 		bool CanRunForward();
-		bool CanRunBack();
+		bool CanRunBackward();
 		bool CanWalkForward();
-		bool CanWalkBack();
-		bool CanWalkBackSwamp();
+		bool CanWalkBackward();
 		bool CanSidestepLeft();
-		bool CanSidestepLeftWade(); // TODO
-		bool CanSidestepLeftSwamp();
 		bool CanSidestepRight();
-		bool CanSidestepRightWade(); // TODO
-		bool CanSidestepRightSwamp();
-		bool CanWadeForward(); // TODO
-		bool CanWadeForwardSwamp();
+		bool CanWadeForward();
+		bool CanWadeBackward();
 
 		// Crouch and crawl movement
 		bool CanCrouch();
@@ -41,7 +36,7 @@ namespace TEN::Entities::Player
 
 		// Monkey swing movement
 		bool CanMonkeyForward();
-		bool CanMonkeyBack();
+		bool CanMonkeyBackward();
 		bool CanMonkeyShimmyLeft();
 		bool CanMonkeyShimmyRight();
 
@@ -51,7 +46,7 @@ namespace TEN::Entities::Player
 		// Miscellaneous movement
 
 	private:
-		bool TestGroundMovementSetup(ContextSetupGroundMovement contextSetup, bool useCrawlSetup = false);
-		bool TestMonkeyMovementSetup(ContextSetupMonkeyMovement contextSetup);
+		bool TestGroundMovementSetup(Context::SetupGroundMovement contextSetup, bool useCrawlSetup = false);
+		bool TestMonkeyMovementSetup(Context::SetupMonkeyMovement contextSetup);
 	};
 }

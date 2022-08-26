@@ -1021,13 +1021,6 @@ bool IsRunJumpCountableState(LaraState state)
 	return TestLaraState(state, RunningJumpTimerStates);
 }
 
-bool TestLaraRoll180(ItemInfo* item, CollisionInfo* coll)
-{
-	auto* lara = GetLaraInfo(item);
-
-	return (lara->Control.WaterStatus != WaterStatus::Wade);
-}
-
 bool TestLaraPose(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
