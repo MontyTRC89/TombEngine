@@ -537,9 +537,8 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	// TODO: Without animation blending, the AFK state's
-	// movement lock will be rather obnoxious.
-	// Adding some idle breathing would also be nice. @Sezz 2021.10.31
+	// TODO: Without animation blending, the AFK state's movement lock will be rather obnoxious.
+	// TODO: Add idle breathing motion. -- Sezz 2021.10.31
 	if (lara->Control.Count.Pose >= LARA_POSE_TIME && TestLaraPose(item, coll))
 	{
 		item->Animation.TargetState = LS_POSE;

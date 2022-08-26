@@ -82,55 +82,12 @@ namespace TEN::Entities::Player
 
 	bool PlayerContext::CanSidestepLeft()
 	{
-		auto* player = GetLaraInfo(PlayerItemPtr);
-
-		// TODO: Condition for wading in water.
-		if (player->Control.WaterStatus == WaterStatus::Wade &&
-			TestEnvironment(ENV_FLAG_SWAMP, PlayerItemPtr))
-		{
-			Context::SetupGroundMovement contextSetup =
-			{
-				PlayerItemPtr->Pose.Orientation.y - ANGLE(90.0f),
-				NO_LOWER_BOUND, int(-CLICK(0.8f)), // Defined by sidestep left state.
-				false, false, false
-			};
-			return this->TestGroundMovementSetup(contextSetup);
-		}
-		else
-		{
-			Context::SetupGroundMovement contextSetup =
-			{
-				PlayerItemPtr->Pose.Orientation.y - ANGLE(90.0f),
-				int(CLICK(0.8f)), int(-CLICK(0.8f)) // Defined by sidestep left state.
-			};
-			return this->TestGroundMovementSetup(contextSetup);
-		}
+		return this->TestSidestep(false);
 	}
 
 	bool PlayerContext::CanSidestepRight()
 	{
-		auto* player = GetLaraInfo(PlayerItemPtr);
-
-		if (player->Control.WaterStatus == WaterStatus::Wade &&
-			TestEnvironment(ENV_FLAG_SWAMP, PlayerItemPtr))
-		{
-			Context::SetupGroundMovement contextSetup =
-			{
-				PlayerItemPtr->Pose.Orientation.y + ANGLE(90.0f),
-				NO_LOWER_BOUND, int(-CLICK(0.8f)), // Defined by sidestep right state.
-				false, false, false
-			};
-			return this->TestGroundMovementSetup(contextSetup);
-		}
-		else
-		{
-			Context::SetupGroundMovement contextSetup =
-			{
-				PlayerItemPtr->Pose.Orientation.y + ANGLE(90.0f),
-				int(CLICK(0.8f)), int(-CLICK(0.8f)) // Defined by sidestep right state state.
-			};
-			return this->TestGroundMovementSetup(contextSetup);
-		}
+		return this->TestSidestep(true);
 	}
 
 	bool PlayerContext::CanWadeForward()
@@ -245,7 +202,7 @@ namespace TEN::Entities::Player
 		return this->TestGroundMovementSetup(contextSetup, true);
 	}
 
-	bool PlayerContext::CanCrawlBack()
+	bool PlayerContext::CanCrawlBackward()
 	{
 		Context::SetupGroundMovement contextSetup =
 		{
@@ -277,20 +234,47 @@ namespace TEN::Entities::Player
 
 	bool PlayerContext::CanMonkeyShimmyLeft()
 	{
-		Context::SetupMonkeyMovement contextSetup =
-		{
-			PlayerItemPtr->Pose.Orientation.y - ANGLE(90.0f),
-			int(CLICK(0.5f)), int(-CLICK(0.5f)) // Defined by monkey shimmy left state.
-		};
-		return TestMonkeyMovementSetup(contextSetup);
+		return this->TestMonkeyShimmy(false);
+	}
+	
+	bool PlayerContext::CanMonkeyShimmyRight()
+	{
+		return this->TestMonkeyShimmy(true);
 	}
 
-	bool PlayerContext::CanMonkeyShimmyRight()
+	bool PlayerContext::TestSidestep(bool goingRight)
+	{
+		auto* player = GetLaraInfo(PlayerItemPtr);
+
+		// TODO: Make specific condition for wading in water.
+		if (player->Control.WaterStatus == WaterStatus::Wade &&
+			TestEnvironment(ENV_FLAG_SWAMP, PlayerItemPtr))
+		{
+			Context::SetupGroundMovement contextSetup =
+			{
+				PlayerItemPtr->Pose.Orientation.y + (goingRight ? ANGLE(90.0f) : ANGLE(-90.0f)),
+				NO_LOWER_BOUND, int(-CLICK(0.8f)), // Defined by sidestep left/right states.
+				false, false, false
+			};
+			return this->TestGroundMovementSetup(contextSetup);
+		}
+		else
+		{
+			Context::SetupGroundMovement contextSetup =
+			{
+				PlayerItemPtr->Pose.Orientation.y + (goingRight ? ANGLE(90.0f) : ANGLE(-90.0f)),
+				int(CLICK(0.8f)), int(-CLICK(0.8f)) // Defined by sidestep left/right states.
+			};
+			return this->TestGroundMovementSetup(contextSetup);
+		}
+	}
+
+	bool PlayerContext::TestMonkeyShimmy(bool goingRight)
 	{
 		Context::SetupMonkeyMovement contextSetup =
 		{
-			PlayerItemPtr->Pose.Orientation.y + ANGLE(90.0f),
-			int(CLICK(0.5f)), int(-CLICK(0.5f)) // Defined by monkey shimmy right state.
+			PlayerItemPtr->Pose.Orientation.y + (goingRight ? ANGLE(90.0f) : ANGLE(-90.0f)),
+			int(CLICK(0.5f)), int(-CLICK(0.5f)) // Defined by monkey shimmy left/right states.
 		};
 		return TestMonkeyMovementSetup(contextSetup);
 	}

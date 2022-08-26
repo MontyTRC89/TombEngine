@@ -32,7 +32,7 @@ namespace TEN::Entities::Player
 		bool CanCrouchToCrawl();
 		bool CanCrouchRoll();
 		bool CanCrawlForward();
-		bool CanCrawlBack();
+		bool CanCrawlBackward();
 
 		// Monkey swing movement
 		bool CanMonkeyForward();
@@ -43,9 +43,13 @@ namespace TEN::Entities::Player
 		// Vault movement
 		// Crawl vault movement
 		// Water tread climb out movement
-		// Miscellaneous movement
 
 	private:
+		// Helper inquirers
+		bool TestSidestep(bool goingRight);
+		bool TestMonkeyShimmy(bool goingRight);
+
+		// Setup inquirers
 		bool TestGroundMovementSetup(Context::SetupGroundMovement contextSetup, bool useCrawlSetup = false);
 		bool TestMonkeyMovementSetup(Context::SetupMonkeyMovement contextSetup);
 	};

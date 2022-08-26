@@ -439,7 +439,7 @@ void lara_as_crawl_idle(ItemInfo* item, CollisionInfo* coll)
 				DoLaraCrawlToHangSnap(item, coll);
 				return;
 			}
-			else if (lara->Context.CanCrawlBack()) USE_FEATURE_IF_CPP20([[likely]])
+			else if (lara->Context.CanCrawlBackward()) USE_FEATURE_IF_CPP20([[likely]])
 			{
 				item->Animation.TargetState = LS_CRAWL_BACK;
 				return;
@@ -720,7 +720,7 @@ void lara_as_crawl_turn_left(ItemInfo* item, CollisionInfo* coll)
 			return;
 		}
 
-		if (TrInput & IN_BACK && lara->Context.CanCrawlBack())
+		if (TrInput & IN_BACK && lara->Context.CanCrawlBackward())
 		{
 			item->Animation.TargetState = LS_CRAWL_BACK;
 			return;
@@ -779,7 +779,7 @@ void lara_as_crawl_turn_right(ItemInfo* item, CollisionInfo* coll)
 			return;
 		}
 
-		if (TrInput & IN_BACK && lara->Context.CanCrawlBack())
+		if (TrInput & IN_BACK && lara->Context.CanCrawlBackward())
 		{
 			item->Animation.TargetState = LS_CRAWL_BACK;
 			return;
