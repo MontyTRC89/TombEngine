@@ -3,6 +3,9 @@ Version 1.0.2
 
 * Fix zeroed forward velocity upon landing.
 * Adjust max turn rate of idle state.
+* Align Lara on slopes when crouching, crawling and dying.
+* Better slope alignment for certain types of enemies.
+
 
 Version 1.0.1
 =============

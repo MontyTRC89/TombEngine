@@ -1,13 +1,13 @@
 #include "framework.h"
 #include "Game/Lara/lara_helpers.h"
 
+#include "Flow/ScriptInterfaceFlowHandler.h"
 #include "Game/collision/collide_room.h"
 #include "Game/control/control.h"
 #include "Game/control/volume.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_collide.h"
-#include "Flow/ScriptInterfaceFlowHandler.h"
 #include "Game/Lara/lara_fire.h"
 #include "Game/Lara/lara_tests.h"
 #include "Renderer/Renderer11.h"
@@ -57,8 +57,11 @@ void HandleLaraMovementParameters(ItemInfo* item, CollisionInfo* coll)
 		lara->Control.RunJumpQueued = false;
 
 	// Reset lean.
-	if (!lara->Control.IsMoving || (lara->Control.IsMoving && !(TrInput & (IN_LEFT | IN_RIGHT))))
+	if ((!lara->Control.IsMoving || (lara->Control.IsMoving && !(TrInput & (IN_LEFT | IN_RIGHT)))) &&
+		(!lara->Control.IsLow && item->Animation.ActiveState != LS_DEATH)) // HACK: Don't interfere with surface alignment in crouch, crawl, and death states.
+	{
 		ResetLaraLean(item, 6.0f);
+	}
 
 	// Reset crawl flex.
 	if (!(TrInput & IN_LOOK) && coll->Setup.Height > LARA_HEIGHT - LARA_HEADROOM &&	// HACK
@@ -71,6 +74,8 @@ void HandleLaraMovementParameters(ItemInfo* item, CollisionInfo* coll)
 	item->Pose.Orientation.y += lara->Control.TurnRate.y;
 	if (!(TrInput & (IN_LEFT | IN_RIGHT)))
 		lara->Control.TurnRate.y = 0;
+
+	lara->Control.IsLow = false;
 }
 
 bool HandleLaraVehicle(ItemInfo* item, CollisionInfo* coll)
@@ -378,7 +383,7 @@ short GetLaraSlideDirection(ItemInfo* item, CollisionInfo* coll)
 	// Get either:
 	// a) the surface aspect angle (extended slides), or
 	// b) the derived nearest cardinal direction from it (original slides).
-	headingAngle = GetSurfaceAspectAngle(probe.FloorTilt.x, probe.FloorTilt.y);
+	headingAngle = GetSurfaceAspectAngle(probe.FloorTilt);
 	if (g_GameFlow->HasSlideExtended())
 		return headingAngle;
 	else
@@ -580,8 +585,8 @@ void ModulateLaraSlideVelocity(ItemInfo* item, CollisionInfo* coll)
 	{
 		auto probe = GetCollision(item);
 		short minSlideAngle = ANGLE(33.75f);
-		short steepness = GetSurfaceSteepnessAngle(probe.FloorTilt.x, probe.FloorTilt.y);
-		short direction = GetSurfaceAspectAngle(probe.FloorTilt.x, probe.FloorTilt.y);
+		short steepness = GetSurfaceSteepnessAngle(probe.FloorTilt);
+		short direction = GetSurfaceAspectAngle(probe.FloorTilt);
 
 		float velocityMultiplier = 1 / (float)ANGLE(33.75f);
 		int slideVelocity = std::min<int>(minVelocity + 10 * (steepness * velocityMultiplier), LARA_TERMINAL_VELOCITY);
@@ -596,7 +601,25 @@ void ModulateLaraSlideVelocity(ItemInfo* item, CollisionInfo* coll)
 		//lara->ExtraVelocity.x += minVelocity;
 }
 
-void SetLaraJumpDirection(ItemInfo* item, CollisionInfo* coll)
+void AlignLaraToSurface(ItemInfo* item, float alpha)
+{
+	auto probe = GetCollision(item);
+	short aspectAngle = GetSurfaceAspectAngle(probe.FloorTilt);
+	short steepnessAngle = std::min(GetSurfaceSteepnessAngle(probe.FloorTilt), ANGLE(70.0f));
+
+	short deltaAngle = GetShortestAngularDistance(item->Pose.Orientation.y, aspectAngle);
+	float sinDeltaAngle = phd_sin(deltaAngle);
+	float cosDeltaAngle = phd_cos(deltaAngle);
+
+	auto extraRot = Vector3Shrt(
+		-steepnessAngle * cosDeltaAngle,
+		0,
+		steepnessAngle * sinDeltaAngle
+	) - Vector3Shrt(item->Pose.Orientation.x, 0, item->Pose.Orientation.z);
+	item->Pose.Orientation += extraRot * alpha;
+}
+
+void SetLaraJumpDirection(ItemInfo* item, CollisionInfo* coll) 
 {
 	auto* lara = GetLaraInfo(item);
 
