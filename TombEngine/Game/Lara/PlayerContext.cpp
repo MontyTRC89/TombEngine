@@ -294,7 +294,7 @@ namespace TEN::Entities::Player
 			auto probe = GetCollision(PlayerItemPtr);
 
 			short directionAngle = GetLaraSlideDirection(PlayerItemPtr, PlayerCollPtr);
-			short steepnessAngle = GetSurfaceSteepnessAngle(probe.FloorTilt.x, probe.FloorTilt.y);
+			short steepnessAngle = GetSurfaceSteepnessAngle(probe.FloorTilt);
 			return (abs(short(PlayerCollPtr->Setup.ForwardAngle - directionAngle)) <= abs(steepnessAngle));
 		}
 
