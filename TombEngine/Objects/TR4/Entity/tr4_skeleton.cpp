@@ -29,6 +29,7 @@ namespace TEN::Entities::TR4
 	const auto SkeletonBite = BiteInfo(Vector3(0.0f, -16.0f, 200.0f), 11);
 	const vector<int> SkeletonSwordAttackJoints = { 15, 16 };
 
+	// TODO: Fill in missign states.
 	enum SkeletonState
 	{
 		SKELETON_STATE_SUBTERRANEAN = 0,
@@ -72,36 +73,28 @@ namespace TEN::Entities::TR4
 	void InitialiseSkeleton(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
-		auto* object = &Objects[item->ObjectNumber];
 
 		ClearItem(itemNumber);
 
+		// TODO: Check cases 0 and 3.
 		switch (item->TriggerFlags)
 		{
 		case 0:
-			item->Animation.AnimNumber = object->animIndex;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			SetAnimation(item, SKELETON_ANIM_EMERGE);
 			item->Animation.ActiveState = SKELETON_STATE_SUBTERRANEAN;
 			item->Animation.TargetState = SKELETON_STATE_SUBTERRANEAN;
 			break;
 
 		case 1:
-			item->Animation.AnimNumber = object->animIndex + SKELETON_ANIM_JUMP_RIGHT_START;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-			item->Animation.ActiveState = SKELETON_STATE_JUMP_RIGHT;
-			item->Animation.TargetState = SKELETON_STATE_JUMP_RIGHT;
+			SetAnimation(item, SKELETON_ANIM_JUMP_RIGHT_START);
 			break;
 
 		case 2:
-			item->Animation.AnimNumber = object->animIndex + SKELETON_ANIM_JUMP_LEFT_START;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-			item->Animation.ActiveState = SKELETON_STATE_JUMP_LEFT;
-			item->Animation.TargetState = SKELETON_STATE_JUMP_LEFT;
+			SetAnimation(item, SKELETON_ANIM_JUMP_LEFT_START);
 			break;
 
 		case 3:
-			item->Animation.AnimNumber = object->animIndex;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			SetAnimation(item, SKELETON_ANIM_EMERGE);
 			item->Animation.ActiveState = SKELETON_STATE_JUMP_LIE_DOWN;
 			item->Animation.TargetState = SKELETON_STATE_JUMP_LIE_DOWN;
 			//item->status = ITEM_DEACTIVATED;
@@ -175,15 +168,15 @@ namespace TEN::Entities::TR4
 		bool jumpLeft = false;
 		bool jumpRight = false;
 
-		int distance = 0;
-		short tilt = 0;
 		short angle = 0;
+		short tilt = 0;
 		short joint1 = 0;
 		short joint2 = 0;
 		short joint3 = 0;
 		short rotation = 0;
+		int distance = 0;
 
-		// Can skeleton jump? Check for a distance of 1 and 2 sectors.
+		// Can skeleton jump? Check for a distance of 1 and 2 blocks.
 		int x = item->Pose.Position.x;
 		int y = item->Pose.Position.y;
 		int z = item->Pose.Position.z;
@@ -204,24 +197,24 @@ namespace TEN::Entities::TR4
 		int height3 = GetCollision(x, y, z, item->RoomNumber).Position.Floor;
 
 		int height = 0;
-		bool canJump1sector = true;
-		if (enemyItem && item->BoxNumber == LaraItem->BoxNumber && item->MeshBits & 0x200 ||
-			y >= height1 - CLICK(1.5f) ||
-			y >= height2 + CLICK(2) ||
-			y <= height2 - CLICK(2))
+		bool canJump1Block = true;
+		if (enemyItem && item->BoxNumber == LaraItem->BoxNumber && (item->MeshBits & 0x200) ||
+			y >= (height1 - CLICK(1.5f)) ||
+			y >= (height2 + CLICK(2)) ||
+			y <= (height2 - CLICK(2)))
 		{
 			height = height2;
-			canJump1sector = false;
+			canJump1Block = false;
 		}
 
-		bool canJump2sectors = true;
-		if (enemyItem && item->BoxNumber == LaraItem->BoxNumber && item->MeshBits & 0x200 ||
-			y >= height1 - CLICK(1.5f) ||
-			y >= height - CLICK(1.5f) ||
-			y >= height3 + CLICK(2) ||
-			y <= height3 - CLICK(2))
+		bool canJump2Blocks = true;
+		if (enemyItem && item->BoxNumber == LaraItem->BoxNumber && (item->MeshBits & 0x200) ||
+			y >= (height1 - CLICK(1.5f)) ||
+			y >= (height - CLICK(1.5f)) ||
+			y >= (height3 + CLICK(2)) ||
+			y <= (height3 - CLICK(2)))
 		{
-			canJump2sectors = false;
+			canJump2Blocks = false;
 		}
 
 		if (item->AIBits)
@@ -235,17 +228,17 @@ namespace TEN::Entities::TR4
 		if (item->HitStatus &&
 			Lara.Control.Weapon.GunType == LaraWeaponType::Shotgun &&
 			AI.distance < pow(SECTOR(3.5f), 2) &&
-			item->Animation.ActiveState != 7 &&
+			item->Animation.ActiveState != SKELETON_STATE_USE_SHIELD &&
 			item->Animation.ActiveState != 17 &&
 			item->Animation.ActiveState != SKELETON_STATE_HURT_BY_SHOTGUN_1 &&
 			item->Animation.ActiveState != SKELETON_STATE_HURT_BY_SHOTGUN_2 &&
-			item->Animation.ActiveState != 25)
+			item->Animation.ActiveState != SKELETON_STATE_JUMP_LIE_DOWN)
 		{
 			if (AI.angle >= ANGLE(67.5f) || AI.angle <= -ANGLE(67.5f))
 			{
 				item->Animation.ActiveState = SKELETON_STATE_HURT_BY_SHOTGUN_2;
 				item->Animation.AnimNumber = Objects[ID_SKELETON].animIndex + 33;
-				item->Pose.Orientation.y += AI.angle + -32768;
+				item->Pose.Orientation.y += AI.angle - ANGLE(180.0f);
 			}
 			else
 			{
@@ -381,14 +374,14 @@ namespace TEN::Entities::TR4
 				{
 					if (item->AIBits & PATROL1)
 						item->Animation.TargetState = 15;
-					else if (canJump1sector || canJump2sectors)
+					else if (canJump1Block || canJump2Blocks)
 					{
 						item->Animation.AnimNumber = Objects[ID_SKELETON].animIndex + 40;
 						item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 						item->Animation.ActiveState = SKELETON_STATE_JUMP_LEFT;
 						creature->MaxTurn = 0;
 
-						if (!canJump2sectors)
+						if (!canJump2Blocks)
 						{
 							item->Animation.TargetState = SKELETON_STATE_JUMP_FORWARD_1_BLOCK;
 							creature->LOT.IsJumping = true;
@@ -400,26 +393,15 @@ namespace TEN::Entities::TR4
 						}
 					}
 					else if (jumpLeft)
-					{
-						item->Animation.AnimNumber = Objects[ID_SKELETON].animIndex + 34;
-						item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-						item->Animation.ActiveState = SKELETON_STATE_JUMP_LEFT;
-						item->Animation.TargetState = SKELETON_STATE_JUMP_LEFT;
-					}
+						SetAnimation(item, SKELETON_ANIM_JUMP_LEFT_START);
 					else if (jumpRight)
-					{
-						item->Animation.AnimNumber = Objects[ID_SKELETON].animIndex + 37;
-						item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-						item->Animation.ActiveState = SKELETON_STATE_JUMP_RIGHT;
-						item->Animation.TargetState = SKELETON_STATE_JUMP_RIGHT;
-					}
+						SetAnimation(item, SKELETON_ANIM_JUMP_RIGHT_START);
 					else
 					{
 						if (creature->Mood == MoodType::Escape)
 						{
 							if (Lara.TargetEntity == item ||
-								!AI.ahead ||
-								item->HitStatus ||
+								!AI.ahead || item->HitStatus ||
 								!(item->MeshBits & 0x200))
 							{
 								item->Animation.TargetState = 15;
@@ -430,8 +412,7 @@ namespace TEN::Entities::TR4
 						}
 						else if (creature->Mood == MoodType::Bored ||
 							item->AIBits & FOLLOW &&
-							(creature->ReachedGoal ||
-								laraAI.distance > pow(SECTOR(2), 2)))
+							(creature->ReachedGoal || laraAI.distance > pow(SECTOR(2), 2)))
 						{
 							if (item->Animation.RequiredState)
 								item->Animation.TargetState = item->Animation.RequiredState;
@@ -439,8 +420,7 @@ namespace TEN::Entities::TR4
 								item->Animation.TargetState = 15;
 						}
 						else if (Lara.TargetEntity == item &&
-							laraAI.angle &&
-							laraAI.distance < pow(SECTOR(2), 2) &&
+							laraAI.angle && laraAI.distance < pow(SECTOR(2), 2) &&
 							TestProbability(0.5f) &&
 							(Lara.Control.Weapon.GunType == LaraWeaponType::Shotgun || TestProbability(0.06f)) &&
 							item->MeshBits == -1)
@@ -509,7 +489,7 @@ namespace TEN::Entities::TR4
 						{
 							if (AI.bite && AI.distance < pow(SECTOR(1), 2))
 								item->Animation.TargetState = 18;
-							else if (canJump1sector || canJump2sectors)
+							else if (canJump1Block || canJump2Blocks)
 							{
 								item->Animation.TargetState = 2;
 								creature->MaxTurn = 0;
@@ -530,7 +510,7 @@ namespace TEN::Entities::TR4
 				creature->MaxTurn = ANGLE(7.0f);
 				creature->LOT.IsJumping = false;
 
-				if (item->AIBits & GUARD || canJump1sector || canJump2sectors)
+				if (item->AIBits & GUARD || canJump1Block || canJump2Blocks)
 				{
 					if (item->MeshBits & 0x200)
 					{

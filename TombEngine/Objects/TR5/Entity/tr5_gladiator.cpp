@@ -88,8 +88,8 @@ namespace TEN::Entities::Creatures::TR5
 		auto* item = &g_Level.Items[itemNumber];
 		auto* creature = GetCreatureInfo(item);
 
-		short tilt = 0;
 		short angle = 0;
+		short tilt = 0;
 		short joint0 = 0;
 		short joint1 = 0;
 		short joint2 = 0;
@@ -99,11 +99,7 @@ namespace TEN::Entities::Creatures::TR5
 			item->HitPoints = 0;
 
 			if (item->Animation.ActiveState != GLADIATOR_STATE_DEATH)
-			{
-				item->Animation.AnimNumber = Objects[ID_GLADIATOR].animIndex + GLADIATOR_ANIM_DEATH;
-				item->Animation.ActiveState = GLADIATOR_STATE_DEATH;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-			}
+				SetAnimation(item, GLADIATOR_ANIM_DEATH);
 		}
 		else
 		{
@@ -116,21 +112,21 @@ namespace TEN::Entities::Creatures::TR5
 			CreatureAIInfo(item, &AI);
 
 			int unknown = true;
-			short rot;
+			short deltaAngle;
 			int distance;
 
 			if (creature->Enemy == LaraItem)
 			{
 				distance = AI.distance;
-				rot = AI.angle;
+				deltaAngle = AI.angle;
 			}
 			else
 			{
 				int dx = LaraItem->Pose.Position.x - item->Pose.Position.x;
 				int dz = LaraItem->Pose.Position.z - item->Pose.Position.z;
 
-				rot = phd_atan(dz, dx) - item->Pose.Orientation.y;
-				if (rot <= -ANGLE(90.0f) || rot >= ANGLE(90.0f))
+				deltaAngle = phd_atan(dz, dx) - item->Pose.Orientation.y;
+				if (deltaAngle <= -ANGLE(90.0f) || deltaAngle >= ANGLE(90.0f))
 					unknown = false;
 
 				distance = pow(dx, 2) + pow(dz, 2);
@@ -151,7 +147,7 @@ namespace TEN::Entities::Creatures::TR5
 			switch (item->Animation.ActiveState)
 			{
 			case GLADIATOR_STATE_IDLE:
-				joint2 = rot;
+				joint2 = deltaAngle;
 				creature->MaxTurn = (-(int)(creature->Mood != MoodType::Bored)) & 0x16C;
 				creature->Flags = 0;
 
@@ -169,8 +165,7 @@ namespace TEN::Entities::Creatures::TR5
 				{
 					if (creature->Mood == MoodType::Escape)
 					{
-						if (Lara.TargetEntity != item &&
-							AI.ahead && !item->HitStatus)
+						if (Lara.TargetEntity != item && AI.ahead && !item->HitStatus)
 						{
 							item->Animation.TargetState = GLADIATOR_STATE_IDLE;
 							break;
@@ -179,8 +174,7 @@ namespace TEN::Entities::Creatures::TR5
 					else
 					{
 						if (creature->Mood == MoodType::Bored ||
-							(item->AIBits & FOLLOW &&
-								(creature->ReachedGoal || distance > pow(SECTOR(2), 2))))
+							(item->AIBits & FOLLOW && (creature->ReachedGoal || distance > pow(SECTOR(2), 2))))
 						{
 							if (item->Animation.RequiredState)
 								item->Animation.TargetState = item->Animation.RequiredState;
@@ -217,7 +211,7 @@ namespace TEN::Entities::Creatures::TR5
 				break;
 
 			case GLADIATOR_STATE_WALK_FORWARD:
-				joint2 = rot;
+				joint2 = deltaAngle;
 				creature->MaxTurn = creature->Mood != MoodType::Bored ? ANGLE(7.0f) : ANGLE(2.0f);
 				creature->Flags = 0;
 
