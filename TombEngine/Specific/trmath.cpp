@@ -91,6 +91,11 @@ Vector3Shrt GetOrientBetweenPoints(Vector3Int origin, Vector3Int target)
 	return GetVectorAngles(target.x - origin.x, target.y - origin.y, target.z - origin.z);
 }
 
+short GetShortestAngularDistance(short angleFrom, short angleTo)
+{
+	return short(angleTo - angleFrom);
+}
+
 int phd_Distance(PHD_3DPOS* first, PHD_3DPOS* second)
 {
 	return (int)round(Vector3::Distance(first->Position.ToVector3(), second->Position.ToVector3()));
