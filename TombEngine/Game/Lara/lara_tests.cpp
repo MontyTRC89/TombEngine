@@ -1113,11 +1113,11 @@ void GetTightropeFallOff(ItemInfo* item, int regularity)
 #endif
 
 // TODO: Organise all of this properly. -- Sezz 2022.07.28
-bool CheckLaraState(LaraState state, std::vector<LaraState> stateList)
+bool CheckLaraState(LaraState referenceState, const std::vector<LaraState>& stateList)
 {
-	for (auto listedState : stateList)
+	for (auto& state : stateList)
 	{
-		if (state == listedState)
+		if (state == referenceState)
 			return true;
 	}
 

@@ -361,29 +361,29 @@ void TestForObjectOnLedge(ItemInfo* item, CollisionInfo* coll)
 
 bool TestLaraPosition(OBJECT_COLLISION_BOUNDS* bounds, ItemInfo* item, ItemInfo* laraItem)
 {
-	auto rotRel = laraItem->Pose.Orientation - item->Pose.Orientation;
+	auto deltaOrient = laraItem->Pose.Orientation - item->Pose.Orientation;
 
-	if (rotRel.x < bounds->rotX1)
+	if (deltaOrient.x < bounds->rotX1)
 		return false;
 
-	if (rotRel.x > bounds->rotX2)
+	if (deltaOrient.x > bounds->rotX2)
 		return false;
 
-	if (rotRel.y < bounds->rotY1)
+	if (deltaOrient.y < bounds->rotY1)
 		return false;
 
-	if (rotRel.y > bounds->rotY2)
+	if (deltaOrient.y > bounds->rotY2)
 		return false;
 
-	if (rotRel.z < bounds->rotZ1)
+	if (deltaOrient.z < bounds->rotZ1)
 		return false;
 
-	if (rotRel.z > bounds->rotZ2)
+	if (deltaOrient.z > bounds->rotZ2)
 		return false;
 
 	auto pos = (laraItem->Pose.Position - item->Pose.Position).ToVector3();
 
-	Matrix matrix = Matrix::CreateFromYawPitchRoll(
+	auto matrix = Matrix::CreateFromYawPitchRoll(
 		TO_RAD(item->Pose.Orientation.y),
 		TO_RAD(item->Pose.Orientation.x),
 		TO_RAD(item->Pose.Orientation.z)
@@ -401,34 +401,35 @@ bool TestLaraPosition(OBJECT_COLLISION_BOUNDS* bounds, ItemInfo* item, ItemInfo*
 	if (pos.x < bounds->boundingBox.X1 || pos.x > bounds->boundingBox.X2 ||
 		pos.y < bounds->boundingBox.Y1 || pos.y > bounds->boundingBox.Y2 ||
 		pos.z < bounds->boundingBox.Z1 || pos.z > bounds->boundingBox.Z2)
+	{
 		return false;
+	}
 
 	return true;
 }
 
 bool AlignLaraPosition(Vector3Int* vec, ItemInfo* item, ItemInfo* laraItem)
 {
+	auto* lara = GetLaraInfo(laraItem);
+
 	laraItem->Pose.Orientation = item->Pose.Orientation;
 
-	Matrix matrix = Matrix::CreateFromYawPitchRoll(
+	auto matrix = Matrix::CreateFromYawPitchRoll(
 		TO_RAD(item->Pose.Orientation.y),
 		TO_RAD(item->Pose.Orientation.x),
 		TO_RAD(item->Pose.Orientation.z)
 	);
 
-	Vector3 pos = Vector3::Transform(Vector3(vec->x, vec->y, vec->z), matrix);
-	Vector3 newPos = item->Pose.Position.ToVector3() + pos;
+	auto pos = Vector3::Transform(Vector3(vec->x, vec->y, vec->z), matrix);
+	auto newPos = item->Pose.Position.ToVector3() + pos;
 
 	int height = GetCollision(newPos.x, newPos.y, newPos.z, laraItem->RoomNumber).Position.Floor;
 	if ((laraItem->Pose.Position.y - height) <= CLICK(2))
 	{
-		laraItem->Pose.Position.x = newPos.x;
-		laraItem->Pose.Position.y = newPos.y;
-		laraItem->Pose.Position.z = newPos.z;
+		laraItem->Pose.Position = Vector3Int(newPos);
 		return true;
 	}
 
-	auto* lara = GetLaraInfo(laraItem);
 	if (lara->Control.IsMoving)
 	{
 		lara->Control.IsMoving = false;
@@ -535,22 +536,22 @@ bool ItemNearTarget(PHD_3DPOS* src, ItemInfo* target, int radius)
 	return false;
 }
 
-bool Move3DPosTo3DPos(PHD_3DPOS* src, PHD_3DPOS* dest, int velocity, short angleAdd)
+bool Move3DPosTo3DPos(PHD_3DPOS* origin, PHD_3DPOS* target, int velocity, short angleAdd)
 {
-	auto direction = dest->Position - src->Position;
+	auto direction = target->Position - origin->Position;
 	int distance = sqrt(pow(direction.x, 2) + pow(direction.y, 2) + pow(direction.z, 2));
 
 	if (velocity < distance)
-		src->Position += direction * velocity / distance;
+		origin->Position += direction * velocity / distance;
 	else
-		src->Position = dest->Position;
+		origin->Position = target->Position;
 
 	if (!Lara.Control.IsMoving)
 	{
 		if (Lara.Control.WaterStatus != WaterStatus::Underwater)
 		{
-			int angle = mGetAngle(dest->Position.x, dest->Position.z, src->Position.x, src->Position.z);
-			int direction = (GetQuadrant(angle) - GetQuadrant(dest->Orientation.y)) & 3;
+			int angle = mGetAngle(target->Position.x, target->Position.z, origin->Position.x, origin->Position.z);
+			int direction = (GetQuadrant(angle) - GetQuadrant(target->Orientation.y)) & 3;
 
 			switch (direction)
 			{
@@ -581,31 +582,31 @@ bool Move3DPosTo3DPos(PHD_3DPOS* src, PHD_3DPOS* dest, int velocity, short angle
 		Lara.Control.Count.PositionAdjust = 0;
 	}
 
-	short deltaAngle = dest->Orientation.x - src->Orientation.x;
+	short deltaAngle = target->Orientation.x - origin->Orientation.x;
 	if (deltaAngle > angleAdd)
-		src->Orientation.x += angleAdd;
+		origin->Orientation.x += angleAdd;
 	else if (deltaAngle < -angleAdd)
-		src->Orientation.x -= angleAdd;
+		origin->Orientation.x -= angleAdd;
 	else
-		src->Orientation.x = dest->Orientation.x;
+		origin->Orientation.x = target->Orientation.x;
 
-	deltaAngle = dest->Orientation.y - src->Orientation.y;
+	deltaAngle = target->Orientation.y - origin->Orientation.y;
 	if (deltaAngle > angleAdd)
-		src->Orientation.y += angleAdd;
+		origin->Orientation.y += angleAdd;
 	else if (deltaAngle < -angleAdd)
-		src->Orientation.y -= angleAdd;
+		origin->Orientation.y -= angleAdd;
 	else
-		src->Orientation.y = dest->Orientation.y;
+		origin->Orientation.y = target->Orientation.y;
 
-	deltaAngle = dest->Orientation.z - src->Orientation.z;
+	deltaAngle = target->Orientation.z - origin->Orientation.z;
 	if (deltaAngle > angleAdd)
-		src->Orientation.z += angleAdd;
+		origin->Orientation.z += angleAdd;
 	else if (deltaAngle < -angleAdd)
-		src->Orientation.z -= angleAdd;
+		origin->Orientation.z -= angleAdd;
 	else
-		src->Orientation.z = dest->Orientation.z;
+		origin->Orientation.z = target->Orientation.z;
 
-	return (src->Position == dest->Position && src->Orientation == dest->Orientation);
+	return (origin->Position == target->Position && origin->Orientation == target->Orientation);
 }
 
 bool TestBoundsCollide(ItemInfo* item, ItemInfo* laraItem, int radius)
@@ -911,7 +912,7 @@ bool CollideSolidBounds(ItemInfo* item, BOUNDING_BOX* box, PHD_3DPOS pos, Collis
 
 	// Calculate vertical item coll bounds according to either height (land mode) or precise bounds (water mode).
 	// Water mode needs special processing because height calc in original engines is inconsistent in such cases.
-	if (g_Level.Rooms[item->RoomNumber].flags & ENV_FLAG_WATER)
+	if (TestEnvironment(ENV_FLAG_WATER, item))
 	{
 		collBox.Y1 = itemBBox->Y1;
 		collBox.Y2 = itemBBox->Y2;
