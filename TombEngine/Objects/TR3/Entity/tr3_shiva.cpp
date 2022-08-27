@@ -2,35 +2,37 @@
 #include "Objects/TR3/Entity/tr3_shiva.h"
 
 #include "Game/animation.h"
+#include "Game/camera.h"
 #include "Game/collision/collide_room.h"
 #include "Game/control/box.h"
 #include "Game/effects/effects.h"
-#include "Game/items.h"
 #include "Game/itemdata/creature_info.h"
+#include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
+#include "Renderer/Renderer11Enums.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
+#include "Specific/prng.h"
 #include "Specific/setup.h"
-#include "Game/camera.h"
-#include "Renderer/Renderer11Enums.h"
 
+using namespace TEN::Math::Random;
 using std::vector;
 
 namespace TEN::Entities::TR3
 {
-	BITE_INFO ShivaBiteLeft = { 0, 0, 920, 13 };
-	BITE_INFO ShivaBiteRight = { 0, 0, 920, 22 };
-	const vector<int> ShivaAttackLeftJoints = { 10, 13 };
-	const vector<int> ShivaAttackRightJoints = { 22, 25 };
-
-	constexpr auto SHIVA_GRAB_ATTACK_DAMAGE = 150;
+	constexpr auto SHIVA_GRAB_ATTACK_DAMAGE		= 150;
 	constexpr auto SHIVA_DOWNWARD_ATTACK_DAMAGE = 180;
 
-	#define SHIVA_WALK_TURN_ANGLE Angle::DegToRad(4.0f)
-	#define SHIVA_ATTACK_TURN_ANGLE Angle::DegToRad(4.0f)
-
 	constexpr auto LARA_ANIM_SHIVA_DEATH = 7;
+
+	#define SHIVA_WALK_TURN_RATE_MAX   Angle::DegToRad(4.0f)
+	#define SHIVA_ATTACK_TURN_RATE_MAX Angle::DegToRad(4.0f)
+
+	const vector<int> ShivaAttackLeftJoints	 = { 10, 13 };
+	const vector<int> ShivaAttackRightJoints = { 22, 25 };
+	const auto ShivaBiteLeft  = BiteInfo(Vector3(0.0f, 0.0f, 920.0f), 13);
+	const auto ShivaBiteRight = BiteInfo(Vector3(0.0f, 0.0f, 920.0f), 22);
 
 	enum ShivaState
 	{
@@ -71,6 +73,12 @@ namespace TEN::Entities::TR3
 		SHIVA_ANIM_WALK_BACK_LEFT = 20,
 		SHIVA_ANIM_WALK_BACK_RIGHT = 21,
 		SHIVA_ANIM_DEATH = 22
+	};
+
+	// TODO
+	enum ShivaFlags
+	{
+
 	};
 
 	static void TriggerShivaSmoke(long x, long y, long z, long uw)
@@ -165,16 +173,16 @@ namespace TEN::Entities::TR3
 	{
 		if (!(creature->Flags) && item->TestBits(JointBitType::Touch, ShivaAttackRightJoints))
 		{
-			CreatureEffect(item, &ShivaBiteRight, DoBloodSplat);
 			DoDamage(creature->Enemy, damage);
+			CreatureEffect(item, ShivaBiteRight, DoBloodSplat);
 			SoundEffect(SFX_TR2_CRUNCH2, &item->Pose);
 			creature->Flags = 1;
 		}
 
 		if (!(creature->Flags) && item->TestBits(JointBitType::Touch, ShivaAttackLeftJoints))
 		{
-			CreatureEffect(item, &ShivaBiteLeft, DoBloodSplat);
 			DoDamage(creature->Enemy, damage);
+			CreatureEffect(item, ShivaBiteLeft, DoBloodSplat);
 			SoundEffect(SFX_TR2_CRUNCH2, &item->Pose);
 			creature->Flags = 1;
 		}
@@ -182,10 +190,12 @@ namespace TEN::Entities::TR3
 
 	void InitialiseShiva(short itemNumber)
 	{
+		auto* item = &g_Level.Items[itemNumber];
+
 		ClearItem(itemNumber);
 
-		auto* item = &g_Level.Items[itemNumber];
 		item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + SHIVA_ANIM_INACTIVE;
+
 		auto* anim = &g_Level.Anims[item->Animation.AnimNumber];
 
 		item->Animation.FrameNumber = anim->frameBase;
@@ -205,8 +215,8 @@ namespace TEN::Entities::TR3
 
 		EulerAngles extraHeadRot;
 		EulerAngles extraTorsoRot;
-		float angle = 0;
-		float tilt = 0;
+		short angle = 0;
+		short tilt = 0;
 
 		if (item->HitPoints <= 0)
 		{
@@ -222,8 +232,8 @@ namespace TEN::Entities::TR3
 			AI_INFO AI;
 			CreatureAIInfo(item, &AI);
 
-			GetCreatureMood(item, &AI, VIOLENT);
-			CreatureMood(item, &AI, VIOLENT);
+			GetCreatureMood(item, &AI, true);
+			CreatureMood(item, &AI, true);
 
 			if (shiva->Mood == MoodType::Escape)
 			{
@@ -234,7 +244,7 @@ namespace TEN::Entities::TR3
 			angle = CreatureTurn(item, shiva->MaxTurn);
 
 			if (item->Animation.ActiveState != SHIVA_STATE_INACTIVE)
-				item->MeshBits = 0xFFFFFFFF;
+				item->MeshBits = ALL_JOINT_BITS;
 
 			int effectMesh = 0;
 
@@ -245,7 +255,7 @@ namespace TEN::Entities::TR3
 
 				if (!shiva->Flags)
 				{
-					if (item->MeshBits == 0)
+					if (!item->MeshBits)
 						effectMesh = 0;
 
 					item->MeshBits = (item->MeshBits * 2) + 1;
@@ -297,8 +307,7 @@ namespace TEN::Entities::TR3
 				}
 				else if (shiva->Mood == MoodType::Bored)
 				{
-					int random = GetRandomControl();
-					if (random < 0x400)
+					if (TestProbability(0.0325f))
 						item->Animation.TargetState = SHIVA_STATE_WALK_FORWARD;
 				}
 				else if (AI.bite && AI.distance < pow(SECTOR(1.25f), 2))
@@ -351,7 +360,7 @@ namespace TEN::Entities::TR3
 				break;
 
 			case SHIVA_STATE_WALK_FORWARD:
-				shiva->MaxTurn = SHIVA_WALK_TURN_ANGLE;
+				shiva->MaxTurn = SHIVA_WALK_TURN_RATE_MAX;
 
 				if (AI.ahead)
 					extraHeadRot.y = AI.angle;
@@ -374,7 +383,7 @@ namespace TEN::Entities::TR3
 				break;
 
 			case SHIVA_STATE_WALK_FORWARD_GUARDING:
-				shiva->MaxTurn = SHIVA_WALK_TURN_ANGLE;
+				shiva->MaxTurn = SHIVA_WALK_TURN_RATE_MAX;
 
 				if (AI.ahead)
 					extraHeadRot.y = AI.angle;
@@ -398,7 +407,7 @@ namespace TEN::Entities::TR3
 				break;
 
 			case SHIVA_STATE_WALK_BACK:
-				shiva->MaxTurn = SHIVA_WALK_TURN_ANGLE;
+				shiva->MaxTurn = SHIVA_WALK_TURN_RATE_MAX;
 
 				if (AI.ahead)
 					extraHeadRot.y = AI.angle;
@@ -418,19 +427,19 @@ namespace TEN::Entities::TR3
 				break;
 
 			case SHIVA_STATE_GRAB_ATTACK:
-				shiva->MaxTurn = SHIVA_ATTACK_TURN_ANGLE;
+				shiva->MaxTurn = SHIVA_ATTACK_TURN_RATE_MAX;
 
 				if (AI.ahead)
 				{
 					extraHeadRot.y = AI.angle;
-					extraTorsoRot = EulerAngles(AI.xAngle, AI.angle, 0.0f);
+					extraTorsoRot = EulerAngles(AI.xAngle, AI.angle, 0);
 				}
 
 				ShivaDamage(item, shiva, SHIVA_GRAB_ATTACK_DAMAGE);
 				break;
 
 			case SHIVA_STATE_DOWNWARD_ATTACK:
-				shiva->MaxTurn = SHIVA_ATTACK_TURN_ANGLE;
+				shiva->MaxTurn = SHIVA_ATTACK_TURN_RATE_MAX;
 				extraHeadRot.y = AI.angle;
 				extraTorsoRot.y = AI.angle;
 
@@ -442,15 +451,15 @@ namespace TEN::Entities::TR3
 
 			case SHIVA_STATE_KILL:
 				shiva->MaxTurn = 0;
-				extraHeadRot = EulerAngles::Zero;
-				extraTorsoRot = EulerAngles::Zero;
+				extraHeadRot = EulerAngles();
+				extraTorsoRot = EulerAngles();
 
 				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + SHIVA_ANIM_WALK_FORWARD_TO_GUARDED_LEFT_1 ||
 					item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + SHIVA_ANIM_WALK_BACK_RIGHT ||
 					item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + 33) // TODO: Huh? No such anim index exists for the Shiva.
 				{
-					CreatureEffect(item, &ShivaBiteRight, DoBloodSplat);
-					CreatureEffect(item, &ShivaBiteLeft, DoBloodSplat);
+					CreatureEffect(item, ShivaBiteRight, DoBloodSplat);
+					CreatureEffect(item, ShivaBiteLeft, DoBloodSplat);
 				}
 
 				break;
@@ -466,7 +475,7 @@ namespace TEN::Entities::TR3
 				ItemNewRoom(Lara.ItemNumber, item->RoomNumber);
 
 			LaraItem->Pose.Position = item->Pose.Position;
-			LaraItem->Pose.Orientation = EulerAngles(0.0f, item->Pose.Orientation.y, 0.0f);
+			LaraItem->Pose.Orientation = EulerAngles(0, item->Pose.Orientation.y, 0);
 			LaraItem->Animation.IsAirborne = false;
 
 			LaraItem->Animation.AnimNumber = Objects[ID_LARA_EXTRA_ANIMS].animIndex + LARA_ANIM_SHIVA_DEATH;

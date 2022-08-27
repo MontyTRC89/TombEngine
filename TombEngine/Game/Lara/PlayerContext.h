@@ -9,49 +9,63 @@ namespace TEN::Entities::Player
 	class PlayerContext
 	{
 	private:
+		// Private pointer variables
+		// TODO: Bad idea or okay?
 		ItemInfo*	   PlayerItemPtr = nullptr;
 		CollisionInfo* PlayerCollPtr = nullptr;
 
 	public:
+		// Constructors
 		PlayerContext();
 		PlayerContext(ItemInfo* item, CollisionInfo* coll);
 
-		// Basic movement
+		// Basic ground movement
 		bool CanTurnFast();
 		bool CanRunForward();
-		bool CanRunBack();
+		bool CanRunBackward();
 		bool CanWalkForward();
-		bool CanWalkBack();
-		bool CanWalkBackSwamp();
+		bool CanWalkBackward();
 		bool CanSidestepLeft();
-		bool CanSidestepLeftWade(); // TODO
-		bool CanSidestepLeftSwamp();
 		bool CanSidestepRight();
-		bool CanSidestepRightWade(); // TODO
-		bool CanSidestepRightSwamp();
-		bool CanWadeForward(); // TODO
-		bool CanWadeForwardSwamp();
+		bool CanWadeForward();
+		bool CanWadeBackward();
 
 		// Crouch and crawl movement
 		bool CanCrouch();
 		bool CanCrouchToCrawl();
 		bool CanCrouchRoll();
 		bool CanCrawlForward();
-		bool CanCrawlBack();
+		bool CanCrawlBackward();
 
 		// Monkey swing movement
 		bool CanMonkeyForward();
-		bool CanMonkeyBack();
+		bool CanMonkeyBackward();
 		bool CanMonkeyShimmyLeft();
 		bool CanMonkeyShimmyRight();
+
+		// Jump movement
+		bool CanJumpUp();
+		bool CanJumpForward();
+		bool CanJumpBackward();
+		bool CanJumpLeft();
+		bool CanJumpRight();
+		bool CanRunJumpForward();
+		bool CanSlideJumpForward();
+		bool CanCrawlspaceDive();
 
 		// Vault movement
 		// Crawl vault movement
 		// Water tread climb out movement
-		// Miscellaneous movement
 
 	private:
-		bool TestGroundMovementSetup(ContextSetupGroundMovement contextSetup, bool useCrawlSetup = false);
-		bool TestMonkeyMovementSetup(ContextSetupMonkeyMovement contextSetup);
+		// Helper inquirers
+		bool TestSidestep(bool goingRight);
+		bool TestMonkeyShimmy(bool goingRight);
+		bool TestDirectionalStandingJump(float angle);
+
+		// Setup inquirers
+		bool TestGroundMovementSetup(Context::SetupGroundMovement contextSetup, bool useCrawlSetup = false);
+		bool TestMonkeyMovementSetup(Context::SetupMonkeyMovement contextSetup);
+		bool TestJumpMovementSetup(Context::SetupJump testSetup);
 	};
 }

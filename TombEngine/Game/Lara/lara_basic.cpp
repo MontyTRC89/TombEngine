@@ -1,6 +1,7 @@
 #include "framework.h"
 #include "Game/Lara/lara_basic.h"
 
+#include "Flow/ScriptInterfaceFlowHandler.h"
 #include "Game/animation.h"
 #include "Game/camera.h"
 #include "Game/collision/collide_room.h"
@@ -17,7 +18,6 @@
 #include "Specific/input.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
-#include "Flow/ScriptInterfaceFlowHandler.h"
 
 using namespace TEN::Input;
 
@@ -140,9 +140,12 @@ void lara_as_walk_forward(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	// TODO: Implement item alignment properly someday. @Sezz 2021.11.01
+	// TODO: Implement item alignment properly someday. -- Sezz 2021.11.01
 	if (lara->Control.IsMoving)
+	{
+		ModulateLaraTurnRateY(item, 0, 0, 0);
 		return;
+	}
 
 	if (TrInput & (IN_LEFT | IN_RIGHT))
 	{
@@ -256,7 +259,7 @@ void lara_as_run_forward(ItemInfo* item, CollisionInfo* coll)
 	if (TrInput & IN_JUMP || lara->Control.RunJumpQueued)
 	{
 		if (!(TrInput & IN_SPRINT) && lara->Control.Count.Run >= LARA_RUN_JUMP_TIME &&
-			TestLaraRunJumpForward(item, coll))
+			lara->Context.CanRunJumpForward())
 		{
 			item->Animation.TargetState = LS_JUMP_FORWARD;
 			return;
@@ -411,7 +414,7 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 			(TrInput & IN_RIGHT &&
 				!(TrInput & IN_RSTEP || (TrInput & IN_WALK && TrInput & IN_RIGHT))))
 		{
-			ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_SLOW_TURN_RATE_MAX);
+			ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_SLOW_MED_TURN_RATE_MAX);
 		}
 	}
 
@@ -425,14 +428,8 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 	}
 
 	if ((TrInput & IN_ROLL || (TrInput & IN_FORWARD && TrInput & IN_BACK)) &&
-		TestLaraRoll180(item, coll))
+		lara->Control.WaterStatus != WaterStatus::Wade)
 	{
-		// TODO: Safe 180 turn.
-		/*if (TrInput & IN_WALK || lara->Control.WaterStatus == WaterStatus::Wade)
-			item->Animation.TargetState = LS_TURN_180;
-		else if (TestLaraRoll180(item, coll))
-			item->Animation.TargetState = LS_ROLL_FORWARD;*/
-
 		item->Animation.TargetState = LS_ROLL_FORWARD;
 		return;
 	}
@@ -445,93 +442,62 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 
 	if (TrInput & IN_FORWARD)
 	{
-		auto vaultResult = TestLaraVault(item, coll);
-
-		if (TrInput & IN_ACTION && vaultResult.Success)
+		auto vaultContext = TestLaraVault(item, coll);
+		if (TrInput & IN_ACTION && vaultContext.Success)
 		{
-			item->Animation.TargetState = vaultResult.TargetState;
-			SetLaraVault(item, coll, vaultResult);
+			item->Animation.TargetState = vaultContext.TargetState;
+			SetLaraVault(item, coll, vaultContext);
 			return;
 		}
-		
-		if (lara->Control.WaterStatus == WaterStatus::Wade)
+
+		if (lara->Context.CanWadeForward())
 		{
-			if (isSwamp)
+			item->Animation.TargetState = LS_WADE_FORWARD;
+			return;
+		}
+		else if (TrInput & IN_WALK)
+		{
+			if (lara->Context.CanWalkForward())
 			{
-				if (lara->Context.CanWadeForwardSwamp())
-				{
-					item->Animation.TargetState = LS_WADE_FORWARD;
-					return;
-				}
-			}
-			else if (lara->Context.CanRunForward())
-			{
-				item->Animation.TargetState = LS_WADE_FORWARD;
+				item->Animation.TargetState = LS_WALK_FORWARD;
 				return;
 			}
 		}
-		else USE_FEATURE_IF_CPP20([[likely]])
+		else if (lara->Context.CanRunForward())
 		{
-			if (TrInput & IN_WALK)
-			{
-				if (lara->Context.CanWalkForward())
-				{
-					item->Animation.TargetState = LS_WALK_FORWARD;
-					return;
-				}
-			}
-			else if (lara->Context.CanRunForward()) USE_FEATURE_IF_CPP20([[likely]])
-			{
-				if (TrInput & IN_SPRINT)
-					item->Animation.TargetState = LS_RUN_FORWARD;
-				else
-					item->Animation.TargetState = LS_SPRINT;
+			if (TrInput & IN_SPRINT)
+				item->Animation.TargetState = LS_SPRINT;
+			else
+				item->Animation.TargetState = LS_RUN_FORWARD;
 
-				return;
-			}
+			return;
 		}
 	}
 	else if (TrInput & IN_BACK)
 	{
-		if (lara->Control.WaterStatus == WaterStatus::Wade)
+		if (lara->Context.CanWadeBackward())
 		{
-			if (isSwamp)
-			{
-				if (lara->Context.CanWalkBackSwamp())
-				{
-					item->Animation.TargetState = LS_WALK_BACK;
-					return;
-				}
-			}
-			else if (lara->Context.CanWalkBack())
+			item->Animation.TargetState = LS_WALK_BACK;
+			return;
+		}
+		else if (TrInput & IN_WALK)
+		{
+			if (lara->Context.CanWalkBackward())
 			{
 				item->Animation.TargetState = LS_WALK_BACK;
 				return;
 			}
 		}
-		else USE_FEATURE_IF_CPP20([[likely]])
+		else if (lara->Context.CanRunBackward())
 		{
-			if (TrInput & IN_WALK)
-			{
-				if (lara->Context.CanWalkBack())
-				{
-					item->Animation.TargetState = LS_WALK_BACK;
-					return;
-				}
-			}
-			else if (lara->Context.CanRunBack()) USE_FEATURE_IF_CPP20([[likely]])
-			{
-				item->Animation.TargetState = LS_RUN_BACK;
-				return;
-			}
+			item->Animation.TargetState = LS_RUN_BACK;
+			return;
 		}
 	}
 
 	if (TrInput & IN_LSTEP || (TrInput & IN_WALK && TrInput & IN_LEFT))
 	{
-		if (isSwamp && lara->Control.WaterStatus == WaterStatus::Wade && lara->Context.CanSidestepLeftSwamp())
-			item->Animation.TargetState = LS_STEP_LEFT;
-		else if (lara->Context.CanSidestepLeft())
+		if (lara->Context.CanSidestepLeft())
 			item->Animation.TargetState = LS_STEP_LEFT;
 		else
 			item->Animation.TargetState = LS_IDLE;
@@ -540,9 +506,7 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 	}
 	else if (TrInput & IN_RSTEP || (TrInput & IN_WALK && TrInput & IN_RIGHT))
 	{
-		if (isSwamp && lara->Control.WaterStatus == WaterStatus::Wade && lara->Context.CanSidestepRightSwamp())
-			item->Animation.TargetState = LS_STEP_RIGHT;
-		else if (lara->Context.CanSidestepRight())
+		if (lara->Context.CanSidestepRight())
 			item->Animation.TargetState = LS_STEP_RIGHT;
 		else
 			item->Animation.TargetState = LS_IDLE;
@@ -577,9 +541,8 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	// TODO: Without animation blending, the AFK state's
-	// movement lock will be rather obnoxious.
-	// Adding some idle breathing would also be nice. @Sezz 2021.10.31
+	// TODO: Without animation blending, the AFK state's movement lock will be rather obnoxious.
+	// TODO: Add idle breathing motion. -- Sezz 2021.10.31
 	if (lara->Control.Count.Pose >= LARA_POSE_TIME && TestLaraPose(item, coll))
 	{
 		item->Animation.TargetState = LS_POSE;
@@ -608,7 +571,7 @@ void lara_col_idle(ItemInfo* item, CollisionInfo* coll)
 	coll->Setup.ForwardAngle = lara->Control.MoveAngle;
 	GetCollisionInfo(coll, item);
 
-	// TODO: Better clamp handling. This can result in Lara standing above or below the floor. @Sezz 2022.04.01
+	// TODO: Better clamp handling. This can result in Lara standing above or below the floor. -- Sezz 2022.04.01
 	/*if (TestLaraHitCeiling(coll))
 	{
 		SetLaraHitCeiling(item, coll);
@@ -775,14 +738,8 @@ void lara_as_turn_slow(ItemInfo* item, CollisionInfo* coll)
 	}
 
 	if ((TrInput & IN_ROLL || (TrInput & IN_FORWARD && TrInput & IN_BACK)) &&
-		TestLaraRoll180(item, coll))
+		lara->Control.WaterStatus != WaterStatus::Wade)
 	{
-		// TODO: Safe 180 turn.
-		/*if (TrInput & IN_WALK || lara->Control.WaterStatus == WaterStatus::Wade)
-			item->Animation.TargetState = LS_TURN_180;
-		else if (TestLaraRoll180(item, coll))
-			item->Animation.TargetState = LS_ROLL_FORWARD;*/
-
 		item->Animation.TargetState = LS_ROLL_FORWARD;
 		return;
 	}
@@ -795,81 +752,56 @@ void lara_as_turn_slow(ItemInfo* item, CollisionInfo* coll)
 
 	if (TrInput & IN_FORWARD)
 	{
-		auto vaultResult = TestLaraVault(item, coll);
-
-		if (TrInput & IN_ACTION && vaultResult.Success)
+		auto vaultContext = TestLaraVault(item, coll);
+		if (TrInput & IN_ACTION && vaultContext.Success)
 		{
-			item->Animation.TargetState = vaultResult.TargetState;
-			SetLaraVault(item, coll, vaultResult);
+			item->Animation.TargetState = vaultContext.TargetState;
+			SetLaraVault(item, coll, vaultContext);
 			return;
 		}
-		
-		if (lara->Control.WaterStatus == WaterStatus::Wade)
+
+		if (lara->Context.CanWadeForward())
 		{
-			if (isSwamp)
+			item->Animation.TargetState = LS_WADE_FORWARD;
+			return;
+		}
+		else if (TrInput & IN_WALK)
+		{
+			if (lara->Context.CanWalkForward())
 			{
-				if (lara->Context.CanWadeForwardSwamp())
-				{
-					item->Animation.TargetState = LS_WADE_FORWARD;
-					return;
-				}
-			}
-			else if (lara->Context.CanRunForward())
-			{
-				item->Animation.TargetState = LS_WADE_FORWARD;
+				item->Animation.TargetState = LS_WALK_FORWARD;
 				return;
 			}
 		}
-		else USE_FEATURE_IF_CPP20([[likely]])
+		else if (lara->Context.CanRunForward())
 		{
-			if (TrInput & IN_WALK)
-			{
-				if (lara->Context.CanWalkForward())
-				{
-					item->Animation.TargetState = LS_WALK_FORWARD;
-					return;
-				}
-			}
-			else if (lara->Context.CanRunForward()) USE_FEATURE_IF_CPP20([[likely]])
-			{
-				if (TrInput & IN_SPRINT)
-					item->Animation.TargetState = LS_RUN_FORWARD;
-				else
-					item->Animation.TargetState = LS_SPRINT;
+			if (TrInput & IN_SPRINT)
+				item->Animation.TargetState = LS_SPRINT;
+			else
+				item->Animation.TargetState = LS_RUN_FORWARD;
 
-				return;
-			}
+			return;
 		}
 	}
 	else if (TrInput & IN_BACK)
 	{
-		if (lara->Control.WaterStatus == WaterStatus::Wade)
+		if (lara->Context.CanWadeBackward())
 		{
-			if (isSwamp)
-			{
-				if (lara->Context.CanWalkBackSwamp())
-					item->Animation.TargetState = LS_WALK_BACK;
-			}
-			else if (lara->Context.CanWalkBack())
-				item->Animation.TargetState = LS_WALK_BACK;
-
+			item->Animation.TargetState = LS_WALK_BACK;
 			return;
 		}
-		else
+		else if (TrInput & IN_WALK)
 		{
-			if (TrInput & IN_WALK)
+			if (lara->Context.CanWalkBackward())
 			{
-				if (lara->Context.CanWalkBack())
-				{
-					item->Animation.TargetState = LS_WALK_BACK;
-					return;
-				}
-			}
-			else if (lara->Context.CanRunBack()) USE_FEATURE_IF_CPP20([[likely]] )
-			{
-				item->Animation.TargetState = LS_RUN_BACK;
+				item->Animation.TargetState = LS_WALK_BACK;
 				return;
 			}
+		}
+		else if (lara->Context.CanRunBackward())
+		{
+			item->Animation.TargetState = LS_RUN_BACK;
+			return;
 		}
 	}
 
@@ -937,12 +869,12 @@ void lara_col_turn_slow(ItemInfo* item, CollisionInfo* coll)
 void lara_as_death(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
+	auto* bounds = GetBoundsAccurate(item);
 
+	item->Animation.Velocity.z = 0.0f;
 	lara->Control.CanLook = false;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
-
-	ModulateLaraTurnRateY(item, 0, 0, 0);
 
 	if (BinocularRange)
 	{
@@ -952,6 +884,11 @@ void lara_as_death(ItemInfo* item, CollisionInfo* coll)
 		item->MeshBits = ALL_JOINT_BITS;
 		lara->Inventory.IsBusy = false;
 	}
+
+	if (bounds->Height() <= (LARA_HEIGHT * 0.75f))
+		AlignLaraToSurface(item);
+
+	ModulateLaraTurnRateY(item, 0, 0, 0);
 }
 
 // State:		LS_DEATH (8)
@@ -1033,7 +970,10 @@ void lara_as_walk_back(ItemInfo* item, CollisionInfo* coll)
 	}
 
 	if (lara->Control.IsMoving)
+	{
+		ModulateLaraTurnRateY(item, 0, 0, 0);
 		return;
+	}
 
 	if (TrInput & (IN_LEFT | IN_RIGHT))
 	{
@@ -1132,7 +1072,7 @@ void lara_as_turn_fast(ItemInfo* item, CollisionInfo* coll)
 	}
 
 	if ((TrInput & IN_ROLL || (TrInput & IN_FORWARD && TrInput & IN_BACK)) &&
-		TestLaraRoll180(item, coll))
+		lara->Control.WaterStatus != WaterStatus::Wade)
 	{
 		item->Animation.TargetState = LS_ROLL_FORWARD;
 		return;
@@ -1146,12 +1086,17 @@ void lara_as_turn_fast(ItemInfo* item, CollisionInfo* coll)
 
 	if (TrInput & IN_FORWARD)
 	{
-		auto vaultResult = TestLaraVault(item, coll);
-
-		if (TrInput & IN_ACTION && vaultResult.Success)
+		auto vaultContext = TestLaraVault(item, coll);
+		if (TrInput & IN_ACTION && vaultContext.Success)
 		{
-			item->Animation.TargetState = vaultResult.TargetState;
-			SetLaraVault(item, coll, vaultResult);
+			item->Animation.TargetState = vaultContext.TargetState;
+			SetLaraVault(item, coll, vaultContext);
+			return;
+		}
+
+		if (lara->Context.CanWadeForward())
+		{
+			item->Animation.TargetState = LS_WADE_FORWARD;
 			return;
 		}
 		else if (TrInput & IN_WALK)
@@ -1162,27 +1107,32 @@ void lara_as_turn_fast(ItemInfo* item, CollisionInfo* coll)
 				return;
 			}
 		}
-		else if (lara->Context.CanRunForward()) USE_FEATURE_IF_CPP20([[likely]])
+		else if (lara->Context.CanRunForward())
 		{
 			if (TrInput & IN_SPRINT)
-				item->Animation.TargetState = LS_RUN_FORWARD;
-			else
 				item->Animation.TargetState = LS_SPRINT;
+			else
+				item->Animation.TargetState = LS_RUN_FORWARD;
 
 			return;
 		}
 	}
 	else if (TrInput & IN_BACK)
 	{
-		if (TrInput & IN_WALK)
+		if (lara->Context.CanWadeBackward())
 		{
-			if (lara->Context.CanWalkBack())
+			item->Animation.TargetState = LS_WALK_BACK;
+			return;
+		}
+		else if (TrInput & IN_WALK)
+		{
+			if (lara->Context.CanWalkBackward())
 			{
 				item->Animation.TargetState = LS_WALK_BACK;
 				return;
 			}
 		}
-		else if (lara->Context.CanRunBack()) USE_FEATURE_IF_CPP20([[likely]])
+		else if (lara->Context.CanRunBackward())
 		{
 			item->Animation.TargetState = LS_RUN_BACK;
 			return;
@@ -1240,7 +1190,10 @@ void lara_as_step_right(ItemInfo* item, CollisionInfo* coll)
 	}
 
 	if (lara->Control.IsMoving)
+	{
+		ModulateLaraTurnRateY(item, 0, 0, 0);
 		return;
+	}
 
 	if (TrInput & IN_WALK) // WALK locks orientation.
 		ModulateLaraTurnRateY(item, 0, 0, 0);
@@ -1331,7 +1284,10 @@ void lara_as_step_left(ItemInfo* item, CollisionInfo* coll)
 	}
 
 	if (lara->Control.IsMoving)
+	{
+		ModulateLaraTurnRateY(item, 0, 0, 0);
 		return;
+	}
 
 	if (TrInput & IN_WALK) // WALK locks orientation.
 		ModulateLaraTurnRateY(item, 0, 0, 0);
@@ -1667,7 +1623,7 @@ void lara_as_sprint(ItemInfo* item, CollisionInfo* coll)
 			return;
 		}
 		else if (TrInput & IN_SPRINT && lara->Control.Count.Run >= LARA_SPRINT_JUMP_TIME &&
-			TestLaraRunJumpForward(item, coll) && HasStateDispatch(item, LS_JUMP_FORWARD))
+			lara->Context.CanRunJumpForward() && HasStateDispatch(item, LS_JUMP_FORWARD))
 		{
 			item->Animation.TargetState = LS_JUMP_FORWARD;
 			return;

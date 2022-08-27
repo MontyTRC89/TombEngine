@@ -1,29 +1,32 @@
 #include "framework.h"
-#include "tr4_small_scorpion.h"
+#include "Objects/TR4/Entity/tr4_small_scorpion.h"
+
 #include "Game/control/box.h"
-#include "Game/items.h"
+#include "Game/control/control.h"
 #include "Game/effects/effects.h"
-#include "Specific/setup.h"
-#include "Specific/level.h"
+#include "Game/itemdata/creature_info.h"
+#include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Game/misc.h"
-#include "Game/itemdata/creature_info.h"
-#include "Game/control/control.h"
+#include "Specific/level.h"
+#include "Specific/prng.h"
+#include "Specific/setup.h"
 
+using namespace TEN::Math::Random;
 using std::vector;
 
 namespace TEN::Entities::TR4
 {
-	BITE_INFO SmallScorpionBiteInfo1 = { 0, 0, 0, 0 };
-	BITE_INFO SmallScorpionBiteInfo2 = { 0, 0, 0, 23 };
-	const vector<int> SmallScorpionAttackJoints = { 8, 22, 23, 25, 26 };
-
-	constexpr auto SMALL_SCORPION_PINCER_ATTACK_DAMAGE = 50;
-	constexpr auto SMALL_SCORPION_STINGER_ATTACK_DAMAGE = 20;
+	constexpr auto SMALL_SCORPION_PINCER_ATTACK_DAMAGE	 = 50;
+	constexpr auto SMALL_SCORPION_STINGER_ATTACK_DAMAGE	 = 20;
 	constexpr auto SMALL_SCORPION_STINGER_POISON_POTENCY = 2;
 
-	constexpr auto SMALL_SCORPION_ATTACK_RANGE = SECTOR(0.31);
+	constexpr auto SMALL_SCORPION_ATTACK_RANGE = SQUARE(SECTOR(0.31));
+
+	const auto SmallScorpionBite1 = BiteInfo(Vector3::Zero, 0);
+	const auto SmallScorpionBite2 = BiteInfo(Vector3::Zero, 23);
+	const vector<int> SmallScorpionAttackJoints = { 8, 22, 23, 25, 26 };
 
 	enum SmallScorionState
 	{
@@ -54,7 +57,7 @@ namespace TEN::Entities::TR4
 		auto* item = &g_Level.Items[itemNumber];
 
 		ClearItem(itemNumber);
-
+		
 		item->Animation.AnimNumber = Objects[ID_SMALL_SCORPION].animIndex + SSCORPION_ANIM_IDLE;
 		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 		item->Animation.TargetState = SSCORPION_STATE_IDLE;
@@ -91,7 +94,6 @@ namespace TEN::Entities::TR4
 		}
 		else
 		{
-
 			if (item->AIBits & GUARD)
 				GetAITarget(creature);
 			else
@@ -100,8 +102,8 @@ namespace TEN::Entities::TR4
 			AI_INFO AI;
 			CreatureAIInfo(item, &AI);
 
-			GetCreatureMood(item, &AI, VIOLENT);
-			CreatureMood(item, &AI, VIOLENT);
+			GetCreatureMood(item, &AI, true);
+			CreatureMood(item, &AI, true);
 
 			angle = CreatureTurn(item, creature->MaxTurn);
 
@@ -111,12 +113,12 @@ namespace TEN::Entities::TR4
 				creature->MaxTurn = 0;
 				creature->Flags = 0;
 
-				if (AI.distance > pow(SMALL_SCORPION_ATTACK_RANGE, 2))
+				if (AI.distance > SMALL_SCORPION_ATTACK_RANGE)
 					item->Animation.TargetState = SSCORPION_STATE_WALK;
 				else if (AI.bite)
 				{
 					creature->MaxTurn = Angle::DegToRad(6.0f);
-					if (GetRandomControl() & 1)
+					if (TestProbability(0.5f))
 						item->Animation.TargetState = SSCORPION_STATE_ATTACK_1;
 					else
 						item->Animation.TargetState = SSCORPION_STATE_ATTACK_2;
@@ -129,20 +131,18 @@ namespace TEN::Entities::TR4
 			case SSCORPION_STATE_WALK:
 				creature->MaxTurn = Angle::DegToRad(6.0f);
 
-					if (AI.distance >= pow(SMALL_SCORPION_ATTACK_RANGE, 2))
-					{
-							item->Animation.TargetState = SSCORPION_STATE_RUN;
-					}
-					else
-						item->Animation.TargetState = SSCORPION_STATE_IDLE;
+				if (AI.distance >= SMALL_SCORPION_ATTACK_RANGE)
+						item->Animation.TargetState = SSCORPION_STATE_RUN;
+				else
+					item->Animation.TargetState = SSCORPION_STATE_IDLE;
 
 					break;
 
 			case SSCORPION_STATE_RUN:
 				creature->MaxTurn = Angle::DegToRad(8.0f);
 
-					if (AI.distance < pow(SMALL_SCORPION_ATTACK_RANGE, 2))
-						item->Animation.TargetState = SSCORPION_STATE_IDLE;
+				if (AI.distance < SMALL_SCORPION_ATTACK_RANGE)
+					item->Animation.TargetState = SSCORPION_STATE_IDLE;
 
 					break;
 
@@ -168,16 +168,16 @@ namespace TEN::Entities::TR4
 							item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].frameBase + 32)
 						{
 							short rotation;
-							BITE_INFO* biteInfo;
+							BiteInfo biteInfo;
 
 							// Pincer attack
 							if (item->Animation.ActiveState == SSCORPION_STATE_ATTACK_1)
 							{
 								DoDamage(creature->Enemy, SMALL_SCORPION_PINCER_ATTACK_DAMAGE);
 								rotation = item->Pose.Orientation.y - Angle::DegToRad(180.0f);
-								biteInfo = &SmallScorpionBiteInfo1;
+								biteInfo = SmallScorpionBite1;
 							}
-							// Tail attack
+							// Stinger attack
 							else
 							{
 								if (creature->Enemy->IsLara())
@@ -185,7 +185,7 @@ namespace TEN::Entities::TR4
 
 								DoDamage(creature->Enemy, SMALL_SCORPION_STINGER_ATTACK_DAMAGE);
 								rotation = item->Pose.Orientation.y - Angle::DegToRad(180.0f);
-								biteInfo = &SmallScorpionBiteInfo2;
+								biteInfo = SmallScorpionBite2;
 							}
 
 							CreatureEffect2(item, biteInfo, 3, rotation, DoBloodSplat);

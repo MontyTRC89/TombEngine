@@ -17,6 +17,13 @@
 		this->z = z;
 	}
 
+	Vector3Int::Vector3Int(Vector3 vector)
+	{
+		this->x = (int)round(vector.x);
+		this->y = (int)round(vector.y);
+		this->z = (int)round(vector.z);
+	}
+
 	float Vector3Int::Distance(Vector3Int origin, Vector3Int target)
 	{
 		return Vector3::Distance(origin.ToVector3(), target.ToVector3());

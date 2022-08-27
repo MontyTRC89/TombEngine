@@ -54,12 +54,9 @@ struct AI_OBJECT
 {
 	GAME_OBJECT_ID objectNumber;
 	short roomNumber;
-	int x;
-	int y;
-	int z;
+	PHD_3DPOS pos;
 	short triggerFlags;
 	short flags;
-	float yRot;
 	int boxNumber;
 	std::string luaName;
 };

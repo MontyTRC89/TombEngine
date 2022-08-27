@@ -4,20 +4,22 @@
 #include "Game/animation.h"
 #include "Game/collision/collide_item.h"
 #include "Game/collision/collide_room.h"
+#include "Game/effects/tomb4fx.h"
 #include "Game/effects/effects.h"
+#include "Game/effects/explosion.h"
+#include "Game/effects/bubble.h"
 #include "Game/Lara/lara.h"
 #include "Game/items.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-#define SHARD_DAMAGE 30
-#define ROCKET_DAMAGE 100
-#define DIVER_HARPOON_DAMAGE 50
+using namespace TEN::Effects::Explosion;
 
-#define SHARD_VELOCITY     250
-#define ROCKET_VELOCITY    220
-#define NATLA_GUN_VELOCITY 400
+#define MUTANT_SHARD_DAMAGE 30
+#define MUTANT_BOMB_DAMAGE 100
+#define DIVER_HARPOON_DAMAGE 50
+#define KNIFE_DAMAGE 50
 
 void ShootAtLara(FX_INFO *fx)
 {
@@ -33,91 +35,97 @@ void ShootAtLara(FX_INFO *fx)
 	fx->pos.Orientation.y = atan2(z, x);
 
 	// Random scatter (only a little bit else it's too hard to avoid).
-	fx->pos.Orientation.x += Angle::ShrtToRad((GetRandomControl() - 0x4000) / 0x40);
-	fx->pos.Orientation.y += Angle::ShrtToRad((GetRandomControl() - 0x4000) / 0x40);
+	fx->pos.Orientation.x += (GetRandomControl() - Angle::DegToRad(90.0f)) / 64;
+	fx->pos.Orientation.y += (GetRandomControl() - Angle::DegToRad(90.0f)) / 64;
 }
 
 void ControlMissile(short fxNumber)
 {
-	auto* fx = &EffectList[fxNumber];
+	auto* fx = &EffectList[fxNumber]; // TODO: add fx->target (ItemInfo* target) to get the actual target (if it was really it)
+	auto isUnderwater = TestEnvironment(ENV_FLAG_WATER, fx->roomNumber);
+	auto soundFxType = isUnderwater ? SoundEnvironment::Water : SoundEnvironment::Land;
 
-	if (fx->objectNumber == ID_SCUBA_HARPOON && !TestEnvironment(ENV_FLAG_WATER, fx->roomNumber) && fx->pos.Orientation.x > Angle::DegToRad(-6.75f))
+	if (fx->objectNumber == ID_SCUBA_HARPOON && isUnderwater &&
+		fx->pos.Orientation.x > Angle::DegToRad(-67.5f))
 	{
 		fx->pos.Orientation.x -= Angle::DegToRad(1.0f);
 	}
 
-	fx->pos.Position.y += fx->speed * sin(-fx->pos.Orientation.x);
 	int velocity = fx->speed * cos(fx->pos.Orientation.x);
 	fx->pos.Position.z += velocity * cos(fx->pos.Orientation.y);
+	fx->pos.Position.y += fx->speed * sin(-fx->pos.Orientation.x);
 	fx->pos.Position.x += velocity * sin(fx->pos.Orientation.y);
 
 	auto probe = GetCollision(fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z, fx->roomNumber);
+	auto hitLara = ItemNearLara(&fx->pos, 200);
 
 	// Check for hitting something.
 	if (fx->pos.Position.y >= probe.Position.Floor ||
-		fx->pos.Position.y <= probe.Position.Ceiling)
+		fx->pos.Position.y <= probe.Position.Ceiling ||
+		hitLara)
 	{
-		if (/*fx->objectNumber == KNIFE ||*/ fx->objectNumber == ID_SCUBA_HARPOON)
+		if (fx->objectNumber == ID_KNIFETHROWER_KNIFE ||
+			fx->objectNumber == ID_SCUBA_HARPOON ||
+			fx->objectNumber == ID_PROJ_SHARD)
 		{
-			// Change shard into ricochet.
-			//			fx->speed = 0;
-			//			fx->frameNumber = -GetRandomControl()/11000;
-			//			fx->counter = 6;
-			//			fx->objectNumber = RICOCHET1;
-			SoundEffect((fx->objectNumber == ID_SCUBA_HARPOON) ? SFX_TR4_WEAPON_RICOCHET : SFX_TR2_CIRCLE_BLADE_HIT, &fx->pos);
+			SoundEffect((fx->objectNumber == ID_SCUBA_HARPOON) ? SFX_TR4_WEAPON_RICOCHET : SFX_TR2_CIRCLE_BLADE_HIT, &fx->pos, soundFxType);
 		}
-		/*else if (fx->objectNumber == DRAGON_FIRE)
+		else if (fx->objectNumber == ID_PROJ_BOMB)
 		{
-			AddDynamicLight(fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z, 14, 11);
-			KillEffect(fx_number);
-		}*/
-		return;
+			SoundEffect(SFX_TR1_ATLANTEAN_EXPLODE, &fx->pos, soundFxType);
+			TriggerExplosionSparks(fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z, NULL, false, isUnderwater, fx->roomNumber);
+		}
+
+		if (hitLara)
+		{
+			if (fx->objectNumber == ID_KNIFETHROWER_KNIFE)
+			{
+				DoDamage(LaraItem, KNIFE_DAMAGE); // TODO: Make ControlMissile() not use LaraItem global. -- TokyoSU, 5/8/2022
+				KillEffect(fxNumber);
+			}
+			else if (fx->objectNumber == ID_SCUBA_HARPOON)
+			{
+				DoDamage(LaraItem, DIVER_HARPOON_DAMAGE); // TODO: Make ControlMissile() not use LaraItem global. -- TokyoSU, 5/8/2022
+				KillEffect(fxNumber);
+			}
+			else if (fx->objectNumber == ID_PROJ_BOMB)
+			{
+				DoDamage(LaraItem, MUTANT_BOMB_DAMAGE); // TODO: Make ControlMissile() not use LaraItem global. -- TokyoSU, 5/8/2022
+				KillEffect(fxNumber);
+			}
+			else if (fx->objectNumber == ID_PROJ_SHARD)
+			{
+				TriggerBlood(fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z, NULL, 10);
+				SoundEffect(SFX_TR4_BLOOD_LOOP, &fx->pos, soundFxType);
+				DoDamage(LaraItem, MUTANT_SHARD_DAMAGE);
+				KillEffect(fxNumber);
+			}
+
+			LaraItem->HitStatus = 1; // TODO: Make ControlMissile() not use LaraItem global. -- TokyoSU, 5/8/2022
+			fx->pos.Orientation.y = LaraItem->Pose.Orientation.y;
+			fx->speed = LaraItem->Animation.Velocity.z;
+			fx->frameNumber = fx->counter = 0;
+		}
 	}
 
 	if (probe.RoomNumber != fx->roomNumber)
 		EffectNewRoom(fxNumber, probe.RoomNumber);
 
-	// Check for hitting Lara.
-	/*if (fx->objectNumber == DRAGON_FIRE)
-	{
-		if (ItemNearLara(&fx->pos, 350))
-		{
-			DoDamage(LaraItem, 3);
-			LaraBurn(LaraItem);
-			return;
-		}
-	}*/
-	else if (ItemNearLara(&fx->pos, 200))
-	{
-		/*if (fx->objectNumber == KNIFE)
-		{
-			DoDamage(LaraItem, KNIFE_DAMAGE);
-			KillEffect(fx_number);
-		}
-		else*/ if (fx->objectNumber == ID_SCUBA_HARPOON)
-		{
-			DoDamage(LaraItem, DIVER_HARPOON_DAMAGE);
-			KillEffect(fxNumber);
-		}
+	if (fx->objectNumber == ID_KNIFETHROWER_KNIFE)
+		fx->pos.Orientation.z += Angle::DegToRad(3.0f); // update knife rotation overtime
 
-		LaraItem->HitStatus = 1;
 
-		fx->pos.Orientation.y = LaraItem->Pose.Orientation.y;
-		fx->speed = LaraItem->Animation.Velocity.z;
-		fx->frameNumber = fx->counter = 0;
+	switch (fx->objectNumber)
+	{
+	case ID_SCUBA_HARPOON:
+		if (TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, fx->roomNumber))
+			CreateBubble(&fx->pos.Position, fx->roomNumber, 1, 0, 0, 0, 0, 0);
+		break;
+
+	case ID_PROJ_BOMB:
+		TriggerDynamicLight(fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z, 14, 180, 100, 0);
+		break;
 	}
-
-	// Create bubbles in wake of harpoon bolt.
-	//if (fx->objectNumber == ID_SCUBA_HARPOON && g_Level.Rooms[fx->roomNumber].flags & 1)
-	//	CreateBubble(&fx->pos, fx->roomNumber, 1, 0);
-	/*else if (fx->objectNumber == DRAGON_FIRE && !fx->counter--)
-	{
-		AddDynamicLight(fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z, 14, 11);
-		SoundEffect(305, &fx->pos);
-		KillEffect(fx_number);
-	}
-	else if (fx->objectNumber == KNIFE)
-		fx->pos.Orientation.z = .Orientation.z + 30 * ONE_DEGREE;*/
 }
 
 void ControlNatlaGun(short fxNumber)
@@ -174,7 +182,7 @@ short ShardGun(int x, int y, int z, short velocity, short yRot, short roomNumber
 		fx->pos.Position.z = z;
 		fx->roomNumber = roomNumber;
 		fx->pos.Orientation = EulerAngles(0.0f, yRot, 0.0f);
-		fx->speed = SHARD_VELOCITY;
+		fx->speed = velocity;
 		fx->frameNumber = 0;
 		fx->objectNumber = ID_PROJ_SHARD;
 		fx->color = Vector4::One;
@@ -196,7 +204,7 @@ short BombGun(int x, int y, int z, short velocity, short yRot, short roomNumber)
 		fx->pos.Position.z = z;
 		fx->roomNumber = roomNumber;
 		fx->pos.Orientation = EulerAngles(0.0f, yRot, 0.0f);
-		fx->speed = ROCKET_VELOCITY;
+		fx->speed = velocity;
 		fx->frameNumber = 0;
 		fx->objectNumber = ID_PROJ_BOMB;
 		fx->color = Vector4::One;
@@ -218,7 +226,7 @@ short NatlaGun(int x, int y, int z, short velocity, short yRot, short roomNumber
 		fx->pos.Position.z = z;
 		fx->roomNumber = roomNumber;
 		fx->pos.Orientation = EulerAngles(0.0f, yRot, 0.0f);
-		fx->speed = NATLA_GUN_VELOCITY;
+		fx->speed = velocity;
 		fx->frameNumber = 0;
 		fx->objectNumber = ID_PROJ_NATLA;
 		fx->color = Vector4::One;

@@ -35,7 +35,7 @@ using std::vector;
 
 namespace TEN::Entities::Vehicles
 {
-	BITE_INFO UPVBites[6] =
+	BiteInfo UPVBites[6] =
 	{
 		{ 0, 0, 0, 3 },
 		{ 0, 96, 256, 0 },
@@ -334,7 +334,7 @@ namespace TEN::Entities::Vehicles
 
 			if (UPV->Velocity)
 			{
-				pos = Vector3Int(UPVBites[UPV_BITE_TURBINE].x, UPVBites[UPV_BITE_TURBINE].y, UPVBites[UPV_BITE_TURBINE].z);
+				pos = Vector3Int(UPVBites[UPV_BITE_TURBINE].Position);
 				GetJointAbsPosition(UPVItem, &pos, UPVBites[UPV_BITE_TURBINE].meshNum);
 
 				TriggerUPVMist(pos.x, pos.y + UPV_SHIFT, pos.z, abs(UPV->Velocity) / VEHICLE_VELOCITY_SCALE, UPVItem->Pose.Orientation.y + Angle::DegToRad(180.0f));
@@ -356,7 +356,8 @@ namespace TEN::Entities::Vehicles
 		for (int lp = 0; lp < 2; lp++)
 		{
 			int random = 31 - (GetRandomControl() & 3);
-			pos = Vector3Int(UPVBites[UPV_BITE_FRONT_LIGHT].x, UPVBites[UPV_BITE_FRONT_LIGHT].y, UPVBites[UPV_BITE_FRONT_LIGHT].z << (lp * 6));
+			pos = Vector3Int(UPVBites[UPV_BITE_FRONT_LIGHT].Position);
+			pos.z <<= (lp * 6);
 			GetJointAbsPosition(UPVItem, &pos, UPVBites[UPV_BITE_FRONT_LIGHT].meshNum);
 
 			GameVector source;

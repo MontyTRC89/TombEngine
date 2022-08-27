@@ -1,13 +1,13 @@
 #include "framework.h"
 #include "Game/Lara/lara_helpers.h"
 
+#include "Flow/ScriptInterfaceFlowHandler.h"
 #include "Game/collision/collide_room.h"
 #include "Game/control/control.h"
 #include "Game/control/volume.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_collide.h"
-#include "Flow/ScriptInterfaceFlowHandler.h"
 #include "Game/Lara/lara_fire.h"
 #include "Game/Lara/lara_tests.h"
 #include "Renderer/Renderer11.h"
@@ -57,8 +57,11 @@ void HandleLaraMovementParameters(ItemInfo* item, CollisionInfo* coll)
 		lara->Control.RunJumpQueued = false;
 
 	// Reset lean.
-	if (!lara->Control.IsMoving || (lara->Control.IsMoving && !(TrInput & (IN_LEFT | IN_RIGHT))))
+	if ((!lara->Control.IsMoving || (lara->Control.IsMoving && !(TrInput & (IN_LEFT | IN_RIGHT)))) &&
+		(!lara->Control.IsLow && item->Animation.ActiveState != LS_DEATH)) // HACK: Don't interfere with surface alignment in crouch, crawl, and death states.
+	{
 		ResetLaraLean(item, 0.15f);
+	}
 
 	// Reset crawl flex.
 	if (!(TrInput & IN_LOOK) && coll->Setup.Height > LARA_HEIGHT - LARA_HEADROOM &&	// HACK
@@ -71,6 +74,8 @@ void HandleLaraMovementParameters(ItemInfo* item, CollisionInfo* coll)
 	item->Pose.Orientation.y += lara->Control.TurnRate.y;
 	if (!(TrInput & (IN_LEFT | IN_RIGHT)))
 		lara->Control.TurnRate.y = 0;
+
+	lara->Control.IsLow = false;
 }
 
 bool HandleLaraVehicle(ItemInfo* item, CollisionInfo* coll)
@@ -350,7 +355,7 @@ float GetLaraSlideDirection(ItemInfo* item, CollisionInfo* coll)
 	// Get either:
 	// a) the surface aspect angle (extended slides), or
 	// b) the derived nearest cardinal direction from it (original slides).
-	headingAngle = GetSurfaceAspectAngle(probe.FloorTilt.x, probe.FloorTilt.y);
+	headingAngle = GetSurfaceAspectAngle(probe.FloorTilt);
 	if (g_GameFlow->HasSlideExtended())
 		return headingAngle;
 	else
@@ -564,8 +569,8 @@ void ModulateLaraSlideVelocity(ItemInfo* item, CollisionInfo* coll)
 	{
 		auto probe = GetCollision(item);
 		float minSlideAngle = Angle::DegToRad(33.75f);
-		float steepness = GetSurfaceSteepnessAngle(probe.FloorTilt.x, probe.FloorTilt.y);
-		float direction = GetSurfaceAspectAngle(probe.FloorTilt.x, probe.FloorTilt.y);
+		float steepness = GetSurfaceSteepnessAngle(probe.FloorTilt);
+		float direction = GetSurfaceAspectAngle(probe.FloorTilt);
 
 		float velocityMultiplier = 1 / (float)Angle::DegToRad(33.75f);
 		int slideVelocity = std::min<int>(minVelocity + 10 * (steepness * velocityMultiplier), LARA_TERMINAL_VELOCITY);
@@ -580,31 +585,49 @@ void ModulateLaraSlideVelocity(ItemInfo* item, CollisionInfo* coll)
 		//lara->ExtraVelocity.x += minVelocity;
 }
 
-void SetLaraJumpDirection(ItemInfo* item, CollisionInfo* coll)
+void AlignLaraToSurface(ItemInfo* item, float alpha)
+{
+	auto surfaceTilt = GetCollision(item).FloorTilt;
+	float aspectAngle = GetSurfaceAspectAngle(surfaceTilt);
+	float steepnessAngle = std::min(GetSurfaceSteepnessAngle(surfaceTilt), Angle::DegToRad(70.0f));
+
+	float deltaAngle = Angle::GetShortestAngularDistance(item->Pose.Orientation.y, aspectAngle);
+	float sinDeltaAngle = sin(deltaAngle);
+	float cosDeltaAngle = cos(deltaAngle);
+
+	auto extraRot = EulerAngles(
+		-steepnessAngle * cosDeltaAngle,
+		0,
+		steepnessAngle * sinDeltaAngle
+	) - EulerAngles(item->Pose.Orientation.x, 0, item->Pose.Orientation.z);
+	item->Pose.Orientation += extraRot * alpha;
+}
+
+void SetLaraJumpDirection(ItemInfo* item, CollisionInfo* coll) 
 {
 	auto* lara = GetLaraInfo(item);
 
 	if (TrInput & IN_FORWARD &&
-		TestLaraJumpForward(item, coll))
+		lara->Context.CanJumpForward())
 	{
 		lara->Control.JumpDirection = JumpDirection::Forward;
 	}
 	else if (TrInput & IN_BACK &&
-		TestLaraJumpBack(item, coll))
+		lara->Context.CanJumpBackward())
 	{
 		lara->Control.JumpDirection = JumpDirection::Back;
 	}
 	else if (TrInput & IN_LEFT &&
-		TestLaraJumpLeft(item, coll))
+		lara->Context.CanJumpLeft())
 	{
 		lara->Control.JumpDirection = JumpDirection::Left;
 	}
 	else if (TrInput & IN_RIGHT &&
-		TestLaraJumpRight(item, coll))
+		lara->Context.CanJumpRight())
 	{
 		lara->Control.JumpDirection = JumpDirection::Right;
 	}
-	else if (TestLaraJumpUp(item, coll)) USE_FEATURE_IF_CPP20([[likely]])
+	else if (lara->Context.CanJumpUp()) USE_FEATURE_IF_CPP20([[likely]])
 		lara->Control.JumpDirection = JumpDirection::Up;
 	else
 		lara->Control.JumpDirection = JumpDirection::None;
@@ -620,7 +643,7 @@ void SetLaraRunJumpQueue(ItemInfo* item, CollisionInfo* coll)
 	int distance = SECTOR(1);
 	auto probe = GetCollision(item, item->Pose.Orientation.y, distance, -coll->Setup.Height);
 
-	if ((TestLaraRunJumpForward(item, coll) ||													// Area close ahead is permissive...
+	if ((lara->Context.CanRunJumpForward() ||													// Area close ahead is permissive...
 		(probe.Position.Ceiling - y) < -(coll->Setup.Height + (LARA_HEADROOM * 0.8f)) ||		// OR ceiling height far ahead is permissive
 		(probe.Position.Floor - y) >= CLICK(0.5f)) &&											// OR there is a drop below far ahead.
 		probe.Position.Floor != NO_HEIGHT)
@@ -677,10 +700,8 @@ void SetContextWaterClimbOut(ItemInfo* item, CollisionInfo* coll, WaterClimbOutT
 
 void SetLaraLand(ItemInfo* item, CollisionInfo* coll)
 {
-	//item->IsAirborne = false; // TODO: Removing this avoids an unusual landing bug Core had worked around in an obscure way. I hope to find a proper solution. @Sezz 2022.02.18
-	item->Animation.Velocity.z = 0;
-	item->Animation.Velocity.y = 0;
-
+	//item->IsAirborne = false; // TODO: Removing this avoids an unusual landing bug. I hope to find a proper solution later. -- Sezz 2022.02.18
+	item->Animation.Velocity.y = 0.0f;
 	LaraSnapToHeight(item, coll);
 }
 

@@ -124,7 +124,7 @@ Save::Vector4 FromVector4(Vector4 vec)
 	return Save::Vector4(vec.x, vec.y, vec.z, vec.w);
 }
 
-EulerAngles ToVector3Shrt(const Save::Vector3* vec)
+EulerAngles ToEulerAngles(const Save::Vector3* vec)
 {
 	return EulerAngles(short(vec->x()), short(vec->y()), short(vec->z()));
 }
@@ -815,6 +815,7 @@ bool SaveGame::Save(int slot)
 			Save::StaticMeshInfoBuilder staticMesh{ fbb };
 
 			staticMesh.add_pose(&FromPHD(room->mesh[j].pos));
+			staticMesh.add_scale(room->mesh[j].scale);
 			staticMesh.add_color(&FromVector4(room->mesh[j].color));
 
 			staticMesh.add_flags(room->mesh[j].flags);
@@ -1236,6 +1237,7 @@ bool SaveGame::Load(int slot)
 		int number = staticMesh->number();
 
 		room->mesh[number].pos = ToPHD(staticMesh->pose());
+		room->mesh[number].scale = staticMesh->scale();
 		room->mesh[number].color = ToVector4(staticMesh->color());
 
 		room->mesh[number].flags = staticMesh->flags();
@@ -1781,7 +1783,7 @@ bool SaveGame::Load(int slot)
 	Lara.LeftArm.FrameBase = s->lara()->left_arm()->frame_base();
 	Lara.LeftArm.FrameNumber = s->lara()->left_arm()->frame_number();
 	Lara.LeftArm.Locked = s->lara()->left_arm()->locked();
-	Lara.LeftArm.Orientation = ToVector3Shrt(s->lara()->left_arm()->rotation());
+	Lara.LeftArm.Orientation = ToEulerAngles(s->lara()->left_arm()->rotation());
 	Lara.Location = s->lara()->location();
 	Lara.LocationPad = s->lara()->location_pad();
 	Lara.NextCornerPos = ToPHD(s->lara()->next_corner_pose());
@@ -1793,7 +1795,7 @@ bool SaveGame::Load(int slot)
 	Lara.RightArm.FrameBase = s->lara()->right_arm()->frame_base();
 	Lara.RightArm.FrameNumber = s->lara()->right_arm()->frame_number();
 	Lara.RightArm.Locked = s->lara()->right_arm()->locked();
-	Lara.RightArm.Orientation = ToVector3Shrt(s->lara()->right_arm()->rotation());
+	Lara.RightArm.Orientation = ToEulerAngles(s->lara()->right_arm()->rotation());
 	Lara.Torch.IsLit = s->lara()->torch()->is_lit();
 	Lara.Torch.State = (TorchState)s->lara()->torch()->state();
 	Lara.Control.Rope.Segment = s->lara()->control()->rope()->segment();

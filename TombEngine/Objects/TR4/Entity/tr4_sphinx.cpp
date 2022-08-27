@@ -1,28 +1,29 @@
 #include "framework.h"
-#include "tr4_sphinx.h"
+#include "Objects/TR4/Entity/tr4_sphinx.h"
+
 #include "Game/collision/collide_room.h"
-#include "Game/effects/debris.h"
-#include "Game/items.h"
 #include "Game/control/box.h"
+#include "Game/effects/debris.h"
 #include "Game/effects/effects.h"
-#include "Specific/setup.h"
-#include "Specific/level.h"
-#include "Game/Lara/lara.h"
-#include "Sound/sound.h"
 #include "Game/itemdata/creature_info.h"
+#include "Game/items.h"
+#include "Game/Lara/lara.h"
 #include "Game/misc.h"
+#include "Sound/sound.h"
+#include "Specific/level.h"
+#include "Specific/setup.h"
 
 using std::vector;
 
 namespace TEN::Entities::TR4
 {
-	BITE_INFO SphinxBiteInfo = { 0, 0, 0, 6 };
-	const vector<int> SphinxAttackJoints = { 6 };
-
 	constexpr auto SPHINX_ATTACK_DAMAGE = 200;
 
 	#define SPHINX_WALK_TURN_ANGLE Angle::DegToRad(3.0f)
-	#define SPHINX_RUN_TURN_ANGLE Angle::DegToRad(0.33f)
+	#define SPHINX_RUN_TURN_ANGLE  Angle::DegToRad(0.33f)
+
+	const auto SphinxBite = BiteInfo(Vector3::Zero, 6);
+	const vector<int> SphinxAttackJoints = { 6 };
 
 	enum SphinxState
 	{
@@ -126,11 +127,11 @@ namespace TEN::Entities::TR4
 		AI_INFO AI;
 		CreatureAIInfo(item, &AI);
 
-	if (creature->Enemy != LaraItem)
-		atan2(LaraItem->Pose.Position.z - item->Pose.Position.z, LaraItem->Pose.Position.x - item->Pose.Position.x);
+		if (!creature->Enemy->IsLara())
+			phd_atan(LaraItem->Pose.Position.z - item->Pose.Position.z, LaraItem->Pose.Position.x - item->Pose.Position.x);
 
-		GetCreatureMood(item, &AI, VIOLENT);
-		CreatureMood(item, &AI, VIOLENT);
+		GetCreatureMood(item, &AI, true);
+		CreatureMood(item, &AI, true);
 
 	float angle = CreatureTurn(item, creature->MaxTurn);
 
@@ -145,6 +146,7 @@ namespace TEN::Entities::TR4
 			if (AI.distance < pow(SECTOR(1), 2) || item->TriggerFlags)
 				item->Animation.TargetState = SPHINX_STATE_SLEEP_TO_IDLE;
 
+			// TODO: Use TestProbability().
 			if (GetRandomControl() == 0)
 				item->Animation.TargetState = SPHINX_STATE_REST_ALERTED;
 
@@ -156,6 +158,7 @@ namespace TEN::Entities::TR4
 			if (AI.distance < pow(SECTOR(1), 2) || item->TriggerFlags)
 				item->Animation.TargetState = SPHINX_STATE_SLEEP_TO_IDLE;
 
+			// TODO: Use TestProbability().
 			if (GetRandomControl() == 0)
 				item->Animation.TargetState = SPHINX_STATE_REST;
 
@@ -164,8 +167,11 @@ namespace TEN::Entities::TR4
 		case SPHINX_STATE_WALK_FORWARD:
 			creature->MaxTurn = SPHINX_WALK_TURN_ANGLE;
 
-			if (AI.distance > pow(SECTOR(1), 2) && abs(AI.angle) <= Angle::DegToRad(2.8f) || item->Animation.RequiredState == SPHINX_STATE_RUN_FORWARD)
+			if (AI.distance > pow(SECTOR(1), 2) && abs(AI.angle) <= Angle::DegToRad(2.8f) ||
+				item->Animation.RequiredState == SPHINX_STATE_RUN_FORWARD)
+			{
 				item->Animation.TargetState = SPHINX_STATE_RUN_FORWARD;
+			}
 			else if (AI.distance < pow(SECTOR(2), 2) && item->Animation.TargetState != SPHINX_STATE_RUN_FORWARD)
 			{
 				if (height2 <= (item->Pose.Position.y + CLICK(1)) &&
@@ -185,15 +191,9 @@ namespace TEN::Entities::TR4
 			{
 				if (item->TestBits(JointBitType::Touch, SphinxAttackJoints))
 				{
-					CreatureEffect2(
-						item,
-						&SphinxBiteInfo,
-						20,
-						-1,
-						DoBloodSplat);
-					creature->Flags = 1;
-
 					DoDamage(creature->Enemy, SPHINX_ATTACK_DAMAGE);
+					CreatureEffect2(item, SphinxBite, 20, -1, DoBloodSplat);
+					creature->Flags = 1;
 				}
 			}
 
@@ -232,14 +232,8 @@ namespace TEN::Entities::TR4
 
 				if (item->TestBits(JointBitType::Touch, SphinxAttackJoints))
 				{
-					CreatureEffect2(
-						item,
-						&SphinxBiteInfo,
-						50,
-						-1,
-						DoBloodSplat);
-
 					DoDamage(creature->Enemy, INT_MAX);
+					CreatureEffect2(item, SphinxBite, 50, -1, DoBloodSplat);
 				}
 			}
 

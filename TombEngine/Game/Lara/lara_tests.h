@@ -53,8 +53,6 @@ bool IsJumpState(LaraState state);
 bool IsRunJumpQueueableState(LaraState state);
 bool IsRunJumpCountableState(LaraState state);
 
-bool TestLaraRoll180(ItemInfo* item, CollisionInfo* coll);
-
 bool TestLaraPose(ItemInfo* item, CollisionInfo* coll);
 bool TestLaraKeepLow(ItemInfo* item, CollisionInfo* coll);
 bool TestLaraSlide(ItemInfo* item, CollisionInfo* coll);
@@ -108,15 +106,6 @@ bool TestLaraHangToCrouch(ItemInfo* item, CollisionInfo* coll);
 bool TestLaraHangToStand(ItemInfo* item, CollisionInfo* coll);
 
 bool TestLaraStandingJump(ItemInfo* item, CollisionInfo* coll);
-bool TestLaraJumpTolerance(ItemInfo* item, CollisionInfo* coll, JumpTestSetup testSetup);
-bool TestLaraRunJumpForward(ItemInfo* item, CollisionInfo* coll);
-bool TestLaraJumpForward(ItemInfo* item, CollisionInfo* coll);
-bool TestLaraJumpBack(ItemInfo* item, CollisionInfo* coll);
-bool TestLaraJumpLeft(ItemInfo* item, CollisionInfo* coll);
-bool TestLaraJumpRight(ItemInfo* item, CollisionInfo* coll);
-bool TestLaraJumpUp(ItemInfo* item, CollisionInfo* coll);
-bool TestLaraSlideJump(ItemInfo* item, CollisionInfo* coll);
-bool TestLaraCrawlspaceDive(ItemInfo* item, CollisionInfo* coll);
 
 bool TestLaraTightropeDismount(ItemInfo* item, CollisionInfo* coll);
 

@@ -3,6 +3,7 @@
 
 #include <process.h>
 #include <zlib.h>
+
 #include "Game/animation.h"
 #include "Game/animation.h"
 #include "Game/camera.h"
@@ -17,8 +18,8 @@
 #include "Game/pickup/pickup.h"
 #include "Game/savegame.h"
 #include "Game/spotcam.h"
-#include "Renderer/Renderer11.h"
 #include "Objects/Generic/Doors/generic_doors.h"
+#include "Renderer/Renderer11.h"
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Scripting/Include/Objects/ScriptInterfaceObjectsHandler.h"
 #include "Scripting/Include/ScriptInterfaceGame.h"
@@ -29,11 +30,11 @@
 #include "Specific/trutils.h"
 
 using TEN::Renderer::g_Renderer;
-using std::vector;
 using std::string;
+using std::vector;
 
-using namespace TEN::Input;
 using namespace TEN::Entities::Doors;
+using namespace TEN::Input;
 
 char* LevelDataPtr;
 bool IsLevelLoading;
@@ -177,7 +178,9 @@ void LoadItems()
 			item->Pose.Position.x = ReadInt32();
 			item->Pose.Position.y = ReadInt32();
 			item->Pose.Position.z = ReadInt32();
+			item->Pose.Orientation.x = Angle::ShrtToRad(ReadInt16());
 			item->Pose.Orientation.y = Angle::ShrtToRad(ReadInt16());
+			item->Pose.Orientation.z = Angle::ShrtToRad(ReadInt16());
 			item->Color = ReadVector4();
 			item->TriggerFlags = ReadInt16();
 			item->Flags = ReadInt16();
@@ -591,6 +594,12 @@ void ReadRooms()
 	for (int i = 0; i < numRooms; i++)
 	{
 		auto & room = g_Level.Rooms.emplace_back();
+		
+		room.name = ReadString();
+		int numTags = ReadInt32();
+		for (int j = 0; j < numTags; j++)
+			room.tags.push_back(ReadString());
+		
 		room.x = ReadInt32();
 		room.y = 0;
 		room.z = ReadInt32();
@@ -767,9 +776,9 @@ void ReadRooms()
 			mesh.pos.Position.x = ReadInt32();
 			mesh.pos.Position.y = ReadInt32();
 			mesh.pos.Position.z = ReadInt32();
-			mesh.pos.Orientation.x = 0.0f;
+			mesh.pos.Orientation.x = Angle::ShrtToRad(ReadUInt16());
 			mesh.pos.Orientation.y = Angle::ShrtToRad(ReadUInt16());
-			mesh.pos.Orientation.z = 0.0f;
+			mesh.pos.Orientation.z = Angle::ShrtToRad(ReadUInt16());
 			mesh.flags = ReadUInt16();
 			mesh.color = ReadVector4();
 			mesh.staticNumber = ReadUInt16();
@@ -955,12 +964,14 @@ void LoadAIObjects()
 
 		obj.objectNumber = (GAME_OBJECT_ID)ReadInt16();
 		obj.roomNumber = ReadInt16();
-		obj.x = ReadInt32();
-		obj.y = ReadInt32();
-		obj.z = ReadInt32();
+		obj.pos.Position.x = ReadInt32();
+		obj.pos.Position.y = ReadInt32();
+		obj.pos.Position.z = ReadInt32();
+		obj.pos.Orientation.y = ReadInt16();
+		obj.pos.Orientation.x = ReadInt16();
+		obj.pos.Orientation.z = ReadInt16();
 		obj.triggerFlags = ReadInt16();
 		obj.flags = ReadInt16();
-		obj.yRot = Angle::ShrtToRad(ReadInt16()); // TODO
 		obj.boxNumber = ReadInt32();
 		obj.luaName = ReadString();
 
@@ -1377,8 +1388,8 @@ void GetAIPickups()
 			{
 				auto* object = &g_Level.AIObjects[number];
 
-				if (abs(object->x - item->Pose.Position.x) < CLICK(2) &&
-					abs(object->z - item->Pose.Position.z) < CLICK(2) &&
+				if (abs(object->pos.Position.x - item->Pose.Position.x) < CLICK(2) &&
+					abs(object->pos.Position.z - item->Pose.Position.z) < CLICK(2) &&
 					object->roomNumber == item->RoomNumber &&
 					object->objectNumber < ID_AI_PATROL2)
 				{

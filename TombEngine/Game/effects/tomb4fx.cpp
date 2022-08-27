@@ -1450,8 +1450,6 @@ void ExplodingDeath(short itemNumber, short flags)
 		obj = &Objects[ID_LARA_SKIN];
 	else
 		obj = &Objects[item->ObjectNumber];
-
-	ANIM_FRAME* frame = GetBestFrame(item);
 	
 	Matrix world = Matrix::CreateFromYawPitchRoll(
 		item->Pose.Orientation.y,

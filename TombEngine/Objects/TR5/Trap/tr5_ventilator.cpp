@@ -80,7 +80,7 @@ static void VentilatorEffect(BOUNDING_BOX* bounds, int intensity, float rot, int
 				}
 				else
 				{
-					int factor = 3 * (bounds->Y2 - bounds->Y1) / 8;
+					int factor = 3 * bounds->Height() / 8;
 					short angle = 2 * GetRandomControl();
 
 					spark->y = (bounds->Y1 + bounds->Y2) / 2;

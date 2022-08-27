@@ -48,6 +48,16 @@ void Static::Register(sol::table & parent)
 		// @tparam Rotation rotation the static's new rotation
 		ScriptReserved_SetRotation, &Static::SetRot,
 
+		/// Get the static's scale
+		// @function Static:GetScale
+		// @treturn float current static scale
+		ScriptReserved_GetScale, & Static::GetScale,
+
+		/// Set the static's scale
+		// @function Static:SetScale
+		// @tparam Scale scale the static's new scale
+		ScriptReserved_SetScale, & Static::SetScale,
+
 		/// Get the static's unique string identifier
 		// @function Static:GetName
 		// @treturn string the static's name
@@ -90,6 +100,16 @@ void Static::SetPos(Vec3 const& pos)
 	m_mesh.pos.Position.x = pos.x;
 	m_mesh.pos.Position.y = pos.y;
 	m_mesh.pos.Position.z = pos.z;
+}
+
+float Static::GetScale() const
+{
+	return m_mesh.scale;
+}
+
+void Static::SetScale(float const& scale)
+{
+	m_mesh.scale = scale;
 }
 
 // This does not guarantee that the returned value will be identical

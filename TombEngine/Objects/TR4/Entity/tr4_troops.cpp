@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "tr4_troops.h"
+#include "Objects/TR4/Entity/tr4_troops.h"
 
 #include "Game/control/box.h"
 #include "Game/control/lot.h"
@@ -13,11 +13,14 @@
 #include "Game/animation.h"
 #include "Game/misc.h"
 #include "Specific/level.h"
+#include "Specific/prng.h"
 #include "Specific/setup.h"
+
+using namespace TEN::Math::Random;
 
 namespace TEN::Entities::TR4
 {
-	BITE_INFO TroopsBite1 = { 0, 300, 64, 7 };
+	const auto TroopsBite1 = BiteInfo(Vector3(0.0f, 300.0f, 64.0f), 7);
 
 	enum TroopState
 	{
@@ -68,26 +71,26 @@ namespace TEN::Entities::TR4
 		if (!CreatureActive(itemNumber))
 			return;
 
-	auto* item = &g_Level.Items[itemNumber];
-	auto* creature = GetCreatureInfo(item);
-	auto* object = &Objects[item->ObjectNumber];
-	
-	float angle = 0;
-	float tilt = 0;
-	float rot = 0;
-	float joint0 = 0;
-	float joint1 = 0;
-	float joint2 = 0;
-	
-	int dx = 0;
-	int dy = 0;
-	int dz = 0;
-	
-	int distance = 0;
+		auto* item = &g_Level.Items[itemNumber];
+		auto* creature = GetCreatureInfo(item);
+		auto* object = &Objects[item->ObjectNumber];
+
+		short angle = 0;
+		short tilt = 0;
+		short rot = 0;
+		short joint0 = 0;
+		short joint1 = 0;
+		short joint2 = 0;
+
+		int dx = 0;
+		int dy = 0;
+		int dz = 0;
+
+		int distance = 0;
 
 		if (creature->FiredWeapon)
 		{
-			auto pos = Vector3Int(TroopsBite1.x, TroopsBite1.y, TroopsBite1.z);
+			auto pos = Vector3Int(TroopsBite1.Position);
 			GetJointAbsPosition(item, &pos, TroopsBite1.meshNum);
 
 			TriggerDynamicLight(pos.x, pos.y, pos.z, 2 * creature->FiredWeapon + 8, 24, 16, 4);
@@ -160,7 +163,7 @@ namespace TEN::Entities::TR4
 						if (currentItem->ObjectNumber != ID_LARA)
 						{
 							if (currentItem->ObjectNumber != ID_TROOPS &&
-								(currentItem != LaraItem || creature->HurtByLara))
+								(!currentItem->IsLara() || creature->HurtByLara))
 							{
 								dx = currentItem->Pose.Position.x - item->Pose.Position.x;
 								dy = currentItem->Pose.Position.y - item->Pose.Position.y;
@@ -185,25 +188,25 @@ namespace TEN::Entities::TR4
 			AI_INFO AI;
 			CreatureAIInfo(item, &AI);
 
-		int distance = 0;
-		if (creature->Enemy == LaraItem)
-		{
-			distance = AI.distance;
-			rot = AI.angle;
-		}
-		else
-		{
-			dx = LaraItem->Pose.Position.x - item->Pose.Position.x;
-			dz = LaraItem->Pose.Position.z - item->Pose.Position.z;
-			distance = pow(dx, 2) + pow(dz, 2);
-			rot = atan2(dz, dx) - item->Pose.Orientation.y;
-		}
+			int distance = 0;
+			if (creature->Enemy->IsLara())
+			{
+				distance = AI.distance;
+				rot = AI.angle;
+			}
+			else
+			{
+				dx = LaraItem->Pose.Position.x - item->Pose.Position.x;
+				dz = LaraItem->Pose.Position.z - item->Pose.Position.z;
+				distance = pow(dx, 2) + pow(dz, 2);
+				rot = phd_atan(dz, dx) - item->Pose.Orientation.y;
+			}
 
-			if (!creature->HurtByLara && creature->Enemy == LaraItem)
+			if (!creature->HurtByLara && creature->Enemy->IsLara())
 				creature->Enemy = nullptr;
 
-			GetCreatureMood(item, &AI, TIMID);
-			CreatureMood(item, &AI, TIMID);
+			GetCreatureMood(item, &AI, false);
+			CreatureMood(item, &AI, false);
 
 			// Vehicle handling
 			if (Lara.Vehicle != NO_ITEM && AI.bite)
@@ -221,23 +224,24 @@ namespace TEN::Entities::TR4
 				creature->Flags = 0;
 				joint2 = rot;
 
-			if (item->Animation.AnimNumber == object->animIndex + 17)
-			{
-				if (abs(AI.angle) >= Angle::DegToRad(10.0f))
+				if (item->Animation.AnimNumber == object->animIndex + 17)
 				{
-					if (AI.angle >= 0)
-						item->Pose.Orientation.y += Angle::DegToRad(10.0f);
+					if (abs(AI.angle) >= Angle::DegToRad(10.0f))
+					{
+						if (AI.angle >= 0)
+							item->Pose.Orientation.y += Angle::DegToRad(10.0f);
+						else
+							item->Pose.Orientation.y -= Angle::DegToRad(10.0f);
+					}
 					else
-						item->Pose.Orientation.y -= Angle::DegToRad(10.0f);
+						item->Pose.Orientation.y += AI.angle;
 				}
-				else
-					item->Pose.Orientation.y += AI.angle;
-			}
 
 				if (item->AIBits & GUARD)
 				{
 					joint2 = AIGuard(creature);
 
+					// TODO: Use TestProbability().
 					if (!GetRandomControl())
 					{
 						if (item->Animation.ActiveState == TROOP_STATE_IDLE)
@@ -257,7 +261,7 @@ namespace TEN::Entities::TR4
 				{
 					if (AI.distance < pow(SECTOR(3), 2) || AI.zoneNumber != AI.enemyZone)
 					{
-						if (GetRandomControl() >= 16384)
+						if (TestProbability(0.5f))
 							item->Animation.TargetState = TROOP_STATE_AIM_3;
 						else
 							item->Animation.TargetState = TROOP_STATE_AIM_1;
@@ -284,10 +288,10 @@ namespace TEN::Entities::TR4
 
 				break;
 
-		case TROOP_STATE_WALK:
-			creature->MaxTurn = Angle::DegToRad(5.0f);
-			creature->Flags = 0;
-			joint2 = rot;
+			case TROOP_STATE_WALK:
+				creature->MaxTurn = Angle::DegToRad(5.0f);
+				creature->Flags = 0;
+				joint2 = rot;
 
 				if (item->AIBits & PATROL1)
 					item->Animation.TargetState = TROOP_STATE_WALK;
@@ -320,9 +324,9 @@ namespace TEN::Entities::TR4
 
 				break;
 
-		case TROOP_STATE_RUN:
-			creature->MaxTurn = Angle::DegToRad(10.0f);
-			tilt = angle / 2;
+			case TROOP_STATE_RUN:
+				creature->MaxTurn = Angle::DegToRad(10.0f);
+				tilt = angle / 2;
 
 				if (AI.ahead)
 					joint2 = AI.angle;
@@ -356,6 +360,7 @@ namespace TEN::Entities::TR4
 
 				if (item->AIBits & GUARD)
 				{
+					// TODO: Use TestProbability().
 					joint2 = AIGuard(creature);
 					if (!GetRandomControl())
 						item->Animation.TargetState = TROOP_STATE_IDLE;
@@ -380,7 +385,7 @@ namespace TEN::Entities::TR4
 				else
 				{
 					creature->FiredWeapon = 1;
-					ShotLara(item, &AI, &TroopsBite1, joint0, 23);
+					ShotLara(item, &AI, TroopsBite1, joint0, 23);
 					creature->Flags = 5;
 				}
 
@@ -439,7 +444,7 @@ namespace TEN::Entities::TR4
 				else
 				{
 					creature->FiredWeapon = 1;
-					ShotLara(item, &AI, &TroopsBite1, joint0, 23);
+					ShotLara(item, &AI, TroopsBite1, joint0, 23);
 					creature->Flags = 5;
 				}
 
@@ -450,7 +455,7 @@ namespace TEN::Entities::TR4
 				break;
 
 			case TROOP_STATE_FLASHED:
-				if (!FlashGrenadeAftershockTimer && !(GetRandomControl() & 0x7F))
+				if (!FlashGrenadeAftershockTimer && TestProbability(0.008f))
 					item->Animation.TargetState = TROOP_STATE_GUARD;
 
 				break;

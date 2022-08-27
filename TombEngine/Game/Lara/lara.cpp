@@ -465,8 +465,6 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 
 	RumbleLaraHealthCondition(item);
 
-	lara->Control.IsLow = false;
-
 	bool isWater = TestEnvironment(ENV_FLAG_WATER, item);
 	bool isSwamp = TestEnvironment(ENV_FLAG_SWAMP, item);
 
@@ -810,10 +808,8 @@ void LaraAboveWater(ItemInfo* item, CollisionInfo* coll)
 	static bool dbU = false;
 	if (doRoutines || KeyMap[OIS::KeyCode::KC_U] && !dbU)
 	{
-		HandleLaraMovementParameters(item, coll);
-
-		// Handle current Lara status.
 		lara_control_routines[item->Animation.ActiveState](item, coll);
+		HandleLaraMovementParameters(item, coll);
 		AnimateLara(item);
 
 		if (lara->ExtraAnim == NO_ITEM)
@@ -847,6 +843,8 @@ void LaraAboveWater(ItemInfo* item, CollisionInfo* coll)
 void LaraWaterSurface(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
+
+	lara->Control.IsLow = false;
 
 	Camera.targetElevation = Angle::DegToRad(-22.0f);
 
@@ -917,6 +915,8 @@ void LaraWaterSurface(ItemInfo* item, CollisionInfo* coll)
 void LaraUnderwater(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
+
+	lara->Control.IsLow = false;
 
 	coll->Setup.Mode = CollisionProbeMode::Quadrants;
 	coll->Setup.Radius = LARA_RADIUS_UNDERWATER;

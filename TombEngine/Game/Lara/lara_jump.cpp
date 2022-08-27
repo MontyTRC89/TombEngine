@@ -269,9 +269,9 @@ void lara_as_jump_prepare(ItemInfo* item, CollisionInfo* coll)
 		lara->Control.JumpDirection = JumpDirection::None;
 
 	if (((TrInput & IN_FORWARD &&
-			!(TrInput & IN_BACK && lara->Control.JumpDirection == JumpDirection::Back)) ||	// Back jump takes priority in this exception.
+			!(TrInput & IN_BACK && lara->Control.JumpDirection == JumpDirection::Back)) || // Back jump takes priority in this exception.
 		!(TrInput & IN_DIRECTION) && lara->Control.JumpDirection == JumpDirection::Forward) &&
-		TestLaraJumpForward(item, coll))
+		lara->Context.CanJumpForward())
 	{
 		item->Animation.TargetState = LS_JUMP_FORWARD;
 		lara->Control.JumpDirection = JumpDirection::Forward;
@@ -279,7 +279,7 @@ void lara_as_jump_prepare(ItemInfo* item, CollisionInfo* coll)
 	}
 	else if ((TrInput & IN_BACK ||
 		!(TrInput & IN_DIRECTION) && lara->Control.JumpDirection == JumpDirection::Back) &&
-		TestLaraJumpBack(item, coll))
+		lara->Context.CanJumpBackward())
 	{
 		item->Animation.TargetState = LS_JUMP_BACK;
 		lara->Control.JumpDirection = JumpDirection::Back;
@@ -288,7 +288,7 @@ void lara_as_jump_prepare(ItemInfo* item, CollisionInfo* coll)
 
 	if ((TrInput & IN_LEFT ||
 		!(TrInput & IN_DIRECTION) && lara->Control.JumpDirection == JumpDirection::Left) &&
-		TestLaraJumpLeft(item, coll))
+		lara->Context.CanJumpLeft())
 	{
 		item->Animation.TargetState = LS_JUMP_LEFT;
 		lara->Control.JumpDirection = JumpDirection::Left;
@@ -296,7 +296,7 @@ void lara_as_jump_prepare(ItemInfo* item, CollisionInfo* coll)
 	}
 	else if ((TrInput & IN_RIGHT ||
 		!(TrInput & IN_DIRECTION) && lara->Control.JumpDirection == JumpDirection::Right) &&
-		TestLaraJumpRight(item, coll))
+		lara->Context.CanJumpRight())
 	{
 		item->Animation.TargetState = LS_JUMP_RIGHT;
 		lara->Control.JumpDirection = JumpDirection::Right;
@@ -304,7 +304,7 @@ void lara_as_jump_prepare(ItemInfo* item, CollisionInfo* coll)
 	}
 
 	// No directional key pressed AND no directional lock; commit to jump up.
-	if (TestLaraJumpUp(item, coll))
+	if (lara->Context.CanJumpUp())
 	{
 		item->Animation.TargetState = LS_JUMP_UP;
 		lara->Control.JumpDirection = JumpDirection::Up;
@@ -744,7 +744,7 @@ void lara_as_swan_dive(ItemInfo* item, CollisionInfo* coll)
 			item->Animation.TargetState = LS_DEATH;
 		else if (TestLaraSlide(item, coll))
 			SetLaraSlideAnimation(item, coll);
-		else if ((TrInput & IN_CROUCH || TestLaraCrawlspaceDive(item, coll)) &&
+		else if ((TrInput & IN_CROUCH || lara->Context.CanCrawlspaceDive()) &&
 			g_GameFlow->HasCrawlspaceSwandive())
 		{
 			item->Animation.TargetState = LS_CROUCH_IDLE;
@@ -774,7 +774,7 @@ void lara_col_swan_dive(ItemInfo* item, CollisionInfo* coll)
 	auto* lara = GetLaraInfo(item);
 
 	auto* bounds = GetBoundsAccurate(item);
-	int realHeight = g_GameFlow->HasCrawlspaceSwandive() ? ((bounds->Y2 - bounds->Y1) * 0.7f) : LARA_HEIGHT;
+	int realHeight = g_GameFlow->HasCrawlspaceSwandive() ? (bounds->Height() * 0.7f) : LARA_HEIGHT;
 
 	lara->Control.MoveAngle = item->Pose.Orientation.y;
 	coll->Setup.Height = std::max(LARA_HEIGHT_CRAWL, realHeight);

@@ -1,20 +1,24 @@
 #include "framework.h"
-#include "tr4_enemy_jeep.h"
-#include "Game/items.h"
-#include "Specific/level.h"
+#include "Objects/TR4/Entity/tr4_enemy_jeep.h"
+
+#include "Game/animation.h"
 #include "Game/collision/collide_room.h"
 #include "Game/control/box.h"
-#include "Specific/trmath.h"
-#include "Game/Lara/lara.h"
 #include "Game/control/lot.h"
-#include "Sound/sound.h"
-#include "Game/animation.h"
-#include "Game/itemdata/creature_info.h"
-#include "Specific/setup.h"
 #include "Game/control/trigger.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/tomb4fx.h"
+#include "Game/itemdata/creature_info.h"
+#include "Game/items.h"
+#include "Game/Lara/lara.h"
 #include "Game/misc.h"
+#include "Sound/sound.h"
+#include "Specific/level.h"
+#include "Specific/prng.h"
+#include "Specific/setup.h"
+#include "Specific/trmath.h"
+
+using namespace TEN::Math::Random;
 
 namespace TEN::Entities::TR4
 {
@@ -32,18 +36,18 @@ namespace TEN::Entities::TR4
 
 			InitialiseItem(grenadeItemNumber);
 
-		grenadeItem->Pose.Orientation.x = item->Pose.Orientation.x;
-		grenadeItem->Pose.Orientation.y = item->Pose.Orientation.y + Angle::DegToRad(-180.0f);
-		grenadeItem->Pose.Orientation.z = 0.0f;
+			grenadeItem->Pose.Orientation.x = item->Pose.Orientation.x;
+			grenadeItem->Pose.Orientation.y = item->Pose.Orientation.y - Angle::DegToRad(180.0f);
+			grenadeItem->Pose.Orientation.z = 0;
 
-		grenadeItem->Pose.Position.x = item->Pose.Position.x + SECTOR(1)* sin(grenadeItem->Pose.Orientation.y);
-		grenadeItem->Pose.Position.y = item->Pose.Position.y - CLICK(3);
-		grenadeItem->Pose.Position.z = item->Pose.Position.x + SECTOR(1) * cos(grenadeItem->Pose.Orientation.y);
+			grenadeItem->Pose.Position.x = item->Pose.Position.x + SECTOR(1) * sin(grenadeItem->Pose.Orientation.y);
+			grenadeItem->Pose.Position.y = item->Pose.Position.y - CLICK(3);
+			grenadeItem->Pose.Position.z = item->Pose.Position.x + SECTOR(1) * cos(grenadeItem->Pose.Orientation.y);
 
 			for (int i = 0; i < 5; i++)
 				TriggerGunSmoke(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, 0, 0, 0, 1, LaraWeaponType::GrenadeLauncher, 32);
 
-			if (GetRandomControl() & 3)
+			if (TestProbability(0.75f))
 				grenadeItem->ItemFlags[0] = 1;
 			else
 				grenadeItem->ItemFlags[0] = 2;
@@ -92,28 +96,28 @@ namespace TEN::Entities::TR4
 			int y = item->Pose.Position.y;
 			int z = item->Pose.Position.z;
 
-		int dx = 682 * sin(item->Pose.Orientation.y);
-		int dz = 682 * cos(item->Pose.Orientation.y);
+			int dx = 682 * sin(item->Pose.Orientation.y);
+			int dz = 682 * cos(item->Pose.Orientation.y);
 
-		int height1 = GetCollision(x - dz, y, z - dx, item->RoomNumber).Position.Floor;
-		if (abs(item->Pose.Position.y - height1) > CLICK(3))
-		{
-			item->Pose.Position.x += dz / 64;
-			item->Pose.Position.z += dx / 64;
-			item->Pose.Orientation.y += Angle::DegToRad(2.0f);
-			height1 = y;
-		}
+			int height1 = GetCollision(x - dz, y, z - dx, item->RoomNumber).Position.Floor;
+			if (abs(item->Pose.Position.y - height1) > CLICK(3))
+			{
+				item->Pose.Position.x += dz / 64;
+				item->Pose.Position.z += dx / 64;
+				item->Pose.Orientation.y += Angle::DegToRad(2.0f);
+				height1 = y;
+			}
 
-		int height2 = GetCollision(x + dz, y, z - dx, item->RoomNumber).Position.Floor;
-		if (abs(item->Pose.Position.y - height2) > CLICK(3))
-		{
-			item->Pose.Orientation.y -= Angle::DegToRad(2.0f);
-			item->Pose.Position.x -= dz / 64;
-			item->Pose.Position.z += dx / 64;
-			height2 = y;
-		}
+			int height2 = GetCollision(x + dz, y, z - dx, item->RoomNumber).Position.Floor;
+			if (abs(item->Pose.Position.y - height2) > CLICK(3))
+			{
+				item->Pose.Orientation.y -= Angle::DegToRad(2.0f);
+				item->Pose.Position.x -= dz / 64;
+				item->Pose.Position.z += dx / 64;
+				height2 = y;
+			}
 
-		float zRot = atan2(1364, height2 - height1);
+			short zRot = phd_atan(1364, height2 - height1);
 
 			int height3 = GetCollision(x + dx, y, z + dz, item->RoomNumber).Position.Floor;
 			if (abs(y - height3) > CLICK(3))
@@ -123,7 +127,7 @@ namespace TEN::Entities::TR4
 			if (abs(y - height4) > CLICK(3))
 				height4 = y;
 
-		float xRot = atan2(1364, height4 - height3);
+			short xRot = phd_atan(1364, height4 - height3);
 
 			AI_INFO AI;
 			CreatureAIInfo(item, &AI);
@@ -132,9 +136,9 @@ namespace TEN::Entities::TR4
 
 			auto* target = creature->AITarget;
 
-		dx = LaraItem->Pose.Position.x - item->Pose.Position.x;
-		dz = LaraItem->Pose.Position.z - item->Pose.Position.z;
-		short angle = atan2(dz, dx) - item->Pose.Orientation.y;
+			dx = LaraItem->Pose.Position.x - item->Pose.Position.x;
+			dz = LaraItem->Pose.Position.z - item->Pose.Position.z;
+			short angle = phd_atan(dz, dx) - item->Pose.Orientation.y;
 
 			int distance;
 			if (dx > SECTOR(31.25f) || dx < -SECTOR(31.25f) ||
@@ -177,13 +181,13 @@ namespace TEN::Entities::TR4
 				if (item->ItemFlags[0] > 8704)
 					item->ItemFlags[0] = 8704;
 
-			if (AI.angle <= Angle::DegToRad(1.4f))
-			{
-				if (AI.angle < Angle::DegToRad(-1.4f))
-					item->Animation.TargetState = 3;
-			}
-			else
-				item->Animation.TargetState = 4;
+				if (AI.angle <= Angle::DegToRad(1.4f))
+				{
+					if (AI.angle < Angle::DegToRad(-1.4f))
+						item->Animation.TargetState = 3;
+				}
+				else
+					item->Animation.TargetState = 4;
 
 				break;
 
@@ -266,14 +270,14 @@ namespace TEN::Entities::TR4
 					}
 				}
 
-			if (distance > pow(SECTOR(2), 2) &&
-				distance < pow(SECTOR(10), 2) &&
-				!item->ItemFlags[2] &&
-				(angle < Angle::DegToRad(-112.5f) || angle > Angle::DegToRad(112.5f)))
-			{
-				EnemyJeepLaunchGrenade(item);
-				item->ItemFlags[2] = 150;
-			}
+				if (distance > pow(SECTOR(2), 2) &&
+					distance < pow(SECTOR(10), 2) &&
+					!item->ItemFlags[2] &&
+					(angle < Angle::DegToRad(-112.5f) || angle > Angle::DegToRad(112.5f)))
+				{
+					EnemyJeepLaunchGrenade(item);
+					item->ItemFlags[2] = 150;
+				}
 
 				if (target->Flags == 62)
 				{
@@ -301,52 +305,52 @@ namespace TEN::Entities::TR4
 						}
 					}
 
-				if (aiObject != nullptr)
-				{
-					creature->Enemy = nullptr;
-					target->ObjectNumber = aiObject->objectNumber;
-					target->RoomNumber = aiObject->roomNumber;
-					target->Pose.Position.x = aiObject->x;
-					target->Pose.Position.y = aiObject->y;
-					target->Pose.Position.z = aiObject->z;
-					target->Pose.Orientation.y = aiObject->yRot;
-					target->Flags = aiObject->flags;
-					target->TriggerFlags = aiObject->triggerFlags;
-					target->BoxNumber = aiObject->boxNumber;
-
-					if (!(aiObject->flags & 0x20))
+					if (aiObject != nullptr)
 					{
-						target->Pose.Position.x += CLICK(1) * sin(target->Pose.Orientation.y);
-						target->Pose.Position.z += CLICK(1) * cos(target->Pose.Orientation.y);
+						creature->Enemy = nullptr;
+						target->ObjectNumber = aiObject->objectNumber;
+						target->RoomNumber = aiObject->roomNumber;
+						target->Pose.Position.x = aiObject->pos.Position.x;
+						target->Pose.Position.y = aiObject->pos.Position.y;
+						target->Pose.Position.z = aiObject->pos.Position.z;
+						target->Pose.Orientation.y = aiObject->pos.Orientation.y;
+						target->Flags = aiObject->flags;
+						target->TriggerFlags = aiObject->triggerFlags;
+						target->BoxNumber = aiObject->boxNumber;
+
+						if (!(aiObject->flags & 0x20))
+						{
+							target->Pose.Position.x += CLICK(1) * sin(target->Pose.Orientation.y);
+							target->Pose.Position.z += CLICK(1) * cos(target->Pose.Orientation.y);
+						}
 					}
 				}
 			}
-		}
 
 			item->ItemFlags[2]--;
 			if (item->ItemFlags[2] < 0)
 				item->ItemFlags[2] = 0;
 
-		if (abs(xRot - item->Pose.Orientation.x) < Angle::DegToRad(1.4f))
-			item->Pose.Orientation.x = xRot;
-		else if (xRot < item->Pose.Orientation.x)
-			item->Pose.Orientation.x -= Angle::DegToRad(1.4f);
-		else 
-			item->Pose.Orientation.x += Angle::DegToRad(1.4f);
+			if (abs(xRot - item->Pose.Orientation.x) < Angle::DegToRad(1.4f))
+				item->Pose.Orientation.x = xRot;
+			else if (xRot < item->Pose.Orientation.x)
+				item->Pose.Orientation.x -= Angle::DegToRad(1.4f);
+			else
+				item->Pose.Orientation.x += Angle::DegToRad(1.4f);
 
-		if (abs(zRot - item->Pose.Orientation.z) < Angle::DegToRad(1.4f))
-			item->Pose.Orientation.z = zRot;
-		else if (zRot < item->Pose.Orientation.z)
-			item->Pose.Orientation.z -= Angle::DegToRad(1.4f);
-		else
-			item->Pose.Orientation.z += Angle::DegToRad(1.4f);
+			if (abs(zRot - item->Pose.Orientation.z) < Angle::DegToRad(1.4f))
+				item->Pose.Orientation.z = zRot;
+			else if (zRot < item->Pose.Orientation.z)
+				item->Pose.Orientation.z -= Angle::DegToRad(1.4f);
+			else
+				item->Pose.Orientation.z += Angle::DegToRad(1.4f);
 
 			item->ItemFlags[0] += -2 - xRot / 512;
 			if (item->ItemFlags[0] < 0)
 				item->ItemFlags[0] = 0;
 
-		dx = item->ItemFlags[0] * sin(-2 - xRot / 512);
-		dz = item->ItemFlags[0] * cos(-2 - xRot / 512);
+			dx = item->ItemFlags[0] * sin(-2 - xRot / 512);
+			dz = item->ItemFlags[0] * cos(-2 - xRot / 512);
 
 			item->Pose.Position.x += dx / 64;
 			item->Pose.Position.z += dz / 64;

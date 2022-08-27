@@ -1,24 +1,28 @@
 #include "framework.h"
 #include "Objects/TR4/Entity/tr4_mutant.h"
-#include "Objects/Effects/tr4_locusts.h"
-#include "Game/effects/effects.h"
-#include "Game/misc.h"
-#include "Game/Lara/lara.h"
-#include "Specific/setup.h"
-#include "Game/collision/sphere.h"
-#include "Objects/objectslist.h"
-#include "Specific/trmath.h"
-#include "Game/itemdata/creature_info.h"
-#include "Game/control/control.h"
+
 #include "Game/animation.h"
+#include "Game/collision/sphere.h"
+#include "Game/control/control.h"
+#include "Game/effects/effects.h"
+#include "Game/itemdata/creature_info.h"
 #include "Game/items.h"
+#include "Game/Lara/lara.h"
+#include "Game/misc.h"
+#include "Objects/Effects/tr4_locusts.h"
+#include "Objects/objectslist.h"
 #include "Renderer/Renderer11Enums.h"
+#include "Specific/prng.h"
+#include "Specific/setup.h"
+#include "Specific/trmath.h"
+
+using namespace TEN::Math::Random;
 
 namespace TEN::Entities::TR4
 {
-	#define MUTANT_PROJECTILE_ATTACK_RANGE pow(SECTOR(10), 2)
-	#define MUTANT_LOCUST_ATTACK_1_RANGE pow(SECTOR(15), 2)
-	#define MUTANT_LOCUST_ATTACK_2_RANGE pow(SECTOR(30), 2)
+	constexpr auto MUTANT_PROJECTILE_ATTACK_RANGE = SQUARE(SECTOR(10));
+	constexpr auto MUTANT_LOCUST_ATTACK_1_RANGE	  = SQUARE(SECTOR(15));
+	constexpr auto MUTANT_LOCUST_ATTACK_2_RANGE   = SQUARE(SECTOR(30));
 
 	enum MutantState
 	{
@@ -118,7 +122,7 @@ namespace TEN::Entities::TR4
 		sptr->flags = SP_EXPDEF | SP_ROTATE | SP_DEF | SP_SCALE;
 		sptr->rotAng = GetRandomControl() & 0xFFF;
 
-		if (GetRandomControl() & 1)
+		if (TestProbability(0.5f))
 			sptr->rotAdd = (GetRandomControl() & 0x1F) - 32;
 		else
 			sptr->rotAdd = (GetRandomControl() & 0x1F) + 32;
@@ -175,7 +179,7 @@ namespace TEN::Entities::TR4
 		}
 
 		auto* enemy = creature->Enemy;
-		auto pos = Vector3Int();
+		auto pos = Vector3Int::Zero;
 		GetJointAbsPosition(item, &pos, joint);
 
 		int x = enemy->Pose.Position.x - pos.x;
@@ -284,8 +288,8 @@ namespace TEN::Entities::TR4
 		MutantAIFix(item, &AI);
 
 		RotateHeadToTarget(item, creature, 9, headY);
-		GetCreatureMood(item, &AI, VIOLENT);
-		CreatureMood(item, &AI, VIOLENT);
+		GetCreatureMood(item, &AI, true);
+		CreatureMood(item, &AI, true);
 
 		creature->MaxTurn = 0;
 		angle = CreatureTurn(item, 0);
@@ -295,12 +299,11 @@ namespace TEN::Entities::TR4
 		case MUTANT_STATE_IDLE:
 			if (AI.ahead)
 			{
-				int random = GetRandomControl() & 31;
-				if ((random > 0 && random < 10) && AI.distance <= MUTANT_PROJECTILE_ATTACK_RANGE)
+				if (TestProbability(0.28f) && AI.distance <= MUTANT_PROJECTILE_ATTACK_RANGE)
 					item->Animation.TargetState = MUTANT_STATE_PROJECTILE_ATTACK;
-				else if ((random > 10 && random < 20) && AI.distance <= MUTANT_LOCUST_ATTACK_1_RANGE)
+				else if (TestProbability(0.28f) && AI.distance <= MUTANT_LOCUST_ATTACK_1_RANGE)
 					item->Animation.TargetState = MUTANT_STATE_LOCUST_ATTACK_1;
-				else if ((random > 20 && random < 30) && AI.distance <= MUTANT_LOCUST_ATTACK_2_RANGE)
+				else if (TestProbability(0.28f) && AI.distance <= MUTANT_LOCUST_ATTACK_2_RANGE)
 					item->Animation.TargetState = MUTANT_STATE_LOCUST_ATTACK_2;
 			}
 

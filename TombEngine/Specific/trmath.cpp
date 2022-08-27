@@ -3,7 +3,16 @@
 #include "Specific/prng.h"
 #include <cmath>
 
+#include "Specific/prng.h"
+
 using namespace TEN::Math::Random;
+
+// TODO: phd_atan arguments were in the wrong order!
+float phd_atan(int y, int x)
+{
+	return atan2(x, y);
+}
+
 const Vector3 GetRandomVector()
 {
 	auto vector = Vector3(GenerateFloat(-1, 1), GenerateFloat(-1, 1), GenerateFloat(-1, 1));

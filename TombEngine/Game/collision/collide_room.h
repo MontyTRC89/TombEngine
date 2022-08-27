@@ -152,10 +152,10 @@ void SnapItemToLedge(ItemInfo* item, CollisionInfo* coll, float offsetMultiplier
 void SnapItemToLedge(ItemInfo* item, CollisionInfo* coll, float angle, float offsetMultiplier = 0.0f);
 void SnapItemToGrid(ItemInfo* item, CollisionInfo* coll);
 
-void CalculateItemRotationToSurface(ItemInfo* item, float radiusDivisor = 1.0f, float xOffset = 0, float zOffset = 0);
+void AlignEntityToSurface(ItemInfo* item, Vector2 radius, float tiltConstraintAngle = 45.0f, EulerAngles tiltOffset = EulerAngles::Zero);
 
-float GetSurfaceAspectAngle(float xTilt, float zTilt);
-float GetSurfaceSteepnessAngle(float xTilt, float zTilt);
+float GetSurfaceAspectAngle(Vector2 tilt);
+float GetSurfaceSteepnessAngle(Vector2 tilt);
 
 bool TestEnvironment(RoomEnvFlags environmentType, int x, int y, int z, int roomNumber);
 bool TestEnvironment(RoomEnvFlags environmentType, ItemInfo* item);

@@ -1,28 +1,31 @@
 #include "framework.h"
-#include "tr4_sas.h"
-#include "Game/control/box.h"
-#include "Game/items.h"
-#include "Game/people.h"
-#include "Game/Lara/lara.h"
-#include "Game/Lara/lara_helpers.h"
-#include "Game/Lara/lara_fire.h"
-#include "Game/control/control.h"
+#include "Objects/TR4/Entity/tr4_sas.h"
+
 #include "Game/animation.h"
+#include "Game/collision/collide_item.h"
+#include "Game/control/box.h"
+#include "Game/control/control.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/tomb4fx.h"
-#include "Game/Lara/lara_one_gun.h"
 #include "Game/itemdata/creature_info.h"
-#include "Game/collision/collide_item.h"
+#include "Game/items.h"
+#include "Game/Lara/lara.h"
+#include "Game/Lara/lara_fire.h"
+#include "Game/Lara/lara_helpers.h"
+#include "Game/Lara/lara_one_gun.h"
 #include "Game/misc.h"
+#include "Game/people.h"
 #include "Specific/input.h"
-#include "Specific/setup.h"
 #include "Specific/level.h"
+#include "Specific/prng.h"
+#include "Specific/setup.h"
 
 using namespace TEN::Input;
+using namespace TEN::Math::Random;
 
 namespace TEN::Entities::TR4
 {
-	BITE_INFO SASGunBite = { 0, 300, 64, 7 };
+	const auto SASGunBite = BiteInfo(Vector3(0.0f, 300.0f, 64.0f), 7);
 
 	auto SASDragBodyPosition = Vector3Int(0, 0, -460);
 	OBJECT_COLLISION_BOUNDS SASDragBodyBounds =
@@ -121,7 +124,7 @@ namespace TEN::Entities::TR4
 		// Handle SAS firing.
 		if (creature->FiredWeapon)
 		{
-			auto pos = Vector3Int(SASGunBite.x, SASGunBite.y, SASGunBite.z);
+			auto pos = Vector3Int(SASGunBite.Position);
 			GetJointAbsPosition(item, &pos, SASGunBite.meshNum);
 
 			TriggerDynamicLight(pos.x, pos.y, pos.z, 10, 24, 16, 4);
@@ -139,8 +142,8 @@ namespace TEN::Entities::TR4
 			CreatureAIInfo(item, &AI);
 
 			int distance = 0;
-			float angle = 0;
-			if (creature->Enemy == LaraItem)
+			int angle = 0;
+			if (creature->Enemy->IsLara())
 			{
 				angle = AI.angle;
 				distance = AI.distance;
@@ -153,13 +156,13 @@ namespace TEN::Entities::TR4
 				distance = pow(dx, 2) + pow(dz, 2);
 			}
 
-			GetCreatureMood(item, &AI, creature->Enemy != LaraItem);
+			GetCreatureMood(item, &AI, !creature->Enemy->IsLara());
 
 			// Vehicle handling
 			if (Lara.Vehicle != NO_ITEM && AI.bite)
 				creature->Mood = MoodType::Escape;
 
-			CreatureMood(item, &AI, creature->Enemy != LaraItem);
+			CreatureMood(item, &AI, !creature->Enemy->IsLara());
 			angle = CreatureTurn(item, creature->MaxTurn);
 
 			if (item->HitStatus)
@@ -224,9 +227,9 @@ namespace TEN::Entities::TR4
 						if (AI.distance < pow(SECTOR(3), 2) ||
 							AI.zoneNumber != AI.enemyZone)
 						{
-							if (GetRandomControl() & 1)
+							if (TestProbability(0.5f))
 								item->Animation.TargetState = SAS_STATE_SIGHT_AIM;
-							else if (GetRandomControl() & 1)
+							else if (TestProbability(0.5f))
 								item->Animation.TargetState = SAS_STATE_HOLD_AIM;
 							else
 								item->Animation.TargetState = SAS_STATE_KNEEL_AIM;
@@ -405,7 +408,7 @@ namespace TEN::Entities::TR4
 							item->Animation.TargetState = SAS_STATE_SIGHT_SHOOT;
 						else if (item->Animation.ActiveState == SAS_STATE_KNEEL_AIM)
 							item->Animation.TargetState = SAS_STATE_KNEEL_SHOOT;
-						else if (GetRandomControl() & 1)
+						else if (TestProbability(0.5f))
 							item->Animation.TargetState = SAS_STATE_HOLD_SHOOT;
 						else
 							item->Animation.TargetState = SAS_STATE_HOLD_PREPARE_GRENADE;
@@ -508,7 +511,7 @@ namespace TEN::Entities::TR4
 					creature->Flags -= 1;
 				else
 				{
-					ShotLara(item, &AI, &SASGunBite, joint0, 15);
+					ShotLara(item, &AI, SASGunBite, joint0, 15);
 					creature->Flags = 5;
 					creature->FiredWeapon = 3;
 				}
@@ -563,7 +566,7 @@ namespace TEN::Entities::TR4
 			grenadeItem->ObjectNumber = ID_GRENADE;
 			grenadeItem->RoomNumber = item->RoomNumber;
 
-			auto pos = Vector3Int(SASGunBite.x, SASGunBite.y, SASGunBite.z);
+			auto pos = Vector3Int(SASGunBite.Position);
 			GetJointAbsPosition(item, &pos, SASGunBite.meshNum);
 
 			grenadeItem->Pose.Position = pos;
@@ -588,7 +591,7 @@ namespace TEN::Entities::TR4
 				0.0f
 			);
 
-			if (GetRandomControl() & 3)
+			if (TestProbability(0.75f))
 				grenadeItem->ItemFlags[0] = (int)GrenadeType::Normal;
 			else
 				grenadeItem->ItemFlags[0] = (int)GrenadeType::Super;
@@ -629,7 +632,7 @@ namespace TEN::Entities::TR4
 
 		if (item->Animation.ActiveState == 1)
 		{
-			if (!(GetRandomControl() & 0x7F))
+			if (TestProbability(0.008f))
 			{
 				item->Animation.TargetState = 2;
 				AnimateItem(item);
@@ -637,7 +640,8 @@ namespace TEN::Entities::TR4
 			else if (!(byte)GetRandomControl())
 				item->Animation.TargetState = 3;
 		}
-		else if (item->Animation.ActiveState == 4 && !(GetRandomControl() & 0x7F))
+		else if (item->Animation.ActiveState == 4 &&
+			TestProbability(0.008f))
 		{
 			item->Animation.TargetState = 5;
 			AnimateItem(item);

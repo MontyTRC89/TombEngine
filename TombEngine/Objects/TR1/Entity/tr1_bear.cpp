@@ -15,25 +15,25 @@ using std::vector;
 
 namespace TEN::Entities::TR1
 {
-	BITE_INFO BearBite = { 0, 96, 335, 14 };
-	const vector<int> BearAttackJoints = { 2, 3, 5, 6, 14, 17 };
-
-	constexpr auto BEAR_RUN_DAMAGE = 3;
+	constexpr auto BEAR_RUN_DAMAGE	  = 3;
 	constexpr auto BEAR_ATTACK_DAMAGE = 200;
-	constexpr auto BEAR_SLAM_DAMAGE = 200;
-	constexpr auto BEAR_PAT_DAMAGE = 400;
+	constexpr auto BEAR_SLAM_DAMAGE	  = 200;
+	constexpr auto BEAR_PAT_DAMAGE	  = 400;
 
-	constexpr auto BEAR_ATTACK_RANGE = SECTOR(1);
-	constexpr auto BEAR_REAR_RANGE = SECTOR(2);
+	constexpr auto BEAR_ATTACK_RANGE			= SECTOR(1);
+	constexpr auto BEAR_REAR_RANGE				= SECTOR(2);
 	constexpr auto BEAR_REAR_SWIPE_ATTACK_RANGE = SECTOR(0.6f);
-	constexpr auto BEAR_EAT_RANGE = CLICK(3);
+	constexpr auto BEAR_EAT_RANGE				= CLICK(3);
 
 	constexpr auto BEAR_ROAR_CHANCE = 0x50;
 	constexpr auto BEAR_REAR_CHANCE = 0x300;
 	constexpr auto BEAR_DROP_CHANCE = 0x600;
 
 	#define BEAR_WALK_TURN_RATE_MAX Angle::DegToRad(2.0f)
-	#define BEAR_RUN_TURN_RATE_MAX Angle::DegToRad(5.0f)
+	#define BEAR_RUN_TURN_RATE_MAX	Angle::DegToRad(5.0f)
+
+	const auto BearBite = BiteInfo(Vector3(0.0f, 96.0f, 335.0f), 14);
+	const vector<int> BearAttackJoints = { 2, 3, 5, 6, 14, 17 };
 
 	enum BearState
 	{
@@ -133,8 +133,8 @@ namespace TEN::Entities::TR1
 			if (AI.ahead)
 				head = AI.angle;
 
-			GetCreatureMood(item, &AI, VIOLENT);
-			CreatureMood(item, &AI, VIOLENT);
+			GetCreatureMood(item, &AI, true);
+			CreatureMood(item, &AI, true);
 
 			angle = CreatureTurn(item, creature->MaxTurn);
 
@@ -194,7 +194,9 @@ namespace TEN::Entities::TR1
 					item->Animation.TargetState = BEAR_STATE_IDLE;
 				else if (AI.ahead && !item->Animation.RequiredState)
 				{
-					if (!creature->Flags && AI.distance < pow(BEAR_REAR_RANGE, 2) && GetRandomControl() < BEAR_REAR_CHANCE)
+					if (AI.distance < pow(BEAR_REAR_RANGE, 2) &&
+						GetRandomControl() < BEAR_REAR_CHANCE &&
+						!creature->Flags)
 					{
 						item->Animation.RequiredState = BEAR_STATE_REAR;
 						item->Animation.TargetState = BEAR_STATE_IDLE;
@@ -262,7 +264,7 @@ namespace TEN::Entities::TR1
 				if (!item->Animation.RequiredState &&
 					item->TestBits(JointBitType::Touch, BearAttackJoints))
 				{
-					CreatureEffect(item, &BearBite, DoBloodSplat);
+					CreatureEffect(item, BearBite, DoBloodSplat);
 					DoDamage(creature->Enemy, BEAR_ATTACK_DAMAGE);
 					item->Animation.RequiredState = BEAR_STATE_IDLE;
 				}

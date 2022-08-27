@@ -38,6 +38,7 @@ void UpdateLaraSubsuitAngles(ItemInfo* item);
 void ModulateLaraLean(ItemInfo* item, CollisionInfo* coll, float baseRate, float maxAngle);
 void ModulateLaraCrawlFlex(ItemInfo* item, float baseRate, float maxAngle);
 void ModulateLaraSlideVelocity(ItemInfo* item, CollisionInfo* coll);
+void AlignLaraToSurface(ItemInfo* item, float alpha = 0.15f);
 
 void SetLaraJumpDirection(ItemInfo* item, CollisionInfo* coll);
 void SetLaraRunJumpQueue(ItemInfo* item, CollisionInfo* coll);

@@ -1,12 +1,13 @@
 #include "framework.h"
 #include "Objects/Generic/Traps/dart_emitter.h"
-#include "Specific/level.h"
+
 #include "Game/collision/collide_room.h"
-#include "Game/Lara/lara.h"
 #include "Game/effects/effects.h"
 #include "Game/items.h"
-#include "Sound/sound.h"
+#include "Game/Lara/lara.h"
 #include "Renderer/Renderer11Enums.h"
+#include "Sound/sound.h"
+#include "Specific/level.h"
 
 namespace TEN::Entities::Traps
 {

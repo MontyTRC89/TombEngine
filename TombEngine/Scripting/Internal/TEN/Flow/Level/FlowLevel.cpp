@@ -49,7 +49,6 @@ void Level::Register(sol::table & parent)
 		"layer1", &Level::Layer1,
 
 /// (@{Flow.SkyLayer}) Secondary sky layer
-// __(not yet implemented)__
 //@mem layer2
 		"layer2", &Level::Layer2,
 

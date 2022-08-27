@@ -12,6 +12,7 @@
 
 		Vector3Int();
 		Vector3Int(int x, int y, int z);
+		Vector3Int(Vector3 vector);
 
 		static float Distance(Vector3Int origin, Vector3Int target);
 

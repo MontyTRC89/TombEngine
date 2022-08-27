@@ -422,8 +422,7 @@ namespace TEN::Renderer
 			if (obj.ObjectMeshes.size() == 0)
 				continue;
 
-			auto stat = &StaticObjects[mesh->staticNumber];
-			auto bounds = TO_DX_BBOX(mesh->pos, &stat->visibilityBox);
+			auto bounds = TO_DX_BBOX(mesh->pos, GetBoundsAccurate(mesh, true));
 			auto length = Vector3(bounds.Extents).Length();
 			if (!renderView.camera.frustum.SphereInFrustum(bounds.Center, length))
 				continue;
@@ -433,6 +432,7 @@ namespace TEN::Renderer
 				CollectLights(mesh->pos.Position.ToVector3(), ITEM_LIGHT_COLLECTION_RADIUS, room.RoomNumber, NO_ROOM, false, lights);
 
 			Matrix world = (Matrix::CreateFromYawPitchRoll(mesh->pos.Orientation.y, mesh->pos.Orientation.x, mesh->pos.Orientation.z) *
+							Matrix::CreateScale(mesh->scale) *
 							Matrix::CreateTranslation(mesh->pos.Position.x, mesh->pos.Position.y, mesh->pos.Position.z));
 
 			auto staticInfo = RendererStatic

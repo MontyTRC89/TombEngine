@@ -16,8 +16,8 @@ using std::vector;
 
 namespace TEN::Entities::TR3
 {
-	BITE_INFO MonkeyBite = { 10, 10, 11, 13 };
 	const vector<int> MonkeyAttackJoints = { 10, 13 };
+	const auto MonkeyBite = BiteInfo(Vector3(10.0f, 10.0f, 11.0f), 13);
 
 	void InitialiseMonkey(short itemNumber)
 	{
@@ -64,7 +64,7 @@ namespace TEN::Entities::TR3
 			else
 			{
 				int minDistance = 0x7FFFFFFF;
-				creature->Enemy = NULL;
+				creature->Enemy = nullptr;
 
 				for (int i = 0; i < ActiveCreatures.size(); i++)
 				{
@@ -110,7 +110,7 @@ namespace TEN::Entities::TR3
 			CreatureAIInfo(item, &AI);
 
 			if (!creature->HurtByLara && creature->Enemy == LaraItem)
-				creature->Enemy = NULL;
+				creature->Enemy = nullptr;
 
 			AI_INFO laraAI;
 			if (creature->Enemy == LaraItem)
@@ -127,12 +127,12 @@ namespace TEN::Entities::TR3
 				laraAI.distance = pow(dx, 2) + pow(dz, 2);
 			}
 
-			GetCreatureMood(item, &AI, VIOLENT);
+			GetCreatureMood(item, &AI, true);
 
 			if (Lara.Vehicle != NO_ITEM)
 				creature->Mood = MoodType::Escape;
 
-			CreatureMood(item, &AI, VIOLENT);
+			CreatureMood(item, &AI, true);
 
 			angle = CreatureTurn(item, creature->MaxTurn);
 
@@ -263,7 +263,7 @@ namespace TEN::Entities::TR3
 					item->Animation.TargetState = 14;
 				else if (AI.bite && AI.distance < pow(682, 2))
 					item->Animation.TargetState = 2;
-				else if (AI.distance < pow(682, 2) && creature->Enemy != LaraItem && creature->Enemy != NULL &&
+				else if (AI.distance < pow(682, 2) && creature->Enemy != LaraItem && creature->Enemy != nullptr &&
 					creature->Enemy->ObjectNumber != ID_AI_PATROL1 && creature->Enemy->ObjectNumber != ID_AI_PATROL2 &&
 					abs(item->Pose.Position.y - creature->Enemy->Pose.Position.y) < 256)
 				{
@@ -279,7 +279,7 @@ namespace TEN::Entities::TR3
 			case 5:
 				creature->ReachedGoal = true;
 
-				if (creature->Enemy == NULL)
+				if (creature->Enemy == nullptr)
 					break;
 				else if ((creature->Enemy->ObjectNumber == ID_SMALLMEDI_ITEM ||
 					creature->Enemy->ObjectNumber == ID_KEY_ITEM4) &&
@@ -288,7 +288,9 @@ namespace TEN::Entities::TR3
 					if (creature->Enemy->RoomNumber == NO_ROOM ||
 						creature->Enemy->Status == ITEM_INVISIBLE ||
 						creature->Enemy->Flags & -32768)
-						creature->Enemy = NULL;
+					{
+						creature->Enemy = nullptr;
+					}
 					else
 					{
 						item->CarriedItem = creature->Enemy - g_Level.Items.data();
@@ -304,10 +306,10 @@ namespace TEN::Entities::TR3
 
 							auto* target = &g_Level.Items[currentCreature->ItemNumber];
 							if (currentCreature->Enemy == creature->Enemy)
-								currentCreature->Enemy = NULL;
+								currentCreature->Enemy = nullptr;
 						}
 
-						creature->Enemy = NULL;
+						creature->Enemy = nullptr;
 
 						if (item->AIBits != MODIFY)
 						{
@@ -330,7 +332,7 @@ namespace TEN::Entities::TR3
 					item->CarriedItem = NO_ITEM;
 
 					carriedItem->AIBits = GUARD;
-					creature->Enemy = NULL;
+					creature->Enemy = nullptr;
 				}
 				else
 				{
@@ -413,8 +415,8 @@ namespace TEN::Entities::TR3
 				{
 					if (!creature->Flags && item->TestBits(JointBitType::Touch, MonkeyAttackJoints))
 					{
-						CreatureEffect(item, &MonkeyBite, DoBloodSplat);
 						DoDamage(enemy, 40);
+						CreatureEffect(item, MonkeyBite, DoBloodSplat);
 						creature->Flags = 1;
 					}
 				}
@@ -426,8 +428,8 @@ namespace TEN::Entities::TR3
 							abs(enemy->Pose.Position.y - item->Pose.Position.y) <= CLICK(1) &&
 							abs(enemy->Pose.Position.z - item->Pose.Position.z) < CLICK(1))
 						{
-							CreatureEffect(item, &MonkeyBite, DoBloodSplat);
 							DoDamage(enemy, 20);
+							CreatureEffect(item, MonkeyBite, DoBloodSplat);
 							creature->Flags = 1;
 						}
 					}
@@ -455,8 +457,8 @@ namespace TEN::Entities::TR3
 				{
 					if (!creature->Flags && item->TestBits(JointBitType::Touch, MonkeyAttackJoints))
 					{
-						CreatureEffect(item, &MonkeyBite, DoBloodSplat);
 						DoDamage(enemy, 40);
+						CreatureEffect(item, MonkeyBite, DoBloodSplat);
 						creature->Flags = 1;
 					}
 				}
@@ -468,8 +470,8 @@ namespace TEN::Entities::TR3
 							abs(enemy->Pose.Position.y - item->Pose.Position.y) <= CLICK(1) &&
 							abs(enemy->Pose.Position.z - item->Pose.Position.z) < CLICK(1))
 						{
-							CreatureEffect(item, &MonkeyBite, DoBloodSplat);
 							DoDamage(enemy, 20);
+							CreatureEffect(item, MonkeyBite, DoBloodSplat);
 							creature->Flags = 1;
 						}
 					}
@@ -497,8 +499,8 @@ namespace TEN::Entities::TR3
 				{
 					if (creature->Flags != 1 && item->TestBits(JointBitType::Touch, MonkeyAttackJoints))
 					{
-						CreatureEffect(item, &MonkeyBite, DoBloodSplat);
 						DoDamage(enemy, 50);
+						CreatureEffect(item, MonkeyBite, DoBloodSplat);
 						creature->Flags = 1;
 					}
 				}
@@ -510,8 +512,8 @@ namespace TEN::Entities::TR3
 							abs(enemy->Pose.Position.y - item->Pose.Position.y) <= CLICK(1) &&
 							abs(enemy->Pose.Position.z - item->Pose.Position.z) < CLICK(1))
 						{
-							CreatureEffect(item, &MonkeyBite, DoBloodSplat);
 							DoDamage(enemy, 25);
+							CreatureEffect(item, MonkeyBite, DoBloodSplat);
 							creature->Flags = 1;
 						}
 					}
