@@ -74,6 +74,11 @@
 		);
 	}
 
+	short GetShortestAngularDistance(short angleFrom, short angleTo)
+	{
+		return short(angleTo - angleFrom);
+	}
+
 	short GetSurfaceSteepnessAngle(Vector2 tilt)
 	{
 		short qtrBlockAngleIncrement = ANGLE(45.0f) / 4;

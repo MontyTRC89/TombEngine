@@ -89,6 +89,7 @@ namespace TEN::Entities::TR4
 
 	static bool IsCrocodileInWater(ItemInfo* item)
 	{
+		auto* object = &Objects[item->ObjectNumber];
 		auto* creature = GetCreatureInfo(item);
 
 		if (TestEnvironment(ENV_FLAG_WATER, item))
@@ -323,8 +324,12 @@ namespace TEN::Entities::TR4
 		CreatureJoint(item, 3, boneRot.bone3);
 
 		CreatureAnimation(itemNumber, angle, 0);
+
 		if (item->Animation.ActiveState < CROC_STATE_SWIM_FORWARD)
-			CalculateItemRotationToSurface(item, 2.0f);
+		{
+			auto radius = Vector2(object->radius, object->radius * 1.5f);
+			AlignEntityToSurface(item, radius);
+		}
 
 		if (item->Animation.ActiveState >= CROC_STATE_SWIM_FORWARD && item->Animation.ActiveState <= CROC_STATE_WATER_DEATH)
 			CreatureUnderwater(item, CLICK(1));
