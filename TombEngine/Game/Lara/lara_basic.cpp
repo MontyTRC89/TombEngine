@@ -139,9 +139,12 @@ void lara_as_walk_forward(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	// TODO: Implement item alignment properly someday. @Sezz 2021.11.01
+	// TODO: Implement item alignment properly someday. -- Sezz 2021.11.01
 	if (lara->Control.IsMoving)
+	{
+		ModulateLaraTurnRateY(item, 0, 0, 0);
 		return;
+	}
 
 	if (TrInput & (IN_LEFT | IN_RIGHT))
 	{
@@ -1426,7 +1429,10 @@ void lara_as_walk_back(ItemInfo* item, CollisionInfo* coll)
 	}
 
 	if (lara->Control.IsMoving)
+	{
+		ModulateLaraTurnRateY(item, 0, 0, 0);
 		return;
+	}
 
 	if (isSwamp && lara->Control.WaterStatus == WaterStatus::Wade)
 	{
@@ -1786,7 +1792,10 @@ void lara_as_step_right(ItemInfo* item, CollisionInfo* coll)
 	}
 
 	if (lara->Control.IsMoving)
+	{
+		ModulateLaraTurnRateY(item, 0, 0, 0);
 		return;
+	}
 
 	if (TrInput & IN_WALK) // WALK locks orientation.
 		ModulateLaraTurnRateY(item, 0, 0, 0);
@@ -1877,7 +1886,10 @@ void lara_as_step_left(ItemInfo* item, CollisionInfo* coll)
 	}
 
 	if (lara->Control.IsMoving)
+	{
+		ModulateLaraTurnRateY(item, 0, 0, 0);
 		return;
+	}
 
 	if (TrInput & IN_WALK) // WALK locks orientation.
 		ModulateLaraTurnRateY(item, 0, 0, 0);
