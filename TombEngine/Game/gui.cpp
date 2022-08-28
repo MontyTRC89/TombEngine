@@ -21,7 +21,6 @@
 #include "Sound/sound.h"
 #include "Specific/clock.h"
 #include "Specific/configuration.h"
-#include "Specific/configuration.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
 
@@ -297,7 +296,7 @@ namespace TEN::Gui
 
 		// Get current display mode
 		CurrentSettings.SelectedScreenResolution = 0;
-		for (size_t i = 0; i < g_Configuration.SupportedScreenResolutions.size(); i++)
+		for (int i = 0; i < g_Configuration.SupportedScreenResolutions.size(); i++)
 		{
 			auto screenResolution = g_Configuration.SupportedScreenResolutions[i];
 			if (screenResolution.x == CurrentSettings.Configuration.Width &&
@@ -883,7 +882,7 @@ namespace TEN::Gui
 
 	bool GuiController::DoObjectsCombine(int objectNumber1, int objectNumber2)
 	{
-		for (size_t n = 0; n < MAX_COMBINES; n++)
+		for (int n = 0; n < MAX_COMBINES; n++)
 		{
 			if (CombineTable[n].Item1 == objectNumber1 &&
 				CombineTable[n].Item2 == objectNumber2)
@@ -901,7 +900,7 @@ namespace TEN::Gui
 	{
 		if (objectNumber < INV_OBJECT_SMALL_WATERSKIN_EMPTY || objectNumber > INV_OBJECT_BIG_WATERSKIN_5L)//trash
 		{
-			for (size_t n = 0; n < MAX_COMBINES; n++)
+			for (int n = 0; n < MAX_COMBINES; n++)
 			{
 				if (CombineTable[n].Item1 == objectNumber)
 				{
@@ -918,7 +917,7 @@ namespace TEN::Gui
 		}
 		else if (objectNumber > INV_OBJECT_SMALL_WATERSKIN_3L)
 		{
-			for (size_t n = 0; n < 4; n++)
+			for (int n = 0; n < 4; n++)
 			{
 				if (IsItemInInventory(n + INV_OBJECT_SMALL_WATERSKIN_EMPTY))
 					return true;
@@ -926,7 +925,7 @@ namespace TEN::Gui
 		}
 		else
 		{
-			for (size_t n = 0; n < 6; n++)
+			for (int n = 0; n < 6; n++)
 			{
 				if (IsItemInInventory(n + INV_OBJECT_BIG_WATERSKIN_EMPTY))
 					return true;
@@ -938,7 +937,7 @@ namespace TEN::Gui
 
 	bool GuiController::IsItemInInventory(int objectNumber)
 	{
-		for (size_t i = 0; i < INVENTORY_TABLE_SIZE; i++)
+		for (int i = 0; i < INVENTORY_TABLE_SIZE; i++)
 		{
 			if (Rings[(int)RingTypes::Inventory]->CurrentObjectList[i].InventoryItem == objectNumber)
 				return true;
@@ -983,7 +982,7 @@ namespace TEN::Gui
 
 	void GuiController::SetupObjectListStartPosition(int newObjectNumber)
 	{
-		for (size_t i = 0; i < INVENTORY_TABLE_SIZE; i++)
+		for (int i = 0; i < INVENTORY_TABLE_SIZE; i++)
 		{
 			if (Rings[(int)RingTypes::Inventory]->CurrentObjectList[i].InventoryItem == newObjectNumber)
 				Rings[(int)RingTypes::Inventory]->CurrentObjectInList = i;
@@ -1158,7 +1157,7 @@ namespace TEN::Gui
 
 		Rings[(int)RingTypes::Inventory]->NumObjectsInList = 0;
 
-		for (size_t i = 0; i < INVENTORY_TABLE_SIZE; i++)
+		for (int i = 0; i < INVENTORY_TABLE_SIZE; i++)
 			Rings[(int)RingTypes::Inventory]->CurrentObjectList[i].InventoryItem = NO_ITEM;
 
 		Ammo.CurrentPistolsAmmoType = 0;
@@ -1315,49 +1314,49 @@ namespace TEN::Gui
 		if (lara->Inventory.BigWaterskin)
 			InsertObjectIntoList((lara->Inventory.BigWaterskin - 1) + INV_OBJECT_BIG_WATERSKIN_EMPTY);
 
-		for (size_t i = 0; i < NUM_PUZZLES; i++)
+		for (int i = 0; i < NUM_PUZZLES; i++)
 		{
 			if (lara->Inventory.Puzzles[i])
 				InsertObjectIntoList(INV_OBJECT_PUZZLE1 + i);
 		}
 
-		for (size_t i = 0; i < NUM_PUZZLE_PIECES; i++)
+		for (int i = 0; i < NUM_PUZZLE_PIECES; i++)
 		{
 			if (lara->Inventory.PuzzlesCombo[i])
 				InsertObjectIntoList(INV_OBJECT_PUZZLE1_COMBO1 + i);
 		}
 
-		for (size_t i = 0; i < NUM_KEYS; i++)
+		for (int i = 0; i < NUM_KEYS; i++)
 		{
 			if (lara->Inventory.Keys[i])
 				InsertObjectIntoList(INV_OBJECT_KEY1 + i);
 		}
 
-		for (size_t i = 0; i < NUM_KEY_PIECES; i++)
+		for (int i = 0; i < NUM_KEY_PIECES; i++)
 		{
 			if (lara->Inventory.KeysCombo[i])
 				InsertObjectIntoList(INV_OBJECT_KEY1_COMBO1 + i);
 		}
 
-		for (size_t i = 0; i < NUM_PICKUPS; i++)
+		for (int i = 0; i < NUM_PICKUPS; i++)
 		{
 			if (lara->Inventory.Pickups[i])
 				InsertObjectIntoList(INV_OBJECT_PICKUP1 + i);
 		}
 
-		for (size_t i = 0; i < NUM_PICKUPS_PIECES; i++)
+		for (int i = 0; i < NUM_PICKUPS_PIECES; i++)
 		{
 			if (lara->Inventory.PickupsCombo[i])
 				InsertObjectIntoList(INV_OBJECT_PICKUP1_COMBO1 + i);
 		}
 
-		for (size_t i = 0; i < NUM_EXAMINES; i++)
+		for (int i = 0; i < NUM_EXAMINES; i++)
 		{
 			if (lara->Inventory.Examines[i])
 				InsertObjectIntoList(INV_OBJECT_EXAMINE1 + i);
 		}
 
-		for (size_t i = 0; i < NUM_EXAMINES_PIECES; i++)
+		for (int i = 0; i < NUM_EXAMINES_PIECES; i++)
 		{
 			if (lara->Inventory.ExaminesCombo[i])
 				InsertObjectIntoList(INV_OBJECT_EXAMINE1_COMBO1 + i);
@@ -1388,7 +1387,7 @@ namespace TEN::Gui
 
 		Rings[(int)RingTypes::Ammo]->NumObjectsInList = 0;
 
-		for (size_t i = 0; i < INVENTORY_TABLE_SIZE; i++)
+		for (int i = 0; i < INVENTORY_TABLE_SIZE; i++)
 			Rings[(int)RingTypes::Ammo]->CurrentObjectList[i].InventoryItem = NO_ITEM;
 
 		if (!(g_GameFlow->GetLevel(CurrentLevel)->GetLaraType() == LaraType::Young))
@@ -1434,25 +1433,25 @@ namespace TEN::Gui
 		if (lara->Inventory.BigWaterskin)
 			InsertObjectIntoList_v2(lara->Inventory.BigWaterskin - 1 + INV_OBJECT_BIG_WATERSKIN_EMPTY);
 
-		for (size_t i = 0; i < NUM_PUZZLE_PIECES; i++)
+		for (int i = 0; i < NUM_PUZZLE_PIECES; i++)
 		{
 			if (lara->Inventory.PuzzlesCombo[i])
 				InsertObjectIntoList_v2(INV_OBJECT_PUZZLE1_COMBO1 + i);
 		}
 
-		for (size_t i = 0; i < NUM_KEY_PIECES; i++)
+		for (int i = 0; i < NUM_KEY_PIECES; i++)
 		{
 			if (lara->Inventory.KeysCombo[i])
 				InsertObjectIntoList_v2(INV_OBJECT_KEY1_COMBO1 + i);
 		}
 
-		for (size_t i = 0; i < NUM_PICKUPS_PIECES; i++)
+		for (int i = 0; i < NUM_PICKUPS_PIECES; i++)
 		{
 			if (lara->Inventory.PickupsCombo[i])
 				InsertObjectIntoList_v2(INV_OBJECT_PICKUP1_COMBO1 + i);
 		}
 
-		for (size_t i = 0; i < NUM_EXAMINES_PIECES; i++)
+		for (int i = 0; i < NUM_EXAMINES_PIECES; i++)
 		{
 			if (lara->Inventory.ExaminesCombo[i])
 				InsertObjectIntoList_v2(INV_OBJECT_EXAMINE1_COMBO1 + i);
@@ -1507,7 +1506,7 @@ namespace TEN::Gui
 				{
 					if (LastInvItem >= INV_OBJECT_SMALL_WATERSKIN_EMPTY && LastInvItem <= INV_OBJECT_SMALL_WATERSKIN_3L)
 					{
-						for (size_t i = INV_OBJECT_SMALL_WATERSKIN_EMPTY; i <= INV_OBJECT_SMALL_WATERSKIN_3L; i++)
+						for (int i = INV_OBJECT_SMALL_WATERSKIN_EMPTY; i <= INV_OBJECT_SMALL_WATERSKIN_3L; i++)
 						{
 							if (IsItemInInventory(i))
 							{
@@ -1518,7 +1517,7 @@ namespace TEN::Gui
 					}
 					else if (LastInvItem >= INV_OBJECT_BIG_WATERSKIN_EMPTY && LastInvItem <= INV_OBJECT_BIG_WATERSKIN_5L)
 					{
-						for (size_t i = INV_OBJECT_BIG_WATERSKIN_EMPTY; i <= INV_OBJECT_BIG_WATERSKIN_5L; i++)
+						for (int i = INV_OBJECT_BIG_WATERSKIN_EMPTY; i <= INV_OBJECT_BIG_WATERSKIN_5L; i++)
 						{
 							if (IsItemInInventory(i))
 							{
@@ -1558,7 +1557,7 @@ namespace TEN::Gui
 
 	void GuiController::SetupObjectListStartPosition2(int newObjectNumber)
 	{
-		for (size_t i = 0; i < INVENTORY_TABLE_SIZE; i++)
+		for (int i = 0; i < INVENTORY_TABLE_SIZE; i++)
 		{
 			if (InventoryObjectTable[Rings[(int)RingTypes::Inventory]->CurrentObjectList[i].InventoryItem].ObjectNumber == newObjectNumber)
 				Rings[(int)RingTypes::Inventory]->CurrentObjectInList = i;
@@ -1567,7 +1566,7 @@ namespace TEN::Gui
 
 	int GuiController::ConvertObjectToInventoryItem(int objectNumber)
 	{
-		for (size_t i = 0; i < INVENTORY_TABLE_SIZE; i++)
+		for (int i = 0; i < INVENTORY_TABLE_SIZE; i++)
 		{
 			if (InventoryObjectTable[i].ObjectNumber == objectNumber)
 				return i;
@@ -1953,7 +1952,7 @@ namespace TEN::Gui
 		{
 			int num = Rings[(int)RingTypes::Inventory]->CurrentObjectList[Rings[(int)RingTypes::Inventory]->CurrentObjectInList].InventoryItem;
 
-			for (size_t i = 0; i < 3; i++)
+			for (int i = 0; i < 3; i++)
 			{
 				CurrentOptions[i].Type = MenuType::None;
 				CurrentOptions[i].Text = 0;
@@ -2074,7 +2073,7 @@ namespace TEN::Gui
 
 			if (n > 0)
 			{
-				for (size_t i = 0; i < n; i++)
+				for (int i = 0; i < n; i++)
 				{
 					if (i == CurrentSelectedOption)
 					{
@@ -2509,7 +2508,7 @@ namespace TEN::Gui
 
 		if (minObj <= maxObj)
 		{
-			for (size_t i = minObj; i <= maxObj; i++)
+			for (int i = minObj; i <= maxObj; i++)
 			{
 				int shade = 0;
 

@@ -68,6 +68,26 @@ namespace TEN::Input
 		g_Renderer.PrintDebugMessage("TimeInactive: %.3f", TimeInactive);
 	}
 
+	ActionID InputAction::GetID()
+	{
+		return ID;
+	}
+
+	float InputAction::GetValue()
+	{
+		return Value;
+	}
+
+	float InputAction::GetTimeActive()
+	{
+		return TimeActive;
+	}
+
+	float InputAction::GetTimeInactive()
+	{
+		return TimeInactive;
+	}
+
 	bool InputAction::IsClicked()
 	{
 		return (Value != 0.0f && PrevValue == 0.0f);
@@ -100,26 +120,6 @@ namespace TEN::Input
 	bool InputAction::IsReleased(float maxDelayInSeconds)
 	{
 		return (Value == 0.0f && PrevValue != 0.0f && TimeActive <= maxDelayInSeconds);
-	}
-
-	ActionID InputAction::GetID()
-	{
-		return ID;
-	}
-
-	float InputAction::GetValue()
-	{
-		return Value;
-	}
-
-	float InputAction::GetTimeActive()
-	{
-		return TimeActive;
-	}
-
-	float InputAction::GetTimeInactive()
-	{
-		return TimeInactive;
 	}
 
 	void InputAction::UpdateValue(float value)

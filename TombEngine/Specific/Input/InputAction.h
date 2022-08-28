@@ -75,15 +75,15 @@ namespace TEN::Input
 		void Clear();
 		void PrintDebugInfo();
 
-		bool IsClicked();
-		bool IsPulsed(float delayInSeconds, float initialDelayInSeconds = 0.0f);
-		bool IsHeld();
-		bool IsReleased(float maxDelayInSeconds = FLT_MAX);
-
 		ActionID GetID();
 		float GetValue();
 		float GetTimeActive();
 		float GetTimeInactive();
+
+		bool IsClicked();
+		bool IsPulsed(float delayInSeconds, float initialDelayInSeconds = 0.0f);
+		bool IsHeld();
+		bool IsReleased(float maxDelayInSeconds = FLT_MAX);
 
 	private:
 		ActionID ID			 = In::None;

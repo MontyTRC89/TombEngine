@@ -101,8 +101,8 @@ namespace TEN::Gui
 
 	struct SettingsData
 	{
-		bool WaitingForKey = false; // Waiting for a key to be pressed when configuring controls
-		bool IgnoreInput = false;   // Ignore input unless all keys were released
+		bool WaitingForKey = false; // Waiting for a key to be pressed when configuring controls.
+		bool IgnoreInput = false;   // Ignore input unless all keys were released.
 		int SelectedScreenResolution;
 		GameConfiguration Configuration;
 	};
