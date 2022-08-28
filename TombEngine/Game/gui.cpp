@@ -2077,7 +2077,7 @@ namespace TEN::Gui
 				{
 					if (i == CurrentSelectedOption)
 					{
-						g_Renderer.AddString(PHD_CENTER_Y, yPos, CurrentOptions[i].Text, PRINTSTRING_COLOR_WHITE, PRINTSTRING_BLINK | PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
+						g_Renderer.AddString(PHD_CENTER_X, yPos, CurrentOptions[i].Text, PRINTSTRING_COLOR_WHITE, PRINTSTRING_BLINK | PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
 						yPos += LINE_HEIGHT;
 					}
 					else
@@ -2366,7 +2366,6 @@ namespace TEN::Gui
 
 					if (AmmoSelectorFadeVal)
 						g_Renderer.AddString(PHD_CENTER_X, 380, &invTextBuffer[0], PRINTSTRING_COLOR_YELLOW, PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
-
 				
 					if (n == *CurrentAmmoType)
 						g_Renderer.DrawObjectOn2DPosition(x, y, obj, XRot, YRot, ZRot, scaler);
