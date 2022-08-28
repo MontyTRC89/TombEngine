@@ -2759,7 +2759,6 @@ namespace TEN::Gui
 							if (AmmoSelectorFlag)
 								AmmoSelectorFadeDir = 2;
 						}
-
 					}
 
 					if (Rings[ringIndex]->ObjectListMovement < 65536)
