@@ -172,14 +172,15 @@ void LoadItems()
 		for (int i = 0; i < g_Level.NumItems; i++)
 		{
 			auto* item = &g_Level.Items[i];
-			
+
+			item->Data = ITEM_DATA{};
 			item->ObjectNumber = from_underlying(ReadInt16());
 			item->RoomNumber = ReadInt16();
 			item->Pose.Position.x = ReadInt32();
 			item->Pose.Position.y = ReadInt32();
 			item->Pose.Position.z = ReadInt32();
-			item->Pose.Orientation.x = Angle::ShrtToRad(ReadInt16());
 			item->Pose.Orientation.y = Angle::ShrtToRad(ReadInt16());
+			item->Pose.Orientation.x = Angle::ShrtToRad(ReadInt16());
 			item->Pose.Orientation.z = Angle::ShrtToRad(ReadInt16());
 			item->Color = ReadVector4();
 			item->TriggerFlags = ReadInt16();
@@ -230,7 +231,7 @@ void LoadObjects()
 
 		mesh.bones.resize(numVertices);
 		ReadBytes(mesh.bones.data(), 4 * numVertices);
-		
+
 		int numBuckets = ReadInt32();
 		mesh.buckets.reserve(numBuckets);
 		for (int j = 0; j < numBuckets; j++)
@@ -259,7 +260,7 @@ void LoadObjects()
 				poly.normals.resize(count);
 				poly.tangents.resize(count);
 				poly.bitangents.resize(count);
-				
+
 				for (int n = 0; n < count; n++)
 					poly.indices[n] = ReadInt32();
 				for (int n = 0; n < count; n++)
@@ -414,7 +415,7 @@ void LoadCameras()
 	g_Level.Cameras.reserve(numCameras);
 	for (int i = 0; i < numCameras; i++)
 	{
-		auto & camera = g_Level.Cameras.emplace_back();
+		auto& camera = g_Level.Cameras.emplace_back();
 		camera.x = ReadInt32();
 		camera.y = ReadInt32();
 		camera.z = ReadInt32();
@@ -439,7 +440,7 @@ void LoadCameras()
 	g_Level.Sinks.reserve(numSinks);
 	for (int i = 0; i < numSinks; i++)
 	{
-		auto & sink = g_Level.Sinks.emplace_back();
+		auto& sink = g_Level.Sinks.emplace_back();
 		sink.x = ReadInt32();
 		sink.y = ReadInt32();
 		sink.z = ReadInt32();
@@ -471,7 +472,7 @@ void LoadTextures()
 		size = ReadInt32();
 		texture.colorMapData.resize(size);
 		ReadBytes(texture.colorMapData.data(), size);
-		
+
 		bool hasNormalMap = ReadBool();
 		if (hasNormalMap)
 		{
@@ -593,13 +594,13 @@ void ReadRooms()
 
 	for (int i = 0; i < numRooms; i++)
 	{
-		auto & room = g_Level.Rooms.emplace_back();
-		
+		auto& room = g_Level.Rooms.emplace_back();
+
 		room.name = ReadString();
 		int numTags = ReadInt32();
 		for (int j = 0; j < numTags; j++)
 			room.tags.push_back(ReadString());
-		
+
 		room.x = ReadInt32();
 		room.y = 0;
 		room.z = ReadInt32();
@@ -637,7 +638,7 @@ void ReadRooms()
 			for (int k = 0; k < numPolygons; k++)
 			{
 				POLYGON poly;
-				
+
 				poly.shape = ReadInt32();
 				poly.animatedSequence = ReadInt32();
 				poly.animatedFrame = ReadInt32();
@@ -767,18 +768,19 @@ void ReadRooms()
 
 			room.lights.push_back(light);
 		}
-		
+
 		int numStatics = ReadInt32();
 		room.mesh.reserve(numStatics);
 		for (int j = 0; j < numStatics; j++)
 		{
-			auto & mesh = room.mesh.emplace_back();
+			auto& mesh = room.mesh.emplace_back();
 			mesh.pos.Position.x = ReadInt32();
 			mesh.pos.Position.y = ReadInt32();
 			mesh.pos.Position.z = ReadInt32();
-			mesh.pos.Orientation.x = Angle::ShrtToRad(ReadUInt16());
 			mesh.pos.Orientation.y = Angle::ShrtToRad(ReadUInt16());
+			mesh.pos.Orientation.x = Angle::ShrtToRad(ReadUInt16());
 			mesh.pos.Orientation.z = Angle::ShrtToRad(ReadUInt16());
+			mesh.scale = ReadFloat();
 			mesh.flags = ReadUInt16();
 			mesh.color = ReadVector4();
 			mesh.staticNumber = ReadUInt16();
@@ -812,7 +814,7 @@ void ReadRooms()
 			volume.EventSetIndex = ReadInt32();
 
 			volume.Status = TriggerStatus::Outside;
-			volume.Box    = BoundingOrientedBox(volume.Position, volume.Scale, volume.Rotation);
+			volume.Box = BoundingOrientedBox(volume.Position, volume.Scale, volume.Rotation);
 			volume.Sphere = BoundingSphere(volume.Position, volume.Scale.x);
 
 			room.triggerVolumes.push_back(volume);
@@ -832,13 +834,13 @@ void ReadRooms()
 void LoadRooms()
 {
 	TENLog("Loading rooms... ", LogLevel::Info);
-	
+
 	Wibble = 0;
 
 	ReadRooms();
 	BuildOutsideRoomsTable();
 
-	int numFloorData = ReadInt32(); 
+	int numFloorData = ReadInt32();
 	g_Level.FloorData.resize(numFloorData);
 	ReadBytes(g_Level.FloorData.data(), numFloorData * sizeof(short));
 }
@@ -960,7 +962,7 @@ void LoadAIObjects()
 	g_Level.AIObjects.reserve(nAIObjects);
 	for (int i = 0; i < nAIObjects; i++)
 	{
-		auto & obj = g_Level.AIObjects.emplace_back();
+		auto& obj = g_Level.AIObjects.emplace_back();
 
 		obj.objectNumber = (GAME_OBJECT_ID)ReadInt16();
 		obj.roomNumber = ReadInt16();
@@ -1284,16 +1286,16 @@ int LoadLevelFile(int levelIndex)
 
 	CleanUp();
 	FreeLevel();
-	
+
 	// Loading level is done is two threads, one for loading level and one for drawing loading screen
 	IsLevelLoading = true;
 
 	_beginthreadex(
 		nullptr,
-		0, 
-		LoadLevel, 
-		reinterpret_cast<void*>(levelIndex), 
-		0, 
+		0,
+		LoadLevel,
+		reinterpret_cast<void*>(levelIndex),
+		0,
 		NULL);
 
 	while (IsLevelLoading);
