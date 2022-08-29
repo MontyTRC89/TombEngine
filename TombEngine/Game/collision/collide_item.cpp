@@ -420,7 +420,7 @@ bool AlignLaraPosition(Vector3Int* vec, ItemInfo* item, ItemInfo* laraItem)
 		TO_RAD(item->Pose.Orientation.z)
 	);
 
-	auto pos = Vector3::Transform(Vector3(vec->x, vec->y, vec->z), matrix);
+	auto pos = Vector3::Transform(vec->ToVector3(), matrix);
 	auto newPos = item->Pose.Position.ToVector3() + pos;
 
 	int height = GetCollision(newPos.x, newPos.y, newPos.z, laraItem->RoomNumber).Position.Floor;
@@ -443,9 +443,8 @@ bool MoveLaraPosition(Vector3Int* vec, ItemInfo* item, ItemInfo* laraItem)
 {
 	auto* lara = GetLaraInfo(laraItem);
 
-	auto dest = PHD_3DPOS(item->Pose.Orientation);
-
-	Vector3 pos = Vector3(vec->x, vec->y, vec->z);
+	auto target = PHD_3DPOS(item->Pose.Orientation);
+	auto pos = vec->ToVector3();
 
 	Matrix matrix = Matrix::CreateFromYawPitchRoll(
 		TO_RAD(item->Pose.Orientation.y),
@@ -454,24 +453,21 @@ bool MoveLaraPosition(Vector3Int* vec, ItemInfo* item, ItemInfo* laraItem)
 	);
 
 	pos = Vector3::Transform(pos, matrix);
-
-	dest.Position.x = item->Pose.Position.x + pos.x;
-	dest.Position.y = item->Pose.Position.y + pos.y;
-	dest.Position.z = item->Pose.Position.z + pos.z;
+	target.Position = item->Pose.Position + Vector3Int(pos);
 
 	if (item->ObjectNumber != ID_FLARE_ITEM && item->ObjectNumber != ID_BURNING_TORCH_ITEM)
-		return Move3DPosTo3DPos(&laraItem->Pose, &dest, LARA_VELOCITY, ANGLE(2.0f));
+		return Move3DPosTo3DPos(&laraItem->Pose, &target, LARA_VELOCITY, ANGLE(2.0f));
 
-	int height = GetCollision(dest.Position.x, dest.Position.y, dest.Position.z, laraItem->RoomNumber).Position.Floor;
+	int height = GetCollision(target.Position.x, target.Position.y, target.Position.z, laraItem->RoomNumber).Position.Floor;
 	if (abs(height - laraItem->Pose.Position.y) <= CLICK(2))
 	{
-		auto direction = dest.Position - laraItem->Pose.Position;
+		auto direction = target.Position - laraItem->Pose.Position;
 
 		float distance = sqrt(pow(direction.x, 2) + pow(direction.y, 2) + pow(direction.z, 2));
 		if (distance < CLICK(0.5f))
 			return true;
 
-		return Move3DPosTo3DPos(&laraItem->Pose, &dest, LARA_VELOCITY, ANGLE(2.0f));
+		return Move3DPosTo3DPos(&laraItem->Pose, &target, LARA_VELOCITY, ANGLE(2.0f));
 	}
 
 	if (lara->Control.IsMoving)

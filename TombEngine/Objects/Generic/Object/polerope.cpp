@@ -20,7 +20,15 @@ using std::vector;
 
 namespace TEN::Entities::Generic
 {
-	const vector<LaraState> PoleGrabStates =
+	const vector<LaraState> VPoleStates =
+	{
+		LS_POLE_IDLE,
+		LS_POLE_UP,
+		LS_POLE_DOWN,
+		LS_POLE_TURN_CLOCKWISE,
+		LS_POLE_TURN_COUNTER_CLOCKWISE
+	};
+	const vector<LaraState> VPoleGroundedMountStates =
 	{
 		LS_IDLE,
 		LS_TURN_LEFT_SLOW,
@@ -28,16 +36,19 @@ namespace TEN::Entities::Generic
 		LS_TURN_LEFT_FAST,
 		LS_TURN_RIGHT_FAST,
 		LS_WALK_FORWARD,
-		LS_RUN_FORWARD,
-
-		//LS_JUMP_UP,
-		//LS_REACH
+		LS_RUN_FORWARD
+	};
+	const vector<LaraState> VPoleAirborneMountStates =
+	{
+		LS_REACH,
+		LS_JUMP_UP
 	};
 
-	auto PolePos = Vector3Int(0, 0, -208);
-	auto PolePosR = Vector3Int::Zero;
+	// TODO: These might be interfering with the set position command. -- Sezz 2022.08.29
+	auto VPolePos = Vector3Int(0, 0, -208);
+	auto VPolePosR = Vector3Int::Zero;
 
-	OBJECT_COLLISION_BOUNDS PoleBounds = 
+	OBJECT_COLLISION_BOUNDS VPoleBounds = 
 	{
 		-CLICK(1), CLICK(1),
 		0, 0, 
@@ -56,17 +67,19 @@ namespace TEN::Entities::Generic
 		short angleBetweenPositions = poleItem->Pose.Orientation.y - GetOrientBetweenPoints(laraItem->Pose.Position, poleItem->Pose.Position).y;
 		bool isFacingPole = abs(deltaAngle - angleBetweenPositions) < ANGLE(90.0f);
 
+		// Mount while grounded.
 		if (TrInput & IN_ACTION && isFacingPole &&
-			CheckLaraState((LaraState)laraItem->Animation.ActiveState, PoleGrabStates) &&
+			CheckLaraState((LaraState)laraItem->Animation.ActiveState, VPoleGroundedMountStates) &&
 			lara->Control.HandStatus == HandStatus::Free ||
 			(lara->Control.IsMoving && lara->InteractedItem == itemNumber))
 		{
+			// Temporarily reorient pole.
 			short yOrient = poleItem->Pose.Orientation.y;
 			poleItem->Pose.Orientation.y = laraItem->Pose.Orientation.y;
 
-			if (TestLaraPosition(&PoleBounds, poleItem, laraItem))
+			if (TestLaraPosition(&VPoleBounds, poleItem, laraItem))
 			{
-				if (MoveLaraPosition(&PolePos, poleItem, laraItem))
+				if (MoveLaraPosition(&VPolePos, poleItem, laraItem))
 				{
 					SetAnimation(laraItem, LA_STAND_TO_POLE);
 					lara->Control.IsMoving = false;
@@ -87,31 +100,39 @@ namespace TEN::Entities::Generic
 
 				poleItem->Pose.Orientation.y = yOrient;
 			}
+
+			return;
 		}
-		else if (TrInput & IN_ACTION &&
-			lara->Control.HandStatus == HandStatus::Free &&
+
+		// Mount while airborne.
+		if (TrInput & IN_ACTION && isFacingPole &&
+			CheckLaraState((LaraState)laraItem->Animation.ActiveState, VPoleAirborneMountStates) &&
 			laraItem->Animation.IsAirborne &&
 			laraItem->Animation.Velocity.y > 0.0f &&
-			laraItem->Animation.ActiveState == LS_REACH || laraItem->Animation.ActiveState == LS_JUMP_UP) // TODO: Wrong parentheses, but changing anything breaks it all.
+			lara->Control.HandStatus == HandStatus::Free)
 		{
-			if (TestBoundsCollide(poleItem, laraItem, 100) &&
+			if (TestBoundsCollide(poleItem, laraItem, LARA_RADIUS + (int)round(abs(laraItem->Animation.Velocity.z))) &&
 				TestLaraPoleCollision(laraItem, coll, true, -CLICK(1)) &&
 				TestLaraPoleCollision(laraItem, coll, false))
 			{
 				if (TestCollision(poleItem, laraItem))
 				{
+					// Temporarily reorient pole.
 					short yOrient = poleItem->Pose.Orientation.y;
 					poleItem->Pose.Orientation.y = laraItem->Pose.Orientation.y;
+
+					// Reaching.
 					if (laraItem->Animation.ActiveState == LS_REACH)
 					{
-						PolePosR.y = laraItem->Pose.Position.y - poleItem->Pose.Position.y + 10;
-						AlignLaraPosition(&PolePosR, poleItem, laraItem);
+						VPolePosR.y = laraItem->Pose.Position.y - poleItem->Pose.Position.y + 10;
+						AlignLaraPosition(&VPolePosR, poleItem, laraItem);
 						SetAnimation(laraItem, LA_REACH_TO_POLE);
 					}
+					// Jumping up.
 					else
 					{
-						PolePosR.y = laraItem->Pose.Position.y - poleItem->Pose.Position.y + 66;
-						AlignLaraPosition(&PolePosR, poleItem, laraItem);
+						VPolePosR.y = laraItem->Pose.Position.y - poleItem->Pose.Position.y + 66;
+						AlignLaraPosition(&VPolePosR, poleItem, laraItem);
 						SetAnimation(laraItem, LA_JUMP_UP_TO_POLE);
 					}
 
@@ -121,15 +142,15 @@ namespace TEN::Entities::Generic
 					poleItem->Pose.Orientation.y = yOrient;
 				}
 			}
+
+			return;
 		}
-		else
+
+		// Not interacting; do regular object collision.
+		if (!CheckLaraState((LaraState)laraItem->Animation.ActiveState, VPoleStates) &&
+			laraItem->Animation.ActiveState != LS_JUMP_BACK)
 		{
-			if (((laraItem->Animation.ActiveState < LS_POLE_IDLE ||
-				laraItem->Animation.ActiveState > LS_POLE_TURN_COUNTER_CLOCKWISE) &&
-				laraItem->Animation.ActiveState != LS_JUMP_BACK))
-			{
-				ObjectCollision(itemNumber, laraItem, coll);
-			}
+			ObjectCollision(itemNumber, laraItem, coll);
 		}
 	}
 }
