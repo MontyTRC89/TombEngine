@@ -47,6 +47,7 @@ void GetTightropeFallOff(ItemInfo* item, int regularity);
 #endif
 
 bool CheckLaraState(LaraState referenceState, const std::vector<LaraState>& stateList);
+bool CheckLaraWeaponType(LaraWeaponType referenceWeaponType, const std::vector<LaraWeaponType>& weaponTypeList);
 bool IsStandingWeapon(ItemInfo* item, LaraWeaponType weaponType);
 bool IsVaultState(LaraState state);
 bool IsJumpState(LaraState state);

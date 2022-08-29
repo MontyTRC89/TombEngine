@@ -463,7 +463,7 @@ bool MoveLaraPosition(Vector3Int* vec, ItemInfo* item, ItemInfo* laraItem)
 	{
 		auto direction = target.Position - laraItem->Pose.Position;
 
-		float distance = sqrt(pow(direction.x, 2) + pow(direction.y, 2) + pow(direction.z, 2));
+		float distance = sqrt(SQUARE(direction.x) + SQUARE(direction.y) + SQUARE(direction.z));
 		if (distance < CLICK(0.5f))
 			return true;
 
@@ -481,20 +481,21 @@ bool MoveLaraPosition(Vector3Int* vec, ItemInfo* item, ItemInfo* laraItem)
 
 static bool ItemCollide(int value, int radius)
 {
-	return value >= -radius && value <= radius;
+	return (value >= -radius && value <= radius);
 }
 
 static bool ItemInRange(int x, int z, int radius)
 {
-	return (pow(x, 2) + pow(z, 2)) <= pow(radius, 2);
+	return ((SQUARE(x) + SQUARE(z)) <= SQUARE(radius));
 }
 
 bool ItemNearLara(PHD_3DPOS* pos, int radius)
 {
-	GameVector target;
-	target.x = pos->Position.x - LaraItem->Pose.Position.x;
-	target.y = pos->Position.y - LaraItem->Pose.Position.y;
-	target.z = pos->Position.z - LaraItem->Pose.Position.z;
+	auto target = GameVector(
+		pos->Position.x - LaraItem->Pose.Position.x,
+		pos->Position.y - LaraItem->Pose.Position.y,
+		pos->Position.z - LaraItem->Pose.Position.z
+	);
 
 	if (!ItemCollide(target.y, ITEM_RADIUS_YMAX))
 		return false;
@@ -535,7 +536,7 @@ bool ItemNearTarget(PHD_3DPOS* src, ItemInfo* target, int radius)
 bool Move3DPosTo3DPos(PHD_3DPOS* origin, PHD_3DPOS* target, int velocity, short angleAdd)
 {
 	auto direction = target->Position - origin->Position;
-	int distance = sqrt(pow(direction.x, 2) + pow(direction.y, 2) + pow(direction.z, 2));
+	int distance = sqrt(SQUARE(direction.x) + SQUARE(direction.y) + SQUARE(direction.z));
 
 	if (velocity < distance)
 		origin->Position += direction * velocity / distance;
@@ -607,13 +608,13 @@ bool Move3DPosTo3DPos(PHD_3DPOS* origin, PHD_3DPOS* target, int velocity, short 
 
 bool TestBoundsCollide(ItemInfo* item, ItemInfo* laraItem, int radius)
 {
-	auto bounds = (BOUNDING_BOX*)GetBestFrame(item);
-	auto laraBounds = (BOUNDING_BOX*)GetBestFrame(laraItem);
+	auto* bounds = (BOUNDING_BOX*)GetBestFrame(item);
+	auto* laraBounds = (BOUNDING_BOX*)GetBestFrame(laraItem);
 
-	if (item->Pose.Position.y + bounds->Y2 <= laraItem->Pose.Position.y + laraBounds->Y1)
+	if ((item->Pose.Position.y + bounds->Y2) <= (laraItem->Pose.Position.y + laraBounds->Y1))
 		return false;
 
-	if (item->Pose.Position.y + bounds->Y1 >= laraItem->Pose.Position.y + laraBounds->Y2)
+	if ((item->Pose.Position.y + bounds->Y1) >= (laraItem->Pose.Position.y + laraBounds->Y2))
 		return false;
 
 	float sinY = phd_sin(item->Pose.Orientation.y);
@@ -668,19 +669,20 @@ bool TestBoundsCollideStatic(ItemInfo* item, MESH_INFO* mesh, int radius)
 		return false;
 }
 
-bool ItemPushItem(ItemInfo* item, ItemInfo* item2, CollisionInfo* coll, bool spasmEnabled, char bigPush) // previously ItemPushLara
+// NOTE: Previously ItemPushLara().
+bool ItemPushItem(ItemInfo* item, ItemInfo* item2, CollisionInfo* coll, bool spasmEnabled, char bigPush)
 {
-	// Get item's rotation
+	// Get item's rotation.
 	float sinY = phd_sin(item->Pose.Orientation.y);
 	float cosY = phd_cos(item->Pose.Orientation.y);
 
-	// Get vector from item to Lara
+	// Get vector from item to Lara.
 	int dx = item2->Pose.Position.x - item->Pose.Position.x;
 	int dz = item2->Pose.Position.z - item->Pose.Position.z;
 
-	// Rotate Lara vector into item frame
-	int rx = cosY * dx - sinY * dz;
-	int rz = cosY * dz + sinY * dx;
+	// Rotate Lara vector into item frame.
+	int rx = (dx * cosY) - (dz * sinY);
+	int rz = (dz * cosY) + (dx * sinY);
 
 	BOUNDING_BOX* bounds;
 	if (bigPush & 2)
@@ -728,13 +730,13 @@ bool ItemPushItem(ItemInfo* item, ItemInfo* item2, CollisionInfo* coll, bool spa
 
 	auto* lara = item2->IsLara() ? GetLaraInfo(item2) : nullptr;
 
-	if (lara != nullptr && spasmEnabled && bounds->Y2 - bounds->Y1 > CLICK(1))
+	if (lara != nullptr && spasmEnabled && (bounds->Y2 - bounds->Y1) > CLICK(1))
 	{
 		rx = (bounds->X1 + bounds->X2) / 2;
 		rz = (bounds->Z1 + bounds->Z2) / 2;
 
-		dx -= cosY * rx + sinY * rz;
-		dz -= cosY * rz - sinY * rx;
+		dx -= (rx * cosY) + (rz * sinY);
+		dz -= (rz * cosY) - (rx * sinY);
 
 		lara->HitDirection = (item2->Pose.Orientation.y - phd_atan(dz, dz) - ANGLE(135.0f)) / ANGLE(90.0f);
 		DoDamage(item2, 0); // Dummy hurt call. Only for ooh sound!

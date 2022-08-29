@@ -63,7 +63,7 @@ namespace TEN::Entities::Generic
 		auto* poleItem = &g_Level.Items[itemNumber];
 		auto* lara = GetLaraInfo(laraItem);
 
-		short deltaAngle = poleItem->Pose.Orientation.y - laraItem->Pose.Orientation.y;
+		short deltaAngle = GetShortestAngularDistance(laraItem->Pose.Orientation.y, poleItem->Pose.Orientation.y);
 		short angleBetweenPositions = poleItem->Pose.Orientation.y - GetOrientBetweenPoints(laraItem->Pose.Position, poleItem->Pose.Position).y;
 		bool isFacingPole = abs(deltaAngle - angleBetweenPositions) < ANGLE(90.0f);
 
@@ -146,7 +146,7 @@ namespace TEN::Entities::Generic
 			return;
 		}
 
-		// Not interacting; do regular object collision.
+		// Player is not interacting with vertical pole; do regular object collision.
 		if (!CheckLaraState((LaraState)laraItem->Animation.ActiveState, VPoleStates) &&
 			laraItem->Animation.ActiveState != LS_JUMP_BACK)
 		{
