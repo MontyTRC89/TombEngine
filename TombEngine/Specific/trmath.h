@@ -82,5 +82,5 @@ Vector3 TranslateVector(Vector3& vector, Vector3Shrt& orient, float distance);
 Vector3Int TranslateVector(Vector3Int& vector, Vector3Shrt& orient, float distance);
 Vector3 TranslateVector(Vector3& vector, Vector3& direction, float distance);
 Vector3Int TranslateVector(Vector3Int& vector, Vector3& direction, float distance);
-bool IsPointInFront(PHD_3DPOS& pose, const Vector3& target);
+bool IsPointInFront(const PHD_3DPOS& pose, const Vector3& target);
 bool IsPointInFront(const Vector3& origin, const Vector3Shrt& orient, const Vector3& target);

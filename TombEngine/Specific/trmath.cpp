@@ -400,9 +400,10 @@ Vector3Int TranslateVector(Vector3Int& vector, Vector3& direction, float distanc
 	);
 }
 
-bool IsPointInFront(PHD_3DPOS& pose, const Vector3& target)
+bool IsPointInFront(const PHD_3DPOS& pose, const Vector3& target)
 {
-	return IsPointInFront(pose.Position.ToVector3(), pose.Orientation, target);
+	auto pos = Vector3(pose.Position.x, pose.Position.y, pose.Position.z);
+	return IsPointInFront(pos, pose.Orientation, target);
 }
 
 bool IsPointInFront(const Vector3& origin, const Vector3Shrt& orient, const Vector3& target)
