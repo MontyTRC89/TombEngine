@@ -44,7 +44,7 @@ namespace TEN::Entities::Generic
 		LS_JUMP_UP
 	};
 
-	// TODO: These might be interfering with the set position command. -- Sezz 2022.08.29
+	// TODO: These might be interfering with the SetPosition command. -- Sezz 2022.08.29
 	auto VPolePos = Vector3Int(0, 0, -208);
 	auto VPolePosR = Vector3Int::Zero;
 

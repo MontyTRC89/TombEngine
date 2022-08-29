@@ -2519,7 +2519,7 @@ bool TestLaraTightropeDismount(ItemInfo* item, CollisionInfo* coll)
 	return false;
 }
 
-bool TestLaraPoleCollision(ItemInfo* item, CollisionInfo* coll, bool up, float offset)
+bool TestLaraPoleCollision(ItemInfo* item, CollisionInfo* coll, bool goingUp, float offset)
 {
 	constexpr auto poleProbeCollRadius = 16.0f;
 
@@ -2530,10 +2530,15 @@ bool TestLaraPoleCollision(ItemInfo* item, CollisionInfo* coll, bool up, float o
 	{
 		auto laraBox = TO_DX_BBOX(item->Pose, GetBoundsAccurate(item));
 
-		// HACK: because Core implemented upward pole movement as SetPosition command, we can't precisely
+		// HACK: Because Core implemented upward pole movement as a SetPosition command, we can't precisely
 		// check her position. So we add a fixed height offset.
 
-		auto sphere = BoundingSphere(laraBox.Center + Vector3(0.0f, (laraBox.Extents.y + poleProbeCollRadius + offset) * (up ? -1 : 1), 0), poleProbeCollRadius);
+		// Offset sphere when jumping toward pole.
+		auto sphereOffset2D = Vector3::Zero;
+		sphereOffset2D = TranslateVector(sphereOffset2D, item->Pose.Orientation.y, coll->Setup.Radius + item->Animation.Velocity.z);
+
+		auto spherePos = laraBox.Center + Vector3(0.0f, (laraBox.Extents.y + poleProbeCollRadius + offset) * (goingUp ? -1 : 1), 0.0f) + sphereOffset2D;
+		auto sphere = BoundingSphere(spherePos, poleProbeCollRadius);
 
 		//g_Renderer.AddDebugSphere(sphere.Center, 16.0f, Vector4(1, 0, 0, 1), RENDERER_DEBUG_PAGE::LOGIC_STATS);
 
