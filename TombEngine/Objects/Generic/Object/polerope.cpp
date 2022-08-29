@@ -20,7 +20,7 @@ using std::vector;
 
 namespace TEN::Entities::Generic
 {
-	const vector<LaraState> VPoleStates =
+	const vector<LaraState> VPoleMountedStates =
 	{
 		LS_POLE_IDLE,
 		LS_POLE_UP,
@@ -111,9 +111,10 @@ namespace TEN::Entities::Generic
 			laraItem->Animation.Velocity.y > 0.0f &&
 			lara->Control.HandStatus == HandStatus::Free)
 		{
-			if (TestBoundsCollide(poleItem, laraItem, LARA_RADIUS + (int)round(abs(laraItem->Animation.Velocity.z))) &&
-				TestLaraPoleCollision(laraItem, coll, true, -CLICK(1)) &&
-				TestLaraPoleCollision(laraItem, coll, false))
+			if (!TestLaraPoleCollision(laraItem, coll, true, -CLICK(1)) || !TestLaraPoleCollision(laraItem, coll, false))
+				return;
+
+			if (TestBoundsCollide(poleItem, laraItem, LARA_RADIUS + (int)round(abs(laraItem->Animation.Velocity.z))))
 			{
 				if (TestCollision(poleItem, laraItem))
 				{
@@ -147,7 +148,7 @@ namespace TEN::Entities::Generic
 		}
 
 		// Player is not interacting with vertical pole; do regular object collision.
-		if (!CheckLaraState((LaraState)laraItem->Animation.ActiveState, VPoleStates) &&
+		if (!CheckLaraState((LaraState)laraItem->Animation.ActiveState, VPoleMountedStates) &&
 			laraItem->Animation.ActiveState != LS_JUMP_BACK)
 		{
 			ObjectCollision(itemNumber, laraItem, coll);
