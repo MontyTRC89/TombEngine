@@ -139,7 +139,7 @@ void lara_as_walk_forward(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	// TODO: Implement item alignment properly someday. @Sezz 2021.11.01
+	// TODO: Implement item alignment properly someday. -- Sezz 2021.11.01
 	if (lara->Control.IsMoving)
 	{
 		ModulateLaraTurnRateY(item, 0, 0, 0);
