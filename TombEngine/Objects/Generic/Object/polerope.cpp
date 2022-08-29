@@ -63,9 +63,7 @@ namespace TEN::Entities::Generic
 		auto* poleItem = &g_Level.Items[itemNumber];
 		auto* lara = GetLaraInfo(laraItem);
 
-		short deltaAngle = GetShortestAngularDistance(laraItem->Pose.Orientation.y, poleItem->Pose.Orientation.y);
-		short angleBetweenPositions = poleItem->Pose.Orientation.y - GetOrientBetweenPoints(laraItem->Pose.Position, poleItem->Pose.Position).y;
-		bool isFacingPole = abs(deltaAngle - angleBetweenPositions) < ANGLE(90.0f);
+		bool isFacingPole = IsPointInFront(laraItem->Pose, poleItem->Pose.Position.ToVector3());
 
 		// Mount while grounded.
 		if (TrInput & IN_ACTION && isFacingPole &&
@@ -111,9 +109,11 @@ namespace TEN::Entities::Generic
 			laraItem->Animation.Velocity.y > 0.0f &&
 			lara->Control.HandStatus == HandStatus::Free)
 		{
+			// Test sphere collision.
 			if (!TestLaraPoleCollision(laraItem, coll, true, -CLICK(1)) || !TestLaraPoleCollision(laraItem, coll, false))
 				return;
 
+			// Test bounds collision.
 			if (TestBoundsCollide(poleItem, laraItem, LARA_RADIUS + (int)round(abs(laraItem->Animation.Velocity.z))))
 			{
 				if (TestCollision(poleItem, laraItem))

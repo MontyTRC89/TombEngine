@@ -399,3 +399,23 @@ Vector3Int TranslateVector(Vector3Int& vector, Vector3& direction, float distanc
 		(int)round(newVector.z)
 	);
 }
+
+bool IsPointInFront(PHD_3DPOS& pose, const Vector3& target)
+{
+	return IsPointInFront(pose.Position.ToVector3(), pose.Orientation, target);
+}
+
+bool IsPointInFront(const Vector3& origin, const Vector3Shrt& orient, const Vector3& target)
+{
+	float sinY = phd_sin(orient.y);
+	float cosY = phd_cos(orient.y);
+
+	auto normalizedDirection2D = Vector3(sinY, 0.0f, cosY);
+	auto direction = origin - target;
+
+	float dot = normalizedDirection2D.Dot(direction);
+	if (dot >= 0.0f)
+		return false;
+
+	return true;
+}
