@@ -12,6 +12,7 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
+#include "Game/pickup/pickup.h"
 #include "Game/room.h"
 #include "Renderer/Renderer11.h"
 #include "ScriptInterfaceGame.h"
@@ -26,6 +27,8 @@ using namespace TEN::Renderer;
 BOUNDING_BOX GlobalCollisionBounds;
 ItemInfo* CollidedItems[MAX_COLLIDED_OBJECTS];
 MESH_INFO* CollidedMeshes[MAX_COLLIDED_OBJECTS];
+
+constexpr auto ANIMATED_ALIGNMENT_FRAME_COUNT_THRESHOLD = 6;
 
 void GenericSphereBoxCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 {
@@ -160,8 +163,8 @@ bool GetCollidedObjects(ItemInfo* collidingItem, int radius, bool onlyVisible, I
 						item->ObjectNumber == ID_LARA && ignoreLara ||
 						item->Flags & 0x8000 ||
 						item->MeshBits == NO_JOINT_BITS ||
-						(Objects[item->ObjectNumber].drawRoutine == NULL && item->ObjectNumber != ID_LARA) ||
-						(Objects[item->ObjectNumber].collision == NULL && item->ObjectNumber != ID_LARA) ||
+						(Objects[item->ObjectNumber].drawRoutine == nullptr && item->ObjectNumber != ID_LARA) ||
+						(Objects[item->ObjectNumber].collision == nullptr && item->ObjectNumber != ID_LARA) ||
 						onlyVisible && item->Status == ITEM_INVISIBLE ||
 						item->ObjectNumber == ID_BURNING_FLOOR)
 					{
@@ -462,8 +465,10 @@ bool MoveLaraPosition(Vector3Int* vec, ItemInfo* item, ItemInfo* laraItem)
 	pos = Vector3::Transform(pos, matrix);
 	target.Position = item->Pose.Position + Vector3Int(pos);
 
-	if (item->ObjectNumber != ID_FLARE_ITEM && item->ObjectNumber != ID_BURNING_TORCH_ITEM)
-		return Move3DPosTo3DPos(&laraItem->Pose, &target, LARA_VELOCITY, ANGLE(2.0f));
+	if (!Objects[item->ObjectNumber].isPickup)
+		return Move3DPosTo3DPos(&laraItem->Pose, &target, LARA_ALIGN_VELOCITY, ANGLE(2.0f));
+
+	// Prevent picking up items which can result in so called "flare pickup bug"
 
 	int height = GetCollision(target.Position.x, target.Position.y, target.Position.z, laraItem->RoomNumber).Position.Floor;
 	if (abs(height - laraItem->Pose.Position.y) <= CLICK(2))
@@ -474,7 +479,7 @@ bool MoveLaraPosition(Vector3Int* vec, ItemInfo* item, ItemInfo* laraItem)
 		if (distance < CLICK(0.5f))
 			return true;
 
-		return Move3DPosTo3DPos(&laraItem->Pose, &target, LARA_VELOCITY, ANGLE(2.0f));
+		return Move3DPosTo3DPos(&laraItem->Pose, &target, LARA_ALIGN_VELOCITY, ANGLE(2.0f));
 	}
 
 	if (lara->Control.IsMoving)
@@ -552,7 +557,9 @@ bool Move3DPosTo3DPos(PHD_3DPOS* origin, PHD_3DPOS* target, int velocity, short 
 
 	if (!Lara.Control.IsMoving)
 	{
-		if (Lara.Control.WaterStatus != WaterStatus::Underwater)
+		bool shouldAnimate = (distance - velocity) > (velocity * ANIMATED_ALIGNMENT_FRAME_COUNT_THRESHOLD);
+
+		if (shouldAnimate && Lara.Control.WaterStatus != WaterStatus::Underwater)
 		{
 			int angle = mGetAngle(target->Position.x, target->Position.z, origin->Position.x, origin->Position.z);
 			int direction = (GetQuadrant(angle) - GetQuadrant(target->Orientation.y)) & 3;
