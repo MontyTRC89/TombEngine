@@ -104,10 +104,10 @@
 		float sinY = phd_sin(orient.y);
 		float cosY = phd_cos(orient.y);
 
-		auto direction2DNorm = Vector3(sinY, 0.0f, cosY);
-		auto direction = origin - target;
+		auto normal = Vector3(sinY, 0.0f, cosY);
+		auto difference = origin - target;
 
-		float dot = direction2DNorm.Dot(direction);
+		float dot = normal.Dot(difference);
 		if (dot >= 0.0f)
 			return false;
 
@@ -134,9 +134,9 @@
 		auto refDirection = refPoint - origin;
 
 		auto normal = Vector3(refDirection.z, 0.0f, -refDirection.x);
-		auto targetDirection = target - origin;
+		auto direction = target - origin;
 
-		float dot = normal.Dot(targetDirection);
+		float dot = normal.Dot(direction);
 		if (dot > 0.0f)
 			return true;
 
