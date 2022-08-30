@@ -5,17 +5,12 @@
 // We need a way to save and load functions in a way that remembers exactly what "path" they have in the LevelFuncs table hierarchy.
 // Thus, even if we use Lua to put a LevelFuncs function in a variable with another, shorter name, we can still pass it into
 // LevelVars and have it remember the right function name when loaded.
-// todo actually test the above
 // This is needed for things like Timers, which call a certain function after a certain amount of time. If we save and then load,
 // the FuncNameHolder will be able to use its path as the key to find the actual Lua function to call at the end of the timer.
 
 // The alternative would be to pass in a full string, but then we would need to split the string at runtime to find
 // the exact tables to look in, which seems like it would take longer.
 
-TO DO:
-make sure nested tables save/loads work
-make sure timers whose funcs take multiple args works
-make sure nested tables AND multiple args works
 class FuncNameHolder {
 public:
 	std::string m_funcName;
