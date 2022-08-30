@@ -562,9 +562,9 @@ void ModulateLaraSlideVelocity(ItemInfo* item, CollisionInfo* coll)
 
 void AlignLaraToSurface(ItemInfo* item, float alpha)
 {
-	auto probe = GetCollision(item);
-	short aspectAngle = GetSurfaceAspectAngle(probe.FloorTilt);
-	short steepnessAngle = std::min(GetSurfaceSteepnessAngle(probe.FloorTilt), ANGLE(70.0f));
+	auto floorTilt = GetCollision(item).FloorTilt;
+	short aspectAngle = GetSurfaceAspectAngle(floorTilt);
+	short steepnessAngle = std::min(GetSurfaceSteepnessAngle(floorTilt), ANGLE(70.0f));
 
 	short deltaAngle = GetShortestAngularDistance(item->Pose.Orientation.y, aspectAngle);
 	float sinDeltaAngle = phd_sin(deltaAngle);
