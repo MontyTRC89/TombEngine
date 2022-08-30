@@ -143,5 +143,14 @@
 			return true;
 
 		return false;
+
+		// TODO: Check.
+		/*auto difference = origin - target;
+
+		float dot = normal.Dot(difference);
+		if (dot >= 0.0f)
+			return false;
+
+		return true;*/
 	}
 //}

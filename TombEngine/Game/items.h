@@ -62,7 +62,7 @@ struct EntityAnimationData
 	int RequiredState = -1; // TODO: Phase out this weird feature.
 
 	bool IsAirborne	= false;
-	Vector3 Velocity = Vector3::Zero; // CONVENTION: +X is right, +Y is down, +Z is forward.
+	Vector3 Velocity = Vector3::Zero; // CONVENTION: +X = right, +Y = down, +Z = forward.
 	std::vector<BoneMutator> Mutator = {};
 };
 
