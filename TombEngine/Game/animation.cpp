@@ -556,31 +556,56 @@ int GetNextAnimState(int objectID, int animNumber)
 void DrawAnimatingItem(ItemInfo* item)
 {
 	// TODO: to refactor
-	// Empty stub because actually we disable items drawing when drawRoutine pointer is NULL in ObjectInfo
+	// Empty stub because actually we disable items drawing when drawRoutine pointer is nullptr in ObjectInfo
 }
 
-void GetLaraJointPosition(Vector3Int* pos, int laraMeshIndex)
-{
-	if (laraMeshIndex >= NUM_LARA_MESHES)
-		laraMeshIndex = LM_HEAD;
-
-	Vector3 p = Vector3(pos->x, pos->y, pos->z);
-	g_Renderer.GetLaraAbsBonePosition(&p, laraMeshIndex);
-
-	pos->x = p.x;
-	pos->y = p.y;
-	pos->z = p.z;
-}
-
-void ClampRotation(PHD_3DPOS* pos, short angle, short rotation)
+void ClampRotation(PHD_3DPOS* pose, short angle, short rotation)
 {
 	if (angle <= rotation)
 	{
 		if (angle >= -rotation)
-			pos->Orientation.y += angle;
+			pose->Orientation.y += angle;
 		else
-			pos->Orientation.y -= rotation;
+			pose->Orientation.y -= rotation;
 	}
 	else
-		pos->Orientation.y += rotation;
+		pose->Orientation.y += rotation;
+}
+
+Vector3Int GetLaraJointPosition(int jointIndex, Vector3Int offset)
+{
+	auto pos = offset;
+	GetLaraJointPosition(&pos, jointIndex);
+	return pos;
+}
+
+void GetLaraJointPosition(Vector3Int* offset, int jointIndex)
+{
+	if (jointIndex >= NUM_LARA_MESHES)
+		jointIndex = LM_HEAD;
+
+	auto pos = offset->ToVector3();
+	g_Renderer.GetLaraAbsBonePosition(&pos, jointIndex);
+
+	*offset = Vector3Int(pos);
+}
+
+Vector3Int GetJointAbsPosition(ItemInfo* item, int jointIndex, Vector3Int offset)
+{
+	auto pos = offset;
+	GetJointAbsPosition(item, &pos, jointIndex);
+	return pos;
+}
+
+void GetJointAbsPosition(ItemInfo* item, Vector3Int* offset, int jointIndex)
+{
+	// Get real item number.
+	short itemNumber = item - g_Level.Items.data();
+
+	// Use matrices done in the renderer and transform the input vector.
+	auto pos = offset->ToVector3();
+	g_Renderer.GetItemAbsBonePosition(itemNumber, &pos, jointIndex);
+
+	// Store the result.
+	*offset = Vector3Int(pos);
 }

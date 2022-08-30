@@ -67,7 +67,7 @@ struct BoneMutator
 	Vector3 Rotation = Vector3::Zero;
 	Vector3 Scale    = Vector3::One;
 
-	bool IsEmpty() { return  (Offset == Vector3::Zero) && (Rotation == Vector3::Zero) && (Scale == Vector3::One); };
+	bool IsEmpty() { return (Offset == Vector3::Zero) && (Rotation == Vector3::Zero) && (Scale == Vector3::One); };
 };
 
 void AnimateLara(ItemInfo* item);
@@ -90,11 +90,12 @@ int GetNextAnimState(int objectID, int animNumber);
 bool GetChange(ItemInfo* item, ANIM_STRUCT* anim);
 int GetFrame(ItemInfo* item, ANIM_FRAME* framePtr[], int* rate);
 ANIM_FRAME* GetBestFrame(ItemInfo* item);
-
 BOUNDING_BOX* GetBoundsAccurate(ItemInfo* item);
-void GetLaraJointPosition(Vector3Int* pos, int laraMeshIndex);
-void GetJointAbsPosition(ItemInfo* item, Vector3Int* vec, int joint);
 
-void ClampRotation(PHD_3DPOS* pos, short angle, short rotation); 
-
+void ClampRotation(PHD_3DPOS* pose, short angle, short rotation); 
 void DrawAnimatingItem(ItemInfo* item);
+
+Vector3Int GetLaraJointPosition(int jointIndex, Vector3Int offset = Vector3Int::Zero);
+void GetLaraJointPosition(Vector3Int* offset, int jointIndex);
+Vector3Int GetJointAbsPosition(ItemInfo* item, int jointIndex, Vector3Int offset = Vector3Int::Zero);
+void GetJointAbsPosition(ItemInfo* item, Vector3Int* vec, int jointIndex);
