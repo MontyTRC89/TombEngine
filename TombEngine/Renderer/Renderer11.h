@@ -466,7 +466,7 @@ namespace TEN::Renderer
 		void UpdateItemAnimations(RenderView& view);
 		bool PrintDebugMessage(int x, int y, int alpha, byte r, byte g, byte b, LPCSTR Message);
 
-		void InitialiseScreen(int w, int h, bool windowed, HWND handle, bool reset);
+		void InitialiseScreen(int w, int h, HWND handle, bool reset);
 		void InitialiseGameBars();
 		void InitialiseMenuBars(int y);
 
@@ -625,6 +625,7 @@ namespace TEN::Renderer
 		void UpdateProgress(float value);
 		void GetLaraBonePosition(Vector3* pos, int bone);
 		void ToggleFullScreen(bool force = false);
+		void SetFullScreen();
 		bool IsFullsScreen();
 		void RenderTitleImage();
 		void AddLine2D(int x1, int y1, int x2, int y2, byte r, byte g, byte b, byte a);
