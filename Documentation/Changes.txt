@@ -10,6 +10,7 @@ Version 1.0.2
 * Fix zeroed forward velocity upon landing.
 * Fix 1-frame turn rate delays.
 * Fix occasional leave event calls when moving closely to volumes.
+* Fix incorrect viewport size in windowed mode.
 
 
 Version 1.0.1
