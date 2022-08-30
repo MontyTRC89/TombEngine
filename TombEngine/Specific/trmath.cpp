@@ -402,11 +402,10 @@ Vector3Int TranslateVector(Vector3Int& vector, Vector3& direction, float distanc
 
 bool IsPointInFront(const PHD_3DPOS& pose, const Vector3& target)
 {
-	auto pos = Vector3(pose.Position.x, pose.Position.y, pose.Position.z);
-	return IsPointInFront(pos, pose.Orientation, target);
+	return IsPointInFront(pose.Position.ToVector3(), target, pose.Orientation);
 }
 
-bool IsPointInFront(const Vector3& origin, const Vector3Shrt& orient, const Vector3& target)
+bool IsPointInFront(const Vector3& origin, const Vector3& target, const Vector3Shrt& orient)
 {
 	float sinY = phd_sin(orient.y);
 	float cosY = phd_cos(orient.y);
