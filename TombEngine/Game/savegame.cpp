@@ -1082,6 +1082,16 @@ bool SaveGame::Save(int slot)
 
 			putDataInVec(Save::VarUnion::tab, scriptTableOffset);
 		}
+		else if (std::holds_alternative<FuncName>(s))
+		{
+			std::string data = std::get<FuncName>(s).name;
+			auto strOffset = fbb.CreateString(data);
+			Save::funcNameTableBuilder ftb{ fbb };
+			ftb.add_str(strOffset);
+			auto funcNameOffset = ftb.Finish();
+
+			putDataInVec(Save::VarUnion::funcName, funcNameOffset);
+		}
 		else if (std::holds_alternative<Vector3Int>(s))
 		{
 			Save::vec3TableBuilder vtb{ fbb };
@@ -1926,6 +1936,11 @@ bool SaveGame::Load(int slot)
 			{
 				loadedVars.push_back(ToVector3Int(var->u_as_vec3()->vec()));
 			}
+			else if (var->u_type() == Save::VarUnion::funcName)
+			{
+				loadedVars.push_back(FuncName{var->u_as_funcName()->str()->str()});
+			}
+
 		}
 	}
 

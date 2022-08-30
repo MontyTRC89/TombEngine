@@ -143,6 +143,10 @@ struct vec3Table;
 struct vec3TableBuilder;
 struct vec3TableT;
 
+struct funcNameTable;
+struct funcNameTableBuilder;
+struct funcNameTableT;
+
 struct UnionTable;
 struct UnionTableBuilder;
 struct UnionTableT;
@@ -206,37 +210,40 @@ enum class VarUnion : uint8_t {
   num = 3,
   boolean = 4,
   vec3 = 5,
+  funcName = 6,
   MIN = NONE,
-  MAX = vec3
+  MAX = funcName
 };
 
-inline const VarUnion (&EnumValuesVarUnion())[6] {
+inline const VarUnion (&EnumValuesVarUnion())[7] {
   static const VarUnion values[] = {
     VarUnion::NONE,
     VarUnion::str,
     VarUnion::tab,
     VarUnion::num,
     VarUnion::boolean,
-    VarUnion::vec3
+    VarUnion::vec3,
+    VarUnion::funcName
   };
   return values;
 }
 
 inline const char * const *EnumNamesVarUnion() {
-  static const char * const names[7] = {
+  static const char * const names[8] = {
     "NONE",
     "str",
     "tab",
     "num",
     "boolean",
     "vec3",
+    "funcName",
     nullptr
   };
   return names;
 }
 
 inline const char *EnumNameVarUnion(VarUnion e) {
-  if (flatbuffers::IsOutRange(e, VarUnion::NONE, VarUnion::vec3)) return "";
+  if (flatbuffers::IsOutRange(e, VarUnion::NONE, VarUnion::funcName)) return "";
   const size_t index = static_cast<size_t>(e);
   return EnumNamesVarUnion()[index];
 }
@@ -263,6 +270,10 @@ template<> struct VarUnionTraits<TEN::Save::boolTable> {
 
 template<> struct VarUnionTraits<TEN::Save::vec3Table> {
   static const VarUnion enum_value = VarUnion::vec3;
+};
+
+template<> struct VarUnionTraits<TEN::Save::funcNameTable> {
+  static const VarUnion enum_value = VarUnion::funcName;
 };
 
 struct VarUnionUnion {
@@ -336,6 +347,14 @@ struct VarUnionUnion {
   const TEN::Save::vec3TableT *Asvec3() const {
     return type == VarUnion::vec3 ?
       reinterpret_cast<const TEN::Save::vec3TableT *>(value) : nullptr;
+  }
+  TEN::Save::funcNameTableT *AsfuncName() {
+    return type == VarUnion::funcName ?
+      reinterpret_cast<TEN::Save::funcNameTableT *>(value) : nullptr;
+  }
+  const TEN::Save::funcNameTableT *AsfuncName() const {
+    return type == VarUnion::funcName ?
+      reinterpret_cast<const TEN::Save::funcNameTableT *>(value) : nullptr;
   }
 };
 
@@ -5438,6 +5457,74 @@ struct vec3Table::Traits {
 
 flatbuffers::Offset<vec3Table> Createvec3Table(flatbuffers::FlatBufferBuilder &_fbb, const vec3TableT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
 
+struct funcNameTableT : public flatbuffers::NativeTable {
+  typedef funcNameTable TableType;
+  std::string str{};
+};
+
+struct funcNameTable FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef funcNameTableT NativeTableType;
+  typedef funcNameTableBuilder Builder;
+  struct Traits;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_STR = 4
+  };
+  const flatbuffers::String *str() const {
+    return GetPointer<const flatbuffers::String *>(VT_STR);
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyOffset(verifier, VT_STR) &&
+           verifier.VerifyString(str()) &&
+           verifier.EndTable();
+  }
+  funcNameTableT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(funcNameTableT *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static flatbuffers::Offset<funcNameTable> Pack(flatbuffers::FlatBufferBuilder &_fbb, const funcNameTableT* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+};
+
+struct funcNameTableBuilder {
+  typedef funcNameTable Table;
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_str(flatbuffers::Offset<flatbuffers::String> str) {
+    fbb_.AddOffset(funcNameTable::VT_STR, str);
+  }
+  explicit funcNameTableBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  flatbuffers::Offset<funcNameTable> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<funcNameTable>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<funcNameTable> CreatefuncNameTable(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    flatbuffers::Offset<flatbuffers::String> str = 0) {
+  funcNameTableBuilder builder_(_fbb);
+  builder_.add_str(str);
+  return builder_.Finish();
+}
+
+struct funcNameTable::Traits {
+  using type = funcNameTable;
+  static auto constexpr Create = CreatefuncNameTable;
+};
+
+inline flatbuffers::Offset<funcNameTable> CreatefuncNameTableDirect(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    const char *str = nullptr) {
+  auto str__ = str ? _fbb.CreateString(str) : 0;
+  return TEN::Save::CreatefuncNameTable(
+      _fbb,
+      str__);
+}
+
+flatbuffers::Offset<funcNameTable> CreatefuncNameTable(flatbuffers::FlatBufferBuilder &_fbb, const funcNameTableT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
 struct UnionTableT : public flatbuffers::NativeTable {
   typedef UnionTable TableType;
   TEN::Save::VarUnionUnion u{};
@@ -5473,6 +5560,9 @@ struct UnionTable FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   const TEN::Save::vec3Table *u_as_vec3() const {
     return u_type() == TEN::Save::VarUnion::vec3 ? static_cast<const TEN::Save::vec3Table *>(u()) : nullptr;
   }
+  const TEN::Save::funcNameTable *u_as_funcName() const {
+    return u_type() == TEN::Save::VarUnion::funcName ? static_cast<const TEN::Save::funcNameTable *>(u()) : nullptr;
+  }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyField<uint8_t>(verifier, VT_U_TYPE) &&
@@ -5503,6 +5593,10 @@ template<> inline const TEN::Save::boolTable *UnionTable::u_as<TEN::Save::boolTa
 
 template<> inline const TEN::Save::vec3Table *UnionTable::u_as<TEN::Save::vec3Table>() const {
   return u_as_vec3();
+}
+
+template<> inline const TEN::Save::funcNameTable *UnionTable::u_as<TEN::Save::funcNameTable>() const {
+  return u_as_funcName();
 }
 
 struct UnionTableBuilder {
@@ -8068,6 +8162,32 @@ inline flatbuffers::Offset<vec3Table> Createvec3Table(flatbuffers::FlatBufferBui
       _vec);
 }
 
+inline funcNameTableT *funcNameTable::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = std::make_unique<funcNameTableT>();
+  UnPackTo(_o.get(), _resolver);
+  return _o.release();
+}
+
+inline void funcNameTable::UnPackTo(funcNameTableT *_o, const flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = str(); if (_e) _o->str = _e->str(); }
+}
+
+inline flatbuffers::Offset<funcNameTable> funcNameTable::Pack(flatbuffers::FlatBufferBuilder &_fbb, const funcNameTableT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
+  return CreatefuncNameTable(_fbb, _o, _rehasher);
+}
+
+inline flatbuffers::Offset<funcNameTable> CreatefuncNameTable(flatbuffers::FlatBufferBuilder &_fbb, const funcNameTableT *_o, const flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const funcNameTableT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _str = _o->str.empty() ? _fbb.CreateSharedString("") : _fbb.CreateString(_o->str);
+  return TEN::Save::CreatefuncNameTable(
+      _fbb,
+      _str);
+}
+
 inline UnionTableT *UnionTable::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
   auto _o = std::make_unique<UnionTableT>();
   UnPackTo(_o.get(), _resolver);
@@ -8376,6 +8496,10 @@ inline bool VerifyVarUnion(flatbuffers::Verifier &verifier, const void *obj, Var
       auto ptr = reinterpret_cast<const TEN::Save::vec3Table *>(obj);
       return verifier.VerifyTable(ptr);
     }
+    case VarUnion::funcName: {
+      auto ptr = reinterpret_cast<const TEN::Save::funcNameTable *>(obj);
+      return verifier.VerifyTable(ptr);
+    }
     default: return true;
   }
 }
@@ -8414,6 +8538,10 @@ inline void *VarUnionUnion::UnPack(const void *obj, VarUnion type, const flatbuf
       auto ptr = reinterpret_cast<const TEN::Save::vec3Table *>(obj);
       return ptr->UnPack(resolver);
     }
+    case VarUnion::funcName: {
+      auto ptr = reinterpret_cast<const TEN::Save::funcNameTable *>(obj);
+      return ptr->UnPack(resolver);
+    }
     default: return nullptr;
   }
 }
@@ -8440,6 +8568,10 @@ inline flatbuffers::Offset<void> VarUnionUnion::Pack(flatbuffers::FlatBufferBuil
       auto ptr = reinterpret_cast<const TEN::Save::vec3TableT *>(value);
       return Createvec3Table(_fbb, ptr, _rehasher).Union();
     }
+    case VarUnion::funcName: {
+      auto ptr = reinterpret_cast<const TEN::Save::funcNameTableT *>(value);
+      return CreatefuncNameTable(_fbb, ptr, _rehasher).Union();
+    }
     default: return 0;
   }
 }
@@ -8464,6 +8596,10 @@ inline VarUnionUnion::VarUnionUnion(const VarUnionUnion &u) : type(u.type), valu
     }
     case VarUnion::vec3: {
       FLATBUFFERS_ASSERT(false);  // TEN::Save::vec3TableT not copyable.
+      break;
+    }
+    case VarUnion::funcName: {
+      value = new TEN::Save::funcNameTableT(*reinterpret_cast<TEN::Save::funcNameTableT *>(u.value));
       break;
     }
     default:
@@ -8495,6 +8631,11 @@ inline void VarUnionUnion::Reset() {
     }
     case VarUnion::vec3: {
       auto ptr = reinterpret_cast<TEN::Save::vec3TableT *>(value);
+      delete ptr;
+      break;
+    }
+    case VarUnion::funcName: {
+      auto ptr = reinterpret_cast<TEN::Save::funcNameTableT *>(value);
       delete ptr;
       break;
     }

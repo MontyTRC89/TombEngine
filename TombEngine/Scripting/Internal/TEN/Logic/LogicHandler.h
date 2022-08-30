@@ -5,12 +5,76 @@
 #include <unordered_set>
 #include "Strings/StringsHandler.h"
 
+class FuncNameHolder;
 enum class CallbackPoint;
+
+//template<typename ... Ts> class OnlyAllows
+//{
+//	OnlyAllows()
+//	{
+//		
+//	}
+//};
+enum class TestEnum
+{
+	one,
+	two,
+	three
+};
+
+template<TestEnum ... allowed> bool allow(TestEnum type)
+{
+	std::array<TestEnum, sizeof(allowed)> allowedTypes{allowed...};
+	for(TestEnum e : allowedTypes)
+	{
+		if (e == type)
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
 
 class LogicHandler : public ScriptInterfaceGame
 {
 private:
-	std::unordered_map<std::string, sol::protected_function>	m_levelFuncs{};
+	// Hierarchy of tables.
+	//
+	// LevelFuncs
+	// |-	TEN
+	//		|-	Timer
+	//		|-	Util
+	// |-	Ext
+	//		|-	MyLib
+	//		|-	MySecondLib
+	//			|-	SubTable
+	//
+	// Each of these tables can only contain other tables as well as a string with their "path".
+	// For example, the SubTable table will have a path of "LevelFuncs.Ext.MySecondLib.SubTable".
+	// It uses this to construct the full path name of any functions that end up in m_levelFuncsActualFuncs.
+	//
+	// Each of these has a metatable whose __index metamethod looks in m_levelFuncsTables, using the path
+	// as the key, for the full name of the function. It then gets the FuncNameHolder from m_levelFuncsFakeFuncs,
+	// and that FuncNameHolder's __call metamethod looks in m_levelFuncsActualFuncs for the real function.
+	sol::table m_levelFuncs{};
+
+	// Maps full function paths into Lua functions.
+	sol::table m_levelFuncsActualFuncs{};
+
+	// Maps full function paths to FunctionNameHolders.
+	sol::table m_levelFuncsFakeFuncs{};
+
+	// Contains tables; each table refers to a table in the LevelFuncs hierarchy, and contains the full names
+	// of the functions to index in m_levelFuncsActualFuncs (or fake funcs? idk).
+	// Tables are non-nested, so the following are all at the base level of m_levelFuncsTables.
+	// "LevelFuncs"
+	// "LevelFuncs.TEN"
+	// "LevelFuncs.TEN.Util"
+	// "LevelFuncs.MyLevel"
+	// "LevelFuncs.MyLevel.CoolFuncs"
+	sol::table m_levelFuncsTables{};
+
 	sol::protected_function										m_onStart{};
 	sol::protected_function										m_onLoad{};
 	sol::protected_function										m_onControlPhase{};
@@ -27,17 +91,20 @@ private:
 public:	
 	LogicHandler(sol::state* lua, sol::table & parent);
 
+	void CallLevelFunc(std::string, sol::variadic_args);
+	void CallLevelFunc(std::string, float dt);
+
 	void								FreeLevelScripts() override;
 
 	void								LogPrint(sol::variadic_args va);
 	bool								SetLevelFunc(sol::table tab, std::string const& luaName, sol::object value);
 
-	void								AddCallback(CallbackPoint point, std::string const& name);
+	void								AddCallback(CallbackPoint point, FuncNameHolder & holder);
 	void								RemoveCallback(CallbackPoint point, std::string const & name);
 
 	void								ResetScripts(bool clearGameVars) override;
 
-	sol::protected_function				GetLevelFunc(sol::table tab, std::string const& luaName);
+	sol::object							GetLevelFunc(sol::table tab, std::string const& luaName);
 
 	void								ExecuteScriptFile(const std::string& luaFilename) override;
 	void								ExecuteFunction(std::string const& name, TEN::Control::Volumes::VolumeTriggerer, std::string const& arguments) override;
