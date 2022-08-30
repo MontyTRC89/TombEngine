@@ -7,6 +7,8 @@ Version 1.0.2
 * Better slope alignment for large, flat enemies (i.e. big scorpion and crocodile).
 * Fix 1-frame turn rate delays.
 * Lock turn rate when automatically aligning Lara to objects.
+* Don't play Lara alignment animations if interacted object is too close.
+* Fix incorrect pole grabbing.
 
 
 Version 1.0.1
