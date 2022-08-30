@@ -23,21 +23,21 @@ private:
 	//
 	// Each of these tables can only contain other tables as well as a string with their "path".
 	// For example, the SubTable table will have a path of "LevelFuncs.Ext.MySecondLib.SubTable".
-	// It uses this to construct the full path name of any functions that end up in m_levelFuncsActualFuncs.
+	// It uses this to construct the full path name of any functions that end up in m_levelFuncs_luaFunctions.
 	//
 	// Each of these has a metatable whose __index metamethod looks in m_levelFuncsTables, using the path
 	// as the key, for the full name of the function. It then gets the FuncNameHolder from m_levelFuncsFakeFuncs,
-	// and that FuncNameHolder's __call metamethod looks in m_levelFuncsActualFuncs for the real function.
+	// and that FuncNameHolder's __call metamethod looks in m_levelFuncs_luaFunctions for the real function.
 	sol::table m_levelFuncs{};
 
 	// Maps full function paths into Lua functions.
-	sol::table m_levelFuncsActualFuncs{};
+	sol::table m_levelFuncs_luaFunctions{};
 
 	// Maps full function paths to FunctionNameHolders.
 	sol::table m_levelFuncsFakeFuncs{};
 
 	// Contains tables; each table refers to a table in the LevelFuncs hierarchy, and contains the full names
-	// of the functions to index in m_levelFuncsActualFuncs (or fake funcs? idk).
+	// of the functions to index in m_levelFuncs_luaFunctions.
 	// Tables are non-nested, so the following are all at the base level of m_levelFuncsTables.
 	// "LevelFuncs"
 	// "LevelFuncs.TEN"

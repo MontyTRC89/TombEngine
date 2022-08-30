@@ -186,71 +186,33 @@ void LogicHandler::ResetLevelTables()
 
 sol::object LogicHandler::GetLevelFunc(sol::table tab, std::string const& luaName)
 {
-	//if (m_levelFuncs.find(luaName) == m_levelFuncs.end())
-	//	return sol::lua_nil;
-
 	std::string partName = tab.raw_get<std::string>(strKey);
-	//std::string x = m_levelFuncsTables[luaName];
 	sol::table theTab = m_levelFuncsTables[partName];
-	//TENLog("looking for " + luaName);
-	//std::string x = theTab.raw_get<std::string>(luaName);
-	//theTab.raw_get_or()
-	//TENLog("table has:");
-	//for(auto & [key, val] : theTab)
-	//{
-	//	std::string keyStr = key.as<std::string>();
-	//	std::string valStr = val.as<std::string>();
-	//	TENLog(fmt::format("{} = {}", keyStr, valStr));
-	//}
-	//TENLog("");
-	std::string x;
+
 	sol::object obj = theTab.raw_get<sol::object>(luaName);
 	if (obj.is<std::string>())
 	{
-		x = obj.as<std::string>();
-		//TENLog("found " + luaName + ", it was " + x);
-
-		//what if you are asking for a table?
-		if (m_levelFuncsFakeFuncs[x].valid())
-			return m_levelFuncsFakeFuncs[x];
-		else
-			return m_levelFuncsTables[x];
+		std::string key = obj.as<std::string>();
+		if (m_levelFuncsFakeFuncs[key].valid())
+			return m_levelFuncsFakeFuncs[key];
 	}
-	if (obj.is<sol::table>())
-	{
-		return obj;
-	}
-	else
-	{
-		return sol::nil;
-	}
-	//return m_levelFuncs.at(luaName);
+	return sol::nil;
 }
 
 void LogicHandler::CallLevelFunc(std::string name, float dt)
 {
-	sol::protected_function f = m_levelFuncsActualFuncs[name];
-	//for (auto & v : va)
-	//{
-	//	TENLog(v.as<std::string>());
-	//}
+	sol::protected_function f = m_levelFuncs_luaFunctions[name];
 	f.call(dt);
 }
 
-
 void LogicHandler::CallLevelFunc(std::string name, sol::variadic_args va)
 {
-	sol::protected_function f = m_levelFuncsActualFuncs[name];
-	//for (auto & v : va)
-	//{
-	//	TENLog(v.as<std::string>());
-	//}
+	sol::protected_function f = m_levelFuncs_luaFunctions[name];
 	f.call(va);
 }
 
 bool LogicHandler::SetLevelFunc(sol::table tab, std::string const& luaName, sol::object value)
 {
-
 	//make m_levelFuncs the 'root' table, make everything else go into "tab" (so maybe all these should act on "tab" and we gotta create original m_levelFuncs ourselves outside of here)
 	std::string partName;
 	std::string fullName;
@@ -267,7 +229,7 @@ bool LogicHandler::SetLevelFunc(sol::table tab, std::string const& luaName, sol:
 			fullName = partName + "." + luaName;
 			aTab = m_levelFuncsTables[partName];
 			aTab.raw_set(luaName, fullName);
-			m_levelFuncsActualFuncs[fullName] = value;
+			m_levelFuncs_luaFunctions[fullName] = value;
 
 			fnh.m_funcName = fullName;
 			fnh.m_handler = this;
@@ -369,7 +331,7 @@ void LogicHandler::FreeLevelScripts()
 	m_levelFuncs = MakeSpecialTable(m_handler.GetState(), ScriptReserved_LevelFuncs, &LogicHandler::GetLevelFunc, &LogicHandler::SetLevelFunc, this);
 
 	m_levelFuncsTables = sol::table{ *(m_handler.GetState()), sol::create };
-	m_levelFuncsActualFuncs = sol::table{ *(m_handler.GetState()), sol::create };
+	m_levelFuncs_luaFunctions = sol::table{ *(m_handler.GetState()), sol::create };
 	m_levelFuncsFakeFuncs = sol::table{ *(m_handler.GetState()), sol::create };
 
 	m_levelFuncsTables[ScriptReserved_LevelFuncs] = sol::table{ *(m_handler.GetState()), sol::create };
@@ -864,7 +826,7 @@ void LogicHandler::InitCallbacks()
 		}
 		LevelFunc fnh = (*m_handler.GetState())["LevelFuncs"][luaFunc];
 
-		func = m_levelFuncsActualFuncs[fnh.m_funcName];
+		func = m_levelFuncs_luaFunctions[fnh.m_funcName];
 
 		if(func.get_type() == sol::type::function)
 		{
