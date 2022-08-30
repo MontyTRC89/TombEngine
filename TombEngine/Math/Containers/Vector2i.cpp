@@ -7,7 +7,6 @@
 
 	Vector2Int::Vector2Int()
 	{
-		*this = Vector2Int::Zero;
 	}
 
 	Vector2Int::Vector2Int(int x, int y)
@@ -27,7 +26,7 @@
 		return Vector2::Distance(origin.ToVector2(), target.ToVector2());
 	}
 
-	Vector2 Vector2Int::ToVector2()
+	Vector2 Vector2Int::ToVector2() const
 	{
 		return Vector2(x, y);
 	}

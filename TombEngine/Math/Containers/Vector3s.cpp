@@ -7,7 +7,6 @@
 
 	Vector3Shrt::Vector3Shrt()
 	{
-		*this = Vector3Shrt::Zero;
 	}
 
 	Vector3Shrt::Vector3Shrt(short x, short y, short z)

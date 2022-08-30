@@ -17,7 +17,7 @@
 
 		static float Distance(Vector3Int origin, Vector3Int target);
 
-		Vector3 ToVector3();
+		Vector3 ToVector3() const;
 
 		bool		operator ==(Vector3Int vector);
 		bool		operator !=(Vector3Int vector);

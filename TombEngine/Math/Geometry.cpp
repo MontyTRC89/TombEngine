@@ -1,37 +1,39 @@
 #include "framework.h"
 #include "Math/Geometry.h"
 
+#include "Math/Containers/PoseData.h"
 #include "Math/Containers/Vector3i.h"
 #include "Math/Containers/Vector3s.h"
 #include "Specific/trmath.h"
 
 //namespace TEN::Math::Geometry
 //{
-	Vector3 TranslatePoint(Vector3& point, short angle, float forward, float down, float right)
+	Vector3Int TranslatePoint(const Vector3Int& point, short angle, float forward, float down, float right)
+	{
+		return Vector3Int(TranslatePoint(point.ToVector3(), angle, forward, down, right));
+	}
+
+	Vector3 TranslatePoint(const Vector3& point, short headingAngle, float forward, float down, float right)
 	{
 		if (forward == 0.0f && down == 0.0f && right == 0.0f)
 			return point;
 
-		float sinAngle = phd_sin(angle);
-		float cosAngle = phd_cos(angle);
+		float sinHeading = phd_sin(headingAngle);
+		float cosHeading = phd_cos(headingAngle);
 
-		point.x += (forward * sinAngle) + (right * cosAngle);
-		point.y += down;
-		point.z += (forward * cosAngle) - (right * sinAngle);
-		return point;
-	}
-
-	Vector3Int TranslatePoint(Vector3Int& point, short angle, float forward, float down, float right)
-	{
-		auto newPoint = TranslatePoint(point.ToVector3(), angle, forward, down, right);
-		return Vector3Int(
-			(int)round(newPoint.x),
-			(int)round(newPoint.y),
-			(int)round(newPoint.z)
+		return Vector3(
+			point.x + ((forward * sinHeading) + (right * cosHeading)),
+			point.y + down,
+			point.z + ((forward * cosHeading) - (right * sinHeading))
 		);
 	}
 
-	Vector3 TranslatePoint(Vector3& point, Vector3Shrt& orient, float distance)
+	Vector3Int TranslatePoint(const Vector3Int& point, const Vector3Shrt& orient, float distance)
+	{
+		return Vector3Int(TranslatePoint(point.ToVector3(), orient, distance));
+	}
+
+	Vector3 TranslatePoint(const Vector3& point, const Vector3Shrt& orient, float distance)
 	{
 		if (distance == 0.0f)
 			return point;
@@ -41,42 +43,31 @@
 		float sinY = phd_sin(orient.y);
 		float cosY = phd_cos(orient.y);
 
-		point.x += distance * (sinY * cosX);
-		point.y -= distance * sinX;
-		point.z += distance * (cosY * cosX);
-		return point;
-	}
-
-	Vector3Int TranslatePoint(Vector3Int& point, Vector3Shrt& orient, float distance)
-	{
-		auto newPoint = TranslatePoint(point.ToVector3(), orient, distance);
-		return Vector3Int(
-			(int)round(newPoint.x),
-			(int)round(newPoint.y),
-			(int)round(newPoint.z)
+		return Vector3(
+			point.x + (distance * (sinY * cosX)),
+			point.y - (distance * sinX),
+			point.z + (distance * (cosX * cosY))
 		);
 	}
 
-	Vector3 TranslatePoint(Vector3& point, Vector3& direction, float distance)
+	Vector3Int TranslatePoint(const Vector3Int& point, const Vector3& direction, float distance)
 	{
-		direction.Normalize();
-		point += direction * distance;
-		return point;
+		return Vector3Int(TranslatePoint(point.ToVector3(), direction, distance));
 	}
 
-	Vector3Int TranslatePoint(Vector3Int& point, Vector3& direction, float distance)
+	Vector3 TranslatePoint(const Vector3& point, const Vector3& direction, float distance)
 	{
-		auto newPoint = TranslatePoint(point.ToVector3(), direction, distance);
-		return Vector3Int(
-			(int)round(newPoint.x),
-			(int)round(newPoint.y),
-			(int)round(newPoint.z)
-		);
+		auto directionNorm = direction;
+		directionNorm.Normalize();
+		return (point + (directionNorm * distance));
 	}
 
-	short GetShortestAngularDistance(short angleFrom, short angleTo)
+	short GetShortestAngularDistance(short angleFrom, short angleTo, bool getShortest)
 	{
-		return short(angleTo - angleFrom);
+		if (getShortest)
+			return short(angleTo - angleFrom);
+		else
+			return short(angleFrom - angleTo); // TODO: Check this. I have no clue. -- Sezz 2022.08.30
 	}
 
 	short GetSurfaceSteepnessAngle(Vector2 tilt)
@@ -90,7 +81,7 @@
 		return (short)phd_atan(-tilt.y, -tilt.x);
 	}
 
-	Vector3Shrt GetOrientTowardPoint(Vector3 origin, Vector3 target)
+	Vector3Shrt GetOrientTowardPoint(const Vector3& origin, const Vector3& target)
 	{
 		auto direction = target - origin;
 		float yOrient = phd_atan(direction.x, direction.z);
@@ -103,21 +94,27 @@
 		return Vector3Shrt(xOrient, yOrient, 0.0f);
 	}
 
-	bool IsPointOnLeft(Vector3 origin, Vector3 refPoint, Vector3 target)
+	bool IsPointInFront(const PHD_3DPOS& pose, const Vector3& target)
 	{
-		auto refDirection = refPoint - origin;
+		return IsPointInFront(pose.Position.ToVector3(), target, pose.Orientation);
+	}
+	
+	bool IsPointInFront(const Vector3& origin, const Vector3& target, const Vector3Shrt& orient)
+	{
+		float sinY = phd_sin(orient.y);
+		float cosY = phd_cos(orient.y);
 
-		auto normal = Vector3(refDirection.z, 0.0f, -refDirection.x);
-		auto targetDirection = target - origin;
+		auto direction2DNorm = Vector3(sinY, 0.0f, cosY);
+		auto direction = origin - target;
 
-		float dot = normal.Dot(targetDirection);
-		if (dot > 0.0f)
-			return true;
+		float dot = direction2DNorm.Dot(direction);
+		if (dot >= 0.0f)
+			return false;
 
-		return false;
+		return true;
 	}
 
-	bool IsPointOnLeft(Vector3 origin, Vector3Shrt orient, Vector3 target)
+	bool IsPointOnLeft(const Vector3& origin, const Vector3& target, const Vector3Shrt& orient)
 	{
 		float sinY = phd_sin(orient.y);
 		float cosY = phd_cos(orient.y);
@@ -130,5 +127,19 @@
 			return false;
 
 		return true;
+	}
+
+	bool IsPointOnLeft(const Vector3& origin, const Vector3& target, const Vector3& refPoint)
+	{
+		auto refDirection = refPoint - origin;
+
+		auto normal = Vector3(refDirection.z, 0.0f, -refDirection.x);
+		auto targetDirection = target - origin;
+
+		float dot = normal.Dot(targetDirection);
+		if (dot > 0.0f)
+			return true;
+
+		return false;
 	}
 //}

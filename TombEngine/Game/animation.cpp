@@ -410,11 +410,6 @@ void TranslateItem(ItemInfo* item, Vector3 direction, float distance)
 	item->Pose.Position = TranslatePoint(item->Pose.Position, direction, distance);
 }
 
-void TranslateItem(ItemInfo* item, Vector3 direction, float distance)
-{
-	item->Pose.Position = TranslatePoint(item->Pose.Position, direction, distance);
-}
-
 void SetAnimation(ItemInfo* item, int animIndex, int frameToStart)
 {
 	if (item->Animation.AnimNumber == animIndex)
