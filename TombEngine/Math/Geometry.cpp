@@ -104,10 +104,11 @@
 		float sinY = phd_sin(orient.y);
 		float cosY = phd_cos(orient.y);
 
-		auto normal = Vector3(sinY, 0.0f, cosY);
+		// The heading angle (Y only) vector: X = +sinY, Y = 0, Z = +cosY
+		auto direction = Vector3(sinY, 0.0f, cosY);
 		auto difference = origin - target;
 
-		float dot = normal.Dot(difference);
+		float dot = direction.Dot(difference);
 		if (dot >= 0.0f)
 			return false;
 
@@ -119,6 +120,7 @@
 		float sinY = phd_sin(orient.y);
 		float cosY = phd_cos(orient.y);
 
+		// The normal vector to the heading angle (Y only) vector: X = +cosY, Y = 0, Z = -sinY
 		auto normal = Vector3(cosY, 0.0f, -sinY);
 		auto difference = origin - target;
 
@@ -131,12 +133,12 @@
 
 	bool IsPointOnLeft(const Vector3& origin, const Vector3& target, const Vector3& refPoint)
 	{
-		auto refDirection = refPoint - origin;
+		auto direction = refPoint - origin;
 
-		auto normal = Vector3(refDirection.z, 0.0f, -refDirection.x);
-		auto direction = target - origin;
+		auto normal = Vector3(direction.z, 0.0f, -direction.x);
+		auto targetDirection = target - origin;
 
-		float dot = normal.Dot(direction);
+		float dot = normal.Dot(targetDirection);
 		if (dot > 0.0f)
 			return true;
 
