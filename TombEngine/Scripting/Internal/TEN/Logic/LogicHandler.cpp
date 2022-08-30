@@ -193,8 +193,8 @@ sol::object LogicHandler::GetLevelFunc(sol::table tab, std::string const& luaNam
 	if (obj.is<std::string>())
 	{
 		std::string key = obj.as<std::string>();
-		if (m_levelFuncsFakeFuncs[key].valid())
-			return m_levelFuncsFakeFuncs[key];
+		if (m_levelFuncs_levelFuncObjects[key].valid())
+			return m_levelFuncs_levelFuncObjects[key];
 	}
 	return sol::nil;
 }
@@ -213,7 +213,6 @@ void LogicHandler::CallLevelFunc(std::string name, sol::variadic_args va)
 
 bool LogicHandler::SetLevelFunc(sol::table tab, std::string const& luaName, sol::object value)
 {
-	//make m_levelFuncs the 'root' table, make everything else go into "tab" (so maybe all these should act on "tab" and we gotta create original m_levelFuncs ourselves outside of here)
 	std::string partName;
 	std::string fullName;
 	sol::table newTab;
@@ -224,6 +223,7 @@ bool LogicHandler::SetLevelFunc(sol::table tab, std::string const& luaName, sol:
 	switch (value.get_type())
 	{
 	case sol::type::lua_nil:
+		//todo should we handle this?
 	case sol::type::function:
 			partName = tab.raw_get<std::string>(strKey);
 			fullName = partName + "." + luaName;
@@ -234,23 +234,9 @@ bool LogicHandler::SetLevelFunc(sol::table tab, std::string const& luaName, sol:
 			fnh.m_funcName = fullName;
 			fnh.m_handler = this;
 
-			m_levelFuncsFakeFuncs[fullName] = fnh;
-
-			//newTab = sol::table{ *(m_handler.GetState()), sol::create };
-			//newTab[sol::metatable_key] = sol::table{ *(m_handler.GetState()), sol::create };
-
-			//meta = newTab[sol::metatable_key];
-			//meta.set_function("__call", &LogicHandler::CallLevelFunc, this);
-			//newTab.set("funcName", fullName);
-//			m_levelFuncsFakeFuncs[fullName] = newTab;
-
-			//update: don't need to do this actually I don't think...
-			//todo make another m_levelFuncsActualFuncs member with the actual func call
+			m_levelFuncs_levelFuncObjects[fullName] = fnh;
 		break;
 	case sol::type::table:
-		//make a copy of the table using
-		//tab.raw_set(luaName, MakeSpecialTable(m_handler.GetState(), luaName, &LogicHandler::GetLevelFunc, &LogicHandler::SetLevelFunc, this));
-			//todo need to make anonoymous version of MakeSpecialTable
 			newTab = sol::table{ *(m_handler.GetState()), sol::create };
 			fullName = tab.raw_get<std::string>(strKey) + "." + luaName;
 			m_levelFuncsTables[fullName] = newTab;
@@ -274,9 +260,6 @@ bool LogicHandler::SetLevelFunc(sol::table tab, std::string const& luaName, sol:
 			{
 				newLevelFuncsTab[key] = val;
 			}
-			//tab.raw_set(luaName, newTab);
-
-		//	assign the copy of the table
 		break;
 	default:
 		std::string error{ "Failed to add " };
@@ -332,7 +315,7 @@ void LogicHandler::FreeLevelScripts()
 
 	m_levelFuncsTables = sol::table{ *(m_handler.GetState()), sol::create };
 	m_levelFuncs_luaFunctions = sol::table{ *(m_handler.GetState()), sol::create };
-	m_levelFuncsFakeFuncs = sol::table{ *(m_handler.GetState()), sol::create };
+	m_levelFuncs_levelFuncObjects = sol::table{ *(m_handler.GetState()), sol::create };
 
 	m_levelFuncsTables[ScriptReserved_LevelFuncs] = sol::table{ *(m_handler.GetState()), sol::create };
 	m_levelFuncs.raw_set(strKey, ScriptReserved_LevelFuncs);

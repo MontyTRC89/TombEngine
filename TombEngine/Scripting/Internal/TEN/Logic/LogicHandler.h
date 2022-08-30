@@ -33,8 +33,8 @@ private:
 	// Maps full function paths into Lua functions.
 	sol::table m_levelFuncs_luaFunctions{};
 
-	// Maps full function paths to FunctionNameHolders.
-	sol::table m_levelFuncsFakeFuncs{};
+	// Maps full function paths to LevelFunc objects.
+	sol::table m_levelFuncs_levelFuncObjects{};
 
 	// Contains tables; each table refers to a table in the LevelFuncs hierarchy, and contains the full names
 	// of the functions to index in m_levelFuncs_luaFunctions.
