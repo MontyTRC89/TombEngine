@@ -410,12 +410,13 @@ bool IsPointInFront(const Vector3& origin, const Vector3& target, const Vector3S
 	float sinY = phd_sin(orient.y);
 	float cosY = phd_cos(orient.y);
 
-	auto normalizedDirection2D = Vector3(sinY, 0.0f, cosY);
-	auto direction = origin - target;
+	// The heading angle (Y only) direction vector: X = +sinY, Y = 0, Z = +cosY
+	auto headingDirection = Vector3(sinY, 0.0f, cosY);
+	auto targetDirection = target - origin;
 
-	float dot = normalizedDirection2D.Dot(direction);
-	if (dot >= 0.0f)
-		return false;
+	float dot = headingDirection.Dot(targetDirection);
+	if (dot > 0.0f)
+		return true;
 
-	return true;
+	return false;
 }

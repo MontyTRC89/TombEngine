@@ -2521,7 +2521,7 @@ bool TestLaraTightropeDismount(ItemInfo* item, CollisionInfo* coll)
 
 bool TestLaraPoleCollision(ItemInfo* item, CollisionInfo* coll, bool goingUp, float offset)
 {
-	constexpr auto poleProbeCollRadius = 16.0f;
+	static constexpr auto poleProbeCollRadius = 16.0f;
 
 	bool atLeastOnePoleCollided = false;
 
