@@ -3,38 +3,9 @@
 #include "Game/items.h"
 #include "LuaHandler.h"
 #include <unordered_set>
-#include "Strings/StringsHandler.h"
 
-class FuncNameHolder;
+class LevelFunc;
 enum class CallbackPoint;
-
-//template<typename ... Ts> class OnlyAllows
-//{
-//	OnlyAllows()
-//	{
-//		
-//	}
-//};
-enum class TestEnum
-{
-	one,
-	two,
-	three
-};
-
-template<TestEnum ... allowed> bool allow(TestEnum type)
-{
-	std::array<TestEnum, sizeof(allowed)> allowedTypes{allowed...};
-	for(TestEnum e : allowedTypes)
-	{
-		if (e == type)
-		{
-			return true;
-		}
-	}
-
-	return false;
-}
 
 class LogicHandler : public ScriptInterfaceGame
 {
@@ -99,7 +70,7 @@ public:
 	void								LogPrint(sol::variadic_args va);
 	bool								SetLevelFunc(sol::table tab, std::string const& luaName, sol::object value);
 
-	void								AddCallback(CallbackPoint point, FuncNameHolder & holder);
+	void								AddCallback(CallbackPoint point, LevelFunc & holder);
 	void								RemoveCallback(CallbackPoint point, std::string const & name);
 
 	void								ResetScripts(bool clearGameVars) override;

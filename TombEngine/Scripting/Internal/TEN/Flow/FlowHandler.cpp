@@ -11,6 +11,7 @@
 #include "Logic/FuncNameHolder.h"
 #include "Vec3/Vec3.h"
 #include "Objects/ScriptInterfaceObjectsHandler.h"
+#include "Strings/ScriptInterfaceStringsHandler.h"
 #include "Specific/trutils.h"
 
 /***
@@ -113,7 +114,9 @@ Specify which translations in the strings table correspond to which languages.
 	Animations::Register(table_flow);
 	Settings::Register(table_flow);
 	Fog::Register(table_flow);
-	FuncNameHolder::Register(parent);
+	
+	//todo find out why this can't be in logic
+	LevelFunc::Register(parent);
 
 	m_handler.MakeReadOnlyTable(table_flow, ScriptReserved_WeatherType, kWeatherTypes);
 	m_handler.MakeReadOnlyTable(table_flow, ScriptReserved_LaraType, kLaraTypes);

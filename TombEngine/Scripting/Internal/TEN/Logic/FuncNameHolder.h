@@ -1,5 +1,6 @@
 #pragma once
 #include "LogicHandler.h"
+#include "ReservedScriptNames.h"
 
 // Why do we need this class?
 // We need a way to save and load functions in a way that remembers exactly what "path" they have in the LevelFuncs table hierarchy.
@@ -11,7 +12,7 @@
 // The alternative would be to pass in a full string, but then we would need to split the string at runtime to find
 // the exact tables to look in, which seems like it would take longer.
 
-class FuncNameHolder {
+class LevelFunc {
 public:
 	std::string m_funcName;
 	LogicHandler* m_handler;
@@ -26,7 +27,7 @@ public:
 
 	static void Register(sol::table & parent)
 	{
-		parent.new_usertype<FuncNameHolder>("FuncHolderNameString", sol::no_constructor, sol::meta_function::call, &Call);
+		parent.new_usertype<LevelFunc>(ScriptReserved_LevelFunc, sol::no_constructor, sol::meta_function::call, &Call);
 	}
 };
 

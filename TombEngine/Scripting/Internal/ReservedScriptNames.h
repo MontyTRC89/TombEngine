@@ -20,6 +20,7 @@ static constexpr char ScriptReserved_AIObject[]			= "AIObject";
 static constexpr char ScriptReserved_DisplayString[]	= "DisplayString";
 static constexpr char ScriptReserved_Vec3[]				= "Vec3";
 static constexpr char ScriptReserved_Rotation[]			= "Rotation";
+static constexpr char ScriptReserved_LevelFunc[]		= "LevelFunc";
 
 // Member functions
 static constexpr char ScriptReserved_New[]					= "New";

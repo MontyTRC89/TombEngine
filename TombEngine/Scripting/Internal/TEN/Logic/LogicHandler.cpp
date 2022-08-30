@@ -117,7 +117,7 @@ i.e. if you register `MyFunc` and `MyFunc2` with `PRECONTROLPHASE`, both will be
 	local MyFunc = function(dt) print(dt) end
 	TEN.Logic.AddCallback(TEN.Logic.CallbackPoint.PRECONTROLPHASE, "MyFunc")
 */
-void LogicHandler::AddCallback(CallbackPoint point, FuncNameHolder & fnh)
+void LogicHandler::AddCallback(CallbackPoint point, LevelFunc & fnh)
 {
 	//sol::object obj = tab["funcName"];
 	//sol::type type = obj.get_type();
@@ -258,7 +258,7 @@ bool LogicHandler::SetLevelFunc(sol::table tab, std::string const& luaName, sol:
 	sol::table newLevelFuncsTab;
 	sol::table aTab;
 	sol::table meta;
-	FuncNameHolder fnh;
+	LevelFunc fnh;
 	switch (value.get_type())
 	{
 	case sol::type::lua_nil:
@@ -457,7 +457,7 @@ void LogicHandler::SetVariables(std::vector<SavedVar> const & vars)
 				}
 				else if (std::holds_alternative<FuncName>(vars[second]))
 				{
-					FuncNameHolder fnh;
+					LevelFunc fnh;
 					fnh.m_funcName = std::get<FuncName>(vars[second]).name;
 					fnh.m_handler = this;
 					solTables[i][vars[first]] = fnh;
@@ -557,7 +557,7 @@ void LogicHandler::GetVariables(std::vector<SavedVar> & vars)
 		return first->second;
 	};
 
-	auto handleFuncName = [&](FuncNameHolder const& fnh)
+	auto handleFuncName = [&](LevelFunc const& fnh)
 	{
 		//auto str = obj.as<sol::string_view>();
 		auto [first, second] = varsMap.insert(std::make_pair(&fnh, nVars));
@@ -622,8 +622,8 @@ void LogicHandler::GetVariables(std::vector<SavedVar> & vars)
 				{
 					if(second.is<Vec3>())
 						putInVars(handleVec3(second.as<Vec3>()));
-					else if(second.is<FuncNameHolder>())
-						putInVars(handleFuncName(second.as<FuncNameHolder>()));
+					else if(second.is<LevelFunc>())
+						putInVars(handleFuncName(second.as<LevelFunc>()));
 					else
 						ScriptAssert(false, "Tried saving an unsupported userdata as a value");
 				}
@@ -746,8 +746,7 @@ void LogicHandler::OnControlPhase(float dt)
 		if (!func.valid())
 			ScriptAssertF(false, "Callback {} not valid", name);
 		else //todo this is a FuncNameHolder, not a function, so ye
-			func.get<FuncNameHolder>().CallDT(dt);
-			//sol::function(func).call(dt);
+			func.get<LevelFunc>().CallDT(dt);
 	};
 
 	for (auto& name : m_callbacksPreControl)
@@ -863,7 +862,7 @@ void LogicHandler::InitCallbacks()
 			ScriptWarn("Defaulting to no " + fullName + " behaviour.");
 			return;
 		}
-		FuncNameHolder fnh = (*m_handler.GetState())["LevelFuncs"][luaFunc];
+		LevelFunc fnh = (*m_handler.GetState())["LevelFuncs"][luaFunc];
 
 		func = m_levelFuncsActualFuncs[fnh.m_funcName];
 
