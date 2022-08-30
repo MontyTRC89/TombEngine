@@ -27,7 +27,7 @@ void lara_as_underwater_idle(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->Control.Look.Mode = LookMode::Unrestrained;
+	lara->Control.Look.Mode = LookMode::Free;
 
 	auto* level = g_GameFlow->GetLevel(CurrentLevel);
 	auto laraType = g_GameFlow->GetLevel(CurrentLevel)->GetLaraType();

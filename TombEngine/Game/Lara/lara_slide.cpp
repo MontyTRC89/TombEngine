@@ -25,7 +25,7 @@ void lara_as_slide_forward(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->Control.Look.Mode = LookMode::Unrestrained;
+	lara->Control.Look.Mode = LookMode::Free;
 	Camera.targetElevation = -ANGLE(45.0f);
 
 	if (item->HitPoints <= 0)
@@ -131,7 +131,7 @@ void lara_as_slide_back(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->Control.Look.Mode = LookMode::Unrestrained;
+	lara->Control.Look.Mode = LookMode::Free;
 	Camera.targetElevation = -ANGLE(45.0f);
 	Camera.targetAngle = ANGLE(135.0f);
 

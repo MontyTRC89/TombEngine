@@ -102,14 +102,14 @@ void DoLookAround(ItemInfo* item, bool invertVerticalAxis)
 	// Determine axis coefficients.
 	float vAxisCoeff = 0.0f;
 	if (TrInput & (IN_FORWARD | IN_BACK) &&
-		(lara->Control.Look.Mode == LookMode::Vertical || lara->Control.Look.Mode == LookMode::Unrestrained))
+		(lara->Control.Look.Mode == LookMode::Vertical || lara->Control.Look.Mode == LookMode::Free))
 	{
 		vAxisCoeff = AxisMap[InputAxis::MoveVertical];
 	}
 
 	float hAxisCoeff = 0.0f;
 	if (TrInput & (IN_LEFT | IN_RIGHT) &&
-		(lara->Control.Look.Mode == LookMode::Horizontal || lara->Control.Look.Mode == LookMode::Unrestrained))
+		(lara->Control.Look.Mode == LookMode::Horizontal || lara->Control.Look.Mode == LookMode::Free))
 	{
 		hAxisCoeff = AxisMap[InputAxis::MoveHorizontal];
 	}
@@ -139,7 +139,7 @@ void DoLookAround(ItemInfo* item, bool invertVerticalAxis)
 
 	// Clear directional inputs.
 	if (lara->Control.Look.Mode == LookMode::Vertical ||
-		lara->Control.Look.Mode == LookMode::Unrestrained)
+		lara->Control.Look.Mode == LookMode::Free)
 	{
 		TrInput &= ~IN_DIRECTION;
 	}

@@ -350,7 +350,7 @@ void lara_as_climb_idle(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->Control.Look.Mode = LookMode::Unrestrained;
+	lara->Control.Look.Mode = LookMode::Free;
 	lara->Control.IsClimbingLadder = true;
 	coll->Setup.EnableSpasm = false;
 	coll->Setup.EnableObjectPush = false;

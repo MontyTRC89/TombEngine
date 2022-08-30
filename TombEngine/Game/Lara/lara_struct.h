@@ -935,7 +935,7 @@ enum class LookMode
 	None,
 	Vertical,
 	Horizontal,
-	Unrestrained
+	Free
 };
 
 enum class JumpDirection

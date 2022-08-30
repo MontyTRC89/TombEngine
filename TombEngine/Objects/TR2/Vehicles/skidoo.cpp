@@ -433,7 +433,7 @@ namespace TEN::Entities::Vehicles
 			*pitch = skidooItem->Animation.Velocity.z + (height - skidooItem->Pose.Position.y);
 
 			if (skidooItem->Animation.Velocity.z)
-				lara->Control.Look.Mode = LookMode::Unrestrained;
+				lara->Control.Look.Mode = LookMode::Free;
 			else
 				lara->Control.Look.Mode = LookMode::Horizontal;
 

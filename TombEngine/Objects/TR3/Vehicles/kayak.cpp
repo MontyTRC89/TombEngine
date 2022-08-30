@@ -1199,7 +1199,7 @@ namespace TEN::Entities::Vehicles
 		auto* kayakItem = &g_Level.Items[lara->Vehicle];
 		auto* kayak = GetKayakInfo(kayakItem);
 
-		lara->Control.Look.Mode = LookMode::Unrestrained;
+		lara->Control.Look.Mode = LookMode::Free;
 
 		int ofs = kayakItem->Animation.Velocity.y;
 

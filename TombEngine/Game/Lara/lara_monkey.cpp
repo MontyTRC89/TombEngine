@@ -29,7 +29,7 @@ void lara_as_monkey_idle(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->Control.Look.Mode = LookMode::Unrestrained;
+	lara->Control.Look.Mode = LookMode::Free;
 	lara->ExtraTorsoRot = Vector3Shrt();
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
