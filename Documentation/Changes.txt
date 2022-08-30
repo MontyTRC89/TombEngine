@@ -9,6 +9,7 @@ Version 1.0.2
 * Fix incorrect pole grabbing.
 * Fix zeroed forward velocity upon landing.
 * Fix 1-frame turn rate delays.
+* Fix occasional leave event calls when moving closely to volumes.
 
 
 Version 1.0.1
