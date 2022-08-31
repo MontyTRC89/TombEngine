@@ -60,6 +60,8 @@ void lara_as_step_right(ItemInfo* item, CollisionInfo* coll);
 void lara_col_step_right(ItemInfo* item, CollisionInfo* coll);
 void lara_as_step_left(ItemInfo* item, CollisionInfo* coll);
 void lara_col_step_left(ItemInfo* item, CollisionInfo* coll);
+void lara_as_stand_turn_180(ItemInfo* item, CollisionInfo* coll);
+void lara_col_stand_turn_180(ItemInfo* item, CollisionInfo* coll);
 void lara_as_roll_back(ItemInfo* item, CollisionInfo* coll);
 void lara_col_roll_back(ItemInfo* item, CollisionInfo* coll);
 void lara_as_roll_forward(ItemInfo* item, CollisionInfo* coll);

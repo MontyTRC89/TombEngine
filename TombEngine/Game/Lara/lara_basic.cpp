@@ -1981,6 +1981,25 @@ void lara_col_step_left(ItemInfo* item, CollisionInfo* coll)
 	}
 }
 
+// State:	  LS_STAND_TURN_180 (173)
+// Collision: lara_col_stand_turn_180()
+void lara_as_stand_turn_180(ItemInfo* item, CollisionInfo* coll)
+{
+	auto* lara = GetLaraInfo(item);
+
+	lara->Control.CanLook = false;
+	ModulateLaraTurnRateY(item, 0, 0, 0);
+
+	item->Animation.TargetState = LS_IDLE;
+}
+
+// State:	LS_STAND_TURN_180 (173)
+// Control: lara_as_stand_turn_180()
+void lara_col_stand_turn_180(ItemInfo* item, CollisionInfo* coll)
+{
+	lara_col_idle(item, coll);
+}
+
 // State:		LS_ROLL_BACK (23)
 // Collision:	lara_col_roll_back()
 void lara_as_roll_back(ItemInfo* item, CollisionInfo* coll)
