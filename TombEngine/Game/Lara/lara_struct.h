@@ -504,10 +504,10 @@ enum LaraAnim
 	LA_CRAWL_TO_CROUCH_CONTINUE = 274,								// Crawl > crouch (2/3)
 	LA_CRAWL_IDLE_TO_CRAWL_BACK = 275,								// Crawl > crawl back
 	LA_CRAWL_BACK = 276,											// Crawl back (looped)
-	LA_CRAWL_BACK_TO_IDLE_RIGHT = 277,								// Unused.
-	LA_CRAWL_BACK_TO_IDLE_RIGHT_END = 278,							// 
-	LA_CRAWL_BACK_TO_IDLE_LEFT = 279,								// Unused.
-	LA_CRAWL_BACK_TO_IDLE_LEFT_END = 280,							// 
+	LA_CRAWL_BACK_TO_IDLE_RIGHT = 277,								// Crawl back > crawl idle, right foot first
+	LA_CRAWL_BACK_TO_IDLE_RIGHT_END = 278,							// Unused.
+	LA_CRAWL_BACK_TO_IDLE_LEFT = 279,								// Crawl back > crawl idle, left foot first
+	LA_CRAWL_BACK_TO_IDLE_LEFT_END = 280,							// Unused.
 	LA_CRAWL_TURN_LEFT_TO_IDLE_EARLY = 281,							// Crawl rotate left > crawl idle, early opportunity
 	LA_CRAWL_TURN_RIGHT_TO_IDLE_EARLY = 282,						// Crawl rotate right > crawl idle, early opportunity
 	LA_MONKEY_TURN_LEFT_TO_IDLE_EARLY = 283,						// Turn left on monkey swing > monkey swing idle, 1st opportunity
