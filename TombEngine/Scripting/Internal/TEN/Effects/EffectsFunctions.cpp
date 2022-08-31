@@ -318,7 +318,7 @@ namespace Effects
 	}
 
 /***Flash screen.
-@function Flash
+@function FlashScreen
 @tparam Color color (default Color(255, 255, 255))
 @tparam float speed (default 1.0). Speed in "amount" per second. A value of 1 will make the flash take one second. Clamped to [0.005, 1.0]
 */
