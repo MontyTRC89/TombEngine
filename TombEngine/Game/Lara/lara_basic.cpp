@@ -439,7 +439,7 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 	if (TrInput & IN_ROLL || (TrInput & IN_FORWARD && TrInput & IN_BACK))
 	{
 		if (TrInput & IN_WALK || TestLaraTurn180(item, coll))
-			item->Animation.TargetState = LS_TURN_180;
+			item->Animation.TargetState = LS_STAND_TURN_180;
 		else
 			item->Animation.TargetState = LS_ROLL_FORWARD;
 		
@@ -569,6 +569,12 @@ void PseudoLaraAsWadeIdle(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
+	if (TrInput & IN_ROLL || (TrInput & IN_FORWARD && TrInput & IN_BACK))
+	{
+		item->Animation.TargetState = LS_STAND_TURN_180;
+		return;
+	}
+
 	if (TrInput & IN_FORWARD)
 	{
 		auto vaultResult = TestLaraVault(item, coll);
@@ -629,6 +635,12 @@ void PseudoLaraAsWadeIdle(ItemInfo* item, CollisionInfo* coll)
 void PseudoLaraAsSwampIdle(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
+
+	if (TrInput & IN_ROLL || (TrInput & IN_FORWARD && TrInput & IN_BACK))
+	{
+		item->Animation.TargetState = LS_STAND_TURN_180;
+		return;
+	}
 
 	if (TrInput & IN_FORWARD)
 	{

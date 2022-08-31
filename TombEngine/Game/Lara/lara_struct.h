@@ -207,7 +207,7 @@ enum LaraState
 	LS_SOFT_SPLAT = 170,
 	LS_CROUCH_TURN_180 = 171,
 	LS_CRAWL_TURN_180 = 172,
-	LS_TURN_180 = 173,
+	LS_STAND_TURN_180 = 173,
 
 	NUM_LARA_STATES
 };
@@ -492,8 +492,8 @@ enum LaraAnim
 	LA_CRAWL_TO_IDLE_LEFT = 262,									// Crawl forward > crawl idle, left leg first
 	LA_CRAWL_IDLE = 263,											// Crwal idle
 	LA_CROUCH_TO_CRAWL_END = 264,									// Crawl > crouch (2/2)
-	LA_TURN_180_START = 265,										// Standing turn 180 (1/2)
-	LA_TURN_180_END = 266,											// Standing turn 180 (2/2)
+	LA_STAND_TURN_180_START = 265,									// Standing turn 180 (1/2)
+	LA_STAND_TURN_180_END = 266,									// Standing turn 180 (2/2)
 	LA_CRAWL_TO_IDLE_RIGHT = 267,									// Crawl forward > crawl idle, right leg first
 	LA_CRAWL_TO_IDLE_END_LEFT_POINTLESS = 268,							// TODO: remove.
 	LA_CRAWL_TURN_LEFT = 269,										// Crawl rotate left (looped)
@@ -812,7 +812,7 @@ enum LaraAnim
 
 	// TRASHED ANIMS (please reuse slots before going any higher and remove entries from this list as you go):
 	// 102
-	// 265, 266, 268, 273, 274, 278, 280,
+	// 268, 273, 274, 278, 280,
 	// 343, 345,
 	// 364, 366, 368, 370,
 };
