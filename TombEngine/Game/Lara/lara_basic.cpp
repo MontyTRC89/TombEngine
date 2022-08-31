@@ -555,8 +555,7 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 	item->Animation.TargetState = LS_IDLE;
 }
 
-// TODO: Future-proof for rising water.
-// TODO: Make these into true states someday? It may take a bit of work. @Sezz 2021.10.13
+// NOTE: Pseudo-states already removed on states_tier_3.
 // Pseudo-state for idling in wade-height water.
 void PseudoLaraAsWadeIdle(ItemInfo* item, CollisionInfo* coll)
 {
@@ -631,6 +630,7 @@ void PseudoLaraAsWadeIdle(ItemInfo* item, CollisionInfo* coll)
 	item->Animation.TargetState = LS_IDLE;
 }
 
+// NOTE: Pseudo-states already removed on states_tier_3.
 // Pseudo-state for idling in swamps.
 void PseudoLaraAsSwampIdle(ItemInfo* item, CollisionInfo* coll)
 {
