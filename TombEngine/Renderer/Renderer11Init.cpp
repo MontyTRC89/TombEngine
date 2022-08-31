@@ -21,7 +21,7 @@ void TEN::Renderer::Renderer11::Initialise(int w, int h, bool windowed, HWND han
 	m_screenWidth = w;
 	m_screenHeight = h;
 	m_windowed = windowed;
-	InitialiseScreen(w, h, windowed, handle, false);
+	InitialiseScreen(w, h, handle, false);
 
 	// Initialise render states
 	m_states = std::make_unique<CommonStates>(m_device.Get());
@@ -207,7 +207,7 @@ void TEN::Renderer::Renderer11::Initialise(int w, int h, bool windowed, HWND han
 	initQuad(m_device.Get());
 }
 
-void TEN::Renderer::Renderer11::InitialiseScreen(int w, int h, bool windowed, HWND handle, bool reset)
+void TEN::Renderer::Renderer11::InitialiseScreen(int w, int h, HWND handle, bool reset)
 {
 	DXGI_SWAP_CHAIN_DESC sd;
 	sd.BufferDesc.Width = w;
@@ -300,23 +300,7 @@ void TEN::Renderer::Renderer11::InitialiseScreen(int w, int h, bool windowed, HW
 	m_viewportToolkit = Viewport(m_viewport.TopLeftX, m_viewport.TopLeftY, m_viewport.Width, m_viewport.Height,
 		m_viewport.MinDepth, m_viewport.MaxDepth);
 
-	if (!windowed)
-	{
-		SetWindowLongPtr(handle, GWL_STYLE, 0);
-		SetWindowLongPtr(handle, GWL_EXSTYLE, WS_EX_TOPMOST);
-		SetWindowPos(handle, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
-		ShowWindow(handle, SW_SHOWMAXIMIZED);
-	}
-	else
-	{
-		SetWindowLongPtr(handle, GWL_STYLE, WS_OVERLAPPEDWINDOW);
-		SetWindowLongPtr(handle, GWL_EXSTYLE, 0);
-		ShowWindow(handle, SW_SHOWNORMAL);
-		SetWindowPos(handle, HWND_TOP, 0, 0, w, h, SWP_NOMOVE | SWP_NOZORDER | SWP_FRAMECHANGED);
-	}
-
-	UpdateWindow(handle);
-
+	SetFullScreen();
 }
 
 void TEN::Renderer::Renderer11::Create()
@@ -338,7 +322,11 @@ void TEN::Renderer::Renderer11::Create()
 void Renderer11::ToggleFullScreen(bool force)
 {
 	m_windowed = force ? false : !m_windowed;
+	SetFullScreen();
+}
 
+void Renderer11::SetFullScreen()
+{
 	if (!m_windowed)
 	{
 		SetWindowLongPtr(WindowsHandle, GWL_STYLE, 0);
@@ -348,10 +336,18 @@ void Renderer11::ToggleFullScreen(bool force)
 	}
 	else
 	{
+		int frameW = GetSystemMetrics(SM_CXPADDEDBORDER);
+		int frameX = GetSystemMetrics(SM_CXSIZEFRAME);
+		int frameY = GetSystemMetrics(SM_CYSIZEFRAME);
+		int frameC = GetSystemMetrics(SM_CYCAPTION);
+
+		int borderWidth  = (frameX + frameW) * 2;
+		int borderHeight = (frameY + frameW) * 2 + frameC;
+
 		SetWindowLongPtr(WindowsHandle, GWL_STYLE, WS_OVERLAPPEDWINDOW);
 		SetWindowLongPtr(WindowsHandle, GWL_EXSTYLE, 0);
 		ShowWindow(WindowsHandle, SW_SHOWNORMAL);
-		SetWindowPos(WindowsHandle, HWND_TOP, 0, 0, m_screenWidth, m_screenHeight, SWP_NOMOVE | SWP_NOZORDER | SWP_FRAMECHANGED);
+		SetWindowPos(WindowsHandle, HWND_TOP, 0, 0, m_screenWidth + borderWidth, m_screenHeight + borderHeight, SWP_NOMOVE | SWP_NOZORDER | SWP_FRAMECHANGED);
 	}
 
 	UpdateWindow(WindowsHandle);

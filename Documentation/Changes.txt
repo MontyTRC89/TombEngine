@@ -1,8 +1,17 @@
 Version 1.0.2
 =============
 
-* Fix zeroed forward velocity upon landing.
 * Adjust max turn rate of idle state.
+* Align Lara on slopes when crouching, crawling, and dying.
+* Better slope alignment for large, flat enemies (i.e. big scorpion and crocodile).
+* Lock turn rate when automatically aligning Lara to objects.
+* Don't play Lara alignment animations if interacted object is too close.
+* Fix incorrect pole grabbing.
+* Fix zeroed forward velocity upon landing.
+* Fix 1-frame turn rate delays.
+* Fix occasional leave event calls when moving closely to volumes.
+* Fix incorrect viewport size in windowed mode.
+
 
 Version 1.0.1
 =============

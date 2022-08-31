@@ -91,6 +91,11 @@ Vector3Shrt GetOrientBetweenPoints(Vector3Int origin, Vector3Int target)
 	return GetVectorAngles(target.x - origin.x, target.y - origin.y, target.z - origin.z);
 }
 
+short GetShortestAngularDistance(short angleFrom, short angleTo)
+{
+	return short(angleTo - angleFrom);
+}
+
 int phd_Distance(PHD_3DPOS* first, PHD_3DPOS* second)
 {
 	return (int)round(Vector3::Distance(first->Position.ToVector3(), second->Position.ToVector3()));
@@ -393,4 +398,25 @@ Vector3Int TranslateVector(Vector3Int& vector, Vector3& direction, float distanc
 		(int)round(newVector.y),
 		(int)round(newVector.z)
 	);
+}
+
+bool IsPointInFront(const PHD_3DPOS& pose, const Vector3& target)
+{
+	return IsPointInFront(pose.Position.ToVector3(), target, pose.Orientation);
+}
+
+bool IsPointInFront(const Vector3& origin, const Vector3& target, const Vector3Shrt& orient)
+{
+	float sinY = phd_sin(orient.y);
+	float cosY = phd_cos(orient.y);
+
+	// The heading angle (Y only) direction vector: X = +sinY, Y = 0, Z = +cosY
+	auto headingDirection = Vector3(sinY, 0.0f, cosY);
+	auto targetDirection = target - origin;
+
+	float dot = headingDirection.Dot(targetDirection);
+	if (dot > 0.0f)
+		return true;
+
+	return false;
 }

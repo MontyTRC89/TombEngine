@@ -45,6 +45,7 @@ int mGetAngle(int x1, int y1, int x2, int y2);
 int phd_atan(int dz, int dx);
 Vector3Shrt GetVectorAngles(int x, int y, int z);
 Vector3Shrt GetOrientBetweenPoints(Vector3Int origin, Vector3Int target);
+short GetShortestAngularDistance(short angleFrom, short angleTo);
 void phd_RotBoundingBoxNoPersp(PHD_3DPOS* pos, BOUNDING_BOX* bounds, BOUNDING_BOX* tbounds);
 int phd_Distance(PHD_3DPOS* first, PHD_3DPOS* second);
 
@@ -81,3 +82,5 @@ Vector3 TranslateVector(Vector3& vector, Vector3Shrt& orient, float distance);
 Vector3Int TranslateVector(Vector3Int& vector, Vector3Shrt& orient, float distance);
 Vector3 TranslateVector(Vector3& vector, Vector3& direction, float distance);
 Vector3Int TranslateVector(Vector3Int& vector, Vector3& direction, float distance);
+bool IsPointInFront(const PHD_3DPOS& pose, const Vector3& target);
+bool IsPointInFront(const Vector3& origin, const Vector3& target, const Vector3Shrt& orient);

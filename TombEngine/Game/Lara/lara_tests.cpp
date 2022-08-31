@@ -1113,22 +1113,22 @@ void GetTightropeFallOff(ItemInfo* item, int regularity)
 #endif
 
 // TODO: Organise all of this properly. -- Sezz 2022.07.28
-bool CheckLaraState(LaraState state, std::vector<LaraState> stateList)
+bool CheckLaraState(LaraState referenceState, const std::vector<LaraState>& stateList)
 {
-	for (auto listedState : stateList)
+	for (auto& state : stateList)
 	{
-		if (state == listedState)
+		if (state == referenceState)
 			return true;
 	}
 
 	return false;
 }
 
-bool CheckLaraWeaponType(LaraWeaponType weaponType, std::vector<LaraWeaponType> weaponTypeList)
+bool CheckLaraWeaponType(LaraWeaponType referenceWeaponType, const std::vector<LaraWeaponType>& weaponTypeList)
 {
-	for (auto listedWeaponType : weaponTypeList)
+	for (auto& weaponType : weaponTypeList)
 	{
-		if (weaponType == listedWeaponType)
+		if (weaponType == referenceWeaponType)
 			return true;
 	}
 
@@ -2494,7 +2494,7 @@ bool TestLaraSlideJump(ItemInfo* item, CollisionInfo* coll)
 		auto probe = GetCollision(item);
 
 		short direction = GetLaraSlideDirection(item, coll);
-		short steepness = GetSurfaceSteepnessAngle(probe.FloorTilt.x, probe.FloorTilt.y);
+		short steepness = GetSurfaceSteepnessAngle(probe.FloorTilt);
 		return (abs((short)(coll->Setup.ForwardAngle - direction)) <= abs(steepness));
 	}
 
@@ -2529,25 +2529,33 @@ bool TestLaraTightropeDismount(ItemInfo* item, CollisionInfo* coll)
 	return false;
 }
 
-bool TestLaraPoleCollision(ItemInfo* item, CollisionInfo* coll, bool up, float offset)
+bool TestLaraPoleCollision(ItemInfo* item, CollisionInfo* coll, bool goingUp, float offset)
 {
 	static constexpr auto poleProbeCollRadius = 16.0f;
 
 	bool atLeastOnePoleCollided = false;
 
-	if (GetCollidedObjects(item, SECTOR(1), true, CollidedItems, nullptr, 0) && CollidedItems[0])
+	if (GetCollidedObjects(item, SECTOR(1), true, CollidedItems, nullptr, false) &&
+		CollidedItems[0] != nullptr)
 	{
 		auto laraBox = TO_DX_BBOX(item->Pose, GetBoundsAccurate(item));
 
-		// HACK: because Core implemented upward pole movement as SetPosition command, we can't precisely
+		// HACK: Because Core implemented upward pole movement as a SetPosition command, we can't precisely
 		// check her position. So we add a fixed height offset.
 
-		auto sphere = BoundingSphere(laraBox.Center + Vector3(0, (laraBox.Extents.y + poleProbeCollRadius + offset) * (up ? -1 : 1), 0), poleProbeCollRadius);
+		// Offset a sphere when jumping toward pole.
+		auto sphereOffset2D = Vector3::Zero;
+		sphereOffset2D = TranslateVector(sphereOffset2D, item->Pose.Orientation.y, coll->Setup.Radius + item->Animation.Velocity.z);
+
+		auto spherePos = laraBox.Center + Vector3(0.0f, (laraBox.Extents.y + poleProbeCollRadius + offset) * (goingUp ? -1 : 1), 0.0f);
+
+		auto sphere = BoundingSphere(spherePos, poleProbeCollRadius);
+		auto offsetSphere = BoundingSphere(spherePos + sphereOffset2D, poleProbeCollRadius);
 
 		//g_Renderer.AddDebugSphere(sphere.Center, 16.0f, Vector4(1, 0, 0, 1), RENDERER_DEBUG_PAGE::LOGIC_STATS);
 
 		int i = 0;
-		while (CollidedItems[i] != NULL)
+		while (CollidedItems[i] != nullptr)
 		{
 			auto*& object = CollidedItems[i];
 			i++;
@@ -2556,11 +2564,11 @@ bool TestLaraPoleCollision(ItemInfo* item, CollisionInfo* coll, bool up, float o
 				continue;
 
 			auto poleBox = TO_DX_BBOX(object->Pose, GetBoundsAccurate(object));
-			poleBox.Extents = poleBox.Extents + Vector3(coll->Setup.Radius, 0, coll->Setup.Radius);
+			poleBox.Extents = poleBox.Extents + Vector3(coll->Setup.Radius, 0.0f, coll->Setup.Radius);
 
 			//g_Renderer.AddDebugBox(poleBox, Vector4(0, 0, 1, 1), RENDERER_DEBUG_PAGE::LOGIC_STATS);
 
-			if (poleBox.Intersects(sphere))
+			if (poleBox.Intersects(sphere) || poleBox.Intersects(offsetSphere))
 			{
 				atLeastOnePoleCollided = true;
 				break;

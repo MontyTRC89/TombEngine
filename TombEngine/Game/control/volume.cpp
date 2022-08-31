@@ -100,13 +100,19 @@ namespace TEN::Control::Volumes
 			{
 				if (volume->Status == TriggerStatus::Inside)
 				{
-					volume->Triggerer = nullptr;
-					volume->Status = TriggerStatus::Leaving;
-					if (!set->OnLeave.Function.empty() && set->OnLeave.CallCounter != 0)
+					// Only fire leave event when a certain timeout has passed.
+					// This helps to filter out borderline cases when moving around volumes.
+
+					if (GameTimer - volume->Timeout > VOLUME_LEAVE_TIMEOUT)
 					{
-						g_GameScript->ExecuteFunction(set->OnLeave.Function, triggerer, set->OnLeave.Argument);
-						if (set->OnLeave.CallCounter != NO_CALL_COUNTER)
-							set->OnLeave.CallCounter--;
+						volume->Triggerer = nullptr;
+						volume->Status = TriggerStatus::Leaving;
+						if (!set->OnLeave.Function.empty() && set->OnLeave.CallCounter != 0)
+						{
+							g_GameScript->ExecuteFunction(set->OnLeave.Function, triggerer, set->OnLeave.Argument);
+							if (set->OnLeave.CallCounter != NO_CALL_COUNTER)
+								set->OnLeave.CallCounter--;
+						}
 					}
 				}
 				else
