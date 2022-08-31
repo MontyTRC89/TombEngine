@@ -484,7 +484,7 @@ enum LaraAnim
 	LA_MONKEY_SHIMMY_RIGHT = 255,									// Monkey swing shimmy right (looped)
 	LA_MONKEY_SHIMMY_RIGHT_END = 256,								// Monkey swing shimmy right > monkey swing idle
 																		// TODO: generic shimmy anims between ledges and ladders?
-	LA_MONKEY_TURN_180 = 257,										// Monkey swing turn 180
+	LA_MONKEY_TURN_180_START = 257,									// Monkey swing turn 180 (1/2)
 	LA_CROUCH_TO_CRAWL_START = 258,									// Crouch > crawl (1/3)
 	LA_CRAWL_TO_CROUCH_START = 259,									// Crawl > crouch (1/3)
 	LA_CRAWL = 260,													// Crawl forward (looped)
@@ -495,7 +495,7 @@ enum LaraAnim
 	LA_STAND_TURN_180_START = 265,									// Standing turn 180 (1/2)
 	LA_STAND_TURN_180_END = 266,									// Standing turn 180 (2/2)
 	LA_CRAWL_TO_IDLE_RIGHT = 267,									// Crawl forward > crawl idle, right leg first
-	LA_CRAWL_TO_IDLE_END_LEFT_POINTLESS = 268,							// TODO: remove.
+	LA_MONKEY_TURN_180_END = 268,									// Monkey swing turn 180 (2/2)
 	LA_CRAWL_TURN_LEFT = 269,										// Crawl rotate left (looped)
 	LA_CRAWL_TURN_RIGHT = 270,										// Crawl rotate right (looped)
 	LA_MONKEY_TURN_LEFT = 271,										// Monkey swing rotate left
@@ -812,7 +812,7 @@ enum LaraAnim
 
 	// TRASHED ANIMS (please reuse slots before going any higher and remove entries from this list as you go):
 	// 102
-	// 268, 273, 274, 278, 280,
+	// 273, 274, 278, 280,
 	// 343, 345,
 	// 364, 366, 368, 370,
 };
