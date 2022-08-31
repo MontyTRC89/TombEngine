@@ -47,7 +47,7 @@ enum LaraState
 	LS_TURN_RIGHT_FAST = 20,
 	LS_STEP_RIGHT = 21,
 	LS_STEP_LEFT = 22,
-	LS_ROLL_BACK = 23,
+	LS_ROLL_180_BACKWARD = 23,
 	LS_SLIDE_FORWARD = 24,
 	LS_JUMP_BACK = 25,
 	LS_JUMP_RIGHT = 26,
@@ -69,7 +69,7 @@ enum LaraState
 	LS_INSERT_KEY = 42,
 	LS_INSERT_PUZZLE = 43,
 	LS_WATER_DEATH = 44,
-	LS_ROLL_FORWARD = 45,
+	LS_ROLL_180_FORWARD = 45,
 	LS_BOULDER_DEATH = 46,
 	LS_ONWATER_BACK = 47,
 	LS_ONWATER_LEFT = 48,
@@ -207,7 +207,7 @@ enum LaraState
 	LS_SOFT_SPLAT = 170,
 	LS_CROUCH_TURN_180 = 171,
 	LS_CRAWL_TURN_180 = 172,
-	LS_STAND_TURN_180 = 173,
+	LS_TURN_180 = 173,
 
 	NUM_LARA_STATES
 };
@@ -492,8 +492,8 @@ enum LaraAnim
 	LA_CRAWL_TO_IDLE_LEFT = 262,									// Crawl forward > crawl idle, left leg first
 	LA_CRAWL_IDLE = 263,											// Crwal idle
 	LA_CROUCH_TO_CRAWL_END = 264,									// Crawl > crouch (2/2)
-	LA_STAND_TURN_180_START = 265,									// Standing turn 180 (1/2)
-	LA_STAND_TURN_180_END = 266,									// Standing turn 180 (2/2)
+	LA_TURN_180_START = 265,										// Standing turn 180 (1/2)
+	LA_TURN_180_END = 266,											// Standing turn 180 (2/2)
 	LA_CRAWL_TO_IDLE_RIGHT = 267,									// Crawl forward > crawl idle, right leg first
 	LA_MONKEY_TURN_180_END = 268,									// Monkey swing turn 180 (2/2)
 	LA_CRAWL_TURN_LEFT = 269,										// Crawl rotate left (looped)
