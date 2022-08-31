@@ -2007,12 +2007,7 @@ void lara_as_roll_back(ItemInfo* item, CollisionInfo* coll)
 	auto* lara = GetLaraInfo(item);
 
 	lara->Control.CanLook = false;
-
-	if (TrInput & IN_ROLL)
-	{
-		item->Animation.TargetState = LS_ROLL_BACK;
-		return;
-	}
+	ModulateLaraTurnRateY(item, 0, 0, 0);
 
 	item->Animation.TargetState = LS_IDLE;
 }
@@ -2069,20 +2064,6 @@ void lara_as_roll_forward(ItemInfo* item, CollisionInfo* coll)
 
 	lara->Control.CanLook = false;
 	ModulateLaraTurnRateY(item, 0, 0, 0);
-
-	// TODO: Change swandive roll anim's state to something sensible.
-	if (TrInput & IN_FORWARD &&
-		item->Animation.AnimNumber == LA_SWANDIVE_ROLL) // Hack.
-	{
-		item->Animation.TargetState = LS_RUN_FORWARD;
-		return;
-	}
-
-	if (TrInput & IN_ROLL)
-	{
-		item->Animation.TargetState = LS_ROLL_FORWARD;
-		return;
-	}
 
 	item->Animation.TargetState = LS_IDLE;
 }
