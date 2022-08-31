@@ -187,12 +187,12 @@ void LogicHandler::ResetLevelTables()
 sol::object LogicHandler::GetLevelFunc(sol::table tab, std::string const& luaName)
 {
 	std::string partName = tab.raw_get<std::string>(strKey);
-	sol::table theTab = m_levelFuncsTables[partName];
+	auto & theMap = m_levelFuncs_tablesOfNames[partName];
 
-	sol::object obj = theTab.raw_get<sol::object>(luaName);
-	if (obj.is<std::string>())
+	auto fullNameIt = theMap.find(luaName);
+	if (fullNameIt != std::cend(theMap))
 	{
-		std::string key = obj.as<std::string>();
+		std::string_view key = fullNameIt->second;
 		if (m_levelFuncs_levelFuncObjects[key].valid())
 			return m_levelFuncs_levelFuncObjects[key];
 	}
@@ -213,54 +213,51 @@ void LogicHandler::CallLevelFunc(std::string name, sol::variadic_args va)
 
 bool LogicHandler::SetLevelFunc(sol::table tab, std::string const& luaName, sol::object value)
 {
-	std::string partName;
 	std::string fullName;
-	sol::table newTab;
+	std::unordered_map<std::string, std::string> newNameTab;
 	sol::table newLevelFuncsTab;
-	sol::table aTab;
 	sol::table meta;
-	LevelFunc fnh;
+	LevelFunc levelFuncObject;
+	std::string partName;
 	switch (value.get_type())
 	{
 	case sol::type::lua_nil:
 		//todo should we handle this?
 	case sol::type::function:
-			partName = tab.raw_get<std::string>(strKey);
-			fullName = partName + "." + luaName;
-			aTab = m_levelFuncsTables[partName];
-			aTab.raw_set(luaName, fullName);
-			m_levelFuncs_luaFunctions[fullName] = value;
+	{
+		partName = tab.raw_get<std::string>(strKey);
+		fullName = partName + "." + luaName;
+		auto & parentNameTab = m_levelFuncs_tablesOfNames[partName];
+		parentNameTab.insert_or_assign(luaName, fullName);
 
-			fnh.m_funcName = fullName;
-			fnh.m_handler = this;
+		m_levelFuncs_luaFunctions[fullName] = value;
 
-			m_levelFuncs_levelFuncObjects[fullName] = fnh;
-		break;
+		levelFuncObject.m_funcName = fullName;
+		levelFuncObject.m_handler = this;
+
+		m_levelFuncs_levelFuncObjects[fullName] = levelFuncObject;
+	}
+	break;
 	case sol::type::table:
-			newTab = sol::table{ *(m_handler.GetState()), sol::create };
-			fullName = tab.raw_get<std::string>(strKey) + "." + luaName;
-			m_levelFuncsTables[fullName] = newTab;
+	{
+		fullName = tab.raw_get<std::string>(strKey) + "." + luaName;
+		m_levelFuncs_tablesOfNames.insert_or_assign(fullName, newNameTab);
 
-			partName = tab.raw_get<std::string>(strKey);
-			aTab = m_levelFuncsTables[partName];
-			aTab.raw_set(luaName, fullName);
+		auto& parentNameTab = m_levelFuncs_tablesOfNames[partName];
+		partName = tab.raw_get<std::string>(strKey);
+		parentNameTab = m_levelFuncs_tablesOfNames[partName];
+		parentNameTab.insert_or_assign(luaName, fullName);
 
-			newTab.raw_set(strKey, fullName);
+		newLevelFuncsTab = MakeSpecialTable(m_handler.GetState(), luaName, &LogicHandler::GetLevelFunc, &LogicHandler::SetLevelFunc, this);
+		newLevelFuncsTab.raw_set(strKey, fullName);
+		tab.raw_set(luaName, newLevelFuncsTab);
 
-			for (auto& [key, val] : value.as<sol::table>())
-			{
-				newTab[key] = val;
-			}
-
-			newLevelFuncsTab = MakeSpecialTable(m_handler.GetState(), luaName, &LogicHandler::GetLevelFunc, &LogicHandler::SetLevelFunc, this);
-			newLevelFuncsTab.raw_set(strKey, fullName);
-			tab.raw_set(luaName, newLevelFuncsTab);
-
-			for (auto& [key, val] : value.as<sol::table>())
-			{
-				newLevelFuncsTab[key] = val;
-			}
-		break;
+		for (auto& [key, val] : value.as<sol::table>())
+		{
+			newLevelFuncsTab[key] = val;
+		}
+	}
+	break;
 	default:
 		std::string error{ "Failed to add " };
 		error += luaName + " to LevelFuncs or one of its tables; it must be a function, a table of functions, or nil.";
@@ -312,13 +309,14 @@ void LogicHandler::FreeLevelScripts()
 	//m_levelFuncs.clear();
 	//m_levelFuncs = 
 	m_levelFuncs = MakeSpecialTable(m_handler.GetState(), ScriptReserved_LevelFuncs, &LogicHandler::GetLevelFunc, &LogicHandler::SetLevelFunc, this);
+	m_levelFuncs.raw_set(strKey, ScriptReserved_LevelFuncs);
 
-	m_levelFuncsTables = sol::table{ *(m_handler.GetState()), sol::create };
+	m_levelFuncs_tablesOfNames.clear();
 	m_levelFuncs_luaFunctions = sol::table{ *(m_handler.GetState()), sol::create };
 	m_levelFuncs_levelFuncObjects = sol::table{ *(m_handler.GetState()), sol::create };
 
-	m_levelFuncsTables[ScriptReserved_LevelFuncs] = sol::table{ *(m_handler.GetState()), sol::create };
-	m_levelFuncs.raw_set(strKey, ScriptReserved_LevelFuncs);
+	m_levelFuncs_tablesOfNames.emplace(std::make_pair(ScriptReserved_LevelFuncs, std::unordered_map<std::string, std::string>{}));
+
 	ResetLevelTables();
 	m_onStart = sol::nil;
 	m_onLoad = sol::nil;

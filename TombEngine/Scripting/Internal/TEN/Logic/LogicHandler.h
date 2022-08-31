@@ -44,7 +44,7 @@ private:
 	// "LevelFuncs.TEN.Util"
 	// "LevelFuncs.MyLevel"
 	// "LevelFuncs.MyLevel.CoolFuncs"
-	sol::table m_levelFuncsTables{};
+	std::unordered_map<std::string, std::unordered_map<std::string, std::string>> m_levelFuncs_tablesOfNames{};
 
 	sol::protected_function										m_onStart{};
 	sol::protected_function										m_onLoad{};
