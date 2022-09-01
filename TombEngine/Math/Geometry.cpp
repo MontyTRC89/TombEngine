@@ -115,6 +115,24 @@
 		return false;
 	}
 
+	// TODO: Check! Not certain this is correct. -- Sezz 2022.09.01
+	bool IsPointInFront(const Vector3& origin, const Vector3& target, const Vector3& refPoint)
+	{
+		auto refDirection = refPoint - origin;
+		auto targetDirection = target - origin;
+
+		float dot = refDirection.Dot(targetDirection);
+		if (dot > 0.0f)
+			return true;
+
+		return false;
+	}
+
+	bool IsPointOnLeft(const PHD_3DPOS& pose, const Vector3& target)
+	{
+		return IsPointOnLeft(pose.Position.ToVector3(), target, pose.Orientation);
+	}
+
 	bool IsPointOnLeft(const Vector3& origin, const Vector3& target, const Vector3Shrt& orient)
 	{
 		float sinY = phd_sin(orient.y);

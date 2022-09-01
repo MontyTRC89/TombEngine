@@ -18,11 +18,13 @@ struct Vector3Shrt;
 	short GetSurfaceAspectAngle(Vector2 tilt);
 	Vector3Shrt GetOrientTowardPoint(const Vector3& origin, const Vector3& target);
 
-	// Since Y is assumed as the vertical axis, only the Y component of the angle needs to be considered
-	// and 2D vector operations can be done in the XZ plane. Maybe revise these to each take an up vector argument someday.
+	// Since Y is assumed as the vertical axis, only the Y Euler component needs to be considered and
+	// 2D vector operations can be done in the XZ plane. Maybe revise these to each take an up vector argument someday.
 
 	bool IsPointInFront(const PHD_3DPOS& pose, const Vector3& target);
 	bool IsPointInFront(const Vector3& origin, const Vector3& target, const Vector3Shrt& orient);
+	bool IsPointInFront(const Vector3& origin, const Vector3& target, const Vector3& refPoint);
+	bool IsPointOnLeft(const PHD_3DPOS& pose, const Vector3& target);
 	bool IsPointOnLeft(const Vector3& origin, const Vector3& target, const Vector3Shrt& orient);
 	bool IsPointOnLeft(const Vector3& origin, const Vector3& target, const Vector3& refPoint);
 //}
