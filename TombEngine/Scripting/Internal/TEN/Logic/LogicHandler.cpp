@@ -108,11 +108,11 @@ Possible values for CallbackPoint:
 The order in which two functions with the same CallbackPoint are called is undefined.
 i.e. if you register `MyFunc` and `MyFunc2` with `PRECONTROLPHASE`, both will be called before `OnControlPhase`, but there is no guarantee whether `MyFunc` will be called before `MyFunc2`, or vice-versa.
 
-
+Any returned value will be discarded.
 
 @function AddCallback
 @tparam point CallbackPoint When should the callback be called?
-@tparam LevelFunc The function to be called (must be in the LevelFuncs hierarchy). Will receive as an argument the time in seconds since the last frame.
+@tparam LevelFunc The function to be called (must be in the LevelFuncs hierarchy). Will receive, as an argument, the time in seconds since the last frame.
 @usage
 	LevelFuncs.MyFunc = function(dt) print(dt) end
 	TEN.Logic.AddCallback(TEN.Logic.CallbackPoint.PRECONTROLPHASE, LevelFuncs.MyFunc)
@@ -157,10 +157,6 @@ void LogicHandler::RemoveCallback(CallbackPoint point, LevelFunc const & lf)
 	static constexpr char const* strKey = "__internal_name";
 void LogicHandler::ResetLevelTables()
 {
-	//todo does levelFuncs get cleared normally, pre-these changes?
-	//NO. the TABLE gets reset but m_levelFuncs does NOT get reset
-
-
 	MakeSpecialTable(m_handler.GetState(), ScriptReserved_LevelVars, &GetVariable, &SetVariable);
 }
 
@@ -198,8 +194,6 @@ bool LogicHandler::SetLevelFuncsMember(sol::table tab, std::string const& luaNam
 		std::string error{ "Tried to set LevelFuncs member " };
 		error += luaName + " to nil; this not permitted at this time.";
 		return ScriptAssert(false, error);
-
-		//todo should we handle this?
 	}
 	else if (sol::type::function == value.get_type())
 	{
@@ -261,10 +255,6 @@ void LogicHandler::LogPrint(sol::variadic_args va)
 void LogicHandler::ResetScripts(bool clearGameVars)
 {
 	FreeLevelScripts();
-
-	//todo are these getting called?
-	//load level. walk to trigger that adds here
-	//save and reload
 
 	m_callbacksPreControl.clear();
 	m_callbacksPostControl.clear();
@@ -659,15 +649,13 @@ void LogicHandler::OnLoad()
 
 void LogicHandler::OnControlPhase(float dt)
 {
-	//todo write that returned values will get ignored
 	auto tryCall = [this, dt](std::string const& name)
 	{
 		auto func = m_handler.GetState()->script("return " + name);
 
-		//todo fail if this is nil
 		if (!func.valid())
 			ScriptAssertF(false, "Callback {} not valid", name);
-		else //todo this is a FuncNameHolder, not a function, so ye
+		else 
 			func.get<LevelFunc>().CallDT(dt);
 	};
 
