@@ -50,11 +50,12 @@ void lara_default_col(ItemInfo* item, CollisionInfo* coll)
 	LaraResetGravityStatus(item, coll);
 }
 
+// Boulder death.
 void lara_as_special(ItemInfo* item, CollisionInfo* coll)
 {
 	Camera.flags = CF_FOLLOW_CENTER;
 	Camera.targetAngle = ANGLE(170.0f);
-	Camera.targetElevation = -ANGLE(25.0f);
+	Camera.targetElevation = ANGLE(-25.0f);
 }
 
 void lara_as_null(ItemInfo* item, CollisionInfo* coll)
