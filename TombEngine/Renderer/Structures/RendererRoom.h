@@ -27,6 +27,7 @@ namespace TEN::Renderer
 		std::vector<RendererEffect*> EffectsToDraw;
 		std::vector<RendererStatic> StaticsToDraw;
 		std::vector<RendererTransparentFace> TransparentFacesToDraw;
+		std::vector<RendererLight*> LightsToDraw;
 
 		std::vector<int> Neighbors;
 	};

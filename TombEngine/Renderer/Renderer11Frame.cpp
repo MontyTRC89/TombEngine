@@ -27,6 +27,7 @@ namespace TEN::Renderer
 			m_rooms[i].EffectsToDraw.clear();
 			m_rooms[i].TransparentFacesToDraw.clear();
 			m_rooms[i].StaticsToDraw.clear();
+			m_rooms[i].LightsToDraw.clear();
 			m_rooms[i].Visited = false;
 			m_rooms[i].Clip = RendererRectangle(m_screenWidth, m_screenHeight, 0, 0);
 			m_rooms[i].ClipTest = RendererRectangle(m_screenWidth, m_screenHeight, 0, 0);
@@ -704,6 +705,7 @@ namespace TEN::Renderer
 				continue;
 
 			renderView.lightsToDraw.push_back(light);
+			room.LightsToDraw.push_back(light);
 		}
 	}
 

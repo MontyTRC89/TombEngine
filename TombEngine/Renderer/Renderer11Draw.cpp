@@ -563,6 +563,8 @@ namespace TEN::Renderer
 					m_cbStatic.updateData(m_stStatic, m_context.Get());
 					BindConstantBufferVS(CB_STATIC, m_cbStatic.get());
 
+					BindLights(m_rooms[rat->RoomNumber].LightsToDraw);
+
 					for (int b = 0; b < mesh->Buckets.size(); b++)
 					{
 						RendererBucket* bucket = &mesh->Buckets[b];
@@ -621,6 +623,8 @@ namespace TEN::Renderer
 						m_cbStatic.updateData(m_stStatic, m_context.Get());
 						BindConstantBufferVS(CB_STATIC, m_cbStatic.get());
 
+						BindLights(m_rooms[bat->RoomNumber].LightsToDraw);
+
 						DrawIndexedTriangles(bucket->NumIndices, bucket->StartIndex, 0);
 
 						m_numMoveablesDrawCalls++;
@@ -664,6 +668,8 @@ namespace TEN::Renderer
 					m_stStatic.AmbientLight = m_rooms[beetle->RoomNumber].AmbientLight;
 					m_cbStatic.updateData(m_stStatic, m_context.Get());
 					BindConstantBufferVS(CB_STATIC, m_cbStatic.get());
+
+					BindLights(m_rooms[beetle->RoomNumber].LightsToDraw);
 
 					for (int b = 0; b < mesh->Buckets.size(); b++)
 					{
