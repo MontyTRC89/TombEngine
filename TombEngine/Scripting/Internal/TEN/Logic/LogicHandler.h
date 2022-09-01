@@ -31,9 +31,10 @@ private:
 	sol::table m_levelFuncs{};
 
 	// Maps full function paths into Lua functions.
-	sol::table m_levelFuncs_luaFunctions{};
+	std::unordered_map<std::string, sol::protected_function> m_levelFuncs_luaFunctions{};
 
 	// Maps full function paths to LevelFunc objects.
+	// This is a table instead of a C++ container to more easily interface with Sol.
 	sol::table m_levelFuncs_levelFuncObjects{};
 
 	// Contains tables; each table refers to a table in the LevelFuncs hierarchy, and contains the full names
@@ -62,20 +63,20 @@ private:
 public:	
 	LogicHandler(sol::state* lua, sol::table & parent);
 
-	void CallLevelFunc(std::string, sol::variadic_args);
-	void CallLevelFunc(std::string, float dt);
+	void								CallLevelFunc(std::string const &, sol::variadic_args);
+	void								CallLevelFunc(std::string const &, float dt);
 
 	void								FreeLevelScripts() override;
 
 	void								LogPrint(sol::variadic_args va);
-	bool								SetLevelFunc(sol::table tab, std::string const& luaName, sol::object value);
+	bool								SetLevelFuncsMember(sol::table tab, std::string const& luaName, sol::object value);
 
-	void								AddCallback(CallbackPoint point, LevelFunc & holder);
-	void								RemoveCallback(CallbackPoint point, std::string const & name);
+	void								AddCallback(CallbackPoint point, LevelFunc const & lf);
+	void								RemoveCallback(CallbackPoint point, LevelFunc const & lf);
 
 	void								ResetScripts(bool clearGameVars) override;
 
-	sol::object							GetLevelFunc(sol::table tab, std::string const& luaName);
+	sol::object							GetLevelFuncsMember(sol::table tab, std::string const& luaName);
 
 	void								ExecuteScriptFile(const std::string& luaFilename) override;
 	void								ExecuteFunction(std::string const& name, TEN::Control::Volumes::VolumeTriggerer, std::string const& arguments) override;

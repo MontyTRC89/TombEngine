@@ -112,40 +112,21 @@ i.e. if you register `MyFunc` and `MyFunc2` with `PRECONTROLPHASE`, both will be
 
 @function AddCallback
 @tparam point CallbackPoint When should the callback be called?
-@tparam func string The name of the function to be called. Will receive as an argument the time in seconds since the last frame.
+@tparam LevelFunc The function to be called (must be in the LevelFuncs hierarchy). Will receive as an argument the time in seconds since the last frame.
 @usage
-	local MyFunc = function(dt) print(dt) end
-	TEN.Logic.AddCallback(TEN.Logic.CallbackPoint.PRECONTROLPHASE, "MyFunc")
+	LevelFuncs.MyFunc = function(dt) print(dt) end
+	TEN.Logic.AddCallback(TEN.Logic.CallbackPoint.PRECONTROLPHASE, LevelFuncs.MyFunc)
 */
-void LogicHandler::AddCallback(CallbackPoint point, LevelFunc & fnh)
+void LogicHandler::AddCallback(CallbackPoint point, LevelFunc const & lf)
 {
-	//sol::object obj = tab["funcName"];
-	//sol::type type = obj.get_type();
-	//switch(type)
-	//{
-	//case sol::type::string:
-	//	TENLog("fuck it's a string");
-	//	break;
-
-	//case sol::type::userdata:
-	//	TENLog("fuck it's userdata");
-	//	break;
-
-	//case sol::type::table:
-	//	TENLog("fuck it's a table");
-	//	break;
-	//}
-
-	//auto fnh = tab["funcName"];
-	//std::string name = tab["funcName"];
 	switch(point)
 	{
 	case CallbackPoint::PreControl:
-		m_callbacksPreControl.insert(fnh.m_funcName);
+		m_callbacksPreControl.insert(lf.m_funcName);
 		break;
 
 	case CallbackPoint::PostControl:
-		m_callbacksPostControl.insert(fnh.m_funcName);
+		m_callbacksPostControl.insert(lf.m_funcName);
 		break;
 	}
 }
@@ -159,17 +140,16 @@ Will have no effect if the function was not registered as a callback
 @usage
 	TEN.Logic.RemoveCallback(TEN.Logic.CallbackPoint.PRECONTROLPHASE, "MyFunc")
 */
-//todo this has to deal with LevelFuncs subtables too now
-void LogicHandler::RemoveCallback(CallbackPoint point, std::string const & name)
+void LogicHandler::RemoveCallback(CallbackPoint point, LevelFunc const & lf)
 {
 	switch(point)
 	{
 	case CallbackPoint::PreControl:
-		m_callbacksPreControl.erase(name);
+		m_callbacksPreControl.erase(lf.m_funcName);
 		break;
 
 	case CallbackPoint::PostControl:
-		m_callbacksPostControl.erase(name);
+		m_callbacksPostControl.erase(lf.m_funcName);
 		break;
 	}
 }
@@ -184,7 +164,7 @@ void LogicHandler::ResetLevelTables()
 	MakeSpecialTable(m_handler.GetState(), ScriptReserved_LevelVars, &GetVariable, &SetVariable);
 }
 
-sol::object LogicHandler::GetLevelFunc(sol::table tab, std::string const& luaName)
+sol::object LogicHandler::GetLevelFuncsMember(sol::table tab, std::string const& luaName)
 {
 	std::string partName = tab.raw_get<std::string>(strKey);
 	auto & theMap = m_levelFuncs_tablesOfNames[partName];
@@ -199,68 +179,67 @@ sol::object LogicHandler::GetLevelFunc(sol::table tab, std::string const& luaNam
 	return sol::nil;
 }
 
-void LogicHandler::CallLevelFunc(std::string name, float dt)
+void LogicHandler::CallLevelFunc(std::string const & name, float dt)
 {
 	sol::protected_function f = m_levelFuncs_luaFunctions[name];
 	f.call(dt);
 }
 
-void LogicHandler::CallLevelFunc(std::string name, sol::variadic_args va)
+void LogicHandler::CallLevelFunc(std::string const & name, sol::variadic_args va)
 {
 	sol::protected_function f = m_levelFuncs_luaFunctions[name];
 	f.call(va);
 }
 
-bool LogicHandler::SetLevelFunc(sol::table tab, std::string const& luaName, sol::object value)
+bool LogicHandler::SetLevelFuncsMember(sol::table tab, std::string const& luaName, sol::object value)
 {
-	std::string fullName;
-	std::unordered_map<std::string, std::string> newNameTab;
-	sol::table newLevelFuncsTab;
-	sol::table meta;
-	LevelFunc levelFuncObject;
-	std::string partName;
-	switch (value.get_type())
+	if (sol::type::lua_nil == value.get_type())
 	{
-	case sol::type::lua_nil:
+		std::string error{ "Tried to set LevelFuncs member " };
+		error += luaName + " to nil; this not permitted at this time.";
+		return ScriptAssert(false, error);
+
 		//todo should we handle this?
-	case sol::type::function:
+	}
+	else if (sol::type::function == value.get_type())
 	{
-		partName = tab.raw_get<std::string>(strKey);
-		fullName = partName + "." + luaName;
-		auto & parentNameTab = m_levelFuncs_tablesOfNames[partName];
+		// Add the name to the table of names
+		auto partName = tab.raw_get<std::string>(strKey);
+		auto fullName = partName + "." + luaName;
+		auto& parentNameTab = m_levelFuncs_tablesOfNames[partName];
 		parentNameTab.insert_or_assign(luaName, fullName);
 
-		m_levelFuncs_luaFunctions[fullName] = value;
-
+		// Create a LevelFunc userdata and add that too
+		LevelFunc levelFuncObject;
 		levelFuncObject.m_funcName = fullName;
 		levelFuncObject.m_handler = this;
-
 		m_levelFuncs_levelFuncObjects[fullName] = levelFuncObject;
+
+		// Add the function itself
+		m_levelFuncs_luaFunctions[fullName] = value;
 	}
-	break;
-	case sol::type::table:
+	else if (sol::type::table == value.get_type())
 	{
-		fullName = tab.raw_get<std::string>(strKey) + "." + luaName;
-		m_levelFuncs_tablesOfNames.insert_or_assign(fullName, newNameTab);
+		// Create and add a new name map
+		std::unordered_map<std::string, std::string> newNameMap;
+		auto fullName = tab.raw_get<std::string>(strKey) + "." + luaName;
+		m_levelFuncs_tablesOfNames.insert_or_assign(fullName, newNameMap);
 
-		auto& parentNameTab = m_levelFuncs_tablesOfNames[partName];
-		partName = tab.raw_get<std::string>(strKey);
-		parentNameTab = m_levelFuncs_tablesOfNames[partName];
-		parentNameTab.insert_or_assign(luaName, fullName);
-
-		newLevelFuncsTab = MakeSpecialTable(m_handler.GetState(), luaName, &LogicHandler::GetLevelFunc, &LogicHandler::SetLevelFunc, this);
+		// Create a new table to put in the LevelFuncs hierarchy
+		auto newLevelFuncsTab = MakeSpecialTable(m_handler.GetState(), luaName, &LogicHandler::GetLevelFuncsMember, &LogicHandler::SetLevelFuncsMember, this);
 		newLevelFuncsTab.raw_set(strKey, fullName);
 		tab.raw_set(luaName, newLevelFuncsTab);
 
+		// "populate" the new table. This will trigger the __newindex metafunction and will
+		// thus call this function recursively, handling all subtables and functions.
 		for (auto& [key, val] : value.as<sol::table>())
 		{
 			newLevelFuncsTab[key] = val;
 		}
 	}
-	break;
-	default:
+	else{
 		std::string error{ "Failed to add " };
-		error += luaName + " to LevelFuncs or one of its tables; it must be a function, a table of functions, or nil.";
+		error += luaName + " to LevelFuncs or one of its tables; it must be a function or a table of functions.";
 		return ScriptAssert(false, error);
 	}
 	return true;
@@ -308,11 +287,11 @@ void LogicHandler::FreeLevelScripts()
 {
 	//m_levelFuncs.clear();
 	//m_levelFuncs = 
-	m_levelFuncs = MakeSpecialTable(m_handler.GetState(), ScriptReserved_LevelFuncs, &LogicHandler::GetLevelFunc, &LogicHandler::SetLevelFunc, this);
+	m_levelFuncs = MakeSpecialTable(m_handler.GetState(), ScriptReserved_LevelFuncs, &LogicHandler::GetLevelFuncsMember, &LogicHandler::SetLevelFuncsMember, this);
 	m_levelFuncs.raw_set(strKey, ScriptReserved_LevelFuncs);
 
 	m_levelFuncs_tablesOfNames.clear();
-	m_levelFuncs_luaFunctions = sol::table{ *(m_handler.GetState()), sol::create };
+	m_levelFuncs_luaFunctions.clear();
 	m_levelFuncs_levelFuncObjects = sol::table{ *(m_handler.GetState()), sol::create };
 
 	m_levelFuncs_tablesOfNames.emplace(std::make_pair(ScriptReserved_LevelFuncs, std::unordered_map<std::string, std::string>{}));
@@ -809,14 +788,6 @@ void LogicHandler::InitCallbacks()
 
 		func = m_levelFuncs_luaFunctions[fnh.m_funcName];
 
-		if(func.get_type() == sol::type::function)
-		{
-			TENLog("function");
-		}
-		if(func.get_type() == sol::type::userdata)
-		{
-			TENLog("userdata");
-		}
 		if (!ScriptAssert(func.valid(), err)) {
 			ScriptWarn("Defaulting to no " + fullName + " behaviour.");
 		}
