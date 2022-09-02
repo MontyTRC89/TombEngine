@@ -115,9 +115,6 @@ Specify which translations in the strings table correspond to which languages.
 	Settings::Register(table_flow);
 	Fog::Register(table_flow);
 	
-	//todo find out why this can't be in logic
-	LevelFunc::Register(parent);
-
 	m_handler.MakeReadOnlyTable(table_flow, ScriptReserved_WeatherType, kWeatherTypes);
 	m_handler.MakeReadOnlyTable(table_flow, ScriptReserved_LaraType, kLaraTypes);
 	m_handler.MakeReadOnlyTable(table_flow, ScriptReserved_InvItem, kInventorySlots);

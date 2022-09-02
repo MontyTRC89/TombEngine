@@ -88,9 +88,7 @@ LogicHandler::LogicHandler(sol::state* lua, sol::table & parent) : m_handler{ lu
 
 	m_handler.MakeReadOnlyTable(table_logic, ScriptReserved_CallbackPoint, kCallbackPoints);
 
-	//it crashes when here
-	// todo fix?
-	//FuncNameHolder::Register(table_logic);
+	LevelFunc::Register(table_logic);
 
 	ResetScripts(true);
 }

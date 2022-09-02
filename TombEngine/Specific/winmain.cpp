@@ -281,12 +281,18 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	// Initialise scripting
 	try 
 	{
-		// TODO: make sure the right objects are deleted at the end
 		g_GameFlow = ScriptInterfaceState::CreateFlow();
 		g_GameFlow->LoadFlowScript();
-		g_GameScript = ScriptInterfaceState::CreateGame();
 		g_GameScriptEntities = ScriptInterfaceState::CreateObjectsHandler();
 		g_GameStringsHandler = ScriptInterfaceState::CreateStringsHandler();
+
+		// This must be loaded last as it adds metafunctions to the global
+		// table so that every global variable added henceforth gets put
+		// into a special hidden table which we can clean up.
+		// By doing this last, we ensure that all built-in usertypes
+		// are added to a hierarchy in the REAL global table, not the fake
+		// hidden one.
+		g_GameScript = ScriptInterfaceState::CreateGame();
 	}
 	catch (TENScriptException const& e)
 	{
