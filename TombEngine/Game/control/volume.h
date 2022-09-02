@@ -8,6 +8,7 @@ constexpr auto NO_EVENT_SET = -1;
 constexpr auto NO_CALL_COUNTER = -1;
 
 constexpr auto VOLUME_BUSY_TIMEOUT = 10;
+constexpr auto VOLUME_LEAVE_TIMEOUT = 5;
 
 enum class TriggerStatus
 {

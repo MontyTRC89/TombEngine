@@ -38,11 +38,11 @@ namespace TEN::Renderer
 
 		Utils::throwIfFailed( m_swapChain->ResizeTarget(mode));
 
-		InitialiseScreen(width, height, windowed, WindowsHandle, true);
-
 		m_screenWidth = width;
 		m_screenHeight = height;
 		m_windowed = windowed;
+
+		InitialiseScreen(width, height, WindowsHandle, true);
 	}
 
 	std::string Renderer11::GetDefaultAdapterName()
