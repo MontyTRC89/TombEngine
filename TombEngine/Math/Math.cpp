@@ -30,19 +30,19 @@
 		return Smoothstep(0.0f, 1.0f, x);
 	}
 
-	const float Luma(Vector3& color)
+	const float Luma(const Vector3& color)
 	{
 		// Use Rec.709 trichromat formula to get perceptive luma value
-		return (float)((color.x * 0.2126f) + (color.y * 0.7152f) + (color.z * 0.0722f));
+		return float((color.x * 0.2126f) + (color.y * 0.7152f) + (color.z * 0.0722f));
 	}
 
-	const Vector4 Screen(Vector4& ambient, Vector4& tint)
+	const Vector4 Screen(const Vector4& ambient, const Vector4& tint)
 	{
 		auto result = Screen(Vector3(ambient.x, ambient.y, ambient.z), Vector3(tint.x, tint.y, tint.z));
 		return Vector4(result.x, result.y, result.z, ambient.w * tint.w);
 	}
 
-	const Vector3 Screen(Vector3& ambient, Vector3& tint)
+	const Vector3 Screen(const Vector3& ambient, const Vector3& tint)
 	{
 		float luma = Luma(tint);
 
