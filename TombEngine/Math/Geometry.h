@@ -13,7 +13,7 @@ struct Vector3Shrt;
 	Vector3Int TranslatePoint(const Vector3Int& point, const Vector3& direction, float distance);
 	Vector3	   TranslatePoint(const Vector3& point, const Vector3& direction, float distance);
 
-	short GetShortestAngularDistance(short angleFrom, short angleTo, bool getShortest = true);
+	short GetShortestAngularDistance(short angleFrom, short angleTo);
 	short GetSurfaceSteepnessAngle(Vector2 tilt);
 	short GetSurfaceAspectAngle(Vector2 tilt);
 	Vector3Shrt GetOrientTowardPoint(const Vector3& origin, const Vector3& target);

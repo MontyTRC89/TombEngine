@@ -62,12 +62,9 @@
 		return (point + (directionNorm * distance));
 	}
 
-	short GetShortestAngularDistance(short angleFrom, short angleTo, bool getShortest)
+	short GetShortestAngularDistance(short angleFrom, short angleTo)
 	{
-		if (getShortest)
-			return short(angleTo - angleFrom);
-		else
-			return short(angleFrom - angleTo); // TODO: Check this. I have no clue. -- Sezz 2022.08.30
+		return short(angleTo - angleFrom);
 	}
 
 	short GetSurfaceSteepnessAngle(Vector2 tilt)
