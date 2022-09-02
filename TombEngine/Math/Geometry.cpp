@@ -122,7 +122,7 @@
 		auto headingDirection = Vector3(refDirection.x, 0.0f, refDirection.z);
 		auto targetDirection = target - origin;
 
-		float dot = refDirection.Dot(targetDirection);
+		float dot = headingDirection.Dot(targetDirection);
 		if (dot > 0.0f)
 			return true;
 
