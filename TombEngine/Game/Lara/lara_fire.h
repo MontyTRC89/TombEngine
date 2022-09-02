@@ -3,6 +3,7 @@
 
 struct CollisionInfo;
 struct ItemInfo;
+struct Vector3Shrt;
 
 constexpr auto MAX_TARGETS = 8;
 
@@ -15,11 +16,10 @@ enum class FireWeaponType
 
 struct WeaponInfo
 {
-	// y, y, x, x -> xy, xy
-
-	Vector3Shrt LockAngles[2]; 
+	Vector3Shrt LockAngles[2];
 	Vector3Shrt LeftAngles[2];
 	Vector3Shrt RightAngles[2];
+
 	int AimSpeed;
 	short ShotAccuracy;
 	int GunHeight;
