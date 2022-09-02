@@ -101,7 +101,7 @@
 		float sinY = phd_sin(orient.y);
 		float cosY = phd_cos(orient.y);
 
-		// The heading angle (Y only) direction vector: X = +sinY, Y = 0, Z = +cosY
+		// The 2D heading angle direction vector: X = +sinY, Y = 0, Z = +cosY
 		auto headingDirection = Vector3(sinY, 0.0f, cosY);
 		auto targetDirection = target - origin;
 
@@ -116,6 +116,9 @@
 	bool IsPointInFront(const Vector3& origin, const Vector3& target, const Vector3& refPoint)
 	{
 		auto refDirection = refPoint - origin;
+
+		// The 2D heading direction vector to the 3D reference direction vector: X = +refDirection.x, Y = 0, Z = +refDirection.z
+		auto headingDirection = Vector3(refDirection.x, 0.0f, refDirection.z);
 		auto targetDirection = target - origin;
 
 		float dot = refDirection.Dot(targetDirection);
@@ -135,7 +138,7 @@
 		float sinY = phd_sin(orient.y);
 		float cosY = phd_cos(orient.y);
 
-		// The normal vector to the heading angle (Y only) direction vector: X = +cosY, Y = 0, Z = -sinY
+		// The 2D normal vector to the 2D heading angle direction vector: X = +cosY, Y = 0, Z = -sinY
 		auto headingNormal = Vector3(cosY, 0.0f, -sinY);
 		auto targetDirection = target - origin;
 
@@ -150,6 +153,7 @@
 	{
 		auto refDirection = refPoint - origin;
 
+		// The 2D normal vector to the 3D reference direction vector: X = +refDirection.z, Y = 0, Z = -refDirection.x
 		auto headingNormal = Vector3(refDirection.z, 0.0f, -refDirection.x);
 		auto targetDirection = target - origin;
 
