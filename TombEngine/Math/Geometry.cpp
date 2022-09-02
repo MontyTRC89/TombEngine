@@ -69,7 +69,8 @@
 
 	short GetSurfaceSteepnessAngle(Vector2 tilt)
 	{
-		short qtrBlockAngleIncrement = ANGLE(45.0f) / 4;
+		static const short qtrBlockAngleIncrement = ANGLE(45.0f) / 4;
+
 		return (short)sqrt(pow(tilt.x * qtrBlockAngleIncrement, 2) + pow(tilt.y * qtrBlockAngleIncrement, 2));
 	}
 
