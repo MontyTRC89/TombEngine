@@ -113,7 +113,6 @@
 		return false;
 	}
 
-	// TODO: Check! Not certain this is correct. -- Sezz 2022.09.01
 	bool IsPointInFront(const Vector3& origin, const Vector3& target, const Vector3& refPoint)
 	{
 		auto refDirection = refPoint - origin;
