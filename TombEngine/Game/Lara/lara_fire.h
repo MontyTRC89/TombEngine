@@ -1,8 +1,8 @@
 #pragma once
 #include "Game/Lara/lara.h"
 
-struct ItemInfo;
 struct CollisionInfo;
+struct ItemInfo;
 
 constexpr auto MAX_TARGETS = 8;
 
@@ -15,9 +15,11 @@ enum class FireWeaponType
 
 struct WeaponInfo
 {
-	short LockAngles[4];
-	short LeftAngles[4];
-	short RightAngles[4];
+	// y, y, x, x -> xy, xy
+
+	Vector3Shrt LockAngles[2]; 
+	Vector3Shrt LeftAngles[2];
+	Vector3Shrt RightAngles[2];
 	int AimSpeed;
 	short ShotAccuracy;
 	int GunHeight;
