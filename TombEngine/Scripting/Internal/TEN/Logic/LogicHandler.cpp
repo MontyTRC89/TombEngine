@@ -9,7 +9,8 @@
 #include "ScriptUtil.h"
 #include "Objects/Moveable/MoveableObject.h"
 #include "Vec3/Vec3.h"
-#include "FuncNameHolder.h"
+#include "LevelFunc.h"
+
 using namespace TEN::Effects::Lightning;
 
 /***
@@ -765,17 +766,21 @@ void LogicHandler::InitCallbacks()
 
 		sol::object theData = (*m_handler.GetState())["LevelFuncs"][luaFunc];
 
-		std::string err{ "Level's script does not define callback " + fullName};
-		if (!ScriptAssert(theData.valid(), err)) {
-			ScriptWarn("Defaulting to no " + fullName + " behaviour.");
+		std::string msg{ "Level's script does not define callback " + fullName
+			+ ". Defaulting to no " + fullName + " behaviour."};
+
+		if(!theData.valid())
+		{
+			TENLog(msg);
 			return;
 		}
+
 		LevelFunc fnh = (*m_handler.GetState())["LevelFuncs"][luaFunc];
 
 		func = m_levelFuncs_luaFunctions[fnh.m_funcName];
 
-		if (!ScriptAssert(func.valid(), err)) {
-			ScriptWarn("Defaulting to no " + fullName + " behaviour.");
+		if (!func.valid()) {
+			TENLog(msg);
 		}
 	};
 
