@@ -33,13 +33,13 @@ bool TestWithGlobalCollisionBounds(ItemInfo* item, ItemInfo* laraItem, Collision
 void TestForObjectOnLedge(ItemInfo* item, CollisionInfo* coll);
 
 bool TestLaraPosition(OBJECT_COLLISION_BOUNDS* bounds, ItemInfo* item, ItemInfo* laraItem);
-bool AlignLaraPosition(Vector3Int* vec, ItemInfo* item, ItemInfo* laraItem);
+bool AlignLaraPosition(Vector3Int* offset, ItemInfo* item, ItemInfo* laraItem);
 bool MoveLaraPosition(Vector3Int* pos, ItemInfo* item, ItemInfo* laraItem);
 
 bool ItemNearLara(PHD_3DPOS* pos, int radius);
-bool ItemNearTarget(PHD_3DPOS* src, ItemInfo* target, int radius);
+bool ItemNearTarget(PHD_3DPOS* origin, ItemInfo* target, int radius);
 
-bool Move3DPosTo3DPos(PHD_3DPOS* src, PHD_3DPOS* dest, int velocity, short angleAdd);
+bool Move3DPosTo3DPos(PHD_3DPOS* origin, PHD_3DPOS* target, int velocity, short angleAdd);
 
 bool TestBoundsCollide(ItemInfo* item, ItemInfo* laraItem, int radius);
 bool TestBoundsCollideStatic(ItemInfo* item, MESH_INFO* mesh, int radius);
