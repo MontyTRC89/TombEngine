@@ -8,6 +8,8 @@
 
 //namespace TEN::Math
 //{
+	PHD_3DPOS const PHD_3DPOS::Empty = PHD_3DPOS(Vector3Int::Zero, Vector3Shrt::Zero);
+
 	PHD_3DPOS::PHD_3DPOS()
 	{
 	}

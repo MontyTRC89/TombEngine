@@ -102,7 +102,7 @@
 		float sinY = phd_sin(orient.y);
 		float cosY = phd_cos(orient.y);
 
-		// The 2D heading angle direction vector: X = +sinY, Y = 0, Z = +cosY
+		// The 2D heading direction vector: X = +sinY, Y = 0, Z = +cosY
 		auto headingDirection = Vector3(sinY, 0.0f, cosY);
 		auto targetDirection = target - origin;
 
@@ -138,7 +138,7 @@
 		float sinY = phd_sin(orient.y);
 		float cosY = phd_cos(orient.y);
 
-		// The 2D normal vector to the 2D heading angle direction vector: X = +cosY, Y = 0, Z = -sinY
+		// The 2D normal vector to the 2D heading direction vector: X = +cosY, Y = 0, Z = -sinY
 		auto headingNormal = Vector3(cosY, 0.0f, -sinY);
 		auto targetDirection = target - origin;
 

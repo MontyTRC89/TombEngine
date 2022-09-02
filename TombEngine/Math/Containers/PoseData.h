@@ -11,6 +11,8 @@
 		Vector3Int  Position	= Vector3Int::Zero;
 		Vector3Shrt Orientation = Vector3Shrt::Zero;
 
+		static const PHD_3DPOS Empty;
+
 		PHD_3DPOS();
 		PHD_3DPOS(Vector3Int pos);
 		PHD_3DPOS(int xPos, int yPos, int zPos);
