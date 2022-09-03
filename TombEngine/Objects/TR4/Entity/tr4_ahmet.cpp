@@ -44,7 +44,7 @@ namespace TEN::Entities::TR4
 
 	enum AhmetState
 	{
-		AHMET_STATE_NONE = 0,
+		// No state 0.
 		AHMET_STATE_IDLE = 1,
 		AHMET_STATE_WALK_FORWARD = 2,
 		AHMET_STATE_RUN_FORWARD = 3,

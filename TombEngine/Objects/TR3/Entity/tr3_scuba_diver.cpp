@@ -23,7 +23,6 @@ namespace TEN::Entities::Creatures::TR3
 
 	enum ScubaDiverState
 	{
-		SDIVER_STATE_NONE = 0,
 		SDIVER_STATE_SWIM = 1,
 		SDIVER_STATE_TREAD_WATER_IDLE = 2,
 		SDIVER_STATE_SWIM_SHOOT = 3,

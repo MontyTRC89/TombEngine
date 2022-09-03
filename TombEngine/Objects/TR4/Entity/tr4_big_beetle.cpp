@@ -28,7 +28,7 @@ namespace TEN::Entities::TR4
 
 	enum BigBeetleState
 	{
-		BBEETLE_STATE_NONE = 0,
+		// No state 0.
 		BBEETLE_STATE_IDLE = 1,
 		BBEETLE_STATE_TAKE_OFF = 2,
 		BBEETLE_STATE_FLY_FORWARD = 3,

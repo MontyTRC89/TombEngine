@@ -29,7 +29,7 @@ namespace TEN::Entities::Creatures::TR2
 
 	enum KnifeThrowerState
 	{
-		KTHROWER_STATE_NONE = 0,
+		// No state 0.
 		KTHROWER_STATE_IDLE = 1,
 		KTHROWER_STATE_WALK_FORWARD = 2,
 		KTHROWER_STATE_RUN_FORWARD = 3,

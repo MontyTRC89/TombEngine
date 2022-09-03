@@ -47,7 +47,6 @@ namespace TEN::Entities::Creatures::TR3
 
 	enum TribesmanState
 	{
-		TRIBESMAN_STATE_NONE = 0,
 		TRIBESMAN_STATE_CROUCH_IDLE = 1,
 		TRIBESMAN_STATE_WALK_FORWARD = 2,
 		TRIBESMAN_STATE_RUN_FORWARD = 3,

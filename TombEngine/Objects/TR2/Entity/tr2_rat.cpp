@@ -29,7 +29,7 @@ namespace TEN::Entities::Creatures::TR2
 
 	enum RatState
 	{
-		RAT_STATE_NONE = 0,
+		// No state 0.
 		RAT_STATE_WALK_FORWARD = 1,
 		RAT_STATE_IDLE = 2,
 		RAT_STATE_SQUEAK = 3,

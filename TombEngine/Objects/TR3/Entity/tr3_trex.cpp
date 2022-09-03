@@ -29,7 +29,6 @@ namespace TEN::Entities::Creatures::TR3
 
 	enum TRexState
 	{
-		TREX_STATE_NONE = 0,
 		TREX_STATE_IDLE = 1,
 		TREX_STATE_WALK_FORWARD = 2,
 		TREX_STATE_RUN_FORWARD = 3,

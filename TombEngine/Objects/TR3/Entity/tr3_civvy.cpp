@@ -42,7 +42,6 @@ namespace TEN::Entities::Creatures::TR3
 	// TODO
 	enum CivvyState
 	{
-		CIVVY_STATE_NONE,
 		CIVVY_STATE_IDLE,
 		CIVVY_STATE_WALK_FORWARD,
 		CIVVY_PUNCH2,

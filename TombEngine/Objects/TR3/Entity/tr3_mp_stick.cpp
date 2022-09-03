@@ -26,7 +26,6 @@ namespace TEN::Entities::Creatures::TR3
 
 	enum MPStickState
 	{
-		MPSTICK_STATE_NONE,
 		MPSTICK_STATE_STOP,
 		MPSTICK_STATE_WALK,
 		MPSTICK_STATE_PUNCH2,

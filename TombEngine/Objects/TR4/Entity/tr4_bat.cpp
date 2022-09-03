@@ -29,7 +29,7 @@ namespace TEN::Entities::TR4
 
 	enum BatState
 	{
-		BAT_STATE_NONE = 0,
+		// No state 0.
 		BAT_STATE_DROP_FROM_CEILING = 1,
 		BAT_STATE_FLY = 2,
 		BAT_STATE_ATTACK = 3,

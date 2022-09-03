@@ -53,7 +53,7 @@ namespace TEN::Entities::Creatures::TR2
 
 	enum DragonState
 	{
-		DRAGON_STATE_NONE = 0,
+		// No state 0.
 		DRAGON_STATE_WALK = 1,
 		DRAGON_STATE_LEFT = 2,
 		DRAGON_STATE_RIGHT = 3,

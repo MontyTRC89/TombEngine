@@ -29,7 +29,7 @@ namespace TEN::Entities::Creatures::TR2
 
 	enum BirdMonsterState
 	{
-		BMONSTER_STATE_NONE = 0,
+		// No state 0.
 		BMONSTER_STATE_IDLE = 1,
 		BMONSTER_STATE_WALK_FORWARD = 2,
 		BMONSTER_STATE_SLAM_ATTACK_START = 3,

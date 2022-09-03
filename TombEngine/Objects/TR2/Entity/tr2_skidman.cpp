@@ -28,7 +28,7 @@ namespace TEN::Entities::Creatures::TR2
 
 	enum SnowmobileManState
 	{
-		SMAN_STATE_NONE = 0,
+		// No state 0.
 		SMAN_STATE_WAIT = 1,
 		SMAN_STATE_MOVING = 2,
 		SMAN_STATE_START_LEFT = 3,

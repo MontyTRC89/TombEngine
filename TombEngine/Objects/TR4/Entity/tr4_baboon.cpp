@@ -49,8 +49,7 @@ namespace TEN::Entities::TR4
 
 	enum BaboonState
 	{
-		BABOON_STATE_NULL = 0,
-		BABOON_STATE_NONE = 1,
+		// No states 0-1.
 		BABOON_STATE_WALK_FORWARD = 2,
 		BABOON_STATE_IDLE = 3,
 		BABOON_STATE_RUN_FORWARD = 4,

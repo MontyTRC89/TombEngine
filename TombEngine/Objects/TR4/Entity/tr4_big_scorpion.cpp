@@ -35,7 +35,7 @@ namespace TEN::Entities::TR4
 
 	enum BigScorpionState
 	{
-		BSCORPION_STATE_NONE = 0,
+		// No state 0.
 		BSCORPION_STATE_IDLE = 1,
 		BSCORPION_STATE_WALK_FORWARD = 2,
 		BSCORPION_STATE_RUN_FORWARD = 3,
