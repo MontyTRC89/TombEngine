@@ -19,6 +19,6 @@
 	constexpr inline auto NO_HEIGHT	 = INT_MIN + UCHAR_MAX;
 	constexpr inline auto MAX_HEIGHT = INT_MIN + 1;
 
-	constexpr inline auto BLOCK			= [](auto x, int divisor = 1) { return ((BLOCK_UNIT * x) / divisor); };
-	constexpr inline auto OFFSET_RADIUS = [](auto x)				  { return ((x * SQRT_2) + 4); };
+	constexpr inline auto BLOCK			= [](auto x) { return (BLOCK_UNIT * x); };
+	constexpr inline auto OFFSET_RADIUS = [](auto x) { return ((x * SQRT_2) + 4); };
 //}
