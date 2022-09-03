@@ -8,9 +8,9 @@
 
 //namespace TEN::Math::Geometry
 //{
-	Vector3Int TranslatePoint(const Vector3Int& point, short angle, float forward, float down, float right)
+	Vector3Int TranslatePoint(const Vector3Int& point, short headingAngle, float forward, float down, float right)
 	{
-		return Vector3Int(TranslatePoint(point.ToVector3(), angle, forward, down, right));
+		return Vector3Int(TranslatePoint(point.ToVector3(), headingAngle, forward, down, right));
 	}
 
 	Vector3 TranslatePoint(const Vector3& point, short headingAngle, float forward, float down, float right)
