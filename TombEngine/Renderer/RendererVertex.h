@@ -16,5 +16,5 @@ namespace TEN::Renderer
 		int IndexInPoly;
 		int OriginalIndex;
 		int Hash;
-	};
+	}; 
 }

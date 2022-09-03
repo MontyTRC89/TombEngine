@@ -40,6 +40,7 @@
 #include "Renderer/Structures/RendererLight.h"
 #include "Renderer/Structures/RendererStringToDraw.h"
 #include "Renderer/Structures/RendererRoom.h"
+#include <Renderer/ConstantBuffers/InstancedSpriteBuffer.h>
 
 struct CAMERA_INFO;
 
@@ -158,6 +159,7 @@ namespace TEN::Renderer
 
 	struct RendererSprite
 	{
+		int Index;
 		int Width;
 		int Height;
 		Vector2 UV[4];
@@ -238,6 +240,7 @@ namespace TEN::Renderer
 		ComPtr<ID3D11RasterizerState> m_cullClockwiseRasterizerState = nullptr;
 		ComPtr<ID3D11RasterizerState> m_cullNoneRasterizerState = nullptr;
 		ComPtr<ID3D11InputLayout> m_inputLayout = nullptr;
+		//ComPtr<ID3D11InputLayout> m_inputLayoutSprites = nullptr;
 		D3D11_VIEWPORT m_viewport;
 		D3D11_VIEWPORT m_shadowMapViewport;
 		Viewport m_viewportToolkit;
@@ -272,6 +275,8 @@ namespace TEN::Renderer
 		ComPtr<ID3D11PixelShader> m_psSky;
 		ComPtr<ID3D11VertexShader> m_vsSprites;
 		ComPtr<ID3D11PixelShader> m_psSprites;
+		ComPtr<ID3D11VertexShader> m_vsInstancedSprites;
+		ComPtr<ID3D11PixelShader> m_psInstancedSprites;
 		ComPtr<ID3D11VertexShader> m_vsSolid;
 		ComPtr<ID3D11PixelShader> m_psSolid;
 		ComPtr<ID3D11VertexShader> m_vsInventory;
@@ -315,6 +320,8 @@ namespace TEN::Renderer
 		ConstantBuffer<CPostProcessBuffer> m_cbPostProcessBuffer;
 		CAlphaTestBuffer m_stAlphaTest;
 		ConstantBuffer<CAlphaTestBuffer> m_cbAlphaTest;
+		CInstancedSpriteBuffer m_stInstancedSpriteBuffer;
+		ConstantBuffer<CInstancedSpriteBuffer> m_cbInstancedSpriteBuffer;
 
 		// Sprites
 		std::unique_ptr<SpriteBatch> m_spriteBatch;

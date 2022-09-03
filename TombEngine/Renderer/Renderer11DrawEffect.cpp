@@ -62,6 +62,13 @@ namespace TEN::Renderer
 	using namespace TEN::Effects::Footprints;
 	using std::vector;
 
+	struct RendererSpriteBucket
+	{
+		RendererSprite* Sprite;
+		BLEND_MODES BlendMode;
+		std::vector<RendererSpriteToDraw> SpritesToDraw;
+	};
+
 	void Renderer11::DrawLightning(RenderView& view) 
 	{
 		for (int i = 0; i < Lightning.size(); i++)
@@ -807,9 +814,7 @@ namespace TEN::Renderer
 
 	void Renderer11::DrawSprites(RenderView& view)
 	{
-		const int numSpritesToDraw = view.spritesToDraw.size();
-
-		if (numSpritesToDraw == 0)
+		if (view.spritesToDraw.size() == 0)
 			return;
 		
 		BindRenderTargetAsTexture(TEXTURE_DEPTH_MAP, &m_depthMap, SAMPLER_LINEAR_CLAMP);
@@ -817,22 +822,166 @@ namespace TEN::Renderer
 		SetDepthState(DEPTH_STATE_READ_ONLY_ZBUFFER);
 		SetCullMode(CULL_MODE_NONE);
 
-		m_context->VSSetShader(m_vsSprites.Get(), NULL, 0);
-		m_context->PSSetShader(m_psSprites.Get(), NULL, 0);
+		m_context->VSSetShader(m_vsInstancedSprites.Get(), NULL, 0);
+		m_context->PSSetShader(m_psInstancedSprites.Get(), NULL, 0);
 
-		BindConstantBufferVS(CB_SPRITE, m_cbSprite.get());
+		//BindConstantBufferVS(CB_SPRITE, m_cbSprite.get());
 
 		std::sort(
 			view.spritesToDraw.begin(),
 			view.spritesToDraw.end(),
 			[](RendererSpriteToDraw& a, RendererSpriteToDraw& b)
 			{
-				return (a.Type > b.Type);
+				if (a.Sprite != b.Sprite)
+					return a.Sprite > b.Sprite;
+				else
+					return a.BlendMode > b.BlendMode;
 			}
 		);
 
-		for (auto& spr : view.spritesToDraw) 
+		std::vector<RendererSpriteBucket> spriteBuckets;
+		RendererSpriteBucket currentSpriteBucket;
+
+		currentSpriteBucket.Sprite = view.spritesToDraw[0].Sprite;
+		currentSpriteBucket.BlendMode = view.spritesToDraw[0].BlendMode;
+
+		for (int i = 0; i < view.spritesToDraw.size(); i++)
 		{
+			RendererSpriteToDraw& spr = view.spritesToDraw[i];
+
+			if (spr.Sprite != currentSpriteBucket.Sprite 
+				|| spr.BlendMode != currentSpriteBucket.BlendMode 
+				|| currentSpriteBucket.SpritesToDraw.size() == 128)
+			{
+				spriteBuckets.push_back(currentSpriteBucket);
+
+				currentSpriteBucket.Sprite = spr.Sprite;
+				currentSpriteBucket.BlendMode = spr.BlendMode;
+				currentSpriteBucket.SpritesToDraw.clear();
+			}
+
+			Matrix spriteMatrix;
+			Matrix scale = Matrix::CreateScale((spr.Width) * spr.Scale, (spr.Height) * spr.Scale, spr.Scale);
+
+			if (spr.Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_BILLBOARD)
+			{
+				Vector3 cameraUp = Vector3(view.camera.View._12, view.camera.View._22, view.camera.View._32);
+				spriteMatrix = scale * Matrix::CreateRotationZ(spr.Rotation) * Matrix::CreateBillboard(spr.pos, Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z), cameraUp);
+			}
+			else if (spr.Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_BILLBOARD_CUSTOM)
+			{
+				Matrix rotation = Matrix::CreateRotationY(spr.Rotation);
+				Vector3 quadForward = Vector3(0, 0, 1);
+				spriteMatrix = scale * Matrix::CreateConstrainedBillboard(
+					spr.pos,
+					Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z),
+					spr.ConstrainAxis,
+					nullptr,
+					&quadForward);
+			}
+			else if (spr.Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_BILLBOARD_LOOKAT)
+			{
+				Matrix translation = Matrix::CreateTranslation(spr.pos);
+				Matrix rotation = Matrix::CreateRotationZ(spr.Rotation) * Matrix::CreateLookAt(Vector3::Zero, spr.LookAtAxis, Vector3::UnitZ);
+				spriteMatrix = scale * rotation * translation;
+			}
+			else if (spr.Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_3D)
+			{
+				spriteMatrix = Matrix::Identity;
+			}
+
+			if (DoesBlendModeRequireSorting(spr.BlendMode))
+			{
+				int distance = (spr.pos - Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z)).Length();
+				RendererTransparentFace face;
+				face.type = RendererTransparentFaceType::TRANSPARENT_FACE_SPRITE;
+				face.info.sprite = &spr;
+				face.distance = distance;
+				face.info.world = spriteMatrix;
+				face.info.blendMode = spr.BlendMode;
+
+				RendererRoom& room = m_rooms[FindRoomNumber(Vector3Int(spr.pos))];
+				room.TransparentFacesToDraw.push_back(face);
+			}
+			else
+			{
+				currentSpriteBucket.SpritesToDraw.push_back(spr);
+			}
+		}
+
+		for (auto& spriteBucket : spriteBuckets)
+		{
+			for (int i = 0; i < spriteBucket.SpritesToDraw.size(); i++)
+			{
+				RendererSpriteToDraw& spr = spriteBucket.SpritesToDraw[i];
+
+				Matrix spriteMatrix;
+				Matrix scale = Matrix::CreateScale((spr.Width) * spr.Scale, (spr.Height) * spr.Scale, spr.Scale);
+
+				if (spr.Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_BILLBOARD)
+				{
+					Vector3 cameraUp = Vector3(view.camera.View._12, view.camera.View._22, view.camera.View._32);
+					spriteMatrix = scale * Matrix::CreateRotationZ(spr.Rotation) * Matrix::CreateBillboard(spr.pos, Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z), cameraUp);
+				}
+				else if (spr.Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_BILLBOARD_CUSTOM)
+				{
+					Matrix rotation = Matrix::CreateRotationY(spr.Rotation);
+					Vector3 quadForward = Vector3(0, 0, 1);
+					spriteMatrix = scale * Matrix::CreateConstrainedBillboard(
+						spr.pos,
+						Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z),
+						spr.ConstrainAxis,
+						nullptr,
+						&quadForward);
+				}
+				else if (spr.Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_BILLBOARD_LOOKAT)
+				{
+					Matrix translation = Matrix::CreateTranslation(spr.pos);
+					Matrix rotation = Matrix::CreateRotationZ(spr.Rotation) * Matrix::CreateLookAt(Vector3::Zero, spr.LookAtAxis, Vector3::UnitZ);
+					spriteMatrix = scale * rotation * translation;
+				}
+				else if (spr.Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_3D)
+				{
+					spriteMatrix = Matrix::Identity;
+				}
+
+				m_stInstancedSpriteBuffer.Sprites[i].World = spriteMatrix;
+				m_stInstancedSpriteBuffer.Sprites[i].Color = spr.color;
+				m_stInstancedSpriteBuffer.Sprites[i].IsBillboard = spr.Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_3D ? 0 : 1;
+			}
+
+			// Set up vertex buffer and parameters
+			UINT stride = sizeof(RendererVertex);
+			UINT offset = 0;
+			m_context->IASetInputLayout(m_inputLayout.Get());
+			m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+			m_context->IASetVertexBuffers(0, 1, quadVertexBuffer.GetAddressOf(), &stride, &offset);
+
+			SetBlendMode(lastBlendMode);
+			BindTexture(TEXTURE_COLOR_MAP, spriteBucket.Sprite->Texture, SAMPLER_LINEAR_CLAMP);
+
+			if (lastBlendMode == BLEND_MODES::BLENDMODE_ALPHATEST)
+				SetAlphaTest(ALPHA_TEST_GREATER_THAN, ALPHA_TEST_THRESHOLD, true);
+			else
+				SetAlphaTest(ALPHA_TEST_NONE, 0);
+
+			m_cbInstancedSpriteBuffer.updateData(m_stInstancedSpriteBuffer, m_context.Get());
+			BindConstantBufferVS(CB_INSTANCED_SPRITES, m_cbInstancedSpriteBuffer.get());
+
+			m_context->DrawInstanced(4, spriteBucket.SpritesToDraw.size(), 0, 0);
+		}
+
+		/*RendererSprite* lastSprite = view.spritesToDraw[0].Sprite;
+		int lastSpriteBlendMode = view.spritesToDraw[0].BlendMode;
+		int numSpritesToDraw = 0;
+		int processedSprites = 0;
+		bool drawSprites = false;
+		int lastSpriteIndex = 0;
+
+		for (int i=0;i<view.spritesToDraw.size();i++) 
+		{
+			RendererSpriteToDraw& spr = view.spritesToDraw[i];
+
 			// Calculate matrices for sprites
 			Matrix spriteMatrix;
 			Matrix scale = Matrix::CreateScale((spr.Width) * spr.Scale, (spr.Height) * spr.Scale, spr.Scale);
@@ -879,8 +1028,74 @@ namespace TEN::Renderer
 			}
 			else // Draw sprites immediately
 			{
+				bool timeToDraw = false;
+
+				if (spr.Sprite != lastSprite || spr.BlendMode != lastBlendMode)
+				{
+					if (numSpritesToDraw > 0)
+					{
+						// Set up vertex buffer and parameters
+						UINT stride = sizeof(RendererVertex);
+						UINT offset = 0;
+						m_context->IASetInputLayout(m_inputLayout.Get());
+						m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+						m_context->IASetVertexBuffers(0, 1, quadVertexBuffer.GetAddressOf(), &stride, &offset);
+
+						SetBlendMode(lastBlendMode);
+						BindTexture(TEXTURE_COLOR_MAP, lastSprite->Texture, SAMPLER_LINEAR_CLAMP);
+
+						if (lastBlendMode == BLEND_MODES::BLENDMODE_ALPHATEST)
+							SetAlphaTest(ALPHA_TEST_GREATER_THAN, ALPHA_TEST_THRESHOLD, true);
+						else
+							SetAlphaTest(ALPHA_TEST_NONE, 0);
+
+						m_cbInstancedSpriteBuffer.updateData(m_stInstancedSpriteBuffer, m_context.Get());
+						BindConstantBufferVS(CB_INSTANCED_SPRITES, m_cbInstancedSpriteBuffer.get());
+
+						m_context->DrawInstanced(4, numSpritesToDraw, 0, 0);
+					}
+
+					numSpritesToDraw = 0;
+
+					lastSprite = spr.Sprite;
+					lastBlendMode = spr.BlendMode;
+				}
+
+					m_stInstancedSpriteBuffer.Sprites[numSpritesToDraw].World = spriteMatrix;
+					m_stInstancedSpriteBuffer.Sprites[numSpritesToDraw].Color = spr.color;
+					m_stInstancedSpriteBuffer.Sprites[numSpritesToDraw].IsBillboard = spr.Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_3D ? 0 : 1;
+
+					numSpritesToDraw++;
+
+				if (numSpritesToDraw > 0 && (numSpritesToDraw == 128 || i == view.spritesToDraw.size() - 1))
+				{
+					// Set up vertex buffer and parameters
+					UINT stride = sizeof(RendererVertex);
+					UINT offset = 0;
+					m_context->IASetInputLayout(m_inputLayout.Get());
+					m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+					m_context->IASetVertexBuffers(0, 1, quadVertexBuffer.GetAddressOf(), &stride, &offset);
+
+					SetBlendMode(lastBlendMode);
+					BindTexture(TEXTURE_COLOR_MAP, lastSprite->Texture, SAMPLER_LINEAR_CLAMP);
+
+					if (lastBlendMode == BLEND_MODES::BLENDMODE_ALPHATEST)
+						SetAlphaTest(ALPHA_TEST_GREATER_THAN, ALPHA_TEST_THRESHOLD, true);
+					else
+						SetAlphaTest(ALPHA_TEST_NONE, 0);
+
+					Matrix scale = Matrix::CreateScale((spr.Width) * spr.Scale, (spr.Height) * spr.Scale, spr.Scale);
+
+					m_cbInstancedSpriteBuffer.updateData(m_stInstancedSpriteBuffer, m_context.Get());
+					BindConstantBufferVS(CB_INSTANCED_SPRITES, m_cbInstancedSpriteBuffer.get());
+
+					m_context->DrawInstanced(4, numSpritesToDraw, 0, 0);
+
+					numSpritesToDraw = 0;
+				}
+
 				// Set up vertex buffer and parameters
-				UINT stride = sizeof(RendererVertex);
+				/*UINT stride = sizeof(RendererVertex);
 				UINT offset = 0;
 				m_context->IASetInputLayout(m_inputLayout.Get());
 				m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
@@ -989,7 +1204,7 @@ namespace TEN::Renderer
 				}
 			}
 		}
-
+*/
 	}
 
 	void Renderer11::DrawSpritesTransparent(RendererTransparentFaceInfo* info, RenderView& view)
