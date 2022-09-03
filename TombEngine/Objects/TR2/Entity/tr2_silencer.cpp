@@ -8,7 +8,10 @@
 #include "Game/misc.h"
 #include "Game/people.h"
 #include "Specific/level.h"
+#include "Specific/prng.h"
 #include "Specific/setup.h"
+
+using namespace TEN::Math::Random;
 
 namespace TEN::Entities::Creatures::TR2
 {
@@ -36,13 +39,16 @@ namespace TEN::Entities::Creatures::TR2
 
 		short angle = 0;
 		short tilt = 0;
-		Vector3Shrt extraHeadRot = Vector3Shrt::Zero;
-		Vector3Shrt extraTorsoRot = Vector3Shrt::Zero;
+		auto extraHeadRot = Vector3Shrt::Zero;
+		auto extraTorsoRot = Vector3Shrt::Zero;
 
 		if (item->HitPoints <= 0)
 		{
-			if (item->Animation.ActiveState != 12 && item->Animation.ActiveState != 13)
+			if (item->Animation.ActiveState != 12 &&
+				item->Animation.ActiveState != 13)
+			{
 				SetAnimation(item, 20);
+			}
 		}
 		else
 		{
@@ -83,7 +89,7 @@ namespace TEN::Entities::Creatures::TR2
 					if (Targetable(item, &AI))
 					{
 						item->Animation.TargetState = 3;
-						item->Animation.RequiredState = (GetRandomControl() >= 0x4000 ? 10 : 6);
+						item->Animation.RequiredState = TestProbability(0.5f) ? 6 : 10;
 					}
 
 					if (creature->Mood == MoodType::Attack || !AI.ahead)
@@ -101,9 +107,9 @@ namespace TEN::Entities::Creatures::TR2
 					}
 					else
 					{
-						if (GetRandomControl() >= 1280)
+						if (TestProbability(0.96f))
 						{
-							if (GetRandomControl() < 2560)
+							if (TestProbability(0.08f))
 							{
 								item->Animation.TargetState = 3;
 								item->Animation.RequiredState = 1;
@@ -130,13 +136,13 @@ namespace TEN::Entities::Creatures::TR2
 				else if (Targetable(item, &AI))
 				{
 					item->Animation.TargetState = 3;
-					item->Animation.RequiredState = (GetRandomControl() >= 0x4000 ? 10 : 6);
+					item->Animation.RequiredState = TestProbability(0.5f) ? 6 : 10;
 				}
 				else
 				{
 					if (AI.distance > pow(SECTOR(2), 2) || !AI.ahead)
 						item->Animation.TargetState = 2;
-					if (creature->Mood == MoodType::Bored && GetRandomControl() < 0x300)
+					if (creature->Mood == MoodType::Bored && TestProbability(0.025f))
 						item->Animation.TargetState = 3;
 				}
 
@@ -167,7 +173,7 @@ namespace TEN::Entities::Creatures::TR2
 					break;
 				}
 				else if (creature->Mood == MoodType::Attack)
-					item->Animation.TargetState = (GetRandomControl() >= 0x4000) ? 3 : 2;
+					item->Animation.TargetState = TestProbability(0.5f) ? 2 : 3;
 				else
 					item->Animation.TargetState = 3;
 
@@ -186,8 +192,9 @@ namespace TEN::Entities::Creatures::TR2
 				}
 				else
 				{
-					if (creature->Mood == MoodType::Attack || GetRandomControl() < 0x100)
+					if (creature->Mood == MoodType::Attack || TestProbability(0.008f))
 						item->Animation.TargetState = 3;
+
 					if (!AI.ahead)
 						item->Animation.TargetState = 3;
 				}

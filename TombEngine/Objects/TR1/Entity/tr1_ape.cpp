@@ -31,7 +31,7 @@ namespace TEN::Entities::Creatures::TR1
 	constexpr auto APE_RUN_POUND_GROUND_CHANCE	= 0.015f;
 	constexpr auto APE_RUN_RUN_LEFT_CHANCE		= 0.02f;
 
-	constexpr auto SHIFT = 75;
+	constexpr auto APE_SHIFT = 75;
 
 	#define APE_RUN_TURN_RATE_MAX ANGLE(5.0f)
 	#define APE_DISPLAY_ANGLE	  ANGLE(45.0f)
@@ -122,12 +122,12 @@ namespace TEN::Entities::Creatures::TR1
 
 			if (yy < yFloor)
 			{
-				item->Pose.Position.x = (yFloor * SECTOR(1)) - SHIFT;
+				item->Pose.Position.x = (yFloor * SECTOR(1)) - APE_SHIFT;
 				item->Pose.Orientation.y = ANGLE(90.0f);
 			}
 			else
 			{
-				item->Pose.Position.x = (yy * SECTOR(1)) + SHIFT;
+				item->Pose.Position.x = (yy * SECTOR(1)) + APE_SHIFT;
 				item->Pose.Orientation.y = -ANGLE(90.0f);
 			}
 		}
@@ -135,12 +135,12 @@ namespace TEN::Entities::Creatures::TR1
 		{
 			if (xx < xFloor)
 			{
-				item->Pose.Position.z = (xFloor * SECTOR(1)) - SHIFT;
+				item->Pose.Position.z = (xFloor * SECTOR(1)) - APE_SHIFT;
 				item->Pose.Orientation.y = 0;
 			}
 			else
 			{
-				item->Pose.Position.z = (xx * SECTOR(1)) + SHIFT;
+				item->Pose.Position.z = (xx * SECTOR(1)) + APE_SHIFT;
 				item->Pose.Orientation.y = -ANGLE(180.0f);
 			}
 		}
@@ -149,7 +149,7 @@ namespace TEN::Entities::Creatures::TR1
 			// diagonal
 		}
 
-		if (CreatureVault(itemNumber, angle, 2, SHIFT) == 2)
+		if (CreatureVault(itemNumber, angle, 2, APE_SHIFT) == 2)
 		{
 			item->Pose.Position.y = y;
 			SetAnimation(item, APE_ANIM_VAULT);
