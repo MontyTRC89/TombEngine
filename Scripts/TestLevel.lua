@@ -1,6 +1,6 @@
 -- Test level script file
 
-local Util = require("Util")
+local Util = require("TEN.Util")
 Util.ShortenTENCalls()
 
 -- Called when entering a level, not called when loading from a save
