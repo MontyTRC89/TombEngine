@@ -25,4 +25,4 @@ void InitialiseSearchObject(short itemNumber);
 void SearchObjectCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);
 void SearchObjectControl(short itemNumber);
 void DoPickup(ItemInfo* laraItem);
-bool UseSpecialItem(ItemInfo* item);
+bool UseSpecialItem(ItemInfo* laraItem);
