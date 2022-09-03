@@ -1,30 +1,32 @@
 #include "framework.h"
-#include "Game/effects/debris.h"
-#include "Game/collision/collide_room.h"
-#include "Game/camera.h"
+#include "Objects/Generic/Traps/falling_block.h"
+
 #include "Game/animation.h"
+#include "Game/camera.h"
+#include "Game/collision/collide_room.h"
 #include "Game/collision/floordata.h"
-#include "Specific/level.h"
-#include "Specific/setup.h"
+#include "Game/effects/debris.h"
 #include "Game/room.h"
 #include "Sound/sound.h"
+#include "Specific/level.h"
 #include "Specific/prng.h"
+#include "Specific/setup.h"
 
 using namespace TEN::Floordata;
 using namespace TEN::Math::Random;
 
-constexpr auto FALLINGBLOCK_INITIAL_SPEED = 10;
-constexpr auto FALLINGBLOCK_MAX_SPEED = 100;
-constexpr auto FALLINGBLOCK_FALL_VELOCITY = 4;
+constexpr auto FALLINGBLOCK_INITIAL_SPEED		= 10;
+constexpr auto FALLINGBLOCK_MAX_SPEED			= 100;
+constexpr auto FALLINGBLOCK_FALL_VELOCITY		= 4;
 constexpr auto FALLINGBLOCK_FALL_ROTATION_SPEED = 1;
-constexpr auto FALLINGBLOCK_DELAY = 52;
-constexpr auto FALLINGBLOCK_WIBBLE = 3;
-constexpr auto FALLINGBLOCK_HEIGHT_TOLERANCE = 8;
-constexpr auto FALLINGBLOCK_CRUMBLE_DELAY = 100;
+constexpr auto FALLINGBLOCK_DELAY				= 52;
+constexpr auto FALLINGBLOCK_WIBBLE				= 3;
+constexpr auto FALLINGBLOCK_HEIGHT_TOLERANCE	= 8;
+constexpr auto FALLINGBLOCK_CRUMBLE_DELAY		= 100;
 
 void InitialiseFallingBlock(short itemNumber)
 {
-	auto item = &g_Level.Items[itemNumber];
+	auto* item = &g_Level.Items[itemNumber];
 
 	g_Level.Items[itemNumber].MeshBits = 1;
 	TEN::Floordata::UpdateBridgeItem(itemNumber);
@@ -34,15 +36,17 @@ void InitialiseFallingBlock(short itemNumber)
 		item->Animation.Mutator[i].Rotation = Vector3::Zero;
 }
 
-void FallingBlockCollision(short itemNum, ItemInfo* l, CollisionInfo* coll)
+void FallingBlockCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 {
-	ItemInfo* item = &g_Level.Items[itemNum];
-	if (!item->ItemFlags[0] && !item->TriggerFlags && abs(item->Pose.Position.y - l->Pose.Position.y) < FALLINGBLOCK_HEIGHT_TOLERANCE)
+	auto* item = &g_Level.Items[itemNumber];
+
+	if (!item->ItemFlags[0] && !item->TriggerFlags &&
+		abs(item->Pose.Position.y - laraItem->Pose.Position.y) < FALLINGBLOCK_HEIGHT_TOLERANCE)
 	{
-		if (!((item->Pose.Position.x ^ l->Pose.Position.x) & 0xFFFFFC00) && !((l->Pose.Position.z ^ item->Pose.Position.z) & 0xFFFFFC00))
+		if (!((item->Pose.Position.x ^ laraItem->Pose.Position.x) & 0xFFFFFC00) && !((laraItem->Pose.Position.z ^ item->Pose.Position.z) & 0xFFFFFC00))
 		{
 			SoundEffect(SFX_TR4_ROCK_FALL_CRUMBLE, &item->Pose);
-			AddActiveItem(itemNum);
+			AddActiveItem(itemNumber);
 
 			item->ItemFlags[0] = 0;
 			item->Status = ITEM_ACTIVE;
@@ -53,7 +57,7 @@ void FallingBlockCollision(short itemNum, ItemInfo* l, CollisionInfo* coll)
 
 void FallingBlockControl(short itemNumber)
 {
-	ItemInfo* item = &g_Level.Items[itemNumber];
+	auto* item = &g_Level.Items[itemNumber];
 
 	if (item->TriggerFlags)
 	{
@@ -65,7 +69,7 @@ void FallingBlockControl(short itemNumber)
 		{
 			if (item->ItemFlags[0] < FALLINGBLOCK_DELAY)
 			{
-				// Subtly shake all meshes separately
+				// Subtly shake all meshes separately.
 				for (int i = 0; i < item->Animation.Mutator.size(); i++)
 				{
 					item->Animation.Mutator[i].Rotation.x = RADIAN * GenerateFloat(-FALLINGBLOCK_WIBBLE, FALLINGBLOCK_WIBBLE);
@@ -75,7 +79,7 @@ void FallingBlockControl(short itemNumber)
 			}
 			else
 			{
-				// Make rotational falling movement with some random seed
+				// Make rotational falling movement with some random seed.
 				for (int i = 0; i < item->Animation.Mutator.size(); i++)
 				{
 					auto rotSpeed = i % 2 ? FALLINGBLOCK_FALL_ROTATION_SPEED : -FALLINGBLOCK_FALL_ROTATION_SPEED;
@@ -97,31 +101,31 @@ void FallingBlockControl(short itemNumber)
 
 					item->Pose.Position.y += item->ItemFlags[1];
 				}
+
+				if (GetDistanceToFloor(itemNumber) >= 0)
+				{
+					// If crumbled before actual delay (e.g. too low position), force delay to be correct
+					if (item->ItemFlags[0] < FALLINGBLOCK_DELAY)
+						item->ItemFlags[0] = FALLINGBLOCK_DELAY;
+
+					// Convert object to shatter item
+					ShatterItem.yRot = item->Pose.Orientation.y;
+					ShatterItem.meshIndex = Objects[item->ObjectNumber].meshIndex;
+					ShatterItem.color = item->Color;
+					ShatterItem.sphere.x = item->Pose.Position.x;
+					ShatterItem.sphere.y = item->Pose.Position.y - STEP_SIZE; // So debris won't spawn below floor
+					ShatterItem.sphere.z = item->Pose.Position.z;
+					ShatterItem.bit = 0;
+					ShatterImpactData.impactDirection = Vector3(0, -(float)item->ItemFlags[1] / (float)FALLINGBLOCK_MAX_SPEED, 0);
+					ShatterImpactData.impactLocation = { (float)ShatterItem.sphere.x, (float)ShatterItem.sphere.y, (float)ShatterItem.sphere.z };
+					ShatterObject(&ShatterItem, nullptr, 0, item->RoomNumber, false);
+
+					SoundEffect(SFX_TR4_ROCK_FALL_LAND, &item->Pose);
+					KillItem(itemNumber);
+				}
 			}
 
 			item->ItemFlags[0]++;
-
-			if (GetDistanceToFloor(itemNumber) >= 0)
-			{
-				// If crumbled before actual delay (e.g. too low position), force delay to be correct
-				if (item->ItemFlags[0] < FALLINGBLOCK_DELAY)
-					item->ItemFlags[0] = FALLINGBLOCK_DELAY;
-
-				// Convert object to shatter item
-				ShatterItem.yRot = item->Pose.Orientation.y;
-				ShatterItem.meshIndex = Objects[item->ObjectNumber].meshIndex;
-				ShatterItem.color = item->Color;
-				ShatterItem.sphere.x = item->Pose.Position.x;
-				ShatterItem.sphere.y = item->Pose.Position.y - STEP_SIZE; // So debris won't spawn below floor
-				ShatterItem.sphere.z = item->Pose.Position.z;
-				ShatterItem.bit = 0;
-				ShatterImpactData.impactDirection = Vector3(0, -(float)item->ItemFlags[1] / (float)FALLINGBLOCK_MAX_SPEED, 0);
-				ShatterImpactData.impactLocation = { (float)ShatterItem.sphere.x, (float)ShatterItem.sphere.y, (float)ShatterItem.sphere.z };
-				ShatterObject(&ShatterItem, nullptr, 0, item->RoomNumber, false);
-
-				SoundEffect(SFX_TR4_ROCK_FALL_LAND, &item->Pose);
-				KillItem(itemNumber);
-			}
 		}
 		else
 		{

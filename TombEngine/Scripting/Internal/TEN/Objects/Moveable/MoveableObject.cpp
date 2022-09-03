@@ -279,6 +279,11 @@ void Moveable::Register(sol::table & parent)
 // @tparam int HP the amount of HP to give the moveable
 	ScriptReserved_SetHP, &Moveable::SetHP,
 
+/// Get HP definded for that object type (hit points/health points) (Read Only).
+// @function Moveable:GetSlotHP
+// @tparam int ID of the moveable slot type.
+ScriptReserved_GetSlotHP, & Moveable::GetSlotHP,
+
 /// Get OCB (object code bit) of the moveable
 // @function Moveable:GetOCB
 // @treturn int the moveable's current OCB value
@@ -288,6 +293,16 @@ void Moveable::Register(sol::table & parent)
 // @function Moveable:SetOCB
 // @tparam int OCB the new value for the moveable's OCB
 	ScriptReserved_SetOCB, &Moveable::SetOCB,
+
+/// Get the value stored in ItemFlags[x] (x is the value of the parameter)
+// @function Moveable:GetItemFlags
+// @treturn short id of the ItemFlags array
+	ScriptReserved_GetItemFlags, & Moveable::GetItemFlags,
+
+/// Stores the value of the first parameter in the ItemFlags[x] (x is the value of the second parameter)
+// @function Moveable:SetItemFlags
+// @tparam short value to store in the moveable's ItemFlags[x], short id of ItemFlags array to store the value.
+	ScriptReserved_SetItemFlags, & Moveable::SetItemFlags,
 
 /// Get the moveable's color
 // @function Moveable:GetColor
@@ -603,8 +618,11 @@ void Moveable::SetHP(short hp)
 		ScriptAssert(false, "Invalid HP value: " + std::to_string(hp));
 		if (hp < 0)
 		{
-			hp = 0;
-			ScriptWarn("Setting HP to 0.");
+			if (hp != NOT_TARGETABLE)
+			{
+				hp = 0;
+				ScriptWarn("Setting HP to 0.");
+			}
 		}
 		else if (hp > Objects[m_item->ObjectNumber].HitPoints)
 		{
@@ -616,6 +634,11 @@ void Moveable::SetHP(short hp)
 	m_item->HitPoints = hp;
 }
 
+short Moveable::GetSlotHP() const
+{
+	return (Objects[m_item->ObjectNumber].HitPoints);
+}
+
 short Moveable::GetOCB() const
 {
 	return m_item->TriggerFlags;
@@ -625,6 +648,17 @@ void Moveable::SetOCB(short ocb)
 {
 	m_item->TriggerFlags = ocb;
 }
+
+short Moveable::GetItemFlags(int index) const
+{
+	return m_item->ItemFlags[index];
+}
+
+void Moveable::SetItemFlags(short value, int index)
+{
+	m_item->ItemFlags[index] = value;
+}
+
 
 ScriptColor Moveable::GetColor() const
 {

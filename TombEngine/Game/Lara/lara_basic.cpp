@@ -139,9 +139,12 @@ void lara_as_walk_forward(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	// TODO: Implement item alignment properly someday. @Sezz 2021.11.01
+	// TODO: Implement item alignment properly someday. -- Sezz 2021.11.01
 	if (lara->Control.IsMoving)
+	{
+		ModulateLaraTurnRateY(item, 0, 0, 0);
 		return;
+	}
 
 	if (TrInput & (IN_LEFT | IN_RIGHT))
 	{
@@ -410,7 +413,7 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 			(TrInput & IN_RIGHT &&
 				!(TrInput & IN_RSTEP || (TrInput & IN_WALK && TrInput & IN_RIGHT))))
 		{
-			ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_SLOW_TURN_RATE_MAX);
+			ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_SLOW_MED_TURN_RATE_MAX);
 		}
 	}
 
@@ -1325,12 +1328,12 @@ void lara_col_turn_left_slow(ItemInfo* item, CollisionInfo* coll)
 void lara_as_death(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
+	auto* bounds = GetBoundsAccurate(item);
 
+	item->Animation.Velocity.z = 0.0f;
 	lara->Control.CanLook = false;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
-
-	ModulateLaraTurnRateY(item, 0, 0, 0);
 
 	if (BinocularRange)
 	{
@@ -1340,6 +1343,11 @@ void lara_as_death(ItemInfo* item, CollisionInfo* coll)
 		item->MeshBits = ALL_JOINT_BITS;
 		lara->Inventory.IsBusy = false;
 	}
+
+	if (bounds->Height() <= (LARA_HEIGHT * 0.75f))
+		AlignLaraToSurface(item);
+
+	ModulateLaraTurnRateY(item, 0, 0, 0);
 }
 
 // State:		LS_DEATH (8)
@@ -1421,7 +1429,10 @@ void lara_as_walk_back(ItemInfo* item, CollisionInfo* coll)
 	}
 
 	if (lara->Control.IsMoving)
+	{
+		ModulateLaraTurnRateY(item, 0, 0, 0);
 		return;
+	}
 
 	if (isSwamp && lara->Control.WaterStatus == WaterStatus::Wade)
 	{
@@ -1781,7 +1792,10 @@ void lara_as_step_right(ItemInfo* item, CollisionInfo* coll)
 	}
 
 	if (lara->Control.IsMoving)
+	{
+		ModulateLaraTurnRateY(item, 0, 0, 0);
 		return;
+	}
 
 	if (TrInput & IN_WALK) // WALK locks orientation.
 		ModulateLaraTurnRateY(item, 0, 0, 0);
@@ -1872,7 +1886,10 @@ void lara_as_step_left(ItemInfo* item, CollisionInfo* coll)
 	}
 
 	if (lara->Control.IsMoving)
+	{
+		ModulateLaraTurnRateY(item, 0, 0, 0);
 		return;
+	}
 
 	if (TrInput & IN_WALK) // WALK locks orientation.
 		ModulateLaraTurnRateY(item, 0, 0, 0);

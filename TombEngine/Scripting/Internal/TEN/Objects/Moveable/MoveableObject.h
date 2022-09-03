@@ -62,11 +62,16 @@ public:
 	[[nodiscard]] short GetHP() const;
 	void SetHP(short hp);
 
+	[[nodiscard]] short GetSlotHP() const;
+
 	[[nodiscard]] short GetOCB() const;
 	void SetOCB(short ocb);
 
 	[[nodiscard]] aiBitsType GetAIBits() const;
 	void SetAIBits(aiBitsType const & bits);
+
+	[[nodiscard]] short GetItemFlags(int index = 0) const;
+	void SetItemFlags(short value, int index = 0);
 
 	[[nodiscard]] bool MeshIsVisible(int meshId) const;
 	void ShowMesh(int meshId);

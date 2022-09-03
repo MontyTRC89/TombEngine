@@ -100,13 +100,19 @@ namespace TEN::Control::Volumes
 			{
 				if (volume->Status == TriggerStatus::Inside)
 				{
-					volume->Triggerer = nullptr;
-					volume->Status = TriggerStatus::Leaving;
-					if (!set->OnLeave.Function.empty() && set->OnLeave.CallCounter != 0)
+					// Only fire leave event when a certain timeout has passed.
+					// This helps to filter out borderline cases when moving around volumes.
+
+					if (GameTimer - volume->Timeout > VOLUME_LEAVE_TIMEOUT)
 					{
-						g_GameScript->ExecuteFunction(set->OnLeave.Function, triggerer, set->OnLeave.Argument);
-						if (set->OnLeave.CallCounter != NO_CALL_COUNTER)
-							set->OnLeave.CallCounter--;
+						volume->Triggerer = nullptr;
+						volume->Status = TriggerStatus::Leaving;
+						if (!set->OnLeave.Function.empty() && set->OnLeave.CallCounter != 0)
+						{
+							g_GameScript->ExecuteFunction(set->OnLeave.Function, triggerer, set->OnLeave.Argument);
+							if (set->OnLeave.CallCounter != NO_CALL_COUNTER)
+								set->OnLeave.CallCounter--;
+						}
 					}
 				}
 				else
@@ -129,8 +135,7 @@ namespace TEN::Control::Volumes
 
 	void TestVolumes(short roomNumber, MESH_INFO* mesh)
 	{
-		auto* staticInfo = &StaticObjects[mesh->staticNumber];
-		auto bbox = TO_DX_BBOX(mesh->pos, &staticInfo->collisionBox);
+		auto bbox = TO_DX_BBOX(mesh->pos, GetBoundsAccurate(mesh, false));
 
 		TestVolumes(roomNumber, bbox, TriggerVolumeActivators::Static, mesh);
 	}

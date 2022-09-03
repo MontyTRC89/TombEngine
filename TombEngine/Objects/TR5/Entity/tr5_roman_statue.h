@@ -1,6 +1,9 @@
 #pragma once
 #include "Specific/phd_global.h"
 
-void InitialiseRomanStatue(short itemNumber);
-void RomanStatueControl(short itemNumber);
-void TriggerRomanStatueMissileSparks(Vector3Int* pos, char fxObject);
+namespace TEN::Entities::TR5
+{
+	void InitialiseRomanStatue(short itemNumber);
+	void RomanStatueControl(short itemNumber);
+	void TriggerRomanStatueMissileSparks(Vector3Int* pos, char fxObject);
+}
