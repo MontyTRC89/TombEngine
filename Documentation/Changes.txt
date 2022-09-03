@@ -5,19 +5,20 @@ Version 1.0.2
 * Align Lara on slopes when crouching, crawling, and dying.
 * Better slope alignment for large, flat enemies (i.e. big scorpion and crocodile).
 * Lock turn rate when automatically aligning Lara to objects.
-* Don't play Lara alignment animations if interacted object is too close.
+* Don't play Lara alignment animations if the interacted object is too close.
 * Allow vertical pole mounts only when facing one directly.
 * Allow vertical pole mounts while turning, walking, or running.
-* Add standing 180 turn. Activated with WALK+ROLL on dry ground, automatic when wade-height water or swamps.
+* Add standing 180 turn. Activated with WALK+ROLL on dry ground, automatic when in wade-height water or swamp.
 * Update monkey swing 180 turn animation.
 * Update backward monkey swing animations.
 * Crouch turn to crouch idle and crawl turn 
 * Fix incorrect pole mounting.
 * Fix zeroed forward velocity upon landing.
 * Fix 1-frame turn rate delays.
-* Fix occasional leave event calls when moving closely to volumes.
+* Fix occasional leave event calls when moving closer to volumes.
 * Fix incorrect viewport size in windowed mode.
 * Fix late landing animation dispatch in rare cases.
+* Fix Lara's subway train death so that she no longer slides slowly after the animation has finished. 
 
 
 Version 1.0.1
