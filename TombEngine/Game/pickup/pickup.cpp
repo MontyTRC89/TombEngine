@@ -420,7 +420,8 @@ void PickupCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 	item->Pose.Orientation.x = 0;
 	switch (triggerFlags)
 	{
-	case 1: // Pickup from wall hole
+	// Pick up from hole in wall.
+	case 1:
 		if (lara->Control.IsLow || !TestLaraPosition(&HiddenPickUpBounds, item, laraItem))
 		{
 			if (lara->Control.IsMoving)
@@ -446,7 +447,8 @@ void PickupCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 		lara->InteractedItem = itemNumber;
 		break;
 
-	case 2: // Pickup with crowbar
+	// Pick up with crowbar.
+	case 2:
 		item->Pose.Orientation.y = prevOrient.y;
 
 		if (lara->Control.IsLow || !TestLaraPosition(&CrowbarPickUpBounds, item, laraItem))
@@ -499,6 +501,7 @@ void PickupCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 		lara->InteractedItem = itemNumber;
 		break;
 
+	// Pick up from plinth.
 	case 3:
 	case 4:
 	case 7:
@@ -563,7 +566,8 @@ void PickupCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 		item->Pose.Orientation = prevOrient;
 		return;
 
-	case 9: // Pickup object and conver it to crowbar (like submarine level)
+	// Pick up and convert object to a crowbar. Used in TR5 submarine level.
+	case 9:
 		item->Pose.Orientation.y = prevOrient.y;
 
 		if (!TestLaraPosition(&JobyCrowPickUpBounds, item, laraItem))
@@ -584,6 +588,7 @@ void PickupCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 		lara->InteractedItem = itemNumber;
 		break;
 
+	// Pick up from ground.
 	default:
 		if (!TestLaraPosition(&PickUpBounds, item, laraItem))
 		{
@@ -669,7 +674,7 @@ void PickupCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 				}
 				else
 				{
-					// HACK: because of MoveLaraPosition(), we can't properly dispatch. Must be fixed later.
+					// HACK: Because of MoveLaraPosition(), we can't properly dispatch. Must be fixed later.
 					laraItem->Animation.AnimNumber = LA_PICKUP;
 					laraItem->Animation.ActiveState = LS_PICKUP;
 				}
