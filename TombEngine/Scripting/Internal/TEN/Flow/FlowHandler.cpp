@@ -8,7 +8,7 @@
 #include "Flow/InventoryItem/InventoryItem.h"
 #include "InventorySlots.h"
 #include "Game/gui.h"
-#include "Logic/FuncNameHolder.h"
+#include "Logic/LevelFunc.h"
 #include "Vec3/Vec3.h"
 #include "Objects/ScriptInterfaceObjectsHandler.h"
 #include "Strings/ScriptInterfaceStringsHandler.h"
