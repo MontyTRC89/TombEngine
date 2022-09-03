@@ -7,7 +7,6 @@ using std::vector;
 
 namespace TEN::Utils
 {
-	// TODO: Remove size cap when all conversions are complete.
 	constexpr auto BIT_FIELD_SIZE_MAX = std::numeric_limits<uint>::digits;
 
 	BitField::BitField()
@@ -25,7 +24,7 @@ namespace TEN::Utils
 		size = std::min<uint>(size, BIT_FIELD_SIZE_MAX);
 		this->Container.resize(size);
 
-		for (size_t i = 0; i < size; i++)
+		for (uint i = 0; i < size; i++)
 		{
 			uint bit = uint(1 << i);
 			if ((packedBits & bit) == bit)
@@ -41,7 +40,7 @@ namespace TEN::Utils
 	uint BitField::GetPackedBits()
 	{
 		uint packedBits = 0;
-		for (size_t i = 0; i < Container.size(); i++)
+		for (uint i = 0; i < Container.size(); i++)
 		{
 			if (Container[i])
 			{
@@ -177,7 +176,7 @@ namespace TEN::Utils
 
 	BitField& BitField::operator =(uint packedBits)
 	{
-		for (size_t i = 0; i < Container.size(); i++)
+		for (uint i = 0; i < Container.size(); i++)
 		{
 			uint bit = uint(1 << i);
 			if ((packedBits & bit) == bit)
@@ -191,7 +190,7 @@ namespace TEN::Utils
 
 	BitField& BitField::operator |=(uint packedBits)
 	{
-		for (size_t i = 0; i < Container.size(); i++)
+		for (uint i = 0; i < Container.size(); i++)
 		{
 			uint bit = uint(1 << i);
 			if ((packedBits & bit) == bit)
@@ -206,7 +205,7 @@ namespace TEN::Utils
 		BitField newBitField = {};
 		vector<uint> indices = {};
 
-		for (size_t i = 0; i < Container.size(); i++)
+		for (uint i = 0; i < Container.size(); i++)
 		{
 			uint bit = uint(1 << i);
 			if (Container[i] && (packedBits & bit) == bit)

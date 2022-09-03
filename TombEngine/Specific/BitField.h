@@ -4,6 +4,9 @@ using std::vector;
 
 namespace TEN::Utils
 {
+	// TODO: Switch to std::span container type as parameter whenever we update to C++20.
+	// TODO: Remove size cap when all conversions are complete.
+
 	class BitField
 	{
 	private:
