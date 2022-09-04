@@ -414,7 +414,7 @@ GameStatus DoTitle(int index, std::string const& ambient)
 
 		if (!level->ScriptFileName.empty())
 		{
-			g_GameScript->ExecuteScriptFile(level->ScriptFileName);
+			g_GameScript->ExecuteLevelScriptFile(level->ScriptFileName);
 			g_GameScript->InitCallbacks();
 			g_GameStringsHandler->SetCallbackDrawString([](std::string const key, D3DCOLOR col, int x, int y, int flags)
 			{
@@ -519,7 +519,7 @@ GameStatus DoLevel(int index, std::string const& ambient, bool loadFromSavegame)
 
 	if (!level->ScriptFileName.empty())
 	{
-		g_GameScript->ExecuteScriptFile(level->ScriptFileName);
+		g_GameScript->ExecuteLevelScriptFile(level->ScriptFileName);
 		g_GameScript->InitCallbacks();
 		g_GameStringsHandler->SetCallbackDrawString([](std::string const key, D3DCOLOR col, int x, int y, int flags)
 		{
