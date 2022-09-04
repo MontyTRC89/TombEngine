@@ -16,6 +16,7 @@ using std::vector;
 namespace TEN::Entities::TR4
 {
 	constexpr auto HAMMERHEAD_BITE_ATTACK_DAMAGE = 120;
+	constexpr auto HAMMERHEAD_ATTACK_RANGE = SQUARE(SECTOR(0.66f));
 
 	const auto HammerheadBite = BiteInfo(Vector3::Zero, 12);
 	const vector<int> HammerheadBiteAttackJoints = { 10, 12, 13 };
@@ -109,7 +110,7 @@ namespace TEN::Entities::TR4
 
 				if (AI.distance <= pow(SECTOR(1), 2))
 				{
-					if (AI.distance < pow(682, 2))
+					if (AI.distance < HAMMERHEAD_ATTACK_RANGE)
 						item->Animation.TargetState = HAMMERHEAD_STATE_IDLE_BITE_ATTACK;
 				}
 				else

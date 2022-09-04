@@ -29,7 +29,7 @@ namespace TEN::Entities::TR4
 
 	enum KnightTemplarState
 	{
-		KTEMPLAR_STATE_NONE = 0,
+		// No state 0.
 		KTEMPLAR_STATE_IDLE = 1,
 		KTEMPLAR_STATE_WALK_FORWARD = 2,
 		KTEMPLAR_STATE_SWORD_ATTACK_1 = 3,

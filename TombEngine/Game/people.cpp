@@ -17,45 +17,45 @@ bool ShotLara(ItemInfo* item, AI_INFO* AI, BiteInfo gun, short extraRotation, in
 	auto* creature = GetCreatureInfo(item);
 	auto* enemy = creature->Enemy;
 
-	bool hit = false;
-	bool targetable = false;
+	bool hasHit = false;
+	bool isTargetable = false;
 
-	if (AI->distance <= pow(MAX_VISIBILITY_DISTANCE, 2) && Targetable(item, AI))
+	if (AI->distance <= SQUARE(MAX_VISIBILITY_DISTANCE) && Targetable(item, AI))
 	{
 		int distance = phd_sin(AI->enemyFacing) * enemy->Animation.Velocity.z * pow(MAX_VISIBILITY_DISTANCE, 2) / 300;
-		distance = pow(distance, 2) + AI->distance;
-		if (distance <= pow(MAX_VISIBILITY_DISTANCE, 2))
+		distance = SQUARE(distance) + AI->distance;
+		if (distance <= SQUARE(MAX_VISIBILITY_DISTANCE))
 		{
-			int random = (pow(MAX_VISIBILITY_DISTANCE, 2) - AI->distance) / (pow(MAX_VISIBILITY_DISTANCE, 2) / 0x5000) + 8192;
-			hit = GetRandomControl() < random;
+			int random = (SQUARE(MAX_VISIBILITY_DISTANCE) - AI->distance) / (SQUARE(MAX_VISIBILITY_DISTANCE) / 0x5000) + 8192;
+			hasHit = GetRandomControl() < random;
 		}
 		else
-			hit = false;
+			hasHit = false;
 		
-		targetable = true;
+		isTargetable = true;
 	}
 	else
 	{
-		hit = false;
-		targetable = false;
+		hasHit = false;
+		isTargetable = false;
 	}
 
 	if (damage)
 	{
 		if (enemy->IsLara())
 		{
-			if (hit)
+			if (hasHit)
 			{
 				DoDamage(enemy, damage);
 				CreatureEffect(item, gun, &GunHit);
 			}
-			else if (targetable)
+			else if (isTargetable)
 				CreatureEffect(item, gun, &GunMiss);
 		}
 		else
 		{
 			CreatureEffect(item, gun, &GunShot);
-			if (hit)
+			if (hasHit)
 			{
 				enemy->HitStatus = true;
 				enemy->HitPoints += damage / -10;
@@ -74,7 +74,7 @@ bool ShotLara(ItemInfo* item, AI_INFO* AI, BiteInfo gun, short extraRotation, in
 
 	// TODO: smash objects
 
-	return targetable;
+	return isTargetable;
 }
 
 short GunMiss(int x, int y, int z, short velocity, short yRot, short roomNumber)

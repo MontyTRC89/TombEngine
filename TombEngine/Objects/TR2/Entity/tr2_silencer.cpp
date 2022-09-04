@@ -15,7 +15,7 @@ using namespace TEN::Math::Random;
 
 namespace TEN::Entities::Creatures::TR2
 {
-	constexpr auto SILENCER_SHOT_DAMAGE = 50;
+	constexpr auto SILENCER_SHOOT_ATTACK_DAMAGE = 50;
 	constexpr auto SILENCER_RUN_RANGE = SQUARE(SECTOR(2));
 
 	const auto SilencerGunBite = BiteInfo(Vector3(3.0f, 331.0f, 56.0f), 10);
@@ -281,7 +281,7 @@ namespace TEN::Entities::Creatures::TR2
 
 				if (!creature->Flags)
 				{
-					ShotLara(item, &AI, SilencerGunBite, extraTorsoRot.y, SILENCER_SHOT_DAMAGE);
+					ShotLara(item, &AI, SilencerGunBite, extraTorsoRot.y, SILENCER_SHOOT_ATTACK_DAMAGE);
 					creature->Flags = 1;
 				}
 
@@ -300,7 +300,7 @@ namespace TEN::Entities::Creatures::TR2
 
 				if (!item->Animation.RequiredState)
 				{
-					if (!ShotLara(item, &AI, SilencerGunBite, extraTorsoRot.y, SILENCER_SHOT_DAMAGE))
+					if (!ShotLara(item, &AI, SilencerGunBite, extraTorsoRot.y, SILENCER_SHOOT_ATTACK_DAMAGE))
 						item->Animation.TargetState = SILENCER_STATE_RUN_FORWARD;
 
 					item->Animation.RequiredState = SILENCER_STATE_RUN_SHOOT;
