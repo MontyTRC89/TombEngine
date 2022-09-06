@@ -1981,7 +1981,7 @@ namespace TEN::Renderer
 		int meshIndex = Objects[ID_CAUSTICS_TEXTURES].meshIndex;
 		int causticsFrame = nmeshes ? meshIndex + ((GlobalCounter) % nmeshes) : 0;
 
-		// BindTexture(TEXTURE_CAUSTICS, m_sprites[causticsFrame].Texture, SAMPLER_NONE);
+		BindTexture(TEXTURE_CAUSTICS, m_sprites[causticsFrame].Texture, SAMPLER_NONE);
 
 		// Set shadow map data
 		if (shadowLight != nullptr)
@@ -2014,8 +2014,10 @@ namespace TEN::Renderer
 
 			BindLights(view.lightsToDraw);
 
-			// TODO: make caustics optional in Tomb Editor
-			m_stMisc.Caustics = false; // (nativeRoom->flags & ENV_FLAG_WATER);
+			m_stMisc.Caustics = (nativeRoom->flags & ENV_FLAG_WATER);
+			m_cbMisc.updateData(m_stMisc, m_context.Get());
+			BindConstantBufferPS(CB_MISC, m_cbMisc.get());
+			BindConstantBufferVS(CB_MISC, m_cbMisc.get());
 
 			m_stRoom.AmbientColor = room->AmbientLight;
 			m_stRoom.Water = (nativeRoom->flags & ENV_FLAG_WATER) != 0 ? 1 : 0;

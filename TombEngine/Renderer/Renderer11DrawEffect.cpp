@@ -918,6 +918,8 @@ namespace TEN::Renderer
 
 		spriteBuckets.push_back(currentSpriteBucket);
 
+		BindRenderTargetAsTexture(TEXTURE_DEPTH_MAP, &m_depthMap, SAMPLER_LINEAR_CLAMP);
+
 		SetDepthState(DEPTH_STATE_READ_ONLY_ZBUFFER);
 		SetCullMode(CULL_MODE_NONE);
 
