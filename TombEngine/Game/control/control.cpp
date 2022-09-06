@@ -411,7 +411,6 @@ GameStatus DoTitle(int index, std::string const& ambient)
 
 		// Run the level script
 		ScriptInterfaceLevel* level = g_GameFlow->GetLevel(index);
-		g_GameScript->ExecuteScriptFile("Scripts/NodeFunctions.lua");
 
 		if (!level->ScriptFileName.empty())
 		{
@@ -516,7 +515,6 @@ GameStatus DoLevel(int index, std::string const& ambient, bool loadFromSavegame)
 
 	// Run the level script
 	ScriptInterfaceLevel* level = g_GameFlow->GetLevel(index);
-	g_GameScript->ExecuteScriptFile("Scripts/NodeFunctions.lua");
 
 	if (!level->ScriptFileName.empty())
 	{
@@ -571,9 +569,8 @@ GameStatus DoLevel(int index, std::string const& ambient, bool loadFromSavegame)
 	// Initialise flyby cameras
 	InitSpotCamSequences();
 
-	// Initialise ponytails
 	InitialiseHair();
-
+	InitialiseNodeScripts();
 	InitialiseItemBoxData();
 
 	if (loadFromSavegame)

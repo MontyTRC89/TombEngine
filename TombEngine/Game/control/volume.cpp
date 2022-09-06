@@ -1,6 +1,7 @@
 #include "framework.h"
 #include "Game/control/volume.h"
 
+#include <filesystem>
 #include "Game/animation.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
@@ -159,6 +160,15 @@ namespace TEN::Control::Volumes
 
 	void InitialiseNodeScripts()
 	{
+		if (!std::filesystem::exists("Scripts/NodeScripting/"))
+			return;
+
+		for (auto& path : std::filesystem::recursive_directory_iterator("Scripts/NodeScripting/"))
+		{
+			if (path.path().extension() == ".lua")
+				g_GameScript->ExecuteScriptFile(path.path().string());
+		}
+
 		for (auto& set : g_Level.EventSets)
 		{
 			if ((set.OnEnter.Mode == VolumeEventMode::NodeEditor) && (set.OnEnter.Data.size() > 0))
