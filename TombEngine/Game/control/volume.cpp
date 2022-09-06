@@ -160,7 +160,7 @@ namespace TEN::Control::Volumes
 
 	void InitialiseNodeScripts()
 	{
-		static const std::string nodeScriptPath = "Scripts/NodeScripting/";
+		static const std::string nodeScriptPath = "Scripts/NodeCatalogs/";
 
 		if (!std::filesystem::exists(nodeScriptPath))
 			return;
