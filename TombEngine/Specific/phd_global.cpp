@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "Specific/phd_global.h"
 
-BOUNDING_BOX operator+(const BOUNDING_BOX& box, const PHD_3DPOS& vec)
+BOUNDING_BOX operator+(const BOUNDING_BOX& box, const PoseData& vec)
 {
 	BOUNDING_BOX box2 = box;
 	box2.X1 += vec.Position.x;

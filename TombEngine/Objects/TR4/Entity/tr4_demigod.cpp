@@ -150,7 +150,7 @@ namespace TEN::Entities::TR4
 		}
 	}
 
-	void TriggerDemigodMissile(PHD_3DPOS* pose, short roomNumber, int flags)
+	void TriggerDemigodMissile(PoseData* pose, short roomNumber, int flags)
 	{
 		short fxNumber = CreateNewEffect(roomNumber);
 		if (fxNumber != -1)
@@ -196,7 +196,7 @@ namespace TEN::Entities::TR4
 				GetJointAbsPosition(item, &pos2, 16);
 
 				auto angles = GetOrientTowardPoint(pos1.ToVector3(), pos2.ToVector3());
-				auto pose = PHD_3DPOS(pos1, angles);
+				auto pose = PoseData(pos1, angles);
 				if (item->ObjectNumber == ID_DEMIGOD3)
 					TriggerDemigodMissile(&pose, item->RoomNumber, 3);
 				else
@@ -214,7 +214,7 @@ namespace TEN::Entities::TR4
 				GetJointAbsPosition(item, &pos2, 16);
 
 				auto angles = GetOrientTowardPoint(pos1.ToVector3(), pos2.ToVector3());
-				auto pose = PHD_3DPOS(pos1, angles);
+				auto pose = PoseData(pos1, angles);
 				if (item->ObjectNumber == ID_DEMIGOD3)
 					TriggerDemigodMissile(&pose, item->RoomNumber, 3);
 				else
@@ -242,7 +242,7 @@ namespace TEN::Entities::TR4
 				}
 
 				auto angles = GetOrientTowardPoint(pos1.ToVector3(), pos2.ToVector3());
-				auto pose = PHD_3DPOS(pos1, angles);
+				auto pose = PoseData(pos1, angles);
 				TriggerDemigodMissile(&pose, item->RoomNumber, 4);
 			}
 		}
@@ -699,7 +699,7 @@ namespace TEN::Entities::TR4
 					else
 						pos.y = height - 128;
 
-					TriggerShockwave((PHD_3DPOS*)&pos, 24, 88, 256, 128, 128, 128, 32, 0, 2);
+					TriggerShockwave((PoseData*)&pos, 24, 88, 256, 128, 128, 128, 32, 0, 2);
 					TriggerHammerSmoke(pos.x, pos.y + 128, pos.z, 8);
 
 					Camera.bounce = -128;

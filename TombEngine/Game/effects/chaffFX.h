@@ -14,7 +14,7 @@ void TriggerChaffSmoke(Vector3i* pos, Vector3i* vel, int speed, bool moving, boo
 
 void TriggerChaffBubbles(Vector3i* pos, int FlareRoomNumber);
 
-/* void TriggerChaffEffects(ItemInfo* item, PHD_3DPOS pos, short angle, int speed, bool underwater);
-void TriggerChaffSparkles(PHD_3DPOS pos, short angle, int speed);
-void TriggerChaffSmoke(PHD_3DPOS pos, short angle, int speed, bool moving);
-void TriggerChaffBubbles(PHD_3DPOS pos, int FlareRoomNumber); */
+/* void TriggerChaffEffects(ItemInfo* item, PoseData pos, short angle, int speed, bool underwater);
+void TriggerChaffSparkles(PoseData pos, short angle, int speed);
+void TriggerChaffSmoke(PoseData pos, short angle, int speed, bool moving);
+void TriggerChaffBubbles(PoseData pos, int FlareRoomNumber); */

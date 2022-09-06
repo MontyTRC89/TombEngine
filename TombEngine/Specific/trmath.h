@@ -29,7 +29,7 @@ short FROM_RAD(float angle);
 float TO_DEGREES(short angle);
 float TO_RAD(short angle); 
 
-BoundingOrientedBox TO_DX_BBOX(PHD_3DPOS pos, BOUNDING_BOX* box);
+BoundingOrientedBox TO_DX_BBOX(PoseData pos, BOUNDING_BOX* box);
 
 float phd_sin(short a);
 float phd_cos(short a);
@@ -38,7 +38,7 @@ const Vector3 GetRandomVector();
 const Vector3 GetRandomVectorInCone(const Vector3& direction,const float angleDegrees);
 int mGetAngle(int x1, int y1, int x2, int y2);
 int phd_atan(int dz, int dx);
-void phd_RotBoundingBoxNoPersp(PHD_3DPOS* pos, BOUNDING_BOX* bounds, BOUNDING_BOX* tbounds);
+void phd_RotBoundingBoxNoPersp(PoseData* pos, BOUNDING_BOX* bounds, BOUNDING_BOX* tbounds);
 
 void InterpolateAngle(short angle, short* rotation, short* outAngle, int shift);
 void GetMatrixFromTrAngle(Matrix* matrix, short* framePtr, int index);

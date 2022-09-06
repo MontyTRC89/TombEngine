@@ -341,7 +341,7 @@ namespace TEN::Entities::Vehicles
 
 				if ((GetRandomControl() & 1) == 0)
 				{
-					auto pos2 = PHD_3DPOS(
+					auto pos2 = PoseData(
 						pos.x + (GetRandomControl() & 63) - 32,
 						pos.y + UPV_SHIFT,
 						pos.z + (GetRandomControl() & 63) - 32
@@ -675,7 +675,7 @@ namespace TEN::Entities::Vehicles
 					//sub->Flags &= ~UPV_FLAG_CONTROL; having this here causes the UPV glitch, moving it directly to the states' code is better
 
 					StopSoundEffect(SFX_TR3_VEHICLE_UPV_LOOP);
-					SoundEffect(SFX_TR3_VEHICLE_UPV_STOP, (PHD_3DPOS*)&UPVItem->Pose.Position.x, SoundEnvironment::Always);
+					SoundEffect(SFX_TR3_VEHICLE_UPV_STOP, (PoseData*)&UPVItem->Pose.Position.x, SoundEnvironment::Always);
 				}
 			}
 			else if (TrInput & VEHICLE_IN_ACCELERATE)
@@ -699,7 +699,7 @@ namespace TEN::Entities::Vehicles
 				UPVItem->Pose.Orientation.x += ANGLE(1.0f);
 
 				if (frame == UPV_MOUNT_WATER_SURFACE_SOUND_FRAME)
-					SoundEffect(SFX_TR3_VEHICLE_UPV_LOOP, (PHD_3DPOS*)&UPVItem->Pose.Position.x, SoundEnvironment::Always);
+					SoundEffect(SFX_TR3_VEHICLE_UPV_LOOP, (PoseData*)&UPVItem->Pose.Position.x, SoundEnvironment::Always);
 
 				if (frame == UPV_MOUNT_WATER_SURFACE_CONTROL_FRAME)
 					UPV->Flags |= UPV_FLAG_CONTROL;
@@ -708,7 +708,7 @@ namespace TEN::Entities::Vehicles
 			else if (anim == UPV_ANIM_MOUNT_UNDERWATER)
 			{
 				if (frame == UPV_MOUNT_UNDERWATER_SOUND_FRAME)
-					SoundEffect(SFX_TR3_VEHICLE_UPV_LOOP, (PHD_3DPOS*)&UPVItem->Pose.Position.x, SoundEnvironment::Always);
+					SoundEffect(SFX_TR3_VEHICLE_UPV_LOOP, (PoseData*)&UPVItem->Pose.Position.x, SoundEnvironment::Always);
 
 				if (frame == UPV_MOUNT_UNDERWATER_CONTROL_FRAME)
 					UPV->Flags |= UPV_FLAG_CONTROL;
@@ -1007,7 +1007,7 @@ namespace TEN::Entities::Vehicles
 			DoVehicleCollision(UPVItem, UPV_RADIUS);
 
 			if (UPV->Flags & UPV_FLAG_CONTROL)
-				SoundEffect(SFX_TR3_VEHICLE_UPV_LOOP, (PHD_3DPOS*)&UPVItem->Pose.Position.x, SoundEnvironment::Always, 1.0f + (float)UPVItem->Animation.Velocity.z / 96.0f);
+				SoundEffect(SFX_TR3_VEHICLE_UPV_LOOP, (PoseData*)&UPVItem->Pose.Position.x, SoundEnvironment::Always, 1.0f + (float)UPVItem->Animation.Velocity.z / 96.0f);
 
 			UPVItem->Animation.AnimNumber = Objects[ID_UPV].animIndex + (laraItem->Animation.AnimNumber - Objects[ID_UPV_LARA_ANIMS].animIndex);
 			UPVItem->Animation.FrameNumber = g_Level.Anims[UPVItem->Animation.AnimNumber].frameBase + (laraItem->Animation.FrameNumber - g_Level.Anims[laraItem->Animation.AnimNumber].frameBase);

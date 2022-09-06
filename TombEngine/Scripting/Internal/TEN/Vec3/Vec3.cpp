@@ -59,11 +59,11 @@ Vec3::Vec3(int aX, int aY, int aZ) : x{aX}, y{aY}, z{aZ}
 {
 }
 
-Vec3::Vec3(PHD_3DPOS const& pos) : x{pos.Position.x}, y{pos.Position.y}, z{pos.Position.z}
+Vec3::Vec3(PoseData const& pos) : x{pos.Position.x}, y{pos.Position.y}, z{pos.Position.z}
 {
 }
 
-void Vec3::StoreInPHDPos(PHD_3DPOS& pos) const
+void Vec3::StoreInPHDPos(PoseData& pos) const
 {
 	pos.Position.x = x;
 	pos.Position.y = y;

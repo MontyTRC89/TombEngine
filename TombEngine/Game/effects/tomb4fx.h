@@ -65,7 +65,7 @@ struct SHOCKWAVE_STRUCT
 
 struct GUNSHELL_STRUCT
 {
-	PHD_3DPOS pos;
+	PoseData pos;
 	short fallspeed;
 	short roomNumber;
 	short speed;
@@ -238,7 +238,7 @@ void UpdateDrips();
 void TriggerLaraDrips(ItemInfo* item);
 void ExplodingDeath(short itemNumber, short flags); // EXPLODE_ flags
 int GetFreeShockwave();
-void TriggerShockwave(PHD_3DPOS* pos, short innerRad, short outerRad, int speed, unsigned char r, unsigned char g, unsigned char b, unsigned char life, short angle, short flags);
+void TriggerShockwave(PoseData* pos, short innerRad, short outerRad, int speed, unsigned char r, unsigned char g, unsigned char b, unsigned char life, short angle, short flags);
 void TriggerShockwaveHitEffect(int x, int y, int z, unsigned char r, unsigned char g, unsigned char b, short rot, int vel);
 void UpdateShockwaves();
 void TriggerSmallSplash(int x, int y, int z, int number);

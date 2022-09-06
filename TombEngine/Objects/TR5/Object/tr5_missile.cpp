@@ -117,9 +117,9 @@ void MissileControl(short itemNumber)
 			{
 				TriggerExplosionSparks(x, y, z, 3, -2, 2, fx->roomNumber);
 				fx->pos.Position.y -= 64;
-				TriggerShockwave((PHD_3DPOS*)fx, 48, 256, 64, 64, 128, 0, 24, 0, 1);
+				TriggerShockwave((PoseData*)fx, 48, 256, 64, 64, 128, 0, 24, 0, 1);
 				fx->pos.Position.y -= 128;
-				TriggerShockwave((PHD_3DPOS*)fx, 48, 256, 48, 64, 128, 0, 24, 0, 1);
+				TriggerShockwave((PoseData*)fx, 48, 256, 48, 64, 128, 0, 24, 0, 1);
 			}
 			else if (fx->flag1 == 2)
 			{
@@ -130,12 +130,12 @@ void MissileControl(short itemNumber)
 		else
 		{
 			TriggerExplosionSparks(x, y, z, 3, -2, 0, fx->roomNumber);
-			TriggerShockwave((PHD_3DPOS*)fx, 48, 240, 48, 0, 96, 128, 24, 0, 2);
+			TriggerShockwave((PoseData*)fx, 48, 240, 48, 0, 96, 128, 24, 0, 2);
 		}
 		
 		KillEffect(itemNumber);
 	}
-	else if (ItemNearLara((PHD_3DPOS*)fx, 200))
+	else if (ItemNearLara((PoseData*)fx, 200))
 	{
 		if (fx->flag1)
 		{
@@ -144,9 +144,9 @@ void MissileControl(short itemNumber)
 				// ROMAN_GOD hit effect
 				TriggerExplosionSparks(x, y, z, 3, -2, 2, fx->roomNumber);
 				fx->pos.Position.y -= 64;
-				TriggerShockwave((PHD_3DPOS*)fx, 48, 256, 64, 0, 128, 64, 24, 0, 1);
+				TriggerShockwave((PoseData*)fx, 48, 256, 64, 0, 128, 64, 24, 0, 1);
 				fx->pos.Position.y -= 128;
-				TriggerShockwave((PHD_3DPOS*)fx, 48, 256, 48, 0, 128, 64, 24, 0, 1);
+				TriggerShockwave((PoseData*)fx, 48, 256, 48, 0, 128, 64, 24, 0, 1);
 				KillEffect(itemNumber);
 				DoDamage(LaraItem, 200);
 			}
@@ -169,7 +169,7 @@ void MissileControl(short itemNumber)
 		{
 			// HYDRA hit effect
 			TriggerExplosionSparks(x, y, z, 3, -2, 0, fx->roomNumber);
-			TriggerShockwave((PHD_3DPOS*)fx, 48, 240, 48, 0, 96, 128, 24, 0, 0);
+			TriggerShockwave((PoseData*)fx, 48, 240, 48, 0, 96, 128, 24, 0, 0);
 			if (LaraItem->HitPoints >= 500)
 				DoDamage(LaraItem, 300);
 			else

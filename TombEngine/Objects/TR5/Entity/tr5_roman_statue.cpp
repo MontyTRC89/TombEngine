@@ -224,7 +224,7 @@ namespace TEN::Entities::TR5
 		spark->sSize = (spark->size = factor * ((GetRandomControl() & 0x1F) + 64)) / 16;
 	}
 
-	static void RomanStatueAttack(PHD_3DPOS* pos, short roomNumber, short count)
+	static void RomanStatueAttack(PoseData* pos, short roomNumber, short count)
 	{
 		short fxNumber = CreateNewEffect(roomNumber);
 
@@ -593,7 +593,7 @@ namespace TEN::Entities::TR5
 								if (StaticObjects[mesh->staticNumber].shatterType != SHT_NONE)
 								{
 									ShatterObject(0, mesh, -64, LaraItem->RoomNumber, 0);
-									SoundEffect(GetShatterSound(mesh->staticNumber), (PHD_3DPOS*)mesh);
+									SoundEffect(GetShatterSound(mesh->staticNumber), (PoseData*)mesh);
 
 									mesh->flags &= ~StaticMeshFlags::SM_VISIBLE;
 									floor->Stopper = false;
@@ -627,10 +627,10 @@ namespace TEN::Entities::TR5
 							if (item->ItemFlags[0])
 								item->ItemFlags[0]--;
 
-							TriggerShockwave((PHD_3DPOS*)&pos1, 16, 160, 96, 0, 64, 128, 48, 0, 1);
+							TriggerShockwave((PoseData*)&pos1, 16, 160, 96, 0, 64, 128, 48, 0, 1);
 							TriggerRomanStatueShockwaveAttackSparks(pos1.x, pos1.y, pos1.z, 128, 64, 0, 128);
 							pos1.y -= 64;
-							TriggerShockwave((PHD_3DPOS*)&pos1, 16, 160, 64, 0, 64, 128, 48, 0, 1);
+							TriggerShockwave((PoseData*)&pos1, 16, 160, 64, 0, 64, 128, 48, 0, 1);
 						}
 
 						deltaFrame = item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase;
@@ -733,7 +733,7 @@ namespace TEN::Entities::TR5
 					GetJointAbsPosition(item, &pos2, 14);
 
 				auto angles = GetOrientTowardPoint(pos2.ToVector3(), pos1.ToVector3());
-				auto attackPos = PHD_3DPOS(pos2, angles);
+				auto attackPos = PoseData(pos2, angles);
 
 					short roomNumber = item->RoomNumber;
 					GetFloor(pos2.x, pos2.y, pos2.z, &roomNumber);

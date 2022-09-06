@@ -78,9 +78,9 @@ void LoadSavegameInfos()
 	}
 }
 
-PHD_3DPOS ToPHD(Save::Position const* src)
+PoseData ToPHD(Save::Position const* src)
 {
-	PHD_3DPOS dest;
+	PoseData dest;
 	dest.Position.x = src->x_pos();
 	dest.Position.y = src->y_pos();
 	dest.Position.z = src->z_pos();
@@ -90,7 +90,7 @@ PHD_3DPOS ToPHD(Save::Position const* src)
 	return dest;
 }
 
-Save::Position FromPHD(PHD_3DPOS const& src)
+Save::Position FromPHD(PoseData const& src)
 {
 	return Save::Position{
 		src.Position.x,

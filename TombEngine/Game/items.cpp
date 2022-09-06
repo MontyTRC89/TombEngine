@@ -597,7 +597,7 @@ short SpawnItem(ItemInfo* item, GAME_OBJECT_ID objectNumber)
 
 		spawn->ObjectNumber = objectNumber;
 		spawn->RoomNumber = item->RoomNumber;
-		memcpy(&spawn->Pose, &item->Pose, sizeof(PHD_3DPOS));
+		memcpy(&spawn->Pose, &item->Pose, sizeof(PoseData));
 
 		InitialiseItem(itemNumber);
 

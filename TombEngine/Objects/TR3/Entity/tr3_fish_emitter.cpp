@@ -285,7 +285,7 @@ namespace TEN::Entities::TR3
 		{
 			if (item->Flags & OCB_FISH_LETAL)
 			{
-				PHD_3DPOS pos;
+				PoseData pos;
 				pos.Position.x = item->Pose.Position.x + fish->x;
 				pos.Position.y = item->Pose.Position.y + fish->y;
 				pos.Position.z = item->Pose.Position.z + fish->z;
@@ -401,7 +401,7 @@ namespace TEN::Entities::TR3
 		}
 	}
 
-	bool FishNearLara(PHD_3DPOS* pos, int distance, ItemInfo* item)
+	bool FishNearLara(PoseData* pos, int distance, ItemInfo* item)
 	{
 		int x = pos->Position.x - item->Pose.Position.x;
 		int y = abs(pos->Position.y - item->Pose.Position.y);

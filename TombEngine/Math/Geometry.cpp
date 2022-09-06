@@ -92,7 +92,7 @@
 		return EulerAngles(xOrient, yOrient, 0.0f);
 	}
 
-	bool IsPointInFront(const PHD_3DPOS& pose, const Vector3& target)
+	bool IsPointInFront(const PoseData& pose, const Vector3& target)
 	{
 		return IsPointInFront(pose.Position.ToVector3(), target, pose.Orientation);
 	}
@@ -128,7 +128,7 @@
 		return false;
 	}
 
-	bool IsPointOnLeft(const PHD_3DPOS& pose, const Vector3& target)
+	bool IsPointOnLeft(const PoseData& pose, const Vector3& target)
 	{
 		return IsPointOnLeft(pose.Position.ToVector3(), target, pose.Orientation);
 	}

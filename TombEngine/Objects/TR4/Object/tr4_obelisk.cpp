@@ -46,8 +46,8 @@ void ObeliskControl(short itemNumber)
 	auto* item = &g_Level.Items[itemNumber];
 
 	short someNumber;
-	PHD_3DPOS pos;
-	PHD_3DPOS pos2;
+	PoseData pos;
+	PoseData pos2;
 
 	if (TriggerActive(item))
 	{

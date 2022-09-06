@@ -453,7 +453,7 @@ bool MoveLaraPosition(Vector3i* vec, ItemInfo* item, ItemInfo* laraItem)
 {
 	auto* lara = GetLaraInfo(laraItem);
 
-	auto target = PHD_3DPOS(item->Pose.Orientation);
+	auto target = PoseData(item->Pose.Orientation);
 	auto pos = vec->ToVector3();
 
 	Matrix matrix = Matrix::CreateFromYawPitchRoll(
@@ -501,7 +501,7 @@ static bool ItemInRange(int x, int z, int radius)
 	return ((SQUARE(x) + SQUARE(z)) <= SQUARE(radius));
 }
 
-bool ItemNearLara(PHD_3DPOS* pos, int radius)
+bool ItemNearLara(PoseData* pos, int radius)
 {
 	auto target = GameVector(
 		pos->Position.x - LaraItem->Pose.Position.x,
@@ -525,7 +525,7 @@ bool ItemNearLara(PHD_3DPOS* pos, int radius)
 	return false;
 }
 
-bool ItemNearTarget(PHD_3DPOS* src, ItemInfo* target, int radius)
+bool ItemNearTarget(PoseData* src, ItemInfo* target, int radius)
 {
 	auto pos = src->Position - target->Pose.Position;
 
@@ -545,7 +545,7 @@ bool ItemNearTarget(PHD_3DPOS* src, ItemInfo* target, int radius)
 	return false;
 }
 
-bool Move3DPosTo3DPos(PHD_3DPOS* origin, PHD_3DPOS* target, int velocity, short angleAdd)
+bool Move3DPosTo3DPos(PoseData* origin, PoseData* target, int velocity, short angleAdd)
 {
 	auto direction = target->Position - origin->Position;
 	int distance = sqrt(SQUARE(direction.x) + SQUARE(direction.y) + SQUARE(direction.z));
@@ -891,7 +891,7 @@ void CollideSolidStatics(ItemInfo* item, CollisionInfo* coll)
 	}
 }
 
-bool CollideSolidBounds(ItemInfo* item, BOUNDING_BOX* box, PHD_3DPOS pos, CollisionInfo* coll)
+bool CollideSolidBounds(ItemInfo* item, BOUNDING_BOX* box, PoseData pos, CollisionInfo* coll)
 {
 	bool result = false;
 
@@ -936,11 +936,11 @@ bool CollideSolidBounds(ItemInfo* item, BOUNDING_BOX* box, PHD_3DPOS pos, Collis
 	}
 
 	// Get and test DX item coll bounds
-	auto collBounds = TO_DX_BBOX(PHD_3DPOS(item->Pose.Position), &collBox);
+	auto collBounds = TO_DX_BBOX(PoseData(item->Pose.Position), &collBox);
 	bool intersects = staticBounds.Intersects(collBounds);
 
 	// Check if previous item horizontal position intersects bounds
-	auto oldCollBounds = TO_DX_BBOX(PHD_3DPOS(coll->Setup.OldPosition.x, item->Pose.Position.y, coll->Setup.OldPosition.z), &collBox);
+	auto oldCollBounds = TO_DX_BBOX(PoseData(coll->Setup.OldPosition.x, item->Pose.Position.y, coll->Setup.OldPosition.z), &collBox);
 	bool oldHorIntersects = staticBounds.Intersects(oldCollBounds);
 
 	// Draw item coll bounds
@@ -1030,7 +1030,7 @@ bool CollideSolidBounds(ItemInfo* item, BOUNDING_BOX* box, PHD_3DPOS pos, Collis
 		return false;
 
 	// Check if bounds still collide after top/bottom position correction
-	if (!staticBounds.Intersects(TO_DX_BBOX(PHD_3DPOS(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z), &collBox)))
+	if (!staticBounds.Intersects(TO_DX_BBOX(PoseData(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z), &collBox)))
 		return result;
 
 	// Determine identity rotation/distance
@@ -1839,7 +1839,7 @@ void DoObjectCollision(ItemInfo* laraItem, CollisionInfo* coll)
 				!harmless && abs(laraItem->Animation.Velocity.z) > VEHICLE_COLLISION_TERMINAL_VELOCITY &&
 				StaticObjects[mesh->staticNumber].shatterType != SHT_NONE)
 			{
-				SoundEffect(GetShatterSound(mesh->staticNumber), (PHD_3DPOS*)mesh);
+				SoundEffect(GetShatterSound(mesh->staticNumber), (PoseData*)mesh);
 				ShatterObject(nullptr, mesh, -128, laraItem->RoomNumber, 0);
 				SmashedMeshRoom[SmashedMeshCount] = laraItem->RoomNumber;
 				SmashedMesh[SmashedMeshCount] = mesh;

@@ -71,7 +71,7 @@ int phd_atan(int x, int y)
 	return FROM_RAD(atan2(y, x));
 }
 
-void phd_RotBoundingBoxNoPersp(PHD_3DPOS* pos, BOUNDING_BOX* bounds, BOUNDING_BOX* tbounds)
+void phd_RotBoundingBoxNoPersp(PoseData* pos, BOUNDING_BOX* bounds, BOUNDING_BOX* tbounds)
 {
 	auto world = Matrix::CreateFromYawPitchRoll(
 		TO_RAD(pos->Orientation.y),
@@ -151,7 +151,7 @@ void GetMatrixFromTrAngle(Matrix* matrix, short* framePtr, int index)
 	}
 }
 
-BoundingOrientedBox TO_DX_BBOX(PHD_3DPOS pos, BOUNDING_BOX* box)
+BoundingOrientedBox TO_DX_BBOX(PoseData pos, BOUNDING_BOX* box)
 {
 	auto boxCentre = Vector3((box->X2 + box->X1) / 2.0f, (box->Y2 + box->Y1) / 2.0f, (box->Z2 + box->Z1) / 2.0f);
 	auto boxExtent = Vector3((box->X2 - box->X1) / 2.0f, (box->Y2 - box->Y1) / 2.0f, (box->Z2 - box->Z1) / 2.0f);

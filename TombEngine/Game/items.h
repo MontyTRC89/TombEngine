@@ -77,8 +77,8 @@ struct ItemInfo
 
 	ITEM_DATA Data;
 	EntityAnimationData Animation;
-	PHD_3DPOS StartPose;
-	PHD_3DPOS Pose;
+	PoseData StartPose;
+	PoseData Pose;
 	ROOM_VECTOR Location;
 	short RoomNumber;
 	int Floor;

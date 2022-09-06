@@ -559,7 +559,7 @@ void DrawAnimatingItem(ItemInfo* item)
 	// Empty stub because actually we disable items drawing when drawRoutine pointer is nullptr in ObjectInfo
 }
 
-void ClampRotation(PHD_3DPOS* pose, short angle, short rotation)
+void ClampRotation(PoseData* pose, short angle, short rotation)
 {
 	if (angle <= rotation)
 	{

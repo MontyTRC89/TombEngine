@@ -625,7 +625,7 @@ namespace TEN::Entities::Effects
 
 				TriggerDynamicLight(x, item->Pose.Position.y, z, 12, (GetRandomControl() & 0x3F) + 192, ((GetRandomControl() >> 4) & 0x1F) + 96, 0);
 
-				auto pos = PHD_3DPOS(item->Pose.Position);
+				auto pos = PoseData(item->Pose.Position);
 
 				if (ItemNearLara(&pos, 600))
 				{

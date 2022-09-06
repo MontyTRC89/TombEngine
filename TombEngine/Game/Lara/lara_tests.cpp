@@ -678,7 +678,7 @@ CornerTestResult TestItemAtNextCornerPosition(ItemInfo* item, CollisionInfo* col
 	auto turnAngle = outer ? angle : -angle;
 
 	// Backup previous position into array
-	PHD_3DPOS pos[3] = { item->Pose, item->Pose, item->Pose };
+	PoseData pos[3] = { item->Pose, item->Pose, item->Pose };
 
 	// Do a two-step rotation check. First step is real resulting position, and second step is probing
 	// position. We need this because checking at exact ending position does not always return

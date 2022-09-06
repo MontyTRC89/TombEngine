@@ -498,7 +498,7 @@ namespace TEN::Entities::TR4
 		}
 	}
 
-	void SethaThrowAttack(PHD_3DPOS* pose, short roomNumber, short mesh)
+	void SethaThrowAttack(PoseData* pose, short roomNumber, short mesh)
 	{
 		short fxNumber = CreateNewEffect(roomNumber);
 		if (fxNumber != -1)
@@ -591,7 +591,7 @@ namespace TEN::Entities::TR4
 				GetJointAbsPosition(item, &pos, SethaAttack1.meshNum);
 
 				auto angles = GetOrientTowardPoint(pos1.ToVector3(), pos.ToVector3());
-				auto attackPose = PHD_3DPOS(pos1, angles);
+				auto attackPose = PoseData(pos1, angles);
 				SethaThrowAttack(&attackPose, item->RoomNumber, 0);
 			}
 			else if (item->ItemFlags[0] >= 122 && item->ItemFlags[0] <= 125)
@@ -601,7 +601,7 @@ namespace TEN::Entities::TR4
 				GetJointAbsPosition(item, &pos, SethaAttack2.meshNum);
 
 				auto angles = GetOrientTowardPoint(pos2.ToVector3(), pos.ToVector3());
-				auto attackPose = PHD_3DPOS(pos2, angles);
+				auto attackPose = PoseData(pos2, angles);
 				SethaThrowAttack(&attackPose, item->RoomNumber, 0);
 			}
 
@@ -630,7 +630,7 @@ namespace TEN::Entities::TR4
 					GetJointAbsPosition(item, &pos, SethaAttack1.meshNum);
 
 					auto angles = GetOrientTowardPoint(pos1.ToVector3(), pos.ToVector3());
-					auto attackPose = PHD_3DPOS(pos1, angles);
+					auto attackPose = PoseData(pos1, angles);
 					SethaThrowAttack(&attackPose, item->RoomNumber, 0);
 
 					pos = Vector3i(SethaAttack2.Position);
@@ -638,7 +638,7 @@ namespace TEN::Entities::TR4
 					GetJointAbsPosition(item, &pos, SethaAttack2.meshNum);
 
 					angles = GetOrientTowardPoint(pos2.ToVector3(), pos.ToVector3());
-					attackPose = PHD_3DPOS(pos2, angles);
+					attackPose = PoseData(pos2, angles);
 					SethaThrowAttack(&attackPose, item->RoomNumber, 0);
 				}
 			}
@@ -701,7 +701,7 @@ namespace TEN::Entities::TR4
 				GetJointAbsPosition(item, &pos, SethaAttack1.meshNum);
 
 				auto angles = GetOrientTowardPoint(pos1.ToVector3(), pos.ToVector3());
-				auto attackPose = PHD_3DPOS(pos1, angles);
+				auto attackPose = PoseData(pos1, angles);
 				SethaThrowAttack(&attackPose, item->RoomNumber, 0);
 			}
 

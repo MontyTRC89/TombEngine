@@ -99,7 +99,7 @@ void TriggerChaffEffects(ItemInfo* item, Vector3i* pos, Vector3i* vel, int speed
 		}
 	}
 
-	PHD_3DPOS position = item->Pose;
+	PoseData position = item->Pose;
 	if (item->IsLara())
 	{
 		Vector3i handPos = {};

@@ -40,7 +40,7 @@ enum SpriteEnumFlag
 
 struct FX_INFO
 {
-	PHD_3DPOS pos;
+	PoseData pos;
 	short roomNumber;
 	short objectNumber;
 	short nextFx;
@@ -216,4 +216,4 @@ void WadeSplash(ItemInfo* item, int wh, int wd);
 void Splash(ItemInfo* item);
 void TriggerRocketFire(int x, int y, int z);
 void TriggerExplosionBubbles(int x, int y, int z, short roomNumber);
-void Richochet(PHD_3DPOS* pos);
+void Richochet(PoseData* pos);

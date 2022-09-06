@@ -10,7 +10,7 @@ struct ItemInfo;
 
 struct HAIR_STRUCT
 {
-	PHD_3DPOS pos;
+	PoseData pos;
 	Vector3i hvel;
 	Vector3i unknown;
 

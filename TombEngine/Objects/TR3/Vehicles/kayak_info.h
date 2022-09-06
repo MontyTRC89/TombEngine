@@ -12,7 +12,7 @@ namespace TEN::Entities::Vehicles
 		int LeftVerticalVelocity = 0;
 		int RightVerticalVelocity = 0;
 
-		PHD_3DPOS OldPose = PHD_3DPOS();
+		PoseData OldPose = PoseData();
 		unsigned int LeftRightPaddleCount = 0;
 		int WaterHeight = 0;
 		bool Turn = false;

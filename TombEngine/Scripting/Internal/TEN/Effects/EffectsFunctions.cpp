@@ -232,7 +232,7 @@ namespace Effects
 */
 	static void EmitShockwave(Vec3 pos, TypeOrNil<int> innerRadius, TypeOrNil<int> outerRadius, TypeOrNil<ScriptColor> col, TypeOrNil<float> lifetime, TypeOrNil<int> speed, TypeOrNil<int> angle, TypeOrNil<bool> hurtsLara)
 	{
-		PHD_3DPOS p;
+		PoseData p;
 		p.Position.x = pos.x;
 		p.Position.y = pos.y;
 		p.Position.z = pos.z;

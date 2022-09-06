@@ -36,17 +36,17 @@ bool TestLaraPosition(OBJECT_COLLISION_BOUNDS* bounds, ItemInfo* item, ItemInfo*
 bool AlignLaraPosition(Vector3i* vec, ItemInfo* item, ItemInfo* laraItem);
 bool MoveLaraPosition(Vector3i* pos, ItemInfo* item, ItemInfo* laraItem);
 
-bool ItemNearLara(PHD_3DPOS* pos, int radius);
-bool ItemNearTarget(PHD_3DPOS* src, ItemInfo* target, int radius);
+bool ItemNearLara(PoseData* pos, int radius);
+bool ItemNearTarget(PoseData* src, ItemInfo* target, int radius);
 
-bool Move3DPosTo3DPos(PHD_3DPOS* src, PHD_3DPOS* dest, int velocity, short angleAdd);
+bool Move3DPosTo3DPos(PoseData* src, PoseData* dest, int velocity, short angleAdd);
 
 bool TestBoundsCollide(ItemInfo* item, ItemInfo* laraItem, int radius);
 bool TestBoundsCollideStatic(ItemInfo* item, MESH_INFO* mesh, int radius);
 bool ItemPushItem(ItemInfo* item, ItemInfo* laraItem, CollisionInfo* coll, bool spasmEnabled, char bigPush);
 bool ItemPushStatic(ItemInfo* laraItem, MESH_INFO* mesh, CollisionInfo* coll);
 
-bool CollideSolidBounds(ItemInfo* item, BOUNDING_BOX* box, PHD_3DPOS pos, CollisionInfo* coll);
+bool CollideSolidBounds(ItemInfo* item, BOUNDING_BOX* box, PoseData pos, CollisionInfo* coll);
 void CollideSolidStatics(ItemInfo* item, CollisionInfo* coll);
 
 void AIPickupCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);

@@ -5,5 +5,5 @@ namespace TEN::Entities::TR3
 {
 	void SetupShoal(int shoalNumber);
 	void ControlFish(short itemNumber);
-	bool FishNearLara(PHD_3DPOS* pos, int distance, ItemInfo* item);
+	bool FishNearLara(PoseData* pos, int distance, ItemInfo* item);
 }

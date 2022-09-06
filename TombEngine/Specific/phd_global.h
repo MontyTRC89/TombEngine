@@ -229,5 +229,5 @@ struct BOUNDING_BOX
 	int Height() { return abs(Y2 - Y1); }
 };
 
-BOUNDING_BOX operator+(const BOUNDING_BOX& box, const PHD_3DPOS& vec);
+BOUNDING_BOX operator+(const BOUNDING_BOX& box, const PoseData& vec);
 BOUNDING_BOX operator*(const BOUNDING_BOX& box, const float scale);

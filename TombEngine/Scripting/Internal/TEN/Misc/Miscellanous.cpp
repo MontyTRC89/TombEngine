@@ -122,7 +122,7 @@ namespace Misc
 
 	static void PlaySoundEffect(int id, sol::optional<Vec3> p)
 	{
-		SoundEffect(id, p.has_value() ? &PHD_3DPOS(p.value().x, p.value().y, p.value().z) : nullptr, SoundEnvironment::Always);
+		SoundEffect(id, p.has_value() ? &PoseData(p.value().x, p.value().y, p.value().z) : nullptr, SoundEnvironment::Always);
 	}
 
 	static bool KeyIsHeld(int actionIndex)

@@ -54,7 +54,7 @@ struct AI_OBJECT
 {
 	GAME_OBJECT_ID objectNumber;
 	short roomNumber;
-	PHD_3DPOS pos;
+	PoseData pos;
 	short triggerFlags;
 	short flags;
 	int boxNumber;
