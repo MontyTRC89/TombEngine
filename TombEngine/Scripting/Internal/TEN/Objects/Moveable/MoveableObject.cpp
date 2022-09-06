@@ -172,49 +172,13 @@ void Moveable::Register(sol::table & parent)
 // @treturn int a number representing the status of the object
 	ScriptReserved_GetStatus, &Moveable::GetStatus,
 		
-/// Set the name of the function to be called when the moveable is shot by Lara
-// Note that this will be triggered twice when shot with both pistols at once. 
-// @function Moveable:SetOnHit
-// @tparam string name of callback function to be called
 	ScriptReserved_SetOnHit, &Moveable::SetOnHit,
 
-/// Get the name of the function called when this moveable is shot
-// @function Moveable:GetOnHit
-// @treturn string name of the function
-	ScriptReserved_GetOnHit, &Moveable::GetOnHit,
-
-/// Set the name of the function called when this moveable collides with another moveable
-// @function Moveable:SetOnCollidedWithObject
-// @tparam string name of callback function to be called
 	ScriptReserved_SetOnCollidedWithObject, &Moveable::SetOnCollidedWithObject,
 
-/// Get the name of the function called when this moveable collides with another moveable
-// @function Moveable:GetOnCollidedWithObject
-// @treturn string name of the function
-	ScriptReserved_GetOnCollidedWithObject, &Moveable::GetOnCollidedWithObject,
-
-/// Set the name of the function called when this moveable collides with room geometry (e.g. a wall or floor)
-// @function Moveable:SetOnCollidedWithRoom
-// @tparam string name of callback function to be called
 	ScriptReserved_SetOnCollidedWithRoom, &Moveable::SetOnCollidedWithRoom,
 
-/// Get the name of the function called when this moveable collides with room geometry (e.g. a wall or floor)
-// @function Moveable:GetOnCollidedWithRoom
-// @treturn string name of the function
-	ScriptReserved_GetOnCollidedWithRoom, &Moveable::GetOnCollidedWithRoom,
-
-/// Set the name of the function to be called when the moveable is destroyed/killed
-// @function Moveable:SetOnKilled
-// @tparam string callback name of function to be called
-// @usage
-// LevelFuncs.baddyKilled = function(theBaddy) print("You killed a baddy!") end
-// baddy:SetOnKilled("baddyKilled")
 	ScriptReserved_SetOnKilled, &Moveable::SetOnKilled,
-
-/// Get the name of the function called when this moveable is killed
-// @function Moveable:GetOnKilled
-// @treturn string name of the function
-	ScriptReserved_GetOnKilled, &Moveable::GetOnKilled,
 
 /// Retrieve the object ID
 // @function Moveable:GetObjectID
@@ -472,54 +436,63 @@ void Moveable::SetObjectID(GAME_OBJECT_ID id)
 	m_item->ObjectNumber = id;
 }
 
-void Moveable::SetOnHit(std::string const & cbName)
+void SetLevelFuncCallback(TypeOrNil<LevelFunc> const & cb, std::string const & callerName, Moveable & mov, std::string & toModify)
 {
-	m_item->LuaCallbackOnHitName = cbName;
-}
-
-void Moveable::SetOnKilled(std::string const & cbName)
-{
-	m_item->LuaCallbackOnKilledName = cbName;
-}
-
-void Moveable::SetOnCollidedWithObject(std::string const & cbName)
-{
-	m_item->LuaCallbackOnCollidedWithObjectName = cbName;
-
-	if(cbName.empty())
-		dynamic_cast<ObjectsHandler*>(g_GameScriptEntities)->TryRemoveColliding(m_num);
+	if (std::holds_alternative<LevelFunc>(cb))
+	{
+		toModify = std::get<LevelFunc>(cb).m_funcName;
+		dynamic_cast<ObjectsHandler*>(g_GameScriptEntities)->TryAddColliding(mov.m_num);
+	}
+	else if (std::holds_alternative<sol::nil_t>(cb))
+	{
+		toModify = std::string{};
+		dynamic_cast<ObjectsHandler*>(g_GameScriptEntities)->TryRemoveColliding(mov.m_num);
+	}
 	else
-		dynamic_cast<ObjectsHandler*>(g_GameScriptEntities)->TryAddColliding(m_num);
+	{
+		ScriptAssert(false, "Tried giving " + mov.m_item->LuaName
+			+ " a non-LevelFunc object as an arg to "
+			+ callerName);
+	}
+
 }
 
-void Moveable::SetOnCollidedWithRoom(std::string const & cbName)
+/// Set the name of the function to be called when the moveable is shot by Lara
+// Note that this will be triggered twice when shot with both pistols at once. 
+// @function Moveable:SetOnHit
+// @tparam function callback function in LevelFuncs hierarchy to call when moveable is shot
+void Moveable::SetOnHit(TypeOrNil<LevelFunc> const & cb)
 {
-	m_item->LuaCallbackOnCollidedWithRoomName = cbName;
-
-	if(cbName.empty())
-		dynamic_cast<ObjectsHandler*>(g_GameScriptEntities)->TryRemoveColliding(m_num);
-	else
-		dynamic_cast<ObjectsHandler*>(g_GameScriptEntities)->TryAddColliding(m_num);
+	SetLevelFuncCallback(cb, ScriptReserved_SetOnHit, *this, m_item->LuaCallbackOnHitName);
 }
 
-std::string Moveable::GetOnHit() const
+/// Set the name of the function to be called when the moveable is destroyed/killed
+// Note that enemy death often occurs at the end of an animation, and not at the exact moment
+// the enemy's HP becomes zero.
+// @function Moveable:SetOnKilled
+// @tparam function callback function in LevelFuncs hierarchy to call when enemy is killed
+// @usage
+// LevelFuncs.baddyKilled = function(theBaddy) print("You killed a baddy!") end
+// baddy:SetOnKilled(LevelFuncs.baddyKilled)
+void Moveable::SetOnKilled(TypeOrNil<LevelFunc> const & cb)
 {
-	return m_item->LuaCallbackOnHitName;
+	SetLevelFuncCallback(cb, ScriptReserved_SetOnKilled, *this, m_item->LuaCallbackOnKilledName);
 }
 
-std::string Moveable::GetOnKilled() const
+/// Set the function to be called called when this moveable collides with another moveable
+// @function Moveable:SetOnCollidedWithObject
+// @tparam function func callback function to be called (must be in LevelFuncs hierarchy)
+void Moveable::SetOnCollidedWithObject(TypeOrNil<LevelFunc> const & cb)
 {
-	return m_item->LuaCallbackOnKilledName;
+	SetLevelFuncCallback(cb, ScriptReserved_SetOnCollidedWithObject, *this, m_item->LuaCallbackOnCollidedWithObjectName);
 }
 
-std::string Moveable::GetOnCollidedWithObject() const
+/// Set the function called when this moveable collides with room geometry (e.g. a wall or floor)
+// @function Moveable:SetOnCollidedWithRoom
+// @tparam function func callback function to be called (must be in LevelFuncs hierarchy)
+void Moveable::SetOnCollidedWithRoom(TypeOrNil<LevelFunc> const & cb)
 {
-	return m_item->LuaCallbackOnCollidedWithObjectName;
-}
-
-std::string Moveable::GetOnCollidedWithRoom() const
-{
-	return m_item->LuaCallbackOnCollidedWithRoomName;
+	SetLevelFuncCallback(cb, ScriptReserved_SetOnCollidedWithRoom, *this, m_item->LuaCallbackOnCollidedWithRoomName);
 }
 
 std::string Moveable::GetName() const
@@ -608,7 +581,7 @@ void Moveable::SetRot(Rotation const& rot)
 
 short Moveable::GetHP() const
 {
-	return(m_item->HitPoints);
+	return m_item->HitPoints;
 }
 
 void Moveable::SetHP(short hp)
