@@ -112,6 +112,7 @@ enum GAME_OBJECT_ID : short
 	ID_HAMMERHEAD,			// TR4 - OK
 	ID_CROCODILE_GOD,		// TR4 - OK (needs accurate testing)
 	ID_LOCUSTS_EMITTER,		// TR4 - OK
+	ID_LIONESS,				// TR1 Female Lion
 
 	/* Humans */
 	ID_SCUBA_HARPOON = 150,
@@ -162,6 +163,8 @@ enum GAME_OBJECT_ID : short
 	ID_HITMAN,
 	ID_SNIPER,
 	ID_CHEF,
+	ID_PRISONER,					//TR3 - No Code, disfunctional
+	ID_WINSTON,
 
 	/* Supernatural, boss and others */
 	ID_WINGED_MUMMY = 220,
@@ -237,6 +240,13 @@ enum GAME_OBJECT_ID : short
 	ID_BOSS_SHIELD,
 	ID_BOSS_EXPLOSION_SHOCKWAVE,
 	ID_BOSS_EXPLOSION_RING,
+	ID_WILLARD_SPIDER_BOSS,		//TR3 - No Code, disfunctional
+	ID_CRAWLER_MUTANT,			//TR3 - No Code, disfunctional
+	ID_BRUTE_MUTANT,			//TR3 - No Code, disfunctional
+	ID_TINNOS_MONSTER,			//TR3 - No Code, disfunctional
+	ID_TINNOS_WASP,				//TR3 - No Code, disfunctional
+
+
 
 	/* Traps / Doors */
 	ID_SPRINGBOARD = 320,
@@ -832,6 +842,9 @@ enum GAME_OBJECT_ID : short
 	ID_MESHSWAP_HITMAN,
 	ID_MESHSWAP_ROMAN_GOD1,
 	ID_MESHSWAP_ROMAN_GOD2,
+	ID_MESHSWAP_MONKEY_MEDIPACK,
+	ID_MESHSWAP_MONKEY_KEY,
+	ID_MESHSWAP_WINSTON_ARMY,
 
 	ID_ANIMATING1 = 1200,
 	ID_ANIMATING2,

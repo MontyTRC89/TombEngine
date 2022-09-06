@@ -19,6 +19,7 @@
 #include "Objects/TR1/Entity/tr1_big_rat.h" // OK
 #include "Objects/TR1/Entity/tr1_centaur.h"
 #include "Objects/TR1/Entity/tr1_winged_mutant.h"
+#include "Objects/TR1/Entity/tr1_lioness.h"
 #include "Objects/Utils/object_helper.h"
 
 using namespace TEN::Entities::TR1;
@@ -79,6 +80,27 @@ static void StartEntity(ObjectInfo* obj)
 		obj->saveAnim = true;
 		obj->saveFlags = true;
 		obj->zoneType = ZONE_APE;
+	}
+	obj = &Objects[ID_LIONESS];
+
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseLioness;
+		obj->collision = CreatureCollision;
+		obj->control = LionessControl;
+		obj->shadowType = ShadowMode::All;
+		obj->HitPoints = 40;
+		obj->hitEffect = HIT_BLOOD;
+		obj->pivotLength = 50;
+		obj->radius = 341;
+		obj->intelligent = true;
+		obj->savePosition = true;
+		obj->saveFlags = true;
+		obj->saveAnim = true;
+		obj->saveHitpoints = true;
+		obj->zoneType = ZONE_BASIC;
+		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
+		g_Level.Bones[obj->boneIndex + 19 * 4] |= ROT_Y;
 	}
 
 	obj = &Objects[ID_BIG_RAT];
