@@ -474,12 +474,9 @@ bool MoveLaraPosition(Vector3Int* vec, ItemInfo* item, ItemInfo* laraItem)
 	if (abs(height - laraItem->Pose.Position.y) <= CLICK(2))
 	{
 		auto direction = target.Position - laraItem->Pose.Position;
-
 		float distance = sqrt(SQUARE(direction.x) + SQUARE(direction.y) + SQUARE(direction.z));
 		if (distance < CLICK(0.5f))
-			return true;
-
-		return Move3DPosTo3DPos(&laraItem->Pose, &target, LARA_ALIGN_VELOCITY, ANGLE(2.0f));
+			return Move3DPosTo3DPos(&laraItem->Pose, &target, LARA_ALIGN_VELOCITY, ANGLE(2.0f));
 	}
 
 	if (lara->Control.IsMoving)
