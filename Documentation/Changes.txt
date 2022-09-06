@@ -1,11 +1,8 @@
 Version 1.0.2
 =============
 
-- EventSequence and Timer no longer require you to call Timer.UpdateAll in OnControlPhase.
-- TEN.Logic.AddCallback and TEN.Logic.RemoveCallback have been added.
-- GiveItem, TakeItem, and SetItemCount have been reworked (e.g. SetItemCount with a value of -1 can give infinite ammo/consumables).
-- Removing Pistols with TakeItem and SetItemCount now works correctly.
-- Vec3s can now be saved and loaded in LevelVars and GameVars.
+* Removing Pistols with TakeItem and SetItemCount now works correctly.
+* Vec3s can now be saved and loaded in LevelVars and GameVars.
 * Adjust max turn rate of idle state.
 * Align Lara on slopes when crouching, crawling, and dying.
 * Better slope alignment for large, flat enemies (i.e. big scorpion and crocodile).
@@ -18,6 +15,16 @@ Version 1.0.2
 * Fix incorrect viewport size in windowed mode.
 * Fix Lara's subway train death so that she no longer slides slowly after the animation has finished. 
 
+Lua API changes:
+* LevelFuncs can now contain tables as well as functions. These tables can contain functions and other tables, and so forth.
+* Moveable functions SetOnHit, SetOnKilled, SetOnCollidedWithObject and SetOnCollidedWithRoom no longer take strings, and instead take function objects themselves. The function still has to be in the LevelFuncs hierarchy:
+Before:
+baddy:SetOnHit("HealLara")
+After:
+baddy:SetOnHit(LevelFuncs.HealLara)
+* EventSequence and Timer no longer require you to call Timer.UpdateAll in OnControlPhase.
+* TEN.Logic.AddCallback and TEN.Logic.RemoveCallback have been added.
+* GiveItem, TakeItem, and SetItemCount have been reworked (e.g. SetItemCount with a value of -1 can give infinite ammo/consumables).
 
 Version 1.0.1
 =============
