@@ -18,13 +18,13 @@
 
 		Vector3 ToVector3() const;
 
-		bool		operator ==(const Vector3i& vector);
-		bool		operator !=(const Vector3i& vector);
-		Vector3i	operator +(const Vector3i& vector);
-		Vector3i	operator -(const Vector3i& vector);
-		Vector3i	operator *(const Vector3i& vector);
-		Vector3i	operator *(float value);
-		Vector3i	operator /(float value);
+		bool	  operator ==(const Vector3i& vector);
+		bool	  operator !=(const Vector3i& vector);
+		Vector3i  operator +(const Vector3i& vector);
+		Vector3i  operator -(const Vector3i& vector);
+		Vector3i  operator *(const Vector3i& vector);
+		Vector3i  operator *(float value);
+		Vector3i  operator /(float value);
 		Vector3i& operator =(const Vector3i& vector);
 		Vector3i& operator +=(const Vector3i& vector);
 		Vector3i& operator -=(const Vector3i& vector);

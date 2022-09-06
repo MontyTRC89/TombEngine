@@ -49,7 +49,7 @@ struct GameConfiguration
 	bool EnableThumbstickCameraControl;
 	short KeyboardLayout[TEN::Input::KEY_COUNT];
 
-	std::vector<Vector2Int> SupportedScreenResolutions;
+	std::vector<Vector2i> SupportedScreenResolutions;
 	std::string AdapterName;
 };
 

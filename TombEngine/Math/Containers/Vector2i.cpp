@@ -3,105 +3,105 @@
 
 //namespace TEN::Math
 //{
-	Vector2Int const Vector2Int::Zero = Vector2Int(0, 0);
+	Vector2i const Vector2i::Zero = Vector2i(0, 0);
 
-	Vector2Int::Vector2Int()
+	Vector2i::Vector2i()
 	{
 	}
 
-	Vector2Int::Vector2Int(int x, int y)
+	Vector2i::Vector2i(int x, int y)
 	{
 		this->x = x;
 		this->y = y;
 	}
 
-	Vector2Int::Vector2Int(Vector2 vector)
+	Vector2i::Vector2i(const Vector2& vector)
 	{
 		this->x = (int)round(vector.x);
 		this->y = (int)round(vector.y);
 	}
 
-	float Vector2Int::Distance(Vector2Int origin, Vector2Int target)
+	float Vector2i::Distance(const Vector2i& origin, const Vector2i& target)
 	{
 		return Vector2::Distance(origin.ToVector2(), target.ToVector2());
 	}
 
-	Vector2 Vector2Int::ToVector2() const
+	Vector2 Vector2i::ToVector2() const
 	{
 		return Vector2(x, y);
 	}
 
-	bool Vector2Int::operator ==(Vector2Int vector)
+	bool Vector2i::operator ==(const Vector2i& vector)
 	{
 		return (x == vector.x && y == vector.y);
 	}
 
-	bool Vector2Int::operator !=(Vector2Int vector)
+	bool Vector2i::operator !=(const Vector2i& vector)
 	{
 		return (x != vector.x || y != vector.y);
 	}
 
-	Vector2Int Vector2Int::operator +(Vector2Int vector)
+	Vector2i Vector2i::operator +(const Vector2i& vector)
 	{
-		return Vector2Int(x + vector.x, y + vector.y);
+		return Vector2i(x + vector.x, y + vector.y);
 	}
 
-	Vector2Int Vector2Int::operator -(Vector2Int vector)
+	Vector2i Vector2i::operator -(const Vector2i& vector)
 	{
-		return Vector2Int(x - vector.x, y - vector.y);
+		return Vector2i(x - vector.x, y - vector.y);
 	}
 
-	Vector2Int Vector2Int::operator *(Vector2Int vector)
+	Vector2i Vector2i::operator *(const Vector2i& vector)
 	{
-		return Vector2Int(x * vector.x, y * vector.y);
+		return Vector2i(x * vector.x, y * vector.y);
 	}
 
-	Vector2Int Vector2Int::operator *(float value)
+	Vector2i Vector2i::operator *(float value)
 	{
-		return Vector2Int((int)round(x * value), (int)round(y * value));
+		return Vector2i((int)round(x * value), (int)round(y * value));
 	}
 
-	Vector2Int Vector2Int::operator /(float value)
+	Vector2i Vector2i::operator /(float value)
 	{
-		return Vector2Int((int)round(x / value), (int)round(y / value));
+		return Vector2i((int)round(x / value), (int)round(y / value));
 	}
 
-	Vector2Int& Vector2Int::operator =(Vector2Int vector)
+	Vector2i& Vector2i::operator =(const Vector2i& vector)
 	{
 		this->x = vector.x;
 		this->y = vector.y;
 		return *this;
 	}
 
-	Vector2Int& Vector2Int::operator +=(Vector2Int vector)
+	Vector2i& Vector2i::operator +=(const Vector2i& vector)
 	{
 		this->x += vector.x;
 		this->y += vector.y;
 		return *this;
 	}
 
-	Vector2Int& Vector2Int::operator -=(Vector2Int vector)
+	Vector2i& Vector2i::operator -=(const Vector2i& vector)
 	{
 		this->x -= vector.x;
 		this->y -= vector.y;
 		return *this;
 	}
 
-	Vector2Int& Vector2Int::operator *=(Vector2Int vector)
+	Vector2i& Vector2i::operator *=(const Vector2i& vector)
 	{
 		this->x *= vector.x;
 		this->y *= vector.y;
 		return *this;
 	}
 
-	Vector2Int& Vector2Int::operator *=(float value)
+	Vector2i& Vector2i::operator *=(float value)
 	{
 		this->x *= value;
 		this->y *= value;
 		return *this;
 	}
 
-	Vector2Int& Vector2Int::operator /=(float value)
+	Vector2i& Vector2i::operator /=(float value)
 	{
 		this->x /= value;
 		this->y /= value;

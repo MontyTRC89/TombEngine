@@ -265,20 +265,20 @@ void FloorInfo::RemoveItem(short itemNumber)
 
 namespace TEN::Floordata
 {
-	Vector2Int GetSectorPoint(int x, int z)
+	Vector2i GetSectorPoint(int x, int z)
 	{
 		const auto xPoint = x % SECTOR(1) - SECTOR(1) / 2;
 		const auto yPoint = z % SECTOR(1) - SECTOR(1) / 2;
 
-		return Vector2Int{xPoint, yPoint};
+		return Vector2i{xPoint, yPoint};
 	}
 
-	Vector2Int GetRoomPosition(int roomNumber, int x, int z)
+	Vector2i GetRoomPosition(int roomNumber, int x, int z)
 	{
 		const auto& room = g_Level.Rooms[roomNumber];
 		const auto zRoom = (z - room.z) / SECTOR(1);
 		const auto xRoom = (x - room.x) / SECTOR(1);
-		auto pos = Vector2Int{xRoom, zRoom};
+		auto pos = Vector2i{xRoom, zRoom};
 
 		if (pos.x < 0)
 		{
@@ -301,7 +301,7 @@ namespace TEN::Floordata
 		return pos;
 	}
 
-	FloorInfo& GetFloor(int roomNumber, const Vector2Int& pos)
+	FloorInfo& GetFloor(int roomNumber, const Vector2i& pos)
 	{
 		auto& room = g_Level.Rooms[roomNumber];
 		return room.floor[room.zSize * pos.x + pos.y];

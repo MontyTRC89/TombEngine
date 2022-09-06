@@ -2,34 +2,33 @@
 
 //namespace TEN::Math
 //{
-	// TODO: Possibly rename to the more common standard: Vector2i
-	struct Vector2Int
+	struct Vector2i
 	{
 		int x = 0;
 		int y = 0;
 
-		static const Vector2Int Zero;
+		static const Vector2i Zero;
 
-		Vector2Int();
-		Vector2Int(int x, int y);
-		Vector2Int(Vector2 vector);
+		Vector2i();
+		Vector2i(int x, int y);
+		Vector2i(const Vector2& vector);
 
-		static float Distance(Vector2Int origin, Vector2Int target);
+		static float Distance(const Vector2i& origin, const Vector2i& target);
 
 		Vector2 ToVector2() const;
 
-		bool		operator ==(Vector2Int vector);
-		bool		operator !=(Vector2Int vector);
-		Vector2Int	operator +(Vector2Int vector);
-		Vector2Int	operator -(Vector2Int vector);
-		Vector2Int	operator *(Vector2Int vector);
-		Vector2Int	operator *(float value);
-		Vector2Int	operator /(float value);
-		Vector2Int& operator =(Vector2Int vector);
-		Vector2Int& operator +=(Vector2Int vector);
-		Vector2Int& operator -=(Vector2Int vector);
-		Vector2Int& operator *=(Vector2Int vector);
-		Vector2Int& operator *=(float value);
-		Vector2Int& operator /=(float value);
+		bool	  operator ==(const Vector2i& vector);
+		bool	  operator !=(const Vector2i& vector);
+		Vector2i  operator +(const Vector2i& vector);
+		Vector2i  operator -(const Vector2i& vector);
+		Vector2i  operator *(const Vector2i& vector);
+		Vector2i  operator *(float value);
+		Vector2i  operator /(float value);
+		Vector2i& operator =(const Vector2i& vector);
+		Vector2i& operator +=(const Vector2i& vector);
+		Vector2i& operator -=(const Vector2i& vector);
+		Vector2i& operator *=(const Vector2i& vector);
+		Vector2i& operator *=(float value);
+		Vector2i& operator /=(float value);
 	};
 //}

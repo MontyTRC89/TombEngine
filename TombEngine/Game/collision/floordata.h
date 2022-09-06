@@ -132,9 +132,9 @@ class FloorInfo
 
 namespace TEN::Floordata
 {
-	Vector2Int GetSectorPoint(int x, int z);
-	Vector2Int GetRoomPosition(int roomNumber, int x, int z);
-	FloorInfo& GetFloor(int roomNumber, const Vector2Int& pos);
+	Vector2i GetSectorPoint(int x, int z);
+	Vector2i GetRoomPosition(int roomNumber, int x, int z);
+	FloorInfo& GetFloor(int roomNumber, const Vector2i& pos);
 	FloorInfo& GetFloor(int roomNumber, int x, int z);
 	FloorInfo& GetFloorSide(int roomNumber, int x, int z, int* sideRoomNumber = nullptr);
 	FloorInfo& GetBottomFloor(int roomNumber, int x, int z, int* bottomRoomNumber = nullptr);
