@@ -613,10 +613,10 @@ bool TestBoundsCollide(ItemInfo* item, ItemInfo* laraItem, int radius)
 	auto bounds = (BOUNDING_BOX*)GetBestFrame(item);
 	auto laraBounds = (BOUNDING_BOX*)GetBestFrame(laraItem);
 
-	if (item->Pose.Position.y + bounds->Y2 <= laraItem->Pose.Position.y + laraBounds->Y1)
+	if ((item->Pose.Position.y + bounds->Y2) <= (laraItem->Pose.Position.y + laraBounds->Y1))
 		return false;
 
-	if (item->Pose.Position.y + bounds->Y1 >= laraItem->Pose.Position.y + laraBounds->Y2)
+	if ((item->Pose.Position.y + bounds->Y1) >= (laraItem->Pose.Position.y + laraBounds->Y2))
 		return false;
 
 	float sinY = phd_sin(item->Pose.Orientation.y);
@@ -624,13 +624,13 @@ bool TestBoundsCollide(ItemInfo* item, ItemInfo* laraItem, int radius)
 
 	int x = laraItem->Pose.Position.x - item->Pose.Position.x;
 	int z = laraItem->Pose.Position.z - item->Pose.Position.z;
-	int dx = (cosY * x) - (sinY * z);
-	int dz = (cosY * z) + (sinY * x);
+	int dx = (x * cosY) - (z * sinY);
+	int dz = (z * cosY) + (x * sinY);
 
-	if (dx >= bounds->X1 - radius &&
-		dx <= radius + bounds->X2 &&
-		dz >= bounds->Z1 - radius &&
-		dz <= radius + bounds->Z2)
+	if (dx >= (bounds->X1 - radius) &&
+		dx <= (radius + bounds->X2) &&
+		dz >= (bounds->Z1 - radius) &&
+		dz <= (radius + bounds->Z2))
 	{
 		return true;
 	}
@@ -731,13 +731,13 @@ bool ItemPushItem(ItemInfo* item, ItemInfo* item2, CollisionInfo* coll, bool spa
 
 	auto* lara = item2->IsLara() ? GetLaraInfo(item2) : nullptr;
 
-	if (lara != nullptr && spasmEnabled && bounds->Y2 - bounds->Y1 > CLICK(1))
+	if (lara != nullptr && spasmEnabled && (bounds->Y2 - bounds->Y1) > CLICK(1))
 	{
 		rx = (bounds->X1 + bounds->X2) / 2;
 		rz = (bounds->Z1 + bounds->Z2) / 2;
 
-		dx -= cosY * rx + sinY * rz;
-		dz -= cosY * rz - sinY * rx;
+		dx -= (rx * cosY) + (rz * sinY);
+		dz -= (rz * cosY) - (rx * sinY);
 
 		lara->HitDirection = (item2->Pose.Orientation.y - phd_atan(dz, dz) - ANGLE(135.0f)) / ANGLE(90.0f);
 		DoDamage(item2, 0); // Dummy hurt call. Only for ooh sound!
@@ -752,12 +752,12 @@ bool ItemPushItem(ItemInfo* item, ItemInfo* item2, CollisionInfo* coll, bool spa
 	coll->Setup.LowerCeilingBound = 0;
 	coll->Setup.UpperCeilingBound = MAX_HEIGHT;
 
-	auto facing = coll->Setup.ForwardAngle;
+	auto headingAngle = coll->Setup.ForwardAngle;
 	coll->Setup.ForwardAngle = phd_atan(item2->Pose.Position.z - coll->Setup.OldPosition.z, item2->Pose.Position.x - coll->Setup.OldPosition.x);
 
 	GetCollisionInfo(coll, item2);
 
-	coll->Setup.ForwardAngle = facing;
+	coll->Setup.ForwardAngle = headingAngle;
 
 	if (coll->CollisionType == CT_NONE)
 	{
@@ -775,8 +775,8 @@ bool ItemPushItem(ItemInfo* item, ItemInfo* item2, CollisionInfo* coll, bool spa
 	// If Lara is in the process of aligning to an object, cancel it.
 	if (lara != nullptr && lara->Control.Count.PositionAdjust > (LARA_POSITION_ADJUST_MAX_TIME / 6))
 	{
-		Lara.Control.IsMoving = false;
-		Lara.Control.HandStatus = HandStatus::Free;
+		lara->Control.IsMoving = false;
+		lara->Control.HandStatus = HandStatus::Free;
 	}
 
 	return true;
