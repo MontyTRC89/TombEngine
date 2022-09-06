@@ -1214,6 +1214,16 @@ bool IsRunJumpCountableState(LaraState state)
 	return CheckLaraState(state, RunningJumpTimerStates);
 }
 
+bool TestLaraTurn180(ItemInfo* item, CollisionInfo* coll)
+{
+	auto* lara = GetLaraInfo(item);
+
+	if (lara->Control.WaterStatus == WaterStatus::Wade || TestEnvironment(ENV_FLAG_SWAMP, item))
+		return true;
+
+	return false;
+}
+
 bool TestLaraPose(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
