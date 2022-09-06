@@ -467,15 +467,11 @@ bool MoveLaraPosition(Vector3Int* vec, ItemInfo* item, ItemInfo* laraItem)
 
 	if (!Objects[item->ObjectNumber].isPickup)
 		return Move3DPosTo3DPos(&laraItem->Pose, &target, LARA_ALIGN_VELOCITY, ANGLE(2.0f));
-
-	// Prevent picking up items which can result in so called "flare pickup bug"
-
-	int height = GetCollision(target.Position.x, target.Position.y, target.Position.z, laraItem->RoomNumber).Position.Floor;
-	if (abs(height - laraItem->Pose.Position.y) <= CLICK(2))
+	else
 	{
-		auto direction = target.Position - laraItem->Pose.Position;
-		float distance = sqrt(SQUARE(direction.x) + SQUARE(direction.y) + SQUARE(direction.z));
-		if (distance < CLICK(0.5f))
+		// Prevent picking up items which can result in so called "flare pickup bug"
+		int height = GetCollision(target.Position.x, target.Position.y, target.Position.z, laraItem->RoomNumber).Position.Floor;
+		if (abs(height - laraItem->Pose.Position.y) <= CLICK(2))
 			return Move3DPosTo3DPos(&laraItem->Pose, &target, LARA_ALIGN_VELOCITY, ANGLE(2.0f));
 	}
 
