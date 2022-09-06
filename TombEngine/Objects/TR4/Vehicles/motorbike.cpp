@@ -214,7 +214,7 @@ namespace TEN::Entities::Vehicles
 		AnimateItem(laraItem);
 	}
 
-	static int DoMotorbikeShift(ItemInfo* motorbikeItem, Vector3Int* pos, Vector3Int* old)
+	static int DoMotorbikeShift(ItemInfo* motorbikeItem, Vector3i* pos, Vector3i* old)
 	{
 		int x = pos->x / SECTOR(1);
 		int z = pos->z / SECTOR(1);
@@ -317,10 +317,10 @@ namespace TEN::Entities::Vehicles
 		if (motorbike->LightPower <= 0)
 			return;
 
-		auto start = Vector3Int(0, -470, 1836);
+		auto start = Vector3i(0, -470, 1836);
 		GetJointAbsPosition(motorbikeItem, &start, 0);
 
-		auto target = Vector3Int(0, -470, 20780);
+		auto target = Vector3i(0, -470, 20780);
 		GetJointAbsPosition(motorbikeItem, &target, 0);
 
 		int random = (motorbike->LightPower * 2) - (GetRandomControl() & 0xF);
@@ -407,7 +407,7 @@ namespace TEN::Entities::Vehicles
 
 		if (laraItem->Animation.ActiveState != MOTORBIKE_STATE_MOUNT && laraItem->Animation.ActiveState != MOTORBIKE_STATE_DISMOUNT)
 		{
-			auto pos = Vector3Int(56, -144, -500);
+			auto pos = Vector3i(56, -144, -500);
 			GetJointAbsPosition(motorbikeItem, &pos, 0);
 
 			int speed = motorbikeItem->Animation.Velocity.z;
@@ -513,7 +513,7 @@ namespace TEN::Entities::Vehicles
 		return verticalVelocity;
 	}
 
-	static int GetMotorbikeCollisionAnim(ItemInfo* motorbikeItem, Vector3Int* pos)
+	static int GetMotorbikeCollisionAnim(ItemInfo* motorbikeItem, Vector3i* pos)
 	{
 		pos->x = motorbikeItem->Pose.Position.x - pos->x;
 		pos->z = motorbikeItem->Pose.Position.z - pos->z;
@@ -540,14 +540,14 @@ namespace TEN::Entities::Vehicles
 		auto* motorbike = GetMotorbikeInfo(motorbikeItem);
 		auto* lara = GetLaraInfo(laraItem);
 
-		Vector3Int frontLeft, backLeft, mtf, mtb, backRight;
-		Vector3Int moved;
+		Vector3i frontLeft, backLeft, mtf, mtb, backRight;
+		Vector3i moved;
 		int floorHeight, collide, speed, newSpeed;
 		short momentum = 0, rotation;
 
 		motorbike->DisableDismount = false;
 
-		Vector3Int backLeftOld, mtb_old, backRightOld, mtf_old, rightLeftOld;
+		Vector3i backLeftOld, mtb_old, backRightOld, mtf_old, rightLeftOld;
 		int hfl_old  = GetVehicleHeight(motorbikeItem, MOTORBIKE_FRONT, -MOTORBIKE_SIDE, true, &rightLeftOld);
 		int hmf_old  = GetVehicleHeight(motorbikeItem, MOTORBIKE_FRONT, CLICK(0.5f), true, &mtf_old);
 		int hbl_old  = GetVehicleHeight(motorbikeItem, -MOTORBIKE_FRONT, -MOTORBIKE_SIDE, true, &backLeftOld);
@@ -709,7 +709,7 @@ namespace TEN::Entities::Vehicles
 
 		floorHeight = GetCollision(motorbikeItem).Position.Floor;
 		if (floorHeight < (motorbikeItem->Pose.Position.y - CLICK(1)))
-			DoMotorbikeShift(motorbikeItem, (Vector3Int*)&motorbikeItem->Pose, &oldPos);
+			DoMotorbikeShift(motorbikeItem, (Vector3i*)&motorbikeItem->Pose, &oldPos);
 
 		if (!motorbike->Velocity)
 			rot2 = 0;
@@ -1056,7 +1056,7 @@ namespace TEN::Entities::Vehicles
 
 			if (TrInput & VEHICLE_IN_BRAKE)
 			{
-				auto pos = Vector3Int(0, -144, -1024);
+				auto pos = Vector3i(0, -144, -1024);
 				GetJointAbsPosition(motorbikeItem, &pos, NULL);
 
 				TriggerDynamicLight(pos.x, pos.y, pos.z, 10, 64, 0, 0);
@@ -1183,7 +1183,7 @@ namespace TEN::Entities::Vehicles
 
 		auto oldPos = motorbikeItem->Pose.Position;
 
-		Vector3Int frontLeft, frontRight, frontMiddle;
+		Vector3i frontLeft, frontRight, frontMiddle;
 		int heightFrontLeft = GetVehicleHeight(motorbikeItem, MOTORBIKE_FRONT, -MOTORBIKE_SIDE, true, &frontLeft);
 		int heightFrontRight = GetVehicleHeight(motorbikeItem, MOTORBIKE_FRONT, CLICK(0.5f), true, &frontRight);
 		int heightFrontMiddle = GetVehicleHeight(motorbikeItem, -MOTORBIKE_FRONT, 0, true, &frontMiddle);

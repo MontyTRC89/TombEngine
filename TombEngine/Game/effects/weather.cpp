@@ -420,7 +420,7 @@ namespace TEN::Effects::Environment
 			if (!TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, roomNumber))
 				continue;
 
-			if (!IsPointInRoom(Vector3Int(xPos, yPos, zPos), roomNumber))
+			if (!IsPointInRoom(Vector3i(xPos, yPos, zPos), roomNumber))
 				continue;
 
 			auto part = WeatherParticle();

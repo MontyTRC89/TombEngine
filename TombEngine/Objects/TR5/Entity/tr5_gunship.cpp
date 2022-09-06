@@ -28,7 +28,7 @@ namespace TEN::Entities::TR5
 			pos.x = ((GetRandomControl() & 0x1FF) - 255);
 			pos.y = (GetRandomControl() & 0x1FF) - 255;
 			pos.z = (GetRandomControl() & 0x1FF) - 255;
-			GetLaraJointPosition((Vector3Int*)&pos, LM_TORSO);
+			GetLaraJointPosition((Vector3i*)&pos, LM_TORSO);
 
 			GameVector end = pos;
 
@@ -81,7 +81,7 @@ namespace TEN::Entities::TR5
 			if (!(GlobalCounter & 1))
 				return AnimateItem(item);
 
-			Vector3Int hitPos;
+			Vector3i hitPos;
 			MESH_INFO* hitMesh = nullptr;
 			int objOnLos = ObjectOnLOS2(&start, &end, &hitPos, &hitMesh, GAME_OBJECT_ID::ID_LARA);
 

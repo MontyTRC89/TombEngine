@@ -29,7 +29,7 @@ namespace TEN::Entities::TR4
 
 	void SpawnLocust(ItemInfo* item)
 	{
-		Vector3Int start, end;
+		Vector3i start, end;
 	   short locustNumber = CreateLocust();
 	   Vector3Shrt angles;
 		if (locustNumber != NO_ITEM)

@@ -47,15 +47,15 @@ constexpr auto FP_SHIFT = 16;
 constexpr auto FP_ONE = (1 << FP_SHIFT);
 constexpr auto W2V_SHIFT = 14;
 
-void FP_VectorMul(Vector3Int* v, int scale, Vector3Int* result);
+void FP_VectorMul(Vector3i* v, int scale, Vector3i* result);
 __int64 FP_Mul(__int64 a, __int64 b);
 __int64 FP_Div(__int64 a, __int64 b);
-int FP_DotProduct(Vector3Int* a, Vector3Int* b);
-void FP_CrossProduct(Vector3Int* a, Vector3Int* b, Vector3Int* n);
+int FP_DotProduct(Vector3i* a, Vector3i* b);
+void FP_CrossProduct(Vector3i* a, Vector3i* b, Vector3i* n);
 void FP_GetMatrixAngles(MATRIX3D* m, short* angles);
 __int64 FP_ToFixed(__int64 value);
 __int64 FP_FromFixed(__int64 value);
-Vector3Int* FP_Normalise(Vector3Int* v);
+Vector3i* FP_Normalise(Vector3i* v);
 
 #define	MULFP(a,b)		(int)((((__int64)a*(__int64)b))>>16)
 #define DIVFP(a,b)		(int)(((a)/(b>>8))<<8)

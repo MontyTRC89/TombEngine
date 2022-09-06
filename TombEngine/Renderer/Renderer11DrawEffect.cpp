@@ -186,7 +186,7 @@ namespace TEN::Renderer
 
 	void Renderer11::DrawParticles(RenderView& view)
 	{
-		Vector3Int nodePos;
+		Vector3i nodePos;
 
 		for (int i = 0; i < MAX_NODE; i++)
 			NodeOffsets[i].gotIt = false;
@@ -874,7 +874,7 @@ namespace TEN::Renderer
 				face.info.world = spriteMatrix;
 				face.info.blendMode = spr.BlendMode;
 
-				RendererRoom& room = m_rooms[FindRoomNumber(Vector3Int(spr.pos))];
+				RendererRoom& room = m_rooms[FindRoomNumber(Vector3i(spr.pos))];
 				room.TransparentFacesToDraw.push_back(face);
 			}
 			else // Draw sprites immediately

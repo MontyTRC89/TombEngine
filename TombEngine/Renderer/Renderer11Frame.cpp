@@ -284,8 +284,8 @@ namespace TEN::Renderer
 			{
 				ROOM_DOOR* portal = &nativeRoom->doors[i];
 
-				Vector3Int n = Vector3Int(portal->normal.x, portal->normal.y, portal->normal.z);
-				Vector3Int v = Vector3Int(
+				Vector3i n = Vector3i(portal->normal.x, portal->normal.y, portal->normal.z);
+				Vector3i v = Vector3i(
 					Camera.pos.x - (nativeRoom->x + portal->vertices[0].x),
 					Camera.pos.y - (nativeRoom->y + portal->vertices[0].y),
 					Camera.pos.z - (nativeRoom->z + portal->vertices[0].z));

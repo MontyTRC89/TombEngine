@@ -25,7 +25,7 @@ OBJECT_COLLISION_BOUNDS CeilingTrapDoorBounds =
 	-ANGLE(30.0f), ANGLE(30.0f),
 	-ANGLE(10.0f), ANGLE(10.0f)
 };
-static Vector3Int CeilingTrapDoorPos = { 0, 1056, -480 };
+static Vector3i CeilingTrapDoorPos = { 0, 1056, -480 };
 
 OBJECT_COLLISION_BOUNDS FloorTrapDoorBounds =
 {
@@ -36,7 +36,7 @@ OBJECT_COLLISION_BOUNDS FloorTrapDoorBounds =
 	-ANGLE(30.0f), ANGLE(30.0f),
 	-ANGLE(10.0f), ANGLE(10.0f)
 };
-static Vector3Int FloorTrapDoorPos = { 0, 0, -655 };
+static Vector3i FloorTrapDoorPos = { 0, 0, -655 };
 
 void InitialiseTrapDoor(short itemNumber)
 {

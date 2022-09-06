@@ -21,7 +21,7 @@ int NumberLosRooms;
 short LosRooms[20];
 int ClosestItem;
 int ClosestDist;
-Vector3Int ClosestCoord;
+Vector3i ClosestCoord;
 
 bool ClipTarget(GameVector* start, GameVector* target)
 {
@@ -100,7 +100,7 @@ bool GetTargetOnLOS(GameVector* src, GameVector* dest, bool drawTarget, bool fir
 	bool hit = false;
 
 	MESH_INFO* mesh;
-	Vector3Int vector;
+	Vector3i vector;
 	int itemNumber = ObjectOnLOS2(src, dest, &vector, &mesh);
 	if (itemNumber != NO_LOS_ITEM)
 	{
@@ -294,7 +294,7 @@ bool GetTargetOnLOS(GameVector* src, GameVector* dest, bool drawTarget, bool fir
 	return hit;
 }
 
-int ObjectOnLOS2(GameVector* start, GameVector* end, Vector3Int* vec, MESH_INFO** mesh, GAME_OBJECT_ID priorityObject)
+int ObjectOnLOS2(GameVector* start, GameVector* end, Vector3i* vec, MESH_INFO** mesh, GAME_OBJECT_ID priorityObject)
 {
 	ClosestItem = NO_LOS_ITEM;
 	ClosestDist = SQUARE(end->x - start->x) + SQUARE(end->y - start->y) + SQUARE(end->z - start->z);
@@ -358,7 +358,7 @@ int ObjectOnLOS2(GameVector* start, GameVector* end, Vector3Int* vec, MESH_INFO*
 	return ClosestItem;
 }
 
-bool DoRayBox(GameVector* start, GameVector* end, BOUNDING_BOX* box, PHD_3DPOS* itemOrStaticPos, Vector3Int* hitPos, short closesItemNumber)
+bool DoRayBox(GameVector* start, GameVector* end, BOUNDING_BOX* box, PHD_3DPOS* itemOrStaticPos, Vector3i* hitPos, short closesItemNumber)
 {
 	// Ray
 	FXMVECTOR rayStart = { (float)start->x, (float)start->y, (float)start->z };
@@ -444,7 +444,7 @@ bool DoRayBox(GameVector* start, GameVector* end, BOUNDING_BOX* box, PHD_3DPOS* 
 				}
 #endif
 
-				Vector3Int p[4];
+				Vector3i p[4];
 
 				p[1].x = start->x;
 				p[1].y = start->y;

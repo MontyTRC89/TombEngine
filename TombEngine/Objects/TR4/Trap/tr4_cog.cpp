@@ -23,7 +23,7 @@ namespace TEN::Entities::TR4
 
             if (item->TriggerFlags == 666)
             {
-                Vector3Int pos;
+                Vector3i pos;
                 GetJointAbsPosition(item, &pos, 0);
                 SoundEffect(SFX_TR4_LIBRARY_COG_LOOP, (PHD_3DPOS*)&pos);
                 

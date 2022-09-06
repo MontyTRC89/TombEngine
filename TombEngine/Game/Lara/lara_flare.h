@@ -3,7 +3,7 @@
 
 struct CollisionInfo;
 struct ItemInfo;
-struct Vector3Int;
+struct Vector3i;
 enum GAME_OBJECT_ID : short;
 
 void FlareControl(short itemNumber);
@@ -16,4 +16,4 @@ void SetFlareArm(ItemInfo* laraItem, int armFrame);
 void CreateFlare(ItemInfo* laraItem, GAME_OBJECT_ID objectNumber, bool thrown);
 void DrawFlareInAir(ItemInfo* flareItem);
 void DoFlareInHand(ItemInfo* laraItem, int flareLife);
-int DoFlareLight(Vector3Int* pos, int flareLife);
+int DoFlareLight(Vector3i* pos, int flareLife);

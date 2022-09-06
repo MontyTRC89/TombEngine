@@ -286,7 +286,7 @@ namespace TEN::Entities::Vehicles
 
 			if (laraItem->Animation.ActiveState == QBIKE_STATE_FALL_OFF)
 			{
-				auto pos = Vector3Int();
+				auto pos = Vector3i();
 
 				SetAnimation(laraItem, LA_FREEFALL);
 				GetJointAbsPosition(laraItem, &pos, LM_HIPS);
@@ -318,7 +318,7 @@ namespace TEN::Entities::Vehicles
 			return true;
 	}
 
-	static int GetQuadCollisionAnim(ItemInfo* quadBikeItem, Vector3Int* pos)
+	static int GetQuadCollisionAnim(ItemInfo* quadBikeItem, Vector3i* pos)
 	{
 		pos->x = quadBikeItem->Pose.Position.x - pos->x;
 		pos->z = quadBikeItem->Pose.Position.z - pos->z;
@@ -349,7 +349,7 @@ namespace TEN::Entities::Vehicles
 		return 0;
 	}
 
-	static int DoQuadShift(ItemInfo* quadBikeItem, Vector3Int* pos, Vector3Int* old)
+	static int DoQuadShift(ItemInfo* quadBikeItem, Vector3i* pos, Vector3i* old)
 	{
 		CollisionResult probe;
 		int x = pos->x / SECTOR(1);
@@ -481,23 +481,23 @@ namespace TEN::Entities::Vehicles
 
 		quadBike->NoDismount = false;
 
-		Vector3Int oldFrontLeft, oldFrontRight, oldBottomLeft, oldBottomRight;
+		Vector3i oldFrontLeft, oldFrontRight, oldBottomLeft, oldBottomRight;
 		int holdFrontLeft = GetVehicleHeight(quadBikeItem, QBIKE_FRONT, -QBIKE_SIDE, true, &oldFrontLeft);
 		int holdFrontRight = GetVehicleHeight(quadBikeItem, QBIKE_FRONT, QBIKE_SIDE, true, &oldFrontRight);
 		int holdBottomLeft = GetVehicleHeight(quadBikeItem, -QBIKE_FRONT, -QBIKE_SIDE, true, &oldBottomLeft);
 		int holdBottomRight = GetVehicleHeight(quadBikeItem, -QBIKE_FRONT, QBIKE_SIDE, true, &oldBottomRight);
 
-		Vector3Int mtlOld, mtrOld, mmlOld, mmrOld;
+		Vector3i mtlOld, mtrOld, mmlOld, mmrOld;
 		int hmml_old = GetVehicleHeight(quadBikeItem, 0, -QBIKE_SIDE, true, &mmlOld);
 		int hmmr_old = GetVehicleHeight(quadBikeItem, 0, QBIKE_SIDE, true, &mmrOld);
 		int hmtl_old = GetVehicleHeight(quadBikeItem, QBIKE_FRONT / 2, -QBIKE_SIDE, true, &mtlOld);
 		int hmtr_old = GetVehicleHeight(quadBikeItem, QBIKE_FRONT / 2, QBIKE_SIDE, true, &mtrOld);
 
-		Vector3Int moldBottomLeft, moldBottomRight;
+		Vector3i moldBottomLeft, moldBottomRight;
 		int hmoldBottomLeft = GetVehicleHeight(quadBikeItem, -QBIKE_FRONT / 2, -QBIKE_SIDE, true, &moldBottomLeft);
 		int hmoldBottomRight = GetVehicleHeight(quadBikeItem, -QBIKE_FRONT / 2, QBIKE_SIDE, true, &moldBottomRight);
 
-		Vector3Int old;
+		Vector3i old;
 		old.x = quadBikeItem->Pose.Position.x;
 		old.y = quadBikeItem->Pose.Position.y;
 		old.z = quadBikeItem->Pose.Position.z;
@@ -571,7 +571,7 @@ namespace TEN::Entities::Vehicles
 			quadBikeItem->Pose.Position.x += slip * phd_cos(quadBikeItem->Pose.Orientation.y);
 		}
 
-		Vector3Int moved;
+		Vector3i moved;
 		moved.x = quadBikeItem->Pose.Position.x;
 		moved.z = quadBikeItem->Pose.Position.z;
 
@@ -581,27 +581,27 @@ namespace TEN::Entities::Vehicles
 		short rot = 0;
 		short rotAdd = 0;
 
-		Vector3Int fl;
+		Vector3i fl;
 		int heightFrontLeft = GetVehicleHeight(quadBikeItem, QBIKE_FRONT, -QBIKE_SIDE, false, &fl);
 		if (heightFrontLeft < (oldFrontLeft.y - CLICK(1)))
 			rot = DoQuadShift(quadBikeItem, &fl, &oldFrontLeft);
 
-		Vector3Int mtl;
+		Vector3i mtl;
 		int hmtl = GetVehicleHeight(quadBikeItem, QBIKE_FRONT / 2, -QBIKE_SIDE, false, &mtl);
 		if (hmtl < (mtlOld.y - CLICK(1)))
 			DoQuadShift(quadBikeItem, &mtl, &mtlOld);
 
-		Vector3Int mml;
+		Vector3i mml;
 		int hmml = GetVehicleHeight(quadBikeItem, 0, -QBIKE_SIDE, false, &mml);
 		if (hmml < (mmlOld.y - CLICK(1)))
 			DoQuadShift(quadBikeItem, &mml, &mmlOld);
 
-		Vector3Int mbl;
+		Vector3i mbl;
 		int hmbl = GetVehicleHeight(quadBikeItem, -QBIKE_FRONT / 2, -QBIKE_SIDE, false, &mbl);
 		if (hmbl < (moldBottomLeft.y - CLICK(1)))
 			DoQuadShift(quadBikeItem, &mbl, &moldBottomLeft);
 
-		Vector3Int bl;
+		Vector3i bl;
 		int heightBackLeft = GetVehicleHeight(quadBikeItem, -QBIKE_FRONT, -QBIKE_SIDE, false, &bl);
 		if (heightBackLeft < (oldBottomLeft.y - CLICK(1)))
 		{
@@ -610,7 +610,7 @@ namespace TEN::Entities::Vehicles
 				rot += rotAdd;
 		}
 
-		Vector3Int fr;
+		Vector3i fr;
 		int heightFrontRight = GetVehicleHeight(quadBikeItem, QBIKE_FRONT, QBIKE_SIDE, false, &fr);
 		if (heightFrontRight < (oldFrontRight.y - CLICK(1)))
 		{
@@ -619,22 +619,22 @@ namespace TEN::Entities::Vehicles
 				rot += rotAdd;
 		}
 
-		Vector3Int mtr;
+		Vector3i mtr;
 		int hmtr = GetVehicleHeight(quadBikeItem, QBIKE_FRONT / 2, QBIKE_SIDE, false, &mtr);
 		if (hmtr < (mtrOld.y - CLICK(1)))
 			DoQuadShift(quadBikeItem, &mtr, &mtrOld);
 
-		Vector3Int mmr;
+		Vector3i mmr;
 		int hmmr = GetVehicleHeight(quadBikeItem, 0, QBIKE_SIDE, false, &mmr);
 		if (hmmr < (mmrOld.y - CLICK(1)))
 			DoQuadShift(quadBikeItem, &mmr, &mmrOld);
 
-		Vector3Int mbr;
+		Vector3i mbr;
 		int hmbr = GetVehicleHeight(quadBikeItem, -QBIKE_FRONT / 2, QBIKE_SIDE, false, &mbr);
 		if (hmbr < (moldBottomRight.y - CLICK(1)))
 			DoQuadShift(quadBikeItem, &mbr, &moldBottomRight);
 
-		Vector3Int br;
+		Vector3i br;
 		int heightBackRight = GetVehicleHeight(quadBikeItem, -QBIKE_FRONT, QBIKE_SIDE, false, &br);
 		if (heightBackRight < (oldBottomRight.y - CLICK(1)))
 		{
@@ -645,7 +645,7 @@ namespace TEN::Entities::Vehicles
 
 		probe = GetCollision(quadBikeItem);
 		if (probe.Position.Floor < quadBikeItem->Pose.Position.y - CLICK(1))
-			DoQuadShift(quadBikeItem, (Vector3Int*)&quadBikeItem->Pose, &old);
+			DoQuadShift(quadBikeItem, (Vector3i*)&quadBikeItem->Pose, &old);
 
 		quadBike->ExtraRotation = rot;
 
@@ -1122,7 +1122,7 @@ namespace TEN::Entities::Vehicles
 
 		auto probe = GetCollision(quadBikeItem);
 
-		Vector3Int frontLeft, frontRight;
+		Vector3i frontLeft, frontRight;
 		auto floorHeightLeft = GetVehicleHeight(quadBikeItem, QBIKE_FRONT, -QBIKE_SIDE, false, &frontLeft);
 		auto floorHeightRight = GetVehicleHeight(quadBikeItem, QBIKE_FRONT, QBIKE_SIDE, false, &frontRight);
 
@@ -1232,7 +1232,7 @@ namespace TEN::Entities::Vehicles
 
 			for (int i = 0; i < 2; i++)
 			{
-				auto pos = Vector3Int(QuadBikeEffectsPositions[i].Position);
+				auto pos = Vector3i(QuadBikeEffectsPositions[i].Position);
 				GetJointAbsPosition(quadBikeItem, &pos, QuadBikeEffectsPositions[i].meshNum);
 
 				angle = quadBikeItem->Pose.Orientation.y + ((i == 0) ? 0x9000 : 0x7000);

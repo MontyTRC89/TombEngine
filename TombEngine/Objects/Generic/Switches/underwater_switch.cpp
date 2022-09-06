@@ -23,7 +23,7 @@ namespace TEN::Entities::Switches
 		-ANGLE(80.0f), ANGLE(80.0f),
 		-ANGLE(80.0f), ANGLE(80.0f)
 	};
-	Vector3Int UnderwaterSwitchPos = { 0, 0, 108 };
+	Vector3i UnderwaterSwitchPos = { 0, 0, 108 };
 
 	OBJECT_COLLISION_BOUNDS CeilingUnderwaterSwitchBounds1 =
 	{
@@ -34,7 +34,7 @@ namespace TEN::Entities::Switches
 		-ANGLE(80.0f), ANGLE(80.0f),
 		-ANGLE(80.0f), ANGLE(80.0f)
 	};
-	Vector3Int CeilingUnderwaterSwitchPos1 = { 0, -736, -416 };
+	Vector3i CeilingUnderwaterSwitchPos1 = { 0, -736, -416 };
 
 	OBJECT_COLLISION_BOUNDS CeilingUnderwaterSwitchBounds2 =
 	{
@@ -45,7 +45,7 @@ namespace TEN::Entities::Switches
 		-ANGLE(80.0f), ANGLE(80.0f),
 		-ANGLE(80.0f), ANGLE(80.0f)
 	};
-	Vector3Int CeilingUnderwaterSwitchPos2 = { 0, -736, 416 };
+	Vector3i CeilingUnderwaterSwitchPos2 = { 0, -736, 416 };
 
 	void UnderwaterSwitchCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 	{

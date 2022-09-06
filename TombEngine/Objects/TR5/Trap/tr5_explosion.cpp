@@ -91,7 +91,7 @@ void ExplosionControl(short itemNumber)
 			}
 			else if (flag == 2)
 			{
-				Vector3Int vec = { 0, 0, 0 };
+				Vector3i vec = { 0, 0, 0 };
 				GetLaraJointPosition(&vec, 0);
 
 				int dx = vec.x - item->Pose.Position.x;

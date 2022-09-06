@@ -11,14 +11,14 @@
 	{
 	}
 
-	GameVector::GameVector(const Vector3Int& pos)
+	GameVector::GameVector(const Vector3i& pos)
 	{
 		this->x = pos.x;
 		this->y = pos.y;
 		this->z = pos.z;
 	}
 	
-	GameVector::GameVector(const Vector3Int& pos, short roomNumber)
+	GameVector::GameVector(const Vector3i& pos, short roomNumber)
 	{
 		this->x = pos.x;
 		this->y = pos.y;
@@ -26,7 +26,7 @@
 		this->roomNumber = roomNumber;
 	}
 	
-	GameVector::GameVector(const Vector3Int& pos, short roomNumber, short boxNumber)
+	GameVector::GameVector(const Vector3i& pos, short roomNumber, short boxNumber)
 	{
 		this->x = pos.x;
 		this->y = pos.y;
@@ -59,8 +59,8 @@
 		this->boxNumber = boxNumber;
 	}
 
-	Vector3Int GameVector::ToVector3Int()
+	Vector3i GameVector::ToVector3i()
 	{
-		return Vector3Int(x, y, z);
+		return Vector3i(x, y, z);
 	}
 //}

@@ -189,7 +189,7 @@ void BlinkingLightControl(short itemNumber)
 			item->MeshBits = 1;
 		else
 		{
-			Vector3Int pos = { 0, 0, 0 };
+			Vector3i pos = { 0, 0, 0 };
 			GetJointAbsPosition(item, &pos, 0);
 
 			TriggerDynamicLight(

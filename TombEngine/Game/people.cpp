@@ -64,7 +64,7 @@ bool ShotLara(ItemInfo* item, AI_INFO* AI, BiteInfo gun, short extraRotation, in
 				if (random > 14)
 					random = 0;
 
-				auto pos = Vector3Int::Zero;
+				auto pos = Vector3i::Zero;
 				GetJointAbsPosition(enemy, &pos, random);
 
 				DoBloodSplat(pos.x, pos.y, pos.z, (GetRandomControl() & 3) + 4, enemy->Pose.Orientation.y, enemy->RoomNumber);
@@ -92,7 +92,7 @@ short GunMiss(int x, int y, int z, short velocity, short yRot, short roomNumber)
 
 short GunHit(int x, int y, int z, short velocity, short yRot, short roomNumber)
 {
-	auto pos = Vector3Int::Zero;
+	auto pos = Vector3i::Zero;
 	GetLaraJointPosition(&pos, (25 * GetRandomControl()) >> 15);
 
 	DoBloodSplat(pos.x, pos.y, pos.z, (GetRandomControl() & 3) + 3, LaraItem->Pose.Orientation.y, LaraItem->RoomNumber);

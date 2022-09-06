@@ -488,7 +488,7 @@ namespace TEN::Entities::TR4
 
 				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + 212)
 				{
-					auto pos = Vector3Int();
+					auto pos = Vector3i();
 					if (item->Pose.Orientation.y == ANGLE(270.0f))
 					{
 						pos.x = item->Pose.Position.x - SECTOR(1);

@@ -27,7 +27,7 @@ using namespace TEN::Input;
 
 namespace TEN::Entities::Doors
 {
-	Vector3Int CrowbarDoorPos(-412, 0, 256);
+	Vector3i CrowbarDoorPos(-412, 0, 256);
 
 	OBJECT_COLLISION_BOUNDS CrowbarDoorBounds =
 	{

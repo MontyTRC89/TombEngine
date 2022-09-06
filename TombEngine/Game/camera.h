@@ -38,7 +38,7 @@ struct CAMERA_INFO
 	ItemInfo* item; // size=144, offset=92
 	ItemInfo* lastItem; // size=144, offset=96
 	int mikeAtLara; // size=0, offset=104
-	Vector3Int mikePos; // size=12, offset=108
+	Vector3i mikePos; // size=12, offset=108
 };
 
 enum CAMERA_FLAGS

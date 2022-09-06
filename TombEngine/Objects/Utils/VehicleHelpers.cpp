@@ -129,7 +129,7 @@ namespace TEN::Entities::Vehicles
 		return VehicleMountType::None;
 	}
 
-	int GetVehicleHeight(ItemInfo* vehicleItem, int forward, int right, bool clamp, Vector3Int* pos)
+	int GetVehicleHeight(ItemInfo* vehicleItem, int forward, int right, bool clamp, Vector3i* pos)
 	{
 		float sinX = phd_sin(vehicleItem->Pose.Orientation.x);
 		float sinY = phd_sin(vehicleItem->Pose.Orientation.y);
@@ -152,7 +152,7 @@ namespace TEN::Entities::Vehicles
 		return probe.Position.Floor;
 	}
 
-	int GetVehicleWaterHeight(ItemInfo* vehicleItem, int forward, int right, bool clamp, Vector3Int* pos)
+	int GetVehicleWaterHeight(ItemInfo* vehicleItem, int forward, int right, bool clamp, Vector3i* pos)
 	{
 		Matrix world =
 			Matrix::CreateFromYawPitchRoll(TO_RAD(vehicleItem->Pose.Orientation.y), TO_RAD(vehicleItem->Pose.Orientation.x), TO_RAD(vehicleItem->Pose.Orientation.z)) *

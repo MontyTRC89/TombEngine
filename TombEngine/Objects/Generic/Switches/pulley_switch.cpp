@@ -25,7 +25,7 @@ namespace TEN::Entities::Switches
 		-ANGLE(10.0f), ANGLE(10.0f)
 	};
 
-	Vector3Int PulleyPos = { 0, 0, -148 }; 
+	Vector3i PulleyPos = { 0, 0, -148 }; 
 
 	void InitialisePulleySwitch(short itemNumber)
 	{

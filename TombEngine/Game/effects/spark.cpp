@@ -45,7 +45,7 @@ namespace TEN::Effects::Spark
 		return SparkParticles[0];
 	}
 
-	void TriggerFlareSparkParticles(Vector3Int* pos, Vector3Int* vel, CVECTOR* color, int room)
+	void TriggerFlareSparkParticles(Vector3i* pos, Vector3i* vel, CVECTOR* color, int room)
 	{
 		auto& s = GetFreeSparkParticle();
 		s = {};

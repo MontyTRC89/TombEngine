@@ -10,6 +10,6 @@ namespace TEN::Entities::Generic
 	void DoFlameTorch();
 	void GetFlameTorch();
 	void TorchControl(short itemNumber);
-	void LaraTorch(Vector3Int* src, Vector3Int* target, int rot, int color);
+	void LaraTorch(Vector3i* src, Vector3i* target, int rot, int color);
 	void FireCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);
 }

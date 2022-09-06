@@ -181,7 +181,7 @@ namespace TEN::Entities::TR4
 		}
 
 		auto* enemy = creature->Enemy;
-		auto pos = Vector3Int::Zero;
+		auto pos = Vector3i::Zero;
 		GetJointAbsPosition(item, &pos, joint);
 
 		int x = enemy->Pose.Position.x - pos.x;
@@ -191,10 +191,10 @@ namespace TEN::Entities::TR4
 
 	static void GetTargetPosition(ItemInfo* item, PHD_3DPOS* target)
 	{
-		auto start = Vector3Int(0, -96, 144);
+		auto start = Vector3i(0, -96, 144);
 		GetJointAbsPosition(item, &start, 9);
 
-		auto end = Vector3Int(0, -128, 288);
+		auto end = Vector3i(0, -128, 288);
 		GetJointAbsPosition(item, &end, 9);
 
 		auto angles = GetOrientTowardPoint(start.ToVector3(), end.ToVector3());

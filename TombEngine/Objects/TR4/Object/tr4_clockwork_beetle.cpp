@@ -26,7 +26,7 @@ void ClockworkBeetleControl(short itemNumber)
 
 		if (LaraItem->Animation.FrameNumber < fb + 104)
 		{
-			auto pos = Vector3Int(0, 0, -32);
+			auto pos = Vector3i(0, 0, -32);
 			GetLaraJointPosition(&pos, LM_RHAND);
 
 			beetle->Pose.Position = pos;

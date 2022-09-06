@@ -122,7 +122,7 @@ namespace TEN::Entities::TR4
 		// Ignite torch.
 		if (item->ItemFlags[1] == 2)
 		{
-			auto pos = Vector3Int(GuideBite1.Position);
+			auto pos = Vector3i(GuideBite1.Position);
 			GetJointAbsPosition(item, &pos, GuideBite1.meshNum);
 
 			SoundEffect(SFX_TR4_LOOP_FOR_SMALL_FIRES, &item->Pose);
@@ -250,7 +250,7 @@ namespace TEN::Entities::TR4
 		}
 
 		bool someFlag = false;
-		Vector3Int pos1;
+		Vector3i pos1;
 		int frameNumber;
 		short random;
 				
@@ -488,7 +488,7 @@ namespace TEN::Entities::TR4
 			break;
 
 		case GUIDE_STATE_IGNITE_TORCH:
-			pos1 = Vector3Int(GuideBite2.Position);
+			pos1 = Vector3i(GuideBite2.Position);
 			GetJointAbsPosition(item, &pos1, GuideBite2.meshNum);
 
 			frameNumber = item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase;

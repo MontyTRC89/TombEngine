@@ -32,9 +32,9 @@ namespace TEN::Entities::Doors
 		STATE_PUSHPULL_KICK_DOOR_PULL = 3
 	};
 
-	Vector3Int PullDoorPos(-201, 0, 322);
-	Vector3Int PushDoorPos(201, 0, -702);
-	Vector3Int KickDoorPos(0, 0, -917);
+	Vector3i PullDoorPos(-201, 0, 322);
+	Vector3i PushDoorPos(201, 0, -702);
+	Vector3i KickDoorPos(0, 0, -917);
 
 	OBJECT_COLLISION_BOUNDS PushPullKickDoorBounds =
 	{

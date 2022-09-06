@@ -184,7 +184,7 @@ void MissileControl(short itemNumber)
 
 		if (GlobalCounter & 1)
 		{
-			Vector3Int pos = { x, y, z };
+			Vector3i pos = { x, y, z };
 
 			int xv = x - fx->pos.Position.x;
 			int yv = y - fx->pos.Position.y;
@@ -195,7 +195,7 @@ void MissileControl(short itemNumber)
 			else
 			{
 				TriggerHydraMissileSparks(&pos, 4 * xv, 4 * yv, 4 * zv);
-				TriggerHydraMissileSparks((Vector3Int*)&fx, 4 * xv, 4 * yv, 4 * zv);
+				TriggerHydraMissileSparks((Vector3i*)&fx, 4 * xv, 4 * yv, 4 * zv);
 			}
 		}
 	}

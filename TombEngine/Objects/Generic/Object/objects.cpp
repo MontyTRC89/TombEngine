@@ -20,7 +20,7 @@ OBJECT_TEXTURE* WaterfallTextures[6];
 float WaterfallY[6];
 int lastWaterfallY = 0;
 
-Vector3Int TightRopePos = { 0, 0, 0 };
+Vector3i TightRopePos = { 0, 0, 0 };
 OBJECT_COLLISION_BOUNDS TightRopeBounds =
 {
 	-256, 256,
@@ -196,10 +196,10 @@ void HorizontalBarCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo*
 			else
 				laraItem->Pose.Orientation.y = barItem->Pose.Orientation.y + -ANGLE(180.0f);
 
-			Vector3Int pos1 = { 0, -128, 512 };
+			Vector3i pos1 = { 0, -128, 512 };
 			GetLaraJointPosition(&pos1, LM_LHAND);
 
-			Vector3Int pos2 = { 0, -128, 512 };
+			Vector3i pos2 = { 0, -128, 512 };
 			GetLaraJointPosition(&pos2, LM_RHAND);
 		
 			if (laraItem->Pose.Orientation.y & 0x4000)
@@ -221,10 +221,10 @@ void CutsceneRopeControl(short itemNumber)
 {
 	auto* ropeItem = &g_Level.Items[itemNumber];
 
-	Vector3Int pos1 = { -128, -72, -16 };
+	Vector3i pos1 = { -128, -72, -16 };
 	GetJointAbsPosition(&g_Level.Items[ropeItem->ItemFlags[2]], &pos1, 0);
 
-	Vector3Int pos2 = { 830, -12, 0 };
+	Vector3i pos2 = { 830, -12, 0 };
 	GetJointAbsPosition(&g_Level.Items[ropeItem->ItemFlags[3]], &pos2, 0);
 
 	ropeItem->Pose.Position.x = pos2.x;

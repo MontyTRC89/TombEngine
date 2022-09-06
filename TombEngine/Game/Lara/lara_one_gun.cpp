@@ -44,15 +44,15 @@ void AnimateShotgun(ItemInfo* laraItem, LaraWeaponType weaponType)
 
 	if (lara->LeftArm.GunSmoke > 0)
 	{
-		Vector3Int pos;
+		Vector3i pos;
 		if (weaponType == LaraWeaponType::HK)
-			pos = Vector3Int(0, 228, 96);
+			pos = Vector3i(0, 228, 96);
 		else if (weaponType == LaraWeaponType::Shotgun)
-			pos = Vector3Int(0, 228, 0);
+			pos = Vector3i(0, 228, 0);
 		else if (weaponType == LaraWeaponType::GrenadeLauncher)
-			pos = Vector3Int(0, 180, 80);
+			pos = Vector3i(0, 180, 80);
 		else if (weaponType == LaraWeaponType::RocketLauncher)
-			pos = Vector3Int(0, 84, 72);
+			pos = Vector3i(0, 84, 72);
 
 		GetLaraJointPosition(&pos, LM_RHAND);
 
@@ -309,12 +309,12 @@ void FireShotgun(ItemInfo* laraItem)
 
 	if (fired)
 	{
-		auto pos = Vector3Int(0, 228, 32);
+		auto pos = Vector3i(0, 228, 32);
 		GetLaraJointPosition(&pos, LM_RHAND);
 
 		auto pos2 = pos;
 
-		pos = Vector3Int(0, 1508, 32);
+		pos = Vector3i(0, 1508, 32);
 		GetLaraJointPosition(&pos, LM_RHAND);
 
 		lara->LeftArm.GunSmoke = 32;
@@ -461,7 +461,7 @@ void FireHarpoon(ItemInfo* laraItem)
 		item->ObjectNumber = ID_HARPOON;
 		item->RoomNumber = laraItem->RoomNumber;
 
-		auto jointPos = Vector3Int(-2, 373, 77);
+		auto jointPos = Vector3i(-2, 373, 77);
 		GetLaraJointPosition(&jointPos, LM_RHAND);
 
 		int floorHeight = GetCollision(jointPos.x, jointPos.y, jointPos.z, item->RoomNumber).Position.Floor;
@@ -469,7 +469,7 @@ void FireHarpoon(ItemInfo* laraItem)
 			item->Pose.Position = jointPos;
 		else
 		{
-			item->Pose.Position = Vector3Int(laraItem->Pose.Position.x, jointPos.y, laraItem->Pose.Position.z);
+			item->Pose.Position = Vector3i(laraItem->Pose.Position.x, jointPos.y, laraItem->Pose.Position.z);
 			item->RoomNumber = laraItem->RoomNumber;
 		}
 
@@ -525,7 +525,7 @@ void HarpoonBoltControl(short itemNumber)
 		{
 			// Create bubbles
 			if (Wibble & 4)
-				CreateBubble((Vector3Int*)&item->Pose, item->RoomNumber, 0, 0, BUBBLE_FLAG_CLUMP | BUBBLE_FLAG_HIGH_AMPLITUDE, 0, 0, 0);
+				CreateBubble((Vector3i*)&item->Pose, item->RoomNumber, 0, 0, BUBBLE_FLAG_CLUMP | BUBBLE_FLAG_HIGH_AMPLITUDE, 0, 0, 0);
 			
 			item->Animation.Velocity.y = -HARPOON_VELOCITY * phd_sin(item->Pose.Orientation.x) / 2;
 			item->Animation.Velocity.z = HARPOON_VELOCITY * phd_cos(item->Pose.Orientation.x) / 2;
@@ -666,7 +666,7 @@ void FireGrenade(ItemInfo* laraItem)
 		item->ObjectNumber = ID_GRENADE;
 		item->RoomNumber = laraItem->RoomNumber;
 
-		auto jointPos = Vector3Int(0, 276, 80);
+		auto jointPos = Vector3i(0, 276, 80);
 		GetLaraJointPosition(&jointPos, LM_RHAND);
 
 		item->Pose.Position.x = x = jointPos.x;
@@ -682,7 +682,7 @@ void FireGrenade(ItemInfo* laraItem)
 			item->RoomNumber = laraItem->RoomNumber;
 		}
 
-		jointPos = Vector3Int(0, 1204, 5);
+		jointPos = Vector3i(0, 1204, 5);
 		GetLaraJointPosition(&jointPos, LM_RHAND);
 
 		lara->LeftArm.GunSmoke = 32;
@@ -863,7 +863,7 @@ void GrenadeControl(short itemNumber)
 	}
 
 	// Update grenade position
-	auto velocity = Vector3Int(
+	auto velocity = Vector3i(
 		item->Animation.Velocity.z * phd_sin(item->Animation.TargetState),
 		item->Animation.Velocity.y,
 		item->Animation.Velocity.z * phd_cos(item->Animation.TargetState)
@@ -1094,7 +1094,7 @@ void FireRocket(ItemInfo* laraItem)
 		if (!ammos.hasInfinite())
 			(ammos)--;
 
-		auto jointPos = Vector3Int(0, 180, 72);
+		auto jointPos = Vector3i(0, 180, 72);
 		GetLaraJointPosition(&jointPos, LM_RHAND);
 
 		int x, y, z;
@@ -1102,7 +1102,7 @@ void FireRocket(ItemInfo* laraItem)
 		item->Pose.Position.y = y = jointPos.y;
 		item->Pose.Position.z = z = jointPos.z;
 
-		jointPos = Vector3Int(0, 2004, 72);
+		jointPos = Vector3i(0, 2004, 72);
 		GetLaraJointPosition(&jointPos, LM_RHAND);
 
 		lara->LeftArm.GunSmoke = 32;
@@ -1110,7 +1110,7 @@ void FireRocket(ItemInfo* laraItem)
 		for (int i = 0; i < 5; i++)
 			TriggerGunSmoke(x, y, z, jointPos.x - x, jointPos.y - y, jointPos.z - z, 1, LaraWeaponType::RocketLauncher, lara->LeftArm.GunSmoke);
 
-		jointPos = Vector3Int(0, -256, 0);
+		jointPos = Vector3i(0, -256, 0);
 		GetLaraJointPosition(&jointPos, LM_RHAND);
 
 		for (int i = 0; i < 10; i++)
@@ -1200,7 +1200,7 @@ void RocketControl(short itemNumber)
 	// If underwater generate bubbles
 	if (TestEnvironment(ENV_FLAG_WATER, item->RoomNumber))
 	{
-		auto pos = Vector3Int(wx + item->Pose.Position.x, wy + item->Pose.Position.y, wz + item->Pose.Position.z);
+		auto pos = Vector3i(wx + item->Pose.Position.x, wy + item->Pose.Position.y, wz + item->Pose.Position.z);
 		CreateBubble(&pos, item->RoomNumber, 4, 8, 0, 0, 0, 0);
 	}
 
@@ -1389,7 +1389,7 @@ void FireCrossbow(ItemInfo* laraItem, PHD_3DPOS* pos)
 		}
 		else
 		{
-			auto jointPos = Vector3Int(0, 228, 32);
+			auto jointPos = Vector3i(0, 228, 32);
 			GetLaraJointPosition(&jointPos, LM_RHAND);
 
 			item->RoomNumber = laraItem->RoomNumber;
@@ -1399,7 +1399,7 @@ void FireCrossbow(ItemInfo* laraItem, PHD_3DPOS* pos)
 				item->Pose.Position = jointPos;
 			else
 			{
-				item->Pose.Position = Vector3Int(laraItem->Pose.Position.x, jointPos.y, laraItem->Pose.Position.z);
+				item->Pose.Position = Vector3i(laraItem->Pose.Position.x, jointPos.y, laraItem->Pose.Position.z);
 				item->RoomNumber = laraItem->RoomNumber;
 			}
 
@@ -1730,7 +1730,7 @@ void RifleHandler(ItemInfo* laraItem, LaraWeaponType weaponType)
 	{
 		if (weaponType == LaraWeaponType::Shotgun || weaponType == LaraWeaponType::HK)
 		{
-			auto pos = Vector3Int();
+			auto pos = Vector3i();
 			pos.y = -64;
 			GetLaraJointPosition(&pos, LM_RHAND);
 			TriggerDynamicLight(
@@ -1745,7 +1745,7 @@ void RifleHandler(ItemInfo* laraItem, LaraWeaponType weaponType)
 		}
 		else if (weaponType == LaraWeaponType::Revolver)
 		{
-			auto pos = Vector3Int();
+			auto pos = Vector3i();
 			pos.y = -32;
 			GetLaraJointPosition(&pos, LM_RHAND);
 			TriggerDynamicLight(pos.x, pos.y, pos.z, 12, (GetRandomControl() & 0x3F) + 192, (GetRandomControl() & 0x1F) + 128, (GetRandomControl() & 0x3F));

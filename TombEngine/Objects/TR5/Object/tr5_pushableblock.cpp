@@ -16,7 +16,7 @@
 
 using namespace TEN::Input;
 
-Vector3Int PushableBlockPos = { 0, 0, 0 };
+Vector3i PushableBlockPos = { 0, 0, 0 };
 static OBJECT_COLLISION_BOUNDS PushableBlockBounds = 
 {
 	0, 0,
@@ -130,7 +130,7 @@ void PushableBlockControl(short itemNumber)
 
 	Lara.InteractedItem = itemNumber;
 
-	Vector3Int pos = { 0, 0, 0 };
+	Vector3i pos = { 0, 0, 0 };
 
 	short quadrant = (unsigned short)(LaraItem->Pose.Orientation.y + ANGLE(45.0f)) / ANGLE(90.0f);
 

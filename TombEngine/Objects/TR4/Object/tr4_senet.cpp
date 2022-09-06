@@ -19,7 +19,7 @@ char SenetDisplacement, ActiveSenetPieces[6], SenetBoard[17];
 int SenetTargetX, SenetTargetZ;
 char ActivePiece = -1;
 
-static Vector3Int GameStixPosition = { 0, 0, -100 };
+static Vector3i GameStixPosition = { 0, 0, -100 };
 OBJECT_COLLISION_BOUNDS GameStixBounds =
 {
 	-256, 256,

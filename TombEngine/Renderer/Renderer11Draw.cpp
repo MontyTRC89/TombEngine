@@ -70,7 +70,7 @@ namespace TEN::Renderer
 							continue;
 
 						MESH& m = g_Level.Meshes[Lara.MeshPtrs[sphereMeshes[i]]];
-						Vector3Int pos = { (int)m.sphere.Center.x, (int)m.sphere.Center.y, (int)m.sphere.Center.z };
+						Vector3i pos = { (int)m.sphere.Center.x, (int)m.sphere.Center.y, (int)m.sphere.Center.z };
 
 						// Push feet spheres a little bit down
 						if (sphereMeshes[i] == LM_LFOOT || sphereMeshes[i] == LM_RFOOT)
@@ -372,7 +372,7 @@ namespace TEN::Renderer
 
 			for (int n = 0; n < ROPE_SEGMENTS; n++)
 			{
-				Vector3Int* s = &rope.meshSegment[n];
+				Vector3i* s = &rope.meshSegment[n];
 				Vector3 t;
 				Vector3 output;
 

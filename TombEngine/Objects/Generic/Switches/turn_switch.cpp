@@ -34,7 +34,7 @@ namespace TEN::Entities::Switches
 		-ANGLE(10.0f), ANGLE(10.0f)
 	};
 
-	Vector3Int TurnSwitchPos = { 650, 0, 138 }; 
+	Vector3i TurnSwitchPos = { 650, 0, 138 }; 
 
 	OBJECT_COLLISION_BOUNDS TurnSwitchBoundsC =
 	{
@@ -46,7 +46,7 @@ namespace TEN::Entities::Switches
 		-ANGLE(10.0f), ANGLE(10.0f)
 	};
 
-	Vector3Int TurnSwitchPosA = { 650, 0, -138 };
+	Vector3i TurnSwitchPosA = { 650, 0, -138 };
 
 	void TurnSwitchCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 	{

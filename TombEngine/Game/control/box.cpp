@@ -299,14 +299,14 @@ void CreatureKill(ItemInfo* item, int killAnim, int killState, int laraKillState
 
 short CreatureEffect2(ItemInfo* item, BiteInfo bite, short velocity, short angle, std::function<CreatureEffectFunction> func)
 {
-	auto pos = Vector3Int(bite.Position);
+	auto pos = Vector3i(bite.Position);
 	GetJointAbsPosition(item, &pos, bite.meshNum);
 	return func(pos.x, pos.y, pos.z, velocity, angle, item->RoomNumber);
 }
 
 short CreatureEffect(ItemInfo* item, BiteInfo bite, std::function<CreatureEffectFunction> func)
 {
-	auto pos = Vector3Int(bite.Position);
+	auto pos = Vector3i(bite.Position);
 	GetJointAbsPosition(item, &pos, bite.meshNum);
 	return func(pos.x, pos.y, pos.z, item->Animation.Velocity.z, item->Pose.Orientation.y, item->RoomNumber);
 }
@@ -1494,7 +1494,7 @@ void CreatureAIInfo(ItemInfo* item, AI_INFO* AI)
 			AI->enemyZone |= BLOCKED;
 	}
 
-	Vector3Int vector;
+	Vector3i vector;
 
 	if (enemy == LaraItem)
 	{
@@ -1807,7 +1807,7 @@ void GetCreatureMood(ItemInfo* item, AI_INFO* AI, bool isViolent)
 	}
 }
 
-TARGET_TYPE CalculateTarget(Vector3Int* target, ItemInfo* item, LOTInfo* LOT)
+TARGET_TYPE CalculateTarget(Vector3i* target, ItemInfo* item, LOTInfo* LOT)
 {
 	UpdateLOT(LOT, 5);
 

@@ -8,9 +8,9 @@
 
 //namespace TEN::Math::Geometry
 //{
-	Vector3Int TranslatePoint(const Vector3Int& point, short headingAngle, float forward, float down, float right)
+	Vector3i TranslatePoint(const Vector3i& point, short headingAngle, float forward, float down, float right)
 	{
-		return Vector3Int(TranslatePoint(point.ToVector3(), headingAngle, forward, down, right));
+		return Vector3i(TranslatePoint(point.ToVector3(), headingAngle, forward, down, right));
 	}
 
 	Vector3 TranslatePoint(const Vector3& point, short headingAngle, float forward, float down, float right)
@@ -28,9 +28,9 @@
 		);
 	}
 
-	Vector3Int TranslatePoint(const Vector3Int& point, const Vector3Shrt& orient, float distance)
+	Vector3i TranslatePoint(const Vector3i& point, const Vector3Shrt& orient, float distance)
 	{
-		return Vector3Int(TranslatePoint(point.ToVector3(), orient, distance));
+		return Vector3i(TranslatePoint(point.ToVector3(), orient, distance));
 	}
 
 	Vector3 TranslatePoint(const Vector3& point, const Vector3Shrt& orient, float distance)
@@ -50,9 +50,9 @@
 		);
 	}
 
-	Vector3Int TranslatePoint(const Vector3Int& point, const Vector3& direction, float distance)
+	Vector3i TranslatePoint(const Vector3i& point, const Vector3& direction, float distance)
 	{
-		return Vector3Int(TranslatePoint(point.ToVector3(), direction, distance));
+		return Vector3i(TranslatePoint(point.ToVector3(), direction, distance));
 	}
 
 	Vector3 TranslatePoint(const Vector3& point, const Vector3& direction, float distance)

@@ -38,7 +38,7 @@ OBJECT_COLLISION_BOUNDS PuzzleBounds =
 	-ANGLE(10.0f), ANGLE(10.0f)
 };
 
-static Vector3Int KeyHolePosition(0, 0, 312);
+static Vector3i KeyHolePosition(0, 0, 312);
 OBJECT_COLLISION_BOUNDS KeyHoleBounds =
 {
 	-256, 256,
@@ -112,7 +112,7 @@ void PuzzleHoleCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* co
 
 			if (puzzleType != PuzzleType::Cutscene)
 			{
-				Vector3Int pos = { 0, 0, bounds->Z1 - 100 };
+				Vector3i pos = { 0, 0, bounds->Z1 - 100 };
 				if (!MoveLaraPosition(&pos, receptableItem, laraItem))
 				{
 					laraInfo->InteractedItem = itemNumber;

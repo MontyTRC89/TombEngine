@@ -24,7 +24,7 @@ namespace TEN::Entities::TR5
 
 	struct RomanStatueInfo
 	{
-		Vector3Int Position;
+		Vector3i Position;
 		LIGHTNING_INFO* EnergyArcs[8];
 		unsigned int Count;
 	};
@@ -56,7 +56,7 @@ namespace TEN::Entities::TR5
 		STATUE_ANIM_START_JUMP_DOWN = 16
 	};
 
-	static void RomanStatueHitEffect(ItemInfo* item, Vector3Int* pos, int joint)
+	static void RomanStatueHitEffect(ItemInfo* item, Vector3i* pos, int joint)
 	{
 		GetJointAbsPosition(item, pos, joint);
 
@@ -247,7 +247,7 @@ namespace TEN::Entities::TR5
 		}
 	}
 
-	void TriggerRomanStatueMissileSparks(Vector3Int* pos, char fxObject)
+	void TriggerRomanStatueMissileSparks(Vector3i* pos, char fxObject)
 	{
 		auto* spark = GetFreeParticle();
 
@@ -370,7 +370,7 @@ namespace TEN::Entities::TR5
 
 			creature->MaxTurn = 0;
 
-			Vector3Int pos, pos1, pos2;
+			Vector3i pos, pos1, pos2;
 			byte color;
 			int deltaFrame;
 			bool unknown;
@@ -529,8 +529,8 @@ namespace TEN::Entities::TR5
 					if (item->TriggerFlags)
 					{
 						/*RomanStatueData.energyArcs[i] = TriggerEnergyArc(
-							(Vector3Int*)& dest.Orientation.x,
-							(Vector3Int*)& dest,
+							(Vector3i*)& dest.Orientation.x,
+							(Vector3i*)& dest,
 							(GetRandomControl() & 0x3F) + 16,
 							(color >> 1) | ((color | 0x180000) << 8),
 							15,
@@ -726,10 +726,10 @@ namespace TEN::Entities::TR5
 
 				if (deltaFrame == 34)
 				{
-					pos1 = Vector3Int(-48, 48, SECTOR(1));
+					pos1 = Vector3i(-48, 48, SECTOR(1));
 					GetJointAbsPosition(item, &pos1, 14);
 
-					pos2 = Vector3Int(-48, 48, 450);
+					pos2 = Vector3i(-48, 48, 450);
 					GetJointAbsPosition(item, &pos2, 14);
 
 				auto angles = GetOrientTowardPoint(pos2.ToVector3(), pos1.ToVector3());
@@ -879,7 +879,7 @@ namespace TEN::Entities::TR5
 
 		if (item->MeshSwapBits & 0x400)
 		{
-			Vector3Int pos;
+			Vector3i pos;
 			pos.x = (GetRandomControl() & 0x1F) - 16;
 			pos.y = 86;
 			pos.z = (GetRandomControl() & 0x1F) - 16;
@@ -888,7 +888,7 @@ namespace TEN::Entities::TR5
 
 		if (item->MeshSwapBits & 0x10)
 		{
-			Vector3Int pos;
+			Vector3i pos;
 			pos.x = -40;
 			pos.y = (GetRandomControl() & 0x7F) + 148;
 			pos.z = (GetRandomControl() & 0x3F) - 32;
@@ -897,7 +897,7 @@ namespace TEN::Entities::TR5
 
 		if (item->MeshSwapBits & 0x100)
 		{
-			Vector3Int pos;
+			Vector3i pos;
 			pos.x = (GetRandomControl() & 0x3F) + 54;
 			pos.y = -170;
 			pos.z = (GetRandomControl() & 0x1F) + 27;

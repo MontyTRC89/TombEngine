@@ -1,6 +1,6 @@
 #pragma once
 
-struct Vector3Int;
+struct Vector3i;
 
 //namespace TEN::Math
 //{
@@ -15,13 +15,13 @@ struct Vector3Int;
 		static const GameVector Empty;
 
 		GameVector();
-		GameVector(const Vector3Int& pos);
-		GameVector(const Vector3Int& pos, short roomNumber);
-		GameVector(const Vector3Int& pos, short roomNumber, short boxNumber);
+		GameVector(const Vector3i& pos);
+		GameVector(const Vector3i& pos, short roomNumber);
+		GameVector(const Vector3i& pos, short roomNumber, short boxNumber);
 		GameVector(int xPos, int yPos, int zPos);
 		GameVector(int xPos, int yPos, int zPos, short roomNumber);
 		GameVector(int xPos, int yPos, int zPos, short roomNumber, short boxNumber);
 
-		Vector3Int ToVector3Int();
+		Vector3i ToVector3i();
 	};
 //}

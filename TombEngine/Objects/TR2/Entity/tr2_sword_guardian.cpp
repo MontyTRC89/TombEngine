@@ -26,7 +26,7 @@ namespace TEN::Entities::TR2
 
 	static void SwordGuardianFly(ItemInfo* item)
 	{
-		Vector3Int pos;
+		Vector3i pos;
 		pos.x = (GetRandomControl() * 256 / 32768) + item->Pose.Position.x - 128;
 		pos.y = (GetRandomControl() * 256 / 32768) + item->Pose.Position.y - 256;
 		pos.z = (GetRandomControl() * 256 / 32768) + item->Pose.Position.z - 128;

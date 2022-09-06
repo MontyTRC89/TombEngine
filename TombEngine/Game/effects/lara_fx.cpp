@@ -87,11 +87,11 @@ namespace TEN::Effects::Lara
 
 		float z = std::sin(TO_RAD(item->Pose.Orientation.y)) * -64.0f;
 		float x = std::cos(TO_RAD(item->Pose.Orientation.y)) * -64.0f;
-		auto offset = Vector3Int(0, -4, 64);
+		auto offset = Vector3i(0, -4, 64);
 
 		GetLaraJointPosition(&offset, LM_HEAD);
 
-		auto seed = Vector3Int((GetRandomControl() & 7) - 4,
+		auto seed = Vector3i((GetRandomControl() & 7) - 4,
 			(GetRandomControl() & 7) - 8,
 			(GetRandomControl() & 7) - 4);
 

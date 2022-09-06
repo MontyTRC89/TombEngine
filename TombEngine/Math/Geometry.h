@@ -1,16 +1,16 @@
 #pragma once
 
 struct PHD_3DPOS;
-struct Vector3Int;
+struct Vector3i;
 struct Vector3Shrt;
 
 //namespace TEN::Math::Geometry
 //{
-	Vector3Int TranslatePoint(const Vector3Int& point, short headingAngle, float forward, float down = 0.0f, float right = 0.0f);
+	Vector3i TranslatePoint(const Vector3i& point, short headingAngle, float forward, float down = 0.0f, float right = 0.0f);
 	Vector3	   TranslatePoint(const Vector3& point, short headingAngle, float forward, float down = 0.0f, float right = 0.0f);
-	Vector3Int TranslatePoint(const Vector3Int& point, const Vector3Shrt& orient, float distance);
+	Vector3i TranslatePoint(const Vector3i& point, const Vector3Shrt& orient, float distance);
 	Vector3	   TranslatePoint(const Vector3& point, const Vector3Shrt& orient, float distance);
-	Vector3Int TranslatePoint(const Vector3Int& point, const Vector3& direction, float distance);
+	Vector3i TranslatePoint(const Vector3i& point, const Vector3& direction, float distance);
 	Vector3	   TranslatePoint(const Vector3& point, const Vector3& direction, float distance);
 
 	short GetShortestAngularDistance(short angleFrom, short angleTo);

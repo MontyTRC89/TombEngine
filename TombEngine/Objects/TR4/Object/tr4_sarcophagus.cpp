@@ -12,7 +12,7 @@
 
 using namespace TEN::Input;
 
-static Vector3Int SarcophagusPosition(0, 0, -300);
+static Vector3i SarcophagusPosition(0, 0, -300);
 OBJECT_COLLISION_BOUNDS SarcophagusBounds =
 {
 	-512, 512,

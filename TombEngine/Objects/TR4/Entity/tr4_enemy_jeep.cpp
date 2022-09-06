@@ -149,7 +149,7 @@ namespace TEN::Entities::TR4
 			else
 				distance = pow(dx, 2) + pow(dz, 2);
 
-			Vector3Int pos;
+			Vector3i pos;
 
 			switch (item->Animation.ActiveState)
 			{
@@ -158,7 +158,7 @@ namespace TEN::Entities::TR4
 				item->ItemFlags[0] -= 128;
 				item->MeshBits = -98305;
 
-				pos = Vector3Int(0, -144, -1024);
+				pos = Vector3i(0, -144, -1024);
 				GetJointAbsPosition(item, &pos, 11);
 
 				TriggerDynamicLight(pos.x, pos.y, pos.z, 10, 64, 0, 0);

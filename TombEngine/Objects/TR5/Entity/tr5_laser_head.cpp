@@ -23,7 +23,7 @@ namespace TEN::Entities::TR5
 {
 	struct LaserHeadStruct
 	{
-		Vector3Int target;
+		Vector3i target;
 		LIGHTNING_INFO* fireArcs[2];
 		LIGHTNING_INFO* chargeArcs[4];
 		bool LOS[2];
@@ -36,16 +36,16 @@ namespace TEN::Entities::TR5
 	LaserHeadStruct LaserHeadData;
 
 	int GuardianMeshes[5] = { 1, 2 };
-	auto LaserHeadBasePosition = Vector3Int(0, -640, 0);
-	Vector3Int GuardianChargePositions[4] =
+	auto LaserHeadBasePosition = Vector3i(0, -640, 0);
+	Vector3i GuardianChargePositions[4] =
 	{
-		Vector3Int(-188, -832, 440),
-		Vector3Int(188, -832, -440),
-		Vector3Int(440, -832, 188),
-		Vector3Int(-440, -832, -188)
+		Vector3i(-188, -832, 440),
+		Vector3i(188, -832, -440),
+		Vector3i(440, -832, 188),
+		Vector3i(-440, -832, -188)
 	};
 
-	static void TriggerLaserHeadSparks(Vector3Int* pos, int count, byte r, byte g, byte b, int unk)
+	static void TriggerLaserHeadSparks(Vector3i* pos, int count, byte r, byte g, byte b, int unk)
 	{
 		if (count > 0)
 		{
@@ -95,10 +95,10 @@ namespace TEN::Entities::TR5
 
 		auto* creature = (LaserHeadInfo*)item->Data;
 
-		auto dest = Vector3Int(LaserHeadBasePosition.x, LaserHeadBasePosition.y, LaserHeadBasePosition.z);
+		auto dest = Vector3i(LaserHeadBasePosition.x, LaserHeadBasePosition.y, LaserHeadBasePosition.z);
 		GetJointAbsPosition(&g_Level.Items[creature->BaseItem], &dest, 0);
 
-		Vector3Int src;
+		Vector3i src;
 
 		for (int i = 0; i < 4; i++)
 		{
@@ -113,7 +113,7 @@ namespace TEN::Entities::TR5
 			}
 			else
 			{
-				src = Vector3Int(GuardianChargePositions[i].x, GuardianChargePositions[i].y, GuardianChargePositions[i].z);
+				src = Vector3i(GuardianChargePositions[i].x, GuardianChargePositions[i].y, GuardianChargePositions[i].z);
 				GetJointAbsPosition(&g_Level.Items[creature->BaseItem], &src, 0);
 				//LaserHeadData.chargeArcs[i] = TriggerEnergyArc(&src, &dest, 0, g, b, 256, 90, 64, ENERGY_ARC_NO_RANDOMIZE, ENERGY_ARC_STRAIGHT_LINE); //  (GetRandomControl() & 7) + 8, v4 | ((v1 | 0x240000) << 8), 13, 48, 3);
 			}
@@ -125,7 +125,7 @@ namespace TEN::Entities::TR5
 			{
 				if (1 << GuardianMeshes[i] & item->MeshBits)
 				{
-					src = Vector3Int();
+					src = Vector3i();
 					GetJointAbsPosition(item, &src, GuardianMeshes[i]);
 
 					TriggerLightningGlow(src.x, src.y, src.z, size + (GetRandomControl() & 3), 0, g, b);
@@ -139,7 +139,7 @@ namespace TEN::Entities::TR5
 
 		if (!(GlobalCounter & 3))
 		{
-			//TriggerEnergyArc(&dest, (Vector3Int*)&item->pos, 0, g, b, 256, 3, 64, ENERGY_ARC_NO_RANDOMIZE, ENERGY_ARC_STRAIGHT_LINE);
+			//TriggerEnergyArc(&dest, (Vector3i*)&item->pos, 0, g, b, 256, 3, 64, ENERGY_ARC_NO_RANDOMIZE, ENERGY_ARC_STRAIGHT_LINE);
 			//TriggerEnergyArc(&dest, &item->pos, (GetRandomControl() & 7) + 8, v4 | ((v1 | 0x180000) << 8), 13, 64, 3);
 		}
 
@@ -290,7 +290,7 @@ namespace TEN::Entities::TR5
 				src.y = 168;
 				src.z = 248;
 				src.roomNumber = item->RoomNumber;
-				GetJointAbsPosition(item, (Vector3Int*)&src, 0);
+				GetJointAbsPosition(item, (Vector3i*)&src, 0);
 
 				if (item->ItemFlags[0] == 1)
 				{
@@ -299,7 +299,7 @@ namespace TEN::Entities::TR5
 					dest.x = 0;
 					dest.y = 0;
 					dest.z = 0;
-					GetJointAbsPosition(LaraItem, (Vector3Int*)&dest, LM_HEAD);
+					GetJointAbsPosition(LaraItem, (Vector3i*)&dest, LM_HEAD);
 
 					// Calculate distance between guardian and Lara
 					int distance = sqrt(pow(src.x - dest.x, 2) + pow(src.y - dest.y, 2) + pow(src.z - dest.z, 2));
@@ -316,7 +316,7 @@ namespace TEN::Entities::TR5
 						dest.x = 0;
 						dest.y = 0;
 						dest.z = 0;
-						GetJointAbsPosition(LaraItem, (Vector3Int*)&dest, LM_HIPS);
+						GetJointAbsPosition(LaraItem, (Vector3i*)&dest, LM_HIPS);
 
 						LaserHeadData.target.x = dest.x;
 						LaserHeadData.target.y = dest.y;
@@ -466,7 +466,7 @@ namespace TEN::Entities::TR5
 									src.x = 0;
 									src.y = 0;
 									src.z = 0;
-									GetJointAbsPosition(item, (Vector3Int*)&src, GuardianMeshes[i]);
+									GetJointAbsPosition(item, (Vector3i*)&src, GuardianMeshes[i]);
 
 									int c = 8192 * phd_cos(angles.x);
 									dest.x = src.x + c * phd_sin(item->Pose.Orientation.y);
@@ -488,7 +488,7 @@ namespace TEN::Entities::TR5
 										// Start firing from eye
 										src.roomNumber = item->RoomNumber;
 										LaserHeadData.LOS[i] = LOS(&src, &dest);
-										//LaserHeadData.fireArcs[i] = TriggerEnergyArc((Vector3Int*)& src, (Vector3Int*)& dest, r, g, b, 32, 64, 64, ENERGY_ARC_NO_RANDOMIZE, ENERGY_ARC_STRAIGHT_LINE); // (GetRandomControl() & 7) + 4, b | ((&unk_640000 | g) << 8), 12, 64, 5);
+										//LaserHeadData.fireArcs[i] = TriggerEnergyArc((Vector3i*)& src, (Vector3i*)& dest, r, g, b, 32, 64, 64, ENERGY_ARC_NO_RANDOMIZE, ENERGY_ARC_STRAIGHT_LINE); // (GetRandomControl() & 7) + 4, b | ((&unk_640000 | g) << 8), 12, 64, 5);
 										StopSoundEffect(SFX_TR5_GOD_HEAD_CHARGE);
 										SoundEffect(SFX_TR5_GOD_HEAD_BLAST, &item->Pose);
 									}
@@ -497,7 +497,7 @@ namespace TEN::Entities::TR5
 
 									if (GlobalCounter & 1)
 									{
-										TriggerLaserHeadSparks((Vector3Int*)&src, 3, r, g, b, 0);
+										TriggerLaserHeadSparks((Vector3i*)&src, 3, r, g, b, 0);
 										TriggerLightningGlow(src.x, src.y, src.z, (GetRandomControl() & 3) + 32, r, g, b);
 										TriggerDynamicLight(src.x, src.y, src.z, (GetRandomControl() & 3) + 16, r, g, b);
 
@@ -505,7 +505,7 @@ namespace TEN::Entities::TR5
 										{
 											TriggerLightningGlow(currentArc->pos4.x, currentArc->pos4.y, currentArc->pos4.z, (GetRandomControl() & 3) + 16, r, g, b);
 											TriggerDynamicLight(currentArc->pos4.x, currentArc->pos4.y, currentArc->pos4.z, (GetRandomControl() & 3) + 6, r, g, b);
-											TriggerLaserHeadSparks((Vector3Int*)&currentArc->pos4, 3, r, g, b, 0);
+											TriggerLaserHeadSparks((Vector3i*)&currentArc->pos4, 3, r, g, b, 0);
 										}
 									}
 
@@ -611,12 +611,12 @@ namespace TEN::Entities::TR5
 					src.y = 168;
 					src.z = 248;
 					src.roomNumber = item->RoomNumber;
-					GetJointAbsPosition(item, (Vector3Int*)&src, 0);
+					GetJointAbsPosition(item, (Vector3i*)&src, 0);
 
 					dest.x = 0;
 					dest.y = 0;
 					dest.z = 0;
-					GetJointAbsPosition(LaraItem, (Vector3Int*)&dest, LM_HEAD);
+					GetJointAbsPosition(LaraItem, (Vector3i*)&dest, LM_HEAD);
 
 					if (LOS(&src, &src))
 					{

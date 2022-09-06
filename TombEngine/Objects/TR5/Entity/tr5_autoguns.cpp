@@ -23,7 +23,7 @@ namespace TEN::Entities::TR5
 
 	}
 
-	static void TriggerAutoGunSmoke(Vector3Int* pos, char shade)
+	static void TriggerAutoGunSmoke(Vector3i* pos, char shade)
 	{
 		auto* spark = &SmokeSparks[GetFreeSmokeSpark()];
 
@@ -65,10 +65,10 @@ namespace TEN::Entities::TR5
 				item->MeshBits = 1664;
 
 				GameVector pos1 = { 0, 0, -64 };
-				GetJointAbsPosition(item, (Vector3Int*)&pos1, 8);
+				GetJointAbsPosition(item, (Vector3i*)&pos1, 8);
 
 				GameVector pos2 = { 0, 0, 0 };
-				GetLaraJointPosition((Vector3Int*)&pos2, 0);
+				GetLaraJointPosition((Vector3i*)&pos2, 0);
 
 				pos1.roomNumber = item->RoomNumber;
 
@@ -109,8 +109,8 @@ namespace TEN::Entities::TR5
 
 						if (GetRandomControl() & 3)
 						{
-							auto pos2 = Vector3Int();
-							GetLaraJointPosition((Vector3Int*)&pos2, GetRandomControl() % 15);
+							auto pos2 = Vector3i();
+							GetLaraJointPosition((Vector3i*)&pos2, GetRandomControl() % 15);
 
 							DoBloodSplat(pos2.x, pos2.y, pos2.z, (GetRandomControl() & 3) + 3, 2 * GetRandomControl(), LaraItem->RoomNumber);
 							DoDamage(LaraItem, 20);
@@ -161,7 +161,7 @@ namespace TEN::Entities::TR5
 				}
 
 				if (item->ItemFlags[2])
-					TriggerAutoGunSmoke((Vector3Int*)&pos1, item->ItemFlags[2] / 16);
+					TriggerAutoGunSmoke((Vector3i*)&pos1, item->ItemFlags[2] / 16);
 			}
 			else
 			{

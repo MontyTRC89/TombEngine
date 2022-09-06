@@ -32,7 +32,7 @@ using namespace TEN::Input;
 using namespace TEN::Entities::Generic;
 
 // TODO: Adjust these bounds when crawl surface alignment is implemented. @Sezz 2021.11.04
-static Vector3Int PickUpPosition(0, 0, -100);
+static Vector3i PickUpPosition(0, 0, -100);
 OBJECT_COLLISION_BOUNDS PickUpBounds = 
 {
 	-256, 256,
@@ -43,7 +43,7 @@ OBJECT_COLLISION_BOUNDS PickUpBounds =
 	-ANGLE(2.0f), ANGLE(2.0f)
 };
 
-static Vector3Int HiddenPickUpPosition(0, 0, -690);
+static Vector3i HiddenPickUpPosition(0, 0, -690);
 OBJECT_COLLISION_BOUNDS HiddenPickUpBounds =
 {
 	-256, 256,
@@ -54,7 +54,7 @@ OBJECT_COLLISION_BOUNDS HiddenPickUpBounds =
 	0, 0
 };
 
-static Vector3Int CrowbarPickUpPosition(0, 0, 215);
+static Vector3i CrowbarPickUpPosition(0, 0, 215);
 OBJECT_COLLISION_BOUNDS CrowbarPickUpBounds =
 {
 	-256, 256,
@@ -65,7 +65,7 @@ OBJECT_COLLISION_BOUNDS CrowbarPickUpBounds =
 	0, 0
 };
 
-static Vector3Int JobyCrowPickUpPosition(-224, 0, 240);
+static Vector3i JobyCrowPickUpPosition(-224, 0, 240);
 OBJECT_COLLISION_BOUNDS JobyCrowPickUpBounds =
 {
 	-512, 0,
@@ -76,7 +76,7 @@ OBJECT_COLLISION_BOUNDS JobyCrowPickUpBounds =
 	0, 0
 };
 
-static Vector3Int PlinthPickUpPosition(0, 0, -460);
+static Vector3i PlinthPickUpPosition(0, 0, -460);
 OBJECT_COLLISION_BOUNDS PlinthPickUpBounds =
 {
 	-256, 256,
@@ -87,7 +87,7 @@ OBJECT_COLLISION_BOUNDS PlinthPickUpBounds =
 	0, 0
 };
 
-static Vector3Int PickUpPositionUW(0, -200, -350);
+static Vector3i PickUpPositionUW(0, -200, -350);
 OBJECT_COLLISION_BOUNDS PickUpBoundsUW =
 {
 	-512, 512,
@@ -98,7 +98,7 @@ OBJECT_COLLISION_BOUNDS PickUpBoundsUW =
 	ANGLE(-45.0f),  ANGLE(45.0f)
 };
 
-static Vector3Int SOPos(0, 0, 0);
+static Vector3i SOPos(0, 0, 0);
 OBJECT_COLLISION_BOUNDS SOBounds =
 {
 	0, 0,
@@ -126,7 +126,7 @@ OBJECT_COLLISION_BOUNDS MSBounds =
 int NumRPickups;
 short RPickups[16];
 short getThisItemPlease = NO_ITEM;
-Vector3Int OldPickupPos;
+Vector3i OldPickupPos;
 
 void PickedUpObject(GAME_OBJECT_ID objectID, int count)
 {

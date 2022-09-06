@@ -18,7 +18,7 @@ using namespace TEN::Renderer;
 void ShiftItem(ItemInfo* item, CollisionInfo* coll)
 {
 	item->Pose.Position += coll->Shift;
-	coll->Shift = Vector3Int();
+	coll->Shift = Vector3i();
 }
 
 void SnapItemToLedge(ItemInfo* item, CollisionInfo* coll, float offsetMultiplier, bool snapToAngle)
@@ -138,7 +138,7 @@ CollisionResult GetCollision(ItemInfo* item, short headingAngle, float forward, 
 }
 
 // Overload used to probe point/room collision parameters from a given position.
-CollisionResult GetCollision(Vector3Int pos, int roomNumber, short headingAngle, float forward, float down, float right)
+CollisionResult GetCollision(Vector3i pos, int roomNumber, short headingAngle, float forward, float down, float right)
 {
 	short tempRoomNumber = roomNumber;
 	auto location = ROOM_VECTOR{ GetFloor(pos.x, pos.y, pos.z, &tempRoomNumber)->Room, pos.y };
@@ -172,7 +172,7 @@ CollisionResult GetCollision(FloorInfo* floor, int x, int y, int z)
 	CollisionResult result = {};
 
 	// Record coordinates.
-	result.Coordinates = Vector3Int(x, y, z);
+	result.Coordinates = Vector3i(x, y, z);
 
 	// Return provided block into result as itself.
 	result.Block = floor;
@@ -211,10 +211,10 @@ CollisionResult GetCollision(FloorInfo* floor, int x, int y, int z)
 
 void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, bool resetRoom)
 {
-	GetCollisionInfo(coll, item, Vector3Int(), resetRoom);
+	GetCollisionInfo(coll, item, Vector3i(), resetRoom);
 }
 
-void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, Vector3Int offset, bool resetRoom)
+void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, Vector3i offset, bool resetRoom)
 {
 	// Player collision has several more precise checks for bridge collisions.
 	// Therefore, we should differentiate these code paths.
@@ -222,13 +222,13 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, Vector3Int offset, bo
 
 	// Reset collision parameters.
 	coll->CollisionType = CollisionType::CT_NONE;
-	coll->Shift = Vector3Int::Zero;
+	coll->Shift = Vector3i::Zero;
 
 	// Offset base probe position by provided offset, if any.
 	auto entityPos = item->Pose.Position + offset;
 
 	// Specify base probe position, with Y position being bounds top side.
-	auto probePos = Vector3Int(entityPos.x, entityPos.y - coll->Setup.Height, entityPos.z);
+	auto probePos = Vector3i(entityPos.x, entityPos.y - coll->Setup.Height, entityPos.z);
 
 	// Declare side probe offsets.
 	int xFront, zFront, xRight, zRight, xLeft, zLeft;

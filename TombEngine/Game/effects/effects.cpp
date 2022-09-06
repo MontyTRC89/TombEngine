@@ -41,7 +41,7 @@ SPLASH_STRUCT Splashes[MAX_SPLASHES];
 RIPPLE_STRUCT Ripples[MAX_RIPPLES];
 int SplashCount = 0;
 
-Vector3Int NodeVectors[MAX_NODE];
+Vector3i NodeVectors[MAX_NODE];
 NODEOFFSET_INFO NodeOffsets[MAX_NODE] =
 {
 	{ -16, 40, 160, -LM_LHAND, false }, // TR5 offset 0
@@ -478,7 +478,7 @@ void TriggerExplosionBubbles(int x, int y, int z, short roomNumber)
 
 		for (int i = 0; i < 8; i++)
 		{
-			Vector3Int pos;
+			Vector3i pos;
 			pos.x = (GetRandomControl() & 0x1FF) + x - 256;
 			pos.y = (GetRandomControl() & 0x7F) + y - 64;
 			pos.z = (GetRandomControl() & 0x1FF) + z - 256;
@@ -1046,7 +1046,7 @@ void TriggerLaraBlood()
 	{
 		if (node & LaraItem->TouchBits)
 		{
-			Vector3Int vec;
+			Vector3i vec;
 			vec.x = (GetRandomControl() & 31) - 16;
 			vec.y = (GetRandomControl() & 31) - 16;
 			vec.z = (GetRandomControl() & 31) - 16;

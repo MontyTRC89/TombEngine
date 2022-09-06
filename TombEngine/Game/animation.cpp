@@ -572,14 +572,14 @@ void ClampRotation(PHD_3DPOS* pose, short angle, short rotation)
 		pose->Orientation.y += rotation;
 }
 
-Vector3Int GetLaraJointPosition(int jointIndex, Vector3Int offset)
+Vector3i GetLaraJointPosition(int jointIndex, Vector3i offset)
 {
 	auto pos = offset;
 	GetLaraJointPosition(&pos, jointIndex);
 	return pos;
 }
 
-void GetLaraJointPosition(Vector3Int* offset, int jointIndex)
+void GetLaraJointPosition(Vector3i* offset, int jointIndex)
 {
 	if (jointIndex >= NUM_LARA_MESHES)
 		jointIndex = LM_HEAD;
@@ -587,17 +587,17 @@ void GetLaraJointPosition(Vector3Int* offset, int jointIndex)
 	auto pos = offset->ToVector3();
 	g_Renderer.GetLaraAbsBonePosition(&pos, jointIndex);
 
-	*offset = Vector3Int(pos);
+	*offset = Vector3i(pos);
 }
 
-Vector3Int GetJointAbsPosition(ItemInfo* item, int jointIndex, Vector3Int offset)
+Vector3i GetJointAbsPosition(ItemInfo* item, int jointIndex, Vector3i offset)
 {
 	auto pos = offset;
 	GetJointAbsPosition(item, &pos, jointIndex);
 	return pos;
 }
 
-void GetJointAbsPosition(ItemInfo* item, Vector3Int* offset, int jointIndex)
+void GetJointAbsPosition(ItemInfo* item, Vector3i* offset, int jointIndex)
 {
 	// Get real item number.
 	short itemNumber = item - g_Level.Items.data();
@@ -607,5 +607,5 @@ void GetJointAbsPosition(ItemInfo* item, Vector3Int* offset, int jointIndex)
 	g_Renderer.GetItemAbsBonePosition(itemNumber, &pos, jointIndex);
 
 	// Store the result.
-	*offset = Vector3Int(pos);
+	*offset = Vector3i(pos);
 }

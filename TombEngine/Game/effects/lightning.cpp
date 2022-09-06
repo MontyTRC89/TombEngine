@@ -24,7 +24,7 @@ namespace TEN::Effects::Lightning
 	
 	int LightningRandomSeed = 0x0D371F947;
 	float FloatSinCosTable[8192];
-	Vector3Int LightningPos[6];
+	Vector3i LightningPos[6];
 	short LightningBuffer[1024];
 	
 	std::vector<LIGHTNING_INFO> Lightning;
@@ -69,7 +69,7 @@ namespace TEN::Effects::Lightning
 		}
 	}
 
-	void TriggerLightning(Vector3Int* src, Vector3Int* dest, unsigned char amplitude, unsigned char r, unsigned char g, unsigned char b, unsigned char life, char flags, char width, char segments)
+	void TriggerLightning(Vector3i* src, Vector3i* dest, unsigned char amplitude, unsigned char r, unsigned char g, unsigned char b, unsigned char life, char flags, char width, char segments)
 	{
 		LIGHTNING_INFO arc;
 
@@ -308,7 +308,7 @@ namespace TEN::Effects::Lightning
 		return ret + k[3];
 	}
 
-	void CalcLightningSpline(Vector3Int* pos, short* buffer, LIGHTNING_INFO* arc)
+	void CalcLightningSpline(Vector3i* pos, short* buffer, LIGHTNING_INFO* arc)
 	{
 		buffer[0] = pos->x;
 		buffer[1] = pos->y;

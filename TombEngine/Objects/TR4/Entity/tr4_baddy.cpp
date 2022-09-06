@@ -422,7 +422,7 @@ namespace TEN::Entities::TR4
 		// Handle baddy firing
 		if (creature->FiredWeapon)
 		{
-			auto pos = Vector3Int(BaddyGunBite.Position);
+			auto pos = Vector3i(BaddyGunBite.Position);
 			GetJointAbsPosition(item, &pos, BaddyGunBite.meshNum);
 
 			TriggerDynamicLight(pos.x, pos.y, pos.z, 4 * creature->FiredWeapon + 8, 24, 16, 4);

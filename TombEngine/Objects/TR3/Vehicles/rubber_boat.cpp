@@ -220,7 +220,7 @@ namespace TEN::Entities::Vehicles
 		}
 	}
 
-	static int DoRubberBoatShift2(ItemInfo* rBoatItem, Vector3Int* pos, Vector3Int* old)
+	static int DoRubberBoatShift2(ItemInfo* rBoatItem, Vector3i* pos, Vector3i* old)
 	{
 		int x = pos->x / SECTOR(1);
 		int z = pos->z / SECTOR(1);
@@ -316,7 +316,7 @@ namespace TEN::Entities::Vehicles
 		return 0;
 	}
 
-	static int GetRubberBoatCollisionAnim(ItemInfo* rBoatItem, Vector3Int* moved)
+	static int GetRubberBoatCollisionAnim(ItemInfo* rBoatItem, Vector3i* moved)
 	{
 		moved->x = rBoatItem->Pose.Position.x - moved->x;
 		moved->z = rBoatItem->Pose.Position.z - moved->z;
@@ -356,14 +356,14 @@ namespace TEN::Entities::Vehicles
 
 		rBoatItem->Pose.Orientation.z -= rBoat->LeanAngle;
 
-		Vector3Int frontLeftOld, frontRightOld, backLeftOld, backRightOld, frontOld;
+		Vector3i frontLeftOld, frontRightOld, backLeftOld, backRightOld, frontOld;
 		int heightFrontLeftOld = GetVehicleWaterHeight(rBoatItem, RBOAT_FRONT, -RBOAT_SIDE, true, &frontLeftOld);
 		int heightFrontRightOld = GetVehicleWaterHeight(rBoatItem, RBOAT_FRONT, RBOAT_SIDE, true, &frontRightOld);
 		int heightBackLeftOld = GetVehicleWaterHeight(rBoatItem, -RBOAT_FRONT, -RBOAT_SIDE, true, &backLeftOld);
 		int heightBackRightOld = GetVehicleWaterHeight(rBoatItem, -RBOAT_FRONT, RBOAT_SIDE, true, &backRightOld);
 		int heightFrontOld = GetVehicleWaterHeight(rBoatItem, 1000, 0, true, &frontOld);
 	
-		Vector3Int old;
+		Vector3i old;
 		old.x = rBoatItem->Pose.Position.x;
 		old.y = rBoatItem->Pose.Position.y;
 		old.z = rBoatItem->Pose.Position.z;
@@ -392,13 +392,13 @@ namespace TEN::Entities::Vehicles
 		rBoatItem->Pose.Position.z -= slip * phd_cos(rBoatItem->Pose.Orientation.y);
 		rBoatItem->Pose.Position.x -= slip * phd_sin(rBoatItem->Pose.Orientation.y);
 
-		Vector3Int moved;
+		Vector3i moved;
 		moved.x = rBoatItem->Pose.Position.x;
 		moved.z = rBoatItem->Pose.Position.z;
 
 		DoRubberBoatShift(itemNumber, laraItem);
 
-		Vector3Int frontLeft, frontRight, backRight, backLeft, front;
+		Vector3i frontLeft, frontRight, backRight, backLeft, front;
 		short rotation = 0;
 
 		int heightBackLeft = GetVehicleWaterHeight(rBoatItem, -RBOAT_FRONT, -RBOAT_SIDE, false, &backLeft);
@@ -432,7 +432,7 @@ namespace TEN::Entities::Vehicles
 			height = GetFloorHeight(floor, rBoatItem->Pose.Position.x, rBoatItem->Pose.Position.y, rBoatItem->Pose.Position.z);
 
 		if (height < (rBoatItem->Pose.Position.y - CLICK(0.5f)))
-			DoRubberBoatShift2(rBoatItem, (Vector3Int*)&rBoatItem->Pose, &old);
+			DoRubberBoatShift2(rBoatItem, (Vector3i*)&rBoatItem->Pose, &old);
 
 		DoVehicleCollision(rBoatItem, RBOAT_RADIUS);
 
@@ -834,7 +834,7 @@ namespace TEN::Entities::Vehicles
 
 		int pitch, height, ofs;
 
-		Vector3Int frontLeft, frontRight;
+		Vector3i frontLeft, frontRight;
 		int collide = RubberBoatDynamics(itemNumber, laraItem);
 		int heightFrontLeft = GetVehicleWaterHeight(rBoatItem, RBOAT_FRONT, -RBOAT_SIDE, true, &frontLeft);
 		int heightFrontRight = GetVehicleWaterHeight(rBoatItem, RBOAT_FRONT, RBOAT_SIDE, true, &frontRight);
@@ -964,7 +964,7 @@ namespace TEN::Entities::Vehicles
 		else
 			height = 1;
 
-		auto prop = Vector3Int(0, 0, -80);
+		auto prop = Vector3i(0, 0, -80);
 		GetJointAbsPosition(rBoatItem, &prop, 2);
 
 		probedRoomNumber = GetCollision(prop.x, prop.y, prop.z, rBoatItem->RoomNumber).RoomNumber;
@@ -983,7 +983,7 @@ namespace TEN::Entities::Vehicles
 
 				short roomNumber = rBoatItem->RoomNumber;
 				GetFloor(pos.Position.x, pos.Position.y, pos.Position.z, &roomNumber);
-				CreateBubble((Vector3Int*)&pos, roomNumber, 16, 8, 0, 0, 0, 0);
+				CreateBubble((Vector3i*)&pos, roomNumber, 16, 8, 0, 0, 0, 0);
 			}
 		}
 		else

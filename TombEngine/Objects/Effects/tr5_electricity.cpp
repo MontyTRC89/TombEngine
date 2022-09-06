@@ -86,7 +86,7 @@ void TriggerElectricityWireSparks(int x, int z, byte objNum, byte node, bool glo
 
 void TriggerElectricitySparks(ItemInfo* item, int joint, int flame)
 {
-	Vector3Int pos = { 0, 0, 0 };
+	Vector3i pos = { 0, 0, 0 };
 	GetJointAbsPosition(item, &pos, joint);
 
 	auto* spark = GetFreeParticle();
@@ -119,7 +119,7 @@ void TriggerElectricitySparks(ItemInfo* item, int joint, int flame)
 		TriggerFireFlame(pos.x, pos.y, pos.z, -1, 254);
 }
 
-static bool ElectricityWireCheckDeadlyBounds(Vector3Int* pos, short delta)
+static bool ElectricityWireCheckDeadlyBounds(Vector3i* pos, short delta)
 {
 	if (pos->x + delta >= DeadlyBounds[0] && pos->x - delta <= DeadlyBounds[1] &&
 		pos->y + delta >= DeadlyBounds[2] && pos->y - delta <= DeadlyBounds[3] &&
@@ -154,7 +154,7 @@ void ElectricityWiresControl(short itemNumber)
 
 	for (int i = 0; i < object->nmeshes; i++)
 	{
-		auto pos = Vector3Int(0, 0, CLICK(1));
+		auto pos = Vector3i(0, 0, CLICK(1));
 		GetJointAbsPosition(item, &pos, i);
 
 		if (pos.y < cableBottomPlane)
@@ -196,7 +196,7 @@ void ElectricityWiresControl(short itemNumber)
 
 		for (int i = 0; i < object->nmeshes; i++)
 		{
-			auto pos = Vector3Int(0, 0, CLICK(1));
+			auto pos = Vector3i(0, 0, CLICK(1));
 			GetJointAbsPosition(item, &pos, i);
 
 			short roomNumber = item->RoomNumber;
@@ -215,7 +215,7 @@ void ElectricityWiresControl(short itemNumber)
 
 			for (int j = 0; j < collObj->nmeshes; j++)
 			{
-				Vector3Int collPos = {};
+				Vector3i collPos = {};
 				GetJointAbsPosition(collItem, &collPos, j);
 
 				auto collJointRoom = GetCollision(collPos.x, collPos.y, collPos.z, collItem->RoomNumber).RoomNumber;

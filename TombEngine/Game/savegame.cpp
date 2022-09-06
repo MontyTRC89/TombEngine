@@ -107,7 +107,7 @@ Save::Vector3 FromVector3(Vector3 vec)
 	return Save::Vector3(vec.x, vec.y, vec.z);
 }
 
-Save::Vector3 FromVector3(Vector3Int vec)
+Save::Vector3 FromVector3(Vector3i vec)
 {
 	return Save::Vector3(vec.x, vec.y, vec.z);
 }
@@ -127,9 +127,9 @@ Vector3Shrt ToVector3Shrt(const Save::Vector3* vec)
 	return Vector3Shrt(short(vec->x()), short(vec->y()), short(vec->z()));
 }
 
-Vector3Int ToVector3Int(const Save::Vector3* vec)
+Vector3i ToVector3i(const Save::Vector3* vec)
 {
-	return Vector3Int(int(vec->x()), int(vec->y()), int(vec->z()));
+	return Vector3i(int(vec->x()), int(vec->y()), int(vec->z()));
 }
 
 Vector3 ToVector3(const Save::Vector3* vec)
@@ -1871,25 +1871,25 @@ bool SaveGame::Load(int slot)
 		
 		for (int i = 0; i < ROPE_SEGMENTS; i++)
 		{
-			rope->segment[i] = ToVector3Int(s->rope()->segments()->Get(i));
-			rope->normalisedSegment[i] = ToVector3Int(s->rope()->normalised_segments()->Get(i));
-			rope->meshSegment[i] = ToVector3Int(s->rope()->mesh_segments()->Get(i));
-			rope->coords[i] = ToVector3Int(s->rope()->coords()->Get(i));
-			rope->velocity[i] = ToVector3Int(s->rope()->velocities()->Get(i));
+			rope->segment[i] = ToVector3i(s->rope()->segments()->Get(i));
+			rope->normalisedSegment[i] = ToVector3i(s->rope()->normalised_segments()->Get(i));
+			rope->meshSegment[i] = ToVector3i(s->rope()->mesh_segments()->Get(i));
+			rope->coords[i] = ToVector3i(s->rope()->coords()->Get(i));
+			rope->velocity[i] = ToVector3i(s->rope()->velocities()->Get(i));
 		}
 
 		rope->coiled = s->rope()->coiled();
 		rope->active = s->rope()->active();
 
-		rope->position = ToVector3Int(s->rope()->position());
-		CurrentPendulum.position = ToVector3Int(s->pendulum()->position());
-		CurrentPendulum.velocity = ToVector3Int(s->pendulum()->velocity());
+		rope->position = ToVector3i(s->rope()->position());
+		CurrentPendulum.position = ToVector3i(s->pendulum()->position());
+		CurrentPendulum.velocity = ToVector3i(s->pendulum()->velocity());
 
 		CurrentPendulum.node = s->pendulum()->node();
 		CurrentPendulum.rope = rope;
 
-		AlternatePendulum.position = ToVector3Int(s->alternate_pendulum()->position());
-		AlternatePendulum.velocity = ToVector3Int(s->alternate_pendulum()->velocity());
+		AlternatePendulum.position = ToVector3i(s->alternate_pendulum()->position());
+		AlternatePendulum.velocity = ToVector3i(s->alternate_pendulum()->velocity());
 
 		AlternatePendulum.node = s->alternate_pendulum()->node();
 		AlternatePendulum.rope = rope;

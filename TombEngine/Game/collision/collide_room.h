@@ -54,7 +54,7 @@ struct CollisionPosition
 
 struct CollisionResult
 {
-	Vector3Int Coordinates;
+	Vector3i Coordinates;
 	int RoomNumber;
 
 	FloorInfo* Block;
@@ -87,7 +87,7 @@ struct CollisionSetup
 	bool EnableSpasm;			// Convulse when pushed
 
 	// Preserve old parameters to restore later
-	Vector3Int OldPosition;
+	Vector3i OldPosition;
 	int OldAnimNumber;
 	int OldFrameNumber;
 	int OldState;
@@ -104,7 +104,7 @@ struct CollisionInfo
 	CollisionPosition FrontLeft;    
 	CollisionPosition FrontRight;   
 
-	Vector3Int Shift;
+	Vector3i Shift;
 	CollisionType CollisionType;
 	Vector2 FloorTilt;				// x = x, y = z
 	Vector2 CeilingTilt;			// x = x, y = z
@@ -124,11 +124,11 @@ struct CollisionInfo
 
 CollisionResult GetCollision(ItemInfo* item);
 CollisionResult GetCollision(ItemInfo* item, short headingAngle, float forward, float down = 0.0f, float right = 0.0f);
-CollisionResult GetCollision(Vector3Int pos, int roomNumber, short headingAngle, float forward, float down = 0.0f, float right = 0.0f);
+CollisionResult GetCollision(Vector3i pos, int roomNumber, short headingAngle, float forward, float down = 0.0f, float right = 0.0f);
 CollisionResult GetCollision(int x, int y, int z, short roomNumber);
 CollisionResult GetCollision(FloorInfo* floor, int x, int y, int z);
 
-void  GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, Vector3Int offset, bool resetRoom = false);
+void  GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, Vector3i offset, bool resetRoom = false);
 void  GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, bool resetRoom = false);
 int   GetQuadrant(short angle);
 short GetNearestLedgeAngle(ItemInfo* item, CollisionInfo* coll, float& distance);

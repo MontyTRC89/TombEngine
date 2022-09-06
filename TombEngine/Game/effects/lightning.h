@@ -6,7 +6,7 @@
 
 using std::vector;
 
-struct Vector3Int;
+struct Vector3i;
 struct ENERGY_ARC;
 
 namespace TEN::Effects::Lightning
@@ -22,10 +22,10 @@ namespace TEN::Effects::Lightning
 
 	struct LIGHTNING_INFO
 	{
-		Vector3Int pos1;
-		Vector3Int pos2;
-		Vector3Int pos3;
-		Vector3Int pos4;
+		Vector3i pos1;
+		Vector3i pos2;
+		Vector3i pos3;
+		Vector3i pos4;
 		signed char interpolation[9];
 		byte r;
 		byte g;
@@ -47,12 +47,12 @@ namespace TEN::Effects::Lightning
 
 	extern int LightningRandomSeed;
 	extern float FloatSinCosTable[8192];
-	extern Vector3Int LightningPos[6];
+	extern Vector3i LightningPos[6];
 	extern short LightningBuffer[1024];
 
 	void InitialiseFloatSinCosTable();
 	void UpdateLightning();
-	void TriggerLightning(Vector3Int* src, Vector3Int* dest, byte amplitude, byte r, byte g, byte b, byte life, char flags, char width, char segments);
-	void CalcLightningSpline(Vector3Int* pos, short* buffer, LIGHTNING_INFO* arc);
+	void TriggerLightning(Vector3i* src, Vector3i* dest, byte amplitude, byte r, byte g, byte b, byte life, char flags, char width, char segments);
+	void CalcLightningSpline(Vector3i* pos, short* buffer, LIGHTNING_INFO* arc);
 	void TriggerLightningGlow(int x, int y, int z, byte size, byte r, byte g, byte b);
 }

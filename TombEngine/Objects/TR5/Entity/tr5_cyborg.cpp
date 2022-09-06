@@ -223,7 +223,7 @@ namespace TEN::Entities::TR5
 
 			if (creature->FiredWeapon)
 			{
-				auto pos = Vector3Int(CyborgGunBite.Position);
+				auto pos = Vector3i(CyborgGunBite.Position);
 				GetJointAbsPosition(item, &pos, CyborgGunBite.meshNum);
 
 				TriggerDynamicLight(pos.x, pos.y, pos.z, 2 * creature->FiredWeapon + 10, 192, 128, 32);
@@ -255,7 +255,7 @@ namespace TEN::Entities::TR5
 				random &= 31;
 			if (random < item->ItemFlags[0])
 			{
-				auto pos = Vector3Int(0, 0, 50);
+				auto pos = Vector3i(0, 0, 50);
 				GetJointAbsPosition(item, &pos, HitmanJoints[random]);
 
 				TriggerLightningGlow(pos.x, pos.y, pos.z, 48, 32, 32, 64);
@@ -266,7 +266,7 @@ namespace TEN::Entities::TR5
 
 				if (random == 5 || random == 7 || random == 10)
 				{
-					auto pos2 = Vector3Int(0, 0, 50);
+					auto pos2 = Vector3i(0, 0, 50);
 
 					switch (random)
 					{
@@ -293,7 +293,7 @@ namespace TEN::Entities::TR5
 						break;
 					}
 
-					//TriggerEnergyArc((Vector3Int*)& src, (Vector3Int*)& src.x_rot, (GetRandomControl() & 7) + 8, 404701055, 13, 64, 3);
+					//TriggerEnergyArc((Vector3i*)& src, (Vector3i*)& src.x_rot, (GetRandomControl() & 7) + 8, 404701055, 13, 64, 3);
 				}
 			}
 
@@ -607,13 +607,13 @@ namespace TEN::Entities::TR5
 			}
 			else if (item->Animation.ActiveState == 43 && !Lara.Burn)
 			{
-				auto pos = Vector3Int(0, 0, 0);
+				auto pos = Vector3i(0, 0, 0);
 				GetLaraJointPosition(&pos, LM_LFOOT);
 
 				short roomNumberLeft = LaraItem->RoomNumber;
 				GetFloor(pos.x, pos.y, pos.z, &roomNumberLeft);
 
-				pos = Vector3Int();
+				pos = Vector3i();
 				GetLaraJointPosition(&pos, LM_RFOOT);
 
 				short roomNumberRight = LaraItem->RoomNumber;

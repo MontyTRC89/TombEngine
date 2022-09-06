@@ -26,7 +26,7 @@ namespace TEN::Entities::TR4
 {
 	const auto SASGunBite = BiteInfo(Vector3(0.0f, 300.0f, 64.0f), 7);
 
-	auto SASDragBodyPosition = Vector3Int(0, 0, -460);
+	auto SASDragBodyPosition = Vector3i(0, 0, -460);
 	OBJECT_COLLISION_BOUNDS SASDragBodyBounds =
 	{
 		-256, 256,
@@ -123,7 +123,7 @@ namespace TEN::Entities::TR4
 		// Handle SAS firing.
 		if (creature->FiredWeapon)
 		{
-			auto pos = Vector3Int(SASGunBite.Position);
+			auto pos = Vector3i(SASGunBite.Position);
 			GetJointAbsPosition(item, &pos, SASGunBite.meshNum);
 
 			TriggerDynamicLight(pos.x, pos.y, pos.z, 10, 24, 16, 4);
@@ -565,7 +565,7 @@ namespace TEN::Entities::TR4
 			grenadeItem->ObjectNumber = ID_GRENADE;
 			grenadeItem->RoomNumber = item->RoomNumber;
 
-			auto pos = Vector3Int(SASGunBite.Position);
+			auto pos = Vector3i(SASGunBite.Position);
 			GetJointAbsPosition(item, &pos, SASGunBite.meshNum);
 
 			grenadeItem->Pose.Position = pos;
@@ -575,7 +575,7 @@ namespace TEN::Entities::TR4
 
 			if (probe.Position.Floor < grenadeItem->Pose.Position.y)
 			{
-				grenadeItem->Pose.Position = Vector3Int(item->Pose.Position.x, probe.Position.Floor, item->Pose.Position.z);
+				grenadeItem->Pose.Position = Vector3i(item->Pose.Position.x, probe.Position.Floor, item->Pose.Position.z);
 				grenadeItem->RoomNumber = item->RoomNumber;
 			}
 

@@ -18,7 +18,7 @@
 
 namespace TEN::Entities::TR2
 {
-	const auto WorkerFlamethrowerOffset = Vector3Int(0, 140, 0);
+	const auto WorkerFlamethrowerOffset = Vector3i(0, 140, 0);
 	const auto WorkerFlamethrowerBite = BiteInfo(Vector3(0.0f, 250.0f, 32.0f), 9);
 
 	// TODO
@@ -51,7 +51,7 @@ namespace TEN::Entities::TR2
 		if (!CreatureActive(itemNumber))
 			return;
 
-		Vector3Int pos;
+		Vector3i pos;
 
 		auto* item = &g_Level.Items[itemNumber];
 		auto* creature = GetCreatureInfo(item);
@@ -63,7 +63,7 @@ namespace TEN::Entities::TR2
 		short torsoX = 0;
 		short torsoY = 0;
 
-		pos = Vector3Int(WorkerFlamethrowerBite.Position);
+		pos = Vector3i(WorkerFlamethrowerBite.Position);
 		GetJointAbsPosition(item, &pos, WorkerFlamethrowerBite.meshNum);
 
 		if (item->HitPoints <= 0)

@@ -74,7 +74,7 @@ namespace TEN::Entities::TR5
 		}
 	}
 
-	void TriggerHydraMissileSparks(Vector3Int* pos, short xv, short yv, short zv)
+	void TriggerHydraMissileSparks(Vector3i* pos, short xv, short yv, short zv)
 	{
 		auto* spark = GetFreeParticle();
 
@@ -317,10 +317,10 @@ namespace TEN::Entities::TR5
 			case 3:
 				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase)
 				{
-					auto pos1 = Vector3Int(0, 1024, 40);
+					auto pos1 = Vector3i(0, 1024, 40);
 					GetJointAbsPosition(item, &pos1, 10);
 
-					auto pos2 = Vector3Int(0, 144, 40);
+					auto pos2 = Vector3i(0, 144, 40);
 					GetJointAbsPosition(item, &pos2, 10);
 
 				auto angles = GetOrientTowardPoint(pos2.ToVector3(), pos1.ToVector3());

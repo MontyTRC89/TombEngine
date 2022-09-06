@@ -28,7 +28,7 @@ void GenSlot1Control(short itemNumber)
 			bool found = false;
 			for (int i = 0; i < 6; i++)
 			{
-				Vector3Int pos = { 0, -350, 0 };
+				Vector3i pos = { 0, -350, 0 };
 				GetJointAbsPosition(item, &pos, i + 1);
 
 				if (pos.x > DeadlyBounds[0] &&
@@ -46,7 +46,7 @@ void GenSlot1Control(short itemNumber)
 			{
 				for (int i = 0; i < 8; i++)
 				{
-					Vector3Int pos = { 0, 0, 0 };
+					Vector3i pos = { 0, 0, 0 };
 					GetLaraJointPosition(&pos, i + 7);
 
 					int x = pos.x + (GetRandomControl() & 0xFF) - 128;

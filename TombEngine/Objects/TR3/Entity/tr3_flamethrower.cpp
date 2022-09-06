@@ -18,7 +18,7 @@
 
 namespace TEN::Entities::TR3
 {
-	const auto FlamethrowerOffset = Vector3Int(0, 340, 0);
+	const auto FlamethrowerOffset = Vector3i(0, 340, 0);
 	const auto FlamethrowerBite = BiteInfo(Vector3(0.0f, 340.0f, 64.0f), 7);
 
 	// TODO
@@ -47,7 +47,7 @@ namespace TEN::Entities::TR3
 		short tilt = 0;
 		short head = 0;
 
-		auto pos = Vector3Int(FlamethrowerBite.Position);
+		auto pos = Vector3i(FlamethrowerBite.Position);
 		GetJointAbsPosition(item, &pos, FlamethrowerBite.meshNum);
 
 		int random = GetRandomControl();
@@ -293,10 +293,10 @@ namespace TEN::Entities::TR3
 					item->Animation.TargetState = 1;
 
 				if (creature->Flags < 40)
-					ThrowFire(itemNumber, FlamethrowerBite.meshNum, FlamethrowerOffset, Vector3Int(0, creature->Flags * 1.5f, 0));
+					ThrowFire(itemNumber, FlamethrowerBite.meshNum, FlamethrowerOffset, Vector3i(0, creature->Flags * 1.5f, 0));
 				else
 				{
-					ThrowFire(itemNumber, FlamethrowerBite.meshNum, FlamethrowerOffset, Vector3Int(0, (GetRandomControl() & 63) + 12, 0));
+					ThrowFire(itemNumber, FlamethrowerBite.meshNum, FlamethrowerOffset, Vector3i(0, (GetRandomControl() & 63) + 12, 0));
 					if (realEnemy)
 					{
 						/*code*/
@@ -328,10 +328,10 @@ namespace TEN::Entities::TR3
 					item->Animation.TargetState = 2;
 
 				if (creature->Flags < 40)
-					ThrowFire(itemNumber, FlamethrowerBite.meshNum, FlamethrowerOffset, Vector3Int(0, creature->Flags * 1.5f, 0));
+					ThrowFire(itemNumber, FlamethrowerBite.meshNum, FlamethrowerOffset, Vector3i(0, creature->Flags * 1.5f, 0));
 				else
 				{
-					ThrowFire(itemNumber, FlamethrowerBite.meshNum, FlamethrowerOffset, Vector3Int(0, (GetRandomControl() & 63) + 12, 0));
+					ThrowFire(itemNumber, FlamethrowerBite.meshNum, FlamethrowerOffset, Vector3i(0, (GetRandomControl() & 63) + 12, 0));
 					if (realEnemy)
 					{
 						/*code*/

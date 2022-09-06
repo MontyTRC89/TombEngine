@@ -173,7 +173,7 @@ void ShiftLaraOnPlatform(short itemNumber, bool isExpanding)
 	}
 
 	auto coll = &LaraCollision;
-	GetCollisionInfo(coll, LaraItem, Vector3Int(xShift, 0, zShift));
+	GetCollisionInfo(coll, LaraItem, Vector3i(xShift, 0, zShift));
 
 	if (coll->Middle.Ceiling >= 0 || coll->HitStatic)
 		return;

@@ -210,7 +210,7 @@ namespace TEN::Entities::TR3
 		auto* item = &g_Level.Items[itemNumber];
 		auto* shiva = GetCreatureInfo(item);
 
-		auto pos = Vector3Int(0, 0, 256);
+		auto pos = Vector3i(0, 0, 256);
 		bool laraAlive = LaraItem->HitPoints > 0;
 
 		Vector3Shrt extraHeadRot;

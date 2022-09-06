@@ -170,7 +170,7 @@ namespace TEN::Entities::Generic
 
 		if (Lara.Torch.IsLit)
 		{
-			auto pos = Vector3Int(-32, 64, 256);
+			auto pos = Vector3i(-32, 64, 256);
 			GetLaraJointPosition(&pos, LM_LHAND);
 
 			TriggerDynamicLight(pos.x, pos.y, pos.z, 12 - (GetRandomControl() & 1), (GetRandomControl() & 0x3F) + 192, (GetRandomControl() & 0x1F) + 96, 0);
@@ -214,14 +214,14 @@ namespace TEN::Entities::Generic
 			item->Pose.Orientation.z = 0;
 		}
 
-		auto velocity = Vector3Int(
+		auto velocity = Vector3i(
 			item->Animation.Velocity.z * phd_sin(item->Pose.Orientation.y),
 			item->Animation.Velocity.y,
 			item->Animation.Velocity.z * phd_cos(item->Pose.Orientation.y)
 		);
 
 		auto oldPos = item->Pose.Position;
-		item->Pose.Position += Vector3Int(velocity.x, 0, velocity.z);
+		item->Pose.Position += Vector3i(velocity.x, 0, velocity.z);
 
 		if (TestEnvironment(ENV_FLAG_WATER, item) ||
 			TestEnvironment(ENV_FLAG_SWAMP, item))
@@ -269,7 +269,7 @@ namespace TEN::Entities::Generic
 		}
 	}
 
-	void LaraTorch(Vector3Int* src, Vector3Int* target, int rot, int color)
+	void LaraTorch(Vector3i* src, Vector3i* target, int rot, int color)
 	{
 		auto pos1 = GameVector(
 			src->x,

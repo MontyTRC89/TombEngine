@@ -21,7 +21,7 @@ namespace TEN::Effects::Footprints
 		short roomNumber = item.RoomNumber;
 
 		auto floor = GetFloor(x, y, z, &roomNumber);
-		auto pos = Vector3Int(0, FOOT_HEIGHT_OFFSET, 0);
+		auto pos = Vector3i(0, FOOT_HEIGHT_OFFSET, 0);
 
 		GetLaraJointPosition(&pos, mesh);
 		int height = GetFloorHeight(floor, pos.x, pos.y - STEP_SIZE, pos.z);

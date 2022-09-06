@@ -821,10 +821,10 @@ FireWeaponType FireWeapon(LaraWeaponType weaponType, ItemInfo* target, ItemInfo*
 
 	auto* weapon = &Weapons[(int)weaponType];
 
-	auto muzzleOffset = Vector3Int();
+	auto muzzleOffset = Vector3i();
 	GetLaraJointPosition(&muzzleOffset, LM_RHAND);
 
-	auto pos = Vector3Int(src->Pose.Position.x, muzzleOffset.y, src->Pose.Position.z);
+	auto pos = Vector3i(src->Pose.Position.x, muzzleOffset.y, src->Pose.Position.z);
 
 	auto wobbleArmOrient = Vector3Shrt(
 		armOrient.x + (GetRandomControl() - ANGLE(90.0f)) * weapon->ShotAccuracy / 65536,
@@ -960,7 +960,7 @@ void LaraTargetInfo(ItemInfo* laraItem, WeaponInfo* weaponInfo)
 		return;
 	}
 
-	auto muzzleOffset = Vector3Int();
+	auto muzzleOffset = Vector3i();
 	GetLaraJointPosition(&muzzleOffset, LM_RHAND);
 
 	auto src = GameVector(
@@ -1036,7 +1036,7 @@ void LaraGetNewTarget(ItemInfo* laraItem, WeaponInfo* weaponInfo)
 		return;
 	}
 
-	auto muzzleOffset = Vector3Int();
+	auto muzzleOffset = Vector3i();
 	GetLaraJointPosition(&muzzleOffset, LM_RHAND);
 
 	auto src = GameVector(

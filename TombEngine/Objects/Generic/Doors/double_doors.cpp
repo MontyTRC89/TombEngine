@@ -23,7 +23,7 @@ using namespace TEN::Input;
 
 namespace TEN::Entities::Doors
 {
-	Vector3Int DoubleDoorPos(0, 0, 220);
+	Vector3i DoubleDoorPos(0, 0, 220);
 
 	OBJECT_COLLISION_BOUNDS DoubleDoorBounds =
 	{

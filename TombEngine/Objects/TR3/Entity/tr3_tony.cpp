@@ -44,7 +44,7 @@ namespace TEN::Entities::TR3
 	struct TonyFlame
 	{
 		bool on;
-		Vector3Int pos;
+		Vector3i pos;
 		int fallspeed;
 		int speed;
 		short yRot;
@@ -252,7 +252,7 @@ namespace TEN::Entities::TR3
 		}
 	}
 
-	static void TriggerFireBall(ItemInfo* item, TonyFlameType type, Vector3Int* laraPos, short roomNumber, short angle, int zdVelocity)
+	static void TriggerFireBall(ItemInfo* item, TonyFlameType type, Vector3i* laraPos, short roomNumber, short angle, int zdVelocity)
 	{
 		TonyFlame flame;
 		memset(&flame, 0, sizeof(TonyFlame));
@@ -411,7 +411,7 @@ namespace TEN::Entities::TR3
 		{
 			if (fx->flag1 == T_ROCKZAPPL || fx->flag1 == T_ROCKZAPPR || fx->flag1 == T_ZAPP || fx->flag1 == T_DROPPER)
 			{
-				Vector3Int pos;
+				Vector3i pos;
 
 				TriggerExplosionSparks(oldX, oldY, oldZ, 3, -2, 0, fx->roomNumber);
 				if (fx->flag1 == T_ROCKZAPPL || fx->flag1 == T_ROCKZAPPR)
@@ -714,7 +714,7 @@ namespace TEN::Entities::TR3
 			g = (g * bright) / 16;
 			b = (b * bright) / 16;
 
-			Vector3Int pos1 = { 0, 0, 0 };
+			Vector3i pos1 = { 0, 0, 0 };
 			GetJointAbsPosition(item, &pos1, 10);
 
 			TriggerDynamicLight(pos1.x, pos1.y, pos1.z, 12, r, g, b);

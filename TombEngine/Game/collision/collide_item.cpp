@@ -331,7 +331,7 @@ void TestForObjectOnLedge(ItemInfo* item, CollisionInfo* coll)
 					continue;
 				}
 
-				if (Vector3Int::Distance(item->Pose.Position, item2->Pose.Position) < COLLISION_CHECK_DISTANCE)
+				if (Vector3i::Distance(item->Pose.Position, item2->Pose.Position) < COLLISION_CHECK_DISTANCE)
 				{
 					auto box = TO_DX_BBOX(item2->Pose, GetBoundsAccurate(item2));
 					float distance;
@@ -353,7 +353,7 @@ void TestForObjectOnLedge(ItemInfo* item, CollisionInfo* coll)
 				if (!(mesh->flags & StaticMeshFlags::SM_VISIBLE))
 					continue;
 
-				if (Vector3Int::Distance(item->Pose.Position, mesh->pos.Position) < COLLISION_CHECK_DISTANCE)
+				if (Vector3i::Distance(item->Pose.Position, mesh->pos.Position) < COLLISION_CHECK_DISTANCE)
 				{
 					auto box = TO_DX_BBOX(mesh->pos, GetBoundsAccurate(mesh, false));
 					float distance;
@@ -418,7 +418,7 @@ bool TestLaraPosition(OBJECT_COLLISION_BOUNDS* bounds, ItemInfo* item, ItemInfo*
 	return true;
 }
 
-bool AlignLaraPosition(Vector3Int* vec, ItemInfo* item, ItemInfo* laraItem)
+bool AlignLaraPosition(Vector3i* vec, ItemInfo* item, ItemInfo* laraItem)
 {
 	auto* lara = GetLaraInfo(laraItem);
 
@@ -436,7 +436,7 @@ bool AlignLaraPosition(Vector3Int* vec, ItemInfo* item, ItemInfo* laraItem)
 	int height = GetCollision(newPos.x, newPos.y, newPos.z, laraItem->RoomNumber).Position.Floor;
 	if ((laraItem->Pose.Position.y - height) <= CLICK(2))
 	{
-		laraItem->Pose.Position = Vector3Int(newPos);
+		laraItem->Pose.Position = Vector3i(newPos);
 		return true;
 	}
 
@@ -449,7 +449,7 @@ bool AlignLaraPosition(Vector3Int* vec, ItemInfo* item, ItemInfo* laraItem)
 	return false;
 }
 
-bool MoveLaraPosition(Vector3Int* vec, ItemInfo* item, ItemInfo* laraItem)
+bool MoveLaraPosition(Vector3i* vec, ItemInfo* item, ItemInfo* laraItem)
 {
 	auto* lara = GetLaraInfo(laraItem);
 
@@ -463,7 +463,7 @@ bool MoveLaraPosition(Vector3Int* vec, ItemInfo* item, ItemInfo* laraItem)
 	);
 
 	pos = Vector3::Transform(pos, matrix);
-	target.Position = item->Pose.Position + Vector3Int(pos);
+	target.Position = item->Pose.Position + Vector3i(pos);
 
 	if (!Objects[item->ObjectNumber].isPickup)
 		return Move3DPosTo3DPos(&laraItem->Pose, &target, LARA_ALIGN_VELOCITY, ANGLE(2.0f));
@@ -880,7 +880,7 @@ void CollideSolidStatics(ItemInfo* item, CollisionInfo* coll)
 			// Only process meshes which are visible and solid
 			if ((mesh->flags & StaticMeshFlags::SM_VISIBLE) && (mesh->flags & StaticMeshFlags::SM_SOLID))
 			{
-				if (Vector3Int::Distance(item->Pose.Position, mesh->pos.Position) < COLLISION_CHECK_DISTANCE)
+				if (Vector3i::Distance(item->Pose.Position, mesh->pos.Position) < COLLISION_CHECK_DISTANCE)
 				{
 					auto staticInfo = &StaticObjects[mesh->staticNumber];
 					if (CollideSolidBounds(item, GetBoundsAccurate(mesh, false), mesh->pos, coll))
@@ -1067,7 +1067,7 @@ bool CollideSolidBounds(ItemInfo* item, BOUNDING_BOX* box, PHD_3DPOS pos, Collis
 
 	// Calculate shifts
 
-	Vector3Int rawShift = {};
+	Vector3i rawShift = {};
 
 	auto shiftLeft = inXMax - XMin;
 	auto shiftRight = XMax - inXMin;
@@ -1761,7 +1761,7 @@ void DoObjectCollision(ItemInfo* laraItem, CollisionInfo* coll)
 			if (object->collision == nullptr)
 				continue;
 
-			if (Vector3Int::Distance(item->Pose.Position, laraItem->Pose.Position) >= COLLISION_CHECK_DISTANCE)
+			if (Vector3i::Distance(item->Pose.Position, laraItem->Pose.Position) >= COLLISION_CHECK_DISTANCE)
 				continue;
 
 			if (doPlayerCollision)
@@ -1826,7 +1826,7 @@ void DoObjectCollision(ItemInfo* laraItem, CollisionInfo* coll)
 			if (doPlayerCollision && (mesh->flags & StaticMeshFlags::SM_SOLID))
 				continue;
 
-			if (Vector3Int::Distance(mesh->pos.Position, laraItem->Pose.Position) >= COLLISION_CHECK_DISTANCE)
+			if (Vector3i::Distance(mesh->pos.Position, laraItem->Pose.Position) >= COLLISION_CHECK_DISTANCE)
 				continue;
 
 			if (!TestBoundsCollideStatic(laraItem, mesh, coll->Setup.Radius))

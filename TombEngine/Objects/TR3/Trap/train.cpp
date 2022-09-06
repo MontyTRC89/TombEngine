@@ -24,7 +24,7 @@ long TrainTestHeight(ItemInfo* item, long x, long z, short* roomNumber)
 	float s = phd_sin(item->Pose.Orientation.y);
 	float c = phd_cos(item->Pose.Orientation.y);
 
-	Vector3Int pos;
+	Vector3i pos;
 	pos.x = round(item->Pose.Position.x + z * s + x * c);
 	pos.y = round(item->Pose.Position.y - z * phd_sin(item->Pose.Orientation.x) + x * phd_sin(item->Pose.Orientation.z));
 	pos.z = round(item->Pose.Position.z + z * c - x * s);

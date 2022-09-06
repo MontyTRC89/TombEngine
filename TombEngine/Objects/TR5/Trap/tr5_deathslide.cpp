@@ -23,7 +23,7 @@ OBJECT_COLLISION_BOUNDS DeathSlideBounds =
 	0, 0
 };
 
-Vector3Int DeathSlidePosition(0, 0, 371);
+Vector3i DeathSlidePosition(0, 0, 371);
 
 void InitialiseDeathSlide(short itemNumber)
 {

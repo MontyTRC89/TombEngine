@@ -1,6 +1,6 @@
 #pragma once
 
-struct Vector3Int;
+struct Vector3i;
 struct PHD_3DPOS;
 
 namespace TEN::Entities::TR4

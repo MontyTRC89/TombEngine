@@ -179,7 +179,7 @@ BOUNDING_BOX* GetBoundsAccurate(const MESH_INFO* mesh, bool visibility)
 	return &result;
 }
 
-bool IsPointInRoom(Vector3Int pos, int roomNumber)
+bool IsPointInRoom(Vector3i pos, int roomNumber)
 {
 	auto* room = &g_Level.Rooms[roomNumber];
 
@@ -196,7 +196,7 @@ bool IsPointInRoom(Vector3Int pos, int roomNumber)
 	return false;
 }
 
-int FindRoomNumber(Vector3Int position)
+int FindRoomNumber(Vector3i position)
 {
 	for (int i = 0; i < g_Level.Rooms.size(); i++)
 		if (IsPointInRoom(position, i))
@@ -205,7 +205,7 @@ int FindRoomNumber(Vector3Int position)
 	return 0;
 }
 
-Vector3Int GetRoomCenter(int roomNumber)
+Vector3i GetRoomCenter(int roomNumber)
 {
 	auto* room = &g_Level.Rooms[roomNumber];
 
@@ -213,7 +213,7 @@ Vector3Int GetRoomCenter(int roomNumber)
 	auto halfDepth = SECTOR(room->zSize) / 2;
 	auto halfHeight = (room->maxceiling - room->minfloor) / 2;
 
-	auto center = Vector3Int(
+	auto center = Vector3i(
 		room->x + halfLength,
 		room->minfloor + halfHeight,
 		room->z + halfDepth

@@ -91,8 +91,8 @@ void ObeliskControl(short itemNumber)
 					if (!(GlobalCounter & 3))
 					{
 						TriggerLightning(
-							(Vector3Int*)&pos,
-							(Vector3Int*)&pos2,
+							(Vector3i*)&pos,
+							(Vector3i*)&pos2,
 							(GetRandomControl() & 0x1F) + 32,
 							r,
 							g,
@@ -147,8 +147,8 @@ void ObeliskControl(short itemNumber)
 					}
 
 					TriggerLightning(
-						(Vector3Int*)&pos,
-						(Vector3Int*)&pos2,
+						(Vector3i*)&pos,
+						(Vector3i*)&pos2,
 						(GetRandomControl() & 0xF) + 16,
 						r,
 						g,

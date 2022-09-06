@@ -69,10 +69,10 @@ namespace TEN::Entities::TR5
 
 static void ImpThrowStones(ItemInfo* item)
 {
-	auto pos1 = Vector3Int::Zero;
+	auto pos1 = Vector3i::Zero;
 	GetJointAbsPosition(item, &pos1, 9);
 
-	auto pos2 = Vector3Int::Zero;
+	auto pos2 = Vector3i::Zero;
 	GetLaraJointPosition(&pos2, LM_HEAD);
 
 		int dx = pos1.x - pos2.x;

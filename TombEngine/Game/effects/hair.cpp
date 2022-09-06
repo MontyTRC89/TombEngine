@@ -106,7 +106,7 @@ void HairControl(ItemInfo* item, int ponytail, ANIM_FRAME* framePtr)
 
 	// Get Lara's spheres in absolute coords, for head, torso, hips and upper arms
 	MESH* mesh = &g_Level.Meshes[lara->MeshPtrs[LM_HIPS]];
-	Vector3Int pos = { (int)mesh->sphere.Center.x, (int)mesh->sphere.Center.y, (int)mesh->sphere.Center.z };
+	Vector3i pos = { (int)mesh->sphere.Center.x, (int)mesh->sphere.Center.y, (int)mesh->sphere.Center.z };
 	GetLaraJointPosition(&pos, LM_HIPS);
 	sphere[0].x = pos.x;
 	sphere[0].y = pos.y;

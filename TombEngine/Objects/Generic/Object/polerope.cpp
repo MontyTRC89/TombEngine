@@ -45,8 +45,8 @@ namespace TEN::Entities::Generic
 	};
 
 	// TODO: These might be interfering with the SetPosition command. -- Sezz 2022.08.29
-	auto VPolePos = Vector3Int(0, 0, -208);
-	auto VPolePosR = Vector3Int::Zero;
+	auto VPolePos = Vector3i(0, 0, -208);
+	auto VPolePosR = Vector3i::Zero;
 
 	OBJECT_COLLISION_BOUNDS VPoleBounds = 
 	{

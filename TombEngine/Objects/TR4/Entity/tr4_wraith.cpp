@@ -37,7 +37,7 @@ namespace TEN::Entities::TR4
 
 		for (int i = 0; i < WRAITH_COUNT; i++)
 		{
-			wraith->Position = Vector3Int(0, 0, item->Pose.Position.z);
+			wraith->Position = Vector3i(0, 0, item->Pose.Position.z);
 			wraith->Velocity.z = 0;
 			wraith->r = 0;
 			wraith->g = 0;
@@ -381,7 +381,7 @@ namespace TEN::Entities::TR4
 		item->Pose.Position.y += 384;
 	}
 
-	void DrawWraith(Vector3Int pos, Vector3Int velocity, int objectNumber)
+	void DrawWraith(Vector3i pos, Vector3i velocity, int objectNumber)
 	{
 		auto* spark = GetFreeParticle();
 		spark->on = 1;
@@ -440,7 +440,7 @@ namespace TEN::Entities::TR4
 		spark->size = size;
 	}
 
-	void WraithWallsEffect(Vector3Int pos, short yRot, short objectNumber)
+	void WraithWallsEffect(Vector3i pos, short yRot, short objectNumber)
 	{
 		byte sR, sG, sB, dR, dG, dB;
 		short color;

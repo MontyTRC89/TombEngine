@@ -287,7 +287,7 @@ namespace TEN::Entities::TR5
 		{
 			creature->FiredWeapon--;
 
-			auto pos = Vector3Int(SwatGunBite.Position);
+			auto pos = Vector3i(SwatGunBite.Position);
 			GetJointAbsPosition(item, &pos, SwatGunBite.meshNum);
 
 			TriggerDynamicLight(pos.x, pos.y, pos.z, 2 * creature->FiredWeapon + 10, 192, 128, 32);
@@ -559,7 +559,7 @@ namespace TEN::Entities::TR5
 					pos1.y = SwatGunBite.y;
 					pos1.z = SwatGunBite.z;
 					GetJointAbsPosition(item, &pos1, SwatGunBite.meshNum);
-					TriggerEnergyArc(&pos1, (Vector3Int*)& LaraItem->pos, 192, 128, 192, 256, 150, 256, 0, ENERGY_ARC_STRAIGHT_LINE);*/
+					TriggerEnergyArc(&pos1, (Vector3i*)& LaraItem->pos, 192, 128, 192, 256, 150, 256, 0, ENERGY_ARC_STRAIGHT_LINE);*/
 
 				}
 
@@ -996,7 +996,7 @@ namespace TEN::Entities::TR5
 
 		if (creature->FiredWeapon)
 		{
-			auto pos = Vector3Int(SniperGunBite.Position);
+			auto pos = Vector3i(SniperGunBite.Position);
 			GetJointAbsPosition(item, &pos, SniperGunBite.meshNum);
 
 			TriggerDynamicLight(pos.x, pos.y, pos.z, 2 * creature->FiredWeapon + 10, 192, 128, 32);
@@ -1155,7 +1155,7 @@ namespace TEN::Entities::TR5
 
 		if (creature->FiredWeapon)
 		{
-			auto pos = Vector3Int(ArmedMafia2GunBite.Position);
+			auto pos = Vector3i(ArmedMafia2GunBite.Position);
 			GetJointAbsPosition(item, &pos, ArmedMafia2GunBite.meshNum);
 
 			TriggerDynamicLight(pos.x, pos.y, pos.z, 4 * creature->FiredWeapon + 8, 24, 16, 4);

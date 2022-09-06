@@ -172,19 +172,19 @@ __int64 FP_Div(__int64 a, __int64 b)
 	return (int)(((a) / (b >> 8)) << 8);
 }
 
-void FP_VectorMul(Vector3Int* v, int scale, Vector3Int* result)
+void FP_VectorMul(Vector3i* v, int scale, Vector3i* result)
 {
 	result->x = FP_FromFixed(v->x * scale);
 	result->y = FP_FromFixed(v->y * scale);
 	result->z = FP_FromFixed(v->z * scale);
 }
 
-int FP_DotProduct(Vector3Int* a, Vector3Int* b)
+int FP_DotProduct(Vector3i* a, Vector3i* b)
 {
 	return ((a->x * b->x) + (a->y * b->y) + (a->z * b->z)) >> W2V_SHIFT;
 }
 
-void FP_CrossProduct(Vector3Int* a, Vector3Int* b, Vector3Int* result)
+void FP_CrossProduct(Vector3i* a, Vector3i* b, Vector3i* result)
 {
 	result->x = ((a->y * b->z) - (a->z * b->y)) >> W2V_SHIFT;
 	result->y = ((a->z * b->x) - (a->x * b->z)) >> W2V_SHIFT;
@@ -221,7 +221,7 @@ __int64 FP_FromFixed(__int64 value)
 	return (value >> FP_SHIFT);
 }
 
-Vector3Int* FP_Normalise(Vector3Int* v)
+Vector3i* FP_Normalise(Vector3i* v)
 {
 	long a = v->x >> FP_SHIFT;
 	long b = v->y >> FP_SHIFT;

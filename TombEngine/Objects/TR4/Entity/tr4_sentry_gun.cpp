@@ -18,7 +18,7 @@
 
 namespace TEN::Entities::TR4
 {
-	const auto SentryGunFlameOffset = Vector3Int(-140, 0, 0);
+	const auto SentryGunFlameOffset = Vector3i(-140, 0, 0);
 	const auto SentryGunBite = BiteInfo(Vector3::Zero, 8);
 
 	void InitialiseSentryGun(short itemNumber)
@@ -49,7 +49,7 @@ namespace TEN::Entities::TR4
 		{
 			if (item->ItemFlags[0])
 			{
-				auto pos = Vector3Int(SentryGunBite.Position);
+				auto pos = Vector3i(SentryGunBite.Position);
 				GetJointAbsPosition(item, &pos, SentryGunBite.meshNum);
 
 				TriggerDynamicLight(pos.x, pos.y, pos.z, 4 * item->ItemFlags[0] + 12, 24, 16, 4);

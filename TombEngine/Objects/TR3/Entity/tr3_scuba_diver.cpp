@@ -57,7 +57,7 @@ namespace TEN::Entities::TR3
 		SDIVER_ANIM_DEATH_END = 17
 	};
 
-	static void ShootHarpoon(ItemInfo* item, Vector3Int pos, short velocity, short yRot, short roomNumber)
+	static void ShootHarpoon(ItemInfo* item, Vector3i pos, short velocity, short yRot, short roomNumber)
 	{
 		short harpoonItemNumber = CreateItem();
 		if (harpoonItemNumber != NO_ITEM)

@@ -70,7 +70,7 @@ void InitialiseSmokeEmitter(short itemNumber)
 
 void SmokeEmitterControl(short itemNumber)
 {
-	Vector3Int pos = {};
+	Vector3i pos = {};
 
 	auto* item = &g_Level.Items[itemNumber];
 

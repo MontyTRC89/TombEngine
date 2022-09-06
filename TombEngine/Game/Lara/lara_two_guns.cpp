@@ -48,7 +48,7 @@ void AnimatePistols(ItemInfo* laraItem, LaraWeaponType weaponType)
 	{
 		if (lara->LeftArm.GunSmoke)
 		{
-			Vector3Int pos;
+			Vector3i pos;
 			switch (weaponType)
 			{
 			case LaraWeaponType::Pistol:
@@ -70,7 +70,7 @@ void AnimatePistols(ItemInfo* laraItem, LaraWeaponType weaponType)
 
 		if (lara->RightArm.GunSmoke)
 		{
-			Vector3Int pos;
+			Vector3i pos;
 
 			switch (weaponType)
 			{
@@ -315,7 +315,7 @@ void PistolHandler(ItemInfo* laraItem, LaraWeaponType weaponType)
 	
 	if (lara->LeftArm.GunFlash || lara->RightArm.GunFlash)
 	{
-		Vector3Int pos;
+		Vector3i pos;
 		pos.x = (byte)GetRandomControl() - 128;
 		pos.y = (GetRandomControl() & 0x7F) - 63;
 		pos.z = (byte)GetRandomControl() - 128;

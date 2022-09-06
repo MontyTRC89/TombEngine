@@ -189,10 +189,10 @@ namespace TEN::Entities::TR4
 		{
 			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase)
 			{
-				auto pos1 = Vector3Int(-544, 96, 0);
+				auto pos1 = Vector3i(-544, 96, 0);
 				GetJointAbsPosition(item, &pos1, 16);
 
-				auto pos2 = Vector3Int (-900, 96, 0);
+				auto pos2 = Vector3i (-900, 96, 0);
 				GetJointAbsPosition(item, &pos2, 16);
 
 				auto angles = GetOrientTowardPoint(pos1.ToVector3(), pos2.ToVector3());
@@ -207,10 +207,10 @@ namespace TEN::Entities::TR4
 		{
 			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase)
 			{
-				auto pos1 = Vector3Int(-544, 96, 0 );
+				auto pos1 = Vector3i(-544, 96, 0 );
 				GetJointAbsPosition(item, &pos1, 16);
 
-				auto pos2 = Vector3Int(-900, 96, 0);
+				auto pos2 = Vector3i(-900, 96, 0);
 				GetJointAbsPosition(item, &pos2, 16);
 
 				auto angles = GetOrientTowardPoint(pos1.ToVector3(), pos2.ToVector3());
@@ -227,8 +227,8 @@ namespace TEN::Entities::TR4
 
 			if (frameNumber >= 8 && frameNumber <= 64)
 			{
-				auto pos1 = Vector3Int(0, 0, 192);
-				auto pos2 = Vector3Int(0, 0, 384);
+				auto pos1 = Vector3i(0, 0, 192);
+				auto pos2 = Vector3i(0, 0, 384);
 
 				if (GlobalCounter & 1)
 				{
@@ -688,7 +688,7 @@ namespace TEN::Entities::TR4
 			case DEMIGOD1_STATE_HAMMER_ATTACK:
 				if (item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase == DEMIGOD_ANIM_RUN_TO_IDLE)
 				{
-					auto pos = Vector3Int(80, -8, -40);
+					auto pos = Vector3i(80, -8, -40);
 					GetJointAbsPosition(item, &pos, 17);
 
 					short roomNumber = item->RoomNumber;

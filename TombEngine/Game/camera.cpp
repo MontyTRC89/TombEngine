@@ -44,7 +44,7 @@ struct OLD_CAMERA
 	short actualAngle;
 	PHD_3DPOS pos;
 	PHD_3DPOS pos2;
-	Vector3Int target;
+	Vector3i target;
 };
 
 GameVector LastTarget;
@@ -56,7 +56,7 @@ int CameraSnaps = 0;
 int TargetSnaps = 0;
 GameVector LookCamPosition;
 GameVector LookCamTarget;
-Vector3Int CamOldPos;
+Vector3i CamOldPos;
 CAMERA_INFO Camera;
 GameVector ForcedFixedCamera;
 int UseForcedFixedCamera;
@@ -460,10 +460,10 @@ void UpdateCameraElevation()
 
 	if (Camera.laraNode != -1)
 	{
-		auto pos = Vector3Int();
+		auto pos = Vector3i();
 		GetLaraJointPosition(&pos, Camera.laraNode);
 
-		auto pos1 = Vector3Int(0, -CLICK(1), SECTOR(2));
+		auto pos1 = Vector3i(0, -CLICK(1), SECTOR(2));
 		GetLaraJointPosition(&pos1, Camera.laraNode);
 
 		pos.x = pos1.x - pos.x;
@@ -834,7 +834,7 @@ void LookCamera(ItemInfo* item)
 	else
 		OldCam.pos.Orientation.y = lara->ExtraHeadRot.y;
 
-	Vector3Int pos = { 0, (int)CLICK(0.25f) / 4, (int)CLICK(0.25f) };
+	Vector3i pos = { 0, (int)CLICK(0.25f) / 4, (int)CLICK(0.25f) };
 	GetLaraJointPosition(&pos, LM_HEAD);
 
 	auto probe = GetCollision(pos.x, pos.y, pos.z, item->RoomNumber);
@@ -869,10 +869,10 @@ void LookCamera(ItemInfo* item)
 		}
 	}
 
-	Vector3Int pos2 = { 0, 0, -SECTOR(1) };
+	Vector3i pos2 = { 0, 0, -SECTOR(1) };
 	GetLaraJointPosition(&pos2, LM_HEAD);
 
-	Vector3Int pos3 = { 0, 0, CLICK(8) };
+	Vector3i pos3 = { 0, 0, CLICK(8) };
 	GetLaraJointPosition(&pos3, LM_HEAD);
 
 	int dx = (pos2.x - pos.x) >> 3;
@@ -1368,8 +1368,8 @@ void BinocularCamera(ItemInfo* item)
 
 	if (!LaserSight)
 	{
-		auto src = Vector3Int(Camera.pos.x, Camera.pos.y, Camera.pos.z);
-		auto target = Vector3Int(Camera.target.x, Camera.target.y, Camera.target.z);
+		auto src = Vector3i(Camera.pos.x, Camera.pos.y, Camera.pos.z);
+		auto target = Vector3i(Camera.target.x, Camera.target.y, Camera.target.z);
 
 		GetTargetOnLOS(&Camera.pos, &Camera.target, false, false);
 
@@ -1382,7 +1382,7 @@ void BinocularCamera(ItemInfo* item)
 
 void ConfirmCameraTargetPos()
 {
-	auto pos = Vector3Int();
+	auto pos = Vector3i();
 	GetLaraJointPosition(&pos, LM_TORSO);
 
 	if (Camera.laraNode != -1)

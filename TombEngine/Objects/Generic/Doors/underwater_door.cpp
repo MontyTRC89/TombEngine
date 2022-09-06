@@ -23,7 +23,7 @@ using namespace TEN::Input;
 
 namespace TEN::Entities::Doors
 {
-	Vector3Int UnderwaterDoorPos(-251, -540, -46);
+	Vector3i UnderwaterDoorPos(-251, -540, -46);
 
 	OBJECT_COLLISION_BOUNDS UnderwaterDoorBounds =
 	{

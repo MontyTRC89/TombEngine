@@ -180,7 +180,7 @@ extern SPLASH_SETUP SplashSetup;
 extern SPLASH_STRUCT Splashes[MAX_SPLASHES];
 extern RIPPLE_STRUCT Ripples[MAX_RIPPLES];
 
-extern Vector3Int NodeVectors[MAX_NODE];
+extern Vector3i NodeVectors[MAX_NODE];
 extern NODEOFFSET_INFO NodeOffsets[MAX_NODE];
 
 extern FX_INFO EffectList[NUM_EFFECTS];

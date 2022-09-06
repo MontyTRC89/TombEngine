@@ -291,16 +291,16 @@ Particle* SetupFireSpark()
 	return spark;
 }
 
-void AttachAndCreateSpark(Particle* spark, ItemInfo* item, int meshIndex, Vector3Int offset, Vector3Int speed)
+void AttachAndCreateSpark(Particle* spark, ItemInfo* item, int meshIndex, Vector3i offset, Vector3i speed)
 {
-	auto pos1 = Vector3Int(-4, -30, -4) + offset;
+	auto pos1 = Vector3i(-4, -30, -4) + offset;
 	GetJointAbsPosition(item, &pos1, meshIndex);
 
 	spark->x = (GetRandomControl() & 0x1F) + pos1.x - 16;
 	spark->y = (GetRandomControl() & 0x1F) + pos1.y - 16;
 	spark->z = (GetRandomControl() & 0x1F) + pos1.z - 16;
 
-	auto pos2 = Vector3Int(-4, -30, -4) + offset + speed;
+	auto pos2 = Vector3i(-4, -30, -4) + offset + speed;
 	GetJointAbsPosition(item, &pos2, meshIndex);
 
 	int v = (GetRandomControl() & 0x3F) + 192;
@@ -324,7 +324,7 @@ void AttachAndCreateSpark(Particle* spark, ItemInfo* item, int meshIndex, Vector
 	spark->on = 1;
 }
 
-void ThrowFire(int itemNum, int meshIndex, Vector3Int offset, Vector3Int speed)
+void ThrowFire(int itemNum, int meshIndex, Vector3i offset, Vector3i speed)
 {
 	auto* item = &g_Level.Items[itemNum];
 
@@ -337,7 +337,7 @@ void ThrowFire(int itemNum, int meshIndex, Vector3Int offset, Vector3Int speed)
 	}
 }
 
-void ThrowPoison(int itemNum, int meshIndex, Vector3Int offset, Vector3Int speed, Vector3 color)
+void ThrowPoison(int itemNum, int meshIndex, Vector3i offset, Vector3i speed, Vector3 color)
 {
 	auto* item = &g_Level.Items[itemNum];
 
@@ -933,7 +933,7 @@ int GetFreeGunshell()
 
 void TriggerGunShell(short hand, short objNum, LaraWeaponType weaponType)
 {
-	Vector3Int pos;
+	Vector3i pos;
 
 	if (hand)
 	{
@@ -1176,7 +1176,7 @@ void AddWaterSparks(int x, int y, int z, int num)
 
 void LaraBubbles(ItemInfo* item)
 {
-	Vector3Int pos;
+	Vector3i pos;
 	int num, i;
 
 	SoundEffect(SFX_TR4_LARA_BUBBLES, &item->Pose, SoundEnvironment::Water);
@@ -1301,7 +1301,7 @@ void TriggerLaraDrips(ItemInfo* item)
 	{
 		for (int i = 0; i < NUM_LARA_MESHES; i++)
 		{
-			auto pos = Vector3Int();
+			auto pos = Vector3i();
 
 			GetLaraJointPosition(&pos, (LARA_MESHES)i);
 			auto room = GetRoom(item->Location, pos.x, pos.y, pos.z).roomNumber;
@@ -1700,7 +1700,7 @@ void TriggerExplosionBubble(int x, int y, int z, short roomNumber)
 
 		for (int i = 0; i < 8; i++)
 		{
-			Vector3Int pos;
+			Vector3i pos;
 			pos.x = (GetRandomControl() & 0x1FF) + x - 256;
 			pos.y = (GetRandomControl() & 0x7F) + y - 64;
 			pos.z = (GetRandomControl() & 0x1FF) + z - 256;

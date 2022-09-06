@@ -347,7 +347,7 @@ namespace TEN::Entities::TR3
 			dartItem->ObjectNumber = ID_DARTS;
 			dartItem->RoomNumber = item->RoomNumber;
 
-			auto pos1 = Vector3Int(TribesmanDartBite2.Position);
+			auto pos1 = Vector3i(TribesmanDartBite2.Position);
 			GetJointAbsPosition(item, &pos1, TribesmanDartBite2.meshNum);
 
 			auto pos2 = pos1;
@@ -367,7 +367,7 @@ namespace TEN::Entities::TR3
 
 			dartItem->Status = ITEM_ACTIVE;
 
-			pos1 = Vector3Int(TribesmanDartBite2.Position);
+			pos1 = Vector3i(TribesmanDartBite2.Position);
 			pos1.z += 96;
 			GetJointAbsPosition(item, &pos1, TribesmanDartBite2.meshNum);
 

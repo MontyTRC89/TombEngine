@@ -50,7 +50,7 @@ namespace TEN::Entities::TR5
 		spark->dSize = spark->sSize = spark->size = (GetRandomControl() & 7) + 192;
 	}
 
-	static void TriggerTorpedoBubbles(Vector3Int* pos1, Vector3Int* pos2, char factor)
+	static void TriggerTorpedoBubbles(Vector3i* pos1, Vector3i* pos2, char factor)
 	{
 		auto* spark = GetFreeParticle();
 
@@ -83,7 +83,7 @@ namespace TEN::Entities::TR5
 		spark->dSize = spark->size * 2;
 	}
 
-	static void TriggerTorpedoSparks2(Vector3Int* pos1, Vector3Int* pos2, char scale)
+	static void TriggerTorpedoSparks2(Vector3i* pos1, Vector3i* pos2, char scale)
 	{
 		auto* spark = GetFreeParticle();
 
@@ -128,8 +128,8 @@ namespace TEN::Entities::TR5
 			torpedoItem->ObjectNumber = ID_TORPEDO;
 			torpedoItem->Color = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
 
-			Vector3Int pos1;
-			Vector3Int pos2;
+			Vector3i pos1;
+			Vector3i pos2;
 
 			for (int i = 0; i < 8; i++)
 			{
@@ -288,10 +288,10 @@ namespace TEN::Entities::TR5
 
 		if (GlobalCounter & 1)
 		{
-			Vector3Int pos1 = { 200, 320, 90 };
+			Vector3i pos1 = { 200, 320, 90 };
 			GetJointAbsPosition(item, &pos1, 1);
 
-			Vector3Int pos2 = { 200, 1280, 90 };
+			Vector3i pos2 = { 200, 1280, 90 };
 			GetJointAbsPosition(item, &pos2, 1);
 
 			TriggerTorpedoBubbles(&pos1, &pos2, 0);
@@ -306,10 +306,10 @@ namespace TEN::Entities::TR5
 		}
 		else
 		{
-			Vector3Int pos1 = { -200, 320, 90 };
+			Vector3i pos1 = { -200, 320, 90 };
 			GetJointAbsPosition(item, &pos1, 2);
 
-			Vector3Int pos2 = { -200, 1280, 90 };
+			Vector3i pos2 = { -200, 1280, 90 };
 			GetJointAbsPosition(item, &pos2, 2);
 
 			TriggerTorpedoBubbles(&pos1, &pos2, 0);
@@ -330,13 +330,13 @@ namespace TEN::Entities::TR5
 		pos1.y = -600;
 		pos1.z = -40;
 		pos1.roomNumber = item->RoomNumber;
-		GetJointAbsPosition(item, (Vector3Int*)&pos1, 0);
+		GetJointAbsPosition(item, (Vector3i*)&pos1, 0);
 
 		GameVector pos2;
 		pos2.x = 0;
 		pos2.y = -15784;
 		pos2.z = -40;
-		GetJointAbsPosition(item, (Vector3Int*)&pos2, 0);
+		GetJointAbsPosition(item, (Vector3i*)&pos2, 0);
 
 		if (!LOS((GameVector*)&pos1, &pos2))
 		{
@@ -394,13 +394,13 @@ namespace TEN::Entities::TR5
 
 		DoProjectileDynamics(itemNumber, item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, dx, item->Animation.Velocity.y, dz);
 
-		Vector3Int pos1;
+		Vector3i pos1;
 		pos1.x = 0;
 		pos1.y = 0;
 		pos1.z = (GlobalCounter & 1) != 0 ? 48 : -48;
 		GetJointAbsPosition(item, &pos1, 0);
 
-		Vector3Int pos2;
+		Vector3i pos2;
 		pos2.x = 0;
 		pos2.y = 0;
 		pos2.z = 8 * ((GlobalCounter & 1) != 0 ? 48 : -48);
@@ -428,7 +428,7 @@ namespace TEN::Entities::TR5
 
 		SoundEffect(SFX_TR5_VEHICLE_DIVESUIT_HIT, &item->Pose, SoundEnvironment::Always);
 
-		Vector3Int pos;
+		Vector3i pos;
 
 		if (item->ItemFlags[0] == NO_ITEM)
 		{
@@ -556,10 +556,10 @@ namespace TEN::Entities::TR5
 				if (probe.RoomNumber != item->RoomNumber)
 					ItemNewRoom(itemNumber, probe.RoomNumber);
 
-				Vector3Int pos1 = { 0, 0, -64 };
+				Vector3i pos1 = { 0, 0, -64 };
 				GetJointAbsPosition(item, &pos1, 0);
 
-				Vector3Int pos2;
+				Vector3i pos2;
 				pos2.x = 0;
 				pos2.y = 0;
 				pos2.z = -64 << ((GlobalCounter & 1) + 2);

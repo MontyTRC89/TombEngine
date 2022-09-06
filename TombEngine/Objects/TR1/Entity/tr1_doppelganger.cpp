@@ -61,7 +61,7 @@ namespace TEN::Entities::TR1
 
 		if (!item->Data)
 		{
-			Vector3Int pos;
+			Vector3i pos;
 			if (reference == nullptr)
 			{
 				pos.x = item->Pose.Position.x;

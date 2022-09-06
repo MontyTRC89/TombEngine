@@ -2,35 +2,34 @@
 
 //namespace TEN::Math
 //{
-	// TODO: Possibly rename to the more common standard: Vector3i
-	struct Vector3Int
+	struct Vector3i
 	{
 		int x = 0;
 		int y = 0;
 		int z = 0;
 
-		static const Vector3Int Zero;
+		static const Vector3i Zero;
 
-		Vector3Int();
-		Vector3Int(int x, int y, int z);
-		Vector3Int(const Vector3& vector);
+		Vector3i();
+		Vector3i(int x, int y, int z);
+		Vector3i(const Vector3& vector);
 
-		static float Distance(const Vector3Int& origin, const Vector3Int& target);
+		static float Distance(const Vector3i& origin, const Vector3i& target);
 
 		Vector3 ToVector3() const;
 
-		bool		operator ==(const Vector3Int& vector);
-		bool		operator !=(const Vector3Int& vector);
-		Vector3Int	operator +(const Vector3Int& vector);
-		Vector3Int	operator -(const Vector3Int& vector);
-		Vector3Int	operator *(const Vector3Int& vector);
-		Vector3Int	operator *(float value);
-		Vector3Int	operator /(float value);
-		Vector3Int& operator =(const Vector3Int& vector);
-		Vector3Int& operator +=(const Vector3Int& vector);
-		Vector3Int& operator -=(const Vector3Int& vector);
-		Vector3Int& operator *=(const Vector3Int& vector);
-		Vector3Int& operator *=(float value);
-		Vector3Int& operator /=(float value);
+		bool		operator ==(const Vector3i& vector);
+		bool		operator !=(const Vector3i& vector);
+		Vector3i	operator +(const Vector3i& vector);
+		Vector3i	operator -(const Vector3i& vector);
+		Vector3i	operator *(const Vector3i& vector);
+		Vector3i	operator *(float value);
+		Vector3i	operator /(float value);
+		Vector3i& operator =(const Vector3i& vector);
+		Vector3i& operator +=(const Vector3i& vector);
+		Vector3i& operator -=(const Vector3i& vector);
+		Vector3i& operator *=(const Vector3i& vector);
+		Vector3i& operator *=(float value);
+		Vector3i& operator /=(float value);
 	};
 //}

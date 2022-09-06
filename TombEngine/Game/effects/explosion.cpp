@@ -30,7 +30,7 @@ namespace TEN::Effects::Explosion
 
 		if (triggerSparks)
 		{
-			Vector3Int sparkPos;
+			Vector3i sparkPos;
 			sparkPos.x = pos.x;
 			sparkPos.y = pos.y;
 			sparkPos.z = pos.z;

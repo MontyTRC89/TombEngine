@@ -526,10 +526,10 @@ namespace TEN::Entities::TR4
 
 		item->ItemFlags[0]++;
 
-		auto pos1 = Vector3Int(SethaAttack1.Position);
+		auto pos1 = Vector3i(SethaAttack1.Position);
 		GetJointAbsPosition(item, &pos1, SethaAttack1.meshNum);
 
-		auto pos2 = Vector3Int(SethaAttack2.Position);
+		auto pos2 = Vector3i(SethaAttack2.Position);
 		GetJointAbsPosition(item, &pos2, SethaAttack2.meshNum);
 
 		int size;
@@ -542,7 +542,7 @@ namespace TEN::Entities::TR4
 			{
 				for (int i = 0; i < 2; i++)
 				{
-					auto pos = Vector3Int(
+					auto pos = Vector3i(
 						(GetRandomControl() & 0x7FF) + pos1.x - SECTOR(1),
 						(GetRandomControl() & 0x7FF) + pos1.y - SECTOR(1),
 						(GetRandomControl() & 0x7FF) + pos1.z - SECTOR(1)
@@ -556,7 +556,7 @@ namespace TEN::Entities::TR4
 						(pos1.y - pos.y),
 						(SECTOR(1) - (GetRandomControl() & 0x7FF)));
 
-					pos = Vector3Int(
+					pos = Vector3i(
 						(GetRandomControl() & 0x7FF) + pos2.x - SECTOR(1),
 						(GetRandomControl() & 0x7FF) + pos2.y - SECTOR(1),
 						(GetRandomControl() & 0x7FF) + pos2.z - SECTOR(1)
@@ -586,7 +586,7 @@ namespace TEN::Entities::TR4
 
 			if (item->ItemFlags[0] >= 96 && item->ItemFlags[0] <= 99)
 			{
-				auto pos = Vector3Int(SethaAttack1.Position);
+				auto pos = Vector3i(SethaAttack1.Position);
 				pos.y *= 2;
 				GetJointAbsPosition(item, &pos, SethaAttack1.meshNum);
 
@@ -596,7 +596,7 @@ namespace TEN::Entities::TR4
 			}
 			else if (item->ItemFlags[0] >= 122 && item->ItemFlags[0] <= 125)
 			{
-				auto pos = Vector3Int(SethaAttack2.Position);
+				auto pos = Vector3i(SethaAttack2.Position);
 				pos.y *= 2;
 				GetJointAbsPosition(item, &pos, SethaAttack2.meshNum);
 
@@ -625,7 +625,7 @@ namespace TEN::Entities::TR4
 			{
 				if (Wibble & 4)
 				{
-					auto pos = Vector3Int(SethaAttack1.Position);
+					auto pos = Vector3i(SethaAttack1.Position);
 					pos.y *= 2;
 					GetJointAbsPosition(item, &pos, SethaAttack1.meshNum);
 
@@ -633,7 +633,7 @@ namespace TEN::Entities::TR4
 					auto attackPose = PHD_3DPOS(pos1, angles);
 					SethaThrowAttack(&attackPose, item->RoomNumber, 0);
 
-					pos = Vector3Int(SethaAttack2.Position);
+					pos = Vector3i(SethaAttack2.Position);
 					pos.y *= 2;
 					GetJointAbsPosition(item, &pos, SethaAttack2.meshNum);
 
@@ -652,7 +652,7 @@ namespace TEN::Entities::TR4
 			{
 				for (int i = 0; i < 2; i++)
 				{
-					auto pos = Vector3Int(
+					auto pos = Vector3i(
 						(GetRandomControl() & 0x7FF) + pos1.x - SECTOR(1),
 						(GetRandomControl() & 0x7FF) + pos1.y - SECTOR(1),
 						(GetRandomControl() & 0x7FF) + pos1.z - SECTOR(1)
@@ -666,7 +666,7 @@ namespace TEN::Entities::TR4
 						(pos1.y - pos.y),
 						(SECTOR(1) - (GetRandomControl() & 0x7FF)));
 
-					pos = Vector3Int(
+					pos = Vector3i(
 						(GetRandomControl() & 0x7FF) + pos2.x - SECTOR(1),
 						(GetRandomControl() & 0x7FF) + pos2.y - SECTOR(1),
 						(GetRandomControl() & 0x7FF) + pos2.z - SECTOR(1)
@@ -696,7 +696,7 @@ namespace TEN::Entities::TR4
 
 			if (item->ItemFlags[0] == 102)
 			{
-				auto pos = Vector3Int(SethaAttack1.Position);
+				auto pos = Vector3i(SethaAttack1.Position);
 				pos.y *= 2;
 				GetJointAbsPosition(item, &pos, SethaAttack1.meshNum);
 

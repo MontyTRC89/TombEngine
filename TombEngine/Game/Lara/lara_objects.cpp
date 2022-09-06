@@ -479,7 +479,7 @@ void lara_as_tightrope_fall(ItemInfo* item, CollisionInfo* coll)
 	{
 		if (TestLastFrame(item, item->Animation.AnimNumber))
 		{
-			Vector3Int pos = { 0, 0, 0 };
+			Vector3i pos = { 0, 0, 0 };
 			GetLaraJointPosition(&pos, LM_RFOOT);
 
 			item->Pose.Position.x = pos.x;

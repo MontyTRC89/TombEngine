@@ -278,7 +278,7 @@ namespace TEN::Entities::Effects
 				fx->pos.Position.y = 0;
 				fx->pos.Position.z = 0;
 
-				GetLaraJointPosition((Vector3Int*)&fx->pos, i);
+				GetLaraJointPosition((Vector3i*)&fx->pos, i);
 
 				// TR5 code?
 				if (Lara.BurnCount)
@@ -295,7 +295,7 @@ namespace TEN::Entities::Effects
 		byte r = (GetRandomControl() & 0x3F) + 192;
 		byte g = (GetRandomControl() & 0x1F) + 96;
 
-		auto pos = Vector3Int();
+		auto pos = Vector3i();
 		GetLaraJointPosition(&pos, LM_HIPS);
 
 		if (!Lara.BurnSmoke)
@@ -481,7 +481,7 @@ namespace TEN::Entities::Effects
 				byte b = (GetRandomControl() & 0x3F) + 192;
 
 				auto src = item->Pose.Position;
-				Vector3Int dest;
+				Vector3i dest;
 
 				if (!(GlobalCounter & 3))
 				{
@@ -527,7 +527,7 @@ namespace TEN::Entities::Effects
 					short targetItemNumber = item->ItemFlags[((GlobalCounter >> 2) & 1) + 2];
 					auto* targetItem = &g_Level.Items[targetItemNumber];
 
-					dest = Vector3Int(0, -64, 20);
+					dest = Vector3i(0, -64, 20);
 					GetJointAbsPosition(targetItem, &dest, 0);
 
 					if (!(GlobalCounter & 3))
@@ -570,7 +570,7 @@ namespace TEN::Entities::Effects
 				{
 					src = item->Pose.Position;
 
-					dest = Vector3Int(
+					dest = Vector3i(
 						(GetRandomControl() & 0x1FF) + src.x - 256,
 						(GetRandomControl() & 0x1FF) + src.y - 256,
 						(GetRandomControl() & 0x1FF) + src.z - 256

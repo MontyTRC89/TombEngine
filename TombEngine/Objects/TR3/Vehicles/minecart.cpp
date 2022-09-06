@@ -231,7 +231,7 @@ namespace TEN::Entities::Vehicles
 	{
 		for (int i = 0; i < 2; i++)
 		{
-			auto pos = Vector3Int();
+			auto pos = Vector3i();
 			GetJointAbsPosition(minecartItem, &pos, Wheels[(left ? 0 : 2) + i]);
 			TriggerFrictionSpark(&GameVector(pos.x, pos.y, pos.z, minecartItem->RoomNumber), minecartItem->Pose.Orientation, 512, 10);
 			
@@ -540,12 +540,12 @@ namespace TEN::Entities::Vehicles
 		else
 			TranslateItem(minecartItem, minecartItem->Pose.Orientation.y, minecartItem->Animation.Velocity.z);
 
-		minecart->FloorHeightMiddle = GetVehicleHeight(minecartItem, 0, 0, true, &Vector3Int());
+		minecart->FloorHeightMiddle = GetVehicleHeight(minecartItem, 0, 0, true, &Vector3i());
 
 		if (!minecart->VerticalVelocity)
 		{
 			minecartItem->Pose.Position.y = minecart->FloorHeightMiddle;
-			minecart->FloorHeightFront = GetVehicleHeight(minecartItem, CLICK(1), 0, false, &Vector3Int());
+			minecart->FloorHeightFront = GetVehicleHeight(minecartItem, CLICK(1), 0, false, &Vector3i());
 			minecart->Gradient = minecart->FloorHeightMiddle - minecart->FloorHeightFront;
 		}
 		else
@@ -758,7 +758,7 @@ namespace TEN::Entities::Vehicles
 			if (laraItem->Animation.AnimNumber == Objects[ID_MINECART_LARA_ANIMS].animIndex + MINECART_ANIM_DISMOUNT_LEFT &&
 				laraItem->Animation.FrameNumber == g_Level.Anims[laraItem->Animation.AnimNumber].frameEnd)
 			{
-				auto pos = Vector3Int(0, 640, 0);
+				auto pos = Vector3i(0, 640, 0);
 				GetLaraJointPosition(&pos, LM_HIPS);
 
 				laraItem->Pose.Position = pos;
@@ -775,7 +775,7 @@ namespace TEN::Entities::Vehicles
 			if (laraItem->Animation.AnimNumber == Objects[ID_MINECART_LARA_ANIMS].animIndex + MINECART_ANIM_DISMOUNT_RIGHT &&
 				laraItem->Animation.FrameNumber == g_Level.Anims[laraItem->Animation.AnimNumber].frameEnd)
 			{
-				auto pos = Vector3Int(0, 640, 0);
+				auto pos = Vector3i(0, 640, 0);
 				GetLaraJointPosition(&pos, LM_HIPS);
 
 				laraItem->Pose.Position = pos;

@@ -122,7 +122,7 @@ namespace TEN::Entities::Vehicles
 			projectileItem->ObjectNumber = ID_ROCKET;
 			projectileItem->RoomNumber = laraItem->RoomNumber;
 
-			auto pos = Vector3Int(0, 0, CLICK(1)); // CLICK(1) or 520?
+			auto pos = Vector3i(0, 0, CLICK(1)); // CLICK(1) or 520?
 			GetJointAbsPosition(bigGunItem, &pos, 2);
 
 			projectileItem->Pose.Position = pos;
