@@ -418,7 +418,7 @@ bool TestLaraPosition(OBJECT_COLLISION_BOUNDS* bounds, ItemInfo* item, ItemInfo*
 	return true;
 }
 
-bool AlignLaraPosition(Vector3Int* vec, ItemInfo* item, ItemInfo* laraItem)
+bool AlignLaraPosition(Vector3Int* offset, ItemInfo* item, ItemInfo* laraItem)
 {
 	auto* lara = GetLaraInfo(laraItem);
 
@@ -430,13 +430,13 @@ bool AlignLaraPosition(Vector3Int* vec, ItemInfo* item, ItemInfo* laraItem)
 		TO_RAD(item->Pose.Orientation.z)
 	);
 
-	auto pos = Vector3::Transform(vec->ToVector3(), matrix);
-	auto newPos = item->Pose.Position.ToVector3() + pos;
+	auto pos = Vector3::Transform(offset->ToVector3(), matrix);
+	auto target = item->Pose.Position.ToVector3() + pos;
 
-	int height = GetCollision(newPos.x, newPos.y, newPos.z, laraItem->RoomNumber).Position.Floor;
+	int height = GetCollision(target.x, target.y, target.z, laraItem->RoomNumber).Position.Floor;
 	if ((laraItem->Pose.Position.y - height) <= CLICK(2))
 	{
-		laraItem->Pose.Position = Vector3Int(newPos);
+		laraItem->Pose.Position = Vector3Int(target);
 		return true;
 	}
 
@@ -449,12 +449,9 @@ bool AlignLaraPosition(Vector3Int* vec, ItemInfo* item, ItemInfo* laraItem)
 	return false;
 }
 
-bool MoveLaraPosition(Vector3Int* vec, ItemInfo* item, ItemInfo* laraItem)
+bool MoveLaraPosition(Vector3Int* offset, ItemInfo* item, ItemInfo* laraItem)
 {
 	auto* lara = GetLaraInfo(laraItem);
-
-	auto target = PHD_3DPOS(item->Pose.Orientation);
-	auto pos = vec->ToVector3();
 
 	Matrix matrix = Matrix::CreateFromYawPitchRoll(
 		TO_RAD(item->Pose.Orientation.y),
@@ -462,24 +459,17 @@ bool MoveLaraPosition(Vector3Int* vec, ItemInfo* item, ItemInfo* laraItem)
 		TO_RAD(item->Pose.Orientation.z)
 	);
 
-	pos = Vector3::Transform(pos, matrix);
-	target.Position = item->Pose.Position + Vector3Int(pos);
+	auto pos = Vector3::Transform(offset->ToVector3(), matrix);
+	auto target = PHD_3DPOS(item->Pose.Position + Vector3Int(pos), item->Pose.Orientation);
 
 	if (!Objects[item->ObjectNumber].isPickup)
 		return Move3DPosTo3DPos(&laraItem->Pose, &target, LARA_ALIGN_VELOCITY, ANGLE(2.0f));
-
-	// Prevent picking up items which can result in so called "flare pickup bug"
-
-	int height = GetCollision(target.Position.x, target.Position.y, target.Position.z, laraItem->RoomNumber).Position.Floor;
-	if (abs(height - laraItem->Pose.Position.y) <= CLICK(2))
+	else
 	{
-		auto direction = target.Position - laraItem->Pose.Position;
-
-		float distance = sqrt(SQUARE(direction.x) + SQUARE(direction.y) + SQUARE(direction.z));
-		if (distance < CLICK(0.5f))
-			return true;
-
-		return Move3DPosTo3DPos(&laraItem->Pose, &target, LARA_ALIGN_VELOCITY, ANGLE(2.0f));
+		// Prevent picking up items which can result in so called "flare pickup bug"
+		int height = GetCollision(target.Position.x, target.Position.y, target.Position.z, laraItem->RoomNumber).Position.Floor;
+		if (abs(height - laraItem->Pose.Position.y) <= CLICK(2))
+			return Move3DPosTo3DPos(&laraItem->Pose, &target, LARA_ALIGN_VELOCITY, ANGLE(2.0f));
 	}
 
 	if (lara->Control.IsMoving)
@@ -525,9 +515,9 @@ bool ItemNearLara(PHD_3DPOS* pos, int radius)
 	return false;
 }
 
-bool ItemNearTarget(PHD_3DPOS* src, ItemInfo* target, int radius)
+bool ItemNearTarget(PHD_3DPOS* origin, ItemInfo* target, int radius)
 {
-	auto pos = src->Position - target->Pose.Position;
+	auto pos = origin->Position - target->Pose.Position;
 
 	if (!ItemCollide(pos.y, ITEM_RADIUS_YMAX))
 		return false;
@@ -795,7 +785,8 @@ bool ItemPushItem(ItemInfo* item, ItemInfo* item2, CollisionInfo* coll, bool spa
 	return true;
 }
 
-bool ItemPushStatic(ItemInfo* item, MESH_INFO* mesh, CollisionInfo* coll) // previously ItemPushLaraStatic
+// NOTE: Previously ItemPushLaraStatic().
+bool ItemPushStatic(ItemInfo* item, MESH_INFO* mesh, CollisionInfo* coll)
 {
 	auto bounds = GetBoundsAccurate(mesh, false);
 
@@ -1869,7 +1860,7 @@ void AIPickupCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll
 		item->Status = ITEM_INVISIBLE;
 }
 
-void ObjectCollision(short const itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
+void ObjectCollision(const short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 {
 	auto* item = &g_Level.Items[itemNumber];
 
