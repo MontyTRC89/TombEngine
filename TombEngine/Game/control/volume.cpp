@@ -80,7 +80,7 @@ namespace TEN::Control::Volumes
 					volume->Status = TriggerStatus::Entering;
 					if (!set->OnEnter.Function.empty() && set->OnEnter.CallCounter != 0)
 					{
-						g_GameScript->ExecuteFunction(set->OnEnter.Function, triggerer, set->OnEnter.Argument);
+						g_GameScript->ExecuteFunction(set->OnEnter.Function, triggerer, set->OnEnter.Data);
 						if (set->OnEnter.CallCounter != NO_CALL_COUNTER)
 							set->OnEnter.CallCounter--;
 					}
@@ -90,7 +90,7 @@ namespace TEN::Control::Volumes
 					volume->Status = TriggerStatus::Inside;
 					if (!set->OnInside.Function.empty() && set->OnInside.CallCounter != 0)
 					{
-						g_GameScript->ExecuteFunction(set->OnInside.Function, triggerer, set->OnInside.Argument);
+						g_GameScript->ExecuteFunction(set->OnInside.Function, triggerer, set->OnInside.Data);
 						if (set->OnInside.CallCounter != NO_CALL_COUNTER)
 							set->OnInside.CallCounter--;
 					}
@@ -109,7 +109,7 @@ namespace TEN::Control::Volumes
 						volume->Status = TriggerStatus::Leaving;
 						if (!set->OnLeave.Function.empty() && set->OnLeave.CallCounter != 0)
 						{
-							g_GameScript->ExecuteFunction(set->OnLeave.Function, triggerer, set->OnLeave.Argument);
+							g_GameScript->ExecuteFunction(set->OnLeave.Function, triggerer, set->OnLeave.Data);
 							if (set->OnLeave.CallCounter != NO_CALL_COUNTER)
 								set->OnLeave.CallCounter--;
 						}
@@ -155,5 +155,20 @@ namespace TEN::Control::Volumes
 			TestVolumes(item->RoomNumber, bbox, TriggerVolumeActivators::NPC, itemNum);
 		else
 			TestVolumes(item->RoomNumber, bbox, TriggerVolumeActivators::Movable, itemNum);
+	}
+
+	void InitialiseNodeScripts()
+	{
+		for (auto& set : g_Level.EventSets)
+		{
+			if ((set.OnEnter.Mode == VolumeEventMode::NodeEditor) && (set.OnEnter.Data.size() > 0))
+				g_GameScript->ExecuteString(set.OnEnter.Data);
+
+			if ((set.OnInside.Mode == VolumeEventMode::NodeEditor) && (set.OnInside.Data.size() > 0))
+				g_GameScript->ExecuteString(set.OnInside.Data);
+
+			if ((set.OnLeave.Mode == VolumeEventMode::NodeEditor) && (set.OnLeave.Data.size() > 0))
+				g_GameScript->ExecuteString(set.OnLeave.Data);
+		}
 	}
 }

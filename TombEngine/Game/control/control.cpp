@@ -411,10 +411,11 @@ GameStatus DoTitle(int index, std::string const& ambient)
 
 		// Run the level script
 		ScriptInterfaceLevel* level = g_GameFlow->GetLevel(index);
+		g_GameScript->ExecuteScriptFile("Scripts/NodeFunctions.lua");
 
 		if (!level->ScriptFileName.empty())
 		{
-			g_GameScript->ExecuteLevelScriptFile(level->ScriptFileName);
+			g_GameScript->ExecuteScriptFile(level->ScriptFileName);
 			g_GameScript->InitCallbacks();
 			g_GameStringsHandler->SetCallbackDrawString([](std::string const key, D3DCOLOR col, int x, int y, int flags)
 			{
@@ -444,9 +445,8 @@ GameStatus DoTitle(int index, std::string const& ambient)
 		g_Gui.SetMenuToDisplay(Menu::Title);
 		g_Gui.SetSelectedOption(0);
 
-		// Initialise ponytails
 		InitialiseHair();
-
+		InitialiseNodeScripts();
 		InitialiseItemBoxData();
 
 		g_GameScript->OnStart();
@@ -516,10 +516,11 @@ GameStatus DoLevel(int index, std::string const& ambient, bool loadFromSavegame)
 
 	// Run the level script
 	ScriptInterfaceLevel* level = g_GameFlow->GetLevel(index);
+	g_GameScript->ExecuteScriptFile("Scripts/NodeFunctions.lua");
 
 	if (!level->ScriptFileName.empty())
 	{
-		g_GameScript->ExecuteLevelScriptFile(level->ScriptFileName);
+		g_GameScript->ExecuteScriptFile(level->ScriptFileName);
 		g_GameScript->InitCallbacks();
 		g_GameStringsHandler->SetCallbackDrawString([](std::string const key, D3DCOLOR col, int x, int y, int flags)
 		{

@@ -1326,11 +1326,11 @@ void LoadSprites()
 		spr->y4 = ReadFloat();
 	}
 
-	g_Level.NumSpritesSequences = ReadInt32();
+	int numSequences = ReadInt32();
 
-	TENLog("Num sprite sequences: " + std::to_string(g_Level.NumSpritesSequences), LogLevel::Info);
+	TENLog("Num sprite sequences: " + std::to_string(numSequences), LogLevel::Info);
 
-	for (int i = 0; i < g_Level.NumSpritesSequences; i++)
+	for (int i = 0; i < numSequences; i++)
 	{
 		int spriteID = ReadInt32();
 		short negLength = ReadInt16();
