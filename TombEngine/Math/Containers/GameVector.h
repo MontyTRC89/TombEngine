@@ -15,9 +15,9 @@ struct Vector3Int;
 		static const GameVector Empty;
 
 		GameVector();
-		GameVector(Vector3Int pos);
-		GameVector(Vector3Int pos, short roomNumber);
-		GameVector(Vector3Int pos, short roomNumber, short boxNumber);
+		GameVector(const Vector3Int& pos);
+		GameVector(const Vector3Int& pos, short roomNumber);
+		GameVector(const Vector3Int& pos, short roomNumber, short boxNumber);
 		GameVector(int xPos, int yPos, int zPos);
 		GameVector(int xPos, int yPos, int zPos, short roomNumber);
 		GameVector(int xPos, int yPos, int zPos, short roomNumber, short boxNumber);

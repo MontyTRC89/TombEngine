@@ -14,17 +14,17 @@
 		Vector3Shrt();
 		Vector3Shrt(short x, short y, short z);
 
-		bool		 operator ==(Vector3Shrt vector);
-		bool		 operator !=(Vector3Shrt vector);
-		Vector3Shrt	 operator +(Vector3Shrt vector);
-		Vector3Shrt	 operator -(Vector3Shrt vector);
-		Vector3Shrt	 operator *(Vector3Shrt vector);
+		bool		 operator ==(const Vector3Shrt& vector);
+		bool		 operator !=(const Vector3Shrt& vector);
+		Vector3Shrt	 operator +(const Vector3Shrt& vector);
+		Vector3Shrt	 operator -(const Vector3Shrt& vector);
+		Vector3Shrt	 operator *(const Vector3Shrt& vector);
 		Vector3Shrt	 operator *(float value);
 		Vector3Shrt	 operator /(float value);
-		Vector3Shrt& operator =(Vector3Shrt vector);
-		Vector3Shrt& operator +=(Vector3Shrt vector);
-		Vector3Shrt& operator -=(Vector3Shrt vector);
-		Vector3Shrt& operator *=(Vector3Shrt vector);
+		Vector3Shrt& operator =(const Vector3Shrt& vector);
+		Vector3Shrt& operator +=(const Vector3Shrt& vector);
+		Vector3Shrt& operator -=(const Vector3Shrt& vector);
+		Vector3Shrt& operator *=(const Vector3Shrt& vector);
 		Vector3Shrt& operator *=(float value);
 		Vector3Shrt& operator /=(float value);
 	};

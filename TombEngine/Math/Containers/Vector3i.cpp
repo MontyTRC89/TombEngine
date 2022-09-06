@@ -16,14 +16,14 @@
 		this->z = z;
 	}
 
-	Vector3Int::Vector3Int(Vector3 vector)
+	Vector3Int::Vector3Int(const Vector3& vector)
 	{
 		this->x = (int)round(vector.x);
 		this->y = (int)round(vector.y);
 		this->z = (int)round(vector.z);
 	}
 
-	float Vector3Int::Distance(Vector3Int origin, Vector3Int target)
+	float Vector3Int::Distance(const Vector3Int& origin, const Vector3Int& target)
 	{
 		return Vector3::Distance(origin.ToVector3(), target.ToVector3());
 	}
@@ -33,27 +33,27 @@
 		return Vector3(x, y, z);
 	}
 
-	bool Vector3Int::operator ==(Vector3Int vector)
+	bool Vector3Int::operator ==(const Vector3Int& vector)
 	{
 		return (x == vector.x && y == vector.y && z == vector.z);
 	}
 
-	bool Vector3Int::operator !=(Vector3Int vector)
+	bool Vector3Int::operator !=(const Vector3Int& vector)
 	{
 		return (x != vector.x || y != vector.y || z != vector.z);
 	}
 
-	Vector3Int Vector3Int::operator +(Vector3Int vector)
+	Vector3Int Vector3Int::operator +(const Vector3Int& vector)
 	{
 		return Vector3Int(x + vector.x, y + vector.y, z + vector.z);
 	}
 
-	Vector3Int Vector3Int::operator -(Vector3Int vector)
+	Vector3Int Vector3Int::operator -(const Vector3Int& vector)
 	{
 		return Vector3Int(x - vector.x, y - vector.y, z - vector.z);
 	}
 
-	Vector3Int Vector3Int::operator *(Vector3Int vector)
+	Vector3Int Vector3Int::operator *(const Vector3Int& vector)
 	{
 		return Vector3Int(x * vector.x, y * vector.y, z * vector.z);
 	}
@@ -68,7 +68,7 @@
 		return Vector3Int((int)round(x / value), (int)round(y / value), (int)round(z / value));
 	}
 
-	Vector3Int& Vector3Int::operator =(Vector3Int vector)
+	Vector3Int& Vector3Int::operator =(const Vector3Int& vector)
 	{
 		this->x = vector.x;
 		this->y = vector.y;
@@ -76,7 +76,7 @@
 		return *this;
 	}
 
-	Vector3Int& Vector3Int::operator +=(Vector3Int vector)
+	Vector3Int& Vector3Int::operator +=(const Vector3Int& vector)
 	{
 		this->x += vector.x;
 		this->y += vector.y;
@@ -84,7 +84,7 @@
 		return *this;
 	}
 
-	Vector3Int& Vector3Int::operator -=(Vector3Int vector)
+	Vector3Int& Vector3Int::operator -=(const Vector3Int& vector)
 	{
 		this->x -= vector.x;
 		this->y -= vector.y;
@@ -92,7 +92,7 @@
 		return *this;
 	}
 
-	Vector3Int& Vector3Int::operator *=(Vector3Int vector)
+	Vector3Int& Vector3Int::operator *=(const Vector3Int& vector)
 	{
 		this->x *= vector.x;
 		this->y *= vector.y;

@@ -16,27 +16,27 @@
 		this->z = z;
 	}
 
-	bool Vector3Shrt::operator ==(Vector3Shrt vector)
+	bool Vector3Shrt::operator ==(const Vector3Shrt& vector)
 	{
 		return (x == vector.x && y == vector.y && z == vector.z);
 	}
 
-	bool Vector3Shrt::operator !=(Vector3Shrt vector)
+	bool Vector3Shrt::operator !=(const Vector3Shrt& vector)
 	{
 		return (x != vector.x || y != vector.y || z != vector.z);
 	}
 
-	Vector3Shrt Vector3Shrt::operator +(Vector3Shrt vector)
+	Vector3Shrt Vector3Shrt::operator +(const Vector3Shrt& vector)
 	{
 		return Vector3Shrt(x + vector.x, y + vector.y, z + vector.z);
 	}
 
-	Vector3Shrt Vector3Shrt::operator -(Vector3Shrt vector)
+	Vector3Shrt Vector3Shrt::operator -(const Vector3Shrt& vector)
 	{
 		return Vector3Shrt(x - vector.x, y - vector.y, z - vector.z);
 	}
 
-	Vector3Shrt Vector3Shrt::operator *(Vector3Shrt vector)
+	Vector3Shrt Vector3Shrt::operator *(const Vector3Shrt& vector)
 	{
 		return Vector3Shrt(x * vector.x, y * vector.y, z * vector.z);
 	}
@@ -51,7 +51,7 @@
 		return Vector3Shrt((short)round(x / value), (short)round(y / value), (short)round(z / value));
 	}
 
-	Vector3Shrt& Vector3Shrt::operator =(Vector3Shrt vector)
+	Vector3Shrt& Vector3Shrt::operator =(const Vector3Shrt& vector)
 	{
 		this->x = vector.x;
 		this->y = vector.y;
@@ -59,7 +59,7 @@
 		return *this;
 	}
 
-	Vector3Shrt& Vector3Shrt::operator +=(Vector3Shrt vector)
+	Vector3Shrt& Vector3Shrt::operator +=(const Vector3Shrt& vector)
 	{
 		this->x += vector.x;
 		this->y += vector.y;
@@ -67,7 +67,7 @@
 		return *this;
 	}
 
-	Vector3Shrt& Vector3Shrt::operator -=(Vector3Shrt vector)
+	Vector3Shrt& Vector3Shrt::operator -=(const Vector3Shrt& vector)
 	{
 		this->x -= vector.x;
 		this->y -= vector.y;
@@ -75,7 +75,7 @@
 		return *this;
 	}
 
-	Vector3Shrt& Vector3Shrt::operator *=(Vector3Shrt vector)
+	Vector3Shrt& Vector3Shrt::operator *=(const Vector3Shrt& vector)
 	{
 		this->x *= vector.x;
 		this->y *= vector.y;

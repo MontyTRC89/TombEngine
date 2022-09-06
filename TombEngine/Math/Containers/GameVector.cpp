@@ -11,14 +11,14 @@
 	{
 	}
 
-	GameVector::GameVector(Vector3Int pos)
+	GameVector::GameVector(const Vector3Int& pos)
 	{
 		this->x = pos.x;
 		this->y = pos.y;
 		this->z = pos.z;
 	}
 	
-	GameVector::GameVector(Vector3Int pos, short roomNumber)
+	GameVector::GameVector(const Vector3Int& pos, short roomNumber)
 	{
 		this->x = pos.x;
 		this->y = pos.y;
@@ -26,7 +26,7 @@
 		this->roomNumber = roomNumber;
 	}
 	
-	GameVector::GameVector(Vector3Int pos, short roomNumber, short boxNumber)
+	GameVector::GameVector(const Vector3Int& pos, short roomNumber, short boxNumber)
 	{
 		this->x = pos.x;
 		this->y = pos.y;

@@ -14,7 +14,7 @@
 	{
 	}
 
-	PHD_3DPOS::PHD_3DPOS(Vector3Int pos)
+	PHD_3DPOS::PHD_3DPOS(const Vector3Int& pos)
 	{
 		this->Position = pos;
 	}
@@ -24,7 +24,7 @@
 		this->Position = Vector3Int(xPos, yPos, zPos);
 	}
 
-	PHD_3DPOS::PHD_3DPOS(Vector3Shrt orient)
+	PHD_3DPOS::PHD_3DPOS(const Vector3Shrt& orient)
 	{
 		this->Orientation = orient;
 	}
@@ -34,19 +34,19 @@
 		this->Orientation = Vector3Shrt(xOrient, yOrient, zOrient);
 	}
 
-	PHD_3DPOS::PHD_3DPOS(Vector3Int pos, Vector3Shrt orient)
+	PHD_3DPOS::PHD_3DPOS(const Vector3Int& pos, const Vector3Shrt& orient)
 	{
 		this->Position = pos;
 		this->Orientation = orient;
 	}
 
-	PHD_3DPOS::PHD_3DPOS(Vector3Int pos, short xOrient, short yOrient, short zOrient)
+	PHD_3DPOS::PHD_3DPOS(const Vector3Int& pos, short xOrient, short yOrient, short zOrient)
 	{
 		this->Position = pos;
 		this->Orientation = Vector3Shrt(xOrient, yOrient, zOrient);
 	}
 
-	PHD_3DPOS::PHD_3DPOS(int xPos, int yPos, int zPos, Vector3Shrt orient)
+	PHD_3DPOS::PHD_3DPOS(int xPos, int yPos, int zPos, const Vector3Shrt& orient)
 	{
 		this->Position = Vector3Int(xPos, yPos, zPos);
 		this->Orientation = orient;

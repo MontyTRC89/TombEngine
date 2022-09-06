@@ -13,23 +13,23 @@
 
 		Vector3Int();
 		Vector3Int(int x, int y, int z);
-		Vector3Int(Vector3 vector);
+		Vector3Int(const Vector3& vector);
 
-		static float Distance(Vector3Int origin, Vector3Int target);
+		static float Distance(const Vector3Int& origin, const Vector3Int& target);
 
 		Vector3 ToVector3() const;
 
-		bool		operator ==(Vector3Int vector);
-		bool		operator !=(Vector3Int vector);
-		Vector3Int	operator +(Vector3Int vector);
-		Vector3Int	operator -(Vector3Int vector);
-		Vector3Int	operator *(Vector3Int vector);
+		bool		operator ==(const Vector3Int& vector);
+		bool		operator !=(const Vector3Int& vector);
+		Vector3Int	operator +(const Vector3Int& vector);
+		Vector3Int	operator -(const Vector3Int& vector);
+		Vector3Int	operator *(const Vector3Int& vector);
 		Vector3Int	operator *(float value);
 		Vector3Int	operator /(float value);
-		Vector3Int& operator =(Vector3Int vector);
-		Vector3Int& operator +=(Vector3Int vector);
-		Vector3Int& operator -=(Vector3Int vector);
-		Vector3Int& operator *=(Vector3Int vector);
+		Vector3Int& operator =(const Vector3Int& vector);
+		Vector3Int& operator +=(const Vector3Int& vector);
+		Vector3Int& operator -=(const Vector3Int& vector);
+		Vector3Int& operator *=(const Vector3Int& vector);
 		Vector3Int& operator *=(float value);
 		Vector3Int& operator /=(float value);
 	};
