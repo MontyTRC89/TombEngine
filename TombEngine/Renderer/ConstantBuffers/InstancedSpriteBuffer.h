@@ -18,7 +18,7 @@ namespace TEN
 
 		struct alignas(4) CInstancedSpriteBuffer
 		{
-			InstancedSprite Sprites[128];
+			InstancedSprite Sprites[INSTANCED_SPRITES_BUCKET_SIZE];
 		};
 	}
 }

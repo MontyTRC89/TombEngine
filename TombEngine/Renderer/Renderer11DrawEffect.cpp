@@ -67,6 +67,7 @@ namespace TEN::Renderer
 		RendererSprite* Sprite;
 		BLEND_MODES BlendMode;
 		std::vector<RendererSpriteToDraw> SpritesToDraw;
+		bool IsBillboard;
 	};
 
 	void Renderer11::DrawLightning(RenderView& view) 
@@ -812,21 +813,47 @@ namespace TEN::Renderer
 		}
 	}
 
+	Matrix Renderer11::GetWorldMatrixForSprite(RendererSpriteToDraw* spr, RenderView& view)
+	{
+		Matrix spriteMatrix;
+		Matrix scale = Matrix::CreateScale((spr->Width) * spr->Scale, (spr->Height) * spr->Scale, spr->Scale);
+
+		if (spr->Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_BILLBOARD)
+		{
+			Vector3 cameraUp = Vector3(view.camera.View._12, view.camera.View._22, view.camera.View._32);
+			spriteMatrix = scale * Matrix::CreateRotationZ(spr->Rotation) * Matrix::CreateBillboard(spr->pos, Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z), cameraUp);
+		}
+		else if (spr->Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_BILLBOARD_CUSTOM)
+		{
+			Matrix rotation = Matrix::CreateRotationY(spr->Rotation);
+			Vector3 quadForward = Vector3(0, 0, 1);
+			spriteMatrix = scale * Matrix::CreateConstrainedBillboard(
+				spr->pos,
+				Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z),
+				spr->ConstrainAxis,
+				nullptr,
+				&quadForward);
+		}
+		else if (spr->Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_BILLBOARD_LOOKAT)
+		{
+			Matrix translation = Matrix::CreateTranslation(spr->pos);
+			Matrix rotation = Matrix::CreateRotationZ(spr->Rotation) * Matrix::CreateLookAt(Vector3::Zero, spr->LookAtAxis, Vector3::UnitZ);
+			spriteMatrix = scale * rotation * translation;
+		}
+		else if (spr->Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_3D)
+		{
+			spriteMatrix = Matrix::Identity;
+		}
+
+		return spriteMatrix;
+	}
+
 	void Renderer11::DrawSprites(RenderView& view)
 	{
 		if (view.spritesToDraw.size() == 0)
 			return;
-		
-		BindRenderTargetAsTexture(TEXTURE_DEPTH_MAP, &m_depthMap, SAMPLER_LINEAR_CLAMP);
 
-		SetDepthState(DEPTH_STATE_READ_ONLY_ZBUFFER);
-		SetCullMode(CULL_MODE_NONE);
-
-		m_context->VSSetShader(m_vsInstancedSprites.Get(), NULL, 0);
-		m_context->PSSetShader(m_psInstancedSprites.Get(), NULL, 0);
-
-		//BindConstantBufferVS(CB_SPRITE, m_cbSprite.get());
-
+		// Sort sprites by sprite and blend mode for faster batching
 		std::sort(
 			view.spritesToDraw.begin(),
 			view.spritesToDraw.end(),
@@ -834,70 +861,49 @@ namespace TEN::Renderer
 			{
 				if (a.Sprite != b.Sprite)
 					return a.Sprite > b.Sprite;
+				else if ((a.Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_3D) != (b.Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_3D))
+					return a.Type > b.Type;
 				else
 					return a.BlendMode > b.BlendMode;
 			}
 		);
 
+		// Group sprites to draw in buckets for instancing (only billboards)
 		std::vector<RendererSpriteBucket> spriteBuckets;
 		RendererSpriteBucket currentSpriteBucket;
 
 		currentSpriteBucket.Sprite = view.spritesToDraw[0].Sprite;
 		currentSpriteBucket.BlendMode = view.spritesToDraw[0].BlendMode;
+		currentSpriteBucket.IsBillboard = view.spritesToDraw[0].Type != RENDERER_SPRITE_TYPE::SPRITE_TYPE_3D;
 
 		for (int i = 0; i < view.spritesToDraw.size(); i++)
 		{
 			RendererSpriteToDraw& spr = view.spritesToDraw[i];
 
+			bool isBillboard = spr.Type != RENDERER_SPRITE_TYPE::SPRITE_TYPE_3D;
+
 			if (spr.Sprite != currentSpriteBucket.Sprite 
 				|| spr.BlendMode != currentSpriteBucket.BlendMode 
-				|| currentSpriteBucket.SpritesToDraw.size() == 128)
+				|| currentSpriteBucket.SpritesToDraw.size() == INSTANCED_SPRITES_BUCKET_SIZE
+				|| isBillboard != currentSpriteBucket.IsBillboard)
 			{
 				spriteBuckets.push_back(currentSpriteBucket);
 
 				currentSpriteBucket.Sprite = spr.Sprite;
 				currentSpriteBucket.BlendMode = spr.BlendMode;
+				currentSpriteBucket.IsBillboard = isBillboard;
 				currentSpriteBucket.SpritesToDraw.clear();
 			}
-
-			Matrix spriteMatrix;
-			Matrix scale = Matrix::CreateScale((spr.Width) * spr.Scale, (spr.Height) * spr.Scale, spr.Scale);
-
-			if (spr.Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_BILLBOARD)
-			{
-				Vector3 cameraUp = Vector3(view.camera.View._12, view.camera.View._22, view.camera.View._32);
-				spriteMatrix = scale * Matrix::CreateRotationZ(spr.Rotation) * Matrix::CreateBillboard(spr.pos, Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z), cameraUp);
-			}
-			else if (spr.Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_BILLBOARD_CUSTOM)
-			{
-				Matrix rotation = Matrix::CreateRotationY(spr.Rotation);
-				Vector3 quadForward = Vector3(0, 0, 1);
-				spriteMatrix = scale * Matrix::CreateConstrainedBillboard(
-					spr.pos,
-					Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z),
-					spr.ConstrainAxis,
-					nullptr,
-					&quadForward);
-			}
-			else if (spr.Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_BILLBOARD_LOOKAT)
-			{
-				Matrix translation = Matrix::CreateTranslation(spr.pos);
-				Matrix rotation = Matrix::CreateRotationZ(spr.Rotation) * Matrix::CreateLookAt(Vector3::Zero, spr.LookAtAxis, Vector3::UnitZ);
-				spriteMatrix = scale * rotation * translation;
-			}
-			else if (spr.Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_3D)
-			{
-				spriteMatrix = Matrix::Identity;
-			}
-
+				 
 			if (DoesBlendModeRequireSorting(spr.BlendMode))
 			{
+				// If the blend mode requires sorting, save the sprite for later
 				int distance = (spr.pos - Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z)).Length();
 				RendererTransparentFace face;
 				face.type = RendererTransparentFaceType::TRANSPARENT_FACE_SPRITE;
 				face.info.sprite = &spr;
 				face.distance = distance;
-				face.info.world = spriteMatrix;
+				face.info.world = GetWorldMatrixForSprite(&spr, view);
 				face.info.blendMode = spr.BlendMode;
 
 				RendererRoom& room = m_rooms[FindRoomNumber(Vector3Int(spr.pos))];
@@ -905,62 +911,45 @@ namespace TEN::Renderer
 			}
 			else
 			{
+				// Otherwise, add the sprite tot he current bucket
 				currentSpriteBucket.SpritesToDraw.push_back(spr);
 			}
 		}
 
+		spriteBuckets.push_back(currentSpriteBucket);
+
+		SetDepthState(DEPTH_STATE_READ_ONLY_ZBUFFER);
+		SetCullMode(CULL_MODE_NONE);
+
+		m_context->VSSetShader(m_vsInstancedSprites.Get(), NULL, 0);
+		m_context->PSSetShader(m_psInstancedSprites.Get(), NULL, 0);
+
+		// Set up vertex buffer and parameters
+		UINT stride = sizeof(RendererVertex);
+		UINT offset = 0;
+		m_context->IASetInputLayout(m_inputLayout.Get());
+		m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+		m_context->IASetVertexBuffers(0, 1, quadVertexBuffer.GetAddressOf(), &stride, &offset);
+
 		for (auto& spriteBucket : spriteBuckets)
 		{
+			if (spriteBucket.SpritesToDraw.size() == 0 || !spriteBucket.IsBillboard)
+				continue;
+
+			// Prepare the constant buffer for instanced sprites
 			for (int i = 0; i < spriteBucket.SpritesToDraw.size(); i++)
 			{
 				RendererSpriteToDraw& spr = spriteBucket.SpritesToDraw[i];
 
-				Matrix spriteMatrix;
-				Matrix scale = Matrix::CreateScale((spr.Width) * spr.Scale, (spr.Height) * spr.Scale, spr.Scale);
-
-				if (spr.Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_BILLBOARD)
-				{
-					Vector3 cameraUp = Vector3(view.camera.View._12, view.camera.View._22, view.camera.View._32);
-					spriteMatrix = scale * Matrix::CreateRotationZ(spr.Rotation) * Matrix::CreateBillboard(spr.pos, Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z), cameraUp);
-				}
-				else if (spr.Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_BILLBOARD_CUSTOM)
-				{
-					Matrix rotation = Matrix::CreateRotationY(spr.Rotation);
-					Vector3 quadForward = Vector3(0, 0, 1);
-					spriteMatrix = scale * Matrix::CreateConstrainedBillboard(
-						spr.pos,
-						Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z),
-						spr.ConstrainAxis,
-						nullptr,
-						&quadForward);
-				}
-				else if (spr.Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_BILLBOARD_LOOKAT)
-				{
-					Matrix translation = Matrix::CreateTranslation(spr.pos);
-					Matrix rotation = Matrix::CreateRotationZ(spr.Rotation) * Matrix::CreateLookAt(Vector3::Zero, spr.LookAtAxis, Vector3::UnitZ);
-					spriteMatrix = scale * rotation * translation;
-				}
-				else if (spr.Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_3D)
-				{
-					spriteMatrix = Matrix::Identity;
-				}
-
-				m_stInstancedSpriteBuffer.Sprites[i].World = spriteMatrix;
+				m_stInstancedSpriteBuffer.Sprites[i].World = GetWorldMatrixForSprite(&spr, view);
 				m_stInstancedSpriteBuffer.Sprites[i].Color = spr.color;
 				m_stInstancedSpriteBuffer.Sprites[i].IsBillboard = spr.Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_3D ? 0 : 1;
 			}
 
-			// Set up vertex buffer and parameters
-			UINT stride = sizeof(RendererVertex);
-			UINT offset = 0;
-			m_context->IASetInputLayout(m_inputLayout.Get());
-			m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
-			m_context->IASetVertexBuffers(0, 1, quadVertexBuffer.GetAddressOf(), &stride, &offset);
-
-			SetBlendMode(lastBlendMode);
+			SetBlendMode(spriteBucket.BlendMode);
 			BindTexture(TEXTURE_COLOR_MAP, spriteBucket.Sprite->Texture, SAMPLER_LINEAR_CLAMP);
 
-			if (lastBlendMode == BLEND_MODES::BLENDMODE_ALPHATEST)
+			if (spriteBucket.BlendMode == BLEND_MODES::BLENDMODE_ALPHATEST)
 				SetAlphaTest(ALPHA_TEST_GREATER_THAN, ALPHA_TEST_THRESHOLD, true);
 			else
 				SetAlphaTest(ALPHA_TEST_NONE, 0);
@@ -968,243 +957,88 @@ namespace TEN::Renderer
 			m_cbInstancedSpriteBuffer.updateData(m_stInstancedSpriteBuffer, m_context.Get());
 			BindConstantBufferVS(CB_INSTANCED_SPRITES, m_cbInstancedSpriteBuffer.get());
 
+			// Draw sprites with instancing
 			m_context->DrawInstanced(4, spriteBucket.SpritesToDraw.size(), 0, 0);
+
+			m_numSpritesDrawCalls++;
+			m_numInstancedSpritesDrawCalls++;
+			m_numDrawCalls++;
 		}
 
-		/*RendererSprite* lastSprite = view.spritesToDraw[0].Sprite;
-		int lastSpriteBlendMode = view.spritesToDraw[0].BlendMode;
-		int numSpritesToDraw = 0;
-		int processedSprites = 0;
-		bool drawSprites = false;
-		int lastSpriteIndex = 0;
+		// Draw 3D sprites
+		SetDepthState(DEPTH_STATE_READ_ONLY_ZBUFFER);
+		SetCullMode(CULL_MODE_NONE);
 
-		for (int i=0;i<view.spritesToDraw.size();i++) 
+		m_context->VSSetShader(m_vsSprites.Get(), NULL, 0);
+		m_context->PSSetShader(m_psSprites.Get(), NULL, 0);
+
+		stride = sizeof(RendererVertex);
+		offset = 0;
+		m_context->IASetInputLayout(m_inputLayout.Get());
+		m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+		m_context->IASetVertexBuffers(0, 1, quadVertexBuffer.GetAddressOf(), &stride, &offset);
+
+		m_stSprite.color = Vector4::One;
+		m_stSprite.isBillboard = false;
+		m_cbSprite.updateData(m_stSprite, m_context.Get());
+		BindConstantBufferVS(CB_SPRITE, m_cbSprite.get());
+		BindConstantBufferPS(CB_SPRITE, m_cbSprite.get());
+
+		for (auto& spriteBucket : spriteBuckets)
 		{
-			RendererSpriteToDraw& spr = view.spritesToDraw[i];
+			if (spriteBucket.SpritesToDraw.size() == 0 || spriteBucket.IsBillboard)
+				continue;
 
-			// Calculate matrices for sprites
-			Matrix spriteMatrix;
-			Matrix scale = Matrix::CreateScale((spr.Width) * spr.Scale, (spr.Height) * spr.Scale, spr.Scale);
+			m_primitiveBatch->Begin();
 
-			if (spr.Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_BILLBOARD)
+			for (auto& spr : spriteBucket.SpritesToDraw)
 			{
-				Vector3 cameraUp = Vector3(view.camera.View._12, view.camera.View._22, view.camera.View._32) ;
-				spriteMatrix = scale * Matrix::CreateRotationZ(spr.Rotation) * Matrix::CreateBillboard(spr.pos, Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z), cameraUp);
+				Vector3 p0t = spr.vtx1;
+				Vector3 p1t = spr.vtx2;
+				Vector3 p2t = spr.vtx3;
+				Vector3 p3t = spr.vtx4;
+
+				RendererVertex v0;
+				v0.Position.x = p0t.x;
+				v0.Position.y = p0t.y;
+				v0.Position.z = p0t.z;
+				v0.UV.x = spr.Sprite->UV[0].x;
+				v0.UV.y = spr.Sprite->UV[0].y;
+				v0.Color = spr.color;
+
+				RendererVertex v1;
+				v1.Position.x = p1t.x;
+				v1.Position.y = p1t.y;
+				v1.Position.z = p1t.z;
+				v1.UV.x = spr.Sprite->UV[1].x;
+				v1.UV.y = spr.Sprite->UV[1].y;
+				v1.Color = spr.color;
+
+				RendererVertex v2;
+				v2.Position.x = p2t.x;
+				v2.Position.y = p2t.y;
+				v2.Position.z = p2t.z;
+				v2.UV.x = spr.Sprite->UV[2].x;
+				v2.UV.y = spr.Sprite->UV[2].y;
+				v2.Color = spr.color;
+
+				RendererVertex v3;
+				v3.Position.x = p3t.x;
+				v3.Position.y = p3t.y;
+				v3.Position.z = p3t.z;
+				v3.UV.x = spr.Sprite->UV[3].x;
+				v3.UV.y = spr.Sprite->UV[3].y;
+				v3.Color = spr.color;
+
+				m_primitiveBatch->DrawTriangle(v0, v1, v3);
+				m_primitiveBatch->DrawTriangle(v1, v2, v3);
 			}
-			else if (spr.Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_BILLBOARD_CUSTOM)
-			{
-				Matrix rotation = Matrix::CreateRotationY(spr.Rotation);
-				Vector3 quadForward = Vector3(0, 0, 1);
-				spriteMatrix = scale * Matrix::CreateConstrainedBillboard(
-					spr.pos,
-					Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z),
-					spr.ConstrainAxis,
-					nullptr,
-					&quadForward);
-			}
-			else if (spr.Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_BILLBOARD_LOOKAT)
-			{
-				Matrix translation = Matrix::CreateTranslation(spr.pos);
-				Matrix rotation = Matrix::CreateRotationZ(spr.Rotation) * Matrix::CreateLookAt(Vector3::Zero, spr.LookAtAxis, Vector3::UnitZ);
-				spriteMatrix = scale * rotation * translation;
-			}
-			else if (spr.Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_3D)
-			{
-				spriteMatrix = Matrix::Identity;
-			}
 
-			if (DoesBlendModeRequireSorting(spr.BlendMode)) // Collect sprites
-			{
-				int distance = (spr.pos - Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z)).Length();
-				RendererTransparentFace face;
-				face.type = RendererTransparentFaceType::TRANSPARENT_FACE_SPRITE;
-				face.info.sprite = &spr;
-				face.distance = distance;
-				face.info.world = spriteMatrix;
-				face.info.blendMode = spr.BlendMode;
+			m_primitiveBatch->End();
 
-				RendererRoom& room = m_rooms[FindRoomNumber(Vector3Int(spr.pos))];
-				room.TransparentFacesToDraw.push_back(face);
-			}
-			else // Draw sprites immediately
-			{
-				bool timeToDraw = false;
-
-				if (spr.Sprite != lastSprite || spr.BlendMode != lastBlendMode)
-				{
-					if (numSpritesToDraw > 0)
-					{
-						// Set up vertex buffer and parameters
-						UINT stride = sizeof(RendererVertex);
-						UINT offset = 0;
-						m_context->IASetInputLayout(m_inputLayout.Get());
-						m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
-						m_context->IASetVertexBuffers(0, 1, quadVertexBuffer.GetAddressOf(), &stride, &offset);
-
-						SetBlendMode(lastBlendMode);
-						BindTexture(TEXTURE_COLOR_MAP, lastSprite->Texture, SAMPLER_LINEAR_CLAMP);
-
-						if (lastBlendMode == BLEND_MODES::BLENDMODE_ALPHATEST)
-							SetAlphaTest(ALPHA_TEST_GREATER_THAN, ALPHA_TEST_THRESHOLD, true);
-						else
-							SetAlphaTest(ALPHA_TEST_NONE, 0);
-
-						m_cbInstancedSpriteBuffer.updateData(m_stInstancedSpriteBuffer, m_context.Get());
-						BindConstantBufferVS(CB_INSTANCED_SPRITES, m_cbInstancedSpriteBuffer.get());
-
-						m_context->DrawInstanced(4, numSpritesToDraw, 0, 0);
-					}
-
-					numSpritesToDraw = 0;
-
-					lastSprite = spr.Sprite;
-					lastBlendMode = spr.BlendMode;
-				}
-
-					m_stInstancedSpriteBuffer.Sprites[numSpritesToDraw].World = spriteMatrix;
-					m_stInstancedSpriteBuffer.Sprites[numSpritesToDraw].Color = spr.color;
-					m_stInstancedSpriteBuffer.Sprites[numSpritesToDraw].IsBillboard = spr.Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_3D ? 0 : 1;
-
-					numSpritesToDraw++;
-
-				if (numSpritesToDraw > 0 && (numSpritesToDraw == 128 || i == view.spritesToDraw.size() - 1))
-				{
-					// Set up vertex buffer and parameters
-					UINT stride = sizeof(RendererVertex);
-					UINT offset = 0;
-					m_context->IASetInputLayout(m_inputLayout.Get());
-					m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
-					m_context->IASetVertexBuffers(0, 1, quadVertexBuffer.GetAddressOf(), &stride, &offset);
-
-					SetBlendMode(lastBlendMode);
-					BindTexture(TEXTURE_COLOR_MAP, lastSprite->Texture, SAMPLER_LINEAR_CLAMP);
-
-					if (lastBlendMode == BLEND_MODES::BLENDMODE_ALPHATEST)
-						SetAlphaTest(ALPHA_TEST_GREATER_THAN, ALPHA_TEST_THRESHOLD, true);
-					else
-						SetAlphaTest(ALPHA_TEST_NONE, 0);
-
-					Matrix scale = Matrix::CreateScale((spr.Width) * spr.Scale, (spr.Height) * spr.Scale, spr.Scale);
-
-					m_cbInstancedSpriteBuffer.updateData(m_stInstancedSpriteBuffer, m_context.Get());
-					BindConstantBufferVS(CB_INSTANCED_SPRITES, m_cbInstancedSpriteBuffer.get());
-
-					m_context->DrawInstanced(4, numSpritesToDraw, 0, 0);
-
-					numSpritesToDraw = 0;
-				}
-
-				// Set up vertex buffer and parameters
-				/*UINT stride = sizeof(RendererVertex);
-				UINT offset = 0;
-				m_context->IASetInputLayout(m_inputLayout.Get());
-				m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
-				m_context->IASetVertexBuffers(0, 1, quadVertexBuffer.GetAddressOf(), &stride, &offset);
-
-				SetBlendMode(spr.BlendMode);
-				BindTexture(TEXTURE_COLOR_MAP, spr.Sprite->Texture, SAMPLER_LINEAR_CLAMP);
-
-				if (spr.BlendMode == BLEND_MODES::BLENDMODE_ALPHATEST)
-					SetAlphaTest(ALPHA_TEST_GREATER_THAN, ALPHA_TEST_THRESHOLD, true);
-				else
-					SetAlphaTest(ALPHA_TEST_NONE, 0);
-
-				Matrix scale = Matrix::CreateScale((spr.Width) * spr.Scale, (spr.Height) * spr.Scale, spr.Scale);
-				
-				if (spr.Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_BILLBOARD) 
-				{
-					m_stSprite.billboardMatrix = spriteMatrix;
-					m_stSprite.color = spr.color;
-					m_stSprite.isBillboard = true;
-					m_cbSprite.updateData(m_stSprite, m_context.Get());
-
-					m_context->Draw(4, 0);
-					m_numDrawCalls++;
-					m_numPolygons += 2;
-					m_numSpritesDrawCalls++;
-
-				}
-				else if (spr.Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_BILLBOARD_CUSTOM) 
-				{
-					m_stSprite.billboardMatrix = spriteMatrix;
-					m_stSprite.color = spr.color;
-					m_stSprite.isBillboard = true;
-					m_cbSprite.updateData(m_stSprite, m_context.Get());
-
-					m_context->Draw(4, 0);
-					m_numDrawCalls++;
-					m_numPolygons += 2;
-					m_numSpritesDrawCalls++;
-
-				}
-				else if (spr.Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_BILLBOARD_LOOKAT)
-				{
-					m_stSprite.billboardMatrix = spriteMatrix;
-					m_stSprite.color = spr.color;
-					m_stSprite.isBillboard = true;
-					m_cbSprite.updateData(m_stSprite, m_context.Get());
-
-					m_context->Draw(4, 0);
-					m_numDrawCalls++;
-					m_numPolygons += 2;
-					m_numSpritesDrawCalls++;
-
-				}
-				else if (spr.Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_3D) 
-				{
-					Vector3 p0t = spr.vtx1;
-					Vector3 p1t = spr.vtx2;
-					Vector3 p2t = spr.vtx3;
-					Vector3 p3t = spr.vtx4;
-
-					RendererVertex v0;
-					v0.Position.x = p0t.x;
-					v0.Position.y = p0t.y;
-					v0.Position.z = p0t.z;
-					v0.UV.x = spr.Sprite->UV[0].x;
-					v0.UV.y = spr.Sprite->UV[0].y;
-					v0.Color = spr.color;
-
-					RendererVertex v1;
-					v1.Position.x = p1t.x;
-					v1.Position.y = p1t.y;
-					v1.Position.z = p1t.z;
-					v1.UV.x = spr.Sprite->UV[1].x;
-					v1.UV.y = spr.Sprite->UV[1].y;
-					v1.Color = spr.color;
-
-					RendererVertex v2;
-					v2.Position.x = p2t.x;
-					v2.Position.y = p2t.y;
-					v2.Position.z = p2t.z;
-					v2.UV.x = spr.Sprite->UV[2].x;
-					v2.UV.y = spr.Sprite->UV[2].y;
-					v2.Color = spr.color;
-
-					RendererVertex v3;
-					v3.Position.x = p3t.x;
-					v3.Position.y = p3t.y;
-					v3.Position.z = p3t.z;
-					v3.UV.x = spr.Sprite->UV[3].x;
-					v3.UV.y = spr.Sprite->UV[3].y;
-					v3.Color = spr.color;
-					
-					m_stSprite.color = spr.color;
-					m_stSprite.isBillboard = false;
-					m_cbSprite.updateData(m_stSprite, m_context.Get());
-
-					m_primitiveBatch->Begin();
-					m_primitiveBatch->DrawTriangle(v0, v1, v3);
-					m_primitiveBatch->DrawTriangle(v1, v2, v3);
-					m_primitiveBatch->End();
-
-					m_numSpritesDrawCalls++;
-					m_numSpritesDrawCalls++;
-					m_numDrawCalls++;
-				}
-			}
+			m_numSpritesDrawCalls++;
+			m_numDrawCalls++;
 		}
-*/
 	}
 
 	void Renderer11::DrawSpritesTransparent(RendererTransparentFaceInfo* info, RenderView& view)

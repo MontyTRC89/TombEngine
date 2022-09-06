@@ -397,6 +397,7 @@ namespace TEN::Renderer
 		int m_numMoveablesDrawCalls = 0;
 		int m_numStaticsDrawCalls = 0;
 		int m_numSpritesDrawCalls = 0;
+		int m_numInstancedSpritesDrawCalls = 0;
 		int m_numTransparentDrawCalls = 0;
 		int m_numRoomsTransparentDrawCalls = 0;
 		int m_numMoveablesTransparentDrawCalls = 0;
@@ -566,6 +567,7 @@ namespace TEN::Renderer
 		                                         RenderView& view);
 		void AddSprite3D(RendererSprite* sprite, Vector3 vtx1, Vector3 vtx2, Vector3 vtx3, Vector3 vtx4, Vector4 color,
 		                 float rotation, float scale, Vector2 size, BLEND_MODES blendMode, RenderView& view);
+		Matrix GetWorldMatrixForSprite(RendererSpriteToDraw* spr, RenderView& view);
 
 		RendererMesh* GetMesh(int meshIndex);
 		Texture2D CreateDefaultNormalTexture();
