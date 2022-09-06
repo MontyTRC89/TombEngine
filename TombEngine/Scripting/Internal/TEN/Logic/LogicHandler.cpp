@@ -726,9 +726,9 @@ Unlike @{LevelVars}, this table will remain intact for the entirety of the game.
 @table GameVars
 */
 
-/*** A table with level-specific functions.
+/*** A table nested table system for level-specific functions.
 
-This serves two purposes: it holds the level callbacks (listed below) as well as
+This serves a few purposes: it holds the level callbacks (listed below) as well as
 any trigger functions you might have specified. For example, if you give a trigger
 a Lua name of "my_trigger" in Tomb Editor, you will have to implement it as a member
 of this table:
@@ -736,6 +736,23 @@ of this table:
 	LevelFuncs.my_trigger = function() 
 		-- implementation goes here
 	end
+
+You can organise functions into tables within the hierarchy:
+
+	LevelFuncs.enemyFuncs = {}
+
+	LevelFuncs.enemyFuncs.makeBaddyRunAway = function() 
+		-- implementation goes here
+	end
+
+	LevelFuncs.enemyFuncs.makeBaddyUseMedkit = function() 
+		-- implementation goes here
+	end
+
+There are two special subtables which you should not overwrite:
+
+	LevelFuncs.TEN -- this is for 'first-party' functions, i.e. ones that come with TombEngine.
+	LevelFuncs.Ext -- this is for 'third-party' functions. If you write a library providing LevelFuncs functions for other builders to use in their levels, put those functions in LevelFuncs.Ext.YourLibraryNameHere
 
 The following are the level callbacks. They are optional; if your level has no special
 behaviour for a particular scenario, you do not need to implement the function. For
