@@ -160,10 +160,14 @@ namespace TEN::Control::Volumes
 
 	void InitialiseNodeScripts()
 	{
-		if (!std::filesystem::exists("Scripts/NodeScripting/"))
+		static const std::string nodeScriptPath = "Scripts/NodeScripting/";
+
+		if (!std::filesystem::exists(nodeScriptPath))
 			return;
 
-		for (auto& path : std::filesystem::recursive_directory_iterator("Scripts/NodeScripting/"))
+		TENLog("Executing node scripts...", LogLevel::Info);
+
+		for (auto& path : std::filesystem::recursive_directory_iterator(nodeScriptPath))
 		{
 			if (path.path().extension() == ".lua")
 				g_GameScript->ExecuteScriptFile(path.path().string());
