@@ -1,8 +1,8 @@
 #pragma once
 
+class EulerAngles;
 struct PoseData;
 struct Vector3i;
-class EulerAngles;
 
 //namespace TEN::Math::Geometry
 //{

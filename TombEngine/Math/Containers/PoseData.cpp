@@ -1,8 +1,8 @@
 #include "framework.h"
 #include "Math/Containers/PoseData.h"
 
-#include "Math/Containers/Vector3i.h"
 #include "Math/Angles/EulerAngles.h"
+#include "Math/Containers/Vector3i.h"
 
 //using namespace TEN::Math::Angles;
 

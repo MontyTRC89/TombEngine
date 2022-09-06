@@ -1,6 +1,6 @@
 #pragma once
 
-//namespace TEN::Math
+//namespace TEN::Math::Angles
 //{
 	class EulerAngles
 	{

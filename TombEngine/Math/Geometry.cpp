@@ -1,9 +1,9 @@
 #include "framework.h"
 #include "Math/Geometry.h"
 
+#include "Math/Angles/EulerAngles.h"
 #include "Math/Containers/PoseData.h"
 #include "Math/Containers/Vector3i.h"
-#include "Math/Angles/EulerAngles.h"
 #include "Specific/trmath.h"
 
 //namespace TEN::Math::Geometry
