@@ -12,6 +12,7 @@ class LogicHandler : public ScriptInterfaceGame
 private:
 	// Hierarchy of tables.
 	//
+	// For example:
 	// LevelFuncs
 	// |-	TEN
 	//		|-	Timer

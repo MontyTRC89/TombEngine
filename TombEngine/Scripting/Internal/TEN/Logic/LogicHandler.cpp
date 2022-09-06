@@ -111,7 +111,7 @@ Any returned value will be discarded.
 
 @function AddCallback
 @tparam point CallbackPoint When should the callback be called?
-@tparam LevelFunc The function to be called (must be in the LevelFuncs hierarchy). Will receive, as an argument, the time in seconds since the last frame.
+@tparam function func The function to be called (must be in the LevelFuncs hierarchy). Will receive, as an argument, the time in seconds since the last frame.
 @usage
 	LevelFuncs.MyFunc = function(dt) print(dt) end
 	TEN.Logic.AddCallback(TEN.Logic.CallbackPoint.PRECONTROLPHASE, LevelFuncs.MyFunc)
@@ -594,7 +594,8 @@ void LogicHandler::ExecuteScriptFile(const std::string & luaFilename)
 void LogicHandler::ExecuteFunction(std::string const& name, short idOne, short idTwo) 
 {
 	sol::protected_function_result r;
-	sol::protected_function func = (*m_handler.GetState())["LevelFuncs"][name.c_str()];
+	sol::protected_function func = m_levelFuncs_luaFunctions[name];
+
 	r = func(std::make_unique<Moveable>(idOne), std::make_unique<Moveable>(idTwo));
 	if (!r.valid())
 	{

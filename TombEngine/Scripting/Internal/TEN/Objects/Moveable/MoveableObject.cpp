@@ -15,6 +15,7 @@
 #include "Objects/ObjectsHandler.h"
 #include "ReservedScriptNames.h"
 #include "Color/Color.h"
+#include "Logic/LevelFunc.h"
 #include "Rotation/Rotation.h"
 #include "Vec3/Vec3.h"
 
