@@ -220,7 +220,7 @@ namespace TEN::Entities::Vehicles
 		DoVehicleFlareDiscard(laraItem);
 		ResetLaraFlex(laraItem);
 		laraItem->Pose.Position = quadBikeItem->Pose.Position;
-		laraItem->Pose.Orientation = Vector3Shrt(0, quadBikeItem->Pose.Orientation.y, 0);
+		laraItem->Pose.Orientation = EulerAngles(0, quadBikeItem->Pose.Orientation.y, 0);
 		lara->Control.HandStatus = HandStatus::Busy;
 		lara->HitDirection = -1;
 		quadBikeItem->HitPoints = 1;

@@ -97,7 +97,7 @@ static void ImpThrowStones(ItemInfo* item)
 			fx->roomNumber = item->RoomNumber;
 			fx->speed = 4 * sqrt(distance);
 
-			fx->pos.Orientation = Vector3Shrt(
+			fx->pos.Orientation = EulerAngles(
 				(angles.x + distance) / 2,
 				angles.y,
 				0

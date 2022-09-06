@@ -3,7 +3,7 @@
 
 #include "Math/Containers/PoseData.h"
 #include "Math/Containers/Vector3i.h"
-#include "Math/Containers/Vector3s.h"
+#include "Math/Angles/EulerAngles.h"
 #include "Specific/trmath.h"
 
 //namespace TEN::Math::Geometry
@@ -28,12 +28,12 @@
 		);
 	}
 
-	Vector3i TranslatePoint(const Vector3i& point, const Vector3Shrt& orient, float distance)
+	Vector3i TranslatePoint(const Vector3i& point, const EulerAngles& orient, float distance)
 	{
 		return Vector3i(TranslatePoint(point.ToVector3(), orient, distance));
 	}
 
-	Vector3 TranslatePoint(const Vector3& point, const Vector3Shrt& orient, float distance)
+	Vector3 TranslatePoint(const Vector3& point, const EulerAngles& orient, float distance)
 	{
 		if (distance == 0.0f)
 			return point;
@@ -79,7 +79,7 @@
 		return (short)phd_atan(-tilt.y, -tilt.x);
 	}
 
-	Vector3Shrt GetOrientTowardPoint(const Vector3& origin, const Vector3& target)
+	EulerAngles GetOrientTowardPoint(const Vector3& origin, const Vector3& target)
 	{
 		auto direction = target - origin;
 		float yOrient = phd_atan(direction.x, direction.z);
@@ -89,7 +89,7 @@
 		Vector3::Transform(vector, matrix, vector);
 
 		float xOrient = -phd_atan(direction.y, vector.z);
-		return Vector3Shrt(xOrient, yOrient, 0.0f);
+		return EulerAngles(xOrient, yOrient, 0.0f);
 	}
 
 	bool IsPointInFront(const PHD_3DPOS& pose, const Vector3& target)
@@ -97,7 +97,7 @@
 		return IsPointInFront(pose.Position.ToVector3(), target, pose.Orientation);
 	}
 	
-	bool IsPointInFront(const Vector3& origin, const Vector3& target, const Vector3Shrt& orient)
+	bool IsPointInFront(const Vector3& origin, const Vector3& target, const EulerAngles& orient)
 	{
 		float sinY = phd_sin(orient.y);
 		float cosY = phd_cos(orient.y);
@@ -133,7 +133,7 @@
 		return IsPointOnLeft(pose.Position.ToVector3(), target, pose.Orientation);
 	}
 
-	bool IsPointOnLeft(const Vector3& origin, const Vector3& target, const Vector3Shrt& orient)
+	bool IsPointOnLeft(const Vector3& origin, const Vector3& target, const EulerAngles& orient)
 	{
 		float sinY = phd_sin(orient.y);
 		float cosY = phd_cos(orient.y);

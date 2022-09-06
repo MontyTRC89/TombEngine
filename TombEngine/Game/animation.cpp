@@ -400,7 +400,7 @@ void TranslateItem(ItemInfo* item, short headingAngle, float forward, float down
 	item->Pose.Position = TranslatePoint(item->Pose.Position, headingAngle, forward, down, right);
 }
 
-void TranslateItem(ItemInfo* item, Vector3Shrt orient, float distance)
+void TranslateItem(ItemInfo* item, EulerAngles orient, float distance)
 {
 	item->Pose.Position = TranslatePoint(item->Pose.Position, orient, distance);
 }

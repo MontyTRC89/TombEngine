@@ -58,7 +58,7 @@ namespace TEN::Entities::TR3
 			ItemNewRoom(Lara.ItemNumber, tRexItem->RoomNumber);
 
 		laraItem->Pose.Position = tRexItem->Pose.Position;
-		laraItem->Pose.Orientation = Vector3Shrt(0, tRexItem->Pose.Orientation.y, 0);
+		laraItem->Pose.Orientation = EulerAngles(0, tRexItem->Pose.Orientation.y, 0);
 		laraItem->Animation.IsAirborne = false;
 
 		laraItem->Animation.AnimNumber = Objects[ID_LARA_EXTRA_ANIMS].animIndex + LARA_ANIM_TREX_DEATH_ANIM;

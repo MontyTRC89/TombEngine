@@ -762,7 +762,7 @@ namespace TEN::Entities::Vehicles
 				GetLaraJointPosition(&pos, LM_HIPS);
 
 				laraItem->Pose.Position = pos;
-				laraItem->Pose.Orientation = Vector3Shrt(0, minecartItem->Pose.Orientation.y + ANGLE(90.0f), 0);
+				laraItem->Pose.Orientation = EulerAngles(0, minecartItem->Pose.Orientation.y + ANGLE(90.0f), 0);
 
 				SetAnimation(laraItem, LA_STAND_SOLID);
 				lara->Control.HandStatus = HandStatus::Free;
@@ -779,7 +779,7 @@ namespace TEN::Entities::Vehicles
 				GetLaraJointPosition(&pos, LM_HIPS);
 
 				laraItem->Pose.Position = pos;
-				laraItem->Pose.Orientation = Vector3Shrt(0, minecartItem->Pose.Orientation.y - ANGLE(90.0f), 0);
+				laraItem->Pose.Orientation = EulerAngles(0, minecartItem->Pose.Orientation.y - ANGLE(90.0f), 0);
 
 				SetAnimation(laraItem, LA_STAND_SOLID);
 				lara->Control.HandStatus = HandStatus::Free;

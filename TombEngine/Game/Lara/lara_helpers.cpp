@@ -131,7 +131,7 @@ bool HandleLaraVehicle(ItemInfo* item, CollisionInfo* coll)
 	return false;
 }
 
-void ApproachLaraTargetOrientation(ItemInfo* item, Vector3Shrt targetOrient, float rate)
+void ApproachLaraTargetOrientation(ItemInfo* item, EulerAngles targetOrient, float rate)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -570,11 +570,11 @@ void AlignLaraToSurface(ItemInfo* item, float alpha)
 	float sinDeltaAngle = phd_sin(deltaAngle);
 	float cosDeltaAngle = phd_cos(deltaAngle);
 
-	auto extraRot = Vector3Shrt(
+	auto extraRot = EulerAngles(
 		-steepnessAngle * cosDeltaAngle,
 		0,
 		steepnessAngle * sinDeltaAngle
-	) - Vector3Shrt(item->Pose.Orientation.x, 0, item->Pose.Orientation.z);
+	) - EulerAngles(item->Pose.Orientation.x, 0, item->Pose.Orientation.z);
 	item->Pose.Orientation += extraRot * alpha;
 }
 
@@ -640,7 +640,7 @@ void SetLaraVault(ItemInfo* item, CollisionInfo* coll, VaultTestResult vaultResu
 	if (vaultResult.SnapToLedge)
 	{
 		SnapItemToLedge(item, coll, 0.2f, false);
-		lara->TargetOrientation = Vector3Shrt(0, coll->NearestLedgeAngle, 0);
+		lara->TargetOrientation = EulerAngles(0, coll->NearestLedgeAngle, 0);
 	}
 
 	if (vaultResult.SetJumpVelocity)

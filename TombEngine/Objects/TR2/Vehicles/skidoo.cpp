@@ -181,7 +181,7 @@ namespace TEN::Entities::Vehicles
 
 		DoVehicleFlareDiscard(laraItem);
 		laraItem->Pose.Position = skidooItem->Pose.Position;
-		laraItem->Pose.Orientation = Vector3Shrt(0, skidooItem->Pose.Orientation.y, 0);
+		laraItem->Pose.Orientation = EulerAngles(0, skidooItem->Pose.Orientation.y, 0);
 		lara->Control.HandStatus = HandStatus::Busy;
 		skidooItem->Collidable = true;
 	}
@@ -678,7 +678,7 @@ namespace TEN::Entities::Vehicles
 
 		if (TrInput & VEHICLE_IN_FIRE && !skidooItem->ItemFlags[0])
 		{
-			auto angles = Vector3Shrt(
+			auto angles = EulerAngles(
 				lara->RightArm.Orientation.x,
 				lara->RightArm.Orientation.y + laraItem->Pose.Orientation.y,
 				0

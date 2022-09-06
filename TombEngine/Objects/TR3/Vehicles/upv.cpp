@@ -247,7 +247,7 @@ namespace TEN::Entities::Vehicles
 			harpoonItem->Pose.Position = pos;
 			InitialiseItem(itemNumber);
 
-			harpoonItem->Pose.Orientation = Vector3Shrt(UPVItem->Pose.Orientation.x, UPVItem->Pose.Orientation.y, 0);
+			harpoonItem->Pose.Orientation = EulerAngles(UPVItem->Pose.Orientation.x, UPVItem->Pose.Orientation.y, 0);
 
 			// TODO: Huh?
 			harpoonItem->Animation.Velocity.y = -UPV_HARPOON_VELOCITY * phd_sin(harpoonItem->Pose.Orientation.x);

@@ -324,7 +324,7 @@ void AimWeapon(ItemInfo* laraItem, WeaponInfo* weaponInfo, ArmInfo* arm)
 {
 	auto* lara = GetLaraInfo(laraItem);
 
-	auto targetArmOrient = Vector3Shrt();
+	auto targetArmOrient = EulerAngles::Zero;
 	if (arm->Locked)
 		targetArmOrient = lara->TargetArmOrient;
 
@@ -656,8 +656,8 @@ void InitialiseNewWeapon(ItemInfo* laraItem)
 
 	lara->LeftArm.FrameNumber = 0;
 	lara->RightArm.FrameNumber = 0;
-	lara->LeftArm.Orientation = Vector3Shrt();
-	lara->RightArm.Orientation = Vector3Shrt();
+	lara->LeftArm.Orientation = EulerAngles::Zero;
+	lara->RightArm.Orientation = EulerAngles::Zero;
 	lara->TargetEntity = nullptr;
 	lara->LeftArm.Locked = false;
 	lara->RightArm.Locked = false;
@@ -809,7 +809,7 @@ void HitTarget(ItemInfo* laraItem, ItemInfo* target, GameVector* hitPos, int dam
 	}
 }
 
-FireWeaponType FireWeapon(LaraWeaponType weaponType, ItemInfo* target, ItemInfo* src, Vector3Shrt armOrient)
+FireWeaponType FireWeapon(LaraWeaponType weaponType, ItemInfo* target, ItemInfo* src, EulerAngles armOrient)
 {
 	auto* lara = GetLaraInfo(src);
 
@@ -826,7 +826,7 @@ FireWeaponType FireWeapon(LaraWeaponType weaponType, ItemInfo* target, ItemInfo*
 
 	auto pos = Vector3i(src->Pose.Position.x, muzzleOffset.y, src->Pose.Position.z);
 
-	auto wobbleArmOrient = Vector3Shrt(
+	auto wobbleArmOrient = EulerAngles(
 		armOrient.x + (GetRandomControl() - ANGLE(90.0f)) * weapon->ShotAccuracy / 65536,
 		armOrient.y + (GetRandomControl() - ANGLE(90.0f)) * weapon->ShotAccuracy / 65536,
 		0
@@ -956,7 +956,7 @@ void LaraTargetInfo(ItemInfo* laraItem, WeaponInfo* weaponInfo)
 	{
 		lara->RightArm.Locked = false;
 		lara->LeftArm.Locked = false;
-		lara->TargetArmOrient = Vector3Shrt();
+		lara->TargetArmOrient = EulerAngles::Zero;
 		return;
 	}
 

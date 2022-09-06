@@ -31,7 +31,7 @@ namespace TEN::Entities::TR4
 	{
 		Vector3i start, end;
 	   short locustNumber = CreateLocust();
-	   Vector3Shrt angles;
+	   EulerAngles angles;
 		if (locustNumber != NO_ITEM)
 		{
 			auto* locust = &Locusts[locustNumber];
@@ -40,7 +40,7 @@ namespace TEN::Entities::TR4
 			if (item->ObjectNumber == ID_LOCUSTS_EMITTER)
 			{
 				end = item->Pose.Position;
-				angles = Vector3Shrt(
+				angles = EulerAngles(
 					0,
 					item->Pose.Orientation.y - ANGLE(180.0f),
 					0

@@ -112,7 +112,7 @@ Save::Vector3 FromVector3(Vector3i vec)
 	return Save::Vector3(vec.x, vec.y, vec.z);
 }
 
-Save::Vector3 FromVector3(Vector3Shrt vec)
+Save::Vector3 FromVector3(EulerAngles vec)
 {
 	return Save::Vector3(vec.x, vec.y, vec.z);
 }
@@ -122,9 +122,9 @@ Save::Vector4 FromVector4(Vector4 vec)
 	return Save::Vector4(vec.x, vec.y, vec.z, vec.w);
 }
 
-Vector3Shrt ToVector3Shrt(const Save::Vector3* vec)
+EulerAngles ToEulerAngles(const Save::Vector3* vec)
 {
-	return Vector3Shrt(short(vec->x()), short(vec->y()), short(vec->z()));
+	return EulerAngles(short(vec->x()), short(vec->y()), short(vec->z()));
 }
 
 Vector3i ToVector3i(const Save::Vector3* vec)
@@ -1781,7 +1781,7 @@ bool SaveGame::Load(int slot)
 	Lara.LeftArm.FrameBase = s->lara()->left_arm()->frame_base();
 	Lara.LeftArm.FrameNumber = s->lara()->left_arm()->frame_number();
 	Lara.LeftArm.Locked = s->lara()->left_arm()->locked();
-	Lara.LeftArm.Orientation = ToVector3Shrt(s->lara()->left_arm()->rotation());
+	Lara.LeftArm.Orientation = ToEulerAngles(s->lara()->left_arm()->rotation());
 	Lara.Location = s->lara()->location();
 	Lara.LocationPad = s->lara()->location_pad();
 	Lara.NextCornerPos = ToPHD(s->lara()->next_corner_pose());
@@ -1793,7 +1793,7 @@ bool SaveGame::Load(int slot)
 	Lara.RightArm.FrameBase = s->lara()->right_arm()->frame_base();
 	Lara.RightArm.FrameNumber = s->lara()->right_arm()->frame_number();
 	Lara.RightArm.Locked = s->lara()->right_arm()->locked();
-	Lara.RightArm.Orientation = ToVector3Shrt(s->lara()->right_arm()->rotation());
+	Lara.RightArm.Orientation = ToEulerAngles(s->lara()->right_arm()->rotation());
 	Lara.Torch.IsLit = s->lara()->torch()->is_lit();
 	Lara.Torch.State = (TorchState)s->lara()->torch()->state();
 	Lara.Control.Rope.Segment = s->lara()->control()->rope()->segment();

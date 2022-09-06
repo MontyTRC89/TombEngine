@@ -73,7 +73,7 @@ namespace TEN::Entities::TR5
 				pos1.roomNumber = item->RoomNumber;
 
 				int los = LOS(&pos1, &pos2);
-				Vector3Shrt angles;
+				EulerAngles angles;
 
 			// FIXME:
 			if (los)

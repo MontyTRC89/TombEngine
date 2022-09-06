@@ -263,8 +263,8 @@ void ReadyShotgun(ItemInfo* laraItem, LaraWeaponType weaponType)
 	auto* lara = GetLaraInfo(laraItem);
 
 	lara->Control.HandStatus = HandStatus::WeaponReady;
-	lara->LeftArm.Orientation = Vector3Shrt();
-	lara->RightArm.Orientation = Vector3Shrt();
+	lara->LeftArm.Orientation = EulerAngles::Zero;
+	lara->RightArm.Orientation = EulerAngles::Zero;
 	lara->LeftArm.FrameNumber = 0;
 	lara->RightArm.FrameNumber = 0;
 	lara->LeftArm.Locked = false;
@@ -278,7 +278,7 @@ void FireShotgun(ItemInfo* laraItem)
 {
 	auto* lara = GetLaraInfo(laraItem);
 
-	auto armOrient = Vector3Shrt(
+	auto armOrient = EulerAngles(
 		lara->LeftArm.Orientation.x,
 		lara->LeftArm.Orientation.y + laraItem->Pose.Orientation.y,
 		0
@@ -286,7 +286,7 @@ void FireShotgun(ItemInfo* laraItem)
 
 	if (!lara->LeftArm.Locked)
 	{
-		armOrient = Vector3Shrt(
+		armOrient = EulerAngles(
 			lara->ExtraTorsoRot.x + lara->LeftArm.Orientation.x,
 			lara->ExtraTorsoRot.y + lara->LeftArm.Orientation.y + laraItem->Pose.Orientation.y,
 			0
@@ -297,7 +297,7 @@ void FireShotgun(ItemInfo* laraItem)
 	bool fired = false;
 	for (int i = 0; i < 6; i++)
 	{
-		auto wobbleArmOrient = Vector3Shrt(
+		auto wobbleArmOrient = EulerAngles(
 			armOrient.x + value * (GetRandomControl() - ANGLE(90.0f)) / 65536,
 			armOrient.y + value * (GetRandomControl() - ANGLE(90.0f)) / 65536,
 			0
@@ -1660,7 +1660,7 @@ void FireHK(ItemInfo* laraItem, int mode)
 {
 	auto* lara = GetLaraInfo(laraItem);
 
-	auto angles = Vector3Shrt(
+	auto angles = EulerAngles(
 		lara->LeftArm.Orientation.x,
 		lara->LeftArm.Orientation.y + laraItem->Pose.Orientation.y,
 		0
@@ -1668,7 +1668,7 @@ void FireHK(ItemInfo* laraItem, int mode)
 
 	if (!lara->LeftArm.Locked)
 	{
-		angles = Vector3Shrt(
+		angles = EulerAngles(
 			lara->ExtraTorsoRot.x + lara->LeftArm.Orientation.x,
 			lara->ExtraTorsoRot.y + lara->LeftArm.Orientation.y + laraItem->Pose.Orientation.y,
 			0

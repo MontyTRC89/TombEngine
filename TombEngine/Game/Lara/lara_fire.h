@@ -54,7 +54,7 @@ void InitialiseNewWeapon(ItemInfo* laraItem);
 GAME_OBJECT_ID WeaponObjectMesh(ItemInfo* laraItem, LaraWeaponType weaponType);
 void AimWeapon(ItemInfo* laraItem, WeaponInfo* weaponInfo, ArmInfo* arm);
 void HitTarget(ItemInfo* laraItem, ItemInfo* target, GameVector* hitPos, int damage, int flag);
-FireWeaponType FireWeapon(LaraWeaponType weaponType, ItemInfo* target, ItemInfo* src, Vector3Shrt armOrient);
+FireWeaponType FireWeapon(LaraWeaponType weaponType, ItemInfo* target, ItemInfo* src, EulerAngles armOrient);
 void FindTargetPoint(ItemInfo* laraItem, GameVector* target);
 void LaraTargetInfo(ItemInfo* laraItem, WeaponInfo* weaponInfo);
 void LaraGetNewTarget(ItemInfo* laraItem, WeaponInfo* weaponInfo);

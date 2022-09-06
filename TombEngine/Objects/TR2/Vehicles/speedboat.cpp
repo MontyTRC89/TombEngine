@@ -170,7 +170,7 @@ namespace TEN::Entities::Vehicles
 
 		laraItem->Pose.Position = speedboatItem->Pose.Position;
 		laraItem->Pose.Position.y -= 5;
-		laraItem->Pose.Orientation = Vector3Shrt(0, speedboatItem->Pose.Orientation.y, 0);
+		laraItem->Pose.Orientation = EulerAngles(0, speedboatItem->Pose.Orientation.y, 0);
 		laraItem->Animation.IsAirborne = false;
 		laraItem->Animation.Velocity.z = 0;
 		laraItem->Animation.Velocity.y = 0;

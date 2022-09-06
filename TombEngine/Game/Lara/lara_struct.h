@@ -1076,7 +1076,7 @@ struct ArmInfo
 	int FrameNumber;
 	int FrameBase;
 
-	Vector3Shrt Orientation;
+	EulerAngles Orientation;
 
 	bool Locked;
 	int GunFlash;
@@ -1257,14 +1257,14 @@ struct LaraInfo
 	FlareData Flare;
 	TorchData Torch;
 
-	Vector3Shrt ExtraHeadRot;
-	Vector3Shrt ExtraTorsoRot;
+	EulerAngles ExtraHeadRot;
+	EulerAngles ExtraTorsoRot;
 	short WaterCurrentActive;
 	Vector3i WaterCurrentPull;
 
 	ArmInfo LeftArm;
 	ArmInfo RightArm;
-	Vector3Shrt TargetArmOrient;
+	EulerAngles TargetArmOrient;
 	ItemInfo* TargetEntity;
 	CreatureInfo* Creature;	// Not saved. Unused?
 
@@ -1280,7 +1280,7 @@ struct LaraInfo
 
 	short InteractedItem;
 	int ProjectedFloorHeight;
-	Vector3Shrt TargetOrientation;
+	EulerAngles TargetOrientation;
 	int WaterSurfaceDist;
 	PHD_3DPOS NextCornerPos;
 

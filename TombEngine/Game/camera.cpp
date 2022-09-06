@@ -1237,8 +1237,8 @@ void BinocularCamera(ItemInfo* item)
 		{
 			item->MeshBits = ALL_JOINT_BITS;
 			lara->Inventory.IsBusy = false;
-			lara->ExtraHeadRot = Vector3Shrt();
-			lara->ExtraTorsoRot = Vector3Shrt();
+			lara->ExtraHeadRot = EulerAngles::Zero;
+			lara->ExtraTorsoRot = EulerAngles::Zero;
 			Camera.type = BinocularOldCamera;
 			BinocularOn = false;
 			BinocularRange = 0;

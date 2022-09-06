@@ -24,7 +24,7 @@ void ShiftItem(ItemInfo* item, CollisionInfo* coll)
 void SnapItemToLedge(ItemInfo* item, CollisionInfo* coll, float offsetMultiplier, bool snapToAngle)
 {
 	TranslateItem(item, coll->NearestLedgeAngle, coll->NearestLedgeDistance + (coll->Setup.Radius * offsetMultiplier));
-	item->Pose.Orientation = Vector3Shrt(
+	item->Pose.Orientation = EulerAngles(
 		0,
 		snapToAngle ? coll->NearestLedgeAngle : item->Pose.Orientation.y,
 		0
@@ -42,7 +42,7 @@ void SnapItemToLedge(ItemInfo* item, CollisionInfo* coll, short angle, float off
 	coll->Setup.ForwardAngle = backup;
 
 	TranslateItem(item, ledgeAngle, distance + (coll->Setup.Radius * offsetMultiplier));
-	item->Pose.Orientation = Vector3Shrt(0, ledgeAngle, 0);
+	item->Pose.Orientation = EulerAngles(0, ledgeAngle, 0);
 }
 
 void SnapItemToGrid(ItemInfo* item, CollisionInfo* coll)
@@ -814,7 +814,7 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, Vector3i offset, bool
 	}
 }
 
-void AlignEntityToSurface(ItemInfo* item, Vector2 radius, float tiltConstraintAngle, Vector3Shrt tiltOffset)
+void AlignEntityToSurface(ItemInfo* item, Vector2 radius, float tiltConstraintAngle, EulerAngles tiltOffset)
 {
 	// Reduce probe radii for stability.
 	auto halvedRadius = radius / 2;
@@ -834,7 +834,7 @@ void AlignEntityToSurface(ItemInfo* item, Vector2 radius, float tiltConstraintAn
 		return;
 
 	// Calculate and apply tilts.
-	auto tiltedOrient = Vector3Shrt(
+	auto tiltedOrient = EulerAngles(
 		phd_atan(radius.y * 2, forwardHeightDif) + tiltOffset.x,
 		0,
 		phd_atan(radius.x * 2, lateralHeightDif) + tiltOffset.z

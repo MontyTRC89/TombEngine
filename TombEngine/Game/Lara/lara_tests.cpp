@@ -377,7 +377,7 @@ bool TestLaraHangJumpUp(ItemInfo* item, CollisionInfo* coll)
 	item->Animation.Velocity.y = 0;
 	item->Animation.IsAirborne = false;
 	lara->Control.HandStatus = HandStatus::Busy;
-	lara->ExtraTorsoRot = Vector3Shrt();
+	lara->ExtraTorsoRot = EulerAngles::Zero;
 	return true;
 }
 
@@ -2177,7 +2177,7 @@ bool TestAndDoLaraLadderClimb(ItemInfo* item, CollisionInfo* coll)
 
 		ShiftItem(item, coll);
 		SnapItemToGrid(item, coll); // HACK: until fragile ladder code is refactored, we must exactly snap to grid.
-		lara->TargetOrientation = Vector3Shrt(0, item->Pose.Orientation.y, 0);
+		lara->TargetOrientation = EulerAngles(0, item->Pose.Orientation.y, 0);
 		AnimateLara(item);
 
 		return true;

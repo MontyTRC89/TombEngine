@@ -223,7 +223,7 @@ namespace TEN::Entities::Vehicles
 
 		DoVehicleFlareDiscard(laraItem);
 		laraItem->Pose.Position = kayakItem->Pose.Position;
-		laraItem->Pose.Orientation = Vector3Shrt(0, kayakItem->Pose.Orientation.y, 0);
+		laraItem->Pose.Orientation = EulerAngles(0, kayakItem->Pose.Orientation.y, 0);
 		laraItem->Animation.IsAirborne = false;
 		laraItem->Animation.Velocity.z = 0;
 		laraItem->Animation.Velocity.y = 0;

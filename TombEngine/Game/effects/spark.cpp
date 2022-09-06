@@ -91,7 +91,7 @@ namespace TEN::Effects::Spark
 		}
 	}
 
-	void TriggerFrictionSpark(GameVector* pos, Vector3Shrt angle, float length, int num)
+	void TriggerFrictionSpark(GameVector* pos, EulerAngles angle, float length, int num)
 	{
 		for (int i = 0; i < num; i++) 
 		{

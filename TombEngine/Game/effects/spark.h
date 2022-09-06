@@ -27,5 +27,5 @@ namespace TEN::Effects::Spark
 	SparkParticle& GetFreeSparkParticle();
 	void TriggerFlareSparkParticles(Vector3i* pos, Vector3i* vel, CVECTOR* color, int room);
 	void TriggerRicochetSpark(GameVector* pos, short angle, int num);
-	void TriggerFrictionSpark(GameVector* pos, Vector3Shrt angle, float length, int num);
+	void TriggerFrictionSpark(GameVector* pos, EulerAngles angle, float length, int num);
 }
