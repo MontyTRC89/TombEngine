@@ -125,7 +125,7 @@ namespace TEN::Entities::TR5
 			{
 				if (1 << GuardianMeshes[i] & item->MeshBits)
 				{
-					src = Vector3i();
+					src = Vector3i::Zero;
 					GetJointAbsPosition(item, &src, GuardianMeshes[i]);
 
 					TriggerLightningGlow(src.x, src.y, src.z, size + (GetRandomControl() & 3), 0, g, b);

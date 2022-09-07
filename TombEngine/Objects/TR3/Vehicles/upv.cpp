@@ -771,7 +771,7 @@ namespace TEN::Entities::Vehicles
 				else
 					heightFromWater = NO_HEIGHT;
 
-				auto vec = Vector3i();
+				auto vec = Vector3i::Zero;
 				GetLaraJointPosition(&vec, LM_HIPS);
 
 				laraItem->Pose.Position.x = vec.x;
@@ -808,7 +808,7 @@ namespace TEN::Entities::Vehicles
 			if ((anim == UPV_ANIM_IDLE_DEATH || anim == UPV_ANIM_MOVING_DEATH) &&
 				(frame == UPV_DEATH_FRAME_1 || frame == UPV_DEATH_FRAME_2))
 			{
-				auto vec = Vector3i();
+				auto vec = Vector3i::Zero;
 				GetLaraJointPosition(&vec, LM_HIPS);
 
 				laraItem->Pose.Position = vec;

@@ -1730,7 +1730,7 @@ void RifleHandler(ItemInfo* laraItem, LaraWeaponType weaponType)
 	{
 		if (weaponType == LaraWeaponType::Shotgun || weaponType == LaraWeaponType::HK)
 		{
-			auto pos = Vector3i();
+			auto pos = Vector3i::Zero;
 			pos.y = -64;
 			GetLaraJointPosition(&pos, LM_RHAND);
 			TriggerDynamicLight(
@@ -1745,7 +1745,7 @@ void RifleHandler(ItemInfo* laraItem, LaraWeaponType weaponType)
 		}
 		else if (weaponType == LaraWeaponType::Revolver)
 		{
-			auto pos = Vector3i();
+			auto pos = Vector3i::Zero;
 			pos.y = -32;
 			GetLaraJointPosition(&pos, LM_RHAND);
 			TriggerDynamicLight(pos.x, pos.y, pos.z, 12, (GetRandomControl() & 0x3F) + 192, (GetRandomControl() & 0x1F) + 128, (GetRandomControl() & 0x3F));

@@ -18,7 +18,7 @@ using namespace TEN::Renderer;
 void ShiftItem(ItemInfo* item, CollisionInfo* coll)
 {
 	item->Pose.Position += coll->Shift;
-	coll->Shift = Vector3i();
+	coll->Shift = Vector3i::Zero;
 }
 
 void SnapItemToLedge(ItemInfo* item, CollisionInfo* coll, float offsetMultiplier, bool snapToAngle)
@@ -211,7 +211,7 @@ CollisionResult GetCollision(FloorInfo* floor, int x, int y, int z)
 
 void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, bool resetRoom)
 {
-	GetCollisionInfo(coll, item, Vector3i(), resetRoom);
+	GetCollisionInfo(coll, item, Vector3i::Zero, resetRoom);
 }
 
 void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, Vector3i offset, bool resetRoom)

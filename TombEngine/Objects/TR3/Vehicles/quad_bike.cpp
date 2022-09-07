@@ -286,7 +286,7 @@ namespace TEN::Entities::Vehicles
 
 			if (laraItem->Animation.ActiveState == QBIKE_STATE_FALL_OFF)
 			{
-				auto pos = Vector3i();
+				auto pos = Vector3i::Zero;
 
 				SetAnimation(laraItem, LA_FREEFALL);
 				GetJointAbsPosition(laraItem, &pos, LM_HIPS);

@@ -1301,7 +1301,7 @@ void TriggerLaraDrips(ItemInfo* item)
 	{
 		for (int i = 0; i < NUM_LARA_MESHES; i++)
 		{
-			auto pos = Vector3i();
+			auto pos = Vector3i::Zero;
 
 			GetLaraJointPosition(&pos, (LARA_MESHES)i);
 			auto room = GetRoom(item->Location, pos.x, pos.y, pos.z).roomNumber;

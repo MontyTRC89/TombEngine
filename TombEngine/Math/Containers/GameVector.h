@@ -12,7 +12,7 @@ struct Vector3i;
 		short roomNumber = 0;
 		int boxNumber = 0;
 
-		static const GameVector Empty;
+		static const GameVector Zero;
 
 		GameVector();
 		GameVector(const Vector3i& pos);

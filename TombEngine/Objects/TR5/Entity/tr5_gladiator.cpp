@@ -343,7 +343,7 @@ namespace TEN::Entities::TR5
 				{
 					auto* room = &g_Level.Rooms[item->RoomNumber];
 
-					auto pos = Vector3i();
+					auto pos = Vector3i::Zero;
 					GetJointAbsPosition(item, &pos, 16);
 
 					auto* floor = GetSector(room, pos.x - room->x, pos.z - room->z);

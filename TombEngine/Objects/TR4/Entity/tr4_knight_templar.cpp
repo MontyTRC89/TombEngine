@@ -179,7 +179,7 @@ namespace TEN::Entities::TR4
 			if (frameNumber > (frameBase + 42) &&
 				frameNumber < (frameBase + 51))
 			{
-				auto pos = Vector3i();
+				auto pos = Vector3i::Zero;
 				GetJointAbsPosition(item, &pos, LM_LINARM);
 				
 				auto* room = &g_Level.Rooms[item->RoomNumber];

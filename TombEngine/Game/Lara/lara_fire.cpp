@@ -970,7 +970,7 @@ void LaraTargetInfo(ItemInfo* laraItem, WeaponInfo* weaponInfo)
 		laraItem->RoomNumber
 	);
 	
-	auto target = GameVector::Empty;
+	auto target = GameVector::Zero;
 	FindTargetPoint(lara->TargetEntity, &target);
 
 	auto angles = GetOrientTowardPoint(

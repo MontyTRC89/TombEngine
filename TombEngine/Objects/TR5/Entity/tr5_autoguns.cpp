@@ -109,7 +109,7 @@ namespace TEN::Entities::TR5
 
 						if (GetRandomControl() & 3)
 						{
-							auto pos2 = Vector3i();
+							auto pos2 = Vector3i::Zero;
 							GetLaraJointPosition((Vector3i*)&pos2, GetRandomControl() % 15);
 
 							DoBloodSplat(pos2.x, pos2.y, pos2.z, (GetRandomControl() & 3) + 3, 2 * GetRandomControl(), LaraItem->RoomNumber);

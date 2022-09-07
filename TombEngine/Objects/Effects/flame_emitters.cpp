@@ -295,7 +295,7 @@ namespace TEN::Entities::Effects
 		byte r = (GetRandomControl() & 0x3F) + 192;
 		byte g = (GetRandomControl() & 0x1F) + 96;
 
-		auto pos = Vector3i();
+		auto pos = Vector3i::Zero;
 		GetLaraJointPosition(&pos, LM_HIPS);
 
 		if (!Lara.BurnSmoke)

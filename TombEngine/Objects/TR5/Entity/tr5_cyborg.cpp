@@ -613,7 +613,7 @@ namespace TEN::Entities::TR5
 				short roomNumberLeft = LaraItem->RoomNumber;
 				GetFloor(pos.x, pos.y, pos.z, &roomNumberLeft);
 
-				pos = Vector3i();
+				pos = Vector3i::Zero;
 				GetLaraJointPosition(&pos, LM_RFOOT);
 
 				short roomNumberRight = LaraItem->RoomNumber;

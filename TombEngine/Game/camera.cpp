@@ -460,7 +460,7 @@ void UpdateCameraElevation()
 
 	if (Camera.laraNode != -1)
 	{
-		auto pos = Vector3i();
+		auto pos = Vector3i::Zero;
 		GetLaraJointPosition(&pos, Camera.laraNode);
 
 		auto pos1 = Vector3i(0, -CLICK(1), SECTOR(2));
@@ -1382,7 +1382,7 @@ void BinocularCamera(ItemInfo* item)
 
 void ConfirmCameraTargetPos()
 {
-	auto pos = Vector3i();
+	auto pos = Vector3i::Zero;
 	GetLaraJointPosition(&pos, LM_TORSO);
 
 	if (Camera.laraNode != -1)
