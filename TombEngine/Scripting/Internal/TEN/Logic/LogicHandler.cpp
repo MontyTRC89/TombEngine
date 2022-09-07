@@ -1,6 +1,7 @@
 #include "framework.h"
 #include "LogicHandler.h"
 
+#include <filesystem>
 #include "ScriptAssert.h"
 #include "Game/savegame.h"
 #include "Sound/sound.h"
@@ -124,10 +125,10 @@ void LogicHandler::ResetScripts(bool clearGameVars)
 	auto currentPackage = m_handler.GetState()->get<sol::table>("package");
 	auto currentLoaded = currentPackage.get<sol::table>("loaded");
 
-	for(auto & [first, second] : currentLoaded)
+	for (auto& [first, second] : currentLoaded)
 		currentLoaded[first] = sol::nil;
 
-	if(clearGameVars)
+	if (clearGameVars)
 		ResetGameTables();
 
 	m_handler.ResetGlobals();
@@ -143,34 +144,6 @@ void LogicHandler::FreeLevelScripts()
 	m_onSave = sol::nil;
 	m_onEnd = sol::nil;
 	m_handler.GetState()->collect_garbage();
-}
-
-void JumpToLevel(int levelNum)
-{
-	if (levelNum >= g_GameFlow->GetNumLevels())
-		return;
-
-	LevelComplete = levelNum;
-}
-
-int GetSecretsCount()
-{
-	return Statistics.Level.Secrets;
-}
-
-void SetSecretsCount(int secretsNum)
-{
-	if (secretsNum > 255)
-		return;
-	Statistics.Level.Secrets = secretsNum;
-}
-
-void AddOneSecret()
-{
-	if (Statistics.Level.Secrets >= 255)
-		return;
-	Statistics.Level.Secrets++;
-	PlaySecretTrack();
 }
 
 void LogicHandler::SetVariables(std::vector<SavedVar> const & vars)
@@ -367,6 +340,11 @@ void LogicHandler::ResetVariables()
 void LogicHandler::ExecuteScriptFile(const std::string & luaFilename)
 {
 	m_handler.ExecuteScript(luaFilename);
+}
+
+void LogicHandler::ExecuteString(const std::string& command)
+{
+	m_handler.ExecuteString(command);
 }
 
 void LogicHandler::ExecuteFunction(std::string const& name, short idOne, short idTwo) 

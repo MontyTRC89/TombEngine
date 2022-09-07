@@ -99,6 +99,10 @@ static constexpr char ScriptReserved_SetTitleScreenImagePath[]	= "SetTitleScreen
 static constexpr char ScriptReserved_SetFarView[]				= "SetFarView";
 static constexpr char ScriptReserved_SetSettings[]				= "SetSettings";
 static constexpr char ScriptReserved_SetAnimations[]			= "SetAnimations";
+static constexpr char ScriptReserved_EndLevel[]					= "EndLevel";
+static constexpr char ScriptReserved_GetSecretCount[]			= "GetSecretCount";
+static constexpr char ScriptReserved_SetSecretCount[]			= "SetSecretCount";
+static constexpr char ScriptReserved_AddSecret[]				= "AddSecret";
 
 // Flow Functions
 static constexpr char ScriptReserved_SetStrings[]			= "SetStrings";

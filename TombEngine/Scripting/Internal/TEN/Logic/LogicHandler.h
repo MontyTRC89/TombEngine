@@ -54,6 +54,7 @@ public:
 	sol::protected_function				GetLevelFunc(sol::table tab, std::string const& luaName);
 
 	void								ExecuteScriptFile(const std::string& luaFilename) override;
+	void								ExecuteString(const std::string& command) override;
 	void								ExecuteFunction(std::string const& name, TEN::Control::Volumes::VolumeTriggerer, std::string const& arguments) override;
 
 	void								ExecuteFunction(std::string const& name, short idOne, short idTwo) override;

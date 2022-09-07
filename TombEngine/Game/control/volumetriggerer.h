@@ -15,14 +15,14 @@ namespace TEN::Control::Volumes
 	enum class VolumeEventMode
 	{
 		LevelScript,
-		Constructor
+		Nodes
 	};
 
 	struct VolumeEvent
 	{
 		VolumeEventMode Mode;
 		std::string Function;
-		std::string Argument;
+		std::string Data;
 
 		int CallCounter;
 	};

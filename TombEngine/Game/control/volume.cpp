@@ -1,6 +1,7 @@
 #include "framework.h"
 #include "Game/control/volume.h"
 
+#include <filesystem>
 #include "Game/animation.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
@@ -79,7 +80,7 @@ namespace TEN::Control::Volumes
 					volume->Status = TriggerStatus::Entering;
 					if (!set->OnEnter.Function.empty() && set->OnEnter.CallCounter != 0)
 					{
-						g_GameScript->ExecuteFunction(set->OnEnter.Function, triggerer, set->OnEnter.Argument);
+						g_GameScript->ExecuteFunction(set->OnEnter.Function, triggerer, set->OnEnter.Data);
 						if (set->OnEnter.CallCounter != NO_CALL_COUNTER)
 							set->OnEnter.CallCounter--;
 					}
@@ -89,7 +90,7 @@ namespace TEN::Control::Volumes
 					volume->Status = TriggerStatus::Inside;
 					if (!set->OnInside.Function.empty() && set->OnInside.CallCounter != 0)
 					{
-						g_GameScript->ExecuteFunction(set->OnInside.Function, triggerer, set->OnInside.Argument);
+						g_GameScript->ExecuteFunction(set->OnInside.Function, triggerer, set->OnInside.Data);
 						if (set->OnInside.CallCounter != NO_CALL_COUNTER)
 							set->OnInside.CallCounter--;
 					}
@@ -108,7 +109,7 @@ namespace TEN::Control::Volumes
 						volume->Status = TriggerStatus::Leaving;
 						if (!set->OnLeave.Function.empty() && set->OnLeave.CallCounter != 0)
 						{
-							g_GameScript->ExecuteFunction(set->OnLeave.Function, triggerer, set->OnLeave.Argument);
+							g_GameScript->ExecuteFunction(set->OnLeave.Function, triggerer, set->OnLeave.Data);
 							if (set->OnLeave.CallCounter != NO_CALL_COUNTER)
 								set->OnLeave.CallCounter--;
 						}
@@ -154,5 +155,55 @@ namespace TEN::Control::Volumes
 			TestVolumes(item->RoomNumber, bbox, TriggerVolumeActivators::NPC, itemNumber);
 		else
 			TestVolumes(item->RoomNumber, bbox, TriggerVolumeActivators::Movable, itemNumber);
+	}
+
+	void InitialiseNodeScripts()
+	{
+		static const std::string nodeScriptPath = "Scripts/Engine/NodeCatalogs/";
+
+		if (!std::filesystem::exists(nodeScriptPath))
+			return;
+
+		TENLog("Loading node scripts...", LogLevel::Info);
+
+		bool anyScriptsFound = false;
+		for (auto& path : std::filesystem::recursive_directory_iterator(nodeScriptPath))
+		{
+			if (path.path().extension() == ".lua")
+			{
+				g_GameScript->ExecuteScriptFile(path.path().string());
+				anyScriptsFound = true;
+			}
+		}
+
+		int nodeCount = 0;
+		for (auto& set : g_Level.EventSets)
+		{
+			if ((set.OnEnter.Mode == VolumeEventMode::Nodes) && (set.OnEnter.Data.size() > 0))
+			{
+				g_GameScript->ExecuteString(set.OnEnter.Data);
+				nodeCount++;
+			}
+
+			if ((set.OnInside.Mode == VolumeEventMode::Nodes) && (set.OnInside.Data.size() > 0))
+			{
+				g_GameScript->ExecuteString(set.OnInside.Data);
+				nodeCount++;
+			}				
+
+			if ((set.OnLeave.Mode == VolumeEventMode::Nodes) && (set.OnLeave.Data.size() > 0))
+			{
+				g_GameScript->ExecuteString(set.OnLeave.Data);
+				nodeCount++;
+			}
+		}
+
+		if (nodeCount == 0)
+			return;
+
+		if (!anyScriptsFound)
+			TENLog("Node catalogs are missing, but node scripts are present in level. Make sure node catalogs are in place.", LogLevel::Warning);
+		else
+			TENLog(std::to_string(nodeCount) + " node scripts found and loaded.", LogLevel::Info);
 	}
 }
