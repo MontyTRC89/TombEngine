@@ -203,3 +203,24 @@ const Vector3 Screen(Vector3& ambient, Vector3& tint)
 
 	return Vector3(R, G, B);
 }
+
+bool IsPointInFront(const PHD_3DPOS& pose, const Vector3& target)
+{
+	return IsPointInFront(pose.Position.ToVector3(), target, pose.Orientation);
+}
+
+bool IsPointInFront(const Vector3& origin, const Vector3& target, const EulerAngles& orient)
+{
+	float sinY = sin(orient.y);
+	float cosY = cos(orient.y);
+
+	// The heading angle (Y only) direction vector: X = +sinY, Y = 0, Z = +cosY
+	auto headingDirection = Vector3(sinY, 0.0f, cosY);
+	auto targetDirection = target - origin;
+
+	float dot = headingDirection.Dot(targetDirection);
+	if (dot > 0.0f)
+		return true;
+
+	return false;
+}

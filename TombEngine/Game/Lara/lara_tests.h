@@ -44,8 +44,8 @@ void TestLaraWaterDepth(ItemInfo* item, CollisionInfo* coll);
 void GetTightropeFallOff(ItemInfo* item, int regularity);
 #endif
 
-bool TestLaraState(LaraState state, std::vector<LaraState> stateList);
-bool TestLaraWeaponType(LaraWeaponType weaponType, std::vector<LaraWeaponType> weaponTypeList);
+bool CheckLaraState(LaraState referenceState, const std::vector<LaraState>& stateList);
+bool CheckLaraWeaponType(LaraWeaponType referenceWeaponType, const std::vector<LaraWeaponType>& weaponTypeList);
 
 bool IsStandingWeapon(ItemInfo* item, LaraWeaponType weaponType);
 bool IsVaultState(LaraState state);
@@ -53,6 +53,7 @@ bool IsJumpState(LaraState state);
 bool IsRunJumpQueueableState(LaraState state);
 bool IsRunJumpCountableState(LaraState state);
 
+bool TestLaraTurn180(ItemInfo* item, CollisionInfo* coll);
 bool TestLaraPose(ItemInfo* item, CollisionInfo* coll);
 bool TestLaraKeepLow(ItemInfo* item, CollisionInfo* coll);
 bool TestLaraSlide(ItemInfo* item, CollisionInfo* coll);
@@ -109,6 +110,6 @@ bool TestLaraStandingJump(ItemInfo* item, CollisionInfo* coll);
 
 bool TestLaraTightropeDismount(ItemInfo* item, CollisionInfo* coll);
 
-bool TestLaraPoleCollision(ItemInfo* item, CollisionInfo* coll, bool up, float offset = 0.0f);
+bool TestLaraPoleCollision(ItemInfo* item, CollisionInfo* coll, bool goingUp, float offset = 0.0f);
 bool TestLaraPoleUp(ItemInfo* item, CollisionInfo* coll);
 bool TestLaraPoleDown(ItemInfo* item, CollisionInfo* coll);

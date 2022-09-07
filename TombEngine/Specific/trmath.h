@@ -60,3 +60,6 @@ const float Smoothstep(float x);
 const float Luma(Vector3& color);
 const Vector3 Screen(Vector3& ambient, Vector3& tint);
 const Vector4 Screen(Vector4& ambient, Vector4& tint);
+
+bool IsPointInFront(const PHD_3DPOS& pose, const Vector3& target);
+bool IsPointInFront(const Vector3& origin, const Vector3& target, const EulerAngles& orient);

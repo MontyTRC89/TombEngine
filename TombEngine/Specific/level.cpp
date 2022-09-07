@@ -1044,14 +1044,6 @@ bool Decompress(byte* dest, byte* src, unsigned long compressedSize, unsigned lo
 		return false;
 }
 
-bool replace(std::string& str, const std::string& from, const std::string& to) {
-	size_t start_pos = str.find(from);
-	if (start_pos == std::string::npos)
-		return false;
-	str.replace(start_pos, from.length(), to);
-	return true;
-}
-
 unsigned int _stdcall LoadLevel(void* data)
 {
 	const int levelIndex = reinterpret_cast<int>(data);
@@ -1085,7 +1077,7 @@ unsigned int _stdcall LoadLevel(void* data)
 		// Read file header
 		ReadFileEx(&header, 1, 4, filePtr);
 		ReadFileEx(&version, 1, 4, filePtr);
-		ReadFileEx(&systemHash, 1, 4, filePtr); // Reserved: for future quick start feature! Check builder system 
+		ReadFileEx(&systemHash, 1, 4, filePtr);
 
 		// Check file header
 		if (std::string(header) != "TEN")
@@ -1098,7 +1090,10 @@ unsigned int _stdcall LoadLevel(void* data)
 		for (int i = 0; i < assemblyVersion.size(); i++)
 		{
 			if (assemblyVersion[i] < version[i])
-				throw std::exception("Level version is higher than TEN version. Please update TEN.");
+			{
+				TENLog("Level version is higher than TEN version. Please update TEN.", LogLevel::Warning);
+				break;
+			}
 		}
 
 		// Check system name hash and reset it if it's valid (because we use build & play feature only once)
