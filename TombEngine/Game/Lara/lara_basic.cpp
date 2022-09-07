@@ -50,11 +50,12 @@ void lara_default_col(ItemInfo* item, CollisionInfo* coll)
 	LaraResetGravityStatus(item, coll);
 }
 
+// Boulder death.
 void lara_as_special(ItemInfo* item, CollisionInfo* coll)
 {
 	Camera.flags = CF_FOLLOW_CENTER;
 	Camera.targetAngle = ANGLE(170.0f);
-	Camera.targetElevation = -ANGLE(25.0f);
+	Camera.targetElevation = ANGLE(-25.0f);
 }
 
 void lara_as_null(ItemInfo* item, CollisionInfo* coll)
@@ -271,7 +272,7 @@ void lara_as_run_forward(ItemInfo* item, CollisionInfo* coll)
 		!lara->Control.RunJumpQueued && // Jump queue blocks roll.
 		lara->Control.WaterStatus != WaterStatus::Wade)
 	{
-		item->Animation.TargetState = LS_ROLL_FORWARD;
+		item->Animation.TargetState = LS_ROLL_180_FORWARD;
 		return;
 	}
 
@@ -426,10 +427,13 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if ((TrInput & IN_ROLL || (TrInput & IN_FORWARD && TrInput & IN_BACK)) &&
-		lara->Control.WaterStatus != WaterStatus::Wade)
+	if (TrInput & IN_ROLL || (TrInput & IN_FORWARD && TrInput & IN_BACK))
 	{
-		item->Animation.TargetState = LS_ROLL_FORWARD;
+		if (TrInput & IN_WALK || TestLaraTurn180(item, coll))
+			item->Animation.TargetState = LS_TURN_180;
+		else
+			item->Animation.TargetState = LS_ROLL_180_FORWARD;
+		
 		return;
 	}
 
@@ -618,7 +622,7 @@ void lara_as_pose(ItemInfo* item, CollisionInfo* coll)
 	{
 		if (TrInput & IN_ROLL)
 		{
-			item->Animation.TargetState = LS_ROLL_FORWARD;
+			item->Animation.TargetState = LS_ROLL_180_FORWARD;
 			return;
 		}
 
@@ -649,7 +653,7 @@ void lara_as_run_back(ItemInfo* item, CollisionInfo* coll)
 
 	if (TrInput & IN_ROLL)
 	{
-		item->Animation.TargetState = LS_ROLL_FORWARD;
+		item->Animation.TargetState = LS_ROLL_180_FORWARD;
 		return;
 	}
 
@@ -739,7 +743,7 @@ void lara_as_turn_slow(ItemInfo* item, CollisionInfo* coll)
 	if ((TrInput & IN_ROLL || (TrInput & IN_FORWARD && TrInput & IN_BACK)) &&
 		lara->Control.WaterStatus != WaterStatus::Wade)
 	{
-		item->Animation.TargetState = LS_ROLL_FORWARD;
+		item->Animation.TargetState = LS_ROLL_180_FORWARD;
 		return;
 	}
 
@@ -1073,7 +1077,7 @@ void lara_as_turn_fast(ItemInfo* item, CollisionInfo* coll)
 	if ((TrInput & IN_ROLL || (TrInput & IN_FORWARD && TrInput & IN_BACK)) &&
 		lara->Control.WaterStatus != WaterStatus::Wade)
 	{
-		item->Animation.TargetState = LS_ROLL_FORWARD;
+		item->Animation.TargetState = LS_ROLL_180_FORWARD;
 		return;
 	}
 
@@ -1362,26 +1366,40 @@ void lara_col_step_left(ItemInfo* item, CollisionInfo* coll)
 	}
 }
 
-// State:		LS_ROLL_BACK (23)
-// Collision:	lara_col_roll_back()
-void lara_as_roll_back(ItemInfo* item, CollisionInfo* coll)
+// State:	  LS_TURN_180 (173)
+// Collision: lara_col_turn_180()
+void lara_as_turn_180(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
 	lara->Control.CanLook = false;
-
-	if (TrInput & IN_ROLL)
-	{
-		item->Animation.TargetState = LS_ROLL_BACK;
-		return;
-	}
+	ModulateLaraTurnRateY(item, 0, 0, 0);
 
 	item->Animation.TargetState = LS_IDLE;
 }
 
-// State:		LS_ROLL_BACK (23)
+// State:	LS_TURN_180 (173)
+// Control: lara_as_turn_180()
+void lara_col_turn_180(ItemInfo* item, CollisionInfo* coll)
+{
+	lara_col_idle(item, coll);
+}
+
+// State:		LS_ROLL_180_BACK (23)
+// Collision:	lara_col_roll_back()
+void lara_as_roll_180_back(ItemInfo* item, CollisionInfo* coll)
+{
+	auto* lara = GetLaraInfo(item);
+
+	lara->Control.CanLook = false;
+	ModulateLaraTurnRateY(item, 0, 0, 0);
+
+	item->Animation.TargetState = LS_IDLE;
+}
+
+// State:		LS_ROLL_180_BACK (23)
 // Control:		lara_as_roll_back()
-void lara_col_roll_back(ItemInfo* item, CollisionInfo* coll)
+void lara_col_roll_180_back(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -1393,7 +1411,7 @@ void lara_col_roll_back(ItemInfo* item, CollisionInfo* coll)
 	coll->Setup.LowerCeilingBound = 0;
 	coll->Setup.BlockFloorSlopeUp = true;
 	coll->Setup.ForwardAngle = lara->Control.MoveAngle;
-	Camera.laraNode = 0;
+	Camera.laraNode = LM_HIPS;
 	GetCollisionInfo(coll, item);
 
 	if (TestLaraHitCeiling(coll))
@@ -1423,35 +1441,21 @@ void lara_col_roll_back(ItemInfo* item, CollisionInfo* coll)
 	}
 }
 
-// State:		LS_ROLL_FORWARD (45)
-// Collision:	lara_col_roll_forward()
-void lara_as_roll_forward(ItemInfo* item, CollisionInfo* coll)
+// State:		LS_ROLL_180_FORWARD (45)
+// Collision:	lara_col_roll_180_forward()
+void lara_as_roll_180_forward(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
 	lara->Control.CanLook = false;
 	ModulateLaraTurnRateY(item, 0, 0, 0);
 
-	// TODO: Change swandive roll anim's state to something sensible.
-	if (TrInput & IN_FORWARD &&
-		item->Animation.AnimNumber == LA_SWANDIVE_ROLL) // Hack.
-	{
-		item->Animation.TargetState = LS_RUN_FORWARD;
-		return;
-	}
-
-	if (TrInput & IN_ROLL)
-	{
-		item->Animation.TargetState = LS_ROLL_FORWARD;
-		return;
-	}
-
 	item->Animation.TargetState = LS_IDLE;
 }
 
-// State:		LS_ROLL_FORWARD (45)
-// Control:		lara_as_roll_forward()
-void lara_col_roll_forward(ItemInfo* item, CollisionInfo* coll)
+// State:		LS_ROLL_180_FORWARD (45)
+// Control:		lara_as_roll_180_forward()
+void lara_col_roll_180_forward(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 

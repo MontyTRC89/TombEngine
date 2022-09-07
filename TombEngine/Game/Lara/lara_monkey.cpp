@@ -460,6 +460,8 @@ void lara_as_monkey_turn_180(ItemInfo* item, CollisionInfo* coll)
 	coll->Setup.EnableSpasm = false;
 	Camera.targetElevation = -ANGLE(5.0f);
 
+	ModulateLaraTurnRateY(item, 0, 0, 0);
+
 	item->Animation.TargetState = LS_MONKEY_IDLE;
 }
 

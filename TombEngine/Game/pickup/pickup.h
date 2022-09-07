@@ -1,10 +1,10 @@
 #pragma once
 
-struct ItemInfo;
-struct CollisionInfo;
-struct Vector3Int;
-struct BOUNDING_BOX;
 enum GAME_OBJECT_ID : short;
+struct BOUNDING_BOX;
+struct CollisionInfo;
+struct ItemInfo;
+struct Vector3Int;
 
 extern int NumRPickups;
 extern short RPickups[16];
@@ -25,4 +25,4 @@ void InitialiseSearchObject(short itemNumber);
 void SearchObjectCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);
 void SearchObjectControl(short itemNumber);
 void DoPickup(ItemInfo* laraItem);
-bool UseSpecialItem(ItemInfo* item);
+bool UseSpecialItem(ItemInfo* laraItem);

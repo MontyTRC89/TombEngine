@@ -2,6 +2,7 @@
 #include "Game/pickup/pickup_misc_items.h"
 
 #include <array>
+
 #include "Game/Lara/lara_struct.h"
 #include "Game/pickup/pickuputil.h"
 #include "Objects/objectslist.h"
@@ -33,7 +34,7 @@ auto LaserSightIsEquipped(LaraInfo& lara)
 	return false;
 };
 
-static bool TryModifyMiscCount(LaraInfo & lara, GAME_OBJECT_ID objectID, bool add)
+static bool TryModifyMiscCount(LaraInfo& lara, GAME_OBJECT_ID objectID, bool add)
 {
 	// If adding, replace the small/large waterskin with one of the requested
 	// capacity. If removing, only remove the waterskin if it contains the given
@@ -138,12 +139,12 @@ static bool TryModifyMiscCount(LaraInfo & lara, GAME_OBJECT_ID objectID, bool ad
 	return true;
 }
 
-bool TryAddMiscItem(LaraInfo & lara, GAME_OBJECT_ID objectID)
+bool TryAddMiscItem(LaraInfo& lara, GAME_OBJECT_ID objectID)
 {
 	return TryModifyMiscCount(lara, objectID, true);
 }
 
-bool TryRemoveMiscItem(LaraInfo & lara, GAME_OBJECT_ID objectID)
+bool TryRemoveMiscItem(LaraInfo& lara, GAME_OBJECT_ID objectID)
 {
 	return TryModifyMiscCount(lara, objectID, false);
 }

@@ -53,7 +53,7 @@ struct Vector3Int
 		this->z = int(v.z);
 	}
 
-	Vector3 ToVector3()
+	Vector3 ToVector3() const
 	{
 		return Vector3(x, y, z);
 	}
@@ -152,7 +152,7 @@ struct Vector3Shrt
 		this->z = z;
 	}
 
-	Vector3 ToVector3()
+	Vector3 ToVector3() const
 	{
 		return Vector3(x, y, z);
 	}
