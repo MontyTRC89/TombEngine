@@ -178,6 +178,7 @@ CALL gen.bat</Command>
     <ClInclude Include="Math\Angles\EulerAngles.h" />
     <ClInclude Include="Math\Constants.h" />
     <ClInclude Include="Math\Geometry.h" />
+    <ClInclude Include="Math\Legacy.h" />
     <ClInclude Include="Math\Math.h" />
     <ClInclude Include="Math\Containers\PoseData.h" />
     <ClInclude Include="Math\Random.h" />
@@ -641,6 +642,7 @@ CALL gen.bat</Command>
     <ClCompile Include="Math\Angles\EulerAngles.cpp" />
     <ClCompile Include="Math\Geometry.cpp" />
     <ClCompile Include="Math\Containers\PoseData.cpp" />
+    <ClCompile Include="Math\Legacy.cpp" />
     <ClCompile Include="Math\Math.cpp" />
     <ClCompile Include="Math\Random.cpp" />
     <ClCompile Include="Math\Containers\Vector2i.cpp" />
@@ -706,7 +708,6 @@ CALL gen.bat</Command>
     <ClCompile Include="Objects\TR5\Switch\tr5_crowdove_switch.cpp" />
     <ClCompile Include="Specific\clock.cpp" />
     <ClCompile Include="Specific\RGBAColor8Byte.cpp" />
-    <ClCompile Include="Specific\trmath.cpp" />
     <ClCompile Include="Game\effects\smoke.cpp" />
     <ClCompile Include="Game\effects\spark.cpp" />
     <ClCompile Include="Objects\Generic\generic_objects.cpp" />

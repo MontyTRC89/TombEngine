@@ -17,7 +17,8 @@
 	// World constants
 	constexpr inline auto BLOCK_UNIT = 1024;
 	constexpr inline auto NO_HEIGHT	 = INT_MIN + UCHAR_MAX;
-	constexpr inline auto MAX_HEIGHT = INT_MIN + 1;
+	constexpr inline auto MAX_HEIGHT = INT_MIN + 1; // NOTE: +1 prevents issues with sign change.
+	constexpr inline auto DEEP_WATER = INT_MAX - 1; // NOTE: -1 prevents issues with sign change.
 
 	constexpr inline auto BLOCK			= [](auto x) { return (BLOCK_UNIT * x); };
 	constexpr inline auto OFFSET_RADIUS = [](auto x) { return ((x * SQRT_2) + 4); };

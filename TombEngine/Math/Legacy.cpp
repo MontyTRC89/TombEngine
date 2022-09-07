@@ -1,9 +1,13 @@
 #include "framework.h"
-#include "Specific/trmath.h"
+#include "Math/Legacy.h"
 
 #include <cmath>
 
+#include "Math/Constants.h"
+#include "Math/Containers/PoseData.h"
+#include "Math/Containers/Vector3i.h"
 #include "Math/Random.h"
+#include "Specific/phd_global.h"
 
 using namespace TEN::Math::Random;
 
@@ -45,7 +49,7 @@ const Vector3 GetRandomVectorInCone(const Vector3& direction, const float angleD
 	float y = GenerateFloat(-angleDegrees, angleDegrees) * RADIAN;
 	float z = GenerateFloat(-angleDegrees, angleDegrees) * RADIAN;
 	auto matrix = Matrix::CreateRotationX(x) * Matrix::CreateRotationY(y) * Matrix::CreateRotationZ(z);
-	
+
 	auto result = direction.TransformNormal(direction, matrix);
 	result.Normalize();
 	return result;
@@ -195,7 +199,7 @@ void FP_GetMatrixAngles(MATRIX3D* m, short* angles)
 {
 	short yaw = phd_atan(m->m22, m->m02);
 	short pitch = phd_atan(sqrt((m->m22 * m->m22) + (m->m02 * m->m02)), m->m12);
-	
+
 	int sy = phd_sin(yaw);
 	int cy = phd_cos(yaw);
 	short roll = phd_atan(((cy * m->m00) - (sy * m->m20)), ((sy * m->m21) - (cy * m->m01)));
@@ -227,7 +231,7 @@ Vector3i* FP_Normalise(Vector3i* v)
 	long b = v->y >> FP_SHIFT;
 	long c = v->z >> FP_SHIFT;
 
-	if (a == 0 && b == 0 && c == 0)	
+	if (a == 0 && b == 0 && c == 0)
 		return v;
 
 	a = a * a;

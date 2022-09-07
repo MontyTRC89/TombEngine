@@ -6,10 +6,13 @@
 #include "Math/Containers/Vector2i.h"
 #include "Math/Containers/Vector3i.h"
 #include "Math/Geometry.h"
+#include "Math/Legacy.h"
 #include "Math/Random.h"
 
 //namespace TEN::Math
 //{
+	constexpr auto MESH_BITS = [](auto x) { return 1 << x; };
+
 	const float Lerp(float value0, float value1, float time);
 	const float Smoothstep(float edge0, float edge1, float x);
 	const float Smoothstep(float x);
