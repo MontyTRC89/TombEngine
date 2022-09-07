@@ -14,12 +14,12 @@ private:
 	//
 	// For example:
 	// LevelFuncs
-	// |-	TEN
+	// |-	Engine
 	//		|-	Timer
 	//		|-	Util
-	// |-	Ext
-	//		|-	MyLib
-	//		|-	MySecondLib
+	// |-	External
+	//		|-	EnemiesBySteve
+	//		|-	BetterEnemiesByChris
 	//			|-	SubTable
 	//
 	// Each of these tables can only contain other tables as well as a string with their "path".
@@ -42,8 +42,8 @@ private:
 	// of the functions to index in m_levelFuncs_luaFunctions.
 	// Tables are non-nested, so the following are all at the base level of m_levelFuncsTables.
 	// "LevelFuncs"
-	// "LevelFuncs.TEN"
-	// "LevelFuncs.TEN.Util"
+	// "LevelFuncs.Engine"
+	// "LevelFuncs.Engine.Util"
 	// "LevelFuncs.MyLevel"
 	// "LevelFuncs.MyLevel.CoolFuncs"
 	std::unordered_map<std::string, std::unordered_map<std::string, std::string>> m_levelFuncs_tablesOfNames{};

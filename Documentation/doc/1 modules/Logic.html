@@ -98,11 +98,11 @@
 <h2><a href="#Functions">Functions</a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" ><a href="#AddCallback">AddCallback(CallbackPoint, string)</a></td>
+	<td class="name" ><a href="#AddCallback">AddCallback(CallbackPoint, func)</a></td>
 	<td class="summary">Register a function as a callback.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#RemoveCallback">RemoveCallback(CallbackPoint, string)</a></td>
+	<td class="name" ><a href="#RemoveCallback">RemoveCallback(CallbackPoint, LevelFunc)</a></td>
 	<td class="summary">Deregister a function as a callback.</td>
 	</tr>
 </table>
@@ -125,7 +125,7 @@
 	</tr>
 	<tr>
 	<td class="name" ><a href="#LevelFuncs">LevelFuncs</a></td>
-	<td class="summary">A table with level-specific functions.</td>
+	<td class="summary">A table nested table system for level-specific functions.</td>
 	</tr>
 </table>
 
@@ -138,7 +138,7 @@
     <dl class="function">
     <dt>
     <a name = "AddCallback"></a>
-    <strong>AddCallback(CallbackPoint, string)</strong>
+    <strong>AddCallback(CallbackPoint, func)</strong>
     </dt>
     <dd>
     Register a function as a callback.
@@ -148,7 +148,9 @@ POSTCONTROLPHASE -- will be called immediately after OnControlPhase
 </code></pre>
 
 <p>The order in which two functions with the same CallbackPoint are called is undefined.
-i.e. if you register <code>MyFunc</code> and <code>MyFunc2</code> with <code>PRECONTROLPHASE</code>, both will be called before <code>OnControlPhase</code>, but there is no guarantee whether <code>MyFunc</code> will be called before <code>MyFunc2</code>, or vice-versa.
+i.e. if you register <code>MyFunc</code> and <code>MyFunc2</code> with <code>PRECONTROLPHASE</code>, both will be called before <code>OnControlPhase</code>, but there is no guarantee whether <code>MyFunc</code> will be called before <code>MyFunc2</code>, or vice-versa.</p>
+
+<p>Any returned value will be discarded.
 
 
     <h3>Parameters:</h3>
@@ -157,9 +159,9 @@ i.e. if you register <code>MyFunc</code> and <code>MyFunc2</code> with <code>PRE
             <span class="types"><span class="type">point</span></span>
          When should the callback be called?
         </li>
-        <li><span class="parameter">string</span>
-            <span class="types"><span class="type">func</span></span>
-         The LevelFuncs function to be called. Will receive as an argument the time in seconds since the last frame.
+        <li><span class="parameter">func</span>
+            <span class="types"><span class="type">function</span></span>
+         The function to be called (must be in the LevelFuncs hierarchy). Will receive, as an argument, the time in seconds since the last frame.
         </li>
     </ul>
 
@@ -169,13 +171,13 @@ i.e. if you register <code>MyFunc</code> and <code>MyFunc2</code> with <code>PRE
     <h3>Usage:</h3>
     <ul>
         <pre class="example">LevelFuncs.MyFunc = <span class="keyword">function</span>(dt) <span class="global">print</span>(dt) <span class="keyword">end</span>
-TEN.Logic.AddCallback(TEN.Logic.CallbackPoint.PRECONTROLPHASE, <span class="string">"MyFunc"</span>)</pre>
+TEN.Logic.AddCallback(TEN.Logic.CallbackPoint.PRECONTROLPHASE, LevelFuncs.MyFunc)</pre>
     </ul>
 
 </dd>
     <dt>
     <a name = "RemoveCallback"></a>
-    <strong>RemoveCallback(CallbackPoint, string)</strong>
+    <strong>RemoveCallback(CallbackPoint, LevelFunc)</strong>
     </dt>
     <dd>
     Deregister a function as a callback.
@@ -188,9 +190,9 @@ Will have no effect if the function was not registered as a callback
             <span class="types"><span class="type">point</span></span>
          The callback point the function was registered with. See <a href="../1 modules/Logic.html#AddCallback">AddCallback</a>
         </li>
-        <li><span class="parameter">string</span>
+        <li><span class="parameter">LevelFunc</span>
             <span class="types"><span class="type">func</span></span>
-         The LevelFuncs function to remove.
+         the function to remove; must be in the LevelFuncs hierarchy.
         </li>
     </ul>
 
@@ -248,7 +250,9 @@ some time later, the values <code>3</code> will be put back into <code>LevelVars
 
 <p><strong>This table is emptied when a level is finished.</strong> If the player needs to be able
 to return to the level (like in the Karnak and Alexandria levels in <em>The Last Revelation</em>),
-you will need to use the <a href="../1 modules/Logic.html#GameVars">GameVars</a> table, below.
+you will need to use the <a href="../1 modules/Logic.html#GameVars">GameVars</a> table, below.</p>
+
+<p><strong>LevelVars.Engine is a reserved table used internally by TombEngine's libs. Do not modify, overwrite, or add to it.</strong>
 
 
 
@@ -280,7 +284,9 @@ write:</p>
 end
 </code></pre>
 
-<p>Unlike <a href="../1 modules/Logic.html#LevelVars">LevelVars</a>, this table will remain intact for the entirety of the game.
+<p>Unlike <a href="../1 modules/Logic.html#LevelVars">LevelVars</a>, this table will remain intact for the entirety of the game.</p>
+
+<p><strong>GameVars.Engine is a reserved table used internally by TombEngine's libs. Do not modify, overwrite, or add to it.</strong>
 
 
 
@@ -295,9 +301,9 @@ end
     </dt>
     <dd>
 
-<p>A table with level-specific functions. </p>
+<p>A table nested table system for level-specific functions. </p>
 
-<p>This serves two purposes: it holds the level callbacks (listed below) as well as
+<p>This serves a few purposes: it holds the level callbacks (listed below) as well as
 any trigger functions you might have specified. For example, if you give a trigger
 a Lua name of "my_trigger" in Tomb Editor, you will have to implement it as a member
 of this table:</p>
@@ -305,6 +311,25 @@ of this table:</p>
 <pre><code>LevelFuncs.my_trigger = function()
     -- implementation goes here
 end
+</code></pre>
+
+<p>You can organise functions into tables within the hierarchy:</p>
+
+<pre><code>LevelFuncs.enemyFuncs = {}
+
+LevelFuncs.enemyFuncs.makeBaddyRunAway = function()
+    -- implementation goes here
+end
+
+LevelFuncs.enemyFuncs.makeBaddyUseMedkit = function()
+    -- implementation goes here
+end
+</code></pre>
+
+<p>There are two special subtables which you should <strong>not</strong> overwrite:</p>
+
+<pre><code>LevelFuncs.Engine -- this is for 'first-party' functions, i.e. ones that come with TombEngine.
+LevelFuncs.External -- this is for 'third-party' functions. If you write a library providing LevelFuncs functions for other builders to use in their levels, put those functions in LevelFuncs.External.YourLibraryNameHere
 </code></pre>
 
 <p>The following are the level callbacks. They are optional; if your level has no special
@@ -362,7 +387,7 @@ and provides the delta time (a float representing game time since last call) via
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
-<i style="float:right;">Last updated 2022-08-19 00:04:24 </i>
+<i style="float:right;">Last updated 2022-09-07 20:56:06 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>
