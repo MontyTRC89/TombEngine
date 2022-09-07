@@ -45,42 +45,42 @@ struct LEVEL_CAMERA_INFO
 		this->speed = 1;
 	}
 
-	LEVEL_CAMERA_INFO(int xpos, int ypos, int zpos)
+	LEVEL_CAMERA_INFO(int xPos, int yPos, int zPos)
 	{
-		this->x = xpos;
-		this->y = ypos;
-		this->z = zpos;
+		this->x = xPos;
+		this->y = yPos;
+		this->z = zPos;
 		this->roomNumber = 0;
 		this->flags = 0x0;
 		this->speed = 1;
 	}
 
-	LEVEL_CAMERA_INFO(int xpos, int ypos, int zpos, short room)
+	LEVEL_CAMERA_INFO(int xPos, int yPos, int zPos, short roomNumber)
 	{
-		this->x = xpos;
-		this->y = ypos;
-		this->z = zpos;
-		this->roomNumber = room;
+		this->x = xPos;
+		this->y = yPos;
+		this->z = zPos;
+		this->roomNumber = roomNumber;
 		this->flags = 0x0;
 		this->speed = 1;
 	}
 
-	LEVEL_CAMERA_INFO(int xpos, int ypos, int zpos, short flags, bool isFlags) // use isFlags to use flag instead of newdata !
+	LEVEL_CAMERA_INFO(int xPos, int yPos, int zPos, short flags, bool isFlags) // Use isFlags to use flag instead of new data.
 	{
-		this->x = xpos;
-		this->y = ypos;
-		this->z = zpos;
+		this->x = xPos;
+		this->y = yPos;
+		this->z = zPos;
 		this->roomNumber = 0;
 		this->flags = flags;
 		this->speed = 1;
 	}
 
-	LEVEL_CAMERA_INFO(int xpos, int ypos, int zpos, short room, short newflags)
+	LEVEL_CAMERA_INFO(int xPos, int yPos, int zPos, short roomNumber, short newflags)
 	{
-		this->x = xpos;
-		this->y = ypos;
-		this->z = zpos;
-		this->roomNumber = room;
+		this->x = xPos;
+		this->y = yPos;
+		this->z = zPos;
+		this->roomNumber = roomNumber;
 		this->flags = newflags;
 		this->speed = 1;
 	}
@@ -104,29 +104,29 @@ struct SINK_INFO
 		this->boxIndex = 0;
 	}
 
-	SINK_INFO(int xpos, int ypos, int zpos)
+	SINK_INFO(int xPos, int yPos, int zPos)
 	{
-		this->x = xpos;
-		this->y = ypos;
-		this->z = zpos;
+		this->x = xPos;
+		this->y = yPos;
+		this->z = zPos;
 		this->strength = 0;
 		this->boxIndex = 0;
 	}
 
-	SINK_INFO(int xpos, int ypos, int zpos, short strength)
+	SINK_INFO(int xPos, int yPos, int zPos, short strength)
 	{
-		this->x = xpos;
-		this->y = ypos;
-		this->z = zpos;
+		this->x = xPos;
+		this->y = yPos;
+		this->z = zPos;
 		this->strength = strength;
 		this->boxIndex = 0;
 	}
 
-	SINK_INFO(int xpos, int ypos, int zpos, short strength, short boxIndex)
+	SINK_INFO(int xPos, int yPos, int zPos, short strength, short boxIndex)
 	{
-		this->x = xpos;
-		this->y = ypos;
-		this->z = zpos;
+		this->x = xPos;
+		this->y = yPos;
+		this->z = zPos;
 		this->strength = strength;
 		this->boxIndex = boxIndex;
 	}
@@ -150,31 +150,31 @@ struct SOUND_SOURCE_INFO
 		this->flags = 0x0;
 	}
 
-	SOUND_SOURCE_INFO(int xpos, int ypos, int zpos)
+	SOUND_SOURCE_INFO(int xPos, int yPos, int zPos)
 	{
-		this->x = xpos;
-		this->y = ypos;
-		this->z = zpos;
+		this->x = xPos;
+		this->y = yPos;
+		this->z = zPos;
 		this->soundId = 0;
 		this->flags = 0x0;
 	}
 
-	SOUND_SOURCE_INFO(int xpos, int ypos, int zpos, short soundId)
+	SOUND_SOURCE_INFO(int xPos, int yPos, int zPos, short soundID)
 	{
-		this->x = xpos;
-		this->y = ypos;
-		this->z = zpos;
-		this->soundId = soundId;
+		this->x = xPos;
+		this->y = yPos;
+		this->z = zPos;
+		this->soundId = soundID;
 		this->flags = 0x0;
 	}
 
-	SOUND_SOURCE_INFO(int xpos, int ypos, int zpos, short soundId, short newflags)
+	SOUND_SOURCE_INFO(int xPos, int yPos, int zPos, short soundID, short newFlags)
 	{
-		this->x = xpos;
-		this->y = ypos;
-		this->z = zpos;
-		this->soundId = soundId;
-		this->flags = newflags;
+		this->x = xPos;
+		this->y = yPos;
+		this->z = zPos;
+		this->soundId = soundID;
+		this->flags = newFlags;
 	}
 };
 
@@ -229,5 +229,5 @@ struct BOUNDING_BOX
 	int Height() { return abs(Y2 - Y1); }
 };
 
-BOUNDING_BOX operator+(const BOUNDING_BOX& box, const PoseData& vec);
+BOUNDING_BOX operator+(const BOUNDING_BOX& box, const PoseData& pose);
 BOUNDING_BOX operator*(const BOUNDING_BOX& box, const float scale);
