@@ -263,11 +263,7 @@ int FlowHandler::GetLevelNumber(std::string const& fileName)
 void FlowHandler::EndLevel(std::optional<int> nextLevel)
 {
 	int index = (nextLevel.has_value() && nextLevel.value() != 0) ? nextLevel.value() : CurrentLevel + 1;
-
-	if (index >= g_GameFlow->GetNumLevels())
-		LevelComplete = 0;
-	else
-		LevelComplete = index;
+	LevelComplete = index;
 }
 
 int FlowHandler::GetSecretCount() const
