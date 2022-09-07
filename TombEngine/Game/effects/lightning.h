@@ -1,8 +1,8 @@
 #pragma once
 #include <cstddef>
 #include <vector>
-#include "Specific/phd_global.h"
-#include "Specific/trmath.h"
+#include "Math/Math.h"
+#include "Math/Math.h"
 
 using std::vector;
 

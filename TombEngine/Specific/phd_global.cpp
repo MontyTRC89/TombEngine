@@ -1,6 +1,8 @@
 #include "framework.h"
 #include "Specific/phd_global.h"
 
+#include "Math/Containers/PoseData.h"
+
 BOUNDING_BOX operator+(const BOUNDING_BOX& box, const PoseData& pose)
 {
 	auto box2 = box;

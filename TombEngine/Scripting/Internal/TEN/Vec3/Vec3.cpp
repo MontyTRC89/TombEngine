@@ -1,6 +1,6 @@
 #include "framework.h"
 #include "Vec3.h"
-#include "Specific/phd_global.h"
+#include "Math/Math.h"
 #include "ReservedScriptNames.h"
 
 /***

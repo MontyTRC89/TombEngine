@@ -7,7 +7,7 @@
 #include "Objects/objectslist.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
-#include "Specific/trmath.h"
+#include "Math/Math.h"
 
 #include "ScriptAssert.h"
 #include "MoveableObject.h"

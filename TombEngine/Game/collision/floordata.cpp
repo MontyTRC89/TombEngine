@@ -5,7 +5,7 @@
 #include "Game/room.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
-#include "Specific/trmath.h"
+#include "Math/Math.h"
 
 using namespace TEN::Floordata;
 

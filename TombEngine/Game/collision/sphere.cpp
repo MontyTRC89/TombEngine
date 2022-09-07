@@ -5,7 +5,7 @@
 #include "Game/items.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
-#include "Specific/trmath.h"
+#include "Math/Math.h"
 #include "Renderer/Renderer11.h"
 
 using namespace TEN::Renderer;

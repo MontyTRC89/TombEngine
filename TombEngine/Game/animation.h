@@ -1,9 +1,11 @@
 #pragma once
-#include "Specific/phd_global.h"
+#include "Math/Math.h" // TODO: Including this here shouldn't be necessary.
 
+class EulerAngles;
+struct BOUNDING_BOX;
+struct ItemInfo;
 struct PoseData;
 struct Vector3i;
-struct ItemInfo;
 
 struct ANIM_FRAME
 {

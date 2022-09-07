@@ -18,7 +18,7 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 #include "Math/Random.h"
-#include "Specific/trmath.h"
+#include "Math/Math.h"
 #include "Flow/ScriptInterfaceFlowHandler.h"
 #include "Renderer/Renderer11.h"
 

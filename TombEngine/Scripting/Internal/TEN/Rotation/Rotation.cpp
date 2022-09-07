@@ -1,6 +1,6 @@
 #include "framework.h"
 #include "Rotation.h"
-#include "Specific/phd_global.h"
+#include "Math/Math.h"
 
 /*** Represents a rotation.
 Rotations are specifed as a combination of individual

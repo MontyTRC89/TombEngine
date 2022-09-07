@@ -8,7 +8,7 @@
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_struct.h"
 #include "Game/Lara/lara.h"
-#include "Specific/trmath.h"
+#include "Math/Math.h"
 #include "Game/collision/collide_room.h"
 #include "Game/collision/sphere.h"
 #include "Objects/Generic/Object/rope.h"

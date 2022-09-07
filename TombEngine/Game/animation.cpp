@@ -7,6 +7,7 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
+#include "Math/Math.h"
 #include "Objects/Generic/Object/rope.h"
 #include "Renderer/Renderer11.h"
 #include "Sound/sound.h"

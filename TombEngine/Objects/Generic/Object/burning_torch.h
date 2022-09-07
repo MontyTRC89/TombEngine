@@ -1,5 +1,5 @@
 #pragma once
-#include "Specific/phd_global.h"
+#include "Math/Math.h"
 
 struct ItemInfo;
 struct CollisionInfo;

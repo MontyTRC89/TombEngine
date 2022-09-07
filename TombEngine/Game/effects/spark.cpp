@@ -3,7 +3,7 @@
 #include "Game/effects/spark.h"
 
 #include <array>
-#include "Specific/trmath.h"
+#include "Math/Math.h"
 #include "Math/Random.h"
 
 using namespace DirectX::SimpleMath;

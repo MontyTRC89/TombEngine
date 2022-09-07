@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "tr5_deathslide.h"
 #include "Specific/input.h"
-#include "Specific/trmath.h"
+#include "Math/Math.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Specific/setup.h"

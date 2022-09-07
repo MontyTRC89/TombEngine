@@ -14,7 +14,7 @@
 #include "Objects/objectslist.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
-#include "Specific/trmath.h"
+#include "Math/Math.h"
 
 namespace TEN::Entities::TR4
 {

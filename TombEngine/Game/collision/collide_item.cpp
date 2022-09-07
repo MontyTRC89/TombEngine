@@ -19,7 +19,7 @@
 #include "ScriptInterfaceGame.h"
 #include "Sound/sound.h"
 #include "Specific/setup.h"
-#include "Specific/trmath.h"
+#include "Math/Math.h"
 
 using namespace TEN::Math::Random;
 using namespace TEN::Renderer;

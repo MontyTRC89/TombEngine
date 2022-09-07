@@ -1,6 +1,6 @@
 #pragma once
 #include "Specific/level.h"
-#include "Specific/phd_global.h"
+#include "Math/Math.h"
 
 struct BiteInfo;
 struct CreatureInfo;

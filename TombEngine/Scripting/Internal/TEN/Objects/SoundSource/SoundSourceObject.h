@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Objects/NamedBase.h"
-#include "Specific/phd_global.h"
+#include "Math/Math.h"
 
 namespace sol {
 	class state;

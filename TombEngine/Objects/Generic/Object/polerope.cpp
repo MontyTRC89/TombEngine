@@ -13,7 +13,7 @@
 #include "Game/Lara/lara_tests.h"
 #include "Specific/input.h"
 #include "Specific/level.h"
-#include "Specific/trmath.h"
+#include "Math/Math.h"
 
 using namespace TEN::Input;
 using std::vector;

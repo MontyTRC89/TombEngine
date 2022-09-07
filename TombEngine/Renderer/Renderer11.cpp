@@ -3,7 +3,7 @@
 #include "Game/camera.h"
 #include "Game/effects/tomb4fx.h"
 #include "Specific/clock.h"
-#include "Specific/trmath.h"
+#include "Math/Math.h"
 #include "Utils.h"
 #include "VertexBuffer/VertexBuffer.h"
 #include "RenderView/RenderView.h"

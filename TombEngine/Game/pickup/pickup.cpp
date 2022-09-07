@@ -25,7 +25,7 @@
 #include "Sound/sound.h"
 #include "Specific/input.h"
 #include "Specific/level.h"
-#include "Specific/phd_global.h"
+#include "Math/Math.h"
 #include "Specific/setup.h"
 
 using namespace TEN::Entities::Generic;

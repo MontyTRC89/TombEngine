@@ -1,7 +1,7 @@
 #pragma once
 #include "Game/room.h"
 #include "Objects/objectslist.h"
-#include "Specific/phd_global.h"
+#include "Math/Math.h"
 
 constexpr auto NO_LOS_ITEM = INT_MAX;
 

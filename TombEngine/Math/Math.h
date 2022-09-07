@@ -8,6 +8,7 @@
 #include "Math/Geometry.h"
 #include "Math/Legacy.h"
 #include "Math/Random.h"
+#include "Specific/phd_global.h"
 
 //namespace TEN::Math
 //{

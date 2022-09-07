@@ -13,7 +13,7 @@
 #include "Specific/level.h"
 #include "Math/Random.h"
 #include "Specific/setup.h"
-#include "Specific/trmath.h"
+#include "Math/Math.h"
 
 using namespace TEN::Math::Random;
 

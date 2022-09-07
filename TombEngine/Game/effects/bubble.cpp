@@ -7,7 +7,7 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 #include "Math/Random.h"
-#include "Specific/trmath.h"
+#include "Math/Math.h"
 
 using std::vector;
 using namespace TEN::Math::Random;

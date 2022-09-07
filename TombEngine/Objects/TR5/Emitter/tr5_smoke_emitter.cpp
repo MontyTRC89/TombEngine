@@ -9,7 +9,7 @@
 #include "Game/control/trigger.h"
 #include "Game/collision/collide_room.h"
 #include "Specific/level.h"
-#include "Specific/trmath.h"
+#include "Math/Math.h"
 #include "Objects/objectslist.h"
 #include "Renderer/Renderer11Enums.h"
 

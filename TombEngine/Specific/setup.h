@@ -1,6 +1,6 @@
 #pragma once
 #include "Objects/objectslist.h"
-#include "Specific/phd_global.h"
+#include "Math/Math.h"
 #include "Specific/level.h"
 #include "Renderer/Renderer11Enums.h"
 

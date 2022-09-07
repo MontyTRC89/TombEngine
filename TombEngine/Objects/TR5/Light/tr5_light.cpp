@@ -5,7 +5,7 @@
 #include "Game/control/los.h"
 #include "Game/effects/effects.h"
 #include "Sound/sound.h"
-#include "Specific/trmath.h"
+#include "Math/Math.h"
 #include "Game/animation.h"
 #include "Game/items.h"
 

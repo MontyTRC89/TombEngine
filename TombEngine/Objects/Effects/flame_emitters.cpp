@@ -15,7 +15,7 @@
 #include "Sound/sound.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
-#include "Specific/trmath.h"
+#include "Math/Math.h"
 #include "input.h"
 
 using namespace TEN::Input;

@@ -6,7 +6,7 @@
 #include "Game/animation.h"
 #include "Game/itemdata/itemdata.h"
 #include "Specific/newtypes.h"
-#include "Specific/phd_global.h"
+#include "Math/Math.h"
 
 enum GAME_OBJECT_ID : short;
 

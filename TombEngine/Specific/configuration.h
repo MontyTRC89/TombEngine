@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Specific/input.h"
-#include "Specific/trmath.h"
+#include "Math/Math.h"
 #include "Renderer/Renderer11Enums.h"
 
 #define REGKEY_ROOT						"Software\\TombEngine\\TombEngine"

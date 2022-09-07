@@ -20,7 +20,7 @@
 #include "Objects/TR4/Vehicles/motorbike_info.h"
 #include "Objects/TR5/Entity/tr5_laserhead_info.h"
 #include "Objects/TR5/Object/tr5_pushableblock_info.h"
-#include "Specific/phd_global.h"
+#include "Math/Math.h"
 
 template<class... Ts> struct visitor : Ts... { using Ts::operator()...; };
 template<class... Ts> visitor(Ts...)->visitor<Ts...>; // line not needed in C++20...

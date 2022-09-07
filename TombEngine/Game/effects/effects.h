@@ -1,5 +1,5 @@
 #pragma once
-#include "Specific/phd_global.h"
+#include "Math/Math.h"
 #include "Renderer/Renderer11Enums.h"
 
 enum class LaraWeaponType;

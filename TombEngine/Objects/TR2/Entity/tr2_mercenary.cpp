@@ -9,7 +9,7 @@
 #include "Game/people.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
-#include "Specific/trmath.h"
+#include "Math/Math.h"
 
 namespace TEN::Entities::TR2
 {

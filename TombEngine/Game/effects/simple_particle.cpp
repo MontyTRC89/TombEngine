@@ -2,7 +2,7 @@
 #include "Game/effects/simple_particle.h"
 
 #include "Game/items.h"
-#include "Specific/trmath.h"
+#include "Math/Math.h"
 #include "Specific/setup.h"
 #include "Math/Random.h"
 

@@ -19,7 +19,7 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 #include "Math/Random.h"
-#include "Specific/trmath.h"
+#include "Math/Math.h"
 
 using std::vector;
 using TEN::Renderer::g_Renderer;

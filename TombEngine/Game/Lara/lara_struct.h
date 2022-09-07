@@ -1,6 +1,6 @@
 #pragma once
 #include "Objects/objectslist.h"
-#include "Specific/trmath.h"
+#include "Math/Math.h"
 
 #define NUM_PUZZLES	(ID_PUZZLE_ITEM16 - ID_PUZZLE_ITEM1 + 1)
 #define NUM_PUZZLE_PIECES	(ID_PUZZLE_ITEM16_COMBO2 - ID_PUZZLE_ITEM1_COMBO1 + 1)

@@ -13,7 +13,7 @@
 #include "Game/people.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
-#include "Specific/trmath.h"
+#include "Math/Math.h"
 
 using std::vector;
 

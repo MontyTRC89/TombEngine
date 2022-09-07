@@ -9,7 +9,7 @@
 #include "Game/items.h"
 #include "Game/room.h"
 #include "Sound/sound.h"
-#include "Specific/trmath.h"
+#include "Math/Math.h"
 #include "Renderer/Renderer11.h"
 
 using namespace TEN::Floordata;

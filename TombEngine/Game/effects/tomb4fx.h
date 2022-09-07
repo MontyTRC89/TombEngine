@@ -1,7 +1,7 @@
 #pragma once
 #include "Game/effects/effects.h"
 #include "Game/Lara/lara_struct.h"
-#include "Specific/phd_global.h"
+#include "Math/Math.h"
 #include "Renderer/Renderer11Enums.h"
 
 enum class LaraWeaponType;

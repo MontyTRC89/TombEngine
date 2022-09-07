@@ -4,7 +4,7 @@
 #include "Math/Angles/EulerAngles.h"
 #include "Math/Containers/PoseData.h"
 #include "Math/Containers/Vector3i.h"
-#include "Specific/trmath.h"
+#include "Math/Math.h"
 
 //namespace TEN::Math::Geometry
 //{

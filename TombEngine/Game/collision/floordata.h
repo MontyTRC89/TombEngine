@@ -1,6 +1,6 @@
 #pragma once
 #include <optional>
-#include "Specific/trmath.h"
+#include "Math/Math.h"
 #include "Specific/newtypes.h"
 
 constexpr auto WALL_PLANE = Vector3(0, 0, static_cast<float>(-CLICK(127)));

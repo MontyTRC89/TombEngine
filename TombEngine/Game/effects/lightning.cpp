@@ -13,7 +13,7 @@
 #include "Flow/ScriptInterfaceFlowHandler.h"
 #include "Specific/setup.h"
 #include "Specific/level.h"
-#include "Specific/trmath.h"
+#include "Math/Math.h"
 
 using std::vector;
 using TEN::Renderer::g_Renderer;

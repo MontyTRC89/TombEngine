@@ -1,6 +1,6 @@
 #pragma once
-#include "Specific/phd_global.h"
-#include "Specific/trmath.h"
+#include "Math/Math.h"
+#include "Math/Math.h"
 
 struct CollisionInfo;
 struct CollisionResult;

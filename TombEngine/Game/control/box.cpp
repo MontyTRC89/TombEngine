@@ -15,7 +15,7 @@
 #include "Game/misc.h"
 #include "Game/room.h"
 #include "Specific/setup.h"
-#include "Specific/trmath.h"
+#include "Math/Math.h"
 #include "Objects/objectslist.h"
 #include "Objects/TR5/Object/tr5_pushableblock.h"
 #include "Renderer/Renderer11.h"

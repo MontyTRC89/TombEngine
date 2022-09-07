@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "tr5_bodypart.h"
 #include "Game/effects/effects.h"
-#include "Specific/trmath.h"
+#include "Math/Math.h"
 #include "Sound/sound.h"
 #include "tr5_missile.h"
 #include "Game/collision/collide_room.h"

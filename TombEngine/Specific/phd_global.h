@@ -1,5 +1,6 @@
 #pragma once
-#include "Math/Math.h"
+
+struct PoseData;
 
 struct RendererRectangle
 {

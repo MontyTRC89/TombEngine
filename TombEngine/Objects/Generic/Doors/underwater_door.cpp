@@ -14,7 +14,7 @@
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_struct.h"
 #include "Game/Lara/lara.h"
-#include "Specific/trmath.h"
+#include "Math/Math.h"
 #include "Game/misc.h"
 #include "Objects/Generic/Doors/underwater_door.h"
 #include "Game/collision/collide_item.h"

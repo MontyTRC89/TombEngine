@@ -2,7 +2,7 @@
 #include "framework.h"
 #include "Game/collision/floordata.h"
 #include "Specific/newtypes.h"
-#include "Specific/phd_global.h"
+#include "Math/Math.h"
 
 struct TriggerVolume;
 
