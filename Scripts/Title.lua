@@ -1,6 +1,6 @@
 -- Title script file
 
-local Util = require("TEN.Util")
+local Util = require("Engine.Util")
 Util.ShortenTENCalls()
 
 LevelFuncs.OnLoad = function() end
