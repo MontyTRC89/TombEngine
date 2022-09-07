@@ -82,53 +82,51 @@ bool HandleLaraVehicle(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	if (lara->Vehicle != NO_ITEM)
+	if (lara->Vehicle == NO_ITEM)
+		return false;
+
+	TestVolumes(lara->Vehicle);
+
+	switch (g_Level.Items[lara->Vehicle].ObjectNumber)
 	{
-		TestVolumes(lara->Vehicle);
+	case ID_QUAD:
+		QuadBikeControl(item, coll);
+		break;
 
-		switch (g_Level.Items[lara->Vehicle].ObjectNumber)
-		{
-		case ID_QUAD:
-			QuadBikeControl(item, coll);
-			break;
+	case ID_JEEP:
+		JeepControl(item);
+		break;
 
-		case ID_JEEP:
-			JeepControl(item);
-			break;
+	case ID_MOTORBIKE:
+		MotorbikeControl(item, coll);
+		break;
 
-		case ID_MOTORBIKE:
-			MotorbikeControl(item, coll);
-			break;
+	case ID_KAYAK:
+		KayakControl(item);
+		break;
 
-		case ID_KAYAK:
-			KayakControl(item);
-			break;
+	case ID_SNOWMOBILE:
+		SkidooControl(item, coll);
+		break;
 
-		case ID_SNOWMOBILE:
-			SkidooControl(item, coll);
-			break;
+	case ID_UPV:
+		UPVControl(item, coll);
+		break;
 
-		case ID_UPV:
-			UPVControl(item, coll);
-			break;
+	case ID_MINECART:
+		MinecartControl(item);
+		break;
 
-		case ID_MINECART:
-			MinecartControl(item);
-			break;
+	case ID_BIGGUN:
+		BigGunControl(item, coll);
+		break;
 
-		case ID_BIGGUN:
-			BigGunControl(item, coll);
-			break;
-
-			// Boats are processed like normal items in loop.
-		default:
-			LaraGun(item);
-		}
-
-		return true;
+		// Boats are processed like normal items in loop.
+	default:
+		LaraGun(item);
 	}
 
-	return false;
+	return true;
 }
 
 void ApproachLaraTargetOrientation(ItemInfo* item, Vector3Shrt targetOrient, float rate)
@@ -349,15 +347,15 @@ short ModulateLaraTurnRate(short turnRate, short accelRate, short minTurnRate, s
 	axisCoeff *= invert ? -1 : 1;
 	int sign = std::copysign(1, axisCoeff);
 
-	short minTurnRateNormalized = minTurnRate * abs(axisCoeff);
-	short maxTurnRateNormalized = maxTurnRate * abs(axisCoeff);
+	short minTurnRateNorm = minTurnRate * abs(axisCoeff);
+	short maxTurnRateNorm = maxTurnRate * abs(axisCoeff);
 
 	short newTurnRate = (turnRate + (accelRate * sign)) * sign;
-	newTurnRate = std::clamp(newTurnRate, minTurnRateNormalized, maxTurnRateNormalized);
+	newTurnRate = std::clamp(newTurnRate, minTurnRateNorm, maxTurnRateNorm);
 	return (newTurnRate * sign);
 }
 
-// TODO: Make these two functions methods of LaraInfo someday. @Sezz 2022.06.26
+// TODO: Make these two functions methods of LaraInfo someday. -- Sezz 2022.06.26
 void ModulateLaraTurnRateX(ItemInfo* item, short accelRate, short minTurnRate, short maxTurnRate, bool invert)
 {
 	auto* lara = GetLaraInfo(item);
@@ -395,7 +393,7 @@ void ModulateLaraSwimTurnRates(ItemInfo* item, CollisionInfo* coll)
 	{
 		ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_MED_TURN_RATE_MAX);
 
-		// TODO: ModulateLaraLean() doesn't really work here. @Sezz 2022.06.22
+		// TODO: ModulateLaraLean() doesn't really work here. -- Sezz 2022.06.22
 		if (TrInput & IN_LEFT)
 			item->Pose.Orientation.z -= LARA_LEAN_RATE;
 		else if (TrInput & IN_RIGHT)
@@ -425,7 +423,7 @@ void ModulateLaraSubsuitSwimTurnRates(ItemInfo* item)
 	}
 }
 
-// TODO: Simplify this function. Some members of SubsuitControlData may be unnecessary. @Sezz 2022.06.22
+// TODO: Simplify this function. Some members of SubsuitControlData may be unnecessary. -- Sezz 2022.06.22
 void UpdateLaraSubsuitAngles(ItemInfo* item)
 {
 	auto* lara = GetLaraInfo(item);
@@ -532,7 +530,7 @@ void ModulateLaraCrawlFlex(ItemInfo* item, short baseRate, short maxAngle)
 	}
 }
 
-// TODO: Unused; I will pick this back up later. @Sezz 2022.06.22
+// TODO: Unused; I will pick this back up later. -- Sezz 2022.06.22
 void ModulateLaraSlideVelocity(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
@@ -562,9 +560,9 @@ void ModulateLaraSlideVelocity(ItemInfo* item, CollisionInfo* coll)
 
 void AlignLaraToSurface(ItemInfo* item, float alpha)
 {
-	auto probe = GetCollision(item);
-	short aspectAngle = GetSurfaceAspectAngle(probe.FloorTilt);
-	short steepnessAngle = std::min(GetSurfaceSteepnessAngle(probe.FloorTilt), ANGLE(70.0f));
+	auto floorTilt = GetCollision(item).FloorTilt;
+	short aspectAngle = GetSurfaceAspectAngle(floorTilt);
+	short steepnessAngle = std::min(GetSurfaceSteepnessAngle(floorTilt), ANGLE(70.0f));
 
 	short deltaAngle = GetShortestAngularDistance(item->Pose.Orientation.y, aspectAngle);
 	float sinDeltaAngle = phd_sin(deltaAngle);
@@ -609,7 +607,7 @@ void SetLaraJumpDirection(ItemInfo* item, CollisionInfo* coll)
 }
 
 // TODO: Add a timeout? Imagine a small, sad rain cloud with the properties of a ceiling following Lara overhead.
-// RunJumpQueued will never reset, and when the sad cloud flies away after an indefinite amount of time, Lara will jump. @Sezz 2022.01.22
+// RunJumpQueued will never reset, and when the sad cloud flies away after an indefinite amount of time, Lara will jump. -- Sezz 2022.01.22
 void SetLaraRunJumpQueue(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);

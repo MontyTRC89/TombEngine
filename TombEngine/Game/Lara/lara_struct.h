@@ -48,7 +48,7 @@ enum LaraState
 	LS_TURN_RIGHT_FAST = 20,
 	LS_STEP_RIGHT = 21,
 	LS_STEP_LEFT = 22,
-	LS_ROLL_BACK = 23,
+	LS_ROLL_180_BACKWARD = 23,
 	LS_SLIDE_FORWARD = 24,
 	LS_JUMP_BACK = 25,
 	LS_JUMP_RIGHT = 26,
@@ -70,7 +70,7 @@ enum LaraState
 	LS_INSERT_KEY = 42,
 	LS_INSERT_PUZZLE = 43,
 	LS_WATER_DEATH = 44,
-	LS_ROLL_FORWARD = 45,
+	LS_ROLL_180_FORWARD = 45,
 	LS_BOULDER_DEATH = 46,
 	LS_ONWATER_BACK = 47,
 	LS_ONWATER_LEFT = 48,
@@ -208,6 +208,7 @@ enum LaraState
 	LS_SOFT_SPLAT = 170,
 	LS_CROUCH_TURN_180 = 171,
 	LS_CRAWL_TURN_180 = 172,
+	LS_TURN_180 = 173,
 
 	NUM_LARA_STATES
 };
@@ -484,7 +485,7 @@ enum LaraAnim
 	LA_MONKEY_SHIMMY_RIGHT = 255,									// Monkey swing shimmy right (looped)
 	LA_MONKEY_SHIMMY_RIGHT_END = 256,								// Monkey swing shimmy right > monkey swing idle
 																		// TODO: generic shimmy anims between ledges and ladders?
-	LA_MONKEY_TURN_180 = 257,										// Monkey swing turn 180
+	LA_MONKEY_TURN_180_START = 257,									// Monkey swing turn 180 (1/2)
 	LA_CROUCH_TO_CRAWL_START = 258,									// Crouch > crawl (1/3)
 	LA_CRAWL_TO_CROUCH_START = 259,									// Crawl > crouch (1/3)
 	LA_CRAWL = 260,													// Crawl forward (looped)
@@ -492,22 +493,22 @@ enum LaraAnim
 	LA_CRAWL_TO_IDLE_LEFT = 262,									// Crawl forward > crawl idle, left leg first
 	LA_CRAWL_IDLE = 263,											// Crwal idle
 	LA_CROUCH_TO_CRAWL_END = 264,									// Crawl > crouch (2/2)
-	LA_CRAWL_TO_CROUCH_END_UNUSED = 265,								// Crouch > crawl (3/3) remove
-	LA_CRAWL_TO_IDLE_END_RIGHT_POINTLESS = 266,							// TODO: remove.
+	LA_TURN_180_START = 265,										// Standing turn 180 (1/2)
+	LA_TURN_180_END = 266,											// Standing turn 180 (2/2)
 	LA_CRAWL_TO_IDLE_RIGHT = 267,									// Crawl forward > crawl idle, right leg first
-	LA_CRAWL_TO_IDLE_END_LEFT_POINTLESS = 268,							// TODO: remove.
+	LA_MONKEY_TURN_180_END = 268,									// Monkey swing turn 180 (2/2)
 	LA_CRAWL_TURN_LEFT = 269,										// Crawl rotate left (looped)
 	LA_CRAWL_TURN_RIGHT = 270,										// Crawl rotate right (looped)
 	LA_MONKEY_TURN_LEFT = 271,										// Monkey swing rotate left
 	LA_MONKEY_TURN_RIGHT = 272,										// Monkey swing rotate right
 	LA_CROUCH_TO_CRAWL_CONTINUE = 273,								// Crouch > crawl (2/3)
-	LA_CRAWL_TO_CROUCH_CONTINUE = 274,								// Crouch > crawl (2/3)
+	LA_CRAWL_TO_CROUCH_CONTINUE = 274,								// Crawl > crouch (2/3)
 	LA_CRAWL_IDLE_TO_CRAWL_BACK = 275,								// Crawl > crawl back
 	LA_CRAWL_BACK = 276,											// Crawl back (looped)
-	LA_CRAWL_BACK_TO_IDLE_RIGHT_START = 277,						// Crawl back > crawl idle, right foot first (1/2)
-	LA_CRAWL_BACK_TO_IDLE_RIGHT_END = 278,							// Crawl back > crawl idle, right foot first (2/2)
-	LA_CRAWL_BACK_TO_IDLE_LEFT_START = 279,							// Crawl back > crawl idle, left foot first (1/2)
-	LA_CRAWL_BACK_TO_IDLE_LEFT_END = 280,							// Crawl back > crawl idle, left foot first (2/2)
+	LA_CRAWL_BACK_TO_IDLE_RIGHT = 277,								// Crawl back > crawl idle, right foot first
+	LA_CRAWL_BACK_TO_IDLE_RIGHT_END = 278,							// Unused.
+	LA_CRAWL_BACK_TO_IDLE_LEFT = 279,								// Crawl back > crawl idle, left foot first
+	LA_CRAWL_BACK_TO_IDLE_LEFT_END = 280,							// Unused.
 	LA_CRAWL_TURN_LEFT_TO_IDLE_EARLY = 281,							// Crawl rotate left > crawl idle, early opportunity
 	LA_CRAWL_TURN_RIGHT_TO_IDLE_EARLY = 282,						// Crawl rotate right > crawl idle, early opportunity
 	LA_MONKEY_TURN_LEFT_TO_IDLE_EARLY = 283,						// Turn left on monkey swing > monkey swing idle, 1st opportunity
@@ -812,7 +813,7 @@ enum LaraAnim
 
 	// TRASHED ANIMS (please reuse slots before going any higher and remove entries from this list as you go):
 	// 102
-	// 265, 266, 268, 273, 274, 278, 280,
+	// 273, 274, 278, 280,
 	// 343, 345,
 	// 364, 366, 368, 370,
 };
