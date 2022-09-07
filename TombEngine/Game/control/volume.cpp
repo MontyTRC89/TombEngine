@@ -6,10 +6,10 @@
 #include "Game/Lara/lara.h"
 #include "Game/room.h"
 #include "Game/savegame.h"
-#include "Specific/setup.h"
-#include "Renderer/Renderer11Enums.h"
-#include "Renderer/Renderer11.h"
 #include "ScriptInterfaceGame.h"
+#include "Specific/setup.h"
+#include "Renderer/Renderer11.h"
+#include "Renderer/Renderer11Enums.h"
 
 using TEN::Renderer::g_Renderer;
 
@@ -37,7 +37,7 @@ namespace TEN::Control::Volumes
 			if ((set->Activators & activatorType) != activatorType)
 				continue;
 			
-			// Determine what to do if volume is busy with another triggerer
+			// Determine what to do if volume is busy with another triggerer.
 			if (!std::holds_alternative<nullptr_t>(volume->Triggerer) && volume->Triggerer != triggerer)
 			{
 				if (GameTimer - volume->Timeout > VOLUME_BUSY_TIMEOUT)
@@ -50,7 +50,6 @@ namespace TEN::Control::Volumes
 					// We are in the same frame, triggerer is busy, leave it alone.
 					continue;
 			}
-
 
 			bool contains = false;
 
@@ -140,9 +139,9 @@ namespace TEN::Control::Volumes
 		TestVolumes(roomNumber, bbox, TriggerVolumeActivators::Static, mesh);
 	}
 
-	void TestVolumes(short itemNum)
+	void TestVolumes(short itemNumber)
 	{
-		auto item = &g_Level.Items[itemNum];
+		auto* item = &g_Level.Items[itemNumber];
 		auto bbox = TO_DX_BBOX(item->Pose, GetBoundsAccurate(item));
 
 #ifdef _DEBUG
@@ -150,10 +149,10 @@ namespace TEN::Control::Volumes
 #endif
 
 		if (item->ObjectNumber == ID_LARA)
-			TestVolumes(item->RoomNumber, bbox, TriggerVolumeActivators::Player, itemNum);
+			TestVolumes(item->RoomNumber, bbox, TriggerVolumeActivators::Player, itemNumber);
 		else if (Objects[item->ObjectNumber].intelligent)
-			TestVolumes(item->RoomNumber, bbox, TriggerVolumeActivators::NPC, itemNum);
+			TestVolumes(item->RoomNumber, bbox, TriggerVolumeActivators::NPC, itemNumber);
 		else
-			TestVolumes(item->RoomNumber, bbox, TriggerVolumeActivators::Movable, itemNum);
+			TestVolumes(item->RoomNumber, bbox, TriggerVolumeActivators::Movable, itemNumber);
 	}
 }
