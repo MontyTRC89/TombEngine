@@ -179,19 +179,19 @@ namespace TEN::Control::Volumes
 		int nodeCount = 0;
 		for (auto& set : g_Level.EventSets)
 		{
-			if ((set.OnEnter.Mode == VolumeEventMode::NodeEditor) && (set.OnEnter.Data.size() > 0))
+			if ((set.OnEnter.Mode == VolumeEventMode::Nodes) && (set.OnEnter.Data.size() > 0))
 			{
 				g_GameScript->ExecuteString(set.OnEnter.Data);
 				nodeCount++;
 			}
 
-			if ((set.OnInside.Mode == VolumeEventMode::NodeEditor) && (set.OnInside.Data.size() > 0))
+			if ((set.OnInside.Mode == VolumeEventMode::Nodes) && (set.OnInside.Data.size() > 0))
 			{
 				g_GameScript->ExecuteString(set.OnInside.Data);
 				nodeCount++;
 			}				
 
-			if ((set.OnLeave.Mode == VolumeEventMode::NodeEditor) && (set.OnLeave.Data.size() > 0))
+			if ((set.OnLeave.Mode == VolumeEventMode::Nodes) && (set.OnLeave.Data.size() > 0))
 			{
 				g_GameScript->ExecuteString(set.OnLeave.Data);
 				nodeCount++;

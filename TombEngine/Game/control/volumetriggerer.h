@@ -15,7 +15,7 @@ namespace TEN::Control::Volumes
 	enum class VolumeEventMode
 	{
 		LevelScript,
-		NodeEditor
+		Nodes
 	};
 
 	struct VolumeEvent
