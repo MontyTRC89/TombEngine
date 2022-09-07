@@ -10,7 +10,7 @@ namespace TEN::Utils
 	class BitField
 	{
 	private:
-		vector<bool> Container;
+		vector<bool> Bits;
 
 	public:
 		// Constructors
@@ -20,7 +20,7 @@ namespace TEN::Utils
 
 		// Getters
 		uint GetSize();
-		uint GetPackedBits();
+		uint GetPackedBits() const;
 
 		// Setters
 		void Set(const vector<uint>& indices);
@@ -42,7 +42,7 @@ namespace TEN::Utils
 		bool IsEmpty();
 
 		// Operators
-		operator uint();
+		operator uint() const;
 		BitField& operator =(uint packedBits);
 		BitField& operator |=(uint packedBits);
 		BitField  operator &(uint packedBits);

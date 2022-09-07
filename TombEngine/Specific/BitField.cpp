@@ -16,33 +16,33 @@ namespace TEN::Utils
 	BitField::BitField(uint size)
 	{
 		size = std::min<uint>(size, BIT_FIELD_SIZE_MAX);
-		this->Container.resize(size);
+		this->Bits.resize(size);
 	}
 
 	BitField::BitField(uint size, uint packedBits)
 	{
 		size = std::min<uint>(size, BIT_FIELD_SIZE_MAX);
-		this->Container.resize(size);
+		this->Bits.resize(size);
 
 		for (uint i = 0; i < size; i++)
 		{
 			uint bit = uint(1 << i);
 			if ((packedBits & bit) == bit)
-				this->Container[i] = true;
+				this->Bits[i] = true;
 		}
 	}
 
 	uint BitField::GetSize()
 	{
-		return Container.size();
+		return Bits.size();
 	}
 
-	uint BitField::GetPackedBits()
+	uint BitField::GetPackedBits() const
 	{
 		uint packedBits = 0;
-		for (uint i = 0; i < Container.size(); i++)
+		for (uint i = 0; i < Bits.size(); i++)
 		{
-			if (Container[i])
+			if (Bits[i])
 			{
 				uint bit = uint(1 << i);
 				packedBits |= bit;
@@ -56,8 +56,8 @@ namespace TEN::Utils
 	{
 		for (auto& index : indices)
 		{
-			if (index < Container.size())
-				this->Container[index] = true;
+			if (index < Bits.size())
+				this->Bits[index] = true;
 		}
 	}
 
@@ -75,8 +75,8 @@ namespace TEN::Utils
 	{
 		for (auto& index : indices)
 		{
-			if (index < Container.size())
-				this->Container[index] = false;
+			if (index < Bits.size())
+				this->Bits[index] = false;
 		}
 	}
 	
@@ -94,8 +94,8 @@ namespace TEN::Utils
 	{
 		for (auto& index : indices)
 		{
-			if (index < Container.size())
-				this->Container[index].flip();
+			if (index < Bits.size())
+				this->Bits[index].flip();
 		}
 	}
 	
@@ -106,14 +106,14 @@ namespace TEN::Utils
 
 	void BitField::FlipAll()
 	{
-		this->Container.flip();
+		this->Bits.flip();
 	}
 
 	bool BitField::Test(const vector<uint>& indices)
 	{
 		for (auto& index : indices)
 		{
-			if (Container[index])
+			if (Bits[index])
 				return true;
 		}
 
@@ -127,7 +127,7 @@ namespace TEN::Utils
 
 	bool BitField::TestAny()
 	{
-		for (auto& bit : this->Container)
+		for (auto& bit : this->Bits)
 		{
 			if (bit)
 				return true;
@@ -138,7 +138,7 @@ namespace TEN::Utils
 
 	bool BitField::TestAll()
 	{
-		for (auto& bit : this->Container)
+		for (auto& bit : this->Bits)
 		{
 			if (bit)
 				return true;
@@ -149,7 +149,7 @@ namespace TEN::Utils
 
 	bool BitField::IsFull()
 	{
-		for (auto& bit : this->Container)
+		for (auto& bit : this->Bits)
 		{
 			if (!bit)
 				return false;
@@ -160,7 +160,7 @@ namespace TEN::Utils
 
 	bool BitField::IsEmpty()
 	{
-		for (auto& bit : this->Container)
+		for (auto& bit : this->Bits)
 		{
 			if (bit)
 				return false;
@@ -169,20 +169,20 @@ namespace TEN::Utils
 		return true;
 	}
 
-	BitField::operator uint()
+	BitField::operator uint() const
 	{
 		return this->GetPackedBits();
 	}
 
 	BitField& BitField::operator =(uint packedBits)
 	{
-		for (uint i = 0; i < Container.size(); i++)
+		for (uint i = 0; i < Bits.size(); i++)
 		{
 			uint bit = uint(1 << i);
 			if ((packedBits & bit) == bit)
-				this->Container[i] = true;
+				this->Bits[i] = true;
 			else
-				this->Container[i] = false;
+				this->Bits[i] = false;
 		}
 
 		return *this;
@@ -190,11 +190,11 @@ namespace TEN::Utils
 
 	BitField& BitField::operator |=(uint packedBits)
 	{
-		for (uint i = 0; i < Container.size(); i++)
+		for (uint i = 0; i < Bits.size(); i++)
 		{
 			uint bit = uint(1 << i);
 			if ((packedBits & bit) == bit)
-				this->Container[i] = true;
+				this->Bits[i] = true;
 		}
 
 		return *this;
@@ -205,10 +205,10 @@ namespace TEN::Utils
 		BitField newBitField = {};
 		vector<uint> indices = {};
 
-		for (uint i = 0; i < Container.size(); i++)
+		for (uint i = 0; i < Bits.size(); i++)
 		{
 			uint bit = uint(1 << i);
-			if (Container[i] && (packedBits & bit) == bit)
+			if (Bits[i] && (packedBits & bit) == bit)
 				indices.push_back(i);
 		}
 
@@ -218,6 +218,6 @@ namespace TEN::Utils
 
 	void BitField::Fill(bool value)
 	{
-		std::fill(this->Container.begin(), this->Container.end(), value);
+		std::fill(this->Bits.begin(), this->Bits.end(), value);
 	}
 }
