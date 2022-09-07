@@ -2,9 +2,14 @@
 #include <d3d11.h>
 #include <SimpleMath.h>
 
-struct alignas(16) CSpriteBuffer
+using DirectX::SimpleMath::Matrix;
+using DirectX::SimpleMath::Vector4;
+
+struct alignas(4) CSpriteBuffer
 {
-	alignas(16) DirectX::SimpleMath::Matrix billboardMatrix;
-	alignas(16) DirectX::SimpleMath::Vector4 color;
-	alignas(16) bool isBillboard;
+	Matrix billboardMatrix;
+	Vector4 color;
+	float IsBillboard;
+	float IsSoftParticle;
+	Vector2 SpritesPadding;
 };

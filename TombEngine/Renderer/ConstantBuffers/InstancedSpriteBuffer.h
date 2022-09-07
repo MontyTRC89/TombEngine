@@ -13,7 +13,8 @@ namespace TEN
 			Matrix World;
 			Vector4 Color;
 			float IsBillboard;
-			Vector3 Padding;
+			float IsSoftParticle;
+			Vector2 SpritesPadding;
 		};
 
 		struct alignas(4) CInstancedSpriteBuffer

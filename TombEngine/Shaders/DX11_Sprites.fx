@@ -6,7 +6,9 @@ cbuffer SpriteBuffer: register(b9)
 {
 	float4x4 billboardMatrix;
 	float4 color;
-	bool isBillboard;
+	float isBillboard;
+	float IsSoftParticle;
+	float2 SpritesPadding;
 }
 
 struct PixelShaderInput
@@ -67,19 +69,22 @@ float4 PS(PixelShaderInput input) : SV_TARGET
 
 	DoAlphaTest(output);
 
-	float particleDepth = input.PositionCopy.z / input.PositionCopy.w;
-	input.PositionCopy.xy /= input.PositionCopy.w;
-	float2 texCoord = 0.5f * (float2(input.PositionCopy.x, -input.PositionCopy.y) + 1);
-	float sceneDepth = DepthMap.Sample(DepthMapSampler, texCoord).r;
+	if (IsSoftParticle == 1)
+	{
+		float particleDepth = input.PositionCopy.z / input.PositionCopy.w;
+		input.PositionCopy.xy /= input.PositionCopy.w;
+		float2 texCoord = 0.5f * (float2(input.PositionCopy.x, -input.PositionCopy.y) + 1);
+		float sceneDepth = DepthMap.Sample(DepthMapSampler, texCoord).r;
 
-	sceneDepth = LinearizeDepth(sceneDepth);
-	particleDepth = LinearizeDepth(particleDepth);
+		sceneDepth = LinearizeDepth(sceneDepth);
+		particleDepth = LinearizeDepth(particleDepth);
 
-	if (particleDepth - sceneDepth > 0.01f)
-		discard;
+		if (particleDepth - sceneDepth > 0.01f)
+			discard;
 
-	float fade = (sceneDepth - particleDepth) * 1024.0f;
-	output.w = min(output.w, fade);
+		float fade = (sceneDepth - particleDepth) * 1024.0f;
+		output.w = min(output.w, fade);
+	}
 
 	if (FogMaxDistance != 0)
 		output.xyz = lerp(output.xyz, FogColor, input.Fog);

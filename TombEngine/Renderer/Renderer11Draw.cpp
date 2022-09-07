@@ -404,7 +404,7 @@ namespace TEN::Renderer
 					{ 32,
 					Vector3::Distance(pos1, pos2) },
 					BLENDMODE_ALPHATEST,
-					d, view);
+					d, false, view);
 			}
 		}
 	}

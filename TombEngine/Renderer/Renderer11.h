@@ -558,15 +558,15 @@ namespace TEN::Renderer
 		float CalculateFrameRate();
 
 		void AddSpriteBillboard(RendererSprite* sprite, Vector3 pos, Vector4 color, float rotation, float scale,
-		                        Vector2 size, BLEND_MODES blendMode, RenderView& view);
+		                        Vector2 size, BLEND_MODES blendMode, bool softParticles, RenderView& view);
 		void AddSpriteBillboardConstrained(RendererSprite* sprite, Vector3 pos, Vector4 color, float rotation,
 		                                   float scale, Vector2 size, BLEND_MODES blendMode, Vector3 constrainAxis,
-		                                   RenderView& view);
+										   bool softParticles, RenderView& view);
 		void AddSpriteBillboardConstrainedLookAt(RendererSprite* sprite, Vector3 pos, Vector4 color, float rotation,
 		                                         float scale, Vector2 size, BLEND_MODES blendMode, Vector3 lookAtAxis,
-		                                         RenderView& view);
+												 bool softParticles, RenderView& view);
 		void AddSprite3D(RendererSprite* sprite, Vector3 vtx1, Vector3 vtx2, Vector3 vtx3, Vector3 vtx4, Vector4 color,
-		                 float rotation, float scale, Vector2 size, BLEND_MODES blendMode, RenderView& view);
+		                 float rotation, float scale, Vector2 size, BLEND_MODES blendMode, bool softParticles, RenderView& view);
 		Matrix GetWorldMatrixForSprite(RendererSpriteToDraw* spr, RenderView& view);
 
 		RendererMesh* GetMesh(int meshIndex);

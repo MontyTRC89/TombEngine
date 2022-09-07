@@ -4,7 +4,7 @@
 
 namespace TEN::Renderer 
 {
-	void Renderer11::AddSpriteBillboard(RendererSprite* sprite, Vector3 pos, Vector4 color, float rotation, float scale, Vector2 size, BLEND_MODES blendMode, RenderView& view)
+	void Renderer11::AddSpriteBillboard(RendererSprite* sprite, Vector3 pos, Vector4 color, float rotation, float scale, Vector2 size, BLEND_MODES blendMode, bool softParticles, RenderView& view)
 	{
 		if (m_Locked)
 			return;
@@ -26,11 +26,12 @@ namespace TEN::Renderer
 		spr.Width = size.x;
 		spr.Height = size.y;
 		spr.BlendMode = blendMode;
+		spr.SoftParticle = softParticles;
 
 		view.spritesToDraw.push_back(spr);
 	}
 
-	void Renderer11::AddSpriteBillboardConstrained(RendererSprite* sprite, Vector3 pos, Vector4 color, float rotation, float scale, Vector2 size, BLEND_MODES blendMode, Vector3 constrainAxis, RenderView& view)
+	void Renderer11::AddSpriteBillboardConstrained(RendererSprite* sprite, Vector3 pos, Vector4 color, float rotation, float scale, Vector2 size, BLEND_MODES blendMode, Vector3 constrainAxis, bool softParticles, RenderView& view)
 	{
 		if (m_Locked)
 			return;
@@ -53,11 +54,12 @@ namespace TEN::Renderer
 		spr.Height = size.y;
 		spr.BlendMode = blendMode;
 		spr.ConstrainAxis = constrainAxis;
+		spr.SoftParticle = softParticles;
 
 		view.spritesToDraw.push_back(spr);
 	}
 
-	void Renderer11::AddSpriteBillboardConstrainedLookAt(RendererSprite* sprite, Vector3 pos, Vector4 color, float rotation, float scale, Vector2 size, BLEND_MODES blendMode, Vector3 lookAtAxis, RenderView& view)
+	void Renderer11::AddSpriteBillboardConstrainedLookAt(RendererSprite* sprite, Vector3 pos, Vector4 color, float rotation, float scale, Vector2 size, BLEND_MODES blendMode, Vector3 lookAtAxis, bool softParticles, RenderView& view)
 	{
 		if (m_Locked)
 			return;
@@ -78,12 +80,13 @@ namespace TEN::Renderer
 		spr.Height = size.y;
 		spr.BlendMode = blendMode;
 		spr.LookAtAxis = lookAtAxis;
+		spr.SoftParticle = softParticles;
 
 		view.spritesToDraw.push_back(spr);
 
 	}
 
-	void Renderer11::AddSprite3D(RendererSprite* sprite, Vector3 vtx1, Vector3 vtx2, Vector3 vtx3, Vector3 vtx4, Vector4 color, float rotation, float scale, Vector2 size, BLEND_MODES blendMode, RenderView& view)
+	void Renderer11::AddSprite3D(RendererSprite* sprite, Vector3 vtx1, Vector3 vtx2, Vector3 vtx3, Vector3 vtx4, Vector4 color, float rotation, float scale, Vector2 size, BLEND_MODES blendMode, bool softParticles, RenderView& view)
 	{
 		if (m_Locked)
 			return;
@@ -109,6 +112,7 @@ namespace TEN::Renderer
 		spr.Height = size.y;
 		spr.BlendMode = blendMode;
 		spr.pos = (vtx1 + vtx2 + vtx3 + vtx4) / 4.0f;
+		spr.SoftParticle = softParticles;
 
 		view.spritesToDraw.push_back(spr);
 	}

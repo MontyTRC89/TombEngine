@@ -78,25 +78,28 @@ float LinearizeDepth(float depth)
 	return (2.0f * NearPlane) / (FarPlane + NearPlane - depth * (FarPlane - NearPlane));
 }
 
-float4 PS(PixelShaderInput input) : SV_TARGET
+float4 PS(PixelShaderInput input, uint InstanceID : SV_InstanceID) : SV_TARGET
 {
 	float4 output = Texture.Sample(Sampler, input.UV) * input.Color;
 
 	DoAlphaTest(output);
 
-	float particleDepth = input.PositionCopy.z / input.PositionCopy.w;
-	input.PositionCopy.xy /= input.PositionCopy.w;
-	float2 texCoord = 0.5f * (float2(input.PositionCopy.x, -input.PositionCopy.y) + 1);
-	float sceneDepth = DepthMap.Sample(DepthMapSampler, texCoord).r;
+	if (Sprites[InstanceID].IsSoftParticle == 1)
+	{
+		float particleDepth = input.PositionCopy.z / input.PositionCopy.w;
+		input.PositionCopy.xy /= input.PositionCopy.w;
+		float2 texCoord = 0.5f * (float2(input.PositionCopy.x, -input.PositionCopy.y) + 1);
+		float sceneDepth = DepthMap.Sample(DepthMapSampler, texCoord).r;
 
-	sceneDepth = LinearizeDepth(sceneDepth);
-	particleDepth = LinearizeDepth(particleDepth);
+		sceneDepth = LinearizeDepth(sceneDepth);
+		particleDepth = LinearizeDepth(particleDepth);
 
-	if (particleDepth - sceneDepth > 0.01f)
-		discard;
+		if (particleDepth - sceneDepth > 0.01f)
+			discard;
 
-	float fade = (sceneDepth - particleDepth) * 1024.0f;
-	output.w = min(output.w, fade);
+		float fade = (sceneDepth - particleDepth) * 1024.0f;
+		output.w = min(output.w, fade);
+	}
 
 	if (FogMaxDistance != 0)
 		output.xyz = lerp(output.xyz, FogColor, input.Fog);
