@@ -4,7 +4,7 @@ enum GAME_OBJECT_ID : short
 {
 	ID_NO_OBJECT = -1,
 
-	/* Lara Primary Slot */
+	// Lara primary slot
 	ID_LARA,
 	ID_LARA_EXTRA_ANIMS,
 	ID_PISTOLS_ANIM,
@@ -44,7 +44,7 @@ enum GAME_OBJECT_ID : short
 	ID_LARA_TORCH_ANIM,
 	ID_LARA_HAIR,
 
-	/* Lara Vehicles */
+	// Vehicles
 	ID_SNOWMOBILE_LARA_ANIMS = 50,
 	ID_SNOWMOBILE,
 	ID_QUAD_LARA_ANIMS,
@@ -69,9 +69,9 @@ enum GAME_OBJECT_ID : short
 	ID_VEHICLE_SMASHABLE_FLOOR = 90, // NEW
 	ID_VEHICLE_SMASHABLE_WALL, // NEW
 
-	/* Enemy */
+	// Enemy
 
-	/* Animals */
+	// Animals
 	ID_WOLF = 100,
 	ID_BEAR,
 	ID_APE,
@@ -113,7 +113,7 @@ enum GAME_OBJECT_ID : short
 	ID_CROCODILE_GOD,		// TR4 - OK (needs accurate testing)
 	ID_LOCUSTS_EMITTER,		// TR4 - OK
 
-	/* Humans */
+	// Humans
 	ID_SCUBA_HARPOON = 150,
 	ID_SCUBA_DIVER,
 	ID_BADDY_SILENCER1,
@@ -163,7 +163,7 @@ enum GAME_OBJECT_ID : short
 	ID_SNIPER,
 	ID_CHEF,
 
-	/* Supernatural, boss and others */
+	// Supernatural, bosses, and others
 	ID_WINGED_MUMMY = 220,
 	ID_CENTAUR_MUTANT,
 	ID_LARA_DOPPELGANGER,
@@ -228,7 +228,7 @@ enum GAME_OBJECT_ID : short
 	ID_BROWN_BEAST,
 	ID_ATTACK_SUB,
 	ID_IMP,
-	ID_IMP_ROCK,			// maybe needed for imp so moved here !
+	ID_IMP_ROCK,			// Maybe needed for imp so moved here.
 	ID_GUNSHIP,
 	ID_AUTOGUN,
 	ID_ROMAN_GOD1,
@@ -238,7 +238,7 @@ enum GAME_OBJECT_ID : short
 	ID_BOSS_EXPLOSION_SHOCKWAVE,
 	ID_BOSS_EXPLOSION_RING,
 
-	/* Traps / Doors */
+	// Traps and doors
 	ID_SPRINGBOARD = 320,
 	ID_ROLLING_SPINDLE,
 	ID_DISK_SHOOTER,
@@ -337,7 +337,7 @@ enum GAME_OBJECT_ID : short
 	ID_GEN_SLOT3,
 	ID_GEN_SLOT4,
 
-	/* Searchable Objects */
+	// Searchable objects
 	ID_SEARCH_OBJECT1,
 	ID_SEARCH_OBJECT2,
 	ID_SEARCH_OBJECT3,
@@ -370,7 +370,7 @@ enum GAME_OBJECT_ID : short
 	ID_TRAIN,
 	ID_EXPLOSION,
 
-	/* Items */
+	// Items
 	ID_PUZZLE_ITEM1 = 500,
 	ID_PUZZLE_ITEM2,
 	ID_PUZZLE_ITEM3,
@@ -598,7 +598,7 @@ enum GAME_OBJECT_ID : short
 	ID_WATERSKIN2_4,				// TR4 Big waterskin 4L - OK
 	ID_WATERSKIN2_5,				// TR4 Big waterskin 5L - OK
 
-	/* Misc inventory objects */
+	// Miscellaneous inventory objects
 	ID_HAMMER_ITEM = 750,
 	ID_CROWBAR_ITEM,				// TR4 - OK
 	ID_BURNING_TORCH_ITEM,
@@ -606,7 +606,7 @@ enum GAME_OBJECT_ID : short
 	ID_CLOCKWORK_BEETLE_COMBO1,		// TR4 - OK
 	ID_CLOCKWORK_BEETLE_COMBO2,		// TR4 - OK
 
-	/* Switches */
+	// Switches
 	ID_SWITCH_TYPE1 = 800,			// OK
 	ID_SWITCH_TYPE2,				// OK
 	ID_SWITCH_TYPE3,				// OK
@@ -695,7 +695,7 @@ enum GAME_OBJECT_ID : short
 	ID_STEEL_DOOR,
 	ID_GOD_HEAD,
 
-	/* Lara Items */
+	// Lara items
 	ID_PISTOLS_ITEM = 950,
 	ID_PISTOLS_AMMO_ITEM,
 	ID_UZI_ITEM,
@@ -740,14 +740,14 @@ enum GAME_OBJECT_ID : short
 	ID_PC_LOAD_SAVE_ITEM,
 	ID_OPEN_DIARY_ITEM,
 
-	/* Inventory main objects */
+	// Main inventory objects
 	ID_INVENTORY_PASSPORT = 1000,
 	ID_INVENTORY_SUNGLASSES,
 	ID_INVENTORY_KEYS,
 	ID_INVENTORY_HEADPHONES,
 	ID_INVENTORY_POLAROID,
 
-	/* other effect in-game */
+	// Other in-gam eeffect
 	ID_SMOKE_EMITTER_WHITE = 1020,
 	ID_SMOKE_EMITTER_BLACK,
 	ID_STEAM_EMITTER,

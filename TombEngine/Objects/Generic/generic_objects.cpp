@@ -461,6 +461,7 @@ void StartTraps()
 		object->saveFlags = true;
 		object->savePosition = true;
 		object->usingDrawAnimatingItem = true;
+		object->isPickup = true;
 	}
 }
 
