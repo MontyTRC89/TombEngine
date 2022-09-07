@@ -35,6 +35,7 @@ public:
 	void SetSlot(int slot);
 	ScriptColor GetColor() const;
 	void SetColor(ScriptColor const & col);
+	void Shatter();
 
 private:
 	MESH_INFO & m_mesh;

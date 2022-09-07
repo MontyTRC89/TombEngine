@@ -1,6 +1,7 @@
 #pragma once
 #include "framework.h"
 
+#include "Game/effects/debris.h"
 #include "ScriptAssert.h"
 #include "StaticObject.h"
 #include "Vec3/Vec3.h"
@@ -87,7 +88,11 @@ void Static::Register(sol::table & parent)
 		/// Set the static's color
 		// @function Static:SetColor
 		// @tparam Color color the new color of the static 
-		ScriptReserved_SetColor, &Static::SetColor);
+		ScriptReserved_SetColor, &Static::SetColor,
+
+		/// Shatter static mesh
+		// @function Static:Shatter
+		ScriptReserved_Shatter, &Static::Shatter);
 }
 
 Vec3 Static::GetPos() const
@@ -175,4 +180,9 @@ ScriptColor Static::GetColor() const
 void Static::SetColor(ScriptColor const& col)
 {
 	m_mesh.color = col;
+}
+
+void Static::Shatter()
+{
+	ShatterObject(nullptr, &m_mesh, -128, m_mesh.roomNumber, 0);
 }

@@ -787,6 +787,7 @@ void ReadRooms()
 			mesh.HitPoints = ReadInt16();
 			mesh.luaName = ReadString();
 
+			mesh.roomNumber = i;
 			g_GameScriptEntities->AddName(mesh.luaName, mesh);
 		}
 
