@@ -2,6 +2,7 @@
 #include "./AlphaTestBuffer.hlsli"
 #include "./VertexInput.hlsli"
 #include "./InstancedSpriteBuffer.hlsli"
+#include "./Math.hlsli"
 
 cbuffer SpriteBuffer: register(b9)
 {
@@ -56,6 +57,27 @@ PixelShaderInput VS(VertexShaderInput input, uint InstanceID : SV_InstanceID)
 	return output;
 }
 
+// TODO: From NVIDIA SDK, check if it can be useful instead of linear ramp
+float Contrast(float Input, float ContrastPower)
+{
+#if 1
+	//piecewise contrast function
+	bool IsAboveHalf = Input > 0.5;
+	float ToRaise = saturate(2 * (IsAboveHalf ? 1 - Input : Input));
+	float Output = 0.5 * pow(ToRaise, ContrastPower);
+	Output = IsAboveHalf ? 1 - Output : Output;
+	return Output;
+#else
+	// another solution to create a kind of contrast function
+	return 1.0 - exp2(-2 * pow(2.0 * saturate(Input), ContrastPower));
+#endif
+}
+
+float LinearizeDepth(float depth)
+{
+	return (2.0f * NearPlane) / (FarPlane + NearPlane - depth * (FarPlane - NearPlane));
+}
+
 float4 PS(PixelShaderInput input) : SV_TARGET
 {
 	float4 output = Texture.Sample(Sampler, input.UV) * input.Color;
@@ -67,10 +89,13 @@ float4 PS(PixelShaderInput input) : SV_TARGET
 	float2 texCoord = 0.5f * (float2(input.PositionCopy.x, -input.PositionCopy.y) + 1);
 	float sceneDepth = DepthMap.Sample(DepthMapSampler, texCoord).r;
 
-	if (particleDepth > sceneDepth)
+	sceneDepth = LinearizeDepth(sceneDepth);
+	particleDepth = LinearizeDepth(particleDepth);
+
+	if (particleDepth - sceneDepth > 0.01f)
 		discard;
 
-	float fade = (sceneDepth - particleDepth) * 300.0F;
+	float fade = (sceneDepth - particleDepth) * 1024.0f;
 	output.w = min(output.w, fade);
 
 	if (FogMaxDistance != 0)

@@ -38,6 +38,8 @@ namespace TEN::Renderer
 		Vector2 InvViewSize;
 		int RoomNumber;
 		Frustum frustum;
+		float NearPlane;
+		float FarPlane;
 
 		RenderViewCamera(CAMERA_INFO* cam, float roll, float fov, float n, float f, int w, int h);
 		RenderViewCamera(const Vector3& pos, const Vector3& dir, const Vector3& up, int room, int width, int height, float fov, float n, float f);

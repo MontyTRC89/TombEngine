@@ -11,8 +11,4 @@ struct InstancedSprite
 cbuffer InstancedSpriteBuffer : register(b13)
 {
 	InstancedSprite Sprites[MAX_SPRITES];
-
-	//float4x4 World[MAX_SPRITES];
-	//float4 Color[MAX_SPRITES];
-	//float IsBillboard[MAX_SPRITES];
 };

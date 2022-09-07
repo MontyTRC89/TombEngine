@@ -56,6 +56,11 @@ PixelShaderInput VS(VertexShaderInput input)
 	return output;
 }
 
+float LinearizeDepth(float depth)
+{
+	return (2.0f * NearPlane) / (FarPlane + NearPlane - depth * (FarPlane - NearPlane));
+}
+
 float4 PS(PixelShaderInput input) : SV_TARGET
 {
 	float4 output = Texture.Sample(Sampler, input.UV) * input.Color;
@@ -67,10 +72,13 @@ float4 PS(PixelShaderInput input) : SV_TARGET
 	float2 texCoord = 0.5f * (float2(input.PositionCopy.x, -input.PositionCopy.y) + 1);
 	float sceneDepth = DepthMap.Sample(DepthMapSampler, texCoord).r;
 
-	if (particleDepth > sceneDepth)
+	sceneDepth = LinearizeDepth(sceneDepth);
+	particleDepth = LinearizeDepth(particleDepth);
+
+	if (particleDepth - sceneDepth > 0.01f)
 		discard;
 
-	float fade = (sceneDepth - particleDepth) * 300.0F;
+	float fade = (sceneDepth - particleDepth) * 1024.0f;
 	output.w = min(output.w, fade);
 
 	if (FogMaxDistance != 0)
