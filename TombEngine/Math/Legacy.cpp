@@ -65,14 +65,14 @@ float phd_cos(short a)
 	return cos(TO_RAD(a));
 }
 
-int mGetAngle(int x1, int y1, int x2, int y2)
-{
-	return (65536 - phd_atan(x2 - x1, y2 - y1)) % 65536;
-}
-
 int phd_atan(int x, int y)
 {
 	return FROM_RAD(atan2(y, x));
+}
+
+int mGetAngle(int x1, int y1, int x2, int y2)
+{
+	return (65536 - phd_atan(x2 - x1, y2 - y1)) % 65536;
 }
 
 void phd_RotBoundingBoxNoPersp(PoseData* pos, BOUNDING_BOX* bounds, BOUNDING_BOX* tbounds)
@@ -166,35 +166,6 @@ BoundingOrientedBox TO_DX_BBOX(PoseData pos, BOUNDING_BOX* box)
 	return result;
 }
 
-__int64 FP_Mul(__int64 a, __int64 b)
-{
-	return (int)((((__int64)a * (__int64)b)) >> FP_SHIFT);
-}
-
-__int64 FP_Div(__int64 a, __int64 b)
-{
-	return (int)(((a) / (b >> 8)) << 8);
-}
-
-void FP_VectorMul(Vector3i* v, int scale, Vector3i* result)
-{
-	result->x = FP_FromFixed(v->x * scale);
-	result->y = FP_FromFixed(v->y * scale);
-	result->z = FP_FromFixed(v->z * scale);
-}
-
-int FP_DotProduct(Vector3i* a, Vector3i* b)
-{
-	return ((a->x * b->x) + (a->y * b->y) + (a->z * b->z)) >> W2V_SHIFT;
-}
-
-void FP_CrossProduct(Vector3i* a, Vector3i* b, Vector3i* result)
-{
-	result->x = ((a->y * b->z) - (a->z * b->y)) >> W2V_SHIFT;
-	result->y = ((a->z * b->x) - (a->x * b->z)) >> W2V_SHIFT;
-	result->z = ((a->x * b->y) - (a->y * b->x)) >> W2V_SHIFT;
-}
-
 void FP_GetMatrixAngles(MATRIX3D* m, short* angles)
 {
 	short yaw = phd_atan(m->m22, m->m02);
@@ -213,41 +184,4 @@ void FP_GetMatrixAngles(MATRIX3D* m, short* angles)
 	angles[0] = pitch;
 	angles[1] = yaw;
 	angles[2] = roll;
-}
-
-__int64 FP_ToFixed(__int64 value)
-{
-	return (value << FP_SHIFT);
-}
-
-__int64 FP_FromFixed(__int64 value)
-{
-	return (value >> FP_SHIFT);
-}
-
-Vector3i* FP_Normalise(Vector3i* v)
-{
-	long a = v->x >> FP_SHIFT;
-	long b = v->y >> FP_SHIFT;
-	long c = v->z >> FP_SHIFT;
-
-	if (a == 0 && b == 0 && c == 0)
-		return v;
-
-	a = a * a;
-	b = b * b;
-	c = c * c;
-	long d = (a + b + c);
-	long e = sqrt(abs(d));
-
-	e <<= FP_SHIFT;
-
-	long mod = FP_Div(FP_ONE << 8, e);
-	mod >>= 8;
-
-	v->x = FP_Mul(v->x, mod);
-	v->y = FP_Mul(v->y, mod);
-	v->z = FP_Mul(v->z, mod);
-
-	return v;
 }
