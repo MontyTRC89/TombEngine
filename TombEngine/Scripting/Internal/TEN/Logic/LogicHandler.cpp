@@ -146,34 +146,6 @@ void LogicHandler::FreeLevelScripts()
 	m_handler.GetState()->collect_garbage();
 }
 
-void JumpToLevel(int levelNum)
-{
-	if (levelNum >= g_GameFlow->GetNumLevels())
-		return;
-
-	LevelComplete = levelNum;
-}
-
-int GetSecretsCount()
-{
-	return Statistics.Level.Secrets;
-}
-
-void SetSecretsCount(int secretsNum)
-{
-	if (secretsNum > 255)
-		return;
-	Statistics.Level.Secrets = secretsNum;
-}
-
-void AddOneSecret()
-{
-	if (Statistics.Level.Secrets >= 255)
-		return;
-	Statistics.Level.Secrets++;
-	PlaySecretTrack();
-}
-
 void LogicHandler::SetVariables(std::vector<SavedVar> const & vars)
 {
 	ResetGameTables();
