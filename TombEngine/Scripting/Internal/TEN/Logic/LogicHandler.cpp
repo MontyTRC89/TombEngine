@@ -31,7 +31,7 @@ static const std::unordered_map<std::string, CallbackPoint> kCallbackPoints
 	{"POSTCONTROLPHASE", CallbackPoint::PostControl},
 };
 
-using LevelFuncsTable = std::pair<sol::table, std::string>;
+static constexpr char const* strKey = "__internal_name";
 
 void SetVariable(sol::table tab, sol::object key, sol::object value)
 {
@@ -96,7 +96,10 @@ LogicHandler::LogicHandler(sol::state* lua, sol::table & parent) : m_handler{ lu
 
 void LogicHandler::ResetGameTables() 
 {
-	MakeSpecialTable(m_handler.GetState(), ScriptReserved_GameVars, &GetVariable, &SetVariable);
+	auto state = m_handler.GetState();
+	MakeSpecialTable(state, ScriptReserved_GameVars, &GetVariable, &SetVariable);
+
+	(*state)[ScriptReserved_GameVars][ScriptReserved_Engine] = sol::table{ *state, sol::create };
 }
 
 /*** Register a function as a callback.
@@ -153,10 +156,12 @@ void LogicHandler::RemoveCallback(CallbackPoint point, LevelFunc const & lf)
 	}
 }
 
-	static constexpr char const* strKey = "__internal_name";
 void LogicHandler::ResetLevelTables()
 {
-	MakeSpecialTable(m_handler.GetState(), ScriptReserved_LevelVars, &GetVariable, &SetVariable);
+	auto state = m_handler.GetState();
+	MakeSpecialTable(state, ScriptReserved_LevelVars, &GetVariable, &SetVariable);
+
+	(*state)[ScriptReserved_LevelVars][ScriptReserved_Engine] = sol::table{ *state, sol::create };
 }
 
 sol::object LogicHandler::GetLevelFuncsMember(sol::table tab, std::string const& luaName)
@@ -177,13 +182,24 @@ sol::object LogicHandler::GetLevelFuncsMember(sol::table tab, std::string const&
 void LogicHandler::CallLevelFunc(std::string const & name, float dt)
 {
 	sol::protected_function f = m_levelFuncs_luaFunctions[name];
-	f.call(dt);
+	auto r = f.call(dt);
+
+	if (!r.valid())
+	{
+		sol::error err = r;
+		ScriptAssertF(false, "Could not execute function {}: {}", name, err.what());
+	}
 }
 
 void LogicHandler::CallLevelFunc(std::string const & name, sol::variadic_args va)
 {
 	sol::protected_function f = m_levelFuncs_luaFunctions[name];
-	f.call(va);
+	auto r = f.call(va);
+	if (!r.valid())
+	{
+		sol::error err = r;
+		ScriptAssertF(false, "Could not execute function {}: {}", name, err.what());
+	}
 }
 
 bool LogicHandler::SetLevelFuncsMember(sol::table tab, std::string const& luaName, sol::object value)
@@ -274,14 +290,14 @@ void LogicHandler::ResetScripts(bool clearGameVars)
 
 void LogicHandler::FreeLevelScripts()
 {
-	//m_levelFuncs.clear();
-	//m_levelFuncs = 
 	m_levelFuncs = MakeSpecialTable(m_handler.GetState(), ScriptReserved_LevelFuncs, &LogicHandler::GetLevelFuncsMember, &LogicHandler::SetLevelFuncsMember, this);
 	m_levelFuncs.raw_set(strKey, ScriptReserved_LevelFuncs);
 
+	m_levelFuncs[ScriptReserved_Engine] = sol::table{ *m_handler.GetState(), sol::create };
+
 	m_levelFuncs_tablesOfNames.clear();
 	m_levelFuncs_luaFunctions.clear();
-	m_levelFuncs_levelFuncObjects = sol::table{ *(m_handler.GetState()), sol::create };
+	m_levelFuncs_levelFuncObjects = sol::table{ *m_handler.GetState(), sol::create };
 
 	m_levelFuncs_tablesOfNames.emplace(std::make_pair(ScriptReserved_LevelFuncs, std::unordered_map<std::string, std::string>{}));
 
@@ -591,36 +607,25 @@ void LogicHandler::ExecuteScriptFile(const std::string & luaFilename)
 	m_handler.ExecuteScript(luaFilename);
 }
 
+// These wind up calling CallLevelFunc, which is where all the error checking is.
 void LogicHandler::ExecuteFunction(std::string const& name, short idOne, short idTwo) 
 {
-	sol::protected_function_result r;
 	sol::protected_function func = m_levelFuncs_luaFunctions[name];
 
-	r = func(std::make_unique<Moveable>(idOne), std::make_unique<Moveable>(idTwo));
-	if (!r.valid())
-	{
-		sol::error err = r;
-		ScriptAssertF(false, "Could not execute function {}: {}", name, err.what());
-	}
+	func(std::make_unique<Moveable>(idOne), std::make_unique<Moveable>(idTwo));
+
 }
 
 void LogicHandler::ExecuteFunction(std::string const& name, TEN::Control::Volumes::VolumeTriggerer triggerer, std::string const& arguments)
 {
-	sol::protected_function_result r;
 	sol::protected_function func = (*m_handler.GetState())["LevelFuncs"][name.c_str()];
 	if (std::holds_alternative<short>(triggerer))
 	{
-		r = func(std::make_unique<Moveable>(std::get<short>(triggerer), true), arguments);
+		func(std::make_unique<Moveable>(std::get<short>(triggerer), true), arguments);
 	}
 	else
 	{
-		r = func(nullptr, arguments);
-	}
-
-	if (!r.valid())
-	{
-		sol::error err = r;
-		ScriptAssertF(false, "Could not execute function {}: {}", name, err.what());
+		func(nullptr, arguments);
 	}
 }
 
@@ -704,6 +709,9 @@ some time later, the values `3` will be put back into `LevelVars.enemiesKilled.`
 __This table is emptied when a level is finished.__ If the player needs to be able
 to return to the level (like in the Karnak and Alexandria levels in *The Last Revelation*),
 you will need to use the @{GameVars} table, below.
+
+__LevelVars.Engine is a reserved table used internally by TombEngine's libs. Do not modify, overwrite, or add to it.__
+
 @table LevelVars
 */
 
@@ -724,6 +732,9 @@ And in the script file for the level with the boss, you could write:
 	end
 
 Unlike @{LevelVars}, this table will remain intact for the entirety of the game.
+
+__GameVars.Engine is a reserved table used internally by TombEngine's libs. Do not modify, overwrite, or add to it.__
+
 @table GameVars
 */
 
@@ -750,10 +761,10 @@ You can organise functions into tables within the hierarchy:
 		-- implementation goes here
 	end
 
-There are two special subtables which you should not overwrite:
+There are two special subtables which you should __not__ overwrite:
 
-	LevelFuncs.TEN -- this is for 'first-party' functions, i.e. ones that come with TombEngine.
-	LevelFuncs.Ext -- this is for 'third-party' functions. If you write a library providing LevelFuncs functions for other builders to use in their levels, put those functions in LevelFuncs.Ext.YourLibraryNameHere
+	LevelFuncs.Engine -- this is for 'first-party' functions, i.e. ones that come with TombEngine.
+	LevelFuncs.External -- this is for 'third-party' functions. If you write a library providing LevelFuncs functions for other builders to use in their levels, put those functions in LevelFuncs.External.YourLibraryNameHere
 
 The following are the level callbacks. They are optional; if your level has no special
 behaviour for a particular scenario, you do not need to implement the function. For
