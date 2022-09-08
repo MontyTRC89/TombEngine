@@ -67,13 +67,14 @@ namespace TEN::Entities::TR4
 			item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 20 && // Hardcoded frame range.
 			item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].frameBase + 60)
 		{
-			// Blades incur damage cumulatively.
+			// Blades deal damage cumulatively.
 			for (int i = 0; i < StargateHarmJoints.size(); i++)
 			{
 				if (item->TestBits(JointBitType::Touch, StargateHarmJoints[i]));
 				{
 					DoDamage(laraItem, STARGATE_HARM_DAMAGE);
-					DoBloodSplat((GetRandomControl() & 0x3F) + laraItem->Pose.Position.x - 32,
+					DoBloodSplat(
+						(GetRandomControl() & 0x3F) + laraItem->Pose.Position.x - 32,
 						(GetRandomControl() & 0x1F) + CreatureSpheres[i].y - 16,
 						(GetRandomControl() & 0x3F) + laraItem->Pose.Position.z - 32,
 						(GetRandomControl() & 3) + 2,

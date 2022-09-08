@@ -453,7 +453,7 @@ bool MoveLaraPosition(Vector3Int* offset, ItemInfo* item, ItemInfo* laraItem)
 {
 	auto* lara = GetLaraInfo(laraItem);
 
-	Matrix matrix = Matrix::CreateFromYawPitchRoll(
+	auto matrix = Matrix::CreateFromYawPitchRoll(
 		TO_RAD(item->Pose.Orientation.y),
 		TO_RAD(item->Pose.Orientation.x),
 		TO_RAD(item->Pose.Orientation.z)
@@ -515,9 +515,9 @@ bool ItemNearLara(PHD_3DPOS* pos, int radius)
 	return false;
 }
 
-bool ItemNearTarget(PHD_3DPOS* origin, ItemInfo* target, int radius)
+bool ItemNearTarget(PHD_3DPOS* fromPose, ItemInfo* targetEntity, int radius)
 {
-	auto pos = origin->Position - target->Pose.Position;
+	auto pos = fromPose->Position - targetEntity->Pose.Position;
 
 	if (!ItemCollide(pos.y, ITEM_RADIUS_YMAX))
 		return false;
@@ -528,22 +528,22 @@ bool ItemNearTarget(PHD_3DPOS* origin, ItemInfo* target, int radius)
 	if (!ItemInRange(pos.x, pos.z, radius))
 		return false;
 
-	auto* bounds = GetBoundsAccurate(target);
+	auto* bounds = GetBoundsAccurate(targetEntity);
 	if (pos.y >= bounds->Y1 && pos.y <= bounds->Y2)
 		return true;
 
 	return false;
 }
 
-bool Move3DPosTo3DPos(PHD_3DPOS* origin, PHD_3DPOS* target, int velocity, short angleAdd)
+bool Move3DPosTo3DPos(PHD_3DPOS* fromPose, PHD_3DPOS* toPose, int velocity, short angleAdd)
 {
-	auto direction = target->Position - origin->Position;
+	auto direction = toPose->Position - fromPose->Position;
 	int distance = sqrt(SQUARE(direction.x) + SQUARE(direction.y) + SQUARE(direction.z));
 
 	if (velocity < distance)
-		origin->Position += direction * velocity / distance;
+		fromPose->Position += direction * velocity / distance;
 	else
-		origin->Position = target->Position;
+		fromPose->Position = toPose->Position;
 
 	if (!Lara.Control.IsMoving)
 	{
@@ -551,8 +551,8 @@ bool Move3DPosTo3DPos(PHD_3DPOS* origin, PHD_3DPOS* target, int velocity, short 
 
 		if (shouldAnimate && Lara.Control.WaterStatus != WaterStatus::Underwater)
 		{
-			int angle = mGetAngle(target->Position.x, target->Position.z, origin->Position.x, origin->Position.z);
-			int direction = (GetQuadrant(angle) - GetQuadrant(target->Orientation.y)) & 3;
+			int angle = mGetAngle(toPose->Position.x, toPose->Position.z, fromPose->Position.x, fromPose->Position.z);
+			int direction = (GetQuadrant(angle) - GetQuadrant(toPose->Orientation.y)) & 3;
 
 			switch (direction)
 			{
@@ -583,31 +583,31 @@ bool Move3DPosTo3DPos(PHD_3DPOS* origin, PHD_3DPOS* target, int velocity, short 
 		Lara.Control.Count.PositionAdjust = 0;
 	}
 
-	short deltaAngle = target->Orientation.x - origin->Orientation.x;
+	short deltaAngle = toPose->Orientation.x - fromPose->Orientation.x;
 	if (deltaAngle > angleAdd)
-		origin->Orientation.x += angleAdd;
+		fromPose->Orientation.x += angleAdd;
 	else if (deltaAngle < -angleAdd)
-		origin->Orientation.x -= angleAdd;
+		fromPose->Orientation.x -= angleAdd;
 	else
-		origin->Orientation.x = target->Orientation.x;
+		fromPose->Orientation.x = toPose->Orientation.x;
 
-	deltaAngle = target->Orientation.y - origin->Orientation.y;
+	deltaAngle = toPose->Orientation.y - fromPose->Orientation.y;
 	if (deltaAngle > angleAdd)
-		origin->Orientation.y += angleAdd;
+		fromPose->Orientation.y += angleAdd;
 	else if (deltaAngle < -angleAdd)
-		origin->Orientation.y -= angleAdd;
+		fromPose->Orientation.y -= angleAdd;
 	else
-		origin->Orientation.y = target->Orientation.y;
+		fromPose->Orientation.y = toPose->Orientation.y;
 
-	deltaAngle = target->Orientation.z - origin->Orientation.z;
+	deltaAngle = toPose->Orientation.z - fromPose->Orientation.z;
 	if (deltaAngle > angleAdd)
-		origin->Orientation.z += angleAdd;
+		fromPose->Orientation.z += angleAdd;
 	else if (deltaAngle < -angleAdd)
-		origin->Orientation.z -= angleAdd;
+		fromPose->Orientation.z -= angleAdd;
 	else
-		origin->Orientation.z = target->Orientation.z;
+		fromPose->Orientation.z = toPose->Orientation.z;
 
-	return (origin->Position == target->Position && origin->Orientation == target->Orientation);
+	return (fromPose->Position == toPose->Position && fromPose->Orientation == toPose->Orientation);
 }
 
 bool TestBoundsCollide(ItemInfo* item, ItemInfo* laraItem, int radius)
@@ -688,11 +688,7 @@ bool ItemPushItem(ItemInfo* item, ItemInfo* item2, CollisionInfo* coll, bool spa
 	int rx = (dx * cosY) - (dz * sinY);
 	int rz = (dz * cosY) + (dx * sinY);
 
-	BOUNDING_BOX* bounds;
-	if (bigPush & 2)
-		bounds = &GlobalCollisionBounds;
-	else
-		bounds = (BOUNDING_BOX*)GetBestFrame(item);
+	auto* bounds = (bigPush & 2) ? &GlobalCollisionBounds : (BOUNDING_BOX*)GetBestFrame(item);
 
 	int minX = bounds->X1;
 	int maxX = bounds->X2;
@@ -729,8 +725,8 @@ bool ItemPushItem(ItemInfo* item, ItemInfo* item2, CollisionInfo* coll, bool spa
 	else
 		rz -= bottom;
 
-	item2->Pose.Position.x = item->Pose.Position.x + cosY * rx + sinY * rz;
-	item2->Pose.Position.z = item->Pose.Position.z + cosY * rz - sinY * rx;
+	item2->Pose.Position.x = item->Pose.Position.x + (rx * cosY) + (rz * sinY);
+	item2->Pose.Position.z = item->Pose.Position.z + (rz * cosY) - (rx * sinY);
 
 	auto* lara = item2->IsLara() ? GetLaraInfo(item2) : nullptr;
 
@@ -868,7 +864,7 @@ void CollideSolidStatics(ItemInfo* item, CollisionInfo* coll)
 		{
 			auto* mesh = &g_Level.Rooms[i].mesh[j];
 
-			// Only process meshes which are visible and solid
+			// Only process meshes which are visible and solid.
 			if ((mesh->flags & StaticMeshFlags::SM_VISIBLE) && (mesh->flags & StaticMeshFlags::SM_SOLID))
 			{
 				if (phd_Distance(&item->Pose, &mesh->pos) < COLLISION_CHECK_DISTANCE)
@@ -886,35 +882,35 @@ bool CollideSolidBounds(ItemInfo* item, BOUNDING_BOX* box, PHD_3DPOS pos, Collis
 {
 	bool result = false;
 
-	// Get DX static bounds in global coords
+	// Get DX static bounds in global coordinates.
 	auto staticBounds = TO_DX_BBOX(pos, box);
 
-	// Get local TR bounds and DX item bounds in global coords
+	// Get local TR bounds and DX item bounds in global coordinates.
 	auto itemBBox = GetBoundsAccurate(item);
 	auto itemBounds = TO_DX_BBOX(item->Pose, itemBBox);
 
-	// Extend bounds a bit for visual testing
-	itemBounds.Extents = itemBounds.Extents + Vector3(WALL_SIZE);
+	// Extend bounds a bit for visual testing.
+	itemBounds.Extents = itemBounds.Extents + Vector3(SECTOR(1));
 
-	// Filter out any further checks if static isn't nearby
+	// Filter out any further checks if static isn't nearby.
 	if (!staticBounds.Intersects(itemBounds))
 		return false;
 
-	// Bring back extents
-	itemBounds.Extents = itemBounds.Extents - Vector3(WALL_SIZE);
+	// Bring back extents.
+	itemBounds.Extents = itemBounds.Extents - Vector3(SECTOR(1));
 
-	// Draw static bounds
+	// Draw static bounds.
 	g_Renderer.AddDebugBox(staticBounds, Vector4(1, 0.3f, 0, 1), RENDERER_DEBUG_PAGE::LOGIC_STATS);
 
-	// Calculate horizontal item coll bounds according to radius
+	// Calculate horizontal item collision bounds according to radius.
 	BOUNDING_BOX collBox;
 	collBox.X1 = -coll->Setup.Radius;
 	collBox.X2 = coll->Setup.Radius;
 	collBox.Z1 = -coll->Setup.Radius;
 	collBox.Z2 = coll->Setup.Radius;
 
-	// Calculate vertical item coll bounds according to either height (land mode) or precise bounds (water mode).
-	// Water mode needs special processing because height calc in original engines is inconsistent in such cases.
+	// Calculate vertical item collision bounds according to either height (land mode) or precise bounds (water mode).
+	// Water mode needs special processing because height calculation in original engines is inconsistent in such cases.
 	if (TestEnvironment(ENV_FLAG_WATER, item))
 	{
 		collBox.Y1 = itemBBox->Y1;
@@ -926,18 +922,18 @@ bool CollideSolidBounds(ItemInfo* item, BOUNDING_BOX* box, PHD_3DPOS pos, Collis
 		collBox.Y2 = 0;
 	}
 
-	// Get and test DX item coll bounds
+	// Get and test DX item collision bounds.
 	auto collBounds = TO_DX_BBOX(PHD_3DPOS(item->Pose.Position), &collBox);
 	bool intersects = staticBounds.Intersects(collBounds);
 
-	// Check if previous item horizontal position intersects bounds
+	// Check if previous item horizontal position intersects bounds.
 	auto oldCollBounds = TO_DX_BBOX(PHD_3DPOS(coll->Setup.OldPosition.x, item->Pose.Position.y, coll->Setup.OldPosition.z), &collBox);
 	bool oldHorIntersects = staticBounds.Intersects(oldCollBounds);
 
-	// Draw item coll bounds
+	// Draw item coll bounds.
 	g_Renderer.AddDebugBox(collBounds, intersects ? Vector4(1, 0, 0, 1) : Vector4(0, 1, 0, 1), RENDERER_DEBUG_PAGE::LOGIC_STATS);
 
-	// Decompose static bounds into top/bottom plane vertices
+	// Decompose static bounds into top/bottom plane vertices.
 	Vector3 corners[8];
 	staticBounds.GetCorners(corners);
 	Vector3 planeVertices[4][3] =
@@ -948,7 +944,7 @@ bool CollideSolidBounds(ItemInfo* item, BOUNDING_BOX* box, PHD_3DPOS pos, Collis
 		{ corners[3], corners[6], corners[2] }
 	};
 
-	// Determine collision box vertical dimensions
+	// Determine collision box vertical dimensions.
 	auto height = collBox.Height();
 	auto center = item->Pose.Position.y - height / 2;
 
@@ -960,24 +956,23 @@ bool CollideSolidBounds(ItemInfo* item, BOUNDING_BOX* box, PHD_3DPOS pos, Collis
 
 	for (int i = 0; i < 4; i++)
 	{
-		// Calculate ray direction
+		// Calculate ray direction.
 		auto mxR = Matrix::CreateFromYawPitchRoll(TO_RAD(item->Pose.Orientation.y), TO_RAD(item->Pose.Orientation.x + (ANGLE(90 * i))), 0);
 		auto mxT = Matrix::CreateTranslation(Vector3::UnitY);
 		auto direction = (mxT * mxR).Translation();
 
-		// Make a ray and do ray tests against all decomposed planes
+		// Make a ray and do ray tests against all decomposed planes.
 		auto ray = Ray(collBounds.Center, direction);
 
-		// Determine if top/bottom planes are closest ones or not
+		// Determine if top/bottom planes are closest ones or not.
 		for (int p = 0; p < 4; p++)
 		{
-			// No plane intersection, quickly discard
+			// No plane intersection, quickly discard.
 			float d = 0.0f;
 			if (!ray.Intersects(planeVertices[p][0], planeVertices[p][1], planeVertices[p][2], d))
 				continue;
 
-			// Process plane intersection only if distance is smaller
-			// than already found minimum
+			// Process plane intersection only if distance is smaller than already found minimum.
 			if (d < minDistance)
 			{
 				closestRay = ray;
@@ -987,24 +982,25 @@ bool CollideSolidBounds(ItemInfo* item, BOUNDING_BOX* box, PHD_3DPOS pos, Collis
 		}
 	}
 
-	if (closestPlane != -1) // Top/bottom plane found
+	// Top/bottom plane found.
+	if (closestPlane != -1)
 	{
 		auto bottom = closestPlane >= 2;
 		auto yPoint = abs((closestRay.direction * minDistance).y);
 		auto distanceToVerticalPlane = height / 2 - yPoint;
 
-		// Correct position according to top/bottom bounds, if collided and plane is nearby
+		// Correct position according to top/bottom bounds, if collided and plane is nearby.
 		if (intersects && oldHorIntersects && minDistance < height)
 		{
 			if (bottom)
 			{
-				// HACK: additionally subtract 2 from bottom plane, or else false positives may occur.
+				// HACK: Additionally subtract 2 from bottom plane, otherwise false positives may occur.
 				item->Pose.Position.y += distanceToVerticalPlane + 2;
 				coll->CollisionType = CT_TOP;
 			}
 			else
 			{
-				// Set collision type only if dry room (in water rooms it causes stucking)
+				// Set collision type only if dry room (in water rooms the player can get stuck).
 				item->Pose.Position.y -= distanceToVerticalPlane;
 				coll->CollisionType = (g_Level.Rooms[item->RoomNumber].flags & 1) ? coll->CollisionType : CT_CLAMP;
 			}
@@ -1020,21 +1016,21 @@ bool CollideSolidBounds(ItemInfo* item, BOUNDING_BOX* box, PHD_3DPOS pos, Collis
 	if (!intersects)
 		return false;
 
-	// Check if bounds still collide after top/bottom position correction
+	// Check if bounds still collide after top/bottom position correction.
 	if (!staticBounds.Intersects(TO_DX_BBOX(PHD_3DPOS(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z), &collBox)))
 		return result;
 
-	// Determine identity rotation/distance
-	auto distance = Vector3(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z) - Vector3(pos.Position.x, pos.Position.y, pos.Position.z);
+	// Determine identity orientation/distance.
+	auto distance = item->Pose.Position.ToVector3() - pos.Position.ToVector3();
 	auto sinY = phd_sin(pos.Orientation.y);
 	auto cosY = phd_cos(pos.Orientation.y);
 
-	// Rotate item to collision bounds identity
-	auto x = round(distance.x * cosY - distance.z * sinY) + pos.Position.x;
+	// Rotate item to collision bounds identity.
+	auto x = round((distance.x * cosY) - (distance.z * sinY)) + pos.Position.x;
 	auto y = item->Pose.Position.y;
-	auto z = round(distance.x * sinY + distance.z * cosY) + pos.Position.z;
+	auto z = round((distance.x * sinY) + (distance.z * cosY)) + pos.Position.z;
 
-	// Determine identity static collision bounds
+	// Determine identity static collision bounds.
 	auto XMin = pos.Position.x + box->X1;
 	auto XMax = pos.Position.x + box->X2;
 	auto YMin = pos.Position.y + box->Y1;
@@ -1042,7 +1038,7 @@ bool CollideSolidBounds(ItemInfo* item, BOUNDING_BOX* box, PHD_3DPOS pos, Collis
 	auto ZMin = pos.Position.z + box->Z1;
 	auto ZMax = pos.Position.z + box->Z2;
 
-	// Determine item collision bounds
+	// Determine item collision bounds.
 	auto inXMin = x + collBox.X1;
 	auto inXMax = x + collBox.X2;
 	auto inYMin = y + collBox.Y1;
@@ -1050,15 +1046,15 @@ bool CollideSolidBounds(ItemInfo* item, BOUNDING_BOX* box, PHD_3DPOS pos, Collis
 	auto inZMin = z + collBox.Z1;
 	auto inZMax = z + collBox.Z2;
 
-	// Don't calculate shifts if not in bounds
+	// Don't calculate shifts if not in bounds.
 	if (inXMax <= XMin || inXMin >= XMax ||
 		inYMax <= YMin || inYMin >= YMax ||
 		inZMax <= ZMin || inZMin >= ZMax)
 		return result;
 
-	// Calculate shifts
+	// Calculate shifts.
 
-	Vector3Int rawShift = {};
+	auto rawShift = Vector3Int::Zero;
 
 	auto shiftLeft = inXMax - XMin;
 	auto shiftRight = XMax - inXMin;
@@ -1076,12 +1072,12 @@ bool CollideSolidBounds(ItemInfo* item, BOUNDING_BOX* box, PHD_3DPOS pos, Collis
 	else
 		rawShift.z = shiftRight;
 
-	// Rotate previous collision position to identity
-	distance = Vector3(coll->Setup.OldPosition.x, coll->Setup.OldPosition.y, coll->Setup.OldPosition.z) - Vector3(pos.Position.x, pos.Position.y, pos.Position.z);
-	auto ox = round(distance.x * cosY - distance.z * sinY) + pos.Position.x;
-	auto oz = round(distance.x * sinY + distance.z * cosY) + pos.Position.z;
+	// Rotate previous collision position to identity.
+	distance = coll->Setup.OldPosition.ToVector3() - pos.Position.ToVector3();
+	auto ox = round((distance.x * cosY) - (distance.z * sinY)) + pos.Position.x;
+	auto oz = round((distance.x * sinY) + (distance.z * cosY)) + pos.Position.z;
 
-	// Calculate collisison type based on identity rotation
+	// Calculate collisison type based on identity orientation.
 	switch (GetQuadrant(coll->Setup.ForwardAngle - pos.Orientation.y))
 	{
 	case NORTH:
@@ -1173,19 +1169,19 @@ bool CollideSolidBounds(ItemInfo* item, BOUNDING_BOX* box, PHD_3DPOS pos, Collis
 		break;
 	}
 
-	// Determine final shifts rotation/distance
-	distance = Vector3(x + coll->Shift.x, y, z + coll->Shift.z) - Vector3(pos.Position.x, pos.Position.y, pos.Position.z);
+	// Determine final shifts orientation/distance.
+	distance = Vector3(x + coll->Shift.x, y, z + coll->Shift.z) - pos.Position.ToVector3();
 	sinY = phd_sin(-pos.Orientation.y);
 	cosY = phd_cos(-pos.Orientation.y);
 
-	// Calculate final shifts rotation/distance
-	coll->Shift.x = (round(distance.x * cosY - distance.z * sinY) + pos.Position.x) - item->Pose.Position.x;
-	coll->Shift.z = (round(distance.x * sinY + distance.z * cosY) + pos.Position.z) - item->Pose.Position.z;
+	// Calculate final shifts orientation/distance.
+	coll->Shift.x = (round((distance.x * cosY) - (distance.z * sinY)) + pos.Position.x) - item->Pose.Position.x;
+	coll->Shift.z = (round((distance.x * sinY) + (distance.z * cosY)) + pos.Position.z) - item->Pose.Position.z;
 
 	if (coll->Shift.x == 0 && coll->Shift.z == 0)
-		coll->CollisionType = CT_NONE; // Paranoid
+		coll->CollisionType = CT_NONE; // Paranoid.
 
-	// Set splat state flag if item is Lara and bounds are taller than Lara's headroom
+	// Set splat state flag if item is Lara and bounds are taller than Lara's headroom.
 	if (item == LaraItem && coll->CollisionType == CT_FRONT)
 		coll->HitTallObject = (YMin <= inYMin + LARA_HEADROOM);
 
@@ -1197,39 +1193,39 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 {
 	auto* item = &g_Level.Items[itemNumber];
 
-	auto prevCollResult = GetCollision(x, y, z, item->RoomNumber);
-	auto collResult = GetCollision(item);
+	auto prevPointProbe = GetCollision(x, y, z, item->RoomNumber);
+	auto pointProbe = GetCollision(item);
 
 	auto* bounds = GetBoundsAccurate(item);
 	int radius = bounds->Height();
 
 	item->Pose.Position.y += radius;
 
-	if (item->Pose.Position.y >= collResult.Position.Floor)
+	if (item->Pose.Position.y >= pointProbe.Position.Floor)
 	{
 		int bs = 0;
 
-		if (collResult.Position.FloorSlope && prevCollResult.Position.Floor < collResult.Position.Floor)
+		if (pointProbe.Position.FloorSlope && prevPointProbe.Position.Floor < pointProbe.Position.Floor)
 		{
 			int yAngle = (long)((unsigned short)item->Pose.Orientation.y);
 
-			if (collResult.FloorTilt.x < 0)
+			if (pointProbe.FloorTilt.x < 0)
 			{
 				if (yAngle >= ANGLE(180.0f))
 					bs = 1;
 			}
-			else if (collResult.FloorTilt.x > 0)
+			else if (pointProbe.FloorTilt.x > 0)
 			{
 				if (yAngle <= ANGLE(180.0f))
 					bs = 1;
 			}
 
-			if (collResult.FloorTilt.y < 0)
+			if (pointProbe.FloorTilt.y < 0)
 			{
 				if (yAngle >= ANGLE(90.0f) && yAngle <= ANGLE(270.0f))
 					bs = 1;
 			}
-			else if (collResult.FloorTilt.y > 0)
+			else if (pointProbe.FloorTilt.y > 0)
 			{
 				if (yAngle <= ANGLE(90.0f) || yAngle >= ANGLE(270.0f))
 					bs = 1;
@@ -1238,7 +1234,7 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 
 		// If last position of item was also below this floor height, we've hit a wall, else we've hit a floor.
 
-		if (y > (collResult.Position.Floor + 32) && bs == 0 &&
+		if (y > (pointProbe.Position.Floor + 32) && bs == 0 &&
 			(((x / SECTOR(1)) != (item->Pose.Position.x / SECTOR(1))) ||
 				((z / SECTOR(1)) != (item->Pose.Position.z / SECTOR(1)))))
 		{
@@ -1246,8 +1242,8 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 
 			long xs;
 
-			if ((x & (~(WALL_SIZE - 1))) != (item->Pose.Position.x & (~(WALL_SIZE - 1))) &&	// X crossed boundary?
-				(z & (~(WALL_SIZE - 1))) != (item->Pose.Position.z & (~(WALL_SIZE - 1))))	// Z crossed boundary as well?
+			if ((x & (~WALL_MASK)) != (item->Pose.Position.x & (~WALL_MASK)) &&	// X crossed boundary?
+				(z & (~WALL_MASK)) != (item->Pose.Position.z & (~WALL_MASK)))	// Z crossed boundary as well?
 			{
 				if (abs(x - item->Pose.Position.x) < abs(z - item->Pose.Position.z))
 					xs = 1;	// X has travelled the shortest, so (maybe) hit first. (Seems to work ok).
@@ -1257,7 +1253,7 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 			else
 				xs = 1;
 
-			if ((x & (~(WALL_SIZE - 1))) != (item->Pose.Position.x & (~(WALL_SIZE - 1))) && xs)	// X crossed boundary?
+			if ((x & (~WALL_MASK)) != (item->Pose.Position.x & (~WALL_MASK)) && xs)	// X crossed boundary?
 			{
 				// Hit angle = ANGLE(270.0f).
 				if (xv <= 0)
@@ -1278,14 +1274,14 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 			item->Pose.Position.z = z;
 		}
 		// Hit a steep slope?
-		else if (collResult.Position.FloorSlope)
+		else if (pointProbe.Position.FloorSlope)
 		{
 			// Need to know which direction the slope is.
 
 			item->Animation.Velocity.z -= (item->Animation.Velocity.z / 4);
 
 			// Hit angle = ANGLE(90.0f)
-			if (collResult.FloorTilt.x < 0 && ((abs(collResult.FloorTilt.x)) - (abs(collResult.FloorTilt.y)) >= 2))
+			if (pointProbe.FloorTilt.x < 0 && ((abs(pointProbe.FloorTilt.x)) - (abs(pointProbe.FloorTilt.y)) >= 2))
 			{
 				if (((unsigned short)item->Pose.Orientation.y) > ANGLE(180.0f))
 				{
@@ -1297,7 +1293,7 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 				{
 					if (item->Animation.Velocity.z < 32)
 					{
-						item->Animation.Velocity.z -= collResult.FloorTilt.x * 2;
+						item->Animation.Velocity.z -= pointProbe.FloorTilt.x * 2;
 						if ((unsigned short)item->Pose.Orientation.y > ANGLE(90.0f) && (unsigned short)item->Pose.Orientation.y < ANGLE(270.0f))
 						{
 							item->Pose.Orientation.y -= ANGLE(22.5f);
@@ -1319,7 +1315,7 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 				}
 			}
 			// Hit angle = ANGLE(270.0f)
-			else if (collResult.FloorTilt.x > 0 && ((abs(collResult.FloorTilt.x)) - (abs(collResult.FloorTilt.y)) >= 2))
+			else if (pointProbe.FloorTilt.x > 0 && ((abs(pointProbe.FloorTilt.x)) - (abs(pointProbe.FloorTilt.y)) >= 2))
 			{
 				if (((unsigned short)item->Pose.Orientation.y) < ANGLE(180.0f))
 				{
@@ -1331,7 +1327,7 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 				{
 					if (item->Animation.Velocity.z < 32)
 					{
-						item->Animation.Velocity.z += collResult.FloorTilt.x * 2;
+						item->Animation.Velocity.z += pointProbe.FloorTilt.x * 2;
 						if ((unsigned short)item->Pose.Orientation.y > ANGLE(270.0f) || (unsigned short)item->Pose.Orientation.y < ANGLE(90.0f))
 						{
 							item->Pose.Orientation.y -= ANGLE(22.5f);
@@ -1353,7 +1349,7 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 				}
 			}
 			// Hit angle = 0
-			else if (collResult.FloorTilt.y < 0 && ((abs(collResult.FloorTilt.y)) - (abs(collResult.FloorTilt.x)) >= 2))
+			else if (pointProbe.FloorTilt.y < 0 && ((abs(pointProbe.FloorTilt.y)) - (abs(pointProbe.FloorTilt.x)) >= 2))
 			{
 				if (((unsigned short)item->Pose.Orientation.y) > ANGLE(90.0f) && ((unsigned short)item->Pose.Orientation.y) < ANGLE(270.0f))
 				{
@@ -1365,7 +1361,7 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 				{
 					if (item->Animation.Velocity.z < 32)
 					{
-						item->Animation.Velocity.z -= collResult.FloorTilt.y * 2;
+						item->Animation.Velocity.z -= pointProbe.FloorTilt.y * 2;
 
 						if ((unsigned short)item->Pose.Orientation.y < ANGLE(180.0f))
 						{
@@ -1388,7 +1384,7 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 				}
 			}
 			// Hit angle = ANGLE(180.0f)
-			else if (collResult.FloorTilt.y > 0 && ((abs(collResult.FloorTilt.y)) - (abs(collResult.FloorTilt.x)) >= 2))
+			else if (pointProbe.FloorTilt.y > 0 && ((abs(pointProbe.FloorTilt.y)) - (abs(pointProbe.FloorTilt.x)) >= 2))
 			{
 				if (((unsigned short)item->Pose.Orientation.y) > ANGLE(270.0f) || ((unsigned short)item->Pose.Orientation.y) < ANGLE(90.0f))
 				{
@@ -1400,7 +1396,7 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 				{
 					if (item->Animation.Velocity.z < 32)
 					{
-						item->Animation.Velocity.z += collResult.FloorTilt.y * 2;
+						item->Animation.Velocity.z += pointProbe.FloorTilt.y * 2;
 
 						if ((unsigned short)item->Pose.Orientation.y > ANGLE(180.0f))
 						{
@@ -1422,7 +1418,7 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 						item->Animation.Velocity.y = 0;
 				}
 			}
-			else if (collResult.FloorTilt.x < 0 && collResult.FloorTilt.y < 0)	// Hit angle = 0x2000
+			else if (pointProbe.FloorTilt.x < 0 && pointProbe.FloorTilt.y < 0)	// Hit angle = 0x2000
 			{
 				if (((unsigned short)item->Pose.Orientation.y) > ANGLE(135.0f) && ((unsigned short)item->Pose.Orientation.y) < ANGLE(315.0f))
 				{
@@ -1434,7 +1430,7 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 				{
 					if (item->Animation.Velocity.z < 32)
 					{
-						item->Animation.Velocity.z += -collResult.FloorTilt.x + -collResult.FloorTilt.y;
+						item->Animation.Velocity.z += -pointProbe.FloorTilt.x + -pointProbe.FloorTilt.y;
 						if ((unsigned short)item->Pose.Orientation.y > ANGLE(45.0f) && (unsigned short)item->Pose.Orientation.y < ANGLE(225.0f))
 						{
 							item->Pose.Orientation.y -= ANGLE(22.5f);
@@ -1456,7 +1452,7 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 				}
 			}
 			// Hit angle = ANGLE(135.0f)
-			else if (collResult.FloorTilt.x < 0 && collResult.FloorTilt.y > 0)
+			else if (pointProbe.FloorTilt.x < 0 && pointProbe.FloorTilt.y > 0)
 			{
 				if (((unsigned short)item->Pose.Orientation.y) > ANGLE(225.0f) || ((unsigned short)item->Pose.Orientation.y) < ANGLE(45.0f))
 				{
@@ -1468,7 +1464,7 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 				{
 					if (item->Animation.Velocity.z < 32)
 					{
-						item->Animation.Velocity.z += (-collResult.FloorTilt.x) + collResult.FloorTilt.y;
+						item->Animation.Velocity.z += (-pointProbe.FloorTilt.x) + pointProbe.FloorTilt.y;
 						if ((unsigned short)item->Pose.Orientation.y < ANGLE(315.0f) && (unsigned short)item->Pose.Orientation.y > ANGLE(135.0f))
 						{
 							item->Pose.Orientation.y -= ANGLE(22.5f);
@@ -1490,7 +1486,7 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 				}
 			}
 			// Hit angle = ANGLE(225.5f)
-			else if (collResult.FloorTilt.x > 0 && collResult.FloorTilt.y > 0)
+			else if (pointProbe.FloorTilt.x > 0 && pointProbe.FloorTilt.y > 0)
 			{
 				if (((unsigned short)item->Pose.Orientation.y) > ANGLE(315.0f) || ((unsigned short)item->Pose.Orientation.y) < ANGLE(135.0f))
 				{
@@ -1502,7 +1498,7 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 				{
 					if (item->Animation.Velocity.z < 32)
 					{
-						item->Animation.Velocity.z += collResult.FloorTilt.x + collResult.FloorTilt.y;
+						item->Animation.Velocity.z += pointProbe.FloorTilt.x + pointProbe.FloorTilt.y;
 						if ((unsigned short)item->Pose.Orientation.y < ANGLE(45.0f) || (unsigned short)item->Pose.Orientation.y > ANGLE(225.5f))
 						{
 							item->Pose.Orientation.y -= ANGLE(22.5f);
@@ -1524,7 +1520,7 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 				}
 			}
 			// Hit angle = ANGLE(315.0f)
-			else if (collResult.FloorTilt.x > 0 && collResult.FloorTilt.y < 0)
+			else if (pointProbe.FloorTilt.x > 0 && pointProbe.FloorTilt.y < 0)
 			{
 				if (((unsigned short)item->Pose.Orientation.y) > ANGLE(45.0f) && ((unsigned short)item->Pose.Orientation.y) < ANGLE(225.5f))
 				{
@@ -1536,7 +1532,7 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 				{
 					if (item->Animation.Velocity.z < 32)
 					{
-						item->Animation.Velocity.z += collResult.FloorTilt.x + (-collResult.FloorTilt.y);
+						item->Animation.Velocity.z += pointProbe.FloorTilt.x + (-pointProbe.FloorTilt.y);
 						if ((unsigned short)item->Pose.Orientation.y < ANGLE(135.0f) || (unsigned short)item->Pose.Orientation.y > ANGLE(315.0f))
 						{
 							item->Pose.Orientation.y -= ANGLE(22.5f);
@@ -1558,7 +1554,7 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 				}
 			}
 
-			// Put item back in its last position.
+			// Move item back to its previous position.
 			item->Pose.Position.x = x;
 			item->Pose.Position.y = y;
 			item->Pose.Position.z = z;
@@ -1597,7 +1593,7 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 				}
 			}
 
-			item->Pose.Position.y = collResult.Position.Floor;
+			item->Pose.Position.y = pointProbe.Position.Floor;
 		}
 	}
 	// Check for on top of object.
@@ -1605,8 +1601,8 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 	{
 		if (yv >= 0)
 		{
-			prevCollResult = GetCollision(item->Pose.Position.x, y, item->Pose.Position.z, item->RoomNumber);
-			collResult = GetCollision(item);
+			prevPointProbe = GetCollision(item->Pose.Position.x, y, item->Pose.Position.z, item->RoomNumber);
+			pointProbe = GetCollision(item);
 
 			// Bounce off floor.
 
@@ -1614,7 +1610,7 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 			// was always set to 0 by GetHeight() function which was called before the check.
 			// Possibly a mistake or unfinished feature by Core? -- Lwmte, 27.08.21
 
-			if (item->Pose.Position.y >= prevCollResult.Position.Floor)
+			if (item->Pose.Position.y >= prevPointProbe.Position.Floor)
 			{
 				// Hit the floor; bounce and slow down.
 				if (item->Animation.Velocity.y > 0)
@@ -1648,17 +1644,17 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 					}
 				}
 
-				item->Pose.Position.y = prevCollResult.Position.Floor;
+				item->Pose.Position.y = prevPointProbe.Position.Floor;
 			}
 		}
 		// else
 		{
 			// Bounce off ceiling.
-			collResult = GetCollision(item);
+			pointProbe = GetCollision(item);
 
-			if (item->Pose.Position.y < collResult.Position.Ceiling)
+			if (item->Pose.Position.y < pointProbe.Position.Ceiling)
 			{
-				if (y < collResult.Position.Ceiling &&
+				if (y < pointProbe.Position.Ceiling &&
 					(((x / SECTOR(1)) != (item->Pose.Position.x / SECTOR(1))) ||
 						((z / SECTOR(1)) != (item->Pose.Position.z / SECTOR(1)))))
 				{
@@ -1681,13 +1677,13 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 					else
 						item->Animation.Velocity.z /= 2;
 
-					// Put item back in its last position.
+					// Move item back to its previous position.
 					item->Pose.Position.x = x;
 					item->Pose.Position.y = y;
 					item->Pose.Position.z = z;
 				}
 				else
-					item->Pose.Position.y = collResult.Position.Ceiling;
+					item->Pose.Position.y = pointProbe.Position.Ceiling;
 
 				if (item->Animation.Velocity.y < 0)
 					item->Animation.Velocity.y = -item->Animation.Velocity.y;
@@ -1695,14 +1691,14 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 		}
 	}
 
-	collResult = GetCollision(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, item->RoomNumber);
+	pointProbe = GetCollision(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, item->RoomNumber);
 
-	if (collResult.RoomNumber != item->RoomNumber)
+	if (pointProbe.RoomNumber != item->RoomNumber)
 	{
-		if (item->ObjectNumber == ID_GRENADE && TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, collResult.RoomNumber))
+		if (item->ObjectNumber == ID_GRENADE && TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, pointProbe.RoomNumber))
 			Splash(item);
 
-		ItemNewRoom(itemNumber, collResult.RoomNumber);
+		ItemNewRoom(itemNumber, pointProbe.RoomNumber);
 	}
 
 	item->Pose.Position.y -= radius;
@@ -1791,8 +1787,8 @@ void DoObjectCollision(ItemInfo* laraItem, CollisionInfo* coll)
 					else
 					{
 						DoDamage(item, INT_MAX);
-
-						DoLotsOfBlood(item->Pose.Position.x,
+						DoLotsOfBlood(
+							item->Pose.Position.x,
 							laraItem->Pose.Position.y - CLICK(1),
 							item->Pose.Position.z,
 							laraItem->Animation.Velocity.z,
@@ -1901,7 +1897,7 @@ void CreatureCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll
 		int rx = (frame->boundingBox.X1 + frame->boundingBox.X2) / 2;
 		int rz = (frame->boundingBox.X2 + frame->boundingBox.Z2) / 2;
 
-		if (frame->boundingBox.Height() > STEP_SIZE)
+		if (frame->boundingBox.Height() > CLICK(1))
 		{
 			auto* lara = GetLaraInfo(laraItem);
 
@@ -1909,7 +1905,7 @@ void CreatureCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll
 
 			lara->HitDirection = (short)angle;
 
-			// TODO: check if a second Lara.hitFrame++; is required there !						
+			// TODO: Check if a second Lara.hitFrame++ is required. -- TokyoSU					
 			lara->HitFrame++;
 			if (lara->HitFrame > 30)
 				lara->HitFrame = 30;
