@@ -32,7 +32,7 @@ auto LaserSightIsEquipped(LaraInfo& lara)
 	return false;
 };
 
-static bool TryModifyMiscCount(LaraInfo & lara, GAME_OBJECT_ID objectID, std::optional<int> amount, ModificationType modType)
+bool TryModifyMiscCount(LaraInfo & lara, GAME_OBJECT_ID objectID, std::optional<int> amount, ModificationType modType)
 {
 	// If adding, replace the small/large waterskin with one of the requested
 	// capacity. If removing, only remove the waterskin if it contains the given

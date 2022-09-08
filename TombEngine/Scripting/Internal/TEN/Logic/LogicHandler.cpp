@@ -580,6 +580,11 @@ void LogicHandler::ExecuteScriptFile(const std::string & luaFilename)
 	m_handler.ExecuteScript(luaFilename);
 }
 
+void LogicHandler::ExecuteString(const std::string& command)
+{
+	m_handler.ExecuteString(command);
+}
+
 // These wind up calling CallLevelFunc, which is where all the error checking is.
 void LogicHandler::ExecuteFunction(std::string const& name, short idOne, short idTwo) 
 {
