@@ -198,7 +198,6 @@ namespace TEN::Entities::TR4
 							ShatterObject(nullptr, mesh, -64, LaraItem->RoomNumber, 0);
 							SoundEffect(SFX_TR4_SMASH_ROCK, &item->Pose);
 
-							mesh->flags &= ~StaticMeshFlags::SM_VISIBLE;
 							currentFloor->Stopper = false;
 
 							TestTriggers(pos.x, pos.y, pos.z, item->RoomNumber, true);

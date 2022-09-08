@@ -1,8 +1,9 @@
 #pragma once
 #include "Game/Lara/lara.h"
 
-struct ItemInfo;
 struct CollisionInfo;
+struct ItemInfo;
+struct Vector3Shrt;
 
 constexpr auto MAX_TARGETS = 8;
 
@@ -15,9 +16,10 @@ enum class FireWeaponType
 
 struct WeaponInfo
 {
-	short LockAngles[4];
-	short LeftAngles[4];
-	short RightAngles[4];
+	Vector3Shrt LockAngles[2];
+	Vector3Shrt LeftAngles[2];
+	Vector3Shrt RightAngles[2];
+
 	int AimSpeed;
 	short ShotAccuracy;
 	int GunHeight;
@@ -46,7 +48,7 @@ enum WeaponState
 extern WeaponInfo Weapons[(int)LaraWeaponType::NumWeapons];
 extern int FlashGrenadeAftershockTimer;
 
-void SmashItem(short itemNum);
+void SmashItem(short itemNumber);
 GAME_OBJECT_ID WeaponObject(LaraWeaponType weaponType);
 void LaraGun(ItemInfo* laraItem);
 Ammo& GetAmmo(ItemInfo* laraItem, LaraWeaponType weaponType);

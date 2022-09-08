@@ -41,6 +41,7 @@ public:
 	virtual void FreeLevelScripts() = 0;
 	virtual void ResetScripts(bool clearGameVars) = 0;
 	virtual void ExecuteScriptFile(std::string const& luaFileName) = 0;
+	virtual void ExecuteString(std::string const& command) = 0;
 	virtual void ExecuteFunction(std::string const& luaFuncName, TEN::Control::Volumes::VolumeTriggerer, std::string const& arguments) = 0;
 	virtual void ExecuteFunction(std::string const& luaFuncName, short idOne, short idTwo = 0) = 0;
 

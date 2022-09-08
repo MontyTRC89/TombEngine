@@ -818,7 +818,7 @@ bool SaveGame::Save(int slot)
 
 			staticMesh.add_flags(room->mesh[j].flags);
 			staticMesh.add_hit_points(room->mesh[j].HitPoints);
-			staticMesh.add_room_number(i);
+			staticMesh.add_room_number(room->mesh[j].roomNumber);
 			staticMesh.add_number(j);
 			staticMeshes.push_back(staticMesh.Finish());
 		}
@@ -1245,6 +1245,7 @@ bool SaveGame::Load(int slot)
 		int number = staticMesh->number();
 
 		room->mesh[number].pos = ToPHD(staticMesh->pose());
+		room->mesh[number].roomNumber = staticMesh->room_number();
 		room->mesh[number].scale = staticMesh->scale();
 		room->mesh[number].color = ToVector4(staticMesh->color());
 
