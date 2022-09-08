@@ -580,7 +580,7 @@ Vector3i GetLaraJointPosition(int jointIndex, const Vector3i& offset)
 		jointIndex = LM_HEAD;
 
 	auto pos = offset.ToVector3();
-	g_Renderer.GetLaraAbsBonePosition(&pos, jointIndex);
+	g_Renderer.GetLaraAbsBonePosition(pos, jointIndex);
 	return Vector3i(pos);
 }
 

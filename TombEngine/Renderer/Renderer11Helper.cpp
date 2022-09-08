@@ -384,17 +384,17 @@ namespace TEN::Renderer
 		return m_meshes[meshIndex];
 	}
 
-	void Renderer11::GetLaraAbsBonePosition(Vector3 *pos, int joint)
+	void Renderer11::GetLaraAbsBonePosition(Vector3& pos, int jointIndex)
 	{
-		if (joint >= MAX_BONES)
-			joint = 0;
+		if (jointIndex >= MAX_BONES)
+			jointIndex = 0;
 
-		auto world = m_moveableObjects[ID_LARA]->AnimationTransforms[joint];
+		auto world = m_moveableObjects[ID_LARA]->AnimationTransforms[jointIndex];
 		world = world * m_LaraWorldMatrix;
-		*pos = Vector3::Transform(*pos, world);
+		pos = Vector3::Transform(pos, world);
 	}
 
-	void Renderer11::GetItemAbsBonePosition(int itemNumber, Vector3 *pos, int joint)
+	void Renderer11::GetItemAbsBonePosition(int itemNumber, Vector3* pos, int jointIndex)
 	{
 		auto* rendererItem = &m_items[itemNumber];
 		auto* nativeItem = &g_Level.Items[itemNumber];
@@ -412,10 +412,10 @@ namespace TEN::Renderer
 				UpdateItemAnimations(itemNumber, false);
 		}
 
-		if (joint >= MAX_BONES)
-			joint = 0;
+		if (jointIndex >= MAX_BONES)
+			jointIndex = 0;
 
-		auto world = rendererItem->AnimationTransforms[joint] * rendererItem->World;
+		auto world = rendererItem->AnimationTransforms[jointIndex] * rendererItem->World;
 		*pos = Vector3::Transform(*pos, world);
 	}
 
