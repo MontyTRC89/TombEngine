@@ -57,6 +57,8 @@ Timer = {
 	--
 	--__At any given time, only one timer can show its countdown__.
 	--
+	--__Do not give your timers a name beginning with __TEN, as this is reserved for timers used by other internal libaries__.
+	--
 	--Use this sparingly; in the classics, timed challenges did not have visible countdowns. For shorter timers, the gameplay benefit from showing the remaining time might not be necessary, and could interfere with the atmosphere of the level.
 	--
 	-- @string name A label to give this timer; used to retrieve the timer later
