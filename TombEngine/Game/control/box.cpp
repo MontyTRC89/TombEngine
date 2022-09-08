@@ -511,14 +511,14 @@ int CreatureAnimation(short itemNumber, short angle, short tilt)
 		shiftZ = prevPos.z / SECTOR(1);
 
 		if (xPos < shiftX)
-			item->Pose.Position.x = prevPos.x & (~(SECTOR(1) - 1));
+			item->Pose.Position.x = prevPos.x & (~WALL_MASK);
 		else if (xPos > shiftX)
-			item->Pose.Position.x = prevPos.x | (SECTOR(1) - 1);
+			item->Pose.Position.x = prevPos.x | WALL_MASK;
 
 		if (zPos < shiftZ)
-			item->Pose.Position.z = prevPos.z & (~(SECTOR(1) - 1));
+			item->Pose.Position.z = prevPos.z & (~WALL_MASK);
 		else if (zPos > shiftZ)
-			item->Pose.Position.z = prevPos.z | (SECTOR(1) - 1);
+			item->Pose.Position.z = prevPos.z | (WALL_MASK);
 
 		floor = GetFloor(item->Pose.Position.x, y, item->Pose.Position.z, &roomNumber);
 		height = g_Level.Boxes[floor->Box].height;
@@ -539,8 +539,8 @@ int CreatureAnimation(short itemNumber, short angle, short tilt)
 
 	int x = item->Pose.Position.x;
 	int z = item->Pose.Position.z;
-	xPos = x & (SECTOR(1) - 1);
-	zPos = z & (SECTOR(1) - 1);
+	xPos = x & WALL_MASK;
+	zPos = z & WALL_MASK;
 	short radius = Objects[item->ObjectNumber].radius;
 	shiftX = 0;
 	shiftZ = 0;
