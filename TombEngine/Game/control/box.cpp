@@ -92,7 +92,7 @@ void DrawNearbyPathfinding(int boxIndex)
 
 void DropEntityPickups(ItemInfo* item)
 {
-	ItemInfo* pickup = NULL;
+	ItemInfo* pickup = nullptr;
 
 	for (short pickupNumber = item->CarriedItem; pickupNumber != NO_ITEM; pickupNumber = pickup->CarriedItem)
 	{
@@ -463,7 +463,7 @@ int CreatureAnimation(short itemNumber, short angle, short tilt)
 	else
 		boxHeight = item->Floor;
 
-	auto oldPos = item->Pose.Position;
+	auto prevPos = item->Pose.Position;
 
 	AnimateItem(item);
 
@@ -478,7 +478,7 @@ int CreatureAnimation(short itemNumber, short angle, short tilt)
 	int y = item->Pose.Position.y + bounds->Y1;
 
 	short roomNumber = item->RoomNumber;
-	GetFloor(oldPos.x, y, oldPos.z, &roomNumber);  
+	GetFloor(prevPos.x, y, prevPos.z, &roomNumber);  
 	FloorInfo* floor = GetFloor(item->Pose.Position.x, y, item->Pose.Position.z, &roomNumber);
 
 	// TODO: Check why some blocks have box = -1 assigned to them -- Lwmte, 10.11.21
@@ -507,18 +507,18 @@ int CreatureAnimation(short itemNumber, short angle, short tilt)
 	{
 		xPos = item->Pose.Position.x / SECTOR(1);
 		zPos = item->Pose.Position.z / SECTOR(1);
-		shiftX = oldPos.x / SECTOR(1);
-		shiftZ = oldPos.z / SECTOR(1);
+		shiftX = prevPos.x / SECTOR(1);
+		shiftZ = prevPos.z / SECTOR(1);
 
 		if (xPos < shiftX)
-			item->Pose.Position.x = oldPos.x & (~(SECTOR(1) - 1));
+			item->Pose.Position.x = prevPos.x & (~(SECTOR(1) - 1));
 		else if (xPos > shiftX)
-			item->Pose.Position.x = oldPos.x | (SECTOR(1) - 1);
+			item->Pose.Position.x = prevPos.x | (SECTOR(1) - 1);
 
 		if (zPos < shiftZ)
-			item->Pose.Position.z = oldPos.z & (~(SECTOR(1) - 1));
+			item->Pose.Position.z = prevPos.z & (~(SECTOR(1) - 1));
 		else if (zPos > shiftZ)
-			item->Pose.Position.z = oldPos.z | (SECTOR(1) - 1);
+			item->Pose.Position.z = prevPos.z | (SECTOR(1) - 1);
 
 		floor = GetFloor(item->Pose.Position.x, y, item->Pose.Position.z, &roomNumber);
 		height = g_Level.Boxes[floor->Box].height;
@@ -670,8 +670,8 @@ int CreatureAnimation(short itemNumber, short angle, short tilt)
 				{
 					if (item->Pose.Position.y + top < ceiling)
 					{
-						item->Pose.Position.x = oldPos.x;
-						item->Pose.Position.z = oldPos.z;
+						item->Pose.Position.x = prevPos.x;
+						item->Pose.Position.z = prevPos.z;
 						dy = LOT->Fly;
 					}
 					else
@@ -695,8 +695,8 @@ int CreatureAnimation(short itemNumber, short angle, short tilt)
 		}
 		else
 		{
-			item->Pose.Position.x = oldPos.x;
-			item->Pose.Position.z = oldPos.z;
+			item->Pose.Position.x = prevPos.x;
+			item->Pose.Position.z = prevPos.z;
 			dy = -LOT->Fly;
 		}
 
@@ -733,7 +733,7 @@ int CreatureAnimation(short itemNumber, short angle, short tilt)
 			if (item->Pose.Position.y > item->Floor)
 			{
 				if (item->Pose.Position.y > (item->Floor + CLICK(1)))
-					item->Pose.Position = oldPos;
+					item->Pose.Position = prevPos;
 				else
 					item->Pose.Position.y = item->Floor;
 			}
@@ -750,7 +750,7 @@ int CreatureAnimation(short itemNumber, short angle, short tilt)
 			top = bounds->Y1; // TODO: check if Y1 or Y2
 
 		if (item->Pose.Position.y + top < ceiling)
-			item->Pose.Position = oldPos;
+			item->Pose.Position = prevPos;
 
 		floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNumber);
 		item->Floor = GetFloorHeight(floor, item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z);
@@ -1367,7 +1367,7 @@ void FindAITargetObject(CreatureInfo* creature, short objectNumber)
 
 	if (g_Level.AIObjects.size() > 0)
 	{
-		AI_OBJECT* foundObject = NULL;
+		AI_OBJECT* foundObject = nullptr;
 
 		for (int i = 0; i < g_Level.AIObjects.size(); i++)
 		{
@@ -1394,7 +1394,7 @@ void FindAITargetObject(CreatureInfo* creature, short objectNumber)
 			}
 		}
 
-		if (foundObject != NULL)
+		if (foundObject != nullptr)
 		{
 			auto* aiItem = creature->AITarget;
 
