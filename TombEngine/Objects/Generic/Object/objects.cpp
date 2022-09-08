@@ -194,13 +194,10 @@ void HorizontalBarCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo*
 			if (test1)
 				laraItem->Pose.Orientation.y = barItem->Pose.Orientation.y;
 			else
-				laraItem->Pose.Orientation.y = barItem->Pose.Orientation.y + -ANGLE(180.0f);
+				laraItem->Pose.Orientation.y = barItem->Pose.Orientation.y - ANGLE(180.0f);
 
-			Vector3i pos1 = { 0, -128, 512 };
-			GetLaraJointPosition(&pos1, LM_LHAND);
-
-			Vector3i pos2 = { 0, -128, 512 };
-			GetLaraJointPosition(&pos2, LM_RHAND);
+			auto pos1 = GetLaraJointPosition(LM_LHAND, Vector3i(0, -128, 512));
+			auto pos2 = GetLaraJointPosition(LM_RHAND, Vector3i(0, -128, 512));
 		
 			if (laraItem->Pose.Orientation.y & 0x4000)
 				laraItem->Pose.Position.x += barItem->Pose.Position.x - ((pos1.x + pos2.x) >> 1);
@@ -239,7 +236,7 @@ void CutsceneRopeControl(short itemNumber)
 	ropeItem->Pose.Orientation.x = -4869;
 }
 
-void HybridCollision(short itemNumber, ItemInfo* laraitem, CollisionInfo* coll) 
+void HybridCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll) 
 {
 	auto* item = &g_Level.Items[itemNumber];
 
@@ -259,13 +256,13 @@ void InitialiseTightrope(short itemNumber)
 	if (tightropeItem->Pose.Orientation.y > 0)
 	{
 		if (tightropeItem->Pose.Orientation.y == ANGLE(90.0f))
-			tightropeItem->Pose.Position.x -= 256;
+			tightropeItem->Pose.Position.x -= CLICK(1);
 	}
 	else if (tightropeItem->Pose.Orientation.y)
 	{
-		if (tightropeItem->Pose.Orientation.y == -ANGLE(180.0f))
+		if (tightropeItem->Pose.Orientation.y == ANGLE(-180.0f))
 			tightropeItem->Pose.Position.z += CLICK(1);
-		else if (tightropeItem->Pose.Orientation.y == -ANGLE(90.0f))
+		else if (tightropeItem->Pose.Orientation.y == ANGLE(-90.0f))
 			tightropeItem->Pose.Position.x += CLICK(1);
 	}
 	else

@@ -460,14 +460,9 @@ void UpdateCameraElevation()
 
 	if (Camera.laraNode != -1)
 	{
-		auto pos = Vector3i::Zero;
-		GetLaraJointPosition(&pos, Camera.laraNode);
-
-		auto pos1 = Vector3i(0, -CLICK(1), SECTOR(2));
-		GetLaraJointPosition(&pos1, Camera.laraNode);
-
-		pos.x = pos1.x - pos.x;
-		pos.z = pos1.z - pos.z;
+		auto pos = GetLaraJointPosition(Camera.laraNode, Vector3i::Zero);
+		auto pos1 = GetLaraJointPosition(Camera.laraNode, Vector3i(0, -CLICK(1), SECTOR(2)));
+		pos = pos1 - pos;
 		Camera.actualAngle = Camera.targetAngle + phd_atan(pos.z, pos.x);
 	}
 	else
@@ -779,7 +774,7 @@ void FixedCamera(ItemInfo* item)
 	}
 	else
 	{
-		LEVEL_CAMERA_INFO* camera = &g_Level.Cameras[Camera.number];
+		auto* camera = &g_Level.Cameras[Camera.number];
 
 		from.x = camera->x;
 		from.y = camera->y;
@@ -834,8 +829,7 @@ void LookCamera(ItemInfo* item)
 	else
 		OldCam.pos.Orientation.y = lara->ExtraHeadRot.y;
 
-	Vector3i pos = { 0, (int)CLICK(0.25f) / 4, (int)CLICK(0.25f) };
-	GetLaraJointPosition(&pos, LM_HEAD);
+	auto pos = GetLaraJointPosition(LM_HEAD, Vector3i(0, CLICK(0.25f) / 4, CLICK(0.25f)));
 
 	auto probe = GetCollision(pos.x, pos.y, pos.z, item->RoomNumber);
 	if (probe.Position.Floor == NO_HEIGHT ||
@@ -844,8 +838,7 @@ void LookCamera(ItemInfo* item)
 		pos.y > probe.Position.Floor ||
 		pos.y < probe.Position.Ceiling)
 	{
-		pos = { 0, (int)CLICK(0.25f) / 4 , 0 };
-		GetLaraJointPosition(&pos, LM_HEAD);
+		pos = GetLaraJointPosition(LM_HEAD, Vector3i(0, CLICK(0.25f) / 4, 0));
 
 		probe = GetCollision(pos.x, pos.y + CLICK(1), pos.z, item->RoomNumber);
 		if (TestEnvironment(ENV_FLAG_SWAMP, probe.RoomNumber))
@@ -862,18 +855,12 @@ void LookCamera(ItemInfo* item)
 			pos.y > probe.Position.Floor ||
 			pos.y < probe.Position.Ceiling)
 		{
-			pos.x = 0;
-			pos.y = CLICK(0.25f) / 4;
-			pos.z = -CLICK(0.25f);
-			GetLaraJointPosition(&pos, LM_HEAD);
+			pos = GetLaraJointPosition(LM_HEAD, Vector3i(0, CLICK(0.25f) / 4, -CLICK(0.25f)));
 		}
 	}
 
-	Vector3i pos2 = { 0, 0, -SECTOR(1) };
-	GetLaraJointPosition(&pos2, LM_HEAD);
-
-	Vector3i pos3 = { 0, 0, CLICK(8) };
-	GetLaraJointPosition(&pos3, LM_HEAD);
+	auto pos2 = GetLaraJointPosition(LM_HEAD, Vector3i(0, 0, -SECTOR(1)));
+	auto pos3 = GetLaraJointPosition(LM_HEAD, Vector3i(0, 0, CLICK(8)));
 
 	int dx = (pos2.x - pos.x) >> 3;
 	int dy = (pos2.y - pos.y) >> 3;
@@ -882,12 +869,12 @@ void LookCamera(ItemInfo* item)
 	int y = pos.y;
 	int z = pos.z;
 
-	int roomNum;
+	int roomNumber;
 	probe.RoomNumber = item->RoomNumber;
 	int i = 0;
 	for (i = 0; i < 8; i++)
 	{
-		roomNum = probe.RoomNumber;
+		roomNumber = probe.RoomNumber;
 		probe = GetCollision(x, y + CLICK(1), z, probe.RoomNumber);
 		if (TestEnvironment(ENV_FLAG_SWAMP, probe.RoomNumber))
 		{
@@ -918,8 +905,7 @@ void LookCamera(ItemInfo* item)
 		z -= dz;
 	}
 
-	GameVector ideal = { x, y, z };
-	ideal.roomNumber = roomNum;
+	auto ideal = GameVector(x, y, z, roomNumber);
 
 	if (OldCam.pos.Orientation.x == lara->ExtraHeadRot.x &&
 		OldCam.pos.Orientation.y == lara->ExtraHeadRot.y &&
@@ -1382,8 +1368,7 @@ void BinocularCamera(ItemInfo* item)
 
 void ConfirmCameraTargetPos()
 {
-	auto pos = Vector3i::Zero;
-	GetLaraJointPosition(&pos, LM_TORSO);
+	auto pos = GetLaraJointPosition(LM_TORSO);
 
 	if (Camera.laraNode != -1)
 	{

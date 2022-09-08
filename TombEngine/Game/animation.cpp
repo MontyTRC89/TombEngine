@@ -576,20 +576,12 @@ void ClampRotation(PoseData* pose, short angle, short rotation)
 
 Vector3i GetLaraJointPosition(int jointIndex, const Vector3i& offset)
 {
-	auto pos = offset;
-	GetLaraJointPosition(&pos, jointIndex);
-	return pos;
-}
-
-void GetLaraJointPosition(Vector3i* offset, int jointIndex)
-{
 	if (jointIndex >= NUM_LARA_MESHES)
 		jointIndex = LM_HEAD;
 
-	auto pos = offset->ToVector3();
+	auto pos = offset.ToVector3();
 	g_Renderer.GetLaraAbsBonePosition(&pos, jointIndex);
-
-	*offset = Vector3i(pos);
+	return Vector3i(pos);
 }
 
 Vector3i GetJointAbsPosition(ItemInfo* item, int jointIndex, Vector3i offset)

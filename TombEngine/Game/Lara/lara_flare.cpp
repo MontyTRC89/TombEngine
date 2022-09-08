@@ -296,8 +296,7 @@ void CreateFlare(ItemInfo* laraItem, GAME_OBJECT_ID objectNumber, bool thrown)
 		flareItem->ObjectNumber = objectNumber;
 		flareItem->RoomNumber = laraItem->RoomNumber;
 
-		auto pos = Vector3i(-16, 32, 42);
-		GetLaraJointPosition(&pos, LM_LHAND);
+		auto pos = GetLaraJointPosition(LM_LHAND, Vector3i(-16, 32, 42));
 
 		flareItem->Pose.Position = pos;
 
@@ -368,8 +367,7 @@ void DoFlareInHand(ItemInfo* laraItem, int flareLife)
 {
 	auto* lara = GetLaraInfo(laraItem);
 
-	auto pos = Vector3i(11, 32, 41);
-	GetLaraJointPosition(&pos, LM_LHAND);
+	auto pos = GetLaraJointPosition(LM_LHAND, Vector3i(11, 32, 41));
 
 	if (DoFlareLight(&pos, flareLife))
 		TriggerChaffEffects(flareLife);
@@ -391,10 +389,10 @@ void DoFlareInHand(ItemInfo* laraItem, int flareLife)
 		lara->Flare.Life++;
 }
 
-int DoFlareLight(Vector3i* pos, int flareLife)
+bool DoFlareLight(Vector3i* pos, int flareLife)
 {
 	if (flareLife >= FLARE_LIFE_MAX || flareLife == 0)
-		return 0;
+		return false;
 
 	float random = GenerateFloat();
 
@@ -443,5 +441,5 @@ int DoFlareLight(Vector3i* pos, int flareLife)
 		result = (random < 0.3f);
 	}
 
-	return (dying || ending ? result : true);
+	return ((dying || ending) ? result : true);
 }

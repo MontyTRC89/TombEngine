@@ -933,63 +933,45 @@ int GetFreeGunshell()
 
 void TriggerGunShell(short hand, short objNum, LaraWeaponType weaponType)
 {
-	Vector3i pos;
-
+	auto pos = Vector3i::Zero;
 	if (hand)
 	{
+		auto offset = Vector3i::Zero;
 		switch (weaponType)
 		{
 		case LaraWeaponType::Pistol:
-			pos.x = 8;
-			pos.y = 48;
-			pos.z = 40;
+			offset = Vector3i(8, 48, 40);
 			break;
+
 		case LaraWeaponType::Uzi:
-			pos.x = 8;
-			pos.y = 35;
-			pos.z = 48;
+			offset = Vector3i(8, 35, 48);
 			break;
+
 		case LaraWeaponType::Shotgun:
-			pos.x = 16;
-			pos.y = 114;
-			pos.z = 32;
+			offset = Vector3i(16, 114, 32);
 			break;
+
 		case LaraWeaponType::HK:
-			pos.x = 16;
-			pos.y = 114;
-			pos.z = 96;
+			offset = Vector3i(16, 114, 96);
 			break;
+
 		default:
 			break;
 		}
 
-		GetLaraJointPosition(&pos, LM_RHAND);
+		pos = GetLaraJointPosition(LM_RHAND, offset);
 	}
 	else
 	{
 		if (weaponType == LaraWeaponType::Pistol)
-		{
-			pos.x = -12;
-			pos.y = 48;
-			pos.z = 40;
-
-			GetLaraJointPosition(&pos, LM_LHAND);
-		}
+			pos = GetLaraJointPosition(LM_LHAND, Vector3i(-12, 48, 40));
 		else if (weaponType == LaraWeaponType::Uzi)
-		{
-			pos.x = -16;
-			pos.y = 35;
-			pos.z = 48;
-
-			GetLaraJointPosition(&pos, LM_LHAND);
-		}		
+			pos = GetLaraJointPosition(LM_LHAND, Vector3i(-16, 35, 48));
 	}
 
-	GUNSHELL_STRUCT* gshell = &Gunshells[GetFreeGunshell()];
+	auto* gshell = &Gunshells[GetFreeGunshell()];
 
-	gshell->pos.Position.x = pos.x;
-	gshell->pos.Position.y = pos.y;
-	gshell->pos.Position.z = pos.z;
+	gshell->pos.Position = pos;
 	gshell->pos.Orientation.x = 0;
 	gshell->pos.Orientation.y = 0;
 	gshell->pos.Orientation.z = GetRandomControl();
@@ -1003,31 +985,36 @@ void TriggerGunShell(short hand, short objNum, LaraWeaponType weaponType)
 	{
 		if (weaponType == LaraWeaponType::Shotgun)
 		{
-			gshell->dirXrot = Lara.LeftArm.Orientation.y
-				+ Lara.ExtraTorsoRot.y
-				+ LaraItem->Pose.Orientation.y
-				- (GetRandomControl() & 0xFFF)
-				+ 10240;
-			gshell->pos.Orientation.y += Lara.LeftArm.Orientation.y 
-				+ Lara.ExtraTorsoRot.y 
-				+ LaraItem->Pose.Orientation.y;
+			gshell->dirXrot =
+				Lara.LeftArm.Orientation.y +
+				Lara.ExtraTorsoRot.y +
+				LaraItem->Pose.Orientation.y -
+				(GetRandomControl() & 0xFFF) +
+				10240;
+			gshell->pos.Orientation.y +=
+				Lara.LeftArm.Orientation.y +
+				Lara.ExtraTorsoRot.y +
+				LaraItem->Pose.Orientation.y;
+
 			if (gshell->speed < 24)
 				gshell->speed += 24;
 		}
 		else
 		{
-			gshell->dirXrot = Lara.LeftArm.Orientation.y 
-				+ LaraItem->Pose.Orientation.y 
-				- (GetRandomControl() & 0xFFF) 
-				+ 18432;
+			gshell->dirXrot =
+				Lara.LeftArm.Orientation.y +
+				LaraItem->Pose.Orientation.y -
+				(GetRandomControl() & 0xFFF) +
+				18432;
 		}
 	}
 	else
 	{
-		gshell->dirXrot = Lara.LeftArm.Orientation.y 
-			+ LaraItem->Pose.Orientation.y 
-			+ (GetRandomControl() & 0xFFF) 
-			- 18432;
+		gshell->dirXrot =
+			Lara.LeftArm.Orientation.y +
+			LaraItem->Pose.Orientation.y +
+			(GetRandomControl() & 0xFFF) -
+			18432;
 	}
 
 	if (LaraItem->MeshBits)
@@ -1043,97 +1030,88 @@ void UpdateGunShells()
 {
 	for (int i = 0; i < MAX_GUNSHELL; i++)
 	{
-		GUNSHELL_STRUCT* gs = &Gunshells[i];
+		auto* gunshell = &Gunshells[i];
 
-		if (gs->counter)
+		if (gunshell->counter)
 		{
-			int oldX = gs->pos.Position.x;
-			int oldY = gs->pos.Position.y;
-			int oldZ = gs->pos.Position.z;
+			auto prevPos = gunshell->pos.Position;
 
-			gs->counter--;
+			gunshell->counter--;
 
-			short oldRoomNumber = gs->roomNumber;
+			short prevRoomNumber = gunshell->roomNumber;
 
-			if (g_Level.Rooms[gs->roomNumber].flags & ENV_FLAG_WATER)
+			if (TestEnvironment(ENV_FLAG_WATER, gunshell->roomNumber))
 			{
-				gs->fallspeed++;
+				gunshell->fallspeed++;
 
-				if (gs->fallspeed <= 8)
+				if (gunshell->fallspeed <= 8)
 				{
-					if (gs->fallspeed < 0)
-						gs->fallspeed >>= 1;
+					if (gunshell->fallspeed < 0)
+						gunshell->fallspeed >>= 1;
 				}
 				else
-				{
-					gs->fallspeed = 8;
-				}
-				gs->speed -= gs->speed >> 1;
+					gunshell->fallspeed = 8;
+				
+				gunshell->speed -= gunshell->speed >> 1;
 			}
 			else
-			{
-				gs->fallspeed += 6;
-			}
+				gunshell->fallspeed += 6;
 
-			gs->pos.Orientation.x += (gs->speed >> 1 + 7) * ANGLE(1);
-			gs->pos.Orientation.y += gs->speed * ANGLE(1);
-			gs->pos.Orientation.z += ANGLE(23);
+			gunshell->pos.Orientation.x += (gunshell->speed >> 1 + 7) * ANGLE(1.0f);
+			gunshell->pos.Orientation.y += gunshell->speed * ANGLE(1.0f);
+			gunshell->pos.Orientation.z += ANGLE(23.0f);
 
-			gs->pos.Position.x += gs->speed * phd_sin(gs->dirXrot);
-			gs->pos.Position.y += gs->fallspeed;
-			gs->pos.Position.z += gs->speed * phd_cos(gs->dirXrot);
+			gunshell->pos.Position.x += gunshell->speed * phd_sin(gunshell->dirXrot);
+			gunshell->pos.Position.y += gunshell->fallspeed;
+			gunshell->pos.Position.z += gunshell->speed * phd_cos(gunshell->dirXrot);
 
-			FloorInfo* floor = GetFloor(gs->pos.Position.x, gs->pos.Position.y, gs->pos.Position.z, &gs->roomNumber);
-			if (g_Level.Rooms[gs->roomNumber].flags & ENV_FLAG_WATER
-				&& !(g_Level.Rooms[oldRoomNumber].flags & ENV_FLAG_WATER))
+			FloorInfo* floor = GetFloor(gunshell->pos.Position.x, gunshell->pos.Position.y, gunshell->pos.Position.z, &gunshell->roomNumber);
+			if (g_Level.Rooms[gunshell->roomNumber].flags & ENV_FLAG_WATER
+				&& !(g_Level.Rooms[prevRoomNumber].flags & ENV_FLAG_WATER))
 			{
 
-				TEN::Effects::Drip::SpawnGunshellDrips(Vector3(gs->pos.Position.x, g_Level.Rooms[gs->roomNumber].maxceiling, gs->pos.Position.z), gs->roomNumber);
+				TEN::Effects::Drip::SpawnGunshellDrips(Vector3(gunshell->pos.Position.x, g_Level.Rooms[gunshell->roomNumber].maxceiling, gunshell->pos.Position.z), gunshell->roomNumber);
 				//AddWaterSparks(gs->pos.Position.x, g_Level.Rooms[gs->roomNumber].maxceiling, gs->pos.Position.z, 8);
-				SetupRipple(gs->pos.Position.x, g_Level.Rooms[gs->roomNumber].maxceiling, gs->pos.Position.z, (GetRandomControl() & 3) + 8, RIPPLE_FLAG_SHORT_INIT);
-				gs->fallspeed >>= 5;
+				SetupRipple(gunshell->pos.Position.x, g_Level.Rooms[gunshell->roomNumber].maxceiling, gunshell->pos.Position.z, (GetRandomControl() & 3) + 8, RIPPLE_FLAG_SHORT_INIT);
+				gunshell->fallspeed >>= 5;
 				continue;
 			}
 
-			int ceiling = GetCeiling(floor, gs->pos.Position.x, gs->pos.Position.y, gs->pos.Position.z);
-			if (gs->pos.Position.y < ceiling)
+			int ceiling = GetCeiling(floor, gunshell->pos.Position.x, gunshell->pos.Position.y, gunshell->pos.Position.z);
+			if (gunshell->pos.Position.y < ceiling)
 			{
-				SoundEffect(SFX_TR4_SHOTGUN_SHELL, &gs->pos);
-				gs->speed -= 4;
+				SoundEffect(SFX_TR4_SHOTGUN_SHELL, &gunshell->pos);
+				gunshell->speed -= 4;
 
-				if (gs->speed < 8)
+				if (gunshell->speed < 8)
 				{
-					gs->counter = 0;
+					gunshell->counter = 0;
 					continue;
 				}
 
-				gs->pos.Position.y = ceiling;
-				gs->fallspeed = -gs->fallspeed;
+				gunshell->pos.Position.y = ceiling;
+				gunshell->fallspeed = -gunshell->fallspeed;
 			}
 
-			int height = GetFloorHeight(floor, gs->pos.Position.x, gs->pos.Position.y, gs->pos.Position.z);
-			if (gs->pos.Position.y >= height)
+			int height = GetFloorHeight(floor, gunshell->pos.Position.x, gunshell->pos.Position.y, gunshell->pos.Position.z);
+			if (gunshell->pos.Position.y >= height)
 			{
-				SoundEffect(SFX_TR4_SHOTGUN_SHELL, &gs->pos);
-				gs->speed -= 8;
-				if (gs->speed >= 8)
+				SoundEffect(SFX_TR4_SHOTGUN_SHELL, &gunshell->pos);
+				gunshell->speed -= 8;
+				if (gunshell->speed >= 8)
 				{
-					if (oldY <= height)
-					{
-						gs->fallspeed = -gs->fallspeed >> 1;
-					}
+					if (prevPos.y <= height)
+						gunshell->fallspeed = -gunshell->fallspeed >> 1;
 					else
 					{
-						gs->dirXrot += -ANGLE(180);
-						gs->pos.Position.x = oldX;
-						gs->pos.Position.z = oldZ;
+						gunshell->dirXrot += ANGLE(-180.0f);
+						gunshell->pos.Position.x = prevPos.x;
+						gunshell->pos.Position.z = prevPos.z;
 					}
-					gs->pos.Position.y = oldY;
+					gunshell->pos.Position.y = prevPos.y;
 				}
 				else
-				{
-					gs->counter = 0;
-				}
+					gunshell->counter = 0;
 			}
 		}
 	}
@@ -1176,42 +1154,24 @@ void AddWaterSparks(int x, int y, int z, int num)
 
 void LaraBubbles(ItemInfo* item)
 {
-	Vector3i pos;
-	int num, i;
-
 	SoundEffect(SFX_TR4_LARA_BUBBLES, &item->Pose, SoundEnvironment::Water);
 
-	pos.x = 0;
-
 	auto level = g_GameFlow->GetLevel(CurrentLevel);
+	auto pos = Vector3i::Zero;
 
 	if (level->GetLaraType() == LaraType::Divesuit)
-	{
-		pos.y = -192;
-		pos.z = -160;
-
-		GetLaraJointPosition(&pos, LM_TORSO);
-	}
+		pos = GetLaraJointPosition(LM_TORSO, Vector3i(0, -192, -160));
 	else
-	{
-		pos.y = -4;
-		pos.z = 64;
+		GetLaraJointPosition(LM_HEAD, Vector3i(0, -4, -64));
 
-		GetLaraJointPosition(&pos, LM_HEAD);
-	}
-
-	num = (GetRandomControl() & 1) + 2;
-
-	for (i = 0; i < num; i++)
-	{
+	int numBubbles = (GetRandomControl() & 1) + 2;
+	for (int i = 0; i < numBubbles; i++)
 		CreateBubble(&pos, item->RoomNumber, 8, 7, 0, 0, 0, 0);
-	}
 }
-
 
 int GetFreeDrip()
 {
-	DRIP_STRUCT* drip = &Drips[NextDrip];
+	auto* drip = &Drips[NextDrip];
 	int dripNum = NextDrip;
 	short minLife = 4095;
 	short minIndex = 0;
@@ -1301,42 +1261,41 @@ void TriggerLaraDrips(ItemInfo* item)
 	{
 		for (int i = 0; i < NUM_LARA_MESHES; i++)
 		{
-			auto pos = Vector3i::Zero;
-
-			GetLaraJointPosition(&pos, (LARA_MESHES)i);
+			auto pos = GetLaraJointPosition(i);
 			auto room = GetRoom(item->Location, pos.x, pos.y, pos.z).roomNumber;
 
 			if (g_Level.Rooms[room].flags & ENV_FLAG_WATER)
 				Lara.Wet[i] = UCHAR_MAX;
 
-			if (Lara.Wet[i] 
-				&& !LaraNodeUnderwater[i] 
-				&& (GetRandomControl() & 0x1FF) < Lara.Wet[i])
+			if (Lara.Wet[i] &&
+				!LaraNodeUnderwater[i] &&
+				(GetRandomControl() & 0x1FF) < Lara.Wet[i])
 			{
+				auto* drip = &Drips[GetFreeDrip()];
 
-				pos.x = (GetRandomControl() & 0x1F) - 16;
-				pos.y = (GetRandomControl() & 0xF) + 16;
-				pos.z = (GetRandomControl() & 0x1F) - 16;
-
-				DRIP_STRUCT* dptr = &Drips[GetFreeDrip()];
-				GetLaraJointPosition(&pos, i);
-				dptr->x = pos.x;
-				dptr->y = pos.y;
-				dptr->z = pos.z;
-				dptr->on = 1;
-				dptr->r = (GetRandomControl() & 7) + 64;
-				dptr->g = (GetRandomControl() & 7) + 96;
-				dptr->b = (GetRandomControl() & 7) + 128;
-				dptr->yVel = (GetRandomControl() & 0x1F) + 32;
-				dptr->gravity = (GetRandomControl() & 0x1F) + 32;
-				dptr->life = (GetRandomControl() & 0x1F) + 8;
-				dptr->roomNumber = LaraItem->RoomNumber;
+				auto pos = GetLaraJointPosition(
+					i,
+					Vector3i(
+						(GetRandomControl() & 0x1F) - 16,
+						(GetRandomControl() & 0xF) + 16,
+						(GetRandomControl() & 0x1F) - 16
+					));
+				drip->x = pos.x;
+				drip->y = pos.y;
+				drip->z = pos.z;
+				drip->on = 1;
+				drip->r = (GetRandomControl() & 7) + 64;
+				drip->g = (GetRandomControl() & 7) + 96;
+				drip->b = (GetRandomControl() & 7) + 128;
+				drip->yVel = (GetRandomControl() & 0x1F) + 32;
+				drip->gravity = (GetRandomControl() & 0x1F) + 32;
+				drip->life = (GetRandomControl() & 0x1F) + 8;
+				drip->roomNumber = LaraItem->RoomNumber;
 
 				if (Lara.Wet[i] >= 4)
 					Lara.Wet[i] -= 4;
 				else
 					Lara.Wet[i] = 0;
-
 			}
 		}
 	}

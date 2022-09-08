@@ -48,46 +48,45 @@ void AnimatePistols(ItemInfo* laraItem, LaraWeaponType weaponType)
 	{
 		if (lara->LeftArm.GunSmoke)
 		{
-			Vector3i pos;
+			auto offset = Vector3i::Zero;
 			switch (weaponType)
 			{
 			case LaraWeaponType::Pistol:
-				pos = { 4, 128, 40 };
+				offset = Vector3i(4, 128, 40);
 				break;
 
 			case LaraWeaponType::Revolver:
-				pos = { 16, 160, 56 };
+				offset = Vector3i(16, 160, 56);
 				break;
 
 			case LaraWeaponType::Uzi:
-				pos = { 8, 140, 48 };
+				offset = Vector3i(8, 140, 48);
 				break;
 			}
 
-			GetLaraJointPosition(&pos, LM_LHAND);
+			auto pos = GetLaraJointPosition(LM_LHAND, offset);
 			TriggerGunSmoke(pos.x, pos.y, pos.z, 0, 0, 0, 0, weaponType, lara->LeftArm.GunSmoke);
 		}
 
 		if (lara->RightArm.GunSmoke)
 		{
-			Vector3i pos;
-
+			auto offset = Vector3i::Zero;
 			switch (weaponType)
 			{
 			case LaraWeaponType::Pistol:
-				pos = { -16, 128, 40 };
+				offset = Vector3i(-16, 128, 40);
 				break;
 
 			case LaraWeaponType::Revolver:
-				pos = { -32, 160, 56 };
+				offset = Vector3i(-32, 160, 56);
 				break;
 
 			case LaraWeaponType::Uzi:
-				pos = { -16, 140, 48 };
+				offset = Vector3i(-16, 140, 48);
 				break;
 			}
 
-			GetLaraJointPosition(&pos, LM_RHAND);
+			auto pos = GetLaraJointPosition(LM_RHAND, offset);
 			TriggerGunSmoke(pos.x, pos.y, pos.z, 0, 0, 0, 0, weaponType, lara->RightArm.GunSmoke);
 		}
 	}
@@ -315,12 +314,13 @@ void PistolHandler(ItemInfo* laraItem, LaraWeaponType weaponType)
 	
 	if (lara->LeftArm.GunFlash || lara->RightArm.GunFlash)
 	{
-		Vector3i pos;
-		pos.x = (byte)GetRandomControl() - 128;
-		pos.y = (GetRandomControl() & 0x7F) - 63;
-		pos.z = (byte)GetRandomControl() - 128;
-		GetLaraJointPosition(&pos, lara->LeftArm.GunFlash != 0 ? LM_LHAND : LM_RHAND);
-
+		auto pos = GetLaraJointPosition(
+			(lara->LeftArm.GunFlash != 0) ? LM_LHAND : LM_RHAND,
+			Vector3i(
+				(byte)GetRandomControl() - 128,
+				(GetRandomControl() & 0x7F) - 63,
+				(byte)GetRandomControl() - 128
+			));
 		TriggerDynamicLight(pos.x+GenerateFloat(-128,128), pos.y + GenerateFloat(-128, 128), pos.z + GenerateFloat(-128, 128), GenerateFloat(8,11), (GetRandomControl() & 0x3F) + 192, (GetRandomControl() & 0x1F) + 128, GetRandomControl() & 0x3F);
 	}
 }

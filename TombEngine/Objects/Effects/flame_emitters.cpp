@@ -274,11 +274,7 @@ namespace TEN::Entities::Effects
 		{
 			if (!(Wibble & 0xC))
 			{
-				fx->pos.Position.x = 0;
-				fx->pos.Position.y = 0;
-				fx->pos.Position.z = 0;
-
-				GetLaraJointPosition((Vector3i*)&fx->pos, i);
+				fx->pos.Position = GetLaraJointPosition(i);
 
 				// TR5 code?
 				if (Lara.BurnCount)
@@ -295,8 +291,7 @@ namespace TEN::Entities::Effects
 		byte r = (GetRandomControl() & 0x3F) + 192;
 		byte g = (GetRandomControl() & 0x1F) + 96;
 
-		auto pos = Vector3i::Zero;
-		GetLaraJointPosition(&pos, LM_HIPS);
+		auto pos = GetLaraJointPosition(LM_HIPS);
 
 		if (!Lara.BurnSmoke)
 		{

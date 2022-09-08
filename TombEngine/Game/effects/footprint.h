@@ -22,7 +22,7 @@ namespace TEN::Effects::Footprints
 	};
 	extern std::deque<FOOTPRINT_STRUCT> footprints;
 
-	bool CheckFootOnFloor(ItemInfo const & item, int mesh, Vector3& outFootprintPosition);
+	bool CheckFootOnFloor(const ItemInfo& item, int mesh, Vector3& outFootprintPosition);
 	void AddFootprint(ItemInfo* item, bool rightFoot);
 	void UpdateFootprints();
 }

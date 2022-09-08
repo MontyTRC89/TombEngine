@@ -67,28 +67,27 @@ namespace TEN::Entities::TR5
 
 				item->MeshBits = 1664;
 
-				GameVector pos1 = { 0, 0, -64 };
+				auto pos1 = GameVector(0, 0, -64);
 				GetJointAbsPosition(item, (Vector3i*)&pos1, 8);
 
-				GameVector pos2 = { 0, 0, 0 };
-				GetLaraJointPosition((Vector3i*)&pos2, 0);
+				auto pos2 = GameVector(GetLaraJointPosition(LM_HIPS));
 
 				pos1.roomNumber = item->RoomNumber;
 
 				int los = LOS(&pos1, &pos2);
 				EulerAngles orient;
 
-			// FIXME:
-			if (los)
-			{
-				orient = Geometry::GetOrientTowardPoint(pos1.ToVector3(), pos2.ToVector3());
-				orient.y -= item->Pose.Orientation.y;
-			}
-			else
-			{
-				orient.x = item->ItemFlags[1];
-				orient.y = item->ItemFlags[0];
-			}
+				// FIXME:
+				if (los)
+				{
+					orient = Geometry::GetOrientTowardPoint(pos1.ToVector3(), pos2.ToVector3());
+					orient.y -= item->Pose.Orientation.y;
+				}
+				else
+				{
+					orient.x = item->ItemFlags[1];
+					orient.y = item->ItemFlags[0];
+				}
 
 				short angle1, angle2;
 				InterpolateAngle(orient.x, &item->ItemFlags[1], &angle2, 4);
@@ -110,8 +109,7 @@ namespace TEN::Entities::TR5
 
 						if (GetRandomControl() & 3)
 						{
-							auto pos2 = Vector3i::Zero;
-							GetLaraJointPosition((Vector3i*)&pos2, GetRandomControl() % 15);
+							auto pos2 = GetLaraJointPosition(GetRandomControl() % 15);
 
 							DoBloodSplat(pos2.x, pos2.y, pos2.z, (GetRandomControl() & 3) + 3, 2 * GetRandomControl(), LaraItem->RoomNumber);
 							DoDamage(LaraItem, 20);

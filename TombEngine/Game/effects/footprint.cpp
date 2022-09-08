@@ -13,7 +13,7 @@ namespace TEN::Effects::Footprints
 {
 	std::deque<FOOTPRINT_STRUCT> footprints = std::deque<FOOTPRINT_STRUCT>();
 
-	bool CheckFootOnFloor(ItemInfo const & item, int mesh, Vector3& outFootprintPosition) 
+	bool CheckFootOnFloor(const ItemInfo& item, int mesh, Vector3& outFootprintPosition)
 	{
 		int x = item.Pose.Position.x;
 		int y = item.Pose.Position.y;
@@ -21,10 +21,8 @@ namespace TEN::Effects::Footprints
 		short roomNumber = item.RoomNumber;
 
 		auto floor = GetFloor(x, y, z, &roomNumber);
-		auto pos = Vector3i(0, FOOT_HEIGHT_OFFSET, 0);
-
-		GetLaraJointPosition(&pos, mesh);
-		int height = GetFloorHeight(floor, pos.x, pos.y - STEP_SIZE, pos.z);
+		auto pos = GetLaraJointPosition(mesh, Vector3i(0, FOOT_HEIGHT_OFFSET, 0));
+		int height = GetFloorHeight(floor, pos.x, pos.y - CLICK(1), pos.z);
 
 		outFootprintPosition.x = pos.x;
 		outFootprintPosition.y = height - 8;

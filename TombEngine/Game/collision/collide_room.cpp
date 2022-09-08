@@ -1445,6 +1445,11 @@ bool TestEnvironment(RoomEnvFlags environmentType, int x, int y, int z, int room
 	return TestEnvironment(environmentType, GetCollision(x, y, z, roomNumber).RoomNumber);
 }
 
+bool TestEnvironment(RoomEnvFlags environmentType, Vector3i pos, int roomNumber)
+{
+	return TestEnvironment(environmentType, GetCollision(pos.x, pos.y, pos.z, roomNumber).RoomNumber);
+}
+
 bool TestEnvironment(RoomEnvFlags environmentType, ItemInfo* item)
 {
 	return TestEnvironment(environmentType, item->RoomNumber);

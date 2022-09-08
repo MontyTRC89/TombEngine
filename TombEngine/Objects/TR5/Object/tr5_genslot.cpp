@@ -46,9 +46,7 @@ void GenSlot1Control(short itemNumber)
 			{
 				for (int i = 0; i < 8; i++)
 				{
-					Vector3i pos = { 0, 0, 0 };
-					GetLaraJointPosition(&pos, i + 7);
-
+					auto pos = GetLaraJointPosition(i + 7);
 					int x = pos.x + (GetRandomControl() & 0xFF) - 128;
 					int y = pos.y + (GetRandomControl() & 0xFF) - 128;
 					int z = pos.z + (GetRandomControl() & 0xFF) - 128;

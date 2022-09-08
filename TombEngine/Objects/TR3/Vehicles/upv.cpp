@@ -721,8 +721,7 @@ namespace TEN::Entities::Vehicles
 			{
 				UPV->Flags &= ~UPV_FLAG_CONTROL;
 
-				Vector3i vec = { 0, 0, 0 };
-				GetLaraJointPosition(&vec, LM_HIPS);
+				auto vec = GetLaraJointPosition(LM_HIPS);
 
 				auto LPos = GameVector(
 					vec.x,
@@ -771,8 +770,7 @@ namespace TEN::Entities::Vehicles
 				else
 					heightFromWater = NO_HEIGHT;
 
-				auto vec = Vector3i::Zero;
-				GetLaraJointPosition(&vec, LM_HIPS);
+				auto vec = GetLaraJointPosition(LM_HIPS);
 
 				laraItem->Pose.Position.x = vec.x;
 				//laraItem->Pose.Position.y += -heightFromWater + 1; // Doesn't work as intended.
@@ -808,9 +806,7 @@ namespace TEN::Entities::Vehicles
 			if ((anim == UPV_ANIM_IDLE_DEATH || anim == UPV_ANIM_MOVING_DEATH) &&
 				(frame == UPV_DEATH_FRAME_1 || frame == UPV_DEATH_FRAME_2))
 			{
-				auto vec = Vector3i::Zero;
-				GetLaraJointPosition(&vec, LM_HIPS);
-
+				auto vec = GetLaraJointPosition(LM_HIPS);
 				laraItem->Pose.Position = vec;
 				laraItem->Pose.Orientation.x = 0;
 				laraItem->Pose.Orientation.z = 0;

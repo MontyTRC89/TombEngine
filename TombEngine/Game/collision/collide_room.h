@@ -155,6 +155,7 @@ void SnapItemToGrid(ItemInfo* item, CollisionInfo* coll);
 void AlignEntityToSurface(ItemInfo* item, Vector2 radius, float tiltConstraintAngle = 45.0f, EulerAngles tiltOffset = EulerAngles::Zero);
 
 bool TestEnvironment(RoomEnvFlags environmentType, int x, int y, int z, int roomNumber);
+bool TestEnvironment(RoomEnvFlags environmentType, Vector3i pos, int roomNumber);
 bool TestEnvironment(RoomEnvFlags environmentType, ItemInfo* item);
 bool TestEnvironment(RoomEnvFlags environmentType, int roomNumber);
 bool TestEnvironment(RoomEnvFlags environmentType, ROOM_INFO* room);

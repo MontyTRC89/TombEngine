@@ -1054,6 +1054,7 @@ void LaraGetNewTarget(ItemInfo* laraItem, WeaponInfo* weaponInfo)
 				int x = item->Pose.Position.x - origin.x;
 				int y = item->Pose.Position.y - origin.y;
 				int z = item->Pose.Position.z - origin.z;
+
 				if (abs(x) <= maxDistance &&
 					abs(y) <= maxDistance &&
 					abs(z) <= maxDistance)
@@ -1063,6 +1064,7 @@ void LaraGetNewTarget(ItemInfo* laraItem, WeaponInfo* weaponInfo)
 					{
 						auto target = GameVector::Zero;
 						FindTargetPoint(item, &target);
+
 						if (LOS(&origin, &target))
 						{
 							auto orient = Geometry::GetOrientTowardPoint(origin.ToVector3(), target.ToVector3());

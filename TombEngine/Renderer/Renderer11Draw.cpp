@@ -46,18 +46,18 @@ namespace TEN::Renderer
 		std::vector<Sphere> nearestSpheres;
 		nearestSpheres.reserve(g_Configuration.ShadowMaxBlobs);
 
-		// Collect Lara spheres
+		// Collect Lara spheres.
 
 		static const std::array<LARA_MESHES, 4> sphereMeshes = { LM_HIPS, LM_TORSO, LM_LFOOT, LM_RFOOT };
 		static const std::array<float, 4> sphereScaleFactors = { 6.0f, 3.2f, 2.8f, 2.8f };
 
-		for (auto& r : renderView.roomsToDraw) 
+		for (auto& room : renderView.roomsToDraw) 
 		{
-			for (auto& i : r->ItemsToDraw) 
+			for (auto& i : room->ItemsToDraw) 
 			{
 				auto& nativeItem = g_Level.Items[i->ItemNumber];
 
-				//Skip everything thats not "alive" or is not a vehicle
+				// Skip everything that's not "alive" or not a vehicle.
 
 				if (Objects[nativeItem.ObjectNumber].shadowType == ShadowMode::None)
 					continue;
@@ -69,26 +69,26 @@ namespace TEN::Renderer
 						if (!nativeItem.TestBits(JointBitType::Mesh, sphereMeshes[i]))
 							continue;
 
-						MESH& m = g_Level.Meshes[Lara.MeshPtrs[sphereMeshes[i]]];
-						Vector3i pos = { (int)m.sphere.Center.x, (int)m.sphere.Center.y, (int)m.sphere.Center.z };
+						auto& mesh = g_Level.Meshes[Lara.MeshPtrs[sphereMeshes[i]]];
+						auto offset = Vector3i(mesh.sphere.Center.x, mesh.sphere.Center.y, mesh.sphere.Center.z);
 
-						// Push feet spheres a little bit down
+						// Push foot spheres a little lower.
 						if (sphereMeshes[i] == LM_LFOOT || sphereMeshes[i] == LM_RFOOT)
-							pos.y += 8;
-						GetLaraJointPosition(&pos, sphereMeshes[i]);
+							offset.y += 8;
+						auto pos = GetLaraJointPosition(sphereMeshes[i], offset);
 
 						auto& newSphere = nearestSpheres.emplace_back();
 						newSphere.position = Vector3(pos.x, pos.y, pos.z);
-						newSphere.radius = m.sphere.Radius * sphereScaleFactors[i];
+						newSphere.radius = mesh.sphere.Radius * sphereScaleFactors[i];
 					}
 				}
 				else
 				{
-					auto bb = GetBoundsAccurate(&nativeItem);
-					Vector3 center = ((Vector3(bb->X1, bb->Y1, bb->Z1) + Vector3(bb->X2, bb->Y2, bb->Z2)) / 2) +
+					auto bBox = GetBoundsAccurate(&nativeItem);
+					auto center = ((Vector3(bBox->X1, bBox->Y1, bBox->Z1) + Vector3(bBox->X2, bBox->Y2, bBox->Z2)) / 2) +
 						Vector3(nativeItem.Pose.Position.x, nativeItem.Pose.Position.y, nativeItem.Pose.Position.z);
 					center.y = nativeItem.Pose.Position.y;
-					float maxExtent = std::max(bb->X2 - bb->X1, bb->Z2 - bb->Z1);
+					float maxExtent = std::max(bBox->X2 - bBox->X1, bBox->Z2 - bBox->Z1);
 
 					auto& newSphere = nearestSpheres.emplace_back();
 					newSphere.position = center;
@@ -102,8 +102,7 @@ namespace TEN::Renderer
 			std::sort(nearestSpheres.begin(), nearestSpheres.end(), [](const Sphere& a, const Sphere& b) 
 			{
 				auto& laraPos = LaraItem->Pose.Position;
-				auto laraPosition = Vector3(laraPos.x, laraPos.y, laraPos.z);
-				return Vector3::Distance(laraPosition, a.position) < Vector3::Distance(laraPosition, b.position);
+				return Vector3::Distance(laraPos.ToVector3(), a.position) < Vector3::Distance(laraPos.ToVector3(), b.position);
 			});
 
 			std::copy(nearestSpheres.begin(), nearestSpheres.begin() + g_Configuration.ShadowMaxBlobs, m_stShadowMap.Spheres);
