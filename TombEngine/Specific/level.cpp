@@ -1092,7 +1092,7 @@ unsigned int _stdcall LoadLevel(void* data)
 		{
 			if (assemblyVersion[i] < version[i])
 			{
-				TENLog("Level version is higher than TEN version. Please update TEN.", LogLevel::Warning);
+				TENLog("Level version is different from TEN version.", LogLevel::Warning);
 				break;
 			}
 		}

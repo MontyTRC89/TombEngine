@@ -23,6 +23,8 @@ public:
 
 	static void Register(sol::table & parent);
 
+	void Enable();
+	void Disable();
 	Rotation GetRot() const;
 	void SetRot(Rotation const& rot);
 	Vec3 GetPos() const;

@@ -29,6 +29,14 @@ void Static::Register(sol::table & parent)
 		sol::meta_function::index, index_error,
 		sol::meta_function::new_index, newindex_error,
 
+		/// Enable the static, e.g. in cases when it was shattered or manually disabled before.
+		// @function Static:Enable
+		ScriptReserved_Enable, &Static::Enable,
+
+		/// Disable the static
+		// @function Static:Disable
+		ScriptReserved_Disable, &Static::Disable,
+
 		/// Get the static's position
 		// @function Static:GetPosition
 		// @treturn Vec3 a copy of the static's position
@@ -93,6 +101,16 @@ void Static::Register(sol::table & parent)
 		/// Shatter static mesh
 		// @function Static:Shatter
 		ScriptReserved_Shatter, &Static::Shatter);
+}
+
+void Static::Enable()
+{
+	m_mesh.flags |= StaticMeshFlags::SM_VISIBLE;
+}
+
+void Static::Disable()
+{
+	m_mesh.flags &= ~StaticMeshFlags::SM_VISIBLE;
 }
 
 Vec3 Static::GetPos() const
