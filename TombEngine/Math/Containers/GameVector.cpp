@@ -59,7 +59,12 @@
 		this->boxNumber = boxNumber;
 	}
 
-	Vector3i GameVector::ToVector3i()
+	Vector3 GameVector::ToVector3() const
+	{
+		return Vector3(x, y, z);
+	}
+
+	Vector3i GameVector::ToVector3i() const
 	{
 		return Vector3i(x, y, z);
 	}

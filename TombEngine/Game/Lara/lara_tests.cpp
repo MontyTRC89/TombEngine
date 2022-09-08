@@ -1,9 +1,10 @@
 #include "framework.h"
 #include "Game/Lara/lara_tests.h"
 
+#include "Flow/ScriptInterfaceFlowHandler.h"
 #include "Game/animation.h"
-#include "Game/collision/collide_room.h"
 #include "Game/collision/collide_item.h"
+#include "Game/collision/collide_room.h"
 #include "Game/control/control.h"
 #include "Game/control/los.h"
 #include "Game/items.h"
@@ -13,12 +14,13 @@
 #include "Game/Lara/lara_flare.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_monkey.h"
+#include "Math/Math.h"
 #include "Renderer/Renderer11.h"
-#include "Flow/ScriptInterfaceFlowHandler.h"
 #include "Specific/input.h"
 #include "Specific/level.h"
 
 using namespace TEN::Input;
+using namespace TEN::Math;
 using namespace TEN::Renderer;
 using namespace TEN::Floordata;
 
@@ -2494,7 +2496,7 @@ bool TestLaraSlideJump(ItemInfo* item, CollisionInfo* coll)
 		auto probe = GetCollision(item);
 
 		short direction = GetLaraSlideDirection(item, coll);
-		short steepness = GetSurfaceSteepnessAngle(probe.FloorTilt);
+		short steepness = Geometry::GetSurfaceSteepnessAngle(probe.FloorTilt);
 		return (abs((short)(coll->Setup.ForwardAngle - direction)) <= abs(steepness));
 	}
 
@@ -2545,7 +2547,7 @@ bool TestLaraPoleCollision(ItemInfo* item, CollisionInfo* coll, bool goingUp, fl
 
 		// Offset a sphere when jumping toward pole.
 		auto sphereOffset2D = Vector3::Zero;
-		sphereOffset2D = TranslatePoint(sphereOffset2D, item->Pose.Orientation.y, coll->Setup.Radius + item->Animation.Velocity.z);
+		sphereOffset2D = Geometry::TranslatePoint(sphereOffset2D, item->Pose.Orientation.y, coll->Setup.Radius + item->Animation.Velocity.z);
 
 		auto spherePos = laraBox.Center + Vector3(0.0f, (laraBox.Extents.y + poleProbeCollRadius + offset) * (goingUp ? -1 : 1), 0.0f);
 

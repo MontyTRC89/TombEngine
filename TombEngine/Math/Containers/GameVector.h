@@ -22,6 +22,7 @@ struct Vector3i;
 		GameVector(int xPos, int yPos, int zPos, short roomNumber);
 		GameVector(int xPos, int yPos, int zPos, short roomNumber, short boxNumber);
 
-		Vector3i ToVector3i();
+		Vector3	 ToVector3() const;
+		Vector3i ToVector3i() const;
 	};
 //}

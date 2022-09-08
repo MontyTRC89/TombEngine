@@ -1,6 +1,6 @@
 #pragma once
-#include "Math/Angles/EulerAngles.h"
 #include "Math/Constants.h"
+#include "Math/Containers/EulerAngles.h"
 #include "Math/Containers/GameVector.h"
 #include "Math/Containers/PoseData.h"
 #include "Math/Containers/Vector2i.h"

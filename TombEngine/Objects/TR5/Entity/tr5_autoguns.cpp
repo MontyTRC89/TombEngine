@@ -6,9 +6,12 @@
 #include "Game/control/los.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/tomb4fx.h"
+#include "Math/Math.h"
 #include "Specific/level.h"
 #include "Sound/sound.h"
 #include "Game/items.h"
+
+using namespace TEN::Math;
 
 namespace TEN::Entities::TR5
 {
@@ -73,25 +76,23 @@ namespace TEN::Entities::TR5
 				pos1.roomNumber = item->RoomNumber;
 
 				int los = LOS(&pos1, &pos2);
-				EulerAngles angles;
+				EulerAngles orient;
 
 			// FIXME:
 			if (los)
 			{
-				angles = GetOrientTowardPoint(
-					Vector3(pos1.x, pos1.y, pos1.z),
-					Vector3(pos2.x, pos2.y, pos2.z));
-				angles.y -= item->Pose.Orientation.y;
+				orient = Geometry::GetOrientTowardPoint(pos1.ToVector3(), pos2.ToVector3());
+				orient.y -= item->Pose.Orientation.y;
 			}
 			else
 			{
-				angles.x = item->ItemFlags[1];
-				angles.y = item->ItemFlags[0];
+				orient.x = item->ItemFlags[1];
+				orient.y = item->ItemFlags[0];
 			}
 
 				short angle1, angle2;
-				InterpolateAngle(angles.x, &item->ItemFlags[1], &angle2, 4);
-				InterpolateAngle(angles.y, item->ItemFlags, &angle1, 4);
+				InterpolateAngle(orient.x, &item->ItemFlags[1], &angle2, 4);
+				InterpolateAngle(orient.y, item->ItemFlags, &angle1, 4);
 
 				data[0] = item->ItemFlags[0];
 				data[1] = item->ItemFlags[1];

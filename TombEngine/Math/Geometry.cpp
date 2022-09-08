@@ -1,13 +1,13 @@
 #include "framework.h"
 #include "Math/Geometry.h"
 
-#include "Math/Angles/EulerAngles.h"
+#include "Math/Containers/EulerAngles.h"
 #include "Math/Containers/PoseData.h"
 #include "Math/Containers/Vector3i.h"
 #include "Math/Math.h"
 
-//namespace TEN::Math::Geometry
-//{
+namespace TEN::Math::Geometry
+{
 	Vector3i TranslatePoint(const Vector3i& point, short headingAngle, float forward, float down, float right)
 	{
 		return Vector3i(TranslatePoint(point.ToVector3(), headingAngle, forward, down, right));
@@ -163,4 +163,4 @@
 
 		return false;
 	}
-//}
+}

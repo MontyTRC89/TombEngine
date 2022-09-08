@@ -9,13 +9,13 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
+#include "Math/Math.h"
 #include "Objects/Effects/tr4_locusts.h"
 #include "Objects/objectslist.h"
 #include "Renderer/Renderer11Enums.h"
-#include "Math/Random.h"
 #include "Specific/setup.h"
-#include "Math/Math.h"
 
+using namespace TEN::Math;
 using namespace TEN::Math::Random;
 
 namespace TEN::Entities::TR4
@@ -139,7 +139,7 @@ namespace TEN::Entities::TR4
 		sptr->dSize = size / 4;
 	}
 
-	static void ShootFireball(PoseData* src, MissileRotationType rotationType, short roomNumber, int timer)
+	void ShootFireball(PoseData* src, MissileRotationType rotationType, short roomNumber, int timer)
 	{
 		switch (rotationType)
 		{
@@ -155,7 +155,7 @@ namespace TEN::Entities::TR4
 		TriggerCrocgodMissile(src, roomNumber, timer);
 	}
 
-	static bool ShootFrame(ItemInfo* item)
+	bool ShootFrame(ItemInfo* item)
 	{
 		int frameNumber = (item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase);
 		if (frameNumber == 45 ||
@@ -189,20 +189,20 @@ namespace TEN::Entities::TR4
 		headAngle = (short)(phd_atan(z, x) - item->Pose.Orientation.y) / 2;
 	}
 
-	static void GetTargetPosition(ItemInfo* item, PoseData* target)
+	void GetTargetPosition(ItemInfo* item, PoseData* targetPose)
 	{
-		auto start = Vector3i(0, -96, 144);
-		GetJointAbsPosition(item, &start, 9);
+		auto origin = Vector3i(0, -96, 144);
+		GetJointAbsPosition(item, &origin, 9);
 
-		auto end = Vector3i(0, -128, 288);
-		GetJointAbsPosition(item, &end, 9);
+		auto target = Vector3i(0, -128, 288);
+		GetJointAbsPosition(item, &target, 9);
 
-		auto angles = GetOrientTowardPoint(start.ToVector3(), end.ToVector3());
-		target->Position = end;
-		target->Orientation = angles;
+		auto orient = Geometry::GetOrientTowardPoint(origin.ToVector3(), target.ToVector3());
+		targetPose->Position = target;
+		targetPose->Orientation = orient;
 	}
 
-	static void MoveItemFront(ItemInfo* item, int distance)
+	void MoveItemFront(ItemInfo* item, int distance)
 	{
 		short angle = short(TO_DEGREES(item->Pose.Orientation.y));
 		switch (angle)
@@ -225,7 +225,7 @@ namespace TEN::Entities::TR4
 		}
 	}
 
-	static void MoveItemBack(ItemInfo* item, int distance)
+	void MoveItemBack(ItemInfo* item, int distance)
 	{
 		short angle = short(TO_DEGREES(item->Pose.Orientation.y));
 		switch (angle)
@@ -248,7 +248,7 @@ namespace TEN::Entities::TR4
 		}
 	}
 
-	static void MutantAIFix(ItemInfo* item, AI_INFO* AI)
+	void MutantAIFix(ItemInfo* item, AI_INFO* AI)
 	{
 		MoveItemFront(item, SECTOR(2));
 		item->Pose.Position.y -= CLICK(3);

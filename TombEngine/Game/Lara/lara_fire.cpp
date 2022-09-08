@@ -18,6 +18,7 @@
 #include "Game/Lara/lara_two_guns.h"
 #include "Game/misc.h"
 #include "Game/savegame.h"
+#include "Math/Math.h"
 #include "Objects/Generic/Object/burning_torch.h"
 #include "Objects/Generic/Object/objects.h"
 #include "Objects/ScriptInterfaceObjectsHandler.h"
@@ -31,6 +32,7 @@
 
 using namespace TEN::Entities::Generic;
 using namespace TEN::Input;
+using namespace TEN::Math;
 
 ItemInfo* LastTargets[MAX_TARGETS];
 ItemInfo* TargetList[MAX_TARGETS];
@@ -815,14 +817,13 @@ FireWeaponType FireWeapon(LaraWeaponType weaponType, ItemInfo* targetEntity, Ite
 	auto& ammo = GetAmmo(originEntity, weaponType);
 	if (ammo.getCount() == 0 && !ammo.hasInfinite())
 		return FireWeaponType::NoAmmo;
+
 	if (!ammo.hasInfinite())
 		ammo--;
 
 	auto* weapon = &Weapons[(int)weaponType];
 
-	auto muzzleOffset = Vector3i::Zero;
-	GetLaraJointPosition(&muzzleOffset, LM_RHAND);
-
+	auto muzzleOffset = GetLaraJointPosition(LM_RHAND);
 	auto pos = Vector3i(originEntity->Pose.Position.x, muzzleOffset.y, originEntity->Pose.Position.z);
 
 	auto wobbleArmOrient = EulerAngles(
@@ -831,7 +832,7 @@ FireWeaponType FireWeapon(LaraWeaponType weaponType, ItemInfo* targetEntity, Ite
 		0
 	);
 
-	// Calculate ray from rotation angles
+	// Calculate ray from rotation angles.
 	float x =  sin(TO_RAD(wobbleArmOrient.y)) * cos(TO_RAD(wobbleArmOrient.x));
 	float y = -sin(TO_RAD(wobbleArmOrient.x));
 	float z =  cos(TO_RAD(wobbleArmOrient.y)) * cos(TO_RAD(wobbleArmOrient.x));
@@ -960,31 +961,24 @@ void LaraTargetInfo(ItemInfo* laraItem, WeaponInfo* weaponInfo)
 		return;
 	}
 
-	auto muzzleOffset = Vector3i::Zero;
-	GetLaraJointPosition(&muzzleOffset, LM_RHAND);
-
 	auto origin = GameVector(
 		laraItem->Pose.Position.x,
-		muzzleOffset.y,
+		GetLaraJointPosition(LM_RHAND).y, // Muzzle offset.
 		laraItem->Pose.Position.z,
 		laraItem->RoomNumber
 	);
-	
 	auto target = GameVector::Zero;
 	FindTargetPoint(lara->TargetEntity, &target);
 
-	auto angles = GetOrientTowardPoint(
-		Vector3(origin.x, origin.y, origin.z),
-		Vector3(target.x, target.y, target.z));
-	angles.x -= laraItem->Pose.Orientation.x;
-	angles.y -= laraItem->Pose.Orientation.y;
+	auto orient = Geometry::GetOrientTowardPoint(origin.ToVector3(), target.ToVector3());
+	orient -= EulerAngles(laraItem->Pose.Orientation.x, laraItem->Pose.Orientation.y, 0);
 
 	if (LOS(&origin, &target))
 	{
-		if (angles.x >= weaponInfo->LockAngles[0].x &&
-			angles.y >= weaponInfo->LockAngles[0].y &&
-			angles.x <= weaponInfo->LockAngles[1].x &&
-			angles.y <= weaponInfo->LockAngles[1].y)
+		if (orient.x >= weaponInfo->LockAngles[0].x &&
+			orient.y >= weaponInfo->LockAngles[0].y &&
+			orient.x <= weaponInfo->LockAngles[1].x &&
+			orient.y <= weaponInfo->LockAngles[1].y)
 		{
 			lara->RightArm.Locked = true;
 			lara->LeftArm.Locked = true;
@@ -993,10 +987,10 @@ void LaraTargetInfo(ItemInfo* laraItem, WeaponInfo* weaponInfo)
 		{
 			if (lara->LeftArm.Locked)
 			{
-				if (angles.x < weaponInfo->LeftAngles[0].x ||
-					angles.y < weaponInfo->LeftAngles[0].y ||
-					angles.x > weaponInfo->LeftAngles[1].x ||
-					angles.y > weaponInfo->LeftAngles[1].y)
+				if (orient.x < weaponInfo->LeftAngles[0].x ||
+					orient.y < weaponInfo->LeftAngles[0].y ||
+					orient.x > weaponInfo->LeftAngles[1].x ||
+					orient.y > weaponInfo->LeftAngles[1].y)
 				{
 					lara->LeftArm.Locked = false;
 				}
@@ -1004,10 +998,10 @@ void LaraTargetInfo(ItemInfo* laraItem, WeaponInfo* weaponInfo)
 
 			if (lara->RightArm.Locked)
 			{
-				if (angles.x < weaponInfo->RightAngles[0].x ||
-					angles.y < weaponInfo->RightAngles[0].y ||
-					angles.x > weaponInfo->RightAngles[1].x ||
-					angles.y > weaponInfo->RightAngles[1].y)
+				if (orient.x < weaponInfo->RightAngles[0].x ||
+					orient.y < weaponInfo->RightAngles[0].y ||
+					orient.x > weaponInfo->RightAngles[1].x ||
+					orient.y > weaponInfo->RightAngles[1].y)
 				{
 					lara->RightArm.Locked = false;
 				}
@@ -1020,7 +1014,7 @@ void LaraTargetInfo(ItemInfo* laraItem, WeaponInfo* weaponInfo)
 		lara->LeftArm.Locked = false;
 	}
 
-	lara->TargetArmOrient = angles;
+	lara->TargetArmOrient = orient;
 }
 
 void LaraGetNewTarget(ItemInfo* laraItem, WeaponInfo* weaponInfo)
@@ -1036,26 +1030,25 @@ void LaraGetNewTarget(ItemInfo* laraItem, WeaponInfo* weaponInfo)
 		return;
 	}
 
-	auto muzzleOffset = Vector3i::Zero;
-	GetLaraJointPosition(&muzzleOffset, LM_RHAND);
-
 	auto origin = GameVector(
 		laraItem->Pose.Position.x,
-		muzzleOffset.y,
+		GetLaraJointPosition(LM_RHAND).y, // Muzzle offset.
 		laraItem->Pose.Position.z,
 		laraItem->RoomNumber
 	);
 
 	ItemInfo* bestItem = nullptr;
-	short bestYrot = MAXSHORT;
-	int bestDistance = MAXINT;
-	int maxDistance = weaponInfo->TargetDist;
-	int targets = 0;
+	short bestYOrient = MAXSHORT;
+	float bestDistance = FLT_MAX;
+	float maxDistance = weaponInfo->TargetDist;
+	int numTargets = 0;
+
 	for (int slot = 0; slot < ActiveCreatures.size(); ++slot)
 	{
 		if (ActiveCreatures[slot]->ItemNumber != NO_ITEM)
 		{
 			auto* item = &g_Level.Items[ActiveCreatures[slot]->ItemNumber];
+
 			if (item->HitPoints > 0)
 			{
 				int x = item->Pose.Position.x - origin.x;
@@ -1065,30 +1058,32 @@ void LaraGetNewTarget(ItemInfo* laraItem, WeaponInfo* weaponInfo)
 					abs(y) <= maxDistance &&
 					abs(z) <= maxDistance)
 				{
-					int distance = pow(x, 2) + pow(y, 2) + pow(z, 2);
-					if (distance < pow(maxDistance, 2))
+					float distance = SQUARE(x) + SQUARE(y) + SQUARE(z);
+					if (distance < SQUARE(maxDistance))
 					{
-						auto target = GameVector();
+						auto target = GameVector::Zero;
 						FindTargetPoint(item, &target);
 						if (LOS(&origin, &target))
 						{
-							auto angles = GetOrientTowardPoint(
-								Vector3(origin.x, origin.y, origin.z),
-								Vector3(target.x, target.y, target.z));
-							angles.x -= laraItem->Pose.Orientation.x + lara->ExtraTorsoRot.x;
-							angles.y -= laraItem->Pose.Orientation.y + lara->ExtraTorsoRot.y;
+							auto orient = Geometry::GetOrientTowardPoint(origin.ToVector3(), target.ToVector3());
+							orient -= EulerAngles(
+								laraItem->Pose.Orientation.x + lara->ExtraTorsoRot.x,
+								laraItem->Pose.Orientation.y + lara->ExtraTorsoRot.y,
+								0
+							);
 
-							if (angles.x >= weaponInfo->LockAngles[0].x &&
-								angles.y >= weaponInfo->LockAngles[0].y &&
-								angles.x <= weaponInfo->LockAngles[1].x &&
-								angles.y <= weaponInfo->LockAngles[1].y)
+							if (orient.x >= weaponInfo->LockAngles[0].x &&
+								orient.y >= weaponInfo->LockAngles[0].y &&
+								orient.x <= weaponInfo->LockAngles[1].x &&
+								orient.y <= weaponInfo->LockAngles[1].y)
 							{
-								TargetList[targets] = item;
-								++targets;
-								if (abs(angles.y) < bestYrot + ANGLE(15.0f) && distance < bestDistance)
+								TargetList[numTargets] = item;
+								++numTargets;
+
+								if (abs(orient.y) < (bestYOrient + ANGLE(15.0f)) && distance < bestDistance)
 								{
 									bestDistance = distance;
-									bestYrot = abs(angles.y);
+									bestYOrient = abs(orient.y);
 									bestItem = item;
 								}
 							}
@@ -1099,7 +1094,7 @@ void LaraGetNewTarget(ItemInfo* laraItem, WeaponInfo* weaponInfo)
 		}
 	}
 
-	TargetList[targets] = nullptr;
+	TargetList[numTargets] = nullptr;
 	if (!TargetList[0])
 		lara->TargetEntity = nullptr;
 	else
@@ -1127,17 +1122,17 @@ void LaraGetNewTarget(ItemInfo* laraItem, WeaponInfo* weaponInfo)
 
 				for (int match = 0; match < MAX_TARGETS && TargetList[match]; ++match)
 				{
-					bool loop = false;
+					bool doLoop = false;
 					for (int slot = 0; slot < MAX_TARGETS && LastTargets[slot]; ++slot)
 					{
 						if (LastTargets[slot] == TargetList[match])
 						{
-							loop = true;
+							doLoop = true;
 							break;
 						}
 					}
 
-					if (!loop)
+					if (!doLoop)
 					{
 						lara->TargetEntity = TargetList[match];
 						if (lara->TargetEntity)

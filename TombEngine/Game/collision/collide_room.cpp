@@ -8,11 +8,12 @@
 #include "Game/Lara/lara.h"
 #include "Game/items.h"
 #include "Game/room.h"
-#include "Sound/sound.h"
 #include "Math/Math.h"
+#include "Sound/sound.h"
 #include "Renderer/Renderer11.h"
 
 using namespace TEN::Floordata;
+using namespace TEN::Math;
 using namespace TEN::Renderer;
 
 void ShiftItem(ItemInfo* item, CollisionInfo* coll)
@@ -132,7 +133,7 @@ CollisionResult GetCollision(ItemInfo* item, short headingAngle, float forward, 
 		item->Location :
 		ROOM_VECTOR{ GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &tempRoomNumber)->Room, item->Pose.Position.y };
 
-	auto point = TranslatePoint(item->Pose.Position, headingAngle, forward, down, right);
+	auto point = Geometry::TranslatePoint(item->Pose.Position, headingAngle, forward, down, right);
 	int adjacentRoomNumber = GetRoom(location, item->Pose.Position.x, point.y, item->Pose.Position.z).roomNumber;
 	return GetCollision(point.x, point.y, point.z, adjacentRoomNumber);
 }
@@ -143,9 +144,11 @@ CollisionResult GetCollision(Vector3i pos, int roomNumber, short headingAngle, f
 	short tempRoomNumber = roomNumber;
 	auto location = ROOM_VECTOR{ GetFloor(pos.x, pos.y, pos.z, &tempRoomNumber)->Room, pos.y };
 
-	auto point = TranslatePoint(pos, headingAngle, forward, down, right);
+	auto point = Geometry::TranslatePoint(pos, headingAngle, forward, down, right);
 	int adjacentRoomNumber = GetRoom(location, pos.x, point.y, pos.z).roomNumber;
 	return GetCollision(point.x, point.y, point.z, adjacentRoomNumber);
+
+	Random::TestProbability(0.5f);
 }
 
 // Overload used as a universal wrapper across collisional code to replace

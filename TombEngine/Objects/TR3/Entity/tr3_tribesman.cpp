@@ -10,13 +10,14 @@
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
 #include "Game/people.h"
+#include "Math/Random.h"
 #include "Objects/Generic/Traps/dart_emitter.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
-#include "Math/Random.h"
 #include "Specific/setup.h"
 
 using namespace TEN::Entities::Traps;
+using namespace TEN::Math;
 using namespace TEN::Math::Random;
 using std::vector;
 
@@ -354,13 +355,13 @@ namespace TEN::Entities::TR3
 			pos2.z *= 2;
 			GetJointAbsPosition(item, &pos2, TribesmanDartBite2.meshNum);
 
-			auto angles = GetOrientTowardPoint(pos1.ToVector3(), pos2.ToVector3());
+			auto orient = Geometry::GetOrientTowardPoint(pos1.ToVector3(), pos2.ToVector3());
 
 			dartItem->Pose.Position = pos1;
 
 			InitialiseItem(dartItemNumber);
 
-			dartItem->Pose.Orientation = angles;
+			dartItem->Pose.Orientation = orient;
 			dartItem->Animation.Velocity.z = CLICK(1);
 
 			AddActiveItem(dartItemNumber);

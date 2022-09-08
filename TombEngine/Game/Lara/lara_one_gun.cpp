@@ -19,6 +19,7 @@
 #include "Game/Lara/lara_two_guns.h"
 #include "Game/misc.h"
 #include "Game/savegame.h"
+#include "Math/Math.h"
 #include "Objects/Generic/Object/objects.h"
 #include "Objects/Generic/Switches/generic_switch.h"
 #include "Specific/level.h"
@@ -30,6 +31,7 @@ using namespace TEN::Input;
 using namespace TEN::Effects::Lara;
 using namespace TEN::Entities::Switches;
 using namespace TEN::Effects::Environment;
+using namespace TEN::Math;
 
 enum class CrossbowBoltType
 {
@@ -502,11 +504,12 @@ void HarpoonBoltControl(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
 
-	// Store old position for later
-	auto oldPos = item->Pose.Position;
+	// Store previous position for later.
+	auto prevPos = item->Pose.Position;
+
 	bool aboveWater = false;
 
-	// Update speed and check if above water
+	// Update speed and check if above water.
 	if (item->HitPoints == HARPOON_TIME)
 	{
 		item->Pose.Orientation.z += ANGLE(35.0f);
@@ -562,7 +565,7 @@ void HarpoonBoltControl(short itemNumber)
 	if (item->RoomNumber != probe.RoomNumber)
 		ItemNewRoom(itemNumber, probe.RoomNumber);
 
-	// If now in water and before in land, add a ripple
+	// If now in water and before in land, add a ripple.
 	if (TestEnvironment(ENV_FLAG_WATER, item) && aboveWater)
 		SetupRipple(item->Pose.Position.x, g_Level.Rooms[item->RoomNumber].minfloor, item->Pose.Position.z, (GetRandomControl() & 7) + 8, 0);
 
@@ -570,10 +573,10 @@ void HarpoonBoltControl(short itemNumber)
 	bool foundCollidedObjects = false;
 	bool explodeItem = true;
 
-	// Found possible collided items and statics
+	// Found possible collided items and statics.
 	GetCollidedObjects(item, HARPOON_HIT_RADIUS, true, &CollidedItems[0], &CollidedMeshes[0], 1);
 
-	// If no collided items and meshes are found, then exit the loop
+	// If no collided items and meshes are found, then exit the loop.
 	if (!CollidedItems[0] && !CollidedMeshes[0])
 		return;
 
@@ -584,22 +587,23 @@ void HarpoonBoltControl(short itemNumber)
 		int k = 0;
 		do
 		{
-			auto* currentObj = &Objects[currentItem->ObjectNumber];
+			auto* currentObject = &Objects[currentItem->ObjectNumber];
 
-			if (!currentObj->isPickup && currentObj->collision && currentItem->Collidable)
+			if (!currentObject->isPickup && currentObject->collision && currentItem->Collidable)
 				foundCollidedObjects = true;
 
-			if (currentObj->intelligent && currentObj->collision && currentItem->Status == ITEM_ACTIVE && !currentObj->undead)
+			if (currentObject->intelligent && currentObject->collision && currentItem->Status == ITEM_ACTIVE && !currentObject->undead)
 			{
 				explodeItem = false;
 				HitTarget(LaraItem, currentItem, (GameVector*)&item->Pose, Weapons[(int)LaraWeaponType::HarpoonGun].Damage, 0);
 			}
 
-			// All other items (like puzzles) can't be hit
+			// All other items (like puzzles) can't be hit.
 			k++;
 			currentItem = CollidedItems[k];
 
-		} while (currentItem);
+		}
+		while (currentItem);
 	}
 
 	if (CollidedMeshes[0])
@@ -631,10 +635,11 @@ void HarpoonBoltControl(short itemNumber)
 			k++;
 			currentMesh = CollidedMeshes[k];
 
-		} while (currentMesh);
+		}
+		while (currentMesh);
 	}
 
-	// If harpoon has hit some objects then shatter itself
+	// If harpoon has hit some objects then shatter itself.
 	if (foundCollidedObjects)
 	{
 		if (explodeItem)
@@ -804,12 +809,12 @@ void GrenadeControl(short itemNumber)
 		return;
 	}
 	   
-	// Store old position for later
-	auto oldPos = item->Pose.Position;
+	// Store previous position for later.
+	auto prevPos = item->Pose.Position;
 
 	item->Color = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
 
-	// Check if above water and update velocity and vertical velocity
+	// Check if above water and update Y and Z velocities.
 	bool aboveWater = false;
 	bool someFlag = false;
 	if (TestEnvironment(ENV_FLAG_WATER, item->RoomNumber) ||
@@ -845,7 +850,7 @@ void GrenadeControl(short itemNumber)
 		}
 	}
 
-	// Trigger fire and smoke sparks in the direction of motion
+	// Trigger fire and smoke sparks in the direction of motion.
 	if (item->Animation.Velocity.z && aboveWater)
 	{
 		Matrix world = Matrix::CreateFromYawPitchRoll(
@@ -862,7 +867,7 @@ void GrenadeControl(short itemNumber)
 		TriggerRocketFire(wx + item->Pose.Position.x, wy + item->Pose.Position.y, wz + item->Pose.Position.z);
 	}
 
-	// Update grenade position
+	// Update grenade position.
 	auto velocity = Vector3i(
 		item->Animation.Velocity.z * phd_sin(item->Animation.TargetState),
 		item->Animation.Velocity.y,
@@ -870,7 +875,7 @@ void GrenadeControl(short itemNumber)
 	);
 	item->Pose.Position += velocity;
 
-	// Grenades that originate from first grenade when special ammo is selected
+	// Grenades that originate from first grenade when special ammo is selected.
 	if (item->ItemFlags[0] == (int)GrenadeType::Ultra)
 	{
 		auto probe = GetCollision(item);
@@ -882,14 +887,14 @@ void GrenadeControl(short itemNumber)
 	}
 	else
 	{
-		// Do grenade's physics
-		short sYrot = item->Pose.Orientation.y;
+		// Do grenade physics.
+		short sYOrient = item->Pose.Orientation.y;
 		item->Pose.Orientation.y = item->Animation.TargetState;
 
-		DoProjectileDynamics(itemNumber, oldPos.x, oldPos.y, oldPos.z, velocity.x, velocity.y, velocity.z);
+		DoProjectileDynamics(itemNumber, prevPos.x, prevPos.y, prevPos.z, velocity.x, velocity.y, velocity.z);
 
 		item->Animation.TargetState = item->Pose.Orientation.y;
-		item->Pose.Orientation.y = sYrot;
+		item->Pose.Orientation.y = sYOrient;
 	}
 
 	short probedRoomNumber = GetCollision(item).RoomNumber;
@@ -897,7 +902,7 @@ void GrenadeControl(short itemNumber)
 	if (item->ItemFlags[0] == (int)GrenadeType::Ultra)
 		TriggerFireFlame(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, -1, 1);
 
-	// Check if it's time to explode
+	// Check if it's time to explode.
 	int radius = 0;
 	bool explode = false; 
 
@@ -917,17 +922,17 @@ void GrenadeControl(short itemNumber)
 		}
 	}
 
-	// If is not a flash grenade then try to destroy surrounding objects
+	// If is not a flash grenade then try to destroy surrounding objects.
 	if (!(item->ItemFlags[0] == (int)GrenadeType::Flash && explode))
 	{
 		bool foundCollidedObjects = false;
 
 		for (int n = 0; n < 2; n++)
 		{
-			// Step 0: check for specific collision in a small radius
-			// Step 1: done only if explosion, try to smash all objects in the blast radius
+			// Step 0: check for specific collision in a small radius.
+			// Step 1: done only if explosion, try to smash all objects in the blast radius.
 
-			// Found possible collided items and statics
+			// Found possible collided items and statics.
 			GetCollidedObjects(item, radius, true, &CollidedItems[0], &CollidedMeshes[0], false);
 
 			if (explode)
@@ -979,7 +984,7 @@ void GrenadeControl(short itemNumber)
 					}
 					else
 					{
-						// Smash objects are legacy objects from TRC, let's make them explode in the legacy way
+						// Smash objects are legacy objects from TRC, let's make them explode in the legacy way.
 						TriggerExplosionSparks(currentItem->Pose.Position.x, currentItem->Pose.Position.y, currentItem->Pose.Position.z, 3, -2, 0, currentItem->RoomNumber);
 						auto pos = PoseData(currentItem->Pose.Position.x, currentItem->Pose.Position.y - 128, currentItem->Pose.Position.z);
 						TriggerShockwave(&pos, 48, 304, 96, 0, 96, 128, 24, 0, 0);
@@ -1017,12 +1022,13 @@ void GrenadeControl(short itemNumber)
 						k++;
 						currentMesh = CollidedMeshes[k];
 
-					} while (currentMesh);
+					}
+					while (currentMesh);
 				}
 			}
 			else
 			{
-				// If no collided items and meshes are found, then exit the loop
+				// If no collided items and meshes are found, then exit the loop.
 				if (!CollidedItems[0] && !CollidedMeshes[0])
 					return;
 
@@ -1035,7 +1041,7 @@ void GrenadeControl(short itemNumber)
 		}
 	}
 
-	// Handle explosion effects
+	// Handle explosion effects.
 	if (explode || (item->ItemFlags[0] == (int)GrenadeType::Flash && explode))
 	{
 		if (item->ItemFlags[0] == (int)GrenadeType::Flash)
@@ -1051,9 +1057,9 @@ void GrenadeControl(short itemNumber)
 			item->Pose.Position.y -= 128;
 			TriggerShockwave(&item->Pose, 48, 304, 96, 0, 96, 128, 24, 0, 0);
 
-			TriggerExplosionSparks(oldPos.x, oldPos.y, oldPos.z, 3, -2, 0, item->RoomNumber);
+			TriggerExplosionSparks(prevPos.x, prevPos.y, prevPos.z, 3, -2, 0, item->RoomNumber);
 			for (int x = 0; x < 2; x++)
-				TriggerExplosionSparks(oldPos.x, oldPos.y, oldPos.z, 3, -1, 0, item->RoomNumber);
+				TriggerExplosionSparks(prevPos.x, prevPos.y, prevPos.z, 3, -1, 0, item->RoomNumber);
 		}
 
 		AlertNearbyGuards(item);
@@ -1146,11 +1152,11 @@ void RocketControl(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
 
-	// Save old position for later
-	auto oldPos = item->Pose.Position;
-	short oldRoom = item->RoomNumber;
+	// Save previous position for later.
+	auto prevPos = item->Pose.Position;
+	short prevRoomNumber = item->RoomNumber;
 
-	// Update speed and rotation and check if above water or underwater
+	// Update speed and rotation and check if above water or underwater.
 	bool abovewater = false;
 	if (TestEnvironment(ENV_FLAG_WATER, item->RoomNumber))
 	{
@@ -1178,7 +1184,7 @@ void RocketControl(short itemNumber)
 
 	item->Color = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
 
-	// Calculate offset in rocket direction for fire and smoke sparks
+	// Calculate offset in rocket direction for fire and smoke sparks.
 	Matrix world = Matrix::CreateFromYawPitchRoll(
 		TO_RAD(item->Pose.Orientation.y - ANGLE(180.0f)),
 		TO_RAD(item->Pose.Orientation.x),
@@ -1189,7 +1195,7 @@ void RocketControl(short itemNumber)
 	int wy = world.Translation().y;
 	int wz = world.Translation().z;
 
-	// Trigger fire, smoke and lighting
+	// Trigger fire, smoke and lighting.
 	TriggerRocketSmoke(wx + item->Pose.Position.x, wy + item->Pose.Position.y, wz + item->Pose.Position.z, -1);
 	TriggerRocketFire(wx + item->Pose.Position.x, wy + item->Pose.Position.y, wz + item->Pose.Position.z);
 	TriggerDynamicLight(wx + item->Pose.Position.x + (GetRandomControl() & 15) - 8, 
@@ -1197,14 +1203,14 @@ void RocketControl(short itemNumber)
 						wz + item->Pose.Position.z + (GetRandomControl() & 15) - 8, 
 						14, 28 + (GetRandomControl() & 3), 16 + (GetRandomControl() & 7), (GetRandomControl() & 7));
 
-	// If underwater generate bubbles
+	// If underwater generate bubbles.
 	if (TestEnvironment(ENV_FLAG_WATER, item->RoomNumber))
 	{
 		auto pos = Vector3i(wx + item->Pose.Position.x, wy + item->Pose.Position.y, wz + item->Pose.Position.z);
 		CreateBubble(&pos, item->RoomNumber, 4, 8, 0, 0, 0, 0);
 	}
 
-	// Update rocket's position
+	// Update rocket's position.
 	short speed = item->Animation.Velocity.z * phd_cos(item->Pose.Orientation.x);
 	item->Pose.Position.x += speed * phd_sin(item->Pose.Orientation.y);
 	item->Pose.Position.y += -item->Animation.Velocity.z * phd_sin(item->Pose.Orientation.x);
@@ -1213,12 +1219,12 @@ void RocketControl(short itemNumber)
 	bool explode = false;
 	bool hitRoom = false;
 	
-	// Check if solid wall and then decide if explode or not
+	// Check if solid wall and then decide if explode or not.
 	auto probe = GetCollision(item);
 	if (probe.Position.Floor < item->Pose.Position.y ||
 		probe.Position.Ceiling > item->Pose.Position.y)
 	{
-		item->Pose.Position = oldPos;
+		item->Pose.Position = prevPos;
 		hitRoom = true;
 	}
 
@@ -1226,26 +1232,26 @@ void RocketControl(short itemNumber)
 	if (item->RoomNumber != probe.RoomNumber)
 		ItemNewRoom(itemNumber, probe.RoomNumber);
 
-	// If now in water and before in land, add a ripple
+	// If now in water and before in land, add a ripple.
 	if (TestEnvironment(ENV_FLAG_WATER, item->RoomNumber) && abovewater)
 		SetupRipple(item->Pose.Position.x, g_Level.Rooms[item->RoomNumber].minfloor, item->Pose.Position.z, (GetRandomControl() & 7) + 8, 0);
 
 	int radius = (explode ? ROCKET_EXPLODE_RADIUS : ROCKET_HIT_RADIUS);
 	bool foundCollidedObjects = false;
 
-	// Decrease launch timer
+	// Decrease launch timer.
 	if (item->HitPoints)
 		item->HitPoints--;
 
 	for (int n = 0; n < 2; n++)
 	{
-		// Step 0: check for specific collision in a small radius
-		// Step 1: done only if explosion, try to smash all objects in the blast radius
+		// Step 0: check for specific collision in a small radius.
+		// Step 1: done only if explosion, try to smash all objects in the blast radius.
 
 		// Found possible collided items and statics
 		GetCollidedObjects(item, radius, true, &CollidedItems[0], &CollidedMeshes[0], false);
 
-		// If no collided items and meshes are found, then exit the loop
+		// If no collided items and meshes are found, then exit the loop.
 		if (!CollidedItems[0] && !CollidedMeshes[0])
 			break;
 
@@ -1256,16 +1262,16 @@ void RocketControl(short itemNumber)
 			int k = 0;
 			do
 			{
-				auto* currentObj = &Objects[currentItem->ObjectNumber];
+				auto* currentObject = &Objects[currentItem->ObjectNumber];
 
-				if ((currentObj->intelligent && currentObj->collision && currentItem->Status == ITEM_ACTIVE) ||
+				if ((currentObject->intelligent && currentObject->collision && currentItem->Status == ITEM_ACTIVE) ||
 					currentItem->ObjectNumber == ID_LARA || (currentItem->Flags & 0x40 &&
 					(Objects[currentItem->ObjectNumber].explodableMeshbits || currentItem == LaraItem)))
 				{
-					// All active intelligent creatures explode, if their HP is <= 0
-					// Explosion is handled by CreatureDie()
+					// All active intelligent creatures explode, if their HP is <= 0.
+					// Explosion is handled by CreatureDie().
 					// Also Lara can be damaged, if enough time has passed or missile has hit the room.
-					// HitTarget() is called inside this
+					// HitTarget() is called inside this.
 
 					if (currentItem != LaraItem || (hitRoom || item->HitPoints < EXPLOSION_TRIGGER_TIME))
 					{
@@ -1275,7 +1281,7 @@ void RocketControl(short itemNumber)
 				}
 				else if (currentItem->ObjectNumber >= ID_SMASH_OBJECT1 && currentItem->ObjectNumber <= ID_SMASH_OBJECT8)
 				{
-					// Smash objects are legacy objects from TRC, let's make them explode in the legacy way
+					// Smash objects are legacy objects from TRC, let's make them explode in the legacy way.
 					TriggerExplosionSparks(currentItem->Pose.Position.x, currentItem->Pose.Position.y, currentItem->Pose.Position.z, 3, -2, 0, currentItem->RoomNumber);
 					auto pose = PoseData(currentItem->Pose.Position.x, currentItem->Pose.Position.y - 128, currentItem->Pose.Position.z);
 					TriggerShockwave(&pose, 48, 304, 96, 0, 96, 128, 24, 0, 0);
@@ -1285,19 +1291,20 @@ void RocketControl(short itemNumber)
 					KillItem(currentItemNumber);
 					explode = true;
 				}
-				// TODO_LUA: we need to handle it with an event like OnDestroy
+				// TODO_LUA: we need to handle it with an event like OnDestroy.
 				/*else if (currentObj->hitEffect == HIT_SPECIAL)
 				{
 					// Some objects need a custom behaviour
 					//HitSpecial(item, currentItem, 1);
 				}*/
 
-				// All other items (like puzzles) don't explode
+				// All other items (like puzzles) don't explode.
 
 				k++;
 				currentItem = CollidedItems[k];
 
-			} while (currentItem);
+			}
+			while (currentItem);
 		}
 
 		if (CollidedMeshes[0])
@@ -1307,8 +1314,8 @@ void RocketControl(short itemNumber)
 
 			do
 			{
-				auto* s = &StaticObjects[currentMesh->staticNumber];
-				if (s->shatterType != SHT_NONE)
+				auto* staticObject = &StaticObjects[currentMesh->staticNumber];
+				if (staticObject->shatterType != SHT_NONE)
 				{
 					currentMesh->HitPoints -= Weapons[(int)LaraWeaponType::RocketLauncher].Damage;
 					if (currentMesh->HitPoints <= 0)
@@ -1328,13 +1335,14 @@ void RocketControl(short itemNumber)
 				k++;
 				currentMesh = CollidedMeshes[k];
 
-			} while (currentMesh);
+			}
+			while (currentMesh);
 		}
 
 		radius = ROCKET_EXPLODE_RADIUS;
 	}
 
-	// Do explosion if needed
+	// Do explosion if needed.
 	if (hitRoom || explode)
 	{
 		if (TestEnvironment(ENV_FLAG_WATER, item->RoomNumber))
@@ -1343,9 +1351,9 @@ void RocketControl(short itemNumber)
 		{
 			TriggerShockwave(&item->Pose, 48, 304, 96, 0, 96, 128, 24, 0, 0);
 			item->Pose.Position.y += 128;
-			TriggerExplosionSparks(oldPos.x, oldPos.y, oldPos.z, 3, -2, 0, item->RoomNumber);
+			TriggerExplosionSparks(prevPos.x, prevPos.y, prevPos.z, 3, -2, 0, item->RoomNumber);
 			for (int j = 0; j < 2; j++)
-				TriggerExplosionSparks(oldPos.x, oldPos.y, oldPos.z, 3, -1, 0, item->RoomNumber);
+				TriggerExplosionSparks(prevPos.x, prevPos.y, prevPos.z, 3, -1, 0, item->RoomNumber);
 		}
 
 		AlertNearbyGuards(item);
@@ -1430,7 +1438,7 @@ void FireCrossbow(ItemInfo* laraItem, PoseData* pos)
 	}
 }
 
-void FireCrossBowFromLaserSight(ItemInfo* laraItem, GameVector* src, GameVector* target)
+void FireCrossBowFromLaserSight(ItemInfo* laraItem, GameVector* origin, GameVector* target)
 {
 	/* this part makes arrows fire at bad angles
 	target->x &= ~1023;
@@ -1438,10 +1446,8 @@ void FireCrossBowFromLaserSight(ItemInfo* laraItem, GameVector* src, GameVector*
 	target->x |= 512;
 	target->z |= 512;*/
 
-	auto angles = GetOrientTowardPoint(
-		Vector3(src->x, src->y, src->z),
-		Vector3(target->x, target->y, target->z));
-	auto boltPose = PoseData(src->x, src->y, src->z, angles);
+	auto orient = Geometry::GetOrientTowardPoint(origin->ToVector3(), target->ToVector3());
+	auto boltPose = PoseData(origin->x, origin->y, origin->z, orient);
 	FireCrossbow(laraItem, &boltPose);
 }
 
@@ -1450,8 +1456,8 @@ void CrossbowBoltControl(short itemNumber)
 	auto* lara = GetLaraInfo(LaraItem);
 	auto* item = &g_Level.Items[itemNumber];
 
-	// Store old position for later
-	auto oldPos = item->Pose.Position;
+	// Store orevious position for later
+	auto prevPos = item->Pose.Position;
 
 	bool aboveWater = false;
 	bool explode = false;
@@ -1481,7 +1487,7 @@ void CrossbowBoltControl(short itemNumber)
 		probe.Position.Ceiling > item->Pose.Position.y)
 	{
 		// I have hit a solid wall, this is the end for the bolt
-		item->Pose.Position = oldPos;
+		item->Pose.Position = prevPos;
 
 		// If ammos are normal, then just shatter the bolt and quit
 		if (item->ItemFlags[0] != (int)CrossbowBoltType::Explosive)
@@ -1640,10 +1646,10 @@ void CrossbowBoltControl(short itemNumber)
 		{
 			TriggerShockwave(&item->Pose, 48, 304, 96, 0, 96, 128, 24, 0, 0);
 			item->Pose.Position.y += 128;
-			TriggerExplosionSparks(oldPos.x, oldPos.y, oldPos.z, 3, -2, 0, item->RoomNumber);
+			TriggerExplosionSparks(prevPos.x, prevPos.y, prevPos.z, 3, -2, 0, item->RoomNumber);
 
 			for (int j = 0; j < 2; j++)
-				TriggerExplosionSparks(oldPos.x, oldPos.y, oldPos.z, 3, -1, 0, item->RoomNumber);
+				TriggerExplosionSparks(prevPos.x, prevPos.y, prevPos.z, 3, -1, 0, item->RoomNumber);
 		}
 
 		AlertNearbyGuards(item);
@@ -1734,9 +1740,7 @@ void RifleHandler(ItemInfo* laraItem, LaraWeaponType weaponType)
 			pos.y = -64;
 			GetLaraJointPosition(&pos, LM_RHAND);
 			TriggerDynamicLight(
-				pos.x,
-				pos.y,
-				pos.z,
+				pos.x, pos.y, pos.z,
 				12,
 				(GetRandomControl() & 0x3F) + 192,
 				(GetRandomControl() & 0x1F) + 128,
@@ -1753,42 +1757,42 @@ void RifleHandler(ItemInfo* laraItem, LaraWeaponType weaponType)
 	}
 }
 
-void DoExplosiveDamageOnBaddy(ItemInfo* laraItem, ItemInfo* dest, ItemInfo* src, LaraWeaponType weaponType)
+void DoExplosiveDamageOnBaddy(ItemInfo* laraItem, ItemInfo* targetEntity, ItemInfo* originEntity, LaraWeaponType weaponType)
 {
-	if (dest->Flags & IFLAG_KILLED)
+	if (targetEntity->Flags & IFLAG_KILLED)
 		return;
 
-	if (dest->HitPoints == NOT_TARGETABLE)
+	if (targetEntity->HitPoints == NOT_TARGETABLE)
 		return;
 
-	if (dest != laraItem || laraItem->HitPoints <= 0)
+	if (targetEntity != laraItem || laraItem->HitPoints <= 0)
 	{
-		if (src->ItemFlags[2])
+		if (originEntity->ItemFlags[2])
 			return;
 
-		dest->HitStatus = true;
+		targetEntity->HitStatus = true;
 
-		HitTarget(laraItem, dest, 0, Weapons[(int)weaponType].ExplosiveDamage, 1);
+		HitTarget(laraItem, targetEntity, 0, Weapons[(int)weaponType].ExplosiveDamage, 1);
 					
-		if (dest != laraItem)
+		if (targetEntity != laraItem)
 		{
 			Statistics.Game.AmmoHits++;
-			if (dest->HitPoints <= 0)
+			if (targetEntity->HitPoints <= 0)
 			{
 				Statistics.Level.Kills++;
-				CreatureDie((dest - g_Level.Items.data()), true);
+				CreatureDie((targetEntity - g_Level.Items.data()), true);
 			}
 		}
 	}
 	else
 	{
 		DoDamage(laraItem, Weapons[(int)weaponType].Damage * 5);
-		if (!TestEnvironment(ENV_FLAG_WATER, dest->RoomNumber) && laraItem->HitPoints <= Weapons[(int)weaponType].Damage)
+		if (!TestEnvironment(ENV_FLAG_WATER, targetEntity->RoomNumber) && laraItem->HitPoints <= Weapons[(int)weaponType].Damage)
 			LaraBurn(laraItem);
 	}
 }
 
-void HitSpecial(ItemInfo* projectile, ItemInfo* target, int flags)
+void HitSpecial(ItemInfo* projectile, ItemInfo* targetEntity, int flags)
 {
 
 }

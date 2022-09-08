@@ -8,12 +8,13 @@
 #include "Game/Lara/lara_flare.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_struct.h"
+#include "Math/Random.h"
 #include "Game/room.h"
 #include "Sound/sound.h"
 #include "Specific/input.h"
-#include "Math/Random.h"
 
 using namespace TEN::Input;
+using namespace TEN::Math;
 
 namespace TEN::Entities::Vehicles
 {
@@ -47,7 +48,7 @@ namespace TEN::Entities::Vehicles
 		bool hasInputAction = TrInput & IN_ACTION;
 
 		short deltaHeadingAngle = vehicleItem->Pose.Orientation.y - laraItem->Pose.Orientation.y;
-		short angleBetweenPositions = vehicleItem->Pose.Orientation.y - GetOrientTowardPoint(laraItem->Pose.Position.ToVector3(), vehicleItem->Pose.Position.ToVector3()).y;
+		short angleBetweenPositions = vehicleItem->Pose.Orientation.y - Geometry::GetOrientTowardPoint(laraItem->Pose.Position.ToVector3(), vehicleItem->Pose.Position.ToVector3()).y;
 		bool onCorrectSide = abs(deltaHeadingAngle - angleBetweenPositions) < ANGLE(45.0f);
 
 		// Assess mount types allowed for vehicle.

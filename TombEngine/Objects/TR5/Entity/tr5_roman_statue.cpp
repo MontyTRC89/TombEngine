@@ -12,11 +12,13 @@
 #include "Game/itemdata/creature_info.h"
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
+#include "Math/Math.h"
 #include "Sound/sound.h"
 #include "Specific/setup.h"
 #include "Specific/level.h"
 
 using namespace TEN::Effects::Lightning;
+using namespace TEN::Math;
 
 namespace TEN::Entities::TR5
 {
@@ -732,8 +734,8 @@ namespace TEN::Entities::TR5
 					pos2 = Vector3i(-48, 48, 450);
 					GetJointAbsPosition(item, &pos2, 14);
 
-				auto angles = GetOrientTowardPoint(pos2.ToVector3(), pos1.ToVector3());
-				auto attackPos = PoseData(pos2, angles);
+				auto orient = Geometry::GetOrientTowardPoint(pos2.ToVector3(), pos1.ToVector3());
+				auto attackPos = PoseData(pos2, orient);
 
 					short roomNumber = item->RoomNumber;
 					GetFloor(pos2.x, pos2.y, pos2.z, &roomNumber);

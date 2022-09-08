@@ -11,11 +11,12 @@
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_struct.h"
 #include "Game/Lara/lara_tests.h"
+#include "Math/Math.h"
 #include "Specific/input.h"
 #include "Specific/level.h"
-#include "Math/Math.h"
 
 using namespace TEN::Input;
+using namespace TEN::Math;
 using std::vector;
 
 namespace TEN::Entities::Generic
@@ -63,7 +64,7 @@ namespace TEN::Entities::Generic
 		auto* poleItem = &g_Level.Items[itemNumber];
 		auto* lara = GetLaraInfo(laraItem);
 
-		bool isFacingPole = IsPointInFront(laraItem->Pose, poleItem->Pose.Position.ToVector3());
+		bool isFacingPole = Geometry::IsPointInFront(laraItem->Pose, poleItem->Pose.Position.ToVector3());
 
 		// Mount while grounded.
 		if (TrInput & IN_ACTION && isFacingPole &&

@@ -4,8 +4,8 @@ class EulerAngles;
 struct PoseData;
 struct Vector3i;
 
-//namespace TEN::Math::Geometry
-//{
+namespace TEN::Math::Geometry
+{
 	Vector3i TranslatePoint(const Vector3i& point, short headingAngle, float forward, float down = 0.0f, float right = 0.0f);
 	Vector3	 TranslatePoint(const Vector3& point, short headingAngle, float forward, float down = 0.0f, float right = 0.0f);
 	Vector3i TranslatePoint(const Vector3i& point, const EulerAngles& orient, float distance);
@@ -27,4 +27,4 @@ struct Vector3i;
 	bool IsPointOnLeft(const PoseData& pose, const Vector3& target);
 	bool IsPointOnLeft(const Vector3& origin, const Vector3& target, const EulerAngles& orient);
 	bool IsPointOnLeft(const Vector3& origin, const Vector3& target, const Vector3& refPoint);
-//}
+}

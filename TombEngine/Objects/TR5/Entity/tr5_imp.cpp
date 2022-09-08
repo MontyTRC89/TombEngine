@@ -11,8 +11,10 @@
 #include "Game/itemdata/creature_info.h"
 #include "Game/control/control.h"
 #include "Objects/Generic/Object/burning_torch.h"
+#include "Math/Math.h"
 
 using namespace TEN::Entities::Generic;
+using namespace TEN::Math;
 
 namespace TEN::Entities::TR5
 {
@@ -79,14 +81,14 @@ static void ImpThrowStones(ItemInfo* item)
 		int dy = pos1.y - pos2.y;
 		int dz = pos1.z - pos2.z;
 
-	auto angles = GetOrientTowardPoint(pos1.ToVector3(), pos2.ToVector3());
+	auto orient = Geometry::GetOrientTowardPoint(pos1.ToVector3(), pos2.ToVector3());
 	
 	int distance = sqrt(pow(dx, 2) + pow(dy, 2) + pow(dz, 2));
 	if (distance < 8)
 		distance = 8;
 
-		angles.x += GetRandomControl() % (distance / 2) - (distance / 4);
-		angles.y += GetRandomControl() % (distance / 4) - (distance / 8);
+		orient.x += GetRandomControl() % (distance / 2) - (distance / 4);
+		orient.y += GetRandomControl() % (distance / 4) - (distance / 8);
 
 		short fxNumber = CreateNewEffect(item->RoomNumber);
 		if (fxNumber != NO_ITEM)
@@ -98,8 +100,8 @@ static void ImpThrowStones(ItemInfo* item)
 			fx->speed = 4 * sqrt(distance);
 
 			fx->pos.Orientation = EulerAngles(
-				(angles.x + distance) / 2,
-				angles.y,
+				(orient.x + distance) / 2,
+				orient.y,
 				0
 			);
 

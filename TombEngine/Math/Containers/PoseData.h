@@ -1,5 +1,5 @@
 #pragma once
-#include "Math/Angles/EulerAngles.h"
+#include "Math/Containers/EulerAngles.h"
 #include "Math/Containers/Vector3i.h"
 
 //namespace TEN::Math

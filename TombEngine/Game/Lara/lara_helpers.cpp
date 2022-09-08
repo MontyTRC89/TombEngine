@@ -10,6 +10,7 @@
 #include "Game/Lara/lara_collide.h"
 #include "Game/Lara/lara_fire.h"
 #include "Game/Lara/lara_tests.h"
+#include "Math/Math.h"
 #include "Renderer/Renderer11.h"
 #include "Sound/sound.h"
 #include "Specific/input.h"
@@ -27,6 +28,7 @@
 
 using namespace TEN::Control::Volumes;
 using namespace TEN::Input;
+using namespace TEN::Math;
 using namespace TEN::Renderer;
 
 // -----------------------------
@@ -335,7 +337,7 @@ short GetLaraSlideDirection(ItemInfo* item, CollisionInfo* coll)
 	// Get either:
 	// a) the surface aspect angle (extended slides), or
 	// b) the derived nearest cardinal direction from it (original slides).
-	headingAngle = GetSurfaceAspectAngle(probe.FloorTilt);
+	headingAngle = Geometry::GetSurfaceAspectAngle(probe.FloorTilt);
 	if (g_GameFlow->HasSlideExtended())
 		return headingAngle;
 	else
@@ -542,8 +544,8 @@ void ModulateLaraSlideVelocity(ItemInfo* item, CollisionInfo* coll)
 	{
 		auto probe = GetCollision(item);
 		short minSlideAngle = ANGLE(33.75f);
-		short steepness = GetSurfaceSteepnessAngle(probe.FloorTilt);
-		short direction = GetSurfaceAspectAngle(probe.FloorTilt);
+		short steepness = Geometry::GetSurfaceSteepnessAngle(probe.FloorTilt);
+		short direction = Geometry::GetSurfaceAspectAngle(probe.FloorTilt);
 
 		float velocityMultiplier = 1 / (float)ANGLE(33.75f);
 		int slideVelocity = std::min<int>(minVelocity + 10 * (steepness * velocityMultiplier), LARA_TERMINAL_VELOCITY);
@@ -561,10 +563,10 @@ void ModulateLaraSlideVelocity(ItemInfo* item, CollisionInfo* coll)
 void AlignLaraToSurface(ItemInfo* item, float alpha)
 {
 	auto floorTilt = GetCollision(item).FloorTilt;
-	short aspectAngle = GetSurfaceAspectAngle(floorTilt);
-	short steepnessAngle = std::min(GetSurfaceSteepnessAngle(floorTilt), ANGLE(70.0f));
+	short aspectAngle = Geometry::GetSurfaceAspectAngle(floorTilt);
+	short steepnessAngle = std::min(Geometry::GetSurfaceSteepnessAngle(floorTilt), ANGLE(70.0f));
 
-	short deltaAngle = GetShortestAngularDistance(item->Pose.Orientation.y, aspectAngle);
+	short deltaAngle = Geometry::GetShortestAngularDistance(item->Pose.Orientation.y, aspectAngle);
 	float sinDeltaAngle = phd_sin(deltaAngle);
 	float cosDeltaAngle = phd_cos(deltaAngle);
 

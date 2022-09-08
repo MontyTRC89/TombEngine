@@ -12,11 +12,12 @@
 #include "Game/Lara/lara_helpers.h"
 #include "Game/misc.h"
 #include "Game/people.h"
+#include "Math/Math.h"
 #include "Renderer/Renderer11Enums.h"
 #include "Specific/level.h"
-#include "Math/Random.h"
 #include "Specific/setup.h"
 
+using namespace TEN::Math;
 using namespace TEN::Math::Random;
 using std::vector;
 
@@ -228,8 +229,8 @@ namespace TEN::Entities::TR4
 				pos3.y *= 2;
 				GetJointAbsPosition(item, &pos3, HarpyAttack1.meshNum);
 
-				auto angles = GetOrientTowardPoint(rh.ToVector3(), lr.ToVector3());
-				auto pose = PoseData(rh, angles);
+				auto orient = Geometry::GetOrientTowardPoint(rh.ToVector3(), lr.ToVector3());
+				auto pose = PoseData(rh, orient);
 				TriggerHarpyMissile(&pose, item->RoomNumber, 2);
 			}
 
@@ -239,8 +240,8 @@ namespace TEN::Entities::TR4
 				pos3.y *= 2;
 				GetJointAbsPosition(item, &pos3, HarpyAttack2.meshNum);
 
-				auto angles = GetOrientTowardPoint(rh.ToVector3(), lr.ToVector3());
-				auto pose = PoseData(rh, angles);
+				auto orient = Geometry::GetOrientTowardPoint(rh.ToVector3(), lr.ToVector3());
+				auto pose = PoseData(rh, orient);
 				TriggerHarpyMissile(&pose, item->RoomNumber, 2);
 			}
 		}

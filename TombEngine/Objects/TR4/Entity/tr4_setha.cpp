@@ -11,10 +11,10 @@
 #include "Game/misc.h"
 #include "Game/people.h"
 #include "Specific/level.h"
-#include "Math/Random.h"
-#include "Specific/setup.h"
 #include "Math/Math.h"
+#include "Specific/setup.h"
 
+using namespace TEN::Math;
 using namespace TEN::Math::Random;
 
 namespace TEN::Entities::TR4
@@ -590,8 +590,8 @@ namespace TEN::Entities::TR4
 				pos.y *= 2;
 				GetJointAbsPosition(item, &pos, SethaAttack1.meshNum);
 
-				auto angles = GetOrientTowardPoint(pos1.ToVector3(), pos.ToVector3());
-				auto attackPose = PoseData(pos1, angles);
+				auto orient = Geometry::GetOrientTowardPoint(pos1.ToVector3(), pos.ToVector3());
+				auto attackPose = PoseData(pos1, orient);
 				SethaThrowAttack(&attackPose, item->RoomNumber, 0);
 			}
 			else if (item->ItemFlags[0] >= 122 && item->ItemFlags[0] <= 125)
@@ -600,8 +600,8 @@ namespace TEN::Entities::TR4
 				pos.y *= 2;
 				GetJointAbsPosition(item, &pos, SethaAttack2.meshNum);
 
-				auto angles = GetOrientTowardPoint(pos2.ToVector3(), pos.ToVector3());
-				auto attackPose = PoseData(pos2, angles);
+				auto orient = Geometry::GetOrientTowardPoint(pos2.ToVector3(), pos.ToVector3());
+				auto attackPose = PoseData(pos2, orient);
 				SethaThrowAttack(&attackPose, item->RoomNumber, 0);
 			}
 
@@ -629,16 +629,16 @@ namespace TEN::Entities::TR4
 					pos.y *= 2;
 					GetJointAbsPosition(item, &pos, SethaAttack1.meshNum);
 
-					auto angles = GetOrientTowardPoint(pos1.ToVector3(), pos.ToVector3());
-					auto attackPose = PoseData(pos1, angles);
+					auto orient = Geometry::GetOrientTowardPoint(pos1.ToVector3(), pos.ToVector3());
+					auto attackPose = PoseData(pos1, orient);
 					SethaThrowAttack(&attackPose, item->RoomNumber, 0);
 
 					pos = Vector3i(SethaAttack2.Position);
 					pos.y *= 2;
 					GetJointAbsPosition(item, &pos, SethaAttack2.meshNum);
 
-					angles = GetOrientTowardPoint(pos2.ToVector3(), pos.ToVector3());
-					attackPose = PoseData(pos2, angles);
+					orient = Geometry::GetOrientTowardPoint(pos2.ToVector3(), pos.ToVector3());
+					attackPose = PoseData(pos2, orient);
 					SethaThrowAttack(&attackPose, item->RoomNumber, 0);
 				}
 			}
@@ -700,8 +700,8 @@ namespace TEN::Entities::TR4
 				pos.y *= 2;
 				GetJointAbsPosition(item, &pos, SethaAttack1.meshNum);
 
-				auto angles = GetOrientTowardPoint(pos1.ToVector3(), pos.ToVector3());
-				auto attackPose = PoseData(pos1, angles);
+				auto orient = Geometry::GetOrientTowardPoint(pos1.ToVector3(), pos.ToVector3());
+				auto attackPose = PoseData(pos1, orient);
 				SethaThrowAttack(&attackPose, item->RoomNumber, 0);
 			}
 

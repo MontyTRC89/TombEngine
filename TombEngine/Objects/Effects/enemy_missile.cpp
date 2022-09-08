@@ -10,13 +10,15 @@
 #include "Game/effects/tomb4fx.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
+#include "Math/Math.h"
 #include "Objects/TR4/Entity/tr4_mutant.h"
 #include "Objects/TR4/Entity/tr4_demigod.h"
-#include "Specific/level.h"
 #include "Renderer/Renderer11Enums.h"
+#include "Specific/level.h"
 
 using namespace TEN::Effects::Lara;
 using namespace TEN::Entities::TR4;
+using namespace TEN::Math;
 
 namespace TEN::Entities::Effects
 {
@@ -134,7 +136,7 @@ namespace TEN::Entities::Effects
 	{
 		auto* fx = &EffectList[fxNum];
 
-		auto angles = GetOrientTowardPoint(
+		auto orient = Geometry::GetOrientTowardPoint(
 			Vector3(fx->pos.Position.x, fx->pos.Position.y - CLICK(1), fx->pos.Position.z),
 			LaraItem->Pose.Position.ToVector3());
 
@@ -168,11 +170,11 @@ namespace TEN::Entities::Effects
 			else
 				fx->speed += 3;
 
-			int dy = angles.y - fx->pos.Orientation.y;
+			int dy = orient.y - fx->pos.Orientation.y;
 			if (abs(dy) > ANGLE(180.0f))
 				dy = -dy;
 
-			int dx = angles.x - fx->pos.Orientation.x;
+			int dx = orient.x - fx->pos.Orientation.x;
 			if (abs(dx) > ANGLE(180.0f))
 				dx = -dx;
 

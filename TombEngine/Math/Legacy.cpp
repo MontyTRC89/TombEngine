@@ -36,6 +36,21 @@ float TO_RAD(short angle)
 	return angle * 360.0f / 65536.0f * RADIAN;
 }
 
+float phd_sin(short a)
+{
+	return sin(TO_RAD(a));
+}
+
+float phd_cos(short a)
+{
+	return cos(TO_RAD(a));
+}
+
+int phd_atan(int x, int y)
+{
+	return FROM_RAD(atan2(y, x));
+}
+
 const Vector3 GetRandomVector()
 {
 	auto vector = Vector3(GenerateFloat(-1, 1), GenerateFloat(-1, 1), GenerateFloat(-1, 1));
@@ -53,21 +68,6 @@ const Vector3 GetRandomVectorInCone(const Vector3& direction, const float angleD
 	auto result = direction.TransformNormal(direction, matrix);
 	result.Normalize();
 	return result;
-}
-
-float phd_sin(short a)
-{
-	return sin(TO_RAD(a));
-}
-
-float phd_cos(short a)
-{
-	return cos(TO_RAD(a));
-}
-
-int phd_atan(int x, int y)
-{
-	return FROM_RAD(atan2(y, x));
 }
 
 int mGetAngle(int x1, int y1, int x2, int y2)

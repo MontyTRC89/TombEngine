@@ -175,7 +175,7 @@ CALL gen.bat</Command>
     <ClInclude Include="Game\Lara\lara_overhang.h" />
     <ClInclude Include="Game\Lara\lara_test_structs.h" />
     <ClInclude Include="Math\Containers\GameVector.h" />
-    <ClInclude Include="Math\Angles\EulerAngles.h" />
+    <ClInclude Include="Math\Containers\EulerAngles.h" />
     <ClInclude Include="Math\Constants.h" />
     <ClInclude Include="Math\Geometry.h" />
     <ClInclude Include="Math\Legacy.h" />
@@ -639,7 +639,7 @@ CALL gen.bat</Command>
     <ClCompile Include="Game\pickup\pickup_weapon.cpp" />
     <ClCompile Include="Game\room.cpp" />
     <ClCompile Include="Math\Containers\GameVector.cpp" />
-    <ClCompile Include="Math\Angles\EulerAngles.cpp" />
+    <ClCompile Include="Math\Containers\EulerAngles.cpp" />
     <ClCompile Include="Math\Geometry.cpp" />
     <ClCompile Include="Math\Containers\PoseData.cpp" />
     <ClCompile Include="Math\Legacy.cpp" />

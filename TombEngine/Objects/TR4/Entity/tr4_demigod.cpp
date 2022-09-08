@@ -13,11 +13,12 @@
 #include "Game/Lara/lara_helpers.h"
 #include "Game/misc.h"
 #include "Game/people.h"
+#include "Math/Random.h"
 #include "Renderer/Renderer11Enums.h"
 #include "Specific/level.h"
-#include "Math/Random.h"
 #include "Specific/setup.h"
 
+using namespace TEN::Math;
 using namespace TEN::Math::Random;
 
 namespace TEN::Entities::TR4
@@ -195,8 +196,8 @@ namespace TEN::Entities::TR4
 				auto pos2 = Vector3i (-900, 96, 0);
 				GetJointAbsPosition(item, &pos2, 16);
 
-				auto angles = GetOrientTowardPoint(pos1.ToVector3(), pos2.ToVector3());
-				auto pose = PoseData(pos1, angles);
+				auto orient = Geometry::GetOrientTowardPoint(pos1.ToVector3(), pos2.ToVector3());
+				auto pose = PoseData(pos1, orient);
 				if (item->ObjectNumber == ID_DEMIGOD3)
 					TriggerDemigodMissile(&pose, item->RoomNumber, 3);
 				else
@@ -213,8 +214,8 @@ namespace TEN::Entities::TR4
 				auto pos2 = Vector3i(-900, 96, 0);
 				GetJointAbsPosition(item, &pos2, 16);
 
-				auto angles = GetOrientTowardPoint(pos1.ToVector3(), pos2.ToVector3());
-				auto pose = PoseData(pos1, angles);
+				auto orient = Geometry::GetOrientTowardPoint(pos1.ToVector3(), pos2.ToVector3());
+				auto pose = PoseData(pos1, orient);
 				if (item->ObjectNumber == ID_DEMIGOD3)
 					TriggerDemigodMissile(&pose, item->RoomNumber, 3);
 				else
@@ -241,8 +242,8 @@ namespace TEN::Entities::TR4
 					GetJointAbsPosition(item, &pos2, 17);
 				}
 
-				auto angles = GetOrientTowardPoint(pos1.ToVector3(), pos2.ToVector3());
-				auto pose = PoseData(pos1, angles);
+				auto orient = Geometry::GetOrientTowardPoint(pos1.ToVector3(), pos2.ToVector3());
+				auto pose = PoseData(pos1, orient);
 				TriggerDemigodMissile(&pose, item->RoomNumber, 4);
 			}
 		}

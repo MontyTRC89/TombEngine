@@ -1,7 +1,7 @@
 #include "framework.h"
-#include "Math/Angles/EulerAngles.h"
+#include "Math/Containers/EulerAngles.h"
 
-//namespace TEN::Math::Angles
+//namespace TEN::Math
 //{
 	EulerAngles const EulerAngles::Zero = EulerAngles(0, 0, 0);
 

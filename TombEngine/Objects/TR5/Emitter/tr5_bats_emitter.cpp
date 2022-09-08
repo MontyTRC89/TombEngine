@@ -1,5 +1,6 @@
 #include "framework.h"
 #include "Objects/TR5/Emitter/tr5_bats_emitter.h"
+
 #include "Specific/level.h"
 #include "Game/control/control.h"
 #include "Specific/setup.h"
@@ -9,6 +10,9 @@
 #include "Game/Lara/lara.h"
 #include "Game/animation.h"
 #include "Game/items.h"
+#include "Math/Math.h"
+
+using namespace TEN::Math;
 
 int NextBat;
 BatData Bats[NUM_BATS];
@@ -146,7 +150,7 @@ void UpdateBats()
 			bat->ZTarget = (GetRandomControl() & 0x7F) - 64;
 		}
 
-		auto angles = GetOrientTowardPoint(
+		auto angles = Geometry::GetOrientTowardPoint(
 			bat->Pose.Position.ToVector3(),
 			Vector3(
 				LaraItem->Pose.Position.x + bat->XTarget * 8,

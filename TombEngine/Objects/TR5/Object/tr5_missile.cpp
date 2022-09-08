@@ -13,8 +13,10 @@
 #include "tr5_hydra.h"
 #include "Game/collision/collide_item.h"
 #include "Game/effects/lara_fx.h"
+#include "Math/Math.h"
 
 using namespace TEN::Effects::Lara;
+using namespace TEN::Math;
 
 int DebrisFlags;
 
@@ -37,7 +39,7 @@ void MissileControl(short itemNumber)
 	}
 	else
 	{
-		auto angles = GetOrientTowardPoint(
+		auto orient = Geometry::GetOrientTowardPoint(
 			Vector3(fx->pos.Position.x, fx->pos.Position.y - CLICK(1), fx->pos.Position.z),
 			LaraItem->Pose.Position.ToVector3());
 
@@ -57,12 +59,12 @@ void MissileControl(short itemNumber)
 			if (fx->flag1 == 0 || fx->flag1 == 1)
 				fx->speed++;
 
-			int dy = angles.y - fx->pos.Orientation.y;
+			int dy = orient.y - fx->pos.Orientation.y;
 			if (abs(dy) > ANGLE(180.0f))
 				dy = -dy;
 			dy /= 8;
 
-			int dx = angles.x - fx->pos.Orientation.x;
+			int dx = orient.x - fx->pos.Orientation.x;
 			if (abs(dx) > ANGLE(180.0f))
 				dx = -dx;
 			dx /= 8;

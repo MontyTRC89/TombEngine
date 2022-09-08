@@ -57,12 +57,12 @@ void FireRocket(ItemInfo* laraItem);
 void RocketControl(short itemNumber);
 void FireCrossbow(ItemInfo* laraItem, PoseData* pos);
 void CrossbowBoltControl(short itemNumber);
-void FireCrossBowFromLaserSight(ItemInfo* laraItem, GameVector* src, GameVector* target);
+void FireCrossBowFromLaserSight(ItemInfo* laraItem, GameVector* origin, GameVector* target);
 
 void FireHK(ItemInfo* laraItem, int mode);
 void RifleHandler(ItemInfo* laraItem, LaraWeaponType weaponType);
 
-void DoExplosiveDamageOnBaddy(ItemInfo* laraItem, ItemInfo* src, ItemInfo* dest, LaraWeaponType weaponType);
+void DoExplosiveDamageOnBaddy(ItemInfo* laraItem, ItemInfo* targetEntity, ItemInfo* originEntity, LaraWeaponType weaponType);
 void SomeSparkEffect(int x, int y, int z, int count);
 
-void HitSpecial(ItemInfo* projectile, ItemInfo* target, int flags);
+void HitSpecial(ItemInfo* projectile, ItemInfo* targetEntity, int flags);

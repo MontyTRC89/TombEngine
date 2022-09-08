@@ -15,6 +15,7 @@
 #include "Specific/setup.h"
 
 using namespace TEN::Entities::Generic;
+using namespace TEN::Math;
 using TEN::Renderer::g_Renderer;
 
 BOUNDING_BOX InterpolatedBounds;
@@ -398,17 +399,17 @@ bool TestLastFrame(ItemInfo* item, int animNumber)
 
 void TranslateItem(ItemInfo* item, short headingAngle, float forward, float down, float right)
 {
-	item->Pose.Position = TranslatePoint(item->Pose.Position, headingAngle, forward, down, right);
+	item->Pose.Position = Geometry::TranslatePoint(item->Pose.Position, headingAngle, forward, down, right);
 }
 
 void TranslateItem(ItemInfo* item, EulerAngles orient, float distance)
 {
-	item->Pose.Position = TranslatePoint(item->Pose.Position, orient, distance);
+	item->Pose.Position = Geometry::TranslatePoint(item->Pose.Position, orient, distance);
 }
 
 void TranslateItem(ItemInfo* item, Vector3 direction, float distance)
 {
-	item->Pose.Position = TranslatePoint(item->Pose.Position, direction, distance);
+	item->Pose.Position = Geometry::TranslatePoint(item->Pose.Position, direction, distance);
 }
 
 void SetAnimation(ItemInfo* item, int animIndex, int frameToStart)
@@ -573,7 +574,7 @@ void ClampRotation(PoseData* pose, short angle, short rotation)
 		pose->Orientation.y += rotation;
 }
 
-Vector3i GetLaraJointPosition(int jointIndex, Vector3i offset)
+Vector3i GetLaraJointPosition(int jointIndex, const Vector3i& offset)
 {
 	auto pos = offset;
 	GetLaraJointPosition(&pos, jointIndex);

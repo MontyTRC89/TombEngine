@@ -15,9 +15,11 @@
 #include "Game/effects/lightning.h"
 #include "Game/effects/lara_fx.h"
 #include "Game/misc.h"
+#include "Math/Math.h"
 
 using namespace TEN::Effects::Lara;
 using namespace TEN::Effects::Lightning;
+using namespace TEN::Math;
 
 namespace TEN::Entities::TR5
 {
@@ -201,7 +203,7 @@ namespace TEN::Entities::TR5
 		auto* item = &g_Level.Items[itemNumber];
 		auto* creature = (LaserHeadInfo*)item->Data;
 
-		GameVector src, dest;
+		GameVector origin, dest;
 
 		// NOTICE: itemFlags[0] seems to be a state machine, if it's equal to 3 then death animations is triggered
 		// Other values still unknown
@@ -286,11 +288,11 @@ namespace TEN::Entities::TR5
 				item->ItemFlags[2] += ANGLE(3.0f);
 
 				// Get guardian head's position
-				src.x = 0;
-				src.y = 168;
-				src.z = 248;
-				src.roomNumber = item->RoomNumber;
-				GetJointAbsPosition(item, (Vector3i*)&src, 0);
+				origin.x = 0;
+				origin.y = 168;
+				origin.z = 248;
+				origin.roomNumber = item->RoomNumber;
+				GetJointAbsPosition(item, (Vector3i*)&origin, 0);
 
 				if (item->ItemFlags[0] == 1)
 				{
@@ -302,11 +304,11 @@ namespace TEN::Entities::TR5
 					GetJointAbsPosition(LaraItem, (Vector3i*)&dest, LM_HEAD);
 
 					// Calculate distance between guardian and Lara
-					int distance = sqrt(pow(src.x - dest.x, 2) + pow(src.y - dest.y, 2) + pow(src.z - dest.z, 2));
+					int distance = sqrt(pow(origin.x - dest.x, 2) + pow(origin.y - dest.y, 2) + pow(origin.z - dest.z, 2));
 
 					// Check if there's a valid LOS between guardian and Lara 
 					// and if distance is less than 8 sectors  and if Lara is alive and not burning
-					if (LOS(&src, &dest) &&
+					if (LOS(&origin, &dest) &&
 						distance <= MAX_VISIBILITY_DISTANCE &&
 						LaraItem->HitPoints > 0 &&
 						!Lara.Burn &&
@@ -339,9 +341,9 @@ namespace TEN::Entities::TR5
 								yRot = 2 * GetRandomControl();
 							int v = ((GetRandomControl() & 0x1FFF) + 8192);
 							int c = v * phd_cos(-xRot);
-							dest.x = src.x + c * phd_sin(yRot);
-							dest.y = src.y + v * phd_sin(-xRot);
-							dest.z = src.z + c * phd_cos(yRot);
+							dest.x = origin.x + c * phd_sin(yRot);
+							dest.y = origin.y + v * phd_sin(-xRot);
+							dest.z = origin.z + c * phd_cos(yRot);
 
 							if (condition)
 							{
@@ -375,9 +377,9 @@ namespace TEN::Entities::TR5
 					{
 						int c = 8192 * phd_cos(item->Pose.Orientation.x + 3328);
 
-						dest.x = LaserHeadData.target.x = src.x + c * phd_sin(item->Pose.Orientation.y);
-						dest.y = LaserHeadData.target.y = src.y + SECTOR(8) * phd_sin(3328 - item->Pose.Orientation.x);
-						dest.z = LaserHeadData.target.z = src.z + c * phd_cos(item->Pose.Orientation.y);
+						dest.x = LaserHeadData.target.x = origin.x + c * phd_sin(item->Pose.Orientation.y);
+						dest.y = LaserHeadData.target.y = origin.y + SECTOR(8) * phd_sin(3328 - item->Pose.Orientation.x);
+						dest.z = LaserHeadData.target.z = origin.z + c * phd_cos(item->Pose.Orientation.y);
 					}
 					else
 					{
@@ -387,9 +389,7 @@ namespace TEN::Entities::TR5
 					}
 				}
 
-			auto angles = GetOrientTowardPoint(
-				Vector3(src.x, src.y, src.z),
-				LaserHeadData.target.ToVector3());
+			auto angles = Geometry::GetOrientTowardPoint(origin.ToVector3(), LaserHeadData.target.ToVector3());
 			InterpolateAngle(angles.x + 3328, &item->Pose.Orientation.x, &LaserHeadData.xRot, LaserHeadData.byte1);
 			InterpolateAngle(angles.y, &item->Pose.Orientation.y, &LaserHeadData.yRot, LaserHeadData.byte1);
 
@@ -463,15 +463,15 @@ namespace TEN::Entities::TR5
 								// If eye was not destroyed then fire from it
 								if ((1 << GuardianMeshes[i]) & item->MeshBits)
 								{
-									src.x = 0;
-									src.y = 0;
-									src.z = 0;
-									GetJointAbsPosition(item, (Vector3i*)&src, GuardianMeshes[i]);
+									origin.x = 0;
+									origin.y = 0;
+									origin.z = 0;
+									GetJointAbsPosition(item, (Vector3i*)&origin, GuardianMeshes[i]);
 
 									int c = 8192 * phd_cos(angles.x);
-									dest.x = src.x + c * phd_sin(item->Pose.Orientation.y);
-									dest.y = src.y + 8192 * phd_sin(-angles.x);
-									dest.z = src.z + c * phd_cos(item->Pose.Orientation.y);
+									dest.x = origin.x + c * phd_sin(item->Pose.Orientation.y);
+									dest.y = origin.y + 8192 * phd_sin(-angles.x);
+									dest.z = origin.z + c * phd_cos(item->Pose.Orientation.y);
 
 									if (item->ItemFlags[3] != 90 &&
 										LaserHeadData.fireArcs[i] != nullptr)
@@ -479,15 +479,15 @@ namespace TEN::Entities::TR5
 										// Eye is aready firing
 										SoundEffect(SFX_TR5_GOD_HEAD_LASER_LOOPS, &item->Pose);
 
-										LaserHeadData.fireArcs[i]->pos1.x = src.x;
-										LaserHeadData.fireArcs[i]->pos1.y = src.y;
-										LaserHeadData.fireArcs[i]->pos1.z = src.z;
+										LaserHeadData.fireArcs[i]->pos1.x = origin.x;
+										LaserHeadData.fireArcs[i]->pos1.y = origin.y;
+										LaserHeadData.fireArcs[i]->pos1.z = origin.z;
 									}
 									else
 									{
 										// Start firing from eye
-										src.roomNumber = item->RoomNumber;
-										LaserHeadData.LOS[i] = LOS(&src, &dest);
+										origin.roomNumber = item->RoomNumber;
+										LaserHeadData.LOS[i] = LOS(&origin, &dest);
 										//LaserHeadData.fireArcs[i] = TriggerEnergyArc((Vector3i*)& src, (Vector3i*)& dest, r, g, b, 32, 64, 64, ENERGY_ARC_NO_RANDOMIZE, ENERGY_ARC_STRAIGHT_LINE); // (GetRandomControl() & 7) + 4, b | ((&unk_640000 | g) << 8), 12, 64, 5);
 										StopSoundEffect(SFX_TR5_GOD_HEAD_CHARGE);
 										SoundEffect(SFX_TR5_GOD_HEAD_BLAST, &item->Pose);
@@ -497,9 +497,9 @@ namespace TEN::Entities::TR5
 
 									if (GlobalCounter & 1)
 									{
-										TriggerLaserHeadSparks((Vector3i*)&src, 3, r, g, b, 0);
-										TriggerLightningGlow(src.x, src.y, src.z, (GetRandomControl() & 3) + 32, r, g, b);
-										TriggerDynamicLight(src.x, src.y, src.z, (GetRandomControl() & 3) + 16, r, g, b);
+										TriggerLaserHeadSparks((Vector3i*)&origin, 3, r, g, b, 0);
+										TriggerLightningGlow(origin.x, origin.y, origin.z, (GetRandomControl() & 3) + 32, r, g, b);
+										TriggerDynamicLight(origin.x, origin.y, origin.z, (GetRandomControl() & 3) + 16, r, g, b);
 
 										if (!LaserHeadData.LOS[i])
 										{
@@ -529,7 +529,7 @@ namespace TEN::Entities::TR5
 										int yc = LaraItem->Pose.Position.y + ((bounds->Y1 + bounds->Y2) / 2);
 										int zc = LaraItem->Pose.Position.z + ((bounds->Z1 + bounds->Z2) / 2);
 
-										int distance = sqrt(pow(xc - src.x, 2) + pow(yc - src.y, 2) + pow(zc - src.z, 2));
+										int distance = sqrt(pow(xc - origin.x, 2) + pow(yc - origin.y, 2) + pow(zc - origin.z, 2));
 
 										if (distance < MAX_VISIBILITY_DISTANCE)
 										{
@@ -537,22 +537,22 @@ namespace TEN::Entities::TR5
 
 											if (dl < MAX_VISIBILITY_DISTANCE)
 											{
-												dest.x = src.x + dl * (dest.x - src.x) / MAX_VISIBILITY_DISTANCE;
-												dest.y = src.y + dl * (dest.y - src.y) / MAX_VISIBILITY_DISTANCE;
-												dest.z = src.z + dl * (dest.z - src.z) / MAX_VISIBILITY_DISTANCE;
+												dest.x = origin.x + dl * (dest.x - origin.x) / MAX_VISIBILITY_DISTANCE;
+												dest.y = origin.y + dl * (dest.y - origin.y) / MAX_VISIBILITY_DISTANCE;
+												dest.z = origin.z + dl * (dest.z - origin.z) / MAX_VISIBILITY_DISTANCE;
 											}
 
-											int dx = (dest.x - src.x) / 32;
-											int dy = (dest.y - src.y) / 32;
-											int dz = (dest.z - src.z) / 32;
+											int dx = (dest.x - origin.x) / 32;
+											int dy = (dest.y - origin.y) / 32;
+											int dz = (dest.z - origin.z) / 32;
 
-											int adx = currentArc->pos4.x - src.z;
-											int ady = currentArc->pos4.y - src.y;
-											int adz = currentArc->pos4.z - src.z;
+											int adx = currentArc->pos4.x - origin.z;
+											int ady = currentArc->pos4.y - origin.y;
+											int adz = currentArc->pos4.z - origin.z;
 
-											int x = src.x;
-											int y = src.y;
-											int z = src.z;
+											int x = origin.x;
+											int y = origin.y;
+											int z = origin.z;
 
 											for (int j = 0; j < 32; j++)
 											{
@@ -607,18 +607,18 @@ namespace TEN::Entities::TR5
 			{
 				if (item->Pose.Position.y <= item->ItemFlags[1])
 				{
-					src.x = 0;
-					src.y = 168;
-					src.z = 248;
-					src.roomNumber = item->RoomNumber;
-					GetJointAbsPosition(item, (Vector3i*)&src, 0);
+					origin.x = 0;
+					origin.y = 168;
+					origin.z = 248;
+					origin.roomNumber = item->RoomNumber;
+					GetJointAbsPosition(item, (Vector3i*)&origin, 0);
 
 					dest.x = 0;
 					dest.y = 0;
 					dest.z = 0;
 					GetJointAbsPosition(LaraItem, (Vector3i*)&dest, LM_HEAD);
 
-					if (LOS(&src, &src))
+					if (LOS(&origin, &origin))
 					{
 						item->ItemFlags[0]++;
 						item->ItemFlags[1] = item->Pose.Position.y;

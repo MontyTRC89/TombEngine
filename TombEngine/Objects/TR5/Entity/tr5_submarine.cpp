@@ -12,9 +12,12 @@
 #include "Game/animation.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_one_gun.h"
+#include "Math/Math.h"
 #include "Specific/setup.h"
 #include "Specific/level.h"
 #include "Sound/sound.h"
+
+using namespace TEN::Math;
 
 namespace TEN::Entities::TR5
 {
@@ -476,7 +479,7 @@ namespace TEN::Entities::TR5
 			}
 		}
 
-	auto angles = GetOrientTowardPoint(item->Pose.Position.ToVector3(), pos.ToVector3());
+		auto orient = Geometry::GetOrientTowardPoint(item->Pose.Position.ToVector3(), pos.ToVector3());
 
 		if (item->Animation.Velocity.z >= 48)
 		{
@@ -490,11 +493,11 @@ namespace TEN::Entities::TR5
 
 		if (item->ItemFlags[1] - 1 < 60)
 		{
-			short dry = angles.y - item->Pose.Orientation.y;
+			short dry = orient.y - item->Pose.Orientation.y;
 			if (abs(dry) > ANGLE(180.0f))
 				dry = -dry;
 
-			short drx = angles.x - item->Pose.Orientation.x;
+			short drx = orient.x - item->Pose.Orientation.x;
 			if (abs(drx) > ANGLE(180.0f))
 				drx = -drx;
 
