@@ -109,28 +109,28 @@ void DropEntityPickups(ItemInfo* item)
 	}
 }
 
-bool MoveCreature3DPos(PoseData* origin, PoseData* target, int velocity, short angleDif, int angleAdd)
+bool MoveCreature3DPos(PoseData* fromPose, PoseData* toPose, int velocity, short angleDif, int angleAdd)
 {
-	auto differenceVector = target->Position - origin->Position;
-	float distance = Vector3::Distance(origin->Position.ToVector3(), target->Position.ToVector3());
+	auto differenceVector = toPose->Position - fromPose->Position;
+	float distance = Vector3::Distance(fromPose->Position.ToVector3(), toPose->Position.ToVector3());
 
 	if (velocity < distance)
-		origin->Position += differenceVector * (velocity / distance);
+		fromPose->Position += differenceVector * (velocity / distance);
 	else
-		origin->Position = target->Position;
+		fromPose->Position = toPose->Position;
 
 	if (angleDif <= angleAdd)
 	{
 		if (angleDif >= -angleAdd)
-			origin->Orientation.y = target->Orientation.y;
+			fromPose->Orientation.y = toPose->Orientation.y;
 		else
-			origin->Orientation.y -= angleAdd;
+			fromPose->Orientation.y -= angleAdd;
 	}
 	else
-		origin->Orientation.y += angleAdd;
+		fromPose->Orientation.y += angleAdd;
 
-	if (origin->Position == target->Position &&
-		origin->Orientation.y == target->Orientation.y)
+	if (fromPose->Position == toPose->Position &&
+		fromPose->Orientation.y == toPose->Orientation.y)
 	{
 		return true;
 	}
@@ -138,21 +138,21 @@ bool MoveCreature3DPos(PoseData* origin, PoseData* target, int velocity, short a
 	return false;
 }
 
-void CreatureYRot2(PoseData* srcPos, short angle, short angleAdd) 
+void CreatureYRot2(PoseData* fromPose, short angle, short angleAdd) 
 {
 	if (angleAdd < angle)
 	{
-		srcPos->Orientation.y += angleAdd;
+		fromPose->Orientation.y += angleAdd;
 		return;
 	} 
 
 	if (angle < -angleAdd)
 	{
-		srcPos->Orientation.y -= angleAdd;
+		fromPose->Orientation.y -= angleAdd;
 		return;
 	} 
 
-	srcPos->Orientation.y += angle;
+	fromPose->Orientation.y += angle;
 }
 
 bool SameZone(CreatureInfo* creature, ItemInfo* target)

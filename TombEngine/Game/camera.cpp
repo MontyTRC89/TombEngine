@@ -1354,13 +1354,13 @@ void BinocularCamera(ItemInfo* item)
 
 	if (!LaserSight)
 	{
-		auto src = Vector3i(Camera.pos.x, Camera.pos.y, Camera.pos.z);
+		auto origin = Vector3i(Camera.pos.x, Camera.pos.y, Camera.pos.z);
 		auto target = Vector3i(Camera.target.x, Camera.target.y, Camera.target.z);
 
 		GetTargetOnLOS(&Camera.pos, &Camera.target, false, false);
 
 		if (RawInput & IN_ACTION)
-			LaraTorch(&src, &target, lara->ExtraHeadRot.y, 192);
+			LaraTorch(&origin, &target, lara->ExtraHeadRot.y, 192);
 	}
 	else
 		LaserSightCamera(item);

@@ -475,22 +475,22 @@ namespace TEN::Entities::Effects
 				byte g = (GetRandomControl() & 0x3F) + 192;
 				byte b = (GetRandomControl() & 0x3F) + 192;
 
-				auto src = item->Pose.Position;
-				Vector3i dest;
+				auto origin = item->Pose.Position;
+				Vector3i target;
 
 				if (!(GlobalCounter & 3))
 				{
 					if (item->TriggerFlags == 2 || item->TriggerFlags == 4)
 					{
-						dest.x = item->Pose.Position.x + 2048 * phd_sin(item->Pose.Orientation.y + ANGLE(180));
-						dest.y = item->Pose.Position.y;
-						dest.z = item->Pose.Position.z + 2048 * phd_cos(item->Pose.Orientation.y + ANGLE(180));
+						target.x = item->Pose.Position.x + 2048 * phd_sin(item->Pose.Orientation.y + ANGLE(180.0f));
+						target.y = item->Pose.Position.y;
+						target.z = item->Pose.Position.z + 2048 * phd_cos(item->Pose.Orientation.y + ANGLE(180.0f));
 
 						if (GetRandomControl() & 3)
 						{
 							TriggerLightning(
-								&src, 
-								&dest, 
+								&origin, 
+								&target, 
 								(GetRandomControl() & 0x1F) + 64, 
 								0, 
 								g, 
@@ -503,8 +503,8 @@ namespace TEN::Entities::Effects
 						else
 						{
 							TriggerLightning(
-								&src, 
-								&dest, 
+								&origin, 
+								&target, 
 								(GetRandomControl() & 0x1F) + 96,
 								0,
 								g, 
@@ -522,16 +522,16 @@ namespace TEN::Entities::Effects
 					short targetItemNumber = item->ItemFlags[((GlobalCounter >> 2) & 1) + 2];
 					auto* targetItem = &g_Level.Items[targetItemNumber];
 
-					dest = Vector3i(0, -64, 20);
-					GetJointAbsPosition(targetItem, &dest, 0);
+					target = Vector3i(0, -64, 20);
+					GetJointAbsPosition(targetItem, &target, 0);
 
 					if (!(GlobalCounter & 3))
 					{
 						if (GetRandomControl() & 3)
 						{
 							TriggerLightning(
-								&src, 
-								&dest,
+								&origin, 
+								&target,
 								(GetRandomControl() & 0x1F) + 64,
 								0,
 								g,
@@ -544,8 +544,8 @@ namespace TEN::Entities::Effects
 						else
 						{
 							TriggerLightning(
-								&src,
-								&dest,
+								&origin,
+								&target,
 								(GetRandomControl() & 0x1F) + 96,
 								0,
 								g,
@@ -558,22 +558,22 @@ namespace TEN::Entities::Effects
 					}
 
 					if (item->TriggerFlags != 3 || targetItem->TriggerFlags)
-						TriggerLightningGlow(dest.x, dest.y, dest.z, 64, 0, g, b);
+						TriggerLightningGlow(target.x, target.y, target.z, 64, 0, g, b);
 				}
 
 				if ((GlobalCounter & 3) == 2)
 				{
-					src = item->Pose.Position;
+					origin = item->Pose.Position;
 
-					dest = Vector3i(
-						(GetRandomControl() & 0x1FF) + src.x - 256,
-						(GetRandomControl() & 0x1FF) + src.y - 256,
-						(GetRandomControl() & 0x1FF) + src.z - 256
+					target = Vector3i(
+						(GetRandomControl() & 0x1FF) + origin.x - 256,
+						(GetRandomControl() & 0x1FF) + origin.y - 256,
+						(GetRandomControl() & 0x1FF) + origin.z - 256
 					);
 
 					TriggerLightning(
-						&src, 
-						&dest, 
+						&origin, 
+						&target, 
 						(GetRandomControl() & 0xF) + 16,
 						0,
 						g,
@@ -582,7 +582,7 @@ namespace TEN::Entities::Effects
 						LI_SPLINE | LI_MOVEEND,
 						32,
 						3);
-					TriggerLightningGlow(dest.x, dest.y, dest.z, 64, 0, g, b);
+					TriggerLightningGlow(target.x, target.y, target.z, 64, 0, g, b);
 				}
 			}
 			else
