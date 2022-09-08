@@ -431,7 +431,7 @@ void LogicHandler::GetVariables(std::vector<SavedVar> & vars)
 
 	// The purpose of this is to only store each value once, and to fill our tables with
 	// indices to the values rather than copies of the values.
-	 auto handleNum = [&](double num)
+	auto handleNum = [&](double num)
 	{
 		auto [first, second] = numMap.insert(std::make_pair(num, nVars));
 
