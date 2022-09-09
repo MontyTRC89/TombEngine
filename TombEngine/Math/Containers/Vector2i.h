@@ -1,7 +1,7 @@
 #pragma once
 
-//namespace TEN::Math
-//{
+namespace TEN::Math
+{
 	struct Vector2i
 	{
 		int x = 0;
@@ -31,4 +31,4 @@
 		Vector2i& operator *=(float value);
 		Vector2i& operator /=(float value);
 	};
-//}
+}

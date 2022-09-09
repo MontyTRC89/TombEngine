@@ -3,11 +3,12 @@
 
 #include "Game/items.h"
 #include "Game/room.h"
+#include "Math/Math.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
-#include "Math/Math.h"
 
 using namespace TEN::Floordata;
+using namespace TEN::Math;
 
 int FloorInfo::SectorPlane(int x, int z) const
 {

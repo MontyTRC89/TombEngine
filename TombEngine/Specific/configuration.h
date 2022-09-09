@@ -1,8 +1,9 @@
 #pragma once
-
 #include "Specific/input.h"
 #include "Math/Math.h"
 #include "Renderer/Renderer11Enums.h"
+
+using namespace TEN::Math;
 
 #define REGKEY_ROOT						"Software\\TombEngine\\TombEngine"
 

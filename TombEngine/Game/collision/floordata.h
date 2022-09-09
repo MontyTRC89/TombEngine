@@ -1,9 +1,12 @@
 #pragma once
 #include <optional>
+
 #include "Math/Math.h"
 #include "Specific/newtypes.h"
 
-constexpr auto WALL_PLANE = Vector3(0, 0, static_cast<float>(-CLICK(127)));
+using namespace TEN::Math;
+
+constexpr auto WALL_PLANE = Vector3(0, 0, (float)-CLICK(127));
 
 enum class CLIMB_DIRECTION : short
 {

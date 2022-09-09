@@ -1,8 +1,8 @@
 #include "framework.h"
 #include "Math/Containers/Vector2i.h"
 
-//namespace TEN::Math
-//{
+namespace TEN::Math
+{
 	Vector2i const Vector2i::Zero = Vector2i(0, 0);
 
 	Vector2i::Vector2i()
@@ -107,4 +107,4 @@
 		this->y /= value;
 		return *this;
 	}
-//}
+}

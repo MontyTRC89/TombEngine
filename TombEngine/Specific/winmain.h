@@ -9,7 +9,10 @@
 
 #include <process.h>
 #include <vector>
+
 #include "Math/Math.h"
+
+using namespace TEN::Math;
 
 struct WINAPP
 {
