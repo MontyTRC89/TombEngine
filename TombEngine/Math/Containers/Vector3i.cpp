@@ -27,6 +27,11 @@
 	{
 		return Vector3::Distance(origin.ToVector3(), target.ToVector3());
 	}
+	
+	float Vector3i::DistanceSquared(const Vector3i& origin, const Vector3i& target)
+	{
+		return Vector3::DistanceSquared(origin.ToVector3(), target.ToVector3());
+	}
 
 	Vector3 Vector3i::ToVector3() const
 	{
