@@ -644,7 +644,7 @@ namespace TEN::Renderer
 		void GetLaraAbsBonePosition(Vector3& pos, int jointIndex);
 		void GetItemAbsBonePosition(int itemNumber, Vector3& pos, int jointIndex);
 		int  GetSpheres(short itemNumber, BoundingSphere* ptr, char worldSpace, Matrix local);
-		void GetBoneMatrix(short itemNumber, int joint, Matrix* outMatrix);
+		void GetBoneMatrix(short itemNumber, int jointIndex, Matrix* outMatrix);
 		void DrawObjectOn2DPosition(short x, short y, short objectNum, short rotX, short rotY, short rotZ,  float scale1);
 		void SetLoadingScreen(std::wstring& fileName);
 		void SetTextureOrDefault(Texture2D& texture, std::wstring path);

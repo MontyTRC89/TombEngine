@@ -14,6 +14,11 @@
 
 		EulerAngles();
 		EulerAngles(short x, short y, short z);
+		EulerAngles(Vector3 direction);
+		EulerAngles(Quaternion quat);
+
+		Vector3	   ToDirection() const;
+		Quaternion ToQuaternion() const;
 
 		bool		 operator ==(const EulerAngles& eulers);
 		bool		 operator !=(const EulerAngles& eulers);

@@ -419,7 +419,7 @@ namespace TEN::Renderer
 		pos = Vector3::Transform(pos, world);
 	}
 
-	int Renderer11::GetSpheres(short itemNumber, BoundingSphere *spheres, char worldSpace, Matrix local)
+	int Renderer11::GetSpheres(short itemNumber, BoundingSphere* spheres, char worldSpace, Matrix local)
 	{
 		auto* itemToDraw = &m_items[itemNumber];
 		auto* nativeItem = &g_Level.Items[itemNumber];
@@ -471,12 +471,12 @@ namespace TEN::Renderer
 		return moveable.ObjectMeshes.size();
 	}
 
-	void Renderer11::GetBoneMatrix(short itemNumber, int joint, Matrix *outMatrix)
+	void Renderer11::GetBoneMatrix(short itemNumber, int jointIndex, Matrix* outMatrix)
 	{
 		if (itemNumber == Lara.ItemNumber)
 		{
-			auto& obj = *m_moveableObjects[ID_LARA];
-			*outMatrix = obj.AnimationTransforms[joint] * m_LaraWorldMatrix;
+			auto& object = *m_moveableObjects[ID_LARA];
+			*outMatrix = object.AnimationTransforms[jointIndex] * m_LaraWorldMatrix;
 		}
 		else
 		{
@@ -486,7 +486,7 @@ namespace TEN::Renderer
 			auto* nativeItem = &g_Level.Items[itemNumber];
 
 			auto& obj = *m_moveableObjects[nativeItem->ObjectNumber];
-			*outMatrix = obj.AnimationTransforms[joint] * rendererItem->World;
+			*outMatrix = obj.AnimationTransforms[jointIndex] * rendererItem->World;
 		}
 	}
 

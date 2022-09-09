@@ -25,6 +25,11 @@ namespace TEN::Math
 	{
 		return Vector2::Distance(origin.ToVector2(), target.ToVector2());
 	}
+	
+	float Vector2i::DistanceSquared(const Vector2i& origin, const Vector2i& target)
+	{
+		return Vector2::DistanceSquared(origin.ToVector2(), target.ToVector2());
+	}
 
 	Vector2 Vector2i::ToVector2() const
 	{

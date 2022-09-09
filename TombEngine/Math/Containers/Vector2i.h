@@ -14,6 +14,7 @@ namespace TEN::Math
 		Vector2i(const Vector2& vector);
 
 		static float Distance(const Vector2i& origin, const Vector2i& target);
+		static float DistanceSquared(const Vector2i& origin, const Vector2i& target);
 
 		Vector2 ToVector2() const;
 
