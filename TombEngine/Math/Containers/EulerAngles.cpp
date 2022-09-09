@@ -42,12 +42,12 @@
 
 		// Y axis
 		float sinYCosP = ((quat.w * quat.z) + (quat.x * quat.y)) * 2;
-		float cosYCosP = 1 - (((quat.y * quat.y) + (quat.z * quat.z)) * 2);
+		float cosYCosP = 1 - (((quat.y * quat.y) * 2) + (quat.z * quat.z));
 		this->y = phd_atan(cosYCosP, sinYCosP);
 
 		// Z axis
 		float sinRCosP = ((quat.w * quat.x) + (quat.y * quat.z)) * 2;
-		float cosRCosP = 1 - (((quat.x * quat.x) + (quat.y * quat.y)) * 2);
+		float cosRCosP = 1 - (((quat.x * quat.x) * 2) + (quat.y * quat.y));
 		this->z = phd_atan(cosRCosP, sinRCosP);
 	}
 
