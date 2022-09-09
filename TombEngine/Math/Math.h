@@ -6,8 +6,10 @@
 #include "Math/Containers/Vector2i.h"
 #include "Math/Containers/Vector3i.h"
 #include "Math/Geometry.h"
-#include "Math/Legacy.h"
 #include "Math/Random.h"
+
+// TODO: Phase these out.
+#include "Math/Legacy.h"
 #include "Specific/phd_global.h"
 
 namespace TEN::Math

@@ -4,7 +4,7 @@
 #include "Math/Containers/EulerAngles.h"
 #include "Math/Containers/PoseData.h"
 #include "Math/Containers/Vector3i.h"
-#include "Math/Math.h"
+#include "Math/Legacy.h"
 
 namespace TEN::Math::Geometry
 {

@@ -7,7 +7,7 @@
 #include "Math/Containers/PoseData.h"
 #include "Math/Containers/Vector3i.h"
 #include "Math/Random.h"
-#include "Math/Math.h"
+#include "Specific/phd_global.h"
 
 using namespace TEN::Math::Random;
 
