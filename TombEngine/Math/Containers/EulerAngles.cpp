@@ -3,7 +3,7 @@
 
 //namespace TEN::Math
 //{
-	EulerAngles const EulerAngles::Zero = EulerAngles(0, 0, 0);
+	const EulerAngles EulerAngles::Zero = EulerAngles(0, 0, 0);
 
 	EulerAngles::EulerAngles()
 	{

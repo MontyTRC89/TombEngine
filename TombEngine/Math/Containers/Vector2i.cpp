@@ -3,7 +3,7 @@
 
 namespace TEN::Math
 {
-	Vector2i const Vector2i::Zero = Vector2i(0, 0);
+	const Vector2i Vector2i::Zero = Vector2i(0, 0);
 
 	Vector2i::Vector2i()
 	{

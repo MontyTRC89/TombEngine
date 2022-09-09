@@ -13,7 +13,7 @@ using namespace TEN::Math;
 int FloorInfo::SectorPlane(int x, int z) const
 {
 	const auto point = GetSectorPoint(x, z);
-	auto vector = Vector2(point.x, point.y);
+	auto vector = point.ToVector2();
 	const auto matrix = Matrix::CreateRotationZ(FloorCollision.SplitAngle);
 	Vector2::Transform(vector, matrix, vector);
 
@@ -23,7 +23,7 @@ int FloorInfo::SectorPlane(int x, int z) const
 int FloorInfo::SectorPlaneCeiling(int x, int z) const
 {
 	const auto point = GetSectorPoint(x, z);
-	auto vector = Vector2(point.x, point.y);
+	auto vector = point.ToVector2();
 	const auto matrix = Matrix::CreateRotationZ(CeilingCollision.SplitAngle);
 	Vector2::Transform(vector, matrix, vector);
 

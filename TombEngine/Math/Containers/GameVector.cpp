@@ -5,7 +5,7 @@
 
 //namespace TEN::Math
 //{
-	GameVector const GameVector::Zero = GameVector(0, 0, 0, 0, 0);
+	const GameVector GameVector::Zero = GameVector(0, 0, 0, 0, 0);
 
 	GameVector::GameVector()
 	{
