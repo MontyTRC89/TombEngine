@@ -491,12 +491,12 @@ static bool ItemInRange(int x, int z, int radius)
 	return ((SQUARE(x) + SQUARE(z)) <= SQUARE(radius));
 }
 
-bool ItemNearLara(PHD_3DPOS* pos, int radius)
+bool ItemNearLara(PHD_3DPOS* origin, int radius)
 {
 	auto target = GameVector(
-		pos->Position.x - LaraItem->Pose.Position.x,
-		pos->Position.y - LaraItem->Pose.Position.y,
-		pos->Position.z - LaraItem->Pose.Position.z
+		origin->Position.x - LaraItem->Pose.Position.x,
+		origin->Position.y - LaraItem->Pose.Position.y,
+		origin->Position.z - LaraItem->Pose.Position.z
 	);
 
 	if (!ItemCollide(target.y, ITEM_RADIUS_YMAX))
@@ -538,16 +538,16 @@ bool ItemNearTarget(PHD_3DPOS* origin, ItemInfo* targetEntity, int radius)
 bool Move3DPosTo3DPos(PHD_3DPOS* fromPose, PHD_3DPOS* toPose, int velocity, short angleAdd)
 {
 	auto direction = toPose->Position - fromPose->Position;
-	int distance = sqrt(SQUARE(direction.x) + SQUARE(direction.y) + SQUARE(direction.z));
+	float distance = Vector3Int::Distance(fromPose->Position, toPose->Position);
 
 	if (velocity < distance)
-		fromPose->Position += direction * velocity / distance;
+		fromPose->Position += direction * (velocity / distance);
 	else
 		fromPose->Position = toPose->Position;
 
 	if (!Lara.Control.IsMoving)
 	{
-		bool shouldAnimate = (distance - velocity) > (velocity * ANIMATED_ALIGNMENT_FRAME_COUNT_THRESHOLD);
+		bool shouldAnimate = ((distance - velocity) > (velocity * ANIMATED_ALIGNMENT_FRAME_COUNT_THRESHOLD));
 
 		if (shouldAnimate && Lara.Control.WaterStatus != WaterStatus::Underwater)
 		{

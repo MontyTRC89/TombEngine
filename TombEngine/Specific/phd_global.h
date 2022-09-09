@@ -41,11 +41,21 @@ struct Vector3Int
 		this->z = z;
 	}
 
-	Vector3Int(Vector3 v)
+	Vector3Int(Vector3 vector)
 	{
-		this->x = int(v.x);
-		this->y = int(v.y);
-		this->z = int(v.z);
+		this->x = int(vector.x);
+		this->y = int(vector.y);
+		this->z = int(vector.z);
+	}
+
+	static float Distance(const Vector3Int& origin, const Vector3Int& target)
+	{
+		return Vector3::Distance(origin.ToVector3(), target.ToVector3());
+	}
+	
+	static float DistanceSquared(const Vector3Int& origin, const Vector3Int& target)
+	{
+		return Vector3::DistanceSquared(origin.ToVector3(), target.ToVector3());
 	}
 
 	Vector3 ToVector3() const
