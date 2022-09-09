@@ -218,22 +218,17 @@ void CutsceneRopeControl(short itemNumber)
 {
 	auto* ropeItem = &g_Level.Items[itemNumber];
 
-	Vector3i pos1 = { -128, -72, -16 };
-	GetJointAbsPosition(&g_Level.Items[ropeItem->ItemFlags[2]], &pos1, 0);
+	auto pos1 = GetJointPosition(&g_Level.Items[ropeItem->ItemFlags[2]], 0, Vector3i(-128, -72, -16));
+	auto pos2 = GetJointPosition(&g_Level.Items[ropeItem->ItemFlags[3]], 0, Vector3i(830, -12, 0));
 
-	Vector3i pos2 = { 830, -12, 0 };
-	GetJointAbsPosition(&g_Level.Items[ropeItem->ItemFlags[3]], &pos2, 0);
-
-	ropeItem->Pose.Position.x = pos2.x;
-	ropeItem->Pose.Position.y = pos2.y;
-	ropeItem->Pose.Position.z = pos2.z;
+	ropeItem->Pose.Position = pos2;
 
 	int dx = (pos2.x - pos1.x) * (pos2.x - pos1.x);
 	int dy = (pos2.y - pos1.y) * (pos2.y - pos1.y);
 	int dz = (pos2.z - pos1.z) * (pos2.z - pos1.z);
 
 	ropeItem->ItemFlags[1] = ((sqrt(dx + dy + dz) * 2) + sqrt(dx + dy + dz)) * 2;
-	ropeItem->Pose.Orientation.x = -4869;
+	ropeItem->Pose.Orientation.x = ANGLE(-26.75f);
 }
 
 void HybridCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll) 

@@ -67,9 +67,7 @@ namespace TEN::Entities::TR5
 
 				item->MeshBits = 1664;
 
-				auto pos1 = GameVector(0, 0, -64);
-				GetJointAbsPosition(item, (Vector3i*)&pos1, 8);
-
+				auto pos1 = GameVector(GetJointPosition(item, 8, Vector3i(0, 0, -64)));
 				auto pos2 = GameVector(GetLaraJointPosition(LM_HIPS));
 
 				pos1.roomNumber = item->RoomNumber;

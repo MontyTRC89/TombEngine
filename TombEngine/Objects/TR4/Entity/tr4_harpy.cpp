@@ -186,9 +186,9 @@ namespace TEN::Entities::TR4
 		item->ItemFlags[0]++;
 
 		auto rh = Vector3i(HarpyAttack1.Position);
-		GetJointAbsPosition(item, &rh, HarpyAttack1.meshNum);
+		GetJointPosition(item, &rh, HarpyAttack1.meshNum);
 		auto lr = Vector3i(HarpyAttack2.Position);
-		GetJointAbsPosition(item, &lr, HarpyAttack2.meshNum);
+		GetJointPosition(item, &lr, HarpyAttack2.meshNum);
 
 		if (item->ItemFlags[0] >= 24 &&
 			item->ItemFlags[0] <= 47 &&
@@ -227,7 +227,7 @@ namespace TEN::Entities::TR4
 			{
 				auto pos3 = Vector3i(HarpyAttack1.Position);
 				pos3.y *= 2;
-				GetJointAbsPosition(item, &pos3, HarpyAttack1.meshNum);
+				GetJointPosition(item, &pos3, HarpyAttack1.meshNum);
 
 				auto orient = Geometry::GetOrientTowardPoint(rh.ToVector3(), lr.ToVector3());
 				auto pose = PoseData(rh, orient);
@@ -238,7 +238,7 @@ namespace TEN::Entities::TR4
 			{
 				auto pos3 = Vector3i(HarpyAttack2.Position);
 				pos3.y *= 2;
-				GetJointAbsPosition(item, &pos3, HarpyAttack2.meshNum);
+				GetJointPosition(item, &pos3, HarpyAttack2.meshNum);
 
 				auto orient = Geometry::GetOrientTowardPoint(rh.ToVector3(), lr.ToVector3());
 				auto pose = PoseData(rh, orient);

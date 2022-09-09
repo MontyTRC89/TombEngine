@@ -261,7 +261,7 @@ namespace TEN::Entities::TR3
 					item->MeshBits = (item->MeshBits * 2) + 1;
 					shiva->Flags = 1;
 
-					GetJointAbsPosition(item, &pos, effectMesh++);
+					GetJointPosition(item, &pos, effectMesh++);
 					TriggerExplosionSparks(pos.x, pos.y, pos.z, 2, 0, 0, item->RoomNumber);
 					TriggerShivaSmoke(pos.x, pos.y, pos.z, 1);
 

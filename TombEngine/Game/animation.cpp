@@ -585,7 +585,7 @@ Vector3i GetLaraJointPosition(int jointIndex, const Vector3i& offset)
 	return Vector3i(pos);
 }
 
-Vector3i GetJointAbsPosition(ItemInfo* item, int jointIndex, const Vector3i& offset)
+Vector3i GetJointPosition(ItemInfo* item, int jointIndex, const Vector3i& offset)
 {
 	// Get real item number.
 	short itemNumber = item - g_Level.Items.data();
@@ -597,7 +597,7 @@ Vector3i GetJointAbsPosition(ItemInfo* item, int jointIndex, const Vector3i& off
 }
 
 // TODO: Adopt above version and remove this one.
-void GetJointAbsPosition(ItemInfo* item, Vector3i* offset, int jointIndex)
+void GetJointPosition(ItemInfo* item, Vector3i* offset, int jointIndex)
 {
 	short itemNumber = item - g_Level.Items.data();
 	auto pos = offset->ToVector3();

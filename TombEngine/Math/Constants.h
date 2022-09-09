@@ -21,5 +21,6 @@
 	constexpr inline auto DEEP_WATER = INT_MAX - 1; // NOTE: -1 prevents issues with sign change.
 
 	constexpr inline auto BLOCK			= [](auto x) { return (BLOCK_UNIT * x); };
+	constexpr inline auto QTR_BLOCK		= [](auto x) { return ((BLOCK_UNIT / 4) * x); };
 	constexpr inline auto OFFSET_RADIUS = [](auto x) { return ((x * SQRT_2) + 4); };
 //}

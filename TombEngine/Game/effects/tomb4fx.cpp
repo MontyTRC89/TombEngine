@@ -293,15 +293,13 @@ Particle* SetupFireSpark()
 
 void AttachAndCreateSpark(Particle* spark, ItemInfo* item, int meshIndex, Vector3i offset, Vector3i speed)
 {
-	auto pos1 = Vector3i(-4, -30, -4) + offset;
-	GetJointAbsPosition(item, &pos1, meshIndex);
+	auto pos1 = GetJointPosition(item, meshIndex, Vector3i(-4, -30, -4) + offset);
 
 	spark->x = (GetRandomControl() & 0x1F) + pos1.x - 16;
 	spark->y = (GetRandomControl() & 0x1F) + pos1.y - 16;
 	spark->z = (GetRandomControl() & 0x1F) + pos1.z - 16;
 
-	auto pos2 = Vector3i(-4, -30, -4) + offset + speed;
-	GetJointAbsPosition(item, &pos2, meshIndex);
+	auto pos2 = GetJointPosition(item, meshIndex, Vector3i(-4, -30, -4) + offset + speed);
 
 	int v = (GetRandomControl() & 0x3F) + 192;
 

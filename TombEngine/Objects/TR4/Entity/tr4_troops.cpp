@@ -90,9 +90,7 @@ namespace TEN::Entities::TR4
 
 		if (creature->FiredWeapon)
 		{
-			auto pos = Vector3i(TroopsBite1.Position);
-			GetJointAbsPosition(item, &pos, TroopsBite1.meshNum);
-
+			auto pos = GetJointPosition(item, TroopsBite1.meshNum, Vector3i(TroopsBite1.Position));
 			TriggerDynamicLight(pos.x, pos.y, pos.z, 2 * creature->FiredWeapon + 8, 24, 16, 4);
 
 			creature->FiredWeapon--;

@@ -47,14 +47,8 @@ namespace TEN::Entities::TR4
 			// Mutant.
 			else
 			{
-				origin.x = 0;
-				origin.y = -96;
-				origin.z = 144;
-				GetJointAbsPosition(item, &origin, 9);
-				target.x = 0;
-				target.y = -128;
-				target.z = 288;
-				GetJointAbsPosition(item, &target, 9);
+				origin = GetJointPosition(item, 9, Vector3i(0, -96, 144));
+				target = GetJointPosition(item, 9, Vector3i(0, -128, 288));
 				orient = Geometry::GetOrientTowardPoint(origin.ToVector3(), target.ToVector3());
 			}
 

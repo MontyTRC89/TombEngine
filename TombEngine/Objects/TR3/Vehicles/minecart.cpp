@@ -231,8 +231,7 @@ namespace TEN::Entities::Vehicles
 	{
 		for (int i = 0; i < 2; i++)
 		{
-			auto pos = Vector3i::Zero;
-			GetJointAbsPosition(minecartItem, &pos, Wheels[(left ? 0 : 2) + i]);
+			auto pos = GetJointPosition(minecartItem, Wheels[(left ? 0 : 2) + i]);
 			TriggerFrictionSpark(&GameVector(pos.x, pos.y, pos.z, minecartItem->RoomNumber), minecartItem->Pose.Orientation, 512, 10);
 			
 			if (i)

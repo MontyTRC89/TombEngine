@@ -123,9 +123,7 @@ namespace TEN::Entities::TR4
 		// Handle SAS firing.
 		if (creature->FiredWeapon)
 		{
-			auto pos = Vector3i(SASGunBite.Position);
-			GetJointAbsPosition(item, &pos, SASGunBite.meshNum);
-
+			auto pos = GetJointPosition(item, SASGunBite.meshNum, Vector3i(SASGunBite.Position));
 			TriggerDynamicLight(pos.x, pos.y, pos.z, 10, 24, 16, 4);
 			creature->FiredWeapon--;
 		}
@@ -565,9 +563,7 @@ namespace TEN::Entities::TR4
 			grenadeItem->ObjectNumber = ID_GRENADE;
 			grenadeItem->RoomNumber = item->RoomNumber;
 
-			auto pos = Vector3i(SASGunBite.Position);
-			GetJointAbsPosition(item, &pos, SASGunBite.meshNum);
-
+			auto pos = GetJointPosition(item, SASGunBite.meshNum, Vector3i(SASGunBite.Position));
 			grenadeItem->Pose.Position = pos;
 
 			auto probe = GetCollision(pos.x, pos.y, pos.z, grenadeItem->RoomNumber);

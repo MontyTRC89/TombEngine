@@ -86,11 +86,9 @@ void TriggerElectricityWireSparks(int x, int z, byte objNum, byte node, bool glo
 
 void TriggerElectricitySparks(ItemInfo* item, int joint, int flame)
 {
-	Vector3i pos = { 0, 0, 0 };
-	GetJointAbsPosition(item, &pos, joint);
-
 	auto* spark = GetFreeParticle();
 
+	auto pos = GetJointPosition(item, joint);
 	spark->on = 1;
 	spark->dR = 0;
 	spark->colFadeSpeed = 8;
@@ -154,8 +152,7 @@ void ElectricityWiresControl(short itemNumber)
 
 	for (int i = 0; i < object->nmeshes; i++)
 	{
-		auto pos = Vector3i(0, 0, CLICK(1));
-		GetJointAbsPosition(item, &pos, i);
+		auto pos = GetJointPosition(item, i, Vector3i(0, 0, CLICK(1)));
 
 		if (pos.y < cableBottomPlane)
 			continue;
@@ -196,9 +193,7 @@ void ElectricityWiresControl(short itemNumber)
 
 		for (int i = 0; i < object->nmeshes; i++)
 		{
-			auto pos = Vector3i(0, 0, CLICK(1));
-			GetJointAbsPosition(item, &pos, i);
-
+			auto pos = GetJointPosition(item, i, Vector3i(0, 0, CLICK(1)));
 			short roomNumber = item->RoomNumber;
 			auto floor = GetFloor(pos.x, pos.y, pos.z, &roomNumber);
 
@@ -215,8 +210,7 @@ void ElectricityWiresControl(short itemNumber)
 
 			for (int j = 0; j < collObj->nmeshes; j++)
 			{
-				Vector3i collPos = {};
-				GetJointAbsPosition(collItem, &collPos, j);
+				auto collPos = GetJointPosition(collItem, j);
 
 				auto collJointRoom = GetCollision(collPos.x, collPos.y, collPos.z, collItem->RoomNumber).RoomNumber;
 

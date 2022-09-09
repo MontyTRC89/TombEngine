@@ -181,23 +181,19 @@ namespace TEN::Entities::TR4
 		}
 
 		auto* enemy = creature->Enemy;
-		auto pos = Vector3i::Zero;
-		GetJointAbsPosition(item, &pos, joint);
 
+		auto pos = GetJointPosition(item,joint);
 		int x = enemy->Pose.Position.x - pos.x;
 		int z = enemy->Pose.Position.z - pos.z;
 		headAngle = (short)(phd_atan(z, x) - item->Pose.Orientation.y) / 2;
 	}
 
-	void GetTargetPosition(ItemInfo* item, PoseData* targetPose)
+	void GetTargetPosition(ItemInfo* originEntity, PoseData* targetPose)
 	{
-		auto origin = Vector3i(0, -96, 144);
-		GetJointAbsPosition(item, &origin, 9);
-
-		auto target = Vector3i(0, -128, 288);
-		GetJointAbsPosition(item, &target, 9);
-
+		auto origin = GetJointPosition(originEntity, 9, Vector3i(0, -96, 144));
+		auto target = GetJointPosition(originEntity, 9, Vector3i(0, -128, 288));
 		auto orient = Geometry::GetOrientTowardPoint(origin.ToVector3(), target.ToVector3());
+
 		targetPose->Position = target;
 		targetPose->Orientation = orient;
 	}

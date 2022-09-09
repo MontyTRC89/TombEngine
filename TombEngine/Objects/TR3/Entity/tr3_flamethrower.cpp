@@ -47,8 +47,7 @@ namespace TEN::Entities::TR3
 		short tilt = 0;
 		short head = 0;
 
-		auto pos = Vector3i(FlamethrowerBite.Position);
-		GetJointAbsPosition(item, &pos, FlamethrowerBite.meshNum);
+		auto pos = GetJointPosition(item, FlamethrowerBite.meshNum, Vector3i(FlamethrowerBite.Position));
 
 		int random = GetRandomControl();
 		if (item->Animation.ActiveState != 6 && item->Animation.ActiveState != 11)

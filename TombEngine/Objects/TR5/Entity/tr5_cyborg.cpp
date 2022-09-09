@@ -223,9 +223,7 @@ namespace TEN::Entities::TR5
 
 			if (creature->FiredWeapon)
 			{
-				auto pos = Vector3i(CyborgGunBite.Position);
-				GetJointAbsPosition(item, &pos, CyborgGunBite.meshNum);
-
+				auto pos = GetJointPosition(item, CyborgGunBite.meshNum, Vector3i(CyborgGunBite.Position));
 				TriggerDynamicLight(pos.x, pos.y, pos.z, 2 * creature->FiredWeapon + 10, 192, 128, 32);
 				creature->FiredWeapon--;
 			}
@@ -255,8 +253,7 @@ namespace TEN::Entities::TR5
 				random &= 31;
 			if (random < item->ItemFlags[0])
 			{
-				auto pos = Vector3i(0, 0, 50);
-				GetJointAbsPosition(item, &pos, HitmanJoints[random]);
+				auto pos = GetJointPosition(item, HitmanJoints[random], Vector3i(0, 0, 50));
 
 				TriggerLightningGlow(pos.x, pos.y, pos.z, 48, 32, 32, 64);
 				TriggerHitmanSparks(pos.x, pos.y, pos.z, -1, -1, -1);
@@ -266,16 +263,15 @@ namespace TEN::Entities::TR5
 
 				if (random == 5 || random == 7 || random == 10)
 				{
-					auto pos2 = Vector3i(0, 0, 50);
-
+					auto pos2 = Vector3i::Zero;
 					switch (random)
 					{
 					case 5:
-						GetJointAbsPosition(item, &pos2, 15);
+						GetJointPosition(item, 15, Vector3i(0, 0, 50));
 						break;
 
 					case 7:
-						GetJointAbsPosition(item, &pos2, 6);
+						GetJointPosition(item, 6, Vector3i(0, 0, 50));
 
 						if (TestEnvironment(ENV_FLAG_WATER, item) && item->HitPoints > 0)
 						{
@@ -289,7 +285,7 @@ namespace TEN::Entities::TR5
 						break;
 
 					case 10:
-						GetJointAbsPosition(item, &pos2, 12);
+						GetJointPosition(item, 12, Vector3i(0, 0, 50));
 						break;
 					}
 

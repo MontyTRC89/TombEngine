@@ -20,9 +20,7 @@ namespace TEN::Entities::TR2
 
 	static void S_SpiderBite(ItemInfo* item)
 	{
-		auto pos = Vector3i((int)round(SpiderBite.Position.x), (int)round(SpiderBite.Position.y), (int)round(SpiderBite.Position.z));
-		GetJointAbsPosition(item, &pos, SpiderBite.meshNum);
-
+		auto pos = GetJointPosition(item, SpiderBite.meshNum, Vector3i(SpiderBite.Position));
 		DoBloodSplat(pos.x, pos.y, pos.z, 10, item->Pose.Position.y, item->RoomNumber);
 	}
 

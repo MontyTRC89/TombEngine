@@ -5,7 +5,7 @@
 	class EulerAngles
 	{
 	public:
-		// CONVENTION: X = pitch, Y = yaw, Z = roll
+		// CONVENTION: X = pitch, Y = yaw, Z = roll.
 		short x = 0;
 		short y = 0;
 		short z = 0;

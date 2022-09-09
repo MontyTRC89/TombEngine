@@ -965,7 +965,7 @@ namespace TEN::Entities::Vehicles
 			height = 1;
 
 		auto prop = Vector3i(0, 0, -80);
-		GetJointAbsPosition(rBoatItem, &prop, 2);
+		GetJointPosition(rBoatItem, &prop, 2);
 
 		probedRoomNumber = GetCollision(prop.x, prop.y, prop.z, rBoatItem->RoomNumber).RoomNumber;
 

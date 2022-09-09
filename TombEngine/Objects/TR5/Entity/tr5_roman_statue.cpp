@@ -60,7 +60,7 @@ namespace TEN::Entities::TR5
 
 	static void RomanStatueHitEffect(ItemInfo* item, Vector3i* pos, int joint)
 	{
-		GetJointAbsPosition(item, pos, joint);
+		*pos = GetJointPosition(item, joint, *pos);
 
 		if (!(GetRandomControl() & 0x1F))
 		{
@@ -69,9 +69,7 @@ namespace TEN::Entities::TR5
 			{
 				auto* fx = &EffectList[fxNumber];
 
-				fx->pos.Position.x = pos->x;
-				fx->pos.Position.y = pos->y;
-				fx->pos.Position.z = pos->z;
+				fx->pos.Position = *pos;
 				fx->roomNumber = item->RoomNumber;
 				fx->pos.Orientation.z = 0;
 				fx->pos.Orientation.x = 0;
@@ -441,13 +439,10 @@ namespace TEN::Entities::TR5
 			case STATUE_STATE_SCREAM:
 				unknown = false;
 
-				pos1 = { -32, 48, 64 };
-				GetJointAbsPosition(item, &pos1, 14);
+				pos1 = GetJointPosition(item, 14, Vector3i(-32, 48, 64));
+				pos2 = GetJointPosition(item, 14, Vector3i(-48, 48, 490));
 
-				pos2 = { -48, 48, 490 };
-				GetJointAbsPosition(item, &pos2, 14);
-
-				pos = { (pos1.x + pos2.x) / 2, (pos1.y + pos2.y) / 2, (pos1.z + pos2.z) / 2 };
+				pos = Vector3i((pos1.x + pos2.x) / 2, (pos1.y + pos2.y) / 2, (pos1.z + pos2.z) / 2);
 
 				deltaFrame = item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase;
 
@@ -496,7 +491,7 @@ namespace TEN::Entities::TR5
 				else
 					pos = { -40, 64, GetRandomControl() % 360 };
 
-				GetJointAbsPosition(item, &pos, 14);
+				GetJointPosition(item, &pos, 14);
 
 				color = (GetRandomControl() & 0x3F) + 128;
 
@@ -578,7 +573,7 @@ namespace TEN::Entities::TR5
 				if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 10)
 				{
 					pos = { 0, 0, 0 };
-					GetJointAbsPosition(item, &pos, 16);
+					GetJointPosition(item, &pos, 16);
 
 					auto* room = &g_Level.Rooms[item->RoomNumber];
 					FloorInfo* floor = GetSector(room, pos.x - room->x, pos.z - room->z);
@@ -620,7 +615,7 @@ namespace TEN::Entities::TR5
 					if (!item->TriggerFlags)
 					{
 						pos1 = { -40, 64, 360 };
-						GetJointAbsPosition(item, &pos1, 14);
+						GetJointPosition(item, &pos1, 14);
 
 						pos1.y = item->Pose.Position.y - 64;
 
@@ -729,10 +724,10 @@ namespace TEN::Entities::TR5
 				if (deltaFrame == 34)
 				{
 					pos1 = Vector3i(-48, 48, SECTOR(1));
-					GetJointAbsPosition(item, &pos1, 14);
+					GetJointPosition(item, &pos1, 14);
 
 					pos2 = Vector3i(-48, 48, 450);
-					GetJointAbsPosition(item, &pos2, 14);
+					GetJointPosition(item, &pos2, 14);
 
 				auto orient = Geometry::GetOrientTowardPoint(pos2.ToVector3(), pos1.ToVector3());
 				auto attackPos = PoseData(pos2, orient);
@@ -766,10 +761,10 @@ namespace TEN::Entities::TR5
 				if (deltaFrame < 32)
 				{
 					pos1 = { -32, 48, 64 };
-					GetJointAbsPosition(item, &pos1, 14);
+					GetJointPosition(item, &pos1, 14);
 
 					pos2 = { -48, 48, 490 };
-					GetJointAbsPosition(item, &pos2, 14);
+					GetJointPosition(item, &pos2, 14);
 
 					for (int i = 0; i < 4; i++)
 					{

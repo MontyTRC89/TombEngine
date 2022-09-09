@@ -856,10 +856,9 @@ namespace TEN::Entities::Vehicles
 
 		if (TrInput & VEHICLE_IN_BRAKE)
 		{
-			auto pos = Vector3i(0, -144, -1024);
-			GetJointAbsPosition(jeepItem, &pos, 11);
-
+			auto pos = GetJointPosition(jeepItem, 11, Vector3i(0, -144, -1024));
 			TriggerDynamicLight(pos.x, pos.y, pos.z, 10, 64, 0, 0);
+
 			jeepItem->SetBits(JointBitType::Mesh, { 17 });
 			jeepItem->ClearBits(JointBitType::Mesh, JeepBrakeLightJoints);
 		}
@@ -1486,8 +1485,7 @@ namespace TEN::Entities::Vehicles
 			short speed = 0;
 			short angle = 0;
 
-			auto pos = Vector3i(90, 0, -500);
-			GetJointAbsPosition(jeepItem, &pos, 11);
+			auto pos = GetJointPosition(jeepItem, 11, Vector3i(90, 0, -500));
 
 			if (jeepItem->Animation.Velocity.z <= 32)
 			{

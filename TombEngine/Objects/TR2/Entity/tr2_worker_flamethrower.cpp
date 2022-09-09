@@ -51,8 +51,6 @@ namespace TEN::Entities::TR2
 		if (!CreatureActive(itemNumber))
 			return;
 
-		Vector3i pos;
-
 		auto* item = &g_Level.Items[itemNumber];
 		auto* creature = GetCreatureInfo(item);
 
@@ -63,8 +61,7 @@ namespace TEN::Entities::TR2
 		short torsoX = 0;
 		short torsoY = 0;
 
-		pos = Vector3i(WorkerFlamethrowerBite.Position);
-		GetJointAbsPosition(item, &pos, WorkerFlamethrowerBite.meshNum);
+		auto pos = GetJointPosition(item, WorkerFlamethrowerBite.meshNum, Vector3i(WorkerFlamethrowerBite.Position));
 
 		if (item->HitPoints <= 0)
 		{

@@ -131,20 +131,21 @@ namespace TEN::Entities::TR5
 			torpedoItem->ObjectNumber = ID_TORPEDO;
 			torpedoItem->Color = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
 
-			Vector3i pos1;
-			Vector3i pos2;
-
+			auto pos1 = Vector3i::Zero;
+			auto pos2 = Vector3i::Zero;
 			for (int i = 0; i < 8; i++)
 			{
-				pos1.x = (GetRandomControl() & 0x7F) - 414;
-				pos1.y = -320;
-				pos1.z = 352;
-				GetJointAbsPosition(item, &pos1, 4);
+				pos1 = GetJointPosition(item, 4, Vector3i(
+					(GetRandomControl() & 0x7F) - 414,
+					-320,
+					352
+				));
 
-				pos2.x = (GetRandomControl() & 0x3FF) - 862;
-				pos2.y = -320 - (GetRandomControl() & 0x3FF);
-				pos2.z = (GetRandomControl() & 0x3FF) - 160;
-				GetJointAbsPosition(item, &pos2, 4);
+				pos2 = GetJointPosition(item, 4, Vector3i(
+					(GetRandomControl() & 0x3FF) - 862,
+					-320 - (GetRandomControl() & 0x3FF),
+					(GetRandomControl() & 0x3FF) - 160
+				));
 
 				TriggerTorpedoSparks2(&pos1, &pos2, 0);
 			}
@@ -152,17 +153,15 @@ namespace TEN::Entities::TR5
 			torpedoItem->RoomNumber = item->RoomNumber;
 			GetFloor(pos1.x, pos1.y, pos1.z, &torpedoItem->RoomNumber);
 
-			torpedoItem->Pose.Position.x = pos1.x;
-			torpedoItem->Pose.Position.y = pos1.y;
-			torpedoItem->Pose.Position.z = pos1.z;
+			torpedoItem->Pose.Position = pos1;
 
 			InitialiseItem(itemNumber);
 
 			torpedoItem->Pose.Orientation.x = 0;
 			torpedoItem->Pose.Orientation.y = item->Pose.Orientation.y;
 			torpedoItem->Pose.Orientation.z = 0;
-			torpedoItem->Animation.Velocity.z = 0;
-			torpedoItem->Animation.Velocity.y = 0;
+			torpedoItem->Animation.Velocity.y = 0.0f;
+			torpedoItem->Animation.Velocity.z = 0.0f;
 			torpedoItem->ItemFlags[0] = -1;
 
 			AddActiveItem(itemNumber);
@@ -291,38 +290,22 @@ namespace TEN::Entities::TR5
 
 		if (GlobalCounter & 1)
 		{
-			Vector3i pos1 = { 200, 320, 90 };
-			GetJointAbsPosition(item, &pos1, 1);
-
-			Vector3i pos2 = { 200, 1280, 90 };
-			GetJointAbsPosition(item, &pos2, 1);
-
+			auto pos1 = GetJointPosition(item, 1, Vector3i(200, 320, 90));
+			auto pos2 = GetJointPosition(item, 1, Vector3i(200, 1280, 90));
 			TriggerTorpedoBubbles(&pos1, &pos2, 0);
 
-			pos1 = { 200, 320, -100 };
-			GetJointAbsPosition(item, &pos1, 1);
-
-			pos2 = { 200, 1280, -100 };
-			GetJointAbsPosition(item, &pos2, 1);
-
+			pos1 = GetJointPosition(item, 1, Vector3i(200, 230, -100));
+			pos2 = GetJointPosition(item, 1, Vector3i(200, 1280, -100));
 			TriggerTorpedoBubbles(&pos1, &pos2, 0);
 		}
 		else
 		{
-			Vector3i pos1 = { -200, 320, 90 };
-			GetJointAbsPosition(item, &pos1, 2);
-
-			Vector3i pos2 = { -200, 1280, 90 };
-			GetJointAbsPosition(item, &pos2, 2);
-
+			auto pos1 = GetJointPosition(item, 2, Vector3i(-200, 320, 90));
+			auto pos2 = GetJointPosition(item, 2, Vector3i(-200, 1280, 90));
 			TriggerTorpedoBubbles(&pos1, &pos2, 0);
 
-			pos1 = { -200, 320, -100 };
-			GetJointAbsPosition(item, &pos1, 2);
-
-			pos2 = { -200, 1280, -100 };
-			GetJointAbsPosition(item, &pos2, 2);
-
+			pos1 = GetJointPosition(item, 2, Vector3i(-200, 320, -100));
+			pos2 = GetJointPosition(item, 2, Vector3i(-200, 1280, -100));
 			TriggerTorpedoBubbles(&pos1, &pos2, 0);
 		}
 
@@ -333,13 +316,13 @@ namespace TEN::Entities::TR5
 		pos1.y = -600;
 		pos1.z = -40;
 		pos1.roomNumber = item->RoomNumber;
-		GetJointAbsPosition(item, (Vector3i*)&pos1, 0);
+		GetJointPosition(item, (Vector3i*)&pos1, 0);
 
 		GameVector pos2;
 		pos2.x = 0;
 		pos2.y = -15784;
 		pos2.z = -40;
-		GetJointAbsPosition(item, (Vector3i*)&pos2, 0);
+		GetJointPosition(item, (Vector3i*)&pos2, 0);
 
 		if (!LOS((GameVector*)&pos1, &pos2))
 		{
@@ -401,13 +384,13 @@ namespace TEN::Entities::TR5
 		pos1.x = 0;
 		pos1.y = 0;
 		pos1.z = (GlobalCounter & 1) != 0 ? 48 : -48;
-		GetJointAbsPosition(item, &pos1, 0);
+		GetJointPosition(item, &pos1, 0);
 
 		Vector3i pos2;
 		pos2.x = 0;
 		pos2.y = 0;
 		pos2.z = 8 * ((GlobalCounter & 1) != 0 ? 48 : -48);
-		GetJointAbsPosition(item, &pos2, 0);
+		GetJointPosition(item, &pos2, 0);
 
 		TriggerTorpedoBubbles(&pos1, &pos2, 1);
 
@@ -560,13 +543,13 @@ namespace TEN::Entities::TR5
 					ItemNewRoom(itemNumber, probe.RoomNumber);
 
 				Vector3i pos1 = { 0, 0, -64 };
-				GetJointAbsPosition(item, &pos1, 0);
+				GetJointPosition(item, &pos1, 0);
 
 				Vector3i pos2;
 				pos2.x = 0;
 				pos2.y = 0;
 				pos2.z = -64 << ((GlobalCounter & 1) + 2);
-				GetJointAbsPosition(item, &pos2, 0);
+				GetJointPosition(item, &pos2, 0);
 
 				TriggerTorpedoBubbles(&pos1, &pos2, 1);
 			}

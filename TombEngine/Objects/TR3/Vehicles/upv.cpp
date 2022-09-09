@@ -242,7 +242,7 @@ namespace TEN::Entities::Vehicles
 			harpoonItem->RoomNumber = UPVItem->RoomNumber;
 
 			auto pos = Vector3i((UPV->HarpoonLeft ? 22 : -22), 24, 230);
-			GetJointAbsPosition(UPVItem, &pos, UPV_JOINT_TURBINE);
+			GetJointPosition(UPVItem, &pos, UPV_JOINT_TURBINE);
 
 			harpoonItem->Pose.Position = pos;
 			InitialiseItem(itemNumber);
@@ -335,7 +335,7 @@ namespace TEN::Entities::Vehicles
 			if (UPV->Velocity)
 			{
 				pos = Vector3i(UPVBites[UPV_BITE_TURBINE].Position);
-				GetJointAbsPosition(UPVItem, &pos, UPVBites[UPV_BITE_TURBINE].meshNum);
+				GetJointPosition(UPVItem, &pos, UPVBites[UPV_BITE_TURBINE].meshNum);
 
 				TriggerUPVMist(pos.x, pos.y + UPV_SHIFT, pos.z, abs(UPV->Velocity) / VEHICLE_VELOCITY_SCALE, UPVItem->Pose.Orientation.y + ANGLE(180.0f));
 
@@ -358,7 +358,7 @@ namespace TEN::Entities::Vehicles
 			int random = 31 - (GetRandomControl() & 3);
 			pos = Vector3i(UPVBites[UPV_BITE_FRONT_LIGHT].Position);
 			pos.z <<= (lp * 6);
-			GetJointAbsPosition(UPVItem, &pos, UPVBites[UPV_BITE_FRONT_LIGHT].meshNum);
+			GetJointPosition(UPVItem, &pos, UPVBites[UPV_BITE_FRONT_LIGHT].meshNum);
 
 			GameVector source;
 			if (lp == 1)

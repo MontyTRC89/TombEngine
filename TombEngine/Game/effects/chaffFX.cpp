@@ -78,8 +78,7 @@ void TriggerChaffEffects(ItemInfo* item, Vector3i* pos, Vector3i* vel, int speed
 	auto pose = item->Pose;
 	if (item->IsLara())
 	{
-		auto handPos = Vector3i::Zero;
-		GetJointAbsPosition(item, &handPos, LM_RHAND);
+		auto handPos = GetJointPosition(item, LM_RHAND);
 		pose.Position = handPos;
 		pose.Position.y -= 64;
 	}

@@ -585,7 +585,7 @@ void Moveable::SetPos(Vec3 const& pos)
 Vec3 Moveable::GetJointPos(int jointIndex) const
 {
 	Vector3i result = {};
-	GetJointAbsPosition(m_item, &result, jointIndex);
+	GetJointPosition(m_item, &result, jointIndex);
 
 	return Vec3(result.x, result.y, result.z);
 }

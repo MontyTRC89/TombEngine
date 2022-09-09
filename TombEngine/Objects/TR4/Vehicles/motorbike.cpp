@@ -317,16 +317,12 @@ namespace TEN::Entities::Vehicles
 		if (motorbike->LightPower <= 0)
 			return;
 
-		auto start = Vector3i(0, -470, 1836);
-		GetJointAbsPosition(motorbikeItem, &start, 0);
-
-		auto target = Vector3i(0, -470, 20780);
-		GetJointAbsPosition(motorbikeItem, &target, 0);
-
+		auto origin = GetJointPosition(motorbikeItem, 0, Vector3i(0, -470, 1836));
+		auto target = GetJointPosition(motorbikeItem, 0, Vector3i(0, -470, 20780));
 		int random = (motorbike->LightPower * 2) - (GetRandomControl() & 0xF);
 
 		// TODO: Use target as direction vector for spotlight.
-		TriggerDynamicLight(start.x, start.y, start.z, 8, random, random / 2, 0);
+		TriggerDynamicLight(origin.x, origin.y, origin.z, 8, random, random / 2, 0);
 	}
 
 	static void TriggerMotorbikeExhaustSmoke(int x, int y, int z, short angle, short speed, bool moving)
@@ -407,8 +403,7 @@ namespace TEN::Entities::Vehicles
 
 		if (laraItem->Animation.ActiveState != MOTORBIKE_STATE_MOUNT && laraItem->Animation.ActiveState != MOTORBIKE_STATE_DISMOUNT)
 		{
-			auto pos = Vector3i(56, -144, -500);
-			GetJointAbsPosition(motorbikeItem, &pos, 0);
+			auto pos = GetJointPosition(motorbikeItem,  0, Vector3i(56, -144, -500));
 
 			int speed = motorbikeItem->Animation.Velocity.z;
 			if (speed > 32 && speed < 64)
@@ -1056,10 +1051,9 @@ namespace TEN::Entities::Vehicles
 
 			if (TrInput & VEHICLE_IN_BRAKE)
 			{
-				auto pos = Vector3i(0, -144, -1024);
-				GetJointAbsPosition(motorbikeItem, &pos, NULL);
-
+				auto pos = GetJointPosition(motorbikeItem, 0, Vector3i(0, -144, -1024));
 				TriggerDynamicLight(pos.x, pos.y, pos.z, 10, 64, 0, 0);
+
 				motorbikeItem->SetBits(JointBitType::Mesh, MotorbikeBrakeLightJoints);
 			}
 			else

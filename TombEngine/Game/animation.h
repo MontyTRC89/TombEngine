@@ -98,5 +98,5 @@ void ClampRotation(PoseData* pose, short angle, short rotation);
 void DrawAnimatingItem(ItemInfo* item);
 
 Vector3i GetLaraJointPosition(int jointIndex, const Vector3i& offset = Vector3i::Zero);
-Vector3i GetJointAbsPosition(ItemInfo* item, int jointIndex, const Vector3i& offset = Vector3i::Zero);
-void GetJointAbsPosition(ItemInfo* item, Vector3i* offset, int jointIndex);
+Vector3i GetJointPosition(ItemInfo* item, int jointIndex, const Vector3i& offset = Vector3i::Zero);
+void GetJointPosition(ItemInfo* item, Vector3i* offset, int jointIndex);

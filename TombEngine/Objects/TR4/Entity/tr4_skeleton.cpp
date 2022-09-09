@@ -617,8 +617,7 @@ namespace TEN::Entities::TR4
 				{
 					auto* room = &g_Level.Rooms[item->RoomNumber];
 
-					auto pos = Vector3i::Zero;
-					GetJointAbsPosition(item, &pos, 16);
+					auto pos = GetJointPosition(item, 16);
 
 					auto floor = GetCollision(x, y, z, item->RoomNumber).Block;
 					if (floor->Stopper)

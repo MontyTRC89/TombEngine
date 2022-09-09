@@ -353,8 +353,7 @@ namespace TEN::Entities::TR4
 								SoundEffect(SFX_TR4_HORSEMAN_TAKEHIT, &item->Pose);
 								SoundEffect(SFX_TR4_HORSE_RICOCHET, &item->Pose);
 
-								auto pos = Vector3i(0, -128, 80);
-								GetJointAbsPosition(item, &pos, SPHERES_SPACE_WORLD);
+								auto pos = GetJointPosition(item, SPHERES_SPACE_WORLD, Vector3i(0, -128, 80));
 								HorsemanSparks(&pos, item->Pose.Orientation.y, 7);
 							}
 							else if (TestProbability(0.125f))

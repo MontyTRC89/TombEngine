@@ -98,7 +98,7 @@ namespace TEN::Entities::TR5
 		auto* creature = (LaserHeadInfo*)item->Data;
 
 		auto dest = Vector3i(LaserHeadBasePosition.x, LaserHeadBasePosition.y, LaserHeadBasePosition.z);
-		GetJointAbsPosition(&g_Level.Items[creature->BaseItem], &dest, 0);
+		GetJointPosition(&g_Level.Items[creature->BaseItem], &dest, 0);
 
 		Vector3i src;
 
@@ -116,7 +116,7 @@ namespace TEN::Entities::TR5
 			else
 			{
 				src = Vector3i(GuardianChargePositions[i].x, GuardianChargePositions[i].y, GuardianChargePositions[i].z);
-				GetJointAbsPosition(&g_Level.Items[creature->BaseItem], &src, 0);
+				GetJointPosition(&g_Level.Items[creature->BaseItem], &src, 0);
 				//LaserHeadData.chargeArcs[i] = TriggerEnergyArc(&src, &dest, 0, g, b, 256, 90, 64, ENERGY_ARC_NO_RANDOMIZE, ENERGY_ARC_STRAIGHT_LINE); //  (GetRandomControl() & 7) + 8, v4 | ((v1 | 0x240000) << 8), 13, 48, 3);
 			}
 		}
@@ -128,7 +128,7 @@ namespace TEN::Entities::TR5
 				if (1 << GuardianMeshes[i] & item->MeshBits)
 				{
 					src = Vector3i::Zero;
-					GetJointAbsPosition(item, &src, GuardianMeshes[i]);
+					GetJointPosition(item, &src, GuardianMeshes[i]);
 
 					TriggerLightningGlow(src.x, src.y, src.z, size + (GetRandomControl() & 3), 0, g, b);
 					TriggerLaserHeadSparks(&src, 3, 0, g, b, 0);
@@ -292,7 +292,7 @@ namespace TEN::Entities::TR5
 				origin.y = 168;
 				origin.z = 248;
 				origin.roomNumber = item->RoomNumber;
-				GetJointAbsPosition(item, (Vector3i*)&origin, 0);
+				GetJointPosition(item, (Vector3i*)&origin, 0);
 
 				if (item->ItemFlags[0] == 1)
 				{
@@ -301,7 +301,7 @@ namespace TEN::Entities::TR5
 					dest.x = 0;
 					dest.y = 0;
 					dest.z = 0;
-					GetJointAbsPosition(LaraItem, (Vector3i*)&dest, LM_HEAD);
+					GetJointPosition(LaraItem, (Vector3i*)&dest, LM_HEAD);
 
 					// Calculate distance between guardian and Lara
 					int distance = sqrt(pow(origin.x - dest.x, 2) + pow(origin.y - dest.y, 2) + pow(origin.z - dest.z, 2));
@@ -318,7 +318,7 @@ namespace TEN::Entities::TR5
 						dest.x = 0;
 						dest.y = 0;
 						dest.z = 0;
-						GetJointAbsPosition(LaraItem, (Vector3i*)&dest, LM_HIPS);
+						GetJointPosition(LaraItem, (Vector3i*)&dest, LM_HIPS);
 
 						LaserHeadData.target.x = dest.x;
 						LaserHeadData.target.y = dest.y;
@@ -466,7 +466,7 @@ namespace TEN::Entities::TR5
 									origin.x = 0;
 									origin.y = 0;
 									origin.z = 0;
-									GetJointAbsPosition(item, (Vector3i*)&origin, GuardianMeshes[i]);
+									GetJointPosition(item, (Vector3i*)&origin, GuardianMeshes[i]);
 
 									int c = 8192 * phd_cos(angles.x);
 									dest.x = origin.x + c * phd_sin(item->Pose.Orientation.y);
@@ -611,12 +611,12 @@ namespace TEN::Entities::TR5
 					origin.y = 168;
 					origin.z = 248;
 					origin.roomNumber = item->RoomNumber;
-					GetJointAbsPosition(item, (Vector3i*)&origin, 0);
+					GetJointPosition(item, (Vector3i*)&origin, 0);
 
 					dest.x = 0;
 					dest.y = 0;
 					dest.z = 0;
-					GetJointAbsPosition(LaraItem, (Vector3i*)&dest, LM_HEAD);
+					GetJointPosition(LaraItem, (Vector3i*)&dest, LM_HEAD);
 
 					if (LOS(&origin, &origin))
 					{

@@ -191,10 +191,10 @@ namespace TEN::Entities::TR4
 			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase)
 			{
 				auto pos1 = Vector3i(-544, 96, 0);
-				GetJointAbsPosition(item, &pos1, 16);
+				GetJointPosition(item, &pos1, 16);
 
 				auto pos2 = Vector3i (-900, 96, 0);
-				GetJointAbsPosition(item, &pos2, 16);
+				GetJointPosition(item, &pos2, 16);
 
 				auto orient = Geometry::GetOrientTowardPoint(pos1.ToVector3(), pos2.ToVector3());
 				auto pose = PoseData(pos1, orient);
@@ -209,10 +209,10 @@ namespace TEN::Entities::TR4
 			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase)
 			{
 				auto pos1 = Vector3i(-544, 96, 0 );
-				GetJointAbsPosition(item, &pos1, 16);
+				GetJointPosition(item, &pos1, 16);
 
 				auto pos2 = Vector3i(-900, 96, 0);
-				GetJointAbsPosition(item, &pos2, 16);
+				GetJointPosition(item, &pos2, 16);
 
 				auto orient = Geometry::GetOrientTowardPoint(pos1.ToVector3(), pos2.ToVector3());
 				auto pose = PoseData(pos1, orient);
@@ -233,13 +233,13 @@ namespace TEN::Entities::TR4
 
 				if (GlobalCounter & 1)
 				{
-					GetJointAbsPosition(item, &pos1, 18);
-					GetJointAbsPosition(item, &pos2, 18);
+					GetJointPosition(item, &pos1, 18);
+					GetJointPosition(item, &pos2, 18);
 				}
 				else
 				{
-					GetJointAbsPosition(item, &pos1, 17);
-					GetJointAbsPosition(item, &pos2, 17);
+					GetJointPosition(item, &pos1, 17);
+					GetJointPosition(item, &pos2, 17);
 				}
 
 				auto orient = Geometry::GetOrientTowardPoint(pos1.ToVector3(), pos2.ToVector3());
@@ -690,7 +690,7 @@ namespace TEN::Entities::TR4
 				if (item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase == DEMIGOD_ANIM_RUN_TO_IDLE)
 				{
 					auto pos = Vector3i(80, -8, -40);
-					GetJointAbsPosition(item, &pos, 17);
+					GetJointPosition(item, &pos, 17);
 
 					short roomNumber = item->RoomNumber;
 					FloorInfo* floor = GetFloor(pos.x, pos.y, pos.z, &roomNumber);
