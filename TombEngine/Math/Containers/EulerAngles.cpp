@@ -20,16 +20,17 @@
 	}
 
 	// TODO: Check.
-	EulerAngles::EulerAngles(Vector3 direction)
+	EulerAngles::EulerAngles(const Vector3& direction)
 	{
-		direction.Normalize();
+		auto directionNorm = direction;
+		directionNorm.Normalize();
 		this->x = atan2(direction.y, direction.x);
 		this->y = -asin(direction.z);
 		this->z = 0.0f;
 	}
 
 	// TODO: Check.
-	EulerAngles::EulerAngles(Quaternion quat)
+	EulerAngles::EulerAngles(const Quaternion& quat)
 	{
 		// X axis
 		float sinP = ((quat.w * quat.y) - (quat.z * quat.x)) * 2;
