@@ -77,8 +77,10 @@
 #include "tr4_teethspike.h"
 
 // Vehicles
-#include "Objects/TR4/Vehicles/motorbike.h"
 #include "Objects/TR4/Vehicles/jeep.h"
+#include "Objects/TR4/Vehicles/motorbike.h"
+
+using namespace TEN::Entities::Traps;
 
 namespace TEN::Entities
 {

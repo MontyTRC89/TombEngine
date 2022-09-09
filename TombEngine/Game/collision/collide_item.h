@@ -10,7 +10,7 @@ struct MESH_INFO;
 constexpr auto MAX_COLLIDED_OBJECTS = 1024;
 constexpr auto ITEM_RADIUS_YMAX = SECTOR(3);
 
-constexpr auto VEHICLE_COLLISION_TERMINAL_VELOCITY = 30;
+constexpr auto VEHICLE_COLLISION_TERMINAL_VELOCITY = 30.0f;
 
 extern BOUNDING_BOX GlobalCollisionBounds;
 extern ItemInfo* CollidedItems[MAX_COLLIDED_OBJECTS];

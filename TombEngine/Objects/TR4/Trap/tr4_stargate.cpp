@@ -14,7 +14,7 @@
 
 using std::vector;
 
-namespace TEN::Entities::TR4
+namespace TEN::Entities::Traps
 {
 	constexpr auto STARGATE_HARM_DAMAGE = 100;
 
@@ -49,10 +49,7 @@ namespace TEN::Entities::TR4
 		if (item->Status == ITEM_INVISIBLE)
 			return;
 
-		if (!TestBoundsCollide(item, laraItem, coll->Setup.Radius))
-			return;
-
-		// TODO: Define bounds for collision with the border.
+		// TODO: Border collision.
 		/*for (auto& bounds : StargateBounds)
 		{
 			GlobalCollisionBounds.X1 = bounds.x;
@@ -62,6 +59,9 @@ namespace TEN::Entities::TR4
 			if (TestWithGlobalCollisionBounds(item, laraItem, coll))
 				ItemPushItem(item, laraItem, coll, 0, 2);
 		}*/
+
+		if (!TestBoundsCollide(item, laraItem, coll->Setup.Radius))
+			return;
 
 		if (TriggerActive(item) &&
 			item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 20 && // Hardcoded frame range.

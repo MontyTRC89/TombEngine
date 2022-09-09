@@ -271,10 +271,10 @@ bool TestWithGlobalCollisionBounds(ItemInfo* item, ItemInfo* laraItem, Collision
 {
 	auto* framePtr = GetBestFrame(laraItem);
 
-	if (item->Pose.Position.y + GlobalCollisionBounds.Y2 <= laraItem->Pose.Position.y + framePtr->boundingBox.Y1)
+	if ((item->Pose.Position.y + GlobalCollisionBounds.Y2) <= (laraItem->Pose.Position.y + framePtr->boundingBox.Y1))
 		return false;
 
-	if (item->Pose.Position.y + GlobalCollisionBounds.Y1 >= framePtr->boundingBox.Y2)
+	if ((item->Pose.Position.y + GlobalCollisionBounds.Y1) >= framePtr->boundingBox.Y2)
 		return false;
 
 	float sinY = phd_sin(item->Pose.Orientation.y);
@@ -286,10 +286,10 @@ bool TestWithGlobalCollisionBounds(ItemInfo* item, ItemInfo* laraItem, Collision
 	int x = (dx * cosY) - (dz * sinY);
 	int z = (dz * cosY) + (dx * sinY);
 
-	if (x < GlobalCollisionBounds.X1 - coll->Setup.Radius ||
-		x > GlobalCollisionBounds.X2 + coll->Setup.Radius ||
-		z < GlobalCollisionBounds.Z1 - coll->Setup.Radius ||
-		z > GlobalCollisionBounds.Z2 + coll->Setup.Radius)
+	if (x < (GlobalCollisionBounds.X1 - coll->Setup.Radius) ||
+		x > (GlobalCollisionBounds.X2 + coll->Setup.Radius) ||
+		z < (GlobalCollisionBounds.Z1 - coll->Setup.Radius) ||
+		z > (GlobalCollisionBounds.Z2 + coll->Setup.Radius))
 	{
 		return false;
 	}
