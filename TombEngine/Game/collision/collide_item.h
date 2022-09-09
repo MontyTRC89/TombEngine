@@ -46,7 +46,7 @@ bool TestBoundsCollideStatic(ItemInfo* item, MESH_INFO* mesh, int radius);
 bool ItemPushItem(ItemInfo* item, ItemInfo* laraItem, CollisionInfo* coll, bool spasmEnabled, char bigPush);
 bool ItemPushStatic(ItemInfo* laraItem, MESH_INFO* mesh, CollisionInfo* coll);
 
-bool CollideSolidBounds(ItemInfo* item, BOUNDING_BOX* box, PHD_3DPOS pos, CollisionInfo* coll);
+bool CollideSolidBounds(ItemInfo* item, BOUNDING_BOX* box, PHD_3DPOS pose, CollisionInfo* coll);
 void CollideSolidStatics(ItemInfo* item, CollisionInfo* coll);
 
 void AIPickupCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);

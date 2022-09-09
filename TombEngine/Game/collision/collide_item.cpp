@@ -878,12 +878,12 @@ void CollideSolidStatics(ItemInfo* item, CollisionInfo* coll)
 	}
 }
 
-bool CollideSolidBounds(ItemInfo* item, BOUNDING_BOX* box, PHD_3DPOS pos, CollisionInfo* coll)
+bool CollideSolidBounds(ItemInfo* item, BOUNDING_BOX* box, PHD_3DPOS pose, CollisionInfo* coll)
 {
 	bool result = false;
 
 	// Get DX static bounds in global coordinates.
-	auto staticBounds = TO_DX_BBOX(pos, box);
+	auto staticBounds = TO_DX_BBOX(pose, box);
 
 	// Get local TR bounds and DX item bounds in global coordinates.
 	auto itemBBox = GetBoundsAccurate(item);
@@ -1021,22 +1021,22 @@ bool CollideSolidBounds(ItemInfo* item, BOUNDING_BOX* box, PHD_3DPOS pos, Collis
 		return result;
 
 	// Determine identity orientation/distance.
-	auto distance = item->Pose.Position.ToVector3() - pos.Position.ToVector3();
-	auto sinY = phd_sin(pos.Orientation.y);
-	auto cosY = phd_cos(pos.Orientation.y);
+	auto distance = (item->Pose.Position - pose.Position).ToVector3();
+	auto sinY = phd_sin(pose.Orientation.y);
+	auto cosY = phd_cos(pose.Orientation.y);
 
 	// Rotate item to collision bounds identity.
-	auto x = round((distance.x * cosY) - (distance.z * sinY)) + pos.Position.x;
+	auto x = round((distance.x * cosY) - (distance.z * sinY)) + pose.Position.x;
 	auto y = item->Pose.Position.y;
-	auto z = round((distance.x * sinY) + (distance.z * cosY)) + pos.Position.z;
+	auto z = round((distance.x * sinY) + (distance.z * cosY)) + pose.Position.z;
 
 	// Determine identity static collision bounds.
-	auto XMin = pos.Position.x + box->X1;
-	auto XMax = pos.Position.x + box->X2;
-	auto YMin = pos.Position.y + box->Y1;
-	auto YMax = pos.Position.y + box->Y2;
-	auto ZMin = pos.Position.z + box->Z1;
-	auto ZMax = pos.Position.z + box->Z2;
+	auto XMin = pose.Position.x + box->X1;
+	auto XMax = pose.Position.x + box->X2;
+	auto YMin = pose.Position.y + box->Y1;
+	auto YMax = pose.Position.y + box->Y2;
+	auto ZMin = pose.Position.z + box->Z1;
+	auto ZMax = pose.Position.z + box->Z2;
 
 	// Determine item collision bounds.
 	auto inXMin = x + collBox.X1;
@@ -1073,12 +1073,12 @@ bool CollideSolidBounds(ItemInfo* item, BOUNDING_BOX* box, PHD_3DPOS pos, Collis
 		rawShift.z = shiftRight;
 
 	// Rotate previous collision position to identity.
-	distance = coll->Setup.OldPosition.ToVector3() - pos.Position.ToVector3();
-	auto ox = round((distance.x * cosY) - (distance.z * sinY)) + pos.Position.x;
-	auto oz = round((distance.x * sinY) + (distance.z * cosY)) + pos.Position.z;
+	distance = (coll->Setup.OldPosition - pose.Position).ToVector3();
+	auto ox = round((distance.x * cosY) - (distance.z * sinY)) + pose.Position.x;
+	auto oz = round((distance.x * sinY) + (distance.z * cosY)) + pose.Position.z;
 
 	// Calculate collisison type based on identity orientation.
-	switch (GetQuadrant(coll->Setup.ForwardAngle - pos.Orientation.y))
+	switch (GetQuadrant(coll->Setup.ForwardAngle - pose.Orientation.y))
 	{
 	case NORTH:
 		if (rawShift.x > coll->Setup.Radius || rawShift.x < -coll->Setup.Radius)
@@ -1170,13 +1170,13 @@ bool CollideSolidBounds(ItemInfo* item, BOUNDING_BOX* box, PHD_3DPOS pos, Collis
 	}
 
 	// Determine final shifts orientation/distance.
-	distance = Vector3(x + coll->Shift.x, y, z + coll->Shift.z) - pos.Position.ToVector3();
-	sinY = phd_sin(-pos.Orientation.y);
-	cosY = phd_cos(-pos.Orientation.y);
+	distance = Vector3(x + coll->Shift.x, y, z + coll->Shift.z) - pose.Position.ToVector3();
+	sinY = phd_sin(-pose.Orientation.y);
+	cosY = phd_cos(-pose.Orientation.y);
 
 	// Calculate final shifts orientation/distance.
-	coll->Shift.x = (round((distance.x * cosY) - (distance.z * sinY)) + pos.Position.x) - item->Pose.Position.x;
-	coll->Shift.z = (round((distance.x * sinY) + (distance.z * cosY)) + pos.Position.z) - item->Pose.Position.z;
+	coll->Shift.x = (round((distance.x * cosY) - (distance.z * sinY)) + pose.Position.x) - item->Pose.Position.x;
+	coll->Shift.z = (round((distance.x * sinY) + (distance.z * cosY)) + pose.Position.z) - item->Pose.Position.z;
 
 	if (coll->Shift.x == 0 && coll->Shift.z == 0)
 		coll->CollisionType = CT_NONE; // Paranoid.
