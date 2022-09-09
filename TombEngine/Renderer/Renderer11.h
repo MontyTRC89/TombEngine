@@ -642,7 +642,7 @@ namespace TEN::Renderer
 		void UpdateLaraAnimations(bool force);
 		void UpdateItemAnimations(int itemNumber, bool force);
 		void GetLaraAbsBonePosition(Vector3& pos, int jointIndex);
-		void GetItemAbsBonePosition(int itemNumber, Vector3* pos, int jointIndex);
+		void GetItemAbsBonePosition(int itemNumber, Vector3& pos, int jointIndex);
 		int  GetSpheres(short itemNumber, BoundingSphere* ptr, char worldSpace, Matrix local);
 		void GetBoneMatrix(short itemNumber, int joint, Matrix* outMatrix);
 		void DrawObjectOn2DPosition(short x, short y, short objectNum, short rotX, short rotY, short rotZ,  float scale1);

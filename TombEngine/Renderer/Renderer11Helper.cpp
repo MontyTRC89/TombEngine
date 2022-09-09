@@ -394,7 +394,7 @@ namespace TEN::Renderer
 		pos = Vector3::Transform(pos, world);
 	}
 
-	void Renderer11::GetItemAbsBonePosition(int itemNumber, Vector3* pos, int jointIndex)
+	void Renderer11::GetItemAbsBonePosition(int itemNumber, Vector3& pos, int jointIndex)
 	{
 		auto* rendererItem = &m_items[itemNumber];
 		auto* nativeItem = &g_Level.Items[itemNumber];
@@ -416,7 +416,7 @@ namespace TEN::Renderer
 			jointIndex = 0;
 
 		auto world = rendererItem->AnimationTransforms[jointIndex] * rendererItem->World;
-		*pos = Vector3::Transform(*pos, world);
+		pos = Vector3::Transform(pos, world);
 	}
 
 	int Renderer11::GetSpheres(short itemNumber, BoundingSphere *spheres, char worldSpace, Matrix local)

@@ -579,27 +579,28 @@ Vector3i GetLaraJointPosition(int jointIndex, const Vector3i& offset)
 	if (jointIndex >= NUM_LARA_MESHES)
 		jointIndex = LM_HEAD;
 
+	// Use matrices done in the renderer to transform the offset vector.
 	auto pos = offset.ToVector3();
 	g_Renderer.GetLaraAbsBonePosition(pos, jointIndex);
 	return Vector3i(pos);
 }
 
-Vector3i GetJointAbsPosition(ItemInfo* item, int jointIndex, Vector3i offset)
-{
-	auto pos = offset;
-	GetJointAbsPosition(item, &pos, jointIndex);
-	return pos;
-}
-
-void GetJointAbsPosition(ItemInfo* item, Vector3i* offset, int jointIndex)
+Vector3i GetJointAbsPosition(ItemInfo* item, int jointIndex, const Vector3i& offset)
 {
 	// Get real item number.
 	short itemNumber = item - g_Level.Items.data();
 
-	// Use matrices done in the renderer and transform the input vector.
-	auto pos = offset->ToVector3();
-	g_Renderer.GetItemAbsBonePosition(itemNumber, &pos, jointIndex);
+	// Use matrices done in the renderer to transform the offset vector.
+	auto pos = offset.ToVector3();
+	g_Renderer.GetItemAbsBonePosition(itemNumber, pos, jointIndex);
+	return Vector3i(pos);
+}
 
-	// Store the result.
+// TODO: Adopt above version and remove this one.
+void GetJointAbsPosition(ItemInfo* item, Vector3i* offset, int jointIndex)
+{
+	short itemNumber = item - g_Level.Items.data();
+	auto pos = offset->ToVector3();
+	g_Renderer.GetItemAbsBonePosition(itemNumber, pos, jointIndex);
 	*offset = Vector3i(pos);
 }
