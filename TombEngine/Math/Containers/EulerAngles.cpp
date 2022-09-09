@@ -23,11 +23,9 @@
 	EulerAngles::EulerAngles(Vector3 direction)
 	{
 		direction.Normalize();
-		*this = EulerAngles(
-			atan2(direction.y, direction.x),
-			-asin(direction.z),
-			0.0f
-		);
+		this->x = atan2(direction.y, direction.x);
+		this->y = -asin(direction.z);
+		this->z = 0.0f;
 	}
 
 	// TODO: Check.
