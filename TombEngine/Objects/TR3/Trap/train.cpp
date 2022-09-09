@@ -48,10 +48,10 @@ void TrainControl(short itemNumber)
 		item->ItemFlags[0] = item->ItemFlags[1] = TRAIN_VEL;
 
 	float sinY = phd_sin(item->Pose.Orientation.y);
-	float cozY = phd_cos(item->Pose.Orientation.y);
+	float cosY = phd_cos(item->Pose.Orientation.y);
 
 	item->Pose.Position.x += item->ItemFlags[1] * sinY;
-	item->Pose.Position.z += item->ItemFlags[1] * cozY;
+	item->Pose.Position.z += item->ItemFlags[1] * cosY;
 
 	short roomNumber;
 	long rh = TrainTestHeight(item, 0, SECTOR(5), &roomNumber);
@@ -72,7 +72,7 @@ void TrainControl(short itemNumber)
 
 	item->Pose.Orientation.x = -(rh - floorHeight) * 2;
 
-	TriggerDynamicLight(item->Pose.Position.x + SECTOR(3) * sinY, item->Pose.Position.y, item->Pose.Position.z + SECTOR(3) * cozY, 16, 31, 31, 31);
+	TriggerDynamicLight(item->Pose.Position.x + SECTOR(3) * sinY, item->Pose.Position.y, item->Pose.Position.z + SECTOR(3) * cosY, 16, 31, 31, 31);
 
 	if (item->ItemFlags[1] != TRAIN_VEL)
 	{
@@ -83,7 +83,7 @@ void TrainControl(short itemNumber)
 		if (!UseForcedFixedCamera)
 		{
 			ForcedFixedCamera.x = item->Pose.Position.x + SECTOR(8) * sinY;
-			ForcedFixedCamera.z = item->Pose.Position.z + SECTOR(8) * cozY;
+			ForcedFixedCamera.z = item->Pose.Position.z + SECTOR(8) * cosY;
 
 			ForcedFixedCamera.y = GetCollision(ForcedFixedCamera.x, item->Pose.Position.y - CLICK(2), ForcedFixedCamera.z, item->RoomNumber).Position.Floor;
 

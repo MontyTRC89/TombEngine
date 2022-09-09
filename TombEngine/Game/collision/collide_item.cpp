@@ -515,9 +515,9 @@ bool ItemNearLara(PHD_3DPOS* pos, int radius)
 	return false;
 }
 
-bool ItemNearTarget(PHD_3DPOS* fromPose, ItemInfo* targetEntity, int radius)
+bool ItemNearTarget(PHD_3DPOS* origin, ItemInfo* targetEntity, int radius)
 {
-	auto pos = fromPose->Position - targetEntity->Pose.Position;
+	auto pos = origin->Position - targetEntity->Pose.Position;
 
 	if (!ItemCollide(pos.y, ITEM_RADIUS_YMAX))
 		return false;
