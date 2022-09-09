@@ -1,8 +1,8 @@
 #include "framework.h"
 #include "Math/Math.h"
 
-//namespace TEN::Math
-//{
+namespace TEN::Math
+{
 	const float Lerp(float value0, float value1, float time)
 	{
 		return (((1.0f - time) * value0) + (time * value1));
@@ -12,16 +12,16 @@
 	{
 		x = std::clamp(x, edge0, edge1);
 
-		// Don't process if input value is the same as one of edges
+		// Don't process if input value is the same as one of edges.
 		if (x == edge0)
 			return edge0;
 		else if (x == edge1)
 			return edge1;
 
-		// Scale, bias and saturate x to 0..1 range
+		// Scale, bias, and saturate x to [0, 1] range.
 		x = std::clamp((x - edge0) / (edge1 - edge0), 0.0f, 1.0f);
 
-		// Evaluate polynomial
+		// Evaluate polynomial.
 		return (x * x * x * (x * (x * 6 - 15) + 10));
 	}
 
@@ -32,7 +32,7 @@
 
 	const float Luma(const Vector3& color)
 	{
-		// Use Rec.709 trichromat formula to get perceptive luma value
+		// Use Rec.709 trichromat formula to get perceptive luma value.
 		return float((color.x * 0.2126f) + (color.y * 0.7152f) + (color.z * 0.0722f));
 	}
 
@@ -54,4 +54,4 @@
 		float B = Lerp(multiplicative.z, additive.z, luma);
 		return Vector3(R, G, B);
 	}
-//}
+}

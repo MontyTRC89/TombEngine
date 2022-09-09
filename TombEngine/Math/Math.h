@@ -10,8 +10,8 @@
 #include "Math/Random.h"
 #include "Specific/phd_global.h"
 
-//namespace TEN::Math
-//{
+namespace TEN::Math
+{
 	constexpr auto MESH_BITS = [](auto x) { return 1 << x; };
 
 	const float Lerp(float value0, float value1, float time);
@@ -20,4 +20,4 @@
 	const float Luma(const Vector3& color);
 	const Vector3 Screen(const Vector3& ambient, const Vector3& tint);
 	const Vector4 Screen(const Vector4& ambient, const Vector4& tint);
-//}
+}

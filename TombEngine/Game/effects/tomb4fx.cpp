@@ -1,6 +1,7 @@
 #include "framework.h"
 #include "Game/effects/tomb4fx.h"
 
+#include "Flow/ScriptInterfaceFlowHandler.h"
 #include "Game/animation.h"
 #include "Game/collision/collide_room.h"
 #include "Game/collision/floordata.h"
@@ -13,19 +14,17 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
+#include "Math/Math.h"
 #include "Renderer/Renderer11.h"
-#include "Flow/ScriptInterfaceFlowHandler.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
-#include "Math/Random.h"
-#include "Math/Math.h"
 
+using namespace TEN::Effects::Environment;
+using namespace TEN::Floordata;
+using namespace TEN::Math;
 using std::vector;
 using TEN::Renderer::g_Renderer;
-using namespace TEN::Floordata;
-using namespace TEN::Math::Random;
-using namespace TEN::Effects::Environment;
 
 char LaserSightActive = 0;
 char LaserSightCol = 0;
@@ -1138,7 +1137,7 @@ void AddWaterSparks(int x, int y, int z, int num)
 		spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;	
 		int random = GetRandomControl() & 0xFFF;
 		spark->xVel = -phd_sin(random << 4) * 128;
-		spark->yVel = -GenerateInt(128, 256);
+		spark->yVel = -Random::GenerateInt(128, 256);
 		spark->zVel = phd_cos(random << 4) * 128;
 		spark->friction = 5;
 		spark->flags = SP_NONE;

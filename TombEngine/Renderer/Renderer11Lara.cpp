@@ -1,5 +1,7 @@
 #include "framework.h"
 #include "Renderer/Renderer11.h"
+
+#include "Flow/ScriptInterfaceFlowHandler.h"
 #include "Game/animation.h"
 #include "Game/effects/hair.h"
 #include "Game/items.h"
@@ -9,10 +11,11 @@
 #include "Game/spotcam.h"
 #include "Game/camera.h"
 #include "Game/collision/sphere.h"
+#include "Math/Math.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
-#include "Flow/ScriptInterfaceFlowHandler.h"
 
+using namespace TEN::Math;
 using namespace TEN::Renderer;
 
 extern ScriptInterfaceFlowHandler *g_GameFlow;

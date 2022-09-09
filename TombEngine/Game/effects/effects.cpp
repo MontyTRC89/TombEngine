@@ -1,33 +1,32 @@
 #include "framework.h"
 #include "Game/effects/effects.h"
 
+#include "Flow/ScriptInterfaceFlowHandler.h"
 #include "Game/animation.h"
 #include "Game/collision/collide_room.h"
-#include "Game/effects/lara_fx.h"
-#include "Game/effects/drip.h"
 #include "Game/effects/bubble.h"
+#include "Game/effects/drip.h"
 #include "Game/effects/explosion.h"
+#include "Game/effects/lara_fx.h"
 #include "Game/effects/smoke.h"
 #include "Game/effects/spark.h"
 #include "Game/effects/tomb4fx.h"
 #include "Game/effects/weather.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
+#include "Math/Math.h"
 #include "Objects/objectslist.h"
+#include "Renderer/Renderer11.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
-#include "Math/Random.h"
-#include "Math/Math.h"
-#include "Flow/ScriptInterfaceFlowHandler.h"
-#include "Renderer/Renderer11.h"
 
-using TEN::Renderer::g_Renderer;
+using namespace TEN::Effects::Environment;
 using namespace TEN::Effects::Explosion;
 using namespace TEN::Effects::Lara;
 using namespace TEN::Effects::Spark;
-using namespace TEN::Effects::Environment;
-using namespace TEN::Math::Random;
+using namespace TEN::Math;
+using TEN::Renderer::g_Renderer;
 
 // New particle class
 Particle Particles[MAX_PARTICLES];
@@ -899,7 +898,7 @@ void SetupSplash(const SPLASH_SETUP* const setup, int room)
 			}
 			else
 			{
-				float thickness = GenerateFloat(64,128);
+				float thickness = Random::GenerateFloat(64,128);
 				splash.isActive = true;
 				splash.x = setup->x;
 				splash.y = setup->y;
@@ -908,15 +907,15 @@ void SetupSplash(const SPLASH_SETUP* const setup, int room)
 				float vel;
 
 				if (numSplashesSetup == 2)
-					vel = (splashVelocity / 16) + GenerateFloat(2, 4);
+					vel = (splashVelocity / 16) + Random::GenerateFloat(2, 4);
 				else
-					vel = (splashVelocity / 7) + GenerateFloat(3, 7);
+					vel = (splashVelocity / 7) + Random::GenerateFloat(3, 7);
 				
 				float innerRadius = 0;
 				splash.innerRad = innerRadius;
-				splash.innerRadVel = vel*1.3f;
+				splash.innerRadVel = vel * 1.3f;
 				splash.outerRad = innerRadius+thickness;
-				splash.outerRadVel = vel*2.3f;
+				splash.outerRadVel = vel * 2.3f;
 				splash.heightSpeed = 128;
 				splash.height = 0;
 				splash.heightVel = -16;
@@ -937,7 +936,7 @@ void SetupSplash(const SPLASH_SETUP* const setup, int room)
 		}
 	}
 
-	TEN::Effects::Drip::SpawnSplashDrips(Vector3(setup->x, setup->y-15, setup->z),32,room);
+	TEN::Effects::Drip::SpawnSplashDrips(Vector3(setup->x, setup->y - 15, setup->z), 32, room);
 	PoseData soundPosition;
 	soundPosition.Position.x = setup->x;
 	soundPosition.Position.y = setup->y;
@@ -956,7 +955,8 @@ void UpdateSplashes()
 
 	for (int i = 0; i < MAX_SPLASHES; i++)
 	{
-		SPLASH_STRUCT& splash = Splashes[i];
+		auto& splash = Splashes[i];
+
 		if (splash.isActive)
 		{
 			splash.life--;

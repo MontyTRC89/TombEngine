@@ -1,12 +1,14 @@
 #include "framework.h"
 #include "Renderer/Renderer11.h"
-#include "Game/savegame.h"
-#include "Game/health.h"
+
 #include "Game/animation.h"
-#include "Game/gui.h"
-#include "Game/Lara/lara.h"
 #include "Game/control/control.h"
 #include "Game/control/volume.h"
+#include "Game/gui.h"
+#include "Game/health.h"
+#include "Game/Lara/lara.h"
+#include "Game/savegame.h"
+#include "Math/Math.h"
 #include "Scripting/Internal/TEN/Flow//Level/FlowLevel.h"
 #include "Specific/configuration.h"
 #include "Specific/level.h"
@@ -15,6 +17,7 @@
 #include "Specific/winmain.h"
 
 using namespace TEN::Input;
+using namespace TEN::Math;
 
 extern TEN::Renderer::RendererHUDBar* g_SFXVolumeBar;
 extern TEN::Renderer::RendererHUDBar* g_MusicVolumeBar;

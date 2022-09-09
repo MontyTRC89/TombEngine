@@ -1,5 +1,6 @@
 #include "framework.h"
 #include "Renderer/Renderer11.h"
+
 #include "Game/animation.h"
 #include "Game/camera.h"
 #include "Game/collision/sphere.h"
@@ -7,9 +8,12 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/spotcam.h"
+#include "Math/Math.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
 #include "RenderView/RenderView.h"
+
+using namespace TEN::Math;
 
 namespace TEN::Renderer
 {

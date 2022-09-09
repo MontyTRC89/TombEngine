@@ -1,19 +1,16 @@
 #include "framework.h"
 #include "Game/effects/drip.h"
 
-#include <d3d11.h>
-#include <SimpleMath.h>
 #include "Game/collision/collide_room.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/weather.h"
 #include "Game/room.h"
-#include "Specific/level.h"
-#include "Math/Random.h"
-#include "Specific/setup.h"
 #include "Math/Math.h"
+#include "Specific/level.h"
+#include "Specific/setup.h"
 
 using namespace TEN::Effects::Environment;
-using namespace TEN::Math::Random;
+using namespace TEN::Math;
 
 namespace TEN::Effects::Drip
 {
@@ -32,39 +29,39 @@ namespace TEN::Effects::Drip
 	{
 		for (int i = 0; i < dripParticles.size(); i++) 
 		{
-			auto& d = dripParticles[i];
+			auto& drip = dripParticles[i];
 
-			if (!d.active)
+			if (!drip.active)
 				continue;
 
-			d.age++;
-			if (d.age > d.life)
-				d.active = false;
+			drip.age++;
+			if (drip.age > drip.life)
+				drip.active = false;
 
-			d.velocity.y += d.gravity;
+			drip.velocity.y += drip.gravity;
 
-			if (g_Level.Rooms[d.room].flags & ENV_FLAG_WIND) 
+			if (TestEnvironment(ENV_FLAG_WIND, drip.room))
 			{
-				d.velocity.x = Weather.Wind().x;
-				d.velocity.z = Weather.Wind().z;
+				drip.velocity.x = Weather.Wind().x;
+				drip.velocity.z = Weather.Wind().z;
 			}
 
-			d.pos += d.velocity;
-			float normalizedAge = d.age / d.life;
-			d.color = Vector4::Lerp(DRIP_COLOR, Vector4::Zero, normalizedAge);
-			d.height = Lerp(DRIP_WIDTH / 0.15625f, 0, normalizedAge);
-			short room = d.room;
-			FloorInfo* floor = GetFloor(d.pos.x, d.pos.y, d.pos.z, &room);
-			int floorheight = floor->FloorHeight(d.pos.x, d.pos.z);
-			int wh = GetWaterHeight(d.pos.x, d.pos.y, d.pos.z, d.room);
+			drip.pos += drip.velocity;
+			float normalizedAge = drip.age / drip.life;
+			drip.color = Vector4::Lerp(DRIP_COLOR, Vector4::Zero, normalizedAge);
+			drip.height = Lerp(DRIP_WIDTH / 0.15625f, 0, normalizedAge);
+			short room = drip.room;
+			FloorInfo* floor = GetFloor(drip.pos.x, drip.pos.y, drip.pos.z, &room);
+			int floorheight = floor->FloorHeight(drip.pos.x, drip.pos.z);
+			int waterHeight = GetWaterHeight(drip.pos.x, drip.pos.y, drip.pos.z, drip.room);
 
-			if (d.pos.y > floorheight) 
-				d.active = false;
+			if (drip.pos.y > floorheight) 
+				drip.active = false;
 
-			if (d.pos.y > wh) 
+			if (drip.pos.y > waterHeight) 
 			{
-				d.active = false;
-				SetupRipple(d.pos.x, wh, d.pos.z, GenerateInt(16, 24), RIPPLE_FLAG_SHORT_INIT | RIPPLE_FLAG_LOW_OPACITY);
+				drip.active = false;
+				SetupRipple(drip.pos.x, waterHeight, drip.pos.z, Random::GenerateInt(16, 24), RIPPLE_FLAG_SHORT_INIT | RIPPLE_FLAG_LOW_OPACITY);
 			}
 		}
 	}
@@ -80,49 +77,51 @@ namespace TEN::Effects::Drip
 		return dripParticles[0];
 	}
 
-	void SpawnWetnessDrip(Vector3 const & pos, int room)
+	void SpawnWetnessDrip(const Vector3& pos, int room)
 	{
-		auto& d = getFreeDrip();
-		d = {};
-		d.active = true;
-		d.pos = pos;
-		d.room = room;
-		d.life = DRIP_LIFE;
-		d.gravity = GenerateFloat(3, 6);
+		auto& drip = getFreeDrip();
+		drip = {};
+		drip.active = true;
+		drip.pos = pos;
+		drip.room = room;
+		drip.life = DRIP_LIFE;
+		drip.gravity = Random::GenerateFloat(3, 6);
 	}
 
-	void SpawnSplashDrips(Vector3 const& pos, int num,int room)
+	void SpawnSplashDrips(const Vector3& pos, int number, int room)
 	{
-		for (int i = 0; i < num; i++) 
+		for (int i = 0; i < number; i++) 
 		{
-			Vector3 dripPos = pos + Vector3(GenerateFloat(-128, 128), GenerateFloat(-128, 128), GenerateFloat(-128, 128));
-			Vector3 dir = (dripPos - pos);
-			dir.Normalize();
-			DripParticle& drip = getFreeDrip();
+			auto dripPos = pos + Vector3(Random::GenerateFloat(-128, 128), Random::GenerateFloat(-128, 128), Random::GenerateFloat(-128, 128));
+			auto direction = (dripPos - pos);
+			direction.Normalize();
+
+			auto& drip = getFreeDrip();
 			drip = {};
 			drip.pos = dripPos;
-			drip.velocity = dir*16;
-			drip.velocity -= Vector3(0, GenerateFloat(32, 64), 0);
-			drip.gravity = GenerateFloat(3, 6);
+			drip.velocity = direction*16;
+			drip.velocity -= Vector3(0, Random::GenerateFloat(32, 64), 0);
+			drip.gravity = Random::GenerateFloat(3, 6);
 			drip.room = room;
 			drip.life = DRIP_LIFE_LONG;
 			drip.active = true;
 		}
 	}
 
-	void SpawnGunshellDrips(Vector3 const & pos, int room)
+	void SpawnGunshellDrips(const Vector3& pos, int room)
 	{
 		for (int i = 0; i < 4; i++) 
 		{
-			Vector3 dripPos = pos + Vector3(GenerateFloat(-16, 16), GenerateFloat(-16, 16), GenerateFloat(-16, 16));
-			Vector3 dir = (dripPos - pos);
-			dir.Normalize();
-			DripParticle& drip = getFreeDrip();
+			auto dripPos = pos + Vector3(Random::GenerateFloat(-16, 16), Random::GenerateFloat(-16, 16), Random::GenerateFloat(-16, 16));
+			auto direction = dripPos - pos;
+			direction.Normalize();
+
+			auto& drip = getFreeDrip();
 			drip = {};
 			drip.pos = dripPos;
-			drip.velocity = dir * 16;
-			drip.velocity -= Vector3(0, GenerateFloat(16, 24), 0);
-			drip.gravity = GenerateFloat(2, 3);
+			drip.velocity = direction * 16;
+			drip.velocity -= Vector3(0, Random::GenerateFloat(16, 24), 0);
+			drip.gravity = Random::GenerateFloat(2, 3);
 			drip.room = room;
 			drip.life = DRIP_LIFE_LONG;
 			drip.active = true;

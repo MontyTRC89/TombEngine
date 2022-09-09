@@ -6,8 +6,11 @@
 #include "Game/control/control.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
+#include "Math/Math.h";
 #include "Sound/sound.h"
 #include "Specific/level.h"
+
+using namespace TEN::Math;
 
 namespace TEN::Effects::Footprints
 {
