@@ -286,11 +286,8 @@ namespace TEN::Entities::Vehicles
 
 			if (laraItem->Animation.ActiveState == QBIKE_STATE_FALL_OFF)
 			{
-				auto pos = Vector3i::Zero;
-
 				SetAnimation(laraItem, LA_FREEFALL);
-				GetJointPosition(laraItem, &pos, LM_HIPS);
-
+				auto pos = GetJointPosition(laraItem, LM_HIPS);
 				laraItem->Pose.Position = pos;
 				laraItem->Animation.IsAirborne = true;
 				laraItem->Animation.Velocity.y = quadBikeItem->Animation.Velocity.y;
@@ -1232,8 +1229,7 @@ namespace TEN::Entities::Vehicles
 
 			for (int i = 0; i < 2; i++)
 			{
-				auto pos = Vector3i(QuadBikeEffectsPositions[i].Position);
-				GetJointPosition(quadBikeItem, &pos, QuadBikeEffectsPositions[i].meshNum);
+				auto pos = GetJointPosition(quadBikeItem, QuadBikeEffectsPositions[i].meshNum, Vector3i(QuadBikeEffectsPositions[i].Position));
 
 				angle = quadBikeItem->Pose.Orientation.y + ((i == 0) ? 0x9000 : 0x7000);
 				if (quadBikeItem->Animation.Velocity.z > 32)

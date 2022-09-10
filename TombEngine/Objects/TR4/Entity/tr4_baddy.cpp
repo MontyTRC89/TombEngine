@@ -419,12 +419,10 @@ namespace TEN::Entities::TR4
 
 		item->ItemFlags[1] = item->RoomNumber;
 
-		// Handle baddy firing
+		// Handle baddy firing.
 		if (creature->FiredWeapon)
 		{
-			auto pos = Vector3i(BaddyGunBite.Position);
-			GetJointPosition(item, &pos, BaddyGunBite.meshNum);
-
+			auto pos = GetJointPosition(item, BaddyGunBite.meshNum, Vector3i(BaddyGunBite.Position));
 			TriggerDynamicLight(pos.x, pos.y, pos.z, 4 * creature->FiredWeapon + 8, 24, 16, 4);
 			creature->FiredWeapon--;
 		}

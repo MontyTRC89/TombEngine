@@ -241,9 +241,7 @@ namespace TEN::Entities::Vehicles
 			harpoonItem->Color = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
 			harpoonItem->RoomNumber = UPVItem->RoomNumber;
 
-			auto pos = Vector3i((UPV->HarpoonLeft ? 22 : -22), 24, 230);
-			GetJointPosition(UPVItem, &pos, UPV_JOINT_TURBINE);
-
+			auto pos = GetJointPosition(UPVItem, UPV_JOINT_TURBINE, Vector3i((UPV->HarpoonLeft ? 22 : -22), 24, 230));
 			harpoonItem->Pose.Position = pos;
 			InitialiseItem(itemNumber);
 
@@ -324,8 +322,6 @@ namespace TEN::Entities::Vehicles
 		auto* laraItem = LaraItem;
 		auto* lara = GetLaraInfo(laraItem);
 
-		Vector3i pos;
-
 		if (lara->Vehicle == itemNumber)
 		{
 			UPV->TurbineRotation += UPV->Velocity ? (UPV->Velocity / 8) : ANGLE(2.0f);
@@ -334,9 +330,7 @@ namespace TEN::Entities::Vehicles
 
 			if (UPV->Velocity)
 			{
-				pos = Vector3i(UPVBites[UPV_BITE_TURBINE].Position);
-				GetJointPosition(UPVItem, &pos, UPVBites[UPV_BITE_TURBINE].meshNum);
-
+				auto pos = GetJointPosition(UPVItem, UPVBites[UPV_BITE_TURBINE].meshNum, Vector3i(UPVBites[UPV_BITE_TURBINE].Position));
 				TriggerUPVMist(pos.x, pos.y + UPV_SHIFT, pos.z, abs(UPV->Velocity) / VEHICLE_VELOCITY_SCALE, UPVItem->Pose.Orientation.y + ANGLE(180.0f));
 
 				if ((GetRandomControl() & 1) == 0)
@@ -356,19 +350,21 @@ namespace TEN::Entities::Vehicles
 		for (int lp = 0; lp < 2; lp++)
 		{
 			int random = 31 - (GetRandomControl() & 3);
-			pos = Vector3i(UPVBites[UPV_BITE_FRONT_LIGHT].Position);
-			pos.z <<= (lp * 6);
-			GetJointPosition(UPVItem, &pos, UPVBites[UPV_BITE_FRONT_LIGHT].meshNum);
+			auto pos = GetJointPosition(UPVItem, UPVBites[UPV_BITE_FRONT_LIGHT].meshNum, Vector3i(
+				UPVBites[UPV_BITE_FRONT_LIGHT].Position.x,
+				UPVBites[UPV_BITE_FRONT_LIGHT].Position.y,
+				(int)UPVBites[UPV_BITE_FRONT_LIGHT].Position.z << (lp * 6)
+			));
 
-			GameVector source;
+			GameVector origin;
 			if (lp == 1)
 			{
-				auto target = GameVector(pos.x, pos.y, pos.z, UPVItem->RoomNumber);
-				LOS(&source, &target);
+				auto target = GameVector(pos, UPVItem->RoomNumber);
+				LOS(&origin, &target);
 				pos = Vector3i(target.x, target.y, target.z);
 			}
 			else
-				source = GameVector(pos.x, pos.y, pos.z, UPVItem->RoomNumber);
+				origin = GameVector(pos, UPVItem->RoomNumber);
 
 			TriggerDynamicLight(pos.x, pos.y, pos.z, 16 + (lp << 3), random, random, random);
 		}

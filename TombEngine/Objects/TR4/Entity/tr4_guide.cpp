@@ -122,11 +122,9 @@ namespace TEN::Entities::TR4
 		// Ignite torch.
 		if (item->ItemFlags[1] == 2)
 		{
-			auto pos = Vector3i(GuideBite1.Position);
-			GetJointPosition(item, &pos, GuideBite1.meshNum);
-
-			SoundEffect(SFX_TR4_LOOP_FOR_SMALL_FIRES, &item->Pose);
+			auto pos = GetJointPosition(item, GuideBite1.meshNum, Vector3i(GuideBite1.Position));
 			TriggerFireFlame(pos.x, pos.y - 20, pos.z, -1, 3);
+			SoundEffect(SFX_TR4_LOOP_FOR_SMALL_FIRES, &item->Pose);
 
 			short random = GetRandomControl();
 			TriggerDynamicLight(
@@ -488,9 +486,7 @@ namespace TEN::Entities::TR4
 			break;
 
 		case GUIDE_STATE_IGNITE_TORCH:
-			pos1 = Vector3i(GuideBite2.Position);
-			GetJointPosition(item, &pos1, GuideBite2.meshNum);
-
+			pos1 = GetJointPosition(item, GuideBite2.meshNum, Vector3i(GuideBite2.Position));
 			frameNumber = item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase;
 			random = GetRandomControl();
 

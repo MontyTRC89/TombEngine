@@ -311,27 +311,17 @@ namespace TEN::Entities::TR5
 
 		TriggerSubmarineSparks(itemNumber);
 
-		GameVector pos1;
-		pos1.x = 0;
-		pos1.y = -600;
-		pos1.z = -40;
-		pos1.roomNumber = item->RoomNumber;
-		GetJointPosition(item, (Vector3i*)&pos1, 0);
+		auto origin = GameVector(GetJointPosition(item, 0, Vector3i(0, -600, -40)), item->RoomNumber);
+		auto target = GameVector(GetJointPosition(item, 0, Vector3i(0, -15784, -40)));
 
-		GameVector pos2;
-		pos2.x = 0;
-		pos2.y = -15784;
-		pos2.z = -40;
-		GetJointPosition(item, (Vector3i*)&pos2, 0);
-
-		if (!LOS((GameVector*)&pos1, &pos2))
+		if (!LOS(&origin, &target))
 		{
-			int distance = sqrt(pow(pos2.x - pos1.x, 2) + pow(pos2.y - pos1.y, 2) + pow(pos2.z - pos1.z, 2));
+			int distance = sqrt(pow(target.x - origin.x, 2) + pow(target.y - origin.y, 2) + pow(target.z - origin.z, 2));
 			if (distance < SECTOR(16))
 			{
 				distance = SECTOR(16) - distance;
 				byte color = (GetRandomControl() & 0xF) + (distance / 128) + 64;
-				TriggerDynamicLight(pos2.x, pos2.y, pos2.z, (GetRandomControl() & 1) + (distance / 2048) + 12, color / 2, color, color / 2);
+				TriggerDynamicLight(target.x, target.y, target.z, (GetRandomControl() & 1) + (distance / 2048) + 12, color / 2, color, color / 2);
 			}
 		}
 
@@ -380,18 +370,8 @@ namespace TEN::Entities::TR5
 
 		DoProjectileDynamics(itemNumber, item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, dx, item->Animation.Velocity.y, dz);
 
-		Vector3i pos1;
-		pos1.x = 0;
-		pos1.y = 0;
-		pos1.z = (GlobalCounter & 1) != 0 ? 48 : -48;
-		GetJointPosition(item, &pos1, 0);
-
-		Vector3i pos2;
-		pos2.x = 0;
-		pos2.y = 0;
-		pos2.z = 8 * ((GlobalCounter & 1) != 0 ? 48 : -48);
-		GetJointPosition(item, &pos2, 0);
-
+		auto pos1 = GetJointPosition(item, 0, Vector3i(0, 0, (GlobalCounter & 1) != 0 ? 48 : -48));
+		auto pos2 = GetJointPosition(item, 0, Vector3i(0, 0, 8 * ((GlobalCounter & 1) != 0 ? 48 : -48)));
 		TriggerTorpedoBubbles(&pos1, &pos2, 1);
 
 		if (item->ItemFlags[0] >= 300)
@@ -426,20 +406,14 @@ namespace TEN::Entities::TR5
 				if (searchItem->ObjectNumber == ID_CHAFF && searchItem->Active)
 				{
 					item->ItemFlags[0] = i;
-					pos.x = searchItem->Pose.Position.x;
-					pos.y = searchItem->Pose.Position.y;
-					pos.z = searchItem->Pose.Position.z;
+					pos = searchItem->Pose.Position;
 					found = true;
 					break;
 				}
 			}
 
 			if (!found)
-			{
-				pos.x = LaraItem->Pose.Position.x;
-				pos.y = LaraItem->Pose.Position.y;
-				pos.z = LaraItem->Pose.Position.z;
-			}
+				pos = LaraItem->Pose.Position;
 		}
 		else
 		{
@@ -447,9 +421,7 @@ namespace TEN::Entities::TR5
 
 			if (chaffItem->Active && chaffItem->ObjectNumber == ID_CHAFF)
 			{
-				pos.x = chaffItem->Pose.Position.x;
-				pos.y = chaffItem->Pose.Position.y;
-				pos.z = chaffItem->Pose.Position.z;
+				pos = chaffItem->Pose.Position;
 				item->Animation.ActiveState = pos.x / 4;
 				item->Animation.TargetState = pos.y / 4;
 				item->Animation.RequiredState = pos.z / 4;
@@ -542,15 +514,8 @@ namespace TEN::Entities::TR5
 				if (probe.RoomNumber != item->RoomNumber)
 					ItemNewRoom(itemNumber, probe.RoomNumber);
 
-				Vector3i pos1 = { 0, 0, -64 };
-				GetJointPosition(item, &pos1, 0);
-
-				Vector3i pos2;
-				pos2.x = 0;
-				pos2.y = 0;
-				pos2.z = -64 << ((GlobalCounter & 1) + 2);
-				GetJointPosition(item, &pos2, 0);
-
+				auto pos1 = GetJointPosition(item, 0, Vector3i(0, 0, -64));
+				auto pos2 = GetJointPosition(item, 0, Vector3i(0, 0, -64 << ((GlobalCounter & 1) + 2)));
 				TriggerTorpedoBubbles(&pos1, &pos2, 1);
 			}
 		}

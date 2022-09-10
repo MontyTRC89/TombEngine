@@ -210,7 +210,6 @@ namespace TEN::Entities::TR3
 		auto* item = &g_Level.Items[itemNumber];
 		auto* shiva = GetCreatureInfo(item);
 
-		auto pos = Vector3i(0, 0, 256);
 		bool laraAlive = LaraItem->HitPoints > 0;
 
 		EulerAngles extraHeadRot;
@@ -247,6 +246,7 @@ namespace TEN::Entities::TR3
 				item->MeshBits = ALL_JOINT_BITS;
 
 			int effectMesh = 0;
+			auto pos = Vector3i(0, 0, CLICK(1));
 
 			switch (item->Animation.ActiveState)
 			{
@@ -261,7 +261,7 @@ namespace TEN::Entities::TR3
 					item->MeshBits = (item->MeshBits * 2) + 1;
 					shiva->Flags = 1;
 
-					GetJointPosition(item, &pos, effectMesh++);
+					pos = GetJointPosition(item, effectMesh++, pos);
 					TriggerExplosionSparks(pos.x, pos.y, pos.z, 2, 0, 0, item->RoomNumber);
 					TriggerShivaSmoke(pos.x, pos.y, pos.z, 1);
 

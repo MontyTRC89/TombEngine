@@ -190,14 +190,11 @@ namespace TEN::Entities::TR4
 		{
 			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase)
 			{
-				auto pos1 = Vector3i(-544, 96, 0);
-				GetJointPosition(item, &pos1, 16);
+				auto origin = GetJointPosition(item, 16, Vector3i(-544, 96, 0));
+				auto target = GetJointPosition(item, 16, Vector3i(-900, 96, 0));
+				auto orient = Geometry::GetOrientTowardPoint(origin.ToVector3(), target.ToVector3());
 
-				auto pos2 = Vector3i (-900, 96, 0);
-				GetJointPosition(item, &pos2, 16);
-
-				auto orient = Geometry::GetOrientTowardPoint(pos1.ToVector3(), pos2.ToVector3());
-				auto pose = PoseData(pos1, orient);
+				auto pose = PoseData(origin, orient);
 				if (item->ObjectNumber == ID_DEMIGOD3)
 					TriggerDemigodMissile(&pose, item->RoomNumber, 3);
 				else
@@ -208,13 +205,10 @@ namespace TEN::Entities::TR4
 		{
 			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase)
 			{
-				auto pos1 = Vector3i(-544, 96, 0 );
-				GetJointPosition(item, &pos1, 16);
-
-				auto pos2 = Vector3i(-900, 96, 0);
-				GetJointPosition(item, &pos2, 16);
-
+				auto pos1 = GetJointPosition(item,  16, Vector3i(-544, 96, 0));
+				auto pos2 = GetJointPosition(item, 16, Vector3i(-900, 96, 0));
 				auto orient = Geometry::GetOrientTowardPoint(pos1.ToVector3(), pos2.ToVector3());
+
 				auto pose = PoseData(pos1, orient);
 				if (item->ObjectNumber == ID_DEMIGOD3)
 					TriggerDemigodMissile(&pose, item->RoomNumber, 3);
@@ -233,13 +227,13 @@ namespace TEN::Entities::TR4
 
 				if (GlobalCounter & 1)
 				{
-					GetJointPosition(item, &pos1, 18);
-					GetJointPosition(item, &pos2, 18);
+					pos1 = GetJointPosition(item, 18, pos1);
+					pos2 = GetJointPosition(item, 18, pos2);
 				}
 				else
 				{
-					GetJointPosition(item, &pos1, 17);
-					GetJointPosition(item, &pos2, 17);
+					pos1 = GetJointPosition(item, 17, pos1);
+					pos2 = GetJointPosition(item, 17, pos2);
 				}
 
 				auto orient = Geometry::GetOrientTowardPoint(pos1.ToVector3(), pos2.ToVector3());
@@ -689,8 +683,7 @@ namespace TEN::Entities::TR4
 			case DEMIGOD1_STATE_HAMMER_ATTACK:
 				if (item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase == DEMIGOD_ANIM_RUN_TO_IDLE)
 				{
-					auto pos = Vector3i(80, -8, -40);
-					GetJointPosition(item, &pos, 17);
+					auto pos = GetJointPosition(item, 17, Vector3i(80, -8, -40));
 
 					short roomNumber = item->RoomNumber;
 					FloorInfo* floor = GetFloor(pos.x, pos.y, pos.z, &roomNumber);

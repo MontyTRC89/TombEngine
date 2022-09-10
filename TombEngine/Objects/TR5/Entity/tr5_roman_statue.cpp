@@ -487,11 +487,10 @@ namespace TEN::Entities::TR5
 					break;
 
 				if (item->TriggerFlags)
-					pos = { -48, 48, GetRandomControl() % 480 };
+					pos = Vector3i(-48, 48, GetRandomControl() % 480);
 				else
-					pos = { -40, 64, GetRandomControl() % 360 };
-
-				GetJointPosition(item, &pos, 14);
+					pos = Vector3i(-40, 64, GetRandomControl() % 360);
+				pos = GetJointPosition(item, 14, pos);
 
 				color = (GetRandomControl() & 0x3F) + 128;
 
@@ -572,8 +571,7 @@ namespace TEN::Entities::TR5
 
 				if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 10)
 				{
-					pos = { 0, 0, 0 };
-					GetJointPosition(item, &pos, 16);
+					pos = GetJointPosition(item, 16);
 
 					auto* room = &g_Level.Rooms[item->RoomNumber];
 					FloorInfo* floor = GetSector(room, pos.x - room->x, pos.z - room->z);
@@ -614,9 +612,7 @@ namespace TEN::Entities::TR5
 
 					if (!item->TriggerFlags)
 					{
-						pos1 = { -40, 64, 360 };
-						GetJointPosition(item, &pos1, 14);
-
+						pos1 = GetJointPosition(item, 14, Vector3i(-40, 64, 360));
 						pos1.y = item->Pose.Position.y - 64;
 
 						if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + 34 && item->Animation.ActiveState == 3)
@@ -723,11 +719,8 @@ namespace TEN::Entities::TR5
 
 				if (deltaFrame == 34)
 				{
-					pos1 = Vector3i(-48, 48, SECTOR(1));
-					GetJointPosition(item, &pos1, 14);
-
-					pos2 = Vector3i(-48, 48, 450);
-					GetJointPosition(item, &pos2, 14);
+					pos1 = GetJointPosition(item, 14, Vector3i(-48, 48, SECTOR(1)));
+					pos2 = GetJointPosition(item, 14, Vector3i(-48, 48, 450));
 
 				auto orient = Geometry::GetOrientTowardPoint(pos2.ToVector3(), pos1.ToVector3());
 				auto attackPos = PoseData(pos2, orient);
@@ -760,11 +753,8 @@ namespace TEN::Entities::TR5
 				deltaFrame -= 10;
 				if (deltaFrame < 32)
 				{
-					pos1 = { -32, 48, 64 };
-					GetJointPosition(item, &pos1, 14);
-
-					pos2 = { -48, 48, 490 };
-					GetJointPosition(item, &pos2, 14);
+					pos1 = GetJointPosition(item, 14, Vector3i(-32, 48, 64));
+					pos2 = GetJointPosition(item, 14, Vector3i(-48, 48, 490));
 
 					for (int i = 0; i < 4; i++)
 					{

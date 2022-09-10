@@ -352,7 +352,7 @@ namespace TEN::Entities::TR3
 
 			auto pos2 = pos1;
 			pos2.z *= 2;
-			GetJointPosition(item, &pos2, TribesmanDartBite2.meshNum);
+			pos2 = GetJointPosition(item, TribesmanDartBite2.meshNum, pos2);
 
 			auto orient = Geometry::GetOrientTowardPoint(pos1.ToVector3(), pos2.ToVector3());
 
@@ -369,7 +369,7 @@ namespace TEN::Entities::TR3
 
 			pos1 = Vector3i(TribesmanDartBite2.Position);
 			pos1.z += 96;
-			GetJointPosition(item, &pos1, TribesmanDartBite2.meshNum);
+			pos1 = GetJointPosition(item, TribesmanDartBite2.meshNum, pos1);
 
 			TriggerDartSmoke(pos1.x, pos1.y, pos1.z, 0, 0, 1);
 			TriggerDartSmoke(pos1.x, pos1.y, pos1.z, 0, 0, 1);

@@ -248,7 +248,7 @@ namespace TEN::Renderer
 
 								int meshIndex = NodeOffsets[particle->nodeNumber].meshNum;
 								if (meshIndex >= 0)
-									GetJointPosition(item, &nodePos, meshIndex);
+									nodePos = GetJointPosition(item, meshIndex, nodePos);
 								else
 									nodePos = GetLaraJointPosition(-meshIndex, nodePos);
 

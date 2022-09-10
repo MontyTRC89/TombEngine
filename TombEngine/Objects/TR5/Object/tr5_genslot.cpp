@@ -28,8 +28,7 @@ void GenSlot1Control(short itemNumber)
 			bool found = false;
 			for (int i = 0; i < 6; i++)
 			{
-				Vector3i pos = { 0, -350, 0 };
-				GetJointPosition(item, &pos, i + 1);
+				auto pos = GetJointPosition(item, i + 1, Vector3i(0, -350, 0));
 
 				if (pos.x > DeadlyBounds[0] &&
 					pos.x < DeadlyBounds[1] &&
