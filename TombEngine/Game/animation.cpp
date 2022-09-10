@@ -595,12 +595,3 @@ Vector3i GetJointPosition(ItemInfo* item, int jointIndex, const Vector3i& offset
 	g_Renderer.GetItemAbsBonePosition(itemNumber, pos, jointIndex);
 	return Vector3i(pos);
 }
-
-// TODO: Adopt above version and remove this one.
-void GetJointPosition(ItemInfo* item, Vector3i* offset, int jointIndex)
-{
-	short itemNumber = item - g_Level.Items.data();
-	auto pos = offset->ToVector3();
-	g_Renderer.GetItemAbsBonePosition(itemNumber, pos, jointIndex);
-	*offset = Vector3i(pos);
-}
