@@ -24,8 +24,8 @@
 	{
 		auto directionNorm = direction;
 		directionNorm.Normalize();
-		this->x = atan2(directionNorm.y, directionNorm.x);
-		this->y = -asin(directionNorm.z);
+		this->x = FROM_RAD(atan2(directionNorm.y, directionNorm.x));
+		this->y = FROM_RAD(-asin(directionNorm.z));
 		this->z = 0.0f;
 	}
 
