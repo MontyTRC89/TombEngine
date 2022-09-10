@@ -408,7 +408,7 @@ bool TestLaraPosition(OBJECT_COLLISION_BOUNDS* bounds, ItemInfo* item, ItemInfo*
 	// of the object we are test against.
 	matrix = matrix.Transpose();
 
-	pos = Vector3::Transform(differenceVector, matrix);
+	auto pos = Vector3::Transform(differenceVector, matrix);
 
 	if (pos.x < bounds->boundingBox.X1 || pos.x > bounds->boundingBox.X2 ||
 		pos.y < bounds->boundingBox.Y1 || pos.y > bounds->boundingBox.Y2 ||

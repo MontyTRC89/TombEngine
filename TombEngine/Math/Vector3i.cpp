@@ -29,7 +29,7 @@
 		return Vector3::Distance(origin.ToVector3(), target.ToVector3());
 	}
 
-	Vector3 Vector3Int::ToVector3()
+	Vector3 Vector3Int::ToVector3() const
 	{
 		return Vector3(x, y, z);
 	}
