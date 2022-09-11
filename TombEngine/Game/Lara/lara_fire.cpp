@@ -826,26 +826,28 @@ FireWeaponType FireWeapon(LaraWeaponType weaponType, ItemInfo* targetEntity, Ite
 	auto muzzleOffset = GetLaraJointPosition(LM_RHAND);
 	auto pos = Vector3i(originEntity->Pose.Position.x, muzzleOffset.y, originEntity->Pose.Position.z);
 
-	auto wobbleArmOrient = EulerAngles(
-		armOrient.x + (GetRandomControl() - ANGLE(90.0f)) * weapon->ShotAccuracy / 65536,
-		armOrient.y + (GetRandomControl() - ANGLE(90.0f)) * weapon->ShotAccuracy / 65536,
+	auto wobbledArmOrient = EulerAngles(
+		armOrient.x + (Random::GenerateAngle(0, ANGLE(180.0f)) - ANGLE(90.0f)) * weapon->ShotAccuracy / 65536,
+		armOrient.y + (Random::GenerateAngle(0, ANGLE(180.0f)) - ANGLE(90.0f)) * weapon->ShotAccuracy / 65536,
 		0
 	);
 
 	// Calculate ray from rotation angles.
-	float x =  sin(TO_RAD(wobbleArmOrient.y)) * cos(TO_RAD(wobbleArmOrient.x));
-	float y = -sin(TO_RAD(wobbleArmOrient.x));
-	float z =  cos(TO_RAD(wobbleArmOrient.y)) * cos(TO_RAD(wobbleArmOrient.x));
-	auto direction = Vector3(x, y, z);
-	direction.Normalize();
+	auto directionNorm = Vector3(
+		sin(TO_RAD(wobbledArmOrient.y)) * cos(TO_RAD(wobbledArmOrient.x)),
+		-sin(TO_RAD(wobbledArmOrient.x)),
+		cos(TO_RAD(wobbledArmOrient.y)) * cos(TO_RAD(wobbledArmOrient.x))
+	);
+	directionNorm.Normalize();
 
 	auto origin = pos.ToVector3();
-	auto target = origin + direction * weapon->TargetDist;
-	auto ray = Ray(origin, direction);
+	auto target = origin + (directionNorm * weapon->TargetDist);
+	auto ray = Ray(origin, directionNorm);
 
 	int num = GetSpheres(targetEntity, CreatureSpheres, SPHERES_SPACE_WORLD, Matrix::Identity);
-	int best = NO_ITEM;
+	int bestItemNumber = NO_ITEM;
 	float bestDistance = FLT_MAX;
+
 	for (int i = 0; i < num; i++)
 	{
 		auto sphere = BoundingSphere(Vector3(CreatureSpheres[i].x, CreatureSpheres[i].y, CreatureSpheres[i].z), CreatureSpheres[i].r);
@@ -855,7 +857,7 @@ FireWeaponType FireWeapon(LaraWeaponType weaponType, ItemInfo* targetEntity, Ite
 			if (distance < bestDistance)
 			{
 				bestDistance = distance;
-				best = i;
+				bestItemNumber = i;
 			}
 		}
 	}
@@ -863,12 +865,12 @@ FireWeaponType FireWeapon(LaraWeaponType weaponType, ItemInfo* targetEntity, Ite
 	lara->Control.Weapon.HasFired = true;
 	lara->Control.Weapon.Fired = true;
 	
-	auto vOrigin = GameVector(pos.x, pos.y, pos.z);
+	auto vOrigin = GameVector(pos);
 	short roomNumber = originEntity->RoomNumber;
 	GetFloor(pos.x, pos.y, pos.z, &roomNumber);
 	vOrigin.roomNumber = roomNumber;
 
-	if (best < 0)
+	if (bestItemNumber < 0)
 	{
 		auto vTarget = GameVector(target.x, target.y, target.z);
 		GetTargetOnLOS(&vOrigin, &vTarget, false, true);
@@ -878,9 +880,9 @@ FireWeaponType FireWeapon(LaraWeaponType weaponType, ItemInfo* targetEntity, Ite
 	{
 		Statistics.Game.AmmoHits++;
 
-		target = origin + (direction * bestDistance);
+		target = origin + (directionNorm * bestDistance);
 
-		auto vDest = GameVector(target.x, target.y, target.z);
+		auto vDest = GameVector(target);
 
 		// TODO: Enable when slot is created.
 		/*
