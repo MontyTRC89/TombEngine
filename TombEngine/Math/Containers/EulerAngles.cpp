@@ -19,14 +19,14 @@
 		this->z = z;
 	}
 
-	// TODO: Check.
 	EulerAngles::EulerAngles(const Vector3& direction)
 	{
 		auto directionNorm = direction;
 		directionNorm.Normalize();
-		this->x = FROM_RAD(atan2(directionNorm.y, directionNorm.x));
-		this->y = FROM_RAD(-asin(directionNorm.z));
-		this->z = 0.0f;
+
+		this->x = FROM_RAD(-asin(directionNorm.y));
+		this->y = FROM_RAD(atan2(directionNorm.x, directionNorm.z));
+		this->z = 0;
 	}
 
 	// TODO: Check.
