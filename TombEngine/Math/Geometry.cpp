@@ -82,14 +82,17 @@ namespace TEN::Math::Geometry
 	EulerAngles GetOrientTowardPoint(const Vector3& origin, const Vector3& target)
 	{
 		auto direction = target - origin;
-		float yOrient = phd_atan(direction.x, direction.z);
+		float yRad = atan2(direction.x, direction.z);
 
 		auto vector = direction;
-		auto matrix = Matrix::CreateRotationY(-yOrient);
+		auto matrix = Matrix::CreateRotationY(-yRad);
 		Vector3::Transform(vector, matrix, vector);
 
-		float xOrient = -phd_atan(direction.y, vector.z);
-		return EulerAngles(xOrient, yOrient, 0.0f);
+		return EulerAngles(
+			FROM_RAD(-atan2(direction.y, vector.z)),
+			FROM_RAD(yRad),
+			0
+		);
 	}
 
 	bool IsPointInFront(const PoseData& pose, const Vector3& target)
