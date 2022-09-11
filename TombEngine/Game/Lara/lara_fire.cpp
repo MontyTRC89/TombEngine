@@ -872,7 +872,7 @@ FireWeaponType FireWeapon(LaraWeaponType weaponType, ItemInfo* targetEntity, Ite
 
 	if (bestItemNumber < 0)
 	{
-		auto vTarget = GameVector(target.x, target.y, target.z);
+		auto vTarget = GameVector(target);
 		GetTargetOnLOS(&vOrigin, &vTarget, false, true);
 		return FireWeaponType::Miss;
 	}
@@ -882,7 +882,7 @@ FireWeaponType FireWeapon(LaraWeaponType weaponType, ItemInfo* targetEntity, Ite
 
 		target = origin + (directionNorm * bestDistance);
 
-		auto vDest = GameVector(target);
+		auto vTarget = GameVector(target);
 
 		// TODO: Enable when slot is created.
 		/*
@@ -926,8 +926,8 @@ FireWeaponType FireWeapon(LaraWeaponType weaponType, ItemInfo* targetEntity, Ite
 			// NOTE: it seems that items for being hit by Lara in the normal way must have GetTargetOnLOS returning false
 			// it's really weird but we decided to replicate original behaviour until we'll fully understand what is happening
 			// with weapons
-			if (!GetTargetOnLOS(&vOrigin, &vDest, false, true))
-				HitTarget(originEntity, targetEntity, &vDest, weapon->Damage, false);
+			if (!GetTargetOnLOS(&vOrigin, &vTarget, false, true))
+				HitTarget(originEntity, targetEntity, &vTarget, weapon->Damage, false);
 		//}
 		
 		return FireWeaponType::PossibleHit;

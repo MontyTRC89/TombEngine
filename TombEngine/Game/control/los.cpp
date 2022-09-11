@@ -79,10 +79,10 @@ bool ClipTarget(GameVector* origin, GameVector* target)
 
 bool GetTargetOnLOS(GameVector* origin, GameVector* target, bool drawTarget, bool isFiring)
 {
-	auto direction = Vector3(target->x, target->y, target->z) - Vector3(origin->x, origin->y, origin->z);
-	direction.Normalize();
+	auto directionNorm = target->ToVector3() - origin->ToVector3();
+	directionNorm.Normalize();
 
-	auto target2 = GameVector(target->x, target->y, target->z);
+	auto target2 = *target;
 	int result = LOS(origin, &target2);
 
 	GetFloor(target2.x, target2.y, target2.z, &target2.roomNumber);
@@ -98,8 +98,8 @@ bool GetTargetOnLOS(GameVector* origin, GameVector* target, bool drawTarget, boo
 
 	bool hasHit = false;
 
-	MESH_INFO* mesh;
-	Vector3i vector;
+	MESH_INFO* mesh = nullptr;
+	auto vector = Vector3i::Zero;
 	int itemNumber = ObjectOnLOS2(origin, target, &vector, &mesh);
 
 	if (itemNumber != NO_LOS_ITEM)
@@ -118,7 +118,7 @@ bool GetTargetOnLOS(GameVector* origin, GameVector* target, bool drawTarget, boo
 				{
 					if (StaticObjects[mesh->staticNumber].shatterType != SHT_NONE)
 					{
-						ShatterImpactData.impactDirection = direction;
+						ShatterImpactData.impactDirection = directionNorm;
 						ShatterImpactData.impactLocation = Vector3(mesh->pos.Position.x, mesh->pos.Position.y, mesh->pos.Position.z);
 						ShatterObject(nullptr, mesh, 128, target2.roomNumber, 0);
 						SmashedMeshRoom[SmashedMeshCount] = target2.roomNumber;
@@ -142,11 +142,11 @@ bool GetTargetOnLOS(GameVector* origin, GameVector* target, bool drawTarget, boo
 						{
 							//if (!Objects[item->objectNumber].intelligent)
 							//{
-							item->MeshBits &= ~ShatterItem.bit;
-							ShatterImpactData.impactDirection = direction;
-							ShatterImpactData.impactLocation = Vector3(ShatterItem.sphere.x, ShatterItem.sphere.y, ShatterItem.sphere.z);
-							ShatterObject(&ShatterItem, 0, 128, target2.roomNumber, 0);
-							TriggerRicochetSpark(&target2, LaraItem->Pose.Orientation.y, 3, 0);
+								item->MeshBits &= ~ShatterItem.bit;
+								ShatterImpactData.impactDirection = directionNorm;
+								ShatterImpactData.impactLocation = Vector3(ShatterItem.sphere.x, ShatterItem.sphere.y, ShatterItem.sphere.z);
+								ShatterObject(&ShatterItem, 0, 128, target2.roomNumber, 0);
+								TriggerRicochetSpark(&target2, LaraItem->Pose.Orientation.y, 3, 0);
 							/*}
 							else
 							{
