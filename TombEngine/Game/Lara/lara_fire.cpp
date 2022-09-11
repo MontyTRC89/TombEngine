@@ -1077,12 +1077,12 @@ void LaraGetNewTarget(ItemInfo* laraItem, WeaponInfo* weaponInfo)
 			TargetList[numTargets] = item;
 			++numTargets;
 
-			if (abs(orient.y) < (bestYOrient + ANGLE(15.0f)) &&
-				distance < bestDistance)
+			if (distance < bestDistance &&
+				abs(orient.y) < (bestYOrient + ANGLE(15.0f)))
 			{
+				bestEntity = item;
 				bestDistance = distance;
 				bestYOrient = abs(orient.y);
-				bestEntity = item;
 			}
 		}
 	}
