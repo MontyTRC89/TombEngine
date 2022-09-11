@@ -1039,57 +1039,50 @@ void LaraGetNewTarget(ItemInfo* laraItem, WeaponInfo* weaponInfo)
 		laraItem->RoomNumber
 	);
 
-	ItemInfo* bestItem = nullptr;
-	short bestYOrient = MAXSHORT;
+	ItemInfo* bestEntity = nullptr;
 	float bestDistance = FLT_MAX;
+	short bestYOrient = MAXSHORT;
+	unsigned int numTargets = 0;
 	float maxDistance = weaponInfo->TargetDist;
-	int numTargets = 0;
 
-	for (int slot = 0; slot < ActiveCreatures.size(); ++slot)
+	for (auto* activeCreature : ActiveCreatures)
 	{
-		if (ActiveCreatures[slot]->ItemNumber != NO_ITEM)
+		// Continue loop if no item.
+		if (activeCreature->ItemNumber == NO_ITEM)
+			continue;
+
+		auto* item = &g_Level.Items[activeCreature->ItemNumber];
+
+		// Assess whether creature is alive.
+		if (item->HitPoints <= 0)
+			continue;
+
+		// Assess distance.
+		float distance = Vector3::Distance(origin.ToVector3(), item->Pose.Position.ToVector3());
+		if (distance > maxDistance)
+			continue;
+
+		// Assess line of sight.
+		auto target = FindTargetPoint(item);
+		if (!LOS(&origin, &target))
+			continue;
+
+		// Assess whether relative orientation falls within weapon's lock constraints.
+		auto orient = Geometry::GetOrientTowardPoint(origin.ToVector3(), target.ToVector3()) - (laraItem->Pose.Orientation + lara->ExtraTorsoRot);
+		if (orient.x >= weaponInfo->LockAngles[0].x &&
+			orient.y >= weaponInfo->LockAngles[0].y &&
+			orient.x <= weaponInfo->LockAngles[1].x &&
+			orient.y <= weaponInfo->LockAngles[1].y)
 		{
-			auto* item = &g_Level.Items[ActiveCreatures[slot]->ItemNumber];
+			TargetList[numTargets] = item;
+			++numTargets;
 
-			if (item->HitPoints > 0)
+			if (abs(orient.y) < (bestYOrient + ANGLE(15.0f)) &&
+				distance < bestDistance)
 			{
-				int x = item->Pose.Position.x - origin.x;
-				int y = item->Pose.Position.y - origin.y;
-				int z = item->Pose.Position.z - origin.z;
-
-				if (abs(x) <= maxDistance &&
-					abs(y) <= maxDistance &&
-					abs(z) <= maxDistance)
-				{
-					float distance = SQUARE(x) + SQUARE(y) + SQUARE(z);
-					if (distance < SQUARE(maxDistance))
-					{
-						auto target = FindTargetPoint(item);
-
-						if (LOS(&origin, &target))
-						{
-							auto orient = Geometry::GetOrientTowardPoint(origin.ToVector3(), target.ToVector3()) -
-								(laraItem->Pose.Orientation + lara->ExtraTorsoRot);
-
-							if (orient.x >= weaponInfo->LockAngles[0].x &&
-								orient.y >= weaponInfo->LockAngles[0].y &&
-								orient.x <= weaponInfo->LockAngles[1].x &&
-								orient.y <= weaponInfo->LockAngles[1].y)
-							{
-								TargetList[numTargets] = item;
-								++numTargets;
-
-								if (abs(orient.y) < (bestYOrient + ANGLE(15.0f)) &&
-									distance < bestDistance)
-								{
-									bestDistance = distance;
-									bestYOrient = abs(orient.y);
-									bestItem = item;
-								}
-							}
-						}
-					}
-				}
+				bestDistance = distance;
+				bestYOrient = abs(orient.y);
+				bestEntity = item;
 			}
 		}
 	}
@@ -1112,7 +1105,7 @@ void LaraGetNewTarget(ItemInfo* laraItem, WeaponInfo* weaponInfo)
 		{
 			if (!lara->TargetEntity)
 			{
-				lara->TargetEntity = bestItem;
+				lara->TargetEntity = bestEntity;
 				LastTargets[0] = nullptr;
 			}
 			else if (TrInput & IN_LOOKSWITCH)
@@ -1144,7 +1137,7 @@ void LaraGetNewTarget(ItemInfo* laraItem, WeaponInfo* weaponInfo)
 
 				if (flag)
 				{
-					lara->TargetEntity = bestItem;
+					lara->TargetEntity = bestEntity;
 					LastTargets[0] = nullptr;
 				}
 			}
