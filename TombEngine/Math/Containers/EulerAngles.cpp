@@ -43,12 +43,12 @@
 		// Y axis
 		float sinYCosP = ((quat.w * quat.z) + (quat.x * quat.y)) * 2;
 		float cosYCosP = 1 - (((quat.y * quat.y) * 2) + (quat.z * quat.z));
-		this->y = phd_atan(cosYCosP, sinYCosP);
+		this->y = FROM_RAD(atan2(sinYCosP, cosYCosP));
 
 		// Z axis
 		float sinRCosP = ((quat.w * quat.x) + (quat.y * quat.z)) * 2;
 		float cosRCosP = 1 - (((quat.x * quat.x) * 2) + (quat.y * quat.y));
-		this->z = phd_atan(cosRCosP, sinRCosP);
+		this->z = FROM_RAD(atan2(sinRCosP, cosRCosP));
 	}
 
 	// TODO: Check.
