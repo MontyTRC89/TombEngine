@@ -275,8 +275,8 @@ namespace TEN::Renderer
 			for (int i = 0; i < hairsObj.BindPoseTransforms.size(); i++)
 			{
 				auto* hairs = &Hairs[0][i];
-				Matrix world = Matrix::CreateFromYawPitchRoll(TO_RAD(hairs->pos.Orientation.y), TO_RAD(hairs->pos.Orientation.x), 0) *
-							   Matrix::CreateTranslation(hairs->pos.Position.x, hairs->pos.Position.y, hairs->pos.Position.z);
+				auto world = Matrix::CreateFromYawPitchRoll(TO_RAD(hairs->pos.Orientation.y), TO_RAD(hairs->pos.Orientation.x), 0.0f) *
+					Matrix::CreateTranslation(hairs->pos.Position.x, hairs->pos.Position.y, hairs->pos.Position.z);
 				m_stItem.BonesMatrices[i + 1] = world;
 				m_stItem.BoneLightModes[i] = LIGHT_MODES::LIGHT_MODE_DYNAMIC;
 			}
@@ -305,38 +305,35 @@ namespace TEN::Renderer
 
 	void Renderer11::DrawGunShells(RenderView& view)
 	{
-		RendererRoom& room = m_rooms[LaraItem->RoomNumber];
-		RendererItem* item = &m_items[Lara.ItemNumber];
+		auto& room = m_rooms[LaraItem->RoomNumber];
+		auto* item = &m_items[Lara.ItemNumber];
 
 		m_stStatic.Color = room.AmbientLight;
 		m_stStatic.LightMode = LIGHT_MODES::LIGHT_MODE_DYNAMIC;
 
 		BindLights(item->LightsToDraw);
-
 		SetAlphaTest(ALPHA_TEST_GREATER_THAN, ALPHA_TEST_THRESHOLD);
 
 		for (int i = 0; i < MAX_GUNSHELL; i++)
 		{
-			GUNSHELL_STRUCT* gunshell = &Gunshells[i];
+			auto* gunshell = &Gunshells[i];
 
 			if (gunshell->counter <= 0)
 				continue;
 
-			ObjectInfo* obj = &Objects[gunshell->objectNumber];
-			RendererObject& moveableObj = *m_moveableObjects[gunshell->objectNumber];
+			auto* object = &Objects[gunshell->objectNumber];
+			auto& moveableObject = *m_moveableObjects[gunshell->objectNumber];
 
-			Matrix translation = Matrix::CreateTranslation(gunshell->pos.Position.x, gunshell->pos.Position.y,
-															gunshell->pos.Position.z);
-			Matrix rotation = Matrix::CreateFromYawPitchRoll(TO_RAD(gunshell->pos.Orientation.y), TO_RAD(gunshell->pos.Orientation.x),
-																TO_RAD(gunshell->pos.Orientation.z));
-			Matrix world = rotation * translation;
+			auto translation = Matrix::CreateTranslation(gunshell->pos.Position.x, gunshell->pos.Position.y, gunshell->pos.Position.z);
+			auto rotation = gunshell->pos.Orientation.ToRotationMatrix();
+			auto world = rotation * translation;
 			m_stStatic.World = world;
 
 			m_cbStatic.updateData(m_stStatic, m_context.Get());
 			BindConstantBufferVS(CB_STATIC, m_cbStatic.get());
 			BindConstantBufferPS(CB_STATIC, m_cbStatic.get());
 
-			RendererMesh* mesh = moveableObj.ObjectMeshes[0];
+			auto* mesh = moveableObject.ObjectMeshes[0];
 
 			for (auto& bucket : mesh->Buckets)
 			{
@@ -346,7 +343,7 @@ namespace TEN::Renderer
 				BindTexture(TEXTURE_COLOR_MAP, &std::get<0>(m_moveablesTextures[bucket.Texture]), SAMPLER_ANISOTROPIC_CLAMP);
 				BindTexture(TEXTURE_NORMAL_MAP, &std::get<1>(m_moveablesTextures[bucket.Texture]), SAMPLER_NONE);
 
-				// Draw vertices
+				// Draw vertices.
 				DrawIndexedTriangles(bucket.NumIndices, bucket.StartIndex, 0);
 
 				m_numMoveablesDrawCalls++;
@@ -361,17 +358,13 @@ namespace TEN::Renderer
 			if (!rope.active)
 				continue;
 
-			Matrix world = Matrix::CreateTranslation(
-				rope.position.x,
-				rope.position.y,
-				rope.position.z
-			);
+			auto world = Matrix::CreateTranslation(rope.position.x, rope.position.y, rope.position.z);
 
 			Vector3 absolute[24];
 
 			for (int n = 0; n < ROPE_SEGMENTS; n++)
 			{
-				Vector3i* s = &rope.meshSegment[n];
+				auto* s = &rope.meshSegment[n];
 				Vector3 t;
 				Vector3 output;
 
@@ -381,19 +374,19 @@ namespace TEN::Renderer
 
 				output = Vector3::Transform(t, world);
 
-				Vector3 absolutePosition = Vector3(output.x, output.y, output.z);
+				auto absolutePosition = output;
 				absolute[n] = absolutePosition;
 			}
 
 			for (int n = 0; n < ROPE_SEGMENTS - 1; n++)
 			{
-				Vector3 pos1 = Vector3(absolute[n].x, absolute[n].y, absolute[n].z);
-				Vector3 pos2 = Vector3(absolute[n + 1].x, absolute[n + 1].y, absolute[n + 1].z);
+				auto pos1 = absolute[n];
+				auto pos2 = absolute[n + 1];
 
-				Vector3 d = pos2 - pos1;
+				auto d = pos2 - pos1;
 				d.Normalize();
 
-				Vector3 c = (pos1 + pos2) / 2.0f;
+				auto c = (pos1 + pos2) / 2.0f;
 
 				AddSpriteBillboardConstrained(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_EMPTY1],
 					c,
@@ -552,8 +545,7 @@ namespace TEN::Renderer
 				{
 					RendererMesh* mesh = GetMesh(Objects[ID_RATS_EMITTER].meshIndex + (rand() % 8));
 					Matrix translation = Matrix::CreateTranslation(rat->Pose.Position.x, rat->Pose.Position.y, rat->Pose.Position.z);
-					Matrix rotation = Matrix::CreateFromYawPitchRoll(TO_RAD(rat->Pose.Orientation.y), TO_RAD(rat->Pose.Orientation.x),
-																	 TO_RAD(rat->Pose.Orientation.z));
+					Matrix rotation = rat->Pose.Orientation.ToRotationMatrix();
 					Matrix world = rotation * translation;
 
 					m_stStatic.World = world;
@@ -610,8 +602,7 @@ namespace TEN::Renderer
 					if (bat->On)
 					{
 						Matrix translation = Matrix::CreateTranslation(bat->Pose.Position.x, bat->Pose.Position.y, bat->Pose.Position.z);
-						Matrix rotation = Matrix::CreateFromYawPitchRoll(TO_RAD(bat->Pose.Orientation.y), TO_RAD(bat->Pose.Orientation.x), 
-																		 TO_RAD(bat->Pose.Orientation.z));
+						Matrix rotation = bat->Pose.Orientation.ToRotationMatrix();
 						Matrix world = rotation * translation;
 
 						m_stStatic.World = world;
@@ -654,8 +645,7 @@ namespace TEN::Renderer
 				{
 					RendererMesh* mesh = GetMesh(Objects[ID_LITTLE_BEETLE].meshIndex + ((Wibble >> 2) % 2));
 					Matrix translation = Matrix::CreateTranslation(beetle->Pose.Position.x, beetle->Pose.Position.y, beetle->Pose.Position.z);
-					Matrix rotation = Matrix::CreateFromYawPitchRoll(TO_RAD(beetle->Pose.Orientation.y), TO_RAD(beetle->Pose.Orientation.x),
-																	 TO_RAD(beetle->Pose.Orientation.z));
+					Matrix rotation = beetle->Pose.Orientation.ToRotationMatrix();
 					Matrix world = rotation * translation;
 
 					m_stStatic.World = world;
@@ -705,8 +695,7 @@ namespace TEN::Renderer
 				{
 					RendererMesh* mesh = GetMesh(Objects[ID_LOCUSTS].meshIndex + (-locust->counter & 3));
 					Matrix translation = Matrix::CreateTranslation(locust->pos.Position.x, locust->pos.Position.y, locust->pos.Position.z);
-					Matrix rotation = Matrix::CreateFromYawPitchRoll(TO_RAD(locust->pos.Orientation.y), TO_RAD(locust->pos.Orientation.x),
-																	 TO_RAD(locust->pos.Orientation.z));
+					Matrix rotation = locust->pos.Orientation.ToRotationMatrix();
 					Matrix world = rotation * translation;
 
 					m_stStatic.World = world;

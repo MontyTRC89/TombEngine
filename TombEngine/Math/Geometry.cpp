@@ -76,7 +76,7 @@ namespace TEN::Math::Geometry
 
 	short GetSurfaceAspectAngle(Vector2 tilt)
 	{
-		return (short)phd_atan(-tilt.y, -tilt.x);
+		return FROM_RAD(atan2(-tilt.x, -tilt.y));
 	}
 
 	EulerAngles GetOrientTowardPoint(const Vector3& origin, const Vector3& target)

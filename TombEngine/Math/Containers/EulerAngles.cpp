@@ -71,6 +71,11 @@
 		return Quaternion::CreateFromYawPitchRoll(TO_RAD(y), TO_RAD(x), TO_RAD(z));
 	}
 
+	Matrix EulerAngles::ToRotationMatrix() const
+	{
+		return Matrix::CreateFromYawPitchRoll(TO_RAD(y), TO_RAD(x), TO_RAD(z));
+	}
+
 	bool EulerAngles::operator ==(const EulerAngles& eulers)
 	{
 		return (x == eulers.x && y == eulers.y && z == eulers.z);

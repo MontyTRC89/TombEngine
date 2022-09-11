@@ -978,7 +978,7 @@ short GetNearestLedgeAngle(ItemInfo* item, CollisionInfo* coll, float& distance)
 			auto cY = height + 1;
 
 			// Calculate ray
-			auto mxR = Matrix::CreateFromYawPitchRoll(TO_RAD(coll->Setup.ForwardAngle), 0, 0);
+			auto mxR = Matrix::CreateFromYawPitchRoll(TO_RAD(coll->Setup.ForwardAngle), 0.0f, 0.0f);
 			auto direction = (Matrix::CreateTranslation(Vector3::UnitZ) * mxR).Translation();
 			auto ray = Ray(Vector3(eX, cY, eZ), direction);
 

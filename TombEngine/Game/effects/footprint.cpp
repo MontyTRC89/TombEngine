@@ -41,19 +41,19 @@ namespace TEN::Effects::Footprints
 
 		auto foot = rightFoot ? LM_RFOOT : LM_LFOOT;
 
-		// Don't process actual footprint placement if foot isn't on floor
+		// Don't process actual footprint placement if foot isn't on floor.
 		auto footPos = Vector3();
 		if (!CheckFootOnFloor(*item, foot, footPos))
 			return;
 
-		// Randomize foot position slightly to avoid patterns
+		// Slightly randomize foot position to avoid patterns.
 		footPos.x += (GetRandomControl() & 10) - 5;
 		footPos.z += (GetRandomControl() & 10) - 5;
 
 		auto result = GetCollision(footPos.x, footPos.y - STEP_SIZE, footPos.z, item->RoomNumber);
 		auto floor = result.BottomBlock;
 
-		// Don't process material if foot has hit bridge object
+		// Don't process material if foot has hit bridge object.
 		if (result.Position.Bridge >= 0)
 			return;
 
@@ -150,7 +150,7 @@ namespace TEN::Effects::Footprints
 			break;
 		}
 
-		// HACK: must be here until reference wad2 is revised
+		// HACK: Must be here until reference WAD2 is revised.
 		if (fx != SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS)
 			SoundEffect(fx, &item->Pose);
 
@@ -162,17 +162,19 @@ namespace TEN::Effects::Footprints
 			floor->Material != FLOOR_MATERIAL::Custom1 &&
 			floor->Material != FLOOR_MATERIAL::Custom3 &&
 			floor->Material != FLOOR_MATERIAL::Custom4)
+		{
 			return;
+		}
 
-		// Calculate footprint tilts
+		// Calculate footprint tilts.
 		auto plane = floor->FloorCollision.Planes[floor->SectorPlane(footPos.x, footPos.z)];
-		auto c = phd_cos(item->Pose.Orientation.y + ANGLE(180));
-		auto s = phd_sin(item->Pose.Orientation.y + ANGLE(180));
+		auto c = phd_cos(item->Pose.Orientation.y + ANGLE(180.0f));
+		auto s = phd_sin(item->Pose.Orientation.y + ANGLE(180.0f));
 		auto yRot = TO_RAD(item->Pose.Orientation.y);
 		auto xRot = plane.x * s + plane.y * c;
 		auto zRot = plane.y * s - plane.x * c;
 
-		// Calculate footprint positions
+		// Calculate footprint positions.
 		auto p0 = Vector3( FOOTPRINT_SIZE, 0,  FOOTPRINT_SIZE);
 		auto p1 = Vector3(-FOOTPRINT_SIZE, 0,  FOOTPRINT_SIZE);
 		auto p2 = Vector3(-FOOTPRINT_SIZE, 0, -FOOTPRINT_SIZE);

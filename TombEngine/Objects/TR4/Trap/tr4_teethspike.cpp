@@ -81,10 +81,7 @@ namespace TEN::Entities::TR4
 			if (LaraItem->Animation.ActiveState != LS_DEATH && intersection != ContainmentType::DISJOINT)
 			{
 				// Calculate spike angle to the horizon. If angle is upward, impale Lara.
-				auto normal = Vector3::Transform(Vector3::UnitY, Matrix::CreateFromYawPitchRoll(
-					TO_RAD(item->Pose.Orientation.y), 
-					TO_RAD(item->Pose.Orientation.x), 
-					TO_RAD(item->Pose.Orientation.z)));
+				auto normal = Vector3::Transform(Vector3::UnitY, item->Pose.Orientation.ToRotationMatrix());
 				float dot = Vector3::UnitX.Dot(normal);
 				float angle = acos(dot / sqrt(normal.LengthSquared() * Vector3::UnitX.LengthSquared()));
 

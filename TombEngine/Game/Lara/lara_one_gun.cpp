@@ -845,11 +845,11 @@ void GrenadeControl(short itemNumber)
 	// Trigger fire and smoke sparks in the direction of motion.
 	if (item->Animation.Velocity.z && aboveWater)
 	{
-		Matrix world = Matrix::CreateFromYawPitchRoll(
+		auto world = Matrix::CreateFromYawPitchRoll(
 			TO_RAD(item->Pose.Orientation.y - ANGLE(180.0f)),
 			TO_RAD(item->Pose.Orientation.x),
-			TO_RAD(item->Pose.Orientation.z)
-		) * Matrix::CreateTranslation(0, 0, -64);
+			TO_RAD(item->Pose.Orientation.z)) *
+			Matrix::CreateTranslation(0, 0, -64);
 
 		int wx = world.Translation().x;
 		int wy = world.Translation().y;
@@ -1174,11 +1174,11 @@ void RocketControl(short itemNumber)
 	item->Color = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
 
 	// Calculate offset in rocket direction for fire and smoke sparks.
-	Matrix world = Matrix::CreateFromYawPitchRoll(
+	auto world = Matrix::CreateFromYawPitchRoll(
 		TO_RAD(item->Pose.Orientation.y - ANGLE(180.0f)),
 		TO_RAD(item->Pose.Orientation.x),
-		TO_RAD(item->Pose.Orientation.z)
-	) * Matrix::CreateTranslation(0, 0, -64);
+		TO_RAD(item->Pose.Orientation.z)) *
+		Matrix::CreateTranslation(0, 0, -64);
 
 	int wx = world.Translation().x;
 	int wy = world.Translation().y;

@@ -388,9 +388,7 @@ namespace TEN::Renderer
 			newItem->Color = item->Color;
 			newItem->Position = item->Pose.Position.ToVector3();
 			newItem->Translation = Matrix::CreateTranslation(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z);
-			newItem->Rotation = Matrix::CreateFromYawPitchRoll(TO_RAD(item->Pose.Orientation.y),
-															   TO_RAD(item->Pose.Orientation.x),
-															   TO_RAD(item->Pose.Orientation.z));
+			newItem->Rotation = item->Pose.Orientation.ToRotationMatrix();
 			newItem->Scale = Matrix::CreateScale(1.0f);
 			newItem->World = newItem->Rotation * newItem->Translation;
 
@@ -437,7 +435,7 @@ namespace TEN::Renderer
 			if (obj.ObjectMeshes.front()->LightMode != LIGHT_MODES::LIGHT_MODE_STATIC)
 				CollectLights(mesh->pos.Position.ToVector3(), ITEM_LIGHT_COLLECTION_RADIUS, room.RoomNumber, NO_ROOM, false, lights);
 
-			Matrix world = (Matrix::CreateFromYawPitchRoll(TO_RAD(mesh->pos.Orientation.y), TO_RAD(mesh->pos.Orientation.x), TO_RAD(mesh->pos.Orientation.z)) *
+			Matrix world = (mesh->pos.Orientation.ToRotationMatrix() *
 							Matrix::CreateScale(mesh->scale) *
 							Matrix::CreateTranslation(mesh->pos.Position.x, mesh->pos.Position.y, mesh->pos.Position.z));
 
@@ -732,7 +730,7 @@ namespace TEN::Renderer
 			RendererEffect *newEffect = &m_effects[fxNum];
 
 			Matrix translation = Matrix::CreateTranslation(fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z);
-			Matrix rotation = Matrix::CreateFromYawPitchRoll(TO_RAD(fx->pos.Orientation.y), TO_RAD(fx->pos.Orientation.x), TO_RAD(fx->pos.Orientation.z));
+			Matrix rotation = fx->pos.Orientation.ToRotationMatrix();
 
 			newEffect->ObjectNumber = fx->objectNumber;
 			newEffect->RoomNumber = fx->roomNumber;

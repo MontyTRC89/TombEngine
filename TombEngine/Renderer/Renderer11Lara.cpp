@@ -94,11 +94,11 @@ void Renderer11::UpdateLaraAnimations(bool force)
 
 	// Clear extra rotations
 	for (int i = 0; i < laraObj.LinearizedBones.size(); i++)
-		laraObj.LinearizedBones[i]->ExtraRotation = Vector3(0.0f, 0.0f, 0.0f);
+		laraObj.LinearizedBones[i]->ExtraRotation = Vector3::Zero;
 
 	// Lara world matrix
 	translation = Matrix::CreateTranslation(LaraItem->Pose.Position.x, LaraItem->Pose.Position.y, LaraItem->Pose.Position.z);
-	rotation = Matrix::CreateFromYawPitchRoll(TO_RAD(LaraItem->Pose.Orientation.y), TO_RAD(LaraItem->Pose.Orientation.x), TO_RAD(LaraItem->Pose.Orientation.z));
+	rotation = LaraItem->Pose.Orientation.ToRotationMatrix();
 
 	m_LaraWorldMatrix = rotation * translation;
 	item->World = m_LaraWorldMatrix;
@@ -329,7 +329,7 @@ void TEN::Renderer::Renderer11::DrawLara(RenderView& view, bool transparent)
 		for (int i = 0; i < hairsObj.BindPoseTransforms.size(); i++)
 		{
 			auto* hairs = &Hairs[0][i];
-			Matrix world = Matrix::CreateFromYawPitchRoll(TO_RAD(hairs->pos.Orientation.y), TO_RAD(hairs->pos.Orientation.x), 0) *
+			Matrix world = Matrix::CreateFromYawPitchRoll(TO_RAD(hairs->pos.Orientation.y), TO_RAD(hairs->pos.Orientation.x), 0.0f) *
 				Matrix::CreateTranslation(hairs->pos.Position.x, hairs->pos.Position.y, hairs->pos.Position.z);
 			m_stItem.BonesMatrices[i + 1] = world;
 			m_stItem.BoneLightModes[i] = LIGHT_MODES::LIGHT_MODE_DYNAMIC;

@@ -1409,11 +1409,7 @@ void ExplodingDeath(short itemNumber, short flags)
 	else
 		obj = &Objects[item->ObjectNumber];
 	
-	Matrix world = Matrix::CreateFromYawPitchRoll(
-		TO_RAD(item->Pose.Orientation.y),
-		TO_RAD(item->Pose.Orientation.x),
-		TO_RAD(item->Pose.Orientation.z)
-	);
+	auto world = item->Pose.Orientation.ToRotationMatrix();
 
 	for (int i = 0; i < obj->nmeshes; i++)
 	{

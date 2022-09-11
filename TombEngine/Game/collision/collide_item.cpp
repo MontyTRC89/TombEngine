@@ -392,21 +392,16 @@ bool TestLaraPosition(OBJECT_COLLISION_BOUNDS* bounds, ItemInfo* item, ItemInfo*
 		return false;
 
 	auto pos = (laraItem->Pose.Position - item->Pose.Position).ToVector3();
-
-	auto matrix = Matrix::CreateFromYawPitchRoll(
-		TO_RAD(item->Pose.Orientation.y),
-		TO_RAD(item->Pose.Orientation.x),
-		TO_RAD(item->Pose.Orientation.z)
-	);
+	auto rotMatrix = item->Pose.Orientation.ToRotationMatrix();
 
 	// This solves once for all the minus sign hack of CreateFromYawPitchRoll.
 	// In reality it should be the inverse, but the inverse of a rotation matrix is equal to the transpose
 	// and transposing a matrix is faster.
 	// It's the only piece of code that does it, because we want Lara's location relative to the identity frame
 	// of the object we are test against.
-	matrix = matrix.Transpose();
+	rotMatrix = rotMatrix.Transpose();
 
-	pos = Vector3::Transform(pos, matrix);
+	pos = Vector3::Transform(pos, rotMatrix);
 
 	if (pos.x < bounds->boundingBox.X1 || pos.x > bounds->boundingBox.X2 ||
 		pos.y < bounds->boundingBox.Y1 || pos.y > bounds->boundingBox.Y2 ||
@@ -424,13 +419,8 @@ bool AlignLaraPosition(Vector3i* offset, ItemInfo* item, ItemInfo* laraItem)
 
 	laraItem->Pose.Orientation = item->Pose.Orientation;
 
-	auto matrix = Matrix::CreateFromYawPitchRoll(
-		TO_RAD(item->Pose.Orientation.y),
-		TO_RAD(item->Pose.Orientation.x),
-		TO_RAD(item->Pose.Orientation.z)
-	);
-
-	auto pos = Vector3::Transform(offset->ToVector3(), matrix);
+	auto rotMatrix = item->Pose.Orientation.ToRotationMatrix();
+	auto pos = Vector3::Transform(offset->ToVector3(), rotMatrix);
 	auto target = item->Pose.Position.ToVector3() + pos;
 
 	int height = GetCollision(target.x, target.y, target.z, laraItem->RoomNumber).Position.Floor;
@@ -453,13 +443,8 @@ bool MoveLaraPosition(Vector3i* offset, ItemInfo* item, ItemInfo* laraItem)
 {
 	auto* lara = GetLaraInfo(laraItem);
 
-	Matrix matrix = Matrix::CreateFromYawPitchRoll(
-		TO_RAD(item->Pose.Orientation.y),
-		TO_RAD(item->Pose.Orientation.x),
-		TO_RAD(item->Pose.Orientation.z)
-	);
-
-	auto pos = Vector3::Transform(offset->ToVector3(), matrix);
+	auto rotMatrix = item->Pose.Orientation.ToRotationMatrix();
+	auto pos = Vector3::Transform(offset->ToVector3(), rotMatrix);
 	auto target = PoseData(item->Pose.Position + Vector3i(pos), item->Pose.Orientation);
 
 	if (!Objects[item->ObjectNumber].isPickup)
@@ -961,7 +946,7 @@ bool CollideSolidBounds(ItemInfo* item, BOUNDING_BOX* box, PoseData pos, Collisi
 	for (int i = 0; i < 4; i++)
 	{
 		// Calculate ray direction
-		auto mxR = Matrix::CreateFromYawPitchRoll(TO_RAD(item->Pose.Orientation.y), TO_RAD(item->Pose.Orientation.x + (ANGLE(90 * i))), 0);
+		auto mxR = Matrix::CreateFromYawPitchRoll(TO_RAD(item->Pose.Orientation.y), TO_RAD(item->Pose.Orientation.x + (ANGLE(90 * i))), 0.0f);
 		auto mxT = Matrix::CreateTranslation(Vector3::UnitY);
 		auto direction = (mxT * mxR).Translation();
 

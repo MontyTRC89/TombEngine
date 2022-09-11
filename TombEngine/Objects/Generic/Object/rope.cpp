@@ -816,7 +816,7 @@ namespace TEN::Entities::Generic
 		item->Pose.Position.y = rope->position.y + (rope->meshSegment[Lara.Control.Rope.Segment].y >> FP_SHIFT) + Lara.Control.Rope.Offset;
 		item->Pose.Position.z = rope->position.z + (rope->meshSegment[Lara.Control.Rope.Segment].z >> FP_SHIFT);
 
-		Matrix rotMatrix = Matrix::CreateFromYawPitchRoll(
+		auto rotMatrix = Matrix::CreateFromYawPitchRoll(
 			TO_RAD(angle[1]),
 			TO_RAD(angle[0]),
 			TO_RAD(angle[2])

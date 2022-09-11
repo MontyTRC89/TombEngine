@@ -823,9 +823,6 @@ FireWeaponType FireWeapon(LaraWeaponType weaponType, ItemInfo* targetEntity, Ite
 
 	auto* weapon = &Weapons[(int)weaponType];
 
-	auto muzzleOffset = GetLaraJointPosition(LM_RHAND);
-	auto pos = Vector3i(originEntity->Pose.Position.x, muzzleOffset.y, originEntity->Pose.Position.z);
-
 	auto wobbledArmOrient = EulerAngles(
 		armOrient.x + (Random::GenerateAngle(0, ANGLE(180.0f)) - ANGLE(90.0f)) * weapon->ShotAccuracy / 65536,
 		armOrient.y + (Random::GenerateAngle(0, ANGLE(180.0f)) - ANGLE(90.0f)) * weapon->ShotAccuracy / 65536,
@@ -839,6 +836,9 @@ FireWeaponType FireWeapon(LaraWeaponType weaponType, ItemInfo* targetEntity, Ite
 		cos(TO_RAD(wobbledArmOrient.y)) * cos(TO_RAD(wobbledArmOrient.x))
 	);
 	directionNorm.Normalize();
+
+	auto muzzleOffset = GetLaraJointPosition(LM_RHAND);
+	auto pos = Vector3i(originEntity->Pose.Position.x, muzzleOffset.y, originEntity->Pose.Position.z);
 
 	auto origin = pos.ToVector3();
 	auto target = origin + (directionNorm * weapon->TargetDist);

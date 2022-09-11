@@ -32,14 +32,14 @@ void TriggerChaffEffects(ItemInfo* item, int age)
 {
 	Matrix world =
 		Matrix::CreateTranslation(-6, 6, 32) *
-		Matrix::CreateFromYawPitchRoll(TO_RAD(item->Pose.Orientation.y), TO_RAD(item->Pose.Orientation.x), TO_RAD(item->Pose.Orientation.z));
+		item->Pose.Orientation.ToRotationMatrix();
 
 	auto pos = item->Pose.Position + Vector3i(world.Translation());
 
 	world =
 		Matrix::CreateTranslation(-6, 6, 32) *
 		Matrix::CreateTranslation((GetRandomDraw() & 127) - 64, (GetRandomDraw() & 127) - 64, (GetRandomDraw() & 511) + 512) *
-		Matrix::CreateFromYawPitchRoll(TO_RAD(item->Pose.Orientation.y), TO_RAD(item->Pose.Orientation.x), TO_RAD(item->Pose.Orientation.z));
+		item->Pose.Orientation.ToRotationMatrix();
 
 	auto vel = Vector3i(world.Translation());
 	TriggerChaffEffects(item, &pos, &vel, item->Animation.Velocity.z, TestEnvironment(ENV_FLAG_WATER, item), age);

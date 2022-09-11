@@ -77,12 +77,7 @@ int mGetAngle(int x1, int y1, int x2, int y2)
 
 void phd_RotBoundingBoxNoPersp(PoseData* pos, BOUNDING_BOX* bounds, BOUNDING_BOX* tbounds)
 {
-	auto world = Matrix::CreateFromYawPitchRoll(
-		TO_RAD(pos->Orientation.y),
-		TO_RAD(pos->Orientation.x),
-		TO_RAD(pos->Orientation.z)
-	);
-
+	auto world = pos->Orientation.ToRotationMatrix();
 	auto bMin = Vector3(bounds->X1, bounds->Y1, bounds->Z1);
 	auto bMax = Vector3(bounds->X2, bounds->Y2, bounds->Z2);
 
@@ -136,7 +131,8 @@ void GetMatrixFromTrAngle(Matrix* matrix, short* framePtr, int index)
 		rotY = (((rot1 & 0xfc00) >> 10) | ((rot0 & 0xf) << 6) & 0x3ff);
 		rotZ = ((rot1) & 0x3ff);
 
-		*matrix = Matrix::CreateFromYawPitchRoll(rotY * (360.0f / 1024.0f) * RADIAN,
+		*matrix = Matrix::CreateFromYawPitchRoll(
+			rotY * (360.0f / 1024.0f) * RADIAN,
 			rotX * (360.0f / 1024.0f) * RADIAN,
 			rotZ * (360.0f / 1024.0f) * RADIAN);
 		break;
@@ -159,7 +155,7 @@ BoundingOrientedBox TO_DX_BBOX(PoseData pos, BOUNDING_BOX* box)
 {
 	auto boxCentre = Vector3((box->X2 + box->X1) / 2.0f, (box->Y2 + box->Y1) / 2.0f, (box->Z2 + box->Z1) / 2.0f);
 	auto boxExtent = Vector3((box->X2 - box->X1) / 2.0f, (box->Y2 - box->Y1) / 2.0f, (box->Z2 - box->Z1) / 2.0f);
-	auto rotation = Quaternion::CreateFromYawPitchRoll(TO_RAD(pos.Orientation.y), TO_RAD(pos.Orientation.x), TO_RAD(pos.Orientation.z));
+	auto rotation = pos.Orientation.ToQuaternion();
 
 	BoundingOrientedBox result;
 	BoundingOrientedBox(boxCentre, boxExtent, Vector4::UnitY).Transform(result, 1, rotation, Vector3(pos.Position.x, pos.Position.y, pos.Position.z));

@@ -84,9 +84,7 @@ namespace TEN::Renderer
 				if (bone == obj.Skeleton)
 					translation = Matrix::CreateTranslation(p.x, p.y, p.z);
 
-				Matrix extraRotation;
-				extraRotation = Matrix::CreateFromYawPitchRoll(bone->ExtraRotation.y, bone->ExtraRotation.x, bone->ExtraRotation.z);
-					
+				Matrix extraRotation = Matrix::CreateFromYawPitchRoll(bone->ExtraRotation.y, bone->ExtraRotation.x, bone->ExtraRotation.z);
 
 				if (useObjectWorldRotation)
 				{
@@ -444,7 +442,7 @@ namespace TEN::Renderer
 		else
 			world = Matrix::Identity * local;
 
-		world = Matrix::CreateFromYawPitchRoll(TO_RAD(nativeItem->Pose.Orientation.y), TO_RAD(nativeItem->Pose.Orientation.x), TO_RAD(nativeItem->Pose.Orientation.z)) * world;
+		world = nativeItem->Pose.Orientation.ToRotationMatrix() * world;
 
 		short objNum = nativeItem->ObjectNumber;
 		if (objNum == ID_LARA) objNum = ID_LARA_SKIN;
