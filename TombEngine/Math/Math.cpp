@@ -22,7 +22,7 @@ namespace TEN::Math
 		x = std::clamp((x - edge0) / (edge1 - edge0), 0.0f, 1.0f);
 
 		// Evaluate polynomial.
-		return (x * x * x * (x * (x * 6 - 15) + 10));
+		return (CUBE(x) * (x * (x * 6 - 15) + 10));
 	}
 
 	const float Smoothstep(float x)
