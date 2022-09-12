@@ -163,18 +163,22 @@ namespace TEN::Control::Volumes
 
 		if (!std::filesystem::exists(nodeScriptPath))
 			return;
+		
+		std::vector<std::string> nodeCatalogs;
+		for (auto& path : std::filesystem::recursive_directory_iterator(nodeScriptPath))
+			if (path.path().extension() == ".lua")
+				nodeCatalogs.push_back(path.path().filename().string());
+
+		if (nodeCatalogs.size() == 0)
+			return;
 
 		TENLog("Loading node scripts...", LogLevel::Info);
 
-		bool anyScriptsFound = false;
-		for (auto& path : std::filesystem::recursive_directory_iterator(nodeScriptPath))
-		{
-			if (path.path().extension() == ".lua")
-			{
-				g_GameScript->ExecuteScriptFile(path.path().string());
-				anyScriptsFound = true;
-			}
-		}
+		std::sort(nodeCatalogs.rbegin(), nodeCatalogs.rend());
+		for (auto& file : nodeCatalogs)
+			g_GameScript->ExecuteScriptFile(nodeScriptPath + file);
+
+		TENLog(std::to_string(nodeCatalogs.size()) + " node catalogs were found and loaded.", LogLevel::Info);
 
 		int nodeCount = 0;
 		for (auto& set : g_Level.EventSets)
@@ -198,12 +202,7 @@ namespace TEN::Control::Volumes
 			}
 		}
 
-		if (nodeCount == 0)
-			return;
-
-		if (!anyScriptsFound)
-			TENLog("Node catalogs are missing, but node scripts are present in level. Make sure node catalogs are in place.", LogLevel::Warning);
-		else
-			TENLog(std::to_string(nodeCount) + " node scripts found and loaded.", LogLevel::Info);
+		if (nodeCount != 0)
+			TENLog(std::to_string(nodeCount) + " node scripts were found and loaded.", LogLevel::Info);
 	}
 }

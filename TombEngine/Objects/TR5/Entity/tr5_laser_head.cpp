@@ -19,7 +19,7 @@
 using namespace TEN::Effects::Lara;
 using namespace TEN::Effects::Lightning;
 
-namespace TEN::Entities::TR5
+namespace TEN::Entities::Creatures::TR5
 {
 	struct LaserHeadStruct
 	{

@@ -16,13 +16,13 @@ class LevelFunc {
 public:
 	std::string m_funcName;
 	LogicHandler* m_handler;
-	void Call(sol::variadic_args vs)
+	sol::protected_function_result Call(sol::variadic_args vs)
 	{
-		m_handler->CallLevelFunc(m_funcName, vs);
+		return m_handler->CallLevelFunc(m_funcName, vs);
 	}
-	void CallDT(float dt)
+	sol::protected_function_result CallDT(float dt)
 	{
-		m_handler->CallLevelFunc(m_funcName, dt);
+		return m_handler->CallLevelFunc(m_funcName, dt);
 	}
 
 	static void Register(sol::table & parent)

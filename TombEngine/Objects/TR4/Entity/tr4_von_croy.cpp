@@ -770,10 +770,10 @@ namespace TEN::Entities::TR4
 			creature->MaxTurn = 0;
 			ClampRotation(&item->Pose, AI.angle, ANGLE(6.0f));
 
-			if ((enemy == NULL || enemy->Flags != NULL) ||
+			if ((enemy == nullptr || enemy->Flags != 0) ||
 				item->Animation.FrameNumber <= g_Level.Anims[item->Animation.AnimNumber].frameBase + 21)
 			{
-				if (creature->Flags == NULL && enemy != nullptr)
+				if (creature->Flags == 0 && enemy != nullptr)
 				{
 					if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 15 &&
 						item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].frameBase + 26)
@@ -849,7 +849,7 @@ namespace TEN::Entities::TR4
 
 			item->Animation.TargetState = VON_CROY_STATE_WALK;
 			item->Animation.RequiredState = VON_CROY_STATE_RUN;
-			item->ItemFlags[2] = NULL;
+			item->ItemFlags[2] = 0;
 			//if (sVar3 == -1) goto LAB_0041a991;
 			if (!flags)
 			{
@@ -878,38 +878,38 @@ namespace TEN::Entities::TR4
 		CreatureJoint(item, 2, joint2);
 		CreatureJoint(item, 3, joint3);
 
-		if ((item->Animation.ActiveState < VON_CROY_STATE_JUMP) && (item->Animation.ActiveState != VON_CROY_STATE_MONKEY))
+		if (item->Animation.ActiveState < VON_CROY_STATE_JUMP &&
+			item->Animation.ActiveState != VON_CROY_STATE_MONKEY)
 		{
 			switch (CreatureVault(itemNumber, angle, 2, 260))
 			{
-			case VON_CROY_STATE_WALK:
+			case 2:
 				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + VON_CROY_ANIM_CLIMB_2_BLOCKS;
 				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 				item->Animation.ActiveState = VON_CROY_STATE_CLIMB_2_BLOCKS;
 				creature->MaxTurn = 0;
 				break;
 
-			case VON_CROY_STATE_RUN:
+			case 3:
 				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + VON_CROY_ANIM_CLIMB_3_BLOCKS;
 				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 				item->Animation.ActiveState = VON_CROY_STATE_CLIMB_3_BLOCKS;
 				creature->MaxTurn = 0;
 				break;
 
-			case VON_CROY_STATE_START_MONKEY:
+			case 4:
 				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + VON_CROY_ANIM_CLIMB_4_BLOCKS;
 				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 				item->Animation.ActiveState = VON_CROY_STATE_CLIMB_4_BLOCKS;
 				creature->MaxTurn = 0;
 				break;
 
-			case VON_CROY_STATE_LOOK_BEFORE_JUMP:
+			case 7:
 				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + VON_CROY_ANIM_JUMP_TO_HANG;
 				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 				item->Animation.ActiveState = VON_CROY_STATE_GRAB_LADDER;
 				creature->MaxTurn = 0;
 				break;
-			// I am not sure what negative states are (probably the inverse of the above), I will leave them alone - Kubsy 18/06/2022
 			case -7:
 				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + VON_CROY_ANIM_CLIMB_DOWN_2_SECTORS;
 				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;

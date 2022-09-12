@@ -17,7 +17,7 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-namespace TEN::Entities::TR2
+namespace TEN::Entities::Creatures::TR2
 {
 	#define SMAN_MIN_TURN (ANGLE(2.0f))
 	#define SMAN_TARGET_ANGLE ANGLE(15.0f)
@@ -28,7 +28,7 @@ namespace TEN::Entities::TR2
 
 	enum SnowmobileManState
 	{
-		SMAN_STATE_NONE = 0,
+		// No state 0.
 		SMAN_STATE_WAIT = 1,
 		SMAN_STATE_MOVING = 2,
 		SMAN_STATE_START_LEFT = 3,
