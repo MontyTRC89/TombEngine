@@ -142,7 +142,7 @@ namespace TEN::Entities::Creatures::TR5
 
 					if (creature->Mood == MoodType::Bored)
 					{
-						if (TestProbability(1.0f / 256.0f))
+						if (TestProbability(1.0f / 256))
 						{
 							item->Animation.TargetState = LION_STATE_IDLE;
 							item->Animation.RequiredState = LION_STATE_ROAR;
@@ -165,7 +165,7 @@ namespace TEN::Entities::Creatures::TR5
 							item->Animation.TargetState = LION_STATE_IDLE;
 						else if (creature->Mood != MoodType::Escape)
 						{
-							if (TestProbability(1.0f / 256.0f))
+							if (TestProbability(1.0f / 256))
 							{
 								item->Animation.TargetState = LION_STATE_IDLE;
 								item->Animation.RequiredState = LION_STATE_ROAR;

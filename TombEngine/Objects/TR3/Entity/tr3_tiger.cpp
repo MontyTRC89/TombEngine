@@ -24,7 +24,7 @@ namespace TEN::Entities::Creatures::TR3
 	constexpr auto TIGER_RUN_ATTACK_RANGE	 = SQUARE(SECTOR(1.5f));
 
 	constexpr auto TIGER_WALK_CHANCE = 0.035f;
-	constexpr auto TIGER_ROAR_CHANCE = 0.003f;
+	constexpr auto TIGER_ROAR_CHANCE = 1.0f / 340;
 
 	const auto TigerBite = BiteInfo(Vector3(19.0f, -13.0f, 3.0f), 26);
 	const vector<int> TigerAttackJoints = { 14, 15, 16, 18, 19, 20, 21, 22, 23, 24, 25, 26 };
@@ -61,11 +61,6 @@ namespace TEN::Entities::Creatures::TR3
 		TIGER_ANIM_WALK_FORWARD_TO_IDLE = 10,
 		TIGER_ANIM_DEATH = 11,
 		TIGER_ANIM_POUNCE_ATTACK_END = 12
-	};
-
-	enum TigerFlags
-	{
-		TIGER_FLAG_ATTACKING = (1 << 0)
 	};
 
 	void TigerControl(short itemNumber)
@@ -189,7 +184,7 @@ namespace TEN::Entities::Creatures::TR3
 				{
 					DoDamage(creature->Enemy, TIGER_ATTACK_DAMAGE);
 					CreatureEffect(item, TigerBite, DoBloodSplat);
-					creature->Flags = TIGER_FLAG_ATTACKING;
+					creature->Flags = 1; // 1 = is attacking.
 				}
 
 				break;

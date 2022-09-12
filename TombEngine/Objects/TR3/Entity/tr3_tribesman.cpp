@@ -152,7 +152,7 @@ namespace TEN::Entities::Creatures::TR3
 				{
 					creature->MaxTurn = 0;
 
-					if (TestProbability(1.0f / 128.0f))
+					if (TestProbability(1.0f / 128))
 						item->Animation.TargetState = TRIBESMAN_STATE_WALK_FORWARD;
 				}
 				else if (creature->Mood == MoodType::Escape)
@@ -191,7 +191,7 @@ namespace TEN::Entities::Creatures::TR3
 				{
 					creature->MaxTurn = 0;
 
-					if (TestProbability(1.0f / 128.0f))
+					if (TestProbability(1.0f / 128))
 						item->Animation.TargetState = TRIBESMAN_STATE_WALK_FORWARD;
 				}
 				else if (creature->Mood == MoodType::Escape)
@@ -224,7 +224,7 @@ namespace TEN::Entities::Creatures::TR3
 				{
 					creature->MaxTurn /= 4;
 
-					if (TestProbability(1.0f / 128.0f))
+					if (TestProbability(1.0f / 128))
 					{
 						if (TestProbability(0.25f))
 							item->Animation.TargetState = TRIBESMAN_STATE_CROUCH_IDLE;
@@ -255,7 +255,7 @@ namespace TEN::Entities::Creatures::TR3
 				{
 					creature->MaxTurn /= 4;
 
-					if (TestProbability(1.0f / 128.0f))
+					if (TestProbability(1.0f / 128))
 					{
 						if (TestProbability(0.5f))
 							item->Animation.TargetState = TRIBESMAN_STATE_CROUCH_IDLE;
@@ -447,7 +447,7 @@ namespace TEN::Entities::Creatures::TR3
 					extraTorsoRot.x = 0;
 					extraTorsoRot.y = 0;
 
-					if (TestProbability(1.0f / 256.0f))
+					if (TestProbability(1.0f / 256))
 						item->Animation.TargetState = TRIBESMAN_STATE_IDLE;
 
 					break;
@@ -467,7 +467,7 @@ namespace TEN::Entities::Creatures::TR3
 					item->Animation.TargetState = TRIBESMAN_STATE_DART_ATTACK;
 				else if (creature->Mood == MoodType::Bored)
 				{
-					if (TestProbability(0.015f))
+					if (TestProbability(1.0f / 64))
 						item->Animation.TargetState = TRIBESMAN_STATE_WALK_FORWARD;
 					else
 						break;
@@ -488,7 +488,7 @@ namespace TEN::Entities::Creatures::TR3
 					extraTorsoRot.x = 0;
 					extraTorsoRot.y = 0;
 
-					if (TestProbability(1.0f / 256.0f))
+					if (TestProbability(1.0f / 256))
 						item->Animation.TargetState = TRIBESMAN_STATE_CROUCH_IDLE;
 
 					break;
@@ -506,7 +506,7 @@ namespace TEN::Entities::Creatures::TR3
 					item->Animation.TargetState = TRIBESMAN_STATE_WALK_FORWARD;
 				else if (Targetable(item, &AI) && AI.distance < pow(MAX_VISIBILITY_DISTANCE, 2))
 					item->Animation.TargetState = TRIBESMAN_STATE_CROUCH_IDLE;
-				else if (creature->Mood == MoodType::Bored && TestProbability(0.015f))
+				else if (creature->Mood == MoodType::Bored && TestProbability(1.0f / 64))
 					item->Animation.TargetState = TRIBESMAN_STATE_WALK_FORWARD;
 				else
 					item->Animation.TargetState = TRIBESMAN_STATE_RUN_FORWARD;

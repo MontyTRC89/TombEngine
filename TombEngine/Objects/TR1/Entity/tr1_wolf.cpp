@@ -25,7 +25,7 @@ namespace TEN::Entities::Creatures::TR1
 
 	constexpr auto WOLF_WAKE_CHANCE	 = 1.0f / 1000;
 	constexpr auto WOLF_SLEEP_CHANCE = 1.0f / 1000;
-	constexpr auto WOLF_HOWL_CHANCE  = 0.012f;
+	constexpr auto WOLF_HOWL_CHANCE  = 1.0f / 85;
 
 	constexpr auto WOLF_SLEEP_FRAME = 96;
 

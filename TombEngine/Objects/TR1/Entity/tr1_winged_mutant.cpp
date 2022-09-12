@@ -31,8 +31,8 @@ namespace TEN::Entities::Creatures::TR1
 	constexpr auto WINGED_MUTANT_IDLE_JUMP_ATTACK_RANGE = SQUARE(SECTOR(2.5f));
 	constexpr auto WINGED_MUTANT_ATTACK_RANGE			= SQUARE(SECTOR(3.75f));
 
-	constexpr auto WINGED_MUTANT_POSE_CHANCE   = 0.0025f;
-	constexpr auto WINGED_MUTANT_UNPOSE_CHANCE = 0.006f;
+	constexpr auto WINGED_MUTANT_POSE_CHANCE   = 1.0f / 400;
+	constexpr auto WINGED_MUTANT_UNPOSE_CHANCE = 1.0f / 164;
 
 	constexpr auto WINGED_MUTANT_FLY_VELOCITY	= CLICK(1) / 8;
 	constexpr auto WINGED_MUTANT_SHARD_VELOCITY = 250;

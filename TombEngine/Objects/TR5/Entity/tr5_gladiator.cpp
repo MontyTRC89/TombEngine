@@ -152,7 +152,7 @@ namespace TEN::Entities::Creatures::TR5
 				creature->Flags = 0;
 
 				if (item->AIBits & GUARD ||
-					TestProbability(0.03f) &&
+					TestProbability(1.0f / 30) &&
 					(AI.distance > pow(SECTOR(1), 2) || creature->Mood != MoodType::Attack))
 				{
 					joint2 = AIGuard(creature);
@@ -178,7 +178,7 @@ namespace TEN::Entities::Creatures::TR5
 						{
 							if (item->Animation.RequiredState)
 								item->Animation.TargetState = item->Animation.RequiredState;
-							else if (TestProbability(0.015f))
+							else if (TestProbability(1.0f / 64))
 								item->Animation.TargetState = GLADIATOR_STATE_IDLE;
 
 							break;
@@ -235,7 +235,7 @@ namespace TEN::Entities::Creatures::TR5
 					else if (!AI.ahead || AI.distance > pow(SECTOR(1.5f), 2))
 						item->Animation.TargetState = GLADIATOR_STATE_RUN_FORWARD;
 				}
-				else if (TestProbability(0.015f))
+				else if (TestProbability(1.0f / 64))
 				{
 					item->Animation.TargetState = GLADIATOR_STATE_IDLE;
 					break;
@@ -301,7 +301,7 @@ namespace TEN::Entities::Creatures::TR5
 						break;
 					}
 				}
-				else if (Lara.TargetEntity != item || TestProbability(1.0f / 128.0f))
+				else if (Lara.TargetEntity != item || TestProbability(1.0f / 128))
 				{
 					item->Animation.TargetState = GLADIATOR_STATE_IDLE;
 					break;

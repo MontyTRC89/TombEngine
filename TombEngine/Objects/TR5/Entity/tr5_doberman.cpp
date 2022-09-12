@@ -194,13 +194,13 @@ namespace TEN::Entities::Creatures::TR5
 				break;
 
 			case DOBERMAN_STATE_SIT_IDLE:
-				if (creature->Mood != MoodType::Bored || TestProbability(1.0f / 128.0f))
+				if (creature->Mood != MoodType::Bored || TestProbability(1.0f / 128))
 					item->Animation.TargetState = DOBERMAN_STATE_STOP;
 
 				break;
 
 			case DOBERMAN_STATE_STAND_IDLE:
-				if (creature->Mood != MoodType::Bored || TestProbability(0.015f))
+				if (creature->Mood != MoodType::Bored || TestProbability(1.0f / 64))
 					item->Animation.TargetState = DOBERMAN_STATE_STOP;
 
 				break;

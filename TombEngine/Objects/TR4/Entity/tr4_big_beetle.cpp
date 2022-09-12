@@ -122,7 +122,7 @@ namespace TEN::Entities::TR4
 			angle = CreatureTurn(item, creature->MaxTurn);
 
 			if (item->HitStatus || AI.distance > BIG_BEETLE_AWARE_RANGE ||
-				TestProbability(1.0f / 128.0f))
+				TestProbability(1.0f / 128))
 			{
 				creature->Flags = 0;
 			}

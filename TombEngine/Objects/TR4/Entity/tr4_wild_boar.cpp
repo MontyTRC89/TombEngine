@@ -148,7 +148,7 @@ namespace TEN::Entities::TR4
 
 				if (AI.ahead && AI.distance)
 					item->Animation.TargetState = BOAR_STATE_IDLE;
-				else if (TestProbability(1.0f / 128.0f))
+				else if (TestProbability(1.0f / 128))
 					item->Animation.TargetState = BOAR_STATE_IDLE;
 
 				break;

@@ -255,7 +255,7 @@ namespace TEN::Entities::TR4
 				joint1 = 0;
 				joint2 = 0;
 
-				if (AI.distance < MUMMY_ACTIVATE_RANGE || TestProbability(1.0f / 128.0f))
+				if (AI.distance < MUMMY_ACTIVATE_RANGE || TestProbability(1.0f / 128))
 				{
 					item->Animation.TargetState = MUMMY_STATE_COLLAPSED_TO_IDLE;
 					item->HitPoints = Objects[item->ObjectNumber].HitPoints;

@@ -1215,7 +1215,7 @@ namespace TEN::Entities::TR4
 			case BADDY_STATE_BLIND:
 				if (!FlashGrenadeAftershockTimer)
 				{
-					if (TestProbability(1.0f / 128.0f))
+					if (TestProbability(1.0f / 128))
 						item->Animation.TargetState = BADDY_STATE_IDLE;
 				}
 

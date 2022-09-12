@@ -25,7 +25,7 @@ namespace TEN::Entities::Creatures::TR1
 {
 	constexpr auto CENTAUR_REAR_DAMAGE = 200;
 	constexpr auto CENTAUR_REAR_RANGE = SECTOR(1.5f);
-	constexpr auto CENTAUR_REAR_CHANCE = 0.003f;
+	constexpr auto CENTAUR_REAR_CHANCE = 1.0f / 340;
 	constexpr auto CENTAUR_BOMB_VELOCITY = 20;
 
 	#define CENTAUR_TURN_RATE_MAX ANGLE(4.0f)

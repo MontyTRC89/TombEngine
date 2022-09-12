@@ -149,7 +149,7 @@ namespace TEN::Entities::Creatures::TR3
 				{
 					extraHeadRot.y = AIGuard(creature);
 
-					if (TestProbability(1.0f / 128.0f))
+					if (TestProbability(1.0f / 128))
 						item->Animation.TargetState = 4;
 
 					break;
@@ -165,9 +165,9 @@ namespace TEN::Entities::Creatures::TR3
 					else
 						item->Animation.TargetState = 2;
 				}
-				else if (creature->Mood == MoodType::Bored && AI.ahead && TestProbability(1.0f / 128.0f))
+				else if (creature->Mood == MoodType::Bored && AI.ahead && TestProbability(1.0f / 128))
 					item->Animation.TargetState = 4;
-				else if (creature->Mood == MoodType::Attack || TestProbability(1.0f / 128.0f))
+				else if (creature->Mood == MoodType::Attack || TestProbability(1.0f / 128))
 					item->Animation.TargetState = 2;
 
 				break;
@@ -179,7 +179,7 @@ namespace TEN::Entities::Creatures::TR3
 				{
 					extraHeadRot.y = AIGuard(creature);
 
-					if (TestProbability(1.0f / 128.0f))
+					if (TestProbability(1.0f / 128))
 						item->Animation.TargetState = 1;
 
 					break;
@@ -188,7 +188,7 @@ namespace TEN::Entities::Creatures::TR3
 					AI.distance < pow(SECTOR(4), 2) &&
 					(realEnemy != LaraItem || creature->HurtByLara) ||
 					creature->Mood != MoodType::Bored ||
-					TestProbability(1.0f / 128.0f)))
+					TestProbability(1.0f / 128)))
 				{
 					item->Animation.TargetState = 1;
 				}

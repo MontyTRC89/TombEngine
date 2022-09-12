@@ -24,8 +24,8 @@ namespace TEN::Entities::Creatures::TR3
 	constexpr auto RAPTOR_JUMP_ATTACK_RANGE = SQUARE(SECTOR(1.5f));
 	constexpr auto RAPTOR_RUN_ATTACK_RANGE	= SQUARE(SECTOR(1.5f));
 
-	constexpr auto RAPTOR_ROAR_CHANCE		   = 0.004f;
-	constexpr auto RAPTOR_SWITCH_TARGET_CHANCE = 0.008f;
+	constexpr auto RAPTOR_ROAR_CHANCE		   = 1.0f / 256;
+	constexpr auto RAPTOR_SWITCH_TARGET_CHANCE = 1.0f / 128;
 
 	#define RAPTOR_WALK_TURN_RATE_MAX	ANGLE(2.0f)
 	#define RAPTOR_RUN_TURN_RATE_MAX	ANGLE(2.0f)
@@ -124,7 +124,7 @@ namespace TEN::Entities::Creatures::TR3
 
 				if (nearestItem != nullptr &&
 					(nearestItem->ObjectNumber != ID_RAPTOR ||
-						(TestProbability(0.03f) && minDistance < SQUARE(SECTOR(2)))))
+						(TestProbability(1.0f / 30) && minDistance < SQUARE(SECTOR(2)))))
 				{
 					creature->Enemy = nearestItem;
 				}

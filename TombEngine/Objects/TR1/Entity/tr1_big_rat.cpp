@@ -27,7 +27,7 @@ namespace TEN::Entities::Creatures::TR1
 	constexpr auto BIG_RAT_POUNCE_ATTACK_RANGE	   = SQUARE(SECTOR(0.5f));
 	constexpr auto BIG_RAT_WATER_BITE_ATTACK_RANGE = SQUARE(SECTOR(0.3f));
 
-	constexpr auto BIG_RAT_REAR_POSE_CHANCE = 1.0f / 128.0f;
+	constexpr auto BIG_RAT_REAR_POSE_CHANCE = 1.0f / 128;
 	constexpr auto BIG_RAT_SWIM_UP_DOWN_SPEED = 32;
 	constexpr auto BIG_RAT_WATER_SURFACE_OFFSET = 10;
 

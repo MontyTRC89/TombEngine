@@ -434,7 +434,7 @@ namespace TEN::Entities::Creatures::TR3
 
 				if (Targetable(item, &AI))
 					item->Animation.TargetState = MPGUN_STATE_CROUCH_AIM;
-				else if (item->HitStatus || !cover || (AI.ahead && TestProbability(0.03f)))
+				else if (item->HitStatus || !cover || (AI.ahead && TestProbability(1.0f / 30)))
 					item->Animation.TargetState = MPGUN_STATE_STAND;
 				else
 					item->Animation.TargetState = MPGUN_STATE_CROUCH_WALK;
@@ -472,7 +472,7 @@ namespace TEN::Entities::Creatures::TR3
 				if (AI.ahead)
 					head = AI.angle;
 
-				if (Targetable(item, &AI) || item->HitStatus || !cover || (AI.ahead && TestProbability(0.03f)))
+				if (Targetable(item, &AI) || item->HitStatus || !cover || (AI.ahead && TestProbability(1.0f / 30)))
 					item->Animation.TargetState = MPGUN_STATE_CROUCHED;
 
 				break;

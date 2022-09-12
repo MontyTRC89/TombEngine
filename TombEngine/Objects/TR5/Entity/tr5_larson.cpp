@@ -202,7 +202,7 @@ namespace TEN::Entities::Creatures::TR5
 				if (AI.ahead)
 					joint2 = AI.angle;
 
-				if (creature->Mood == MoodType::Bored && TestProbability(0.003f))
+				if (creature->Mood == MoodType::Bored && TestProbability(1.0f / 340))
 				{
 					item->Animation.TargetState = STATE_TR5_LARSON_STOP;
 					item->Animation.RequiredState = STATE_TR5_LARSON_IDLE;
@@ -298,7 +298,7 @@ namespace TEN::Entities::Creatures::TR5
 					item->Animation.TargetState = STATE_TR5_LARSON_STOP;
 				else
 				{
-					if (TestProbability(0.003f))
+					if (TestProbability(1.0f / 340))
 					{
 						item->Animation.TargetState = STATE_TR5_LARSON_STOP;
 						item->Animation.RequiredState = STATE_TR5_LARSON_WALK;

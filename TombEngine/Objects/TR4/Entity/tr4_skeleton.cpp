@@ -358,7 +358,7 @@ namespace TEN::Entities::TR4
 				creature->Flags = 0;
 
 				if (item->AIBits & GUARD ||
-					TestProbability(0.03f) &&
+					TestProbability(1.0f / 30) &&
 					(AI.distance > pow(SECTOR(1), 2) ||
 						creature->Mood != MoodType::Attack))
 				{
@@ -649,7 +649,7 @@ namespace TEN::Entities::TR4
 					else
 						item->Animation.TargetState = 2;
 				}
-				else if (Lara.TargetEntity != item || item->MeshBits != -1 || Lara.Control.Weapon.GunType != LaraWeaponType::Shotgun || TestProbability(1.0f / 128.0f))
+				else if (Lara.TargetEntity != item || item->MeshBits != -1 || Lara.Control.Weapon.GunType != LaraWeaponType::Shotgun || TestProbability(1.0f / 128))
 					item->Animation.TargetState = 2;
 				
 				break;
@@ -709,7 +709,7 @@ namespace TEN::Entities::TR4
 
 				if (GetCollision(item).Position.Floor <= (item->Pose.Position.y + SECTOR(1)))
 				{
-					if (TestProbability(0.03f))
+					if (TestProbability(1.0f / 30))
 						item->Animation.TargetState = 14;
 				}
 				else
