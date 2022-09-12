@@ -24,13 +24,10 @@ Version 1.0.2
 * Fix Lara's subway train death so that she no longer slides slowly after the animation has finished. 
 
 Lua API changes:
+
 * Timer.lua, EventSequence.lua and Util.lua have been moved to a subfolder, Engine.
 * LevelFuncs can now contain tables as well as functions. These tables can contain functions and other tables, and so forth.
-* Moveable functions SetOnHit, SetOnKilled, SetOnCollidedWithObject and SetOnCollidedWithRoom no longer take strings, and instead take function objects themselves. The function still has to be in the LevelFuncs hierarchy:
-Before:
-baddy:SetOnHit("HealLara")
-After:
-baddy:SetOnHit(LevelFuncs.HealLara)
+* Moveable functions SetOnHit, SetOnKilled, SetOnCollidedWithObject and SetOnCollidedWithRoom no longer take strings, and instead take function objects themselves.
 * EventSequence and Timer no longer require you to call Timer.UpdateAll in OnControlPhase.
 * TEN.Logic.AddCallback and TEN.Logic.RemoveCallback have been added.
 * GiveItem, TakeItem, and SetItemCount have been reworked (e.g. SetItemCount with a value of -1 can give infinite ammo/consumables).
