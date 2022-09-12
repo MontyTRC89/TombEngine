@@ -169,7 +169,7 @@ namespace TEN::Entities::TR4
 					creature->Flags++;
 					creature->MaxTurn = 0;
 
-					if (creature->Flags > 300 && TestProbability(0.004f))
+					if (creature->Flags > 300 && TestProbability(1.0f / 256.0f))
 						item->Animation.TargetState = DOG_STATE_IDLE;
 				}
 
@@ -202,7 +202,7 @@ namespace TEN::Entities::TR4
 				else
 				{
 					if (item->Animation.ActiveState == DOG_STATE_STALK_IDLE &&
-						TestProbability(0.004f))
+						TestProbability(1.0f / 256.0f))
 					{
 						item->Animation.TargetState = DOG_STATE_IDLE;
 						break;
@@ -243,7 +243,7 @@ namespace TEN::Entities::TR4
 					creature->MaxTurn = ANGLE(1.0f);
 					creature->Flags = 0;
 
-					if (TestProbability(0.008f))
+					if (TestProbability(1.0f / 128.0f))
 					{
 						if (item->AIBits & MODIFY)
 						{
@@ -279,7 +279,7 @@ namespace TEN::Entities::TR4
 
 				if (item->AIBits & PATROL1)
 					item->Animation.TargetState = DOG_STATE_WALK_FORWARD;
-				else if (creature->Mood == MoodType::Bored && TestProbability(0.008f))
+				else if (creature->Mood == MoodType::Bored && TestProbability(1.0f / 128.0f))
 					item->Animation.TargetState = DOG_STATE_IDLE;
 				else
 					item->Animation.TargetState = DOG_STATE_STALK;

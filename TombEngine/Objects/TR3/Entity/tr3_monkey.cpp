@@ -421,7 +421,7 @@ namespace TEN::Entities::Creatures::TR3
 					item->Animation.TargetState = MONKEY_STATE_RUN_FORWARD;
 				else if (creature->Mood == MoodType::Bored)
 				{
-					if (TestProbability(0.008f))
+					if (TestProbability(1.0f / 128.0f))
 						item->Animation.TargetState = MONKEY_STATE_SIT;
 				}
 				else if (AI.bite && AI.distance < pow(682, 2))

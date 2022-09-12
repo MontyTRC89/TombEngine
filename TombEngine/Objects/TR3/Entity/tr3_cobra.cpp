@@ -47,11 +47,6 @@ namespace TEN::Entities::Creatures::TR3
 		COBRA_ANIM_DEATH = 4
 	};
 
-	enum CobraFlags
-	{
-		COBRA_FLAG_ATTACKING = (1 << 0)
-	};
-
 	void InitialiseCobra(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
@@ -155,12 +150,12 @@ namespace TEN::Entities::Creatures::TR3
 				break;
 
 			case COBRA_STATE_ATTACK:
-				if (!(creature->Flags & COBRA_FLAG_ATTACKING) &&
+				if (!(creature->Flags & 1) && // 1 = is attacking.
 					item->TestBits(JointBitType::Touch, CobraAttackJoints))
 				{
 					DoDamage(creature->Enemy, COBRA_BITE_ATTACK_DAMAGE);
 					CreatureEffect(item, CobraBite, DoBloodSplat);
-					creature->Flags |= COBRA_FLAG_ATTACKING;
+					creature->Flags |= 1; // 1 = is attacking.
 
 					if (creature->Enemy->IsLara())
 						GetLaraInfo(creature->Enemy)->PoisonPotency += COBRA_BITE_POISON_POTENCY;

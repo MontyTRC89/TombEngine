@@ -91,7 +91,7 @@ namespace TEN::Entities::Creatures::TR2
 					item->Animation.TargetState = item->Animation.RequiredState;
 				else if (info->Mood == MoodType::Bored)
 				{
-					if (TestProbability(0.008f) || !isLaraAlive)
+					if (TestProbability(1.0f / 128.0f) || !isLaraAlive)
 						item->Animation.TargetState = 7;
 					else if (TestProbability(0.015f))
 						item->Animation.TargetState = 9;
@@ -119,7 +119,7 @@ namespace TEN::Entities::Creatures::TR2
 				{
 					if (isLaraAlive)
 					{
-						if (TestProbability(0.008f))
+						if (TestProbability(1.0f / 128.0f))
 							item->Animation.TargetState = 2;
 						else if (TestProbability(0.015f))
 							item->Animation.TargetState = 9;
@@ -143,7 +143,7 @@ namespace TEN::Entities::Creatures::TR2
 					item->Animation.TargetState = 2;
 				else if (info->Mood == MoodType::Bored)
 				{
-					if (TestProbability(0.008f) || !isLaraAlive)
+					if (TestProbability(1.0f / 128.0f) || !isLaraAlive)
 						item->Animation.TargetState = 7;
 					else if (TestProbability(0.015f))
 						item->Animation.TargetState = 2;
@@ -168,7 +168,7 @@ namespace TEN::Entities::Creatures::TR2
 					item->Animation.TargetState = 1;
 				else if (info->Mood == MoodType::Bored)
 				{
-					if (TestProbability(0.008f) || !isLaraAlive)
+					if (TestProbability(1.0f / 128.0f) || !isLaraAlive)
 					{
 						item->Animation.TargetState = 2;
 						item->Animation.RequiredState = 7;

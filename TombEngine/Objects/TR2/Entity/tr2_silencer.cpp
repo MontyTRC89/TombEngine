@@ -236,7 +236,7 @@ namespace TEN::Entities::Creatures::TR2
 				}
 				else
 				{
-					if (creature->Mood == MoodType::Attack || TestProbability(0.008f))
+					if (creature->Mood == MoodType::Attack || TestProbability(1.0f / 128.0f))
 						item->Animation.TargetState = SILENCER_STATE_IDLE_FRAME;
 
 					if (!AI.ahead)

@@ -301,7 +301,7 @@ namespace TEN::Entities::Creatures::TR5
 						break;
 					}
 				}
-				else if (Lara.TargetEntity != item || TestProbability(0.008f))
+				else if (Lara.TargetEntity != item || TestProbability(1.0f / 128.0f))
 				{
 					item->Animation.TargetState = GLADIATOR_STATE_IDLE;
 					break;

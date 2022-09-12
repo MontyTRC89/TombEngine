@@ -179,7 +179,7 @@ namespace TEN::Entities::Creatures::TR3
 				if (item->AIBits & GUARD)
 				{
 					head = AIGuard(creature);
-					if (TestProbability(0.004f))
+					if (TestProbability(1.0f / 256.0f))
 					{
 						if (item->Animation.ActiveState == MPSTICK_STATE_STOP)
 							item->Animation.TargetState = MPSTICK_STATE_WAIT;
@@ -234,7 +234,7 @@ namespace TEN::Entities::Creatures::TR3
 					item->Animation.TargetState = MPSTICK_STATE_RUN;
 				else if (creature->Mood == MoodType::Bored)
 				{
-					if (TestProbability(0.008f))
+					if (TestProbability(1.0f / 128.0f))
 					{
 						item->Animation.RequiredState = MPSTICK_STATE_WAIT;
 						item->Animation.TargetState = MPSTICK_STATE_STOP;

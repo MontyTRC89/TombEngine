@@ -23,8 +23,8 @@ namespace TEN::Entities::Creatures::TR1
 	constexpr auto WOLF_ATTACK_RANGE = SQUARE(SECTOR(1.5f));
 	constexpr auto WOLF_STALK_RANGE	 = SQUARE(SECTOR(2));
 
-	constexpr auto WOLF_WAKE_CHANCE	 = 0.00095f;
-	constexpr auto WOLF_SLEEP_CHANCE = 0.00095f;
+	constexpr auto WOLF_WAKE_CHANCE	 = 1.0f / 1000;
+	constexpr auto WOLF_SLEEP_CHANCE = 1.0f / 1000;
 	constexpr auto WOLF_HOWL_CHANCE  = 0.012f;
 
 	constexpr auto WOLF_SLEEP_FRAME = 96;

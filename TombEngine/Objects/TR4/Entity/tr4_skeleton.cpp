@@ -649,7 +649,7 @@ namespace TEN::Entities::TR4
 					else
 						item->Animation.TargetState = 2;
 				}
-				else if (Lara.TargetEntity != item || item->MeshBits != -1 || Lara.Control.Weapon.GunType != LaraWeaponType::Shotgun || TestProbability(0.008f))
+				else if (Lara.TargetEntity != item || item->MeshBits != -1 || Lara.Control.Weapon.GunType != LaraWeaponType::Shotgun || TestProbability(1.0f / 128.0f))
 					item->Animation.TargetState = 2;
 				
 				break;
