@@ -590,7 +590,6 @@ namespace TEN::Entities::TR5
 									ShatterObject(0, mesh, -64, LaraItem->RoomNumber, 0);
 									SoundEffect(GetShatterSound(mesh->staticNumber), (PoseData*)mesh);
 
-									mesh->flags &= ~StaticMeshFlags::SM_VISIBLE;
 									floor->Stopper = false;
 
 									TestTriggers(pos.x, pos.y, pos.z, item->RoomNumber, true);

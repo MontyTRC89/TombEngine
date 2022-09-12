@@ -1,5 +1,7 @@
 #pragma once
 
+struct Vector3Int;
+
 namespace sol {
 	class state;
 }
@@ -15,6 +17,9 @@ public:
 
 	Vec3(int x, int y, int z);
 	Vec3(PoseData const& pos);
+	Vec3(Vector3i const& pos);
+
+	operator Vector3i() const;
 
 	[[nodiscard]] std::string ToString() const;
 

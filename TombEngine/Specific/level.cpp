@@ -163,8 +163,6 @@ void LoadItems()
 	if (g_Level.NumItems == 0)
 		return;
 
-	g_Level.Items.resize(NUM_ITEMS);
-
 	InitialiseItemArray(NUM_ITEMS);
 
 	if (g_Level.NumItems > 0)
@@ -787,6 +785,7 @@ void ReadRooms()
 			mesh.HitPoints = ReadInt16();
 			mesh.luaName = ReadString();
 
+			mesh.roomNumber = i;
 			g_GameScriptEntities->AddName(mesh.luaName, mesh);
 		}
 
@@ -995,17 +994,17 @@ void LoadEventSets()
 
 		eventSet.OnEnter.Mode = (VolumeEventMode)ReadInt32();
 		eventSet.OnEnter.Function = ReadString();
-		eventSet.OnEnter.Argument = ReadString();
+		eventSet.OnEnter.Data = ReadString();
 		eventSet.OnEnter.CallCounter = ReadInt32();
 
 		eventSet.OnInside.Mode = (VolumeEventMode)ReadInt32();
 		eventSet.OnInside.Function = ReadString();
-		eventSet.OnInside.Argument = ReadString();
+		eventSet.OnInside.Data = ReadString();
 		eventSet.OnInside.CallCounter = ReadInt32();
 
 		eventSet.OnLeave.Mode = (VolumeEventMode)ReadInt32();
 		eventSet.OnLeave.Function = ReadString();
-		eventSet.OnLeave.Argument = ReadString();
+		eventSet.OnLeave.Data = ReadString();
 		eventSet.OnLeave.CallCounter = ReadInt32();
 
 		g_Level.EventSets.push_back(eventSet);
@@ -1091,7 +1090,7 @@ unsigned int _stdcall LoadLevel(void* data)
 		{
 			if (assemblyVersion[i] < version[i])
 			{
-				TENLog("Level version is higher than TEN version. Please update TEN.", LogLevel::Warning);
+				TENLog("Level version is different from TEN version.", LogLevel::Warning);
 				break;
 			}
 		}
@@ -1321,11 +1320,11 @@ void LoadSprites()
 		spr->y4 = ReadFloat();
 	}
 
-	g_Level.NumSpritesSequences = ReadInt32();
+	int numSequences = ReadInt32();
 
-	TENLog("Num sprite sequences: " + std::to_string(g_Level.NumSpritesSequences), LogLevel::Info);
+	TENLog("Num sprite sequences: " + std::to_string(numSequences), LogLevel::Info);
 
-	for (int i = 0; i < g_Level.NumSpritesSequences; i++)
+	for (int i = 0; i < numSequences; i++)
 	{
 		int spriteID = ReadInt32();
 		short negLength = ReadInt16();

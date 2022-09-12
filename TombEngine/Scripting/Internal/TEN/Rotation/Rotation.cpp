@@ -1,6 +1,8 @@
 #include "framework.h"
 #include "Rotation.h"
+
 #include "Math/Math.h"
+#include "ReservedScriptNames.h"
 
 /*** Represents a rotation.
 Rotations are specifed as a combination of individual
@@ -13,7 +15,7 @@ All values will be clamped to [-32768, 32767].
 void Rotation::Register(sol::table & parent)
 {
 	using ctors = sol::constructors<Rotation(int, int, int)>;
-	parent.new_usertype<Rotation>("Rotation",
+	parent.new_usertype<Rotation>(ScriptReserved_Rotation,
 		ctors(),
 		sol::call_constructor, ctors(),
 		sol::meta_function::to_string, &Rotation::ToString,

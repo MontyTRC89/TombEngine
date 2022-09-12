@@ -419,7 +419,7 @@ void PlaySoundTrack(std::string track, SoundTrackType mode, QWORD position)
 			fullTrackName = TRACKS_PATH + track + ".wav";
 			if (!std::filesystem::exists(fullTrackName))
 			{
-				TENLog("No soundtrack files with name '" + track + "' were found", LogLevel::Error);
+				TENLog("No soundtrack files with name '" + track + "' were found", LogLevel::Warning);
 				return;
 			}
 		}

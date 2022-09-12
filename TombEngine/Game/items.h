@@ -70,8 +70,11 @@ struct EntityAnimationData
 struct ItemInfo
 {
 	GAME_OBJECT_ID ObjectNumber;
+
 	int Status;	// ItemStatus enum.
 	bool Active;
+
+	short Index;
 	short NextItem;
 	short NextActive;
 

@@ -63,6 +63,15 @@ Vec3::Vec3(PoseData const& pos) : x{pos.Position.x}, y{pos.Position.y}, z{pos.Po
 {
 }
 
+Vec3::Vec3(Vector3i const& pos) : x{pos.x}, y{pos.y}, z{pos.z}
+{
+}
+
+Vec3::operator Vector3i() const
+{
+	return Vector3i{ x, y, z };
+};
+
 void Vec3::StoreInPHDPos(PoseData& pos) const
 {
 	pos.Position.x = x;

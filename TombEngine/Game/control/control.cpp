@@ -444,9 +444,8 @@ GameStatus DoTitle(int index, std::string const& ambient)
 		g_Gui.SetMenuToDisplay(Menu::Title);
 		g_Gui.SetSelectedOption(0);
 
-		// Initialise ponytails
 		InitialiseHair();
-
+		InitialiseNodeScripts();
 		InitialiseItemBoxData();
 
 		g_GameScript->OnStart();
@@ -570,9 +569,8 @@ GameStatus DoLevel(int index, std::string const& ambient, bool loadFromSavegame)
 	// Initialise flyby cameras
 	InitSpotCamSequences();
 
-	// Initialise ponytails
 	InitialiseHair();
-
+	InitialiseNodeScripts();
 	InitialiseItemBoxData();
 
 	if (loadFromSavegame)

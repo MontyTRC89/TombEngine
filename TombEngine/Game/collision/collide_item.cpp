@@ -1817,10 +1817,6 @@ void DoObjectCollision(ItemInfo* laraItem, CollisionInfo* coll)
 			{
 				SoundEffect(GetShatterSound(mesh->staticNumber), (PoseData*)mesh);
 				ShatterObject(nullptr, mesh, -128, laraItem->RoomNumber, 0);
-				SmashedMeshRoom[SmashedMeshCount] = laraItem->RoomNumber;
-				SmashedMesh[SmashedMeshCount] = mesh;
-				SmashedMeshCount++;
-				mesh->flags &= ~StaticMeshFlags::SM_VISIBLE;
 			}
 			else if (coll->Setup.EnableObjectPush)
 				ItemPushStatic(laraItem, mesh, coll);

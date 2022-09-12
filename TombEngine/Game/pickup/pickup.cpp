@@ -1,6 +1,7 @@
 #include "framework.h"
 #include "Game/pickup/pickup.h"
 
+#include "pickuputil.h"
 #include "Game/animation.h"
 #include "Game/camera.h"
 #include "Game/collision/collide_item.h"
@@ -127,10 +128,23 @@ short RPickups[16];
 short getThisItemPlease = NO_ITEM;
 Vector3i OldPickupPos;
 
-void PickedUpObject(GAME_OBJECT_ID objectID, int count)
+bool SetInventoryCount(GAME_OBJECT_ID objectID, int count)
+{
+	if (!TryModifyWeapon(Lara, objectID, count, ModificationType::Set) &&
+		!TryModifyingAmmo(Lara, objectID, count, ModificationType::Set) &&
+		!TryModifyingKeyItem(Lara, objectID, count, ModificationType::Set) &&
+		!TryModifyingConsumable(Lara, objectID, count, ModificationType::Set) &&
+		!TryModifyMiscCount(Lara, objectID, count, ModificationType::Set))
+	{
+		return false;
+	}
+	return true;
+}
+
+void PickedUpObject(GAME_OBJECT_ID objectID, std::optional<int> count)
 {
 	// See if the items fit into one of these easy groups.
-	if (!TryAddingWeapon(Lara, objectID, count) &&
+	if (!TryAddingWeapon(Lara, objectID) &&
 		!TryAddingAmmo(Lara, objectID, count) &&
 		!TryAddingKeyItem(Lara, objectID, count) &&
 		!TryAddingConsumable(Lara, objectID, count) &&
@@ -165,10 +179,10 @@ int GetInventoryCount(GAME_OBJECT_ID objectID)
 	return 0;
 }
 
-void RemoveObjectFromInventory(GAME_OBJECT_ID objectID, int count)
+void RemoveObjectFromInventory(GAME_OBJECT_ID objectID, std::optional<int> count)
 {
 	// See if the items fit into one of these easy groups.
-	if (!TryRemovingWeapon(Lara, objectID, count) && 
+	if (!TryRemovingWeapon(Lara, objectID) && 
 		!TryRemovingAmmo(Lara, objectID, count) && 
 		!TryRemovingKeyItem(Lara, objectID, count) && 
 		!TryRemovingConsumable(Lara, objectID, count) && 
