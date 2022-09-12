@@ -188,8 +188,6 @@ namespace TEN::Entities::Creatures::TR1
 			if (item->HitStatus || AI.distance < APE_PANIC_RANGE)
 				creatureInfo->Flags |= APE_FLAG_ATTACK;
 
-			short random;
-
 			switch (item->Animation.ActiveState)
 			{
 			case APE_STATE_IDLE:

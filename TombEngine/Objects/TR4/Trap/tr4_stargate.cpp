@@ -70,7 +70,7 @@ namespace TEN::Entities::Traps
 			// Blades deal damage cumulatively.
 			for (int i = 0; i < StargateHarmJoints.size(); i++)
 			{
-				if (item->TestBits(JointBitType::Touch, StargateHarmJoints[i]));
+				if (item->TestBits(JointBitType::Touch, StargateHarmJoints[i]))
 				{
 					DoDamage(laraItem, STARGATE_HARM_DAMAGE);
 					DoBloodSplat(
