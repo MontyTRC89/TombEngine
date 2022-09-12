@@ -36,8 +36,8 @@ bool TestLaraPosition(OBJECT_COLLISION_BOUNDS* bounds, ItemInfo* item, ItemInfo*
 bool AlignLaraPosition(Vector3Int* offset, ItemInfo* item, ItemInfo* laraItem);
 bool MoveLaraPosition(Vector3Int* pos, ItemInfo* item, ItemInfo* laraItem);
 
-bool ItemNearLara(PHD_3DPOS* origin, int radius);
-bool ItemNearTarget(PHD_3DPOS* origin, ItemInfo* targetEntity, int radius);
+bool ItemNearLara(Vector3Int* origin, int radius);
+bool ItemNearTarget(Vector3Int* origin, ItemInfo* targetEntity, int radius);
 
 bool Move3DPosTo3DPos(PHD_3DPOS* fromPose, PHD_3DPOS* toPose, int velocity, short angleAdd);
 

@@ -101,7 +101,7 @@ namespace TEN::Entities::Creatures::TR2
 
 		fx->pos.Orientation.z += ANGLE(30.0f);
 
-		if (ItemNearLara(&fx->pos, 200))
+		if (ItemNearLara(&fx->pos.Position, 200))
 		{
 			DoDamage(LaraItem, KNIFE_PROJECTILE_DAMAGE);
 

@@ -491,12 +491,12 @@ static bool ItemInRange(int x, int z, int radius)
 	return ((SQUARE(x) + SQUARE(z)) <= SQUARE(radius));
 }
 
-bool ItemNearLara(PHD_3DPOS* origin, int radius)
+bool ItemNearLara(Vector3Int* origin, int radius)
 {
 	auto target = GameVector(
-		origin->Position.x - LaraItem->Pose.Position.x,
-		origin->Position.y - LaraItem->Pose.Position.y,
-		origin->Position.z - LaraItem->Pose.Position.z
+		origin->x - LaraItem->Pose.Position.x,
+		origin->y - LaraItem->Pose.Position.y,
+		origin->z - LaraItem->Pose.Position.z
 	);
 
 	if (!ItemCollide(target.y, ITEM_RADIUS_YMAX))
@@ -515,9 +515,9 @@ bool ItemNearLara(PHD_3DPOS* origin, int radius)
 	return false;
 }
 
-bool ItemNearTarget(PHD_3DPOS* origin, ItemInfo* targetEntity, int radius)
+bool ItemNearTarget(Vector3Int* origin, ItemInfo* targetEntity, int radius)
 {
-	auto pos = origin->Position - targetEntity->Pose.Position;
+	auto pos = *origin - targetEntity->Pose.Position;
 
 	if (!ItemCollide(pos.y, ITEM_RADIUS_YMAX))
 		return false;

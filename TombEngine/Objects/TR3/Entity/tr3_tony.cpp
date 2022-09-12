@@ -467,7 +467,7 @@ namespace TEN::Entities::Creatures::TR3
 
 		if (!Lara.Burn)
 		{
-			if (ItemNearLara(&fx->pos, 200))
+			if (ItemNearLara(&fx->pos.Position, 200))
 			{
 				LaraItem->HitStatus = true;
 				KillEffect(fxNumber);
