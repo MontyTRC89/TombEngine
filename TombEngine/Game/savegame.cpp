@@ -1305,9 +1305,6 @@ bool SaveGame::Load(int slot)
 
 	ZeroMemory(&Lara, sizeof(LaraInfo));
 
-	// Items
-	InitialiseItemArray(NUM_ITEMS);
-
 	NextItemFree = s->next_item_free();
 	NextItemActive = s->next_item_active();
 

@@ -477,8 +477,6 @@ void InitialiseItem(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
 
-	item->VectorIndex = itemNumber;
-
 	item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex;
 	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 
@@ -572,16 +570,18 @@ short CreateItem()
 
 void InitialiseItemArray(int totalItem)
 {
-	auto* item = &g_Level.Items[g_Level.NumItems];
+	g_Level.Items.clear();
+	g_Level.Items.resize(totalItem);
 
-	NextItemActive = NO_ITEM;
-	NextItemFree = g_Level.NumItems;
+	for (int i = 0; i < totalItem; i++)
+		g_Level.Items[i].Index = i;
+
+	auto* item = &g_Level.Items[g_Level.NumItems];
 
 	if (g_Level.NumItems + 1 < totalItem)
 	{
-		for(int i = g_Level.NumItems + 1; i < totalItem; i++, item++)
+		for (int i = g_Level.NumItems + 1; i < totalItem; i++, item++)
 		{
-			item->VectorIndex = i-1;
 			item->NextItem = i;
 			item->Active = false;
 			item->Data = nullptr;
@@ -589,6 +589,8 @@ void InitialiseItemArray(int totalItem)
 	}
 
 	item->NextItem = NO_ITEM;
+	NextItemActive = NO_ITEM;
+	NextItemFree = g_Level.NumItems;
 }
 
 short SpawnItem(ItemInfo* item, GAME_OBJECT_ID objectNumber)
@@ -645,7 +647,7 @@ void UpdateItemRoom(ItemInfo* item, int height, int xOffset, int zOffset)
 	item->Floor = GetFloorHeight(item->Location, x, z).value_or(NO_HEIGHT);
 
 	if (item->RoomNumber != item->Location.roomNumber)
-		ItemNewRoom(item->VectorIndex, item->Location.roomNumber);
+		ItemNewRoom(item->Index, item->Location.roomNumber);
 }
 
 std::vector<int> FindAllItems(short objectNumber)

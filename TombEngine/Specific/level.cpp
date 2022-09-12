@@ -163,8 +163,6 @@ void LoadItems()
 	if (g_Level.NumItems == 0)
 		return;
 
-	g_Level.Items.resize(NUM_ITEMS);
-
 	InitialiseItemArray(NUM_ITEMS);
 
 	if (g_Level.NumItems > 0)
@@ -173,7 +171,6 @@ void LoadItems()
 		{
 			ItemInfo* item = &g_Level.Items[i];
 
-			item->VectorIndex = i;
 			item->Data = ITEM_DATA{};
 			item->ObjectNumber = from_underlying(ReadInt16());
 			item->RoomNumber = ReadInt16();

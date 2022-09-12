@@ -69,10 +69,12 @@ struct EntityAnimationData
 //todo we need to find good "default states" for a lot of these - squidshire 25/05/2022
 struct ItemInfo
 {
-	short VectorIndex = -1;
 	GAME_OBJECT_ID ObjectNumber;
+
 	int Status;	// ItemStatus enum.
 	bool Active;
+
+	short Index;
 	short NextItem;
 	short NextActive;
 
