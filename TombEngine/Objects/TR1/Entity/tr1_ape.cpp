@@ -25,7 +25,7 @@ namespace TEN::Entities::Creatures::TR1
 	constexpr auto APE_IDLE_JUMP_CHANCE			= 1.0f / 6;
 	constexpr auto APE_IDLE_POUND_CHEST_CHANCE  = 1.0f / 3;
 	constexpr auto APE_IDLE_POUND_GROUND_CHANCE = 1.0f / 2;
-	constexpr auto APE_IDLE_RUN_LEFT_CHANCE		= 1.0f / 1;
+	constexpr auto APE_IDLE_RUN_LEFT_CHANCE		= 1.0f / 2;
 	constexpr auto APE_RUN_JUMP_CHANCE			= APE_IDLE_JUMP_CHANCE / 32;
 	constexpr auto APE_RUN_POUND_CHEST_CHANCE	= APE_IDLE_POUND_CHEST_CHANCE / 32;
 	constexpr auto APE_RUN_POUND_GROUND_CHANCE	= APE_IDLE_POUND_GROUND_CHANCE / 32;
