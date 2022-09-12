@@ -33,22 +33,22 @@
 	EulerAngles::EulerAngles(const Quaternion& quat)
 	{
 		// X axis
-		float sinP = ((quat.w * quat.y) - (quat.z * quat.x)) * 2;
+		float sinX = ((quat.w * quat.y) - (quat.z * quat.x)) * 2;
 		// Use 90 degrees if out of range.
-		if (std::abs(sinP) >= 1)
-			this->x = FROM_RAD(std::copysign(PI_DIV_2, sinP));
+		if (std::abs(sinX) >= 1)
+			this->x = FROM_RAD(std::copysign(PI_DIV_2, sinX));
 		else
-			this->x = FROM_RAD(asin(sinP));
+			this->x = FROM_RAD(asin(sinX));
 
 		// Y axis
-		float sinYCosP = ((quat.w * quat.z) + (quat.x * quat.y)) * 2;
-		float cosYCosP = 1 - (((quat.y * quat.y) * 2) + (quat.z * quat.z));
-		this->y = FROM_RAD(atan2(sinYCosP, cosYCosP));
+		float sinYCosX = ((quat.w * quat.z) + (quat.x * quat.y)) * 2;
+		float cosYCosX = 1 - (((quat.y * quat.y) * 2) + (quat.z * quat.z));
+		this->y = FROM_RAD(atan2(sinYCosX, cosYCosX));
 
 		// Z axis
-		float sinRCosP = ((quat.w * quat.x) + (quat.y * quat.z)) * 2;
-		float cosRCosP = 1 - (((quat.x * quat.x) * 2) + (quat.y * quat.y));
-		this->z = FROM_RAD(atan2(sinRCosP, cosRCosP));
+		float sinZCosX = ((quat.w * quat.x) + (quat.y * quat.z)) * 2;
+		float cosZCosX = 1 - (((quat.x * quat.x) * 2) + (quat.y * quat.y));
+		this->z = FROM_RAD(atan2(sinZCosX, cosZCosX));
 	}
 
 	// TODO: Check.
