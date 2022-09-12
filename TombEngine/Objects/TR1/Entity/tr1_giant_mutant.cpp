@@ -27,8 +27,8 @@ namespace TEN::Entities::Creatures::TR1
 	constexpr auto MUTANT_CLOSE_RANGE  = SQUARE(SECTOR(2.2f));
 
 	// TODO: Unused.
-	constexpr auto MUTANT_ATTACK_1_CHANCE = 0.33f;
-	constexpr auto MUTANT_ATTACK_2_CHANCE = 0.67f;
+	constexpr auto MUTANT_ATTACK_1_CHANCE = 1.0f / 3.0f;
+	constexpr auto MUTANT_ATTACK_2_CHANCE = MUTANT_ATTACK_1_CHANCE * 2;
 
 	#define MUTANT_NEED_TURN ANGLE(45.0f)
 	#define MUTANT_TURN ANGLE(3.0f)
