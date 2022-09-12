@@ -17,12 +17,6 @@
 
 #include "Game/debug/debug.h"
 
-using namespace DirectX;
-using namespace DirectX::SimpleMath;
-
-typedef unsigned int  uint;
-typedef unsigned long ulong;
-
 #if __cplusplus >= 202002L
 #define USE_FEATURE_IF_CPP20(x) x
 #else
@@ -30,3 +24,12 @@ typedef unsigned long ulong;
 #endif
 
 #pragma warning(disable: 4996)
+
+using namespace DirectX;
+using namespace DirectX::SimpleMath;
+
+typedef unsigned char	   uchar;
+typedef unsigned short	   ushort;
+typedef unsigned int	   uint;
+typedef unsigned long	   ulong;
+typedef unsigned long long ulonglong;
