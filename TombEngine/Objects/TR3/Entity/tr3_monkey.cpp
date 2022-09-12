@@ -530,9 +530,7 @@ namespace TEN::Entities::Creatures::TR3
 				{
 					if (!creature->Flags && enemy != nullptr)
 					{
-						if (abs(enemy->Pose.Position.x - item->Pose.Position.x) < CLICK(1) &&
-							abs(enemy->Pose.Position.y - item->Pose.Position.y) <= CLICK(1) &&
-							abs(enemy->Pose.Position.z - item->Pose.Position.z) < CLICK(1))
+						if (Vector3Int::Distance(item->Pose.Position, enemy->Pose.Position) <= CLICK(1))
 						{
 							DoDamage(enemy, 20);
 							CreatureEffect(item, MonkeyBite, DoBloodSplat);
@@ -572,9 +570,7 @@ namespace TEN::Entities::Creatures::TR3
 				{
 					if (creature->Flags != 1 && enemy)
 					{
-						if (abs(enemy->Pose.Position.x - item->Pose.Position.x) < CLICK(1) &&
-							abs(enemy->Pose.Position.y - item->Pose.Position.y) <= CLICK(1) &&
-							abs(enemy->Pose.Position.z - item->Pose.Position.z) < CLICK(1))
+						if (Vector3Int::Distance(item->Pose.Position, creature->Enemy->Pose.Position) <= CLICK(1))
 						{
 							DoDamage(enemy, 25);
 							CreatureEffect(item, MonkeyBite, DoBloodSplat);

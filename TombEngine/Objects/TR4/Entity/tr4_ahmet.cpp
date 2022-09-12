@@ -147,14 +147,14 @@ namespace TEN::Entities::TR4
 			else
 			{
 				SetAnimation(item, AHMET_ANIM_DEATH);
-				Lara.InteractedItem = itemNumber; // TODO: Check if it's really required! -- TokyoSU, 3/8/2022
+				Lara.InteractedItem = itemNumber; // TODO: Check if it's really required! -- TokyoSU 3/8/2022
 			}
 			
 			TriggerAhmetDeathEffect(item);
 		}
 		else
 		{
-			if (item->AIBits != 0) // Does this entity have AI object? NOTE: Previous one checked "& ALL_AIOBJ" -- TokyoSU, 3/8/2022
+			if (item->AIBits != 0) // Does this entity have AI object? NOTE: Previous one checked "& ALL_AIOBJ" -- TokyoSU 3/8/2022
 				GetAITarget(creature);
 
 			AI_INFO AI, laraAI;
@@ -167,7 +167,7 @@ namespace TEN::Entities::TR4
 			}
 			else
 			{
-				int dx = LaraItem->Pose.Position.x - item->Pose.Position.x; // TODO: Make ahmet to not use LaraItem global -- TokyoSU, 3/8/2022
+				int dx = LaraItem->Pose.Position.x - item->Pose.Position.x; // TODO: Make ahmet to not use LaraItem global -- TokyoSU 3/8/2022
 				int dz = LaraItem->Pose.Position.z - item->Pose.Position.z;
 				laraAI.angle = short(phd_atan(dx, dz)) - item->Pose.Orientation.y;
 				laraAI.distance = SQUARE(dx) + SQUARE(dz);
@@ -206,7 +206,7 @@ namespace TEN::Entities::TR4
 				}
 				else if (creature->Mood == MoodType::Bored || creature->Mood == MoodType::Escape)
 				{
-					if (Lara.TargetEntity == item || !AI.ahead) // TODO: Make ahmet not use LaraInfo global. -- TokyoSU, 3/8/2022
+					if (Lara.TargetEntity == item || !AI.ahead) // TODO: Make ahmet not use LaraInfo global. -- TokyoSU 3/8/2022
 						item->Animation.TargetState = AHMET_STATE_RUN_FORWARD;
 					else
 						item->Animation.TargetState = AHMET_STATE_IDLE;
@@ -323,7 +323,8 @@ namespace TEN::Entities::TR4
 					if (!(creature->Flags & 1) &&
 						item->Animation.AnimNumber == (Objects[item->ObjectNumber].animIndex + AHMET_ANIM_JUMP_BITE_ATTACK_CONTINUE))
 					{
-						if (item->Animation.FrameNumber > (g_Level.Anims[item->Animation.AnimNumber].frameBase + 11) && item->TestBits(JointBitType::Touch, AhmetSwipeAttackLeftJoints))
+						if (item->Animation.FrameNumber > (g_Level.Anims[item->Animation.AnimNumber].frameBase + 11) &&
+							item->TestBits(JointBitType::Touch, AhmetSwipeAttackLeftJoints))
 						{
 							DoDamage(creature->Enemy, AHMET_BITE_ATTACK_DAMAGE);
 							CreatureEffect2(item, AhmetBiteJaw, 10, -1, DoBloodSplat);
@@ -351,13 +352,17 @@ namespace TEN::Entities::TR4
 				}
 				else
 				{
-					if (!(creature->Flags & 1) && item->Animation.FrameNumber > (g_Level.Anims[item->Animation.AnimNumber].frameBase + 14) && item->TestBits(JointBitType::Touch, AhmetSwipeAttackLeftJoints))
+					if (!(creature->Flags & 1) &&
+						item->Animation.FrameNumber > (g_Level.Anims[item->Animation.AnimNumber].frameBase + 14) &&
+						item->TestBits(JointBitType::Touch, AhmetSwipeAttackLeftJoints))
 					{
 						DoDamage(creature->Enemy, AHMET_SWIPE_ATTACK_DAMAGE);
 						CreatureEffect2(item, AhmetBiteLeft, 10, -1, DoBloodSplat);
 						creature->Flags |= 1;
 					}
-					else if (!(creature->Flags & 2) && item->Animation.FrameNumber > (g_Level.Anims[item->Animation.AnimNumber].frameBase + 22) && item->TestBits(JointBitType::Touch, AhmetSwipeAttackRightJoints))
+					else if (!(creature->Flags & 2) &&
+						item->Animation.FrameNumber > (g_Level.Anims[item->Animation.AnimNumber].frameBase + 22) &&
+						item->TestBits(JointBitType::Touch, AhmetSwipeAttackRightJoints))
 					{
 						DoDamage(creature->Enemy, AHMET_SWIPE_ATTACK_DAMAGE);
 						CreatureEffect2(item, AhmetBiteRight, 10, -1, DoBloodSplat);

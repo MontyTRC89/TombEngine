@@ -336,7 +336,7 @@ namespace TEN::Entities::Creatures::TR3
 					extraTorsoRot.y = AI.angle;
 				}
 
-				if (enemy->IsLara())
+				if (creature->Enemy->IsLara())
 				{
 					if (!creature->Flags && item->TestBits(JointBitType::Touch, MPStickPunchAttackJoints))
 					{
@@ -348,11 +348,9 @@ namespace TEN::Entities::Creatures::TR3
 				}
 				else
 				{
-					if (!creature->Flags && enemy)
+					if (!creature->Flags && enemy != nullptr)
 					{
-						if (abs(enemy->Pose.Position.x - item->Pose.Position.x) < SECTOR(0.25f) &&
-							abs(enemy->Pose.Position.y - item->Pose.Position.y) <= SECTOR(0.25f) &&
-							abs(enemy->Pose.Position.z - item->Pose.Position.z) < SECTOR(0.25f))
+						if (Vector3Int::Distance(item->Pose.Position, creature->Enemy->Pose.Position) <= SECTOR(0.25f))
 						{
 							DoDamage(enemy, 5);
 							CreatureEffect(item, MPStickBite1, DoBloodSplat);
@@ -373,11 +371,11 @@ namespace TEN::Entities::Creatures::TR3
 					extraTorsoRot.y = AI.angle;
 				}
 
-				if (enemy->IsLara())
+				if (creature->Enemy->IsLara())
 				{
 					if (!creature->Flags && item->TestBits(JointBitType::Touch, MPStickPunchAttackJoints))
 					{
-						DoDamage(enemy, 80);
+						DoDamage(creature->Enemy, 80);
 						CreatureEffect(item, MPStickBite1, DoBloodSplat);
 						SoundEffect(SFX_TR4_LARA_THUD, &item->Pose);
 						creature->Flags = 1;
@@ -385,13 +383,11 @@ namespace TEN::Entities::Creatures::TR3
 				}
 				else
 				{
-					if (!creature->Flags && enemy)
+					if (!creature->Flags && creature->Enemy != nullptr)
 					{
-						if (abs(enemy->Pose.Position.x - item->Pose.Position.x) < SECTOR(0.25f) &&
-							abs(enemy->Pose.Position.y - item->Pose.Position.y) <= SECTOR(0.25f) &&
-							abs(enemy->Pose.Position.z - item->Pose.Position.z) < SECTOR(0.25f))
+						if (Vector3Int::Distance(item->Pose.Position, creature->Enemy->Pose.Position) <= SECTOR(0.25f))
 						{
-							DoDamage(enemy, 5);
+							DoDamage(creature->Enemy, 5);
 							CreatureEffect(item, MPStickBite1, DoBloodSplat);
 							SoundEffect(SFX_TR4_LARA_THUD, &item->Pose);
 							creature->Flags = 1;
@@ -413,11 +409,11 @@ namespace TEN::Entities::Creatures::TR3
 					extraTorsoRot.y = AI.angle;
 				}
 
-				if (enemy->IsLara())
+				if (creature->Enemy->IsLara())
 				{
 					if (creature->Flags != 2 && item->TestBits(JointBitType::Touch, MPStickPunchAttackJoints))
 					{
-						DoDamage(enemy, 100);
+						DoDamage(creature->Enemy, 100);
 						CreatureEffect(item, MPStickBite1, DoBloodSplat);
 						SoundEffect(70, &item->Pose);
 						creature->Flags = 2;
@@ -425,13 +421,11 @@ namespace TEN::Entities::Creatures::TR3
 				}
 				else
 				{
-					if (creature->Flags != 2 && enemy)
+					if (creature->Flags != 2 && creature->Enemy)
 					{
-						if (abs(enemy->Pose.Position.x - item->Pose.Position.x) < SECTOR(0.25f) &&
-							abs(enemy->Pose.Position.y - item->Pose.Position.y) <= SECTOR(0.25f) &&
-							abs(enemy->Pose.Position.z - item->Pose.Position.z) < SECTOR(0.25f))
+						if (Vector3Int::Distance(item->Pose.Position, creature->Enemy->Pose.Position) <= SECTOR(0.25f))
 						{
-							DoDamage(enemy, 6);
+							DoDamage(creature->Enemy, 6);
 							CreatureEffect(item, MPStickBite1, DoBloodSplat);
 							SoundEffect(SFX_TR4_LARA_THUD, &item->Pose);
 							creature->Flags = 2;
@@ -447,12 +441,12 @@ namespace TEN::Entities::Creatures::TR3
 				if (AI.ahead)
 					extraTorsoRot.y = AI.angle;
 
-				if (enemy->IsLara())
+				if (creature->Enemy->IsLara())
 				{
 					if (creature->Flags != 1 && item->TestBits(JointBitType::Touch, MPStickKickAttackJoints) &&
 						item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 8)
 					{
-						DoDamage(enemy, 150);
+						DoDamage(creature->Enemy, 150);
 						CreatureEffect(item, MPStickBite2, DoBloodSplat);
 						SoundEffect(SFX_TR4_LARA_THUD, &item->Pose);
 						creature->Flags = 1;
@@ -460,14 +454,12 @@ namespace TEN::Entities::Creatures::TR3
 				}
 				else
 				{
-					if (!creature->Flags != 1 && enemy &&
+					if (!creature->Flags != 1 && creature->Enemy &&
 						item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 8)
 					{
-						if (abs(enemy->Pose.Position.x - item->Pose.Position.x) < SECTOR(0.25f) &&
-							abs(enemy->Pose.Position.y - item->Pose.Position.y) <= SECTOR(0.25f) &&
-							abs(enemy->Pose.Position.z - item->Pose.Position.z) < SECTOR(0.25f))
+						if (Vector3Int::Distance(item->Pose.Position, creature->Enemy->Pose.Position) <= SECTOR(0.25f))
 						{
-							DoDamage(enemy, 9);
+							DoDamage(creature->Enemy, 9);
 							CreatureEffect(item, MPStickBite2, DoBloodSplat);
 							SoundEffect(SFX_TR4_LARA_THUD, &item->Pose);
 							creature->Flags = 1;

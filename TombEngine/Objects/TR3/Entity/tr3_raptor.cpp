@@ -263,10 +263,7 @@ namespace TEN::Entities::Creatures::TR3
 				{
 					if (!(creature->Flags & 1) && creature->Enemy != nullptr)
 					{
-						auto direction = creature->Enemy->Pose.Position - item->Pose.Position;
-						if (abs(direction.x) < SECTOR(0.5f) &&
-							abs(direction.y) < SECTOR(0.5f) &&
-							abs(direction.z) < SECTOR(0.5f))
+						if (Vector3Int::Distance(item->Pose.Position, creature->Enemy->Pose.Position) <= SECTOR(0.5f))
 						{
 							if (creature->Enemy->HitPoints <= 0)
 								creature->Flags |= 2;
@@ -303,10 +300,7 @@ namespace TEN::Entities::Creatures::TR3
 				{
 					if (!(creature->Flags & 1) && creature->Enemy != nullptr)
 					{
-						auto direction = creature->Enemy->Pose.Position - item->Pose.Position;
-						if (abs(direction.x) < SECTOR(0.5f) &&
-							abs(direction.y) < SECTOR(0.5f) &&
-							abs(direction.z) < SECTOR(0.5f))
+						if (Vector3Int::Distance(item->Pose.Position, creature->Enemy->Pose.Position) <= SECTOR(0.5f))
 						{
 							if (creature->Enemy->HitPoints <= 0)
 								creature->Flags |= 2;
@@ -342,10 +336,7 @@ namespace TEN::Entities::Creatures::TR3
 				{
 					if (!(creature->Flags & 1) && creature->Enemy != nullptr)
 					{
-						auto direction = creature->Enemy->Pose.Position - item->Pose.Position;
-						if (abs(direction.x) < SECTOR(0.5f) &&
-							abs(direction.y) < SECTOR(0.5f) &&
-							abs(direction.z) < SECTOR(0.5f))
+						if (Vector3Int::Distance(item->Pose.Position, creature->Enemy->Pose.Position) <= SECTOR(0.5f))
 						{
 							if (creature->Enemy->HitPoints <= 0)
 								creature->Flags |= 2;

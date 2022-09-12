@@ -310,7 +310,8 @@ namespace TEN::Entities::Creatures::TR3
 				}
 
 				if (item->Animation.AnimNumber == Objects[ID_MP_WITH_GUN].animIndex + 12 ||
-					(item->Animation.AnimNumber == Objects[ID_MP_WITH_GUN].animIndex + 1 && item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + 10))
+					(item->Animation.AnimNumber == Objects[ID_MP_WITH_GUN].animIndex + 1 &&
+						item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + 10))
 				{
 					if (!ShotLara(item, &AI, MPGunBite, extraTorsoRot.y, 32))
 						item->Animation.RequiredState = MPGUN_STATE_WAIT;
@@ -384,8 +385,10 @@ namespace TEN::Entities::Creatures::TR3
 					extraTorsoRot.y = AI.angle;
 				}
 
-				if ((item->Animation.AnimNumber == Objects[ID_MP_WITH_GUN].animIndex + 18 && item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + 17) ||
-					(item->Animation.AnimNumber == Objects[ID_MP_WITH_GUN].animIndex + 19 && item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + 6))
+				if ((item->Animation.AnimNumber == Objects[ID_MP_WITH_GUN].animIndex + 18 &&
+						item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + 17) ||
+					(item->Animation.AnimNumber == Objects[ID_MP_WITH_GUN].animIndex + 19 &&
+						item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + 6))
 				{
 					if (!ShotLara(item, &AI, MPGunBite, extraTorsoRot.y, 32))
 						item->Animation.RequiredState = MPGUN_STATE_WALK;

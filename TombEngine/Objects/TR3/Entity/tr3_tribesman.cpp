@@ -313,10 +313,7 @@ namespace TEN::Entities::Creatures::TR3
 				{
 					if (creature->Enemy != nullptr)
 					{
-						auto direction = creature->Enemy->Pose.Position - item->Pose.Position;
-						if (abs(direction.x) < SECTOR(0.5f) &&
-							abs(direction.y) < SECTOR(0.5f) &&
-							abs(direction.z) < SECTOR(0.5f) &&
+						if (Vector3Int::Distance(item->Pose.Position, creature->Enemy->Pose.Position) <= SECTOR(0.5f) &&
 							creature->Flags >= TribesmanAxeHit[item->Animation.ActiveState][0] &&
 							creature->Flags <= TribesmanAxeHit[item->Animation.ActiveState][1])
 						{
@@ -608,9 +605,7 @@ namespace TEN::Entities::Creatures::TR3
 				{
 					if (creature->Enemy != nullptr && !(creature->Flags & 0xf000))
 					{
-						if (abs(creature->Enemy->Pose.Position.x - item->Pose.Position.x) < pow(SECTOR(0.5f), 2) &&
-							abs(creature->Enemy->Pose.Position.y - item->Pose.Position.y) < pow(SECTOR(0.5f), 2) &&
-							abs(creature->Enemy->Pose.Position.z - item->Pose.Position.z) < pow(SECTOR(0.5f), 2))
+						if (Vector3Int::Distance(item->Pose.Position, creature->Enemy->Pose.Position) <= SECTOR(0.5f))
 						{
 							DoDamage(creature->Enemy, 5);
 							SoundEffect(SFX_TR4_LARA_THUD, &item->Pose);
