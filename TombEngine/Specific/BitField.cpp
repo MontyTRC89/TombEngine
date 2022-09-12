@@ -136,17 +136,6 @@ namespace TEN::Utils
 		return false;
 	}
 
-	bool BitField::TestAll()
-	{
-		for (auto& bit : this->Bits)
-		{
-			if (bit)
-				return true;
-		}
-
-		return false;
-	}
-
 	bool BitField::IsFull()
 	{
 		for (auto& bit : this->Bits)

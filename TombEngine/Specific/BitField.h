@@ -37,7 +37,6 @@ namespace TEN::Utils
 		bool Test(const vector<uint>& indices);
 		bool Test(uint index);
 		bool TestAny();
-		bool TestAll();
 		bool IsFull();
 		bool IsEmpty();
 
