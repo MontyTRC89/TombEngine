@@ -8,7 +8,7 @@
 
 //namespace TEN::Math
 //{
-	const PoseData PoseData::Empty = PoseData(Vector3i::Zero, EulerAngles::Zero);
+	const PoseData PoseData::Zero = PoseData(Vector3i::Zero, EulerAngles::Zero);
 
 	PoseData::PoseData()
 	{

@@ -6,11 +6,14 @@
 //{
 	struct PoseData
 	{
+		// Components
 		Vector3i	Position	= Vector3i::Zero;
 		EulerAngles Orientation = EulerAngles::Zero;
 
-		static const PoseData Empty;
+		// Constants
+		static const PoseData Zero;
 
+		// Constructors
 		PoseData();
 		PoseData(const Vector3i& pos);
 		PoseData(int xPos, int yPos, int zPos);

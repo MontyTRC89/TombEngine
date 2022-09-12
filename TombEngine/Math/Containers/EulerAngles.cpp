@@ -52,6 +52,14 @@
 	}
 
 	// TODO: Check.
+	EulerAngles::EulerAngles(const Matrix& rotMatrix)
+	{
+		this->x = FROM_RAD(asin(rotMatrix._31));
+		this->y = FROM_RAD(-atan2(rotMatrix._21, rotMatrix._11));
+		this->z = FROM_RAD(atan2(rotMatrix._32, rotMatrix._33));
+	}
+
+	// TODO: Check.
 	Vector3 EulerAngles::ToDirection() const
 	{
 		float sinX = phd_sin(x);
