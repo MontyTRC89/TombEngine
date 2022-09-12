@@ -1,8 +1,6 @@
 #include "framework.h"
 #include "Game/pickup/pickup_misc_items.h"
 
-#include <array>
-
 #include "Game/Lara/lara_struct.h"
 #include "Game/pickup/pickuputil.h"
 #include "Objects/objectslist.h"
@@ -34,11 +32,14 @@ auto LaserSightIsEquipped(LaraInfo& lara)
 	return false;
 };
 
-static bool TryModifyMiscCount(LaraInfo& lara, GAME_OBJECT_ID objectID, bool add)
+bool TryModifyMiscCount(LaraInfo & lara, GAME_OBJECT_ID objectID, std::optional<int> amount, ModificationType modType)
 {
 	// If adding, replace the small/large waterskin with one of the requested
 	// capacity. If removing, only remove the waterskin if it contains the given
 	// capacity.
+
+	bool add = ModificationType::Add == modType || ((ModificationType::Set == modType) && amount != 0);
+
 	auto modifyWaterSkinAmount = [&](byte& currentFlag, byte newFlag)
 	{
 		if (add)
@@ -141,12 +142,12 @@ static bool TryModifyMiscCount(LaraInfo& lara, GAME_OBJECT_ID objectID, bool add
 
 bool TryAddMiscItem(LaraInfo& lara, GAME_OBJECT_ID objectID)
 {
-	return TryModifyMiscCount(lara, objectID, true);
+	return TryModifyMiscCount(lara, objectID, std::nullopt, ModificationType::Add);
 }
 
 bool TryRemoveMiscItem(LaraInfo& lara, GAME_OBJECT_ID objectID)
 {
-	return TryModifyMiscCount(lara, objectID, false);
+	return TryModifyMiscCount(lara, objectID, std::nullopt, ModificationType::Remove);
 }
 
 std::optional<bool> HasMiscItem(LaraInfo& lara, GAME_OBJECT_ID objectID)

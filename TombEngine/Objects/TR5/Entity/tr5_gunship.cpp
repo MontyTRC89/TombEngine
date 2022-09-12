@@ -107,7 +107,6 @@ namespace TEN::Entities::Creatures::TR5
 					if (StaticObjects[hitMesh->staticNumber].shatterType != SHT_NONE)
 					{
 						ShatterObject(0, hitMesh, 64, end.roomNumber, 0);
-						hitMesh->flags &= ~StaticMeshFlags::SM_VISIBLE;
 						TestTriggers(hitMesh->pos.Position.x, hitMesh->pos.Position.y, hitMesh->pos.Position.z, end.roomNumber, true);
 						SoundEffect(GetShatterSound(hitMesh->staticNumber), &hitMesh->pos);
 					}

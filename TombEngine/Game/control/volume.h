@@ -61,4 +61,6 @@ namespace TEN::Control::Volumes
 	void TestVolumes(short itemNum);
 	void TestVolumes(short roomNumber, MESH_INFO* mesh);
 	void TestVolumes(CAMERA_INFO* camera);
+
+	void InitialiseNodeScripts();
 }

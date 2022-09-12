@@ -386,11 +386,21 @@ table boolTable {
 	scalar: bool;
 }
 
+table vec3Table {
+	vec: Vector3;
+}
+
+table funcNameTable {
+	str: string;
+}
+
 union VarUnion {
 	str: stringTable,
 	tab: ScriptTable,
 	num: doubleTable,
-	boolean: boolTable
+	boolean: boolTable,
+	vec3: vec3Table,
+	funcName: funcNameTable
 }
 
 table UnionTable{
@@ -459,6 +469,8 @@ table SaveGame {
 	volume_states: [VolumeState];
 	call_counters: [EventSetCallCounters];
 	script_vars: UnionVec;
+	callbacks_pre_control: [string];
+	callbacks_post_control: [string];
 	}
 
 root_type TEN.Save.SaveGame;

@@ -353,7 +353,6 @@ namespace TEN::Entities::Creatures::TR5
 									{
 										ShatterObject(0, mesh, -64, LaraItem->RoomNumber, 0);
 										//SoundEffect(ShatterSounds[gfCurrentLevel - 5][*(v28 + 18)], v28);
-										mesh->flags &= ~StaticMeshFlags::SM_VISIBLE;
 
 										TestTriggers(pos.x, pos.y, pos.z, item->RoomNumber, true);
 									}

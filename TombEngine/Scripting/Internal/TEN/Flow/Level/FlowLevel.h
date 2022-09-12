@@ -29,7 +29,6 @@ struct Level : public ScriptInterfaceLevel
 	std::string AmbientTrack;
 	SkyLayer Layer1;
 	SkyLayer Layer2;
-	bool ColAddHorizon{ false };
 	Fog Fog;
 	bool Storm{ false };
 	WeatherType Weather{ WeatherType::None };
