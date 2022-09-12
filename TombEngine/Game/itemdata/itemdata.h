@@ -26,7 +26,7 @@ template<class... Ts> struct visitor : Ts... { using Ts::operator()...; };
 template<class... Ts> visitor(Ts...)->visitor<Ts...>; // line not needed in C++20...
 
 using namespace TEN::Entities::TR4;
-using namespace TEN::Entities::TR5;
+using namespace TEN::Entities::Creatures::TR5;
 using namespace TEN::Entities::Vehicles;
 
 struct ItemInfo;

@@ -1,6 +1,6 @@
 #pragma once
 
-namespace TEN::Entities::TR5
+namespace TEN::Entities::Creatures::TR5
 {
 	void InitialiseAutoGuns(short itemNumber);
 	void AutoGunsControl(short itemNumber);

@@ -9,7 +9,7 @@
 #include "Objects/TR3/fish.h"
 #include "Specific/level.h"
 
-namespace TEN::Entities::TR3
+namespace TEN::Entities::Creatures::TR3
 {
 	int PirahnaHitWait = false;
 	int CarcassItem = NO_ITEM;
