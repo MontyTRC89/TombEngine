@@ -521,7 +521,7 @@ static void StartEntity(ObjectInfo *obj)
 		g_Level.Bones[obj->boneIndex + 7 * 4] |= ROT_X;
 	}
 
-	obj = &Objects[ID_HITMAN];
+	obj = &Objects[ID_CYBORG];
 	if (obj->loaded)
 	{
 		obj->biteOffset = 5;
@@ -1002,7 +1002,7 @@ static void StartObject(ObjectInfo *obj)
 		obj->saveFlags = true;
 	}
 
-	obj = &Objects[ID_STEAM_EMITTER];
+	obj = &Objects[ID_SMOKE_EMITTER];
 	if (obj->loaded)
 	{
 		obj->initialise = InitialiseSmokeEmitter;

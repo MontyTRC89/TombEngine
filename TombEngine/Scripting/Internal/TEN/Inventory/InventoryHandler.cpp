@@ -22,7 +22,7 @@ namespace InventoryHandler
 	//@function GiveItem
 	//@tparam InvID item the item to be added
 	//@int[opt] count the number of items to add (default: the amount you would get from a pickup)
-	static void InventoryAdd(ItemEnumPair slot, sol::optional<int> count)
+	static void InventoryAdd(GAME_OBJECT_ID slot, sol::optional<int> count)
 	{
 		// If nil is passed in, then the amount added will be the default amount
 		// for that pickup - i.e. the amount you would get from picking up the
@@ -30,9 +30,9 @@ namespace InventoryHandler
 
 		// can't use value_or(std::nullopt) here because nullopt isn't an int
 		if (count.has_value())
-			PickedUpObject(slot.m_pair.first, count.value());
+			PickedUpObject(slot, count.value());
 		else
-			PickedUpObject(slot.m_pair.first, std::nullopt);
+			PickedUpObject(slot, std::nullopt);
 	}
 
 	///Remove x of a certain item from the inventory.

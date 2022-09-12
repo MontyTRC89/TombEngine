@@ -138,7 +138,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->SetBoneRotation(1, ROT_Y);
 	}
 
-	obj = &Objects[ID_LARA_DOPPELGANGER];
+	obj = &Objects[ID_DOPPELGANGER];
 	if (obj->loaded)
 	{
 		if (Objects[ID_LARA].loaded)

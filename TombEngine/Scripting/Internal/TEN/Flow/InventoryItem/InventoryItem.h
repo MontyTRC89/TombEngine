@@ -22,7 +22,7 @@ namespace sol {
 
 struct InventoryItem
 {
-	InventoryItem(std::string const & a_name, ItemEnumPair a_slot, short a_yOffset, float a_scale, Rotation const & a_rot, RotationFlags a_rotationFlags, int a_meshBits, ItemOptions a_actions);
+	InventoryItem(std::string const & a_name, GAME_OBJECT_ID a_slot, short a_yOffset, float a_scale, Rotation const & a_rot, RotationFlags a_rotationFlags, int a_meshBits, ItemOptions a_actions);
 
 	static void Register(sol::table& lua);
 

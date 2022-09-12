@@ -35,21 +35,21 @@ Must be one of:
 e.g. `myItem.action = ItemAction.EXAMINE`
 	@return an InventoryItem
 */
-InventoryItem::InventoryItem(std::string const& a_name, ItemEnumPair a_slot, short a_yOffset, float a_scale, Rotation const & a_rot, RotationFlags a_rotationFlags, int a_meshBits, ItemOptions a_action) :
+InventoryItem::InventoryItem(std::string const& a_name, GAME_OBJECT_ID a_slot, short a_yOffset, float a_scale, Rotation const & a_rot, RotationFlags a_rotationFlags, int a_meshBits, ItemOptions a_action) :
 	name{ a_name },
-	slot{ a_slot.m_pair.second },
 	yOffset{ a_yOffset },
 	scale{ a_scale },
 	rot{ a_rot },
 	rotationFlags{ a_rotationFlags },
 	meshBits{ a_meshBits }
 {
+	slot = (InventoryObjectTypes)g_Gui.ConvertObjectToInventoryItem(a_slot);
 	SetAction(a_action);
 }
 
 void InventoryItem::Register(sol::table & parent)
 {
-	using ctors = sol::constructors<InventoryItem(std::string const&, ItemEnumPair, short, float, Rotation const&, RotationFlags, int, ItemOptions)>;
+	using ctors = sol::constructors<InventoryItem(std::string const&, GAME_OBJECT_ID, short, float, Rotation const&, RotationFlags, int, ItemOptions)>;
 	parent.new_usertype<InventoryItem>(ScriptReserved_InventoryItem,
 	ctors(),
 		sol::call_constructor, ctors()
