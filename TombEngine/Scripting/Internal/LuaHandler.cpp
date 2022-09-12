@@ -4,7 +4,6 @@
 
 LuaHandler::LuaHandler(sol::state* lua) : m_lua{ lua }
 {
-	ResetGlobals();
 }
 
 void LuaHandler::ResetGlobals()

@@ -8,8 +8,10 @@
 #include "Flow/InventoryItem/InventoryItem.h"
 #include "InventorySlots.h"
 #include "Game/gui.h"
+#include "Logic/LevelFunc.h"
 #include "Vec3/Vec3.h"
 #include "Objects/ScriptInterfaceObjectsHandler.h"
+#include "Strings/ScriptInterfaceStringsHandler.h"
 #include "Specific/trutils.h"
 
 /***
@@ -156,7 +158,7 @@ Specify which translations in the strings table correspond to which languages.
 	Animations::Register(table_flow);
 	Settings::Register(table_flow);
 	Fog::Register(table_flow);
-
+	
 	m_handler.MakeReadOnlyTable(table_flow, ScriptReserved_WeatherType, kWeatherTypes);
 	m_handler.MakeReadOnlyTable(table_flow, ScriptReserved_LaraType, kLaraTypes);
 	m_handler.MakeReadOnlyTable(table_flow, ScriptReserved_InvItem, kInventorySlots);
@@ -334,8 +336,9 @@ bool FlowHandler::DoFlow()
 			}
 			catch (TENScriptException const& e)
 			{
-				std::string msg = std::string{ "An unrecoverable error occurred in " } + __func__ + ": " + e.what();
+				std::string msg = std::string{ "A Lua error occurred while running the title level; " } + __func__ + ": " + e.what();
 				TENLog(msg, LogLevel::Error, LogConfig::All);
+				ShutdownTENLog();
 				throw;
 			}
 		}
@@ -367,7 +370,7 @@ bool FlowHandler::DoFlow()
 			}
 			catch (TENScriptException const& e) 
 			{
-				std::string msg = std::string{ "An unrecoverable error occurred in " } + __func__ + ": " + e.what();
+				std::string msg = std::string{ "A Lua error occurred while running a level; " } + __func__ + ": " + e.what();
 				TENLog(msg, LogLevel::Error, LogConfig::All);
 				status = GameStatus::ExitToTitle;
 			}

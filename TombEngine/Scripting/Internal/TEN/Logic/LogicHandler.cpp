@@ -9,6 +9,8 @@
 #include "Game/effects/lightning.h"
 #include "ScriptUtil.h"
 #include "Objects/Moveable/MoveableObject.h"
+#include "Vec3/Vec3.h"
+#include "LevelFunc.h"
 
 using namespace TEN::Effects::Lightning;
 
@@ -17,6 +19,20 @@ Saving data, triggering functions, and callbacks for level-specific scripts.
 @tentable Logic 
 @pragma nostrip
 */
+
+enum class CallbackPoint
+{
+	PreControl,
+	PostControl,
+};
+
+static const std::unordered_map<std::string, CallbackPoint> kCallbackPoints
+{
+	{"PRECONTROLPHASE", CallbackPoint::PreControl},
+	{"POSTCONTROLPHASE", CallbackPoint::PostControl},
+};
+
+static constexpr char const* strKey = "__internal_name";
 
 void SetVariable(sol::table tab, sol::object key, sol::object value)
 {
@@ -64,42 +80,176 @@ sol::object GetVariable(sol::table tab, sol::object key)
 LogicHandler::LogicHandler(sol::state* lua, sol::table & parent) : m_handler{ lua }
 {
 	m_handler.GetState()->set_function("print", &LogicHandler::LogPrint, this);
+
+	sol::table table_logic{ m_handler.GetState()->lua_state(), sol::create };
+
+	parent.set(ScriptReserved_Logic, table_logic);
+
+	table_logic.set_function(ScriptReserved_AddCallback, &LogicHandler::AddCallback, this);
+	table_logic.set_function(ScriptReserved_RemoveCallback, &LogicHandler::RemoveCallback, this);
+
+	m_handler.MakeReadOnlyTable(table_logic, ScriptReserved_CallbackPoint, kCallbackPoints);
+
+	LevelFunc::Register(table_logic);
+
 	ResetScripts(true);
 }
 
 void LogicHandler::ResetGameTables() 
 {
-	MakeSpecialTable(m_handler.GetState(), ScriptReserved_GameVars, &GetVariable, &SetVariable);
+	auto state = m_handler.GetState();
+	MakeSpecialTable(state, ScriptReserved_GameVars, &GetVariable, &SetVariable);
+
+	(*state)[ScriptReserved_GameVars][ScriptReserved_Engine] = sol::table{ *state, sol::create };
 }
 
+/*** Register a function as a callback.
+Possible values for CallbackPoint:
+	PRECONTROLPHASE -- will be called immediately before OnControlPhase
+	POSTCONTROLPHASE -- will be called immediately after OnControlPhase
+
+The order in which two functions with the same CallbackPoint are called is undefined.
+i.e. if you register `MyFunc` and `MyFunc2` with `PRECONTROLPHASE`, both will be called before `OnControlPhase`, but there is no guarantee whether `MyFunc` will be called before `MyFunc2`, or vice-versa.
+
+Any returned value will be discarded.
+
+@function AddCallback
+@tparam point CallbackPoint When should the callback be called?
+@tparam function func The function to be called (must be in the LevelFuncs hierarchy). Will receive, as an argument, the time in seconds since the last frame.
+@usage
+	LevelFuncs.MyFunc = function(dt) print(dt) end
+	TEN.Logic.AddCallback(TEN.Logic.CallbackPoint.PRECONTROLPHASE, LevelFuncs.MyFunc)
+*/
+void LogicHandler::AddCallback(CallbackPoint point, LevelFunc const & lf)
+{
+	switch(point)
+	{
+	case CallbackPoint::PreControl:
+		m_callbacksPreControl.insert(lf.m_funcName);
+		break;
+
+	case CallbackPoint::PostControl:
+		m_callbacksPostControl.insert(lf.m_funcName);
+		break;
+	}
+}
+
+/*** Deregister a function as a callback.
+Will have no effect if the function was not registered as a callback
+
+@function RemoveCallback
+@tparam point CallbackPoint The callback point the function was registered with. See @{AddCallback}
+@tparam func LevelFunc the function to remove; must be in the LevelFuncs hierarchy.
+@usage
+	TEN.Logic.RemoveCallback(TEN.Logic.CallbackPoint.PRECONTROLPHASE, "MyFunc")
+*/
+void LogicHandler::RemoveCallback(CallbackPoint point, LevelFunc const & lf)
+{
+	switch(point)
+	{
+	case CallbackPoint::PreControl:
+		m_callbacksPreControl.erase(lf.m_funcName);
+		break;
+
+	case CallbackPoint::PostControl:
+		m_callbacksPostControl.erase(lf.m_funcName);
+		break;
+	}
+}
 
 void LogicHandler::ResetLevelTables()
 {
-	MakeSpecialTable(m_handler.GetState(), ScriptReserved_LevelFuncs, &LogicHandler::GetLevelFunc, &LogicHandler::SetLevelFunc, this);
-	MakeSpecialTable(m_handler.GetState(), ScriptReserved_LevelVars, &GetVariable, &SetVariable);
+	auto state = m_handler.GetState();
+	MakeSpecialTable(state, ScriptReserved_LevelVars, &GetVariable, &SetVariable);
+
+	(*state)[ScriptReserved_LevelVars][ScriptReserved_Engine] = sol::table{ *state, sol::create };
 }
 
-sol::protected_function LogicHandler::GetLevelFunc(sol::table tab, std::string const& luaName)
+sol::object LogicHandler::GetLevelFuncsMember(sol::table tab, std::string const& luaName)
 {
-	if (m_levelFuncs.find(luaName) == m_levelFuncs.end())
-		return sol::lua_nil;
+	std::string partName = tab.raw_get<std::string>(strKey);
+	auto & theMap = m_levelFuncs_tablesOfNames[partName];
 
-	return m_levelFuncs.at(luaName);
-}
-
-bool LogicHandler::SetLevelFunc(sol::table tab, std::string const& luaName, sol::object value)
-{
-	switch (value.get_type())
+	auto fullNameIt = theMap.find(luaName);
+	if (fullNameIt != std::cend(theMap))
 	{
-	case sol::type::lua_nil:
-		m_levelFuncs.erase(luaName);
-		break;
-	case sol::type::function:
-		m_levelFuncs.insert_or_assign(luaName, value.as<sol::protected_function>());
-		break;
-	default:
-		std::string error{ "Could not assign LevelFuncs." };
-		error += luaName + "; it must be a function (or nil).";
+		std::string_view key = fullNameIt->second;
+		if (m_levelFuncs_levelFuncObjects[key].valid())
+			return m_levelFuncs_levelFuncObjects[key];
+	}
+	return sol::nil;
+}
+
+void LogicHandler::CallLevelFunc(std::string const & name, float dt)
+{
+	sol::protected_function f = m_levelFuncs_luaFunctions[name];
+	auto r = f.call(dt);
+
+	if (!r.valid())
+	{
+		sol::error err = r;
+		ScriptAssertF(false, "Could not execute function {}: {}", name, err.what());
+	}
+}
+
+void LogicHandler::CallLevelFunc(std::string const & name, sol::variadic_args va)
+{
+	sol::protected_function f = m_levelFuncs_luaFunctions[name];
+	auto r = f.call(va);
+	if (!r.valid())
+	{
+		sol::error err = r;
+		ScriptAssertF(false, "Could not execute function {}: {}", name, err.what());
+	}
+}
+
+bool LogicHandler::SetLevelFuncsMember(sol::table tab, std::string const& luaName, sol::object value)
+{
+	if (sol::type::lua_nil == value.get_type())
+	{
+		std::string error{ "Tried to set LevelFuncs member " };
+		error += luaName + " to nil; this not permitted at this time.";
+		return ScriptAssert(false, error);
+	}
+	else if (sol::type::function == value.get_type())
+	{
+		// Add the name to the table of names
+		auto partName = tab.raw_get<std::string>(strKey);
+		auto fullName = partName + "." + luaName;
+		auto& parentNameTab = m_levelFuncs_tablesOfNames[partName];
+		parentNameTab.insert_or_assign(luaName, fullName);
+
+		// Create a LevelFunc userdata and add that too
+		LevelFunc levelFuncObject;
+		levelFuncObject.m_funcName = fullName;
+		levelFuncObject.m_handler = this;
+		m_levelFuncs_levelFuncObjects[fullName] = levelFuncObject;
+
+		// Add the function itself
+		m_levelFuncs_luaFunctions[fullName] = value;
+	}
+	else if (sol::type::table == value.get_type())
+	{
+		// Create and add a new name map
+		std::unordered_map<std::string, std::string> newNameMap;
+		auto fullName = tab.raw_get<std::string>(strKey) + "." + luaName;
+		m_levelFuncs_tablesOfNames.insert_or_assign(fullName, newNameMap);
+
+		// Create a new table to put in the LevelFuncs hierarchy
+		auto newLevelFuncsTab = MakeSpecialTable(m_handler.GetState(), luaName, &LogicHandler::GetLevelFuncsMember, &LogicHandler::SetLevelFuncsMember, this);
+		newLevelFuncsTab.raw_set(strKey, fullName);
+		tab.raw_set(luaName, newLevelFuncsTab);
+
+		// "populate" the new table. This will trigger the __newindex metafunction and will
+		// thus call this function recursively, handling all subtables and functions.
+		for (auto& [key, val] : value.as<sol::table>())
+		{
+			newLevelFuncsTab[key] = val;
+		}
+	}
+	else{
+		std::string error{ "Failed to add " };
+		error += luaName + " to LevelFuncs or one of its tables; it must be a function or a table of functions.";
 		return ScriptAssert(false, error);
 	}
 	return true;
@@ -122,6 +272,9 @@ void LogicHandler::ResetScripts(bool clearGameVars)
 {
 	FreeLevelScripts();
 
+	m_callbacksPreControl.clear();
+	m_callbacksPostControl.clear();
+
 	auto currentPackage = m_handler.GetState()->get<sol::table>("package");
 	auto currentLoaded = currentPackage.get<sol::table>("loaded");
 
@@ -132,11 +285,23 @@ void LogicHandler::ResetScripts(bool clearGameVars)
 		ResetGameTables();
 
 	m_handler.ResetGlobals();
+
+	m_handler.GetState()->collect_garbage();
 }
 
 void LogicHandler::FreeLevelScripts()
 {
-	m_levelFuncs.clear();
+	m_levelFuncs = MakeSpecialTable(m_handler.GetState(), ScriptReserved_LevelFuncs, &LogicHandler::GetLevelFuncsMember, &LogicHandler::SetLevelFuncsMember, this);
+	m_levelFuncs.raw_set(strKey, ScriptReserved_LevelFuncs);
+
+	m_levelFuncs[ScriptReserved_Engine] = sol::table{ *m_handler.GetState(), sol::create };
+
+	m_levelFuncs_tablesOfNames.clear();
+	m_levelFuncs_luaFunctions.clear();
+	m_levelFuncs_levelFuncObjects = sol::table{ *m_handler.GetState(), sol::create };
+
+	m_levelFuncs_tablesOfNames.emplace(std::make_pair(ScriptReserved_LevelFuncs, std::unordered_map<std::string, std::string>{}));
+
 	ResetLevelTables();
 	m_onStart = sol::nil;
 	m_onLoad = sol::nil;
@@ -185,6 +350,18 @@ void LogicHandler::SetVariables(std::vector<SavedVar> const & vars)
 						solTables[i][vars[first]] = vars[second];
 					}
 				}
+				else if (std::holds_alternative<Vector3Int>(vars[second]))
+				{
+					auto theVec = Vec3{ std::get<Vector3Int>(vars[second]) };
+					solTables[i][vars[first]] = theVec;
+				}
+				else if (std::holds_alternative<FuncName>(vars[second]))
+				{
+					LevelFunc fnh;
+					fnh.m_funcName = std::get<FuncName>(vars[second]).name;
+					fnh.m_handler = this;
+					solTables[i][vars[first]] = fnh;
+				}
 				else
 				{
 					solTables[i][vars[first]] = vars[second];
@@ -217,12 +394,20 @@ void LogicHandler::GetVariables(std::vector<SavedVar> & vars)
 	std::unordered_map<void const*, uint32_t> varsMap;
 	std::unordered_map<double, uint32_t> numMap;
 	std::unordered_map<bool, uint32_t> boolMap;
+
 	size_t nVars = 0;
+
+	// The following functions will all try to put their values in a map. If it succeeds
+	// then the value was not already in the map, so we can put it into the var vector.
+	// If it fails, the value is in the map, and thus will also be in the var vector.
+	// We then return the value's position in the var vector.
+
+	// The purpose of this is to only store each value once, and to fill our tables with
+	// indices to the values rather than copies of the values.
 	auto handleNum = [&](double num)
 	{
-		auto [first, second] = numMap.insert(std::pair<double, uint32_t>(num, nVars));
+		auto [first, second] = numMap.insert(std::make_pair(num, nVars));
 
-		// true if the var was inserted
 		if (second)
 		{
 			vars.push_back(num);
@@ -234,9 +419,8 @@ void LogicHandler::GetVariables(std::vector<SavedVar> & vars)
 
 	auto handleBool = [&](bool num)
 	{
-		auto [first, second] = boolMap.insert(std::pair<bool, uint32_t>(num, nVars));
+		auto [first, second] = boolMap.insert(std::make_pair(num, nVars));
 
-		// true if the var was inserted
 		if (second)
 		{
 			vars.push_back(num);
@@ -249,9 +433,8 @@ void LogicHandler::GetVariables(std::vector<SavedVar> & vars)
 	auto handleStr = [&](sol::object const& obj)
 	{
 		auto str = obj.as<sol::string_view>();
-		auto [first, second] = varsMap.insert(std::pair<void const*, uint32_t>(str.data(), nVars));
+		auto [first, second] = varsMap.insert(std::make_pair(str.data(), nVars));
 
-		// true if the string was inserted
 		if (second)
 		{
 			vars.push_back(std::string{ str.data() });
@@ -261,11 +444,37 @@ void LogicHandler::GetVariables(std::vector<SavedVar> & vars)
 		return first->second;
 	};
 
+	auto handleVec3 = [&](Vec3 const & vec)
+	{
+		auto [first, second] = varsMap.insert(std::make_pair(&vec, nVars));
+
+		if (second)
+		{
+			vars.push_back(vec);
+			++nVars;
+		}
+
+		return first->second;
+	};
+
+	auto handleFuncName = [&](LevelFunc const& fnh)
+	{
+		//auto str = obj.as<sol::string_view>();
+		auto [first, second] = varsMap.insert(std::make_pair(&fnh, nVars));
+
+		if (second)
+		{
+			vars.push_back(FuncName{ std::string{ fnh.m_funcName } });
+			++nVars;
+		}
+
+		return first->second;
+	};
+
 	std::function<uint32_t(sol::table const &)> populate = [&](sol::table const & obj) 
 	{
-		auto [first, second] = varsMap.insert(std::pair<void const*, uint32_t>(obj.pointer(), nVars));
+		auto [first, second] = varsMap.insert(std::make_pair(obj.pointer(), nVars));
 
-		// true if the table was inserted
 		if(second)
 		{
 			++nVars;
@@ -289,24 +498,35 @@ void LogicHandler::GetVariables(std::vector<SavedVar> & vars)
 					ScriptAssert(false, "Tried saving an unsupported type as a key");
 				}
 
+				auto putInVars = [&vars, id, keyIndex](uint32_t valIndex)
+				{
+					std::get<IndexTable>(vars[id]).push_back(std::make_pair(keyIndex, valIndex));
+				};
+
 				uint32_t valIndex = 0;
 				switch (second.get_type())
 				{
 				case sol::type::table:
-					valIndex = populate(second.as<sol::table>());
-					std::get<IndexTable>(vars[id]).push_back(std::make_pair(keyIndex, valIndex));
+					putInVars(populate(second.as<sol::table>()));
 					break;
 				case sol::type::string:
-					valIndex = handleStr(second);
-					std::get<IndexTable>(vars[id]).push_back(std::make_pair(keyIndex, valIndex));
+					putInVars(handleStr(second));
 					break;
 				case sol::type::number:
-					valIndex = handleNum(second.as<double>());
-					std::get<IndexTable>(vars[id]).push_back(std::make_pair(keyIndex, valIndex));
+					putInVars(handleNum(second.as<double>()));
 					break;
 				case sol::type::boolean:
-					valIndex = handleBool(second.as<bool>());
-					std::get<IndexTable>(vars[id]).push_back(std::make_pair(keyIndex, valIndex));
+					putInVars(handleBool(second.as<bool>()));
+					break;
+				case sol::type::userdata:
+				{
+					if(second.is<Vec3>())
+						putInVars(handleVec3(second.as<Vec3>()));
+					else if(second.is<LevelFunc>())
+						putInVars(handleFuncName(second.as<LevelFunc>()));
+					else
+						ScriptAssert(false, "Tried saving an unsupported userdata as a value");
+				}
 					break;
 				default:
 					ScriptAssert(false, "Tried saving an unsupported type as a value");
@@ -316,6 +536,24 @@ void LogicHandler::GetVariables(std::vector<SavedVar> & vars)
 		return first->second;
 	};
 	populate(tab);
+}
+
+void LogicHandler::GetCallbackStrings(std::vector<std::string>& preControl, std::vector<std::string>& postControl) const
+{
+	for (auto const& s : m_callbacksPreControl)
+		preControl.push_back(s);
+
+	for (auto const& s : m_callbacksPostControl)
+		postControl.push_back(s);
+}
+
+void LogicHandler::SetCallbackStrings(std::vector<std::string> const & preControl, std::vector<std::string> const & postControl)
+{
+	for (auto const& s : preControl)
+		m_callbacksPreControl.insert(s);
+
+	for (auto const& s : postControl)
+		m_callbacksPostControl.insert(s);
 }
 
 template <typename R, char const * S, typename mapType>
@@ -347,35 +585,25 @@ void LogicHandler::ExecuteString(const std::string& command)
 	m_handler.ExecuteString(command);
 }
 
+// These wind up calling CallLevelFunc, which is where all the error checking is.
 void LogicHandler::ExecuteFunction(std::string const& name, short idOne, short idTwo) 
 {
-	sol::protected_function_result r;
-	sol::protected_function func = (*m_handler.GetState())["LevelFuncs"][name.c_str()];
-	r = func(std::make_unique<Moveable>(idOne), std::make_unique<Moveable>(idTwo));
-	if (!r.valid())
-	{
-		sol::error err = r;
-		ScriptAssertF(false, "Could not execute function {}: {}", name, err.what());
-	}
+	sol::protected_function func = m_levelFuncs_luaFunctions[name];
+
+	func(std::make_unique<Moveable>(idOne), std::make_unique<Moveable>(idTwo));
+
 }
 
 void LogicHandler::ExecuteFunction(std::string const& name, TEN::Control::Volumes::VolumeTriggerer triggerer, std::string const& arguments)
 {
-	sol::protected_function_result r;
 	sol::protected_function func = (*m_handler.GetState())["LevelFuncs"][name.c_str()];
 	if (std::holds_alternative<short>(triggerer))
 	{
-		r = func(std::make_unique<Moveable>(std::get<short>(triggerer), true), arguments);
+		func(std::make_unique<Moveable>(std::get<short>(triggerer), true), arguments);
 	}
 	else
 	{
-		r = func(nullptr, arguments);
-	}
-
-	if (!r.valid())
-	{
-		sol::error err = r;
-		ScriptAssertF(false, "Could not execute function {}: {}", name, err.what());
+		func(nullptr, arguments);
 	}
 }
 
@@ -404,9 +632,25 @@ void LogicHandler::OnLoad()
 
 void LogicHandler::OnControlPhase(float dt)
 {
+	auto tryCall = [this, dt](std::string const& name)
+	{
+		auto func = m_handler.GetState()->script("return " + name);
+
+		if (!func.valid())
+			ScriptAssertF(false, "Callback {} not valid", name);
+		else 
+			func.get<LevelFunc>().CallDT(dt);
+	};
+
+	for (auto& name : m_callbacksPreControl)
+		tryCall(name);
+
 	lua_gc(m_handler.GetState()->lua_state(), LUA_GCCOLLECT, 0);
 	if(m_onControlPhase.valid())
 		doCallback(m_onControlPhase, dt);
+
+	for (auto& name : m_callbacksPostControl)
+		tryCall(name);
 }
 
 void LogicHandler::OnSave()
@@ -443,6 +687,9 @@ some time later, the values `3` will be put back into `LevelVars.enemiesKilled.`
 __This table is emptied when a level is finished.__ If the player needs to be able
 to return to the level (like in the Karnak and Alexandria levels in *The Last Revelation*),
 you will need to use the @{GameVars} table, below.
+
+__LevelVars.Engine is a reserved table used internally by TombEngine's libs. Do not modify, overwrite, or add to it.__
+
 @table LevelVars
 */
 
@@ -463,12 +710,15 @@ And in the script file for the level with the boss, you could write:
 	end
 
 Unlike @{LevelVars}, this table will remain intact for the entirety of the game.
+
+__GameVars.Engine is a reserved table used internally by TombEngine's libs. Do not modify, overwrite, or add to it.__
+
 @table GameVars
 */
 
-/*** A table with level-specific functions.
+/*** A table nested table system for level-specific functions.
 
-This serves two purposes: it holds the level callbacks (listed below) as well as
+This serves a few purposes: it holds the level callbacks (listed below) as well as
 any trigger functions you might have specified. For example, if you give a trigger
 a Lua name of "my_trigger" in Tomb Editor, you will have to implement it as a member
 of this table:
@@ -476,6 +726,23 @@ of this table:
 	LevelFuncs.my_trigger = function() 
 		-- implementation goes here
 	end
+
+You can organise functions into tables within the hierarchy:
+
+	LevelFuncs.enemyFuncs = {}
+
+	LevelFuncs.enemyFuncs.makeBaddyRunAway = function() 
+		-- implementation goes here
+	end
+
+	LevelFuncs.enemyFuncs.makeBaddyUseMedkit = function() 
+		-- implementation goes here
+	end
+
+There are two special subtables which you should __not__ overwrite:
+
+	LevelFuncs.Engine -- this is for 'first-party' functions, i.e. ones that come with TombEngine.
+	LevelFuncs.External -- this is for 'third-party' functions. If you write a library providing LevelFuncs functions for other builders to use in their levels, put those functions in LevelFuncs.External.YourLibraryNameHere
 
 The following are the level callbacks. They are optional; if your level has no special
 behaviour for a particular scenario, you do not need to implement the function. For
@@ -503,10 +770,24 @@ void LogicHandler::InitCallbacks()
 {
 	auto assignCB = [this](sol::protected_function& func, std::string const & luaFunc) {
 		std::string fullName = "LevelFuncs." + luaFunc;
-		func = (*m_handler.GetState())["LevelFuncs"][luaFunc];
-		std::string err{ "Level's script does not define callback " + fullName};
-		if (!ScriptAssert(func.valid(), err)) {
-			ScriptWarn("Defaulting to no " + fullName + " behaviour.");
+
+		sol::object theData = (*m_handler.GetState())["LevelFuncs"][luaFunc];
+
+		std::string msg{ "Level's script does not define callback " + fullName
+			+ ". Defaulting to no " + fullName + " behaviour."};
+
+		if(!theData.valid())
+		{
+			TENLog(msg);
+			return;
+		}
+
+		LevelFunc fnh = (*m_handler.GetState())["LevelFuncs"][luaFunc];
+
+		func = m_levelFuncs_luaFunctions[fnh.m_funcName];
+
+		if (!func.valid()) {
+			TENLog(msg);
 		}
 	};
 

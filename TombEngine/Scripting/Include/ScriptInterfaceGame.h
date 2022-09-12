@@ -19,7 +19,12 @@ using VarSaveType = std::variant<bool, double, std::string>;
 
 using IndexTable = std::vector<std::pair<uint32_t, uint32_t>>;
 
-using SavedVar = std::variant<bool, std::string, double, IndexTable>;
+struct FuncName
+{
+	std::string name;
+};
+
+using SavedVar = std::variant<bool, std::string, double, IndexTable, Vector3Int, FuncName>;
 
 class ScriptInterfaceGame {
 public:
@@ -42,6 +47,9 @@ public:
 
 	virtual void GetVariables(std::vector<SavedVar> & vars) = 0;
 	virtual void SetVariables(std::vector<SavedVar> const& vars) = 0;
+
+	virtual void GetCallbackStrings(std::vector<std::string> & preControl, std::vector<std::string> & postControl) const = 0;
+	virtual void SetCallbackStrings(std::vector<std::string> const & preControl, std::vector<std::string> const & postControl) = 0;
 };
 
 extern ScriptInterfaceGame* g_GameScript;

@@ -163,8 +163,6 @@ void LoadItems()
 	if (g_Level.NumItems == 0)
 		return;
 
-	g_Level.Items.resize(NUM_ITEMS);
-
 	InitialiseItemArray(NUM_ITEMS);
 
 	if (g_Level.NumItems > 0)

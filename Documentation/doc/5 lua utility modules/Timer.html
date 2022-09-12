@@ -3,7 +3,7 @@
 <html>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 <head>
-    <title>TombEngine 1.0.1 Lua API</title>
+    <title>TombEngine 1.0.2 Lua API</title>
     <link rel="stylesheet" href="../ldoc.css" type="text/css" />
 </head>
 <body>
@@ -90,10 +90,13 @@
 <p>Basic timer - after a specified number of seconds, the specified thing happens.</p>
 <p>
 
+
+<p> Timers are updated automatically every frame before OnControlPhase.</p>
+
 <p> Example usage:</p>
 
 <pre>
-<span class="keyword">local</span> Timer = <span class="global">require</span>(<span class="string">"Timer"</span>)
+<span class="keyword">local</span> Timer = <span class="global">require</span>(<span class="string">"Engine.Timer"</span>)
 
 <span class="comment">-- This will be called when the timer runs out
 </span>LevelFuncs.FinishTimer = <span class="keyword">function</span>(healthWhenStarted, victoryMessage)
@@ -107,14 +110,10 @@
         <span class="number">5.0</span>,
         <span class="keyword">false</span>,
         {minutes = <span class="keyword">false</span>, seconds = <span class="keyword">true</span>, deciseconds = <span class="keyword">true</span>},
-        <span class="string">"FinishTimer"</span>,
+        LevelFuncs.FinishTimer,
         Lara:GetHP(),
         <span class="string">"Well done!"</span>)
     myTimer:Start()
-<span class="keyword">end</span>
-
-LevelFuncs.OnControlPhase = <span class="keyword">function</span>(dt)
-    Timer.UpdateAll(dt)
 <span class="keyword">end</span>
 </pre>
 
@@ -124,16 +123,12 @@ LevelFuncs.OnControlPhase = <span class="keyword">function</span>(dt)
 <h2><a href="#Functions">Functions</a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" ><a href="#Create">Create(name, totalTime, loop, timerFormat, func[, ...])</a></td>
+	<td class="name" ><a href="#func">func(name, totalTime, loop, timerFormat[, ...])</a></td>
 	<td class="summary">Create (but do not start) a new timer.</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#Get">Get(name)</a></td>
 	<td class="summary">Get a timer by its name.</td>
-	</tr>
-	<tr>
-	<td class="name" ><a href="#UpdateAll">UpdateAll(dt)</a></td>
-	<td class="summary">Update all active timers.</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#myTimer:SetFunction">myTimer:SetFunction(func[, ...])</a></td>
@@ -189,8 +184,8 @@ LevelFuncs.OnControlPhase = <span class="keyword">function</span>(dt)
 
     <dl class="function">
     <dt>
-    <a name = "Create"></a>
-    <strong>Create(name, totalTime, loop, timerFormat, func[, ...])</strong>
+    <a name = "func"></a>
+    <strong>func(name, totalTime, loop, timerFormat[, ...])</strong>
     </dt>
     <dd>
     Create (but do not start) a new timer. </p>
@@ -214,7 +209,10 @@ local myTimeFormat4 = {seconds = true}
 
 <p><strong>At any given time, only one timer can show its countdown</strong>.</p>
 
+<p><strong>Do not give your timers a name beginning with __TEN, as this is reserved for timers used by other internal libaries</strong>.</p>
+
 <p>Use this sparingly; in the classics, timed challenges did not have visible countdowns. For shorter timers, the gameplay benefit from showing the remaining time might not be necessary, and could interfere with the atmosphere of the level.
+ The LevelFunc function to call when the time is up
 
 
     <h3>Parameters:</h3>
@@ -234,10 +232,6 @@ local myTimeFormat4 = {seconds = true}
         <li><span class="parameter">timerFormat</span>
             <span class="types"><a class="type" href="https://www.lua.org/manual/5.1/manual.html#5.5">table</a> or <span class="type">bool</span></span>
          If a table is given, the remaining time will be shown as a string, formatted according to the values in the table. If true, the remaining seconds, rounded up, will show at the bottom of the screen. If false, the remaining time will not be shown on screen.
-        </li>
-        <li><span class="parameter">func</span>
-            <span class="types"><a class="type" href="https://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
-         The name of the LevelFunc member to call when the time is upssss
         </li>
         <li><span class="parameter">...</span>
          a variable number of arguments with which the above function will be called
@@ -282,28 +276,6 @@ local myTimeFormat4 = {seconds = true}
 
 </dd>
     <dt>
-    <a name = "UpdateAll"></a>
-    <strong>UpdateAll(dt)</strong>
-    </dt>
-    <dd>
-    Update all active timers.
- Should be called in LevelFuncs.OnControlPhase
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">dt</span>
-            <span class="types"><span class="type">number</span></span>
-         The time in seconds since the last frame
-        </li>
-    </ul>
-
-
-
-
-
-</dd>
-    <dt>
     <a name = "myTimer:SetFunction"></a>
     <strong>myTimer:SetFunction(func[, ...])</strong>
     </dt>
@@ -314,8 +286,8 @@ local myTimeFormat4 = {seconds = true}
     <h3>Parameters:</h3>
     <ul>
         <li><span class="parameter">func</span>
-            <span class="types"><a class="type" href="https://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
-         The name of the LevelFunc member to call when the time is up
+            <span class="types"><span class="type">function</span></span>
+         The LevelFunc member to call when the time is up
         </li>
         <li><span class="parameter">...</span>
          a variable number of arguments with which the above function will be called
@@ -524,7 +496,7 @@ local myTimeFormat4 = {seconds = true}
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
-<i style="float:right;">Last updated 2022-08-11 22:43:52 </i>
+<i style="float:right;">Last updated 2022-09-07 20:56:06 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>

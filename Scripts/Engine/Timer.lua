@@ -1,7 +1,10 @@
 -----
 --- Basic timer - after a specified number of seconds, the specified thing happens.
+--
+-- Timers are updated automatically every frame before OnControlPhase.
+--
 -- Example usage:
---	local Timer = require("Timer")
+--	local Timer = require("Engine.Timer")
 --
 --	-- This will be called when the timer runs out
 --	LevelFuncs.FinishTimer = function(healthWhenStarted, victoryMessage)
@@ -15,25 +18,23 @@
 --			5.0,
 --			false,
 --			{minutes = false, seconds = true, deciseconds = true},
---			"FinishTimer",
+--			LevelFuncs.FinishTimer,
 --			Lara:GetHP(),
 --			"Well done!")
 --		myTimer:Start()
 --	end
 --
---	LevelFuncs.OnControlPhase = function(dt)
---		Timer.UpdateAll(dt)
---	end
---
 -- @luautil Timer
 
-LevelVars.__TEN_timer = {timers = {}}
+LevelFuncs.Engine.Timer = {}
+LevelVars.Engine.Timer = {timers = {}}
 
 local Timer
 
 local unpausedColor = TEN.Color(255, 255, 255)
 local pausedColor = TEN.Color(255, 255, 0)
 local str = TEN.Strings.DisplayString("TIMER", 0, 0, unpausedColor, false, {TEN.Strings.DisplayStringOption.CENTER, TEN.Strings.DisplayStringOption.SHADOW} )
+
 
 Timer = {
 	--- Create (but do not start) a new timer.
@@ -56,13 +57,15 @@ Timer = {
 	--
 	--__At any given time, only one timer can show its countdown__.
 	--
+	--__Do not give your timers a name beginning with __TEN, as this is reserved for timers used by other internal libaries__.
+	--
 	--Use this sparingly; in the classics, timed challenges did not have visible countdowns. For shorter timers, the gameplay benefit from showing the remaining time might not be necessary, and could interfere with the atmosphere of the level.
 	--
 	-- @string name A label to give this timer; used to retrieve the timer later
 	-- @number totalTime The duration of the timer, in seconds
 	-- @bool loop if true, the timer will start again immediately after the time has elapsed
 	-- @tparam ?table|bool timerFormat If a table is given, the remaining time will be shown as a string, formatted according to the values in the table. If true, the remaining seconds, rounded up, will show at the bottom of the screen. If false, the remaining time will not be shown on screen. 
-	-- @string func The name of the LevelFunc member to call when the time is upssss
+	-- @function func The LevelFunc function to call when the time is up
 	-- @param[opt] ... a variable number of arguments with which the above function will be called
 	-- @return The timer in its paused state
 	--
@@ -73,8 +76,13 @@ Timer = {
 		setmetatable(obj, mt)
 
 		obj.name = name
-		LevelVars.__TEN_timer.timers[name] ={} 
-		local thisTimer = LevelVars.__TEN_timer.timers[name]
+
+		if LevelVars.Engine.Timer.timers[name] then
+			print("Warning: a timer with name " .. name .. " already exists.")
+		end
+
+		LevelVars.Engine.Timer.timers[name] ={} 
+		local thisTimer = LevelVars.Engine.Timer.timers[name]
 		thisTimer.name = name
 		thisTimer.totalTime = totalTime
 		thisTimer.remainingTime = totalTime
@@ -95,7 +103,7 @@ Timer = {
 	-- @string name The label that was given to the timer when it was created
 	-- @return The timer
 	Get = function(name)
-		if LevelVars.__TEN_timer.timers[name] then
+		if LevelVars.Engine.Timer.timers[name] then
 			local obj = {}
 			local mt = {}
 			mt.__index = Timer
@@ -112,8 +120,7 @@ Timer = {
 				t.remainingTime = t.remainingTime - dt
 
 				if t.remainingTime <= 0 then
-					LevelFuncs[t.func](table.unpack(t.funcArgs))
-
+					t.func(table.unpack(t.funcArgs))
 					if not t.loop then
 						t.active = false
 					else
@@ -190,21 +197,16 @@ Timer = {
 		end
 	end;
 
-	--- Update all active timers.
-	-- Should be called in LevelFuncs.OnControlPhase
-	-- @number dt The time in seconds since the last frame
 	UpdateAll = function(dt)
-		for _, t in pairs(LevelVars.__TEN_timer.timers) do
-			Timer.Update(t, dt)
-		end
+		print("Timer.UpdateAll is deprecated; timers and event sequences now get updated automatically pre-control phase.")
 	end;
 
 	--- Give the timer a new function and args
 	-- @function myTimer:SetFunction
-	-- @string func The name of the LevelFunc member to call when the time is up
+	-- @tparam function func The LevelFunc member to call when the time is up
 	-- @param[opt] ... a variable number of arguments with which the above function will be called
 	SetFunction = function(t, func, ...)
-		local thisTimer = LevelVars.__TEN_timer.timers[t.name]
+		local thisTimer = LevelVars.Engine.Timer.timers[t.name]
 		thisTimer.func = func
 		thisTimer.funcArgs = {...}
 	end;
@@ -212,7 +214,7 @@ Timer = {
 	--- Begin or unpause a timer. If showing the remaining time on-screen, its color will be set to white.
 	-- @function myTimer:Start
 	Start = function(t)
-		local thisTimer = LevelVars.__TEN_timer.timers[t.name]
+		local thisTimer = LevelVars.Engine.Timer.timers[t.name]
 		if not thisTimer.active then
 			thisTimer.active = true
 		end
@@ -227,21 +229,21 @@ Timer = {
 	--- Stop the timer.
 	-- @function myTimer:Stop
 	Stop = function(t)
-		LevelVars.__TEN_timer.timers[t.name].active = false
+		LevelVars.Engine.Timer.timers[t.name].active = false
 	end;
 
 	--- Get whether or not the timer is active
 	-- @function myTimer:IsActive
 	-- @return true if the timer is active, false if otherwise
 	IsActive = function(t)
-		return LevelVars.__TEN_timer.timers[t.name].active
+		return LevelVars.Engine.Timer.timers[t.name].active
 	end;
 
 	--- Pause or unpause the timer. If showing the remaining time on-screen, its color will be set to yellow (paused) or white (unpaused).
 	-- @function myTimer:SetPaused
 	-- @bool p if true, the timer will be paused; if false, it would be unpaused 
 	SetPaused = function(t, p)
-		local thisTimer = LevelVars.__TEN_timer.timers[t.name]
+		local thisTimer = LevelVars.Engine.Timer.timers[t.name]
 		thisTimer.paused = p
 		if thisTimer.timerFormat then
 			if p then
@@ -256,21 +258,21 @@ Timer = {
 	-- @function myTimer:IsPaused
 	-- @return true if the timer is paused, false if otherwise
 	IsPaused = function(t)
-		return LevelVars.__TEN_timer.timers[t.name].paused
+		return LevelVars.Engine.Timer.timers[t.name].paused
 	end;
 
 	--- Get the remaining time for a timer.
 	-- @function myTimer:GetRemainingTime
 	-- @return the time in seconds remaining on the clock
 	GetRemainingTime = function(t)
-		return LevelVars.__TEN_timer.timers[t.name].remainingTime
+		return LevelVars.Engine.Timer.timers[t.name].remainingTime
 	end;
 
 	--- Set the remaining time for a timer
 	-- @function myTimer:SetRemainingTime
 	-- @number remainingTime the new time remaining for the timer
 	SetRemainingTime = function(t, remainingTime)
-		LevelVars.__TEN_timer.timers[t.name].remainingTime = remainingTime
+		LevelVars.Engine.Timer.timers[t.name].remainingTime = remainingTime
 	end;
 
 	--- Get the total time for a timer.
@@ -278,23 +280,31 @@ Timer = {
 	-- @function myTimer:GetRemainingTime
 	-- @return the timer's total time
 	GetTotalTime = function(t)
-		return LevelVars.__TEN_timer.timers[t.name].totalTime
+		return LevelVars.Engine.Timer.timers[t.name].totalTime
 	end;
 
 	--- Set the total time for a timer
 	-- @function myTimer:SetTotalTime
 	-- @number totalTime timer's new total time
 	SetTotalTime = function(t, totalTime)
-		LevelVars.__TEN_timer.timers[t.name].totalTime = totalTime
+		LevelVars.Engine.Timer.timers[t.name].totalTime = totalTime
 	end;
 
 	--- Set whether or not the timer loops 
 	-- @function myTimer:SetLooping
 	-- @bool looping whether or not the timer loops
 	SetLooping = function(t, looping)
-		LevelVars.__TEN_timer.timers[t.name].loop = looping
+		LevelVars.Engine.Timer.timers[t.name].loop = looping
 	end;
 }
+
+LevelFuncs.Engine.Timer.UpdateAll = function(dt) 
+	for _, t in pairs(LevelVars.Engine.Timer.timers) do
+		Timer.Update(t, dt)
+	end
+end
+
+TEN.Logic.AddCallback(TEN.Logic.CallbackPoint.PRECONTROLPHASE, LevelFuncs.Engine.Timer.UpdateAll)
 
 return Timer
 
