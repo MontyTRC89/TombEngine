@@ -1495,7 +1495,7 @@ void GuiController::SetupAmmoSelector()
 		{
 			num++;
 			ammo_object_list[0].invitem = INV_OBJECT_PISTOLS_AMMO;
-			ammo_object_list[0].amount = -1;
+			ammo_object_list[0].amount = AmountPistolsAmmo;
 			num_ammo_slots = num;
 			current_ammo_type = &CurrentPistolsAmmoType;
 		}
