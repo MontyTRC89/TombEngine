@@ -59,7 +59,6 @@
 		this->z = FROM_RAD(atan2(rotMatrix._32, rotMatrix._33));
 	}
 
-	// TODO: Check.
 	Vector3 EulerAngles::ToDirection() const
 	{
 		float sinX = phd_sin(x);
@@ -67,6 +66,7 @@
 		float sinY = phd_sin(y);
 		float cosY = phd_cos(y);
 
+		// Return normalized direction vector.
 		return Vector3(
 			sinY * cosX,
 			-sinX,

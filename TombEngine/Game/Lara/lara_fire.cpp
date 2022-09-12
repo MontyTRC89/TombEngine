@@ -829,17 +829,11 @@ FireWeaponType FireWeapon(LaraWeaponType weaponType, ItemInfo* targetEntity, Ite
 		0
 	);
 
-	// Calculate ray from rotation angles.
-	auto directionNorm = Vector3(
-		sin(TO_RAD(wobbledArmOrient.y)) * cos(TO_RAD(wobbledArmOrient.x)),
-		-sin(TO_RAD(wobbledArmOrient.x)),
-		cos(TO_RAD(wobbledArmOrient.y)) * cos(TO_RAD(wobbledArmOrient.x))
-	);
-	directionNorm.Normalize();
-
 	auto muzzleOffset = GetLaraJointPosition(LM_RHAND);
 	auto pos = Vector3i(originEntity->Pose.Position.x, muzzleOffset.y, originEntity->Pose.Position.z);
 
+	// Calculate ray from wobbled orientation.
+	auto directionNorm = wobbledArmOrient.ToDirection();
 	auto origin = pos.ToVector3();
 	auto target = origin + (directionNorm * weapon->TargetDist);
 	auto ray = Ray(origin, directionNorm);
