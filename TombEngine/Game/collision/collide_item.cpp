@@ -331,7 +331,7 @@ void TestForObjectOnLedge(ItemInfo* item, CollisionInfo* coll)
 					continue;
 				}
 
-				if (phd_Distance(&item->Pose, &item2->Pose) < COLLISION_CHECK_DISTANCE)
+				if (Vector3Int::Distance(item->Pose.Position, item2->Pose.Position) < COLLISION_CHECK_DISTANCE)
 				{
 					auto box = TO_DX_BBOX(item2->Pose, GetBoundsAccurate(item2));
 					float distance;
@@ -346,16 +346,14 @@ void TestForObjectOnLedge(ItemInfo* item, CollisionInfo* coll)
 				itemNumber = item2->NextItem;
 			}
 
-			for (int j = 0; j < g_Level.Rooms[i].mesh.size(); j++)
+			for (auto& mesh : g_Level.Rooms[i].mesh)
 			{
-				auto* mesh = &g_Level.Rooms[i].mesh[j];
-
-				if (!(mesh->flags & StaticMeshFlags::SM_VISIBLE))
+				if (!(mesh.flags & StaticMeshFlags::SM_VISIBLE))
 					continue;
 
-				if (phd_Distance(&item->Pose, &mesh->pos) < COLLISION_CHECK_DISTANCE)
+				if (phd_Distance(&item->Pose, &mesh.pos) < COLLISION_CHECK_DISTANCE)
 				{
-					auto box = TO_DX_BBOX(mesh->pos, GetBoundsAccurate(mesh, false));
+					auto box = TO_DX_BBOX(mesh.pos, GetBoundsAccurate(&mesh, false));
 					float distance;
 
 					if (box.Intersects(origin, direction, distance) && distance < coll->Setup.Radius * 2)
