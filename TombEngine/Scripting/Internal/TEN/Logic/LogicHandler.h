@@ -64,8 +64,8 @@ private:
 public:	
 	LogicHandler(sol::state* lua, sol::table & parent);
 
-	void								CallLevelFunc(std::string const &, sol::variadic_args);
-	void								CallLevelFunc(std::string const &, float dt);
+	sol::protected_function_result		CallLevelFunc(std::string const &, sol::variadic_args);
+	sol::protected_function_result		CallLevelFunc(std::string const &, float dt);
 
 	void								FreeLevelScripts() override;
 
