@@ -1,8 +1,9 @@
 #pragma once
 #include <string>
-#include "ItemEnumPair.h"
 #include "Rotation/Rotation.h"
 #include "Game/gui.h"
+
+enum GAME_OBJECT_ID : short;
 
 static const std::unordered_map<std::string, RotationFlags> kRotAxes{
 	{"X", RotationFlags::INV_ROT_X},
@@ -36,5 +37,4 @@ struct InventoryItem
 	ItemOptions action{ ItemOptions::OPT_USE };
 
 	void SetAction(ItemOptions a_action);
-	void SetSlot(ItemEnumPair a_slot);
 };

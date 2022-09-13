@@ -75,7 +75,3 @@ void InventoryItem::SetAction(ItemOptions a_action)
 	}
 }
 
-void InventoryItem::SetSlot(ItemEnumPair a_slot)
-{
-	slot = a_slot.m_pair.second;
-}

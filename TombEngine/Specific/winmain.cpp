@@ -282,8 +282,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	try 
 	{
 		g_GameFlow = ScriptInterfaceState::CreateFlow();
-		g_GameFlow->LoadFlowScript();
 		g_GameScriptEntities = ScriptInterfaceState::CreateObjectsHandler();
+		g_GameFlow->LoadFlowScript();
 		g_GameStringsHandler = ScriptInterfaceState::CreateStringsHandler();
 
 		// This must be loaded last as it adds metafunctions to the global

@@ -3,7 +3,6 @@
 #include "InventoryHandler.h"
 #include "ReservedScriptNames.h"
 #include "pickup.h"
-#include "ItemEnumPair.h"
 
 /***
 Inventory manipulation
@@ -20,7 +19,7 @@ namespace InventoryHandler
 	//10 instead.
 	//Has no effect if the player has an infinite number of that item.
 	//@function GiveItem
-	//@tparam InvID item the item to be added
+	//@tparam ObjID item the item to be added
 	//@int[opt] count the number of items to add (default: the amount you would get from a pickup)
 	static void InventoryAdd(GAME_OBJECT_ID slot, sol::optional<int> count)
 	{
@@ -39,34 +38,34 @@ namespace InventoryHandler
 	//As in @{GiveItem}, omitting the count will remove the "default" amount of that item.
 	//Has no effect if the player has an infinite number of the item.
 	//@function TakeItem
-	//@tparam InvID item the item to be removed
+	//@tparam ObjID item the item to be removed
 	//@int[opt] count the number of items to remove (default: the amount you would get from a pickup)
-	static void InventoryRemove(ItemEnumPair slot, sol::optional<int> count)
+	static void InventoryRemove(GAME_OBJECT_ID slot, sol::optional<int> count)
 	{
 		//can't use value_or(std::nullopt) here because nullopt isn't an int
 		if (count.has_value())
-			RemoveObjectFromInventory(slot.m_pair.first, count.value());
+			RemoveObjectFromInventory(slot, count.value());
 		else
-			RemoveObjectFromInventory(slot.m_pair.first, std::nullopt);
+			RemoveObjectFromInventory(slot, std::nullopt);
 	}
 
 	///Set the amount of a certain item the player has in the inventory.
 	//Similar to @{GiveItem} but replaces with the new amount instead of adding it.
 	//@function SetItemCount
-	//@tparam InvID item the ID of the item to be set.
+	//@tparam ObjID item the ID of the item to be set.
 	//@tparam int count the number of items the player will have. A value of -1 will give an infinite amount of that item.
-	static int InventoryGetCount(ItemEnumPair slot)
+	static int InventoryGetCount(GAME_OBJECT_ID slot)
 	{
-		return GetInventoryCount(slot.m_pair.first);
+		return GetInventoryCount(slot);
 	}
 
 	///Get the amount the player holds of an item.
 	//@function GetItemCount
-	//@tparam InvID item the ID item to check
+	//@tparam ObjID item the ID item to check
 	//@treturn int the amount of the item the player has in the inventory. -1 indicates an infinite amount of that item.
-	static void InventorySetCount(ItemEnumPair slot, int count)
+	static void InventorySetCount(GAME_OBJECT_ID slot, int count)
 	{
-		SetInventoryCount(slot.m_pair.first, count);
+		SetInventoryCount(slot, count);
 	}
 
 	static void InventoryCombine(int slot1, int slot2)
