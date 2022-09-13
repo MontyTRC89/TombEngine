@@ -12,7 +12,7 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 
-namespace TEN::Entities::TR5
+namespace TEN::Entities::Creatures::TR5
 {
 	int GunShipCounter = 0;
 

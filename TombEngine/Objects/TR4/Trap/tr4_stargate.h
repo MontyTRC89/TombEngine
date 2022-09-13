@@ -1,9 +1,9 @@
 #pragma once
 
-struct ItemInfo;
 struct CollisionInfo;
+struct ItemInfo;
 
-namespace TEN::Entities::TR4
+namespace TEN::Entities::Traps
 {
 	void StargateControl(short itemNumber);
 	void StargateCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);

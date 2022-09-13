@@ -20,7 +20,7 @@ using namespace TEN::Entities::Traps;
 using namespace TEN::Math::Random;
 using std::vector;
 
-namespace TEN::Entities::TR3
+namespace TEN::Entities::Creatures::TR3
 {
 	const auto TribesmanAxeBite	  = BiteInfo(Vector3(0.0f, 16.0f, 265.0f), 13);
 	const auto TribesmanDartBite1 = BiteInfo(Vector3(0.0f, 0.0f, -200.0f), 13);
@@ -47,7 +47,6 @@ namespace TEN::Entities::TR3
 
 	enum TribesmanState
 	{
-		TRIBESMAN_STATE_NONE = 0,
 		TRIBESMAN_STATE_CROUCH_IDLE = 1,
 		TRIBESMAN_STATE_WALK_FORWARD = 2,
 		TRIBESMAN_STATE_RUN_FORWARD = 3,
@@ -105,9 +104,9 @@ namespace TEN::Entities::TR3
 		auto* item = &g_Level.Items[itemNumber];
 		auto* creature = GetCreatureInfo(item);
 
-		short head = 0;
 		short angle = 0;
 		short tilt = 0;
+		short head = 0;
 
 		if (item->HitPoints <= 0)
 		{
@@ -153,7 +152,7 @@ namespace TEN::Entities::TR3
 				{
 					creature->MaxTurn = 0;
 
-					if (TestProbability(0.008f))
+					if (TestProbability(1.0f / 128))
 						item->Animation.TargetState = TRIBESMAN_STATE_WALK_FORWARD;
 				}
 				else if (creature->Mood == MoodType::Escape)
@@ -192,7 +191,7 @@ namespace TEN::Entities::TR3
 				{
 					creature->MaxTurn = 0;
 
-					if (TestProbability(0.008f))
+					if (TestProbability(1.0f / 128))
 						item->Animation.TargetState = TRIBESMAN_STATE_WALK_FORWARD;
 				}
 				else if (creature->Mood == MoodType::Escape)
@@ -217,15 +216,15 @@ namespace TEN::Entities::TR3
 				break;
 
 			case TRIBESMAN_STATE_WALK_FORWARD:
-				tilt = angle / 8;
 				creature->MaxTurn = ANGLE(9.0f);
 				creature->Flags = 0;
+				tilt = angle / 8;
 
 				if (creature->Mood == MoodType::Bored)
 				{
 					creature->MaxTurn /= 4;
 
-					if (TestProbability(0.008f))
+					if (TestProbability(1.0f / 128))
 					{
 						if (TestProbability(0.25f))
 							item->Animation.TargetState = TRIBESMAN_STATE_CROUCH_IDLE;
@@ -248,15 +247,15 @@ namespace TEN::Entities::TR3
 				break;
 
 			case TRIBESMAN_STATE_RUN_FORWARD:
-				tilt = angle / 4;
 				creature->MaxTurn = ANGLE(6.0f);
 				creature->Flags = 0;
+				tilt = angle / 4;
 
 				if (creature->Mood == MoodType::Bored)
 				{
 					creature->MaxTurn /= 4;
 
-					if (TestProbability(0.008f))
+					if (TestProbability(1.0f / 128))
 					{
 						if (TestProbability(0.5f))
 							item->Animation.TargetState = TRIBESMAN_STATE_CROUCH_IDLE;
@@ -280,6 +279,7 @@ namespace TEN::Entities::TR3
 
 			case TRIBESMAN_STATE_AXE_ATTACK_HIGH_START:
 				creature->MaxTurn = ANGLE(4.0f);
+
 				if (AI.bite || AI.distance < pow(682, 2))
 					item->Animation.TargetState = TRIBESMAN_STATE_AXE_ATTACK_HIGH_CONTINUE;
 				else
@@ -311,12 +311,9 @@ namespace TEN::Entities::TR3
 				}
 				else
 				{
-					if (creature->Enemy)
+					if (creature->Enemy != nullptr)
 					{
-						auto direction = creature->Enemy->Pose.Position - item->Pose.Position;
-						if (abs(direction.x) < SECTOR(0.5f) &&
-							abs(direction.y) < SECTOR(0.5f) &&
-							abs(direction.z) < SECTOR(0.5f) &&
+						if (Vector3Int::Distance(item->Pose.Position, creature->Enemy->Pose.Position) <= SECTOR(0.5f) &&
 							creature->Flags >= TribesmanAxeHit[item->Animation.ActiveState][0] &&
 							creature->Flags <= TribesmanAxeHit[item->Animation.ActiveState][1])
 						{
@@ -386,10 +383,8 @@ namespace TEN::Entities::TR3
 
 		short angle = 0;
 		short tilt = 0;
-		short headX = 0;
-		short headY = 0;
-		short torsoX = 0;
-		short torsoY = 0;
+		auto extraHeadRot = Vector3Shrt::Zero;
+		auto extraTorsoRot = Vector3Shrt::Zero;
 
 		if (item->HitPoints <= 0)
 		{
@@ -422,8 +417,8 @@ namespace TEN::Entities::TR3
 			angle = CreatureTurn(item, creature->Mood == MoodType::Bored ? ANGLE(2.0f) : creature->MaxTurn);
 			if (AI.ahead)
 			{
-				headY = AI.angle / 2;
-				torsoY = AI.angle / 2;
+				extraHeadRot.y = AI.angle / 2;
+				extraTorsoRot.y = AI.angle / 2;
 			}
 
 			if (item->HitStatus ||
@@ -441,18 +436,18 @@ namespace TEN::Entities::TR3
 
 				if (AI.ahead)
 				{
-					torsoY = AI.angle;
-					torsoX = AI.xAngle / 2;
+					extraTorsoRot.x = AI.xAngle / 2;
+					extraTorsoRot.y = AI.angle;
 				}
 
 				if (item->AIBits & GUARD)
 				{
 					creature->MaxTurn = 0;
-					headY = AIGuard(creature);
-					torsoX = 0;
-					torsoY = 0;
+					extraHeadRot.y = AIGuard(creature);
+					extraTorsoRot.x = 0;
+					extraTorsoRot.y = 0;
 
-					if (!(GetRandomControl() & 0xFF))
+					if (TestProbability(1.0f / 256))
 						item->Animation.TargetState = TRIBESMAN_STATE_IDLE;
 
 					break;
@@ -472,7 +467,7 @@ namespace TEN::Entities::TR3
 					item->Animation.TargetState = TRIBESMAN_STATE_DART_ATTACK;
 				else if (creature->Mood == MoodType::Bored)
 				{
-					if (TestProbability(0.015f))
+					if (TestProbability(1.0f / 64))
 						item->Animation.TargetState = TRIBESMAN_STATE_WALK_FORWARD;
 					else
 						break;
@@ -482,18 +477,18 @@ namespace TEN::Entities::TR3
 
 				break;
 
-			case 11:
+			case TRIBESMAN_STATE_IDLE:
 				creature->MaxTurn = ANGLE(2.0f);
 				creature->Flags &= 0x0FFF;
 
 				if (item->AIBits & GUARD)
 				{
 					creature->MaxTurn = 0;
-					headY = AIGuard(creature);
-					torsoX = 0;
-					torsoY = 0;
+					extraHeadRot.y = AIGuard(creature);
+					extraTorsoRot.x = 0;
+					extraTorsoRot.y = 0;
 
-					if (!(GetRandomControl() & 0xFF))
+					if (TestProbability(1.0f / 256))
 						item->Animation.TargetState = TRIBESMAN_STATE_CROUCH_IDLE;
 
 					break;
@@ -511,7 +506,7 @@ namespace TEN::Entities::TR3
 					item->Animation.TargetState = TRIBESMAN_STATE_WALK_FORWARD;
 				else if (Targetable(item, &AI) && AI.distance < pow(MAX_VISIBILITY_DISTANCE, 2))
 					item->Animation.TargetState = TRIBESMAN_STATE_CROUCH_IDLE;
-				else if (creature->Mood == MoodType::Bored && TestProbability(0.015f))
+				else if (creature->Mood == MoodType::Bored && TestProbability(1.0f / 64))
 					item->Animation.TargetState = TRIBESMAN_STATE_WALK_FORWARD;
 				else
 					item->Animation.TargetState = TRIBESMAN_STATE_RUN_FORWARD;
@@ -543,7 +538,7 @@ namespace TEN::Entities::TR3
 
 				break;
 
-			case 3:
+			case TRIBESMAN_STATE_RUN_FORWARD:
 				creature->MaxTurn = ANGLE(6.0f);
 				creature->Flags &= 0x0FFF;
 				tilt = angle / 4;
@@ -575,8 +570,8 @@ namespace TEN::Entities::TR3
 
 				if (AI.ahead)
 				{
-					torsoX = AI.xAngle;
-					torsoY = AI.angle;
+					extraTorsoRot.x = AI.xAngle;
+					extraTorsoRot.y = AI.angle;
 				}
 
 				if (abs(AI.angle) < ANGLE(2.0f))
@@ -610,9 +605,7 @@ namespace TEN::Entities::TR3
 				{
 					if (creature->Enemy != nullptr && !(creature->Flags & 0xf000))
 					{
-						if (abs(creature->Enemy->Pose.Position.x - item->Pose.Position.x) < pow(SECTOR(0.5f), 2) &&
-							abs(creature->Enemy->Pose.Position.y - item->Pose.Position.y) < pow(SECTOR(0.5f), 2) &&
-							abs(creature->Enemy->Pose.Position.z - item->Pose.Position.z) < pow(SECTOR(0.5f), 2))
+						if (Vector3Int::Distance(item->Pose.Position, creature->Enemy->Pose.Position) <= SECTOR(0.5f))
 						{
 							DoDamage(creature->Enemy, 5);
 							SoundEffect(SFX_TR4_LARA_THUD, &item->Pose);
@@ -627,12 +620,12 @@ namespace TEN::Entities::TR3
 
 		CreatureTilt(item, tilt);
 
-		headY -= torsoY;
+		extraHeadRot.y -= extraTorsoRot.y;
 
-		CreatureJoint(item, 0, torsoY);
-		CreatureJoint(item, 1, torsoX);
-		CreatureJoint(item, 2, headY);
-		CreatureJoint(item, 3, headX);
+		CreatureJoint(item, 0, extraTorsoRot.y);
+		CreatureJoint(item, 1, extraTorsoRot.x);
+		CreatureJoint(item, 2, extraHeadRot.y);
+		CreatureJoint(item, 3, extraHeadRot.x);
 
 		CreatureAnimation(itemNumber, angle, 0);
 	}
