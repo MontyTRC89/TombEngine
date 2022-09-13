@@ -1,36 +1,24 @@
 local parseFile = require('xmllpegparser').parseFile
 
-local enumName = "Objects.ObjID"
-local enumIncludes = [==[
-#include "objectslist.h"
-#include <unordered_map>
-#include <string>
-]==]
+local args = {...}
+local helpStr = [[Usage: lua generateobjects.lua CATALOGPATH
 
-local srcFile = "P:\\Projects\\Tomb-Editor\\BuildRelease (x64)\\net6.0-windows\\Catalogs\\TrCatalog.xml"
-local srcFileInv = "Enum generation\\inventoryslots"
-local enumDesc = "Constants for object IDs."
-local constantsDesc = "The following constants are inside ObjID."
-local tableDesc = "Table of constants."
+This tool reads the TrCatalog.xml file whose path is given as input and creates game_object_ids.h (which defines GAME_OBJECT_ID enum used by TEN) and ObjectIDs.h (which creates constants and documentation for the API).
 
-local outputFileList = [[P:\Projects\TombEngine\TombEngine\Objects\game_object_ids.h]]
-local outputFileIDs = [[P:\Projects\TombEngine\TombEngine\Scripting\Internal\TEN\Objects\ObjectIDs.h]]
+To work properly, this script must be in the folder TombEngine/Tools/Enum generation.]]
 
-local decl = "static const std::unordered_map<std::string, GAME_OBJECT_ID> kObjIDs {"
-local footer = [==[
-};
-]==]
+if not args[1] or args[1] == "--help" then
+	print(helpStr)
+	return
+end
 
-local enumFile = "objIDs.txt"
-local enumFile2 = "inventorySlots"
-local outputFile = "../../TombEngine/Scripting/Internal/TEN/Objects/ObjectIDs.h"
+local srcFile = args[1]
+
+local outputFileList = [[..\..\TombEngine\Objects\game_object_ids.h]]
+local outputFileIDs = [[..\..\TombEngine\Scripting\Internal\TEN\Objects\ObjectIDs.h]]
 
 local doc, err = parseFile(srcFile)
 local theTab = doc.children[1]
-for k, v in pairs(theTab) do print(k, v) end
-print("")
-print(next(theTab))
-print(theTab)
 
 local editorNames = {}
 local engineNames = {}
@@ -47,7 +35,6 @@ function printelem(path, index, e, prefix)
 			if not attrsMatch then
 				attrsMatch = true
 				for k, v in pairs(tag.attrs) do
-					print(k, v, e.attrs[k])
 					if e.attrs[k] ~= v then
 						attrsMatch = false
 					end
@@ -55,12 +42,10 @@ function printelem(path, index, e, prefix)
 			end
 
 			if attrsMatch then
-				print(tag.name, "match")
 				if tag.process then
 					tag.process(e)
 				else
 					for i, child in pairs(e.children) do
-						print(i)
 						printelem(path, index+1, child, prefix)
 					end
 				end
@@ -83,10 +68,6 @@ end
 function printdoc(doc)
 	local path = {{name = "xml"}, {name = "game", attrs = {id = "TombEngine"}}, {name="moveables"}, {name="moveable", process = getObject}}
 	local path2 = {{name = "xml"}, {name = "game", attrs = {id = "TombEngine"}}, {name="sprite_sequences"}, {name="sprite_sequence", process = getObject}}
-	for i, e in pairs(doc.entities) do
---		print(' ' .. e.name .. ": " .. e.value)
-	end
-	print("Data:")
 	for i, child in pairs(doc.children) do
 		printelem(path, 1, child, ' ')
 		printelem(path2, 1, child, ' ')
@@ -94,18 +75,12 @@ function printdoc(doc)
 end
 
 printdoc(doc)
-for k, v in pairs(editorNames) do
-	print(k, v, engineNames[k])
-end
-
-print(maxID)
 
 local namePairs = {}
 
 for i = 0, maxID do
 	namePairs[i] = {editor = editorNames[i], engine = engineNames[i]}
 	local p = namePairs[i]
-	print(i, p.editor, p.engine)
 end
 
 local objlistH = [====[#pragma once
@@ -134,11 +109,12 @@ end
 	ID_NUMBER_OBJECTS
 };
 ]====]
-print (objlistH)
 
 local file = io.open(outputFileList, 'w')
 file:write(objlistH)
 io.close(file)
+
+print("Written " .. outputFileList)
 
 
 local objidsH = [=[#pragma once
@@ -177,8 +153,6 @@ for i = 0, maxID do
 	end
 end
 
--- TODO PICKUPS
---
 objidsH = objidsH .. [=[
 Table of constants.
 @table Members
@@ -224,17 +198,4 @@ else
 	io.close(file)
 end
 
---TEN NAME, XML NAME
---STEAM_EMITTER, removed
---HITMAN, CYBORG
---LARA_HAIR, HAIR
---BIGGUN_ANIMS, LARA_BIGGUN_ANIM
---BADDY_SILENCER1, GOON_SILENCER1
---BADDY_SILENCER2, GOON_SILENCER2
---BADDY_SILENCER3, GOON_SILENCER3
---LARA_DOPPELGANGER, DOPPELGANGER
---MOTOR_BOAT_FOAM_SPRITES, MOTORBOAT_FOAM_SPRITES,
---PC_LOAD_SAVE_ITEM, PC_SAVE_INV_ITEM
---OPEN_DIARY_ITEM, DIARY_OPEN
---LARA_FLARE_ANIM, FLARE_ANIM
---
+print("Written " .. outputFileIDs)
