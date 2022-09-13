@@ -20,7 +20,6 @@ namespace TEN::Utils
 
 		// Getters
 		uint GetSize();
-		uint GetPackedBits() const;
 
 		// Setters
 		void Set(const vector<uint>& indices);
@@ -41,10 +40,13 @@ namespace TEN::Utils
 		bool IsEmpty();
 
 		// Operators
+		// NOTE: packedBits will not be assessed in full if the length of the given BitField object is less than BIT_FIELD_SIZE_MAX.
 		operator uint() const;
 		BitField& operator =(uint packedBits);
+		BitField& operator &=(uint packedBits);
 		BitField& operator |=(uint packedBits);
 		BitField  operator &(uint packedBits);
+		BitField  operator |(uint packedBits);
 
 	private:
 		void Fill(bool value);

@@ -11,6 +11,7 @@ namespace TEN::Utils
 
 	BitField::BitField()
 	{
+		this->Bits.resize(BIT_FIELD_SIZE_MAX);
 	}
 
 	BitField::BitField(uint size)
@@ -35,21 +36,6 @@ namespace TEN::Utils
 	uint BitField::GetSize()
 	{
 		return Bits.size();
-	}
-
-	uint BitField::GetPackedBits() const
-	{
-		uint packedBits = 0;
-		for (uint i = 0; i < Bits.size(); i++)
-		{
-			if (Bits[i])
-			{
-				uint bit = uint(1 << i);
-				packedBits |= bit;
-			}
-		}
-
-		return packedBits;
 	}
 
 	void BitField::Set(const vector<uint>& indices)
@@ -160,7 +146,17 @@ namespace TEN::Utils
 
 	BitField::operator uint() const
 	{
-		return this->GetPackedBits();
+		uint packedBits = 0;
+		for (uint i = 0; i < Bits.size(); i++)
+		{
+			if (Bits[i])
+			{
+				uint bit = uint(1 << i);
+				packedBits |= bit;
+			}
+		}
+
+		return packedBits;
 	}
 
 	BitField& BitField::operator =(uint packedBits)
@@ -177,10 +173,27 @@ namespace TEN::Utils
 		return *this;
 	}
 
+	BitField& BitField::operator &=(uint packedBits)
+	{
+		for (uint i = 0; i < Bits.size(); i++)
+		{
+			uint bit = uint(1 << i);
+			if (Bits[i] && (packedBits & bit) == bit)
+				this->Bits[i] = true;
+			else
+				this->Bits[i] = false;
+		}
+
+		return *this;
+	}
+
 	BitField& BitField::operator |=(uint packedBits)
 	{
 		for (uint i = 0; i < Bits.size(); i++)
 		{
+			if (Bits[i])
+				continue;
+
 			uint bit = uint(1 << i);
 			if ((packedBits & bit) == bit)
 				this->Bits[i] = true;
@@ -191,13 +204,35 @@ namespace TEN::Utils
 	
 	BitField BitField::operator &(uint packedBits)
 	{
-		BitField newBitField = {};
-		vector<uint> indices = {};
+		auto newBitField = BitField(Bits.size());
+		auto indices = vector<uint>{};
 
 		for (uint i = 0; i < Bits.size(); i++)
 		{
 			uint bit = uint(1 << i);
 			if (Bits[i] && (packedBits & bit) == bit)
+				indices.push_back(i);
+		}
+
+		newBitField.Set(indices);
+		return newBitField;
+	}
+
+	BitField BitField::operator |(uint packedBits)
+	{
+		auto newBitField = BitField(Bits.size());
+		auto indices = vector<uint>{};
+
+		for (uint i = 0; i < Bits.size(); i++)
+		{
+			if (Bits[i])
+			{
+				indices.push_back(i);
+				continue;
+			}
+
+			uint bit = uint(1 << i);
+			if ((packedBits & bit) == bit)
 				indices.push_back(i);
 		}
 
