@@ -63,7 +63,8 @@ namespace TEN::Entities::Traps
 		if (!TestBoundsCollide(item, laraItem, coll->Setup.Radius))
 			return;
 
-		if (TriggerActive(item) &&
+		if (TestCollision(item, laraItem) &&
+			TriggerActive(item) &&
 			item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 20 && // Hardcoded frame range.
 			item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].frameBase + 60)
 		{
