@@ -625,7 +625,7 @@ namespace TEN::Entities::TR4
 
 		if (item->Animation.ActiveState == 1)
 		{
-			if (TestProbability(0.008f))
+			if (TestProbability(1.0f / 128))
 			{
 				item->Animation.TargetState = 2;
 				AnimateItem(item);
@@ -634,7 +634,7 @@ namespace TEN::Entities::TR4
 				item->Animation.TargetState = 3;
 		}
 		else if (item->Animation.ActiveState == 4 &&
-			TestProbability(0.008f))
+			TestProbability(1.0f / 128))
 		{
 			item->Animation.TargetState = 5;
 			AnimateItem(item);

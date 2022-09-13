@@ -16,7 +16,9 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-namespace TEN::Entities::TR3
+using namespace TEN::Math::Random;
+
+namespace TEN::Entities::Creatures::TR3
 {
 	const auto FlamethrowerOffset = Vector3i(0, 340, 0);
 	const auto FlamethrowerBite = BiteInfo(Vector3(0.0f, 340.0f, 64.0f), 7);
@@ -41,33 +43,26 @@ namespace TEN::Entities::TR3
 		auto* item = &g_Level.Items[itemNumber];
 		auto* creature = GetCreatureInfo(item);
 
-		short torsoX = 0;
-		short torsoY = 0;
 		short angle = 0;
 		short tilt = 0;
-		short head = 0;
+		auto extraHeadRot = EulerAngles::Zero;
+		auto extraTorsoRot = EulerAngles::Zero;
 
 		auto pos = GetJointPosition(item, FlamethrowerBite.meshNum, Vector3i(FlamethrowerBite.Position));
 
-		int random = GetRandomControl();
+		int randomInt = GetRandomControl();
 		if (item->Animation.ActiveState != 6 && item->Animation.ActiveState != 11)
 		{
-			TriggerDynamicLight(pos.x, pos.y, pos.z, (random & 3) + 6, 24 - ((random / 16) & 3), 16 - ((random / 64) & 3), random & 3);
+			TriggerDynamicLight(pos.x, pos.y, pos.z, (randomInt & 3) + 6, 24 - ((randomInt / 16) & 3), 16 - ((randomInt / 64) & 3), randomInt & 3);
 			TriggerPilotFlame(itemNumber, 9);
 		}
 		else
-		{
-			TriggerDynamicLight(pos.x, pos.y, pos.z, (random & 3) + 10, 31 - ((random / 16) & 3), 24 - ((random / 64) & 3), random & 7);
-		}
+			TriggerDynamicLight(pos.x, pos.y, pos.z, (randomInt & 3) + 10, 31 - ((randomInt / 16) & 3), 24 - ((randomInt / 64) & 3), randomInt & 7);
 
 		if (item->HitPoints <= 0)
 		{
 			if (item->Animation.ActiveState != 7)
-			{
-				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 19;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-				item->Animation.ActiveState = 7;
-			}
+				SetAnimation(item, 19);
 		}
 		else
 		{
@@ -82,9 +77,8 @@ namespace TEN::Entities::TR3
 				ItemInfo* target = nullptr;
 				int minDistance = INT_MAX;
 
-				for (int i = 0; i < ActiveCreatures.size(); i++)
+				for (auto& currentCreature : ActiveCreatures)
 				{
-					auto* currentCreature = ActiveCreatures[i];
 					if (currentCreature->ItemNumber == NO_ITEM || currentCreature->ItemNumber == itemNumber)
 						continue;
 
@@ -147,13 +141,13 @@ namespace TEN::Entities::TR3
 			case 1:
 				creature->MaxTurn = 0;
 				creature->Flags = 0;
-				head = laraAI.angle;
+				extraHeadRot.y = laraAI.angle;
 
 				if (item->AIBits & GUARD)
 				{
-					head = AIGuard(creature);
+					extraHeadRot.y = AIGuard(creature);
 
-					if (!(GetRandomControl() & 0xFF))
+					if (TestProbability(1.0f / 128))
 						item->Animation.TargetState = 4;
 
 					break;
@@ -169,21 +163,21 @@ namespace TEN::Entities::TR3
 					else
 						item->Animation.TargetState = 2;
 				}
-				else if (creature->Mood == MoodType::Bored && AI.ahead && !(GetRandomControl() & 0xFF))
+				else if (creature->Mood == MoodType::Bored && AI.ahead && TestProbability(1.0f / 128))
 					item->Animation.TargetState = 4;
-				else if (creature->Mood == MoodType::Attack || !(GetRandomControl() & 0xFF))
+				else if (creature->Mood == MoodType::Attack || TestProbability(1.0f / 128))
 					item->Animation.TargetState = 2;
 
 				break;
 
 			case 4:
-				head = laraAI.angle;
+				extraHeadRot.y = laraAI.angle;
 
 				if (item->AIBits & GUARD)
 				{
-					head = AIGuard(creature);
+					extraHeadRot.y = AIGuard(creature);
 
-					if (!(GetRandomControl() & 0xFF))
+					if (TestProbability(1.0f / 128))
 						item->Animation.TargetState = 1;
 
 					break;
@@ -192,7 +186,7 @@ namespace TEN::Entities::TR3
 					AI.distance < pow(SECTOR(4), 2) &&
 					(realEnemy != LaraItem || creature->HurtByLara) ||
 					creature->Mood != MoodType::Bored ||
-					!(GetRandomControl() & 0xFF)))
+					TestProbability(1.0f / 128)))
 				{
 					item->Animation.TargetState = 1;
 				}
@@ -200,17 +194,12 @@ namespace TEN::Entities::TR3
 				break;
 
 			case 2:
-				creature->Flags = 0;
 				creature->MaxTurn = ANGLE(5.0f);
-				head = laraAI.angle;
+				creature->Flags = 0;
+				extraHeadRot.y = laraAI.angle;
 
 				if (item->AIBits & GUARD)
-				{
-					item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 12;
-					item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-					item->Animation.ActiveState = 1;
-					item->Animation.TargetState = 1;
-				}
+					SetAnimation(item, 12);
 				else if (item->AIBits & PATROL1)
 					item->Animation.TargetState = 2;
 				else if (creature->Mood == MoodType::Escape)
@@ -235,8 +224,8 @@ namespace TEN::Entities::TR3
 
 				if (AI.ahead)
 				{
-					torsoX = AI.xAngle;
-					torsoY = AI.angle;
+					extraTorsoRot.x = AI.xAngle;
+					extraTorsoRot.y = AI.angle;
 
 					if (Targetable(item, &AI) &&
 						AI.distance < pow(SECTOR(4), 2) &&
@@ -255,8 +244,8 @@ namespace TEN::Entities::TR3
 
 				if (AI.ahead)
 				{
-					torsoX = AI.xAngle;
-					torsoY = AI.angle;
+					extraTorsoRot.x = AI.xAngle;
+					extraTorsoRot.y = AI.angle;
 
 					if (Targetable(item, &AI) &&
 						AI.distance < pow(SECTOR(4), 2) &&
@@ -276,8 +265,8 @@ namespace TEN::Entities::TR3
 
 				if (AI.ahead)
 				{
-					torsoX = AI.xAngle;
-					torsoY = AI.angle;
+					extraTorsoRot.x = AI.xAngle;
+					extraTorsoRot.y = AI.angle;
 
 					if (Targetable(item, &AI) &&
 						AI.distance < pow(SECTOR(4), 2) &&
@@ -311,12 +300,12 @@ namespace TEN::Entities::TR3
 
 				if (AI.ahead)
 				{
-					torsoX = AI.xAngle;
-					torsoY = AI.angle;
+					extraTorsoRot.x = AI.xAngle;
+					extraTorsoRot.y = AI.angle;
 
 					if (Targetable(item, &AI) &&
 						AI.distance < pow(SECTOR(4), 2) &&
-						(realEnemy != LaraItem || creature->HurtByLara))
+						(!realEnemy->IsLara() || creature->HurtByLara))
 					{
 						item->Animation.TargetState = 6;
 					}
@@ -343,9 +332,9 @@ namespace TEN::Entities::TR3
 		}
 
 		CreatureTilt(item, tilt);
-		CreatureJoint(item, 0, torsoY);
-		CreatureJoint(item, 1, torsoX);
-		CreatureJoint(item, 2, head);
+		CreatureJoint(item, 0, extraTorsoRot.y);
+		CreatureJoint(item, 1, extraTorsoRot.x);
+		CreatureJoint(item, 2, extraHeadRot.y);
 
 		CreatureAnimation(itemNumber, angle, 0);
 	}

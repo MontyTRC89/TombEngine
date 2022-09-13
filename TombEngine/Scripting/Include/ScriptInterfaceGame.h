@@ -24,7 +24,7 @@ struct FuncName
 	std::string name;
 };
 
-using SavedVar = std::variant<bool, std::string, double, IndexTable, Vector3Int, FuncName>;
+using SavedVar = std::variant<bool, std::string, double, IndexTable, Vector3i, FuncName>;
 
 class ScriptInterfaceGame {
 public:

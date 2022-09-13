@@ -23,6 +23,7 @@ int DebrisFlags;
 void MissileControl(short itemNumber)
 {
 	auto* fx = &EffectList[itemNumber];
+
 	if (fx->flag1 == 2)
 	{
 		fx->pos.Orientation.z += 16 * fx->speed;
@@ -119,9 +120,9 @@ void MissileControl(short itemNumber)
 			{
 				TriggerExplosionSparks(x, y, z, 3, -2, 2, fx->roomNumber);
 				fx->pos.Position.y -= 64;
-				TriggerShockwave((PoseData*)fx, 48, 256, 64, 64, 128, 0, 24, 0, 1);
+				TriggerShockwave(&fx->pos, 48, 256, 64, 64, 128, 0, 24, 0, 1);
 				fx->pos.Position.y -= 128;
-				TriggerShockwave((PoseData*)fx, 48, 256, 48, 64, 128, 0, 24, 0, 1);
+				TriggerShockwave(&fx->pos, 48, 256, 48, 64, 128, 0, 24, 0, 1);
 			}
 			else if (fx->flag1 == 2)
 			{
@@ -132,12 +133,12 @@ void MissileControl(short itemNumber)
 		else
 		{
 			TriggerExplosionSparks(x, y, z, 3, -2, 0, fx->roomNumber);
-			TriggerShockwave((PoseData*)fx, 48, 240, 48, 0, 96, 128, 24, 0, 2);
+			TriggerShockwave(&fx->pos, 48, 240, 48, 0, 96, 128, 24, 0, 2);
 		}
 		
 		KillEffect(itemNumber);
 	}
-	else if (ItemNearLara((PoseData*)fx, 200))
+	else if (ItemNearLara(&fx->pos.Position, 200))
 	{
 		if (fx->flag1)
 		{
@@ -146,9 +147,9 @@ void MissileControl(short itemNumber)
 				// ROMAN_GOD hit effect
 				TriggerExplosionSparks(x, y, z, 3, -2, 2, fx->roomNumber);
 				fx->pos.Position.y -= 64;
-				TriggerShockwave((PoseData*)fx, 48, 256, 64, 0, 128, 64, 24, 0, 1);
+				TriggerShockwave(&fx->pos, 48, 256, 64, 0, 128, 64, 24, 0, 1);
 				fx->pos.Position.y -= 128;
-				TriggerShockwave((PoseData*)fx, 48, 256, 48, 0, 128, 64, 24, 0, 1);
+				TriggerShockwave(&fx->pos, 48, 256, 48, 0, 128, 64, 24, 0, 1);
 				KillEffect(itemNumber);
 				DoDamage(LaraItem, 200);
 			}
@@ -171,7 +172,7 @@ void MissileControl(short itemNumber)
 		{
 			// HYDRA hit effect
 			TriggerExplosionSparks(x, y, z, 3, -2, 0, fx->roomNumber);
-			TriggerShockwave((PoseData*)fx, 48, 240, 48, 0, 96, 128, 24, 0, 0);
+			TriggerShockwave(&fx->pos, 48, 240, 48, 0, 96, 128, 24, 0, 0);
 			if (LaraItem->HitPoints >= 500)
 				DoDamage(LaraItem, 300);
 			else
@@ -186,8 +187,7 @@ void MissileControl(short itemNumber)
 
 		if (GlobalCounter & 1)
 		{
-			Vector3i pos = { x, y, z };
-
+			auto pos = Vector3i(x, y, z);
 			int xv = x - fx->pos.Position.x;
 			int yv = y - fx->pos.Position.y;
 			int zv = z - fx->pos.Position.z;
@@ -197,7 +197,7 @@ void MissileControl(short itemNumber)
 			else
 			{
 				TriggerHydraMissileSparks(&pos, 4 * xv, 4 * yv, 4 * zv);
-				TriggerHydraMissileSparks((Vector3i*)&fx, 4 * xv, 4 * yv, 4 * zv);
+				TriggerHydraMissileSparks(&fx->pos.Position, 4 * xv, 4 * yv, 4 * zv);
 			}
 		}
 	}

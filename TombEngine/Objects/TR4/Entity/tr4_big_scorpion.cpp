@@ -22,7 +22,7 @@ namespace TEN::Entities::TR4
 {
 	constexpr auto BIG_SCORPION_ATTACK_DAMAGE		   = 120;
 	constexpr auto BIG_SCORPION_TROOP_ATTACK_DAMAGE	   = 15;
-	constexpr auto BIG_SCORPION_STINGER_POISON_POTENCY = 8;
+	constexpr auto BIG_SCORPION_STINGER_POISON_POTENCY = 16;
 
 	constexpr auto BIG_SCORPION_ATTACK_RANGE = SQUARE(SECTOR(1.35));
 	constexpr auto BIG_SCORPION_RUN_RANGE	 = SQUARE(SECTOR(2));
@@ -35,7 +35,7 @@ namespace TEN::Entities::TR4
 
 	enum BigScorpionState
 	{
-		BSCORPION_STATE_NONE = 0,
+		// No state 0.
 		BSCORPION_STATE_IDLE = 1,
 		BSCORPION_STATE_WALK_FORWARD = 2,
 		BSCORPION_STATE_RUN_FORWARD = 3,

@@ -11,13 +11,14 @@
 #include "Game/misc.h"
 #include "Game/missile.h"
 #include "Game/people.h"
+#include "Math/Math.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
-#include "Math/Math.h"
 
+using namespace TEN::Math::Random;
 using std::vector;
 
-namespace TEN::Entities::TR1
+namespace TEN::Entities::Creatures::TR1
 {
 	constexpr auto WINGED_MUTANT_IDLE_JUMP_ATTACK_DAMAGE = 150;
 	constexpr auto WINGED_MUTANT_RUN_JUMP_ATTACK_DAMAGE  = 100;
@@ -29,8 +30,8 @@ namespace TEN::Entities::TR1
 	constexpr auto WINGED_MUTANT_IDLE_JUMP_ATTACK_RANGE = SQUARE(SECTOR(2.5f));
 	constexpr auto WINGED_MUTANT_ATTACK_RANGE			= SQUARE(SECTOR(3.75f));
 
-	constexpr auto WINGED_MUTANT_POSE_CHANCE   = 85;
-	constexpr auto WINGED_MUTANT_UNPOSE_CHANCE = 200;
+	constexpr auto WINGED_MUTANT_POSE_CHANCE   = 1.0f / 400;
+	constexpr auto WINGED_MUTANT_UNPOSE_CHANCE = 1.0f / 164;
 
 	constexpr auto WINGED_MUTANT_FLY_VELOCITY	= CLICK(1) / 8;
 	constexpr auto WINGED_MUTANT_SHARD_VELOCITY = 250;
@@ -337,7 +338,7 @@ namespace TEN::Entities::TR1
 					if (AI.distance < WINGED_MUTANT_WALK_RANGE)
 					{
 						if (AI.zoneNumber == AI.enemyZone ||
-							GetRandomControl() < WINGED_MUTANT_UNPOSE_CHANCE)
+							TestProbability(WINGED_MUTANT_UNPOSE_CHANCE))
 						{
 							item->Animation.TargetState = WMUTANT_STATE_WALK_FORWARD;
 						}
@@ -345,7 +346,7 @@ namespace TEN::Entities::TR1
 					else
 						item->Animation.TargetState = WMUTANT_STATE_IDLE;
 				}
-				else if (creature->Mood == MoodType::Bored && GetRandomControl() < WINGED_MUTANT_UNPOSE_CHANCE)
+				else if (creature->Mood == MoodType::Bored && TestProbability(WINGED_MUTANT_UNPOSE_CHANCE))
 					item->Animation.TargetState = WMUTANT_STATE_WALK_FORWARD;
 				else if (creature->Mood == MoodType::Attack ||
 					creature->Mood == MoodType::Escape)
@@ -363,7 +364,7 @@ namespace TEN::Entities::TR1
 				else if (creature->Mood == MoodType::Bored ||
 					(creature->Mood == MoodType::Stalk && AI.zoneNumber != AI.enemyZone))
 				{
-					if (GetRandomControl() < WINGED_MUTANT_POSE_CHANCE)
+					if (TestProbability(WINGED_MUTANT_POSE_CHANCE))
 						item->Animation.TargetState = WMUTANT_STATE_POSE;
 				}
 				else if (creature->Mood == MoodType::Stalk &&

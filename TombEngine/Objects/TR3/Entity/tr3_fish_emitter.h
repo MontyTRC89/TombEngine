@@ -1,7 +1,7 @@
 #pragma once
 #include "Game/items.h"
 
-namespace TEN::Entities::TR3
+namespace TEN::Entities::Creatures::TR3
 {
 	void SetupShoal(int shoalNumber);
 	void ControlFish(short itemNumber);

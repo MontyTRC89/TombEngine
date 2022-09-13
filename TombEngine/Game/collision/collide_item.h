@@ -1,16 +1,15 @@
 #pragma once
 #include "Math/Math.h"
-#include "Math/Math.h"
 
-struct ItemInfo;
-struct CollisionInfo;
 class FloorInfo;
+struct CollisionInfo;
+struct ItemInfo;
 struct MESH_INFO;
 
 constexpr auto MAX_COLLIDED_OBJECTS = 1024;
 constexpr auto ITEM_RADIUS_YMAX = SECTOR(3);
 
-constexpr auto VEHICLE_COLLISION_TERMINAL_VELOCITY = 30;
+constexpr auto VEHICLE_COLLISION_TERMINAL_VELOCITY = 30.0f;
 
 extern BOUNDING_BOX GlobalCollisionBounds;
 extern ItemInfo* CollidedItems[MAX_COLLIDED_OBJECTS];
@@ -36,17 +35,17 @@ bool TestLaraPosition(OBJECT_COLLISION_BOUNDS* bounds, ItemInfo* item, ItemInfo*
 bool AlignLaraPosition(Vector3i* offset, ItemInfo* item, ItemInfo* laraItem);
 bool MoveLaraPosition(Vector3i* pos, ItemInfo* item, ItemInfo* laraItem);
 
-bool ItemNearLara(PoseData* pos, int radius);
-bool ItemNearTarget(PoseData* origin, ItemInfo* target, int radius);
+bool ItemNearLara(Vector3i* origin, int radius);
+bool ItemNearTarget(Vector3i* origin, ItemInfo* targetEntity, int radius);
 
-bool Move3DPosTo3DPos(PoseData* origin, PoseData* target, int velocity, short angleAdd);
+bool Move3DPosTo3DPos(PoseData* fromPose, PoseData* toPose, int velocity, short angleAdd);
 
 bool TestBoundsCollide(ItemInfo* item, ItemInfo* laraItem, int radius);
 bool TestBoundsCollideStatic(ItemInfo* item, MESH_INFO* mesh, int radius);
 bool ItemPushItem(ItemInfo* item, ItemInfo* laraItem, CollisionInfo* coll, bool spasmEnabled, char bigPush);
 bool ItemPushStatic(ItemInfo* laraItem, MESH_INFO* mesh, CollisionInfo* coll);
 
-bool CollideSolidBounds(ItemInfo* item, BOUNDING_BOX* box, PoseData pos, CollisionInfo* coll);
+bool CollideSolidBounds(ItemInfo* item, BOUNDING_BOX* box, PoseData pose, CollisionInfo* coll);
 void CollideSolidStatics(ItemInfo* item, CollisionInfo* coll);
 
 void AIPickupCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);

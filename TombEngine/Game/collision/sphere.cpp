@@ -77,7 +77,7 @@ int TestCollision(ItemInfo* item, ItemInfo* laraItem)
 						int dz = z1 - z2;
 						int r = r1 + r2;
 
-						if ((pow(dx, 2) + pow(dy, 2) + pow(dz, 2)) < pow(r, 2))
+						if ((SQUARE(dx) + SQUARE(dy) + SQUARE(dz)) < SQUARE(r))
 						{
 							item->SetBits(JointBitType::Touch, i);
 							laraItem->SetBits(JointBitType::Touch, j);

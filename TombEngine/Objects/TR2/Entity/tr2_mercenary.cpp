@@ -11,7 +11,7 @@
 #include "Specific/setup.h"
 #include "Math/Math.h"
 
-namespace TEN::Entities::TR2
+namespace TEN::Entities::Creatures::TR2
 {
 	const auto MercenaryUziBite		   = BiteInfo(Vector3(0.0f, 150.0f, 19.0f), 17);
 	const auto MercenaryAutoPistolBite = BiteInfo(Vector3(0.0f, 230.0f, 9.0f), 17);

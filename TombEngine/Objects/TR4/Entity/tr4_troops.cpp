@@ -453,7 +453,7 @@ namespace TEN::Entities::TR4
 				break;
 
 			case TROOP_STATE_FLASHED:
-				if (!FlashGrenadeAftershockTimer && TestProbability(0.008f))
+				if (!FlashGrenadeAftershockTimer && TestProbability(1.0f / 128))
 					item->Animation.TargetState = TROOP_STATE_GUARD;
 
 				break;

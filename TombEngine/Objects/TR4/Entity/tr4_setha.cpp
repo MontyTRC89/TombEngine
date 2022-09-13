@@ -29,10 +29,7 @@ namespace TEN::Entities::TR4
 		auto* item = &g_Level.Items[itemNumber];
 
 		ClearItem(itemNumber);
-		item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 4;
-		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-		item->Animation.ActiveState = 12;
-		item->Animation.TargetState = 12;
+		SetAnimation(item, 4);
 	}
 
 	void SethaControl(short itemNumber)
@@ -113,8 +110,7 @@ namespace TEN::Entities::TR4
 				else if (LaraItem->Pose.Position.y >= (item->Pose.Position.y - SECTOR(1)))
 				{
 					if (AI.distance < pow(SECTOR(2.5f), 2) &&
-						AI.ahead &&
-						TestProbability(0.5f) &&
+						AI.ahead && TestProbability(0.5f) &&
 						Targetable(item, &AI))
 					{
 						item->Animation.TargetState = 11;
@@ -195,8 +191,7 @@ namespace TEN::Entities::TR4
 
 				if (AI.bite &&
 					AI.distance < pow(SECTOR(4), 2) ||
-					canJump ||
-					creature->ReachedGoal)
+					canJump || creature->ReachedGoal)
 				{
 					item->Animation.TargetState = 1;
 				}
@@ -210,8 +205,7 @@ namespace TEN::Entities::TR4
 
 				if (AI.bite &&
 					AI.distance < pow(SECTOR(4), 2) ||
-					canJump ||
-					creature->ReachedGoal)
+					canJump || creature->ReachedGoal)
 				{
 					item->Animation.TargetState = 1;
 				}

@@ -180,7 +180,7 @@ sol::object LogicHandler::GetLevelFuncsMember(sol::table tab, std::string const&
 	return sol::nil;
 }
 
-void LogicHandler::CallLevelFunc(std::string const & name, float dt)
+sol::protected_function_result LogicHandler::CallLevelFunc(std::string const & name, float dt)
 {
 	sol::protected_function f = m_levelFuncs_luaFunctions[name];
 	auto r = f.call(dt);
@@ -190,9 +190,11 @@ void LogicHandler::CallLevelFunc(std::string const & name, float dt)
 		sol::error err = r;
 		ScriptAssertF(false, "Could not execute function {}: {}", name, err.what());
 	}
+
+	return r;
 }
 
-void LogicHandler::CallLevelFunc(std::string const & name, sol::variadic_args va)
+sol::protected_function_result LogicHandler::CallLevelFunc(std::string const & name, sol::variadic_args va)
 {
 	sol::protected_function f = m_levelFuncs_luaFunctions[name];
 	auto r = f.call(va);
@@ -201,6 +203,8 @@ void LogicHandler::CallLevelFunc(std::string const & name, sol::variadic_args va
 		sol::error err = r;
 		ScriptAssertF(false, "Could not execute function {}: {}", name, err.what());
 	}
+
+	return r;
 }
 
 bool LogicHandler::SetLevelFuncsMember(sol::table tab, std::string const& luaName, sol::object value)
@@ -350,9 +354,9 @@ void LogicHandler::SetVariables(std::vector<SavedVar> const & vars)
 						solTables[i][vars[first]] = vars[second];
 					}
 				}
-				else if (std::holds_alternative<Vector3Int>(vars[second]))
+				else if (std::holds_alternative<Vector3i>(vars[second]))
 				{
-					auto theVec = Vec3{ std::get<Vector3Int>(vars[second]) };
+					auto theVec = Vec3{ std::get<Vector3i>(vars[second]) };
 					solTables[i][vars[first]] = theVec;
 				}
 				else if (std::holds_alternative<FuncName>(vars[second]))

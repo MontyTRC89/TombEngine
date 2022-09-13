@@ -18,14 +18,13 @@ using namespace TEN::Math::Random;
 namespace TEN::Entities::TR4
 {
 	constexpr auto WILD_BOAR_ATTACK_DAMAGE = 30;
-
 	constexpr auto WILD_BOAR_ATTACK_RANGE = SQUARE(CLICK(1));
 
 	const auto WildBoarBite = BiteInfo(Vector3::Zero, 14);
 
 	enum WildBoarState
 	{
-		BOAR_STATE_NONE = 0,
+		// No state 0.
 		BOAR_STATE_IDLE = 1,
 		BOAR_STATE_RUN_FORWARD = 2,
 		BOAR_STATE_GRAZE = 3,
@@ -51,11 +50,7 @@ namespace TEN::Entities::TR4
 		auto* item = &g_Level.Items[itemNumber];
 
 		ClearItem(itemNumber);
-
-		item->Animation.AnimNumber = Objects[ID_WILD_BOAR].animIndex + BOAR_ANIM_IDLE;
-		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-		item->Animation.ActiveState = BOAR_STATE_IDLE;
-		item->Animation.TargetState = BOAR_STATE_IDLE;
+		SetAnimation(item, BOAR_ANIM_IDLE);
 	}
 
 	void WildBoarControl(short itemNumber)
@@ -67,9 +62,9 @@ namespace TEN::Entities::TR4
 		auto* creature = GetCreatureInfo(item);
 
 		short angle = 0;
+		short tilt = 0;
 		short head = 0;
 		short neck = 0;
-		short tilt = 0;
 		short joint0 = 0;
 		short joint1 = 0;
 		short joint2 = 0;
@@ -153,7 +148,7 @@ namespace TEN::Entities::TR4
 
 				if (AI.ahead && AI.distance)
 					item->Animation.TargetState = BOAR_STATE_IDLE;
-				else if (TestProbability(0.008f))
+				else if (TestProbability(1.0f / 128))
 					item->Animation.TargetState = BOAR_STATE_IDLE;
 
 				break;
@@ -192,11 +187,7 @@ namespace TEN::Entities::TR4
 			item->HitPoints = 0;
 
 			if (item->Animation.ActiveState != BOAR_STATE_DEATH)
-			{
-				item->Animation.AnimNumber = Objects[ID_WILD_BOAR].animIndex + BOAR_ANIM_DEATH;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-				item->Animation.ActiveState = BOAR_STATE_DEATH;
-			}
+				SetAnimation(item, BOAR_ANIM_DEATH);
 		}
 
 		CreatureJoint(item, 0, joint0);

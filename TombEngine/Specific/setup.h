@@ -4,9 +4,9 @@
 #include "Specific/level.h"
 #include "Renderer/Renderer11Enums.h"
 
-struct ItemInfo;
+enum class ZoneType;
 struct CollisionInfo;
-enum ZoneType : char;
+struct ItemInfo;
 
 constexpr auto DEFAULT_RADIUS = 10;
 constexpr auto ROT_X = 0x0004;
@@ -44,7 +44,7 @@ struct ObjectInfo
 	std::function<int(short itemNumber)> ceilingBorder;
 	std::function<void(ItemInfo* item)> drawRoutine;
 	std::function<void(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)> collision;
-	ZoneType zoneType;
+	ZoneType ZoneType;
 	int animIndex; 
 	short HitPoints; 
 	short pivotLength; 

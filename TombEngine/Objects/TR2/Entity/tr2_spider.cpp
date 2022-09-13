@@ -14,17 +14,17 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-namespace TEN::Entities::TR2
+namespace TEN::Entities::Creatures::TR2
 {
 	const auto SpiderBite = BiteInfo(Vector3(0.0f, 0.0f, 41.0f), 1);
 
-	static void S_SpiderBite(ItemInfo* item)
+	void S_SpiderBite(ItemInfo* item)
 	{
 		auto pos = GetJointPosition(item, SpiderBite.meshNum, Vector3i(SpiderBite.Position));
 		DoBloodSplat(pos.x, pos.y, pos.z, 10, item->Pose.Position.y, item->RoomNumber);
 	}
 
-	static void SpiderLeap(short itemNumber, ItemInfo* item, short angle)
+	void SpiderLeap(short itemNumber, ItemInfo* item, short angle)
 	{
 		auto vec = GameVector(
 			item->Pose.Position.x,
@@ -38,9 +38,7 @@ namespace TEN::Entities::TR2
 		if (item->Pose.Position.y > (vec.y - CLICK(1.5f)))
 			return;
 
-		item->Pose.Position.x = vec.x;
-		item->Pose.Position.y = vec.y;
-		item->Pose.Position.z = vec.z;
+		item->Pose.Position = Vector3i(vec.x, vec.y, vec.z);
 		if (item->RoomNumber != vec.roomNumber)
 			ItemNewRoom(item->RoomNumber, vec.roomNumber);
 

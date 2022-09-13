@@ -1,7 +1,7 @@
 #pragma once
 #include "Math/Math.h"
 
-namespace TEN::Entities::TR5
+namespace TEN::Entities::Creatures::TR5
 {
 	void InitialiseHydra(short itemNumber);
 	void HydraControl(short itemNumber);

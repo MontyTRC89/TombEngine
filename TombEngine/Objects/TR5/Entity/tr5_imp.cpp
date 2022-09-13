@@ -16,7 +16,7 @@
 using namespace TEN::Entities::Generic;
 using namespace TEN::Math;
 
-namespace TEN::Entities::TR5
+namespace TEN::Entities::Creatures::TR5
 {
 	const auto ImpBite = BiteInfo(Vector3(0.0f, 100.0f, 0.0f), 9);
 

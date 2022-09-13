@@ -20,7 +20,7 @@
 
 using namespace TEN::Effects::Lara;
 
-namespace TEN::Entities::TR3
+namespace TEN::Entities::Creatures::TR3
 {
 	static BOSS_STRUCT BossData;
 
@@ -452,7 +452,7 @@ namespace TEN::Entities::TR3
 
 		if (!Lara.Burn)
 		{
-			if (ItemNearLara(&fx->pos, 200))
+			if (ItemNearLara(&fx->pos.Position, 200))
 			{
 				LaraItem->HitStatus = true;
 				KillEffect(fxNumber);

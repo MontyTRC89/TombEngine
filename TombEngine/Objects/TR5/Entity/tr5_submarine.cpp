@@ -1,27 +1,29 @@
 #include "framework.h"
-#include "tr5_submarine.h"
-#include "Game/items.h"
-#include "Game/control/box.h"
-#include "Game/people.h"
+#include "Objects/TR5/Entity/tr5_submarine.h"
+
+#include "Game/animation.h"
 #include "Game/collision/collide_item.h"
 #include "Game/collision/collide_room.h"
+#include "Game/control/box.h"
 #include "Game/control/los.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/tomb4fx.h"
 #include "Game/itemdata/creature_info.h"
-#include "Game/animation.h"
+#include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_one_gun.h"
 #include "Math/Math.h"
-#include "Specific/setup.h"
-#include "Specific/level.h"
+#include "Game/misc.h"
+#include "Game/people.h"
 #include "Sound/sound.h"
+#include "Specific/level.h"
+#include "Specific/setup.h"
 
 using namespace TEN::Math;
 
-namespace TEN::Entities::TR5
+namespace TEN::Entities::Creatures::TR5
 {
-	static void TriggerSubmarineSparks(short itemNumber)
+	void TriggerSubmarineSparks(short itemNumber)
 	{
 		auto* spark = GetFreeParticle();
 
@@ -53,7 +55,7 @@ namespace TEN::Entities::TR5
 		spark->dSize = spark->sSize = spark->size = (GetRandomControl() & 7) + 192;
 	}
 
-	static void TriggerTorpedoBubbles(Vector3i* pos1, Vector3i* pos2, char factor)
+	void TriggerTorpedoBubbles(Vector3i* pos1, Vector3i* pos2, char factor)
 	{
 		auto* spark = GetFreeParticle();
 
@@ -86,7 +88,7 @@ namespace TEN::Entities::TR5
 		spark->dSize = spark->size * 2;
 	}
 
-	static void TriggerTorpedoSparks2(Vector3i* pos1, Vector3i* pos2, char scale)
+	void TriggerTorpedoSparks2(Vector3i* pos1, Vector3i* pos2, char scale)
 	{
 		auto* spark = GetFreeParticle();
 
@@ -118,18 +120,18 @@ namespace TEN::Entities::TR5
 		spark->dSize = spark->size * 2;
 	}
 
-	static void SubmarineAttack(ItemInfo* item)
+	void SubmarineAttack(ItemInfo* item)
 	{
 		short itemNumber = CreateItem();
+		if (itemNumber == NO_ITEM)
+			return;
 
-		if (itemNumber != NO_ITEM)
-		{
-			auto* torpedoItem = &g_Level.Items[itemNumber];
+		auto* torpedoItem = &g_Level.Items[itemNumber];
 
-			SoundEffect(SFX_TR5_UNDERWATER_TORPEDO, &torpedoItem->Pose, SoundEnvironment::Always);
+		SoundEffect(SFX_TR5_UNDERWATER_TORPEDO, &torpedoItem->Pose, SoundEnvironment::Always);
 
-			torpedoItem->ObjectNumber = ID_TORPEDO;
-			torpedoItem->Color = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
+		torpedoItem->ObjectNumber = ID_TORPEDO;
+		torpedoItem->Color = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
 
 			auto pos1 = Vector3i::Zero;
 			auto pos2 = Vector3i::Zero;
@@ -147,15 +149,15 @@ namespace TEN::Entities::TR5
 					(GetRandomControl() & 0x3FF) - 160
 				));
 
-				TriggerTorpedoSparks2(&pos1, &pos2, 0);
-			}
+			TriggerTorpedoSparks2(&pos1, &pos2, 0);
+		}
 
-			torpedoItem->RoomNumber = item->RoomNumber;
-			GetFloor(pos1.x, pos1.y, pos1.z, &torpedoItem->RoomNumber);
+		torpedoItem->RoomNumber = item->RoomNumber;
+		GetFloor(pos1.x, pos1.y, pos1.z, &torpedoItem->RoomNumber);
 
 			torpedoItem->Pose.Position = pos1;
 
-			InitialiseItem(itemNumber);
+		InitialiseItem(itemNumber);
 
 			torpedoItem->Pose.Orientation.x = 0;
 			torpedoItem->Pose.Orientation.y = item->Pose.Orientation.y;
@@ -164,8 +166,7 @@ namespace TEN::Entities::TR5
 			torpedoItem->Animation.Velocity.z = 0.0f;
 			torpedoItem->ItemFlags[0] = -1;
 
-			AddActiveItem(itemNumber);
-		}
+		AddActiveItem(itemNumber);
 	}
 
 	void InitialiseSubmarine(short itemNumber)
@@ -173,10 +174,7 @@ namespace TEN::Entities::TR5
 		auto* item = &g_Level.Items[itemNumber];
 
 		ClearItem(itemNumber);
-		item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex;
-		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-		item->Animation.TargetState = 0;
-		item->Animation.ActiveState = 0;
+		SetAnimation(item, 0);
 
 		if (!item->TriggerFlags)
 			item->TriggerFlags = 120;
@@ -188,14 +186,14 @@ namespace TEN::Entities::TR5
 			return;
 
 		auto* item = &g_Level.Items[itemNumber];
-		auto* creature = (CreatureInfo*)item->Data;
+		auto* creature = GetCreatureInfo(item);
 
 		if (item->AIBits)
 			GetAITarget(creature);
 		else
 			creature->Enemy = LaraItem;
 
-		AI_INFO AI, laraInfo;
+		AI_INFO AI, laraAI;
 		CreatureAIInfo(item, &AI);
 
 		GetCreatureMood(item, &AI, true);
@@ -205,34 +203,34 @@ namespace TEN::Entities::TR5
 
 		if (creature->Enemy == LaraItem)
 		{
-			laraInfo.angle = AI.angle;
-			laraInfo.distance = AI.distance;
+			laraAI.angle = AI.angle;
+			laraAI.distance = AI.distance;
 		}
 		else
 		{
 			int dx = LaraItem->Pose.Position.x - item->Pose.Position.x;
 			int dz = LaraItem->Pose.Position.z - item->Pose.Position.z;
 
-			laraInfo.angle = phd_atan(dz, dx) - item->Pose.Orientation.y;
-			laraInfo.distance = pow(dx, 2) + pow(dz, 2);
-			laraInfo.ahead = true;
+			laraAI.angle = phd_atan(dz, dx) - item->Pose.Orientation.y;
+			laraAI.distance = pow(dx, 2) + pow(dz, 2);
+			laraAI.ahead = true;
 		}
 
 		int tilt = item->ItemFlags[0] + (angle / 2);
 
-		if (tilt > 2048)
-			tilt = 2048;
-		else if (tilt < -2048)
-			tilt = -2048;
+		if (tilt > ANGLE(11.25f))
+			tilt = ANGLE(11.25f);
+		else if (tilt < ANGLE(-11.25f))
+			tilt = ANGLE(-11.25f);
 
 		item->ItemFlags[0] = tilt;
 
-		if (abs(tilt) >= 64)
+		if (abs(tilt) >= ANGLE(0.35f))
 		{
 			if (tilt > 0)
-				item->ItemFlags[0] -= 64;
+				item->ItemFlags[0] -= ANGLE(0.35f);
 			else
-				item->ItemFlags[0] += 64;
+				item->ItemFlags[0] += ANGLE(0.35f);
 		}
 		else
 			item->ItemFlags[0] = 0;
@@ -247,17 +245,17 @@ namespace TEN::Entities::TR5
 		auto* enemy = creature->Enemy;
 		creature->Enemy = LaraItem;
 
-		if (Targetable(item, &laraInfo))
+		if (Targetable(item, &laraAI))
 		{
 			if (creature->Flags >= item->TriggerFlags &&
-				laraInfo.angle > -ANGLE(90.0f) &&
-				laraInfo.angle < ANGLE(90.0f))
+				laraAI.angle > -ANGLE(90.0f) &&
+				laraAI.angle < ANGLE(90.0f))
 			{
 				SubmarineAttack(item);
 				creature->Flags = 0;
 			}
 
-			if (laraInfo.distance >= pow(SECTOR(3), 2))
+			if (laraAI.distance >= pow(SECTOR(3), 2))
 			{
 				item->Animation.TargetState = 1;
 				SoundEffect(SFX_TR5_VEHICLE_DIVESUIT_LOOP, &item->Pose, SoundEnvironment::Always);
@@ -268,15 +266,15 @@ namespace TEN::Entities::TR5
 			if (AI.distance < pow(SECTOR(1), 2))
 			{
 				creature->MaxTurn = 0;
-				if (abs(laraInfo.angle) >= ANGLE(2.0f))
+				if (abs(laraAI.angle) >= ANGLE(2.0f))
 				{
-					if (laraInfo.angle >= 0)
+					if (laraAI.angle >= 0)
 						item->Pose.Orientation.y += ANGLE(2.0f);
 					else
 						item->Pose.Orientation.y -= ANGLE(2.0f);
 				}
 				else
-					item->Pose.Orientation.y += laraInfo.angle;
+					item->Pose.Orientation.y += laraAI.angle;
 			}
 		}
 		else
@@ -360,8 +358,8 @@ namespace TEN::Entities::TR5
 
 		if (TestEnvironment(ENV_FLAG_WATER, item->RoomNumber))
 		{
-			item->Animation.Velocity.z += (5 - item->Animation.Velocity.z) / 2;
-			item->Animation.Velocity.y+= (5 - item->Animation.Velocity.y) / 2;
+			item->Animation.Velocity.y += (5.0f - item->Animation.Velocity.y) / 2.0f;
+			item->Animation.Velocity.z += (5.0f - item->Animation.Velocity.z) / 2.0f;
 		}
 		else
 			item->Animation.Velocity.y += GRAVITY;
@@ -436,13 +434,13 @@ namespace TEN::Entities::TR5
 
 		auto orient = Geometry::GetOrientTowardPoint(item->Pose.Position.ToVector3(), pos.ToVector3());
 
-		if (item->Animation.Velocity.z >= 48)
+		if (item->Animation.Velocity.z >= 48.0f)
 		{
-			if (item->Animation.Velocity.z < 192)
+			if (item->Animation.Velocity.z < 192.0f)
 				item->Animation.Velocity.z++;
 		}
 		else
-			item->Animation.Velocity.z += 4;
+			item->Animation.Velocity.z += 4.0f;
 
 		item->ItemFlags[1]++;
 
@@ -497,7 +495,7 @@ namespace TEN::Entities::TR5
 			item->Pose.Position.y > probe.Position.Ceiling &&
 			TestEnvironment(ENV_FLAG_WATER, probe.RoomNumber))
 		{
-			if (ItemNearLara(&item->Pose, 200))
+			if (ItemNearLara(&item->Pose.Position, 200))
 			{
 				LaraItem->HitStatus = true;
 				KillItem(itemNumber);

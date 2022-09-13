@@ -92,7 +92,7 @@ void DrawNearbyPathfinding(int boxIndex)
 
 void DropEntityPickups(ItemInfo* item)
 {
-	ItemInfo* pickup = NULL;
+	ItemInfo* pickup = nullptr;
 
 	for (short pickupNumber = item->CarriedItem; pickupNumber != NO_ITEM; pickupNumber = pickup->CarriedItem)
 	{
@@ -157,7 +157,7 @@ void CreatureYRot2(PoseData* fromPose, short angle, short angleAdd)
 
 bool SameZone(CreatureInfo* creature, ItemInfo* target)
 {
-	int* zone = g_Level.Zones[creature->LOT.Zone][FlipStatus].data();
+	int* zone = g_Level.Zones[(int)creature->LOT.Zone][FlipStatus].data();
 	auto* item = &g_Level.Items[creature->ItemNumber];
 
 	auto* room = &g_Level.Rooms[item->RoomNumber];
@@ -447,12 +447,13 @@ int CreatureAnimation(short itemNumber, short angle, short tilt)
 	short top;
 
 	auto* item = &g_Level.Items[itemNumber];
-	if (!item->Data)
+
+	if (!item->IsCreature())
 		return false;
 
 	auto* creature = GetCreatureInfo(item);
 	auto* LOT = &creature->LOT;
-	int* zone = g_Level.Zones[LOT->Zone][FlipStatus].data();
+	int* zone = g_Level.Zones[(int)LOT->Zone][FlipStatus].data();
 
 	int boxHeight;
 	if (item->BoxNumber != NO_BOX)
@@ -460,7 +461,7 @@ int CreatureAnimation(short itemNumber, short angle, short tilt)
 	else
 		boxHeight = item->Floor;
 
-	auto old = item->Pose.Position;
+	auto prevPos = item->Pose.Position;
 
 	AnimateItem(item);
 
@@ -475,7 +476,7 @@ int CreatureAnimation(short itemNumber, short angle, short tilt)
 	int y = item->Pose.Position.y + bounds->Y1;
 
 	short roomNumber = item->RoomNumber;
-	GetFloor(old.x, y, old.z, &roomNumber);  
+	GetFloor(prevPos.x, y, prevPos.z, &roomNumber);  
 	FloorInfo* floor = GetFloor(item->Pose.Position.x, y, item->Pose.Position.z, &roomNumber);
 
 	// TODO: Check why some blocks have box = -1 assigned to them -- Lwmte, 10.11.21
@@ -504,18 +505,18 @@ int CreatureAnimation(short itemNumber, short angle, short tilt)
 	{
 		xPos = item->Pose.Position.x / SECTOR(1);
 		zPos = item->Pose.Position.z / SECTOR(1);
-		shiftX = old.x / SECTOR(1);
-		shiftZ = old.z / SECTOR(1);
+		shiftX = prevPos.x / SECTOR(1);
+		shiftZ = prevPos.z / SECTOR(1);
 
 		if (xPos < shiftX)
-			item->Pose.Position.x = old.x & (~(SECTOR(1) - 1));
+			item->Pose.Position.x = prevPos.x & (~WALL_MASK);
 		else if (xPos > shiftX)
-			item->Pose.Position.x = old.x | (SECTOR(1) - 1);
+			item->Pose.Position.x = prevPos.x | WALL_MASK;
 
 		if (zPos < shiftZ)
-			item->Pose.Position.z = old.z & (~(SECTOR(1) - 1));
+			item->Pose.Position.z = prevPos.z & (~WALL_MASK);
 		else if (zPos > shiftZ)
-			item->Pose.Position.z = old.z | (SECTOR(1) - 1);
+			item->Pose.Position.z = prevPos.z | (WALL_MASK);
 
 		floor = GetFloor(item->Pose.Position.x, y, item->Pose.Position.z, &roomNumber);
 		height = g_Level.Boxes[floor->Box].height;
@@ -536,8 +537,8 @@ int CreatureAnimation(short itemNumber, short angle, short tilt)
 
 	int x = item->Pose.Position.x;
 	int z = item->Pose.Position.z;
-	xPos = x & (SECTOR(1) - 1);
-	zPos = z & (SECTOR(1) - 1);
+	xPos = x & WALL_MASK;
+	zPos = z & WALL_MASK;
 	short radius = Objects[item->ObjectNumber].radius;
 	shiftX = 0;
 	shiftZ = 0;
@@ -667,8 +668,8 @@ int CreatureAnimation(short itemNumber, short angle, short tilt)
 				{
 					if (item->Pose.Position.y + top < ceiling)
 					{
-						item->Pose.Position.x = old.x;
-						item->Pose.Position.z = old.z;
+						item->Pose.Position.x = prevPos.x;
+						item->Pose.Position.z = prevPos.z;
 						dy = LOT->Fly;
 					}
 					else
@@ -687,13 +688,13 @@ int CreatureAnimation(short itemNumber, short angle, short tilt)
 		}
 		else if (item->Pose.Position.y <= height)
 		{
-			dy = 0;
 			item->Pose.Position.y = height;
+			dy = 0;
 		}
 		else
 		{
-			item->Pose.Position.x = old.x;
-			item->Pose.Position.z = old.z;
+			item->Pose.Position.x = prevPos.x;
+			item->Pose.Position.z = prevPos.z;
 			dy = -LOT->Fly;
 		}
 
@@ -730,11 +731,7 @@ int CreatureAnimation(short itemNumber, short angle, short tilt)
 			if (item->Pose.Position.y > item->Floor)
 			{
 				if (item->Pose.Position.y > (item->Floor + CLICK(1)))
-				{
-					item->Pose.Position.x = old.x;
-					item->Pose.Position.y = old.y;
-					item->Pose.Position.z = old.z;
-				}
+					item->Pose.Position = prevPos;
 				else
 					item->Pose.Position.y = item->Floor;
 			}
@@ -751,11 +748,7 @@ int CreatureAnimation(short itemNumber, short angle, short tilt)
 			top = bounds->Y1; // TODO: check if Y1 or Y2
 
 		if (item->Pose.Position.y + top < ceiling)
-		{
-			item->Pose.Position.x = old.x;
-			item->Pose.Position.z = old.z;
-			item->Pose.Position.y = old.y;
-		}
+			item->Pose.Position = prevPos;
 
 		floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNumber);
 		item->Floor = GetFloorHeight(floor, item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z);
@@ -771,7 +764,6 @@ int CreatureAnimation(short itemNumber, short angle, short tilt)
 	}
 
 	CreatureSwitchRoom(itemNumber);
-
 	return true;
 }
 
@@ -890,7 +882,7 @@ int ValidBox(ItemInfo* item, short zoneNumber, short boxNumber)
 		return false;
 
 	auto* creature = GetCreatureInfo(item);
-	int* zone = g_Level.Zones[creature->LOT.Zone][FlipStatus].data();
+	int* zone = g_Level.Zones[(int)creature->LOT.Zone][FlipStatus].data();
 	if (creature->LOT.Fly == NO_FLYING && zone[boxNumber] != zoneNumber)
 		return false;
 
@@ -976,7 +968,7 @@ int UpdateLOT(LOTInfo* LOT, int depth)
 
 int SearchLOT(LOTInfo* LOT, int depth)
 {
-	int* zone = g_Level.Zones[LOT->Zone][FlipStatus].data();
+	int* zone = g_Level.Zones[(int)LOT->Zone][FlipStatus].data();
 	int searchZone = zone[LOT->Head];
 
 	if (depth <= 0)
@@ -1090,7 +1082,7 @@ int CreatureActive(short itemNumber)
 	if (item->Flags & IFLAG_KILLED)
 		return false; // Object is already dead
 
-	if (item->Status == ITEM_INVISIBLE || !item->Data.is<CreatureInfo>())
+	if (item->Status == ITEM_INVISIBLE || !item->IsCreature())
 	{
 		if (!EnableEntityAI(itemNumber, 0))
 			return false; // AI couldn't be activated
@@ -1168,7 +1160,7 @@ int CreatureVault(short itemNumber, short angle, int vault, int shift)
 		vault = 0;
 	else if (item->Floor > y + CHECK_CLICK(7))
 		vault = -4;
-	// FIXME: edit assets adding climb down animations for Von Croy and baddys?
+	// FIXME: edit assets adding climb down animations for Von Croy and baddies?
 	else if (item->Floor > y + CHECK_CLICK(5) &&
 		item->ObjectNumber != ID_VON_CROY &&
 		item->ObjectNumber != ID_BADDY1 &&
@@ -1373,7 +1365,7 @@ void FindAITargetObject(CreatureInfo* creature, short objectNumber)
 
 	if (g_Level.AIObjects.size() > 0)
 	{
-		AI_OBJECT* foundObject = NULL;
+		AI_OBJECT* foundObject = nullptr;
 
 		for (int i = 0; i < g_Level.AIObjects.size(); i++)
 		{
@@ -1381,7 +1373,7 @@ void FindAITargetObject(CreatureInfo* creature, short objectNumber)
 
 			if (aiObject->objectNumber == objectNumber && aiObject->triggerFlags == item->ItemFlags[3] && aiObject->roomNumber != NO_ROOM)
 			{
-				int* zone = g_Level.Zones[creature->LOT.Zone][FlipStatus].data();
+				int* zone = g_Level.Zones[(int)creature->LOT.Zone][FlipStatus].data();
 
 				auto* room = &g_Level.Rooms[item->RoomNumber];
 				item->BoxNumber = GetSector(room, item->Pose.Position.x - room->x, item->Pose.Position.z - room->z)->Box;
@@ -1400,7 +1392,7 @@ void FindAITargetObject(CreatureInfo* creature, short objectNumber)
 			}
 		}
 
-		if (foundObject != NULL)
+		if (foundObject != nullptr)
 		{
 			auto* aiItem = creature->AITarget;
 
@@ -1441,7 +1433,7 @@ void CreatureAIInfo(ItemInfo* item, AI_INFO* AI)
 		creature->Enemy = LaraItem;
 	}
 
-	int* zone = g_Level.Zones[creature->LOT.Zone][FlipStatus].data();
+	int* zone = g_Level.Zones[(int)creature->LOT.Zone][FlipStatus].data();
 
 	auto* room = &g_Level.Rooms[item->RoomNumber];
 	item->BoxNumber = NO_BOX;
@@ -1463,8 +1455,8 @@ void CreatureAIInfo(ItemInfo* item, AI_INFO* AI)
 	// This prevents enemies from running to Lara and attacking nothing when she is hanging or shimmying. -- Lwmte, 27.06.22
 
 	bool reachable = false;
-	if (object->zoneType == ZoneType::ZONE_FLYER ||
-	   (object->zoneType == ZoneType::ZONE_WATER && TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, item->RoomNumber)))
+	if (object->ZoneType == ZoneType::Flyer ||
+	   (object->ZoneType == ZoneType::Water && TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, item->RoomNumber)))
 	{
 		reachable = true; // If NPC is flying or swimming in water, always reach Lara
 	}

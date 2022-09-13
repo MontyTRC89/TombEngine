@@ -1093,11 +1093,11 @@ bool SaveGame::Save(int slot)
 
 			putDataInVec(Save::VarUnion::funcName, funcNameOffset);
 		}
-		else if (std::holds_alternative<Vector3Int>(s))
+		else if (std::holds_alternative<Vector3i>(s))
 		{
 			Save::vec3TableBuilder vtb{ fbb };
-			Vector3Int data = std::get<Vector3Int>(s);
-			Save::Vector3 saveVec = FromVector3(std::get<Vector3Int>(s));
+			Vector3i data = std::get<Vector3i>(s);
+			Save::Vector3 saveVec = FromVector3(std::get<Vector3i>(s));
 			vtb.add_vec(&saveVec);
 			auto vec3Offset = vtb.Finish();
 
@@ -1934,7 +1934,7 @@ bool SaveGame::Load(int slot)
 			}
 			else if (var->u_type() == Save::VarUnion::vec3)
 			{
-				loadedVars.push_back(ToVector3Int(var->u_as_vec3()->vec()));
+				loadedVars.push_back(ToVector3i(var->u_as_vec3()->vec()));
 			}
 			else if (var->u_type() == Save::VarUnion::funcName)
 			{

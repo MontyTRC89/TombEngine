@@ -1,6 +1,6 @@
 #pragma once
 
-struct Vector3Int;
+struct Vector3i;
 
 namespace sol {
 	class state;

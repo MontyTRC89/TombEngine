@@ -1,45 +1,45 @@
 #include "framework.h"
-#include "tr5_larson.h"
-#include "Game/items.h"
-#include "Game/control/box.h"
-#include "Game/effects/effects.h"
-#include "Game/people.h"
-#include "Game/Lara/lara.h"
-#include "Specific/setup.h"
-#include "Specific/level.h"
-#include "Game/itemdata/creature_info.h"
-#include "Game/control/control.h"
+#include "Objects/TR5/Entity/tr5_larson.h"
+
 #include "Game/animation.h"
+#include "Game/control/box.h"
+#include "Game/control/control.h"
+#include "Game/effects/effects.h"
+#include "Game/itemdata/creature_info.h"
+#include "Game/items.h"
+#include "Game/Lara/lara.h"
+#include "Game/misc.h"
+#include "Game/people.h"
+#include "Specific/level.h"
+#include "Specific/setup.h"
 
-namespace TEN::Entities::TR5
+using namespace TEN::Math::Random;
+
+namespace TEN::Entities::Creatures::TR5
 {
-#define STATE_TR5_LARSON_STOP	1
-#define STATE_TR5_LARSON_WALK	2
-#define STATE_TR5_LARSON_RUN	3
-#define STATE_TR5_LARSON_AIM	4
-#define STATE_TR5_LARSON_DIE	5
-#define STATE_TR5_LARSON_IDLE	6
-#define STATE_TR5_LARSON_ATTACK	7
+	#define STATE_TR5_LARSON_STOP	1
+	#define STATE_TR5_LARSON_WALK	2
+	#define STATE_TR5_LARSON_RUN	3
+	#define STATE_TR5_LARSON_AIM	4
+	#define STATE_TR5_LARSON_DIE	5
+	#define STATE_TR5_LARSON_IDLE	6
+	#define STATE_TR5_LARSON_ATTACK	7
 
-#define ANIMATION_TR5_PIERRE_DIE 12
-#define ANIMATION_TR5_LARSON_DIE 15
+	#define ANIMATION_TR5_PIERRE_DIE 12
+	#define ANIMATION_TR5_LARSON_DIE 15
 
-#define TR5_LARSON_MIN_HP 40
+	#define TR5_LARSON_MIN_HP 40
 
-	const auto LarsonGun  = BiteInfo(Vector3(-55, 200, 5), 14);
-	const auto PierreGun1 = BiteInfo(Vector3(60, 200, 0), 11);
-	const auto PierreGun2 = BiteInfo(Vector3(-57, 200, 0), 14);
+	const auto LarsonGun  = BiteInfo(Vector3(-55.0f, 200.0f, 5.0f), 14);
+	const auto PierreGun1 = BiteInfo(Vector3(60.0f, 200.0f, 0.0f), 11);
+	const auto PierreGun2 = BiteInfo(Vector3(-57.0f, 200.0f, 0.0f), 14);
 
-	void InitialiseLarson(short itemNum)
+	void InitialiseLarson(short itemNumber)
 	{
-		ItemInfo* item = &g_Level.Items[itemNum];
+		auto* item = &g_Level.Items[itemNumber];
 
-		ClearItem(itemNum);
-
-		item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex;
-		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-		item->Animation.TargetState = STATE_TR5_LARSON_STOP;
-		item->Animation.ActiveState = STATE_TR5_LARSON_STOP;
+		ClearItem(itemNumber);
+		SetAnimation(item, 0);
 
 		if (!item->TriggerFlags)
 			return;
@@ -47,22 +47,14 @@ namespace TEN::Entities::TR5
 		item->ItemFlags[3] = item->TriggerFlags;
 		short rotY = item->Pose.Orientation.y;
 
-		if (rotY > ANGLE(22.5f) && rotY < 28672)
-		{
+		if (rotY > ANGLE(22.5f) && rotY < ANGLE(157.5f))
 			item->Pose.Position.x += STEPUP_HEIGHT;
-		}
-		else if (rotY < -ANGLE(22.5f) && rotY > -28672)
-		{
+		else if (rotY < ANGLE(-22.5f) && rotY > ANGLE(-157.5f))
 			item->Pose.Position.x -= STEPUP_HEIGHT;
-		}
-		else if (rotY < -20480 || rotY > 20480)
-		{
+		else if (rotY < ANGLE(-112.5f) || rotY > ANGLE(112.5f))
 			item->Pose.Position.z -= STEPUP_HEIGHT;
-		}
-		else if (rotY > -8192 || rotY < 8192)
-		{
+		else if (rotY > ANGLE(-45.0f) || rotY < ANGLE(45.0f))
 			item->Pose.Position.z += STEPUP_HEIGHT;
-		}
 	}
 
 	void LarsonControl(short itemNumber)
@@ -70,23 +62,23 @@ namespace TEN::Entities::TR5
 		if (!CreatureActive(itemNumber))
 			return;
 
-		short tilt = 0;
+		auto* item = &g_Level.Items[itemNumber];
+		auto* creature = GetCreatureInfo(item);
+
 		short angle = 0;
+		short tilt = 0;
 		short joint0 = 0;
 		short joint1 = 0;
 		short joint2 = 0;
 
-		auto* item = &g_Level.Items[itemNumber];
-		CreatureInfo* creature = (CreatureInfo*)item->Data;
-
-		// In Streets of Rome when Larson HP are below 40 he runs way
+		// TODO: When Larson's HP is below 40, he runs away in Streets of Rome. Keeping block commented for reference.
 		/*if (item->HitPoints <= TR5_LARSON_MIN_HP && !(item->flags & IFLAG_INVISIBLE))
 		{
 			item->HitPoints = TR5_LARSON_MIN_HP;
 			creature->flags++;
 		}*/
 
-		// Fire weapon effects
+		// Fire weapon effects.
 		if (creature->FiredWeapon)
 		{
 			auto pos = GetJointPosition(item, LarsonGun.meshNum, Vector3i(LarsonGun.Position));
@@ -98,19 +90,20 @@ namespace TEN::Entities::TR5
 		{
 			if (CurrentLevel == 2)
 			{
-				item->ItemFlags[3] = 1;
 				item->Animation.IsAirborne = false;
-				item->HitStatus = false;
-				item->Collidable = false;
 				item->Status = ITEM_DEACTIVATED;
+				item->Collidable = false;
+				item->HitStatus = false;
+				item->ItemFlags[3] = 1;
 			}
 			else
 			{
 				item->Animation.IsAirborne = false;
-				item->HitStatus = false;
-				item->Collidable = false;
 				item->Status = ITEM_ACTIVE;
+				item->Collidable = false;
+				item->HitStatus = false;
 			}
+
 			item->TriggerFlags = 0;
 		}
 
@@ -121,30 +114,30 @@ namespace TEN::Entities::TR5
 			else
 				creature->Enemy = LaraItem;
 
-			AI_INFO info;
-			CreatureAIInfo(item, &info);
+			AI_INFO AI;
+			CreatureAIInfo(item, &AI);
 
-			if (info.ahead)
-				joint2 = info.angle;
+			if (AI.ahead)
+				joint2 = AI.angle;
 
-			// FIXME: this should make Larson running away, but it's broken
+			// FIXME: This should make Larson run away, but it doesn't work.
 			/*if (creature->flags)
 			{
 				item->HitPoints = 60;
 				item->IsAirborne = false;
-				item->hitStatus = false;
-				item->collidable = false;
-				item->status = ITEM_DESACTIVATED;
-				creature->flags = 0;
+				item->HitStatus = false;
+				item->Collidable = false;
+				item->Status = ITEM_DESACTIVATED;
+				creature->Flags = 0;
 			}*/
 
-			GetCreatureMood(item, &info, true);
-			CreatureMood(item, &info, true);
+			GetCreatureMood(item, &AI, true);
+			CreatureMood(item, &AI, true);
 
-			if (info.distance < SQUARE(2048)
-				&& LaraItem->Animation.Velocity.z > 20
-				|| item->HitStatus
-				|| TargetVisible(item, &info) != 0)
+			if (AI.distance < SQUARE(SECTOR(2)) &&
+				LaraItem->Animation.Velocity.z > 20.0f ||
+				item->HitStatus ||
+				TargetVisible(item, &AI) != 0)
 			{
 				item->Status &= ~ITEM_ACTIVE;
 				creature->Alerted = true;
@@ -155,40 +148,34 @@ namespace TEN::Entities::TR5
 			switch (item->Animation.ActiveState)
 			{
 			case STATE_TR5_LARSON_STOP:
-				joint0 = info.angle / 2;
-				joint2 = info.angle / 2;
-				if (info.ahead)
-					joint1 = info.xAngle;
+				joint0 = AI.angle / 2;
+				joint2 = AI.angle / 2;
+
+				if (AI.ahead)
+					joint1 = AI.xAngle;
 
 				if (item->Animation.RequiredState)
-				{
 					item->Animation.TargetState = item->Animation.RequiredState;
-				}
 				else if (item->AIBits & AMBUSH)
-				{
 					item->Animation.TargetState = STATE_TR5_LARSON_RUN;
-				}
-				else if (Targetable(item, &info))
-				{
+				else if (Targetable(item, &AI))
 					item->Animation.TargetState = STATE_TR5_LARSON_AIM;
-				}
 				else
 				{
 					if (item->AIBits & GUARD || CurrentLevel == 2 || item->ItemFlags[3])
 					{
-						creature->MaxTurn = 0;
 						item->Animation.TargetState = STATE_TR5_LARSON_STOP;
-						if (abs(info.angle) >= ANGLE(2))
+						creature->MaxTurn = 0;
+
+						if (abs(AI.angle) >= ANGLE(2.0f))
 						{
-							if (info.angle > 0)
-								item->Pose.Orientation.y += ANGLE(2);
+							if (AI.angle > 0)
+								item->Pose.Orientation.y += ANGLE(2.0f);
 							else
-								item->Pose.Orientation.y -= ANGLE(2);
+								item->Pose.Orientation.y -= ANGLE(2.0f);
 						}
 						else
-						{
-							item->Pose.Orientation.y += info.angle;
-						}
+							item->Pose.Orientation.y += AI.angle;
 					}
 					else
 					{
@@ -200,175 +187,177 @@ namespace TEN::Entities::TR5
 								item->Animation.TargetState = STATE_TR5_LARSON_WALK;
 						}
 						else
-						{
-							item->Animation.TargetState = GetRandomControl() >= 96 ? 2 : 6;
-						}
+							item->Animation.TargetState = TestProbability(0.997f) ? 2 : 6;
 					}
 				}
+
 				break;
 
 			case STATE_TR5_LARSON_WALK:
-				if (info.ahead)
-					joint2 = info.angle;
+				creature->MaxTurn = ANGLE(7.0f);
 
-				creature->MaxTurn = ANGLE(7);
-				if (creature->Mood == MoodType::Bored && GetRandomControl() < 96)
+				if (AI.ahead)
+					joint2 = AI.angle;
+
+				if (creature->Mood == MoodType::Bored && TestProbability(1.0f / 340))
 				{
-					item->Animation.RequiredState = STATE_TR5_LARSON_IDLE;
 					item->Animation.TargetState = STATE_TR5_LARSON_STOP;
+					item->Animation.RequiredState = STATE_TR5_LARSON_IDLE;
 					break;
 				}
 
 				if (creature->Mood == MoodType::Escape || item->AIBits & AMBUSH)
 				{
-					item->Animation.RequiredState = STATE_TR5_LARSON_RUN;
 					item->Animation.TargetState = STATE_TR5_LARSON_STOP;
+					item->Animation.RequiredState = STATE_TR5_LARSON_RUN;
 				}
-				else if (Targetable(item, &info))
+				else if (Targetable(item, &AI))
 				{
+					item->Animation.TargetState = STATE_TR5_LARSON_STOP;
 					item->Animation.RequiredState = STATE_TR5_LARSON_AIM;
-					item->Animation.TargetState = STATE_TR5_LARSON_STOP;
 				}
-				else if (!info.ahead || info.distance > SQUARE(3072))
+				else if (!AI.ahead || AI.distance > SQUARE(SECTOR(3)))
 				{
-					item->Animation.RequiredState = STATE_TR5_LARSON_RUN;
 					item->Animation.TargetState = STATE_TR5_LARSON_STOP;
+					item->Animation.RequiredState = STATE_TR5_LARSON_RUN;
 				}
+
 				break;
 
 			case STATE_TR5_LARSON_RUN:
-				if (info.ahead)
-					joint2 = info.angle;
-				creature->MaxTurn = ANGLE(11);
+				creature->MaxTurn = ANGLE(11.0f);
 				tilt = angle / 2;
 
+				if (AI.ahead)
+					joint2 = AI.angle;
+
 				if (creature->ReachedGoal)
-				{
 					item->Animation.TargetState = STATE_TR5_LARSON_STOP;
-				}
 				else if (item->AIBits & AMBUSH)
-				{
 					item->Animation.TargetState = STATE_TR5_LARSON_RUN;
-				}
-				else if (creature->Mood != MoodType::Bored || GetRandomControl() >= 96)
+				else if (creature->Mood != MoodType::Bored || TestProbability(0.997f))
 				{
-					if (Targetable(item, &info))
+					if (Targetable(item, &AI))
 					{
-						item->Animation.RequiredState = STATE_TR5_LARSON_AIM;
 						item->Animation.TargetState = STATE_TR5_LARSON_STOP;
+						item->Animation.RequiredState = STATE_TR5_LARSON_AIM;
 					}
-					else if (info.ahead)
+					else if (AI.ahead)
 					{
-						if (info.distance <= SQUARE(3072))
+						if (AI.distance <= SQUARE(SECTOR(3)))
 						{
-							item->Animation.RequiredState = STATE_TR5_LARSON_WALK;
 							item->Animation.TargetState = STATE_TR5_LARSON_STOP;
+							item->Animation.RequiredState = STATE_TR5_LARSON_WALK;
 						}
 					}
 				}
 				else
 				{
-					item->Animation.RequiredState = STATE_TR5_LARSON_IDLE;
 					item->Animation.TargetState = STATE_TR5_LARSON_STOP;
+					item->Animation.RequiredState = STATE_TR5_LARSON_IDLE;
 				}
+
 				break;
 
 			case STATE_TR5_LARSON_AIM:
-				joint0 = info.angle / 2;
-				joint2 = info.angle / 2;
-				if (info.ahead)
-					joint1 = info.xAngle;
 				creature->MaxTurn = 0;
-				if (abs(info.angle) >= ANGLE(2))
+				joint0 = AI.angle / 2;
+				joint2 = AI.angle / 2;
+
+				if (AI.ahead)
+					joint1 = AI.xAngle;
+
+				if (abs(AI.angle) >= ANGLE(2.0f))
 				{
-					if (info.angle > 0)
-						item->Pose.Orientation.y += ANGLE(2);
+					if (AI.angle > 0)
+						item->Pose.Orientation.y += ANGLE(2.0f);
 					else
-						item->Pose.Orientation.y -= ANGLE(2);
+						item->Pose.Orientation.y -= ANGLE(2.0f);
 				}
 				else
-				{
-					item->Pose.Orientation.y += info.angle;
-				}
+					item->Pose.Orientation.y += AI.angle;
 
-				if (Targetable(item, &info))
+				if (Targetable(item, &AI))
 					item->Animation.TargetState = STATE_TR5_LARSON_ATTACK;
 				else
 					item->Animation.TargetState = STATE_TR5_LARSON_STOP;
+
 				break;
 
 			case STATE_TR5_LARSON_IDLE:
-				joint0 = info.angle / 2;
-				joint2 = info.angle / 2;
-				if (info.ahead)
-					joint1 = info.xAngle;
+				joint0 = AI.angle / 2;
+				joint2 = AI.angle / 2;
+
+				if (AI.ahead)
+					joint1 = AI.xAngle;
 
 				if (creature->Mood != MoodType::Bored)
-				{
 					item->Animation.TargetState = STATE_TR5_LARSON_STOP;
-				}
 				else
 				{
-					if (GetRandomControl() <= 96)
+					if (TestProbability(1.0f / 340))
 					{
-						item->Animation.RequiredState = STATE_TR5_LARSON_WALK;
 						item->Animation.TargetState = STATE_TR5_LARSON_STOP;
+						item->Animation.RequiredState = STATE_TR5_LARSON_WALK;
 					}
 				}
+
 				break;
 
 			case STATE_TR5_LARSON_ATTACK:
-				joint0 = info.angle / 2;
-				joint2 = info.angle / 2;
-				if (info.ahead)
-					joint1 = info.xAngle;
 				creature->MaxTurn = 0;
-				if (abs(info.angle) >= ANGLE(2))
+				joint0 = AI.angle / 2;
+				joint2 = AI.angle / 2;
+
+				if (AI.ahead)
+					joint1 = AI.xAngle;
+
+				if (abs(AI.angle) >= ANGLE(2.0f))
 				{
-					if (info.angle > 0)
-						item->Pose.Orientation.y += ANGLE(2);
+					if (AI.angle > 0)
+						item->Pose.Orientation.y += ANGLE(2.0f);
 					else
-						item->Pose.Orientation.y -= ANGLE(2);
+						item->Pose.Orientation.y -= ANGLE(2.0f);
 				}
 				else
-				{
-					item->Pose.Orientation.y += info.angle;
-				}
+					item->Pose.Orientation.y += AI.angle;
+				
 				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase)
 				{
 					if (item->ObjectNumber == ID_PIERRE)
 					{
-						ShotLara(item, &info, PierreGun1, joint0, 20);
-						ShotLara(item, &info, PierreGun2, joint0, 20);
+						ShotLara(item, &AI, PierreGun1, joint0, 20);
+						ShotLara(item, &AI, PierreGun2, joint0, 20);
 					}
 					else
-					{
-						ShotLara(item, &info, LarsonGun, joint0, 20);
-					}
+						ShotLara(item, &AI, LarsonGun, joint0, 20);
+					
 					creature->FiredWeapon = 2;
 				}
-				if (creature->Mood == MoodType::Escape && GetRandomControl() > 0x2000)
+
+				if (creature->Mood == MoodType::Escape && TestProbability(0.75f))
 					item->Animation.RequiredState = STATE_TR5_LARSON_STOP;
+
 				break;
 
 			default:
 				break;
-
 			}
 		}
 		else if (item->Animation.ActiveState == STATE_TR5_LARSON_DIE)
 		{
 			// When Larson dies, it activates trigger at start position
-			if (item->ObjectNumber == ID_LARSON
-				&& item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameEnd)
+			if (item->ObjectNumber == ID_LARSON &&
+				item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameEnd)
 			{
 				short roomNumber = item->ItemFlags[2] & 0xFF;
 				short floorHeight = item->ItemFlags[2] & 0xFF00;
-				ROOM_INFO* r = &g_Level.Rooms[roomNumber];
 
-				int x = r->x + (creature->Tosspad / 256 & 0xFF) * SECTOR(1) + 512;
-				int y = r->minfloor + floorHeight;
-				int z = r->z + (creature->Tosspad & 0xFF) * SECTOR(1) + 512;
+				auto* room = &g_Level.Rooms[roomNumber];
+
+				int x = room->x + (creature->Tosspad / 256 & 0xFF) * SECTOR(1) + 512;
+				int y = room->minfloor + floorHeight;
+				int z = room->z + (creature->Tosspad & 0xFF) * SECTOR(1) + 512;
 
 				TestTriggers(x, y, z, roomNumber, true);
 
@@ -377,13 +366,14 @@ namespace TEN::Entities::TR5
 		}
 		else
 		{
-			// Die
+			// Death.
 			if (item->ObjectNumber == ID_PIERRE)
 				item->Animation.AnimNumber = Objects[ID_PIERRE].animIndex + ANIMATION_TR5_PIERRE_DIE;
 			else
 				item->Animation.AnimNumber = Objects[ID_LARSON].animIndex + ANIMATION_TR5_LARSON_DIE;
-			item->Animation.ActiveState = STATE_TR5_LARSON_DIE;
+
 			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.ActiveState = STATE_TR5_LARSON_DIE;
 		}
 
 		CreatureTilt(item, tilt);
@@ -398,12 +388,12 @@ namespace TEN::Entities::TR5
 			{
 				item->TargetState = STATE_TR5_LARSON_STOP;
 				item->RequiredState = STATE_TR5_LARSON_STOP;
-				creature->reachedGoal = false;
+				creature->ReachedGoal = false;
 				item->IsAirborne = false;
-				item->hitStatus = false;
-				item->collidable = false;
-				item->status = ITEM_NOT_ACTIVE;
-				item->triggerFlags = 0;
+				item->HitStatus = false;
+				item->Collidable = false;
+				item->Status = ITEM_NOT_ACTIVE;
+				item->TriggerFlags = 0;
 			}
 			else
 			{

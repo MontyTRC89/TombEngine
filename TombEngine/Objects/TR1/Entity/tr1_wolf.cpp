@@ -11,9 +11,10 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
+using namespace TEN::Math::Random;
 using std::vector;
 
-namespace TEN::Entities::TR1
+namespace TEN::Entities::Creatures::TR1
 {
 	constexpr auto WOLF_BITE_DAMAGE	 = 100;
 	constexpr auto WOLF_LUNGE_DAMAGE = 50;
@@ -21,9 +22,9 @@ namespace TEN::Entities::TR1
 	constexpr auto WOLF_ATTACK_RANGE = SQUARE(SECTOR(1.5f));
 	constexpr auto WOLF_STALK_RANGE	 = SQUARE(SECTOR(2));
 
-	constexpr auto WOLF_WAKE_CHANCE	 = 0x20;
-	constexpr auto WOLF_SLEEP_CHANCE = 0x20;
-	constexpr auto WOLF_HOWL_CHANCE  = 0x180;
+	constexpr auto WOLF_WAKE_CHANCE	 = 1.0f / 1000;
+	constexpr auto WOLF_SLEEP_CHANCE = 1.0f / 1000;
+	constexpr auto WOLF_HOWL_CHANCE  = 1.0f / 85;
 
 	constexpr auto WOLF_SLEEP_FRAME = 96;
 
@@ -110,7 +111,7 @@ namespace TEN::Entities::TR1
 					item->Animation.RequiredState = WOLF_STATE_CROUCH;
 					item->Animation.TargetState = WOLF_STATE_IDLE;
 				}
-				else if (GetRandomControl() < WOLF_WAKE_CHANCE)
+				else if (TestProbability(WOLF_WAKE_CHANCE))
 				{
 					item->Animation.RequiredState = WOLF_STATE_WALK;
 					item->Animation.TargetState = WOLF_STATE_IDLE;
@@ -133,7 +134,7 @@ namespace TEN::Entities::TR1
 					item->Animation.TargetState = WOLF_STATE_STALK;
 					item->Animation.RequiredState = WOLF_STATE_NONE;
 				}
-				else if (GetRandomControl() < WOLF_SLEEP_CHANCE)
+				else if (TestProbability(WOLF_SLEEP_CHANCE))
 				{
 					item->Animation.RequiredState = WOLF_STATE_SLEEP;
 					item->Animation.TargetState = WOLF_STATE_IDLE;
@@ -174,7 +175,7 @@ namespace TEN::Entities::TR1
 						item->Animation.TargetState = WOLF_STATE_RUN;
 					}
 				}
-				else if (GetRandomControl() < WOLF_HOWL_CHANCE)
+				else if (TestProbability(WOLF_HOWL_CHANCE))
 				{
 					item->Animation.RequiredState = WOLF_STATE_HOWL;
 					item->Animation.TargetState = WOLF_STATE_CROUCH;

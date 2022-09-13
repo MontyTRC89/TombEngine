@@ -48,10 +48,16 @@ namespace Misc
 		pos1.StoreInGameVector(vec1);
 		vec1.roomNumber = roomNumber1;
 		pos2.StoreInGameVector(vec2);
-		return LOS(&vec1, &vec2);
+
+		MESH_INFO* mesh;
+		Vector3i vector;
+		return LOS(&vec1, &vec2) && (ObjectOnLOS2(&vec1, &vec2, &vector, &mesh) == NO_LOS_ITEM);
 	}
 
-
+	///Vibrate game controller, if function is available and setting is on.
+	//@function Vibrate
+	//@tparam float strength Strength of the vibration
+	//@tparam float time __(default 0.3)__ Time of the vibration, in seconds
 	static void Vibrate(float strength, sol::optional<float> time)
 	{
 		Rumble(strength, time.value_or(0.3f), RumbleMode::Both);

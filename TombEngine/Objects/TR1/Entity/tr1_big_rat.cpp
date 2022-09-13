@@ -16,7 +16,7 @@
 using namespace TEN::Math::Random;
 using std::vector;
 
-namespace TEN::Entities::TR1
+namespace TEN::Entities::Creatures::TR1
 {
 	constexpr auto BIG_RAT_BITE_ATTACK_DAMAGE	= 20;
 	constexpr auto BIG_RAT_POUNCE_ATTACK_DAMAGE = 25;
@@ -27,7 +27,7 @@ namespace TEN::Entities::TR1
 	constexpr auto BIG_RAT_POUNCE_ATTACK_RANGE	   = SQUARE(SECTOR(0.5f));
 	constexpr auto BIG_RAT_WATER_BITE_ATTACK_RANGE = SQUARE(SECTOR(0.3f));
 
-	constexpr auto BIG_RAT_REAR_POSE_CHANCE = 0.008f;
+	constexpr auto BIG_RAT_REAR_POSE_CHANCE = 1.0f / 128;
 	constexpr auto BIG_RAT_SWIM_UP_DOWN_SPEED = 32;
 	constexpr auto BIG_RAT_WATER_SURFACE_OFFSET = 10;
 
@@ -115,9 +115,10 @@ namespace TEN::Entities::TR1
 		auto* creature = GetCreatureInfo(item);
 
 		int waterHeight = GetRatWaterHeight(item);
-		short head = 0;
-		short angle = 0;
 		bool isOnWater = waterHeight != NO_HEIGHT;
+
+		short angle = 0;
+		short head = 0;
 
 		if (item->HitPoints <= 0)
 		{
@@ -183,9 +184,9 @@ namespace TEN::Entities::TR1
 				if (!item->Animation.RequiredState && AI.ahead &&
 					item->TestBits(JointBitType::Touch, BigRatBite.meshNum))
 				{
-					item->Animation.RequiredState = BIG_RAT_STATE_IDLE;
 					DoDamage(creature->Enemy, BIG_RAT_BITE_ATTACK_DAMAGE);
 					CreatureEffect(item, BigRatBite, DoBloodSplat);
+					item->Animation.RequiredState = BIG_RAT_STATE_IDLE;
 				}
 
 				break;
@@ -194,9 +195,9 @@ namespace TEN::Entities::TR1
 				if (!item->Animation.RequiredState && AI.ahead &&
 					item->TestBits(JointBitType::Touch, BigRatBite.meshNum))
 				{
-					item->Animation.RequiredState = BIG_RAT_STATE_RUN_FORWARD;
 					DoDamage(creature->Enemy, BIG_RAT_POUNCE_ATTACK_DAMAGE);
 					CreatureEffect(item, BigRatBite, DoBloodSplat);
+					item->Animation.RequiredState = BIG_RAT_STATE_RUN_FORWARD;
 				}
 
 				break;

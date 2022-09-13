@@ -20,7 +20,7 @@
 using namespace TEN::Effects::Lightning;
 using namespace TEN::Math;
 
-namespace TEN::Entities::TR5
+namespace TEN::Entities::Creatures::TR5
 {
 	const auto RomanStatueBite = BiteInfo(Vector3::Zero, 15);
 
