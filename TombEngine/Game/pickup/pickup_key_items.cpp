@@ -2,7 +2,7 @@
 #include "Game/pickup/pickup_key_items.h"
 
 #include "Game/Lara/lara_struct.h"
-#include "Game/pickup/pickup_misc_items.h"
+#include "Game/pickup/pickuputil.h"
 #include "Objects/objectslist.h"
 
 template <size_t N> struct KeyPickupInfo
@@ -64,29 +64,42 @@ template<> static std::pair<int*, size_t> GetArrayInternal<0>(LaraInfo& lara, GA
 	return TestAgainstRange<0>(lara, objectID);
 }
 
-static bool TryModifyingKeyItem(LaraInfo& lara, GAME_OBJECT_ID objectID, int amount, bool add)
+bool TryModifyingKeyItem(LaraInfo& lara, GAME_OBJECT_ID objectID, std::optional<int> amount, ModificationType modType)
 {
 	// kick off the recursion starting at the last element
 	auto result = GetArrayInternal<nInfos - 1>(lara, objectID);
+
 	if (result.first)
 	{
-		int defaultModify = add ? kDefaultPickupAmount : -kDefaultPickupAmount;
-		int newVal = int{result.first[result.second]} + (amount ? amount : defaultModify);
-		result.first[result.second] = std::max(0, newVal);
+		auto& amt = result.first[result.second];
+		switch (modType)
+		{
+		case ModificationType::Set:
+			// infinite key items not yet implemented
+			amt = amount.value();
+			break;
+		default:
+			int defaultModify = modType == ModificationType::Add ? kDefaultPickupAmount : -kDefaultPickupAmount;
+			int newVal = int{ result.first[result.second] } + (amount.has_value() ? amount.value() : defaultModify);
+			result.first[result.second] = std::max(0, newVal);
+		}
 		return true;
 	}
 
 	return false;
 }
 
-bool TryAddingKeyItem(LaraInfo& lara, GAME_OBJECT_ID objectID, int count)
+bool TryAddingKeyItem(LaraInfo& lara, GAME_OBJECT_ID objectID, std::optional<int> amount)
 {
-	return TryModifyingKeyItem(lara, objectID, count, true);
+	return TryModifyingKeyItem(lara, objectID, amount, ModificationType::Add);
 }
 
-bool TryRemovingKeyItem(LaraInfo& lara, GAME_OBJECT_ID objectID, int count)
+bool TryRemovingKeyItem(LaraInfo& lara, GAME_OBJECT_ID objectID, std::optional<int> amount)
 {
-	return TryModifyingKeyItem(lara, objectID, -count, false);
+	if(amount.has_value())
+		return TryModifyingKeyItem(lara, objectID, -amount.value(), ModificationType::Remove);
+	else
+		return TryModifyingKeyItem(lara, objectID, amount, ModificationType::Remove);
 }
 
 std::optional<int> GetKeyItemCount(LaraInfo& lara, GAME_OBJECT_ID objectID)

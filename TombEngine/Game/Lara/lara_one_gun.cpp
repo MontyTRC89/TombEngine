@@ -436,8 +436,12 @@ void UndrawShotgunMeshes(ItemInfo* laraItem, LaraWeaponType weaponType)
 {
 	auto* lara = GetLaraInfo(laraItem);
 
-	lara->Control.Weapon.HolsterInfo.BackHolster = HolsterSlotForWeapon(weaponType);
 	lara->MeshPtrs[LM_RHAND] = Objects[ID_LARA_SKIN].meshIndex + LM_RHAND;
+
+	if (lara->Weapons[(int)weaponType].Present)
+		lara->Control.Weapon.HolsterInfo.BackHolster = HolsterSlotForWeapon(weaponType);
+	else
+		lara->Control.Weapon.HolsterInfo.BackHolster = HolsterSlot::Empty;
 }
 
 void FireHarpoon(ItemInfo* laraItem)
@@ -621,10 +625,6 @@ void HarpoonBoltControl(short itemNumber)
 					auto pos = PHD_3DPOS(currentMesh->pos.Position.x, currentMesh->pos.Position.y - 128, currentMesh->pos.Position.z, 0, currentMesh->pos.Orientation.y, 0);
 					TriggerShockwave(&pos, 40, 176, 64, 0, 96, 128, 16, 0, 0);
 					ShatterObject(nullptr, currentMesh, -128, item->RoomNumber, 0);
-					SmashedMeshRoom[SmashedMeshCount] = item->RoomNumber;
-					SmashedMesh[SmashedMeshCount] = currentMesh;
-					SmashedMeshCount++;
-					currentMesh->flags &= ~StaticMeshFlags::SM_VISIBLE;
 				}
 			}
 
@@ -1009,10 +1009,6 @@ void GrenadeControl(short itemNumber)
 								auto pos = PHD_3DPOS(currentMesh->pos.Position.x, currentMesh->pos.Position.y - 128, currentMesh->pos.Position.z, 0, currentMesh->pos.Orientation.y, 0);
 								TriggerShockwave(&pos, 40, 176, 64, 0, 96, 128, 16, 0, 0);
 								ShatterObject(nullptr, currentMesh, -128, item->RoomNumber, 0);
-								SmashedMeshRoom[SmashedMeshCount] = item->RoomNumber;
-								SmashedMesh[SmashedMeshCount] = currentMesh;
-								SmashedMeshCount++;
-								currentMesh->flags &= ~StaticMeshFlags::SM_VISIBLE;
 							}
 						}
 
@@ -1316,10 +1312,6 @@ void RocketControl(short itemNumber)
 						auto pose = PHD_3DPOS(currentMesh->pos.Position.x, currentMesh->pos.Position.y - 128, currentMesh->pos.Position.z, 0, currentMesh->pos.Orientation.y, 0);
 						TriggerShockwave(&pose, 40, 176, 64, 0, 96, 128, 16, 0, 0);
 						ShatterObject(nullptr, currentMesh, -128, item->RoomNumber, 0);
-						SmashedMeshRoom[SmashedMeshCount] = item->RoomNumber;
-						SmashedMesh[SmashedMeshCount] = currentMesh;
-						SmashedMeshCount++;
-						currentMesh->flags &= ~StaticMeshFlags::SM_VISIBLE;
 					}
 				}
 
@@ -1598,13 +1590,7 @@ void CrossbowBoltControl(short itemNumber)
 				{
 					currentMesh->HitPoints -= Weapons[(int)LaraWeaponType::Crossbow].Damage;
 					if (currentMesh->HitPoints <= 0)
-					{
 						ShatterObject(nullptr, currentMesh, -128, item->RoomNumber, 0);
-						SmashedMeshRoom[SmashedMeshCount] = item->RoomNumber;
-						SmashedMesh[SmashedMeshCount] = currentMesh;
-						SmashedMeshCount++;
-						currentMesh->flags &= ~StaticMeshFlags::SM_VISIBLE;
-					}
 				}
 
 				k++;

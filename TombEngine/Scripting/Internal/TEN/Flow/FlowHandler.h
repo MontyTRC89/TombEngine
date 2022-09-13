@@ -49,6 +49,10 @@ public:
 	Level*				GetCurrentLevel();
 	int					GetLevelNumber(std::string const& flieName);
 	int					GetNumLevels() const;
+	void				EndLevel(std::optional<int> nextLevel);
+	int					GetSecretCount() const;
+	void				SetSecretCount(int secretsNum);
+	void				AddSecret(int levelSecretIndex);
 	void				SetIntroImagePath(std::string const& path);
 	void				SetTitleScreenImagePath(std::string const& path);
 	bool				IsFlyCheatEnabled() const;
