@@ -1,16 +1,20 @@
 #include "framework.h"
-#include "tr5_autoguns.h"
-#include "Game/collision/sphere.h"
-#include "Game/Lara/lara.h"
+#include "Objects/TR5/Entity/tr5_autoguns.h"
+
 #include "Game/animation.h"
+#include "Game/collision/sphere.h"
 #include "Game/control/los.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/tomb4fx.h"
+#include "Game/items.h"
+#include "Game/Lara/lara.h"
 #include "Specific/level.h"
 #include "Sound/sound.h"
-#include "Game/items.h"
+#include "Specific/prng.h"
 
-namespace TEN::Entities::TR5
+using namespace TEN::Math::Random;
+
+namespace TEN::Entities::Creatures::TR5
 {
 	void InitialiseAutoGuns(short itemNumber)
 	{
@@ -64,10 +68,10 @@ namespace TEN::Entities::TR5
 
 				item->MeshBits = 1664;
 
-				GameVector pos1 = { 0, 0, -64 };
+				auto pos1 = GameVector(0, 0, -64);
 				GetJointAbsPosition(item, (Vector3Int*)&pos1, 8);
 
-				GameVector pos2 = { 0, 0, 0 };
+				auto pos2 = GameVector();
 				GetLaraJointPosition((Vector3Int*)&pos2, 0);
 
 				pos1.roomNumber = item->RoomNumber;
@@ -95,7 +99,7 @@ namespace TEN::Entities::TR5
 				data[1] = item->ItemFlags[1];
 				data[2] += item->ItemFlags[2];
 
-				if (abs(angle1) < 1024 && abs(angle2) < 1024 && los)
+				if (abs(angle1) < Angle::DegToRad(5.6f) && abs(angle2) < Angle::DegToRad(5.6f) && los)
 				{
 					SoundEffect(SFX_TR4_HK_FIRE, &item->Pose, SoundEnvironment::Land, 0.8f);
 
@@ -105,10 +109,10 @@ namespace TEN::Entities::TR5
 
 						TriggerDynamicLight(pos1.x, pos1.y, pos1.z, 10, (GetRandomControl() & 0x1F) + 192, (GetRandomControl() & 0x1F) + 128, 0);
 
-						if (GetRandomControl() & 3)
+						if (TestProbability(0.75f))
 						{
-							auto pos2 = Vector3Int();
-							GetLaraJointPosition((Vector3Int*)&pos2, GetRandomControl() % 15);
+							auto pos2 = Vector3Int::Zero;
+							GetLaraJointPosition(&pos2, GetRandomControl() % 15);
 
 							DoBloodSplat(pos2.x, pos2.y, pos2.z, (GetRandomControl() & 3) + 3, 2 * GetRandomControl(), LaraItem->RoomNumber);
 							DoDamage(LaraItem, 20);

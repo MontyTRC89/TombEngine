@@ -30,9 +30,9 @@ namespace TEN::Entities::TR4
 
 	constexpr auto CROC_SWIM_SPEED	  = 16;
 
-	#define CROC_STATE_WALK_FORWARD_ANGLE Angle::DegToRad(3.0f)
-	#define CROC_SWIM_ANGLE Angle::DegToRad(3.0f)
-	#define CROC_STATE_RUN_FORWARD_ANGLE Angle::DegToRad(5.0f)
+	#define CROC_STATE_WALK_TURN_RATE_MAX Angle::DegToRad(3.0f)
+	#define CROC_STATE_RUN_TURN_RATE_MAX  Angle::DegToRad(5.0f)
+	#define CROC_STATE_SWIM_TURN_RATE_MAX Angle::DegToRad(3.0f)
 
 	const auto CrocodileBite = BiteInfo(Vector3(0.0f, -100.0f, 500.0f), 9);
 	const vector<int> CrocodileBiteAttackJoints = { 8, 9 };
@@ -49,7 +49,7 @@ namespace TEN::Entities::TR4
 		CROC_STATE_DEATH = 7,
 		CROC_STATE_SWIM_FORWARD = 8,
 		CROC_STATE_WATER_BITE_ATTACK = 9,
-		CROC_STATE_WATER_DEATH = 10,
+		CROC_STATE_WATER_DEATH = 10
 	};
 
 	enum CrocodileAnim
@@ -119,12 +119,12 @@ namespace TEN::Entities::TR4
 			return;
 
 		auto* item = &g_Level.Items[itemNumber];
-		auto* creature = GetCreatureInfo(item);
 		auto* object = &Objects[item->ObjectNumber];
+		auto* creature = GetCreatureInfo(item);
 
-		AI_INFO AI;
 		short angle = 0;
 		short boneAngle = 0;
+		AI_INFO AI;
 
 		if (item->HitPoints <= 0)
 		{
@@ -178,7 +178,7 @@ namespace TEN::Entities::TR4
 					item->Animation.TargetState = CROC_STATE_IDLE;
 					item->ItemFlags[0] += item->ItemFlags[1];
 
-					if (TestProbability(0.03f))
+					if (TestProbability(1.0f / 30))
 					{
 						if (TestProbability(0.5f))
 							item->ItemFlags[1] = 0;
@@ -203,7 +203,7 @@ namespace TEN::Entities::TR4
 				break;
 
 			case CROC_STATE_WALK_FORWARD:
-				creature->MaxTurn = CROC_STATE_WALK_FORWARD_ANGLE;
+				creature->MaxTurn = CROC_STATE_WALK_TURN_RATE_MAX;
 
 				// Land to water transition.
 				if (IsCrocodileInWater(item) && !item->Animation.RequiredState)
@@ -222,7 +222,7 @@ namespace TEN::Entities::TR4
 				break;
 
 			case CROC_STATE_RUN_FORWARD:
-				creature->MaxTurn = CROC_STATE_RUN_FORWARD_ANGLE;
+				creature->MaxTurn = CROC_STATE_RUN_TURN_RATE_MAX;
 
 				// Land to water transition.
 				if (IsCrocodileInWater(item))
@@ -243,7 +243,7 @@ namespace TEN::Entities::TR4
 
 			case CROC_STATE_BITE_ATTACK:
 				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase)
-					item->Animation.RequiredState = 0;
+					item->Animation.RequiredState = CROC_STATE_NONE_1;
 
 				if (AI.bite &&
 					item->TestBits(JointBitType::Touch, CrocodileBiteAttackJoints))
@@ -261,7 +261,7 @@ namespace TEN::Entities::TR4
 				break;
 
 			case CROC_STATE_SWIM_FORWARD:
-				creature->MaxTurn = CROC_SWIM_ANGLE;
+				creature->MaxTurn = CROC_STATE_SWIM_TURN_RATE_MAX;
 
 				// Water to land transition.
 				if (!IsCrocodileInWater(item))

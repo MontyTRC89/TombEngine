@@ -16,7 +16,7 @@
 #include "Specific/level.h"
 #include "Specific/trmath.h"
 
-namespace TEN::Entities::TR2
+namespace TEN::Entities::Creatures::TR2
 {
 	const auto WorkerFlamethrowerOffset = Vector3Int(0, 140, 0);
 	const auto WorkerFlamethrowerBite = BiteInfo(Vector3(0.0f, 250.0f, 32.0f), 9);

@@ -11,7 +11,7 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-namespace TEN::Entities::TR2
+namespace TEN::Entities::Creatures::TR2
 {
 	const auto WorkerMachineGunBite = BiteInfo(Vector3(0.0f, 308.0f, 32.0f), 9);
 

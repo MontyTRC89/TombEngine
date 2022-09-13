@@ -17,45 +17,45 @@ bool ShotLara(ItemInfo* item, AI_INFO* AI, BiteInfo gun, short extraRotation, in
 	auto* creature = GetCreatureInfo(item);
 	auto* enemy = creature->Enemy;
 
-	bool hit = false;
-	bool targetable = false;
+	bool hasHit = false;
+	bool isTargetable = false;
 
-	if (AI->distance <= pow(MAX_VISIBILITY_DISTANCE, 2) && Targetable(item, AI))
+	if (AI->distance <= SQUARE(MAX_VISIBILITY_DISTANCE) && Targetable(item, AI))
 	{
-		int distance = sin(AI->enemyFacing) * enemy->Animation.Velocity.z * pow(MAX_VISIBILITY_DISTANCE, 2) / 300;
-		distance = pow(distance, 2) + AI->distance;
-		if (distance <= pow(MAX_VISIBILITY_DISTANCE, 2))
+		int distance = sin(AI->enemyFacing) * enemy->Animation.Velocity.z * SQUARE(MAX_VISIBILITY_DISTANCE) / 300;
+		distance = SQUARE(distance) + AI->distance;
+		if (distance <= SQUARE(MAX_VISIBILITY_DISTANCE))
 		{
-			int random = (pow(MAX_VISIBILITY_DISTANCE, 2) - AI->distance) / (pow(MAX_VISIBILITY_DISTANCE, 2) / 0x5000) + 8192;
-			hit = GetRandomControl() < random;
+			int random = (SQUARE(MAX_VISIBILITY_DISTANCE) - AI->distance) / (SQUARE(MAX_VISIBILITY_DISTANCE) / 0x5000) + 8192;
+			hasHit = GetRandomControl() < random;
 		}
 		else
-			hit = false;
+			hasHit = false;
 		
-		targetable = true;
+		isTargetable = true;
 	}
 	else
 	{
-		hit = false;
-		targetable = false;
+		hasHit = false;
+		isTargetable = false;
 	}
 
 	if (damage)
 	{
 		if (enemy->IsLara())
 		{
-			if (hit)
+			if (hasHit)
 			{
 				DoDamage(enemy, damage);
 				CreatureEffect(item, gun, &GunHit);
 			}
-			else if (targetable)
+			else if (isTargetable)
 				CreatureEffect(item, gun, &GunMiss);
 		}
 		else
 		{
 			CreatureEffect(item, gun, &GunShot);
-			if (hit)
+			if (hasHit)
 			{
 				enemy->HitStatus = true;
 				enemy->HitPoints += damage / -10;
@@ -74,7 +74,7 @@ bool ShotLara(ItemInfo* item, AI_INFO* AI, BiteInfo gun, short extraRotation, in
 
 	// TODO: smash objects
 
-	return targetable;
+	return isTargetable;
 }
 
 short GunMiss(int x, int y, int z, short velocity, short yRot, short roomNumber)
@@ -145,32 +145,32 @@ bool TargetVisible(ItemInfo* item, AI_INFO* AI, float maxAngle)
 		return false;
 
 	// Check just in case.
-	auto* creatureInfo = GetCreatureInfo(item);
-	if (creatureInfo == nullptr)
+	auto* creature = GetCreatureInfo(item);
+	if (creature == nullptr)
 		return false;
 
-	auto* enemy = creatureInfo->Enemy;
+	auto* enemy = creature->Enemy;
 	if (enemy == nullptr || enemy->HitPoints == 0)
 		return false;
 
-	float angle = AI->angle - creatureInfo->JointRotation[2];
+	auto angle = AI->angle - creature->JointRotation[2];
 	if (angle > Angle::DegToRad(-maxAngle) && angle < Angle::DegToRad(maxAngle))
 	{
-		GameVector start;
-		GameVector target;
 		auto& bounds = GetBestFrame(enemy)->boundingBox;
 
-		start.x = item->Pose.Position.x;
-		start.y = item->Pose.Position.y - CLICK(3);
-		start.z = item->Pose.Position.z;
-		start.roomNumber = item->RoomNumber;
-
-		target.x = enemy->Pose.Position.x;
-		target.y = enemy->Pose.Position.y + ((((bounds.Y1 * 2) + bounds.Y1) + bounds.Y2) / 4);
-		target.z = enemy->Pose.Position.z;
-		target.roomNumber = enemy->RoomNumber; // TODO: Check why this line didn't exist before. -- TokyoSU, 10/8/2022
-
-		return LOS(&start, &target);
+		auto origin = GameVector(
+			item->Pose.Position.x,
+			item->Pose.Position.y - CLICK(3),
+			item->Pose.Position.z,
+			item->RoomNumber
+		);
+		auto target = GameVector(
+			enemy->Pose.Position.x,
+			enemy->Pose.Position.y + ((((bounds.Y1 * 2) + bounds.Y1) + bounds.Y2) / 4),
+			enemy->Pose.Position.z,
+			enemy->RoomNumber // TODO: Check why this line didn't exist before. -- TokyoSU, 10/8/2022
+		);
+		return LOS(&origin, &target);
 	}
 
 	return false;

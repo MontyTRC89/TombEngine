@@ -57,11 +57,7 @@ namespace TEN::Entities::TR4
 		auto* item = &g_Level.Items[itemNumber];
 
 		ClearItem(itemNumber);
-		
-		item->Animation.AnimNumber = Objects[ID_SMALL_SCORPION].animIndex + SSCORPION_ANIM_IDLE;
-		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-		item->Animation.TargetState = SSCORPION_STATE_IDLE;
-		item->Animation.ActiveState = SSCORPION_STATE_IDLE;
+		SetAnimation(item, SSCORPION_ANIM_IDLE);
 	}
 
 	void SmallScorpionControl(short itemNumber)
@@ -72,14 +68,14 @@ namespace TEN::Entities::TR4
 		auto* item = &g_Level.Items[itemNumber];
 		auto* creature = GetCreatureInfo(item);
 
-	float angle = 0;
-	float head = 0;
-	float neck = 0;
-	float tilt = 0;
-	float joint0 = 0;
-	float joint1 = 0;
-	float joint2 = 0;
-	float joint3 = 0;
+		short angle = 0;
+		short tilt = 0;
+		short head = 0;
+		short neck = 0;
+		short joint0 = 0;
+		short joint1 = 0;
+		short joint2 = 0;
+		short joint3 = 0;
 
 		if (item->HitPoints <= 0)
 		{
@@ -87,9 +83,7 @@ namespace TEN::Entities::TR4
 			if (item->Animation.ActiveState != SSCORPION_STATE_DEATH_1 &&
 				item->Animation.ActiveState != SSCORPION_STATE_DEATH_2)
 			{
-				item->Animation.AnimNumber = Objects[ID_SMALL_SCORPION].animIndex + SSCORPION_ANIM_DEATH;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-				item->Animation.ActiveState = SSCORPION_STATE_DEATH_1;
+				SetAnimation(item, SSCORPION_ANIM_DEATH);
 			}
 		}
 		else
@@ -118,6 +112,7 @@ namespace TEN::Entities::TR4
 				else if (AI.bite)
 				{
 					creature->MaxTurn = Angle::DegToRad(6.0f);
+
 					if (TestProbability(0.5f))
 						item->Animation.TargetState = SSCORPION_STATE_ATTACK_1;
 					else

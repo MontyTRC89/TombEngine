@@ -29,7 +29,7 @@ namespace TEN::Entities::TR4
 
 	enum BatState
 	{
-		BAT_STATE_NONE = 0,
+		// No state 0.
 		BAT_STATE_DROP_FROM_CEILING = 1,
 		BAT_STATE_FLY = 2,
 		BAT_STATE_ATTACK = 3,
@@ -102,7 +102,7 @@ namespace TEN::Entities::TR4
 				break;
 
 			case BAT_STATE_FLY:
-				if (AI.distance < BAT_ATTACK_RANGE || TestProbability(0.015f))
+				if (AI.distance < BAT_ATTACK_RANGE || TestProbability(1.0f / 64))
 					creature->Flags = 0;
 
 				if (!creature->Flags)

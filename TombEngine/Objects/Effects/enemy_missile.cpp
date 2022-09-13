@@ -256,7 +256,7 @@ namespace TEN::Entities::Effects
 			return;
 		}
 
-		if (ItemNearLara(&fx->pos, 200))
+		if (ItemNearLara(&fx->pos.Position, 200))
 		{
 			LaraItem->HitStatus = true;
 			if (fx->flag1 != 6)

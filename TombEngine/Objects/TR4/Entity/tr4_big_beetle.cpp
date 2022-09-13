@@ -28,7 +28,7 @@ namespace TEN::Entities::TR4
 
 	enum BigBeetleState
 	{
-		BBEETLE_STATE_NONE = 0,
+		// No state 0.
 		BBEETLE_STATE_IDLE = 1,
 		BBEETLE_STATE_TAKE_OFF = 2,
 		BBEETLE_STATE_FLY_FORWARD = 3,
@@ -122,7 +122,7 @@ namespace TEN::Entities::TR4
 			angle = CreatureTurn(item, creature->MaxTurn);
 
 			if (item->HitStatus || AI.distance > BIG_BEETLE_AWARE_RANGE ||
-				TestProbability(0.008f))
+				TestProbability(1.0f / 128))
 			{
 				creature->Flags = 0;
 			}

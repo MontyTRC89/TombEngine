@@ -69,11 +69,19 @@ void ShatterObject(SHATTER_ITEM* item, MESH_INFO* mesh, int num, short roomNumbe
 
 	if (mesh)
 	{
+		if (!(mesh->flags & StaticMeshFlags::SM_VISIBLE))
+			return;
+
 		isStatic = true;
 		meshIndex = StaticObjects[mesh->staticNumber].meshNumber;
 		yRot = mesh->pos.Orientation.y;
 		pos = Vector3(mesh->pos.Position.x, mesh->pos.Position.y, mesh->pos.Position.z);
 		scale = mesh->scale;
+
+		mesh->flags &= ~StaticMeshFlags::SM_VISIBLE;
+		SmashedMeshRoom[SmashedMeshCount] = roomNumber;
+		SmashedMesh[SmashedMeshCount] = mesh;
+		SmashedMeshCount++;
 	}
 	else
 	{

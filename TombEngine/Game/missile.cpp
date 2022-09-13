@@ -57,7 +57,7 @@ void ControlMissile(short fxNumber)
 	fx->pos.Position.x += velocity * sin(fx->pos.Orientation.y);
 
 	auto probe = GetCollision(fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z, fx->roomNumber);
-	auto hitLara = ItemNearLara(&fx->pos, 200);
+	auto hitLara = ItemNearLara(&fx->pos.Position, 200);
 
 	// Check for hitting something.
 	if (fx->pos.Position.y >= probe.Position.Floor ||

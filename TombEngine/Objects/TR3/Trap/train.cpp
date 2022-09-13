@@ -21,15 +21,16 @@
 
 long TrainTestHeight(ItemInfo* item, long x, long z, short* roomNumber)
 {
+	float sinX = sin(item->Pose.Orientation.x);
 	float sinY = sin(item->Pose.Orientation.y);
 	float cosY = cos(item->Pose.Orientation.y);
+	float sinZ = sin(item->Pose.Orientation.z);
 
 	auto pos = Vector3Int(
-		(int)round(item->Pose.Position.x + z * sinY + x * cosY),
-		(int)round(item->Pose.Position.y - z * sin(item->Pose.Orientation.x) + x * sin(item->Pose.Orientation.z)),
-		(int)round(item->Pose.Position.z + z * cosY - x * sinY)
+		round(item->Pose.Position.x + ((z * sinY) + (x * cosY))),
+		round(item->Pose.Position.y - ((z * sinX) + (x * sinZ))),
+		round(item->Pose.Position.z + ((z * sinY) - (x * cosY)))
 	);
-
 	auto probe = GetCollision(pos.x, pos.y, pos.z, item->RoomNumber);
 
 	*roomNumber = probe.RoomNumber;
@@ -96,12 +97,13 @@ void TrainControl(short itemNumber)
 
 void TrainCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 {
+	auto* item = &g_Level.Items[itemNumber];
 	auto* laraInfo = GetLaraInfo(laraItem);
-	auto* trainItem = &g_Level.Items[itemNumber];
 
-	if (!TestBoundsCollide(trainItem, laraItem, coll->Setup.Radius))
+	if (!TestBoundsCollide(item, laraItem, coll->Setup.Radius))
 		return;
-	if (!TestCollision(trainItem, laraItem))
+
+	if (!TestCollision(item, laraItem))
 		return;
 
 	SoundEffect(SFX_TR4_LARA_GENERAL_DEATH, &laraItem->Pose, SoundEnvironment::Always);
@@ -112,10 +114,10 @@ void TrainCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 	laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
 	// laraItem->Animation.ActiveState = EXTRA_TRAINKILL;
 	// laraItem->Animation.TargetState = EXTRA_TRAINKILL;
-	laraItem->Pose.Orientation.y = trainItem->Pose.Orientation.y;
-	laraItem->Animation.Velocity.z = 0;
-	laraItem->Animation.Velocity.y = 0;
 	laraItem->Animation.IsAirborne = false;
+	laraItem->Animation.Velocity.y = 0.0f;
+	laraItem->Animation.Velocity.z = 0.0f;
+	laraItem->Pose.Orientation.y = item->Pose.Orientation.y;
 
 	DoDamage(laraItem, INT_MAX);
 
@@ -127,13 +129,13 @@ void TrainCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 	laraInfo->HitDirection = -1;
 	laraInfo->Air = -1;
 
-	trainItem->ItemFlags[1] = 160;
+	item->ItemFlags[1] = 160;
 
-	float s = sin(trainItem->Pose.Orientation.y);
-	float c = cos(trainItem->Pose.Orientation.y);
+	float sinY = sin(item->Pose.Orientation.y);
+	float cosY = cos(item->Pose.Orientation.y);
 
-	long x = laraItem->Pose.Position.x + CLICK(1) * s;
-	long z = laraItem->Pose.Position.z + CLICK(1) * c;
+	long x = laraItem->Pose.Position.x + CLICK(1) * sinY;
+	long z = laraItem->Pose.Position.z + CLICK(1) * cosY;
 
-	DoLotsOfBlood(x, laraItem->Pose.Position.y - CLICK(2), z, SECTOR(1), trainItem->Pose.Orientation.y, laraItem->RoomNumber, 15);
+	DoLotsOfBlood(x, laraItem->Pose.Position.y - CLICK(2), z, SECTOR(1), item->Pose.Orientation.y, laraItem->RoomNumber, 15);
 }

@@ -10,7 +10,7 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-namespace TEN::Entities::TR2
+namespace TEN::Entities::Creatures::TR2
 {
 	const auto WorkerDualGunBiteLeft  = BiteInfo(Vector3(-2.0f, 275.0f, 23.0f), 6);
 	const auto WorkerDualGunBiteRight = BiteInfo(Vector3(2.0f, 275.0f, 23.0f), 10);

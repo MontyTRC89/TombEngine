@@ -17,7 +17,7 @@ using std::vector;
 
 namespace TEN::Entities::TR4
 {
-	constexpr auto MUMMY_ATTACK_DAMAGE = 100;
+	constexpr auto MUMMY_SWIPE_ATTACK_DAMAGE = 100;
 
 	constexpr auto MUMMY_IDLE_SWIPE_ATTACK_RANGE = SQUARE(SECTOR(0.5f));
 	constexpr auto MUMMY_WALK_SWIPE_ATTACK_RANGE = SQUARE(SECTOR(0.67f));
@@ -26,11 +26,12 @@ namespace TEN::Entities::TR4
 	constexpr auto MUMMY_ARMS_UP_RANGE			 = SQUARE(SECTOR(3));
 	constexpr auto MUMMY_AWARE_RANGE			 = SQUARE(SECTOR(7));
 
-	#define MUMMY_WALK_TURN_ANGLE Angle::DegToRad(7.0f)
+	#define MUMMY_WALK_TURN_RATE_MAX Angle::DegToRad(7.0f)
+	#define MUMMY_ATTACK_TURN_RATE_MAX Angle::DegToRad(7.0f)
 
 	const auto MummyBite1 = BiteInfo(Vector3::Zero, 11);
 	const auto MummyBite2 = BiteInfo(Vector3::Zero, 14);
-	const vector<int> MummyAttackJoints { 11, 14 };
+	const vector<int> MummySwipeAttackJoints { 11, 14 };
 
 	enum MummyState
 	{
@@ -81,16 +82,10 @@ namespace TEN::Entities::TR4
 		if (item->TriggerFlags == 2)
 		{
 			SetAnimation(item, MUMMY_ANIM_COLLAPSE_END);
-			item->Animation.TargetState = MUMMY_STATE_INACTIVE_LYING_DOWN; // TODO: Check if needed. -- Sezz
-			item->Animation.ActiveState = MUMMY_STATE_INACTIVE_LYING_DOWN;
 			item->Status -= ITEM_INVISIBLE;
 		}
 		else
-		{
 			SetAnimation(item, MUMMY_ANIM_ARMS_CROSSED);
-			item->Animation.TargetState = MUMMY_STATE_INACTIVE_ARMS_CROSSED; // TODO: Check if needed. -- Sezz
-			item->Animation.ActiveState = MUMMY_STATE_INACTIVE_ARMS_CROSSED;
-		}
 	}
 
 	void MummyControl(short itemNumber)
@@ -101,11 +96,11 @@ namespace TEN::Entities::TR4
 		auto* item = &g_Level.Items[itemNumber];
 		auto* creature = GetCreatureInfo(item);
 
-	float tilt = 0;
-	float angle = 0;
-	float joint0 = 0;
-	float joint1 = 0;
-	float joint2 = 0;
+		short angle = 0;
+		short tilt = 0;
+		short joint0 = 0;
+		short joint1 = 0;
+		short joint2 = 0;
 
 		if (item->AIBits)
 			GetAITarget(creature);
@@ -209,7 +204,7 @@ namespace TEN::Entities::TR4
 				}
 				else
 				{
-					creature->MaxTurn = MUMMY_WALK_TURN_ANGLE;
+					creature->MaxTurn = MUMMY_WALK_TURN_RATE_MAX;
 
 					if (AI.distance >= MUMMY_ARMS_UP_RANGE)
 					{
@@ -223,7 +218,7 @@ namespace TEN::Entities::TR4
 				break;
 
 			case MUMMY_STATE_WALK_FORWARD_ARMS_UP:
-				creature->MaxTurn = MUMMY_WALK_TURN_ANGLE;
+				creature->MaxTurn = MUMMY_WALK_TURN_RATE_MAX;
 				creature->Flags = 0;
 
 				if (AI.distance < MUMMY_IDLE_SWIPE_ATTACK_RANGE)
@@ -260,7 +255,7 @@ namespace TEN::Entities::TR4
 				joint1 = 0;
 				joint2 = 0;
 
-				if (AI.distance < MUMMY_ACTIVATE_RANGE || TestProbability(0.008f))
+				if (AI.distance < MUMMY_ACTIVATE_RANGE || TestProbability(1.0f / 128))
 				{
 					item->Animation.TargetState = MUMMY_STATE_COLLAPSED_TO_IDLE;
 					item->HitPoints = Objects[item->ObjectNumber].HitPoints;
@@ -272,26 +267,26 @@ namespace TEN::Entities::TR4
 			case MUMMY_STATE_IDLE_SWIPE_ATTACK:
 				creature->MaxTurn = 0;
 
-			if (abs(AI.angle) >= Angle::DegToRad(7.0f))
-			{
-				if (AI.angle >= 0)
-					item->Pose.Orientation.y += Angle::DegToRad(7.0f);
+				if (abs(AI.angle) >= MUMMY_ATTACK_TURN_RATE_MAX)
+				{
+					if (AI.angle >= 0)
+						item->Pose.Orientation.y += MUMMY_ATTACK_TURN_RATE_MAX;
+					else
+						item->Pose.Orientation.y -= MUMMY_ATTACK_TURN_RATE_MAX;
+				}
 				else
-					item->Pose.Orientation.y -= Angle::DegToRad(7.0f);
-			}
-			else
-				item->Pose.Orientation.y += AI.angle;
+					item->Pose.Orientation.y += AI.angle;
 
 				if (!creature->Flags)
 				{
-					if (item->TestBits(JointBitType::Touch, MummyAttackJoints))
+					if (item->TestBits(JointBitType::Touch, MummySwipeAttackJoints))
 					{
 						if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase &&
 							item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].frameEnd)
 						{
-							DoDamage(creature->Enemy, MUMMY_ATTACK_DAMAGE);
+							DoDamage(creature->Enemy, MUMMY_SWIPE_ATTACK_DAMAGE);
 
-							if (item->Animation.AnimNumber == Objects[item->ObjectNumber].animIndex + MUMMY_ANIM_IDLE_SWIPE_ATTACK_LEFT)
+							if (item->Animation.AnimNumber == (Objects[item->ObjectNumber].animIndex + MUMMY_ANIM_IDLE_SWIPE_ATTACK_LEFT))
 								CreatureEffect2(item, MummyBite1, 5, -1, DoBloodSplat);
 							else
 								CreatureEffect2(item, MummyBite2, 5, -1, DoBloodSplat);
@@ -309,11 +304,9 @@ namespace TEN::Entities::TR4
 		}
 
 		CreatureTilt(item, 0);
-
 		CreatureJoint(item, 0, joint0);
 		CreatureJoint(item, 1, joint1);
 		CreatureJoint(item, 2, joint2);
-
 		CreatureAnimation(itemNumber, angle, 0);
 	}
 }

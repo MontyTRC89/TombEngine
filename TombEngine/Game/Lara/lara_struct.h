@@ -891,7 +891,7 @@ enum class HolsterSlot
 	Shotgun			= ID_SHOTGUN_ANIM,
 	HK				= ID_HK_ANIM,
 	Harpoon			= ID_HARPOON_ANIM,
-	Crowssbow		= ID_CROSSBOW_ANIM,
+	Crossbow		= ID_CROSSBOW_ANIM,
 	GrenadeLauncher = ID_GRENADE_ANIM,
 	RocketLauncher	= ID_ROCKET_ANIM
 };

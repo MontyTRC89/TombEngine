@@ -103,7 +103,6 @@ namespace TEN::Entities::TR4
 					ShatterObject(nullptr, mesh, -64, item->RoomNumber, 0);
 					SoundEffect(SFX_TR4_SMASH_ROCK, &item->Pose);
 
-					mesh->flags &= ~StaticMeshFlags::SM_VISIBLE;
 					probe.Block = false;
 
 					TestTriggers(x, y, z, item->RoomNumber, true);

@@ -49,8 +49,7 @@ namespace TEN::Entities::TR4
 
 	enum BaboonState
 	{
-		BABOON_STATE_NULL = 0,
-		BABOON_STATE_NONE = 1,
+		// No states 0-1.
 		BABOON_STATE_WALK_FORWARD = 2,
 		BABOON_STATE_IDLE = 3,
 		BABOON_STATE_RUN_FORWARD = 4,
@@ -437,7 +436,7 @@ namespace TEN::Entities::TR4
 				{
 					if (item->AIBits & FOLLOW)
 						item->Animation.TargetState = BABOON_STATE_WALK_FORWARD;
-					else if (TestProbability(0.008f))
+					else if (TestProbability(1.0f / 128))
 						item->Animation.TargetState = BABOON_STATE_SIT_IDLE;
 				}
 				else if (creature->Mood == MoodType::Escape)
@@ -447,7 +446,7 @@ namespace TEN::Entities::TR4
 					if (AI.bite && AI.distance < BABOON_ATTACK_READY_RANGE)
 						item->Animation.TargetState = BABOON_STATE_IDLE;
 				}
-				else if (TestProbability(0.008f))
+				else if (TestProbability(1.0f / 128))
 					item->Animation.TargetState = BABOON_STATE_SIT_IDLE;
 
 				break;

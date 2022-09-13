@@ -86,7 +86,7 @@ void SarcophagusCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* c
 			{
 				if (Objects[currentItem->ObjectNumber].isPickup)
 				{
-					PickedUpObject(static_cast<GAME_OBJECT_ID>(currentItem->ObjectNumber), 0);
+					PickedUpObject(currentItem->ObjectNumber);
 					currentItem->Status = ITEM_ACTIVE;
 					currentItem->ItemFlags[3] = 1;
 					AddDisplayPickup(currentItem->ObjectNumber);

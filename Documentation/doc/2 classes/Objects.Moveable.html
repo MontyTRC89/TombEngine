@@ -3,7 +3,7 @@
 <html>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 <head>
-    <title>TombEngine 1.0.1 Lua API</title>
+    <title>TombEngine 1.0.2 Lua API</title>
     <link rel="stylesheet" href="../ldoc.css" type="text/css" />
 </head>
 <body>
@@ -95,7 +95,7 @@ pickups, and Lara herself.</p>
 <h2><a href="#Functions">Functions</a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" ><a href="#Moveable">Moveable(object, name, position, rotation, room, animNumber, frameNumber, hp, OCB, AIBits)</a></td>
+	<td class="name" ><a href="#Moveable">Moveable(object, name, position[, rotation[, room[, animNumber=0[, frameNumber=0[, hp=10[, OCB=0[, AIBits]]]]]]])</a></td>
 	<td class="summary">For more information on each parameter, see the
 associated getters and setters.</td>
 	</tr>
@@ -122,39 +122,6 @@ associated getters and setters.</td>
 	<tr>
 	<td class="name" ><a href="#Moveable:GetStatus">Moveable:GetStatus()</a></td>
 	<td class="summary">Get the status of object.</td>
-	</tr>
-	<tr>
-	<td class="name" ><a href="#Moveable:SetOnHit">Moveable:SetOnHit(name)</a></td>
-	<td class="summary">Set the name of the function to be called when the moveable is shot by Lara
- Note that this will be triggered twice when shot with both pistols at once.</td>
-	</tr>
-	<tr>
-	<td class="name" ><a href="#Moveable:GetOnHit">Moveable:GetOnHit()</a></td>
-	<td class="summary">Get the name of the function called when this moveable is shot</td>
-	</tr>
-	<tr>
-	<td class="name" ><a href="#Moveable:SetOnCollidedWithObject">Moveable:SetOnCollidedWithObject(name)</a></td>
-	<td class="summary">Set the name of the function called when this moveable collides with another moveable</td>
-	</tr>
-	<tr>
-	<td class="name" ><a href="#Moveable:GetOnCollidedWithObject">Moveable:GetOnCollidedWithObject()</a></td>
-	<td class="summary">Get the name of the function called when this moveable collides with another moveable</td>
-	</tr>
-	<tr>
-	<td class="name" ><a href="#Moveable:SetOnCollidedWithRoom">Moveable:SetOnCollidedWithRoom(name)</a></td>
-	<td class="summary">Set the name of the function called when this moveable collides with room geometry (e.g.</td>
-	</tr>
-	<tr>
-	<td class="name" ><a href="#Moveable:GetOnCollidedWithRoom">Moveable:GetOnCollidedWithRoom()</a></td>
-	<td class="summary">Get the name of the function called when this moveable collides with room geometry (e.g.</td>
-	</tr>
-	<tr>
-	<td class="name" ><a href="#Moveable:SetOnKilled">Moveable:SetOnKilled(callback)</a></td>
-	<td class="summary">Set the name of the function to be called when the moveable is destroyed/killed</td>
-	</tr>
-	<tr>
-	<td class="name" ><a href="#Moveable:GetOnKilled">Moveable:GetOnKilled()</a></td>
-	<td class="summary">Get the name of the function called when this moveable is killed</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#Moveable:GetObjectID">Moveable:GetObjectID()</a></td>
@@ -197,12 +164,24 @@ associated getters and setters.</td>
 	<td class="summary">Set current HP (hit points/health points)</td>
 	</tr>
 	<tr>
+	<td class="name" ><a href="#Moveable:GetSlotHP">Moveable:GetSlotHP(ID)</a></td>
+	<td class="summary">Get HP definded for that object type (hit points/health points) (Read Only).</td>
+	</tr>
+	<tr>
 	<td class="name" ><a href="#Moveable:GetOCB">Moveable:GetOCB()</a></td>
 	<td class="summary">Get OCB (object code bit) of the moveable</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#Moveable:SetOCB">Moveable:SetOCB(OCB)</a></td>
 	<td class="summary">Set OCB (object code bit) of the moveable</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Moveable:GetItemFlags">Moveable:GetItemFlags()</a></td>
+	<td class="summary">Get the value stored in ItemFlags[x] (x is the value of the parameter)</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Moveable:SetItemFlags">Moveable:SetItemFlags(value)</a></td>
+	<td class="summary">Stores the value of the first parameter in the ItemFlags[x] (x is the value of the second parameter)</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#Moveable:GetColor">Moveable:GetColor()</a></td>
@@ -270,27 +249,8 @@ associated getters and setters.</td>
 	<td class="summary">Determine whether the moveable is active or not</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#Moveable:GetRoom">Moveable:GetRoom()</a></td>
-	<td class="summary">Get the current room of the object</td>
-	</tr>
-	<tr>
-	<td class="name" ><a href="#Moveable:SetRoom">Moveable:SetRoom(ID)</a></td>
-	<td class="summary">Set room of object
- This is used in conjunction with SetPosition to teleport an item to a new room.</td>
-	</tr>
-	<tr>
-	<td class="name" ><a href="#Moveable:GetPosition">Moveable:GetPosition()</a></td>
-	<td class="summary">Get the object's position</td>
-	</tr>
-	<tr>
 	<td class="name" ><a href="#Moveable:GetJointPosition">Moveable:GetJointPosition()</a></td>
 	<td class="summary">Get the object's joint position</td>
-	</tr>
-	<tr>
-	<td class="name" ><a href="#Moveable:SetPosition">Moveable:SetPosition(position)</a></td>
-	<td class="summary">Set the moveable's position
- If you are moving a moveable whose behaviour involves knowledge of room geometry,
- (e.g.</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#Moveable:GetRotation">Moveable:GetRotation()</a></td>
@@ -318,6 +278,44 @@ associated getters and setters.</td>
 	<td class="name" ><a href="#Moveable:Destroy">Moveable:Destroy()</a></td>
 	<td class="summary">Destroy the moveable.</td>
 	</tr>
+	<tr>
+	<td class="name" ><a href="#Moveable:SetOnHit">Moveable:SetOnHit(callback)</a></td>
+	<td class="summary">Set the name of the function to be called when the moveable is shot by Lara
+ Note that this will be triggered twice when shot with both pistols at once.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Moveable:SetOnKilled">Moveable:SetOnKilled(callback)</a></td>
+	<td class="summary">Set the name of the function to be called when the moveable is destroyed/killed
+ Note that enemy death often occurs at the end of an animation, and not at the exact moment
+ the enemy's HP becomes zero.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Moveable:SetOnCollidedWithObject">Moveable:SetOnCollidedWithObject(func)</a></td>
+	<td class="summary">Set the function to be called called when this moveable collides with another moveable</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Moveable:SetOnCollidedWithRoom">Moveable:SetOnCollidedWithRoom(func)</a></td>
+	<td class="summary">Set the function called when this moveable collides with room geometry (e.g.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Moveable:GetPosition">Moveable:GetPosition()</a></td>
+	<td class="summary">Get the object's position</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Moveable:SetPosition">Moveable:SetPosition(position[, updateRoom])</a></td>
+	<td class="summary">Set the moveable's position
+ If you are moving a moveable whose behaviour involves knowledge of room geometry,
+ (e.g.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Moveable:GetRoom">Moveable:GetRoom()</a></td>
+	<td class="summary">Get the current room of the object</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Moveable:SetRoom">Moveable:SetRoom(ID)</a></td>
+	<td class="summary">Set room of object
+ Use this if you are not using SetPosition's automatic room update - for example, when dealing with overlapping rooms.</td>
+	</tr>
 </table>
 
 <br/>
@@ -329,7 +327,7 @@ associated getters and setters.</td>
     <dl class="function">
     <dt>
     <a name = "Moveable"></a>
-    <strong>Moveable(object, name, position, rotation, room, animNumber, frameNumber, hp, OCB, AIBits)</strong>
+    <strong>Moveable(object, name, position[, rotation[, room[, animNumber=0[, frameNumber=0[, hp=10[, OCB=0[, AIBits]]]]]]])</strong>
     </dt>
     <dd>
     For more information on each parameter, see the
@@ -354,30 +352,37 @@ most can just be ignored (see usage).
         <li><span class="parameter">rotation</span>
             <span class="types"><span class="type">Rotation</span></span>
          rotation about x, y, and z axes (default Rotation(0, 0, 0))
+         (<em>optional</em>)
         </li>
         <li><span class="parameter">room</span>
             <span class="types"><span class="type">int</span></span>
-         room ID item is in
+         room ID item is in (default: calculated automatically)
+         (<em>optional</em>)
         </li>
         <li><span class="parameter">animNumber</span>
             <span class="types"><span class="type">int</span></span>
-         anim number (default 0)
+         anim number
+         (<em>default</em> 0)
         </li>
         <li><span class="parameter">frameNumber</span>
             <span class="types"><span class="type">int</span></span>
-         frame number (default 0)
+         frame number
+         (<em>default</em> 0)
         </li>
         <li><span class="parameter">hp</span>
             <span class="types"><span class="type">int</span></span>
-         HP of item (default 10)
+         HP of item
+         (<em>default</em> 10)
         </li>
         <li><span class="parameter">OCB</span>
             <span class="types"><span class="type">int</span></span>
          ocb of item (default 0)
+         (<em>default</em> 0)
         </li>
         <li><span class="parameter">AIBits</span>
             <span class="types"><a class="type" href="https://www.lua.org/manual/5.1/manual.html#5.5">table</a></span>
          table with AI bits (default {0,0,0,0,0,0})
+         (<em>optional</em>)
         </li>
     </ul>
 
@@ -394,10 +399,8 @@ most can just be ignored (see usage).
         <pre class="example"><span class="keyword">local</span> item = Moveable(
 	TEN.ObjID.PISTOLS_ITEM, <span class="comment">-- object id
 </span>	<span class="string">"test"</span>, <span class="comment">-- name
-</span>	Vec3(<span class="number">18907</span>, <span class="number">0</span>, <span class="number">21201</span>),
-	Rotation(<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>),
-	<span class="number">0</span>, <span class="comment">-- room
-</span>	)</pre>
+</span>	Vec3(<span class="number">18907</span>, <span class="number">0</span>, <span class="number">21201</span>)
+	)</pre>
     </ul>
 
 </dd>
@@ -490,176 +493,6 @@ most can just be ignored (see usage).
 
            <span class="types"><span class="type">int</span></span>
         a number representing the status of the object
-    </ol>
-
-
-
-
-</dd>
-    <dt>
-    <a name = "Moveable:SetOnHit"></a>
-    <strong>Moveable:SetOnHit(name)</strong>
-    </dt>
-    <dd>
-    Set the name of the function to be called when the moveable is shot by Lara
- Note that this will be triggered twice when shot with both pistols at once.
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">name</span>
-            <span class="types"><a class="type" href="https://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
-         of callback function to be called
-        </li>
-    </ul>
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "Moveable:GetOnHit"></a>
-    <strong>Moveable:GetOnHit()</strong>
-    </dt>
-    <dd>
-    Get the name of the function called when this moveable is shot
-
-
-
-    <h3>Returns:</h3>
-    <ol>
-
-           <span class="types"><a class="type" href="https://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
-        name of the function
-    </ol>
-
-
-
-
-</dd>
-    <dt>
-    <a name = "Moveable:SetOnCollidedWithObject"></a>
-    <strong>Moveable:SetOnCollidedWithObject(name)</strong>
-    </dt>
-    <dd>
-    Set the name of the function called when this moveable collides with another moveable
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">name</span>
-            <span class="types"><a class="type" href="https://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
-         of callback function to be called
-        </li>
-    </ul>
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "Moveable:GetOnCollidedWithObject"></a>
-    <strong>Moveable:GetOnCollidedWithObject()</strong>
-    </dt>
-    <dd>
-    Get the name of the function called when this moveable collides with another moveable
-
-
-
-    <h3>Returns:</h3>
-    <ol>
-
-           <span class="types"><a class="type" href="https://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
-        name of the function
-    </ol>
-
-
-
-
-</dd>
-    <dt>
-    <a name = "Moveable:SetOnCollidedWithRoom"></a>
-    <strong>Moveable:SetOnCollidedWithRoom(name)</strong>
-    </dt>
-    <dd>
-    Set the name of the function called when this moveable collides with room geometry (e.g.  a wall or floor)
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">name</span>
-            <span class="types"><a class="type" href="https://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
-         of callback function to be called
-        </li>
-    </ul>
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "Moveable:GetOnCollidedWithRoom"></a>
-    <strong>Moveable:GetOnCollidedWithRoom()</strong>
-    </dt>
-    <dd>
-    Get the name of the function called when this moveable collides with room geometry (e.g.  a wall or floor)
-
-
-
-    <h3>Returns:</h3>
-    <ol>
-
-           <span class="types"><a class="type" href="https://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
-        name of the function
-    </ol>
-
-
-
-
-</dd>
-    <dt>
-    <a name = "Moveable:SetOnKilled"></a>
-    <strong>Moveable:SetOnKilled(callback)</strong>
-    </dt>
-    <dd>
-    Set the name of the function to be called when the moveable is destroyed/killed
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">callback</span>
-            <span class="types"><a class="type" href="https://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
-         name of function to be called
-        </li>
-    </ul>
-
-
-
-
-    <h3>Usage:</h3>
-    <ul>
-        <pre class="example">LevelFuncs.baddyKilled = <span class="keyword">function</span>(theBaddy) <span class="global">print</span>(<span class="string">"You killed a baddy!"</span>) <span class="keyword">end</span>
-baddy:SetOnKilled(<span class="string">"baddyKilled"</span>)</pre>
-    </ul>
-
-</dd>
-    <dt>
-    <a name = "Moveable:GetOnKilled"></a>
-    <strong>Moveable:GetOnKilled()</strong>
-    </dt>
-    <dd>
-    Get the name of the function called when this moveable is killed
-
-
-
-    <h3>Returns:</h3>
-    <ol>
-
-           <span class="types"><a class="type" href="https://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
-        name of the function
     </ol>
 
 
@@ -888,6 +721,27 @@ shiva:SetObjectID(TEN.Objects.ObjID.BIGMEDI_ITEM)</pre>
 
 </dd>
     <dt>
+    <a name = "Moveable:GetSlotHP"></a>
+    <strong>Moveable:GetSlotHP(ID)</strong>
+    </dt>
+    <dd>
+    Get HP definded for that object type (hit points/health points) (Read Only).
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">ID</span>
+            <span class="types"><span class="type">int</span></span>
+         of the moveable slot type.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
     <a name = "Moveable:GetOCB"></a>
     <strong>Moveable:GetOCB()</strong>
     </dt>
@@ -920,6 +774,47 @@ shiva:SetObjectID(TEN.Objects.ObjID.BIGMEDI_ITEM)</pre>
         <li><span class="parameter">OCB</span>
             <span class="types"><span class="type">int</span></span>
          the new value for the moveable's OCB
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Moveable:GetItemFlags"></a>
+    <strong>Moveable:GetItemFlags()</strong>
+    </dt>
+    <dd>
+    Get the value stored in ItemFlags[x] (x is the value of the parameter)
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">short</span></span>
+        id of the ItemFlags array
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Moveable:SetItemFlags"></a>
+    <strong>Moveable:SetItemFlags(value)</strong>
+    </dt>
+    <dd>
+    Stores the value of the first parameter in the ItemFlags[x] (x is the value of the second parameter)
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">value</span>
+            <span class="types"><span class="type">short</span></span>
+         to store in the moveable's ItemFlags[x], short id of ItemFlags array to store the value.
         </li>
     </ul>
 
@@ -1244,74 +1139,6 @@ sas:SetAIBits({<span class="number">1</span>, <span class="number">0</span>, <sp
 
 </dd>
     <dt>
-    <a name = "Moveable:GetRoom"></a>
-    <strong>Moveable:GetRoom()</strong>
-    </dt>
-    <dd>
-    Get the current room of the object
-
-
-
-    <h3>Returns:</h3>
-    <ol>
-
-           <span class="types"><span class="type">int</span></span>
-        number representing the current room of the object
-    </ol>
-
-
-
-
-</dd>
-    <dt>
-    <a name = "Moveable:SetRoom"></a>
-    <strong>Moveable:SetRoom(ID)</strong>
-    </dt>
-    <dd>
-    Set room of object
- This is used in conjunction with SetPosition to teleport an item to a new room.
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">ID</span>
-            <span class="types"><span class="type">int</span></span>
-         the ID of the new room
-        </li>
-    </ul>
-
-
-
-
-    <h3>Usage:</h3>
-    <ul>
-        <pre class="example"><span class="keyword">local</span> sas = TEN.Objects.GetMoveableByName(<span class="string">"sas_enemy"</span>)
-sas:SetRoom(destinationRoom)
-sas:SetPosition(destinationPosition)</pre>
-    </ul>
-
-</dd>
-    <dt>
-    <a name = "Moveable:GetPosition"></a>
-    <strong>Moveable:GetPosition()</strong>
-    </dt>
-    <dd>
-    Get the object's position
-
-
-
-    <h3>Returns:</h3>
-    <ol>
-
-           <span class="types"><span class="type">Vec3</span></span>
-        a copy of the moveable's position
-    </ol>
-
-
-
-
-</dd>
-    <dt>
     <a name = "Moveable:GetJointPosition"></a>
     <strong>Moveable:GetJointPosition()</strong>
     </dt>
@@ -1326,30 +1153,6 @@ sas:SetPosition(destinationPosition)</pre>
            <span class="types"><span class="type">Vec3</span></span>
         a copy of the moveable's position
     </ol>
-
-
-
-
-</dd>
-    <dt>
-    <a name = "Moveable:SetPosition"></a>
-    <strong>Moveable:SetPosition(position)</strong>
-    </dt>
-    <dd>
-    Set the moveable's position
- If you are moving a moveable whose behaviour involves knowledge of room geometry,
- (e.g.  a BADDY1, which uses it for pathfinding), then you <em>must</em> use this in conjunction
- with <a href="../2 classes/Objects.Moveable.html#Moveable:SetRoom">Moveable:SetRoom</a>. Otherwise, said moveable will not behave correctly.
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">position</span>
-            <span class="types"><span class="type">Vec3</span></span>
-         the new position of the moveable
-        </li>
-    </ul>
-
 
 
 
@@ -1481,6 +1284,195 @@ sas:SetPosition(destinationPosition)</pre>
 
 
 </dd>
+    <dt>
+    <a name = "Moveable:SetOnHit"></a>
+    <strong>Moveable:SetOnHit(callback)</strong>
+    </dt>
+    <dd>
+    Set the name of the function to be called when the moveable is shot by Lara
+ Note that this will be triggered twice when shot with both pistols at once.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">callback</span>
+            <span class="types"><span class="type">function</span></span>
+         function in LevelFuncs hierarchy to call when moveable is shot
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Moveable:SetOnKilled"></a>
+    <strong>Moveable:SetOnKilled(callback)</strong>
+    </dt>
+    <dd>
+    Set the name of the function to be called when the moveable is destroyed/killed
+ Note that enemy death often occurs at the end of an animation, and not at the exact moment
+ the enemy's HP becomes zero.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">callback</span>
+            <span class="types"><span class="type">function</span></span>
+         function in LevelFuncs hierarchy to call when enemy is killed
+        </li>
+    </ul>
+
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">LevelFuncs.baddyKilled = <span class="keyword">function</span>(theBaddy) <span class="global">print</span>(<span class="string">"You killed a baddy!"</span>) <span class="keyword">end</span>
+baddy:SetOnKilled(LevelFuncs.baddyKilled)</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "Moveable:SetOnCollidedWithObject"></a>
+    <strong>Moveable:SetOnCollidedWithObject(func)</strong>
+    </dt>
+    <dd>
+    Set the function to be called called when this moveable collides with another moveable
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">func</span>
+            <span class="types"><span class="type">function</span></span>
+         callback function to be called (must be in LevelFuncs hierarchy)
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Moveable:SetOnCollidedWithRoom"></a>
+    <strong>Moveable:SetOnCollidedWithRoom(func)</strong>
+    </dt>
+    <dd>
+    Set the function called when this moveable collides with room geometry (e.g.  a wall or floor)
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">func</span>
+            <span class="types"><span class="type">function</span></span>
+         callback function to be called (must be in LevelFuncs hierarchy)
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Moveable:GetPosition"></a>
+    <strong>Moveable:GetPosition()</strong>
+    </dt>
+    <dd>
+    Get the object's position
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">Vec3</span></span>
+        a copy of the moveable's position
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Moveable:SetPosition"></a>
+    <strong>Moveable:SetPosition(position[, updateRoom])</strong>
+    </dt>
+    <dd>
+    Set the moveable's position
+ If you are moving a moveable whose behaviour involves knowledge of room geometry,
+ (e.g.  a BADDY1, which uses it for pathfinding), then the second argument should
+ be true (or omitted, as true is the default). Otherwise, said moveable will not behave correctly.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">position</span>
+            <span class="types"><span class="type">Vec3</span></span>
+         the new position of the moveable
+        </li>
+        <li><span class="parameter">updateRoom</span>
+            <span class="types"><span class="type">bool</span></span>
+         Will room changes be automatically detected? Set to false if you are using overlapping rooms (default: true)
+         (<em>optional</em>)
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Moveable:GetRoom"></a>
+    <strong>Moveable:GetRoom()</strong>
+    </dt>
+    <dd>
+    Get the current room of the object
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">int</span></span>
+        number representing the current room of the object
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Moveable:SetRoom"></a>
+    <strong>Moveable:SetRoom(ID)</strong>
+    </dt>
+    <dd>
+    Set room of object
+ Use this if you are not using SetPosition's automatic room update - for example, when dealing with overlapping rooms.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">ID</span>
+            <span class="types"><span class="type">int</span></span>
+         the ID of the new room
+        </li>
+    </ul>
+
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="keyword">local</span> sas = TEN.Objects.GetMoveableByName(<span class="string">"sas_enemy"</span>)
+sas:SetRoom(destinationRoom)
+sas:SetPosition(destinationPosition, <span class="keyword">false</span>)</pre>
+    </ul>
+
+</dd>
 </dl>
 
 
@@ -1488,7 +1480,7 @@ sas:SetPosition(destinationPosition)</pre>
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
-<i style="float:right;">Last updated 2022-08-11 22:43:52 </i>
+<i style="float:right;">Last updated 2022-09-07 20:56:06 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>

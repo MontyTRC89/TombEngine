@@ -121,10 +121,6 @@ bool GetTargetOnLOS(GameVector* origin, GameVector* target, bool drawTarget, boo
 						ShatterImpactData.impactDirection = direction;
 						ShatterImpactData.impactLocation = Vector3(mesh->pos.Position.x, mesh->pos.Position.y, mesh->pos.Position.z);
 						ShatterObject(nullptr, mesh, 128, target2.roomNumber, 0);
-						SmashedMeshRoom[SmashedMeshCount] = target2.roomNumber;
-						SmashedMesh[SmashedMeshCount] = mesh;
-						++SmashedMeshCount;
-						mesh->flags &= ~StaticMeshFlags::SM_VISIBLE;
 						SoundEffect(GetShatterSound(mesh->staticNumber), (PHD_3DPOS*)mesh);
 					}
 

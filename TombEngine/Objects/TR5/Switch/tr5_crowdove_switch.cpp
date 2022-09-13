@@ -1,21 +1,21 @@
 #include "framework.h"
 #include "tr5_crowdove_switch.h"
+
+#include "Game/animation.h"
+#include "Game/collision/collide_item.h"
 #include "Game/control/control.h"
-#include "Specific/input.h"
-#include "Specific/level.h"
+#include "Game/effects/debris.h"
+#include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Objects/Generic/Switches/generic_switch.h"
 #include "Sound/sound.h"
-#include "Game/animation.h"
-#include "Game/items.h"
-#include "Game/collision/collide_item.h"
-#include "Game/effects/debris.h"
+#include "Specific/input.h"
+#include "Specific/level.h"
 
 using namespace TEN::Input;
-using namespace TEN::Entities::Switches;
 
-namespace TEN::Entities::TR5
+namespace TEN::Entities::Switches
 {
 	OBJECT_COLLISION_BOUNDS CrowDoveBounds =
 	{

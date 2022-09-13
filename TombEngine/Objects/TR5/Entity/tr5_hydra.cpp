@@ -1,20 +1,23 @@
 #include "framework.h"
-#include "tr5_hydra.h"
+#include "Objects/TR5/Entity/tr5_hydra.h"
 
-#include "Game/items.h"
+#include "Game/Lara/lara.h"
+#include "Game/animation.h"
 #include "Game/collision/collide_room.h"
 #include "Game/control/box.h"
 #include "Game/effects/debris.h"
 #include "Game/effects/effects.h"
-#include "Specific/setup.h"
-#include "Game/animation.h"
-#include "Specific/level.h"
-#include "Game/Lara/lara.h"
+#include "Game/itemdata/creature_info.h"
+#include "Game/items.h"
 #include "Game/misc.h"
 #include "Sound/sound.h"
-#include "Game/itemdata/creature_info.h"
+#include "Specific/level.h"
+#include "Specific/prng.h"
+#include "Specific/setup.h"
 
-namespace TEN::Entities::TR5
+using namespace TEN::Math::Random;
+
+namespace TEN::Entities::Creatures::TR5
 {
 	const auto HydraBite = BiteInfo(Vector3::Zero, 11);
 
@@ -103,7 +106,7 @@ namespace TEN::Entities::TR5
 		spark->flags = SP_EXPDEF | SP_ROTATE | SP_DEF | SP_SCALE;
 		spark->rotAng = GetRandomControl() & 0xFFF;
 
-		if (GetRandomControl() & 1)
+		if (TestProbability(0.5f))
 			spark->rotAdd = -32 - (GetRandomControl() & 0x1F);
 		else
 			spark->rotAdd = (GetRandomControl() & 0x1F) + 32;
@@ -227,11 +230,11 @@ namespace TEN::Entities::TR5
 				else if (item->TriggerFlags == 2)
 					tilt = Angle::DegToRad(2.8f);
 
-				if (AI.distance >= pow(CLICK(7), 2) && GetRandomControl() & 0x1F)
+				if (AI.distance >= pow(CLICK(7), 2) && TestProbability(0.97f))
 				{
-					if (AI.distance >= pow(SECTOR(2), 2) && GetRandomControl() & 0x1F)
+					if (AI.distance >= pow(SECTOR(2), 2) && TestProbability(0.97f))
 					{
-						if (!(GetRandomControl() & 0xF))
+						if (TestProbability(0.06f))
 							item->Animation.TargetState = HYDRA_STATE_AIM;
 					}
 					else
@@ -290,7 +293,8 @@ namespace TEN::Entities::TR5
 					if (Lara.Control.Weapon.GunType == LaraWeaponType::Shotgun)
 						damage *= 3;
 
-					if ((GetRandomControl() & 0xF) < damage && AI.distance < SQUARE(10240) && damage > 0)
+					if ((GetRandomControl() & 0xF) < damage &&
+						AI.distance < SQUARE(SECTOR(10)) && damage > 0)
 					{
 						item->Animation.TargetState = 4;
 						DoDamage(item, damage);

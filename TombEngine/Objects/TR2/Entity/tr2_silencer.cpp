@@ -8,22 +8,70 @@
 #include "Game/misc.h"
 #include "Game/people.h"
 #include "Specific/level.h"
+#include "Specific/prng.h"
 #include "Specific/setup.h"
 
-namespace TEN::Entities::TR2
+using namespace TEN::Math::Random;
+
+namespace TEN::Entities::Creatures::TR2
 {
+	constexpr auto SILENCER_SHOOT_ATTACK_DAMAGE = 50;
+	constexpr auto SILENCER_RUN_RANGE = SQUARE(SECTOR(2));
+
 	const auto SilencerGunBite = BiteInfo(Vector3(3.0f, 331.0f, 56.0f), 10);
 
-	// TODO
+	#define SILENCER_WALK_TURN_RATE_MAX Angle::DegToRad(5.0f)
+	#define SILENCER_RUN_TURN_RATE_MAX	Angle::DegToRad(5.0f)
+
 	enum SilencerState
 	{
-
+		// No state 0.
+		SILENCER_STATE_WALK_FORWARD = 1,
+		SILENCER_STATE_RUN_FORWARD = 2,
+		SILENCER_STATE_IDLE_FRAME = 3,
+		SILENCER_STATE_IDLE = 4,
+		SILENCER_STATE_POSE = 5,
+		SILENCER_STATE_AIM_1 = 6,
+		SILENCER_STATE_SHOOT_1 = 7,
+		// No state 8.
+		SILENCER_STATE_RUN_SHOOT = 9,
+		SILENCER_STATE_AIM_2 = 10,
+		SILENCER_STATE_SHOOT_2 = 11,
+		SILENCER_STATE_DEATH_1 = 12,
+		SILENCER_STATE_DEATH_2 = 13
 	};
 
-	// TODO
 	enum SilencerAnim
 	{
-
+		SILENCER_ANIM_IDLE_FRAME = 0,
+		SILENCER_ANIM_IDLE_TO_WALK_FORWARD = 1,
+		SILENCER_ANIM_WALK_FORWARD = 2,
+		SILENCER_ANIM_WALK_FORWARD_TO_IDLE = 3,
+		SILENCER_ANIM_WALK_FORWARD_TO_POSE = 4,
+		SILENCER_ANIM_POSE = 5,
+		SILENCER_ANIM_WALK_FORWARD_TO_RUN_FORWARD = 6,
+		SILENCER_ANIM_RUN_FORWARD = 7,
+		SILENCER_ANIM_RUN_FORWARD_TO_IDLE = 8,
+		SILENCER_ANIM_IDLE_TO_RUN_FORWARD = 9,
+		SILENCER_ANIM_POSE_TO_IDLE = 10,
+		SILENCER_ANIM_RUN_FORWARD_AIM_LEFT = 11,
+		SILENCER_ANIM_RUN_FORWARD_SHOOT_LEFT = 12,
+		SILENCER_ANIM_RUN_FORWARD_UNAIM_LEFT = 13,
+		SILENCER_ANIM_AIM_1_START = 14,
+		SILENCER_ANIM_AIM_1_CONTINUE = 15,
+		SILENCER_ANIM_SHOOT_1 = 16,
+		SILENCER_ANIM_UNAIM_1 = 17,
+		SILENCER_ANIM_POSE_TO_AIM_1 = 18,
+		SILENCER_ANIM_IDLE = 19,
+		SILENCER_ANIM_DEATH_1 = 20,
+		SILENCER_ANIM_DEATH_2 = 21, // Unused.
+		SILENCER_ANIM_AIM_2_START = 22,
+		SILENCER_ANIM_AIM_2_CONTINUE = 23,
+		SILENCER_ANIM_SHOOT_2 = 24,
+		SILENCER_ANIM_UNAIM_2 = 25,
+		SILENCER_ANIM_RUN_FORWARD_AIM_RIGHT = 26,
+		SILENCER_ANIM_RUN_FORWARD_SHOOT_RIGHT = 27,
+		SILENCER_ANIM_RUN_FORWARD_UNAIM_RIGHT = 28
 	};
 
 	void SilencerControl(short itemNumber)
@@ -32,21 +80,19 @@ namespace TEN::Entities::TR2
 			return;
 
 		auto* item = &g_Level.Items[itemNumber];
-		auto* info = GetCreatureInfo(item);
+		auto* creature = GetCreatureInfo(item);
 
 		short angle = 0;
-		short torsoX = 0;
-		short torsoY = 0;
-		short head = 0;
 		short tilt = 0;
+		auto extraHeadRot = EulerAngles::Zero;
+		auto extraTorsoRot = EulerAngles::Zero;
 
 		if (item->HitPoints <= 0)
 		{
-			if (item->Animation.ActiveState != 12 && item->Animation.ActiveState != 13)
+			if (item->Animation.ActiveState != SILENCER_STATE_DEATH_1 &&
+				item->Animation.ActiveState != SILENCER_STATE_DEATH_2)
 			{
-				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 20;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-				item->Animation.ActiveState = 13;
+				SetAnimation(item, SILENCER_ANIM_DEATH_1);
 			}
 		}
 		else
@@ -57,205 +103,207 @@ namespace TEN::Entities::TR2
 			GetCreatureMood(item, &AI, true);
 			CreatureMood(item, &AI, true);
 
-			angle = CreatureTurn(item, info->MaxTurn);
+			angle = CreatureTurn(item, creature->MaxTurn);
 
 			switch (item->Animation.ActiveState)
 			{
-			case 3:
+			case SILENCER_STATE_IDLE_FRAME:
+				creature->MaxTurn = 0;
+
 				if (AI.ahead)
-					head = AI.angle;
-				info->MaxTurn = 0;
+					extraHeadRot.y = AI.angle;
 
 				if (item->Animation.RequiredState)
 					item->Animation.TargetState = item->Animation.RequiredState;
 
 				break;
 
-			case 4:
-				if (AI.ahead)
-					head = AI.angle;
-				info->MaxTurn = 0;
+			case SILENCER_STATE_IDLE:
+				creature->MaxTurn = 0;
 
-				if (info->Mood == MoodType::Escape)
+				if (AI.ahead)
+					extraHeadRot.y = AI.angle;
+
+				if (creature->Mood == MoodType::Escape)
 				{
-					item->Animation.RequiredState = 2;
-					item->Animation.TargetState = 3;
+					item->Animation.TargetState = SILENCER_STATE_IDLE_FRAME;
+					item->Animation.RequiredState = SILENCER_STATE_RUN_FORWARD;
 				}
 				else
 				{
 					if (Targetable(item, &AI))
 					{
-						item->Animation.RequiredState = (GetRandomControl() >= 0x4000 ? 10 : 6);
-						item->Animation.TargetState = 3;
+						item->Animation.TargetState = SILENCER_STATE_IDLE_FRAME;
+						item->Animation.RequiredState = TestProbability(0.5f) ? SILENCER_STATE_AIM_1 : SILENCER_STATE_AIM_2;
 					}
 
-					if (info->Mood == MoodType::Attack || !AI.ahead)
+					if (creature->Mood == MoodType::Attack || !AI.ahead)
 					{
-						if (AI.distance >= pow(SECTOR(2), 2))
+						if (AI.distance >= SILENCER_RUN_RANGE)
 						{
-							item->Animation.RequiredState = 2;
-							item->Animation.TargetState = 3;
+							item->Animation.TargetState = SILENCER_STATE_IDLE_FRAME;
+							item->Animation.RequiredState = SILENCER_STATE_RUN_FORWARD;
 						}
 						else
 						{
-							item->Animation.RequiredState = 1;
-							item->Animation.TargetState = 3;
+							item->Animation.TargetState = SILENCER_STATE_IDLE_FRAME;
+							item->Animation.RequiredState = SILENCER_STATE_WALK_FORWARD;
 						}
 					}
 					else
 					{
-						if (GetRandomControl() >= 1280)
+						if (TestProbability(0.96f))
 						{
-							if (GetRandomControl() < 2560)
+							if (TestProbability(0.08f))
 							{
-								item->Animation.RequiredState = 1;
-								item->Animation.TargetState = 3;
+								item->Animation.TargetState = SILENCER_STATE_IDLE_FRAME;
+								item->Animation.RequiredState = SILENCER_STATE_WALK_FORWARD;
 							}
 						}
 						else
 						{
-							item->Animation.RequiredState = 5;
-							item->Animation.TargetState = 3;
+							item->Animation.TargetState = SILENCER_STATE_IDLE_FRAME;
+							item->Animation.RequiredState = SILENCER_STATE_POSE;
 						}
 					}
 				}
 
 				break;
 
-			case 1:
+			case SILENCER_STATE_WALK_FORWARD:
+				creature->MaxTurn = SILENCER_WALK_TURN_RATE_MAX;
+
 				if (AI.ahead)
-					head = AI.angle;
+					extraHeadRot.y = AI.angle;
 
-				info->MaxTurn = 910;
-
-				if (info->Mood == MoodType::Escape)
-					item->Animation.TargetState = 2;
+				if (creature->Mood == MoodType::Escape)
+					item->Animation.TargetState = SILENCER_STATE_RUN_FORWARD;
 				else if (Targetable(item, &AI))
 				{
-					item->Animation.RequiredState = (GetRandomControl() >= 0x4000 ? 10 : 6);
-					item->Animation.TargetState = 3;
+					item->Animation.TargetState = SILENCER_STATE_IDLE_FRAME;
+					item->Animation.RequiredState = TestProbability(0.5f) ? SILENCER_STATE_AIM_1 : SILENCER_STATE_AIM_2;
 				}
 				else
 				{
-					if (AI.distance > pow(SECTOR(2), 2) || !AI.ahead)
-						item->Animation.TargetState = 2;
-					if (info->Mood == MoodType::Bored && GetRandomControl() < 0x300)
-						item->Animation.TargetState = 3;
+					if (AI.distance > SILENCER_RUN_RANGE || !AI.ahead)
+						item->Animation.TargetState = SILENCER_STATE_RUN_FORWARD;
+					if (creature->Mood == MoodType::Bored && TestProbability(0.025f))
+						item->Animation.TargetState = SILENCER_STATE_IDLE_FRAME;
 				}
 
 				break;
 
-			case 2:
-				if (AI.ahead)
-					head = AI.angle;
-
-				info->MaxTurn = Angle::DegToRad(5.0f);
-				info->Flags = 0;
+			case SILENCER_STATE_RUN_FORWARD:
+				creature->MaxTurn = SILENCER_RUN_TURN_RATE_MAX;
+				creature->Flags = 0;
 				tilt = angle / 4;
 
-				if (info->Mood == MoodType::Escape)
+				if (AI.ahead)
+					extraHeadRot.y = AI.angle;
+
+				if (creature->Mood == MoodType::Escape)
 				{
 					if (Targetable(item, &AI))
-						item->Animation.TargetState = 9;
+						item->Animation.TargetState = SILENCER_STATE_RUN_SHOOT;
 
 					break;
-
 				}
 
 				if (Targetable(item, &AI))
 				{
-					if (AI.distance >= pow(SECTOR(2), 2) && AI.zoneNumber == AI.enemyZone)
-						item->Animation.TargetState = 9;
+					if (AI.distance >= SILENCER_RUN_RANGE && AI.zoneNumber == AI.enemyZone)
+						item->Animation.TargetState = SILENCER_STATE_RUN_SHOOT;
 
 					break;
 				}
-				else if (info->Mood == MoodType::Attack)
-					item->Animation.TargetState = (GetRandomControl() >= 0x4000) ? 3 : 2;
+				else if (creature->Mood == MoodType::Attack)
+					item->Animation.TargetState = TestProbability(0.5f) ? SILENCER_STATE_RUN_FORWARD : SILENCER_STATE_IDLE_FRAME;
 				else
-					item->Animation.TargetState = 3;
+					item->Animation.TargetState = SILENCER_STATE_IDLE_FRAME;
 
 				break;
 
-			case 5:
-				if (AI.ahead)
-					head = AI.angle;
+			case SILENCER_STATE_POSE:
+				creature->MaxTurn = 0;
 
-				info->MaxTurn = 0;
+				if (AI.ahead)
+					extraHeadRot.y = AI.angle;
 
 				if (Targetable(item, &AI))
 				{
-					item->Animation.RequiredState = 6;
-					item->Animation.TargetState = 3;
+					item->Animation.TargetState = SILENCER_STATE_IDLE_FRAME;
+					item->Animation.RequiredState = SILENCER_STATE_AIM_1;
 				}
 				else
 				{
-					if (info->Mood == MoodType::Attack || GetRandomControl() < 0x100)
-						item->Animation.TargetState = 3;
+					if (creature->Mood == MoodType::Attack || TestProbability(1.0f / 128))
+						item->Animation.TargetState = SILENCER_STATE_IDLE_FRAME;
+
 					if (!AI.ahead)
-						item->Animation.TargetState = 3;
+						item->Animation.TargetState = SILENCER_STATE_IDLE_FRAME;
 				}
 
 				break;
 
-			case 6:
-			case 10:
-				info->MaxTurn = 0;
-				info->Flags = 0;
+			case SILENCER_STATE_AIM_1:
+			case SILENCER_STATE_AIM_2:
+				creature->MaxTurn = 0;
+				creature->Flags = 0;
 
 				if (AI.ahead)
 				{
-					torsoY = AI.angle;
-					torsoX = AI.xAngle;
+					extraTorsoRot.x = AI.xAngle;
+					extraTorsoRot.y = AI.angle;
 				}
 				else
-					head = AI.angle;
+					extraHeadRot.y = AI.angle;
 
-				if (info->Mood == MoodType::Escape)
-					item->Animation.TargetState = 3;
+				if (creature->Mood == MoodType::Escape)
+					item->Animation.TargetState = SILENCER_STATE_IDLE_FRAME;
 				else if (Targetable(item, &AI))
-					item->Animation.TargetState = item->Animation.ActiveState != 6 ? 11 : 7;
+					item->Animation.TargetState = (item->Animation.ActiveState != SILENCER_STATE_AIM_1) ? SILENCER_STATE_SHOOT_2 : SILENCER_STATE_SHOOT_1;
 				else
-					item->Animation.TargetState = 3;
+					item->Animation.TargetState = SILENCER_STATE_IDLE_FRAME;
 
 				break;
 
-			case 7:
-			case 11:
-				info->MaxTurn = 0;
+			case SILENCER_STATE_SHOOT_1:
+			case SILENCER_STATE_SHOOT_2:
+				creature->MaxTurn = 0;
 
 				if (AI.ahead)
 				{
-					torsoY = AI.angle;
-					torsoX = AI.xAngle;
+					extraTorsoRot.x = AI.xAngle;
+					extraTorsoRot.y = AI.angle;
 				}
 				else
-					head = AI.angle;
+					extraHeadRot.y = AI.angle;
 
-				if (!info->Flags)
+				if (!creature->Flags)
 				{
-					ShotLara(item, &AI, SilencerGunBite, torsoY, 50);
-					info->Flags = 1;
+					ShotLara(item, &AI, SilencerGunBite, extraTorsoRot.y, SILENCER_SHOOT_ATTACK_DAMAGE);
+					creature->Flags = 1;
 				}
 
 				break;
 
-			case 9:
-				info->MaxTurn = Angle::DegToRad(5.0f);
+			case SILENCER_STATE_RUN_SHOOT:
+				creature->MaxTurn = SILENCER_RUN_TURN_RATE_MAX;
 
 				if (AI.ahead)
 				{
-					torsoY = AI.angle;
-					torsoX = AI.xAngle;
+					extraTorsoRot.x = AI.xAngle;
+					extraTorsoRot.y = AI.angle;
 				}
 				else
-					head = AI.angle;
+					extraHeadRot.y = AI.angle;
 
 				if (!item->Animation.RequiredState)
 				{
-					if (!ShotLara(item, &AI, SilencerGunBite, torsoY, 50))
-						item->Animation.TargetState = 2;
+					if (!ShotLara(item, &AI, SilencerGunBite, extraTorsoRot.y, SILENCER_SHOOT_ATTACK_DAMAGE))
+						item->Animation.TargetState = SILENCER_STATE_RUN_FORWARD;
 
-					item->Animation.RequiredState = 9;
+					item->Animation.RequiredState = SILENCER_STATE_RUN_SHOOT;
 				}
 
 				break;
@@ -263,9 +311,9 @@ namespace TEN::Entities::TR2
 		}
 
 		CreatureTilt(item, tilt);
-		CreatureJoint(item, 0, torsoY);
-		CreatureJoint(item, 1, torsoX);
-		CreatureJoint(item, 2, head);
+		CreatureJoint(item, 0, extraTorsoRot.y);
+		CreatureJoint(item, 1, extraTorsoRot.x);
+		CreatureJoint(item, 2, extraHeadRot.y);
 		CreatureAnimation(itemNumber, angle, tilt);
 	}
 }

@@ -485,7 +485,10 @@ void UndrawPistolMeshRight(ItemInfo* laraItem, LaraWeaponType weaponType)
 	auto* lara = GetLaraInfo(laraItem);
 
 	lara->MeshPtrs[LM_RHAND] = Objects[ID_LARA_SKIN].meshIndex + LM_RHAND;
-	lara->Control.Weapon.HolsterInfo.RightHolster = HolsterSlotForWeapon(weaponType);
+	if (lara->Weapons[(int)weaponType].Present)
+		lara->Control.Weapon.HolsterInfo.RightHolster = HolsterSlotForWeapon(weaponType);
+	else
+		lara->Control.Weapon.HolsterInfo.RightHolster = HolsterSlot::Empty;
 }
 
 void UndrawPistolMeshLeft(ItemInfo* laraItem, LaraWeaponType weaponType)
@@ -495,6 +498,10 @@ void UndrawPistolMeshLeft(ItemInfo* laraItem, LaraWeaponType weaponType)
 	if (weaponType != LaraWeaponType::Revolver)
 	{
 		lara->MeshPtrs[LM_LHAND] = Objects[ID_LARA_SKIN].meshIndex + LM_LHAND;
-		lara->Control.Weapon.HolsterInfo.LeftHolster = HolsterSlotForWeapon(weaponType);
+
+		if (lara->Weapons[(int)weaponType].Present)
+			lara->Control.Weapon.HolsterInfo.LeftHolster = HolsterSlotForWeapon(weaponType);
+		else
+			lara->Control.Weapon.HolsterInfo.LeftHolster = HolsterSlot::Empty;
 	}
 }

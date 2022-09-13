@@ -10,7 +10,7 @@
 #include "Sound/sound.h"
 #include "Game/itemdata/creature_info.h"
 
-namespace TEN::Entities::TR5
+namespace TEN::Entities::Creatures::TR5
 {
 	const auto InvisibleGhostBite = BiteInfo(Vector3::Zero, 17);
 

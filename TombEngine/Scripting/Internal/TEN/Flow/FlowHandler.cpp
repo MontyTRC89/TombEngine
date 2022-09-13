@@ -8,8 +8,10 @@
 #include "Flow/InventoryItem/InventoryItem.h"
 #include "InventorySlots.h"
 #include "Game/gui.h"
+#include "Logic/LevelFunc.h"
 #include "Vec3/Vec3.h"
 #include "Objects/ScriptInterfaceObjectsHandler.h"
+#include "Strings/ScriptInterfaceStringsHandler.h"
 #include "Specific/trutils.h"
 
 /***
@@ -60,6 +62,35 @@ Returns the level that the game control is running in that moment.
 @treturn Level the current level
 */
 	table_flow.set_function(ScriptReserved_GetCurrentLevel, &FlowHandler::GetCurrentLevel, this);
+
+/*** EndLevel.
+Finish level, with optional level index provided. If level index is not provided or is zero, jumps
+to next level. If level index is more than level count, jumps to title.
+@function EndLevel
+@tparam int index (optional) level index.
+*/
+	table_flow.set_function(ScriptReserved_EndLevel, &FlowHandler::EndLevel, this);
+
+/*** GetSecretCount.
+Returns current game secret count.
+@function GetSecretCount
+@treturn Current game secret count.
+*/
+	table_flow.set_function(ScriptReserved_GetSecretCount, &FlowHandler::GetSecretCount, this);
+
+/*** SetSecretCount.
+Sets current secret count, overwriting existing one.
+@function SetSecretCount
+@tparam int count new secret count.
+*/
+	table_flow.set_function(ScriptReserved_SetSecretCount, &FlowHandler::SetSecretCount, this);
+
+/*** AddSecret.
+Adds one secret to game secret count and also plays secret music track.
+@function AddSecret
+@tparam int index an index of current level's secret (must be from 0 to 7).
+*/
+	table_flow.set_function(ScriptReserved_AddSecret, &FlowHandler::AddSecret, this);
 
 /*** Image to show when loading the game.
 Must be a .jpg or .png image.
@@ -127,7 +158,7 @@ Specify which translations in the strings table correspond to which languages.
 	Animations::Register(table_flow);
 	Settings::Register(table_flow);
 	Fog::Register(table_flow);
-
+	
 	m_handler.MakeReadOnlyTable(table_flow, ScriptReserved_WeatherType, kWeatherTypes);
 	m_handler.MakeReadOnlyTable(table_flow, ScriptReserved_LaraType, kLaraTypes);
 	m_handler.MakeReadOnlyTable(table_flow, ScriptReserved_InvItem, kInventorySlots);
@@ -231,6 +262,47 @@ int FlowHandler::GetLevelNumber(std::string const& fileName)
 	return -1;
 }
 
+void FlowHandler::EndLevel(std::optional<int> nextLevel)
+{
+	int index = (nextLevel.has_value() && nextLevel.value() != 0) ? nextLevel.value() : CurrentLevel + 1;
+	LevelComplete = index;
+}
+
+int FlowHandler::GetSecretCount() const
+{
+	return Statistics.Game.Secrets;
+}
+
+void FlowHandler::SetSecretCount(int secretsNum)
+{
+	if (secretsNum > UCHAR_MAX)
+		return;
+
+	Statistics.Game.Secrets = secretsNum;
+}
+
+void FlowHandler::AddSecret(int levelSecretIndex)
+{
+	if (levelSecretIndex > 7)
+	{
+		TENLog("Current maximum amount of secrets per level is 7.", LogLevel::Warning);
+		return;
+	}
+
+	if (!(Statistics.Level.Secrets & (1 << levelSecretIndex)))
+	{
+		if (Statistics.Game.Secrets >= UCHAR_MAX)
+		{
+			TENLog("Maximum amount of game secrets is already reached!", LogLevel::Warning);
+			return;
+		}
+
+		PlaySecretTrack();
+		Statistics.Level.Secrets |= (1 << levelSecretIndex);
+		Statistics.Game.Secrets++;
+	}
+}
+
 bool FlowHandler::IsFlyCheatEnabled() const
 {
 	return FlyCheat;
@@ -264,8 +336,9 @@ bool FlowHandler::DoFlow()
 			}
 			catch (TENScriptException const& e)
 			{
-				std::string msg = std::string{ "An unrecoverable error occurred in " } + __func__ + ": " + e.what();
+				std::string msg = std::string{ "A Lua error occurred while running the title level; " } + __func__ + ": " + e.what();
 				TENLog(msg, LogLevel::Error, LogConfig::All);
+				ShutdownTENLog();
 				throw;
 			}
 		}
@@ -297,7 +370,7 @@ bool FlowHandler::DoFlow()
 			}
 			catch (TENScriptException const& e) 
 			{
-				std::string msg = std::string{ "An unrecoverable error occurred in " } + __func__ + ": " + e.what();
+				std::string msg = std::string{ "A Lua error occurred while running a level; " } + __func__ + ": " + e.what();
 				TENLog(msg, LogLevel::Error, LogConfig::All);
 				status = GameStatus::ExitToTitle;
 			}

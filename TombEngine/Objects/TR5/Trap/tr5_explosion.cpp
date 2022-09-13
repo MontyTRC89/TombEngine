@@ -153,10 +153,6 @@ void ExplosionControl(short itemNumber)
 						CollidedMeshes[i]->pos.Position.y += 128;
 						SoundEffect(GetShatterSound(CollidedMeshes[i]->staticNumber), &CollidedMeshes[i]->pos);
 						ShatterObject(NULL, CollidedMeshes[i], -128, item->RoomNumber, 0);
-						SmashedMeshRoom[SmashedMeshCount] = item->RoomNumber;
-						SmashedMesh[SmashedMeshCount] = CollidedMeshes[i];
-						++SmashedMeshCount;
-						CollidedMeshes[i]->flags &= ~StaticMeshFlags::SM_VISIBLE;
 					}
 
 					++i;
