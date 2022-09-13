@@ -49,6 +49,7 @@ void Static::Register(sol::table & parent)
 
 		/// Set static mesh solid collision state
 		// @function Static:SetSolid
+		// @tparam bool if set, collision will be solid, if not, will be soft
 		ScriptReserved_SetSolid, & Static::SetSolid,
 
 		/// Get the static's position
