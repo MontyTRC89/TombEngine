@@ -16,7 +16,7 @@
 using namespace TEN::Math::Random;
 using std::vector;
 
-namespace TEN::Entities::TR3
+namespace TEN::Entities::Creatures::TR3
 {
 	constexpr auto CIVVY_ATTACK_DAMAGE = 40;
 	constexpr auto CIVVY_SWIPE_DAMAGE  = 50;
@@ -42,7 +42,6 @@ namespace TEN::Entities::TR3
 	// TODO
 	enum CivvyState
 	{
-		CIVVY_STATE_NONE,
 		CIVVY_STATE_IDLE,
 		CIVVY_STATE_WALK_FORWARD,
 		CIVVY_PUNCH2,
@@ -89,11 +88,10 @@ namespace TEN::Entities::TR3
 		auto* item = &g_Level.Items[itemNumber];
 		auto* creature = GetCreatureInfo(item);
 
-		short torsoX = 0;
-		short torsoY = 0;
-		short head = 0;
 		short angle = 0;
 		short tilt = 0;
+		auto extraHeadRot = Vector3Shrt::Zero;
+		auto extraTorsoRot = Vector3Shrt::Zero;
 
 		if (item->BoxNumber != NO_BOX && (g_Level.Boxes[item->BoxNumber].flags & BLOCKED))
 		{
@@ -119,18 +117,18 @@ namespace TEN::Entities::TR3
 			AI_INFO AI;
 			CreatureAIInfo(item, &AI);
 
-			AI_INFO laraAiInfo;
+			AI_INFO laraAI;
 			if (creature->Enemy == LaraItem)
 			{
-				laraAiInfo.angle = AI.angle;
-				laraAiInfo.distance = AI.distance;
+				laraAI.angle = AI.angle;
+				laraAI.distance = AI.distance;
 			}
 			else
 			{
 				int laraDz = LaraItem->Pose.Position.z - item->Pose.Position.z;
 				int laraDx = LaraItem->Pose.Position.x - item->Pose.Position.x;
-				laraAiInfo.angle = phd_atan(laraDz, laraDx) - item->Pose.Orientation.y;
-				laraAiInfo.distance = pow(laraDx, 2) + pow(laraDz, 2);
+				laraAI.angle = phd_atan(laraDz, laraDx) - item->Pose.Orientation.y;
+				laraAI.distance = pow(laraDx, 2) + pow(laraDz, 2);
 			}
 
 			GetCreatureMood(item, &AI, true);
@@ -150,7 +148,7 @@ namespace TEN::Entities::TR3
 			auto* realEnemy = creature->Enemy;
 			creature->Enemy = LaraItem;
 
-			if ((laraAiInfo.distance < CIVVY_AWARE_RANGE || item->HitStatus || TargetVisible(item, &laraAiInfo)) &&
+			if ((laraAI.distance < CIVVY_AWARE_RANGE || item->HitStatus || TargetVisible(item, &laraAI)) &&
 				!(item->AIBits & FOLLOW))
 			{
 				if (!creature->Alerted)
@@ -170,13 +168,13 @@ namespace TEN::Entities::TR3
 				}
 
 			case CIVVY_STATE_IDLE:
-				head = laraAiInfo.angle;
 				creature->MaxTurn = 0;
 				creature->Flags = 0;
+				extraHeadRot.y = laraAI.angle;
 
 				if (item->AIBits & GUARD)
 				{
-					head = AIGuard(creature);
+					extraHeadRot.y = AIGuard(creature);
 					if (!(GetRandomControl() & 0xFF))
 					{
 						if (item->Animation.ActiveState == CIVVY_STATE_IDLE)
@@ -199,7 +197,7 @@ namespace TEN::Entities::TR3
 						item->Animation.TargetState = CIVVY_STATE_RUN_FORWARD;
 				}
 				else if (creature->Mood == MoodType::Bored ||
-					(item->AIBits & FOLLOW && (creature->ReachedGoal || laraAiInfo.distance > pow(SECTOR(2), 2))))
+					(item->AIBits & FOLLOW && (creature->ReachedGoal || laraAI.distance > pow(SECTOR(2), 2))))
 				{
 					if (item->Animation.RequiredState)
 						item->Animation.TargetState = item->Animation.RequiredState;
@@ -221,11 +219,11 @@ namespace TEN::Entities::TR3
 
 			case CIVVY_STATE_WALK_FORWARD:
 				creature->MaxTurn = CIVVY_WALK_TURN_RATE_MAX;
-				head = laraAiInfo.angle;
+				extraHeadRot.y = laraAI.angle;
 
 				if (item->AIBits & PATROL1)
 				{
-					head = 0;
+					extraHeadRot.y = 0;
 					item->Animation.TargetState = CIVVY_STATE_WALK_FORWARD;
 				}
 				else if (creature->Mood == MoodType::Escape)
@@ -252,7 +250,7 @@ namespace TEN::Entities::TR3
 				tilt = angle / 2;
 
 				if (AI.ahead)
-					head = AI.angle;
+					extraHeadRot.y = AI.angle;
 
 				if (item->AIBits & GUARD)
 					item->Animation.TargetState = CIVVY_WAIT;
@@ -262,7 +260,7 @@ namespace TEN::Entities::TR3
 						item->Animation.TargetState = CIVVY_STATE_IDLE;
 					break;
 				}
-				else if ((item->AIBits & FOLLOW) && (creature->ReachedGoal || laraAiInfo.distance > pow(SECTOR(2), 2)))
+				else if ((item->AIBits & FOLLOW) && (creature->ReachedGoal || laraAI.distance > pow(SECTOR(2), 2)))
 					item->Animation.TargetState = CIVVY_STATE_IDLE;
 				else if (creature->Mood == MoodType::Bored)
 					item->Animation.TargetState = CIVVY_STATE_WALK_FORWARD;
@@ -273,11 +271,12 @@ namespace TEN::Entities::TR3
 
 			case CIVVY_AIM0:
 				creature->MaxTurn = CIVVY_WALK_TURN_RATE_MAX;
+				creature->Flags = 0;
 
 				if (AI.ahead)
 				{
-					torsoX = AI.xAngle;
-					torsoY = AI.angle;
+					extraTorsoRot.x = AI.xAngle;
+					extraTorsoRot.y = AI.angle;
 				}
 
 				if (AI.bite && AI.distance < CIVVY_ATTACK0_RANGE)
@@ -285,16 +284,16 @@ namespace TEN::Entities::TR3
 				else
 					item->Animation.TargetState = CIVVY_STATE_IDLE;
 
-				creature->Flags = 0;
 				break;
 
 			case CIVVY_AIM1:
 				creature->MaxTurn = CIVVY_WALK_TURN_RATE_MAX;
+				creature->Flags = 0;
 
 				if (AI.ahead)
 				{
-					torsoX = AI.xAngle;
-					torsoY = AI.angle;
+					extraTorsoRot.x = AI.xAngle;
+					extraTorsoRot.y = AI.angle;
 				}
 
 				if (AI.ahead && AI.distance < CIVVY_ATTACK1_RANGE)
@@ -302,7 +301,6 @@ namespace TEN::Entities::TR3
 				else
 					item->Animation.TargetState = CIVVY_STATE_IDLE;
 
-				creature->Flags = 0;
 				break;
 
 			case CIVVY_AIM2:
@@ -311,8 +309,8 @@ namespace TEN::Entities::TR3
 
 				if (AI.ahead)
 				{
-					torsoX = AI.xAngle;
-					torsoY = AI.angle;
+					extraTorsoRot.x = AI.xAngle;
+					extraTorsoRot.y = AI.angle;
 				}
 
 				if (AI.bite && AI.distance < CIVVY_ATTACK2_RANGE)
@@ -327,8 +325,8 @@ namespace TEN::Entities::TR3
 
 				if (AI.ahead)
 				{
-					torsoX = AI.xAngle;
-					torsoY = AI.angle;
+					extraTorsoRot.x = AI.xAngle;
+					extraTorsoRot.y = AI.angle;
 				}
 
 				if (!creature->Flags && item->TestBits(JointBitType::Touch, CivvyAttackJoints))
@@ -346,8 +344,8 @@ namespace TEN::Entities::TR3
 
 				if (AI.ahead)
 				{
-					torsoX = AI.xAngle;
-					torsoY = AI.angle;
+					extraTorsoRot.x = AI.xAngle;
+					extraTorsoRot.y = AI.angle;
 				}
 
 				if (!creature->Flags && item->TestBits(JointBitType::Touch, CivvyAttackJoints))
@@ -368,8 +366,8 @@ namespace TEN::Entities::TR3
 
 				if (AI.ahead)
 				{
-					torsoX = AI.xAngle;
-					torsoY = AI.angle;
+					extraTorsoRot.x = AI.xAngle;
+					extraTorsoRot.y = AI.angle;
 				}
 
 				if (creature->Flags != 2 && item->TestBits(JointBitType::Touch, CivvyAttackJoints))
@@ -385,9 +383,9 @@ namespace TEN::Entities::TR3
 		}
 
 		CreatureTilt(item, tilt);
-		CreatureJoint(item, 0, torsoY);
-		CreatureJoint(item, 1, torsoX);
-		CreatureJoint(item, 2, head);
+		CreatureJoint(item, 0, extraTorsoRot.y);
+		CreatureJoint(item, 1, extraTorsoRot.x);
+		CreatureJoint(item, 2, extraHeadRot.y);
 
 		if (item->Animation.ActiveState < CIVVY_DEATH)
 		{

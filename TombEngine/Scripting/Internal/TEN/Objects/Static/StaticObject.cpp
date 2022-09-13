@@ -1,6 +1,7 @@
 #pragma once
 #include "framework.h"
 
+#include "Game/effects/debris.h"
 #include "ScriptAssert.h"
 #include "StaticObject.h"
 #include "Vec3/Vec3.h"
@@ -27,6 +28,14 @@ void Static::Register(sol::table & parent)
 		sol::no_constructor, // ability to spawn new ones could be added later
 		sol::meta_function::index, index_error,
 		sol::meta_function::new_index, newindex_error,
+
+		/// Enable the static, e.g. in cases when it was shattered or manually disabled before.
+		// @function Static:Enable
+		ScriptReserved_Enable, &Static::Enable,
+
+		/// Disable the static
+		// @function Static:Disable
+		ScriptReserved_Disable, &Static::Disable,
 
 		/// Get the static's position
 		// @function Static:GetPosition
@@ -87,7 +96,21 @@ void Static::Register(sol::table & parent)
 		/// Set the static's color
 		// @function Static:SetColor
 		// @tparam Color color the new color of the static 
-		ScriptReserved_SetColor, &Static::SetColor);
+		ScriptReserved_SetColor, &Static::SetColor,
+
+		/// Shatter static mesh
+		// @function Static:Shatter
+		ScriptReserved_Shatter, &Static::Shatter);
+}
+
+void Static::Enable()
+{
+	m_mesh.flags |= StaticMeshFlags::SM_VISIBLE;
+}
+
+void Static::Disable()
+{
+	m_mesh.flags &= ~StaticMeshFlags::SM_VISIBLE;
 }
 
 Vec3 Static::GetPos() const
@@ -175,4 +198,9 @@ ScriptColor Static::GetColor() const
 void Static::SetColor(ScriptColor const& col)
 {
 	m_mesh.color = col;
+}
+
+void Static::Shatter()
+{
+	ShatterObject(nullptr, &m_mesh, -128, m_mesh.roomNumber, 0);
 }

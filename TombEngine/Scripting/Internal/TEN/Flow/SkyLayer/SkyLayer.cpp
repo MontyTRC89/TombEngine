@@ -37,7 +37,7 @@ Less is more. City of The Dead, for example, uses a speed value of 16.
 @tparam Color color RGB color
 @tparam int speed cloud speed
 @return A SkyLayer object.
-@function SkyLayer.new
+@function SkyLayer
 */
 SkyLayer::SkyLayer(ScriptColor const& col, short speed)
 {

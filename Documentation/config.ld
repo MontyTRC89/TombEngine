@@ -12,7 +12,7 @@ new_type("luautil", "5 Lua utility modules", true)
 
 not_luadoc = true
 
-local version = "1.0.1"
+local version = "1.0.2"
 project = "TombEngine"
 title = "TombEngine " .. version .. " Lua API"
 description = "TombEngine " .. version .. " scripting interface"
@@ -24,7 +24,7 @@ Other than the "special tables" (GameVars, LevelVars and LevelFuncs), every modu
 For example, to call GetMoveableByName, you would have to do:
 	local door = TEN.Objects.GetMoveableByName("door_type4_14")
 To save on typing, you can put the following at the start of a Lua file:
-	local Util = require("Util")
+	local Util = require("Engine.Util")
 	Util.ShortenTENCalls()
 This will put the modules and classes in the global table. In other words, it means you can do the following:
 	local door = GetMoveableByName("door_type4_14")

@@ -93,7 +93,6 @@ void DisplayString::Register(sol::table & parent)
 {
 	parent.new_usertype<DisplayString>(
 		ScriptReserved_DisplayString,
-		ScriptReserved_New, &CreateString,
 		sol::call_constructor, &CreateString,
 
 		/// Get the display string's color
