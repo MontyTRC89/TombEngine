@@ -63,7 +63,7 @@ namespace TEN::Utils
 
 	void BitField::Set(uint index)
 	{
-		this->Set({ index });
+		this->Bits[index] = true;
 	}
 
 	void BitField::SetAll()
@@ -82,7 +82,7 @@ namespace TEN::Utils
 	
 	void BitField::Clear(uint index)
 	{
-		this->Clear({ index });
+		this->Bits[index] = false;
 	}
 
 	void BitField::ClearAll()
@@ -101,7 +101,7 @@ namespace TEN::Utils
 	
 	void BitField::Flip(uint index)
 	{
-		this->Flip({ index });
+		this->Bits[index].flip();
 	}
 
 	void BitField::FlipAll()
@@ -122,7 +122,7 @@ namespace TEN::Utils
 
 	bool BitField::Test(uint index)
 	{
-		return this->Test({ index });
+		return Bits[index];
 	}
 
 	bool BitField::TestAny()
