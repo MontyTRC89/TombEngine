@@ -79,6 +79,13 @@ namespace Misc
 		SetScreenFadeIn(USE_IF_HAVE(float, speed, 1.0f) / float(FPS));
 	}
 
+	///Check if fade out is complete and screen is completely black.
+	//@treturn bool state of the fade out
+	static bool FadeOutComplete()
+	{
+		return ScreenFadeCurrent == 0.0f;
+	}
+
 	///Move black cinematic bars in from the top and bottom of the game window.
 	//@function SetCineBars
 	//@tparam float height  __(default 30)__ Percentage of the screen to be covered
@@ -248,6 +255,7 @@ namespace Misc
 
 		table_misc.set_function(ScriptReserved_FadeIn, &FadeIn);
 		table_misc.set_function(ScriptReserved_FadeOut, &FadeOut);
+		table_misc.set_function(ScriptReserved_FadeOutComplete, &FadeOutComplete);
 
 		table_misc.set_function(ScriptReserved_SetCineBars, &SetCineBars);
 

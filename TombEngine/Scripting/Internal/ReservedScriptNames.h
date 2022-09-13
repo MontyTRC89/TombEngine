@@ -161,6 +161,7 @@ static constexpr char ScriptReserved_Vibrate[]						= "Vibrate";
 static constexpr char ScriptReserved_FlashScreen[]					= "FlashScreen";
 static constexpr char ScriptReserved_FadeIn[]						= "FadeIn";
 static constexpr char ScriptReserved_FadeOut[]						= "FadeOut";
+static constexpr char ScriptReserved_FadeOutComplete[]				= "FadeOutComplete";
 static constexpr char ScriptReserved_SetCineBars[]					= "SetCineBars";
 static constexpr char ScriptReserved_SetFOV[]						= "SetFOV";
 static constexpr char ScriptReserved_GetFOV[]						= "GetFOV";
