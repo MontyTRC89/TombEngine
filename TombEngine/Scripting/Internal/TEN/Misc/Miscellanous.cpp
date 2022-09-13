@@ -126,6 +126,22 @@ namespace Misc
 		PlaySoundTrack(trackName, SoundTrackType::BGM);
 	}
 
+	///Stop any audio tracks currently playing
+	//@function StopAudioTracks
+	static void StopAudioTracks()
+	{
+		StopSoundTracks();
+	}
+
+	///Stop audio track that is currently playing
+	//@function StopAudioTrack
+	//@tparam bool looped if set, stop looped audio track, if not, stop one-shot audio track
+	static void StopAudioTrack(TypeOrNil<bool> looped)
+	{
+		auto mode = USE_IF_HAVE(bool, looped, false) ? SoundTrackType::BGM : SoundTrackType::OneShot;
+		StopSoundTrack(mode, SOUND_XFADETIME_ONESHOT);
+	}
+
 	/// Play sound effect
 	//@function PlaySound
 	//@tparam int sound ID to play. Corresponds to the value in the sound XML file or Tomb Editor's "Sound Infos" window.
@@ -240,6 +256,8 @@ namespace Misc
 		table_misc.set_function(ScriptReserved_SetAmbientTrack, &SetAmbientTrack);
 
 		table_misc.set_function(ScriptReserved_PlayAudioTrack, &PlayAudioTrack);
+		table_misc.set_function(ScriptReserved_StopAudioTrack, &StopAudioTrack);
+		table_misc.set_function(ScriptReserved_StopAudioTracks, &StopAudioTracks);
 
 		table_misc.set_function(ScriptReserved_PlaySound, &PlaySoundEffect);
 
