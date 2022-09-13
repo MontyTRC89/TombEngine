@@ -57,6 +57,8 @@ private:
 	std::unordered_set<std::string> m_callbacksPreControl;
 	std::unordered_set<std::string> m_callbacksPostControl;
 
+	bool m_shortenedCalls = false;
+
 	void ResetLevelTables();
 	void ResetGameTables();
 	LuaHandler m_handler;
@@ -99,5 +101,4 @@ public:
 	void								OnControlPhase(float dt) override;
 	void								OnSave() override;
 	void								OnEnd() override;
-
 };

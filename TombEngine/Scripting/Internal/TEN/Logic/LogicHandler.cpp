@@ -290,6 +290,8 @@ void LogicHandler::ResetScripts(bool clearGameVars)
 
 	m_handler.ResetGlobals();
 
+	m_shortenedCalls = false;
+
 	m_handler.GetState()->collect_garbage();
 }
 
@@ -604,7 +606,12 @@ void LogicHandler::ShortenTENCalls()
 
 void LogicHandler::ExecuteScriptFile(const std::string & luaFilename)
 {
-	ShortenTENCalls();
+	if (!m_shortenedCalls)
+	{
+		ShortenTENCalls();
+		m_shortenedCalls = true;
+	}
+
 	m_handler.ExecuteScript(luaFilename);
 }
 
