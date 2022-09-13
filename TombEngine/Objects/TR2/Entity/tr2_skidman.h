@@ -2,7 +2,7 @@
 #include "Game/collision/collide_room.h"
 #include "Game/items.h"
 
-namespace TEN::Entities::TR2
+namespace TEN::Entities::Creatures::TR2
 {
 	void InitialiseSkidooMan(short itemNumber);
 	void SkidooManCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);

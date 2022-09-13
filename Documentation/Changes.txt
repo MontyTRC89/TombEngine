@@ -1,6 +1,9 @@
 Version 1.0.2
 =============
 
+* Removing Pistols with TakeItem and SetItemCount now works correctly.
+* Vec3s can now be saved and loaded in LevelVars and GameVars.
+* Support volume triggers made with node editor.
 * Adjust max turn rate of idle state.
 * Align Lara on slopes when crouching, crawling, and dying.
 * Better slope alignment for large, flat enemies (i.e. big scorpion and crocodile).
@@ -18,8 +21,18 @@ Version 1.0.2
 * Fix occasional leave event calls when moving closer to volumes.
 * Fix incorrect viewport size in windowed mode.
 * Fix late landing animation dispatch in rare cases.
-* Fix Lara's subway train death so that she no longer slides slowly after the animation has finished. 
+* Fix Lara's subway train death so that she no longer slides slowly after the animation has finished.
+* Fix horseman's axe attack using his left foot as the damaging joint.
+* Fix stargate blades needlessly pushing the player around while hardly doing any damage.
 
+Lua API changes:
+
+* Timer.lua, EventSequence.lua and Util.lua have been moved to a subfolder, Engine.
+* LevelFuncs can now contain tables as well as functions. These tables can contain functions and other tables, and so forth.
+* Moveable functions SetOnHit, SetOnKilled, SetOnCollidedWithObject and SetOnCollidedWithRoom no longer take strings, and instead take function objects themselves.
+* EventSequence and Timer no longer require you to call Timer.UpdateAll in OnControlPhase.
+* TEN.Logic.AddCallback and TEN.Logic.RemoveCallback have been added.
+* GiveItem, TakeItem, and SetItemCount have been reworked (e.g. SetItemCount with a value of -1 can give infinite ammo/consumables).
 
 Version 1.0.1
 =============

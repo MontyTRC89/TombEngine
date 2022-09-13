@@ -23,6 +23,8 @@ public:
 
 	static void Register(sol::table & parent);
 
+	void Enable();
+	void Disable();
 	Rotation GetRot() const;
 	void SetRot(Rotation const& rot);
 	Vec3 GetPos() const;
@@ -35,6 +37,7 @@ public:
 	void SetSlot(int slot);
 	ScriptColor GetColor() const;
 	void SetColor(ScriptColor const & col);
+	void Shatter();
 
 private:
 	MESH_INFO & m_mesh;

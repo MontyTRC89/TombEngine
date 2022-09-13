@@ -49,10 +49,16 @@ namespace Misc
 		pos1.StoreInGameVector(vec1);
 		vec1.roomNumber = roomNumber1;
 		pos2.StoreInGameVector(vec2);
-		return LOS(&vec1, &vec2);
+
+		MESH_INFO* mesh;
+		Vector3Int vector;
+		return LOS(&vec1, &vec2) && (ObjectOnLOS2(&vec1, &vec2, &vector, &mesh) == NO_LOS_ITEM);
 	}
 
-
+	///Vibrate game controller, if function is available and setting is on.
+	//@function Vibrate
+	//@tparam float strength Strength of the vibration
+	//@tparam float time __(default 0.3)__ Time of the vibration, in seconds
 	static void Vibrate(float strength, sol::optional<float> time)
 	{
 		Rumble(strength, time.value_or(0.3f), RumbleMode::Both);
@@ -121,6 +127,10 @@ namespace Misc
 		PlaySoundTrack(trackName, SoundTrackType::BGM);
 	}
 
+	/// Play sound effect
+	//@function PlaySound
+	//@tparam int sound ID to play. Corresponds to the value in the sound XML file or Tomb Editor's "Sound Infos" window.
+	////@tparam[opt] Vec3 position The 3D position of the sound, i.e. where the sound "comes from". If not given, the sound will not be positional.
 	static void PlaySoundEffect(int id, sol::optional<Vec3> p)
 	{
 		SoundEffect(id, p.has_value() ? &PHD_3DPOS(p.value().x, p.value().y, p.value().z) : nullptr, SoundEnvironment::Always);
@@ -175,6 +185,15 @@ namespace Misc
 	//@tparam float y percent value to translate to y-coordinate
 	//@treturn int x coordinate in pixels
 	//@treturn int y coordinate in pixels
+	//@usage	
+	//local halfwayX, halfwayY = PercentToScreen(50, 50)
+	//local baddy
+	//local spawnLocationNullmesh = GetMoveableByName("position_behind_left_pillar")
+	//local str1 = DisplayString("You spawned a baddy!", halfwayX, halfwayY, Color(255, 100, 100), false, {DisplayStringOption.SHADOW, DisplayStringOption.CENTER})
+	//
+	//LevelFuncs.triggerOne = function(obj) 
+	//	ShowString(str1, 4)
+	//end
 	static std::tuple<int, int> PercentToScreen(double x, double y)
 	{
 		auto fWidth = static_cast<double>(g_Configuration.Width);
@@ -223,10 +242,6 @@ namespace Misc
 
 		table_misc.set_function(ScriptReserved_PlayAudioTrack, &PlayAudioTrack);
 
-		/// Play sound effect
-		//@function PlaySound
-		//@tparam int sound ID to play
-		//@tparam Vec3 position
 		table_misc.set_function(ScriptReserved_PlaySound, &PlaySoundEffect);
 
 		/// Check if particular action key is held

@@ -1039,7 +1039,7 @@ namespace TEN::Gui
 			{
 				number++;
 				AmmoObjectList[0].InventoryItem = INV_OBJECT_PISTOLS_AMMO;
-				AmmoObjectList[0].Amount = -1;
+				AmmoObjectList[0].Amount = AmountPistolsAmmo;
 				NumAmmoSlots = number;
 				CurrentAmmoType = &Ammo.CurrentPistolsAmmoType;
 			}
