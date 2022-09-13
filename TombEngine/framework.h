@@ -24,5 +24,3 @@
 
 using namespace DirectX;
 using namespace DirectX::SimpleMath;
-
-#pragma warning(disable: 4996)
