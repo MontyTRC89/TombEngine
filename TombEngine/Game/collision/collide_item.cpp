@@ -566,26 +566,25 @@ bool Move3DPosTo3DPos(PoseData* fromPose, PoseData* toPose, int velocity, short 
 		Lara.Control.Count.PositionAdjust = 0;
 	}
 
-	short deltaAngle = toPose->Orientation.x - fromPose->Orientation.x;
-	if (deltaAngle > angleAdd)
+	auto deltaOrient = toPose->Orientation - fromPose->Orientation;
+
+	if (deltaOrient.x > angleAdd)
 		fromPose->Orientation.x += angleAdd;
-	else if (deltaAngle < -angleAdd)
+	else if (deltaOrient.x < -angleAdd)
 		fromPose->Orientation.x -= angleAdd;
 	else
 		fromPose->Orientation.x = toPose->Orientation.x;
 
-	deltaAngle = toPose->Orientation.y - fromPose->Orientation.y;
-	if (deltaAngle > angleAdd)
+	if (deltaOrient.y > angleAdd)
 		fromPose->Orientation.y += angleAdd;
-	else if (deltaAngle < -angleAdd)
+	else if (deltaOrient.y < -angleAdd)
 		fromPose->Orientation.y -= angleAdd;
 	else
 		fromPose->Orientation.y = toPose->Orientation.y;
 
-	deltaAngle = toPose->Orientation.z - fromPose->Orientation.z;
-	if (deltaAngle > angleAdd)
+	if (deltaOrient.z > angleAdd)
 		fromPose->Orientation.z += angleAdd;
-	else if (deltaAngle < -angleAdd)
+	else if (deltaOrient.z < -angleAdd)
 		fromPose->Orientation.z -= angleAdd;
 	else
 		fromPose->Orientation.z = toPose->Orientation.z;

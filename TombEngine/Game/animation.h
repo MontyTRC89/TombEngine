@@ -37,7 +37,7 @@ struct ANIM_STRUCT
 	int Interpolation;
 	int ActiveState;
 
-	// CONVENTION: +X = right, +Y = down, +Z = forward.
+	// CONVENTION: +X = right, +Y = down, +Z = forward
 	Vector3 VelocityStart = Vector3::Zero;
 	Vector3 VelocityEnd	  = Vector3::Zero;
 
