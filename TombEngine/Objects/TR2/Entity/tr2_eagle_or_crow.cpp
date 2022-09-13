@@ -10,7 +10,7 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-namespace TEN::Entities::TR2
+namespace TEN::Entities::Creatures::TR2
 {
 	const auto EagleBite = BiteInfo(Vector3(15.0f, 46.0f, 21.0f), 6);
 	const auto CrowBite	 = BiteInfo(Vector3(2.0f, 10.0f, 60.0f), 14);

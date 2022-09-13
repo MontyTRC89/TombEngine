@@ -14,7 +14,7 @@
 
 using namespace TEN::Math::Random;
 
-namespace TEN::Entities::TR2
+namespace TEN::Entities::Creatures::TR2
 {
 	constexpr auto RAT_ATTACK_DAMAGE = 20;
 	constexpr auto RAT_ATTACK_RANGE = SQUARE(CLICK(0.7f));
@@ -29,7 +29,7 @@ namespace TEN::Entities::TR2
 
 	enum RatState
 	{
-		RAT_STATE_NONE = 0,
+		// No state 0.
 		RAT_STATE_WALK_FORWARD = 1,
 		RAT_STATE_IDLE = 2,
 		RAT_STATE_SQUEAK = 3,

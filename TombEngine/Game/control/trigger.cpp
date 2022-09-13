@@ -56,6 +56,7 @@ int TriggerActive(ItemInfo* item)
 				flag = !flag;
 		}
 	}
+
 	return flag;
 }
 

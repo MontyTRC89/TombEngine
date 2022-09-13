@@ -4,7 +4,6 @@
 
 LuaHandler::LuaHandler(sol::state* lua) : m_lua{ lua }
 {
-	ResetGlobals();
 }
 
 void LuaHandler::ResetGlobals()
@@ -26,7 +25,7 @@ void LuaHandler::ExecuteScript(std::string const& luaFilename) {
 	}
 }
 
-void LuaHandler::ExecuteString(std::string const & command) {
+void LuaHandler::ExecuteString(std::string const& command) {
 	auto result = m_lua->safe_script(command, sol::environment(m_lua->lua_state(), sol::create, m_lua->globals()), sol::script_pass_on_error);
 	if (!result.valid())
 	{

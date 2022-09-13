@@ -12,11 +12,13 @@
 #include "Game/misc.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
+#include "Specific/prng.h"
 #include "Specific/setup.h"
 
+using namespace TEN::Math::Random;
 using std::vector;
 
-namespace TEN::Entities::TR1
+namespace TEN::Entities::Creatures::TR1
 {
 	constexpr auto MUTANT_ATTACK_DAMAGE	 = 500;
 	constexpr auto MUTANT_CONTACT_DAMAGE = 6;
@@ -24,16 +26,17 @@ namespace TEN::Entities::TR1
 	constexpr auto MUTANT_ATTACK_RANGE = SQUARE(SECTOR(2.5f));
 	constexpr auto MUTANT_CLOSE_RANGE  = SQUARE(SECTOR(2.2f));
 
-	constexpr auto MUTANT_ATTACK_1_CHANCE = 0x2AF8;
-	constexpr auto MUTANT_ATTACK_2_CHANCE = 0x55F0;
+	// TODO: Unused.
+	constexpr auto MUTANT_ATTACK_1_CHANCE = 1.0f / 3.0f;
+	constexpr auto MUTANT_ATTACK_2_CHANCE = MUTANT_ATTACK_1_CHANCE * 2;
 
 	#define MUTANT_NEED_TURN ANGLE(45.0f)
 	#define MUTANT_TURN ANGLE(3.0f)
 
 	#define LARA_GIANT_MUTANT_DEATH 6 // TODO: Not 13? Check this.
 
-	const vector<int> MutantAttackJoints = { 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25 };
-	const vector<int> MutantAttackLeftJoints = { 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14 };
+	const vector<int> MutantAttackJoints	  = { 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25 };
+	const vector<int> MutantAttackLeftJoint	  = { 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14 };
 	const vector<int> MutantAttackRightJoints = { 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25 };
 
 	enum GiantMutantState
@@ -66,17 +69,13 @@ namespace TEN::Entities::TR1
 		auto* item = &g_Level.Items[itemNumber];
 		auto* creature = GetCreatureInfo(item);
 
-		short head = 0;
 		short angle = 0;
+		short head = 0;
 
 		if (item->HitPoints <= 0)
 		{
 			if (item->Animation.ActiveState != MUTANT_STATE_DEATH)
-			{
-				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + MUTANT_ANIM_DEATH;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-				item->Animation.ActiveState = MUTANT_STATE_DEATH;
-			}
+				SetAnimation(item, MUTANT_ANIM_DEATH);
 		}
 		else
 		{
@@ -92,9 +91,7 @@ namespace TEN::Entities::TR1
 			angle = (short)phd_atan(creature->Target.z - item->Pose.Position.z, creature->Target.x - item->Pose.Position.x) - item->Pose.Orientation.y;
 
 			if (item->TouchBits)
-			{
 				DoDamage(creature->Enemy, MUTANT_CONTACT_DAMAGE);
-			}
 
 			switch (item->Animation.ActiveState)
 			{
@@ -122,7 +119,7 @@ namespace TEN::Entities::TR1
 						else
 							item->Animation.TargetState = MUTANT_STATE_FORWARD;
 					}
-					else if (GetRandomControl() < 0x4000)
+					else if (TestProbability(0.5f))
 						item->Animation.TargetState = MUTANT_STATE_ATTACK_1;
 					else
 						item->Animation.TargetState = MUTANT_STATE_ATTACK_2;
@@ -178,8 +175,8 @@ namespace TEN::Entities::TR1
 			case MUTANT_STATE_ATTACK_1:
 				if (!creature->Flags && item->TestBits(JointBitType::Touch, MutantAttackRightJoints))
 				{
-					creature->Flags = 1;
 					DoDamage(creature->Enemy, MUTANT_ATTACK_DAMAGE);
+					creature->Flags = 1;
 				}
 
 				break;
@@ -187,8 +184,8 @@ namespace TEN::Entities::TR1
 			case MUTANT_STATE_ATTACK_2:
 				if (!creature->Flags && item->TestBits(JointBitType::Touch, MutantAttackJoints))
 				{
-					creature->Flags = 1;
 					DoDamage(creature->Enemy, MUTANT_ATTACK_DAMAGE);
+					creature->Flags = 1;
 				}
 
 				break;
@@ -202,14 +199,11 @@ namespace TEN::Entities::TR1
 
 					LaraItem->Animation.AnimNumber = Objects[ID_LARA_EXTRA_ANIMS].animIndex + LARA_GIANT_MUTANT_DEATH;
 					LaraItem->Animation.FrameNumber = g_Level.Anims[LaraItem->Animation.AnimNumber].frameBase;
-					LaraItem->Animation.ActiveState = LaraItem->Animation.TargetState = 46;
-					LaraItem->RoomNumber = item->RoomNumber;
-					LaraItem->Pose.Position.x = item->Pose.Position.x;
-					LaraItem->Pose.Position.y = item->Pose.Position.y;
-					LaraItem->Pose.Position.z = item->Pose.Position.z;
-					LaraItem->Pose.Orientation.y = item->Pose.Orientation.y;
-					LaraItem->Pose.Orientation.x = LaraItem->Pose.Orientation.z = 0;
+					LaraItem->Animation.ActiveState = 46;
+					LaraItem->Animation.TargetState = 46;
 					LaraItem->Animation.IsAirborne = false;
+					LaraItem->Pose = PHD_3DPOS(item->Pose.Position, 0, item->Pose.Orientation.y, 0);
+					LaraItem->RoomNumber = item->RoomNumber;
 					LaraItem->HitPoints = -1;
 					Lara.Air = -1;
 					Lara.Control.HandStatus = HandStatus::Busy;

@@ -13,8 +13,8 @@
 
 namespace TEN::Entities::TR4
 {
-	constexpr auto TEETH_SPIKE_HARM_CONSTANT = 8;
-	constexpr auto TEETH_SPIKE_HARM_EMERGING = 30;
+	constexpr auto TEETH_SPIKE_HARM_DAMAGE_CONSTANT = 8;
+	constexpr auto TEETH_SPIKE_HARM_DAMAGE_EMERGING = 30;
 	constexpr auto TEETH_SPIKES_DEFAULT_INTERVAL = 64;
 	constexpr auto TEETH_SPIKE_BOUNDS_TOLERANCE_RATIO = 0.95f;
 
@@ -37,7 +37,7 @@ namespace TEN::Entities::TR4
 		auto spikeBox = TO_DX_BBOX(item->Pose, GetBoundsAccurate(item));
 		auto itemBox = TO_DX_BBOX(collidingItem->Pose, GetBoundsAccurate(collidingItem));
 
-		// Make intersection a bit more forgiving by reducing spike bounds a bit.
+		// Make intersection more forgiving by slightly reducing spike bounds.
 		spikeBox.Extents = spikeBox.Extents * TEETH_SPIKE_BOUNDS_TOLERANCE_RATIO;
 		return spikeBox.Contains(itemBox);
 	}
@@ -96,16 +96,16 @@ namespace TEN::Entities::TR4
 				if ((item->ItemFlags[0] >= 1024 || LaraItem->Animation.IsAirborne) &&
 					(angle > PI * 0.25f && angle < PI * 0.75f))
 				{
-					if (LaraItem->Animation.Velocity.y > 6 || item->ItemFlags[0] > 1024)
+					if (LaraItem->Animation.Velocity.y > 6.0f || item->ItemFlags[0] > 1024)
 					{
 						LaraItem->HitPoints = -1;
 						bloodCount = 20;
 					}
 				}
 				// Spikes are emerging or already fully protruded (in latter case, only damage Lara if she runs).
-				else if ((item->TriggerFlags != 1) || LaraItem->Animation.Velocity.z >= 30)
+				else if ((item->TriggerFlags != 1) || LaraItem->Animation.Velocity.z >= 30.0f)
 				{
-					int damage = item->ItemFlags[0] == 1024 ? TEETH_SPIKE_HARM_EMERGING : TEETH_SPIKE_HARM_CONSTANT;
+					int damage = item->ItemFlags[0] == 1024 ? TEETH_SPIKE_HARM_DAMAGE_EMERGING : TEETH_SPIKE_HARM_DAMAGE_CONSTANT;
 					DoDamage(LaraItem, damage);
 					bloodCount = (GetRandomControl() & 3) + 2;
 				}
@@ -117,15 +117,15 @@ namespace TEN::Entities::TR4
 				int yTop = laraBounds->Y1 + LaraItem->Pose.Position.y;
 				int yBottom = laraBounds->Y2 + LaraItem->Pose.Position.y;
 				
+				// Spikes are downward; move blood origin to top.
 				if (angle < PI * 0.125f || angle > PI * 0.825f)
 				{
-					// Spikes are downward; move blood origin to top.
 					y1 = -bounds->Y2;
 					y2 = -bounds->Y1;
 				}
+				// Spikes are upward; leave origin as is.
 				else
 				{
-					// Spikes are upward; leave origin as is.
 					y1 = bounds->Y1;
 					y2 = bounds->Y2;
 				}

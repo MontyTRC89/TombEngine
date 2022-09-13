@@ -9,7 +9,7 @@
 #include "Sound/sound.h"
 #include "Specific/level.h"
 
-namespace TEN::Entities::TR3
+namespace TEN::Entities::Creatures::TR3
 {
 	static BOSS_STRUCT BossData;
 
