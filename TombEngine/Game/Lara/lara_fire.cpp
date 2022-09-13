@@ -604,7 +604,7 @@ void LaraGun(ItemInfo* laraItem)
 		if (lara->Control.Weapon.GunType == LaraWeaponType::Flare)
 		{
 			if (lara->Vehicle != NO_ITEM ||
-				TestLaraState((LaraState)laraItem->Animation.ActiveState, FlarePoseStates))
+				CheckLaraState((LaraState)laraItem->Animation.ActiveState, FlarePoseStates))
 			{
 				if (lara->Flare.ControlLeft)
 				{
@@ -634,7 +634,7 @@ void LaraGun(ItemInfo* laraItem)
 		{
 			if (lara->MeshPtrs[LM_LHAND] == Objects[ID_LARA_FLARE_ANIM].meshIndex + LM_LHAND)
 			{
-				lara->Flare.ControlLeft = (lara->Vehicle != NO_ITEM || TestLaraState((LaraState)laraItem->Animation.ActiveState, FlarePoseStates));
+				lara->Flare.ControlLeft = (lara->Vehicle != NO_ITEM || CheckLaraState((LaraState)laraItem->Animation.ActiveState, FlarePoseStates));
 				DoFlareInHand(laraItem, lara->Flare.Life);
 				SetFlareArm(laraItem, lara->LeftArm.FrameNumber);
 			}
