@@ -22,6 +22,7 @@ Version 1.0.2
   - 3 for big button
   - 4 for giant button (sequence switch)
   - 5 for valve turn
+  - 6 for hole switch
   - any other OCBs play corresponding switch on anim or OCB+1 switch off anim.
   
 * Fix incorrect pole mounting.
