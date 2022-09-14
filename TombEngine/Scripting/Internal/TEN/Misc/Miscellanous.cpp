@@ -48,10 +48,16 @@ namespace Misc
 		pos1.StoreInGameVector(vec1);
 		vec1.roomNumber = roomNumber1;
 		pos2.StoreInGameVector(vec2);
-		return LOS(&vec1, &vec2);
+
+		MESH_INFO* mesh;
+		Vector3Int vector;
+		return LOS(&vec1, &vec2) && (ObjectOnLOS2(&vec1, &vec2, &vector, &mesh) == NO_LOS_ITEM);
 	}
 
-
+	///Vibrate game controller, if function is available and setting is on.
+	//@function Vibrate
+	//@tparam float strength Strength of the vibration
+	//@tparam float time __(default 0.3)__ Time of the vibration, in seconds
 	static void Vibrate(float strength, sol::optional<float> time)
 	{
 		Rumble(strength, time.value_or(0.3f), RumbleMode::Both);
@@ -71,6 +77,13 @@ namespace Misc
 	static void FadeIn(TypeOrNil<float> speed)
 	{
 		SetScreenFadeIn(USE_IF_HAVE(float, speed, 1.0f) / float(FPS));
+	}
+
+	///Check if fade out is complete and screen is completely black.
+	//@treturn bool state of the fade out
+	static bool FadeOutComplete()
+	{
+		return ScreenFadeCurrent == 0.0f;
 	}
 
 	///Move black cinematic bars in from the top and bottom of the game window.
@@ -118,6 +131,22 @@ namespace Misc
 	static void SetAmbientTrack(std::string const& trackName)
 	{
 		PlaySoundTrack(trackName, SoundTrackType::BGM);
+	}
+
+	///Stop any audio tracks currently playing
+	//@function StopAudioTracks
+	static void StopAudioTracks()
+	{
+		StopSoundTracks();
+	}
+
+	///Stop audio track that is currently playing
+	//@function StopAudioTrack
+	//@tparam bool looped if set, stop looped audio track, if not, stop one-shot audio track
+	static void StopAudioTrack(TypeOrNil<bool> looped)
+	{
+		auto mode = USE_IF_HAVE(bool, looped, false) ? SoundTrackType::BGM : SoundTrackType::OneShot;
+		StopSoundTrack(mode, SOUND_XFADETIME_ONESHOT);
 	}
 
 	/// Play sound effect
@@ -226,6 +255,7 @@ namespace Misc
 
 		table_misc.set_function(ScriptReserved_FadeIn, &FadeIn);
 		table_misc.set_function(ScriptReserved_FadeOut, &FadeOut);
+		table_misc.set_function(ScriptReserved_FadeOutComplete, &FadeOutComplete);
 
 		table_misc.set_function(ScriptReserved_SetCineBars, &SetCineBars);
 
@@ -234,6 +264,8 @@ namespace Misc
 		table_misc.set_function(ScriptReserved_SetAmbientTrack, &SetAmbientTrack);
 
 		table_misc.set_function(ScriptReserved_PlayAudioTrack, &PlayAudioTrack);
+		table_misc.set_function(ScriptReserved_StopAudioTrack, &StopAudioTrack);
+		table_misc.set_function(ScriptReserved_StopAudioTracks, &StopAudioTracks);
 
 		table_misc.set_function(ScriptReserved_PlaySound, &PlaySoundEffect);
 

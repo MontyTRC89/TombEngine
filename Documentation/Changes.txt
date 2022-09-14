@@ -29,6 +29,9 @@ Lua API changes:
 
 * Util.ShortenTENCalls no longer needs to be called; it is now automatic.
 * Flow.InvID has been removed; any function taking a pickup (e.g. GiveItem) now takes an Objects.ObjID instead.
+* Added Enable, Disable, GetActive, Get/SetSolid functions for static meshes.
+* Added FadeOutComplete, StopAudioTrack and StopAudioTracks functions.
+* Account for objects in HasLineOfSight tests.
 * Timer.lua, EventSequence.lua and Util.lua have been moved to a subfolder, Engine.
 * LevelFuncs can now contain tables as well as functions. These tables can contain functions and other tables, and so forth.
 * Moveable functions SetOnHit, SetOnKilled, SetOnCollidedWithObject and SetOnCollidedWithRoom no longer take strings, and instead take function objects themselves.

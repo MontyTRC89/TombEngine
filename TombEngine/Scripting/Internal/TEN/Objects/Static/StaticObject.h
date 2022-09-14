@@ -25,6 +25,9 @@ public:
 
 	void Enable();
 	void Disable();
+	bool GetActive();
+	bool GetSolid();
+	void SetSolid(bool yes);
 	Rotation GetRot() const;
 	void SetRot(Rotation const& rot);
 	Vec3 GetPos() const;
