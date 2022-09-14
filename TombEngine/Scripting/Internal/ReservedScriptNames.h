@@ -116,7 +116,6 @@ static constexpr char ScriptReserved_SetLanguageNames[]		= "SetLanguageNames";
 // Flow Tables
 static constexpr char ScriptReserved_WeatherType[]		= "WeatherType";
 static constexpr char ScriptReserved_LaraType[]			= "LaraType";
-static constexpr char ScriptReserved_InvItem[]			= "InvID";
 static constexpr char ScriptReserved_RotationAxis[]		= "RotationAxis";
 static constexpr char ScriptReserved_ItemAction[]		= "ItemAction";
 static constexpr char ScriptReserved_ErrorMode[]		= "ErrorMode";

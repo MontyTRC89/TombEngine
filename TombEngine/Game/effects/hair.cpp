@@ -22,7 +22,7 @@ void InitialiseHair()
 {
 	for (int h = 0; h < HAIR_MAX; h++)
 	{
-		int* bone = &g_Level.Bones[Objects[ID_LARA_HAIR].boneIndex];
+		int* bone = &g_Level.Bones[Objects[ID_HAIR].boneIndex];
 
 		Hairs[h][0].initialised = true;
 		Hairs[h][0].pos.Orientation.y = 0;
@@ -180,7 +180,7 @@ void HairControl(ItemInfo* item, int ponytail, ANIM_FRAME* framePtr)
 	pos.y = world.Translation().y; 
 	pos.z = world.Translation().z;
 
-	int* bone = &g_Level.Bones[Objects[ID_LARA_HAIR].boneIndex];
+	int* bone = &g_Level.Bones[Objects[ID_HAIR].boneIndex];
 
 	if (Hairs[ponytail][0].initialised)
 	{

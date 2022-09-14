@@ -211,7 +211,7 @@ bool LogicHandler::SetLevelFuncsMember(sol::table tab, std::string const& luaNam
 {
 	if (sol::type::lua_nil == value.get_type())
 	{
-		std::string error{ "Tried to set LevelFuncs member " };
+		std::string error{ "Tried to set " + std::string{ScriptReserved_LevelFuncs} + " member " };
 		error += luaName + " to nil; this not permitted at this time.";
 		return ScriptAssert(false, error);
 	}
@@ -253,7 +253,7 @@ bool LogicHandler::SetLevelFuncsMember(sol::table tab, std::string const& luaNam
 	}
 	else{
 		std::string error{ "Failed to add " };
-		error += luaName + " to LevelFuncs or one of its tables; it must be a function or a table of functions.";
+		error += luaName + " to " + ScriptReserved_LevelFuncs + " or one of its tables; it must be a function or a table of functions.";
 		return ScriptAssert(false, error);
 	}
 	return true;
@@ -289,6 +289,8 @@ void LogicHandler::ResetScripts(bool clearGameVars)
 		ResetGameTables();
 
 	m_handler.ResetGlobals();
+
+	m_shortenedCalls = false;
 
 	m_handler.GetState()->collect_garbage();
 }
@@ -463,7 +465,6 @@ void LogicHandler::GetVariables(std::vector<SavedVar> & vars)
 
 	auto handleFuncName = [&](LevelFunc const& fnh)
 	{
-		//auto str = obj.as<sol::string_view>();
 		auto [first, second] = varsMap.insert(std::make_pair(&fnh, nVars));
 
 		if (second)
@@ -579,8 +580,38 @@ void LogicHandler::ResetVariables()
 	(*m_handler.GetState())["Lara"] = nullptr;
 }
 
+
+void LogicHandler::ShortenTENCalls()
+{
+	auto str = R"(local ShortenInner 
+
+	ShortenInner = function(tab)
+		for k, v in pairs(tab) do
+			if _G[k] then
+				print("WARNING! Key " .. k .. " already exists in global environment!")
+			else
+				_G[k] = v
+				if "table" == type(v) then
+					if nil == v.__type then
+						ShortenInner(v)
+					end
+				end
+			end
+		end
+	end
+	ShortenInner(TEN))";
+
+	ExecuteString(str);
+}
+
 void LogicHandler::ExecuteScriptFile(const std::string & luaFilename)
 {
+	if (!m_shortenedCalls)
+	{
+		ShortenTENCalls();
+		m_shortenedCalls = true;
+	}
+
 	m_handler.ExecuteScript(luaFilename);
 }
 
@@ -600,7 +631,7 @@ void LogicHandler::ExecuteFunction(std::string const& name, short idOne, short i
 
 void LogicHandler::ExecuteFunction(std::string const& name, TEN::Control::Volumes::VolumeTriggerer triggerer, std::string const& arguments)
 {
-	sol::protected_function func = (*m_handler.GetState())["LevelFuncs"][name.c_str()];
+	sol::protected_function func = (*m_handler.GetState())[ScriptReserved_LevelFuncs][name.c_str()];
 	if (std::holds_alternative<short>(triggerer))
 	{
 		func(std::make_unique<Moveable>(std::get<short>(triggerer), true), arguments);
@@ -773,9 +804,10 @@ and provides the delta time (a float representing game time since last call) via
 void LogicHandler::InitCallbacks()
 {
 	auto assignCB = [this](sol::protected_function& func, std::string const & luaFunc) {
-		std::string fullName = "LevelFuncs." + luaFunc;
+		auto state = m_handler.GetState();
+		std::string fullName = std::string{ ScriptReserved_LevelFuncs } + "." + luaFunc;
 
-		sol::object theData = (*m_handler.GetState())["LevelFuncs"][luaFunc];
+		sol::object theData = (*state)[ScriptReserved_LevelFuncs][luaFunc];
 
 		std::string msg{ "Level's script does not define callback " + fullName
 			+ ". Defaulting to no " + fullName + " behaviour."};
@@ -786,7 +818,7 @@ void LogicHandler::InitCallbacks()
 			return;
 		}
 
-		LevelFunc fnh = (*m_handler.GetState())["LevelFuncs"][luaFunc];
+		LevelFunc fnh = (*state)[ScriptReserved_LevelFuncs][luaFunc];
 
 		func = m_levelFuncs_luaFunctions[fnh.m_funcName];
 

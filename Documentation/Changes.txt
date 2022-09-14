@@ -11,10 +11,19 @@ Version 1.0.2
 * Don't play Lara alignment animations if the interacted object is too close.
 * Allow vertical pole mounts only when facing one directly.
 * Allow vertical pole mounts while turning, walking, or running.
-* Add standing 180 turn. Activated with WALK+ROLL on dry ground, automatic when in wade-height water or swamp.
 * Update monkey swing 180 turn animation.
 * Update backward monkey swing animations.
-* Crouch turn to crouch idle and crawl turn 
+* Added standing 180 turn. Activated with WALK+ROLL on dry ground, automatic when in wade-height water or swamp.
+* Added crouch turn and crawl turn animations.
+* Added new switch OCBs:
+  - 0 for wall switch
+  - 1 for small wall switch
+  - 2 for small button
+  - 3 for big button
+  - 4 for giant button (sequence switch)
+  - 5 for valve turn
+  - any other OCBs play corresponding switch on anim or OCB+1 switch off anim.
+  
 * Fix incorrect pole mounting.
 * Fix zeroed forward velocity upon landing.
 * Fix 1-frame turn rate delays.
@@ -24,9 +33,12 @@ Version 1.0.2
 * Fix Lara's subway train death so that she no longer slides slowly after the animation has finished.
 * Fix horseman's axe attack using his left foot as the damaging joint.
 * Fix stargate blades needlessly pushing the player around while hardly doing any damage.
+* Fix weapon hotkeys and add missing crossbow hotkey.
 
 Lua API changes:
 
+* Util.ShortenTENCalls no longer needs to be called; it is now automatic.
+* Flow.InvID has been removed; any function taking a pickup (e.g. GiveItem) now takes an Objects.ObjID instead.
 * Added Enable, Disable, GetActive, Get/SetSolid functions for static meshes.
 * Added FadeOutComplete, StopAudioTrack and StopAudioTracks functions.
 * Account for objects in HasLineOfSight tests.

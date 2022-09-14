@@ -267,7 +267,7 @@ namespace TEN::Renderer
 				}
 			}
 
-			auto& hairsObj = *m_moveableObjects[ID_LARA_HAIR];
+			auto& hairsObj = *m_moveableObjects[ID_HAIR];
 
 			// First matrix is Lara's head matrix, then all 6 hairs matrices. Bones are adjusted at load time for accounting this.
 			m_stItem.World = Matrix::Identity;

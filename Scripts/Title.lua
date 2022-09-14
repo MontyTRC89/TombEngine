@@ -1,8 +1,5 @@
 -- Title script file
 
-local Util = require("Engine.Util")
-Util.ShortenTENCalls()
-
 LevelFuncs.OnLoad = function() end
 LevelFuncs.OnSave = function() end
 LevelFuncs.OnEnd = function() end
