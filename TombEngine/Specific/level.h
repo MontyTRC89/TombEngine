@@ -144,6 +144,8 @@ void LoadSoundSources();
 void LoadAnimatedTextures();
 void LoadAIObjects();
 
+void LoadPortal(ROOM_INFO& room);
+
 void GetCarriedItems();
 void GetAIPickups();
 void BuildOutsideRoomsTable();

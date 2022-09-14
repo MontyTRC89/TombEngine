@@ -50,20 +50,20 @@ namespace InventoryHandler
 			RemoveObjectFromInventory(slot.m_pair.first, std::nullopt);
 	}
 
-	///Set the amount of a certain item the player has in the inventory.
-	//Similar to @{GiveItem} but replaces with the new amount instead of adding it.
-	//@function SetItemCount
-	//@tparam InvID item the ID of the item to be set.
-	//@tparam int count the number of items the player will have. A value of -1 will give an infinite amount of that item.
+	///Get the amount the player holds of an item.
+	//@function GetItemCount
+	//@tparam InvID item the ID item to check
+	//@treturn int the amount of the item the player has in the inventory. -1 indicates an infinite amount of that item.
 	static int InventoryGetCount(ItemEnumPair slot)
 	{
 		return GetInventoryCount(slot.m_pair.first);
 	}
 
-	///Get the amount the player holds of an item.
-	//@function GetItemCount
-	//@tparam InvID item the ID item to check
-	//@treturn int the amount of the item the player has in the inventory. -1 indicates an infinite amount of that item.
+	///Set the amount of a certain item the player has in the inventory.
+	//Similar to @{GiveItem} but replaces with the new amount instead of adding it.
+	//@function SetItemCount
+	//@tparam InvID item the ID of the item to be set.
+	//@tparam int count the number of items the player will have. A value of -1 will give an infinite amount of that item.
 	static void InventorySetCount(ItemEnumPair slot, int count)
 	{
 		SetInventoryCount(slot.m_pair.first, count);

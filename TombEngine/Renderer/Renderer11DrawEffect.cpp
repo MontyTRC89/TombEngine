@@ -798,8 +798,8 @@ namespace TEN::Renderer
 
 	Texture2D Renderer11::CreateDefaultNormalTexture() 
 	{
-		vector<byte> data = {128,128,255,1};
-		return Texture2D(m_device.Get(),1,1,data.data());
+		vector<byte> data = { 128, 128, 255, 1 };
+		return Texture2D(m_device.Get(), 1, 1, data.data());
 	}
 
 	void Renderer11::DrawFootprints(RenderView& view) 
@@ -812,7 +812,7 @@ namespace TEN::Renderer
 			if (footprint.Active && g_Level.Sprites.size() > spriteIndex)
 				AddSprite3D(&m_sprites[spriteIndex],
 					footprint.Position[0], footprint.Position[1], footprint.Position[2], footprint.Position[3], 
-					Vector4(footprint.Opacity), 0, 1, { 1,1 }, BLENDMODE_SUBTRACTIVE, false, view);
+					Vector4(footprint.Opacity), 0, 1, { 1, 1 }, BLENDMODE_SUBTRACTIVE, false, view);
 		}
 	}
 

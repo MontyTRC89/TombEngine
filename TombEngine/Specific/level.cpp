@@ -671,108 +671,7 @@ void ReadRooms()
 
 		int numPortals = ReadInt32();
 		for (int j = 0; j < numPortals; j++)
-		{
-			ROOM_DOOR door;
-
-			door.room = ReadInt16();
-			door.normal.x = ReadInt32();
-			door.normal.y = ReadInt32();
-			door.normal.z = ReadInt32();
-
-			float minX1 = INFINITY;
-			float minY1 = INFINITY;
-			float minZ1 = INFINITY;
-			float maxX1 = -INFINITY;
-			float maxY1 = -INFINITY;
-			float maxZ1 = -INFINITY;
-
-			for (int k = 0; k < 4; k++)
-			{
-				door.vertices[k].x = ReadInt32();
-				door.vertices[k].y = ReadInt32();
-				door.vertices[k].z = ReadInt32();
-
-				minX1 = std::min(minX1, door.vertices[k].x);
-				minY1 = std::min(minY1, door.vertices[k].y);
-				minZ1 = std::min(minZ1, door.vertices[k].z);
-
-				maxX1 = std::max(maxX1, door.vertices[k].x);
-				maxY1 = std::max(maxY1, door.vertices[k].y);
-				maxZ1 = std::max(maxZ1, door.vertices[k].z);
-			}
-
-			bool found = false;
-
-			float minX2 = INFINITY;
-			float minY2 = INFINITY;
-			float minZ2 = INFINITY;
-			float maxX2 = -INFINITY;
-			float maxY2 = -INFINITY;
-			float maxZ2 = -INFINITY;
-
-			for (int k = 0; k < room.doors.size(); k++)
-			{
-				ROOM_DOOR* current = &room.doors[k];
-
-				if (current->room == door.room)
-				{
-					// Merge door
-					found = true;
-
-					for (int n = 0; n < 4; n++)
-					{
-						minX2 = std::min(minX2, current->vertices[n].x);
-						minY2 = std::min(minY2, current->vertices[n].y);
-						minZ2 = std::min(minZ2, current->vertices[n].z);
-
-						maxX2 = std::max(maxX2, current->vertices[n].x);
-						maxY2 = std::max(maxY2, current->vertices[n].y);
-						maxZ2 = std::max(maxZ2, current->vertices[n].z);
-					}
-
-					minX1 = std::min(minX2, minX1);
-					minY1 = std::min(minY2, minY1);
-					minZ1 = std::min(minZ2, minZ1);
-
-					maxX1 = std::max(maxX2, maxX1);
-					maxY1 = std::max(maxY2, maxY1);
-					maxZ1 = std::max(maxZ2, maxZ1);
-
-					if (minY1 == maxY1)
-					{
-						current->vertices[0] = Vector3(minX1, minY1, minZ1);
-						current->vertices[1] = Vector3(minX1, minY1, maxZ1);
-						current->vertices[2] = Vector3(maxX1, minY1, maxZ1);
-						current->vertices[3] = Vector3(maxX1, minY1, minZ1);
-					}
-					else if (minX1 == maxX1)
-					{
-						current->vertices[0] = Vector3(minX1, minY1, minZ1);
-						current->vertices[1] = Vector3(minX1, maxY1, minZ1);
-						current->vertices[2] = Vector3(minX1, maxY1, maxZ1);
-						current->vertices[3] = Vector3(minX1, minY1, maxZ1);
-					}
-					else if (minZ1 == maxZ1)
-					{
-						current->vertices[0] = Vector3(minX1, minY1, minZ1);
-						current->vertices[1] = Vector3(minX1, maxY1, minZ1);
-						current->vertices[2] = Vector3(maxX1, maxY1, minZ1);
-						current->vertices[3] = Vector3(maxX1, minY1, minZ1);
-					}
-					else
-					{
-						current->vertices[0] = Vector3(minX1, minY1, minZ1);
-						current->vertices[1] = Vector3(minX1, maxY1, maxZ1);
-						current->vertices[2] = Vector3(maxX1, maxY1, maxZ1);
-						current->vertices[3] = Vector3(maxX1, minY1, minZ1);
-					}
-				}
-			}
-
-			if (!found)
-				room.doors.push_back(door);
-		}
-
+			LoadPortal(room);
 
 		room.zSize = ReadInt32();
 		room.xSize = ReadInt32();
@@ -1519,4 +1418,107 @@ void BuildOutsideRoomsTable()
 			}
 		}
 	}
+}
+
+void LoadPortal(ROOM_INFO& room) 
+{
+	ROOM_DOOR door;
+
+	door.room = ReadInt16();
+	door.normal.x = ReadInt32();
+	door.normal.y = ReadInt32();
+	door.normal.z = ReadInt32();
+
+	float minX1 = INFINITY;
+	float minY1 = INFINITY;
+	float minZ1 = INFINITY;
+	float maxX1 = -INFINITY;
+	float maxY1 = -INFINITY;
+	float maxZ1 = -INFINITY;
+
+	for (int k = 0; k < 4; k++)
+	{
+		door.vertices[k].x = ReadInt32();
+		door.vertices[k].y = ReadInt32();
+		door.vertices[k].z = ReadInt32();
+
+		minX1 = std::min(minX1, door.vertices[k].x);
+		minY1 = std::min(minY1, door.vertices[k].y);
+		minZ1 = std::min(minZ1, door.vertices[k].z);
+
+		maxX1 = std::max(maxX1, door.vertices[k].x);
+		maxY1 = std::max(maxY1, door.vertices[k].y);
+		maxZ1 = std::max(maxZ1, door.vertices[k].z);
+	}
+
+	bool found = false;
+
+	float minX2 = INFINITY;
+	float minY2 = INFINITY;
+	float minZ2 = INFINITY;
+	float maxX2 = -INFINITY;
+	float maxY2 = -INFINITY;
+	float maxZ2 = -INFINITY;
+
+	for (int k = 0; k < room.doors.size(); k++)
+	{
+		ROOM_DOOR* current = &room.doors[k];
+
+		if (current->room == door.room)
+		{
+			// Merge door
+			found = true;
+
+			for (int n = 0; n < 4; n++)
+			{
+				minX2 = std::min(minX2, current->vertices[n].x);
+				minY2 = std::min(minY2, current->vertices[n].y);
+				minZ2 = std::min(minZ2, current->vertices[n].z);
+
+				maxX2 = std::max(maxX2, current->vertices[n].x);
+				maxY2 = std::max(maxY2, current->vertices[n].y);
+				maxZ2 = std::max(maxZ2, current->vertices[n].z);
+			}
+
+			minX1 = std::min(minX2, minX1);
+			minY1 = std::min(minY2, minY1);
+			minZ1 = std::min(minZ2, minZ1);
+
+			maxX1 = std::max(maxX2, maxX1);
+			maxY1 = std::max(maxY2, maxY1);
+			maxZ1 = std::max(maxZ2, maxZ1);
+
+			if (minY1 == maxY1)
+			{
+				current->vertices[0] = Vector3(minX1, minY1, minZ1);
+				current->vertices[1] = Vector3(minX1, minY1, maxZ1);
+				current->vertices[2] = Vector3(maxX1, minY1, maxZ1);
+				current->vertices[3] = Vector3(maxX1, minY1, minZ1);
+			}
+			else if (minX1 == maxX1)
+			{
+				current->vertices[0] = Vector3(minX1, minY1, minZ1);
+				current->vertices[1] = Vector3(minX1, maxY1, minZ1);
+				current->vertices[2] = Vector3(minX1, maxY1, maxZ1);
+				current->vertices[3] = Vector3(minX1, minY1, maxZ1);
+			}
+			else if (minZ1 == maxZ1)
+			{
+				current->vertices[0] = Vector3(minX1, minY1, minZ1);
+				current->vertices[1] = Vector3(minX1, maxY1, minZ1);
+				current->vertices[2] = Vector3(maxX1, maxY1, minZ1);
+				current->vertices[3] = Vector3(maxX1, minY1, minZ1);
+			}
+			else
+			{
+				current->vertices[0] = Vector3(minX1, minY1, minZ1);
+				current->vertices[1] = Vector3(minX1, maxY1, maxZ1);
+				current->vertices[2] = Vector3(maxX1, maxY1, maxZ1);
+				current->vertices[3] = Vector3(maxX1, minY1, minZ1);
+			}
+		}
+	}
+
+	if (!found)
+		room.doors.push_back(door);
 }
