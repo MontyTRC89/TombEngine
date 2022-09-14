@@ -107,7 +107,7 @@ void DrawFlareMeshes(ItemInfo* laraItem)
 {
 	auto* lara = GetLaraInfo(laraItem);
 
-	lara->MeshPtrs[LM_LHAND] = Objects[ID_LARA_FLARE_ANIM].meshIndex + LM_LHAND;
+	lara->MeshPtrs[LM_LHAND] = Objects[ID_FLARE_ANIM].meshIndex + LM_LHAND;
 }
 
 void UndrawFlare(ItemInfo* laraItem)
@@ -269,7 +269,7 @@ void DrawFlare(ItemInfo* laraItem)
 void SetFlareArm(ItemInfo* laraItem, int armFrame)
 {
 	auto* lara = GetLaraInfo(laraItem);
-	int flareAnimNum = Objects[ID_LARA_FLARE_ANIM].animIndex;
+	int flareAnimNum = Objects[ID_FLARE_ANIM].animIndex;
 
 	if (armFrame >= 95)
 		flareAnimNum += 4;

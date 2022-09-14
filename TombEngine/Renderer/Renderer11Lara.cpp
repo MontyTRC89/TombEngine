@@ -222,8 +222,8 @@ void Renderer11::UpdateLaraAnimations(bool force)
 
 			// HACK: Mask head and torso only when pulling out the flare.
 			if (!Lara.Control.IsLow &&
-				tempItem.Animation.AnimNumber > Objects[ID_LARA_FLARE_ANIM].animIndex + 1 &&
-				tempItem.Animation.AnimNumber < Objects[ID_LARA_FLARE_ANIM].animIndex + 4)
+				tempItem.Animation.AnimNumber > Objects[ID_FLARE_ANIM].animIndex + 1 &&
+				tempItem.Animation.AnimNumber < Objects[ID_FLARE_ANIM].animIndex + 4)
 				mask |= MESH_BITS(LM_TORSO) | MESH_BITS(LM_HEAD);
 
 			frac = GetFrame(&tempItem, framePtr, &rate);
@@ -315,9 +315,9 @@ void TEN::Renderer::Renderer11::DrawLara(RenderView& view, bool transparent)
 		}
 	}
 
-	if (Objects[ID_LARA_HAIR].loaded)
+	if (Objects[ID_HAIR].loaded)
 	{
-		RendererObject& hairsObj = *m_moveableObjects[ID_LARA_HAIR];
+		RendererObject& hairsObj = *m_moveableObjects[ID_HAIR];
 
 		// First matrix is Lara's head matrix, then all 6 hairs matrices. Bones are adjusted at load time for accounting this.
 		m_stItem.World = Matrix::Identity;

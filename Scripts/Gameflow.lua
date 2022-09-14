@@ -8,7 +8,7 @@ local Level = Flow.Level
 local Color = TEN.Color
 local Rotation = TEN.Rotation
 local InventoryItem = Flow.InventoryItem
-local InvID = Flow.InvID
+local ObjID = TEN.Objects.ObjID
 local RotationAxis = Flow.RotationAxis
 local ItemAction = Flow.ItemAction
 
@@ -64,7 +64,7 @@ test.fog = Flow.Fog.new(Color.new(0, 0, 0), 12, 20)
 test.objects = {
 	InventoryItem.new(
 		"tut1_ba_cartouche1",
-		InvID.PUZZLE_ITEM3_COMBO1,
+		ObjID.PUZZLE_ITEM3_COMBO1,
 		0,
 		0.5,
 		Rotation.new(0, 0, 0),
@@ -74,7 +74,7 @@ test.objects = {
 	),
 	InventoryItem.new(
 		"tut1_ba_cartouche2",
-		InvID.PUZZLE_ITEM3_COMBO2,
+		ObjID.PUZZLE_ITEM3_COMBO2,
 		0,
 		0.5,
 		Rotation.new(0, 0, 0),
@@ -84,7 +84,7 @@ test.objects = {
 	),
 	InventoryItem.new(
 		"tut1_ba_cartouche",
-		InvID.PUZZLE_ITEM3,
+		ObjID.PUZZLE_ITEM3,
 		0,
 		0.5,
 		Rotation.new(0, 0, 0),
@@ -94,7 +94,7 @@ test.objects = {
 	),
 	InventoryItem.new(
 		"tut1_hand_orion",
-		InvID.PUZZLE_ITEM6,
+		ObjID.PUZZLE_ITEM6,
 		0,
 		0.5,
 		Rotation.new(270, 180, 0),
@@ -104,7 +104,7 @@ test.objects = {
 	),
 	InventoryItem.new(
 		"tut1_hand_sirius",
-		InvID.PUZZLE_ITEM8,
+		ObjID.PUZZLE_ITEM8,
 		0,
 		0.5,
 		Rotation.new(270, 180, 0),

@@ -57,6 +57,8 @@ private:
 	std::unordered_set<std::string> m_callbacksPreControl;
 	std::unordered_set<std::string> m_callbacksPostControl;
 
+	bool m_shortenedCalls = false;
+
 	void ResetLevelTables();
 	void ResetGameTables();
 	LuaHandler m_handler;
@@ -76,6 +78,7 @@ public:
 	void								RemoveCallback(CallbackPoint point, LevelFunc const & lf);
 
 	void								ResetScripts(bool clearGameVars) override;
+	void								ShortenTENCalls();
 
 	sol::object							GetLevelFuncsMember(sol::table tab, std::string const& luaName);
 
@@ -98,5 +101,4 @@ public:
 	void								OnControlPhase(float dt) override;
 	void								OnSave() override;
 	void								OnEnd() override;
-
 };

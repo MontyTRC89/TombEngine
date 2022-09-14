@@ -37,6 +37,8 @@ Version 1.0.2
 
 Lua API changes:
 
+* Util.ShortenTENCalls no longer needs to be called; it is now automatic.
+* Flow.InvID has been removed; any function taking a pickup (e.g. GiveItem) now takes an Objects.ObjID instead.
 * Added Enable, Disable, GetActive, Get/SetSolid functions for static meshes.
 * Added FadeOutComplete, StopAudioTrack and StopAudioTracks functions.
 * Account for objects in HasLineOfSight tests.
