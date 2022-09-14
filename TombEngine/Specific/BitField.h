@@ -35,11 +35,11 @@ namespace TEN::Utils
 		void FlipAll();
 
 		// Inquirers
-		bool Test(const vector<uint>& indices);
+		bool Test(const vector<uint>& indices, bool checkAny = true);
 		bool Test(uint index);
 		bool TestAny();
-		bool IsFull();
-		bool IsEmpty();
+		bool TestAll();
+		bool TestNone();
 
 		// Converters
 		uint   ToPackedBits() const;

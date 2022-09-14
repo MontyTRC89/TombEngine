@@ -102,15 +102,30 @@ namespace TEN::Utils
 		this->Bits.flip();
 	}
 
-	bool BitField::Test(const vector<uint>& indices)
+	bool BitField::Test(const vector<uint>& indices, bool checkAny)
 	{
-		for (const uint& index : indices)
+		// Check whether any indices passed are true.
+		if (checkAny)
 		{
-			if (Bits[index])
-				return true;
-		}
+			for (const uint& index : indices)
+			{
+				if (Bits[index])
+					return true;
+			}
 
-		return false;
+			return false;
+		}
+		// Check whether all indices passed are true.
+		else
+		{
+			for (const uint& index : indices)
+			{
+				if (!Bits[index])
+					return false;
+			}
+
+			return true;
+		}
 	}
 
 	bool BitField::Test(uint index)
@@ -129,7 +144,7 @@ namespace TEN::Utils
 		return false;
 	}
 
-	bool BitField::IsFull()
+	bool BitField::TestAll()
 	{
 		for (const uint& bit : this->Bits)
 		{
@@ -140,7 +155,7 @@ namespace TEN::Utils
 		return true;
 	}
 
-	bool BitField::IsEmpty()
+	bool BitField::TestNone()
 	{
 		for (const uint& bit : this->Bits)
 		{
