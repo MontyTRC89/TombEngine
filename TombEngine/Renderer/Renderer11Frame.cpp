@@ -371,7 +371,7 @@ namespace TEN::Renderer
 				bool inFrustum = false;
 				for (int i = 0; !inFrustum, i < cnt; i++)
 					// Blow up sphere radius by half for cases of too small calculated spheres.
-					if (renderView.camera.frustum.SphereInFrustum(spheres[i].Center, spheres[i].Radius * 1.5f))
+					if (renderView.camera.Frustum.SphereInFrustum(spheres[i].Center, spheres[i].Radius * 1.5f))
 						inFrustum = true;
 				
 				if (!inFrustum)
@@ -427,7 +427,7 @@ namespace TEN::Renderer
 
 			auto bounds = TO_DX_BBOX(mesh->pos, GetBoundsAccurate(mesh, true));
 			auto length = Vector3(bounds.Extents).Length();
-			if (!renderView.camera.frustum.SphereInFrustum(bounds.Center, length))
+			if (!renderView.camera.Frustum.SphereInFrustum(bounds.Center, length))
 				continue;
 
 			std::vector<RendererLight*> lights;

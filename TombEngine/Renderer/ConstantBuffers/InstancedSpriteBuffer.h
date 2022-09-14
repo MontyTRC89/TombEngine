@@ -1,25 +1,22 @@
 #pragma once
 #include <SimpleMath.h>
 
-namespace TEN
+namespace TEN::Renderer
 {
-	namespace Renderer
+	using DirectX::SimpleMath::Matrix;
+	using DirectX::SimpleMath::Vector4;
+
+	struct alignas(4) InstancedSprite
 	{
-		using DirectX::SimpleMath::Matrix;
-		using DirectX::SimpleMath::Vector4;
+		Matrix World;
+		Vector4 Color;
+		float IsBillboard;
+		float IsSoftParticle;
+		Vector2 SpritesPadding;
+	};
 
-		struct alignas(4) InstancedSprite
-		{
-			Matrix World;
-			Vector4 Color;
-			float IsBillboard;
-			float IsSoftParticle;
-			Vector2 SpritesPadding;
-		};
-
-		struct alignas(4) CInstancedSpriteBuffer
-		{
-			InstancedSprite Sprites[INSTANCED_SPRITES_BUCKET_SIZE];
-		};
-	}
+	struct alignas(4) CInstancedSpriteBuffer
+	{
+		InstancedSprite Sprites[INSTANCED_SPRITES_BUCKET_SIZE];
+	};
 }

@@ -397,7 +397,7 @@ namespace TEN::Renderer
 				AddSpriteBillboardConstrained(&m_sprites[Objects[ID_DRIP_SPRITE].meshIndex],
 					Vector3(drip->x, drip->y, drip->z),
 					Vector4(drip->r / 255.0f, drip->g / 255.0f, drip->b / 255.0f, 1.0f),
-					0.0f, 1.0f, Vector2(TEN::Effects::Drip::DRIP_WIDTH, 24.0f), BLENDMODE_ADDITIVE, -Vector3::UnitY, true, view);
+					0.0f, 1.0f, Vector2(TEN::Effects::Drip::DRIP_WIDTH, 24.0f), BLENDMODE_ADDITIVE, -Vector3::UnitY, false, view);
 			}
 		}
 	}
@@ -535,7 +535,7 @@ namespace TEN::Renderer
 								shockwave->g * shockwave->life / 255.0f / 16.0f,
 								shockwave->b * shockwave->life / 255.0f / 16.0f,
 								1.0f),
-								0, 1, {0,0}, BLENDMODE_ADDITIVE, true, view);
+								0, 1, {0,0}, BLENDMODE_ADDITIVE, false, view);
 
 					p1 = p2;
 					p4 = p3;
@@ -888,11 +888,11 @@ namespace TEN::Renderer
 
 			bool isBillboard = spr.Type != RENDERER_SPRITE_TYPE::SPRITE_TYPE_3D;
 
-			if (spr.Sprite != currentSpriteBucket.Sprite 
-				|| spr.BlendMode != currentSpriteBucket.BlendMode 
-				|| currentSpriteBucket.SpritesToDraw.size() == INSTANCED_SPRITES_BUCKET_SIZE
-				|| isBillboard != currentSpriteBucket.IsBillboard
-				|| spr.SoftParticle != currentSpriteBucket.IsSoftParticle)
+			if (spr.Sprite != currentSpriteBucket.Sprite || 
+				spr.BlendMode != currentSpriteBucket.BlendMode ||
+				spr.SoftParticle != currentSpriteBucket.IsSoftParticle ||
+				currentSpriteBucket.SpritesToDraw.size() == INSTANCED_SPRITES_BUCKET_SIZE || 
+				isBillboard != currentSpriteBucket.IsBillboard)
 			{
 				spriteBuckets.push_back(currentSpriteBucket);
 
@@ -1279,7 +1279,7 @@ namespace TEN::Renderer
 			auto height = Lerp(1.0f, 0.0f, normalizedLife);
 			auto color = Vector4::Lerp(s.sourceColor, s.destinationColor, normalizedLife);
 
-			AddSpriteBillboardConstrained(&m_sprites[Objects[ID_SPARK_SPRITE].meshIndex], s.pos, color, 0, 1, { s.width, s.height * height }, BLENDMODE_ADDITIVE, -v, true, view);
+			AddSpriteBillboardConstrained(&m_sprites[Objects[ID_SPARK_SPRITE].meshIndex], s.pos, color, 0, 1, { s.width, s.height * height }, BLENDMODE_ADDITIVE, -v, false, view);
 		}
 	}
 
@@ -1295,7 +1295,7 @@ namespace TEN::Renderer
 			if (!d.active) continue;
 			Vector3 v;
 			d.velocity.Normalize(v);
-			AddSpriteBillboardConstrained(&m_sprites[Objects[ID_DRIP_SPRITE].meshIndex], d.pos, d.color, 0, 1, { DRIP_WIDTH, d.height }, BLENDMODE_ADDITIVE, -v, true, view);
+			AddSpriteBillboardConstrained(&m_sprites[Objects[ID_DRIP_SPRITE].meshIndex], d.pos, d.color, 0, 1, { DRIP_WIDTH, d.height }, BLENDMODE_ADDITIVE, -v, false, view);
 		}
 	}
 

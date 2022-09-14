@@ -3,8 +3,6 @@
 
 namespace TEN::Renderer
 {
-	constexpr float EPSILON = 0.00001f;
-
 	RenderView::RenderView(CAMERA_INFO* cam, float roll, float fov, float nearPlane, float farPlane, int w, int h) : camera(cam, roll, fov, nearPlane, farPlane, w, h) 
 	{
 		viewport = {};
@@ -70,9 +68,9 @@ namespace TEN::Renderer
 		View = Matrix::CreateLookAt(WorldPosition, target, up);
 		Projection = Matrix::CreatePerspectiveFieldOfView(fov, w / (float)h, n, f);
 		ViewProjection = View * Projection;
-		ViewSize = { (float)w,(float)h };
-		InvViewSize = { 1.0f / w,1.0f / h };
-		frustum.Update(View, Projection);
+		ViewSize = { (float)w, (float)h };
+		InvViewSize = { 1.0f / w, 1.0f / h };
+		Frustum.Update(View, Projection);
 		NearPlane = n;
 		FarPlane = f;
 	}
@@ -82,13 +80,13 @@ namespace TEN::Renderer
 		RoomNumber = room;
 		WorldPosition = pos;
 		WorldDirection = dir;
-		View = Matrix::CreateLookAt(pos, pos + dir*10240, up);
+		View = Matrix::CreateLookAt(pos, pos + dir * 10240, up);
 		float aspect = (float)width / (float)height;
 		Projection = Matrix::CreatePerspectiveFieldOfView(fov, aspect, n, f);
 		ViewProjection = View * Projection;
-		ViewSize = { (float)width,(float)height };
-		InvViewSize = { 1.0f / width,1.0f / height };
-		frustum.Update(View, Projection);
+		ViewSize = { (float)width, (float)height };
+		InvViewSize = { 1.0f / width, 1.0f / height };
+		Frustum.Update(View, Projection);
 		NearPlane = n;
 		FarPlane = f;
 	}

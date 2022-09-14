@@ -4,6 +4,12 @@
 #include <SpriteFont.h>
 #include <PrimitiveBatch.h>
 #include <d3d9types.h>
+#include "Game/items.h"
+#include "Game/animation.h"
+#include "Game/gui.h"
+#include "Game/effects/effects.h"
+#include "Specific/level.h"
+#include "Specific/fast_vector.h"
 #include "Renderer/Renderer11Enums.h"
 #include "Renderer/ConstantBuffers/StaticBuffer.h"
 #include "Renderer/ConstantBuffers/LightBuffer.h"
@@ -15,32 +21,26 @@
 #include "Renderer/ConstantBuffers/ItemBuffer.h"
 #include "Renderer/ConstantBuffers/AnimatedBuffer.h"
 #include "Renderer/ConstantBuffers/AlphaTestBuffer.h"
-#include "Frustum.h"
-#include "RendererBucket.h"
-#include "Game/items.h"
-#include "Game/animation.h"
-#include "Game/gui.h"
-#include "Game/effects/effects.h"
-#include "IndexBuffer/IndexBuffer.h"
-#include "VertexBuffer/VertexBuffer.h"
-#include "RenderTarget2D/RenderTarget2D.h"
-#include "ConstantBuffers/CameraMatrixBuffer.h"
-#include "Texture2D/Texture2D.h"
-#include "ConstantBuffers/SpriteBuffer.h"
-#include "RenderTargetCube/RenderTargetCube.h"
-#include "RenderView/RenderView.h"
-#include "Specific/level.h"
-#include "ConstantBuffer/ConstantBuffer.h"
-#include "RenderTargetCubeArray/RenderTargetCubeArray.h"
-#include "Specific/fast_vector.h"
+#include "Renderer/Frustum.h"
+#include "Renderer/RendererBucket.h"
+#include "Renderer/IndexBuffer/IndexBuffer.h"
+#include "Renderer/VertexBuffer/VertexBuffer.h"
+#include "Renderer/RenderTarget2D/RenderTarget2D.h"
+#include "Renderer/ConstantBuffers/CameraMatrixBuffer.h"
+#include "Renderer/Texture2D/Texture2D.h"
+#include "Renderer/ConstantBuffers/SpriteBuffer.h"
+#include "Renderer/RenderTargetCube/RenderTargetCube.h"
+#include "Renderer/RenderView/RenderView.h"
+#include "Renderer/ConstantBuffer/ConstantBuffer.h"
+#include "Renderer/RenderTargetCubeArray/RenderTargetCubeArray.h"
 #include "Renderer/TextureBase.h"
 #include "Renderer/Texture2DArray/Texture2DArray.h"
+#include "Renderer/ConstantBuffers/InstancedSpriteBuffer.h"
 #include "Renderer/ConstantBuffers/PostProcessBuffer.h"
 #include "Renderer/Structures/RendererBone.h"
 #include "Renderer/Structures/RendererLight.h"
 #include "Renderer/Structures/RendererStringToDraw.h"
 #include "Renderer/Structures/RendererRoom.h"
-#include <Renderer/ConstantBuffers/InstancedSpriteBuffer.h>
 
 struct CAMERA_INFO;
 
@@ -240,7 +240,6 @@ namespace TEN::Renderer
 		ComPtr<ID3D11RasterizerState> m_cullClockwiseRasterizerState = nullptr;
 		ComPtr<ID3D11RasterizerState> m_cullNoneRasterizerState = nullptr;
 		ComPtr<ID3D11InputLayout> m_inputLayout = nullptr;
-		//ComPtr<ID3D11InputLayout> m_inputLayoutSprites = nullptr;
 		D3D11_VIEWPORT m_viewport;
 		D3D11_VIEWPORT m_shadowMapViewport;
 		Viewport m_viewportToolkit;

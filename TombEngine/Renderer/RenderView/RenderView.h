@@ -37,7 +37,7 @@ namespace TEN::Renderer
 		Vector2 ViewSize;
 		Vector2 InvViewSize;
 		int RoomNumber;
-		Frustum frustum;
+		Frustum Frustum;
 		float NearPlane;
 		float FarPlane;
 

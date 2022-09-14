@@ -4,9 +4,9 @@
 
 cbuffer SpriteBuffer: register(b9)
 {
-	float4x4 billboardMatrix;
-	float4 color;
-	float isBillboard;
+	float4x4 BillboardMatrix;
+	float4 Color;
+	float IsBillboard;
 	float IsSoftParticle;
 	float2 SpritesPadding;
 }
@@ -33,10 +33,10 @@ PixelShaderInput VS(VertexShaderInput input)
 
 	float4 worldPosition;
 
-	if (isBillboard) 
+	if (IsBillboard) 
 	{
-		worldPosition = mul(float4(input.Position, 1.0f), billboardMatrix);
-		output.Position = mul(mul(float4(input.Position, 1.0f), billboardMatrix), ViewProjection);
+		worldPosition = mul(float4(input.Position, 1.0f), BillboardMatrix);
+		output.Position = mul(mul(float4(input.Position, 1.0f), BillboardMatrix), ViewProjection);
 	} else 
 	{
 		worldPosition = float4(input.Position, 1.0f);
@@ -46,7 +46,7 @@ PixelShaderInput VS(VertexShaderInput input)
 	output.PositionCopy = output.Position;
 	
 	output.Normal = input.Normal;
-	output.Color = input.Color * color;
+	output.Color = input.Color * Color;
 	output.UV = input.UV;
 
 	float4 d = length(CamPositionWS - worldPosition);
