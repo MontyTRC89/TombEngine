@@ -7,8 +7,8 @@ using DirectX::SimpleMath::Vector4;
 
 struct alignas(4) CSpriteBuffer
 {
-	Matrix billboardMatrix;
-	Vector4 color;
+	Matrix BillboardMatrix;
+	Vector4 Color;
 	float IsBillboard;
 	float IsSoftParticle;
 	Vector2 SpritesPadding;

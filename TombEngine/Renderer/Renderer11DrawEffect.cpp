@@ -996,7 +996,7 @@ namespace TEN::Renderer
 			if (spriteBucket.SpritesToDraw.size() == 0 || spriteBucket.IsBillboard)
 				continue;
 
-			m_stSprite.color = Vector4::One;
+			m_stSprite.Color = Vector4::One;
 			m_stSprite.IsBillboard = 0;
 			m_stSprite.IsSoftParticle = spriteBucket.IsSoftParticle ? 1 : 0;
 			m_cbSprite.updateData(m_stSprite, m_context.Get());
@@ -1069,8 +1069,8 @@ namespace TEN::Renderer
 		m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		m_context->IASetInputLayout(m_inputLayout.Get());
 
-		m_stSprite.billboardMatrix = Matrix::Identity;
-		m_stSprite.color = Vector4::One;
+		m_stSprite.BillboardMatrix = Matrix::Identity;
+		m_stSprite.Color = Vector4::One;
 		m_stSprite.IsBillboard = 0;
 		m_stSprite.IsSoftParticle = info->IsSoftParticle ? 1 : 0;
 		m_cbSprite.updateData(m_stSprite, m_context.Get());
