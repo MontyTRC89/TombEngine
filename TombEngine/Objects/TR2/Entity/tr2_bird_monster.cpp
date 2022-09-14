@@ -14,7 +14,7 @@
 using namespace TEN::Math::Random;
 using std::vector;
 
-namespace TEN::Entities::TR2
+namespace TEN::Entities::Creatures::TR2
 {
 	constexpr auto BIRD_MONSTER_ATTACK_DAMAGE = 200;
 	constexpr auto BIRD_MONSTER_SLAM_CRUSH_ATTACK_RANGE = SQUARE(SECTOR(1));
@@ -29,7 +29,7 @@ namespace TEN::Entities::TR2
 
 	enum BirdMonsterState
 	{
-		BMONSTER_STATE_NONE = 0,
+		// No state 0.
 		BMONSTER_STATE_IDLE = 1,
 		BMONSTER_STATE_WALK_FORWARD = 2,
 		BMONSTER_STATE_SLAM_ATTACK_START = 3,

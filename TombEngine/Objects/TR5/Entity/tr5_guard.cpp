@@ -1,21 +1,25 @@
 #include "framework.h"
-#include "tr5_guard.h"
-#include "Game/items.h"
+#include "Objects/TR5/Entity/tr5_guard.h"
+
+#include "Game/animation.h"
 #include "Game/collision/collide_room.h"
 #include "Game/control/box.h"
-#include "Game/people.h"
+#include "Game/control/los.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/tomb4fx.h"
-#include "Game/control/los.h"
-#include "Specific/setup.h"
-#include "Game/animation.h"
-#include "Specific/level.h"
+#include "Game/itemdata/creature_info.h"
+#include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
+#include "Game/people.h"
 #include "Sound/sound.h"
-#include "Game/itemdata/creature_info.h"
+#include "Specific/level.h"
+#include "Specific/prng.h"
+#include "Specific/setup.h"
 
-namespace TEN::Entities::TR5
+using namespace TEN::Math::Random;
+
+namespace TEN::Entities::Creatures::TR5
 {
 	const auto SwatGunBite		  = BiteInfo(Vector3(80.0f, 200.0f, 13.0f), 0);
 	const auto SniperGunBite	  = BiteInfo(Vector3(0.0f, 480.0f, 110.0f), 13);
@@ -354,7 +358,7 @@ namespace TEN::Entities::TR5
 				if (item->ObjectNumber == ID_SWAT_PLUS)
 				{
 					item->ItemFlags[0]++;
-					if (item->ItemFlags[0] > 60 && !(GetRandomControl() & 0xF))
+					if (item->ItemFlags[0] > 60 && TestProbability(0.06f))
 					{
 						SoundEffect(SFX_TR5_BIO_BREATHE_OUT, &item->Pose);
 						item->ItemFlags[0] = 0;
@@ -839,7 +843,7 @@ namespace TEN::Entities::TR5
 
 			case GUARD_STATE_USE_COMPUTER:
 				if ((item->ObjectNumber != ID_SCIENTIST || item != Lara.TargetEntity) &&
-					(GetRandomControl() & 0x7F || item->TriggerFlags >= 10 || item->TriggerFlags == 9))
+					(TestProbability(0.992f) || item->TriggerFlags >= 10 || item->TriggerFlags == 9))
 				{
 					if (item->AIBits & GUARD)
 					{
@@ -859,7 +863,7 @@ namespace TEN::Entities::TR5
 				break;
 
 			case GUARD_STATE_SURRENDER:
-				if (item != Lara.TargetEntity && !(GetRandomControl() & 0x3F))
+				if (item != Lara.TargetEntity && TestProbability(1.0f / 64))
 				{
 					if (item->TriggerFlags == 7 || item->TriggerFlags == 9)
 						item->Animation.RequiredState = GUARD_STATE_USE_COMPUTER;
@@ -1044,11 +1048,11 @@ namespace TEN::Entities::TR5
 				creature->Flags = 0;
 				if (!TargetVisible(item, &AI) ||
 					item->HitStatus &&
-					GetRandomControl() & 1)
+					TestProbability(0.5f))
 				{
 					item->Animation.TargetState = SNIPER_STATE_COVER;
 				}
-				else if (!(GetRandomControl() & 0x1F))
+				else if (TestProbability(1.0f / 30))
 					item->Animation.TargetState = SNIPER_STATE_FIRE;
 			
 				break;
