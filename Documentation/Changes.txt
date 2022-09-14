@@ -24,6 +24,7 @@ Version 1.0.2
 * Fix Lara's subway train death so that she no longer slides slowly after the animation has finished.
 * Fix horseman's axe attack using his left foot as the damaging joint.
 * Fix stargate blades needlessly pushing the player around while hardly doing any damage.
+* Fix weapon hotkeys and add missing crossbow hotkey.
 
 Lua API changes:
 
