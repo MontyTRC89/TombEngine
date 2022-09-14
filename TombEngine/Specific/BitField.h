@@ -22,6 +22,7 @@ namespace TEN::Utils
 
 		// Getters
 		uint GetSize();
+		uint GetCount();
 
 		// Setters
 		void Set(const vector<uint>& indices);

@@ -45,6 +45,18 @@ namespace TEN::Utils
 		return Bits.size();
 	}
 
+	uint BitField::GetCount()
+	{
+		uint count = 0;
+		for (const uint& bit : this->Bits)
+		{
+			if (bit)
+				count++;
+		}
+
+		return count;
+	}
+
 	void BitField::Set(const vector<uint>& indices)
 	{
 		for (const uint& index : indices)
