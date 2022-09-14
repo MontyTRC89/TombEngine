@@ -1,5 +1,6 @@
 #pragma once
 
+using std::string;
 using std::vector;
 
 namespace TEN::Utils
@@ -17,6 +18,7 @@ namespace TEN::Utils
 		BitField();
 		BitField(uint size);
 		BitField(uint size, uint packedBits);
+		BitField(const string& bitString);
 
 		// Getters
 		uint GetSize();
@@ -39,9 +41,12 @@ namespace TEN::Utils
 		bool IsFull();
 		bool IsEmpty();
 
+		// Converters
+		uint   ToPackedBits() const;
+		string ToString() const;
+
 		// Operators
 		// NOTE: packedBits will not be assessed in full if the length of the given BitField object is less than BIT_FIELD_SIZE_MAX.
-		operator uint() const;
 		BitField& operator =(uint packedBits);
 		BitField& operator &=(uint packedBits);
 		BitField& operator |=(uint packedBits);

@@ -3,6 +3,7 @@
 
 #include <limits>
 
+using std::string;
 using std::vector;
 
 namespace TEN::Utils
@@ -33,6 +34,12 @@ namespace TEN::Utils
 		}
 	}
 
+	BitField::BitField(const string& bitString)
+	{
+		for (const char& bit : bitString)
+			this->Bits.push_back((&bit == "1") ? true : false); // TODO: Check.
+	}
+
 	uint BitField::GetSize()
 	{
 		return Bits.size();
@@ -40,7 +47,7 @@ namespace TEN::Utils
 
 	void BitField::Set(const vector<uint>& indices)
 	{
-		for (auto& index : indices)
+		for (const uint& index : indices)
 		{
 			if (index < Bits.size())
 				this->Bits[index] = true;
@@ -59,7 +66,7 @@ namespace TEN::Utils
 
 	void BitField::Clear(const vector<uint>& indices)
 	{
-		for (auto& index : indices)
+		for (const uint& index : indices)
 		{
 			if (index < Bits.size())
 				this->Bits[index] = false;
@@ -78,7 +85,7 @@ namespace TEN::Utils
 	
 	void BitField::Flip(const vector<uint>& indices)
 	{
-		for (auto& index : indices)
+		for (const uint& index : indices)
 		{
 			if (index < Bits.size())
 				this->Bits[index].flip();
@@ -97,7 +104,7 @@ namespace TEN::Utils
 
 	bool BitField::Test(const vector<uint>& indices)
 	{
-		for (auto& index : indices)
+		for (const uint& index : indices)
 		{
 			if (Bits[index])
 				return true;
@@ -113,7 +120,7 @@ namespace TEN::Utils
 
 	bool BitField::TestAny()
 	{
-		for (auto& bit : this->Bits)
+		for (const uint& bit : this->Bits)
 		{
 			if (bit)
 				return true;
@@ -124,7 +131,7 @@ namespace TEN::Utils
 
 	bool BitField::IsFull()
 	{
-		for (auto& bit : this->Bits)
+		for (const uint& bit : this->Bits)
 		{
 			if (!bit)
 				return false;
@@ -135,7 +142,7 @@ namespace TEN::Utils
 
 	bool BitField::IsEmpty()
 	{
-		for (auto& bit : this->Bits)
+		for (const uint& bit : this->Bits)
 		{
 			if (bit)
 				return false;
@@ -144,7 +151,7 @@ namespace TEN::Utils
 		return true;
 	}
 
-	BitField::operator uint() const
+	uint BitField::ToPackedBits() const
 	{
 		uint packedBits = 0;
 		for (uint i = 0; i < Bits.size(); i++)
@@ -157,6 +164,15 @@ namespace TEN::Utils
 		}
 
 		return packedBits;
+	}
+
+	string BitField::ToString() const
+	{
+		auto bitString = string("");
+		for (const uint& bit : this->Bits)
+			bitString += bit ? "1" : "0";
+
+		return bitString;
 	}
 
 	BitField& BitField::operator =(uint packedBits)
