@@ -319,28 +319,34 @@ void TEN::Renderer::Renderer11::DrawLara(RenderView& view, bool transparent)
 	{
 		RendererObject& hairsObj = *m_moveableObjects[ID_HAIR];
 
-		// First matrix is Lara's head matrix, then all 6 hairs matrices. Bones are adjusted at load time for accounting this.
-		m_stItem.World = Matrix::Identity;
-		m_stItem.BonesMatrices[0] = laraObj.AnimationTransforms[LM_HEAD] * m_LaraWorldMatrix;
-
-		for (int i = 0; i < hairsObj.BindPoseTransforms.size(); i++)
+		for (int h = 0; h < HAIR_MAX; h++)
 		{
-			auto* hairs = &Hairs[0][i];
-			Matrix world = Matrix::CreateFromYawPitchRoll(TO_RAD(hairs->pos.Orientation.y), TO_RAD(hairs->pos.Orientation.x), 0) *
-				Matrix::CreateTranslation(hairs->pos.Position.x, hairs->pos.Position.y, hairs->pos.Position.z);
-			m_stItem.BonesMatrices[i + 1] = world;
-			m_stItem.BoneLightModes[i] = LIGHT_MODES::LIGHT_MODE_DYNAMIC;
+			if (!Hairs[h][0].enabled)
+				continue;
+
+			// First matrix is Lara's head matrix, then all 6 hairs matrices. Bones are adjusted at load time for accounting this.
+			m_stItem.World = Matrix::Identity;
+			m_stItem.BonesMatrices[0] = laraObj.AnimationTransforms[LM_HEAD] * m_LaraWorldMatrix;
+
+			for (int i = 0; i < hairsObj.BindPoseTransforms.size(); i++)
+			{
+				auto* hairs = &Hairs[h][i];
+				Matrix world = Matrix::CreateFromYawPitchRoll(TO_RAD(hairs->pos.Orientation.y), TO_RAD(hairs->pos.Orientation.x), 0) *
+					Matrix::CreateTranslation(hairs->pos.Position.x, hairs->pos.Position.y, hairs->pos.Position.z);
+				m_stItem.BonesMatrices[i + 1] = world;
+				m_stItem.BoneLightModes[i] = LIGHT_MODES::LIGHT_MODE_DYNAMIC;
+			}
+
+			m_cbItem.updateData(m_stItem, m_context.Get());
+			BindConstantBufferVS(CB_ITEM, m_cbItem.get());
+			BindConstantBufferPS(CB_ITEM, m_cbItem.get());
+
+			for (int k = 0; k < hairsObj.ObjectMeshes.size(); k++)
+			{
+				RendererMesh* mesh = hairsObj.ObjectMeshes[k];
+				DrawMoveableMesh(item, mesh, room, k, transparent);
+			}
 		}
-
-		m_cbItem.updateData(m_stItem, m_context.Get());
-		BindConstantBufferVS(CB_ITEM, m_cbItem.get());
-		BindConstantBufferPS(CB_ITEM, m_cbItem.get());
-
-		for (int k = 0; k < hairsObj.ObjectMeshes.size(); k++)
-		{
-			RendererMesh* mesh = hairsObj.ObjectMeshes[k];
-			DrawMoveableMesh(item, mesh, room, k, transparent);
-		}	
 	}
 }
 
