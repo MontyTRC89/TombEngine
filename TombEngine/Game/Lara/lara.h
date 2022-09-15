@@ -95,3 +95,4 @@ void LaraWaterSurface(ItemInfo* item, CollisionInfo* coll);
 void LaraUnderwater(ItemInfo* item, CollisionInfo* coll);
 void LaraCheat(ItemInfo* item, CollisionInfo* coll);
 void AnimateLara(ItemInfo* item);
+void PerformAnimCommands(ItemInfo* item, bool frameBased);
