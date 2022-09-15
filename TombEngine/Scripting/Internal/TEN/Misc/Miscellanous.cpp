@@ -80,6 +80,13 @@ namespace Misc
 		SetScreenFadeIn(USE_IF_HAVE(float, speed, 1.0f) / float(FPS));
 	}
 
+	///Check if fade out is complete and screen is completely black.
+	//@treturn bool state of the fade out
+	static bool FadeOutComplete()
+	{
+		return ScreenFadeCurrent == 0.0f;
+	}
+
 	///Move black cinematic bars in from the top and bottom of the game window.
 	//@function SetCineBars
 	//@tparam float height  __(default 30)__ Percentage of the screen to be covered
@@ -125,6 +132,22 @@ namespace Misc
 	static void SetAmbientTrack(std::string const& trackName)
 	{
 		PlaySoundTrack(trackName, SoundTrackType::BGM);
+	}
+
+	///Stop any audio tracks currently playing
+	//@function StopAudioTracks
+	static void StopAudioTracks()
+	{
+		StopSoundTracks();
+	}
+
+	///Stop audio track that is currently playing
+	//@function StopAudioTrack
+	//@tparam bool looped if set, stop looped audio track, if not, stop one-shot audio track
+	static void StopAudioTrack(TypeOrNil<bool> looped)
+	{
+		auto mode = USE_IF_HAVE(bool, looped, false) ? SoundTrackType::BGM : SoundTrackType::OneShot;
+		StopSoundTrack(mode, SOUND_XFADETIME_ONESHOT);
 	}
 
 	/// Play sound effect
@@ -233,6 +256,7 @@ namespace Misc
 
 		table_misc.set_function(ScriptReserved_FadeIn, &FadeIn);
 		table_misc.set_function(ScriptReserved_FadeOut, &FadeOut);
+		table_misc.set_function(ScriptReserved_FadeOutComplete, &FadeOutComplete);
 
 		table_misc.set_function(ScriptReserved_SetCineBars, &SetCineBars);
 
@@ -241,6 +265,8 @@ namespace Misc
 		table_misc.set_function(ScriptReserved_SetAmbientTrack, &SetAmbientTrack);
 
 		table_misc.set_function(ScriptReserved_PlayAudioTrack, &PlayAudioTrack);
+		table_misc.set_function(ScriptReserved_StopAudioTrack, &StopAudioTrack);
+		table_misc.set_function(ScriptReserved_StopAudioTracks, &StopAudioTracks);
 
 		table_misc.set_function(ScriptReserved_PlaySound, &PlaySoundEffect);
 

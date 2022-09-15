@@ -393,7 +393,7 @@ namespace TEN::Renderer
 					RendererMesh *mesh = GetRendererMeshFromTrMesh(&moveable,
 																   &g_Level.Meshes[obj->meshIndex + j],
 																   j, MoveablesIds[i] == ID_LARA_SKIN_JOINTS,
-																   MoveablesIds[i] == ID_LARA_HAIR, &lastVertex, &lastIndex);
+																   MoveablesIds[i] == ID_HAIR, &lastVertex, &lastIndex);
 					moveable.ObjectMeshes.push_back(mesh);
 				}
 
@@ -559,7 +559,7 @@ namespace TEN::Renderer
 							}
 						}
 					}
-					else if (MoveablesIds[i] == ID_LARA_HAIR && skinPresent)
+					else if (MoveablesIds[i] == ID_HAIR && skinPresent)
 					{
 						hairsPresent = true;
 

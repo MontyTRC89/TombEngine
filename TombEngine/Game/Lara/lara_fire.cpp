@@ -303,7 +303,7 @@ GAME_OBJECT_ID WeaponObject(LaraWeaponType weaponType)
 		return ID_HK_ANIM;
 
 	case LaraWeaponType::Flare:
-		return ID_LARA_FLARE_ANIM;
+		return ID_FLARE_ANIM;
 
 	case LaraWeaponType::GrenadeLauncher:
 		return ID_GRENADE_ANIM;
@@ -632,7 +632,7 @@ void LaraGun(ItemInfo* laraItem)
 	case HandStatus::Busy:
 		if (lara->Control.Weapon.GunType == LaraWeaponType::Flare)
 		{
-			if (lara->MeshPtrs[LM_LHAND] == Objects[ID_LARA_FLARE_ANIM].meshIndex + LM_LHAND)
+			if (lara->MeshPtrs[LM_LHAND] == Objects[ID_FLARE_ANIM].meshIndex + LM_LHAND)
 			{
 				lara->Flare.ControlLeft = (lara->Vehicle != NO_ITEM || CheckLaraState((LaraState)laraItem->Animation.ActiveState, FlarePoseStates));
 				DoFlareInHand(laraItem, lara->Flare.Life);
@@ -692,8 +692,8 @@ void InitialiseNewWeapon(ItemInfo* laraItem)
 		break;
 
 	case LaraWeaponType::Flare:
-		lara->RightArm.FrameBase = Objects[ID_LARA_FLARE_ANIM].frameBase;
-		lara->LeftArm.FrameBase = Objects[ID_LARA_FLARE_ANIM].frameBase;
+		lara->RightArm.FrameBase = Objects[ID_FLARE_ANIM].frameBase;
+		lara->LeftArm.FrameBase = Objects[ID_FLARE_ANIM].frameBase;
 
 		if (lara->Control.HandStatus != HandStatus::Free)
 			DrawFlareMeshes(laraItem);
@@ -815,7 +815,7 @@ FireWeaponType FireWeapon(LaraWeaponType weaponType, ItemInfo* targetEntity, Ite
 	auto* lara = GetLaraInfo(originEntity);
 
 	auto& ammo = GetAmmo(originEntity, weaponType);
-	if (ammo.getCount() == 0 && !ammo.HasInfinite())
+	if (ammo.GetCount() == 0 && !ammo.HasInfinite())
 		return FireWeaponType::NoAmmo;
 	if (!ammo.HasInfinite())
 		ammo--;

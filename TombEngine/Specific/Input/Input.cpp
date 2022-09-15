@@ -496,40 +496,44 @@ namespace TEN::Input
 
 		// Handle weapon hotkeys.
 
-		if (KeyMap[KC_1] && lara->Weapons[(int)LaraWeaponType::Pistol].Present)
-			lara->Control.Weapon.RequestGunType = LaraWeaponType::Pistol;
+		if (KeyMap[KC_1] && Lara.Weapons[(int)LaraWeaponType::Pistol].Present)
+			Lara.Control.Weapon.RequestGunType = LaraWeaponType::Pistol;
 
-		if (KeyMap[KC_2] && lara->Weapons[(int)LaraWeaponType::Shotgun].Present)
-			lara->Control.Weapon.RequestGunType = LaraWeaponType::Shotgun;
+		if (KeyMap[KC_2] && Lara.Weapons[(int)LaraWeaponType::Shotgun].Present)
+			Lara.Control.Weapon.RequestGunType = LaraWeaponType::Shotgun;
 
-		if (KeyMap[KC_3] && lara->Weapons[(int)LaraWeaponType::Revolver].Present)
-			lara->Control.Weapon.RequestGunType = LaraWeaponType::Revolver;
+		if (KeyMap[KC_3] && Lara.Weapons[(int)LaraWeaponType::Uzi].Present)
+			Lara.Control.Weapon.RequestGunType = LaraWeaponType::Uzi;
 
-		if (KeyMap[KC_4] && lara->Weapons[(int)LaraWeaponType::Uzi].Present)
-			lara->Control.Weapon.RequestGunType = LaraWeaponType::Uzi;
+		if (KeyMap[KC_4] && Lara.Weapons[(int)LaraWeaponType::Revolver].Present)
+			Lara.Control.Weapon.RequestGunType = LaraWeaponType::Revolver;
 
-		if (KeyMap[KC_5] && lara->Weapons[(int)LaraWeaponType::HarpoonGun].Present)
-			lara->Control.Weapon.RequestGunType = LaraWeaponType::HarpoonGun;
+		if (KeyMap[KC_5] && Lara.Weapons[(int)LaraWeaponType::GrenadeLauncher].Present)
+			Lara.Control.Weapon.RequestGunType = LaraWeaponType::GrenadeLauncher;
 
-		if (KeyMap[KC_6] && lara->Weapons[(int)LaraWeaponType::HK].Present)
-			lara->Control.Weapon.RequestGunType = LaraWeaponType::HK;
+		if (KeyMap[KC_6] && Lara.Weapons[(int)LaraWeaponType::Crossbow].Present)
+			Lara.Control.Weapon.RequestGunType = LaraWeaponType::Crossbow;
 
-		if (KeyMap[KC_7] && lara->Weapons[(int)LaraWeaponType::RocketLauncher].Present)
-			lara->Control.Weapon.RequestGunType = LaraWeaponType::RocketLauncher;
+		if (KeyMap[KC_7] && Lara.Weapons[(int)LaraWeaponType::HarpoonGun].Present)
+			Lara.Control.Weapon.RequestGunType = LaraWeaponType::HarpoonGun;
 
-		if (KeyMap[KC_8] && lara->Weapons[(int)LaraWeaponType::GrenadeLauncher].Present)
-			lara->Control.Weapon.RequestGunType = LaraWeaponType::GrenadeLauncher;
+		if (KeyMap[KC_8] && Lara.Weapons[(int)LaraWeaponType::HK].Present)
+			Lara.Control.Weapon.RequestGunType = LaraWeaponType::HK;
+
+		if (KeyMap[KC_9] && Lara.Weapons[(int)LaraWeaponType::RocketLauncher].Present)
+			Lara.Control.Weapon.RequestGunType = LaraWeaponType::RocketLauncher;
 
 		// Handle medipack hotkeys.
+		// TODO: [ and ] are temporary. Use modifiers?
 		static bool dbMedipack = true;
-		if ((KeyMap[KC_0] || KeyMap[KC_9]) && dbMedipack)
+		if ((KeyMap[KC_LBRACKET] || KeyMap[KC_RBRACKET]) && dbMedipack)
 		{
 			if ((item->HitPoints > 0 && item->HitPoints < LARA_HEALTH_MAX) ||
 				lara->PoisonPotency)
 			{
 				bool hasUsedMedipack = false;
 
-				if (KeyMap[KC_0] &&
+				if (KeyMap[KC_LBRACKET] &&
 					lara->Inventory.TotalSmallMedipacks != 0)
 				{
 					hasUsedMedipack = true;
@@ -541,7 +545,7 @@ namespace TEN::Input
 					if (lara->Inventory.TotalSmallMedipacks != -1)
 						lara->Inventory.TotalSmallMedipacks--;
 				}
-				else if (KeyMap[KC_9] &&
+				else if (KeyMap[KC_RBRACKET] &&
 					lara->Inventory.TotalLargeMedipacks != 0)
 				{
 					hasUsedMedipack = true;
@@ -559,7 +563,7 @@ namespace TEN::Input
 				}
 			}
 		}
-		dbMedipack = (KeyMap[KC_0] || KeyMap[KC_9]) ? false : true;
+		dbMedipack = (KeyMap[KC_LBRACKET] || KeyMap[KC_RBRACKET]) ? false : true;
 
 		// Toggle fullscreen.
 		static bool dbFullscreen = true;

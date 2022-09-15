@@ -3,10 +3,10 @@
 #include <string>
 
 #include "Game/gui.h"
-#include "ItemEnumPair.h"
 #include "Rotation/Rotation.h"
-
 using namespace TEN::Gui;
+
+enum GAME_OBJECT_ID : short;
 
 static const std::unordered_map<std::string, RotationFlags> kRotAxes
 {
@@ -29,7 +29,7 @@ namespace sol
 
 struct InventoryItem
 {
-	InventoryItem(std::string const & a_name, ItemEnumPair a_slot, short a_yOffset, float a_scale, Rotation const & a_rot, RotationFlags a_rotationFlags, int a_meshBits, ItemOptions a_actions);
+	InventoryItem(std::string const & a_name, GAME_OBJECT_ID a_slot, short a_yOffset, float a_scale, Rotation const & a_rot, RotationFlags a_rotationFlags, int a_meshBits, ItemOptions a_actions);
 
 	static void Register(sol::table& lua);
 
@@ -43,5 +43,4 @@ struct InventoryItem
 	ItemOptions action{ ItemOptions::OPT_USE };
 
 	void SetAction(ItemOptions a_action);
-	void SetSlot(ItemEnumPair a_slot);
 };

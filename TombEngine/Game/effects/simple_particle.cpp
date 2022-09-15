@@ -59,7 +59,7 @@ namespace TEN::Effects
 			p.room = boat->RoomNumber;
 			p.ageRate = GenerateFloat(0.9f, 1.3f);
 			p.worldPosition = { x, y, z };
-			p.sequence = ID_MOTOR_BOAT_FOAM_SPRITES;
+			p.sequence = ID_MOTORBOAT_FOAM_SPRITES;
 			p.size = GenerateFloat(256, 512);
 		}
 	}
