@@ -28,6 +28,7 @@ Version 1.0.2
 * Fix incorrect pole mounting.
 * Fix zeroed forward velocity upon landing.
 * Fix incorrect behaviour when falling on statics from the top after monkeyswing.
+* Fix missing animcommand calls on first animation frame.
 * Fix 1-frame turn rate delays.
 * Fix occasional leave event calls when moving closer to volumes.
 * Fix incorrect viewport size in windowed mode.
