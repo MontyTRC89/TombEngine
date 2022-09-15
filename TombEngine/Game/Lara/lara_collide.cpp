@@ -51,6 +51,23 @@ bool LaraDeflectEdge(ItemInfo* item, CollisionInfo* coll)
 	return false;
 }
 
+bool LaraDeflectTopSide(ItemInfo* item, CollisionInfo* coll)
+{
+	// HACK: If we are falling down, collision is CT_CLAMP and
+	// HitStatic flag is set, it means we've collided static from the top.
+
+	if (coll->CollisionType == CT_CLAMP &&
+		coll->HitStatic && item->Animation.Velocity.y > 0)
+	{
+		SetAnimation(item, LA_JUMP_WALL_SMASH_START, 1);
+		Rumble(0.5f, 0.15f);
+
+		return true;
+	}
+
+	return false;
+}
+
 bool LaraDeflectEdgeJump(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
