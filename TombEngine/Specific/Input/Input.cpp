@@ -524,16 +524,15 @@ namespace TEN::Input
 			Lara.Control.Weapon.RequestGunType = LaraWeaponType::RocketLauncher;
 
 		// Handle medipack hotkeys.
-		// TODO: [ and ] are temporary. Use modifiers?
 		static bool dbMedipack = true;
-		if ((KeyMap[KC_LBRACKET] || KeyMap[KC_RBRACKET]) && dbMedipack)
+		if ((KeyMap[KC_MINUS] || KeyMap[KC_EQUALS]) && dbMedipack)
 		{
 			if ((item->HitPoints > 0 && item->HitPoints < LARA_HEALTH_MAX) ||
 				lara->PoisonPotency)
 			{
 				bool hasUsedMedipack = false;
 
-				if (KeyMap[KC_LBRACKET] &&
+				if (KeyMap[KC_MINUS] &&
 					lara->Inventory.TotalSmallMedipacks != 0)
 				{
 					hasUsedMedipack = true;
@@ -545,7 +544,7 @@ namespace TEN::Input
 					if (lara->Inventory.TotalSmallMedipacks != -1)
 						lara->Inventory.TotalSmallMedipacks--;
 				}
-				else if (KeyMap[KC_RBRACKET] &&
+				else if (KeyMap[KC_EQUALS] &&
 					lara->Inventory.TotalLargeMedipacks != 0)
 				{
 					hasUsedMedipack = true;
@@ -563,7 +562,7 @@ namespace TEN::Input
 				}
 			}
 		}
-		dbMedipack = (KeyMap[KC_LBRACKET] || KeyMap[KC_RBRACKET]) ? false : true;
+		dbMedipack = (KeyMap[KC_MINUS] || KeyMap[KC_EQUALS]) ? false : true;
 
 		// Toggle fullscreen.
 		static bool dbFullscreen = true;
