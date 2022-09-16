@@ -44,8 +44,9 @@ void AnimateLara(ItemInfo* item)
 		item->Animation.ActiveState = anim->ActiveState;
 	}
 
-	int frameCount = (anim->frameEnd - anim->frameBase) + 1;
-	int currentFrame = (item->Animation.FrameNumber - anim->frameBase) + 1;
+	int frameCount = anim->frameEnd - anim->frameBase;
+	frameCount = (frameCount > 0) ? frameCount : 1;
+	int currentFrame = item->Animation.FrameNumber - anim->frameBase;
 
 	if (item->Animation.IsAirborne)
 	{
@@ -254,8 +255,9 @@ void AnimateItem(ItemInfo* item)
 			item->Animation.RequiredState = 0;
 	}
 
-	int frameCount = (anim->frameEnd - anim->frameBase) + 1;
-	int currentFrame = (item->Animation.FrameNumber - anim->frameBase) + 1;
+	int frameCount = anim->frameEnd - anim->frameBase;
+	frameCount = (frameCount > 0) ? frameCount : 1;
+	int currentFrame = item->Animation.FrameNumber - anim->frameBase;
 
 	if (item->Animation.IsAirborne)
 	{
