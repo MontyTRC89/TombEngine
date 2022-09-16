@@ -78,7 +78,7 @@ public:
 	void								RemoveCallback(CallbackPoint point, LevelFunc const & lf);
 
 	void								ResetScripts(bool clearGameVars) override;
-	void								ShortenTENCalls();
+	void								ShortenTENCalls() override;
 
 	sol::object							GetLevelFuncsMember(sol::table tab, std::string const& luaName);
 
