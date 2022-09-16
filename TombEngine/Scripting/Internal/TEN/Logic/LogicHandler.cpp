@@ -602,15 +602,14 @@ void LogicHandler::ShortenTENCalls()
 	ShortenInner(TEN))";
 
 	ExecuteString(str);
+
+	m_shortenedCalls = true;
 }
 
 void LogicHandler::ExecuteScriptFile(const std::string & luaFilename)
 {
 	if (!m_shortenedCalls)
-	{
 		ShortenTENCalls();
-		m_shortenedCalls = true;
-	}
 
 	m_handler.ExecuteScript(luaFilename);
 }
