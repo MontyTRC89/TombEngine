@@ -22,6 +22,8 @@ void AnimateLara(ItemInfo* item)
 {
 	auto* lara = GetLaraInfo(item);
 
+	PerformAnimCommands(item, true);
+
 	item->Animation.FrameNumber++;
 
 	auto* anim = &g_Level.Anims[item->Animation.AnimNumber];
@@ -33,47 +35,7 @@ void AnimateLara(ItemInfo* item)
 
 	if (item->Animation.FrameNumber > anim->frameEnd)
 	{
-		if (anim->numberCommands > 0)
-		{
-			short* cmd = &g_Level.Commands[anim->commandIndex];
-			for (int i = anim->numberCommands; i > 0; i--)
-			{
-				switch (*(cmd++))
-				{
-				case COMMAND_MOVE_ORIGIN:
-					TranslateItem(item, item->Pose.Orientation.y, cmd[2], cmd[1], cmd[0]);
-					UpdateItemRoom(item, -LARA_HEIGHT / 2, -cmd[0], -cmd[2]);
-					cmd += 3;
-					break;
-
-				case COMMAND_JUMP_VELOCITY:
-					item->Animation.Velocity.y = *(cmd++);
-					item->Animation.Velocity.z = *(cmd++);
-					item->Animation.IsAirborne = true;
-					if (lara->Control.CalculatedJumpVelocity)
-					{
-						item->Animation.Velocity.y = lara->Control.CalculatedJumpVelocity;
-						lara->Control.CalculatedJumpVelocity = 0;
-					}
-
-					break;
-
-				case COMMAND_ATTACK_READY:
-					if (lara->Control.HandStatus != HandStatus::Special)
-						lara->Control.HandStatus = HandStatus::Free;
-
-					break;
-
-				case COMMAND_SOUND_FX:
-				case COMMAND_EFFECT:
-					cmd += 2;
-					break;
-
-				default:
-					break;
-				}
-			}
-		}
+		PerformAnimCommands(item, false);
 
 		item->Animation.AnimNumber = anim->jumpAnimNum;
 		item->Animation.FrameNumber = anim->jumpFrameNum;
@@ -82,70 +44,8 @@ void AnimateLara(ItemInfo* item)
 		item->Animation.ActiveState = anim->ActiveState;
 	}
 
-	if (anim->numberCommands > 0)
-	{
-		short* cmd = &g_Level.Commands[anim->commandIndex];
-
-		for (int i = anim->numberCommands; i > 0; i--)
-		{
-			switch (*(cmd++))
-			{
-			case COMMAND_MOVE_ORIGIN:
-				cmd += 3;
-				break;
-
-			case COMMAND_JUMP_VELOCITY:
-				cmd += 2;
-				break;
-
-			case COMMAND_SOUND_FX:
-				if (item->Animation.FrameNumber != *cmd)
-				{
-					cmd += 2;
-					break;
-				}
-				else
-				{
-					bool inWater = (cmd[1] & 0x8000) != 0;
-					bool inDry   = (cmd[1] & 0x4000) != 0;
-					bool always  = (inWater && inDry) || (!inWater && !inDry);
-
-					SoundEnvironment condition = SoundEnvironment::Always;
-					if (inWater) condition = SoundEnvironment::Water;
-					if (inDry)   condition = SoundEnvironment::Land;
-					if (always)  condition = SoundEnvironment::Always;
-
-					if (condition == SoundEnvironment::Always ||
-						(condition == SoundEnvironment::Land && (lara->WaterSurfaceDist >= -SHALLOW_WATER_START_LEVEL || lara->WaterSurfaceDist == NO_HEIGHT)) ||
-						(condition == SoundEnvironment::Water && lara->WaterSurfaceDist <  -SHALLOW_WATER_START_LEVEL && lara->WaterSurfaceDist != NO_HEIGHT && !TestEnvironment(ENV_FLAG_SWAMP, item)))
-					{
-						SoundEffect(cmd[1] & 0x3FFF, &item->Pose, SoundEnvironment::Always);
-					}
-				}
-
-				cmd += 2;
-				break;
-
-			case COMMAND_EFFECT:
-				if (item->Animation.FrameNumber != *cmd)
-				{
-					cmd += 2;
-					break;
-				}
-
-				DoFlipEffect((cmd[1] & 0x3FFF), item);
-
-				cmd += 2;
-				break;
-
-			default:
-				break;
-
-			}
-		}
-	}
-
-	int frameCount = (anim->frameEnd - anim->frameBase) + 1;
+	int frameCount = anim->frameEnd - anim->frameBase;
+	frameCount = (frameCount > 0) ? frameCount : 1;
 	int currentFrame = item->Animation.FrameNumber - anim->frameBase;
 
 	if (item->Animation.IsAirborne)
@@ -194,14 +94,140 @@ void AnimateLara(ItemInfo* item)
 	g_Renderer.UpdateLaraAnimations(true);
 }
 
+void PerformAnimCommands(ItemInfo* item, bool frameBased)
+{
+	auto* anim = &g_Level.Anims[item->Animation.AnimNumber];
+
+	if (anim->numberCommands == 0)
+		return;
+
+	short* cmd = &g_Level.Commands[anim->commandIndex];
+
+	for (int i = anim->numberCommands; i > 0; i--)
+	{
+		auto animCommand = (AnimCommandType)cmd[0];
+		cmd++;
+
+		switch (animCommand)
+		{
+		case AnimCommandType::MoveOrigin:
+			if (!frameBased)
+			{
+				TranslateItem(item, item->Pose.Orientation.y, cmd[2], cmd[1], cmd[0]);
+				auto* bounds = GetBoundsAccurate(item);
+				UpdateItemRoom(item, -bounds->Height() / 2, -cmd[0], -cmd[2]);
+			}
+			cmd += 3;
+			break;
+
+		case AnimCommandType::JumpVelocity:
+			if (!frameBased)
+			{
+				item->Animation.Velocity.y = cmd[0];
+				item->Animation.Velocity.z = cmd[1];
+				item->Animation.IsAirborne = true;
+
+				if (item->IsLara())
+				{
+					auto* lara = GetLaraInfo(item);
+
+					if (lara->Control.CalculatedJumpVelocity)
+					{
+						item->Animation.Velocity.y = lara->Control.CalculatedJumpVelocity;
+						lara->Control.CalculatedJumpVelocity = 0;
+					}
+				}
+			}
+			cmd += 2;
+			break;
+
+		case AnimCommandType::Deactivate:
+			if (!frameBased)
+			{
+				if (Objects[item->ObjectNumber].intelligent && !item->AfterDeath)
+					item->AfterDeath = 1;
+
+				item->Status = ITEM_DEACTIVATED;
+			}
+			break;
+
+		case AnimCommandType::AttackReady:
+			if (!frameBased && item->IsLara())
+			{
+				auto* lara = GetLaraInfo(item);
+				if (lara->Control.HandStatus != HandStatus::Special)
+					lara->Control.HandStatus = HandStatus::Free;
+			}
+			break;
+
+		case AnimCommandType::SoundEffect:
+			if (frameBased && item->Animation.FrameNumber == cmd[0])
+			{
+				if (!Objects[item->ObjectNumber].waterCreature)
+				{
+					bool inWater = (cmd[1] & 0x8000) != 0;
+					bool inDry   = (cmd[1] & 0x4000) != 0;
+					bool always  = (inWater && inDry) || (!inWater && !inDry);
+
+					if (item->IsLara())
+					{
+						auto* lara = GetLaraInfo(item);
+
+						if (always ||
+						   (inDry && (lara->WaterSurfaceDist >= -SHALLOW_WATER_START_LEVEL || lara->WaterSurfaceDist == NO_HEIGHT)) ||
+						   (inWater && lara->WaterSurfaceDist < -SHALLOW_WATER_START_LEVEL && lara->WaterSurfaceDist != NO_HEIGHT && !TestEnvironment(ENV_FLAG_SWAMP, item)))
+						{
+							SoundEffect(cmd[1] & 0x3FFF, &item->Pose, SoundEnvironment::Always);
+						}
+					}
+					else
+					{
+						if (item->RoomNumber == NO_ROOM)
+						{
+							SoundEffect(cmd[1] & 0x3FFF, &item->Pose, SoundEnvironment::Always);
+						}
+						else if (TestEnvironment(ENV_FLAG_WATER, item))
+						{
+							if (always || (inWater && TestEnvironment(ENV_FLAG_WATER, Camera.pos.roomNumber)))
+								SoundEffect(cmd[1] & 0x3FFF, &item->Pose, SoundEnvironment::Always);
+						}
+						else if (always || (inDry && !TestEnvironment(ENV_FLAG_WATER, Camera.pos.roomNumber) && !TestEnvironment(ENV_FLAG_SWAMP, Camera.pos.roomNumber)))
+							SoundEffect(cmd[1] & 0x3FFF, &item->Pose, SoundEnvironment::Always);
+					}
+				}
+				else
+				{
+					SoundEffect(cmd[1] & 0x3FFF, &item->Pose, TestEnvironment(ENV_FLAG_WATER, item) ? SoundEnvironment::Water : SoundEnvironment::Land);
+				}
+			}
+			cmd += 2;
+			break;
+
+		case AnimCommandType::Flipeffect:
+			if (frameBased && item->Animation.FrameNumber == cmd[0])
+			{
+				DoFlipEffect((cmd[1] & 0x3FFF), item);
+			}
+			cmd += 2;
+			break;
+
+		default:
+			break;
+		}
+	}
+}
+
 void AnimateItem(ItemInfo* item)
 {
 	item->TouchBits = NO_JOINT_BITS;
 	item->HitStatus = false;
 
+	PerformAnimCommands(item, true);
+
 	item->Animation.FrameNumber++;
 
 	auto* anim = &g_Level.Anims[item->Animation.AnimNumber];
+
 	if (anim->numberChanges > 0 && GetChange(item, anim))
 	{
 		anim = &g_Level.Anims[item->Animation.AnimNumber];
@@ -213,41 +239,7 @@ void AnimateItem(ItemInfo* item)
 
 	if (item->Animation.FrameNumber > anim->frameEnd)
 	{
-		if (anim->numberCommands > 0)
-		{
-			short* cmd = &g_Level.Commands[anim->commandIndex];
-			for (int i = anim->numberCommands; i > 0; i--)
-			{
-				switch (*(cmd++))
-				{
-				case COMMAND_MOVE_ORIGIN:
-					TranslateItem(item, item->Pose.Orientation.y, cmd[2], cmd[1], cmd[0]);
-					cmd += 3;
-					break;
-
-				case COMMAND_JUMP_VELOCITY:
-					item->Animation.Velocity.y = *(cmd++);
-					item->Animation.Velocity.z = *(cmd++);
-					item->Animation.IsAirborne = true;
-					break;
-
-				case COMMAND_DEACTIVATE:
-					if (Objects[item->ObjectNumber].intelligent && !item->AfterDeath)
-						item->AfterDeath = 1;
-
-					item->Status = ITEM_DEACTIVATED;
-					break;
-
-				case COMMAND_SOUND_FX:
-				case COMMAND_EFFECT:
-					cmd += 2;
-					break;
-
-				default:
-					break;
-				}
-			}
-		}
+		PerformAnimCommands(item, false);
 
 		item->Animation.AnimNumber = anim->jumpAnimNum;
 		item->Animation.FrameNumber = anim->jumpFrameNum;
@@ -263,77 +255,8 @@ void AnimateItem(ItemInfo* item)
 			item->Animation.RequiredState = 0;
 	}
 
-	if (anim->numberCommands > 0)
-	{
-		short* cmd = &g_Level.Commands[anim->commandIndex];
-
-		for (int i = anim->numberCommands; i > 0; i--)
-		{
-			switch (*(cmd++))
-			{
-			case COMMAND_MOVE_ORIGIN:
-				cmd += 3;
-				break;
-
-			case COMMAND_JUMP_VELOCITY:
-				cmd += 2;
-				break;
-
-			case COMMAND_SOUND_FX:
-				if (item->Animation.FrameNumber != *cmd)
-				{
-					cmd += 2;
-					break;
-				}
-
-				if (!Objects[item->ObjectNumber].waterCreature)
-				{
-					bool inWater = (cmd[1] & 0x8000) != 0;
-					bool inDry   = (cmd[1] & 0x4000) != 0;
-					bool always  = (inWater && inDry) || (!inWater && !inDry);
-
-					if (item->RoomNumber == NO_ROOM)
-					{
-						item->Pose.Position.x = LaraItem->Pose.Position.x;
-						item->Pose.Position.y = LaraItem->Pose.Position.y - 762;
-						item->Pose.Position.z = LaraItem->Pose.Position.z;
-
-						SoundEffect(cmd[1] & 0x3FFF, &item->Pose, SoundEnvironment::Always);
-					}
-					else if (TestEnvironment(ENV_FLAG_WATER, item))
-					{
-						if (always || (inWater && TestEnvironment(ENV_FLAG_WATER, Camera.pos.roomNumber)))
-							SoundEffect(cmd[1] & 0x3FFF, &item->Pose, SoundEnvironment::Always);
-					}
-					else if (always || (inDry && !TestEnvironment(ENV_FLAG_WATER, Camera.pos.roomNumber) && !TestEnvironment(ENV_FLAG_SWAMP, Camera.pos.roomNumber)))
-						SoundEffect(cmd[1] & 0x3FFF, &item->Pose, SoundEnvironment::Always);
-				}
-				else
-				{
-					SoundEffect(cmd[1] & 0x3FFF, &item->Pose, TestEnvironment(ENV_FLAG_WATER, item) ? SoundEnvironment::Water : SoundEnvironment::Land);
-				}
-
-				break;
-
-			case COMMAND_EFFECT:
-				if (item->Animation.FrameNumber != *cmd)
-				{
-					cmd += 2;
-					break;
-				}
-
-				DoFlipEffect((cmd[1] & 0x3FFF), item);
-
-				cmd += 2;
-				break;
-
-			default:
-				break;
-			}
-		}
-	}
-
-	int frameCount = (anim->frameEnd - anim->frameBase) + 1;
+	int frameCount = anim->frameEnd - anim->frameBase;
+	frameCount = (frameCount > 0) ? frameCount : 1;
 	int currentFrame = item->Animation.FrameNumber - anim->frameBase;
 
 	if (item->Animation.IsAirborne)

@@ -282,7 +282,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	try 
 	{
 		g_GameFlow = ScriptInterfaceState::CreateFlow();
-		g_GameFlow->LoadFlowScript();
 		g_GameScriptEntities = ScriptInterfaceState::CreateObjectsHandler();
 		g_GameStringsHandler = ScriptInterfaceState::CreateStringsHandler();
 
@@ -293,6 +292,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		// are added to a hierarchy in the REAL global table, not the fake
 		// hidden one.
 		g_GameScript = ScriptInterfaceState::CreateGame();
+
+		//todo Major hack. This should not be needed to leak outside of
+		//LogicHandler internals. In a future version stuff from FlowHandler
+		//should be moved to LogicHandler or vice versa to make this stuff
+		//less fragile (squidshire, 16/09/22)
+		g_GameScript->ShortenTENCalls();
+		g_GameFlow->LoadFlowScript();
 	}
 	catch (TENScriptException const& e)
 	{

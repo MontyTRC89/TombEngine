@@ -29,7 +29,7 @@ void Static::Register(sol::table & parent)
 		sol::meta_function::index, index_error,
 		sol::meta_function::new_index, newindex_error,
 
-		/// Enable the static, e.g. in cases when it was shattered or manually disabled before.
+		/// Enable the static, for cases when it was shattered or manually disabled before.
 		// @function Static:Enable
 		ScriptReserved_Enable, &Static::Enable,
 
@@ -49,6 +49,7 @@ void Static::Register(sol::table & parent)
 
 		/// Set static mesh solid collision state
 		// @function Static:SetSolid
+		// @tparam bool solidState if set, collision will be solid, if not, will be soft
 		ScriptReserved_SetSolid, & Static::SetSolid,
 
 		/// Get the static's position

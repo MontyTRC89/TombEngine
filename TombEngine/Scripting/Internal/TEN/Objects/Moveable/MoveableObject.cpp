@@ -171,13 +171,31 @@ void Moveable::Register(sol::table & parent)
 // @function Moveable:GetStatus
 // @treturn int a number representing the status of the object
 	ScriptReserved_GetStatus, &Moveable::GetStatus,
-		
+
+/// Set the name of the function to be called when the moveable is shot by Lara
+// Note that this will be triggered twice when shot with both pistols at once. 
+// @function Moveable:SetOnHit
+// @tparam function callback function in LevelFuncs hierarchy to call when moveable is shot
 	ScriptReserved_SetOnHit, &Moveable::SetOnHit,
 
+/// Set the function to be called called when this moveable collides with another moveable
+// @function Moveable:SetOnCollidedWithObject
+// @tparam function func callback function to be called (must be in LevelFuncs hierarchy)
 	ScriptReserved_SetOnCollidedWithObject, &Moveable::SetOnCollidedWithObject,
 
+/// Set the function called when this moveable collides with room geometry (e.g. a wall or floor)
+// @function Moveable:SetOnCollidedWithRoom
+// @tparam function func callback function to be called (must be in LevelFuncs hierarchy)
 	ScriptReserved_SetOnCollidedWithRoom, &Moveable::SetOnCollidedWithRoom,
 
+/// Set the name of the function to be called when the moveable is destroyed/killed
+// Note that enemy death often occurs at the end of an animation, and not at the exact moment
+// the enemy's HP becomes zero.
+// @function Moveable:SetOnKilled
+// @tparam function callback function in LevelFuncs hierarchy to call when enemy is killed
+// @usage
+// LevelFuncs.baddyKilled = function(theBaddy) print("You killed a baddy!") end
+// baddy:SetOnKilled(LevelFuncs.baddyKilled)
 	ScriptReserved_SetOnKilled, &Moveable::SetOnKilled,
 
 /// Retrieve the object ID
@@ -224,6 +242,20 @@ void Moveable::Register(sol::table & parent)
 // @function Moveable:GetFrame
 // @treturn int the current frame of the active animation
 	ScriptReserved_GetFrameNumber, &Moveable::GetFrameNumber,
+
+/// Set the object's velocity to specified value.
+// In most cases, only Z and Y components are used as forward and vertical velocity.
+// In some cases, primarily NPCs, X component is used as side velocity.
+// @function Moveable:SetVelocity
+// @tparam Vec3 velocity velocity represented as vector 
+	ScriptReserved_SetVelocity, &Moveable::SetVelocity,
+		
+/// Get the object's velocity.
+// In most cases, only Z and Y components are used as forward and vertical velocity.
+// In some cases, primarily NPCs, X component is used as side velocity.
+// @function Moveable:GetVelocity
+// @treturn Vec3 current object velocity
+	ScriptReserved_GetVelocity, &Moveable::GetVelocity,
 
 /// Set frame number.
 // This will move the animation to the given frame.
@@ -457,39 +489,21 @@ void SetLevelFuncCallback(TypeOrNil<LevelFunc> const & cb, std::string const & c
 
 }
 
-/// Set the name of the function to be called when the moveable is shot by Lara
-// Note that this will be triggered twice when shot with both pistols at once. 
-// @function Moveable:SetOnHit
-// @tparam function callback function in LevelFuncs hierarchy to call when moveable is shot
 void Moveable::SetOnHit(TypeOrNil<LevelFunc> const & cb)
 {
 	SetLevelFuncCallback(cb, ScriptReserved_SetOnHit, *this, m_item->LuaCallbackOnHitName);
 }
 
-/// Set the name of the function to be called when the moveable is destroyed/killed
-// Note that enemy death often occurs at the end of an animation, and not at the exact moment
-// the enemy's HP becomes zero.
-// @function Moveable:SetOnKilled
-// @tparam function callback function in LevelFuncs hierarchy to call when enemy is killed
-// @usage
-// LevelFuncs.baddyKilled = function(theBaddy) print("You killed a baddy!") end
-// baddy:SetOnKilled(LevelFuncs.baddyKilled)
 void Moveable::SetOnKilled(TypeOrNil<LevelFunc> const & cb)
 {
 	SetLevelFuncCallback(cb, ScriptReserved_SetOnKilled, *this, m_item->LuaCallbackOnKilledName);
 }
 
-/// Set the function to be called called when this moveable collides with another moveable
-// @function Moveable:SetOnCollidedWithObject
-// @tparam function func callback function to be called (must be in LevelFuncs hierarchy)
 void Moveable::SetOnCollidedWithObject(TypeOrNil<LevelFunc> const & cb)
 {
 	SetLevelFuncCallback(cb, ScriptReserved_SetOnCollidedWithObject, *this, m_item->LuaCallbackOnCollidedWithObjectName);
 }
 
-/// Set the function called when this moveable collides with room geometry (e.g. a wall or floor)
-// @function Moveable:SetOnCollidedWithRoom
-// @tparam function func callback function to be called (must be in LevelFuncs hierarchy)
 void Moveable::SetOnCollidedWithRoom(TypeOrNil<LevelFunc> const & cb)
 {
 	SetLevelFuncCallback(cb, ScriptReserved_SetOnCollidedWithRoom, *this, m_item->LuaCallbackOnCollidedWithRoomName);
@@ -690,6 +704,18 @@ void Moveable::SetAnimNumber(int animNumber)
 int Moveable::GetFrameNumber() const
 {
 	return m_item->Animation.FrameNumber - g_Level.Anims[m_item->Animation.AnimNumber].frameBase;
+}
+
+Vec3 Moveable::GetVelocity() const
+{
+	return Vec3(int(round(m_item->Animation.Velocity.x)),
+				int(round(m_item->Animation.Velocity.y)),
+				int(round(m_item->Animation.Velocity.z)));
+}
+
+void Moveable::SetVelocity(Vec3 velocity)
+{
+	m_item->Animation.Velocity = Vector3(velocity.x, velocity.y, velocity.z);
 }
 
 void Moveable::SetFrameNumber(int frameNumber)
