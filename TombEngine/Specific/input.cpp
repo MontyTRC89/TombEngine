@@ -529,29 +529,32 @@ namespace TEN::Input
 		if (KeyMap[KC_2] && Lara.Weapons[(int)LaraWeaponType::Shotgun].Present == true)
 			Lara.Control.Weapon.RequestGunType = LaraWeaponType::Shotgun;
 
-		if (KeyMap[KC_3] && Lara.Weapons[(int)LaraWeaponType::Revolver].Present == true)
-			Lara.Control.Weapon.RequestGunType = LaraWeaponType::Revolver;
-
-		if (KeyMap[KC_4] && Lara.Weapons[(int)LaraWeaponType::Uzi].Present == true)
+		if (KeyMap[KC_3] && Lara.Weapons[(int)LaraWeaponType::Uzi].Present == true)
 			Lara.Control.Weapon.RequestGunType = LaraWeaponType::Uzi;
 
-		if (KeyMap[KC_5] && Lara.Weapons[(int)LaraWeaponType::HarpoonGun].Present == true)
+		if (KeyMap[KC_4] && Lara.Weapons[(int)LaraWeaponType::Revolver].Present == true)
+			Lara.Control.Weapon.RequestGunType = LaraWeaponType::Revolver;
+
+		if (KeyMap[KC_5] && Lara.Weapons[(int)LaraWeaponType::GrenadeLauncher].Present == true)
+			Lara.Control.Weapon.RequestGunType = LaraWeaponType::GrenadeLauncher;
+
+		if (KeyMap[KC_6] && Lara.Weapons[(int)LaraWeaponType::Crossbow].Present == true)
+			Lara.Control.Weapon.RequestGunType = LaraWeaponType::Crossbow;
+
+		if (KeyMap[KC_7] && Lara.Weapons[(int)LaraWeaponType::HarpoonGun].Present == true)
 			Lara.Control.Weapon.RequestGunType = LaraWeaponType::HarpoonGun;
 
-		if (KeyMap[KC_6] && Lara.Weapons[(int)LaraWeaponType::HK].Present == true)
+		if (KeyMap[KC_8] && Lara.Weapons[(int)LaraWeaponType::HK].Present == true)
 			Lara.Control.Weapon.RequestGunType = LaraWeaponType::HK;
 
-		if (KeyMap[KC_7] && Lara.Weapons[(int)LaraWeaponType::RocketLauncher].Present == true)
+		if (KeyMap[KC_9] && Lara.Weapons[(int)LaraWeaponType::RocketLauncher].Present == true)
 			Lara.Control.Weapon.RequestGunType = LaraWeaponType::RocketLauncher;
-
-		if (KeyMap[KC_8] && Lara.Weapons[(int)LaraWeaponType::GrenadeLauncher].Present == true)
-			Lara.Control.Weapon.RequestGunType = LaraWeaponType::GrenadeLauncher;
 
 		// Handle medipack hotkeys
 
 		static int medipackTimeout = 0;
 
-		if (KeyMap[KC_0])
+		if (KeyMap[KC_MINUS])
 		{
 			if (medipackTimeout == 0)
 			{
@@ -578,7 +581,7 @@ namespace TEN::Input
 				}
 			}
 		}
-		else if (KeyMap[KC_9])
+		else if (KeyMap[KC_EQUALS])
 		{
 			if (medipackTimeout == 0)
 			{

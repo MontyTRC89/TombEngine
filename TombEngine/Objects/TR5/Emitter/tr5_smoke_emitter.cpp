@@ -34,7 +34,7 @@ void InitialiseSmokeEmitter(short itemNumber)
 		else
 			item->Pose.Position.z += CLICK(2);
 	}
-	else if (item->ObjectNumber != ID_STEAM_EMITTER)
+	else if (item->ObjectNumber != ID_SMOKE_EMITTER)
 		return;
 	else if (item->TriggerFlags & 8)
 	{
@@ -107,7 +107,7 @@ void SmokeEmitterControl(short itemNumber)
 		return;
 	}
 
-	if (item->ObjectNumber == ID_STEAM_EMITTER && item->TriggerFlags & 8)
+	if (item->ObjectNumber == ID_SMOKE_EMITTER && item->TriggerFlags & 8)
 	{
 		bool normal = false;
 
@@ -188,7 +188,7 @@ void SmokeEmitterControl(short itemNumber)
 			return;
 	}
 
-	if (!(Wibble & 0x0F) && (item->ObjectNumber != ID_STEAM_EMITTER || !(Wibble & 0x1F)))
+	if (!(Wibble & 0x0F) && (item->ObjectNumber != ID_SMOKE_EMITTER || !(Wibble & 0x1F)))
 	{
 		int dx = Camera.pos.x - item->Pose.Position.x;
 		int dz = Camera.pos.z - item->Pose.Position.z;
@@ -247,7 +247,7 @@ void SmokeEmitterControl(short itemNumber)
 		sptr->dSize = float(size);
 		sptr->sSize = sptr->size = float(size / 4);
 
-		if (item->ObjectNumber == ID_STEAM_EMITTER)
+		if (item->ObjectNumber == ID_SMOKE_EMITTER)
 		{
 			sptr->gravity /= 2;
 			sptr->yVel    /= 2;

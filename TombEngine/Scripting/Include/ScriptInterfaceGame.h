@@ -37,6 +37,7 @@ public:
 	virtual void OnControlPhase(float dt) = 0;
 	virtual void OnSave() = 0;
 	virtual void OnEnd() = 0;
+	virtual void ShortenTENCalls() = 0;
 
 	virtual void FreeLevelScripts() = 0;
 	virtual void ResetScripts(bool clearGameVars) = 0;

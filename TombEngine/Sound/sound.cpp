@@ -515,14 +515,17 @@ void PlaySoundTrack(int index, short mask)
 
 void StopSoundTracks()
 {
-	// Do quick fadeouts.
-	BASS_ChannelSlideAttribute(BASS_Soundtrack[(int)SoundTrackType::OneShot].Channel, BASS_ATTRIB_VOL | BASS_SLIDE_LOG, -1.0f, SOUND_XFADETIME_ONESHOT);
-	BASS_ChannelSlideAttribute(BASS_Soundtrack[(int)SoundTrackType::BGM].Channel, BASS_ATTRIB_VOL | BASS_SLIDE_LOG, -1.0f, SOUND_XFADETIME_ONESHOT);
+	StopSoundTrack(SoundTrackType::OneShot, SOUND_XFADETIME_ONESHOT);
+	StopSoundTrack(SoundTrackType::BGM, SOUND_XFADETIME_ONESHOT);
+}
 
-	BASS_Soundtrack[(int)SoundTrackType::OneShot].Track = {};
-	BASS_Soundtrack[(int)SoundTrackType::OneShot].Channel = NULL;
-	BASS_Soundtrack[(int)SoundTrackType::BGM].Track = {};
-	BASS_Soundtrack[(int)SoundTrackType::BGM].Channel = NULL;
+void StopSoundTrack(SoundTrackType mode, int fadeoutTime)
+{
+	// Do fadeout.
+	BASS_ChannelSlideAttribute(BASS_Soundtrack[(int)mode].Channel, BASS_ATTRIB_VOL | BASS_SLIDE_LOG, -1.0f, fadeoutTime);
+
+	BASS_Soundtrack[(int)mode].Track = {};
+	BASS_Soundtrack[(int)mode].Channel = NULL;
 }
 
 void ClearSoundTrackMasks()

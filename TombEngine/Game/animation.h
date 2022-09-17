@@ -52,15 +52,15 @@ struct ANIM_STRUCT
 	int commandIndex;
 };
 
-enum ANIMCOMMAND_TYPES
+enum class AnimCommandType
 {
-	COMMAND_NULL = 0,
-	COMMAND_MOVE_ORIGIN,
-	COMMAND_JUMP_VELOCITY,
-	COMMAND_ATTACK_READY,
-	COMMAND_DEACTIVATE,
-	COMMAND_SOUND_FX,
-	COMMAND_EFFECT
+	None = 0,
+	MoveOrigin,
+	JumpVelocity,
+	AttackReady,
+	Deactivate,
+	SoundEffect,
+	Flipeffect
 };
 
 struct BoneMutator

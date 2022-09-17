@@ -65,12 +65,8 @@ namespace TEN::Entities::Switches
 		{
 			auto* bounds = GetBoundsAccurate(switchItem);
 
-			if (switchItem->TriggerFlags == 3 && switchItem->Animation.ActiveState == SWITCH_ON ||
-				switchItem->TriggerFlags >= 5 && switchItem->TriggerFlags <= 7 &&
-				switchItem->Animation.ActiveState == SWITCH_OFF)
-			{
+			if ((switchItem->TriggerFlags == 3 || switchItem->TriggerFlags == 4) && switchItem->Animation.ActiveState == SWITCH_ON)
 				return;
-			}
 
 			SwitchBounds.boundingBox.X1 = bounds->X1 - 256;
 			SwitchBounds.boundingBox.X2 = bounds->X2 + 256;
@@ -96,39 +92,60 @@ namespace TEN::Entities::Switches
 			{
 				if (MoveLaraPosition(&SwitchPos, switchItem, laraItem))
 				{
+					auto onAnim = LaraAnim::LA_WALLSWITCH_DOWN;
+					auto offAnim = LaraAnim::LA_WALLSWITCH_UP;
+
+					switch (switchItem->TriggerFlags)
+					{
+					case 0:
+						onAnim = LaraAnim::LA_WALLSWITCH_DOWN;
+						offAnim = LaraAnim::LA_WALLSWITCH_UP;
+						break;
+
+					case 1:
+						onAnim = LaraAnim::LA_SWITCH_SMALL_DOWN;
+						offAnim = LaraAnim::LA_SWITCH_SMALL_UP;
+						break;
+
+					case 2:
+						onAnim = LaraAnim::LA_BUTTON_SMALL_PUSH;
+						offAnim = LaraAnim::LA_BUTTON_SMALL_PUSH;
+						break;
+
+					case 3:
+						onAnim = LaraAnim::LA_BUTTON_LARGE_PUSH;
+						offAnim = LaraAnim::LA_BUTTON_LARGE_PUSH;
+						break;
+
+					case 4:
+						onAnim = LaraAnim::LA_BUTTON_GIANT_PUSH;
+						offAnim = LaraAnim::LA_BUTTON_GIANT_PUSH;
+						break;
+
+					case 5:
+						onAnim = LaraAnim::LA_VALVE_TURN;
+						offAnim = LaraAnim::LA_VALVE_TURN;
+						break;
+
+					case 6:
+						onAnim = LaraAnim::LA_HOLESWITCH_ACTIVATE;
+						offAnim = LaraAnim::LA_HOLESWITCH_ACTIVATE;
+						break;
+
+					default:
+						onAnim = (LaraAnim)(switchItem->TriggerFlags);
+						offAnim = (LaraAnim)(switchItem->TriggerFlags + 1);
+						break;
+					}
+
 					if (switchItem->Animation.ActiveState == SWITCH_ON) /* Switch down */
 					{
-						if (switchItem->TriggerFlags)
-						{
-							laraItem->Animation.AnimNumber = LA_HOLESWITCH_ACTIVATE;
-							laraItem->Animation.ActiveState = LS_HOLE;
-						}
-						else
-						{
-							laraItem->Animation.ActiveState = LS_SWITCH_UP;
-							laraItem->Animation.AnimNumber = LA_WALLSWITCH_DOWN;
-						}
-						
+						SetAnimation(laraItem, offAnim);
 						switchItem->Animation.TargetState = SWITCH_OFF;
 					}
 					else /* Switch up */
 					{
-						if (switchItem->TriggerFlags)
-						{
-							if (switchItem->TriggerFlags == 3)
-								laraItem->Animation.AnimNumber = LA_BUTTON_LARGE_PUSH;
-							else
-							{
-								laraItem->Animation.AnimNumber = LA_HOLESWITCH_ACTIVATE;
-								laraItem->Animation.ActiveState = LS_HOLE;
-							}
-						}
-						else
-						{
-							laraItem->Animation.ActiveState = LS_SWITCH_DOWN;
-							laraItem->Animation.AnimNumber = LA_WALLSWITCH_UP;
-						}
-
+						SetAnimation(laraItem, onAnim);
 						switchItem->Animation.TargetState = SWITCH_ON;
 					}
 
