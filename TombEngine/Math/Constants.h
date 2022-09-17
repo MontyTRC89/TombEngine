@@ -23,4 +23,24 @@
 	constexpr inline auto BLOCK			= [](auto x) { return (BLOCK_UNIT * x); };
 	constexpr inline auto QTR_BLOCK		= [](auto x) { return ((BLOCK_UNIT / 4) * x); };
 	constexpr inline auto OFFSET_RADIUS = [](auto x) { return ((x * SQRT_2) + 4); };
+
+	constexpr inline auto STEPUP_HEIGHT				= QTR_BLOCK(3) / 2;
+	constexpr inline auto BAD_JUMP_CEILING			= QTR_BLOCK(3) / 4;
+	constexpr inline auto SHALLOW_WATER_START_LEVEL = QTR_BLOCK(1) / 4;
+	constexpr inline auto WADE_DEPTH				= STEPUP_HEIGHT;
+	constexpr inline auto SWIM_DEPTH				= 730;
+
+	// Legacy constants
+	constexpr inline auto FPS					  = 30;
+	constexpr inline auto PREDICTIVE_SCALE_FACTOR = 14;
+	constexpr inline auto SLOPE_DIFFERENCE		  = 60;
+
+	constexpr inline auto WALL_SIZE		 = BLOCK(1);
+	constexpr inline auto STOP_SIZE		 = QTR_BLOCK(2);
+	constexpr inline auto STEP_SIZE		 = QTR_BLOCK(1);
+	constexpr inline auto GRID_SNAP_SIZE = QTR_BLOCK(1) / 2;
+	constexpr inline auto WALL_MASK		 = BLOCK_UNIT - 1;
+
+	constexpr inline auto CLICK	 = [](auto x) { return STEP_SIZE * x; };
+	constexpr inline auto SECTOR = [](auto x) { return WALL_SIZE * x; };
 //}

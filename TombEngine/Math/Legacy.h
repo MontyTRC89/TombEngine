@@ -5,25 +5,6 @@ struct MATRIX3D;
 struct PoseData;
 struct Vector3i;
 
-constexpr auto FPS = 30;
-
-constexpr auto ONE_DEGREE = 182;
-constexpr auto PREDICTIVE_SCALE_FACTOR = 14;
-constexpr auto WALL_SIZE = 1024;
-constexpr auto WALL_MASK = WALL_SIZE - 1;
-constexpr auto STEP_SIZE = WALL_SIZE / 4;
-constexpr auto STOP_SIZE = WALL_SIZE / 2;
-constexpr auto GRID_SNAP_SIZE = STEP_SIZE / 2;
-constexpr auto STEPUP_HEIGHT = ((STEP_SIZE * 3) / 2);
-constexpr auto SWIM_DEPTH = 730;
-constexpr auto WADE_DEPTH = STEPUP_HEIGHT;
-constexpr auto SHALLOW_WATER_START_LEVEL = STEP_SIZE / 4;
-constexpr auto BAD_JUMP_CEILING = ((STEP_SIZE * 3) / 4);
-constexpr auto SLOPE_DIFFERENCE = 60;
-
-constexpr auto CLICK = [](auto x) { return STEP_SIZE * x; };
-constexpr auto SECTOR = [](auto x) { return WALL_SIZE * x; };
-
 short ANGLE(float angle);
 short FROM_DEGREES(float angle);
 short FROM_RAD(float angle);

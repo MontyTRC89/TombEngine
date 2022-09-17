@@ -238,7 +238,7 @@ namespace TEN::Entities::Creatures::TR5
 				}
 
 				item->Pose.Position.y = item->ItemFlags[1] - (192 - item->Animation.Velocity.z) * phd_sin(item->ItemFlags[2]);
-				item->ItemFlags[2] += ONE_DEGREE * item->Animation.Velocity.z;
+				item->ItemFlags[2] += ANGLE(item->Animation.Velocity.z);
 
 				if (!(GlobalCounter & 7))
 				{
