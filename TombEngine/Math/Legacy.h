@@ -28,5 +28,3 @@ void GetMatrixFromTrAngle(Matrix* matrix, short* framePtr, int index);
 constexpr auto FP_SHIFT = 16;
 constexpr auto FP_ONE = (1 << FP_SHIFT);
 constexpr auto W2V_SHIFT = 14;
-
-void FP_GetMatrixAngles(MATRIX3D* m, short* angles);

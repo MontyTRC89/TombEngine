@@ -161,23 +161,3 @@ BoundingOrientedBox TO_DX_BBOX(PoseData pos, BOUNDING_BOX* box)
 	BoundingOrientedBox(boxCentre, boxExtent, Vector4::UnitY).Transform(result, 1, rotation, Vector3(pos.Position.x, pos.Position.y, pos.Position.z));
 	return result;
 }
-
-void FP_GetMatrixAngles(MATRIX3D* m, short* angles)
-{
-	short yaw = phd_atan(m->m22, m->m02);
-	short pitch = phd_atan(sqrt((m->m22 * m->m22) + (m->m02 * m->m02)), m->m12);
-
-	int sy = phd_sin(yaw);
-	int cy = phd_cos(yaw);
-	short roll = phd_atan(((cy * m->m00) - (sy * m->m20)), ((sy * m->m21) - (cy * m->m01)));
-
-	if ((m->m12 >= 0 && pitch > 0) ||
-		(m->m12 < 0 && pitch < 0))
-	{
-		pitch = -pitch;
-	}
-
-	angles[0] = pitch;
-	angles[1] = yaw;
-	angles[2] = roll;
-}
