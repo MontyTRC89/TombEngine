@@ -817,40 +817,40 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, Vector3i offset, bool
 	}
 }
 
-void AlignEntityToSurface(ItemInfo* item, const Vector2& ellipse, float tiltConstraintAngle, const EulerAngles& tiltOffset)
+void AlignEntityToSurface(ItemInfo* item, const Vector2& ellipse, float alpha, float constraintAngle)
 {
 	// Reduce ellipse axis lengths for stability.
-	auto halvedRadius = ellipse * 0.75f;
+	auto reducedEllipse = ellipse * 0.75f;
 
 	// Probe heights at points around the entity.
-	int frontHeight = GetCollision(item, item->Pose.Orientation.y, halvedRadius.y).Position.Floor;
-	int backHeight	= GetCollision(item, item->Pose.Orientation.y + ANGLE(180.0f), halvedRadius.y).Position.Floor;
-	int leftHeight	= GetCollision(item, item->Pose.Orientation.y - ANGLE(90.0f), halvedRadius.x).Position.Floor;
-	int rightHeight = GetCollision(item, item->Pose.Orientation.y + ANGLE(90.0f), halvedRadius.x).Position.Floor;
+	int frontHeight = GetCollision(item, item->Pose.Orientation.y, reducedEllipse.y).Position.Floor;
+	int backHeight	= GetCollision(item, item->Pose.Orientation.y + ANGLE(180.0f), reducedEllipse.y).Position.Floor;
+	int leftHeight	= GetCollision(item, item->Pose.Orientation.y - ANGLE(90.0f), reducedEllipse.x).Position.Floor;
+	int rightHeight = GetCollision(item, item->Pose.Orientation.y + ANGLE(90.0f), reducedEllipse.x).Position.Floor;
 
 	// Calculate height differences.
 	int forwardHeightDif = backHeight - frontHeight;
 	int lateralHeightDif = rightHeight - leftHeight;
 
-	// Calculate tilt.
-	auto tiltedOrient = EulerAngles(
+	// Calculate extra rotation required.
+	auto extraRot = EulerAngles(
 		FROM_RAD(atan2(forwardHeightDif, ellipse.y * 2)),
 		0,
 		FROM_RAD(atan2(lateralHeightDif, ellipse.x * 2))
-	) + tiltOffset;
+	) - EulerAngles(item->Pose.Orientation.x, 0, item->Pose.Orientation.z);
 
-	// Align X orientation if forward height difference is not too significant.
+	// Rotate X axis if forward height difference is not too significant.
 	if (abs(forwardHeightDif) <= STEPUP_HEIGHT)
 	{
-		if (abs(tiltedOrient.x) <= ANGLE(tiltConstraintAngle))
-			item->Pose.Orientation.x = tiltedOrient.x;
+		if (abs(extraRot.x) <= ANGLE(constraintAngle))
+			item->Pose.Orientation.x =+ extraRot.x * alpha;
 	}
 
-	// Align Z orientation if lateral height difference is not too significant.
+	// Rotate Z axis if lateral height difference is not too significant.
 	if (abs(lateralHeightDif) <= STEPUP_HEIGHT)
 	{
-		if (abs(tiltedOrient.z) <= ANGLE(tiltConstraintAngle))
-			item->Pose.Orientation.z = tiltedOrient.z;
+		if (abs(extraRot.z) <= ANGLE(constraintAngle))
+			item->Pose.Orientation.z += extraRot.z * alpha;
 	}
 }
 

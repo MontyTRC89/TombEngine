@@ -571,7 +571,7 @@ void AlignLaraToSurface(ItemInfo* item, float alpha)
 	float sinDeltaAngle = phd_sin(deltaAngle);
 	float cosDeltaAngle = phd_cos(deltaAngle);
 
-	// Determine extra rotation required.
+	// Calculate extra rotation required.
 	auto extraRot = EulerAngles(
 		-steepnessAngle * cosDeltaAngle,
 		0,
