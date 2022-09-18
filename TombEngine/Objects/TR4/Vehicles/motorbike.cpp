@@ -27,9 +27,9 @@ using namespace TEN::Math::Random;
 
 namespace TEN::Entities::Vehicles
 {
-	const vector<int> MotorbikeJoints = { 0, 1, 2, 4, 5, 6, 7, 8, 9 };
-	const vector<int> MotorbikeBrakeLightJoints = { 10 };
-	const vector<int> MotorbikeHeadLightJoints = { 3 };
+	const vector<uint> MotorbikeJoints = { 0, 1, 2, 4, 5, 6, 7, 8, 9 };
+	const vector<uint> MotorbikeBrakeLightJoints = { 10 };
+	const vector<uint> MotorbikeHeadLightJoints = { 3 };
 
 	const vector<VehicleMountType> MotorbikeMountTypes =
 	{
@@ -143,10 +143,10 @@ namespace TEN::Entities::Vehicles
 		motorbikeItem->Data = MotorbikeInfo();
 		auto* motorbike = GetMotorbikeInfo(motorbikeItem);
 
-		motorbikeItem->SetBits(JointBitType::Mesh, MotorbikeJoints);
+		motorbikeItem->MeshBits.Set(MotorbikeJoints);
 		motorbike->MomentumAngle = motorbikeItem->Pose.Orientation.y;
 
-		motorbikeItem->ClearBits(JointBitType::Mesh, MotorbikeHeadLightJoints);
+		motorbikeItem->MeshBits.Clear(MotorbikeHeadLightJoints);
 	}
 
 	void MotorbikePlayerCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
@@ -1060,10 +1060,10 @@ namespace TEN::Entities::Vehicles
 				GetJointAbsPosition(motorbikeItem, &pos, NULL);
 
 				TriggerDynamicLight(pos.x, pos.y, pos.z, 10, 64, 0, 0);
-				motorbikeItem->SetBits(JointBitType::Mesh, MotorbikeBrakeLightJoints);
+				motorbikeItem->MeshBits.Set(MotorbikeBrakeLightJoints);
 			}
 			else
-				motorbikeItem->ClearBits(JointBitType::Mesh, MotorbikeBrakeLightJoints);
+				motorbikeItem->MeshBits.Clear(MotorbikeBrakeLightJoints);
 
 			if (TrInput & VEHICLE_IN_BRAKE)
 			{
@@ -1208,14 +1208,14 @@ namespace TEN::Entities::Vehicles
 			laraItem->Animation.ActiveState > MOTORBIKE_STATE_DISMOUNT)
 		{
 			DrawMotorbikeLight(motorbikeItem);
-			motorbikeItem->SetBits(JointBitType::Mesh, MotorbikeHeadLightJoints);
+			motorbikeItem->MeshBits.Set(MotorbikeHeadLightJoints);
 
 			drive = MotorbikeUserControl(motorbikeItem, laraItem, probe.Position.Floor, &pitch);
 		}
 		else
 		{
-			motorbikeItem->ClearBits(JointBitType::Mesh, MotorbikeHeadLightJoints);
-			motorbikeItem->ClearBits(JointBitType::Mesh, MotorbikeBrakeLightJoints);
+			motorbikeItem->MeshBits.Clear(MotorbikeHeadLightJoints);
+			motorbikeItem->MeshBits.Clear(MotorbikeBrakeLightJoints);
 
 			drive = -1;
 			collide = 0;

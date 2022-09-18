@@ -48,11 +48,13 @@ namespace TEN::Utils
 
 		// Operators
 		// NOTE: packedBits will not be assessed in full if the length of the given BitField object is less than BIT_FIELD_SIZE_MAX.
+		bool	  operator ==(uint packedBits);
+		bool	  operator !=(uint packedBits);
 		BitField& operator =(uint packedBits);
 		BitField& operator &=(uint packedBits);
 		BitField& operator |=(uint packedBits);
-		BitField  operator &(uint packedBits);
-		BitField  operator |(uint packedBits);
+		uint	  operator &(uint packedBits);
+		uint	  operator |(uint packedBits);
 
 	private:
 		void Fill(bool value);

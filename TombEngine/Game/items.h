@@ -6,7 +6,10 @@
 #include "Game/animation.h"
 #include "Game/itemdata/itemdata.h"
 #include "Specific/newtypes.h"
+#include "Specific/BitField.h"
 #include "Specific/phd_global.h"
+
+using namespace TEN::Utils;
 
 enum GAME_OBJECT_ID : short;
 
@@ -96,9 +99,9 @@ struct ItemInfo
 	int Timer;
 	Vector4 Color;
 
-	unsigned int TouchBits;
-	unsigned int MeshBits;
-	unsigned int MeshSwapBits;
+	BitField TouchBits;
+	BitField MeshBits;
+	BitField MeshSwapBits;
 
 	unsigned short Flags; // ItemFlags enum
 	short ItemFlags[8];
@@ -115,13 +118,6 @@ struct ItemInfo
 	std::string LuaCallbackOnHitName;
 	std::string LuaCallbackOnCollidedWithObjectName;
 	std::string LuaCallbackOnCollidedWithRoomName;
-
-	bool TestBits(JointBitType type, std::vector<int> jointIndices);
-	bool TestBits(JointBitType type, int jointIndex);
-	void SetBits(JointBitType type, std::vector<int> jointIndices);
-	void SetBits(JointBitType type, int jointIndex);
-	void ClearBits(JointBitType type, std::vector<int> jointIndices);
-	void ClearBits(JointBitType type, int jointIndex);
 
 	bool TestOcb(short ocbFlags);
 	void RemoveOcb(short ocbFlags);

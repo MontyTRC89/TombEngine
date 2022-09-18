@@ -25,10 +25,10 @@ namespace TEN::Entities::TR4
 	const auto HorsemanBite1 = BiteInfo(Vector3::Zero, 6);
 	const auto HorsemanBite2 = BiteInfo(Vector3::Zero, 14);
 	const auto HorsemanBite3 = BiteInfo(Vector3::Zero, 10);
-	const vector<int> HorsemanAxeAttackJoints = { 5, 6 };
-	const vector<int> HorsemanKickAttackJoints = { 14 };
-	const vector<int> HorsemanMountedAttackJoints = { 5, 6, 10 };
-	const vector<int> HorsemanShieldAttackJoints = { 10 };
+	const vector<uint> HorsemanAxeAttackJoints = { 5, 6 };
+	const vector<uint> HorsemanKickAttackJoints = { 14 };
+	const vector<uint> HorsemanMountedAttackJoints = { 5, 6, 10 };
+	const vector<uint> HorsemanShieldAttackJoints = { 10 };
 
 	const auto HorseBite1 = BiteInfo(Vector3::Zero, 13);
 	const auto HorseBite2 = BiteInfo(Vector3::Zero, 17);
@@ -555,7 +555,7 @@ namespace TEN::Entities::TR4
 			case HORSEMAN_STATE_MOUNTED_ATTACK_RIGHT:
 				if (!creature->Flags)
 				{
-					if (item->TestBits(JointBitType::Touch, HorsemanAxeAttackJoints))
+					if (item->TouchBits.Test(HorsemanAxeAttackJoints))
 					{
 						DoDamage(creature->Enemy, 250);
 						CreatureEffect2(item, HorsemanBite1, 10, item->Pose.Orientation.y, DoBloodSplat);
@@ -571,7 +571,7 @@ namespace TEN::Entities::TR4
 			case HORSEMAN_STATE_MOUNTED_ATTACK_LEFT:
 				if (!creature->Flags)
 				{
-					if (item->TestBits(JointBitType::Touch, HorsemanKickAttackJoints))
+					if (item->TouchBits.Test(HorsemanKickAttackJoints))
 					{
 						DoDamage(creature->Enemy, 100);
 						CreatureEffect2(item, HorsemanBite2, 3, item->Pose.Orientation.y, DoBloodSplat);
@@ -660,7 +660,7 @@ namespace TEN::Entities::TR4
 
 				if (!creature->Flags)
 				{
-					if (item->TestBits(JointBitType::Touch, HorsemanAxeAttackJoints))
+					if (item->TouchBits.Test(HorsemanAxeAttackJoints))
 					{
 						DoDamage(creature->Enemy, 100);
 						CreatureEffect2(item, HorsemanBite2, 3, item->Pose.Orientation.y, DoBloodSplat);
@@ -701,16 +701,16 @@ namespace TEN::Entities::TR4
 
 				if (!creature->Flags)
 				{
-					if (item->TestBits(JointBitType::Touch, HorsemanMountedAttackJoints))
+					if (item->TouchBits.Test(HorsemanMountedAttackJoints))
 					{
 						LaraItem->HitStatus = true;
 
-						if (item->TestBits(JointBitType::Touch, HorsemanAxeAttackJoints))
+						if (item->TouchBits.Test(HorsemanAxeAttackJoints))
 						{
 							DoDamage(creature->Enemy, 250);
 							CreatureEffect2(horseItem, HorsemanBite1, 20, -1, DoBloodSplat);
 						}
-						else if (item->TestBits(JointBitType::Touch, HorsemanShieldAttackJoints))
+						else if (item->TouchBits.Test(HorsemanShieldAttackJoints))
 						{
 							DoDamage(creature->Enemy, 150);
 							CreatureEffect2(horseItem, HorsemanBite3, 10, -1, DoBloodSplat);

@@ -202,6 +202,30 @@ namespace TEN::Utils
 		return bitString;
 	}
 
+	bool BitField::operator ==(uint packedBits)
+	{
+		for (uint i = 0; i < Bits.size(); i++)
+		{
+			uint bit = uint(1 << i);
+			if (Bits[i] != (bool)bit)
+				return false;
+		}
+
+		return true;
+	}
+	
+	bool BitField::operator !=(uint packedBits)
+	{
+		for (uint i = 0; i < Bits.size(); i++)
+		{
+			uint bit = uint(1 << i);
+			if (Bits[i] != (bool)bit)
+				return true;
+		}
+
+		return false;
+	}
+
 	BitField& BitField::operator =(uint packedBits)
 	{
 		for (uint i = 0; i < Bits.size(); i++)
@@ -245,42 +269,14 @@ namespace TEN::Utils
 		return *this;
 	}
 	
-	BitField BitField::operator &(uint packedBits)
+	uint BitField::operator &(uint packedBits)
 	{
-		auto newBitField = BitField(Bits.size());
-		auto indices = vector<uint>{};
-
-		for (uint i = 0; i < Bits.size(); i++)
-		{
-			uint bit = uint(1 << i);
-			if (Bits[i] && (packedBits & bit) == bit)
-				indices.push_back(i);
-		}
-
-		newBitField.Set(indices);
-		return newBitField;
+		return (this->ToPackedBits() & packedBits);
 	}
 
-	BitField BitField::operator |(uint packedBits)
+	uint BitField::operator |(uint packedBits)
 	{
-		auto newBitField = BitField(Bits.size());
-		auto indices = vector<uint>{};
-
-		for (uint i = 0; i < Bits.size(); i++)
-		{
-			if (Bits[i])
-			{
-				indices.push_back(i);
-				continue;
-			}
-
-			uint bit = uint(1 << i);
-			if ((packedBits & bit) == bit)
-				indices.push_back(i);
-		}
-
-		newBitField.Set(indices);
-		return newBitField;
+		return (this->ToPackedBits() | packedBits);
 	}
 
 	void BitField::Fill(bool value)
