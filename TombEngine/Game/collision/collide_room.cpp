@@ -834,7 +834,7 @@ void AlignEntityToSurface(ItemInfo* item, const Vector2& ellipse, float alpha, f
 
 	// Calculate extra rotation required.
 	auto extraRot = EulerAngles(
-		FROM_RAD(atan2(forwardHeightDif, ellipse.y * 2)),
+		FROM_RAD(atan2f(forwardHeightDif, ellipse.y * 2)),
 		0,
 		FROM_RAD(atan2(lateralHeightDif, ellipse.x * 2))
 	) - EulerAngles(item->Pose.Orientation.x, 0, item->Pose.Orientation.z);
@@ -843,7 +843,7 @@ void AlignEntityToSurface(ItemInfo* item, const Vector2& ellipse, float alpha, f
 	if (abs(forwardHeightDif) <= STEPUP_HEIGHT)
 	{
 		if (abs(extraRot.x) <= ANGLE(constraintAngle))
-			item->Pose.Orientation.x =+ extraRot.x * alpha;
+			item->Pose.Orientation.x += extraRot.x * alpha;
 	}
 
 	// Rotate Z axis if lateral height difference is not too significant.
