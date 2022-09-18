@@ -250,7 +250,7 @@ namespace TEN::Renderer
 								if (meshIndex >= 0)
 									nodePos = GetJointPosition(item, meshIndex, nodePos);
 								else
-									nodePos = GetLaraJointPosition(-meshIndex, nodePos);
+									nodePos = GetJointPosition(LaraItem, -meshIndex, nodePos);
 
 								NodeOffsets[particle->nodeNumber].gotIt = true;
 

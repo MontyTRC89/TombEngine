@@ -382,16 +382,6 @@ namespace TEN::Renderer
 		return m_meshes[meshIndex];
 	}
 
-	void Renderer11::GetLaraAbsBonePosition(Vector3& pos, int jointIndex)
-	{
-		if (jointIndex >= MAX_BONES)
-			jointIndex = 0;
-
-		auto world = m_moveableObjects[ID_LARA]->AnimationTransforms[jointIndex];
-		world = world * m_LaraWorldMatrix;
-		pos = Vector3::Transform(pos, world);
-	}
-
 	void Renderer11::GetItemAbsBonePosition(int itemNumber, Vector3& pos, int jointIndex)
 	{
 		auto* rendererItem = &m_items[itemNumber];

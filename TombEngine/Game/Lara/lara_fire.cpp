@@ -812,11 +812,11 @@ void HitTarget(ItemInfo* laraItem, ItemInfo* targetEntity, GameVector* hitPos, i
 	}
 }
 
-FireWeaponType FireWeapon(LaraWeaponType weaponType, ItemInfo* targetEntity, ItemInfo* originEntity, EulerAngles armOrient)
+FireWeaponType FireWeapon(LaraWeaponType weaponType, ItemInfo* targetEntity, ItemInfo* laraItem, EulerAngles armOrient)
 {
-	auto* lara = GetLaraInfo(originEntity);
+	auto* lara = GetLaraInfo(laraItem);
 
-	auto& ammo = GetAmmo(originEntity, weaponType);
+	auto& ammo = GetAmmo(laraItem, weaponType);
 	if (ammo.getCount() == 0 && !ammo.hasInfinite())
 		return FireWeaponType::NoAmmo;
 
@@ -831,8 +831,8 @@ FireWeaponType FireWeapon(LaraWeaponType weaponType, ItemInfo* targetEntity, Ite
 		0
 	);
 
-	auto muzzleOffset = GetLaraJointPosition(LM_RHAND);
-	auto pos = Vector3i(originEntity->Pose.Position.x, muzzleOffset.y, originEntity->Pose.Position.z);
+	auto muzzleOffset = GetJointPosition(laraItem, LM_RHAND);
+	auto pos = Vector3i(laraItem->Pose.Position.x, muzzleOffset.y, laraItem->Pose.Position.z);
 
 	// Calculate ray from wobbled orientation.
 	auto directionNorm = wobbledArmOrient.ToDirection();
@@ -862,7 +862,7 @@ FireWeaponType FireWeapon(LaraWeaponType weaponType, ItemInfo* targetEntity, Ite
 	lara->Control.Weapon.Fired = true;
 	
 	auto vOrigin = GameVector(pos);
-	short roomNumber = originEntity->RoomNumber;
+	short roomNumber = laraItem->RoomNumber;
 	GetFloor(pos.x, pos.y, pos.z, &roomNumber);
 	vOrigin.roomNumber = roomNumber;
 
@@ -923,7 +923,7 @@ FireWeaponType FireWeapon(LaraWeaponType weaponType, ItemInfo* targetEntity, Ite
 			// it's really weird but we decided to replicate original behaviour until we'll fully understand what is happening
 			// with weapons
 			if (!GetTargetOnLOS(&vOrigin, &vTarget, false, true))
-				HitTarget(originEntity, targetEntity, &vTarget, weapon->Damage, false);
+				HitTarget(laraItem, targetEntity, &vTarget, weapon->Damage, false);
 		//}
 		
 		return FireWeaponType::PossibleHit;
@@ -965,7 +965,7 @@ void LaraTargetInfo(ItemInfo* laraItem, WeaponInfo* weaponInfo)
 
 	auto origin = GameVector(
 		laraItem->Pose.Position.x,
-		GetLaraJointPosition(LM_RHAND).y, // Muzzle offset.
+		GetJointPosition(laraItem, LM_RHAND).y, // Muzzle offset.
 		laraItem->Pose.Position.z,
 		laraItem->RoomNumber
 	);
@@ -1032,7 +1032,7 @@ void LaraGetNewTarget(ItemInfo* laraItem, WeaponInfo* weaponInfo)
 
 	auto origin = GameVector(
 		laraItem->Pose.Position.x,
-		GetLaraJointPosition(LM_RHAND).y, // Muzzle offset.
+		GetJointPosition(laraItem, LM_RHAND).y, // Muzzle offset.
 		laraItem->Pose.Position.z,
 		laraItem->RoomNumber
 	);

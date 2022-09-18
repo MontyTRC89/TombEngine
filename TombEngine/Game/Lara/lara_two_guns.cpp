@@ -64,7 +64,7 @@ void AnimatePistols(ItemInfo* laraItem, LaraWeaponType weaponType)
 				break;
 			}
 
-			auto pos = GetLaraJointPosition(LM_LHAND, offset);
+			auto pos = GetJointPosition(laraItem, LM_LHAND, offset);
 			TriggerGunSmoke(pos.x, pos.y, pos.z, 0, 0, 0, 0, weaponType, lara->LeftArm.GunSmoke);
 		}
 
@@ -86,7 +86,7 @@ void AnimatePistols(ItemInfo* laraItem, LaraWeaponType weaponType)
 				break;
 			}
 
-			auto pos = GetLaraJointPosition(LM_RHAND, offset);
+			auto pos = GetJointPosition(laraItem, LM_RHAND, offset);
 			TriggerGunSmoke(pos.x, pos.y, pos.z, 0, 0, 0, 0, weaponType, lara->RightArm.GunSmoke);
 		}
 	}
@@ -314,7 +314,7 @@ void PistolHandler(ItemInfo* laraItem, LaraWeaponType weaponType)
 	
 	if (lara->LeftArm.GunFlash || lara->RightArm.GunFlash)
 	{
-		auto pos = GetLaraJointPosition(
+		auto pos = GetJointPosition(laraItem, 
 			(lara->LeftArm.GunFlash != 0) ? LM_LHAND : LM_RHAND,
 			Vector3i(
 				(byte)GetRandomControl() - 128,

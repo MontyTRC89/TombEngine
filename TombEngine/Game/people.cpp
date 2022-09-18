@@ -90,7 +90,7 @@ short GunMiss(int x, int y, int z, short velocity, short yRot, short roomNumber)
 
 short GunHit(int x, int y, int z, short velocity, short yRot, short roomNumber)
 {
-	auto pos = GetLaraJointPosition((25 * GetRandomControl()) >> 15);
+	auto pos = GetJointPosition(LaraItem, (25 * GetRandomControl()) >> 15);
 	DoBloodSplat(pos.x, pos.y, pos.z, (GetRandomControl() & 3) + 3, LaraItem->Pose.Orientation.y, LaraItem->RoomNumber);
 	return GunShot(x, y, z, velocity, yRot, roomNumber);
 }

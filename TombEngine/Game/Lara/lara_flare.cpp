@@ -284,7 +284,7 @@ void SetFlareArm(ItemInfo* laraItem, int armFrame)
 	lara->LeftArm.FrameBase = g_Level.Anims[flareAnimNum].framePtr;
 }
 
-void CreateFlare(ItemInfo* laraItem, GAME_OBJECT_ID objectNumber, bool thrown)
+void CreateFlare(ItemInfo* laraItem, GAME_OBJECT_ID objectNumber, bool isThrown)
 {
 	auto* lara = GetLaraInfo(laraItem);
 	auto itemNumber = CreateItem();
@@ -296,7 +296,7 @@ void CreateFlare(ItemInfo* laraItem, GAME_OBJECT_ID objectNumber, bool thrown)
 		flareItem->ObjectNumber = objectNumber;
 		flareItem->RoomNumber = laraItem->RoomNumber;
 
-		auto pos = GetLaraJointPosition(LM_LHAND, Vector3i(-16, 32, 42));
+		auto pos = GetJointPosition(laraItem, LM_LHAND, Vector3i(-16, 32, 42));
 
 		flareItem->Pose.Position = pos;
 
@@ -313,7 +313,7 @@ void CreateFlare(ItemInfo* laraItem, GAME_OBJECT_ID objectNumber, bool thrown)
 		}
 		else
 		{
-			if (thrown)
+			if (isThrown)
 				flareItem->Pose.Orientation.y = laraItem->Pose.Orientation.y;
 			else
 				flareItem->Pose.Orientation.y = laraItem->Pose.Orientation.y - ANGLE(45.0f);
@@ -327,7 +327,7 @@ void CreateFlare(ItemInfo* laraItem, GAME_OBJECT_ID objectNumber, bool thrown)
 		flareItem->Pose.Orientation.z = 0;
 		flareItem->Color = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
 
-		if (thrown)
+		if (isThrown)
 		{
 			flareItem->Animation.Velocity.z = laraItem->Animation.Velocity.z + 50;
 			flareItem->Animation.Velocity.y = laraItem->Animation.Velocity.y - 50;
@@ -367,7 +367,7 @@ void DoFlareInHand(ItemInfo* laraItem, int flareLife)
 {
 	auto* lara = GetLaraInfo(laraItem);
 
-	auto pos = GetLaraJointPosition(LM_LHAND, Vector3i(11, 32, 41));
+	auto pos = GetJointPosition(laraItem, LM_LHAND, Vector3i(11, 32, 41));
 
 	if (DoFlareLight(&pos, flareLife))
 		TriggerChaffEffects(flareLife);

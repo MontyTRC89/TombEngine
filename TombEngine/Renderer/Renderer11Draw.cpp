@@ -75,7 +75,7 @@ namespace TEN::Renderer
 						// Push foot spheres a little lower.
 						if (sphereMeshes[i] == LM_LFOOT || sphereMeshes[i] == LM_RFOOT)
 							offset.y += 8;
-						auto pos = GetLaraJointPosition(sphereMeshes[i], offset);
+						auto pos = GetJointPosition(LaraItem, sphereMeshes[i], offset);
 
 						auto& newSphere = nearestSpheres.emplace_back();
 						newSphere.position = Vector3(pos.x, pos.y, pos.z);

@@ -599,12 +599,12 @@ namespace TEN::Entities::Creatures::TR5
 			}
 			else if (item->Animation.ActiveState == 43 && !Lara.Burn)
 			{
-				auto pos = GetLaraJointPosition(LM_LFOOT);
+				auto pos = GetJointPosition(LaraItem, LM_LFOOT);
 
 				short roomNumberLeft = LaraItem->RoomNumber;
 				GetFloor(pos.x, pos.y, pos.z, &roomNumberLeft);
 
-				pos = GetLaraJointPosition(LM_RFOOT);
+				pos = GetJointPosition(LaraItem, LM_RFOOT);
 				short roomNumberRight = LaraItem->RoomNumber;
 				GetFloor(pos.x, pos.y, pos.z, &roomNumberRight);
 

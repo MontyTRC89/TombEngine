@@ -325,12 +325,12 @@ void TranslateItem(ItemInfo* item, short headingAngle, float forward, float down
 	item->Pose.Position = Geometry::TranslatePoint(item->Pose.Position, headingAngle, forward, down, right);
 }
 
-void TranslateItem(ItemInfo* item, EulerAngles orient, float distance)
+void TranslateItem(ItemInfo* item, const EulerAngles& orient, float distance)
 {
 	item->Pose.Position = Geometry::TranslatePoint(item->Pose.Position, orient, distance);
 }
 
-void TranslateItem(ItemInfo* item, Vector3 direction, float distance)
+void TranslateItem(ItemInfo* item, const Vector3& direction, float distance)
 {
 	item->Pose.Position = Geometry::TranslatePoint(item->Pose.Position, direction, distance);
 }
@@ -497,17 +497,6 @@ void ClampRotation(PoseData* pose, short angle, short rotation)
 	}
 	else
 		pose->Orientation.y += rotation;
-}
-
-Vector3i GetLaraJointPosition(int jointIndex, const Vector3i& offset)
-{
-	if (jointIndex >= NUM_LARA_MESHES)
-		jointIndex = LM_HEAD;
-
-	// Use matrices done in the renderer to transform the offset vector.
-	auto pos = offset.ToVector3();
-	g_Renderer.GetLaraAbsBonePosition(pos, jointIndex);
-	return Vector3i(pos);
 }
 
 Vector3i GetJointPosition(ItemInfo* item, int jointIndex, const Vector3i& offset)

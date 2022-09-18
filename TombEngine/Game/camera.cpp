@@ -460,8 +460,8 @@ void UpdateCameraElevation()
 
 	if (Camera.laraNode != -1)
 	{
-		auto pos = GetLaraJointPosition(Camera.laraNode, Vector3i::Zero);
-		auto pos1 = GetLaraJointPosition(Camera.laraNode, Vector3i(0, -CLICK(1), SECTOR(2)));
+		auto pos = GetJointPosition(LaraItem, Camera.laraNode, Vector3i::Zero);
+		auto pos1 = GetJointPosition(LaraItem, Camera.laraNode, Vector3i(0, -CLICK(1), SECTOR(2)));
 		pos = pos1 - pos;
 		Camera.actualAngle = Camera.targetAngle + phd_atan(pos.z, pos.x);
 	}
@@ -829,7 +829,7 @@ void LookCamera(ItemInfo* item)
 	else
 		OldCam.pos.Orientation.y = lara->ExtraHeadRot.y;
 
-	auto pos = GetLaraJointPosition(LM_HEAD, Vector3i(0, CLICK(0.25f) / 4, CLICK(0.25f)));
+	auto pos = GetJointPosition(item, LM_HEAD, Vector3i(0, CLICK(0.25f) / 4, CLICK(0.25f)));
 
 	auto probe = GetCollision(pos.x, pos.y, pos.z, item->RoomNumber);
 	if (probe.Position.Floor == NO_HEIGHT ||
@@ -838,7 +838,7 @@ void LookCamera(ItemInfo* item)
 		pos.y > probe.Position.Floor ||
 		pos.y < probe.Position.Ceiling)
 	{
-		pos = GetLaraJointPosition(LM_HEAD, Vector3i(0, CLICK(0.25f) / 4, 0));
+		pos = GetJointPosition(item, LM_HEAD, Vector3i(0, CLICK(0.25f) / 4, 0));
 
 		probe = GetCollision(pos.x, pos.y + CLICK(1), pos.z, item->RoomNumber);
 		if (TestEnvironment(ENV_FLAG_SWAMP, probe.RoomNumber))
@@ -855,12 +855,12 @@ void LookCamera(ItemInfo* item)
 			pos.y > probe.Position.Floor ||
 			pos.y < probe.Position.Ceiling)
 		{
-			pos = GetLaraJointPosition(LM_HEAD, Vector3i(0, CLICK(0.25f) / 4, -CLICK(0.25f)));
+			pos = GetJointPosition(item, LM_HEAD, Vector3i(0, CLICK(0.25f) / 4, -CLICK(0.25f)));
 		}
 	}
 
-	auto pos2 = GetLaraJointPosition(LM_HEAD, Vector3i(0, 0, -SECTOR(1)));
-	auto pos3 = GetLaraJointPosition(LM_HEAD, Vector3i(0, 0, CLICK(8)));
+	auto pos2 = GetJointPosition(item, LM_HEAD, Vector3i(0, 0, -SECTOR(1)));
+	auto pos3 = GetJointPosition(item, LM_HEAD, Vector3i(0, 0, CLICK(8)));
 
 	int dx = (pos2.x - pos.x) >> 3;
 	int dy = (pos2.y - pos.y) >> 3;
@@ -1368,7 +1368,7 @@ void BinocularCamera(ItemInfo* item)
 
 void ConfirmCameraTargetPos()
 {
-	auto pos = GetLaraJointPosition(LM_TORSO);
+	auto pos = GetJointPosition(LaraItem, LM_TORSO);
 
 	if (Camera.laraNode != -1)
 	{

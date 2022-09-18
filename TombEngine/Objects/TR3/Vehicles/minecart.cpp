@@ -757,7 +757,7 @@ namespace TEN::Entities::Vehicles
 			if (laraItem->Animation.AnimNumber == Objects[ID_MINECART_LARA_ANIMS].animIndex + MINECART_ANIM_DISMOUNT_LEFT &&
 				laraItem->Animation.FrameNumber == g_Level.Anims[laraItem->Animation.AnimNumber].frameEnd)
 			{
-				auto pos = GetLaraJointPosition(LM_HIPS, Vector3i(0, 640, 0));
+				auto pos = GetJointPosition(laraItem, LM_HIPS, Vector3i(0, 640, 0));
 				laraItem->Pose.Position = pos;
 				laraItem->Pose.Orientation = EulerAngles(0, minecartItem->Pose.Orientation.y + ANGLE(90.0f), 0);
 
@@ -772,7 +772,7 @@ namespace TEN::Entities::Vehicles
 			if (laraItem->Animation.AnimNumber == Objects[ID_MINECART_LARA_ANIMS].animIndex + MINECART_ANIM_DISMOUNT_RIGHT &&
 				laraItem->Animation.FrameNumber == g_Level.Anims[laraItem->Animation.AnimNumber].frameEnd)
 			{
-				auto pos = GetLaraJointPosition(LM_HIPS, Vector3i(0, 640, 0));
+				auto pos = GetJointPosition(laraItem, LM_HIPS, Vector3i(0, 640, 0));
 				laraItem->Pose.Position = pos;
 				laraItem->Pose.Orientation = EulerAngles(0, minecartItem->Pose.Orientation.y - ANGLE(90.0f), 0);
 

@@ -956,14 +956,14 @@ void TriggerGunShell(short hand, short objNum, LaraWeaponType weaponType)
 			break;
 		}
 
-		pos = GetLaraJointPosition(LM_RHAND, offset);
+		pos = GetJointPosition(LaraItem, LM_RHAND, offset);
 	}
 	else
 	{
 		if (weaponType == LaraWeaponType::Pistol)
-			pos = GetLaraJointPosition(LM_LHAND, Vector3i(-12, 48, 40));
+			pos = GetJointPosition(LaraItem, LM_LHAND, Vector3i(-12, 48, 40));
 		else if (weaponType == LaraWeaponType::Uzi)
-			pos = GetLaraJointPosition(LM_LHAND, Vector3i(-16, 35, 48));
+			pos = GetJointPosition(LaraItem, LM_LHAND, Vector3i(-16, 35, 48));
 	}
 
 	auto* gshell = &Gunshells[GetFreeGunshell()];
@@ -1157,9 +1157,9 @@ void LaraBubbles(ItemInfo* item)
 	auto pos = Vector3i::Zero;
 
 	if (level->GetLaraType() == LaraType::Divesuit)
-		pos = GetLaraJointPosition(LM_TORSO, Vector3i(0, -192, -160));
+		pos = GetJointPosition(item, LM_TORSO, Vector3i(0, -192, -160));
 	else
-		GetLaraJointPosition(LM_HEAD, Vector3i(0, -4, -64));
+		GetJointPosition(item, LM_HEAD, Vector3i(0, -4, -64));
 
 	int numBubbles = (GetRandomControl() & 1) + 2;
 	for (int i = 0; i < numBubbles; i++)
@@ -1258,7 +1258,7 @@ void TriggerLaraDrips(ItemInfo* item)
 	{
 		for (int i = 0; i < NUM_LARA_MESHES; i++)
 		{
-			auto pos = GetLaraJointPosition(i);
+			auto pos = GetJointPosition(item, i);
 			auto room = GetRoom(item->Location, pos.x, pos.y, pos.z).roomNumber;
 
 			if (g_Level.Rooms[room].flags & ENV_FLAG_WATER)
@@ -1270,7 +1270,7 @@ void TriggerLaraDrips(ItemInfo* item)
 			{
 				auto* drip = &Drips[GetFreeDrip()];
 
-				auto pos = GetLaraJointPosition(
+				auto pos = GetJointPosition(item, 
 					i,
 					Vector3i(
 						(GetRandomControl() & 0x1F) - 16,

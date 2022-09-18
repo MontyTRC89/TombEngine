@@ -22,8 +22,8 @@ using namespace TEN::Math::Random;
 
 void TriggerChaffEffects(int flareAge)
 {
-	auto pos = GetLaraJointPosition(LM_LHAND, Vector3i(8, 36, 32));
-	auto vect = GetLaraJointPosition(LM_LHAND, Vector3i(8, 36, 1024 + (GetRandomDraw() & 255)));
+	auto pos = GetJointPosition(LaraItem, LM_LHAND, Vector3i(8, 36, 32));
+	auto vect = GetJointPosition(LaraItem, LM_LHAND, Vector3i(8, 36, 1024 + (GetRandomDraw() & 255)));
 	auto vel = vect - pos;
 	TriggerChaffEffects(LaraItem, &pos, &vel, LaraItem->Animation.Velocity.z, (bool)(g_Level.Rooms[LaraItem->RoomNumber].flags & ENV_FLAG_WATER), flareAge);
 }

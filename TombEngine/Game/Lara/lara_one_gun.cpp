@@ -56,7 +56,7 @@ void AnimateShotgun(ItemInfo* laraItem, LaraWeaponType weaponType)
 		else if (weaponType == LaraWeaponType::RocketLauncher)
 			pos = Vector3i(0, 84, 72);
 
-		pos = GetLaraJointPosition(LM_RHAND, pos);
+		pos = GetJointPosition(laraItem, LM_RHAND, pos);
 
 		if (laraItem->MeshBits)
 			TriggerGunSmoke(pos.x, pos.y, pos.z, 0, 0, 0, 0, weaponType, lara->LeftArm.GunSmoke);
@@ -311,8 +311,8 @@ void FireShotgun(ItemInfo* laraItem)
 
 	if (hasFired)
 	{
-		auto pos = GetLaraJointPosition(LM_RHAND, Vector3i(0, 1508, 32));
-		auto pos2 = GetLaraJointPosition(LM_RHAND, Vector3i(0, 228, 32));
+		auto pos = GetJointPosition(laraItem, LM_RHAND, Vector3i(0, 1508, 32));
+		auto pos2 = GetJointPosition(laraItem, LM_RHAND, Vector3i(0, 228, 32));
 
 		lara->LeftArm.GunSmoke = 32;
 
@@ -462,7 +462,7 @@ void FireHarpoon(ItemInfo* laraItem)
 		item->ObjectNumber = ID_HARPOON;
 		item->RoomNumber = laraItem->RoomNumber;
 
-		auto jointPos = GetLaraJointPosition(LM_RHAND, Vector3i(-2, 373, 77));
+		auto jointPos = GetJointPosition(laraItem, LM_RHAND, Vector3i(-2, 373, 77));
 
 		int floorHeight = GetCollision(jointPos.x, jointPos.y, jointPos.z, item->RoomNumber).Position.Floor;
 		if (floorHeight >= jointPos.y)
@@ -665,7 +665,7 @@ void FireGrenade(ItemInfo* laraItem)
 		item->ObjectNumber = ID_GRENADE;
 		item->RoomNumber = laraItem->RoomNumber;
 
-		auto jointPos = GetLaraJointPosition(LM_RHAND, Vector3i(0, 276, 80));
+		auto jointPos = GetJointPosition(laraItem, LM_RHAND, Vector3i(0, 276, 80));
 
 		item->Pose.Position.x = x = jointPos.x;
 		item->Pose.Position.y = y = jointPos.y;
@@ -680,7 +680,7 @@ void FireGrenade(ItemInfo* laraItem)
 			item->RoomNumber = laraItem->RoomNumber;
 		}
 
-		jointPos = GetLaraJointPosition(LM_RHAND, Vector3i(0, 1204, 5));
+		jointPos = GetJointPosition(laraItem, LM_RHAND, Vector3i(0, 1204, 5));
 
 		lara->LeftArm.GunSmoke = 32;
 
@@ -1088,21 +1088,21 @@ void FireRocket(ItemInfo* laraItem)
 		if (!ammos.hasInfinite())
 			(ammos)--;
 
-		auto jointPos = GetLaraJointPosition(LM_RHAND, Vector3i(0, 180, 72));
+		auto jointPos = GetJointPosition(laraItem, LM_RHAND, Vector3i(0, 180, 72));
 
 		int x, y, z;
 		item->Pose.Position.x = x = jointPos.x;
 		item->Pose.Position.y = y = jointPos.y;
 		item->Pose.Position.z = z = jointPos.z;
 
-		jointPos = GetLaraJointPosition(LM_RHAND, Vector3i(0, 2004, 72));
+		jointPos = GetJointPosition(laraItem, LM_RHAND, Vector3i(0, 2004, 72));
 
 		lara->LeftArm.GunSmoke = 32;
 
 		for (int i = 0; i < 5; i++)
 			TriggerGunSmoke(x, y, z, jointPos.x - x, jointPos.y - y, jointPos.z - z, 1, LaraWeaponType::RocketLauncher, lara->LeftArm.GunSmoke);
 
-		jointPos = GetLaraJointPosition(LM_RHAND, Vector3i(0, -CLICK(1), 0));
+		jointPos = GetJointPosition(laraItem, LM_RHAND, Vector3i(0, -CLICK(1), 0));
 
 		for (int i = 0; i < 10; i++)
 			TriggerGunSmoke(jointPos.x, jointPos.y, jointPos.z, jointPos.x - x, jointPos.y - y, jointPos.z - z, 2, LaraWeaponType::RocketLauncher, 32);
@@ -1378,7 +1378,7 @@ void FireCrossbow(ItemInfo* laraItem, PoseData* pos)
 		}
 		else
 		{
-			auto jointPos = GetLaraJointPosition(LM_RHAND, Vector3i(0, 228, 32));
+			auto jointPos = GetJointPosition(laraItem, LM_RHAND, Vector3i(0, 228, 32));
 
 			item->RoomNumber = laraItem->RoomNumber;
 
@@ -1710,7 +1710,7 @@ void RifleHandler(ItemInfo* laraItem, LaraWeaponType weaponType)
 	{
 		if (weaponType == LaraWeaponType::Shotgun || weaponType == LaraWeaponType::HK)
 		{
-			auto pos = GetLaraJointPosition(LM_RHAND, Vector3i(0, -64, 0));
+			auto pos = GetJointPosition(laraItem, LM_RHAND, Vector3i(0, -64, 0));
 			TriggerDynamicLight(
 				pos.x, pos.y, pos.z,
 				12,
@@ -1721,7 +1721,7 @@ void RifleHandler(ItemInfo* laraItem, LaraWeaponType weaponType)
 		}
 		else if (weaponType == LaraWeaponType::Revolver)
 		{
-			auto pos = GetLaraJointPosition(LM_RHAND, Vector3i(0, -32, 0));
+			auto pos = GetJointPosition(laraItem, LM_RHAND, Vector3i(0, -32, 0));
 			TriggerDynamicLight(pos.x, pos.y, pos.z, 12, (GetRandomControl() & 0x3F) + 192, (GetRandomControl() & 0x1F) + 128, (GetRandomControl() & 0x3F));
 		}
 	}

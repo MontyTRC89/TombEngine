@@ -79,8 +79,8 @@ bool HasStateDispatch(ItemInfo* item, int targetState = -1);
 bool TestLastFrame(ItemInfo* item, int animNumber = -1);
 
 void TranslateItem(ItemInfo* item, short headingAngle, float forward, float down = 0.0f, float right = 0.0f);
-void TranslateItem(ItemInfo* item, EulerAngles orient, float distance);
-void TranslateItem(ItemInfo* item, Vector3 direction, float distance);
+void TranslateItem(ItemInfo* item, const EulerAngles& orient, float distance);
+void TranslateItem(ItemInfo* item, const Vector3& direction, float distance);
 void SetAnimation(ItemInfo* item, int animIndex, int frameToStart = 0);
 
 int GetCurrentRelativeFrameNumber(ItemInfo* item);
@@ -97,5 +97,4 @@ BOUNDING_BOX* GetBoundsAccurate(ItemInfo* item);
 void ClampRotation(PoseData* pose, short angle, short rotation); 
 void DrawAnimatingItem(ItemInfo* item);
 
-Vector3i GetLaraJointPosition(int jointIndex, const Vector3i& offset = Vector3i::Zero);
 Vector3i GetJointPosition(ItemInfo* item, int jointIndex, const Vector3i& offset = Vector3i::Zero);

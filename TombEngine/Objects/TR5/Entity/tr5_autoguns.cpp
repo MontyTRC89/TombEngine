@@ -69,7 +69,7 @@ namespace TEN::Entities::Creatures::TR5
 				item->MeshBits = 1664;
 
 				auto pos1 = GameVector(GetJointPosition(item, 8, Vector3i(0, 0, -64)));
-				auto pos2 = GameVector(GetLaraJointPosition(LM_HIPS));
+				auto pos2 = GameVector(GetJointPosition(LaraItem, LM_HIPS));
 
 				pos1.roomNumber = item->RoomNumber;
 
@@ -108,7 +108,7 @@ namespace TEN::Entities::Creatures::TR5
 
 						if (TestProbability(0.75f))
 						{
-							auto pos2 = GetLaraJointPosition(GetRandomControl() % 15);
+							auto pos2 = GetJointPosition(LaraItem, GetRandomControl() % 15);
 							DoBloodSplat(pos2.x, pos2.y, pos2.z, (GetRandomControl() & 3) + 3, 2 * GetRandomControl(), LaraItem->RoomNumber);
 							DoDamage(LaraItem, 20);
 						}

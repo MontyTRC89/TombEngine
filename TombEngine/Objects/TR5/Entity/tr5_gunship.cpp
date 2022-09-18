@@ -24,7 +24,7 @@ namespace TEN::Entities::Creatures::TR5
 		{
 			SoundEffect(SFX_TR4_HELICOPTER_LOOP, &item->Pose);
 
-			auto pos = GameVector(GetLaraJointPosition(
+			auto pos = GameVector(GetJointPosition(LaraItem, 
 				LM_TORSO,
 				Vector3i(
 					(GetRandomControl() & 0x1FF) - 255,

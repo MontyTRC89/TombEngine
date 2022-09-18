@@ -1046,12 +1046,13 @@ void TriggerLaraBlood()
 	{
 		if (node & LaraItem->TouchBits)
 		{
-			auto vec = GetLaraJointPosition(
+			auto vec = GetJointPosition(LaraItem, 
 				i,
 				Vector3i(
 					(GetRandomControl() & 31) - 16,
 					(GetRandomControl() & 31) - 16,
-					(GetRandomControl() & 31) - 16));
+					(GetRandomControl() & 31) - 16
+				));
 			DoBloodSplat(vec.x, vec.y, vec.z, (GetRandomControl() & 7) + 8, 2 * GetRandomControl(), LaraItem->RoomNumber);
 		}
 

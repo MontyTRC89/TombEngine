@@ -163,7 +163,7 @@ void ScalesCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 		laraItem->Animation.FrameNumber >= g_Level.Anims[LA_WATERSKIN_POUR_HIGH].frameBase + 51 &&
 		laraItem->Animation.FrameNumber <= g_Level.Anims[LA_WATERSKIN_POUR_HIGH].frameBase + 74)
 	{
-		auto pos = GetLaraJointPosition(LM_LHAND);
+		auto pos = GetJointPosition(laraItem, LM_LHAND);
 
 		auto* drip = &Drips[GetFreeDrip()];
 		drip->x = pos.x;

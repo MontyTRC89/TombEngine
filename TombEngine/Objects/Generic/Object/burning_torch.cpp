@@ -173,7 +173,7 @@ namespace TEN::Entities::Generic
 
 		if (lara->Torch.IsLit)
 		{
-			auto pos = GetLaraJointPosition(LM_LHAND, Vector3i(-32, 64, 256));
+			auto pos = GetJointPosition(laraItem, LM_LHAND, Vector3i(-32, 64, 256));
 			TriggerDynamicLight(pos.x, pos.y, pos.z, 12 - (GetRandomControl() & 1), (GetRandomControl() & 0x3F) + 192, (GetRandomControl() & 0x1F) + 96, 0);
 
 			if (!(Wibble & 7))

@@ -196,8 +196,8 @@ void HorizontalBarCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo*
 			else
 				laraItem->Pose.Orientation.y = barItem->Pose.Orientation.y - ANGLE(180.0f);
 
-			auto pos1 = GetLaraJointPosition(LM_LHAND, Vector3i(0, -128, 512));
-			auto pos2 = GetLaraJointPosition(LM_RHAND, Vector3i(0, -128, 512));
+			auto pos1 = GetJointPosition(laraItem, LM_LHAND, Vector3i(0, -128, 512));
+			auto pos2 = GetJointPosition(laraItem, LM_RHAND, Vector3i(0, -128, 512));
 		
 			if (laraItem->Pose.Orientation.y & 0x4000)
 				laraItem->Pose.Position.x += barItem->Pose.Position.x - ((pos1.x + pos2.x) >> 1);

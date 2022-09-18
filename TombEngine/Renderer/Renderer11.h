@@ -641,7 +641,6 @@ namespace TEN::Renderer
 		void ResetAnimations();
 		void UpdateLaraAnimations(bool force);
 		void UpdateItemAnimations(int itemNumber, bool force);
-		void GetLaraAbsBonePosition(Vector3& pos, int jointIndex);
 		void GetItemAbsBonePosition(int itemNumber, Vector3& pos, int jointIndex);
 		int  GetSpheres(short itemNumber, BoundingSphere* ptr, char worldSpace, Matrix local);
 		void GetBoneMatrix(short itemNumber, int jointIndex, Matrix* outMatrix);

@@ -8,6 +8,7 @@
 #include "Game/effects/weather.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
+#include "Game/Lara/lara_helpers.h"
 #include "Renderer/Renderer11.h"
 #include "Flow/ScriptInterfaceFlowHandler.h"
 #include "Specific/setup.h"
@@ -60,7 +61,7 @@ void HairControl(ItemInfo* item, int ponytail, ANIM_FRAME* framePtr)
 	int spaz;
 	bool youngLara = g_GameFlow->GetLevel(CurrentLevel)->GetLaraType() == LaraType::Young;
 
-	LaraInfo*& lara = item->Data;
+	auto* lara = GetLaraInfo(item);
 
 	if (framePtr == NULL)
 	{
@@ -107,14 +108,14 @@ void HairControl(ItemInfo* item, int ponytail, ANIM_FRAME* framePtr)
 
 	// Get Lara's spheres in absolute coordinates for head, torso, hips, and upper arms.
 	auto* mesh = &g_Level.Meshes[lara->MeshPtrs[LM_HIPS]];
-	auto pos = GetLaraJointPosition(LM_HIPS, Vector3i(mesh->sphere.Center.x, mesh->sphere.Center.y, mesh->sphere.Center.z));
+	auto pos = GetJointPosition(item, LM_HIPS, Vector3i(mesh->sphere.Center.x, mesh->sphere.Center.y, mesh->sphere.Center.z));
 	sphere[0].x = pos.x;
 	sphere[0].y = pos.y;
 	sphere[0].z = pos.z;
 	sphere[0].r = (int)mesh->sphere.Radius;
 
 	mesh = &g_Level.Meshes[lara->MeshPtrs[LM_TORSO]];
-	pos = GetLaraJointPosition(LM_TORSO, Vector3i(mesh->sphere.Center.x - 10, mesh->sphere.Center.y, mesh->sphere.Center.z + 25));
+	pos = GetJointPosition(item, LM_TORSO, Vector3i(mesh->sphere.Center.x - 10, mesh->sphere.Center.y, mesh->sphere.Center.z + 25));
 	sphere[1].x = pos.x;
 	sphere[1].y = pos.y;
 	sphere[1].z = pos.z;
@@ -123,21 +124,21 @@ void HairControl(ItemInfo* item, int ponytail, ANIM_FRAME* framePtr)
 		sphere[1].r = sphere[1].r - ((sphere[1].r >> 2) + (sphere[1].r >> 3));
 
 	mesh = &g_Level.Meshes[lara->MeshPtrs[LM_HEAD]];
-	pos = GetLaraJointPosition(LM_HEAD, Vector3i(mesh->sphere.Center.x - 2, mesh->sphere.Center.y, mesh->sphere.Center.z));
+	pos = GetJointPosition(item, LM_HEAD, Vector3i(mesh->sphere.Center.x - 2, mesh->sphere.Center.y, mesh->sphere.Center.z));
 	sphere[2].x = pos.x;
 	sphere[2].y = pos.y;
 	sphere[2].z = pos.z;
 	sphere[2].r = (int)mesh->sphere.Radius;
 
 	mesh = &g_Level.Meshes[lara->MeshPtrs[LM_RINARM]];
-	pos = GetLaraJointPosition(LM_RINARM, Vector3i(mesh->sphere.Center.x, mesh->sphere.Center.y, mesh->sphere.Center.z));
+	pos = GetJointPosition(item, LM_RINARM, Vector3i(mesh->sphere.Center.x, mesh->sphere.Center.y, mesh->sphere.Center.z));
 	sphere[3].x = pos.x;
 	sphere[3].y = pos.y;
 	sphere[3].z = pos.z;
 	sphere[3].r = int(4.0f * mesh->sphere.Radius / 3.0f); // Resizing sphere - from tomb5 
 
 	mesh = &g_Level.Meshes[lara->MeshPtrs[LM_LINARM]];
-	pos = GetLaraJointPosition(LM_LINARM, Vector3i(mesh->sphere.Center.x, mesh->sphere.Center.y, mesh->sphere.Center.z));
+	pos = GetJointPosition(item, LM_LINARM, Vector3i(mesh->sphere.Center.x, mesh->sphere.Center.y, mesh->sphere.Center.z));
 	sphere[4].x = pos.x;
 	sphere[4].y = pos.y;
 	sphere[4].z = pos.z;

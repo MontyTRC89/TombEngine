@@ -1049,7 +1049,7 @@ namespace TEN::Entities::Vehicles
 			if (laraItem->Animation.AnimNumber == Objects[ID_KAYAK_LARA_ANIMS].animIndex + KAYAK_ANIM_DISMOUNT_LEFT &&
 				frame == 83)
 			{
-				auto vec = GetLaraJointPosition(LM_HIPS, Vector3i(0, 350, 500));
+				auto vec = GetJointPosition(laraItem, LM_HIPS, Vector3i(0, 350, 500));
 
 				SetAnimation(laraItem, LA_JUMP_FORWARD);
 				laraItem->Pose.Position = vec;
@@ -1070,7 +1070,7 @@ namespace TEN::Entities::Vehicles
 			if (laraItem->Animation.AnimNumber == Objects[ID_KAYAK_LARA_ANIMS].animIndex + KAYAK_ANIM_DISMOUNT_RIGHT &&
 				frame == 83)
 			{
-				auto vec = GetLaraJointPosition(LM_HIPS, Vector3i(0, 350, 500));
+				auto vec = GetJointPosition(laraItem, LM_HIPS, Vector3i(0, 350, 500));
 
 				SetAnimation(laraItem, LA_JUMP_FORWARD);
 				laraItem->Pose.Position = vec;

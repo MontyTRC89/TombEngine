@@ -69,10 +69,10 @@ namespace TEN::Entities::Creatures::TR5
 		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 	}
 
-	static void ImpThrowStones(ItemInfo* item)
+	void ImpThrowStones(ItemInfo* item)
 	{
 		auto pos1 = GetJointPosition(item, 9);
-		auto pos2 = GetLaraJointPosition(LM_HEAD);
+		auto pos2 = GetJointPosition(LaraItem, LM_HEAD);
 
 		int dx = pos1.x - pos2.x;
 		int dy = pos1.y - pos2.y;
