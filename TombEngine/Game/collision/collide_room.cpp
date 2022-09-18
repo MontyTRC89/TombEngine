@@ -817,10 +817,10 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, Vector3i offset, bool
 	}
 }
 
-void AlignEntityToSurface(ItemInfo* item, Vector2 radius, float tiltConstraintAngle, EulerAngles tiltOffset)
+void AlignEntityToSurface(ItemInfo* item, const Vector2& ellipse, float tiltConstraintAngle, const EulerAngles& tiltOffset)
 {
-	// Reduce probe radii for stability.
-	auto halvedRadius = radius / 2;
+	// Reduce ellipse axis lengths for stability.
+	auto halvedRadius = ellipse * 0.75f;
 
 	// Probe heights at points around the entity.
 	int frontHeight = GetCollision(item, item->Pose.Orientation.y, halvedRadius.y).Position.Floor;
@@ -832,22 +832,26 @@ void AlignEntityToSurface(ItemInfo* item, Vector2 radius, float tiltConstraintAn
 	int forwardHeightDif = backHeight - frontHeight;
 	int lateralHeightDif = rightHeight - leftHeight;
 
-	// Don't align if height differences are too significant.
-	if ((abs(forwardHeightDif) > STEPUP_HEIGHT) || (abs(lateralHeightDif) > STEPUP_HEIGHT))
-		return;
-
-	// Calculate and apply tilts.
+	// Calculate tilt.
 	auto tiltedOrient = EulerAngles(
-		phd_atan(radius.y * 2, forwardHeightDif) + tiltOffset.x,
+		FROM_RAD(atan2(forwardHeightDif, ellipse.y * 2)),
 		0,
-		phd_atan(radius.x * 2, lateralHeightDif) + tiltOffset.z
-	);
+		FROM_RAD(atan2(lateralHeightDif, ellipse.x * 2))
+	) + tiltOffset;
 
-	if (abs(tiltedOrient.x) <= ANGLE(tiltConstraintAngle))
-		item->Pose.Orientation.x = tiltedOrient.x;
+	// Align X orientation if forward height difference is not too significant.
+	if (abs(forwardHeightDif) <= STEPUP_HEIGHT)
+	{
+		if (abs(tiltedOrient.x) <= ANGLE(tiltConstraintAngle))
+			item->Pose.Orientation.x = tiltedOrient.x;
+	}
 
-	if (abs(tiltedOrient.z) <= ANGLE(tiltConstraintAngle))
-		item->Pose.Orientation.z = tiltedOrient.z;
+	// Align Z orientation if lateral height difference is not too significant.
+	if (abs(lateralHeightDif) <= STEPUP_HEIGHT)
+	{
+		if (abs(tiltedOrient.z) <= ANGLE(tiltConstraintAngle))
+			item->Pose.Orientation.z = tiltedOrient.z;
+	}
 }
 
 int GetQuadrant(short angle)
