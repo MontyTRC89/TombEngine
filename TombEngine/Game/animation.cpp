@@ -98,14 +98,14 @@ void AnimateLara(ItemInfo* item)
 
 void PerformAnimCommands(ItemInfo* item, bool frameBased)
 {
-	auto* anim = &g_Level.Anims[item->Animation.AnimNumber];
+	const auto& anim = g_Level.Anims[item->Animation.AnimNumber];
 
-	if (anim->numberCommands == 0)
+	if (anim.numberCommands == 0)
 		return;
 
-	short* cmd = &g_Level.Commands[anim->commandIndex];
+	short* cmd = &g_Level.Commands[anim.commandIndex];
 
-	for (int i = anim->numberCommands; i > 0; i--)
+	for (int i = anim.numberCommands; i > 0; i--)
 	{
 		auto animCommand = (AnimCommandType)cmd[0];
 		cmd++;
@@ -283,25 +283,25 @@ void AnimateItem(ItemInfo* item)
 
 bool HasStateDispatch(ItemInfo* item, int targetState)
 {
-	auto* anim = &g_Level.Anims[item->Animation.AnimNumber];
+	const auto& anim = g_Level.Anims[item->Animation.AnimNumber];
 
-	if (anim->numberChanges <= 0)
+	if (anim.numberChanges <= 0)
 		return false;
 
 	if (targetState < 0)
 		targetState = item->Animation.TargetState;
 
 	// Iterate over possible state dispatches.
-	for (int i = 0; i < anim->numberChanges; i++)
+	for (int i = 0; i < anim.numberChanges; i++)
 	{
-		auto* dispatch = &g_Level.Changes[anim->changeIndex + i];
-		if (dispatch->TargetState == targetState)
+		const auto& dispatch = g_Level.Changes[anim.changeIndex + i];
+		if (dispatch.TargetState == targetState)
 		{
 			// Iterate over frame range of state dispatch.
-			for (int j = 0; j < dispatch->numberRanges; j++)
+			for (int j = 0; j < dispatch.numberRanges; j++)
 			{
-				auto* range = &g_Level.Ranges[dispatch->rangeIndex + j];
-				if (item->Animation.FrameNumber >= range->startFrame && item->Animation.FrameNumber <= range->endFrame)
+				const auto& range = g_Level.Ranges[dispatch.rangeIndex + j];
+				if (item->Animation.FrameNumber >= range.startFrame && item->Animation.FrameNumber <= range.endFrame)
 					return true;
 			}
 		}
@@ -318,8 +318,8 @@ bool TestLastFrame(ItemInfo* item, int animNumber)
 	if (item->Animation.AnimNumber != animNumber)
 		return false;
 
-	auto* anim = &g_Level.Anims[animNumber];
-	return (item->Animation.FrameNumber >= anim->frameEnd);
+	const auto& anim = g_Level.Anims[animNumber];
+	return (item->Animation.FrameNumber >= anim.frameEnd);
 }
 
 void TranslateItem(ItemInfo* item, short headingAngle, float forward, float down, float right)
@@ -366,17 +366,17 @@ bool GetChange(ItemInfo* item, ANIM_STRUCT* anim)
 	// Iterate over possible state dispatches.
 	for (int i = 0; i < anim->numberChanges; i++)
 	{
-		auto* dispatch = &g_Level.Changes[anim->changeIndex + i];
-		if (dispatch->TargetState == item->Animation.TargetState)
+		const auto& dispatch = g_Level.Changes[anim->changeIndex + i];
+		if (dispatch.TargetState == item->Animation.TargetState)
 		{
 			// Iterate over frame range of state dispatch.
-			for (int j = 0; j < dispatch->numberRanges; j++)
+			for (int j = 0; j < dispatch.numberRanges; j++)
 			{
-				auto* range = &g_Level.Ranges[dispatch->rangeIndex + j];
-				if (item->Animation.FrameNumber >= range->startFrame && item->Animation.FrameNumber <= range->endFrame)
+				const auto& range = g_Level.Ranges[dispatch.rangeIndex + j];
+				if (item->Animation.FrameNumber >= range.startFrame && item->Animation.FrameNumber <= range.endFrame)
 				{
-					item->Animation.AnimNumber = range->linkAnimNum;
-					item->Animation.FrameNumber = range->linkFrameNum;
+					item->Animation.AnimNumber = range.linkAnimNum;
+					item->Animation.FrameNumber = range.linkFrameNum;
 					return true;
 				}
 			}
@@ -424,10 +424,11 @@ ANIM_FRAME* GetBestFrame(ItemInfo* item)
 int GetFrame(ItemInfo* item, ANIM_FRAME* framePtr[], int* rate)
 {
 	int frame = item->Animation.FrameNumber;
-	auto* anim = &g_Level.Anims[item->Animation.AnimNumber];
-	framePtr[0] = framePtr[1] = &g_Level.Frames[anim->framePtr];
-	int rate2 = *rate = anim->Interpolation & 0x00ff;
-	frame -= anim->frameBase; 
+	const auto& anim = g_Level.Anims[item->Animation.AnimNumber];
+
+	framePtr[0] = framePtr[1] = &g_Level.Frames[anim.framePtr];
+	int rate2 = *rate = anim.Interpolation & 0x00ff;
+	frame -= anim.frameBase; 
 
 	int first = frame / rate2;
 	int interpolation = frame % rate2;
@@ -439,8 +440,8 @@ int GetFrame(ItemInfo* item, ANIM_FRAME* framePtr[], int* rate)
 
 	// Clamp key frame to end if need be.
 	int second = first * rate2 + rate2;
-	if (second > anim->frameEnd)
-		*rate = anim->frameEnd - (second - rate2);
+	if (second > anim.frameEnd)
+		*rate = anim.frameEnd - (second - rate2);
 
 	return interpolation;
 }

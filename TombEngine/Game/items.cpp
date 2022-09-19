@@ -636,7 +636,7 @@ int GlobalItemReplace(short search, GAME_OBJECT_ID replace)
 // Offset values may be used to account for the quirk of room traversal only being able to occur at portals.
 void UpdateItemRoom(ItemInfo* item, int height, int xOffset, int zOffset)
 {
-	auto point = TranslateVector(item->Pose.Position, item->Pose.Orientation.y, zOffset, height, xOffset);
+	auto point = Geometry::TranslatePoint(item->Pose.Position, item->Pose.Orientation.y, zOffset, height, xOffset);
 
 	// Hacky L-shaped Location traversal.
 	item->Location = GetRoom(item->Location, point.x, point.y, point.z);
