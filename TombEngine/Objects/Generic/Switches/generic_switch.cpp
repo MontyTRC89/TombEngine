@@ -138,15 +138,15 @@ namespace TEN::Entities::Switches
 						break;
 					}
 
-					if (switchItem->Animation.ActiveState == SWITCH_ON) /* Switch down */
+					if (switchItem->Animation.ActiveState == SWITCH_OFF) /* Switch down */
 					{
 						SetAnimation(laraItem, offAnim);
-						switchItem->Animation.TargetState = SWITCH_OFF;
+						switchItem->Animation.TargetState = SWITCH_ON;
 					}
 					else /* Switch up */
 					{
 						SetAnimation(laraItem, onAnim);
-						switchItem->Animation.TargetState = SWITCH_ON;
+						switchItem->Animation.TargetState = SWITCH_OFF;
 					}
 
 					ResetLaraFlex(laraItem);
