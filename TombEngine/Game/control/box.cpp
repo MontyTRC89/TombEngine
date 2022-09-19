@@ -1422,8 +1422,8 @@ void CreatureAIInfo(ItemInfo* item, AI_INFO* AI)
 	if (!item->Data)
 		return;
 
-	auto* creature = GetCreatureInfo(item);
 	auto* object = &Objects[item->ObjectNumber];
+	auto* creature = GetCreatureInfo(item);
 
 	// TODO: Deal with LaraItem global.
 	auto* enemy = creature->Enemy;
@@ -1438,7 +1438,7 @@ void CreatureAIInfo(ItemInfo* item, AI_INFO* AI)
 	auto* room = &g_Level.Rooms[item->RoomNumber];
 	item->BoxNumber = NO_BOX;
 	FloorInfo* floor = GetSector(room, item->Pose.Position.x - room->x, item->Pose.Position.z - room->z);
-	if(floor)
+	if (floor)
 		item->BoxNumber = floor->Box;
 
 	if (item->BoxNumber != NO_BOX)
@@ -1451,14 +1451,14 @@ void CreatureAIInfo(ItemInfo* item, AI_INFO* AI)
 	room = &g_Level.Rooms[enemy->RoomNumber];
 	floor = GetSector(room, enemy->Pose.Position.x - room->x, enemy->Pose.Position.z - room->z);
 
-	// NEW: Only update enemy box number if will be actually reachable by enemy.
-	// This prevents enemies from running to Lara and attacking nothing when she is hanging or shimmying. -- Lwmte, 27.06.22
+	// NEW: Only update enemy box number if it is actually reachable by enemy.
+	// This prevents enemies from running to the player and attacking nothing when they are hanging or shimmying. -- Lwmte, 27.06.22
 
 	bool reachable = false;
 	if (object->ZoneType == ZoneType::Flyer ||
 	   (object->ZoneType == ZoneType::Water && TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, item->RoomNumber)))
 	{
-		reachable = true; // If NPC is flying or swimming in water, always reach Lara
+		reachable = true; // If NPC is flying or swimming in water, player is always reachable.
 	}
 	else
 	{
@@ -1485,30 +1485,41 @@ void CreatureAIInfo(ItemInfo* item, AI_INFO* AI)
 	}
 
 	Vector3i vector;
-
-	if (enemy == LaraItem)
+	if (enemy->IsLara())
 	{
-		vector.x = enemy->Pose.Position.x + enemy->Animation.Velocity.z * PREDICTIVE_SCALE_FACTOR * phd_sin(Lara.Control.MoveAngle) - item->Pose.Position.x - object->pivotLength * phd_sin(item->Pose.Orientation.y);
-		vector.z = enemy->Pose.Position.z + enemy->Animation.Velocity.z * PREDICTIVE_SCALE_FACTOR * phd_cos(Lara.Control.MoveAngle) - item->Pose.Position.z - object->pivotLength * phd_cos(item->Pose.Orientation.y);
+		vector.x = enemy->Pose.Position.x +
+			(enemy->Animation.Velocity.z * PREDICTIVE_SCALE_FACTOR) * phd_sin(Lara.Control.MoveAngle) -
+			item->Pose.Position.x - (object->pivotLength * phd_sin(item->Pose.Orientation.y));
+		vector.z = enemy->Pose.Position.z +
+			(enemy->Animation.Velocity.z * PREDICTIVE_SCALE_FACTOR) * phd_cos(Lara.Control.MoveAngle) -
+			item->Pose.Position.z - (object->pivotLength * phd_cos(item->Pose.Orientation.y));
 	}
 	else
 	{
-		vector.x = enemy->Pose.Position.x + enemy->Animation.Velocity.z * PREDICTIVE_SCALE_FACTOR * phd_sin(enemy->Pose.Orientation.y) - item->Pose.Position.x - object->pivotLength * phd_sin(item->Pose.Orientation.y);
-		vector.z = enemy->Pose.Position.z + enemy->Animation.Velocity.z * PREDICTIVE_SCALE_FACTOR * phd_cos(enemy->Pose.Orientation.y) - item->Pose.Position.z - object->pivotLength * phd_cos(item->Pose.Orientation.y);
+		vector.x = enemy->Pose.Position.x +
+			(enemy->Animation.Velocity.z * PREDICTIVE_SCALE_FACTOR) * phd_sin(enemy->Pose.Orientation.y) -
+			item->Pose.Position.x - (object->pivotLength * phd_sin(item->Pose.Orientation.y));
+		vector.z = enemy->Pose.Position.z +
+			(enemy->Animation.Velocity.z * PREDICTIVE_SCALE_FACTOR) * phd_cos(enemy->Pose.Orientation.y) -
+			item->Pose.Position.z - (object->pivotLength * phd_cos(item->Pose.Orientation.y));
 	}
-
 	vector.y = item->Pose.Position.y - enemy->Pose.Position.y;
+
 	short angle = phd_atan(vector.z, vector.x);
 
-	if (vector.x > SECTOR(31.25f) || vector.x < -SECTOR(31.25f) || vector.z > SECTOR(31.25f) || vector.z < -SECTOR(31.25f))
-		AI->distance = AI->verticalDistance = INT_MAX;
+	if (vector.x > SECTOR(31.25f) || vector.x < -SECTOR(31.25f) ||
+		vector.z > SECTOR(31.25f) || vector.z < -SECTOR(31.25f))
+	{
+		AI->distance = INT_MAX;
+		AI->verticalDistance = INT_MAX;
+	}
 	else
 	{
-		if (creature->Enemy)
+		if (creature->Enemy != nullptr)
 		{
 			// TODO: distance is squared, verticalDistance is not. Desquare distance later. -- Lwmte, 27.06.22
 
-			AI->distance = pow(vector.x, 2) + pow(vector.z, 2);
+			AI->distance = pow(vector.x, 2) + pow(vector.z, 2); // 2D distance.
 			AI->verticalDistance = abs(vector.y);
 		}
 		else
@@ -1516,7 +1527,7 @@ void CreatureAIInfo(ItemInfo* item, AI_INFO* AI)
 	}
 
 	AI->angle = angle - item->Pose.Orientation.y;
-	AI->enemyFacing = ANGLE(180.0f) + angle - enemy->Pose.Orientation.y;
+	AI->enemyFacing = (angle - enemy->Pose.Orientation.y) + ANGLE(180.0f);
 
 	vector.x = abs(vector.x);
 	vector.z = abs(vector.z);

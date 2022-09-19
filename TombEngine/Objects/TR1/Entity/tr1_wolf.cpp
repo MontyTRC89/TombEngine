@@ -74,9 +74,9 @@ namespace TEN::Entities::Creatures::TR1
 		auto* item = &g_Level.Items[itemNumber];
 		auto* creature = GetCreatureInfo(item);
 
-		short head = 0;
 		short angle = 0;
 		short tilt = 0;
+		short head = 0;
 
 		if (item->HitPoints <= 0)
 		{

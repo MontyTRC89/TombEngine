@@ -56,8 +56,8 @@ namespace TEN::Entities::Creatures::TR1
 		auto* creature = GetCreatureInfo(item);
 
 		short head = 0;
-		short angle = 0;
 		short tilt = 0;
+		short angle = 0;
 		short facing = 0;
 		short gun = creature->JointRotation[0] * 7 / 8;
 

@@ -93,7 +93,7 @@ namespace TEN::Entities::Creatures::TR2
 			angle = CreatureTurn(item, creature->MaxTurn);
 
 			if (item->Animation.ActiveState != 9)
-				item->MeshBits = 0xFFFFFFFF;
+				item->MeshBits = ALL_JOINT_BITS;
 
 			switch (item->Animation.ActiveState)
 			{

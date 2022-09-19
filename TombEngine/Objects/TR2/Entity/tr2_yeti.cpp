@@ -54,8 +54,8 @@ namespace TEN::Entities::Creatures::TR2
 
 		short angle = 0;
 		short tilt = 0;
-		short torso = 0;
 		short head = 0;
+		short torso = 0;
 
 		if (item->HitPoints <= 0)
 		{

@@ -129,11 +129,8 @@ namespace TEN::Entities::TR4
 				GetAITarget(creature);
 			else
 			{
-				if (creature->HurtByLara &&
-					item->Animation.ActiveState != BSCORPION_STATE_KILL_TROOP)
-				{
+				if (creature->HurtByLara && item->Animation.ActiveState != BSCORPION_STATE_KILL_TROOP)
 					creature->Enemy = LaraItem;
-				}
 				else
 				{
 					creature->Enemy = nullptr;

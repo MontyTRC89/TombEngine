@@ -96,30 +96,26 @@ namespace TEN::Entities::Creatures::TR3
 			if (creature->Enemy == nullptr || TestProbability(RAPTOR_SWITCH_TARGET_CHANCE))
 			{
 				ItemInfo* nearestItem = nullptr;
-				int minDistance = INT_MAX;
+				float minDistance = FLT_MAX;
 
-				for (auto* currentCreature : ActiveCreatures)
+				for (auto* activeCreature : ActiveCreatures)
 				{
-					if (currentCreature->ItemNumber == NO_ITEM || currentCreature->ItemNumber == itemNumber)
+					if (activeCreature->ItemNumber == NO_ITEM || activeCreature->ItemNumber == itemNumber)
 					{
-						currentCreature++;
+						activeCreature++;
 						continue;
 					}
 
-					auto* targetItem = &g_Level.Items[currentCreature->ItemNumber];
+					auto* targetItem = &g_Level.Items[activeCreature->ItemNumber];
 
-					int x = (targetItem->Pose.Position.x - item->Pose.Position.x) / 64;
-					int y = (targetItem->Pose.Position.y - item->Pose.Position.y) / 64;
-					int z = (targetItem->Pose.Position.z - item->Pose.Position.z) / 64;
-
-					int distance = SQUARE(x) + SQUARE(y) + SQUARE(z);
+					int distance = Vector3i::Distance(item->Pose.Position, targetItem->Pose.Position);
 					if (distance < minDistance && item->HitPoints > 0)
 					{
 						nearestItem = targetItem;
 						minDistance = distance;
 					}
 
-					currentCreature++;
+					activeCreature++;
 				}
 
 				if (nearestItem != nullptr &&
@@ -129,11 +125,7 @@ namespace TEN::Entities::Creatures::TR3
 					creature->Enemy = nearestItem;
 				}
 
-				int x = (LaraItem->Pose.Position.x - item->Pose.Position.x) / 64;
-				int y = (LaraItem->Pose.Position.y - item->Pose.Position.y) / 64;
-				int z = (LaraItem->Pose.Position.z - item->Pose.Position.z) / 64;
-
-				int distance = SQUARE(x) + SQUARE(y) + SQUARE(z);
+				int distance = Vector3i::Distance(item->Pose.Position, LaraItem->Pose.Position);
 				if (distance <= minDistance)
 					creature->Enemy = LaraItem;
 			}

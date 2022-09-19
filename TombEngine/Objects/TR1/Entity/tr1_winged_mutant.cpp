@@ -234,9 +234,9 @@ namespace TEN::Entities::Creatures::TR1
 		auto* item = &g_Level.Items[itemNumber];
 		auto* creature = GetCreatureInfo(item);
 
+		short angle = 0;
 		short head = 0;
 		short torso = 0; // Only when shooting.
-		short angle = 0;
 
 		bool flyEnabled = item->TestFlags(WMUTANT_CONF_CAN_FLY, true);
 		bool flyStatus = item->TestFlags(WMUTANT_CONF_PATHFINDING_MODE, WMUTANT_PATH_AERIAL);

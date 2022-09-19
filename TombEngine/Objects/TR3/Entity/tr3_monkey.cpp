@@ -425,7 +425,7 @@ namespace TEN::Entities::Creatures::TR3
 				}
 				else if (AI.bite && AI.distance < pow(682, 2))
 					item->Animation.TargetState = MONKEY_STATE_IDLE;
-
+				
 				break;
 
 			case MONKEY_STATE_RUN_FORWARD:
@@ -485,11 +485,10 @@ namespace TEN::Entities::Creatures::TR3
 				}
 				else
 				{
-					if (!creature->Flags && enemy)
+					if (!creature->Flags && enemy != nullptr)
 					{
-						if (abs(enemy->Pose.Position.x - item->Pose.Position.x) < CLICK(1) &&
-							abs(enemy->Pose.Position.y - item->Pose.Position.y) <= CLICK(1) &&
-							abs(enemy->Pose.Position.z - item->Pose.Position.z) < CLICK(1))
+						float distance = Vector3i::Distance(item->Pose.Position, enemy->Pose.Position);
+						if (distance <= CLICK(1))
 						{
 							DoDamage(enemy, MONKEY_SWIPE_ATTACK_CREATURE_DAMAGE);
 							CreatureEffect(item, MonkeyBite, DoBloodSplat);
@@ -567,9 +566,9 @@ namespace TEN::Entities::Creatures::TR3
 				}
 				else
 				{
-					if (creature->Flags != 1 && enemy)
+					if (creature->Flags != 1 && enemy != nullptr)
 					{
-						if (Vector3i::Distance(item->Pose.Position, creature->Enemy->Pose.Position) <= CLICK(1))
+						if (Vector3i::Distance(item->Pose.Position, enemy->Pose.Position) <= CLICK(1))
 						{
 							DoDamage(enemy, 25);
 							CreatureEffect(item, MonkeyBite, DoBloodSplat);
