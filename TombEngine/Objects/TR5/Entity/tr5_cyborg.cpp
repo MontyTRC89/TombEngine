@@ -127,7 +127,7 @@ namespace TEN::Entities::Creatures::TR5
 		SetAnimation(item, CYBORG_ANIM_IDLE);
 	}
 
-	static void TriggerHitmanSparks(int x, int y, int z, short xv, short yv, short zv)
+	void TriggerHitmanSparks(int x, int y, int z, short xv, short yv, short zv)
 	{
 		int dx = LaraItem->Pose.Position.x - x;
 		int dz = LaraItem->Pose.Position.z - z;

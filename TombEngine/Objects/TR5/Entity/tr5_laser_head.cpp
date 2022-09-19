@@ -47,7 +47,7 @@ namespace TEN::Entities::Creatures::TR5
 		Vector3i(-440, -832, -188)
 	};
 
-	static void TriggerLaserHeadSparks(Vector3i* pos, int count, byte r, byte g, byte b, int unk)
+	void TriggerLaserHeadSparks(Vector3i* pos, int count, byte r, byte g, byte b, int unk)
 	{
 		if (count > 0)
 		{
@@ -81,7 +81,7 @@ namespace TEN::Entities::Creatures::TR5
 		}
 	}
 
-	static void LaserHeadCharge(ItemInfo* item)
+	void LaserHeadCharge(ItemInfo* item)
 	{
 		byte size = item->ItemFlags[3];
 		byte g = ((GetRandomControl() & 0x1F) + 128);
@@ -97,9 +97,8 @@ namespace TEN::Entities::Creatures::TR5
 
 		auto* creature = (LaserHeadInfo*)item->Data;
 
-		auto dest = GetJointPosition(&g_Level.Items[creature->BaseItem], 0, LaserHeadBasePosition);
-
-		Vector3i src;
+		Vector3i origin;
+		auto target = GetJointPosition(&g_Level.Items[creature->BaseItem], 0, LaserHeadBasePosition);
 
 		for (int i = 0; i < 4; i++)
 		{
@@ -114,8 +113,8 @@ namespace TEN::Entities::Creatures::TR5
 			}
 			else
 			{
-				src = GetJointPosition(&g_Level.Items[creature->BaseItem], 0, GuardianChargePositions[i]);
-				//LaserHeadData.chargeArcs[i] = TriggerEnergyArc(&src, &dest, 0, g, b, 256, 90, 64, ENERGY_ARC_NO_RANDOMIZE, ENERGY_ARC_STRAIGHT_LINE); //  (GetRandomControl() & 7) + 8, v4 | ((v1 | 0x240000) << 8), 13, 48, 3);
+				origin = GetJointPosition(&g_Level.Items[creature->BaseItem], 0, GuardianChargePositions[i]);
+				//LaserHeadData.chargeArcs[i] = TriggerEnergyArc(&origin, &target, 0, g, b, 256, 90, 64, ENERGY_ARC_NO_RANDOMIZE, ENERGY_ARC_STRAIGHT_LINE); //  (GetRandomControl() & 7) + 8, v4 | ((v1 | 0x240000) << 8), 13, 48, 3);
 			}
 		}
 
@@ -125,23 +124,23 @@ namespace TEN::Entities::Creatures::TR5
 			{
 				if (1 << GuardianMeshes[i] & item->MeshBits)
 				{
-					src = GetJointPosition(item, GuardianMeshes[i]);
-					TriggerLightningGlow(src.x, src.y, src.z, size + (GetRandomControl() & 3), 0, g, b);
-					TriggerLaserHeadSparks(&src, 3, 0, g, b, 0);
+					origin = GetJointPosition(item, GuardianMeshes[i]);
+					TriggerLightningGlow(origin.x, origin.y, origin.z, size + (GetRandomControl() & 3), 0, g, b);
+					TriggerLaserHeadSparks(&origin, 3, 0, g, b, 0);
 				}
 			}
 
-			TriggerLightningGlow(dest.x, dest.y, dest.z, (GetRandomControl() & 3) + size + 8, 0, g, b);
-			TriggerDynamicLight(dest.x, dest.y, dest.z, (GetRandomControl() & 3) + 16, 0, g, b);
+			TriggerLightningGlow(target.x, target.y, target.z, (GetRandomControl() & 3) + size + 8, 0, g, b);
+			TriggerDynamicLight(target.x, target.y, target.z, (GetRandomControl() & 3) + 16, 0, g, b);
 		}
 
 		if (!(GlobalCounter & 3))
 		{
-			//TriggerEnergyArc(&dest, (Vector3i*)&item->pos, 0, g, b, 256, 3, 64, ENERGY_ARC_NO_RANDOMIZE, ENERGY_ARC_STRAIGHT_LINE);
-			//TriggerEnergyArc(&dest, &item->pos, (GetRandomControl() & 7) + 8, v4 | ((v1 | 0x180000) << 8), 13, 64, 3);
+			//TriggerEnergyArc(&target, (Vector3i*)&item->pos, 0, g, b, 256, 3, 64, ENERGY_ARC_NO_RANDOMIZE, ENERGY_ARC_STRAIGHT_LINE);
+			//TriggerEnergyArc(&target, &item->pos, (GetRandomControl() & 7) + 8, v4 | ((v1 | 0x180000) << 8), 13, 64, 3);
 		}
 
-		TriggerLaserHeadSparks(&dest, 3, 0, g, b, 1);
+		TriggerLaserHeadSparks(&target, 3, 0, g, b, 1);
 	}
 
 	void InitialiseLaserHead(short itemNumber)
@@ -199,7 +198,7 @@ namespace TEN::Entities::Creatures::TR5
 		auto* item = &g_Level.Items[itemNumber];
 		auto* creature = (LaserHeadInfo*)item->Data;
 
-		GameVector origin, dest;
+		GameVector origin, target;
 
 		// NOTICE: itemFlags[0] seems to be a state machine, if it's equal to 3 then death animations is triggered
 		// Other values still unknown
@@ -290,24 +289,24 @@ namespace TEN::Entities::Creatures::TR5
 				{
 					// Get Lara's left hand position
 					// TODO: check if left hand or head
-					dest = GameVector(GetJointPosition(LaraItem, LM_HEAD), dest.roomNumber);
+					target = GameVector(GetJointPosition(LaraItem, LM_HEAD), target.roomNumber);
 
 					// Calculate distance between guardian and Lara
-					int distance = sqrt(pow(origin.x - dest.x, 2) + pow(origin.y - dest.y, 2) + pow(origin.z - dest.z, 2));
+					int distance = sqrt(pow(origin.x - target.x, 2) + pow(origin.y - target.y, 2) + pow(origin.z - target.z, 2));
 
 					// Check if there's a valid LOS between guardian and Lara 
 					// and if distance is less than 8 sectors  and if Lara is alive and not burning
-					if (LOS(&origin, &dest) &&
+					if (LOS(&origin, &target) &&
 						distance <= MAX_VISIBILITY_DISTANCE &&
 						LaraItem->HitPoints > 0 &&
 						!Lara.Burn &&
 						(LaserHeadData.target.x || LaserHeadData.target.y || LaserHeadData.target.z))
 					{
 						// Lock target for attacking.
-						dest = GameVector(GetJointPosition(LaraItem, LM_HIPS), dest.roomNumber);
-						LaserHeadData.target.x = dest.x;
-						LaserHeadData.target.y = dest.y;
-						LaserHeadData.target.z = dest.z;
+						target = GameVector(GetJointPosition(LaraItem, LM_HIPS), target.roomNumber);
+						LaserHeadData.target.x = target.x;
+						LaserHeadData.target.y = target.y;
+						LaserHeadData.target.z = target.z;
 						LaserHeadData.byte1 = 3;
 						LaserHeadData.byte2 = 1;
 					}
@@ -326,9 +325,9 @@ namespace TEN::Entities::Creatures::TR5
 								yRot = 2 * GetRandomControl();
 							int v = ((GetRandomControl() & 0x1FFF) + 8192);
 							int c = v * phd_cos(-xRot);
-							dest.x = origin.x + c * phd_sin(yRot);
-							dest.y = origin.y + v * phd_sin(-xRot);
-							dest.z = origin.z + c * phd_cos(yRot);
+							target.x = origin.x + c * phd_sin(yRot);
+							target.y = origin.y + v * phd_sin(-xRot);
+							target.z = origin.z + c * phd_cos(yRot);
 
 							if (condition)
 							{
@@ -340,15 +339,15 @@ namespace TEN::Entities::Creatures::TR5
 
 							item->ItemFlags[3] = LaserHeadData.byte1 * ((GetRandomControl() & 3) + 8);
 
-							LaserHeadData.target.x = dest.x;
-							LaserHeadData.target.y = dest.y;
-							LaserHeadData.target.z = dest.z;
+							LaserHeadData.target.x = target.x;
+							LaserHeadData.target.y = target.y;
+							LaserHeadData.target.z = target.z;
 						}
 						else
 						{
-							dest.x = LaserHeadData.target.x;
-							dest.y = LaserHeadData.target.y;
-							dest.z = LaserHeadData.target.z;
+							target.x = LaserHeadData.target.x;
+							target.y = LaserHeadData.target.y;
+							target.z = LaserHeadData.target.z;
 						}
 
 						LaserHeadData.byte2 = 0;
@@ -362,15 +361,15 @@ namespace TEN::Entities::Creatures::TR5
 					{
 						int c = 8192 * phd_cos(item->Pose.Orientation.x + 3328);
 
-						dest.x = LaserHeadData.target.x = origin.x + c * phd_sin(item->Pose.Orientation.y);
-						dest.y = LaserHeadData.target.y = origin.y + SECTOR(8) * phd_sin(3328 - item->Pose.Orientation.x);
-						dest.z = LaserHeadData.target.z = origin.z + c * phd_cos(item->Pose.Orientation.y);
+						target.x = LaserHeadData.target.x = origin.x + c * phd_sin(item->Pose.Orientation.y);
+						target.y = LaserHeadData.target.y = origin.y + SECTOR(8) * phd_sin(3328 - item->Pose.Orientation.x);
+						target.z = LaserHeadData.target.z = origin.z + c * phd_cos(item->Pose.Orientation.y);
 					}
 					else
 					{
-						dest.x = LaserHeadData.target.x;
-						dest.y = LaserHeadData.target.y;
-						dest.z = LaserHeadData.target.z;
+						target.x = LaserHeadData.target.x;
+						target.y = LaserHeadData.target.y;
+						target.z = LaserHeadData.target.z;
 					}
 				}
 
@@ -451,9 +450,9 @@ namespace TEN::Entities::Creatures::TR5
 									origin = GameVector(GetJointPosition(item, GuardianMeshes[i]), origin.roomNumber);
 
 									int c = ANGLE(45.0f) * phd_cos(angles.x);
-									dest.x = origin.x + c * phd_sin(item->Pose.Orientation.y);
-									dest.y = origin.y + 8192 * phd_sin(-angles.x);
-									dest.z = origin.z + c * phd_cos(item->Pose.Orientation.y);
+									target.x = origin.x + c * phd_sin(item->Pose.Orientation.y);
+									target.y = origin.y + 8192 * phd_sin(-angles.x);
+									target.z = origin.z + c * phd_cos(item->Pose.Orientation.y);
 
 									if (item->ItemFlags[3] != 90 &&
 										LaserHeadData.fireArcs[i] != nullptr)
@@ -469,7 +468,7 @@ namespace TEN::Entities::Creatures::TR5
 									{
 										// Start firing from eye
 										origin.roomNumber = item->RoomNumber;
-										LaserHeadData.LOS[i] = LOS(&origin, &dest);
+										LaserHeadData.LOS[i] = LOS(&origin, &target);
 										//LaserHeadData.fireArcs[i] = TriggerEnergyArc((Vector3i*)& src, (Vector3i*)& dest, r, g, b, 32, 64, 64, ENERGY_ARC_NO_RANDOMIZE, ENERGY_ARC_STRAIGHT_LINE); // (GetRandomControl() & 7) + 4, b | ((&unk_640000 | g) << 8), 12, 64, 5);
 										StopSoundEffect(SFX_TR5_GOD_HEAD_CHARGE);
 										SoundEffect(SFX_TR5_GOD_HEAD_BLAST, &item->Pose);
@@ -519,14 +518,14 @@ namespace TEN::Entities::Creatures::TR5
 
 											if (dl < MAX_VISIBILITY_DISTANCE)
 											{
-												dest.x = origin.x + dl * (dest.x - origin.x) / MAX_VISIBILITY_DISTANCE;
-												dest.y = origin.y + dl * (dest.y - origin.y) / MAX_VISIBILITY_DISTANCE;
-												dest.z = origin.z + dl * (dest.z - origin.z) / MAX_VISIBILITY_DISTANCE;
+												target.x = origin.x + dl * (target.x - origin.x) / MAX_VISIBILITY_DISTANCE;
+												target.y = origin.y + dl * (target.y - origin.y) / MAX_VISIBILITY_DISTANCE;
+												target.z = origin.z + dl * (target.z - origin.z) / MAX_VISIBILITY_DISTANCE;
 											}
 
-											int dx = (dest.x - origin.x) / 32;
-											int dy = (dest.y - origin.y) / 32;
-											int dz = (dest.z - origin.z) / 32;
+											int dx = (target.x - origin.x) / 32;
+											int dy = (target.y - origin.y) / 32;
+											int dz = (target.z - origin.z) / 32;
 
 											int adx = currentArc->pos4.x - origin.z;
 											int ady = currentArc->pos4.y - origin.y;
@@ -590,7 +589,7 @@ namespace TEN::Entities::Creatures::TR5
 				if (item->Pose.Position.y <= item->ItemFlags[1])
 				{
 					origin = GameVector(GetJointPosition(item, 0, Vector3i(0, 168, 248)), item->RoomNumber);
-					dest = GameVector(GetJointPosition(LaraItem, LM_HEAD), dest.roomNumber);
+					target = GameVector(GetJointPosition(LaraItem, LM_HEAD), target.roomNumber);
 					
 					if (LOS(&origin, &origin))
 					{

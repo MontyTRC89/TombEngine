@@ -203,12 +203,7 @@ namespace TEN::Entities::Creatures::TR5
 		auto* item = &g_Level.Items[itemNumber];
 
 		ClearItem(itemNumber);
-
-		item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex;
-		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-		item->Animation.TargetState = SNIPER_STATE_IDLE;
-		item->Animation.ActiveState = SNIPER_STATE_IDLE;
-
+		SetAnimation(item, 0);
 		item->Pose.Position.x += SECTOR(1) * phd_sin(item->Pose.Orientation.y + ANGLE(90.0f));
 		item->Pose.Position.y += CLICK(2);
 		item->Pose.Position.z += SECTOR(1) * phd_cos(item->Pose.Orientation.y + ANGLE(90.0f));
@@ -219,11 +214,7 @@ namespace TEN::Entities::Creatures::TR5
 		auto* item = &g_Level.Items[itemNumber];
 
 		ClearItem(itemNumber);
-
-		item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 6;
-		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-		item->Animation.TargetState = GUARD_STATE_IDLE;
-		item->Animation.ActiveState = GUARD_STATE_IDLE;
+		SetAnimation(item, 6);
 	}
 
 	void ControlGuardLaser(short itemNumber)
@@ -398,20 +389,19 @@ namespace TEN::Entities::Creatures::TR5
 
 			creature->Enemy = enemy;
 
-			GameVector src;
-			src.x = item->Pose.Position.x;
-			src.y = item->Pose.Position.y - CLICK(1.5f);
-			src.z = item->Pose.Position.z;
-			src.roomNumber = item->RoomNumber;
-
+			auto origin = GameVector(
+				item->Pose.Position.x,
+				item->Pose.Position.y - CLICK(1.5f),
+				item->Pose.Position.z,
+				item->RoomNumber
+			);
 			auto* frame = GetBestFrame(LaraItem);
-
-			GameVector dest;
-			dest.x = LaraItem->Pose.Position.x;
-			dest.y = LaraItem->Pose.Position.y + ((frame->boundingBox.Y2 + 3 * frame->boundingBox.Y1) / 4);
-			dest.z = LaraItem->Pose.Position.z;
-
-			bool los = !LOS(&src, &dest) && item->TriggerFlags != 10;
+			auto target = GameVector(
+				LaraItem->Pose.Position.x,
+				LaraItem->Pose.Position.y + ((frame->boundingBox.Y2 + 3 * frame->boundingBox.Y1) / 4),
+				LaraItem->Pose.Position.z
+			);
+			bool los = !LOS(&origin, &target) && item->TriggerFlags != 10;
 
 			creature->MaxTurn = 0;
 

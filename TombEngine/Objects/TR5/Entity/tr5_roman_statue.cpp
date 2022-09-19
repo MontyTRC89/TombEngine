@@ -311,7 +311,7 @@ namespace TEN::Entities::Creatures::TR5
 		auto* item = &g_Level.Items[itemNumber];
 		auto* creature = GetCreatureInfo(item);
 
-		int oldMeshSwapBits = item->MeshSwapBits;
+		int prevMeshSwapBits = item->MeshSwapBits;
 
 		// At determined HP values, roman statues sheds material.
 		if (item->HitPoints < 1 && !(item->MeshSwapBits & 0x10000))
@@ -341,7 +341,7 @@ namespace TEN::Entities::Creatures::TR5
 		}
 
 		// Play hit animation.
-		if (oldMeshSwapBits != item->MeshSwapBits)
+		if (prevMeshSwapBits != item->MeshSwapBits)
 		{
 			item->Animation.TargetState = STATUE_STATE_HIT;
 			item->Animation.ActiveState = STATUE_STATE_HIT;
@@ -785,12 +785,8 @@ namespace TEN::Entities::Creatures::TR5
 								arc->b = b;
 							}
 
-							arc->pos1.x = pos1.x;
-							arc->pos1.y = pos1.y;
-							arc->pos1.z = pos1.z;
-							arc->pos4.x = pos2.x;
-							arc->pos4.y = pos2.y;
-							arc->pos4.z = pos2.z;
+							arc->pos1 = pos1;
+							arc->pos4 = pos2;
 						}
 						else if (deltaFrame >= 16)
 						{
@@ -865,28 +861,31 @@ namespace TEN::Entities::Creatures::TR5
 
 		if (item->MeshSwapBits & 0x400)
 		{
-			Vector3i pos;
-			pos.x = (GetRandomControl() & 0x1F) - 16;
-			pos.y = 86;
-			pos.z = (GetRandomControl() & 0x1F) - 16;
+			auto pos = Vector3i(
+				(GetRandomControl() & 0x1F) - 16,
+				86,
+				(GetRandomControl() & 0x1F) - 16
+			);
 			RomanStatueHitEffect(item, &pos, 10);
 		}
 
 		if (item->MeshSwapBits & 0x10)
 		{
-			Vector3i pos;
-			pos.x = -40;
-			pos.y = (GetRandomControl() & 0x7F) + 148;
-			pos.z = (GetRandomControl() & 0x3F) - 32;
+			auto pos = Vector3i(
+				-40,
+				(GetRandomControl() & 0x7F) + 148,
+				(GetRandomControl() & 0x3F) - 32
+			);
 			RomanStatueHitEffect(item, &pos, 4);
 		}
 
 		if (item->MeshSwapBits & 0x100)
 		{
-			Vector3i pos;
-			pos.x = (GetRandomControl() & 0x3F) + 54;
-			pos.y = -170;
-			pos.z = (GetRandomControl() & 0x1F) + 27;
+			auto pos = Vector3i(
+				(GetRandomControl() & 0x3F) + 54,
+				-170,
+				(GetRandomControl() & 0x1F) + 27
+			);
 			RomanStatueHitEffect(item, &pos, 8);
 		}
 

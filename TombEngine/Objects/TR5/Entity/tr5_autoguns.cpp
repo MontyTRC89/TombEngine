@@ -27,7 +27,7 @@ namespace TEN::Entities::Creatures::TR5
 
 	}
 
-	static void TriggerAutoGunSmoke(Vector3i* pos, char shade)
+	void TriggerAutoGunSmoke(Vector3i* pos, char shade)
 	{
 		auto* spark = &SmokeSparks[GetFreeSmokeSpark()];
 

@@ -137,24 +137,19 @@ namespace TEN::Entities::TR4
 				else
 				{
 					creature->Enemy = nullptr;
-					int minDistance = INT_MAX;
+					float minDistance = FLT_MAX;
 
-					for (int i = 0; i < ActiveCreatures.size(); i++)
+					for (auto* activeCreature : ActiveCreatures)
 					{
-						auto* currentCreatureInfo = ActiveCreatures[i];
-						if (currentCreatureInfo->ItemNumber != NO_ITEM && currentCreatureInfo->ItemNumber != itemNumber)
+						if (activeCreature->ItemNumber != NO_ITEM && activeCreature->ItemNumber != itemNumber)
 						{
-							auto* currentItem = &g_Level.Items[currentCreatureInfo->ItemNumber];
+							auto* currentItem = &g_Level.Items[activeCreature->ItemNumber];
 							if (currentItem->ObjectNumber != ID_LARA)
 							{
 								if (currentItem->ObjectNumber != ID_BIG_SCORPION &&
 									(!currentItem->IsLara() || creature->HurtByLara))
 								{
-									int dx = currentItem->Pose.Position.x - item->Pose.Position.x;
-									int dy = currentItem->Pose.Position.y - item->Pose.Position.y;
-									int dz = currentItem->Pose.Position.z - item->Pose.Position.z;
-
-									int distance = SQUARE(dx) + SQUARE(dy) + SQUARE(dz);
+									int distance = Vector3i::Distance(item->Pose.Position, currentItem->Pose.Position);
 									if (distance < minDistance)
 									{
 										minDistance = distance;

@@ -155,16 +155,16 @@ namespace TEN::Entities::Creatures::TR5
 		torpedoItem->RoomNumber = item->RoomNumber;
 		GetFloor(pos1.x, pos1.y, pos1.z, &torpedoItem->RoomNumber);
 
-			torpedoItem->Pose.Position = pos1;
+		torpedoItem->Pose.Position = pos1;
 
 		InitialiseItem(itemNumber);
 
-			torpedoItem->Pose.Orientation.x = 0;
-			torpedoItem->Pose.Orientation.y = item->Pose.Orientation.y;
-			torpedoItem->Pose.Orientation.z = 0;
-			torpedoItem->Animation.Velocity.y = 0.0f;
-			torpedoItem->Animation.Velocity.z = 0.0f;
-			torpedoItem->ItemFlags[0] = -1;
+		torpedoItem->Pose.Orientation.x = 0;
+		torpedoItem->Pose.Orientation.y = item->Pose.Orientation.y;
+		torpedoItem->Pose.Orientation.z = 0;
+		torpedoItem->Animation.Velocity.y = 0.0f;
+		torpedoItem->Animation.Velocity.z = 0.0f;
+		torpedoItem->ItemFlags[0] = -1;
 
 		AddActiveItem(itemNumber);
 	}
@@ -483,12 +483,8 @@ namespace TEN::Entities::Creatures::TR5
 
 		item->Pose.Orientation.z += 16 * item->Animation.Velocity.z;
 
-		int c = item->Animation.Velocity.z * phd_cos(item->Pose.Orientation.x);
-
-		item->Pose.Position.x += c * phd_sin(item->Pose.Orientation.y);
-		item->Pose.Position.y += item->Animation.Velocity.z * phd_sin(-item->Pose.Orientation.x);
-		item->Pose.Position.z += c * phd_cos(item->Pose.Orientation.y);
-
+		TranslateItem(item, item->Pose.Orientation, item->Animation.Velocity.z);
+		
 		auto probe = GetCollision(item);
 
 		if (item->Pose.Position.y < probe.Position.Floor &&

@@ -341,8 +341,8 @@ namespace TEN::Entities::TR4
 
 		auto* creature = GetCreatureInfo(item);
 
-		short tilt = 0;
 		short angle = 0;
+		short tilt = 0;
 		short joint0 = 0;
 		short joint1 = 0;
 		short joint2 = 0;
@@ -681,7 +681,7 @@ namespace TEN::Entities::TR4
 				break;
 
 			case DEMIGOD1_STATE_HAMMER_ATTACK:
-				if (item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase == DEMIGOD_ANIM_RUN_TO_IDLE)
+				if ((item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase) == DEMIGOD_ANIM_RUN_TO_IDLE)
 				{
 					auto pos = GetJointPosition(item, 17, Vector3i(80, -8, -40));
 
@@ -689,9 +689,9 @@ namespace TEN::Entities::TR4
 					FloorInfo* floor = GetFloor(pos.x, pos.y, pos.z, &roomNumber);
 					int height = GetFloorHeight(floor, pos.x, pos.y, pos.z);
 					if (height == NO_HEIGHT)
-						pos.y = pos.y - 128;
+						pos.y = pos.y - CLICK(0.5f);
 					else
-						pos.y = height - 128;
+						pos.y = height - CLICK(0.5f);
 
 					TriggerShockwave((PoseData*)&pos, 24, 88, 256, 128, 128, 128, 32, 0, 2);
 					TriggerHammerSmoke(pos.x, pos.y + 128, pos.z, 8);

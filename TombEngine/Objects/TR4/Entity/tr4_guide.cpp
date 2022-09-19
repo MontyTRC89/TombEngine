@@ -212,8 +212,8 @@ namespace TEN::Entities::TR4
 					dy = currentItem->Pose.Position.y - item->Pose.Position.y;
 					dz = currentItem->Pose.Position.z - item->Pose.Position.z;
 
-					if (dx > 32000 || dx < -32000 || dz > 32000 || dz < -32000)
-						distance = 0x7FFFFFFF;
+					if (dx > SECTOR(31.25f) || dx < -SECTOR(31.25f) || dz > SECTOR(31.25f) || dz < -SECTOR(31.25f))
+						distance = INT_MAX;
 					else
 						distance = pow(dx, 2) + pow(dz, 2);
 
@@ -600,13 +600,8 @@ namespace TEN::Entities::TR4
 					if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 15 &&
 						item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].frameBase + 26)
 					{
-						dx = abs(enemy->Pose.Position.x - item->Pose.Position.x);
-						dy = abs(enemy->Pose.Position.y - item->Pose.Position.y);
-						dz = abs(enemy->Pose.Position.z - item->Pose.Position.z);
-
-						if (dx < CLICK(2) &&
-							dy < CLICK(2) &&
-							dz < CLICK(2))
+						float distance = Vector3i::Distance(item->Pose.Position, enemy->Pose.Position);
+						if (distance <= CLICK(2))
 						{
 							DoDamage(enemy, GUIDE_ATTACK_DAMAGE);
 							CreatureEffect2(item, GuideBite1, 8, -1, DoBloodSplat);
