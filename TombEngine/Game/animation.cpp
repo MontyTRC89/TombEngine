@@ -117,6 +117,7 @@ void PerformAnimCommands(ItemInfo* item, bool frameBased)
 				auto* bounds = GetBoundsAccurate(item);
 				UpdateItemRoom(item, -bounds->Height() / 2, -cmd[0], -cmd[2]);
 			}
+
 			cmd += 3;
 			break;
 
@@ -138,6 +139,7 @@ void PerformAnimCommands(ItemInfo* item, bool frameBased)
 					}
 				}
 			}
+
 			cmd += 2;
 			break;
 
@@ -149,6 +151,7 @@ void PerformAnimCommands(ItemInfo* item, bool frameBased)
 
 				item->Status = ITEM_DEACTIVATED;
 			}
+
 			break;
 
 		case AnimCommandType::AttackReady:
@@ -158,6 +161,7 @@ void PerformAnimCommands(ItemInfo* item, bool frameBased)
 				if (lara->Control.HandStatus != HandStatus::Special)
 					lara->Control.HandStatus = HandStatus::Free;
 			}
+
 			break;
 
 		case AnimCommandType::SoundEffect:
@@ -196,18 +200,16 @@ void PerformAnimCommands(ItemInfo* item, bool frameBased)
 					}
 				}
 				else
-				{
 					SoundEffect(cmd[1] & 0x3FFF, &item->Pose, TestEnvironment(ENV_FLAG_WATER, item) ? SoundEnvironment::Water : SoundEnvironment::Land);
-				}
 			}
+
 			cmd += 2;
 			break;
 
 		case AnimCommandType::Flipeffect:
 			if (frameBased && item->Animation.FrameNumber == cmd[0])
-			{
 				DoFlipEffect((cmd[1] & 0x3FFF), item);
-			}
+
 			cmd += 2;
 			break;
 
