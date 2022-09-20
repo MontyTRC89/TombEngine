@@ -1,22 +1,24 @@
 #include "framework.h"
-#include "tr5_explosion.h"
+#include "Objects/TR5/Trap/tr5_explosion.h"
+
+#include "Game/animation.h"
+#include "Game/collision/collide_item.h"
+#include "Game/collision/collide_room.h"
+#include "Game/control/box.h"
+#include "Game/control/control.h"
+#include "Game/effects/debris.h"
+#include "Game/effects/effects.h"
+#include "Game/effects/lara_fx.h"
+#include "Game/effects/tomb4fx.h"
+#include "Game/items.h"
+#include "Game/Lara/lara.h"
+#include "Game/Lara/lara_one_gun.h"
+#include "Objects/Generic/Switches/generic_switch.h"
+#include "Objects/Generic/Traps/traps.h"
+#include "Objects/TR5/Shatter/tr5_smashobject.h"
+#include "Sound/sound.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
-#include "Game/control/control.h"
-#include "Sound/sound.h"
-#include "Game/effects/effects.h"
-#include "Game/effects/tomb4fx.h"
-#include "Game/animation.h"
-#include "Objects/Generic/Traps/traps.h"
-#include "Game/Lara/lara.h"
-#include "Objects/TR5/Shatter/tr5_smashobject.h"
-#include "Game/Lara/lara_one_gun.h"
-#include "Game/effects/debris.h"
-#include "Objects/Generic/Switches/generic_switch.h"
-#include "Game/collision/collide_item.h"
-#include "Game/control/box.h"
-#include "Game/effects/lara_fx.h"
-#include "Game/items.h"
 
 using namespace TEN::Effects::Lara;
 using namespace TEN::Entities::Switches;
@@ -65,7 +67,7 @@ void ExplosionControl(short itemNumber)
 			int flag;
 
 			++item->ItemFlags[0];
-			if (g_Level.Rooms[item->RoomNumber].flags & ENV_FLAG_WATER)
+			if (TestEnvironment(ENV_FLAG_WATER, item->RoomNumber))
 				flag = 1;
 			else
 				flag = item->ItemFlags[1] == 1 ? 2 : 0;

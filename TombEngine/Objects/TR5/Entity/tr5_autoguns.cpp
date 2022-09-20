@@ -74,9 +74,9 @@ namespace TEN::Entities::Creatures::TR5
 				pos1.roomNumber = item->RoomNumber;
 
 				int los = LOS(&pos1, &pos2);
-				EulerAngles orient;
 
 				// FIXME:
+				auto orient = EulerAngles::Zero;
 				if (los)
 				{
 					orient = Geometry::GetOrientTowardPoint(pos1.ToVector3(), pos2.ToVector3());
@@ -127,10 +127,13 @@ namespace TEN::Entities::Creatures::TR5
 							{
 								if (abs(dx) >= 12288)
 									break;
+
 								if (abs(dy) >= 12288)
 									break;
+
 								if (abs(dz) >= 12288)
 									break;
+
 								dx *= 2;
 								dy *= 2;
 								dz *= 2;

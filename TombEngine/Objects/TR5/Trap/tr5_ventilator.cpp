@@ -1,14 +1,15 @@
 #include "framework.h"
-#include "tr5_ventilator.h"
+#include "Objects/TR5/Trap/tr5_ventilator.h"
+
 #include "Game/animation.h"
-#include "Specific/level.h"
-#include "Game/control/control.h"
-#include "Game/Lara/lara.h"
 #include "Game/camera.h"
+#include "Game/control/control.h"
 #include "Game/effects/effects.h"
 #include "Game/items.h"
+#include "Game/Lara/lara.h"
+#include "Specific/level.h"
 
-static void VentilatorEffect(BOUNDING_BOX* bounds, int intensity, short rot, int speed)
+void VentilatorEffect(BOUNDING_BOX* bounds, int intensity, short rot, int speed)
 {
 	int x, y, z;
 
