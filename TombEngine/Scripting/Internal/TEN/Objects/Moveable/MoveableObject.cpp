@@ -266,14 +266,8 @@ void Moveable::Register(sol::table & parent)
 // @tparam int frame the new frame number
 	ScriptReserved_SetFrameNumber, &Moveable::SetFrameNumber,
 		
-/// Get current HP (hit points/health points)
-// @function Moveable:GetHP
-// @treturn int the amount of HP the moveable currently has
 	ScriptReserved_GetHP, &Moveable::GetHP,
 
-/// Set current HP (hit points/health points)
-// @function Moveable:SetHP
-// @tparam int HP the amount of HP to give the moveable
 	ScriptReserved_SetHP, &Moveable::SetHP,
 
 /// Get HP definded for that object type (hit points/health points) (Read Only).
@@ -593,29 +587,27 @@ void Moveable::SetRot(Rotation const& rot)
 	m_item->Pose.Orientation.z = FROM_DEGREES(rot.z);
 }
 
+/// Get current HP (hit points/health points)
+// @function Moveable:GetHP
+// @treturn int the amount of HP the moveable currently has
 short Moveable::GetHP() const
 {
 	return m_item->HitPoints;
 }
 
+/// Set current HP (hit points/health points)
+// Clamped to [0, 32767] for "intelligent" entities (i.e. anything with AI); clamped to [-32767, 32767] otherwise.
+// @function Moveable:SetHP
+// @tparam int HP the amount of HP to give the moveable
 void Moveable::SetHP(short hp)
 {
-	if(Objects[m_item->ObjectNumber].intelligent &&
-		(hp < 0 || hp > Objects[m_item->ObjectNumber].HitPoints))
+	if(Objects[m_item->ObjectNumber].intelligent && hp < 0)
 	{
-		ScriptAssert(false, "Invalid HP value: " + std::to_string(hp));
-		if (hp < 0)
+		if (hp != NOT_TARGETABLE)
 		{
-			if (hp != NOT_TARGETABLE)
-			{
-				hp = 0;
-				ScriptWarn("Setting HP to 0.");
-			}
-		}
-		else if (hp > Objects[m_item->ObjectNumber].HitPoints)
-		{
-			hp = Objects[m_item->ObjectNumber].HitPoints;
-			ScriptWarn("Setting HP to default value (" + std::to_string(hp) + ")");
+			ScriptAssert(false, "Invalid HP value: " + std::to_string(hp));
+			ScriptWarn("Setting HP to 0.");
+			hp = 0;
 		}
 	}
 
@@ -624,7 +616,7 @@ void Moveable::SetHP(short hp)
 
 short Moveable::GetSlotHP() const
 {
-	return (Objects[m_item->ObjectNumber].HitPoints);
+	return Objects[m_item->ObjectNumber].HitPoints;
 }
 
 short Moveable::GetOCB() const

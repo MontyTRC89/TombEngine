@@ -122,6 +122,25 @@ associated getters and setters.</td>
 	<td class="summary">Get the status of object.</td>
 	</tr>
 	<tr>
+	<td class="name" ><a href="#Moveable:SetOnHit">Moveable:SetOnHit(callback)</a></td>
+	<td class="summary">Set the name of the function to be called when the moveable is shot by Lara
+ Note that this will be triggered twice when shot with both pistols at once.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Moveable:SetOnCollidedWithObject">Moveable:SetOnCollidedWithObject(func)</a></td>
+	<td class="summary">Set the function to be called called when this moveable collides with another moveable</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Moveable:SetOnCollidedWithRoom">Moveable:SetOnCollidedWithRoom(func)</a></td>
+	<td class="summary">Set the function called when this moveable collides with room geometry (e.g.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Moveable:SetOnKilled">Moveable:SetOnKilled(callback)</a></td>
+	<td class="summary">Set the name of the function to be called when the moveable is destroyed/killed
+ Note that enemy death often occurs at the end of an animation, and not at the exact moment
+ the enemy's HP becomes zero.</td>
+	</tr>
+	<tr>
 	<td class="name" ><a href="#Moveable:GetObjectID">Moveable:GetObjectID()</a></td>
 	<td class="summary">Retrieve the object ID</td>
 	</tr>
@@ -150,16 +169,16 @@ associated getters and setters.</td>
 	<td class="summary">Retrieve frame number.</td>
 	</tr>
 	<tr>
+	<td class="name" ><a href="#Moveable:SetVelocity">Moveable:SetVelocity(velocity)</a></td>
+	<td class="summary">Set the object's velocity to specified value.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Moveable:GetVelocity">Moveable:GetVelocity()</a></td>
+	<td class="summary">Get the object's velocity.</td>
+	</tr>
+	<tr>
 	<td class="name" ><a href="#Moveable:SetFrame">Moveable:SetFrame(frame)</a></td>
 	<td class="summary">Set frame number.</td>
-	</tr>
-	<tr>
-	<td class="name" ><a href="#Moveable:GetHP">Moveable:GetHP()</a></td>
-	<td class="summary">Get current HP (hit points/health points)</td>
-	</tr>
-	<tr>
-	<td class="name" ><a href="#Moveable:SetHP">Moveable:SetHP(HP)</a></td>
-	<td class="summary">Set current HP (hit points/health points)</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#Moveable:GetSlotHP">Moveable:GetSlotHP(ID)</a></td>
@@ -277,25 +296,6 @@ associated getters and setters.</td>
 	<td class="summary">Destroy the moveable.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#Moveable:SetOnHit">Moveable:SetOnHit(callback)</a></td>
-	<td class="summary">Set the name of the function to be called when the moveable is shot by Lara
- Note that this will be triggered twice when shot with both pistols at once.</td>
-	</tr>
-	<tr>
-	<td class="name" ><a href="#Moveable:SetOnKilled">Moveable:SetOnKilled(callback)</a></td>
-	<td class="summary">Set the name of the function to be called when the moveable is destroyed/killed
- Note that enemy death often occurs at the end of an animation, and not at the exact moment
- the enemy's HP becomes zero.</td>
-	</tr>
-	<tr>
-	<td class="name" ><a href="#Moveable:SetOnCollidedWithObject">Moveable:SetOnCollidedWithObject(func)</a></td>
-	<td class="summary">Set the function to be called called when this moveable collides with another moveable</td>
-	</tr>
-	<tr>
-	<td class="name" ><a href="#Moveable:SetOnCollidedWithRoom">Moveable:SetOnCollidedWithRoom(func)</a></td>
-	<td class="summary">Set the function called when this moveable collides with room geometry (e.g.</td>
-	</tr>
-	<tr>
 	<td class="name" ><a href="#Moveable:GetPosition">Moveable:GetPosition()</a></td>
 	<td class="summary">Get the object's position</td>
 	</tr>
@@ -304,6 +304,15 @@ associated getters and setters.</td>
 	<td class="summary">Set the moveable's position
  If you are moving a moveable whose behaviour involves knowledge of room geometry,
  (e.g.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Moveable:GetHP">Moveable:GetHP()</a></td>
+	<td class="summary">Get current HP (hit points/health points)</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Moveable:SetHP">Moveable:SetHP(HP)</a></td>
+	<td class="summary">Set current HP (hit points/health points)
+ Clamped to [0, 32767] for "intelligent" entities (i.e.</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#Moveable:GetRoom">Moveable:GetRoom()</a></td>
@@ -498,6 +507,98 @@ most can just be ignored (see usage).
 
 </dd>
     <dt>
+    <a name = "Moveable:SetOnHit"></a>
+    <strong>Moveable:SetOnHit(callback)</strong>
+    </dt>
+    <dd>
+    Set the name of the function to be called when the moveable is shot by Lara
+ Note that this will be triggered twice when shot with both pistols at once.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">callback</span>
+            <span class="types"><span class="type">function</span></span>
+         function in LevelFuncs hierarchy to call when moveable is shot
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Moveable:SetOnCollidedWithObject"></a>
+    <strong>Moveable:SetOnCollidedWithObject(func)</strong>
+    </dt>
+    <dd>
+    Set the function to be called called when this moveable collides with another moveable
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">func</span>
+            <span class="types"><span class="type">function</span></span>
+         callback function to be called (must be in LevelFuncs hierarchy)
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Moveable:SetOnCollidedWithRoom"></a>
+    <strong>Moveable:SetOnCollidedWithRoom(func)</strong>
+    </dt>
+    <dd>
+    Set the function called when this moveable collides with room geometry (e.g.  a wall or floor)
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">func</span>
+            <span class="types"><span class="type">function</span></span>
+         callback function to be called (must be in LevelFuncs hierarchy)
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Moveable:SetOnKilled"></a>
+    <strong>Moveable:SetOnKilled(callback)</strong>
+    </dt>
+    <dd>
+    Set the name of the function to be called when the moveable is destroyed/killed
+ Note that enemy death often occurs at the end of an animation, and not at the exact moment
+ the enemy's HP becomes zero.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">callback</span>
+            <span class="types"><span class="type">function</span></span>
+         function in LevelFuncs hierarchy to call when enemy is killed
+        </li>
+    </ul>
+
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">LevelFuncs.baddyKilled = <span class="keyword">function</span>(theBaddy) <span class="global">print</span>(<span class="string">"You killed a baddy!"</span>) <span class="keyword">end</span>
+baddy:SetOnKilled(LevelFuncs.baddyKilled)</pre>
+    </ul>
+
+</dd>
+    <dt>
     <a name = "Moveable:GetObjectID"></a>
     <strong>Moveable:GetObjectID()</strong>
     </dt>
@@ -653,6 +754,51 @@ shiva:SetObjectID(TEN.Objects.ObjID.BIGMEDI_ITEM)</pre>
 
 </dd>
     <dt>
+    <a name = "Moveable:SetVelocity"></a>
+    <strong>Moveable:SetVelocity(velocity)</strong>
+    </dt>
+    <dd>
+    Set the object's velocity to specified value.
+ In most cases, only Z and Y components are used as forward and vertical velocity.
+ In some cases, primarily NPCs, X component is used as side velocity.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">velocity</span>
+            <span class="types"><span class="type">Vec3</span></span>
+         velocity represented as vector
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Moveable:GetVelocity"></a>
+    <strong>Moveable:GetVelocity()</strong>
+    </dt>
+    <dd>
+    Get the object's velocity.
+ In most cases, only Z and Y components are used as forward and vertical velocity.
+ In some cases, primarily NPCs, X component is used as side velocity.
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">Vec3</span></span>
+        current object velocity
+    </ol>
+
+
+
+
+</dd>
+    <dt>
     <a name = "Moveable:SetFrame"></a>
     <strong>Moveable:SetFrame(frame)</strong>
     </dt>
@@ -669,47 +815,6 @@ shiva:SetObjectID(TEN.Objects.ObjID.BIGMEDI_ITEM)</pre>
         <li><span class="parameter">frame</span>
             <span class="types"><span class="type">int</span></span>
          the new frame number
-        </li>
-    </ul>
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "Moveable:GetHP"></a>
-    <strong>Moveable:GetHP()</strong>
-    </dt>
-    <dd>
-    Get current HP (hit points/health points)
-
-
-
-    <h3>Returns:</h3>
-    <ol>
-
-           <span class="types"><span class="type">int</span></span>
-        the amount of HP the moveable currently has
-    </ol>
-
-
-
-
-</dd>
-    <dt>
-    <a name = "Moveable:SetHP"></a>
-    <strong>Moveable:SetHP(HP)</strong>
-    </dt>
-    <dd>
-    Set current HP (hit points/health points)
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">HP</span>
-            <span class="types"><span class="type">int</span></span>
-         the amount of HP to give the moveable
         </li>
     </ul>
 
@@ -1283,98 +1388,6 @@ sas:SetAIBits({<span class="number">1</span>, <span class="number">0</span>, <sp
 
 </dd>
     <dt>
-    <a name = "Moveable:SetOnHit"></a>
-    <strong>Moveable:SetOnHit(callback)</strong>
-    </dt>
-    <dd>
-    Set the name of the function to be called when the moveable is shot by Lara
- Note that this will be triggered twice when shot with both pistols at once.
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">callback</span>
-            <span class="types"><span class="type">function</span></span>
-         function in LevelFuncs hierarchy to call when moveable is shot
-        </li>
-    </ul>
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "Moveable:SetOnKilled"></a>
-    <strong>Moveable:SetOnKilled(callback)</strong>
-    </dt>
-    <dd>
-    Set the name of the function to be called when the moveable is destroyed/killed
- Note that enemy death often occurs at the end of an animation, and not at the exact moment
- the enemy's HP becomes zero.
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">callback</span>
-            <span class="types"><span class="type">function</span></span>
-         function in LevelFuncs hierarchy to call when enemy is killed
-        </li>
-    </ul>
-
-
-
-
-    <h3>Usage:</h3>
-    <ul>
-        <pre class="example">LevelFuncs.baddyKilled = <span class="keyword">function</span>(theBaddy) <span class="global">print</span>(<span class="string">"You killed a baddy!"</span>) <span class="keyword">end</span>
-baddy:SetOnKilled(LevelFuncs.baddyKilled)</pre>
-    </ul>
-
-</dd>
-    <dt>
-    <a name = "Moveable:SetOnCollidedWithObject"></a>
-    <strong>Moveable:SetOnCollidedWithObject(func)</strong>
-    </dt>
-    <dd>
-    Set the function to be called called when this moveable collides with another moveable
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">func</span>
-            <span class="types"><span class="type">function</span></span>
-         callback function to be called (must be in LevelFuncs hierarchy)
-        </li>
-    </ul>
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "Moveable:SetOnCollidedWithRoom"></a>
-    <strong>Moveable:SetOnCollidedWithRoom(func)</strong>
-    </dt>
-    <dd>
-    Set the function called when this moveable collides with room geometry (e.g.  a wall or floor)
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">func</span>
-            <span class="types"><span class="type">function</span></span>
-         callback function to be called (must be in LevelFuncs hierarchy)
-        </li>
-    </ul>
-
-
-
-
-
-</dd>
-    <dt>
     <a name = "Moveable:GetPosition"></a>
     <strong>Moveable:GetPosition()</strong>
     </dt>
@@ -1415,6 +1428,48 @@ baddy:SetOnKilled(LevelFuncs.baddyKilled)</pre>
             <span class="types"><span class="type">bool</span></span>
          Will room changes be automatically detected? Set to false if you are using overlapping rooms (default: true)
          (<em>optional</em>)
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Moveable:GetHP"></a>
+    <strong>Moveable:GetHP()</strong>
+    </dt>
+    <dd>
+    Get current HP (hit points/health points)
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">int</span></span>
+        the amount of HP the moveable currently has
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Moveable:SetHP"></a>
+    <strong>Moveable:SetHP(HP)</strong>
+    </dt>
+    <dd>
+    Set current HP (hit points/health points)
+ Clamped to [0, 32767] for "intelligent" entities (i.e.  anything with AI); clamped to [-32767, 32767] otherwise.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">HP</span>
+            <span class="types"><span class="type">int</span></span>
+         the amount of HP to give the moveable
         </li>
     </ul>
 
@@ -1478,7 +1533,7 @@ sas:SetPosition(destinationPosition, <span class="keyword">false</span>)</pre>
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
-<i style="float:right;">Last updated 2022-09-14 20:04:13 </i>
+<i style="float:right;">Last updated 2022-09-20 19:42:44 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>
