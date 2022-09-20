@@ -6,7 +6,6 @@
 #include "Sound/sound.h"
 #include "Game/savegame.h"
 #include "Flow/InventoryItem/InventoryItem.h"
-#include "InventorySlots.h"
 #include "Game/gui.h"
 #include "Logic/LevelFunc.h"
 #include "Vec3/Vec3.h"
@@ -161,7 +160,6 @@ Specify which translations in the strings table correspond to which languages.
 	
 	m_handler.MakeReadOnlyTable(table_flow, ScriptReserved_WeatherType, kWeatherTypes);
 	m_handler.MakeReadOnlyTable(table_flow, ScriptReserved_LaraType, kLaraTypes);
-	m_handler.MakeReadOnlyTable(table_flow, ScriptReserved_InvItem, kInventorySlots);
 	m_handler.MakeReadOnlyTable(table_flow, ScriptReserved_RotationAxis, kRotAxes);
 	m_handler.MakeReadOnlyTable(table_flow, ScriptReserved_ItemAction, kItemActions);
 	m_handler.MakeReadOnlyTable(table_flow, ScriptReserved_ErrorMode, kErrorModes);
@@ -259,6 +257,7 @@ int FlowHandler::GetLevelNumber(std::string const& fileName)
 			return i;
 	}
 
+	TENLog("Specified level filename was not found in script. Level won't be loaded. Please edit level filename in gameflow.lua.");
 	return -1;
 }
 
@@ -312,7 +311,7 @@ bool FlowHandler::DoFlow()
 {
 	// We start with the title level, if no other index is specified
 	if (CurrentLevel == -1)
-		CurrentLevel = 0;
+		CurrentLevel = SystemNameHash = 0;
 
 	SelectedLevelForNewGame = 0;
 	SelectedSaveGame = 0;

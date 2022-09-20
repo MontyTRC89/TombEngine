@@ -20,10 +20,13 @@ HAIR_STRUCT Hairs[HAIR_MAX][HAIR_SEGMENTS + 1];
 
 void InitialiseHair()
 {
+	bool youngLara = g_GameFlow->GetLevel(CurrentLevel)->GetLaraType() == LaraType::Young;
+
 	for (int h = 0; h < HAIR_MAX; h++)
 	{
-		int* bone = &g_Level.Bones[Objects[ID_LARA_HAIR].boneIndex];
+		int* bone = &g_Level.Bones[Objects[ID_HAIR].boneIndex];
 
+		Hairs[h][0].enabled = (h == 0 || youngLara);
 		Hairs[h][0].initialised = true;
 		Hairs[h][0].pos.Orientation.y = 0;
 		Hairs[h][0].pos.Orientation.x = -0x4000;
@@ -180,7 +183,7 @@ void HairControl(ItemInfo* item, int ponytail, ANIM_FRAME* framePtr)
 	pos.y = world.Translation().y; 
 	pos.z = world.Translation().z;
 
-	int* bone = &g_Level.Bones[Objects[ID_LARA_HAIR].boneIndex];
+	int* bone = &g_Level.Bones[Objects[ID_HAIR].boneIndex];
 
 	if (Hairs[ponytail][0].initialised)
 	{

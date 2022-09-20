@@ -59,6 +59,9 @@ public:
 	[[nodiscard]] int GetFrameNumber() const;
 	void SetFrameNumber(int frameNumber);
 
+	[[nodiscard]] Vec3 GetVelocity() const;
+	void SetVelocity(Vec3 velocity);
+
 	[[nodiscard]] ScriptColor GetColor() const;
 	void SetColor(ScriptColor const& col);
 
