@@ -7,6 +7,7 @@
 #include "Math/Containers/Vector3i.h"
 #include "Math/Geometry.h"
 #include "Math/Random.h"
+#include "Math/Solvers.h"
 
 // TODO: Phase these out.
 #include "Math/Legacy.h"
