@@ -79,6 +79,28 @@ namespace TEN::Math::Geometry
 		return FROM_RAD(atan2(-tilt.x, -tilt.y));
 	}
 
+	float GetDistanceToLine(const Vector3& origin, const Vector3& linePoint0, const Vector3& linePoint1)
+	{
+		auto closestPointOnLine = GetClosestPointOnLine(origin, linePoint0, linePoint1);
+		return Vector3::Distance(origin, closestPointOnLine);
+	}
+
+	Vector3 GetClosestPointOnLine(const Vector3& origin, const Vector3& linePoint0, const Vector3& linePoint1)
+	{
+		if (linePoint0 == linePoint1)
+			return linePoint0;
+
+		auto direction = linePoint1 - linePoint0;
+		float distance = direction.Dot(origin - linePoint0) / direction.Dot(direction);
+
+		if (distance < 0.0f)
+			return linePoint0;
+		else if (distance > 1.0f)
+			return linePoint1;
+
+		return (linePoint0 + (direction * distance));
+	}
+
 	EulerAngles GetOrientTowardPoint(const Vector3& origin, const Vector3& target)
 	{
 		return EulerAngles(target - origin);

@@ -8,6 +8,22 @@ namespace TEN::Math
 		return (((1.0f - time) * value0) + (time * value1));
 	}
 
+	const float InterpolateCos(float value0, float value1, float time)
+	{
+		return Lerp(value0, value1, (1 - cos(time * PI)) * 0.5f);
+	}
+
+	const float InterpolateCubic(float value0, float value1, float value2, float value3, float time)
+	{
+		float p = (value3 - value2) - (value0 - value1);
+		float q = (value0 - value1) - p;
+		float r = value2 - value0;
+		float s = value1;
+		float x = time;
+		float xSquared = SQUARE(x);
+		return p * xSquared * x + q * xSquared + r * x + s;
+	}
+
 	const float Smoothstep(float edge0, float edge1, float x)
 	{
 		x = std::clamp(x, edge0, edge1);
