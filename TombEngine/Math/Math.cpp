@@ -54,7 +54,7 @@ namespace TEN::Math
 
 	const Vector4 Screen(const Vector4& ambient, const Vector4& tint)
 	{
-		auto result = Screen(Vector3(ambient.x, ambient.y, ambient.z), Vector3(tint.x, tint.y, tint.z));
+		auto result = Screen(Vector3(ambient), Vector3(tint));
 		return Vector4(result.x, result.y, result.z, ambient.w * tint.w);
 	}
 
@@ -65,9 +65,9 @@ namespace TEN::Math
 		auto multiplicative = ambient * tint;
 		auto additive = ambient + tint;
 
-		float R = Lerp(multiplicative.x, additive.x, luma);
-		float G = Lerp(multiplicative.y, additive.y, luma);
-		float B = Lerp(multiplicative.z, additive.z, luma);
-		return Vector3(R, G, B);
+		float r = Lerp(multiplicative.x, additive.x, luma);
+		float g = Lerp(multiplicative.y, additive.y, luma);
+		float b = Lerp(multiplicative.z, additive.z, luma);
+		return Vector3(r, g, b);
 	}
 }

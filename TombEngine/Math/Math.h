@@ -15,7 +15,7 @@
 
 namespace TEN::Math
 {
-	constexpr auto MESH_BITS = [](auto x) { return 1 << x; };
+	constexpr auto MESH_BITS = [](auto x) { return (1 << x); };
 
 	const float Lerp(float value0, float value1, float time);
 	const float InterpolateCos(float value0, float value1, float time);
