@@ -1,6 +1,7 @@
 #include "framework.h"
 #include "Math/Geometry.h"
 
+#include "Math/Constants.h"
 #include "Math/Containers/EulerAngles.h"
 #include "Math/Containers/PoseData.h"
 #include "Math/Containers/Vector3i.h"
@@ -71,7 +72,7 @@ namespace TEN::Math::Geometry
 	{
 		static const short qtrBlockAngleIncrement = ANGLE(45.0f) / 4;
 
-		return (short)sqrt(pow(tilt.x * qtrBlockAngleIncrement, 2) + pow(tilt.y * qtrBlockAngleIncrement, 2));
+		return (short)sqrt(SQUARE(tilt.x * qtrBlockAngleIncrement) + SQUARE(tilt.y * qtrBlockAngleIncrement));
 	}
 
 	short GetSurfaceAspectAngle(Vector2 tilt)
@@ -91,14 +92,14 @@ namespace TEN::Math::Geometry
 			return linePoint0;
 
 		auto direction = linePoint1 - linePoint0;
-		float distance = direction.Dot(origin - linePoint0) / direction.Dot(direction);
+		float distanceAlpha = direction.Dot(origin - linePoint0) / direction.Dot(direction);
 
-		if (distance < 0.0f)
+		if (distanceAlpha < 0.0f)
 			return linePoint0;
-		else if (distance > 1.0f)
+		else if (distanceAlpha > 1.0f)
 			return linePoint1;
 
-		return (linePoint0 + (direction * distance));
+		return (linePoint0 + (direction * distanceAlpha));
 	}
 
 	EulerAngles GetOrientTowardPoint(const Vector3& origin, const Vector3& target)
