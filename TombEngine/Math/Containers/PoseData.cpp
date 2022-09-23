@@ -59,18 +59,18 @@ using namespace TEN::Math;
 		this->Orientation = EulerAngles(xOrient, yOrient, zOrient);
 	}
 
-	void PoseData::Translate(short headingAngle, float forward, float down = 0.0f, float right = 0.0f)
+	void PoseData::Translate(short headingAngle, float forward, float down, float right)
 	{
-		this->Position = Geometry::TranslatePoint(Position, headingAngle, forward, down, right);
+		this->Position = Geometry::TranslatePoint(this->Position, headingAngle, forward, down, right);
 	}
 
 	void PoseData::Translate(const EulerAngles& orient, float distance)
 	{
-		this->Position = Geometry::TranslatePoint(Position, orient, distance);
+		this->Position = Geometry::TranslatePoint(this->Position, orient, distance);
 	}
 
 	void PoseData::Translate(const Vector3& direction, float distance)
 	{
-		this->Position = Geometry::TranslatePoint(Position, direction, distance);
+		this->Position = Geometry::TranslatePoint(this->Position, direction, distance);
 	}
 //}
