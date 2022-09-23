@@ -23,5 +23,10 @@
 		PoseData(const Vector3i& pos, short xOrient, short yOrient, short zOrient);
 		PoseData(int xPos, int yPos, int zPos, const EulerAngles& orient);
 		PoseData(int xPos, int yPos, int zPos, short xOrient, short yOrient, short zOrient);
+
+		// Utilities
+		void Translate(short headingAngle, float forward, float down = 0.0f, float right = 0.0f);
+		void Translate(const EulerAngles& orient, float distance);
+		void Translate(const Vector3& direction, float distance);
 	};
 //}

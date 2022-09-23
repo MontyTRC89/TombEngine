@@ -3,8 +3,9 @@
 
 #include "Math/Containers/EulerAngles.h"
 #include "Math/Containers/Vector3i.h"
+#include "Math/Geometry.h"
 
-//using namespace TEN::Math::Angles;
+using namespace TEN::Math;
 
 //namespace TEN::Math
 //{
@@ -56,5 +57,20 @@
 	{
 		this->Position = Vector3i(xPos, yPos, zPos);
 		this->Orientation = EulerAngles(xOrient, yOrient, zOrient);
+	}
+
+	void PoseData::Translate(short headingAngle, float forward, float down = 0.0f, float right = 0.0f)
+	{
+		this->Position = Geometry::TranslatePoint(Position, headingAngle, forward, down, right);
+	}
+
+	void PoseData::Translate(const EulerAngles& orient, float distance)
+	{
+		this->Position = Geometry::TranslatePoint(Position, orient, distance);
+	}
+
+	void PoseData::Translate(const Vector3& direction, float distance)
+	{
+		this->Position = Geometry::TranslatePoint(Position, direction, distance);
 	}
 //}

@@ -324,17 +324,17 @@ bool TestLastFrame(ItemInfo* item, int animNumber)
 
 void TranslateItem(ItemInfo* item, short headingAngle, float forward, float down, float right)
 {
-	item->Pose.Position = Geometry::TranslatePoint(item->Pose.Position, headingAngle, forward, down, right);
+	item->Pose.Translate(headingAngle, forward, down, right);
 }
 
 void TranslateItem(ItemInfo* item, const EulerAngles& orient, float distance)
 {
-	item->Pose.Position = Geometry::TranslatePoint(item->Pose.Position, orient, distance);
+	item->Pose.Translate(orient, distance);
 }
 
 void TranslateItem(ItemInfo* item, const Vector3& direction, float distance)
 {
-	item->Pose.Position = Geometry::TranslatePoint(item->Pose.Position, direction, distance);
+	item->Pose.Translate(direction, distance);
 }
 
 void SetAnimation(ItemInfo* item, int animIndex, int frameToStart)
