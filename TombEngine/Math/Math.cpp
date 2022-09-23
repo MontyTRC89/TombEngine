@@ -21,7 +21,7 @@ namespace TEN::Math
 		float s = value1;
 		float x = time;
 		float xSquared = SQUARE(x);
-		return p * xSquared * x + q * xSquared + r * x + s;
+		return ((p * xSquared * x) + (q * xSquared) + (r * x) + s);
 	}
 
 	const float Smoothstep(float edge0, float edge1, float x)
