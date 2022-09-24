@@ -113,7 +113,7 @@ void lara_col_jump_forward(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->Control.MoveAngle = (item->Animation.Velocity.z > 0) ? item->Pose.Orientation.y : item->Pose.Orientation.y + ANGLE(180.0f);
+	lara->Control.MoveAngle = (item->Animation.Velocity.z > 0.0f) ? item->Pose.Orientation.y : item->Pose.Orientation.y + ANGLE(180.0f);
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
 	coll->Setup.LowerCeilingBound = BAD_JUMP_CEILING;
@@ -123,7 +123,7 @@ void lara_col_jump_forward(ItemInfo* item, CollisionInfo* coll)
 	LaraDeflectEdgeJump(item, coll);
 
 	// TODO: Why??
-	lara->Control.MoveAngle = (item->Animation.Velocity.z < 0) ? item->Pose.Orientation.y : lara->Control.MoveAngle;
+	lara->Control.MoveAngle = (item->Animation.Velocity.z < 0.0f) ? item->Pose.Orientation.y : lara->Control.MoveAngle;
 }
 
 // State:		LS_FREEFALL (9)
@@ -802,7 +802,7 @@ void lara_col_swan_dive(ItemInfo* item, CollisionInfo* coll)
 	if (LaraDeflectEdgeJump(item, coll))
 	{
 		// Reset position to avoid embedding inside sloped ceilings meeting the floor.
-		item->Pose.Position = coll->Setup.OldPosition;
+		item->Pose.Position = coll->Setup.PrevPosition;
 		lara->Control.HandStatus = HandStatus::Free;
 	}
 }

@@ -750,7 +750,7 @@ bool ItemPushItem(ItemInfo* item, ItemInfo* item2, CollisionInfo* coll, bool spa
 	coll->Setup.UpperCeilingBound = MAX_HEIGHT;
 
 	auto headingAngle = coll->Setup.ForwardAngle;
-	coll->Setup.ForwardAngle = phd_atan(item2->Pose.Position.z - coll->Setup.OldPosition.z, item2->Pose.Position.x - coll->Setup.OldPosition.x);
+	coll->Setup.ForwardAngle = phd_atan(item2->Pose.Position.z - coll->Setup.PrevPosition.z, item2->Pose.Position.x - coll->Setup.PrevPosition.x);
 
 	GetCollisionInfo(coll, item2);
 
@@ -758,15 +758,15 @@ bool ItemPushItem(ItemInfo* item, ItemInfo* item2, CollisionInfo* coll, bool spa
 
 	if (coll->CollisionType == CT_NONE)
 	{
-		coll->Setup.OldPosition = item2->Pose.Position;
+		coll->Setup.PrevPosition = item2->Pose.Position;
 
 		// Commented because causes Lara to jump out of the water if she touches an object on the surface. re: "kayak bug"
 		// UpdateItemRoom(item2, -10);
 	}
 	else
 	{
-		item2->Pose.Position.x = coll->Setup.OldPosition.x;
-		item2->Pose.Position.z = coll->Setup.OldPosition.z;
+		item2->Pose.Position.x = coll->Setup.PrevPosition.x;
+		item2->Pose.Position.z = coll->Setup.PrevPosition.z;
 	}
 
 	// If Lara is in the process of aligning to an object, cancel it.
@@ -822,23 +822,23 @@ bool ItemPushStatic(ItemInfo* item, MESH_INFO* mesh, CollisionInfo* coll)
 	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
 	coll->Setup.LowerCeilingBound = 0;
 
-	auto oldFacing = coll->Setup.ForwardAngle;
-	coll->Setup.ForwardAngle = phd_atan(item->Pose.Position.z - coll->Setup.OldPosition.z, item->Pose.Position.x - coll->Setup.OldPosition.x);
+	auto prevHeadingAngle = coll->Setup.ForwardAngle;
+	coll->Setup.ForwardAngle = phd_atan(item->Pose.Position.z - coll->Setup.PrevPosition.z, item->Pose.Position.x - coll->Setup.PrevPosition.x);
 
 	GetCollisionInfo(coll, item);
 
-	coll->Setup.ForwardAngle = oldFacing;
+	coll->Setup.ForwardAngle = prevHeadingAngle;
 
 	if (coll->CollisionType == CT_NONE)
 	{
-		coll->Setup.OldPosition = item->Pose.Position;
+		coll->Setup.PrevPosition = item->Pose.Position;
 		if (item->IsLara())
 			UpdateItemRoom(item, -10);
 	}
 	else
 	{
-		item->Pose.Position.x = coll->Setup.OldPosition.x;
-		item->Pose.Position.z = coll->Setup.OldPosition.z;
+		item->Pose.Position.x = coll->Setup.PrevPosition.x;
+		item->Pose.Position.z = coll->Setup.PrevPosition.z;
 	}
 
 	// If Lara is in the process of aligning to an object, cancel it.
@@ -925,8 +925,8 @@ bool CollideSolidBounds(ItemInfo* item, BOUNDING_BOX* box, PHD_3DPOS pose, Colli
 	bool intersects = staticBounds.Intersects(collBounds);
 
 	// Check if previous item horizontal position intersects bounds.
-	auto oldCollBounds = TO_DX_BBOX(PHD_3DPOS(coll->Setup.OldPosition.x, item->Pose.Position.y, coll->Setup.OldPosition.z), &collBox);
-	bool oldHorIntersects = staticBounds.Intersects(oldCollBounds);
+	auto prevCollBounds = TO_DX_BBOX(PHD_3DPOS(coll->Setup.PrevPosition.x, item->Pose.Position.y, coll->Setup.PrevPosition.z), &collBox);
+	bool prevHorIntersects = staticBounds.Intersects(prevCollBounds);
 
 	// Draw item coll bounds.
 	g_Renderer.AddDebugBox(collBounds, intersects ? Vector4(1, 0, 0, 1) : Vector4(0, 1, 0, 1), RENDERER_DEBUG_PAGE::LOGIC_STATS);
@@ -988,7 +988,7 @@ bool CollideSolidBounds(ItemInfo* item, BOUNDING_BOX* box, PHD_3DPOS pose, Colli
 		auto distanceToVerticalPlane = height / 2 - yPoint;
 
 		// Correct position according to top/bottom bounds, if collided and plane is nearby.
-		if (intersects && oldHorIntersects && minDistance < height)
+		if (intersects && prevHorIntersects && minDistance < height)
 		{
 			if (bottom)
 			{
@@ -1071,7 +1071,7 @@ bool CollideSolidBounds(ItemInfo* item, BOUNDING_BOX* box, PHD_3DPOS pose, Colli
 		rawShift.z = shiftRight;
 
 	// Rotate previous collision position to identity.
-	distance = (coll->Setup.OldPosition - pose.Position).ToVector3();
+	distance = (coll->Setup.PrevPosition - pose.Position).ToVector3();
 	auto ox = round((distance.x * cosY) - (distance.z * sinY)) + pose.Position.x;
 	auto oz = round((distance.x * sinY) + (distance.z * cosY)) + pose.Position.z;
 

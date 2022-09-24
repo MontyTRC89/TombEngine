@@ -763,10 +763,10 @@ void LaraAboveWater(ItemInfo* item, CollisionInfo* coll)
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpasm = true;
 
-	coll->Setup.OldPosition = item->Pose.Position;
-	coll->Setup.OldAnimNumber = item->Animation.AnimNumber;
-	coll->Setup.OldFrameNumber = item->Animation.FrameNumber;
-	coll->Setup.OldState = item->Animation.ActiveState;
+	coll->Setup.PrevPosition = item->Pose.Position;
+	coll->Setup.PrevAnimNumber = item->Animation.AnimNumber;
+	coll->Setup.PrevFrameNumber = item->Animation.FrameNumber;
+	coll->Setup.PrevState = item->Animation.ActiveState;
 
 	// ------------------------------------
 
@@ -853,7 +853,7 @@ void LaraWaterSurface(ItemInfo* item, CollisionInfo* coll)
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
 
-	coll->Setup.OldPosition = item->Pose.Position;
+	coll->Setup.PrevPosition = item->Pose.Position;
 
 	if (TrInput & IN_LOOK && lara->Control.Look.Mode != LookMode::None)
 		DoLookAround(item);
@@ -923,7 +923,7 @@ void LaraUnderwater(ItemInfo* item, CollisionInfo* coll)
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpasm = false;
 
-	coll->Setup.OldPosition = item->Pose.Position;
+	coll->Setup.PrevPosition = item->Pose.Position;
 
 	if (TrInput & IN_LOOK && lara->Control.Look.Mode != LookMode::None)
 		DoLookAround(item);

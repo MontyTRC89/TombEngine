@@ -805,7 +805,7 @@ void SetLaraCornerAnimation(ItemInfo* item, CollisionInfo* coll, bool flip)
 
 		item->Pose.Position = lara->NextCornerPos.Position;
 		item->Pose.Orientation.y = lara->NextCornerPos.Orientation.y;
-		coll->Setup.OldPosition = lara->NextCornerPos.Position;
+		coll->Setup.PrevPosition = lara->NextCornerPos.Position;
 	}
 }
 

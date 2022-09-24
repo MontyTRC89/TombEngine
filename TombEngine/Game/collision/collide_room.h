@@ -87,10 +87,10 @@ struct CollisionSetup
 	bool EnableSpasm;			// Convulse when pushed
 
 	// Preserve previous parameters to restore later
-	Vector3Int OldPosition;
-	int OldAnimNumber;
-	int OldFrameNumber;
-	int OldState;
+	Vector3Int PrevPosition;
+	int PrevAnimNumber;
+	int PrevFrameNumber;
+	int PrevState;
 };
 
 struct CollisionInfo

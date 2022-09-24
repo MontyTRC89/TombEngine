@@ -486,7 +486,7 @@ namespace TEN::Entities::Vehicles
 		coll->Setup.EnableObjectPush = true;
 		coll->Setup.EnableSpasm = false;
 
-		coll->Setup.OldPosition = UPVItem->Pose.Position;
+		coll->Setup.PrevPosition = UPVItem->Pose.Position;
 
 		if ((UPVItem->Pose.Orientation.x >= -(SHRT_MAX / 2 + 1)) && (UPVItem->Pose.Orientation.x <= (SHRT_MAX / 2 + 1)))
 		{
@@ -541,7 +541,7 @@ namespace TEN::Entities::Vehicles
 			UPVItem->Pose.Orientation.y -= ANGLE(5.0f);
 		else if (coll->CollisionType == CT_CLAMP)
 		{
-			UPVItem->Pose.Position = coll->Setup.OldPosition;
+			UPVItem->Pose.Position = coll->Setup.PrevPosition;
 			UPV->Velocity = 0;
 			return;
 		}

@@ -98,7 +98,7 @@ void lara_as_switch_off(ItemInfo* item, CollisionInfo* coll)
 // Control:	lara_as_controlled_no_look()
 void lara_col_turn_switch(ItemInfo* item, CollisionInfo* coll)
 {
-	if (coll->Setup.OldPosition.x != item->Pose.Position.x || coll->Setup.OldPosition.z != item->Pose.Position.z)
+	if (coll->Setup.PrevPosition.x != item->Pose.Position.x || coll->Setup.PrevPosition.z != item->Pose.Position.z)
 	{
 		if (item->Animation.AnimNumber == LA_TURNSWITCH_PUSH_COUNTER_CLOCKWISE_CONTINUE)
 		{
