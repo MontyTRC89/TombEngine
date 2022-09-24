@@ -86,7 +86,7 @@ struct CollisionSetup
 	bool EnableObjectPush;		// Can be pushed by objects
 	bool EnableSpasm;			// Convulse when pushed
 
-	// Preserve old parameters to restore later
+	// Preserve previous parameters to restore later
 	Vector3Int OldPosition;
 	int OldAnimNumber;
 	int OldFrameNumber;

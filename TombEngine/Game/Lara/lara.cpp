@@ -776,7 +776,7 @@ void LaraAboveWater(ItemInfo* item, CollisionInfo* coll)
 	{
 		DoLookAround(item);
 	}
-	else /*if (!lara->Control.IsFlexing)*/
+	else //if (!lara->Control.IsFlexing)
 		ResetLook(item); // TODO: Extend ResetLaraFlex() to be a catch-all function.
 	lara->Control.Look.Mode = LookMode::None;
 
