@@ -1,6 +1,9 @@
 #pragma once
 
+#include "ScriptUtil.h"
 #include "Objects/NamedBase.h"
+
+class LevelFunc;
 
 namespace sol {
 	class state;
@@ -42,7 +45,7 @@ public:
 
 	[[nodiscard]] Vec3 GetPos() const;
 	[[nodiscard]] Vec3 GetJointPos(int index) const;
-	void SetPos(Vec3 const& pos);
+	void SetPos(Vec3 const& pos, sol::optional<bool> updateRoom);
 
 	[[nodiscard]] Rotation GetRot() const;
 	void SetRot(Rotation const& rot);
@@ -55,6 +58,9 @@ public:
 
 	[[nodiscard]] int GetFrameNumber() const;
 	void SetFrameNumber(int frameNumber);
+
+	[[nodiscard]] Vec3 GetVelocity() const;
+	void SetVelocity(Vec3 velocity);
 
 	[[nodiscard]] ScriptColor GetColor() const;
 	void SetColor(ScriptColor const& col);
@@ -96,20 +102,18 @@ public:
 	void Explode();
 	void Shatter();
 
-	[[nodiscard]] std::string GetOnHit() const;
-	void SetOnHit(std::string const &);
-	[[nodiscard]] std::string GetOnKilled() const;
-	void SetOnKilled(std::string const &);
-	[[nodiscard]] std::string GetOnCollidedWithObject() const;
-	void SetOnCollidedWithObject(std::string const &);
-	[[nodiscard]] std::string GetOnCollidedWithRoom() const;
-	void SetOnCollidedWithRoom(std::string const &);
+	void SetOnHit(TypeOrNil<LevelFunc> const& cb);
+	void SetOnKilled(TypeOrNil<LevelFunc> const& cb);
+	void SetOnCollidedWithObject(TypeOrNil<LevelFunc> const& cb);
+	void SetOnCollidedWithRoom(TypeOrNil<LevelFunc> const& cb);
 
 	[[nodiscard]] short GetStatus() const;
 
 	void Init();
 
 	friend bool operator==(Moveable const&, Moveable const&);
+	friend void SetLevelFuncCallback(TypeOrNil<LevelFunc> const& cb, std::string const & callerName, Moveable& mov, std::string& toModify);
+
 private:
 	ItemInfo* m_item;
 	short m_num;

@@ -570,14 +570,17 @@ short CreateItem()
 
 void InitialiseItemArray(int totalItem)
 {
-	auto* item = &g_Level.Items[g_Level.NumItems];
+	g_Level.Items.clear();
+	g_Level.Items.resize(totalItem);
 
-	NextItemActive = NO_ITEM;
-	NextItemFree = g_Level.NumItems;
+	for (int i = 0; i < totalItem; i++)
+		g_Level.Items[i].Index = i;
+
+	auto* item = &g_Level.Items[g_Level.NumItems];
 
 	if (g_Level.NumItems + 1 < totalItem)
 	{
-		for(int i = g_Level.NumItems + 1; i < totalItem; i++, item++)
+		for (int i = g_Level.NumItems + 1; i < totalItem; i++, item++)
 		{
 			item->NextItem = i;
 			item->Active = false;
@@ -586,6 +589,8 @@ void InitialiseItemArray(int totalItem)
 	}
 
 	item->NextItem = NO_ITEM;
+	NextItemActive = NO_ITEM;
+	NextItemFree = g_Level.NumItems;
 }
 
 short SpawnItem(ItemInfo* item, GAME_OBJECT_ID objectNumber)
@@ -629,21 +634,17 @@ int GlobalItemReplace(short search, GAME_OBJECT_ID replace)
 }
 
 // Offset values may be used to account for the quirk of room traversal only being able to occur at portals.
-// Note: may not work for dynamic items because of FindItem.
 void UpdateItemRoom(ItemInfo* item, int height, int xOffset, int zOffset)
 {
-	float sinY = phd_sin(item->Pose.Orientation.y);
-	float cosY = phd_cos(item->Pose.Orientation.y);
+	auto point = TranslateVector(item->Pose.Position, item->Pose.Orientation.y, zOffset, height, xOffset);
 
-	int x = (int)round(item->Pose.Position.x + ((cosY * xOffset) + (sinY * zOffset)));
-	int y = height + item->Pose.Position.y;
-	int z = (int)round(item->Pose.Position.z + ((-sinY * xOffset) + (cosY * zOffset)));
-
-	item->Location = GetRoom(item->Location, x, y, z);
-	item->Floor = GetFloorHeight(item->Location, x, z).value_or(NO_HEIGHT);
+	// Hacky L-shaped Location traversal.
+	item->Location = GetRoom(item->Location, point.x, point.y, point.z);
+	item->Location = GetRoom(item->Location, item->Pose.Position.x, point.y, item->Pose.Position.z);
+	item->Floor = GetFloorHeight(item->Location, item->Pose.Position.x, item->Pose.Position.z).value_or(NO_HEIGHT);
 
 	if (item->RoomNumber != item->Location.roomNumber)
-		ItemNewRoom(FindItem(item), item->Location.roomNumber);
+		ItemNewRoom(item->Index, item->Location.roomNumber);
 }
 
 std::vector<int> FindAllItems(short objectNumber)
@@ -669,7 +670,7 @@ ItemInfo* FindItem(int objectNumber)
 			return item;
 	}
 
-	return 0;
+	return nullptr;
 }
 
 int FindItem(ItemInfo* item)

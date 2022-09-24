@@ -117,7 +117,6 @@ struct LEVEL
 	std::vector<ANIMATED_TEXTURES_SEQUENCE> AnimatedTexturesSequences;
 	std::vector<VolumeEventSet> EventSets;
 	int NumItems;
-	int NumSpritesSequences;
 };
 
 extern std::vector<int> MoveablesIds;

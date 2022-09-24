@@ -51,6 +51,23 @@ bool LaraDeflectEdge(ItemInfo* item, CollisionInfo* coll)
 	return false;
 }
 
+bool LaraDeflectTopSide(ItemInfo* item, CollisionInfo* coll)
+{
+	// HACK: If we are falling down, collision is CT_CLAMP and
+	// HitStatic flag is set, it means we've collided static from the top.
+
+	if (coll->CollisionType == CT_CLAMP &&
+		coll->HitStatic && item->Animation.Velocity.y > 0.0f)
+	{
+		SetAnimation(item, LA_JUMP_WALL_SMASH_START, 1);
+		Rumble(0.5f, 0.15f);
+
+		return true;
+	}
+
+	return false;
+}
+
 bool LaraDeflectEdgeJump(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
@@ -60,16 +77,21 @@ bool LaraDeflectEdgeJump(ItemInfo* item, CollisionInfo* coll)
 
 	if (coll->CollisionType == CT_FRONT || coll->CollisionType == CT_TOP_FRONT)
 	{
-		if (!lara->Control.CanClimbLadder || item->Animation.Velocity.z != 2)
+		if (!lara->Control.CanClimbLadder || item->Animation.Velocity.z != 2.0f)
 		{
 			if (coll->Middle.Floor <= CLICK(1))
 			{
-				SetAnimation(item, LA_LAND);
-				LaraSnapToHeight(item, coll);
+				if (TestLaraSlide(item, coll))
+					SetLaraSlideAnimation(item, coll);
+				else
+				{
+					SetAnimation(item, LA_LAND);
+					LaraSnapToHeight(item, coll);
+				}
 			}
-			else if (abs(item->Animation.Velocity.z) > 47)
+			// TODO: Demagic. This is Lara's running velocity. Jumps have a minimum of 50.
+			else if (abs(item->Animation.Velocity.z) > 47.0f)
 			{
-				// TODO: Demagic. This is Lara's running velocity. Jumps have a minimum of 50.
 				SetAnimation(item, LA_JUMP_WALL_SMASH_START, 1);
 				Rumble(0.5f, 0.15f);
 			}
@@ -77,8 +99,8 @@ bool LaraDeflectEdgeJump(ItemInfo* item, CollisionInfo* coll)
 			item->Animation.Velocity.z /= 4;
 			lara->Control.MoveAngle += ANGLE(180.0f);
 
-			if (item->Animation.Velocity.y <= 0)
-				item->Animation.Velocity.y = 1;
+			if (item->Animation.Velocity.y <= 0.0f)
+				item->Animation.Velocity.y = 1.0f;
 		}
 
 		return true;
@@ -96,19 +118,19 @@ bool LaraDeflectEdgeJump(ItemInfo* item, CollisionInfo* coll)
 
 	case CT_TOP:
 	case CT_TOP_FRONT:
-		if (item->Animation.Velocity.y <= 0)
-			item->Animation.Velocity.y = 1;
+		if (item->Animation.Velocity.y <= 0.0f)
+			item->Animation.Velocity.y = 1.0f;
 
 		break;
 
 	case CT_CLAMP:
 		item->Pose.Position.z += CLICK(1.5f) * phd_cos(item->Pose.Orientation.y + ANGLE(180.0f));
 		item->Pose.Position.x += CLICK(1.5f) * phd_sin(item->Pose.Orientation.y + ANGLE(180.0f));
-		item->Animation.Velocity.z = 0;
-		coll->Middle.Floor = 0;
+		item->Animation.Velocity.z = 0.0f;
+		coll->Middle.Floor = 0.0f;
 
-		if (item->Animation.Velocity.y <= 0)
-			item->Animation.Velocity.y = 16;
+		if (item->Animation.Velocity.y <= 0.0f)
+			item->Animation.Velocity.y = 16.0f;
 
 		break;
 	}

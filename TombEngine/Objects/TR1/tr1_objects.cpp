@@ -1,7 +1,6 @@
 #include "framework.h"
 #include "Objects/TR1/tr1_objects.h"
 
-/// necessary import
 #include "Game/control/box.h"
 #include "Game/collision/collide_item.h"
 #include "Game/itemdata/creature_info.h"
@@ -9,7 +8,7 @@
 #include "Specific/setup.h"
 #include "Specific/level.h"
 
-/// entities
+// Creatures
 #include "Objects/TR1/Entity/tr1_ape.h" // OK
 #include "Objects/TR1/Entity/tr1_bear.h" // OK
 #include "Objects/TR1/Entity/tr1_doppelganger.h" // OK
@@ -21,7 +20,7 @@
 #include "Objects/TR1/Entity/tr1_winged_mutant.h"
 #include "Objects/Utils/object_helper.h"
 
-using namespace TEN::Entities::TR1;
+using namespace TEN::Entities::Creatures::TR1;
 
 static void StartEntity(ObjectInfo* obj)
 {
@@ -78,7 +77,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->saveHitpoints = true;
 		obj->saveAnim = true;
 		obj->saveFlags = true;
-		obj->zoneType = ZONE_APE;
+		obj->ZoneType = ZoneType::Ape;
 	}
 
 	obj = &Objects[ID_BIG_RAT];
@@ -98,7 +97,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->saveAnim = true;
 		obj->saveFlags = true;
 		obj->waterCreature = true;
-		obj->zoneType = ZONE_WATER;
+		obj->ZoneType = ZoneType::Water;
 		obj->SetBoneRotation(1, ROT_Y); // head
 	}
 
@@ -138,7 +137,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->SetBoneRotation(1, ROT_Y);
 	}
 
-	obj = &Objects[ID_LARA_DOPPELGANGER];
+	obj = &Objects[ID_DOPPELGANGER];
 	if (obj->loaded)
 	{
 		if (Objects[ID_LARA].loaded)
@@ -174,7 +173,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->saveHitpoints = true;
 		obj->saveAnim = true;
 		obj->saveFlags = true;
-		obj->zoneType = ZONE_BLOCKABLE;
+		obj->ZoneType = ZoneType::Blockable;
 		obj->SetBoneRotation(10, ROT_X | ROT_Y);
 	}
 
@@ -194,7 +193,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->saveFlags = true;
 		obj->saveHitpoints = true;
 		obj->savePosition = true;
-		obj->zoneType = ZONE_FLYER;
+		obj->ZoneType = ZoneType::Flyer;
 		obj->SetBoneRotation(1, ROT_Y); // torso
 		obj->SetBoneRotation(2, ROT_Y); // head
 	}

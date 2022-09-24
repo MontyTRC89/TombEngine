@@ -3,7 +3,7 @@
 <html>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 <head>
-    <title>TombEngine 1.0.1 Lua API</title>
+    <title>TombEngine 1.0.2 Lua API</title>
     <link rel="stylesheet" href="../ldoc.css" type="text/css" />
 </head>
 <body>
@@ -71,7 +71,6 @@
 </ul>
 <h2>4 Enums</h2>
 <ul class="nowrap">
-  <li><a href="../4 enums/Flow.InvID.html">Flow.InvID</a></li>
   <li><a href="../4 enums/Effects.BlendID.html">Effects.BlendID</a></li>
   <li><a href="../4 enums/Objects.ObjID.html">Objects.ObjID</a></li>
 </ul>
@@ -79,7 +78,6 @@
 <ul class="nowrap">
   <li><a href="../5 lua utility modules/EventSequence.html">EventSequence</a></li>
   <li><a href="../5 lua utility modules/Timer.html">Timer</a></li>
-  <li><a href="../5 lua utility modules/Util.html">Util</a></li>
 </ul>
 
 </div>
@@ -98,6 +96,10 @@
 	<tr>
 	<td class="name" ><a href="#HasLineOfSight">HasLineOfSight(room1, pos1, pos2)</a></td>
 	<td class="summary">Determine if there's a line of sight between two points.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Vibrate">Vibrate(strength, time)</a></td>
+	<td class="summary">Vibrate game controller, if function is available and setting is on.</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#FadeOut">FadeOut(speed)</a></td>
@@ -124,6 +126,18 @@
 	<td class="summary">Set and play an ambient track</td>
 	</tr>
 	<tr>
+	<td class="name" ><a href="#StopAudioTracks">StopAudioTracks()</a></td>
+	<td class="summary">Stop any audio tracks currently playing</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#StopAudioTrack">StopAudioTrack(looped)</a></td>
+	<td class="summary">Stop audio track that is currently playing</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#PlaySound">PlaySound(sound[, position])</a></td>
+	<td class="summary">Play sound effect</td>
+	</tr>
+	<tr>
 	<td class="name" ><a href="#CalculateDistance">CalculateDistance(posA, posB)</a></td>
 	<td class="summary">Calculate the distance between two positions.</td>
 	</tr>
@@ -142,10 +156,6 @@
 	<tr>
 	<td class="name" ><a href="#Vibrate">Vibrate(strength, time)</a></td>
 	<td class="summary">Vibrate gamepad, if possible.</td>
-	</tr>
-	<tr>
-	<td class="name" ><a href="#PlaySound">PlaySound(sound, position)</a></td>
-	<td class="summary">Play sound effect</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#KeyIsHeld">KeyIsHeld(action)</a></td>
@@ -220,6 +230,31 @@ eyes of the creatures would be.
         <pre class="example"><span class="keyword">local</span> flamePlinthPos = flamePlinth:GetPosition() + Vec3(<span class="number">0</span>, flamePlinthHeight, <span class="number">0</span>);
 <span class="global">print</span>(Misc.HasLineOfSight(enemyHead:GetRoom(), enemyHead:GetPosition(), flamePlinthPos))</pre>
     </ul>
+
+</dd>
+    <dt>
+    <a name = "Vibrate"></a>
+    <strong>Vibrate(strength, time)</strong>
+    </dt>
+    <dd>
+    Vibrate game controller, if function is available and setting is on.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">strength</span>
+            <span class="types"><span class="type">float</span></span>
+         Strength of the vibration
+        </li>
+        <li><span class="parameter">time</span>
+            <span class="types"><span class="type">float</span></span>
+         <strong>(default 0.3)</strong> Time of the vibration, in seconds
+        </li>
+    </ul>
+
+
+
+
 
 </dd>
     <dt>
@@ -357,6 +392,67 @@ eyes of the creatures would be.
 
 </dd>
     <dt>
+    <a name = "StopAudioTracks"></a>
+    <strong>StopAudioTracks()</strong>
+    </dt>
+    <dd>
+    Stop any audio tracks currently playing
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "StopAudioTrack"></a>
+    <strong>StopAudioTrack(looped)</strong>
+    </dt>
+    <dd>
+    Stop audio track that is currently playing
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">looped</span>
+            <span class="types"><span class="type">bool</span></span>
+         if set, stop looped audio track, if not, stop one-shot audio track
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "PlaySound"></a>
+    <strong>PlaySound(sound[, position])</strong>
+    </dt>
+    <dd>
+    Play sound effect
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">sound</span>
+            <span class="types"><span class="type">int</span></span>
+         ID to play. Corresponds to the value in the sound XML file or Tomb Editor's "Sound Infos" window.
+        </li>
+        <li><span class="parameter">position</span>
+            <span class="types"><span class="type">Vec3</span></span>
+         The 3D position of the sound, i.e. where the sound "comes from". If not given, the sound will not be positional.
+         (<em>optional</em>)
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
     <a name = "CalculateDistance"></a>
     <strong>CalculateDistance(posA, posB)</strong>
     </dt>
@@ -451,6 +547,17 @@ To be used with <a href="../2 classes/Strings.DisplayString.html#DisplayString:S
 
 
 
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="keyword">local</span> halfwayX, halfwayY = PercentToScreen(<span class="number">50</span>, <span class="number">50</span>)
+<span class="keyword">local</span> baddy
+<span class="keyword">local</span> spawnLocationNullmesh = GetMoveableByName(<span class="string">"position_behind_left_pillar"</span>)
+<span class="keyword">local</span> str1 = DisplayString(<span class="string">"You spawned a baddy!"</span>, halfwayX, halfwayY, Color(<span class="number">255</span>, <span class="number">100</span>, <span class="number">100</span>), <span class="keyword">false</span>, {DisplayStringOption.SHADOW, DisplayStringOption.CENTER})
+
+LevelFuncs.triggerOne = <span class="keyword">function</span>(obj)
+	ShowString(str1, <span class="number">4</span>)
+<span class="keyword">end</span></pre>
+    </ul>
 
 </dd>
     <dt>
@@ -507,33 +614,6 @@ To be used with <a href="../2 classes/Strings.DisplayString.html#DisplayString:G
         <li><span class="parameter">time</span>
             <span class="types"><span class="type">float</span></span>
          (in seconds, default: 0.3)
-        </li>
-    </ul>
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "PlaySound"></a>
-    <strong>PlaySound(sound, position)</strong>
-    </dt>
-    <dd>
-    Play sound effect
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">sound</span>
-            <span class="types"><span class="type">int</span></span>
-         ID to play
-        </li>
-        <li><span class="parameter">position</span>
-            <span class="types"><span class="type">Vec3</span></span>
-
-
-
         </li>
     </ul>
 
@@ -633,7 +713,7 @@ To be used with <a href="../2 classes/Strings.DisplayString.html#DisplayString:G
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
-<i style="float:right;">Last updated 2022-08-11 22:43:52 </i>
+<i style="float:right;">Last updated 2022-09-14 20:04:13 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>

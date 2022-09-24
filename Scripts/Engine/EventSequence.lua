@@ -1,7 +1,10 @@
 -----
 --- Event sequence - a chain of functions to call at specified times, modeled after TRNG's organizers.
+--
+-- Works atop the Timer, and so is updated automatically pre-OnControlPhase, and saved automatically when the game is saved.
+--
 -- Example usage:
---	local EventSequence = require("EventSequence")
+--	local EventSequence = require("Engine.EventSequence")
 --
 --	-- These will be called by the sequence
 --	LevelFuncs.HealLara = function()
@@ -23,21 +26,16 @@
 --			false, -- does not loop
 --			{seconds = true, deciseconds = true}, -- timer format, see Timer for details
 --			6, -- seconds until call the function specified in next arg 
---			"HealLara", -- first function to call. If we don't need to pass any arguments, we can just give the func name as a string
+--			LevelFuncs.HealLara, -- first function to call. If we don't need to pass any arguments, we can just pass the function
 --			2.1, -- seconds until the next function, after the previous one has been called
---			{"SpawnBaddy", TEN.Objects.ObjID.BADDY1, "steve", posSteve}, -- if we DO want to pass arguments to the function to be called, we give a table with the name of the function ("SpawnBaddy" in this case) followed by the args to pass to it
+--			{LevelFuncs.SpawnBaddy, TEN.Objects.ObjID.BADDY1, "steve", posSteve}, -- if we DO want to pass arguments to the function to be called, we give a table with the function (LevelFuncs.SpawnBaddy in this case) followed by the args to pass to it
 --			0.5,
---			{"SpawnBaddy", TEN.Objects.ObjID.SAS_CAIRO, "chris", posChris},
+--			{LevelFuncs.SpawnBaddy, TEN.Objects.ObjID.SAS_CAIRO, "chris", posChris},
 --			1,
---			"HealLara")
+--			LevelFuncs.HealLara)
 --
 --		-- event sequences are inactive to begin with and so need to be started
 --		mySeq:Start()
---	end
---
---	-- EventSequence runs on Timer, so this call is required
---	LevelFuncs.OnControlPhase = function(dt)
---		Timer.UpdateAll(dt)
 --	end
 --
 -- @luautil EventSequence
@@ -46,11 +44,12 @@ local Timer = require("Timer")
 
 local EventSequence
 
-LevelVars.__TEN_eventSequence = {sequences = {}}
+LevelFuncs.Engine.EventSequence = {}
+LevelVars.Engine.EventSequence = {sequences = {}}
 
-LevelFuncs.__TEN_eventSequence_callNext = function(sequenceName, nextTimerName, func, ...)
-	local thisES = LevelVars.__TEN_eventSequence.sequences[sequenceName]
-	LevelFuncs[func](...)
+LevelFuncs.Engine.EventSequence.CallNext = function(sequenceName, nextTimerName, func, ...)
+	local thisES = LevelVars.Engine.EventSequence.sequences[sequenceName]
+	func(...)
 
 	thisES.currentTimer = thisES.currentTimer + 1
 	if thisES.currentTimer <= #thisES.timers then
@@ -82,9 +81,8 @@ EventSequence = {
 		setmetatable(obj, mt)
 
 		obj.name = name
-
-		LevelVars.__TEN_eventSequence.sequences[name] = {} 
-		local thisES = LevelVars.__TEN_eventSequence.sequences[name]
+		LevelVars.Engine.EventSequence.sequences[name] = {} 
+		local thisES = LevelVars.Engine.EventSequence.sequences[name]
 		thisES.name = name
 		thisES.timesFuncsAndArgs = {...}
 		thisES.loop = loop
@@ -99,7 +97,6 @@ EventSequence = {
 			local nextTimer = i + 2
 			local timerIndex = #thisES.timers + 1 
 
-			local funcName = "__TEN_eventSequence_" .. name .. "_func" .. timerIndex 
 			local timerName = "__TEN_eventSequence_" .. name .. "_timer" .. timerIndex 
 			local nextTimerName = "__TEN_eventSequence_" .. name .. "_timer" .. timerIndex + 1
 
@@ -110,7 +107,7 @@ EventSequence = {
 				thisES.firstTimerName = timerName
 			end
 
-			if type(funcAndArgs) == "string" then
+			if type(funcAndArgs) == "userdata" then
 				-- we only have a function
 				func = funcAndArgs
 				funcAndArgs = {}
@@ -123,7 +120,7 @@ EventSequence = {
 						tfa[i], -- time
 						false,
 						timerFormat,
-						"__TEN_eventSequence_callNext",
+						LevelFuncs.Engine.EventSequence.CallNext,
 						name,
 						nextTimerName,
 						func,
@@ -140,7 +137,7 @@ EventSequence = {
 	-- @string name The label that was given to the sequence when it was created
 	-- @return The sequence
 	Get = function(name)
-		if LevelVars.__TEN_eventSequence.sequences[name] then
+		if LevelVars.Engine.EventSequence.sequences[name] then
 			local obj = {}
 			local mt = {}
 			mt.__index = EventSequence
@@ -155,7 +152,7 @@ EventSequence = {
 	-- @function mySequence:SetPaused
 	-- @bool p if true, the sequence will be paused; if false, it will be unpaused 
 	SetPaused = function(t, p)
-		local thisES = LevelVars.__TEN_eventSequence.sequences[t.name]
+		local thisES = LevelVars.Engine.EventSequence.sequences[t.name]
 		Timer.Get(thisES.timers[thisES.currentTimer]):SetPaused(p)
 	end;
 
@@ -163,21 +160,21 @@ EventSequence = {
 	-- @function mySequence:IsPaused
 	-- @return true if the timer is paused, false if otherwise
 	IsPaused = function(t)
-		local thisES = LevelVars.__TEN_eventSequence.sequences[t.name]
+		local thisES = LevelVars.Engine.EventSequence.sequences[t.name]
 		return Timer.Get(thisES.timers[thisES.currentTimer]):IsPaused()
 	end;
 	
 	--- Begin or unpause a sequence. If showing the remaining time on-screen, its color will be set to white.
 	-- @function mySequence:Start
 	Start = function(t)
-		local thisES = LevelVars.__TEN_eventSequence.sequences[t.name]
+		local thisES = LevelVars.Engine.EventSequence.sequences[t.name]
 		Timer.Get(thisES.timers[thisES.currentTimer]):Start()
 	end;
 
 	--- Stop the sequence.
 	--@function mySequence:Stop
 	Stop = function(t)
-		local thisES = LevelVars.__TEN_eventSequence.sequences[t.name]
+		local thisES = LevelVars.Engine.EventSequence.sequences[t.name]
 		Timer.Get(thisES.timers[thisES.currentTimer]):Stop()
 	end;
 
@@ -185,7 +182,7 @@ EventSequence = {
 	-- @function mySequence:IsActive
 	-- @return true if the sequence is active, false if otherwise
 	IsActive = function(t)
-		local thisES = LevelVars.__TEN_eventSequence.sequences[t.name]
+		local thisES = LevelVars.Engine.EventSequence.sequences[t.name]
 		return Timer.Get(thisES.timers[thisES.currentTimer]):IsActive()
 	end;
 }

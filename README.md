@@ -75,9 +75,11 @@ We do not and have never worked for Core Design, Eidos Interactive, or Square En
 ## Assets and Miscellaneous
 
 ### Animations
-- SrDanielPonces (Diagonal shimmy transitions)
+- SrDanielPonces (Diagonal shimmy transitions, backwards monkey swinging)
 - Krystian (Flexibility crawlspace, slope climbing animations)
 - Sezz (Additional Animations for player state refactoring) 
+- Naotheia (Underwater puzzle placement, crouch 180° turn, crawl 180° turn, water surface 180° turn)
+- JoeyQuint (Standing 180° turn, monkey swing 180° turn)
 
 ### TombEngine Wiki tutorials 
 - Kubsy (Lua Basics tutorial)

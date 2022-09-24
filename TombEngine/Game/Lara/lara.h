@@ -50,7 +50,7 @@ constexpr int LARA_RADIUS			 = 100;
 constexpr int LARA_RADIUS_CRAWL		 = 200;
 constexpr int LARA_RADIUS_UNDERWATER = 300;
 constexpr int LARA_RADIUS_DEATH		 = 400;
-constexpr int LARA_VELOCITY			 = 12; // TODO: Float.
+constexpr int LARA_ALIGN_VELOCITY	 = 12; // TODO: Float.
 
 constexpr auto LARA_FREEFALL_VELOCITY   = 131.0f;
 constexpr auto LARA_DAMAGE_VELOCITY		= 141.0f;
@@ -95,3 +95,4 @@ void LaraWaterSurface(ItemInfo* item, CollisionInfo* coll);
 void LaraUnderwater(ItemInfo* item, CollisionInfo* coll);
 void LaraCheat(ItemInfo* item, CollisionInfo* coll);
 void AnimateLara(ItemInfo* item);
+void PerformAnimCommands(ItemInfo* item, bool frameBased);

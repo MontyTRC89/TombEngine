@@ -73,7 +73,7 @@ function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] =
 	lara_as_turn_right_fast,//20
 	lara_as_step_right,//21
 	lara_as_step_left,//22
-	lara_as_roll_back,
+	lara_as_roll_180_back,//23
 	lara_as_slide_forward,//24
 	lara_as_jump_back,//25
 	lara_as_jump_right,//26
@@ -95,7 +95,7 @@ function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] =
 	lara_as_use_key,//42
 	lara_as_use_puzzle,//43
 	lara_as_underwater_death,//44
-	lara_as_roll_forward,//45
+	lara_as_roll_180_forward,//45
 	lara_as_special,//46
 	lara_as_surface_swim_back,//47
 	lara_as_surface_swim_left,//48
@@ -227,6 +227,7 @@ function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] =
 	lara_as_idle,//170
 	lara_as_crouch_turn_180,//171
 	lara_as_crawl_turn_180,//172
+	lara_as_turn_180,//173
 };
 
 function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] =
@@ -254,7 +255,7 @@ function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] =
 	lara_col_turn_right_fast,
 	lara_col_step_right,
 	lara_col_step_left,
-	lara_col_roll_back,
+	lara_col_roll_180_back,
 	lara_col_slide_forward,//24
 	lara_col_jump_back,//25
 	lara_col_jump_right,//26
@@ -276,7 +277,7 @@ function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] =
 	lara_default_col,
 	lara_default_col,
 	lara_col_underwater_death,//44
-	lara_col_roll_forward,//45
+	lara_col_roll_180_forward,//45
 	lara_void_func,//46
 	lara_col_surface_swim_back,//47
 	lara_col_surface_swim_left,//48
@@ -404,6 +405,7 @@ function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] =
 	lara_col_idle,//170
 	lara_col_crouch_turn_180,//171
 	lara_col_crawl_turn_180,//172
+	lara_col_turn_180,//173
 };
 
 void LaraControl(ItemInfo* item, CollisionInfo* coll)
@@ -456,8 +458,6 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 		lara->SprintEnergy++;
 
 	RumbleLaraHealthCondition(item);
-
-	lara->Control.IsLow = false;
 
 	bool isWater = TestEnvironment(ENV_FLAG_WATER, item);
 	bool isSwamp = TestEnvironment(ENV_FLAG_SWAMP, item);
@@ -809,11 +809,9 @@ void LaraAboveWater(ItemInfo* item, CollisionInfo* coll)
 	if (HandleLaraVehicle(item, coll))
 		return;
 
-	HandleLaraMovementParameters(item, coll);
-
 	// Handle current Lara status.
 	lara_control_routines[item->Animation.ActiveState](item, coll);
-
+	HandleLaraMovementParameters(item, coll);
 	AnimateLara(item);
 
 	if (lara->ExtraAnim == NO_ITEM)
@@ -843,6 +841,8 @@ void LaraAboveWater(ItemInfo* item, CollisionInfo* coll)
 void LaraWaterSurface(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
+
+	lara->Control.IsLow = false;
 
 	Camera.targetElevation = -ANGLE(22.0f);
 
@@ -913,6 +913,8 @@ void LaraWaterSurface(ItemInfo* item, CollisionInfo* coll)
 void LaraUnderwater(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
+
+	lara->Control.IsLow = false;
 
 	coll->Setup.Mode = CollisionProbeMode::Quadrants;
 	coll->Setup.Radius = LARA_RADIUS_UNDERWATER;

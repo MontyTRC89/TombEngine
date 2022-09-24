@@ -18,7 +18,7 @@
 
 using namespace TEN::Math::Random;
 
-namespace TEN::Entities::TR2
+namespace TEN::Entities::Creatures::TR2
 {
 	constexpr auto KNIFE_PROJECTILE_DAMAGE = 50;
 
@@ -29,7 +29,7 @@ namespace TEN::Entities::TR2
 
 	enum KnifeThrowerState
 	{
-		KTHROWER_STATE_NONE = 0,
+		// No state 0.
 		KTHROWER_STATE_IDLE = 1,
 		KTHROWER_STATE_WALK_FORWARD = 2,
 		KTHROWER_STATE_RUN_FORWARD = 3,
@@ -101,7 +101,7 @@ namespace TEN::Entities::TR2
 
 		fx->pos.Orientation.z += ANGLE(30.0f);
 
-		if (ItemNearLara(&fx->pos, 200))
+		if (ItemNearLara(&fx->pos.Position, 200))
 		{
 			DoDamage(LaraItem, KNIFE_PROJECTILE_DAMAGE);
 

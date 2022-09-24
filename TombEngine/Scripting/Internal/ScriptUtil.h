@@ -37,17 +37,19 @@ template <typename ... Ts> using TypeOrNil = std::variant<Ts..., sol::nil_t, sol
 sol::table MakeSpecialTableBase(sol::state* state, std::string const& name);
 
 template <typename funcIndex, typename funcNewindex>
-void MakeSpecialTable(sol::state * state, std::string const & name, funcIndex const & fi, funcNewindex const & fni)
+sol::table MakeSpecialTable(sol::state * state, std::string const & name, funcIndex const & fi, funcNewindex const & fni)
 {
 	auto meta = MakeSpecialTableBase(state, name);
 	meta.set_function("__index", fi);
 	meta.set_function("__newindex", fni);
+	return (*state)[name];
 }
 
 template <typename funcIndex, typename funcNewindex, typename ObjPtr>
-void MakeSpecialTable(sol::state * state, std::string const & name, funcIndex const & fi, funcNewindex const & fni, ObjPtr objPtr)
+sol::table MakeSpecialTable(sol::state * state, std::string const & name, funcIndex const & fi, funcNewindex const & fni, ObjPtr objPtr)
 {
 	auto meta = MakeSpecialTableBase(state, name);
 	meta.set_function("__index", fi, objPtr);
 	meta.set_function("__newindex", fni, objPtr);
+	return (*state)[name];
 }

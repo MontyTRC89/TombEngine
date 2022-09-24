@@ -1,7 +1,20 @@
 #include "framework.h"
 #include "Objects/TR5/tr5_objects.h"
 
-/// Entities
+#include "Game/collision/collide_item.h"
+#include "Game/control/box.h"
+#include "Game/itemdata/creature_info.h"
+#include "Game/Lara/lara_flare.h"
+#include "Game/Lara/lara_initialise.h"
+#include "Game/Lara/lara_one_gun.h"
+#include "Game/pickup/pickup.h"
+#include "Objects/Generic/Object/objects.h"
+#include "Objects/Generic/Switches/switch.h"
+#include "Objects/Utils/object_helper.h"
+#include "Specific/level.h"
+#include "Specific/setup.h"
+
+// Creatures
 #include "tr5_autoguns.h"	  // OK
 #include "tr5_brownbeast.h"	  // OK
 #include "tr5_chef.h"		  // OK
@@ -23,13 +36,13 @@
 #include "tr5_submarine.h"	  // OK
 #include "tr5_willowwisp.h"	  // OK
 
-/// Emitters
+// Emitters
 #include "Objects/TR5/Emitter/tr5_rats_emitter.h"
 #include "Objects/TR5/Emitter/tr5_bats_emitter.h"
 #include "Objects/TR5/Emitter/tr5_spider_emitter.h"
 #include "tr5_smoke_emitter.h"
 
-/// Objects
+// Objects
 #include "Objects/TR5/Object/tr5_pushableblock.h"
 #include "tr5_twoblockplatform.h"
 #include "tr5_raisingcog.h"
@@ -42,7 +55,7 @@
 #include "tr5_missile.h"
 #include "tr5_genslot.h"
 
-/// Traps
+// Traps
 #include "tr5_ventilator.h"
 #include "tr5_deathslide.h"
 #include "Objects/Effects/tr5_electricity.h"
@@ -55,24 +68,11 @@
 // Switches
 #include "tr5_crowdove_switch.h"
 
-/// shatter
+// Shatters
 #include "Objects/TR5/Shatter/tr5_smashobject.h"
-/// necessary import
-#include "Game/collision/collide_item.h"
-#include "Game/Lara/lara_one_gun.h"
-#include "Game/Lara/lara_flare.h"
-#include "Game/Lara/lara_initialise.h"
-#include "Game/pickup/pickup.h"
-#include "Specific/setup.h"
-#include "Objects/Generic/Switches/switch.h"
-#include "Objects/Generic/Object/objects.h"
-#include "Specific/level.h"
-/// register objects
-#include "Objects/Utils/object_helper.h"
-#include "Game/itemdata/creature_info.h"
-#include "Game/control/box.h"
 
-using namespace TEN::Entities::TR5;
+using namespace TEN::Entities::Creatures::TR5;
+using namespace TEN::Entities::Switches;
 
 static void StartEntity(ObjectInfo *obj)
 {
@@ -105,7 +105,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->saveFlags = true;
 		obj->saveAnim = true;
 		obj->saveHitpoints = true;
-		obj->zoneType = ZONE_HUMAN_CLASSIC;
+		obj->ZoneType = ZoneType::HumanClassic;
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_X;
 		g_Level.Bones[obj->boneIndex + 13 * 4] |= ROT_Y;
@@ -130,7 +130,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->saveFlags = true;
 		obj->saveAnim = true;
 		obj->saveHitpoints = true;
-		obj->zoneType = ZONE_HUMAN_CLASSIC;
+		obj->ZoneType = ZoneType::HumanClassic;
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_X;
 		g_Level.Bones[obj->boneIndex + 13 * 4] |= ROT_Y;
@@ -157,7 +157,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->saveFlags = true;
 		obj->saveAnim = true;
 		obj->saveHitpoints = true;
-		obj->zoneType = ZONE_HUMAN_CLASSIC;
+		obj->ZoneType = ZoneType::HumanClassic;
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_X;
 		g_Level.Bones[obj->boneIndex + 13 * 4] |= ROT_Y;
@@ -187,7 +187,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->saveFlags = true;
 		obj->saveAnim = true;
 		obj->saveHitpoints = true;
-		obj->zoneType = ZONE_HUMAN_CLASSIC;
+		obj->ZoneType = ZoneType::HumanClassic;
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_X;
 		g_Level.Bones[obj->boneIndex + 13 * 4] |= ROT_Y;
@@ -218,7 +218,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->saveFlags = true;
 		obj->saveAnim = true;
 		obj->saveHitpoints = true;
-		obj->zoneType = ZONE_HUMAN_CLASSIC;
+		obj->ZoneType = ZoneType::HumanClassic;
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_X;
 		g_Level.Bones[obj->boneIndex + 13 * 4] |= ROT_Y;
@@ -247,7 +247,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->saveFlags = true;
 		obj->saveAnim = true;
 		obj->saveHitpoints = true;
-		obj->zoneType = ZONE_HUMAN_CLASSIC;
+		obj->ZoneType = ZoneType::HumanClassic;
 		g_Level.Bones[Objects[69].boneIndex + 6 * 4] |= ROT_Y;
 		g_Level.Bones[Objects[69].boneIndex + 6 * 4] |= ROT_X;
 		g_Level.Bones[Objects[69].boneIndex + 13 * 4] |= ROT_Y;
@@ -278,7 +278,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->saveFlags = true;
 		obj->saveAnim = true;
 		obj->saveHitpoints = true;
-		obj->zoneType = ZONE_HUMAN_CLASSIC;
+		obj->ZoneType = ZoneType::HumanClassic;
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_X;
 		g_Level.Bones[obj->boneIndex + 13 * 4] |= ROT_Y;
@@ -310,7 +310,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->saveFlags = true;
 		obj->saveAnim = true;
 		obj->saveHitpoints = true;
-		obj->zoneType = ZONE_HUMAN_CLASSIC;
+		obj->ZoneType = ZoneType::HumanClassic;
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_X;
 		g_Level.Bones[obj->boneIndex + 13 * 4] |= ROT_Y;
@@ -334,7 +334,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->saveHitpoints = true;
 		obj->savePosition = true;
 		obj->waterCreature = true;
-		obj->zoneType = ZONE_FLYER;
+		obj->ZoneType = ZoneType::Flyer;
 		obj->undead = true;
 		g_Level.Bones[obj->boneIndex] |= ROT_X;
 		g_Level.Bones[obj->boneIndex + 4] |= ROT_X;
@@ -357,7 +357,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->saveFlags = true;
 		obj->saveAnim = true;
 		obj->saveHitpoints = true;
-		obj->zoneType = ZONE_HUMAN_CLASSIC;
+		obj->ZoneType = ZoneType::HumanClassic;
 
 		g_Level.Bones[obj->boneIndex + 4 * 6] |= ROT_Y;
 		g_Level.Bones[obj->boneIndex + 4 * 6] |= ROT_X;
@@ -381,7 +381,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->saveFlags = true;
 		obj->saveAnim = true;
 		obj->saveHitpoints = true;
-		obj->zoneType = ZONE_BASIC;
+		obj->ZoneType = ZoneType::Basic;
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
 		g_Level.Bones[obj->boneIndex + 19 * 4] |= ROT_Y;
 	}
@@ -402,7 +402,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->saveFlags = true;
 		obj->saveAnim = true;
 		obj->saveHitpoints = true;
-		obj->zoneType = ZONE_BASIC;
+		obj->ZoneType = ZoneType::Basic;
 		g_Level.Bones[obj->boneIndex + 19 * 4] |= ROT_Y;
 	}
 
@@ -422,7 +422,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->saveFlags = true;
 		obj->saveAnim = true;
 		obj->saveHitpoints = true;
-		obj->zoneType = ZONE_BASIC;
+		obj->ZoneType = ZoneType::Basic;
 		g_Level.Bones[obj->boneIndex + 19 * 4] |= ROT_Y;
 	}
 
@@ -443,7 +443,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->saveHitpoints = true;
 		obj->savePosition = true;
 		obj->waterCreature = true;
-		obj->zoneType = ZONE_FLYER;
+		obj->ZoneType = ZoneType::Flyer;
 	}
 
 	obj = &Objects[ID_MAFIA2];
@@ -464,7 +464,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->saveFlags = true;
 		obj->saveAnim = true;
 		obj->saveHitpoints = true;
-		obj->zoneType = ZONE_HUMAN_CLASSIC;
+		obj->ZoneType = ZoneType::HumanClassic;
 		obj->meshSwapSlot = ID_MESHSWAP_MAFIA2;
 
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
@@ -490,7 +490,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->saveFlags = true;
 		obj->saveAnim = true;
 		obj->saveHitpoints = true;
-		obj->zoneType = ZONE_HUMAN_CLASSIC;
+		obj->ZoneType = ZoneType::HumanClassic;
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_X;
 		g_Level.Bones[obj->boneIndex + 7 * 4] |= ROT_Y;
@@ -514,14 +514,14 @@ static void StartEntity(ObjectInfo *obj)
 		obj->saveFlags = true;
 		obj->saveAnim = true;
 		obj->saveHitpoints = true;
-		obj->zoneType = ZONE_HUMAN_CLASSIC;
+		obj->ZoneType = ZoneType::HumanClassic;
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_X;
 		g_Level.Bones[obj->boneIndex + 7 * 4] |= ROT_Y;
 		g_Level.Bones[obj->boneIndex + 7 * 4] |= ROT_X;
 	}
 
-	obj = &Objects[ID_HITMAN];
+	obj = &Objects[ID_CYBORG];
 	if (obj->loaded)
 	{
 		obj->biteOffset = 5;
@@ -539,7 +539,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->saveAnim = true;
 		obj->saveHitpoints = true;
 		obj->undead = true;
-		obj->zoneType = ZONE_HUMAN_CLASSIC;
+		obj->ZoneType = ZoneType::HumanClassic;
 		obj->meshSwapSlot = ID_MESHSWAP_HITMAN;
 
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
@@ -591,7 +591,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->saveAnim = true;
 		obj->saveHitpoints = true;
 		obj->undead = true;
-		obj->zoneType = ZONE_HUMAN_CLASSIC;
+		obj->ZoneType = ZoneType::HumanClassic;
 		g_Level.Bones[obj->boneIndex] |= ROT_Y;
 		g_Level.Bones[obj->boneIndex] |= ROT_X;
 		g_Level.Bones[obj->boneIndex + 4] |= ROT_Y;
@@ -616,7 +616,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->saveAnim = true;
 		obj->saveHitpoints = true;
 		obj->undead = true;
-		obj->zoneType = ZONE_BASIC;
+		obj->ZoneType = ZoneType::Basic;
 		g_Level.Bones[obj->boneIndex + 0] |= ROT_Y;
 		g_Level.Bones[obj->boneIndex + 8 * 4] |= ROT_Y;
 		g_Level.Bones[obj->boneIndex + 8 * 4] |= ROT_X;
@@ -641,7 +641,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->saveAnim = true;
 		obj->saveHitpoints = true;
 		obj->meshSwapSlot = ID_MESHSWAP_IMP;
-		obj->zoneType = ZONE_BASIC;
+		obj->ZoneType = ZoneType::Basic;
 
 		g_Level.Bones[obj->meshIndex + 4 * 4] |= ROT_Z;
 		g_Level.Bones[obj->meshIndex + 4 * 4] |= ROT_X;
@@ -665,7 +665,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->saveFlags = true;
 		obj->saveHitpoints = true;
 		obj->savePosition = true;
-		obj->zoneType = ZONE_FLYER;
+		obj->ZoneType = ZoneType::Flyer;
 		g_Level.Bones[obj->boneIndex + 4 * 4] |= ROT_Z;
 		g_Level.Bones[obj->boneIndex + 4 * 4] |= ROT_X;
 		g_Level.Bones[obj->boneIndex + 9 * 4] |= ROT_Z;
@@ -689,7 +689,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->saveFlags = true;
 		obj->saveHitpoints = true;
 		obj->savePosition = true;
-		obj->zoneType = ZONE_BASIC;
+		obj->ZoneType = ZoneType::Basic;
 		g_Level.Bones[obj->boneIndex + 4 * 4] |= ROT_Z;
 		g_Level.Bones[obj->boneIndex + 4 * 4] |= ROT_X;
 		g_Level.Bones[obj->boneIndex + 9 * 4] |= ROT_Z;
@@ -714,7 +714,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->saveHitpoints = true;
 		obj->savePosition = true;
 		obj->waterCreature = true;
-		obj->zoneType = ZONE_BASIC;
+		obj->ZoneType = ZoneType::Basic;
 
 		g_Level.Bones[obj->boneIndex + 4 * 4] |= ROT_Z;
 		g_Level.Bones[obj->boneIndex + 4 * 4] |= ROT_X;
@@ -739,7 +739,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->saveFlags = true;
 		obj->saveAnim = true;
 		obj->saveHitpoints = true;
-		obj->zoneType = ZONE_HUMAN_CLASSIC;
+		obj->ZoneType = ZoneType::HumanClassic;
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_X;
 		g_Level.Bones[obj->boneIndex + 8 * 4] |= ROT_Y;
@@ -790,7 +790,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->saveFlags = true;
 		obj->saveAnim = true;
 		obj->saveHitpoints = true;
-		obj->zoneType = ZONE_HUMAN_CLASSIC;
+		obj->ZoneType = ZoneType::HumanClassic;
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_X;
 		g_Level.Bones[obj->boneIndex + 13 * 4] |= ROT_Y;
@@ -817,7 +817,7 @@ static void StartEntity(ObjectInfo *obj)
 			obj->saveAnim = true;
 			obj->saveHitpoints = true;
 			obj->meshSwapSlot = ID_MESHSWAP_ROMAN_GOD1 + i;
-			obj->zoneType = ZONE_HUMAN_CLASSIC;
+			obj->ZoneType = ZoneType::HumanClassic;
 
 			g_Level.Bones[obj->boneIndex + 24] |= ROT_Y;
 			g_Level.Bones[obj->boneIndex + 24] |= ROT_X;
@@ -876,7 +876,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->initialise = InitialiseSubmarine;
 		obj->control = SubmarineControl;
 		obj->saveAnim = true;
-		obj->zoneType = ZONE_BASIC;
+		obj->ZoneType = ZoneType::Basic;
 		obj->hitEffect = HIT_RICOCHET;
 		obj->shadowType = ShadowMode::All;
 		obj->HitPoints = 100;
@@ -1002,7 +1002,7 @@ static void StartObject(ObjectInfo *obj)
 		obj->saveFlags = true;
 	}
 
-	obj = &Objects[ID_STEAM_EMITTER];
+	obj = &Objects[ID_SMOKE_EMITTER];
 	if (obj->loaded)
 	{
 		obj->initialise = InitialiseSmokeEmitter;

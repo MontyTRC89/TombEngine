@@ -41,14 +41,24 @@ struct Vector3Int
 		this->z = z;
 	}
 
-	Vector3Int(Vector3 v)
+	Vector3Int(Vector3 vector)
 	{
-		this->x = int(v.x);
-		this->y = int(v.y);
-		this->z = int(v.z);
+		this->x = int(vector.x);
+		this->y = int(vector.y);
+		this->z = int(vector.z);
 	}
 
-	Vector3 ToVector3()
+	static float Distance(const Vector3Int& origin, const Vector3Int& target)
+	{
+		return Vector3::Distance(origin.ToVector3(), target.ToVector3());
+	}
+	
+	static float DistanceSquared(const Vector3Int& origin, const Vector3Int& target)
+	{
+		return Vector3::DistanceSquared(origin.ToVector3(), target.ToVector3());
+	}
+
+	Vector3 ToVector3() const
 	{
 		return Vector3(x, y, z);
 	}
@@ -147,7 +157,7 @@ struct Vector3Shrt
 		this->z = z;
 	}
 
-	Vector3 ToVector3()
+	Vector3 ToVector3() const
 	{
 		return Vector3(x, y, z);
 	}
@@ -354,6 +364,15 @@ struct GameVector
 		this->z = zpos;
 		this->roomNumber = roomNumber;
 		this->boxNumber = boxNumber;
+	}
+
+	GameVector(Vector3Int& pos)
+	{
+		this->x = pos.x;
+		this->y = pos.y;
+		this->z = pos.z;
+		this->roomNumber = 0;
+		this->boxNumber = 0;
 	}
 
 	GameVector(Vector3Int& pos, short roomNumber)
@@ -586,5 +605,5 @@ struct BOUNDING_BOX
 	int Height() { return abs(Y2 - Y1); }
 };
 
-BOUNDING_BOX operator+(const BOUNDING_BOX& box, const PHD_3DPOS& vec);
+BOUNDING_BOX operator+(const BOUNDING_BOX& box, const PHD_3DPOS& pose);
 BOUNDING_BOX operator*(const BOUNDING_BOX& box, const float scale);
