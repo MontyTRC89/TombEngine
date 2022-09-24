@@ -418,7 +418,7 @@ void lara_as_crawl_idle(ItemInfo* item, CollisionInfo* coll)
 			return;
 		}
 
-		if (TrInput & IN_FORWARD)
+		if (TrInput & IN_FORWARD && !(TrInput & IN_LOOK)) // TODO: Look input check shouldn't be necessary, but it prevents start-stop bug for now. -- Sezz 2022.09.25
 		{
 			auto crawlVaultResult = TestLaraCrawlVault(item, coll);
 
@@ -436,7 +436,7 @@ void lara_as_crawl_idle(ItemInfo* item, CollisionInfo* coll)
 				return;
 			}
 		}
-		else if (TrInput & IN_BACK)
+		else if (TrInput & IN_BACK && !(TrInput & IN_LOOK))
 		{
 			if (TrInput & (IN_ACTION | IN_JUMP) && TestLaraCrawlToHang(item, coll))
 			{
