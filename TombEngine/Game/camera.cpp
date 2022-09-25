@@ -191,17 +191,18 @@ void LookCamera(ItemInfo* item)
 	// Determine best position.
 	auto origin = GameVector(pivot, item->RoomNumber);
 	auto target = GameVector(cameraPos, Camera.pos.roomNumber);
-	LOS(&origin, &target);
+
+	LOSAndReturnTarget(&origin, &target, 0);
 	cameraPos = target.ToVector3Int();
 
 	// Handle room and object collisions.
-	auto temp = GameVector(cameraPos, item->RoomNumber);
+	auto temp = target;
 	CameraCollisionBounds(&temp, CLICK(1) - CLICK(0.25f) / 2, true);
 	cameraPos = temp.ToVector3Int();
 	ItemsCollideCamera();
 
 	// Smoothly update camera position.
-	Camera.pos = GameVector(Camera.pos.ToVector3Int() + (cameraPos - Camera.pos.ToVector3Int()) * 0.25f, Camera.pos.roomNumber);
+	Camera.pos = GameVector(Camera.pos.ToVector3Int() + (cameraPos - Camera.pos.ToVector3Int()) * 0.25f, target.roomNumber);
 	Camera.target = GameVector(Camera.target.ToVector3Int() + (lookAtPos - Camera.target.ToVector3Int()) * 0.25f, item->RoomNumber);
 
 	LookAt(&Camera, 0);
@@ -885,8 +886,6 @@ bool CameraCollisionBounds(GameVector* ideal, int push, bool yFirst)
 
 void FixedCamera(ItemInfo* item)
 {
-	GameVector from, to;
-
 	// Fixed cameras before TR3 had optional "movement" effect. 
 	// Later for some reason it was forced to always be 1, and actual speed value
 	// from camera trigger was ignored. In TEN, we move speed value out of legacy
@@ -895,29 +894,22 @@ void FixedCamera(ItemInfo* item)
 
 	int moveSpeed = 1;
 
+	GameVector origin, target;
 	if (UseForcedFixedCamera)
-	{
-		from.x = ForcedFixedCamera.x;
-		from.y = ForcedFixedCamera.y;
-		from.z = ForcedFixedCamera.z;
-		from.roomNumber = ForcedFixedCamera.roomNumber;
-	}
+		origin = ForcedFixedCamera;
 	else
 	{
-		LEVEL_CAMERA_INFO* camera = &g_Level.Cameras[Camera.number];
+		auto* camera = &g_Level.Cameras[Camera.number];
 
-		from.x = camera->x;
-		from.y = camera->y;
-		from.z = camera->z;
-		from.roomNumber = camera->roomNumber;
+		origin = GameVector(camera->x, camera->y, camera->z, camera->roomNumber);
 
-		// Multiply original speed by 8 to comply with original bitshifted speed from TR1-2
+		// Multiply original speed by 8 to comply with original bitshifted speed from TR1-2.
 		moveSpeed = camera->speed * 8 + 1;
 	}
 
 	Camera.fixedCamera = true;
 
-	MoveCamera(&from, moveSpeed);
+	MoveCamera(&origin, moveSpeed);
 
 	if (Camera.timer)
 	{
@@ -928,8 +920,7 @@ void FixedCamera(ItemInfo* item)
 
 void BounceCamera(ItemInfo* item, short bounce, short maxDistance)
 {
-	float distance = Vector3::Distance(item->Pose.Position.ToVector3(), ((Vector3Int*)&Camera.pos)->ToVector3());
-
+	float distance = Vector3Int::Distance(item->Pose.Position, Camera.pos.ToVector3Int());
 	if (distance < maxDistance)
 	{
 		if (maxDistance == -1)
@@ -951,7 +942,7 @@ void LaserSightCamera(ItemInfo* item)
 	if (LSHKTimer)
 		LSHKTimer--;
 
-	bool firing = false;
+	bool isFiring = false;
 	auto& ammo = GetAmmo(item, lara->Control.Weapon.GunType);
 
 	if (!(RawInput & IN_ACTION) || WeaponDelay || !ammo)
@@ -966,7 +957,7 @@ void LaserSightCamera(ItemInfo* item)
 	{
 		if (lara->Control.Weapon.GunType == LaraWeaponType::Revolver)
 		{
-			firing = true;
+			isFiring = true;
 			WeaponDelay = 16;
 			Statistics.Game.AmmoUsed++;
 
@@ -977,7 +968,7 @@ void LaserSightCamera(ItemInfo* item)
 		}
 		else if (lara->Control.Weapon.GunType == LaraWeaponType::Crossbow)
 		{
-			firing = true;
+			isFiring = true;
 			WeaponDelay = 32;
 		}
 		else
@@ -985,7 +976,7 @@ void LaserSightCamera(ItemInfo* item)
 			if (lara->Weapons[(int)LaraWeaponType::HK].SelectedAmmo == WeaponAmmoType::Ammo1)
 			{
 				WeaponDelay = 12;
-				firing = true;
+				isFiring = true;
 
 				if (lara->Weapons[(int)LaraWeaponType::HK].HasSilencer)
 					SoundEffect(SFX_TR4_HK_SILENCED, nullptr);
@@ -1008,7 +999,7 @@ void LaserSightCamera(ItemInfo* item)
 					}
 
 					LSHKTimer = 4;
-					firing = true;
+					isFiring = true;
 
 					if (lara->Weapons[(int)LaraWeaponType::HK].HasSilencer)
 						SoundEffect(SFX_TR4_HK_SILENCED, nullptr);
@@ -1050,7 +1041,7 @@ void LaserSightCamera(ItemInfo* item)
 				else
 				{
 					LSHKTimer = 4;
-					firing = true;
+					isFiring = true;
 
 					if (lara->Weapons[(int)LaraWeaponType::HK].HasSilencer)
 						SoundEffect(SFX_TR4_HK_SILENCED, nullptr);
@@ -1067,7 +1058,7 @@ void LaserSightCamera(ItemInfo* item)
 		}
 	}
 
-	GetTargetOnLOS(&Camera.pos, &Camera.target, true, firing);
+	GetTargetOnLOS(&Camera.pos, &Camera.target, true, isFiring);
 }
 
 void BinocularCamera(ItemInfo* item)
@@ -1081,8 +1072,8 @@ void BinocularCamera(ItemInfo* item)
 		{
 			item->MeshBits = ALL_JOINT_BITS;
 			lara->Inventory.IsBusy = false;
-			lara->ExtraHeadRot = Vector3Shrt();
-			lara->ExtraTorsoRot = Vector3Shrt();
+			lara->ExtraHeadRot = Vector3Shrt::Zero;
+			lara->ExtraTorsoRot = Vector3Shrt::Zero;
 			Camera.type = BinocularOldCamera;
 			BinocularOn = false;
 			BinocularRange = 0;
@@ -1137,9 +1128,9 @@ void BinocularCamera(ItemInfo* item)
 	}
 	else
 	{
-		Camera.target.x += (tx - Camera.target.x) >> 2;
-		Camera.target.y += (ty - Camera.target.y) >> 2;
-		Camera.target.z += (tz - Camera.target.z) >> 2;
+		Camera.target.x += (tx - Camera.target.x) / 4;
+		Camera.target.y += (ty - Camera.target.y) / 4;
+		Camera.target.z += (tz - Camera.target.z) / 4;
 		Camera.target.roomNumber = item->RoomNumber;
 	}
 
@@ -1148,9 +1139,9 @@ void BinocularCamera(ItemInfo* item)
 	{
 		if (Camera.bounce <= 0)
 		{
-			Camera.target.x += (CLICK(0.25f) / 4) * (GetRandomControl() % (-Camera.bounce) - (-Camera.bounce >> 1));
-			Camera.target.y += (CLICK(0.25f) / 4) * (GetRandomControl() % (-Camera.bounce) - (-Camera.bounce >> 1));
-			Camera.target.z += (CLICK(0.25f) / 4) * (GetRandomControl() % (-Camera.bounce) - (-Camera.bounce >> 1));
+			Camera.target.x += (CLICK(0.25f) / 4) * (GetRandomControl() % (-Camera.bounce) - (-Camera.bounce / 2));
+			Camera.target.y += (CLICK(0.25f) / 4) * (GetRandomControl() % (-Camera.bounce) - (-Camera.bounce / 2));
+			Camera.target.z += (CLICK(0.25f) / 4) * (GetRandomControl() % (-Camera.bounce) - (-Camera.bounce / 2));
 			Camera.bounce += 5;
 			RumbleFromBounce();
 		}
@@ -1212,13 +1203,12 @@ void BinocularCamera(ItemInfo* item)
 
 	if (!LaserSight)
 	{
-		auto src = Vector3Int(Camera.pos.x, Camera.pos.y, Camera.pos.z);
-		auto target = Vector3Int(Camera.target.x, Camera.target.y, Camera.target.z);
-
+		auto origin = Camera.pos.ToVector3Int();
+		auto target = Camera.target.ToVector3Int();
 		GetTargetOnLOS(&Camera.pos, &Camera.target, false, false);
 
 		if (RawInput & IN_ACTION)
-			LaraTorch(&src, &target, lara->ExtraHeadRot.y, 192);
+			LaraTorch(&origin, &target, lara->ExtraHeadRot.y, 192);
 	}
 	else
 		LaserSightCamera(item);
@@ -1226,7 +1216,7 @@ void BinocularCamera(ItemInfo* item)
 
 void ConfirmCameraTargetPos()
 {
-	auto pos = Vector3Int();
+	auto pos = Vector3Int::Zero;
 	GetLaraJointPosition(&pos, LM_TORSO);
 
 	if (Camera.laraNode != -1)
@@ -1289,17 +1279,17 @@ void CalculateCamera()
 	}
 
 	ItemInfo* item;
-	bool fixedCamera = false;
-	if (Camera.item != NULL &&
+	bool isFixedCamera = false;
+	if (Camera.item != nullptr &&
 		(Camera.type == CameraType::Fixed || Camera.type == CameraType::Heavy))
 	{
 		item = Camera.item;
-		fixedCamera = true;
+		isFixedCamera = true;
 	}
 	else
 	{
 		item = LaraItem;
-		fixedCamera = false;
+		isFixedCamera = false;
 	}
 
 	auto* bounds = GetBoundsAccurate(item);
@@ -1310,7 +1300,7 @@ void CalculateCamera()
 
 	if (Camera.item)
 	{
-		if (!fixedCamera)
+		if (!isFixedCamera)
 		{
 			auto dx = Camera.item->Pose.Position.x - item->Pose.Position.x;
 			auto dz = Camera.item->Pose.Position.z - item->Pose.Position.z;
@@ -1406,7 +1396,7 @@ void CalculateCamera()
 		if (item->IsLara() && Camera.flags != CF_FOLLOW_CENTER)
 			ConfirmCameraTargetPos();
 
-		if (fixedCamera == Camera.fixedCamera)
+		if (isFixedCamera == Camera.fixedCamera)
 		{
 			Camera.fixedCamera = false;
 			if (Camera.speed != 1 &&
@@ -1449,7 +1439,7 @@ void CalculateCamera()
 			ChaseCamera(item);
 	}
 
-	Camera.fixedCamera = fixedCamera;
+	Camera.fixedCamera = isFixedCamera;
 	Camera.last = Camera.number;
 
 	if (Camera.type != CameraType::Heavy ||
@@ -1459,7 +1449,7 @@ void CalculateCamera()
 		Camera.speed = 10;
 		Camera.number = -1;
 		Camera.lastItem = Camera.item;
-		Camera.item = NULL;
+		Camera.item = nullptr;
 		Camera.targetElevation = 0;
 		Camera.targetAngle = 0;
 		Camera.targetDistance = SECTOR(1.5f);
