@@ -1405,7 +1405,7 @@ void lara_as_splat(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->Control.Look.Mode = LookMode::None;
+	lara->Control.Look.Mode = LookMode::Free;
 	ModulateLaraTurnRateY(item, 0, 0, 0);
 }
 

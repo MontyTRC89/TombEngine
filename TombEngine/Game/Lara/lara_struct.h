@@ -1257,7 +1257,6 @@ struct LaraControlData
 	TightropeControlData Tightrope = {};
 	SubsuitControlData	 Subsuit   = {};
 
-	bool CanLook		  = false;
 	bool IsMoving		  = false;
 	bool KeepLow		  = false;
 	bool IsLow			  = false;

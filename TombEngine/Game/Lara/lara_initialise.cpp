@@ -28,7 +28,7 @@ void InitialiseLara(bool restore)
 
 	ZeroMemory(&Lara, sizeof(LaraInfo));
 
-	Lara.Control.CanLook = true;
+	Lara.Control.Look.Mode = LookMode::None;
 	Lara.ItemNumber = itemNumber;
 	Lara.HitDirection = -1;
 	Lara.SprintEnergy = LARA_SPRINT_ENERGY_MAX;

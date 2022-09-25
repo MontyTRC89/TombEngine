@@ -374,7 +374,6 @@ bool SaveGame::Save(int slot)
 	control.add_hand_status((int)Lara.Control.HandStatus);
 	control.add_is_moving(Lara.Control.IsMoving);
 	control.add_run_jump_queued(Lara.Control.RunJumpQueued);
-	control.add_can_look(Lara.Control.CanLook);
 	control.add_count(countOffset);
 	control.add_keep_low(Lara.Control.KeepLow);
 	control.add_is_low(Lara.Control.IsLow);
@@ -1732,7 +1731,6 @@ bool SaveGame::Load(int slot)
 	Lara.Control.IsMoving = s->lara()->control()->is_moving();
 	Lara.Control.JumpDirection = (JumpDirection)s->lara()->control()->jump_direction();
 	Lara.Control.KeepLow = s->lara()->control()->keep_low();
-	Lara.Control.CanLook = s->lara()->control()->can_look();
 	Lara.Control.MoveAngle = s->lara()->control()->move_angle();
 	Lara.Control.RunJumpQueued = s->lara()->control()->run_jump_queued();
 	Lara.Control.TurnRate = s->lara()->control()->turn_rate();

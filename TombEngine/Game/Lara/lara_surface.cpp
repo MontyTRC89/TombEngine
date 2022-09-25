@@ -109,6 +109,8 @@ void lara_as_surface_swim_forward(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
+	lara->Control.Look.Mode = LookMode::Horizontal;
+
 	if (item->HitPoints <= 0)
 	{
 		item->Animation.TargetState = LS_WATER_DEATH;

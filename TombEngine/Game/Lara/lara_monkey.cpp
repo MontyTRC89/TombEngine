@@ -160,6 +160,7 @@ void lara_as_monkey_forward(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
+	lara->Control.Look.Mode = LookMode::Horizontal;
 	lara->ExtraTorsoRot = Vector3Shrt();
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
@@ -237,6 +238,7 @@ void lara_as_monkey_back(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
+	lara->Control.Look.Mode = LookMode::Horizontal;
 	lara->ExtraTorsoRot = Vector3Shrt();
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
@@ -308,6 +310,7 @@ void lara_as_monkey_shimmy_left(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
+	lara->Control.Look.Mode = LookMode::Vertical;
 	lara->ExtraTorsoRot = Vector3Shrt();
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
@@ -382,6 +385,7 @@ void lara_as_monkey_shimmy_right(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
+	lara->Control.Look.Mode = LookMode::Vertical;
 	lara->ExtraTorsoRot = Vector3Shrt();
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
@@ -454,6 +458,9 @@ void lara_col_monkey_shimmy_right(ItemInfo* item, CollisionInfo* coll)
 // Collision:	lara_as_monkey_turn_180()
 void lara_as_monkey_turn_180(ItemInfo* item, CollisionInfo* coll)
 {
+	auto* lara = GetLaraInfo(item);
+
+	lara->Control.Look.Mode = LookMode::None;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
 	Camera.targetElevation = -ANGLE(5.0f);
@@ -476,6 +483,7 @@ void lara_as_monkey_turn_left(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
+	lara->Control.Look.Mode = LookMode::Vertical;
 	lara->ExtraTorsoRot = Vector3Shrt();
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
@@ -555,6 +563,7 @@ void lara_as_monkey_turn_right(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
+	lara->Control.Look.Mode = LookMode::Vertical;
 	lara->ExtraTorsoRot = Vector3Shrt();
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;

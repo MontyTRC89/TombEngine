@@ -779,8 +779,6 @@ void LaraAboveWater(ItemInfo* item, CollisionInfo* coll)
 		ResetLook(item); // TODO: Extend ResetLaraFlex() to be a catch-all function.
 	lara->Control.Look.Mode = LookMode::None;
 
-	lara->Control.CanLook = true;
-
 	// ------------------------------------
 
 	UpdateItemRoom(item, -LARA_HEIGHT / 2);
@@ -850,12 +848,11 @@ void LaraWaterSurface(ItemInfo* item, CollisionInfo* coll)
 	else
 		ResetLook(item);
 
-	lara->Control.CanLook = true;
 	lara->Control.Count.Pose = 0;
 
 	lara_control_routines[item->Animation.ActiveState](item, coll);
 
-	auto level = g_GameFlow->GetLevel(CurrentLevel);
+	auto* level = g_GameFlow->GetLevel(CurrentLevel);
 
 	// TODO: Subsuit gradually slows down at rate of 0.5 degrees. @Sezz 2022.06.23
 	// Apply and reset turn rate.
@@ -920,7 +917,6 @@ void LaraUnderwater(ItemInfo* item, CollisionInfo* coll)
 	else
 		ResetLook(item);
 
-	lara->Control.CanLook = true;
 	lara->Control.Count.Pose = 0;
 
 	lara_control_routines[item->Animation.ActiveState](item, coll);
