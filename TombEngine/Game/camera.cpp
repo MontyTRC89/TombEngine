@@ -189,8 +189,8 @@ void LookCamera(ItemInfo* item)
 	auto lookAtPos = TranslateVector(pivot, orient, CLICK(0.75f));
 
 	// Determine best position.
-	auto origin = GameVector(pivot, item->RoomNumber);
-	auto target = GameVector(cameraPos, Camera.pos.roomNumber);
+	auto origin = GameVector(pivot, GetCollision(item, item->Pose.Orientation.y, CLICK(0.25f), -LaraCollision.Setup.Height).RoomNumber);
+	auto target = GameVector(cameraPos, GetCollision(origin.ToVector3Int(), origin.roomNumber, orient, -std::max(Camera.targetDistance * 0.5f, SECTOR(0.5f))).RoomNumber);
 
 	LOSAndReturnTarget(&origin, &target, 0);
 	cameraPos = target.ToVector3Int();
@@ -292,8 +292,6 @@ void InitialiseCamera()
 
 void MoveCamera(GameVector* ideal, int speed)
 {
-	GameVector from, to;
-
 	if (BinocularOn)
 		speed = 1;
 
@@ -382,23 +380,12 @@ void MoveCamera(GameVector* ideal, int speed)
 			abs(Camera.pos.y - ideal->y) < SECTOR(0.5f) &&
 			abs(Camera.pos.z - ideal->z) < SECTOR(0.5f))
 		{
-			to.x = Camera.pos.x;
-			to.y = Camera.pos.y;
-			to.z = Camera.pos.z;
-			to.roomNumber = Camera.pos.roomNumber;
-
-			from.x = ideal->x;
-			from.y = ideal->y;
-			from.z = ideal->z;
-			from.roomNumber = ideal->roomNumber;
-
-			if (!LOSAndReturnTarget(&from, &to, 0) &&
+			auto origin = *ideal;
+			auto target = Camera.pos;
+			if (!LOSAndReturnTarget(&origin, &target, 0) &&
 				++CameraSnaps >= 8)
 			{
-				Camera.pos.x = ideal->x;
-				Camera.pos.y = ideal->y;
-				Camera.pos.z = ideal->z;
-				Camera.pos.roomNumber = ideal->roomNumber;
+				Camera.pos = *ideal;
 				CameraSnaps = 0;
 			}
 		}
@@ -433,10 +420,7 @@ void MoveCamera(GameVector* ideal, int speed)
 		probe.Position.Floor == NO_HEIGHT ||
 		probe.Position.Ceiling == NO_HEIGHT)
 	{
-		Camera.pos.x = ideal->x;
-		Camera.pos.y = ideal->y;
-		Camera.pos.z = ideal->z;
-		Camera.pos.roomNumber = ideal->roomNumber;
+		Camera.pos = *ideal;
 	}
 
 	ItemsCollideCamera();
@@ -454,9 +438,9 @@ void MoveCamera(GameVector* ideal, int speed)
 	else
 	{
 		short angle = phd_atan(Camera.target.z - Camera.pos.z, Camera.target.x - Camera.pos.x);
-		Camera.mikePos.x = Camera.pos.x + PhdPerspective * phd_sin(angle);
+		Camera.mikePos.x = Camera.pos.x + (PhdPerspective * phd_sin(angle));
 		Camera.mikePos.y = Camera.pos.y;
-		Camera.mikePos.z = Camera.pos.z + PhdPerspective * phd_cos(angle);
+		Camera.mikePos.z = Camera.pos.z + (PhdPerspective * phd_cos(angle));
 		Camera.oldType = Camera.type;
 	}
 }
@@ -469,7 +453,7 @@ void ChaseCamera(ItemInfo* item)
 	Camera.targetElevation += item->Pose.Orientation.x;
 	UpdateCameraElevation();
 
-	// Clamp x rotation.
+	// Clamp X orientation.
 	if (Camera.actualElevation > ANGLE(85.0f))
 		Camera.actualElevation = ANGLE(85.0f);
 	else if (Camera.actualElevation < -ANGLE(85.0f))
@@ -488,10 +472,7 @@ void ChaseCamera(ItemInfo* item)
 		(probe.Position.Floor == NO_HEIGHT || probe.Position.Ceiling == NO_HEIGHT))
 	{
 		TargetSnaps++;
-		Camera.target.x = LastTarget.x;
-		Camera.target.y = LastTarget.y;
-		Camera.target.z = LastTarget.z;
-		Camera.target.roomNumber = LastTarget.roomNumber;
+		Camera.target = LastTarget;
 	}
 	else
 		TargetSnaps = 0;
@@ -500,7 +481,7 @@ void ChaseCamera(ItemInfo* item)
 		Ideals[i].y = Camera.target.y + Camera.targetDistance * phd_sin(Camera.actualElevation);
 
 	int farthest = INT_MAX;
-	int farthestnum = 0;
+	int farthestNum = 0;
 	GameVector temp[2];
 
 	for (int i = 0; i < 5; i++)
@@ -532,7 +513,7 @@ void ChaseCamera(ItemInfo* item)
 			{
 				if (i == 0)
 				{
-					farthestnum = 0;
+					farthestNum = 0;
 					break;
 				}
 
@@ -541,7 +522,7 @@ void ChaseCamera(ItemInfo* item)
 				if (dx < farthest)
 				{
 					farthest = dx;
-					farthestnum = i;
+					farthestNum = i;
 				}
 			}
 		}
@@ -562,18 +543,16 @@ void ChaseCamera(ItemInfo* item)
 				int dx = (Camera.target.x - Ideals[i].x) * (Camera.target.x - Ideals[i].x);
 				int dz = (Camera.target.z - Ideals[i].z) * (Camera.target.z - Ideals[i].z);
 
-				if ((dx + dz) > 0x90000)
+				if ((dx + dz) > SECTOR(576))
 				{
-					farthestnum = 0;
+					farthestNum = 0;
 					break;
 				}
 			}
 		}
 	}
 
-	GameVector ideal = { Ideals[farthestnum].x , Ideals[farthestnum].y, Ideals[farthestnum].z };
-	ideal.roomNumber = Ideals[farthestnum].roomNumber;
-
+	auto ideal = Ideals[farthestNum];
 	CameraCollisionBounds(&ideal, CLICK(1.5f), 1);
 	MoveCamera(&ideal, Camera.speed);
 }
@@ -584,7 +563,7 @@ void UpdateCameraElevation()
 
 	if (Camera.laraNode != -1)
 	{
-		auto pos = Vector3Int();
+		auto pos = Vector3Int::Zero;
 		GetLaraJointPosition(&pos, Camera.laraNode);
 
 		auto pos1 = Vector3Int(0, -CLICK(1), SECTOR(2));
@@ -595,9 +574,7 @@ void UpdateCameraElevation()
 		Camera.actualAngle = Camera.targetAngle + phd_atan(pos.z, pos.x);
 	}
 	else
-	{
 		Camera.actualAngle = LaraItem->Pose.Orientation.y + Camera.targetAngle;
-	}
 
 	Camera.actualElevation += (Camera.targetElevation - Camera.actualElevation) / 8;
 }
@@ -659,10 +636,7 @@ void CombatCamera(ItemInfo* item)
 		probe.Position.Ceiling == NO_HEIGHT)
 	{
 		TargetSnaps++;
-		Camera.target.x = LastTarget.x;
-		Camera.target.y = LastTarget.y;
-		Camera.target.z = LastTarget.z;
-		Camera.target.roomNumber = LastTarget.roomNumber;
+		Camera.target = LastTarget;
 	}
 	else
 		TargetSnaps = 0;
@@ -676,7 +650,7 @@ void CombatCamera(ItemInfo* item)
 		Ideals[i].y = Camera.target.y + Camera.targetDistance * phd_sin(Camera.actualElevation);
 
 	int farthest = INT_MAX;
-	int farthestnum = 0;
+	int farthestNum = 0;
 	GameVector temp[2];
 
 	for (int i = 0; i < 5; i++)
@@ -694,22 +668,13 @@ void CombatCamera(ItemInfo* item)
 
 		if (LOSAndReturnTarget(&Camera.target, &Ideals[i], 200))
 		{
-			temp[0].x = Ideals[i].x;
-			temp[0].y = Ideals[i].y;
-			temp[0].z = Ideals[i].z;
-			temp[0].roomNumber = Ideals[i].roomNumber;
-
-			temp[1].x = Camera.pos.x;
-			temp[1].y = Camera.pos.y;
-			temp[1].z = Camera.pos.z;
-			temp[1].roomNumber = Camera.pos.roomNumber;
-
-			if (i == 0 ||
-				LOSAndReturnTarget(&temp[0], &temp[1], 0))
+			temp[0] = Ideals[i];
+			temp[1] = Camera.pos;
+			if (i == 0 || LOSAndReturnTarget(&temp[0], &temp[1], 0))
 			{
 				if (i == 0)
 				{
-					farthestnum = 0;
+					farthestNum = 0;
 					break;
 				}
 
@@ -718,40 +683,29 @@ void CombatCamera(ItemInfo* item)
 				if (dx < farthest)
 				{
 					farthest = dx;
-					farthestnum = i;
+					farthestNum = i;
 				}
 			}
 		}
 		else if (i == 0)
 		{
-			temp[0].x = Ideals[i].x;
-			temp[0].y = Ideals[i].y;
-			temp[0].z = Ideals[i].z;
-			temp[0].roomNumber = Ideals[i].roomNumber;
-
-			temp[1].x = Camera.pos.x;
-			temp[1].y = Camera.pos.y;
-			temp[1].z = Camera.pos.z;
-			temp[1].roomNumber = Camera.pos.roomNumber;
-
-			if (i == 0 ||
-				LOSAndReturnTarget(&temp[0], &temp[1], 0))
+			temp[0] = Ideals[i];
+			temp[1] = Camera.pos;
+			if (i == 0 || LOSAndReturnTarget(&temp[0], &temp[1], 0))
 			{
 				int dx = (Camera.target.x - Ideals[i].x) * (Camera.target.x - Ideals[i].x);
 				int dz = (Camera.target.z - Ideals[i].z) * (Camera.target.z - Ideals[i].z);
 
-				if ((dx + dz) > 0x90000)
+				if ((dx + dz) > SECTOR(576))
 				{
-					farthestnum = 0;
+					farthestNum = 0;
 					break;
 				}
 			}
 		}
 	}
 
-	GameVector ideal = { Ideals[farthestnum].x, Ideals[farthestnum].y, Ideals[farthestnum].z };
-	ideal.roomNumber = Ideals[farthestnum].roomNumber;
-
+	auto ideal = Ideals[farthestNum];
 	CameraCollisionBounds(&ideal, CLICK(1.5f), 1);
 
 	if (Camera.oldType == CameraType::Fixed)

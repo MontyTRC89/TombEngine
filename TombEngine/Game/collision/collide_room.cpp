@@ -149,6 +149,16 @@ CollisionResult GetCollision(Vector3Int pos, int roomNumber, short angle, float 
 	return GetCollision(point.x, point.y, point.z, adjacentRoomNumber);
 }
 
+CollisionResult GetCollision(Vector3Int pos, int roomNumber, Vector3Shrt orient, float distance)
+{
+	auto point = TranslateVector(pos, orient, distance);
+
+	short tempRoomNumber = roomNumber;
+	auto location = ROOM_VECTOR{ GetFloor(pos.x, pos.y, pos.z, &tempRoomNumber)->Room, pos.y };
+	int adjacentRoomNumber = GetRoom(location, pos.x, point.y, pos.z).roomNumber;
+	return GetCollision(point.x, point.y, point.z, adjacentRoomNumber);
+}
+
 // Overload used as a universal wrapper across collisional code to replace
 // triads of roomNumber-GetFloor()-GetFloorHeight() operations.
 // The advantage is that it does NOT modify the incoming roomNumber argument,

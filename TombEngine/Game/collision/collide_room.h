@@ -125,6 +125,7 @@ struct CollisionInfo
 CollisionResult GetCollision(ItemInfo* item);
 CollisionResult GetCollision(ItemInfo* item, short angle, float forward, float up = 0.0f, float right = 0.0f);
 CollisionResult GetCollision(Vector3Int pos, int roomNumber, short angle, float forward, float up = 0.0f, float right = 0.0f);
+CollisionResult GetCollision(Vector3Int pos, int roomNumber, Vector3Shrt orient, float distance);
 CollisionResult GetCollision(int x, int y, int z, short roomNumber);
 CollisionResult GetCollision(FloorInfo* floor, int x, int y, int z);
 
