@@ -770,8 +770,7 @@ void LaraAboveWater(ItemInfo* item, CollisionInfo* coll)
 
 	// ------------------------------------
 
-	if (TrInput & IN_LOOK &&
-		lara->Control.Look.Mode != LookMode::None &&
+	if (TrInput & IN_LOOK && lara->Control.Look.Mode != LookMode::None &&
 		lara->ExtraAnim == NO_ITEM)
 	{
 		DoLookAround(item);
@@ -780,15 +779,6 @@ void LaraAboveWater(ItemInfo* item, CollisionInfo* coll)
 		ResetLook(item); // TODO: Extend ResetLaraFlex() to be a catch-all function.
 	lara->Control.Look.Mode = LookMode::None;
 
-	//if (TrInput & IN_LOOK && lara->Control.CanLook &&
-	//	lara->ExtraAnim == NO_ITEM)
-	//{
-	//	LookLeftRight(item);
-	//}
-	//else if (coll->Setup.Height > LARA_HEIGHT - LARA_HEADROOM) // TEMP HACK: Look feature will need a dedicated refactor; ResetLook() interferes with crawl flexing. @Sezz 2021.12.10
-	//	ResetLook(item);
-
-	// Deprecated.
 	lara->Control.CanLook = true;
 
 	// ------------------------------------

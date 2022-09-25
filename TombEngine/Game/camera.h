@@ -95,7 +95,7 @@ void BounceCamera(ItemInfo* item, short bounce, short maxDistance);
 void BinocularCamera(ItemInfo* item);
 void ConfirmCameraTargetPos();
 void CalculateCamera();
-void ResetLook(ItemInfo* item);
+void ResetLook(ItemInfo* item, float alpha = 0.9f);
 void RumbleScreen();
 bool TestBoundsCollideCamera(BOUNDING_BOX* bounds, PHD_3DPOS* pos, short radius);
 void ItemPushCamera(BOUNDING_BOX* bounds, PHD_3DPOS* pos, short radius);

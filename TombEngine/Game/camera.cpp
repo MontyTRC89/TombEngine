@@ -98,7 +98,7 @@ void DoLookAround(ItemInfo* item, bool invertVerticalAxis)
 
 	Camera.type = CameraType::Look;
 
-	// Determine axis coefficients.
+	// Determine vertical axis coefficient.
 	float vAxisCoeff = 0.0f;
 	if (TrInput & (IN_FORWARD | IN_BACK) &&
 		(lara->Control.Look.Mode == LookMode::Vertical || lara->Control.Look.Mode == LookMode::Free))
@@ -106,6 +106,7 @@ void DoLookAround(ItemInfo* item, bool invertVerticalAxis)
 		vAxisCoeff = AxisMap[InputAxis::MoveVertical];
 	}
 
+	// Determine orizontal axis coefficient.
 	float hAxisCoeff = 0.0f;
 	if (TrInput & (IN_LEFT | IN_RIGHT) &&
 		(lara->Control.Look.Mode == LookMode::Horizontal || lara->Control.Look.Mode == LookMode::Free))
@@ -121,7 +122,7 @@ void DoLookAround(ItemInfo* item, bool invertVerticalAxis)
 	lara->Control.Look.TurnRate.x = ModulateLaraTurnRate(lara->Control.Look.TurnRate.x, LOOKCAM_TURN_RATE_ACCEL, 0, turnRateMax, vAxisCoeff, invertVerticalAxis);
 	lara->Control.Look.TurnRate.y = ModulateLaraTurnRate(lara->Control.Look.TurnRate.y, LOOKCAM_TURN_RATE_ACCEL, 0, turnRateMax, hAxisCoeff, false);
 
-	// Apply turn rates.
+	// Apply and constrain turn rates.
 	lara->Control.Look.Orientation += lara->Control.Look.TurnRate;
 	lara->Control.Look.Orientation.x = std::clamp<short>(lara->Control.Look.Orientation.x, -LOOKCAM_VERTICAL_CONSTRAINT_ANGLE, LOOKCAM_VERTICAL_CONSTRAINT_ANGLE);
 	lara->Control.Look.Orientation.y = std::clamp<short>(lara->Control.Look.Orientation.y, -LOOKCAM_HORIZONTAL_CONSTRAINT_ANGLE, LOOKCAM_HORIZONTAL_CONSTRAINT_ANGLE);
@@ -146,7 +147,7 @@ void DoLookAround(ItemInfo* item, bool invertVerticalAxis)
 		TrInput &= ~(IN_LEFT | IN_RIGHT);
 
 	// Debug
-	g_Renderer.PrintDebugMessage("LookMode.x: %d", (int)lara->Control.Look.Mode);
+	g_Renderer.PrintDebugMessage("LookMode: %d", (int)lara->Control.Look.Mode);
 	g_Renderer.PrintDebugMessage("LookCam.x: %.3f", TO_DEGREES(lara->Control.Look.Orientation.x));
 	g_Renderer.PrintDebugMessage("LookCam.y: %.3f", TO_DEGREES(lara->Control.Look.Orientation.y));
 	g_Renderer.PrintDebugMessage("hAxisCoeff: %f", hAxisCoeff);
@@ -1482,32 +1483,31 @@ void CalculateCamera()
 	}
 }
 
-void ResetLook(ItemInfo* item)
+void ResetLook(ItemInfo* item, float alpha)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->Control.Look.Orientation = Vector3Shrt();
+	lara->Control.Look.Orientation = Vector3Shrt::Zero;
 
 	if (Camera.type != CameraType::Look)
 	{
 		if (abs(lara->ExtraHeadRot.x) > ANGLE(0.1f))
-			lara->ExtraHeadRot.x += lara->ExtraHeadRot.x / -8;
+			lara->ExtraHeadRot.x *= alpha;
 		else
 			lara->ExtraHeadRot.x = 0;
 
 		if (abs(lara->ExtraHeadRot.y) > ANGLE(0.1f))
-			lara->ExtraHeadRot.y += lara->ExtraHeadRot.y / -8;
+			lara->ExtraHeadRot.y *= alpha;
 		else
 			lara->ExtraHeadRot.y = 0;
 
 		if (abs(lara->ExtraHeadRot.z) > ANGLE(0.1f))
-			lara->ExtraHeadRot.z += lara->ExtraHeadRot.z / -8;
+			lara->ExtraHeadRot.z *= alpha;
 		else
 			lara->ExtraHeadRot.z = 0;
 
 		if (lara->Control.HandStatus != HandStatus::Busy &&
-			!lara->LeftArm.Locked &&
-			!lara->RightArm.Locked &&
+			!lara->LeftArm.Locked && !lara->RightArm.Locked &&
 			lara->Vehicle == NO_ITEM)
 		{
 			lara->ExtraTorsoRot = lara->ExtraHeadRot;
