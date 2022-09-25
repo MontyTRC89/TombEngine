@@ -186,22 +186,13 @@ void LookCamera(ItemInfo* item)
 	// Define landmarks.
 	auto pivot = TranslateVector(item->Pose.Position, item->Pose.Orientation.y, CLICK(0.25f), -LaraCollision.Setup.Height);
 	auto cameraPos = TranslateVector(pivot, orient, -std::max(Camera.targetDistance * 0.5f, SECTOR(0.5f)));
-	auto lookAtPos = TranslateVector(pivot, orient, CLICK(0.5f));
-
-	// Determine steps to farthest position.
-	static const unsigned int numSteps = 8;
-	auto directionalIncrement = (pivot - cameraPos) / numSteps;
+	auto lookAtPos = TranslateVector(pivot, orient, CLICK(0.75f));
 
 	// Determine best position.
 	auto origin = GameVector(pivot, item->RoomNumber);
-	for (int i = 0; i < numSteps; i++)
-	{
-		auto target = GameVector(cameraPos, item->RoomNumber);
-		if (LOS(&origin, &target))
-			break;
-
-		cameraPos += directionalIncrement;
-	}
+	auto target = GameVector(cameraPos, Camera.pos.roomNumber);
+	LOS(&origin, &target);
+	cameraPos = target.ToVector3Int();
 
 	// Handle room and object collisions.
 	auto temp = GameVector(cameraPos, item->RoomNumber);
@@ -1529,70 +1520,65 @@ void ItemPushCamera(BOUNDING_BOX* bounds, PHD_3DPOS* pos, short radius)
 {
 	int dx = Camera.pos.x - pos->Position.x;
 	int dz = Camera.pos.z - pos->Position.z;
-	auto sin = phd_sin(pos->Orientation.y);
-	auto cos = phd_cos(pos->Orientation.y);
-	auto x = dx * cos - dz * sin;
-	auto z = dx * sin + dz * cos;
+	auto sinY = phd_sin(pos->Orientation.y);
+	auto cosY = phd_cos(pos->Orientation.y);
+	auto x = (dx * cosY) - (dz * sinY);
+	auto z = (dx * sinY) + (dz * cosY);
 
-	int xmin = bounds->X1 - radius;
-	int xmax = bounds->X2 + radius;
-	int zmin = bounds->Z1 - radius;
-	int zmax = bounds->Z2 + radius;
+	int xMin = bounds->X1 - radius;
+	int xMax = bounds->X2 + radius;
+	int zMin = bounds->Z1 - radius;
+	int zMax = bounds->Z2 + radius;
 
-	if (x <= xmin || x >= xmax || z <= zmin || z >= zmax)
+	if (x <= xMin || x >= xMax || z <= zMin || z >= zMax)
 		return;
 
-	auto left = x - xmin;
-	auto right = xmax - x;
-	auto top = zmax - z;
-	auto bottom = z - zmin;
+	auto left = x - xMin;
+	auto right = xMax - x;
+	auto top = zMax - z;
+	auto bottom = z - zMin;
 
-	if (left <= right && left <= top && left <= bottom) // Left is closest
+	// Left is closest.
+	if (left <= right && left <= top && left <= bottom)
 		x -= left;
-	else if (right <= left && right <= top && right <= bottom) // Right is closest
+	// Right is closest.
+	else if (right <= left && right <= top && right <= bottom)
 		x += right;
-	else if (top <= left && top <= right && top <= bottom) // Top is closest
+	// Right is closest.
+	else if (top <= left && top <= right && top <= bottom)
 		z += top;
+	// Bottom.
 	else
-		z -= bottom; // Bottom
+		z -= bottom;
 
-	Camera.pos.x = pos->Position.x + (cos * x + sin * z);
-	Camera.pos.z = pos->Position.z + (cos * z - sin * x);
+	Camera.pos.x = pos->Position.x + ((x * cosY) + (z * sinY));
+	Camera.pos.z = pos->Position.z + ((z * cosY) - (x * sinY));
 
-	auto coll = GetCollision(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.roomNumber);
-	if (coll.Position.Floor == NO_HEIGHT || Camera.pos.y > coll.Position.Floor || Camera.pos.y < coll.Position.Ceiling)
-	{
-		Camera.pos.x = CamOldPos.x;
-		Camera.pos.y = CamOldPos.y;
-		Camera.pos.z = CamOldPos.z;
-		Camera.pos.roomNumber = coll.RoomNumber;
-	}
+	auto pointColl = GetCollision(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.roomNumber);
+	if (pointColl.Position.Floor == NO_HEIGHT || Camera.pos.y > pointColl.Position.Floor || Camera.pos.y < pointColl.Position.Ceiling)
+		Camera.pos = GameVector(CamOldPos, pointColl.RoomNumber);
 }
 
-static bool CheckItemCollideCamera(ItemInfo* item)
+bool CheckItemCollideCamera(ItemInfo* item)
 {
-	auto dx = Camera.pos.x - item->Pose.Position.x;
-	auto dy = Camera.pos.y - item->Pose.Position.y;
-	auto dz = Camera.pos.z - item->Pose.Position.z;
+	bool isCloseEnough = Vector3Int::Distance(item->Pose.Position, Camera.pos.ToVector3Int()) <= COLL_CHECK_THRESHOLD;
 
-	bool closeEnough = dx > -COLL_CHECK_THRESHOLD && dx < COLL_CHECK_THRESHOLD &&
-						dz > -COLL_CHECK_THRESHOLD && dz < COLL_CHECK_THRESHOLD &&
-						dy > -COLL_CHECK_THRESHOLD && dy < COLL_CHECK_THRESHOLD;
-
-	if (!closeEnough || !item->Collidable || !Objects[item->ObjectNumber].usingDrawAnimatingItem)
+	if (!isCloseEnough || !item->Collidable || !Objects[item->ObjectNumber].usingDrawAnimatingItem)
 		return false;
 
 	// TODO: Find a better way to define objects which are collidable with camera.
-	auto obj = &Objects[item->ObjectNumber];
-	if (obj->intelligent || obj->isPickup || obj->isPuzzleHole || obj->collision == nullptr)
+	auto* object = &Objects[item->ObjectNumber];
+	if (object->intelligent || object->isPickup || object->isPuzzleHole || object->collision == nullptr)
 		return false;
 
 	// Check extents, if any 2 bounds are smaller than threshold, discard.
-	Vector3 extents = TO_DX_BBOX(item->Pose, GetBoundsAccurate(item)).Extents;
+	auto extents = TO_DX_BBOX(item->Pose, GetBoundsAccurate(item)).Extents;
 	if ((abs(extents.x) < COLL_DISCARD_THRESHOLD && abs(extents.y) < COLL_DISCARD_THRESHOLD) ||
 		(abs(extents.x) < COLL_DISCARD_THRESHOLD && abs(extents.z) < COLL_DISCARD_THRESHOLD) ||
 		(abs(extents.y) < COLL_DISCARD_THRESHOLD && abs(extents.z) < COLL_DISCARD_THRESHOLD))
+	{
 		return false;
+	}
 
 	return true;
 }
@@ -1618,32 +1604,29 @@ std::vector<short> FillCollideableItemList()
 	return itemList;
 }
 
-static bool CheckStaticCollideCamera(MESH_INFO* mesh)
+bool CheckStaticCollideCamera(MESH_INFO* mesh)
 {
-	auto dx = Camera.pos.x - mesh->pos.Position.x;
-	auto dy = Camera.pos.y - mesh->pos.Position.y;
-	auto dz = Camera.pos.z - mesh->pos.Position.z;
-
-	bool closeEnough = dx > -COLL_CHECK_THRESHOLD && dx < COLL_CHECK_THRESHOLD &&
-					   dz > -COLL_CHECK_THRESHOLD && dz < COLL_CHECK_THRESHOLD &&
-					   dy > -COLL_CHECK_THRESHOLD && dy < COLL_CHECK_THRESHOLD;
-
-	if (!closeEnough)
+	bool isCloseEnough = Vector3Int::Distance(mesh->pos.Position, Camera.pos.ToVector3Int()) <= COLL_CHECK_THRESHOLD;
+	if (!isCloseEnough)
 		return false;
 
 	if (!(mesh->flags & StaticMeshFlags::SM_VISIBLE))
 		return false;
 
 	auto bounds = GetBoundsAccurate(mesh, false);
-	auto extents = Vector3(abs(bounds->X1 - bounds->X2),
-						   abs(bounds->Y1 - bounds->Y2),
-						   abs(bounds->Z1 - bounds->Z2));
+	auto extents = Vector3(
+		abs(bounds->X1 - bounds->X2),
+		abs(bounds->Y1 - bounds->Y2),
+		abs(bounds->Z1 - bounds->Z2)
+	);
 
-	// Check extents, if any 2 bounds are smaller than threshold, discard.
+	// Check extents; if any two bounds are smaller than threshold, discard.
 	if ((abs(extents.x) < COLL_DISCARD_THRESHOLD && abs(extents.y) < COLL_DISCARD_THRESHOLD) ||
 		(abs(extents.x) < COLL_DISCARD_THRESHOLD && abs(extents.z) < COLL_DISCARD_THRESHOLD) ||
 		(abs(extents.y) < COLL_DISCARD_THRESHOLD && abs(extents.z) < COLL_DISCARD_THRESHOLD))
+	{
 		return false;
+	}
 
 	return true;
 }
@@ -1653,9 +1636,10 @@ std::vector<MESH_INFO*> FillCollideableStaticsList()
 	std::vector<MESH_INFO*> staticList;
 	auto& roomList = g_Level.Rooms[Camera.pos.roomNumber].neighbors;
 
-	for (auto i : roomList)
+	for (int i : roomList)
 	{
-		auto room = &g_Level.Rooms[i];
+		auto* room = &g_Level.Rooms[i];
+
 		for (short j = 0; j < room->mesh.size(); j++)
 		{
 			if (!CheckStaticCollideCamera(&room->mesh[j]))
@@ -1670,24 +1654,19 @@ std::vector<MESH_INFO*> FillCollideableStaticsList()
 
 void ItemsCollideCamera()
 {
-	auto rad = 128;
+	float rad = CLICK(0.5f);
 	auto itemList = FillCollideableItemList();
 
-	// Collide with the items list
-
+	// Collide with items in the items list.
 	for (int i = 0; i < itemList.size(); i++)
 	{
-		auto item = &g_Level.Items[itemList[i]];
-
+		auto* item = &g_Level.Items[itemList[i]];
 		if (!item)
 			return;
 
-		auto dx = abs(LaraItem->Pose.Position.x - item->Pose.Position.x);
-		auto dy = abs(LaraItem->Pose.Position.y - item->Pose.Position.y);
-		auto dz = abs(LaraItem->Pose.Position.z - item->Pose.Position.z);
-
-		// If camera is stuck behind some item, and Lara runs off somewhere
-		if (dx > COLL_CANCEL_THRESHOLD || dz > COLL_CANCEL_THRESHOLD || dy > COLL_CANCEL_THRESHOLD)
+		// Break off if camera is stuck behind an object and the player runs off.
+		auto distance = Vector3Int::Distance(item->Pose.Position, LaraItem->Pose.Position);
+		if (distance > COLL_CANCEL_THRESHOLD)
 			continue;
 
 		auto bounds = GetBoundsAccurate(item);
@@ -1700,23 +1679,18 @@ void ItemsCollideCamera()
 #endif
 	}
 
-	itemList.clear(); // Done
+	// Done.
+	itemList.clear();
 
-	// Collide with static meshes
-
+	// Collide with static meshes.
 	auto staticList = FillCollideableStaticsList();
-
-	for (int i = 0; i < staticList.size(); i++)
+	for (auto* mesh : staticList)
 	{
-		auto mesh = staticList[i];
 		if (!mesh)
 			return;
 
-		auto dx = abs(LaraItem->Pose.Position.x - mesh->pos.Position.x);
-		auto dy = abs(LaraItem->Pose.Position.y - mesh->pos.Position.y);
-		auto dz = abs(LaraItem->Pose.Position.z - mesh->pos.Position.z);
-
-		if (dx > COLL_CANCEL_THRESHOLD || dz > COLL_CANCEL_THRESHOLD || dy > COLL_CANCEL_THRESHOLD)
+		auto distance = Vector3Int::Distance(mesh->pos.Position, LaraItem->Pose.Position);
+		if (distance > COLL_CANCEL_THRESHOLD)
 			continue;
 
 		auto bounds = GetBoundsAccurate(mesh, false);
@@ -1729,7 +1703,8 @@ void ItemsCollideCamera()
 #endif
 	}
 
-	staticList.clear(); // Done
+	// Done.
+	staticList.clear();
 }
 
 void RumbleScreen()
