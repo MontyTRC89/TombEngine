@@ -181,8 +181,7 @@ void LookCamera(ItemInfo* item)
 	// - Reenable looking in states where it was disabled due to severe twisting.
 
 	// Define camera orientation.
-	auto orient = lara->Control.Look.Orientation;
-	orient.y += item->Pose.Orientation.y;
+	auto orient = lara->Control.Look.Orientation + Vector3Shrt(0, item->Pose.Orientation.y, 0);
 
 	// Define landmarks.
 	auto pivot = TranslateVector(item->Pose.Position, item->Pose.Orientation.y, CLICK(0.25f), -LaraCollision.Setup.Height);
@@ -190,14 +189,14 @@ void LookCamera(ItemInfo* item)
 	auto lookAtPos = TranslateVector(pivot, orient, CLICK(0.5f));
 
 	// Determine steps to farthest position.
-	const unsigned int numSteps = 8;
+	static const unsigned int numSteps = 8;
 	auto directionalIncrement = (pivot - cameraPos) / numSteps;
 
 	// Determine best position.
-	auto origin = GameVector(pivot.x, pivot.y, pivot.z, item->RoomNumber);
-	for (size_t i = 0; i < numSteps; i++)
+	auto origin = GameVector(pivot, item->RoomNumber);
+	for (int i = 0; i < numSteps; i++)
 	{
-		auto target = GameVector(cameraPos.x, cameraPos.y, cameraPos.z, item->RoomNumber);
+		auto target = GameVector(cameraPos, item->RoomNumber);
 		if (LOS(&origin, &target))
 			break;
 
@@ -205,19 +204,14 @@ void LookCamera(ItemInfo* item)
 	}
 
 	// Handle room and object collisions.
-	auto temp = GameVector(cameraPos.x, cameraPos.y, cameraPos.z, item->RoomNumber);
+	auto temp = GameVector(cameraPos, item->RoomNumber);
 	CameraCollisionBounds(&temp, CLICK(1) - CLICK(0.25f) / 2, true);
-	cameraPos = Vector3Int(temp.x, temp.y, temp.z);
+	cameraPos = temp.ToVector3Int();
 	ItemsCollideCamera();
 
 	// Smoothly update camera position.
-	Camera.pos.x += (cameraPos.x - Camera.pos.x) / 4;
-	Camera.pos.y += (cameraPos.y - Camera.pos.y) / 4;
-	Camera.pos.z += (cameraPos.z - Camera.pos.z) / 4;
-	Camera.target.x += (lookAtPos.x - Camera.target.x) / 4;
-	Camera.target.y += (lookAtPos.y - Camera.target.y) / 4;
-	Camera.target.z += (lookAtPos.z - Camera.target.z) / 4;
-	Camera.target.roomNumber = item->RoomNumber;
+	Camera.pos = GameVector(Camera.pos.ToVector3Int() + (cameraPos - Camera.pos.ToVector3Int()) * 0.25f, Camera.pos.roomNumber);
+	Camera.target = GameVector(Camera.target.ToVector3Int() + (lookAtPos - Camera.target.ToVector3Int()) * 0.25f, item->RoomNumber);
 
 	LookAt(&Camera, 0);
 
@@ -231,9 +225,9 @@ void LookCamera(ItemInfo* item)
 	{
 		Camera.actualAngle = phd_atan(Camera.target.z - Camera.pos.z, Camera.target.x - Camera.pos.x);
 		Camera.mikePos = Vector3Int(
-			Camera.pos.x + PhdPerspective * phd_sin(Camera.actualAngle),
-			Camera.mikePos.y = Camera.pos.y,
-			Camera.mikePos.z = Camera.pos.z + PhdPerspective * phd_cos(Camera.actualAngle)
+			Camera.pos.x + (PhdPerspective * phd_sin(Camera.actualAngle)),
+			Camera.pos.y,
+			Camera.pos.z + (PhdPerspective * phd_cos(Camera.actualAngle))
 		);
 	}
 

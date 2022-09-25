@@ -385,6 +385,11 @@ struct GameVector
 		this->roomNumber = roomNumber;
 		this->boxNumber = 0;
 	}
+
+	Vector3Int ToVector3Int() const
+	{
+		return Vector3Int(x, y, z);
+	}
 };
 
 struct LEVEL_CAMERA_INFO
