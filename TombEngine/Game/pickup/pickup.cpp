@@ -1131,7 +1131,7 @@ bool UseSpecialItem(ItemInfo* laraItem)
 
 		if (flag == 1)
 		{
-			if (itemIDToUse != ID_WATERSKIN1_3 && itemIDToUse != ID_WATERSKIN2_5 && (lara->WaterSurfaceDist < -SHALLOW_WATER_START_LEVEL))
+			if (itemIDToUse != ID_WATERSKIN1_3 && itemIDToUse != ID_WATERSKIN2_5 && (lara->WaterSurfaceDist < -SHALLOW_WATER_DEPTH))
 			{
 				if (itemIDToUse < ID_WATERSKIN1_3)
 					lara->Inventory.SmallWaterskin = 4;

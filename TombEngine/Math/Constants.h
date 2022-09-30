@@ -24,11 +24,11 @@
 	constexpr inline auto QTR_BLOCK		= [](auto x)			{ return ((BLOCK_UNIT / 4) * x); }; // TODO: Maybe unnecessary with BLOCK()'s divisor argument.
 	constexpr inline auto OFFSET_RADIUS = [](auto x)			{ return ((x * SQRT_2) + 4); };
 
-	constexpr inline auto STEPUP_HEIGHT				= BLOCK(3, 4) / 2;
-	constexpr inline auto BAD_JUMP_CEILING			= BLOCK(3, 4) / 4;
-	constexpr inline auto SHALLOW_WATER_START_LEVEL = BLOCK(1, 8);
-	constexpr inline auto WADE_DEPTH				= STEPUP_HEIGHT;
-	constexpr inline auto SWIM_DEPTH				= BLOCK(3, 4) - 38;
+	constexpr inline auto STEPUP_HEIGHT		  = BLOCK(3, 4) / 2;
+	constexpr inline auto BAD_JUMP_CEILING	  = BLOCK(3, 4) / 4;
+	constexpr inline auto SHALLOW_WATER_DEPTH = BLOCK(1, 8);
+	constexpr inline auto WADE_DEPTH		  = STEPUP_HEIGHT;
+	constexpr inline auto SWIM_DEPTH		  = BLOCK(3, 4) - 38;
 
 	// Legacy constants
 	constexpr inline auto FPS					  = 30;
