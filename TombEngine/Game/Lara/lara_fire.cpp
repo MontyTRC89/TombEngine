@@ -60,7 +60,7 @@ WeaponInfo Weapons[(int)LaraWeaponType::NumWeapons] =
 
 	// Pistols
 	{
-		{ EulerAngles(ANGLE(-60.0f), ANGLE(-60.0f), 0), EulerAngles(ANGLE(60.0f), ANGLE(60.0f), 0) },
+		{ EulerAngles(ANGLE(-80.0f), ANGLE(-60.0f), 0), EulerAngles(ANGLE(80.0f), ANGLE(60.0f), 0) },
 		{ EulerAngles(ANGLE(-80.0f), ANGLE(-170.0f), 0), EulerAngles(ANGLE(80.0f), ANGLE(60.0f), 0) },
 		{ EulerAngles(ANGLE(-80.0f), ANGLE(-60.0f), 0), EulerAngles(ANGLE(80.0f), ANGLE(170.0f), 0) },
 		ANGLE(10.0f),
@@ -77,7 +77,7 @@ WeaponInfo Weapons[(int)LaraWeaponType::NumWeapons] =
 
 	// Revolver
 	{
-		{ EulerAngles(ANGLE(-60.0f), ANGLE(-60.0f), 0), EulerAngles(ANGLE(60.0f), ANGLE(60.0f), 0) },
+		{ EulerAngles(ANGLE(-80.0f), ANGLE(-60.0f), 0), EulerAngles(ANGLE(80.0f), ANGLE(60.0f), 0) },
 		{ EulerAngles(ANGLE(-80.0f), ANGLE(-10.0f), 0), EulerAngles(ANGLE(80.0f), ANGLE(10.0f), 0) },
 		{ EulerAngles::Zero, EulerAngles::Zero },
 		ANGLE(10.0f),
@@ -94,7 +94,7 @@ WeaponInfo Weapons[(int)LaraWeaponType::NumWeapons] =
 
 	// Uzis
 	{
-		{ EulerAngles(ANGLE(-60.0f), ANGLE(-60.0f), 0), EulerAngles(ANGLE(60.0f), ANGLE(60.0f), 0) },
+		{ EulerAngles(ANGLE(-80.0f), ANGLE(-60.0f), 0), EulerAngles(ANGLE(80.0f), ANGLE(60.0f), 0) },
 		{ EulerAngles(ANGLE(-80.0f), ANGLE(-170.0f), 0), EulerAngles(ANGLE(80.0f), ANGLE(60.0f), 0) },
 		{ EulerAngles(ANGLE(-80.0f), ANGLE(-60.0f), 0), EulerAngles(ANGLE(80.0f), ANGLE(170.0f), 0) },
 		ANGLE(10.0f),
@@ -111,9 +111,9 @@ WeaponInfo Weapons[(int)LaraWeaponType::NumWeapons] =
 
 	// Shotgun
 	{
-		{ EulerAngles(ANGLE(-55.0f), ANGLE(-60.0f), 0), EulerAngles(ANGLE(55.0f), ANGLE(60.0f), 0) },
-		{ EulerAngles(ANGLE(-65.0f), ANGLE(-80.0f), 0), EulerAngles(ANGLE(65.0f), ANGLE(80.0f), 0) },
-		{ EulerAngles(ANGLE(-65.0f), ANGLE(-80.0f), 0), EulerAngles(ANGLE(65.0f), ANGLE(80.0f), 0) },
+		{ EulerAngles(ANGLE(-70.0f), ANGLE(-60.0f), 0), EulerAngles(ANGLE(65.0f), ANGLE(60.0f), 0) },
+		{ EulerAngles(ANGLE(-70.0f), ANGLE(-80.0f), 0), EulerAngles(ANGLE(65.0f), ANGLE(80.0f), 0) },
+		{ EulerAngles(ANGLE(-70.0f), ANGLE(-80.0f), 0), EulerAngles(ANGLE(65.0f), ANGLE(80.0f), 0) },
 		ANGLE(10.0f),
 		0,
 		500,
@@ -128,9 +128,9 @@ WeaponInfo Weapons[(int)LaraWeaponType::NumWeapons] =
 
 	// HK
 	{
-		{ EulerAngles(ANGLE(-55.0f), ANGLE(-60.0f), 0), EulerAngles(ANGLE(55.0f), ANGLE(60.0f), 0) },
-		{ EulerAngles(ANGLE(-65.0f), ANGLE(-80.0f), 0), EulerAngles(ANGLE(65.0f), ANGLE(80.0f), 0) },
-		{ EulerAngles(ANGLE(-65.0f), ANGLE(-80.0f), 0), EulerAngles(ANGLE(65.0f), ANGLE(80.0f), 0) },
+		{ EulerAngles(ANGLE(-70.0f), ANGLE(-60.0f), 0), EulerAngles(ANGLE(65.0f), ANGLE(60.0f), 0) },
+		{ EulerAngles(ANGLE(-70.0f), ANGLE(-80.0f), 0), EulerAngles(ANGLE(65.0f), ANGLE(80.0f), 0) },
+		{ EulerAngles(ANGLE(-70.0f), ANGLE(-80.0f), 0), EulerAngles(ANGLE(65.0f), ANGLE(80.0f), 0) },
 		ANGLE(10.0f),
 		ANGLE(4.0f),
 		500,
@@ -145,9 +145,9 @@ WeaponInfo Weapons[(int)LaraWeaponType::NumWeapons] =
 
 	// Crossbow
 	{
-		{ EulerAngles(ANGLE(-55.0f), ANGLE(-60.0f), 0), EulerAngles(ANGLE(55.0f), ANGLE(60.0f), 0) },
-		{ EulerAngles(ANGLE(-65.0f), ANGLE(-80.0f), 0), EulerAngles(ANGLE(65.0f), ANGLE(80.0f), 0) },
-		{ EulerAngles(ANGLE(-65.0f), ANGLE(-80.0f), 0), EulerAngles(ANGLE(65.0f), ANGLE(80.0f), 0) },
+		{ EulerAngles(ANGLE(-70.0f), ANGLE(-60.0f), 0), EulerAngles(ANGLE(65.0f), ANGLE(60.0f), 0) },
+		{ EulerAngles(ANGLE(-70.0f), ANGLE(-80.0f), 0), EulerAngles(ANGLE(65.0f), ANGLE(80.0f), 0) },
+		{ EulerAngles(ANGLE(-70.0f), ANGLE(-80.0f), 0), EulerAngles(ANGLE(65.0f), ANGLE(80.0f), 0) },
 		ANGLE(10.0f),
 		ANGLE(8.0f),
 		500,
@@ -196,9 +196,9 @@ WeaponInfo Weapons[(int)LaraWeaponType::NumWeapons] =
 
 	// Grenade launcher
 	{
-		{ EulerAngles(ANGLE(-55.0f), ANGLE(-60.0f), 0), EulerAngles(ANGLE(55.0f), ANGLE(60.0f), 0) },
-		{ EulerAngles(ANGLE(-65.0f), ANGLE(-80.0f), 0), EulerAngles(ANGLE(65.0f), ANGLE(80.0f), 0) },
-		{ EulerAngles(ANGLE(-65.0f), ANGLE(-80.0f), 0), EulerAngles(ANGLE(65.0f), ANGLE(80.0f), 0) },
+		{ EulerAngles(ANGLE(-70.0f), ANGLE(-60.0f), 0), EulerAngles(ANGLE(65.0f), ANGLE(60.0f), 0) },
+		{ EulerAngles(ANGLE(-70.0f), ANGLE(-80.0f), 0), EulerAngles(ANGLE(65.0f), ANGLE(80.0f), 0) },
+		{ EulerAngles(ANGLE(-70.0f), ANGLE(-80.0f), 0), EulerAngles(ANGLE(65.0f), ANGLE(80.0f), 0) },
 		ANGLE(10.0f),
 		ANGLE(8.0f),
 		500,
@@ -213,7 +213,7 @@ WeaponInfo Weapons[(int)LaraWeaponType::NumWeapons] =
 
 	// Harpoon gun
 	{
-		{ EulerAngles(ANGLE(-65.0f), ANGLE(-60.0f), 0), EulerAngles(ANGLE(65.0f), ANGLE(60.0f), 0) },
+		{ EulerAngles(ANGLE(-75.0f), ANGLE(-60.0f), 0), EulerAngles(ANGLE(75.0f), ANGLE(60.0f), 0) },
 		{ EulerAngles(ANGLE(-75.0f), ANGLE(-20.0f), 0), EulerAngles(ANGLE(75.0f), ANGLE(20.0f), 0) },
 		{ EulerAngles(ANGLE(-75.0f), ANGLE(-80.0f), 0), EulerAngles(ANGLE(75.0f), ANGLE(80.0f), 0) },
 		ANGLE(10.0f),
@@ -230,9 +230,9 @@ WeaponInfo Weapons[(int)LaraWeaponType::NumWeapons] =
 
 	// Rocket launcher
 	{
-		{ EulerAngles(ANGLE(-55.0f), ANGLE(-60.0f), 0), EulerAngles(ANGLE(55.0f), ANGLE(60.0f), 0) },
-		{ EulerAngles(ANGLE(-65.0f), ANGLE(-80.0f), 0), EulerAngles(ANGLE(65.0f), ANGLE(80.0f), 0) },
-		{ EulerAngles(ANGLE(-65.0f), ANGLE(-80.0f), 0), EulerAngles(ANGLE(65.0f), ANGLE(80.0f), 0) },
+		{ EulerAngles(ANGLE(-70.0f), ANGLE(-60.0f), 0), EulerAngles(ANGLE(65.0f), ANGLE(60.0f), 0) },
+		{ EulerAngles(ANGLE(-70.0f), ANGLE(-80.0f), 0), EulerAngles(ANGLE(65.0f), ANGLE(80.0f), 0) },
+		{ EulerAngles(ANGLE(-70.0f), ANGLE(-80.0f), 0), EulerAngles(ANGLE(65.0f), ANGLE(80.0f), 0) },
 		ANGLE(10.0f),
 		ANGLE(8.0f),
 		500,
@@ -975,10 +975,10 @@ void LaraTargetInfo(ItemInfo* laraItem, WeaponInfo* weaponInfo)
 
 	if (LOS(&origin, &target))
 	{
-		if (orient.x >= weaponInfo->LockAngles[0].x &&
-			orient.y >= weaponInfo->LockAngles[0].y &&
-			orient.x <= weaponInfo->LockAngles[1].x &&
-			orient.y <= weaponInfo->LockAngles[1].y)
+		if (orient.x >= weaponInfo->LockOrientConstraint.first.x &&
+			orient.y >= weaponInfo->LockOrientConstraint.first.y &&
+			orient.x <= weaponInfo->LockOrientConstraint.second.x &&
+			orient.y <= weaponInfo->LockOrientConstraint.second.y)
 		{
 			lara->RightArm.Locked = true;
 			lara->LeftArm.Locked = true;
@@ -987,10 +987,10 @@ void LaraTargetInfo(ItemInfo* laraItem, WeaponInfo* weaponInfo)
 		{
 			if (lara->LeftArm.Locked)
 			{
-				if (orient.x < weaponInfo->LeftAngles[0].x ||
-					orient.y < weaponInfo->LeftAngles[0].y ||
-					orient.x > weaponInfo->LeftAngles[1].x ||
-					orient.y > weaponInfo->LeftAngles[1].y)
+				if (orient.x < weaponInfo->LeftOrientConstraint.first.x ||
+					orient.y < weaponInfo->LeftOrientConstraint.first.y ||
+					orient.x > weaponInfo->LeftOrientConstraint.second.x ||
+					orient.y > weaponInfo->LeftOrientConstraint.second.y)
 				{
 					lara->LeftArm.Locked = false;
 				}
@@ -998,10 +998,10 @@ void LaraTargetInfo(ItemInfo* laraItem, WeaponInfo* weaponInfo)
 
 			if (lara->RightArm.Locked)
 			{
-				if (orient.x < weaponInfo->RightAngles[0].x ||
-					orient.y < weaponInfo->RightAngles[0].y ||
-					orient.x > weaponInfo->RightAngles[1].x ||
-					orient.y > weaponInfo->RightAngles[1].y)
+				if (orient.x < weaponInfo->RightOrientConstraint.first.x ||
+					orient.y < weaponInfo->RightOrientConstraint.first.y ||
+					orient.x > weaponInfo->RightOrientConstraint.second.x ||
+					orient.y > weaponInfo->RightOrientConstraint.second.y)
 				{
 					lara->RightArm.Locked = false;
 				}
@@ -1067,10 +1067,10 @@ void LaraGetNewTarget(ItemInfo* laraItem, WeaponInfo* weaponInfo)
 
 		// Assess whether relative orientation falls within weapon's lock constraints.
 		auto orient = Geometry::GetOrientTowardPoint(origin.ToVector3(), target.ToVector3()) - (laraItem->Pose.Orientation + lara->ExtraTorsoRot);
-		if (orient.x >= weaponInfo->LockAngles[0].x &&
-			orient.y >= weaponInfo->LockAngles[0].y &&
-			orient.x <= weaponInfo->LockAngles[1].x &&
-			orient.y <= weaponInfo->LockAngles[1].y)
+		if (orient.x >= weaponInfo->LockOrientConstraint.first.x &&
+			orient.y >= weaponInfo->LockOrientConstraint.first.y &&
+			orient.x <= weaponInfo->LockOrientConstraint.second.x &&
+			orient.y <= weaponInfo->LockOrientConstraint.second.y)
 		{
 			TargetList[numTargets] = item;
 			++numTargets;
