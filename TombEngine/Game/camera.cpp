@@ -1480,10 +1480,10 @@ void ItemPushCamera(BOUNDING_BOX* bounds, PHD_3DPOS* pos, short radius)
 	// Right is closest.
 	else if (right <= left && right <= top && right <= bottom)
 		x += right;
-	// Right is closest.
+	// Top is closest.
 	else if (top <= left && top <= right && top <= bottom)
 		z += top;
-	// Bottom.
+	// Bottom is closest.
 	else
 		z -= bottom;
 
@@ -1590,7 +1590,7 @@ std::vector<MESH_INFO*> FillCollideableStaticsList()
 
 void ItemsCollideCamera()
 {
-	float rad = CLICK(0.5f);
+	float radius = CLICK(0.5f);
 	auto itemList = FillCollideableItemList();
 
 	// Collide with items in the items list.
@@ -1607,7 +1607,7 @@ void ItemsCollideCamera()
 
 		auto bounds = GetBoundsAccurate(item);
 		if (TestBoundsCollideCamera(bounds, &item->Pose, CAMERA_RADIUS))
-			ItemPushCamera(bounds, &item->Pose, rad);
+			ItemPushCamera(bounds, &item->Pose, radius);
 
 #ifdef _DEBUG
 		TEN::Renderer::g_Renderer.AddDebugBox(TO_DX_BBOX(item->Pose, bounds),
@@ -1631,7 +1631,7 @@ void ItemsCollideCamera()
 
 		auto bounds = GetBoundsAccurate(mesh, false);
 		if (TestBoundsCollideCamera(bounds, &mesh->pos, CAMERA_RADIUS))
-			ItemPushCamera(bounds, &mesh->pos, rad);
+			ItemPushCamera(bounds, &mesh->pos, radius);
 
 #ifdef _DEBUG
 		TEN::Renderer::g_Renderer.AddDebugBox(TO_DX_BBOX(mesh->pos, bounds),
