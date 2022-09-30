@@ -981,10 +981,10 @@ void LaraTargetInfo(ItemInfo* laraItem, WeaponInfo* weaponInfo)
 
 	if (LOS(&origin, &target))
 	{
-		if (angles.x >= weaponInfo->LockAngles[0].x &&
-			angles.y >= weaponInfo->LockAngles[0].y &&
-			angles.x <= weaponInfo->LockAngles[1].x &&
-			angles.y <= weaponInfo->LockAngles[1].y)
+		if (angles.x >= weaponInfo->LockOrientConstraint.first.x &&
+			angles.y >= weaponInfo->LockOrientConstraint.first.y &&
+			angles.x <= weaponInfo->LockOrientConstraint.second.x &&
+			angles.y <= weaponInfo->LockOrientConstraint.second.y)
 		{
 			lara->RightArm.Locked = true;
 			lara->LeftArm.Locked = true;
@@ -993,10 +993,10 @@ void LaraTargetInfo(ItemInfo* laraItem, WeaponInfo* weaponInfo)
 		{
 			if (lara->LeftArm.Locked)
 			{
-				if (angles.x < weaponInfo->LeftAngles[0].x ||
-					angles.y < weaponInfo->LeftAngles[0].y ||
-					angles.x > weaponInfo->LeftAngles[1].x ||
-					angles.y > weaponInfo->LeftAngles[1].y)
+				if (angles.x < weaponInfo->LeftOrientConstraint.first.x ||
+					angles.y < weaponInfo->LeftOrientConstraint.first.y ||
+					angles.x > weaponInfo->LeftOrientConstraint.second.x ||
+					angles.y > weaponInfo->LeftOrientConstraint.second.y)
 				{
 					lara->LeftArm.Locked = false;
 				}
@@ -1004,10 +1004,10 @@ void LaraTargetInfo(ItemInfo* laraItem, WeaponInfo* weaponInfo)
 
 			if (lara->RightArm.Locked)
 			{
-				if (angles.x < weaponInfo->RightAngles[0].x ||
-					angles.y < weaponInfo->RightAngles[0].y ||
-					angles.x > weaponInfo->RightAngles[1].x ||
-					angles.y > weaponInfo->RightAngles[1].y)
+				if (angles.x < weaponInfo->RightOrientConstraint.first.x ||
+					angles.y < weaponInfo->RightOrientConstraint.first.y ||
+					angles.x > weaponInfo->RightOrientConstraint.second.x ||
+					angles.y > weaponInfo->RightOrientConstraint.second.y)
 				{
 					lara->RightArm.Locked = false;
 				}
@@ -1076,10 +1076,10 @@ void LaraGetNewTarget(ItemInfo* laraItem, WeaponInfo* weaponInfo)
 							angles.x -= laraItem->Pose.Orientation.x + lara->ExtraTorsoRot.x;
 							angles.y -= laraItem->Pose.Orientation.y + lara->ExtraTorsoRot.y;
 
-							if (angles.x >= weaponInfo->LockAngles[0].x &&
-								angles.y >= weaponInfo->LockAngles[0].y &&
-								angles.x <= weaponInfo->LockAngles[1].x &&
-								angles.y <= weaponInfo->LockAngles[1].y)
+							if (angles.x >= weaponInfo->LockOrientConstraint.first.x &&
+								angles.y >= weaponInfo->LockOrientConstraint.first.y &&
+								angles.x <= weaponInfo->LockOrientConstraint.second.x &&
+								angles.y <= weaponInfo->LockOrientConstraint.second.y)
 							{
 								TargetList[targets] = item;
 								++targets;

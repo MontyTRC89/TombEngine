@@ -1,6 +1,8 @@
 #pragma once
 #include "Game/Lara/lara.h"
 
+using std::pair;
+
 struct CollisionInfo;
 struct ItemInfo;
 struct Vector3Shrt;
@@ -16,9 +18,9 @@ enum class FireWeaponType
 
 struct WeaponInfo
 {
-	Vector3Shrt LockAngles[2];
-	Vector3Shrt LeftAngles[2];
-	Vector3Shrt RightAngles[2];
+	pair<Vector3Shrt, Vector3Shrt> LockOrientConstraint  = {};
+	pair<Vector3Shrt, Vector3Shrt> LeftOrientConstraint  = {};
+	pair<Vector3Shrt, Vector3Shrt> RightOrientConstraint = {};
 
 	int AimSpeed;
 	short ShotAccuracy;
