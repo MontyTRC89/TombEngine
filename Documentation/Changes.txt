@@ -1,8 +1,14 @@
+Version 1.0.3
+=============
+
+* Fix dodgy weapon lock angle constraints.
+
+
 Version 1.0.2
 =============
 
-* Removing Pistols with TakeItem and SetItemCount now works correctly.
-* Vec3s can now be saved and loaded in LevelVars and GameVars.
+* Fix removing Pistols with TakeItem and SetItemCount.
+* Allow saving and loading of Vec3s in LevelVars and GameVars.
 * Support volume triggers made with node editor.
 * Adjust max turn rate of idle state.
 * Align Lara on slopes when crouching, crawling, and dying.
@@ -39,18 +45,18 @@ Version 1.0.2
 * Fix weapon hotkeys and add missing crossbow hotkey.
 
 Lua API changes:
-
 * Util.ShortenTENCalls no longer needs to be called; it is now automatic for both level scripts and Gameflow.lua.
 * Flow.InvID has been removed; any function taking a pickup (e.g. GiveItem) now takes an Objects.ObjID instead.
-* Added Enable, Disable, GetActive, Get/SetSolid functions for static meshes.
-* Added FadeOutComplete, StopAudioTrack and StopAudioTracks functions.
+* Add Enable, Disable, GetActive, Get/SetSolid functions for static meshes.
+* Add FadeOutComplete, StopAudioTrack and StopAudioTracks functions.
 * Account for objects in HasLineOfSight tests.
-* Timer.lua, EventSequence.lua and Util.lua have been moved to a subfolder, Engine.
+* Move Timer.lua, EventSequence.lua and Util.lua to a subfolder named "Engine".
 * LevelFuncs can now contain tables as well as functions. These tables can contain functions and other tables, and so forth.
 * Moveable functions SetOnHit, SetOnKilled, SetOnCollidedWithObject and SetOnCollidedWithRoom no longer take strings, and instead take function objects themselves.
-* EventSequence and Timer no longer require you to call Timer.UpdateAll in OnControlPhase.
-* TEN.Logic.AddCallback and TEN.Logic.RemoveCallback have been added.
-* GiveItem, TakeItem, and SetItemCount have been reworked (e.g. SetItemCount with a value of -1 can give infinite ammo/consumables).
+* Don't require EventSequence and Timer to call Timer.UpdateAll in OnControlPhase.
+* Add TEN.Logic.AddCallback and TEN.Logic.RemoveCallback.
+* Rework GiveItem, TakeItem, and SetItemCount (e.g. SetItemCount with a value of -1 can give infinite ammo/consumables).
+
 
 Version 1.0.1
 =============

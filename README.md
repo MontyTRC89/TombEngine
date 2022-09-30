@@ -15,6 +15,8 @@ TombEngine (TEN) is a new, open-source engine which aims to abolish all limits, 
 
 TEN is based on the Tomb Raider: Chronicles engine of the classic era and continues to build upon and replace its systems to modernize ...
 
+If you would like to participate in TEN discussion with other TEN devs whether it is contributing or bugs, then join this discord server: https://discord.gg/apjBW2NsVj and head to #tombengine channel.
+
 # Compiling TombEngine
 To compile TEN, ensure you have installed:
 - Microsoft Visual Studio 
