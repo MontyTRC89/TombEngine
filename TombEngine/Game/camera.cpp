@@ -31,10 +31,14 @@ constexpr auto COLL_CANCEL_THRESHOLD  = SECTOR(2);
 constexpr auto COLL_DISCARD_THRESHOLD = CLICK(0.5f);
 constexpr auto CAMERA_RADIUS          = CLICK(1);
 
-#define LOOKCAM_VERTICAL_CONSTRAINT_ANGLE   ANGLE(70.0f)
-#define LOOKCAM_HORIZONTAL_CONSTRAINT_ANGLE ANGLE(90.0f)
-#define LOOKCAM_TURN_RATE_ACCEL			    ANGLE(1.0f)
-#define LOOKCAM_TURN_RATE_MAX			    ANGLE(4.0f)
+const auto LOOKCAM_ORIENT_CONSTRAINT = std::pair<Vector3Shrt, Vector3Shrt>
+{
+	Vector3Shrt(ANGLE(-70.0f), ANGLE(-90.0f), 0),
+	Vector3Shrt(ANGLE(60.0f), ANGLE(90.0f), 0)
+};
+
+#define LOOKCAM_TURN_RATE_ACCEL ANGLE(1.0f)
+#define LOOKCAM_TURN_RATE_MAX	ANGLE(4.0f)
 
 #define THUMBCAM_VERTICAL_CONSTRAINT_ANGLE   ANGLE(120.0f)
 #define THUMBCAM_HORIZONTAL_CONSTRAINT_ANGLE ANGLE(80.0f)
@@ -124,8 +128,8 @@ void DoLookAround(ItemInfo* item, bool invertVerticalAxis)
 
 	// Apply and constrain turn rates.
 	lara->Control.Look.Orientation += lara->Control.Look.TurnRate;
-	lara->Control.Look.Orientation.x = std::clamp<short>(lara->Control.Look.Orientation.x, -LOOKCAM_VERTICAL_CONSTRAINT_ANGLE, LOOKCAM_VERTICAL_CONSTRAINT_ANGLE);
-	lara->Control.Look.Orientation.y = std::clamp<short>(lara->Control.Look.Orientation.y, -LOOKCAM_HORIZONTAL_CONSTRAINT_ANGLE, LOOKCAM_HORIZONTAL_CONSTRAINT_ANGLE);
+	lara->Control.Look.Orientation.x = std::clamp<short>(lara->Control.Look.Orientation.x, LOOKCAM_ORIENT_CONSTRAINT.first.x, LOOKCAM_ORIENT_CONSTRAINT.second.x);
+	lara->Control.Look.Orientation.y = std::clamp<short>(lara->Control.Look.Orientation.y, LOOKCAM_ORIENT_CONSTRAINT.first.y, LOOKCAM_ORIENT_CONSTRAINT.second.y);
 
 	// Visually adapt head and torso orientations.
 	lara->ExtraHeadRot = lara->Control.Look.Orientation / 2;
