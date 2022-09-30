@@ -228,8 +228,8 @@ namespace TEN::Entities::Vehicles
 		int xOld = old->x / SECTOR(1);
 		int zOld = old->z / SECTOR(1);
 
-		int xShift = pos->x & (SECTOR(1) - 1);
-		int zShift = pos->z & (SECTOR(1) - 1);
+		int xShift = pos->x & WALL_MASK;
+		int zShift = pos->z & WALL_MASK;
 
 		if (x == xOld)
 		{

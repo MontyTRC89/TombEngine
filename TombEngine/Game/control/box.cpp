@@ -516,7 +516,7 @@ int CreatureAnimation(short itemNumber, short angle, short tilt)
 		if (zPos < shiftZ)
 			item->Pose.Position.z = prevPos.z & (~WALL_MASK);
 		else if (zPos > shiftZ)
-			item->Pose.Position.z = prevPos.z | (WALL_MASK);
+			item->Pose.Position.z = prevPos.z | WALL_MASK;
 
 		floor = GetFloor(item->Pose.Position.x, y, item->Pose.Position.z, &roomNumber);
 		height = g_Level.Boxes[floor->Box].height;

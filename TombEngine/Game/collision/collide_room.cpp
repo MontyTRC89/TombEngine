@@ -55,19 +55,19 @@ void SnapItemToGrid(ItemInfo* item, CollisionInfo* coll)
 	switch (direction)
 	{
 	case NORTH:
-		item->Pose.Position.z = (item->Pose.Position.z | (SECTOR(1) - 1)) - coll->Setup.Radius;
+		item->Pose.Position.z = (item->Pose.Position.z | WALL_MASK) - coll->Setup.Radius;
 		break;
 
 	case EAST:
-		item->Pose.Position.x = (item->Pose.Position.x | (SECTOR(1) - 1)) - coll->Setup.Radius;
+		item->Pose.Position.x = (item->Pose.Position.x | WALL_MASK) - coll->Setup.Radius;
 		break;
 
 	case SOUTH:
-		item->Pose.Position.z = (item->Pose.Position.z & ~(SECTOR(1) - 1)) + coll->Setup.Radius;
+		item->Pose.Position.z = (item->Pose.Position.z & ~WALL_MASK) + coll->Setup.Radius;
 		break;
 
 	case WEST:
-		item->Pose.Position.x = (item->Pose.Position.x & ~(SECTOR(1) - 1)) + coll->Setup.Radius;
+		item->Pose.Position.x = (item->Pose.Position.x & ~WALL_MASK) + coll->Setup.Radius;
 		break;
 	}
 }
@@ -80,7 +80,7 @@ int FindGridShift(int x, int z)
 	if ((z / SECTOR(1)) <= (x / SECTOR(1)))
 		return (-1 - (x & (WALL_SIZE - 1)));
 	else
-		return ((SECTOR(1) + 1) - (x & (SECTOR(1) - 1)));
+		return ((SECTOR(1) + 1) - (x & WALL_MASK));
 }
 
 // Test if the axis-aligned bounding box collides with geometry at all.

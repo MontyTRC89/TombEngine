@@ -353,8 +353,8 @@ namespace TEN::Entities::Vehicles
 		int z = pos->z / SECTOR(1);
 		int oldX = old->x / SECTOR(1);
 		int oldZ = old->z / SECTOR(1);
-		int shiftX = pos->x & (SECTOR(1) - 1);
-		int shiftZ = pos->z & (SECTOR(1) - 1);
+		int shiftX = pos->x & WALL_MASK;
+		int shiftZ = pos->z & WALL_MASK;
 
 		if (x == oldX)
 		{
