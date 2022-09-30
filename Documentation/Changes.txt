@@ -2,6 +2,11 @@ Version 1.0.3
 =============
 
 * Fix dodgy weapon lock angle constraints.
+* Overhaul look mode:
+ - Give consistent view angle while crawling, crouching, and hanging.
+ - Widen view range.
+ - Provide cleaner camera movement.
+ - Reenable look mode while performing up jump, backward jump, or backward crawl.
 
 
 Version 1.0.2
