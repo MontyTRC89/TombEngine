@@ -386,6 +386,11 @@ struct GameVector
 		this->boxNumber = 0;
 	}
 
+	Vector3 ToVector3() const
+	{
+		return Vector3(x, y, z);
+	}
+
 	Vector3Int ToVector3Int() const
 	{
 		return Vector3Int(x, y, z);
