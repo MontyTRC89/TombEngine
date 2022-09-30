@@ -58,7 +58,7 @@ WeaponInfo Weapons[(int)LaraWeaponType::NumWeapons] =
 
 	// Pistols
 	{
-		{ Vector3Shrt(ANGLE(-60.0f), ANGLE(-60.0f), 0), Vector3Shrt(ANGLE(60.0f), ANGLE(60.0f), 0) },
+		{ Vector3Shrt(ANGLE(-80.0f), ANGLE(-60.0f), 0), Vector3Shrt(ANGLE(80.0f), ANGLE(60.0f), 0) },
 		{ Vector3Shrt(ANGLE(-80.0f), ANGLE(-170.0f), 0), Vector3Shrt(ANGLE(80.0f), ANGLE(60.0f), 0) },
 		{ Vector3Shrt(ANGLE(-80.0f), ANGLE(-60.0f), 0), Vector3Shrt(ANGLE(80.0f), ANGLE(170.0f), 0) },
 		ANGLE(10.0f),
@@ -75,7 +75,7 @@ WeaponInfo Weapons[(int)LaraWeaponType::NumWeapons] =
 
 	// Revolver
 	{
-		{ Vector3Shrt(ANGLE(-60.0f), ANGLE(-60.0f), 0), Vector3Shrt(ANGLE(60.0f), ANGLE(60.0f), 0) },
+		{ Vector3Shrt(ANGLE(-80.0f), ANGLE(-60.0f), 0), Vector3Shrt(ANGLE(80.0f), ANGLE(60.0f), 0) },
 		{ Vector3Shrt(ANGLE(-80.0f), ANGLE(-10.0f), 0), Vector3Shrt(ANGLE(80.0f), ANGLE(10.0f), 0) },
 		{ Vector3Shrt::Zero, Vector3Shrt::Zero },
 		ANGLE(10.0f),
@@ -92,7 +92,7 @@ WeaponInfo Weapons[(int)LaraWeaponType::NumWeapons] =
 
 	// Uzis
 	{
-		{ Vector3Shrt(ANGLE(-60.0f), ANGLE(-60.0f), 0), Vector3Shrt(ANGLE(60.0f), ANGLE(60.0f), 0) },
+		{ Vector3Shrt(ANGLE(-80.0f), ANGLE(-60.0f), 0), Vector3Shrt(ANGLE(80.0f), ANGLE(60.0f), 0) },
 		{ Vector3Shrt(ANGLE(-80.0f), ANGLE(-170.0f), 0), Vector3Shrt(ANGLE(80.0f), ANGLE(60.0f), 0) },
 		{ Vector3Shrt(ANGLE(-80.0f), ANGLE(-60.0f), 0), Vector3Shrt(ANGLE(80.0f), ANGLE(170.0f), 0) },
 		ANGLE(10.0f),
@@ -109,9 +109,9 @@ WeaponInfo Weapons[(int)LaraWeaponType::NumWeapons] =
 
 	// Shotgun
 	{
-		{ Vector3Shrt(ANGLE(-55.0f), ANGLE(-60.0f), 0), Vector3Shrt(ANGLE(55.0f), ANGLE(60.0f), 0) },
-		{ Vector3Shrt(ANGLE(-65.0f), ANGLE(-80.0f), 0), Vector3Shrt(ANGLE(65.0f), ANGLE(80.0f), 0) },
-		{ Vector3Shrt(ANGLE(-65.0f), ANGLE(-80.0f), 0), Vector3Shrt(ANGLE(65.0f), ANGLE(80.0f), 0) },
+		{ Vector3Shrt(ANGLE(-70.0f), ANGLE(-60.0f), 0), Vector3Shrt(ANGLE(65.0f), ANGLE(60.0f), 0) },
+		{ Vector3Shrt(ANGLE(-70.0f), ANGLE(-80.0f), 0), Vector3Shrt(ANGLE(65.0f), ANGLE(80.0f), 0) },
+		{ Vector3Shrt(ANGLE(-70.0f), ANGLE(-80.0f), 0), Vector3Shrt(ANGLE(65.0f), ANGLE(80.0f), 0) },
 		ANGLE(10.0f),
 		0,
 		500,
@@ -126,9 +126,9 @@ WeaponInfo Weapons[(int)LaraWeaponType::NumWeapons] =
 
 	// HK
 	{
-		{ Vector3Shrt(ANGLE(-55.0f), ANGLE(-60.0f), 0), Vector3Shrt(ANGLE(55.0f), ANGLE(60.0f), 0) },
-		{ Vector3Shrt(ANGLE(-65.0f), ANGLE(-80.0f), 0), Vector3Shrt(ANGLE(65.0f), ANGLE(80.0f), 0) },
-		{ Vector3Shrt(ANGLE(-65.0f), ANGLE(-80.0f), 0), Vector3Shrt(ANGLE(65.0f), ANGLE(80.0f), 0) },
+		{ Vector3Shrt(ANGLE(-70.0f), ANGLE(-60.0f), 0), Vector3Shrt(ANGLE(65.0f), ANGLE(60.0f), 0) },
+		{ Vector3Shrt(ANGLE(-70.0f), ANGLE(-80.0f), 0), Vector3Shrt(ANGLE(65.0f), ANGLE(80.0f), 0) },
+		{ Vector3Shrt(ANGLE(-70.0f), ANGLE(-80.0f), 0), Vector3Shrt(ANGLE(65.0f), ANGLE(80.0f), 0) },
 		ANGLE(10.0f),
 		ANGLE(4.0f),
 		500,
@@ -143,9 +143,9 @@ WeaponInfo Weapons[(int)LaraWeaponType::NumWeapons] =
 
 	// Crossbow
 	{
-		{ Vector3Shrt(ANGLE(-55.0f), ANGLE(-60.0f), 0), Vector3Shrt(ANGLE(55.0f), ANGLE(60.0f), 0) },
-		{ Vector3Shrt(ANGLE(-65.0f), ANGLE(-80.0f), 0), Vector3Shrt(ANGLE(65.0f), ANGLE(80.0f), 0) },
-		{ Vector3Shrt(ANGLE(-65.0f), ANGLE(-80.0f), 0), Vector3Shrt(ANGLE(65.0f), ANGLE(80.0f), 0) },
+		{ Vector3Shrt(ANGLE(-70.0f), ANGLE(-60.0f), 0), Vector3Shrt(ANGLE(65.0f), ANGLE(60.0f), 0) },
+		{ Vector3Shrt(ANGLE(-70.0f), ANGLE(-80.0f), 0), Vector3Shrt(ANGLE(65.0f), ANGLE(80.0f), 0) },
+		{ Vector3Shrt(ANGLE(-70.0f), ANGLE(-80.0f), 0), Vector3Shrt(ANGLE(65.0f), ANGLE(80.0f), 0) },
 		ANGLE(10.0f),
 		ANGLE(8.0f),
 		500,
@@ -194,9 +194,9 @@ WeaponInfo Weapons[(int)LaraWeaponType::NumWeapons] =
 
 	// Grenade launcher
 	{
-		{ Vector3Shrt(ANGLE(-55.0f), ANGLE(-60.0f), 0), Vector3Shrt(ANGLE(55.0f), ANGLE(60.0f), 0) },
-		{ Vector3Shrt(ANGLE(-65.0f), ANGLE(-80.0f), 0), Vector3Shrt(ANGLE(65.0f), ANGLE(80.0f), 0) },
-		{ Vector3Shrt(ANGLE(-65.0f), ANGLE(-80.0f), 0), Vector3Shrt(ANGLE(65.0f), ANGLE(80.0f), 0) },
+		{ Vector3Shrt(ANGLE(-70.0f), ANGLE(-60.0f), 0), Vector3Shrt(ANGLE(65.0f), ANGLE(60.0f), 0) },
+		{ Vector3Shrt(ANGLE(-70.0f), ANGLE(-80.0f), 0), Vector3Shrt(ANGLE(65.0f), ANGLE(80.0f), 0) },
+		{ Vector3Shrt(ANGLE(-70.0f), ANGLE(-80.0f), 0), Vector3Shrt(ANGLE(65.0f), ANGLE(80.0f), 0) },
 		ANGLE(10.0f),
 		ANGLE(8.0f),
 		500,
@@ -211,7 +211,7 @@ WeaponInfo Weapons[(int)LaraWeaponType::NumWeapons] =
 
 	// Harpoon gun
 	{
-		{ Vector3Shrt(ANGLE(-65.0f), ANGLE(-60.0f), 0), Vector3Shrt(ANGLE(65.0f), ANGLE(60.0f), 0) },
+		{ Vector3Shrt(ANGLE(-75.0f), ANGLE(-60.0f), 0), Vector3Shrt(ANGLE(75.0f), ANGLE(60.0f), 0) },
 		{ Vector3Shrt(ANGLE(-75.0f), ANGLE(-20.0f), 0), Vector3Shrt(ANGLE(75.0f), ANGLE(20.0f), 0) },
 		{ Vector3Shrt(ANGLE(-75.0f), ANGLE(-80.0f), 0), Vector3Shrt(ANGLE(75.0f), ANGLE(80.0f), 0) },
 		ANGLE(10.0f),
@@ -228,9 +228,9 @@ WeaponInfo Weapons[(int)LaraWeaponType::NumWeapons] =
 
 	// Rocket launcher
 	{
-		{ Vector3Shrt(ANGLE(-55.0f), ANGLE(-60.0f), 0), Vector3Shrt(ANGLE(55.0f), ANGLE(60.0f), 0) },
-		{ Vector3Shrt(ANGLE(-65.0f), ANGLE(-80.0f), 0), Vector3Shrt(ANGLE(65.0f), ANGLE(80.0f), 0) },
-		{ Vector3Shrt(ANGLE(-65.0f), ANGLE(-80.0f), 0), Vector3Shrt(ANGLE(65.0f), ANGLE(80.0f), 0) },
+		{ Vector3Shrt(ANGLE(-70.0f), ANGLE(-60.0f), 0), Vector3Shrt(ANGLE(65.0f), ANGLE(60.0f), 0) },
+		{ Vector3Shrt(ANGLE(-70.0f), ANGLE(-80.0f), 0), Vector3Shrt(ANGLE(65.0f), ANGLE(80.0f), 0) },
+		{ Vector3Shrt(ANGLE(-70.0f), ANGLE(-80.0f), 0), Vector3Shrt(ANGLE(65.0f), ANGLE(80.0f), 0) },
 		ANGLE(10.0f),
 		ANGLE(8.0f),
 		500,
