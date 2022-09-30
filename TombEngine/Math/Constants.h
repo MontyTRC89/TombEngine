@@ -20,15 +20,15 @@
 	constexpr inline auto MAX_HEIGHT = INT_MIN + 1; // NOTE: +1 prevents issues with sign change.
 	constexpr inline auto DEEP_WATER = INT_MAX - 1; // NOTE: -1 prevents issues with sign change.
 
-	constexpr inline auto BLOCK			= [](auto x) { return (BLOCK_UNIT * x); };
-	constexpr inline auto QTR_BLOCK		= [](auto x) { return ((BLOCK_UNIT / 4) * x); };
-	constexpr inline auto OFFSET_RADIUS = [](auto x) { return ((x * SQRT_2) + 4); };
+	constexpr inline auto BLOCK			= [](auto x, int d = 1) { return ((BLOCK_UNIT / d) * x); };
+	constexpr inline auto QTR_BLOCK		= [](auto x)			{ return ((BLOCK_UNIT / 4) * x); }; // TODO: Maybe unnecessary with BLOCK()'s divisor argument.
+	constexpr inline auto OFFSET_RADIUS = [](auto x)			{ return ((x * SQRT_2) + 4); };
 
-	constexpr inline auto STEPUP_HEIGHT				= QTR_BLOCK(3) / 2;
-	constexpr inline auto BAD_JUMP_CEILING			= QTR_BLOCK(3) / 4;
-	constexpr inline auto SHALLOW_WATER_START_LEVEL = QTR_BLOCK(1) / 4;
+	constexpr inline auto STEPUP_HEIGHT				= BLOCK(3, 4) / 2;
+	constexpr inline auto BAD_JUMP_CEILING			= BLOCK(3, 4) / 4;
+	constexpr inline auto SHALLOW_WATER_START_LEVEL = BLOCK(1, 8);
 	constexpr inline auto WADE_DEPTH				= STEPUP_HEIGHT;
-	constexpr inline auto SWIM_DEPTH				= 730;
+	constexpr inline auto SWIM_DEPTH				= BLOCK(3, 4) - 38;
 
 	// Legacy constants
 	constexpr inline auto FPS					  = 30;
@@ -36,11 +36,11 @@
 	constexpr inline auto SLOPE_DIFFERENCE		  = 60;
 
 	constexpr inline auto WALL_SIZE		 = BLOCK(1);
-	constexpr inline auto STOP_SIZE		 = QTR_BLOCK(2);
-	constexpr inline auto STEP_SIZE		 = QTR_BLOCK(1);
-	constexpr inline auto GRID_SNAP_SIZE = QTR_BLOCK(1) / 2;
-	constexpr inline auto WALL_MASK		 = BLOCK_UNIT - 1;
+	constexpr inline auto STOP_SIZE		 = BLOCK(1, 2);
+	constexpr inline auto STEP_SIZE		 = BLOCK(1, 4);
+	constexpr inline auto GRID_SNAP_SIZE = BLOCK(1, 8);
+	constexpr inline auto WALL_MASK		 = BLOCK(1) - 1;
 
-	constexpr inline auto CLICK	 = [](auto x) { return STEP_SIZE * x; };
-	constexpr inline auto SECTOR = [](auto x) { return WALL_SIZE * x; };
+	constexpr inline auto SECTOR = [](auto x) { return BLOCK(x); };
+	constexpr inline auto CLICK	 = [](auto x) { return BLOCK(x, 4); };
 //}
