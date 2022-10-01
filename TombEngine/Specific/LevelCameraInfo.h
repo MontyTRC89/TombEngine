@@ -8,11 +8,11 @@ using std::string;
 
 struct LevelCameraInfo
 {
-	Vector3i Position = Vector3i::Zero;
+	Vector3i Position	= Vector3i::Zero;
 	int		 RoomNumber = 0;
-	int		 Flags = 0;
-	int		 Speed = 1;
-	string	 LuaName = "";
+	int		 Flags		= 0;
+	int		 Speed		= 1;
+	string	 LuaName	= "";
 
 	LevelCameraInfo()
 	{
