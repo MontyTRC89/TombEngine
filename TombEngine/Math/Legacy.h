@@ -65,29 +65,8 @@ struct BOUNDING_BOX
 
 	int Height() { return abs(Y2 - Y1); }
 
-	BOUNDING_BOX operator +(const PoseData& pose)
-	{
-		auto newBox = *this;
-		newBox.X1 += pose.Position.x;
-		newBox.X2 += pose.Position.x;
-		newBox.Y1 += pose.Position.y;
-		newBox.Y2 += pose.Position.y;
-		newBox.Z1 += pose.Position.z;
-		newBox.Z2 += pose.Position.z;
-		return newBox;
-	}
-
-	BOUNDING_BOX operator *(float scale)
-	{
-		auto newBox = *this;
-		newBox.X1 *= scale;
-		newBox.X2 *= scale;
-		newBox.Y1 *= scale;
-		newBox.Y2 *= scale;
-		newBox.Z1 *= scale;
-		newBox.Z2 *= scale;
-		return newBox;
-	}
+	BOUNDING_BOX operator +(const PoseData& pose);
+	BOUNDING_BOX operator *(float scale);
 };
 
 short ANGLE(float angle);
