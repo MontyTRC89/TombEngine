@@ -4,7 +4,6 @@
 struct Vector3i;
 
 constexpr auto FP_SHIFT	 = 16;
-constexpr auto FP_ONE	 = 1 << FP_SHIFT;
 constexpr auto W2V_SHIFT = 14;
 
 struct VECTOR
