@@ -108,7 +108,7 @@ struct LEVEL
 	std::vector<SPRITE> Sprites;
 	std::vector<LEVEL_CAMERA_INFO> Cameras;
 	std::vector<SinkInfo> Sinks;
-	std::vector<SOUND_SOURCE_INFO> SoundSources;
+	std::vector<SoundSourceInfo> SoundSources;
 	std::vector<BOX_INFO> Boxes;
 	std::vector<OVERLAP> Overlaps;
 	std::vector<int> Zones[MAX_ZONES][2];

@@ -476,49 +476,33 @@ struct SinkInfo
 	}
 };
 
-struct SOUND_SOURCE_INFO
+struct SoundSourceInfo
 {
-	int x;
-	int y;
-	int z;
-	int soundId;
-	int flags;
-	std::string luaName;
+	Vector3Int	Position = Vector3Int::Zero;
+	int			SoundID	 = 0;
+	int			Flags	 = 0;
+	std::string LuaName	 = "";
 
-	SOUND_SOURCE_INFO()
+	SoundSourceInfo()
 	{
-		this->x = 0;
-		this->y = 0;
-		this->z = 0;
-		this->soundId = 0;
-		this->flags = 0x0;
 	}
 
-	SOUND_SOURCE_INFO(int xPos, int yPos, int zPos)
+	SoundSourceInfo(int xPos, int yPos, int zPos)
 	{
-		this->x = xPos;
-		this->y = yPos;
-		this->z = zPos;
-		this->soundId = 0;
-		this->flags = 0x0;
+		this->Position = Vector3Int(xPos, yPos, zPos);
 	}
 
-	SOUND_SOURCE_INFO(int xPos, int yPos, int zPos, short soundId)
+	SoundSourceInfo(int xPos, int yPos, int zPos, short soundID)
 	{
-		this->x = xPos;
-		this->y = yPos;
-		this->z = zPos;
-		this->soundId = soundId;
-		this->flags = 0x0;
+		this->Position = Vector3Int(xPos, yPos, zPos);
+		this->SoundID = soundID;
 	}
 
-	SOUND_SOURCE_INFO(int xPos, int yPos, int zPos, short soundId, short newflags)
+	SoundSourceInfo(int xPos, int yPos, int zPos, short soundID, short newflags)
 	{
-		this->x = xPos;
-		this->y = yPos;
-		this->z = zPos;
-		this->soundId = soundId;
-		this->flags = newflags;
+		this->Position = Vector3Int(xPos, yPos, zPos);
+		this->SoundID = soundID;
+		this->Flags = newflags;
 	}
 };
 
@@ -528,14 +512,6 @@ struct VECTOR
 	int vy;
 	int vz;
 	int pad;
-};
-
-struct SVECTOR
-{
-	short vx;
-	short vy;
-	short vz;
-	short pad;
 };
 
 struct CVECTOR

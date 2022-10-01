@@ -910,16 +910,16 @@ void LoadSoundSources()
 	g_Level.SoundSources.reserve(numSoundSources);
 	for (int i = 0; i < numSoundSources; i++)
 	{
-		auto& source = g_Level.SoundSources.emplace_back(SOUND_SOURCE_INFO{});
+		auto& source = g_Level.SoundSources.emplace_back(SoundSourceInfo{});
 
-		source.x = ReadInt32();
-		source.y = ReadInt32();
-		source.z = ReadInt32();
-		source.soundId = ReadInt32();
-		source.flags = ReadInt32();
-		source.luaName = ReadString();
+		source.Position.x = ReadInt32();
+		source.Position.y = ReadInt32();
+		source.Position.z = ReadInt32();
+		source.SoundID = ReadInt32();
+		source.Flags = ReadInt32();
+		source.LuaName = ReadString();
 
-		g_GameScriptEntities->AddName(source.luaName, source);
+		g_GameScriptEntities->AddName(source.LuaName, source);
 	}
 }
 
