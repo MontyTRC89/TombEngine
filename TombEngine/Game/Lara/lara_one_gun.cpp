@@ -253,7 +253,7 @@ void AnimateShotgun(ItemInfo* laraItem, LaraWeaponType weaponType)
 
 	AnimateItem(item);
 
-	lara->LeftArm.FrameBase = lara->RightArm.FrameBase = g_Level.Anims[item->Animation.AnimNumber].framePtr;
+	lara->LeftArm.FrameBase = lara->RightArm.FrameBase = g_Level.Anims[item->Animation.AnimNumber].FramePtr;
 	lara->LeftArm.FrameNumber = lara->RightArm.FrameNumber = item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase;
 	lara->LeftArm.AnimNumber = lara->RightArm.AnimNumber = item->Animation.AnimNumber;
 }
@@ -384,7 +384,7 @@ void DrawShotgun(ItemInfo* laraItem, LaraWeaponType weaponType)
 	else
 		ReadyShotgun(laraItem, weaponType);
 
-	lara->LeftArm.FrameBase = lara->RightArm.FrameBase = g_Level.Anims[item->Animation.AnimNumber].framePtr;
+	lara->LeftArm.FrameBase = lara->RightArm.FrameBase = g_Level.Anims[item->Animation.AnimNumber].FramePtr;
 	lara->LeftArm.FrameNumber = lara->RightArm.FrameNumber = item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase;
 	lara->LeftArm.AnimNumber = lara->RightArm.AnimNumber = item->Animation.AnimNumber;
 }
@@ -418,8 +418,8 @@ void UndrawShotgun(ItemInfo* laraItem, LaraWeaponType weaponType)
 		}
 	}
 
-	lara->RightArm.FrameBase = g_Level.Anims[item->Animation.AnimNumber].framePtr;
-	lara->LeftArm.FrameBase = g_Level.Anims[item->Animation.AnimNumber].framePtr;
+	lara->RightArm.FrameBase = g_Level.Anims[item->Animation.AnimNumber].FramePtr;
+	lara->LeftArm.FrameBase = g_Level.Anims[item->Animation.AnimNumber].FramePtr;
 	lara->RightArm.FrameNumber = item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase;
 	lara->LeftArm.FrameNumber = item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase;
 	lara->RightArm.AnimNumber = item->Animation.AnimNumber;

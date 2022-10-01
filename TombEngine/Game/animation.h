@@ -16,22 +16,22 @@ struct AnimFrame
 
 struct StateDispatchData
 {
-	int TargetState;
-	int numberRanges;
-	int rangeIndex;
+	int TargetState	 = -1;
+	int NumberRanges = 0;
+	int RangeIndex	 = -1;
 };
 
 struct StateDispatchRangeData
 {
-	int startFrame;
-	int endFrame;
-	int linkAnimNum;
-	int linkFrameNum;
+	int StartFrame	 = -1;
+	int EndFrame	 = -1;
+	int LinkAnimNum	 = -1;
+	int LinkFrameNum = -1;
 };
 
 struct AnimData
 {
-	int framePtr;
+	int FramePtr;
 	int Interpolation;
 	int ActiveState;
 
@@ -42,12 +42,12 @@ struct AnimData
 	int frameBase;
 	int frameEnd;
 
-	int jumpAnimNum;
-	int jumpFrameNum;
-	int numberChanges;
-	int changeIndex;
-	int numberCommands;
-	int commandIndex;
+	int JumpAnimNum;
+	int JumpFrameNum;
+	int NumStateDispatches;
+	int StateDispatchIndex;
+	int NumCommands;
+	int CommandIndex;
 };
 
 enum class AnimCommandType

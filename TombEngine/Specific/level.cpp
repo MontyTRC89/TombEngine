@@ -292,19 +292,19 @@ void LoadObjects()
 	{
 		auto* anim = &g_Level.Anims[i];
 
-		anim->framePtr = ReadInt32();
+		anim->FramePtr = ReadInt32();
 		anim->Interpolation = ReadInt32();
 		anim->ActiveState = ReadInt32();
 		anim->VelocityStart = ReadVector3();
 		anim->VelocityEnd = ReadVector3();
 		anim->frameBase = ReadInt32();
 		anim->frameEnd = ReadInt32();
-		anim->jumpAnimNum = ReadInt32();
-		anim->jumpFrameNum = ReadInt32();
-		anim->numberChanges = ReadInt32();
-		anim->changeIndex = ReadInt32();
-		anim->numberCommands = ReadInt32();
-		anim->commandIndex = ReadInt32();
+		anim->JumpAnimNum = ReadInt32();
+		anim->JumpFrameNum = ReadInt32();
+		anim->NumStateDispatches = ReadInt32();
+		anim->StateDispatchIndex = ReadInt32();
+		anim->NumCommands = ReadInt32();
+		anim->CommandIndex = ReadInt32();
 	}
 
 	int numChanges = ReadInt32();

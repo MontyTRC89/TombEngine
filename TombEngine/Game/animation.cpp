@@ -28,7 +28,7 @@ void AnimateLara(ItemInfo* item)
 
 	auto* anim = &g_Level.Anims[item->Animation.AnimNumber];
 
-	if (anim->numberChanges > 0 && GetStateDispatch(item, *anim))
+	if (anim->NumStateDispatches > 0 && GetStateDispatch(item, *anim))
 	{
 		anim = &g_Level.Anims[item->Animation.AnimNumber];
 		item->Animation.ActiveState = anim->ActiveState;
@@ -38,8 +38,8 @@ void AnimateLara(ItemInfo* item)
 	{
 		PerformAnimCommands(item, false);
 
-		item->Animation.AnimNumber = anim->jumpAnimNum;
-		item->Animation.FrameNumber = anim->jumpFrameNum;
+		item->Animation.AnimNumber = anim->JumpAnimNum;
+		item->Animation.FrameNumber = anim->JumpFrameNum;
 
 		anim = &g_Level.Anims[item->Animation.AnimNumber];
 		item->Animation.ActiveState = anim->ActiveState;
@@ -99,12 +99,12 @@ void PerformAnimCommands(ItemInfo* item, bool isFrameBased)
 {
 	const auto& anim = g_Level.Anims[item->Animation.AnimNumber];
 
-	if (anim.numberCommands == 0)
+	if (anim.NumCommands == 0)
 		return;
 
-	short* cmd = &g_Level.Commands[anim.commandIndex];
+	short* cmd = &g_Level.Commands[anim.CommandIndex];
 
-	for (int i = anim.numberCommands; i > 0; i--)
+	for (int i = anim.NumCommands; i > 0; i--)
 	{
 		auto animCommand = (AnimCommandType)cmd[0];
 		cmd++;
@@ -229,7 +229,7 @@ void AnimateItem(ItemInfo* item)
 
 	auto* anim = &g_Level.Anims[item->Animation.AnimNumber];
 
-	if (anim->numberChanges > 0 && GetStateDispatch(item, *anim))
+	if (anim->NumStateDispatches > 0 && GetStateDispatch(item, *anim))
 	{
 		anim = &g_Level.Anims[item->Animation.AnimNumber];
 
@@ -242,8 +242,8 @@ void AnimateItem(ItemInfo* item)
 	{
 		PerformAnimCommands(item, false);
 
-		item->Animation.AnimNumber = anim->jumpAnimNum;
-		item->Animation.FrameNumber = anim->jumpFrameNum;
+		item->Animation.AnimNumber = anim->JumpAnimNum;
+		item->Animation.FrameNumber = anim->JumpFrameNum;
 
 		anim = &g_Level.Anims[item->Animation.AnimNumber];
 		if (item->Animation.ActiveState != anim->ActiveState)
@@ -282,23 +282,23 @@ bool HasStateDispatch(ItemInfo* item, int targetState)
 {
 	const auto& anim = g_Level.Anims[item->Animation.AnimNumber];
 
-	if (anim.numberChanges <= 0)
+	if (anim.NumStateDispatches <= 0)
 		return false;
 
 	if (targetState < 0)
 		targetState = item->Animation.TargetState;
 
 	// Iterate over possible state dispatches.
-	for (int i = 0; i < anim.numberChanges; i++)
+	for (int i = 0; i < anim.NumStateDispatches; i++)
 	{
-		const auto& dispatch = g_Level.Changes[anim.changeIndex + i];
+		const auto& dispatch = g_Level.Changes[anim.StateDispatchIndex + i];
 		if (dispatch.TargetState == targetState)
 		{
 			// Iterate over frame range of state dispatch.
-			for (int j = 0; j < dispatch.numberRanges; j++)
+			for (int j = 0; j < dispatch.NumberRanges; j++)
 			{
-				const auto& range = g_Level.Ranges[dispatch.rangeIndex + j];
-				if (item->Animation.FrameNumber >= range.startFrame && item->Animation.FrameNumber <= range.endFrame)
+				const auto& range = g_Level.Ranges[dispatch.RangeIndex + j];
+				if (item->Animation.FrameNumber >= range.StartFrame && item->Animation.FrameNumber <= range.EndFrame)
 					return true;
 			}
 		}
@@ -358,25 +358,25 @@ bool GetStateDispatch(ItemInfo* item, const AnimData& anim)
 	if (item->Animation.ActiveState == item->Animation.TargetState)
 		return false;
 
-	if (anim.numberChanges <= 0)
+	if (anim.NumStateDispatches <= 0)
 		return false;
 
 	// Iterate over possible state dispatches.
-	for (int i = 0; i < anim.numberChanges; i++)
+	for (int i = 0; i < anim.NumStateDispatches; i++)
 	{
-		const auto& dispatch = g_Level.Changes[anim.changeIndex + i];
+		const auto& dispatch = g_Level.Changes[anim.StateDispatchIndex + i];
 
 		if (dispatch.TargetState == item->Animation.TargetState)
 		{
 			// Iterate over frame range of state dispatch.
-			for (int j = 0; j < dispatch.numberRanges; j++)
+			for (int j = 0; j < dispatch.NumberRanges; j++)
 			{
-				const auto& range = g_Level.Ranges[dispatch.rangeIndex + j];
+				const auto& range = g_Level.Ranges[dispatch.RangeIndex + j];
 
-				if (item->Animation.FrameNumber >= range.startFrame && item->Animation.FrameNumber <= range.endFrame)
+				if (item->Animation.FrameNumber >= range.StartFrame && item->Animation.FrameNumber <= range.EndFrame)
 				{
-					item->Animation.AnimNumber = range.linkAnimNum;
-					item->Animation.FrameNumber = range.linkFrameNum;
+					item->Animation.AnimNumber = range.LinkAnimNum;
+					item->Animation.FrameNumber = range.LinkFrameNum;
 					return true;
 				}
 			}
@@ -424,7 +424,7 @@ int GetFrame(ItemInfo* item, AnimFrame* framePtr[], int* rate)
 	int frame = item->Animation.FrameNumber;
 	const auto& anim = g_Level.Anims[item->Animation.AnimNumber];
 
-	framePtr[0] = framePtr[1] = &g_Level.Frames[anim.framePtr];
+	framePtr[0] = framePtr[1] = &g_Level.Frames[anim.FramePtr];
 	int rate2 = *rate = anim.Interpolation & 0x00ff;
 	frame -= anim.frameBase; 
 
@@ -477,7 +477,7 @@ int GetNextAnimState(ItemInfo* item)
 
 int GetNextAnimState(int objectID, int animNumber)
 {
-	int nextAnim = g_Level.Anims[Objects[objectID].animIndex + animNumber].jumpAnimNum;
+	int nextAnim = g_Level.Anims[Objects[objectID].animIndex + animNumber].JumpAnimNum;
 	return g_Level.Anims[Objects[objectID].animIndex + nextAnim].ActiveState;
 }
 

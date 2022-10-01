@@ -189,13 +189,13 @@ bool GetCollidedObjects(ItemInfo* collidingItem, int radius, bool onlyVisible, I
 					int dy = collidingItem->Pose.Position.y - item->Pose.Position.y;
 					int dz = collidingItem->Pose.Position.z - item->Pose.Position.z;
 
-					auto* framePtr = GetBestFrame(item);
+					auto* FramePtr = GetBestFrame(item);
 
 					if (dx >= -SECTOR(2) && dx <= SECTOR(2) &&
 						dy >= -SECTOR(2) && dy <= SECTOR(2) &&
 						dz >= -SECTOR(2) && dz <= SECTOR(2) &&
-						(collidingItem->Pose.Position.y + radius + CLICK(0.5f)) >= (item->Pose.Position.y + framePtr->boundingBox.Y1) &&
-						(collidingItem->Pose.Position.y - radius - CLICK(0.5f)) <= (item->Pose.Position.y + framePtr->boundingBox.Y2))
+						(collidingItem->Pose.Position.y + radius + CLICK(0.5f)) >= (item->Pose.Position.y + FramePtr->boundingBox.Y1) &&
+						(collidingItem->Pose.Position.y - radius - CLICK(0.5f)) <= (item->Pose.Position.y + FramePtr->boundingBox.Y2))
 					{
 						float sinY = phd_sin(item->Pose.Orientation.y);
 						float cosY = phd_cos(item->Pose.Orientation.y);
@@ -205,25 +205,25 @@ bool GetCollidedObjects(ItemInfo* collidingItem, int radius, bool onlyVisible, I
 
 						if (item->ObjectNumber == ID_TURN_SWITCH)
 						{
-							framePtr->boundingBox.X1 = -CLICK(1);
-							framePtr->boundingBox.X2 = CLICK(1);
-							framePtr->boundingBox.Z1 = -CLICK(1);
-							framePtr->boundingBox.Z1 = CLICK(1);
+							FramePtr->boundingBox.X1 = -CLICK(1);
+							FramePtr->boundingBox.X2 = CLICK(1);
+							FramePtr->boundingBox.Z1 = -CLICK(1);
+							FramePtr->boundingBox.Z1 = CLICK(1);
 						}
 
-						if ((radius + rx + CLICK(0.5f)) >= framePtr->boundingBox.X1 &&
-							(rx - radius - CLICK(0.5f)) <= framePtr->boundingBox.X2)
+						if ((radius + rx + CLICK(0.5f)) >= FramePtr->boundingBox.X1 &&
+							(rx - radius - CLICK(0.5f)) <= FramePtr->boundingBox.X2)
 						{
-							if ((radius + rz + CLICK(0.5f)) >= framePtr->boundingBox.Z1 &&
-								(rz - radius - CLICK(0.5f)) <= framePtr->boundingBox.Z2)
+							if ((radius + rz + CLICK(0.5f)) >= FramePtr->boundingBox.Z1 &&
+								(rz - radius - CLICK(0.5f)) <= FramePtr->boundingBox.Z2)
 							{
 								collidedItems[numItems++] = item;
 							}
 						}
 						else
 						{
-							if ((collidingItem->Pose.Position.y + radius + CLICK(0.5f)) >= (item->Pose.Position.y + framePtr->boundingBox.Y1) &&
-								(collidingItem->Pose.Position.y - radius - CLICK(0.5f)) <= (item->Pose.Position.y + framePtr->boundingBox.Y2))
+							if ((collidingItem->Pose.Position.y + radius + CLICK(0.5f)) >= (item->Pose.Position.y + FramePtr->boundingBox.Y1) &&
+								(collidingItem->Pose.Position.y - radius - CLICK(0.5f)) <= (item->Pose.Position.y + FramePtr->boundingBox.Y2))
 							{
 								float sinY = phd_sin(item->Pose.Orientation.y);
 								float cosY = phd_cos(item->Pose.Orientation.y);
@@ -233,17 +233,17 @@ bool GetCollidedObjects(ItemInfo* collidingItem, int radius, bool onlyVisible, I
 
 								if (item->ObjectNumber == ID_TURN_SWITCH)
 								{
-									framePtr->boundingBox.X1 = -CLICK(1);
-									framePtr->boundingBox.X2 = CLICK(1);
-									framePtr->boundingBox.Z1 = -CLICK(1);
-									framePtr->boundingBox.Z1 = CLICK(1);
+									FramePtr->boundingBox.X1 = -CLICK(1);
+									FramePtr->boundingBox.X2 = CLICK(1);
+									FramePtr->boundingBox.Z1 = -CLICK(1);
+									FramePtr->boundingBox.Z1 = CLICK(1);
 								}
 
-								if ((radius + rx + CLICK(0.5f)) >= framePtr->boundingBox.X1 &&
-									(rx - radius - CLICK(0.5f)) <= framePtr->boundingBox.X2)
+								if ((radius + rx + CLICK(0.5f)) >= FramePtr->boundingBox.X1 &&
+									(rx - radius - CLICK(0.5f)) <= FramePtr->boundingBox.X2)
 								{
-									if ((radius + rz + CLICK(0.5f)) >= framePtr->boundingBox.Z1 &&
-										(rz - radius - CLICK(0.5f)) <= framePtr->boundingBox.Z2)
+									if ((radius + rz + CLICK(0.5f)) >= FramePtr->boundingBox.Z1 &&
+										(rz - radius - CLICK(0.5f)) <= FramePtr->boundingBox.Z2)
 									{
 										collidedItems[numItems++] = item;
 
@@ -269,12 +269,12 @@ bool GetCollidedObjects(ItemInfo* collidingItem, int radius, bool onlyVisible, I
 
 bool TestWithGlobalCollisionBounds(ItemInfo* item, ItemInfo* laraItem, CollisionInfo* coll)
 {
-	auto* framePtr = GetBestFrame(laraItem);
+	auto* FramePtr = GetBestFrame(laraItem);
 
-	if ((item->Pose.Position.y + GlobalCollisionBounds.Y2) <= (laraItem->Pose.Position.y + framePtr->boundingBox.Y1))
+	if ((item->Pose.Position.y + GlobalCollisionBounds.Y2) <= (laraItem->Pose.Position.y + FramePtr->boundingBox.Y1))
 		return false;
 
-	if ((item->Pose.Position.y + GlobalCollisionBounds.Y1) >= framePtr->boundingBox.Y2)
+	if ((item->Pose.Position.y + GlobalCollisionBounds.Y1) >= FramePtr->boundingBox.Y2)
 		return false;
 
 	float sinY = phd_sin(item->Pose.Orientation.y);
