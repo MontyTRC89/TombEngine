@@ -80,7 +80,6 @@ int	  phd_atan(int dz, int dx);
 
 BoundingOrientedBox TO_DX_BBOX(PoseData pos, BOUNDING_BOX* box);
 
-int mGetAngle(int x1, int y1, int x2, int y2);
 void phd_RotBoundingBoxNoPersp(PoseData* pos, BOUNDING_BOX* bounds, BOUNDING_BOX* tbounds);
 
 void InterpolateAngle(short angle, short* rotation, short* outAngle, int shift);

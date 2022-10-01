@@ -24,23 +24,30 @@ namespace TEN::Math::Random
 		return (short)GenerateInt(low, high);
 	}
 
-	Vector3 GenerateVector3()
+	Vector2 GenerateVector2(float length)
+	{
+		auto vector = Vector2(GenerateFloat(-1.0f, 1.0f), GenerateFloat(-1.0f, 1.0f));
+		vector.Normalize();
+		return (vector * length);
+	}
+
+	Vector3 GenerateVector3(float length)
 	{
 		auto vector = Vector3(GenerateFloat(-1.0f, 1.0f), GenerateFloat(-1.0f, 1.0f), GenerateFloat(-1.0f, 1.0f));
 		vector.Normalize();
-		return vector;
+		return (vector * length);
 	}
 
-	Vector3 GenerateVector3InCone(const Vector3& direction, float angleInDegrees)
+	Vector3 GenerateVector3InCone(const Vector3& direction, float semiangleInDegrees, float length)
 	{
-		float x = GenerateFloat(-angleInDegrees, angleInDegrees) * RADIAN;
-		float y = GenerateFloat(-angleInDegrees, angleInDegrees) * RADIAN;
-		float z = GenerateFloat(-angleInDegrees, angleInDegrees) * RADIAN;
+		float x = GenerateFloat(-semiangleInDegrees, semiangleInDegrees) * RADIAN;
+		float y = GenerateFloat(-semiangleInDegrees, semiangleInDegrees) * RADIAN;
+		float z = GenerateFloat(-semiangleInDegrees, semiangleInDegrees) * RADIAN;
 		auto matrix = Matrix::CreateRotationX(x) * Matrix::CreateRotationY(y) * Matrix::CreateRotationZ(z);
 
 		auto vector = direction.TransformNormal(direction, matrix);
 		vector.Normalize();
-		return vector;
+		return (vector * length);
 	}
 
 	bool TestProbability(float probability)

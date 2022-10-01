@@ -74,11 +74,6 @@ int phd_atan(int x, int y)
 	return FROM_RAD(atan2(y, x));
 }
 
-int mGetAngle(int x1, int y1, int x2, int y2)
-{
-	return (65536 - phd_atan(x2 - x1, y2 - y1)) % 65536;
-}
-
 void phd_RotBoundingBoxNoPersp(PoseData* pos, BOUNDING_BOX* bounds, BOUNDING_BOX* tbounds)
 {
 	auto world = pos->Orientation.ToRotationMatrix();

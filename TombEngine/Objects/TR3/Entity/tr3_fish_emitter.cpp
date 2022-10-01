@@ -115,7 +115,7 @@ namespace TEN::Entities::Creatures::TR3
 			else
 				enemy = &g_Level.Items[CarcassItem];
 
-			LeaderInfo[leader].angle = fish->angle = ((-(mGetAngle(fish->x + item->Pose.Position.x, fish->z + item->Pose.Position.z, enemy->Pose.Position.x, enemy->Pose.Position.z) + 0x4000)) / 16) & 4095;
+			LeaderInfo[leader].angle = fish->angle = ((-(Geometry::GetOrientTowardPoint(Vector3(fish->x + item->Pose.Position.x, 0.0f, fish->z + item->Pose.Position.z), enemy->Pose.Position.ToVector3()).y + ANGLE(90.0f))) / 16) & ANGLE(22.5f);
 			LeaderInfo[leader].speed = (GetRandomControl() & 63) + 192;
 		}
 
@@ -303,7 +303,7 @@ namespace TEN::Entities::Creatures::TR3
 				}
 			}
 
-			angle = ((-(mGetAngle(fish->x, fish->z, ftx, ftz) + 0x4000)) / 16) & 4095;
+			angle = ((-(Geometry::GetOrientTowardPoint(Vector3(fish->x, 0.0f, fish->z), Vector3(ftx, 0.0f, ftz)).y + ANGLE(90.0f))) / 16) & ANGLE(22.5f);
 			int dx = fish->x - ftx + ((24 - i) * 128);
 			int dz = fish->z - ftz - ((24 - i) * 128);
 

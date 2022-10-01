@@ -1084,16 +1084,13 @@ void TriggerUnderwaterBlood(int x, int y, int z, int size)
 
 void Richochet(PoseData* pos)
 {
-	short angle = mGetAngle(pos->Position.z, pos->Position.x, LaraItem->Pose.Position.z, LaraItem->Pose.Position.x);
-	GameVector target;
-	target.x = pos->Position.x;
-	target.y = pos->Position.y;
-	target.z = pos->Position.z;
+	short angle = Geometry::GetOrientTowardPoint(pos->Position.ToVector3(), LaraItem->Pose.Position.ToVector3()).y;
+	auto target = GameVector(pos->Position);
 	TriggerRicochetSpark(&target, angle / 16, 3, 0);
 	SoundEffect(SFX_TR4_WEAPON_RICOCHET, pos);
 }
 
-void ControlWaterfallMist(short itemNumber) // ControlWaterfallMist
+void ControlWaterfallMist(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
 
@@ -1179,7 +1176,7 @@ void TriggerWaterfallMist(int x, int y, int z, int angle)
 
 void KillAllCurrentItems(short itemNumber)
 {
-	// TODO: Reimplement this functionality
+	// TODO: Reimplement this functionality.
 }
 
 void TriggerDynamicLight(int x, int y, int z, short falloff, byte r, byte g, byte b)
@@ -1202,6 +1199,7 @@ void SetupRipple(int x, int y, int z, int size, int flags)
 			ripple->x = x;
 			ripple->y = y;
 			ripple->z = z;
+
 			if (flags & RIPPLE_FLAG_NO_RAND)
 			{
 				ripple->x += (GetRandomControl() & 127) - 64;
@@ -1229,7 +1227,7 @@ void WadeSplash(ItemInfo* item, int wh, int wd)
 	if (item->Pose.Position.y + frame->boundingBox.Y2 < wh)
 		return;
 
-	if (item->Animation.Velocity.y <= 0 || wd >= 474 || SplashCount != 0)
+	if (item->Animation.Velocity.y <= 0.0f || wd >= 474 || SplashCount != 0)
 	{
 		if (!(Wibble & 0xF))
 		{
@@ -1448,7 +1446,8 @@ void TriggerFireFlame(int x, int y, int z, int fxObj, int type)
 	int dx = LaraItem->Pose.Position.x - x;
 	int dz = LaraItem->Pose.Position.z - z;
 
-	if (dx >= -16384 && dx <= 16384 && dz >= -16384 && dz <= 16384)
+	if (dx >= -SECTOR(16) && dx <= SECTOR(16) &&
+		dz >= -SECTOR(16) && dz <= SECTOR(16))
 	{
 		auto* spark = GetFreeParticle();
 

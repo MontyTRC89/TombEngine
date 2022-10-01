@@ -534,7 +534,7 @@ bool Move3DPosTo3DPos(PoseData* fromPose, PoseData* toPose, int velocity, short 
 
 		if (shouldAnimate && Lara.Control.WaterStatus != WaterStatus::Underwater)
 		{
-			int angle = mGetAngle(toPose->Position.x, toPose->Position.z, fromPose->Position.x, fromPose->Position.z);
+			short angle = Geometry::GetOrientTowardPoint(toPose->Position.ToVector3(), fromPose->Position.ToVector3()).y;
 			int direction = (GetQuadrant(angle) - GetQuadrant(toPose->Orientation.y)) & 3;
 
 			switch (direction)

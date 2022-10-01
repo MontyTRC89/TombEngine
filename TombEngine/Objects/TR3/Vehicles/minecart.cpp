@@ -424,7 +424,7 @@ namespace TEN::Entities::Vehicles
 				break;
 			}
 
-			angle = mGetAngle(minecartItem->Pose.Position.x, minecartItem->Pose.Position.z, minecart->TurnX, minecart->TurnZ) & 0x3fff;
+			angle = Geometry::GetOrientTowardPoint(minecartItem->Pose.Position.ToVector3(), Vector3(minecart->TurnX, 0.0f, minecart->TurnZ)).y & 0x3fff;
 
 			if (rotation < 4)
 			{
