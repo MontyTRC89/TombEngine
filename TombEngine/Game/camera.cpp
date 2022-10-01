@@ -776,13 +776,10 @@ void FixedCamera(ItemInfo* item)
 	{
 		auto* camera = &g_Level.Cameras[Camera.number];
 
-		from.x = camera->x;
-		from.y = camera->y;
-		from.z = camera->z;
-		from.roomNumber = camera->roomNumber;
+		from = GameVector(camera->Position, camera->RoomNumber);
 
 		// Multiply original speed by 8 to comply with original bitshifted speed from TR1-2
-		moveSpeed = camera->speed * 8 + 1;
+		moveSpeed = camera->Speed * 8 + 1;
 	}
 
 	Camera.fixedCamera = true;

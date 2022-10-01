@@ -87,8 +87,8 @@ int FindGridShift(int x, int z)
 
 bool TestItemRoomCollisionAABB(ItemInfo* item)
 {
-	auto* framePtr = GetBestFrame(item);
-	auto box = framePtr->boundingBox + item->Pose;
+	auto* FramePtr = GetBestFrame(item);
+	auto box = FramePtr->boundingBox + item->Pose;
 	short maxY = std::min(box.Y1, box.Y2);
 	short minY = std::max(box.Y1, box.Y2);
 

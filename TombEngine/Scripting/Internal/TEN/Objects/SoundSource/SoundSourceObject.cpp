@@ -15,7 +15,7 @@ Sound source
 static auto index_error = index_error_maker(SoundSource, ScriptReserved_SoundSource);
 static auto newindex_error = newindex_error_maker(SoundSource, ScriptReserved_SoundSource);
 
-SoundSource::SoundSource(SOUND_SOURCE_INFO & ref) : m_soundSource{ref}
+SoundSource::SoundSource(SoundSourceInfo & ref) : m_soundSource{ref}
 {};
 
 void SoundSource::Register(sol::table & parent)
@@ -60,19 +60,17 @@ void SoundSource::Register(sol::table & parent)
 
 Vec3 SoundSource::GetPos() const
 {
-	return Vec3{ m_soundSource.x, m_soundSource.y, m_soundSource.z };
+	return Vec3{ m_soundSource.Position };
 }
 
 void SoundSource::SetPos(Vec3 const& pos)
 {
-	m_soundSource.x = pos.x;
-	m_soundSource.y = pos.y;
-	m_soundSource.z = pos.z;
+	m_soundSource.Position = Vector3i(pos.x, pos.y, pos.z);
 }
 
 std::string SoundSource::GetName() const
 {
-	return m_soundSource.luaName;
+	return m_soundSource.LuaName;
 }
 
 void SoundSource::SetName(std::string const & id) 
@@ -85,8 +83,8 @@ void SoundSource::SetName(std::string const & id)
 	if (s_callbackSetName(id, m_soundSource))
 	{
 		// remove the old name if we have one
-		s_callbackRemoveName(m_soundSource.luaName);
-		m_soundSource.luaName = id;
+		s_callbackRemoveName(m_soundSource.LuaName);
+		m_soundSource.LuaName = id;
 	}
 	else
 	{
@@ -97,10 +95,10 @@ void SoundSource::SetName(std::string const & id)
 
 int SoundSource::GetSoundID() const
 {
-	return m_soundSource.soundId;
+	return m_soundSource.SoundID;
 }
 
 void SoundSource::SetSoundID(int soundID)
 {	
-	m_soundSource.soundId = soundID;
+	m_soundSource.SoundID = soundID;
 }

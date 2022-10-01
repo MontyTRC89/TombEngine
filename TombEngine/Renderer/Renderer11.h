@@ -444,7 +444,7 @@ namespace TEN::Renderer
 		
 		void BuildHierarchy(RendererObject* obj);
 		void BuildHierarchyRecursive(RendererObject* obj, RendererBone* node, RendererBone* parentNode);
-		void UpdateAnimation(RendererItem* item, RendererObject& obj, ANIM_FRAME** frmptr, short frac, short rate,
+		void UpdateAnimation(RendererItem* item, RendererObject& obj, AnimFrame** frmptr, short frac, short rate,
 		                     int mask, bool useObjectWorldRotation = false);
 		void GetVisibleObjects(RenderView& renderView, bool onlyRooms);
 		void GetRoomBounds(RenderView& renderView, bool onlyRooms);

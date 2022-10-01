@@ -36,7 +36,7 @@ namespace TEN::Renderer
 	using std::pair;
 	using std::vector;
 
-	void Renderer11::UpdateAnimation(RendererItem *item, RendererObject& obj, ANIM_FRAME** frmptr, short frac, short rate, int mask, bool useObjectWorldRotation)
+	void Renderer11::UpdateAnimation(RendererItem *item, RendererObject& obj, AnimFrame** frmptr, short frac, short rate, int mask, bool useObjectWorldRotation)
 	{
 		static std::vector<int> boneIndexList;
 		boneIndexList.clear();
@@ -282,7 +282,7 @@ namespace TEN::Renderer
 					});
 			}
 
-			ANIM_FRAME* framePtr[2];
+			AnimFrame* framePtr[2];
 			int rate;
 			int frac = GetFrame(nativeItem, framePtr, &rate);
 

@@ -1580,7 +1580,7 @@ void UpdateShockwaves()
 				{
 					if (sw->flags & 3)
 					{
-						ANIM_FRAME* frame = GetBestFrame(LaraItem);
+						AnimFrame* frame = GetBestFrame(LaraItem);
 
 						int dx = LaraItem->Pose.Position.x - sw->x;
 						int dz = LaraItem->Pose.Position.z - sw->z;

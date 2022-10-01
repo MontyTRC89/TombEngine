@@ -17,7 +17,7 @@ Basic cameras that can point at Lara or at a CAMERA_TARGET.
 static auto index_error = index_error_maker(Camera, ScriptReserved_Camera);
 static auto newindex_error = newindex_error_maker(Camera, ScriptReserved_Camera);
 
-Camera::Camera(LEVEL_CAMERA_INFO & ref) : m_camera{ref}
+Camera::Camera(LevelCameraInfo & ref) : m_camera{ref}
 {};
 
 void Camera::Register(sol::table & parent)
@@ -62,19 +62,17 @@ void Camera::Register(sol::table & parent)
 
 Vec3 Camera::GetPos() const
 {
-	return Vec3{ m_camera.x, m_camera.y, m_camera.z };
+	return Vec3{ m_camera.Position };
 }
 
 void Camera::SetPos(Vec3 const& pos)
 {
-	m_camera.x = pos.x;
-	m_camera.y = pos.y;
-	m_camera.z = pos.z;
+	m_camera.Position = Vector3i(pos.x, pos.y, pos.z);
 }
 
 std::string Camera::GetName() const
 {
-	return m_camera.luaName;
+	return m_camera.LuaName;
 }
 
 void Camera::SetName(std::string const & id) 
@@ -87,8 +85,8 @@ void Camera::SetName(std::string const & id)
 	if (s_callbackSetName(id, m_camera))
 	{
 		// remove the old name if we have one
-		s_callbackRemoveName(m_camera.luaName);
-		m_camera.luaName = id;
+		s_callbackRemoveName(m_camera.LuaName);
+		m_camera.LuaName = id;
 	}
 	else
 	{
@@ -99,7 +97,7 @@ void Camera::SetName(std::string const & id)
 
 short Camera::GetRoom() const
 {
-	return m_camera.roomNumber;
+	return m_camera.RoomNumber;
 }
 
 void Camera::SetRoom(short room)
@@ -112,5 +110,5 @@ void Camera::SetRoom(short room)
 		return;
 	}
 
-	m_camera.roomNumber = room;
+	m_camera.RoomNumber = room;
 }

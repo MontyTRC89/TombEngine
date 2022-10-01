@@ -1,5 +1,7 @@
 #pragma once
 
+using std::string;
+
 struct PoseData;
 
 // TODO: Clean this out. Move every struct into an appropriate file. Let's stop dumping everything in here.
@@ -28,157 +30,110 @@ struct RendererRectangle
 	}
 };
 
-struct LEVEL_CAMERA_INFO
+struct LevelCameraInfo
 {
-	int x;
-	int y;
-	int z;
-	int roomNumber;
-	int flags;
-	int speed;
-	std::string luaName;
+	Vector3i Position	= Vector3i::Zero;
+	int		 RoomNumber	= 0;
+	int		 Flags		= 0;
+	int		 Speed		= 1;
+	string	 LuaName	= "";
 
-	LEVEL_CAMERA_INFO()
+	LevelCameraInfo()
 	{
-		this->x = 0;
-		this->y = 0;
-		this->z = 0;
-		this->roomNumber = 0;
-		this->flags = 0x0;
-		this->speed = 1;
 	}
 
-	LEVEL_CAMERA_INFO(int xPos, int yPos, int zPos)
+	LevelCameraInfo(int xPos, int yPos, int zPos)
 	{
-		this->x = xPos;
-		this->y = yPos;
-		this->z = zPos;
-		this->roomNumber = 0;
-		this->flags = 0x0;
-		this->speed = 1;
+		this->Position = Vector3i(xPos, yPos, zPos);
 	}
 
-	LEVEL_CAMERA_INFO(int xPos, int yPos, int zPos, short roomNumber)
+	LevelCameraInfo(int xPos, int yPos, int zPos, short roomNumber)
 	{
-		this->x = xPos;
-		this->y = yPos;
-		this->z = zPos;
-		this->roomNumber = roomNumber;
-		this->flags = 0x0;
-		this->speed = 1;
+		this->Position = Vector3i(xPos, yPos, zPos);
+		this->RoomNumber = roomNumber;
 	}
 
-	LEVEL_CAMERA_INFO(int xPos, int yPos, int zPos, short flags, bool isFlags) // Use isFlags to use flag instead of new data.
+	// Use isFlags to use flag instead of new data.
+	LevelCameraInfo(int xPos, int yPos, int zPos, short flags, bool isFlags)
 	{
-		this->x = xPos;
-		this->y = yPos;
-		this->z = zPos;
-		this->roomNumber = 0;
-		this->flags = flags;
-		this->speed = 1;
+		this->Position = Vector3i(xPos, yPos, zPos);
+		this->Flags = flags;
 	}
 
-	LEVEL_CAMERA_INFO(int xPos, int yPos, int zPos, short roomNumber, short newflags)
+	LevelCameraInfo(int xPos, int yPos, int zPos, short roomNumber, short newflags)
 	{
-		this->x = xPos;
-		this->y = yPos;
-		this->z = zPos;
-		this->roomNumber = roomNumber;
-		this->flags = newflags;
-		this->speed = 1;
+		this->Position = Vector3i(xPos, yPos, zPos);
+		this->RoomNumber = roomNumber;
+		this->Flags = newflags;
 	}
 };
 
-struct SINK_INFO
+struct SinkInfo
 {
-	int x;
-	int y;
-	int z;
-	int strength;
-	int boxIndex;
-	std::string luaName;
+	Vector3i Position = Vector3i::Zero;
+	int		 Strength = 0;
+	int		 BoxIndex = 0;
+	string	 LuaName  = "";
 
-	SINK_INFO()
+	SinkInfo()
 	{
-		this->x = 0;
-		this->y = 0;
-		this->z = 0;
-		this->strength = 0;
-		this->boxIndex = 0;
 	}
 
-	SINK_INFO(int xPos, int yPos, int zPos)
+	SinkInfo(int xPos, int yPos, int zPos)
 	{
-		this->x = xPos;
-		this->y = yPos;
-		this->z = zPos;
-		this->strength = 0;
-		this->boxIndex = 0;
+		this->Position = Vector3i(xPos, yPos, zPos);
 	}
 
-	SINK_INFO(int xPos, int yPos, int zPos, short strength)
+	SinkInfo(int xPos, int yPos, int zPos, short strength)
 	{
-		this->x = xPos;
-		this->y = yPos;
-		this->z = zPos;
-		this->strength = strength;
-		this->boxIndex = 0;
+		this->Position = Vector3i(xPos, yPos, zPos);
+		this->Strength = strength;
 	}
 
-	SINK_INFO(int xPos, int yPos, int zPos, short strength, short boxIndex)
+	SinkInfo(int xPos, int yPos, int zPos, short strength, short boxIndex)
 	{
-		this->x = xPos;
-		this->y = yPos;
-		this->z = zPos;
-		this->strength = strength;
-		this->boxIndex = boxIndex;
+		this->Position = Vector3i(xPos, yPos, zPos);
+		this->Strength = strength;
+		this->BoxIndex = boxIndex;
 	}
 };
 
-struct SOUND_SOURCE_INFO
+struct SoundSourceInfo
 {
-	int x;
-	int y;
-	int z;
-	int soundId;
-	int flags;
-	std::string luaName;
+	Vector3i Position = Vector3i::Zero;
+	int		 SoundID  = 0;
+	int		 Flags	  = 0;
+	string	 LuaName  = "";
 
-	SOUND_SOURCE_INFO()
+	SoundSourceInfo()
 	{
-		this->x = 0;
-		this->y = 0;
-		this->z = 0;
-		this->soundId = 0;
-		this->flags = 0x0;
 	}
 
-	SOUND_SOURCE_INFO(int xPos, int yPos, int zPos)
+	SoundSourceInfo(int xPos, int yPos, int zPos)
 	{
-		this->x = xPos;
-		this->y = yPos;
-		this->z = zPos;
-		this->soundId = 0;
-		this->flags = 0x0;
+		this->Position = Vector3i(xPos, yPos, zPos);
 	}
 
-	SOUND_SOURCE_INFO(int xPos, int yPos, int zPos, short soundID)
+	SoundSourceInfo(int xPos, int yPos, int zPos, short soundID)
 	{
-		this->x = xPos;
-		this->y = yPos;
-		this->z = zPos;
-		this->soundId = soundID;
-		this->flags = 0x0;
+		this->Position = Vector3i(xPos, yPos, zPos);
+		this->SoundID = soundID;
 	}
 
-	SOUND_SOURCE_INFO(int xPos, int yPos, int zPos, short soundID, short newFlags)
+	SoundSourceInfo(int xPos, int yPos, int zPos, short soundID, short newflags)
 	{
-		this->x = xPos;
-		this->y = yPos;
-		this->z = zPos;
-		this->soundId = soundID;
-		this->flags = newFlags;
+		this->Position = Vector3i(xPos, yPos, zPos);
+		this->SoundID = soundID;
+		this->Flags = newflags;
 	}
+};
+
+struct VECTOR
+{
+	int vx;
+	int vy;
+	int vz;
+	int pad;
 };
 
 struct CVECTOR
