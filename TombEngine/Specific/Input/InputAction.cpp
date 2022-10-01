@@ -94,7 +94,7 @@ namespace TEN::Input
 
 	bool InputAction::IsClicked()
 	{
-		return (Value != 0.0f && PrevValue == 0.0f);
+		return ((Value != 0.0f) && (PrevValue == 0.0f));
 	}
 
 	// To avoid desync on the second pulse, ensure initialDelayInSeconds is a multiple of delayInSeconds.
@@ -131,7 +131,7 @@ namespace TEN::Input
 
 	bool InputAction::IsReleased(float maxDelayInSeconds)
 	{
-		return (Value == 0.0f && PrevValue != 0.0f && TimeActive <= maxDelayInSeconds);
+		return ((Value == 0.0f) && (PrevValue != 0.0f) && (TimeActive <= maxDelayInSeconds));
 	}
 
 	void InputAction::UpdateValue(float value)
