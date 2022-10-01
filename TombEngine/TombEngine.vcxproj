@@ -214,6 +214,7 @@ CALL gen.bat</Command>
     <ClInclude Include="Objects\Utils\VehicleHelpers.h" />
     <ClInclude Include="Renderer\ConstantBuffers\AlphaTestBuffer.h" />
     <ClInclude Include="Renderer\ConstantBuffers\PostProcessBuffer.h" />
+    <ClInclude Include="Renderer\RendererRectangle.h" />
     <ClInclude Include="Renderer\Structures\RendererBone.h" />
     <ClInclude Include="Renderer\Structures\RendererDisplayMode.h" />
     <ClInclude Include="Renderer\Structures\RendererLight.h" />

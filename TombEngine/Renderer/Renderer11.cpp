@@ -7,6 +7,7 @@
 #include "Utils.h"
 #include "VertexBuffer/VertexBuffer.h"
 #include "RenderView/RenderView.h"
+#include "Renderer/RendererRectangle.h"
 
 using std::vector;
 

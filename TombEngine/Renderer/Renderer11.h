@@ -4,6 +4,7 @@
 #include <SpriteFont.h>
 #include <PrimitiveBatch.h>
 #include <d3d9types.h>
+
 #include "Renderer/Renderer11Enums.h"
 #include "Renderer/ConstantBuffers/StaticBuffer.h"
 #include "Renderer/ConstantBuffers/LightBuffer.h"
@@ -42,6 +43,7 @@
 #include "Renderer/Structures/RendererRoom.h"
 
 struct CAMERA_INFO;
+struct RendererRectangle;
 
 namespace TEN::Renderer
 {
