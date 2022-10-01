@@ -3,7 +3,10 @@
 #include "Objects/NamedBase.h"
 #include "Math/Math.h"
 
-namespace sol {
+struct SoundSourceInfo;
+
+namespace sol
+{
 	class state;
 }
 class Vec3;

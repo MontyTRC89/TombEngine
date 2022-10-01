@@ -1,10 +1,11 @@
 #include "framework.h"
-
-#include "ScriptAssert.h"
 #include "SoundSourceObject.h"
-#include "Vec3/Vec3.h"
-#include "ScriptUtil.h"
+
 #include "ReservedScriptNames.h"
+#include "Sound/sound.h"
+#include "ScriptAssert.h"
+#include "ScriptUtil.h"
+#include "Vec3/Vec3.h"
 /***
 Sound source
 
@@ -15,10 +16,10 @@ Sound source
 static auto index_error = index_error_maker(SoundSource, ScriptReserved_SoundSource);
 static auto newindex_error = newindex_error_maker(SoundSource, ScriptReserved_SoundSource);
 
-SoundSource::SoundSource(SoundSourceInfo & ref) : m_soundSource{ref}
+SoundSource::SoundSource(SoundSourceInfo& ref) : m_soundSource{ref}
 {};
 
-void SoundSource::Register(sol::table & parent)
+void SoundSource::Register(sol::table& parent)
 {
 	parent.new_usertype<SoundSource>(ScriptReserved_SoundSource,
 		sol::no_constructor, // ability to spawn new ones could be added later
@@ -73,7 +74,7 @@ std::string SoundSource::GetName() const
 	return m_soundSource.LuaName;
 }
 
-void SoundSource::SetName(std::string const & id) 
+void SoundSource::SetName(std::string const& id) 
 {
 	if (!ScriptAssert(!id.empty(), "Name cannot be blank. Not setting name."))
 	{

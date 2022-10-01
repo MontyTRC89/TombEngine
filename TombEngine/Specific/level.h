@@ -3,6 +3,7 @@
 #include "Game/control/volumetriggerer.h"
 #include "Game/items.h"
 #include "Game/room.h"
+#include "Sound/sound.h"
 #include "Specific/IO/ChunkId.h"
 #include "Specific/IO/ChunkReader.h"
 #include "Specific/IO/LEB128.h"

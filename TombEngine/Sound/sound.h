@@ -1,6 +1,7 @@
 #pragma once
 #include <bass.h>
 #include <bass_fx.h>
+
 #include "Game/control/control.h"
 #include "Sound/sound_effects.h"
 
@@ -105,6 +106,36 @@ struct SoundTrackInfo
 	std::string Name{};
 	SoundTrackType Mode{ SoundTrackType::OneShot };
 	int Mask{ 0 };
+};
+
+struct SoundSourceInfo
+{
+	Vector3i Position = Vector3i::Zero;
+	int		 SoundID = 0;
+	int		 Flags = 0;
+	string	 LuaName = "";
+
+	SoundSourceInfo()
+	{
+	}
+
+	SoundSourceInfo(int xPos, int yPos, int zPos)
+	{
+		this->Position = Vector3i(xPos, yPos, zPos);
+	}
+
+	SoundSourceInfo(int xPos, int yPos, int zPos, short soundID)
+	{
+		this->Position = Vector3i(xPos, yPos, zPos);
+		this->SoundID = soundID;
+	}
+
+	SoundSourceInfo(int xPos, int yPos, int zPos, short soundID, short newflags)
+	{
+		this->Position = Vector3i(xPos, yPos, zPos);
+		this->SoundID = soundID;
+		this->Flags = newflags;
+	}
 };
 
 extern std::map<std::string, int> SoundTrackMap;
