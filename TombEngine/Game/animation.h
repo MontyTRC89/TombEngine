@@ -87,7 +87,7 @@ int GetFrameNumber(int objectID, int animNumber, int frameToStart);
 int GetFrameCount(int animNumber);
 int GetNextAnimState(ItemInfo* item);
 int GetNextAnimState(int objectID, int animNumber);
-bool GetChange(ItemInfo* item, ANIM_STRUCT* anim);
+bool GetChange(ItemInfo* item, const ANIM_STRUCT& anim);
 int GetFrame(ItemInfo* item, ANIM_FRAME* framePtr[], int* rate);
 ANIM_FRAME* GetBestFrame(ItemInfo* item);
 
