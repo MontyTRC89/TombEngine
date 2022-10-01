@@ -46,7 +46,7 @@ void AnimateShotgun(ItemInfo* laraItem, LaraWeaponType weaponType)
 
 	if (lara->LeftArm.GunSmoke > 0)
 	{
-		Vector3i pos;
+		auto pos = Vector3i::Zero;
 		if (weaponType == LaraWeaponType::HK)
 			pos = Vector3i(0, 228, 96);
 		else if (weaponType == LaraWeaponType::Shotgun)
@@ -311,6 +311,10 @@ void FireShotgun(ItemInfo* laraItem)
 
 	if (hasFired)
 	{
+		auto& ammo = GetAmmo(laraItem, LaraWeaponType::Shotgun);
+		if (!ammo.hasInfinite())
+			ammo--;
+
 		auto pos = GetJointPosition(laraItem, LM_RHAND, Vector3i(0, 1508, 32));
 		auto pos2 = GetJointPosition(laraItem, LM_RHAND, Vector3i(0, 228, 32));
 
@@ -337,7 +341,7 @@ void DrawShotgun(ItemInfo* laraItem, LaraWeaponType weaponType)
 {
 	auto* lara = GetLaraInfo(laraItem);
 
-	ItemInfo* item;
+	ItemInfo* item = nullptr;
 
 	if (lara->Control.Weapon.WeaponItem == NO_ITEM)
 	{
@@ -443,8 +447,8 @@ void FireHarpoon(ItemInfo* laraItem)
 {
 	auto* lara = GetLaraInfo(laraItem);
 
-	auto& ammos = GetAmmo(laraItem, LaraWeaponType::HarpoonGun);
-	if (!ammos)
+	auto& ammo = GetAmmo(laraItem, LaraWeaponType::HarpoonGun);
+	if (!ammo)
 		return;
 
 	lara->Control.Weapon.HasFired = true;
@@ -453,8 +457,8 @@ void FireHarpoon(ItemInfo* laraItem)
 	short itemNumber = CreateItem();
 	if (itemNumber != NO_ITEM)
 	{
-		if (!ammos.hasInfinite())
-			(ammos)--;
+		if (!ammo.hasInfinite())
+			ammo--;
 
 		auto* item = &g_Level.Items[itemNumber];
 
@@ -715,7 +719,7 @@ void FireGrenade(ItemInfo* laraItem)
 		AddActiveItem(itemNumber);
 
 		if (!ammo.hasInfinite())
-			(ammo)--;
+			ammo--;
 
 		item->ItemFlags[0] = (int)lara->Weapons[(int)LaraWeaponType::GrenadeLauncher].SelectedAmmo;
 
@@ -814,16 +818,16 @@ void GrenadeControl(short itemNumber)
 	{
 		aboveWater = false;
 		someFlag = false;
-		item->Animation.Velocity.y += (5.0f - item->Animation.Velocity.y) / 2.0f;
-		item->Animation.Velocity.z -= item->Animation.Velocity.z / 4.0f;
+		item->Animation.Velocity.y += (5.0f - item->Animation.Velocity.y) / 2;
+		item->Animation.Velocity.z -= item->Animation.Velocity.z / 4;
 
 		if (item->Animation.Velocity.z)
 		{
-			item->Pose.Orientation.z += (short((item->Animation.Velocity.z / 16.0f) + 3.0f) * ANGLE(1.0f));
+			item->Pose.Orientation.z += (short((item->Animation.Velocity.z / 16) + 3.0f) * ANGLE(1.0f));
 			if (item->Animation.RequiredState)
-				item->Pose.Orientation.y += (short((item->Animation.Velocity.z / 4.0f) + 3.0f) * ANGLE(1.0f));
+				item->Pose.Orientation.y += (short((item->Animation.Velocity.z / 4) + 3.0f) * ANGLE(1.0f));
 			else
-				item->Pose.Orientation.x += (short((item->Animation.Velocity.z / 4.0f) + 3.0f) * ANGLE(1.0f));
+				item->Pose.Orientation.x += (short((item->Animation.Velocity.z / 4) + 3.0f) * ANGLE(1.0f));
 		}
 	}
 	else
@@ -834,11 +838,11 @@ void GrenadeControl(short itemNumber)
 
 		if (item->Animation.Velocity.z)
 		{
-			item->Pose.Orientation.z += (short((item->Animation.Velocity.z / 4.0f) + 7.0f) * ANGLE(1.0f));
+			item->Pose.Orientation.z += (short((item->Animation.Velocity.z / 4) + 7.0f) * ANGLE(1.0f));
 			if (item->Animation.RequiredState)
-				item->Pose.Orientation.y += (short((item->Animation.Velocity.z / 2.0f) + 7.0f) * ANGLE(1.0f));
+				item->Pose.Orientation.y += (short((item->Animation.Velocity.z / 2) + 7.0f) * ANGLE(1.0f));
 			else
-				item->Pose.Orientation.x += (short((item->Animation.Velocity.z / 2.0f) + 7.0f) * ANGLE(1.0f));
+				item->Pose.Orientation.x += (short((item->Animation.Velocity.z / 2) + 7.0f) * ANGLE(1.0f));
 		}
 	}
 
@@ -1055,7 +1059,7 @@ void GrenadeControl(short itemNumber)
 		SoundEffect(SFX_TR4_EXPLOSION1, &item->Pose, SoundEnvironment::Land, 0.7f, 0.5f);
 		SoundEffect(SFX_TR4_EXPLOSION2, &item->Pose);
 
-		// Setup the counter for spawned grenades in the case of flash and super grenades ammos
+		// Setup the counter for spawned grenades in the case of flash and super grenades ammo
 		if (item->ItemFlags[0] != (int)GrenadeType::Normal && item->ItemFlags[0] != (int)GrenadeType::Ultra)
 		{
 			item->MeshBits = 0;
@@ -1072,8 +1076,8 @@ void FireRocket(ItemInfo* laraItem)
 {
 	auto* lara = GetLaraInfo(laraItem);
 
-	auto& ammos = GetAmmo(laraItem, LaraWeaponType::RocketLauncher);
-	if (!ammos)
+	auto& ammo = GetAmmo(laraItem, LaraWeaponType::RocketLauncher);
+	if (!ammo)
 		return;
 
 	lara->Control.Weapon.HasFired = true;
@@ -1085,8 +1089,8 @@ void FireRocket(ItemInfo* laraItem)
 		item->ObjectNumber = ID_ROCKET;
 		item->RoomNumber = laraItem->RoomNumber;
 
-		if (!ammos.hasInfinite())
-			(ammos)--;
+		if (!ammo.hasInfinite())
+			ammo--;
 
 		auto jointPos = GetJointPosition(laraItem, LM_RHAND, Vector3i(0, 180, 72));
 
@@ -1351,8 +1355,8 @@ void FireCrossbow(ItemInfo* laraItem, PoseData* pos)
 {
 	auto* lara = GetLaraInfo(laraItem);
 
-	auto& ammos = GetAmmo(laraItem, LaraWeaponType::Crossbow);
-	if (!ammos)
+	auto& ammo = GetAmmo(laraItem, LaraWeaponType::Crossbow);
+	if (!ammo)
 		return;
 
 	lara->Control.Weapon.HasFired = true;
@@ -1364,8 +1368,8 @@ void FireCrossbow(ItemInfo* laraItem, PoseData* pos)
 		item->ObjectNumber = ID_CROSSBOW_BOLT;
 		item->Color = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
 
-		if (!ammos.hasInfinite())
-			(ammos)--;
+		if (!ammo.hasInfinite())
+			ammo--;
 
 		if (pos)
 		{
@@ -1436,13 +1440,13 @@ void CrossbowBoltControl(short itemNumber)
 	auto* lara = GetLaraInfo(LaraItem);
 	auto* item = &g_Level.Items[itemNumber];
 
-	// Store orevious position for later
+	// Store previous position for later
 	auto prevPos = item->Pose.Position;
 
 	bool aboveWater = false;
 	bool explode = false;
 
-	// Update speed and check if above water
+	// Update speed and check if above water.
 	if (TestEnvironment(ENV_FLAG_WATER, item))
 	{
 		auto bubblePos = item->Pose.Position;
@@ -1469,7 +1473,7 @@ void CrossbowBoltControl(short itemNumber)
 		// I have hit a solid wall, this is the end for the bolt
 		item->Pose.Position = prevPos;
 
-		// If ammos are normal, then just shatter the bolt and quit
+		// If ammo is normal, simply shatter the bolt and exit.
 		if (item->ItemFlags[0] != (int)CrossbowBoltType::Explosive)
 		{
 			ExplodeItemNode(item, 0, 0, BODY_EXPLODE);
@@ -1506,7 +1510,7 @@ void CrossbowBoltControl(short itemNumber)
 
 		foundCollidedObjects = true;
 
-		// If explosive ammos selected and item hit, then blast everything
+		// If explosive ammo selected and item hit, then blast everything
 		if (item->ItemFlags[0] == (int)CrossbowBoltType::Explosive)
 			explode = true;
 
@@ -1537,7 +1541,7 @@ void CrossbowBoltControl(short itemNumber)
 						// Normal hit
 						HitTarget(LaraItem, currentItem, (GameVector*)& item->Pose, Weapons[(int)LaraWeaponType::Crossbow].Damage << item->ItemFlags[0], 0);
 
-						// Poisoned ammos
+						// Poisone ammo
 						if (item->ItemFlags[0] == (int)CrossbowBoltType::Poison)
 						{
 							if (currentItem->Data.is<CreatureInfo>())
@@ -1668,6 +1672,10 @@ void FireHK(ItemInfo* laraItem, int mode)
 
 	if (FireWeapon(LaraWeaponType::HK, lara->TargetEntity, laraItem, angles) != FireWeaponType::NoAmmo)
 	{
+		auto& ammo = GetAmmo(laraItem, LaraWeaponType::HK);
+		if (!ammo.hasInfinite())
+			ammo--;
+
 		lara->LeftArm.GunSmoke = 12;
 
 		TriggerGunShell(1, ID_GUNSHELL, LaraWeaponType::HK);
@@ -1698,7 +1706,7 @@ void RifleHandler(ItemInfo* laraItem, LaraWeaponType weaponType)
 		lara->ExtraTorsoRot.y = lara->LeftArm.Orientation.y;
 
 		if (Camera.oldType != CameraType::Look && !BinocularRange)
-			lara->ExtraHeadRot = { 0, 0, 0 };
+			lara->ExtraHeadRot = EulerAngles::Zero;
 	}
 
 	if (weaponType == LaraWeaponType::Revolver)

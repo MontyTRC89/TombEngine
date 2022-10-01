@@ -753,13 +753,13 @@ void HitTarget(ItemInfo* laraItem, ItemInfo* targetEntity, GameVector* hitPos, i
 	if (targetEntity->IsCreature())
 		GetCreatureInfo(targetEntity)->HurtByLara = true;
 
-	auto* object = &Objects[targetEntity->ObjectNumber];
+	const auto& object = Objects[targetEntity->ObjectNumber];
 
 	if (hitPos != nullptr)
 	{
-		if (object->hitEffect != HIT_NONE)
+		if (object.hitEffect != HIT_NONE)
 		{
-			switch (object->hitEffect)
+			switch (object.hitEffect)
 			{
 			case HIT_BLOOD:
 				if (targetEntity->ObjectNumber == ID_BADDY2 &&
@@ -796,7 +796,7 @@ void HitTarget(ItemInfo* laraItem, ItemInfo* targetEntity, GameVector* hitPos, i
 		}
 	}
 
-	if (!object->undead || grenade)
+	if (!object.undead || grenade)
 	{
 		if (targetEntity->HitPoints > 0)
 		{
@@ -823,11 +823,11 @@ FireWeaponType FireWeapon(LaraWeaponType weaponType, ItemInfo* targetEntity, Ite
 	if (!ammo.hasInfinite())
 		ammo--;
 
-	auto* weapon = &Weapons[(int)weaponType];
+	const auto& weapon = Weapons[(int)weaponType];
 
 	auto wobbledArmOrient = EulerAngles(
-		armOrient.x + (Random::GenerateAngle(0, ANGLE(180.0f)) - ANGLE(90.0f)) * weapon->ShotAccuracy / 65536,
-		armOrient.y + (Random::GenerateAngle(0, ANGLE(180.0f)) - ANGLE(90.0f)) * weapon->ShotAccuracy / 65536,
+		armOrient.x + (Random::GenerateAngle(0, ANGLE(180.0f)) - ANGLE(90.0f)) * weapon.ShotAccuracy / 65536,
+		armOrient.y + (Random::GenerateAngle(0, ANGLE(180.0f)) - ANGLE(90.0f)) * weapon.ShotAccuracy / 65536,
 		0
 	);
 
@@ -837,7 +837,7 @@ FireWeaponType FireWeapon(LaraWeaponType weaponType, ItemInfo* targetEntity, Ite
 	// Calculate ray from wobbled orientation.
 	auto directionNorm = wobbledArmOrient.ToDirection();
 	auto origin = pos.ToVector3();
-	auto target = origin + (directionNorm * weapon->TargetDist);
+	auto target = origin + (directionNorm * weapon.TargetDist);
 	auto ray = Ray(origin, directionNorm);
 
 	int num = GetSpheres(targetEntity, CreatureSpheres, SPHERES_SPACE_WORLD, Matrix::Identity);
@@ -923,7 +923,7 @@ FireWeaponType FireWeapon(LaraWeaponType weaponType, ItemInfo* targetEntity, Ite
 			// it's really weird but we decided to replicate original behaviour until we'll fully understand what is happening
 			// with weapons
 			if (!GetTargetOnLOS(&vOrigin, &vTarget, false, true))
-				HitTarget(laraItem, targetEntity, &vTarget, weapon->Damage, false);
+				HitTarget(laraItem, targetEntity, &vTarget, weapon.Damage, false);
 		//}
 		
 		return FireWeaponType::PossibleHit;
