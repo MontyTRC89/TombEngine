@@ -257,6 +257,7 @@ int FlowHandler::GetLevelNumber(std::string const& fileName)
 			return i;
 	}
 
+	TENLog("Specified level filename was not found in script. Level won't be loaded. Please edit level filename in gameflow.lua.");
 	return -1;
 }
 
@@ -310,7 +311,7 @@ bool FlowHandler::DoFlow()
 {
 	// We start with the title level, if no other index is specified
 	if (CurrentLevel == -1)
-		CurrentLevel = 0;
+		CurrentLevel = SystemNameHash = 0;
 
 	SelectedLevelForNewGame = 0;
 	SelectedSaveGame = 0;

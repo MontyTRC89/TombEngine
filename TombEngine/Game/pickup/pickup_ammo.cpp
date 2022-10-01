@@ -41,10 +41,10 @@ bool TryModifyingAmmo(LaraInfo& lara, GAME_OBJECT_ID objectID, std::optional<int
 	if (-1 == arrayPos)
 		return false;
 
-	AmmoPickupInfo info = kAmmo[arrayPos];
+	auto ammoPickup = kAmmo[arrayPos];
 
-	auto& currentWeapon = lara.Weapons[(int)info.LaraWeaponType];
-	auto& currentAmmo = currentWeapon.Ammo[(int)info.AmmoType];
+	auto& currentWeapon = lara.Weapons[(int)ammoPickup.LaraWeaponType];
+	auto& currentAmmo = currentWeapon.Ammo[(int)ammoPickup.AmmoType];
 
 	switch(modType)
 	{
@@ -56,10 +56,11 @@ bool TryModifyingAmmo(LaraInfo& lara, GAME_OBJECT_ID objectID, std::optional<int
 	default:
 		if (!currentAmmo.HasInfinite())
 		{
-			int defaultModify = modType == ModificationType::Add ? info.Amount : -info.Amount;
-			int newVal = int{ currentAmmo.GetCount() } + (amount.has_value() ? amount.value() : defaultModify);
+			int defaultModify = modType == ModificationType::Add ? ammoPickup.Amount : -ammoPickup.Amount;
+			int newVal = (int)currentAmmo.GetCount() + (amount.has_value() ? amount.value() : defaultModify);
 			currentAmmo = std::max(0, newVal);
 		}
+
 		break;
 	};
 
