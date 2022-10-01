@@ -2,6 +2,7 @@ Version 1.0.3
 =============
 
 * Fix dodgy weapon lock angle constraints.
+* Fix wrong shotgun ammo pickup amount.
 
 
 Version 1.0.2
