@@ -106,7 +106,6 @@ namespace TEN::Input
 		if (!this->IsHeld() || PrevTimeActive == 0.0f || TimeActive == PrevTimeActive)
 			return false;
 
-
 		// TODO: Because our delta time is a placeholder constant and we cannot properly account for time drift,
 		// count whole frames instead of actual time passed for now.
 		float activeDelayAsFrameTime = (TimeActive > round(initialDelayInSeconds / DELTA_TIME)) ? round(delayInSeconds / DELTA_TIME) : round(initialDelayInSeconds / DELTA_TIME);
