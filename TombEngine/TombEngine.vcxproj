@@ -594,7 +594,6 @@ CALL gen.bat</Command>
     <ClInclude Include="Specific\savegame\flatbuffers\ten_savegame_generated.h" />
     <ClInclude Include="Specific\setup.h" />
     <ClInclude Include="Specific\clock.h" />
-    <ClInclude Include="Specific\trmath.h" />
     <ClInclude Include="Specific\trutils.h" />
     <ClInclude Include="Specific\winmain.h" />
     <ClInclude Include="targetver.h" />
