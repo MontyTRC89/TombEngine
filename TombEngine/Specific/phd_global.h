@@ -366,7 +366,7 @@ struct GameVector
 		this->boxNumber = boxNumber;
 	}
 
-	GameVector(Vector3Int& pos)
+	GameVector(const Vector3Int& pos)
 	{
 		this->x = pos.x;
 		this->y = pos.y;
@@ -375,7 +375,7 @@ struct GameVector
 		this->boxNumber = 0;
 	}
 
-	GameVector(Vector3Int& pos, short roomNumber)
+	GameVector(const Vector3Int& pos, short roomNumber)
 	{
 		this->x = pos.x;
 		this->y = pos.y;
@@ -385,64 +385,41 @@ struct GameVector
 	}
 };
 
-struct LEVEL_CAMERA_INFO
+struct LevelCameraInfo
 {
-	int x;
-	int y;
-	int z;
-	int roomNumber;
-	int flags;
-	int speed;
-	std::string luaName;
+	Vector3Int Position = Vector3Int::Zero;
+	int RoomNumber		= 0;
+	int Flags			= 0;
+	int Speed			= 1;
+	std::string LuaName = "";
 
-	LEVEL_CAMERA_INFO()
+	LevelCameraInfo()
 	{
-		this->x = 0;
-		this->y = 0;
-		this->z = 0;
-		this->roomNumber = 0;
-		this->flags = 0x0;
-		this->speed = 1;
 	}
 
-	LEVEL_CAMERA_INFO(int xPos, int yPos, int zPos)
+	LevelCameraInfo(int xPos, int yPos, int zPos)
 	{
-		this->x = xPos;
-		this->y = yPos;
-		this->z = zPos;
-		this->roomNumber = 0;
-		this->flags = 0x0;
-		this->speed = 1;
+		this->Position = Vector3Int(xPos, yPos, zPos);
 	}
 
-	LEVEL_CAMERA_INFO(int xPos, int yPos, int zPos, short room)
+	LevelCameraInfo(int xPos, int yPos, int zPos, short roomNumber)
 	{
-		this->x = xPos;
-		this->y = yPos;
-		this->z = zPos;
-		this->roomNumber = room;
-		this->flags = 0x0;
-		this->speed = 1;
+		this->Position = Vector3Int(xPos, yPos, zPos);
+		this->RoomNumber = roomNumber;
 	}
 
-	LEVEL_CAMERA_INFO(int xPos, int yPos, int zPos, short flags, bool isFlags) // use isFlags to use flag instead of newdata !
+	// Use isFlags to use flag instead of new data.
+	LevelCameraInfo(int xPos, int yPos, int zPos, short flags, bool isFlags)
 	{
-		this->x = xPos;
-		this->y = yPos;
-		this->z = zPos;
-		this->roomNumber = 0;
-		this->flags = flags;
-		this->speed = 1;
+		this->Position = Vector3Int(xPos, yPos, zPos);
+		this->Flags = flags;
 	}
 
-	LEVEL_CAMERA_INFO(int xPos, int yPos, int zPos, short room, short newflags)
+	LevelCameraInfo(int xPos, int yPos, int zPos, short roomNumber, short newflags)
 	{
-		this->x = xPos;
-		this->y = yPos;
-		this->z = zPos;
-		this->roomNumber = room;
-		this->flags = newflags;
-		this->speed = 1;
+		this->Position = Vector3Int(xPos, yPos, zPos);
+		this->RoomNumber = roomNumber;
+		this->Flags = newflags;
 	}
 };
 
