@@ -74,25 +74,6 @@ int phd_atan(int x, int y)
 	return FROM_RAD(atan2(y, x));
 }
 
-const Vector3 GetRandomVector()
-{
-	auto vector = Vector3(GenerateFloat(-1, 1), GenerateFloat(-1, 1), GenerateFloat(-1, 1));
-	vector.Normalize();
-	return vector;
-}
-
-const Vector3 GetRandomVectorInCone(const Vector3& direction, const float angleDegrees)
-{
-	float x = GenerateFloat(-angleDegrees, angleDegrees) * RADIAN;
-	float y = GenerateFloat(-angleDegrees, angleDegrees) * RADIAN;
-	float z = GenerateFloat(-angleDegrees, angleDegrees) * RADIAN;
-	auto matrix = Matrix::CreateRotationX(x) * Matrix::CreateRotationY(y) * Matrix::CreateRotationZ(z);
-
-	auto result = direction.TransformNormal(direction, matrix);
-	result.Normalize();
-	return result;
-}
-
 int mGetAngle(int x1, int y1, int x2, int y2)
 {
 	return (65536 - phd_atan(x2 - x1, y2 - y1)) % 65536;

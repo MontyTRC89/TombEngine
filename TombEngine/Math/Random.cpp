@@ -3,6 +3,8 @@
 
 #include <random>
 
+#include "Math/Constants.h"
+
 namespace TEN::Math::Random
 {
 	static std::mt19937 Engine;
@@ -20,6 +22,25 @@ namespace TEN::Math::Random
 	short GenerateAngle(short low, short high)
 	{
 		return (short)GenerateInt(low, high);
+	}
+
+	Vector3 GenerateVector3()
+	{
+		auto vector = Vector3(GenerateFloat(-1.0f, 1.0f), GenerateFloat(-1.0f, 1.0f), GenerateFloat(-1.0f, 1.0f));
+		vector.Normalize();
+		return vector;
+	}
+
+	Vector3 GenerateVector3InCone(const Vector3& direction, float angleInDegrees)
+	{
+		float x = GenerateFloat(-angleInDegrees, angleInDegrees) * RADIAN;
+		float y = GenerateFloat(-angleInDegrees, angleInDegrees) * RADIAN;
+		float z = GenerateFloat(-angleInDegrees, angleInDegrees) * RADIAN;
+		auto matrix = Matrix::CreateRotationX(x) * Matrix::CreateRotationY(y) * Matrix::CreateRotationZ(z);
+
+		auto vector = direction.TransformNormal(direction, matrix);
+		vector.Normalize();
+		return vector;
 	}
 
 	bool TestProbability(float probability)

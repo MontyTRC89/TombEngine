@@ -147,7 +147,7 @@ namespace TEN::Effects::Smoke
 					float size = Random::GenerateFloat(48, 80);
 					s.sourceSize = size * 2;
 					s.destinationSize = size * 16;
-					s.velocity = GetRandomVectorInCone(direction,25);
+					s.velocity = Random::GenerateVector3InCone(direction, 25);
 					s.velocity *= Random::GenerateFloat(0, 32);
 				}
 				else
@@ -155,7 +155,7 @@ namespace TEN::Effects::Smoke
 					float size = Random::GenerateFloat(48, 80);
 					s.sourceSize = size;
 					s.destinationSize = size * 8;
-					s.velocity = GetRandomVectorInCone(direction,3);
+					s.velocity = Random::GenerateVector3InCone(direction, 3);
 					s.velocity *= Random::GenerateFloat(0, 16);
 				}
 			}
@@ -167,7 +167,7 @@ namespace TEN::Effects::Smoke
 				s.terminalVelocity = 0;
 				s.friction = 0.88f;
 				s.life = Random::GenerateFloat(60, 90);
-				s.velocity = GetRandomVectorInCone(direction, 10);
+				s.velocity = Random::GenerateVector3InCone(direction, 10);
 				s.velocity *= Random::GenerateFloat(16, 30);
 			}
 		}
@@ -176,7 +176,7 @@ namespace TEN::Effects::Smoke
 			float size = (float)((GetRandomControl() & 0x0F) + 48); // -TriggerGunSmoke_SubFunction(weaponType);
 
 			if (weaponType == LaraWeaponType::RocketLauncher)
-				s.sourceColor = {0.75,0.75,1,1};
+				s.sourceColor = { 0.75, 0.75, 1, 1 };
 
 			s.sourceSize = size / 2;
 			s.destinationSize = size * 4;
@@ -188,7 +188,7 @@ namespace TEN::Effects::Smoke
 
 		s.position = Vector3(x, y, z);
 		s.position += Vector3(Random::GenerateFloat(-8, 8), Random::GenerateFloat(-8, 8), Random::GenerateFloat(-8, 8));
-		s.angularVelocity = Random::GenerateFloat(-PI / 4, PI / 4);
+		s.angularVelocity = Random::GenerateFloat(-PI_DIV_4, PI_DIV_4);
 		s.angularDrag = 0.95f;
 		s.room = LaraItem->RoomNumber;
 	}
@@ -220,12 +220,12 @@ namespace TEN::Effects::Smoke
 	{
 		auto& s = GetFreeSmokeParticle();
 		s = {};
-		s.position = Vector3(x, y, z) + Vector3(Random::GenerateFloat(8, 16), Random::GenerateFloat(8, 16), Random::GenerateFloat(8, 16));
+		s.position = Vector3(x, y, z) + Vector3(Random::GenerateFloat(8.0f, 16.0f), Random::GenerateFloat(8.0f, 16.0f), Random::GenerateFloat(8.0f, 16.0f));
 		s.sourceColor = Vector4(0.8f, 0.8f, 1, 1);
 		s.destinationColor = Vector4(0, 0, 0, 0);
-		s.sourceSize = Random::GenerateFloat(32, 64);
+		s.sourceSize = Random::GenerateFloat(32.0f, 64.0f);
 		s.active = true;
-		s.velocity = GetRandomVector() * Random::GenerateFloat(1, 3);
+		s.velocity = Random::GenerateVector3() * Random::GenerateFloat(1.0f, 3.0f);
 		s.affectedByWind = true;
 		s.friction = 0.979f;
 		s.gravity = -0.1f;
