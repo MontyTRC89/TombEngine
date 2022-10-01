@@ -8,6 +8,7 @@
 #include "Specific/IO/ChunkReader.h"
 #include "Specific/IO/LEB128.h"
 #include "Specific/IO/Streams.h"
+#include "Specific/LevelCameraInfo.h"
 #include "Specific/newtypes.h"
 
 #define AddPtr(p, t, n) p = (t*)((char*)(p) + (ptrdiff_t)(n));

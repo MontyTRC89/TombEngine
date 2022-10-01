@@ -275,6 +275,7 @@ CALL gen.bat</Command>
     <ClInclude Include="Scripting\ReservedScriptNames.h" />
     <ClInclude Include="Scripting\ScriptAssert.h" />
     <ClInclude Include="Scripting\ScriptUtil.h" />
+    <ClInclude Include="Specific\LevelCameraInfo.h" />
     <ClInclude Include="Specific\memory\LinearArrayBuffer.h" />
     <ClInclude Include="Game\memory\MemoryPoolAllocator.h" />
     <ClInclude Include="Specific\memory\Vector.h" />
@@ -284,7 +285,6 @@ CALL gen.bat</Command>
     <ClInclude Include="Renderer\RendererTransparentFace.h" />
     <ClInclude Include="Scripting\GameScriptFog.h" />
     <ClInclude Include="Specific\fast_vector.h" />
-    <ClInclude Include="Specific\phd_global.h" />
     <ClInclude Include="Game\memory\qmalloc.h" />
     <ClInclude Include="Game\pickup\pickuputil.h" />
     <ClInclude Include="Game\pickup\pickup_ammo.h" />

@@ -1,9 +1,11 @@
 #pragma once
 
 #include "Objects/NamedBase.h"
-#include "Math/Math.h"
 
-namespace sol {
+struct LevelCameraInfo;
+
+namespace sol
+{
 	class state;
 }
 class Vec3;

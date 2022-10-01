@@ -4,6 +4,7 @@
 #include "Math/Math.h"
 
 using namespace TEN::Math;
+using std::string;
 
 struct SinkInfo
 {

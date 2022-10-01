@@ -9,9 +9,7 @@
 #include "Math/Random.h"
 #include "Math/Solvers.h"
 
-// TODO: Phase these out.
 #include "Math/Legacy.h"
-#include "Specific/phd_global.h"
 
 namespace TEN::Math
 {
