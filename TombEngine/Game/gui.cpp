@@ -2578,7 +2578,7 @@ namespace TEN::Gui
 								break;
 
 							case ID_SHOTGUN_AMMO2_ITEM:
-								nummeup = Lara.Weapons[(int)LaraWeaponType::Shotgun].Ammo[(int)WeaponAmmoType::Ammo2].GetCount();
+								numMeUp = Lara.Weapons[(int)LaraWeaponType::Shotgun].Ammo[(int)WeaponAmmoType::Ammo2].GetCount();
 								break;
 
 							case ID_HK_AMMO_ITEM:
