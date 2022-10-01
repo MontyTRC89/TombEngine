@@ -1,5 +1,7 @@
 #pragma once
 
+using std::string;
+
 // TODO: Possibly rename these vector structs to more common standards later:
 // Vector2i, Vector3i, Vector3s. -- Sezz 2022.07.23
 struct Vector2Int
@@ -391,7 +393,7 @@ struct LevelCameraInfo
 	int RoomNumber		= 0;
 	int Flags			= 0;
 	int Speed			= 1;
-	std::string LuaName = "";
+	string LuaName		= "";
 
 	LevelCameraInfo()
 	{
@@ -425,10 +427,10 @@ struct LevelCameraInfo
 
 struct SinkInfo
 {
-	Vector3Int	Position = Vector3Int::Zero;
-	int			Strength = 0;
-	int			BoxIndex = 0;
-	std::string LuaName	 = "";
+	Vector3Int Position = Vector3Int::Zero;
+	int		   Strength = 0;
+	int		   BoxIndex = 0;
+	string	   LuaName	= "";
 
 	SinkInfo()
 	{
@@ -455,10 +457,10 @@ struct SinkInfo
 
 struct SoundSourceInfo
 {
-	Vector3Int	Position = Vector3Int::Zero;
-	int			SoundID	 = 0;
-	int			Flags	 = 0;
-	std::string LuaName	 = "";
+	Vector3Int Position = Vector3Int::Zero;
+	int		   SoundID	= 0;
+	int		   Flags	= 0;
+	string	   LuaName	= "";
 
 	SoundSourceInfo()
 	{
