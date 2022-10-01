@@ -28,7 +28,7 @@ void AnimateLara(ItemInfo* item)
 
 	auto* anim = &g_Level.Anims[item->Animation.AnimNumber];
 
-	if (anim->numberChanges > 0 && GetChange(item, *anim))
+	if (anim->numberChanges > 0 && GetStateDispatch(item, *anim))
 	{
 		anim = &g_Level.Anims[item->Animation.AnimNumber];
 		item->Animation.ActiveState = anim->ActiveState;
@@ -229,7 +229,7 @@ void AnimateItem(ItemInfo* item)
 
 	auto* anim = &g_Level.Anims[item->Animation.AnimNumber];
 
-	if (anim->numberChanges > 0 && GetChange(item, *anim))
+	if (anim->numberChanges > 0 && GetStateDispatch(item, *anim))
 	{
 		anim = &g_Level.Anims[item->Animation.AnimNumber];
 
@@ -353,7 +353,7 @@ void SetAnimation(ItemInfo* item, int animIndex, int frameToStart)
 	item->Animation.TargetState = item->Animation.ActiveState;
 }
 
-bool GetChange(ItemInfo* item, const ANIM_STRUCT& anim)
+bool GetStateDispatch(ItemInfo* item, const AnimData& anim)
 {
 	if (item->Animation.ActiveState == item->Animation.TargetState)
 		return false;
@@ -389,7 +389,7 @@ bool GetChange(ItemInfo* item, const ANIM_STRUCT& anim)
 BOUNDING_BOX* GetBoundsAccurate(ItemInfo* item)
 {
 	int rate = 0;
-	ANIM_FRAME* framePtr[2];
+	AnimFrame* framePtr[2];
 	
 	int frac = GetFrame(item, framePtr, &rate);
 	if (frac == 0)
@@ -406,10 +406,10 @@ BOUNDING_BOX* GetBoundsAccurate(ItemInfo* item)
 	}
 }
 
-ANIM_FRAME* GetBestFrame(ItemInfo* item)
+AnimFrame* GetBestFrame(ItemInfo* item)
 {
 	int rate = 0;
-	ANIM_FRAME* framePtr[2];
+	AnimFrame* framePtr[2];
 
 	int frac = GetFrame(item, framePtr, &rate);
 
@@ -419,7 +419,7 @@ ANIM_FRAME* GetBestFrame(ItemInfo* item)
 		return framePtr[1];
 }
 
-int GetFrame(ItemInfo* item, ANIM_FRAME* framePtr[], int* rate)
+int GetFrame(ItemInfo* item, AnimFrame* framePtr[], int* rate)
 {
 	int frame = item->Animation.FrameNumber;
 	const auto& anim = g_Level.Anims[item->Animation.AnimNumber];

@@ -98,11 +98,11 @@ struct LEVEL
 	std::vector<short> FloorData;
 	std::vector<MESH> Meshes;
 	std::vector<int> Bones;
-	std::vector<ANIM_STRUCT> Anims;
-	std::vector<CHANGE_STRUCT> Changes;
-	std::vector<RANGE_STRUCT> Ranges;
+	std::vector<AnimData> Anims;
+	std::vector<StateDispatchData> Changes;
+	std::vector<StateDispatchRangeData> Ranges;
 	std::vector<short> Commands;
-	std::vector<ANIM_FRAME> Frames;
+	std::vector<AnimFrame> Frames;
 	std::vector<ItemInfo> Items;
 	std::vector<AI_OBJECT> AIObjects;
 	std::vector<SPRITE> Sprites;

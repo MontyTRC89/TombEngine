@@ -1,11 +1,11 @@
 #pragma once
 #include "Specific/phd_global.h"
 
+struct ItemInfo;
 struct PHD_3DPOS;
 struct Vector3Int;
-struct ItemInfo;
 
-struct ANIM_FRAME
+struct AnimFrame
 {
 	BOUNDING_BOX boundingBox;
 	short offsetX;
@@ -14,14 +14,14 @@ struct ANIM_FRAME
 	std::vector<Quaternion> angles;
 };
 
-struct CHANGE_STRUCT
+struct StateDispatchData
 {
 	int TargetState;
 	int numberRanges;
 	int rangeIndex;
 };
 
-struct RANGE_STRUCT
+struct StateDispatchRangeData
 {
 	int startFrame;
 	int endFrame;
@@ -29,7 +29,7 @@ struct RANGE_STRUCT
 	int linkFrameNum;
 };
 
-struct ANIM_STRUCT
+struct AnimData
 {
 	int framePtr;
 	int Interpolation;
@@ -87,9 +87,9 @@ int GetFrameNumber(int objectID, int animNumber, int frameToStart);
 int GetFrameCount(int animNumber);
 int GetNextAnimState(ItemInfo* item);
 int GetNextAnimState(int objectID, int animNumber);
-bool GetChange(ItemInfo* item, const ANIM_STRUCT& anim);
-int GetFrame(ItemInfo* item, ANIM_FRAME* framePtr[], int* rate);
-ANIM_FRAME* GetBestFrame(ItemInfo* item);
+bool GetStateDispatch(ItemInfo* item, const AnimData& anim);
+int GetFrame(ItemInfo* item, AnimFrame* framePtr[], int* rate);
+AnimFrame* GetBestFrame(ItemInfo* item);
 
 BOUNDING_BOX* GetBoundsAccurate(ItemInfo* item);
 void GetLaraJointPosition(Vector3Int* pos, int laraMeshIndex);

@@ -548,7 +548,7 @@ namespace TEN::Renderer
 
 		if (obj->animIndex != -1)
 		{
-			ANIM_FRAME* frame[] = { &g_Level.Frames[g_Level.Anims[obj->animIndex].framePtr] };
+			AnimFrame* frame[] = { &g_Level.Frames[g_Level.Anims[obj->animIndex].framePtr] };
 			UpdateAnimation(nullptr, *moveableObj, frame, 0, 0, 0xFFFFFFFF);
 		}
 

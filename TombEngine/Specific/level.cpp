@@ -309,11 +309,11 @@ void LoadObjects()
 
 	int numChanges = ReadInt32();
 	g_Level.Changes.resize(numChanges);
-	ReadBytes(g_Level.Changes.data(), sizeof(CHANGE_STRUCT) * numChanges);
+	ReadBytes(g_Level.Changes.data(), sizeof(StateDispatchData) * numChanges);
 
 	int numRanges = ReadInt32();
 	g_Level.Ranges.resize(numRanges);
-	ReadBytes(g_Level.Ranges.data(), sizeof(RANGE_STRUCT) * numRanges);
+	ReadBytes(g_Level.Ranges.data(), sizeof(StateDispatchRangeData) * numRanges);
 
 	int numCommands = ReadInt32();
 	g_Level.Commands.resize(numCommands);
@@ -327,7 +327,7 @@ void LoadObjects()
 	g_Level.Frames.resize(numFrames);
 	for (int i = 0; i < numFrames; i++)
 	{
-		ANIM_FRAME* frame = &g_Level.Frames[i];
+		AnimFrame* frame = &g_Level.Frames[i];
 		frame->boundingBox.X1 = ReadInt16();
 		frame->boundingBox.X2 = ReadInt16();
 		frame->boundingBox.Y1 = ReadInt16();
@@ -348,7 +348,7 @@ void LoadObjects()
 			q->w = ReadFloat();
 		}
 	}
-	//ReadBytes(g_Level.Frames.data(), sizeof(ANIM_FRAME) * numFrames);
+	//ReadBytes(g_Level.Frames.data(), sizeof(AnimFrame) * numFrames);
 
 	int numModels = ReadInt32();
 	TENLog("Num models: " + std::to_string(numModels), LogLevel::Info);
