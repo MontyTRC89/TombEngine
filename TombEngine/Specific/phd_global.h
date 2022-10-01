@@ -339,29 +339,29 @@ struct GameVector
 		this->boxNumber = 0;
 	}
 
-	GameVector(int xpos, int ypos, int zpos)
+	GameVector(int xPos, int yPos, int zPos)
 	{
-		this->x = xpos;
-		this->y = ypos;
-		this->z = zpos;
+		this->x = xPos;
+		this->y = yPos;
+		this->z = zPos;
 		this->roomNumber = 0;
 		this->boxNumber = 0;
 	}
 
-	GameVector(int xpos, int ypos, int zpos, short roomNumber)
+	GameVector(int xPos, int yPos, int zPos, short roomNumber)
 	{
-		this->x = xpos;
-		this->y = ypos;
-		this->z = zpos;
+		this->x = xPos;
+		this->y = yPos;
+		this->z = zPos;
 		this->roomNumber = roomNumber;
 		this->boxNumber = 0;
 	}
 
-	GameVector(int xpos, int ypos, int zpos, short roomNumber, short boxNumber)
+	GameVector(int xPos, int yPos, int zPos, short roomNumber, short boxNumber)
 	{
-		this->x = xpos;
-		this->y = ypos;
-		this->z = zpos;
+		this->x = xPos;
+		this->y = yPos;
+		this->z = zPos;
 		this->roomNumber = roomNumber;
 		this->boxNumber = boxNumber;
 	}
@@ -405,90 +405,74 @@ struct LEVEL_CAMERA_INFO
 		this->speed = 1;
 	}
 
-	LEVEL_CAMERA_INFO(int xpos, int ypos, int zpos)
+	LEVEL_CAMERA_INFO(int xPos, int yPos, int zPos)
 	{
-		this->x = xpos;
-		this->y = ypos;
-		this->z = zpos;
+		this->x = xPos;
+		this->y = yPos;
+		this->z = zPos;
 		this->roomNumber = 0;
 		this->flags = 0x0;
 		this->speed = 1;
 	}
 
-	LEVEL_CAMERA_INFO(int xpos, int ypos, int zpos, short room)
+	LEVEL_CAMERA_INFO(int xPos, int yPos, int zPos, short room)
 	{
-		this->x = xpos;
-		this->y = ypos;
-		this->z = zpos;
+		this->x = xPos;
+		this->y = yPos;
+		this->z = zPos;
 		this->roomNumber = room;
 		this->flags = 0x0;
 		this->speed = 1;
 	}
 
-	LEVEL_CAMERA_INFO(int xpos, int ypos, int zpos, short flags, bool isFlags) // use isFlags to use flag instead of newdata !
+	LEVEL_CAMERA_INFO(int xPos, int yPos, int zPos, short flags, bool isFlags) // use isFlags to use flag instead of newdata !
 	{
-		this->x = xpos;
-		this->y = ypos;
-		this->z = zpos;
+		this->x = xPos;
+		this->y = yPos;
+		this->z = zPos;
 		this->roomNumber = 0;
 		this->flags = flags;
 		this->speed = 1;
 	}
 
-	LEVEL_CAMERA_INFO(int xpos, int ypos, int zpos, short room, short newflags)
+	LEVEL_CAMERA_INFO(int xPos, int yPos, int zPos, short room, short newflags)
 	{
-		this->x = xpos;
-		this->y = ypos;
-		this->z = zpos;
+		this->x = xPos;
+		this->y = yPos;
+		this->z = zPos;
 		this->roomNumber = room;
 		this->flags = newflags;
 		this->speed = 1;
 	}
 };
 
-struct SINK_INFO
+struct SinkInfo
 {
-	int x;
-	int y;
-	int z;
-	int strength;
-	int boxIndex;
-	std::string luaName;
+	Vector3Int	Position = Vector3Int::Zero;
+	int			Strength = 0;
+	int			BoxIndex = 0;
+	std::string LuaName	 = "";
 
-	SINK_INFO()
+	SinkInfo()
 	{
-		this->x = 0;
-		this->y = 0;
-		this->z = 0;
-		this->strength = 0;
-		this->boxIndex = 0;
 	}
 
-	SINK_INFO(int xpos, int ypos, int zpos)
+	SinkInfo(int xPos, int yPos, int zPos)
 	{
-		this->x = xpos;
-		this->y = ypos;
-		this->z = zpos;
-		this->strength = 0;
-		this->boxIndex = 0;
+		this->Position = Vector3Int(xPos, yPos, zPos);
 	}
 
-	SINK_INFO(int xpos, int ypos, int zpos, short strength)
+	SinkInfo(int xPos, int yPos, int zPos, short strength)
 	{
-		this->x = xpos;
-		this->y = ypos;
-		this->z = zpos;
-		this->strength = strength;
-		this->boxIndex = 0;
+		this->Position = Vector3Int(xPos, yPos, zPos);
+		this->Strength = strength;
 	}
 
-	SINK_INFO(int xpos, int ypos, int zpos, short strength, short boxIndex)
+	SinkInfo(int xPos, int yPos, int zPos, short strength, short boxIndex)
 	{
-		this->x = xpos;
-		this->y = ypos;
-		this->z = zpos;
-		this->strength = strength;
-		this->boxIndex = boxIndex;
+		this->Position = Vector3Int(xPos, yPos, zPos);
+		this->Strength = strength;
+		this->BoxIndex = boxIndex;
 	}
 };
 
@@ -510,29 +494,29 @@ struct SOUND_SOURCE_INFO
 		this->flags = 0x0;
 	}
 
-	SOUND_SOURCE_INFO(int xpos, int ypos, int zpos)
+	SOUND_SOURCE_INFO(int xPos, int yPos, int zPos)
 	{
-		this->x = xpos;
-		this->y = ypos;
-		this->z = zpos;
+		this->x = xPos;
+		this->y = yPos;
+		this->z = zPos;
 		this->soundId = 0;
 		this->flags = 0x0;
 	}
 
-	SOUND_SOURCE_INFO(int xpos, int ypos, int zpos, short soundId)
+	SOUND_SOURCE_INFO(int xPos, int yPos, int zPos, short soundId)
 	{
-		this->x = xpos;
-		this->y = ypos;
-		this->z = zpos;
+		this->x = xPos;
+		this->y = yPos;
+		this->z = zPos;
 		this->soundId = soundId;
 		this->flags = 0x0;
 	}
 
-	SOUND_SOURCE_INFO(int xpos, int ypos, int zpos, short soundId, short newflags)
+	SOUND_SOURCE_INFO(int xPos, int yPos, int zPos, short soundId, short newflags)
 	{
-		this->x = xpos;
-		this->y = ypos;
-		this->z = zpos;
+		this->x = xPos;
+		this->y = yPos;
+		this->z = zPos;
 		this->soundId = soundId;
 		this->flags = newflags;
 	}

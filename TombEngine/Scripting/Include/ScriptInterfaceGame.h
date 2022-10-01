@@ -1,15 +1,16 @@
 #pragma once
 #include <string>
 #include <functional>
-#include "room.h"
-#include "Specific/level.h"
+
 #include "Game/control/volumetriggerer.h"
+#include "Game/room.h"
+#include "Specific/level.h"
 
 typedef DWORD D3DCOLOR;
 using VarMapVal = std::variant< short,
 	std::reference_wrapper<MESH_INFO>,
 	std::reference_wrapper<LEVEL_CAMERA_INFO>,
-	std::reference_wrapper<SINK_INFO>,
+	std::reference_wrapper<SinkInfo>,
 	std::reference_wrapper<SOUND_SOURCE_INFO>,
 	std::reference_wrapper<AI_OBJECT>>;
 
@@ -26,7 +27,8 @@ struct FuncName
 
 using SavedVar = std::variant<bool, std::string, double, IndexTable, Vector3Int, FuncName>;
 
-class ScriptInterfaceGame {
+class ScriptInterfaceGame
+{
 public:
 	virtual ~ScriptInterfaceGame() = default;
 	

@@ -439,14 +439,14 @@ void LoadCameras()
 	for (int i = 0; i < numSinks; i++)
 	{
 		auto & sink = g_Level.Sinks.emplace_back();
-		sink.x = ReadInt32();
-		sink.y = ReadInt32();
-		sink.z = ReadInt32();
-		sink.strength = ReadInt32();
-		sink.boxIndex = ReadInt32();
-		sink.luaName = ReadString();
+		sink.Position.x = ReadInt32();
+		sink.Position.y = ReadInt32();
+		sink.Position.z = ReadInt32();
+		sink.Strength = ReadInt32();
+		sink.BoxIndex = ReadInt32();
+		sink.LuaName = ReadString();
 
-		g_GameScriptEntities->AddName(sink.luaName, sink);
+		g_GameScriptEntities->AddName(sink.LuaName, sink);
 	}
 }
 

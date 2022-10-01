@@ -107,7 +107,7 @@ struct LEVEL
 	std::vector<AI_OBJECT> AIObjects;
 	std::vector<SPRITE> Sprites;
 	std::vector<LEVEL_CAMERA_INFO> Cameras;
-	std::vector<SINK_INFO> Sinks;
+	std::vector<SinkInfo> Sinks;
 	std::vector<SOUND_SOURCE_INFO> SoundSources;
 	std::vector<BOX_INFO> Boxes;
 	std::vector<OVERLAP> Overlaps;
