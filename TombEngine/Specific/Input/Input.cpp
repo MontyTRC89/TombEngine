@@ -131,6 +131,9 @@ namespace TEN::Input
 	{
 		TENLog("Initializing input system...", LogLevel::Info);
 
+		for (size_t i = 0; i < (int)ActionID::Count; i++)
+			ActionMap.push_back(InputAction((ActionID)i));
+
 		KeyMap.resize(MAX_INPUT_SLOTS);
 		AxisMap.resize(InputAxis::Count);
 
@@ -174,9 +177,6 @@ namespace TEN::Input
 				TENLog("An exception occured during game controller init: " + std::string(ex.eText), LogLevel::Error);
 			}
 		}
-
-		for (size_t i = 0; i < (int)ActionID::Count; i++)
-			ActionMap.push_back(InputAction((ActionID)i));
 	}
 
 	void DeInitialiseInput()
@@ -464,10 +464,10 @@ namespace TEN::Input
 		auto* lara = GetLaraInfo(item);
 
 		// Handle hardcoded action-to-key mappings.
-		ActionMap[(int)In::Save].Update(KeyMap[KC_F5] ? 1.0f : 0.0f);
-		ActionMap[(int)In::Load].Update(KeyMap[KC_F6] ? 1.0f : 0.0f);
-		ActionMap[(int)In::Select].Update((KeyMap[KC_RETURN] || Key(KEY_ACTION)) ? 1.0f : 0.0f);
-		ActionMap[(int)In::Deselect].Update((KeyMap[KC_ESCAPE] || Key(KEY_DRAW)) ? 1.0f : 0.0f);
+		ActionMap[(int)In::Save].Update(KeyMap[KC_F5] ? true : false);
+		ActionMap[(int)In::Load].Update(KeyMap[KC_F6] ? true : false);
+		ActionMap[(int)In::Select].Update((KeyMap[KC_RETURN] || Key(KEY_ACTION)) ? true : false);
+		ActionMap[(int)In::Deselect].Update((KeyMap[KC_ESCAPE] || Key(KEY_DRAW)) ? true : false);
 
 		// Handle target switch when locked on to an entity.
 		if (lara->Control.HandStatus == HandStatus::WeaponReady &&
@@ -475,7 +475,7 @@ namespace TEN::Input
 		{
 			if (IsHeld(In::Look))
 			{
-				ActionMap[(int)In::SwitchTarget].Update(1.0f);
+				ActionMap[(int)In::SwitchTarget].Update(true);
 				ActionMap[(int)In::Look].Clear();
 			}
 		}
@@ -642,24 +642,20 @@ namespace TEN::Input
 
 		// Update action map (mappable actions only).
 		for (size_t i = 0; i < KEY_COUNT; i++)
-			ActionMap[i].Update(Key(i) ? 1.0f : 0.0f); // TODO: Poll analog value of key. Any key can potentially be a trigger.
+			ActionMap[i].Update(Key(i) ? true : false); // TODO: Poll analog value of key. Any key can potentially be a trigger.
 
 		// Additional handling.
 		HandleLaraHotkeys(LaraItem);
 		SolveActionCollisions();
 
 		// Port actions back to legacy bit fields.
-		for (auto& action : ActionMap)
+		for (const auto& action : ActionMap)
 		{
 			int actionBit = 1 << (int)action.GetID();
 
 			DbInput |= action.IsClicked() ? actionBit : 0;
 			TrInput |= action.IsHeld()	  ? actionBit : 0;
 		}
-
-		// Debug display for FORWARD input.
-		g_Renderer.PrintDebugMessage("Debug for FORWARD input:");
-		ActionMap[(int)In::Forward].PrintDebugInfo();
 	}
 
 	void ClearAllActions()
@@ -708,7 +704,7 @@ namespace TEN::Input
 
 	bool NoAction()
 	{
-		for (auto& action : ActionMap)
+		for (const auto& action : ActionMap)
 		{
 			if (action.IsHeld())
 				return false;

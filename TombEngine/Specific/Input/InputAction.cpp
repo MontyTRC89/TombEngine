@@ -72,33 +72,33 @@ namespace TEN::Input
 		g_Renderer.PrintDebugMessage("TimeInactive: %.3f", TimeInactive);
 	}
 
-	ActionID InputAction::GetID()
+	ActionID InputAction::GetID() const
 	{
 		return ID;
 	}
 
-	float InputAction::GetValue()
+	float InputAction::GetValue() const
 	{
 		return Value;
 	}
 
-	float InputAction::GetTimeActive()
+	float InputAction::GetTimeActive() const
 	{
 		return TimeActive;
 	}
 
-	float InputAction::GetTimeInactive()
+	float InputAction::GetTimeInactive() const
 	{
 		return TimeInactive;
 	}
 
-	bool InputAction::IsClicked()
+	bool InputAction::IsClicked() const
 	{
 		return ((Value != 0.0f) && (PrevValue == 0.0f));
 	}
 
 	// To avoid desync on the second pulse, ensure initialDelayInSeconds is a multiple of delayInSeconds.
-	bool InputAction::IsPulsed(float delayInSeconds, float initialDelayInSeconds)
+	bool InputAction::IsPulsed(float delayInSeconds, float initialDelayInSeconds) const
 	{
 		if (this->IsClicked())
 			return true;
@@ -124,12 +124,12 @@ namespace TEN::Input
 		return false;
 	}
 
-	bool InputAction::IsHeld()
+	bool InputAction::IsHeld() const
 	{
 		return (Value != 0.0f);
 	}
 
-	bool InputAction::IsReleased(float maxDelayInSeconds)
+	bool InputAction::IsReleased(float maxDelayInSeconds) const
 	{
 		return ((Value == 0.0f) && (PrevValue != 0.0f) && (TimeActive <= maxDelayInSeconds));
 	}
