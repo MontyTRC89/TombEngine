@@ -309,6 +309,10 @@ void FireShotgun(ItemInfo* laraItem)
 
 	if (fired)
 	{
+		auto& ammo = GetAmmo(laraItem, LaraWeaponType::Shotgun);
+		if (!ammo.hasInfinite())
+			ammo--;
+
 		auto pos = Vector3Int(0, 228, 32);
 		GetLaraJointPosition(&pos, LM_RHAND);
 
@@ -1672,6 +1676,10 @@ void FireHK(ItemInfo* laraItem, int mode)
 
 	if (FireWeapon(LaraWeaponType::HK, lara->TargetEntity, laraItem, angles) != FireWeaponType::NoAmmo)
 	{
+		auto& ammo = GetAmmo(laraItem, LaraWeaponType::HK);
+		if (!ammo.hasInfinite())
+			ammo--;
+
 		lara->LeftArm.GunSmoke = 12;
 
 		TriggerGunShell(1, ID_GUNSHELL, LaraWeaponType::HK);
