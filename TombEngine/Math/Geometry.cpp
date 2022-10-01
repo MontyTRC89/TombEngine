@@ -102,7 +102,7 @@ namespace TEN::Math::Geometry
 		return (linePoint0 + (direction * distanceAlpha));
 	}
 
-	EulerAngles GetOrientTowardPoint(const Vector3& origin, const Vector3& target)
+	EulerAngles GetOrientToPoint(const Vector3& origin, const Vector3& target)
 	{
 		return EulerAngles(target - origin);
 	}

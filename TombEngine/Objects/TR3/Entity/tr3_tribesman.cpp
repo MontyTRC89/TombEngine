@@ -351,7 +351,7 @@ namespace TEN::Entities::Creatures::TR3
 			pos2.z *= 2;
 			pos2 = GetJointPosition(item, TribesmanDartBite2.meshNum, pos2);
 
-			auto orient = Geometry::GetOrientTowardPoint(pos1.ToVector3(), pos2.ToVector3());
+			auto orient = Geometry::GetOrientToPoint(pos1.ToVector3(), pos2.ToVector3());
 
 			dartItem->Pose.Position = pos1;
 

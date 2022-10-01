@@ -49,7 +49,7 @@ namespace TEN::Entities::TR4
 			{
 				origin = GetJointPosition(item, 9, Vector3i(0, -96, 144));
 				target = GetJointPosition(item, 9, Vector3i(0, -128, 288));
-				orient = Geometry::GetOrientTowardPoint(origin.ToVector3(), target.ToVector3());
+				orient = Geometry::GetOrientToPoint(origin.ToVector3(), target.ToVector3());
 			}
 
 			// NOTE: this is not present in original TR4 code
@@ -131,7 +131,7 @@ namespace TEN::Entities::TR4
 					locust->escapeZrot = (GetRandomControl() & 0x7F) - 64;
 				}
 
-				auto orient = Geometry::GetOrientTowardPoint(
+				auto orient = Geometry::GetOrientToPoint(
 					locust->pos.Position.ToVector3(),
 					Vector3(
 						LaraItem->Pose.Position.x + locust->escapeXrot * 8,

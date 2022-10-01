@@ -192,7 +192,7 @@ namespace TEN::Entities::TR4
 	{
 		auto origin = GetJointPosition(originEntity, 9, Vector3i(0, -96, 144));
 		auto target = GetJointPosition(originEntity, 9, Vector3i(0, -128, 288));
-		auto orient = Geometry::GetOrientTowardPoint(origin.ToVector3(), target.ToVector3());
+		auto orient = Geometry::GetOrientToPoint(origin.ToVector3(), target.ToVector3());
 
 		targetPose->Position = target;
 		targetPose->Orientation = orient;

@@ -574,14 +574,14 @@ namespace TEN::Entities::TR4
 			if (item->ItemFlags[0] >= 96 && item->ItemFlags[0] <= 99)
 			{
 				auto pos = GetJointPosition(item, SethaAttack1.meshNum, Vector3i(SethaAttack1.Position.x, SethaAttack1.Position.y * 2, SethaAttack1.Position.z));
-				auto orient = Geometry::GetOrientTowardPoint(pos1.ToVector3(), pos.ToVector3());
+				auto orient = Geometry::GetOrientToPoint(pos1.ToVector3(), pos.ToVector3());
 				auto attackPose = PoseData(pos1, orient);
 				SethaThrowAttack(&attackPose, item->RoomNumber, 0);
 			}
 			else if (item->ItemFlags[0] >= 122 && item->ItemFlags[0] <= 125)
 			{
 				auto pos = GetJointPosition(item, SethaAttack1.meshNum, Vector3i(SethaAttack2.Position.x, SethaAttack2.Position.y * 2, SethaAttack2.Position.z));
-				auto orient = Geometry::GetOrientTowardPoint(pos2.ToVector3(), pos.ToVector3());
+				auto orient = Geometry::GetOrientToPoint(pos2.ToVector3(), pos.ToVector3());
 				auto attackPose = PoseData(pos2, orient);
 				SethaThrowAttack(&attackPose, item->RoomNumber, 0);
 			}
@@ -607,12 +607,12 @@ namespace TEN::Entities::TR4
 				if (Wibble & 4)
 				{
 					auto pos = GetJointPosition(item, SethaAttack1.meshNum, Vector3i(SethaAttack2.Position.x, SethaAttack2.Position.y * 2, SethaAttack2.Position.z));
-					auto orient = Geometry::GetOrientTowardPoint(pos1.ToVector3(), pos.ToVector3());
+					auto orient = Geometry::GetOrientToPoint(pos1.ToVector3(), pos.ToVector3());
 					auto attackPose = PoseData(pos1, orient);
 					SethaThrowAttack(&attackPose, item->RoomNumber, 0);
 
 					pos = GetJointPosition(item, SethaAttack1.meshNum, Vector3i(SethaAttack2.Position.x, SethaAttack2.Position.y * 2, SethaAttack2.Position.z));
-					orient = Geometry::GetOrientTowardPoint(pos2.ToVector3(), pos.ToVector3());
+					orient = Geometry::GetOrientToPoint(pos2.ToVector3(), pos.ToVector3());
 					attackPose = PoseData(pos2, orient);
 					SethaThrowAttack(&attackPose, item->RoomNumber, 0);
 				}
@@ -668,7 +668,7 @@ namespace TEN::Entities::TR4
 			if (item->ItemFlags[0] == 102)
 			{
 				auto pos = GetJointPosition(item, SethaAttack1.meshNum, Vector3i(SethaAttack2.Position.x, SethaAttack2.Position.y * 2, SethaAttack2.Position.z));
-				auto orient = Geometry::GetOrientTowardPoint(pos1.ToVector3(), pos.ToVector3());
+				auto orient = Geometry::GetOrientToPoint(pos1.ToVector3(), pos.ToVector3());
 				auto attackPose = PoseData(pos1, orient);
 				SethaThrowAttack(&attackPose, item->RoomNumber, 0);
 			}

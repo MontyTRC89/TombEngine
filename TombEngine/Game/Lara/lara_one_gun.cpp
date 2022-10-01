@@ -1430,7 +1430,7 @@ void FireCrossBowFromLaserSight(ItemInfo* laraItem, GameVector* origin, GameVect
 	target->x |= 512;
 	target->z |= 512;*/
 
-	auto orient = Geometry::GetOrientTowardPoint(origin->ToVector3(), target->ToVector3());
+	auto orient = Geometry::GetOrientToPoint(origin->ToVector3(), target->ToVector3());
 	auto boltPose = PoseData(origin->x, origin->y, origin->z, orient);
 	FireCrossbow(laraItem, &boltPose);
 }

@@ -192,7 +192,7 @@ namespace TEN::Entities::TR4
 			{
 				auto origin = GetJointPosition(item, 16, Vector3i(-544, 96, 0));
 				auto target = GetJointPosition(item, 16, Vector3i(-900, 96, 0));
-				auto orient = Geometry::GetOrientTowardPoint(origin.ToVector3(), target.ToVector3());
+				auto orient = Geometry::GetOrientToPoint(origin.ToVector3(), target.ToVector3());
 
 				auto pose = PoseData(origin, orient);
 				if (item->ObjectNumber == ID_DEMIGOD3)
@@ -207,7 +207,7 @@ namespace TEN::Entities::TR4
 			{
 				auto pos1 = GetJointPosition(item,  16, Vector3i(-544, 96, 0));
 				auto pos2 = GetJointPosition(item, 16, Vector3i(-900, 96, 0));
-				auto orient = Geometry::GetOrientTowardPoint(pos1.ToVector3(), pos2.ToVector3());
+				auto orient = Geometry::GetOrientToPoint(pos1.ToVector3(), pos2.ToVector3());
 
 				auto pose = PoseData(pos1, orient);
 				if (item->ObjectNumber == ID_DEMIGOD3)
@@ -236,7 +236,7 @@ namespace TEN::Entities::TR4
 					pos2 = GetJointPosition(item, 17, pos2);
 				}
 
-				auto orient = Geometry::GetOrientTowardPoint(pos1.ToVector3(), pos2.ToVector3());
+				auto orient = Geometry::GetOrientToPoint(pos1.ToVector3(), pos2.ToVector3());
 				auto pose = PoseData(pos1, orient);
 				TriggerDemigodMissile(&pose, item->RoomNumber, 4);
 			}

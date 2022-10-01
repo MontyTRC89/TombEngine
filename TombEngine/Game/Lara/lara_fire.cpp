@@ -971,7 +971,7 @@ void LaraTargetInfo(ItemInfo* laraItem, WeaponInfo* weaponInfo)
 	);
 	auto target = FindTargetPoint(lara->TargetEntity);
 
-	auto orient = Geometry::GetOrientTowardPoint(origin.ToVector3(), target.ToVector3()) - laraItem->Pose.Orientation;
+	auto orient = Geometry::GetOrientToPoint(origin.ToVector3(), target.ToVector3()) - laraItem->Pose.Orientation;
 
 	if (LOS(&origin, &target))
 	{
@@ -1066,7 +1066,7 @@ void LaraGetNewTarget(ItemInfo* laraItem, WeaponInfo* weaponInfo)
 			continue;
 
 		// Assess whether relative orientation falls within weapon's lock constraints.
-		auto orient = Geometry::GetOrientTowardPoint(origin.ToVector3(), target.ToVector3()) - (laraItem->Pose.Orientation + lara->ExtraTorsoRot);
+		auto orient = Geometry::GetOrientToPoint(origin.ToVector3(), target.ToVector3()) - (laraItem->Pose.Orientation + lara->ExtraTorsoRot);
 		if (orient.x >= weaponInfo->LockOrientConstraint.first.x &&
 			orient.y >= weaponInfo->LockOrientConstraint.first.y &&
 			orient.x <= weaponInfo->LockOrientConstraint.second.x &&

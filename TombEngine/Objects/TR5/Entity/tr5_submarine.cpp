@@ -432,7 +432,7 @@ namespace TEN::Entities::Creatures::TR5
 			}
 		}
 
-		auto orient = Geometry::GetOrientTowardPoint(item->Pose.Position.ToVector3(), pos.ToVector3());
+		auto orient = Geometry::GetOrientToPoint(item->Pose.Position.ToVector3(), pos.ToVector3());
 
 		if (item->Animation.Velocity.z >= 48.0f)
 		{

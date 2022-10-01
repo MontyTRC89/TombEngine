@@ -721,7 +721,7 @@ namespace TEN::Entities::Creatures::TR5
 					pos1 = GetJointPosition(item, 14, Vector3i(-48, 48, SECTOR(1)));
 					pos2 = GetJointPosition(item, 14, Vector3i(-48, 48, 450));
 
-				auto orient = Geometry::GetOrientTowardPoint(pos2.ToVector3(), pos1.ToVector3());
+				auto orient = Geometry::GetOrientToPoint(pos2.ToVector3(), pos1.ToVector3());
 				auto attackPos = PoseData(pos2, orient);
 
 					short roomNumber = item->RoomNumber;

@@ -14,14 +14,13 @@
 #include "Game/Lara/lara_helpers.h"
 #include "Game/pickup/pickup.h"
 #include "Game/room.h"
-#include "Math/Random.h"
+#include "Math/Math.h"
 #include "Renderer/Renderer11.h"
 #include "ScriptInterfaceGame.h"
 #include "Sound/sound.h"
 #include "Specific/setup.h"
-#include "Math/Math.h"
 
-using namespace TEN::Math::Random;
+using namespace TEN::Math;
 using namespace TEN::Renderer;
 
 BOUNDING_BOX GlobalCollisionBounds;
@@ -534,7 +533,7 @@ bool Move3DPosTo3DPos(PoseData* fromPose, PoseData* toPose, int velocity, short 
 
 		if (shouldAnimate && Lara.Control.WaterStatus != WaterStatus::Underwater)
 		{
-			short angle = Geometry::GetOrientTowardPoint(toPose->Position.ToVector3(), fromPose->Position.ToVector3()).y;
+			short angle = Geometry::GetOrientToPoint(toPose->Position.ToVector3(), fromPose->Position.ToVector3()).y;
 			int direction = (GetQuadrant(angle) - GetQuadrant(toPose->Orientation.y)) & 3;
 
 			switch (direction)

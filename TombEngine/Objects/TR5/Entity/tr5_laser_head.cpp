@@ -373,7 +373,7 @@ namespace TEN::Entities::Creatures::TR5
 					}
 				}
 
-			auto angles = Geometry::GetOrientTowardPoint(origin.ToVector3(), LaserHeadData.target.ToVector3());
+			auto angles = Geometry::GetOrientToPoint(origin.ToVector3(), LaserHeadData.target.ToVector3());
 			InterpolateAngle(angles.x + 3328, &item->Pose.Orientation.x, &LaserHeadData.xRot, LaserHeadData.byte1);
 			InterpolateAngle(angles.y, &item->Pose.Orientation.y, &LaserHeadData.yRot, LaserHeadData.byte1);
 

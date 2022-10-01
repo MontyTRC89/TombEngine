@@ -136,7 +136,7 @@ namespace TEN::Entities::Effects
 	{
 		auto* fx = &EffectList[fxNum];
 
-		auto orient = Geometry::GetOrientTowardPoint(
+		auto orient = Geometry::GetOrientToPoint(
 			Vector3(fx->pos.Position.x, fx->pos.Position.y - CLICK(1), fx->pos.Position.z),
 			LaraItem->Pose.Position.ToVector3());
 

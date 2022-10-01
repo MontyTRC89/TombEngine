@@ -324,7 +324,7 @@ namespace TEN::Entities::Creatures::TR5
 					auto pos1 = GetJointPosition(item, 10, Vector3i(0, 1024, 40));
 					auto pos2 = GetJointPosition(item, 10, Vector3i(0, 144, 40));
 
-					auto orient = Geometry::GetOrientTowardPoint(pos2.ToVector3(), pos1.ToVector3());
+					auto orient = Geometry::GetOrientToPoint(pos2.ToVector3(), pos1.ToVector3());
 					auto pose = PoseData(pos1, orient);
 					roomNumber = item->RoomNumber;
 					GetFloor(pos2.x, pos2.y, pos2.z, &roomNumber);

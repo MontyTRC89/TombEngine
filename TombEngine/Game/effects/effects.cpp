@@ -1084,7 +1084,7 @@ void TriggerUnderwaterBlood(int x, int y, int z, int size)
 
 void Richochet(PoseData* pos)
 {
-	short angle = Geometry::GetOrientTowardPoint(pos->Position.ToVector3(), LaraItem->Pose.Position.ToVector3()).y;
+	short angle = Geometry::GetOrientToPoint(pos->Position.ToVector3(), LaraItem->Pose.Position.ToVector3()).y;
 	auto target = GameVector(pos->Position);
 	TriggerRicochetSpark(&target, angle / 16, 3, 0);
 	SoundEffect(SFX_TR4_WEAPON_RICOCHET, pos);

@@ -225,7 +225,7 @@ namespace TEN::Entities::TR4
 			if (item->ItemFlags[0] <= 65 && GlobalCounter & 1)
 			{
 				auto pos3 = GetJointPosition(item, HarpyAttack1.meshNum, Vector3i(HarpyAttack1.Position.x, HarpyAttack1.Position.y * 2, HarpyAttack1.Position.z));
-				auto orient = Geometry::GetOrientTowardPoint(rh.ToVector3(), lr.ToVector3());
+				auto orient = Geometry::GetOrientToPoint(rh.ToVector3(), lr.ToVector3());
 				auto pose = PoseData(rh, orient);
 				TriggerHarpyMissile(&pose, item->RoomNumber, 2);
 			}
@@ -233,7 +233,7 @@ namespace TEN::Entities::TR4
 			if (item->ItemFlags[0] >= 61 && item->ItemFlags[0] <= 65 && !(GlobalCounter & 1))
 			{
 				auto pos3 = GetJointPosition(item, HarpyAttack2.meshNum, Vector3i(HarpyAttack1.Position.x, HarpyAttack2.Position.y * 2, HarpyAttack2.Position.z));
-				auto orient = Geometry::GetOrientTowardPoint(rh.ToVector3(), lr.ToVector3());
+				auto orient = Geometry::GetOrientToPoint(rh.ToVector3(), lr.ToVector3());
 				auto pose = PoseData(rh, orient);
 				TriggerHarpyMissile(&pose, item->RoomNumber, 2);
 			}

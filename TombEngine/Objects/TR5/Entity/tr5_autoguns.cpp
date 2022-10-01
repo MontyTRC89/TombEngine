@@ -79,7 +79,7 @@ namespace TEN::Entities::Creatures::TR5
 				auto orient = EulerAngles::Zero;
 				if (los)
 				{
-					orient = Geometry::GetOrientTowardPoint(pos1.ToVector3(), pos2.ToVector3());
+					orient = Geometry::GetOrientToPoint(pos1.ToVector3(), pos2.ToVector3());
 					orient.y -= item->Pose.Orientation.y;
 				}
 				else
