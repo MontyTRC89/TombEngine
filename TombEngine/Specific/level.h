@@ -20,6 +20,7 @@ using namespace TEN::Control::Volumes;
 struct ChunkId;
 struct LEB128;
 struct SampleInfo;
+struct SinkInfo;
 struct BOX_INFO;
 struct OVERLAP;
 

@@ -19,6 +19,7 @@
 #include "Game/savegame.h"
 #include "Game/spotcam.h"
 #include "Objects/Generic/Doors/generic_doors.h"
+#include "Objects/Sink.h"
 #include "Renderer/Renderer11.h"
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Scripting/Include/Objects/ScriptInterfaceObjectsHandler.h"

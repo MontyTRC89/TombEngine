@@ -2,6 +2,7 @@
 #include "Game/savegame.h"
 
 #include <filesystem>
+
 #include "Game/collision/collide_room.h"
 #include "Game/collision/floordata.h"
 #include "Game/control/box.h"
@@ -21,6 +22,7 @@
 #include "Objects/Generic/Switches/fullblock_switch.h"
 #include "Objects/Generic/Traps/traps.h"
 #include "Objects/Generic/puzzles_keys.h"
+#include "Objects/Sink.h"
 #include "Objects/TR4/Entity/tr4_beetle_swarm.h"
 #include "Objects/TR5/Emitter/tr5_rats_emitter.h"
 #include "Objects/TR5/Emitter/tr5_bats_emitter.h"

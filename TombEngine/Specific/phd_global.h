@@ -2,8 +2,6 @@
 
 using std::string;
 
-// TODO: Clean this out. Move every struct into an appropriate file. Let's stop dumping everything in here.
-
 struct LevelCameraInfo
 {
 	Vector3i Position	= Vector3i::Zero;
@@ -39,35 +37,5 @@ struct LevelCameraInfo
 		this->Position = Vector3i(xPos, yPos, zPos);
 		this->RoomNumber = roomNumber;
 		this->Flags = newflags;
-	}
-};
-
-struct SinkInfo
-{
-	Vector3i Position = Vector3i::Zero;
-	int		 Strength = 0;
-	int		 BoxIndex = 0;
-	string	 LuaName  = "";
-
-	SinkInfo()
-	{
-	}
-
-	SinkInfo(int xPos, int yPos, int zPos)
-	{
-		this->Position = Vector3i(xPos, yPos, zPos);
-	}
-
-	SinkInfo(int xPos, int yPos, int zPos, short strength)
-	{
-		this->Position = Vector3i(xPos, yPos, zPos);
-		this->Strength = strength;
-	}
-
-	SinkInfo(int xPos, int yPos, int zPos, short strength, short boxIndex)
-	{
-		this->Position = Vector3i(xPos, yPos, zPos);
-		this->Strength = strength;
-		this->BoxIndex = boxIndex;
 	}
 };
