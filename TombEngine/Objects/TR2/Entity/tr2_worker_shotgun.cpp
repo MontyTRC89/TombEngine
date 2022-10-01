@@ -14,9 +14,9 @@
 
 namespace TEN::Entities::Creatures::TR2
 {
-	const auto WorkerShotgunBite = BiteInfo(Vector3(0.0f, 281.0f, 40.0f), 9);
-
 	constexpr auto WORKER_SHOTGUN_NUM_SHOTS = 6;
+
+	const auto WorkerShotgunBite = BiteInfo(Vector3(0.0f, 281.0f, 40.0f), 9);
 
 	// TODO
 	enum ShotgunWorkerState
@@ -36,12 +36,12 @@ namespace TEN::Entities::Creatures::TR2
 			ShotLara(item, info, bite, angleY, damage);
 	}
 
-	void InitialiseWorkerShotgun(short itemNum)
+	void InitialiseWorkerShotgun(short itemNumber)
 	{
-		auto* item = &g_Level.Items[itemNum];
+		auto* item = &g_Level.Items[itemNumber];
 
 		item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 5;
-		ClearItem(itemNum);
+		ClearItem(itemNumber);
 
 		auto* anim = &g_Level.Anims[item->Animation.AnimNumber];
 		item->Animation.FrameNumber = anim->frameBase;
@@ -159,8 +159,8 @@ namespace TEN::Entities::Creatures::TR2
 				break;
 
 			case 5:
+				creature->MaxTurn = ANGLE(5.0f);
 				tilt = angle / 2;
-				creature->MaxTurn = 910;
 
 				if (AI.ahead)
 				{
