@@ -26,13 +26,13 @@
 		Matrix	   ToRotationMatrix() const;
 
 		// Operators
-		bool		 operator ==(const EulerAngles& eulers);
-		bool		 operator !=(const EulerAngles& eulers);
-		EulerAngles	 operator +(const EulerAngles& eulers);
-		EulerAngles	 operator -(const EulerAngles& eulers);
-		EulerAngles	 operator *(const EulerAngles& eulers);
-		EulerAngles	 operator *(float value);
-		EulerAngles	 operator /(float value);
+		bool		 operator ==(const EulerAngles& eulers) const;
+		bool		 operator !=(const EulerAngles& eulers) const;
+		EulerAngles	 operator +(const EulerAngles& eulers) const;
+		EulerAngles	 operator -(const EulerAngles& eulers) const;
+		EulerAngles	 operator *(const EulerAngles& eulers) const;
+		EulerAngles	 operator *(float value) const;
+		EulerAngles	 operator /(float value) const;
 		EulerAngles& operator =(const EulerAngles& eulers);
 		EulerAngles& operator +=(const EulerAngles& eulers);
 		EulerAngles& operator -=(const EulerAngles& eulers);

@@ -84,37 +84,37 @@
 		return Matrix::CreateFromYawPitchRoll(TO_RAD(y), TO_RAD(x), TO_RAD(z));
 	}
 
-	bool EulerAngles::operator ==(const EulerAngles& eulers)
+	bool EulerAngles::operator ==(const EulerAngles& eulers) const
 	{
 		return (x == eulers.x && y == eulers.y && z == eulers.z);
 	}
 
-	bool EulerAngles::operator !=(const EulerAngles& eulers)
+	bool EulerAngles::operator !=(const EulerAngles& eulers) const
 	{
 		return (x != eulers.x || y != eulers.y || z != eulers.z);
 	}
 
-	EulerAngles EulerAngles::operator +(const EulerAngles& eulers)
+	EulerAngles EulerAngles::operator +(const EulerAngles& eulers) const
 	{
 		return EulerAngles(x + eulers.x, y + eulers.y, z + eulers.z);
 	}
 
-	EulerAngles EulerAngles::operator -(const EulerAngles& eulers)
+	EulerAngles EulerAngles::operator -(const EulerAngles& eulers) const
 	{
 		return EulerAngles(x - eulers.x, y - eulers.y, z - eulers.z);
 	}
 
-	EulerAngles EulerAngles::operator *(const EulerAngles& eulers)
+	EulerAngles EulerAngles::operator *(const EulerAngles& eulers) const
 	{
 		return EulerAngles(x * eulers.x, y * eulers.y, z * eulers.z);
 	}
 
-	EulerAngles EulerAngles::operator *(float value)
+	EulerAngles EulerAngles::operator *(float value) const
 	{
 		return EulerAngles((short)round(x * value), (short)round(y * value), (short)round(z * value));
 	}
 
-	EulerAngles EulerAngles::operator /(float value)
+	EulerAngles EulerAngles::operator /(float value) const
 	{
 		return EulerAngles((short)round(x / value), (short)round(y / value), (short)round(z / value));
 	}

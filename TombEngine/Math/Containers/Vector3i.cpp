@@ -38,37 +38,37 @@
 		return Vector3(x, y, z);
 	}
 
-	bool Vector3i::operator ==(const Vector3i& vector)
+	bool Vector3i::operator ==(const Vector3i& vector) const
 	{
 		return (x == vector.x && y == vector.y && z == vector.z);
 	}
 
-	bool Vector3i::operator !=(const Vector3i& vector)
+	bool Vector3i::operator !=(const Vector3i& vector) const
 	{
 		return (x != vector.x || y != vector.y || z != vector.z);
 	}
 
-	Vector3i Vector3i::operator +(const Vector3i& vector)
+	Vector3i Vector3i::operator +(const Vector3i& vector) const
 	{
 		return Vector3i(x + vector.x, y + vector.y, z + vector.z);
 	}
 
-	Vector3i Vector3i::operator -(const Vector3i& vector)
+	Vector3i Vector3i::operator -(const Vector3i& vector) const
 	{
 		return Vector3i(x - vector.x, y - vector.y, z - vector.z);
 	}
 
-	Vector3i Vector3i::operator *(const Vector3i& vector)
+	Vector3i Vector3i::operator *(const Vector3i& vector) const
 	{
 		return Vector3i(x * vector.x, y * vector.y, z * vector.z);
 	}
 
-	Vector3i Vector3i::operator *(float value)
+	Vector3i Vector3i::operator *(float value) const
 	{
 		return Vector3i((int)round(x * value), (int)round(y * value), (int)round(z * value));
 	}
 
-	Vector3i Vector3i::operator /(float value)
+	Vector3i Vector3i::operator /(float value) const
 	{
 		return Vector3i((int)round(x / value), (int)round(y / value), (int)round(z / value));
 	}

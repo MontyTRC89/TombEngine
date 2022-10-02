@@ -445,13 +445,13 @@ bool MoveLaraPosition(Vector3i* offset, ItemInfo* item, ItemInfo* laraItem)
 	auto target = PoseData(item->Pose.Position + Vector3i(pos), item->Pose.Orientation);
 
 	if (!Objects[item->ObjectNumber].isPickup)
-		return Move3DPosTo3DPos(&laraItem->Pose, &target, LARA_ALIGN_VELOCITY, ANGLE(2.0f));
+		return Move3DPosTo3DPos(laraItem, laraItem->Pose, target, LARA_ALIGN_VELOCITY, ANGLE(2.0f));
 	else
 	{
 		// Prevent picking up items which can result in so called "flare pickup bug"
 		int height = GetCollision(target.Position.x, target.Position.y, target.Position.z, laraItem->RoomNumber).Position.Floor;
 		if (abs(height - laraItem->Pose.Position.y) <= CLICK(2))
-			return Move3DPosTo3DPos(&laraItem->Pose, &target, LARA_ALIGN_VELOCITY, ANGLE(2.0f));
+			return Move3DPosTo3DPos(laraItem, laraItem->Pose, target, LARA_ALIGN_VELOCITY, ANGLE(2.0f));
 	}
 
 	if (lara->Control.IsMoving)
@@ -517,78 +517,78 @@ bool ItemNearTarget(Vector3i* origin, ItemInfo* targetEntity, int radius)
 	return false;
 }
 
-bool Move3DPosTo3DPos(PoseData* fromPose, PoseData* toPose, int velocity, short angleAdd)
+bool Move3DPosTo3DPos(ItemInfo* item, PoseData& fromPose, const PoseData& toPose, int velocity, short angleAdd)
 {
-	auto direction = toPose->Position - fromPose->Position;
-	float distance = Vector3i::Distance(fromPose->Position, toPose->Position);
+	auto* lara = GetLaraInfo(item);
+
+	auto direction = toPose.Position - fromPose.Position;
+	float distance = Vector3i::Distance(fromPose.Position, toPose.Position);
 
 	if (velocity < distance)
-		fromPose->Position += direction * (velocity / distance);
+		fromPose.Position += direction * (velocity / distance);
 	else
-		fromPose->Position = toPose->Position;
+		fromPose.Position = toPose.Position;
 
-	if (!Lara.Control.IsMoving)
+	if (!lara->Control.IsMoving)
 	{
 		bool shouldAnimate = ((distance - velocity) > (velocity * ANIMATED_ALIGNMENT_FRAME_COUNT_THRESHOLD));
 
-		if (shouldAnimate && Lara.Control.WaterStatus != WaterStatus::Underwater)
+		if (shouldAnimate && lara->Control.WaterStatus != WaterStatus::Underwater)
 		{
-			short angle = Geometry::GetOrientToPoint(toPose->Position.ToVector3(), fromPose->Position.ToVector3()).y;
-			int direction = (GetQuadrant(angle) - GetQuadrant(toPose->Orientation.y)) & 3;
+			short angle = Geometry::GetOrientToPoint(fromPose.Position.ToVector3(), toPose.Position.ToVector3()).y;
+			int direction = (GetQuadrant(angle) - GetQuadrant(fromPose.Orientation.y)) & 3;
 
 			switch (direction)
 			{
-			case 0:
-				SetAnimation(LaraItem, LA_SIDESTEP_LEFT);
-				Lara.Control.HandStatus = HandStatus::Busy;
-				break;
-
-			case 1:
-				SetAnimation(LaraItem, LA_WALK);
-				Lara.Control.HandStatus = HandStatus::Busy;
-				break;
-
-			case 2:
-				SetAnimation(LaraItem, LA_SIDESTEP_RIGHT);
-				Lara.Control.HandStatus = HandStatus::Busy;
-				break;
-
-			case 3:
 			default:
-				SetAnimation(LaraItem, LA_WALK_BACK);
-				Lara.Control.HandStatus = HandStatus::Busy;
+			case NORTH:
+				SetAnimation(item, LA_WALK);
+				break;
+
+			case SOUTH:
+				SetAnimation(item, LA_WALK_BACK);
+				break;
+
+			case EAST:
+				SetAnimation(item, LA_SIDESTEP_RIGHT);
+				break;
+
+			case WEST:
+				SetAnimation(item, LA_SIDESTEP_LEFT);
 				break;
 			}
+
+			lara->Control.HandStatus = HandStatus::Busy;
 		}
 
-		Lara.Control.IsMoving = true;
-		Lara.Control.Count.PositionAdjust = 0;
+		lara->Control.IsMoving = true;
+		lara->Control.Count.PositionAdjust = 0;
 	}
 
-	auto deltaOrient = toPose->Orientation - fromPose->Orientation;
+	auto deltaOrient = toPose.Orientation - fromPose.Orientation;
 
 	if (deltaOrient.x > angleAdd)
-		fromPose->Orientation.x += angleAdd;
+		fromPose.Orientation.x += angleAdd;
 	else if (deltaOrient.x < -angleAdd)
-		fromPose->Orientation.x -= angleAdd;
+		fromPose.Orientation.x -= angleAdd;
 	else
-		fromPose->Orientation.x = toPose->Orientation.x;
+		fromPose.Orientation.x = toPose.Orientation.x;
 
 	if (deltaOrient.y > angleAdd)
-		fromPose->Orientation.y += angleAdd;
+		fromPose.Orientation.y += angleAdd;
 	else if (deltaOrient.y < -angleAdd)
-		fromPose->Orientation.y -= angleAdd;
+		fromPose.Orientation.y -= angleAdd;
 	else
-		fromPose->Orientation.y = toPose->Orientation.y;
+		fromPose.Orientation.y = toPose.Orientation.y;
 
 	if (deltaOrient.z > angleAdd)
-		fromPose->Orientation.z += angleAdd;
+		fromPose.Orientation.z += angleAdd;
 	else if (deltaOrient.z < -angleAdd)
-		fromPose->Orientation.z -= angleAdd;
+		fromPose.Orientation.z -= angleAdd;
 	else
-		fromPose->Orientation.z = toPose->Orientation.z;
+		fromPose.Orientation.z = toPose.Orientation.z;
 
-	return (fromPose->Position == toPose->Position && fromPose->Orientation == toPose->Orientation);
+	return (fromPose.Position == toPose.Position && fromPose.Orientation == toPose.Orientation);
 }
 
 bool TestBoundsCollide(ItemInfo* item, ItemInfo* laraItem, int radius)

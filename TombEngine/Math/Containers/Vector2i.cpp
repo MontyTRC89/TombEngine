@@ -36,37 +36,37 @@ namespace TEN::Math
 		return Vector2(x, y);
 	}
 
-	bool Vector2i::operator ==(const Vector2i& vector)
+	bool Vector2i::operator ==(const Vector2i& vector) const
 	{
 		return (x == vector.x && y == vector.y);
 	}
 
-	bool Vector2i::operator !=(const Vector2i& vector)
+	bool Vector2i::operator !=(const Vector2i& vector) const
 	{
 		return (x != vector.x || y != vector.y);
 	}
 
-	Vector2i Vector2i::operator +(const Vector2i& vector)
+	Vector2i Vector2i::operator +(const Vector2i& vector) const
 	{
 		return Vector2i(x + vector.x, y + vector.y);
 	}
 
-	Vector2i Vector2i::operator -(const Vector2i& vector)
+	Vector2i Vector2i::operator -(const Vector2i& vector) const
 	{
 		return Vector2i(x - vector.x, y - vector.y);
 	}
 
-	Vector2i Vector2i::operator *(const Vector2i& vector)
+	Vector2i Vector2i::operator *(const Vector2i& vector) const
 	{
 		return Vector2i(x * vector.x, y * vector.y);
 	}
 
-	Vector2i Vector2i::operator *(float value)
+	Vector2i Vector2i::operator *(float value) const
 	{
 		return Vector2i((int)round(x * value), (int)round(y * value));
 	}
 
-	Vector2i Vector2i::operator /(float value)
+	Vector2i Vector2i::operator /(float value) const
 	{
 		return Vector2i((int)round(x / value), (int)round(y / value));
 	}

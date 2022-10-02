@@ -24,13 +24,13 @@ namespace TEN::Math
 		Vector2 ToVector2() const;
 
 		// Operators
-		bool	  operator ==(const Vector2i& vector);
-		bool	  operator !=(const Vector2i& vector);
-		Vector2i  operator +(const Vector2i& vector);
-		Vector2i  operator -(const Vector2i& vector);
-		Vector2i  operator *(const Vector2i& vector);
-		Vector2i  operator *(float value);
-		Vector2i  operator /(float value);
+		bool	  operator ==(const Vector2i& vector) const;
+		bool	  operator !=(const Vector2i& vector) const;
+		Vector2i  operator +(const Vector2i& vector) const;
+		Vector2i  operator -(const Vector2i& vector) const;
+		Vector2i  operator *(const Vector2i& vector) const;
+		Vector2i  operator *(float value) const;
+		Vector2i  operator /(float value) const;
 		Vector2i& operator =(const Vector2i& vector);
 		Vector2i& operator +=(const Vector2i& vector);
 		Vector2i& operator -=(const Vector2i& vector);
