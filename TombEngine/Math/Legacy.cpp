@@ -36,27 +36,27 @@ BOUNDING_BOX BOUNDING_BOX::operator *(float scale)
 
 short ANGLE(float angle)
 {
-	return angle * 65536.0f / 360.0f;
+	return (angle * (65536.0f / 360.0f));
 }
 
 short FROM_DEGREES(float angle)
 {
-	return angle * 65536.0f / 360.0f;
+	return (angle * (65536.0f / 360.0f));
 }
 
 short FROM_RAD(float angle)
 {
-	return angle / RADIAN * 65536.0f / 360.0f;
+	return ((angle / RADIAN) * (65536.0f / 360.0f));
 }
 
 float TO_DEGREES(short angle)
 {
-	return lround(angle * 360.0f / 65536.0f);
+	return lround(angle * (360.0f / 65536.0f));
 }
 
 float TO_RAD(short angle)
 {
-	return angle * 360.0f / 65536.0f * RADIAN;
+	return ((angle * (360.0f / 65536.0f)) * RADIAN);
 }
 
 float phd_sin(short a)
@@ -74,21 +74,32 @@ int phd_atan(int x, int y)
 	return FROM_RAD(atan2(y, x));
 }
 
-void phd_RotBoundingBoxNoPersp(PoseData* pos, BOUNDING_BOX* bounds, BOUNDING_BOX* tbounds)
+BoundingOrientedBox TO_DX_BBOX(PoseData pose, BOUNDING_BOX* bBox)
 {
-	auto world = pos->Orientation.ToRotationMatrix();
+	auto boxCentre = Vector3((bBox->X2 + bBox->X1) / 2.0f, (bBox->Y2 + bBox->Y1) / 2.0f, (bBox->Z2 + bBox->Z1) / 2.0f);
+	auto boxExtent = Vector3((bBox->X2 - bBox->X1) / 2.0f, (bBox->Y2 - bBox->Y1) / 2.0f, (bBox->Z2 - bBox->Z1) / 2.0f);
+	auto rotation = pose.Orientation.ToQuaternion();
+
+	BoundingOrientedBox result;
+	BoundingOrientedBox(boxCentre, boxExtent, Vector4::UnitY).Transform(result, 1.0f, rotation, Vector3(pose.Position.x, pose.Position.y, pose.Position.z));
+	return result;
+}
+
+void phd_RotBoundingBoxNoPersp(PoseData* pose, BOUNDING_BOX* bounds, BOUNDING_BOX* tBounds)
+{
+	auto world = pose->Orientation.ToRotationMatrix();
 	auto bMin = Vector3(bounds->X1, bounds->Y1, bounds->Z1);
 	auto bMax = Vector3(bounds->X2, bounds->Y2, bounds->Z2);
 
 	bMin = Vector3::Transform(bMin, world);
 	bMax = Vector3::Transform(bMax, world);
 
-	tbounds->X1 = bMin.x;
-	tbounds->X2 = bMax.x;
-	tbounds->Y1 = bMin.y;
-	tbounds->Y2 = bMax.y;
-	tbounds->Z1 = bMin.z;
-	tbounds->Z2 = bMax.z;
+	tBounds->X1 = bMin.x;
+	tBounds->X2 = bMax.x;
+	tBounds->Y1 = bMin.y;
+	tBounds->Y2 = bMax.y;
+	tBounds->Z1 = bMin.z;
+	tBounds->Z2 = bMax.z;
 }
 
 void InterpolateAngle(short angle, short* rotation, short* outAngle, int shift)
@@ -134,6 +145,7 @@ void GetMatrixFromTrAngle(Matrix* matrix, short* framePtr, int index)
 			rotY * (360.0f / 1024.0f) * RADIAN,
 			rotX * (360.0f / 1024.0f) * RADIAN,
 			rotZ * (360.0f / 1024.0f) * RADIAN);
+
 		break;
 
 	case 0x4000:
@@ -148,15 +160,4 @@ void GetMatrixFromTrAngle(Matrix* matrix, short* framePtr, int index)
 		*matrix = Matrix::CreateRotationZ((rot0 & 0xfff) * (360.0f / 4096.0f) * RADIAN);
 		break;
 	}
-}
-
-BoundingOrientedBox TO_DX_BBOX(PoseData pos, BOUNDING_BOX* box)
-{
-	auto boxCentre = Vector3((box->X2 + box->X1) / 2.0f, (box->Y2 + box->Y1) / 2.0f, (box->Z2 + box->Z1) / 2.0f);
-	auto boxExtent = Vector3((box->X2 - box->X1) / 2.0f, (box->Y2 - box->Y1) / 2.0f, (box->Z2 - box->Z1) / 2.0f);
-	auto rotation = pos.Orientation.ToQuaternion();
-
-	BoundingOrientedBox result;
-	BoundingOrientedBox(boxCentre, boxExtent, Vector4::UnitY).Transform(result, 1, rotation, Vector3(pos.Position.x, pos.Position.y, pos.Position.z));
-	return result;
 }

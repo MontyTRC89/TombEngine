@@ -78,9 +78,9 @@ float phd_sin(short a);
 float phd_cos(short a);
 int	  phd_atan(int dz, int dx);
 
-BoundingOrientedBox TO_DX_BBOX(PoseData pos, BOUNDING_BOX* box);
+BoundingOrientedBox TO_DX_BBOX(PoseData pose, BOUNDING_BOX* bBox);
 
-void phd_RotBoundingBoxNoPersp(PoseData* pos, BOUNDING_BOX* bounds, BOUNDING_BOX* tbounds);
+void phd_RotBoundingBoxNoPersp(PoseData* pose, BOUNDING_BOX* bounds, BOUNDING_BOX* tBounds);
 
 void InterpolateAngle(short angle, short* rotation, short* outAngle, int shift);
 void GetMatrixFromTrAngle(Matrix* matrix, short* framePtr, int index);
