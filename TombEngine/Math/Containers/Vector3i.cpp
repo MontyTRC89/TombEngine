@@ -105,19 +105,19 @@
 		return *this;
 	}
 
-	Vector3i& Vector3i::operator *=(float value)
+	Vector3i& Vector3i::operator *=(float scale)
 	{
-		this->x *= value;
-		this->y *= value;
-		this->z *= value;
+		this->x *= scale;
+		this->y *= scale;
+		this->z *= scale;
 		return *this;
 	}
 
-	Vector3i& Vector3i::operator /=(float value)
+	Vector3i& Vector3i::operator /=(float scale)
 	{
-		this->x /= value;
-		this->y /= value;
-		this->z /= value;
+		this->x /= scale;
+		this->y /= scale;
+		this->z /= scale;
 		return *this;
 	}
 //}

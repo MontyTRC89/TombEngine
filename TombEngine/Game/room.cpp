@@ -167,16 +167,16 @@ FloorInfo* GetSector(ROOM_INFO* room, int x, int z)
 	return &room->floor[index];
 }
 
-BOUNDING_BOX* GetBoundsAccurate(const MESH_INFO* mesh, bool visibility)
+BOUNDING_BOX& GetBoundsAccurate(const MESH_INFO& mesh, bool visibility)
 {
 	static BOUNDING_BOX result;
 
 	if (visibility)
-		result = StaticObjects[mesh->staticNumber].visibilityBox * mesh->scale;
+		result = StaticObjects[mesh.staticNumber].visibilityBox * mesh.scale;
 	else
-		result = StaticObjects[mesh->staticNumber].collisionBox * mesh->scale;
+		result = StaticObjects[mesh.staticNumber].collisionBox * mesh.scale;
 
-	return &result;
+	return result;
 }
 
 bool IsPointInRoom(Vector3i pos, int roomNumber)
@@ -188,7 +188,7 @@ bool IsPointInRoom(Vector3i pos, int roomNumber)
 
 	if ((xSector >= 0 && xSector <= (room->xSize - 1)) &&
 		(zSector >= 0 && zSector <= (room->zSize - 1)) &&
-		(pos.y <= room->minfloor && pos.y >= room->maxceiling)) // Up is -y, hence y should be "less" than floor.
+		(pos.y <= room->minfloor && pos.y >= room->maxceiling)) // Up is -Y, hence Y should be "less" than floor.
 	{
 		return true;
 	}

@@ -1835,10 +1835,12 @@ static bool CheckStaticCollideCamera(MESH_INFO* mesh)
 	if (!(mesh->flags & StaticMeshFlags::SM_VISIBLE))
 		return false;
 
-	auto bounds = GetBoundsAccurate(mesh, false);
-	auto extents = Vector3(abs(bounds->X1 - bounds->X2),
-						   abs(bounds->Y1 - bounds->Y2),
-						   abs(bounds->Z1 - bounds->Z2));
+	const auto& bounds = GetBoundsAccurate(*mesh, false);
+	auto extents = Vector3(
+		abs(bounds.X1 - bounds.X2),
+		abs(bounds.Y1 - bounds.Y2),
+		abs(bounds.Z1 - bounds.Z2)
+	);
 
 	// Check extents, if any 2 bounds are smaller than threshold, discard.
 	if ((abs(extents.x) < COLL_DISCARD_THRESHOLD && abs(extents.y) < COLL_DISCARD_THRESHOLD) ||
@@ -1911,7 +1913,7 @@ void ItemsCollideCamera()
 
 	for (int i = 0; i < staticList.size(); i++)
 	{
-		auto mesh = staticList[i];
+		auto* mesh = staticList[i];
 		if (!mesh)
 			return;
 
@@ -1922,12 +1924,12 @@ void ItemsCollideCamera()
 		if (dx > COLL_CANCEL_THRESHOLD || dz > COLL_CANCEL_THRESHOLD || dy > COLL_CANCEL_THRESHOLD)
 			continue;
 
-		auto bounds = GetBoundsAccurate(mesh, false);
-		if (TestBoundsCollideCamera(*bounds, mesh->pos, CAMERA_RADIUS))
-			ItemPushCamera(bounds, &mesh->pos, rad);
+		auto bounds = GetBoundsAccurate(*mesh, false);
+		if (TestBoundsCollideCamera(bounds, mesh->pos, CAMERA_RADIUS))
+			ItemPushCamera(&bounds, &mesh->pos, rad);
 
 #ifdef _DEBUG
-		TEN::Renderer::g_Renderer.AddDebugBox(bounds->ToDXBoundingOrientedBox(mesh->pos),
+		TEN::Renderer::g_Renderer.AddDebugBox(bounds.ToDXBoundingOrientedBox(mesh->pos),
 			Vector4(1.0f, 0.0f, 0.0f, 1.0f), RENDERER_DEBUG_PAGE::DIMENSION_STATS);
 #endif
 	}

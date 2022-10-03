@@ -2086,13 +2086,13 @@ void InitialiseItemBoxData()
 			if (!(g_Level.Boxes[floor->Box].flags & BLOCKED))
 			{
 				int floorHeight = floor->FloorHeight(mesh.pos.Position.x, mesh.pos.Position.z);
-				auto bbox = GetBoundsAccurate(&mesh, false);
+				auto bBox = GetBoundsAccurate(mesh, false);
 
-				if (floorHeight <= mesh.pos.Position.y - bbox->Y2 + CLICK(2) &&
-					floorHeight < mesh.pos.Position.y - bbox->Y1)
+				if (floorHeight <= mesh.pos.Position.y - bBox.Y2 + CLICK(2) &&
+					floorHeight < mesh.pos.Position.y - bBox.Y1)
 				{
-					if (bbox->X1 == 0 || bbox->X2 == 0 || bbox->Z1 == 0 || bbox->Z2 == 0 ||
-					   ((bbox->X1 < 0) ^ (bbox->X2 < 0)) && ((bbox->Z1 < 0) ^ (bbox->Z2 < 0)))
+					if (bBox.X1 == 0 || bBox.X2 == 0 || bBox.Z1 == 0 || bBox.Z2 == 0 ||
+					   ((bBox.X1 < 0) ^ (bBox.X2 < 0)) && ((bBox.Z1 < 0) ^ (bBox.Z2 < 0)))
 					{
 						floor->Stopper = true;
 					}

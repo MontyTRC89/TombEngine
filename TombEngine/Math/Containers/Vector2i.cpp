@@ -99,17 +99,17 @@ namespace TEN::Math
 		return *this;
 	}
 
-	Vector2i& Vector2i::operator *=(float value)
+	Vector2i& Vector2i::operator *=(float scale)
 	{
-		this->x *= value;
-		this->y *= value;
+		this->x *= scale;
+		this->y *= scale;
 		return *this;
 	}
 
-	Vector2i& Vector2i::operator /=(float value)
+	Vector2i& Vector2i::operator /=(float scale)
 	{
-		this->x /= value;
-		this->y /= value;
+		this->x /= scale;
+		this->y /= scale;
 		return *this;
 	}
 }

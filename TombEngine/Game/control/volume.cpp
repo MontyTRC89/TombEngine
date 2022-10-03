@@ -135,9 +135,9 @@ namespace TEN::Control::Volumes
 
 	void TestVolumes(short roomNumber, MESH_INFO* mesh)
 	{
-		auto bbox = GetBoundsAccurate(mesh, false)->ToDXBoundingOrientedBox(mesh->pos);
-
-		TestVolumes(roomNumber, bbox, TriggerVolumeActivators::Static, mesh);
+		const auto& bBox = GetBoundsAccurate(*mesh, false).ToDXBoundingOrientedBox(mesh->pos);
+		
+		TestVolumes(roomNumber, bBox, TriggerVolumeActivators::Static, mesh);
 	}
 
 	void TestVolumes(short itemNumber)

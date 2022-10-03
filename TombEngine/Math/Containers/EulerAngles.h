@@ -31,8 +31,8 @@
 		EulerAngles	 operator +(const EulerAngles& eulers) const;
 		EulerAngles	 operator -(const EulerAngles& eulers) const;
 		EulerAngles	 operator *(const EulerAngles& eulers) const;
-		EulerAngles	 operator *(float value) const;
-		EulerAngles	 operator /(float value) const;
+		EulerAngles	 operator *(float scale) const;
+		EulerAngles	 operator /(float scale) const;
 		EulerAngles& operator =(const EulerAngles& eulers);
 		EulerAngles& operator +=(const EulerAngles& eulers);
 		EulerAngles& operator -=(const EulerAngles& eulers);

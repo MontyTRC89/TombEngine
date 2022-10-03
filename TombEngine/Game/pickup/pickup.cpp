@@ -841,13 +841,13 @@ BOUNDING_BOX* FindPlinth(ItemInfo* item)
 			continue;
 
 		auto* frame = (BOUNDING_BOX*)GetBestFrame(item);
-		auto* bbox = GetBoundsAccurate(mesh, false);
+		auto& bBox = GetBoundsAccurate(*mesh, false);
 
-		if (frame->X1 <= bbox->X2 && frame->X2 >= bbox->X1 &&
-			frame->Z1 <= bbox->Z2 && frame->Z2 >= bbox->Z1 &&
-			(bbox->X1 || bbox->X2))
+		if (frame->X1 <= bBox.X2 && frame->X2 >= bBox.X1 &&
+			frame->Z1 <= bBox.Z2 && frame->Z2 >= bBox.Z1 &&
+			(bBox.X1 || bBox.X2))
 		{
-			return bbox;
+			return &bBox;
 		}
 	}
 

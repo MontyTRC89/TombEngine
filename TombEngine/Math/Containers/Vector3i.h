@@ -30,8 +30,8 @@
 		Vector3i  operator +(const Vector3i& vector) const;
 		Vector3i  operator -(const Vector3i& vector) const;
 		Vector3i  operator *(const Vector3i& vector) const;
-		Vector3i  operator *(float value) const;
-		Vector3i  operator /(float value) const;
+		Vector3i  operator *(float scale) const;
+		Vector3i  operator /(float scale) const;
 		Vector3i& operator =(const Vector3i& vector);
 		Vector3i& operator +=(const Vector3i& vector);
 		Vector3i& operator -=(const Vector3i& vector);

@@ -413,7 +413,7 @@ namespace TEN::Renderer
 		int numStatics = r->mesh.size();
 		for (int i = 0; i < numStatics; i++)
 		{
-			auto mesh = &r->mesh[i];
+			auto* mesh = &r->mesh[i];
 			
 			if (!(mesh->flags & StaticMeshFlags::SM_VISIBLE))
 				continue;
@@ -426,7 +426,7 @@ namespace TEN::Renderer
 			if (obj.ObjectMeshes.size() == 0)
 				continue;
 
-			auto bounds = GetBoundsAccurate(mesh, true)->ToDXBoundingOrientedBox(mesh->pos);
+			const auto& bounds = GetBoundsAccurate(*mesh, true).ToDXBoundingOrientedBox(mesh->pos);
 			auto length = Vector3(bounds.Extents).Length();
 			if (!renderView.camera.frustum.SphereInFrustum(bounds.Center, length))
 				continue;

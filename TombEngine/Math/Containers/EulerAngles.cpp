@@ -151,19 +151,19 @@
 		return *this;
 	}
 
-	EulerAngles& EulerAngles::operator *=(float value)
+	EulerAngles& EulerAngles::operator *=(float scale)
 	{
-		this->x *= value;
-		this->y *= value;
-		this->z *= value;
+		this->x *= scale;
+		this->y *= scale;
+		this->z *= scale;
 		return *this;
 	}
 
-	EulerAngles& EulerAngles::operator /=(float value)
+	EulerAngles& EulerAngles::operator /=(float scale)
 	{
-		this->x /= value;
-		this->y /= value;
-		this->z /= value;
+		this->x /= scale;
+		this->y /= scale;
+		this->z /= scale;
 		return *this;
 	}
 //}
