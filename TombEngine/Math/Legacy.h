@@ -2,7 +2,6 @@
 #include "Math/Containers/BoundingBox.h" // TODO: Including this here shouldn't be necessary.
 
 struct PoseData;
-struct Vector3i;
 
 constexpr auto FP_SHIFT	 = 16;
 constexpr auto W2V_SHIFT = 14;
@@ -16,9 +15,7 @@ enum MatrixArrayValue
 
 struct ColorData
 {
-	byte r;
-	byte g;
-	byte b;
+	byte r, g, b;
 	byte cd;
 };
 
