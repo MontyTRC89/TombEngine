@@ -67,8 +67,8 @@ struct BOUNDING_BOX
 	int Height() const;
 
 	// Converters
-	BoundingBox			ToDXBoundingBox() const;
-	BoundingOrientedBox ToDXBoundingOrientedBox(PoseData pose) const;
+	BoundingOrientedBox ToDXBoundingOrientedBox(const PoseData& pose) const;
+	BoundingOrientedBox ToDXBoundingOrientedBox(const Vector3& pos, const Quaternion& orient) const;
 
 	// Operators
 	BOUNDING_BOX operator +(const PoseData& pose) const;
@@ -84,8 +84,6 @@ float TO_RAD(short angle);
 float phd_sin(short a);
 float phd_cos(short a);
 int	  phd_atan(int dz, int dx);
-
-BoundingOrientedBox TO_DX_BBOX(PoseData pose, BOUNDING_BOX* bBox);
 
 void phd_RotBoundingBoxNoPersp(PoseData* pose, BOUNDING_BOX* bounds, BOUNDING_BOX* tBounds);
 

@@ -360,11 +360,11 @@ bool DoRayBox(GameVector* origin, GameVector* target, BOUNDING_BOX* box, PoseDat
 	XMVECTOR rayDirectionNorm = XMVector3Normalize(rayDirection);
 
 	// Create the bounding box for raw collision detection
-	auto obox = TO_DX_BBOX(*itemOrStaticPos, box);
+	auto oBox = box->ToDXBoundingOrientedBox(*itemOrStaticPos);
 
 	// Get the collision with the bounding box
 	float distance;
-	bool collided = obox.Intersects(rayOrigin, rayDirectionNorm, distance);
+	bool collided = oBox.Intersects(rayOrigin, rayDirectionNorm, distance);
 
 	// If no collision happened, then don't test spheres
 	if (!collided)

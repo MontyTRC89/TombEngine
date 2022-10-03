@@ -15,14 +15,18 @@ int BOUNDING_BOX::Height() const
 	return abs(Y2 - Y1);
 }
 
-BoundingOrientedBox BOUNDING_BOX::ToDXBoundingOrientedBox(PoseData pose) const
+BoundingOrientedBox BOUNDING_BOX::ToDXBoundingOrientedBox(const PoseData& pose) const
+{
+	return this->ToDXBoundingOrientedBox(pose.Position.ToVector3(), pose.Orientation.ToQuaternion());
+}
+
+BoundingOrientedBox BOUNDING_BOX::ToDXBoundingOrientedBox(const Vector3& pos, const Quaternion& orient) const
 {
 	auto boxCenter = Vector3((X2 + X1) / 2.0f, (Y2 + Y1) / 2.0f, (Z2 + Z1) / 2.0f);
 	auto boxExtent = Vector3((X2 - X1) / 2.0f, (Y2 - Y1) / 2.0f, (Z2 - Z1) / 2.0f);
-	auto orient = pose.Orientation.ToQuaternion();
 
 	BoundingOrientedBox result;
-	BoundingOrientedBox(boxCenter, boxExtent, Vector4::UnitY).Transform(result, 1.0f, orient, pose.Position.ToVector3());
+	BoundingOrientedBox(boxCenter, boxExtent, Vector4::UnitY).Transform(result, 1.0f, orient, pos);
 	return result;
 }
 
@@ -88,17 +92,6 @@ float phd_cos(short a)
 int phd_atan(int x, int y)
 {
 	return FROM_RAD(atan2(y, x));
-}
-
-BoundingOrientedBox TO_DX_BBOX(PoseData pose, BOUNDING_BOX* bBox)
-{
-	auto boxCentre = Vector3((bBox->X2 + bBox->X1) / 2.0f, (bBox->Y2 + bBox->Y1) / 2.0f, (bBox->Z2 + bBox->Z1) / 2.0f);
-	auto boxExtent = Vector3((bBox->X2 - bBox->X1) / 2.0f, (bBox->Y2 - bBox->Y1) / 2.0f, (bBox->Z2 - bBox->Z1) / 2.0f);
-	auto rotation = pose.Orientation.ToQuaternion();
-
-	BoundingOrientedBox result;
-	BoundingOrientedBox(boxCentre, boxExtent, Vector4::UnitY).Transform(result, 1.0f, rotation, Vector3(pose.Position.x, pose.Position.y, pose.Position.z));
-	return result;
 }
 
 void phd_RotBoundingBoxNoPersp(PoseData* pose, BOUNDING_BOX* bounds, BOUNDING_BOX* tBounds)

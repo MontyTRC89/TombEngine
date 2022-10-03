@@ -144,7 +144,7 @@ void ElectricityWiresControl(short itemNumber)
 
 	auto* object = &Objects[item->ObjectNumber];
 
-	auto cableBox = TO_DX_BBOX(item->Pose, GetBoundsAccurate(item));
+	auto cableBox = GetBoundsAccurate(item)->ToDXBoundingOrientedBox(item->Pose);
 	auto cableBottomPlane = cableBox.Center.y + cableBox.Extents.y - CLICK(1);
 
 	int currentEndNode = 0;
@@ -189,7 +189,7 @@ void ElectricityWiresControl(short itemNumber)
 			continue;
 
 		bool isWaterNearby = false;
-		auto npcBox = TO_DX_BBOX(collItem->Pose, GetBoundsAccurate(collItem));
+		auto npcBox = GetBoundsAccurate(collItem)->ToDXBoundingOrientedBox(collItem->Pose);
 
 		for (int i = 0; i < object->nmeshes; i++)
 		{

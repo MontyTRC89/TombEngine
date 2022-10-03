@@ -861,20 +861,18 @@ int GetQuadrant(short angle)
 
 // Determines vertical surfaces and gets nearest ledge angle.
 // Allows to eventually use unconstrained vaults and shimmying.
-
 short GetNearestLedgeAngle(ItemInfo* item, CollisionInfo* coll, float& distance)
 {
 	// Calculation ledge angle for non-Lara objects is unnecessary.
 	if (!item->IsLara())
 		return 0; 
 
-	// Get item bounds and current rotation
+	// Get item bounds and current rotation.
 	auto bounds = GetBoundsAccurate(item);
 	auto c = phd_cos(coll->Setup.ForwardAngle);
 	auto s = phd_sin(coll->Setup.ForwardAngle);
 
-	// Origin test position should be slightly in front of origin, because otherwise
-	// misfire may occur near block corners for split angles.
+	// Origin test position should be slightly in front of origin, because otherwise misfire may occur near block corners for split angles.
 	auto frontalOffset = coll->Setup.Radius * 0.3f;
 	auto x = item->Pose.Position.x + frontalOffset * s;
 	auto z = item->Pose.Position.z + frontalOffset * c;
@@ -885,7 +883,7 @@ short GetNearestLedgeAngle(ItemInfo* item, CollisionInfo* coll, float& distance)
 	int yPoints[2] = { item->Pose.Position.y + bounds->Y1 + headroom,
 					   item->Pose.Position.y + bounds->Y2 - headroom };
 
-	// Prepare test data
+	// Prepare test data.
 	float finalDistance[2] = { FLT_MAX, FLT_MAX };
 	short finalResult[2] = { 0 };
 	bool  hitBridge = false;
@@ -895,35 +893,35 @@ short GetNearestLedgeAngle(ItemInfo* item, CollisionInfo* coll, float& distance)
 
 	for (int h = 0; h < 2; h++)
 	{
-		// Use either bottom or top Y point to test
+		// Use either bottom or top Y point to test.
 		auto y = yPoints[h];
 
-		// Prepare test data
+		// Prepare test data.
 		Ray   originRay;
 		Plane closestPlane[3] = { };
 		float closestDistance[3] = { FLT_MAX, FLT_MAX, FLT_MAX };
 		short result[3] = { };
 
-		// If bridge was hit on the first pass, stop checking
+		// If bridge was hit on the first pass, stop checking.
 		if (h == 1 && hitBridge)
 			break;
 
 		for (int p = 0; p < 3; p++)
 		{
-			// Prepare test data
+			// Prepare test data.
 			float distance = 0.0f;
 
-			// Determine horizontal probe coordinates
+			// Determine horizontal probe coordinates.
 			auto eX = x;
 			auto eZ = z;
 
-			// Determine if probe must be shifted (if left or right probe)
+			// Determine if probe must be shifted (if left or right probe).
 			if (p > 0)
 			{
 				auto s2 = phd_sin(coll->Setup.ForwardAngle + (p == 1 ? ANGLE(90.0f) : -ANGLE(90.0f)));
 				auto c2 = phd_cos(coll->Setup.ForwardAngle + (p == 1 ? ANGLE(90.0f) : -ANGLE(90.0f)));
 
-				// Slightly extend width beyond coll radius to hit adjacent blocks for sure
+				// Slightly extend width beyond coll radius to hit adjacent blocks for sure.
 				eX += s2 * (coll->Setup.Radius * 2);
 				eZ += c2 * (coll->Setup.Radius * 2);
 			}
@@ -961,7 +959,7 @@ short GetNearestLedgeAngle(ItemInfo* item, CollisionInfo* coll, float& distance)
 			bool useCeilingLedge = ceilingHeight > y;
 			int height = useCeilingLedge ? ceilingHeight : floorHeight;
 
-			// Determine if there is a bridge in front
+			// Determine if there is a bridge in front.
 			auto bridge = block->InsideBridge(ffpX, height, ffpZ, true, y == height);
 
 			// Determine floor probe offset.
@@ -970,14 +968,14 @@ short GetNearestLedgeAngle(ItemInfo* item, CollisionInfo* coll, float& distance)
 			auto fpX = eX + floorProbeOffset * s;
 			auto fpZ = eZ + floorProbeOffset * c;
 
-			// Debug probe point
+			// Debug probe point.
 			// g_Renderer.AddDebugSphere(Vector3(fpX, y, fpZ), 16, Vector4(0, 1, 0, 1), RENDERER_DEBUG_PAGE::LOGIC_STATS);
 
 			// Get true room number and block, based on derived height
 			room = GetRoom(item->Location, fpX, height, fpZ).roomNumber;
 			block = GetCollision(fpX, height, fpZ, room).Block;
 
-			// We don't need actual corner heights to build planes, so just use normalized value here
+			// We don't need actual corner heights to build planes, so just use normalized value here.
 			auto fY = height - 1;
 			auto cY = height + 1;
 
@@ -986,20 +984,21 @@ short GetNearestLedgeAngle(ItemInfo* item, CollisionInfo* coll, float& distance)
 			auto direction = (Matrix::CreateTranslation(Vector3::UnitZ) * mxR).Translation();
 			auto ray = Ray(Vector3(eX, cY, eZ), direction);
 
-			// Debug ray direction
+			// Debug ray direction.
 			// g_Renderer.AddLine3D(Vector3(eX, y, eZ), Vector3(eX, y, eZ) + direction * 256, Vector4(1, 0, 0, 1));
 
-			// Keep origin ray to calculate true centerpoint distance to ledge later
+			// Keep origin ray to calculate true centerpoint distance to ledge later.
 			if (p == 0)
 				originRay = Ray(Vector3(eX, cY, eZ), direction);
 
-			if (bridge >= 0) // Surface is inside bridge
+			// Surface is inside bridge.
+			if (bridge >= 0)
 			{
-				// Get and test DX item coll bounds
+				// Get and test DX item coll bounds.
 				auto bounds = GetBoundsAccurate(&g_Level.Items[bridge]);
-				auto dxBounds = TO_DX_BBOX(g_Level.Items[bridge].Pose, bounds);
+				auto dxBounds = bounds->ToDXBoundingOrientedBox(g_Level.Items[bridge].Pose);
 
-				// Decompose bounds into planes
+				// Decompose bounds into planes.
 				Vector3 corners[8];
 				dxBounds.GetCorners(corners);
 				Plane plane[4] =
@@ -1010,15 +1009,14 @@ short GetNearestLedgeAngle(ItemInfo* item, CollisionInfo* coll, float& distance)
 					Plane(corners[6], corners[5], corners[1])
 				};
 
-				// Find closest bridge edge plane
+				// Find closest bridge edge plane.
 				for (int i = 0; i < 4; i++)
 				{
-					// No plane intersection, quickly discard
+					// No plane intersection, quickly discard.
 					if (!ray.Intersects(plane[i], distance))
 						continue;
 
-					// Process plane intersection only if distance is smaller
-					// than already found minimum
+					// Process plane intersection only if distance is smaller than already found minimum.
 					if (distance < closestDistance[p])
 					{
 						closestPlane[p] = plane[i];
@@ -1029,27 +1027,28 @@ short GetNearestLedgeAngle(ItemInfo* item, CollisionInfo* coll, float& distance)
 					}
 				}
 			}
-			else // Surface is inside block
+			// Surface is inside block.
+			else
 			{
 				// Determine if we should use floor or ceiling split angle based on early tests.
 				auto splitAngle = (useCeilingLedge ? block->CeilingCollision.SplitAngle : block->FloorCollision.SplitAngle);
 
-				// Get horizontal block corner coordinates
-				auto fX = floor(eX / WALL_SIZE) * WALL_SIZE - 1;
-				auto fZ = floor(eZ / WALL_SIZE) * WALL_SIZE - 1;
-				auto cX = fX + WALL_SIZE + 1;
-				auto cZ = fZ + WALL_SIZE + 1;
+				// Get horizontal block corner coordinates.
+				auto fX = floor(eX / SECTOR(1)) * SECTOR(1) - 1;
+				auto fZ = floor(eZ / SECTOR(1)) * SECTOR(1) - 1;
+				auto cX = fX + SECTOR(1) + 1;
+				auto cZ = fZ + SECTOR(1) + 1;
 
 				// Debug used block
 				// g_Renderer.AddDebugSphere(Vector3(round(eX / WALL_SIZE) * WALL_SIZE + 512, y, round(eZ / WALL_SIZE) * WALL_SIZE + 512), 16, Vector4(1, 1, 1, 1), RENDERER_DEBUG_PAGE::LOGIC_STATS);
 
-				// Get split angle coordinates
-				auto sX = fX + 1 + WALL_SIZE / 2;
-				auto sZ = fZ + 1 + WALL_SIZE / 2;
+				// Get split angle coordinates.
+				auto sX = fX + 1 + SECTOR(0.5f);
+				auto sZ = fZ + 1 + SECTOR(0.5f);
 				auto sShiftX = coll->Setup.Radius * sin(splitAngle);
 				auto sShiftZ = coll->Setup.Radius * cos(splitAngle);
 
-				// Get block edge planes + split angle plane
+				// Get block edge planes + split angle plane.
 				Plane plane[5] =
 				{
 					Plane(Vector3(fX, cY, cZ), Vector3(cX, cY, cZ), Vector3(cX, fY, cZ)), // North 
@@ -1062,20 +1061,19 @@ short GetNearestLedgeAngle(ItemInfo* item, CollisionInfo* coll, float& distance)
 				// If split angle exists, take split plane into account too.
 				auto useSplitAngle = (useCeilingLedge ? block->CeilingIsSplit() : block->FloorIsSplit());
 
-				// Find closest block edge plane
+				// Find closest block edge plane.
 				for (int i = 0; i < (useSplitAngle ? 5 : 4); i++)
 				{
-					// No plane intersection, quickly discard
+					// No plane intersection, quickly discard.
 					if (!ray.Intersects(plane[i], distance))
 						continue;
 
-					// Intersection point is out of block bounds, discard
+					// Intersection point is out of block bounds, discard.
 					auto cPoint = ray.position + ray.direction * distance;
 					if (cPoint.x < minX || cPoint.x > maxX || cPoint.z < minZ || cPoint.z > maxZ)
 						continue;
 
-					// Process plane intersection only if distance is smaller
-					// than already found minimum
+					// Process plane intersection only if distance is smaller than already found minimum.
 					if (distance < closestDistance[p])
 					{
 						closestDistance[p] = distance;
@@ -1108,20 +1106,20 @@ short GetNearestLedgeAngle(ItemInfo* item, CollisionInfo* coll, float& distance)
 		std::set<short> angles;
 		for (int p = 0; p < 3; p++)
 		{
-			// Prioritize ledge angle which was twice recognized
+			// Prioritize ledge angle which was twice recognized.
 			if (!angles.insert(result[p]).second)
 			{
-				// Find existing angle in results
+				// Find existing angle in results.
 				int firstEqualAngle;
 				for (firstEqualAngle = 0; firstEqualAngle < 3; firstEqualAngle++)
 				{
 					if (result[firstEqualAngle] == result[p])
 						break;
 					else if (firstEqualAngle == 2)
-						firstEqualAngle = 0; // No equal angles, use center one
+						firstEqualAngle = 0; // No equal angles; use center one.
 				}
 				
-				// Remember distance to the closest plane with same angle (it happens sometimes with bridges)
+				// Remember distance to the closest plane with same angle (it happens sometimes with bridges).
 				float dist1 = FLT_MAX;
 				float dist2 = FLT_MAX;
 				bool r1 = originRay.Intersects(closestPlane[p], dist1);
@@ -1133,8 +1131,7 @@ short GetNearestLedgeAngle(ItemInfo* item, CollisionInfo* coll, float& distance)
 			}
 		}
 
-		// A case when all 3 results are different (no priority) or prioritized result 
-		// is a long-distance misfire
+		// A case when all 3 results are different (no priority) or prioritized result is a long-distance misfire.
 
 		if (finalDistance[h] == FLT_MAX || finalDistance[h] > WALL_SIZE / 2)
 		{

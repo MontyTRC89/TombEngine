@@ -426,7 +426,7 @@ namespace TEN::Renderer
 			if (obj.ObjectMeshes.size() == 0)
 				continue;
 
-			auto bounds = TO_DX_BBOX(mesh->pos, GetBoundsAccurate(mesh, true));
+			auto bounds = GetBoundsAccurate(mesh, true)->ToDXBoundingOrientedBox(mesh->pos);
 			auto length = Vector3(bounds.Extents).Length();
 			if (!renderView.camera.frustum.SphereInFrustum(bounds.Center, length))
 				continue;

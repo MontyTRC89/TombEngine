@@ -123,19 +123,19 @@ namespace TEN::Control::Volumes
 
 	void TestVolumes(CAMERA_INFO* camera)
 	{
-		auto pos = PoseData(camera->pos.x, camera->pos.y, camera->pos.z, 0, 0, 0);
+		auto pos = PoseData(camera->pos.ToVector3i(), EulerAngles::Zero);
 		auto box = BOUNDING_BOX();
 		box.X1 = box.Y1 = box.Z1 =  CAM_SIZE;
 		box.X2 = box.Y2 = box.Z2 = -CAM_SIZE;
 
-		auto bbox = TO_DX_BBOX(pos, &box);
+		auto bBox = box.ToDXBoundingOrientedBox(pos);
 
-		TestVolumes(camera->pos.roomNumber, bbox, TriggerVolumeActivators::Flyby, camera);
+		TestVolumes(camera->pos.roomNumber, bBox, TriggerVolumeActivators::Flyby, camera);
 	}
 
 	void TestVolumes(short roomNumber, MESH_INFO* mesh)
 	{
-		auto bbox = TO_DX_BBOX(mesh->pos, GetBoundsAccurate(mesh, false));
+		auto bbox = GetBoundsAccurate(mesh, false)->ToDXBoundingOrientedBox(mesh->pos);
 
 		TestVolumes(roomNumber, bbox, TriggerVolumeActivators::Static, mesh);
 	}
@@ -143,18 +143,18 @@ namespace TEN::Control::Volumes
 	void TestVolumes(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
-		auto bbox = TO_DX_BBOX(item->Pose, GetBoundsAccurate(item));
+		auto bBox = GetBoundsAccurate(item)->ToDXBoundingOrientedBox(item->Pose);
 
 #ifdef _DEBUG
-		g_Renderer.AddDebugBox(bbox, Vector4(1.0f, 1.0f, 0.0f, 1.0f), RENDERER_DEBUG_PAGE::LOGIC_STATS);
+		g_Renderer.AddDebugBox(bBox, Vector4(1.0f, 1.0f, 0.0f, 1.0f), RENDERER_DEBUG_PAGE::LOGIC_STATS);
 #endif
 
 		if (item->ObjectNumber == ID_LARA)
-			TestVolumes(item->RoomNumber, bbox, TriggerVolumeActivators::Player, itemNumber);
+			TestVolumes(item->RoomNumber, bBox, TriggerVolumeActivators::Player, itemNumber);
 		else if (Objects[item->ObjectNumber].intelligent)
-			TestVolumes(item->RoomNumber, bbox, TriggerVolumeActivators::NPC, itemNumber);
+			TestVolumes(item->RoomNumber, bBox, TriggerVolumeActivators::NPC, itemNumber);
 		else
-			TestVolumes(item->RoomNumber, bbox, TriggerVolumeActivators::Movable, itemNumber);
+			TestVolumes(item->RoomNumber, bBox, TriggerVolumeActivators::Movable, itemNumber);
 	}
 
 	void InitialiseNodeScripts()
