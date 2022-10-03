@@ -58,14 +58,20 @@ namespace TEN::Math::Geometry
 
 	Vector3 TranslatePoint(const Vector3& point, const Vector3& direction, float distance)
 	{
+		if (distance == 0.0f)
+			return point;
+
 		auto directionNorm = direction;
 		directionNorm.Normalize();
 		return (point + (directionNorm * distance));
 	}
 
-	short GetShortestAngularDistance(short angleFrom, short angleTo)
+	short GetShortestAngularDistance(short fromAngle, short toAngle)
 	{
-		return short(angleTo - angleFrom);
+		if (fromAngle == toAngle)
+			return 0;
+
+		return short(toAngle - fromAngle);
 	}
 
 	short GetSurfaceSteepnessAngle(Vector2 tilt)
@@ -77,6 +83,9 @@ namespace TEN::Math::Geometry
 
 	short GetSurfaceAspectAngle(Vector2 tilt)
 	{
+		if (tilt == Vector2::Zero)
+			return 0;
+
 		return FROM_RAD(atan2(-tilt.x, -tilt.y));
 	}
 
@@ -104,6 +113,9 @@ namespace TEN::Math::Geometry
 
 	EulerAngles GetOrientToPoint(const Vector3& origin, const Vector3& target)
 	{
+		if (origin == target)
+			return EulerAngles::Zero;
+
 		return EulerAngles(target - origin);
 	}
 
@@ -114,6 +126,9 @@ namespace TEN::Math::Geometry
 	
 	bool IsPointInFront(const Vector3& origin, const Vector3& target, const EulerAngles& orient)
 	{
+		if (origin == target)
+			return false;
+
 		float sinY = phd_sin(orient.y);
 		float cosY = phd_cos(orient.y);
 
@@ -130,6 +145,9 @@ namespace TEN::Math::Geometry
 
 	bool IsPointInFront(const Vector3& origin, const Vector3& target, const Vector3& refPoint)
 	{
+		if (origin == target)
+			return false;
+
 		auto refDirection = refPoint - origin;
 
 		// The 2D heading direction vector to the 3D reference direction vector: X = +refDirection.x, Y = 0, Z = +refDirection.z
@@ -150,6 +168,9 @@ namespace TEN::Math::Geometry
 
 	bool IsPointOnLeft(const Vector3& origin, const Vector3& target, const EulerAngles& orient)
 	{
+		if (origin == target)
+			return false;
+
 		float sinY = phd_sin(orient.y);
 		float cosY = phd_cos(orient.y);
 
@@ -166,6 +187,9 @@ namespace TEN::Math::Geometry
 
 	bool IsPointOnLeft(const Vector3& origin, const Vector3& target, const Vector3& refPoint)
 	{
+		if (origin == target)
+			return false;
+
 		auto refDirection = refPoint - origin;
 
 		// The 2D normal vector to the 3D reference direction vector: X = +refDirection.z, Y = 0, Z = -refDirection.x
