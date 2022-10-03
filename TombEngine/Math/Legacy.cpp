@@ -78,9 +78,9 @@ void InterpolateAngle(short angle, short* rotation, short* outAngle, int shift)
 		deltaAngle -= ANGLE(360.0f);
 
 	if (outAngle)
-		*outAngle = static_cast<short>(deltaAngle);
+		*outAngle = (short)deltaAngle;
 
-	*rotation += static_cast<short>(deltaAngle >> shift);
+	*rotation += short(deltaAngle >> shift);
 }
 
 void GetMatrixFromTrAngle(Matrix* matrix, short* framePtr, int index)
