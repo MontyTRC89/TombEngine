@@ -7,27 +7,12 @@ struct Vector3i;
 constexpr auto FP_SHIFT	 = 16;
 constexpr auto W2V_SHIFT = 14;
 
-struct VECTOR
-{
-	int vx;
-	int vy;
-	int vz;
-	int pad;
-};
-
 struct CVECTOR
 {
 	byte r;
 	byte g;
 	byte b;
 	byte cd;
-};
-
-struct TR_VERTEX
-{
-	int x;
-	int y;
-	int z;
 };
 
 enum MATRIX_ARRAY_VALUE
@@ -39,19 +24,11 @@ enum MATRIX_ARRAY_VALUE
 
 struct MATRIX3D
 {
-	short m00;
-	short m01;
-	short m02;
-	short m10;
-	short m11;
-	short m12;
-	short m20;
-	short m21;
-	short m22;
+	short m00, m01, m02;
+	short m10, m11, m12;
+	short m20, m21, m22;
 	short pad;
-	int tx;
-	int ty;
-	int tz;
+	int tx, ty, tz;
 };
 
 short ANGLE(float angle);
