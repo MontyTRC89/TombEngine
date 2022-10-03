@@ -42,7 +42,7 @@ struct SMOKE_SPARKS
 
 struct GUNFLASH_STRUCT
 {
-	MATRIX3D matrix;
+	Matrix3D matrix;
 	short on;
 };
 

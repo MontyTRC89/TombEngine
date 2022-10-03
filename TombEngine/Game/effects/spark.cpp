@@ -45,7 +45,7 @@ namespace TEN::Effects::Spark
 		return SparkParticles[0];
 	}
 
-	void TriggerFlareSparkParticles(Vector3i* pos, Vector3i* vel, CVECTOR* color, int room)
+	void TriggerFlareSparkParticles(Vector3i* pos, Vector3i* vel, ColorData* color, int room)
 	{
 		auto& s = GetFreeSparkParticle();
 		s = {};
@@ -56,13 +56,13 @@ namespace TEN::Effects::Spark
 		s.width = 8.0f;
 		s.height = 48.0f;
 		s.room = room;
-		s.pos = Vector3(pos->x, pos->y, pos->z);
-		Vector3 v = Vector3(vel->x, vel->y, vel->z);
+		s.pos = pos->ToVector3();
+		auto v = vel->ToVector3();
 		v += Vector3(GenerateFloat(-64, 64), GenerateFloat(-64, 64), GenerateFloat(-64, 64));
 		v.Normalize(v);
 		s.velocity = v *GenerateFloat(17,24);
 		s.sourceColor = Vector4(1, 1, 1, 1);
-		s.destinationColor = Vector4(color->r/255.0f,color->g/255.0f,color->b/255.0f,1);
+		s.destinationColor = Vector4(color->r / 255.0f, color->g / 255.0f, color->b / 255.0f, 1.0f);
 		s.active = true;
 	}
 

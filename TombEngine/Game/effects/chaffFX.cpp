@@ -58,7 +58,7 @@ void TriggerChaffEffects(ItemInfo* item, Vector3i* pos, Vector3i* vel, int speed
 		if (dx < -MAX_TRIGGER_RANGE || dx > MAX_TRIGGER_RANGE || dz < -MAX_TRIGGER_RANGE || dz > MAX_TRIGGER_RANGE)
 			return;
 
-		CVECTOR color;
+		ColorData color;
 		color.r = 255;
 		color.g = (GetRandomDraw() & 127) + 64;
 		color.b = 192 - color.g;
@@ -68,8 +68,8 @@ void TriggerChaffEffects(ItemInfo* item, Vector3i* pos, Vector3i* vel, int speed
 			TriggerChaffBubbles(pos, item->RoomNumber);
 		else
 		{
-			auto position = Vector3(pos->x, pos->y, pos->z);
-			Vector3 direction = Vector3(vel->x, vel->y, vel->z);
+			auto position = pos->ToVector3();
+			Vector3 direction = vel->ToVector3();
 			direction.Normalize();
 			TEN::Effects::Smoke::TriggerFlareSmoke(position + direction * 20, direction, age, item->RoomNumber);
 		}
@@ -87,7 +87,7 @@ void TriggerChaffEffects(ItemInfo* item, Vector3i* pos, Vector3i* vel, int speed
 	SoundEffect(cond ? SFX_TR4_FLARE_BURN_UNDERWATER : SFX_TR4_FLARE_BURN_DRY, &pose, SoundEnvironment::Always, 1.0f, 0.5f);
 }
 
-void TriggerChaffSparkles(Vector3i* pos, Vector3i* vel, CVECTOR* color, int age, ItemInfo* item)
+void TriggerChaffSparkles(Vector3i* pos, Vector3i* vel, ColorData* color, int age, ItemInfo* item)
 {
 	/*
 	SPARKS* sparkle;

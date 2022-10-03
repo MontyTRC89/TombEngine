@@ -7,7 +7,14 @@ struct Vector3i;
 constexpr auto FP_SHIFT	 = 16;
 constexpr auto W2V_SHIFT = 14;
 
-struct CVECTOR
+enum MatrixArrayValue
+{
+	M00, M01, M02, M03,
+	M10, M11, M12, M13,
+	M20, M21, M22, M23
+};
+
+struct ColorData
 {
 	byte r;
 	byte g;
@@ -15,14 +22,7 @@ struct CVECTOR
 	byte cd;
 };
 
-enum MATRIX_ARRAY_VALUE
-{
-	M00, M01, M02, M03,
-	M10, M11, M12, M13,
-	M20, M21, M22, M23
-};
-
-struct MATRIX3D
+struct Matrix3D
 {
 	short m00, m01, m02;
 	short m10, m11, m12;
