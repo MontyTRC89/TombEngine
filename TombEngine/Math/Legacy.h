@@ -55,6 +55,7 @@ struct MATRIX3D
 
 struct BOUNDING_BOX
 {
+	// Components
 	short X1;
 	short X2;
 	short Y1;
@@ -62,10 +63,16 @@ struct BOUNDING_BOX
 	short Z1;
 	short Z2;
 
-	int Height() { return abs(Y2 - Y1); }
+	// Utilities
+	int Height() const;
 
-	BOUNDING_BOX operator +(const PoseData& pose);
-	BOUNDING_BOX operator *(float scale);
+	// Converters
+	BoundingBox			ToDXBoundingBox() const;
+	BoundingOrientedBox ToDXBoundingOrientedBox(PoseData pose) const;
+
+	// Operators
+	BOUNDING_BOX operator +(const PoseData& pose) const;
+	BOUNDING_BOX operator *(float scale) const;
 };
 
 short ANGLE(float angle);

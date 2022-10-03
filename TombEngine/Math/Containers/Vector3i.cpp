@@ -40,12 +40,12 @@
 
 	bool Vector3i::operator ==(const Vector3i& vector) const
 	{
-		return (x == vector.x && y == vector.y && z == vector.z);
+		return ((x == vector.x) && (y == vector.y) && (z == vector.z));
 	}
 
 	bool Vector3i::operator !=(const Vector3i& vector) const
 	{
-		return (x != vector.x || y != vector.y || z != vector.z);
+		return ((x != vector.x) || (y != vector.y) || (z != vector.z));
 	}
 
 	Vector3i Vector3i::operator +(const Vector3i& vector) const

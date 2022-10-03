@@ -10,7 +10,23 @@
 
 using namespace TEN::Math::Random;
 
-BOUNDING_BOX BOUNDING_BOX::operator +(const PoseData& pose)
+int BOUNDING_BOX::Height() const
+{
+	return abs(Y2 - Y1);
+}
+
+BoundingOrientedBox BOUNDING_BOX::ToDXBoundingOrientedBox(PoseData pose) const
+{
+	auto boxCenter = Vector3((X2 + X1) / 2.0f, (Y2 + Y1) / 2.0f, (Z2 + Z1) / 2.0f);
+	auto boxExtent = Vector3((X2 - X1) / 2.0f, (Y2 - Y1) / 2.0f, (Z2 - Z1) / 2.0f);
+	auto orient = pose.Orientation.ToQuaternion();
+
+	BoundingOrientedBox result;
+	BoundingOrientedBox(boxCenter, boxExtent, Vector4::UnitY).Transform(result, 1.0f, orient, pose.Position.ToVector3());
+	return result;
+}
+
+BOUNDING_BOX BOUNDING_BOX::operator +(const PoseData& pose) const
 {
 	auto newBox = *this;
 	newBox.X1 += pose.Position.x;
@@ -22,7 +38,7 @@ BOUNDING_BOX BOUNDING_BOX::operator +(const PoseData& pose)
 	return newBox;
 }
 
-BOUNDING_BOX BOUNDING_BOX::operator *(float scale)
+BOUNDING_BOX BOUNDING_BOX::operator *(float scale) const
 {
 	auto newBox = *this;
 	newBox.X1 *= scale;

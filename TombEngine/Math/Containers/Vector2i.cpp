@@ -38,12 +38,12 @@ namespace TEN::Math
 
 	bool Vector2i::operator ==(const Vector2i& vector) const
 	{
-		return (x == vector.x && y == vector.y);
+		return ((x == vector.x) && (y == vector.y));
 	}
 
 	bool Vector2i::operator !=(const Vector2i& vector) const
 	{
-		return (x != vector.x || y != vector.y);
+		return ((x != vector.x) || (y != vector.y));
 	}
 
 	Vector2i Vector2i::operator +(const Vector2i& vector) const

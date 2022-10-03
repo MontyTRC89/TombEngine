@@ -38,7 +38,7 @@ bool MoveLaraPosition(Vector3i* pos, ItemInfo* item, ItemInfo* laraItem);
 bool ItemNearLara(Vector3i* origin, int radius);
 bool ItemNearTarget(Vector3i* origin, ItemInfo* targetEntity, int radius);
 
-bool Move3DPosTo3DPos(ItemInfo* item, PoseData& fromPose, const PoseData& toPose, int velocity, short angleAdd);
+bool Move3DPosTo3DPos(ItemInfo* item, PoseData& fromPose, const PoseData& toPose, int velocity, short turnRate);
 
 bool TestBoundsCollide(ItemInfo* item, ItemInfo* laraItem, int radius);
 bool TestBoundsCollideStatic(ItemInfo* item, MESH_INFO* mesh, int radius);

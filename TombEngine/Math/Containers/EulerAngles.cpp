@@ -86,12 +86,12 @@
 
 	bool EulerAngles::operator ==(const EulerAngles& eulers) const
 	{
-		return (x == eulers.x && y == eulers.y && z == eulers.z);
+		return ((x == eulers.x) && (y == eulers.y) && (z == eulers.z));
 	}
 
 	bool EulerAngles::operator !=(const EulerAngles& eulers) const
 	{
-		return (x != eulers.x || y != eulers.y || z != eulers.z);
+		return ((x != eulers.x) || (y != eulers.y) || (z != eulers.z));
 	}
 
 	EulerAngles EulerAngles::operator +(const EulerAngles& eulers) const
