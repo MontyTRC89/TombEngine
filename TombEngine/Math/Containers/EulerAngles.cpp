@@ -109,14 +109,14 @@
 		return EulerAngles(x * eulers.x, y * eulers.y, z * eulers.z);
 	}
 
-	EulerAngles EulerAngles::operator *(float value) const
+	EulerAngles EulerAngles::operator *(float scale) const
 	{
-		return EulerAngles((short)round(x * value), (short)round(y * value), (short)round(z * value));
+		return EulerAngles((short)round(x * scale), (short)round(y * scale), (short)round(z * scale));
 	}
 
-	EulerAngles EulerAngles::operator /(float value) const
+	EulerAngles EulerAngles::operator /(float scale) const
 	{
-		return EulerAngles((short)round(x / value), (short)round(y / value), (short)round(z / value));
+		return EulerAngles((short)round(x / scale), (short)round(y / scale), (short)round(z / scale));
 	}
 
 	EulerAngles& EulerAngles::operator =(const EulerAngles& eulers)

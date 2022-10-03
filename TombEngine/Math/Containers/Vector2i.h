@@ -35,7 +35,7 @@ namespace TEN::Math
 		Vector2i& operator +=(const Vector2i& vector);
 		Vector2i& operator -=(const Vector2i& vector);
 		Vector2i& operator *=(const Vector2i& vector);
-		Vector2i& operator *=(float value);
-		Vector2i& operator /=(float value);
+		Vector2i& operator *=(float scale);
+		Vector2i& operator /=(float scale);
 	};
 }

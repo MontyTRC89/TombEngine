@@ -63,14 +63,14 @@
 		return Vector3i(x * vector.x, y * vector.y, z * vector.z);
 	}
 
-	Vector3i Vector3i::operator *(float value) const
+	Vector3i Vector3i::operator *(float scale) const
 	{
-		return Vector3i((int)round(x * value), (int)round(y * value), (int)round(z * value));
+		return Vector3i((int)round(x * scale), (int)round(y * scale), (int)round(z * scale));
 	}
 
-	Vector3i Vector3i::operator /(float value) const
+	Vector3i Vector3i::operator /(float scale) const
 	{
-		return Vector3i((int)round(x / value), (int)round(y / value), (int)round(z / value));
+		return Vector3i((int)round(x / scale), (int)round(y / scale), (int)round(z / scale));
 	}
 
 	Vector3i& Vector3i::operator =(const Vector3i& vector)

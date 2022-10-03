@@ -37,7 +37,7 @@
 		EulerAngles& operator +=(const EulerAngles& eulers);
 		EulerAngles& operator -=(const EulerAngles& eulers);
 		EulerAngles& operator *=(const EulerAngles& eulers);
-		EulerAngles& operator *=(float value);
-		EulerAngles& operator /=(float value);
+		EulerAngles& operator *=(float scale);
+		EulerAngles& operator /=(float scale);
 	};
 //}

@@ -36,7 +36,7 @@
 		Vector3i& operator +=(const Vector3i& vector);
 		Vector3i& operator -=(const Vector3i& vector);
 		Vector3i& operator *=(const Vector3i& vector);
-		Vector3i& operator *=(float value);
-		Vector3i& operator /=(float value);
+		Vector3i& operator *=(float scale);
+		Vector3i& operator /=(float scale);
 	};
 //}
