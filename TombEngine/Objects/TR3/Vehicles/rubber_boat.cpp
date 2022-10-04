@@ -185,7 +185,7 @@ namespace TEN::Entities::Vehicles
 				rBoatItem->Animation.Velocity.z = 0;
 		}
 
-		ResetVehicleTurnRateY(&rBoat->TurnRate, RBOAT_TURN_RATE_DECEL);
+		ResetVehicleTurnRateY(rBoat->TurnRate, RBOAT_TURN_RATE_DECEL);
 
 		height = probe.Position.Floor;
 
@@ -342,7 +342,7 @@ namespace TEN::Entities::Vehicles
 		}
 
 		if (TrInput & (VEHICLE_IN_LEFT | VEHICLE_IN_RIGHT))
-			ModulateVehicleTurnRateY(&rBoat->TurnRate, RBOAT_TURN_RATE_ACCEL, -RBOAT_TURN_RATE_MAX, RBOAT_TURN_RATE_MAX);
+			ModulateVehicleTurnRateY(rBoat->TurnRate, RBOAT_TURN_RATE_ACCEL, -RBOAT_TURN_RATE_MAX, RBOAT_TURN_RATE_MAX);
 		
 		if (TrInput & VEHICLE_IN_ACCELERATE)
 		{

@@ -384,9 +384,9 @@ namespace TEN::Entities::Vehicles
 			}
 
 			if (jeep->Velocity < 0)
-				ModulateVehicleTurnRateY(&jeep->TurnRate, turnRateAccel, -maxTurnRate, maxTurnRate, true);
+				ModulateVehicleTurnRateY(jeep->TurnRate, turnRateAccel, -maxTurnRate, maxTurnRate, true);
 			else if (jeep->Velocity > 0)
-				ModulateVehicleTurnRateY(&jeep->TurnRate, turnRateAccel, -maxTurnRate, maxTurnRate);
+				ModulateVehicleTurnRateY(jeep->TurnRate, turnRateAccel, -maxTurnRate, maxTurnRate);
 
 			if (TrInput & VEHICLE_IN_BRAKE)
 			{
@@ -1060,7 +1060,7 @@ namespace TEN::Entities::Vehicles
 
 		if (prevPos.y <= (jeepItem->Floor - 8))
 		{
-			ResetVehicleTurnRateY(&jeep->TurnRate, JEEP_TURN_RATE_DECEL);
+			ResetVehicleTurnRateY(jeep->TurnRate, JEEP_TURN_RATE_DECEL);
 			jeepItem->Pose.Orientation.y += jeep->TurnRate + jeep->ExtraRotation;
 
 			jeep->MomentumAngle += (jeepItem->Pose.Orientation.y - jeep->MomentumAngle) / 32;

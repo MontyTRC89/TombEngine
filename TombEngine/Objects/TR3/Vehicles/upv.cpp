@@ -188,7 +188,7 @@ namespace TEN::Entities::Vehicles
 				upvItem->Pose.Orientation.x = -UPV_X_ORIENT_MAX;
 
 			if (!(TrInput & IN_LEFT) && !(TrInput & IN_RIGHT))
-				ResetVehicleLean(upvItem, 12.0f);
+				ResetVehicleLean(upvItem, 0.08f);
 
 			TranslateItem(upvItem, upvItem->Pose.Orientation, upvItem->Animation.Velocity.z);
 		}
@@ -350,7 +350,7 @@ namespace TEN::Entities::Vehicles
 
 			if (TrInput & (VEHICLE_IN_LEFT | VEHICLE_IN_RIGHT))
 			{
-				ModulateVehicleTurnRateY(&upv->TurnRate.y, UPV_Y_TURN_RATE_ACCEL, -UPV_Y_TURN_RATE_MAX, UPV_Y_TURN_RATE_MAX);
+				ModulateVehicleTurnRateY(upv->TurnRate.y, UPV_Y_TURN_RATE_ACCEL, -UPV_Y_TURN_RATE_MAX, UPV_Y_TURN_RATE_MAX);
 				ModulateVehicleLean(upvItem, UPV_LEAN_RATE, UPV_LEAN_MAX);
 			}
 
@@ -379,7 +379,7 @@ namespace TEN::Entities::Vehicles
 			else
 			{
 				if (TrInput & (VEHICLE_IN_UP | VEHICLE_IN_DOWN))
-					ModulateVehicleTurnRateX(&upv->TurnRate.x, UPV_X_TURN_RATE_ACCEL, -UPV_X_TURN_RATE_MAX, UPV_X_TURN_RATE_MAX);
+					ModulateVehicleTurnRateX(upv->TurnRate.x, UPV_X_TURN_RATE_ACCEL, -UPV_X_TURN_RATE_MAX, UPV_X_TURN_RATE_MAX);
 			}
 
 			if (TrInput & VEHICLE_IN_ACCELERATE)
@@ -407,7 +407,7 @@ namespace TEN::Entities::Vehicles
 
 			if (TrInput & (VEHICLE_IN_LEFT | VEHICLE_IN_RIGHT))
 			{
-				ModulateVehicleTurnRateY(&upv->TurnRate.y, UPV_Y_TURN_RATE_ACCEL, -UPV_Y_TURN_RATE_MAX, UPV_Y_TURN_RATE_MAX);
+				ModulateVehicleTurnRateY(upv->TurnRate.y, UPV_Y_TURN_RATE_ACCEL, -UPV_Y_TURN_RATE_MAX, UPV_Y_TURN_RATE_MAX);
 				ModulateVehicleLean(upvItem, UPV_LEAN_RATE, UPV_LEAN_MAX);
 			}
 
@@ -435,7 +435,7 @@ namespace TEN::Entities::Vehicles
 			else
 			{
 				if (TrInput & (VEHICLE_IN_UP | VEHICLE_IN_DOWN))
-					ModulateVehicleTurnRateX(&upv->TurnRate.x, UPV_X_TURN_RATE_ACCEL, -UPV_X_TURN_RATE_MAX, UPV_X_TURN_RATE_MAX);
+					ModulateVehicleTurnRateX(upv->TurnRate.x, UPV_X_TURN_RATE_ACCEL, -UPV_X_TURN_RATE_MAX, UPV_X_TURN_RATE_MAX);
 			}
 
 			if (TrInput & VEHICLE_IN_DISMOUNT && TestUpvDismount(upvItem, laraItem))
@@ -630,8 +630,8 @@ namespace TEN::Entities::Vehicles
 		else if (upv->Velocity < -UPV_VELOCITY_MAX)
 			upv->Velocity = -UPV_VELOCITY_MAX;
 
-		ResetVehicleTurnRateX(&upv->TurnRate.x, UPV_X_TURN_RATE_FRICTION_DECEL);
-		ResetVehicleTurnRateY(&upv->TurnRate.y, UPV_Y_TURN_RATE_FRICTION_DECEL);
+		ResetVehicleTurnRateX(upv->TurnRate.x, UPV_X_TURN_RATE_FRICTION_DECEL);
+		ResetVehicleTurnRateY(upv->TurnRate.y, UPV_Y_TURN_RATE_FRICTION_DECEL);
 	}
 
 	void UpvPlayerCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)

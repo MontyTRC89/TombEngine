@@ -181,7 +181,7 @@ namespace TEN::Entities::Vehicles
 		}
 
 		// Apply turn rate friction.
-		ResetVehicleTurnRateY(&speedboat->TurnRate, SPEEDBOAT_TURN_RATE_DECEL);
+		ResetVehicleTurnRateY(speedboat->TurnRate, SPEEDBOAT_TURN_RATE_DECEL);
 
 		speedboatItem->Floor = probe.Position.Floor - 5;
 		if (speedboat->Water == NO_HEIGHT)
@@ -301,7 +301,7 @@ namespace TEN::Entities::Vehicles
 		}
 
 		if (TrInput & (VEHICLE_IN_LEFT | VEHICLE_IN_RIGHT))
-			ModulateVehicleTurnRateY(&speedboat->TurnRate, SPEEDBOAT_TURN_RATE_ACCEL, -SPEEDBOAT_TURN_RATE_MAX, SPEEDBOAT_TURN_RATE_MAX);
+			ModulateVehicleTurnRateY(speedboat->TurnRate, SPEEDBOAT_TURN_RATE_ACCEL, -SPEEDBOAT_TURN_RATE_MAX, SPEEDBOAT_TURN_RATE_MAX);
 		
 		if (TrInput & VEHICLE_IN_ACCELERATE)
 		{

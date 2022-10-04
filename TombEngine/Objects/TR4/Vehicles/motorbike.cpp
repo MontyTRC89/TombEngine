@@ -428,7 +428,7 @@ namespace TEN::Entities::Vehicles
 			}
 			// Reversing.
 			else if (motorbike->Velocity < 0)
-				ModulateVehicleTurnRateY(&motorbike->TurnRate, MOTORBIKE_BACK_TURN_ANGLE, -MOTORBIKE_TURN_ANGLE_MAX, MOTORBIKE_TURN_ANGLE_MAX, true);
+				ModulateVehicleTurnRateY(motorbike->TurnRate, MOTORBIKE_BACK_TURN_ANGLE, -MOTORBIKE_TURN_ANGLE_MAX, MOTORBIKE_TURN_ANGLE_MAX, true);
 
 			if (TrInput & VEHICLE_IN_BRAKE)
 			{
@@ -854,14 +854,14 @@ namespace TEN::Entities::Vehicles
 
 		if (motorbikeItem->Pose.Position.y <= (motorbikeItem->Floor - 8))
 		{
-			ResetVehicleTurnRateY(&motorbike->TurnRate, ANGLE(0.5f));
+			ResetVehicleTurnRateY(motorbike->TurnRate, ANGLE(0.5f));
 			motorbikeItem->Pose.Orientation.y += motorbike->TurnRate + motorbike->ExtraRotation;
 
 			motorbike->MomentumAngle += (motorbikeItem->Pose.Orientation.y - motorbike->MomentumAngle) / 32;
 		}
 		else
 		{
-			ResetVehicleTurnRateY(&motorbike->TurnRate, ANGLE(1.0f));
+			ResetVehicleTurnRateY(motorbike->TurnRate, ANGLE(1.0f));
 			motorbikeItem->Pose.Orientation.y += motorbike->TurnRate + motorbike->ExtraRotation;
 
 			short rotation = motorbikeItem->Pose.Orientation.y - motorbike->MomentumAngle;

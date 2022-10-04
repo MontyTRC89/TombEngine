@@ -301,7 +301,7 @@ namespace TEN::Entities::Vehicles
 		// Apply rotations and determine angle of momentum.
 		if (skidooItem->Pose.Position.y > (skidooItem->Floor - SKIDOO_STEP_HEIGHT))
 		{
-			ResetVehicleTurnRateY(&skidoo->TurnRate, SKIDOO_TURN_RATE_DECEL);
+			ResetVehicleTurnRateY(skidoo->TurnRate, SKIDOO_TURN_RATE_DECEL);
 			skidooItem->Pose.Orientation.y += skidoo->TurnRate + skidoo->ExtraRotation;
 
 			short rotation = skidooItem->Pose.Orientation.y - skidoo->MomentumAngle;
@@ -422,7 +422,7 @@ namespace TEN::Entities::Vehicles
 				LookUpDown(laraItem);
 
 			if (TrInput & (VEHICLE_IN_LEFT | VEHICLE_IN_RIGHT))
-				ModulateVehicleTurnRateY(&skidoo->TurnRate, SKIDOO_TURN_RATE_ACCEL, -SKIDOO_TURN_RATE_MAX, SKIDOO_TURN_RATE_MAX);
+				ModulateVehicleTurnRateY(skidoo->TurnRate, SKIDOO_TURN_RATE_ACCEL, -SKIDOO_TURN_RATE_MAX, SKIDOO_TURN_RATE_MAX);
 
 			if (TrInput & VEHICLE_IN_REVERSE)
 			{

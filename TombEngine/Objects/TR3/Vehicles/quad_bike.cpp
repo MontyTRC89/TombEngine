@@ -390,10 +390,10 @@ namespace TEN::Entities::Vehicles
 					(quadBike->Velocity > QBIKE_DRIFT_VELOCITY_MIN ||
 						quadBike->Velocity < (-QBIKE_DRIFT_VELOCITY_MIN + (8 * VEHICLE_VELOCITY_SCALE))))
 				{
-					ModulateVehicleTurnRateY(&quadBike->TurnRate, QBIKE_DRIFT_TURN_RATE_ACCEL, -QBIKE_DRIFT_TURN_RATE_MAX, QBIKE_DRIFT_TURN_RATE_MAX);
+					ModulateVehicleTurnRateY(quadBike->TurnRate, QBIKE_DRIFT_TURN_RATE_ACCEL, -QBIKE_DRIFT_TURN_RATE_MAX, QBIKE_DRIFT_TURN_RATE_MAX);
 				}
 				else
-					ModulateVehicleTurnRateY(&quadBike->TurnRate, QBIKE_TURN_RATE_ACCEL, -QBIKE_TURN_RATE_MAX, QBIKE_TURN_RATE_MAX);
+					ModulateVehicleTurnRateY(quadBike->TurnRate, QBIKE_TURN_RATE_ACCEL, -QBIKE_TURN_RATE_MAX, QBIKE_TURN_RATE_MAX);
 			}
 
 			// Reversing / braking.
@@ -887,7 +887,7 @@ namespace TEN::Entities::Vehicles
 		// Apply rotations and determine angle of momentum.
 		if (quadBikeItem->Pose.Position.y > (quadBikeItem->Floor - CLICK(1)))
 		{
-			ResetVehicleTurnRateY(&quadBike->TurnRate, QBIKE_TURN_RATE_DECEL);
+			ResetVehicleTurnRateY(quadBike->TurnRate, QBIKE_TURN_RATE_DECEL);
 			quadBikeItem->Pose.Orientation.y += quadBike->TurnRate + quadBike->ExtraRotation;
 
 			short momentum = QBIKE_MOMENTUM_TURN_RATE_MIN - (((((QBIKE_MOMENTUM_TURN_RATE_MIN - QBIKE_MOMENTUM_TURN_RATE_MAX) * 256) / QBIKE_VELOCITY_MAX) * quadBike->Velocity) / 256);

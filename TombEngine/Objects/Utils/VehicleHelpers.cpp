@@ -544,14 +544,14 @@ namespace TEN::Entities::Vehicles
 		return (newTurnRate * sign);
 	}
 
-	void ModulateVehicleTurnRateX(short* turnRate, short accelRate, short minTurnRate, short maxTurnRate, bool invert)
+	void ModulateVehicleTurnRateX(short& outTurnRate, short accelRate, short minTurnRate, short maxTurnRate, bool invert)
 	{
-		*turnRate = ModulateVehicleTurnRate(*turnRate, accelRate, minTurnRate, maxTurnRate, AxisMap[InputAxis::MoveVertical], invert);
+		outTurnRate = ModulateVehicleTurnRate(outTurnRate, accelRate, minTurnRate, maxTurnRate, AxisMap[InputAxis::MoveVertical], invert);
 	}
 
-	void ModulateVehicleTurnRateY(short* turnRate, short accelRate, short minTurnRate, short maxTurnRate, bool invert)
+	void ModulateVehicleTurnRateY(short& outTurnRate, short accelRate, short minTurnRate, short maxTurnRate, bool invert)
 	{
-		*turnRate = ModulateVehicleTurnRate(*turnRate, accelRate, minTurnRate, maxTurnRate, AxisMap[InputAxis::MoveHorizontal], invert);
+		outTurnRate = ModulateVehicleTurnRate(outTurnRate, accelRate, minTurnRate, maxTurnRate, AxisMap[InputAxis::MoveHorizontal], invert);
 	}
 
 	short ResetVehicleTurnRate(short turnRate, short decelRate)
@@ -564,14 +564,14 @@ namespace TEN::Entities::Vehicles
 			return 0;
 	}
 
-	void ResetVehicleTurnRateX(short* turnRate, short decelRate)
+	void ResetVehicleTurnRateX(short& outTurnRate, short decelRate)
 	{
-		*turnRate = ResetVehicleTurnRate(*turnRate, decelRate);
+		outTurnRate = ResetVehicleTurnRate(outTurnRate, decelRate);
 	}
 
-	void ResetVehicleTurnRateY(short* turnRate, short decelRate)
+	void ResetVehicleTurnRateY(short& outTurnRate, short decelRate)
 	{
-		*turnRate = ResetVehicleTurnRate(*turnRate, decelRate);
+		outTurnRate = ResetVehicleTurnRate(outTurnRate, decelRate);
 	}
 	
 	void ModulateVehicleLean(ItemInfo* vehicleItem, short baseRate, short maxAngle)
@@ -582,10 +582,10 @@ namespace TEN::Entities::Vehicles
 		vehicleItem->Pose.Orientation.z += std::min<short>(baseRate, abs(maxAngleNormalized - vehicleItem->Pose.Orientation.z) / 3) * sign;
 	}
 
-	void ResetVehicleLean(ItemInfo* vehicleItem, float rate)
+	void ResetVehicleLean(ItemInfo* vehicleItem, float alpha)
 	{
 		if (abs(vehicleItem->Pose.Orientation.z) > ANGLE(0.1f))
-			vehicleItem->Pose.Orientation.z += vehicleItem->Pose.Orientation.z / -rate;
+			vehicleItem->Pose.Orientation.z *= alpha;
 		else
 			vehicleItem->Pose.Orientation.z = 0;
 	}
