@@ -7,12 +7,9 @@ struct PoseData;
 	struct BOUNDING_BOX
 	{
 		// Components
-		short X1;
-		short X2;
-		short Y1;
-		short Y2;
-		short Z1;
-		short Z2;
+		short X1, X2 = 0;
+		short Y1, Y2 = 0;
+		short Z1, Z2 = 0;
 
 		// Utilities
 		int Height() const;

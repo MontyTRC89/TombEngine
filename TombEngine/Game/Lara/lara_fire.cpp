@@ -864,7 +864,7 @@ FireWeaponType FireWeapon(LaraWeaponType weaponType, ItemInfo* targetEntity, Ite
 	auto vOrigin = GameVector(pos);
 	short roomNumber = laraItem->RoomNumber;
 	GetFloor(pos.x, pos.y, pos.z, &roomNumber);
-	vOrigin.roomNumber = roomNumber;
+	vOrigin.RoomNumber = roomNumber;
 
 	if (bestItemNumber < 0)
 	{

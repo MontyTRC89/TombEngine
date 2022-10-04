@@ -289,7 +289,7 @@ namespace TEN::Entities::Creatures::TR5
 				{
 					// Get Lara's left hand position
 					// TODO: check if left hand or head
-					target = GameVector(GetJointPosition(LaraItem, LM_HEAD), target.roomNumber);
+					target = GameVector(GetJointPosition(LaraItem, LM_HEAD), target.RoomNumber);
 
 					// Calculate distance between guardian and Lara
 					int distance = sqrt(pow(origin.x - target.x, 2) + pow(origin.y - target.y, 2) + pow(origin.z - target.z, 2));
@@ -303,7 +303,7 @@ namespace TEN::Entities::Creatures::TR5
 						(LaserHeadData.target.x || LaserHeadData.target.y || LaserHeadData.target.z))
 					{
 						// Lock target for attacking.
-						target = GameVector(GetJointPosition(LaraItem, LM_HIPS), target.roomNumber);
+						target = GameVector(GetJointPosition(LaraItem, LM_HIPS), target.RoomNumber);
 						LaserHeadData.target.x = target.x;
 						LaserHeadData.target.y = target.y;
 						LaserHeadData.target.z = target.z;
@@ -447,7 +447,7 @@ namespace TEN::Entities::Creatures::TR5
 								// If eye was not destroyed then fire from it
 								if ((1 << GuardianMeshes[i]) & item->MeshBits)
 								{
-									origin = GameVector(GetJointPosition(item, GuardianMeshes[i]), origin.roomNumber);
+									origin = GameVector(GetJointPosition(item, GuardianMeshes[i]), origin.RoomNumber);
 
 									int c = ANGLE(45.0f) * phd_cos(angles.x);
 									target.x = origin.x + c * phd_sin(item->Pose.Orientation.y);
@@ -467,7 +467,7 @@ namespace TEN::Entities::Creatures::TR5
 									else
 									{
 										// Start firing from eye
-										origin.roomNumber = item->RoomNumber;
+										origin.RoomNumber = item->RoomNumber;
 										LaserHeadData.LOS[i] = LOS(&origin, &target);
 										//LaserHeadData.fireArcs[i] = TriggerEnergyArc((Vector3i*)& src, (Vector3i*)& dest, r, g, b, 32, 64, 64, ENERGY_ARC_NO_RANDOMIZE, ENERGY_ARC_STRAIGHT_LINE); // (GetRandomControl() & 7) + 4, b | ((&unk_640000 | g) << 8), 12, 64, 5);
 										StopSoundEffect(SFX_TR5_GOD_HEAD_CHARGE);
@@ -589,7 +589,7 @@ namespace TEN::Entities::Creatures::TR5
 				if (item->Pose.Position.y <= item->ItemFlags[1])
 				{
 					origin = GameVector(GetJointPosition(item, 0, Vector3i(0, 168, 248)), item->RoomNumber);
-					target = GameVector(GetJointPosition(LaraItem, LM_HEAD), target.roomNumber);
+					target = GameVector(GetJointPosition(LaraItem, LM_HEAD), target.RoomNumber);
 					
 					if (LOS(&origin, &origin))
 					{

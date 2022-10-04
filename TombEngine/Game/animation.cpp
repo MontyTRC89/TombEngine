@@ -193,10 +193,10 @@ void PerformAnimCommands(ItemInfo* item, bool isFrameBased)
 							SoundEffect(cmd[1] & 0x3FFF, &item->Pose, SoundEnvironment::Always);
 						else if (TestEnvironment(ENV_FLAG_WATER, item))
 						{
-							if (always || (inWater && TestEnvironment(ENV_FLAG_WATER, Camera.pos.roomNumber)))
+							if (always || (inWater && TestEnvironment(ENV_FLAG_WATER, Camera.pos.RoomNumber)))
 								SoundEffect(cmd[1] & 0x3FFF, &item->Pose, SoundEnvironment::Always);
 						}
-						else if (always || (onDry && !TestEnvironment(ENV_FLAG_WATER, Camera.pos.roomNumber) && !TestEnvironment(ENV_FLAG_SWAMP, Camera.pos.roomNumber)))
+						else if (always || (onDry && !TestEnvironment(ENV_FLAG_WATER, Camera.pos.RoomNumber) && !TestEnvironment(ENV_FLAG_SWAMP, Camera.pos.RoomNumber)))
 							SoundEffect(cmd[1] & 0x3FFF, &item->Pose, SoundEnvironment::Always);
 					}
 				}

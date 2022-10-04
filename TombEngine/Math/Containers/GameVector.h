@@ -10,8 +10,8 @@ struct Vector3i;
 		int	  x			 = 0;
 		int	  y			 = 0;
 		int	  z			 = 0;
-		short roomNumber = 0;
-		int	  boxNumber	 = 0;
+		short RoomNumber = 0;
+		int	  BoxNumber	 = 0; // Unused.
 
 		// Constants
 		static const GameVector Zero;

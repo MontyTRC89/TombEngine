@@ -681,14 +681,14 @@ namespace TEN::Entities::Vehicles
 			kayakPos.x = kayak->OldPose.Position.x;
 			kayakPos.y = kayak->OldPose.Position.y;
 			kayakPos.z = kayak->OldPose.Position.z;
-			kayakPos.roomNumber = kayakItem->RoomNumber;
+			kayakPos.RoomNumber = kayakItem->RoomNumber;
 
 			CameraCollisionBounds(&kayakPos, 256, 0);
 			{
 				kayakItem->Pose.Position.x = kayakPos.x;
 				kayakItem->Pose.Position.y = kayakPos.y;
 				kayakItem->Pose.Position.z = kayakPos.z;
-				kayakItem->RoomNumber = kayakPos.roomNumber;
+				kayakItem->RoomNumber = kayakPos.RoomNumber;
 			}
 		}
 

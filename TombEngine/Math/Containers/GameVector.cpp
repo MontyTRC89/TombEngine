@@ -23,7 +23,7 @@
 		this->x = pos.x;
 		this->y = pos.y;
 		this->z = pos.z;
-		this->roomNumber = roomNumber;
+		this->RoomNumber = roomNumber;
 	}
 	
 	GameVector::GameVector(const Vector3i& pos, short roomNumber, short boxNumber)
@@ -31,8 +31,8 @@
 		this->x = pos.x;
 		this->y = pos.y;
 		this->z = pos.z;
-		this->roomNumber = roomNumber;
-		this->boxNumber = boxNumber;
+		this->RoomNumber = roomNumber;
+		this->BoxNumber = boxNumber;
 	}
 
 	GameVector::GameVector(int xPos, int yPos, int zPos)
@@ -47,7 +47,7 @@
 		this->x = xPos;
 		this->y = yPos;
 		this->z = zPos;
-		this->roomNumber = roomNumber;
+		this->RoomNumber = roomNumber;
 	}
 
 	GameVector::GameVector(int xPos, int yPos, int zPos, short roomNumber, short boxNumber)
@@ -55,8 +55,8 @@
 		this->x = xPos;
 		this->y = yPos;
 		this->z = zPos;
-		this->roomNumber = roomNumber;
-		this->boxNumber = boxNumber;
+		this->RoomNumber = roomNumber;
+		this->BoxNumber = boxNumber;
 	}
 
 	Vector3 GameVector::ToVector3() const

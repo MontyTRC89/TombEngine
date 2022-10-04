@@ -40,7 +40,7 @@ void TriggerAlertLight(int x, int y, int z, int r, int g, int b, int angle, shor
 	start.y = y;
 	start.z = z;
 	GetFloor(x, y, z, &room);
-	start.roomNumber = room;
+	start.RoomNumber = room;
 
 	GameVector end;
 	end.x = x + 16384 * phd_sin(16 * angle);

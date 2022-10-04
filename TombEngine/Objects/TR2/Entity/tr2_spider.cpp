@@ -38,9 +38,9 @@ namespace TEN::Entities::Creatures::TR2
 		if (item->Pose.Position.y > (vec.y - CLICK(1.5f)))
 			return;
 
-		item->Pose.Position = Vector3i(vec.x, vec.y, vec.z);
-		if (item->RoomNumber != vec.roomNumber)
-			ItemNewRoom(item->RoomNumber, vec.roomNumber);
+		item->Pose.Position = vec.ToVector3i();
+		if (item->RoomNumber != vec.RoomNumber)
+			ItemNewRoom(item->RoomNumber, vec.RoomNumber);
 
 		item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 2;
 		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;

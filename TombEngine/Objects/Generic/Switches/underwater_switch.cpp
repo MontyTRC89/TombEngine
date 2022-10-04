@@ -147,7 +147,7 @@ namespace TEN::Entities::Switches
 				ForcedFixedCamera.x = switchItem->Pose.Position.x - SECTOR(1) * phd_sin(switchItem->Pose.Orientation.y + ANGLE(90.0f));
 				ForcedFixedCamera.y = switchItem->Pose.Position.y - SECTOR(1);
 				ForcedFixedCamera.z = switchItem->Pose.Position.z - SECTOR(1) * phd_cos(switchItem->Pose.Orientation.y + ANGLE(90.0f));
-				ForcedFixedCamera.roomNumber = switchItem->RoomNumber;
+				ForcedFixedCamera.RoomNumber = switchItem->RoomNumber;
 			}
 		}
 	}

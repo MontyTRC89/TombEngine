@@ -87,7 +87,7 @@ void TrainControl(short itemNumber)
 
 			ForcedFixedCamera.y = GetCollision(ForcedFixedCamera.x, item->Pose.Position.y - CLICK(2), ForcedFixedCamera.z, item->RoomNumber).Position.Floor;
 
-			ForcedFixedCamera.roomNumber = roomNumber;
+			ForcedFixedCamera.RoomNumber = roomNumber;
 			UseForcedFixedCamera = 1;
 		}
 	}

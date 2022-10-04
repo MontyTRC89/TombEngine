@@ -71,7 +71,7 @@ namespace TEN::Entities::Creatures::TR5
 				auto pos1 = GameVector(GetJointPosition(item, 8, Vector3i(0, 0, -64)));
 				auto pos2 = GameVector(GetJointPosition(LaraItem, LM_HIPS));
 
-				pos1.roomNumber = item->RoomNumber;
+				pos1.RoomNumber = item->RoomNumber;
 
 				int los = LOS(&pos1, &pos2);
 

@@ -154,7 +154,7 @@ bool SoundEffect(int effectID, PoseData* position, SoundEnvironment condition, f
 	if (condition != SoundEnvironment::Always)
 	{
 		// Get current camera room's environment
-		auto cameraCondition = TestEnvironment(ENV_FLAG_WATER, Camera.pos.roomNumber) ? SoundEnvironment::Water : SoundEnvironment::Land;
+		auto cameraCondition = TestEnvironment(ENV_FLAG_WATER, Camera.pos.RoomNumber) ? SoundEnvironment::Water : SoundEnvironment::Land;
 
 		// Don't play effect if effect's environment isn't the same as camera position's environment
 		if (condition != cameraCondition)
@@ -723,7 +723,7 @@ void Sound_UpdateScene()
 	// Apply environmental effects
 
 	static int currentReverb = -1;
-	auto roomReverb = g_Configuration.EnableReverb ? g_Level.Rooms[Camera.pos.roomNumber].reverbType : (int)ReverbType::Small;
+	auto roomReverb = g_Configuration.EnableReverb ? g_Level.Rooms[Camera.pos.RoomNumber].reverbType : (int)ReverbType::Small;
 
 	if (currentReverb == -1 || roomReverb != currentReverb)
 	{

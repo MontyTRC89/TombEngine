@@ -281,7 +281,7 @@ void CreatureKill(ItemInfo* item, int killAnim, int killState, int laraKillState
 	Lara.HitDirection = -1;
 	Lara.Air = -1;
 
-	Camera.pos.roomNumber = LaraItem->RoomNumber; 
+	Camera.pos.RoomNumber = LaraItem->RoomNumber; 
 	Camera.type = CameraType::Chase;
 	Camera.flags = CF_FOLLOW_CENTER;
 	Camera.targetAngle = ANGLE(170.0f);

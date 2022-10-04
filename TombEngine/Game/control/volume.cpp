@@ -57,13 +57,13 @@ namespace TEN::Control::Volumes
 			switch (volume->Type)
 			{
 			case TriggerVolumeType::Box:
-				if (roomNumber == Camera.pos.roomNumber)
+				if (roomNumber == Camera.pos.RoomNumber)
 					g_Renderer.AddDebugBox(volume->Box, Vector4(1.0f, 0.0f, 1.0f, 1.0f), RENDERER_DEBUG_PAGE::LOGIC_STATS);
 				contains = volume->Box.Intersects(bbox);
 				break;
 
 			case TriggerVolumeType::Sphere:
-				if (roomNumber == Camera.pos.roomNumber)
+				if (roomNumber == Camera.pos.RoomNumber)
 					g_Renderer.AddDebugSphere(volume->Sphere.Center, volume->Sphere.Radius, Vector4(1.0f, 0.0f, 1.0f, 1.0f), RENDERER_DEBUG_PAGE::LOGIC_STATS);
 				contains = volume->Sphere.Intersects(bbox);
 				break;
@@ -130,7 +130,7 @@ namespace TEN::Control::Volumes
 
 		auto bBox = box.ToDXBoundingOrientedBox(pos);
 
-		TestVolumes(camera->pos.roomNumber, bBox, TriggerVolumeActivators::Flyby, camera);
+		TestVolumes(camera->pos.RoomNumber, bBox, TriggerVolumeActivators::Flyby, camera);
 	}
 
 	void TestVolumes(short roomNumber, MESH_INFO* mesh)

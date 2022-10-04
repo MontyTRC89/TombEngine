@@ -304,8 +304,8 @@ namespace TEN::Renderer
 
 	void Renderer11::GetVisibleObjects(RenderView& renderView, bool onlyRooms)
 	{
-		RendererRoom* room = &m_rooms[Camera.pos.roomNumber];
-		ROOM_INFO* nativeRoom = &g_Level.Rooms[Camera.pos.roomNumber];
+		RendererRoom* room = &m_rooms[Camera.pos.RoomNumber];
+		ROOM_INFO* nativeRoom = &g_Level.Rooms[Camera.pos.RoomNumber];
 
 		room->ClipTest = RendererRectangle(0, 0, m_screenWidth, m_screenHeight);
 		m_outside = nativeRoom->flags & ENV_FLAG_OUTSIDE;
@@ -314,7 +314,7 @@ namespace TEN::Renderer
 		room->BoundActive = 2;
 
 		// Initialise bounds list
-		m_boundList[0] = Camera.pos.roomNumber;
+		m_boundList[0] = Camera.pos.RoomNumber;
 		m_boundStart = 0;
 		m_boundEnd = 1;
 
@@ -618,7 +618,7 @@ namespace TEN::Renderer
 	void Renderer11::CollectLightsForCamera()
 	{
 		std::vector<RendererLight*> lightsToDraw;
-		CollectLights(Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z), CAMERA_LIGHT_COLLECTION_RADIUS, Camera.pos.roomNumber, NO_ROOM, true, lightsToDraw);
+		CollectLights(Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z), CAMERA_LIGHT_COLLECTION_RADIUS, Camera.pos.RoomNumber, NO_ROOM, true, lightsToDraw);
 
 		if (lightsToDraw.size() > 0 && lightsToDraw.front()->CastShadows)
 			shadowLight = lightsToDraw.front();

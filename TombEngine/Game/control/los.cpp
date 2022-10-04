@@ -26,7 +26,7 @@ bool ClipTarget(GameVector* origin, GameVector* target)
 {
 	int x, y, z, wx, wy, wz;
 
-	short roomNumber = target->roomNumber;
+	short roomNumber = target->RoomNumber;
 	if (target->y > GetFloorHeight(GetFloor(target->x, target->y, target->z, &roomNumber), target->x, target->y, target->z))
 	{
 		x = (7 * (target->x - origin->x) >> 3) + origin->x;
@@ -46,11 +46,11 @@ bool ClipTarget(GameVector* origin, GameVector* target)
 		target->x = wx;
 		target->y = wy;
 		target->z = wz;
-		target->roomNumber = roomNumber;
+		target->RoomNumber = roomNumber;
 		return false;
 	}
 
-	roomNumber = target->roomNumber;
+	roomNumber = target->RoomNumber;
 	if (target->y < GetCeiling(GetFloor(target->x, target->y, target->z, &roomNumber), target->x, target->y, target->z))
 	{
 		x = (7 * (target->x - origin->x) >> 3) + origin->x;
@@ -70,7 +70,7 @@ bool ClipTarget(GameVector* origin, GameVector* target)
 		target->x = wx;
 		target->y = wy;
 		target->z = wz;
-		target->roomNumber = roomNumber;
+		target->RoomNumber = roomNumber;
 		return false;
 	}
 
@@ -85,7 +85,7 @@ bool GetTargetOnLOS(GameVector* origin, GameVector* target, bool drawTarget, boo
 	auto target2 = *target;
 	int result = LOS(origin, &target2);
 
-	GetFloor(target2.x, target2.y, target2.z, &target2.roomNumber);
+	GetFloor(target2.x, target2.y, target2.z, &target2.RoomNumber);
 
 	if (isFiring && LaserSight)
 	{
@@ -108,7 +108,7 @@ bool GetTargetOnLOS(GameVector* origin, GameVector* target, bool drawTarget, boo
 		target2.y = vector.y - (vector.y - origin->y >> 5);
 		target2.z = vector.z - (vector.z - origin->z >> 5);
 
-		GetFloor(target2.x, target2.y, target2.z, &target2.roomNumber);
+		GetFloor(target2.x, target2.y, target2.z, &target2.RoomNumber);
 
 		if (isFiring)
 		{
@@ -120,7 +120,7 @@ bool GetTargetOnLOS(GameVector* origin, GameVector* target, bool drawTarget, boo
 					{
 						ShatterImpactData.impactDirection = directionNorm;
 						ShatterImpactData.impactLocation = Vector3(mesh->pos.Position.x, mesh->pos.Position.y, mesh->pos.Position.z);
-						ShatterObject(nullptr, mesh, 128, target2.roomNumber, 0);
+						ShatterObject(nullptr, mesh, 128, target2.RoomNumber, 0);
 						SoundEffect(GetShatterSound(mesh->staticNumber), (PoseData*)mesh);
 					}
 
@@ -141,7 +141,7 @@ bool GetTargetOnLOS(GameVector* origin, GameVector* target, bool drawTarget, boo
 								item->MeshBits &= ~ShatterItem.bit;
 								ShatterImpactData.impactDirection = directionNorm;
 								ShatterImpactData.impactLocation = Vector3(ShatterItem.sphere.x, ShatterItem.sphere.y, ShatterItem.sphere.z);
-								ShatterObject(&ShatterItem, 0, 128, target2.roomNumber, 0);
+								ShatterObject(&ShatterItem, 0, 128, target2.RoomNumber, 0);
 								TriggerRicochetSpark(&target2, LaraItem->Pose.Orientation.y, 3, 0);
 							/*}
 							else
@@ -313,7 +313,7 @@ int ObjectOnLOS2(GameVector* origin, GameVector* target, Vector3i* vec, MESH_INF
 				if (DoRayBox(origin, target, &GetBoundsAccurate(*meshp, false), &pos, vec, -1 - meshp->staticNumber))
 				{
 					*mesh = meshp;
-					target->roomNumber = LosRooms[r];
+					target->RoomNumber = LosRooms[r];
 				}
 			}
 		}
@@ -340,7 +340,7 @@ int ObjectOnLOS2(GameVector* origin, GameVector* target, Vector3i* vec, MESH_INF
 			pos.Orientation.y = item->Pose.Orientation.y;
 
 			if (DoRayBox(origin, target, box, &pos, vec, linkNumber))
-				target->roomNumber = LosRooms[r];
+				target->RoomNumber = LosRooms[r];
 		}
 	}
 
@@ -535,7 +535,7 @@ bool LOS(GameVector* origin, GameVector* target)
 {
 	int result1, result2;
 
-	target->roomNumber = origin->roomNumber;
+	target->RoomNumber = origin->RoomNumber;
 	if (abs(target->z - origin->z) > abs(target->x - origin->x))
 	{
 		result1 = xLOS(origin, target);
@@ -549,7 +549,7 @@ bool LOS(GameVector* origin, GameVector* target)
 
 	if (result2)
 	{
-		GetFloor(target->x, target->y, target->z, &target->roomNumber);
+		GetFloor(target->x, target->y, target->z, &target->RoomNumber);
 		if (ClipTarget(origin, target) && result1 == 1 && result2 == 1)
 			return true;
 	}
@@ -567,10 +567,10 @@ int xLOS(GameVector* origin, GameVector* target)
 	int dz = (target->z - origin->z << 10) / dx;
 
 	NumberLosRooms = 1;
-	LosRooms[0] = origin->roomNumber;
+	LosRooms[0] = origin->RoomNumber;
 
-	short room = origin->roomNumber;
-	short room2 = origin->roomNumber;
+	short room = origin->RoomNumber;
+	short room2 = origin->RoomNumber;
 
 	int flag = 1;
 	if (dx < 0)
@@ -621,7 +621,7 @@ int xLOS(GameVector* origin, GameVector* target)
 			target->z = z;
 		}
 
-		target->roomNumber = flag ? room : room2;
+		target->RoomNumber = flag ? room : room2;
 	}
 	else
 	{
@@ -671,7 +671,7 @@ int xLOS(GameVector* origin, GameVector* target)
 			target->z = z;
 		}
 
-		target->roomNumber = flag ? room : room2;
+		target->RoomNumber = flag ? room : room2;
 	}
 
 	return flag;
@@ -687,10 +687,10 @@ int zLOS(GameVector* origin, GameVector* target)
 	int dy = (target->y - origin->y << 10) / dz;
 
 	NumberLosRooms = 1;
-	LosRooms[0] = origin->roomNumber;
+	LosRooms[0] = origin->RoomNumber;
 
-	short room = origin->roomNumber;
-	short room2 = origin->roomNumber;
+	short room = origin->RoomNumber;
+	short room2 = origin->RoomNumber;
 
 	int flag = 1;
 	if (dz < 0)
@@ -741,7 +741,7 @@ int zLOS(GameVector* origin, GameVector* target)
 			target->z = z;
 		}
 
-		target->roomNumber = flag ? room : room2;
+		target->RoomNumber = flag ? room : room2;
 	}
 	else
 	{
@@ -791,7 +791,7 @@ int zLOS(GameVector* origin, GameVector* target)
 			target->z = z;
 		}
 
-		target->roomNumber = flag ? room : room2;
+		target->RoomNumber = flag ? room : room2;
 	}
 
 	return flag;
@@ -802,7 +802,7 @@ bool LOSAndReturnTarget(GameVector* origin, GameVector* target, int push)
 	int x = origin->x;
 	int y = origin->y;
 	int z = origin->z;
-	short roomNumber = origin->roomNumber;
+	short roomNumber = origin->RoomNumber;
 	short roomNumber2 = roomNumber;
 	int dx = target->x - x >> 3;
 	int dy = target->y - y >> 3;
@@ -872,7 +872,7 @@ bool LOSAndReturnTarget(GameVector* origin, GameVector* target, int push)
 	target->x = x;
 	target->y = y;
 	target->z = z;
-	target->roomNumber = roomNumber2;
+	target->RoomNumber = roomNumber2;
 
 	return !flag;
 }

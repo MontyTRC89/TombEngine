@@ -62,7 +62,7 @@ namespace TEN::Entities::Creatures::TR5
 			origin.x = GetRandomControl() + item->Pose.Position.x - 128;
 			origin.y = GetRandomControl() + item->Pose.Position.y - 128;
 			origin.z = GetRandomControl() + item->Pose.Position.z - 128;
-			origin.roomNumber = item->RoomNumber;
+			origin.RoomNumber = item->RoomNumber;
 			bool los = LOS(&origin, &target);
 
 			target.x = 3 * pos.x - 2 * origin.x;
@@ -111,8 +111,8 @@ namespace TEN::Entities::Creatures::TR5
 				{
 					if (StaticObjects[hitMesh->staticNumber].shatterType != SHT_NONE)
 					{
-						ShatterObject(0, hitMesh, 64, target.roomNumber, 0);
-						TestTriggers(hitMesh->pos.Position.x, hitMesh->pos.Position.y, hitMesh->pos.Position.z, target.roomNumber, true);
+						ShatterObject(0, hitMesh, 64, target.RoomNumber, 0);
+						TestTriggers(hitMesh->pos.Position.x, hitMesh->pos.Position.y, hitMesh->pos.Position.z, target.RoomNumber, true);
 						SoundEffect(GetShatterSound(hitMesh->staticNumber), &hitMesh->pos);
 					}
 

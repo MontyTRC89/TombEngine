@@ -87,8 +87,8 @@ void ControlDeathSlide(short itemNumber)
 
 			zipLineItem->Pose.Position = prevPos->ToVector3i();
 
-			if (prevPos->roomNumber != zipLineItem->RoomNumber)
-				ItemNewRoom(itemNumber, prevPos->roomNumber);
+			if (prevPos->RoomNumber != zipLineItem->RoomNumber)
+				ItemNewRoom(itemNumber, prevPos->RoomNumber);
 
 			zipLineItem->Status = ITEM_NOT_ACTIVE;
 			zipLineItem->Animation.ActiveState = zipLineItem->Animation.TargetState = 1;

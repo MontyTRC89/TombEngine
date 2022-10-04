@@ -46,7 +46,7 @@ namespace Misc
 	{
 		GameVector vec1, vec2;
 		pos1.StoreInGameVector(vec1);
-		vec1.roomNumber = roomNumber1;
+		vec1.RoomNumber = roomNumber1;
 		pos2.StoreInGameVector(vec2);
 
 		MESH_INFO* mesh;

@@ -118,7 +118,7 @@ namespace TEN::Entities::Switches
 
 			UseForcedFixedCamera = true;
 			ForcedFixedCamera.y = switchItem->Pose.Position.y - 2048;
-			ForcedFixedCamera.roomNumber = switchItem->RoomNumber;
+			ForcedFixedCamera.RoomNumber = switchItem->RoomNumber;
 
 			AddActiveItem(itemNumber);
 

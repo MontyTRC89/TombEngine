@@ -1113,7 +1113,7 @@ namespace TEN::Entities::Vehicles
 		oldPos.x = quadBikeItem->Pose.Position.x;
 		oldPos.y = quadBikeItem->Pose.Position.y;
 		oldPos.z = quadBikeItem->Pose.Position.z;
-		oldPos.roomNumber = quadBikeItem->RoomNumber;
+		oldPos.RoomNumber = quadBikeItem->RoomNumber;
 
 		bool collide = QuadDynamics(quadBikeItem, laraItem);
 

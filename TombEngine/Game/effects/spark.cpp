@@ -78,7 +78,7 @@ namespace TEN::Effects::Spark
 			s.gravity = 1.2f;
 			s.width = 8.0f;
 			s.height = 64.0f;
-			s.room = pos->roomNumber;
+			s.room = pos->RoomNumber;
 			s.pos = Vector3(pos->x, pos->y, pos->z);
 			float ang = TO_RAD(angle);
 			Vector3 v = Vector3(sin(ang + GenerateFloat(-PI / 2, PI / 2)), GenerateFloat(-1, 1), cos(ang + GenerateFloat(-PI / 2, PI / 2)));
@@ -103,7 +103,7 @@ namespace TEN::Effects::Spark
 			s.gravity = 0.0f;
 			s.height = length;
 			s.width = GenerateFloat(16.0f, 32.0f);
-			s.room = pos->roomNumber;
+			s.room = pos->RoomNumber;
 			s.pos = Vector3(pos->x + GenerateFloat(-16, 16), pos->y + GenerateFloat(-16, 16), pos->z + GenerateFloat(-16, 16));
 			float ang = TO_RAD(angle.y);
 			float vAng = -TO_RAD(angle.x);
