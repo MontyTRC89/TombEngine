@@ -51,6 +51,23 @@ bool LaraDeflectEdge(ItemInfo* item, CollisionInfo* coll)
 	return false;
 }
 
+bool LaraDeflectTopSide(ItemInfo* item, CollisionInfo* coll)
+{
+	// HACK: If we are falling down, collision is CT_CLAMP and
+	// HitStatic flag is set, it means we've collided static from the top.
+
+	if (coll->CollisionType == CT_CLAMP &&
+		coll->HitStatic && item->Animation.Velocity.y > 0.0f)
+	{
+		SetAnimation(item, LA_JUMP_WALL_SMASH_START, 1);
+		Rumble(0.5f, 0.15f);
+
+		return true;
+	}
+
+	return false;
+}
+
 bool LaraDeflectEdgeJump(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
@@ -60,16 +77,21 @@ bool LaraDeflectEdgeJump(ItemInfo* item, CollisionInfo* coll)
 
 	if (coll->CollisionType == CT_FRONT || coll->CollisionType == CT_TOP_FRONT)
 	{
-		if (!lara->Control.CanClimbLadder || item->Animation.Velocity.z != 2)
+		if (!lara->Control.CanClimbLadder || item->Animation.Velocity.z != 2.0f)
 		{
 			if (coll->Middle.Floor <= CLICK(1))
 			{
-				SetAnimation(item, LA_LAND);
-				LaraSnapToHeight(item, coll);
+				if (TestLaraSlide(item, coll))
+					SetLaraSlideAnimation(item, coll);
+				else
+				{
+					SetAnimation(item, LA_LAND);
+					LaraSnapToHeight(item, coll);
+				}
 			}
-			else if (abs(item->Animation.Velocity.z) > 47)
+			// TODO: Demagic. This is Lara's running velocity. Jumps have a minimum of 50.
+			else if (abs(item->Animation.Velocity.z) > 47.0f)
 			{
-				// TODO: Demagic. This is Lara's running velocity. Jumps have a minimum of 50.
 				SetAnimation(item, LA_JUMP_WALL_SMASH_START, 1);
 				Rumble(0.5f, 0.15f);
 			}
@@ -77,8 +99,8 @@ bool LaraDeflectEdgeJump(ItemInfo* item, CollisionInfo* coll)
 			item->Animation.Velocity.z /= 4;
 			lara->Control.MoveAngle += ANGLE(180.0f);
 
-			if (item->Animation.Velocity.y <= 0)
-				item->Animation.Velocity.y = 1;
+			if (item->Animation.Velocity.y <= 0.0f)
+				item->Animation.Velocity.y = 1.0f;
 		}
 
 		return true;
@@ -96,19 +118,19 @@ bool LaraDeflectEdgeJump(ItemInfo* item, CollisionInfo* coll)
 
 	case CT_TOP:
 	case CT_TOP_FRONT:
-		if (item->Animation.Velocity.y <= 0)
-			item->Animation.Velocity.y = 1;
+		if (item->Animation.Velocity.y <= 0.0f)
+			item->Animation.Velocity.y = 1.0f;
 
 		break;
 
 	case CT_CLAMP:
 		item->Pose.Position.z += CLICK(1.5f) * phd_cos(item->Pose.Orientation.y + ANGLE(180.0f));
 		item->Pose.Position.x += CLICK(1.5f) * phd_sin(item->Pose.Orientation.y + ANGLE(180.0f));
-		item->Animation.Velocity.z = 0;
-		coll->Middle.Floor = 0;
+		item->Animation.Velocity.z = 0.0f;
+		coll->Middle.Floor = 0.0f;
 
-		if (item->Animation.Velocity.y <= 0)
-			item->Animation.Velocity.y = 16;
+		if (item->Animation.Velocity.y <= 0.0f)
+			item->Animation.Velocity.y = 16.0f;
 
 		break;
 	}
@@ -608,11 +630,11 @@ void LaraWaterCurrent(ItemInfo* item, CollisionInfo* coll)
 	{
 		auto* sink = &g_Level.Sinks[lara->WaterCurrentActive - 1];
 
-		short angle = mGetAngle(sink->x, sink->z, item->Pose.Position.x, item->Pose.Position.z);
-		lara->WaterCurrentPull.x += (sink->strength * SECTOR(1) * phd_sin(angle - ANGLE(90.0f)) - lara->WaterCurrentPull.x) / 16;
-		lara->WaterCurrentPull.z += (sink->strength * SECTOR(1) * phd_cos(angle - ANGLE(90.0f)) - lara->WaterCurrentPull.z) / 16;
+		short angle = mGetAngle(sink->Position.x, sink->Position.z, item->Pose.Position.x, item->Pose.Position.z);
+		lara->WaterCurrentPull.x += (sink->Strength * SECTOR(1) * phd_sin(angle - ANGLE(90.0f)) - lara->WaterCurrentPull.x) / 16;
+		lara->WaterCurrentPull.z += (sink->Strength * SECTOR(1) * phd_cos(angle - ANGLE(90.0f)) - lara->WaterCurrentPull.z) / 16;
 
-		item->Pose.Position.y += (sink->y - item->Pose.Position.y) >> 4;
+		item->Pose.Position.y += (sink->Position.y - item->Pose.Position.y) >> 4;
 	}
 	else
 	{
