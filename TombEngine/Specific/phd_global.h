@@ -103,7 +103,7 @@ struct Vector3Int
 		return Vector3Int((int)round(x * value), (int)round(y * value), (int)round(z * value));
 	}
 
-	Vector3Int operator /(float value)
+	Vector3Int operator /(float value) const
 	{
 		return Vector3Int((int)round(x / value), (int)round(y / value), (int)round(z / value));
 	}

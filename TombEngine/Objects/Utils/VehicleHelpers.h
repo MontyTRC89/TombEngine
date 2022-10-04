@@ -69,22 +69,22 @@ namespace TEN::Entities::Vehicles
 
 	//-------------------
 
-	int GetVehicleHeight(ItemInfo* vehicleItem, int forward, int right, bool clamp, Vector3Int* pos);
+	int GetVehicleHeight(ItemInfo* vehicleItem, int forward, int right, bool clamp, Vector3Int& pos);
 
 	//-------------------
 	
-	VehicleMountType GetVehicleMountType(ItemInfo* vehicleItem, ItemInfo* laraItem, CollisionInfo* coll, vector<VehicleMountType> allowedMountTypes, float maxDistance2D, float maxVerticalDistance = STEPUP_HEIGHT);
-	VehicleDismountType GetVehicleDismountType(ItemInfo* vehicleItem, vector<VehicleDismountType> allowedDismountTypes, float distance, bool onLand = true);
-	bool TestVehicleDismount(ItemInfo* vehicleItem, VehicleDismountType dismountType, short angle, float distance, bool onLand);
-	VehicleImpactDirection GetVehicleImpactDirection(ItemInfo* vehicleItem, Vector3Int prevPos);
+	VehicleMountType GetVehicleMountType(ItemInfo* vehicleItem, ItemInfo* laraItem, CollisionInfo* coll, const vector<VehicleMountType>& allowedMountTypes, float maxDistance2D, float maxVerticalDistance = STEPUP_HEIGHT);
+	VehicleDismountType GetVehicleDismountType(ItemInfo* vehicleItem, const vector<VehicleDismountType>& allowedDismountTypes, float distance, bool onLand = true);
+	bool TestVehicleDismount(ItemInfo* vehicleItem, VehicleDismountType dismountType, short headingAngle, float distance, bool onLand);
+	VehicleImpactDirection GetVehicleImpactDirection(ItemInfo* vehicleItem, const Vector3Int& prevPos);
 	
 	VehiclePointCollision GetVehicleCollision(ItemInfo* vehicleItem, int forward, int right, bool clamp);
-	int GetVehicleWaterHeight(ItemInfo* vehicleItem, int forward, int right, bool clamp, Vector3Int* pos);
+	int GetVehicleWaterHeight(ItemInfo* vehicleItem, int forward, int right, bool clamp, const Vector3Int& pos);
 
 	void  DoVehicleCollision(ItemInfo* vehicleItem, int radius);
 	float DoVehicleDynamics(int height, float verticalVelocity, int minBounce, int maxKick, int* yPos, float weightMult = 1.0f);
-	void  CalculateVehicleShift(ItemInfo* vehcleItem, short* extraRot, VehiclePointCollision prevPoint, int height, int front, int side, int step, bool clamp);
-	short DoVehicleShift(ItemInfo* vehicleItem, Vector3Int pos, Vector3Int oldPos);
+	void  CalculateVehicleShift(ItemInfo* vehcleItem, short* extraRot, const VehiclePointCollision& prevPoint, int height, int front, int side, int step, bool clamp);
+	short DoVehicleShift(ItemInfo* vehicleItem, const Vector3Int& pos, const Vector3Int& prevPos);
 	float DoVehicleWaterMovement(ItemInfo* vehicleItem, ItemInfo* laraItem, float currentVelocity, int radius, short* turnRate);
 	void  DoVehicleFlareDiscard(ItemInfo* laraItem);
 
