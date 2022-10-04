@@ -79,7 +79,7 @@ namespace TEN::Entities::Vehicles
 	VehicleImpactDirection GetVehicleImpactDirection(ItemInfo* vehicleItem, const Vector3Int& prevPos);
 	
 	VehiclePointCollision GetVehicleCollision(ItemInfo* vehicleItem, int forward, int right, bool clamp);
-	int GetVehicleWaterHeight(ItemInfo* vehicleItem, int forward, int right, bool clamp, const Vector3Int& pos);
+	int GetVehicleWaterHeight(ItemInfo* vehicleItem, int forward, int right, bool clamp, Vector3Int& pos);
 
 	void  DoVehicleCollision(ItemInfo* vehicleItem, int radius);
 	float DoVehicleDynamics(int height, float verticalVelocity, int minBounce, int maxKick, int* yPos, float weightMult = 1.0f);

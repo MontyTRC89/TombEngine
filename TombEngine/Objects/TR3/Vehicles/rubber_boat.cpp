@@ -145,12 +145,12 @@ namespace TEN::Entities::Vehicles
 
 		bool drive = false;
 
-		int pitch, height, ofs, nowake;
+		int pitch, height, ofs;
 
 		Vector3Int frontLeft, frontRight;
 		auto impactDirection = RubberBoatDynamics(itemNumber, laraItem);
-		int heightFrontLeft = GetVehicleWaterHeight(rBoatItem, RBOAT_FRONT, -RBOAT_SIDE, true, &frontLeft);
-		int heightFrontRight = GetVehicleWaterHeight(rBoatItem, RBOAT_FRONT, RBOAT_SIDE, true, &frontRight);
+		int heightFrontLeft = GetVehicleWaterHeight(rBoatItem, RBOAT_FRONT, -RBOAT_SIDE, true, frontLeft);
+		int heightFrontRight = GetVehicleWaterHeight(rBoatItem, RBOAT_FRONT, RBOAT_SIDE, true, frontRight);
 
 		if (lara->Vehicle == itemNumber)
 		{
@@ -624,11 +624,11 @@ namespace TEN::Entities::Vehicles
 
 		// Get point/room collision at vehicle front and corners.
 		Vector3Int frontLeftOld, frontRightOld, backLeftOld, backRightOld, frontOld;
-		int heightFrontLeftOld = GetVehicleWaterHeight(rBoatItem, RBOAT_FRONT, -RBOAT_SIDE, true, &frontLeftOld);
-		int heightFrontRightOld = GetVehicleWaterHeight(rBoatItem, RBOAT_FRONT, RBOAT_SIDE, true, &frontRightOld);
-		int heightBackLeftOld = GetVehicleWaterHeight(rBoatItem, -RBOAT_FRONT, -RBOAT_SIDE, true, &backLeftOld);
-		int heightBackRightOld = GetVehicleWaterHeight(rBoatItem, -RBOAT_FRONT, RBOAT_SIDE, true, &backRightOld);
-		int heightFrontOld = GetVehicleWaterHeight(rBoatItem, 1000, 0, true, &frontOld);
+		int heightFrontLeftOld = GetVehicleWaterHeight(rBoatItem, RBOAT_FRONT, -RBOAT_SIDE, true, frontLeftOld);
+		int heightFrontRightOld = GetVehicleWaterHeight(rBoatItem, RBOAT_FRONT, RBOAT_SIDE, true, frontRightOld);
+		int heightBackLeftOld = GetVehicleWaterHeight(rBoatItem, -RBOAT_FRONT, -RBOAT_SIDE, true, backLeftOld);
+		int heightBackRightOld = GetVehicleWaterHeight(rBoatItem, -RBOAT_FRONT, RBOAT_SIDE, true, backRightOld);
+		int heightFrontOld = GetVehicleWaterHeight(rBoatItem, 1000, 0, true, frontOld);
 
 		auto prevPos = rBoatItem->Pose.Position;
 
@@ -665,25 +665,25 @@ namespace TEN::Entities::Vehicles
 
 		Vector3Int frontLeft, frontRight, backRight, backLeft, front;
 		short extraRot = 0;
-		int heightBackLeft = GetVehicleWaterHeight(rBoatItem, -RBOAT_FRONT, -RBOAT_SIDE, false, &backLeft);
+		int heightBackLeft = GetVehicleWaterHeight(rBoatItem, -RBOAT_FRONT, -RBOAT_SIDE, false, backLeft);
 		if (heightBackLeft < (backLeftOld.y - CLICK(0.5f)))
 			extraRot = DoVehicleShift(rBoatItem, backLeft,backLeftOld);
 
-		int heightBackRight = GetVehicleWaterHeight(rBoatItem, -RBOAT_FRONT, RBOAT_SIDE, false, &backRight);
+		int heightBackRight = GetVehicleWaterHeight(rBoatItem, -RBOAT_FRONT, RBOAT_SIDE, false, backRight);
 		if (heightBackRight < (backRightOld.y - CLICK(0.5f)))
 			extraRot += DoVehicleShift(rBoatItem, backRight, backRightOld);
 
-		int heightFrontLeft = GetVehicleWaterHeight(rBoatItem, RBOAT_FRONT, -RBOAT_SIDE, false, &frontLeft);
+		int heightFrontLeft = GetVehicleWaterHeight(rBoatItem, RBOAT_FRONT, -RBOAT_SIDE, false, frontLeft);
 		if (heightFrontLeft < (frontLeftOld.y - CLICK(0.5f)))
 			extraRot += DoVehicleShift(rBoatItem, frontLeft, frontLeftOld);
 
-		int heightFrontRight = GetVehicleWaterHeight(rBoatItem, RBOAT_FRONT, RBOAT_SIDE, false, &frontRight);
+		int heightFrontRight = GetVehicleWaterHeight(rBoatItem, RBOAT_FRONT, RBOAT_SIDE, false, frontRight);
 		if (heightFrontRight < (frontRightOld.y - CLICK(0.5f)))
 			extraRot += DoVehicleShift(rBoatItem, frontRight, frontRightOld);
 
 		if (!slip)
 		{
-			int heightFront = GetVehicleWaterHeight(rBoatItem, 1000, 0, false, &front);
+			int heightFront = GetVehicleWaterHeight(rBoatItem, 1000, 0, false, front);
 			if (heightFront < (frontOld.y - CLICK(0.5f)))
 				DoVehicleShift(rBoatItem, front, frontOld);
 		}

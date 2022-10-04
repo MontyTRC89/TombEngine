@@ -132,7 +132,7 @@ namespace TEN::Entities::Vehicles
 		QBIKE_BITE_TYRE_BACK_RIGHT	= 5
 	};
 
-	BITE_INFO QuadBikeBites[6] =
+	BiteInfo QuadBikeBites[6] =
 	{
 		{ -56, -32, -380, 0	},
 		{ 56, -32, -380, 0 },
@@ -205,8 +205,8 @@ namespace TEN::Entities::Vehicles
 		auto probe = GetCollision(quadBikeItem);
 
 		Vector3Int frontLeft, frontRight;
-		auto floorHeightLeft = GetVehicleHeight(quadBikeItem, QBIKE_FRONT, -QBIKE_SIDE, false, &frontLeft);
-		auto floorHeightRight = GetVehicleHeight(quadBikeItem, QBIKE_FRONT, QBIKE_SIDE, false, &frontRight);
+		auto floorHeightLeft = GetVehicleHeight(quadBikeItem, QBIKE_FRONT, -QBIKE_SIDE, false, frontLeft);
+		auto floorHeightRight = GetVehicleHeight(quadBikeItem, QBIKE_FRONT, QBIKE_SIDE, false, frontRight);
 
 		TestTriggers(quadBikeItem, false);
 
@@ -315,14 +315,12 @@ namespace TEN::Entities::Vehicles
 
 			for (int i = 0; i < 2; i++)
 			{
-				pos.x = QuadBikeBites[i].x;
-				pos.y = QuadBikeBites[i].y;
-				pos.z = QuadBikeBites[i].z;
+				pos = QuadBikeBites[i].Position;
 				GetJointAbsPosition(quadBikeItem, &pos, QuadBikeBites[i].meshNum);
-				angle = quadBikeItem->Pose.Orientation.y + ((i == 0) ? 0x9000 : 0x7000);
-				if (quadBikeItem->Animation.Velocity.z > 32)
+				angle = quadBikeItem->Pose.Orientation.y + ((i == 0) ? ANGLE(202.5f) : ANGLE(157.5f));
+				if (quadBikeItem->Animation.Velocity.z > 32.0f)
 				{
-					if (quadBikeItem->Animation.Velocity.z < 64)
+					if (quadBikeItem->Animation.Velocity.z < 64.0f)
 					{
 						speed = 64 - quadBikeItem->Animation.Velocity.z;
 						TriggerQuadBikeExhaustSmokeEffect(pos.x, pos.y, pos.z, angle, speed, 1);

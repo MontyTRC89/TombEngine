@@ -137,7 +137,7 @@ namespace TEN::Entities::Vehicles
 		UPV_BITE_RIGHT_RUDDER_LEFT  = 5	 // Unused.
 	};
 
-	BITE_INFO UpvBites[6] =
+	BiteInfo UpvBites[6] =
 	{
 		{ 0, 0, 0, 3 },
 		{ 0, 96, 256, 0 },
@@ -927,7 +927,7 @@ namespace TEN::Entities::Vehicles
 
 			if (upv->Velocity)
 			{
-				pos = Vector3Int(UpvBites[UPV_BITE_TURBINE].x, UpvBites[UPV_BITE_TURBINE].y, UpvBites[UPV_BITE_TURBINE].z);
+				pos = UpvBites[UPV_BITE_TURBINE].Position;
 				GetJointAbsPosition(upvItem, &pos, UpvBites[UPV_BITE_TURBINE].meshNum);
 
 				TriggerUpvMistEffect(pos.x, pos.y + UPV_SHIFT, pos.z, abs((int)round(upv->Velocity)), upvItem->Pose.Orientation.y + ANGLE(180.0f));
@@ -949,7 +949,7 @@ namespace TEN::Entities::Vehicles
 		for (int lp = 0; lp < 2; lp++)
 		{
 			int random = 31 - (GetRandomControl() & 3);
-			pos = Vector3Int(UpvBites[UPV_BITE_FRONT_LIGHT].x, UpvBites[UPV_BITE_FRONT_LIGHT].y, UpvBites[UPV_BITE_FRONT_LIGHT].z << (lp * 6));
+			pos = UpvBites[UPV_BITE_FRONT_LIGHT].Position;
 			GetJointAbsPosition(upvItem, &pos, UpvBites[UPV_BITE_FRONT_LIGHT].meshNum);
 
 			GameVector source;

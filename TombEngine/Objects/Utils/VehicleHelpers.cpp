@@ -153,13 +153,13 @@ namespace TEN::Entities::Vehicles
 		// Assess dismount types allowed for vehicle.
 		for (auto dismountType : allowedDismountTypes)
 		{
-			short angle;
+			short headingAngle;
 			switch (dismountType)
 			{
 			case VehicleDismountType::Front:
 				if (TrInput & IN_FORWARD)
 				{
-					angle = ANGLE(0.0f);
+					headingAngle = ANGLE(0.0f);
 					break;
 				}
 
@@ -168,7 +168,7 @@ namespace TEN::Entities::Vehicles
 			case VehicleDismountType::Back:
 				if (TrInput & IN_BACK)
 				{
-					angle = ANGLE(180.0f);
+					headingAngle = ANGLE(180.0f);
 					break;
 				}
 
@@ -177,7 +177,7 @@ namespace TEN::Entities::Vehicles
 			case VehicleDismountType::Left:
 				if (TrInput & IN_LEFT)
 				{
-					angle = ANGLE(-90.0f);
+					headingAngle = ANGLE(-90.0f);
 					break;
 				}
 
@@ -186,14 +186,14 @@ namespace TEN::Entities::Vehicles
 			case VehicleDismountType::Right:
 				if (TrInput & IN_RIGHT)
 				{
-					angle = ANGLE(90.0f);
+					headingAngle = ANGLE(90.0f);
 					break;
 				}
 
 				continue;
 			}
 
-			if (TestVehicleDismount(vehicleItem, dismountType, angle, distance, onLand))
+			if (TestVehicleDismount(vehicleItem, dismountType, headingAngle, distance, onLand))
 				return dismountType;
 		}
 

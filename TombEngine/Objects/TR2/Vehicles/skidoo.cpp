@@ -141,8 +141,8 @@ namespace TEN::Entities::Vehicles
 
 		Vector3Int frontLeft, frontRight;
 		auto collide = SkidooDynamics(skidooItem, laraItem);
-		auto heightFrontLeft = GetVehicleHeight(skidooItem, SKIDOO_FRONT, -SKIDOO_SIDE, true, &frontLeft);
-		auto heightFrontRight = GetVehicleHeight(skidooItem, SKIDOO_FRONT, SKIDOO_SIDE, true, &frontRight);
+		auto heightFrontLeft = GetVehicleHeight(skidooItem, SKIDOO_FRONT, -SKIDOO_SIDE, true, frontLeft);
+		auto heightFrontRight = GetVehicleHeight(skidooItem, SKIDOO_FRONT, SKIDOO_SIDE, true, frontRight);
 
 		auto probe = GetCollision(skidooItem);
 
