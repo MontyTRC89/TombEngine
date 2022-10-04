@@ -578,8 +578,8 @@ namespace TEN::Entities::Vehicles
 	{
 		float axisCoeff = AxisMap[InputAxis::MoveHorizontal];
 		int sign = copysign(1, axisCoeff);
-		short maxAngleNormalized = maxAngle * axisCoeff;
-		vehicleItem->Pose.Orientation.z += std::min<short>(baseRate, abs(maxAngleNormalized - vehicleItem->Pose.Orientation.z) / 3) * sign;
+		short maxAngleNorm = maxAngle * axisCoeff;
+		vehicleItem->Pose.Orientation.z += std::min<short>(baseRate, abs(maxAngleNorm - vehicleItem->Pose.Orientation.z) / 3) * sign;
 	}
 
 	void ResetVehicleLean(ItemInfo* vehicleItem, float alpha)
