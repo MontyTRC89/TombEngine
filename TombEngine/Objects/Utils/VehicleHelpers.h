@@ -58,13 +58,13 @@ namespace TEN::Entities::Vehicles
 		Right
 	};
 
-	// Collision struct specific to vehicles. Used to ascertain point probe collision parameters
-	// at wheels and around the base perimeter. Essentially a pseudo-raycast. May revise later.
+	// Collision struct specific to vehicles. Used to determine point collision parameters
+	// at wheels and around the base perimeter of a vehicle. May revise.
 	struct VehiclePointCollision
 	{
-		Vector3Int Position = Vector3Int::Zero;
-		int		   Floor	= 0;
-		int		   Ceiling	= 0;
+		Vector3Int Position		 = Vector3Int::Zero;
+		int		   FloorHeight	 = 0;
+		int		   CeilingHeight = 0;
 	};
 
 	//-------------------
@@ -82,10 +82,10 @@ namespace TEN::Entities::Vehicles
 	int GetVehicleWaterHeight(ItemInfo* vehicleItem, int forward, int right, bool clamp, Vector3Int& pos);
 
 	void  DoVehicleCollision(ItemInfo* vehicleItem, int radius);
-	float DoVehicleDynamics(int height, float verticalVelocity, int minBounce, int maxKick, int* yPos, float weightMult = 1.0f);
-	void  CalculateVehicleShift(ItemInfo* vehcleItem, short* extraRot, const VehiclePointCollision& prevPoint, int height, int front, int side, int step, bool clamp);
+	float DoVehicleDynamics(int height, float verticalVelocity, int minBounce, int maxKick, int& outYPos, float weightMult = 1.0f);
+	void  CalculateVehicleShift(ItemInfo* vehcleItem, short& outExtraRot, const VehiclePointCollision& prevPoint, int height, int front, int side, int step, bool clamp);
 	short DoVehicleShift(ItemInfo* vehicleItem, const Vector3Int& pos, const Vector3Int& prevPos);
-	float DoVehicleWaterMovement(ItemInfo* vehicleItem, ItemInfo* laraItem, float currentVelocity, int radius, short* turnRate);
+	float DoVehicleWaterMovement(ItemInfo* vehicleItem, ItemInfo* laraItem, float currentVelocity, int radius, short& outTurnRate);
 	void  DoVehicleFlareDiscard(ItemInfo* laraItem);
 
 	short ModulateVehicleTurnRate(short turnRate, short accelRate, short minTurnRate, short maxTurnRate, float axisCoeff, bool invert);

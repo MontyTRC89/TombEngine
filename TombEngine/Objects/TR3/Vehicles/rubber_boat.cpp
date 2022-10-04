@@ -195,10 +195,10 @@ namespace TEN::Entities::Vehicles
 		else
 			rBoat->Water -= 5;
 
-		rBoat->LeftVerticalVelocity = DoVehicleDynamics(heightFrontLeft, rBoat->LeftVerticalVelocity, RBOAT_BOUNCE_MIN, RBOAT_KICK_MAX, (int*)&frontLeft.y);
-		rBoat->RightVerticalVelocity = DoVehicleDynamics(heightFrontRight, rBoat->RightVerticalVelocity, RBOAT_BOUNCE_MIN, RBOAT_KICK_MAX, (int*)&frontRight.y);
+		rBoat->LeftVerticalVelocity = DoVehicleDynamics(heightFrontLeft, rBoat->LeftVerticalVelocity, RBOAT_BOUNCE_MIN, RBOAT_KICK_MAX, frontLeft.y);
+		rBoat->RightVerticalVelocity = DoVehicleDynamics(heightFrontRight, rBoat->RightVerticalVelocity, RBOAT_BOUNCE_MIN, RBOAT_KICK_MAX, frontRight.y);
 		ofs = rBoatItem->Animation.Velocity.y;
-		rBoatItem->Animation.Velocity.y = DoVehicleDynamics(rBoat->Water, rBoatItem->Animation.Velocity.y, RBOAT_BOUNCE_MIN, RBOAT_KICK_MAX, (int*)&rBoatItem->Pose.Position.y);
+		rBoatItem->Animation.Velocity.y = DoVehicleDynamics(rBoat->Water, rBoatItem->Animation.Velocity.y, RBOAT_BOUNCE_MIN, RBOAT_KICK_MAX, rBoatItem->Pose.Position.y);
 
 		height = frontLeft.y + frontRight.y;
 		if (height < 0)

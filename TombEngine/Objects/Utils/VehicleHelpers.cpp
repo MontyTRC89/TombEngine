@@ -32,15 +32,15 @@ namespace TEN::Entities::Vehicles
 		pos.z = vehicleItem->Pose.Position.z + (forward * cosY) - (right * sinY);
 
 		// Get collision a bit higher to be able to detect bridges.
-		auto probe = GetCollision(pos.x, pos.y - CLICK(2), pos.z, vehicleItem->RoomNumber);
+		auto pointColl = GetCollision(pos.x, pos.y - CLICK(2), pos.z, vehicleItem->RoomNumber);
 
-		if (pos.y < probe.Position.Ceiling || probe.Position.Ceiling == NO_HEIGHT)
+		if (pos.y < pointColl.Position.Ceiling || pointColl.Position.Ceiling == NO_HEIGHT)
 			return NO_HEIGHT;
 
-		if (pos.y > probe.Position.Floor && clamp)
-			pos.y = probe.Position.Floor;
+		if (pos.y > pointColl.Position.Floor && clamp)
+			pos.y = pointColl.Position.Floor;
 
-		return probe.Position.Floor;
+		return pointColl.Position.Floor;
 	}
 
 	VehicleMountType GetVehicleMountType(ItemInfo* vehicleItem, ItemInfo* laraItem, CollisionInfo* coll, const vector<VehicleMountType>& allowedMountTypes, float maxDistance2D, float maxVerticalDistance)
@@ -204,20 +204,20 @@ namespace TEN::Entities::Vehicles
 	{
 		if (dismountType == VehicleDismountType::None)
 			return false;
-		auto probe = GetCollision(vehicleItem, headingAngle, distance, -CLICK(2));
+		auto pointColl = GetCollision(vehicleItem, headingAngle, distance, -CLICK(2));
 
 		// Assess for walls. Check ceiling as well?
-		if (probe.Position.Floor == NO_HEIGHT)
+		if (pointColl.Position.Floor == NO_HEIGHT)
 			return false;
 
 		// Assess for slopes (if applicable).
-		if (probe.Position.FloorSlope && onLand)
+		if (pointColl.Position.FloorSlope && onLand)
 			return false;
 
 		// Assess feasibility of dismount.
-		if (abs(probe.Position.Floor - vehicleItem->Pose.Position.y) <= STEPUP_HEIGHT && // Floor is within highest step threshold.
-			(probe.Position.Ceiling - vehicleItem->Pose.Position.y) > -LARA_HEIGHT &&	 // Gap is optically permissive.
-			abs(probe.Position.Ceiling - probe.Position.Floor) > LARA_HEIGHT)			 // Space is not a clamp.
+		if (abs(pointColl.Position.Floor - vehicleItem->Pose.Position.y) <= STEPUP_HEIGHT && // Floor is within highest step threshold.
+			(pointColl.Position.Ceiling - vehicleItem->Pose.Position.y) > -LARA_HEIGHT &&	 // Gap is optically permissive.
+			abs(pointColl.Position.Ceiling - pointColl.Position.Floor) > LARA_HEIGHT)		 // Space is not a clamp.
 		{
 			return true;
 		}
@@ -270,15 +270,15 @@ namespace TEN::Entities::Vehicles
 		);
 
 		// Get collision a bit higher to be able to detect bridges.
-		auto probe = GetCollision(point.x, point.y - CLICK(2), point.z, vehicleItem->RoomNumber);
+		auto pointColl = GetCollision(point.x, point.y - CLICK(2), point.z, vehicleItem->RoomNumber);
 
-		if (point.y < probe.Position.Ceiling || probe.Position.Ceiling == NO_HEIGHT)
+		if (point.y < pointColl.Position.Ceiling || pointColl.Position.Ceiling == NO_HEIGHT)
 			return VehiclePointCollision{ point, NO_HEIGHT, NO_HEIGHT};
 
-		if (point.y > probe.Position.Floor && clamp)
-			point.y = probe.Position.Floor;
+		if (point.y > pointColl.Position.Floor && clamp)
+			point.y = pointColl.Position.Floor;
 
-		return VehiclePointCollision{ point, probe.Position.Floor, probe.Position.Ceiling };
+		return VehiclePointCollision{ point, pointColl.Position.Floor, pointColl.Position.Ceiling };
 	}
 	
 	int GetVehicleWaterHeight(ItemInfo* vehicleItem, int forward, int right, bool clamp, Vector3Int& pos)
@@ -291,14 +291,14 @@ namespace TEN::Entities::Vehicles
 		vec = Vector3::Transform(vec, world);
 
 		pos = Vector3Int(vec);
-		auto probe = GetCollision(pos.x, pos.y, pos.z, vehicleItem->RoomNumber);
-		int probedRoomNumber = probe.RoomNumber;
+		auto pointColl = GetCollision(pos.x, pos.y, pos.z, vehicleItem->RoomNumber);
+		int pointColldRoomNumber = pointColl.RoomNumber;
 
-		int height = GetWaterHeight(pos.x, pos.y, pos.z, probedRoomNumber);
+		int height = GetWaterHeight(pos.x, pos.y, pos.z, pointColldRoomNumber);
 
 		if (height == NO_HEIGHT)
 		{
-			height = probe.Position.Floor;
+			height = pointColl.Position.Floor;
 			if (height == NO_HEIGHT)
 				return height;
 		}
@@ -323,16 +323,16 @@ namespace TEN::Entities::Vehicles
 	}
 
 	// Motorbike and jeep had the values in their dynamics functions tweaked to make them feel heavier.
-	// Using this unified function, they leap off hills as easily as the older vehicles for now. @Sezz 2022.06.30
-	float DoVehicleDynamics(int height, float verticalVelocity, int minBounce, int maxKick, int* yPos, float weightMult)
+	// Using this unified function, they leap off hills as easily as the older vehicles for now. -- Sezz 2022.06.30
+	float DoVehicleDynamics(int height, float verticalVelocity, int minBounce, int maxKick, int& outYPos, float weightMult)
 	{
 		// Grounded.
-		if (height > *yPos)
+		if (height > outYPos)
 		{
-			*yPos += verticalVelocity;
-			if (*yPos > (height - minBounce))
+			outYPos += verticalVelocity;
+			if (outYPos > (height - minBounce))
 			{
-				*yPos = height;
+				outYPos = height;
 				verticalVelocity = 0.0f;
 			}
 			else
@@ -341,29 +341,29 @@ namespace TEN::Entities::Vehicles
 		// Airborne.
 		else
 		{
-			int kick = (height - *yPos) * 4;
+			int kick = (height - outYPos) * 4;
 			if (kick < maxKick)
 				kick = maxKick;
 
 			verticalVelocity += (kick - verticalVelocity) / 8;
 
-			if (*yPos > height)
-				*yPos = height;
+			if (outYPos > height)
+				outYPos = height;
 		}
 
 		return verticalVelocity;
 	}
 
 	// Temp. scaffolding function. Shifts need a rework.
-	void CalculateVehicleShift(ItemInfo* vehicleItem, short* extraRot, const VehiclePointCollision& prevPoint, int height, int front, int side, int step, bool clamp)
+	void CalculateVehicleShift(ItemInfo* vehicleItem, short& outExtraRot, const VehiclePointCollision& prevPoint, int height, int front, int side, int step, bool clamp)
 	{
-		auto point = GetVehicleCollision(vehicleItem, front, side, clamp);
+		auto vPointColl = GetVehicleCollision(vehicleItem, front, side, clamp);
 
-		if (point.Floor < (prevPoint.Position.y - step) ||	   // Floor is beyond upper bound.
-			//point.Ceiling > (prevPoint.Position.y - height) || // Ceiling is too low. Will get stuck on jumps that hit the ceiling.
-			abs(point.Ceiling - point.Floor) <= height)		   // Floor and ceiling form a clamp.
+		if (vPointColl.FloorHeight < (prevPoint.Position.y - step) ||		  // Floor is beyond upper bound.
+			//point.CeilingHeight > (prevPoint.Position.y - height) ||		  // Ceiling is too low. Will get stuck on jumps that hit the ceiling.
+			abs(vPointColl.CeilingHeight - vPointColl.FloorHeight) <= height) // Floor and ceiling form a clamp.
 		{
-			*extraRot += DoVehicleShift(vehicleItem, point.Position, prevPoint.Position);
+			outExtraRot += DoVehicleShift(vehicleItem, vPointColl.Position, prevPoint.Position);
 		}
 	}
 
@@ -412,8 +412,8 @@ namespace TEN::Entities::Vehicles
 		{
 			alignedPos = Vector3Int::Zero;
 
-			auto probe = GetCollision(prevPos.x, pos.y, pos.z, vehicleItem->RoomNumber);
-			if (probe.Position.Floor < (prevPos.y - CLICK(1)))
+			auto pointColl = GetCollision(prevPos.x, pos.y, pos.z, vehicleItem->RoomNumber);
+			if (pointColl.Position.Floor < (prevPos.y - CLICK(1)))
 			{
 				if (pos.z > prevPos.z)
 					alignedPos.z = -alignedShift.z - 1;
@@ -421,8 +421,8 @@ namespace TEN::Entities::Vehicles
 					alignedPos.z = SECTOR(1) - alignedShift.z;
 			}
 
-			probe = GetCollision(pos.x, pos.y, prevPos.z, vehicleItem->RoomNumber);
-			if (probe.Position.Floor < (prevPos.y - CLICK(1)))
+			pointColl = GetCollision(pos.x, pos.y, prevPos.z, vehicleItem->RoomNumber);
+			if (pointColl.Position.Floor < (prevPos.y - CLICK(1)))
 			{
 				if (pos.x > prevPos.x)
 					alignedPos.x = -alignedShift.x - 1;
@@ -430,7 +430,7 @@ namespace TEN::Entities::Vehicles
 					alignedPos.x = SECTOR(1) - alignedShift.x;
 			}
 
-			// NOTE: Commented lines are skidoo-specific. Likely unnecessary but keeping for reference. @Sezz 2022.06.30
+			// NOTE: Commented lines are skidoo-specific. Likely unnecessary but keeping for reference. -- Sezz 2022.06.30
 			if (alignedPos.x && alignedPos.z)
 			{
 				vehicleItem->Pose.Position.z += alignedPos.z;
@@ -468,7 +468,7 @@ namespace TEN::Entities::Vehicles
 		return 0;
 	}
 
-	float DoVehicleWaterMovement(ItemInfo* vehicleItem, ItemInfo* laraItem, float currentVelocity, int radius, short* turnRate)
+	float DoVehicleWaterMovement(ItemInfo* vehicleItem, ItemInfo* laraItem, float currentVelocity, int radius, short& outTurnRate)
 	{
 		if (TestEnvironment(ENV_FLAG_WATER, vehicleItem) ||
 			TestEnvironment(ENV_FLAG_SWAMP, vehicleItem))
@@ -497,10 +497,10 @@ namespace TEN::Entities::Vehicles
 						TEN::Effects::TriggerSpeedboatFoam(vehicleItem, Vector3(0, -waterDepth / 2.0f, -radius));
 				}
 
-				if (*turnRate)
+				if (outTurnRate)
 				{
 					float coeff = isWater ? VEHICLE_WATER_TURN_RATE_COEFF : VEHICLE_SWAMP_TURN_RATE_COEFF;
-					*turnRate -= *turnRate * ((waterDepth / VEHICLE_WATER_HEIGHT_MAX) / coeff);
+					outTurnRate -= outTurnRate * ((waterDepth / VEHICLE_WATER_HEIGHT_MAX) / coeff);
 				}
 			}
 			else

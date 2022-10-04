@@ -246,15 +246,15 @@ namespace TEN::Entities::Vehicles
 		}*/
 
 		int prevYPos = jeepItem->Pose.Position.y;
-		jeepItem->Animation.Velocity.y = DoVehicleDynamics(floorHeight, jeepItem->Animation.Velocity.y, JEEP_BOUNCE_MIN, JEEP_KICK_MAX, &jeepItem->Pose.Position.y, 1.5f);
-		jeep->Velocity = DoVehicleWaterMovement(jeepItem, laraItem, jeep->Velocity, JEEP_FRONT, &jeep->TurnRate);
+		jeepItem->Animation.Velocity.y = DoVehicleDynamics(floorHeight, jeepItem->Animation.Velocity.y, JEEP_BOUNCE_MIN, JEEP_KICK_MAX, jeepItem->Pose.Position.y, 1.5f);
+		jeep->Velocity = DoVehicleWaterMovement(jeepItem, laraItem, jeep->Velocity, JEEP_FRONT, jeep->TurnRate);
 
 		floorHeight = (pointFrontLeft.Position.y + pointFrontRight.Position.y) / 2;
 		
 		short xRot;
-		if (pointBackCenter.Position.y < pointBackCenter.Floor)
+		if (pointBackCenter.Position.y < pointBackCenter.FloorHeight)
 		{
-			if (floorHeight < (pointFrontLeft.Floor + pointFrontRight.Floor) / 2)
+			if (floorHeight < (pointFrontLeft.FloorHeight + pointFrontRight.FloorHeight) / 2)
 			{
 				xRot = phd_atan(ANGLE(0.75f), prevYPos - jeepItem->Pose.Position.y);
 				if (jeep->Velocity < 0)
@@ -265,10 +265,10 @@ namespace TEN::Entities::Vehicles
 		}
 		else
 		{
-			if (floorHeight < (pointFrontLeft.Floor + pointFrontRight.Floor) / 2)
-				xRot = phd_atan(JEEP_FRONT, pointBackCenter.Floor - jeepItem->Pose.Position.y);
+			if (floorHeight < (pointFrontLeft.FloorHeight + pointFrontRight.FloorHeight) / 2)
+				xRot = phd_atan(JEEP_FRONT, pointBackCenter.FloorHeight - jeepItem->Pose.Position.y);
 			else
-				xRot = phd_atan(ANGLE(6.0f), pointBackCenter.Floor - floorHeight);
+				xRot = phd_atan(ANGLE(6.0f), pointBackCenter.FloorHeight - floorHeight);
 		}
 
 		short zRot = phd_atan(ANGLE(1.9f), floorHeight - pointFrontLeft.Position.y);
@@ -1177,11 +1177,11 @@ namespace TEN::Entities::Vehicles
 		int rot2 = 0;
 
 		auto pointFrontLeft = GetVehicleCollision(jeepItem, JEEP_FRONT, -JEEP_SIDE, false);
-		if (pointFrontLeft.Floor < prevPointFrontLeft.Position.y - CLICK(1))
+		if (pointFrontLeft.FloorHeight < prevPointFrontLeft.Position.y - CLICK(1))
 			rot1 = abs(4 * DoVehicleShift(jeepItem, pointFrontLeft.Position, prevPointFrontLeft.Position));
 
 		auto pointBackLeft = GetVehicleCollision(jeepItem, -(JEEP_FRONT + 50), -JEEP_SIDE, false);
-		if (pointBackLeft.Floor < prevPointBackLeft.Position.y - CLICK(1))
+		if (pointBackLeft.FloorHeight < prevPointBackLeft.Position.y - CLICK(1))
 		{
 			if (rotation)
 				rot1 += abs(4 * DoVehicleShift(jeepItem, pointBackLeft.Position, prevPointBackLeft.Position));
@@ -1190,15 +1190,15 @@ namespace TEN::Entities::Vehicles
 		}
 
 		auto pointFrontRight = GetVehicleCollision(jeepItem, JEEP_FRONT, JEEP_SIDE, false);
-		if (pointFrontRight.Floor < pointFrontRight.Position.y - CLICK(1))
+		if (pointFrontRight.FloorHeight < pointFrontRight.Position.y - CLICK(1))
 			rot2 = -abs(4 * DoVehicleShift(jeepItem, pointFrontRight.Position, prevPointFrontRight.Position));
 
 		auto pointBack = GetVehicleCollision(jeepItem, -(JEEP_FRONT + 50), 0, false);
-		if (pointBack.Floor < prevPointBack.Position.y - CLICK(1))
+		if (pointBack.FloorHeight < prevPointBack.Position.y - CLICK(1))
 			DoVehicleShift(jeepItem, pointBack.Position, prevPointBack.Position);
 	
 		auto pointBackRight = GetVehicleCollision(jeepItem, -(JEEP_FRONT + 50), JEEP_SIDE, false);
-		if (pointBackRight.Floor < prevPointBack.Position.y - CLICK(1))
+		if (pointBackRight.FloorHeight < prevPointBack.Position.y - CLICK(1))
 		{
 			if (rot2)
 				rot2 -= abs(4 * DoVehicleShift(jeepItem, pointBackRight.Position, prevPointBack.Position));

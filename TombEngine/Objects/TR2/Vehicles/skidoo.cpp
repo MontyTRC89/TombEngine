@@ -208,10 +208,10 @@ namespace TEN::Entities::Vehicles
 		}
 		skidooItem->Floor = height;
 
-		skidoo->LeftVerticalVelocity = DoVehicleDynamics(heightFrontLeft, skidoo->LeftVerticalVelocity, SKIDOO_BOUNCE, SKIDOO_KICK, &frontLeft.y);
-		skidoo->RightVerticalVelocity = DoVehicleDynamics(heightFrontRight, skidoo->RightVerticalVelocity, SKIDOO_BOUNCE, SKIDOO_KICK, &frontRight.y);
-		skidooItem->Animation.Velocity.y = DoVehicleDynamics(height, skidooItem->Animation.Velocity.y, SKIDOO_BOUNCE, SKIDOO_KICK, &skidooItem->Pose.Position.y);
-		skidooItem->Animation.Velocity.z = DoVehicleWaterMovement(skidooItem, laraItem, skidooItem->Animation.Velocity.z, SKIDOO_RADIUS, &skidoo->TurnRate);
+		skidoo->LeftVerticalVelocity = DoVehicleDynamics(heightFrontLeft, skidoo->LeftVerticalVelocity, SKIDOO_BOUNCE, SKIDOO_KICK, frontLeft.y);
+		skidoo->RightVerticalVelocity = DoVehicleDynamics(heightFrontRight, skidoo->RightVerticalVelocity, SKIDOO_BOUNCE, SKIDOO_KICK, frontRight.y);
+		skidooItem->Animation.Velocity.y = DoVehicleDynamics(height, skidooItem->Animation.Velocity.y, SKIDOO_BOUNCE, SKIDOO_KICK, skidooItem->Pose.Position.y);
+		skidooItem->Animation.Velocity.z = DoVehicleWaterMovement(skidooItem, laraItem, skidooItem->Animation.Velocity.z, SKIDOO_RADIUS, skidoo->TurnRate);
 
 		height = (frontLeft.y + frontRight.y) / 2;
 		short xRot = phd_atan(SKIDOO_FRONT, skidooItem->Pose.Position.y - height);
@@ -369,10 +369,10 @@ namespace TEN::Entities::Vehicles
 
 		// Apply shifts.
 		short extraRot = 0;
-		CalculateVehicleShift(skidooItem, &extraRot, prevPointBackLeft, SKIDOO_HEIGHT, -SKIDOO_FRONT, -SKIDOO_SIDE, SKIDOO_STEP_HEIGHT, false);
-		CalculateVehicleShift(skidooItem, &extraRot, prevPointBackRight, SKIDOO_HEIGHT, -SKIDOO_FRONT, SKIDOO_SIDE, SKIDOO_STEP_HEIGHT, false);
-		CalculateVehicleShift(skidooItem, &extraRot, prevPointFrontLeft, SKIDOO_HEIGHT, SKIDOO_FRONT, -SKIDOO_SIDE, SKIDOO_STEP_HEIGHT, false);
-		CalculateVehicleShift(skidooItem, &extraRot, prevPointFrontRight, SKIDOO_HEIGHT, SKIDOO_FRONT, SKIDOO_SIDE, SKIDOO_STEP_HEIGHT, false);
+		CalculateVehicleShift(skidooItem, extraRot, prevPointBackLeft, SKIDOO_HEIGHT, -SKIDOO_FRONT, -SKIDOO_SIDE, SKIDOO_STEP_HEIGHT, false);
+		CalculateVehicleShift(skidooItem, extraRot, prevPointBackRight, SKIDOO_HEIGHT, -SKIDOO_FRONT, SKIDOO_SIDE, SKIDOO_STEP_HEIGHT, false);
+		CalculateVehicleShift(skidooItem, extraRot, prevPointFrontLeft, SKIDOO_HEIGHT, SKIDOO_FRONT, -SKIDOO_SIDE, SKIDOO_STEP_HEIGHT, false);
+		CalculateVehicleShift(skidooItem, extraRot, prevPointFrontRight, SKIDOO_HEIGHT, SKIDOO_FRONT, SKIDOO_SIDE, SKIDOO_STEP_HEIGHT, false);
 
 		auto probe = GetCollision(skidooItem);
 		if (probe.Position.Floor < (skidooItem->Pose.Position.y - SKIDOO_STEP_HEIGHT) ||

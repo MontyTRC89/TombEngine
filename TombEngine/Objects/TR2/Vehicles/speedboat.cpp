@@ -189,9 +189,9 @@ namespace TEN::Entities::Vehicles
 		else
 			speedboat->Water -= 5;
 
-		speedboat->LeftVerticalVelocity = DoVehicleDynamics(heightFrontLeft, speedboat->LeftVerticalVelocity, SPEEDBOAT_BOUNCE_MIN, SPEEDBOAT_KICK_MAX, (int*)&frontLeft.y);
-		speedboat->RightVerticalVelocity = DoVehicleDynamics(heightFrontRight, speedboat->RightVerticalVelocity, SPEEDBOAT_BOUNCE_MIN, SPEEDBOAT_KICK_MAX, (int*)&frontRight.y);
-		speedboatItem->Animation.Velocity.y = DoVehicleDynamics(speedboat->Water, speedboatItem->Animation.Velocity.y, SPEEDBOAT_BOUNCE_MIN, SPEEDBOAT_KICK_MAX, (int*)&speedboatItem->Pose.Position.y);
+		speedboat->LeftVerticalVelocity = DoVehicleDynamics(heightFrontLeft, speedboat->LeftVerticalVelocity, SPEEDBOAT_BOUNCE_MIN, SPEEDBOAT_KICK_MAX, frontLeft.y);
+		speedboat->RightVerticalVelocity = DoVehicleDynamics(heightFrontRight, speedboat->RightVerticalVelocity, SPEEDBOAT_BOUNCE_MIN, SPEEDBOAT_KICK_MAX, frontRight.y);
+		speedboatItem->Animation.Velocity.y = DoVehicleDynamics(speedboat->Water, speedboatItem->Animation.Velocity.y, SPEEDBOAT_BOUNCE_MIN, SPEEDBOAT_KICK_MAX, speedboatItem->Pose.Position.y);
 
 		auto ofs = speedboatItem->Animation.Velocity.y;
 		if (ofs - speedboatItem->Animation.Velocity.y > 32 && speedboatItem->Animation.Velocity.y == 0 && water != NO_HEIGHT)

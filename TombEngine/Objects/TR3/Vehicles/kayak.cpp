@@ -714,11 +714,11 @@ namespace TEN::Entities::Vehicles
 
 		// TODO: Check. Previously, the kayak did not have its own bounce constant applied.
 		// In case of odd behaviour make the constant 0. @Sezz 2022.06.30
-		kayak->LeftVerticalVelocity = DoVehicleDynamics(leftHeight, kayak->LeftVerticalVelocity, KAYAK_BOUNCE_MIN, KAYAK_KICK_MAX, &leftPos.y);
-		kayak->RightVerticalVelocity = DoVehicleDynamics(rightHeight, kayak->RightVerticalVelocity, KAYAK_BOUNCE_MIN, KAYAK_KICK_MAX, &rightPos.y);
-		kayak->FrontVerticalVelocity = DoVehicleDynamics(frontHeight, kayak->FrontVerticalVelocity, KAYAK_BOUNCE_MIN, KAYAK_KICK_MAX, &frontPos.y);
+		kayak->LeftVerticalVelocity = DoVehicleDynamics(leftHeight, kayak->LeftVerticalVelocity, KAYAK_BOUNCE_MIN, KAYAK_KICK_MAX, leftPos.y);
+		kayak->RightVerticalVelocity = DoVehicleDynamics(rightHeight, kayak->RightVerticalVelocity, KAYAK_BOUNCE_MIN, KAYAK_KICK_MAX, rightPos.y);
+		kayak->FrontVerticalVelocity = DoVehicleDynamics(frontHeight, kayak->FrontVerticalVelocity, KAYAK_BOUNCE_MIN, KAYAK_KICK_MAX, frontPos.y);
 
-		kayakItem->Animation.Velocity.y = DoVehicleDynamics(kayak->WaterHeight, kayakItem->Animation.Velocity.y, KAYAK_BOUNCE_MIN, KAYAK_KICK_MAX, &kayakItem->Pose.Position.y);
+		kayakItem->Animation.Velocity.y = DoVehicleDynamics(kayak->WaterHeight, kayakItem->Animation.Velocity.y, KAYAK_BOUNCE_MIN, KAYAK_KICK_MAX, kayakItem->Pose.Position.y);
 
 		int height2 = (leftPos.y + rightPos.y) / 2;
 		int x = phd_atan(1024, kayakItem->Pose.Position.y - frontPos.y);
