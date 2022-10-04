@@ -78,17 +78,16 @@ int FindGridShift(int x, int z)
 		return 0;
 
 	if ((z / SECTOR(1)) <= (x / SECTOR(1)))
-		return (-1 - (x & (WALL_SIZE - 1)));
+		return (-1 - (x & WALL_MASK));
 	else
 		return ((SECTOR(1) + 1) - (x & WALL_MASK));
 }
 
 // Test if the axis-aligned bounding box collides with geometry at all.
-
 bool TestItemRoomCollisionAABB(ItemInfo* item)
 {
-	auto* FramePtr = GetBestFrame(item);
-	auto box = FramePtr->boundingBox + item->Pose;
+	auto* framePtr = GetBestFrame(item);
+	auto box = framePtr->boundingBox + item->Pose;
 	short maxY = std::min(box.Y1, box.Y2);
 	short minY = std::max(box.Y1, box.Y2);
 
