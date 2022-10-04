@@ -16,6 +16,7 @@
 #include "Specific/setup.h"
 
 using namespace TEN::Input;
+using namespace TEN::Math;
 
 namespace TEN::Entities::Vehicles
 {
@@ -490,7 +491,7 @@ namespace TEN::Entities::Vehicles
 					float coeff = isWater ? VEHICLE_WATER_VELOCITY_COEFF : VEHICLE_SWAMP_VELOCITY_COEFF;
 					currentVelocity -= std::copysign(currentVelocity * ((waterDepth / VEHICLE_WATER_HEIGHT_MAX) / coeff), currentVelocity);
 
-					if (TEN::Math::Random::GenerateInt(0, 32) > 28)
+					if (Random::GenerateInt(0, 32) > 28)
 						SoundEffect(SFX_TR4_LARA_WADE, &PHD_3DPOS(vehicleItem->Pose.Position), SoundEnvironment::Land, isWater ? 0.8f : 0.7f);
 
 					if (isWater)
@@ -507,7 +508,7 @@ namespace TEN::Entities::Vehicles
 			{
 				if (waterDepth > VEHICLE_WATER_HEIGHT_MAX && waterHeight > VEHICLE_WATER_HEIGHT_MAX)
 					ExplodeVehicle(laraItem, vehicleItem);
-				else if (TEN::Math::Random::GenerateInt(0, 32) > 25)
+				else if (Random::GenerateInt(0, 32) > 25)
 					Splash(vehicleItem);
 			}
 		}
@@ -530,17 +531,17 @@ namespace TEN::Entities::Vehicles
 		}
 	}
 
-	// TODO: Vehicle turn rates must be affected by speed for more tactile modulation. Slower speeds slow the turn rate.
+	// TODO: Vehicle turn rates must be affected by speed for more tactile modulation. Slower speed = slower turn rate.
 	short ModulateVehicleTurnRate(short turnRate, short accelRate, short minTurnRate, short maxTurnRate, float axisCoeff, bool invert)
 	{
 		axisCoeff *= invert ? -1 : 1;
 		int sign = std::copysign(1, axisCoeff);
 
-		short minTurnRateNormalized = minTurnRate * abs(axisCoeff);
-		short maxTurnRateNormalized = maxTurnRate * abs(axisCoeff);
+		short minTurnRateNorm = minTurnRate * abs(axisCoeff);
+		short maxTurnRateNorm = maxTurnRate * abs(axisCoeff);
 
 		short newTurnRate = (turnRate + (accelRate * sign)) * sign;
-		newTurnRate = std::clamp(newTurnRate, minTurnRateNormalized, maxTurnRateNormalized);
+		newTurnRate = std::clamp(newTurnRate, minTurnRateNorm, maxTurnRateNorm);
 		return (newTurnRate * sign);
 	}
 
