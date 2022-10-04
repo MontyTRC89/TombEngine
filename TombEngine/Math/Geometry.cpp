@@ -91,8 +91,8 @@ namespace TEN::Math::Geometry
 
 	float GetDistanceToLine(const Vector3& origin, const Vector3& linePoint0, const Vector3& linePoint1)
 	{
-		auto closestPointOnLine = GetClosestPointOnLine(origin, linePoint0, linePoint1);
-		return Vector3::Distance(origin, closestPointOnLine);
+		auto closestPoint = GetClosestPointOnLine(origin, linePoint0, linePoint1);
+		return Vector3::Distance(origin, closestPoint);
 	}
 
 	Vector3 GetClosestPointOnLine(const Vector3& origin, const Vector3& linePoint0, const Vector3& linePoint1)
