@@ -108,9 +108,9 @@ namespace TEN::Input
 
 		// TODO: Because our delta time is a placeholder constant and we cannot properly account for time drift,
 		// count whole frames instead of actual time passed for now.
-		float activeDelayAsFrameTime = (TimeActive > round(initialDelayInSeconds / DELTA_TIME)) ? round(delayInSeconds / DELTA_TIME) : round(initialDelayInSeconds / DELTA_TIME);
-		float delayTime = std::floor(TimeActive / activeDelayAsFrameTime) * activeDelayAsFrameTime;
-		if (delayTime > (std::floor(PrevTimeActive / activeDelayAsFrameTime) * activeDelayAsFrameTime))
+		float activeDelayInFrameTime = (TimeActive > round(initialDelayInSeconds / DELTA_TIME)) ? round(delayInSeconds / DELTA_TIME) : round(initialDelayInSeconds / DELTA_TIME);
+		float delayInFrameTime = std::floor(TimeActive / activeDelayInFrameTime) * activeDelayInFrameTime;
+		if (delayInFrameTime > (std::floor(PrevTimeActive / activeDelayInFrameTime) * activeDelayInFrameTime))
 			return true;
 
 		// Keeping the previous, inaccurate method for future reference. -- Sezz 2022.10.01
