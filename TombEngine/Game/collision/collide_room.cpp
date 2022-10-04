@@ -94,8 +94,11 @@ bool TestItemRoomCollisionAABB(ItemInfo* item)
 	auto test = [item](short x, short y, short z, bool floor)
 	{
 		auto collPos = GetCollision(x, y, z, item->RoomNumber).Position;
-		if (floor) return y > collPos.Floor;
-		return y < collPos.Ceiling;
+		
+		if (floor)
+			return (y > collPos.Floor);
+		else
+			return (y < collPos.Ceiling);
 	};
 
 	bool collided =
@@ -106,7 +109,7 @@ bool TestItemRoomCollisionAABB(ItemInfo* item)
 		test(box.X1, maxY, box.Z1, false) ||
 		test(box.X2, maxY, box.Z1, false) ||
 		test(box.X1, maxY, box.Z2, false) ||
-		test(box.X2, maxY, box.Z2, false) ;
+		test(box.X2, maxY, box.Z2, false);
 
 	return collided;
 }
