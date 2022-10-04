@@ -95,5 +95,5 @@ namespace TEN::Entities::Vehicles
 	void  ResetVehicleTurnRateX(short& outTurnRate, short decelRate);
 	void  ResetVehicleTurnRateY(short& outTurnRate, short decelRate);
 	void  ModulateVehicleLean(ItemInfo* vehicleItem, short baseRate, short maxAngle);
-	void  ResetVehicleLean(ItemInfo* vehicleItem, float alpha = 0.4f);
+	void  ResetVehicleLean(ItemInfo* vehicleItem, float alpha = 0.5f);
 }
