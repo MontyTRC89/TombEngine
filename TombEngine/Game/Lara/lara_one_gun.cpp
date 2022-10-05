@@ -1220,7 +1220,7 @@ void RocketControl(short itemNumber)
 		hasHitRoom = true;
 	}
 
-	// Has rochet changed room?
+	// Has rocket changed room?
 	if (item->RoomNumber != pointColl.RoomNumber)
 		ItemNewRoom(itemNumber, pointColl.RoomNumber);
 
@@ -1327,8 +1327,6 @@ void RocketControl(short itemNumber)
 			}
 			while (currentMesh);
 		}
-
-		radius = ROCKET_EXPLODE_RADIUS;
 	}
 
 	// Do explosion if needed.
@@ -1430,12 +1428,6 @@ void FireCrossbow(ItemInfo* laraItem, PHD_3DPOS* pos)
 
 void FireCrossBowFromLaserSight(ItemInfo* laraItem, GameVector* origin, GameVector* target)
 {
-	/* this part makes arrows fire at bad angles
-	target->x &= ~1023;
-	target->z &= ~1023;
-	target->x |= 512;
-	target->z |= 512;*/
-
 	auto angles = GetVectorAngles(target->x - origin->x, target->y - origin->y, target->z - origin->z);
 	auto boltPose = PHD_3DPOS(origin->x, origin->y, origin->z, angles);
 	FireCrossbow(laraItem, &boltPose);
@@ -1458,7 +1450,7 @@ void CrossbowBoltControl(short itemNumber)
 		auto bubblePos = item->Pose.Position;
 
 		if (item->Animation.Velocity.z > 64.0f)
-			item->Animation.Velocity.z -= item->Animation.Velocity.z / 16.0f;
+			item->Animation.Velocity.z -= item->Animation.Velocity.z / 16;
 
 		if (GlobalCounter & 1)
 			CreateBubble(&bubblePos, item->RoomNumber, 4, 7, 0, 0, 0, 0);
@@ -1582,7 +1574,8 @@ void CrossbowBoltControl(short itemNumber)
 				k++;
 				currentItem = CollidedItems[k];
 
-			} while (currentItem);
+			}
+			while (currentItem);
 		}
 
 		if (CollidedMeshes[0])
