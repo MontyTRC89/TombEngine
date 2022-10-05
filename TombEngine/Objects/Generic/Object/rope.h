@@ -9,6 +9,13 @@ namespace TEN::Entities::Generic
 	constexpr auto ROPE_SEGMENTS = 24;
 	constexpr auto ROPE_WIDTH = 24;
 
+	enum MatrixArrayValue
+	{
+		M00, M01, M02, M03,
+		M10, M11, M12, M13,
+		M20, M21, M22, M23
+	};
+
 	struct ROPE_STRUCT
 	{
 		int room;

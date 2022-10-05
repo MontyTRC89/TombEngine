@@ -29,15 +29,12 @@ namespace TEN::Entities::Generic
 		auto* item = &g_Level.Items[itemNumber];
 		short roomNumber = item->RoomNumber;
 
-		Vector3i itemPos;
-		itemPos.x = item->Pose.Position.x;
-		itemPos.y = item->Pose.Position.y;
-		itemPos.z = item->Pose.Position.z;
+		auto itemPos = item->Pose.Position;
 
 		FloorInfo* floor = GetFloor(itemPos.x, itemPos.y, itemPos.z, &roomNumber);
 		itemPos.y = GetCeiling(floor, itemPos.x, itemPos.y, itemPos.z);
 
-		Vector3i pos = { 0, 16384, 0 };
+		auto pos = Vector3i(0, 16384, 0);
 		ROPE_STRUCT rope;
 		PrepareRope(&rope, &itemPos, &pos, CLICK(0.5f), item);
 

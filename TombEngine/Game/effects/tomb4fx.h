@@ -7,6 +7,15 @@
 enum class LaraWeaponType;
 struct ItemInfo;
 
+struct Matrix3D
+{
+	short m00, m01, m02;
+	short m10, m11, m12;
+	short m20, m21, m22;
+	short pad;
+	int tx, ty, tz;
+};
+
 struct SMOKE_SPARKS
 {
 	int x;
