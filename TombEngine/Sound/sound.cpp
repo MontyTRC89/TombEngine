@@ -59,7 +59,7 @@ void SetVolumeFX(int vol)
 	GlobalFXVolume = vol;
 }
 
-bool LoadSample(char *pointer, int compSize, int uncompSize, int index)
+bool LoadSample(char* pointer, int compSize, int uncompSize, int index)
 {
 	if (index >= SOUND_MAX_SAMPLES)
 	{
@@ -67,13 +67,13 @@ bool LoadSample(char *pointer, int compSize, int uncompSize, int index)
 		return 0;
 	}
 
-	if (pointer == NULL || compSize <= 0)
+	if (pointer == nullptr || compSize <= 0)
 	{
 		TENLog("Sample size or memory address is incorrect for index " + std::to_string(index), LogLevel::Warning);
 		return 0;
 	}
 
-	// Load and uncompress sample to 32-bit float format
+	// Load and uncompress sample to 32-bit float format.
 	HSAMPLE sample = BASS_SampleLoad(true, pointer, 0, compSize, 1, SOUND_SAMPLE_FLAGS);
 
 	if (!sample)
@@ -83,7 +83,7 @@ bool LoadSample(char *pointer, int compSize, int uncompSize, int index)
 	}
 
 	// Paranoid (c) TeslaRus
-	// Try to free sample before allocating new one
+	// Try to free sample before allocating new one.
 	Sound_FreeSample(index);
 
 	BASS_SAMPLE info;
@@ -910,20 +910,20 @@ void PlaySoundSources()
 {
 	for (size_t i = 0; i < g_Level.SoundSources.size(); i++)
 	{
-		SOUND_SOURCE_INFO* sound = &g_Level.SoundSources[i];
+		const auto& sound = g_Level.SoundSources[i];
 
-		short t = sound->flags & 31;
+		short t = sound.Flags & 31;
 		short group = t & 1;
 		group += t & 2;
 		group += ((t >> 2) & 1) * 3;
 		group += ((t >> 3) & 1) * 4;
 		group += ((t >> 4) & 1) * 5;
 
-		if (!FlipStats[group] && (sound->flags & 128) == 0)
+		if (!FlipStats[group] && (sound.Flags & 128) == 0)
 			continue;
-		else if (FlipStats[group] && (sound->flags & 128) == 0)
+		else if (FlipStats[group] && (sound.Flags & 128) == 0)
 			continue;
 
-		SoundEffect(sound->soundId, (PHD_3DPOS*)&sound->x);
+		SoundEffect(sound.SoundID, (PHD_3DPOS*)&sound.Position);
 	}
 }
