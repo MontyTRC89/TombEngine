@@ -1,7 +1,4 @@
 #pragma once
-#include "Math/Containers/BoundingBox.h" // TODO: Including this here shouldn't be necessary.
-
-struct PoseData;
 
 constexpr auto FP_SHIFT	 = 16;
 constexpr auto W2V_SHIFT = 14;
@@ -21,8 +18,6 @@ float TO_RAD(short angle);
 float phd_sin(short a);
 float phd_cos(short a);
 int	  phd_atan(int dz, int dx);
-
-void phd_RotBoundingBoxNoPersp(PoseData* pose, BOUNDING_BOX* bounds, BOUNDING_BOX* tBounds);
 
 void InterpolateAngle(short angle, short* rotation, short* outAngle, int shift);
 void GetMatrixFromTrAngle(Matrix* matrix, short* framePtr, int index);

@@ -425,9 +425,9 @@ void LaraSnapToHeight(ItemInfo* item, CollisionInfo* coll)
 
 void GetLaraDeadlyBounds()
 {
-	BOUNDING_BOX tBounds;
 	auto* bounds = GetBoundsAccurate(LaraItem);
-	phd_RotBoundingBoxNoPersp(&LaraItem->Pose, bounds, &tBounds);
+	BOUNDING_BOX tBounds = {};
+	tBounds.RotNoPersp(LaraItem->Pose.Orientation, *bounds);
 
 	DeadlyBounds[0] = LaraItem->Pose.Position.x + tBounds.X1;
 	DeadlyBounds[1] = LaraItem->Pose.Position.x + tBounds.X2;

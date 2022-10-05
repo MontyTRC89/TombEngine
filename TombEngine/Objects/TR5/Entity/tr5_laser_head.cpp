@@ -496,15 +496,15 @@ namespace TEN::Entities::Creatures::TR5
 										int someIndex = 0;
 
 										auto* bounds = GetBoundsAccurate(LaraItem);
-										BOUNDING_BOX tbounds;
-										phd_RotBoundingBoxNoPersp(&LaraItem->Pose, bounds, &tbounds);
+										BOUNDING_BOX tBounds = {};
+										tBounds.RotNoPersp(LaraItem->Pose.Orientation, *bounds);
 
-										int x1 = LaraItem->Pose.Position.x + tbounds.X1;
-										int x2 = LaraItem->Pose.Position.x + tbounds.X2;
-										int y1 = LaraItem->Pose.Position.y + tbounds.Y1;
-										int y2 = LaraItem->Pose.Position.y + tbounds.Y1;
-										int z1 = LaraItem->Pose.Position.z + tbounds.Z1;
-										int z2 = LaraItem->Pose.Position.z + tbounds.Z2;
+										int x1 = LaraItem->Pose.Position.x + tBounds.X1;
+										int x2 = LaraItem->Pose.Position.x + tBounds.X2;
+										int y1 = LaraItem->Pose.Position.y + tBounds.Y1;
+										int y2 = LaraItem->Pose.Position.y + tBounds.Y1;
+										int z1 = LaraItem->Pose.Position.z + tBounds.Z1;
+										int z2 = LaraItem->Pose.Position.z + tBounds.Z2;
 
 										int xc = LaraItem->Pose.Position.x + ((bounds->X1 + bounds->X2) / 2);
 										int yc = LaraItem->Pose.Position.y + ((bounds->Y1 + bounds->Y2) / 2);

@@ -270,13 +270,13 @@ void VentilatorControl(short itemNumber)
 	}
 	else
 	{
-		BOUNDING_BOX tbounds;
-		phd_RotBoundingBoxNoPersp(&item->Pose, bounds, &tbounds);
+		BOUNDING_BOX tBounds = {};
+		tBounds.RotNoPersp(item->Pose.Orientation, *bounds);
 
-		effectBounds.X1 = item->Pose.Position.x + tbounds.X1;
-		effectBounds.X2 = item->Pose.Position.x + tbounds.X2;
-		effectBounds.Z1 = item->Pose.Position.z + tbounds.Z1;
-		effectBounds.Z2 = item->Pose.Position.z + tbounds.Z2;
+		effectBounds.X1 = item->Pose.Position.x + tBounds.X1;
+		effectBounds.X2 = item->Pose.Position.x + tBounds.X2;
+		effectBounds.Z1 = item->Pose.Position.z + tBounds.Z1;
+		effectBounds.Z2 = item->Pose.Position.z + tBounds.Z2;
 
 		VentilatorEffect(&effectBounds, 1, 0, speed);
 		VentilatorEffect(&effectBounds, -1, 0, speed);

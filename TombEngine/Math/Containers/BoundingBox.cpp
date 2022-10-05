@@ -1,6 +1,7 @@
 #include "framework.h"
 #include "Math/Containers/BoundingBox.h"
 
+#include "Math/Containers/EulerAngles.h"
 #include "Math/Containers/PoseData.h"
 
 //namespace TEN::Math
@@ -8,6 +9,23 @@
 	int BOUNDING_BOX::Height() const
 	{
 		return abs(Y2 - Y1);
+	}
+
+	void BOUNDING_BOX::RotNoPersp(const EulerAngles& orient, const BOUNDING_BOX& bounds)
+	{
+		auto world = orient.ToRotationMatrix();
+		auto bMin = Vector3(bounds.X1, bounds.Y1, bounds.Z1);
+		auto bMax = Vector3(bounds.X2, bounds.Y2, bounds.Z2);
+
+		bMin = Vector3::Transform(bMin, world);
+		bMax = Vector3::Transform(bMax, world);
+
+		this->X1 = bMin.x;
+		this->X2 = bMax.x;
+		this->Y1 = bMin.y;
+		this->Y2 = bMax.y;
+		this->Z1 = bMin.z;
+		this->Z2 = bMax.z;
 	}
 
 	BoundingOrientedBox BOUNDING_BOX::ToDXBoundingOrientedBox(const PoseData& pose) const

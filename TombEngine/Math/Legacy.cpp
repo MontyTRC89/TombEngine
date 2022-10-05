@@ -4,8 +4,6 @@
 #include <cmath>
 
 #include "Math/Constants.h"
-#include "Math/Containers/BoundingBox.h"
-#include "Math/Containers/PoseData.h"
 
 short ANGLE(float angle)
 {
@@ -45,23 +43,6 @@ float phd_cos(short a)
 int phd_atan(int x, int y)
 {
 	return FROM_RAD(atan2(y, x));
-}
-
-void phd_RotBoundingBoxNoPersp(PoseData* pose, BOUNDING_BOX* bounds, BOUNDING_BOX* tBounds)
-{
-	auto world = pose->Orientation.ToRotationMatrix();
-	auto bMin = Vector3(bounds->X1, bounds->Y1, bounds->Z1);
-	auto bMax = Vector3(bounds->X2, bounds->Y2, bounds->Z2);
-
-	bMin = Vector3::Transform(bMin, world);
-	bMax = Vector3::Transform(bMax, world);
-
-	tBounds->X1 = bMin.x;
-	tBounds->X2 = bMax.x;
-	tBounds->Y1 = bMin.y;
-	tBounds->Y2 = bMax.y;
-	tBounds->Z1 = bMin.z;
-	tBounds->Z2 = bMax.z;
 }
 
 void InterpolateAngle(short angle, short* rotation, short* outAngle, int shift)

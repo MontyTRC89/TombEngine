@@ -1,5 +1,6 @@
 #pragma once
 
+class EulerAngles;
 struct PoseData;
 
 //namespace TEN::Math
@@ -11,8 +12,11 @@ struct PoseData;
 		short Y1, Y2 = 0;
 		short Z1, Z2 = 0;
 
-		// Utilities
+		// Getters
 		int Height() const;
+
+		// Utilities
+		void RotNoPersp(const EulerAngles& orient, const BOUNDING_BOX& bounds);
 
 		// Converters
 		BoundingOrientedBox ToDXBoundingOrientedBox(const PoseData& pose) const;
