@@ -45,22 +45,22 @@ int phd_atan(int x, int y)
 	return FROM_RAD(atan2(y, x));
 }
 
-void InterpolateAngle(short angle, short* rotation, short* outAngle, int shift)
+void InterpolateAngle(short angle, short& outRotation, short& outAngle, int shift)
 {
-	int deltaAngle = angle - *rotation;
+	int deltaAngle = angle - outRotation;
 
-	if (deltaAngle < -ANGLE(180.0f))
+	if (deltaAngle < ANGLE(-180.0f))
 		deltaAngle += ANGLE(360.0f);
 	else if (deltaAngle > ANGLE(180.0f))
 		deltaAngle -= ANGLE(360.0f);
 
 	if (outAngle)
-		*outAngle = (short)deltaAngle;
+		outAngle = (short)deltaAngle;
 
-	*rotation += short(deltaAngle >> shift);
+	outRotation += short(deltaAngle >> shift);
 }
 
-void GetMatrixFromTrAngle(Matrix* matrix, short* framePtr, int index)
+void GetMatrixFromTrAngle(Matrix& outMatrix, short* framePtr, int index)
 {
 	short* ptr = &framePtr[0];
 
@@ -84,7 +84,7 @@ void GetMatrixFromTrAngle(Matrix* matrix, short* framePtr, int index)
 		rotY = ((rot1 & 0xfc00) >> 10) | ((rot0 & 0xf) << 6) & 0x3ff;
 		rotZ = (rot1) & 0x3ff;
 
-		*matrix = Matrix::CreateFromYawPitchRoll(
+		outMatrix = Matrix::CreateFromYawPitchRoll(
 			rotY * (360.0f / 1024.0f) * RADIAN,
 			rotX * (360.0f / 1024.0f) * RADIAN,
 			rotZ * (360.0f / 1024.0f) * RADIAN);
@@ -92,15 +92,15 @@ void GetMatrixFromTrAngle(Matrix* matrix, short* framePtr, int index)
 		break;
 
 	case 0x4000:
-		*matrix = Matrix::CreateRotationX((rot0 & 0xfff) * (360.0f / 4096.0f) * RADIAN);
+		outMatrix = Matrix::CreateRotationX((rot0 & 0xfff) * (360.0f / 4096.0f) * RADIAN);
 		break;
 
 	case 0x8000:
-		*matrix = Matrix::CreateRotationY((rot0 & 0xfff) * (360.0f / 4096.0f) * RADIAN);
+		outMatrix = Matrix::CreateRotationY((rot0 & 0xfff) * (360.0f / 4096.0f) * RADIAN);
 		break;
 
 	case 0xc000:
-		*matrix = Matrix::CreateRotationZ((rot0 & 0xfff) * (360.0f / 4096.0f) * RADIAN);
+		outMatrix = Matrix::CreateRotationZ((rot0 & 0xfff) * (360.0f / 4096.0f) * RADIAN);
 		break;
 	}
 }

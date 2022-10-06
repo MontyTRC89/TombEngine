@@ -61,10 +61,10 @@
 
 	Vector3 EulerAngles::ToDirection() const
 	{
-		float sinX = phd_sin(x);
-		float cosX = phd_cos(x);
-		float sinY = phd_sin(y);
-		float cosY = phd_cos(y);
+		float sinX = sin(TO_RAD(x));
+		float cosX = cos(TO_RAD(x));
+		float sinY = sin(TO_RAD(y));
+		float cosY = cos(TO_RAD(y));
 
 		// Return normalized direction vector.
 		return Vector3(

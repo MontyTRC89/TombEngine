@@ -245,8 +245,10 @@ namespace TEN::Entities::Creatures::TR5
 					item->TriggerFlags = (GetRandomControl() & 0x1000) - 2048;
 				}
 
-				InterpolateAngle(item->ItemFlags[3], &item->Pose.Orientation.y, 0, 2);
-				InterpolateAngle(item->TriggerFlags, &item->Pose.Orientation.x, 0, 2);
+				short temp = 0;
+				InterpolateAngle(item->ItemFlags[3], item->Pose.Orientation.y, temp, 2);
+				temp = 0;
+				InterpolateAngle(item->TriggerFlags, item->Pose.Orientation.x, temp, 2);
 
 				// Final death
 				item->Animation.Velocity.z++;
@@ -374,8 +376,8 @@ namespace TEN::Entities::Creatures::TR5
 				}
 
 			auto angles = Geometry::GetOrientToPoint(origin.ToVector3(), LaserHeadData.target.ToVector3());
-			InterpolateAngle(angles.x + 3328, &item->Pose.Orientation.x, &LaserHeadData.xRot, LaserHeadData.byte1);
-			InterpolateAngle(angles.y, &item->Pose.Orientation.y, &LaserHeadData.yRot, LaserHeadData.byte1);
+			InterpolateAngle(angles.x + 3328, item->Pose.Orientation.x, LaserHeadData.xRot, LaserHeadData.byte1);
+			InterpolateAngle(angles.y, item->Pose.Orientation.y, LaserHeadData.yRot, LaserHeadData.byte1);
 
 				if (item->ItemFlags[0] == 1)
 				{

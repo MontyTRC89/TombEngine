@@ -89,8 +89,8 @@ namespace TEN::Entities::Creatures::TR5
 				}
 
 				short angle1, angle2;
-				InterpolateAngle(orient.x, &item->ItemFlags[1], &angle2, 4);
-				InterpolateAngle(orient.y, item->ItemFlags, &angle1, 4);
+				InterpolateAngle(orient.x, item->ItemFlags[1], angle2, 4);
+				InterpolateAngle(orient.y, *item->ItemFlags, angle1, 4);
 
 				data[0] = item->ItemFlags[0];
 				data[1] = item->ItemFlags[1];
