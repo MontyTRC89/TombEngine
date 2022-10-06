@@ -40,6 +40,7 @@ float phd_cos(short a)
 	return cos(TO_RAD(a));
 }
 
+// NOTE: Order of parameters is inverted!
 int phd_atan(int x, int y)
 {
 	return FROM_RAD(atan2(y, x));
