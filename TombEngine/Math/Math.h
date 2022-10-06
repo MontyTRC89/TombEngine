@@ -24,6 +24,6 @@ namespace TEN::Math
 	const float Smoothstep(float x);
 	const float Smoothstep(float edge0, float edge1, float x);
 	const float Luma(const Vector3& color);
-	const Vector4 Screen(const Vector4& ambient, const Vector4& tint);
 	const Vector3 Screen(const Vector3& ambient, const Vector3& tint);
+	const Vector4 Screen(const Vector4& ambient, const Vector4& tint);
 }
