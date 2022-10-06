@@ -20,8 +20,10 @@
 	constexpr inline auto MAX_HEIGHT = INT_MIN + 1; // NOTE: +1 prevents issues with sign change.
 	constexpr inline auto DEEP_WATER = INT_MAX - 1; // NOTE: -1 prevents issues with sign change.
 
+	// TODO: BLOCK() and QTR_BLOCK() would replace SECTOR() and CLICK() respectively as proper units of measurement used by the engine.
+	// Perhaps QTR_BLOCK() is unnecessary, given that BLOCK() may take a divisor argument.
 	constexpr inline auto BLOCK			= [](auto x, int d = 1) { return ((BLOCK_UNIT / d) * x); };
-	constexpr inline auto QTR_BLOCK		= [](auto x)			{ return ((BLOCK_UNIT / 4) * x); }; // TODO: Maybe unnecessary with BLOCK()'s divisor argument.
+	constexpr inline auto QTR_BLOCK		= [](auto x)			{ return (BLOCK(1, 4) * x); };
 	constexpr inline auto OFFSET_RADIUS = [](auto x)			{ return ((x * SQRT_2) + 4); };
 
 	constexpr inline auto STEPUP_HEIGHT		  = BLOCK(3, 4) / 2;
