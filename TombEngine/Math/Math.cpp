@@ -24,6 +24,11 @@ namespace TEN::Math
 		return ((p * xSquared * x) + (q * xSquared) + (r * x) + s);
 	}
 
+	const float Smoothstep(float x)
+	{
+		return Smoothstep(0.0f, 1.0f, x);
+	}
+
 	const float Smoothstep(float edge0, float edge1, float x)
 	{
 		x = std::clamp(x, edge0, edge1);
@@ -41,21 +46,10 @@ namespace TEN::Math
 		return (CUBE(x) * (x * (x * 6 - 15) + 10));
 	}
 
-	const float Smoothstep(float x)
-	{
-		return Smoothstep(0.0f, 1.0f, x);
-	}
-
 	const float Luma(const Vector3& color)
 	{
 		// Use Rec.709 trichromat formula to get perceptive luma value.
 		return float((color.x * 0.2126f) + (color.y * 0.7152f) + (color.z * 0.0722f));
-	}
-
-	const Vector4 Screen(const Vector4& ambient, const Vector4& tint)
-	{
-		auto result = Screen(Vector3(ambient), Vector3(tint));
-		return Vector4(result.x, result.y, result.z, ambient.w * tint.w);
 	}
 
 	const Vector3 Screen(const Vector3& ambient, const Vector3& tint)
@@ -69,5 +63,11 @@ namespace TEN::Math
 		float g = Lerp(multiplicative.y, additive.y, luma);
 		float b = Lerp(multiplicative.z, additive.z, luma);
 		return Vector3(r, g, b);
+	}
+
+	const Vector4 Screen(const Vector4& ambient, const Vector4& tint)
+	{
+		auto result = Screen(Vector3(ambient), Vector3(tint));
+		return Vector4(result.x, result.y, result.z, ambient.w * tint.w);
 	}
 }

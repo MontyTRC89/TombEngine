@@ -24,7 +24,6 @@
 	// Perhaps QTR_BLOCK() is unnecessary, given that BLOCK() may take a divisor argument.
 	constexpr inline auto BLOCK			= [](auto x, int d = 1) { return ((BLOCK_UNIT / d) * x); };
 	constexpr inline auto QTR_BLOCK		= [](auto x)			{ return BLOCK(x, 4); };
-	constexpr inline auto OFFSET_RADIUS = [](auto x)			{ return ((x * SQRT_2) + 4); };
 
 	constexpr inline auto STEPUP_HEIGHT		  = BLOCK(3, 4) / 2;
 	constexpr inline auto BAD_JUMP_CEILING	  = BLOCK(3, 4) / 4;
