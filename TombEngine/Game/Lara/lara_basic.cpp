@@ -1361,7 +1361,7 @@ void lara_as_death(ItemInfo* item, CollisionInfo* coll)
 		lara->Inventory.IsBusy = false;
 	}
 
-	if (bounds->Height() <= (LARA_HEIGHT * 0.75f))
+	if (bounds->GetHeight() <= (LARA_HEIGHT * 0.75f))
 		AlignLaraToSurface(item);
 
 	ModulateLaraTurnRateY(item, 0, 0, 0);

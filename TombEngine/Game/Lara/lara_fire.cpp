@@ -936,7 +936,7 @@ GameVector FindTargetPoint(ItemInfo* item)
 
 	auto center = Vector3i(
 		int(bounds->X1 + bounds->X2) / 2,
-		(int)bounds->Y1 + bounds->Height() / 3,
+		(int)bounds->Y1 + bounds->GetHeight() / 3,
 		int(bounds->Z1 + bounds->Z2) / 2
 	);
 

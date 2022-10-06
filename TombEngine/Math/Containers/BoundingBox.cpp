@@ -6,9 +6,19 @@
 
 //namespace TEN::Math
 //{
-	int BOUNDING_BOX::Height() const
+	int BOUNDING_BOX::GetWidth() const
+	{
+		return abs(X2 - X1);
+	}
+
+	int BOUNDING_BOX::GetHeight() const
 	{
 		return abs(Y2 - Y1);
+	}
+	
+	int BOUNDING_BOX::GetDepth() const
+	{
+		return abs(Z2 - Z1);
 	}
 
 	void BOUNDING_BOX::RotNoPersp(const EulerAngles& orient, const BOUNDING_BOX& bounds)

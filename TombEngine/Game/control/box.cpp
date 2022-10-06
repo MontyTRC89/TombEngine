@@ -1465,7 +1465,7 @@ void CreatureAIInfo(ItemInfo* item, AI_INFO* AI)
 		auto probe = GetCollision(floor, enemy->Pose.Position.x, enemy->Pose.Position.y, enemy->Pose.Position.z);
 		auto bounds = GetBoundsAccurate(item);
 
-		reachable = abs(enemy->Pose.Position.y - probe.Position.Floor) < bounds->Height();
+		reachable = abs(enemy->Pose.Position.y - probe.Position.Floor) < bounds->GetHeight();
 	}
 
 	if (floor && reachable)

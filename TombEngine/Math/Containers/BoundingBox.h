@@ -13,7 +13,9 @@ struct PoseData;
 		short Z1, Z2 = 0;
 
 		// Getters
-		int Height() const;
+		int GetWidth() const;
+		int GetHeight() const;
+		int GetDepth() const;
 
 		// Utilities
 		void RotNoPersp(const EulerAngles& orient, const BOUNDING_BOX& bounds);

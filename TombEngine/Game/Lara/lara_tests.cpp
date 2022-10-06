@@ -497,10 +497,10 @@ bool TestLaraHangOnClimbableWall(ItemInfo* item, CollisionInfo* coll)
 			return false;
 	}
 
-	if (LaraTestClimbPos(item, LARA_RADIUS, LARA_RADIUS, bounds->Y1, bounds->Height(), &shift) &&
-		LaraTestClimbPos(item, LARA_RADIUS, -LARA_RADIUS, bounds->Y1, bounds->Height(), &shift))
+	if (LaraTestClimbPos(item, LARA_RADIUS, LARA_RADIUS, bounds->Y1, bounds->GetHeight(), &shift) &&
+		LaraTestClimbPos(item, LARA_RADIUS, -LARA_RADIUS, bounds->Y1, bounds->GetHeight(), &shift))
 	{
-		result = LaraTestClimbPos(item, LARA_RADIUS, 0, bounds->Y1, bounds->Height(), &shift);
+		result = LaraTestClimbPos(item, LARA_RADIUS, 0, bounds->Y1, bounds->GetHeight(), &shift);
 		if (result)
 		{
 			if (result != 1)

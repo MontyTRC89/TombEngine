@@ -881,7 +881,7 @@ short GetNearestLedgeAngle(ItemInfo* item, CollisionInfo* coll, float& distance)
 
 	// Determine two Y points to test (lower and higher).
 	// 1/10 headroom crop is needed to avoid possible issues with tight diagonal headrooms.
-	int headroom = bounds->Height() / 20.0f;
+	int headroom = bounds->GetHeight() / 20.0f;
 	int yPoints[2] = { item->Pose.Position.y + bounds->Y1 + headroom,
 					   item->Pose.Position.y + bounds->Y2 - headroom };
 

@@ -118,7 +118,7 @@ void PerformAnimCommands(ItemInfo* item, bool isFrameBased)
 			{
 				TranslateItem(item, item->Pose.Orientation.y, cmd[2], cmd[1], cmd[0]);
 				auto* bounds = GetBoundsAccurate(item);
-				UpdateItemRoom(item, -bounds->Height() / 2, -cmd[0], -cmd[2]);
+				UpdateItemRoom(item, -bounds->GetHeight() / 2, -cmd[0], -cmd[2]);
 			}
 
 			cmd += 3;
