@@ -443,16 +443,14 @@ namespace TEN::Entities::Vehicles
 		else
 		{
 			int sinkVal = lara->WaterCurrentActive - 1;
-			target.x = g_Level.Sinks[sinkVal].x;
-			target.y = g_Level.Sinks[sinkVal].y;
-			target.z = g_Level.Sinks[sinkVal].z;
+			target = g_Level.Sinks[sinkVal].Position;
 		
 			int angle = ((mGetAngle(target.x, target.z, laraItem->Pose.Position.x, laraItem->Pose.Position.z) - ANGLE(90.0f)) / 16) & 4095;
 
 			int dx = target.x - laraItem->Pose.Position.x;
 			int dz = target.z - laraItem->Pose.Position.z;
 
-			int velocity = g_Level.Sinks[sinkVal].strength;
+			int velocity = g_Level.Sinks[sinkVal].Strength;
 			dx = phd_sin(angle * 16) * velocity * SECTOR(1);
 			dz = phd_cos(angle * 16) * velocity * SECTOR(1);
 

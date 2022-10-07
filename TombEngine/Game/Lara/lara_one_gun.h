@@ -14,7 +14,7 @@ constexpr auto HARPOON_TIME = 10 * FPS;
 constexpr auto GRENADE_TIME = 4 * FPS;
 constexpr auto ROCKET_TIME = 4.5f * FPS;
 constexpr auto EXPLOSION_TRIGGER_TIME = 4 * FPS - 2;
-constexpr auto ROCKET_VELOCITY = CLICK(2);
+constexpr auto ROCKET_VELOCITY = (float)CLICK(2);
 constexpr auto GRENADE_VELOCITY = CLICK(0.5f);
 constexpr auto MAX_GRENADE_VERTICAL_VELOCITY = CLICK(0.5f);
 constexpr auto GRENADE_Y_OFFSET = 180;
@@ -57,7 +57,7 @@ void FireRocket(ItemInfo* laraItem);
 void RocketControl(short itemNumber);
 void FireCrossbow(ItemInfo* laraItem, PHD_3DPOS* pos);
 void CrossbowBoltControl(short itemNumber);
-void FireCrossBowFromLaserSight(ItemInfo* laraItem, GameVector* src, GameVector* target);
+void FireCrossBowFromLaserSight(ItemInfo* laraItem, GameVector* origin, GameVector* target);
 
 void FireHK(ItemInfo* laraItem, int mode);
 void RifleHandler(ItemInfo* laraItem, LaraWeaponType weaponType);

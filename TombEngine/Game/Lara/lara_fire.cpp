@@ -701,8 +701,8 @@ void InitialiseNewWeapon(ItemInfo* laraItem)
 		break;
 
 	default:
-		lara->RightArm.FrameBase = g_Level.Anims[laraItem->Animation.AnimNumber].framePtr;
-		lara->LeftArm.FrameBase = g_Level.Anims[laraItem->Animation.AnimNumber].framePtr;
+		lara->RightArm.FrameBase = g_Level.Anims[laraItem->Animation.AnimNumber].FramePtr;
+		lara->LeftArm.FrameBase = g_Level.Anims[laraItem->Animation.AnimNumber].FramePtr;
 		break;
 	}
 }
@@ -751,13 +751,13 @@ void HitTarget(ItemInfo* laraItem, ItemInfo* targetEntity, GameVector* hitPos, i
 	if (targetEntity->IsCreature())
 		GetCreatureInfo(targetEntity)->HurtByLara = true;
 
-	auto* object = &Objects[targetEntity->ObjectNumber];
+	const auto& object = Objects[targetEntity->ObjectNumber];
 
 	if (hitPos != nullptr)
 	{
-		if (object->hitEffect != HIT_NONE)
+		if (object.hitEffect != HIT_NONE)
 		{
-			switch (object->hitEffect)
+			switch (object.hitEffect)
 			{
 			case HIT_BLOOD:
 				if (targetEntity->ObjectNumber == ID_BADDY2 &&
@@ -794,7 +794,7 @@ void HitTarget(ItemInfo* laraItem, ItemInfo* targetEntity, GameVector* hitPos, i
 		}
 	}
 
-	if (!object->undead || grenade)
+	if (!object.undead || grenade)
 	{
 		if (targetEntity->HitPoints > 0)
 		{
@@ -814,13 +814,11 @@ FireWeaponType FireWeapon(LaraWeaponType weaponType, ItemInfo* targetEntity, Ite
 {
 	auto* lara = GetLaraInfo(originEntity);
 
-	auto& ammo = GetAmmo(originEntity, weaponType);
+	const auto& ammo = GetAmmo(originEntity, weaponType);
 	if (ammo.getCount() == 0 && !ammo.hasInfinite())
 		return FireWeaponType::NoAmmo;
-	if (!ammo.hasInfinite())
-		ammo--;
 
-	auto* weapon = &Weapons[(int)weaponType];
+	const auto& weapon = Weapons[(int)weaponType];
 
 	auto muzzleOffset = Vector3Int::Zero;
 	GetLaraJointPosition(&muzzleOffset, LM_RHAND);
@@ -828,8 +826,8 @@ FireWeaponType FireWeapon(LaraWeaponType weaponType, ItemInfo* targetEntity, Ite
 	auto pos = Vector3Int(originEntity->Pose.Position.x, muzzleOffset.y, originEntity->Pose.Position.z);
 
 	auto wobbleArmOrient = Vector3Shrt(
-		armOrient.x + (GetRandomControl() - ANGLE(90.0f)) * weapon->ShotAccuracy / 65536,
-		armOrient.y + (GetRandomControl() - ANGLE(90.0f)) * weapon->ShotAccuracy / 65536,
+		armOrient.x + (GetRandomControl() - ANGLE(90.0f)) * weapon.ShotAccuracy / 65536,
+		armOrient.y + (GetRandomControl() - ANGLE(90.0f)) * weapon.ShotAccuracy / 65536,
 		0
 	);
 
@@ -841,7 +839,7 @@ FireWeaponType FireWeapon(LaraWeaponType weaponType, ItemInfo* targetEntity, Ite
 	direction.Normalize();
 
 	auto origin = pos.ToVector3();
-	auto target = origin + direction * weapon->TargetDist;
+	auto target = origin + direction * weapon.TargetDist;
 	auto ray = Ray(origin, direction);
 
 	int num = GetSpheres(targetEntity, CreatureSpheres, SPHERES_SPACE_WORLD, Matrix::Identity);
@@ -926,7 +924,7 @@ FireWeaponType FireWeapon(LaraWeaponType weaponType, ItemInfo* targetEntity, Ite
 			// it's really weird but we decided to replicate original behaviour until we'll fully understand what is happening
 			// with weapons
 			if (!GetTargetOnLOS(&vOrigin, &vDest, false, true))
-				HitTarget(originEntity, targetEntity, &vDest, weapon->Damage, false);
+				HitTarget(originEntity, targetEntity, &vDest, weapon.Damage, false);
 		//}
 		
 		return FireWeaponType::PossibleHit;

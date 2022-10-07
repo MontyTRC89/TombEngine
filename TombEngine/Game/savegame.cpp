@@ -775,7 +775,7 @@ bool SaveGame::Save(int slot)
 	for (int i = 0; i < g_Level.Cameras.size(); i++)
 	{
 		Save::FixedCameraBuilder camera{ fbb };
-		camera.add_flags(g_Level.Cameras[i].flags);
+		camera.add_flags(g_Level.Cameras[i].Flags);
 		cameras.push_back(camera.Finish());
 	}
 	auto camerasOffset = fbb.CreateVector(cameras);
@@ -785,7 +785,7 @@ bool SaveGame::Save(int slot)
 	for (int i = 0; i < g_Level.Sinks.size(); i++)
 	{
 		Save::SinkBuilder sink{ fbb };
-		sink.add_flags(g_Level.Sinks[i].strength);
+		sink.add_flags(g_Level.Sinks[i].Strength);
 		sinks.push_back(sink.Finish());
 	}
 	auto sinksOffset = fbb.CreateVector(sinks);
@@ -1285,14 +1285,14 @@ bool SaveGame::Load(int slot)
 	for (int i = 0; i < s->fixed_cameras()->size(); i++)
 	{
 		if (i < g_Level.Cameras.size())
-			g_Level.Cameras[i].flags = s->fixed_cameras()->Get(i)->flags();
+			g_Level.Cameras[i].Flags = s->fixed_cameras()->Get(i)->flags();
 	}
 
 	// Sinks 
 	for (int i = 0; i < s->sinks()->size(); i++)
 	{
 		if (i < g_Level.Sinks.size())
-			g_Level.Sinks[i].strength = s->sinks()->Get(i)->flags();
+			g_Level.Sinks[i].Strength = s->sinks()->Get(i)->flags();
 	}
 
 	// Flyby cameras 
