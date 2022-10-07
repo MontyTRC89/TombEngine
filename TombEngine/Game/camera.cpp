@@ -187,26 +187,23 @@ void LookCamera(ItemInfo* item)
 	auto orient = lara->Control.Look.Orientation + Vector3Shrt(0, item->Pose.Orientation.y, 0);
 
 	// Define landmarks.
-	auto pivot = TranslateVector(item->Pose.Position, item->Pose.Orientation.y, CLICK(0.25f), -LaraCollision.Setup.Height);
-	auto cameraPos = TranslateVector(pivot, orient, -std::max(Camera.targetDistance * 0.5f, SECTOR(0.5f)));
+	auto pivot = TranslateVector(item->Pose.Position, item->Pose.Orientation.y, CLICK(0.25f), -(LaraCollision.Setup.Height + CLICK(0.25f)));
+	auto idealPos = TranslateVector(pivot, orient, -std::max(Camera.targetDistance * 0.5f, SECTOR(0.5f)));
 	auto lookAtPos = TranslateVector(pivot, orient, CLICK(0.75f));
 
 	// Determine best position.
-	auto origin = GameVector(pivot, GetCollision(item, item->Pose.Orientation.y, CLICK(0.25f), -LaraCollision.Setup.Height).RoomNumber);
-	auto target = GameVector(cameraPos, GetCollision(origin.ToVector3Int(), origin.roomNumber, orient, -std::max(Camera.targetDistance * 0.5f, SECTOR(0.5f))).RoomNumber);
-
-	LOSAndReturnTarget(&origin, &target, 0);
-	cameraPos = target.ToVector3Int();
+	auto origin = GameVector(pivot, GetCollision(item, item->Pose.Orientation.y, CLICK(0.25f), -(LaraCollision.Setup.Height + CLICK(0.25f))).RoomNumber);
+	auto target = GameVector(idealPos, GetCollision(origin.ToVector3Int(), origin.roomNumber, orient, -std::max(Camera.targetDistance * 0.5f, SECTOR(0.5f))).RoomNumber);
 
 	// Handle room and object collisions.
-	auto temp = target;
-	CameraCollisionBounds(&temp, CLICK(1) - CLICK(0.25f) / 2, true);
-	cameraPos = temp.ToVector3Int();
+	LOSAndReturnTarget(&origin, &target, 0);
+	CameraCollisionBounds(&target, CLICK(1) - CLICK(0.25f) / 2, true);
+	idealPos = target.ToVector3Int();
 	ItemsCollideCamera();
 
 	// Smoothly update camera position.
 	//MoveCamera(&GameVector(Camera.target.ToVector3Int() + (lookAtPos - Camera.target.ToVector3Int()) * 0.25f, item->RoomNumber), Camera.speed);
-	Camera.pos = GameVector(Camera.pos.ToVector3Int() + (cameraPos - Camera.pos.ToVector3Int()) * 0.25f, target.roomNumber);
+	Camera.pos = GameVector(Camera.pos.ToVector3Int() + (idealPos - Camera.pos.ToVector3Int()) * 0.25f, Camera.pos.roomNumber);
 	Camera.target = GameVector(Camera.target.ToVector3Int() + (lookAtPos - Camera.target.ToVector3Int()) * 0.25f, item->RoomNumber);
 
 	LookAt(&Camera, 0);
