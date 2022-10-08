@@ -128,14 +128,14 @@ namespace TEN::Control::Volumes
 		box.X1 = box.Y1 = box.Z1 =  CAM_SIZE;
 		box.X2 = box.Y2 = box.Z2 = -CAM_SIZE;
 
-		auto bBox = box.ToDXBoundingOrientedBox(pos);
+		auto bBox = box.ToBoundingOrientedBox(pos);
 
 		TestVolumes(camera->pos.RoomNumber, bBox, TriggerVolumeActivators::Flyby, camera);
 	}
 
 	void TestVolumes(short roomNumber, MESH_INFO* mesh)
 	{
-		const auto& bBox = GetBoundsAccurate(*mesh, false).ToDXBoundingOrientedBox(mesh->pos);
+		const auto& bBox = GetBoundsAccurate(*mesh, false).ToBoundingOrientedBox(mesh->pos);
 		
 		TestVolumes(roomNumber, bBox, TriggerVolumeActivators::Static, mesh);
 	}
@@ -143,7 +143,7 @@ namespace TEN::Control::Volumes
 	void TestVolumes(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
-		auto bBox = GetBoundsAccurate(item)->ToDXBoundingOrientedBox(item->Pose);
+		auto bBox = GetBoundsAccurate(item)->ToBoundingOrientedBox(item->Pose);
 
 #ifdef _DEBUG
 		g_Renderer.AddDebugBox(bBox, Vector4(1.0f, 1.0f, 0.0f, 1.0f), RENDERER_DEBUG_PAGE::LOGIC_STATS);

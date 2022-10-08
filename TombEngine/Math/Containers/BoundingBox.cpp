@@ -38,12 +38,12 @@
 		this->Z2 = bMax.z;
 	}
 
-	BoundingOrientedBox BOUNDING_BOX::ToDXBoundingOrientedBox(const PoseData& pose) const
+	BoundingOrientedBox BOUNDING_BOX::ToBoundingOrientedBox(const PoseData& pose) const
 	{
-		return this->ToDXBoundingOrientedBox(pose.Position.ToVector3(), pose.Orientation.ToQuaternion());
+		return this->ToBoundingOrientedBox(pose.Position.ToVector3(), pose.Orientation.ToQuaternion());
 	}
 
-	BoundingOrientedBox BOUNDING_BOX::ToDXBoundingOrientedBox(const Vector3& pos, const Quaternion& orient) const
+	BoundingOrientedBox BOUNDING_BOX::ToBoundingOrientedBox(const Vector3& pos, const Quaternion& orient) const
 	{
 		auto boxCenter = Vector3((X2 + X1) / 2.0f, (Y2 + Y1) / 2.0f, (Z2 + Z1) / 2.0f);
 		auto boxExtent = Vector3((X2 - X1) / 2.0f, (Y2 - Y1) / 2.0f, (Z2 - Z1) / 2.0f);

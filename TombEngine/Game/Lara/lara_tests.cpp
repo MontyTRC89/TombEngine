@@ -2540,7 +2540,7 @@ bool TestLaraPoleCollision(ItemInfo* item, CollisionInfo* coll, bool goingUp, fl
 	if (GetCollidedObjects(item, SECTOR(1), true, CollidedItems, nullptr, false) &&
 		CollidedItems[0] != nullptr)
 	{
-		auto laraBox = GetBoundsAccurate(item)->ToDXBoundingOrientedBox(item->Pose);
+		auto laraBox = GetBoundsAccurate(item)->ToBoundingOrientedBox(item->Pose);
 
 		// HACK: Because Core implemented upward pole movement as a SetPosition command, we can't precisely
 		// check her position. So we add a fixed height offset.
@@ -2565,7 +2565,7 @@ bool TestLaraPoleCollision(ItemInfo* item, CollisionInfo* coll, bool goingUp, fl
 			if (object->ObjectNumber != ID_POLEROPE)
 				continue;
 
-			auto poleBox = GetBoundsAccurate(object)->ToDXBoundingOrientedBox(object->Pose);
+			auto poleBox = GetBoundsAccurate(object)->ToBoundingOrientedBox(object->Pose);
 			poleBox.Extents = poleBox.Extents + Vector3(coll->Setup.Radius, 0.0f, coll->Setup.Radius);
 
 			//g_Renderer.AddDebugBox(poleBox, Vector4(0, 0, 1, 1), RENDERER_DEBUG_PAGE::LOGIC_STATS);

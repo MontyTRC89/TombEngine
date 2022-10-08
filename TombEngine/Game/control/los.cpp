@@ -360,7 +360,7 @@ bool DoRayBox(GameVector* origin, GameVector* target, BOUNDING_BOX* box, PoseDat
 	XMVECTOR rayDirectionNorm = XMVector3Normalize(rayDirection);
 
 	// Create the bounding box for raw collision detection
-	auto oBox = box->ToDXBoundingOrientedBox(*itemOrStaticPos);
+	auto oBox = box->ToBoundingOrientedBox(*itemOrStaticPos);
 
 	// Get the collision with the bounding box
 	float distance;

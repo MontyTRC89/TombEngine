@@ -998,7 +998,7 @@ short GetNearestLedgeAngle(ItemInfo* item, CollisionInfo* coll, float& distance)
 			{
 				// Get and test DX item coll bounds.
 				auto bounds = GetBoundsAccurate(&g_Level.Items[bridge]);
-				auto dxBounds = bounds->ToDXBoundingOrientedBox(g_Level.Items[bridge].Pose);
+				auto dxBounds = bounds->ToBoundingOrientedBox(g_Level.Items[bridge].Pose);
 
 				// Decompose bounds into planes.
 				Vector3 corners[8];

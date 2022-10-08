@@ -332,7 +332,7 @@ void TestForObjectOnLedge(ItemInfo* item, CollisionInfo* coll)
 
 				if (Vector3i::Distance(item->Pose.Position, item2->Pose.Position) < COLLISION_CHECK_DISTANCE)
 				{
-					auto box = GetBoundsAccurate(item2)->ToDXBoundingOrientedBox(item2->Pose);
+					auto box = GetBoundsAccurate(item2)->ToBoundingOrientedBox(item2->Pose);
 					float distance;
 
 					if (box.Intersects(origin, direction, distance) && distance < (coll->Setup.Radius * 2))
@@ -352,7 +352,7 @@ void TestForObjectOnLedge(ItemInfo* item, CollisionInfo* coll)
 
 				if (Vector3i::Distance(item->Pose.Position, mesh.pos.Position) < COLLISION_CHECK_DISTANCE)
 				{
-					const auto& bBox = GetBoundsAccurate(mesh, false).ToDXBoundingOrientedBox(mesh.pos);
+					const auto& bBox = GetBoundsAccurate(mesh, false).ToBoundingOrientedBox(mesh.pos);
 					float distance;
 
 					if (bBox.Intersects(origin, direction, distance) && distance < (coll->Setup.Radius * 2))
@@ -863,11 +863,11 @@ bool CollideSolidBounds(ItemInfo* item, BOUNDING_BOX* box, PoseData pose, Collis
 	bool result = false;
 
 	// Get DX static bounds in global coordinates.
-	auto staticBounds = box->ToDXBoundingOrientedBox(pose);
+	auto staticBounds = box->ToBoundingOrientedBox(pose);
 
 	// Get local TR bounds and DX item bounds in global coordinates.
 	auto* itemBBox = GetBoundsAccurate(item);
-	auto itemBounds = itemBBox->ToDXBoundingOrientedBox(item->Pose);
+	auto itemBounds = itemBBox->ToBoundingOrientedBox(item->Pose);
 
 	// Extend bounds a bit for visual testing.
 	itemBounds.Extents = itemBounds.Extents + Vector3(SECTOR(1));
@@ -903,11 +903,11 @@ bool CollideSolidBounds(ItemInfo* item, BOUNDING_BOX* box, PoseData pose, Collis
 	}
 
 	// Get and test DX item collision bounds.
-	auto collBounds = collBox.ToDXBoundingOrientedBox(PoseData(item->Pose.Position));
+	auto collBounds = collBox.ToBoundingOrientedBox(PoseData(item->Pose.Position));
 	bool intersects = staticBounds.Intersects(collBounds);
 
 	// Check if previous item horizontal position intersects bounds.
-	auto prevCollBounds = collBox.ToDXBoundingOrientedBox(PoseData(coll->Setup.OldPosition));
+	auto prevCollBounds = collBox.ToBoundingOrientedBox(PoseData(coll->Setup.OldPosition));
 	bool prevHorIntersects = staticBounds.Intersects(prevCollBounds);
 
 	// Draw item coll bounds.
@@ -995,7 +995,7 @@ bool CollideSolidBounds(ItemInfo* item, BOUNDING_BOX* box, PoseData pose, Collis
 		return false;
 
 	// Check if bounds still collide after top/bottom position correction.
-	if (!staticBounds.Intersects(collBox.ToDXBoundingOrientedBox(PoseData(item->Pose.Position))))
+	if (!staticBounds.Intersects(collBox.ToBoundingOrientedBox(PoseData(item->Pose.Position))))
 		return result;
 
 	// Determine identity orientation/distance.

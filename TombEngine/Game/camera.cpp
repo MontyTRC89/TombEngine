@@ -1723,7 +1723,7 @@ void ResetLook(ItemInfo* item)
 bool TestBoundsCollideCamera(const BOUNDING_BOX& bounds, const PoseData& pose, short radius)
 {
 	auto sphere = BoundingSphere(Camera.pos.ToVector3(), radius);
-	return sphere.Intersects(bounds.ToDXBoundingOrientedBox(pose));
+	return sphere.Intersects(bounds.ToBoundingOrientedBox(pose));
 }
 
 void ItemPushCamera(BOUNDING_BOX* bounds, PoseData* pos, short radius)
@@ -1789,7 +1789,7 @@ static bool CheckItemCollideCamera(ItemInfo* item)
 		return false;
 
 	// Check extents, if any 2 bounds are smaller than threshold, discard.
-	auto extents = GetBoundsAccurate(item)->ToDXBoundingOrientedBox(item->Pose).Extents;
+	auto extents = GetBoundsAccurate(item)->ToBoundingOrientedBox(item->Pose).Extents;
 	if ((abs(extents.x) < COLL_DISCARD_THRESHOLD && abs(extents.y) < COLL_DISCARD_THRESHOLD) ||
 		(abs(extents.x) < COLL_DISCARD_THRESHOLD && abs(extents.z) < COLL_DISCARD_THRESHOLD) ||
 		(abs(extents.y) < COLL_DISCARD_THRESHOLD && abs(extents.z) < COLL_DISCARD_THRESHOLD))
@@ -1899,7 +1899,7 @@ void ItemsCollideCamera()
 
 #ifdef _DEBUG
 		TEN::Renderer::g_Renderer.AddDebugBox(
-			bounds->ToDXBoundingOrientedBox(item->Pose),
+			bounds->ToBoundingOrientedBox(item->Pose),
 			Vector4(1.0f, 0.0f, 0.0f, 1.0f),
 			RENDERER_DEBUG_PAGE::DIMENSION_STATS);
 #endif
@@ -1929,7 +1929,7 @@ void ItemsCollideCamera()
 			ItemPushCamera(&bounds, &mesh->pos, rad);
 
 #ifdef _DEBUG
-		TEN::Renderer::g_Renderer.AddDebugBox(bounds.ToDXBoundingOrientedBox(mesh->pos),
+		TEN::Renderer::g_Renderer.AddDebugBox(bounds.ToBoundingOrientedBox(mesh->pos),
 			Vector4(1.0f, 0.0f, 0.0f, 1.0f), RENDERER_DEBUG_PAGE::DIMENSION_STATS);
 #endif
 	}

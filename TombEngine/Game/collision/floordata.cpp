@@ -765,7 +765,7 @@ namespace TEN::Floordata
 		auto item = &g_Level.Items[itemNumber];
 
 		auto bounds = GetBoundsAccurate(item);
-		auto dxBounds = bounds->ToDXBoundingOrientedBox(item->Pose);
+		auto dxBounds = bounds->ToBoundingOrientedBox(item->Pose);
 
 		Vector3 pos = Vector3(x, y + (bottom ? 4 : -4), z); // Introduce slight vertical margin just in case
 
@@ -798,7 +798,7 @@ namespace TEN::Floordata
 
 		// Get real OBB bounds of a bridge in world space
 		auto bounds = GetBoundsAccurate(item);
-		auto dxBounds = bounds->ToDXBoundingOrientedBox(item->Pose);
+		auto dxBounds = bounds->ToBoundingOrientedBox(item->Pose);
 
 		// Get corners of a projected OBB
 		Vector3 corners[8];

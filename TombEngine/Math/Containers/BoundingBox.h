@@ -21,8 +21,8 @@ struct PoseData;
 		void RotNoPersp(const EulerAngles& orient, const BOUNDING_BOX& bounds);
 
 		// Converters
-		BoundingOrientedBox ToDXBoundingOrientedBox(const PoseData& pose) const;
-		BoundingOrientedBox ToDXBoundingOrientedBox(const Vector3& pos, const Quaternion& orient) const;
+		BoundingOrientedBox ToBoundingOrientedBox(const PoseData& pose) const;
+		BoundingOrientedBox ToBoundingOrientedBox(const Vector3& pos, const Quaternion& orient) const;
 
 		// Operators
 		BOUNDING_BOX operator +(const PoseData& pose) const;
