@@ -32,14 +32,7 @@
 		if (frac == 0 || !accurate)
 			*this = framePtr[0]->boundingBox;
 		else
-		{
-			this->X1 = framePtr[0]->boundingBox.X1 + ((framePtr[1]->boundingBox.X1 - framePtr[0]->boundingBox.X1) * (frac / rate));
-			this->X2 = framePtr[0]->boundingBox.X2 + ((framePtr[1]->boundingBox.X2 - framePtr[0]->boundingBox.X2) * (frac / rate));
-			this->Y1 = framePtr[0]->boundingBox.Y1 + ((framePtr[1]->boundingBox.Y1 - framePtr[0]->boundingBox.Y1) * (frac / rate));
-			this->Y2 = framePtr[0]->boundingBox.Y2 + ((framePtr[1]->boundingBox.Y2 - framePtr[0]->boundingBox.Y2) * (frac / rate));
-			this->Z1 = framePtr[0]->boundingBox.Z1 + ((framePtr[1]->boundingBox.Z1 - framePtr[0]->boundingBox.Z1) * (frac / rate));
-			this->Z2 = framePtr[0]->boundingBox.Z2 + ((framePtr[1]->boundingBox.Z2 - framePtr[0]->boundingBox.Z2) * (frac / rate));
-		}
+			*this = framePtr[0]->boundingBox + ((framePtr[1]->boundingBox - framePtr[0]->boundingBox) * (frac / rate));
 	}
 
 	int BOUNDING_BOX::GetWidth() const
@@ -89,6 +82,18 @@
 		return result;
 	}
 
+	BOUNDING_BOX BOUNDING_BOX::operator +(const BOUNDING_BOX& bounds) const
+	{
+		auto newBox = *this;
+		newBox.X1 += bounds.X1;
+		newBox.X2 += bounds.X2;
+		newBox.Y1 += bounds.Y1;
+		newBox.Y2 += bounds.Y2;
+		newBox.Z1 += bounds.Z1;
+		newBox.Z2 += bounds.Z2;
+		return newBox;
+	}
+	
 	BOUNDING_BOX BOUNDING_BOX::operator +(const PoseData& pose) const
 	{
 		auto newBox = *this;
@@ -100,7 +105,31 @@
 		newBox.Z2 += pose.Position.z;
 		return newBox;
 	}
+	
+	BOUNDING_BOX BOUNDING_BOX::operator -(const BOUNDING_BOX& bounds) const
+	{
+		auto newBox = *this;
+		newBox.X1 -= bounds.X1;
+		newBox.X2 -= bounds.X2;
+		newBox.Y1 -= bounds.Y1;
+		newBox.Y2 -= bounds.Y2;
+		newBox.Z1 -= bounds.Z1;
+		newBox.Z2 -= bounds.Z2;
+		return newBox;
+	}
 
+	BOUNDING_BOX BOUNDING_BOX::operator -(const PoseData& pose) const
+	{
+		auto newBox = *this;
+		newBox.X1 -= pose.Position.x;
+		newBox.X2 -= pose.Position.x;
+		newBox.Y1 -= pose.Position.y;
+		newBox.Y2 -= pose.Position.y;
+		newBox.Z1 -= pose.Position.z;
+		newBox.Z2 -= pose.Position.z;
+		return newBox;
+	}
+	
 	BOUNDING_BOX BOUNDING_BOX::operator *(float scale) const
 	{
 		auto newBox = *this;

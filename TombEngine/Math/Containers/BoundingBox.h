@@ -34,7 +34,10 @@ struct PoseData;
 		BoundingOrientedBox ToBoundingOrientedBox(const Vector3& pos, const Quaternion& orient) const;
 
 		// Operators
+		BOUNDING_BOX operator +(const BOUNDING_BOX& bounds) const;
 		BOUNDING_BOX operator +(const PoseData& pose) const;
+		BOUNDING_BOX operator -(const BOUNDING_BOX& bounds) const;
+		BOUNDING_BOX operator -(const PoseData& pose) const;
 		BOUNDING_BOX operator *(float scale) const;
 	};
 //}
