@@ -27,9 +27,11 @@ namespace TEN::Entities::Doors
 
 	OBJECT_COLLISION_BOUNDS UnderwaterDoorBounds =
 	{
-		-256, 256, 
-		-1024, 0, 
-		-1024, 0, 
+		BOUNDING_BOX(
+			-256, 256,
+			-1024, 0, 
+			-1024, 0
+		),
 		-ANGLE(80.0f), ANGLE(80.0f),
 		-ANGLE(80.0f), ANGLE(80.0f),
 		-ANGLE(80.0f), ANGLE(80.0f)

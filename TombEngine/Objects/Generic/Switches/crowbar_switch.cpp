@@ -20,9 +20,11 @@ namespace TEN::Entities::Switches
 
 	OBJECT_COLLISION_BOUNDS CrowbarBounds = 
 	{
-		-256, 256,
-		0, 0,
-		-512, -256,
+		BOUNDING_BOX(
+			-256, 256,
+			0, 0,
+			-512, -256
+		),
 		-ANGLE(10.0f), ANGLE(10.0f),
 		-ANGLE(30.0f), ANGLE(30.0f),
 		-ANGLE(10.0f), ANGLE(10.0f)
@@ -32,9 +34,11 @@ namespace TEN::Entities::Switches
 
 	OBJECT_COLLISION_BOUNDS CrowbarBounds2 = 
 	{
-		-256, 256,
-		0, 0,
-		256, 512,
+		BOUNDING_BOX(
+			-256, 256,
+			0, 0,
+			256, 512
+		),
 		-ANGLE(10.0f), ANGLE(10.0f),
 		-ANGLE(30.0f), ANGLE(30.0f),
 		-ANGLE(10.0f), ANGLE(10.0f)

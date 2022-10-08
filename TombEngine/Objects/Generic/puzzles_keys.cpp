@@ -30,9 +30,11 @@ enum class PuzzleType
 
 OBJECT_COLLISION_BOUNDS PuzzleBounds =
 {
-	0, 0,
-	-256, 256,
-	0, 0,
+	BOUNDING_BOX(
+		0, 0,
+		-256, 256,
+		0, 0
+	),
 	-ANGLE(10.0f), ANGLE(10.0f),
 	-ANGLE(30.0f), ANGLE(30.0f),
 	-ANGLE(10.0f), ANGLE(10.0f)
@@ -41,9 +43,11 @@ OBJECT_COLLISION_BOUNDS PuzzleBounds =
 static Vector3i KeyHolePosition(0, 0, 312);
 OBJECT_COLLISION_BOUNDS KeyHoleBounds =
 {
-	-256, 256,
-	0, 0,
-	0, 412,
+	BOUNDING_BOX(
+		-256, 256,
+		0, 0,
+		0, 412
+	),
 	-ANGLE(10.0f), ANGLE(10.0f),
 	-ANGLE(30.0f), ANGLE(30.0f),
 	-ANGLE(10.0f), ANGLE(10.0f)
@@ -84,11 +88,11 @@ void PuzzleHoleCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* co
 	{
 		short oldYrot = receptableItem->Pose.Orientation.y;
 
-		auto* bounds = GetBoundsAccurate(receptableItem);
-		PuzzleBounds.boundingBox.X1 = bounds->X1 - CLICK(1);
-		PuzzleBounds.boundingBox.X2 = bounds->X2 + CLICK(1);
-		PuzzleBounds.boundingBox.Z1 = bounds->Z1 - CLICK(1);;
-		PuzzleBounds.boundingBox.Z2 = bounds->Z2 + CLICK(1);;
+		auto bounds = BOUNDING_BOX(receptableItem);
+		PuzzleBounds.boundingBox.X1 = bounds.X1 - CLICK(1);
+		PuzzleBounds.boundingBox.X2 = bounds.X2 + CLICK(1);
+		PuzzleBounds.boundingBox.Z1 = bounds.Z1 - CLICK(1);;
+		PuzzleBounds.boundingBox.Z2 = bounds.Z2 + CLICK(1);;
 
 		if (TestLaraPosition(&PuzzleBounds, receptableItem, laraItem))
 		{
@@ -112,7 +116,7 @@ void PuzzleHoleCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* co
 
 			if (puzzleType != PuzzleType::Cutscene)
 			{
-				Vector3i pos = { 0, 0, bounds->Z1 - 100 };
+				auto pos = Vector3i(0, 0, bounds.Z1 - 100);
 				if (!MoveLaraPosition(&pos, receptableItem, laraItem))
 				{
 					laraInfo->InteractedItem = itemNumber;

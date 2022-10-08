@@ -27,9 +27,11 @@ namespace TEN::Entities::Doors
 
 	OBJECT_COLLISION_BOUNDS DoubleDoorBounds =
 	{
-		-384, 384, 
-		0, 0, 
-		-1024, 512, 
+		BOUNDING_BOX(
+			-384, 384,
+			0, 0, 
+			-1024, 512
+		),
 		-ANGLE(10.0f), ANGLE(10.0f),
 		-ANGLE(30.0f), ANGLE(30.0f),
 		-ANGLE(10.0f), ANGLE(10.0f),

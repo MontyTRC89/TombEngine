@@ -33,11 +33,13 @@ using namespace TEN::Entities::Generic;
 using namespace TEN::Input;
 
 static Vector3i PickUpPosition(0, 0, -100);
-OBJECT_COLLISION_BOUNDS PickUpBounds = 
+OBJECT_COLLISION_BOUNDS PickUpBounds =
 {
-	-CLICK(1), CLICK(1),
-	-200, 200,
-	-CLICK(1), CLICK(1),
+	BOUNDING_BOX(
+		-CLICK(1), CLICK(1),
+		-200, 200,
+		-CLICK(1), CLICK(1)
+	),
 	ANGLE(-45.0f),  ANGLE(45.0f),
 	0, 0,
 	ANGLE(-45.0f),  ANGLE(45.0f),
@@ -46,9 +48,11 @@ OBJECT_COLLISION_BOUNDS PickUpBounds =
 static Vector3i HiddenPickUpPosition(0, 0, -690);
 OBJECT_COLLISION_BOUNDS HiddenPickUpBounds =
 {
-	-CLICK(1), CLICK(1),
-	-100, 100,
-	-800, -CLICK(1),
+	BOUNDING_BOX(
+		-CLICK(1), CLICK(1),
+		-100, 100,
+		-800, -CLICK(1)
+	),
 	ANGLE(-45.0f),  ANGLE(45.0f),
 	ANGLE(-30.0f), ANGLE(30.0f),
 	ANGLE(-45.0f),  ANGLE(45.0f),
@@ -57,9 +61,11 @@ OBJECT_COLLISION_BOUNDS HiddenPickUpBounds =
 static Vector3i CrowbarPickUpPosition(0, 0, 215);
 OBJECT_COLLISION_BOUNDS CrowbarPickUpBounds =
 {
-	-CLICK(1), CLICK(1),
-	-100, 100,
-	200, CLICK(2),
+	BOUNDING_BOX(
+		-CLICK(1), CLICK(1),
+		-100, 100,
+		200, CLICK(2)
+	),
 	ANGLE(-45.0f),  ANGLE(45.0f),
 	ANGLE(-30.0f), ANGLE(30.0f),
 	ANGLE(-45.0f),  ANGLE(45.0f),
@@ -68,9 +74,11 @@ OBJECT_COLLISION_BOUNDS CrowbarPickUpBounds =
 static Vector3i JobyCrowPickUpPosition(-224, 0, 240);
 OBJECT_COLLISION_BOUNDS JobyCrowPickUpBounds =
 {
-	-CLICK(2), 0,
-	-100, 100,
-	0, CLICK(2),
+	BOUNDING_BOX(
+		-CLICK(2), 0,
+		-100, 100,
+		0, CLICK(2)
+	),
 	ANGLE(-45.0f),  ANGLE(45.0f),
 	ANGLE(-30.0f), ANGLE(30.0f),
 	ANGLE(-45.0f),  ANGLE(45.0f),
@@ -79,9 +87,11 @@ OBJECT_COLLISION_BOUNDS JobyCrowPickUpBounds =
 static Vector3i PlinthPickUpPosition(0, 0, -460);
 OBJECT_COLLISION_BOUNDS PlinthPickUpBounds =
 {
-	-CLICK(1), CLICK(1),
-	-640, 640,
-	-511, 0,
+	BOUNDING_BOX(
+		-CLICK(1), CLICK(1),
+		-640, 640,
+		-511, 0
+	),
 	ANGLE(-45.0f),  ANGLE(45.0f),
 	ANGLE(-30.0f), ANGLE(30.0f),
 	ANGLE(-45.0f),  ANGLE(45.0f),
@@ -90,9 +100,11 @@ OBJECT_COLLISION_BOUNDS PlinthPickUpBounds =
 static Vector3i PickUpPositionUW(0, -200, -350);
 OBJECT_COLLISION_BOUNDS PickUpBoundsUW =
 {
-	-CLICK(2), CLICK(2),
-	-CLICK(2), CLICK(2),
-	-CLICK(2), CLICK(2),
+	BOUNDING_BOX(
+		-CLICK(2), CLICK(2),
+		-CLICK(2), CLICK(2),
+		-CLICK(2), CLICK(2)
+	),
 	ANGLE(-45.0f),  ANGLE(45.0f),
 	ANGLE(-45.0f),  ANGLE(45.0f),
 	ANGLE(-45.0f),  ANGLE(45.0f)
@@ -101,9 +113,7 @@ OBJECT_COLLISION_BOUNDS PickUpBoundsUW =
 static Vector3i SOPos(0, 0, 0);
 OBJECT_COLLISION_BOUNDS SOBounds =
 {
-	0, 0,
-	0, 0,
-	0, 0,
+	BOUNDING_BOX::Zero,
 	ANGLE(-45.0f),  ANGLE(45.0f),
 	ANGLE(-30.0f), ANGLE(30.0f),
 	ANGLE(-45.0f),  ANGLE(45.0f),
@@ -115,9 +125,7 @@ short SearchOffsets[4] = { 160, 96, 160, 112 };
 
 OBJECT_COLLISION_BOUNDS MSBounds =
 {
-	0, 0,
-	0, 0,
-	0, 0,
+	BOUNDING_BOX::Zero,
 	ANGLE(-10.0f), ANGLE(10.0f),
 	ANGLE(-30.0f), ANGLE(30.0f),
 	ANGLE(-10.0f), ANGLE(10.0f)
@@ -879,18 +887,19 @@ BOUNDING_BOX* FindPlinth(ItemInfo* item)
 void InitialisePickup(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
-	auto* bounds = GetBoundsAccurate(item);
+
+	auto bounds = BOUNDING_BOX(item);
 
 	short triggerFlags = item->TriggerFlags & 0x3F;
 	if (triggerFlags == 5)
 	{
-		item->ItemFlags[0] = item->Pose.Position.y - bounds->Y2;
+		item->ItemFlags[0] = item->Pose.Position.y - bounds.Y2;
 		item->Status = ITEM_INVISIBLE;
 	}
 	else
 	{
 		if (triggerFlags == 0 || triggerFlags == 3 || triggerFlags == 4 || triggerFlags == 7 || triggerFlags == 8 || triggerFlags == 11)
-			item->Pose.Position.y -= bounds->Y2;
+			item->Pose.Position.y -= bounds.Y2;
 		
 		if ((item->TriggerFlags & 0x80) != 0)
 		{
@@ -961,21 +970,21 @@ void SearchObjectCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* 
 		((item->Status == ITEM_NOT_ACTIVE && item->ObjectNumber != ID_SEARCH_OBJECT4) || !item->ItemFlags[0])) ||
 		(lara->Control.IsMoving && lara->InteractedItem == itemNumber))
 	{
-		auto* bounds = GetBoundsAccurate(item);
+		auto bounds = BOUNDING_BOX(item);
 		if (item->ObjectNumber != ID_SEARCH_OBJECT1)
 		{
-			SOBounds.boundingBox.X1 = bounds->X1 - CLICK(0.5f);
-			SOBounds.boundingBox.X2 = bounds->X2 + CLICK(0.5f);
+			SOBounds.boundingBox.X1 = bounds.X1 - CLICK(0.5f);
+			SOBounds.boundingBox.X2 = bounds.X2 + CLICK(0.5f);
 		}
 		else
 		{
-			SOBounds.boundingBox.X1 = bounds->X1 + CLICK(0.25f);
-			SOBounds.boundingBox.X2 = bounds->X2 - CLICK(0.25f);
+			SOBounds.boundingBox.X1 = bounds.X1 + CLICK(0.25f);
+			SOBounds.boundingBox.X2 = bounds.X2 - CLICK(0.25f);
 		}
 
-		SOBounds.boundingBox.Z1 = bounds->Z1 - 200;
-		SOBounds.boundingBox.Z2 = bounds->Z2 + 200;
-		SOPos.z = bounds->Z1 - SearchOffsets[objectNumber];
+		SOBounds.boundingBox.Z1 = bounds.Z1 - 200;
+		SOBounds.boundingBox.Z2 = bounds.Z2 + 200;
+		SOPos.z = bounds.Z1 - SearchOffsets[objectNumber];
 
 		if (TestLaraPosition(&SOBounds, item, laraItem))
 		{

@@ -26,9 +26,11 @@ namespace TEN::Entities::Switches
 
 	OBJECT_COLLISION_BOUNDS TurnSwitchBoundsA = 
 	{
-		512, 896,
-		0, 0,
-		-512, 0,
+		BOUNDING_BOX(
+			512, 896,
+			0, 0,
+			-512, 0
+		),
 		-ANGLE(10.0f), ANGLE(10.0f),
 		-ANGLE(30.0f), ANGLE(30.0f),
 		-ANGLE(10.0f), ANGLE(10.0f)
@@ -38,9 +40,11 @@ namespace TEN::Entities::Switches
 
 	OBJECT_COLLISION_BOUNDS TurnSwitchBoundsC =
 	{
-		512, 896,
-		0, 0,
-		0, 512,
+		BOUNDING_BOX(
+			512, 896,
+			0, 0,
+			0, 512
+		),
 		-ANGLE(10.0f), ANGLE(10.0f),
 		-ANGLE(30.0f), ANGLE(30.0f),
 		-ANGLE(10.0f), ANGLE(10.0f)

@@ -16,9 +16,11 @@ using namespace TEN::Input;
 
 OBJECT_COLLISION_BOUNDS DeathSlideBounds =
 {
-	-CLICK(1), CLICK(1),
-	-100, 100,
-	CLICK(1), CLICK(2),
+	BOUNDING_BOX(
+		-CLICK(1), CLICK(1),
+		-100, 100,
+		CLICK(1), CLICK(2)
+	),
 	0, 0,
 	-ANGLE(25.0f), ANGLE(25.0f),
 	0, 0

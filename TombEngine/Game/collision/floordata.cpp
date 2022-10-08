@@ -762,16 +762,16 @@ namespace TEN::Floordata
 
 	std::optional<int> GetBridgeItemIntersect(int itemNumber, int x, int y, int z, bool bottom)
 	{
-		auto item = &g_Level.Items[itemNumber];
+		auto* item = &g_Level.Items[itemNumber];
 
-		auto bounds = GetBoundsAccurate(item);
-		auto dxBounds = bounds->ToBoundingOrientedBox(item->Pose);
+		auto bounds = BOUNDING_BOX(item);
+		auto dxBounds = bounds.ToBoundingOrientedBox(item->Pose);
 
 		Vector3 pos = Vector3(x, y + (bottom ? 4 : -4), z); // Introduce slight vertical margin just in case
 
 		static float distance;
 		if (dxBounds.Intersects(pos, (bottom ? -Vector3::UnitY : Vector3::UnitY), distance))
-			return std::optional{ item->Pose.Position.y + (bottom ? bounds->Y2 : bounds->Y1) };
+			return std::optional{ item->Pose.Position.y + (bottom ? bounds.Y2 : bounds.Y1) };
 		else
 			return std::nullopt;
 	}
@@ -782,8 +782,8 @@ namespace TEN::Floordata
 	{
 		auto item = &g_Level.Items[itemNumber];
 
-		auto bounds = GetBoundsAccurate(item);
-		return item->Pose.Position.y + (bottom ? bounds->Y2 : bounds->Y1);
+		auto bounds = BOUNDING_BOX(item);
+		return item->Pose.Position.y + (bottom ? bounds.Y2 : bounds.Y1);
 	}
 
 	// Updates BridgeItem for all blocks which are enclosed by bridge bounds.
@@ -797,8 +797,8 @@ namespace TEN::Floordata
 			forceRemoval = true;
 
 		// Get real OBB bounds of a bridge in world space
-		auto bounds = GetBoundsAccurate(item);
-		auto dxBounds = bounds->ToBoundingOrientedBox(item->Pose);
+		auto bounds = BOUNDING_BOX(item);
+		auto dxBounds = bounds.ToBoundingOrientedBox(item->Pose);
 
 		// Get corners of a projected OBB
 		Vector3 corners[8];

@@ -334,12 +334,12 @@ int ObjectOnLOS2(GameVector* origin, GameVector* target, Vector3i* vec, MESH_INF
 			if ((item->ObjectNumber == ID_LARA) && (priorityObject != ID_LARA))
 				continue;
 
-			auto* box = GetBoundsAccurate(item);
+			auto box = BOUNDING_BOX(item);
 
 			pos.Position = item->Pose.Position;
 			pos.Orientation.y = item->Pose.Orientation.y;
 
-			if (DoRayBox(origin, target, box, &pos, vec, linkNumber))
+			if (DoRayBox(origin, target, &box, &pos, vec, linkNumber))
 				target->RoomNumber = LosRooms[r];
 		}
 	}

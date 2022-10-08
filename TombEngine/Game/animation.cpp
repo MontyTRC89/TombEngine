@@ -18,8 +18,6 @@ using namespace TEN::Entities::Generic;
 using namespace TEN::Math;
 using TEN::Renderer::g_Renderer;
 
-BOUNDING_BOX InterpolatedBounds;
-
 void AnimateLara(ItemInfo* item)
 {
 	auto* lara = GetLaraInfo(item);
@@ -117,8 +115,8 @@ void PerformAnimCommands(ItemInfo* item, bool isFrameBased)
 			if (!isFrameBased)
 			{
 				TranslateItem(item, item->Pose.Orientation.y, cmd[2], cmd[1], cmd[0]);
-				auto* bounds = GetBoundsAccurate(item);
-				UpdateItemRoom(item, -bounds->GetHeight() / 2, -cmd[0], -cmd[2]);
+				auto bounds = BOUNDING_BOX(item);
+				UpdateItemRoom(item, -bounds.GetHeight() / 2, -cmd[0], -cmd[2]);
 			}
 
 			cmd += 3;
@@ -386,26 +384,6 @@ bool GetStateDispatch(ItemInfo* item, const AnimData& anim)
 	}
 
 	return false;
-}
-
-BOUNDING_BOX* GetBoundsAccurate(ItemInfo* item)
-{
-	int rate = 0;
-	AnimFrame* framePtr[2];
-	
-	int frac = GetFrame(item, framePtr, &rate);
-	if (frac == 0)
-		return &framePtr[0]->boundingBox;
-	else
-	{
-		InterpolatedBounds.X1 = framePtr[0]->boundingBox.X1 + (framePtr[1]->boundingBox.X1 - framePtr[0]->boundingBox.X1) * frac / rate;
-		InterpolatedBounds.X2 = framePtr[0]->boundingBox.X2 + (framePtr[1]->boundingBox.X2 - framePtr[0]->boundingBox.X2) * frac / rate;
-		InterpolatedBounds.Y1 = framePtr[0]->boundingBox.Y1 + (framePtr[1]->boundingBox.Y1 - framePtr[0]->boundingBox.Y1) * frac / rate;
-		InterpolatedBounds.Y2 = framePtr[0]->boundingBox.Y2 + (framePtr[1]->boundingBox.Y2 - framePtr[0]->boundingBox.Y2) * frac / rate;
-		InterpolatedBounds.Z1 = framePtr[0]->boundingBox.Z1 + (framePtr[1]->boundingBox.Z1 - framePtr[0]->boundingBox.Z1) * frac / rate;
-		InterpolatedBounds.Z2 = framePtr[0]->boundingBox.Z2 + (framePtr[1]->boundingBox.Z2 - framePtr[0]->boundingBox.Z2) * frac / rate;
-		return &InterpolatedBounds;
-	}
 }
 
 AnimFrame* GetBestFrame(ItemInfo* item)

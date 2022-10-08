@@ -109,16 +109,16 @@ void UpdateBats()
 	if (!Objects[ID_BATS_EMITTER].loaded)
 		return;
 
-	auto* bounds = GetBoundsAccurate(LaraItem);
+	auto bounds = BOUNDING_BOX(LaraItem);
 
-	int x1 = LaraItem->Pose.Position.x + bounds->X1 - (bounds->X1 / 4);
-	int x2 = LaraItem->Pose.Position.x + bounds->X2 - (bounds->X2 / 4);
+	int x1 = LaraItem->Pose.Position.x + bounds.X1 - (bounds.X1 / 4);
+	int x2 = LaraItem->Pose.Position.x + bounds.X2 - (bounds.X2 / 4);
 
-	int y1 = LaraItem->Pose.Position.y + bounds->Y1 - (bounds->Y1 / 4);
-	int y2 = LaraItem->Pose.Position.y + bounds->Y1 - (bounds->Y1 / 4);
+	int y1 = LaraItem->Pose.Position.y + bounds.Y1 - (bounds.Y1 / 4);
+	int y2 = LaraItem->Pose.Position.y + bounds.Y1 - (bounds.Y1 / 4);
 
-	int z1 = LaraItem->Pose.Position.z + bounds->Z1 - (bounds->Z1 / 4);
-	int z2 = LaraItem->Pose.Position.z + bounds->Z1 - (bounds->Z1 / 4);
+	int z1 = LaraItem->Pose.Position.z + bounds.Z1 - (bounds.Z1 / 4);
+	int z2 = LaraItem->Pose.Position.z + bounds.Z1 - (bounds.Z1 / 4);
 
 	int minDistance = MAXINT;
 	int minIndex = -1;

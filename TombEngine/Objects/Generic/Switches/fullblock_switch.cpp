@@ -16,9 +16,11 @@ namespace TEN::Entities::Switches
 {
 	OBJECT_COLLISION_BOUNDS FullBlockSwitchBounds = 
 	{
-		-384, 384,
-		0, 256,
-		0, 512,
+		BOUNDING_BOX(
+			-384, 384,
+			0, 256,
+			0, 512
+		),
 		-ANGLE(10.0f), ANGLE(10.0f),
 		-ANGLE(30.0f), ANGLE(30.0f),
 		-ANGLE(10.0f), ANGLE(10.0f)

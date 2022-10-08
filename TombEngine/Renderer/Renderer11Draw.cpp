@@ -84,11 +84,11 @@ namespace TEN::Renderer
 				}
 				else
 				{
-					auto bBox = GetBoundsAccurate(&nativeItem);
-					auto center = ((Vector3(bBox->X1, bBox->Y1, bBox->Z1) + Vector3(bBox->X2, bBox->Y2, bBox->Z2)) / 2) +
+					auto bBox = BOUNDING_BOX(&nativeItem);
+					auto center = ((Vector3(bBox.X1, bBox.Y1, bBox.Z1) + Vector3(bBox.X2, bBox.Y2, bBox.Z2)) / 2) +
 						Vector3(nativeItem.Pose.Position.x, nativeItem.Pose.Position.y, nativeItem.Pose.Position.z);
 					center.y = nativeItem.Pose.Position.y;
-					float maxExtent = std::max(bBox->X2 - bBox->X1, bBox->Z2 - bBox->Z1);
+					float maxExtent = std::max(bBox.X2 - bBox.X1, bBox.Z2 - bBox.Z1);
 
 					auto& newSphere = nearestSpheres.emplace_back();
 					newSphere.position = center;

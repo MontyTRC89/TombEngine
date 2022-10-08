@@ -34,7 +34,7 @@ ParticleDynamic ParticleDynamics[MAX_PARTICLE_DYNAMICS];
 
 FX_INFO EffectList[NUM_EFFECTS];
 
-int DeadlyBounds[6];
+BOUNDING_BOX DeadlyBounds;
 SPLASH_SETUP SplashSetup;
 SPLASH_STRUCT Splashes[MAX_SPLASHES];
 RIPPLE_STRUCT Ripples[MAX_RIPPLES];
@@ -158,13 +158,15 @@ Particle* GetFreeParticle()
 
 void UpdateSparks()
 {
-	auto* bounds = GetBoundsAccurate(LaraItem);
-	DeadlyBounds[0] = LaraItem->Pose.Position.x + bounds->X1;
-	DeadlyBounds[1] = LaraItem->Pose.Position.x + bounds->X2;
-	DeadlyBounds[2] = LaraItem->Pose.Position.y + bounds->Y1;
-	DeadlyBounds[3] = LaraItem->Pose.Position.y + bounds->Y2;
-	DeadlyBounds[4] = LaraItem->Pose.Position.z + bounds->Z1;
-	DeadlyBounds[5] = LaraItem->Pose.Position.z + bounds->Z2;
+	auto bounds = BOUNDING_BOX(LaraItem);
+	DeadlyBounds = BOUNDING_BOX(
+		LaraItem->Pose.Position.x + bounds.X1,
+		LaraItem->Pose.Position.x + bounds.X2,
+		LaraItem->Pose.Position.y + bounds.Y1,
+		LaraItem->Pose.Position.y + bounds.Y2,
+		LaraItem->Pose.Position.z + bounds.Z1,
+		LaraItem->Pose.Position.z + bounds.Z2
+	);
 
 	for (int i = 0; i < MAX_PARTICLES; i++)
 	{
@@ -290,11 +292,11 @@ void UpdateSparks()
 			{
 				ds = spark->size * (spark->scalar / 2.0);
 
-				if (spark->x + ds > DeadlyBounds[0] && spark->x - ds < DeadlyBounds[1])
+				if (spark->x + ds > DeadlyBounds.X1 && spark->x - ds < DeadlyBounds.X2)
 				{
-					if (spark->y + ds > DeadlyBounds[2] && spark->y - ds < DeadlyBounds[3])
+					if (spark->y + ds > DeadlyBounds.Y1 && spark->y - ds < DeadlyBounds.Y2)
 					{
-						if (spark->z + ds > DeadlyBounds[4] && spark->z - ds < DeadlyBounds[5])
+						if (spark->z + ds > DeadlyBounds.Z1 && spark->z - ds < DeadlyBounds.Z2)
 						{
 							if (spark->flags & SP_FIRE)
 								LaraBurn(LaraItem);

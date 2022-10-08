@@ -174,13 +174,13 @@ namespace TEN::Entities::Generic
 			laraItem->Animation.Velocity.y > 0.0f &&
 			rope->active)
 		{
-			auto* frame = GetBoundsAccurate(laraItem);
+			auto frame = BOUNDING_BOX(laraItem);
 
 			int segment = RopeNodeCollision(
 				rope,
 				laraItem->Pose.Position.x,
-				laraItem->Pose.Position.y + frame->Y1 + 512,
-				laraItem->Pose.Position.z + frame->Z2 * phd_cos(laraItem->Pose.Orientation.y),
+				laraItem->Pose.Position.y + frame.Y1 + 512,
+				laraItem->Pose.Position.z + frame.Z2 * phd_cos(laraItem->Pose.Orientation.y),
 				laraItem->Animation.ActiveState == LS_REACH ? 128 : 320);
 
 			if (segment >= 0)

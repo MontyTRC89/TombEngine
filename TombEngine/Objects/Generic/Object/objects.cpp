@@ -23,9 +23,11 @@ int lastWaterfallY = 0;
 Vector3i TightRopePos = { 0, 0, 0 };
 OBJECT_COLLISION_BOUNDS TightRopeBounds =
 {
-	-256, 256,
-	0, 0,
-	-256, 256,
+	BOUNDING_BOX(
+		-256, 256,
+		0, 0,
+		-256, 256
+	),
 	ANGLE(-10.0f), ANGLE(10.0f),
 	ANGLE(-30.0f), ANGLE(30.0f),
 	ANGLE(-10.0f), ANGLE(10.0f)
@@ -33,9 +35,11 @@ OBJECT_COLLISION_BOUNDS TightRopeBounds =
 
 OBJECT_COLLISION_BOUNDS ParallelBarsBounds =
 {
-	-640, 640,
-	704, 832,
-	-96, 96,
+	BOUNDING_BOX(
+		-640, 640,
+		704, 832,
+		-96, 96
+	),
 	ANGLE(-10.0f), ANGLE(10.0f),
 	ANGLE(-30.0f), ANGLE(30.0f),
 	ANGLE(-10.0f), ANGLE(10.0f)

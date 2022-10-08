@@ -19,9 +19,11 @@ namespace TEN::Entities::Switches
 {
 	OBJECT_COLLISION_BOUNDS CrowDoveBounds =
 	{
-		-256, 256,
-		0, 0,
-		-512, 512,
+		BOUNDING_BOX(
+			-256, 256,
+			0, 0,
+			-512, 512
+		),
 		-ANGLE(10.0f), ANGLE(10.0f),
 		-ANGLE(30.0f), ANGLE(30.0f),
 		-ANGLE(10.0f), ANGLE(10.0f)

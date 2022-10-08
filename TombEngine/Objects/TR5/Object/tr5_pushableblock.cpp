@@ -19,9 +19,11 @@ using namespace TEN::Input;
 Vector3i PushableBlockPos = { 0, 0, 0 };
 static OBJECT_COLLISION_BOUNDS PushableBlockBounds = 
 {
-	0, 0,
-	-64, 0,
-	0, 0,
+	BOUNDING_BOX(
+		0, 0,
+		-64, 0,
+		0, 0
+	),
 	ANGLE(-10.0f), ANGLE(10.0f),
 	ANGLE(-30.0f), ANGLE(30.0f),
 	ANGLE(-10.0f), ANGLE(10.0f)
@@ -112,7 +114,7 @@ void InitialisePushableBlock(short itemNumber)
 		height = (OCB & 0x1F) * CLICK(1);
 	}
 	else
-		height = -GetBoundsAccurate(item)->Y1;
+		height = -BOUNDING_BOX(item).Y1;
 
 	info->height = height;
 
@@ -192,7 +194,7 @@ void PushableBlockControl(short itemNumber)
 		return;
 	}
 
-	int displaceBox = GetBoundsAccurate(LaraItem)->Z2 - 80; // move pushable based on bbox->Z2 of Lara
+	int displaceBox = BOUNDING_BOX(LaraItem).Z2 - 80; // move pushable based on bbox->Z2 of Lara
 
 	switch (LaraItem->Animation.AnimNumber)
 	{
@@ -467,10 +469,10 @@ void PushableBlockCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo*
 	}
 	else
 	{
-		auto* bounds = GetBoundsAccurate(pushableItem);
-		PushableBlockBounds.boundingBox.X1 = (bounds->X1 / 2) - 100;
-		PushableBlockBounds.boundingBox.X2 = (bounds->X2 / 2) + 100;
-		PushableBlockBounds.boundingBox.Z1 = bounds->Z1 - 200;
+		auto bounds = BOUNDING_BOX(pushableItem);
+		PushableBlockBounds.boundingBox.X1 = (bounds.X1 / 2) - 100;
+		PushableBlockBounds.boundingBox.X2 = (bounds.X2 / 2) + 100;
+		PushableBlockBounds.boundingBox.Z1 = bounds.Z1 - 200;
 		PushableBlockBounds.boundingBox.Z2 = 0;
 
 		short rot = pushableItem->Pose.Orientation.y;
@@ -480,9 +482,9 @@ void PushableBlockCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo*
 		{
 			unsigned short quadrant = (unsigned short)((pushableItem->Pose.Orientation.y / 0x4000) + ((rot + 0x2000) / 0x4000));
 			if (quadrant & 1)
-				PushableBlockPos.z = bounds->X1 - 35;
+				PushableBlockPos.z = bounds.X1 - 35;
 			else
-				PushableBlockPos.z = bounds->Z1 - 35;
+				PushableBlockPos.z = bounds.Z1 - 35;
 
 			if (pushableInfo->hasFloorCeiling)
 			{					

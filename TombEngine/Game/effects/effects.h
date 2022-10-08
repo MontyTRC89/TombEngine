@@ -166,7 +166,7 @@ constexpr auto SD_UWEXPLOSION = 2;
 #define MAX_SPLASHES 8
 #define NUM_EFFECTS 256
 
-extern int DeadlyBounds[6];
+extern BOUNDING_BOX DeadlyBounds;
 
 
 // New particle class

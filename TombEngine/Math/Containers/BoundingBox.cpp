@@ -1,11 +1,47 @@
 #include "framework.h"
 #include "Math/Containers/BoundingBox.h"
 
+#include "Game/animation.h"
 #include "Math/Containers/EulerAngles.h"
 #include "Math/Containers/PoseData.h"
 
 //namespace TEN::Math
 //{
+	const BOUNDING_BOX BOUNDING_BOX::Zero = BOUNDING_BOX(0, 0, 0, 0, 0, 0);
+
+	BOUNDING_BOX::BOUNDING_BOX()
+	{
+	}
+
+	BOUNDING_BOX::BOUNDING_BOX(int x1, int x2, int y1, int y2, int z1, int z2)
+	{
+		this->X1 = x1;
+		this->X2 = x2;
+		this->Y1 = y1;
+		this->Y2 = y2;
+		this->Z1 = z1;
+		this->Z2 = z2;
+	}
+	
+	BOUNDING_BOX::BOUNDING_BOX(ItemInfo* item, bool accurate)
+	{
+		int rate = 0;
+		AnimFrame* framePtr[2];
+
+		int frac = GetFrame(item, framePtr, &rate);
+		if (frac == 0 || !accurate)
+			*this = framePtr[0]->boundingBox;
+		else
+		{
+			this->X1 = framePtr[0]->boundingBox.X1 + ((framePtr[1]->boundingBox.X1 - framePtr[0]->boundingBox.X1) * (frac / rate));
+			this->X2 = framePtr[0]->boundingBox.X2 + ((framePtr[1]->boundingBox.X2 - framePtr[0]->boundingBox.X2) * (frac / rate));
+			this->Y1 = framePtr[0]->boundingBox.Y1 + ((framePtr[1]->boundingBox.Y1 - framePtr[0]->boundingBox.Y1) * (frac / rate));
+			this->Y2 = framePtr[0]->boundingBox.Y2 + ((framePtr[1]->boundingBox.Y2 - framePtr[0]->boundingBox.Y2) * (frac / rate));
+			this->Z1 = framePtr[0]->boundingBox.Z1 + ((framePtr[1]->boundingBox.Z1 - framePtr[0]->boundingBox.Z1) * (frac / rate));
+			this->Z2 = framePtr[0]->boundingBox.Z2 + ((framePtr[1]->boundingBox.Z2 - framePtr[0]->boundingBox.Z2) * (frac / rate));
+		}
+	}
+
 	int BOUNDING_BOX::GetWidth() const
 	{
 		return abs(X2 - X1);

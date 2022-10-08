@@ -19,9 +19,11 @@ namespace TEN::Entities::Switches
 {
 	OBJECT_COLLISION_BOUNDS CogSwitchBounds =
 	{
-		-512, 512,
-		0, 0,
-		-1536, -512,
+		BOUNDING_BOX(
+			-512, 512,
+			0, 0,
+			-1536, -512
+		),
 		-ANGLE(10.0f), ANGLE(10.0f),
 		-ANGLE(30.0f), ANGLE(30.0f),
 		-ANGLE(10.0f), ANGLE(10.0f)

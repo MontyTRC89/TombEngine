@@ -298,8 +298,8 @@ bool TestWithGlobalCollisionBounds(ItemInfo* item, ItemInfo* laraItem, Collision
 
 void TestForObjectOnLedge(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* bounds = GetBoundsAccurate(item);
-	int height = abs(bounds->Y2 + bounds->Y1);
+	auto bounds = BOUNDING_BOX(item);
+	int height = abs(bounds.Y2 + bounds.Y1);
 
 	for (int i = 0; i < 3; i++)
 	{
@@ -332,7 +332,7 @@ void TestForObjectOnLedge(ItemInfo* item, CollisionInfo* coll)
 
 				if (Vector3i::Distance(item->Pose.Position, item2->Pose.Position) < COLLISION_CHECK_DISTANCE)
 				{
-					auto box = GetBoundsAccurate(item2)->ToBoundingOrientedBox(item2->Pose);
+					auto box = BOUNDING_BOX(item2).ToBoundingOrientedBox(item2->Pose);
 					float distance;
 
 					if (box.Intersects(origin, direction, distance) && distance < (coll->Setup.Radius * 2))
@@ -490,8 +490,8 @@ bool ItemNearLara(Vector3i* origin, int radius)
 	if (!ItemInRange(target.x, target.z, radius))
 		return false;
 
-	auto* bounds = GetBoundsAccurate(LaraItem);
-	if (target.y >= bounds->Y1 && target.y <= (bounds->Y2 + LARA_RADIUS))
+	auto bounds = BOUNDING_BOX(LaraItem);
+	if (target.y >= bounds.Y1 && target.y <= (bounds.Y2 + LARA_RADIUS))
 		return true;
 
 	return false;
@@ -510,8 +510,8 @@ bool ItemNearTarget(Vector3i* origin, ItemInfo* targetEntity, int radius)
 	if (!ItemInRange(pos.x, pos.z, radius))
 		return false;
 
-	auto* bounds = GetBoundsAccurate(targetEntity);
-	if (pos.y >= bounds->Y1 && pos.y <= bounds->Y2)
+	auto bounds = BOUNDING_BOX(targetEntity);
+	if (pos.y >= bounds.Y1 && pos.y <= bounds.Y2)
 		return true;
 
 	return false;
@@ -866,8 +866,8 @@ bool CollideSolidBounds(ItemInfo* item, BOUNDING_BOX* box, PoseData pose, Collis
 	auto staticBounds = box->ToBoundingOrientedBox(pose);
 
 	// Get local TR bounds and DX item bounds in global coordinates.
-	auto* itemBBox = GetBoundsAccurate(item);
-	auto itemBounds = itemBBox->ToBoundingOrientedBox(item->Pose);
+	auto itemBBox = BOUNDING_BOX(item);
+	auto itemBounds = itemBBox.ToBoundingOrientedBox(item->Pose);
 
 	// Extend bounds a bit for visual testing.
 	itemBounds.Extents = itemBounds.Extents + Vector3(SECTOR(1));
@@ -893,8 +893,8 @@ bool CollideSolidBounds(ItemInfo* item, BOUNDING_BOX* box, PoseData pose, Collis
 	// Water mode needs special processing because height calculation in original engines is inconsistent in such cases.
 	if (TestEnvironment(ENV_FLAG_WATER, item))
 	{
-		collBox.Y1 = itemBBox->Y1;
-		collBox.Y2 = itemBBox->Y2;
+		collBox.Y1 = itemBBox.Y1;
+		collBox.Y2 = itemBBox.Y2;
 	}
 	else
 	{
@@ -1175,8 +1175,8 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 	auto prevPointProbe = GetCollision(x, y, z, item->RoomNumber);
 	auto pointProbe = GetCollision(item);
 
-	auto* bounds = GetBoundsAccurate(item);
-	int radius = bounds->GetHeight();
+	auto bounds = BOUNDING_BOX(item);
+	int radius = bounds.GetHeight();
 
 	item->Pose.Position.y += radius;
 

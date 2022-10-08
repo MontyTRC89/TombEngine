@@ -92,8 +92,6 @@ bool GetStateDispatch(ItemInfo* item, const AnimData& anim);
 int GetFrame(ItemInfo* item, AnimFrame* framePtr[], int* rate);
 AnimFrame* GetBestFrame(ItemInfo* item);
 
-BOUNDING_BOX* GetBoundsAccurate(ItemInfo* item);
-
 void ClampRotation(PoseData* pose, short angle, short rotation); 
 void DrawAnimatingItem(ItemInfo* item);
 

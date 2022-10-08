@@ -20,22 +20,22 @@ void GenSlot1Control(short itemNumber)
 		{
 			GetLaraDeadlyBounds();
 
-			DeadlyBounds[0] -= 350;
-			DeadlyBounds[1] += 350;
-			DeadlyBounds[4] -= 350;
-			DeadlyBounds[5] += 350;
+			DeadlyBounds.X1 -= 350;
+			DeadlyBounds.X2 += 350;
+			DeadlyBounds.Z1 -= 350;
+			DeadlyBounds.Z2 += 350;
 
 			bool found = false;
 			for (int i = 0; i < 6; i++)
 			{
 				auto pos = GetJointPosition(item, i + 1, Vector3i(0, -350, 0));
 
-				if (pos.x > DeadlyBounds[0] &&
-					pos.x < DeadlyBounds[1] &&
-					pos.y > DeadlyBounds[2] &&
-					pos.y < DeadlyBounds[3] &&
-					pos.z > DeadlyBounds[4] &&
-					pos.z < DeadlyBounds[5])
+				if (pos.x > DeadlyBounds.X1 &&
+					pos.x < DeadlyBounds.X2 &&
+					pos.y > DeadlyBounds.Y1 &&
+					pos.y < DeadlyBounds.Y2 &&
+					pos.z > DeadlyBounds.Z1 &&
+					pos.z < DeadlyBounds.Z2)
 				{
 					found = true;
 				}

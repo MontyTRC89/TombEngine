@@ -117,11 +117,11 @@ void TriggerElectricitySparks(ItemInfo* item, int joint, int flame)
 		TriggerFireFlame(pos.x, pos.y, pos.z, -1, 254);
 }
 
-static bool ElectricityWireCheckDeadlyBounds(Vector3i* pos, short delta)
+bool ElectricityWireCheckDeadlyBounds(Vector3i* pos, short delta)
 {
-	if (pos->x + delta >= DeadlyBounds[0] && pos->x - delta <= DeadlyBounds[1] &&
-		pos->y + delta >= DeadlyBounds[2] && pos->y - delta <= DeadlyBounds[3] &&
-		pos->z + delta >= DeadlyBounds[4] && pos->z - delta <= DeadlyBounds[5])
+	if ((pos->x + delta) >= DeadlyBounds.X1 && (pos->x - delta) <= DeadlyBounds.X2 &&
+		(pos->y + delta) >= DeadlyBounds.Y1 && (pos->y - delta) <= DeadlyBounds.Y2 &&
+		(pos->z + delta) >= DeadlyBounds.Z1 && (pos->z - delta) <= DeadlyBounds.Z2)
 	{
 		return true;
 	}
@@ -144,7 +144,7 @@ void ElectricityWiresControl(short itemNumber)
 
 	auto* object = &Objects[item->ObjectNumber];
 
-	auto cableBox = GetBoundsAccurate(item)->ToBoundingOrientedBox(item->Pose);
+	auto cableBox = BOUNDING_BOX(item).ToBoundingOrientedBox(item->Pose);
 	auto cableBottomPlane = cableBox.Center.y + cableBox.Extents.y - CLICK(1);
 
 	int currentEndNode = 0;
@@ -189,7 +189,7 @@ void ElectricityWiresControl(short itemNumber)
 			continue;
 
 		bool isWaterNearby = false;
-		auto npcBox = GetBoundsAccurate(collItem)->ToBoundingOrientedBox(collItem->Pose);
+		auto npcBox = BOUNDING_BOX(collItem).ToBoundingOrientedBox(collItem->Pose);
 
 		for (int i = 0; i < object->nmeshes; i++)
 		{

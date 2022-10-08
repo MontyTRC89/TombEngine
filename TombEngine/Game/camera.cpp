@@ -1440,10 +1440,10 @@ void CalculateCamera()
 		fixedCamera = false;
 	}
 
-	auto* bounds = GetBoundsAccurate(item);
+	auto bounds = BOUNDING_BOX(item);
 
 	int x;
-	int y = item->Pose.Position.y + bounds->Y2 + (3 * (bounds->Y1 - bounds->Y2) / 4);
+	int y = item->Pose.Position.y + bounds.Y2 + (3 * (bounds.Y1 - bounds.Y2) / 4);
 	int z;
 
 	if (Camera.item)
@@ -1454,8 +1454,8 @@ void CalculateCamera()
 			auto dz = Camera.item->Pose.Position.z - item->Pose.Position.z;
 			int shift = sqrt(pow(dx, 2) + pow(dz, 2));
 			short angle = phd_atan(dz, dx) - item->Pose.Orientation.y;
-			short tilt = phd_atan(shift, y - (bounds->Y1 + bounds->Y2) / 2 - Camera.item->Pose.Position.y);
-			bounds = GetBoundsAccurate(Camera.item);
+			short tilt = phd_atan(shift, y - (bounds.Y1 + bounds.Y2) / 2 - Camera.item->Pose.Position.y);
+			bounds = BOUNDING_BOX(Camera.item);
 			angle /= 2;
 			tilt /= 2;
 
@@ -1530,7 +1530,7 @@ void CalculateCamera()
 
 		if (Camera.flags == CF_FOLLOW_CENTER)	//Troye Aug. 7th 2022
 		{
-			auto shift = (bounds->Z1 + bounds->Z2) / 2;
+			auto shift = (bounds.Z1 + bounds.Z2) / 2;
 			x += shift * phd_sin(item->Pose.Orientation.y);
 			z += shift * phd_cos(item->Pose.Orientation.y);
 		}
@@ -1789,7 +1789,7 @@ static bool CheckItemCollideCamera(ItemInfo* item)
 		return false;
 
 	// Check extents, if any 2 bounds are smaller than threshold, discard.
-	auto extents = GetBoundsAccurate(item)->ToBoundingOrientedBox(item->Pose).Extents;
+	auto extents = BOUNDING_BOX(item).ToBoundingOrientedBox(item->Pose).Extents;
 	if ((abs(extents.x) < COLL_DISCARD_THRESHOLD && abs(extents.y) < COLL_DISCARD_THRESHOLD) ||
 		(abs(extents.x) < COLL_DISCARD_THRESHOLD && abs(extents.z) < COLL_DISCARD_THRESHOLD) ||
 		(abs(extents.y) < COLL_DISCARD_THRESHOLD && abs(extents.z) < COLL_DISCARD_THRESHOLD))
@@ -1893,13 +1893,13 @@ void ItemsCollideCamera()
 		if (dx > COLL_CANCEL_THRESHOLD || dz > COLL_CANCEL_THRESHOLD || dy > COLL_CANCEL_THRESHOLD)
 			continue;
 
-		auto* bounds = GetBoundsAccurate(item);
-		if (TestBoundsCollideCamera(*bounds, item->Pose, CAMERA_RADIUS))
-			ItemPushCamera(bounds, &item->Pose, rad);
+		auto bounds = BOUNDING_BOX(item);
+		if (TestBoundsCollideCamera(bounds, item->Pose, CAMERA_RADIUS))
+			ItemPushCamera(&bounds, &item->Pose, rad);
 
 #ifdef _DEBUG
 		TEN::Renderer::g_Renderer.AddDebugBox(
-			bounds->ToBoundingOrientedBox(item->Pose),
+			bounds.ToBoundingOrientedBox(item->Pose),
 			Vector4(1.0f, 0.0f, 0.0f, 1.0f),
 			RENDERER_DEBUG_PAGE::DIMENSION_STATS);
 #endif

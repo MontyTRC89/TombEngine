@@ -34,8 +34,8 @@ namespace TEN::Entities::TR4
 	ContainmentType TestBoundsCollideTeethSpikes(ItemInfo* item, ItemInfo* collidingItem)
 	{
 		// Get both teeth spikes and colliding item bounds.
-		auto spikeBox = GetBoundsAccurate(item)->ToBoundingOrientedBox(item->Pose);
-		auto itemBox = GetBoundsAccurate(collidingItem)->ToBoundingOrientedBox(collidingItem->Pose);
+		auto spikeBox = BOUNDING_BOX(item).ToBoundingOrientedBox(item->Pose);
+		auto itemBox = BOUNDING_BOX(collidingItem).ToBoundingOrientedBox(collidingItem->Pose);
 
 		// Make intersection more forgiving by slightly reducing spike bounds.
 		spikeBox.Extents = spikeBox.Extents * TEETH_SPIKE_BOUNDS_TOLERANCE_RATIO;

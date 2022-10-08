@@ -497,9 +497,9 @@ namespace TEN::Entities::Creatures::TR5
 									{
 										int someIndex = 0;
 
-										auto* bounds = GetBoundsAccurate(LaraItem);
-										BOUNDING_BOX tBounds = {};
-										tBounds.RotNoPersp(LaraItem->Pose.Orientation, *bounds);
+										auto bounds = BOUNDING_BOX(LaraItem);
+										auto tBounds = BOUNDING_BOX::Zero;
+										tBounds.RotNoPersp(LaraItem->Pose.Orientation, bounds);
 
 										int x1 = LaraItem->Pose.Position.x + tBounds.X1;
 										int x2 = LaraItem->Pose.Position.x + tBounds.X2;
@@ -508,9 +508,9 @@ namespace TEN::Entities::Creatures::TR5
 										int z1 = LaraItem->Pose.Position.z + tBounds.Z1;
 										int z2 = LaraItem->Pose.Position.z + tBounds.Z2;
 
-										int xc = LaraItem->Pose.Position.x + ((bounds->X1 + bounds->X2) / 2);
-										int yc = LaraItem->Pose.Position.y + ((bounds->Y1 + bounds->Y2) / 2);
-										int zc = LaraItem->Pose.Position.z + ((bounds->Z1 + bounds->Z2) / 2);
+										int xc = LaraItem->Pose.Position.x + ((bounds.X1 + bounds.X2) / 2);
+										int yc = LaraItem->Pose.Position.y + ((bounds.Y1 + bounds.Y2) / 2);
+										int zc = LaraItem->Pose.Position.z + ((bounds.Z1 + bounds.Z2) / 2);
 
 										int distance = sqrt(pow(xc - origin.x, 2) + pow(yc - origin.y, 2) + pow(zc - origin.z, 2));
 

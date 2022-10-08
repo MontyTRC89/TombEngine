@@ -101,8 +101,8 @@ void DropEntityPickups(ItemInfo* item)
 		pickup->Pose.Position.z = (item->Pose.Position.z & -CLICK(1)) | CLICK(1);
 
 		pickup->Pose.Position.y = GetCollision(pickup->Pose.Position.x, item->Pose.Position.y, pickup->Pose.Position.z, item->RoomNumber).Position.Floor;
-		auto* bounds = GetBoundsAccurate(pickup);
-		pickup->Pose.Position.y -= bounds->Y2;
+		auto bounds = BOUNDING_BOX(pickup);
+		pickup->Pose.Position.y -= bounds.Y2;
 
 		ItemNewRoom(pickupNumber, item->RoomNumber);
 		pickup->Flags |= 32;
@@ -471,9 +471,9 @@ int CreatureAnimation(short itemNumber, short angle, short tilt)
 		return false;
 	}
 
-	auto* bounds = GetBoundsAccurate(item);
+	auto bounds = BOUNDING_BOX(item);
 
-	int y = item->Pose.Position.y + bounds->Y1;
+	int y = item->Pose.Position.y + bounds.Y1;
 
 	short roomNumber = item->RoomNumber;
 	GetFloor(prevPos.x, y, prevPos.z, &roomNumber);  
@@ -662,7 +662,7 @@ int CreatureAnimation(short itemNumber, short angle, short tilt)
 				if (item->ObjectNumber == ID_WHALE)
 					top = CLICK(0.5f);
 				else
-					top = bounds->Y1;
+					top = bounds.Y1;
 
 				if (item->Pose.Position.y + top + dy < ceiling)
 				{
@@ -724,7 +724,7 @@ int CreatureAnimation(short itemNumber, short angle, short tilt)
 		if (LOT->IsMonkeying)
 		{
 			ceiling = GetCeiling(floor, item->Pose.Position.x, y, item->Pose.Position.z);
-			item->Pose.Position.y = ceiling - bounds->Y1;
+			item->Pose.Position.y = ceiling - bounds.Y1;
 		}
 		else
 		{
@@ -745,7 +745,7 @@ int CreatureAnimation(short itemNumber, short angle, short tilt)
 		if (item->ObjectNumber == ID_TYRANNOSAUR || item->ObjectNumber == ID_SHIVA || item->ObjectNumber == ID_MUTANT2)
 			top = CLICK(3);
 		else
-			top = bounds->Y1; // TODO: check if Y1 or Y2
+			top = bounds.Y1; // TODO: check if Y1 or Y2
 
 		if (item->Pose.Position.y + top < ceiling)
 			item->Pose.Position = prevPos;
@@ -782,10 +782,10 @@ void CreatureSwitchRoom(short itemNumber)
 	if (!Objects[item->ObjectNumber].waterCreature &&
 		TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, &g_Level.Rooms[roomNumber]))
 	{
-		auto bounds = GetBoundsAccurate(item);
+		auto bounds = BOUNDING_BOX(item);
 		auto height = item->Pose.Position.y - GetWaterHeight(item);
 
-		if (abs(bounds->Y1 + bounds->Y2) < height)
+		if (abs(bounds.Y1 + bounds.Y2) < height)
 			DoDamage(item, INT_MAX);
 	}
 }
@@ -1463,9 +1463,9 @@ void CreatureAIInfo(ItemInfo* item, AI_INFO* AI)
 	else
 	{
 		auto probe = GetCollision(floor, enemy->Pose.Position.x, enemy->Pose.Position.y, enemy->Pose.Position.z);
-		auto bounds = GetBoundsAccurate(item);
+		auto bounds = BOUNDING_BOX(item);
 
-		reachable = abs(enemy->Pose.Position.y - probe.Position.Floor) < bounds->GetHeight();
+		reachable = abs(enemy->Pose.Position.y - probe.Position.Floor) < bounds.GetHeight();
 	}
 
 	if (floor && reachable)

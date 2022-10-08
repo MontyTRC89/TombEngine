@@ -1345,7 +1345,6 @@ void lara_col_turn_left_slow(ItemInfo* item, CollisionInfo* coll)
 void lara_as_death(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
-	auto* bounds = GetBoundsAccurate(item);
 
 	item->Animation.Velocity.z = 0.0f;
 	lara->Control.CanLook = false;
@@ -1361,7 +1360,8 @@ void lara_as_death(ItemInfo* item, CollisionInfo* coll)
 		lara->Inventory.IsBusy = false;
 	}
 
-	if (bounds->GetHeight() <= (LARA_HEIGHT * 0.75f))
+	auto bounds = BOUNDING_BOX(item);
+	if (bounds.GetHeight() <= (LARA_HEIGHT * 0.75f))
 		AlignLaraToSurface(item);
 
 	ModulateLaraTurnRateY(item, 0, 0, 0);

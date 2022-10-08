@@ -870,7 +870,7 @@ short GetNearestLedgeAngle(ItemInfo* item, CollisionInfo* coll, float& distance)
 		return 0; 
 
 	// Get item bounds and current rotation.
-	auto bounds = GetBoundsAccurate(item);
+	auto bounds = BOUNDING_BOX(item);
 	auto c = phd_cos(coll->Setup.ForwardAngle);
 	auto s = phd_sin(coll->Setup.ForwardAngle);
 
@@ -881,9 +881,9 @@ short GetNearestLedgeAngle(ItemInfo* item, CollisionInfo* coll, float& distance)
 
 	// Determine two Y points to test (lower and higher).
 	// 1/10 headroom crop is needed to avoid possible issues with tight diagonal headrooms.
-	int headroom = bounds->GetHeight() / 20.0f;
-	int yPoints[2] = { item->Pose.Position.y + bounds->Y1 + headroom,
-					   item->Pose.Position.y + bounds->Y2 - headroom };
+	int headroom = bounds.GetHeight() / 20.0f;
+	int yPoints[2] = { item->Pose.Position.y + bounds.Y1 + headroom,
+					   item->Pose.Position.y + bounds.Y2 - headroom };
 
 	// Prepare test data.
 	float finalDistance[2] = { FLT_MAX, FLT_MAX };
@@ -997,8 +997,8 @@ short GetNearestLedgeAngle(ItemInfo* item, CollisionInfo* coll, float& distance)
 			if (bridge >= 0)
 			{
 				// Get and test DX item coll bounds.
-				auto bounds = GetBoundsAccurate(&g_Level.Items[bridge]);
-				auto dxBounds = bounds->ToBoundingOrientedBox(g_Level.Items[bridge].Pose);
+				auto bounds = BOUNDING_BOX(&g_Level.Items[bridge]);
+				auto dxBounds = bounds.ToBoundingOrientedBox(g_Level.Items[bridge].Pose);
 
 				// Decompose bounds into planes.
 				Vector3 corners[8];
@@ -1199,8 +1199,8 @@ int GetDistanceToFloor(int itemNumber, bool precise)
 	auto height = GetFloorHeight(probe.Block, item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z);
 	probe.Block->AddItem(itemNumber);
 
-	auto bounds = GetBoundsAccurate(item);
-	int minHeight = precise ? bounds->Y2 : 0;
+	auto bounds = BOUNDING_BOX(item);
+	int minHeight = precise ? bounds.Y2 : 0;
 
 	return (minHeight + item->Pose.Position.y - height);
 }

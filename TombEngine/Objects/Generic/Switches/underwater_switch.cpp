@@ -16,9 +16,11 @@ namespace TEN::Entities::Switches
 { 
 	OBJECT_COLLISION_BOUNDS UnderwaterSwitchBounds =
 	{
-		-1024, 1024,
-		-1024, 1024,
-		-1024, 512,
+		BOUNDING_BOX(
+			-1024, 1024,
+			-1024, 1024,
+			-1024, 512
+		),
 		-ANGLE(80.0f), ANGLE(80.0f),
 		-ANGLE(80.0f), ANGLE(80.0f),
 		-ANGLE(80.0f), ANGLE(80.0f)
@@ -27,9 +29,11 @@ namespace TEN::Entities::Switches
 
 	OBJECT_COLLISION_BOUNDS CeilingUnderwaterSwitchBounds1 =
 	{
-		-256, 256,
-		-1280, -512,
-		-512, 0,
+		BOUNDING_BOX(
+			-256, 256,
+			-1280, -512,
+			-512, 0
+		),
 		-ANGLE(80.0f), ANGLE(80.0f),
 		-ANGLE(80.0f), ANGLE(80.0f),
 		-ANGLE(80.0f), ANGLE(80.0f)
@@ -38,9 +42,11 @@ namespace TEN::Entities::Switches
 
 	OBJECT_COLLISION_BOUNDS CeilingUnderwaterSwitchBounds2 =
 	{
-		-256, 256,
-		-1280, -512,
-		0, 512,
+		BOUNDING_BOX(
+			-256, 256,
+			-1280, -512,
+			0, 512
+		),
 		-ANGLE(80.0f), ANGLE(80.0f),
 		-ANGLE(80.0f), ANGLE(80.0f),
 		-ANGLE(80.0f), ANGLE(80.0f)

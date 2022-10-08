@@ -425,16 +425,18 @@ void LaraSnapToHeight(ItemInfo* item, CollisionInfo* coll)
 
 void GetLaraDeadlyBounds()
 {
-	auto* bounds = GetBoundsAccurate(LaraItem);
-	BOUNDING_BOX tBounds = {};
-	tBounds.RotNoPersp(LaraItem->Pose.Orientation, *bounds);
+	auto bounds = BOUNDING_BOX(LaraItem);
+	auto tBounds = BOUNDING_BOX::Zero;
+	tBounds.RotNoPersp(LaraItem->Pose.Orientation, bounds);
 
-	DeadlyBounds[0] = LaraItem->Pose.Position.x + tBounds.X1;
-	DeadlyBounds[1] = LaraItem->Pose.Position.x + tBounds.X2;
-	DeadlyBounds[2] = LaraItem->Pose.Position.y + tBounds.Y1;
-	DeadlyBounds[3] = LaraItem->Pose.Position.y + tBounds.Y2;
-	DeadlyBounds[4] = LaraItem->Pose.Position.z + tBounds.Z1;
-	DeadlyBounds[5] = LaraItem->Pose.Position.z + tBounds.Z2;
+	DeadlyBounds = BOUNDING_BOX(
+		LaraItem->Pose.Position.x + tBounds.X1,
+		LaraItem->Pose.Position.x + tBounds.X2,
+		LaraItem->Pose.Position.y + tBounds.Y1,
+		LaraItem->Pose.Position.y + tBounds.Y2,
+		LaraItem->Pose.Position.z + tBounds.Z1,
+		LaraItem->Pose.Position.z + tBounds.Z2
+	);
 }
 
 void LaraJumpCollision(ItemInfo* item, CollisionInfo* coll, short moveAngle)

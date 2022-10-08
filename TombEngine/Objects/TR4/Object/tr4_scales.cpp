@@ -17,9 +17,11 @@ using namespace TEN::Entities::TR4;
 
 OBJECT_COLLISION_BOUNDS ScalesBounds =
 {
-	-1408, -1408,
-	0, 0,
-	-512, 512,
+	BOUNDING_BOX(
+		-1408, -1408,
+		0, 0,
+		-512, 512
+	),
 	ANGLE(-10.0f), ANGLE(10.0f),
 	ANGLE(-30.0f), ANGLE(30.0f),
 	ANGLE(-10.0f), ANGLE(10.0f)

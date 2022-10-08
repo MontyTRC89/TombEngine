@@ -27,8 +27,8 @@ void ShootAtLara(FX_INFO *fx)
 	int y = LaraItem->Pose.Position.y - fx->pos.Position.y;
 	int z = LaraItem->Pose.Position.z - fx->pos.Position.z;
 
-	auto* bounds = GetBoundsAccurate(LaraItem);
-	y += bounds->Y2 + (bounds->Y1 - bounds->Y2) * 0.75f;
+	auto bounds = BOUNDING_BOX(LaraItem);
+	y += bounds.Y2 + (bounds.Y1 - bounds.Y2) * 0.75f;
 
 	int distance = sqrt(pow(x, 2) + pow(z, 2));
 	fx->pos.Orientation.x = -phd_atan(distance, y);

@@ -51,9 +51,11 @@ namespace TEN::Entities::Generic
 
 	OBJECT_COLLISION_BOUNDS VPoleBounds = 
 	{
-		-CLICK(1), CLICK(1),
-		0, 0, 
-		-CLICK(2), CLICK(2),
+		BOUNDING_BOX(
+			-CLICK(1), CLICK(1),
+			0, 0, 
+			-CLICK(2), CLICK(2)
+		),
 		ANGLE(-10.0f), ANGLE(10.0f),
 		ANGLE(-30.0f), ANGLE(30.0f),
 		ANGLE(-10.0f), ANGLE(10.0f)

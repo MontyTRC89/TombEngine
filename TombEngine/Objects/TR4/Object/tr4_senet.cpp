@@ -22,9 +22,11 @@ char ActivePiece = -1;
 static Vector3i GameStixPosition = { 0, 0, -100 };
 OBJECT_COLLISION_BOUNDS GameStixBounds =
 {
-	-256, 256,
-	-200, 200,
-	-256, 256,
+	BOUNDING_BOX(
+		-256, 256,
+		-200, 200,
+		-256, 256
+	),
 	ANGLE(-10.0f), ANGLE(10.0f),
 	ANGLE(-30.0f), ANGLE(30.0f),
 	0, 0

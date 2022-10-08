@@ -193,7 +193,7 @@ bool TestLaraHang(ItemInfo* item, CollisionInfo* coll)
 			if (stopped && hdif > 0 && climbDirection != 0 && (climbDirection > 0 == coll->MiddleLeft.Floor > coll->MiddleRight.Floor))
 				stopped = false;
 
-			auto verticalShift = coll->Front.Floor - GetBoundsAccurate(item)->Y1;
+			auto verticalShift = coll->Front.Floor - BOUNDING_BOX(item).Y1;
 			auto x = item->Pose.Position.x;
 			auto z = item->Pose.Position.z;
 
@@ -249,7 +249,7 @@ bool TestLaraHang(ItemInfo* item, CollisionInfo* coll)
 		{
 			SetAnimation(item, LA_JUMP_UP, 9);
 			item->Pose.Position.x += coll->Shift.x;
-			item->Pose.Position.y += GetBoundsAccurate(item)->Y2 * 1.8f;
+			item->Pose.Position.y += BOUNDING_BOX(item).Y2 * 1.8f;
 			item->Pose.Position.z += coll->Shift.z;
 			item->Animation.IsAirborne = true;
 			item->Animation.Velocity.z = 2;
@@ -307,14 +307,14 @@ bool TestLaraHangJump(ItemInfo* item, CollisionInfo* coll)
 	else
 		SetAnimation(item, LA_REACH_TO_HANG);
 
-	auto bounds = GetBoundsAccurate(item);
+	auto bounds = BOUNDING_BOX(item);
 	if (edgeCatch <= 0)
 	{
-		item->Pose.Position.y = edge - bounds->Y1 - 20;
+		item->Pose.Position.y = edge - bounds.Y1 - 20;
 		item->Pose.Orientation.y = coll->NearestLedgeAngle;
 	}
 	else
-		item->Pose.Position.y += coll->Front.Floor - bounds->Y1 - 20;
+		item->Pose.Position.y += coll->Front.Floor - bounds.Y1 - 20;
 
 	if (ladder)
 		SnapItemToGrid(item, coll); // HACK: until fragile ladder code is refactored, we must exactly snap to grid.
@@ -364,11 +364,11 @@ bool TestLaraHangJumpUp(ItemInfo* item, CollisionInfo* coll)
 
 	SetAnimation(item, LA_REACH_TO_HANG, 12);
 
-	auto bounds = GetBoundsAccurate(item);
+	auto bounds = BOUNDING_BOX(item);
 	if (edgeCatch <= 0)
-		item->Pose.Position.y = edge - bounds->Y1 + 4;
+		item->Pose.Position.y = edge - bounds.Y1 + 4;
 	else
-		item->Pose.Position.y += coll->Front.Floor - bounds->Y1;
+		item->Pose.Position.y += coll->Front.Floor - bounds.Y1;
 
 	if (ladder)
 		SnapItemToGrid(item, coll); // HACK: until fragile ladder code is refactored, we must exactly snap to grid.
@@ -385,12 +385,12 @@ bool TestLaraHangJumpUp(ItemInfo* item, CollisionInfo* coll)
 
 int TestLaraEdgeCatch(ItemInfo* item, CollisionInfo* coll, int* edge)
 {
-	BOUNDING_BOX* bounds = GetBoundsAccurate(item);
-	int heightDif = coll->Front.Floor - bounds->Y1;
+	auto bounds = BOUNDING_BOX(item);
+	int heightDif = coll->Front.Floor - bounds.Y1;
 
 	if (heightDif < 0 == heightDif + item->Animation.Velocity.y < 0)
 	{
-		heightDif = item->Pose.Position.y + bounds->Y1;
+		heightDif = item->Pose.Position.y + bounds.Y1;
 
 		if ((heightDif + (int)round(item->Animation.Velocity.y) & 0xFFFFFF00) != (heightDif & 0xFFFFFF00))
 		{
@@ -486,7 +486,7 @@ bool TestLaraHangOnClimbableWall(ItemInfo* item, CollisionInfo* coll)
 		break;
 	}
 
-	auto bounds = GetBoundsAccurate(item);
+	auto bounds = BOUNDING_BOX(item);
 
 	if (lara->Control.MoveAngle != item->Pose.Orientation.y)
 	{
@@ -497,10 +497,10 @@ bool TestLaraHangOnClimbableWall(ItemInfo* item, CollisionInfo* coll)
 			return false;
 	}
 
-	if (LaraTestClimbPos(item, LARA_RADIUS, LARA_RADIUS, bounds->Y1, bounds->GetHeight(), &shift) &&
-		LaraTestClimbPos(item, LARA_RADIUS, -LARA_RADIUS, bounds->Y1, bounds->GetHeight(), &shift))
+	if (LaraTestClimbPos(item, LARA_RADIUS, LARA_RADIUS, bounds.Y1, bounds.GetHeight(), &shift) &&
+		LaraTestClimbPos(item, LARA_RADIUS, -LARA_RADIUS, bounds.Y1, bounds.GetHeight(), &shift))
 	{
-		result = LaraTestClimbPos(item, LARA_RADIUS, 0, bounds->Y1, bounds->GetHeight(), &shift);
+		result = LaraTestClimbPos(item, LARA_RADIUS, 0, bounds.Y1, bounds.GetHeight(), &shift);
 		if (result)
 		{
 			if (result != 1)
@@ -573,13 +573,13 @@ CornerType TestLaraHangCorner(ItemInfo* item, CollisionInfo* coll, float testAng
 	if (cornerResult.Success)
 	{
 		// Get bounding box height for further ledge height calculations
-		auto bounds = GetBoundsAccurate(item);
+		auto bounds = BOUNDING_BOX(item);
 
 		// Store next position
 		item->Pose = cornerResult.RealPositionResult;
 		lara->NextCornerPos.Position = Vector3i(
 			item->Pose.Position.x,
-			GetCollision(item, item->Pose.Orientation.y, coll->Setup.Radius + 16, -(coll->Setup.Height + CLICK(0.5f))).Position.Floor + abs(bounds->Y1),
+			GetCollision(item, item->Pose.Orientation.y, coll->Setup.Radius + 16, -(coll->Setup.Height + CLICK(0.5f))).Position.Floor + abs(bounds.Y1),
 			item->Pose.Position.z
 		);
 		lara->NextCornerPos.Orientation.y = item->Pose.Orientation.y;
@@ -632,12 +632,12 @@ CornerType TestLaraHangCorner(ItemInfo* item, CollisionInfo* coll, float testAng
 	if (cornerResult.Success)
 	{
 		// Get bounding box height for further ledge height calculations
-		auto bounds = GetBoundsAccurate(item);
+		auto bounds = BOUNDING_BOX(item);
 
 		// Store next position
 		item->Pose = cornerResult.RealPositionResult;
 		lara->NextCornerPos.Position.x = item->Pose.Position.x;
-		lara->NextCornerPos.Position.y = GetCollision(item, item->Pose.Orientation.y, coll->Setup.Radius * 2, -(abs(bounds->Y1) + LARA_HEADROOM)).Position.Floor + abs(bounds->Y1);
+		lara->NextCornerPos.Position.y = GetCollision(item, item->Pose.Orientation.y, coll->Setup.Radius * 2, -(abs(bounds.Y1) + LARA_HEADROOM)).Position.Floor + abs(bounds.Y1);
 		lara->NextCornerPos.Position.z = item->Pose.Position.z;
 		lara->NextCornerPos.Orientation.y = item->Pose.Orientation.y;
 		lara->Control.MoveAngle = item->Pose.Orientation.y;
@@ -2540,7 +2540,7 @@ bool TestLaraPoleCollision(ItemInfo* item, CollisionInfo* coll, bool goingUp, fl
 	if (GetCollidedObjects(item, SECTOR(1), true, CollidedItems, nullptr, false) &&
 		CollidedItems[0] != nullptr)
 	{
-		auto laraBox = GetBoundsAccurate(item)->ToBoundingOrientedBox(item->Pose);
+		auto laraBox = BOUNDING_BOX(item).ToBoundingOrientedBox(item->Pose);
 
 		// HACK: Because Core implemented upward pole movement as a SetPosition command, we can't precisely
 		// check her position. So we add a fixed height offset.
@@ -2565,7 +2565,7 @@ bool TestLaraPoleCollision(ItemInfo* item, CollisionInfo* coll, bool goingUp, fl
 			if (object->ObjectNumber != ID_POLEROPE)
 				continue;
 
-			auto poleBox = GetBoundsAccurate(object)->ToBoundingOrientedBox(object->Pose);
+			auto poleBox = BOUNDING_BOX(object).ToBoundingOrientedBox(object->Pose);
 			poleBox.Extents = poleBox.Extents + Vector3(coll->Setup.Radius, 0.0f, coll->Setup.Radius);
 
 			//g_Renderer.AddDebugBox(poleBox, Vector4(0, 0, 1, 1), RENDERER_DEBUG_PAGE::LOGIC_STATS);
