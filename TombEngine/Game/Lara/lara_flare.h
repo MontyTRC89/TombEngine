@@ -3,7 +3,7 @@
 
 struct CollisionInfo;
 struct ItemInfo;
-struct Vector3i;
+class Vector3i;
 enum GAME_OBJECT_ID : short;
 
 void FlareControl(short itemNumber);

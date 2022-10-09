@@ -6,8 +6,9 @@ class Pose;
 
 //namespace TEN::Math
 //{
-	struct BOUNDING_BOX
+	class BOUNDING_BOX
 	{
+	public:
 		// Components
 		short X1, X2 = 0;
 		short Y1, Y2 = 0;

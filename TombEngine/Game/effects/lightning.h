@@ -6,7 +6,7 @@
 
 using std::vector;
 
-struct Vector3i;
+class Vector3i;
 struct ENERGY_ARC;
 
 namespace TEN::Effects::Lightning

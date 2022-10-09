@@ -1,13 +1,13 @@
 #pragma once
 
-struct Vector3i;
+class Vector3i;
 
 namespace sol {
 	class state;
 }
 
 class Pose;
-struct GameVector;
+class GameVector;
 
 class Vec3 {
 public:

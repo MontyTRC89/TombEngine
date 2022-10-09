@@ -4,7 +4,7 @@
 class EulerAngles;
 struct ItemInfo;
 class Pose;
-struct Vector3i;
+class Vector3i;
 
 struct AnimFrame
 {

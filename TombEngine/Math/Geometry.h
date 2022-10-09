@@ -2,7 +2,7 @@
 
 class EulerAngles;
 class Pose;
-struct Vector3i;
+class Vector3i;
 
 namespace TEN::Math::Geometry
 {

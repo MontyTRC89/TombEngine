@@ -2,8 +2,9 @@
 
 namespace TEN::Math
 {
-	struct Vector2i
+	class Vector2i
 	{
+	public:
 		// Components
 		int x = 0;
 		int y = 0;

@@ -1,11 +1,12 @@
 #pragma once
 
-struct Vector3i;
+class Vector3i;
 
 //namespace TEN::Math
 //{
-	struct GameVector
+	class GameVector
 	{
+	public:
 		// Components
 		int	  x			 = 0;
 		int	  y			 = 0;

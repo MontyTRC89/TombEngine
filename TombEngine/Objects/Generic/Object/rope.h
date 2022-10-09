@@ -2,7 +2,7 @@
 
 struct ItemInfo;
 struct CollisionInfo;
-struct Vector3i;
+class Vector3i;
 
 namespace TEN::Entities::Generic
 {

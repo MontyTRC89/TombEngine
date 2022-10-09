@@ -1,6 +1,6 @@
 #pragma once
 
-struct Vector3i;
+class Vector3i;
 class Pose;
 
 namespace TEN::Entities::TR4
