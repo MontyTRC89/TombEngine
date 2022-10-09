@@ -121,7 +121,7 @@ bool GetTargetOnLOS(GameVector* origin, GameVector* target, bool drawTarget, boo
 						ShatterImpactData.impactDirection = directionNorm;
 						ShatterImpactData.impactLocation = Vector3(mesh->pos.Position.x, mesh->pos.Position.y, mesh->pos.Position.z);
 						ShatterObject(nullptr, mesh, 128, target2.RoomNumber, 0);
-						SoundEffect(GetShatterSound(mesh->staticNumber), (PoseData*)mesh);
+						SoundEffect(GetShatterSound(mesh->staticNumber), (Pose*)mesh);
 					}
 
 					TriggerRicochetSpark(&target2, LaraItem->Pose.Orientation.y, 3, 0);
@@ -298,7 +298,7 @@ int ObjectOnLOS2(GameVector* origin, GameVector* target, Vector3i* vec, MESH_INF
 
 	for (int r = 0; r < NumberLosRooms; ++r)
 	{
-		PoseData pos;
+		Pose pos;
 		auto* room = &g_Level.Rooms[LosRooms[r]];
 
 		for (int m = 0; m < room->mesh.size(); m++)
@@ -351,7 +351,7 @@ int ObjectOnLOS2(GameVector* origin, GameVector* target, Vector3i* vec, MESH_INF
 	return ClosestItem;
 }
 
-bool DoRayBox(GameVector* origin, GameVector* target, BOUNDING_BOX* box, PoseData* itemOrStaticPos, Vector3i* hitPos, short closesItemNumber)
+bool DoRayBox(GameVector* origin, GameVector* target, BOUNDING_BOX* box, Pose* itemOrStaticPos, Vector3i* hitPos, short closesItemNumber)
 {
 	// Ray
 	FXMVECTOR rayOrigin = { (float)origin->x, (float)origin->y, (float)origin->z };

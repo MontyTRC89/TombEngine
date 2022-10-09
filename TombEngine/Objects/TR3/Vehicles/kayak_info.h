@@ -12,7 +12,7 @@ namespace TEN::Entities::Vehicles
 		int LeftVerticalVelocity = 0;
 		int RightVerticalVelocity = 0;
 
-		PoseData OldPose = PoseData();
+		Pose OldPose = Pose();
 		unsigned int LeftRightPaddleCount = 0;
 		int WaterHeight = 0;
 		bool Turn = false;

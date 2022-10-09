@@ -41,7 +41,7 @@ struct ROOM_LIGHT
 
 struct MESH_INFO
 {
-	PoseData pos;
+	Pose pos;
 	int roomNumber;
 	float scale;
 	short staticNumber;

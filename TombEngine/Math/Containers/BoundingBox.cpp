@@ -3,7 +3,7 @@
 
 #include "Game/animation.h"
 #include "Math/Containers/EulerAngles.h"
-#include "Math/Containers/PoseData.h"
+#include "Math/Containers/Pose.h"
 
 //namespace TEN::Math
 //{
@@ -67,7 +67,7 @@
 		this->Z2 = bMax.z;
 	}
 
-	BoundingOrientedBox BOUNDING_BOX::ToBoundingOrientedBox(const PoseData& pose) const
+	BoundingOrientedBox BOUNDING_BOX::ToBoundingOrientedBox(const Pose& pose) const
 	{
 		return this->ToBoundingOrientedBox(pose.Position.ToVector3(), pose.Orientation.ToQuaternion());
 	}
@@ -94,7 +94,7 @@
 		return newBox;
 	}
 	
-	BOUNDING_BOX BOUNDING_BOX::operator +(const PoseData& pose) const
+	BOUNDING_BOX BOUNDING_BOX::operator +(const Pose& pose) const
 	{
 		auto newBox = *this;
 		newBox.X1 += pose.Position.x;
@@ -118,7 +118,7 @@
 		return newBox;
 	}
 
-	BOUNDING_BOX BOUNDING_BOX::operator -(const PoseData& pose) const
+	BOUNDING_BOX BOUNDING_BOX::operator -(const Pose& pose) const
 	{
 		auto newBox = *this;
 		newBox.X1 -= pose.Position.x;

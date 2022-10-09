@@ -42,8 +42,8 @@ struct OLD_CAMERA
 	short actualElevation;
 	short targetElevation;
 	short actualAngle;
-	PoseData pos;
-	PoseData pos2;
+	Pose pos;
+	Pose pos2;
 	Vector3i target;
 };
 
@@ -1720,13 +1720,13 @@ void ResetLook(ItemInfo* item)
 	}
 }
 
-bool TestBoundsCollideCamera(const BOUNDING_BOX& bounds, const PoseData& pose, short radius)
+bool TestBoundsCollideCamera(const BOUNDING_BOX& bounds, const Pose& pose, short radius)
 {
 	auto sphere = BoundingSphere(Camera.pos.ToVector3(), radius);
 	return sphere.Intersects(bounds.ToBoundingOrientedBox(pose));
 }
 
-void ItemPushCamera(BOUNDING_BOX* bounds, PoseData* pos, short radius)
+void ItemPushCamera(BOUNDING_BOX* bounds, Pose* pos, short radius)
 {
 	int dx = Camera.pos.x - pos->Position.x;
 	int dz = Camera.pos.z - pos->Position.z;

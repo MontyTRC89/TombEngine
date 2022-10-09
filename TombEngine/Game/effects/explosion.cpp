@@ -35,7 +35,7 @@ namespace TEN::Effects::Explosion
 
 		if (triggerShockwave)
 		{
-			auto shockPos = PoseData(Vector3i(pos));
+			auto shockPos = Pose(Vector3i(pos));
 			TriggerShockwave(&shockPos, 0, size, 64, 32, 32, 32, 30, rand() & 0xFFFF, 0);
 		}
 	}

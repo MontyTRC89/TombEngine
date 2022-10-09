@@ -183,7 +183,7 @@ CALL gen.bat</Command>
     <ClInclude Include="Math\Geometry.h" />
     <ClInclude Include="Math\Legacy.h" />
     <ClInclude Include="Math\Math.h" />
-    <ClInclude Include="Math\Containers\PoseData.h" />
+    <ClInclude Include="Math\Containers\Pose.h" />
     <ClInclude Include="Math\Random.h" />
     <ClInclude Include="Math\Containers\Vector2i.h" />
     <ClInclude Include="Math\Containers\Vector3i.h" />
@@ -647,7 +647,7 @@ CALL gen.bat</Command>
     <ClCompile Include="Math\Containers\GameVector.cpp" />
     <ClCompile Include="Math\Containers\EulerAngles.cpp" />
     <ClCompile Include="Math\Geometry.cpp" />
-    <ClCompile Include="Math\Containers\PoseData.cpp" />
+    <ClCompile Include="Math\Containers\Pose.cpp" />
     <ClCompile Include="Math\Legacy.cpp" />
     <ClCompile Include="Math\Math.cpp" />
     <ClCompile Include="Math\Random.cpp" />

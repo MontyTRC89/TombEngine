@@ -6,7 +6,7 @@ namespace sol {
 	class state;
 }
 
-struct PoseData;
+class Pose;
 struct GameVector;
 
 class Vec3 {
@@ -16,7 +16,7 @@ public:
 	int z;
 
 	Vec3(int x, int y, int z);
-	Vec3(PoseData const& pos);
+	Vec3(Pose const& pos);
 	Vec3(Vector3i const& pos);
 
 	operator Vector3i() const;
@@ -24,7 +24,7 @@ public:
 	[[nodiscard]] std::string ToString() const;
 
 	void ToLength(int newLength);
-	void StoreInPHDPos(PoseData& pos) const;
+	void StoreInPHDPos(Pose& pos) const;
 	void StoreInGameVector(GameVector& vec) const;
 
 	static void Register(sol::table &);

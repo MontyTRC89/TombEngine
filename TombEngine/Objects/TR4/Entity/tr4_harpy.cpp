@@ -76,7 +76,7 @@ namespace TEN::Entities::TR4
 		HARPY_ANIM_GLIDE = 18
 	};
 
-	void TriggerHarpyMissile(PoseData* pose, short roomNumber, short mesh)
+	void TriggerHarpyMissile(Pose* pose, short roomNumber, short mesh)
 	{
 		short fxNumber = CreateNewEffect(roomNumber);
 		if (fxNumber == -1)
@@ -226,7 +226,7 @@ namespace TEN::Entities::TR4
 			{
 				auto pos3 = GetJointPosition(item, HarpyAttack1.meshNum, Vector3i(HarpyAttack1.Position.x, HarpyAttack1.Position.y * 2, HarpyAttack1.Position.z));
 				auto orient = Geometry::GetOrientToPoint(rh.ToVector3(), lr.ToVector3());
-				auto pose = PoseData(rh, orient);
+				auto pose = Pose(rh, orient);
 				TriggerHarpyMissile(&pose, item->RoomNumber, 2);
 			}
 
@@ -234,7 +234,7 @@ namespace TEN::Entities::TR4
 			{
 				auto pos3 = GetJointPosition(item, HarpyAttack2.meshNum, Vector3i(HarpyAttack1.Position.x, HarpyAttack2.Position.y * 2, HarpyAttack2.Position.z));
 				auto orient = Geometry::GetOrientToPoint(rh.ToVector3(), lr.ToVector3());
-				auto pose = PoseData(rh, orient);
+				auto pose = Pose(rh, orient);
 				TriggerHarpyMissile(&pose, item->RoomNumber, 2);
 			}
 		}

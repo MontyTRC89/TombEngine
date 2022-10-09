@@ -24,7 +24,7 @@ namespace TEN::Entities::TR4
             if (item->TriggerFlags == 666)
             {
                 auto pos = GetJointPosition(item, 0);
-                SoundEffect(SFX_TR4_LIBRARY_COG_LOOP, (PoseData*)&pos);
+                SoundEffect(SFX_TR4_LIBRARY_COG_LOOP, (Pose*)&pos);
                 
                 //Shouldnt this be TR4_LIBRARY_COG_LOOP? Changed. Rollback if incorrect. Stranger1992 06/06/22
 

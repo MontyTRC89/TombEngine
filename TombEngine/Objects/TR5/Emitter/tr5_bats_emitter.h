@@ -6,7 +6,7 @@ constexpr auto NUM_BATS = 64;
 struct BatData
 {
 	bool On;
-	PoseData Pose;
+	Pose Pose;
 	short RoomNumber;
 
 	short Velocity;

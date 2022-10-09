@@ -974,7 +974,7 @@ namespace TEN::Entities::Vehicles
 			TriggerRubberBoatMist(prop.x, prop.y, prop.z, abs(rBoatItem->Animation.Velocity.z), rBoatItem->Pose.Orientation.y + 0x8000, 0);
 			if ((GetRandomControl() & 1) == 0)
 			{
-				PoseData pos;
+				Pose pos;
 				pos.Position.x = prop.x + (GetRandomControl() & 63) - 32;
 				pos.Position.y = prop.y + (GetRandomControl() & 15);
 				pos.Position.z = prop.z + (GetRandomControl() & 63) - 32;

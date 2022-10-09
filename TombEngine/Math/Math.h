@@ -3,7 +3,7 @@
 #include "Math/Containers/BoundingBox.h"
 #include "Math/Containers/EulerAngles.h"
 #include "Math/Containers/GameVector.h"
-#include "Math/Containers/PoseData.h"
+#include "Math/Containers/Pose.h"
 #include "Math/Containers/Vector2i.h"
 #include "Math/Containers/Vector3i.h"
 #include "Math/Geometry.h"

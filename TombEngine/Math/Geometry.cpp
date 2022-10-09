@@ -3,7 +3,7 @@
 
 #include "Math/Constants.h"
 #include "Math/Containers/EulerAngles.h"
-#include "Math/Containers/PoseData.h"
+#include "Math/Containers/Pose.h"
 #include "Math/Containers/Vector3i.h"
 #include "Math/Legacy.h"
 
@@ -119,7 +119,7 @@ namespace TEN::Math::Geometry
 		return EulerAngles(target - origin);
 	}
 
-	bool IsPointInFront(const PoseData& pose, const Vector3& target)
+	bool IsPointInFront(const Pose& pose, const Vector3& target)
 	{
 		return IsPointInFront(pose.Position.ToVector3(), target, pose.Orientation);
 	}
@@ -161,7 +161,7 @@ namespace TEN::Math::Geometry
 		return false;
 	}
 
-	bool IsPointOnLeft(const PoseData& pose, const Vector3& target)
+	bool IsPointOnLeft(const Pose& pose, const Vector3& target)
 	{
 		return IsPointOnLeft(pose.Position.ToVector3(), target, pose.Orientation);
 	}

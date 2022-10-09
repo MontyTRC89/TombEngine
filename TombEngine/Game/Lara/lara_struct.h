@@ -1283,7 +1283,7 @@ struct LaraInfo
 	int ProjectedFloorHeight;
 	EulerAngles TargetOrientation;
 	int WaterSurfaceDist;
-	PoseData NextCornerPos;
+	Pose NextCornerPos;
 
 	// TODO: Use BurnType in place of Burn, BurnBlue, and BurnSmoke. Core didn't make replacing them easy.
 	BurnType BurnType;

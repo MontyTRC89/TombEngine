@@ -201,7 +201,7 @@ namespace TEN::Entities::Creatures::TR1
 					LaraItem->Animation.ActiveState = 46;
 					LaraItem->Animation.TargetState = 46;
 					LaraItem->Animation.IsAirborne = false;
-					LaraItem->Pose = PoseData(item->Pose.Position, 0, item->Pose.Orientation.y, 0);
+					LaraItem->Pose = Pose(item->Pose.Position, 0, item->Pose.Orientation.y, 0);
 					LaraItem->RoomNumber = item->RoomNumber;
 					LaraItem->HitPoints = -1;
 					Lara.Air = -1;

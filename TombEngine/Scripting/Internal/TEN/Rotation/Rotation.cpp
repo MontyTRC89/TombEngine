@@ -48,14 +48,14 @@ Rotation::Rotation(int aX, int aY, int aZ)
 	z = aZ;
 }
 
-void Rotation::StoreInPHDPos(PoseData& pos) const
+void Rotation::StoreInPHDPos(Pose& pos) const
 {
 	pos.Orientation.x = x;
 	pos.Orientation.y = y;
 	pos.Orientation.z = z;
 }
 
-Rotation::Rotation(PoseData const & pos)
+Rotation::Rotation(Pose const & pos)
 {
 	x = pos.Orientation.x;
 	y = pos.Orientation.y;

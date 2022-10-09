@@ -3,7 +3,7 @@
 namespace sol {
 	class state;
 }
-struct PoseData;
+class Pose;
 
 class Rotation {
 public:
@@ -13,11 +13,11 @@ public:
 
 	Rotation() = default;
 	Rotation(int x, int y, int z);
-	Rotation(PoseData const& pos);
+	Rotation(Pose const& pos);
 
 	std::string ToString() const;
 
-	void StoreInPHDPos(PoseData& pos) const;
+	void StoreInPHDPos(Pose& pos) const;
 
 	static void Register(sol::table & parent);
 };

@@ -38,14 +38,14 @@ bool MoveLaraPosition(Vector3i* pos, ItemInfo* item, ItemInfo* laraItem);
 bool ItemNearLara(Vector3i* origin, int radius);
 bool ItemNearTarget(Vector3i* origin, ItemInfo* targetEntity, int radius);
 
-bool Move3DPosTo3DPos(ItemInfo* item, PoseData& fromPose, const PoseData& toPose, int velocity, short turnRate);
+bool Move3DPosTo3DPos(ItemInfo* item, Pose& fromPose, const Pose& toPose, int velocity, short turnRate);
 
 bool TestBoundsCollide(ItemInfo* item, ItemInfo* laraItem, int radius);
 bool TestBoundsCollideStatic(ItemInfo* item, MESH_INFO* mesh, int radius);
 bool ItemPushItem(ItemInfo* item, ItemInfo* laraItem, CollisionInfo* coll, bool spasmEnabled, char bigPush);
 bool ItemPushStatic(ItemInfo* laraItem, MESH_INFO* mesh, CollisionInfo* coll);
 
-bool CollideSolidBounds(ItemInfo* item, BOUNDING_BOX* box, PoseData pose, CollisionInfo* coll);
+bool CollideSolidBounds(ItemInfo* item, BOUNDING_BOX* box, Pose pose, CollisionInfo* coll);
 void CollideSolidStatics(ItemInfo* item, CollisionInfo* coll);
 
 void AIPickupCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);

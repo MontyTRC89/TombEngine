@@ -7,7 +7,7 @@ namespace TEN::Entities::TR4
 	struct BaboonRespawnData
 	{
 		int ID;
-		PoseData Pose;
+		Pose Pose;
 		unsigned int Count;
 		unsigned int MaxCount;  // Used to limit the number of respawns.
 	};

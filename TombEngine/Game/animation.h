@@ -3,7 +3,7 @@
 
 class EulerAngles;
 struct ItemInfo;
-struct PoseData;
+class Pose;
 struct Vector3i;
 
 struct AnimFrame
@@ -92,7 +92,7 @@ bool GetStateDispatch(ItemInfo* item, const AnimData& anim);
 int GetFrame(ItemInfo* item, AnimFrame* framePtr[], int* rate);
 AnimFrame* GetBestFrame(ItemInfo* item);
 
-void ClampRotation(PoseData* pose, short angle, short rotation); 
+void ClampRotation(Pose* pose, short angle, short rotation); 
 void DrawAnimatingItem(ItemInfo* item);
 
 Vector3i GetJointPosition(ItemInfo* item, int jointIndex, const Vector3i& offset = Vector3i::Zero);

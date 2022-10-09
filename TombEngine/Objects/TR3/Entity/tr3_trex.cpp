@@ -62,7 +62,7 @@ namespace TEN::Entities::Creatures::TR3
 		if (laraItem->RoomNumber != tRexItem->RoomNumber)
 			ItemNewRoom(Lara.ItemNumber, tRexItem->RoomNumber);
 
-		laraItem->Pose = PoseData(
+		laraItem->Pose = Pose(
 			tRexItem->Pose.Position,
 			EulerAngles(0, tRexItem->Pose.Orientation.y, 0)
 		);

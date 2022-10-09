@@ -59,7 +59,7 @@ Vec3::Vec3(int aX, int aY, int aZ) : x{aX}, y{aY}, z{aZ}
 {
 }
 
-Vec3::Vec3(PoseData const& pos) : x{pos.Position.x}, y{pos.Position.y}, z{pos.Position.z}
+Vec3::Vec3(Pose const& pos) : x{pos.Position.x}, y{pos.Position.y}, z{pos.Position.z}
 {
 }
 
@@ -72,7 +72,7 @@ Vec3::operator Vector3i() const
 	return Vector3i{ x, y, z };
 };
 
-void Vec3::StoreInPHDPos(PoseData& pos) const
+void Vec3::StoreInPHDPos(Pose& pos) const
 {
 	pos.Position.x = x;
 	pos.Position.y = y;

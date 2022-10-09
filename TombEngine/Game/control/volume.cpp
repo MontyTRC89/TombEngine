@@ -123,7 +123,7 @@ namespace TEN::Control::Volumes
 
 	void TestVolumes(CAMERA_INFO* camera)
 	{
-		auto pos = PoseData(camera->pos.ToVector3i(), EulerAngles::Zero);
+		auto pos = Pose(camera->pos.ToVector3i(), EulerAngles::Zero);
 		auto box = BOUNDING_BOX::Zero;
 		box.X1 = box.Y1 = box.Z1 =  CAM_SIZE;
 		box.X2 = box.Y2 = box.Z2 = -CAM_SIZE;

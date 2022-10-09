@@ -55,7 +55,7 @@ namespace TEN::Entities::Creatures::TR5
 		item->Pose.Position.x -= CLICK(1);
 	}
 
-	static void HydraBubblesAttack(PoseData* pos, short roomNumber, int count)
+	static void HydraBubblesAttack(Pose* pos, short roomNumber, int count)
 	{
 		short fxNumber = CreateNewEffect(roomNumber);
 		if (fxNumber != NO_ITEM)
@@ -325,7 +325,7 @@ namespace TEN::Entities::Creatures::TR5
 					auto pos2 = GetJointPosition(item, 10, Vector3i(0, 144, 40));
 
 					auto orient = Geometry::GetOrientToPoint(pos2.ToVector3(), pos1.ToVector3());
-					auto pose = PoseData(pos1, orient);
+					auto pose = Pose(pos1, orient);
 					roomNumber = item->RoomNumber;
 					GetFloor(pos2.x, pos2.y, pos2.z, &roomNumber);
 

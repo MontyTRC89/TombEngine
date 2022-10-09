@@ -140,7 +140,7 @@ bool LoadSample(char* pointer, int compSize, int uncompSize, int index)
 	return true;
 }
 
-bool SoundEffect(int effectID, PoseData* position, SoundEnvironment condition, float pitchMultiplier, float gainMultiplier)
+bool SoundEffect(int effectID, Pose* position, SoundEnvironment condition, float pitchMultiplier, float gainMultiplier)
 {
 	if (!g_Configuration.EnableSound)
 		return false;
@@ -597,7 +597,7 @@ int Sound_GetFreeSlot()
 // We use origin position as a reference, because in original TRs it's not possible to clearly
 // identify what's the source of the producing effect.
 
-int Sound_EffectIsPlaying(int effectID, PoseData *position)
+int Sound_EffectIsPlaying(int effectID, Pose *position)
 {
 	for (int i = 0; i < SOUND_MAX_CHANNELS; i++)
 	{
@@ -630,7 +630,7 @@ int Sound_EffectIsPlaying(int effectID, PoseData *position)
 
 // Gets the distance to the source.
 
-float Sound_DistanceToListener(PoseData *position)
+float Sound_DistanceToListener(Pose *position)
 {
 	if (!position) return 0.0f;	// Assume sound is 2D menu sound
 	return Sound_DistanceToListener(Vector3(position->Position.x, position->Position.y, position->Position.z));
@@ -671,7 +671,7 @@ void Sound_FreeSlot(int index, unsigned int fadeout)
 
 // Update sound position in a level.
 
-bool Sound_UpdateEffectPosition(int index, PoseData *position, bool force)
+bool Sound_UpdateEffectPosition(int index, Pose *position, bool force)
 {
 	if (index > SOUND_MAX_CHANNELS || index < 0)
 		return false;
@@ -924,6 +924,6 @@ void PlaySoundSources()
 		else if (FlipStats[group] && (sound.Flags & 128) == 0)
 			continue;
 
-		SoundEffect(sound.SoundID, (PoseData*)&sound.Position);
+		SoundEffect(sound.SoundID, (Pose*)&sound.Position);
 	}
 }

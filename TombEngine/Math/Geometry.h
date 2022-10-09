@@ -1,7 +1,7 @@
 #pragma once
 
 class EulerAngles;
-struct PoseData;
+class Pose;
 struct Vector3i;
 
 namespace TEN::Math::Geometry
@@ -24,10 +24,10 @@ namespace TEN::Math::Geometry
 	Vector3		GetClosestPointOnLine(const Vector3& origin, const Vector3& linePoint0, const Vector3& linePoint1);
 	EulerAngles GetOrientToPoint(const Vector3& origin, const Vector3& target);
 
-	bool IsPointInFront(const PoseData& pose, const Vector3& target);
+	bool IsPointInFront(const Pose& pose, const Vector3& target);
 	bool IsPointInFront(const Vector3& origin, const Vector3& target, const EulerAngles& orient);
 	bool IsPointInFront(const Vector3& origin, const Vector3& target, const Vector3& refPoint);
-	bool IsPointOnLeft(const PoseData& pose, const Vector3& target);
+	bool IsPointOnLeft(const Pose& pose, const Vector3& target);
 	bool IsPointOnLeft(const Vector3& origin, const Vector3& target, const EulerAngles& orient);
 	bool IsPointOnLeft(const Vector3& origin, const Vector3& target, const Vector3& refPoint);
 }

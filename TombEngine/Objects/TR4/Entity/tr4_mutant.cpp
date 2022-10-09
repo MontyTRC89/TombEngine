@@ -63,7 +63,7 @@ namespace TEN::Entities::TR4
 		C_WEST_NORTH = 315
 	};
 
-	void TriggerCrocgodMissile(PoseData* src, short roomNumber, short counter)
+	void TriggerCrocgodMissile(Pose* src, short roomNumber, short counter)
 	{
 		short fxNumber = NO_ITEM;
 
@@ -139,7 +139,7 @@ namespace TEN::Entities::TR4
 		sptr->dSize = size / 4;
 	}
 
-	void ShootFireball(PoseData* src, MissileRotationType rotationType, short roomNumber, int timer)
+	void ShootFireball(Pose* src, MissileRotationType rotationType, short roomNumber, int timer)
 	{
 		switch (rotationType)
 		{
@@ -188,7 +188,7 @@ namespace TEN::Entities::TR4
 		headAngle = (short)(phd_atan(z, x) - item->Pose.Orientation.y) / 2;
 	}
 
-	void GetTargetPosition(ItemInfo* originEntity, PoseData* targetPose)
+	void GetTargetPosition(ItemInfo* originEntity, Pose* targetPose)
 	{
 		auto origin = GetJointPosition(originEntity, 9, Vector3i(0, -96, 144));
 		auto target = GetJointPosition(originEntity, 9, Vector3i(0, -128, 288));
@@ -313,7 +313,7 @@ namespace TEN::Entities::TR4
 			frameNumber = item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase;
 			if (frameNumber >= 94 && frameNumber <= 96)
 			{
-				PoseData src;
+				Pose src;
 				GetTargetPosition(item, &src);
 
 				if (frameNumber == 94)
@@ -342,7 +342,7 @@ namespace TEN::Entities::TR4
 		case MUTANT_STATE_LOCUST_ATTACK_2:
 			if (ShootFrame(item))
 			{
-				PoseData src;
+				Pose src;
 				GetTargetPosition(item, &src);
 				ShootFireball(&src, MissileRotationType::Front, item->RoomNumber, 1);
 			}

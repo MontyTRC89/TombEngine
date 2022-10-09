@@ -109,7 +109,7 @@ void DropEntityPickups(ItemInfo* item)
 	}
 }
 
-bool MoveCreature3DPos(PoseData* fromPose, PoseData* toPose, int velocity, short angleDif, int angleAdd)
+bool MoveCreature3DPos(Pose* fromPose, Pose* toPose, int velocity, short angleDif, int angleAdd)
 {
 	auto differenceVector = toPose->Position - fromPose->Position;
 	float distance = Vector3::Distance(fromPose->Position.ToVector3(), toPose->Position.ToVector3());
@@ -138,7 +138,7 @@ bool MoveCreature3DPos(PoseData* fromPose, PoseData* toPose, int velocity, short
 	return false;
 }
 
-void CreatureYRot2(PoseData* fromPose, short angle, short angleAdd) 
+void CreatureYRot2(Pose* fromPose, short angle, short angleAdd) 
 {
 	if (angleAdd < angle)
 	{

@@ -151,7 +151,7 @@ namespace TEN::Entities::TR4
 		}
 	}
 
-	void TriggerDemigodMissile(PoseData* pose, short roomNumber, int flags)
+	void TriggerDemigodMissile(Pose* pose, short roomNumber, int flags)
 	{
 		short fxNumber = CreateNewEffect(roomNumber);
 		if (fxNumber != -1)
@@ -194,7 +194,7 @@ namespace TEN::Entities::TR4
 				auto target = GetJointPosition(item, 16, Vector3i(-900, 96, 0));
 				auto orient = Geometry::GetOrientToPoint(origin.ToVector3(), target.ToVector3());
 
-				auto pose = PoseData(origin, orient);
+				auto pose = Pose(origin, orient);
 				if (item->ObjectNumber == ID_DEMIGOD3)
 					TriggerDemigodMissile(&pose, item->RoomNumber, 3);
 				else
@@ -209,7 +209,7 @@ namespace TEN::Entities::TR4
 				auto pos2 = GetJointPosition(item, 16, Vector3i(-900, 96, 0));
 				auto orient = Geometry::GetOrientToPoint(pos1.ToVector3(), pos2.ToVector3());
 
-				auto pose = PoseData(pos1, orient);
+				auto pose = Pose(pos1, orient);
 				if (item->ObjectNumber == ID_DEMIGOD3)
 					TriggerDemigodMissile(&pose, item->RoomNumber, 3);
 				else
@@ -237,7 +237,7 @@ namespace TEN::Entities::TR4
 				}
 
 				auto orient = Geometry::GetOrientToPoint(pos1.ToVector3(), pos2.ToVector3());
-				auto pose = PoseData(pos1, orient);
+				auto pose = Pose(pos1, orient);
 				TriggerDemigodMissile(&pose, item->RoomNumber, 4);
 			}
 		}
@@ -693,7 +693,7 @@ namespace TEN::Entities::TR4
 					else
 						pos.y = height - CLICK(0.5f);
 
-					TriggerShockwave((PoseData*)&pos, 24, 88, 256, 128, 128, 128, 32, 0, 2);
+					TriggerShockwave((Pose*)&pos, 24, 88, 256, 128, 128, 128, 32, 0, 2);
 					TriggerHammerSmoke(pos.x, pos.y + 128, pos.z, 8);
 
 					Camera.bounce = -128;

@@ -108,7 +108,7 @@ namespace TEN::Entities::TR4
 		BABOON_ANIM_ACTIVATE_SWITCH = 31
 	};
 
-	static void TriggerBaboonShockwave(PoseData pos, short xRot)
+	static void TriggerBaboonShockwave(Pose pos, short xRot)
 	{
 		short shockwaveID = GetFreeShockwave();
 		if (shockwaveID != NO_ITEM)
@@ -131,7 +131,7 @@ namespace TEN::Entities::TR4
 
 	void BaboonDieEffect(ItemInfo* item)
 	{
-		auto pose = PoseData(item->Pose.Position.x, item->Pose.Position.y - CLICK(0.5f), item->Pose.Position.z);
+		auto pose = Pose(item->Pose.Position.x, item->Pose.Position.y - CLICK(0.5f), item->Pose.Position.z);
 
 		// Trigger shockwave effect.
 		TriggerBaboonShockwave(pose, ANGLE(0.0f));

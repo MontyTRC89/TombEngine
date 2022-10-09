@@ -66,6 +66,6 @@ struct JumpTestSetup
 struct CornerTestResult
 {
 	bool Success;
-	PoseData ProbeResult;
-	PoseData RealPositionResult;
+	Pose ProbeResult;
+	Pose RealPositionResult;
 };

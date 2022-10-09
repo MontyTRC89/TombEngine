@@ -939,7 +939,7 @@ void SetupSplash(const SPLASH_SETUP* const setup, int room)
 	}
 
 	TEN::Effects::Drip::SpawnSplashDrips(Vector3(setup->x, setup->y - 15, setup->z), 32, room);
-	PoseData soundPosition;
+	Pose soundPosition;
 	soundPosition.Position.x = setup->x;
 	soundPosition.Position.y = setup->y;
 	soundPosition.Position.z = setup->z;
@@ -1084,7 +1084,7 @@ void TriggerUnderwaterBlood(int x, int y, int z, int size)
 	}
 }
 
-void Richochet(PoseData* pos)
+void Richochet(Pose* pos)
 {
 	short angle = Geometry::GetOrientToPoint(pos->Position.ToVector3(), LaraItem->Pose.Position.ToVector3()).y;
 	auto target = GameVector(pos->Position);

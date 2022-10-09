@@ -442,7 +442,7 @@ bool MoveLaraPosition(Vector3i* offset, ItemInfo* item, ItemInfo* laraItem)
 
 	auto rotMatrix = item->Pose.Orientation.ToRotationMatrix();
 	auto pos = Vector3::Transform(offset->ToVector3(), rotMatrix);
-	auto target = PoseData(item->Pose.Position + Vector3i(pos), item->Pose.Orientation);
+	auto target = Pose(item->Pose.Position + Vector3i(pos), item->Pose.Orientation);
 
 	if (!Objects[item->ObjectNumber].isPickup)
 		return Move3DPosTo3DPos(laraItem, laraItem->Pose, target, LARA_ALIGN_VELOCITY, ANGLE(2.0f));
@@ -517,7 +517,7 @@ bool ItemNearTarget(Vector3i* origin, ItemInfo* targetEntity, int radius)
 	return false;
 }
 
-bool Move3DPosTo3DPos(ItemInfo* item, PoseData& fromPose, const PoseData& toPose, int velocity, short turnRate)
+bool Move3DPosTo3DPos(ItemInfo* item, Pose& fromPose, const Pose& toPose, int velocity, short turnRate)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -858,7 +858,7 @@ void CollideSolidStatics(ItemInfo* item, CollisionInfo* coll)
 	}
 }
 
-bool CollideSolidBounds(ItemInfo* item, BOUNDING_BOX* box, PoseData pose, CollisionInfo* coll)
+bool CollideSolidBounds(ItemInfo* item, BOUNDING_BOX* box, Pose pose, CollisionInfo* coll)
 {
 	bool result = false;
 
@@ -903,11 +903,11 @@ bool CollideSolidBounds(ItemInfo* item, BOUNDING_BOX* box, PoseData pose, Collis
 	}
 
 	// Get and test DX item collision bounds.
-	auto collBounds = collBox.ToBoundingOrientedBox(PoseData(item->Pose.Position));
+	auto collBounds = collBox.ToBoundingOrientedBox(Pose(item->Pose.Position));
 	bool intersects = staticBounds.Intersects(collBounds);
 
 	// Check if previous item horizontal position intersects bounds.
-	auto prevCollBounds = collBox.ToBoundingOrientedBox(PoseData(coll->Setup.OldPosition));
+	auto prevCollBounds = collBox.ToBoundingOrientedBox(Pose(coll->Setup.OldPosition));
 	bool prevHorIntersects = staticBounds.Intersects(prevCollBounds);
 
 	// Draw item coll bounds.
@@ -995,7 +995,7 @@ bool CollideSolidBounds(ItemInfo* item, BOUNDING_BOX* box, PoseData pose, Collis
 		return false;
 
 	// Check if bounds still collide after top/bottom position correction.
-	if (!staticBounds.Intersects(collBox.ToBoundingOrientedBox(PoseData(item->Pose.Position))))
+	if (!staticBounds.Intersects(collBox.ToBoundingOrientedBox(Pose(item->Pose.Position))))
 		return result;
 
 	// Determine identity orientation/distance.
@@ -1805,7 +1805,7 @@ void DoObjectCollision(ItemInfo* laraItem, CollisionInfo* coll)
 				!harmless && abs(laraItem->Animation.Velocity.z) > VEHICLE_COLLISION_TERMINAL_VELOCITY &&
 				StaticObjects[mesh->staticNumber].shatterType != SHT_NONE)
 			{
-				SoundEffect(GetShatterSound(mesh->staticNumber), (PoseData*)mesh);
+				SoundEffect(GetShatterSound(mesh->staticNumber), (Pose*)mesh);
 				ShatterObject(nullptr, mesh, -128, laraItem->RoomNumber, 0);
 			}
 			else if (coll->Setup.EnableObjectPush)
