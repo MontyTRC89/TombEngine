@@ -168,8 +168,11 @@ namespace TEN::Entities::Creatures::TR3
 			AI_INFO AI;
 			CreatureAIInfo(item, &AI);
 
-			if (!creature->HurtByLara && creature->Enemy != nullptr && creature->Enemy->IsLara())
-				creature->Enemy = nullptr;
+			if (creature->Enemy != nullptr)
+			{
+				if (!creature->HurtByLara && creature->Enemy->IsLara())
+					creature->Enemy = nullptr;
+			}
 
 			AI_INFO laraAI;
 			if (creature->Enemy != nullptr && creature->Enemy->IsLara())
