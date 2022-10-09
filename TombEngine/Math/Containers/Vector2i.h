@@ -26,16 +26,16 @@ namespace TEN::Math
 		// Operators
 		bool	  operator ==(const Vector2i& vector) const;
 		bool	  operator !=(const Vector2i& vector) const;
-		Vector2i  operator +(const Vector2i& vector) const;
-		Vector2i  operator -(const Vector2i& vector) const;
-		Vector2i  operator *(const Vector2i& vector) const;
-		Vector2i  operator *(float scale) const;
-		Vector2i  operator /(float scale) const;
 		Vector2i& operator =(const Vector2i& vector);
 		Vector2i& operator +=(const Vector2i& vector);
 		Vector2i& operator -=(const Vector2i& vector);
 		Vector2i& operator *=(const Vector2i& vector);
 		Vector2i& operator *=(float scale);
 		Vector2i& operator /=(float scale);
+		Vector2i  operator +(const Vector2i& vector) const;
+		Vector2i  operator -(const Vector2i& vector) const;
+		Vector2i  operator *(const Vector2i& vector) const;
+		Vector2i  operator *(float scale) const;
+		Vector2i  operator /(float scale) const;
 	};
 }

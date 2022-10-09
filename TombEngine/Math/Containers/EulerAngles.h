@@ -28,16 +28,16 @@
 		// Operators
 		bool		 operator ==(const EulerAngles& eulers) const;
 		bool		 operator !=(const EulerAngles& eulers) const;
-		EulerAngles	 operator +(const EulerAngles& eulers) const;
-		EulerAngles	 operator -(const EulerAngles& eulers) const;
-		EulerAngles	 operator *(const EulerAngles& eulers) const;
-		EulerAngles	 operator *(float scale) const;
-		EulerAngles	 operator /(float scale) const;
 		EulerAngles& operator =(const EulerAngles& eulers);
 		EulerAngles& operator +=(const EulerAngles& eulers);
 		EulerAngles& operator -=(const EulerAngles& eulers);
 		EulerAngles& operator *=(const EulerAngles& eulers);
 		EulerAngles& operator *=(float scale);
 		EulerAngles& operator /=(float scale);
+		EulerAngles	 operator +(const EulerAngles& eulers) const;
+		EulerAngles	 operator -(const EulerAngles& eulers) const;
+		EulerAngles	 operator *(const EulerAngles& eulers) const;
+		EulerAngles	 operator *(float scale) const;
+		EulerAngles	 operator /(float scale) const;
 	};
 //}
