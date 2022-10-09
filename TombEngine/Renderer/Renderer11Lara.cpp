@@ -112,7 +112,7 @@ void Renderer11::UpdateLaraAnimations(bool force)
 	AnimFrame* framePtr[2];
 	int rate, frac;
 
-	frac = GetFrame(LaraItem, framePtr, &rate);
+	frac = GetFrame(LaraItem, framePtr, rate);
 	UpdateAnimation(item, laraObj, framePtr, frac, rate, mask);
 
 	// Then the arms, based on current weapon status
@@ -122,7 +122,7 @@ void Renderer11::UpdateLaraAnimations(bool force)
 	{
 		// Both arms
 		mask = MESH_BITS(LM_LINARM) | MESH_BITS(LM_LOUTARM) | MESH_BITS(LM_LHAND) | MESH_BITS(LM_RINARM) | MESH_BITS(LM_ROUTARM) | MESH_BITS(LM_RHAND);
-		frac = GetFrame(LaraItem, framePtr, &rate);
+		frac = GetFrame(LaraItem, framePtr, rate);
 		UpdateAnimation(item, laraObj, framePtr, frac, rate, mask);
 	}
 	else
@@ -229,12 +229,12 @@ void Renderer11::UpdateLaraAnimations(bool force)
 				tempItem.Animation.AnimNumber < Objects[ID_FLARE_ANIM].animIndex + 4)
 				mask |= MESH_BITS(LM_TORSO) | MESH_BITS(LM_HEAD);
 
-			frac = GetFrame(&tempItem, framePtr, &rate);
+			frac = GetFrame(&tempItem, framePtr, rate);
 			UpdateAnimation(item, laraObj, framePtr, frac, rate, mask);
 
 			// Right arm
 			mask = MESH_BITS(LM_RINARM) | MESH_BITS(LM_ROUTARM) | MESH_BITS(LM_RHAND);
-			frac = GetFrame(LaraItem, framePtr, &rate);
+			frac = GetFrame(LaraItem, framePtr, rate);
 			UpdateAnimation(item, laraObj, framePtr, frac, rate, mask);
 			break;
 		}

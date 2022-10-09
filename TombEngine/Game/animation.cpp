@@ -390,8 +390,7 @@ AnimFrame* GetBestFrame(ItemInfo* item)
 {
 	int rate = 0;
 	AnimFrame* framePtr[2];
-
-	int frac = GetFrame(item, framePtr, &rate);
+	int frac = GetFrame(item, framePtr, rate);
 
 	if (frac <= (rate >> 1))
 		return framePtr[0];
@@ -399,19 +398,19 @@ AnimFrame* GetBestFrame(ItemInfo* item)
 		return framePtr[1];
 }
 
-int GetFrame(ItemInfo* item, AnimFrame* framePtr[], int* rate)
+int GetFrame(ItemInfo* item, AnimFrame* outFramePtr[], int& outRate)
 {
 	int frame = item->Animation.FrameNumber;
 	const auto& anim = g_Level.Anims[item->Animation.AnimNumber];
 
-	framePtr[0] = framePtr[1] = &g_Level.Frames[anim.FramePtr];
-	int rate2 = *rate = anim.Interpolation & 0x00ff;
+	outFramePtr[0] = outFramePtr[1] = &g_Level.Frames[anim.FramePtr];
+	int rate2 = outRate = anim.Interpolation & 0x00ff;
 	frame -= anim.frameBase; 
 
 	int first = frame / rate2;
 	int interpolation = frame % rate2;
-	framePtr[0] += first;			// Get frame pointers...
-	framePtr[1] = framePtr[0] + 1;	// and store away.
+	outFramePtr[0] += first;			 // Get frame pointers...
+	outFramePtr[1] = outFramePtr[0] + 1; // and store away.
 
 	if (interpolation == 0)
 		return 0;
@@ -419,7 +418,7 @@ int GetFrame(ItemInfo* item, AnimFrame* framePtr[], int* rate)
 	// Clamp key frame to end if need be.
 	int second = first * rate2 + rate2;
 	if (second > anim.frameEnd)
-		*rate = anim.frameEnd - (second - rate2);
+		outRate = anim.frameEnd - (second - rate2);
 
 	return interpolation;
 }
@@ -467,17 +466,17 @@ void DrawAnimatingItem(ItemInfo* item)
 	// Empty stub because actually we disable items drawing when drawRoutine pointer is nullptr in ObjectInfo
 }
 
-void ClampRotation(Pose* pose, short angle, short rotation)
+void ClampRotation(Pose& outPose, short angle, short rotation)
 {
 	if (angle <= rotation)
 	{
 		if (angle >= -rotation)
-			pose->Orientation.y += angle;
+			outPose.Orientation.y += angle;
 		else
-			pose->Orientation.y -= rotation;
+			outPose.Orientation.y -= rotation;
 	}
 	else
-		pose->Orientation.y += rotation;
+		outPose.Orientation.y += rotation;
 }
 
 Vector3i GetJointPosition(ItemInfo* item, int jointIndex, const Vector3i& offset)

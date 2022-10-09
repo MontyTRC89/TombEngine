@@ -1073,7 +1073,7 @@ namespace TEN::Entities::TR4
 				break;
 
 			case BADDY_STATE_CROUCH_PICKUP:
-				ClampRotation(&item->Pose, AI.angle, ANGLE(11.0f));
+				ClampRotation(item->Pose, AI.angle, ANGLE(11.0f));
 
 				if (item->Animation.FrameNumber != g_Level.Anims[item->Animation.AnimNumber].frameBase + FRAME_BADDY_CROUCH_PICKUP)
 					break;
@@ -1128,7 +1128,7 @@ namespace TEN::Entities::TR4
 					joint1 = AI.angle;
 					joint2 = AI.xAngle;
 				}
-				ClampRotation(&item->Pose, AI.angle, ANGLE(7));
+				ClampRotation(item->Pose, AI.angle, ANGLE(7));
 
 				if (!Targetable(item, &AI) ||
 					item->ItemFlags[2] < 1)
@@ -1147,7 +1147,7 @@ namespace TEN::Entities::TR4
 					joint1 = AI.angle;
 					joint2 = AI.xAngle;
 				}
-				ClampRotation(&item->Pose, AI.angle, ANGLE(7.0f));
+				ClampRotation(item->Pose, AI.angle, ANGLE(7.0f));
 
 				if (item->Animation.FrameNumber >= g_Level.Anims[item->Animation.AnimNumber].frameBase + FRAME_BADDY_FIRE_MAX ||
 					item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + FRAME_BADDY_FIRE_MIN)
@@ -1200,7 +1200,7 @@ namespace TEN::Entities::TR4
 			case BADDY_STATE_UNKNOWN_8:
 				currentCreature->MaxTurn = 0;
 
-				ClampRotation(&item->Pose, AI.angle, ANGLE(11.0f));
+				ClampRotation(item->Pose, AI.angle, ANGLE(11.0f));
 
 				if (laraAI.distance < pow(682, 2) ||
 					item != Lara.TargetEntity)
@@ -1222,7 +1222,7 @@ namespace TEN::Entities::TR4
 			case BADDY_STATE_SOMERSAULT:
 				if (item->Animation.AnimNumber == (Objects[objectNumber].animIndex + BADDY_ANIM_SOMERSAULT_END))
 				{
-					ClampRotation(&item->Pose, AI.angle, ANGLE(7.0f));
+					ClampRotation(item->Pose, AI.angle, ANGLE(7.0f));
 					break;
 				}
 

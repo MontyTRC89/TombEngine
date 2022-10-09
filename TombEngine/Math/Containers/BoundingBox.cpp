@@ -28,7 +28,7 @@
 		int rate = 0;
 		AnimFrame* framePtr[2];
 
-		int frac = GetFrame(item, framePtr, &rate);
+		int frac = GetFrame(item, framePtr, rate);
 		if (frac == 0 || !accurate)
 			*this = framePtr[0]->boundingBox;
 		else

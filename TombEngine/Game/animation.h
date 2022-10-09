@@ -89,10 +89,10 @@ int GetFrameCount(int animNumber);
 int GetNextAnimState(ItemInfo* item);
 int GetNextAnimState(int objectID, int animNumber);
 bool GetStateDispatch(ItemInfo* item, const AnimData& anim);
-int GetFrame(ItemInfo* item, AnimFrame* framePtr[], int* rate);
+int GetFrame(ItemInfo* item, AnimFrame* outFramePtr[], int& outRate);
 AnimFrame* GetBestFrame(ItemInfo* item);
 
-void ClampRotation(Pose* pose, short angle, short rotation); 
+void ClampRotation(Pose& outPose, short angle, short rotation); 
 void DrawAnimatingItem(ItemInfo* item);
 
 Vector3i GetJointPosition(ItemInfo* item, int jointIndex, const Vector3i& offset = Vector3i::Zero);

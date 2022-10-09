@@ -354,7 +354,7 @@ namespace TEN::Entities::TR4
 				creature->JointRotation[i] -= item->ItemFlags[0];
 
 			if (!creature->ReachedGoal)
-				ClampRotation(&item->Pose, AI.angle, item->ItemFlags[0] / 16);
+				ClampRotation(item->Pose, AI.angle, item->ItemFlags[0] / 16);
 
 			creature->MaxTurn = 0;
 			AnimateItem(item);

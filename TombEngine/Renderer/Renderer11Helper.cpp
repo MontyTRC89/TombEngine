@@ -284,9 +284,9 @@ namespace TEN::Renderer
 
 			AnimFrame* framePtr[2];
 			int rate;
-			int frac = GetFrame(nativeItem, framePtr, &rate);
+			int frac = GetFrame(nativeItem, framePtr, rate);
 
-			UpdateAnimation(itemToDraw, moveableObj, framePtr, frac, rate, 0xFFFFFFFF);
+			UpdateAnimation(itemToDraw, moveableObj, framePtr, frac, rate, UINT_MAX);
 
 			for (int m = 0; m < obj->nmeshes; m++)
 				itemToDraw->AnimationTransforms[m] = itemToDraw->AnimationTransforms[m];
