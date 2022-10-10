@@ -1289,11 +1289,11 @@ bool TestLaraKeepLow(ItemInfo* item, CollisionInfo* coll)
 
 bool TestLaraSlide(ItemInfo* item, CollisionInfo* coll)
 {
-	int y = item->Pose.Position.y;
-	auto probe = GetCollision(item, 0, 0, -(coll->Setup.Height / 2));
+	int yPos = item->Pose.Position.y;
+	auto pointColl = GetCollision(item, 0, 0, -(coll->Setup.Height / 2));
 
-	if (abs(probe.Position.Floor - y) <= STEPUP_HEIGHT &&
-		probe.Position.FloorSlope &&
+	if (abs(pointColl.Position.Floor - yPos) <= STEPUP_HEIGHT &&
+		pointColl.Position.FloorSlope &&
 		!TestEnvironment(ENV_FLAG_SWAMP, item))
 	{
 		return true;
@@ -1320,10 +1320,10 @@ bool TestLaraFall(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	int y = item->Pose.Position.y;
-	auto probe = GetCollision(item, 0, 0, -(coll->Setup.Height / 2));
+	int yPos = item->Pose.Position.y;
+	auto pointColl = GetCollision(item, 0, 0, -(coll->Setup.Height / 2));
 
-	if ((probe.Position.Floor - y) <= STEPUP_HEIGHT ||
+	if ((pointColl.Position.Floor - yPos) <= STEPUP_HEIGHT ||
 		lara->Control.WaterStatus == WaterStatus::Wade)	// TODO: This causes a legacy floor snap bug when Lara wades off a ledge into a dry room. @Sezz 2021.09.26
 	{
 		return false;
