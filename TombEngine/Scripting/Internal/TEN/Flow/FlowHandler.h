@@ -66,6 +66,8 @@ public:
 	bool HasOverhangClimb() const override { return Anims.HasOverhangClimb; }
 	bool HasSlideExtended() const override { return Anims.HasSlideExtended; }
 	bool HasSprintJump() const override { return Anims.HasSprintJump; }
+	bool HasLedgeJumpUp() const override { return Anims.HasLedgeJumpUp; }
+	bool HasLedgeJumpBack() const override { return Anims.HasLedgeJumpBack; }
 	bool DoFlow() override;
 };
 

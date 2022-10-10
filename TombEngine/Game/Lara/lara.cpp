@@ -4,6 +4,7 @@
 #include "Game/Lara/lara_basic.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_jump.h"
+#include "Game/Lara/lara_ledge_jump.h"
 #include "Game/Lara/lara_tests.h"
 #include "Game/Lara/lara_monkey.h"
 #include "Game/Lara/lara_crawl.h"
@@ -400,8 +401,8 @@ function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] =
 	lara_void_func,//165
 	lara_void_func,//166
 	lara_void_func,//167
-	lara_void_func,//168
-	lara_void_func,//169
+	lara_col_ledge_jump_up,
+	lara_col_ledge_jump_back,
 	lara_col_idle,//170
 	lara_col_crouch_turn_180,//171
 	lara_col_crawl_turn_180,//172
