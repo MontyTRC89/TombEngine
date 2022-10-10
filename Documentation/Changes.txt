@@ -7,6 +7,7 @@ Version 1.0.3
 * Fix rocket explosions near statics.
 * Fix TR3 monkey level crash.
 * Fix occasional ejection when landing on a slope.
+* Fix slow centaur projectile velocity.
 
 
 Version 1.0.2
