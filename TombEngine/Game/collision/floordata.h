@@ -6,14 +6,14 @@
 
 using namespace TEN::Math;
 
-constexpr auto WALL_PLANE = Vector3(0, 0, (float)-CLICK(127));
+constexpr auto WALL_PLANE = Vector3(0, 0, -CLICK(127));
 
-enum class CLIMB_DIRECTION : short
+enum class ClimbDirection : short
 {
-	North = 0x0100,
-	East = 0x0200,
-	South = 0x0400,
-	West = 0x0800
+	North = (1 << 8),
+	East  = (1 << 9),
+	South = (1 << 10),
+	West  = (1 << 11)
 };
 
 enum class FLOOR_MATERIAL : unsigned char
@@ -67,17 +67,17 @@ struct SECTOR_FLAGS
 	bool MinecartRight() { return MarkBeetle; }
 	bool MinecartStop() { return MarkBeetle && MarkTriggerer; }
 
-	bool ClimbPossible(CLIMB_DIRECTION direction)
+	bool ClimbPossible(ClimbDirection direction)
 	{
 		switch (direction)
 		{
-		case CLIMB_DIRECTION::North:
+		case ClimbDirection::North:
 			return ClimbNorth;
-		case CLIMB_DIRECTION::South:
+		case ClimbDirection::South:
 			return ClimbSouth;
-		case CLIMB_DIRECTION::East:
+		case ClimbDirection::East:
 			return ClimbEast;
-		case CLIMB_DIRECTION::West:
+		case ClimbDirection::West:
 			return ClimbWest;
 		}
 
