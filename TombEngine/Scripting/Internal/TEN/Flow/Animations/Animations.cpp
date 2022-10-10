@@ -20,7 +20,6 @@ void Animations::Register(sol::table& parent)
 		"slideExtended", &Animations::HasSlideExtended,
 		"sprintJump", &Animations::HasSprintJump,
 		"pose", &Animations::HasPose,
-		"ledgeJumpUp", &Animations::HasLedgeJumpUp,
-		"ledgeJumpBack", &Animations::HasLedgeJumpBack
+		"ledgeJumps", &Animations::HasLedgeJumps
 		);
 }

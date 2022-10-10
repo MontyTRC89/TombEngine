@@ -31,8 +31,7 @@ public:
 	virtual bool HasAFKPose() const = 0;
 	virtual bool HasOverhangClimb() const = 0;
 	virtual bool HasSlideExtended() const = 0;
-	virtual bool HasLedgeJumpUp() const = 0;
-	virtual bool HasLedgeJumpBack() const = 0;
+	virtual bool HasLedgeJumps() const = 0;
 	virtual ScriptInterfaceLevel * GetLevel(int level) = 0;
 	virtual int	GetLevelNumber(std::string const& fileName) = 0;
 	virtual bool CanPlayAnyLevel() const = 0;
