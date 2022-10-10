@@ -18,10 +18,10 @@
 using namespace TEN::Effects::Explosion;
 using namespace TEN::Math;
 
-#define MUTANT_SHARD_DAMAGE 30
-#define MUTANT_BOMB_DAMAGE 100
-#define DIVER_HARPOON_DAMAGE 50
-#define KNIFE_DAMAGE 50
+constexpr auto MUTANT_SHARD_DAMAGE	= 30;
+constexpr auto MUTANT_BOMB_DAMAGE	= 100;
+constexpr auto DIVER_HARPOON_DAMAGE = 50;
+constexpr auto KNIFE_DAMAGE			= 50;
 
 void ShootAtLara(FX_INFO& fx)
 {
