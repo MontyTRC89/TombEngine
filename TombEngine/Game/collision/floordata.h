@@ -42,7 +42,6 @@ enum class FLOOR_MATERIAL : unsigned char
 	Custom8 = 21,
 };
 
-
 struct SECTOR_COLLISION_INFO
 {
 	float SplitAngle;
@@ -73,10 +72,13 @@ struct SECTOR_FLAGS
 		{
 		case ClimbDirection::North:
 			return ClimbNorth;
+
 		case ClimbDirection::South:
 			return ClimbSouth;
+
 		case ClimbDirection::East:
 			return ClimbEast;
+
 		case ClimbDirection::West:
 			return ClimbWest;
 		}

@@ -271,28 +271,28 @@ SlopeData GetSlopeData(ItemInfo* item)
 	case NORTH:
 		slopeData.Offset.z = CLICK(1);
 		slopeData.Goal.y = -4;
-		slopeData.ClimbOrient = (short)CLIMB_DIRECTION::North;
+		slopeData.ClimbOrient = (short)ClimbDirection::North;
 		slopeData.GoalOrient = 0;
 		break;
 
 	case EAST:
 		slopeData.Offset.x = CLICK(1);
 		slopeData.Goal.x = -4;
-		slopeData.ClimbOrient = (short)CLIMB_DIRECTION::East;
+		slopeData.ClimbOrient = (short)ClimbDirection::East;
 		slopeData.GoalOrient = ANGLE(90.0f);
 		break;
 
 	case SOUTH:
 		slopeData.Offset.z = -CLICK(1);
 		slopeData.Goal.y = 4;
-		slopeData.ClimbOrient = (short)CLIMB_DIRECTION::South;
+		slopeData.ClimbOrient = (short)ClimbDirection::South;
 		slopeData.GoalOrient = ANGLE(180.0f);
 		break;
 
 	case WEST:
 		slopeData.Offset.x = -CLICK(1);
 		slopeData.Goal.x = 4;
-		slopeData.ClimbOrient = (short)CLIMB_DIRECTION::West;
+		slopeData.ClimbOrient = (short)ClimbDirection::West;
 		slopeData.GoalOrient = ANGLE(270.0f);
 		break;
 	}

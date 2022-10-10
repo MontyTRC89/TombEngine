@@ -9,19 +9,19 @@ struct ROOM_INFO;
 struct MESH_INFO;
 enum RoomEnvFlags;
 
-constexpr auto NO_LOWER_BOUND = -NO_HEIGHT;	// used by coll->Setup.LowerFloorBound
-constexpr auto NO_UPPER_BOUND = NO_HEIGHT;	// used by coll->Setup.UpperFloorBound
+constexpr auto NO_LOWER_BOUND = -NO_HEIGHT;	// Used by coll->Setup.LowerFloorBound.
+constexpr auto NO_UPPER_BOUND = NO_HEIGHT;	// Used by coll->Setup.UpperFloorBound.
 constexpr auto COLLISION_CHECK_DISTANCE = SECTOR(8);
 
 enum CollisionType
 {
-	CT_NONE = 0,				// 0x00
-	CT_FRONT = (1 << 0),		// 0x01
-	CT_LEFT = (1 << 1),			// 0x02
-	CT_RIGHT = (1 << 2),		// 0x04
-	CT_TOP = (1 << 3),			// 0x08
-	CT_TOP_FRONT = (1 << 4),	// 0x10
-	CT_CLAMP = (1 << 5)			// 0x20
+	CT_NONE		 = 0,
+	CT_FRONT	 = (1 << 0),
+	CT_LEFT		 = (1 << 1),
+	CT_RIGHT	 = (1 << 2),
+	CT_TOP		 = (1 << 3),
+	CT_TOP_FRONT = (1 << 4),
+	CT_CLAMP	 = (1 << 5)
 };
 
 enum class CollisionProbeMode
@@ -48,8 +48,8 @@ struct CollisionPosition
 	bool CeilingSlope;
 	bool DiagonalStep;
 
-	bool HasDiagonalSplit() { return SplitAngle == 45.0f * RADIAN || SplitAngle == 135.0f * RADIAN; }
-	bool HasFlippedDiagonalSplit() { return HasDiagonalSplit() && SplitAngle != 45.0f * RADIAN; }
+	bool HasDiagonalSplit()		   { return ((SplitAngle == (45.0f * RADIAN)) || (SplitAngle == (135.0f * RADIAN))); }
+	bool HasFlippedDiagonalSplit() { return (HasDiagonalSplit() && (SplitAngle != (45.0f * RADIAN))); }
 };
 
 struct CollisionResult
@@ -61,8 +61,8 @@ struct CollisionResult
 	FloorInfo* BottomBlock;
 
 	CollisionPosition Position;
-	Vector2 FloorTilt;			// x = x, y = z
-	Vector2 CeilingTilt;		// x = x, y = z
+	Vector2 FloorTilt;	 // x = x, y = z
+	Vector2 CeilingTilt; // x = x, y = z
 };
 
 struct CollisionSetup
@@ -106,18 +106,18 @@ struct CollisionInfo
 
 	Vector3i Shift;
 	CollisionType CollisionType;
-	Vector2 FloorTilt;				// x = x, y = z
-	Vector2 CeilingTilt;			// x = x, y = z
+	Vector2 FloorTilt;	 // x = x, y = z
+	Vector2 CeilingTilt; // x = x, y = z
 	short NearestLedgeAngle;
 	float NearestLedgeDistance;
 
 	bool HitStatic;
 	bool HitTallObject;
 
-	bool TriangleAtRight() { return MiddleRight.SplitAngle != 0.0f && MiddleRight.SplitAngle == Middle.SplitAngle; }
-	bool TriangleAtLeft() { return MiddleLeft.SplitAngle != 0.0f && MiddleLeft.SplitAngle == Middle.SplitAngle; }
-	bool DiagonalStepAtRight() { return MiddleRight.DiagonalStep && TriangleAtRight() && (NearestLedgeAngle % ANGLE(90.0f)); }
-	bool DiagonalStepAtLeft()  { return MiddleLeft.DiagonalStep && TriangleAtLeft() && (NearestLedgeAngle % ANGLE(90.0f)); }
+	bool TriangleAtRight()	   { return ((MiddleRight.SplitAngle != 0.0f) && (MiddleRight.SplitAngle == Middle.SplitAngle)); }
+	bool TriangleAtLeft()	   { return ((MiddleLeft.SplitAngle != 0.0f) && (MiddleLeft.SplitAngle == Middle.SplitAngle)); }
+	bool DiagonalStepAtRight() { return (MiddleRight.DiagonalStep && TriangleAtRight() && (NearestLedgeAngle % ANGLE(90.0f))); }
+	bool DiagonalStepAtLeft()  { return (MiddleLeft.DiagonalStep && TriangleAtLeft() && (NearestLedgeAngle % ANGLE(90.0f))); }
 };
 
 [[nodiscard]] bool TestItemRoomCollisionAABB(ItemInfo* item);
