@@ -73,17 +73,17 @@ struct LIGHTINFO
 
 enum RoomEnvFlags
 {
-	ENV_FLAG_WATER = 0x0001,
-	ENV_FLAG_SWAMP = 0x0004,
-	ENV_FLAG_OUTSIDE = 0x0008,
-	ENV_FLAG_DYNAMIC_LIT = 0x0010,
-	ENV_FLAG_WIND = 0x0020,
-	ENV_FLAG_NOT_NEAR_OUTSIDE = 0x0040,
-	ENV_FLAG_NO_LENSFLARE = 0x0080, // Was quicksand in TR3.
-	ENV_FLAG_MIST = 0x0100,
-	ENV_FLAG_CAUSTICS = 0x0200,
-	ENV_FLAG_UNKNOWN3 = 0x0400,
-	ENV_FLAG_COLD = 0x1000
+	ENV_FLAG_WATER			  = (1 << 0),
+	ENV_FLAG_SWAMP			  = (1 << 2),
+	ENV_FLAG_OUTSIDE		  = (1 << 3),
+	ENV_FLAG_DYNAMIC_LIT	  = (1 << 4),
+	ENV_FLAG_WIND			  = (1 << 5),
+	ENV_FLAG_NOT_NEAR_OUTSIDE = (1 << 6),
+	ENV_FLAG_NO_LENSFLARE	  = (1 << 7), // NOTE: Was quicksand in TR3.
+	ENV_FLAG_MIST			  = (1 << 8),
+	ENV_FLAG_CAUSTICS		  = (1 << 9),
+	ENV_FLAG_UNKNOWN3		  = (1 << 10),
+	ENV_FLAG_COLD			  = (1 << 12)
 };
 
 enum StaticMeshFlags : short

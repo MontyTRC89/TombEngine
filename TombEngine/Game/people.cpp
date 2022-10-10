@@ -135,7 +135,7 @@ bool Targetable(ItemInfo* item, AI_INFO* AI)
 	return LOS(&origin, &target);
 }
 
-bool TargetVisible(ItemInfo* item, AI_INFO* AI, float maxAngle)
+bool TargetVisible(ItemInfo* item, AI_INFO* AI, float maxAngleInDegrees)
 {
 	if (!item->IsCreature() || AI->distance >= SQUARE(MAX_VISIBILITY_DISTANCE))
 		return false;
@@ -150,7 +150,7 @@ bool TargetVisible(ItemInfo* item, AI_INFO* AI, float maxAngle)
 		return false;
 
 	short angle = AI->angle - creature->JointRotation[2];
-	if (angle > ANGLE(-maxAngle) && angle < ANGLE(maxAngle))
+	if (angle > ANGLE(-maxAngleInDegrees) && angle < ANGLE(maxAngleInDegrees))
 	{
 		auto& bounds = GetBestFrame(enemy)->boundingBox;
 

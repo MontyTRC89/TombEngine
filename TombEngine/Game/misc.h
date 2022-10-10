@@ -5,7 +5,7 @@
 #define CHK_EXI(var, flag) var & flag
 #define CHK_NOP(var, flag) !(var & flag)
 
-enum LARA_MESH_MASK
+enum LaraMeshMask
 {
 	LARA_ONLY_LEGS			  = 0,
 	LARA_ONLY_ARMS			  = (1 << 1),

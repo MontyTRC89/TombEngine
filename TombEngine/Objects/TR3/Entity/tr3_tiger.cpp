@@ -23,7 +23,7 @@ namespace TEN::Entities::Creatures::TR3
 	constexpr auto TIGER_POUNCE_ATTACK_RANGE = SQUARE(SECTOR(1));
 	constexpr auto TIGER_RUN_ATTACK_RANGE	 = SQUARE(SECTOR(1.5f));
 
-	constexpr auto TIGER_WALK_CHANCE = 0.035f;
+	constexpr auto TIGER_WALK_CHANCE = 1.0f / 32;
 	constexpr auto TIGER_ROAR_CHANCE = 1.0f / 340;
 
 	const auto TigerBite = BiteInfo(Vector3(19.0f, -13.0f, 3.0f), 26);
@@ -71,8 +71,8 @@ namespace TEN::Entities::Creatures::TR3
 		auto* item = &g_Level.Items[itemNumber];
 		auto* creature = GetCreatureInfo(item);
 
-		short angle = 0;
-		short tilt = 0;
+		short headingAngle = 0;
+		short tiltAngle = 0;
 		auto extraHeadRot = EulerAngles::Zero;
 
 		if (item->HitPoints <= 0)
@@ -95,7 +95,7 @@ namespace TEN::Entities::Creatures::TR3
 
 			CreatureMood(item, &AI, true);
 
-			angle = CreatureTurn(item, creature->MaxTurn);
+			headingAngle = CreatureTurn(item, creature->MaxTurn);
 
 			switch (item->Animation.ActiveState)
 			{
@@ -191,8 +191,8 @@ namespace TEN::Entities::Creatures::TR3
 			}
 		}
 
-		CreatureTilt(item, tilt);
+		CreatureTilt(item, tiltAngle);
 		CreatureJoint(item, 0, extraHeadRot.y);
-		CreatureAnimation(itemNumber, angle, tilt);
+		CreatureAnimation(itemNumber, headingAngle, tiltAngle);
 	}
 }

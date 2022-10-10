@@ -43,10 +43,10 @@ struct CAMERA_INFO
 
 enum CAMERA_FLAGS
 {
-	CF_NONE = 0,
+	CF_NONE			 = 0,
 	CF_FOLLOW_CENTER = 1,
-	CF_NO_CHUNKY = 2,
-	CF_CHASE_OBJECT = 3,
+	CF_NO_CHUNKY	 = 2,
+	CF_CHASE_OBJECT	 = 3,
 };
 
 constexpr auto FADE_SCREEN_SPEED = 16.0f / 255.0f;
