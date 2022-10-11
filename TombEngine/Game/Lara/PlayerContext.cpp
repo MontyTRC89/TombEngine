@@ -174,13 +174,10 @@ namespace TEN::Entities::Player
 		// HACK: coll->Setup.Radius is only set to LARA_RADIUS_CRAWL in lara_col functions, then reset by LaraAboveWater(),
 		// meaning that for tests called in lara_as functions it will store the wrong radius. -- Sezz 2021.11.05
 		static const std::vector<LaraState> crouchStates = { LS_CROUCH_IDLE, LS_CROUCH_TURN_LEFT, LS_CROUCH_TURN_RIGHT };
-		int radius = CheckLaraState((LaraState)PlayerItemPtr->Animation.ActiveState, crouchStates) ? LARA_RADIUS_CRAWL : LARA_RADIUS;
-
-		auto pointCollFront = GetCollision(PlayerItemPtr, PlayerItemPtr->Pose.Orientation.y, radius, -PlayerCollPtr->Setup.Height);
-		auto pointCollBack = GetCollision(PlayerItemPtr, PlayerItemPtr->Pose.Orientation.y + ANGLE(180.0f), radius, -PlayerCollPtr->Setup.Height);
-		auto pointCollCenter = GetCollision(PlayerItemPtr, 0, 0.0f, -LARA_HEIGHT / 2);
+		float radius = CheckLaraState((LaraState)PlayerItemPtr->Animation.ActiveState, crouchStates) ? LARA_RADIUS_CRAWL : LARA_RADIUS;
 
 		// Assess middle point collision.
+		auto pointCollCenter = GetCollision(PlayerItemPtr, 0, 0.0f, -LARA_HEIGHT / 2);
 		if (abs(pointCollCenter.Position.Ceiling - pointCollCenter.Position.Floor) < LARA_HEIGHT ||	// Center space is narrow enough.
 			abs(PlayerCollPtr->Middle.Ceiling - LARA_HEIGHT_CRAWL) < LARA_HEIGHT)					// Consider statics overhead detected by GetCollisionInfo().
 		{
@@ -190,6 +187,7 @@ namespace TEN::Entities::Player
 		// TODO: Check whether < or <= and > or >=.
 
 		// Assess front point collision.
+		auto pointCollFront = GetCollision(PlayerItemPtr, PlayerItemPtr->Pose.Orientation.y, radius, -PlayerCollPtr->Setup.Height);
 		if (abs(pointCollFront.Position.Ceiling - pointCollFront.Position.Floor) < LARA_HEIGHT &&		  // Front space is narrow enough.
 			abs(pointCollFront.Position.Ceiling - pointCollFront.Position.Floor) > LARA_HEIGHT_CRAWL &&	  // Front space not too narrow.
 			abs(pointCollFront.Position.Floor - pointCollCenter.Position.Floor) <= CRAWL_STEPUP_HEIGHT && // Front floor is within upper/lower floor bounds.
@@ -199,6 +197,7 @@ namespace TEN::Entities::Player
 		}
 
 		// Assess back point collision.
+		auto pointCollBack = GetCollision(PlayerItemPtr, PlayerItemPtr->Pose.Orientation.y, -radius, -PlayerCollPtr->Setup.Height);
 		if (abs(pointCollBack.Position.Ceiling - pointCollBack.Position.Floor) < LARA_HEIGHT &&			 // Back space is narrow enough.
 			abs(pointCollBack.Position.Ceiling - pointCollBack.Position.Floor) > LARA_HEIGHT_CRAWL &&	 // Back space not too narrow.
 			abs(pointCollBack.Position.Floor - pointCollCenter.Position.Floor) <= CRAWL_STEPUP_HEIGHT && // Back floor is within upper/lower floor bounds.
@@ -246,7 +245,7 @@ namespace TEN::Entities::Player
 
 		const auto& player = GetLaraInfo(PlayerItemPtr);
 
-		// 1. Assess water depth.
+		// 1. Check water depth.
 		if (player->WaterSurfaceDist < maxWaterHeight)
 			return false;
 
@@ -290,6 +289,33 @@ namespace TEN::Entities::Player
 			CRAWL_STEPUP_HEIGHT, -CRAWL_STEPUP_HEIGHT // Defined by crawl backward state.
 		};
 		return this->TestGroundMovementSetup(contextSetup, true);
+	}
+
+	bool PlayerContext::CanGrabMonkeySwing()
+	{
+		static const float monkeySwingGrabTolerance = CLICK(0.5f);
+
+		auto* player = GetLaraInfo(PlayerItemPtr);
+
+		// 1. Check for monkey swing ceiling.
+		if (!player->Control.CanMonkeySwing)
+			return false;
+
+		int vPos = PlayerItemPtr->Pose.Position.y - LARA_HEIGHT_MONKEY;
+		auto pointColl = GetCollision(PlayerItemPtr);
+
+		// 2. Assess collision with ceiling.
+		if ((pointColl.Position.Ceiling - vPos) < 0 & PlayerCollPtr->CollisionType != CT_TOP && PlayerCollPtr->CollisionType != CT_TOP_FRONT)
+			return false;
+
+		// 3. Assess point collision.
+		if ((pointColl.Position.Ceiling - vPos) <= monkeySwingGrabTolerance &&
+			abs(pointColl.Position.Ceiling - pointColl.Position.Floor) > LARA_HEIGHT_MONKEY)
+		{
+			return true;
+		}
+
+		return false;
 	}
 
 	bool PlayerContext::CanMonkeyForward()
@@ -360,10 +386,36 @@ namespace TEN::Entities::Player
 
 	bool PlayerContext::CanRunJumpForward()
 	{
+		auto* player = GetLaraInfo(PlayerItemPtr);
+
+		// Check run timer.
+		if (player->Control.Count.Run < LARA_RUN_JUMP_TIME)
+			return false;
+
 		Context::SetupJump contextSetup
 		{
 			PlayerItemPtr->Pose.Orientation.y,
 			CLICK(1.5f)
+		};
+		return TestJumpMovementSetup(contextSetup);
+	}
+	
+	bool PlayerContext::CanSprintJumpForward()
+	{
+		auto* player = GetLaraInfo(PlayerItemPtr);
+
+		// Check for jump state dispatch.
+		if (!HasStateDispatch(PlayerItemPtr, LS_JUMP_FORWARD))
+			return false;
+
+		// Check run timer.
+		if (player->Control.Count.Run < LARA_SPRINT_JUMP_TIME)
+			return false;
+
+		Context::SetupJump contextSetup
+		{
+			PlayerItemPtr->Pose.Orientation.y,
+			CLICK(1.8f)
 		};
 		return TestJumpMovementSetup(contextSetup);
 	}
@@ -428,15 +480,15 @@ namespace TEN::Entities::Player
 		return TestMonkeyMovementSetup(contextSetup);
 	}
 
-	bool PlayerContext::TestDirectionalStandingJump(short headingAngle)
+	bool PlayerContext::TestDirectionalStandingJump(short relativeHeadingAngle)
 	{
-		// In swamp; return early.
+		// Check for swamp.
 		if (TestEnvironment(ENV_FLAG_SWAMP, PlayerItemPtr))
 			return false;
 
 		Context::SetupJump testSetup =
 		{
-			PlayerItemPtr->Pose.Orientation.y + headingAngle,
+			PlayerItemPtr->Pose.Orientation.y + relativeHeadingAngle,
 			CLICK(0.85f)
 		};
 		return TestJumpMovementSetup(testSetup);
@@ -450,16 +502,16 @@ namespace TEN::Entities::Player
 		int playerRadius = useCrawlSetup ? LARA_RADIUS_CRAWL : PlayerCollPtr->Setup.Radius;
 		int playerHeight = useCrawlSetup ? LARA_HEIGHT_CRAWL : PlayerCollPtr->Setup.Height;
 
-		int yPos = PlayerItemPtr->Pose.Position.y;
-		int yPosTop = yPos - playerHeight;
+		int vPos = PlayerItemPtr->Pose.Position.y;
+		int vPosTop = vPos - playerHeight;
 		auto pointColl = GetCollision(PlayerItemPtr, contextSetup.HeadingAngle, OFFSET_RADIUS(playerRadius), -playerHeight);
 
 		// 1. Check for wall.
 		if (pointColl.Position.Floor == NO_HEIGHT)
 			return false;
 
-		bool isSlopeDown  = contextSetup.TestSlopeDown  ? (pointColl.Position.FloorSlope && pointColl.Position.Floor > yPos) : false;
-		bool isSlopeUp	  = contextSetup.TestSlopeUp	? (pointColl.Position.FloorSlope && pointColl.Position.Floor < yPos) : false;
+		bool isSlopeDown  = contextSetup.TestSlopeDown  ? (pointColl.Position.FloorSlope && pointColl.Position.Floor > vPos) : false;
+		bool isSlopeUp	  = contextSetup.TestSlopeUp	? (pointColl.Position.FloorSlope && pointColl.Position.Floor < vPos) : false;
 		bool isDeathFloor = contextSetup.TestDeathFloor ? pointColl.Block->Flags.Death										 : false;
 
 		// 2. Check for floor slope or death floor (if applicable).
@@ -469,13 +521,13 @@ namespace TEN::Entities::Player
 		// Raycast setup at upper floor bound.
 		auto originA = GameVector(
 			PlayerItemPtr->Pose.Position.x,
-			(yPos + contextSetup.UpperFloorBound) - 1,
+			(vPos + contextSetup.UpperFloorBound) - 1,
 			PlayerItemPtr->Pose.Position.z,
 			PlayerItemPtr->RoomNumber
 		);
 		auto targetA = GameVector(
 			pointColl.Coordinates.x,
-			(yPos + contextSetup.UpperFloorBound) - 1,
+			(vPos + contextSetup.UpperFloorBound) - 1,
 			pointColl.Coordinates.z,
 			PlayerItemPtr->RoomNumber
 		);
@@ -483,13 +535,13 @@ namespace TEN::Entities::Player
 		// Raycast setup at lowest ceiling bound (player height).
 		auto originB = GameVector(
 			PlayerItemPtr->Pose.Position.x,
-			yPosTop + 1,
+			vPosTop + 1,
 			PlayerItemPtr->Pose.Position.z,
 			PlayerItemPtr->RoomNumber
 		);
 		auto targetB = GameVector(
 			pointColl.Coordinates.x,
-			yPosTop + 1,
+			vPosTop + 1,
 			pointColl.Coordinates.z,
 			PlayerItemPtr->RoomNumber
 		);
@@ -499,9 +551,9 @@ namespace TEN::Entities::Player
 			return false;
 
 		// 4. Assess point collision.
-		if ((pointColl.Position.Floor - yPos) <= contextSetup.LowerFloorBound &&	   // Floor is within lower floor bound.
-			(pointColl.Position.Floor - yPos) >= contextSetup.UpperFloorBound &&	   // Floor is within upper floor bound.
-			(pointColl.Position.Ceiling - yPos) < -playerHeight &&					   // Ceiling is within lowest ceiling bound (player height).
+		if ((pointColl.Position.Floor - vPos) <= contextSetup.LowerFloorBound &&	   // Floor is within lower floor bound.
+			(pointColl.Position.Floor - vPos) >= contextSetup.UpperFloorBound &&	   // Floor is within upper floor bound.
+			(pointColl.Position.Ceiling - vPos) < -playerHeight &&					   // Ceiling is within lowest ceiling bound (player height).
 			abs(pointColl.Position.Ceiling - pointColl.Position.Floor) > playerHeight) // Space is not too narrow.
 		{
 			return true;
@@ -515,8 +567,8 @@ namespace TEN::Entities::Player
 		// HACK: Have to make the height explicit for now (see comment in above function). -- Sezz 2022.07.28
 		static const int playerHeight = LARA_HEIGHT_MONKEY;
 
-		int yPos = PlayerItemPtr->Pose.Position.y;
-		int yPosTop = yPos - playerHeight;
+		int vPos = PlayerItemPtr->Pose.Position.y;
+		int vPosTop = vPos - playerHeight;
 		auto pointColl = GetCollision(PlayerItemPtr, contextSetup.HeadingAngle, OFFSET_RADIUS(PlayerCollPtr->Setup.Radius));
 
 		// 1. Check for wall.
@@ -530,13 +582,13 @@ namespace TEN::Entities::Player
 		// Raycast setup at highest floor bound (player base)
 		auto originA = GameVector(
 			PlayerItemPtr->Pose.Position.x,
-			yPos - 1,
+			vPos - 1,
 			PlayerItemPtr->Pose.Position.z,
 			PlayerItemPtr->RoomNumber
 		);
 		auto targetA = GameVector(
 			pointColl.Coordinates.x,
-			yPos - 1,
+			vPos - 1,
 			pointColl.Coordinates.z,
 			PlayerItemPtr->RoomNumber
 		);
@@ -544,13 +596,13 @@ namespace TEN::Entities::Player
 		// Raycast setup at lower ceiling bound.
 		auto originB = GameVector(
 			PlayerItemPtr->Pose.Position.x,
-			(yPosTop + contextSetup.LowerCeilingBound) + 1,
+			(vPosTop + contextSetup.LowerCeilingBound) + 1,
 			PlayerItemPtr->Pose.Position.z,
 			PlayerItemPtr->RoomNumber
 		);
 		auto targetB = GameVector(
 			pointColl.Coordinates.x,
-			(yPosTop + contextSetup.LowerCeilingBound) + 1,
+			(vPosTop + contextSetup.LowerCeilingBound) + 1,
 			pointColl.Coordinates.z,
 			PlayerItemPtr->RoomNumber
 		);
@@ -561,9 +613,9 @@ namespace TEN::Entities::Player
 
 		// 4. Assess point collision.
 		if (pointColl.BottomBlock->Flags.Monkeyswing &&								    // Ceiling is monkey swing.
-			(pointColl.Position.Ceiling - yPosTop) <= contextSetup.LowerCeilingBound &&	// Ceiling is within lower ceiling bound.
-			(pointColl.Position.Ceiling - yPosTop) >= contextSetup.UpperCeilingBound &&	// Ceiling is within upper ceiling bound.
-			(pointColl.Position.Floor - yPos) > 0 &&									// Floor is within highest floor bound (player base).
+			(pointColl.Position.Ceiling - vPosTop) <= contextSetup.LowerCeilingBound &&	// Ceiling is within lower ceiling bound.
+			(pointColl.Position.Ceiling - vPosTop) >= contextSetup.UpperCeilingBound &&	// Ceiling is within upper ceiling bound.
+			(pointColl.Position.Floor - vPos) > 0 &&									// Floor is within highest floor bound (player base).
 			abs(pointColl.Position.Ceiling - pointColl.Position.Floor) > playerHeight)	// Space is not too narrow.
 		{
 			return true;
@@ -576,7 +628,7 @@ namespace TEN::Entities::Player
 	{
 		auto* player = GetLaraInfo(PlayerItemPtr);
 
-		int yPos = PlayerItemPtr->Pose.Position.y;
+		int vPos = PlayerItemPtr->Pose.Position.y;
 		auto pointColl = GetCollision(PlayerItemPtr, contextSetup.HeadingAngle, contextSetup.Distance, -PlayerCollPtr->Setup.Height);
 
 		// 1. Check for wall.
@@ -595,10 +647,10 @@ namespace TEN::Entities::Player
 			return false;
 
 		// 4. Assess point collision.
-		if ((pointColl.Position.Floor - yPos) >= -STEPUP_HEIGHT &&											  // Floor is within highest floor bound.
-			((pointColl.Position.Ceiling - yPos) < -(PlayerCollPtr->Setup.Height + (LARA_HEADROOM * 0.8f)) || // Ceiling is within lowest ceiling bound... 
-				((pointColl.Position.Ceiling - yPos) < -PlayerCollPtr->Setup.Height &&								// OR ceiling is level with Lara's head
-					(pointColl.Position.Floor - yPos) >= CLICK(0.5f))))												// AND there is a drop below.
+		if ((pointColl.Position.Floor - vPos) >= -STEPUP_HEIGHT &&											  // Floor is within highest floor bound.
+			((pointColl.Position.Ceiling - vPos) < -(PlayerCollPtr->Setup.Height + (LARA_HEADROOM * 0.8f)) || // Ceiling is within lowest ceiling bound... 
+				((pointColl.Position.Ceiling - vPos) < -PlayerCollPtr->Setup.Height &&								// OR ceiling is level with Lara's head...
+					(pointColl.Position.Floor - vPos) >= CLICK(0.5f))))												// AND there is a drop below.
 		{
 			return true;
 		}

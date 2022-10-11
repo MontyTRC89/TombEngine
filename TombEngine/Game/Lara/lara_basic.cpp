@@ -258,8 +258,7 @@ void lara_as_run_forward(ItemInfo* item, CollisionInfo* coll)
 
 	if (TrInput & IN_JUMP || lara->Control.RunJumpQueued)
 	{
-		if (!(TrInput & IN_SPRINT) && lara->Control.Count.Run >= LARA_RUN_JUMP_TIME &&
-			lara->Context.CanRunJumpForward())
+		if (!(TrInput & IN_SPRINT) && lara->Context.CanRunJumpForward())
 		{
 			item->Animation.TargetState = LS_JUMP_FORWARD;
 			return;
@@ -1627,8 +1626,7 @@ void lara_as_sprint(ItemInfo* item, CollisionInfo* coll)
 			item->Animation.TargetState = LS_SPRINT_DIVE;
 			return;
 		}
-		else if (TrInput & IN_SPRINT && lara->Control.Count.Run >= LARA_SPRINT_JUMP_TIME &&
-			lara->Context.CanRunJumpForward() && HasStateDispatch(item, LS_JUMP_FORWARD))
+		else if (TrInput & IN_SPRINT && lara->Context.CanSprintJumpForward())
 		{
 			item->Animation.TargetState = LS_JUMP_FORWARD;
 			return;
@@ -1643,8 +1641,6 @@ void lara_as_sprint(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	// TODO: Supposedly there is a bug wherein sprinting into the boundary between shallow and deep water
-	// while meeting some condition allows Lara to run around in the water room. Investigate. @Sezz 2021.09.29
 	if (TrInput & IN_FORWARD)
 	{
 		auto vaultResult = TestLaraVault(item, coll);

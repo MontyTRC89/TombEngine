@@ -41,6 +41,7 @@ namespace TEN::Entities::Player
 		bool CanCrawlBackward();
 
 		// Monkey swing movement
+		bool CanGrabMonkeySwing();
 		bool CanMonkeyForward();
 		bool CanMonkeyBackward();
 		bool CanMonkeyShimmyLeft();
@@ -54,6 +55,7 @@ namespace TEN::Entities::Player
 		bool CanJumpLeft();
 		bool CanJumpRight();
 		bool CanRunJumpForward();
+		bool CanSprintJumpForward();
 		bool CanSlideJumpForward();
 		bool CanCrawlspaceDive();
 
@@ -65,7 +67,7 @@ namespace TEN::Entities::Player
 		// Helper inquirers
 		bool TestSidestep(bool isGoingRight);
 		bool TestMonkeyShimmy(bool isGoingRight);
-		bool TestDirectionalStandingJump(short headingAngle);
+		bool TestDirectionalStandingJump(short relativeHeadingAngle);
 
 		// Setup inquirers
 		bool TestGroundMovementSetup(const Context::SetupGroundMovement& contextSetup, bool useCrawlSetup = false);

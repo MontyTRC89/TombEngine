@@ -249,7 +249,7 @@ bool DoLaraLedgeHang(ItemInfo* item, CollisionInfo* coll)
 		return false;
 
 	// Grab monkey swing.
-	if (TestLaraMonkeyGrab(item, coll))
+	if (lara->Context.CanGrabMonkeySwing())
 	{
 		if (item->Animation.ActiveState == LS_JUMP_UP)
 			SetAnimation(item, LA_JUMP_UP_TO_MONKEY);
@@ -1061,23 +1061,6 @@ bool TestLaraFall(ItemInfo* item, CollisionInfo* coll)
 	}
 
 	return true;
-}
-
-bool TestLaraMonkeyGrab(ItemInfo* item, CollisionInfo* coll)
-{
-	auto* lara = GetLaraInfo(item);
-
-	int y = item->Pose.Position.y - LARA_HEIGHT_MONKEY;
-	auto probe = GetCollision(item);
-
-	if (lara->Control.CanMonkeySwing && (probe.Position.Ceiling - y) <= CLICK(0.5f) &&
-		((probe.Position.Ceiling - y) >= 0 || coll->CollisionType == CT_TOP || coll->CollisionType == CT_TOP_FRONT) &&
-		abs(probe.Position.Ceiling - probe.Position.Floor) > LARA_HEIGHT_MONKEY)
-	{
-		return true;
-	}
-
-	return false;
 }
 
 bool TestLaraMonkeyFall(ItemInfo* item, CollisionInfo* coll)
@@ -1895,7 +1878,7 @@ WaterClimbOutTestResult TestLaraWaterClimbOut(ItemInfo* item, CollisionInfo* col
 
 LedgeHangTestResult TestLaraLedgeHang(ItemInfo* item, CollisionInfo* coll)
 {
-	static const float handRoom = CLICK(0.1f);
+	static const float handRoomTolerance = CLICK(0.1f);
 
 	int y = item->Pose.Position.y - coll->Setup.Height;
 	auto probeFront = GetCollision(item, item->Pose.Orientation.y, OFFSET_RADIUS(coll->Setup.Radius), -coll->Setup.Height + std::min(item->Animation.Velocity.y, 0.0f));
@@ -1910,8 +1893,8 @@ LedgeHangTestResult TestLaraLedgeHang(ItemInfo* item, CollisionInfo* coll)
 		(probeFront.Position.Floor * sign) >= (y * sign) &&									// Ledge is lower/higher than player's current position.
 		(probeFront.Position.Floor * sign) <= ((y + item->Animation.Velocity.y) * sign) &&	// Ledge is higher/lower than player's projected position.
 		
-		abs(probeFront.Position.Ceiling - probeFront.Position.Floor) >= handRoom &&		// Adequate hand room.
-		abs(probeFront.Position.Floor - probeMiddle.Position.Floor) >= LARA_HEIGHT_STRETCH) // Ledge high enough.
+		abs(probeFront.Position.Ceiling - probeFront.Position.Floor) >= handRoomTolerance && // Adequate hand room.
+		abs(probeFront.Position.Floor - probeMiddle.Position.Floor) >= LARA_HEIGHT_STRETCH)	 // Ledge high enough.
 	{
 		return LedgeHangTestResult{ true, probeFront.Position.Floor };
 	}
