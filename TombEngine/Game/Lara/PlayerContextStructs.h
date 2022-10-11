@@ -2,7 +2,7 @@
 
 namespace TEN::Entities::Player::Context
 {
-	struct SetupGroundMovement
+	struct GroundMovementSetup
 	{
 		short HeadingAngle	  = 0;
 		float LowerFloorBound = 0.0f;
@@ -13,14 +13,14 @@ namespace TEN::Entities::Player::Context
 		bool TestDeathFloor = true;
 	};
 
-	struct SetupMonkeyMovement
+	struct MonkeyMovementSetup
 	{
 		short HeadingAngle		= 0;
 		float LowerCeilingBound = 0.0f;
 		float UpperCeilingBound = 0.0f;
 	};
 
-	struct SetupJump
+	struct JumpSetup
 	{
 		short HeadingAngle = 0;
 		float Distance	   = 0.0f;
@@ -28,4 +28,61 @@ namespace TEN::Entities::Player::Context
 		bool TestWadeStatus = true;
 	};
 
+	struct VaultSetup
+	{
+		float LowerFloorBound = 0.0f;
+		float UpperFloorBound = 0.0f;
+		float ClampMin		  = 0.0f;
+		float ClampMax		  = 0.0f;
+		float GapMin		  = 0.0f;
+
+		bool TestSwampDepth = true;
+	};
+
+	struct Vault
+	{
+		bool Success	 = false;
+		int	 Height		 = 0;
+		int	 TargetState = -1;
+
+		bool SetBusyHands	 = false;
+		bool DoLedgeSnap	 = false;
+		bool SetJumpVelocity = false;
+	};
+
+	struct CrawlVaultSetup
+	{
+		float LowerFloorBound = 0.0f;
+		float UpperFloorBound = 0.0f;
+		float ClampMin		  = 0.0f;
+		float GapMin		  = 0.0f;
+		float CrossDist		  = 0.0f;
+		float DestDist		  = 0.0f;
+		float FloorBound	  = 0.0f;
+
+		bool TestSlope = true;
+		bool TestDeath = true;
+	};
+
+	struct CrawlVault
+	{
+		bool Success	 = false;
+		int	 TargetState = -1;
+	};
+
+	struct WaterClimbOutSetup
+	{
+		float LowerFloorBound = 0.0f;
+		float UpperFloorBound = 0.0f;
+		float ClampMin		  = 0.0f;
+		float ClampMax		  = 0.0f;
+		float GapMin		  = 0.0f;
+	};
+
+	struct WaterClimbOut
+	{
+		bool Success	 = false;
+		int	 Height		 = 0;
+		int	 TargetState = -1;
+	};
 }

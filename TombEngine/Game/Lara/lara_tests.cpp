@@ -1185,26 +1185,6 @@ VaultTestResult TestLaraVaultTolerance(ItemInfo* item, CollisionInfo* coll, Vaul
 	return VaultTestResult{ false };
 }
 
-VaultTestResult TestLaraVault2Steps(ItemInfo* item, CollisionInfo* coll)
-{
-	// Floor range: (-STEPUP_HEIGHT, -CLICK(2.5f)]
-	// Clamp range: (-LARA_HEIGHT, -MAX_HEIGHT]
-
-	VaultTestSetup testSetup
-	{
-		-STEPUP_HEIGHT, int(-CLICK(2.5f)),
-		LARA_HEIGHT, -MAX_HEIGHT,
-		CLICK(1)
-	};
-
-	auto testResult = TestLaraVaultTolerance(item, coll, testSetup);
-	testResult.Height += CLICK(2);
-	testResult.SetBusyHands = true;
-	testResult.SnapToLedge = true;
-	testResult.SetJumpVelocity = false;
-	return testResult;
-}
-
 VaultTestResult TestLaraVault3Steps(ItemInfo* item, CollisionInfo* coll)
 {
 	// Floor range: (-CLICK(2.5f), -CLICK(3.5f)]
@@ -1398,12 +1378,18 @@ VaultTestResult TestLaraVault(ItemInfo* item, CollisionInfo* coll)
 		}
 
 		// Vault to stand up two steps.
-		vaultResult = TestLaraVault2Steps(item, coll);
-		if (vaultResult.Success)
+		auto vaultContext = lara->Context.GetVaultUp2Steps();
+		if (vaultContext.Success)
 		{
-			vaultResult.TargetState = LS_VAULT_2_STEPS;
-			vaultResult.Success = HasStateDispatch(item, vaultResult.TargetState);
-			return vaultResult;
+			return VaultTestResult
+			{
+				vaultContext.Success,
+				vaultContext.Height,
+				vaultContext.SetBusyHands,
+				vaultContext.DoLedgeSnap,
+				vaultContext.SetJumpVelocity,
+				(LaraState)vaultContext.TargetState
+			};
 		}
 
 		// Vault to crouch up two steps.

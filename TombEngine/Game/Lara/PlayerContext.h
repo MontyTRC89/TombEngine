@@ -60,6 +60,8 @@ namespace TEN::Entities::Player
 		bool CanCrawlspaceDive();
 
 		// Vault movement
+		Context::Vault GetVaultUp2Steps();
+
 		// Crawl vault movement
 		// Water tread climb out movement
 
@@ -69,9 +71,12 @@ namespace TEN::Entities::Player
 		bool TestMonkeyShimmy(bool isGoingRight);
 		bool TestDirectionalStandingJump(short relativeHeadingAngle);
 
-		// Setup inquirers
-		bool TestGroundMovementSetup(const Context::SetupGroundMovement& contextSetup, bool useCrawlSetup = false);
-		bool TestMonkeyMovementSetup(const Context::SetupMonkeyMovement& contextSetup);
-		bool TestJumpMovementSetup(const Context::SetupJump& testSetup);
+		// Context setup inquirers
+		bool TestGroundMovementSetup(const Context::GroundMovementSetup& contextSetup, bool useCrawlSetup = false);
+		bool TestMonkeyMovementSetup(const Context::MonkeyMovementSetup& contextSetup);
+		bool TestJumpMovementSetup(const Context::JumpSetup& contextSetup);
+
+		// Context getters
+		Context::Vault GetVault(const Context::VaultSetup& contextSetup);
 	};
 }
