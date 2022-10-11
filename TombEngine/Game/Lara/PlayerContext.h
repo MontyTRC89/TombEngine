@@ -9,7 +9,7 @@ namespace TEN::Entities::Player
 	class PlayerContext
 	{
 	private:
-		// Private pointer variables
+		// Private player pointers
 		// TODO: Bad idea or okay?
 		ItemInfo*	   PlayerItemPtr = nullptr;
 		CollisionInfo* PlayerCollPtr = nullptr;
@@ -64,8 +64,8 @@ namespace TEN::Entities::Player
 		bool TestDirectionalStandingJump(short headingAngle);
 
 		// Setup inquirers
-		bool TestGroundMovementSetup(Context::SetupGroundMovement contextSetup, bool useCrawlSetup = false);
-		bool TestMonkeyMovementSetup(Context::SetupMonkeyMovement contextSetup);
-		bool TestJumpMovementSetup(Context::SetupJump testSetup);
+		bool TestGroundMovementSetup(const Context::SetupGroundMovement& contextSetup, bool useCrawlSetup = false);
+		bool TestMonkeyMovementSetup(const Context::SetupMonkeyMovement& contextSetup);
+		bool TestJumpMovementSetup(const Context::SetupJump& testSetup);
 	};
 }

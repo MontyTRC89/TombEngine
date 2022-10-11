@@ -1105,8 +1105,8 @@ bool TestLaraSlide(ItemInfo* item, CollisionInfo* coll)
 	if (TestEnvironment(ENV_FLAG_SWAMP, item))
 		return false;
 
-	if (abs(probe.Position.Floor - yPos) <= STEPUP_HEIGHT &&
-		probe.Position.FloorSlope)
+	if (abs(pointColl.Position.Floor - yPos) <= STEPUP_HEIGHT &&
+		pointColl.Position.FloorSlope)
 	{
 		return true;
 	}
@@ -1118,7 +1118,7 @@ bool TestLaraLand(ItemInfo* item, CollisionInfo* coll)
 {
 	int heightFromFloor = GetCollision(item).Position.Floor - item->Pose.Position.y;
 
-	if (item->Animation.IsAirborne && item->Animation.Velocity.y >= 0 &&
+	if (item->Animation.IsAirborne && item->Animation.Velocity.y >= 0.0f &&
 		(heightFromFloor <= item->Animation.Velocity.y ||
 			TestEnvironment(ENV_FLAG_SWAMP, item)))
 	{

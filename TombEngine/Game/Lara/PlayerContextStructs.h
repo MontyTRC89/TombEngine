@@ -7,9 +7,10 @@ namespace TEN::Entities::Player::Context
 		short HeadingAngle	  = 0;
 		float LowerFloorBound = 0.0f;
 		float UpperFloorBound = 0.0f;
-		bool  CheckSlopeDown  = true;
-		bool  CheckSlopeUp	  = true;
-		bool  CheckDeathFloor = true;
+
+		bool TestSlopeDown  = true;
+		bool TestSlopeUp	= true;
+		bool TestDeathFloor = true;
 	};
 
 	struct SetupMonkeyMovement
@@ -21,9 +22,10 @@ namespace TEN::Entities::Player::Context
 
 	struct SetupJump
 	{
-		short HeadingAngle	  = 0;
-		float Distance		  = 0.0f;
-		bool  CheckWadeStatus = true;
+		short HeadingAngle = 0;
+		float Distance	   = 0.0f;
+
+		bool TestWadeStatus = true;
 	};
 
 }

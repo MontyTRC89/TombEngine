@@ -224,7 +224,7 @@ namespace TEN::Entities::Player
 		Context::SetupMonkeyMovement contextSetup =
 		{
 			PlayerItemPtr->Pose.Orientation.y,
-			int(CLICK(1.25f)), int(-CLICK(1.25f)) // Defined by monkey forward state.
+			CLICK(1.25f), -CLICK(1.25f) // Defined by monkey forward state.
 		};
 		return TestMonkeyMovementSetup(contextSetup);
 	}
@@ -234,7 +234,7 @@ namespace TEN::Entities::Player
 		Context::SetupMonkeyMovement contextSetup =
 		{
 			PlayerItemPtr->Pose.Orientation.y + ANGLE(180.0f),
-			int(CLICK(1.25f)), int(-CLICK(1.25f)) // Defined by monkey backward state.
+			CLICK(1.25f), -CLICK(1.25f) // Defined by monkey backward state.
 		};
 		return TestMonkeyMovementSetup(contextSetup);
 	}
@@ -254,7 +254,7 @@ namespace TEN::Entities::Player
 		Context::SetupJump contextSetup =
 		{
 			0,
-			0,
+			0.0f,
 			false
 		};
 		return TestJumpMovementSetup(contextSetup);
@@ -285,7 +285,7 @@ namespace TEN::Entities::Player
 		Context::SetupJump contextSetup
 		{
 			PlayerItemPtr->Pose.Orientation.y,
-			(int)CLICK(1.5f)
+			CLICK(1.5f)
 		};
 		return TestJumpMovementSetup(contextSetup);
 	}
@@ -331,7 +331,7 @@ namespace TEN::Entities::Player
 			Context::SetupGroundMovement contextSetup =
 			{
 				PlayerItemPtr->Pose.Orientation.y + (isGoingRight ? ANGLE(90.0f) : ANGLE(-90.0f)),
-				NO_LOWER_BOUND, (int)-CLICK(0.8f), // Upper bound defined by sidestep left/right states.
+				NO_LOWER_BOUND, -CLICK(0.8f), // Upper bound defined by sidestep left/right states.
 				false, false, false
 			};
 			return this->TestGroundMovementSetup(contextSetup);
@@ -341,7 +341,7 @@ namespace TEN::Entities::Player
 			Context::SetupGroundMovement contextSetup =
 			{
 				PlayerItemPtr->Pose.Orientation.y + (isGoingRight ? ANGLE(90.0f) : ANGLE(-90.0f)),
-				(int)CLICK(0.8f), (int)-CLICK(0.8f) // Defined by sidestep left/right states.
+				CLICK(0.8f), -CLICK(0.8f) // Defined by sidestep left/right states.
 			};
 			return this->TestGroundMovementSetup(contextSetup);
 		}
@@ -352,7 +352,7 @@ namespace TEN::Entities::Player
 		Context::SetupMonkeyMovement contextSetup =
 		{
 			PlayerItemPtr->Pose.Orientation.y + (isGoingRight ? ANGLE(90.0f) : ANGLE(-90.0f)),
-			int(CLICK(0.5f)), int(-CLICK(0.5f)) // Defined by monkey shimmy left/right states.
+			CLICK(0.5f), -CLICK(0.5f) // Defined by monkey shimmy left/right states.
 		};
 		return TestMonkeyMovementSetup(contextSetup);
 	}
@@ -366,12 +366,12 @@ namespace TEN::Entities::Player
 		Context::SetupJump testSetup =
 		{
 			PlayerItemPtr->Pose.Orientation.y + headingAngle,
-			(int)CLICK(0.85f)
+			CLICK(0.85f)
 		};
 		return TestJumpMovementSetup(testSetup);
 	}
 
-	bool PlayerContext::TestGroundMovementSetup(Context::SetupGroundMovement contextSetup, bool useCrawlSetup)
+	bool PlayerContext::TestGroundMovementSetup(const Context::SetupGroundMovement& contextSetup, bool useCrawlSetup)
 	{
 		// HACK: PlayerCollPtr->Setup.Radius and PlayerCollPtr->Setup.Height are set only in lara_col functions, then reset by LaraAboveWater() to defaults.
 		// This means they will store the wrong values for any move context assessments conducted in crouch/crawl lara_as functions.
@@ -387,9 +387,9 @@ namespace TEN::Entities::Player
 		if (pointColl.Position.Floor == NO_HEIGHT)
 			return false;
 
-		bool isSlopeDown  = contextSetup.CheckSlopeDown  ? (pointColl.Position.FloorSlope && pointColl.Position.Floor > yPos) : false;
-		bool isSlopeUp	  = contextSetup.CheckSlopeUp	 ? (pointColl.Position.FloorSlope && pointColl.Position.Floor < yPos) : false;
-		bool isDeathFloor = contextSetup.CheckDeathFloor ? pointColl.Block->Flags.Death										  : false;
+		bool isSlopeDown  = contextSetup.TestSlopeDown  ? (pointColl.Position.FloorSlope && pointColl.Position.Floor > yPos) : false;
+		bool isSlopeUp	  = contextSetup.TestSlopeUp	? (pointColl.Position.FloorSlope && pointColl.Position.Floor < yPos) : false;
+		bool isDeathFloor = contextSetup.TestDeathFloor ? pointColl.Block->Flags.Death										 : false;
 
 		// 2. Check for floor slope or death floor (if applicable).
 		if (isSlopeDown || isSlopeUp || isDeathFloor)
@@ -439,7 +439,7 @@ namespace TEN::Entities::Player
 		return false;
 	}
 
-	bool PlayerContext::TestMonkeyMovementSetup(Context::SetupMonkeyMovement contextSetup)
+	bool PlayerContext::TestMonkeyMovementSetup(const Context::SetupMonkeyMovement& contextSetup)
 	{
 		// HACK: Have to make the height explicit for now (see comment in above function). -- Sezz 2022.07.28
 		static const int playerHeight = LARA_HEIGHT_MONKEY;
@@ -493,7 +493,7 @@ namespace TEN::Entities::Player
 			(pointColl.Position.Ceiling - yPosTop) <= contextSetup.LowerCeilingBound &&	// Ceiling is within lower ceiling bound.
 			(pointColl.Position.Ceiling - yPosTop) >= contextSetup.UpperCeilingBound &&	// Ceiling is within upper ceiling bound.
 			(pointColl.Position.Floor - yPos) > 0 &&									// Floor is within highest floor bound (player base).
-			abs(pointColl.Position.Ceiling - pointColl.Position.Floor) > playerHeight)		// Space is not too narrow.
+			abs(pointColl.Position.Ceiling - pointColl.Position.Floor) > playerHeight)	// Space is not too narrow.
 		{
 			return true;
 		}
@@ -501,7 +501,7 @@ namespace TEN::Entities::Player
 		return false;
 	}
 
-	bool PlayerContext::TestJumpMovementSetup(Context::SetupJump contextSetup)
+	bool PlayerContext::TestJumpMovementSetup(const Context::SetupJump& contextSetup)
 	{
 		auto* player = GetLaraInfo(PlayerItemPtr);
 
@@ -513,7 +513,7 @@ namespace TEN::Entities::Player
 			return false;
 
 		bool isSwamp = TestEnvironment(ENV_FLAG_SWAMP, PlayerItemPtr);
-		bool isWading = contextSetup.CheckWadeStatus ? (player->Control.WaterStatus == WaterStatus::Wade) : false;
+		bool isWading = contextSetup.TestWadeStatus ? (player->Control.WaterStatus == WaterStatus::Wade) : false;
 
 		// 2. Check for swamp or wade status (if applicable).
 		if (isSwamp || isWading)
