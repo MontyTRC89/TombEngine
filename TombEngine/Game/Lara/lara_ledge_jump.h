@@ -3,5 +3,7 @@
 struct ItemInfo;
 struct CollisionInfo;
 
+void lara_as_ledge_jump_up(ItemInfo* item, CollisionInfo* coll);
+void lara_as_ledge_jump_back(ItemInfo* item, CollisionInfo* coll);
 void lara_col_ledge_jump_up(ItemInfo* item, CollisionInfo* coll);
 void lara_col_ledge_jump_back(ItemInfo* item, CollisionInfo* coll);
