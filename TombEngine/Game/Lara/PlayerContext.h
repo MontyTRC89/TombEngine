@@ -59,9 +59,9 @@ namespace TEN::Entities::Player
 
 	private:
 		// Helper inquirers
-		bool TestSidestep(bool goingRight);
-		bool TestMonkeyShimmy(bool goingRight);
-		bool TestDirectionalStandingJump(short angle);
+		bool TestSidestep(bool isGoingRight);
+		bool TestMonkeyShimmy(bool isGoingRight);
+		bool TestDirectionalStandingJump(short headingAngle);
 
 		// Setup inquirers
 		bool TestGroundMovementSetup(Context::SetupGroundMovement contextSetup, bool useCrawlSetup = false);
