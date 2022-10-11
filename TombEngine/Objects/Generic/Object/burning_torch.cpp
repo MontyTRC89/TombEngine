@@ -166,7 +166,7 @@ namespace TEN::Entities::Generic
 		if (Lara.Flare.ControlLeft)
 			Lara.Control.HandStatus = HandStatus::WeaponReady;
 
-		Lara.LeftArm.FrameBase = g_Level.Anims[Lara.LeftArm.AnimNumber].framePtr;
+		Lara.LeftArm.FrameBase = g_Level.Anims[Lara.LeftArm.AnimNumber].FramePtr;
 
 		if (Lara.Torch.IsLit)
 		{
@@ -194,7 +194,7 @@ namespace TEN::Entities::Generic
 		Lara.LeftArm.AnimNumber = Objects[ID_LARA_TORCH_ANIM].animIndex;
 		Lara.LeftArm.Locked = false;
 		Lara.LeftArm.FrameNumber = 0;
-		Lara.LeftArm.FrameBase = g_Level.Anims[Lara.LeftArm.AnimNumber].framePtr;
+		Lara.LeftArm.FrameBase = g_Level.Anims[Lara.LeftArm.AnimNumber].FramePtr;
 
 		Lara.MeshPtrs[LM_LHAND] = Objects[ID_LARA_TORCH_ANIM].meshIndex + LM_LHAND;
 	}

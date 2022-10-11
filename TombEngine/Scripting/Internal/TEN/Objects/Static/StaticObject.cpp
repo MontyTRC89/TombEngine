@@ -29,13 +29,28 @@ void Static::Register(sol::table & parent)
 		sol::meta_function::index, index_error,
 		sol::meta_function::new_index, newindex_error,
 
-		/// Enable the static, e.g. in cases when it was shattered or manually disabled before.
+		/// Enable the static, for cases when it was shattered or manually disabled before.
 		// @function Static:Enable
 		ScriptReserved_Enable, &Static::Enable,
 
 		/// Disable the static
 		// @function Static:Disable
 		ScriptReserved_Disable, &Static::Disable,
+
+		/// Get static mesh visibility
+		// @function Static:GetActive
+		// @treturn bool visibility state
+		ScriptReserved_GetActive, & Static::GetActive,
+
+		/// Get static mesh solid collision state
+		// @function Static:GetSolid
+		// @treturn bool solid collision state (true if solid, false if soft)
+		ScriptReserved_GetSolid, & Static::GetSolid,
+
+		/// Set static mesh solid collision state
+		// @function Static:SetSolid
+		// @tparam bool solidState if set, collision will be solid, if not, will be soft
+		ScriptReserved_SetSolid, & Static::SetSolid,
 
 		/// Get the static's position
 		// @function Static:GetPosition
@@ -111,6 +126,24 @@ void Static::Enable()
 void Static::Disable()
 {
 	m_mesh.flags &= ~StaticMeshFlags::SM_VISIBLE;
+}
+
+bool Static::GetActive()
+{
+	return (m_mesh.flags & StaticMeshFlags::SM_VISIBLE) != 0;
+}
+
+bool Static::GetSolid()
+{
+	return (m_mesh.flags & StaticMeshFlags::SM_SOLID) != 0;
+}
+
+void Static::SetSolid(bool yes)
+{
+	if (yes)
+		m_mesh.flags |= StaticMeshFlags::SM_SOLID;
+	else
+		m_mesh.flags &= ~StaticMeshFlags::SM_SOLID;
 }
 
 Vec3 Static::GetPos() const

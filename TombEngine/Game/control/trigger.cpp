@@ -563,12 +563,12 @@ void TestTriggers(FloorInfo* floor, int x, int y, int z, bool heavy, int heavyFl
 			if (keyResult == 1)
 				break;
 
-			if (g_Level.Cameras[value].flags & ONESHOT)
+			if (g_Level.Cameras[value].Flags & ONESHOT)
 				break;
 
 			Camera.number = value;
 
-			if (Camera.type == CameraType::Look || Camera.type == CameraType::Combat && !(g_Level.Cameras[value].flags & 3))
+			if (Camera.type == CameraType::Look || Camera.type == CameraType::Combat && !(g_Level.Cameras[value].Flags & 3))
 				break;
 
 			if (triggerType == TRIGGER_TYPES::COMBAT)
@@ -582,7 +582,7 @@ void TestTriggers(FloorInfo* floor, int x, int y, int z, bool heavy, int heavyFl
 				Camera.timer = (trigger & 0xFF) * FPS;
 				Camera.type = heavy ? CameraType::Heavy : CameraType::Fixed;
 				if (trigger & ONESHOT)
-					g_Level.Cameras[Camera.number].flags |= ONESHOT;
+					g_Level.Cameras[Camera.number].Flags |= ONESHOT;
 			}
 			break;
 
