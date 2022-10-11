@@ -418,7 +418,7 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 		}
 	}
 
-	if (TrInput & IN_JUMP && TestLaraStandingJump(item, coll))
+	if (TrInput & IN_JUMP && lara->Context.CanPerformJump())
 	{
 		SetLaraJumpDirection(item, coll);
 		if (lara->Control.JumpDirection != JumpDirection::None)
@@ -429,7 +429,7 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 
 	if (TrInput & IN_ROLL || (TrInput & IN_FORWARD && TrInput & IN_BACK))
 	{
-		if (TrInput & IN_WALK || TestLaraTurn180(item, coll))
+		if (TrInput & IN_WALK || lara->Context.CanTurn180())
 			item->Animation.TargetState = LS_TURN_180;
 		else
 			item->Animation.TargetState = LS_ROLL_180_FORWARD;
@@ -546,7 +546,7 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 
 	// TODO: Without animation blending, the AFK state's movement lock will be rather obnoxious.
 	// TODO: Add idle breathing motion. -- Sezz 2021.10.31
-	if (lara->Control.Count.Pose >= LARA_POSE_TIME && TestLaraPose(item, coll))
+	if (lara->Control.Count.Pose >= LARA_POSE_TIME && lara->Context.CanAFKPose())
 	{
 		item->Animation.TargetState = LS_POSE;
 		return;
@@ -609,6 +609,8 @@ void lara_col_idle(ItemInfo* item, CollisionInfo* coll)
 // Collision:	lara_col_idle()
 void lara_as_pose(ItemInfo* item, CollisionInfo* coll)
 {
+	auto* lara = GetLaraInfo(item);
+
 	if (item->HitPoints <= 0)
 	{
 		item->Animation.TargetState = LS_DEATH;
@@ -618,7 +620,7 @@ void lara_as_pose(ItemInfo* item, CollisionInfo* coll)
 	if (TrInput & IN_LOOK)
 		LookUpDown(item);
 
-	if (TestLaraPose(item, coll))
+	if (lara->Context.CanAFKPose())
 	{
 		if (TrInput & IN_ROLL)
 		{
@@ -730,7 +732,7 @@ void lara_as_turn_slow(ItemInfo* item, CollisionInfo* coll)
 	else
 		ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_MED_FAST_TURN_RATE_MAX);
 
-	if (TrInput & IN_JUMP && TestLaraStandingJump(item, coll))
+	if (TrInput & IN_JUMP && lara->Context.CanPerformJump())
 	{
 		SetLaraJumpDirection(item, coll);
 		if (lara->Control.JumpDirection != JumpDirection::None)
@@ -1064,7 +1066,7 @@ void lara_as_turn_fast(ItemInfo* item, CollisionInfo* coll)
 
 	ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, LARA_MED_TURN_RATE_MAX, LARA_FAST_TURN_RATE_MAX);
 
-	if (TrInput & IN_JUMP && TestLaraStandingJump(item, coll))
+	if (TrInput & IN_JUMP && lara->Context.CanPerformJump())
 	{
 		SetLaraJumpDirection(item, coll);
 		if (lara->Control.JumpDirection != JumpDirection::None)

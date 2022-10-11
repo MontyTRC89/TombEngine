@@ -53,9 +53,6 @@ bool IsJumpState(LaraState state);
 bool IsRunJumpQueueableState(LaraState state);
 bool IsRunJumpCountableState(LaraState state);
 
-bool TestLaraTurn180(ItemInfo* item, CollisionInfo* coll);
-bool TestLaraPose(ItemInfo* item, CollisionInfo* coll);
-bool TestLaraKeepLow(ItemInfo* item, CollisionInfo* coll);
 bool TestLaraSlide(ItemInfo* item, CollisionInfo* coll);
 bool TestLaraLand(ItemInfo* item, CollisionInfo* coll);
 bool TestLaraFall(ItemInfo* item, CollisionInfo* coll);
@@ -106,10 +103,8 @@ bool TestLaraHangClimbTolerance(ItemInfo* item, CollisionInfo* coll, HangClimbTe
 bool TestLaraHangToCrouch(ItemInfo* item, CollisionInfo* coll);
 bool TestLaraHangToStand(ItemInfo* item, CollisionInfo* coll);
 
-bool TestLaraStandingJump(ItemInfo* item, CollisionInfo* coll);
-
 bool TestLaraTightropeDismount(ItemInfo* item, CollisionInfo* coll);
 
-bool TestLaraPoleCollision(ItemInfo* item, CollisionInfo* coll, bool goingUp, float offset = 0.0f);
+bool TestLaraPoleCollision(ItemInfo* item, CollisionInfo* coll, bool isGoingUp, float offset = 0.0f);
 bool TestLaraPoleUp(ItemInfo* item, CollisionInfo* coll);
 bool TestLaraPoleDown(ItemInfo* item, CollisionInfo* coll);

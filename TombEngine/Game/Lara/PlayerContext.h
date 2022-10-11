@@ -20,6 +20,8 @@ namespace TEN::Entities::Player
 		PlayerContext(ItemInfo* item, CollisionInfo* coll);
 
 		// Basic ground movement
+		bool CanAFKPose();
+		bool CanTurn180();
 		bool CanTurnFast();
 		bool CanRunForward();
 		bool CanRunBackward();
@@ -31,6 +33,7 @@ namespace TEN::Entities::Player
 		bool CanWadeBackward();
 
 		// Crouch and crawl movement
+		bool IsInNarrowSpace();
 		bool CanCrouch();
 		bool CanCrouchToCrawl();
 		bool CanCrouchRoll();
@@ -44,6 +47,7 @@ namespace TEN::Entities::Player
 		bool CanMonkeyShimmyRight();
 
 		// Jump movement
+		bool CanPerformJump();
 		bool CanJumpUp();
 		bool CanJumpForward();
 		bool CanJumpBackward();

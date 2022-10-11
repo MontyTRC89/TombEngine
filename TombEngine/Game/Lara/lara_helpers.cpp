@@ -39,7 +39,7 @@ void HandleLaraMovementParameters(ItemInfo* item, CollisionInfo* coll)
 	auto* lara = GetLaraInfo(item);
 
 	// Update AFK pose timer.
-	if (lara->Control.Count.Pose < LARA_POSE_TIME && TestLaraPose(item, coll) &&
+	if (lara->Control.Count.Pose < LARA_POSE_TIME && lara->Context.CanAFKPose() &&
 		!(TrInput & (IN_WAKE | IN_LOOK)) &&
 		g_GameFlow->HasAFKPose())
 	{

@@ -25,6 +25,38 @@ namespace TEN::Entities::Player
 		PlayerCollPtr = coll;
 	}
 
+	bool PlayerContext::CanAFKPose()
+	{
+		auto* player = GetLaraInfo(PlayerItemPtr);
+
+		// Assess whether AFK pose is enabled.
+		if (!g_GameFlow->HasAFKPose())
+			return false;
+
+		// Assess wade status.
+		if (player->Control.WaterStatus == WaterStatus::Wade)
+			return false;
+
+		// Assess context.
+		if (!(TrInput & (IN_FLARE | IN_DRAW)) &&					   // Avoid unsightly concurrent actions.
+			player->Control.HandStatus == HandStatus::Free &&		   // Hands are free.
+			(player->Control.Weapon.GunType != LaraWeaponType::Flare || // Flare is not being handled.
+				player->Flare.Life) &&
+			player->Vehicle == NO_ITEM)								   // Not in a vehicle.
+		{
+			return true;
+		}
+
+		return false;
+	}
+
+	bool PlayerContext::CanTurn180()
+	{
+		auto* lara = GetLaraInfo(PlayerItemPtr);
+
+		return (lara->Control.WaterStatus == WaterStatus::Wade || TestEnvironment(ENV_FLAG_SWAMP, PlayerItemPtr));
+	}
+
 	bool PlayerContext::CanTurnFast()
 	{
 		auto* player = GetLaraInfo(PlayerItemPtr);
@@ -95,7 +127,7 @@ namespace TEN::Entities::Player
 	{
 		auto* player = GetLaraInfo(PlayerItemPtr);
 
-		// Not in wade-height water; return early.
+		// Assess wade status.
 		if (player->Control.WaterStatus != WaterStatus::Wade)
 			return false;
 
@@ -118,7 +150,7 @@ namespace TEN::Entities::Player
 	{
 		auto* player = GetLaraInfo(PlayerItemPtr);
 
-		// Not in wade-height water; return early.
+		// Assess wade status.
 		if (player->Control.WaterStatus != WaterStatus::Wade)
 			return false;
 
@@ -137,6 +169,47 @@ namespace TEN::Entities::Player
 		return this->CanWalkBackward();
 	}
 
+	bool PlayerContext::IsInNarrowSpace()
+	{
+		// HACK: coll->Setup.Radius is only set to LARA_RADIUS_CRAWL in lara_col functions, then reset by LaraAboveWater(),
+		// meaning that for tests called in lara_as functions it will store the wrong radius. -- Sezz 2021.11.05
+		static const std::vector<LaraState> crouchStates = { LS_CROUCH_IDLE, LS_CROUCH_TURN_LEFT, LS_CROUCH_TURN_RIGHT };
+		int radius = CheckLaraState((LaraState)PlayerItemPtr->Animation.ActiveState, crouchStates) ? LARA_RADIUS_CRAWL : LARA_RADIUS;
+
+		auto pointCollFront = GetCollision(PlayerItemPtr, PlayerItemPtr->Pose.Orientation.y, radius, -PlayerCollPtr->Setup.Height);
+		auto pointCollBack = GetCollision(PlayerItemPtr, PlayerItemPtr->Pose.Orientation.y + ANGLE(180.0f), radius, -PlayerCollPtr->Setup.Height);
+		auto pointCollCenter = GetCollision(PlayerItemPtr, 0, 0.0f, -LARA_HEIGHT / 2);
+
+		// Assess middle point collision.
+		if (abs(pointCollCenter.Position.Ceiling - pointCollCenter.Position.Floor) < LARA_HEIGHT ||	// Center space is narrow enough.
+			abs(PlayerCollPtr->Middle.Ceiling - LARA_HEIGHT_CRAWL) < LARA_HEIGHT)					// Consider statics overhead detected by GetCollisionInfo().
+		{
+			return true;
+		}
+
+		// TODO: Check whether < or <= and > or >=.
+
+		// Assess front point collision.
+		if (abs(pointCollFront.Position.Ceiling - pointCollFront.Position.Floor) < LARA_HEIGHT &&		  // Front space is narrow enough.
+			abs(pointCollFront.Position.Ceiling - pointCollFront.Position.Floor) > LARA_HEIGHT_CRAWL &&	  // Front space not too narrow.
+			abs(pointCollFront.Position.Floor - pointCollCenter.Position.Floor) <= CRAWL_STEPUP_HEIGHT && // Front floor is within upper/lower floor bounds.
+			pointCollFront.Position.Floor != NO_HEIGHT)
+		{
+			return true;
+		}
+
+		// Assess back point collision.
+		if (abs(pointCollBack.Position.Ceiling - pointCollBack.Position.Floor) < LARA_HEIGHT &&			 // Back space is narrow enough.
+			abs(pointCollBack.Position.Ceiling - pointCollBack.Position.Floor) > LARA_HEIGHT_CRAWL &&	 // Back space not too narrow.
+			abs(pointCollBack.Position.Floor - pointCollCenter.Position.Floor) <= CRAWL_STEPUP_HEIGHT && // Back floor is within upper/lower floor bounds.
+			pointCollBack.Position.Floor != NO_HEIGHT)
+		{
+			return true;
+		}
+
+		return false;
+	}
+
 	bool PlayerContext::CanCrouch()
 	{
 		auto* player = GetLaraInfo(PlayerItemPtr);
@@ -152,7 +225,7 @@ namespace TEN::Entities::Player
 
 	bool PlayerContext::CanCrouchToCrawl()
 	{
-		auto* player = GetLaraInfo(PlayerItemPtr);
+		const auto& player = GetLaraInfo(PlayerItemPtr);
 
 		if (!(TrInput & (IN_FLARE | IN_DRAW)) &&						// Avoid unsightly concurrent actions.
 			player->Control.HandStatus == HandStatus::Free &&			// Hands are free.
@@ -171,7 +244,7 @@ namespace TEN::Entities::Player
 		static const float maxProbeDistance	 = SECTOR(1);
 		static const float distanceIncrement = CLICK(1);
 
-		auto* player = GetLaraInfo(PlayerItemPtr);
+		const auto& player = GetLaraInfo(PlayerItemPtr);
 
 		// 1. Assess water depth.
 		if (player->WaterSurfaceDist < maxWaterHeight)
@@ -249,6 +322,11 @@ namespace TEN::Entities::Player
 		return this->TestMonkeyShimmy(true);
 	}
 
+	bool PlayerContext::CanPerformJump()
+	{
+		return !TestEnvironment(ENV_FLAG_SWAMP, PlayerItemPtr);
+	}
+
 	bool PlayerContext::CanJumpUp()
 	{
 		Context::SetupJump contextSetup =
@@ -310,14 +388,7 @@ namespace TEN::Entities::Player
 	bool PlayerContext::CanCrawlspaceDive()
 	{
 		auto pointColl = GetCollision(PlayerItemPtr, PlayerCollPtr->Setup.ForwardAngle, PlayerCollPtr->Setup.Radius, -PlayerCollPtr->Setup.Height);
-
-		if (abs(pointColl.Position.Ceiling - pointColl.Position.Floor) < LARA_HEIGHT ||
-			TestLaraKeepLow(PlayerItemPtr, PlayerCollPtr))
-		{
-			return true;
-		}
-
-		return false;
+		return (abs(pointColl.Position.Ceiling - pointColl.Position.Floor) < LARA_HEIGHT || this->IsInNarrowSpace());
 	}
 
 	bool PlayerContext::TestSidestep(bool isGoingRight)

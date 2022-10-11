@@ -112,7 +112,7 @@ void lara_col_crouch_idle(ItemInfo* item, CollisionInfo* coll)
 
 	item->Animation.Velocity.y = 0;
 	item->Animation.IsAirborne = false;
-	lara->Control.KeepLow = TestLaraKeepLow(item, coll);
+	lara->Control.KeepLow = lara->Context.IsInNarrowSpace();
 	lara->Control.IsLow = true;
 	lara->Control.MoveAngle = item->Pose.Orientation.y;
 	lara->ExtraTorsoRot = Vector3Shrt();
@@ -177,7 +177,7 @@ void lara_col_crouch_roll(ItemInfo* item, CollisionInfo* coll)
 
 	item->Animation.Velocity.y = 0;
 	item->Animation.IsAirborne = false;
-	lara->Control.KeepLow = TestLaraKeepLow(item, coll);
+	lara->Control.KeepLow = lara->Context.IsInNarrowSpace();
 	lara->Control.IsLow = true;
 	lara->Control.MoveAngle = item->Pose.Orientation.y;
 	coll->Setup.Height = LARA_HEIGHT_CRAWL;
@@ -485,7 +485,7 @@ void lara_col_crawl_idle(ItemInfo* item, CollisionInfo* coll)
 
 	item->Animation.Velocity.y = 0;
 	item->Animation.IsAirborne = false;
-	lara->Control.KeepLow = TestLaraKeepLow(item, coll);
+	lara->Control.KeepLow = lara->Context.IsInNarrowSpace();
 	lara->Control.IsLow = true;
 	lara->Control.MoveAngle = item->Pose.Orientation.y;
 	lara->ExtraTorsoRot.x = 0;
@@ -576,7 +576,7 @@ void lara_col_crawl_forward(ItemInfo* item, CollisionInfo* coll)
 
 	item->Animation.Velocity.y = 0;
 	item->Animation.IsAirborne = false;
-	lara->Control.KeepLow = TestLaraKeepLow(item, coll);
+	lara->Control.KeepLow = lara->Context.IsInNarrowSpace();
 	lara->Control.IsLow = true;
 	lara->Control.MoveAngle = item->Pose.Orientation.y;
 	lara->ExtraTorsoRot.x = 0;
@@ -666,7 +666,7 @@ void lara_col_crawl_back(ItemInfo* item, CollisionInfo* coll)
 
 	item->Animation.Velocity.y = 0;
 	item->Animation.IsAirborne = false;
-	lara->Control.KeepLow = TestLaraKeepLow(item, coll);
+	lara->Control.KeepLow = lara->Context.IsInNarrowSpace();
 	lara->Control.IsLow = true;
 	lara->Control.MoveAngle = item->Pose.Orientation.y + ANGLE(180.0f);
 	coll->Setup.Radius = LARA_RADIUS_CRAWL;
