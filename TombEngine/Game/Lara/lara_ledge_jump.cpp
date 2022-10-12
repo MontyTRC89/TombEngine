@@ -5,14 +5,10 @@
 
 void lara_ledge_jump_up(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
-
 	item->Animation.TargetState = LS_JUMP_UP;
 }
 
 void lara_ledge_jump_back(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
-
 	item->Animation.TargetState = LS_JUMP_BACK;
 }
