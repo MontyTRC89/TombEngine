@@ -111,8 +111,8 @@ namespace TEN::Gui
 	{
 	public:
 		bool CallInventory(ItemInfo* item, bool resetMode);
-		InventoryResult TitleOptions();
-		InventoryResult DoPauseMenu();
+		InventoryResult TitleOptions(ItemInfo* item);
+		InventoryResult DoPauseMenu(ItemInfo* item);
 		void DrawInventory();
 		void DrawCurrentObjectList(ItemInfo* item, int ringIndex);
 		int IsObjectInInventory(int objectNumber);
@@ -197,7 +197,7 @@ namespace TEN::Gui
 		AmmoData Ammo;
 
 		void HandleDisplaySettingsInput(bool fromPauseMenu);
-		void HandleControlSettingsInput(bool fromPauseMenu);
+		void HandleControlSettingsInput(ItemInfo* item, bool fromPauseMenu);
 		void HandleOtherSettingsInput(bool fromPauseMenu);
 		void HandleOptionsInput();
 		void BackupOptions();

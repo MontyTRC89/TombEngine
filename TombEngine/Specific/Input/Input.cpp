@@ -132,7 +132,7 @@ namespace TEN::Input
 	{
 		TENLog("Initializing input system...", LogLevel::Info);
 
-		for (size_t i = 0; i < (int)ActionID::Count; i++)
+		for (int i = 0; i < (int)ActionID::Count; i++)
 			ActionMap.push_back(InputAction((ActionID)i));
 
 		KeyMap.resize(MAX_INPUT_SLOTS);
@@ -142,7 +142,7 @@ namespace TEN::Input
 
 		try
 		{
-			oisInputManager = InputManager::createInputSystem((size_t)handle);
+			oisInputManager = InputManager::createInputSystem((int)handle);
 			oisInputManager->enableAddOnFactory(InputManager::AddOn_All);
 
 			if (oisInputManager->getNumberOfDevices(OISKeyboard) == 0)
@@ -208,9 +208,9 @@ namespace TEN::Input
 
 	bool LayoutContainsIndex(unsigned int index)
 	{
-		for (size_t l = 0; l < 2; l++)
+		for (int l = 0; l < 2; l++)
 		{
-			for (size_t i = 0; i < KEY_COUNT; i++)
+			for (int i = 0; i < KEY_COUNT; i++)
 			{
 				if (KeyboardLayout[l][i] == index)
 					return true;
@@ -222,13 +222,13 @@ namespace TEN::Input
 
 	void DefaultConflict()
 	{
-		for (size_t i = 0; i < KEY_COUNT; i++)
+		for (int i = 0; i < KEY_COUNT; i++)
 		{
 			short key = KeyboardLayout[0][i];
 
 			ConflictingKeys[i] = false;
 
-			for (size_t j = 0; j < KEY_COUNT; j++)
+			for (int j = 0; j < KEY_COUNT; j++)
 			{
 				if (key != KeyboardLayout[1][j])
 					continue;
@@ -321,7 +321,7 @@ namespace TEN::Input
 			}
 
 			// Scan POVs (controllers usually have one, but let's scan all of them for paranoia)
-			for (size_t pov = 0; pov < 4; pov++)
+			for (int pov = 0; pov < 4; pov++)
 			{
 				if (state.mPOV[pov].direction == Pov::Centered)
 					continue;
@@ -377,7 +377,7 @@ namespace TEN::Input
 		{
 			oisKeyboard->capture();
 
-			for (size_t i = 0; i < MAX_KEYBOARD_KEYS; i++)
+			for (int i = 0; i < MAX_KEYBOARD_KEYS; i++)
 			{
 				if (!oisKeyboard->isKeyDown((KeyCode)i))
 				{
@@ -460,7 +460,7 @@ namespace TEN::Input
 		}
 	}
 
-	void HandleLaraHotkeys(ItemInfo* item)
+	void HandlePlayerHotkeys(ItemInfo* item)
 	{
 		static const vector<int> unavailableFlareStates =
 		{
@@ -472,7 +472,7 @@ namespace TEN::Input
 			LS_CRAWL_TURN_180
 		};
 
-		auto* lara = GetLaraInfo(item);
+		auto& lara = *GetLaraInfo(item);
 
 		// Handle hardcoded action-to-key mappings.
 		ActionMap[(int)In::Save].Update(KeyMap[KC_F5] ? true : false);
@@ -481,8 +481,8 @@ namespace TEN::Input
 		ActionMap[(int)In::Deselect].Update((KeyMap[KC_ESCAPE] || Key(KEY_DRAW)) ? true : false);
 
 		// Handle target switch when locked on to an entity.
-		if (lara->Control.HandStatus == HandStatus::WeaponReady &&
-			lara->TargetEntity != nullptr)
+		if (lara.Control.HandStatus == HandStatus::WeaponReady &&
+			lara.TargetEntity != nullptr)
 		{
 			if (IsHeld(In::Look))
 			{
@@ -499,44 +499,44 @@ namespace TEN::Input
 		}
 
 		// Handle weapon hotkeys.
-		if (KeyMap[KC_1] && Lara.Weapons[(int)LaraWeaponType::Pistol].Present)
-			Lara.Control.Weapon.RequestGunType = LaraWeaponType::Pistol;
+		if (KeyMap[KC_1] && lara.Weapons[(int)LaraWeaponType::Pistol].Present)
+			lara.Control.Weapon.RequestGunType = LaraWeaponType::Pistol;
 
-		if (KeyMap[KC_2] && Lara.Weapons[(int)LaraWeaponType::Shotgun].Present)
-			Lara.Control.Weapon.RequestGunType = LaraWeaponType::Shotgun;
+		if (KeyMap[KC_2] && lara.Weapons[(int)LaraWeaponType::Shotgun].Present)
+			lara.Control.Weapon.RequestGunType = LaraWeaponType::Shotgun;
 
-		if (KeyMap[KC_3] && Lara.Weapons[(int)LaraWeaponType::Uzi].Present)
-			Lara.Control.Weapon.RequestGunType = LaraWeaponType::Uzi;
+		if (KeyMap[KC_3] && lara.Weapons[(int)LaraWeaponType::Uzi].Present)
+			lara.Control.Weapon.RequestGunType = LaraWeaponType::Uzi;
 
-		if (KeyMap[KC_4] && Lara.Weapons[(int)LaraWeaponType::Revolver].Present)
-			Lara.Control.Weapon.RequestGunType = LaraWeaponType::Revolver;
+		if (KeyMap[KC_4] && lara.Weapons[(int)LaraWeaponType::Revolver].Present)
+			lara.Control.Weapon.RequestGunType = LaraWeaponType::Revolver;
 
-		if (KeyMap[KC_5] && Lara.Weapons[(int)LaraWeaponType::GrenadeLauncher].Present)
-			Lara.Control.Weapon.RequestGunType = LaraWeaponType::GrenadeLauncher;
+		if (KeyMap[KC_5] && lara.Weapons[(int)LaraWeaponType::GrenadeLauncher].Present)
+			lara.Control.Weapon.RequestGunType = LaraWeaponType::GrenadeLauncher;
 
-		if (KeyMap[KC_6] && Lara.Weapons[(int)LaraWeaponType::Crossbow].Present)
-			Lara.Control.Weapon.RequestGunType = LaraWeaponType::Crossbow;
+		if (KeyMap[KC_6] && lara.Weapons[(int)LaraWeaponType::Crossbow].Present)
+			lara.Control.Weapon.RequestGunType = LaraWeaponType::Crossbow;
 
-		if (KeyMap[KC_7] && Lara.Weapons[(int)LaraWeaponType::HarpoonGun].Present)
-			Lara.Control.Weapon.RequestGunType = LaraWeaponType::HarpoonGun;
+		if (KeyMap[KC_7] && lara.Weapons[(int)LaraWeaponType::HarpoonGun].Present)
+			lara.Control.Weapon.RequestGunType = LaraWeaponType::HarpoonGun;
 
-		if (KeyMap[KC_8] && Lara.Weapons[(int)LaraWeaponType::HK].Present)
-			Lara.Control.Weapon.RequestGunType = LaraWeaponType::HK;
+		if (KeyMap[KC_8] && lara.Weapons[(int)LaraWeaponType::HK].Present)
+			lara.Control.Weapon.RequestGunType = LaraWeaponType::HK;
 
-		if (KeyMap[KC_9] && Lara.Weapons[(int)LaraWeaponType::RocketLauncher].Present)
-			Lara.Control.Weapon.RequestGunType = LaraWeaponType::RocketLauncher;
+		if (KeyMap[KC_9] && lara.Weapons[(int)LaraWeaponType::RocketLauncher].Present)
+			lara.Control.Weapon.RequestGunType = LaraWeaponType::RocketLauncher;
 
 		// Handle medipack hotkeys.
 		static bool dbMedipack = true;
 		if ((KeyMap[KC_MINUS] || KeyMap[KC_EQUALS]) && dbMedipack)
 		{
 			if ((item->HitPoints > 0 && item->HitPoints < LARA_HEALTH_MAX) ||
-				lara->PoisonPotency)
+				lara.PoisonPotency)
 			{
 				bool hasUsedMedipack = false;
 
 				if (KeyMap[KC_MINUS] &&
-					lara->Inventory.TotalSmallMedipacks != 0)
+					lara.Inventory.TotalSmallMedipacks != 0)
 				{
 					hasUsedMedipack = true;
 
@@ -544,22 +544,22 @@ namespace TEN::Input
 					if (item->HitPoints > LARA_HEALTH_MAX)
 						item->HitPoints = LARA_HEALTH_MAX;
 
-					if (lara->Inventory.TotalSmallMedipacks != -1)
-						lara->Inventory.TotalSmallMedipacks--;
+					if (lara.Inventory.TotalSmallMedipacks != -1)
+						lara.Inventory.TotalSmallMedipacks--;
 				}
 				else if (KeyMap[KC_EQUALS] &&
-					lara->Inventory.TotalLargeMedipacks != 0)
+					lara.Inventory.TotalLargeMedipacks != 0)
 				{
 					hasUsedMedipack = true;
 					item->HitPoints = LARA_HEALTH_MAX;
 
-					if (lara->Inventory.TotalLargeMedipacks != -1)
-						lara->Inventory.TotalLargeMedipacks--;
+					if (lara.Inventory.TotalLargeMedipacks != -1)
+						lara.Inventory.TotalLargeMedipacks--;
 				}
 
 				if (hasUsedMedipack)
 				{
-					lara->PoisonPotency = 0;
+					lara.PoisonPotency = 0;
 					SoundEffect(SFX_TR4_MENU_MEDI, nullptr, SoundEnvironment::Always);
 					Statistics.Game.HealthUsed++;
 				}
@@ -591,7 +591,7 @@ namespace TEN::Input
 
 		rumbleData.Power -= rumbleData.FadeSpeed;
 
-		// Don't update effect too frequently if its value isn't changed too much
+		// Don't update effect too frequently if its value hasn't changed much.
 		if (rumbleData.Power >= 0.2f &&
 			rumbleData.LastPower - rumbleData.Power < 0.1f)
 			return;
@@ -632,7 +632,7 @@ namespace TEN::Input
 		rumbleData.LastPower = rumbleData.Power;
 	}
 
-	void UpdateInputActions()
+	void UpdateInputActions(ItemInfo* item)
 	{
 		ClearInputData();
 		UpdateRumble();
@@ -644,11 +644,11 @@ namespace TEN::Input
 		TrInput = 0;
 
 		// Update action map (mappable actions only).
-		for (size_t i = 0; i < KEY_COUNT; i++)
-			ActionMap[i].Update(Key(i) ? true : false); // TODO: Poll analog value of key. Any key can potentially be a trigger.
+		for (int i = 0; i < KEY_COUNT; i++)
+			ActionMap[i].Update(Key(i) ? true : false); // TODO: Poll analog value of key. Potentially, any can be a trigger.
 
 		// Additional handling.
-		HandleLaraHotkeys(LaraItem);
+		HandlePlayerHotkeys(item);
 		SolveActionCollisions();
 
 		// Port actions back to legacy bit fields.

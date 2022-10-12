@@ -1,6 +1,8 @@
 #pragma once
 #include "Specific/Input/InputAction.h"
 
+struct ItemInfo;
+
 namespace TEN::Input
 {
 	constexpr int MAX_KEYBOARD_KEYS    = 256;
@@ -108,6 +110,7 @@ namespace TEN::Input
 
 	enum class RumbleMode
 	{
+		None,
 		Left,
 		Right,
 		Both
@@ -115,17 +118,17 @@ namespace TEN::Input
 
 	struct RumbleData
 	{
-		RumbleMode Mode;
-		float Power;
-		float LastPower;
-		float FadeSpeed;
+		RumbleMode Mode		 = RumbleMode::None;
+		float	   Power	 = 0.0f;
+		float	   LastPower = 0.0f;
+		float	   FadeSpeed = 0.0f;
 	};
 
 	extern const char* g_KeyNames[];
 
-	extern vector<InputAction>	ActionMap;
-	extern vector<bool>			KeyMap;
-	extern vector<float>		AxisMap;
+	extern vector<InputAction> ActionMap;
+	extern vector<bool>		   KeyMap;
+	extern vector<float>	   AxisMap;
 
 	// Legacy input bitfields
 	extern int DbInput; // Debounce: is input clicked?
@@ -136,11 +139,13 @@ namespace TEN::Input
 	void InitialiseInput(HWND handle);
 	void DeInitialiseInput();
 	void DefaultConflict();
-	void UpdateInputActions();
+	void UpdateInputActions(ItemInfo* item);
 	void ClearAllActions();
 	void Rumble(float power, float delayInSec= 0.3f, RumbleMode mode = RumbleMode::Both);
 	void StopRumble();
 
+	// TODO: Later, all these global action accessor functions should be tied to a specific controller/player.
+	// Having them loose like this is very inelegant, but since this is only the first iteration, they will do for now. -- Sezz 2022.10.12
 	void  ClearAction(ActionID actionID);
 	bool  NoAction();
 	bool  IsClicked(ActionID actionID);

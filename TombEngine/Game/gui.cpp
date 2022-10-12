@@ -151,7 +151,7 @@ namespace TEN::Gui
 		g_Renderer.RenderInventory();
 	}
 
-	InventoryResult GuiController::TitleOptions()
+	InventoryResult GuiController::TitleOptions(ItemInfo* item)
 	{
 		auto inventoryResult = InventoryResult::None;
 		static short selectedOptionBackup;
@@ -182,7 +182,7 @@ namespace TEN::Gui
 			return inventoryResult;
 
 		case Menu::Controls:
-			HandleControlSettingsInput(false);
+			HandleControlSettingsInput(item, false);
 			return inventoryResult;
 
 		case Menu::OtherSettings:
@@ -452,7 +452,7 @@ namespace TEN::Gui
 		}
 	}
 
-	void GuiController::HandleControlSettingsInput(bool fromPauseMenu)
+	void GuiController::HandleControlSettingsInput(ItemInfo* item, bool fromPauseMenu)
 	{
 		OptionCount = KEY_COUNT + 1;
 
@@ -479,7 +479,7 @@ namespace TEN::Gui
 
 			while (true)
 			{
-				UpdateInputActions();
+				UpdateInputActions(item);
 
 				if (CurrentSettings.IgnoreInput)
 				{
@@ -766,9 +766,9 @@ namespace TEN::Gui
 		}
 	}
 
-	InventoryResult GuiController::DoPauseMenu()
+	InventoryResult GuiController::DoPauseMenu(ItemInfo* item)
 	{
-		UpdateInputActions();
+		UpdateInputActions(item);
 
 		switch (MenuToDisplay)
 		{
@@ -789,7 +789,7 @@ namespace TEN::Gui
 			return InventoryResult::None;
 
 		case Menu::Controls:
-			HandleControlSettingsInput(true);
+			HandleControlSettingsInput(item, true);
 			return InventoryResult::None;
 
 		case Menu::OtherSettings:
@@ -2819,7 +2819,7 @@ namespace TEN::Gui
 			if (CompassNeedleAngle != 1024)
 				CompassNeedleAngle -= 32;
 
-			UpdateInputActions();
+			UpdateInputActions(item);
 			GameTimer++;
 
 			if (IsClicked(In::Option))

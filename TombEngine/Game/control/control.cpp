@@ -103,7 +103,7 @@ int DrawPhase()
 
 GameStatus ControlPhase(int numFrames, int demoMode)
 {
-	ScriptInterfaceLevel* level = g_GameFlow->GetLevel(CurrentLevel);
+	auto* level = g_GameFlow->GetLevel(CurrentLevel);
 
 	RegeneratePickups();
 
@@ -122,9 +122,9 @@ GameStatus ControlPhase(int numFrames, int demoMode)
 	{
 		GlobalCounter++;
 
-		// Poll the keyboard and update input variables
+		// Poll keyboard and update input variables.
 		if (CurrentLevel != 0)
-			UpdateInputActions();
+			UpdateInputActions(LaraItem);
 
 		// Has Lara control been disabled?
 		if (Lara.Control.Locked || CurrentLevel == 0)
@@ -192,7 +192,7 @@ GameStatus ControlPhase(int numFrames, int demoMode)
 			g_Gui.DrawInventory();
 			g_Renderer.Synchronize();
 
-			if (g_Gui.DoPauseMenu() == InventoryResult::ExitToTitle)
+			if (g_Gui.DoPauseMenu(LaraItem) == InventoryResult::ExitToTitle)
 				return GameStatus::ExitToTitle;
 		}
 
@@ -401,13 +401,13 @@ GameStatus DoTitle(int index, std::string const& ambient)
 
 	if (g_GameFlow->TitleType == TITLE_TYPE::FLYBY)
 	{
-		// Initialise items, effects, lots, camera
+		// Initialise items, effects, lots, camera.
 		InitialiseFXArray(true);
 		InitialisePickupDisplay();
 		InitialiseCamera();
 
-		// Run the level script
-		ScriptInterfaceLevel* level = g_GameFlow->GetLevel(index);
+		// Run the level script.
+		auto* level = g_GameFlow->GetLevel(index);
 
 		if (!level->ScriptFileName.empty())
 		{
@@ -429,15 +429,15 @@ GameStatus DoTitle(int index, std::string const& ambient)
 
 		Statistics.Level.Timer = 0;
 
-		// Initialise flyby cameras
+		// Initialize flyby cameras.
 		InitSpotCamSequences();
 		InitialiseSpotCam(0);
 		UseSpotCam = true;
 
-		// Play background music
+		// Play background music.
 		// MERGE: PlaySoundTrack(index);
 
-		// Initialise menu
+		// Initialize menu.
 		g_Gui.SetMenuToDisplay(Menu::Title);
 		g_Gui.SetSelectedOption(0);
 
@@ -458,9 +458,9 @@ GameStatus DoTitle(int index, std::string const& ambient)
 		{
 			g_Renderer.RenderTitle();
 
-			UpdateInputActions();
+			UpdateInputActions(LaraItem);
 
-			status = g_Gui.TitleOptions();
+			status = g_Gui.TitleOptions(LaraItem);
 
 			if (status != InventoryResult::None)
 				break;
@@ -473,7 +473,7 @@ GameStatus DoTitle(int index, std::string const& ambient)
 		inventoryResult = status;
 	}
 	else
-		inventoryResult = g_Gui.TitleOptions();
+		inventoryResult = g_Gui.TitleOptions(LaraItem);
 
 	StopSoundTracks();
 
