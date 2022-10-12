@@ -218,7 +218,7 @@ void lara_col_walk_forward(ItemInfo* item, CollisionInfo* coll)
 	if (LaraDeflectEdge(item, coll))
 	{
 		item->Animation.TargetState = LS_SOFT_SPLAT;
-		if (GetChange(item, &g_Level.Anims[item->Animation.AnimNumber]))
+		if (GetStateDispatch(item, g_Level.Anims[item->Animation.AnimNumber]))
 		{
 			item->Animation.ActiveState = LS_SOFT_SPLAT;
 			return;
@@ -353,7 +353,7 @@ void lara_col_run_forward(ItemInfo* item, CollisionInfo* coll)
 			coll->HitTallObject)
 		{
 			item->Animation.TargetState = LS_SPLAT;
-			if (GetChange(item, &g_Level.Anims[item->Animation.AnimNumber]))
+			if (GetStateDispatch(item, g_Level.Anims[item->Animation.AnimNumber]))
 			{
 				Rumble(0.4f, 0.15f);
 
@@ -363,7 +363,7 @@ void lara_col_run_forward(ItemInfo* item, CollisionInfo* coll)
 		}
 
 		item->Animation.TargetState = LS_SOFT_SPLAT;
-		if (GetChange(item, &g_Level.Anims[item->Animation.AnimNumber]))
+		if (GetStateDispatch(item, g_Level.Anims[item->Animation.AnimNumber]))
 		{
 			item->Animation.ActiveState = LS_SOFT_SPLAT;
 			return;
@@ -1873,7 +1873,7 @@ void lara_col_step_right(ItemInfo* item, CollisionInfo* coll)
 	if (LaraDeflectEdge(item, coll))
 	{
 		item->Animation.TargetState = LS_SOFT_SPLAT;
-		if (GetChange(item, &g_Level.Anims[item->Animation.AnimNumber]))
+		if (GetStateDispatch(item, g_Level.Anims[item->Animation.AnimNumber]))
 		{
 			item->Animation.ActiveState = LS_SOFT_SPLAT;
 			return;
@@ -1967,7 +1967,7 @@ void lara_col_step_left(ItemInfo* item, CollisionInfo* coll)
 	if (LaraDeflectEdge(item, coll))
 	{
 		item->Animation.TargetState = LS_SOFT_SPLAT;
-		if (GetChange(item, &g_Level.Anims[item->Animation.AnimNumber]))
+		if (GetStateDispatch(item, g_Level.Anims[item->Animation.AnimNumber]))
 		{
 			item->Animation.ActiveState = LS_SOFT_SPLAT;
 			return;
@@ -2223,7 +2223,7 @@ void lara_col_wade_forward(ItemInfo* item, CollisionInfo* coll)
 		ResetLaraLean(item);
 
 		item->Animation.TargetState = LS_SOFT_SPLAT;
-		if (GetChange(item, &g_Level.Anims[item->Animation.AnimNumber]))
+		if (GetStateDispatch(item, g_Level.Anims[item->Animation.AnimNumber]))
 		{
 			item->Animation.ActiveState = LS_SOFT_SPLAT;
 			return;
@@ -2354,7 +2354,7 @@ void lara_col_sprint(ItemInfo* item, CollisionInfo* coll)
 			coll->HitTallObject)
 		{
 			item->Animation.TargetState = LS_SPLAT;
-			if (GetChange(item, &g_Level.Anims[item->Animation.AnimNumber]))
+			if (GetStateDispatch(item, g_Level.Anims[item->Animation.AnimNumber]))
 			{
 				Rumble(0.5f, 0.15f);
 
@@ -2364,7 +2364,7 @@ void lara_col_sprint(ItemInfo* item, CollisionInfo* coll)
 		}
 
 		item->Animation.TargetState = LS_SOFT_SPLAT;
-		if (GetChange(item, &g_Level.Anims[item->Animation.AnimNumber]))
+		if (GetStateDispatch(item, g_Level.Anims[item->Animation.AnimNumber]))
 		{
 			item->Animation.ActiveState = LS_SOFT_SPLAT;
 			return;

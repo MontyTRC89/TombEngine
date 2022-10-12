@@ -21,6 +21,7 @@
 using namespace TEN::Input;
 using namespace TEN::Renderer;
 using namespace TEN::Floordata;
+using std::vector;
 
 // -----------------------------
 // TEST FUNCTIONS
@@ -1112,23 +1113,11 @@ void GetTightropeFallOff(ItemInfo* item, int regularity)
 }
 #endif
 
-// TODO: Organise all of this properly. -- Sezz 2022.07.28
-bool CheckLaraState(LaraState referenceState, const std::vector<LaraState>& stateList)
+bool TestLaraWeaponType(LaraWeaponType refWeaponType, const vector<LaraWeaponType>& weaponTypeList)
 {
-	for (auto& state : stateList)
+	for (const auto& weaponType : weaponTypeList)
 	{
-		if (state == referenceState)
-			return true;
-	}
-
-	return false;
-}
-
-bool CheckLaraWeaponType(LaraWeaponType referenceWeaponType, const std::vector<LaraWeaponType>& weaponTypeList)
-{
-	for (auto& weaponType : weaponTypeList)
-	{
-		if (weaponType == referenceWeaponType)
+		if (weaponType == refWeaponType)
 			return true;
 	}
 
@@ -1149,69 +1138,65 @@ static std::vector<LaraWeaponType> StandingWeaponTypes
 
 bool IsStandingWeapon(ItemInfo* item, LaraWeaponType weaponType)
 {
-	return (CheckLaraWeaponType(weaponType, StandingWeaponTypes) || GetLaraInfo(item)->Weapons[(int)weaponType].HasLasersight);
+	return (TestLaraWeaponType(weaponType, StandingWeaponTypes) || GetLaraInfo(item)->Weapons[(int)weaponType].HasLasersight);
 }
 
-static std::vector<LaraState> VaultStates
+bool IsVaultState(int state)
 {
-	LS_VAULT,
-	LS_VAULT_2_STEPS,
-	LS_VAULT_3_STEPS,
-	LS_VAULT_1_STEP_CROUCH,
-	LS_VAULT_2_STEPS_CROUCH,
-	LS_VAULT_3_STEPS_CROUCH,
-	LS_AUTO_JUMP
-};
-
-bool IsVaultState(LaraState state)
-{
-	return CheckLaraState(state, VaultStates);
+	static const vector<int> vaultStates
+	{
+		LS_VAULT,
+		LS_VAULT_2_STEPS,
+		LS_VAULT_3_STEPS,
+		LS_VAULT_1_STEP_CROUCH,
+		LS_VAULT_2_STEPS_CROUCH,
+		LS_VAULT_3_STEPS_CROUCH,
+		LS_AUTO_JUMP
+	};
+	return TestState(state, vaultStates);
 }
 
-static std::vector<LaraState> JumpStates
+bool IsJumpState(int state)
 {
-	LS_JUMP_FORWARD,
-	LS_JUMP_BACK,
-	LS_JUMP_LEFT,
-	LS_JUMP_RIGHT,
-	LS_JUMP_UP,
-	LS_FALL_BACK,
-	LS_REACH,
-	LS_SWAN_DIVE,
-	LS_FREEFALL_DIVE,
-	LS_FREEFALL
-};
-
-bool IsJumpState(LaraState state)
-{
-	return CheckLaraState(state, JumpStates);
+	static const vector<int> jumpStates
+	{
+		LS_JUMP_FORWARD,
+		LS_JUMP_BACK,
+		LS_JUMP_LEFT,
+		LS_JUMP_RIGHT,
+		LS_JUMP_UP,
+		LS_FALL_BACK,
+		LS_REACH,
+		LS_SWAN_DIVE,
+		LS_FREEFALL_DIVE,
+		LS_FREEFALL
+	};
+	return TestState(state, jumpStates);
 }
 
-static std::vector<LaraState> RunningJumpQueuableStates
+bool IsRunJumpQueueableState(int state)
 {
-	LS_RUN_FORWARD,
-	LS_SPRINT,
-	LS_STEP_UP,
-	LS_STEP_DOWN
-};
-
-bool IsRunJumpQueueableState(LaraState state)
-{
-	return CheckLaraState(state, RunningJumpQueuableStates);
+	static const vector<int> runningJumpQueuableStates
+	{
+		LS_RUN_FORWARD,
+		LS_SPRINT,
+		LS_STEP_UP,
+		LS_STEP_DOWN
+	};
+	return TestState(state, runningJumpQueuableStates);
 }
 
-static std::vector<LaraState> RunningJumpTimerStates
+bool IsRunJumpCountableState(int state)
 {
-	LS_WALK_FORWARD,
-	LS_RUN_FORWARD,
-	LS_SPRINT,
-	LS_SPRINT_DIVE,
-	LS_JUMP_FORWARD
-};
-
-bool IsRunJumpCountableState(LaraState state)
-{
-	return CheckLaraState(state, RunningJumpTimerStates);
+	static const vector<int> runningJumpTimerStates
+	{
+		LS_WALK_FORWARD,
+		LS_RUN_FORWARD,
+		LS_SPRINT,
+		LS_SPRINT_DIVE,
+		LS_JUMP_FORWARD
+	};
+	return TestState(state, runningJumpTimerStates);
 }
 
 bool TestLaraTurn180(ItemInfo* item, CollisionInfo* coll)
@@ -1289,11 +1274,11 @@ bool TestLaraKeepLow(ItemInfo* item, CollisionInfo* coll)
 
 bool TestLaraSlide(ItemInfo* item, CollisionInfo* coll)
 {
-	int y = item->Pose.Position.y;
-	auto probe = GetCollision(item, 0, 0, -(coll->Setup.Height / 2));
+	int yPos = item->Pose.Position.y;
+	auto pointColl = GetCollision(item, 0, 0, -(coll->Setup.Height / 2));
 
-	if (abs(probe.Position.Floor - y) <= STEPUP_HEIGHT &&
-		probe.Position.FloorSlope &&
+	if (abs(pointColl.Position.Floor - yPos) <= STEPUP_HEIGHT &&
+		pointColl.Position.FloorSlope &&
 		!TestEnvironment(ENV_FLAG_SWAMP, item))
 	{
 		return true;
@@ -1320,10 +1305,10 @@ bool TestLaraFall(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	int y = item->Pose.Position.y;
-	auto probe = GetCollision(item, 0, 0, -(coll->Setup.Height / 2));
+	int yPos = item->Pose.Position.y;
+	auto pointColl = GetCollision(item, 0, 0, -(coll->Setup.Height / 2));
 
-	if ((probe.Position.Floor - y) <= STEPUP_HEIGHT ||
+	if ((pointColl.Position.Floor - yPos) <= STEPUP_HEIGHT ||
 		lara->Control.WaterStatus == WaterStatus::Wade)	// TODO: This causes a legacy floor snap bug when Lara wades off a ledge into a dry room. @Sezz 2021.09.26
 	{
 		return false;

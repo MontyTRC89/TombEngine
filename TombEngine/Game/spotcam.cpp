@@ -68,27 +68,25 @@ void ClearSpotCamSequences()
 
 void InitSpotCamSequences() 
 {
-	int s, cc, n, ce;
-
-	n = NumberSpotcams;
+	int n = NumberSpotcams;
 	TrackCameraInit = 0;
-	cc = 1;
+	int cc = 1;
 
 	if (n != 0)
 	{
-		ce = 0;
-		s = SpotCam[0].sequence;
+		int ce = 0;
+		int s = SpotCam[0].sequence;
 
 		if (cc < n)
 		{
 			for (n = 1; n < NumberSpotcams; n++)
 			{
-				//Same sequence
+				// Same sequence.
 				if (SpotCam[n].sequence == s)
 					cc++;
+				// New sequence.
 				else
 				{
-					//New sequence
 					CameraCnt[ce] = cc;
 					cc = 1;
 					SpotCamRemap[s] = ce;
@@ -116,7 +114,7 @@ void InitialiseSpotCam(short Sequence)
 	BinocularRange = 0;
 	LaserSight = false;
 
-	AlterFOV(16380);
+	AlterFOV(ANGLE(90.0f));
 
 	LaraItem->MeshBits = ALL_JOINT_BITS;
 
@@ -353,7 +351,7 @@ void CalculateSpotCameras()
 	int cn; // $s0
 
 
-	CAMERA_INFO Backup;
+	CAMERA_INFO backup;
 
 	if (Lara.Control.Locked)
 	{
@@ -703,7 +701,7 @@ void CalculateSpotCameras()
 					CameraFOV[2] = SpotCam[CurrentSplineCamera - 1].fov;
 					CameraSpeed[2] = SpotCam[CurrentSplineCamera - 1].speed;
 
-					memcpy((char*)& Backup, (char*)& Camera, sizeof(CAMERA_INFO));
+					memcpy((char*)& backup, (char*)& Camera, sizeof(CAMERA_INFO));
 					Camera.oldType = CameraType::Fixed;
 					Camera.type = CameraType::Chase;
 					Camera.speed = 1;
@@ -744,7 +742,7 @@ void CalculateSpotCameras()
 					CameraSpeed[4] = CameraSpeed[2] >> 1;
 					CameraRoll[4] = 0;
 
-					memcpy((char*)& Camera, (char*)& Backup, sizeof(CAMERA_INFO));
+					memcpy((char*)& Camera, (char*)& backup, sizeof(CAMERA_INFO));
 
 					Camera.targetElevation = elevation;
 
@@ -788,7 +786,8 @@ void CalculateSpotCameras()
 }
 
 #if 0
-int Spline(int x, int* knots, int nk)//Monty's version?
+// Monty's version.
+int Spline(int x, int* knots, int nk)
 {
 	/*int num = nk - 1;
 
@@ -878,20 +877,19 @@ int Spline(int x, int* knots, int nk)//Monty's version?
 	*/
 }
 #else
-int Spline(int x, int* knots, int nk)//Core's version, *proper* decompilation by ChocolateFan
+// Core's version. Proper decompilation by ChocolateFan
+int Spline(int x, int* knots, int nk)
 {
-	int* k;
-	int span, c1, c2;
-
-	span = x * (nk - 3) >> 16;
-
+	int span = x * (nk - 3) >> 16;
 	if (span >= nk - 3)
 		span = nk - 4;
 
-	k = &knots[span];
+	int* k = &knots[span];
 	x = x * (nk - 3) - span * 65536;
-	c1 = (k[1] >> 1) - (k[2] >> 1) - k[2] + k[1] + (k[3] >> 1) + ((-k[0] - 1) >> 1);
-	c2 = 2 * k[2] - 2 * k[1] - (k[1] >> 1) - (k[3] >> 1) + k[0];
+
+	int c1 = (k[1] >> 1) - (k[2] >> 1) - k[2] + k[1] + (k[3] >> 1) + ((-k[0] - 1) >> 1);
+	int c2 = 2 * k[2] - 2 * k[1] - (k[1] >> 1) - (k[3] >> 1) + k[0];
+
 	return ((__int64)x * (((__int64)x * (((__int64)x * c1 >> 16) + c2) >> 16) + (k[2] >> 1) + ((-k[0] - 1) >> 1)) >> 16) + k[1];
 }
 #endif
