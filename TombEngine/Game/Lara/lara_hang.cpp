@@ -131,7 +131,8 @@ void lara_col_hang(ItemInfo* item, CollisionInfo* coll)
 			}
 		}
 
-		if (g_GameFlow->HasLedgeJumps()) {
+		if (g_GameFlow->HasLedgeJumps())
+		{
 			if (TrInput & IN_JUMP)
 			{
 				lara_ledge_jump_up(item, coll);
