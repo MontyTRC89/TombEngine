@@ -4,7 +4,6 @@
 #include "Game/Lara/lara_basic.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_jump.h"
-#include "Game/Lara/lara_ledge_jump.h"
 #include "Game/Lara/lara_tests.h"
 #include "Game/Lara/lara_monkey.h"
 #include "Game/Lara/lara_crawl.h"
