@@ -40,7 +40,7 @@ namespace TEN::Input
 	}
 
 	// To avoid desync on the second pulse, ensure initialDelayInSeconds is a multiple of delayInSeconds.
-	bool InputAction::IsPulsed(float delayInSeconds, float initialDelayInSec) const
+	bool InputAction::IsPulsed(float delayInSec, float initialDelayInSec) const
 	{
 		if (this->IsClicked())
 			return true;
@@ -50,7 +50,7 @@ namespace TEN::Input
 
 		// TODO: Because our delta time is a placeholder constant and we cannot properly account for time drift,
 		// count whole frames instead of actual time passed for now.
-		float activeDelayInFrameTime = (TimeActive > round(initialDelayInSec / DELTA_TIME)) ? round(delayInSeconds / DELTA_TIME) : round(initialDelayInSec / DELTA_TIME);
+		float activeDelayInFrameTime = (TimeActive > round(initialDelayInSec / DELTA_TIME)) ? round(delayInSec / DELTA_TIME) : round(initialDelayInSec / DELTA_TIME);
 		float delayInFrameTime = std::floor(TimeActive / activeDelayInFrameTime) * activeDelayInFrameTime;
 		if (delayInFrameTime > (std::floor(PrevTimeActive / activeDelayInFrameTime) * activeDelayInFrameTime))
 			return true;
