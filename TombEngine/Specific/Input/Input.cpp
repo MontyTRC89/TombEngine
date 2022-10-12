@@ -11,6 +11,7 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
+#include "Game/Lara/lara_tests.h"
 #include "Game/savegame.h"
 #include "Renderer/Renderer11.h"
 #include "Sound/sound.h"
@@ -461,6 +462,16 @@ namespace TEN::Input
 
 	void HandleLaraHotkeys(ItemInfo* item)
 	{
+		static const vector<LaraState> unavailableFlareStates =
+		{
+			LS_CRAWL_FORWARD,
+			LS_CRAWL_TURN_LEFT,
+			LS_CRAWL_TURN_RIGHT,
+			LS_CRAWL_BACK,
+			LS_CRAWL_TO_HANG,
+			LS_CRAWL_TURN_180
+		};
+
 		auto* lara = GetLaraInfo(item);
 
 		// Handle hardcoded action-to-key mappings.
@@ -483,19 +494,11 @@ namespace TEN::Input
 		// Handle flares.
 		if (IsClicked(In::Flare))
 		{
-			if (item->Animation.ActiveState == LS_CRAWL_FORWARD ||
-				item->Animation.ActiveState == LS_CRAWL_TURN_LEFT ||
-				item->Animation.ActiveState == LS_CRAWL_TURN_RIGHT ||
-				item->Animation.ActiveState == LS_CRAWL_BACK ||
-				item->Animation.ActiveState == LS_CRAWL_TO_HANG ||
-				item->Animation.ActiveState == LS_CRAWL_TURN_180)
-			{
+			if (CheckLaraState((LaraState)item->Animation.ActiveState, unavailableFlareStates))
 				SoundEffect(SFX_TR4_LARA_NO_ENGLISH, nullptr, SoundEnvironment::Always);
-			}
 		}
 
 		// Handle weapon hotkeys.
-
 		if (KeyMap[KC_1] && Lara.Weapons[(int)LaraWeaponType::Pistol].Present)
 			Lara.Control.Weapon.RequestGunType = LaraWeaponType::Pistol;
 
@@ -667,7 +670,7 @@ namespace TEN::Input
 		TrInput = 0;
 	}
 
-	void Rumble(float power, float delayInSeconds, RumbleMode mode)
+	void Rumble(float power, float delayInSec, RumbleMode mode)
 	{
 		if (!g_Configuration.EnableRumble)
 			return;
@@ -677,7 +680,7 @@ namespace TEN::Input
 		if (power == 0.0f || rumbleData.Power)
 			return;
 
-		rumbleData.FadeSpeed = power / (delayInSeconds * (float)FPS);
+		rumbleData.FadeSpeed = power / (delayInSec * (float)FPS);
 		rumbleData.Power = power + rumbleData.FadeSpeed;
 		rumbleData.LastPower = rumbleData.Power;
 	}
@@ -718,9 +721,9 @@ namespace TEN::Input
 		return ActionMap[(int)actionID].IsClicked();
 	}
 
-	bool IsPulsed(ActionID actionID, float delayInSeconds, float initialDelayInSeconds)
+	bool IsPulsed(ActionID actionID, float delayInSec, float initialDelayInSec)
 	{
-		return ActionMap[(int)actionID].IsPulsed(delayInSeconds, initialDelayInSeconds);
+		return ActionMap[(int)actionID].IsPulsed(delayInSec, initialDelayInSec);
 	}
 
 	bool IsHeld(ActionID actionID)

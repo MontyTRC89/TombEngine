@@ -39,7 +39,7 @@ namespace TEN::Input
 		return ((Value != 0.0f) && (PrevValue == 0.0f));
 	}
 
-	// To avoid desync on the second pulse, ensure initialDelayInSeconds is a multiple of delayInSeconds.
+	// To avoid desync on the second pulse, ensure initialDelayInSec is a multiple of delayInSec.
 	bool InputAction::IsPulsed(float delayInSec, float initialDelayInSec) const
 	{
 		if (this->IsClicked())

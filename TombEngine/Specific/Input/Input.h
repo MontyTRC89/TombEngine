@@ -128,8 +128,8 @@ namespace TEN::Input
 	extern vector<float>		AxisMap;
 
 	// Legacy input bitfields
-	extern int DbInput;  // Debounce: is input clicked?
-	extern int TrInput;  // Throttle: is input held?
+	extern int DbInput; // Debounce: is input clicked?
+	extern int TrInput; // Throttle: is input held?
 
 	extern short KeyboardLayout[2][KEY_COUNT];
 
@@ -138,13 +138,13 @@ namespace TEN::Input
 	void DefaultConflict();
 	void UpdateInputActions();
 	void ClearAllActions();
-	void Rumble(float power, float delayInSeconds = 0.3f, RumbleMode mode = RumbleMode::Both);
+	void Rumble(float power, float delayInSec= 0.3f, RumbleMode mode = RumbleMode::Both);
 	void StopRumble();
 
 	void  ClearAction(ActionID actionID);
 	bool  NoAction();
 	bool  IsClicked(ActionID actionID);
-	bool  IsPulsed(ActionID actionID, float delayInSeconds, float initialDelayInSeconds = 0.0f);
+	bool  IsPulsed(ActionID actionID, float delayInSec, float initialDelayInSec= 0.0f);
 	bool  IsHeld(ActionID actionID);
 	bool  IsReleased(ActionID actionID);
 	float GetActionValue(ActionID actionID);
