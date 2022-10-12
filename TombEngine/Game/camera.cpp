@@ -1356,13 +1356,13 @@ void BinocularCamera(ItemInfo* item)
 		LaserSightCamera(item);
 	else
 	{
-		auto src = Vector3Int(Camera.pos.x, Camera.pos.y, Camera.pos.z);
+		auto origin = Vector3Int(Camera.pos.x, Camera.pos.y, Camera.pos.z);
 		auto target = Vector3Int(Camera.target.x, Camera.target.y, Camera.target.z);
 
 		GetTargetOnLOS(&Camera.pos, &Camera.target, false, false);
 
 		if (IsHeld(In::Action))
-			LaraTorch(&src, &target, lara->ExtraHeadRot.y, 192);
+			LaraTorch(&origin, &target, lara->ExtraHeadRot.y, 192);
 	}
 }
 
@@ -2072,11 +2072,6 @@ void HandleOptics(ItemInfo* item)
 	if ((Lara.Control.IsLow || TrInput & IN_CROUCH) &&
 		(LaraItem->Animation.TargetState == LS_CROUCH_IDLE || LaraItem->Animation.AnimNumber == LA_CROUCH_IDLE))
 		breakOptics = false;
-
-	// TODO: Translate to input action.
-	// If any input but optic controls (directions + action), immediately exit optics.
-	//if ((TrInput & ~IN_OPTIC_CONTROLS) != IN_NONE)
-	//	breakOptics = true;
 
 	// If lasersight, and no look is pressed, exit optics.
 	if (LaserSight && !(TrInput & IN_LOOK))
