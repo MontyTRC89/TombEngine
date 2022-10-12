@@ -65,34 +65,40 @@ namespace TEN::Input
 		Count
 	} In;
 
-	// TODO: For use with analog triggers, use Value range [0.0f, 1.0f] with deadzone up to a quarter press.
+	// TODO: For analog triggers, use Value range [0.0f, 1.0f] with deadzone up to a quarter press.
 	class InputAction
 	{
 	public:
+		// Constructors
 		InputAction(ActionID actionID);
 
+		// Getters
+		ActionID GetID() const;
+		float	 GetValue() const;
+		float	 GetTimeActive() const;
+		float	 GetTimeInactive() const;
+		
+		// Inquirers
+		bool IsClicked() const;
+		bool IsPulsed(float delayInSeconds, float initialDelayInSec = 0.0f) const;
+		bool IsHeld() const;
+		bool IsReleased(float maxDelayInSec = FLT_MAX) const;
+
+		// Utilities
 		void Update(float value);
 		void Clear();
 		void PrintDebugInfo();
 
-		ActionID GetID() const;
-		float GetValue() const;
-		float GetTimeActive() const;
-		float GetTimeInactive() const;
-
-		bool IsClicked() const;
-		bool IsPulsed(float delayInSeconds, float initialDelayInSeconds = 0.0f) const;
-		bool IsHeld() const;
-		bool IsReleased(float maxDelayInSeconds = FLT_MAX) const;
-
 	private:
-		ActionID ID			 = In::None;
-		float Value			 = 0.0f;
-		float PrevValue		 = 0.0f;
-		float TimeActive	 = 0.0f;
-		float PrevTimeActive = 0.0f;
-		float TimeInactive	 = 0.0f;
+		// Components
+		ActionID ID				= In::None;
+		float	 Value			= 0.0f;
+		float	 PrevValue		= 0.0f;
+		float	 TimeActive		= 0.0f;
+		float	 PrevTimeActive = 0.0f;
+		float	 TimeInactive	= 0.0f;
 
+		// Helpers
 		void UpdateValue(float value);
 	};
 }
