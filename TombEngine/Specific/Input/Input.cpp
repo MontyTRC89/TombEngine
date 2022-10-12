@@ -462,7 +462,7 @@ namespace TEN::Input
 
 	void HandleLaraHotkeys(ItemInfo* item)
 	{
-		static const vector<LaraState> unavailableFlareStates =
+		static const vector<int> unavailableFlareStates =
 		{
 			LS_CRAWL_FORWARD,
 			LS_CRAWL_TURN_LEFT,
@@ -494,7 +494,7 @@ namespace TEN::Input
 		// Handle flares.
 		if (IsClicked(In::Flare))
 		{
-			if (CheckLaraState((LaraState)item->Animation.ActiveState, unavailableFlareStates))
+			if (TestState(item->Animation.ActiveState, unavailableFlareStates))
 				SoundEffect(SFX_TR4_LARA_NO_ENGLISH, nullptr, SoundEnvironment::Always);
 		}
 
