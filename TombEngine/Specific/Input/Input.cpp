@@ -132,7 +132,7 @@ namespace TEN::Input
 	{
 		TENLog("Initializing input system...", LogLevel::Info);
 
-		for (int i = 0; i < (int)ActionID::Count; i++)
+		for (uint i = 0; i < (int)ActionID::Count; i++)
 			ActionMap.push_back(InputAction((ActionID)i));
 
 		KeyMap.resize(MAX_INPUT_SLOTS);
@@ -206,11 +206,11 @@ namespace TEN::Input
 			axis = 0.0f;
 	}
 
-	bool LayoutContainsIndex(unsigned int index)
+	bool LayoutContainsIndex(uint index)
 	{
-		for (int l = 0; l < 2; l++)
+		for (uint l = 0; l < 2; l++)
 		{
-			for (int i = 0; i < KEY_COUNT; i++)
+			for (uint i = 0; i < KEY_COUNT; i++)
 			{
 				if (KeyboardLayout[l][i] == index)
 					return true;
@@ -222,13 +222,13 @@ namespace TEN::Input
 
 	void DefaultConflict()
 	{
-		for (int i = 0; i < KEY_COUNT; i++)
+		for (uint i = 0; i < KEY_COUNT; i++)
 		{
 			short key = KeyboardLayout[0][i];
 
 			ConflictingKeys[i] = false;
 
-			for (int j = 0; j < KEY_COUNT; j++)
+			for (uint j = 0; j < KEY_COUNT; j++)
 			{
 				if (key != KeyboardLayout[1][j])
 					continue;
@@ -239,18 +239,18 @@ namespace TEN::Input
 		}
 	}
 
-	void SetDiscreteAxisValues(unsigned int index)
+	void SetDiscreteAxisValues(uint index)
 	{
-		for (int layout = 0; layout <= 1; layout++)
+		for (uint layout = 0; layout <= 1; layout++)
 		{
 			if (KeyboardLayout[layout][KEY_FORWARD] == index)
-				AxisMap[(unsigned int)InputAxis::MoveVertical] = 1.0f;
+				AxisMap[(uint)InputAxis::MoveVertical] = 1.0f;
 			else if (KeyboardLayout[layout][KEY_BACK] == index)
-				AxisMap[(unsigned int)InputAxis::MoveVertical] = -1.0f;
+				AxisMap[(uint)InputAxis::MoveVertical] = -1.0f;
 			else if (KeyboardLayout[layout][KEY_LEFT] == index)
-				AxisMap[(unsigned int)InputAxis::MoveHorizontal] = -1.0f;
+				AxisMap[(uint)InputAxis::MoveHorizontal] = -1.0f;
 			else if (KeyboardLayout[layout][KEY_RIGHT] == index)
-				AxisMap[(unsigned int)InputAxis::MoveHorizontal] = 1.0f;
+				AxisMap[(uint)InputAxis::MoveHorizontal] = 1.0f;
 		}
 	}
 
@@ -261,26 +261,26 @@ namespace TEN::Input
 
 		try
 		{
-			// Poll gamepad
+			// Poll gamepad.
 			oisGamepad->capture();
 			const JoyStickState& state = oisGamepad->getJoyStickState();
 
-			// Scan buttons
-			for (int key = 0; key < state.mButtons.size(); key++)
+			// Scan buttons.
+			for (uint key = 0; key < state.mButtons.size(); key++)
 				KeyMap[MAX_KEYBOARD_KEYS + key] = state.mButtons[key];
 
-			// Scan axes
-			for (int axis = 0; axis < state.mAxes.size(); axis++)
+			// Scan axes.
+			for (uint axis = 0; axis < state.mAxes.size(); axis++)
 			{
-				// We don't support anything above 6 existing XBOX/PS controller axes (two sticks plus triggers)
+				// We don't support anything above 6 existing XBOX/PS controller axes (two sticks plus triggers).
 				if (axis >= MAX_GAMEPAD_AXES)
 					break;
 
-				// Filter out deadzone
+				// Filter out deadzone.
 				if (abs(state.mAxes[axis].abs) < AXIS_DEADZONE)
 					continue;
 
-				// Calculate raw normalized analog value (for camera)
+				// Calculate raw normalized analog value (for camera).
 				float normalizedValue = (float)(state.mAxes[axis].abs + (state.mAxes[axis].abs > 0 ? -AXIS_DEADZONE : AXIS_DEADZONE))
 					/ (float)(std::numeric_limits<short>::max() - AXIS_DEADZONE);
 
@@ -288,14 +288,14 @@ namespace TEN::Input
 				// Minimum value of 0.2f and maximum value of 1.7f is empirically the most organic rate from tests.
 				float scaledValue = abs(normalizedValue) * 1.5f + 0.2f;
 
-				// Calculate and reset discrete input slots
-				unsigned int negKeyIndex = MAX_KEYBOARD_KEYS + MAX_GAMEPAD_KEYS + (axis * 2);
-				unsigned int posKeyIndex = MAX_KEYBOARD_KEYS + MAX_GAMEPAD_KEYS + (axis * 2) + 1;
+				// Calculate and reset discrete input slots.
+				uint negKeyIndex = MAX_KEYBOARD_KEYS + MAX_GAMEPAD_KEYS + (axis * 2);
+				uint posKeyIndex = MAX_KEYBOARD_KEYS + MAX_GAMEPAD_KEYS + (axis * 2) + 1;
 				KeyMap[negKeyIndex] = false;
 				KeyMap[posKeyIndex] = false;
 
 				// Decide on the discrete input registering based on analog value
-				unsigned int usedIndex = normalizedValue > 0 ? negKeyIndex : posKeyIndex;
+				uint usedIndex = normalizedValue > 0 ? negKeyIndex : posKeyIndex;
 				KeyMap[usedIndex] = true;
 
 				// Register analog input in certain direction.
@@ -313,15 +313,15 @@ namespace TEN::Input
 					AxisMap[InputAxis::MoveHorizontal] = abs(scaledValue);
 				else if (!LayoutContainsIndex(usedIndex))
 				{
-					unsigned int camAxisIndex = (unsigned int)std::clamp((unsigned int)InputAxis::CameraVertical + axis % 2,
-						(unsigned int)InputAxis::CameraVertical,
-						(unsigned int)InputAxis::CameraHorizontal);
+					uint camAxisIndex = (uint)std::clamp((uint)InputAxis::CameraVertical + axis % 2,
+						(uint)InputAxis::CameraVertical,
+						(uint)InputAxis::CameraHorizontal);
 					AxisMap[camAxisIndex] = normalizedValue;
 				}
 			}
 
-			// Scan POVs (controllers usually have one, but let's scan all of them for paranoia)
-			for (int pov = 0; pov < 4; pov++)
+			// Scan POVs (controllers usually have one, but let's scan all of them out of paranoia).
+			for (uint pov = 0; pov < 4; pov++)
 			{
 				if (state.mPOV[pov].direction == Pov::Centered)
 					continue;
@@ -329,9 +329,9 @@ namespace TEN::Input
 				// Do 4 passes; every pass checks every POV direction. For every direction,
 				// separate keypress is registered. This is needed to allow multiple directions
 				// pressed at the same time.
-				for (int pass = 0; pass < 4; pass++)
+				for (uint pass = 0; pass < 4; pass++)
 				{
-					unsigned int index = MAX_KEYBOARD_KEYS + MAX_GAMEPAD_KEYS + MAX_GAMEPAD_AXES * 2;
+					uint index = MAX_KEYBOARD_KEYS + MAX_GAMEPAD_KEYS + MAX_GAMEPAD_AXES * 2;
 
 					switch (pass)
 					{
@@ -377,7 +377,7 @@ namespace TEN::Input
 		{
 			oisKeyboard->capture();
 
-			for (int i = 0; i < MAX_KEYBOARD_KEYS; i++)
+			for (uint i = 0; i < MAX_KEYBOARD_KEYS; i++)
 			{
 				if (!oisKeyboard->isKeyDown((KeyCode)i))
 				{
@@ -397,24 +397,9 @@ namespace TEN::Input
 		}
 	}
 
-	// TODO!!!
-	//bool GetActionBindingState(ActionID actionID)
-	//{
-	//	for (int binding : ActionMap[(int)actionID].GetBindings())
-	//	{
-	//		if (KeyMap[binding])
-	//			return true;
-
-	//		// Mirrorings...
-	//		// Conflicts...
-	//	}
-
-	//	return false;
-	//}
-
 	bool Key(int number)
 	{
-		for (int layout = 1; layout >= 0; layout--)
+		for (uint layout = 1; layout >= 0; layout--)
 		{
 			short key = KeyboardLayout[layout][number];
 
@@ -644,7 +629,7 @@ namespace TEN::Input
 		TrInput = 0;
 
 		// Update action map (mappable actions only).
-		for (int i = 0; i < KEY_COUNT; i++)
+		for (uint i = 0; i < KEY_COUNT; i++)
 			ActionMap[i].Update(Key(i) ? true : false); // TODO: Poll analog value of key. Potentially, any can be a trigger.
 
 		// Additional handling.
