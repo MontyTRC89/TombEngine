@@ -10,12 +10,12 @@ class Pose;
 	{
 	public:
 		// Components
-		short X1 = 0;
-		short X2 = 0;
-		short Y1 = 0;
-		short Y2 = 0;
-		short Z1 = 0;
-		short Z2 = 0;
+		int X1 = 0;
+		int X2 = 0;
+		int Y1 = 0;
+		int Y2 = 0;
+		int Z1 = 0;
+		int Z2 = 0;
 
 		// Constants
 		static const BOUNDING_BOX Zero;
