@@ -2,6 +2,7 @@
 #include "Math/Containers/BoundingBox.h"
 
 #include "Game/animation.h"
+#include "Game/items.h"
 #include "Math/Containers/EulerAngles.h"
 #include "Math/Containers/Pose.h"
 
