@@ -138,7 +138,7 @@ void MissileControl(short itemNumber)
 		
 		KillEffect(itemNumber);
 	}
-	else if (ItemNearLara(&fx->pos.Position, 200))
+	else if (ItemNearLara(fx->pos.Position, 200))
 	{
 		if (fx->flag1)
 		{

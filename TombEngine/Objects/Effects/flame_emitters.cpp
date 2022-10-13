@@ -152,7 +152,7 @@ namespace TEN::Entities::Effects
 				SoundEffect(SFX_TR4_LOOP_FOR_SMALL_FIRES, &item->Pose);
 
 				if (!Lara.Burn &&
-					ItemNearLara(&item->Pose.Position, 600) &&
+					ItemNearLara(item->Pose.Position, 600) &&
 					(pow(LaraItem->Pose.Position.x - item->Pose.Position.x, 2) +
 						pow(LaraItem->Pose.Position.z - item->Pose.Position.z, 2) < pow(SECTOR(0.5f), 2)) &&
 					Lara.Control.WaterStatus != WaterStatus::FlyCheat)
@@ -560,7 +560,7 @@ namespace TEN::Entities::Effects
 				TriggerDynamicLight(x, item->Pose.Position.y, z, 12, (GetRandomControl() & 0x3F) + 192, ((GetRandomControl() >> 4) & 0x1F) + 96, 0);
 
 				auto pos = item->Pose.Position;
-				if (ItemNearLara(&pos, 600))
+				if (ItemNearLara(pos, 600))
 				{
 					if ((!Lara.Burn) && Lara.Control.WaterStatus != WaterStatus::FlyCheat)
 					{

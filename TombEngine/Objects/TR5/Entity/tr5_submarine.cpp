@@ -491,7 +491,7 @@ namespace TEN::Entities::Creatures::TR5
 			item->Pose.Position.y > probe.Position.Ceiling &&
 			TestEnvironment(ENV_FLAG_WATER, probe.RoomNumber))
 		{
-			if (ItemNearLara(&item->Pose.Position, 200))
+			if (ItemNearLara(item->Pose.Position, 200))
 			{
 				LaraItem->HitStatus = true;
 				KillItem(itemNumber);

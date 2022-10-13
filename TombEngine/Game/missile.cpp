@@ -60,7 +60,7 @@ void ControlMissile(short fxNumber)
 	fx.pos.Translate(fx.pos.Orientation, fx.speed);
 
 	auto pointColl = GetCollision(fx.pos.Position.x, fx.pos.Position.y, fx.pos.Position.z, fx.roomNumber);
-	auto hasHitPlayer = ItemNearLara(&fx.pos.Position, hitRadius);
+	auto hasHitPlayer = ItemNearLara(fx.pos.Position, hitRadius);
 
 	// Check whether something was hit.
 	if (fx.pos.Position.y >= pointColl.Position.Floor ||

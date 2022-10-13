@@ -51,6 +51,7 @@
 		return abs(Z2 - Z1);
 	}
 
+	// NOTE: Previously phd_RotBoundingBoxNoPersp().
 	void BOUNDING_BOX::RotNoPersp(const EulerAngles& orient, const BOUNDING_BOX& bounds)
 	{
 		auto world = orient.ToRotationMatrix();
