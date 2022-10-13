@@ -76,10 +76,10 @@
 	BoundingOrientedBox BOUNDING_BOX::ToBoundingOrientedBox(const Vector3& pos, const Quaternion& orient) const
 	{
 		auto boxCenter = Vector3(X2 + X1, Y2 + Y1, Z2 + Z1) / 2.0f;
-		auto boxExtent = Vector3(X2 - X1, Y2 - Y1, Z2 - Z1) / 2.0f;
+		auto boxExtents = Vector3(X2 - X1, Y2 - Y1, Z2 - Z1) / 2.0f;
 
 		BoundingOrientedBox box;
-		BoundingOrientedBox(boxCenter, boxExtent, Vector4::UnitY).Transform(box, 1.0f, orient, pos);
+		BoundingOrientedBox(boxCenter, boxExtents, Vector4::UnitY).Transform(box, 1.0f, orient, pos);
 		return box;
 	}
 
