@@ -56,6 +56,7 @@ public:
 	void				SetIntroImagePath(std::string const& path);
 	void				SetTitleScreenImagePath(std::string const& path);
 	bool				IsFlyCheatEnabled() const;
+	void				SetFlyCheatEnabled(bool flyCheat);
 	bool				CanPlayAnyLevel() const;
 
 	bool HasCrawlExtended() const override { return Anims.HasCrawlExtended; }
