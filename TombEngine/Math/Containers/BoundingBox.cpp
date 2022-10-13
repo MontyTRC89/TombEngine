@@ -77,68 +77,53 @@
 		auto boxCenter = Vector3(X2 + X1, Y2 + Y1, Z2 + Z1) / 2.0f;
 		auto boxExtent = Vector3(X2 - X1, Y2 - Y1, Z2 - Z1) / 2.0f;
 
-		BoundingOrientedBox result;
-		BoundingOrientedBox(boxCenter, boxExtent, Vector4::UnitY).Transform(result, 1.0f, orient, pos);
-		return result;
+		BoundingOrientedBox box;
+		BoundingOrientedBox(boxCenter, boxExtent, Vector4::UnitY).Transform(box, 1.0f, orient, pos);
+		return box;
 	}
 
 	BOUNDING_BOX BOUNDING_BOX::operator +(const BOUNDING_BOX& bounds) const
 	{
-		auto newBox = *this;
-		newBox.X1 += bounds.X1;
-		newBox.X2 += bounds.X2;
-		newBox.Y1 += bounds.Y1;
-		newBox.Y2 += bounds.Y2;
-		newBox.Z1 += bounds.Z1;
-		newBox.Z2 += bounds.Z2;
-		return newBox;
+		return BOUNDING_BOX(
+			X1 + bounds.X1, X2 + bounds.X2,
+			Y1 + bounds.Y1, Y2 + bounds.Y2,
+			Z1 + bounds.Z1, Z2 + bounds.Z2
+		);
 	}
 
 	BOUNDING_BOX BOUNDING_BOX::operator +(const Pose& pose) const
 	{
-		auto newBox = *this;
-		newBox.X1 += pose.Position.x;
-		newBox.X2 += pose.Position.x;
-		newBox.Y1 += pose.Position.y;
-		newBox.Y2 += pose.Position.y;
-		newBox.Z1 += pose.Position.z;
-		newBox.Z2 += pose.Position.z;
-		return newBox;
+		return BOUNDING_BOX(
+			X1 + pose.Position.x, X2 + pose.Position.x,
+			Y1 + pose.Position.y, Y2 + pose.Position.y,
+			Z1 + pose.Position.z, Z2 + pose.Position.z
+		);
 	}
 
 	BOUNDING_BOX BOUNDING_BOX::operator -(const BOUNDING_BOX& bounds) const
 	{
-		auto newBox = *this;
-		newBox.X1 -= bounds.X1;
-		newBox.X2 -= bounds.X2;
-		newBox.Y1 -= bounds.Y1;
-		newBox.Y2 -= bounds.Y2;
-		newBox.Z1 -= bounds.Z1;
-		newBox.Z2 -= bounds.Z2;
-		return newBox;
+		return BOUNDING_BOX(
+			X1 - bounds.X1, X2 - bounds.X2,
+			Y1 - bounds.Y1, Y2 - bounds.Y2,
+			Z1 - bounds.Z1, Z2 - bounds.Z2
+		);
 	}
 
 	BOUNDING_BOX BOUNDING_BOX::operator -(const Pose& pose) const
 	{
-		auto newBox = *this;
-		newBox.X1 -= pose.Position.x;
-		newBox.X2 -= pose.Position.x;
-		newBox.Y1 -= pose.Position.y;
-		newBox.Y2 -= pose.Position.y;
-		newBox.Z1 -= pose.Position.z;
-		newBox.Z2 -= pose.Position.z;
-		return newBox;
+		return BOUNDING_BOX(
+			X1 - pose.Position.x, X2 - pose.Position.x,
+			Y1 - pose.Position.y, Y2 - pose.Position.y,
+			Z1 - pose.Position.z, Z2 - pose.Position.z
+		);
 	}
 
 	BOUNDING_BOX BOUNDING_BOX::operator *(float scale) const
 	{
-		auto newBox = *this;
-		newBox.X1 *= scale;
-		newBox.X2 *= scale;
-		newBox.Y1 *= scale;
-		newBox.Y2 *= scale;
-		newBox.Z1 *= scale;
-		newBox.Z2 *= scale;
-		return newBox;
+		return BOUNDING_BOX(
+			X1 * scale, X2 * scale,
+			Y1 * scale, Y2 * scale,
+			Z1 * scale, Z2 * scale
+		);
 	}
 //}
