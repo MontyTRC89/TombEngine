@@ -19,8 +19,8 @@ class Pose;
 
 		// Constructors
 		BOUNDING_BOX();
-		BOUNDING_BOX(int x1, int x2, int y1, int y2, int z1, int z2);
-		BOUNDING_BOX(ItemInfo* item, bool accurate = true);
+		BOUNDING_BOX(float x1, float x2, float y1, float y2, float z1, float z2);
+		BOUNDING_BOX(ItemInfo* item, bool isAccurate = true);
 
 		// Getters
 		int GetWidth() const;
