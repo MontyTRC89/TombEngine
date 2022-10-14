@@ -73,4 +73,13 @@ using namespace TEN::Math;
 	{
 		this->Position = Geometry::TranslatePoint(this->Position, direction, distance);
 	}
+
+	bool Pose::operator ==(const Pose& pose) const
+	{
+		return ((Position == pose.Position) && (Orientation == pose.Orientation));
+	}
+	bool Pose::operator !=(const Pose& pose) const
+	{
+		return ((Position != pose.Position) || (Orientation != pose.Orientation));
+	}
 //}

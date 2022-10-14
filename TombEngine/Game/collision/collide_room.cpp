@@ -219,7 +219,7 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, bool resetRoom)
 	GetCollisionInfo(coll, item, Vector3i::Zero, resetRoom);
 }
 
-void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, Vector3i offset, bool resetRoom)
+void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offset, bool resetRoom)
 {
 	// Player collision has several more precise checks for bridge collisions.
 	// Therefore, we should differentiate these code paths.
