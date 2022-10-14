@@ -427,7 +427,7 @@ void GetLaraDeadlyBounds()
 {
 	auto bounds = GameBoundingBox(LaraItem);
 	auto tBounds = GameBoundingBox::Zero;
-	tBounds.RotNoPersp(LaraItem->Pose.Orientation, bounds);
+	tBounds.RotateNoPersp(LaraItem->Pose.Orientation, bounds);
 
 	DeadlyBounds = GameBoundingBox(
 		LaraItem->Pose.Position.x + tBounds.X1,

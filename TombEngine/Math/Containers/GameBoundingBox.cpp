@@ -52,7 +52,7 @@
 	}
 
 	// NOTE: Previously phd_RotBoundingBoxNoPersp().
-	void GameBoundingBox::RotNoPersp(const EulerAngles& orient, const GameBoundingBox& bounds)
+	void GameBoundingBox::RotateNoPersp(const EulerAngles& orient, const GameBoundingBox& bounds)
 	{
 		auto world = orient.ToRotationMatrix();
 		auto bMin = Vector3(bounds.X1, bounds.Y1, bounds.Z1);
