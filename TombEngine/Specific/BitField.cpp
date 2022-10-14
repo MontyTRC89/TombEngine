@@ -40,12 +40,12 @@ namespace TEN::Utils
 			this->Bits.push_back((bit == '1') ? true : false);
 	}
 
-	uint BitField::GetSize()
+	uint BitField::GetSize() const
 	{
 		return Bits.size();
 	}
 
-	uint BitField::GetCount()
+	uint BitField::GetCount() const
 	{
 		uint count = 0;
 		for (const bool& bit : this->Bits)
@@ -114,7 +114,7 @@ namespace TEN::Utils
 		this->Bits.flip();
 	}
 
-	bool BitField::Test(const vector<uint>& indices, bool testAny)
+	bool BitField::Test(const vector<uint>& indices, bool testAny) const
 	{
 		// Test whether ANY bits at indices passed are true.
 		if (testAny)
@@ -140,12 +140,12 @@ namespace TEN::Utils
 		}
 	}
 
-	bool BitField::Test(uint index)
+	bool BitField::Test(uint index) const
 	{
 		return Bits[index];
 	}
 
-	bool BitField::TestAny()
+	bool BitField::TestAny() const
 	{
 		for (const bool& bit : this->Bits)
 		{
@@ -156,7 +156,7 @@ namespace TEN::Utils
 		return false;
 	}
 
-	bool BitField::TestAll()
+	bool BitField::TestAll() const
 	{
 		for (const bool& bit : this->Bits)
 		{
@@ -167,7 +167,7 @@ namespace TEN::Utils
 		return true;
 	}
 
-	bool BitField::TestNone()
+	bool BitField::TestNone() const
 	{
 		for (const bool& bit : this->Bits)
 		{
@@ -202,7 +202,7 @@ namespace TEN::Utils
 		return bitString;
 	}
 
-	bool BitField::operator ==(uint packedBits)
+	bool BitField::operator ==(uint packedBits) const
 	{
 		for (uint i = 0; i < Bits.size(); i++)
 		{
@@ -214,7 +214,7 @@ namespace TEN::Utils
 		return true;
 	}
 	
-	bool BitField::operator !=(uint packedBits)
+	bool BitField::operator !=(uint packedBits) const
 	{
 		for (uint i = 0; i < Bits.size(); i++)
 		{
@@ -269,12 +269,12 @@ namespace TEN::Utils
 		return *this;
 	}
 	
-	uint BitField::operator &(uint packedBits)
+	uint BitField::operator &(uint packedBits) const
 	{
 		return (this->ToPackedBits() & packedBits);
 	}
 
-	uint BitField::operator |(uint packedBits)
+	uint BitField::operator |(uint packedBits) const
 	{
 		return (this->ToPackedBits() | packedBits);
 	}

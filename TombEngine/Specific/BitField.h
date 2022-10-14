@@ -21,8 +21,8 @@ namespace TEN::Utils
 		BitField(const string& bitString);
 
 		// Getters
-		uint GetSize();
-		uint GetCount();
+		uint GetSize() const;
+		uint GetCount() const;
 
 		// Setters
 		void Set(const vector<uint>& indices);
@@ -36,25 +36,25 @@ namespace TEN::Utils
 		void FlipAll();
 
 		// Inquirers
-		bool Test(const vector<uint>& indices, bool testAny = true);
-		bool Test(uint index);
-		bool TestAny();
-		bool TestAll();
-		bool TestNone();
+		bool Test(const vector<uint>& indices, bool testAny = true) const;
+		bool Test(uint index) const;
+		bool TestAny() const;
+		bool TestAll() const;
+		bool TestNone() const;
 
 		// Converters
 		uint   ToPackedBits() const;
 		string ToString() const;
 
 		// Operators
-		// NOTE: packedBits will not be assessed in full if the length of the given BitField object is less than BIT_FIELD_SIZE_MAX.
-		bool	  operator ==(uint packedBits);
-		bool	  operator !=(uint packedBits);
+		// NOTE: packedBits will not be assessed in full if the size of the given BitField object is less than BIT_FIELD_SIZE_MAX.
+		bool	  operator ==(uint packedBits) const;
+		bool	  operator !=(uint packedBits) const;
 		BitField& operator =(uint packedBits);
 		BitField& operator &=(uint packedBits);
 		BitField& operator |=(uint packedBits);
-		uint	  operator &(uint packedBits);
-		uint	  operator |(uint packedBits);
+		uint	  operator &(uint packedBits) const;
+		uint	  operator |(uint packedBits) const;
 
 	private:
 		void Fill(bool value);
