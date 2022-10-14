@@ -882,7 +882,7 @@ void lara_col_crawl_to_hang(ItemInfo* item, CollisionInfo* coll)
 
 		GetCollisionInfo(coll, item);
 		lara->Control.HandStatus = HandStatus::Busy;
-		item->Pose.Position.y += coll->Front.Floor - BOUNDING_BOX(item).Y1 - 20;
+		item->Pose.Position.y += coll->Front.Floor - GameBoundingBox(item).Y1 - 20;
 		item->Animation.IsAirborne = true;
 		item->Animation.Velocity.z = 2;
 		item->Animation.Velocity.y = 1;

@@ -870,7 +870,7 @@ short GetNearestLedgeAngle(ItemInfo* item, CollisionInfo* coll, float& distance)
 		return 0; 
 
 	// Get item bounds and current rotation.
-	auto bounds = BOUNDING_BOX(item);
+	auto bounds = GameBoundingBox(item);
 	auto c = phd_cos(coll->Setup.ForwardAngle);
 	auto s = phd_sin(coll->Setup.ForwardAngle);
 
@@ -997,7 +997,7 @@ short GetNearestLedgeAngle(ItemInfo* item, CollisionInfo* coll, float& distance)
 			if (bridge >= 0)
 			{
 				// Get and test DX item coll bounds.
-				auto bounds = BOUNDING_BOX(&g_Level.Items[bridge]);
+				auto bounds = GameBoundingBox(&g_Level.Items[bridge]);
 				auto dxBounds = bounds.ToBoundingOrientedBox(g_Level.Items[bridge].Pose);
 
 				// Decompose bounds into planes.
@@ -1199,7 +1199,7 @@ int GetDistanceToFloor(int itemNumber, bool precise)
 	auto height = GetFloorHeight(probe.Block, item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z);
 	probe.Block->AddItem(itemNumber);
 
-	auto bounds = BOUNDING_BOX(item);
+	auto bounds = GameBoundingBox(item);
 	int minHeight = precise ? bounds.Y2 : 0;
 
 	return (minHeight + item->Pose.Position.y - height);

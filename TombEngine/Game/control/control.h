@@ -5,7 +5,7 @@
 #include "Game/room.h"
 #include "Math/Math.h"
 
-class BOUNDING_BOX;
+class GameBoundingBox;
 struct ItemInfo;
 struct CollisionInfo;
 class FloorInfo;

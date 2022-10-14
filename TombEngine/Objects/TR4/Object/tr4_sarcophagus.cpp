@@ -15,7 +15,7 @@ using namespace TEN::Input;
 static Vector3i SarcophagusPosition(0, 0, -300);
 OBJECT_COLLISION_BOUNDS SarcophagusBounds =
 {
-	BOUNDING_BOX(
+	GameBoundingBox(
 		-512, 512,
 		-100, 100,
 		-512, 0

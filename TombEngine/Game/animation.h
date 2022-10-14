@@ -8,7 +8,7 @@ class Vector3i;
 
 struct AnimFrame
 {
-	BOUNDING_BOX boundingBox;
+	GameBoundingBox boundingBox;
 	short offsetX;
 	short offsetY;
 	short offsetZ;

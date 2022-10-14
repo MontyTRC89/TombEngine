@@ -15,7 +15,7 @@ namespace TEN::Entities::Switches
 {
 	OBJECT_COLLISION_BOUNDS JumpSwitchBounds =  
 	{
-		BOUNDING_BOX(
+		GameBoundingBox(
 			-128, 128,
 			-256, 256,
 			384, 512

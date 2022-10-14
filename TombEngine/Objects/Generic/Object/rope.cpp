@@ -174,7 +174,7 @@ namespace TEN::Entities::Generic
 			laraItem->Animation.Velocity.y > 0.0f &&
 			rope->active)
 		{
-			auto frame = BOUNDING_BOX(laraItem);
+			auto frame = GameBoundingBox(laraItem);
 
 			int segment = RopeNodeCollision(
 				rope,

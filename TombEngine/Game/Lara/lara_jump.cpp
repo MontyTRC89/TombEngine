@@ -781,7 +781,7 @@ void lara_col_swan_dive(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	auto bounds = BOUNDING_BOX(item);
+	auto bounds = GameBoundingBox(item);
 	int realHeight = g_GameFlow->HasCrawlspaceSwandive() ? (bounds.GetHeight() * 0.7f) : LARA_HEIGHT;
 
 	lara->Control.MoveAngle = item->Pose.Orientation.y;

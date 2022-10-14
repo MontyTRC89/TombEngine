@@ -34,7 +34,7 @@ ParticleDynamic ParticleDynamics[MAX_PARTICLE_DYNAMICS];
 
 FX_INFO EffectList[NUM_EFFECTS];
 
-BOUNDING_BOX DeadlyBounds;
+GameBoundingBox DeadlyBounds;
 SPLASH_SETUP SplashSetup;
 SPLASH_STRUCT Splashes[MAX_SPLASHES];
 RIPPLE_STRUCT Ripples[MAX_RIPPLES];
@@ -158,8 +158,8 @@ Particle* GetFreeParticle()
 
 void UpdateSparks()
 {
-	auto bounds = BOUNDING_BOX(LaraItem);
-	DeadlyBounds = BOUNDING_BOX(
+	auto bounds = GameBoundingBox(LaraItem);
+	DeadlyBounds = GameBoundingBox(
 		LaraItem->Pose.Position.x + bounds.X1,
 		LaraItem->Pose.Position.x + bounds.X2,
 		LaraItem->Pose.Position.y + bounds.Y1,

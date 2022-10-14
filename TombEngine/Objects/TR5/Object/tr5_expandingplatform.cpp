@@ -47,7 +47,7 @@ bool IsOnExpandingPlatform(int itemNumber, int x, int z)
 	int itemxb = item->Pose.Position.x / SECTOR(1);
 	int itemzb = item->Pose.Position.z / SECTOR(1);
 
-	auto bounds = BOUNDING_BOX(item);
+	auto bounds = GameBoundingBox(item);
 	auto halfWidth = abs(bounds.Z2 - bounds.Z1) / 2;
 
 	if (item->Pose.Orientation.y == ANGLE(90.0f))
@@ -91,7 +91,7 @@ bool IsInFrontOfExpandingPlatform(int itemNumber, int x, int y, int z, int margi
 	if (LaraItem->Pose.Position.y < topHeight - 32 || LaraItem->Pose.Position.y > bottomHeight + 32)
 		return false;
 
-	auto bounds = BOUNDING_BOX(item);
+	auto bounds = GameBoundingBox(item);
 	auto halfWidth = abs(bounds.Z2 - bounds.Z1) / 2;
 	
 	int xb = x / SECTOR(1);
@@ -278,7 +278,7 @@ void ExpandingPlatformUpdateMutators(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
 
-	auto bounds = BOUNDING_BOX(item);
+	auto bounds = GameBoundingBox(item);
 	float normalizedThickness = item->ItemFlags[1] / 4096.0f;
 	int width = abs(bounds.Z2 - bounds.Z1) / 2;
 	float offset = width * normalizedThickness;

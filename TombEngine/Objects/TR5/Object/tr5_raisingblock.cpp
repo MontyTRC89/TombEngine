@@ -157,7 +157,7 @@ std::optional<int> RaisingBlockFloor(short itemNumber, int x, int y, int z)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		auto bounds = BOUNDING_BOX(item);
+		auto bounds = GameBoundingBox(item);
 		int height = bounds.GetHeight();
 
 		int currentHeight = item->Pose.Position.y - height * item->ItemFlags[1] / 4096;

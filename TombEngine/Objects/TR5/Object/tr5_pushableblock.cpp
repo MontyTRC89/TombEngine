@@ -19,7 +19,7 @@ using namespace TEN::Input;
 Vector3i PushableBlockPos = { 0, 0, 0 };
 static OBJECT_COLLISION_BOUNDS PushableBlockBounds = 
 {
-	BOUNDING_BOX(
+	GameBoundingBox(
 		0, 0,
 		-64, 0,
 		0, 0
@@ -114,7 +114,7 @@ void InitialisePushableBlock(short itemNumber)
 		height = (OCB & 0x1F) * CLICK(1);
 	}
 	else
-		height = -BOUNDING_BOX(item).Y1;
+		height = -GameBoundingBox(item).Y1;
 
 	info->height = height;
 
@@ -194,7 +194,7 @@ void PushableBlockControl(short itemNumber)
 		return;
 	}
 
-	int displaceBox = BOUNDING_BOX(LaraItem).Z2 - 80; // move pushable based on bbox->Z2 of Lara
+	int displaceBox = GameBoundingBox(LaraItem).Z2 - 80; // move pushable based on bbox->Z2 of Lara
 
 	switch (LaraItem->Animation.AnimNumber)
 	{
@@ -469,7 +469,7 @@ void PushableBlockCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo*
 	}
 	else
 	{
-		auto bounds = BOUNDING_BOX(pushableItem);
+		auto bounds = GameBoundingBox(pushableItem);
 		PushableBlockBounds.boundingBox.X1 = (bounds.X1 / 2) - 100;
 		PushableBlockBounds.boundingBox.X2 = (bounds.X2 / 2) + 100;
 		PushableBlockBounds.boundingBox.Z1 = bounds.Z1 - 200;

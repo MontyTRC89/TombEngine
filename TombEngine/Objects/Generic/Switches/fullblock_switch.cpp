@@ -16,7 +16,7 @@ namespace TEN::Entities::Switches
 {
 	OBJECT_COLLISION_BOUNDS FullBlockSwitchBounds = 
 	{
-		BOUNDING_BOX(
+		GameBoundingBox(
 			-384, 384,
 			0, 256,
 			0, 512

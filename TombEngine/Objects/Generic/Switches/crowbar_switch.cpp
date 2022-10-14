@@ -20,7 +20,7 @@ namespace TEN::Entities::Switches
 
 	OBJECT_COLLISION_BOUNDS CrowbarBounds = 
 	{
-		BOUNDING_BOX(
+		GameBoundingBox(
 			-256, 256,
 			0, 0,
 			-512, -256
@@ -34,7 +34,7 @@ namespace TEN::Entities::Switches
 
 	OBJECT_COLLISION_BOUNDS CrowbarBounds2 = 
 	{
-		BOUNDING_BOX(
+		GameBoundingBox(
 			-256, 256,
 			0, 0,
 			256, 512

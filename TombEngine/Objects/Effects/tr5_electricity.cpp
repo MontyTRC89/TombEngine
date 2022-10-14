@@ -144,7 +144,7 @@ void ElectricityWiresControl(short itemNumber)
 
 	auto* object = &Objects[item->ObjectNumber];
 
-	auto cableBox = BOUNDING_BOX(item).ToBoundingOrientedBox(item->Pose);
+	auto cableBox = GameBoundingBox(item).ToBoundingOrientedBox(item->Pose);
 	auto cableBottomPlane = cableBox.Center.y + cableBox.Extents.y - CLICK(1);
 
 	int currentEndNode = 0;
@@ -189,7 +189,7 @@ void ElectricityWiresControl(short itemNumber)
 			continue;
 
 		bool isWaterNearby = false;
-		auto npcBox = BOUNDING_BOX(collItem).ToBoundingOrientedBox(collItem->Pose);
+		auto npcBox = GameBoundingBox(collItem).ToBoundingOrientedBox(collItem->Pose);
 
 		for (int i = 0; i < object->nmeshes; i++)
 		{

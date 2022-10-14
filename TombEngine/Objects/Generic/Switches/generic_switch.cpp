@@ -15,7 +15,7 @@ namespace TEN::Entities::Switches
 {
 	OBJECT_COLLISION_BOUNDS SwitchBounds = 
 	{
-		BOUNDING_BOX::Zero,
+		GameBoundingBox::Zero,
 		-ANGLE(10.0f), ANGLE(10.0f),
 		-ANGLE(30.0f), ANGLE(30.0f),
 		-ANGLE(10.0f), ANGLE(10.0f)
@@ -61,7 +61,7 @@ namespace TEN::Entities::Switches
 			switchItem->TriggerFlags >= 0 ||
 			laraInfo->Control.IsMoving && laraInfo->InteractedItem == itemNumber)
 		{
-			auto bounds = BOUNDING_BOX(switchItem);
+			auto bounds = GameBoundingBox(switchItem);
 
 			if ((switchItem->TriggerFlags == 3 || switchItem->TriggerFlags == 4) && switchItem->Animation.ActiveState == SWITCH_ON)
 				return;

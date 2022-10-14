@@ -81,8 +81,8 @@ struct STATIC_INFO
 {
 	int meshNumber;
 	int flags;
-	BOUNDING_BOX visibilityBox;
-	BOUNDING_BOX collisionBox;
+	GameBoundingBox visibilityBox;
+	GameBoundingBox collisionBox;
 	int shatterType;
 	int shatterSound;
 };

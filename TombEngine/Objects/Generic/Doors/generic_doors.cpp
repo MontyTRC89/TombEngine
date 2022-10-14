@@ -31,7 +31,7 @@ namespace TEN::Entities::Doors
 
 	OBJECT_COLLISION_BOUNDS CrowbarDoorBounds =
 	{
-		BOUNDING_BOX(
+		GameBoundingBox(
 			-512, 512,
 			-1024, 0, 
 			0, 512
@@ -269,7 +269,7 @@ namespace TEN::Entities::Doors
 		{
 			if (doorItem->ItemFlags[0])
 			{
-				auto bounds = BOUNDING_BOX(doorItem);
+				auto bounds = GameBoundingBox(doorItem);
 			
 				doorItem->ItemFlags[0]--;
 				doorItem->Pose.Position.y -= TEN::Entities::Switches::COG_DOOR_SPEED;

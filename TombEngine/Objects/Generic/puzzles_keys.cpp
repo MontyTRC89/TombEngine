@@ -30,7 +30,7 @@ enum class PuzzleType
 
 OBJECT_COLLISION_BOUNDS PuzzleBounds =
 {
-	BOUNDING_BOX(
+	GameBoundingBox(
 		0, 0,
 		-256, 256,
 		0, 0
@@ -43,7 +43,7 @@ OBJECT_COLLISION_BOUNDS PuzzleBounds =
 static Vector3i KeyHolePosition(0, 0, 312);
 OBJECT_COLLISION_BOUNDS KeyHoleBounds =
 {
-	BOUNDING_BOX(
+	GameBoundingBox(
 		-256, 256,
 		0, 0,
 		0, 412
@@ -88,7 +88,7 @@ void PuzzleHoleCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* co
 	{
 		short oldYrot = receptableItem->Pose.Orientation.y;
 
-		auto bounds = BOUNDING_BOX(receptableItem);
+		auto bounds = GameBoundingBox(receptableItem);
 		PuzzleBounds.boundingBox.X1 = bounds.X1 - CLICK(1);
 		PuzzleBounds.boundingBox.X2 = bounds.X2 + CLICK(1);
 		PuzzleBounds.boundingBox.Z1 = bounds.Z1 - CLICK(1);;

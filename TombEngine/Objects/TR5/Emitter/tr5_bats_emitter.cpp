@@ -109,7 +109,7 @@ void UpdateBats()
 	if (!Objects[ID_BATS_EMITTER].loaded)
 		return;
 
-	auto bounds = BOUNDING_BOX(LaraItem);
+	auto bounds = GameBoundingBox(LaraItem);
 
 	int x1 = LaraItem->Pose.Position.x + bounds.X1 - (bounds.X1 / 4);
 	int x2 = LaraItem->Pose.Position.x + bounds.X2 - (bounds.X2 / 4);

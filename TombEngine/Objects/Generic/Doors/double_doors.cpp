@@ -27,7 +27,7 @@ namespace TEN::Entities::Doors
 
 	OBJECT_COLLISION_BOUNDS DoubleDoorBounds =
 	{
-		BOUNDING_BOX(
+		GameBoundingBox(
 			-384, 384,
 			0, 0, 
 			-1024, 512

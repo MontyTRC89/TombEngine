@@ -193,7 +193,7 @@ bool TestLaraHang(ItemInfo* item, CollisionInfo* coll)
 			if (stopped && hdif > 0 && climbDirection != 0 && (climbDirection > 0 == coll->MiddleLeft.Floor > coll->MiddleRight.Floor))
 				stopped = false;
 
-			auto verticalShift = coll->Front.Floor - BOUNDING_BOX(item).Y1;
+			auto verticalShift = coll->Front.Floor - GameBoundingBox(item).Y1;
 			auto x = item->Pose.Position.x;
 			auto z = item->Pose.Position.z;
 
@@ -249,7 +249,7 @@ bool TestLaraHang(ItemInfo* item, CollisionInfo* coll)
 		{
 			SetAnimation(item, LA_JUMP_UP, 9);
 			item->Pose.Position.x += coll->Shift.x;
-			item->Pose.Position.y += BOUNDING_BOX(item).Y2 * 1.8f;
+			item->Pose.Position.y += GameBoundingBox(item).Y2 * 1.8f;
 			item->Pose.Position.z += coll->Shift.z;
 			item->Animation.IsAirborne = true;
 			item->Animation.Velocity.z = 2;
@@ -307,7 +307,7 @@ bool TestLaraHangJump(ItemInfo* item, CollisionInfo* coll)
 	else
 		SetAnimation(item, LA_REACH_TO_HANG);
 
-	auto bounds = BOUNDING_BOX(item);
+	auto bounds = GameBoundingBox(item);
 	if (edgeCatch <= 0)
 	{
 		item->Pose.Position.y = edge - bounds.Y1 - 20;
@@ -364,7 +364,7 @@ bool TestLaraHangJumpUp(ItemInfo* item, CollisionInfo* coll)
 
 	SetAnimation(item, LA_REACH_TO_HANG, 12);
 
-	auto bounds = BOUNDING_BOX(item);
+	auto bounds = GameBoundingBox(item);
 	if (edgeCatch <= 0)
 		item->Pose.Position.y = edge - bounds.Y1 + 4;
 	else
@@ -385,7 +385,7 @@ bool TestLaraHangJumpUp(ItemInfo* item, CollisionInfo* coll)
 
 int TestLaraEdgeCatch(ItemInfo* item, CollisionInfo* coll, int* edge)
 {
-	auto bounds = BOUNDING_BOX(item);
+	auto bounds = GameBoundingBox(item);
 	int heightDif = coll->Front.Floor - bounds.Y1;
 
 	if (heightDif < 0 == heightDif + item->Animation.Velocity.y < 0)
@@ -486,7 +486,7 @@ bool TestLaraHangOnClimbableWall(ItemInfo* item, CollisionInfo* coll)
 		break;
 	}
 
-	auto bounds = BOUNDING_BOX(item);
+	auto bounds = GameBoundingBox(item);
 
 	if (lara->Control.MoveAngle != item->Pose.Orientation.y)
 	{
@@ -573,7 +573,7 @@ CornerType TestLaraHangCorner(ItemInfo* item, CollisionInfo* coll, float testAng
 	if (cornerResult.Success)
 	{
 		// Get bounding box height for further ledge height calculations
-		auto bounds = BOUNDING_BOX(item);
+		auto bounds = GameBoundingBox(item);
 
 		// Store next position
 		item->Pose = cornerResult.RealPositionResult;
@@ -632,7 +632,7 @@ CornerType TestLaraHangCorner(ItemInfo* item, CollisionInfo* coll, float testAng
 	if (cornerResult.Success)
 	{
 		// Get bounding box height for further ledge height calculations
-		auto bounds = BOUNDING_BOX(item);
+		auto bounds = GameBoundingBox(item);
 
 		// Store next position
 		item->Pose = cornerResult.RealPositionResult;
@@ -2540,7 +2540,7 @@ bool TestLaraPoleCollision(ItemInfo* item, CollisionInfo* coll, bool goingUp, fl
 	if (GetCollidedObjects(item, SECTOR(1), true, CollidedItems, nullptr, false) &&
 		CollidedItems[0] != nullptr)
 	{
-		auto laraBox = BOUNDING_BOX(item).ToBoundingOrientedBox(item->Pose);
+		auto laraBox = GameBoundingBox(item).ToBoundingOrientedBox(item->Pose);
 
 		// HACK: Because Core implemented upward pole movement as a SetPosition command, we can't precisely
 		// check her position. So we add a fixed height offset.
@@ -2565,7 +2565,7 @@ bool TestLaraPoleCollision(ItemInfo* item, CollisionInfo* coll, bool goingUp, fl
 			if (object->ObjectNumber != ID_POLEROPE)
 				continue;
 
-			auto poleBox = BOUNDING_BOX(object).ToBoundingOrientedBox(object->Pose);
+			auto poleBox = GameBoundingBox(object).ToBoundingOrientedBox(object->Pose);
 			poleBox.Extents = poleBox.Extents + Vector3(coll->Setup.Radius, 0.0f, coll->Setup.Radius);
 
 			//g_Renderer.AddDebugBox(poleBox, Vector4(0, 0, 1, 1), RENDERER_DEBUG_PAGE::LOGIC_STATS);

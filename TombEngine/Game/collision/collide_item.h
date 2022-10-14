@@ -11,13 +11,13 @@ constexpr auto ITEM_RADIUS_YMAX = SECTOR(3);
 
 constexpr auto VEHICLE_COLLISION_TERMINAL_VELOCITY = 30.0f;
 
-extern BOUNDING_BOX GlobalCollisionBounds;
+extern GameBoundingBox GlobalCollisionBounds;
 extern ItemInfo* CollidedItems[MAX_COLLIDED_OBJECTS];
 extern MESH_INFO* CollidedMeshes[MAX_COLLIDED_OBJECTS];
 
 struct OBJECT_COLLISION_BOUNDS
 {
-	BOUNDING_BOX boundingBox;
+	GameBoundingBox boundingBox;
 	short rotX1;
 	short rotX2;
 	short rotY1;
@@ -45,7 +45,7 @@ bool TestBoundsCollideStatic(ItemInfo* item, MESH_INFO* mesh, int radius);
 bool ItemPushItem(ItemInfo* item, ItemInfo* laraItem, CollisionInfo* coll, bool spasmEnabled, char bigPush);
 bool ItemPushStatic(ItemInfo* laraItem, MESH_INFO* mesh, CollisionInfo* coll);
 
-bool CollideSolidBounds(ItemInfo* item, BOUNDING_BOX* box, Pose pose, CollisionInfo* coll);
+bool CollideSolidBounds(ItemInfo* item, GameBoundingBox* box, Pose pose, CollisionInfo* coll);
 void CollideSolidStatics(ItemInfo* item, CollisionInfo* coll);
 
 void AIPickupCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);

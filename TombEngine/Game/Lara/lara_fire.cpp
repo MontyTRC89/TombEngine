@@ -932,7 +932,7 @@ FireWeaponType FireWeapon(LaraWeaponType weaponType, ItemInfo* targetEntity, Ite
 
 GameVector FindTargetPoint(ItemInfo* item)
 {
-	auto* bounds = (BOUNDING_BOX*)GetBestFrame(item);
+	auto* bounds = (GameBoundingBox*)GetBestFrame(item);
 
 	auto center = Vector3i(
 		int(bounds->X1 + bounds->X2) / 2,

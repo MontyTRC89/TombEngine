@@ -19,7 +19,7 @@ namespace TEN::Entities::Switches
 {
 	OBJECT_COLLISION_BOUNDS CogSwitchBounds =
 	{
-		BOUNDING_BOX(
+		GameBoundingBox(
 			-512, 512,
 			0, 0,
 			-1536, -512

@@ -29,7 +29,7 @@ namespace TEN::Entities::TR4
 	auto SASDragBodyPosition = Vector3i(0, 0, -460);
 	OBJECT_COLLISION_BOUNDS SASDragBodyBounds =
 	{
-		BOUNDING_BOX(
+		GameBoundingBox(
 			-256, 256,
 			-64, 100,
 			-200, -460

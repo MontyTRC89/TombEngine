@@ -115,7 +115,7 @@ void PerformAnimCommands(ItemInfo* item, bool isFrameBased)
 			if (!isFrameBased)
 			{
 				TranslateItem(item, item->Pose.Orientation.y, cmd[2], cmd[1], cmd[0]);
-				auto bounds = BOUNDING_BOX(item);
+				auto bounds = GameBoundingBox(item);
 				UpdateItemRoom(item, -bounds.GetHeight() / 2, -cmd[0], -cmd[2]);
 			}
 

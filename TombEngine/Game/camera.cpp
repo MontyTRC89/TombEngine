@@ -1440,7 +1440,7 @@ void CalculateCamera()
 		fixedCamera = false;
 	}
 
-	auto bounds = BOUNDING_BOX(item);
+	auto bounds = GameBoundingBox(item);
 
 	int x;
 	int y = item->Pose.Position.y + bounds.Y2 + (3 * (bounds.Y1 - bounds.Y2) / 4);
@@ -1455,7 +1455,7 @@ void CalculateCamera()
 			int shift = sqrt(pow(dx, 2) + pow(dz, 2));
 			short angle = phd_atan(dz, dx) - item->Pose.Orientation.y;
 			short tilt = phd_atan(shift, y - (bounds.Y1 + bounds.Y2) / 2 - Camera.item->Pose.Position.y);
-			bounds = BOUNDING_BOX(Camera.item);
+			bounds = GameBoundingBox(Camera.item);
 			angle /= 2;
 			tilt /= 2;
 
@@ -1720,13 +1720,13 @@ void ResetLook(ItemInfo* item)
 	}
 }
 
-bool TestBoundsCollideCamera(const BOUNDING_BOX& bounds, const Pose& pose, short radius)
+bool TestBoundsCollideCamera(const GameBoundingBox& bounds, const Pose& pose, short radius)
 {
 	auto sphere = BoundingSphere(Camera.pos.ToVector3(), radius);
 	return sphere.Intersects(bounds.ToBoundingOrientedBox(pose));
 }
 
-void ItemPushCamera(BOUNDING_BOX* bounds, Pose* pos, short radius)
+void ItemPushCamera(GameBoundingBox* bounds, Pose* pos, short radius)
 {
 	int dx = Camera.pos.x - pos->Position.x;
 	int dz = Camera.pos.z - pos->Position.z;
@@ -1789,7 +1789,7 @@ static bool CheckItemCollideCamera(ItemInfo* item)
 		return false;
 
 	// Check extents, if any 2 bounds are smaller than threshold, discard.
-	auto extents = BOUNDING_BOX(item).ToBoundingOrientedBox(item->Pose).Extents;
+	auto extents = GameBoundingBox(item).ToBoundingOrientedBox(item->Pose).Extents;
 	if ((abs(extents.x) < COLL_DISCARD_THRESHOLD && abs(extents.y) < COLL_DISCARD_THRESHOLD) ||
 		(abs(extents.x) < COLL_DISCARD_THRESHOLD && abs(extents.z) < COLL_DISCARD_THRESHOLD) ||
 		(abs(extents.y) < COLL_DISCARD_THRESHOLD && abs(extents.z) < COLL_DISCARD_THRESHOLD))
@@ -1893,7 +1893,7 @@ void ItemsCollideCamera()
 		if (dx > COLL_CANCEL_THRESHOLD || dz > COLL_CANCEL_THRESHOLD || dy > COLL_CANCEL_THRESHOLD)
 			continue;
 
-		auto bounds = BOUNDING_BOX(item);
+		auto bounds = GameBoundingBox(item);
 		if (TestBoundsCollideCamera(bounds, item->Pose, CAMERA_RADIUS))
 			ItemPushCamera(&bounds, &item->Pose, rad);
 

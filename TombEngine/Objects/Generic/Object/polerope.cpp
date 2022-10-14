@@ -51,7 +51,7 @@ namespace TEN::Entities::Generic
 
 	OBJECT_COLLISION_BOUNDS VPoleBounds = 
 	{
-		BOUNDING_BOX(
+		GameBoundingBox(
 			-CLICK(1), CLICK(1),
 			0, 0, 
 			-CLICK(2), CLICK(2)

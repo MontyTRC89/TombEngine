@@ -17,7 +17,7 @@ namespace TEN::Entities::Switches
 
 	OBJECT_COLLISION_BOUNDS RailSwitchBounds =
 	{
-		BOUNDING_BOX(
+		GameBoundingBox(
 			-256, 256,
 			0, 0,
 			-768, -512
@@ -31,7 +31,7 @@ namespace TEN::Entities::Switches
 
 	OBJECT_COLLISION_BOUNDS RailSwitchBounds2 =
 	{
-		BOUNDING_BOX(
+		GameBoundingBox(
 			-256, 256,
 			0, 0,
 			512, 768

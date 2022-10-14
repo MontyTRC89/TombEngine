@@ -9,7 +9,7 @@
 #include "Game/Lara/lara.h"
 #include "Specific/level.h"
 
-void VentilatorEffect(BOUNDING_BOX* bounds, int intensity, short rot, int speed)
+void VentilatorEffect(GameBoundingBox* bounds, int intensity, short rot, int speed)
 {
 	int x, y, z;
 
@@ -166,8 +166,8 @@ void VentilatorControl(short itemNumber)
 	else
 		speed = 128;
 
-	auto bounds = BOUNDING_BOX(item);
-	auto effectBounds = BOUNDING_BOX::Zero;
+	auto bounds = GameBoundingBox(item);
+	auto effectBounds = GameBoundingBox::Zero;
 
 	effectBounds.Y1 = item->Pose.Position.y + bounds.Y1;
 	effectBounds.Y2 = item->Pose.Position.y + bounds.Y2;
@@ -270,7 +270,7 @@ void VentilatorControl(short itemNumber)
 	}
 	else
 	{
-		auto tBounds = BOUNDING_BOX::Zero;
+		auto tBounds = GameBoundingBox::Zero;
 		tBounds.RotNoPersp(item->Pose.Orientation, bounds);
 
 		effectBounds.X1 = item->Pose.Position.x + tBounds.X1;

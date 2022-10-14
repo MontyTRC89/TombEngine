@@ -1360,7 +1360,7 @@ void lara_as_death(ItemInfo* item, CollisionInfo* coll)
 		lara->Inventory.IsBusy = false;
 	}
 
-	auto bounds = BOUNDING_BOX(item);
+	auto bounds = GameBoundingBox(item);
 	if (bounds.GetHeight() <= (LARA_HEIGHT * 0.75f))
 		AlignLaraToSurface(item);
 

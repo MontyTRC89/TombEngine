@@ -101,7 +101,7 @@ void DropEntityPickups(ItemInfo* item)
 		pickup->Pose.Position.z = (item->Pose.Position.z & -CLICK(1)) | CLICK(1);
 
 		pickup->Pose.Position.y = GetCollision(pickup->Pose.Position.x, item->Pose.Position.y, pickup->Pose.Position.z, item->RoomNumber).Position.Floor;
-		auto bounds = BOUNDING_BOX(pickup);
+		auto bounds = GameBoundingBox(pickup);
 		pickup->Pose.Position.y -= bounds.Y2;
 
 		ItemNewRoom(pickupNumber, item->RoomNumber);
@@ -471,7 +471,7 @@ int CreatureAnimation(short itemNumber, short angle, short tilt)
 		return false;
 	}
 
-	auto bounds = BOUNDING_BOX(item);
+	auto bounds = GameBoundingBox(item);
 
 	int y = item->Pose.Position.y + bounds.Y1;
 
@@ -782,7 +782,7 @@ void CreatureSwitchRoom(short itemNumber)
 	if (!Objects[item->ObjectNumber].waterCreature &&
 		TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, &g_Level.Rooms[roomNumber]))
 	{
-		auto bounds = BOUNDING_BOX(item);
+		auto bounds = GameBoundingBox(item);
 		auto height = item->Pose.Position.y - GetWaterHeight(item);
 
 		if (abs(bounds.Y1 + bounds.Y2) < height)
@@ -1463,7 +1463,7 @@ void CreatureAIInfo(ItemInfo* item, AI_INFO* AI)
 	else
 	{
 		auto probe = GetCollision(floor, enemy->Pose.Position.x, enemy->Pose.Position.y, enemy->Pose.Position.z);
-		auto bounds = BOUNDING_BOX(item);
+		auto bounds = GameBoundingBox(item);
 
 		reachable = abs(enemy->Pose.Position.y - probe.Position.Floor) < bounds.GetHeight();
 	}
@@ -1584,7 +1584,7 @@ void CreatureMood(ItemInfo* item, AI_INFO* AI, bool isViolent)
 
 			if (LOT->Fly != NO_FLYING && Lara.Control.WaterStatus == WaterStatus::Dry)
 			{
-				auto* bounds = (BOUNDING_BOX*)GetBestFrame(enemy);
+				auto* bounds = (GameBoundingBox*)GetBestFrame(enemy);
 				LOT->Target.y += bounds->Y1;
 			}
 

@@ -47,7 +47,7 @@ namespace TEN::Entities::Effects
 
 	OBJECT_COLLISION_BOUNDS FireBounds =
 	{
-		BOUNDING_BOX::Zero, 
+		GameBoundingBox::Zero, 
 		-ANGLE(10.0f), ANGLE(10.0f),
 		-ANGLE(30.0f), ANGLE(30.0f),
 		-ANGLE(10.0f), ANGLE(10.0f)

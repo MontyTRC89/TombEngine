@@ -16,7 +16,7 @@ namespace TEN::Entities::Switches
 { 
 	OBJECT_COLLISION_BOUNDS UnderwaterSwitchBounds =
 	{
-		BOUNDING_BOX(
+		GameBoundingBox(
 			-1024, 1024,
 			-1024, 1024,
 			-1024, 512
@@ -29,7 +29,7 @@ namespace TEN::Entities::Switches
 
 	OBJECT_COLLISION_BOUNDS CeilingUnderwaterSwitchBounds1 =
 	{
-		BOUNDING_BOX(
+		GameBoundingBox(
 			-256, 256,
 			-1280, -512,
 			-512, 0
@@ -42,7 +42,7 @@ namespace TEN::Entities::Switches
 
 	OBJECT_COLLISION_BOUNDS CeilingUnderwaterSwitchBounds2 =
 	{
-		BOUNDING_BOX(
+		GameBoundingBox(
 			-256, 256,
 			-1280, -512,
 			0, 512

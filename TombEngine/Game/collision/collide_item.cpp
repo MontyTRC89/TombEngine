@@ -23,7 +23,7 @@
 using namespace TEN::Math;
 using namespace TEN::Renderer;
 
-BOUNDING_BOX GlobalCollisionBounds;
+GameBoundingBox GlobalCollisionBounds;
 ItemInfo* CollidedItems[MAX_COLLIDED_OBJECTS];
 MESH_INFO* CollidedMeshes[MAX_COLLIDED_OBJECTS];
 
@@ -298,7 +298,7 @@ bool TestWithGlobalCollisionBounds(ItemInfo* item, ItemInfo* laraItem, Collision
 
 void TestForObjectOnLedge(ItemInfo* item, CollisionInfo* coll)
 {
-	auto bounds = BOUNDING_BOX(item);
+	auto bounds = GameBoundingBox(item);
 	int height = abs(bounds.Y2 + bounds.Y1);
 
 	for (int i = 0; i < 3; i++)
@@ -332,7 +332,7 @@ void TestForObjectOnLedge(ItemInfo* item, CollisionInfo* coll)
 
 				if (Vector3i::Distance(item->Pose.Position, item2->Pose.Position) < COLLISION_CHECK_DISTANCE)
 				{
-					auto box = BOUNDING_BOX(item2).ToBoundingOrientedBox(item2->Pose);
+					auto box = GameBoundingBox(item2).ToBoundingOrientedBox(item2->Pose);
 					float distance;
 
 					if (box.Intersects(origin, direction, distance) && distance < (coll->Setup.Radius * 2))
@@ -486,7 +486,7 @@ bool ItemNearLara(const Vector3i& origin, int radius)
 	if (!ItemInRange(target.x, target.z, radius))
 		return false;
 
-	auto bounds = BOUNDING_BOX(LaraItem);
+	auto bounds = GameBoundingBox(LaraItem);
 	if (target.y >= bounds.Y1 && target.y <= (bounds.Y2 + LARA_RADIUS))
 		return true;
 
@@ -506,7 +506,7 @@ bool ItemNearTarget(const Vector3i& origin, ItemInfo* targetEntity, int radius)
 	if (!ItemInRange(pos.x, pos.z, radius))
 		return false;
 
-	auto bounds = BOUNDING_BOX(targetEntity);
+	auto bounds = GameBoundingBox(targetEntity);
 	if (pos.y >= bounds.Y1 && pos.y <= bounds.Y2)
 		return true;
 
@@ -589,8 +589,8 @@ bool Move3DPosTo3DPos(ItemInfo* item, Pose& outFromPose, const Pose& toPose, int
 
 bool TestBoundsCollide(ItemInfo* item, ItemInfo* laraItem, int radius)
 {
-	auto* bounds = (BOUNDING_BOX*)GetBestFrame(item);
-	auto* laraBounds = (BOUNDING_BOX*)GetBestFrame(laraItem);
+	auto* bounds = (GameBoundingBox*)GetBestFrame(item);
+	auto* laraBounds = (GameBoundingBox*)GetBestFrame(laraItem);
 
 	if ((item->Pose.Position.y + bounds->Y2) <= (laraItem->Pose.Position.y + laraBounds->Y1))
 		return false;
@@ -663,7 +663,7 @@ bool ItemPushItem(ItemInfo* item, ItemInfo* item2, CollisionInfo* coll, bool spa
 	int rx = (direction.x * cosY) - (direction.z * sinY);
 	int rz = (direction.z * cosY) + (direction.x * sinY);
 
-	auto* bounds = (bigPush & 2) ? &GlobalCollisionBounds : (BOUNDING_BOX*)GetBestFrame(item);
+	auto* bounds = (bigPush & 2) ? &GlobalCollisionBounds : (GameBoundingBox*)GetBestFrame(item);
 
 	int minX = bounds->X1;
 	int maxX = bounds->X2;
@@ -854,7 +854,7 @@ void CollideSolidStatics(ItemInfo* item, CollisionInfo* coll)
 	}
 }
 
-bool CollideSolidBounds(ItemInfo* item, BOUNDING_BOX* box, Pose pose, CollisionInfo* coll)
+bool CollideSolidBounds(ItemInfo* item, GameBoundingBox* box, Pose pose, CollisionInfo* coll)
 {
 	bool result = false;
 
@@ -862,7 +862,7 @@ bool CollideSolidBounds(ItemInfo* item, BOUNDING_BOX* box, Pose pose, CollisionI
 	auto staticBounds = box->ToBoundingOrientedBox(pose);
 
 	// Get local TR bounds and DX item bounds in global coordinates.
-	auto itemBBox = BOUNDING_BOX(item);
+	auto itemBBox = GameBoundingBox(item);
 	auto itemBounds = itemBBox.ToBoundingOrientedBox(item->Pose);
 
 	// Extend bounds a bit for visual testing.
@@ -879,7 +879,7 @@ bool CollideSolidBounds(ItemInfo* item, BOUNDING_BOX* box, Pose pose, CollisionI
 	g_Renderer.AddDebugBox(staticBounds, Vector4(1, 0.3f, 0, 1), RENDERER_DEBUG_PAGE::LOGIC_STATS);
 
 	// Calculate horizontal item collision bounds according to radius.
-	BOUNDING_BOX collBox;
+	GameBoundingBox collBox;
 	collBox.X1 = -coll->Setup.Radius;
 	collBox.X2 = coll->Setup.Radius;
 	collBox.Z1 = -coll->Setup.Radius;
@@ -1171,7 +1171,7 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 	auto prevPointProbe = GetCollision(x, y, z, item->RoomNumber);
 	auto pointProbe = GetCollision(item);
 
-	auto bounds = BOUNDING_BOX(item);
+	auto bounds = GameBoundingBox(item);
 	int radius = bounds.GetHeight();
 
 	item->Pose.Position.y += radius;

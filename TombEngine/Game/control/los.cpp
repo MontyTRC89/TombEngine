@@ -334,7 +334,7 @@ int ObjectOnLOS2(GameVector* origin, GameVector* target, Vector3i* vec, MESH_INF
 			if ((item->ObjectNumber == ID_LARA) && (priorityObject != ID_LARA))
 				continue;
 
-			auto box = BOUNDING_BOX(item);
+			auto box = GameBoundingBox(item);
 
 			pos.Position = item->Pose.Position;
 			pos.Orientation.y = item->Pose.Orientation.y;
@@ -351,7 +351,7 @@ int ObjectOnLOS2(GameVector* origin, GameVector* target, Vector3i* vec, MESH_INF
 	return ClosestItem;
 }
 
-bool DoRayBox(GameVector* origin, GameVector* target, BOUNDING_BOX* box, Pose* itemOrStaticPos, Vector3i* hitPos, short closesItemNumber)
+bool DoRayBox(GameVector* origin, GameVector* target, GameBoundingBox* box, Pose* itemOrStaticPos, Vector3i* hitPos, short closesItemNumber)
 {
 	// Ray
 	FXMVECTOR rayOrigin = { (float)origin->x, (float)origin->y, (float)origin->z };

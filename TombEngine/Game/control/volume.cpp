@@ -124,7 +124,7 @@ namespace TEN::Control::Volumes
 	void TestVolumes(CAMERA_INFO* camera)
 	{
 		auto pos = Pose(camera->pos.ToVector3i(), EulerAngles::Zero);
-		auto box = BOUNDING_BOX::Zero;
+		auto box = GameBoundingBox::Zero;
 		box.X1 = box.Y1 = box.Z1 =  CAM_SIZE;
 		box.X2 = box.Y2 = box.Z2 = -CAM_SIZE;
 
@@ -143,7 +143,7 @@ namespace TEN::Control::Volumes
 	void TestVolumes(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
-		auto bBox = BOUNDING_BOX(item).ToBoundingOrientedBox(item->Pose);
+		auto bBox = GameBoundingBox(item).ToBoundingOrientedBox(item->Pose);
 
 #ifdef _DEBUG
 		g_Renderer.AddDebugBox(bBox, Vector4(1.0f, 1.0f, 0.0f, 1.0f), RENDERER_DEBUG_PAGE::LOGIC_STATS);

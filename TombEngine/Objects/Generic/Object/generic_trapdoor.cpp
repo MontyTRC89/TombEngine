@@ -18,7 +18,7 @@ using namespace TEN::Floordata;
 
 OBJECT_COLLISION_BOUNDS CeilingTrapDoorBounds =
 {
-	BOUNDING_BOX(
+	GameBoundingBox(
 		-256, 256,
 		0, 900,
 		-768, -256
@@ -31,7 +31,7 @@ static Vector3i CeilingTrapDoorPos = { 0, 1056, -480 };
 
 OBJECT_COLLISION_BOUNDS FloorTrapDoorBounds =
 {
-	BOUNDING_BOX(
+	GameBoundingBox(
 		-256, 256,
 		0, 0,
 		-1024, -256

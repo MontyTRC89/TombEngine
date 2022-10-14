@@ -1,7 +1,7 @@
 #pragma once
 #include "Math/Constants.h"
-#include "Math/Containers/BoundingBox.h"
 #include "Math/Containers/EulerAngles.h"
+#include "Math/Containers/GameBoundingBox.h"
 #include "Math/Containers/GameVector.h"
 #include "Math/Containers/Pose.h"
 #include "Math/Containers/Vector2i.h"

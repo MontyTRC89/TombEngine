@@ -35,7 +35,7 @@ using namespace TEN::Input;
 static Vector3i PickUpPosition(0, 0, -100);
 OBJECT_COLLISION_BOUNDS PickUpBounds =
 {
-	BOUNDING_BOX(
+	GameBoundingBox(
 		-CLICK(1), CLICK(1),
 		-200, 200,
 		-CLICK(1), CLICK(1)
@@ -48,7 +48,7 @@ OBJECT_COLLISION_BOUNDS PickUpBounds =
 static Vector3i HiddenPickUpPosition(0, 0, -690);
 OBJECT_COLLISION_BOUNDS HiddenPickUpBounds =
 {
-	BOUNDING_BOX(
+	GameBoundingBox(
 		-CLICK(1), CLICK(1),
 		-100, 100,
 		-800, -CLICK(1)
@@ -61,7 +61,7 @@ OBJECT_COLLISION_BOUNDS HiddenPickUpBounds =
 static Vector3i CrowbarPickUpPosition(0, 0, 215);
 OBJECT_COLLISION_BOUNDS CrowbarPickUpBounds =
 {
-	BOUNDING_BOX(
+	GameBoundingBox(
 		-CLICK(1), CLICK(1),
 		-100, 100,
 		200, CLICK(2)
@@ -74,7 +74,7 @@ OBJECT_COLLISION_BOUNDS CrowbarPickUpBounds =
 static Vector3i JobyCrowPickUpPosition(-224, 0, 240);
 OBJECT_COLLISION_BOUNDS JobyCrowPickUpBounds =
 {
-	BOUNDING_BOX(
+	GameBoundingBox(
 		-CLICK(2), 0,
 		-100, 100,
 		0, CLICK(2)
@@ -87,7 +87,7 @@ OBJECT_COLLISION_BOUNDS JobyCrowPickUpBounds =
 static Vector3i PlinthPickUpPosition(0, 0, -460);
 OBJECT_COLLISION_BOUNDS PlinthPickUpBounds =
 {
-	BOUNDING_BOX(
+	GameBoundingBox(
 		-CLICK(1), CLICK(1),
 		-640, 640,
 		-511, 0
@@ -100,7 +100,7 @@ OBJECT_COLLISION_BOUNDS PlinthPickUpBounds =
 static Vector3i PickUpPositionUW(0, -200, -350);
 OBJECT_COLLISION_BOUNDS PickUpBoundsUW =
 {
-	BOUNDING_BOX(
+	GameBoundingBox(
 		-CLICK(2), CLICK(2),
 		-CLICK(2), CLICK(2),
 		-CLICK(2), CLICK(2)
@@ -113,7 +113,7 @@ OBJECT_COLLISION_BOUNDS PickUpBoundsUW =
 static Vector3i SOPos(0, 0, 0);
 OBJECT_COLLISION_BOUNDS SOBounds =
 {
-	BOUNDING_BOX::Zero,
+	GameBoundingBox::Zero,
 	ANGLE(-45.0f),  ANGLE(45.0f),
 	ANGLE(-30.0f), ANGLE(30.0f),
 	ANGLE(-45.0f),  ANGLE(45.0f),
@@ -125,7 +125,7 @@ short SearchOffsets[4] = { 160, 96, 160, 112 };
 
 OBJECT_COLLISION_BOUNDS MSBounds =
 {
-	BOUNDING_BOX::Zero,
+	GameBoundingBox::Zero,
 	ANGLE(-10.0f), ANGLE(10.0f),
 	ANGLE(-30.0f), ANGLE(30.0f),
 	ANGLE(-10.0f), ANGLE(10.0f)
@@ -438,7 +438,7 @@ void PickupCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 	}
 	
 	bool flag = false;
-	BOUNDING_BOX* plinth = nullptr;
+	GameBoundingBox* plinth = nullptr;
 	item->Pose.Orientation.x = 0;
 	switch (triggerFlags)
 	{
@@ -834,7 +834,7 @@ void PickupControl(short itemNumber)
 	}
 }
 
-BOUNDING_BOX* FindPlinth(ItemInfo* item)
+GameBoundingBox* FindPlinth(ItemInfo* item)
 {
 	auto* room = &g_Level.Rooms[item->RoomNumber];
 	
@@ -848,7 +848,7 @@ BOUNDING_BOX* FindPlinth(ItemInfo* item)
 		if (item->Pose.Position.x != mesh->pos.Position.x || item->Pose.Position.z != mesh->pos.Position.z)
 			continue;
 
-		auto* frame = (BOUNDING_BOX*)GetBestFrame(item);
+		auto* frame = (GameBoundingBox*)GetBestFrame(item);
 		auto& bBox = GetBoundsAccurate(*mesh, false);
 
 		if (frame->X1 <= bBox.X2 && frame->X2 >= bBox.X1 &&
@@ -881,14 +881,14 @@ BOUNDING_BOX* FindPlinth(ItemInfo* item)
 	if (itemNumber == NO_ITEM)
 		return nullptr;
 	else
-		return (BOUNDING_BOX*)GetBestFrame(&g_Level.Items[itemNumber]);
+		return (GameBoundingBox*)GetBestFrame(&g_Level.Items[itemNumber]);
 }
 
 void InitialisePickup(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
 
-	auto bounds = BOUNDING_BOX(item);
+	auto bounds = GameBoundingBox(item);
 
 	short triggerFlags = item->TriggerFlags & 0x3F;
 	if (triggerFlags == 5)
@@ -970,7 +970,7 @@ void SearchObjectCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* 
 		((item->Status == ITEM_NOT_ACTIVE && item->ObjectNumber != ID_SEARCH_OBJECT4) || !item->ItemFlags[0])) ||
 		(lara->Control.IsMoving && lara->InteractedItem == itemNumber))
 	{
-		auto bounds = BOUNDING_BOX(item);
+		auto bounds = GameBoundingBox(item);
 		if (item->ObjectNumber != ID_SEARCH_OBJECT1)
 		{
 			SOBounds.boundingBox.X1 = bounds.X1 - CLICK(0.5f);

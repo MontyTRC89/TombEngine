@@ -425,11 +425,11 @@ void LaraSnapToHeight(ItemInfo* item, CollisionInfo* coll)
 
 void GetLaraDeadlyBounds()
 {
-	auto bounds = BOUNDING_BOX(LaraItem);
-	auto tBounds = BOUNDING_BOX::Zero;
+	auto bounds = GameBoundingBox(LaraItem);
+	auto tBounds = GameBoundingBox::Zero;
 	tBounds.RotNoPersp(LaraItem->Pose.Orientation, bounds);
 
-	DeadlyBounds = BOUNDING_BOX(
+	DeadlyBounds = GameBoundingBox(
 		LaraItem->Pose.Position.x + tBounds.X1,
 		LaraItem->Pose.Position.x + tBounds.X2,
 		LaraItem->Pose.Position.y + tBounds.Y1,

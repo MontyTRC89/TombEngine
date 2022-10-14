@@ -26,7 +26,7 @@ namespace TEN::Entities::Switches
 
 	OBJECT_COLLISION_BOUNDS TurnSwitchBoundsA = 
 	{
-		BOUNDING_BOX(
+		GameBoundingBox(
 			512, 896,
 			0, 0,
 			-512, 0
@@ -40,7 +40,7 @@ namespace TEN::Entities::Switches
 
 	OBJECT_COLLISION_BOUNDS TurnSwitchBoundsC =
 	{
-		BOUNDING_BOX(
+		GameBoundingBox(
 			512, 896,
 			0, 0,
 			0, 512

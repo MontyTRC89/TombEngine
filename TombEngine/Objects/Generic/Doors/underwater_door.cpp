@@ -27,7 +27,7 @@ namespace TEN::Entities::Doors
 
 	OBJECT_COLLISION_BOUNDS UnderwaterDoorBounds =
 	{
-		BOUNDING_BOX(
+		GameBoundingBox(
 			-256, 256,
 			-1024, 0, 
 			-1024, 0

@@ -17,7 +17,7 @@ namespace TEN::Entities::Switches
 {
 	OBJECT_COLLISION_BOUNDS PulleyBounds = 
 	{
-		BOUNDING_BOX(
+		GameBoundingBox(
 			-256, 256,
 			0, 0,
 			-512, 512

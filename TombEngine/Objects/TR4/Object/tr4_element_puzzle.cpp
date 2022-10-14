@@ -22,7 +22,7 @@ namespace TEN::Entities::TR4
 {
     OBJECT_COLLISION_BOUNDS ElementPuzzleBounds =
     {
-        BOUNDING_BOX(
+        GameBoundingBox(
             0, 0,
             -64, 0,
             0, 0
@@ -182,7 +182,7 @@ namespace TEN::Entities::TR4
             laraItem->Animation.AnimNumber == LA_WATERSKIN_POUR_HIGH) &&
             !puzzleItem->ItemFlags[0])
         {
-            auto box = BOUNDING_BOX(puzzleItem);
+            auto box = GameBoundingBox(puzzleItem);
 
             ElementPuzzleBounds.boundingBox.X1 = box.X1;
             ElementPuzzleBounds.boundingBox.X2 = box.X2;
@@ -260,7 +260,7 @@ namespace TEN::Entities::TR4
             }
             else
             {
-                auto box = BOUNDING_BOX(puzzleItem);
+                auto box = GameBoundingBox(puzzleItem);
 
                 ElementPuzzleBounds.boundingBox.X1 = box.X1;
                 ElementPuzzleBounds.boundingBox.X2 = box.X2;

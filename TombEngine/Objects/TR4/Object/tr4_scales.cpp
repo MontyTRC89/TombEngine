@@ -17,7 +17,7 @@ using namespace TEN::Entities::TR4;
 
 OBJECT_COLLISION_BOUNDS ScalesBounds =
 {
-	BOUNDING_BOX(
+	GameBoundingBox(
 		-1408, -1408,
 		0, 0,
 		-512, 512
