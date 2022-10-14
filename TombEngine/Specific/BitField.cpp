@@ -37,7 +37,7 @@ namespace TEN::Utils
 	BitField::BitField(const string& bitString)
 	{
 		for (const char& bit : bitString)
-			this->Bits.push_back((&bit == "1") ? true : false); // TODO: Check.
+			this->Bits.push_back((bit == '1') ? true : false);
 	}
 
 	uint BitField::GetSize()
@@ -48,7 +48,7 @@ namespace TEN::Utils
 	uint BitField::GetCount()
 	{
 		uint count = 0;
-		for (const uint& bit : this->Bits)
+		for (const bool& bit : this->Bits)
 		{
 			if (bit)
 				count++;
@@ -114,10 +114,10 @@ namespace TEN::Utils
 		this->Bits.flip();
 	}
 
-	bool BitField::Test(const vector<uint>& indices, bool checkAny)
+	bool BitField::Test(const vector<uint>& indices, bool testAny)
 	{
-		// Check whether any indices passed are true.
-		if (checkAny)
+		// Test whether ANY bits at indices passed are true.
+		if (testAny)
 		{
 			for (const uint& index : indices)
 			{
@@ -127,7 +127,7 @@ namespace TEN::Utils
 
 			return false;
 		}
-		// Check whether all indices passed are true.
+		// Test whether ALL bits at indices passed are true.
 		else
 		{
 			for (const uint& index : indices)
