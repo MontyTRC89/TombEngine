@@ -147,7 +147,7 @@ namespace TEN::Utils
 
 	bool BitField::TestAny()
 	{
-		for (const uint& bit : this->Bits)
+		for (const bool& bit : this->Bits)
 		{
 			if (bit)
 				return true;
@@ -158,7 +158,7 @@ namespace TEN::Utils
 
 	bool BitField::TestAll()
 	{
-		for (const uint& bit : this->Bits)
+		for (const bool& bit : this->Bits)
 		{
 			if (!bit)
 				return false;
@@ -169,7 +169,7 @@ namespace TEN::Utils
 
 	bool BitField::TestNone()
 	{
-		for (const uint& bit : this->Bits)
+		for (const bool& bit : this->Bits)
 		{
 			if (bit)
 				return false;
@@ -196,7 +196,7 @@ namespace TEN::Utils
 	string BitField::ToString() const
 	{
 		auto bitString = string("");
-		for (const uint& bit : this->Bits)
+		for (const bool& bit : this->Bits)
 			bitString += bit ? "1" : "0";
 
 		return bitString;
