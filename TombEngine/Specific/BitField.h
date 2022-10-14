@@ -11,7 +11,7 @@ namespace TEN::Utils
 	class BitField
 	{
 	private:
-		vector<bool> Bits;
+		vector<bool> Bits = {};
 
 	public:
 		// Constructors
