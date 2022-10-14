@@ -207,8 +207,7 @@ namespace TEN::Utils
 		for (uint i = 0; i < Bits.size(); i++)
 		{
 			uint bit = uint(1 << i);
-			bool packedBitState = (packedBits & bit) == bit;
-			if (Bits[i] != packedBitState)
+			if (Bits[i] != ((packedBits & bit) == bit))
 				return false;
 		}
 
@@ -220,8 +219,7 @@ namespace TEN::Utils
 		for (uint i = 0; i < Bits.size(); i++)
 		{
 			uint bit = uint(1 << i);
-			bool packedBitState = (packedBits & bit) == bit;
-			if (Bits[i] != packedBitState)
+			if (Bits[i] != ((packedBits & bit) == bit))
 				return true;
 		}
 
