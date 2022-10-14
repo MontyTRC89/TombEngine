@@ -187,6 +187,12 @@ namespace TEN::Utils
 
 	bool BitField::Test(uint index) const
 	{
+		if (index >= Bits.size())
+		{
+			TENLog(string("BitField attempted to test bit at invalid index."), LogLevel::Warning);
+			return false;
+		}
+
 		return Bits[index];
 	}
 
