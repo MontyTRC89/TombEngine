@@ -108,7 +108,7 @@ __(not yet implemented)__
 
 /*** Set FlyCheatEnabled
 Must be true or false
-@function SetTitleScreenImagePath
+@function SetFlyCheatEnabled
 @tparam bool true or false
 */
 	table_flow.set_function(ScriptReserved_SetFlyCheatEnabled, &FlowHandler::SetFlyCheatEnabled, this);
