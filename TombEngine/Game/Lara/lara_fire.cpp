@@ -263,8 +263,8 @@ WeaponInfo Weapons[(int)LaraWeaponType::NumWeapons] =
 	}
 };
 
-// States in which Lara will hold a flare out in front.
-const std::vector<LaraState> FlarePoseStates =
+// States in which Lara will hold an active flare out in front.
+const vector<int> FlarePoseStates =
 {
 	LS_WALK_FORWARD,
 	LS_RUN_FORWARD,
@@ -285,6 +285,7 @@ const std::vector<LaraState> FlarePoseStates =
 	LS_CROUCH_TURN_RIGHT,
 	LS_SOFT_SPLAT
 };
+
 GAME_OBJECT_ID WeaponObject(LaraWeaponType weaponType)
 {
 	switch (weaponType)
@@ -605,8 +606,7 @@ void LaraGun(ItemInfo* laraItem)
 	case HandStatus::Free:
 		if (lara->Control.Weapon.GunType == LaraWeaponType::Flare)
 		{
-			if (lara->Vehicle != NO_ITEM ||
-				CheckLaraState((LaraState)laraItem->Animation.ActiveState, FlarePoseStates))
+			if (lara->Vehicle != NO_ITEM || TestState(laraItem->Animation.ActiveState, FlarePoseStates))
 			{
 				if (lara->Flare.ControlLeft)
 				{
@@ -636,7 +636,7 @@ void LaraGun(ItemInfo* laraItem)
 		{
 			if (lara->MeshPtrs[LM_LHAND] == Objects[ID_FLARE_ANIM].meshIndex + LM_LHAND)
 			{
-				lara->Flare.ControlLeft = (lara->Vehicle != NO_ITEM || CheckLaraState((LaraState)laraItem->Animation.ActiveState, FlarePoseStates));
+				lara->Flare.ControlLeft = (lara->Vehicle != NO_ITEM || TestState(laraItem->Animation.ActiveState, FlarePoseStates));
 				DoFlareInHand(laraItem, lara->Flare.Life);
 				SetFlareArm(laraItem, lara->LeftArm.FrameNumber);
 			}

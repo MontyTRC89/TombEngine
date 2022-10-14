@@ -670,14 +670,14 @@ void SetLaraFallAnimation(ItemInfo* item)
 {
 	SetAnimation(item, LA_FALL_START);
 	item->Animation.IsAirborne = true;
-	item->Animation.Velocity.y = 0;
+	item->Animation.Velocity.y = 0.0f;
 }
 
 void SetLaraFallBackAnimation(ItemInfo* item)
 {
 	SetAnimation(item, LA_FALL_BACK);
 	item->Animation.IsAirborne = true;
-	item->Animation.Velocity.y = 0;
+	item->Animation.Velocity.y = 0.0f;
 }
 
 void SetLaraMonkeyFallAnimation(ItemInfo* item)
@@ -695,8 +695,8 @@ void SetLaraMonkeyRelease(ItemInfo* item)
 	auto* lara = GetLaraInfo(item);
 
 	item->Animation.IsAirborne = true;
-	item->Animation.Velocity.z = 2;
-	item->Animation.Velocity.y = 1;
+	item->Animation.Velocity.y = 1.0f;
+	item->Animation.Velocity.z = 2.0f;
 	lara->Control.TurnRate = 0;
 	lara->Control.HandStatus = HandStatus::Free;
 }

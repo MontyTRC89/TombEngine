@@ -8,6 +8,8 @@
 #include "Specific/newtypes.h"
 #include "Math/Math.h"
 
+using std::vector;
+
 enum GAME_OBJECT_ID : short;
 
 constexpr auto NO_ITEM = -1;
@@ -134,6 +136,7 @@ struct ItemInfo
 	bool IsCreature();
 };
 
+bool TestState(int refState, const vector<int>& stateList);
 void EffectNewRoom(short fxNumber, short roomNumber);
 void ItemNewRoom(short itemNumber, short roomNumber);
 void AddActiveItem(short itemNumber);
