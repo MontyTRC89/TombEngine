@@ -99,9 +99,9 @@ struct ItemInfo
 	int Timer;
 	Vector4 Color;
 
-	BitField TouchBits;
-	BitField MeshBits;
-	BitField MeshSwapBits;
+	BitField TouchBits	  = BitField();
+	BitField MeshBits	  = BitField();
+	BitField MeshSwapBits = BitField();
 
 	unsigned short Flags; // ItemFlags enum
 	short ItemFlags[8];
