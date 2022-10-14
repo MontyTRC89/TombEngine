@@ -75,7 +75,7 @@ void RollingBallControl(short itemNumber)
 
 			if (distance < 16384)
 			{
-				if (OCB != 0x1)
+				if ((item->TriggerFlags & 1) != 1) // Flag 1 = silent.
 				{
 					Camera.bounce = -(((16384 - distance) * abs(item->Animation.Velocity.y)) / 16384);
 					SoundEffect(SFX_TR4_BOULDER_FALL, &item->Pose);
