@@ -195,9 +195,9 @@ namespace TEN::Utils
 
 	string BitField::ToString() const
 	{
-		auto bitString = string("");
+		auto bitString = string();
 		for (const bool& bit : this->Bits)
-			bitString += bit ? "1" : "0";
+			bitString += bit ? '1' : '0';
 
 		return bitString;
 	}
