@@ -61,13 +61,24 @@ namespace TEN::Utils
 	{
 		for (const uint& index : indices)
 		{
-			if (index < Bits.size())
-				this->Bits[index] = true;
+			if (index >= Bits.size())
+			{
+				TENLog(string("BitField attempted to set bit at invalid index."), LogLevel::Warning);
+				continue;
+			}
+			
+			this->Bits[index] = true;
 		}
 	}
 
 	void BitField::Set(uint index)
 	{
+		if (index >= Bits.size())
+		{
+			TENLog(string("BitField attempted to set bit at invalid index."), LogLevel::Warning);
+			return;
+		}
+
 		this->Bits[index] = true;
 	}
 
@@ -80,13 +91,24 @@ namespace TEN::Utils
 	{
 		for (const uint& index : indices)
 		{
-			if (index < Bits.size())
-				this->Bits[index] = false;
+			if (index >= Bits.size())
+			{
+				TENLog(string("BitField attempted to clear bit at invalid index."), LogLevel::Warning);
+				continue;
+			}
+
+			this->Bits[index] = false;
 		}
 	}
 	
 	void BitField::Clear(uint index)
 	{
+		if (index >= Bits.size())
+		{
+			TENLog(string("BitField attempted to clear bit at invalid index."), LogLevel::Warning);
+			return;
+		}
+
 		this->Bits[index] = false;
 	}
 
@@ -99,13 +121,24 @@ namespace TEN::Utils
 	{
 		for (const uint& index : indices)
 		{
-			if (index < Bits.size())
-				this->Bits[index].flip();
+			if (index >= Bits.size())
+			{
+				TENLog(string("BitField attempted to flip bit at invalid index."), LogLevel::Warning);
+				continue;
+			}
+
+			this->Bits[index].flip();
 		}
 	}
 	
 	void BitField::Flip(uint index)
 	{
+		if (index >= Bits.size())
+		{
+			TENLog(string("BitField attempted to flip bit at invalid index."), LogLevel::Warning);
+			return;
+		}
+
 		this->Bits[index].flip();
 	}
 
@@ -116,22 +149,34 @@ namespace TEN::Utils
 
 	bool BitField::Test(const vector<uint>& indices, bool testAny) const
 	{
-		// Test whether ANY bits at indices passed are true.
+		// Test whether ANY bits at passed indices are true.
 		if (testAny)
 		{
 			for (const uint& index : indices)
 			{
+				if (index >= Bits.size())
+				{
+					TENLog(string("BitField attempted to test bit at invalid index."), LogLevel::Warning);
+					continue;
+				}
+
 				if (Bits[index])
 					return true;
 			}
 
 			return false;
 		}
-		// Test whether ALL bits at indices passed are true.
+		// Test whether ALL bits at passed indices are true.
 		else
 		{
 			for (const uint& index : indices)
 			{
+				if (index >= Bits.size())
+				{
+					TENLog(string("BitField attempted to test bit at invalid index."), LogLevel::Warning);
+					return false;
+				}
+
 				if (!Bits[index])
 					return false;
 			}
