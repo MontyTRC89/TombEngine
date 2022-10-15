@@ -58,6 +58,17 @@ bool ItemInfo::IsCreature()
 	return this->Data.is<CreatureInfo>();
 }
 
+bool TestState(int refState, const vector<int>& stateList)
+{
+	for (const auto& state : stateList)
+	{
+		if (state == refState)
+			return true;
+	}
+
+	return false;
+}
+
 void ClearItem(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];

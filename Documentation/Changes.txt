@@ -4,6 +4,12 @@ Version 1.0.3
 * Fix dodgy weapon lock angle constraints.
 * Fix wrong shotgun ammo pickup amount.
 * Fix shotgun using 6 units of ammo with each shot.
+* Fix rocket explosions near statics.
+* Fix TR3 monkey level crash.
+* Fix occasional ejection when landing on a slope.
+* Fix slow centaur projectile velocity.
+* Adjust sprint jump timing.
+* Fix grabbing narrow ledges below ceilings.
 
 
 Version 1.0.2
