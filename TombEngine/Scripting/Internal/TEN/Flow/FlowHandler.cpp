@@ -111,7 +111,7 @@ Must be true or false
 @function SetFlyCheatEnabled
 @tparam bool true or false
 */
-	table_flow.set_function(ScriptReserved_SetFlyCheatEnabled, &FlowHandler::SetFlyCheatEnabled, this);
+	table_flow.set_function(ScriptReserved_EnableFlyCheat, &FlowHandler::EnableFlyCheat, this);
 
 /*** settings.lua.
 These functions are called in settings.lua, a file which holds your local settings.
@@ -314,7 +314,7 @@ bool FlowHandler::IsFlyCheatEnabled() const
 	return FlyCheat;
 }
 
-void FlowHandler::SetFlyCheatEnabled(bool flyCheat)
+void FlowHandler::EnableFlyCheat(bool flyCheat)
 {
 	FlyCheat = flyCheat;
 }
