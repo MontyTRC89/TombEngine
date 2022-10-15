@@ -11,6 +11,7 @@ namespace TEN::Utils
 	class BitField
 	{
 	private:
+		// Components
 		vector<bool> Bits = {};
 
 	public:
@@ -57,6 +58,7 @@ namespace TEN::Utils
 		uint	  operator |(uint packedBits) const;
 
 	private:
+		// Helpers
 		void Fill(bool value);
 	};
 }
