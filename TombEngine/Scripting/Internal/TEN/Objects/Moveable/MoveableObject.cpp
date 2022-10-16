@@ -342,25 +342,25 @@ ScriptReserved_GetSlotHP, & Moveable::GetSlotHP,
 // @function Moveable:MeshIsVisible
 // @tparam int index of a mesh
 // @treturn bool visibility status
-	ScriptReserved_MeshIsVisible, &Moveable::MeshIsVisible,
-			
+ScriptReserved_MeshIsVisible, & Moveable::MeshIsVisible,
+
 /// Makes specified mesh visible
 // Use this to show specified mesh of an object.
 // @function Moveable:ShowMesh
 // @tparam int index of a mesh
-	ScriptReserved_ShowMesh, &Moveable::ShowMesh,
-			
+ScriptReserved_ShowMesh, & Moveable::ShowMesh,
+
 /// Makes specified mesh invisible
 // Use this to hide specified mesh of an object.
 // @function Moveable:HideMesh
 // @tparam int index of a mesh
-	ScriptReserved_HideMesh, &Moveable::HideMesh,
-			
+ScriptReserved_HideMesh, & Moveable::HideMesh,
+
 /// Shatters specified mesh and makes it invisible
 // Note that you can re-enable mesh later by using ShowMesh().
 // @function Moveable:ShatterMesh
 // @tparam int index of a mesh
-	ScriptReserved_ShatterMesh, &Moveable::ShatterMesh,
+ScriptReserved_ShatterMesh, & Moveable::ShatterMesh,
 
 /// Get state of specified mesh swap of object
 // Returns true if specified mesh is swapped on an object, and false
@@ -368,61 +368,61 @@ ScriptReserved_GetSlotHP, & Moveable::GetSlotHP,
 // @function Moveable:MeshIsSwapped
 // @tparam int index of a mesh
 // @treturn bool mesh swap status
-	ScriptReserved_MeshIsSwapped, &Moveable::MeshIsSwapped,
-			
+ScriptReserved_MeshIsSwapped, & Moveable::MeshIsSwapped,
+
 /// Set state of specified mesh swap of object
 // Use this to swap specified mesh of an object.
 // @function Moveable:SwapMesh
 // @tparam int index of a mesh
 // @tparam int index of a slot to get meshswap from
 // @tparam int (optional) index of a mesh from meshswap slot to use
-	ScriptReserved_SwapMesh, &Moveable::SwapMesh,
-			
+ScriptReserved_SwapMesh, & Moveable::SwapMesh,
+
 /// Set state of specified mesh swap of object
 // Use this to bring back original unswapped mesh
 // @function Moveable:UnswapMesh
 // @tparam int index of a mesh to unswap
-	ScriptReserved_UnswapMesh, &Moveable::UnswapMesh,
+ScriptReserved_UnswapMesh, & Moveable::UnswapMesh,
 
 /// Get the hit status of the object
 // @function Moveable:GetHitStatus
 // @treturn bool true if the moveable was hit by something in the last gameplay frame, false otherwise 
-	ScriptReserved_GetHitStatus, &Moveable::GetHitStatus,
+ScriptReserved_GetHitStatus, & Moveable::GetHitStatus,
 
 /// Determine whether the moveable is active or not 
 // @function Moveable:GetActive
 // @treturn bool true if the moveable is active
-	ScriptReserved_GetActive, &Moveable::GetActive,
+ScriptReserved_GetActive, & Moveable::GetActive,
 
-	ScriptReserved_GetRoom, &Moveable::GetRoom,
+ScriptReserved_GetRoom, & Moveable::GetRoom,
 
-	ScriptReserved_SetRoom, &Moveable::SetRoom,
+ScriptReserved_SetRoom, & Moveable::SetRoom,
 
-	ScriptReserved_GetPosition, & Moveable::GetPos,
+ScriptReserved_GetPosition, & Moveable::GetPos,
 
 /// Get the object's joint position
 // @function Moveable:GetJointPosition
 // @treturn Vec3 a copy of the moveable's position
-	ScriptReserved_GetJointPosition, & Moveable::GetJointPos,
+ScriptReserved_GetJointPosition, & Moveable::GetJointPos,
 
-	ScriptReserved_SetPosition, & Moveable::SetPos,
+ScriptReserved_SetPosition, & Moveable::SetPos,
 
 /// Get the moveable's rotation
 // @function Moveable:GetRotation
 // @treturn Rotation a copy of the moveable's rotation
-	ScriptReserved_GetRotation, &Moveable::GetRot,
+ScriptReserved_GetRotation, & Moveable::GetRot,
 
 /// Set the moveable's rotation
 // @function Moveable:SetRotation
 // @tparam Rotation rotation The moveable's new rotation
-	ScriptReserved_SetRotation, &Moveable::SetRot,
+ScriptReserved_SetRotation, & Moveable::SetRot,
 
 /// Get the moveable's name (its unique string identifier)
 // e.g. "door\_back\_room" or "cracked\_greek\_statue"
 // This corresponds with the "Lua Name" field in an object's properties in Tomb Editor.
 // @function Moveable:GetName
 // @treturn string the moveable's name
-	ScriptReserved_GetName, &Moveable::GetName,
+ScriptReserved_GetName, & Moveable::GetName,
 
 /// Set the moveable's name (its unique string identifier)
 // e.g. "door\_back\_room" or "cracked\_greek\_statue"
@@ -430,16 +430,20 @@ ScriptReserved_GetSlotHP, & Moveable::GetSlotHP,
 // @function Moveable:SetName
 // @tparam name string the new moveable's name
 // @treturn bool true if we successfully set the name, false otherwise (e.g. if another object has the name already)
-	ScriptReserved_SetName, &Moveable::SetName, 
+ScriptReserved_SetName, & Moveable::SetName,
 
 /// Test if the object is in a valid state (i.e. has not been destroyed through Lua or killed by Lara).
 // @function Moveable:GetValid
 // @treturn valid bool true if the object is still not destroyed
-	ScriptReserved_GetValid, &Moveable::GetValid,
+ScriptReserved_GetValid, & Moveable::GetValid,
 
 /// Destroy the moveable. This will mean it can no longer be used, except to re-initialise it with another object.
 // @function Moveable:Destroy
-	ScriptReserved_Destroy, &Moveable::Destroy);
+ScriptReserved_Destroy, & Moveable::Destroy,
+
+	/// Attach Camera to an Object.
+	// @function Moveable:mesh 1 for camera, mesh 2 for target
+	ScriptReserved_AttachCamera, & Moveable::AttachCamera);
 }
 
 
@@ -1018,3 +1022,12 @@ bool Moveable::MeshExists(int index) const
 
 	return true;
 }
+
+void  Moveable::AttachCamera(short CamMeshId, short TargetMeshId)
+{
+	if (m_item->Active)
+	{
+		ObjCamera(m_item, CamMeshId, m_item, TargetMeshId, true);
+	}
+}
+

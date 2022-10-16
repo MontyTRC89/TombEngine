@@ -96,6 +96,8 @@ public:
 	[[nodiscard]] short GetRoom() const;
 	void SetRoom(short room);
 
+	void  AttachCamera(short CamMeshId, short TargetMeshId);
+
 	void EnableItem();
 	void DisableItem();
 	void MakeInvisible();
