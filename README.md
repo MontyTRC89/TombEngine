@@ -62,6 +62,7 @@ We do not and have never worked for Core Design, Eidos Interactive, or Square En
 - TokyoSU (entity and vehicle decompilation)
 - Troye (general coding, refactoring)
 - WolfCheese (general coding)
+- l.m. (general coding, bug fixing)
 
 ## Testers
 - Adngel

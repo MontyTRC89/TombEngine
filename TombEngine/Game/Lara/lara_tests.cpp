@@ -21,6 +21,7 @@
 using namespace TEN::Floordata;
 using namespace TEN::Input;
 using namespace TEN::Renderer;
+using std::vector;
 
 // -----------------------------
 // TEST FUNCTIONS
@@ -919,12 +920,11 @@ void GetTightropeFallOff(ItemInfo* item, int regularity)
 }
 #endif
 
-// TODO: Organise all of this properly. -- Sezz 2022.07.28
-bool CheckLaraState(LaraState referenceState, const std::vector<LaraState>& stateList)
+bool TestLaraWeaponType(LaraWeaponType refWeaponType, const vector<LaraWeaponType>& weaponTypeList)
 {
-	for (auto& state : stateList)
+	for (const auto& weaponType : weaponTypeList)
 	{
-		if (state == referenceState)
+		if (weaponType == refWeaponType)
 			return true;
 	}
 
@@ -960,7 +960,7 @@ bool IsStandingWeapon(ItemInfo* item, LaraWeaponType weaponType)
 
 bool IsVaultState(LaraState state)
 {
-	static const std::vector<LaraState> vaultStates
+	static const std::vector<int> vaultStates
 	{
 		LS_VAULT,
 		LS_VAULT_2_STEPS,
@@ -970,12 +970,12 @@ bool IsVaultState(LaraState state)
 		LS_VAULT_3_STEPS_CROUCH,
 		LS_AUTO_JUMP
 	};
-	return CheckLaraState(state, vaultStates);
+	return TestState(state, vaultStates);
 }
 
 bool IsJumpState(LaraState state)
 {
-	static const std::vector<LaraState> jumpStates
+	static const std::vector<int> jumpStates
 	{
 		LS_JUMP_FORWARD,
 		LS_JUMP_BACK,
@@ -988,24 +988,24 @@ bool IsJumpState(LaraState state)
 		LS_FREEFALL_DIVE,
 		LS_FREEFALL
 	};
-	return CheckLaraState(state, jumpStates);
+	return TestState(state, jumpStates);
 }
 
 bool IsRunJumpQueueableState(LaraState state)
 {
-	static const std::vector<LaraState> runningJumpQueuableStates
+	static const std::vector<int> runningJumpQueuableStates
 	{
 		LS_RUN_FORWARD,
 		LS_SPRINT,
 		LS_STEP_UP,
 		LS_STEP_DOWN
 	};
-	return CheckLaraState(state, runningJumpQueuableStates);
+	return TestState(state, runningJumpQueuableStates);
 }
 
 bool IsRunJumpCountableState(LaraState state)
 {
-	static const std::vector<LaraState> runningJumpTimerStates
+	static const std::vector<int> runningJumpTimerStates
 	{
 		LS_WALK_FORWARD,
 		LS_RUN_FORWARD,
@@ -1013,7 +1013,7 @@ bool IsRunJumpCountableState(LaraState state)
 		LS_SPRINT_DIVE,
 		LS_JUMP_FORWARD
 	};
-	return CheckLaraState(state, runningJumpTimerStates);
+	return TestState(state, runningJumpTimerStates);
 }
 
 bool TestLaraSlide(ItemInfo* item, CollisionInfo* coll)

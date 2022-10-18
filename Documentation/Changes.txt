@@ -8,6 +8,8 @@ Version 1.0.3
 * Fix TR3 monkey level crash.
 * Fix occasional ejection when landing on a slope.
 * Fix slow centaur projectile velocity.
+* Adjust sprint jump timing.
+* Fix grabbing narrow ledges below ceilings.
 
 
 Version 1.0.2
