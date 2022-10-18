@@ -513,17 +513,17 @@ bool ItemNearTarget(const Vector3i& origin, ItemInfo* targetEntity, int radius)
 	return false;
 }
 
-bool Move3DPosTo3DPos(ItemInfo* item, Pose& outFromPose, const Pose& toPose, int velocity, short turnRate)
+bool Move3DPosTo3DPos(ItemInfo* item, Pose& fromPose, const Pose& toPose, int velocity, short turnRate)
 {
 	auto* lara = GetLaraInfo(item);
 
-	auto direction = toPose.Position - outFromPose.Position;
-	float distance = Vector3i::Distance(outFromPose.Position, toPose.Position);
+	auto direction = toPose.Position - fromPose.Position;
+	float distance = Vector3i::Distance(fromPose.Position, toPose.Position);
 
 	if (velocity < distance)
-		outFromPose.Position += direction * (velocity / distance);
+		fromPose.Position += direction * (velocity / distance);
 	else
-		outFromPose.Position = toPose.Position;
+		fromPose.Position = toPose.Position;
 
 	if (!lara->Control.IsMoving)
 	{
@@ -531,8 +531,8 @@ bool Move3DPosTo3DPos(ItemInfo* item, Pose& outFromPose, const Pose& toPose, int
 
 		if (shouldAnimate && lara->Control.WaterStatus != WaterStatus::Underwater)
 		{
-			short angle = Geometry::GetOrientToPoint(outFromPose.Position.ToVector3(), toPose.Position.ToVector3()).y;
-			int direction = (GetQuadrant(angle) - GetQuadrant(outFromPose.Orientation.y)) & 3;
+			short angle = Geometry::GetOrientToPoint(fromPose.Position.ToVector3(), toPose.Position.ToVector3()).y;
+			int direction = (GetQuadrant(angle) - GetQuadrant(fromPose.Orientation.y)) & 3;
 
 			switch (direction)
 			{
@@ -561,30 +561,30 @@ bool Move3DPosTo3DPos(ItemInfo* item, Pose& outFromPose, const Pose& toPose, int
 		lara->Control.Count.PositionAdjust = 0;
 	}
 
-	auto deltaOrient = toPose.Orientation - outFromPose.Orientation;
+	auto deltaOrient = toPose.Orientation - fromPose.Orientation;
 
 	if (deltaOrient.x > turnRate)
-		outFromPose.Orientation.x += turnRate;
+		fromPose.Orientation.x += turnRate;
 	else if (deltaOrient.x < -turnRate)
-		outFromPose.Orientation.x -= turnRate;
+		fromPose.Orientation.x -= turnRate;
 	else
-		outFromPose.Orientation.x = toPose.Orientation.x;
+		fromPose.Orientation.x = toPose.Orientation.x;
 
 	if (deltaOrient.y > turnRate)
-		outFromPose.Orientation.y += turnRate;
+		fromPose.Orientation.y += turnRate;
 	else if (deltaOrient.y < -turnRate)
-		outFromPose.Orientation.y -= turnRate;
+		fromPose.Orientation.y -= turnRate;
 	else
-		outFromPose.Orientation.y = toPose.Orientation.y;
+		fromPose.Orientation.y = toPose.Orientation.y;
 
 	if (deltaOrient.z > turnRate)
-		outFromPose.Orientation.z += turnRate;
+		fromPose.Orientation.z += turnRate;
 	else if (deltaOrient.z < -turnRate)
-		outFromPose.Orientation.z -= turnRate;
+		fromPose.Orientation.z -= turnRate;
 	else
-		outFromPose.Orientation.z = toPose.Orientation.z;
+		fromPose.Orientation.z = toPose.Orientation.z;
 
-	return ((outFromPose.Position == toPose.Position) && (outFromPose.Orientation == toPose.Orientation));
+	return (fromPose == toPose);
 }
 
 bool TestBoundsCollide(ItemInfo* item, ItemInfo* laraItem, int radius)
