@@ -41,7 +41,6 @@ namespace TEN::Utils
 		bool Test(uint index) const;
 		bool TestAny() const;
 		bool TestAll() const;
-		bool TestNone() const;
 
 		// Converters
 		uint   ToPackedBits() const;

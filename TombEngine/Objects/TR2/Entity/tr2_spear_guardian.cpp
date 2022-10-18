@@ -86,7 +86,7 @@ namespace TEN::Entities::Creatures::TR2
 			item->Animation.ActiveState = 17;
 			item->MeshBits = item->MeshBits.ToPackedBits() / 2;
 
-			if (item->MeshBits.TestNone())
+			if (!item->MeshBits.TestAny())
 			{
 				SoundEffect(SFX_TR4_EXPLOSION1, nullptr);
 				// TODO: exploding death

@@ -99,7 +99,7 @@ std::optional<int> TwoBlocksPlatformFloor(short itemNumber, int x, int y, int z)
 {
 	auto* item = &g_Level.Items[itemNumber];
 
-	if (item->MeshBits.TestNone())
+	if (!item->MeshBits.TestAny())
 		return std::nullopt;
 
 	return GetBridgeItemIntersect(itemNumber, x, y, z, false);
@@ -109,7 +109,7 @@ std::optional<int> TwoBlocksPlatformCeiling(short itemNumber, int x, int y, int 
 {
 	auto* item = &g_Level.Items[itemNumber];
 
-	if (item->MeshBits.TestNone())
+	if (!item->MeshBits.TestAny())
 		return std::nullopt;
 
 	return GetBridgeItemIntersect(itemNumber, x, y, z, true);

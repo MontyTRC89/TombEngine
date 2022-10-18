@@ -218,17 +218,6 @@ namespace TEN::Utils
 		return true;
 	}
 
-	bool BitField::TestNone() const
-	{
-		for (const bool& bit : this->Bits)
-		{
-			if (bit)
-				return false;
-		}
-
-		return true;
-	}
-
 	uint BitField::ToPackedBits() const
 	{
 		uint packedBits = 0;

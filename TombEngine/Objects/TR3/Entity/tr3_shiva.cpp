@@ -255,7 +255,7 @@ namespace TEN::Entities::Creatures::TR3
 
 				if (!creature->Flags)
 				{
-					if (item->MeshBits.TestNone())
+					if (!item->MeshBits.TestAny())
 						effectMesh = 0;
 
 					item->MeshBits = (item->MeshBits.ToPackedBits() * 2) + 1;
