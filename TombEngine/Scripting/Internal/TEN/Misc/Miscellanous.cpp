@@ -11,6 +11,9 @@
 #include "Sound/sound.h"
 #include "Specific/configuration.h"
 #include "Specific/input.h"
+#include "Objects/objectslist.h"
+#include "Specific/level.h"
+#include "Scripting/Internal/TEN/Objects/Moveable/MoveableObject.h"
 
 /***
 Functions that don't fit in the other modules.
@@ -242,6 +245,17 @@ namespace Misc
 		return std::make_tuple(resX, resY);
 	}
 
+	/// Reset object camera back to Lara and deactivate object camera
+	//  ObjCamera @tparam CamSlotId 0 for Lara
+	//  ObjCamera @tparam Mesh 0 for Laras hip mesh
+	//  ObjCamera @tparam CamSlotId 0 for Lara
+	//  ObjCamera @tparam bool false to deactivate object camera
+	static void ResetObjCamera()
+	{
+		int itemNumber1 = 0;
+		ItemInfo* CamSlotId = &g_Level.Items[itemNumber1];
+		ObjCamera(CamSlotId, 0, CamSlotId, 0, false);
+	}
 
 	void Register(sol::state * state, sol::table & parent) {
 		sol::table table_misc{ state->lua_state(), sol::create };
@@ -296,5 +310,9 @@ namespace Misc
 		table_misc.set_function(ScriptReserved_HasLineOfSight, &HasLineOfSight);
 
 		table_misc.set_function(ScriptReserved_ScreenToPercent, &ScreenToPercent);
+
+		table_misc.set_function(ScriptReserved_ResetObjCamera, &ResetObjCamera);	
 	}
+
+
 }

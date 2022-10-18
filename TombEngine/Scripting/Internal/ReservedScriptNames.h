@@ -95,6 +95,8 @@ static constexpr char ScriptReserved_SetOnCollidedWithObject[]	= "SetOnCollidedW
 static constexpr char ScriptReserved_GetOnCollidedWithRoom[]	= "GetOnCollidedWithRoom";
 static constexpr char ScriptReserved_SetOnCollidedWithRoom[]	= "SetOnCollidedWithRoom";
 static constexpr char ScriptReserved_ToLength[]					= "ToLength";
+static constexpr char ScriptReserved_AttachCamera[]			= "AttachCamera";
+static constexpr char ScriptReserved_AnimFromObject[]		= "AnimFromObject";
 
 // Flow Functions
 static constexpr char ScriptReserved_AddLevel[]					= "AddLevel";
@@ -171,6 +173,11 @@ static constexpr char ScriptReserved_KeyIsHeld[]					= "KeyIsHeld";
 static constexpr char ScriptReserved_KeyIsHit[]						= "KeyIsHit";
 static constexpr char ScriptReserved_KeyPush[]						= "KeyPush";
 static constexpr char ScriptReserved_KeyClear[]						= "KeyClear";
+static constexpr char ScriptReserved_ResetObjCamera[]				= "ResetObjCamera";
+static constexpr char ScriptReserved_UndrawWeapons[]  				= "UndrawWeapons";
+static constexpr char ScriptReserved_GetLaraHandStatus[]			= "GetLaraHandStatus";
+static constexpr char ScriptReserved_GetLaraWeaponType[]			= "GetLaraWeaponType";
+
 
 // Enums
 static constexpr char ScriptReserved_ObjID[]					= "ObjID";
