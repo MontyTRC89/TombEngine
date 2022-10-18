@@ -179,7 +179,6 @@ namespace Misc
 	static void KeyClear(int actionIndex)
 	{
 		TrInput &= ~(1 << actionIndex);
-		DbInput &= ~(1 << actionIndex);
 	}
 
 	static void KeyClearInventory()
