@@ -53,12 +53,12 @@
 
 	bool GameVector::operator ==(const GameVector& vector) const
 	{
-		return ((x == vector.x) && (y == vector.y) && (z == vector.z));
+		return ((x == vector.x) && (y == vector.y) && (z == vector.z) && (RoomNumber == vector.RoomNumber));
 	}
 
 	bool GameVector::operator !=(const GameVector& vector) const
 	{
-		return ((x != vector.x) || (y != vector.y) || (z != vector.z));
+		return ((x != vector.x) || (y != vector.y) || (z != vector.z) || (RoomNumber != vector.RoomNumber));
 	}
 
 	GameVector& GameVector::operator =(const GameVector& vector)
@@ -111,26 +111,26 @@
 
 	GameVector GameVector::operator +(const GameVector& vector) const
 	{
-		return GameVector(x + vector.x, y + vector.y, z + vector.z);
+		return GameVector(x + vector.x, y + vector.y, z + vector.z, RoomNumber);
 	}
 
 	GameVector GameVector::operator -(const GameVector& vector) const
 	{
-		return GameVector(x - vector.x, y - vector.y, z - vector.z);
+		return GameVector(x - vector.x, y - vector.y, z - vector.z, RoomNumber);
 	}
 
 	GameVector GameVector::operator *(const GameVector& vector) const
 	{
-		return GameVector(x * vector.x, y * vector.y, z * vector.z);
+		return GameVector(x * vector.x, y * vector.y, z * vector.z, RoomNumber);
 	}
 
 	GameVector GameVector::operator *(float scale) const
 	{
-		return GameVector((int)round(x * scale), (int)round(y * scale), (int)round(z * scale));
+		return GameVector((int)round(x * scale), (int)round(y * scale), (int)round(z * scale), RoomNumber);
 	}
 
 	GameVector GameVector::operator /(float scale) const
 	{
-		return GameVector((int)round(x / scale), (int)round(y / scale), (int)round(z / scale));
+		return GameVector((int)round(x / scale), (int)round(y / scale), (int)round(z / scale), RoomNumber);
 	}
 //}
