@@ -177,7 +177,7 @@ static constexpr char ScriptReserved_ResetObjCamera[]				= "ResetObjCamera";
 static constexpr char ScriptReserved_UndrawWeapons[]  				= "UndrawWeapons";
 static constexpr char ScriptReserved_GetLaraHandStatus[]			= "GetLaraHandStatus";
 static constexpr char ScriptReserved_GetLaraWeaponType[]			= "GetLaraWeaponType";
-
+static constexpr char ScriptReserved_KeyClearInventory[]			= "KeyClearInventory";
 
 // Enums
 static constexpr char ScriptReserved_ObjID[]					= "ObjID";
