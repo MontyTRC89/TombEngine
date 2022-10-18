@@ -179,6 +179,13 @@ namespace Misc
 	static void KeyClear(int actionIndex)
 	{
 		TrInput &= ~(1 << actionIndex);
+		DbInput &= ~(1 << actionIndex);
+	}
+
+	static void KeyClearInventory()
+	{
+		TrInput &= ~(1 << 13);
+		DbInput &= ~(1 << 13);
 	}
 
 	///Calculate the distance between two positions.
@@ -312,6 +319,7 @@ namespace Misc
 		table_misc.set_function(ScriptReserved_ScreenToPercent, &ScreenToPercent);
 
 		table_misc.set_function(ScriptReserved_ResetObjCamera, &ResetObjCamera);	
+		table_misc.set_function(ScriptReserved_KeyClearInventory, &KeyClearInventory);
 	}
 
 
