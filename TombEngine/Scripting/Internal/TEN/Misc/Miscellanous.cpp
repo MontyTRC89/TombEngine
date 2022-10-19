@@ -181,7 +181,7 @@ namespace Misc
 
 	///Do FlipMap with specific ID
 	//@function FlipMap
-	//tparam int flipmap (id of flipmap)
+	//@tparam int flipmap (ID of flipmap)
 	static void FlipMap(int flipmap)
 	{
 		DoFlipMap(flipmap);
@@ -297,6 +297,7 @@ namespace Misc
 		//@function KeyClear
 		//@tparam int action mapping index to clear
 		table_misc.set_function(ScriptReserved_KeyClear, &KeyClear);
+
 		table_misc.set_function(ScriptReserved_CalculateDistance, &CalculateDistance);
 
 		table_misc.set_function(ScriptReserved_CalculateHorizontalDistance, &CalculateHorizontalDistance);
@@ -306,7 +307,6 @@ namespace Misc
 
 		table_misc.set_function(ScriptReserved_ScreenToPercent, &ScreenToPercent);
 
-		//@tparam int flipmap index
 		table_misc.set_function(ScriptReserved_FlipMap, &FlipMap);
 
 	}
