@@ -11,6 +11,7 @@
 #include "Sound/sound.h"
 #include "Specific/configuration.h"
 #include "Specific/input.h"
+#include "Game/room.h"
 
 /***
 Functions that don't fit in the other modules.
@@ -178,6 +179,14 @@ namespace Misc
 		TrInput &= ~(1 << actionIndex);
 	}
 
+	///Do FlipMap with specific ID
+	//@function FlipMap
+	//@tparam int flipmap (ID of flipmap)
+	static void FlipMap(int flipmap)
+	{
+		DoFlipMap(flipmap);
+	}
+
 	///Calculate the distance between two positions.
 	//@function CalculateDistance
 	//@tparam Vec3 posA first position
@@ -288,6 +297,7 @@ namespace Misc
 		//@function KeyClear
 		//@tparam int action mapping index to clear
 		table_misc.set_function(ScriptReserved_KeyClear, &KeyClear);
+
 		table_misc.set_function(ScriptReserved_CalculateDistance, &CalculateDistance);
 
 		table_misc.set_function(ScriptReserved_CalculateHorizontalDistance, &CalculateHorizontalDistance);
@@ -296,5 +306,8 @@ namespace Misc
 		table_misc.set_function(ScriptReserved_HasLineOfSight, &HasLineOfSight);
 
 		table_misc.set_function(ScriptReserved_ScreenToPercent, &ScreenToPercent);
+
+		table_misc.set_function(ScriptReserved_FlipMap, &FlipMap);
+
 	}
 }
