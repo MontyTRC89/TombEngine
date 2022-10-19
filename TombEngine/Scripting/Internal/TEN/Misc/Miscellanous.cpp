@@ -187,6 +187,18 @@ namespace Misc
 		DoFlipMap(flipmap);
 	}
 
+	/// Reset object camera back to Lara and deactivate object camera
+	//  ObjCamera @tparam CamSlotId 0 for Lara
+	//  ObjCamera @tparam Mesh 0 for Laras hip mesh
+	//  ObjCamera @tparam CamSlotId 0 for Lara
+	//  ObjCamera @tparam bool false to deactivate object camera
+	static void ResetObjCamera()
+	{
+		int itemNumber1 = 0;
+		ItemInfo* CamSlotId = &g_Level.Items[itemNumber1];
+		ObjCamera(CamSlotId, 0, CamSlotId, 0, false);
+	}
+
 	///Calculate the distance between two positions.
 	//@function CalculateDistance
 	//@tparam Vec3 posA first position
@@ -308,6 +320,8 @@ namespace Misc
 		table_misc.set_function(ScriptReserved_ScreenToPercent, &ScreenToPercent);
 
 		table_misc.set_function(ScriptReserved_FlipMap, &FlipMap);
+
+		table_misc.set_function(ScriptReserved_ResetObjCamera, &ResetObjCamera);
 
 	}
 }

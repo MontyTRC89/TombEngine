@@ -439,7 +439,11 @@ ScriptReserved_GetSlotHP, & Moveable::GetSlotHP,
 
 /// Destroy the moveable. This will mean it can no longer be used, except to re-initialise it with another object.
 // @function Moveable:Destroy
-	ScriptReserved_Destroy, &Moveable::Destroy);
+	ScriptReserved_Destroy, &Moveable::Destroy,
+
+/// Attach camera to an object.
+// @function Moveable:mesh 1 for camera, mesh 2 for target
+	ScriptReserved_AttachCamera, & Moveable::AttachCamera);
 }
 
 
@@ -1017,4 +1021,12 @@ bool Moveable::MeshExists(int index) const
 	}
 
 	return true;
+}
+
+void  Moveable::AttachCamera(short CamMeshId, short TargetMeshId)
+{
+	if (m_item->Active)
+	{
+		ObjCamera(m_item, CamMeshId, m_item, TargetMeshId, true);
+	}
 }
