@@ -25,7 +25,34 @@ OBJECT_COLLISION_BOUNDS SarcophagusBounds =
 
 void InitialiseSarcophagus(short itemNumber)
 {
+	auto* item = &g_Level.Items[itemNumber];
 
+	item->ItemFlags[1] = -1;
+	item->MeshBits = 9;
+
+	for (short itemNumber2 = 0; itemNumber2 < g_Level.NumItems; ++itemNumber2)
+	{
+		auto* item2 = &g_Level.Items[itemNumber2];
+
+		if (item2->ObjectNumber == ID_EXPLOSION)
+		{
+			if (item->Pose.Position == item2->Pose.Position)
+			{
+				item->ItemFlags[1] = itemNumber2;
+				break;
+			}
+		}
+		else if (Objects[item2->ObjectNumber].isPickup &&
+			item->Pose.Position == item2->Pose.Position)
+		{
+			item->ItemFlags[1] = itemNumber2;
+			break;
+		}
+	}
+
+	AddActiveItem(itemNumber);
+	item->Status = ITEM_ACTIVE;
+	item->Flags |= IFLAG_ACTIVATION_MASK;
 }
 
 void SarcophagusCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
