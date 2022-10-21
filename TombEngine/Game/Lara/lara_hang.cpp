@@ -129,11 +129,11 @@ void lara_col_hang(ItemInfo* item, CollisionInfo* coll)
 			}
 		}
 
-		if (TrInput & IN_JUMP && TestLaraLedgeJump(item, coll))
+		if (TrInput && TestLaraLedgeJump(item, coll))
 		{
 			if (TrInput & IN_BACK)
 				item->Animation.TargetState = LS_JUMP_FORWARD;
-			else
+			else if (TrInput & IN_JUMP)
 				item->Animation.TargetState = LS_JUMP_UP;
 		}
 	}
