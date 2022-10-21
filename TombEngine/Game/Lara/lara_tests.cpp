@@ -186,7 +186,8 @@ bool TestLaraHang(ItemInfo* item, CollisionInfo* coll)
 	}
 	else // Normal case
 	{
-		if (TrInput & IN_ACTION && item->HitPoints > 0 && coll->Front.Floor <= 0)
+		if ((TrInput & IN_ACTION && item->HitPoints > 0 && coll->Front.Floor <= 0) ||
+			(item->Animation.AnimNumber == LA_LEDGE_JUMP_UP_START || item->Animation.AnimNumber == LA_LEDGE_JUMP_BACK_START)) // TODO: Unhardcode this in a later refactor. @Sezz 2022.10.21)
 		{
 			if (stopped && hdif > 0 && climbDirection != 0 && (climbDirection > 0 == coll->MiddleLeft.Floor > coll->MiddleRight.Floor))
 				stopped = false;
@@ -2512,6 +2513,23 @@ bool TestLaraCrawlspaceDive(ItemInfo* item, CollisionInfo* coll)
 	}
 
 	return false;
+}
+
+bool TestLaraLedgeJump(ItemInfo* item, CollisionInfo* coll)
+{
+	auto origin = GameVector(
+		item->Pose.Position.x,
+		(item->Pose.Position.y - coll->Setup.Height),
+		item->Pose.Position.z,
+		item->RoomNumber
+	);
+
+	auto targetPos = TranslateVector(Vector3Int(origin.x, origin.y, origin.z), item->Pose.Orientation.y, OFFSET_RADIUS(coll->Setup.Radius));
+	auto target = GameVector(targetPos, item->RoomNumber);
+
+	// Assess ray collision.
+	if (!LOS(&origin, &target))
+		return false;
 }
 
 bool TestLaraTightropeDismount(ItemInfo* item, CollisionInfo* coll)

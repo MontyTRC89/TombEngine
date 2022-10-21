@@ -8,7 +8,8 @@ enum class TITLE_TYPE
 
 class ScriptInterfaceLevel;
 
-class ScriptInterfaceFlowHandler {
+class ScriptInterfaceFlowHandler
+{
 public:
 
 	std::string	IntroImagePath{};
@@ -25,7 +26,7 @@ public:
 	virtual bool IsFlyCheatEnabled() const = 0;
 	virtual bool HasCrawlExtended() const = 0;
 	virtual bool HasCrouchRoll() const = 0;
-	virtual bool HasCrawlspaceSwandive() const = 0;
+	virtual bool HasCrawlspaceDive() const = 0;
 	virtual bool HasMonkeyAutoJump() const = 0;
 	virtual bool HasSprintJump() const = 0;
 	virtual bool HasAFKPose() const = 0;

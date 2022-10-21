@@ -1,6 +1,7 @@
 #include "framework.h"
 #include "Game/Lara/lara_hang.h"
 
+#include "Flow/ScriptInterfaceFlowHandler.h"
 #include "Game/camera.h"
 #include "Game/collision/collide_room.h"
 #include "Game/collision/collide_item.h"
@@ -8,11 +9,9 @@
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_overhang.h"
-#include "Game/Lara/lara_ledge_jump.h"
 #include "Game/Lara/lara_tests.h"
 #include "Specific/input.h"
 #include "Specific/level.h"
-#include "Flow/ScriptInterfaceFlowHandler.h"
 
 using namespace TEN::Input;
 
@@ -131,16 +130,14 @@ void lara_col_hang(ItemInfo* item, CollisionInfo* coll)
 			}
 		}
 
-		if (g_GameFlow->HasLedgeJumps())
+		if (g_GameFlow->HasLedgeJumps() && TestLaraLedgeJump(item, coll))
 		{
 			if (TrInput & IN_JUMP)
 			{
-				lara_ledge_jump_up(item);
-			}
-		
-			if (TrInput & IN_BACK)
-			{
-				lara_ledge_jump_back(item);
+				if (TrInput & IN_BACK)
+					item->Animation.TargetState = LS_JUMP_FORWARD;
+				else
+					item->Animation.TargetState = LS_JUMP_UP;
 			}
 		}
 	}
