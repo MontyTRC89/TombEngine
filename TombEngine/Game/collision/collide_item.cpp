@@ -607,9 +607,9 @@ bool TestBoundsCollide(ItemInfo* item, ItemInfo* laraItem, int radius)
 	int dz = (z * cosY) + (x * sinY);
 
 	if (dx >= (bounds->X1 - radius) &&
-		dx <= (radius + bounds->X2) &&
+		dx <= (bounds->X2 + radius) &&
 		dz >= (bounds->Z1 - radius) &&
-		dz <= (radius + bounds->Z2))
+		dz <= (bounds->Z2 + radius))
 	{
 		return true;
 	}
