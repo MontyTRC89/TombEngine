@@ -1,7 +1,6 @@
 #include "framework.h"
 #include "Game/Lara/lara_hang.h"
 
-#include "Flow/ScriptInterfaceFlowHandler.h"
 #include "Game/camera.h"
 #include "Game/collision/collide_room.h"
 #include "Game/collision/collide_item.h"
@@ -130,15 +129,12 @@ void lara_col_hang(ItemInfo* item, CollisionInfo* coll)
 			}
 		}
 
-		if (g_GameFlow->HasLedgeJumps() && TestLaraLedgeJump(item, coll))
+		if (TrInput & IN_JUMP && TestLaraLedgeJump(item, coll))
 		{
-			if (TrInput & IN_JUMP)
-			{
-				if (TrInput & IN_BACK)
-					item->Animation.TargetState = LS_JUMP_FORWARD;
-				else
-					item->Animation.TargetState = LS_JUMP_UP;
-			}
+			if (TrInput & IN_BACK)
+				item->Animation.TargetState = LS_JUMP_FORWARD;
+			else
+				item->Animation.TargetState = LS_JUMP_UP;
 		}
 	}
 

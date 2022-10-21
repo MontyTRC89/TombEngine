@@ -1,6 +1,7 @@
 #include "framework.h"
 #include "Game/Lara/lara_tests.h"
 
+#include "Flow/ScriptInterfaceFlowHandler.h"
 #include "Game/animation.h"
 #include "Game/collision/collide_room.h"
 #include "Game/collision/collide_item.h"
@@ -14,7 +15,6 @@
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_monkey.h"
 #include "Renderer/Renderer11.h"
-#include "Flow/ScriptInterfaceFlowHandler.h"
 #include "Specific/input.h"
 #include "Specific/level.h"
 
@@ -2518,6 +2518,9 @@ bool TestLaraCrawlspaceDive(ItemInfo* item, CollisionInfo* coll)
 bool TestLaraLedgeJump(ItemInfo* item, CollisionInfo* coll)
 {
 	static const int minLedgeHeight = CLICK(2);
+
+	if (!g_GameFlow->HasLedgeJumps())
+		return false;
 
 	auto origin = GameVector(
 		item->Pose.Position.x,
