@@ -2517,19 +2517,24 @@ bool TestLaraCrawlspaceDive(ItemInfo* item, CollisionInfo* coll)
 
 bool TestLaraLedgeJump(ItemInfo* item, CollisionInfo* coll)
 {
+	static const int minLedgeHeight = CLICK(2);
+
 	auto origin = GameVector(
 		item->Pose.Position.x,
-		(item->Pose.Position.y - coll->Setup.Height),
+		(item->Pose.Position.y - coll->Setup.Height) + minLedgeHeight,
 		item->Pose.Position.z,
 		item->RoomNumber
 	);
-
-	auto targetPos = TranslateVector(Vector3Int(origin.x, origin.y, origin.z), item->Pose.Orientation.y, OFFSET_RADIUS(coll->Setup.Radius));
-	auto target = GameVector(targetPos, item->RoomNumber);
+	auto target = GameVector(
+		TranslateVector(Vector3Int(origin.x, origin.y, origin.z), item->Pose.Orientation.y, OFFSET_RADIUS(coll->Setup.Radius)),
+		item->RoomNumber
+	);
 
 	// Assess ray collision.
-	if (!LOS(&origin, &target))
+	if (LOS(&origin, &target))
 		return false;
+
+	return true;
 }
 
 bool TestLaraTightropeDismount(ItemInfo* item, CollisionInfo* coll)
