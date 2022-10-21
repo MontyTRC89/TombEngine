@@ -38,11 +38,11 @@ namespace TEN::Math::Random
 		return (vector * length);
 	}
 
-	Vector3 GenerateVector3InCone(const Vector3& direction, float semiangleInDegrees, float length)
+	Vector3 GenerateVector3InCone(const Vector3& direction, float semiangleInDeg, float length)
 	{
-		float x = GenerateFloat(-semiangleInDegrees, semiangleInDegrees) * RADIAN;
-		float y = GenerateFloat(-semiangleInDegrees, semiangleInDegrees) * RADIAN;
-		float z = GenerateFloat(-semiangleInDegrees, semiangleInDegrees) * RADIAN;
+		float x = GenerateFloat(-semiangleInDeg, semiangleInDeg) * RADIAN;
+		float y = GenerateFloat(-semiangleInDeg, semiangleInDeg) * RADIAN;
+		float z = GenerateFloat(-semiangleInDeg, semiangleInDeg) * RADIAN;
 		auto matrix = Matrix::CreateRotationX(x) * Matrix::CreateRotationY(y) * Matrix::CreateRotationZ(z);
 
 		auto vector = direction.TransformNormal(direction, matrix);

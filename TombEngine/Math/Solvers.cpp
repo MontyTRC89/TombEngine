@@ -40,7 +40,7 @@ namespace TEN::Math::Solver
 		return result; // Two solutions.
 	}
 
-	bool SolveIK2D(const Vector2& target, float length0, float length1, Vector2& outMiddle)
+	bool SolveIK2D(const Vector2& target, float length0, float length1, Vector2& middle)
 	{
 		float length = target.Length();
 		if (length > (length0 + length1))
@@ -57,16 +57,16 @@ namespace TEN::Math::Solver
 
 		if (quadratic.first != INFINITY && quadratic.second != INFINITY)
 		{
-			outMiddle.x = flipXY ? quadratic.second : (m - (n * quadratic.second));
-			outMiddle.y = flipXY ? (m - (n * quadratic.second)) : quadratic.second;
+			middle.x = flipXY ? quadratic.second : (m - (n * quadratic.second));
+			middle.y = flipXY ? (m - (n * quadratic.second)) : quadratic.second;
 			return true;
 		}
 
-		outMiddle = target * (length0 / length);
+		middle = target * (length0 / length);
 		return false;
 	}
 
-	bool SolveIK3D(const Vector3& origin, const Vector3& target, const Vector3& pole, float length0, float length1, Vector3& outMiddle)
+	bool SolveIK3D(const Vector3& origin, const Vector3& target, const Vector3& pole, float length0, float length1, Vector3& middle)
 	{
 		auto directionNorm = target - origin;
 		directionNorm.Normalize();
@@ -90,11 +90,11 @@ namespace TEN::Math::Solver
 		matrix._43 = origin.z;
 		matrix._44 = 1.0f;
 
-		auto outMiddle2D = Vector2(outMiddle);
-		bool result = SolveIK2D(Vector2(Vector3::Transform(target, matrix.Invert())), length0, length1, outMiddle2D);
+		auto middle2D = Vector2(middle);
+		bool result = SolveIK2D(Vector2(Vector3::Transform(target, matrix.Invert())), length0, length1, middle2D);
 
-		outMiddle = Vector3(outMiddle2D);
-		outMiddle = Vector3::Transform(outMiddle, matrix);
+		middle = Vector3(middle2D);
+		middle = Vector3::Transform(middle, matrix);
 
 		return result;
 	}

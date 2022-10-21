@@ -8,7 +8,7 @@ namespace TEN::Math::Random
 	short	GenerateAngle(short low = SHRT_MIN, short high = SHRT_MAX);
 	Vector2 GenerateVector2(float length = 1.0f);
 	Vector3 GenerateVector3(float length = 1.0f);
-	Vector3 GenerateVector3InCone(const Vector3& direction, float semiangleInDegrees, float length = 1.0f);
+	Vector3 GenerateVector3InCone(const Vector3& direction, float semiangleInDeg, float length = 1.0f);
 
 	bool TestProbability(float probability);
 }
