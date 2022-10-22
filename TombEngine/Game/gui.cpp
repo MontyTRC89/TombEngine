@@ -1791,8 +1791,13 @@ namespace TEN::Gui
 			}
 		}
 
-		if (gameObject != ID_SHOTGUN_ITEM && gameObject != ID_REVOLVER_ITEM && gameObject != ID_HK_ITEM && gameObject != ID_CROSSBOW_ITEM &&
-			gameObject != ID_GRENADE_GUN_ITEM && gameObject != ID_ROCKET_LAUNCHER_ITEM && gameObject != ID_HARPOON_ITEM)
+		if (gameObject != ID_SHOTGUN_ITEM &&
+			gameObject != ID_REVOLVER_ITEM &&
+			gameObject != ID_HK_ITEM &&
+			gameObject != ID_CROSSBOW_ITEM &&
+			gameObject != ID_GRENADE_GUN_ITEM &&
+			gameObject != ID_ROCKET_LAUNCHER_ITEM &&
+			gameObject != ID_HARPOON_ITEM)
 		{
 			if (gameObject == ID_FLARE_INV_ITEM)
 			{
