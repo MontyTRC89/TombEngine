@@ -277,8 +277,8 @@ namespace TEN::Gui
 				break;
 			}
 		}
-		else if (MenuToDisplay == Menu::Title || 
-			MenuToDisplay == Menu::SelectLevel || 
+		else if (MenuToDisplay == Menu::Title ||
+			MenuToDisplay == Menu::SelectLevel ||
 			MenuToDisplay == Menu::Options)
 		{
 			if (GuiIsPulsed(In::Forward))
@@ -1733,6 +1733,24 @@ namespace TEN::Gui
 
 	void GuiController::UseCurrentItem(ItemInfo* item)
 	{
+		const std::vector<int> CrouchStates =
+		{
+			LS_CROUCH_IDLE,
+			LS_CROUCH_TURN_LEFT,
+			LS_CROUCH_TURN_RIGHT,
+			LS_CROUCH_TURN_180
+		};
+		const std::vector<int> CrawlStates =
+		{
+			LS_CRAWL_IDLE,
+			LS_CRAWL_FORWARD,
+			LS_CRAWL_BACK,
+			LS_CRAWL_TURN_LEFT,
+			LS_CRAWL_TURN_RIGHT,
+			LS_CRAWL_TURN_180,
+			LS_CRAWL_TO_HANG
+		};
+
 		auto* lara = GetLaraInfo(item);
 
 		int prevBinocularRange = BinocularRange;
@@ -1780,12 +1798,7 @@ namespace TEN::Gui
 			{
 				if (lara->Control.HandStatus == HandStatus::Free)
 				{
-					if (item->Animation.ActiveState != LS_CRAWL_IDLE &&
-						item->Animation.ActiveState != LS_CRAWL_FORWARD &&
-						item->Animation.ActiveState != LS_CRAWL_TURN_LEFT &&
-						item->Animation.ActiveState != LS_CRAWL_TURN_RIGHT &&
-						item->Animation.ActiveState != LS_CRAWL_BACK &&
-						item->Animation.ActiveState != LS_CRAWL_TO_HANG)
+					if (!TestState(item->Animation.ActiveState, CrawlStates))
 					{
 						if (lara->Control.Weapon.GunType != LaraWeaponType::Flare)
 						{
@@ -1896,15 +1909,8 @@ namespace TEN::Gui
 			return;
 		}
 
-		if (item->Animation.ActiveState == LS_CRAWL_IDLE ||
-			item->Animation.ActiveState == LS_CRAWL_FORWARD ||
-			item->Animation.ActiveState == LS_CRAWL_TURN_LEFT ||
-			item->Animation.ActiveState == LS_CRAWL_TURN_RIGHT ||
-			item->Animation.ActiveState == LS_CRAWL_BACK ||
-			item->Animation.ActiveState == LS_CRAWL_TO_HANG ||
-			item->Animation.ActiveState == LS_CROUCH_IDLE ||
-			item->Animation.ActiveState == LS_CROUCH_TURN_LEFT ||
-			item->Animation.ActiveState == LS_CROUCH_TURN_RIGHT)
+		if (TestState(item->Animation.ActiveState, CrouchStates) ||
+			TestState(item->Animation.ActiveState, CrawlStates))
 		{
 			SayNo();
 			return;
