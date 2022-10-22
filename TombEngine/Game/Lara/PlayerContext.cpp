@@ -175,10 +175,10 @@ namespace TEN::Entities::Player
 	{
 		// HACK: coll->Setup.Radius is only set to LARA_RADIUS_CRAWL in lara_col functions, then reset by LaraAboveWater(),
 		// meaning that for tests called in lara_as functions it will store the wrong radius. -- Sezz 2021.11.05
-		static const std::vector<LaraState> crouchStates = { LS_CROUCH_IDLE, LS_CROUCH_TURN_LEFT, LS_CROUCH_TURN_RIGHT };
-		float radius = CheckLaraState((LaraState)PlayerItemPtr->Animation.ActiveState, crouchStates) ? LARA_RADIUS_CRAWL : LARA_RADIUS;
+		static const std::vector<int> crouchStates = { LS_CROUCH_IDLE, LS_CROUCH_TURN_LEFT, LS_CROUCH_TURN_RIGHT };
+		float radius = TestState(PlayerItemPtr->Animation.ActiveState, crouchStates) ? LARA_RADIUS_CRAWL : LARA_RADIUS;
 
-		// Assess middle point collision.
+		// Assess center point collision.
 		auto pointCollCenter = GetCollision(PlayerItemPtr, 0, 0.0f, -LARA_HEIGHT / 2);
 		if (abs(pointCollCenter.Position.Ceiling - pointCollCenter.Position.Floor) < LARA_HEIGHT ||	// Center space is narrow enough.
 			abs(PlayerCollPtr->Middle.Ceiling - LARA_HEIGHT_CRAWL) < LARA_HEIGHT)					// Consider statics overhead detected by GetCollisionInfo().
