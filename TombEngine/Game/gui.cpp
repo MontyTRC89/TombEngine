@@ -3,15 +3,15 @@
 
 #include <OISKeyboard.h>
 
+#include "Game/animation.h"
+#include "Game/camera.h"
+#include "Game/control/control.h"
+#include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_fire.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_one_gun.h"
 #include "Game/Lara/lara_two_guns.h"
-#include "Game/animation.h"
-#include "Game/camera.h"
-#include "Game/control/control.h"
-#include "Game/items.h"
 #include "Game/pickup/pickup.h"
 #include "Game/savegame.h"
 #include "Game/spotcam.h"
@@ -19,9 +19,10 @@
 #include "Scripting/Include/ScriptInterfaceGame.h"
 #include "Scripting/Include/ScriptInterfaceLevel.h"
 #include "Sound/sound.h"
+#include "Specific/Input/Input.h"
+#include "Specific/Input/InputAction.h"
 #include "Specific/clock.h"
 #include "Specific/configuration.h"
-#include "Specific/Input/Input.h"
 #include "Specific/level.h"
 
 using namespace TEN::Input;
@@ -80,6 +81,57 @@ namespace TEN::Gui
 		STRING_CONTROLS_BRAKE,
 		STRING_CONTROLS_FIRE
 	};
+
+	bool GuiController::CanSelect() const
+	{
+		if (!IsHeld(In::Deselect) &&
+			GetActionTimeActive(In::Action) <= GetActionTimeInactive(In::Deselect) &&
+			GetActionTimeActive(In::Action) <= GetActionTimeInactive(In::Save) &&
+			GetActionTimeActive(In::Action) <= GetActionTimeInactive(In::Load) &&
+			GetActionTimeActive(In::Action) <= GetActionTimeInactive(In::Pause))
+		{
+			return true;
+		}
+
+		return false;
+	}
+
+	bool GuiController::CanDeselect() const
+	{
+		return (!(IsHeld(In::Select) || IsHeld(In::Action)));
+	}
+
+	bool GuiController::GuiIsPulsed(ActionID actionID) const
+	{
+		// TODO: Cancel doesn't work.
+		auto oppositeAction = ActionID::None;
+		switch (actionID)
+		{
+		case In::Forward:
+			oppositeAction = ActionID::Back;
+
+		case In::Back:
+			oppositeAction = ActionID::Forward;
+			
+		case In::Left:
+			oppositeAction = ActionID::Right;
+			
+		case In::Right:
+			oppositeAction = ActionID::Left;
+		}
+
+		return (IsPulsed(actionID, 0.1f, 0.4f) && (!IsHeld(oppositeAction) || (oppositeAction == ActionID::None)));
+	}
+
+	bool GuiController::GuiIsSelected() const
+	{
+		return ((IsReleased(In::Select) || IsReleased(In::Action)) && CanSelect());
+	}
+	
+	bool GuiController::GuiIsDeselected() const
+	{
+		return (IsClicked(In::Deselect) && CanDeselect());
+	}
 
 	SettingsData GuiController::GetCurrentSettings()
 	{
@@ -212,13 +264,13 @@ namespace TEN::Gui
 			MenuToDisplay == Menu::SelectLevel || 
 			MenuToDisplay == Menu::Options)
 		{
-			if (GUI_ACTION_PULSE_UP)
+			if (GuiIsPulsed(In::Forward))
 			{
 				SelectedOption = (SelectedOption <= 0) ? OptionCount : (SelectedOption - 1);
 				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 			}
 
-			if (GUI_ACTION_PULSE_DOWN)
+			if (GuiIsPulsed(In::Back))
 			{
 				if (SelectedOption < OptionCount)
 					SelectedOption++;
@@ -228,7 +280,7 @@ namespace TEN::Gui
 				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 			}
 
-			if (GUI_ACTION_DESELECT &&
+			if (GuiIsDeselected() &&
 				MenuToDisplay != Menu::Title)
 			{
 				MenuToDisplay = Menu::Title;
@@ -236,7 +288,7 @@ namespace TEN::Gui
 				SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
 			}
 
-			if (GUI_ACTION_SELECT)
+			if (GuiIsSelected())
 			{
 				SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
 
@@ -312,7 +364,7 @@ namespace TEN::Gui
 	{
 		OptionCount = 6;
 
-		if (GUI_ACTION_DESELECT)
+		if (GuiIsDeselected())
 		{
 			SoundEffect(SFX_TR4_MENU_SELECT, nullptr);
 			MenuToDisplay = Menu::Options;
@@ -320,7 +372,7 @@ namespace TEN::Gui
 			return;
 		}
 
-		if (GUI_ACTION_PULSE_LEFT)
+		if (GuiIsPulsed(In::Left))
 		{
 			switch (SelectedOption)
 			{
@@ -363,7 +415,7 @@ namespace TEN::Gui
 			}
 		}
 
-		if (GUI_ACTION_PULSE_RIGHT)
+		if (GuiIsPulsed(In::Right))
 		{
 			switch (SelectedOption)
 			{
@@ -403,7 +455,7 @@ namespace TEN::Gui
 			}
 		}
 
-		if (GUI_ACTION_PULSE_UP)
+		if (GuiIsPulsed(In::Forward))
 		{
 			if (SelectedOption <= 0)
 				SelectedOption += OptionCount;
@@ -413,7 +465,7 @@ namespace TEN::Gui
 			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 		}
 
-		if (GUI_ACTION_PULSE_DOWN)
+		if (GuiIsPulsed(In::Back))
 		{
 			if (SelectedOption < OptionCount)
 				SelectedOption++;
@@ -423,7 +475,7 @@ namespace TEN::Gui
 			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 		}
 
-		if (GUI_ACTION_SELECT)
+		if (GuiIsSelected())
 		{
 			SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
 
@@ -466,7 +518,7 @@ namespace TEN::Gui
 			return;
 		}
 
-		if (GUI_ACTION_SELECT && SelectedOption <= 16)
+		if (GuiIsSelected() && SelectedOption <= 16)
 		{
 			SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
 			CurrentSettings.WaitingForKey = true;
@@ -525,7 +577,7 @@ namespace TEN::Gui
 		}
 		else
 		{
-			if (GUI_ACTION_PULSE_UP)
+			if (GuiIsPulsed(In::Forward))
 			{
 				if (SelectedOption <= 0)
 					SelectedOption += OptionCount;
@@ -535,7 +587,7 @@ namespace TEN::Gui
 				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 			}
 
-			if (GUI_ACTION_PULSE_DOWN)
+			if (GuiIsPulsed(In::Back))
 			{
 				if (SelectedOption < OptionCount)
 					SelectedOption++;
@@ -545,7 +597,7 @@ namespace TEN::Gui
 				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 			}
 
-			if (GUI_ACTION_SELECT)
+			if (GuiIsSelected())
 			{
 				// Apply
 				if (SelectedOption == OptionCount - 1)
@@ -570,7 +622,7 @@ namespace TEN::Gui
 				}
 			}
 
-			if (GUI_ACTION_DESELECT)
+			if (GuiIsDeselected())
 			{
 				SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
 
@@ -612,7 +664,7 @@ namespace TEN::Gui
 	void GuiController::HandleOtherSettingsInput(bool fromPauseMenu)
 	{
 		OptionCount = 7;
-		if (GUI_ACTION_DESELECT)
+		if (GuiIsDeselected())
 		{
 			SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
 
@@ -624,7 +676,7 @@ namespace TEN::Gui
 			return;
 		}
 
-		if (GUI_ACTION_PULSE_LEFT || GUI_ACTION_PULSE_RIGHT)
+		if (GuiIsPulsed(In::Left) || GuiIsPulsed(In::Right))
 		{
 			switch (SelectedOption)
 			{
@@ -715,7 +767,7 @@ namespace TEN::Gui
 			}
 		}
 
-		if (GUI_ACTION_PULSE_UP)
+		if (GuiIsPulsed(In::Forward))
 		{
 			if (SelectedOption <= 0)
 				SelectedOption += OptionCount;
@@ -725,7 +777,7 @@ namespace TEN::Gui
 			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 		}
 
-		if (GUI_ACTION_PULSE_DOWN)
+		if (GuiIsPulsed(In::Back))
 		{
 			if (SelectedOption < OptionCount)
 				SelectedOption++;
@@ -735,7 +787,7 @@ namespace TEN::Gui
 			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 		}
 
-		if (GUI_ACTION_SELECT)
+		if (GuiIsSelected())
 		{
 			SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
 
@@ -799,7 +851,7 @@ namespace TEN::Gui
 
 		if (MenuToDisplay == Menu::Pause || MenuToDisplay == Menu::Options)
 		{
-			if (GUI_ACTION_PULSE_UP)
+			if (GuiIsPulsed(In::Forward))
 			{
 				if (SelectedOption <= 0)
 					SelectedOption += OptionCount;
@@ -809,7 +861,7 @@ namespace TEN::Gui
 				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 			}
 
-			if (GUI_ACTION_PULSE_DOWN)
+			if (GuiIsPulsed(In::Back))
 			{
 				if (SelectedOption < OptionCount)
 					SelectedOption++;
@@ -820,7 +872,7 @@ namespace TEN::Gui
 			}
 		}
 
-		if (GUI_ACTION_DESELECT || IsClicked(In::Pause))
+		if (GuiIsDeselected() || IsClicked(In::Pause))
 		{
 			if (MenuToDisplay == Menu::Pause)
 			{
@@ -837,7 +889,7 @@ namespace TEN::Gui
 			}
 		}
 
-		if (GUI_ACTION_SELECT)
+		if (GuiIsSelected())
 		{
 			switch (MenuToDisplay)
 			{
@@ -1890,7 +1942,7 @@ namespace TEN::Gui
 			if (Rings[(int)RingTypes::Ammo]->ObjectListMovement)
 				return;
 
-			if (GUI_ACTION_SELECT)
+			if (GuiIsSelected())
 			{
 				short invItem = Rings[(int)RingTypes::Inventory]->CurrentObjectList[Rings[(int)RingTypes::Inventory]->CurrentObjectInList].InventoryItem;
 				short ammoItem = Rings[(int)RingTypes::Ammo]->CurrentObjectList[Rings[(int)RingTypes::Ammo]->CurrentObjectInList].InventoryItem;
@@ -1942,7 +1994,7 @@ namespace TEN::Gui
 				}
 			}
 
-			if (GUI_ACTION_DESELECT)
+			if (GuiIsDeselected())
 			{
 				SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
 				CombineRingFadeDir = 2;
@@ -2094,7 +2146,7 @@ namespace TEN::Gui
 				!Rings[(int)RingTypes::Inventory]->ObjectListMovement &&
 				!Rings[(int)RingTypes::Ammo]->ObjectListMovement)
 			{
-				if (GUI_ACTION_PULSE_UP)
+				if (GuiIsPulsed(In::Forward))
 				{
 					if (CurrentSelectedOption <= 0)
 						CurrentSelectedOption = n - 1;
@@ -2103,7 +2155,7 @@ namespace TEN::Gui
 
 					SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
 				}
-				else if (GUI_ACTION_PULSE_DOWN)
+				else if (GuiIsPulsed(In::Back))
 				{
 					if (CurrentSelectedOption >= n - 1)
 						CurrentSelectedOption = 0;
@@ -2115,7 +2167,7 @@ namespace TEN::Gui
 
 				if (AmmoActive)
 				{
-					if (GUI_ACTION_PULSE_LEFT)
+					if (GuiIsPulsed(In::Left))
 					{
 						if (CurrentSelectedOption <= 0)
 							CurrentSelectedOption = n - 1;
@@ -2125,7 +2177,7 @@ namespace TEN::Gui
 						SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
 					}
 
-					if (GUI_ACTION_PULSE_RIGHT)
+					if (GuiIsPulsed(In::Right))
 					{
 						if (CurrentSelectedOption >= n - 1)
 							CurrentSelectedOption = 0;
@@ -2138,7 +2190,7 @@ namespace TEN::Gui
 					*CurrentAmmoType = CurrentSelectedOption;
 				}
 
-				if (GUI_ACTION_SELECT)
+				if (GuiIsSelected())
 				{
 					if (CurrentOptions[CurrentSelectedOption].Type != MenuType::Equip && CurrentOptions[CurrentSelectedOption].Type != MenuType::Use)
 						SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
@@ -2213,7 +2265,7 @@ namespace TEN::Gui
 					}
 				}
 
-				if (GUI_ACTION_DESELECT && AmmoActive)
+				if (GuiIsDeselected() && AmmoActive)
 				{
 					SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
 					AmmoActive = 0;
@@ -2311,17 +2363,10 @@ namespace TEN::Gui
 
 	void GuiController::DrawAmmoSelector()
 	{
-		int n;
-		unsigned short XRot, YRot, ZRot;
-		InventoryObject* objme;
-		char invTextBuffer[256];
-		int x, y;
-
 		if (!AmmoSelectorFlag)
 			return;
 	
 		int xPos = (2 * PHD_CENTER_X - OBJLIST_SPACING) / 2;
-
 		if (NumAmmoSlots == 2)
 			xPos -= OBJLIST_SPACING / 2;
 		else if (NumAmmoSlots == 3)
@@ -2329,19 +2374,20 @@ namespace TEN::Gui
 
 		if (NumAmmoSlots > 0)
 		{
+			int n = 0;
 			for (n = 0; n < NumAmmoSlots; n++)
 			{
-				objme = &InventoryObjectTable[AmmoObjectList[n].InventoryItem];
+				auto* invObject = &InventoryObjectTable[AmmoObjectList[n].InventoryItem];
 
 				if (n == *CurrentAmmoType)
 				{
-					if (objme->RotFlags & INV_ROT_X)
+					if (invObject->RotFlags & INV_ROT_X)
 						AmmoObjectList[n].XRot += ANGLE(5.0f);
 
-					if (objme->RotFlags & INV_ROT_Y)
+					if (invObject->RotFlags & INV_ROT_Y)
 						AmmoObjectList[n].YRot += ANGLE(5.0f);
 
-					if (objme->RotFlags & INV_ROT_Z)
+					if (invObject->RotFlags & INV_ROT_Z)
 						AmmoObjectList[n].ZRot += ANGLE(5.0f);
 				}
 				else
@@ -2351,16 +2397,18 @@ namespace TEN::Gui
 					SpinBack(&AmmoObjectList[n].ZRot);
 				}
 
-				XRot = AmmoObjectList[n].XRot;
-				YRot = AmmoObjectList[n].YRot;
-				ZRot = AmmoObjectList[n].ZRot;
-				x = PHD_CENTER_X - 300 + xPos;
-				y = 480;
-				short obj = ConvertInventoryItemToObject(AmmoObjectList[n].InventoryItem);
+				unsigned short xRot = AmmoObjectList[n].XRot;
+				unsigned short yRot = AmmoObjectList[n].YRot;
+				unsigned short zRot = AmmoObjectList[n].ZRot;
+				int x = PHD_CENTER_X - 300 + xPos;
+				int y = 480;
+				short objectNumber = ConvertInventoryItemToObject(AmmoObjectList[n].InventoryItem);
 				float scaler = InventoryObjectTable[AmmoObjectList[n].InventoryItem].Scale1;
 
 				if (n == *CurrentAmmoType)
 				{
+					char invTextBuffer[256];
+
 					if (AmmoObjectList[n].Amount == -1)
 						sprintf(&invTextBuffer[0], "Unlimited %s", g_GameFlow->GetString(InventoryObjectTable[AmmoObjectList[n].InventoryItem].ObjectName));
 					else
@@ -2370,12 +2418,12 @@ namespace TEN::Gui
 						g_Renderer.AddString(PHD_CENTER_X, 380, &invTextBuffer[0], PRINTSTRING_COLOR_YELLOW, PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
 				
 					if (n == *CurrentAmmoType)
-						g_Renderer.DrawObjectOn2DPosition(x, y, obj, XRot, YRot, ZRot, scaler);
+						g_Renderer.DrawObjectOn2DPosition(x, y, objectNumber, xRot, yRot, zRot, scaler);
 					else
-						g_Renderer.DrawObjectOn2DPosition(x, y, obj, XRot, YRot, ZRot, scaler);
+						g_Renderer.DrawObjectOn2DPosition(x, y, objectNumber, xRot, yRot, zRot, scaler);
 				}
 				else
-					g_Renderer.DrawObjectOn2DPosition(x, y, obj, XRot, YRot, ZRot, scaler);
+					g_Renderer.DrawObjectOn2DPosition(x, y, objectNumber, xRot, yRot, zRot, scaler);
 
 				xPos += OBJLIST_SPACING;
 			}
@@ -2385,9 +2433,6 @@ namespace TEN::Gui
 	void GuiController::DrawCurrentObjectList(ItemInfo* item, int ringIndex)
 	{
 		auto* lara = GetLaraInfo(item);
-
-		char textBufferMe[128];
-		unsigned short xRot, yRot, zRot;
 
 		if (Rings[ringIndex]->CurrentObjectList <= 0)
 			return;
@@ -2552,6 +2597,7 @@ namespace TEN::Gui
 				{
 					int numMeUp = 0;
 					int count = 0;
+					char textBufferMe[128];
 
 					switch (InventoryObjectTable[Rings[ringIndex]->CurrentObjectList[n].InventoryItem].ObjectNumber)
 					{
@@ -2686,9 +2732,9 @@ namespace TEN::Gui
 					SpinBack(&Rings[ringIndex]->CurrentObjectList[n].ZRot);
 				}
 
-				xRot = Rings[ringIndex]->CurrentObjectList[n].XRot;
-				yRot = Rings[ringIndex]->CurrentObjectList[n].YRot;
-				zRot = Rings[ringIndex]->CurrentObjectList[n].ZRot;
+				unsigned short xRot = Rings[ringIndex]->CurrentObjectList[n].XRot;
+				unsigned short yRot = Rings[ringIndex]->CurrentObjectList[n].YRot;
+				unsigned short zRot = Rings[ringIndex]->CurrentObjectList[n].ZRot;
 
 				int activeNum = 0;
 				if (Rings[ringIndex]->ObjectListMovement)
@@ -2909,7 +2955,7 @@ namespace TEN::Gui
 	{
 		InvMode = InventoryMode::Statistics;
 
-		if (GUI_ACTION_DESELECT)
+		if (GuiIsDeselected())
 		{
 			SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
 			InvMode = InventoryMode::InGame;
@@ -2920,7 +2966,7 @@ namespace TEN::Gui
 	{
 		InvMode = InventoryMode::Examine;
 
-		if (GUI_ACTION_DESELECT)
+		if (GuiIsDeselected())
 		{
 			SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
 			InvMode = InventoryMode::None;
@@ -2944,21 +2990,21 @@ namespace TEN::Gui
 
 		InvMode = InventoryMode::Diary;
 
-		if (GUI_ACTION_PULSE_RIGHT &&
+		if (GuiIsPulsed(In::Right) &&
 			lara->Inventory.Diary.CurrentPage < lara->Inventory.Diary.NumPages)
 		{
 			lara->Inventory.Diary.CurrentPage++;
 			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 		}
 
-		if (GUI_ACTION_PULSE_LEFT &&
+		if (GuiIsPulsed(In::Left) &&
 			lara->Inventory.Diary.CurrentPage > 1)
 		{
 			lara->Inventory.Diary.CurrentPage--;
 			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 		}
 
-		if (GUI_ACTION_DESELECT)
+		if (GuiIsDeselected())
 		{
 			SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
 			InvMode = InventoryMode::None;
@@ -2972,7 +3018,7 @@ namespace TEN::Gui
 
 	LoadResult GuiController::DoLoad()
 	{
-		if (GUI_ACTION_PULSE_DOWN)
+		if (GuiIsPulsed(In::Back))
 		{
 			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 
@@ -2982,7 +3028,7 @@ namespace TEN::Gui
 				SelectedSaveSlot++;
 		}
 
-		if (GUI_ACTION_PULSE_UP)
+		if (GuiIsPulsed(In::Forward))
 		{
 			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 
@@ -2992,7 +3038,7 @@ namespace TEN::Gui
 				SelectedSaveSlot--;
 		}
 
-		if (GUI_ACTION_SELECT)
+		if (GuiIsSelected())
 		{
 			if (!SavegameInfos[SelectedSaveSlot].Present)
 				SayNo();
@@ -3004,7 +3050,7 @@ namespace TEN::Gui
 			}
 		}
 
-		if (GUI_ACTION_DESELECT || IsClicked(In::Load))
+		if (GuiIsDeselected() || IsClicked(In::Load))
 			return LoadResult::Cancel;
 
 		return LoadResult::None;
@@ -3012,7 +3058,7 @@ namespace TEN::Gui
 
 	bool GuiController::DoSave()
 	{
-		if (GUI_ACTION_PULSE_DOWN)
+		if (GuiIsPulsed(In::Back))
 		{
 			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 
@@ -3022,7 +3068,7 @@ namespace TEN::Gui
 				SelectedSaveSlot++;
 		}
 
-		if (GUI_ACTION_PULSE_UP)
+		if (GuiIsPulsed(In::Forward))
 		{
 			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 
@@ -3032,7 +3078,7 @@ namespace TEN::Gui
 				SelectedSaveSlot--;
 		}
 
-		if (GUI_ACTION_SELECT)
+		if (GuiIsSelected())
 		{
 			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 			SaveGame::Save(SelectedSaveSlot);
@@ -3040,7 +3086,7 @@ namespace TEN::Gui
 			return true;
 		}
 
-		if (GUI_ACTION_DESELECT || IsClicked(In::Save))
+		if (GuiIsDeselected() || IsClicked(In::Save))
 			return true;
 
 		return false;

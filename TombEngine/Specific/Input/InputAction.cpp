@@ -1,7 +1,6 @@
 #include "framework.h"
 #include "Specific/Input/InputAction.h"
 
-#include "Game/control/control.h"
 #include "Renderer/Renderer11.h"
 #include "Specific/clock.h"
 

@@ -2,6 +2,9 @@
 #include "Game/GuiObjects.h"
 #include "LanguageScript.h"
 #include "Specific/configuration.h"
+#include "Specific/Input/InputAction.h"
+
+using namespace TEN::Input;
 
 struct ItemInfo;
 
@@ -109,6 +112,14 @@ namespace TEN::Gui
 
 	class GuiController
 	{
+	private:
+		// Input inquirers
+		bool CanSelect() const;
+		bool CanDeselect() const;
+		bool GuiIsPulsed(ActionID actionID) const;
+		bool GuiIsSelected() const;
+		bool GuiIsDeselected() const;
+
 	public:
 		bool CallInventory(ItemInfo* item, bool resetMode);
 		InventoryResult TitleOptions(ItemInfo* item);
@@ -142,21 +153,6 @@ namespace TEN::Gui
 		void SetInventoryItemChosen(int number);
 
 	private:
-		#define CAN_SELECT   (!IsHeld(In::Deselect) && \
-							 GetActionTimeActive(In::Action) <= GetActionTimeInactive(In::Deselect) && \
-							 GetActionTimeActive(In::Action) <= GetActionTimeInactive(In::Save) && \
-							 GetActionTimeActive(In::Action) <= GetActionTimeInactive(In::Load) && \
-							 GetActionTimeActive(In::Action) <= GetActionTimeInactive(In::Pause))
-		#define CAN_DESELECT (!(IsHeld(In::Select) || IsHeld(In::Action)))
-
-		// Input macros
-		#define GUI_ACTION_PULSE_UP	   (IsPulsed(In::Forward, 0.1f, 0.4f) && !IsHeld(In::Back))
-		#define GUI_ACTION_PULSE_DOWN  (IsPulsed(In::Back, 0.1f, 0.4f) && !IsHeld(In::Forward))
-		#define GUI_ACTION_PULSE_LEFT  IsPulsed(In::Left, 0.1f, 0.4f)
-		#define GUI_ACTION_PULSE_RIGHT IsPulsed(In::Right, 0.1f, 0.4f)
-		#define GUI_ACTION_SELECT	   ((IsReleased(In::Select) || IsReleased(In::Action)) && CAN_SELECT)
-		#define GUI_ACTION_DESELECT	   (IsClicked(In::Deselect) && CAN_DESELECT)
-
 		// GUI variables
 		Menu MenuToDisplay = Menu::Title;
 		int SelectedOption;
