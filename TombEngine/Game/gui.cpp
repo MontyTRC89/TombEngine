@@ -84,8 +84,10 @@ namespace TEN::Gui
 
 	bool GuiController::CanSelect() const
 	{
-		if (!IsHeld(In::Deselect) &&
-			GetActionTimeActive(In::Action) <= GetActionTimeInactive(In::Deselect) &&
+		if (IsHeld(In::Deselect))
+			return false;
+
+		if (GetActionTimeActive(In::Action) <= GetActionTimeInactive(In::Deselect) &&
 			GetActionTimeActive(In::Action) <= GetActionTimeInactive(In::Save) &&
 			GetActionTimeActive(In::Action) <= GetActionTimeInactive(In::Load) &&
 			GetActionTimeActive(In::Action) <= GetActionTimeInactive(In::Pause))
