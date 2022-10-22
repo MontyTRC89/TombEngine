@@ -101,7 +101,7 @@ int DrawPhase()
 	return Camera.numberFrames;
 }
 
-GameStatus ControlPhase(int numFrames, int demoMode)
+GameStatus ControlPhase(int numFrames, bool demoMode)
 {
 	auto* level = g_GameFlow->GetLevel(CurrentLevel);
 
