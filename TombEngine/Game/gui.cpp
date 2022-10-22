@@ -103,24 +103,27 @@ namespace TEN::Gui
 
 	bool GuiController::GuiIsPulsed(ActionID actionID) const
 	{
-		// TODO: Cancel doesn't work.
-		auto oppositeAction = ActionID::None;
+		auto oppositeAction = In::None;
 		switch (actionID)
 		{
 		case In::Forward:
-			oppositeAction = ActionID::Back;
+			oppositeAction = In::Back;
+			break;
 
 		case In::Back:
-			oppositeAction = ActionID::Forward;
-			
+			oppositeAction = In::Forward;
+			break;
+
 		case In::Left:
-			oppositeAction = ActionID::Right;
-			
+			oppositeAction = In::Right;
+			break;
+
 		case In::Right:
-			oppositeAction = ActionID::Left;
+			oppositeAction = In::Left;
+			break;
 		}
 
-		return (IsPulsed(actionID, 0.1f, 0.4f) && (!IsHeld(oppositeAction) || (oppositeAction == ActionID::None)));
+		return (IsPulsed(actionID, 0.1f, 0.4f) && (!IsHeld(oppositeAction) || (oppositeAction == In::None)));
 	}
 
 	bool GuiController::GuiIsSelected() const
