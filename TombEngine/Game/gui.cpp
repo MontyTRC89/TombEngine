@@ -685,7 +685,6 @@ namespace TEN::Gui
 		{
 			switch (SelectedOption)
 			{
-
 			case 0:
 				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 				CurrentSettings.Configuration.EnableReverb = !CurrentSettings.Configuration.EnableReverb;
@@ -2151,28 +2150,9 @@ namespace TEN::Gui
 				!Rings[(int)RingTypes::Inventory]->ObjectListMovement &&
 				!Rings[(int)RingTypes::Ammo]->ObjectListMovement)
 			{
-				if (GuiIsPulsed(In::Forward))
-				{
-					if (CurrentSelectedOption <= 0)
-						CurrentSelectedOption = n - 1;
-					else
-						CurrentSelectedOption--;
-
-					SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
-				}
-				else if (GuiIsPulsed(In::Back))
-				{
-					if (CurrentSelectedOption >= n - 1)
-						CurrentSelectedOption = 0;
-					else
-						CurrentSelectedOption++;
-
-					SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
-				}
-
 				if (AmmoActive)
 				{
-					if (GuiIsPulsed(In::Left))
+					if (GuiIsPulsed(In::Forward))
 					{
 						if (CurrentSelectedOption <= 0)
 							CurrentSelectedOption = n - 1;
@@ -2182,7 +2162,7 @@ namespace TEN::Gui
 						SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
 					}
 
-					if (GuiIsPulsed(In::Right))
+					if (GuiIsPulsed(In::Back))
 					{
 						if (CurrentSelectedOption >= n - 1)
 							CurrentSelectedOption = 0;
@@ -2193,6 +2173,27 @@ namespace TEN::Gui
 					}
 
 					*CurrentAmmoType = CurrentSelectedOption;
+				}
+				else
+				{
+					if (GuiIsPulsed(In::Forward))
+					{
+						if (CurrentSelectedOption <= 0)
+							CurrentSelectedOption = n - 1;
+						else
+							CurrentSelectedOption--;
+
+						SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
+					}
+					else if (GuiIsPulsed(In::Back))
+					{
+						if (CurrentSelectedOption >= n - 1)
+							CurrentSelectedOption = 0;
+						else
+							CurrentSelectedOption++;
+
+						SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
+					}
 				}
 
 				if (GuiIsSelected())
@@ -2418,7 +2419,8 @@ namespace TEN::Gui
 					else
 						sprintf(&invTextBuffer[0], "%d x %s", AmmoObjectList[n].Amount, g_GameFlow->GetString(InventoryObjectTable[AmmoObjectList[n].InventoryItem].ObjectName));
 
-					if (AmmoSelectorFadeVal)
+					// CHECK: AmmoSelectorFadeVal is never true and therefore the string is never printed.
+					//if (AmmoSelectorFadeVal)
 						g_Renderer.AddString(PHD_CENTER_X, 380, &invTextBuffer[0], PRINTSTRING_COLOR_YELLOW, PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
 				
 					if (n == *CurrentAmmoType)
