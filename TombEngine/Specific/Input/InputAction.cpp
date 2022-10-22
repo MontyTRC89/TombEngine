@@ -49,13 +49,13 @@ namespace TEN::Input
 			return false;
 
 		// TODO: Because our delta time is a placeholder constant and we cannot properly account for time drift,
-		// count whole frames instead of actual time passed for now.
+		// count whole frames instead of actual time passed for now. -- Sezz 2022.10.01
 		float activeDelayInFrameTime = (TimeActive > round(initialDelayInSec / DELTA_TIME)) ? round(delayInSec / DELTA_TIME) : round(initialDelayInSec / DELTA_TIME);
 		float delayInFrameTime = std::floor(TimeActive / activeDelayInFrameTime) * activeDelayInFrameTime;
 		if (delayInFrameTime > (std::floor(PrevTimeActive / activeDelayInFrameTime) * activeDelayInFrameTime))
 			return true;
 
-		// Keeping the previous, inaccurate method for future reference. -- Sezz 2022.10.01
+		// Keeping the previous inaccurate method for future reference. -- Sezz 2022.10.01
 		/*float syncedTimeActive = TimeActive - std::fmod(TimeActive, DELTA_TIME);
 		float activeDelay = (TimeActive > initialDelayInSec) ? delayInSeconds : initialDelayInSec;
 

@@ -68,6 +68,15 @@ namespace TEN::Input
 	// TODO: For analog triggers, use Value range [0.0f, 1.0f] with deadzone up to a quarter press.
 	class InputAction
 	{
+	private:
+		// Components
+		ActionID ID				= In::None;
+		float	 Value			= 0.0f;
+		float	 PrevValue		= 0.0f;
+		float	 TimeActive		= 0.0f;
+		float	 PrevTimeActive = 0.0f;
+		float	 TimeInactive	= 0.0f;
+
 	public:
 		// Constructors
 		InputAction(ActionID actionID);
@@ -90,14 +99,6 @@ namespace TEN::Input
 		void PrintDebugInfo();
 
 	private:
-		// Components
-		ActionID ID				= In::None;
-		float	 Value			= 0.0f;
-		float	 PrevValue		= 0.0f;
-		float	 TimeActive		= 0.0f;
-		float	 PrevTimeActive = 0.0f;
-		float	 TimeInactive	= 0.0f;
-
 		// Helpers
 		void UpdateValue(float value);
 	};
