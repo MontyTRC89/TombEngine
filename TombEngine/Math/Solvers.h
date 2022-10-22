@@ -2,7 +2,7 @@
 
 using std::pair;
 
-namespace TEN::Math::Solver
+namespace TEN::Math::Solvers
 {
 	pair<float, float> SolveQuadratic(float a, float b, float c);
 
