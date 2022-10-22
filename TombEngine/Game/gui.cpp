@@ -2379,8 +2379,7 @@ namespace TEN::Gui
 
 		if (NumAmmoSlots > 0)
 		{
-			int n = 0;
-			for (n = 0; n < NumAmmoSlots; n++)
+			for (int n = 0; n < NumAmmoSlots; n++)
 			{
 				auto* invObject = &InventoryObjectTable[AmmoObjectList[n].InventoryItem];
 
