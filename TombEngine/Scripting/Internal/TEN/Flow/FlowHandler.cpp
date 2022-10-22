@@ -6,7 +6,7 @@
 #include "Sound/sound.h"
 #include "Game/savegame.h"
 #include "Flow/InventoryItem/InventoryItem.h"
-#include "Game/gui.h"
+#include "Game/Gui.h"
 #include "Logic/LevelFunc.h"
 #include "Vec3/Vec3.h"
 #include "Objects/ScriptInterfaceObjectsHandler.h"

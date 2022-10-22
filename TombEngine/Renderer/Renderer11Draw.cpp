@@ -11,7 +11,7 @@
 #include "Game/camera.h"
 #include "Game/items.h"
 #include "Game/animation.h"
-#include "Game/gui.h"
+#include "Game/Gui.h"
 #include "Game/Lara/lara.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"

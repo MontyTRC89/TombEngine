@@ -5,7 +5,7 @@
 #include "Game/camera.h"
 #include "Game/collision/collide_item.h"
 #include "Game/control/control.h"
-#include "Game/gui.h"
+#include "Game/Gui.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"

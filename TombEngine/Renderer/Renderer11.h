@@ -19,7 +19,7 @@
 #include "RendererBucket.h"
 #include "Game/items.h"
 #include "Game/animation.h"
-#include "Game/gui.h"
+#include "Game/Gui.h"
 #include "Game/effects/effects.h"
 #include "IndexBuffer/IndexBuffer.h"
 #include "VertexBuffer/VertexBuffer.h"

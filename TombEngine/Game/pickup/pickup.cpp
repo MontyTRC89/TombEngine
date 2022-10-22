@@ -6,7 +6,7 @@
 #include "Game/camera.h"
 #include "Game/collision/collide_item.h"
 #include "Game/effects/debris.h"
-#include "Game/gui.h"
+#include "Game/Gui.h"
 #include "Game/items.h"
 #include "Game/health.h"
 #include "Game/Lara/lara.h"

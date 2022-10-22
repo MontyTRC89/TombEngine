@@ -8,7 +8,7 @@
 #include "Game/Lara/lara.h"
 #include "Game/items.h"
 #include "Game/control/flipeffect.h"
-#include "Game/gui.h"
+#include "Game/Gui.h"
 #include "Game/control/volume.h"
 #include "Game/control/lot.h"
 #include "Game/health.h"

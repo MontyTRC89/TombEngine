@@ -6,7 +6,7 @@
 #include "Game/effects/effects.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
-#include "Game/gui.h"
+#include "Game/Gui.h"
 #include "Game/collision/collide_item.h"
 #include "Game/Lara/lara_flare.h"
 #include "Game/Lara/lara_one_gun.h"

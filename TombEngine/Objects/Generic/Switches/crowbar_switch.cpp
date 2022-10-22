@@ -4,7 +4,7 @@
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Objects/Generic/Switches/crowbar_switch.h"
-#include "Game/gui.h"
+#include "Game/Gui.h"
 #include "Sound/sound.h"
 #include "Game/pickup/pickup.h"
 #include "Specific/level.h"

@@ -3,7 +3,7 @@
 #include "Game/savegame.h"
 #include "Game/health.h"
 #include "Game/animation.h"
-#include "Game/gui.h"
+#include "Game/Gui.h"
 #include "Game/Lara/lara.h"
 #include "Game/control/control.h"
 #include "Game/control/volume.h"

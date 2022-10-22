@@ -28,7 +28,7 @@
 #include "Game/control/volume.h"
 #include "Game/effects/lara_fx.h"
 #include "Game/effects/tomb4fx.h"
-#include "Game/gui.h"
+#include "Game/Gui.h"
 #include "Game/items.h"
 #include "Game/misc.h"
 #include "Game/savegame.h"

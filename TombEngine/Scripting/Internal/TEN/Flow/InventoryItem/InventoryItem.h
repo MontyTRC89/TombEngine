@@ -2,7 +2,7 @@
 
 #include <string>
 
-#include "Game/gui.h"
+#include "Game/Gui.h"
 #include "Rotation/Rotation.h"
 using namespace TEN::Gui;
 

@@ -5,7 +5,7 @@
 #include "Game/control/box.h"
 #include "Game/items.h"
 #include "Game/control/lot.h"
-#include "Game/gui.h"
+#include "Game/Gui.h"
 #include "Specific/Input/Input.h"
 #include "Game/pickup/pickup.h"
 #include "Sound/sound.h"
