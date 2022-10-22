@@ -119,7 +119,7 @@ namespace TEN::Input
 		this->TimeInactive = 0.0f;
 	}
 
-	void InputAction::PrintDebugInfo()
+	void InputAction::PrintDebugInfo() const
 	{
 		g_Renderer.PrintDebugMessage("ID: %d", (int)ID);
 		g_Renderer.PrintDebugMessage("IsClicked: %d", this->IsClicked());
