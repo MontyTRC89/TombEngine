@@ -731,6 +731,9 @@ void lara_as_ladder_idle(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
+	if (TrInput & IN_LOOK && lara->Control.CanLook)
+		LookUpDown(item);
+
 	if (TrInput & IN_ACTION)
 	{
 		if (TrInput & IN_JUMP)

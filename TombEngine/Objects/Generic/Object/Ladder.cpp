@@ -43,13 +43,13 @@ namespace TEN::Entities::Generic
 		LS_JUMP_UP
 	};
 
-	auto LadderPos = Vector3i(0, 0, -CLICK(0.75f));
+	auto LadderPos = Vector3i(0, 0, -CLICK(0.9f));
 	OBJECT_COLLISION_BOUNDS LadderBounds =
 	{
 		GameBoundingBox(
 			-CLICK(1), CLICK(1),
 			0, 0,
-			-CLICK(2), CLICK(2)
+			-CLICK(1.5f), CLICK(1.5f)
 		),
 		ANGLE(-10.0f), ANGLE(10.0f),
 		-LARA_GRAB_THRESHOLD, LARA_GRAB_THRESHOLD,
@@ -61,9 +61,7 @@ namespace TEN::Entities::Generic
 		auto& ladderItem = g_Level.Items[itemNumber];
 		auto& player = *GetLaraInfo(laraItem);
 
-		short deltaHeadingAngle = ladderItem.Pose.Orientation.y - laraItem->Pose.Orientation.y;
-		short angleBetweenPositions = ladderItem.Pose.Orientation.y - Geometry::GetOrientToPoint(laraItem->Pose.Position.ToVector3(), ladderItem.Pose.Position.ToVector3()).y;
-		bool isFacingLadder = abs(deltaHeadingAngle - angleBetweenPositions) < ANGLE(45.0f);
+		bool isFacingLadder = Geometry::IsPointInFront(laraItem->Pose, ladderItem.Pose.Position.ToVector3());
 
 		// Mount while grounded.
 		if (TrInput & IN_ACTION && isFacingLadder &&
