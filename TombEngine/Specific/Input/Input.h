@@ -130,14 +130,14 @@ namespace TEN::Input
 	extern vector<bool>		   KeyMap;
 	extern vector<float>	   AxisMap;
 
-	// Legacy input bitfields
+	// Legacy input bit fields.
 	extern int DbInput; // Debounce: is input clicked?
 	extern int TrInput; // Throttle: is input held?
 
 	extern short KeyboardLayout[2][KEY_COUNT];
 
-	void InitialiseInput(HWND handle);
-	void DeInitialiseInput();
+	void InitializeInput(HWND handle);
+	void DeinitializeInput();
 	void DefaultConflict();
 	void UpdateInputActions(ItemInfo* item);
 	void ClearAllActions();
