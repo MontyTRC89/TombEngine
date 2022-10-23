@@ -141,7 +141,7 @@ namespace TEN::Input
 	void DefaultConflict();
 	void UpdateInputActions(ItemInfo* item);
 	void ClearAllActions();
-	void Rumble(float power, float delayInSec= 0.3f, RumbleMode mode = RumbleMode::Both);
+	void Rumble(float power, float delayInSec = 0.3f, RumbleMode mode = RumbleMode::Both);
 	void StopRumble();
 
 	// TODO: Later, all these global action accessor functions should be tied to a specific controller/player.
