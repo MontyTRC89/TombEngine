@@ -5,9 +5,10 @@
 #include "Game/collision/collide_item.h"
 
 // Objects
+#include "Objects/Generic/Object/burning_torch.h"
 #include "Objects/Generic/Object/generic_trapdoor.h"
 #include "Objects/Generic/Object/generic_bridge.h"
-#include "Objects/Generic/Object/burning_torch.h"
+#include "Objects/Generic/Object/Ladder.h"
 #include "Objects/Generic/Object/polerope.h"
 #include "Objects/Generic/Object/rope.h"
 
@@ -462,6 +463,13 @@ void StartTraps()
 		object->savePosition = true;
 		object->usingDrawAnimatingItem = true;
 		object->isPickup = true;
+	}
+
+	object = &Objects[ID_LADDER];
+	if (object->loaded)
+	{
+		object->collision = LadderCollision;
+		object->saveFlags = true;
 	}
 }
 

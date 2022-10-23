@@ -712,6 +712,131 @@ void lara_as_rope_down(ItemInfo* item, CollisionInfo* coll)
 	LaraClimbRope(item, coll);
 }
 
+// ------
+// LADDER
+// ------
+
+// State:	  LS_LADDER_IDLE (174)
+// Collision: lara_col_ladder_idle()
+void lara_as_ladder_idle(ItemInfo* item, CollisionInfo* coll)
+{
+	auto* lara = GetLaraInfo(item);
+
+	coll->Setup.EnableSpasm = false;
+	coll->Setup.EnableObjectPush = false;
+
+	if (item->HitPoints <= 0)
+	{
+		item->Animation.TargetState = LS_DEATH;
+		return;
+	}
+
+	if (TrInput & IN_ACTION)
+	{
+		if (TrInput & IN_JUMP)
+		{
+			item->Animation.TargetState = LS_JUMP_BACK;
+			return;
+		}
+
+		if (TrInput & IN_FORWARD)
+		{
+			if (TestLaraLadderDismountTop(item, coll))
+				item->Animation.TargetState = LS_LADDER_DISMOUNT_TOP;
+			else if (TestLaraLadderUp(item, coll))
+				item->Animation.TargetState = LS_LADDER_UP;
+
+			return;
+		}
+		else if (TrInput & IN_BACK)
+		{
+			if (TestLaraLadderDismountBottom(item, coll))
+				item->Animation.TargetState = LS_LADDER_DISMOUNT_BOTTOM;
+			else if (TestLaraLadderDown(item, coll))
+				item->Animation.TargetState = LS_LADDER_DOWN;
+
+			return;
+		}
+
+		if (TrInput & IN_LEFT && TestLaraLadderDismountLeft(item, coll))
+		{
+			item->Animation.TargetState = LS_LADDER_DISMOUNT_LEFT;
+			return;
+		}
+		else if (TrInput & IN_RIGHT && TestLaraLadderDismountRight(item, coll))
+		{
+			item->Animation.TargetState = LS_LADDER_DISMOUNT_RIGHT;
+			return;
+		}
+
+		item->Animation.TargetState = LS_LADDER_IDLE;
+	}
+
+	if (TestLaraLadderDismountBottom(item, coll))
+		item->Animation.TargetState = LS_LADDER_DISMOUNT_BOTTOM;
+	else
+		item->Animation.TargetState = LS_FREEFALL;
+}
+
+// State:	  LS_LADDER_IDLE (174)
+// Collision: lara_as_ladder_idle()
+void lara_col_ladder_idle(ItemInfo* item, CollisionInfo* coll)
+{
+	auto* lara = GetLaraInfo(item);
+
+	lara->Control.MoveAngle = item->Pose.Orientation.y;
+	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
+	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
+	coll->Setup.LowerCeilingBound = BAD_JUMP_CEILING;
+	coll->Setup.ForwardAngle = lara->Control.MoveAngle;
+	coll->Setup.Radius = LARA_RADIUS;
+	GetCollisionInfo(coll, item);
+}
+
+// State:	LS_LADDER_UP (175)
+// Control: lara_col_ladder_up()
+void lara_as_ladder_up(ItemInfo* item, CollisionInfo* coll)
+{
+
+}
+
+// State:	  LS_LADDER_UP (175)
+// Collision: lara_as_ladder_up()
+void lara_col_ladder_up(ItemInfo* item, CollisionInfo* coll)
+{
+	auto* lara = GetLaraInfo(item);
+
+	lara->Control.MoveAngle = item->Pose.Orientation.y;
+	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
+	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
+	coll->Setup.LowerCeilingBound = BAD_JUMP_CEILING;
+	coll->Setup.ForwardAngle = lara->Control.MoveAngle;
+	coll->Setup.Radius = LARA_RADIUS;
+	GetCollisionInfo(coll, item);
+}
+
+// State:	LS_LADDER_DOWN (176)
+// Control: lara_col_ladder_down()
+void lara_as_ladder_down(ItemInfo* item, CollisionInfo* coll)
+{
+
+}
+
+// State:	  LS_LADDER_DOWN (176)
+// Collision: lara_as_ladder_down()
+void lara_col_ladder_down(ItemInfo* item, CollisionInfo* coll)
+{
+	auto* lara = GetLaraInfo(item);
+
+	lara->Control.MoveAngle = item->Pose.Orientation.y;
+	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
+	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
+	coll->Setup.LowerCeilingBound = BAD_JUMP_CEILING;
+	coll->Setup.ForwardAngle = lara->Control.MoveAngle;
+	coll->Setup.Radius = LARA_RADIUS;
+	GetCollisionInfo(coll, item);
+}
+
 // -------------
 // VERTICAL POLE
 // -------------

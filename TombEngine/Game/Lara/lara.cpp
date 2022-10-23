@@ -174,35 +174,35 @@ function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] =
 	lara_as_tightrope_walk,//121
 	lara_as_tightrope_fall,//122
 	lara_as_tightrope_fall,//123
-	lara_as_null,//124
+	lara_void_func,//124
 #ifdef NEW_TIGHTROPE
 	lara_as_tightrope_dismount,//125
 #else // !NEW_TIGHTROPE
-	lara_as_null,//125
+	lara_void_func,//125
 #endif
 	lara_as_switch_on,//126
-	lara_as_null,//127
+	lara_void_func,//127
 	lara_as_horizontal_bar_swing,//128
 	lara_as_horizontal_bar_leap,//129
-	lara_as_null,//130
+	lara_void_func,//130
 	lara_as_controlled_no_look,//131
 	lara_as_controlled_no_look,//132
-	lara_as_null,//133
-	lara_as_null,//134
-	lara_as_null,//135
-	lara_as_null,//136
-	lara_as_null,//137
-	lara_as_null,//138
-	lara_as_null,//139
-	lara_as_null,//140
-	lara_as_null,//141
-	lara_as_null,//142
+	lara_void_func,//133
+	lara_void_func,//134
+	lara_void_func,//135
+	lara_void_func,//136
+	lara_void_func,//137
+	lara_void_func,//138
+	lara_void_func,//139
+	lara_void_func,//140
+	lara_void_func,//141
+	lara_void_func,//142
 	lara_as_slopeclimb,//143
 	lara_as_slopeclimbup,//144
 	lara_as_slopeclimbdown,//145
 	lara_as_controlled_no_look,//146
-	lara_as_null,//147
-	lara_as_null,//148
+	lara_void_func,//147
+	lara_void_func,//148
 	lara_as_slopefall,//149
 	lara_as_climb_stepoff_left,
 	lara_as_climb_stepoff_right,
@@ -215,8 +215,8 @@ function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] =
 	lara_as_sclimbstart,
 	lara_as_sclimbstop,
 	lara_as_sclimbend,
-	lara_as_null,//161
-	lara_as_null,//162
+	lara_void_func,//161
+	lara_void_func,//162
 	lara_as_monkey_back,//163
 	lara_as_vault,//164
 	lara_as_vault,//165
@@ -228,6 +228,19 @@ function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] =
 	lara_as_crouch_turn_180,//171
 	lara_as_crawl_turn_180,//172
 	lara_as_turn_180,//173
+	lara_as_ladder_idle,//174
+	lara_as_ladder_up,//175
+	lara_as_ladder_down,//176
+	lara_void_func,//177
+	lara_void_func,//178
+	lara_void_func,//179
+	lara_void_func,//180
+	lara_void_func,//181
+	lara_void_func,//182
+	lara_void_func,//183
+	lara_void_func,//184
+	lara_void_func,//185
+	lara_void_func,//186
 };
 
 function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] =
@@ -339,10 +352,10 @@ function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] =
 	lara_default_col,
 	lara_col_crouch_turn_left,
 	lara_col_crouch_turn_right,
-	lara_as_null,
-	lara_as_null,
-	lara_as_null,
-	lara_as_null,
+	lara_void_func,
+	lara_void_func,
+	lara_void_func,
+	lara_void_func,
 	lara_col_rope_idle,
 	lara_void_func,
 	lara_void_func,
@@ -406,6 +419,19 @@ function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] =
 	lara_col_crouch_turn_180,//171
 	lara_col_crawl_turn_180,//172
 	lara_col_turn_180,//173
+	lara_col_ladder_idle,//174
+	lara_col_ladder_up,//175
+	lara_col_ladder_down,//176
+	lara_void_func,//177
+	lara_void_func,//178
+	lara_void_func,//179
+	lara_void_func,//180
+	lara_void_func,//181
+	lara_void_func,//182
+	lara_void_func,//183
+	lara_void_func,//184
+	lara_void_func,//185
+	lara_void_func,//186
 };
 
 void LaraControl(ItemInfo* item, CollisionInfo* coll)

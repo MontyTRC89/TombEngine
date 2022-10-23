@@ -188,6 +188,7 @@ CALL gen.bat</Command>
     <ClInclude Include="Math\Containers\Vector2i.h" />
     <ClInclude Include="Math\Containers\Vector3i.h" />
     <ClInclude Include="Objects\Generic\Object\burning_torch.h" />
+    <ClInclude Include="Objects\Generic\Object\Ladder.h" />
     <ClInclude Include="Objects\Generic\Object\polerope.h" />
     <ClInclude Include="Objects\Generic\Object\rope.h" />
     <ClInclude Include="Objects\Generic\Traps\falling_block.h" />
@@ -655,6 +656,7 @@ CALL gen.bat</Command>
     <ClCompile Include="Math\Containers\Vector3i.cpp" />
     <ClCompile Include="Math\Solvers.cpp" />
     <ClCompile Include="Objects\Generic\Object\burning_torch.cpp" />
+    <ClCompile Include="Objects\Generic\Object\Ladder.cpp" />
     <ClCompile Include="Objects\Generic\Object\polerope.cpp" />
     <ClCompile Include="Objects\Generic\Object\rope.cpp" />
     <ClCompile Include="Objects\Generic\Traps\falling_block.cpp" />

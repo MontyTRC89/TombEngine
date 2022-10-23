@@ -1,0 +1,143 @@
+#include "framework.h"
+#include "Objects/Generic/Object/polerope.h"
+
+#include "Game/collision/collide_item.h"
+#include "Game/collision/sphere.h"
+#include "Game/control/box.h"
+#include "Game/control/control.h"
+#include "Game/control/lot.h"
+#include "Game/items.h"
+#include "Game/Lara/lara.h"
+#include "Game/Lara/lara_helpers.h"
+#include "Game/Lara/lara_struct.h"
+#include "Game/Lara/lara_tests.h"
+#include "Math/Math.h"
+#include "Specific/input.h"
+#include "Specific/level.h"
+
+using namespace TEN::Input;
+using namespace TEN::Math;
+using std::vector;
+
+namespace TEN::Entities::Generic
+{
+	const vector<int> LadderMountedStates =
+	{
+		LS_LADDER_IDLE,
+		LS_LADDER_UP,
+		LS_LADDER_DOWN
+	};
+	const vector<int> LadderGroundedMountStates =
+	{
+		LS_IDLE,
+		LS_TURN_LEFT_SLOW,
+		LS_TURN_RIGHT_SLOW,
+		LS_TURN_LEFT_FAST,
+		LS_TURN_RIGHT_FAST,
+		LS_WALK_FORWARD,
+		LS_RUN_FORWARD
+	};
+	const vector<int> LadderAirborneMountStates =
+	{
+		LS_REACH,
+		LS_JUMP_UP
+	};
+
+	auto LadderPos = Vector3i(0, 0, -CLICK(0.75f));
+	OBJECT_COLLISION_BOUNDS LadderBounds =
+	{
+		GameBoundingBox(
+			-CLICK(1), CLICK(1),
+			0, 0,
+			-CLICK(2), CLICK(2)
+		),
+		ANGLE(-10.0f), ANGLE(10.0f),
+		-LARA_GRAB_THRESHOLD, LARA_GRAB_THRESHOLD,
+		ANGLE(-10.0f), ANGLE(10.0f)
+	};
+
+	void LadderCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
+	{
+		auto& ladderItem = g_Level.Items[itemNumber];
+		auto& player = *GetLaraInfo(laraItem);
+
+		short deltaHeadingAngle = ladderItem.Pose.Orientation.y - laraItem->Pose.Orientation.y;
+		short angleBetweenPositions = ladderItem.Pose.Orientation.y - Geometry::GetOrientToPoint(laraItem->Pose.Position.ToVector3(), ladderItem.Pose.Position.ToVector3()).y;
+		bool isFacingLadder = abs(deltaHeadingAngle - angleBetweenPositions) < ANGLE(45.0f);
+
+		// Mount while grounded.
+		if (TrInput & IN_ACTION && isFacingLadder &&
+			TestState(laraItem->Animation.ActiveState, LadderGroundedMountStates) &&
+			player.Control.HandStatus == HandStatus::Free ||
+			(player.Control.IsMoving && player.InteractedItem == itemNumber))
+		{
+			if (TestLaraPosition(&LadderBounds, &ladderItem, laraItem))
+			{
+				if (MoveLaraPosition(&LadderPos, &ladderItem, laraItem))
+				{
+					SetAnimation(laraItem, LA_LADDER_MOUNT_BOTTOM);
+					player.Control.IsMoving = false;
+					player.Control.HandStatus = HandStatus::Busy;
+				}
+				else
+					player.InteractedItem = itemNumber;
+			}
+			else
+			{
+				if (player.Control.IsMoving && player.InteractedItem == itemNumber)
+				{
+					player.Control.IsMoving = false;
+					player.Control.HandStatus = HandStatus::Free;
+				}
+			}
+
+			return;
+		}
+
+		// Mount while airborne.
+		if (TrInput & IN_ACTION && isFacingLadder &&
+			TestState(laraItem->Animation.ActiveState, LadderAirborneMountStates) &&
+			laraItem->Animation.IsAirborne &&
+			laraItem->Animation.Velocity.y > 0.0f &&
+			player.Control.HandStatus == HandStatus::Free)
+		{
+			// Test bounds collision.
+			if (TestBoundsCollide(&ladderItem, laraItem, LARA_RADIUS + (int)round(abs(laraItem->Animation.Velocity.z))))
+			{
+				if (TestCollision(&ladderItem, laraItem))
+				{
+					// Reaching.
+					if (laraItem->Animation.ActiveState == LS_REACH)
+					{
+						auto bounds = GameBoundingBox(&ladderItem);
+						auto offset = Vector3i(
+							0,
+							bounds.Y1 - fmod(abs(bounds.Y1 - laraItem->Pose.Position.y), CLICK(1)),
+							0
+						);
+						AlignLaraPosition(&offset, &ladderItem, laraItem);
+						SetAnimation(laraItem, LA_LADDER_MOUNT_JUMP_REACH);
+					}
+					// Jumping up.
+					/*else
+					{
+
+					}*/
+
+					laraItem->Animation.IsAirborne = false;
+					laraItem->Animation.Velocity.y = 0.0f;
+					player.Control.HandStatus = HandStatus::Busy;
+				}
+			}
+
+			return;
+		}
+
+		// Player is not interacting with ladder; do regular object collision.
+		if (!TestState(laraItem->Animation.ActiveState, LadderMountedStates) &&
+			laraItem->Animation.ActiveState != LS_JUMP_BACK)
+		{
+			ObjectCollision(itemNumber, laraItem, coll);
+		}
+	}
+}

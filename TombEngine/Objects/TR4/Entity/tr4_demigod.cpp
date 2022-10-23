@@ -447,8 +447,8 @@ namespace TEN::Entities::TR4
 					}
 
 					if (AI.bite ||
-						LaraItem->Animation.ActiveState >= LS_LADDER_IDLE &&
-						LaraItem->Animation.ActiveState <= LS_LADDER_DOWN &&
+						LaraItem->Animation.ActiveState >= LS_WALL_CLIMB_IDLE &&
+						LaraItem->Animation.ActiveState <= LS_WALL_CLIMB_DOWN &&
 						!Lara.Location)
 					{
 						item->Animation.TargetState = DEMIGOD1_STATE_AIM;
@@ -669,8 +669,8 @@ namespace TEN::Entities::TR4
 
 				if (AI.distance >= pow(SECTOR(3), 2) ||
 					!AI.bite &&
-					(LaraItem->Animation.ActiveState < LS_LADDER_IDLE ||
-						LaraItem->Animation.ActiveState > LS_LADDER_DOWN ||
+					(LaraItem->Animation.ActiveState < LS_WALL_CLIMB_IDLE ||
+						LaraItem->Animation.ActiveState > LS_WALL_CLIMB_DOWN ||
 						Lara.Location))
 				{
 					item->Animation.TargetState = DEMIGOD_STATE_IDLE;
@@ -700,8 +700,8 @@ namespace TEN::Entities::TR4
 
 					// Lara is climbing a ladder; shake her off.
 					if (/*Lara.Control.IsClimbingLadder &&*/ // TODO: Try with only this line and include hang shimmy states.
-						LaraItem->Animation.ActiveState >= LS_LADDER_IDLE &&
-						LaraItem->Animation.ActiveState <= LS_LADDER_DOWN &&
+						LaraItem->Animation.ActiveState >= LS_WALL_CLIMB_IDLE &&
+						LaraItem->Animation.ActiveState <= LS_WALL_CLIMB_DOWN &&
 						!Lara.Location)
 					{
 						SetAnimation(LaraItem, LA_FALL_START);

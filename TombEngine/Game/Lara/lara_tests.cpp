@@ -158,8 +158,8 @@ bool TestLaraHang(ItemInfo* item, CollisionInfo* coll)
 
 			if (!TestLaraHangOnClimbableWall(item, coll))
 			{
-				if (item->Animation.AnimNumber != LA_LADDER_TO_HANG_RIGHT &&
-					item->Animation.AnimNumber != LA_LADDER_TO_HANG_LEFT)
+				if (item->Animation.AnimNumber != LA_WALL_CLIMB_TO_HANG_RIGHT &&
+					item->Animation.AnimNumber != LA_WALL_CLIMB_TO_HANG_LEFT)
 				{
 					LaraSnapToEdgeOfBlock(item, coll, GetQuadrant(item->Pose.Orientation.y));
 					item->Pose.Position.y = coll->Setup.OldPosition.y;
@@ -173,7 +173,7 @@ bool TestLaraHang(ItemInfo* item, CollisionInfo* coll)
 				if (((item->Animation.AnimNumber == LA_REACH_TO_HANG && item->Animation.FrameNumber == GetFrameNumber(item, 21)) || item->Animation.AnimNumber == LA_HANG_IDLE)  &&
 					TestLaraClimbIdle(item, coll))
 				{
-					item->Animation.TargetState = LS_LADDER_IDLE;
+					item->Animation.TargetState = LS_WALL_CLIMB_IDLE;
 				}
 			}
 		}
@@ -1054,7 +1054,7 @@ bool TestLaraLadderClimbOut(ItemInfo* item, CollisionInfo* coll) // NEW function
 	}
 
 	SetAnimation(item, LA_ONWATER_IDLE);
-	item->Animation.TargetState = LS_LADDER_IDLE;
+	item->Animation.TargetState = LS_WALL_CLIMB_IDLE;
 	AnimateLara(item);
 
 	item->Pose.Position.y -= 10; // Otherwise she falls back into the water.
@@ -2183,7 +2183,7 @@ bool TestAndDoLaraLadderClimb(ItemInfo* item, CollisionInfo* coll)
 	{
 		item->Animation.AnimNumber = LA_STAND_SOLID;
 		item->Animation.FrameNumber = GetFrameNumber(item, 0);
-		item->Animation.TargetState = LS_LADDER_IDLE;
+		item->Animation.TargetState = LS_WALL_CLIMB_IDLE;
 		item->Animation.ActiveState = LS_IDLE;
 		lara->Control.HandStatus = HandStatus::Busy;
 		lara->Control.TurnRate = 0;
@@ -2576,4 +2576,34 @@ bool TestLaraPoleDown(ItemInfo* item, CollisionInfo* coll)
 		return false;
 
 	return (coll->Middle.Floor > 0);
+}
+
+bool TestLaraLadderUp(ItemInfo* item, CollisionInfo* coll)
+{
+	return true;
+}
+
+bool TestLaraLadderDown(ItemInfo* item, CollisionInfo* coll)
+{
+	return true;
+}
+
+bool TestLaraLadderDismountTop(ItemInfo* item, CollisionInfo* coll)
+{
+	return true;
+}
+
+bool TestLaraLadderDismountBottom(ItemInfo* item, CollisionInfo* coll)
+{
+	return true;
+}
+
+bool TestLaraLadderDismountLeft(ItemInfo* item, CollisionInfo* coll)
+{
+	return true;
+}
+
+bool TestLaraLadderDismountRight(ItemInfo* item, CollisionInfo* coll)
+{
+	return true;
 }
