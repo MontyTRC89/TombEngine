@@ -24,6 +24,8 @@ using TEN::Renderer::g_Renderer;
 
 namespace TEN::Input
 {
+	constexpr int AXIS_DEADZONE = 8000;
+
 	const char* g_KeyNames[] =
 	{
 			"<None>",		"Esc",			"1",			"2",			"3",			"4",			"5",			"6",
@@ -69,8 +71,6 @@ namespace TEN::Input
 			"Joy LT",		"Joy LT",		"Joy RT",		"Joy RT",		"D-Pad Up",		"D-Pad Down",	"D-Pad Left",	"D-Pad Right"
 	};
 
-	constexpr int AXIS_DEADZONE = 8000;
-
 	// OIS interfaces
 	InputManager*  oisInputManager = nullptr;
 	Keyboard*	   oisKeyboard	   = nullptr;
@@ -78,16 +78,14 @@ namespace TEN::Input
 	ForceFeedback* oisRumble	   = nullptr;
 	Effect*		   oisEffect	   = nullptr;
 
-	// Rumble functionality
-	RumbleData rumbleData = {};
-
 	// Globals
-	vector<InputAction>	 ActionMap;
-	vector<bool>		 KeyMap;
-	vector<float>		 AxisMap;
+	RumbleData			RumbleInfo = {};
+	vector<InputAction>	ActionMap  = {};
+	vector<bool>		KeyMap	   = {};
+	vector<float>		AxisMap    = {};
 
-	int DbInput;
-	int TrInput;
+	int DbInput = 0;
+	int TrInput = 0;
 
 	vector<int>DefaultBindings =
 	{
@@ -120,12 +118,12 @@ namespace TEN::Input
 		oisEffect->replay_delay = 0;
 		oisEffect->setNumAxes(1);
 
-		auto* pConstForce = dynamic_cast<ConstantEffect*>(oisEffect->getForceEffect());
-		pConstForce->level = 0;
-		pConstForce->envelope.attackLength = 0;
-		pConstForce->envelope.attackLevel = 0;
-		pConstForce->envelope.fadeLength = 0;
-		pConstForce->envelope.fadeLevel = 0;
+		auto& pConstForce = *dynamic_cast<ConstantEffect*>(oisEffect->getForceEffect());
+		pConstForce.level = 0;
+		pConstForce.envelope.attackLength = 0;
+		pConstForce.envelope.attackLevel = 0;
+		pConstForce.envelope.fadeLength = 0;
+		pConstForce.envelope.fadeLevel = 0;
 	}
 
 	void InitializeInput(HWND handle)
@@ -138,7 +136,7 @@ namespace TEN::Input
 		KeyMap.resize(MAX_INPUT_SLOTS);
 		AxisMap.resize(InputAxis::Count);
 
-		rumbleData = {};
+		RumbleInfo = {};
 
 		try
 		{
@@ -261,26 +259,26 @@ namespace TEN::Input
 
 		try
 		{
-			// Poll gamepad
+			// Poll gamepad.
 			oisGamepad->capture();
 			const JoyStickState& state = oisGamepad->getJoyStickState();
 
-			// Scan buttons
+			// Scan buttons.
 			for (int key = 0; key < state.mButtons.size(); key++)
 				KeyMap[MAX_KEYBOARD_KEYS + key] = state.mButtons[key];
 
-			// Scan axes
+			// Scan axes.
 			for (int axis = 0; axis < state.mAxes.size(); axis++)
 			{
-				// We don't support anything above 6 existing XBOX/PS controller axes (two sticks plus triggers)
+				// We don't support anything above 6 existing XBOX/PS controller axes (two sticks plus triggers).
 				if (axis >= MAX_GAMEPAD_AXES)
 					break;
 
-				// Filter out deadzone
+				// Filter out deadzone.
 				if (abs(state.mAxes[axis].abs) < AXIS_DEADZONE)
 					continue;
 
-				// Calculate raw normalized analog value (for camera)
+				// Calculate raw normalized analog value (for camera).
 				float normalizedValue = (float)(state.mAxes[axis].abs + (state.mAxes[axis].abs > 0 ? -AXIS_DEADZONE : AXIS_DEADZONE))
 					/ (float)(std::numeric_limits<short>::max() - AXIS_DEADZONE);
 
@@ -288,13 +286,13 @@ namespace TEN::Input
 				// Minimum value of 0.2f and maximum value of 1.7f is empirically the most organic rate from tests.
 				float scaledValue = abs(normalizedValue) * 1.5f + 0.2f;
 
-				// Calculate and reset discrete input slots
+				// Calculate and reset discrete input slots.
 				unsigned int negKeyIndex = MAX_KEYBOARD_KEYS + MAX_GAMEPAD_KEYS + (axis * 2);
 				unsigned int posKeyIndex = MAX_KEYBOARD_KEYS + MAX_GAMEPAD_KEYS + (axis * 2) + 1;
 				KeyMap[negKeyIndex] = false;
 				KeyMap[posKeyIndex] = false;
 
-				// Decide on the discrete input registering based on analog value
+				// Decide on the discrete input registering based on analog value.
 				unsigned int usedIndex = normalizedValue > 0 ? negKeyIndex : posKeyIndex;
 				KeyMap[usedIndex] = true;
 
@@ -320,15 +318,15 @@ namespace TEN::Input
 				}
 			}
 
-			// Scan POVs (controllers usually have one, but let's scan all of them for paranoia)
+			// Scan POVs (controllers usually have one, but scan all out of paranoia).
 			for (int pov = 0; pov < 4; pov++)
 			{
 				if (state.mPOV[pov].direction == Pov::Centered)
 					continue;
 
 				// Do 4 passes; every pass checks every POV direction. For every direction,
-				// separate keypress is registered. This is needed to allow multiple directions
-				// pressed at the same time.
+				// separate keypress is registered.
+				// This is needed to allow multiple directions  pressed at the same time.
 				for (int pass = 0; pass < 4; pass++)
 				{
 					unsigned int index = MAX_KEYBOARD_KEYS + MAX_GAMEPAD_KEYS + MAX_GAMEPAD_AXES * 2;
@@ -387,7 +385,7 @@ namespace TEN::Input
 
 				KeyMap[i] = true;
 
-				// Register directional discrete keypresses as max analog axis values
+				// Register directional discrete keypresses as max analog axis values.
 				SetDiscreteAxisValues(i);
 			}
 		}
@@ -396,21 +394,6 @@ namespace TEN::Input
 			TENLog("Unable to poll keyboard input: " + std::string(ex.eText), LogLevel::Warning);
 		}
 	}
-
-	// TODO!!!
-	//bool GetActionBindingState(ActionID actionID)
-	//{
-	//	for (int binding : ActionMap[(int)actionID].GetBindings())
-	//	{
-	//		if (KeyMap[binding])
-	//			return true;
-
-	//		// Mirrorings...
-	//		// Conflicts...
-	//	}
-
-	//	return false;
-	//}
 
 	bool Key(int number)
 	{
@@ -586,17 +569,17 @@ namespace TEN::Input
 
 	void UpdateRumble()
 	{
-		if (!oisRumble || !oisEffect || !rumbleData.Power)
+		if (!oisRumble || !oisEffect || !RumbleInfo.Power)
 			return;
 
-		rumbleData.Power -= rumbleData.FadeSpeed;
+		RumbleInfo.Power -= RumbleInfo.FadeSpeed;
 
 		// Don't update effect too frequently if its value hasn't changed much.
-		if (rumbleData.Power >= 0.2f &&
-			rumbleData.LastPower - rumbleData.Power < 0.1f)
+		if (RumbleInfo.Power >= 0.2f &&
+			RumbleInfo.LastPower - RumbleInfo.Power < 0.1f)
 			return;
 
-		if (rumbleData.Power <= 0.0f)
+		if (RumbleInfo.Power <= 0.0f)
 		{
 			StopRumble();
 			return;
@@ -604,10 +587,10 @@ namespace TEN::Input
 
 		try
 		{
-			auto* force = dynamic_cast<ConstantEffect*>(oisEffect->getForceEffect());
-			force->level = rumbleData.Power * 10000;
+			auto& force = *dynamic_cast<ConstantEffect*>(oisEffect->getForceEffect());
+			force.level = RumbleInfo.Power * 10000;
 
-			switch (rumbleData.Mode)
+			switch (RumbleInfo.Mode)
 			{
 			case RumbleMode::Left:
 				oisEffect->direction = Effect::EDirection::West;
@@ -629,7 +612,7 @@ namespace TEN::Input
 			TENLog("Error updating vibration effect: " + std::string(ex.eText), LogLevel::Error);
 		}
 
-		rumbleData.LastPower = rumbleData.Power;
+		RumbleInfo.LastPower = RumbleInfo.Power;
 	}
 
 	void UpdateInputActions(ItemInfo* item)
@@ -677,12 +660,12 @@ namespace TEN::Input
 
 		power = std::clamp(power, 0.0f, 1.0f);
 
-		if (power == 0.0f || rumbleData.Power)
+		if (power == 0.0f || RumbleInfo.Power)
 			return;
 
-		rumbleData.FadeSpeed = power / (delayInSec * (float)FPS);
-		rumbleData.Power = power + rumbleData.FadeSpeed;
-		rumbleData.LastPower = rumbleData.Power;
+		RumbleInfo.FadeSpeed = power / (delayInSec * (float)FPS);
+		RumbleInfo.Power = power + RumbleInfo.FadeSpeed;
+		RumbleInfo.LastPower = RumbleInfo.Power;
 	}
 
 	void StopRumble()
@@ -693,7 +676,7 @@ namespace TEN::Input
 		try { oisRumble->remove(oisEffect); }
 		catch (OIS::Exception& ex) { TENLog("Error when stopping vibration effect: " + std::string(ex.eText), LogLevel::Error); }
 
-		rumbleData = {};
+		RumbleInfo = {};
 	}
 
 	void ClearAction(ActionID actionID)
