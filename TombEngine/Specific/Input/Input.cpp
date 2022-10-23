@@ -550,6 +550,12 @@ namespace TEN::Input
 		}
 		dbMedipack = (KeyMap[KC_MINUS] || KeyMap[KC_EQUALS]) ? false : true;
 
+		// Handle saying "no".
+		static bool dbNo = true;
+		if (KeyMap[KC_N] && dbNo)
+			SayNo();
+		dbNo = KeyMap[KC_N] ? false : true;
+
 		// Toggle fullscreen.
 		static bool dbFullscreen = true;
 		if ((KeyMap[KC_LMENU] || KeyMap[KC_RMENU]) && KeyMap[KC_RETURN] && dbFullscreen)
