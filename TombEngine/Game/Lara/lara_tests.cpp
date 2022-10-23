@@ -2590,20 +2590,20 @@ bool TestLaraLadderDown(ItemInfo* item, CollisionInfo* coll)
 
 bool TestLaraLadderDismountTop(ItemInfo* item, CollisionInfo* coll)
 {
-	return true;
+	return false;
 }
 
 bool TestLaraLadderDismountBottom(ItemInfo* item, CollisionInfo* coll)
 {
-	return true;
+	return false;
 }
 
 bool TestLaraLadderDismountLeft(ItemInfo* item, CollisionInfo* coll)
 {
-	return true;
+	return false;
 }
 
 bool TestLaraLadderDismountRight(ItemInfo* item, CollisionInfo* coll)
 {
-	return true;
+	return false;
 }
