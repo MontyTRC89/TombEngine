@@ -2595,12 +2595,17 @@ bool TestLaraLadderDismountTop(ItemInfo* item, CollisionInfo* coll)
 
 bool TestLaraLadderDismountBottom(ItemInfo* item, CollisionInfo* coll)
 {
-	int vPos = item->Pose.Position.y;
+	static const int dismountFloorBound = CLICK(0.5f);
+
+	auto lFootHeight = GetJointPosition(item, LM_LFOOT).y;
+	auto rFootHeight = GetJointPosition(item, LM_RFOOT).y;
+
+	int vPos = item->Pose.Position.y + (std::max(lFootHeight, rFootHeight) - item->Pose.Position.y);
 	auto pointColl = GetCollision(item);
 
 	// Assess point collision.
-	if (abs(pointColl.Position.Floor - vPos) <= CLICK(1) &&
-		!pointColl.Position.FloorSlope)
+	if (abs(pointColl.Position.Floor - vPos) <= dismountFloorBound && // Floor height is within dismount height bound.
+		!pointColl.Position.FloorSlope)								  // Avoid slopes.
 	{
 		return true;
 	}
@@ -2608,7 +2613,7 @@ bool TestLaraLadderDismountBottom(ItemInfo* item, CollisionInfo* coll)
 	return false;
 }
 
-bool TestLaraLadderDismount(ItemInfo* item, CollisionInfo* coll, bool isGoingLeft)
+bool TestLaraLadderSideDismount(ItemInfo* item, CollisionInfo* coll, bool isGoingLeft)
 {
 	static const int dismountDist		= CLICK(1.5f);
 	static const int dismountFloorBound = CLICK(0.25f);
@@ -2617,7 +2622,7 @@ bool TestLaraLadderDismount(ItemInfo* item, CollisionInfo* coll, bool isGoingLef
 	auto pointColl = GetCollision(item, item->Pose.Orientation.y + (isGoingLeft ? -ANGLE(90.0f) : ANGLE(90.0f)), dismountDist);
 
 	// Assess point collision.
-	if (abs(pointColl.Position.Floor - vPos) <= dismountFloorBound &&				// Floor height is within upper/lower floor bound.
+	if (abs(pointColl.Position.Floor - vPos) <= dismountFloorBound &&				// Floor height is within dismount height bound.
 		abs(pointColl.Position.Ceiling - pointColl.Position.Floor) > LARA_HEIGHT && // Space isn't too narrow.
 		!pointColl.Position.FloorSlope)												// Avoid slopes.
 	{
@@ -2629,11 +2634,11 @@ bool TestLaraLadderDismount(ItemInfo* item, CollisionInfo* coll, bool isGoingLef
 bool TestLaraLadderDismountLeft(ItemInfo* item, CollisionInfo* coll)
 {
 	return false;
-	TestLaraLadderDismount(item, coll, true);
+	TestLaraLadderSideDismount(item, coll, true);
 }
 
 bool TestLaraLadderDismountRight(ItemInfo* item, CollisionInfo* coll)
 {
 	return false;
-	TestLaraLadderDismount(item, coll, false);
+	TestLaraLadderSideDismount(item, coll, false);
 }
