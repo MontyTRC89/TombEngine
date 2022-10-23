@@ -72,11 +72,11 @@ namespace TEN::Input
 	};
 
 	// OIS interfaces
-	InputManager*  oisInputManager = nullptr;
-	Keyboard*	   oisKeyboard	   = nullptr;
-	JoyStick*	   oisGamepad	   = nullptr;
-	ForceFeedback* oisRumble	   = nullptr;
-	Effect*		   oisEffect	   = nullptr;
+	InputManager*  OisInputManager = nullptr;
+	Keyboard*	   OisKeyboard	   = nullptr;
+	JoyStick*	   OisGamepad	   = nullptr;
+	ForceFeedback* OisRumble	   = nullptr;
+	Effect*		   OisEffect	   = nullptr;
 
 	// Globals
 	RumbleData			RumbleInfo = {};
@@ -110,15 +110,15 @@ namespace TEN::Input
 
 	void InitialiseEffect()
 	{
-		oisEffect = new Effect(Effect::ConstantForce, Effect::Constant);
-		oisEffect->direction = Effect::North;
-		oisEffect->trigger_button = 0;
-		oisEffect->trigger_interval = 0;
-		oisEffect->replay_length = Effect::OIS_INFINITE;
-		oisEffect->replay_delay = 0;
-		oisEffect->setNumAxes(1);
+		OisEffect = new Effect(Effect::ConstantForce, Effect::Constant);
+		OisEffect->direction = Effect::North;
+		OisEffect->trigger_button = 0;
+		OisEffect->trigger_interval = 0;
+		OisEffect->replay_length = Effect::OIS_INFINITE;
+		OisEffect->replay_delay = 0;
+		OisEffect->setNumAxes(1);
 
-		auto& pConstForce = *dynamic_cast<ConstantEffect*>(oisEffect->getForceEffect());
+		auto& pConstForce = *dynamic_cast<ConstantEffect*>(OisEffect->getForceEffect());
 		pConstForce.level = 0;
 		pConstForce.envelope.attackLength = 0;
 		pConstForce.envelope.attackLevel = 0;
@@ -140,32 +140,32 @@ namespace TEN::Input
 
 		try
 		{
-			oisInputManager = InputManager::createInputSystem((int)handle);
-			oisInputManager->enableAddOnFactory(InputManager::AddOn_All);
+			OisInputManager = InputManager::createInputSystem((int)handle);
+			OisInputManager->enableAddOnFactory(InputManager::AddOn_All);
 
-			if (oisInputManager->getNumberOfDevices(OISKeyboard) == 0)
+			if (OisInputManager->getNumberOfDevices(OISKeyboard) == 0)
 				TENLog("Keyboard not found!", LogLevel::Warning);
 			else
-				oisKeyboard = (Keyboard*)oisInputManager->createInputObject(OISKeyboard, true);
+				OisKeyboard = (Keyboard*)OisInputManager->createInputObject(OISKeyboard, true);
 		}
 		catch (OIS::Exception& ex)
 		{
 			TENLog("An exception occured during input system init: " + std::string(ex.eText), LogLevel::Error);
 		}
 
-		int numDevices = oisInputManager->getNumberOfDevices(OISJoyStick);
+		int numDevices = OisInputManager->getNumberOfDevices(OISJoyStick);
 		if (numDevices > 0)
 		{
 			TENLog("Found " + std::to_string(numDevices) + " connected game controller" + (numDevices > 1 ? "s." : "."), LogLevel::Info);
 
 			try
 			{
-				oisGamepad = (JoyStick*)oisInputManager->createInputObject(OISJoyStick, true);
-				TENLog("Using '" + oisGamepad->vendor() + "' device for input.", LogLevel::Info);
+				OisGamepad = (JoyStick*)OisInputManager->createInputObject(OISJoyStick, true);
+				TENLog("Using '" + OisGamepad->vendor() + "' device for input.", LogLevel::Info);
 
 				// Try to initialise vibration interface
-				oisRumble = (ForceFeedback*)oisGamepad->queryInterface(Interface::ForceFeedback);
-				if (oisRumble)
+				OisRumble = (ForceFeedback*)OisGamepad->queryInterface(Interface::ForceFeedback);
+				if (OisRumble)
 				{
 					TENLog("Controller supports vibration.", LogLevel::Info);
 					InitialiseEffect();
@@ -180,19 +180,19 @@ namespace TEN::Input
 
 	void DeinitializeInput()
 	{
-		if (oisKeyboard)
-			oisInputManager->destroyInputObject(oisKeyboard);
+		if (OisKeyboard)
+			OisInputManager->destroyInputObject(OisKeyboard);
 
-		if (oisGamepad)
-			oisInputManager->destroyInputObject(oisGamepad);
+		if (OisGamepad)
+			OisInputManager->destroyInputObject(OisGamepad);
 
-		if (oisEffect)
+		if (OisEffect)
 		{
-			delete oisEffect;
-			oisEffect = nullptr;
+			delete OisEffect;
+			OisEffect = nullptr;
 		}
 
-		InputManager::destroyInputSystem(oisInputManager);
+		InputManager::destroyInputSystem(OisInputManager);
 	}
 
 	void ClearInputData()
@@ -254,14 +254,14 @@ namespace TEN::Input
 
 	void ReadGameController()
 	{
-		if (!oisGamepad)
+		if (!OisGamepad)
 			return;
 
 		try
 		{
 			// Poll gamepad.
-			oisGamepad->capture();
-			const JoyStickState& state = oisGamepad->getJoyStickState();
+			OisGamepad->capture();
+			const JoyStickState& state = OisGamepad->getJoyStickState();
 
 			// Scan buttons.
 			for (int key = 0; key < state.mButtons.size(); key++)
@@ -368,16 +368,16 @@ namespace TEN::Input
 
 	void ReadKeyboard()
 	{
-		if (!oisKeyboard)
+		if (!OisKeyboard)
 			return;
 
 		try
 		{
-			oisKeyboard->capture();
+			OisKeyboard->capture();
 
 			for (int i = 0; i < MAX_KEYBOARD_KEYS; i++)
 			{
-				if (!oisKeyboard->isKeyDown((KeyCode)i))
+				if (!OisKeyboard->isKeyDown((KeyCode)i))
 				{
 					KeyMap[i] = false;
 					continue;
@@ -575,7 +575,7 @@ namespace TEN::Input
 
 	void UpdateRumble()
 	{
-		if (!oisRumble || !oisEffect || !RumbleInfo.Power)
+		if (!OisRumble || !OisEffect || !RumbleInfo.Power)
 			return;
 
 		RumbleInfo.Power -= RumbleInfo.FadeSpeed;
@@ -593,25 +593,25 @@ namespace TEN::Input
 
 		try
 		{
-			auto& force = *dynamic_cast<ConstantEffect*>(oisEffect->getForceEffect());
+			auto& force = *dynamic_cast<ConstantEffect*>(OisEffect->getForceEffect());
 			force.level = RumbleInfo.Power * 10000;
 
 			switch (RumbleInfo.Mode)
 			{
 			case RumbleMode::Left:
-				oisEffect->direction = Effect::EDirection::West;
+				OisEffect->direction = Effect::EDirection::West;
 				break;
 
 			case RumbleMode::Right:
-				oisEffect->direction = Effect::EDirection::East;
+				OisEffect->direction = Effect::EDirection::East;
 				break;
 
 			case RumbleMode::Both:
-				oisEffect->direction = Effect::EDirection::North;
+				OisEffect->direction = Effect::EDirection::North;
 				break;
 			}
 
-			oisRumble->upload(oisEffect);
+			OisRumble->upload(OisEffect);
 		}
 		catch (OIS::Exception& ex)
 		{
@@ -676,10 +676,10 @@ namespace TEN::Input
 
 	void StopRumble()
 	{
-		if (!oisRumble || !oisEffect)
+		if (!OisRumble || !OisEffect)
 			return;
 
-		try { oisRumble->remove(oisEffect); }
+		try { OisRumble->remove(OisEffect); }
 		catch (OIS::Exception& ex) { TENLog("Error when stopping vibration effect: " + std::string(ex.eText), LogLevel::Error); }
 
 		RumbleInfo = {};
