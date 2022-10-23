@@ -97,8 +97,8 @@ void RumbleScreen();
 bool TestBoundsCollideCamera(BOUNDING_BOX* bounds, PHD_3DPOS* pos, short radius);
 void ItemPushCamera(BOUNDING_BOX* bounds, PHD_3DPOS* pos, short radius);
 void ItemsCollideCamera();
-void ObjCamera(ItemInfo* CamSlotId, int CamMeshID, ItemInfo* TargetItem, int TargetMeshID, bool cond);
-void MoveObjCamera(GameVector* ideal, ItemInfo* CamSlotId, int CamMeshID, ItemInfo* TargetItem, int TargetMeshID);
+void ObjCamera(ItemInfo* camSlotId, int camMeshID, ItemInfo* targetItem, int targetMeshID, bool cond);
+void MoveObjCamera(GameVector* ideal, ItemInfo* camSlotId, int camMeshID, ItemInfo* targetItem, int targetMeshID);
 
 void SetScreenFadeOut(float speed);
 void SetScreenFadeIn(float speed);

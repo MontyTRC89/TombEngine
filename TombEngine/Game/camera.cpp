@@ -63,15 +63,15 @@ int UseForcedFixedCamera;
 int LastAnglex;
 int LastAngley;
 int LastAnglez;
-ItemInfo* CamSlotId;
-int CamMeshId;
+ItemInfo* camSlotId;
+int camMeshId;
 ItemInfo* TargetSlotId;
-int TargetMeshId;
+int targetMeshId;
 bool cond;
 
 int BinocularRange;
 bool BinocularOn;
-bool ItemCameraOn;   //T
+bool ItemCameraOn;   
 CameraType BinocularOldCamera;
 bool LaserSight;
 
@@ -333,44 +333,39 @@ void MoveCamera(GameVector* ideal, int speed)
 }
 
 
-void ObjCamera(ItemInfo* CamSlotId, int CamMeshID, ItemInfo* TargetItem, int TargetMeshID, bool cond)
+void ObjCamera(ItemInfo* camSlotId, int camMeshId, ItemInfo* targetItem, int targetMeshId, bool cond)
 {
-	GameVector from, to;
-
-	//CamSlotId and TargetItem stay the same object until I know how to expand TargetItem to another object
-	//activates code below ->  void CalculateCamera()
+	//camSlotId and targetItem stay the same object until I know how to expand targetItem to another object.
+	//activates code below ->  void CalculateCamera().
 	ItemCameraOn = cond;
 	
 	UpdateCameraElevation();
 	
 	int moveSpeed = 1;
-	//get mesh 0 coordinates
+	//get mesh 0 coordinates.
 	auto pos = Vector3Int::Zero;
-	GetJointAbsPosition(CamSlotId, &pos, 0);
+	GetJointAbsPosition(camSlotId, &pos, 0);
 	auto dest = Vector3(pos.x, pos.y, pos.z);
 
-	from = GameVector(dest, CamSlotId->RoomNumber);
+	GameVector from = GameVector(dest, camSlotId->RoomNumber);
 	Camera.fixedCamera = true;
 
-	MoveObjCamera(&from, CamSlotId, CamMeshID, TargetItem, TargetMeshID);
+	MoveObjCamera(&from, camSlotId, camMeshId, targetItem, targetMeshId);
 			Camera.timer = -1;
 }
 
 
-void MoveObjCamera(GameVector* ideal, ItemInfo* CamSlotId, int CamMeshID, ItemInfo* TargetItem, int TargetMeshID)
+void MoveObjCamera(GameVector* ideal, ItemInfo* camSlotId, int camMeshId, ItemInfo* targetItem, int targetMeshId)
  {
-	GameVector from, to;
-		
 	int	speed = 1;
 		//Get mesh1 to attach camera to
 	auto pos = Vector3Int::Zero;
-	GetJointAbsPosition(CamSlotId, &pos, CamMeshID);
+	GetJointAbsPosition(camSlotId, &pos, camMeshId);
 		//Get mesh2 to attach target to
 	auto pos2 = Vector3Int::Zero;
-	GetJointAbsPosition(TargetItem, &pos2, TargetMeshID);
+	GetJointAbsPosition(targetItem, &pos2, targetMeshId);
 
-	if (
-		OldCam.pos.Position.x != pos.x ||
+	if (OldCam.pos.Position.x != pos.x ||
 		OldCam.pos.Position.y != pos.y ||
 		OldCam.pos.Position.z != pos.z ||
 		OldCam.targetDistance != Camera.targetDistance ||
@@ -400,7 +395,7 @@ void MoveObjCamera(GameVector* ideal, ItemInfo* CamSlotId, int CamMeshID, ItemIn
 		LastTarget.x = pos2.x;
 		LastTarget.y = pos2.y;
 		LastTarget.z = pos2.z;
-			 }
+	}
 	else
 	{
 		pos.x = LastIdeal.x;
@@ -445,15 +440,12 @@ void MoveObjCamera(GameVector* ideal, ItemInfo* CamSlotId, int CamMeshID, ItemIn
 
 	if (LastAnglex != anglex ||
 		LastAngley != angley ||
-		LastAnglez != anglez
-		)
+		LastAnglez != anglez)
 	{
 		LastAnglex = anglex;
 		LastAngley = angley;
 		LastAnglez = anglez;
-	}
-	
-	
+	}		
 }
 
 
@@ -1554,17 +1546,12 @@ void CalculateCamera()
 		BinocularCamera(LaraItem);
 		return;
 	}
-
 	
-
 	if (ItemCameraOn == true)
 	{
 		return;
 	}
-		
-	
-
-
+			
 	if (UseForcedFixedCamera != 0)
 	{
 		Camera.type = CameraType::Fixed;

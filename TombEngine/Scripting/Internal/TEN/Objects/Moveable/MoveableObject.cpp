@@ -442,7 +442,7 @@ ScriptReserved_GetSlotHP, & Moveable::GetSlotHP,
 	ScriptReserved_Destroy, &Moveable::Destroy,
 
 /// Attach camera to an object.
-// @function Moveable:mesh 1 for camera, mesh 2 for target
+// @function Moveable:mesh 1 for camera, mesh 2 for target.
 	ScriptReserved_AttachCamera, & Moveable::AttachCamera);
 }
 
@@ -1023,10 +1023,10 @@ bool Moveable::MeshExists(int index) const
 	return true;
 }
 
-void  Moveable::AttachCamera(short CamMeshId, short TargetMeshId)
+void  Moveable::AttachCamera(short camMeshId, short targetMeshId)
 {
 	if (m_item->Active)
 	{
-		ObjCamera(m_item, CamMeshId, m_item, TargetMeshId, true);
+		ObjCamera(m_item, camMeshId, m_item, targetMeshId, true);
 	}
 }

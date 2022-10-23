@@ -12,6 +12,7 @@
 #include "Specific/configuration.h"
 #include "Specific/input.h"
 #include "Game/room.h"
+#include "Specific/level.h"
 
 /***
 Functions that don't fit in the other modules.
@@ -188,15 +189,15 @@ namespace Misc
 	}
 
 	/// Reset object camera back to Lara and deactivate object camera
-	//  ObjCamera @tparam CamSlotId 0 for Lara
+	//  ObjCamera @tparam camSlotId 0 for Lara
 	//  ObjCamera @tparam Mesh 0 for Laras hip mesh
-	//  ObjCamera @tparam CamSlotId 0 for Lara
+	//  ObjCamera @tparam camSlotId 0 for Lara
 	//  ObjCamera @tparam bool false to deactivate object camera
 	static void ResetObjCamera()
 	{
 		int itemNumber1 = 0;
-		ItemInfo* CamSlotId = &g_Level.Items[itemNumber1];
-		ObjCamera(CamSlotId, 0, CamSlotId, 0, false);
+		ItemInfo* camSlotId = &g_Level.Items[itemNumber1];
+		ObjCamera(camSlotId, 0, camSlotId, 0, false);
 	}
 
 	///Calculate the distance between two positions.
