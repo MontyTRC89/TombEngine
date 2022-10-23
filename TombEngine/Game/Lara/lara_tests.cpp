@@ -2595,15 +2595,45 @@ bool TestLaraLadderDismountTop(ItemInfo* item, CollisionInfo* coll)
 
 bool TestLaraLadderDismountBottom(ItemInfo* item, CollisionInfo* coll)
 {
+	int vPos = item->Pose.Position.y;
+	auto pointColl = GetCollision(item);
+
+	// Assess point collision.
+	if (abs(pointColl.Position.Floor - vPos) <= CLICK(1) &&
+		!pointColl.Position.FloorSlope)
+	{
+		return true;
+	}
+
 	return false;
 }
 
+bool TestLaraLadderDismount(ItemInfo* item, CollisionInfo* coll, bool isGoingLeft)
+{
+	static const int dismountDist		= CLICK(1.5f);
+	static const int dismountFloorBound = CLICK(0.25f);
+
+	int vPos = item->Pose.Position.y;
+	auto pointColl = GetCollision(item, item->Pose.Orientation.y + (isGoingLeft ? -ANGLE(90.0f) : ANGLE(90.0f)), dismountDist);
+
+	// Assess point collision.
+	if (abs(pointColl.Position.Floor - vPos) <= dismountFloorBound &&				// Floor height is within upper/lower floor bound.
+		abs(pointColl.Position.Ceiling - pointColl.Position.Floor) > LARA_HEIGHT && // Space isn't too narrow.
+		!pointColl.Position.FloorSlope)												// Avoid slopes.
+	{
+		return true;
+	}
+
+	return false;
+}
 bool TestLaraLadderDismountLeft(ItemInfo* item, CollisionInfo* coll)
 {
 	return false;
+	TestLaraLadderDismount(item, coll, true);
 }
 
 bool TestLaraLadderDismountRight(ItemInfo* item, CollisionInfo* coll)
 {
 	return false;
+	TestLaraLadderDismount(item, coll, false);
 }

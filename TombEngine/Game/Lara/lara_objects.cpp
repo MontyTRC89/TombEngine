@@ -727,7 +727,7 @@ void lara_as_ladder_idle(ItemInfo* item, CollisionInfo* coll)
 
 	if (item->HitPoints <= 0)
 	{
-		item->Animation.TargetState = LS_DEATH;
+		item->Animation.TargetState = LS_FREEFALL;
 		return;
 	}
 
@@ -751,13 +751,9 @@ void lara_as_ladder_idle(ItemInfo* item, CollisionInfo* coll)
 
 			return;
 		}
-		else if (TrInput & IN_BACK)
+		else if (TrInput & IN_BACK && TestLaraLadderDown(item, coll))
 		{
-			if (TestLaraLadderDismountBottom(item, coll))
-				item->Animation.TargetState = LS_LADDER_DISMOUNT_BOTTOM;
-			else if (TestLaraLadderDown(item, coll))
-				item->Animation.TargetState = LS_LADDER_DOWN;
-
+			item->Animation.TargetState = LS_LADDER_DOWN;
 			return;
 		}
 
@@ -777,13 +773,16 @@ void lara_as_ladder_idle(ItemInfo* item, CollisionInfo* coll)
 	}
 
 	if (TestLaraLadderDismountBottom(item, coll))
+	{
 		item->Animation.TargetState = LS_LADDER_DISMOUNT_BOTTOM;
-	else
-		item->Animation.TargetState = LS_FREEFALL;
+		return;
+	}
+	
+	item->Animation.TargetState = LS_FREEFALL;
 }
 
-// State:	  LS_LADDER_IDLE (174)
-// Collision: lara_as_ladder_idle()
+// State:	LS_LADDER_IDLE (174)
+// Control: lara_as_ladder_idle()
 void lara_col_ladder_idle(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
@@ -797,8 +796,8 @@ void lara_col_ladder_idle(ItemInfo* item, CollisionInfo* coll)
 	GetCollisionInfo(coll, item);
 }
 
-// State:	LS_LADDER_UP (175)
-// Control: lara_col_ladder_up()
+// State:	  LS_LADDER_UP (175)
+// Collision: lara_col_ladder_up()
 void lara_as_ladder_up(ItemInfo* item, CollisionInfo* coll)
 {
 	coll->Setup.EnableSpasm = false;
@@ -812,6 +811,12 @@ void lara_as_ladder_up(ItemInfo* item, CollisionInfo* coll)
 
 	if (TrInput & IN_ACTION)
 	{
+		if (TrInput & IN_JUMP)
+		{
+			item->Animation.TargetState = LS_LADDER_IDLE;
+			return;
+		}
+
 		if (TrInput & IN_FORWARD)
 		{
 			if (TestLaraLadderDismountTop(item, coll))
@@ -829,8 +834,8 @@ void lara_as_ladder_up(ItemInfo* item, CollisionInfo* coll)
 	item->Animation.TargetState = LS_LADDER_IDLE;
 }
 
-// State:	  LS_LADDER_UP (175)
-// Collision: lara_as_ladder_up()
+// State:	LS_LADDER_UP (175)
+// Control: lara_as_ladder_up()
 void lara_col_ladder_up(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
@@ -844,8 +849,8 @@ void lara_col_ladder_up(ItemInfo* item, CollisionInfo* coll)
 	GetCollisionInfo(coll, item);
 }
 
-// State:	LS_LADDER_DOWN (176)
-// Control: lara_col_ladder_down()
+// State:	  LS_LADDER_DOWN (176)
+// Collisiom: lara_col_ladder_down()
 void lara_as_ladder_down(ItemInfo* item, CollisionInfo* coll)
 {
 	coll->Setup.EnableSpasm = false;
@@ -859,6 +864,12 @@ void lara_as_ladder_down(ItemInfo* item, CollisionInfo* coll)
 
 	if (TrInput & IN_ACTION)
 	{
+		if (TrInput & IN_JUMP)
+		{
+			item->Animation.TargetState = LS_LADDER_IDLE;
+			return;
+		}
+
 		if (TrInput & IN_BACK)
 		{
 			if (TestLaraLadderDismountBottom(item, coll))
@@ -876,8 +887,8 @@ void lara_as_ladder_down(ItemInfo* item, CollisionInfo* coll)
 	item->Animation.TargetState = LS_LADDER_IDLE;
 }
 
-// State:	  LS_LADDER_DOWN (176)
-// Collision: lara_as_ladder_down()
+// State:	LS_LADDER_DOWN (176)
+// Control: lara_as_ladder_down()
 void lara_col_ladder_down(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
