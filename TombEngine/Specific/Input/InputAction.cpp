@@ -38,6 +38,11 @@ namespace TEN::Input
 		return ((Value != 0.0f) && (PrevValue == 0.0f));
 	}
 
+	bool InputAction::IsHeld() const
+	{
+		return (Value != 0.0f);
+	}
+
 	// To avoid desync on the second pulse, ensure initialDelayInSec is a multiple of delayInSec.
 	bool InputAction::IsPulsed(float delayInSec, float initialDelayInSec) const
 	{
@@ -63,11 +68,6 @@ namespace TEN::Input
 			return true;*/
 
 		return false;
-	}
-
-	bool InputAction::IsHeld() const
-	{
-		return (Value != 0.0f);
 	}
 
 	bool InputAction::IsReleased(float maxDelayInSec) const

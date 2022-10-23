@@ -721,14 +721,14 @@ namespace TEN::Input
 		return ActionMap[(int)actionID].IsClicked();
 	}
 
-	bool IsPulsed(ActionID actionID, float delayInSec, float initialDelayInSec)
-	{
-		return ActionMap[(int)actionID].IsPulsed(delayInSec, initialDelayInSec);
-	}
-
 	bool IsHeld(ActionID actionID)
 	{
 		return ActionMap[(int)actionID].IsHeld();
+	}
+
+	bool IsPulsed(ActionID actionID, float delayInSec, float initialDelayInSec)
+	{
+		return ActionMap[(int)actionID].IsPulsed(delayInSec, initialDelayInSec);
 	}
 
 	bool IsReleased(ActionID actionID)

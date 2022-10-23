@@ -149,8 +149,8 @@ namespace TEN::Input
 	void  ClearAction(ActionID actionID);
 	bool  NoAction();
 	bool  IsClicked(ActionID actionID);
-	bool  IsPulsed(ActionID actionID, float delayInSec, float initialDelayInSec= 0.0f);
 	bool  IsHeld(ActionID actionID);
+	bool  IsPulsed(ActionID actionID, float delayInSec, float initialDelayInSec= 0.0f);
 	bool  IsReleased(ActionID actionID);
 	float GetActionValue(ActionID actionID);
 	float GetActionTimeActive(ActionID actionID);
