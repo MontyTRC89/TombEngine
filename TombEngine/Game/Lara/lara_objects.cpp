@@ -751,9 +751,13 @@ void lara_as_ladder_idle(ItemInfo* item, CollisionInfo* coll)
 
 			return;
 		}
-		else if (TrInput & IN_BACK && TestLaraLadderDown(item, coll))
+		else if (TrInput & IN_BACK)
 		{
-			item->Animation.TargetState = LS_LADDER_DOWN;
+			if (TestLaraLadderDismountBottom(item, coll))
+				item->Animation.TargetState = LS_LADDER_DISMOUNT_BOTTOM;
+			else if (TestLaraLadderDown(item, coll))
+				item->Animation.TargetState = LS_LADDER_DOWN;
+
 			return;
 		}
 
@@ -772,15 +776,9 @@ void lara_as_ladder_idle(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	// TODO: Auto dismounts when near ground.
 	if (TestLaraLadderDismountBottom(item, coll))
 	{
 		item->Animation.TargetState = LS_LADDER_DISMOUNT_BOTTOM;
-		return;
-	}
-	else if (TestLaraLadderDismountBottom(item, coll))
-	{
-		item->Animation.TargetState = LS_LADDER_DOWN;
 		return;
 	}
 	

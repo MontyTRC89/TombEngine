@@ -2596,17 +2596,17 @@ bool TestLaraLadderDismountTop(ItemInfo* item, CollisionInfo* coll)
 bool TestLaraLadderDismountBottom(ItemInfo* item, CollisionInfo* coll)
 {
 	static const int dismountDist		= CLICK(0.5f);
-	static const int dismountFloorBound = CLICK(0.5f);
+	static const int dismountFloorBound = CLICK(0.6f);
 
 	auto lFootHeight = GetJointPosition(item, LM_LFOOT).y;
 	auto rFootHeight = GetJointPosition(item, LM_RFOOT).y;
 
-	int vPos = item->Pose.Position.y + (std::max(lFootHeight, rFootHeight) - item->Pose.Position.y);
+	int vPos = std::max(lFootHeight, rFootHeight);
 	auto pointColl = GetCollision(item, item->Pose.Orientation.y, -dismountDist);
 
 	// Assess point collision.
-	if (abs(pointColl.Position.Floor - vPos) <= dismountFloorBound && // Floor height is within dismount height bound.
-		!pointColl.Position.FloorSlope)								  // Avoid slopes.
+	if ((pointColl.Position.Floor - vPos) <= dismountFloorBound && // Floor height is within dismount height bound.
+		!pointColl.Position.FloorSlope)							   // Avoid slopes.
 	{
 		return true;
 	}
@@ -2623,9 +2623,9 @@ bool TestLaraLadderSideDismount(ItemInfo* item, CollisionInfo* coll, bool isGoin
 	auto pointColl = GetCollision(item, item->Pose.Orientation.y + (isGoingLeft ? -ANGLE(90.0f) : ANGLE(90.0f)), dismountDist);
 
 	// Assess point collision.
-	if (abs(pointColl.Position.Floor - vPos) <= dismountFloorBound &&				// Floor height is within dismount height bound.
-		abs(pointColl.Position.Ceiling - pointColl.Position.Floor) > LARA_HEIGHT && // Space isn't too narrow.
-		!pointColl.Position.FloorSlope)												// Avoid slopes.
+	if ((pointColl.Position.Floor - vPos) <= dismountFloorBound &&				 // Floor height is within dismount height bound.
+		(pointColl.Position.Ceiling - pointColl.Position.Floor) > LARA_HEIGHT && // Space isn't too narrow.
+		!pointColl.Position.FloorSlope)											 // Avoid slopes.
 	{
 		return true;
 	}
