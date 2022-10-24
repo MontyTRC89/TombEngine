@@ -2505,6 +2505,13 @@ bool TestLaraLedgeJump(ItemInfo* item, CollisionInfo* coll)
 	if (!g_GameFlow->HasLedgeJumps())
 		return false;
 
+	int vPos = item->Pose.Position.y - coll->Setup.Height;
+	auto pointColl = GetCollision(item);
+
+	// Assess point collision.
+	if ((pointColl.Position.Ceiling - vPos) >= -coll->Setup.Height) // Ceiling isn't too low.
+		return false;
+
 	auto origin = GameVector(
 		item->Pose.Position.x,
 		(item->Pose.Position.y - coll->Setup.Height) + minLedgeHeight,
@@ -2512,12 +2519,12 @@ bool TestLaraLedgeJump(ItemInfo* item, CollisionInfo* coll)
 		item->RoomNumber
 	);
 	auto target = GameVector(
-		TranslateVector(Vector3Int(origin.x, origin.y, origin.z), item->Pose.Orientation.y, OFFSET_RADIUS(coll->Setup.Radius)),
+		Geometry::TranslatePoint(Vector3i(origin.x, origin.y, origin.z), item->Pose.Orientation.y, OFFSET_RADIUS(coll->Setup.Radius)),
 		item->RoomNumber
 	);
 
 	// Assess ray collision.
-	if (LOS(&origin, &target))
+	if (LOS(&origin, &target)) // Ledge isn't too thin.
 		return false;
 
 	return true;
