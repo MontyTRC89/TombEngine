@@ -39,6 +39,9 @@ struct CAMERA_INFO
 	ItemInfo* lastItem; // size=144, offset=96
 	int mikeAtLara; // size=0, offset=104
 	Vector3i mikePos; // size=12, offset=108
+	bool ObjCamera;
+	short CamMeshID;
+	short TargetMeshID;
 };
 
 enum CAMERA_FLAGS
@@ -93,6 +96,8 @@ void RumbleScreen();
 bool TestBoundsCollideCamera(const GameBoundingBox& bounds, const Pose& pose, short radius);
 void ItemPushCamera(GameBoundingBox* bounds, Pose* pos, short radius);
 void ItemsCollideCamera();
+void ObjCamera(ItemInfo* camSlotId, int camMeshID, ItemInfo* targetItem, int targetMeshID, bool cond);
+void MoveObjCamera(GameVector* ideal, ItemInfo* camSlotId, int camMeshID, ItemInfo* targetItem, int targetMeshID);
 
 void SetScreenFadeOut(float speed);
 void SetScreenFadeIn(float speed);

@@ -96,6 +96,14 @@ public:
 	[[nodiscard]] short GetRoom() const;
 	void SetRoom(short room);
 
+	void AttachCamera(short camMeshId, short targetMeshId);
+
+	HandStatus GetLaraHandStatus() const;
+	LaraWeaponType GetLaraWeaponType() const;
+	void ThrowawayTorch();
+	void AnimFromObject(GAME_OBJECT_ID object, int animNumber, int stateID);
+	void UndrawWeapons();
+
 	void EnableItem();
 	void DisableItem();
 	void MakeInvisible();

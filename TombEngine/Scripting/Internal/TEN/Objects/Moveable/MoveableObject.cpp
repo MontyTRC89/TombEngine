@@ -18,6 +18,7 @@
 #include "Logic/LevelFunc.h"
 #include "Rotation/Rotation.h"
 #include "Vec3/Vec3.h"
+#include "Game/Lara/lara_fire.h"
 
 /***
 Represents any object inside the game world.
@@ -439,7 +440,31 @@ ScriptReserved_GetSlotHP, & Moveable::GetSlotHP,
 
 /// Destroy the moveable. This will mean it can no longer be used, except to re-initialise it with another object.
 // @function Moveable:Destroy
-	ScriptReserved_Destroy, &Moveable::Destroy);
+	ScriptReserved_Destroy, &Moveable::Destroy,
+
+/// Attach camera to an object.
+// @function Moveable:mesh 1 for camera, mesh 2 for target
+	ScriptReserved_AttachCamera, & Moveable::AttachCamera,
+
+/// UndrawWeapons
+// @function Lara will undraw her weapons if they are drawn, throw away torch or flare if she helds one in her hand.
+	ScriptReserved_UndrawWeapons, & Moveable::UndrawWeapons,
+
+/// Get Laras current hand status.
+//@treturn 0=HandsFree, 1=Busy(climbing,etc), 2=WeaponDraw, 3=WeaponUndraw, 4=Weapon or Torch in Hand.
+	ScriptReserved_GetLaraHandStatus, & Moveable::GetLaraHandStatus,
+
+/// Get Laras current weapon type.
+//@treturn 0=None, 1=Pistols, 2=Revolver, 3=Uzi, 4=Shotgun, 5=HK, 6=Crossbow, 7=Flare, 8=Torch, 9=GrenadeLauncher, 10=Harpoon, 11=RocketLauncher.
+	ScriptReserved_GetLaraWeaponType, & Moveable::GetLaraWeaponType,
+
+/// Borrow animation from an object
+//@function GAME_OBJECT_ID ObjectID to take animation and stateID from, int animationnumber from object, int stateID from object
+	ScriptReserved_AnimFromObject, & Moveable::AnimFromObject,
+
+/// ThrowawayTorch
+// @function Lara will throw away the torch if she helds one in her hand.
+	ScriptReserved_ThrowawayTorch, & Moveable::ThrowawayTorch);
 }
 
 
@@ -1015,4 +1040,68 @@ bool Moveable::MeshExists(int index) const
 	}
 
 	return true;
+}
+
+//Attach camera and camera target to a mesh of an object.
+void  Moveable::AttachCamera(short camMeshId, short targetMeshId)
+{
+	ObjCamera(m_item, camMeshId, m_item, targetMeshId, true);
+}
+
+//Lara will undraw her weapons if they are drawn, throw away flare if she helds one in her hand.
+void   Moveable::UndrawWeapons()
+{
+	if (m_item->IsLara())
+	{
+		auto* lara = GetLaraInfo(m_item);
+
+		if (lara->Control.HandStatus != HandStatus::Free ||
+			lara->Control.Weapon.GunType == LaraWeaponType::Flare)
+		{
+			lara->Control.HandStatus = HandStatus::WeaponUndraw;
+		}
+	}
+}
+
+//Lara will throw away the torch if she helds one in her hand.
+void   Moveable::ThrowawayTorch()
+{
+	if (m_item->IsLara())
+	{
+		auto* lara = GetLaraInfo(m_item);
+
+		if (lara->Control.Weapon.GunType == LaraWeaponType::Torch)
+		{
+			Lara.Torch.State = TorchState::Dropping;
+		}
+	}
+}
+
+//Returns 0=HandsFree, 1=Busy(climbing,etc), 2=WeaponDraw, 3=WeaponUndraw, 4=WeaponInHand.
+HandStatus Moveable::GetLaraHandStatus() const
+{
+	if (m_item->IsLara())
+	{
+		auto* lara = GetLaraInfo(m_item);
+		return  HandStatus{ lara->Control.HandStatus };
+	}
+}
+
+//Returns 0=None, 1=Pistols, 2=Revolver, 3=Uzi, 4=Shotgun, 5=HK, 6=Crossbow, 7=Flare, 8=Torch, 9=GrenadeLauncher, 10=Harpoon, 11=RocketLauncher.
+LaraWeaponType Moveable::GetLaraWeaponType() const
+{
+	if (m_item->IsLara())
+	{
+		auto* lara = GetLaraInfo(m_item);
+		return  LaraWeaponType{ lara->Control.Weapon.GunType };
+	}
+}
+
+//Borrow an animtaion and state id from an object.
+void Moveable::AnimFromObject(GAME_OBJECT_ID object, int animNumber, int stateID)
+{
+	m_item->Animation.AnimNumber = Objects[object].animIndex + animNumber;
+	m_item->Animation.ActiveState = stateID;
+	m_item->Animation.FrameNumber = g_Level.Anims[m_item->Animation.AnimNumber].frameBase;
+	AnimateItem(m_item);
 }
