@@ -2,7 +2,10 @@
 #include "Math/Containers/EulerAngles.h"
 
 #include "Math/Constants.h"
+#include "Math/Geometry.h"
 #include "Math/Legacy.h"
+
+using namespace TEN::Math;
 
 //namespace TEN::Math
 //{
@@ -57,6 +60,32 @@
 		this->x = FROM_RAD(asin(rotMatrix._31));
 		this->y = FROM_RAD(-atan2(rotMatrix._21, rotMatrix._11));
 		this->z = FROM_RAD(atan2(rotMatrix._32, rotMatrix._33));
+	}
+
+	bool EulerAngles::Compare(const EulerAngles& eulers0, const EulerAngles& eulers1, short epsilon)
+	{
+		if (Compare(eulers0.x, eulers1.x, epsilon) &&
+			Compare(eulers0.y, eulers1.y, epsilon) &&
+			Compare(eulers0.z, eulers1.z, epsilon))
+		{
+			return true;
+		}
+
+		return false;
+	}
+
+	void EulerAngles::Lerp(const EulerAngles& eulersTo, float alpha, short epsilon)
+	{
+		*this = Lerp(*this, eulersTo, alpha, epsilon);
+	}
+
+	EulerAngles EulerAngles::Lerp(const EulerAngles& eulersFrom, const EulerAngles& eulersTo, float alpha, short epsilon) const
+	{
+		return EulerAngles(
+			InterpolateLinear(eulersFrom.x, eulersTo.x, alpha, epsilon),
+			InterpolateLinear(eulersFrom.y, eulersTo.y, alpha, epsilon),
+			InterpolateLinear(eulersFrom.z, eulersTo.z, alpha, epsilon)
+		);
 	}
 
 	Vector3 EulerAngles::ToDirection() const
@@ -165,5 +194,30 @@
 	EulerAngles EulerAngles::operator /(float scale) const
 	{
 		return EulerAngles((short)round(x / scale), (short)round(y / scale), (short)round(z / scale));
+	}
+
+	float EulerAngles::ClampAlpha(float alpha) const
+	{
+		return ((abs(alpha) > 1.0f) ? 1.0f : abs(alpha));
+	}
+
+	bool EulerAngles::Compare(short angle0, short angle1, short epsilon) const
+	{
+		short difference = Geometry::GetShortestAngularDistance(angle0, angle1);
+		if (abs(difference) <= epsilon)
+			return true;
+
+		return false;
+	}
+
+	short EulerAngles::InterpolateLinear(short angleFrom, short angleTo, float alpha, short epsilon) const
+	{
+		alpha = ClampAlpha(alpha);
+
+		if (Compare(angleFrom, angleTo, epsilon))
+			return angleTo;
+
+		short difference = Geometry::GetShortestAngularDistance(angleFrom, angleTo);
+		return (short)round(angleFrom + (difference * alpha));
 	}
 //}
