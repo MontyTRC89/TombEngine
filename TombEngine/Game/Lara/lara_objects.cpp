@@ -745,20 +745,28 @@ void lara_as_ladder_idle(ItemInfo* item, CollisionInfo* coll)
 		if (TrInput & IN_FORWARD)
 		{
 			if (TestLaraLadderDismountTop(item, coll))
+			{
 				item->Animation.TargetState = LS_LADDER_DISMOUNT_TOP;
+				return;
+			}
 			else if (TestLaraLadderUp(item, coll))
+			{
 				item->Animation.TargetState = LS_LADDER_UP;
-
-			return;
+				return;
+			}
 		}
 		else if (TrInput & IN_BACK)
 		{
 			if (TestLaraLadderDismountBottom(item, coll))
+			{
 				item->Animation.TargetState = LS_LADDER_DISMOUNT_BOTTOM;
+				return;
+			}
 			else if (TestLaraLadderDown(item, coll))
+			{
 				item->Animation.TargetState = LS_LADDER_DOWN;
-
-			return;
+				return;
+			}
 		}
 
 		if (TrInput & IN_LEFT && TestLaraLadderDismountLeft(item, coll))
@@ -824,11 +832,15 @@ void lara_as_ladder_up(ItemInfo* item, CollisionInfo* coll)
 		if (TrInput & IN_FORWARD)
 		{
 			if (TestLaraLadderDismountTop(item, coll))
+			{
 				item->Animation.TargetState = LS_LADDER_DISMOUNT_TOP;
+				return;
+			}
 			else if (TestLaraLadderUp(item, coll))
+			{
 				item->Animation.TargetState = LS_LADDER_UP;
-
-			return;
+				return;
+			}
 		}
 
 		item->Animation.TargetState = LS_LADDER_IDLE;
@@ -877,11 +889,15 @@ void lara_as_ladder_down(ItemInfo* item, CollisionInfo* coll)
 		if (TrInput & IN_BACK)
 		{
 			if (TestLaraLadderDismountBottom(item, coll))
+			{
 				item->Animation.TargetState = LS_LADDER_DISMOUNT_BOTTOM;
+				return;
+			}
 			else if (TestLaraLadderDown(item, coll))
+			{
 				item->Animation.TargetState = LS_LADDER_DOWN;
-
-			return;
+				return;
+			}
 		}
 
 		item->Animation.TargetState = LS_LADDER_IDLE;
