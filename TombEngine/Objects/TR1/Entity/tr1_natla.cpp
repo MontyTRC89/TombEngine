@@ -8,10 +8,9 @@
 #include "Game/misc.h"
 #include "Game/missile.h"
 #include "Game/people.h"
+#include "Math/Math.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
-#include "Specific/prng.h"
-#include "Specific/trmath.h"
 
 using namespace TEN::Math::Random;
 
@@ -57,8 +56,8 @@ namespace TEN::Entities::Creatures::TR1
 		auto* creature = GetCreatureInfo(item);
 
 		short head = 0;
-		short angle = 0;
 		short tilt = 0;
+		short angle = 0;
 		short facing = 0;
 		short gun = creature->JointRotation[0] * 7 / 8;
 

@@ -2,6 +2,7 @@
 #include "Game/savegame.h"
 
 #include <filesystem>
+
 #include "Game/collision/collide_room.h"
 #include "Game/collision/floordata.h"
 #include "Game/control/box.h"
@@ -21,6 +22,7 @@
 #include "Objects/Generic/Switches/fullblock_switch.h"
 #include "Objects/Generic/Traps/traps.h"
 #include "Objects/Generic/puzzles_keys.h"
+#include "Objects/Sink.h"
 #include "Objects/TR4/Entity/tr4_beetle_swarm.h"
 #include "Objects/TR5/Emitter/tr5_rats_emitter.h"
 #include "Objects/TR5/Emitter/tr5_bats_emitter.h"
@@ -78,9 +80,9 @@ void LoadSavegameInfos()
 	}
 }
 
-PHD_3DPOS ToPHD(Save::Position const* src)
+Pose ToPHD(Save::Position const* src)
 {
-	PHD_3DPOS dest;
+	Pose dest;
 	dest.Position.x = src->x_pos();
 	dest.Position.y = src->y_pos();
 	dest.Position.z = src->z_pos();
@@ -90,7 +92,7 @@ PHD_3DPOS ToPHD(Save::Position const* src)
 	return dest;
 }
 
-Save::Position FromPHD(PHD_3DPOS const& src)
+Save::Position FromPHD(Pose const& src)
 {
 	return Save::Position{
 		src.Position.x,
@@ -107,12 +109,12 @@ Save::Vector3 FromVector3(Vector3 vec)
 	return Save::Vector3(vec.x, vec.y, vec.z);
 }
 
-Save::Vector3 FromVector3(Vector3Int vec)
+Save::Vector3 FromVector3(Vector3i vec)
 {
 	return Save::Vector3(vec.x, vec.y, vec.z);
 }
 
-Save::Vector3 FromVector3(Vector3Shrt vec)
+Save::Vector3 FromVector3(EulerAngles vec)
 {
 	return Save::Vector3(vec.x, vec.y, vec.z);
 }
@@ -122,14 +124,14 @@ Save::Vector4 FromVector4(Vector4 vec)
 	return Save::Vector4(vec.x, vec.y, vec.z, vec.w);
 }
 
-Vector3Shrt ToVector3Shrt(const Save::Vector3* vec)
+EulerAngles ToEulerAngles(const Save::Vector3* vec)
 {
-	return Vector3Shrt(short(vec->x()), short(vec->y()), short(vec->z()));
+	return EulerAngles(short(vec->x()), short(vec->y()), short(vec->z()));
 }
 
-Vector3Int ToVector3Int(const Save::Vector3* vec)
+Vector3i ToVector3i(const Save::Vector3* vec)
 {
-	return Vector3Int(int(vec->x()), int(vec->y()), int(vec->z()));
+	return Vector3i(int(vec->x()), int(vec->y()), int(vec->z()));
 }
 
 Vector3 ToVector3(const Save::Vector3* vec)
@@ -627,7 +629,7 @@ bool SaveGame::Save(int slot)
 		serializedItem.add_target_state(itemToSerialize.Animation.TargetState);
 		serializedItem.add_hit_points(itemToSerialize.HitPoints);
 		serializedItem.add_item_flags(itemFlagsOffset);
-		serializedItem.add_mesh_bits(itemToSerialize.MeshBits);
+		serializedItem.add_mesh_bits(itemToSerialize.MeshBits.ToPackedBits());
 		serializedItem.add_object_id(itemToSerialize.ObjectNumber);
 		serializedItem.add_pose(&FromPHD(itemToSerialize.Pose));
 		serializedItem.add_required_state(itemToSerialize.Animation.RequiredState);
@@ -635,7 +637,7 @@ bool SaveGame::Save(int slot)
 		serializedItem.add_velocity(&FromVector3(itemToSerialize.Animation.Velocity));
 		serializedItem.add_timer(itemToSerialize.Timer);
 		serializedItem.add_color(&FromVector4(itemToSerialize.Color));
-		serializedItem.add_touch_bits(itemToSerialize.TouchBits);
+		serializedItem.add_touch_bits(itemToSerialize.TouchBits.ToPackedBits());
 		serializedItem.add_trigger_flags(itemToSerialize.TriggerFlags);
 		serializedItem.add_triggered((itemToSerialize.Flags & (TRIGGERED | CODE_BITS | ONESHOT)) != 0);
 		serializedItem.add_active(itemToSerialize.Active);
@@ -645,7 +647,7 @@ bool SaveGame::Save(int slot)
 		serializedItem.add_ai_bits(itemToSerialize.AIBits);
 		serializedItem.add_collidable(itemToSerialize.Collidable);
 		serializedItem.add_looked_at(itemToSerialize.LookedAt);
-		serializedItem.add_swap_mesh_flags(itemToSerialize.MeshSwapBits);
+		serializedItem.add_swap_mesh_flags(itemToSerialize.MeshSwapBits.ToPackedBits());
 
 		if (Objects[itemToSerialize.ObjectNumber].intelligent 
 			&& itemToSerialize.Data.is<CreatureInfo>())
@@ -1093,11 +1095,11 @@ bool SaveGame::Save(int slot)
 
 			putDataInVec(Save::VarUnion::funcName, funcNameOffset);
 		}
-		else if (std::holds_alternative<Vector3Int>(s))
+		else if (std::holds_alternative<Vector3i>(s))
 		{
 			Save::vec3TableBuilder vtb{ fbb };
-			Vector3Int data = std::get<Vector3Int>(s);
-			Save::Vector3 saveVec = FromVector3(std::get<Vector3Int>(s));
+			Vector3i data = std::get<Vector3i>(s);
+			Save::Vector3 saveVec = FromVector3(std::get<Vector3i>(s));
 			vtb.add_vec(&saveVec);
 			auto vec3Offset = vtb.Finish();
 
@@ -1789,7 +1791,7 @@ bool SaveGame::Load(int slot)
 	Lara.LeftArm.FrameBase = s->lara()->left_arm()->frame_base();
 	Lara.LeftArm.FrameNumber = s->lara()->left_arm()->frame_number();
 	Lara.LeftArm.Locked = s->lara()->left_arm()->locked();
-	Lara.LeftArm.Orientation = ToVector3Shrt(s->lara()->left_arm()->rotation());
+	Lara.LeftArm.Orientation = ToEulerAngles(s->lara()->left_arm()->rotation());
 	Lara.Location = s->lara()->location();
 	Lara.LocationPad = s->lara()->location_pad();
 	Lara.NextCornerPos = ToPHD(s->lara()->next_corner_pose());
@@ -1801,7 +1803,7 @@ bool SaveGame::Load(int slot)
 	Lara.RightArm.FrameBase = s->lara()->right_arm()->frame_base();
 	Lara.RightArm.FrameNumber = s->lara()->right_arm()->frame_number();
 	Lara.RightArm.Locked = s->lara()->right_arm()->locked();
-	Lara.RightArm.Orientation = ToVector3Shrt(s->lara()->right_arm()->rotation());
+	Lara.RightArm.Orientation = ToEulerAngles(s->lara()->right_arm()->rotation());
 	Lara.Torch.IsLit = s->lara()->torch()->is_lit();
 	Lara.Torch.State = (TorchState)s->lara()->torch()->state();
 	Lara.Control.Rope.Segment = s->lara()->control()->rope()->segment();
@@ -1879,25 +1881,25 @@ bool SaveGame::Load(int slot)
 		
 		for (int i = 0; i < ROPE_SEGMENTS; i++)
 		{
-			rope->segment[i] = ToVector3Int(s->rope()->segments()->Get(i));
-			rope->normalisedSegment[i] = ToVector3Int(s->rope()->normalised_segments()->Get(i));
-			rope->meshSegment[i] = ToVector3Int(s->rope()->mesh_segments()->Get(i));
-			rope->coords[i] = ToVector3Int(s->rope()->coords()->Get(i));
-			rope->velocity[i] = ToVector3Int(s->rope()->velocities()->Get(i));
+			rope->segment[i] = ToVector3i(s->rope()->segments()->Get(i));
+			rope->normalisedSegment[i] = ToVector3i(s->rope()->normalised_segments()->Get(i));
+			rope->meshSegment[i] = ToVector3i(s->rope()->mesh_segments()->Get(i));
+			rope->coords[i] = ToVector3i(s->rope()->coords()->Get(i));
+			rope->velocity[i] = ToVector3i(s->rope()->velocities()->Get(i));
 		}
 
 		rope->coiled = s->rope()->coiled();
 		rope->active = s->rope()->active();
 
-		rope->position = ToVector3Int(s->rope()->position());
-		CurrentPendulum.position = ToVector3Int(s->pendulum()->position());
-		CurrentPendulum.velocity = ToVector3Int(s->pendulum()->velocity());
+		rope->position = ToVector3i(s->rope()->position());
+		CurrentPendulum.position = ToVector3i(s->pendulum()->position());
+		CurrentPendulum.velocity = ToVector3i(s->pendulum()->velocity());
 
 		CurrentPendulum.node = s->pendulum()->node();
 		CurrentPendulum.rope = rope;
 
-		AlternatePendulum.position = ToVector3Int(s->alternate_pendulum()->position());
-		AlternatePendulum.velocity = ToVector3Int(s->alternate_pendulum()->velocity());
+		AlternatePendulum.position = ToVector3i(s->alternate_pendulum()->position());
+		AlternatePendulum.velocity = ToVector3i(s->alternate_pendulum()->velocity());
 
 		AlternatePendulum.node = s->alternate_pendulum()->node();
 		AlternatePendulum.rope = rope;
@@ -1934,7 +1936,7 @@ bool SaveGame::Load(int slot)
 			}
 			else if (var->u_type() == Save::VarUnion::vec3)
 			{
-				loadedVars.push_back(ToVector3Int(var->u_as_vec3()->vec()));
+				loadedVars.push_back(ToVector3i(var->u_as_vec3()->vec()));
 			}
 			else if (var->u_type() == Save::VarUnion::funcName)
 			{

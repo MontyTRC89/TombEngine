@@ -13,25 +13,29 @@ using namespace TEN::Input;
 
 namespace TEN::Entities::Switches
 {
-	Vector3Int RailSwitchPos = { 0, 0, -550 };
+	Vector3i RailSwitchPos = { 0, 0, -550 };
 
 	OBJECT_COLLISION_BOUNDS RailSwitchBounds =
 	{
-		-256, 256,
-		0, 0,
-		-768, -512,
+		GameBoundingBox(
+			-256, 256,
+			0, 0,
+			-768, -512
+		),
 		-ANGLE(10.0f), ANGLE(10.0f),
 		-ANGLE(30.0f), ANGLE(30.0f),
 		-ANGLE(10.0f), ANGLE(10.0f)
 	};
 
-	Vector3Int RailSwitchPos2 = { 0, 0, 550 }; 
+	Vector3i RailSwitchPos2 = { 0, 0, 550 }; 
 
 	OBJECT_COLLISION_BOUNDS RailSwitchBounds2 =
 	{
-		-256, 256,
-		0, 0,
-		512, 768,
+		GameBoundingBox(
+			-256, 256,
+			0, 0,
+			512, 768
+		),
 		-ANGLE(10.0f), ANGLE(10.0f),
 		-ANGLE(30.0f), ANGLE(30.0f),
 		-ANGLE(10.0f), ANGLE(10.0f)

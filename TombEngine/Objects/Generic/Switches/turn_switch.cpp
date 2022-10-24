@@ -26,27 +26,31 @@ namespace TEN::Entities::Switches
 
 	OBJECT_COLLISION_BOUNDS TurnSwitchBoundsA = 
 	{
-		512, 896,
-		0, 0,
-		-512, 0,
+		GameBoundingBox(
+			512, 896,
+			0, 0,
+			-512, 0
+		),
 		-ANGLE(10.0f), ANGLE(10.0f),
 		-ANGLE(30.0f), ANGLE(30.0f),
 		-ANGLE(10.0f), ANGLE(10.0f)
 	};
 
-	Vector3Int TurnSwitchPos = { 650, 0, 138 }; 
+	Vector3i TurnSwitchPos = { 650, 0, 138 }; 
 
 	OBJECT_COLLISION_BOUNDS TurnSwitchBoundsC =
 	{
-		512, 896,
-		0, 0,
-		0, 512,
+		GameBoundingBox(
+			512, 896,
+			0, 0,
+			0, 512
+		),
 		-ANGLE(10.0f), ANGLE(10.0f),
 		-ANGLE(30.0f), ANGLE(30.0f),
 		-ANGLE(10.0f), ANGLE(10.0f)
 	};
 
-	Vector3Int TurnSwitchPosA = { 650, 0, -138 };
+	Vector3i TurnSwitchPosA = { 650, 0, -138 };
 
 	void TurnSwitchCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 	{
@@ -118,7 +122,7 @@ namespace TEN::Entities::Switches
 
 			UseForcedFixedCamera = true;
 			ForcedFixedCamera.y = switchItem->Pose.Position.y - 2048;
-			ForcedFixedCamera.roomNumber = switchItem->RoomNumber;
+			ForcedFixedCamera.RoomNumber = switchItem->RoomNumber;
 
 			AddActiveItem(itemNumber);
 

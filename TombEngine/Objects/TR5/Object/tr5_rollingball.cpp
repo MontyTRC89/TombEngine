@@ -44,6 +44,8 @@ void RollingBallCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* c
 void RollingBallControl(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
+	// read flags from OCB
+	int OCB = item->TriggerFlags;
 
 	if (!TriggerActive(item))
 		return;
@@ -58,7 +60,7 @@ void RollingBallControl(short itemNumber)
 	item->Pose.Position.x += item->ItemFlags[0] / hDivider;
 	item->Pose.Position.y += item->Animation.Velocity.y / vDivider;
 	item->Pose.Position.z += item->ItemFlags[1] / hDivider;
-	item->Animation.Velocity.z = phd_Distance(&item->Pose, &oldPos);
+	item->Animation.Velocity.z = Vector3i::Distance(item->Pose.Position, oldPos.Position);
 
 	int dh = GetCollision(item).Position.Floor - CLICK(2);
 
@@ -73,8 +75,11 @@ void RollingBallControl(short itemNumber)
 
 			if (distance < 16384)
 			{
-				Camera.bounce = -(((16384 - distance) * abs(item->Animation.Velocity.y)) / 16384);
-				SoundEffect(SFX_TR4_BOULDER_FALL, &item->Pose);
+				if ((item->TriggerFlags & 1) != 1) // Flag 1 = silent.
+				{
+					Camera.bounce = -(((16384 - distance) * abs(item->Animation.Velocity.y)) / 16384);
+					SoundEffect(SFX_TR4_BOULDER_FALL, &item->Pose);
+				}
 			}
 		}
 
@@ -466,13 +471,13 @@ void ClassicRollingBallControl(short itemNum)
 			item->Pose.Position.x = old->x;
 			item->Pose.Position.y = old->y;
 			item->Pose.Position.z = old->z;
-			if (item->RoomNumber != old->roomNumber)
+			if (item->RoomNumber != old->RoomNumber)
 			{
 				RemoveDrawnItem(itemNum);
-				r = &g_Level.Rooms[old->roomNumber];
+				r = &g_Level.Rooms[old->RoomNumber];
 				item->NextItem = r->itemNumber;
 				r->itemNumber = itemNum;
-				item->RoomNumber = old->roomNumber;
+				item->RoomNumber = old->RoomNumber;
 			}
 			item->Animation.ActiveState = 0;
 			item->Animation.TargetState = 0;
@@ -497,6 +502,6 @@ void InitialiseClassicRollingBall(short itemNum)
 	old->x = item->Pose.Position.x;
 	old->y = item->Pose.Position.y;
 	old->z = item->Pose.Position.z;
-	old->roomNumber = item->RoomNumber;
+	old->RoomNumber = item->RoomNumber;
 
 }

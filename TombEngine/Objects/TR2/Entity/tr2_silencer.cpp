@@ -8,7 +8,6 @@
 #include "Game/misc.h"
 #include "Game/people.h"
 #include "Specific/level.h"
-#include "Specific/prng.h"
 #include "Specific/setup.h"
 
 using namespace TEN::Math::Random;
@@ -84,8 +83,8 @@ namespace TEN::Entities::Creatures::TR2
 
 		short angle = 0;
 		short tilt = 0;
-		auto extraHeadRot = Vector3Shrt::Zero;
-		auto extraTorsoRot = Vector3Shrt::Zero;
+		auto extraHeadRot = EulerAngles::Zero;
+		auto extraTorsoRot = EulerAngles::Zero;
 
 		if (item->HitPoints <= 0)
 		{

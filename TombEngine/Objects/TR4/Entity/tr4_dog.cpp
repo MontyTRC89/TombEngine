@@ -9,7 +9,7 @@
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
 #include "Specific/level.h"
-#include "Specific/prng.h"
+#include "Math/Random.h"
 #include "Specific/setup.h"
 
 using namespace TEN::Math::Random;
@@ -24,8 +24,8 @@ namespace TEN::Entities::TR4
 	constexpr auto DOG_JUMP_ATTACK_RANGE = SQUARE(SECTOR(1));
 	
 	const auto DogBite = BiteInfo(Vector3(0.0f, 0.0f, 100.0f), 3.0f);
-	const vector<int> DogJumpAttackJoints = { 3, 6, 9, 10, 13, 14 };
-	const vector<int> DogBiteAttackJoints = { 3, 6 };
+	const vector<uint> DogJumpAttackJoints = { 3, 6, 9, 10, 13, 14 };
+	const vector<uint> DogBiteAttackJoints = { 3, 6 };
 
 	enum DogState
 	{
@@ -330,7 +330,7 @@ namespace TEN::Entities::TR4
 				break;
 
 			case DOG_STATE_JUMP_ATTACK:
-				if (AI.bite && item->TestBits(JointBitType::Touch, DogJumpAttackJoints) &&
+				if (AI.bite && item->TouchBits.Test(DogJumpAttackJoints) &&
 					frame >= 4 && frame <= 14)
 				{
 					DoDamage(creature->Enemy, DOG_JUMP_ATTACK_DAMAGE);
@@ -346,7 +346,7 @@ namespace TEN::Entities::TR4
 				break;
 
 			case DOG_STATE_BITE_ATTACK:
-				if (AI.bite && item->TestBits(JointBitType::Touch, DogBiteAttackJoints) &&
+				if (AI.bite && item->TouchBits.Test(DogBiteAttackJoints) &&
 					((frame >= 9 && frame <= 12) || (frame >= 22 && frame <= 25)))
 				{
 					DoDamage(creature->Enemy, DOG_BITE_ATTACK_DAMAGE);

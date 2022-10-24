@@ -22,9 +22,11 @@ namespace TEN::Entities::TR4
 {
     OBJECT_COLLISION_BOUNDS ElementPuzzleBounds =
     {
-        0, 0, 
-        -64, 0, 
-        0, 0,
+        GameBoundingBox(
+            0, 0,
+            -64, 0,
+            0, 0
+        ),
         -ANGLE(10.0f), ANGLE(10.0f),
         -ANGLE(30.0f), ANGLE(30.0f),
         -ANGLE(10.0f), ANGLE(10.0f)
@@ -180,12 +182,12 @@ namespace TEN::Entities::TR4
             laraItem->Animation.AnimNumber == LA_WATERSKIN_POUR_HIGH) &&
             !puzzleItem->ItemFlags[0])
         {
-            auto* box = GetBoundsAccurate(puzzleItem);
+            auto box = GameBoundingBox(puzzleItem);
 
-            ElementPuzzleBounds.boundingBox.X1 = box->X1;
-            ElementPuzzleBounds.boundingBox.X2 = box->X2;
-            ElementPuzzleBounds.boundingBox.Z1 = box->Z1 - 200;
-            ElementPuzzleBounds.boundingBox.Z2 = box->Z2 + 200;
+            ElementPuzzleBounds.boundingBox.X1 = box.X1;
+            ElementPuzzleBounds.boundingBox.X2 = box.X2;
+            ElementPuzzleBounds.boundingBox.Z1 = box.Z1 - 200;
+            ElementPuzzleBounds.boundingBox.Z2 = box.Z2 + 200;
 
             short oldRot = puzzleItem->Pose.Orientation.y;
             puzzleItem->Pose.Orientation.y = laraItem->Pose.Orientation.y;
@@ -258,12 +260,12 @@ namespace TEN::Entities::TR4
             }
             else
             {
-                auto* box = GetBoundsAccurate(puzzleItem);
+                auto box = GameBoundingBox(puzzleItem);
 
-                ElementPuzzleBounds.boundingBox.X1 = box->X1;
-                ElementPuzzleBounds.boundingBox.X2 = box->X2;
-                ElementPuzzleBounds.boundingBox.Z1 = box->Z1 - 200;
-                ElementPuzzleBounds.boundingBox.Z2 = box->Z2 + 200;
+                ElementPuzzleBounds.boundingBox.X1 = box.X1;
+                ElementPuzzleBounds.boundingBox.X2 = box.X2;
+                ElementPuzzleBounds.boundingBox.Z1 = box.Z1 - 200;
+                ElementPuzzleBounds.boundingBox.Z2 = box.Z2 + 200;
 
                 short oldRot = puzzleItem->Pose.Orientation.y;
                 puzzleItem->Pose.Orientation.y = laraItem->Pose.Orientation.y;

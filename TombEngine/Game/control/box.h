@@ -1,6 +1,6 @@
 #pragma once
 #include "Specific/level.h"
-#include "Specific/phd_global.h"
+#include "Math/Math.h"
 
 struct BiteInfo;
 struct CreatureInfo;
@@ -152,10 +152,10 @@ void FindAITargetObject(CreatureInfo* creature, short objectNumber);
 void GetAITarget(CreatureInfo* creature);
 int CreatureVault(short itemNumber, short angle, int vault, int shift);
 void DropEntityPickups(ItemInfo* item);
-bool MoveCreature3DPos(PHD_3DPOS* origin, PHD_3DPOS* target, int velocity, short angleDif, int angleAdd);
-void CreatureYRot2(PHD_3DPOS* srcPos, short angle, short angleAdd);
+bool MoveCreature3DPos(Pose* fromPose, Pose* toPose, int velocity, short angleDif, int angleAdd);
+void CreatureYRot2(Pose* fromPose, short angle, short angleAdd);
 bool SameZone(CreatureInfo* creature, ItemInfo* target);
-void FindAITargetObject(CreatureInfo* creature, short objNum);
+void FindAITargetObject(CreatureInfo* creature, short objectNumber);
 short AIGuard(CreatureInfo* creature);
 void AlertNearbyGuards(ItemInfo* item);
 void AlertAllGuards(short itemNumber);
@@ -179,7 +179,7 @@ int CreatureActive(short itemNumber);
 void InitialiseCreature(short itemNumber);
 int StalkBox(ItemInfo* item, ItemInfo* enemy, int boxNumber);
 void CreatureAIInfo(ItemInfo* item, AI_INFO* AI);
-TARGET_TYPE CalculateTarget(Vector3Int* target, ItemInfo* item, LOTInfo* LOT);
+TARGET_TYPE CalculateTarget(Vector3i* target, ItemInfo* item, LOTInfo* LOT);
 int CreatureAnimation(short itemNumber, short angle, short tilt);
 void CreatureSwitchRoom(short itemNumber);
 void AdjustStopperFlag(ItemInfo* item, int direction, bool set);

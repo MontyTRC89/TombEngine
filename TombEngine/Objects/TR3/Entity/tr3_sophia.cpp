@@ -66,7 +66,7 @@ namespace TEN::Entities::Creatures::TR3
 #define LONDONBOSS_FINAL_HEIGHT -11776
 #define BIGZAP_TIMER 600
 
-	static void TriggerLaserBolt(Vector3Int* pos, ItemInfo* item, long type, short yAngle)
+	static void TriggerLaserBolt(Vector3i* pos, ItemInfo* item, long type, short yAngle)
 	{
 
 	}
@@ -76,7 +76,7 @@ namespace TEN::Entities::Creatures::TR3
 
 	}
 
-	static void TriggerPlasmaBall(ItemInfo* item, long type, Vector3Int* pos1, short roomNumber, short angle)
+	static void TriggerPlasmaBall(ItemInfo* item, long type, Vector3i* pos1, short roomNumber, short angle)
 	{
 
 	}

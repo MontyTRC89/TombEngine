@@ -14,17 +14,14 @@
 void InitialiseSpinningBlade(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
-
-	item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 3;
-	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-	item->Animation.ActiveState = 1;
+	SetAnimation(item, 3);
 }
 
 void SpinningBladeControl(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
 
-	bool spinning = false;
+	bool isSpinning = false;
 
 	if (item->Animation.ActiveState == 2)
 	{
@@ -33,14 +30,14 @@ void SpinningBladeControl(short itemNumber)
 			int x = item->Pose.Position.x + SECTOR(3) * phd_sin(item->Pose.Orientation.y) / 2;
 			int z = item->Pose.Position.z + SECTOR(3) * phd_cos(item->Pose.Orientation.y) / 2;
 
-			int height = GetCollision(x, item->Pose.Position.y, z, item->RoomNumber).Position.Floor;
-			if (height == NO_HEIGHT)
+			int floorHeight = GetCollision(x, item->Pose.Position.y, z, item->RoomNumber).Position.Floor;
+			if (floorHeight == NO_HEIGHT)
 				item->Animation.TargetState = 1;
 		}
 
-		spinning = true;
+		isSpinning = true;
 
-		if (item->TouchBits)
+		if (item->TouchBits.TestAny())
 		{
 			DoDamage(LaraItem, 100);
 			DoLotsOfBlood(LaraItem->Pose.Position.x, LaraItem->Pose.Position.y - CLICK(2), LaraItem->Pose.Position.z, (short)(item->Animation.Velocity.z * 2), LaraItem->Pose.Orientation.y, LaraItem->RoomNumber, 2);
@@ -53,7 +50,7 @@ void SpinningBladeControl(short itemNumber)
 		if (TriggerActive(item))
 			item->Animation.TargetState = 2;
 
-		spinning = false;
+		isSpinning = false;
 	}
 
 	AnimateItem(item);
@@ -66,6 +63,6 @@ void SpinningBladeControl(short itemNumber)
 	if (probe.RoomNumber != item->RoomNumber)
 		ItemNewRoom(itemNumber, probe.RoomNumber);
 
-	if (spinning && item->Animation.ActiveState == 1)
+	if (isSpinning && item->Animation.ActiveState == 1)
 		item->Pose.Orientation.y += -ANGLE(180.0f);
 }

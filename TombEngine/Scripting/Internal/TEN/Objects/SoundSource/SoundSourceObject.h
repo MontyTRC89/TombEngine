@@ -1,9 +1,12 @@
 #pragma once
 
 #include "Objects/NamedBase.h"
-#include "Specific/phd_global.h"
+#include "Math/Math.h"
 
-namespace sol {
+struct SoundSourceInfo;
+
+namespace sol
+{
 	class state;
 }
 class Vec3;

@@ -1,6 +1,5 @@
 #pragma once
-#include "Specific/phd_global.h"
-#include "Specific/trmath.h"
+#include "Math/Math.h"
 
 class FloorInfo;
 struct CollisionInfo;
@@ -12,13 +11,13 @@ constexpr auto ITEM_RADIUS_YMAX = SECTOR(3);
 
 constexpr auto VEHICLE_COLLISION_TERMINAL_VELOCITY = 30.0f;
 
-extern BOUNDING_BOX GlobalCollisionBounds;
+extern GameBoundingBox GlobalCollisionBounds;
 extern ItemInfo* CollidedItems[MAX_COLLIDED_OBJECTS];
 extern MESH_INFO* CollidedMeshes[MAX_COLLIDED_OBJECTS];
 
 struct OBJECT_COLLISION_BOUNDS
 {
-	BOUNDING_BOX boundingBox;
+	GameBoundingBox boundingBox;
 	short rotX1;
 	short rotX2;
 	short rotY1;
@@ -33,20 +32,20 @@ bool TestWithGlobalCollisionBounds(ItemInfo* item, ItemInfo* laraItem, Collision
 void TestForObjectOnLedge(ItemInfo* item, CollisionInfo* coll);
 
 bool TestLaraPosition(OBJECT_COLLISION_BOUNDS* bounds, ItemInfo* item, ItemInfo* laraItem);
-bool AlignLaraPosition(Vector3Int* offset, ItemInfo* item, ItemInfo* laraItem);
-bool MoveLaraPosition(Vector3Int* pos, ItemInfo* item, ItemInfo* laraItem);
+bool AlignLaraPosition(Vector3i* offset, ItemInfo* item, ItemInfo* laraItem);
+bool MoveLaraPosition(Vector3i* pos, ItemInfo* item, ItemInfo* laraItem);
 
-bool ItemNearLara(Vector3Int* origin, int radius);
-bool ItemNearTarget(Vector3Int* origin, ItemInfo* targetEntity, int radius);
+bool ItemNearLara(const Vector3i& origin, int radius);
+bool ItemNearTarget(const Vector3i& origin, ItemInfo* targetEntity, int radius);
 
-bool Move3DPosTo3DPos(PHD_3DPOS* fromPose, PHD_3DPOS* toPose, int velocity, short angleAdd);
+bool Move3DPosTo3DPos(ItemInfo* item, Pose& fromPose, const Pose& toPose, int velocity, short turnRate);
 
 bool TestBoundsCollide(ItemInfo* item, ItemInfo* laraItem, int radius);
 bool TestBoundsCollideStatic(ItemInfo* item, MESH_INFO* mesh, int radius);
 bool ItemPushItem(ItemInfo* item, ItemInfo* laraItem, CollisionInfo* coll, bool spasmEnabled, char bigPush);
 bool ItemPushStatic(ItemInfo* laraItem, MESH_INFO* mesh, CollisionInfo* coll);
 
-bool CollideSolidBounds(ItemInfo* item, BOUNDING_BOX* box, PHD_3DPOS pose, CollisionInfo* coll);
+bool CollideSolidBounds(ItemInfo* item, GameBoundingBox* box, Pose pose, CollisionInfo* coll);
 void CollideSolidStatics(ItemInfo* item, CollisionInfo* coll);
 
 void AIPickupCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);

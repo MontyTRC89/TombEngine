@@ -1,8 +1,8 @@
 #pragma once
 #include "Objects/objectslist.h"
-#include "Renderer/Renderer11Enums.h"
+#include "Math/Math.h"
 #include "Specific/level.h"
-#include "Specific/phd_global.h"
+#include "Renderer/Renderer11Enums.h"
 
 enum class ZoneType;
 struct CollisionInfo;
@@ -81,8 +81,8 @@ struct STATIC_INFO
 {
 	int meshNumber;
 	int flags;
-	BOUNDING_BOX visibilityBox;
-	BOUNDING_BOX collisionBox;
+	GameBoundingBox visibilityBox;
+	GameBoundingBox collisionBox;
 	int shatterType;
 	int shatterSound;
 };

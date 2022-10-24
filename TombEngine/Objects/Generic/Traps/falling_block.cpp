@@ -7,9 +7,9 @@
 #include "Game/collision/floordata.h"
 #include "Game/effects/debris.h"
 #include "Game/room.h"
+#include "Math/Random.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
-#include "Specific/prng.h"
 #include "Specific/setup.h"
 
 using namespace TEN::Floordata;
@@ -139,7 +139,7 @@ void FallingBlockControl(short itemNumber)
 std::optional<int> FallingBlockFloor(short itemNumber, int x, int y, int z)
 {
 	ItemInfo* item = &g_Level.Items[itemNumber];
-	if (!item->MeshBits || item->ItemFlags[0] >= FALLINGBLOCK_DELAY)
+	if (!item->MeshBits.TestAny() || item->ItemFlags[0] >= FALLINGBLOCK_DELAY)
 		return std::nullopt;
 
 	return GetBridgeItemIntersect(itemNumber, x, y, z, false);
@@ -149,7 +149,7 @@ std::optional<int> FallingBlockCeiling(short itemNumber, int x, int y, int z)
 {
 	ItemInfo* item = &g_Level.Items[itemNumber];
 
-	if (!item->MeshBits || item->ItemFlags[0] >= FALLINGBLOCK_DELAY)
+	if (!item->MeshBits.TestAny() || item->ItemFlags[0] >= FALLINGBLOCK_DELAY)
 		return std::nullopt;
 
 	return GetBridgeItemIntersect(itemNumber, x, y, z, true);

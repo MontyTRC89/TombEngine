@@ -11,6 +11,7 @@ Version 1.0.3
 * Adjust sprint jump timing.
 * Fix grabbing narrow ledges below ceilings.
 * Add FlyCheat option for disable Fly Cheat to gameflow
+* Fix search animations.
 
 
 Version 1.0.2

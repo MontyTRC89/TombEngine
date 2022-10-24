@@ -12,11 +12,13 @@
 #include "Game/itemdata/creature_info.h"
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
+#include "Math/Math.h"
 #include "Sound/sound.h"
 #include "Specific/setup.h"
 #include "Specific/level.h"
 
 using namespace TEN::Effects::Lightning;
+using namespace TEN::Math;
 
 namespace TEN::Entities::Creatures::TR5
 {
@@ -24,7 +26,7 @@ namespace TEN::Entities::Creatures::TR5
 
 	struct RomanStatueInfo
 	{
-		Vector3Int Position;
+		Vector3i Position;
 		LIGHTNING_INFO* EnergyArcs[8];
 		unsigned int Count;
 	};
@@ -56,9 +58,9 @@ namespace TEN::Entities::Creatures::TR5
 		STATUE_ANIM_START_JUMP_DOWN = 16
 	};
 
-	static void RomanStatueHitEffect(ItemInfo* item, Vector3Int* pos, int joint)
+	static void RomanStatueHitEffect(ItemInfo* item, Vector3i* pos, int joint)
 	{
-		GetJointAbsPosition(item, pos, joint);
+		*pos = GetJointPosition(item, joint, *pos);
 
 		if (!(GetRandomControl() & 0x1F))
 		{
@@ -67,9 +69,7 @@ namespace TEN::Entities::Creatures::TR5
 			{
 				auto* fx = &EffectList[fxNumber];
 
-				fx->pos.Position.x = pos->x;
-				fx->pos.Position.y = pos->y;
-				fx->pos.Position.z = pos->z;
+				fx->pos.Position = *pos;
 				fx->roomNumber = item->RoomNumber;
 				fx->pos.Orientation.z = 0;
 				fx->pos.Orientation.x = 0;
@@ -224,7 +224,7 @@ namespace TEN::Entities::Creatures::TR5
 		spark->sSize = (spark->size = factor * ((GetRandomControl() & 0x1F) + 64)) / 16;
 	}
 
-	static void RomanStatueAttack(PHD_3DPOS* pos, short roomNumber, short count)
+	static void RomanStatueAttack(Pose* pos, short roomNumber, short count)
 	{
 		short fxNumber = CreateNewEffect(roomNumber);
 
@@ -247,7 +247,7 @@ namespace TEN::Entities::Creatures::TR5
 		}
 	}
 
-	void TriggerRomanStatueMissileSparks(Vector3Int* pos, char fxObject)
+	void TriggerRomanStatueMissileSparks(Vector3i* pos, char fxObject)
 	{
 		auto* spark = GetFreeParticle();
 
@@ -311,7 +311,7 @@ namespace TEN::Entities::Creatures::TR5
 		auto* item = &g_Level.Items[itemNumber];
 		auto* creature = GetCreatureInfo(item);
 
-		int oldMeshSwapBits = item->MeshSwapBits;
+		int prevMeshSwapBits = item->MeshSwapBits.ToPackedBits();
 
 		// At determined HP values, roman statues sheds material.
 		if (item->HitPoints < 1 && !(item->MeshSwapBits & 0x10000))
@@ -341,7 +341,7 @@ namespace TEN::Entities::Creatures::TR5
 		}
 
 		// Play hit animation.
-		if (oldMeshSwapBits != item->MeshSwapBits)
+		if (prevMeshSwapBits != item->MeshSwapBits.ToPackedBits())
 		{
 			item->Animation.TargetState = STATUE_STATE_HIT;
 			item->Animation.ActiveState = STATUE_STATE_HIT;
@@ -370,7 +370,7 @@ namespace TEN::Entities::Creatures::TR5
 
 			creature->MaxTurn = 0;
 
-			Vector3Int pos, pos1, pos2;
+			Vector3i pos, pos1, pos2;
 			byte color;
 			int deltaFrame;
 			bool unknown;
@@ -439,13 +439,10 @@ namespace TEN::Entities::Creatures::TR5
 			case STATUE_STATE_SCREAM:
 				unknown = false;
 
-				pos1 = { -32, 48, 64 };
-				GetJointAbsPosition(item, &pos1, 14);
+				pos1 = GetJointPosition(item, 14, Vector3i(-32, 48, 64));
+				pos2 = GetJointPosition(item, 14, Vector3i(-48, 48, 490));
 
-				pos2 = { -48, 48, 490 };
-				GetJointAbsPosition(item, &pos2, 14);
-
-				pos = { (pos1.x + pos2.x) / 2, (pos1.y + pos2.y) / 2, (pos1.z + pos2.z) / 2 };
+				pos = Vector3i((pos1.x + pos2.x) / 2, (pos1.y + pos2.y) / 2, (pos1.z + pos2.z) / 2);
 
 				deltaFrame = item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase;
 
@@ -490,11 +487,10 @@ namespace TEN::Entities::Creatures::TR5
 					break;
 
 				if (item->TriggerFlags)
-					pos = { -48, 48, GetRandomControl() % 480 };
+					pos = Vector3i(-48, 48, GetRandomControl() % 480);
 				else
-					pos = { -40, 64, GetRandomControl() % 360 };
-
-				GetJointAbsPosition(item, &pos, 14);
+					pos = Vector3i(-40, 64, GetRandomControl() % 360);
+				pos = GetJointPosition(item, 14, pos);
 
 				color = (GetRandomControl() & 0x3F) + 128;
 
@@ -529,8 +525,8 @@ namespace TEN::Entities::Creatures::TR5
 					if (item->TriggerFlags)
 					{
 						/*RomanStatueData.energyArcs[i] = TriggerEnergyArc(
-							(Vector3Int*)& dest.Orientation.x,
-							(Vector3Int*)& dest,
+							(Vector3i*)& dest.Orientation.x,
+							(Vector3i*)& dest,
 							(GetRandomControl() & 0x3F) + 16,
 							(color >> 1) | ((color | 0x180000) << 8),
 							15,
@@ -575,8 +571,7 @@ namespace TEN::Entities::Creatures::TR5
 
 				if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 10)
 				{
-					pos = { 0, 0, 0 };
-					GetJointAbsPosition(item, &pos, 16);
+					pos = GetJointPosition(item, 16);
 
 					auto* room = &g_Level.Rooms[item->RoomNumber];
 					FloorInfo* floor = GetSector(room, pos.x - room->x, pos.z - room->z);
@@ -593,7 +588,7 @@ namespace TEN::Entities::Creatures::TR5
 								if (StaticObjects[mesh->staticNumber].shatterType != SHT_NONE)
 								{
 									ShatterObject(0, mesh, -64, LaraItem->RoomNumber, 0);
-									SoundEffect(GetShatterSound(mesh->staticNumber), (PHD_3DPOS*)mesh);
+									SoundEffect(GetShatterSound(mesh->staticNumber), (Pose*)mesh);
 
 									floor->Stopper = false;
 
@@ -616,9 +611,7 @@ namespace TEN::Entities::Creatures::TR5
 
 					if (!item->TriggerFlags)
 					{
-						pos1 = { -40, 64, 360 };
-						GetJointAbsPosition(item, &pos1, 14);
-
+						pos1 = GetJointPosition(item, 14, Vector3i(-40, 64, 360));
 						pos1.y = item->Pose.Position.y - 64;
 
 						if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + 34 && item->Animation.ActiveState == 3)
@@ -626,10 +619,10 @@ namespace TEN::Entities::Creatures::TR5
 							if (item->ItemFlags[0])
 								item->ItemFlags[0]--;
 
-							TriggerShockwave((PHD_3DPOS*)&pos1, 16, 160, 96, 0, 64, 128, 48, 0, 1);
+							TriggerShockwave((Pose*)&pos1, 16, 160, 96, 0, 64, 128, 48, 0, 1);
 							TriggerRomanStatueShockwaveAttackSparks(pos1.x, pos1.y, pos1.z, 128, 64, 0, 128);
 							pos1.y -= 64;
-							TriggerShockwave((PHD_3DPOS*)&pos1, 16, 160, 64, 0, 64, 128, 48, 0, 1);
+							TriggerShockwave((Pose*)&pos1, 16, 160, 64, 0, 64, 128, 48, 0, 1);
 						}
 
 						deltaFrame = item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase;
@@ -725,14 +718,11 @@ namespace TEN::Entities::Creatures::TR5
 
 				if (deltaFrame == 34)
 				{
-					pos1 = Vector3Int(-48, 48, SECTOR(1));
-					GetJointAbsPosition(item, &pos1, 14);
+					pos1 = GetJointPosition(item, 14, Vector3i(-48, 48, SECTOR(1)));
+					pos2 = GetJointPosition(item, 14, Vector3i(-48, 48, 450));
 
-					pos2 = Vector3Int(-48, 48, 450);
-					GetJointAbsPosition(item, &pos2, 14);
-
-					auto angles = GetVectorAngles(pos1.x - pos2.x, pos1.y - pos2.y, pos1.z - pos2.z);
-					auto attackPos = PHD_3DPOS(pos2, angles);
+				auto orient = Geometry::GetOrientToPoint(pos2.ToVector3(), pos1.ToVector3());
+				auto attackPos = Pose(pos2, orient);
 
 					short roomNumber = item->RoomNumber;
 					GetFloor(pos2.x, pos2.y, pos2.z, &roomNumber);
@@ -762,11 +752,8 @@ namespace TEN::Entities::Creatures::TR5
 				deltaFrame -= 10;
 				if (deltaFrame < 32)
 				{
-					pos1 = { -32, 48, 64 };
-					GetJointAbsPosition(item, &pos1, 14);
-
-					pos2 = { -48, 48, 490 };
-					GetJointAbsPosition(item, &pos2, 14);
+					pos1 = GetJointPosition(item, 14, Vector3i(-32, 48, 64));
+					pos2 = GetJointPosition(item, 14, Vector3i(-48, 48, 490));
 
 					for (int i = 0; i < 4; i++)
 					{
@@ -798,12 +785,8 @@ namespace TEN::Entities::Creatures::TR5
 								arc->b = b;
 							}
 
-							arc->pos1.x = pos1.x;
-							arc->pos1.y = pos1.y;
-							arc->pos1.z = pos1.z;
-							arc->pos4.x = pos2.x;
-							arc->pos4.y = pos2.y;
-							arc->pos4.z = pos2.z;
+							arc->pos1 = pos1;
+							arc->pos4 = pos2;
 						}
 						else if (deltaFrame >= 16)
 						{
@@ -845,7 +828,7 @@ namespace TEN::Entities::Creatures::TR5
 			{
 				if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 54 &&
 					item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].frameBase + 74 &&
-					item->TouchBits)
+					item->TouchBits.TestAny())
 				{
 					DoDamage(creature->Enemy, 40);
 				}
@@ -878,28 +861,31 @@ namespace TEN::Entities::Creatures::TR5
 
 		if (item->MeshSwapBits & 0x400)
 		{
-			Vector3Int pos;
-			pos.x = (GetRandomControl() & 0x1F) - 16;
-			pos.y = 86;
-			pos.z = (GetRandomControl() & 0x1F) - 16;
+			auto pos = Vector3i(
+				(GetRandomControl() & 0x1F) - 16,
+				86,
+				(GetRandomControl() & 0x1F) - 16
+			);
 			RomanStatueHitEffect(item, &pos, 10);
 		}
 
 		if (item->MeshSwapBits & 0x10)
 		{
-			Vector3Int pos;
-			pos.x = -40;
-			pos.y = (GetRandomControl() & 0x7F) + 148;
-			pos.z = (GetRandomControl() & 0x3F) - 32;
+			auto pos = Vector3i(
+				-40,
+				(GetRandomControl() & 0x7F) + 148,
+				(GetRandomControl() & 0x3F) - 32
+			);
 			RomanStatueHitEffect(item, &pos, 4);
 		}
 
 		if (item->MeshSwapBits & 0x100)
 		{
-			Vector3Int pos;
-			pos.x = (GetRandomControl() & 0x3F) + 54;
-			pos.y = -170;
-			pos.z = (GetRandomControl() & 0x1F) + 27;
+			auto pos = Vector3i(
+				(GetRandomControl() & 0x3F) + 54,
+				-170,
+				(GetRandomControl() & 0x1F) + 27
+			);
 			RomanStatueHitEffect(item, &pos, 8);
 		}
 

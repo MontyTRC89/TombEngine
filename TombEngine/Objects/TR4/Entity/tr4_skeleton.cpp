@@ -16,7 +16,7 @@
 #include "Game/people.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
-#include "Specific/prng.h"
+#include "Math/Random.h"
 #include "Specific/setup.h"
 
 using namespace TEN::Math::Random;
@@ -27,7 +27,7 @@ namespace TEN::Entities::TR4
 	constexpr auto SKELETON_ATTACK_DAMAGE = 80;
 
 	const auto SkeletonBite = BiteInfo(Vector3(0.0f, -16.0f, 200.0f), 11);
-	const vector<int> SkeletonSwordAttackJoints = { 15, 16 };
+	const vector<uint> SkeletonSwordAttackJoints = { 15, 16 };
 
 	// TODO: Fill in missign states.
 	enum SkeletonState
@@ -566,7 +566,7 @@ namespace TEN::Entities::TR4
 
 				if (!creature->Flags)
 				{
-					if (item->TestBits(JointBitType::Touch, SkeletonSwordAttackJoints))
+					if (item->TouchBits.Test(SkeletonSwordAttackJoints))
 					{
 						DoDamage(creature->Enemy, SKELETON_ATTACK_DAMAGE);
 						CreatureEffect2(item, SkeletonBite, 15, -1, DoBloodSplat);
@@ -597,8 +597,7 @@ namespace TEN::Entities::TR4
 				{
 					auto* room = &g_Level.Rooms[item->RoomNumber];
 
-					auto pos = Vector3Int();
-					GetJointAbsPosition(item, &pos, 16);
+					auto pos = GetJointPosition(item, 16);
 
 					auto floor = GetCollision(x, y, z, item->RoomNumber).Block;
 					if (floor->Stopper)
@@ -622,7 +621,7 @@ namespace TEN::Entities::TR4
 
 					if (!creature->Flags)
 					{
-						if (item->TestBits(JointBitType::Touch, SkeletonSwordAttackJoints))
+						if (item->TouchBits.Test(SkeletonSwordAttackJoints))
 						{
 							DoDamage(creature->Enemy, SKELETON_ATTACK_DAMAGE);
 							CreatureEffect2(item, SkeletonBite, 10, item->Pose.Orientation.y, DoBloodSplat);

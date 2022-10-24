@@ -5,10 +5,11 @@
 
 #include "Game/animation.h"
 #include "Game/itemdata/itemdata.h"
+#include "Math/Math.h"
 #include "Specific/newtypes.h"
-#include "Specific/phd_global.h"
+#include "Specific/BitField.h"
 
-using std::vector;
+using namespace TEN::Utils;
 
 enum GAME_OBJECT_ID : short;
 
@@ -38,11 +39,11 @@ enum ItemStatus
 
 enum ItemFlags
 {
-	IFLAG_CLEAR_BODY	  = (1 << 7),  // 0x0080
-	IFLAG_INVISIBLE		  = (1 << 8),  // 0x0100
-	IFLAG_REVERSE		  = (1 << 14), // 0x4000
-	IFLAG_KILLED		  = (1 << 15), // 0x8000
-	IFLAG_ACTIVATION_MASK = 0x3E00	   // bits 9-13
+	IFLAG_CLEAR_BODY	  = (1 << 7),
+	IFLAG_INVISIBLE		  = (1 << 8),
+	IFLAG_REVERSE		  = (1 << 14),
+	IFLAG_KILLED		  = (1 << 15),
+	IFLAG_ACTIVATION_MASK = 0x3E00 // bits 9-13
 };
 
 constexpr unsigned int ALL_JOINT_BITS = UINT_MAX;
@@ -64,7 +65,7 @@ struct EntityAnimationData
 	int RequiredState = -1; // TODO: Phase out this weird feature.
 
 	bool IsAirborne	= false;
-	Vector3 Velocity = Vector3::Zero; // CONVENTION: +X is right, +Y is down, +Z is forward.
+	Vector3 Velocity = Vector3::Zero; // CONVENTION: +X = right, +Y = down, +Z = forward
 	std::vector<BoneMutator> Mutator = {};
 };
 
@@ -82,8 +83,8 @@ struct ItemInfo
 
 	ITEM_DATA Data;
 	EntityAnimationData Animation;
-	PHD_3DPOS StartPose;
-	PHD_3DPOS Pose;
+	Pose StartPose;
+	Pose Pose;
 	ROOM_VECTOR Location;
 	short RoomNumber;
 	int Floor;
@@ -98,9 +99,9 @@ struct ItemInfo
 	int Timer;
 	Vector4 Color;
 
-	unsigned int TouchBits;
-	unsigned int MeshBits;
-	unsigned int MeshSwapBits;
+	BitField TouchBits	  = BitField();
+	BitField MeshBits	  = BitField();
+	BitField MeshSwapBits = BitField();
 
 	unsigned short Flags; // ItemFlags enum
 	short ItemFlags[8];
@@ -118,13 +119,6 @@ struct ItemInfo
 	std::string LuaCallbackOnCollidedWithObjectName;
 	std::string LuaCallbackOnCollidedWithRoomName;
 
-	bool TestBits(JointBitType type, std::vector<int> jointIndices);
-	bool TestBits(JointBitType type, int jointIndex);
-	void SetBits(JointBitType type, std::vector<int> jointIndices);
-	void SetBits(JointBitType type, int jointIndex);
-	void ClearBits(JointBitType type, std::vector<int> jointIndices);
-	void ClearBits(JointBitType type, int jointIndex);
-
 	bool TestOcb(short ocbFlags);
 	void RemoveOcb(short ocbFlags);
 	void ClearAllOcb();
@@ -136,7 +130,7 @@ struct ItemInfo
 	bool IsCreature();
 };
 
-bool TestState(int refState, const vector<int>& stateList);
+bool TestState(int refState, const std::vector<int>& stateList);
 void EffectNewRoom(short fxNumber, short roomNumber);
 void ItemNewRoom(short itemNumber, short roomNumber);
 void AddActiveItem(short itemNumber);

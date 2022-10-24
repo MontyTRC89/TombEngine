@@ -123,6 +123,7 @@ bool TestLaraJumpRight(ItemInfo* item, CollisionInfo* coll);
 bool TestLaraJumpUp(ItemInfo* item, CollisionInfo* coll);
 bool TestLaraSlideJump(ItemInfo* item, CollisionInfo* coll);
 bool TestLaraCrawlspaceDive(ItemInfo* item, CollisionInfo* coll);
+bool TestLaraLedgeJump(ItemInfo* item, CollisionInfo* coll);
 
 bool TestLaraTightropeDismount(ItemInfo* item, CollisionInfo* coll);
 

@@ -17,15 +17,17 @@ namespace TEN::Entities::Switches
 {
 	OBJECT_COLLISION_BOUNDS PulleyBounds = 
 	{
-		-256, 256,
-		0, 0,
-		-512, 512,
+		GameBoundingBox(
+			-256, 256,
+			0, 0,
+			-512, 512
+		),
 		-ANGLE(10.0f), ANGLE(10.0f),
 		-ANGLE(30.0f), ANGLE(30.0f),
 		-ANGLE(10.0f), ANGLE(10.0f)
 	};
 
-	Vector3Int PulleyPos = { 0, 0, -148 }; 
+	Vector3i PulleyPos = { 0, 0, -148 }; 
 
 	void InitialisePulleySwitch(short itemNumber)
 	{
