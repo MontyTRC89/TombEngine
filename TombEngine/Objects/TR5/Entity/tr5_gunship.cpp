@@ -24,13 +24,18 @@ namespace TEN::Entities::Creatures::TR5
 		{
 			SoundEffect(SFX_TR4_HELICOPTER_LOOP, &item->Pose);
 
-			GameVector pos;
-			pos.x = ((GetRandomControl() & 0x1FF) - 255);
-			pos.y = (GetRandomControl() & 0x1FF) - 255;
-			pos.z = (GetRandomControl() & 0x1FF) - 255;
-			GetLaraJointPosition((Vector3Int*)&pos, LM_TORSO);
+			auto pos = GameVector(
+				GetJointPosition(
+					LaraItem, 
+					LM_TORSO,
+					Vector3i(
+						(GetRandomControl() & 0x1FF) - 255,
+						(GetRandomControl() & 0x1FF) - 255,
+						(GetRandomControl() & 0x1FF) - 255
+					))
+			);
 
-			GameVector end = pos;
+			auto target = pos;
 
 			if (!item->ItemFlags[0] && !item->ItemFlags[1] && !item->ItemFlags[2])
 			{
@@ -53,17 +58,17 @@ namespace TEN::Entities::Creatures::TR5
 				item->Pose.Position.x += (pos.x - item->Pose.Position.x) / 32;
 			item->Pose.Position.y += (pos.y - item->Pose.Position.y - 256) / 32;
 
-			GameVector start;
-			start.x = GetRandomControl() + item->Pose.Position.x - 128;
-			start.y = GetRandomControl() + item->Pose.Position.y - 128;
-			start.z = GetRandomControl() + item->Pose.Position.z - 128;
-			start.roomNumber = item->RoomNumber;
-			bool los = LOS(&start, &end);
+			GameVector origin;
+			origin.x = GetRandomControl() + item->Pose.Position.x - 128;
+			origin.y = GetRandomControl() + item->Pose.Position.y - 128;
+			origin.z = GetRandomControl() + item->Pose.Position.z - 128;
+			origin.RoomNumber = item->RoomNumber;
+			bool los = LOS(&origin, &target);
 
-			end.x = 3 * pos.x - 2 * start.x;
-			end.y = 3 * pos.y - 2 * start.y;
-			end.z = 3 * pos.z - 2 * start.z;
-			bool los2 = LOS(&start, &end);
+			target.x = 3 * pos.x - 2 * origin.x;
+			target.y = 3 * pos.y - 2 * origin.y;
+			target.z = 3 * pos.z - 2 * origin.z;
+			bool los2 = LOS(&origin, &target);
 
 			if (los)
 				GunShipCounter = 1;
@@ -81,9 +86,9 @@ namespace TEN::Entities::Creatures::TR5
 			if (!(GlobalCounter & 1))
 				return AnimateItem(item);
 
-			Vector3Int hitPos;
+			Vector3i hitPos;
 			MESH_INFO* hitMesh = nullptr;
-			int objOnLos = ObjectOnLOS2(&start, &end, &hitPos, &hitMesh, GAME_OBJECT_ID::ID_LARA);
+			int objOnLos = ObjectOnLOS2(&origin, &target, &hitPos, &hitMesh, GAME_OBJECT_ID::ID_LARA);
 
 			if (objOnLos == NO_LOS_ITEM || objOnLos < 0)
 			{
@@ -91,23 +96,23 @@ namespace TEN::Entities::Creatures::TR5
 					return AnimateItem(item);
 
 				TriggerDynamicLight(
-					start.x, start.y, start.z, 16,
+					origin.x, origin.y, origin.z, 16,
 					(GetRandomControl() & 0x3F) + 96,
 					(GetRandomControl() & 0x1F) + 64,
 					0);
 
 				if (!los2)
 				{
-					TriggerRicochetSpark(&end, 2 * GetRandomControl(), 3, 0);
-					TriggerRicochetSpark(&end, 2 * GetRandomControl(), 3, 0);
+					TriggerRicochetSpark(&target, 2 * GetRandomControl(), 3, 0);
+					TriggerRicochetSpark(&target, 2 * GetRandomControl(), 3, 0);
 				}
 
 				if (objOnLos < 0 && GetRandomControl() & 1)
 				{
 					if (StaticObjects[hitMesh->staticNumber].shatterType != SHT_NONE)
 					{
-						ShatterObject(0, hitMesh, 64, end.roomNumber, 0);
-						TestTriggers(hitMesh->pos.Position.x, hitMesh->pos.Position.y, hitMesh->pos.Position.z, end.roomNumber, true);
+						ShatterObject(0, hitMesh, 64, target.RoomNumber, 0);
+						TestTriggers(hitMesh->pos.Position.x, hitMesh->pos.Position.y, hitMesh->pos.Position.z, target.RoomNumber, true);
 						SoundEffect(GetShatterSound(hitMesh->staticNumber), &hitMesh->pos);
 					}
 
@@ -132,14 +137,14 @@ namespace TEN::Entities::Creatures::TR5
 				else
 				{
 					TriggerDynamicLight(
-						start.x, start.y, start.z,
+						origin.x, origin.y, origin.z,
 						16,
 						(GetRandomControl() & 0x3F) + 96,
 						(GetRandomControl() & 0x1F) + 64,
 						0);
 
 					DoBloodSplat(
-						start.x, start.y, start.z,
+						origin.x, origin.y, origin.z,
 						(GetRandomControl() & 1) + 2,
 						2 * GetRandomControl(),
 						LaraItem->RoomNumber);
@@ -168,12 +173,12 @@ namespace TEN::Entities::Creatures::TR5
 				spark->fadeToBlack = 0;
 				spark->life = 12;
 				spark->sLife = 12;
-				spark->x = start.x;
-				spark->y = start.y;
-				spark->z = start.z;
-				spark->xVel = 4 * (end.x - start.x);
-				spark->yVel = 4 * (end.y - start.y);
-				spark->zVel = 4 * (end.z - start.z);
+				spark->x = origin.x;
+				spark->y = origin.y;
+				spark->z = origin.z;
+				spark->xVel = 4 * (target.x - origin.x);
+				spark->yVel = 4 * (target.y - origin.y);
+				spark->zVel = 4 * (target.z - origin.z);
 				spark->friction = 0;
 				spark->maxYvel = 0;
 				spark->flags = SP_NONE;

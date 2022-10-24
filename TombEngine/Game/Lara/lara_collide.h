@@ -36,4 +36,4 @@ void LaraWaterCurrent(ItemInfo* item, CollisionInfo* coll);
 bool TestLaraHitCeiling(CollisionInfo* coll);
 void SetLaraHitCeiling(ItemInfo* item, CollisionInfo* coll);
 
-bool TestLaraObjectCollision(ItemInfo* item, short angle, int distance, int height = 0, int side = 0);
+bool TestLaraObjectCollision(ItemInfo* item, short headingAngle, int forward, int down = 0, int right = 0);

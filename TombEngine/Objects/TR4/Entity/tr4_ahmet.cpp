@@ -14,7 +14,7 @@
 #include "Game/people.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
-#include "Specific/prng.h"
+#include "Math/Random.h"
 #include "Specific/setup.h"
 
 using namespace TEN::Effects::Environment;
@@ -131,7 +131,7 @@ namespace TEN::Entities::TR4
 		auto* creature = GetCreatureInfo(item);
 
 		short angle = 0;
-		auto extraHeadRot = Vector3Shrt::Zero;
+		auto extraHeadRot = EulerAngles::Zero;
 
 		if (item->HitPoints <= 0)
 		{

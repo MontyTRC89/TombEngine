@@ -4,8 +4,8 @@ namespace TEN::Entities::TR4
 {
 	struct WraithInfo
 	{
-		Vector3Int Position;
-		Vector3Int Velocity;
+		Vector3i Position;
+		Vector3i Velocity;
 
 		unsigned char r;
 		unsigned char g;

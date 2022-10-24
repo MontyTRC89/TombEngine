@@ -14,7 +14,7 @@
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_struct.h"
 #include "Game/Lara/lara.h"
-#include "Specific/trmath.h"
+#include "Math/Math.h"
 #include "Game/misc.h"
 #include "Objects/Generic/Doors/pushpull_kick_door.h"
 #include "Game/collision/collide_item.h"
@@ -32,15 +32,17 @@ namespace TEN::Entities::Doors
 		STATE_PUSHPULL_KICK_DOOR_PULL = 3
 	};
 
-	Vector3Int PullDoorPos(-201, 0, 322);
-	Vector3Int PushDoorPos(201, 0, -702);
-	Vector3Int KickDoorPos(0, 0, -917);
+	Vector3i PullDoorPos(-201, 0, 322);
+	Vector3i PushDoorPos(201, 0, -702);
+	Vector3i KickDoorPos(0, 0, -917);
 
 	OBJECT_COLLISION_BOUNDS PushPullKickDoorBounds =
 	{
-		-384, 384,
-		0, 0,
-		-1024, 512,
+		GameBoundingBox(
+			-384, 384,
+			0, 0,
+			-1024, 512
+		),
 		-ANGLE(10.0f), ANGLE(10.0f),
 		-ANGLE(30.0f), ANGLE(30.0f),
 		-ANGLE(10.0f), ANGLE(10.0f),

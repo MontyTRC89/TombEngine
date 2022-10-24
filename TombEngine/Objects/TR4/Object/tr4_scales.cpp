@@ -17,9 +17,11 @@ using namespace TEN::Entities::TR4;
 
 OBJECT_COLLISION_BOUNDS ScalesBounds =
 {
-	-1408, -1408,
-	0, 0,
-	-512, 512,
+	GameBoundingBox(
+		-1408, -1408,
+		0, 0,
+		-512, 512
+	),
 	ANGLE(-10.0f), ANGLE(10.0f),
 	ANGLE(-30.0f), ANGLE(30.0f),
 	ANGLE(-10.0f), ANGLE(10.0f)
@@ -163,8 +165,7 @@ void ScalesCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 		laraItem->Animation.FrameNumber >= g_Level.Anims[LA_WATERSKIN_POUR_HIGH].frameBase + 51 &&
 		laraItem->Animation.FrameNumber <= g_Level.Anims[LA_WATERSKIN_POUR_HIGH].frameBase + 74)
 	{
-		Vector3Int pos = { 0, 0, 0 };
-		GetLaraJointPosition(&pos, LM_LHAND);
+		auto pos = GetJointPosition(laraItem, LM_LHAND);
 
 		auto* drip = &Drips[GetFreeDrip()];
 		drip->x = pos.x;

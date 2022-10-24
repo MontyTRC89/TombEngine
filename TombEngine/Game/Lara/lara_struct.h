@@ -1,6 +1,6 @@
 #pragma once
 #include "Objects/objectslist.h"
-#include "Specific/trmath.h"
+#include "Math/Math.h"
 
 #define NUM_PUZZLES	(ID_PUZZLE_ITEM16 - ID_PUZZLE_ITEM1 + 1)
 #define NUM_PUZZLE_PIECES	(ID_PUZZLE_ITEM16_COMBO2 - ID_PUZZLE_ITEM1_COMBO1 + 1)
@@ -1077,7 +1077,7 @@ struct ArmInfo
 	int FrameNumber;
 	int FrameBase;
 
-	Vector3Shrt Orientation;
+	EulerAngles Orientation;
 
 	bool Locked;
 	int GunFlash;
@@ -1258,14 +1258,14 @@ struct LaraInfo
 	FlareData Flare;
 	TorchData Torch;
 
-	Vector3Shrt ExtraHeadRot;
-	Vector3Shrt ExtraTorsoRot;
+	EulerAngles ExtraHeadRot;
+	EulerAngles ExtraTorsoRot;
 	short WaterCurrentActive;
-	Vector3Int WaterCurrentPull;
+	Vector3i WaterCurrentPull;
 
 	ArmInfo LeftArm;
 	ArmInfo RightArm;
-	Vector3Shrt TargetArmOrient;
+	EulerAngles TargetArmOrient;
 	ItemInfo* TargetEntity;
 	CreatureInfo* Creature;	// Not saved. Unused?
 
@@ -1281,9 +1281,9 @@ struct LaraInfo
 
 	short InteractedItem;
 	int ProjectedFloorHeight;
-	Vector3Shrt TargetOrientation;
+	EulerAngles TargetOrientation;
 	int WaterSurfaceDist;
-	PHD_3DPOS NextCornerPos;
+	Pose NextCornerPos;
 
 	// TODO: Use BurnType in place of Burn, BurnBlue, and BurnSmoke. Core didn't make replacing them easy.
 	BurnType BurnType;

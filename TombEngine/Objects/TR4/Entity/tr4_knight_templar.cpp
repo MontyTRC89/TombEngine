@@ -11,7 +11,7 @@
 #include "Game/misc.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
-#include "Specific/prng.h"
+#include "Math/Random.h"
 #include "Specific/setup.h"
 
 using namespace TEN::Math::Random;
@@ -88,9 +88,7 @@ namespace TEN::Entities::TR4
 		{
 			if (TestProbability(0.5f))
 			{
-				auto pos = Vector3Int(0, 48, 448);
-				GetJointAbsPosition(item, &pos, 10);
-
+				auto pos = GetJointPosition(item, 10, Vector3i(0, 48, 448));
 				TriggerMetalSparks(pos.x, pos.y, pos.z, (GetRandomControl() & 0x1FF) - 256, -128 - (GetRandomControl() & 0x7F), (GetRandomControl() & 0x1FF) - 256, 0);
 			}
 		}
@@ -176,8 +174,7 @@ namespace TEN::Entities::TR4
 			if (frameNumber > (frameBase + 42) &&
 				frameNumber < (frameBase + 51))
 			{
-				auto pos = Vector3Int();
-				GetJointAbsPosition(item, &pos, LM_LINARM);
+				auto pos = GetJointPosition(item, LM_LINARM);
 				
 				auto* room = &g_Level.Rooms[item->RoomNumber];
 				FloorInfo* currentFloor = &room->floor[(pos.z - room->z) / SECTOR(1) + (pos.z - room->x) / SECTOR(1) * room->zSize];

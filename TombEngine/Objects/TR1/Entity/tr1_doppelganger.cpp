@@ -42,7 +42,7 @@ namespace TEN::Entities::Creatures::TR1
 		return (itemNumber == NO_ITEM ? nullptr : &g_Level.Items[itemNumber]);
 	}
 
-	static short GetWeaponDamage(LaraWeaponType weaponType)
+	short GetWeaponDamage(LaraWeaponType weaponType)
 	{
 		return short(Weapons[(int)weaponType].Damage) * 25;
 	}
@@ -61,7 +61,7 @@ namespace TEN::Entities::Creatures::TR1
 
 		if (!item->Data)
 		{
-			Vector3Int pos;
+			Vector3i pos;
 			if (reference == nullptr)
 			{
 				pos.x = item->Pose.Position.x;
@@ -112,10 +112,10 @@ namespace TEN::Entities::Creatures::TR1
 				item->Pose.Position.y = item->Floor;
 				TestTriggers(item, true);
 
-				item->Animation.IsAirborne = false;
-				item->Animation.Velocity.y = 0.0f;
 				item->Animation.TargetState = LS_DEATH;
 				item->Animation.RequiredState = LS_DEATH;
+				item->Animation.IsAirborne = false;
+				item->Animation.Velocity.y = 0.0f;
 			}
 		}
 	}

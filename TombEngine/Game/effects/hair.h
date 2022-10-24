@@ -1,5 +1,5 @@
 #pragma once
-#include "Specific/phd_global.h"
+#include "Math/Math.h"
 
 constexpr auto HAIR_MAX = 2; // HAIR_NORMAL = 0, HAIR_YOUNG = 1
 constexpr auto HAIR_SEGMENTS = 6; // classic = 7, young = 14
@@ -10,9 +10,9 @@ struct ItemInfo;
 
 struct HAIR_STRUCT
 {
-	PHD_3DPOS pos;
-	Vector3Int hvel;
-	Vector3Int unknown;
+	Pose pos;
+	Vector3i hvel;
+	Vector3i unknown;
 
 	bool initialised = false;
 	bool enabled = false;

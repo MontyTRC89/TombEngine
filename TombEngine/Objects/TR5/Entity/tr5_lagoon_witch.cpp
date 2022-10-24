@@ -143,7 +143,7 @@ namespace TEN::Entities::Creatures::TR5
 			{
 				auto* enemy = creature->Enemy;
 
-				if (enemy)
+				if (enemy != nullptr)
 				{
 					if (enemy->Flags & 2)
 						item->ItemFlags[3] = (creature->Tosspad & 0xFF) - 1;

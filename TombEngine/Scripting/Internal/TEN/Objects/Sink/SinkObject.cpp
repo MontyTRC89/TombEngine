@@ -63,12 +63,12 @@ void Sink::Register(sol::table& parent)
 
 Vec3 Sink::GetPos() const
 {
-	return Vec3{ m_sink.Position.x, m_sink.Position.y, m_sink.Position.z };
+	return Vec3{ m_sink.Position };
 }
 
 void Sink::SetPos(Vec3 const& pos)
 {
-	m_sink.Position = Vector3Int(pos.x, pos.y, pos.z);
+	m_sink.Position = Vector3i(pos.x, pos.y, pos.z);
 }
 
 std::string Sink::GetName() const

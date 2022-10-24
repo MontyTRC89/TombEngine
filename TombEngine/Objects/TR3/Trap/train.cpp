@@ -26,7 +26,7 @@ long TrainTestHeight(ItemInfo* item, long x, long z, short* roomNumber)
 	float cosY = phd_cos(item->Pose.Orientation.y);
 	float sinZ = phd_sin(item->Pose.Orientation.z);
 
-	auto pos = Vector3Int(
+	auto pos = Vector3i(
 		round(item->Pose.Position.x + ((z * sinY) + (x * cosY))),
 		round(item->Pose.Position.y - ((z * sinX) + (x * sinZ))),
 		round(item->Pose.Position.z + ((z * cosY) - (x * sinY)))
@@ -87,7 +87,7 @@ void TrainControl(short itemNumber)
 
 			ForcedFixedCamera.y = GetCollision(ForcedFixedCamera.x, item->Pose.Position.y - CLICK(2), ForcedFixedCamera.z, item->RoomNumber).Position.Floor;
 
-			ForcedFixedCamera.roomNumber = roomNumber;
+			ForcedFixedCamera.RoomNumber = roomNumber;
 			UseForcedFixedCamera = 1;
 		}
 	}

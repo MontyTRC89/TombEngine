@@ -57,13 +57,13 @@ namespace TEN::Control::Volumes
 			switch (volume->Type)
 			{
 			case TriggerVolumeType::Box:
-				if (roomNumber == Camera.pos.roomNumber)
+				if (roomNumber == Camera.pos.RoomNumber)
 					g_Renderer.AddDebugBox(volume->Box, Vector4(1.0f, 0.0f, 1.0f, 1.0f), RENDERER_DEBUG_PAGE::LOGIC_STATS);
 				contains = volume->Box.Intersects(bbox);
 				break;
 
 			case TriggerVolumeType::Sphere:
-				if (roomNumber == Camera.pos.roomNumber)
+				if (roomNumber == Camera.pos.RoomNumber)
 					g_Renderer.AddDebugSphere(volume->Sphere.Center, volume->Sphere.Radius, Vector4(1.0f, 0.0f, 1.0f, 1.0f), RENDERER_DEBUG_PAGE::LOGIC_STATS);
 				contains = volume->Sphere.Intersects(bbox);
 				break;
@@ -123,38 +123,38 @@ namespace TEN::Control::Volumes
 
 	void TestVolumes(CAMERA_INFO* camera)
 	{
-		auto pos = PHD_3DPOS(camera->pos.x, camera->pos.y, camera->pos.z, 0, 0, 0);
-		auto box = BOUNDING_BOX();
+		auto pos = Pose(camera->pos.ToVector3i(), EulerAngles::Zero);
+		auto box = GameBoundingBox::Zero;
 		box.X1 = box.Y1 = box.Z1 =  CAM_SIZE;
 		box.X2 = box.Y2 = box.Z2 = -CAM_SIZE;
 
-		auto bbox = TO_DX_BBOX(pos, &box);
+		auto bBox = box.ToBoundingOrientedBox(pos);
 
-		TestVolumes(camera->pos.roomNumber, bbox, TriggerVolumeActivators::Flyby, camera);
+		TestVolumes(camera->pos.RoomNumber, bBox, TriggerVolumeActivators::Flyby, camera);
 	}
 
 	void TestVolumes(short roomNumber, MESH_INFO* mesh)
 	{
-		auto bbox = TO_DX_BBOX(mesh->pos, GetBoundsAccurate(mesh, false));
-
-		TestVolumes(roomNumber, bbox, TriggerVolumeActivators::Static, mesh);
+		const auto& bBox = GetBoundsAccurate(*mesh, false).ToBoundingOrientedBox(mesh->pos);
+		
+		TestVolumes(roomNumber, bBox, TriggerVolumeActivators::Static, mesh);
 	}
 
 	void TestVolumes(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
-		auto bbox = TO_DX_BBOX(item->Pose, GetBoundsAccurate(item));
+		auto bBox = GameBoundingBox(item).ToBoundingOrientedBox(item->Pose);
 
 #ifdef _DEBUG
-		g_Renderer.AddDebugBox(bbox, Vector4(1.0f, 1.0f, 0.0f, 1.0f), RENDERER_DEBUG_PAGE::LOGIC_STATS);
+		g_Renderer.AddDebugBox(bBox, Vector4(1.0f, 1.0f, 0.0f, 1.0f), RENDERER_DEBUG_PAGE::LOGIC_STATS);
 #endif
 
 		if (item->ObjectNumber == ID_LARA)
-			TestVolumes(item->RoomNumber, bbox, TriggerVolumeActivators::Player, itemNumber);
+			TestVolumes(item->RoomNumber, bBox, TriggerVolumeActivators::Player, itemNumber);
 		else if (Objects[item->ObjectNumber].intelligent)
-			TestVolumes(item->RoomNumber, bbox, TriggerVolumeActivators::NPC, itemNumber);
+			TestVolumes(item->RoomNumber, bBox, TriggerVolumeActivators::NPC, itemNumber);
 		else
-			TestVolumes(item->RoomNumber, bbox, TriggerVolumeActivators::Movable, itemNumber);
+			TestVolumes(item->RoomNumber, bBox, TriggerVolumeActivators::Movable, itemNumber);
 	}
 
 	void InitialiseNodeScripts()

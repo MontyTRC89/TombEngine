@@ -1,7 +1,7 @@
 #pragma once
 #include <d3d11.h>
 #include <SimpleMath.h>
-#include "Specific/phd_global.h"
+#include "Math/Math.h"
 
 namespace TEN::Effects::Spark
 {
@@ -25,7 +25,7 @@ namespace TEN::Effects::Spark
 			
 	void UpdateSparkParticles();
 	SparkParticle& GetFreeSparkParticle();
-	void TriggerFlareSparkParticles(Vector3Int* pos, Vector3Int* vel, CVECTOR* color, int room);
+	void TriggerFlareSparkParticles(Vector3i* pos, Vector3i* vel, ColorData* color, int room);
 	void TriggerRicochetSpark(GameVector* pos, short angle, int num);
-	void TriggerFrictionSpark(GameVector* pos, Vector3Shrt angle, float length, int num);
+	void TriggerFrictionSpark(GameVector* pos, EulerAngles angle, float length, int num);
 }

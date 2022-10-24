@@ -12,7 +12,6 @@
 #include "Game/misc.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
-#include "Specific/prng.h"
 #include "Specific/setup.h"
 
 using namespace TEN::Math::Random;
@@ -202,7 +201,7 @@ namespace TEN::Entities::Creatures::TR1
 					LaraItem->Animation.ActiveState = 46;
 					LaraItem->Animation.TargetState = 46;
 					LaraItem->Animation.IsAirborne = false;
-					LaraItem->Pose = PHD_3DPOS(item->Pose.Position, 0, item->Pose.Orientation.y, 0);
+					LaraItem->Pose = Pose(item->Pose.Position, 0, item->Pose.Orientation.y, 0);
 					LaraItem->RoomNumber = item->RoomNumber;
 					LaraItem->HitPoints = -1;
 					Lara.Air = -1;

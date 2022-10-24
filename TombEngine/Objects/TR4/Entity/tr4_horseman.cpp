@@ -13,9 +13,9 @@
 #include "Game/misc.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
-#include "Specific/prng.h"
+#include "Math/Random.h"
 #include "Specific/setup.h"
-#include "Specific/trmath.h"
+#include "Math/Math.h"
 
 using namespace TEN::Math::Random;
 using std::vector;
@@ -121,7 +121,7 @@ namespace TEN::Entities::TR4
 		HORSE_ANIM_SPRINT_TO_IDLE = 13
 	};
 
-	static void HorsemanSparks(Vector3Int* pos, int param1, int maxSparks)
+	static void HorsemanSparks(Vector3i* pos, int param1, int maxSparks)
 	{
 		for (int i = 0; i < maxSparks; i++)
 		{
@@ -358,8 +358,7 @@ namespace TEN::Entities::TR4
 								SoundEffect(SFX_TR4_HORSEMAN_TAKEHIT, &item->Pose);
 								SoundEffect(SFX_TR4_HORSE_RICOCHET, &item->Pose);
 
-								auto pos = Vector3Int(0, -128, 80);
-								GetJointAbsPosition(item, &pos, SPHERES_SPACE_WORLD);
+								auto pos = GetJointPosition(item, SPHERES_SPACE_WORLD, Vector3i(0, -128, 80));
 								HorsemanSparks(&pos, item->Pose.Orientation.y, 7);
 							}
 							else if (TestProbability(0.125f))

@@ -12,31 +12,27 @@ using std::vector;
 
 CreatureInfo* GetCreatureInfo(ItemInfo* item)
 {
-    return static_cast<CreatureInfo*>(item->Data);
+    return (CreatureInfo*)item->Data;
 }
 
 void TargetNearestEntity(ItemInfo* item, CreatureInfo* creature)
 {
-	int bestDistance = MAXINT;
+	float bestDistance = FLT_MAX;
 	for (int i = 0; i < g_Level.NumItems; i++)
 	{
-		auto* target = &g_Level.Items[i];
+		auto* targetEntity = &g_Level.Items[i];
 
-		if (target == nullptr)
+		if (targetEntity == nullptr)
 			continue;
 
-		if (target != item &&
-			target->HitPoints > 0 &&
-			target->Status != ITEM_INVISIBLE)
+		if (targetEntity != item &&
+			targetEntity->HitPoints > 0 &&
+			targetEntity->Status != ITEM_INVISIBLE)
 		{
-			int x = target->Pose.Position.x - item->Pose.Position.x;
-			int y = target->Pose.Position.y - item->Pose.Position.y;
-			int z = target->Pose.Position.z - item->Pose.Position.z;
-
-			int distance = SQUARE(x) + SQUARE(y) + SQUARE(z);
+			float distance = Vector3i::Distance(item->Pose.Position, targetEntity->Pose.Position);
 			if (distance < bestDistance)
 			{
-				creature->Enemy = target;
+				creature->Enemy = targetEntity;
 				bestDistance = distance;
 			}
 		}

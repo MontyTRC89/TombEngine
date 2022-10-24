@@ -18,25 +18,29 @@ using namespace TEN::Floordata;
 
 OBJECT_COLLISION_BOUNDS CeilingTrapDoorBounds =
 {
-	-256, 256,
-	0, 900,
-	-768, -256,
+	GameBoundingBox(
+		-256, 256,
+		0, 900,
+		-768, -256
+	),
 	-ANGLE(10.0f), ANGLE(10.0f),
 	-ANGLE(30.0f), ANGLE(30.0f),
 	-ANGLE(10.0f), ANGLE(10.0f)
 };
-static Vector3Int CeilingTrapDoorPos = { 0, 1056, -480 };
+static Vector3i CeilingTrapDoorPos = { 0, 1056, -480 };
 
 OBJECT_COLLISION_BOUNDS FloorTrapDoorBounds =
 {
-	-256, 256,
-	0, 0,
-	-1024, -256,
+	GameBoundingBox(
+		-256, 256,
+		0, 0,
+		-1024, -256
+	),
 	-ANGLE(10.0f), ANGLE(10.0f),
 	-ANGLE(30.0f), ANGLE(30.0f),
 	-ANGLE(10.0f), ANGLE(10.0f)
 };
-static Vector3Int FloorTrapDoorPos = { 0, 0, -655 };
+static Vector3i FloorTrapDoorPos = { 0, 0, -655 };
 
 void InitialiseTrapDoor(short itemNumber)
 {
@@ -95,7 +99,7 @@ void CeilingTrapDoorCollision(short itemNumber, ItemInfo* laraItem, CollisionInf
 		ForcedFixedCamera.x = trapDoorItem->Pose.Position.x - phd_sin(trapDoorItem->Pose.Orientation.y) * 1024;
 		ForcedFixedCamera.y = trapDoorItem->Pose.Position.y + 1024;
 		ForcedFixedCamera.z = trapDoorItem->Pose.Position.z - phd_cos(trapDoorItem->Pose.Orientation.y) * 1024;
-		ForcedFixedCamera.roomNumber = trapDoorItem->RoomNumber;
+		ForcedFixedCamera.RoomNumber = trapDoorItem->RoomNumber;
 	}
 	else
 	{
@@ -144,7 +148,7 @@ void FloorTrapDoorCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo*
 					ForcedFixedCamera.y = g_Level.Rooms[trapDoorItem->RoomNumber].maxceiling;
 
 				ForcedFixedCamera.z = trapDoorItem->Pose.Position.z - phd_cos(trapDoorItem->Pose.Orientation.y) * 2048;
-				ForcedFixedCamera.roomNumber = trapDoorItem->RoomNumber;
+				ForcedFixedCamera.RoomNumber = trapDoorItem->RoomNumber;
 			}
 			else
 				laraInfo->InteractedItem =itemNumber;

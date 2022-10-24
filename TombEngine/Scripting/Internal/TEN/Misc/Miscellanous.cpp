@@ -47,11 +47,11 @@ namespace Misc
 	{
 		GameVector vec1, vec2;
 		pos1.StoreInGameVector(vec1);
-		vec1.roomNumber = roomNumber1;
+		vec1.RoomNumber = roomNumber1;
 		pos2.StoreInGameVector(vec2);
 
 		MESH_INFO* mesh;
-		Vector3Int vector;
+		Vector3i vector;
 		return LOS(&vec1, &vec2) && (ObjectOnLOS2(&vec1, &vec2, &vector, &mesh) == NO_LOS_ITEM);
 	}
 
@@ -156,7 +156,7 @@ namespace Misc
 	////@tparam[opt] Vec3 position The 3D position of the sound, i.e. where the sound "comes from". If not given, the sound will not be positional.
 	static void PlaySoundEffect(int id, sol::optional<Vec3> p)
 	{
-		SoundEffect(id, p.has_value() ? &PHD_3DPOS(p.value().x, p.value().y, p.value().z) : nullptr, SoundEnvironment::Always);
+		SoundEffect(id, p.has_value() ? &Pose(p.value().x, p.value().y, p.value().z) : nullptr, SoundEnvironment::Always);
 	}
 
 	static bool KeyIsHeld(int actionIndex)
