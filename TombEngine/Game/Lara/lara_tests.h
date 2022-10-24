@@ -3,6 +3,8 @@
 #include "Game/Lara/lara_struct.h"
 #include "Game/Lara/lara_test_structs.h"
 
+using std::vector;
+
 struct ItemInfo;
 struct CollisionInfo;
 
@@ -46,13 +48,12 @@ void TestLaraWaterDepth(ItemInfo* item, CollisionInfo* coll);
 void GetTightropeFallOff(ItemInfo* item, int regularity);
 #endif
 
-bool CheckLaraState(LaraState referenceState, const std::vector<LaraState>& stateList);
-bool CheckLaraWeaponType(LaraWeaponType referenceWeaponType, const std::vector<LaraWeaponType>& weaponTypeList);
+bool TestLaraWeaponType(LaraWeaponType refWeaponType, const vector<LaraWeaponType>& weaponTypeList);
 bool IsStandingWeapon(ItemInfo* item, LaraWeaponType weaponType);
-bool IsVaultState(LaraState state);
-bool IsJumpState(LaraState state);
-bool IsRunJumpQueueableState(LaraState state);
-bool IsRunJumpCountableState(LaraState state);
+bool IsVaultState(int state);
+bool IsJumpState(int state);
+bool IsRunJumpQueueableState(int state);
+bool IsRunJumpCountableState(int state);
 
 bool TestLaraTurn180(ItemInfo* item, CollisionInfo* coll);
 bool TestLaraPose(ItemInfo* item, CollisionInfo* coll);

@@ -12,7 +12,6 @@
 #include "Game/misc.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
-#include "Specific/prng.h"
 #include "Specific/setup.h"
 
 using namespace TEN::Math::Random;
@@ -35,9 +34,9 @@ namespace TEN::Entities::Creatures::TR1
 
 	#define LARA_GIANT_MUTANT_DEATH 6 // TODO: Not 13? Check this.
 
-	const vector<int> MutantAttackJoints	  = { 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25 };
-	const vector<int> MutantAttackLeftJoint	  = { 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14 };
-	const vector<int> MutantAttackRightJoints = { 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25 };
+	const vector<uint> MutantAttackJoints	  = { 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25 };
+	const vector<uint> MutantAttackLeftJoint	  = { 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14 };
+	const vector<uint> MutantAttackRightJoints = { 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25 };
 
 	enum GiantMutantState
 	{
@@ -90,7 +89,7 @@ namespace TEN::Entities::Creatures::TR1
 
 			angle = (short)phd_atan(creature->Target.z - item->Pose.Position.z, creature->Target.x - item->Pose.Position.x) - item->Pose.Orientation.y;
 
-			if (item->TouchBits)
+			if (item->TouchBits.TestAny())
 				DoDamage(creature->Enemy, MUTANT_CONTACT_DAMAGE);
 
 			switch (item->Animation.ActiveState)
@@ -173,7 +172,7 @@ namespace TEN::Entities::Creatures::TR1
 				break;
 
 			case MUTANT_STATE_ATTACK_1:
-				if (!creature->Flags && item->TestBits(JointBitType::Touch, MutantAttackRightJoints))
+				if (!creature->Flags && item->TouchBits.Test(MutantAttackRightJoints))
 				{
 					DoDamage(creature->Enemy, MUTANT_ATTACK_DAMAGE);
 					creature->Flags = 1;
@@ -182,7 +181,7 @@ namespace TEN::Entities::Creatures::TR1
 				break;
 
 			case MUTANT_STATE_ATTACK_2:
-				if (!creature->Flags && item->TestBits(JointBitType::Touch, MutantAttackJoints))
+				if (!creature->Flags && item->TouchBits.Test(MutantAttackJoints))
 				{
 					DoDamage(creature->Enemy, MUTANT_ATTACK_DAMAGE);
 					creature->Flags = 1;
@@ -191,7 +190,7 @@ namespace TEN::Entities::Creatures::TR1
 				break;
 
 			case MUTANT_STATE_ATTACK_3:
-				if (item->TestBits(JointBitType::Touch, MutantAttackRightJoints) || LaraItem->HitPoints <= 0)
+				if (item->TouchBits.Test(MutantAttackRightJoints) || LaraItem->HitPoints <= 0)
 				{
 					item->Animation.TargetState = MUTANT_STATE_KILL;
 					Camera.targetDistance = SECTOR(2);
@@ -202,7 +201,7 @@ namespace TEN::Entities::Creatures::TR1
 					LaraItem->Animation.ActiveState = 46;
 					LaraItem->Animation.TargetState = 46;
 					LaraItem->Animation.IsAirborne = false;
-					LaraItem->Pose = PHD_3DPOS(item->Pose.Position, 0, item->Pose.Orientation.y, 0);
+					LaraItem->Pose = Pose(item->Pose.Position, 0, item->Pose.Orientation.y, 0);
 					LaraItem->RoomNumber = item->RoomNumber;
 					LaraItem->HitPoints = -1;
 					Lara.Air = -1;

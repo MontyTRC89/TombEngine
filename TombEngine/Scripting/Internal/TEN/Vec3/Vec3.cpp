@@ -1,6 +1,6 @@
 #include "framework.h"
 #include "Vec3.h"
-#include "Specific/phd_global.h"
+#include "Math/Math.h"
 #include "ReservedScriptNames.h"
 
 /***
@@ -59,20 +59,20 @@ Vec3::Vec3(int aX, int aY, int aZ) : x{aX}, y{aY}, z{aZ}
 {
 }
 
-Vec3::Vec3(PHD_3DPOS const& pos) : x{pos.Position.x}, y{pos.Position.y}, z{pos.Position.z}
+Vec3::Vec3(Pose const& pos) : x{pos.Position.x}, y{pos.Position.y}, z{pos.Position.z}
 {
 }
 
-Vec3::Vec3(Vector3Int const& pos) : x{pos.x}, y{pos.y}, z{pos.z}
+Vec3::Vec3(Vector3i const& pos) : x{pos.x}, y{pos.y}, z{pos.z}
 {
 }
 
-Vec3::operator Vector3Int() const
+Vec3::operator Vector3i() const
 {
-	return Vector3Int{ x, y, z };
+	return Vector3i{ x, y, z };
 };
 
-void Vec3::StoreInPHDPos(PHD_3DPOS& pos) const
+void Vec3::StoreInPHDPos(Pose& pos) const
 {
 	pos.Position.x = x;
 	pos.Position.y = y;

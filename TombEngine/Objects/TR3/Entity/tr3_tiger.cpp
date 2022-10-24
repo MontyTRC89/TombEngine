@@ -9,7 +9,7 @@
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
 #include "Specific/level.h"
-#include "Specific/prng.h"
+#include "Math/Random.h"
 #include "Specific/setup.h"
 
 using namespace TEN::Math::Random;
@@ -23,11 +23,11 @@ namespace TEN::Entities::Creatures::TR3
 	constexpr auto TIGER_POUNCE_ATTACK_RANGE = SQUARE(SECTOR(1));
 	constexpr auto TIGER_RUN_ATTACK_RANGE	 = SQUARE(SECTOR(1.5f));
 
-	constexpr auto TIGER_WALK_CHANCE = 0.035f;
+	constexpr auto TIGER_WALK_CHANCE = 1.0f / 32;
 	constexpr auto TIGER_ROAR_CHANCE = 1.0f / 340;
 
 	const auto TigerBite = BiteInfo(Vector3(19.0f, -13.0f, 3.0f), 26);
-	const vector<int> TigerAttackJoints = { 14, 15, 16, 18, 19, 20, 21, 22, 23, 24, 25, 26 };
+	const vector<uint> TigerAttackJoints = { 14, 15, 16, 18, 19, 20, 21, 22, 23, 24, 25, 26 };
 
 	#define TIGER_WALK_TURN_RATE_MAX		  ANGLE(3.0f)
 	#define TIGER_RUN_TURN_RATE_MAX			  ANGLE(6.0f)
@@ -71,9 +71,9 @@ namespace TEN::Entities::Creatures::TR3
 		auto* item = &g_Level.Items[itemNumber];
 		auto* creature = GetCreatureInfo(item);
 
-		short angle = 0;
-		short tilt = 0;
-		auto extraHeadRot = Vector3Shrt::Zero;
+		short headingAngle = 0;
+		short tiltAngle = 0;
+		auto extraHeadRot = EulerAngles::Zero;
 
 		if (item->HitPoints <= 0)
 		{
@@ -95,7 +95,7 @@ namespace TEN::Entities::Creatures::TR3
 
 			CreatureMood(item, &AI, true);
 
-			angle = CreatureTurn(item, creature->MaxTurn);
+			headingAngle = CreatureTurn(item, creature->MaxTurn);
 
 			switch (item->Animation.ActiveState)
 			{
@@ -180,7 +180,7 @@ namespace TEN::Entities::Creatures::TR3
 			case TIGER_STATE_BITE_ATTACK:
 			case TIGER_STATE_RUN_SWIPE_ATTACK:
 			case TIGER_STATE_POUNCE_ATTACK:
-				if (!creature->Flags && item->TestBits(JointBitType::Touch, TigerAttackJoints))
+				if (!creature->Flags && item->TouchBits.Test(TigerAttackJoints))
 				{
 					DoDamage(creature->Enemy, TIGER_ATTACK_DAMAGE);
 					CreatureEffect(item, TigerBite, DoBloodSplat);
@@ -191,8 +191,8 @@ namespace TEN::Entities::Creatures::TR3
 			}
 		}
 
-		CreatureTilt(item, tilt);
+		CreatureTilt(item, tiltAngle);
 		CreatureJoint(item, 0, extraHeadRot.y);
-		CreatureAnimation(itemNumber, angle, tilt);
+		CreatureAnimation(itemNumber, headingAngle, tiltAngle);
 	}
 }

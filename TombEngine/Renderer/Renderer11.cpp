@@ -3,10 +3,11 @@
 #include "Game/camera.h"
 #include "Game/effects/tomb4fx.h"
 #include "Specific/clock.h"
-#include "Specific/trmath.h"
+#include "Math/Math.h"
 #include "Utils.h"
 #include "VertexBuffer/VertexBuffer.h"
 #include "RenderView/RenderView.h"
+#include "Renderer/RendererRectangle.h"
 
 using std::vector;
 
@@ -98,7 +99,7 @@ namespace TEN::Renderer
 		for (int i = 0; i < 6; i++)
 		{
 			auto renderView = RenderView(pos, RenderTargetCube::forwardVectors[i], RenderTargetCube::upVectors[i],
-			                             dest.resolution, dest.resolution, Camera.pos.roomNumber, 10, 20480,
+			                             dest.resolution, dest.resolution, Camera.pos.RoomNumber, 10, 20480,
 			                             90 * RADIAN);
 			RenderSimpleScene(dest.RenderTargetView[i].Get(), dest.DepthStencilView[i].Get(), renderView);
 			m_context->ClearState();

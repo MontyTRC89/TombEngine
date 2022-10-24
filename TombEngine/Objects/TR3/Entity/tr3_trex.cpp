@@ -9,7 +9,7 @@
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
 #include "Specific/level.h"
-#include "Specific/prng.h"
+#include "Math/Random.h"
 #include "Specific/setup.h"
 
 using namespace TEN::Math::Random;
@@ -22,7 +22,7 @@ namespace TEN::Entities::Creatures::TR3
 	constexpr auto TREX_ROAR_CHANCE = 0.015f;
 	constexpr auto LARA_ANIM_TREX_DEATH_ANIM = 4;
 
-	const vector<int> TRexAttackJoints = { 12, 13 };
+	const vector<uint> TRexAttackJoints = { 12, 13 };
 
 	#define TREX_WALK_TURN_RATE_MAX ANGLE(2.0f)
 	#define TREX_RUN_TURN_RATE_MAX	ANGLE(4.0f)
@@ -62,9 +62,10 @@ namespace TEN::Entities::Creatures::TR3
 		if (laraItem->RoomNumber != tRexItem->RoomNumber)
 			ItemNewRoom(Lara.ItemNumber, tRexItem->RoomNumber);
 
-		laraItem->Pose = PHD_3DPOS(
+		laraItem->Pose = Pose(
 			tRexItem->Pose.Position,
-			Vector3Shrt(0, tRexItem->Pose.Orientation.y, 0));
+			EulerAngles(0, tRexItem->Pose.Orientation.y, 0)
+		);
 		laraItem->Animation.IsAirborne = false;
 
 		laraItem->Animation.AnimNumber = Objects[ID_LARA_EXTRA_ANIMS].animIndex + LARA_ANIM_TREX_DEATH_ANIM;
@@ -113,7 +114,7 @@ namespace TEN::Entities::Creatures::TR3
 
 			angle = CreatureTurn(item, creature->MaxTurn);
 
-			if (item->TouchBits)
+			if (item->TouchBits.TestAny())
 				DoDamage(LaraItem, (item->Animation.ActiveState == TREX_STATE_RUN_FORWARD) ? TREX_RUN_CONTACT_DAMAGE : TREX_CONTACT_DAMAGE);
 
 			creature->Flags = (creature->Mood != MoodType::Escape && !AI.ahead && AI.enemyFacing > -FRONT_ARC && AI.enemyFacing < FRONT_ARC);
@@ -171,7 +172,7 @@ namespace TEN::Entities::Creatures::TR3
 				break;
 
 			case TREX_STATE_ATTACK:
-				if (item->TestBits(JointBitType::Touch, TRexAttackJoints))
+				if (item->TouchBits.Test(TRexAttackJoints))
 				{
 					item->Animation.TargetState = TREX_STATE_KILL;
 

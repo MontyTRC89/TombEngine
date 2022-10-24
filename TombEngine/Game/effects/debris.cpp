@@ -3,9 +3,9 @@
 
 #include "Game/collision/collide_room.h"
 #include "Specific/level.h"
-#include "Specific/prng.h"
+#include "Math/Random.h"
 #include "Specific/setup.h"
-#include "Specific/trmath.h"
+#include "Math/Math.h"
 #include <Game/effects/tomb4fx.h>
 
 using std::vector;
@@ -21,7 +21,7 @@ vector<DebrisFragment> DebrisFragments = vector<DebrisFragment>(MAX_DEBRIS);
 
 bool ExplodeItemNode(ItemInfo* item, int node, int noXZVel, int bits)
 {
-	if (1 << node & item->MeshBits)
+	if (1 << node & item->MeshBits.ToPackedBits())
 	{
 		int number = bits;
 		if (number == BODY_EXPLODE)

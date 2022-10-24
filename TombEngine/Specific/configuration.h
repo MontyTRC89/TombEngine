@@ -1,8 +1,9 @@
 #pragma once
-
 #include "Specific/input.h"
-#include "Specific/trmath.h"
+#include "Math/Math.h"
 #include "Renderer/Renderer11Enums.h"
+
+using namespace TEN::Math;
 
 #define REGKEY_ROOT						"Software\\TombEngine\\TombEngine"
 
@@ -49,7 +50,7 @@ struct GameConfiguration
 	bool EnableThumbstickCameraControl;
 	short KeyboardLayout[TEN::Input::KEY_COUNT];
 
-	std::vector<Vector2Int> SupportedScreenResolutions;
+	std::vector<Vector2i> SupportedScreenResolutions;
 	std::string AdapterName;
 };
 

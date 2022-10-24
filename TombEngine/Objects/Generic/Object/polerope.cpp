@@ -11,16 +11,17 @@
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_struct.h"
 #include "Game/Lara/lara_tests.h"
+#include "Math/Math.h"
 #include "Specific/input.h"
 #include "Specific/level.h"
-#include "Specific/trmath.h"
 
 using namespace TEN::Input;
+using namespace TEN::Math;
 using std::vector;
 
 namespace TEN::Entities::Generic
 {
-	const vector<LaraState> VPoleMountedStates =
+	const vector<int> VPoleMountedStates =
 	{
 		LS_POLE_IDLE,
 		LS_POLE_UP,
@@ -28,7 +29,7 @@ namespace TEN::Entities::Generic
 		LS_POLE_TURN_CLOCKWISE,
 		LS_POLE_TURN_COUNTER_CLOCKWISE
 	};
-	const vector<LaraState> VPoleGroundedMountStates =
+	const vector<int> VPoleGroundedMountStates =
 	{
 		LS_IDLE,
 		LS_TURN_LEFT_SLOW,
@@ -38,21 +39,23 @@ namespace TEN::Entities::Generic
 		LS_WALK_FORWARD,
 		LS_RUN_FORWARD
 	};
-	const vector<LaraState> VPoleAirborneMountStates =
+	const vector<int> VPoleAirborneMountStates =
 	{
 		LS_REACH,
 		LS_JUMP_UP
 	};
 
 	// TODO: These might be interfering with the SetPosition command. -- Sezz 2022.08.29
-	auto VPolePos = Vector3Int(0, 0, -208);
-	auto VPolePosR = Vector3Int::Zero;
+	auto VPolePos = Vector3i(0, 0, -208);
+	auto VPolePosR = Vector3i::Zero;
 
 	OBJECT_COLLISION_BOUNDS VPoleBounds = 
 	{
-		-CLICK(1), CLICK(1),
-		0, 0, 
-		-CLICK(2), CLICK(2),
+		GameBoundingBox(
+			-CLICK(1), CLICK(1),
+			0, 0, 
+			-CLICK(2), CLICK(2)
+		),
 		ANGLE(-10.0f), ANGLE(10.0f),
 		ANGLE(-30.0f), ANGLE(30.0f),
 		ANGLE(-10.0f), ANGLE(10.0f)
@@ -63,11 +66,11 @@ namespace TEN::Entities::Generic
 		auto* poleItem = &g_Level.Items[itemNumber];
 		auto* lara = GetLaraInfo(laraItem);
 
-		bool isFacingPole = IsPointInFront(laraItem->Pose, poleItem->Pose.Position.ToVector3());
+		bool isFacingPole = Geometry::IsPointInFront(laraItem->Pose, poleItem->Pose.Position.ToVector3());
 
 		// Mount while grounded.
 		if (TrInput & IN_ACTION && isFacingPole &&
-			CheckLaraState((LaraState)laraItem->Animation.ActiveState, VPoleGroundedMountStates) &&
+			TestState(laraItem->Animation.ActiveState, VPoleGroundedMountStates) &&
 			lara->Control.HandStatus == HandStatus::Free ||
 			(lara->Control.IsMoving && lara->InteractedItem == itemNumber))
 		{
@@ -104,7 +107,7 @@ namespace TEN::Entities::Generic
 
 		// Mount while airborne.
 		if (TrInput & IN_ACTION && isFacingPole &&
-			CheckLaraState((LaraState)laraItem->Animation.ActiveState, VPoleAirborneMountStates) &&
+			TestState(laraItem->Animation.ActiveState, VPoleAirborneMountStates) &&
 			laraItem->Animation.IsAirborne &&
 			laraItem->Animation.Velocity.y > 0.0f &&
 			lara->Control.HandStatus == HandStatus::Free)
@@ -148,7 +151,7 @@ namespace TEN::Entities::Generic
 		}
 
 		// Player is not interacting with vertical pole; do regular object collision.
-		if (!CheckLaraState((LaraState)laraItem->Animation.ActiveState, VPoleMountedStates) &&
+		if (!TestState(laraItem->Animation.ActiveState, VPoleMountedStates) &&
 			laraItem->Animation.ActiveState != LS_JUMP_BACK)
 		{
 			ObjectCollision(itemNumber, laraItem, coll);

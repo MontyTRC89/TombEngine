@@ -1,6 +1,6 @@
 #pragma once
 #include "Game/control/control.h"
-#include "Specific/trmath.h"
+#include "Math/Math.h"
 
 enum class LaraWeaponType;
 struct ItemInfo;
@@ -55,14 +55,14 @@ void GrenadeControl(short itemNumber);
 //void GrenadeExplosionEffects(int x, int y, int z, short roomNumber);
 void FireRocket(ItemInfo* laraItem);
 void RocketControl(short itemNumber);
-void FireCrossbow(ItemInfo* laraItem, PHD_3DPOS* pos);
+void FireCrossbow(ItemInfo* laraItem, Pose* pos);
 void CrossbowBoltControl(short itemNumber);
 void FireCrossBowFromLaserSight(ItemInfo* laraItem, GameVector* origin, GameVector* target);
 
 void FireHK(ItemInfo* laraItem, int mode);
 void RifleHandler(ItemInfo* laraItem, LaraWeaponType weaponType);
 
-void DoExplosiveDamageOnBaddy(ItemInfo* laraItem, ItemInfo* src, ItemInfo* dest, LaraWeaponType weaponType);
+void DoExplosiveDamageOnBaddy(ItemInfo* laraItem, ItemInfo* targetEntity, ItemInfo* originEntity, LaraWeaponType weaponType);
 void SomeSparkEffect(int x, int y, int z, int count);
 
-void HitSpecial(ItemInfo* projectile, ItemInfo* target, int flags);
+void HitSpecial(ItemInfo* projectile, ItemInfo* targetEntity, int flags);

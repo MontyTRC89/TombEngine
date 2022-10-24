@@ -14,7 +14,7 @@
 #include "Game/people.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
-#include "Specific/prng.h"
+#include "Math/Random.h"
 #include "Specific/setup.h"
 
 using namespace TEN::Effects::Environment;
@@ -39,8 +39,8 @@ namespace TEN::Entities::TR4
 	const auto AhmetBiteLeft  = BiteInfo(Vector3::Zero, 16);
 	const auto AhmetBiteRight = BiteInfo(Vector3::Zero, 22);
 	const auto AhmetBiteJaw	  = BiteInfo(Vector3::Zero, 11);
-	const vector<int> AhmetSwipeAttackLeftJoints  = { 14, 15, 16, 17 };
-	const vector<int> AhmetSwipeAttackRightJoints = { 20, 21, 22, 23 };
+	const vector<uint> AhmetSwipeAttackLeftJoints  = { 14, 15, 16, 17 };
+	const vector<uint> AhmetSwipeAttackRightJoints = { 20, 21, 22, 23 };
 
 	enum AhmetState
 	{
@@ -131,7 +131,7 @@ namespace TEN::Entities::TR4
 		auto* creature = GetCreatureInfo(item);
 
 		short angle = 0;
-		auto extraHeadRot = Vector3Shrt::Zero;
+		auto extraHeadRot = EulerAngles::Zero;
 
 		if (item->HitPoints <= 0)
 		{
@@ -286,7 +286,7 @@ namespace TEN::Entities::TR4
 
 				if (!(creature->Flags & 1) &&
 					item->Animation.FrameNumber > (g_Level.Anims[item->Animation.AnimNumber].frameBase + 7) &&
-					item->TestBits(JointBitType::Touch, AhmetSwipeAttackLeftJoints))
+					item->TouchBits.Test(AhmetSwipeAttackLeftJoints))
 				{
 					DoDamage(creature->Enemy, AHMET_SWIPE_ATTACK_DAMAGE);
 					CreatureEffect2(item, AhmetBiteLeft, 10, -1, DoBloodSplat);
@@ -294,7 +294,7 @@ namespace TEN::Entities::TR4
 				}
 				else if (!(creature->Flags & 2) &&
 					item->Animation.FrameNumber > (g_Level.Anims[item->Animation.AnimNumber].frameBase + 32) &&
-					item->TestBits(JointBitType::Touch, AhmetSwipeAttackRightJoints))
+					item->TouchBits.Test(AhmetSwipeAttackRightJoints))
 				{
 					DoDamage(creature->Enemy, AHMET_SWIPE_ATTACK_DAMAGE);
 					CreatureEffect2(item, AhmetBiteRight, 10, -1, DoBloodSplat);
@@ -324,7 +324,7 @@ namespace TEN::Entities::TR4
 						item->Animation.AnimNumber == (Objects[item->ObjectNumber].animIndex + AHMET_ANIM_JUMP_BITE_ATTACK_CONTINUE))
 					{
 						if (item->Animation.FrameNumber > (g_Level.Anims[item->Animation.AnimNumber].frameBase + 11) &&
-							item->TestBits(JointBitType::Touch, AhmetSwipeAttackLeftJoints))
+							item->TouchBits.Test(AhmetSwipeAttackLeftJoints))
 						{
 							DoDamage(creature->Enemy, AHMET_BITE_ATTACK_DAMAGE);
 							CreatureEffect2(item, AhmetBiteJaw, 10, -1, DoBloodSplat);
@@ -354,7 +354,7 @@ namespace TEN::Entities::TR4
 				{
 					if (!(creature->Flags & 1) &&
 						item->Animation.FrameNumber > (g_Level.Anims[item->Animation.AnimNumber].frameBase + 14) &&
-						item->TestBits(JointBitType::Touch, AhmetSwipeAttackLeftJoints))
+						item->TouchBits.Test(AhmetSwipeAttackLeftJoints))
 					{
 						DoDamage(creature->Enemy, AHMET_SWIPE_ATTACK_DAMAGE);
 						CreatureEffect2(item, AhmetBiteLeft, 10, -1, DoBloodSplat);
@@ -362,7 +362,7 @@ namespace TEN::Entities::TR4
 					}
 					else if (!(creature->Flags & 2) &&
 						item->Animation.FrameNumber > (g_Level.Anims[item->Animation.AnimNumber].frameBase + 22) &&
-						item->TestBits(JointBitType::Touch, AhmetSwipeAttackRightJoints))
+						item->TouchBits.Test(AhmetSwipeAttackRightJoints))
 					{
 						DoDamage(creature->Enemy, AHMET_SWIPE_ATTACK_DAMAGE);
 						CreatureEffect2(item, AhmetBiteRight, 10, -1, DoBloodSplat);

@@ -16,7 +16,7 @@
 #include "Game/health.h"
 #include "Game/camera.h"
 #include "Game/animation.h"
-#include "Specific/prng.h"
+#include "Math/Random.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
 #include "Sound/sound.h"
@@ -27,9 +27,9 @@ using namespace TEN::Math::Random;
 
 namespace TEN::Entities::Vehicles
 {
-	const vector<int> MotorbikeJoints = { 0, 1, 2, 4, 5, 6, 7, 8, 9 };
-	const vector<int> MotorbikeBrakeLightJoints = { 10 };
-	const vector<int> MotorbikeHeadLightJoints = { 3 };
+	const vector<uint> MotorbikeJoints = { 0, 1, 2, 4, 5, 6, 7, 8, 9 };
+	const vector<uint> MotorbikeBrakeLightJoints = { 10 };
+	const vector<uint> MotorbikeHeadLightJoints = { 3 };
 
 	const vector<VehicleMountType> MotorbikeMountTypes =
 	{
@@ -143,10 +143,10 @@ namespace TEN::Entities::Vehicles
 		motorbikeItem->Data = MotorbikeInfo();
 		auto* motorbike = GetMotorbikeInfo(motorbikeItem);
 
-		motorbikeItem->SetBits(JointBitType::Mesh, MotorbikeJoints);
+		motorbikeItem->MeshBits.Set(MotorbikeJoints);
 		motorbike->MomentumAngle = motorbikeItem->Pose.Orientation.y;
 
-		motorbikeItem->ClearBits(JointBitType::Mesh, MotorbikeHeadLightJoints);
+		motorbikeItem->MeshBits.Clear(MotorbikeHeadLightJoints);
 	}
 
 	void MotorbikePlayerCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
@@ -214,14 +214,14 @@ namespace TEN::Entities::Vehicles
 		AnimateItem(laraItem);
 	}
 
-	static int DoMotorbikeShift(ItemInfo* motorbikeItem, Vector3Int* pos, Vector3Int* old)
+	static int DoMotorbikeShift(ItemInfo* motorbikeItem, Vector3i* pos, Vector3i* old)
 	{
 		int x = pos->x / SECTOR(1);
 		int z = pos->z / SECTOR(1);
 		int oldX = old->x / SECTOR(1);
 		int oldZ = old->z / SECTOR(1);
-		int shiftX = pos->x & (SECTOR(1) - 1);
-		int shiftZ = pos->z & (SECTOR(1) - 1);
+		int shiftX = pos->x & WALL_MASK;
+		int shiftZ = pos->z & WALL_MASK;
 
 		if (x == oldX)
 		{
@@ -317,16 +317,12 @@ namespace TEN::Entities::Vehicles
 		if (motorbike->LightPower <= 0)
 			return;
 
-		auto start = Vector3Int(0, -470, 1836);
-		GetJointAbsPosition(motorbikeItem, &start, 0);
-
-		auto target = Vector3Int(0, -470, 20780);
-		GetJointAbsPosition(motorbikeItem, &target, 0);
-
+		auto origin = GetJointPosition(motorbikeItem, 0, Vector3i(0, -470, 1836));
+		auto target = GetJointPosition(motorbikeItem, 0, Vector3i(0, -470, 20780));
 		int random = (motorbike->LightPower * 2) - (GetRandomControl() & 0xF);
 
 		// TODO: Use target as direction vector for spotlight.
-		TriggerDynamicLight(start.x, start.y, start.z, 8, random, random / 2, 0);
+		TriggerDynamicLight(origin.x, origin.y, origin.z, 8, random, random / 2, 0);
 	}
 
 	static void TriggerMotorbikeExhaustSmoke(int x, int y, int z, short angle, short speed, bool moving)
@@ -407,8 +403,7 @@ namespace TEN::Entities::Vehicles
 
 		if (laraItem->Animation.ActiveState != MOTORBIKE_STATE_MOUNT && laraItem->Animation.ActiveState != MOTORBIKE_STATE_DISMOUNT)
 		{
-			auto pos = Vector3Int(56, -144, -500);
-			GetJointAbsPosition(motorbikeItem, &pos, 0);
+			auto pos = GetJointPosition(motorbikeItem,  0, Vector3i(56, -144, -500));
 
 			int speed = motorbikeItem->Animation.Velocity.z;
 			if (speed > 32 && speed < 64)
@@ -513,7 +508,7 @@ namespace TEN::Entities::Vehicles
 		return verticalVelocity;
 	}
 
-	static int GetMotorbikeCollisionAnim(ItemInfo* motorbikeItem, Vector3Int* pos)
+	static int GetMotorbikeCollisionAnim(ItemInfo* motorbikeItem, Vector3i* pos)
 	{
 		pos->x = motorbikeItem->Pose.Position.x - pos->x;
 		pos->z = motorbikeItem->Pose.Position.z - pos->z;
@@ -540,14 +535,14 @@ namespace TEN::Entities::Vehicles
 		auto* motorbike = GetMotorbikeInfo(motorbikeItem);
 		auto* lara = GetLaraInfo(laraItem);
 
-		Vector3Int frontLeft, backLeft, mtf, mtb, backRight;
-		Vector3Int moved;
+		Vector3i frontLeft, backLeft, mtf, mtb, backRight;
+		Vector3i moved;
 		int floorHeight, collide, speed, newSpeed;
 		short momentum = 0, rotation;
 
 		motorbike->DisableDismount = false;
 
-		Vector3Int backLeftOld, mtb_old, backRightOld, mtf_old, rightLeftOld;
+		Vector3i backLeftOld, mtb_old, backRightOld, mtf_old, rightLeftOld;
 		int hfl_old  = GetVehicleHeight(motorbikeItem, MOTORBIKE_FRONT, -MOTORBIKE_SIDE, true, &rightLeftOld);
 		int hmf_old  = GetVehicleHeight(motorbikeItem, MOTORBIKE_FRONT, CLICK(0.5f), true, &mtf_old);
 		int hbl_old  = GetVehicleHeight(motorbikeItem, -MOTORBIKE_FRONT, -MOTORBIKE_SIDE, true, &backLeftOld);
@@ -709,7 +704,7 @@ namespace TEN::Entities::Vehicles
 
 		floorHeight = GetCollision(motorbikeItem).Position.Floor;
 		if (floorHeight < (motorbikeItem->Pose.Position.y - CLICK(1)))
-			DoMotorbikeShift(motorbikeItem, (Vector3Int*)&motorbikeItem->Pose, &oldPos);
+			DoMotorbikeShift(motorbikeItem, (Vector3i*)&motorbikeItem->Pose, &oldPos);
 
 		if (!motorbike->Velocity)
 			rot2 = 0;
@@ -1056,14 +1051,13 @@ namespace TEN::Entities::Vehicles
 
 			if (TrInput & VEHICLE_IN_BRAKE)
 			{
-				auto pos = Vector3Int(0, -144, -1024);
-				GetJointAbsPosition(motorbikeItem, &pos, NULL);
-
+				auto pos = GetJointPosition(motorbikeItem, 0, Vector3i(0, -144, -1024));
 				TriggerDynamicLight(pos.x, pos.y, pos.z, 10, 64, 0, 0);
-				motorbikeItem->SetBits(JointBitType::Mesh, MotorbikeBrakeLightJoints);
+
+				motorbikeItem->MeshBits.Set(MotorbikeBrakeLightJoints);
 			}
 			else
-				motorbikeItem->ClearBits(JointBitType::Mesh, MotorbikeBrakeLightJoints);
+				motorbikeItem->MeshBits.Clear(MotorbikeBrakeLightJoints);
 
 			if (TrInput & VEHICLE_IN_BRAKE)
 			{
@@ -1183,7 +1177,7 @@ namespace TEN::Entities::Vehicles
 
 		auto oldPos = motorbikeItem->Pose.Position;
 
-		Vector3Int frontLeft, frontRight, frontMiddle;
+		Vector3i frontLeft, frontRight, frontMiddle;
 		int heightFrontLeft = GetVehicleHeight(motorbikeItem, MOTORBIKE_FRONT, -MOTORBIKE_SIDE, true, &frontLeft);
 		int heightFrontRight = GetVehicleHeight(motorbikeItem, MOTORBIKE_FRONT, CLICK(0.5f), true, &frontRight);
 		int heightFrontMiddle = GetVehicleHeight(motorbikeItem, -MOTORBIKE_FRONT, 0, true, &frontMiddle);
@@ -1208,14 +1202,14 @@ namespace TEN::Entities::Vehicles
 			laraItem->Animation.ActiveState > MOTORBIKE_STATE_DISMOUNT)
 		{
 			DrawMotorbikeLight(motorbikeItem);
-			motorbikeItem->SetBits(JointBitType::Mesh, MotorbikeHeadLightJoints);
+			motorbikeItem->MeshBits.Set(MotorbikeHeadLightJoints);
 
 			drive = MotorbikeUserControl(motorbikeItem, laraItem, probe.Position.Floor, &pitch);
 		}
 		else
 		{
-			motorbikeItem->ClearBits(JointBitType::Mesh, MotorbikeHeadLightJoints);
-			motorbikeItem->ClearBits(JointBitType::Mesh, MotorbikeBrakeLightJoints);
+			motorbikeItem->MeshBits.Clear(MotorbikeHeadLightJoints);
+			motorbikeItem->MeshBits.Clear(MotorbikeBrakeLightJoints);
 
 			drive = -1;
 			collide = 0;

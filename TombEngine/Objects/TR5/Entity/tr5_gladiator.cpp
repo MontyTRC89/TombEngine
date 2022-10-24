@@ -12,7 +12,7 @@
 #include "Game/misc.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
-#include "Specific/prng.h"
+#include "Math/Random.h"
 #include "Specific/setup.h"
 
 using namespace TEN::Math::Random;
@@ -25,7 +25,7 @@ namespace TEN::Entities::Creatures::TR5
 	// TODO: Ranges.
 
 	const auto GladiatorBite = BiteInfo(Vector3::Zero, 16);
-	const vector<int> GladiatorAttackJoints = { 13, 14 };
+	const vector<uint> GladiatorAttackJoints = { 13, 14 };
 
 	enum GladiatorState
 	{
@@ -335,8 +335,7 @@ namespace TEN::Entities::Creatures::TR5
 				{
 					auto* room = &g_Level.Rooms[item->RoomNumber];
 
-					auto pos = Vector3Int::Zero;
-					GetJointAbsPosition(item, &pos, 16);
+					auto pos = GetJointPosition(item, 16);
 
 					auto* floor = GetSector(room, pos.x - room->x, pos.z - room->z);
 					if (floor->Stopper)
@@ -363,7 +362,7 @@ namespace TEN::Entities::Creatures::TR5
 
 					if (!creature->Flags)
 					{
-						if (item->TestBits(JointBitType::Touch, GladiatorAttackJoints))
+						if (item->TouchBits.Test(GladiatorAttackJoints))
 						{
 							DoDamage(creature->Enemy, GLADIATOR_ATTACK_DAMAGE);
 							CreatureEffect2(item, GladiatorBite, 10, item->Pose.Orientation.y, DoBloodSplat);

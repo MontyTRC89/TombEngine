@@ -5,109 +5,17 @@
 #include "Game/collision/floordata.h"
 #include "Game/effects/effects.h"
 #include "Game/Lara/lara.h"
-#include "ScriptInterfaceGame.h"
-#include "Specific/setup.h"
-#include "Specific/level.h"
-#include "Specific/input.h"
+#include "Math/Random.h"
 #include "Objects/ScriptInterfaceObjectsHandler.h"
+#include "ScriptInterfaceGame.h"
+#include "Specific/input.h"
+#include "Specific/level.h"
+#include "Specific/setup.h"
 #include "Sound/sound.h"
-#include "Specific/prng.h"
 
 using namespace TEN::Floordata;
 using namespace TEN::Input;
 using namespace TEN::Math::Random;
-
-bool ItemInfo::TestBits(JointBitType type, std::vector<int> jointIndices)
-{
-	for (size_t i = 0; i < jointIndices.size(); i++)
-	{
-		unsigned int jointBit = unsigned int(1) << jointIndices[i];
-
-		switch (type)
-		{
-		case JointBitType::Touch:
-			if ((TouchBits & jointBit) == jointBit)
-				return true;
-
-			break;
-
-		case JointBitType::Mesh:
-			if ((MeshBits & jointBit) == jointBit)
-				return true;
-
-			break;
-
-		case JointBitType::MeshSwap:
-			if ((MeshSwapBits & jointBit) == jointBit)
-				return true;
-
-			break;
-		}
-	}
-
-	return false;
-}
-
-bool ItemInfo::TestBits(JointBitType type, int jointIndex)
-{
-	return TestBits(type, std::vector{ jointIndex });
-}
-
-void ItemInfo::SetBits(JointBitType type, std::vector<int> jointIndices)
-{
-	for (size_t i = 0; i < jointIndices.size(); i++)
-	{
-		unsigned int jointBit = unsigned int(1) << jointIndices[i];
-
-		switch (type)
-		{
-		case JointBitType::Touch:
-			this->TouchBits |= jointBit;
-			break;
-
-		case JointBitType::Mesh:
-			this->MeshBits |= jointBit;
-			break;
-
-		case JointBitType::MeshSwap:
-			this->MeshSwapBits |= jointBit;
-			break;
-		}
-	}
-}
-
-void ItemInfo::SetBits(JointBitType type, int jointIndex)
-{
-	return SetBits(type, std::vector{ jointIndex });
-}
-
-void ItemInfo::ClearBits(JointBitType type, std::vector<int> jointIndices)
-{
-	for (size_t i = 0; i < jointIndices.size(); i++)
-	{
-		unsigned int jointBit = unsigned int(1) << jointIndices[i];
-
-		switch (type)
-		{
-		case JointBitType::Touch:
-			this->TouchBits &= ~jointBit;
-			break;
-
-		case JointBitType::Mesh:
-			this->MeshBits &= ~jointBit;
-			break;
-
-		case JointBitType::MeshSwap:
-			this->MeshSwapBits &= ~jointBit;
-			break;
-		}
-	}
-}
-
-void ItemInfo::ClearBits(JointBitType type, int jointIndex)
-{
-	return ClearBits(type, std::vector{ jointIndex });
-}
 
 bool ItemInfo::TestOcb(short ocbFlags)
 {
@@ -121,7 +29,7 @@ void ItemInfo::RemoveOcb(short ocbFlags)
 
 void ItemInfo::ClearAllOcb()
 {
-	TriggerFlags = NULL;
+	TriggerFlags = 0;
 }
 
 bool ItemInfo::TestFlags(short id, short value)
@@ -148,6 +56,17 @@ bool ItemInfo::IsLara()
 bool ItemInfo::IsCreature()
 {
 	return this->Data.is<CreatureInfo>();
+}
+
+bool TestState(int refState, const vector<int>& stateList)
+{
+	for (const auto& state : stateList)
+	{
+		if (state == refState)
+			return true;
+	}
+
+	return false;
 }
 
 void ClearItem(short itemNumber)
@@ -602,7 +521,7 @@ short SpawnItem(ItemInfo* item, GAME_OBJECT_ID objectNumber)
 
 		spawn->ObjectNumber = objectNumber;
 		spawn->RoomNumber = item->RoomNumber;
-		memcpy(&spawn->Pose, &item->Pose, sizeof(PHD_3DPOS));
+		memcpy(&spawn->Pose, &item->Pose, sizeof(Pose));
 
 		InitialiseItem(itemNumber);
 
@@ -636,7 +555,7 @@ int GlobalItemReplace(short search, GAME_OBJECT_ID replace)
 // Offset values may be used to account for the quirk of room traversal only being able to occur at portals.
 void UpdateItemRoom(ItemInfo* item, int height, int xOffset, int zOffset)
 {
-	auto point = TranslateVector(item->Pose.Position, item->Pose.Orientation.y, zOffset, height, xOffset);
+	auto point = Geometry::TranslatePoint(item->Pose.Position, item->Pose.Orientation.y, zOffset, height, xOffset);
 
 	// Hacky L-shaped Location traversal.
 	item->Location = GetRoom(item->Location, point.x, point.y, point.z);

@@ -10,13 +10,14 @@
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
 #include "Game/people.h"
+#include "Math/Random.h"
 #include "Objects/Generic/Traps/dart_emitter.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
-#include "Specific/prng.h"
 #include "Specific/setup.h"
 
 using namespace TEN::Entities::Traps;
+using namespace TEN::Math;
 using namespace TEN::Math::Random;
 using std::vector;
 
@@ -25,8 +26,8 @@ namespace TEN::Entities::Creatures::TR3
 	const auto TribesmanAxeBite	  = BiteInfo(Vector3(0.0f, 16.0f, 265.0f), 13);
 	const auto TribesmanDartBite1 = BiteInfo(Vector3(0.0f, 0.0f, -200.0f), 13);
 	const auto TribesmanDartBite2 = BiteInfo(Vector3(8.0f, 40.0f, -248.0f), 13);
-	const vector<int> TribesmanAxeAttackJoints	= { 13 };
-	const vector<int> TribesmanDartAttackJoints = { 10, 13 }; // TODO: Check.
+	const vector<uint> TribesmanAxeAttackJoints	= { 13 };
+	const vector<uint> TribesmanDartAttackJoints = { 10, 13 }; // TODO: Check.
 
 	const unsigned char TribesmanAxeHit[13][3] =
 	{
@@ -298,7 +299,7 @@ namespace TEN::Entities::Creatures::TR3
 
 				if (creature->Enemy->IsLara())
 				{
-					if (item->TestBits(JointBitType::Touch, TribesmanAxeAttackJoints) &&
+					if (item->TouchBits.Test(TribesmanAxeAttackJoints) &&
 						creature->Flags >= TribesmanAxeHit[item->Animation.ActiveState][0] &&
 						creature->Flags <= TribesmanAxeHit[item->Animation.ActiveState][1])
 					{
@@ -313,7 +314,7 @@ namespace TEN::Entities::Creatures::TR3
 				{
 					if (creature->Enemy != nullptr)
 					{
-						if (Vector3Int::Distance(item->Pose.Position, creature->Enemy->Pose.Position) <= SECTOR(0.5f) &&
+						if (Vector3i::Distance(item->Pose.Position, creature->Enemy->Pose.Position) <= SECTOR(0.5f) &&
 							creature->Flags >= TribesmanAxeHit[item->Animation.ActiveState][0] &&
 							creature->Flags <= TribesmanAxeHit[item->Animation.ActiveState][1])
 						{
@@ -344,29 +345,28 @@ namespace TEN::Entities::Creatures::TR3
 			dartItem->ObjectNumber = ID_DARTS;
 			dartItem->RoomNumber = item->RoomNumber;
 
-			auto pos1 = Vector3Int(TribesmanDartBite2.Position);
-			GetJointAbsPosition(item, &pos1, TribesmanDartBite2.meshNum);
+			auto pos1 = GetJointPosition(item, TribesmanDartBite2.meshNum, Vector3i(TribesmanDartBite2.Position));
 
 			auto pos2 = pos1;
 			pos2.z *= 2;
-			GetJointAbsPosition(item, &pos2, TribesmanDartBite2.meshNum);
+			pos2 = GetJointPosition(item, TribesmanDartBite2.meshNum, pos2);
 
-			auto angles = GetVectorAngles(pos2.x - pos1.x, pos2.y - pos1.y, pos2.z - pos1.z);
+			auto orient = Geometry::GetOrientToPoint(pos1.ToVector3(), pos2.ToVector3());
 
 			dartItem->Pose.Position = pos1;
 
 			InitialiseItem(dartItemNumber);
 
-			dartItem->Pose.Orientation = angles;
+			dartItem->Pose.Orientation = orient;
 			dartItem->Animation.Velocity.z = CLICK(1);
 
 			AddActiveItem(dartItemNumber);
 
 			dartItem->Status = ITEM_ACTIVE;
 
-			pos1 = Vector3Int(TribesmanDartBite2.Position);
+			pos1 = Vector3i(TribesmanDartBite2.Position);
 			pos1.z += 96;
-			GetJointAbsPosition(item, &pos1, TribesmanDartBite2.meshNum);
+			pos1 = GetJointPosition(item, TribesmanDartBite2.meshNum, pos1);
 
 			TriggerDartSmoke(pos1.x, pos1.y, pos1.z, 0, 0, 1);
 			TriggerDartSmoke(pos1.x, pos1.y, pos1.z, 0, 0, 1);
@@ -383,8 +383,8 @@ namespace TEN::Entities::Creatures::TR3
 
 		short angle = 0;
 		short tilt = 0;
-		auto extraHeadRot = Vector3Shrt::Zero;
-		auto extraTorsoRot = Vector3Shrt::Zero;
+		auto extraHeadRot = EulerAngles::Zero;
+		auto extraTorsoRot = EulerAngles::Zero;
 
 		if (item->HitPoints <= 0)
 		{
@@ -593,7 +593,7 @@ namespace TEN::Entities::Creatures::TR3
 				if (creature->Enemy->IsLara())
 				{
 					if (!(creature->Flags & 0xf000) &&
-						item->TestBits(JointBitType::Touch, TribesmanDartAttackJoints))
+						item->TouchBits.Test(TribesmanDartAttackJoints))
 					{
 						DoDamage(creature->Enemy, 100);
 						CreatureEffect(item, TribesmanDartBite1, DoBloodSplat);
@@ -605,7 +605,7 @@ namespace TEN::Entities::Creatures::TR3
 				{
 					if (creature->Enemy != nullptr && !(creature->Flags & 0xf000))
 					{
-						if (Vector3Int::Distance(item->Pose.Position, creature->Enemy->Pose.Position) <= SECTOR(0.5f))
+						if (Vector3i::Distance(item->Pose.Position, creature->Enemy->Pose.Position) <= SECTOR(0.5f))
 						{
 							DoDamage(creature->Enemy, 5);
 							SoundEffect(SFX_TR4_LARA_THUD, &item->Pose);

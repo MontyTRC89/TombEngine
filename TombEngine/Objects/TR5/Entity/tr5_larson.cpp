@@ -11,7 +11,6 @@
 #include "Game/misc.h"
 #include "Game/people.h"
 #include "Specific/level.h"
-#include "Specific/prng.h"
 #include "Specific/setup.h"
 
 using namespace TEN::Math::Random;
@@ -82,9 +81,7 @@ namespace TEN::Entities::Creatures::TR5
 		// Fire weapon effects.
 		if (creature->FiredWeapon)
 		{
-			auto pos = Vector3Int(LarsonGun.Position);
-			GetJointAbsPosition(item, &pos, LarsonGun.meshNum);
-
+			auto pos = GetJointPosition(item, LarsonGun.meshNum, Vector3i(LarsonGun.Position));
 			TriggerDynamicLight(pos.x, pos.y, pos.z, 2 * creature->FiredWeapon + 10, 192, 128, 32);
 			creature->FiredWeapon--;
 		}

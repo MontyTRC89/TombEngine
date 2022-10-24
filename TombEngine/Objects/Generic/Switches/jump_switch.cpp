@@ -15,15 +15,17 @@ namespace TEN::Entities::Switches
 {
 	OBJECT_COLLISION_BOUNDS JumpSwitchBounds =  
 	{
-		-128, 128,
-		-256, 256,
-		384, 512,
+		GameBoundingBox(
+			-128, 128,
+			-256, 256,
+			384, 512
+		),
 		-ANGLE(10.0f), ANGLE(10.0f),
 		-ANGLE(30.0f), ANGLE(30.0f),
 		-ANGLE(10.0f), ANGLE(10.0f)
 	};
 
-	Vector3Int JumpSwitchPos = { 0, -208, 256 };  
+	Vector3i JumpSwitchPos = { 0, -208, 256 };  
 
 	void JumpSwitchCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 	{

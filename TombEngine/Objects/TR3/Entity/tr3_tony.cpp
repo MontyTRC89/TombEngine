@@ -44,7 +44,7 @@ namespace TEN::Entities::Creatures::TR3
 	struct TonyFlame
 	{
 		bool on;
-		Vector3Int pos;
+		Vector3i pos;
 		int fallspeed;
 		int speed;
 		short yRot;
@@ -252,7 +252,7 @@ namespace TEN::Entities::Creatures::TR3
 		}
 	}
 
-	static void TriggerFireBall(ItemInfo* item, TonyFlameType type, Vector3Int* laraPos, short roomNumber, short angle, int zdVelocity)
+	static void TriggerFireBall(ItemInfo* item, TonyFlameType type, Vector3i* laraPos, short roomNumber, short angle, int zdVelocity)
 	{
 		TonyFlame flame;
 		memset(&flame, 0, sizeof(TonyFlame));
@@ -261,12 +261,7 @@ namespace TEN::Entities::Creatures::TR3
 		{
 		case T_ROCKZAPPL:
 			flame.on = true;
-
-			flame.pos.x = 0;
-			flame.pos.y = 0;
-			flame.pos.z = 0;
-			GetJointAbsPosition(item, &flame.pos, 10);
-
+			flame.pos = GetJointPosition(item, 10);
 			flame.fallspeed = -16;
 			flame.speed = 0;
 			flame.yRot = item->Pose.Orientation.y;
@@ -276,12 +271,7 @@ namespace TEN::Entities::Creatures::TR3
 
 		case T_ROCKZAPPR:
 			flame.on = true;
-
-			flame.pos.x = 0;
-			flame.pos.y = 0;
-			flame.pos.z = 0;
-			GetJointAbsPosition(item, &flame.pos, 13);
-
+			flame.pos = GetJointPosition(item, 13);
 			flame.fallspeed = -16;
 			flame.speed = 0;
 			flame.yRot = item->Pose.Orientation.y;
@@ -291,12 +281,7 @@ namespace TEN::Entities::Creatures::TR3
 
 		case T_ZAPP:
 			flame.on = true;
-
-			flame.pos.x = 0;
-			flame.pos.y = 0;
-			flame.pos.z = 0;
-			GetJointAbsPosition(item, &flame.pos, 13);
-
+			flame.pos = GetJointPosition(item, 13);
 			flame.fallspeed = (GetRandomControl() & 7) + 10;
 			flame.speed = 160;
 			flame.yRot = item->Pose.Orientation.y;
@@ -411,7 +396,7 @@ namespace TEN::Entities::Creatures::TR3
 		{
 			if (fx->flag1 == T_ROCKZAPPL || fx->flag1 == T_ROCKZAPPR || fx->flag1 == T_ZAPP || fx->flag1 == T_DROPPER)
 			{
-				Vector3Int pos;
+				Vector3i pos;
 
 				TriggerExplosionSparks(oldX, oldY, oldZ, 3, -2, 0, fx->roomNumber);
 				if (fx->flag1 == T_ROCKZAPPL || fx->flag1 == T_ROCKZAPPR)
@@ -467,7 +452,7 @@ namespace TEN::Entities::Creatures::TR3
 
 		if (!Lara.Burn)
 		{
-			if (ItemNearLara(&fx->pos.Position, 200))
+			if (ItemNearLara(fx->pos.Position, 200))
 			{
 				LaraItem->HitStatus = true;
 				KillEffect(fxNumber);
@@ -714,16 +699,14 @@ namespace TEN::Entities::Creatures::TR3
 			g = (g * bright) / 16;
 			b = (b * bright) / 16;
 
-			Vector3Int pos1 = { 0, 0, 0 };
-			GetJointAbsPosition(item, &pos1, 10);
+			auto pos1 = GetJointPosition(item, 10);
 
 			TriggerDynamicLight(pos1.x, pos1.y, pos1.z, 12, r, g, b);
 			TriggerTonyFlame(itemNumber, 14);
 
 			if (item->Animation.ActiveState == TONY_STATE_ROCKZAPP || item->Animation.ActiveState == TONY_STATE_BIGBOOM)
 			{
-				pos1.x = pos1.y = pos1.z = 0;
-				GetJointAbsPosition(item, &pos1, 13);
+				pos1 = GetJointPosition(item, 13);
 				TriggerDynamicLight(pos1.x, pos1.y, pos1.z, 12, r, g, b);
 				TriggerTonyFlame(itemNumber, 13);
 			}

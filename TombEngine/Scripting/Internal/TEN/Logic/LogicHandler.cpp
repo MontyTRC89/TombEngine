@@ -356,9 +356,9 @@ void LogicHandler::SetVariables(std::vector<SavedVar> const & vars)
 						solTables[i][vars[first]] = vars[second];
 					}
 				}
-				else if (std::holds_alternative<Vector3Int>(vars[second]))
+				else if (std::holds_alternative<Vector3i>(vars[second]))
 				{
-					auto theVec = Vec3{ std::get<Vector3Int>(vars[second]) };
+					auto theVec = Vec3{ std::get<Vector3i>(vars[second]) };
 					solTables[i][vars[first]] = theVec;
 				}
 				else if (std::holds_alternative<FuncName>(vars[second]))

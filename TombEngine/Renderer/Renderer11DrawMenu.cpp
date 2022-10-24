@@ -1,12 +1,14 @@
 #include "framework.h"
 #include "Renderer/Renderer11.h"
-#include "Game/savegame.h"
-#include "Game/health.h"
+
 #include "Game/animation.h"
-#include "Game/gui.h"
-#include "Game/Lara/lara.h"
 #include "Game/control/control.h"
 #include "Game/control/volume.h"
+#include "Game/gui.h"
+#include "Game/health.h"
+#include "Game/Lara/lara.h"
+#include "Game/savegame.h"
+#include "Math/Math.h"
 #include "Scripting/Internal/TEN/Flow//Level/FlowLevel.h"
 #include "Specific/configuration.h"
 #include "Specific/level.h"
@@ -15,6 +17,7 @@
 #include "Specific/winmain.h"
 
 using namespace TEN::Input;
+using namespace TEN::Math;
 
 extern TEN::Renderer::RendererHUDBar* g_SFXVolumeBar;
 extern TEN::Renderer::RendererHUDBar* g_MusicVolumeBar;
@@ -927,7 +930,7 @@ namespace TEN::Renderer
 				PrintDebugMessage("Room.y, minFloor, maxCeiling: %d %d %d ", r->y, r->minfloor, r->maxceiling);
 				PrintDebugMessage("Camera.pos: %d %d %d", Camera.pos.x, Camera.pos.y, Camera.pos.z);
 				PrintDebugMessage("Camera.target: %d %d %d", Camera.target.x, Camera.target.y, Camera.target.z);
-				PrintDebugMessage("Camera.roomNumber: %d", Camera.pos.roomNumber);
+				PrintDebugMessage("Camera.roomNumber: %d", Camera.pos.RoomNumber);
 				break;
 
 			case RENDERER_DEBUG_PAGE::LARA_STATS:

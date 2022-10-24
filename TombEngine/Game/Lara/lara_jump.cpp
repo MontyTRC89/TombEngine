@@ -781,8 +781,8 @@ void lara_col_swan_dive(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	auto* bounds = GetBoundsAccurate(item);
-	int realHeight = g_GameFlow->HasCrawlspaceDive() ? (bounds->Height() * 0.7f) : LARA_HEIGHT;
+	auto bounds = GameBoundingBox(item);
+	int realHeight = g_GameFlow->HasCrawlspaceDive() ? (bounds.GetHeight() * 0.7f) : LARA_HEIGHT;
 
 	lara->Control.MoveAngle = item->Pose.Orientation.y;
 	coll->Setup.Height = std::max(LARA_HEIGHT_CRAWL, realHeight);

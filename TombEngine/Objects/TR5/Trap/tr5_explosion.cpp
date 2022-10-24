@@ -1,22 +1,24 @@
 #include "framework.h"
-#include "tr5_explosion.h"
+#include "Objects/TR5/Trap/tr5_explosion.h"
+
+#include "Game/animation.h"
+#include "Game/collision/collide_item.h"
+#include "Game/collision/collide_room.h"
+#include "Game/control/box.h"
+#include "Game/control/control.h"
+#include "Game/effects/debris.h"
+#include "Game/effects/effects.h"
+#include "Game/effects/lara_fx.h"
+#include "Game/effects/tomb4fx.h"
+#include "Game/items.h"
+#include "Game/Lara/lara.h"
+#include "Game/Lara/lara_one_gun.h"
+#include "Objects/Generic/Switches/generic_switch.h"
+#include "Objects/Generic/Traps/traps.h"
+#include "Objects/TR5/Shatter/tr5_smashobject.h"
+#include "Sound/sound.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
-#include "Game/control/control.h"
-#include "Sound/sound.h"
-#include "Game/effects/effects.h"
-#include "Game/effects/tomb4fx.h"
-#include "Game/animation.h"
-#include "Objects/Generic/Traps/traps.h"
-#include "Game/Lara/lara.h"
-#include "Objects/TR5/Shatter/tr5_smashobject.h"
-#include "Game/Lara/lara_one_gun.h"
-#include "Game/effects/debris.h"
-#include "Objects/Generic/Switches/generic_switch.h"
-#include "Game/collision/collide_item.h"
-#include "Game/control/box.h"
-#include "Game/effects/lara_fx.h"
-#include "Game/items.h"
 
 using namespace TEN::Effects::Lara;
 using namespace TEN::Entities::Switches;
@@ -65,7 +67,7 @@ void ExplosionControl(short itemNumber)
 			int flag;
 
 			++item->ItemFlags[0];
-			if (g_Level.Rooms[item->RoomNumber].flags & ENV_FLAG_WATER)
+			if (TestEnvironment(ENV_FLAG_WATER, item->RoomNumber))
 				flag = 1;
 			else
 				flag = item->ItemFlags[1] == 1 ? 2 : 0;
@@ -77,7 +79,7 @@ void ExplosionControl(short itemNumber)
 			for (int i = 0; i < item->ItemFlags[2]; ++i)
 				TriggerExplosionSparks(item->Pose.Position.x + (GetRandomControl() % 128 - 64) * item->ItemFlags[2], item->Pose.Position.y + (GetRandomControl() % 128 - 64) * item->ItemFlags[2], item->Pose.Position.z + (GetRandomControl() % 128 - 64) * item->ItemFlags[2], 2, 0, i, item->RoomNumber);
 			
-			PHD_3DPOS pos;
+			Pose pos;
 			pos.Position.x = item->Pose.Position.x;
 			pos.Position.y = item->Pose.Position.y - 128;
 			pos.Position.z = item->Pose.Position.z;
@@ -91,8 +93,7 @@ void ExplosionControl(short itemNumber)
 			}
 			else if (flag == 2)
 			{
-				Vector3Int vec = { 0, 0, 0 };
-				GetLaraJointPosition(&vec, 0);
+				auto vec = GetJointPosition(LaraItem, LM_HIPS);
 
 				int dx = vec.x - item->Pose.Position.x;
 				int dy = vec.y - item->Pose.Position.y;
