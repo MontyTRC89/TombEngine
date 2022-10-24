@@ -279,7 +279,7 @@ namespace TEN::Entities::TR4
 
 				if (!creature->Flags)
 				{
-					if (item->TouchBits.Test(MummySwipeAttackJoints));
+					if (item->TouchBits.Test(MummySwipeAttackJoints))
 					{
 						if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase &&
 							item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].frameEnd)
