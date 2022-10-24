@@ -43,7 +43,7 @@ namespace TEN::Entities::Generic
 		LS_JUMP_UP
 	};
 
-	auto LadderPos = Vector3i(0, 0, -CLICK(0.9f));
+	auto LadderPos = Vector3i(0, 0, -CLICK(0.95f));
 	OBJECT_COLLISION_BOUNDS LadderBounds =
 	{
 		GameBoundingBox(

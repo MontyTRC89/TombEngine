@@ -2586,6 +2586,24 @@ bool TestLaraLadderUp(ItemInfo* item, CollisionInfo* coll)
 bool TestLaraLadderDown(ItemInfo* item, CollisionInfo* coll)
 {
 	return true;
+
+	static const int probeDist			= CLICK(0.5f);
+	static const int dismountFloorBound = CLICK(0.6f);
+
+	auto lFootHeight = GetJointPosition(item, LM_LFOOT).y;
+	auto rFootHeight = GetJointPosition(item, LM_RFOOT).y;
+
+	int vPos = std::max(lFootHeight, rFootHeight);
+	auto pointColl = GetCollision(item, item->Pose.Orientation.y, -probeDist);
+
+	// Assess point collision.
+	if ((pointColl.Position.Floor - vPos) > dismountFloorBound && // Floor height is within dismount height bound.
+		!pointColl.Position.FloorSlope)
+	{
+		return true;
+	}
+
+	return false;
 }
 
 bool TestLaraLadderDismountTop(ItemInfo* item, CollisionInfo* coll)
@@ -2616,6 +2634,7 @@ bool TestLaraLadderDismountBottom(ItemInfo* item, CollisionInfo* coll)
 
 bool TestLaraLadderSideDismount(ItemInfo* item, CollisionInfo* coll, bool isGoingLeft)
 {
+	return false;
 	static const int dismountDist		= CLICK(1.5f);
 	static const int dismountFloorBound = CLICK(0.25f);
 
@@ -2634,12 +2653,10 @@ bool TestLaraLadderSideDismount(ItemInfo* item, CollisionInfo* coll, bool isGoin
 }
 bool TestLaraLadderDismountLeft(ItemInfo* item, CollisionInfo* coll)
 {
-	return false;
-	TestLaraLadderSideDismount(item, coll, true);
+	return TestLaraLadderSideDismount(item, coll, true);
 }
 
 bool TestLaraLadderDismountRight(ItemInfo* item, CollisionInfo* coll)
 {
-	return false;
-	TestLaraLadderSideDismount(item, coll, false);
+	return TestLaraLadderSideDismount(item, coll, false);
 }
