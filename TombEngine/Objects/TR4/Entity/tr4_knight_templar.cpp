@@ -25,7 +25,7 @@ namespace TEN::Entities::TR4
 	#define KTEMPLAR_WALK_TURN_RATE_MAX ANGLE(7.0f)
 
 	const auto KnightTemplarBite = BiteInfo(Vector3::Zero, 11);
-	const vector<int> KnightTemplarSwordAttackJoints = { 10, 11 };
+	const vector<uint> KnightTemplarSwordAttackJoints = { 10, 11 };
 
 	enum KnightTemplarState
 	{
@@ -206,7 +206,7 @@ namespace TEN::Entities::TR4
 
 				if (!creature->Flags)
 				{
-					if (item->TestBits(JointBitType::Touch, KnightTemplarSwordAttackJoints))
+					if (item->TouchBits.Test(KnightTemplarSwordAttackJoints))
 					{
 						DoDamage(creature->Enemy, KNIGHT_TEMPLAR_SWORD_ATTACK_DAMAGE);
 						CreatureEffect2(item, KnightTemplarBite, 20, -1, DoBloodSplat);

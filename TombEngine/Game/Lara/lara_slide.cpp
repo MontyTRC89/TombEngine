@@ -105,7 +105,7 @@ void lara_col_slide_forward(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (coll->Middle.Floor > CLICK(1) && !TestEnvironment(ENV_FLAG_SWAMP, item))
+	if (TestLaraFall(item, coll) && !TestEnvironment(ENV_FLAG_SWAMP, item))
 	{
 		SetLaraFallAnimation(item);
 		StopSoundEffect(SFX_TR4_LARA_SLIPPING);
@@ -208,7 +208,7 @@ void lara_col_slide_back(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (coll->Middle.Floor > CLICK(1) && !TestEnvironment(ENV_FLAG_SWAMP, item))
+	if (TestLaraFall(item, coll) && !TestEnvironment(ENV_FLAG_SWAMP, item))
 	{
 		SetLaraFallBackAnimation(item);
 		StopSoundEffect(SFX_TR4_LARA_SLIPPING);

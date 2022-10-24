@@ -29,8 +29,8 @@ namespace TEN::Entities::Vehicles
 	char JeepSmokeStart;
 	bool JeepNoGetOff;
 
-	const vector<int> JeepJoints = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 15, 16 };
-	const vector<int> JeepBrakeLightJoints = { 15, 16 };
+	const vector<uint> JeepJoints = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 15, 16 };
+	const vector<uint> JeepBrakeLightJoints = { 15, 16 };
 
 	const vector<VehicleMountType> JeepMountTypes =
 	{
@@ -146,8 +146,8 @@ namespace TEN::Entities::Vehicles
 		jeepItem->Data = JeepInfo();
 		auto* jeep = GetJeepInfo(jeepItem);
 
-		jeepItem->SetBits(JointBitType::Mesh, JeepJoints);
-		jeepItem->ClearBits(JointBitType::Mesh, { 17 });
+		jeepItem->MeshBits.Set(JeepJoints);
+		jeepItem->MeshBits.Clear(17);
 		jeep->MomentumAngle = jeepItem->Pose.Orientation.y;
 	}
 
@@ -860,13 +860,13 @@ namespace TEN::Entities::Vehicles
 			GetJointAbsPosition(jeepItem, &pos, 11);
 
 			TriggerDynamicLight(pos.x, pos.y, pos.z, 10, 64, 0, 0);
-			jeepItem->SetBits(JointBitType::Mesh, { 17 });
-			jeepItem->ClearBits(JointBitType::Mesh, JeepBrakeLightJoints);
+			jeepItem->MeshBits.Set({ 17 });
+			jeepItem->MeshBits.Clear(JeepBrakeLightJoints);
 		}
 		else
 		{
-			jeepItem->SetBits(JointBitType::Mesh, JeepBrakeLightJoints);
-			jeepItem->ClearBits(JointBitType::Mesh, { 17 });
+			jeepItem->MeshBits.Set(JeepBrakeLightJoints);
+			jeepItem->MeshBits.Clear({ 17 });
 		}
 	
 		*pitch = jeep->EngineRevs;

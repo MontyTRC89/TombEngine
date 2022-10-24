@@ -227,7 +227,7 @@ namespace TEN::Entities::TR4
 
 				if (!creature->Flags)
 				{
-					if (item->TouchBits)
+					if (item->TouchBits.TestAny())
 					{
 						if (item->Animation.AnimNumber == Objects[item->ObjectNumber].animIndex + 16)
 						{
@@ -280,7 +280,7 @@ namespace TEN::Entities::TR4
 
 				if (!creature->Flags)
 				{
-					if (item->TouchBits)
+					if (item->TouchBits.TestAny())
 					{
 						if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 15 &&
 							item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].frameBase + 26)

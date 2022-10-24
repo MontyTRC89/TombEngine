@@ -22,9 +22,9 @@ namespace TEN::Entities::TR4
 
 	const auto GuideBite1 = BiteInfo(Vector3(0.0f, 20.0f, 180.0f), 18);
 	const auto GuideBite2 = BiteInfo(Vector3(30.0f, 80.0f, 50.0f), 15);
-	const vector<int> GuideLeftFingerSwapJoints = { 15 };
-	const vector<int> GuideRightHandSwapJoints	= { 18 };
-	const vector<int> GuideHeadSwapJoints		= { 21 };
+	const vector<uint> GuideLeftFingerSwapJoints = { 15 };
+	const vector<uint> GuideRightHandSwapJoints	= { 18 };
+	const vector<uint> GuideHeadSwapJoints		= { 21 };
 
 	enum GuideState
 	{
@@ -100,7 +100,7 @@ namespace TEN::Entities::TR4
 
 		ClearItem(itemNumber);
 		SetAnimation(item, GUIDE_ANIM_IDLE);
-		item->SetBits(JointBitType::MeshSwap, GuideRightHandSwapJoints);
+		item->MeshSwapBits.Set(GuideRightHandSwapJoints);
 
 	}
 
@@ -422,7 +422,7 @@ namespace TEN::Entities::TR4
 				{
 					if (!foundEnemy ||
 						AI.distance >= pow(SECTOR(1.5f), 2) &&
-						(item->TestBits(JointBitType::MeshSwap, GuideRightHandSwapJoints) || AI.distance >= pow(SECTOR(3), 2)))
+						(item->MeshSwapBits.Test(GuideRightHandSwapJoints) || AI.distance >= pow(SECTOR(3), 2)))
 					{
 						if (creature->Enemy->IsLara())
 						{
@@ -478,7 +478,7 @@ namespace TEN::Entities::TR4
 			}
 			else if (foundEnemy &&
 				(AI.distance < pow(SECTOR(1.5f), 2) ||
-					!(item->TestBits(JointBitType::MeshSwap, GuideRightHandSwapJoints)) &&
+					!(item->MeshSwapBits.Test(GuideRightHandSwapJoints)) &&
 					AI.distance < pow(SECTOR(3), 2)))
 			{
 				item->Animation.TargetState = GUIDE_STATE_IDLE;
@@ -495,9 +495,9 @@ namespace TEN::Entities::TR4
 			random = GetRandomControl();
 
 			if (frameNumber == 32)
-				item->SetBits(JointBitType::MeshSwap, GuideLeftFingerSwapJoints);
+				item->MeshSwapBits.Set(GuideLeftFingerSwapJoints);
 			else if (frameNumber == 216)
-				item->ClearBits(JointBitType::MeshSwap, GuideLeftFingerSwapJoints);
+				item->MeshSwapBits.Clear(GuideLeftFingerSwapJoints);
 			else if (frameNumber <= 79 || frameNumber >= 84)
 			{
 				if (frameNumber <= 83 || frameNumber >= 94)
@@ -672,7 +672,7 @@ namespace TEN::Entities::TR4
 			}
 			else if (item->Animation.FrameNumber == (g_Level.Anims[item->Animation.AnimNumber].frameBase + 35))
 			{
-				item->ClearBits(JointBitType::MeshSwap, GuideRightHandSwapJoints);
+				item->MeshSwapBits.Clear(GuideRightHandSwapJoints);
 
 				auto* room = &g_Level.Rooms[item->RoomNumber];
 
@@ -759,14 +759,14 @@ namespace TEN::Entities::TR4
 					flagScaryInscription)
 				{
 					item->Animation.RequiredState = GUIDE_STATE_RUN_FORWARD;
-					item->SetBits(JointBitType::MeshSwap, GuideHeadSwapJoints);
+					item->MeshSwapBits.Set(GuideHeadSwapJoints);
 					SoundEffect(SFX_TR4_GUIDE_SCARE, &item->Pose);
 				}
 				if (item->Animation.FrameNumber == (g_Level.Anims[item->Animation.AnimNumber].frameBase + 185) &&
 					flagScaryInscription)
 				{
 					item->ItemFlags[2] &= ~(1 << 4); // Turn off 4th bit for flagScaryInscription.
-					item->ClearBits(JointBitType::MeshSwap, GuideHeadSwapJoints);
+					item->MeshSwapBits.Clear(GuideHeadSwapJoints);
 				}
 			}
 			else if ((enemy->Pose.Orientation.y - item->Pose.Orientation.y) <= ANGLE(2.0f))

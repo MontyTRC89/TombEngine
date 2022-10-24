@@ -103,7 +103,7 @@ namespace TEN::Entities::Creatures::TR2
 
 				if (!creature->Flags)
 				{
-					item->MeshBits = (item->MeshBits << 1) + 1;
+					item->MeshBits = (item->MeshBits.ToPackedBits() << 1) + 1;
 					creature->Flags = 3;
 				}
 				else

@@ -123,7 +123,7 @@ namespace TEN::Entities::Creatures::TR5
 		{
 			for (int i = 0; i < 2; i++)
 			{
-				if (1 << GuardianMeshes[i] & item->MeshBits)
+				if (1 << GuardianMeshes[i] & item->MeshBits.ToPackedBits())
 				{
 					src = Vector3Int();
 					GetJointAbsPosition(item, &src, GuardianMeshes[i]);
@@ -459,7 +459,7 @@ namespace TEN::Entities::Creatures::TR5
 							for (int i = 0; i < 2; i++)
 							{
 								// If eye was not destroyed then fire from it
-								if ((1 << GuardianMeshes[i]) & item->MeshBits)
+								if ((1 << GuardianMeshes[i]) & item->MeshBits.ToPackedBits())
 								{
 									src.x = 0;
 									src.y = 0;
