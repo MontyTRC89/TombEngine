@@ -131,7 +131,7 @@ namespace TEN::Entities::Creatures::TR2
 
 			case RAT_STATE_POUNCE_ATTACK:
 				if (!item->Animation.RequiredState &&
-					item->TestBits(JointBitType::Touch, RatBite.meshNum))
+					item->TouchBits.Test(RatBite.meshNum))
 				{
 					item->Animation.RequiredState = RAT_STATE_IDLE;
 					DoDamage(creature->Enemy, RAT_ATTACK_DAMAGE);

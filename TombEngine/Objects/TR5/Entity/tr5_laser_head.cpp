@@ -122,7 +122,7 @@ namespace TEN::Entities::Creatures::TR5
 		{
 			for (int i = 0; i < 2; i++)
 			{
-				if (1 << GuardianMeshes[i] & item->MeshBits)
+				if (1 << GuardianMeshes[i] & item->MeshBits.ToPackedBits())
 				{
 					origin = GetJointPosition(item, GuardianMeshes[i]);
 					TriggerLightningGlow(origin.x, origin.y, origin.z, size + (GetRandomControl() & 3), 0, g, b);
@@ -447,7 +447,7 @@ namespace TEN::Entities::Creatures::TR5
 							for (int i = 0; i < 2; i++)
 							{
 								// If eye was not destroyed then fire from it
-								if ((1 << GuardianMeshes[i]) & item->MeshBits)
+								if ((1 << GuardianMeshes[i]) & item->MeshBits.ToPackedBits())
 								{
 									origin = GameVector(GetJointPosition(item, GuardianMeshes[i]), origin.RoomNumber);
 

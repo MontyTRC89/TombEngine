@@ -27,7 +27,7 @@ namespace TEN::Entities::Creatures::TR3
 	constexpr auto TIGER_ROAR_CHANCE = 1.0f / 340;
 
 	const auto TigerBite = BiteInfo(Vector3(19.0f, -13.0f, 3.0f), 26);
-	const vector<int> TigerAttackJoints = { 14, 15, 16, 18, 19, 20, 21, 22, 23, 24, 25, 26 };
+	const vector<uint> TigerAttackJoints = { 14, 15, 16, 18, 19, 20, 21, 22, 23, 24, 25, 26 };
 
 	#define TIGER_WALK_TURN_RATE_MAX		  ANGLE(3.0f)
 	#define TIGER_RUN_TURN_RATE_MAX			  ANGLE(6.0f)
@@ -180,7 +180,7 @@ namespace TEN::Entities::Creatures::TR3
 			case TIGER_STATE_BITE_ATTACK:
 			case TIGER_STATE_RUN_SWIPE_ATTACK:
 			case TIGER_STATE_POUNCE_ATTACK:
-				if (!creature->Flags && item->TestBits(JointBitType::Touch, TigerAttackJoints))
+				if (!creature->Flags && item->TouchBits.Test(TigerAttackJoints))
 				{
 					DoDamage(creature->Enemy, TIGER_ATTACK_DAMAGE);
 					CreatureEffect(item, TigerBite, DoBloodSplat);

@@ -297,7 +297,7 @@ void TEN::Renderer::Renderer11::DrawLara(RenderView& view, bool transparent)
 
 	for (int k = 0; k < laraSkin.ObjectMeshes.size(); k++)
 	{
-		if (!nativeItem->TestBits(JointBitType::Mesh, k))
+		if (!nativeItem->MeshBits.Test(k))
 			continue;
 
 		RendererMesh *mesh = GetMesh(Lara.MeshPtrs[k]);

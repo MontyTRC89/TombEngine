@@ -79,8 +79,8 @@ int TestCollision(ItemInfo* item, ItemInfo* laraItem)
 
 						if ((SQUARE(dx) + SQUARE(dy) + SQUARE(dz)) < SQUARE(r))
 						{
-							item->SetBits(JointBitType::Touch, i);
-							laraItem->SetBits(JointBitType::Touch, j);
+							item->TouchBits.Set(i);
+							laraItem->TouchBits.Set(j);
 							flags |= 1 << i;
 							break;
 						}

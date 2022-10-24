@@ -33,8 +33,8 @@ namespace TEN::Entities::Vehicles
 		byte life;
 		byte pad[3];
 	};
-	static vector<int> KayakLaraLegJoints = { LM_HIPS, LM_LTHIGH, LM_LSHIN, LM_LFOOT, LM_RTHIGH, LM_RSHIN, LM_RFOOT };
-	static vector<VehicleMountType> KayakMountTypes =
+	const vector<uint> KayakLaraLegJoints = { LM_HIPS, LM_LTHIGH, LM_LSHIN, LM_LFOOT, LM_RTHIGH, LM_RSHIN, LM_RFOOT };
+	const vector<VehicleMountType> KayakMountTypes =
 	{
 		VehicleMountType::LevelStart,
 		VehicleMountType::Left,
@@ -1028,7 +1028,7 @@ namespace TEN::Entities::Vehicles
 			{
 				kayak->Flags |= 0x80;
 				lara->MeshPtrs[LM_RHAND] = Objects[ID_KAYAK_LARA_ANIMS].meshIndex + LM_RHAND;
-				laraItem->ClearBits(JointBitType::Mesh, KayakLaraLegJoints);
+				laraItem->MeshBits.Clear(KayakLaraLegJoints);
 			}
 
 			break;
@@ -1040,7 +1040,7 @@ namespace TEN::Entities::Vehicles
 			{
 				kayak->Flags &= ~0x80;
 				lara->MeshPtrs[LM_RHAND] = Objects[ID_LARA_SKIN].meshIndex + LM_RHAND;
-				laraItem->SetBits(JointBitType::Mesh, KayakLaraLegJoints);
+				laraItem->MeshBits.Set(KayakLaraLegJoints);
 			}
 
 			laraItem->Animation.TargetState = laraItem->Animation.RequiredState;

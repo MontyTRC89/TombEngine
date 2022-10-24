@@ -41,9 +41,9 @@ namespace TEN::Entities::TR4
 	#define BABOON_STATE_WALK_ANIM 14 // TODO: What is this?
 
 	const auto BaboonBite = BiteInfo(Vector3(10.0f, 10.0f, 11.0f), 4);
-	const vector<int> BaboonAttackJoints	  = { 11, 12 };
-	const vector<int> BaboonAttackRightJoints = { 1, 2, 3, 5, 8, 9 };
-	const vector<int> BaboonJumpAttackJoints  = { 3, 4, 8 };
+	const vector<uint> BaboonAttackJoints	  = { 11, 12 };
+	const vector<uint> BaboonAttackRightJoints = { 1, 2, 3, 5, 8, 9 };
+	const vector<uint> BaboonJumpAttackJoints  = { 3, 4, 8 };
 
 	BaboonRespawner BaboonRespawn;
 
@@ -538,9 +538,9 @@ namespace TEN::Entities::TR4
 					item->Pose.Orientation.y += AI.angle;
 
 				if (creature->Flags == 0 &&
-					(item->TestBits(JointBitType::Touch, BaboonAttackJoints) ||
-					 item->TestBits(JointBitType::Touch, BaboonAttackRightJoints) ||
-					 item->TestBits(JointBitType::Touch, BaboonJumpAttackJoints)))
+					(item->TouchBits.Test(BaboonAttackJoints) ||
+					 item->TouchBits.Test(BaboonAttackRightJoints) ||
+					 item->TouchBits.Test(BaboonJumpAttackJoints)))
 				{
 					CreatureEffect2(item, BaboonBite, 10, -1, DoBloodSplat);
 					DoDamage(creature->Enemy, BABOON_ATTACK_DAMAGE);

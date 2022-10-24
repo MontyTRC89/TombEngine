@@ -58,7 +58,7 @@ void AnimateShotgun(ItemInfo* laraItem, LaraWeaponType weaponType)
 
 		pos = GetJointPosition(laraItem, LM_RHAND, pos);
 
-		if (laraItem->MeshBits)
+		if (laraItem->MeshBits.TestAny())
 			TriggerGunSmoke(pos.x, pos.y, pos.z, 0, 0, 0, 0, weaponType, lara->LeftArm.GunSmoke);
 	}
 
@@ -688,7 +688,7 @@ void FireGrenade(ItemInfo* laraItem)
 
 		lara->LeftArm.GunSmoke = 32;
 
-		if (laraItem->MeshBits)
+		if (laraItem->MeshBits.TestAny())
 		{
 			for (int i = 0; i < 5; i++)
 				TriggerGunSmoke(x, y, z, jointPos.x - x, jointPos.y - y, jointPos.z - z, 1, LaraWeaponType::GrenadeLauncher, lara->LeftArm.GunSmoke);

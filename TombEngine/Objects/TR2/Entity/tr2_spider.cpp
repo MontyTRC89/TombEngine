@@ -90,7 +90,7 @@ namespace TEN::Entities::Creatures::TR2
 					else
 						break;
 				}
-				else if (AI.ahead && item->TouchBits)
+				else if (AI.ahead && item->TouchBits.TestAny())
 					item->Animation.TargetState = 4;
 				else if (creature->Mood == MoodType::Stalk)
 					item->Animation.TargetState = 2;
@@ -117,7 +117,7 @@ namespace TEN::Entities::Creatures::TR2
 
 				if (creature->Mood == MoodType::Bored || creature->Mood == MoodType::Stalk)
 					item->Animation.TargetState = 2;
-				else if (AI.ahead && item->TouchBits)
+				else if (AI.ahead && item->TouchBits.TestAny())
 					item->Animation.TargetState = 1;
 				else if (AI.ahead && AI.distance < pow(SECTOR(0.2f), 2))
 					item->Animation.TargetState = 6;
@@ -129,7 +129,7 @@ namespace TEN::Entities::Creatures::TR2
 			case 4:
 			case 5:
 			case 6:
-				if (!creature->Flags && item->TouchBits)
+				if (!creature->Flags && item->TouchBits.TestAny())
 				{
 					S_SpiderBite(item);
 					DoDamage(creature->Enemy, 25);
@@ -213,7 +213,7 @@ namespace TEN::Entities::Creatures::TR2
 
 				if (creature->Mood == MoodType::Bored || creature->Mood == MoodType::Stalk)
 					item->Animation.TargetState = 2;
-				else if (AI.ahead && item->TouchBits)
+				else if (AI.ahead && item->TouchBits.TestAny())
 					item->Animation.TargetState = 1;
 
 				break;
@@ -221,7 +221,7 @@ namespace TEN::Entities::Creatures::TR2
 			case 4:
 			case 5:
 			case 6:
-				if (!creature->Flags && item->TouchBits)
+				if (!creature->Flags && item->TouchBits.TestAny())
 				{
 					S_SpiderBite(item);
 					DoDamage(creature->Enemy, 100);

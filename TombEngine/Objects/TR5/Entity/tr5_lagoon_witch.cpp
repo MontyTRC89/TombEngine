@@ -19,7 +19,7 @@ namespace TEN::Entities::Creatures::TR5
 	constexpr auto LAGOON_WITCH_ATTACK_DAMAGE = 100;
 
 	const auto LagoonWitchBite = BiteInfo(Vector3::Zero, 7);
-	const vector<int> LagoonWitchAttackJoints = { 6, 7, 8, 9, 14, 15, 16, 17 };
+	const vector<uint> LagoonWitchAttackJoints = { 6, 7, 8, 9, 14, 15, 16, 17 };
 
 	enum LagoonWitchState
 	{
@@ -128,7 +128,7 @@ namespace TEN::Entities::Creatures::TR5
 				creature->MaxTurn = ANGLE(2.0f);
 
 				if (!creature->Flags &&
-					item->TestBits(JointBitType::Touch, LagoonWitchAttackJoints) &&
+					item->TouchBits.Test(LagoonWitchAttackJoints) &&
 					item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 29)
 				{
 					DoDamage(creature->Enemy, LAGOON_WITCH_ATTACK_DAMAGE);
