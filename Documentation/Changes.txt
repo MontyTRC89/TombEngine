@@ -10,6 +10,7 @@ Version 1.0.3
 * Fix slow centaur projectile velocity.
 * Adjust sprint jump timing.
 * Fix grabbing narrow ledges below ceilings.
+* Add FlyCheat option for disable Fly Cheat to gameflow
 * Fix search animations.
 
 
