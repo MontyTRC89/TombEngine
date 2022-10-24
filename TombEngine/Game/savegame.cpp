@@ -627,7 +627,7 @@ bool SaveGame::Save(int slot)
 		serializedItem.add_target_state(itemToSerialize.Animation.TargetState);
 		serializedItem.add_hit_points(itemToSerialize.HitPoints);
 		serializedItem.add_item_flags(itemFlagsOffset);
-		serializedItem.add_mesh_bits(itemToSerialize.MeshBits);
+		serializedItem.add_mesh_bits(itemToSerialize.MeshBits.ToPackedBits());
 		serializedItem.add_object_id(itemToSerialize.ObjectNumber);
 		serializedItem.add_pose(&FromPHD(itemToSerialize.Pose));
 		serializedItem.add_required_state(itemToSerialize.Animation.RequiredState);
@@ -635,7 +635,7 @@ bool SaveGame::Save(int slot)
 		serializedItem.add_velocity(&FromVector3(itemToSerialize.Animation.Velocity));
 		serializedItem.add_timer(itemToSerialize.Timer);
 		serializedItem.add_color(&FromVector4(itemToSerialize.Color));
-		serializedItem.add_touch_bits(itemToSerialize.TouchBits);
+		serializedItem.add_touch_bits(itemToSerialize.TouchBits.ToPackedBits());
 		serializedItem.add_trigger_flags(itemToSerialize.TriggerFlags);
 		serializedItem.add_triggered((itemToSerialize.Flags & (TRIGGERED | CODE_BITS | ONESHOT)) != 0);
 		serializedItem.add_active(itemToSerialize.Active);
@@ -645,7 +645,7 @@ bool SaveGame::Save(int slot)
 		serializedItem.add_ai_bits(itemToSerialize.AIBits);
 		serializedItem.add_collidable(itemToSerialize.Collidable);
 		serializedItem.add_looked_at(itemToSerialize.LookedAt);
-		serializedItem.add_swap_mesh_flags(itemToSerialize.MeshSwapBits);
+		serializedItem.add_swap_mesh_flags(itemToSerialize.MeshSwapBits.ToPackedBits());
 
 		if (Objects[itemToSerialize.ObjectNumber].intelligent 
 			&& itemToSerialize.Data.is<CreatureInfo>())
@@ -776,7 +776,7 @@ bool SaveGame::Save(int slot)
 	for (int i = 0; i < g_Level.Cameras.size(); i++)
 	{
 		Save::FixedCameraBuilder camera{ fbb };
-		camera.add_flags(g_Level.Cameras[i].flags);
+		camera.add_flags(g_Level.Cameras[i].Flags);
 		cameras.push_back(camera.Finish());
 	}
 	auto camerasOffset = fbb.CreateVector(cameras);
@@ -786,7 +786,7 @@ bool SaveGame::Save(int slot)
 	for (int i = 0; i < g_Level.Sinks.size(); i++)
 	{
 		Save::SinkBuilder sink{ fbb };
-		sink.add_flags(g_Level.Sinks[i].strength);
+		sink.add_flags(g_Level.Sinks[i].Strength);
 		sinks.push_back(sink.Finish());
 	}
 	auto sinksOffset = fbb.CreateVector(sinks);
@@ -1286,14 +1286,14 @@ bool SaveGame::Load(int slot)
 	for (int i = 0; i < s->fixed_cameras()->size(); i++)
 	{
 		if (i < g_Level.Cameras.size())
-			g_Level.Cameras[i].flags = s->fixed_cameras()->Get(i)->flags();
+			g_Level.Cameras[i].Flags = s->fixed_cameras()->Get(i)->flags();
 	}
 
 	// Sinks 
 	for (int i = 0; i < s->sinks()->size(); i++)
 	{
 		if (i < g_Level.Sinks.size())
-			g_Level.Sinks[i].strength = s->sinks()->Get(i)->flags();
+			g_Level.Sinks[i].Strength = s->sinks()->Get(i)->flags();
 	}
 
 	// Flyby cameras 

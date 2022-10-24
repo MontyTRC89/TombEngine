@@ -40,7 +40,7 @@ void SpinningBladeControl(short itemNumber)
 
 		spinning = true;
 
-		if (item->TouchBits)
+		if (item->TouchBits.TestAny())
 		{
 			DoDamage(LaraItem, 100);
 			DoLotsOfBlood(LaraItem->Pose.Position.x, LaraItem->Pose.Position.y - CLICK(2), LaraItem->Pose.Position.z, (short)(item->Animation.Velocity.z * 2), LaraItem->Pose.Orientation.y, LaraItem->RoomNumber, 2);

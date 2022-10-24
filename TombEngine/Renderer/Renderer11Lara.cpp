@@ -117,7 +117,7 @@ void Renderer11::UpdateLaraAnimations(bool force)
 
 	// First calculate matrices for legs, hips, head and torso
 	int mask = MESH_BITS(LM_HIPS) | MESH_BITS(LM_LTHIGH) | MESH_BITS(LM_LSHIN) | MESH_BITS(LM_LFOOT) | MESH_BITS(LM_RTHIGH) | MESH_BITS(LM_RSHIN) | MESH_BITS(LM_RFOOT) | MESH_BITS(LM_TORSO) | MESH_BITS(LM_HEAD);
-	ANIM_FRAME* framePtr[2];
+	AnimFrame* framePtr[2];
 	int rate, frac;
 
 	frac = GetFrame(LaraItem, framePtr, &rate);
@@ -160,7 +160,7 @@ void Renderer11::UpdateLaraAnimations(bool force)
 		case LaraWeaponType::RocketLauncher:
 		case LaraWeaponType::HarpoonGun:
 		{
-			ANIM_FRAME* shotgunframePtr;
+			AnimFrame* shotgunframePtr;
 
 			// Left arm
 			mask = MESH_BITS(LM_LINARM) | MESH_BITS(LM_LOUTARM) | MESH_BITS(LM_LHAND);
@@ -184,7 +184,7 @@ void Renderer11::UpdateLaraAnimations(bool force)
 
 		case LaraWeaponType::Revolver:
 		{
-			ANIM_FRAME* revolverframePtr;
+			AnimFrame* revolverframePtr;
 
 			// Left arm
 			mask = MESH_BITS(LM_LINARM) | MESH_BITS(LM_LOUTARM) | MESH_BITS(LM_LHAND);
@@ -203,7 +203,7 @@ void Renderer11::UpdateLaraAnimations(bool force)
 		case LaraWeaponType::Uzi:
 		default:
 		{
-			ANIM_FRAME* pistolframePtr;
+			AnimFrame* pistolframePtr;
 
 			// Left arm
 			int upperArmMask = MESH_BITS(LM_LINARM);
@@ -305,7 +305,7 @@ void TEN::Renderer::Renderer11::DrawLara(RenderView& view, bool transparent)
 
 	for (int k = 0; k < laraSkin.ObjectMeshes.size(); k++)
 	{
-		if (!nativeItem->TestBits(JointBitType::Mesh, k))
+		if (!nativeItem->MeshBits.Test(k))
 			continue;
 
 		RendererMesh *mesh = GetMesh(Lara.MeshPtrs[k]);

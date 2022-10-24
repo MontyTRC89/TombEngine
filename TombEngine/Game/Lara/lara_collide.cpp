@@ -630,11 +630,11 @@ void LaraWaterCurrent(ItemInfo* item, CollisionInfo* coll)
 	{
 		auto* sink = &g_Level.Sinks[lara->WaterCurrentActive - 1];
 
-		short angle = mGetAngle(sink->x, sink->z, item->Pose.Position.x, item->Pose.Position.z);
-		lara->WaterCurrentPull.x += (sink->strength * SECTOR(1) * phd_sin(angle - ANGLE(90.0f)) - lara->WaterCurrentPull.x) / 16;
-		lara->WaterCurrentPull.z += (sink->strength * SECTOR(1) * phd_cos(angle - ANGLE(90.0f)) - lara->WaterCurrentPull.z) / 16;
+		short angle = mGetAngle(sink->Position.x, sink->Position.z, item->Pose.Position.x, item->Pose.Position.z);
+		lara->WaterCurrentPull.x += (sink->Strength * SECTOR(1) * phd_sin(angle - ANGLE(90.0f)) - lara->WaterCurrentPull.x) / 16;
+		lara->WaterCurrentPull.z += (sink->Strength * SECTOR(1) * phd_cos(angle - ANGLE(90.0f)) - lara->WaterCurrentPull.z) / 16;
 
-		item->Pose.Position.y += (sink->y - item->Pose.Position.y) >> 4;
+		item->Pose.Position.y += (sink->Position.y - item->Pose.Position.y) >> 4;
 	}
 	else
 	{

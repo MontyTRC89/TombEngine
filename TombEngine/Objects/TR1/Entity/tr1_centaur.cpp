@@ -26,13 +26,13 @@ namespace TEN::Entities::Creatures::TR1
 	constexpr auto CENTAUR_REAR_DAMAGE = 200;
 	constexpr auto CENTAUR_REAR_RANGE = SECTOR(1.5f);
 	constexpr auto CENTAUR_REAR_CHANCE = 1.0f / 340;
-	constexpr auto CENTAUR_BOMB_VELOCITY = 20;
+	constexpr auto CENTAUR_BOMB_VELOCITY = CLICK(1);
 
 	#define CENTAUR_TURN_RATE_MAX ANGLE(4.0f)
 
 	const auto CentaurRocketBite = BiteInfo(Vector3(11.0f, 415.0f, 41.0f), 13);
 	const auto CentaurRearBite	 = BiteInfo(Vector3(50.0f, 30.0f, 0.0f), 5);
-	const vector<int> CentaurAttackJoints = { 0, 3, 4, 7, 8, 16, 17 };
+	const vector<uint> CentaurAttackJoints = { 0, 3, 4, 7, 8, 16, 17 };
 
 	enum CentaurState
 	{
@@ -134,7 +134,7 @@ namespace TEN::Entities::Creatures::TR1
 
 			case CENTAUR_STATE_WARNING:
 				if (!item->Animation.RequiredState &&
-					item->TestBits(JointBitType::Touch, CentaurAttackJoints))
+					item->TouchBits.Test(CentaurAttackJoints))
 				{
 					DoDamage(creature->Enemy, CENTAUR_REAR_DAMAGE);
 					CreatureEffect(item, CentaurRearBite, DoBloodSplat);

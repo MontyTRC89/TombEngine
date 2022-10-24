@@ -281,7 +281,7 @@ void SetFlareArm(ItemInfo* laraItem, int armFrame)
 		flareAnimNum += 1;
 
 	lara->LeftArm.AnimNumber = flareAnimNum;
-	lara->LeftArm.FrameBase = g_Level.Anims[flareAnimNum].framePtr;
+	lara->LeftArm.FrameBase = g_Level.Anims[flareAnimNum].FramePtr;
 }
 
 void CreateFlare(ItemInfo* laraItem, GAME_OBJECT_ID objectNumber, bool thrown)

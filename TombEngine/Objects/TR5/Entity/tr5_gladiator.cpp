@@ -25,7 +25,7 @@ namespace TEN::Entities::Creatures::TR5
 	// TODO: Ranges.
 
 	const auto GladiatorBite = BiteInfo(Vector3::Zero, 16);
-	const vector<int> GladiatorAttackJoints = { 13, 14 };
+	const vector<uint> GladiatorAttackJoints = { 13, 14 };
 
 	enum GladiatorState
 	{
@@ -363,7 +363,7 @@ namespace TEN::Entities::Creatures::TR5
 
 					if (!creature->Flags)
 					{
-						if (item->TestBits(JointBitType::Touch, GladiatorAttackJoints))
+						if (item->TouchBits.Test(GladiatorAttackJoints))
 						{
 							DoDamage(creature->Enemy, GLADIATOR_ATTACK_DAMAGE);
 							CreatureEffect2(item, GladiatorBite, 10, item->Pose.Orientation.y, DoBloodSplat);

@@ -27,7 +27,7 @@ namespace TEN::Entities::TR4
 	constexpr auto SKELETON_ATTACK_DAMAGE = 80;
 
 	const auto SkeletonBite = BiteInfo(Vector3(0.0f, -16.0f, 200.0f), 11);
-	const vector<int> SkeletonSwordAttackJoints = { 15, 16 };
+	const vector<uint> SkeletonSwordAttackJoints = { 15, 16 };
 
 	// TODO: Fill in missign states.
 	enum SkeletonState
@@ -566,7 +566,7 @@ namespace TEN::Entities::TR4
 
 				if (!creature->Flags)
 				{
-					if (item->TestBits(JointBitType::Touch, SkeletonSwordAttackJoints))
+					if (item->TouchBits.Test(SkeletonSwordAttackJoints))
 					{
 						DoDamage(creature->Enemy, SKELETON_ATTACK_DAMAGE);
 						CreatureEffect2(item, SkeletonBite, 15, -1, DoBloodSplat);
@@ -622,7 +622,7 @@ namespace TEN::Entities::TR4
 
 					if (!creature->Flags)
 					{
-						if (item->TestBits(JointBitType::Touch, SkeletonSwordAttackJoints))
+						if (item->TouchBits.Test(SkeletonSwordAttackJoints))
 						{
 							DoDamage(creature->Enemy, SKELETON_ATTACK_DAMAGE);
 							CreatureEffect2(item, SkeletonBite, 10, item->Pose.Orientation.y, DoBloodSplat);

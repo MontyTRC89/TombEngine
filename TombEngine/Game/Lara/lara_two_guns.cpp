@@ -44,7 +44,7 @@ void AnimatePistols(ItemInfo* laraItem, LaraWeaponType weaponType)
 
 	int fired = false;
 
-	if (laraItem->MeshBits)
+	if (laraItem->MeshBits.TestAny())
 	{
 		if (lara->LeftArm.GunSmoke)
 		{
@@ -468,7 +468,7 @@ void SetArmInfo(ItemInfo* laraItem, ArmInfo* arm, int frame)
 		arm->AnimNumber = animBase + 3;
 
 	arm->FrameNumber = frame;
-	arm->FrameBase = g_Level.Anims[arm->AnimNumber].framePtr;
+	arm->FrameBase = g_Level.Anims[arm->AnimNumber].FramePtr;
 }
 
 void DrawPistolMeshes(ItemInfo* laraItem, LaraWeaponType weaponType)

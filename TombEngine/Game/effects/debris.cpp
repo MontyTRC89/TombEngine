@@ -21,7 +21,7 @@ vector<DebrisFragment> DebrisFragments = vector<DebrisFragment>(MAX_DEBRIS);
 
 bool ExplodeItemNode(ItemInfo* item, int node, int noXZVel, int bits)
 {
-	if (1 << node & item->MeshBits)
+	if (1 << node & item->MeshBits.ToPackedBits())
 	{
 		int number = bits;
 		if (number == BODY_EXPLODE)

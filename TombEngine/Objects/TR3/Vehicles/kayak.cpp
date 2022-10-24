@@ -32,8 +32,8 @@ namespace TEN::Entities::Vehicles
 		byte life;
 		byte pad[3];
 	};
-	static vector<int> KayakLaraLegJoints = { LM_HIPS, LM_LTHIGH, LM_LSHIN, LM_LFOOT, LM_RTHIGH, LM_RSHIN, LM_RFOOT };
-	static vector<VehicleMountType> KayakMountTypes =
+	const vector<uint> KayakLaraLegJoints = { LM_HIPS, LM_LTHIGH, LM_LSHIN, LM_LFOOT, LM_RTHIGH, LM_RSHIN, LM_RFOOT };
+	const vector<VehicleMountType> KayakMountTypes =
 	{
 		VehicleMountType::LevelStart,
 		VehicleMountType::Left,
@@ -446,13 +446,13 @@ namespace TEN::Entities::Vehicles
 		{
 			int sinkval = lara->WaterCurrentActive - 1;
 		
-			auto target = Vector3Int(g_Level.Sinks[sinkval].x, g_Level.Sinks[sinkval].y, g_Level.Sinks[sinkval].z);
+			auto target = g_Level.Sinks[sinkval].Position;
 			int angle = (((mGetAngle(target.x, target.z, laraItem->Pose.Position.x, laraItem->Pose.Position.z) - ANGLE(90.0f))) / 16) & 4095;
 
 			int dx = target.x - laraItem->Pose.Position.x;
 			int dz = target.z - laraItem->Pose.Position.z;
 
-			int velocity = g_Level.Sinks[sinkval].strength;
+			int velocity = g_Level.Sinks[sinkval].Strength;
 			dx = phd_sin(angle * 16) * velocity * 1024;
 			dz = phd_cos(angle * 16) * velocity * 1024;
 
@@ -1027,7 +1027,7 @@ namespace TEN::Entities::Vehicles
 			{
 				kayak->Flags |= 0x80;
 				lara->MeshPtrs[LM_RHAND] = Objects[ID_KAYAK_LARA_ANIMS].meshIndex + LM_RHAND;
-				laraItem->ClearBits(JointBitType::Mesh, KayakLaraLegJoints);
+				laraItem->MeshBits.Clear(KayakLaraLegJoints);
 			}
 
 			break;
@@ -1039,7 +1039,7 @@ namespace TEN::Entities::Vehicles
 			{
 				kayak->Flags &= ~0x80;
 				lara->MeshPtrs[LM_RHAND] = Objects[ID_LARA_SKIN].meshIndex + LM_RHAND;
-				laraItem->SetBits(JointBitType::Mesh, KayakLaraLegJoints);
+				laraItem->MeshBits.Set(KayakLaraLegJoints);
 			}
 
 			laraItem->Animation.TargetState = laraItem->Animation.RequiredState;

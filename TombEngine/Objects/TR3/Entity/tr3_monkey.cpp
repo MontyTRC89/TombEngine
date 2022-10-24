@@ -25,7 +25,7 @@ namespace TEN::Entities::Creatures::TR3
 	// TODO: Range constants.
 
 	const auto MonkeyBite = BiteInfo(Vector3(10.0f, 10.0f, 11.0f), 13);
-	const vector<int> MonkeyAttackJoints = { 10, 13 };
+	const vector<uint> MonkeyAttackJoints = { 10, 13 };
 
 	enum MonkeyState
 	{
@@ -168,11 +168,14 @@ namespace TEN::Entities::Creatures::TR3
 			AI_INFO AI;
 			CreatureAIInfo(item, &AI);
 
-			if (!creature->HurtByLara && creature->Enemy->IsLara())
-				creature->Enemy = nullptr;
+			if (creature->Enemy != nullptr)
+			{
+				if (!creature->HurtByLara && creature->Enemy->IsLara())
+					creature->Enemy = nullptr;
+			}
 
 			AI_INFO laraAI;
-			if (creature->Enemy->IsLara())
+			if (creature->Enemy != nullptr && creature->Enemy->IsLara())
 			{
 				laraAI.angle = AI.angle;
 				laraAI.distance = AI.distance;
@@ -477,7 +480,7 @@ namespace TEN::Entities::Creatures::TR3
 
 				if (enemy->IsLara())
 				{
-					if (!creature->Flags && item->TestBits(JointBitType::Touch, MonkeyAttackJoints))
+					if (!creature->Flags && item->TouchBits.Test(MonkeyAttackJoints))
 					{
 						DoDamage(enemy, MONKEY_SWIPE_ATTACK_PLAYER_DAMAGE);
 						CreatureEffect(item, MonkeyBite, DoBloodSplat);
@@ -519,7 +522,7 @@ namespace TEN::Entities::Creatures::TR3
 
 				if (enemy->IsLara())
 				{
-					if (!creature->Flags && item->TestBits(JointBitType::Touch, MonkeyAttackJoints))
+					if (!creature->Flags && item->TouchBits.Test(MonkeyAttackJoints))
 					{
 						DoDamage(enemy, 40);
 						CreatureEffect(item, MonkeyBite, DoBloodSplat);
@@ -559,7 +562,7 @@ namespace TEN::Entities::Creatures::TR3
 
 				if (enemy->IsLara())
 				{
-					if (creature->Flags != 1 && item->TestBits(JointBitType::Touch, MonkeyAttackJoints))
+					if (creature->Flags != 1 && item->TouchBits.Test(MonkeyAttackJoints))
 					{
 						DoDamage(enemy, 50);
 						CreatureEffect(item, MonkeyBite, DoBloodSplat);
