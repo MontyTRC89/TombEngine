@@ -2595,13 +2595,14 @@ bool TestLaraLadderDismountTop(ItemInfo* item, CollisionInfo* coll)
 
 bool TestLaraLadderDismountBottom(ItemInfo* item, CollisionInfo* coll)
 {
+	static const int dismountDist		= CLICK(0.5f);
 	static const int dismountFloorBound = CLICK(0.5f);
 
 	auto lFootHeight = GetJointPosition(item, LM_LFOOT).y;
 	auto rFootHeight = GetJointPosition(item, LM_RFOOT).y;
 
 	int vPos = item->Pose.Position.y + (std::max(lFootHeight, rFootHeight) - item->Pose.Position.y);
-	auto pointColl = GetCollision(item);
+	auto pointColl = GetCollision(item, item->Pose.Orientation.y, -dismountDist);
 
 	// Assess point collision.
 	if (abs(pointColl.Position.Floor - vPos) <= dismountFloorBound && // Floor height is within dismount height bound.
