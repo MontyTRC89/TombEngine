@@ -716,12 +716,12 @@ void RegeneratePickups()
 
 	for (int i = 0; i < NumRPickups; i++)
 	{
-		auto* item = &g_Level.Items[RPickups[i]];
+		auto& item = g_Level.Items[RPickups[i]];
 
-		if (item->Status == ITEM_INVISIBLE)
+		if (item.Status == ITEM_INVISIBLE)
 		{
 			short ammo = 0;
-			switch (item->ObjectNumber)
+			switch (item.ObjectNumber)
 			{
 			case ID_CROSSBOW_AMMO1_ITEM:
 				ammo = lara->Weapons[(int)LaraWeaponType::Crossbow].Ammo[(int)WeaponAmmoType::Ammo1];
@@ -777,7 +777,7 @@ void RegeneratePickups()
 			}
 
 			if (ammo == 0)
-				item->Status = ITEM_NOT_ACTIVE;
+				item.Status = ITEM_NOT_ACTIVE;
 		}
 	}
 }
@@ -792,7 +792,7 @@ void PickupControl(short itemNumber)
 	switch (triggerFlags)
 	{
 	case 5:
-		item->Animation.Velocity.y += 6;
+		item->Animation.Velocity.y += 6.0f;
 		item->Pose.Position.y += item->Animation.Velocity.y;
 		
 		roomNumber = item->RoomNumber;
@@ -801,7 +801,7 @@ void PickupControl(short itemNumber)
 		if (item->Pose.Position.y > item->ItemFlags[0])
 		{
 			item->Pose.Position.y = item->ItemFlags[0];
-			if (item->Animation.Velocity.y <= 64)
+			if (item->Animation.Velocity.y <= 64.0f)
 				item->TriggerFlags &= 0xC0;
 			else
 				item->Animation.Velocity.y = -item->Animation.Velocity.y / 4;
@@ -846,7 +846,9 @@ BOUNDING_BOX* FindPlinth(ItemInfo* item)
 		if (frame->X1 <= bbox->X2 && frame->X2 >= bbox->X1 &&
 			frame->Z1 <= bbox->Z2 && frame->Z2 >= bbox->Z1 &&
 			(bbox->X1 || bbox->X2))
+		{
 			return bbox;
+		}
 	}
 
 	if (room->itemNumber == NO_ITEM)

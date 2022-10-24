@@ -21,10 +21,13 @@ HairData Hairs[HAIR_MAX][HAIR_SEGMENTS + 1];
 
 void InitialiseHair()
 {
+	bool youngLara = g_GameFlow->GetLevel(CurrentLevel)->GetLaraType() == LaraType::Young;
+
 	for (int h = 0; h < HAIR_MAX; h++)
 	{
-		int* bone = &g_Level.Bones[Objects[ID_LARA_HAIR].boneIndex];
+		int* bone = &g_Level.Bones[Objects[ID_HAIR].boneIndex];
 
+		Hairs[h][0].Enabled = (h == 0 || youngLara);
 		Hairs[h][0].Initialized = true;
 		Hairs[h][0].Pose.Orientation.x = Angle::DegToRad(-90.0f);
 		Hairs[h][0].Pose.Orientation.y = 0.0f;
@@ -46,14 +49,14 @@ void HairControl(ItemInfo* item, bool young)
 		HairControl(item, 1, 0);
 }
 
-void HairControl(ItemInfo* item, int braid, ANIM_FRAME* framePtr)
+void HairControl(ItemInfo* item, int braid, AnimFrame* framePtr)
 {
 	auto* lara = GetLaraInfo(item);
 	auto* object = &Objects[ID_LARA];
 
 	bool youngLara = g_GameFlow->GetLevel(CurrentLevel)->GetLaraType() == LaraType::Young;
 
-	ANIM_FRAME* frame;
+	AnimFrame* frame;
 	if (framePtr == NULL)
 	{
 		if (lara->HitDirection >= 0)
@@ -94,7 +97,7 @@ void HairControl(ItemInfo* item, int braid, ANIM_FRAME* framePtr)
 				break;
 			}
 
-			frame = &g_Level.Frames[g_Level.Anims[spasm].framePtr + lara->HitFrame];
+			frame = &g_Level.Frames[g_Level.Anims[spasm].FramePtr + lara->HitFrame];
 		}
 		else
 			frame = GetBestFrame(item);
@@ -174,7 +177,7 @@ void HairControl(ItemInfo* item, int braid, ANIM_FRAME* framePtr)
 
 	pos = Vector3Int(world.Translation().x, world.Translation().y, world.Translation().z);
 
-	int* bone = &g_Level.Bones[Objects[ID_LARA_HAIR].boneIndex];
+	int* bone = &g_Level.Bones[Objects[ID_HAIR].boneIndex];
 
 	if (Hairs[braid][0].Initialized)
 	{

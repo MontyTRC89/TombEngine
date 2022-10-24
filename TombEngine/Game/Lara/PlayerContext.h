@@ -9,7 +9,7 @@ namespace TEN::Entities::Player
 	class PlayerContext
 	{
 	private:
-		// Private pointer variables
+		// Private player pointers
 		// TODO: Bad idea or okay?
 		ItemInfo*	   PlayerItemPtr = nullptr;
 		CollisionInfo* PlayerCollPtr = nullptr;
@@ -20,6 +20,8 @@ namespace TEN::Entities::Player
 		PlayerContext(ItemInfo* item, CollisionInfo* coll);
 
 		// Basic ground movement
+		bool CanAFKPose();
+		bool CanTurn180();
 		bool CanTurnFast();
 		bool CanRunForward();
 		bool CanRunBackward();
@@ -31,6 +33,7 @@ namespace TEN::Entities::Player
 		bool CanWadeBackward();
 
 		// Crouch and crawl movement
+		bool IsInNarrowSpace();
 		bool CanCrouch();
 		bool CanCrouchToCrawl();
 		bool CanCrouchRoll();
@@ -38,34 +41,42 @@ namespace TEN::Entities::Player
 		bool CanCrawlBackward();
 
 		// Monkey swing movement
+		bool CanGrabMonkeySwing();
 		bool CanMonkeyForward();
 		bool CanMonkeyBackward();
 		bool CanMonkeyShimmyLeft();
 		bool CanMonkeyShimmyRight();
 
 		// Jump movement
+		bool CanPerformJump();
 		bool CanJumpUp();
 		bool CanJumpForward();
 		bool CanJumpBackward();
 		bool CanJumpLeft();
 		bool CanJumpRight();
 		bool CanRunJumpForward();
+		bool CanSprintJumpForward();
 		bool CanSlideJumpForward();
 		bool CanCrawlspaceDive();
 
 		// Vault movement
+		Context::Vault GetVaultUp2Steps();
+
 		// Crawl vault movement
 		// Water tread climb out movement
 
 	private:
 		// Helper inquirers
-		bool TestSidestep(bool goingRight);
-		bool TestMonkeyShimmy(bool goingRight);
-		bool TestDirectionalStandingJump(float angle);
+		bool TestSidestep(bool isGoingRight);
+		bool TestMonkeyShimmy(bool isGoingRight);
+		bool TestDirectionalStandingJump(float relativeHeadingAngle);
 
-		// Setup inquirers
-		bool TestGroundMovementSetup(Context::SetupGroundMovement contextSetup, bool useCrawlSetup = false);
-		bool TestMonkeyMovementSetup(Context::SetupMonkeyMovement contextSetup);
-		bool TestJumpMovementSetup(Context::SetupJump testSetup);
+		// Context setup inquirers
+		bool TestGroundMovementSetup(const Context::GroundMovementSetup& contextSetup, bool useCrawlSetup = false);
+		bool TestMonkeyMovementSetup(const Context::MonkeyMovementSetup& contextSetup);
+		bool TestJumpMovementSetup(const Context::JumpSetup& contextSetup);
+
+		// Context getters
+		Context::Vault GetVault(const Context::VaultSetup& contextSetup);
 	};
 }

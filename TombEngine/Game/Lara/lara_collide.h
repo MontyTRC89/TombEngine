@@ -15,6 +15,7 @@ constexpr auto DEFLECT_DIAGONAL_ANGLE_CRAWL = 5.0f;
 
 bool LaraDeflectEdge(ItemInfo* item, CollisionInfo* coll);
 bool LaraDeflectEdgeJump(ItemInfo* item, CollisionInfo* coll);
+bool LaraDeflectTopSide(ItemInfo* item, CollisionInfo* coll);
 void LaraSlideEdgeJump(ItemInfo* item, CollisionInfo* coll);
 bool LaraDeflectEdgeCrawl(ItemInfo* item, CollisionInfo* coll);
 bool LaraDeflectEdgeMonkey(ItemInfo* item, CollisionInfo* coll);

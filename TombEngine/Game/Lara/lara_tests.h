@@ -3,6 +3,8 @@
 #include "Game/Lara/lara_struct.h"
 #include "Game/Lara/lara_test_structs.h"
 
+using std::vector;
+
 struct ItemInfo;
 struct CollisionInfo;
 
@@ -44,22 +46,16 @@ void TestLaraWaterDepth(ItemInfo* item, CollisionInfo* coll);
 void GetTightropeFallOff(ItemInfo* item, int regularity);
 #endif
 
-bool CheckLaraState(LaraState referenceState, const std::vector<LaraState>& stateList);
-bool CheckLaraWeaponType(LaraWeaponType referenceWeaponType, const std::vector<LaraWeaponType>& weaponTypeList);
-
+bool TestLaraWeaponType(LaraWeaponType refWeaponType, const vector<LaraWeaponType>& weaponTypeList);
 bool IsStandingWeapon(ItemInfo* item, LaraWeaponType weaponType);
-bool IsVaultState(LaraState state);
-bool IsJumpState(LaraState state);
-bool IsRunJumpQueueableState(LaraState state);
-bool IsRunJumpCountableState(LaraState state);
+bool IsVaultState(int state);
+bool IsJumpState(int state);
+bool IsRunJumpQueueableState(int state);
+bool IsRunJumpCountableState(int state);
 
-bool TestLaraTurn180(ItemInfo* item, CollisionInfo* coll);
-bool TestLaraPose(ItemInfo* item, CollisionInfo* coll);
-bool TestLaraKeepLow(ItemInfo* item, CollisionInfo* coll);
 bool TestLaraSlide(ItemInfo* item, CollisionInfo* coll);
 bool TestLaraLand(ItemInfo* item, CollisionInfo* coll);
 bool TestLaraFall(ItemInfo* item, CollisionInfo* coll);
-bool TestLaraMonkeyGrab(ItemInfo* item, CollisionInfo* coll);
 bool TestLaraMonkeyFall(ItemInfo* item, CollisionInfo* coll);
 
 bool TestLaraStep(ItemInfo* item, CollisionInfo* coll);
@@ -68,7 +64,6 @@ bool TestLaraStepDown(ItemInfo* item, CollisionInfo* coll);
 bool TestLaraMonkeyStep(ItemInfo* item, CollisionInfo* coll);
 
 VaultTestResult TestLaraVaultTolerance(ItemInfo* item, CollisionInfo* coll, VaultTestSetup testSetup);
-VaultTestResult TestLaraVault2Steps(ItemInfo* item, CollisionInfo* coll);
 VaultTestResult TestLaraVault3Steps(ItemInfo* item, CollisionInfo* coll);
 VaultTestResult TestLaraVault1StepToCrouch(ItemInfo* item, CollisionInfo* coll);
 VaultTestResult TestLaraVault2StepsToCrouch(ItemInfo* item, CollisionInfo* coll);
@@ -106,10 +101,8 @@ bool TestLaraHangClimbTolerance(ItemInfo* item, CollisionInfo* coll, HangClimbTe
 bool TestLaraHangToCrouch(ItemInfo* item, CollisionInfo* coll);
 bool TestLaraHangToStand(ItemInfo* item, CollisionInfo* coll);
 
-bool TestLaraStandingJump(ItemInfo* item, CollisionInfo* coll);
-
 bool TestLaraTightropeDismount(ItemInfo* item, CollisionInfo* coll);
 
-bool TestLaraPoleCollision(ItemInfo* item, CollisionInfo* coll, bool goingUp, float offset = 0.0f);
+bool TestLaraPoleCollision(ItemInfo* item, CollisionInfo* coll, bool isGoingUp, float offset = 0.0f);
 bool TestLaraPoleUp(ItemInfo* item, CollisionInfo* coll);
 bool TestLaraPoleDown(ItemInfo* item, CollisionInfo* coll);

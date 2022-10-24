@@ -106,7 +106,7 @@ void Renderer11::UpdateLaraAnimations(bool force)
 
 	// First calculate matrices for legs, hips, head and torso
 	int mask = MESH_BITS(LM_HIPS) | MESH_BITS(LM_LTHIGH) | MESH_BITS(LM_LSHIN) | MESH_BITS(LM_LFOOT) | MESH_BITS(LM_RTHIGH) | MESH_BITS(LM_RSHIN) | MESH_BITS(LM_RFOOT) | MESH_BITS(LM_TORSO) | MESH_BITS(LM_HEAD);
-	ANIM_FRAME* framePtr[2];
+	AnimFrame* framePtr[2];
 	int rate, frac;
 
 	frac = GetFrame(LaraItem, framePtr, &rate);
@@ -149,7 +149,7 @@ void Renderer11::UpdateLaraAnimations(bool force)
 		case LaraWeaponType::RocketLauncher:
 		case LaraWeaponType::HarpoonGun:
 		{
-			ANIM_FRAME* shotgunframePtr;
+			AnimFrame* shotgunframePtr;
 
 			// Left arm
 			mask = MESH_BITS(LM_LINARM) | MESH_BITS(LM_LOUTARM) | MESH_BITS(LM_LHAND);
@@ -173,7 +173,7 @@ void Renderer11::UpdateLaraAnimations(bool force)
 
 		case LaraWeaponType::Revolver:
 		{
-			ANIM_FRAME* revolverframePtr;
+			AnimFrame* revolverframePtr;
 
 			// Left arm
 			mask = MESH_BITS(LM_LINARM) | MESH_BITS(LM_LOUTARM) | MESH_BITS(LM_LHAND);
@@ -192,7 +192,7 @@ void Renderer11::UpdateLaraAnimations(bool force)
 		case LaraWeaponType::Uzi:
 		default:
 		{
-			ANIM_FRAME* pistolframePtr;
+			AnimFrame* pistolframePtr;
 
 			// Left arm
 			int upperArmMask = MESH_BITS(LM_LINARM);
@@ -222,8 +222,8 @@ void Renderer11::UpdateLaraAnimations(bool force)
 
 			// HACK: Mask head and torso only when pulling out the flare.
 			if (!Lara.Control.IsLow &&
-				tempItem.Animation.AnimNumber > Objects[ID_LARA_FLARE_ANIM].animIndex + 1 &&
-				tempItem.Animation.AnimNumber < Objects[ID_LARA_FLARE_ANIM].animIndex + 4)
+				tempItem.Animation.AnimNumber > Objects[ID_FLARE_ANIM].animIndex + 1 &&
+				tempItem.Animation.AnimNumber < Objects[ID_FLARE_ANIM].animIndex + 4)
 				mask |= MESH_BITS(LM_TORSO) | MESH_BITS(LM_HEAD);
 
 			frac = GetFrame(&tempItem, framePtr, &rate);
@@ -315,31 +315,38 @@ void TEN::Renderer::Renderer11::DrawLara(RenderView& view, bool transparent)
 		}
 	}
 
-	if (Objects[ID_LARA_HAIR].loaded)
+	if (Objects[ID_HAIR].loaded)
 	{
-		RendererObject& hairsObj = *m_moveableObjects[ID_LARA_HAIR];
+		RendererObject& hairsObj = *m_moveableObjects[ID_HAIR];
 
-		// First matrix is Lara's head matrix, then all 6 hairs matrices. Bones are adjusted at load time for accounting this.
-		m_stItem.World = Matrix::Identity;
-		m_stItem.BonesMatrices[0] = laraObj.AnimationTransforms[LM_HEAD] * m_LaraWorldMatrix;
-
-		for (int i = 0; i < hairsObj.BindPoseTransforms.size(); i++)
+		for (int h = 0; h < HAIR_MAX; h++)
 		{
-			auto* hairs = &Hairs[0][i];
-			Matrix world = Matrix::CreateFromYawPitchRoll(hairs->Pose.Orientation.y, hairs->Pose.Orientation.x, hairs->Pose.Orientation.z) * Matrix::CreateTranslation(hairs->Pose.Position.x, hairs->Pose.Position.y, hairs->Pose.Position.z);
-			m_stItem.BonesMatrices[i + 1] = world;
-			m_stItem.BoneLightModes[i] = LIGHT_MODES::LIGHT_MODE_DYNAMIC;
+			if (!Hairs[h][0].Enabled)
+				continue;
+
+			// First matrix is Lara's head matrix, then all 6 hairs matrices. Bones are adjusted at load time for accounting this.
+			m_stItem.World = Matrix::Identity;
+			m_stItem.BonesMatrices[0] = laraObj.AnimationTransforms[LM_HEAD] * m_LaraWorldMatrix;
+
+			for (int i = 0; i < hairsObj.BindPoseTransforms.size(); i++)
+			{
+				auto* hairs = &Hairs[h][i];
+				Matrix world = Matrix::CreateFromYawPitchRoll(hairs->Pose.Orientation.y, hairs->Pose.Orientation.x, 0) *
+					Matrix::CreateTranslation(hairs->Pose.Position.x, hairs->Pose.Position.y, hairs->Pose.Position.z);
+				m_stItem.BonesMatrices[i + 1] = world;
+				m_stItem.BoneLightModes[i] = LIGHT_MODES::LIGHT_MODE_DYNAMIC;
+			}
+
+			m_cbItem.updateData(m_stItem, m_context.Get());
+			BindConstantBufferVS(CB_ITEM, m_cbItem.get());
+			BindConstantBufferPS(CB_ITEM, m_cbItem.get());
+
+			for (int k = 0; k < hairsObj.ObjectMeshes.size(); k++)
+			{
+				RendererMesh* mesh = hairsObj.ObjectMeshes[k];
+				DrawMoveableMesh(item, mesh, room, k, transparent);
+			}
 		}
-
-		m_cbItem.updateData(m_stItem, m_context.Get());
-		BindConstantBufferVS(CB_ITEM, m_cbItem.get());
-		BindConstantBufferPS(CB_ITEM, m_cbItem.get());
-
-		for (int k = 0; k < hairsObj.ObjectMeshes.size(); k++)
-		{
-			RendererMesh* mesh = hairsObj.ObjectMeshes[k];
-			DrawMoveableMesh(item, mesh, room, k, transparent);
-		}	
 	}
 }
 

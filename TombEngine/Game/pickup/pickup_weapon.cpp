@@ -55,42 +55,41 @@ bool TryModifyWeapon(LaraInfo& lara, GAME_OBJECT_ID objectID, std::optional<int>
 	if (-1 == arrayPos)
 		return false;
 
-	auto info = kWeapons[arrayPos];
+	auto weaponPickup = kWeapons[arrayPos];
 
 	// Set the SelectedAmmo type to WeaponAmmoType::Ammo1 (0) if adding the weapon for the first time.
 	// Note that this refers to the index of the weapon's ammo array, and not the weapon's actual ammunition count.
-	auto& currWeapon = lara.Weapons[(int)info.LaraWeaponType];
+	auto& currentWeapon = lara.Weapons[(int)weaponPickup.LaraWeaponType];
 
-	if (!currWeapon.Present)
-		currWeapon.SelectedAmmo = WeaponAmmoType::Ammo1;
+	if (!currentWeapon.Present)
+		currentWeapon.SelectedAmmo = WeaponAmmoType::Ammo1;
 
 	bool add = ModificationType::Add == type || ((ModificationType::Set == type) && count != 0);
-	currWeapon.Present = add;
+	currentWeapon.Present = add;
 
 	if(!add)
 	{
-		if (info.LaraWeaponType == lara.Control.Weapon.GunType || info.LaraWeaponType == lara.Control.Weapon.LastGunType)
+		if (weaponPickup.LaraWeaponType == lara.Control.Weapon.GunType ||
+			weaponPickup.LaraWeaponType == lara.Control.Weapon.LastGunType)
 		{
 			lara.Control.Weapon.RequestGunType = LaraWeaponType::None;
 
 			// If Lara has pistols and it's not the pistols we're removing, set them
 			// as the "next weapon" so that Lara equips them next.
-			if (LaraWeaponType::Pistol == info.LaraWeaponType || !lara.Weapons[(int)LaraWeaponType::Pistol].Present)
-			{
+			if (LaraWeaponType::Pistol == weaponPickup.LaraWeaponType || !lara.Weapons[(int)LaraWeaponType::Pistol].Present)
 				lara.Control.Weapon.LastGunType = LaraWeaponType::None;
-			}
 			else
-			{
 				lara.Control.Weapon.LastGunType = LaraWeaponType::Pistol;
-			}
 		}
 
-		if (HolsterType::Hips == info.Holster && lara.Control.Weapon.HolsterInfo.LeftHolster == HolsterSlotForWeapon(info.LaraWeaponType))
+		if (HolsterType::Hips == weaponPickup.Holster &&
+			lara.Control.Weapon.HolsterInfo.LeftHolster == HolsterSlotForWeapon(weaponPickup.LaraWeaponType))
 		{
 			lara.Control.Weapon.HolsterInfo.LeftHolster = HolsterSlot::Empty;
 			lara.Control.Weapon.HolsterInfo.RightHolster = HolsterSlot::Empty;
 		}
-		else if (HolsterType::Back == info.Holster && lara.Control.Weapon.HolsterInfo.BackHolster == HolsterSlotForWeapon(info.LaraWeaponType))
+		else if (HolsterType::Back == weaponPickup.Holster &&
+			lara.Control.Weapon.HolsterInfo.BackHolster == HolsterSlotForWeapon(weaponPickup.LaraWeaponType))
 		{
 			lara.Control.Weapon.HolsterInfo.BackHolster = HolsterSlot::Empty;
 		}
@@ -99,7 +98,7 @@ bool TryModifyWeapon(LaraInfo& lara, GAME_OBJECT_ID objectID, std::optional<int>
 	return true;
 }
 
-// Adding a weapon will not give the player any ammo even if they already have the weapon
+// Adding a weapon will not give the player any ammo even if they already have the weapon.
 bool TryAddingWeapon(LaraInfo& lara, GAME_OBJECT_ID objectID)
 {
 	return TryModifyWeapon(lara, objectID, 1, ModificationType::Add);
@@ -117,6 +116,6 @@ std::optional<bool> HasWeapon(LaraInfo& lara, GAME_OBJECT_ID objectID)
 	if (-1 == arrPos)
 		return std::nullopt;
 
-	auto info = kWeapons[arrPos];
-	return lara.Weapons[(int)info.LaraWeaponType].Present;
+	auto weaponPickup = kWeapons[arrPos];
+	return lara.Weapons[(int)weaponPickup.LaraWeaponType].Present;
 }

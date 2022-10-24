@@ -1,16 +1,5 @@
--- Place in this LUA script all the levels of your game
+-- Place in this Lua script all the levels of your game
 -- Title is mandatory and must be the first level.
-
--- Shorten some of the internal data types.
-
-local Flow = TEN.Flow
-local Level = Flow.Level
-local Color = TEN.Color
-local Rotation = TEN.Rotation
-local InventoryItem = Flow.InventoryItem
-local InvID = Flow.InvID
-local RotationAxis = Flow.RotationAxis
-local ItemAction = Flow.ItemAction
 
 -- Intro image is a splash screen which appears before actual loading screen.
 -- If you don't want it to appear, just remove this line.
@@ -64,7 +53,7 @@ test.fog = Flow.Fog.new(Color.new(0, 0, 0), 12, 20)
 test.objects = {
 	InventoryItem.new(
 		"tut1_ba_cartouche1",
-		InvID.PUZZLE_ITEM3_COMBO1,
+		ObjID.PUZZLE_ITEM3_COMBO1,
 		0,
 		0.5,
 		Rotation.new(0, 0, 0),
@@ -74,7 +63,7 @@ test.objects = {
 	),
 	InventoryItem.new(
 		"tut1_ba_cartouche2",
-		InvID.PUZZLE_ITEM3_COMBO2,
+		ObjID.PUZZLE_ITEM3_COMBO2,
 		0,
 		0.5,
 		Rotation.new(0, 0, 0),
@@ -84,7 +73,7 @@ test.objects = {
 	),
 	InventoryItem.new(
 		"tut1_ba_cartouche",
-		InvID.PUZZLE_ITEM3,
+		ObjID.PUZZLE_ITEM3,
 		0,
 		0.5,
 		Rotation.new(0, 0, 0),
@@ -94,7 +83,7 @@ test.objects = {
 	),
 	InventoryItem.new(
 		"tut1_hand_orion",
-		InvID.PUZZLE_ITEM6,
+		ObjID.PUZZLE_ITEM6,
 		0,
 		0.5,
 		Rotation.new(270, 180, 0),
@@ -104,7 +93,7 @@ test.objects = {
 	),
 	InventoryItem.new(
 		"tut1_hand_sirius",
-		InvID.PUZZLE_ITEM8,
+		ObjID.PUZZLE_ITEM8,
 		0,
 		0.5,
 		Rotation.new(270, 180, 0),

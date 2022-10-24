@@ -446,13 +446,13 @@ namespace TEN::Entities::Vehicles
 		{
 			int sinkval = lara->WaterCurrentActive - 1;
 		
-			auto target = Vector3Int(g_Level.Sinks[sinkval].x, g_Level.Sinks[sinkval].y, g_Level.Sinks[sinkval].z);
+			auto target = g_Level.Sinks[sinkval].Position;
 			float angle = 0;// (((mGetAngle(target.x, target.z, laraItem->Pose.Position.x, laraItem->Pose.Position.z) - Angle::DegToRad(90.0f))) / 16) & 4095;
 
 			int dx = target.x - laraItem->Pose.Position.x;
 			int dz = target.z - laraItem->Pose.Position.z;
 
-			int velocity = g_Level.Sinks[sinkval].strength;
+			int velocity = g_Level.Sinks[sinkval].Strength;
 			dx = sin(angle * 16) * velocity * 1024;
 			dz = cos(angle * 16) * velocity * 1024;
 

@@ -31,7 +31,6 @@ using namespace TEN::Effects::Spark;
 
 namespace Effects
 {
-
 	///Emit a lightning arc.
 	//@function EmitLightningArc
 	//@tparam Vec3 src
@@ -329,7 +328,8 @@ namespace Effects
 		Weather.Flash(color.GetR(), color.GetG(), color.GetB(), (USE_IF_HAVE(float, speed, 1.0))/ float(FPS));
 	}
 
-	void Register(sol::state* state, sol::table& parent) {
+	void Register(sol::state* state, sol::table& parent) 
+	{
 		sol::table table_effects{ state->lua_state(), sol::create };
 		parent.set(ScriptReserved_Effects, table_effects);
 

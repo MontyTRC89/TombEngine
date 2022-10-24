@@ -633,6 +633,8 @@ void lara_col_jump_up(ItemInfo* item, CollisionInfo* coll)
 	if (DoLaraLedgeHang(item, coll))
 		return;
 
+	LaraDeflectTopSide(item, coll);
+
 	if (coll->Middle.Ceiling >= 0 ||
 		coll->CollisionType == CT_TOP ||
 		coll->CollisionType == CT_TOP_FRONT ||

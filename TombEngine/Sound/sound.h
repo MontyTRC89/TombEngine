@@ -122,6 +122,7 @@ void ResumeAllSounds();
 void PlaySoundTrack(std::string trackName, SoundTrackType mode, QWORD position = 0);
 void PlaySoundTrack(std::string trackName, short mask = 0);
 void PlaySoundTrack(int index, short mask = 0);
+void StopSoundTrack(SoundTrackType mode, int fadeoutTime);
 void StopSoundTracks();
 void ClearSoundTrackMasks();
 void PlaySecretTrack();

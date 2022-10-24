@@ -666,7 +666,7 @@ namespace TEN::Entities::Generic
 	{
 		auto vec = Vector3Int(4096, 0, 0);
 
-		auto* frame = (ANIM_FRAME*)GetBestFrame(item);
+		auto* frame = (AnimFrame*)GetBestFrame(item);
 		float ropeY = Lara.Control.Rope.Y - Angle::DegToRad(90.0f);
 		auto* rope = &Ropes[Lara.Control.Rope.Ptr];
 

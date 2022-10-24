@@ -186,7 +186,7 @@ InventoryObject inventry_objects_list[INVENTORY_TABLE_SIZE] =
 	{ID_FLARE_INV_ITEM, 52, 0.8f, Angle::DegToRad(0), 0, 0, OPT_USE, STRING_FLARES, NO_JOINT_BITS, INV_ROT_Y},
 	{ID_TIMEX_ITEM, 2, 0.4f, 0, 0, 0, OPT_STATS, STRING_TIMEX, NO_JOINT_BITS, INV_ROT_Y},
 	{ID_PC_LOAD_INV_ITEM, 52, 0.3f, Angle::DegToRad(180), 0, 0, OPT_LOAD, STRING_LOAD_GAME, NO_JOINT_BITS, INV_ROT_Y},
-	{ID_PC_LOAD_SAVE_ITEM, 52, 0.3f, Angle::DegToRad(180), 0, 0, OPT_SAVE, STRING_SAVE_GAME, NO_JOINT_BITS, INV_ROT_Y},
+	{ID_PC_SAVE_INV_ITEM, 52, 0.3f, Angle::DegToRad(180), 0, 0, OPT_SAVE, STRING_SAVE_GAME, NO_JOINT_BITS, INV_ROT_Y},
 	{ID_BURNING_TORCH_ITEM, 14, 0.5f, 0, Angle::DegToRad(90), 0, OPT_USE, STRING_TORCH, NO_JOINT_BITS, INV_ROT_Y},
 	{ID_CROWBAR_ITEM, 4, 0.5f, 0, Angle::DegToRad(90), 0, OPT_USE, STRING_CROWBAR, NO_JOINT_BITS, INV_ROT_Y},
 	{ID_DIARY_ITEM, 0, 0.3f, Angle::DegToRad(180), 0, 0, OPT_DIARY, STRING_DIARY, NO_JOINT_BITS, INV_ROT_Y},
@@ -204,7 +204,7 @@ InventoryObject inventry_objects_list[INVENTORY_TABLE_SIZE] =
 	{ID_WATERSKIN2_3, 2, 0.5f, 0, Angle::DegToRad(285), 0, OPT_USE | OPT_COMBINABLE, STRING_WATERSKIN_LARGE_3, NO_JOINT_BITS, INV_ROT_Y},
 	{ID_WATERSKIN2_4, 2, 0.5f, 0, Angle::DegToRad(285), 0, OPT_USE | OPT_COMBINABLE, STRING_WATERSKIN_LARGE_4, NO_JOINT_BITS, INV_ROT_Y},
 	{ID_WATERSKIN2_5, 2, 0.5f, 0, Angle::DegToRad(285), 0, OPT_USE | OPT_COMBINABLE, STRING_WATERSKIN_LARGE_5, NO_JOINT_BITS, INV_ROT_Y},
-	{ID_OPEN_DIARY_ITEM, 0, 0.9f, Angle::DegToRad(90), 0, 0, 0, 0, 0, 0},
+	{ID_DIARY_OPEN, 0, 0.9f, Angle::DegToRad(90), 0, 0, 0, 0, 0, 0},
 
 	// Puzzles
 
@@ -1899,16 +1899,8 @@ void GuiController::InitialiseInventory()
 	ClearInputVariables(0);
 	useItem = 0;
 
-	if (Lara.Weapons[(int)LaraWeaponType::Shotgun].Ammo[0].hasInfinite())
-		AmountShotGunAmmo1 = -1;
-	else
-		AmountShotGunAmmo1 = Lara.Weapons[(int)LaraWeaponType::Shotgun].Ammo[0].getCount() / 6;
-
-	if (Lara.Weapons[(int)LaraWeaponType::Shotgun].Ammo[1].hasInfinite())
-		AmountShotGunAmmo2 = -1;
-	else
-		AmountShotGunAmmo2 = Lara.Weapons[(int)LaraWeaponType::Shotgun].Ammo[1].getCount() / 6;
-
+	AmountShotGunAmmo1 = Lara.Weapons[(int)LaraWeaponType::Shotgun].Ammo[(int)WeaponAmmoType::Ammo1].hasInfinite() ? -1 : Lara.Weapons[(int)LaraWeaponType::Shotgun].Ammo[(int)WeaponAmmoType::Ammo1].getCount();
+	AmountShotGunAmmo2 = Lara.Weapons[(int)LaraWeaponType::Shotgun].Ammo[(int)WeaponAmmoType::Ammo2].hasInfinite() ? -1 : Lara.Weapons[(int)LaraWeaponType::Shotgun].Ammo[(int)WeaponAmmoType::Ammo2].getCount();
 	AmountHKAmmo1 = Lara.Weapons[(int)LaraWeaponType::HK].Ammo[(int)WeaponAmmoType::Ammo1].hasInfinite() ? -1 : Lara.Weapons[(int)LaraWeaponType::HK].Ammo[(int)WeaponAmmoType::Ammo1].getCount();
 	AmountCrossBowAmmo1 = Lara.Weapons[(int)LaraWeaponType::Crossbow].Ammo[(int)WeaponAmmoType::Ammo1].hasInfinite() ? -1 : Lara.Weapons[(int)LaraWeaponType::Crossbow].Ammo[(int)WeaponAmmoType::Ammo1].getCount();
 	AmountCrossBowAmmo2 = Lara.Weapons[(int)LaraWeaponType::Crossbow].Ammo[(int)WeaponAmmoType::Ammo2].hasInfinite() ? -1 : Lara.Weapons[(int)LaraWeaponType::Crossbow].Ammo[(int)WeaponAmmoType::Ammo2].getCount();
@@ -2944,13 +2936,11 @@ void GuiController::DrawCurrentObjectList(int ringnum)
 						switch (inventry_objects_list[rings[ringnum]->current_object_list[n].invitem].object_number)
 						{
 						case ID_SHOTGUN_AMMO1_ITEM:
-							count = Lara.Weapons[(int)LaraWeaponType::Shotgun].Ammo[(int)WeaponAmmoType::Ammo1].getCount();
-							nummeup = count == -1 ? count : count / 6;
+							nummeup = Lara.Weapons[(int)LaraWeaponType::Shotgun].Ammo[(int)WeaponAmmoType::Ammo1].getCount();
 							break;
 
 						case ID_SHOTGUN_AMMO2_ITEM:
-							count = Lara.Weapons[(int)LaraWeaponType::Shotgun].Ammo[(int)WeaponAmmoType::Ammo2].getCount();
-							nummeup = count == -1 ? count : count / 6;
+							nummeup = Lara.Weapons[(int)LaraWeaponType::Shotgun].Ammo[(int)WeaponAmmoType::Ammo2].getCount();
 							break;
 
 						case ID_HK_AMMO_ITEM:

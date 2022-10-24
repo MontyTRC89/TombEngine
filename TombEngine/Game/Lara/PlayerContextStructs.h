@@ -2,28 +2,87 @@
 
 namespace TEN::Entities::Player::Context
 {
-	struct SetupGroundMovement
+	struct GroundMovementSetup
 	{
-		float Angle			  = 0.0f;
+		float HeadingAngle	  = 0.0f;
 		float LowerFloorBound = 0.0f;
 		float UpperFloorBound = 0.0f;
-		bool  CheckSlopeDown  = true;
-		bool  CheckSlopeUp	  = true;
-		bool  CheckDeathFloor = true;
+
+		bool TestSlopeDown  = true;
+		bool TestSlopeUp	= true;
+		bool TestDeathFloor = true;
 	};
 
-	struct SetupMonkeyMovement
+	struct MonkeyMovementSetup
 	{
-		float Angle				= 0.0f;
+		float HeadingAngle		= 0.0f;
 		float LowerCeilingBound = 0.0f;
 		float UpperCeilingBound = 0.0f;
 	};
 
-	struct SetupJump
+	struct JumpSetup
 	{
-		float Angle			  = 0.0f;
-		float Distance		  = 0.0f;
-		bool  CheckWadeStatus = true;
+		short HeadingAngle = 0;
+		float Distance	   = 0.0f;
+
+		bool TestWadeStatus = true;
 	};
 
+	struct VaultSetup
+	{
+		float LowerFloorBound = 0.0f;
+		float UpperFloorBound = 0.0f;
+		float ClampMin		  = 0.0f;
+		float ClampMax		  = 0.0f;
+		float GapMin		  = 0.0f;
+
+		bool TestSwampDepth = true;
+	};
+
+	struct Vault
+	{
+		bool Success	 = false;
+		int	 Height		 = 0;
+		int	 TargetState = -1;
+
+		bool SetBusyHands	 = false;
+		bool DoLedgeSnap	 = false;
+		bool SetJumpVelocity = false;
+	};
+
+	struct CrawlVaultSetup
+	{
+		float LowerFloorBound = 0.0f;
+		float UpperFloorBound = 0.0f;
+		float ClampMin		  = 0.0f;
+		float GapMin		  = 0.0f;
+		float CrossDist		  = 0.0f;
+		float DestDist		  = 0.0f;
+		float FloorBound	  = 0.0f;
+
+		bool TestSlope = true;
+		bool TestDeath = true;
+	};
+
+	struct CrawlVault
+	{
+		bool Success	 = false;
+		int	 TargetState = -1;
+	};
+
+	struct WaterClimbOutSetup
+	{
+		float LowerFloorBound = 0.0f;
+		float UpperFloorBound = 0.0f;
+		float ClampMin		  = 0.0f;
+		float ClampMax		  = 0.0f;
+		float GapMin		  = 0.0f;
+	};
+
+	struct WaterClimbOut
+	{
+		bool Success	 = false;
+		int	 Height		 = 0;
+		int	 TargetState = -1;
+	};
 }

@@ -39,7 +39,7 @@ void HandleLaraMovementParameters(ItemInfo* item, CollisionInfo* coll)
 	auto* lara = GetLaraInfo(item);
 
 	// Update AFK pose timer.
-	if (lara->Control.Count.Pose < LARA_POSE_TIME && TestLaraPose(item, coll) &&
+	if (lara->Control.Count.Pose < LARA_POSE_TIME && lara->Context.CanAFKPose() &&
 		!(TrInput & (IN_WAKE | IN_LOOK)) &&
 		g_GameFlow->HasAFKPose())
 	{
@@ -163,7 +163,7 @@ void DoLaraStep(ItemInfo* item, CollisionInfo* coll)
 		if (TestLaraStepUp(item, coll))
 		{
 			item->Animation.TargetState = LS_STEP_UP;
-			if (GetChange(item, &g_Level.Anims[item->Animation.AnimNumber]))
+			if (GetStateDispatch(item, g_Level.Anims[item->Animation.AnimNumber]))
 			{
 				item->Pose.Position.y += coll->Middle.Floor;
 				return;
@@ -172,7 +172,7 @@ void DoLaraStep(ItemInfo* item, CollisionInfo* coll)
 		else if (TestLaraStepDown(item, coll))
 		{
 			item->Animation.TargetState = LS_STEP_DOWN;
-			if (GetChange(item, &g_Level.Anims[item->Animation.AnimNumber]))
+			if (GetStateDispatch(item, g_Level.Anims[item->Animation.AnimNumber]))
 			{
 				item->Pose.Position.y += coll->Middle.Floor;
 				return;
@@ -710,14 +710,14 @@ void SetLaraFallAnimation(ItemInfo* item)
 {
 	SetAnimation(item, LA_FALL_START);
 	item->Animation.IsAirborne = true;
-	item->Animation.Velocity.y = 0;
+	item->Animation.Velocity.y = 0.0f;
 }
 
 void SetLaraFallBackAnimation(ItemInfo* item)
 {
 	SetAnimation(item, LA_FALL_BACK);
 	item->Animation.IsAirborne = true;
-	item->Animation.Velocity.y = 0;
+	item->Animation.Velocity.y = 0.0f;
 }
 
 void SetLaraMonkeyFallAnimation(ItemInfo* item)
@@ -735,8 +735,8 @@ void SetLaraMonkeyRelease(ItemInfo* item)
 	auto* lara = GetLaraInfo(item);
 
 	item->Animation.IsAirborne = true;
-	item->Animation.Velocity.z = 2;
-	item->Animation.Velocity.y = 1;
+	item->Animation.Velocity.y = 1.0f;
+	item->Animation.Velocity.z = 2.0f;
 	lara->Control.TurnRate.y = 0;
 	lara->Control.HandStatus = HandStatus::Free;
 }

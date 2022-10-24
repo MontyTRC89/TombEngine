@@ -150,6 +150,17 @@ bool ItemInfo::IsCreature()
 	return this->Data.is<CreatureInfo>();
 }
 
+bool TestState(int refState, const vector<int>& stateList)
+{
+	for (const auto& state : stateList)
+	{
+		if (state == refState)
+			return true;
+	}
+
+	return false;
+}
+
 void ClearItem(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
@@ -636,15 +647,12 @@ int GlobalItemReplace(short search, GAME_OBJECT_ID replace)
 // Offset values may be used to account for the quirk of room traversal only being able to occur at portals.
 void UpdateItemRoom(ItemInfo* item, int height, int xOffset, int zOffset)
 {
-	float sinY = sin(item->Pose.Orientation.y);
-	float cosY = cos(item->Pose.Orientation.y);
+	auto point = TranslatePoint(item->Pose.Position, item->Pose.Orientation.y, zOffset, height, xOffset);
 
-	int x = (int)round(item->Pose.Position.x + ((cosY * xOffset) + (sinY * zOffset)));
-	int y = height + item->Pose.Position.y;
-	int z = (int)round(item->Pose.Position.z + ((-sinY * xOffset) + (cosY * zOffset)));
-
-	item->Location = GetRoom(item->Location, x, y, z);
-	item->Floor = GetFloorHeight(item->Location, x, z).value_or(NO_HEIGHT);
+	// Hacky L-shaped Location traversal.
+	item->Location = GetRoom(item->Location, point.x, point.y, point.z);
+	item->Location = GetRoom(item->Location, item->Pose.Position.x, point.y, item->Pose.Position.z);
+	item->Floor = GetFloorHeight(item->Location, item->Pose.Position.x, item->Pose.Position.z).value_or(NO_HEIGHT);
 
 	if (item->RoomNumber != item->Location.roomNumber)
 		ItemNewRoom(item->Index, item->Location.roomNumber);
@@ -673,7 +681,7 @@ ItemInfo* FindItem(int objectNumber)
 			return item;
 	}
 
-	return 0;
+	return nullptr;
 }
 
 int FindItem(ItemInfo* item)

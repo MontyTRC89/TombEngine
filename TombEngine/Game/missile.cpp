@@ -30,7 +30,7 @@ void ShootAtLara(FX_INFO *fx)
 	auto* bounds = GetBoundsAccurate(LaraItem);
 	y += bounds->Y2 + (bounds->Y1 - bounds->Y2) * 0.75f;
 
-	int distance = sqrt(pow(x, 2) + pow(z, 2));
+	int distance = sqrt(SQUARE(x) + SQUARE(z));
 	fx->pos.Orientation.x = -atan2(distance, y);
 	fx->pos.Orientation.y = atan2(z, x);
 
