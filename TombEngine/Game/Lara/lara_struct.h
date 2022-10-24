@@ -807,8 +807,12 @@ enum LaraAnim
 	LA_CROUCH_TURN_180_END = 562,
 	LA_CRAWL_TURN_180_START = 653,
 	LA_CRAWL_TURN_180_END = 654,
+	LA_LEDGE_JUMP_UP_START = 565,
+	LA_LEDGE_JUMP_UP_END = 566,
+	LA_LEDGE_JUMP_BACK_START = 567,
+	LA_LEDGE_JUMP_BACK_END = 568,
 
-	NUM_LARA_ANIMS,
+	NUM_LARA_ANIMS
 
 	// TRASHED ANIMS (please reuse slots before going any higher and remove entries from this list as you go):
 	// 102

@@ -128,6 +128,14 @@ void lara_col_hang(ItemInfo* item, CollisionInfo* coll)
 				break;
 			}
 		}
+
+		if (TrInput && TestLaraLedgeJump(item, coll))
+		{
+			if (TrInput & IN_BACK)
+				item->Animation.TargetState = LS_JUMP_FORWARD;
+			else if (TrInput & IN_JUMP)
+				item->Animation.TargetState = LS_JUMP_UP;
+		}
 	}
 
 	lara->Control.MoveAngle = item->Pose.Orientation.y;
