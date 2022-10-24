@@ -20,29 +20,30 @@ OBJECT_TEXTURE* WaterfallTextures[6];
 float WaterfallY[6];
 int lastWaterfallY = 0;
 
-Vector3i TightRopePos = { 0, 0, 0 };
-OBJECT_COLLISION_BOUNDS TightRopeBounds =
+const auto TightRopePos = Vector3i::Zero;
+const ObjectCollisionBounds TightRopeBounds =
 {
 	GameBoundingBox(
-		-256, 256,
+		-CLICK(1), CLICK(1),
 		0, 0,
-		-256, 256
+		-CLICK(1), CLICK(1)
 	),
-	ANGLE(-10.0f), ANGLE(10.0f),
-	ANGLE(-30.0f), ANGLE(30.0f),
-	ANGLE(-10.0f), ANGLE(10.0f)
+	std::pair(
+		EulerAngles(ANGLE(-10.0f), ANGLE(-30.0f), ANGLE(-10.0f)),
+		EulerAngles(ANGLE(10.0f), ANGLE(30.0f), ANGLE(10.0f))
+	)
 };
-
-OBJECT_COLLISION_BOUNDS ParallelBarsBounds =
+const ObjectCollisionBounds ParallelBarsBounds =
 {
 	GameBoundingBox(
 		-640, 640,
 		704, 832,
 		-96, 96
 	),
-	ANGLE(-10.0f), ANGLE(10.0f),
-	ANGLE(-30.0f), ANGLE(30.0f),
-	ANGLE(-10.0f), ANGLE(10.0f)
+	std::pair(
+		EulerAngles(ANGLE(-10.0f), ANGLE(-30.0f), ANGLE(-10.0f)),
+		EulerAngles(ANGLE(10.0f), ANGLE(30.0f), ANGLE(10.0f))
+	)
 };
 
 void ControlAnimatingSlots(short itemNumber)

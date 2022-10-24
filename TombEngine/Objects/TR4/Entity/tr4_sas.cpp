@@ -26,17 +26,18 @@ namespace TEN::Entities::TR4
 {
 	const auto SASGunBite = BiteInfo(Vector3(0.0f, 300.0f, 64.0f), 7);
 
-	auto SASDragBodyPosition = Vector3i(0, 0, -460);
-	OBJECT_COLLISION_BOUNDS SASDragBodyBounds =
+	const auto SASDragBodyPosition = Vector3i(0, 0, -460);
+	const ObjectCollisionBounds SASDragBodyBounds =
 	{
 		GameBoundingBox(
-			-256, 256,
-			-64, 100,
+			-CLICK(1), CLICK(1),
+			-CLICK(0.25f), 100,
 			-200, -460
 		),
-		ANGLE(-10.0f), ANGLE(10.0f),
-		ANGLE(-30.0f), ANGLE(30.0f),
-		0, 0
+		std::pair(
+			EulerAngles(ANGLE(-10.0f), ANGLE(-30.0f), 0),
+			EulerAngles(ANGLE(10.0f), ANGLE(30.0f), 0)
+		)
 	};
 
 	enum SASState

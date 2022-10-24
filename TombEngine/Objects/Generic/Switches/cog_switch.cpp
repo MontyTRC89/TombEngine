@@ -17,18 +17,19 @@ using namespace TEN::Entities::Doors;
 
 namespace TEN::Entities::Switches
 {
-	OBJECT_COLLISION_BOUNDS CogSwitchBounds =
+	const ObjectCollisionBounds CogSwitchBounds =
 	{
 		GameBoundingBox(
-			-512, 512,
+			-SECTOR(0.5f), SECTOR(0.5f),
 			0, 0,
-			-1536, -512
+			-SECTOR(1.5f), -SECTOR(0.5f)
 		),
-		-ANGLE(10.0f), ANGLE(10.0f),
-		-ANGLE(30.0f), ANGLE(30.0f),
-		-ANGLE(10.0f), ANGLE(10.0f)
+		std::pair(
+			EulerAngles(ANGLE(-10.0f), ANGLE(-30.0f), ANGLE(-10.0f)),
+			EulerAngles(ANGLE(10.0f), ANGLE(30.0f), ANGLE(10.0f))
+		)
 	};
-	Vector3i CogSwitchPos(0, 0, -856);
+	const auto CogSwitchPos = Vector3i(0, 0, -856);
 
 	void CogSwitchCollision(short itemNum, ItemInfo* laraItem, CollisionInfo* coll)
 	{

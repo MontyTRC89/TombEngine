@@ -45,12 +45,13 @@ namespace TEN::Entities::Effects
 		{ 55, 55 }
 	};
 
-	OBJECT_COLLISION_BOUNDS FireBounds =
+	ObjectCollisionBounds FireBounds =
 	{
-		GameBoundingBox::Zero, 
-		-ANGLE(10.0f), ANGLE(10.0f),
-		-ANGLE(30.0f), ANGLE(30.0f),
-		-ANGLE(10.0f), ANGLE(10.0f)
+		GameBoundingBox::Zero,
+		std::pair(
+			EulerAngles(ANGLE(-10.0f), ANGLE(-30.0f), ANGLE(-10.0f)),
+			EulerAngles(ANGLE(10.0f), ANGLE(30.0f), ANGLE(10.0f))
+		)
 	};
 
 	bool FlameEmitterFlags[8];
@@ -599,30 +600,30 @@ namespace TEN::Entities::Effects
 			switch (item->ObjectNumber)
 			{
 			case ID_FLAME_EMITTER:
-				FireBounds.boundingBox.X1 = -256;
-				FireBounds.boundingBox.X2 = 256;
-				FireBounds.boundingBox.Y1 = 0;
-				FireBounds.boundingBox.Y2 = 1024;
-				FireBounds.boundingBox.Z1 = -800;
-				FireBounds.boundingBox.Z2 = 800;
+				FireBounds.BoundingBox.X1 = -256;
+				FireBounds.BoundingBox.X2 = 256;
+				FireBounds.BoundingBox.Y1 = 0;
+				FireBounds.BoundingBox.Y2 = 1024;
+				FireBounds.BoundingBox.Z1 = -800;
+				FireBounds.BoundingBox.Z2 = 800;
 				break;
 
 			case ID_FLAME_EMITTER2:
-				FireBounds.boundingBox.X1 = -256;
-				FireBounds.boundingBox.X2 = 256;
-				FireBounds.boundingBox.Y1 = 0;
-				FireBounds.boundingBox.Y2 = 1024;
-				FireBounds.boundingBox.Z1 = -600;
-				FireBounds.boundingBox.Z2 = 600;
+				FireBounds.BoundingBox.X1 = -256;
+				FireBounds.BoundingBox.X2 = 256;
+				FireBounds.BoundingBox.Y1 = 0;
+				FireBounds.BoundingBox.Y2 = 1024;
+				FireBounds.BoundingBox.Z1 = -600;
+				FireBounds.BoundingBox.Z2 = 600;
 				break;
 
 			case ID_BURNING_ROOTS:
-				FireBounds.boundingBox.X1 = -384;
-				FireBounds.boundingBox.X2 = 384;
-				FireBounds.boundingBox.Y1 = 0;
-				FireBounds.boundingBox.Y2 = 2048;
-				FireBounds.boundingBox.Z1 = -384;
-				FireBounds.boundingBox.Z2 = 384;
+				FireBounds.BoundingBox.X1 = -384;
+				FireBounds.BoundingBox.X2 = 384;
+				FireBounds.BoundingBox.Y1 = 0;
+				FireBounds.BoundingBox.Y2 = 2048;
+				FireBounds.BoundingBox.Z1 = -384;
+				FireBounds.BoundingBox.Z2 = 384;
 				break;
 			}
 

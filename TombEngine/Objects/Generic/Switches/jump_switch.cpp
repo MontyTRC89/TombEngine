@@ -13,19 +13,19 @@ using namespace TEN::Input;
 
 namespace TEN::Entities::Switches
 {
-	OBJECT_COLLISION_BOUNDS JumpSwitchBounds =  
+	const ObjectCollisionBounds JumpSwitchBounds =  
 	{
 		GameBoundingBox(
-			-128, 128,
-			-256, 256,
-			384, 512
+			-CLICK(0.5f), CLICK(0.5f),
+			-CLICK(1), CLICK(1),
+			CLICK(1.5f), SECTOR(0.5f)
 		),
-		-ANGLE(10.0f), ANGLE(10.0f),
-		-ANGLE(30.0f), ANGLE(30.0f),
-		-ANGLE(10.0f), ANGLE(10.0f)
+		std::pair(
+			EulerAngles(ANGLE(-10.0f), ANGLE(-30.0f), ANGLE(-10.0f)),
+			EulerAngles(ANGLE(10.0f), ANGLE(30.0f), ANGLE(10.0f))
+		)
 	};
-
-	Vector3i JumpSwitchPos = { 0, -208, 256 };  
+	const auto JumpSwitchPos = Vector3i(0, -208, 256);
 
 	void JumpSwitchCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 	{

@@ -32,103 +32,111 @@
 using namespace TEN::Entities::Generic;
 using namespace TEN::Input;
 
-static Vector3i PickUpPosition(0, 0, -100);
-OBJECT_COLLISION_BOUNDS PickUpBounds =
+static auto PickUpPosition = Vector3i(0, 0, -100);
+const ObjectCollisionBounds PickUpBounds =
 {
 	GameBoundingBox(
 		-CLICK(1), CLICK(1),
 		-200, 200,
 		-CLICK(1), CLICK(1)
 	),
-	ANGLE(-45.0f),  ANGLE(45.0f),
-	0, 0,
-	ANGLE(-45.0f),  ANGLE(45.0f),
+	std::pair(
+		EulerAngles(ANGLE(-45.0f), 0, ANGLE(-45.0f)),
+		EulerAngles(ANGLE(45.0f), 0, ANGLE(45.0f))
+	)
 };
 
-static Vector3i HiddenPickUpPosition(0, 0, -690);
-OBJECT_COLLISION_BOUNDS HiddenPickUpBounds =
+static auto HiddenPickUpPosition = Vector3i(0, 0, -690);
+const ObjectCollisionBounds HiddenPickUpBounds =
 {
 	GameBoundingBox(
 		-CLICK(1), CLICK(1),
 		-100, 100,
 		-800, -CLICK(1)
 	),
-	ANGLE(-45.0f),  ANGLE(45.0f),
-	ANGLE(-30.0f), ANGLE(30.0f),
-	ANGLE(-45.0f),  ANGLE(45.0f),
+	std::pair(
+		EulerAngles(ANGLE(-45.0f), ANGLE(-30.0f), ANGLE(-45.0f)),
+		EulerAngles(ANGLE(45.0f), ANGLE(30.0f), ANGLE(45.0f))
+	)
 };
 
-static Vector3i CrowbarPickUpPosition(0, 0, 215);
-OBJECT_COLLISION_BOUNDS CrowbarPickUpBounds =
+static auto CrowbarPickUpPosition = Vector3i(0, 0, 215);
+const ObjectCollisionBounds CrowbarPickUpBounds =
 {
 	GameBoundingBox(
 		-CLICK(1), CLICK(1),
 		-100, 100,
 		200, CLICK(2)
 	),
-	ANGLE(-45.0f),  ANGLE(45.0f),
-	ANGLE(-30.0f), ANGLE(30.0f),
-	ANGLE(-45.0f),  ANGLE(45.0f),
+	std::pair(
+		EulerAngles(ANGLE(-45.0f), ANGLE(-30.0f), ANGLE(-45.0f)),
+		EulerAngles(ANGLE(45.0f), ANGLE(30.0f), ANGLE(45.0f))
+	)
 };
 
-static Vector3i JobyCrowPickUpPosition(-224, 0, 240);
-OBJECT_COLLISION_BOUNDS JobyCrowPickUpBounds =
+static auto JobyCrowPickUpPosition = Vector3i(-224, 0, 240);
+const ObjectCollisionBounds JobyCrowPickUpBounds =
 {
 	GameBoundingBox(
 		-CLICK(2), 0,
 		-100, 100,
 		0, CLICK(2)
 	),
-	ANGLE(-45.0f),  ANGLE(45.0f),
-	ANGLE(-30.0f), ANGLE(30.0f),
-	ANGLE(-45.0f),  ANGLE(45.0f),
+	std::pair(
+		EulerAngles(ANGLE(-45.0f), ANGLE(-30.0f), ANGLE(-45.0f)),
+		EulerAngles(ANGLE(45.0f), ANGLE(30.0f), ANGLE(45.0f))
+	)
 };
 
-static Vector3i PlinthPickUpPosition(0, 0, -460);
-OBJECT_COLLISION_BOUNDS PlinthPickUpBounds =
+static auto PlinthPickUpPosition = Vector3i(0, 0, -460);
+ObjectCollisionBounds PlinthPickUpBounds =
 {
 	GameBoundingBox(
 		-CLICK(1), CLICK(1),
 		-640, 640,
 		-511, 0
 	),
-	ANGLE(-45.0f),  ANGLE(45.0f),
-	ANGLE(-30.0f), ANGLE(30.0f),
-	ANGLE(-45.0f),  ANGLE(45.0f),
+	std::pair(
+		EulerAngles(ANGLE(-45.0f), ANGLE(-30.0f), ANGLE(-45.0f)),
+		EulerAngles(ANGLE(45.0f), ANGLE(30.0f), ANGLE(45.0f))
+	)
 };
 
-static Vector3i PickUpPositionUW(0, -200, -350);
-OBJECT_COLLISION_BOUNDS PickUpBoundsUW =
+static auto PickUpPositionUW = Vector3i(0, -200, -350);
+const ObjectCollisionBounds PickUpBoundsUW =
 {
 	GameBoundingBox(
 		-CLICK(2), CLICK(2),
 		-CLICK(2), CLICK(2),
 		-CLICK(2), CLICK(2)
 	),
-	ANGLE(-45.0f),  ANGLE(45.0f),
-	ANGLE(-45.0f),  ANGLE(45.0f),
-	ANGLE(-45.0f),  ANGLE(45.0f)
+	std::pair(
+		EulerAngles(ANGLE(-45.0f), ANGLE(-45.0f), ANGLE(-45.0f)),
+		EulerAngles(ANGLE(45.0f), ANGLE(45.0f), ANGLE(45.0f))
+	)
 };
 
-static Vector3i SOPos(0, 0, 0);
-OBJECT_COLLISION_BOUNDS SOBounds =
+static auto SOPos = Vector3i::Zero;
+ObjectCollisionBounds SOBounds =
 {
 	GameBoundingBox::Zero,
-	ANGLE(-45.0f),  ANGLE(45.0f),
-	ANGLE(-30.0f), ANGLE(30.0f),
-	ANGLE(-45.0f),  ANGLE(45.0f),
+	std::pair(
+		EulerAngles(ANGLE(-45.0f), ANGLE(-30.0f), ANGLE(-45.0f)),
+		EulerAngles(ANGLE(45.0f), ANGLE(30.0f), ANGLE(45.0f))
+	)
 };
 
 short SearchCollectFrames[4] = { 180, 100, 153, 83 };
 short SearchAnims[4] = { LA_LOOT_CABINET, LA_LOOT_DRAWER, LA_LOOT_SHELF, LA_LOOT_CHEST };
 short SearchOffsets[4] = { 160, 96, 160, 112 };
 
-OBJECT_COLLISION_BOUNDS MSBounds =
+const ObjectCollisionBounds MSBounds =
 {
 	GameBoundingBox::Zero,
-	ANGLE(-10.0f), ANGLE(10.0f),
-	ANGLE(-30.0f), ANGLE(30.0f),
-	ANGLE(-10.0f), ANGLE(10.0f)
+	std::pair(
+		EulerAngles(ANGLE(-10.0f), ANGLE(-30.0f), ANGLE(-10.0f)),
+		EulerAngles(ANGLE(10.0f), ANGLE(30.0f), ANGLE(10.0f))
+	)
 };
 
 int NumRPickups;
@@ -536,10 +544,10 @@ void PickupCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 			return;
 		}
 
-		PlinthPickUpBounds.boundingBox.X1 = plinth->X1;
-		PlinthPickUpBounds.boundingBox.X2 = plinth->X2;
-		PlinthPickUpBounds.boundingBox.Y2 = laraItem->Pose.Position.y - item->Pose.Position.y + 100;
-		PlinthPickUpBounds.boundingBox.Z2 = plinth->Z2 + 320;
+		PlinthPickUpBounds.BoundingBox.X1 = plinth->X1;
+		PlinthPickUpBounds.BoundingBox.X2 = plinth->X2;
+		PlinthPickUpBounds.BoundingBox.Y2 = laraItem->Pose.Position.y - item->Pose.Position.y + 100;
+		PlinthPickUpBounds.BoundingBox.Z2 = plinth->Z2 + 320;
 		PlinthPickUpPosition.z = -200 - plinth->Z2;
 
 		// HACK: Until we refactor a way plinth collision is detected, this must be here
@@ -973,17 +981,17 @@ void SearchObjectCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* 
 		auto bounds = GameBoundingBox(item);
 		if (item->ObjectNumber != ID_SEARCH_OBJECT1)
 		{
-			SOBounds.boundingBox.X1 = bounds.X1 - CLICK(0.5f);
-			SOBounds.boundingBox.X2 = bounds.X2 + CLICK(0.5f);
+			SOBounds.BoundingBox.X1 = bounds.X1 - CLICK(0.5f);
+			SOBounds.BoundingBox.X2 = bounds.X2 + CLICK(0.5f);
 		}
 		else
 		{
-			SOBounds.boundingBox.X1 = bounds.X1 + CLICK(0.25f);
-			SOBounds.boundingBox.X2 = bounds.X2 - CLICK(0.25f);
+			SOBounds.BoundingBox.X1 = bounds.X1 + CLICK(0.25f);
+			SOBounds.BoundingBox.X2 = bounds.X2 - CLICK(0.25f);
 		}
 
-		SOBounds.boundingBox.Z1 = bounds.Z1 - 200;
-		SOBounds.boundingBox.Z2 = bounds.Z2 + 200;
+		SOBounds.BoundingBox.Z1 = bounds.Z1 - 200;
+		SOBounds.BoundingBox.Z2 = bounds.Z2 + 200;
 		SOPos.z = bounds.Z1 - SearchOffsets[objectNumber];
 
 		if (TestLaraPosition(SOBounds, item, laraItem))

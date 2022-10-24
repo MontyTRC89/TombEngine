@@ -16,31 +16,33 @@ using namespace TEN::Input;
 using namespace TEN::Renderer;
 using namespace TEN::Floordata;
 
-OBJECT_COLLISION_BOUNDS CeilingTrapDoorBounds =
+const ObjectCollisionBounds CeilingTrapDoorBounds =
 {
 	GameBoundingBox(
-		-256, 256,
+		-CLICK(1), CLICK(1),
 		0, 900,
-		-768, -256
+		-SECTOR(0.75f), -CLICK(1)
 	),
-	-ANGLE(10.0f), ANGLE(10.0f),
-	-ANGLE(30.0f), ANGLE(30.0f),
-	-ANGLE(10.0f), ANGLE(10.0f)
+	std::pair(
+		EulerAngles(ANGLE(-10.0f), ANGLE(-30.0f), ANGLE(-10.0f)),
+		EulerAngles(ANGLE(10.0f), ANGLE(30.0f), ANGLE(10.0f))
+	)
 };
-static Vector3i CeilingTrapDoorPos = { 0, 1056, -480 };
+const auto CeilingTrapDoorPos = Vector3i(0, 1056, -480);
 
-OBJECT_COLLISION_BOUNDS FloorTrapDoorBounds =
+const ObjectCollisionBounds FloorTrapDoorBounds =
 {
 	GameBoundingBox(
-		-256, 256,
+		-CLICK(1), CLICK(1),
 		0, 0,
-		-1024, -256
+		-SECTOR(1), -CLICK(1)
 	),
-	-ANGLE(10.0f), ANGLE(10.0f),
-	-ANGLE(30.0f), ANGLE(30.0f),
-	-ANGLE(10.0f), ANGLE(10.0f)
+	std::pair(
+		EulerAngles(ANGLE(-10.0f), ANGLE(-30.0f), ANGLE(-10.0f)),
+		EulerAngles(ANGLE(10.0f), ANGLE(30.0f), ANGLE(10.0f))
+	)
 };
-static Vector3i FloorTrapDoorPos = { 0, 0, -655 };
+static auto FloorTrapDoorPos = Vector3i(0, 0, -655);
 
 void InitialiseTrapDoor(short itemNumber)
 {

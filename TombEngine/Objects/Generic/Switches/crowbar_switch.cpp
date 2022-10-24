@@ -16,32 +16,32 @@ using namespace TEN::Input;
 
 namespace TEN::Entities::Switches
 {
-	Vector3i CrowbarPos = { -89, 0, -328 }; 
-
-	OBJECT_COLLISION_BOUNDS CrowbarBounds = 
+	const auto CrowbarPos = Vector3i(-89, 0, -328);
+	const ObjectCollisionBounds CrowbarBounds = 
 	{
 		GameBoundingBox(
-			-256, 256,
+			-CLICK(1), CLICK(1),
 			0, 0,
-			-512, -256
+			-SECTOR(0.5f), -CLICK(1)
 		),
-		-ANGLE(10.0f), ANGLE(10.0f),
-		-ANGLE(30.0f), ANGLE(30.0f),
-		-ANGLE(10.0f), ANGLE(10.0f)
+		std::pair(
+			EulerAngles(ANGLE(-10.0f), ANGLE(-30.0f), ANGLE(-10.0f)),
+			EulerAngles(ANGLE(10.0f), ANGLE(30.0f), ANGLE(10.0f))
+		)
 	};
 
-	Vector3i CrowbarPos2 = { 89, 0, 328 }; 
-
-	OBJECT_COLLISION_BOUNDS CrowbarBounds2 = 
+	const auto CrowbarPos2 = Vector3i(89, 0, 328);
+	const ObjectCollisionBounds CrowbarBounds2 =
 	{
 		GameBoundingBox(
-			-256, 256,
+			-CLICK(1), CLICK(1),
 			0, 0,
-			256, 512
+			CLICK(1), SECTOR(0.5f)
 		),
-		-ANGLE(10.0f), ANGLE(10.0f),
-		-ANGLE(30.0f), ANGLE(30.0f),
-		-ANGLE(10.0f), ANGLE(10.0f)
+		std::pair(
+			EulerAngles(ANGLE(-10.0f), ANGLE(-30.0f), ANGLE(-10.0f)),
+			EulerAngles(ANGLE(10.0f), ANGLE(30.0f), ANGLE(10.0f))
+		)
 	};
 
 	void CrowbarSwitchCollision(short itemNumber, ItemInfo* laraitem, CollisionInfo* coll)

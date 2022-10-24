@@ -15,8 +15,8 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-using namespace TEN::Input;
 using namespace TEN::Entities::Switches;
+using namespace TEN::Input;
 
 short PuzzleItem;
 
@@ -28,29 +28,31 @@ enum class PuzzleType
 	AnimAfter 
 };
 
-OBJECT_COLLISION_BOUNDS PuzzleBounds =
+ObjectCollisionBounds PuzzleBounds =
 {
 	GameBoundingBox(
 		0, 0,
-		-256, 256,
+		-CLICK(1), CLICK(1),
 		0, 0
 	),
-	-ANGLE(10.0f), ANGLE(10.0f),
-	-ANGLE(30.0f), ANGLE(30.0f),
-	-ANGLE(10.0f), ANGLE(10.0f)
+	std::pair(
+		EulerAngles(ANGLE(-10.0f), ANGLE(-30.0f), ANGLE(-10.0f)),
+		EulerAngles(ANGLE(10.0f), ANGLE(30.0f), ANGLE(10.0f))
+	)
 };
 
-static Vector3i KeyHolePosition(0, 0, 312);
-OBJECT_COLLISION_BOUNDS KeyHoleBounds =
+const auto KeyHolePosition = Vector3i(0, 0, 312);
+const ObjectCollisionBounds KeyHoleBounds =
 {
 	GameBoundingBox(
-		-256, 256,
+		-CLICK(1), CLICK(1),
 		0, 0,
 		0, 412
 	),
-	-ANGLE(10.0f), ANGLE(10.0f),
-	-ANGLE(30.0f), ANGLE(30.0f),
-	-ANGLE(10.0f), ANGLE(10.0f)
+	std::pair(
+		EulerAngles(ANGLE(-10.0f), ANGLE(-30.0f), ANGLE(-10.0f)),
+		EulerAngles(ANGLE(10.0f), ANGLE(30.0f), ANGLE(10.0f))
+	)
 };
 
 // Puzzles
@@ -89,10 +91,10 @@ void PuzzleHoleCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* co
 		short oldYrot = receptableItem->Pose.Orientation.y;
 
 		auto bounds = GameBoundingBox(receptableItem);
-		PuzzleBounds.boundingBox.X1 = bounds.X1 - CLICK(1);
-		PuzzleBounds.boundingBox.X2 = bounds.X2 + CLICK(1);
-		PuzzleBounds.boundingBox.Z1 = bounds.Z1 - CLICK(1);;
-		PuzzleBounds.boundingBox.Z2 = bounds.Z2 + CLICK(1);;
+		PuzzleBounds.BoundingBox.X1 = bounds.X1 - CLICK(1);
+		PuzzleBounds.BoundingBox.X2 = bounds.X2 + CLICK(1);
+		PuzzleBounds.BoundingBox.Z1 = bounds.Z1 - CLICK(1);;
+		PuzzleBounds.BoundingBox.Z2 = bounds.Z2 + CLICK(1);;
 
 		if (TestLaraPosition(PuzzleBounds, receptableItem, laraItem))
 		{

@@ -1,6 +1,8 @@
 #pragma once
 #include "Math/Math.h"
 
+using std::pair;
+
 class FloorInfo;
 struct CollisionInfo;
 struct ItemInfo;
@@ -15,15 +17,10 @@ extern GameBoundingBox GlobalCollisionBounds;
 extern ItemInfo* CollidedItems[MAX_COLLIDED_OBJECTS];
 extern MESH_INFO* CollidedMeshes[MAX_COLLIDED_OBJECTS];
 
-struct OBJECT_COLLISION_BOUNDS
+struct ObjectCollisionBounds
 {
-	GameBoundingBox boundingBox;
-	short rotX1;
-	short rotX2;
-	short rotY1;
-	short rotY2;
-	short rotZ1;
-	short rotZ2;
+	GameBoundingBox				   BoundingBox		= GameBoundingBox::Zero;
+	pair<EulerAngles, EulerAngles> OrientConstraint = {};
 };
 
 void GenericSphereBoxCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);
@@ -31,7 +28,7 @@ bool GetCollidedObjects(ItemInfo* collidingItem, int radius, bool onlyVisible, I
 bool TestWithGlobalCollisionBounds(ItemInfo* item, ItemInfo* laraItem, CollisionInfo* coll);
 void TestForObjectOnLedge(ItemInfo* item, CollisionInfo* coll);
 
-bool TestLaraPosition(const OBJECT_COLLISION_BOUNDS& bounds, ItemInfo* item, ItemInfo* laraItem);
+bool TestLaraPosition(const ObjectCollisionBounds& bounds, ItemInfo* item, ItemInfo* laraItem);
 bool AlignLaraPosition(const Vector3i& offset, ItemInfo* item, ItemInfo* laraItem);
 bool MoveLaraPosition(const Vector3i& offset, ItemInfo* item, ItemInfo* laraItem);
 

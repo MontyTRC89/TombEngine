@@ -14,44 +14,47 @@ using namespace TEN::Input;
 
 namespace TEN::Entities::Switches
 { 
-	OBJECT_COLLISION_BOUNDS UnderwaterSwitchBounds =
+	const ObjectCollisionBounds UnderwaterSwitchBounds =
 	{
 		GameBoundingBox(
-			-1024, 1024,
-			-1024, 1024,
-			-1024, 512
+			-SECTOR(1), SECTOR(1),
+			-SECTOR(1), SECTOR(1),
+			-SECTOR(1), SECTOR(0.5f)
 		),
-		-ANGLE(80.0f), ANGLE(80.0f),
-		-ANGLE(80.0f), ANGLE(80.0f),
-		-ANGLE(80.0f), ANGLE(80.0f)
+		std::pair(
+			EulerAngles(ANGLE(-80.0f), ANGLE(-80.0f), ANGLE(-80.0f)),
+			EulerAngles(ANGLE(80.0f), ANGLE(80.0f), ANGLE(80.0f))
+		)
 	};
-	Vector3i UnderwaterSwitchPos = { 0, 0, 108 };
+	const auto UnderwaterSwitchPos = Vector3i(0, 0, 108);
 
-	OBJECT_COLLISION_BOUNDS CeilingUnderwaterSwitchBounds1 =
+	const ObjectCollisionBounds CeilingUnderwaterSwitchBounds1 =
 	{
 		GameBoundingBox(
-			-256, 256,
-			-1280, -512,
-			-512, 0
+			-CLICK(1), CLICK(1),
+			-SECTOR(1.25f), -SECTOR(0.5f),
+			-SECTOR(0.5f), 0
 		),
-		-ANGLE(80.0f), ANGLE(80.0f),
-		-ANGLE(80.0f), ANGLE(80.0f),
-		-ANGLE(80.0f), ANGLE(80.0f)
+		std::pair(
+			EulerAngles(ANGLE(-80.0f), ANGLE(-80.0f), ANGLE(-80.0f)),
+			EulerAngles(ANGLE(80.0f), ANGLE(80.0f), ANGLE(80.0f))
+		)
 	};
-	Vector3i CeilingUnderwaterSwitchPos1 = { 0, -736, -416 };
+	const auto CeilingUnderwaterSwitchPos1 = Vector3i(0, -736, -416);
 
-	OBJECT_COLLISION_BOUNDS CeilingUnderwaterSwitchBounds2 =
+	const ObjectCollisionBounds CeilingUnderwaterSwitchBounds2 =
 	{
 		GameBoundingBox(
-			-256, 256,
-			-1280, -512,
-			0, 512
+			-CLICK(1), CLICK(1),
+			-SECTOR(1.25f), -SECTOR(0.5f),
+			0, SECTOR(0.5f)
 		),
-		-ANGLE(80.0f), ANGLE(80.0f),
-		-ANGLE(80.0f), ANGLE(80.0f),
-		-ANGLE(80.0f), ANGLE(80.0f)
+		std::pair(
+			EulerAngles(ANGLE(-80.0f), ANGLE(-80.0f), ANGLE(-80.0f)),
+			EulerAngles(ANGLE(80.0f), ANGLE(80.0f), ANGLE(80.0f))
+		)
 	};
-	Vector3i CeilingUnderwaterSwitchPos2 = { 0, -736, 416 };
+	const auto CeilingUnderwaterSwitchPos2 = Vector3i(0, -736, 416);
 
 	void UnderwaterSwitchCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 	{

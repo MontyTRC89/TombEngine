@@ -366,13 +366,12 @@ void TestForObjectOnLedge(ItemInfo* item, CollisionInfo* coll)
 	}
 }
 
-bool TestLaraPosition(const OBJECT_COLLISION_BOUNDS& bounds, ItemInfo* item, ItemInfo* laraItem)
+bool TestLaraPosition(const ObjectCollisionBounds& bounds, ItemInfo* item, ItemInfo* laraItem)
 {
 	auto deltaOrient = laraItem->Pose.Orientation - item->Pose.Orientation;
-
-	if (deltaOrient.x < bounds.rotX1 || deltaOrient.x > bounds.rotX2 ||
-		deltaOrient.y < bounds.rotY1 || deltaOrient.y > bounds.rotY2 ||
-		deltaOrient.z < bounds.rotZ1 || deltaOrient.z > bounds.rotZ2)
+	if (deltaOrient.x < bounds.OrientConstraint.first.x || deltaOrient.x > bounds.OrientConstraint.second.x ||
+		deltaOrient.y < bounds.OrientConstraint.first.y || deltaOrient.y > bounds.OrientConstraint.second.y ||
+		deltaOrient.z < bounds.OrientConstraint.first.z || deltaOrient.z > bounds.OrientConstraint.second.z)
 	{
 		return false;
 	}
@@ -388,9 +387,10 @@ bool TestLaraPosition(const OBJECT_COLLISION_BOUNDS& bounds, ItemInfo* item, Ite
 	rotMatrix = rotMatrix.Transpose();
 
 	pos = Vector3::Transform(pos, rotMatrix);
-	if (pos.x < bounds.boundingBox.X1 || pos.x > bounds.boundingBox.X2 ||
-		pos.y < bounds.boundingBox.Y1 || pos.y > bounds.boundingBox.Y2 ||
-		pos.z < bounds.boundingBox.Z1 || pos.z > bounds.boundingBox.Z2)
+
+	if (pos.x < bounds.BoundingBox.X1 || pos.x > bounds.BoundingBox.X2 ||
+		pos.y < bounds.BoundingBox.Y1 || pos.y > bounds.BoundingBox.Y2 ||
+		pos.z < bounds.BoundingBox.Z1 || pos.z > bounds.BoundingBox.Z2)
 	{
 		return false;
 	}

@@ -14,19 +14,19 @@
 
 using namespace TEN::Input;
 
-OBJECT_COLLISION_BOUNDS DeathSlideBounds =
+const ObjectCollisionBounds DeathSlideBounds =
 {
 	GameBoundingBox(
 		-CLICK(1), CLICK(1),
 		-100, 100,
 		CLICK(1), CLICK(2)
 	),
-	0, 0,
-	-ANGLE(25.0f), ANGLE(25.0f),
-	0, 0
+	std::pair(
+		EulerAngles(0, ANGLE(-25.0f), 0),
+		EulerAngles(0, ANGLE(25.0f), 0)
+	)
 };
-
-Vector3i DeathSlidePosition(0, 0, 371);
+const auto DeathSlidePosition = Vector3i(0, 0, 371);
 
 void InitialiseDeathSlide(short itemNumber)
 {

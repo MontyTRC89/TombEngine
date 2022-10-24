@@ -49,16 +49,17 @@ namespace TEN::Entities::Generic
 	auto VPolePos = Vector3i(0, 0, -208);
 	auto VPolePosR = Vector3i::Zero;
 
-	OBJECT_COLLISION_BOUNDS VPoleBounds = 
+	const ObjectCollisionBounds VPoleBounds = 
 	{
 		GameBoundingBox(
 			-CLICK(1), CLICK(1),
 			0, 0, 
-			-CLICK(2), CLICK(2)
+			-SECTOR(0.5f), SECTOR(0.5f)
 		),
-		ANGLE(-10.0f), ANGLE(10.0f),
-		ANGLE(-30.0f), ANGLE(30.0f),
-		ANGLE(-10.0f), ANGLE(10.0f)
+		std::pair(
+			EulerAngles(ANGLE(-10.0f), ANGLE(-30.0f), ANGLE(-10.0f)),
+			EulerAngles(ANGLE(10.0f), ANGLE(30.0f), ANGLE(10.0f))
+		)
 	};
 
 	void PoleCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
