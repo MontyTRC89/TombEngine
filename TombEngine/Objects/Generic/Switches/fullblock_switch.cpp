@@ -51,9 +51,9 @@ namespace TEN::Entities::Switches
 			return;
 		}
 
-		if (TestLaraPosition(&FullBlockSwitchBounds, switchItem, laraItem))
+		if (TestLaraPosition(FullBlockSwitchBounds, switchItem, laraItem))
 		{
-			if (MoveLaraPosition(&FullBlockSwitchPos, switchItem, laraItem))
+			if (MoveLaraPosition(FullBlockSwitchPos, switchItem, laraItem))
 			{
 				if (switchItem->Animation.ActiveState == 1)
 				{

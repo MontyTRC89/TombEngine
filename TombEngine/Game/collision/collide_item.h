@@ -31,9 +31,9 @@ bool GetCollidedObjects(ItemInfo* collidingItem, int radius, bool onlyVisible, I
 bool TestWithGlobalCollisionBounds(ItemInfo* item, ItemInfo* laraItem, CollisionInfo* coll);
 void TestForObjectOnLedge(ItemInfo* item, CollisionInfo* coll);
 
-bool TestLaraPosition(OBJECT_COLLISION_BOUNDS* bounds, ItemInfo* item, ItemInfo* laraItem);
-bool AlignLaraPosition(Vector3i* offset, ItemInfo* item, ItemInfo* laraItem);
-bool MoveLaraPosition(Vector3i* pos, ItemInfo* item, ItemInfo* laraItem);
+bool TestLaraPosition(const OBJECT_COLLISION_BOUNDS& bounds, ItemInfo* item, ItemInfo* laraItem);
+bool AlignLaraPosition(const Vector3i& offset, ItemInfo* item, ItemInfo* laraItem);
+bool MoveLaraPosition(const Vector3i& offset, ItemInfo* item, ItemInfo* laraItem);
 
 bool ItemNearLara(const Vector3i& origin, int radius);
 bool ItemNearTarget(const Vector3i& origin, ItemInfo* targetEntity, int radius);

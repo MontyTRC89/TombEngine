@@ -67,9 +67,9 @@ namespace TEN::Entities::Switches
 			switchItem->Animation.ActiveState == TURN_SWITCH_STOP ||
 			laraInfo->Control.IsMoving && laraInfo->InteractedItem == itemNumber)
 		{
-			if (TestLaraPosition(&TurnSwitchBoundsA, switchItem, laraItem))
+			if (TestLaraPosition(TurnSwitchBoundsA, switchItem, laraItem))
 			{
-				if (MoveLaraPosition(&TurnSwitchPosA, switchItem, laraItem))
+				if (MoveLaraPosition(TurnSwitchPosA, switchItem, laraItem))
 				{
 					laraItem->Animation.AnimNumber = LA_TURNSWITCH_GRAB_COUNTER_CLOCKWISE;
 					laraItem->Animation.FrameNumber = g_Level.Anims[LA_TURNSWITCH_GRAB_COUNTER_CLOCKWISE].frameBase;
@@ -87,9 +87,9 @@ namespace TEN::Entities::Switches
 			else
 			{
 				laraItem->Pose.Orientation.y ^= (short)ANGLE(180.0f);
-				if (TestLaraPosition(&TurnSwitchBoundsC, switchItem, laraItem))
+				if (TestLaraPosition(TurnSwitchBoundsC, switchItem, laraItem))
 				{
-					if (MoveLaraPosition(&TurnSwitchPos, switchItem, laraItem))
+					if (MoveLaraPosition(TurnSwitchPos, switchItem, laraItem))
 					{
 						laraItem->Animation.AnimNumber = LA_TURNSWITCH_GRAB_CLOCKWISE;
 						laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;

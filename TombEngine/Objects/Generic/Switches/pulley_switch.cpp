@@ -57,7 +57,7 @@ namespace TEN::Entities::Switches
 		{
 			short oldYrot = switchItem->Pose.Orientation.y;
 			switchItem->Pose.Orientation.y = laraItem->Pose.Orientation.y;
-			if (TestLaraPosition(&PulleyBounds, switchItem, laraItem))
+			if (TestLaraPosition(PulleyBounds, switchItem, laraItem))
 			{
 				if (switchItem->ItemFlags[1])
 				{
@@ -69,7 +69,7 @@ namespace TEN::Entities::Switches
 						SayNo();
 					}
 				}
-				else if (MoveLaraPosition(&PulleyPos, switchItem, laraItem))
+				else if (MoveLaraPosition(PulleyPos, switchItem, laraItem))
 				{
 					laraItem->Animation.AnimNumber = LA_PULLEY_GRAB;
 					laraItem->Animation.ActiveState = LS_PULLEY;

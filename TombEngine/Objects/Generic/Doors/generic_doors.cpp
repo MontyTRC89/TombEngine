@@ -181,7 +181,7 @@ namespace TEN::Entities::Doors
 				laraInfo->Control.IsMoving && laraInfo->InteractedItem == itemNumber))
 		{
 			doorItem->Pose.Orientation.y ^= ANGLE(180.0f);
-			if (TestLaraPosition(&CrowbarDoorBounds, doorItem, laraItem))
+			if (TestLaraPosition(CrowbarDoorBounds, doorItem, laraItem))
 			{
 				if (!laraInfo->Control.IsMoving)
 				{
@@ -217,7 +217,7 @@ namespace TEN::Entities::Doors
 
 				g_Gui.SetInventoryItemChosen(NO_ITEM);
 
-				if (MoveLaraPosition(&CrowbarDoorPos, doorItem, laraItem))
+				if (MoveLaraPosition(CrowbarDoorPos, doorItem, laraItem))
 				{
 					SetAnimation(laraItem, LA_DOOR_OPEN_CROWBAR);
 					doorItem->Pose.Orientation.y ^= ANGLE(180.0f);

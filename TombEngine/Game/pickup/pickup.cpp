@@ -356,11 +356,11 @@ void PickupCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 				item->ObjectNumber != ID_BURNING_TORCH_ITEM && 
 				laraItem->Animation.ActiveState == LS_UNDERWATER_IDLE && 
 				lara->Control.HandStatus == HandStatus::Free &&
-				TestLaraPosition(&PickUpBoundsUW, item, laraItem) || lara->Control.IsMoving && lara->InteractedItem == itemNumber)
+				TestLaraPosition(PickUpBoundsUW, item, laraItem) || lara->Control.IsMoving && lara->InteractedItem == itemNumber)
 			{
-				if (TestLaraPosition(&PickUpBoundsUW, item, laraItem))
+				if (TestLaraPosition(PickUpBoundsUW, item, laraItem))
 				{
-					if (MoveLaraPosition(&PickUpPositionUW, item, laraItem))
+					if (MoveLaraPosition(PickUpPositionUW, item, laraItem))
 					{
 						if (item->ObjectNumber == ID_FLARE_ITEM)
 						{
@@ -444,7 +444,7 @@ void PickupCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 	{
 	// Pick up from hole in wall.
 	case 1:
-		if (lara->Control.IsLow || !TestLaraPosition(&HiddenPickUpBounds, item, laraItem))
+		if (lara->Control.IsLow || !TestLaraPosition(HiddenPickUpBounds, item, laraItem))
 		{
 			if (lara->Control.IsMoving)
 			{
@@ -458,7 +458,7 @@ void PickupCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 			item->Pose.Orientation = prevOrient;
 			return;
 		}
-		else if (MoveLaraPosition(&HiddenPickUpPosition, item, laraItem))
+		else if (MoveLaraPosition(HiddenPickUpPosition, item, laraItem))
 		{
 			getThisItemPlease = itemNumber;
 			laraItem->Animation.AnimNumber = LA_HOLESWITCH_ACTIVATE;
@@ -473,7 +473,7 @@ void PickupCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 	case 2:
 		item->Pose.Orientation.y = prevOrient.y;
 
-		if (lara->Control.IsLow || !TestLaraPosition(&CrowbarPickUpBounds, item, laraItem))
+		if (lara->Control.IsLow || !TestLaraPosition(CrowbarPickUpBounds, item, laraItem))
 		{
 			if (!lara->Control.IsMoving)
 			{
@@ -509,7 +509,7 @@ void PickupCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 
 			g_Gui.SetInventoryItemChosen(NO_ITEM);
 		}
-		if (MoveLaraPosition(&CrowbarPickUpPosition, item, laraItem))
+		if (MoveLaraPosition(CrowbarPickUpPosition, item, laraItem))
 		{
 			getThisItemPlease = itemNumber;
 			laraItem->Animation.AnimNumber = LA_CROWBAR_PRY_WALL_FAST;
@@ -547,13 +547,13 @@ void PickupCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 		if (abs(laraItem->Pose.Position.y - item->Pose.Position.y) > CLICK(4))
 			break;
 
-		if (TestLaraPosition(&PlinthPickUpBounds, item, laraItem) && !lara->Control.IsLow)
+		if (TestLaraPosition(PlinthPickUpBounds, item, laraItem) && !lara->Control.IsLow)
 		{
 			if (item->Pose.Position.y == laraItem->Pose.Position.y)
 				PlinthPickUpPosition.y = 0;
 			else
 				PlinthPickUpPosition.y = laraItem->Pose.Position.y - item->Pose.Position.y;
-			if (MoveLaraPosition(&PlinthPickUpPosition, item, laraItem))
+			if (MoveLaraPosition(PlinthPickUpPosition, item, laraItem))
 			{
 				if (triggerFlags == 3 || triggerFlags == 7)
 				{
@@ -592,13 +592,13 @@ void PickupCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 	case 9:
 		item->Pose.Orientation.y = prevOrient.y;
 
-		if (!TestLaraPosition(&JobyCrowPickUpBounds, item, laraItem))
+		if (!TestLaraPosition(JobyCrowPickUpBounds, item, laraItem))
 		{
 			item->Pose.Orientation = prevOrient;
 			return;
 		}
 
-		if (MoveLaraPosition(&JobyCrowPickUpPosition, item, laraItem))
+		if (MoveLaraPosition(JobyCrowPickUpPosition, item, laraItem))
 		{
 			getThisItemPlease = itemNumber;
 			SetAnimation(laraItem, LA_CROWBAR_PRY_WALL_SLOW);
@@ -612,7 +612,7 @@ void PickupCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 
 	// Pick up from ground.
 	default:
-		if (!TestLaraPosition(&PickUpBounds, item, laraItem))
+		if (!TestLaraPosition(PickUpBounds, item, laraItem))
 		{
 			if (!lara->Control.IsMoving)
 			{
@@ -637,7 +637,7 @@ void PickupCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 			if (item->ObjectNumber == ID_BURNING_TORCH_ITEM)
 				break;
 
-			if (!AlignLaraPosition(&PickUpPosition, item, laraItem))
+			if (!AlignLaraPosition(PickUpPosition, item, laraItem))
 				break;
 
 			if (item->ObjectNumber == ID_FLARE_ITEM)
@@ -660,7 +660,7 @@ void PickupCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 				if (item->ObjectNumber == ID_BURNING_TORCH_ITEM)
 					break;
 
-				if (!AlignLaraPosition(&PickUpPosition, item, laraItem))
+				if (!AlignLaraPosition(PickUpPosition, item, laraItem))
 					break;
 
 				if (item->ObjectNumber == ID_FLARE_ITEM)
@@ -678,7 +678,7 @@ void PickupCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 			}
 			else
 			{
-				if (!MoveLaraPosition(&PickUpPosition, item, laraItem))
+				if (!MoveLaraPosition(PickUpPosition, item, laraItem))
 				{
 					lara->InteractedItem = itemNumber;
 					break;
@@ -986,9 +986,9 @@ void SearchObjectCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* 
 		SOBounds.boundingBox.Z2 = bounds.Z2 + 200;
 		SOPos.z = bounds.Z1 - SearchOffsets[objectNumber];
 
-		if (TestLaraPosition(&SOBounds, item, laraItem))
+		if (TestLaraPosition(SOBounds, item, laraItem))
 		{
-			if (MoveLaraPosition(&SOPos, item, laraItem))
+			if (MoveLaraPosition(SOPos, item, laraItem))
 			{
 				ResetLaraFlex(laraItem);
 				laraItem->Animation.AnimNumber = SearchAnims[objectNumber];

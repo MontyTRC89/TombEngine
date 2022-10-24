@@ -69,9 +69,9 @@ void SarcophagusCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* c
 		sarcItem->Status != ITEM_ACTIVE ||
 		laraInfo->Control.IsMoving && laraInfo->InteractedItem == itemNumber)
 	{
-		if (TestLaraPosition(&SarcophagusBounds, sarcItem, laraItem))
+		if (TestLaraPosition(SarcophagusBounds, sarcItem, laraItem))
 		{
-			if (MoveLaraPosition(&SarcophagusPosition, sarcItem, laraItem))
+			if (MoveLaraPosition(SarcophagusPosition, sarcItem, laraItem))
 			{
 				laraItem->Animation.AnimNumber = LA_PICKUP_SARCOPHAGUS;
 				laraItem->Animation.ActiveState = LS_MISC_CONTROL;

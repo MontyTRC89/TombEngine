@@ -67,9 +67,9 @@ void CeilingTrapDoorCollision(short itemNumber, ItemInfo* laraItem, CollisionInf
 
 	bool itemIsAbove = trapDoorItem->Pose.Position.y <= laraItem->Pose.Position.y - LARA_HEIGHT + LARA_HEADROOM;
 
-	bool result = TestLaraPosition(&CeilingTrapDoorBounds, trapDoorItem, laraItem);
+	bool result = TestLaraPosition(CeilingTrapDoorBounds, trapDoorItem, laraItem);
 	laraItem->Pose.Orientation.y += ANGLE(180.0f);
-	bool result2 = TestLaraPosition(&CeilingTrapDoorBounds, trapDoorItem, laraItem);
+	bool result2 = TestLaraPosition(CeilingTrapDoorBounds, trapDoorItem, laraItem);
 	laraItem->Pose.Orientation.y += ANGLE(180.0f);
 
 	if (TrInput & IN_ACTION &&
@@ -80,7 +80,7 @@ void CeilingTrapDoorCollision(short itemNumber, ItemInfo* laraItem, CollisionInf
 		itemIsAbove &&
 		(result || result2))
 	{
-		AlignLaraPosition(&CeilingTrapDoorPos, trapDoorItem, laraItem);
+		AlignLaraPosition(CeilingTrapDoorPos, trapDoorItem, laraItem);
 		if (result2)
 			laraItem->Pose.Orientation.y += ANGLE(180.0f);
 		
@@ -126,9 +126,9 @@ void FloorTrapDoorCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo*
 		trapDoorItem->Status != ITEM_ACTIVE) ||
 		(laraInfo->Control.IsMoving && laraInfo->InteractedItem == itemNumber))
 	{
-		if (TestLaraPosition(&FloorTrapDoorBounds, trapDoorItem, laraItem))
+		if (TestLaraPosition(FloorTrapDoorBounds, trapDoorItem, laraItem))
 		{
-			if (MoveLaraPosition(&FloorTrapDoorPos, trapDoorItem, laraItem))
+			if (MoveLaraPosition(FloorTrapDoorPos, trapDoorItem, laraItem))
 			{
 				ResetLaraFlex(laraItem);
 				laraItem->Animation.AnimNumber = LA_TRAPDOOR_FLOOR_OPEN;

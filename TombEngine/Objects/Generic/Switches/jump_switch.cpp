@@ -39,9 +39,9 @@ namespace TEN::Entities::Switches
 			laraInfo->Control.HandStatus == HandStatus::Free &&
 			!switchItem->Animation.ActiveState)
 		{
-			if (TestLaraPosition(&JumpSwitchBounds, switchItem, laraItem))
+			if (TestLaraPosition(JumpSwitchBounds, switchItem, laraItem))
 			{
-				AlignLaraPosition(&JumpSwitchPos, switchItem, laraItem);
+				AlignLaraPosition(JumpSwitchPos, switchItem, laraItem);
 
 				laraItem->Animation.ActiveState = LS_SWITCH_DOWN;
 				laraItem->Animation.AnimNumber = LA_JUMPSWITCH_PULL;

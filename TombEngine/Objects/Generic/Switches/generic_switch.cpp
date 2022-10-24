@@ -86,9 +86,9 @@ namespace TEN::Entities::Switches
 				SwitchPos.z = bounds.Z1 - 64;
 			}
 
-			if (TestLaraPosition(&SwitchBounds, switchItem, laraItem))
+			if (TestLaraPosition(SwitchBounds, switchItem, laraItem))
 			{
-				if (MoveLaraPosition(&SwitchPos, switchItem, laraItem))
+				if (MoveLaraPosition(SwitchPos, switchItem, laraItem))
 				{
 					auto onAnim = LaraAnim::LA_WALLSWITCH_DOWN;
 					auto offAnim = LaraAnim::LA_WALLSWITCH_UP;

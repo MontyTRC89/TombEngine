@@ -366,43 +366,31 @@ void TestForObjectOnLedge(ItemInfo* item, CollisionInfo* coll)
 	}
 }
 
-bool TestLaraPosition(OBJECT_COLLISION_BOUNDS* bounds, ItemInfo* item, ItemInfo* laraItem)
+bool TestLaraPosition(const OBJECT_COLLISION_BOUNDS& bounds, ItemInfo* item, ItemInfo* laraItem)
 {
 	auto deltaOrient = laraItem->Pose.Orientation - item->Pose.Orientation;
 
-	if (deltaOrient.x < bounds->rotX1)
+	if (deltaOrient.x < bounds.rotX1 || deltaOrient.x > bounds.rotX2 ||
+		deltaOrient.y < bounds.rotY1 || deltaOrient.y > bounds.rotY2 ||
+		deltaOrient.z < bounds.rotZ1 || deltaOrient.z > bounds.rotZ2)
+	{
 		return false;
-
-	if (deltaOrient.x > bounds->rotX2)
-		return false;
-
-	if (deltaOrient.y < bounds->rotY1)
-		return false;
-
-	if (deltaOrient.y > bounds->rotY2)
-		return false;
-
-	if (deltaOrient.z < bounds->rotZ1)
-		return false;
-
-	if (deltaOrient.z > bounds->rotZ2)
-		return false;
+	}
 
 	auto pos = (laraItem->Pose.Position - item->Pose.Position).ToVector3();
 	auto rotMatrix = item->Pose.Orientation.ToRotationMatrix();
 
-	// This solves once for all the minus sign hack of CreateFromYawPitchRoll.
-	// In reality it should be the inverse, but the inverse of a rotation matrix is equal to the transpose
-	// and transposing a matrix is faster.
-	// It's the only piece of code that does it, because we want Lara's location relative to the identity frame
-	// of the object we are test against.
+	/* This solves once for all the minus sign hack of CreateFromYawPitchRoll.
+	In reality it should be the inverse, but the inverse of a rotation matrix is equal to the transpose
+	and transposing a matrix is faster.
+	It's the only piece of code that does it, because we want Lara's location relative to the identity frame
+	of the object we are test against. */
 	rotMatrix = rotMatrix.Transpose();
 
 	pos = Vector3::Transform(pos, rotMatrix);
-
-	if (pos.x < bounds->boundingBox.X1 || pos.x > bounds->boundingBox.X2 ||
-		pos.y < bounds->boundingBox.Y1 || pos.y > bounds->boundingBox.Y2 ||
-		pos.z < bounds->boundingBox.Z1 || pos.z > bounds->boundingBox.Z2)
+	if (pos.x < bounds.boundingBox.X1 || pos.x > bounds.boundingBox.X2 ||
+		pos.y < bounds.boundingBox.Y1 || pos.y > bounds.boundingBox.Y2 ||
+		pos.z < bounds.boundingBox.Z1 || pos.z > bounds.boundingBox.Z2)
 	{
 		return false;
 	}
@@ -410,14 +398,14 @@ bool TestLaraPosition(OBJECT_COLLISION_BOUNDS* bounds, ItemInfo* item, ItemInfo*
 	return true;
 }
 
-bool AlignLaraPosition(Vector3i* offset, ItemInfo* item, ItemInfo* laraItem)
+bool AlignLaraPosition(const Vector3i& offset, ItemInfo* item, ItemInfo* laraItem)
 {
 	auto* lara = GetLaraInfo(laraItem);
 
 	laraItem->Pose.Orientation = item->Pose.Orientation;
 
 	auto rotMatrix = item->Pose.Orientation.ToRotationMatrix();
-	auto pos = Vector3::Transform(offset->ToVector3(), rotMatrix);
+	auto pos = Vector3::Transform(offset.ToVector3(), rotMatrix);
 	auto target = item->Pose.Position.ToVector3() + pos;
 
 	int height = GetCollision(target.x, target.y, target.z, laraItem->RoomNumber).Position.Floor;
@@ -436,12 +424,12 @@ bool AlignLaraPosition(Vector3i* offset, ItemInfo* item, ItemInfo* laraItem)
 	return false;
 }
 
-bool MoveLaraPosition(Vector3i* offset, ItemInfo* item, ItemInfo* laraItem)
+bool MoveLaraPosition(const Vector3i& offset, ItemInfo* item, ItemInfo* laraItem)
 {
 	auto* lara = GetLaraInfo(laraItem);
 
 	auto rotMatrix = item->Pose.Orientation.ToRotationMatrix();
-	auto pos = Vector3::Transform(offset->ToVector3(), rotMatrix);
+	auto pos = Vector3::Transform(offset.ToVector3(), rotMatrix);
 	auto target = Pose(item->Pose.Position + Vector3i(pos), item->Pose.Orientation);
 
 	if (!Objects[item->ObjectNumber].isPickup)

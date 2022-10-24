@@ -74,12 +74,12 @@ namespace TEN::Entities::Switches
 			lara->Control.HandStatus == HandStatus::Free &&
 			laraItem->Animation.ActiveState == LS_UNDERWATER_IDLE)
 		{
-			if (TestLaraPosition(&UnderwaterSwitchBounds, switchItem, laraItem))
+			if (TestLaraPosition(UnderwaterSwitchBounds, switchItem, laraItem))
 			{
 				if (switchItem->Animation.ActiveState == SWITCH_ON ||
 					switchItem->Animation.ActiveState == SWITCH_OFF)
 				{
-					if (MoveLaraPosition(&UnderwaterSwitchPos, switchItem, laraItem))
+					if (MoveLaraPosition(UnderwaterSwitchPos, switchItem, laraItem))
 					{
 						laraItem->Animation.Velocity.y = 0;
 						laraItem->Animation.TargetState = LS_SWITCH_DOWN;
@@ -117,9 +117,9 @@ namespace TEN::Entities::Switches
 			switchItem->Animation.ActiveState == SWITCH_OFF) ||
 			(lara->Control.IsMoving && lara->InteractedItem == itemNumber))
 		{
-			if (TestLaraPosition(&CeilingUnderwaterSwitchBounds1, switchItem, laraItem))
+			if (TestLaraPosition(CeilingUnderwaterSwitchBounds1, switchItem, laraItem))
 			{
-				if (MoveLaraPosition(&CeilingUnderwaterSwitchPos1, switchItem, laraItem))
+				if (MoveLaraPosition(CeilingUnderwaterSwitchPos1, switchItem, laraItem))
 					flag = true;
 				else
 					lara->InteractedItem = itemNumber;
@@ -128,9 +128,9 @@ namespace TEN::Entities::Switches
 			{
 				laraItem->Pose.Orientation.y ^= (short)ANGLE(180.0f);
 
-				if (TestLaraPosition(&CeilingUnderwaterSwitchBounds2, switchItem, laraItem))
+				if (TestLaraPosition(CeilingUnderwaterSwitchBounds2, switchItem, laraItem))
 				{
-					if (MoveLaraPosition(&CeilingUnderwaterSwitchPos2, switchItem, laraItem))
+					if (MoveLaraPosition(CeilingUnderwaterSwitchPos2, switchItem, laraItem))
 						flag = true;
 					else
 						lara->InteractedItem = itemNumber;
