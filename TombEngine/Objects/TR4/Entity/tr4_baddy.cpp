@@ -54,7 +54,7 @@ namespace TEN::Entities::TR4
 {
 	const auto BaddyGunBite	  = BiteInfo(Vector3(0.0f, -16.0f, 200.0f), 11);
 	const auto BaddySwordBite = BiteInfo(Vector3::Zero, 15);
-	const vector<int> BaddySwordAttackJoints = { 14, 15, 16 };
+	const vector<uint> BaddySwordAttackJoints = { 14, 15, 16 };
 
 	#define BADDY_USE_UZI	24
 
@@ -930,7 +930,7 @@ namespace TEN::Entities::TR4
 
 				if (!currentCreature->Flags)
 				{
-					if (item->TestBits(JointBitType::Touch, BaddySwordAttackJoints))
+					if (item->TouchBits.Test(BaddySwordAttackJoints))
 					{
 						if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + FRAME_BADDY_SWORD_HIT_DAMAGE_MIN &&
 							item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].frameBase + FRAME_BADDY_SWORD_HIT_DAMAGE_MAX)
@@ -1022,7 +1022,7 @@ namespace TEN::Entities::TR4
 
 				if (!currentCreature->Flags)
 				{
-					if (item->TouchBits)
+					if (item->TouchBits.TestAny())
 					{
 						SetAnimation(LaraItem, LA_JUMP_UP);
 						LaraItem->Animation.IsAirborne = true;

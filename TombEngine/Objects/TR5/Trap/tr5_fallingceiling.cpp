@@ -14,7 +14,7 @@ void FallingCeilingControl(short itemNumber)
 
 	if (item->Animation.ActiveState)
 	{
-		if (item->Animation.ActiveState == 1 && item->TouchBits)
+		if (item->Animation.ActiveState == 1 && item->TouchBits.TestAny())
 			DoDamage(LaraItem, 300);
 	}
 	else

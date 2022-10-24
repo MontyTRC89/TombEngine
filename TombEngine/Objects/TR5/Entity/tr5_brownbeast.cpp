@@ -22,8 +22,8 @@ namespace TEN::Entities::Creatures::TR5
 
 	const auto BrownBeastBite1 = BiteInfo(Vector3::Zero, 16);
 	const auto BrownBeastBite2 = BiteInfo(Vector3::Zero, 22);
-	const vector<int> BrownBeastAttackJoints1 = { 14, 15, 16, 17 };
-	const vector<int> BrownBeastAttackJoints2 = { 20, 21, 22, 23 };
+	const vector<uint> BrownBeastAttackJoints1 = { 14, 15, 16, 17 };
+	const vector<uint> BrownBeastAttackJoints2 = { 20, 21, 22, 23 };
 
 	// TODO
 	enum BrownBeastState
@@ -143,7 +143,7 @@ namespace TEN::Entities::Creatures::TR5
 				if (creature->Flags)
 					break;
 
-				if (item->TestBits(JointBitType::Touch, BrownBeastAttackJoints1))
+				if (item->TouchBits.Test(BrownBeastAttackJoints1))
 				{
 					if (item->Animation.AnimNumber == Objects[ID_BROWN_BEAST].animIndex + 8)
 					{
@@ -170,7 +170,7 @@ namespace TEN::Entities::Creatures::TR5
 					}
 				}
 
-				if (!item->TestBits(JointBitType::Touch, BrownBeastAttackJoints2))
+				if (!item->TouchBits.Test(BrownBeastAttackJoints2))
 					break;
 
 				if (item->Animation.AnimNumber == (Objects[ID_BROWN_BEAST].animIndex + 8))

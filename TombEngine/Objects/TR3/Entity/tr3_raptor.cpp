@@ -32,7 +32,7 @@ namespace TEN::Entities::Creatures::TR3
 	#define RAPTOR_ATTACK_TURN_RATE_MAX ANGLE(2.0f)
 
 	const auto RaptorBite = BiteInfo(Vector3(0.0f, 66.0f, 318.0f), 22);
-	const vector<int> RaptorAttackJoints = { 10, 11, 12, 13, 14, 16, 17, 18, 19, 20, 21, 22, 23 };
+	const vector<uint> RaptorAttackJoints = { 10, 11, 12, 13, 14, 16, 17, 18, 19, 20, 21, 22, 23 };
 
 	enum RaptorState
 	{
@@ -161,7 +161,7 @@ namespace TEN::Entities::Creatures::TR3
 					creature->Flags &= ~2;
 					item->Animation.TargetState = RAPTOR_STATE_ROAR;
 				}
-				else if (item->TestBits(JointBitType::Touch, RaptorAttackJoints) ||
+				else if (item->TouchBits.Test(RaptorAttackJoints) ||
 					(AI.distance < RAPTOR_BITE_ATTACK_RANGE && AI.bite))
 				{
 					item->Animation.TargetState = RAPTOR_STATE_BITE_ATTACK;
@@ -200,7 +200,7 @@ namespace TEN::Entities::Creatures::TR3
 				creature->Flags &= ~1;
 				tilt = angle;
 
-				if (item->TestBits(JointBitType::Touch, RaptorAttackJoints))
+				if (item->TouchBits.Test(RaptorAttackJoints))
 					item->Animation.TargetState = RAPTOR_STATE_IDLE;
 				else if (creature->Flags & 2)
 				{
@@ -239,7 +239,7 @@ namespace TEN::Entities::Creatures::TR3
 				if (creature->Enemy->IsLara())
 				{
 					if (!(creature->Flags & 1) &&
-						item->TestBits(JointBitType::Touch, RaptorAttackJoints))
+						item->TouchBits.Test(RaptorAttackJoints))
 					{
 						DoDamage(creature->Enemy, RAPTOR_ATTACK_DAMAGE);
 						CreatureEffect(item, RaptorBite, DoBloodSplat);
@@ -276,7 +276,7 @@ namespace TEN::Entities::Creatures::TR3
 				if (creature->Enemy->IsLara())
 				{
 					if (!(creature->Flags & 1) &&
-						item->TestBits(JointBitType::Touch, RaptorAttackJoints))
+						item->TouchBits.Test(RaptorAttackJoints))
 					{
 						DoDamage(creature->Enemy, RAPTOR_ATTACK_DAMAGE);
 						CreatureEffect(item, RaptorBite, DoBloodSplat);
@@ -313,7 +313,7 @@ namespace TEN::Entities::Creatures::TR3
 				if (creature->Enemy->IsLara())
 				{
 					if (!(creature->Flags & 1) &&
-						item->TestBits(JointBitType::Touch, RaptorAttackJoints))
+						item->TouchBits.Test(RaptorAttackJoints))
 					{
 						DoDamage(creature->Enemy, RAPTOR_ATTACK_DAMAGE);
 						CreatureEffect(item, RaptorBite, DoBloodSplat);

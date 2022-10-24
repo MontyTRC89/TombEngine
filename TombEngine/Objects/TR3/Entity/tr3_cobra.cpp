@@ -27,7 +27,7 @@ namespace TEN::Entities::Creatures::TR3
 	constexpr auto COBRA_SLEEP_FRAME = 45;
 
 	const auto CobraBite = BiteInfo(Vector3::Zero, 13);
-	const vector<int> CobraAttackJoints = { 13 };
+	const vector<uint> CobraAttackJoints = { 13 };
 
 	enum CobraState
 	{
@@ -151,7 +151,7 @@ namespace TEN::Entities::Creatures::TR3
 
 			case COBRA_STATE_ATTACK:
 				if (!(creature->Flags & 1) && // 1 = is attacking.
-					item->TestBits(JointBitType::Touch, CobraAttackJoints))
+					item->TouchBits.Test(CobraAttackJoints))
 				{
 					DoDamage(creature->Enemy, COBRA_BITE_ATTACK_DAMAGE);
 					CreatureEffect(item, CobraBite, DoBloodSplat);

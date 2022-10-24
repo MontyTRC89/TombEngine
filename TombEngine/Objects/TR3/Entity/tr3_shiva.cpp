@@ -31,8 +31,8 @@ namespace TEN::Entities::Creatures::TR3
 
 	const auto ShivaBiteLeft  = BiteInfo(Vector3(0.0f, 0.0f, 920.0f), 13);
 	const auto ShivaBiteRight = BiteInfo(Vector3(0.0f, 0.0f, 920.0f), 22);
-	const vector<int> ShivaAttackLeftJoints	 = { 10, 13 };
-	const vector<int> ShivaAttackRightJoints = { 22, 25 };
+	const vector<uint> ShivaAttackLeftJoints	 = { 10, 13 };
+	const vector<uint> ShivaAttackRightJoints = { 22, 25 };
 
 	enum ShivaState
 	{
@@ -171,7 +171,7 @@ namespace TEN::Entities::Creatures::TR3
 
 	void ShivaDamage(ItemInfo* item, CreatureInfo* creature, int damage)
 	{
-		if (!(creature->Flags) && item->TestBits(JointBitType::Touch, ShivaAttackRightJoints))
+		if (!(creature->Flags) && item->TouchBits.Test(ShivaAttackRightJoints))
 		{
 			DoDamage(creature->Enemy, damage);
 			CreatureEffect(item, ShivaBiteRight, DoBloodSplat);
@@ -179,7 +179,7 @@ namespace TEN::Entities::Creatures::TR3
 			creature->Flags = 1;
 		}
 
-		if (!(creature->Flags) && item->TestBits(JointBitType::Touch, ShivaAttackLeftJoints))
+		if (!(creature->Flags) && item->TouchBits.Test(ShivaAttackLeftJoints))
 		{
 			DoDamage(creature->Enemy, damage);
 			CreatureEffect(item, ShivaBiteLeft, DoBloodSplat);
@@ -256,10 +256,10 @@ namespace TEN::Entities::Creatures::TR3
 
 				if (!creature->Flags)
 				{
-					if (!item->MeshBits)
+					if (!item->MeshBits.TestAny())
 						effectMesh = 0;
 
-					item->MeshBits = (item->MeshBits * 2) + 1;
+					item->MeshBits = (item->MeshBits.ToPackedBits() * 2) + 1;
 					creature->Flags = 1;
 
 					pos = GetJointPosition(item, effectMesh++, pos);

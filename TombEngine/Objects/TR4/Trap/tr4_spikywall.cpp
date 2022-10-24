@@ -36,7 +36,7 @@ void ControlSpikyWall(short itemNumber)
 		}
 	}
 
-	if (item->TouchBits)
+	if (item->TouchBits.TestAny())
 	{
 		DoDamage(LaraItem, 15);
 		DoLotsOfBlood(LaraItem->Pose.Position.x, LaraItem->Pose.Position.y - CLICK(2), LaraItem->Pose.Position.z, 4, item->Pose.Orientation.y, LaraItem->RoomNumber, 3);

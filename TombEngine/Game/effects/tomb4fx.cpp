@@ -1014,7 +1014,7 @@ void TriggerGunShell(short hand, short objNum, LaraWeaponType weaponType)
 			18432;
 	}
 
-	if (LaraItem->MeshBits)
+	if (LaraItem->MeshBits.TestAny())
 	{
 		if (weaponType == LaraWeaponType::Shotgun)
 			TriggerGunSmoke(pos.x, pos.y, pos.z, 0, 0, 0, 0, LaraWeaponType::Shotgun, 24);
@@ -1417,10 +1417,10 @@ void ExplodingDeath(short itemNumber, short flags)
 		g_Renderer.GetBoneMatrix(itemNumber, i, &boneMatrix);
 		boneMatrix = world * boneMatrix;
 
-		if (!item->TestBits(JointBitType::Mesh, i))
+		if (!item->MeshBits.Test(i))
 			continue;
 
-		item->ClearBits(JointBitType::Mesh, i);
+		item->MeshBits.Clear(i);
 
 		if (i == 0 ||  ((GetRandomControl() & 3) != 0 && (flags & BODY_EXPLODE)))
 		{

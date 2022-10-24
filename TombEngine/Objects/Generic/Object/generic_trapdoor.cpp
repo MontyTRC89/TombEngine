@@ -217,7 +217,7 @@ std::optional<int> TrapDoorFloor(short itemNumber, int x, int y, int z)
 {
 	auto* trapDoorItem = &g_Level.Items[itemNumber];
 
-	if (!trapDoorItem->MeshBits || trapDoorItem->ItemFlags[2] == 0)
+	if (!trapDoorItem->MeshBits.TestAny() || trapDoorItem->ItemFlags[2] == 0)
 		return std::nullopt;
 
 	return GetBridgeItemIntersect(itemNumber, x, y, z, false);
@@ -227,7 +227,7 @@ std::optional<int> TrapDoorCeiling(short itemNumber, int x, int y, int z)
 {
 	auto* trapDoorItem = &g_Level.Items[itemNumber];
 
-	if (!trapDoorItem->MeshBits || trapDoorItem->ItemFlags[2] == 0)
+	if (!trapDoorItem->MeshBits.TestAny() || trapDoorItem->ItemFlags[2] == 0)
 		return std::nullopt;
 
 	return GetBridgeItemIntersect(itemNumber, x, y, z, true);

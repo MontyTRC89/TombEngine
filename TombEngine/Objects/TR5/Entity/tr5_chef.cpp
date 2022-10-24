@@ -117,7 +117,7 @@ namespace TEN::Entities::Creatures::TR5
 			case CHEF_STATE_COOKING:
 				if (abs(LaraItem->Pose.Position.y - item->Pose.Position.y) < SECTOR(1) &&
 					AI.distance < pow(SECTOR(1.5f), 2) &&
-					(item->TouchBits ||
+					(item->TouchBits.TestAny() ||
 						item->HitStatus ||
 						LaraItem->Animation.Velocity.z > 15 ||
 						TargetVisible(item, &aiLaraInfo)))

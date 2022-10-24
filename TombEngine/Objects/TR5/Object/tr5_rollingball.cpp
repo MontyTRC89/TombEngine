@@ -44,6 +44,8 @@ void RollingBallCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* c
 void RollingBallControl(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
+	// read flags from OCB
+	int OCB = item->TriggerFlags;
 
 	if (!TriggerActive(item))
 		return;
@@ -73,8 +75,11 @@ void RollingBallControl(short itemNumber)
 
 			if (distance < 16384)
 			{
-				Camera.bounce = -(((16384 - distance) * abs(item->Animation.Velocity.y)) / 16384);
-				SoundEffect(SFX_TR4_BOULDER_FALL, &item->Pose);
+				if ((item->TriggerFlags & 1) != 1) // Flag 1 = silent.
+				{
+					Camera.bounce = -(((16384 - distance) * abs(item->Animation.Velocity.y)) / 16384);
+					SoundEffect(SFX_TR4_BOULDER_FALL, &item->Pose);
+				}
 			}
 		}
 

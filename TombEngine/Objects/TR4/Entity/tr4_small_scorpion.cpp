@@ -26,7 +26,7 @@ namespace TEN::Entities::TR4
 
 	const auto SmallScorpionBite1 = BiteInfo(Vector3::Zero, 0);
 	const auto SmallScorpionBite2 = BiteInfo(Vector3::Zero, 23);
-	const vector<int> SmallScorpionAttackJoints = { 8, 22, 23, 25, 26 };
+	const vector<uint> SmallScorpionAttackJoints = { 8, 22, 23, 25, 26 };
 
 	enum SmallScorionState
 	{
@@ -157,7 +157,7 @@ namespace TEN::Entities::TR4
 
 				if (!creature->Flags)
 				{
-					if (item->TestBits(JointBitType::Touch, SmallScorpionAttackJoints))
+					if (item->TouchBits.Test(SmallScorpionAttackJoints))
 					{
 						if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 20 &&
 							item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].frameBase + 32)

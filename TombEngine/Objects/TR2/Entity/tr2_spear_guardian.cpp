@@ -83,9 +83,9 @@ namespace TEN::Entities::Creatures::TR2
 		if (item->HitPoints <= 0)
 		{
 			item->Animation.ActiveState = 17;
-			item->MeshBits /= 2;
+			item->MeshBits = item->MeshBits.ToPackedBits() / 2;
 
-			if (!item->MeshBits)
+			if (!item->MeshBits.TestAny())
 			{
 				SoundEffect(SFX_TR4_EXPLOSION1, nullptr);
 				// TODO: exploding death
@@ -111,7 +111,7 @@ namespace TEN::Entities::Creatures::TR2
 			case 18:
 				if (!creature->Flags)
 				{
-					item->MeshBits = (item->MeshBits << 1) + 1;
+					item->MeshBits = (item->MeshBits.ToPackedBits() << 1) + 1;
 					creature->Flags = 3;
 				}
 				else

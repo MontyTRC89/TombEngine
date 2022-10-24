@@ -22,7 +22,7 @@ namespace TEN::Entities::Creatures::TR3
 	constexpr auto TREX_ROAR_CHANCE = 0.015f;
 	constexpr auto LARA_ANIM_TREX_DEATH_ANIM = 4;
 
-	const vector<int> TRexAttackJoints = { 12, 13 };
+	const vector<uint> TRexAttackJoints = { 12, 13 };
 
 	#define TREX_WALK_TURN_RATE_MAX ANGLE(2.0f)
 	#define TREX_RUN_TURN_RATE_MAX	ANGLE(4.0f)
@@ -114,7 +114,7 @@ namespace TEN::Entities::Creatures::TR3
 
 			angle = CreatureTurn(item, creature->MaxTurn);
 
-			if (item->TouchBits)
+			if (item->TouchBits.TestAny())
 				DoDamage(LaraItem, (item->Animation.ActiveState == TREX_STATE_RUN_FORWARD) ? TREX_RUN_CONTACT_DAMAGE : TREX_CONTACT_DAMAGE);
 
 			creature->Flags = (creature->Mood != MoodType::Escape && !AI.ahead && AI.enemyFacing > -FRONT_ARC && AI.enemyFacing < FRONT_ARC);
@@ -172,7 +172,7 @@ namespace TEN::Entities::Creatures::TR3
 				break;
 
 			case TREX_STATE_ATTACK:
-				if (item->TestBits(JointBitType::Touch, TRexAttackJoints))
+				if (item->TouchBits.Test(TRexAttackJoints))
 				{
 					item->Animation.TargetState = TREX_STATE_KILL;
 

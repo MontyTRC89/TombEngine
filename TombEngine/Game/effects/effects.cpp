@@ -1046,7 +1046,7 @@ void TriggerLaraBlood()
 
 	for (int i = 0; i < LARA_MESHES::LM_HEAD; i++)
 	{
-		if (node & LaraItem->TouchBits)
+		if (node & LaraItem->TouchBits.ToPackedBits())
 		{
 			auto vec = GetJointPosition(LaraItem, 
 				i,
