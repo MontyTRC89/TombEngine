@@ -2588,12 +2588,9 @@ bool TestLaraLadderDown(ItemInfo* item, CollisionInfo* coll)
 	return true;
 
 	static const int probeDist			= CLICK(0.5f);
-	static const int dismountFloorBound = CLICK(0.6f);
+	static const int dismountFloorBound = CLICK(0.5f);
 
-	auto lFootHeight = GetJointPosition(item, LM_LFOOT).y;
-	auto rFootHeight = GetJointPosition(item, LM_RFOOT).y;
-
-	int vPos = std::max(lFootHeight, rFootHeight);
+	int vPos = item->Pose.Position.y + GameBoundingBox(item).Y2;
 	auto pointColl = GetCollision(item, item->Pose.Orientation.y, -probeDist);
 
 	// Assess point collision.
@@ -2614,12 +2611,9 @@ bool TestLaraLadderDismountTop(ItemInfo* item, CollisionInfo* coll)
 bool TestLaraLadderDismountBottom(ItemInfo* item, CollisionInfo* coll)
 {
 	static const int dismountDist		= CLICK(0.5f);
-	static const int dismountFloorBound = CLICK(0.6f);
+	static const int dismountFloorBound = CLICK(0.5f);
 
-	auto lFootHeight = GetJointPosition(item, LM_LFOOT).y;
-	auto rFootHeight = GetJointPosition(item, LM_RFOOT).y;
-
-	int vPos = std::max(lFootHeight, rFootHeight);
+	int vPos = item->Pose.Position.y + GameBoundingBox(item).Y2;
 	auto pointColl = GetCollision(item, item->Pose.Orientation.y, -dismountDist);
 
 	// Assess point collision.
