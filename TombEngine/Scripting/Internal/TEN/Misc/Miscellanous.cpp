@@ -12,6 +12,7 @@
 #include "Specific/configuration.h"
 #include "Specific/input.h"
 #include "Game/room.h"
+#include "Game/spotcam.h"
 
 /***
 Functions that don't fit in the other modules.
@@ -187,6 +188,15 @@ namespace Misc
 		DoFlipMap(flipmap);
 	}
 
+	///Enable FlyBy with specific ID
+	//@function PlayFlyBy
+	//@tparam short flyby (ID of flyby)
+	static void PlayFlyBy(short flyby)
+	{
+		UseSpotCam = true;
+		InitialiseSpotCam(flyby);
+	}
+
 	///Calculate the distance between two positions.
 	//@function CalculateDistance
 	//@tparam Vec3 posA first position
@@ -308,6 +318,8 @@ namespace Misc
 		table_misc.set_function(ScriptReserved_ScreenToPercent, &ScreenToPercent);
 
 		table_misc.set_function(ScriptReserved_FlipMap, &FlipMap);
+
+		table_misc.set_function(ScriptReserved_PlayFlyBy, &PlayFlyBy);
 
 	}
 }
