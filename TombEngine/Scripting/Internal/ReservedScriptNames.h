@@ -173,7 +173,7 @@ static constexpr char ScriptReserved_KeyPush[]						= "KeyPush";
 static constexpr char ScriptReserved_KeyClear[]						= "KeyClear";
 
 static constexpr char ScriptReserved_FlipMap[]						= "FlipMap";
-static constexpr char ScriptReserved_EnableFlyBy[]					= "EnableFlyBy";
+static constexpr char ScriptReserved_PlayFlyBy[]					= "PlayFlyBy";
 
 // Enums
 static constexpr char ScriptReserved_ObjID[]					= "ObjID";

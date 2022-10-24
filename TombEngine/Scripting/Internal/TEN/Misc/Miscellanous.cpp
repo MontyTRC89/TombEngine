@@ -189,9 +189,9 @@ namespace Misc
 	}
 
 	///Enable FlyBy with specific ID
-	//@function EnableFlyBy
+	//@function PlayFlyBy
 	//@tparam short flyby (ID of flyby)
-	static void EnableFlyBy(short flyby)
+	static void PlayFlyBy(short flyby)
 	{
 		UseSpotCam = true;
 		InitialiseSpotCam(flyby);
@@ -319,7 +319,7 @@ namespace Misc
 
 		table_misc.set_function(ScriptReserved_FlipMap, &FlipMap);
 
-		table_misc.set_function(ScriptReserved_EnableFlyBy, &EnableFlyBy);
+		table_misc.set_function(ScriptReserved_PlayFlyBy, &PlayFlyBy);
 
 	}
 }
