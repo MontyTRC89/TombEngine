@@ -45,7 +45,14 @@ void WreckingBallCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* 
 		int y = laraItem->Pose.Position.y;
 		int z = laraItem->Pose.Position.z;
 
-		bool test = (((x & WALL_MASK) > CLICK(1) && (x & WALL_MASK) < CLICK(3) && (z & WALL_MASK) > CLICK(1) && (z & WALL_MASK)) < CLICK(3));
+		bool test = false;
+		if ((x & WALL_MASK) > CLICK(1) &&
+			(x & WALL_MASK) < CLICK(3) &&
+			(z & WALL_MASK) > CLICK(1) &&
+			(z & WALL_MASK) < CLICK(3))
+		{
+			test = true;
+		}
 
 		int damage = (item->Animation.Velocity.y > 0.0f) ? 96 : 0;
 
