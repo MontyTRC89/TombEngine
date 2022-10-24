@@ -279,12 +279,8 @@ bool TestLaraHangJump(ItemInfo* item, CollisionInfo* coll)
 		return true;
 	}
 
-	if (coll->Middle.Ceiling > -STEPUP_HEIGHT ||
-		coll->Middle.Floor < 200 ||
-		coll->CollisionType != CT_FRONT)
-	{
+	if (coll->Middle.Floor < 200 || coll->CollisionType != CT_FRONT)
 		return false;
-	}
 
 	int edge;
 	auto edgeCatch = TestLaraEdgeCatch(item, coll, &edge);
@@ -346,7 +342,7 @@ bool TestLaraHangJumpUp(ItemInfo* item, CollisionInfo* coll)
 		return true;
 	}
 
-	if (coll->Middle.Ceiling > -STEPUP_HEIGHT || coll->CollisionType != CT_FRONT)
+	if (coll->CollisionType != CT_FRONT)
 		return false;
 
 	int edge;

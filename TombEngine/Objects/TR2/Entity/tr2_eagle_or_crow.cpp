@@ -146,7 +146,7 @@ namespace TEN::Entities::Creatures::TR2
 				break;
 
 			case 6:
-				if (!creature->Flags && item->TouchBits)
+				if (!creature->Flags && item->TouchBits.TestAny())
 				{
 					DoDamage(creature->Enemy, 20);
 

@@ -26,8 +26,8 @@ namespace TEN::Entities::Creatures::TR2
 	constexpr auto DRAGON_CONTACT_DAMAGE	  = 10;
 
 	const auto DragonMouthBite = BiteInfo(Vector3(35.0f, 171.0f, 1168.0f), 12);
-	const vector<int> DragonSwipeAttackJointsLeft  = { 24, 25, 26, 27, 28, 29, 30 };
-	const vector<int> DragonSwipeAttackJointsRight = { 1, 2, 3, 4, 5, 6, 7 };
+	const vector<uint> DragonSwipeAttackJointsLeft  = { 24, 25, 26, 27, 28, 29, 30 };
+	const vector<uint> DragonSwipeAttackJointsRight = { 1, 2, 3, 4, 5, 6, 7 };
 
 	// TODO: Organise.
 	#define DRAGON_LIVE_TIME (30 * 11)
@@ -312,7 +312,7 @@ namespace TEN::Entities::Creatures::TR2
 
 			ahead = (AI.ahead && AI.distance > DRAGON_CLOSE_RANGE && AI.distance < DRAGON_STATE_IDLE_RANGE);
 
-			if (item->TouchBits)
+			if (item->TouchBits.TestAny())
 				DoDamage(creature->Enemy, DRAGON_CONTACT_DAMAGE);
 
 			switch (item->Animation.ActiveState)
@@ -343,7 +343,7 @@ namespace TEN::Entities::Creatures::TR2
 				break;
 
 			case DRAGON_STATE_SWIPE_LEFT:
-				if (item->TestBits(JointBitType::Touch, DragonSwipeAttackJointsLeft))
+				if (item->TouchBits.Test(DragonSwipeAttackJointsLeft))
 				{
 					DoDamage(creature->Enemy, DRAGON_SWIPE_ATTACK_DAMAGE);
 					creature->Flags = 0;
@@ -352,7 +352,7 @@ namespace TEN::Entities::Creatures::TR2
 				break;
 
 			case DRAGON_STATE_SWIPE_RIGHT:
-				if (item->TestBits(JointBitType::Touch, DragonSwipeAttackJointsRight))
+				if (item->TouchBits.Test(DragonSwipeAttackJointsRight))
 				{
 					DoDamage(creature->Enemy, DRAGON_SWIPE_ATTACK_DAMAGE);
 					creature->Flags = 0;

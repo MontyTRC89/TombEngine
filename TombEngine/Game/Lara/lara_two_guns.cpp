@@ -44,7 +44,7 @@ void AnimatePistols(ItemInfo* laraItem, LaraWeaponType weaponType)
 
 	int fired = false;
 
-	if (laraItem->MeshBits)
+	if (laraItem->MeshBits.TestAny())
 	{
 		if (lara->LeftArm.GunSmoke)
 		{

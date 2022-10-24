@@ -9,6 +9,8 @@ Version 1.0.3
 * Fix occasional ejection when landing on a slope.
 * Fix slow centaur projectile velocity.
 * Adjust sprint jump timing.
+* Fix grabbing narrow ledges below ceilings.
+* Fix search animations.
 
 
 Version 1.0.2

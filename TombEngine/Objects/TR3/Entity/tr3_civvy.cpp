@@ -37,7 +37,7 @@ namespace TEN::Entities::Creatures::TR3
 	#define CIVVY_RUN_TURN_RATE_MAX	 ANGLE(6.0f)
 
 	const auto CivvyBite = BiteInfo(Vector3::Zero, 13);
-	const vector<int> CivvyAttackJoints = { 10, 13 };
+	const vector<uint> CivvyAttackJoints = { 10, 13 };
 
 	// TODO
 	enum CivvyState
@@ -330,7 +330,7 @@ namespace TEN::Entities::Creatures::TR3
 					extraTorsoRot.y = AI.angle;
 				}
 
-				if (!creature->Flags && item->TestBits(JointBitType::Touch, CivvyAttackJoints))
+				if (!creature->Flags && item->TouchBits.Test(CivvyAttackJoints))
 				{
 					CreatureEffect(item, CivvyBite, DoBloodSplat);
 					DoDamage(creature->Enemy, CIVVY_ATTACK_DAMAGE);
@@ -349,7 +349,7 @@ namespace TEN::Entities::Creatures::TR3
 					extraTorsoRot.y = AI.angle;
 				}
 
-				if (!creature->Flags && item->TestBits(JointBitType::Touch, CivvyAttackJoints))
+				if (!creature->Flags && item->TouchBits.Test(CivvyAttackJoints))
 				{
 					CreatureEffect(item, CivvyBite, DoBloodSplat);
 					DoDamage(creature->Enemy, CIVVY_ATTACK_DAMAGE);
@@ -371,7 +371,7 @@ namespace TEN::Entities::Creatures::TR3
 					extraTorsoRot.y = AI.angle;
 				}
 
-				if (creature->Flags != 2 && item->TestBits(JointBitType::Touch, CivvyAttackJoints))
+				if (creature->Flags != 2 && item->TouchBits.Test(CivvyAttackJoints))
 				{
 					DoDamage(creature->Enemy, CIVVY_SWIPE_DAMAGE);
 					CreatureEffect(item, CivvyBite, DoBloodSplat);

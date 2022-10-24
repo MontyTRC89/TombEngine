@@ -34,11 +34,11 @@ void ControlSpikyCeiling(short itemNumber)
 		}
 	}
 
-	if (item->TouchBits)
+	if (item->TouchBits.TestAny())
 	{
 		DoDamage(LaraItem, 20);
 		DoLotsOfBlood(LaraItem->Pose.Position.x, item->Pose.Position.y + CLICK(3), LaraItem->Pose.Position.z, 4, item->Pose.Orientation.y, LaraItem->RoomNumber, 3);
-		item->TouchBits = NO_JOINT_BITS;
+		item->TouchBits.ClearAll();
 
 		SoundEffect(SFX_TR4_LARA_GRABFEET, &item->Pose);
 	}

@@ -17,98 +17,6 @@ using namespace TEN::Floordata;
 using namespace TEN::Input;
 using namespace TEN::Math::Random;
 
-bool ItemInfo::TestBits(JointBitType type, std::vector<int> jointIndices)
-{
-	for (int jointIndex : jointIndices)
-	{
-		unsigned int jointBit = unsigned int(1) << jointIndex;
-
-		switch (type)
-		{
-		case JointBitType::Touch:
-			if ((TouchBits & jointBit) == jointBit)
-				return true;
-
-			break;
-
-		case JointBitType::Mesh:
-			if ((MeshBits & jointBit) == jointBit)
-				return true;
-
-			break;
-
-		case JointBitType::MeshSwap:
-			if ((MeshSwapBits & jointBit) == jointBit)
-				return true;
-
-			break;
-		}
-	}
-
-	return false;
-}
-
-bool ItemInfo::TestBits(JointBitType type, int jointIndex)
-{
-	return TestBits(type, std::vector{ jointIndex });
-}
-
-void ItemInfo::SetBits(JointBitType type, std::vector<int> jointIndices)
-{
-	for (int jointIndex : jointIndices)
-	{
-		unsigned int jointBit = unsigned int(1 << jointIndex);
-
-		switch (type)
-		{
-		case JointBitType::Touch:
-			this->TouchBits |= jointBit;
-			break;
-
-		case JointBitType::Mesh:
-			this->MeshBits |= jointBit;
-			break;
-
-		case JointBitType::MeshSwap:
-			this->MeshSwapBits |= jointBit;
-			break;
-		}
-	}
-}
-
-void ItemInfo::SetBits(JointBitType type, int jointIndex)
-{
-	return SetBits(type, std::vector{ jointIndex });
-}
-
-void ItemInfo::ClearBits(JointBitType type, std::vector<int> jointIndices)
-{
-	for (int jointIndex : jointIndices)
-	{
-		unsigned int jointBit = unsigned int(1 << jointIndex);
-
-		switch (type)
-		{
-		case JointBitType::Touch:
-			this->TouchBits &= ~jointBit;
-			break;
-
-		case JointBitType::Mesh:
-			this->MeshBits &= ~jointBit;
-			break;
-
-		case JointBitType::MeshSwap:
-			this->MeshSwapBits &= ~jointBit;
-			break;
-		}
-	}
-}
-
-void ItemInfo::ClearBits(JointBitType type, int jointIndex)
-{
-	return ClearBits(type, std::vector{ jointIndex });
-}
-
 bool ItemInfo::TestOcb(short ocbFlags)
 {
 	return ((TriggerFlags & ocbFlags) == ocbFlags);
@@ -121,7 +29,7 @@ void ItemInfo::RemoveOcb(short ocbFlags)
 
 void ItemInfo::ClearAllOcb()
 {
-	TriggerFlags = NULL;
+	TriggerFlags = 0;
 }
 
 bool ItemInfo::TestFlags(short id, short value)

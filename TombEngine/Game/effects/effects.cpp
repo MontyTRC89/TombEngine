@@ -1044,7 +1044,7 @@ void TriggerLaraBlood()
 
 	for (int i = 0; i < LARA_MESHES::LM_HEAD; i++)
 	{
-		if (node & LaraItem->TouchBits)
+		if (node & LaraItem->TouchBits.ToPackedBits())
 		{
 			Vector3Int vec;
 			vec.x = (GetRandomControl() & 31) - 16;
