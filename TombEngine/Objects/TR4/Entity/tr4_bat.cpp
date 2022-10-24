@@ -50,7 +50,7 @@ namespace TEN::Entities::TR4
 
 	bool IsBatCollideTarget(ItemInfo* item)
 	{
-		return (item->TouchBits >= 0);
+		return (item->TouchBits.ToPackedBits() >= 0);
 	}
 
 	void InitialiseBat(short itemNumber)
@@ -107,7 +107,7 @@ namespace TEN::Entities::TR4
 
 				if (!creature->Flags)
 				{
-					if (item->TouchBits ||
+					if (item->TouchBits.TestAny() ||
 						(!creature->Enemy->IsLara() &&
 						AI.distance < BAT_ATTACK_RANGE && AI.ahead &&
 						abs(item->Pose.Position.y - creature->Enemy->Pose.Position.y) < BAT_UNFURL_HEIGHT_RANGE))
@@ -120,7 +120,7 @@ namespace TEN::Entities::TR4
 
 			case BAT_STATE_ATTACK:
 				if (!creature->Flags &&
-					(item->TouchBits || !creature->Enemy->IsLara()) &&
+					(item->TouchBits.TestAny() || !creature->Enemy->IsLara()) &&
 					AI.distance < BAT_ATTACK_RANGE && AI.ahead &&
 					abs(item->Pose.Position.y - creature->Enemy->Pose.Position.y) < BAT_UNFURL_HEIGHT_RANGE)
 				{

@@ -311,7 +311,7 @@ namespace TEN::Entities::Creatures::TR5
 		auto* item = &g_Level.Items[itemNumber];
 		auto* creature = GetCreatureInfo(item);
 
-		int oldMeshSwapBits = item->MeshSwapBits;
+		int oldMeshSwapBits = item->MeshSwapBits.ToPackedBits();
 
 		// At determined HP values, roman statues sheds material.
 		if (item->HitPoints < 1 && !(item->MeshSwapBits & 0x10000))
@@ -341,7 +341,7 @@ namespace TEN::Entities::Creatures::TR5
 		}
 
 		// Play hit animation.
-		if (oldMeshSwapBits != item->MeshSwapBits)
+		if (oldMeshSwapBits != item->MeshSwapBits.ToPackedBits())
 		{
 			item->Animation.TargetState = STATUE_STATE_HIT;
 			item->Animation.ActiveState = STATUE_STATE_HIT;
@@ -845,7 +845,7 @@ namespace TEN::Entities::Creatures::TR5
 			{
 				if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 54 &&
 					item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].frameBase + 74 &&
-					item->TouchBits)
+					item->TouchBits.TestAny())
 				{
 					DoDamage(creature->Enemy, 40);
 				}

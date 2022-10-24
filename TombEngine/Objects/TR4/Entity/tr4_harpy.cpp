@@ -31,8 +31,8 @@ namespace TEN::Entities::TR4
 	const auto HarpyBite3	= BiteInfo(Vector3::Zero, 15);
 	const auto HarpyAttack1 = BiteInfo(Vector3(0.0f, 128.0f, 0.0f), 2);
 	const auto HarpyAttack2 = BiteInfo(Vector3(0.0f, 128.0f, 0.0f), 4);
-	const vector<int> HarpySwoopAttackJoints   = { HarpyBite2.meshNum, HarpyBite1.meshNum, HarpyBite3.meshNum };
-	const vector<int> HarpyStingerAttackJoints = { HarpyAttack1.meshNum, HarpyAttack2.meshNum };
+	const vector<uint> HarpySwoopAttackJoints   = { 2, 4, 15 };
+	const vector<uint> HarpyStingerAttackJoints = { 2, 4 };
 
 	enum HarpyState
 	{
@@ -505,7 +505,7 @@ namespace TEN::Entities::TR4
 				item->Animation.TargetState = HARPY_STATE_FLY_FORWARD;
 				creature->MaxTurn = ANGLE(2.0f);
 
-				if (item->TestBits(JointBitType::Touch, HarpySwoopAttackJoints) ||
+				if (item->TouchBits.Test(HarpySwoopAttackJoints) ||
 					creature->Enemy != nullptr && !creature->Enemy->IsLara() &&
 					abs(creature->Enemy->Pose.Position.y - item->Pose.Position.y) <= SECTOR(1) &&
 					AI.distance < pow(SECTOR(2), 2))
@@ -524,7 +524,7 @@ namespace TEN::Entities::TR4
 				creature->MaxTurn = ANGLE(2.0f);
 
 				if (creature->Flags == 0 &&
-					(item->TestBits(JointBitType::Touch, HarpyStingerAttackJoints) ||
+					(item->TouchBits.Test(HarpyStingerAttackJoints) ||
 						creature->Enemy != nullptr && !creature->Enemy->IsLara() &&
 						abs(creature->Enemy->Pose.Position.y - item->Pose.Position.y) <= SECTOR(1) &&
 						AI.distance < pow(SECTOR(2), 2)))

@@ -262,6 +262,7 @@ CALL gen.bat</Command>
     <ClInclude Include="Scripting\ReservedScriptNames.h" />
     <ClInclude Include="Scripting\ScriptAssert.h" />
     <ClInclude Include="Scripting\ScriptUtil.h" />
+    <ClInclude Include="Specific\BitField.h" />
     <ClInclude Include="Specific\memory\LinearArrayBuffer.h" />
     <ClInclude Include="Game\memory\MemoryPoolAllocator.h" />
     <ClInclude Include="Specific\memory\Vector.h" />
@@ -672,6 +673,7 @@ CALL gen.bat</Command>
     <ClCompile Include="Scripting\Internal\TEN\Strings\DisplayString\DisplayString.cpp" />
     <ClCompile Include="Scripting\Internal\TEN\Strings\StringsHandler.cpp" />
     <ClCompile Include="Scripting\Internal\TEN\Vec3\Vec3.cpp" />
+    <ClCompile Include="Specific\BitField.cpp" />
     <ClCompile Include="Specific\phd_global.cpp" />
     <ClCompile Include="Specific\prng.cpp" />
     <ClCompile Include="Objects\Generic\puzzles_keys.cpp" />

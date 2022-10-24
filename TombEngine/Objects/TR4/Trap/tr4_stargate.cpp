@@ -18,7 +18,7 @@ namespace TEN::Entities::Traps
 {
 	constexpr auto STARGATE_HARM_DAMAGE = 100;
 
-	const vector<int> StargateHarmJoints = { 9, 10, 12, 13, 15, 16, 18, 19, 21, 22, 24, 25 };
+	const vector<uint> StargateHarmJoints = { 9, 10, 12, 13, 15, 16, 18, 19, 21, 22, 24, 25 };
 	const vector<Vector3Int> StargateBounds =
 	{
 		Vector3Int(-CLICK(2), CLICK(2), -SECTOR(2)), 
@@ -71,7 +71,7 @@ namespace TEN::Entities::Traps
 			// Blades deal damage cumulatively.
 			for (int i = 0; i < StargateHarmJoints.size(); i++)
 			{
-				if (item->TestBits(JointBitType::Touch, StargateHarmJoints[i]))
+				if (item->TouchBits.Test(StargateHarmJoints[i]))
 				{
 					DoDamage(laraItem, STARGATE_HARM_DAMAGE);
 					DoBloodSplat(

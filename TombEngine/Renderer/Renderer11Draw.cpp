@@ -66,7 +66,7 @@ namespace TEN::Renderer
 				{
 					for (auto i = 0; i < sphereMeshes.size(); i++)
 					{
-						if (!nativeItem.TestBits(JointBitType::Mesh, sphereMeshes[i]))
+						if (!nativeItem.MeshBits.Test(sphereMeshes[i]))
 							continue;
 
 						MESH& m = g_Level.Meshes[Lara.MeshPtrs[sphereMeshes[i]]];
@@ -1742,7 +1742,7 @@ namespace TEN::Renderer
 			RendererMesh* mesh = moveableObj.ObjectMeshes[k];
 
 			// Do the swapmesh
-			if (obj->meshSwapSlot != -1 && m_moveableObjects[obj->meshSwapSlot].has_value() && ((nativeItem->MeshSwapBits >> k) & 1))
+			if (obj->meshSwapSlot != -1 && m_moveableObjects[obj->meshSwapSlot].has_value() && ((nativeItem->MeshSwapBits.ToPackedBits() >> k) & 1))
 			{
 				RendererObject& swapMeshObj = *m_moveableObjects[obj->meshSwapSlot];
 				if (swapMeshObj.ObjectMeshes.size() > k)
