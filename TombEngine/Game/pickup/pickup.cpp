@@ -952,7 +952,7 @@ void SearchObjectCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* 
 	auto* item = &g_Level.Items[itemNumber];
 	auto* lara = GetLaraInfo(laraItem);
 
-	int objectNumber = (item->ObjectNumber - ID_SEARCH_OBJECT1) / 2;
+	int objectNumber = (item->ObjectNumber - ID_SEARCH_OBJECT1);
 
 	if ((TrInput & IN_ACTION &&
 		laraItem->Animation.ActiveState == LS_IDLE &&
@@ -1017,7 +1017,7 @@ void SearchObjectControl(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
 
-	int objectNumber = (item->ObjectNumber - ID_SEARCH_OBJECT1) / 2;
+	int objectNumber = (item->ObjectNumber - ID_SEARCH_OBJECT1);
 
 	if (item->ObjectNumber != ID_SEARCH_OBJECT4 || item->ItemFlags[0] == 1)
 		AnimateItem(item);

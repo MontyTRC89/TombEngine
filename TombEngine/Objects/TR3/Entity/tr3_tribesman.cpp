@@ -25,8 +25,8 @@ namespace TEN::Entities::Creatures::TR3
 	const auto TribesmanAxeBite	  = BiteInfo(Vector3(0.0f, 16.0f, 265.0f), 13);
 	const auto TribesmanDartBite1 = BiteInfo(Vector3(0.0f, 0.0f, -200.0f), 13);
 	const auto TribesmanDartBite2 = BiteInfo(Vector3(8.0f, 40.0f, -248.0f), 13);
-	const vector<int> TribesmanAxeAttackJoints	= { 13 };
-	const vector<int> TribesmanDartAttackJoints = { 10, 13 }; // TODO: Check.
+	const vector<uint> TribesmanAxeAttackJoints	= { 13 };
+	const vector<uint> TribesmanDartAttackJoints = { 10, 13 }; // TODO: Check.
 
 	const unsigned char TribesmanAxeHit[13][3] =
 	{
@@ -298,7 +298,7 @@ namespace TEN::Entities::Creatures::TR3
 
 				if (creature->Enemy->IsLara())
 				{
-					if (item->TestBits(JointBitType::Touch, TribesmanAxeAttackJoints) &&
+					if (item->TouchBits.Test(TribesmanAxeAttackJoints) &&
 						creature->Flags >= TribesmanAxeHit[item->Animation.ActiveState][0] &&
 						creature->Flags <= TribesmanAxeHit[item->Animation.ActiveState][1])
 					{
@@ -593,7 +593,7 @@ namespace TEN::Entities::Creatures::TR3
 				if (creature->Enemy->IsLara())
 				{
 					if (!(creature->Flags & 0xf000) &&
-						item->TestBits(JointBitType::Touch, TribesmanDartAttackJoints))
+						item->TouchBits.Test(TribesmanDartAttackJoints))
 					{
 						DoDamage(creature->Enemy, 100);
 						CreatureEffect(item, TribesmanDartBite1, DoBloodSplat);

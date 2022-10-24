@@ -19,7 +19,7 @@ namespace TEN::Entities::TR4
 	constexpr auto HAMMERHEAD_ATTACK_RANGE = SQUARE(SECTOR(0.66f));
 
 	const auto HammerheadBite = BiteInfo(Vector3::Zero, 12);
-	const vector<int> HammerheadBiteAttackJoints = { 10, 12, 13 };
+	const vector<uint> HammerheadBiteAttackJoints = { 10, 12, 13 };
 
 	enum HammerheadState
 	{
@@ -127,7 +127,7 @@ namespace TEN::Entities::TR4
 			case HAMMERHEAD_STATE_IDLE_BITE_ATTACK:
 				if (!creature->Flags)
 				{
-					if (item->TestBits(JointBitType::Touch, HammerheadBiteAttackJoints))
+					if (item->TouchBits.Test(HammerheadBiteAttackJoints))
 					{
 						DoDamage(creature->Enemy, HAMMERHEAD_BITE_ATTACK_DAMAGE);
 						CreatureEffect(item, HammerheadBite, DoBloodSplat);

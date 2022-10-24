@@ -24,7 +24,7 @@ namespace TEN::Entities::TR4
 	constexpr auto BIG_BEETLE_AWARE_RANGE  = SQUARE(CLICK(12));
 
 	const auto BigBeetleBite = BiteInfo(Vector3::Zero, 12);
-	const vector<int> BigBeetleAttackJoints = { 5, 6 };
+	const vector<uint> BigBeetleAttackJoints = { 5, 6 };
 
 	enum BigBeetleState
 	{
@@ -175,7 +175,7 @@ namespace TEN::Entities::TR4
 				}
 
 				if (!creature->Flags &&
-					item->TestBits(JointBitType::Touch, BigBeetleAttackJoints))
+					item->TouchBits.Test(BigBeetleAttackJoints))
 				{
 					DoDamage(creature->Enemy, BIG_BEETLE_ATTACK_DAMAGE);
 					CreatureEffect2(item, BigBeetleBite, 5, -1, DoBloodSplat);
