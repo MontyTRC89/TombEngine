@@ -16,6 +16,7 @@ Version 1.0.3
 * Fix search animations.
 * Fix grabbing narrow ledges below ceilings.
 * Fix Sarcophagus
+* Fix Underwater Door and Double Doors be interactable again infinite times after opening.
 
 
 Version 1.0.2
