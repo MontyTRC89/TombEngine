@@ -40,8 +40,9 @@ namespace TEN::Input
 
 	bool InputAction::IsHeld(float delayInSec) const
 	{
+		// TODO: Why doesnt this work??
 		float delayInFrameTime = round(delayInSec / DELTA_TIME);
-		return ((Value != 0.0f) && (TimeActive >= delayInFrameTime));
+		return ((Value != 0.0f) /*&& (TimeActive >= delayInFrameTime)*/);
 	}
 
 	// To avoid desync on the second pulse, ensure initialDelayInSec is a multiple of delayInSec.
