@@ -19,6 +19,8 @@
 #include "Rotation/Rotation.h"
 #include "Vec3/Vec3.h"
 #include "Game/Lara/lara_fire.h"
+#include "Objects/Generic/Object/burning_torch.h"
+#include "Game/Lara/lara_flare.h"
 
 /***
 Represents any object inside the game world.
@@ -464,7 +466,11 @@ ScriptReserved_GetSlotHP, & Moveable::GetSlotHP,
 
 /// ThrowawayTorch
 // @function Lara will throw away the torch if she helds one in her hand.
-	ScriptReserved_ThrowawayTorch, & Moveable::ThrowawayTorch);
+	ScriptReserved_ThrowawayTorch, & Moveable::ThrowawayTorch,
+
+/// Set Laras current weapon type.
+//@function 0=None, 1=Pistols, 2=Revolver, 3=Uzi, 4=Shotgun, 5=HK, 6=Crossbow, 7=Flare, 8=Torch, 9=GrenadeLauncher, 10=Harpoon, 11=RocketLauncher.
+	ScriptReserved_SetLaraWeaponType, & Moveable::SetLaraWeaponType);
 }
 
 
@@ -1104,4 +1110,41 @@ void Moveable::AnimFromObject(GAME_OBJECT_ID object, int animNumber, int stateID
 	m_item->Animation.ActiveState = stateID;
 	m_item->Animation.FrameNumber = g_Level.Anims[m_item->Animation.AnimNumber].frameBase;
 	AnimateItem(m_item);
+}
+
+//Set Lara Weapon type.
+//0=None, 1=Pistols, 2=Revolver, 3=Uzi, 4=Shotgun, 5=HK, 6=Crossbow, 7=Flare, 8=Torch, 9=GrenadeLauncher, 10=Harpoon, 11=RocketLauncher.
+void Moveable::SetLaraWeaponType(LaraWeaponType weaponType, bool activate)
+{
+	if (m_item->IsLara())
+	{
+		auto* lara = GetLaraInfo(m_item);
+
+		switch (weaponType)
+		{
+		case LaraWeaponType::Flare:
+			lara->Control.Weapon.RequestGunType = LaraWeaponType::Flare;
+		break;
+		case LaraWeaponType::Torch:
+			using namespace TEN::Entities::Generic;
+			if (activate == false)
+			{
+				GetFlameTorch();
+				lara->Torch.IsLit = false;
+				break;
+			}
+			else
+			{
+				GetFlameTorch();
+				lara->Torch.IsLit=true;
+		break;
+			}
+		default:
+				if (activate == false)
+				lara->Control.Weapon.LastGunType = weaponType;
+				else
+				lara->Control.Weapon.RequestGunType = weaponType;
+		break;
+		}
+	}
 }
