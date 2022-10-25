@@ -710,9 +710,9 @@ namespace TEN::Input
 		return ActionMap[(int)actionID].IsClicked();
 	}
 
-	bool IsHeld(ActionID actionID)
+	bool IsHeld(ActionID actionID, float delayInSec)
 	{
-		return ActionMap[(int)actionID].IsHeld();
+		return ActionMap[(int)actionID].IsHeld(delayInSec);
 	}
 
 	bool IsPulsed(ActionID actionID, float delayInSec, float initialDelayInSec)
@@ -720,9 +720,9 @@ namespace TEN::Input
 		return ActionMap[(int)actionID].IsPulsed(delayInSec, initialDelayInSec);
 	}
 
-	bool IsReleased(ActionID actionID)
+	bool IsReleased(ActionID actionID, float maxDelayInSec)
 	{
-		return ActionMap[(int)actionID].IsReleased();
+		return ActionMap[(int)actionID].IsReleased(maxDelayInSec);
 	}
 
 	float GetActionValue(ActionID actionID)

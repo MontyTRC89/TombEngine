@@ -38,9 +38,9 @@ namespace TEN::Input
 		return ((Value != 0.0f) && (PrevValue == 0.0f));
 	}
 
-	bool InputAction::IsHeld() const
+	bool InputAction::IsHeld(float delayInSec) const
 	{
-		return (Value != 0.0f);
+		return ((Value != 0.0f) && (TimeActive >= round(delayInSec / DELTA_TIME)));
 	}
 
 	// To avoid desync on the second pulse, ensure initialDelayInSec is a multiple of delayInSec.
@@ -72,7 +72,7 @@ namespace TEN::Input
 
 	bool InputAction::IsReleased(float maxDelayInSec) const
 	{
-		return ((Value == 0.0f) && (PrevValue != 0.0f) && (TimeActive <= maxDelayInSec));
+		return ((Value == 0.0f) && (PrevValue != 0.0f) && (TimeActive <= round(maxDelayInSec / DELTA_TIME)));
 	}
 
 	void InputAction::Update(float value)
