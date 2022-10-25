@@ -2672,14 +2672,15 @@ bool TestLaraLadderDismountBottom(ItemInfo* item, CollisionInfo* coll)
 bool TestLaraLadderSideDismount(ItemInfo* item, CollisionInfo* coll, bool isGoingLeft)
 {
 	return false;
-	static const int dismountDist		= CLICK(1.5f);
-	static const int dismountFloorBound = CLICK(0.25f);
+	static constexpr int dismountDist		= CLICK(1.5f);
+	static constexpr int dismountFloorBound = CLICK(0.25f);
 
 	int vPos = item->Pose.Position.y;
 	auto pointColl = GetCollision(item, item->Pose.Orientation.y + (isGoingLeft ? -ANGLE(90.0f) : ANGLE(90.0f)), dismountDist);
 
 	// Assess point collision.
 	if ((pointColl.Position.Floor - vPos) <= dismountFloorBound &&				 // Floor height is within dismount height bound.
+		(pointColl.Position.Ceiling - vPos) < -LARA_HEIGHT &&					 // Ceiling height is within highest ceiling bound.
 		(pointColl.Position.Ceiling - pointColl.Position.Floor) > LARA_HEIGHT && // Space isn't too narrow.
 		!pointColl.Position.FloorSlope)											 // Avoid slopes.
 	{
