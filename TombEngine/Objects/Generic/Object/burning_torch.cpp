@@ -255,7 +255,7 @@ namespace TEN::Entities::Generic
 				}
 			}
 			else if (CollidedMeshes[0])
-				ItemPushStatic(item, CollidedMeshes[0], &LaraCollision);
+				ItemPushStatic(item, *CollidedMeshes[0], &LaraCollision);
 			
 			item->Animation.Velocity.z = -int(item->Animation.Velocity.z / 1.5f);
 		}

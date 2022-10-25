@@ -605,25 +605,25 @@ bool TestBoundsCollide(ItemInfo* item, ItemInfo* laraItem, int radius)
 	return false;
 }
 
-bool TestBoundsCollideStatic(ItemInfo* item, MESH_INFO* mesh, int radius)
+bool TestBoundsCollideStatic(ItemInfo* item, const MESH_INFO& mesh, int radius)
 {
-	const auto& bounds = GetBoundsAccurate(*mesh, false);
+	const auto& bounds = GetBoundsAccurate(mesh, false);
 
 	if (!(bounds.Z2 != 0 || bounds.Z1 != 0 || bounds.X1 != 0 || bounds.X2 != 0 || bounds.Y1 != 0 || bounds.Y2 != 0))
 		return false;
 
 	auto* frame = GetBestFrame(item);
-	if (mesh->pos.Position.y + bounds.Y2 <= item->Pose.Position.y + frame->boundingBox.Y1)
+	if (mesh.pos.Position.y + bounds.Y2 <= item->Pose.Position.y + frame->boundingBox.Y1)
 		return false;
 
-	if (mesh->pos.Position.y + bounds.Y1 >= item->Pose.Position.y + frame->boundingBox.Y2)
+	if (mesh.pos.Position.y + bounds.Y1 >= item->Pose.Position.y + frame->boundingBox.Y2)
 		return false;
 
-	float sinY = phd_sin(mesh->pos.Orientation.y);
-	float cosY = phd_cos(mesh->pos.Orientation.y);
+	float sinY = phd_sin(mesh.pos.Orientation.y);
+	float cosY = phd_cos(mesh.pos.Orientation.y);
 
-	int x = item->Pose.Position.x - mesh->pos.Position.x;
-	int z = item->Pose.Position.z - mesh->pos.Position.z;
+	int x = item->Pose.Position.x - mesh.pos.Position.x;
+	int z = item->Pose.Position.z - mesh.pos.Position.z;
 	int dx = (x * cosY) - (z * sinY);
 	int dz = (z * cosY) + (x * sinY);
 
@@ -639,7 +639,7 @@ bool TestBoundsCollideStatic(ItemInfo* item, MESH_INFO* mesh, int radius)
 }
 
 // NOTE: Previously ItemPushLara().
-bool ItemPushItem(ItemInfo* item, ItemInfo* item2, CollisionInfo* coll, bool spasmEnabled, char bigPush)
+bool ItemPushItem(ItemInfo* item, ItemInfo* item2, CollisionInfo* coll, bool enableSpasm, char bigPush)
 {
 	float sinY = phd_sin(item->Pose.Orientation.y);
 	float cosY = phd_cos(item->Pose.Orientation.y);
@@ -693,7 +693,7 @@ bool ItemPushItem(ItemInfo* item, ItemInfo* item2, CollisionInfo* coll, bool spa
 
 	auto* lara = item2->IsLara() ? GetLaraInfo(item2) : nullptr;
 
-	if (lara != nullptr && spasmEnabled && (bounds->Y2 - bounds->Y1) > CLICK(1))
+	if (lara != nullptr && enableSpasm && (bounds->Y2 - bounds->Y1) > CLICK(1))
 	{
 		rx = (bounds->X1 + bounds->X2) / 2;
 		rz = (bounds->Z1 + bounds->Z2) / 2;
@@ -746,15 +746,15 @@ bool ItemPushItem(ItemInfo* item, ItemInfo* item2, CollisionInfo* coll, bool spa
 }
 
 // NOTE: Previously ItemPushLaraStatic().
-bool ItemPushStatic(ItemInfo* item, MESH_INFO* mesh, CollisionInfo* coll)
+bool ItemPushStatic(ItemInfo* item, const MESH_INFO& mesh, CollisionInfo* coll)
 {
-	const auto& bounds = GetBoundsAccurate(*mesh, false);
+	const auto& bounds = GetBoundsAccurate(mesh, false);
 
-	float sinY = phd_sin(mesh->pos.Orientation.y);
-	float cosY = phd_cos(mesh->pos.Orientation.y);
+	float sinY = phd_sin(mesh.pos.Orientation.y);
+	float cosY = phd_cos(mesh.pos.Orientation.y);
 	
-	auto direction = item->Pose.Position - mesh->pos.Position;
-	auto dz = item->Pose.Position.z - mesh->pos.Position.z;
+	auto direction = item->Pose.Position - mesh.pos.Position;
+	auto dz = item->Pose.Position.z - mesh.pos.Position.z;
 	auto rx = (direction.x * cosY) - (direction.z * sinY);
 	auto rz = (direction.z * cosY) + (direction.x * sinY);
 	auto minX = bounds.X1 - coll->Setup.Radius;
@@ -783,8 +783,8 @@ bool ItemPushStatic(ItemInfo* item, MESH_INFO* mesh, CollisionInfo* coll)
 	else
 		rz -= bottom;
 
-	item->Pose.Position.x = mesh->pos.Position.x + cosY * rx + sinY * rz;
-	item->Pose.Position.z = mesh->pos.Position.z + cosY * rz - sinY * rx;
+	item->Pose.Position.x = mesh.pos.Position.x + cosY * rx + sinY * rz;
+	item->Pose.Position.z = mesh.pos.Position.z + cosY * rz - sinY * rx;
 
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
@@ -835,19 +835,19 @@ void CollideSolidStatics(ItemInfo* item, CollisionInfo* coll)
 			float distance = Vector3i::Distance(item->Pose.Position, mesh.pos.Position);
 			if (distance < COLLISION_CHECK_DISTANCE)
 			{
-				if (CollideSolidBounds(item, &GetBoundsAccurate(mesh, false), mesh.pos, coll))
+				if (CollideSolidBounds(item, GetBoundsAccurate(mesh, false), mesh.pos, coll))
 					coll->HitStatic = true;
 			}
 		}
 	}
 }
 
-bool CollideSolidBounds(ItemInfo* item, GameBoundingBox* box, Pose pose, CollisionInfo* coll)
+bool CollideSolidBounds(ItemInfo* item, const GameBoundingBox& box, const Pose& pose, CollisionInfo* coll)
 {
 	bool result = false;
 
 	// Get DX static bounds in global coordinates.
-	auto staticBounds = box->ToBoundingOrientedBox(pose);
+	auto staticBounds = box.ToBoundingOrientedBox(pose);
 
 	// Get local TR bounds and DX item bounds in global coordinates.
 	auto itemBBox = GameBoundingBox(item);
@@ -993,12 +993,12 @@ bool CollideSolidBounds(ItemInfo* item, GameBoundingBox* box, Pose pose, Collisi
 	auto z = round((distance.x * sinY) + (distance.z * cosY)) + pose.Position.z;
 
 	// Determine identity static collision bounds.
-	auto xMin = pose.Position.x + box->X1;
-	auto xMax = pose.Position.x + box->X2;
-	auto yMin = pose.Position.y + box->Y1;
-	auto yMax = pose.Position.y + box->Y2;
-	auto zMin = pose.Position.z + box->Z1;
-	auto zMax = pose.Position.z + box->Z2;
+	auto xMin = pose.Position.x + box.X1;
+	auto xMax = pose.Position.x + box.X2;
+	auto yMin = pose.Position.y + box.Y1;
+	auto yMax = pose.Position.y + box.Y2;
+	auto zMin = pose.Position.z + box.Z1;
+	auto zMax = pose.Position.z + box.Z2;
 
 	// Determine item collision bounds.
 	auto inXMin = x + collBox.X1;
@@ -1766,17 +1766,17 @@ void DoObjectCollision(ItemInfo* laraItem, CollisionInfo* coll)
 
 		for (int j = 0; j < g_Level.Rooms[i].mesh.size(); j++)
 		{
-			auto* mesh = &g_Level.Rooms[i].mesh[j];
+			auto& mesh = g_Level.Rooms[i].mesh[j];
 
-			if (!(mesh->flags & StaticMeshFlags::SM_VISIBLE))
+			if (!(mesh.flags & StaticMeshFlags::SM_VISIBLE))
 				continue;
 
 			// For Lara, solid static mesh collisions are directly managed by GetCollisionInfo,
 			// so we bypass them here to avoid interference.
-			if (doPlayerCollision && (mesh->flags & StaticMeshFlags::SM_SOLID))
+			if (doPlayerCollision && (mesh.flags & StaticMeshFlags::SM_SOLID))
 				continue;
 
-			if (Vector3i::Distance(mesh->pos.Position, laraItem->Pose.Position) >= COLLISION_CHECK_DISTANCE)
+			if (Vector3i::Distance(mesh.pos.Position, laraItem->Pose.Position) >= COLLISION_CHECK_DISTANCE)
 				continue;
 
 			if (!TestBoundsCollideStatic(laraItem, mesh, coll->Setup.Radius))
@@ -1787,10 +1787,10 @@ void DoObjectCollision(ItemInfo* laraItem, CollisionInfo* coll)
 			// HACK: Shatter statics only by non-harmless vehicles.
 			if (!doPlayerCollision && 
 				!harmless && abs(laraItem->Animation.Velocity.z) > VEHICLE_COLLISION_TERMINAL_VELOCITY &&
-				StaticObjects[mesh->staticNumber].shatterType != SHT_NONE)
+				StaticObjects[mesh.staticNumber].shatterType != SHT_NONE)
 			{
-				SoundEffect(GetShatterSound(mesh->staticNumber), (Pose*)mesh);
-				ShatterObject(nullptr, mesh, -128, laraItem->RoomNumber, 0);
+				SoundEffect(GetShatterSound(mesh.staticNumber), (Pose*&)mesh);
+				ShatterObject(nullptr, &mesh, -128, laraItem->RoomNumber, 0);
 			}
 			else if (coll->Setup.EnableObjectPush)
 				ItemPushStatic(laraItem, mesh, coll);

@@ -38,11 +38,11 @@ bool ItemNearTarget(const Vector3i& origin, ItemInfo* targetEntity, int radius);
 bool Move3DPosTo3DPos(ItemInfo* item, Pose& fromPose, const Pose& toPose, int velocity, short turnRate);
 
 bool TestBoundsCollide(ItemInfo* item, ItemInfo* laraItem, int radius);
-bool TestBoundsCollideStatic(ItemInfo* item, MESH_INFO* mesh, int radius);
-bool ItemPushItem(ItemInfo* item, ItemInfo* laraItem, CollisionInfo* coll, bool spasmEnabled, char bigPush);
-bool ItemPushStatic(ItemInfo* laraItem, MESH_INFO* mesh, CollisionInfo* coll);
+bool TestBoundsCollideStatic(ItemInfo* item, const MESH_INFO& mesh, int radius);
+bool ItemPushItem(ItemInfo* item, ItemInfo* laraItem, CollisionInfo* coll, bool enableSpasm, char bigPush);
+bool ItemPushStatic(ItemInfo* laraItem, const MESH_INFO& mesh, CollisionInfo* coll);
 
-bool CollideSolidBounds(ItemInfo* item, GameBoundingBox* box, Pose pose, CollisionInfo* coll);
+bool CollideSolidBounds(ItemInfo* item, const GameBoundingBox& box, const Pose& pose, CollisionInfo* coll);
 void CollideSolidStatics(ItemInfo* item, CollisionInfo* coll);
 
 void AIPickupCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);
