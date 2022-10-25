@@ -2,7 +2,7 @@ Version 1.0.3
 =============
 
 * Add ledge jumps (Lara object must be updated with new animations to make it work).
-* Add FlipMap and EnableFlyBy script commands and node functions.
+* Add FlipMap and PlayFlyBy script commands and node functions.
 * Add OCB 1 for rollingball to make it silent.
 * Add FlyCheat option for disable Fly Cheat to gameflow.
 * Adjust sprint jump timing.
