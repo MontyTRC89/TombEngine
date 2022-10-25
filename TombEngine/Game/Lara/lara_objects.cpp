@@ -790,7 +790,7 @@ void lara_as_ladder_idle(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 	
-	item->Animation.TargetState = LS_FREEFALL;
+	item->Animation.TargetState = LS_JUMP_UP;
 }
 
 // State:	LS_LADDER_IDLE (174)

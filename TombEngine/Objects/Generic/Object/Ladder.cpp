@@ -48,7 +48,7 @@ namespace TEN::Entities::Generic
 	{
 		GameBoundingBox(
 			-CLICK(1), CLICK(1),
-			0, 0,
+			-CLICK(1), CLICK(1),
 			-CLICK(1.5f), CLICK(1.5f)
 		),
 		ANGLE(-10.0f), ANGLE(10.0f),

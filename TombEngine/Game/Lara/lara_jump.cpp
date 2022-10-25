@@ -362,7 +362,7 @@ void lara_col_jump_prepare(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (TestLaraFall(item, coll))
+	/*if (TestLaraFall(item, coll))
 	{
 		SetLaraFallAnimation(item);
 		return;
@@ -373,7 +373,7 @@ void lara_col_jump_prepare(ItemInfo* item, CollisionInfo* coll)
 		SetLaraSlideAnimation(item, coll);
 		SetLaraLand(item, coll);
 		return;
-	}
+	}*/
 
 	ShiftItem(item, coll);
 
@@ -628,6 +628,7 @@ void lara_col_jump_up(ItemInfo* item, CollisionInfo* coll)
 	auto* lara = GetLaraInfo(item);
 
 	lara->Control.MoveAngle = item->Pose.Orientation.y;
+	item->Animation.IsAirborne = true;
 	coll->Setup.Height = LARA_HEIGHT_STRETCH;
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
