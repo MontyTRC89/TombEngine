@@ -100,6 +100,7 @@ public:
 
 	HandStatus GetLaraHandStatus() const;
 	LaraWeaponType GetLaraWeaponType() const;
+	void SetLaraWeaponType(LaraWeaponType weaponType, bool activate);
 	void ThrowawayTorch();
 	void AnimFromObject(GAME_OBJECT_ID object, int animNumber, int stateID);
 	void UndrawWeapons();
