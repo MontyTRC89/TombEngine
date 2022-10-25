@@ -230,8 +230,8 @@ void lara_col_reach(ItemInfo* item, CollisionInfo* coll)
 
 	lara->Control.MoveAngle = item->Pose.Orientation.y;
 
-	// HACK: height is altered according to VerticalVelocity to fix "issues" with physically impossible
-	// 6-click high ceiling running jumps. While TEN model is physically correct, original engines
+	// HACK: height is altered according to Velocity.y to fix "issues" with physically impossible
+	// 1.5 block high ceiling running jumps. While TEN model is physically correct, original engines
 	// allowed certain margin of deflection due to bug caused by hacky inclusion of headroom in coll checks.
 
 	coll->Setup.Height = item->Animation.Velocity.y > 0 ? LARA_HEIGHT_REACH : LARA_HEIGHT;

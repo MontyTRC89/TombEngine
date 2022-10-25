@@ -26,6 +26,7 @@ enum CollisionType
 
 enum class CollisionProbeMode
 {
+	None,
 	Quadrants,
 	FreeForward,
 	FreeFlat
@@ -67,35 +68,36 @@ struct CollisionResult
 
 struct CollisionSetup
 {
-	CollisionProbeMode Mode;	// Probe rotation mode
-	int   Radius;				// Collision bounds horizontal size
-	int   Height;				// Collision bounds vertical size
-	short ForwardAngle;			// Forward angle direction
+	CollisionProbeMode Mode = CollisionProbeMode::None; // Probe mode.
 
-	int LowerFloorBound;		// Borderline floor step-up height 
-	int UpperFloorBound;		// Borderline floor step-down height
-	int LowerCeilingBound;		// Borderline ceiling step-up height
-	int UpperCeilingBound;		// Borderline ceiling step-down height
+	int   Radius	   = 0; // Collision bounds radius.
+	int   Height	   = 0; // Collision bounds height.
+	short ForwardAngle = 0; // 2D heading angle.
 
-	bool BlockFloorSlopeUp;		// Treat steep slopes as walls
-	bool BlockFloorSlopeDown;	// Treat steep slopes as pits
-	bool BlockCeilingSlope;		// Treat steep slopes on ceilings as walls
-	bool BlockDeathFloorDown;	// Treat death sectors as pits
-	bool BlockMonkeySwingEdge;	// Treat non-monkey sectors as walls
+	int UpperFloorBound	  = 0; // Borderline floor step-down height.
+	int LowerFloorBound	  = 0; // Borderline floor step-up height.
+	int UpperCeilingBound = 0; // Borderline ceiling step-down height.
+	int LowerCeilingBound = 0; // Borderline ceiling step-up height.
+
+	bool BlockFloorSlopeUp	  = false; // Block floor slopes above.
+	bool BlockFloorSlopeDown  = false; // Block floor slopes below.
+	bool BlockCeilingSlope	  = false; // Block ceiling slopes.
+	bool BlockDeathFloorDown  = false; // Block death floors.
+	bool BlockMonkeySwingEdge = false; // Block non-monkey sectors.
 	
-	bool EnableObjectPush;		// Can be pushed by objects
-	bool EnableSpasm;			// Convulse when pushed
+	bool EnableObjectPush = false; // Can be pushed by objects.
+	bool EnableSpasm	  = false; // Convulse when pushed.
 
-	// Preserve old parameters to restore later
-	Vector3i OldPosition;
-	int OldAnimNumber;
-	int OldFrameNumber;
-	int OldState;
+	// Preserve previous parameters to restore later.
+	Vector3i OldPosition	= Vector3i::Zero;
+	int		 OldAnimNumber	= 0;
+	int		 OldFrameNumber = 0;
+	int		 OldState		= 0;
 };
 
 struct CollisionInfo
 {
-	CollisionSetup    Setup;    // In parameters
+	CollisionSetup Setup; // In parameters.
 
 	CollisionPosition Middle;       
 	CollisionPosition MiddleLeft;   
