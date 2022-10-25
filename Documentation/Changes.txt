@@ -13,9 +13,9 @@ Version 1.0.3
 * Fix TR3 monkey level crash.
 * Fix occasional ejection when landing on a slope.
 * Fix slow centaur projectile velocity.
-* Fix search animations.
+* Fix search animations - allow chest and shelf animations to play properly.
 * Fix grabbing narrow ledges below ceilings.
-* Fix Sarcophagus
+* Fix Sarcophagus and its item pickup
 * Fix Underwater Door and Double Doors be interactable again infinite times after opening.
 
 
