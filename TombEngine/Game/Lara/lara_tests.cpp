@@ -2678,11 +2678,14 @@ bool TestLaraLadderSideDismount(ItemInfo* item, CollisionInfo* coll, bool isGoin
 	int vPos = item->Pose.Position.y;
 	auto pointColl = GetCollision(item, item->Pose.Orientation.y + (isGoingLeft ? -ANGLE(90.0f) : ANGLE(90.0f)), dismountDist);
 
+	// Check for floor slope.
+	if (pointColl.Position.FloorSlope)
+		return false;
+
 	// Assess point collision.
-	if ((pointColl.Position.Floor - vPos) <= dismountFloorBound &&				 // Floor height is within dismount height bound.
-		(pointColl.Position.Ceiling - vPos) < -LARA_HEIGHT &&					 // Ceiling height is within highest ceiling bound.
-		(pointColl.Position.Ceiling - pointColl.Position.Floor) > LARA_HEIGHT && // Space isn't too narrow.
-		!pointColl.Position.FloorSlope)											 // Avoid slopes.
+	if ((pointColl.Position.Floor - vPos) <= dismountFloorBound &&				  // Floor height is within dismount height bound.
+		(pointColl.Position.Ceiling - vPos) < -LARA_HEIGHT &&					  // Ceiling height is within highest ceiling bound.
+		abs(pointColl.Position.Ceiling - pointColl.Position.Floor) > LARA_HEIGHT) // Space isn't too narrow.
 	{
 		return true;
 	}
