@@ -2093,7 +2093,7 @@ namespace TEN::Gui
 			}
 
 			int n = 0;
-			unsigned long options;
+			ulong options;
 			if (!AmmoActive)
 			{
 				options = InventoryObjectTable[Rings[(int)RingTypes::Inventory]->CurrentObjectList[Rings[(int)RingTypes::Inventory]->CurrentObjectInList].InventoryItem].Options;
@@ -2401,13 +2401,10 @@ namespace TEN::Gui
 		}
 	}
 
-	void GuiController::SpinBack(unsigned short* angle)
+	void GuiController::SpinBack(ushort* angle)
 	{
-		unsigned short val;
-		unsigned short val2;
-
-		val = *angle;
-
+		ushort val = *angle;
+		ushort val2 = 0;
 		if (val)
 		{
 			if (val <= 32768)
@@ -2478,9 +2475,9 @@ namespace TEN::Gui
 					SpinBack(&AmmoObjectList[n].ZRot);
 				}
 
-				unsigned short xRot = AmmoObjectList[n].XRot;
-				unsigned short yRot = AmmoObjectList[n].YRot;
-				unsigned short zRot = AmmoObjectList[n].ZRot;
+				ushort xRot = AmmoObjectList[n].XRot;
+				ushort yRot = AmmoObjectList[n].YRot;
+				ushort zRot = AmmoObjectList[n].ZRot;
 				int x = PHD_CENTER_X - 300 + xPos;
 				int y = 480;
 				short objectNumber = ConvertInventoryItemToObject(AmmoObjectList[n].InventoryItem);
@@ -2814,9 +2811,9 @@ namespace TEN::Gui
 					SpinBack(&Rings[ringIndex]->CurrentObjectList[n].ZRot);
 				}
 
-				unsigned short xRot = Rings[ringIndex]->CurrentObjectList[n].XRot;
-				unsigned short yRot = Rings[ringIndex]->CurrentObjectList[n].YRot;
-				unsigned short zRot = Rings[ringIndex]->CurrentObjectList[n].ZRot;
+				ushort xRot = Rings[ringIndex]->CurrentObjectList[n].XRot;
+				ushort yRot = Rings[ringIndex]->CurrentObjectList[n].YRot;
+				ushort zRot = Rings[ringIndex]->CurrentObjectList[n].ZRot;
 
 				int activeNum = 0;
 				if (Rings[ringIndex]->ObjectListMovement)

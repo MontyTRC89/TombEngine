@@ -212,7 +212,7 @@ namespace TEN::Gui
 		void InsertObjectIntoList(int objectNumber);
 		void InsertObjectIntoList_v2(int objectNumber);
 		void UseCurrentItem(ItemInfo* item);
-		void SpinBack(unsigned short* angle);
+		void SpinBack(ushort* angle);
 		void UpdateWeaponStatus(ItemInfo* item);
 		void DoStatisticsMode();
 		void DoExamineMode();
