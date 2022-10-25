@@ -2637,11 +2637,8 @@ bool TestLaraLadderDown(ItemInfo* item, CollisionInfo* coll)
 	auto pointColl = GetCollision(item, item->Pose.Orientation.y, -probeDist);
 
 	// Assess point collision.
-	if ((pointColl.Position.Floor - vPos) > lowerFloorBound && // Floor height is within lower floor bound.
-		!pointColl.Position.FloorSlope)
-	{
+	if ((pointColl.Position.Floor - vPos) > lowerFloorBound ) // Floor height is within lower floor bound.
 		return true;
-	}
 
 	return false;
 }
@@ -2653,15 +2650,15 @@ bool TestLaraLadderDismountTop(ItemInfo* item, CollisionInfo* coll)
 
 bool TestLaraLadderDismountBottom(ItemInfo* item, CollisionInfo* coll)
 {
-	static constexpr auto dismountDist		 = CLICK(0.5f);
-	static constexpr auto dismountFloorBound = CLICK(0.5f);
+	static constexpr auto probeDist		  = CLICK(0.5f);
+	static constexpr auto lowerFloorBound = CLICK(0.5f);
 
 	int vPos = item->Pose.Position.y + GameBoundingBox(item).Y2;
-	auto pointColl = GetCollision(item, item->Pose.Orientation.y, -dismountDist);
+	auto pointColl = GetCollision(item, item->Pose.Orientation.y, -probeDist);
 
 	// Assess point collision.
-	if ((pointColl.Position.Floor - vPos) <= dismountFloorBound && // Floor height is within dismount height bound.
-		!pointColl.Position.FloorSlope)							   // Avoid slopes.
+	if ((pointColl.Position.Floor - vPos) <= lowerFloorBound && // Floor height is within lower height bound.
+		!pointColl.Position.FloorSlope)							// Avoid slopes.
 	{
 		return true;
 	}
@@ -2692,6 +2689,7 @@ bool TestLaraLadderSideDismount(ItemInfo* item, CollisionInfo* coll, bool isGoin
 
 	return false;
 }
+
 bool TestLaraLadderDismountLeft(ItemInfo* item, CollisionInfo* coll)
 {
 	return TestLaraLadderSideDismount(item, coll, true);
