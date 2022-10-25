@@ -45,7 +45,8 @@ namespace TEN::Entities::Doors
 		if (TrInput & IN_ACTION &&
 			laraItem->Animation.ActiveState == LS_UNDERWATER_IDLE &&
 			laraInfo->Control.WaterStatus == WaterStatus::Underwater &&
-			!(doorItem->Status && doorItem->Animation.IsAirborne) &&
+			doorItem->Status != ITEM_ACTIVE &&
+			!doorItem->Animation.IsAirborne &&
 			laraInfo->Control.HandStatus == HandStatus::Free ||
 			laraInfo->Control.IsMoving && laraInfo->InteractedItem == itemNumber)
 		{
