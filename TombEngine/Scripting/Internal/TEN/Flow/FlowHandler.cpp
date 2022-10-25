@@ -106,6 +106,13 @@ __(not yet implemented)__
 */
 	table_flow.set_function(ScriptReserved_SetTitleScreenImagePath, &FlowHandler::SetTitleScreenImagePath, this);
 
+/*** Set FlyCheatEnabled
+Must be true or false
+@function SetFlyCheatEnabled
+@tparam bool true or false
+*/
+	table_flow.set_function(ScriptReserved_EnableFlyCheat, &FlowHandler::EnableFlyCheat, this);
+
 /*** settings.lua.
 These functions are called in settings.lua, a file which holds your local settings.
 settings.lua shouldn't be bundled with any finished levels/games.
@@ -305,6 +312,11 @@ void FlowHandler::AddSecret(int levelSecretIndex)
 bool FlowHandler::IsFlyCheatEnabled() const
 {
 	return FlyCheat;
+}
+
+void FlowHandler::EnableFlyCheat(bool flyCheat)
+{
+	FlyCheat = flyCheat;
 }
 
 bool FlowHandler::DoFlow()

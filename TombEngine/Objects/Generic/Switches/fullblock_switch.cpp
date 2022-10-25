@@ -16,15 +16,17 @@ namespace TEN::Entities::Switches
 {
 	OBJECT_COLLISION_BOUNDS FullBlockSwitchBounds = 
 	{
-		-384, 384,
-		0, 256,
-		0, 512,
+		GameBoundingBox(
+			-384, 384,
+			0, 256,
+			0, 512
+		),
 		-ANGLE(10.0f), ANGLE(10.0f),
 		-ANGLE(30.0f), ANGLE(30.0f),
 		-ANGLE(10.0f), ANGLE(10.0f)
 	};
 
-	Vector3Int FullBlockSwitchPos = { 0, 0, 0 };
+	Vector3i FullBlockSwitchPos = { 0, 0, 0 };
 
 	byte SequenceUsed[6];
 	byte SequenceResults[3][3][3];

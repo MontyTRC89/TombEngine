@@ -1,12 +1,15 @@
 #include "framework.h"
 #include "Renderer/Renderer11.h"
+
 #include "Game/camera.h"
-#include "Game/spotcam.h"
-#include "Specific/setup.h"
 #include "Game/control/control.h"
+#include "Game/spotcam.h"
 #include "Game/effects/weather.h"
+#include "Math/Math.h"
+#include "Specific/setup.h"
 
 using namespace TEN::Effects::Environment;
+using namespace TEN::Math;
 
 TEN::Renderer::RendererHUDBar* g_HealthBar;
 TEN::Renderer::RendererHUDBar* g_AirBar;

@@ -9,7 +9,7 @@
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
 #include "Specific/level.h"
-#include "Specific/prng.h"
+#include "Math/Random.h"
 #include "Specific/setup.h"
 
 using namespace TEN::Math::Random;
@@ -62,9 +62,10 @@ namespace TEN::Entities::Creatures::TR3
 		if (laraItem->RoomNumber != tRexItem->RoomNumber)
 			ItemNewRoom(Lara.ItemNumber, tRexItem->RoomNumber);
 
-		laraItem->Pose = PHD_3DPOS(
+		laraItem->Pose = Pose(
 			tRexItem->Pose.Position,
-			Vector3Shrt(0, tRexItem->Pose.Orientation.y, 0));
+			EulerAngles(0, tRexItem->Pose.Orientation.y, 0)
+		);
 		laraItem->Animation.IsAirborne = false;
 
 		laraItem->Animation.AnimNumber = Objects[ID_LARA_EXTRA_ANIMS].animIndex + LARA_ANIM_TREX_DEATH_ANIM;

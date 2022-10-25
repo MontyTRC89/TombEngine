@@ -1,6 +1,8 @@
 #pragma once
+#include "Math/Math.h"
 #include "Objects/objectslist.h"
-#include "Specific/trmath.h"
+
+using namespace TEN::Math;
 
 struct CreatureInfo;
 struct FX_INFO;
@@ -808,8 +810,12 @@ enum LaraAnim
 	LA_CROUCH_TURN_180_END = 562,
 	LA_CRAWL_TURN_180_START = 653,
 	LA_CRAWL_TURN_180_END = 654,
+	LA_LEDGE_JUMP_UP_START = 565,
+	LA_LEDGE_JUMP_UP_END = 566,
+	LA_LEDGE_JUMP_BACK_START = 567,
+	LA_LEDGE_JUMP_BACK_END = 568,
 
-	NUM_LARA_ANIMS,
+	NUM_LARA_ANIMS
 
 	// TRASHED ANIMS (please reuse slots before going any higher and remove entries from this list as you go):
 	// 102
@@ -1077,7 +1083,7 @@ struct ArmInfo
 	int FrameNumber;
 	int FrameBase;
 
-	Vector3Shrt Orientation;
+	EulerAngles Orientation;
 
 	bool Locked;
 	int GunFlash;
@@ -1103,8 +1109,8 @@ constexpr int MAX_DIARY_STRINGS_PER_PAGE = 8;
 
 struct DiaryString
 {
-	Vector2Int Position;
-	int		   StringID;
+	Vector2i Position;
+	int		StringID;
 };
 
 struct DiaryPage
@@ -1259,14 +1265,14 @@ struct LaraInfo
 	FlareData Flare;
 	TorchData Torch;
 
-	Vector3Shrt ExtraHeadRot;
-	Vector3Shrt ExtraTorsoRot;
+	EulerAngles ExtraHeadRot;
+	EulerAngles ExtraTorsoRot;
 	short WaterCurrentActive;
-	Vector3Int WaterCurrentPull;
+	Vector3i WaterCurrentPull;
 
 	ArmInfo LeftArm;
 	ArmInfo RightArm;
-	Vector3Shrt TargetArmOrient;
+	EulerAngles TargetArmOrient;
 	ItemInfo* TargetEntity;
 	CreatureInfo* Creature;	// Not saved. Unused?
 
@@ -1282,9 +1288,9 @@ struct LaraInfo
 
 	short InteractedItem;
 	int ProjectedFloorHeight;
-	Vector3Shrt TargetOrientation;
+	EulerAngles TargetOrientation;
 	int WaterSurfaceDist;
-	PHD_3DPOS NextCornerPos;
+	Pose NextCornerPos;
 
 	// TODO: Use BurnType in place of Burn, BurnBlue, and BurnSmoke. Core didn't make replacing them easy.
 	BurnType BurnType;

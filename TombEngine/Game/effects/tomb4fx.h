@@ -1,11 +1,20 @@
 #pragma once
 #include "Game/effects/effects.h"
 #include "Game/Lara/lara_struct.h"
-#include "Specific/phd_global.h"
+#include "Math/Math.h"
 #include "Renderer/Renderer11Enums.h"
 
 enum class LaraWeaponType;
 struct ItemInfo;
+
+struct Matrix3D
+{
+	short m00, m01, m02;
+	short m10, m11, m12;
+	short m20, m21, m22;
+	short pad;
+	int tx, ty, tz;
+};
 
 struct SMOKE_SPARKS
 {
@@ -42,7 +51,7 @@ struct SMOKE_SPARKS
 
 struct GUNFLASH_STRUCT
 {
-	MATRIX3D matrix;
+	Matrix3D matrix;
 	short on;
 };
 
@@ -65,7 +74,7 @@ struct SHOCKWAVE_STRUCT
 
 struct GUNSHELL_STRUCT
 {
-	PHD_3DPOS pos;
+	Pose pos;
 	short fallspeed;
 	short roomNumber;
 	short speed;
@@ -211,8 +220,8 @@ void TriggerGlobalStaticFlame();
 void TriggerGlobalFireSmoke();
 void TriggerGlobalFireFlame();
 void TriggerPilotFlame(int itemNum, int nodeIndex);
-void ThrowFire(int itemNum, int meshIndex, Vector3Int offset, Vector3Int speed);
-void ThrowPoison(int itemNum, int meshIndex, Vector3Int offset, Vector3Int speed, Vector3 color);
+void ThrowFire(int itemNum, int meshIndex, Vector3i offset, Vector3i speed);
+void ThrowPoison(int itemNum, int meshIndex, Vector3i offset, Vector3i speed, Vector3 color);
 void UpdateFireProgress();
 void ClearFires();
 void AddFire(int x, int y, int z, short roomNum, float size, short fade);
@@ -238,7 +247,7 @@ void UpdateDrips();
 void TriggerLaraDrips(ItemInfo* item);
 void ExplodingDeath(short itemNumber, short flags); // EXPLODE_ flags
 int GetFreeShockwave();
-void TriggerShockwave(PHD_3DPOS* pos, short innerRad, short outerRad, int speed, unsigned char r, unsigned char g, unsigned char b, unsigned char life, short angle, short flags);
+void TriggerShockwave(Pose* pos, short innerRad, short outerRad, int speed, unsigned char r, unsigned char g, unsigned char b, unsigned char life, short angle, short flags);
 void TriggerShockwaveHitEffect(int x, int y, int z, unsigned char r, unsigned char g, unsigned char b, short rot, int vel);
 void UpdateShockwaves();
 void TriggerSmallSplash(int x, int y, int z, int number);

@@ -8,12 +8,13 @@
 #include "Game/Lara/lara_flare.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_struct.h"
+#include "Math/Random.h"
 #include "Game/room.h"
 #include "Sound/sound.h"
 #include "Specific/Input/Input.h"
-#include "Specific/prng.h"
 
 using namespace TEN::Input;
+using namespace TEN::Math;
 
 namespace TEN::Entities::Vehicles
 {
@@ -47,7 +48,7 @@ namespace TEN::Entities::Vehicles
 		bool hasInputAction = TrInput & IN_ACTION;
 
 		short deltaHeadingAngle = vehicleItem->Pose.Orientation.y - laraItem->Pose.Orientation.y;
-		short angleBetweenPositions = vehicleItem->Pose.Orientation.y - GetOrientBetweenPoints(laraItem->Pose.Position, vehicleItem->Pose.Position).y;
+		short angleBetweenPositions = vehicleItem->Pose.Orientation.y - Geometry::GetOrientToPoint(laraItem->Pose.Position.ToVector3(), vehicleItem->Pose.Position.ToVector3()).y;
 		bool onCorrectSide = abs(deltaHeadingAngle - angleBetweenPositions) < ANGLE(45.0f);
 
 		// Assess mount types allowed for vehicle.
@@ -129,7 +130,7 @@ namespace TEN::Entities::Vehicles
 		return VehicleMountType::None;
 	}
 
-	int GetVehicleHeight(ItemInfo* vehicleItem, int forward, int right, bool clamp, Vector3Int* pos)
+	int GetVehicleHeight(ItemInfo* vehicleItem, int forward, int right, bool clamp, Vector3i* pos)
 	{
 		float sinX = phd_sin(vehicleItem->Pose.Orientation.x);
 		float sinY = phd_sin(vehicleItem->Pose.Orientation.y);
@@ -152,7 +153,7 @@ namespace TEN::Entities::Vehicles
 		return probe.Position.Floor;
 	}
 
-	int GetVehicleWaterHeight(ItemInfo* vehicleItem, int forward, int right, bool clamp, Vector3Int* pos)
+	int GetVehicleWaterHeight(ItemInfo* vehicleItem, int forward, int right, bool clamp, Vector3i* pos)
 	{
 		Matrix world =
 			Matrix::CreateFromYawPitchRoll(TO_RAD(vehicleItem->Pose.Orientation.y), TO_RAD(vehicleItem->Pose.Orientation.x), TO_RAD(vehicleItem->Pose.Orientation.z)) *
@@ -219,7 +220,7 @@ namespace TEN::Entities::Vehicles
 					currentVelocity -= std::copysign(currentVelocity * ((waterDepth / VEHICLE_WATER_HEIGHT_MAX) / coeff), currentVelocity);
 
 					if (TEN::Math::Random::GenerateInt(0, 32) > 28)
-						SoundEffect(SFX_TR4_LARA_WADE, &PHD_3DPOS(vehicleItem->Pose.Position), SoundEnvironment::Land, isWater ? 0.8f : 0.7f);
+						SoundEffect(SFX_TR4_LARA_WADE, &Pose(vehicleItem->Pose.Position), SoundEnvironment::Land, isWater ? 0.8f : 0.7f);
 
 					if (isWater)
 						TEN::Effects::TriggerSpeedboatFoam(vehicleItem, Vector3(0, -waterDepth / 2.0f, -radius));

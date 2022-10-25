@@ -1,33 +1,32 @@
 #include "framework.h"
 #include "Game/effects/effects.h"
 
+#include "Flow/ScriptInterfaceFlowHandler.h"
 #include "Game/animation.h"
 #include "Game/collision/collide_room.h"
-#include "Game/effects/lara_fx.h"
-#include "Game/effects/drip.h"
 #include "Game/effects/bubble.h"
+#include "Game/effects/drip.h"
 #include "Game/effects/explosion.h"
+#include "Game/effects/lara_fx.h"
 #include "Game/effects/smoke.h"
 #include "Game/effects/spark.h"
 #include "Game/effects/tomb4fx.h"
 #include "Game/effects/weather.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
+#include "Math/Math.h"
 #include "Objects/objectslist.h"
+#include "Renderer/Renderer11.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
-#include "Specific/prng.h"
-#include "Specific/trmath.h"
-#include "Flow/ScriptInterfaceFlowHandler.h"
-#include "Renderer/Renderer11.h"
 
-using TEN::Renderer::g_Renderer;
+using namespace TEN::Effects::Environment;
 using namespace TEN::Effects::Explosion;
 using namespace TEN::Effects::Lara;
 using namespace TEN::Effects::Spark;
-using namespace TEN::Effects::Environment;
-using namespace TEN::Math::Random;
+using namespace TEN::Math;
+using TEN::Renderer::g_Renderer;
 
 // New particle class
 Particle Particles[MAX_PARTICLES];
@@ -35,13 +34,13 @@ ParticleDynamic ParticleDynamics[MAX_PARTICLE_DYNAMICS];
 
 FX_INFO EffectList[NUM_EFFECTS];
 
-int DeadlyBounds[6];
+GameBoundingBox DeadlyBounds;
 SPLASH_SETUP SplashSetup;
 SPLASH_STRUCT Splashes[MAX_SPLASHES];
 RIPPLE_STRUCT Ripples[MAX_RIPPLES];
 int SplashCount = 0;
 
-Vector3Int NodeVectors[MAX_NODE];
+Vector3i NodeVectors[MAX_NODE];
 NODEOFFSET_INFO NodeOffsets[MAX_NODE] =
 {
 	{ -16, 40, 160, -LM_LHAND, false }, // TR5 offset 0
@@ -159,13 +158,15 @@ Particle* GetFreeParticle()
 
 void UpdateSparks()
 {
-	auto* bounds = GetBoundsAccurate(LaraItem);
-	DeadlyBounds[0] = LaraItem->Pose.Position.x + bounds->X1;
-	DeadlyBounds[1] = LaraItem->Pose.Position.x + bounds->X2;
-	DeadlyBounds[2] = LaraItem->Pose.Position.y + bounds->Y1;
-	DeadlyBounds[3] = LaraItem->Pose.Position.y + bounds->Y2;
-	DeadlyBounds[4] = LaraItem->Pose.Position.z + bounds->Z1;
-	DeadlyBounds[5] = LaraItem->Pose.Position.z + bounds->Z2;
+	auto bounds = GameBoundingBox(LaraItem);
+	DeadlyBounds = GameBoundingBox(
+		LaraItem->Pose.Position.x + bounds.X1,
+		LaraItem->Pose.Position.x + bounds.X2,
+		LaraItem->Pose.Position.y + bounds.Y1,
+		LaraItem->Pose.Position.y + bounds.Y2,
+		LaraItem->Pose.Position.z + bounds.Z1,
+		LaraItem->Pose.Position.z + bounds.Z2
+	);
 
 	for (int i = 0; i < MAX_PARTICLES; i++)
 	{
@@ -291,11 +292,11 @@ void UpdateSparks()
 			{
 				ds = spark->size * (spark->scalar / 2.0);
 
-				if (spark->x + ds > DeadlyBounds[0] && spark->x - ds < DeadlyBounds[1])
+				if (spark->x + ds > DeadlyBounds.X1 && spark->x - ds < DeadlyBounds.X2)
 				{
-					if (spark->y + ds > DeadlyBounds[2] && spark->y - ds < DeadlyBounds[3])
+					if (spark->y + ds > DeadlyBounds.Y1 && spark->y - ds < DeadlyBounds.Y2)
 					{
-						if (spark->z + ds > DeadlyBounds[4] && spark->z - ds < DeadlyBounds[5])
+						if (spark->z + ds > DeadlyBounds.Z1 && spark->z - ds < DeadlyBounds.Z2)
 						{
 							if (spark->flags & SP_FIRE)
 								LaraBurn(LaraItem);
@@ -478,7 +479,7 @@ void TriggerExplosionBubbles(int x, int y, int z, short roomNumber)
 
 		for (int i = 0; i < 8; i++)
 		{
-			Vector3Int pos;
+			Vector3i pos;
 			pos.x = (GetRandomControl() & 0x1FF) + x - 256;
 			pos.y = (GetRandomControl() & 0x7F) + y - 64;
 			pos.z = (GetRandomControl() & 0x1FF) + z - 256;
@@ -899,7 +900,7 @@ void SetupSplash(const SPLASH_SETUP* const setup, int room)
 			}
 			else
 			{
-				float thickness = GenerateFloat(64,128);
+				float thickness = Random::GenerateFloat(64,128);
 				splash.isActive = true;
 				splash.x = setup->x;
 				splash.y = setup->y;
@@ -908,15 +909,15 @@ void SetupSplash(const SPLASH_SETUP* const setup, int room)
 				float vel;
 
 				if (numSplashesSetup == 2)
-					vel = (splashVelocity / 16) + GenerateFloat(2, 4);
+					vel = (splashVelocity / 16) + Random::GenerateFloat(2, 4);
 				else
-					vel = (splashVelocity / 7) + GenerateFloat(3, 7);
+					vel = (splashVelocity / 7) + Random::GenerateFloat(3, 7);
 				
 				float innerRadius = 0;
 				splash.innerRad = innerRadius;
-				splash.innerRadVel = vel*1.3f;
+				splash.innerRadVel = vel * 1.3f;
 				splash.outerRad = innerRadius+thickness;
-				splash.outerRadVel = vel*2.3f;
+				splash.outerRadVel = vel * 2.3f;
 				splash.heightSpeed = 128;
 				splash.height = 0;
 				splash.heightVel = -16;
@@ -937,8 +938,8 @@ void SetupSplash(const SPLASH_SETUP* const setup, int room)
 		}
 	}
 
-	TEN::Effects::Drip::SpawnSplashDrips(Vector3(setup->x, setup->y-15, setup->z),32,room);
-	PHD_3DPOS soundPosition;
+	TEN::Effects::Drip::SpawnSplashDrips(Vector3(setup->x, setup->y - 15, setup->z), 32, room);
+	Pose soundPosition;
 	soundPosition.Position.x = setup->x;
 	soundPosition.Position.y = setup->y;
 	soundPosition.Position.z = setup->z;
@@ -956,7 +957,8 @@ void UpdateSplashes()
 
 	for (int i = 0; i < MAX_SPLASHES; i++)
 	{
-		SPLASH_STRUCT& splash = Splashes[i];
+		auto& splash = Splashes[i];
+
 		if (splash.isActive)
 		{
 			splash.life--;
@@ -1046,12 +1048,13 @@ void TriggerLaraBlood()
 	{
 		if (node & LaraItem->TouchBits.ToPackedBits())
 		{
-			Vector3Int vec;
-			vec.x = (GetRandomControl() & 31) - 16;
-			vec.y = (GetRandomControl() & 31) - 16;
-			vec.z = (GetRandomControl() & 31) - 16;
-
-			GetLaraJointPosition(&vec, (LARA_MESHES)i);
+			auto vec = GetJointPosition(LaraItem, 
+				i,
+				Vector3i(
+					(GetRandomControl() & 31) - 16,
+					(GetRandomControl() & 31) - 16,
+					(GetRandomControl() & 31) - 16
+				));
 			DoBloodSplat(vec.x, vec.y, vec.z, (GetRandomControl() & 7) + 8, 2 * GetRandomControl(), LaraItem->RoomNumber);
 		}
 
@@ -1081,18 +1084,15 @@ void TriggerUnderwaterBlood(int x, int y, int z, int size)
 	}
 }
 
-void Richochet(PHD_3DPOS* pos)
+void Richochet(Pose* pos)
 {
-	short angle = mGetAngle(pos->Position.z, pos->Position.x, LaraItem->Pose.Position.z, LaraItem->Pose.Position.x);
-	GameVector target;
-	target.x = pos->Position.x;
-	target.y = pos->Position.y;
-	target.z = pos->Position.z;
+	short angle = Geometry::GetOrientToPoint(pos->Position.ToVector3(), LaraItem->Pose.Position.ToVector3()).y;
+	auto target = GameVector(pos->Position);
 	TriggerRicochetSpark(&target, angle / 16, 3, 0);
 	SoundEffect(SFX_TR4_WEAPON_RICOCHET, pos);
 }
 
-void ControlWaterfallMist(short itemNumber) // ControlWaterfallMist
+void ControlWaterfallMist(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
 
@@ -1178,7 +1178,7 @@ void TriggerWaterfallMist(int x, int y, int z, int angle)
 
 void KillAllCurrentItems(short itemNumber)
 {
-	// TODO: Reimplement this functionality
+	// TODO: Reimplement this functionality.
 }
 
 void TriggerDynamicLight(int x, int y, int z, short falloff, byte r, byte g, byte b)
@@ -1201,6 +1201,7 @@ void SetupRipple(int x, int y, int z, int size, int flags)
 			ripple->x = x;
 			ripple->y = y;
 			ripple->z = z;
+
 			if (flags & RIPPLE_FLAG_NO_RAND)
 			{
 				ripple->x += (GetRandomControl() & 127) - 64;
@@ -1228,7 +1229,7 @@ void WadeSplash(ItemInfo* item, int wh, int wd)
 	if (item->Pose.Position.y + frame->boundingBox.Y2 < wh)
 		return;
 
-	if (item->Animation.Velocity.y <= 0 || wd >= 474 || SplashCount != 0)
+	if (item->Animation.Velocity.y <= 0.0f || wd >= 474 || SplashCount != 0)
 	{
 		if (!(Wibble & 0xF))
 		{
@@ -1447,7 +1448,8 @@ void TriggerFireFlame(int x, int y, int z, int fxObj, int type)
 	int dx = LaraItem->Pose.Position.x - x;
 	int dz = LaraItem->Pose.Position.z - z;
 
-	if (dx >= -16384 && dx <= 16384 && dz >= -16384 && dz <= 16384)
+	if (dx >= -SECTOR(16) && dx <= SECTOR(16) &&
+		dz >= -SECTOR(16) && dz <= SECTOR(16))
 	{
 		auto* spark = GetFreeParticle();
 

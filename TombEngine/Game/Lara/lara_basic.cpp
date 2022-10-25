@@ -103,7 +103,8 @@ void lara_as_vault(ItemInfo* item, CollisionInfo* coll)
 	coll->Setup.EnableSpasm = false;
 
 	EaseOutLaraHeight(item, lara->ProjectedFloorHeight - item->Pose.Position.y);
-	ApproachLaraTargetOrientation(item, lara->TargetOrientation, 2.5f);
+	item->Pose.Orientation.Lerp(lara->TargetOrientation, 0.4f);
+
 	item->Animation.TargetState = LS_IDLE;
 }
 
@@ -116,8 +117,8 @@ void lara_as_auto_jump(ItemInfo* item, CollisionInfo* coll)
 	lara->Control.CanLook = false;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
-	
-	ApproachLaraTargetOrientation(item, lara->TargetOrientation, 2.5f);
+
+	item->Pose.Orientation.Lerp(lara->TargetOrientation, 0.4f);
 }
 
 // ---------------
@@ -1346,7 +1347,6 @@ void lara_col_turn_left_slow(ItemInfo* item, CollisionInfo* coll)
 void lara_as_death(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
-	auto* bounds = GetBoundsAccurate(item);
 
 	item->Animation.Velocity.z = 0.0f;
 	lara->Control.CanLook = false;
@@ -1362,7 +1362,8 @@ void lara_as_death(ItemInfo* item, CollisionInfo* coll)
 		lara->Inventory.IsBusy = false;
 	}
 
-	if (bounds->Height() <= (LARA_HEIGHT * 0.75f))
+	auto bounds = GameBoundingBox(item);
+	if (bounds.GetHeight() <= (LARA_HEIGHT * 0.75f))
 		AlignLaraToSurface(item);
 
 	ModulateLaraTurnRateY(item, 0, 0, 0);

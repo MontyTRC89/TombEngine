@@ -122,11 +122,9 @@ namespace TEN::Entities::TR4
 		// Ignite torch.
 		if (item->ItemFlags[1] == 2)
 		{
-			auto pos = Vector3Int(GuideBite1.Position);
-			GetJointAbsPosition(item, &pos, GuideBite1.meshNum);
-
-			SoundEffect(SFX_TR4_LOOP_FOR_SMALL_FIRES, &item->Pose);
+			auto pos = GetJointPosition(item, GuideBite1.meshNum, Vector3i(GuideBite1.Position));
 			TriggerFireFlame(pos.x, pos.y - 20, pos.z, -1, 3);
+			SoundEffect(SFX_TR4_LOOP_FOR_SMALL_FIRES, &item->Pose);
 
 			short random = GetRandomControl();
 			TriggerDynamicLight(
@@ -214,8 +212,8 @@ namespace TEN::Entities::TR4
 					dy = currentItem->Pose.Position.y - item->Pose.Position.y;
 					dz = currentItem->Pose.Position.z - item->Pose.Position.z;
 
-					if (dx > 32000 || dx < -32000 || dz > 32000 || dz < -32000)
-						distance = 0x7FFFFFFF;
+					if (dx > SECTOR(31.25f) || dx < -SECTOR(31.25f) || dz > SECTOR(31.25f) || dz < -SECTOR(31.25f))
+						distance = INT_MAX;
 					else
 						distance = pow(dx, 2) + pow(dz, 2);
 
@@ -250,7 +248,7 @@ namespace TEN::Entities::TR4
 		}
 
 		bool someFlag = false;
-		Vector3Int pos1;
+		Vector3i pos1;
 		int frameNumber;
 		short random;
 				
@@ -488,9 +486,7 @@ namespace TEN::Entities::TR4
 			break;
 
 		case GUIDE_STATE_IGNITE_TORCH:
-			pos1 = Vector3Int(GuideBite2.Position);
-			GetJointAbsPosition(item, &pos1, GuideBite2.meshNum);
-
+			pos1 = GetJointPosition(item, GuideBite2.meshNum, Vector3i(GuideBite2.Position));
 			frameNumber = item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase;
 			random = GetRandomControl();
 
@@ -604,13 +600,8 @@ namespace TEN::Entities::TR4
 					if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 15 &&
 						item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].frameBase + 26)
 					{
-						dx = abs(enemy->Pose.Position.x - item->Pose.Position.x);
-						dy = abs(enemy->Pose.Position.y - item->Pose.Position.y);
-						dz = abs(enemy->Pose.Position.z - item->Pose.Position.z);
-
-						if (dx < CLICK(2) &&
-							dy < CLICK(2) &&
-							dz < CLICK(2))
+						float distance = Vector3i::Distance(item->Pose.Position, enemy->Pose.Position);
+						if (distance <= CLICK(2))
 						{
 							DoDamage(enemy, GUIDE_ATTACK_DAMAGE);
 							CreatureEffect2(item, GuideBite1, 8, -1, DoBloodSplat);

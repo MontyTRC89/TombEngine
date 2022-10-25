@@ -14,7 +14,7 @@
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_struct.h"
-#include "Specific/trmath.h"
+#include "Math/Math.h"
 #include "Game/misc.h"
 #include "Objects/Generic/Doors/double_doors.h"
 #include "Game/collision/collide_item.h"
@@ -23,13 +23,15 @@ using namespace TEN::Input;
 
 namespace TEN::Entities::Doors
 {
-	Vector3Int DoubleDoorPos(0, 0, 220);
+	Vector3i DoubleDoorPos(0, 0, 220);
 
 	OBJECT_COLLISION_BOUNDS DoubleDoorBounds =
 	{
-		-384, 384, 
-		0, 0, 
-		-1024, 512, 
+		GameBoundingBox(
+			-384, 384,
+			0, 0, 
+			-1024, 512
+		),
 		-ANGLE(10.0f), ANGLE(10.0f),
 		-ANGLE(30.0f), ANGLE(30.0f),
 		-ANGLE(10.0f), ANGLE(10.0f),

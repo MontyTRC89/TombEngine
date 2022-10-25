@@ -19,14 +19,16 @@ namespace TEN::Entities::Switches
 {
 	OBJECT_COLLISION_BOUNDS CogSwitchBounds =
 	{
-		-512, 512,
-		0, 0,
-		-1536, -512,
+		GameBoundingBox(
+			-512, 512,
+			0, 0,
+			-1536, -512
+		),
 		-ANGLE(10.0f), ANGLE(10.0f),
 		-ANGLE(30.0f), ANGLE(30.0f),
 		-ANGLE(10.0f), ANGLE(10.0f)
 	};
-	Vector3Int CogSwitchPos(0, 0, -856);
+	Vector3i CogSwitchPos(0, 0, -856);
 
 	void CogSwitchCollision(short itemNum, ItemInfo* laraItem, CollisionInfo* coll)
 	{

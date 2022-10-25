@@ -13,7 +13,7 @@
 #include "Game/misc.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
-#include "Specific/prng.h"
+#include "Math/Random.h"
 #include "Specific/setup.h"
 
 using namespace TEN::Math::Random;
@@ -696,7 +696,7 @@ namespace TEN::Entities::TR4
 
 		case VON_CROY_STATE_KNIFE_ATTACK_HIGH:
 			creature->MaxTurn = 0;
-			ClampRotation(&item->Pose, AI.angle, ANGLE(6.0f));
+			ClampRotation(item->Pose, AI.angle, ANGLE(6.0f));
 
 			if (AI.ahead)
 			{
@@ -731,9 +731,9 @@ namespace TEN::Entities::TR4
 			creature->MaxTurn = 0;
 
 			if (item->ItemFlags[2] == 0)
-				ClampRotation(&item->Pose, laraAI.angle, ANGLE(2.8f));
+				ClampRotation(item->Pose, laraAI.angle, ANGLE(2.8f));
 			else
-				ClampRotation(&item->Pose, enemy->Pose.Orientation.y - item->Pose.Orientation.y, ANGLE(2.8f));
+				ClampRotation(item->Pose, enemy->Pose.Orientation.y - item->Pose.Orientation.y, ANGLE(2.8f));
 
 			break;
 
@@ -768,7 +768,7 @@ namespace TEN::Entities::TR4
 			}
 
 			creature->MaxTurn = 0;
-			ClampRotation(&item->Pose, AI.angle, ANGLE(6.0f));
+			ClampRotation(item->Pose, AI.angle, ANGLE(6.0f));
 
 			if ((enemy == nullptr || enemy->Flags != 0) ||
 				item->Animation.FrameNumber <= g_Level.Anims[item->Animation.AnimNumber].frameBase + 21)
@@ -811,7 +811,7 @@ namespace TEN::Entities::TR4
 
 		case VON_CROY_STATE_POINT:
 			creature->MaxTurn = 0;
-			ClampRotation(&item->Pose, AI.angle / 2, ANGLE(6.0f));
+			ClampRotation(item->Pose, AI.angle / 2, ANGLE(6.0f));
 
 			if (AI.ahead)
 			{

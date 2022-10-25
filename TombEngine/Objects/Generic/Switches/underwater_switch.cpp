@@ -16,36 +16,42 @@ namespace TEN::Entities::Switches
 { 
 	OBJECT_COLLISION_BOUNDS UnderwaterSwitchBounds =
 	{
-		-1024, 1024,
-		-1024, 1024,
-		-1024, 512,
+		GameBoundingBox(
+			-1024, 1024,
+			-1024, 1024,
+			-1024, 512
+		),
 		-ANGLE(80.0f), ANGLE(80.0f),
 		-ANGLE(80.0f), ANGLE(80.0f),
 		-ANGLE(80.0f), ANGLE(80.0f)
 	};
-	Vector3Int UnderwaterSwitchPos = { 0, 0, 108 };
+	Vector3i UnderwaterSwitchPos = { 0, 0, 108 };
 
 	OBJECT_COLLISION_BOUNDS CeilingUnderwaterSwitchBounds1 =
 	{
-		-256, 256,
-		-1280, -512,
-		-512, 0,
+		GameBoundingBox(
+			-256, 256,
+			-1280, -512,
+			-512, 0
+		),
 		-ANGLE(80.0f), ANGLE(80.0f),
 		-ANGLE(80.0f), ANGLE(80.0f),
 		-ANGLE(80.0f), ANGLE(80.0f)
 	};
-	Vector3Int CeilingUnderwaterSwitchPos1 = { 0, -736, -416 };
+	Vector3i CeilingUnderwaterSwitchPos1 = { 0, -736, -416 };
 
 	OBJECT_COLLISION_BOUNDS CeilingUnderwaterSwitchBounds2 =
 	{
-		-256, 256,
-		-1280, -512,
-		0, 512,
+		GameBoundingBox(
+			-256, 256,
+			-1280, -512,
+			0, 512
+		),
 		-ANGLE(80.0f), ANGLE(80.0f),
 		-ANGLE(80.0f), ANGLE(80.0f),
 		-ANGLE(80.0f), ANGLE(80.0f)
 	};
-	Vector3Int CeilingUnderwaterSwitchPos2 = { 0, -736, 416 };
+	Vector3i CeilingUnderwaterSwitchPos2 = { 0, -736, 416 };
 
 	void UnderwaterSwitchCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 	{
@@ -147,7 +153,7 @@ namespace TEN::Entities::Switches
 				ForcedFixedCamera.x = switchItem->Pose.Position.x - SECTOR(1) * phd_sin(switchItem->Pose.Orientation.y + ANGLE(90.0f));
 				ForcedFixedCamera.y = switchItem->Pose.Position.y - SECTOR(1);
 				ForcedFixedCamera.z = switchItem->Pose.Position.z - SECTOR(1) * phd_cos(switchItem->Pose.Orientation.y + ANGLE(90.0f));
-				ForcedFixedCamera.roomNumber = switchItem->RoomNumber;
+				ForcedFixedCamera.RoomNumber = switchItem->RoomNumber;
 			}
 		}
 	}

@@ -16,7 +16,7 @@
 #include "Game/people.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
-#include "Specific/prng.h"
+#include "Math/Random.h"
 #include "Specific/setup.h"
 
 using namespace TEN::Math::Random;
@@ -597,8 +597,7 @@ namespace TEN::Entities::TR4
 				{
 					auto* room = &g_Level.Rooms[item->RoomNumber];
 
-					auto pos = Vector3Int();
-					GetJointAbsPosition(item, &pos, 16);
+					auto pos = GetJointPosition(item, 16);
 
 					auto floor = GetCollision(x, y, z, item->RoomNumber).Block;
 					if (floor->Stopper)

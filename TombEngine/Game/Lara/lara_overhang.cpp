@@ -32,7 +32,7 @@ constexpr auto HEIGHT_ADJUST = CLICK(2) + 20;
 
 struct SlopeData
 {
-	Vector3Int Offset;
+	Vector3i Offset;
 	Vector2 Goal;
 	short ClimbOrient;
 	short GoalOrient;
@@ -52,7 +52,7 @@ inline bool SlopeInvCheck(Vector2 slope, Vector2 goal)
 	return (slope.x == -goal.x && slope.y == -goal.y);
 }
 
-short FindBridge(int tiltGrade, short orient, Vector3Int& pos, int* returnHeight, int ceilingMinY = 0, int ceilingMaxY = 0)
+short FindBridge(int tiltGrade, short orient, Vector3i& pos, int* returnHeight, int ceilingMinY = 0, int ceilingMaxY = 0)
 {
 	short bridgeSlot;
 
@@ -271,28 +271,28 @@ SlopeData GetSlopeData(ItemInfo* item)
 	case NORTH:
 		slopeData.Offset.z = CLICK(1);
 		slopeData.Goal.y = -4;
-		slopeData.ClimbOrient = (short)CLIMB_DIRECTION::North;
+		slopeData.ClimbOrient = (short)ClimbDirection::North;
 		slopeData.GoalOrient = 0;
 		break;
 
 	case EAST:
 		slopeData.Offset.x = CLICK(1);
 		slopeData.Goal.x = -4;
-		slopeData.ClimbOrient = (short)CLIMB_DIRECTION::East;
+		slopeData.ClimbOrient = (short)ClimbDirection::East;
 		slopeData.GoalOrient = ANGLE(90.0f);
 		break;
 
 	case SOUTH:
 		slopeData.Offset.z = -CLICK(1);
 		slopeData.Goal.y = 4;
-		slopeData.ClimbOrient = (short)CLIMB_DIRECTION::South;
+		slopeData.ClimbOrient = (short)ClimbDirection::South;
 		slopeData.GoalOrient = ANGLE(180.0f);
 		break;
 
 	case WEST:
 		slopeData.Offset.x = -CLICK(1);
 		slopeData.Goal.x = 4;
-		slopeData.ClimbOrient = (short)CLIMB_DIRECTION::West;
+		slopeData.ClimbOrient = (short)ClimbDirection::West;
 		slopeData.GoalOrient = ANGLE(270.0f);
 		break;
 	}
@@ -314,8 +314,8 @@ void lara_col_slopeclimb(ItemInfo* item, CollisionInfo* coll)
 	auto slopeData = GetSlopeData(item);
 
 	auto now = item->Pose.Position;
-	auto up = Vector3Int(item->Pose.Position.x - slopeData.Offset.x, item->Pose.Position.y - CLICK(1), item->Pose.Position.z - slopeData.Offset.z);
-	auto down = Vector3Int(item->Pose.Position.x + slopeData.Offset.x, item->Pose.Position.y + CLICK(1), item->Pose.Position.z + slopeData.Offset.z);
+	auto up = Vector3i(item->Pose.Position.x - slopeData.Offset.x, item->Pose.Position.y - CLICK(1), item->Pose.Position.z - slopeData.Offset.z);
+	auto down = Vector3i(item->Pose.Position.x + slopeData.Offset.x, item->Pose.Position.y + CLICK(1), item->Pose.Position.z + slopeData.Offset.z);
 
 	auto probeNow = GetCollision(now.x, now.y, now.z, item->RoomNumber);
 	auto probeUp = GetCollision(up.x, up.y, up.z, item->RoomNumber);
@@ -827,7 +827,7 @@ void SlopeHangExtra(ItemInfo* item, CollisionInfo* coll)
 
 	auto slopeData = GetSlopeData(item);
 
-	auto down = Vector3Int(item->Pose.Position.x + slopeData.Offset.x, item->Pose.Position.y + CLICK(1), item->Pose.Position.z + slopeData.Offset.z);
+	auto down = Vector3i(item->Pose.Position.x + slopeData.Offset.x, item->Pose.Position.y + CLICK(1), item->Pose.Position.z + slopeData.Offset.z);
 	
 	auto probeDown = GetCollision(down.x, down.y, down.z, item->RoomNumber);
 
@@ -907,7 +907,7 @@ void SlopeClimbExtra(ItemInfo* item, CollisionInfo* coll)
 	auto slopeData = GetSlopeData(item);
 
 	auto now = item->Pose.Position;
-	auto down = Vector3Int(item->Pose.Position.x + slopeData.Offset.x, item->Pose.Position.y + CLICK(1), item->Pose.Position.z + slopeData.Offset.z);
+	auto down = Vector3i(item->Pose.Position.x + slopeData.Offset.x, item->Pose.Position.y + CLICK(1), item->Pose.Position.z + slopeData.Offset.z);
 
 	auto probeNow = GetCollision(now.x, now.y, now.z, item->RoomNumber);
 	auto probeDown = GetCollision(down.x, down.y, down.z, item->RoomNumber);
@@ -982,7 +982,7 @@ void SlopeClimbDownExtra(ItemInfo* item, CollisionInfo* coll)
 
 	auto slopeData = GetSlopeData(item);
 
-	auto down = Vector3Int(item->Pose.Position.x + slopeData.Offset.x, item->Pose.Position.y + CLICK(1), item->Pose.Position.z + slopeData.Offset.z);
+	auto down = Vector3i(item->Pose.Position.x + slopeData.Offset.x, item->Pose.Position.y + CLICK(1), item->Pose.Position.z + slopeData.Offset.z);
 	
 	auto probeDown = GetCollision(down.x, down.y, down.z, item->RoomNumber);
 
@@ -1045,7 +1045,7 @@ void SlopeMonkeyExtra(ItemInfo* item, CollisionInfo* coll)
 	auto slopeData = GetSlopeData(item);
 
 	auto now = item->Pose.Position;
-	auto down = Vector3Int(item->Pose.Position.x + slopeData.Offset.x, item->Pose.Position.y + CLICK(1), item->Pose.Position.z + slopeData.Offset.z);
+	auto down = Vector3i(item->Pose.Position.x + slopeData.Offset.x, item->Pose.Position.y + CLICK(1), item->Pose.Position.z + slopeData.Offset.z);
 
 	auto probeNow = GetCollision(now.x, now.y, now.z, item->RoomNumber);
 	auto probeDown = GetCollision(down.x, down.y, down.z, item->RoomNumber);

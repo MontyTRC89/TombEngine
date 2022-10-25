@@ -10,7 +10,6 @@
 #include "Game/misc.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
-#include "Specific/prng.h"
 #include "Specific/setup.h"
 
 using namespace TEN::Math::Random;
@@ -75,9 +74,9 @@ namespace TEN::Entities::Creatures::TR2
 		auto* creature = GetCreatureInfo(item);
 
 		short angle = 0;
+		short tilt = 0;
 		short head = 0;
 		short neck = 0;
-		short tilt = 0;
 
 		bool isLaraAlive = LaraItem->HitPoints > 0;
 

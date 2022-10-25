@@ -4,6 +4,7 @@
 #include <SpriteFont.h>
 #include <PrimitiveBatch.h>
 #include <d3d9types.h>
+
 #include "Renderer/Renderer11Enums.h"
 #include "Renderer/ConstantBuffers/StaticBuffer.h"
 #include "Renderer/ConstantBuffers/LightBuffer.h"
@@ -42,6 +43,7 @@
 #include "Renderer/Structures/RendererRoom.h"
 
 struct CAMERA_INFO;
+struct RendererRectangle;
 
 using namespace TEN::Gui;
 
@@ -631,8 +633,7 @@ namespace TEN::Renderer
 		bool IsFullsScreen();
 		void RenderTitleImage();
 		void AddLine2D(int x1, int y1, int x2, int y2, byte r, byte g, byte b, byte a);
-		void AddLine3D(Vector3 start, Vector3 end,
-		               Vector4 color);
+		void AddLine3D(Vector3 start, Vector3 end, Vector4 color);
 		void AddBox(Vector3 min, Vector3 max, Vector4 color);
 		void AddBox(Vector3* corners, Vector4 color);
 		void AddDebugBox(BoundingOrientedBox box, Vector4 color, RENDERER_DEBUG_PAGE page);
@@ -644,12 +645,10 @@ namespace TEN::Renderer
 		void ResetAnimations();
 		void UpdateLaraAnimations(bool force);
 		void UpdateItemAnimations(int itemNumber, bool force);
-		void GetLaraAbsBonePosition(Vector3* pos, int joint);
-		void GetItemAbsBonePosition(int itemNumber, Vector3* pos, int joint);
+		void GetItemAbsBonePosition(int itemNumber, Vector3& pos, int jointIndex);
 		int  GetSpheres(short itemNumber, BoundingSphere* ptr, char worldSpace, Matrix local);
-		void GetBoneMatrix(short itemNumber, int joint, Matrix* outMatrix);
-		void DrawObjectOn2DPosition(short x, short y, short objectNum, short rotX, short rotY, short rotZ,
-		                            float scale1);
+		void GetBoneMatrix(short itemNumber, int jointIndex, Matrix* outMatrix);
+		void DrawObjectOn2DPosition(short x, short y, short objectNum, short rotX, short rotY, short rotZ,  float scale1);
 		void SetLoadingScreen(std::wstring& fileName);
 		void SetTextureOrDefault(Texture2D& texture, std::wstring path);
 		std::string GetDefaultAdapterName();

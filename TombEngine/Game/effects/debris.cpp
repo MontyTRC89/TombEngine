@@ -3,9 +3,9 @@
 
 #include "Game/collision/collide_room.h"
 #include "Specific/level.h"
-#include "Specific/prng.h"
+#include "Math/Random.h"
 #include "Specific/setup.h"
-#include "Specific/trmath.h"
+#include "Math/Math.h"
 #include <Game/effects/tomb4fx.h>
 
 using std::vector;

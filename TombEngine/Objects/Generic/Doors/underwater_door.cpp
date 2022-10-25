@@ -14,7 +14,7 @@
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_struct.h"
 #include "Game/Lara/lara.h"
-#include "Specific/trmath.h"
+#include "Math/Math.h"
 #include "Game/misc.h"
 #include "Objects/Generic/Doors/underwater_door.h"
 #include "Game/collision/collide_item.h"
@@ -23,13 +23,15 @@ using namespace TEN::Input;
 
 namespace TEN::Entities::Doors
 {
-	Vector3Int UnderwaterDoorPos(-251, -540, -46);
+	Vector3i UnderwaterDoorPos(-251, -540, -46);
 
 	OBJECT_COLLISION_BOUNDS UnderwaterDoorBounds =
 	{
-		-256, 256, 
-		-1024, 0, 
-		-1024, 0, 
+		GameBoundingBox(
+			-256, 256,
+			-1024, 0, 
+			-1024, 0
+		),
 		-ANGLE(80.0f), ANGLE(80.0f),
 		-ANGLE(80.0f), ANGLE(80.0f),
 		-ANGLE(80.0f), ANGLE(80.0f)

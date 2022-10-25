@@ -17,25 +17,29 @@ using namespace TEN::Input;
 
 namespace TEN::Entities::Switches
 {
-	Vector3Int CrowbarPos = { -89, 0, -328 }; 
+	Vector3i CrowbarPos = { -89, 0, -328 }; 
 
 	OBJECT_COLLISION_BOUNDS CrowbarBounds = 
 	{
-		-256, 256,
-		0, 0,
-		-512, -256,
+		GameBoundingBox(
+			-256, 256,
+			0, 0,
+			-512, -256
+		),
 		-ANGLE(10.0f), ANGLE(10.0f),
 		-ANGLE(30.0f), ANGLE(30.0f),
 		-ANGLE(10.0f), ANGLE(10.0f)
 	};
 
-	Vector3Int CrowbarPos2 = { 89, 0, 328 }; 
+	Vector3i CrowbarPos2 = { 89, 0, 328 }; 
 
 	OBJECT_COLLISION_BOUNDS CrowbarBounds2 = 
 	{
-		-256, 256,
-		0, 0,
-		256, 512,
+		GameBoundingBox(
+			-256, 256,
+			0, 0,
+			256, 512
+		),
 		-ANGLE(10.0f), ANGLE(10.0f),
 		-ANGLE(30.0f), ANGLE(30.0f),
 		-ANGLE(10.0f), ANGLE(10.0f)

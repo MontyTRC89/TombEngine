@@ -10,7 +10,7 @@
 #include "Game/Lara/lara.h"
 #include "Sound/sound.h"
 #include "Specific/setup.h"
-#include "Specific/prng.h"
+#include "Math/Random.h"
 #include "Specific/level.h"
 
 using namespace TEN::Math::Random;

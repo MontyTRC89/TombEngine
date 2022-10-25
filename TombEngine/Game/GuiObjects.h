@@ -1,6 +1,8 @@
 #pragma once
+#include "Math/Math.h"
 #include "Scripting/Internal/LanguageScript.h"
-#include "Specific/phd_global.h"
+
+using namespace TEN::Math;
 
 struct ItemInfo;
 
@@ -289,7 +291,7 @@ namespace TEN::Gui
 		short ObjectNumber;
 		short YOffset;
 		float Scale1;
-		Vector3Shrt Orientation;
+		EulerAngles Orientation;
 		unsigned __int64 Options;
 		const char* ObjectName;
 		uint MeshBits;

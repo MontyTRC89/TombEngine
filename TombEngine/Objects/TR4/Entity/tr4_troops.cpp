@@ -13,7 +13,7 @@
 #include "Game/animation.h"
 #include "Game/misc.h"
 #include "Specific/level.h"
-#include "Specific/prng.h"
+#include "Math/Random.h"
 #include "Specific/setup.h"
 
 using namespace TEN::Math::Random;
@@ -72,8 +72,8 @@ namespace TEN::Entities::TR4
 			return;
 
 		auto* item = &g_Level.Items[itemNumber];
-		auto* creature = GetCreatureInfo(item);
 		auto* object = &Objects[item->ObjectNumber];
+		auto* creature = GetCreatureInfo(item);
 
 		short angle = 0;
 		short tilt = 0;
@@ -86,13 +86,9 @@ namespace TEN::Entities::TR4
 		int dy = 0;
 		int dz = 0;
 
-		int distance = 0;
-
 		if (creature->FiredWeapon)
 		{
-			auto pos = Vector3Int(TroopsBite1.Position);
-			GetJointAbsPosition(item, &pos, TroopsBite1.meshNum);
-
+			auto pos = GetJointPosition(item, TroopsBite1.meshNum, Vector3i(TroopsBite1.Position));
 			TriggerDynamicLight(pos.x, pos.y, pos.z, 2 * creature->FiredWeapon + 8, 24, 16, 4);
 
 			creature->FiredWeapon--;
@@ -148,29 +144,21 @@ namespace TEN::Entities::TR4
 			{
 				// Search for active troops.
 				creature->Enemy = nullptr;
-				CreatureInfo* currentCreature = ActiveCreatures[0];
 
-				int minDistance = INT_MAX;
+				float minDistance = FLT_MAX;
 
-				for (int i = 0; i < ActiveCreatures.size(); i++)
+				for (auto* activeCreature : ActiveCreatures)
 				{
-					currentCreature = ActiveCreatures[i];
-
-					if (currentCreature->ItemNumber != NO_ITEM && currentCreature->ItemNumber != itemNumber)
+					if (activeCreature->ItemNumber != NO_ITEM && activeCreature->ItemNumber != itemNumber)
 					{
-						auto* currentItem = &g_Level.Items[currentCreature->ItemNumber];
+						auto* currentItem = &g_Level.Items[activeCreature->ItemNumber];
 
 						if (currentItem->ObjectNumber != ID_LARA)
 						{
 							if (currentItem->ObjectNumber != ID_TROOPS &&
 								(!currentItem->IsLara() || creature->HurtByLara))
 							{
-								dx = currentItem->Pose.Position.x - item->Pose.Position.x;
-								dy = currentItem->Pose.Position.y - item->Pose.Position.y;
-								dz = currentItem->Pose.Position.z - item->Pose.Position.z;
-
-								distance = pow(dx, 2) + pow(dy, 2) + pow(dz, 2);
-
+								float distance = Vector3i::Distance(item->Pose.Position, currentItem->Pose.Position);
 								if (distance < minDistance)
 								{
 									minDistance = distance;

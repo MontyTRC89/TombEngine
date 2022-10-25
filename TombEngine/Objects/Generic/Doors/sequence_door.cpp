@@ -13,7 +13,7 @@
 #include "Game/collision/sphere.h"
 #include "Game/Lara/lara_struct.h"
 #include "Game/Lara/lara.h"
-#include "Specific/trmath.h"
+#include "Math/Math.h"
 #include "Game/misc.h"
 #include "Objects/Generic/Doors/sequence_door.h"
 #include "Objects/Generic/Switches/fullblock_switch.h"

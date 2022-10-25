@@ -60,14 +60,14 @@ void ControlTeleporter(short itemNumber)
 
 				if (GlobalCounter & 1)
 				{
-					Vector3Int src;
+					Vector3i src;
 					pos.x = targetItem->pos.Position.x;
 					pos.y = targetItem->pos.Position.y - 496;
 					pos.z = targetItem->pos.Position.z + 472;
 
 					int dl = 4 * item->itemFlags[0] + 256;
 
-					Vector3Int dest;
+					Vector3i dest;
 					dest.x = src.x + GetRandomControl() % dl - (dl >> 1);
 					dest.y = src.y + GetRandomControl() % dl - (dl >> 1);
 					dest.z = src.z + GetRandomControl() % dl - (dl >> 1);
@@ -127,7 +127,7 @@ void ControlTeleporter(short itemNumber)
 					v45 = v31->pos.Position.z + 472;
 					v33 = (v30 >> 2) | (((v30 - GetRandomControl() % (v30 >> 1)) | ((v32 | 0x2400) << 8)) << 8);
 					v34 = GetRandomControl();
-					TriggerEnergyArc((Vector3Int*)& src, (Vector3Int*)& src.xRot, (v34 & 0xF) + 16, v33, 13, 56, 5);
+					TriggerEnergyArc((Vector3i*)& src, (Vector3i*)& src.xRot, (v34 & 0xF) + 16, v33, 13, 56, 5);
 					v35* = GetFreeParticle();
 					v35->On = 1;
 					v36 = item->itemFlags[0];

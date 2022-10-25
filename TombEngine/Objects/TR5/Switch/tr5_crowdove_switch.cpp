@@ -19,15 +19,17 @@ namespace TEN::Entities::Switches
 {
 	OBJECT_COLLISION_BOUNDS CrowDoveBounds =
 	{
-		-256, 256,
-		0, 0,
-		-512, 512,
+		GameBoundingBox(
+			-256, 256,
+			0, 0,
+			-512, 512
+		),
 		-ANGLE(10.0f), ANGLE(10.0f),
 		-ANGLE(30.0f), ANGLE(30.0f),
 		-ANGLE(10.0f), ANGLE(10.0f)
 	};
 
-	auto CrowDovePos = Vector3Int(0, 0, -400);
+	auto CrowDovePos = Vector3i(0, 0, -400);
 
 	void InitialiseCrowDoveSwitch(short itemNumber)
 	{

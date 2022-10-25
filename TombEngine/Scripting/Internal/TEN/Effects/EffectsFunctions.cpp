@@ -44,12 +44,12 @@ namespace Effects
 	//@tparam bool endDrift If true, the end of the arc will be able to gradually drift away from its destination in a random direction (default false)
 	static void EmitLightningArc(Vec3 src, Vec3 dest, TypeOrNil<ScriptColor> color, TypeOrNil<float> lifetime, TypeOrNil<int> amplitude, TypeOrNil<int> beamWidth, TypeOrNil<int> segments, TypeOrNil<bool> smooth, TypeOrNil<bool> endDrift)
 	{
-		Vector3Int p1;
+		Vector3i p1;
 		p1.x = src.x;
 		p1.y = src.y;
 		p1.z = src.z;
 
-		Vector3Int p2;
+		Vector3i p2;
 		p2.x = dest.x;
 		p2.y = dest.y;
 		p2.z = dest.z;
@@ -168,7 +168,7 @@ namespace Effects
 		s->x = pos.x;
 		s->y = pos.y;
 		s->z = pos.z;
-		s->roomNumber = FindRoomNumber(Vector3Int(pos.x, pos.y, pos.z));
+		s->roomNumber = FindRoomNumber(Vector3i(pos.x, pos.y, pos.z));
 		constexpr float secsPerFrame = 1.0f / (float)FPS;
 
 		float life = USE_IF_HAVE(float, lifetime, 2.0f);
@@ -231,7 +231,7 @@ namespace Effects
 */
 	static void EmitShockwave(Vec3 pos, TypeOrNil<int> innerRadius, TypeOrNil<int> outerRadius, TypeOrNil<ScriptColor> col, TypeOrNil<float> lifetime, TypeOrNil<int> speed, TypeOrNil<int> angle, TypeOrNil<bool> hurtsLara)
 	{
-		PHD_3DPOS p;
+		Pose p;
 		p.Position.x = pos.x;
 		p.Position.y = pos.y;
 		p.Position.z = pos.z;
@@ -292,7 +292,7 @@ namespace Effects
 	static void EmitFire(Vec3 pos, TypeOrNil<float> size)
 	{
 
-		AddFire(pos.x, pos.y, pos.z, FindRoomNumber(Vector3Int(pos.x, pos.y, pos.z)), USE_IF_HAVE(float, size, 1), 0);
+		AddFire(pos.x, pos.y, pos.z, FindRoomNumber(Vector3i(pos.x, pos.y, pos.z)), USE_IF_HAVE(float, size, 1), 0);
 	}
 
 /***Make an explosion. Does not hurt Lara
@@ -303,7 +303,7 @@ namespace Effects
 */
 	static void MakeExplosion(Vec3 pos, TypeOrNil<float> size, TypeOrNil<bool> shockwave)
 	{
-		TriggerExplosion(Vector3(pos.x, pos.y, pos.z), USE_IF_HAVE(float, size, 512.0f), true, false, USE_IF_HAVE(bool, shockwave, false), FindRoomNumber(Vector3Int(pos.x, pos.y, pos.z)));
+		TriggerExplosion(Vector3(pos.x, pos.y, pos.z), USE_IF_HAVE(float, size, 512.0f), true, false, USE_IF_HAVE(bool, shockwave, false), FindRoomNumber(Vector3i(pos.x, pos.y, pos.z)));
 	}
 
 /***Make an earthquake
