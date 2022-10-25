@@ -79,12 +79,12 @@ using namespace TEN::Math;
 		*this = Lerp(*this, eulersTo, alpha, epsilon);
 	}
 
-	EulerAngles EulerAngles::Lerp(const EulerAngles& eulersFrom, const EulerAngles& eulersTo, float alpha, short epsilon) const
+	EulerAngles EulerAngles::Lerp(const EulerAngles& eulersFrom, const EulerAngles& eulersTo, float alpha, short epsilon)
 	{
 		return EulerAngles(
-			InterpolateLinear(eulersFrom.x, eulersTo.x, alpha, epsilon),
-			InterpolateLinear(eulersFrom.y, eulersTo.y, alpha, epsilon),
-			InterpolateLinear(eulersFrom.z, eulersTo.z, alpha, epsilon)
+			Lerp(eulersFrom.x, eulersTo.x, alpha, epsilon),
+			Lerp(eulersFrom.y, eulersTo.y, alpha, epsilon),
+			Lerp(eulersFrom.z, eulersTo.z, alpha, epsilon)
 		);
 	}
 
@@ -196,12 +196,12 @@ using namespace TEN::Math;
 		return EulerAngles((short)round(x / scale), (short)round(y / scale), (short)round(z / scale));
 	}
 
-	float EulerAngles::ClampAlpha(float alpha) const
+	float EulerAngles::ClampAlpha(float alpha)
 	{
 		return ((abs(alpha) > 1.0f) ? 1.0f : abs(alpha));
 	}
 
-	bool EulerAngles::Compare(short angle0, short angle1, short epsilon) const
+	bool EulerAngles::Compare(short angle0, short angle1, short epsilon)
 	{
 		short difference = Geometry::GetShortestAngularDistance(angle0, angle1);
 		if (abs(difference) <= epsilon)
@@ -210,7 +210,7 @@ using namespace TEN::Math;
 		return false;
 	}
 
-	short EulerAngles::InterpolateLinear(short angleFrom, short angleTo, float alpha, short epsilon) const
+	short EulerAngles::Lerp(short angleFrom, short angleTo, float alpha, short epsilon)
 	{
 		alpha = ClampAlpha(alpha);
 
