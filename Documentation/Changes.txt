@@ -15,6 +15,7 @@ Version 1.0.3
 * Fix slow centaur projectile velocity.
 * Fix search animations.
 * Fix grabbing narrow ledges below ceilings.
+* Fix Sarcophagus
 
 
 Version 1.0.2
