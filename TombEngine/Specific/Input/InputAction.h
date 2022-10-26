@@ -91,7 +91,7 @@ namespace TEN::Input
 		bool IsClicked() const;
 		bool IsHeld(float delayInSec = 0.0f) const;
 		bool IsPulsed(float delayInSec, float initialDelayInSec = 0.0f) const;
-		bool IsReleased(float maxDelayInSec = FLT_MAX) const;
+		bool IsReleased(float maxDelayInSec = INFINITY) const;
 
 		// Utilities
 		void Update(float value);

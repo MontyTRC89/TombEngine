@@ -40,7 +40,7 @@ namespace TEN::Input
 
 	bool InputAction::IsHeld(float delayInSec) const
 	{
-		float delayInFrameTime = round(delayInSec / DELTA_TIME);
+		float delayInFrameTime = (delayInSec == 0.0f) ? 0.0f : round(delayInSec / DELTA_TIME);
 		return ((Value != 0.0f) && (TimeActive >= delayInFrameTime));
 	}
 
@@ -71,7 +71,7 @@ namespace TEN::Input
 
 	bool InputAction::IsReleased(float maxDelayInSec) const
 	{
-		float maxDelayInFrameTime = round(maxDelayInSec / DELTA_TIME);
+		float maxDelayInFrameTime = (maxDelayInSec == INFINITY) ? INFINITY : round(maxDelayInSec / DELTA_TIME);
 		return ((Value == 0.0f) && (PrevValue != 0.0f) && (TimeActive <= maxDelayInFrameTime));
 	}
 

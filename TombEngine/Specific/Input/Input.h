@@ -151,7 +151,7 @@ namespace TEN::Input
 	bool  IsClicked(ActionID actionID);
 	bool  IsHeld(ActionID actionID, float delayInSec = 0.0f);
 	bool  IsPulsed(ActionID actionID, float delayInSec, float initialDelayInSec = 0.0f);
-	bool  IsReleased(ActionID actionID, float maxDelayInSec = 0.0f);
+	bool  IsReleased(ActionID actionID, float maxDelayInSec = INFINITY);
 	float GetActionValue(ActionID actionID);
 	float GetActionTimeActive(ActionID actionID);
 	float GetActionTimeInactive(ActionID actionID);
