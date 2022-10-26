@@ -444,7 +444,6 @@ void LaraJumpCollision(ItemInfo* item, CollisionInfo* coll, short moveAngle)
 	auto* lara = GetLaraInfo(item);
 
 	lara->Control.MoveAngle = moveAngle;
-	item->Animation.IsAirborne = true;
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
 	coll->Setup.LowerCeilingBound = BAD_JUMP_CEILING;

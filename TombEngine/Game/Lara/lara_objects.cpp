@@ -791,6 +791,8 @@ void lara_as_ladder_idle(ItemInfo* item, CollisionInfo* coll)
 	}
 	
 	item->Animation.TargetState = LS_JUMP_UP;
+	if (HasStateDispatch(item, LS_JUMP_UP)) // TODO: Update jump state handling to not require this. -- Sezz 2022.10.26
+		item->Animation.IsAirborne = true;
 }
 
 // State:	LS_LADDER_IDLE (174)
@@ -997,8 +999,7 @@ void lara_as_pole_idle(ItemInfo* item, CollisionInfo* coll)
 		item->Animation.TargetState = LS_FREEFALL;
 
 		// TODO: This shouldn't be required, but the set position command doesn't move Lara correctly.
-		item->Pose.Position.x -= phd_sin(item->Pose.Orientation.y) * 64;
-		item->Pose.Position.z -= phd_cos(item->Pose.Orientation.y) * 64;
+		item->Pose.Translate(item->Pose.Orientation.y, -CLICK(0.25f));
 	}
 }
 

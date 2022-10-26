@@ -2645,8 +2645,9 @@ bool TestLaraLadderDown(ItemInfo* item, CollisionInfo* coll)
 
 bool TestLaraLadderDismountTop(ItemInfo* item, CollisionInfo* coll)
 {
-	static constexpr auto probeDist		  = CLICK(1);
-	static constexpr auto upperFloorBound = -CLICK(0.25f);
+	static constexpr auto probeDist			= CLICK(1);
+	static constexpr auto upperFloorBound	= -CLICK(0.25f);
+	static constexpr auto lowerCeilingBound = -CLICK(2);
 
 	int vPos = item->Pose.Position.y + GameBoundingBox(item).Y1;
 	auto pointColl = GetCollision(item, item->Pose.Orientation.y, probeDist);
@@ -2659,7 +2660,7 @@ bool TestLaraLadderDismountTop(ItemInfo* item, CollisionInfo* coll)
 
 	// Assess point collision.
 	if ((pointColl.Position.Floor - vPos) >= upperFloorBound &&					  // Floor height is within upper floor bound.
-		(pointColl.Position.Ceiling - vPos) < -CLICK(2) &&						  // Ceiling heihgt is withing highest ceiling bound.
+		(pointColl.Position.Ceiling - vPos) < lowerCeilingBound &&				  // Ceiling height is within upper ceiling bound.
 		abs(pointColl.Position.Ceiling - pointColl.Position.Floor) > LARA_HEIGHT) // Space isn't too narrow.
 	{
 		return true;
