@@ -39,9 +39,11 @@ struct CAMERA_INFO
 	ItemInfo* lastItem; // size=144, offset=96
 	int mikeAtLara; // size=0, offset=104
 	Vector3i mikePos; // size=12, offset=108
-	bool ObjCamera;
-	short CamMeshID;
-	short TargetMeshID;
+};
+
+struct OBJ_CAMERA_INFO
+{
+	GameVector LastAngle;
 };
 
 enum CAMERA_FLAGS
@@ -55,6 +57,7 @@ enum CAMERA_FLAGS
 constexpr auto FADE_SCREEN_SPEED = 16.0f / 255.0f;
 
 extern CAMERA_INFO Camera;
+extern OBJ_CAMERA_INFO ItemCamera;
 extern GameVector ForcedFixedCamera;
 extern int UseForcedFixedCamera;
 extern int BinocularRange;
