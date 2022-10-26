@@ -82,27 +82,6 @@ namespace TEN::Gui
 		STRING_CONTROLS_FIRE
 	};
 
-	bool GuiController::CanSelect() const
-	{
-		if (IsHeld(In::Deselect))
-			return false;
-
-		if (GetActionTimeActive(In::Action) <= GetActionTimeInactive(In::Deselect) &&
-			GetActionTimeActive(In::Action) <= GetActionTimeInactive(In::Save) &&
-			GetActionTimeActive(In::Action) <= GetActionTimeInactive(In::Load) &&
-			GetActionTimeActive(In::Action) <= GetActionTimeInactive(In::Pause))
-		{
-			return true;
-		}
-
-		return false;
-	}
-
-	bool GuiController::CanDeselect() const
-	{
-		return (!(IsHeld(In::Select) || IsHeld(In::Action)));
-	}
-
 	bool GuiController::GuiIsPulsed(ActionID actionID) const
 	{
 		auto oppositeAction = In::None;
@@ -125,7 +104,8 @@ namespace TEN::Gui
 			break;
 		}
 
-		return (IsPulsed(actionID, 0.1f, 0.4f) && ((oppositeAction == In::None) || !IsHeld(oppositeAction)));
+		bool isActionLocked = (oppositeAction == In::None) ? false : IsHeld(oppositeAction);
+		return (IsPulsed(actionID, 0.1f, 0.4f) && !isActionLocked);
 	}
 
 	bool GuiController::GuiIsSelected() const
@@ -136,6 +116,27 @@ namespace TEN::Gui
 	bool GuiController::GuiIsDeselected() const
 	{
 		return (IsClicked(In::Deselect) && CanDeselect());
+	}
+
+	bool GuiController::CanSelect() const
+	{
+		if (IsHeld(In::Deselect))
+			return false;
+
+		if (GetActionTimeActive(In::Action) <= GetActionTimeInactive(In::Deselect) &&
+			GetActionTimeActive(In::Action) <= GetActionTimeInactive(In::Save) &&
+			GetActionTimeActive(In::Action) <= GetActionTimeInactive(In::Load) &&
+			GetActionTimeActive(In::Action) <= GetActionTimeInactive(In::Pause))
+		{
+			return true;
+		}
+
+		return false;
+	}
+
+	bool GuiController::CanDeselect() const
+	{
+		return !(IsHeld(In::Select) || IsHeld(In::Action));
 	}
 
 	SettingsData GuiController::GetCurrentSettings()

@@ -114,11 +114,11 @@ namespace TEN::Gui
 	{
 	private:
 		// Input inquirers
-		bool CanSelect() const;
-		bool CanDeselect() const;
 		bool GuiIsPulsed(ActionID actionID) const;
 		bool GuiIsSelected() const;
 		bool GuiIsDeselected() const;
+		bool CanSelect() const;
+		bool CanDeselect() const;
 
 	public:
 		bool CallInventory(ItemInfo* item, bool resetMode);
