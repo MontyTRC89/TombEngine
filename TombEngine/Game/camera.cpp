@@ -58,11 +58,9 @@ GameVector LookCamPosition;
 GameVector LookCamTarget;
 Vector3i CamOldPos;
 CAMERA_INFO Camera;
+OBJ_CAMERA_INFO ItemCamera;
 GameVector ForcedFixedCamera;
 int UseForcedFixedCamera;
-int LastAnglex;
-int LastAngley;
-int LastAnglez;
 ItemInfo* camSlotId;
 int camMeshId;
 ItemInfo* TargetSlotId;
@@ -340,9 +338,7 @@ void ObjCamera(ItemInfo* camSlotId, int camMeshId, ItemInfo* targetItem, int tar
 
 	UpdateCameraElevation();
 
-	int moveSpeed = 1;
-	//get mesh 0 coordinates.
-	
+	//get mesh 0 coordinates.	
 	auto pos = GetJointPosition(camSlotId, 0, Vector3i::Zero);
 	auto dest = Vector3(pos.x, pos.y, pos.z);
 
@@ -413,17 +409,19 @@ void MoveObjCamera(GameVector* ideal, ItemInfo* camSlotId, int camMeshId, ItemIn
 	Camera.pos.RoomNumber = GetCollision(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.RoomNumber).RoomNumber;
 	LookAt(&Camera, 0);
 
-	// write last frame camera angle to LastAngle to compare if next frame camera angle has a bigger step than 100.
-	// To make camera movement smoother a speed of 2 is used. While for big camera angle steps (cuts) -
-	// the speed is set to 1 to make the cut immediatelly.
 	int anglex = Camera.target.x - Camera.pos.x;
 	int angley = Camera.target.y - Camera.pos.y;
 	int anglez = Camera.target.z - Camera.pos.z;
 
-	if (LastAnglex - anglex > 100 ||
-		LastAngley - angley > 100 ||
-		LastAnglez - anglez > 100
-		)
+	auto position = Vector3i(Camera.target.x - Camera.pos.x, Camera.target.y - Camera.pos.y, Camera.target.z - Camera.pos.z);
+
+	// write last frame camera angle to LastAngle to compare if next frame camera angle has a bigger step than 100.
+	// To make camera movement smoother a speed of 2 is used.
+	// While for big camera angle steps (cuts) -
+	// the speed is set to 1 to make the cut immediatelly.
+	if (ItemCamera.LastAngle.x - anglex > 100 ||
+		ItemCamera.LastAngle.y - angley > 100 ||
+		ItemCamera.LastAngle.z - anglez > 100)
 	{
 		speed = 1;
 	}
@@ -437,13 +435,9 @@ void MoveObjCamera(GameVector* ideal, ItemInfo* camSlotId, int camMeshId, ItemIn
 	Camera.target.y += (pos2.y - Camera.target.y) / speed;
 	Camera.target.z += (pos2.z - Camera.target.z) / speed;
 
-	if (LastAnglex != anglex ||
-		LastAngley != angley ||
-		LastAnglez != anglez)
+	if (ItemCamera.LastAngle != position)
 	{
-		LastAnglex = anglex;
-		LastAngley = angley;
-		LastAnglez = anglez;
+		ItemCamera.LastAngle = Vector3i(ItemCamera.LastAngle.x = anglex, ItemCamera.LastAngle.y = angley, ItemCamera.LastAngle.z = anglez);
 	}
 }
 
@@ -1530,7 +1524,7 @@ void CalculateCamera()
 		return;
 	}
 
-	if (ItemCameraOn == true)
+	if (ItemCameraOn)
 	{
 		return;
 	}
