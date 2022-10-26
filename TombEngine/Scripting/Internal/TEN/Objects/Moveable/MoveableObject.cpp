@@ -1057,50 +1057,44 @@ void  Moveable::AttachCamera(short camMeshId, short targetMeshId)
 //Lara will undraw her weapons if they are drawn, throw away flare if she helds one in her hand.
 void   Moveable::UndrawWeapons()
 {
-	if (m_item->IsLara())
-	{
-		auto* lara = GetLaraInfo(m_item);
+	m_item->IsLara();
+	auto* lara = GetLaraInfo(m_item);
 
-		if (lara->Control.HandStatus != HandStatus::Free ||
-			lara->Control.Weapon.GunType == LaraWeaponType::Flare)
-		{
-			lara->Control.HandStatus = HandStatus::WeaponUndraw;
-		}
+	if (lara->Control.HandStatus != HandStatus::Free ||
+		lara->Control.Weapon.GunType == LaraWeaponType::Flare)
+	{
+		lara->Control.HandStatus = HandStatus::WeaponUndraw;
 	}
+	
 }
 
 //Lara will throw away the torch if she helds one in her hand.
 void   Moveable::ThrowawayTorch()
 {
-	if (m_item->IsLara())
-	{
-		auto* lara = GetLaraInfo(m_item);
+	m_item->IsLara();
+	auto* lara = GetLaraInfo(m_item);
 
-		if (lara->Control.Weapon.GunType == LaraWeaponType::Torch)
-		{
-			Lara.Torch.State = TorchState::Dropping;
-		}
+	if (lara->Control.Weapon.GunType == LaraWeaponType::Torch)
+	{
+		Lara.Torch.State = TorchState::Dropping;
 	}
+	
 }
 
 //Returns 0=HandsFree, 1=Busy(climbing,etc), 2=WeaponDraw, 3=WeaponUndraw, 4=WeaponInHand.
 HandStatus Moveable::GetLaraHandStatus() const
 {
-	if (m_item->IsLara())
-	{
-		auto* lara = GetLaraInfo(m_item);
-		return  HandStatus{ lara->Control.HandStatus };
-	}
+	m_item->IsLara();
+	auto* lara = GetLaraInfo(m_item);
+	return  HandStatus{ lara->Control.HandStatus };
 }
 
 //Returns 0=None, 1=Pistols, 2=Revolver, 3=Uzi, 4=Shotgun, 5=HK, 6=Crossbow, 7=Flare, 8=Torch, 9=GrenadeLauncher, 10=Harpoon, 11=RocketLauncher.
 LaraWeaponType Moveable::GetLaraWeaponType() const
 {
-	if (m_item->IsLara())
-	{
-		auto* lara = GetLaraInfo(m_item);
-		return  LaraWeaponType{ lara->Control.Weapon.GunType };
-	}
+	m_item->IsLara();
+	auto* lara = GetLaraInfo(m_item);
+	return  LaraWeaponType{ lara->Control.Weapon.GunType };
 }
 
 //Borrow an animtaion and state id from an object.
@@ -1112,16 +1106,15 @@ void Moveable::AnimFromObject(GAME_OBJECT_ID object, int animNumber, int stateID
 	AnimateItem(m_item);
 }
 
-//Set Lara Weapon type.
+//Set Lara Weapon type
 //0=None, 1=Pistols, 2=Revolver, 3=Uzi, 4=Shotgun, 5=HK, 6=Crossbow, 7=Flare, 8=Torch, 9=GrenadeLauncher, 10=Harpoon, 11=RocketLauncher.
 void Moveable::SetLaraWeaponType(LaraWeaponType weaponType, bool activate)
 {
-	if (m_item->IsLara())
-	{
-		auto* lara = GetLaraInfo(m_item);
+	m_item->IsLara();
+	auto* lara = GetLaraInfo(m_item);
 
-		switch (weaponType)
-		{
+	switch (weaponType)
+	{
 		case LaraWeaponType::Flare:
 			lara->Control.Weapon.RequestGunType = LaraWeaponType::Flare;
 		break;
@@ -1131,20 +1124,19 @@ void Moveable::SetLaraWeaponType(LaraWeaponType weaponType, bool activate)
 			{
 				GetFlameTorch();
 				lara->Torch.IsLit = false;
-				break;
 			}
 			else
 			{
 				GetFlameTorch();
-				lara->Torch.IsLit=true;
-		break;
+				lara->Torch.IsLit = true;
 			}
+		break;
 		default:
 				if (activate == false)
 				lara->Control.Weapon.LastGunType = weaponType;
 				else
 				lara->Control.Weapon.RequestGunType = weaponType;
 		break;
-		}
 	}
+	
 }
