@@ -1594,8 +1594,8 @@ namespace TEN::Gui
 		else
 			Ammo.AmountShotGunAmmo2 = lara->Weapons[(int)LaraWeaponType::Shotgun].Ammo[1].GetCount() / 6;
 		
-		Ammo.AmountShotGunAmmo1 = Lara.Weapons[(int)LaraWeaponType::Shotgun].Ammo[(int)WeaponAmmoType::Ammo1].HasInfinite() ? -1 : Lara.Weapons[(int)LaraWeaponType::Shotgun].Ammo[(int)WeaponAmmoType::Ammo1].GetCount();
-		Ammo.AmountShotGunAmmo2 = Lara.Weapons[(int)LaraWeaponType::Shotgun].Ammo[(int)WeaponAmmoType::Ammo2].HasInfinite() ? -1 : Lara.Weapons[(int)LaraWeaponType::Shotgun].Ammo[(int)WeaponAmmoType::Ammo2].GetCount();
+		Ammo.AmountShotGunAmmo1 = lara->Weapons[(int)LaraWeaponType::Shotgun].Ammo[(int)WeaponAmmoType::Ammo1].HasInfinite() ? -1 : lara->Weapons[(int)LaraWeaponType::Shotgun].Ammo[(int)WeaponAmmoType::Ammo1].GetCount();
+		Ammo.AmountShotGunAmmo2 = lara->Weapons[(int)LaraWeaponType::Shotgun].Ammo[(int)WeaponAmmoType::Ammo2].HasInfinite() ? -1 : lara->Weapons[(int)LaraWeaponType::Shotgun].Ammo[(int)WeaponAmmoType::Ammo2].GetCount();
 		Ammo.AmountHKAmmo1 = lara->Weapons[(int)LaraWeaponType::HK].Ammo[(int)WeaponAmmoType::Ammo1].HasInfinite() ? -1 : lara->Weapons[(int)LaraWeaponType::HK].Ammo[(int)WeaponAmmoType::Ammo1].GetCount();
 		Ammo.AmountCrossBowAmmo1 = lara->Weapons[(int)LaraWeaponType::Crossbow].Ammo[(int)WeaponAmmoType::Ammo1].HasInfinite() ? -1 : lara->Weapons[(int)LaraWeaponType::Crossbow].Ammo[(int)WeaponAmmoType::Ammo1].GetCount();
 		Ammo.AmountCrossBowAmmo2 = lara->Weapons[(int)LaraWeaponType::Crossbow].Ammo[(int)WeaponAmmoType::Ammo2].HasInfinite() ? -1 : lara->Weapons[(int)LaraWeaponType::Crossbow].Ammo[(int)WeaponAmmoType::Ammo2].GetCount();
@@ -2653,7 +2653,7 @@ namespace TEN::Gui
 								break;
 
 							case ID_SHOTGUN_AMMO2_ITEM:
-								numItems = Lara.Weapons[(int)LaraWeaponType::Shotgun].Ammo[(int)WeaponAmmoType::Ammo2].GetCount();
+								numItems = lara->Weapons[(int)LaraWeaponType::Shotgun].Ammo[(int)WeaponAmmoType::Ammo2].GetCount();
 								break;
 
 							case ID_HK_AMMO_ITEM:
