@@ -308,11 +308,9 @@ namespace TEN::Gui
 
 	struct AmmoList
 	{
-		short  InventoryItem;
-		short  Amount;
-		ushort XRot;
-		ushort YRot;
-		ushort ZRot;
+		short		InventoryItem = 0;
+		short		Amount		  = 0;
+		EulerAngles Orientation	  = EulerAngles::Zero;
 	};
 
 	struct AmmoData

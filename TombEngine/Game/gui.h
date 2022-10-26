@@ -1,10 +1,12 @@
 #pragma once
 #include "Game/GuiObjects.h"
 #include "LanguageScript.h"
+#include "Math/Math.h"
 #include "Specific/configuration.h"
 #include "Specific/Input/InputAction.h"
 
 using namespace TEN::Input;
+using namespace TEN::Math;
 
 struct ItemInfo;
 
@@ -87,9 +89,7 @@ namespace TEN::Gui
 	struct ObjectList
 	{
 		short InventoryItem;
-		unsigned short XRot;
-		unsigned short YRot;
-		unsigned short ZRot;
+		EulerAngles Orientation = EulerAngles::Zero;
 		unsigned short Bright;
 	};
 
@@ -212,7 +212,7 @@ namespace TEN::Gui
 		void InsertObjectIntoList(int objectNumber);
 		void InsertObjectIntoList_v2(int objectNumber);
 		void UseCurrentItem(ItemInfo* item);
-		void SpinBack(ushort* angle);
+		void SpinBack(EulerAngles& orient);
 		void UpdateWeaponStatus(ItemInfo* item);
 		void DoStatisticsMode();
 		void DoExamineMode();

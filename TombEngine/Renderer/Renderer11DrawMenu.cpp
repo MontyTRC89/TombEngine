@@ -504,12 +504,11 @@ namespace TEN::Renderer
 		m_context->OMGetRenderTargets(1, nullptr, &dsv);
 		m_context->ClearDepthStencilView(dsv, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
-		DrawObjectOn2DPosition(700 + PickupX, 450, objectNum, 0, m_pickupRotation, 0, 0.5f); // TODO: + PickupY
+		DrawObjectOn2DPosition(700 + PickupX, 450, objectNum, EulerAngles(0, m_pickupRotation, 0), 0.5f); // TODO: + PickupY
 		m_pickupRotation += 45 * 360 / 30;
 	}
 
-	void Renderer11::DrawObjectOn2DPosition(short x, short y, short objectNum, short rotX, short rotY, short rotZ,
-		float scale1)
+	void Renderer11::DrawObjectOn2DPosition(short x, short y, short objectNum, EulerAngles orient, float scale1)
 	{
 		Matrix translation;
 		Matrix rotation;
@@ -532,15 +531,12 @@ namespace TEN::Renderer
 
 		if (index != -1)
 		{
-			auto objme = &InventoryObjectTable[index];
-			y += objme->YOffset;
-			rotX += objme->Orientation.x;
-			rotY += objme->Orientation.y;
-			rotZ += objme->Orientation.z;
+			auto& invObject = InventoryObjectTable[index];
+			y += invObject.YOffset;
+			orient += invObject.Orientation;
 		}
 
-		view = Matrix::CreateLookAt(Vector3(0.0f, 0.0f, 2048.0f), Vector3(0.0f, 0.0f, 0.0f),
-			Vector3(0.0f, -1.0f, 0.0f));
+		view = Matrix::CreateLookAt(Vector3(0.0f, 0.0f, 2048.0f), Vector3(0.0f, 0.0f, 0.0f), Vector3(0.0f, -1.0f, 0.0f));
 		projection = Matrix::CreateOrthographic(m_screenWidth, m_screenHeight, -1024.0f, 1024.0f);
 
 		auto& moveableObj = m_moveableObjects[objectNum];
@@ -590,7 +586,7 @@ namespace TEN::Renderer
 
 			// Finish the world matrix
 			translation = Matrix::CreateTranslation(pos.x, pos.y, pos.z + 1024.0f);
-			rotation = Matrix::CreateFromYawPitchRoll(TO_RAD(rotY), TO_RAD(rotX), TO_RAD(rotZ));
+			rotation = orient.ToRotationMatrix();
 			scale = Matrix::CreateScale(scale1);
 
 			world = scale * rotation;
@@ -665,24 +661,24 @@ namespace TEN::Renderer
 
 	void Renderer11::DrawExamines()
 	{
-		static short xrot = 0, yrot = 0, zrot = 0;
+		static EulerAngles orient = EulerAngles::Zero;
 		static float scaler = 1.2f;
-		float saved_scale;
-		short inv_item = g_Gui.GetRings((int)RingTypes::Inventory)->CurrentObjectList[g_Gui.GetRings(
-			(int)RingTypes::Inventory)->CurrentObjectInList].InventoryItem;
-		InventoryObject* obj = &InventoryObjectTable[inv_item];
 
-		if (TrInput & IN_LEFT)
-			yrot += ANGLE(3);
+		short invItem = g_Gui.GetRings((int)RingTypes::Inventory)->CurrentObjectList[g_Gui.GetRings((int)RingTypes::Inventory)->CurrentObjectInList].InventoryItem;
 
-		if (TrInput & IN_RIGHT)
-			yrot -= ANGLE(3);
+		auto& object = InventoryObjectTable[invItem];
 
 		if (TrInput & IN_FORWARD)
-			xrot += ANGLE(3);
+			orient.x += ANGLE(3.0f);
 
 		if (TrInput & IN_BACK)
-			xrot -= ANGLE(3);
+			orient.x -= ANGLE(3.0f);
+
+		if (TrInput & IN_LEFT)
+			orient.y += ANGLE(3.0f);
+
+		if (TrInput & IN_RIGHT)
+			orient.y -= ANGLE(3.0f);
 
 		if (TrInput & IN_SPRINT)
 			scaler += 0.03f;
@@ -696,18 +692,19 @@ namespace TEN::Renderer
 		if (scaler < 0.8f)
 			scaler = 0.8f;
 
-		saved_scale = obj->Scale1;
-		obj->Scale1 = scaler;
-		DrawObjectOn2DPosition(400, 300, g_Gui.ConvertInventoryItemToObject(inv_item), xrot, yrot, zrot, obj->Scale1);
-		obj->Scale1 = saved_scale;
+		float savedScale = object.Scale1;
+		object.Scale1 = scaler;
+		DrawObjectOn2DPosition(400, 300, g_Gui.ConvertInventoryItemToObject(invItem), orient, object.Scale1);
+		object.Scale1 = savedScale;
 	}
 
 	void Renderer11::DrawDiary()
 	{
-		InventoryObject* obj = &InventoryObjectTable[INV_OBJECT_OPEN_DIARY];
-		unsigned int currentPage = Lara.Inventory.Diary.CurrentPage;
-		DrawObjectOn2DPosition(400, 300, g_Gui.ConvertInventoryItemToObject(INV_OBJECT_OPEN_DIARY),
-			obj->Orientation.x, obj->Orientation.y, obj->Orientation.z, obj->Scale1);
+		uint currentPage = Lara.Inventory.Diary.CurrentPage;
+
+		const auto& object = InventoryObjectTable[INV_OBJECT_OPEN_DIARY];
+
+		DrawObjectOn2DPosition(400, 300, g_Gui.ConvertInventoryItemToObject(INV_OBJECT_OPEN_DIARY), object.Orientation, object.Scale1);
 
 		for (size_t i = 0; i < MAX_DIARY_STRINGS_PER_PAGE; i++)
 		{

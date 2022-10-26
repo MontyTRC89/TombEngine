@@ -1130,15 +1130,9 @@ namespace TEN::Gui
 		if (Rings[(int)RingTypes::Ammo]->RingActive)
 			return;
 	
-		AmmoObjectList[0].XRot = 0;
-		AmmoObjectList[0].YRot = 0;
-		AmmoObjectList[0].ZRot = 0;
-		AmmoObjectList[1].XRot = 0;
-		AmmoObjectList[1].YRot = 0;
-		AmmoObjectList[1].ZRot = 0;
-		AmmoObjectList[2].XRot = 0;
-		AmmoObjectList[2].YRot = 0;
-		AmmoObjectList[2].ZRot = 0;
+		AmmoObjectList[0].Orientation = EulerAngles::Zero;
+		AmmoObjectList[1].Orientation = EulerAngles::Zero;
+		AmmoObjectList[2].Orientation = EulerAngles::Zero;
 
 		if (options & 
 			(OPT_CHOOSE_AMMO_UZI | OPT_CHOOSE_AMMO_PISTOLS | OPT_CHOOSE_AMMO_REVOLVER | OPT_CHOOSE_AMMO_CROSSBOW |
@@ -1248,9 +1242,7 @@ namespace TEN::Gui
 	void GuiController::InsertObjectIntoList(int objectNumber)
 	{
 		Rings[(int)RingTypes::Inventory]->CurrentObjectList[Rings[(int)RingTypes::Inventory]->NumObjectsInList].InventoryItem = objectNumber;
-		Rings[(int)RingTypes::Inventory]->CurrentObjectList[Rings[(int)RingTypes::Inventory]->NumObjectsInList].XRot = 0;
-		Rings[(int)RingTypes::Inventory]->CurrentObjectList[Rings[(int)RingTypes::Inventory]->NumObjectsInList].YRot = 0;
-		Rings[(int)RingTypes::Inventory]->CurrentObjectList[Rings[(int)RingTypes::Inventory]->NumObjectsInList].ZRot = 0;
+		Rings[(int)RingTypes::Inventory]->CurrentObjectList[Rings[(int)RingTypes::Inventory]->NumObjectsInList].Orientation = EulerAngles::Zero;
 		Rings[(int)RingTypes::Inventory]->CurrentObjectList[Rings[(int)RingTypes::Inventory]->NumObjectsInList].Bright = 32;
 		Rings[(int)RingTypes::Inventory]->NumObjectsInList++;
 	}
@@ -1264,9 +1256,7 @@ namespace TEN::Gui
 			if (Rings[(int)RingTypes::Inventory]->CurrentObjectList[Rings[(int)RingTypes::Inventory]->CurrentObjectInList].InventoryItem != objectNumber)
 			{
 				Rings[(int)RingTypes::Ammo]->CurrentObjectList[Rings[(int)RingTypes::Ammo]->NumObjectsInList].InventoryItem = objectNumber;
-				Rings[(int)RingTypes::Ammo]->CurrentObjectList[Rings[(int)RingTypes::Ammo]->NumObjectsInList].XRot = 0;
-				Rings[(int)RingTypes::Ammo]->CurrentObjectList[Rings[(int)RingTypes::Ammo]->NumObjectsInList].YRot = 0;
-				Rings[(int)RingTypes::Ammo]->CurrentObjectList[Rings[(int)RingTypes::Ammo]->NumObjectsInList].ZRot = 0;
+				Rings[(int)RingTypes::Ammo]->CurrentObjectList[Rings[(int)RingTypes::Ammo]->NumObjectsInList].Orientation = EulerAngles::Zero;
 				Rings[(int)RingTypes::Ammo]->CurrentObjectList[Rings[(int)RingTypes::Ammo]->NumObjectsInList++].Bright = 32;
 			}
 		}
@@ -2401,43 +2391,9 @@ namespace TEN::Gui
 		}
 	}
 
-	void GuiController::SpinBack(ushort* angle)
+	void GuiController::SpinBack(EulerAngles& orient)
 	{
-		ushort val = *angle;
-		ushort val2 = 0;
-		if (val)
-		{
-			if (val <= 32768)
-			{
-				val2 = val;
-
-				if (val2 < ANGLE(5.0f))
-					val = ANGLE(5.0f);
-				else if (val2 > ANGLE(90.0f))
-					val2 = ANGLE(90.0f);
-
-				val -= (val2 >> 3);
-
-				if (val > 32768)
-					val = 0;
-			}
-			else
-			{
-				val2 = -val;
-
-				if (val2 < ANGLE(5.0f))
-					val = ANGLE(5.0f);
-				else if (val2 > ANGLE(90.0f))
-					val2 = ANGLE(90.0f);
-
-				val += (val2 >> 3);
-
-				if (val < ANGLE(180.0f))
-					val = 0;
-			}
-
-			*angle = val;
-		}
+		orient.Lerp(EulerAngles::Zero, 1.0f / 8);
 	}
 
 	void GuiController::DrawAmmoSelector()
@@ -2460,24 +2416,17 @@ namespace TEN::Gui
 				if (n == *CurrentAmmoType)
 				{
 					if (invObject->RotFlags & INV_ROT_X)
-						AmmoObjectList[n].XRot += ANGLE(5.0f);
+						AmmoObjectList[n].Orientation.x += ANGLE(5.0f);
 
 					if (invObject->RotFlags & INV_ROT_Y)
-						AmmoObjectList[n].YRot += ANGLE(5.0f);
+						AmmoObjectList[n].Orientation.y += ANGLE(5.0f);
 
 					if (invObject->RotFlags & INV_ROT_Z)
-						AmmoObjectList[n].ZRot += ANGLE(5.0f);
+						AmmoObjectList[n].Orientation.z += ANGLE(5.0f);
 				}
 				else
-				{
-					SpinBack(&AmmoObjectList[n].XRot);
-					SpinBack(&AmmoObjectList[n].YRot);
-					SpinBack(&AmmoObjectList[n].ZRot);
-				}
+					SpinBack(AmmoObjectList[n].Orientation);
 
-				ushort xRot = AmmoObjectList[n].XRot;
-				ushort yRot = AmmoObjectList[n].YRot;
-				ushort zRot = AmmoObjectList[n].ZRot;
 				int x = PHD_CENTER_X - 300 + xPos;
 				int y = 480;
 				short objectNumber = ConvertInventoryItemToObject(AmmoObjectList[n].InventoryItem);
@@ -2497,12 +2446,12 @@ namespace TEN::Gui
 						g_Renderer.AddString(PHD_CENTER_X, 380, &invTextBuffer[0], PRINTSTRING_COLOR_YELLOW, PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
 				
 					if (n == *CurrentAmmoType)
-						g_Renderer.DrawObjectOn2DPosition(x, y, objectNumber, xRot, yRot, zRot, scaler);
+						g_Renderer.DrawObjectOn2DPosition(x, y, objectNumber, AmmoObjectList[n].Orientation, scaler);
 					else
-						g_Renderer.DrawObjectOn2DPosition(x, y, objectNumber, xRot, yRot, zRot, scaler);
+						g_Renderer.DrawObjectOn2DPosition(x, y, objectNumber, AmmoObjectList[n].Orientation, scaler);
 				}
 				else
-					g_Renderer.DrawObjectOn2DPosition(x, y, objectNumber, xRot, yRot, zRot, scaler);
+					g_Renderer.DrawObjectOn2DPosition(x, y, objectNumber, AmmoObjectList[n].Orientation, scaler);
 
 				xPos += OBJLIST_SPACING;
 			}
@@ -2796,24 +2745,16 @@ namespace TEN::Gui
 				if (!i && !Rings[ringIndex]->ObjectListMovement)
 				{
 					if (InventoryObjectTable[Rings[ringIndex]->CurrentObjectList[n].InventoryItem].RotFlags & INV_ROT_X)
-						Rings[ringIndex]->CurrentObjectList[n].XRot += ANGLE(5.0f);
+						Rings[ringIndex]->CurrentObjectList[n].Orientation.x += ANGLE(5.0f);
 
 					if (InventoryObjectTable[Rings[ringIndex]->CurrentObjectList[n].InventoryItem].RotFlags & INV_ROT_Y)
-						Rings[ringIndex]->CurrentObjectList[n].YRot += ANGLE(5.0f);
+						Rings[ringIndex]->CurrentObjectList[n].Orientation.y += ANGLE(5.0f);
 
 					if (InventoryObjectTable[Rings[ringIndex]->CurrentObjectList[n].InventoryItem].RotFlags & INV_ROT_Z)
-						Rings[ringIndex]->CurrentObjectList[n].ZRot += ANGLE(5.0f);
+						Rings[ringIndex]->CurrentObjectList[n].Orientation.z += ANGLE(5.0f);
 				}
 				else
-				{
-					SpinBack(&Rings[ringIndex]->CurrentObjectList[n].XRot);
-					SpinBack(&Rings[ringIndex]->CurrentObjectList[n].YRot);
-					SpinBack(&Rings[ringIndex]->CurrentObjectList[n].ZRot);
-				}
-
-				ushort xRot = Rings[ringIndex]->CurrentObjectList[n].XRot;
-				ushort yRot = Rings[ringIndex]->CurrentObjectList[n].YRot;
-				ushort zRot = Rings[ringIndex]->CurrentObjectList[n].ZRot;
+					SpinBack(Rings[ringIndex]->CurrentObjectList[n].Orientation);
 
 				int activeNum = 0;
 				if (Rings[ringIndex]->ObjectListMovement)
@@ -2844,9 +2785,9 @@ namespace TEN::Gui
 				int x = 400 + xOffset + i * OBJLIST_SPACING;
 				int y = 150;
 				int y2 = 480; // Combine.
-				short obj = ConvertInventoryItemToObject(Rings[ringIndex]->CurrentObjectList[n].InventoryItem);
+				short objectNumber = ConvertInventoryItemToObject(Rings[ringIndex]->CurrentObjectList[n].InventoryItem);
 				float scaler = InventoryObjectTable[Rings[ringIndex]->CurrentObjectList[n].InventoryItem].Scale1;
-				g_Renderer.DrawObjectOn2DPosition(x, ringIndex == (int)RingTypes::Inventory ? y : y2, obj, xRot, yRot, zRot, scaler);
+				g_Renderer.DrawObjectOn2DPosition(x, ringIndex == (int)RingTypes::Inventory ? y : y2, objectNumber, Rings[ringIndex]->CurrentObjectList[n].Orientation, scaler);
 
 				if (++n >= Rings[ringIndex]->NumObjectsInList)
 					n = 0;
@@ -3057,7 +2998,7 @@ namespace TEN::Gui
 		// TODO
 		return;
 
-		g_Renderer.DrawObjectOn2DPosition(130, 480, ID_COMPASS_ITEM, ANGLE(90.0f), 0, ANGLE(180.0f), InventoryObjectTable[INV_OBJECT_COMPASS].Scale1);
+		g_Renderer.DrawObjectOn2DPosition(130, 480, ID_COMPASS_ITEM, EulerAngles(ANGLE(90.0f), 0, ANGLE(180.0f)), InventoryObjectTable[INV_OBJECT_COMPASS].Scale1);
 		short compassSpeed = phd_sin(CompassNeedleAngle - item->Pose.Orientation.y);
 		short compassAngle = (item->Pose.Orientation.y + compassSpeed) - ANGLE(180.0f);
 		Matrix::CreateRotationY(compassAngle);
