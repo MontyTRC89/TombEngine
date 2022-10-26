@@ -18,6 +18,7 @@
 #include "Logic/LevelFunc.h"
 #include "Rotation/Rotation.h"
 #include "Vec3/Vec3.h"
+#include "lara.h"
 
 /***
 Represents any object inside the game world.
@@ -161,6 +162,19 @@ void Moveable::Register(sol::table & parent)
 /// Shatter item. This also kills and disables item.
 // @function Moveable:Shatter
 	ScriptReserved_Shatter, &Moveable::Shatter,
+
+/// Set Poison with potency of poision
+// @function Moveable:SetPoison
+// @tparam Potency Value 
+// @usage
+// Lara:SetPoison(100)
+	ScriptReserved_SetPoison, &Moveable::SetPoison,
+
+/// Remove Poison
+// @function Moveable:RemovePoison
+// @usage
+// Lara:RemovePoison()
+	ScriptReserved_RemovePoison, &Moveable::RemovePoison,
 
 /// Get the status of object.
 // possible values:
@@ -964,6 +978,26 @@ void Moveable::Shatter()
 		ExplodeItemNode(m_item, i, 0, 128);
 
 	CreatureDie(m_num, false);
+}
+
+void Moveable::SetPoison(int potency = 0)
+{
+	if (!m_item->IsLara())
+		return;
+
+	auto* lara = GetLaraInfo(m_item);
+
+	lara->PoisonPotency = potency;
+}
+
+void Moveable::RemovePoison()
+{
+	if (!m_item->IsLara())
+		return;
+
+	auto* lara = GetLaraInfo(m_item);
+
+	lara->PoisonPotency = 0;
 }
 
 void Moveable::MakeInvisible()

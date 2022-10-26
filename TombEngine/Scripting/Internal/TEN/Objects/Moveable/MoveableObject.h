@@ -101,6 +101,8 @@ public:
 	void MakeInvisible();
 	void Explode();
 	void Shatter();
+	void SetPoison(int $potency);
+	void RemovePoison();
 
 	void SetOnHit(TypeOrNil<LevelFunc> const& cb);
 	void SetOnKilled(TypeOrNil<LevelFunc> const& cb);
