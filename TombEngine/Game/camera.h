@@ -44,6 +44,7 @@ struct CAMERA_INFO
 struct OBJ_CAMERA_INFO
 {
 	GameVector LastAngle;
+	bool ItemCameraOn;
 };
 
 enum CAMERA_FLAGS
