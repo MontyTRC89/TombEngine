@@ -145,14 +145,14 @@ void EaseOutLaraHeight(ItemInfo* item, int height)
 	if (height == NO_HEIGHT)
 		return;
 
-	int easingThreshold = std::max(abs(item->Animation.Velocity.z) * 1.5f, BLOCK(1.0f / 64));
-
 	// Swamp case.
 	if (TestEnvironment(ENV_FLAG_SWAMP, item))
 	{
 		item->Pose.Position.y += (height > 0) ? SWAMP_GRAVITY : height;
 		return;
 	}
+
+	int easingThreshold = std::max(abs(item->Animation.Velocity.z) * 1.5f, BLOCK(1.0f / 64));
 
 	// Regular case.
 	if (abs(height) > constantThreshold)
