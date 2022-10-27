@@ -61,12 +61,6 @@ CAMERA_INFO Camera;
 OBJ_CAMERA_INFO ItemCamera;
 GameVector ForcedFixedCamera;
 int UseForcedFixedCamera;
-ItemInfo* camSlotId;
-int camMeshId;
-ItemInfo* TargetSlotId;
-int targetMeshId;
-bool cond;
-bool ItemCameraOn;
 
 int BinocularRange;
 bool BinocularOn;
@@ -334,7 +328,7 @@ void ObjCamera(ItemInfo* camSlotId, int camMeshId, ItemInfo* targetItem, int tar
 {
 	//camSlotId and targetItem stay the same object until I know how to expand targetItem to another object.
 	//activates code below ->  void CalculateCamera().
-	ItemCameraOn = cond;
+	ItemCamera.ItemCameraOn = cond;
 
 	UpdateCameraElevation();
 
@@ -1524,7 +1518,7 @@ void CalculateCamera()
 		return;
 	}
 
-	if (ItemCameraOn)
+	if (ItemCamera.ItemCameraOn)
 	{
 		return;
 	}
