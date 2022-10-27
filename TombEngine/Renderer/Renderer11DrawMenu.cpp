@@ -700,7 +700,7 @@ namespace TEN::Renderer
 
 	void Renderer11::DrawDiary()
 	{
-		uint currentPage = Lara.Inventory.Diary.CurrentPage;
+		unsigned int currentPage = Lara.Inventory.Diary.CurrentPage;
 
 		const auto& object = InventoryObjectTable[INV_OBJECT_OPEN_DIARY];
 

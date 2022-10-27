@@ -739,4 +739,26 @@ namespace TEN::Input
 	{
 		return ActionMap[(int)actionID].GetTimeInactive();
 	}
+
+	bool IsDirectionActionHeld()
+	{
+		return (IsHeld(In::Forward) || IsHeld(In::Back) || IsHeld(In::Left) || IsHeld(In::Right));
+	}
+
+	bool IsWakeActionHeld()
+	{
+		if (IsDirectionActionHeld() || IsHeld(In::LeftStep) || IsHeld(In::RightStep) ||
+			IsHeld(In::Walk) || IsHeld(In::Jump) || IsHeld(In::Sprint) || IsHeld(In::Roll) || IsHeld(In::Crouch) ||
+			IsHeld(In::DrawWeapon) || IsHeld(In::Flare) || IsHeld(In::Action))
+		{
+			return true;
+		}
+
+		return false;
+	}
+
+	bool IsOpticActionHeld()
+	{
+		return (IsDirectionActionHeld() || IsHeld(In::Action) || IsHeld(In::Crouch) || IsHeld(In::Sprint));
+	}
 }

@@ -772,7 +772,7 @@ void lara_as_pose(ItemInfo* item, CollisionInfo* coll)
 			return;
 		}
 
-		if (ACTION_HELD_WAKE)
+		if (IsWakeActionHeld())
 		{
 			item->Animation.TargetState = LS_IDLE;
 			return;

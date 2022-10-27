@@ -77,10 +77,6 @@ namespace TEN::Input
 		IN_LOOKSWITCH = (1 << (KEY_COUNT + 4))
 	};
 	
-	#define ACTION_HELD_DIRECTION	  (IsHeld(In::Forward) || IsHeld(In::Back) || IsHeld(In::Left) || IsHeld(In::Right))
-	#define ACTION_HELD_WAKE		  (ACTION_HELD_DIRECTION || IsHeld(In::LeftStep) || IsHeld(In::RightStep) || IsHeld(In::Walk) || IsHeld(In::Jump) || IsHeld(In::Sprint) || IsHeld(In::Roll) || IsHeld(In::Crouch) || IsHeld(In::DrawWeapon) || IsHeld(In::Flare) || IsHeld(In::Action))
-	#define ACTION_HELD_OPTIC_CONTROL (ACTION_HELD_DIRECTION || IsHeld(In::Action) || IsHeld(In::Crouch) || IsHeld(In::Sprint))
-
 	// Temporary input constants for use with vehicles:
 
 	// TODO: Not needed. Thought too far ahead.
@@ -155,4 +151,8 @@ namespace TEN::Input
 	float GetActionValue(ActionID actionID);
 	float GetActionTimeActive(ActionID actionID);
 	float GetActionTimeInactive(ActionID actionID);
+
+	bool IsDirectionActionHeld();
+	bool IsWakeActionHeld();
+	bool IsOpticActionHeld();
 }
