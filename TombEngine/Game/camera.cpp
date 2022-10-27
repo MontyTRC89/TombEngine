@@ -413,9 +413,9 @@ void MoveObjCamera(GameVector* ideal, ItemInfo* camSlotId, int camMeshId, ItemIn
 	// To make camera movement smoother a speed of 2 is used.
 	// While for big camera angle steps (cuts) -
 	// the speed is set to 1 to make the cut immediatelly.
-	if (ItemCamera.LastAngle.x - anglex > 100 ||
-		ItemCamera.LastAngle.y - angley > 100 ||
-		ItemCamera.LastAngle.z - anglez > 100)
+	if (LastTarget.x - Camera.target.x > 100 ||
+		LastTarget.y - Camera.target.y > 100 ||
+		LastTarget.z - Camera.target.z > 100)
 	{
 		speed = 1;
 	}
