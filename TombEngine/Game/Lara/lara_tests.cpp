@@ -2671,7 +2671,7 @@ bool TestLaraLadderDismountTop(ItemInfo* item, CollisionInfo* coll)
 
 bool TestLaraLadderDismountBottom(ItemInfo* item, CollisionInfo* coll)
 {
-	static constexpr auto probeDist		  = CLICK(1);
+	static constexpr auto probeDist		  = CLICK(0.75f);
 	static constexpr auto lowerFloorBound = CLICK(0.5f);
 
 	int vPos = item->Pose.Position.y + GameBoundingBox(item).Y2;
