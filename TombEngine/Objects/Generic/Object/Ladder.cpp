@@ -44,16 +44,52 @@ namespace TEN::Entities::Generic
 	};
 
 	const auto LadderMountOffset = Vector3i(0, 0, -CLICK(0.55f));
-	const ObjectCollisionBounds LadderBounds =
+	const ObjectCollisionBounds LadderFrontBounds =
 	{
 		GameBoundingBox(
 			-CLICK(1), CLICK(1),
 			-CLICK(1), CLICK(1),
 			-CLICK(1.5f), CLICK(1.5f)
 		),
-		pair(
+		std::pair(
 			EulerAngles(ANGLE(-10.0f), -LARA_GRAB_THRESHOLD, ANGLE(-10.0f)),
 			EulerAngles(ANGLE(10.0f), LARA_GRAB_THRESHOLD, ANGLE(10.0f))
+		)
+	};
+	const ObjectCollisionBounds LadderBackBounds =
+	{
+		GameBoundingBox(
+			-CLICK(1), CLICK(1),
+			-CLICK(1), CLICK(1),
+			-CLICK(1.5f), CLICK(1.5f)
+		),
+		std::pair(
+			EulerAngles(ANGLE(-10.0f), ANGLE(180.0f) - LARA_GRAB_THRESHOLD, ANGLE(-10.0f)),
+			EulerAngles(ANGLE(10.0f), ANGLE(180.0f) + LARA_GRAB_THRESHOLD, ANGLE(10.0f))
+		)
+	};
+	const ObjectCollisionBounds LadderLeftBounds =
+	{
+		GameBoundingBox(
+			-CLICK(1), CLICK(1),
+			-CLICK(1), CLICK(1),
+			-CLICK(1.5f), CLICK(1.5f)
+		),
+		std::pair(
+			EulerAngles(ANGLE(-10.0f), ANGLE(90.0f) - LARA_GRAB_THRESHOLD, ANGLE(-10.0f)),
+			EulerAngles(ANGLE(10.0f), ANGLE(90.0f) + LARA_GRAB_THRESHOLD, ANGLE(10.0f))
+		)
+	};
+	const ObjectCollisionBounds LadderRightBounds =
+	{
+		GameBoundingBox(
+			-CLICK(1), CLICK(1),
+			-CLICK(1), CLICK(1),
+			-CLICK(1.5f), CLICK(1.5f)
+		),
+		std::pair(
+			EulerAngles(ANGLE(-10.0f), ANGLE(-90.0f) - LARA_GRAB_THRESHOLD, ANGLE(-10.0f)),
+			EulerAngles(ANGLE(10.0f), ANGLE(-90.0f) + LARA_GRAB_THRESHOLD, ANGLE(10.0f))
 		)
 	};
 
@@ -70,12 +106,26 @@ namespace TEN::Entities::Generic
 			player.Control.HandStatus == HandStatus::Free ||
 			(player.Control.IsMoving && player.InteractedItem == itemNumber))
 		{
-			if (TestLaraPosition(LadderBounds, &ladderItem, laraItem))
+			// Mount at bottom.
+			if (TestLaraPosition(LadderFrontBounds, &ladderItem, laraItem))
 			{
 				auto mountPos = Vector3i(0, 0, GameBoundingBox(&ladderItem).Z1) + LadderMountOffset;
 				if (MoveLaraPosition(mountPos, &ladderItem, laraItem))
 				{
 					SetAnimation(laraItem, LA_LADDER_MOUNT_BOTTOM);
+					player.Control.IsMoving = false;
+					player.Control.HandStatus = HandStatus::Busy;
+				}
+				else
+					player.InteractedItem = itemNumber;
+			}
+			// Mount from right.
+			else if (TestLaraPosition(LadderRightBounds, &ladderItem, laraItem))
+			{
+				auto mountPos = Vector3i(GameBoundingBox(&ladderItem).Z1 + CLICK(0.55f), 0, 0);
+				if (MoveLaraPosition(mountPos, &ladderItem, laraItem))
+				{
+					SetAnimation(laraItem, LA_LADDER_MOUNT_RIGHT);
 					player.Control.IsMoving = false;
 					player.Control.HandStatus = HandStatus::Busy;
 				}

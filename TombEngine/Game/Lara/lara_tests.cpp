@@ -2712,7 +2712,7 @@ bool TestLaraLadderSideDismount(ItemInfo* item, CollisionInfo* coll, bool isGoin
 		return false;
 
 	// Assess point collision.
-	if ((pointColl.Position.Floor - vPos) <= floorBound &&						  // Floor height is within upper/lower floor bound.
+	if (abs(pointColl.Position.Floor - vPos) <= floorBound &&					  // Floor height is within upper/lower floor bound.
 		abs(pointColl.Position.Ceiling - pointColl.Position.Floor) > LARA_HEIGHT) // Space isn't too narrow.
 	{
 		return true;
