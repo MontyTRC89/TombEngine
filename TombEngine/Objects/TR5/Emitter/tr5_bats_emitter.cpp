@@ -1,5 +1,6 @@
 #include "framework.h"
 #include "Objects/TR5/Emitter/tr5_bats_emitter.h"
+
 #include "Specific/level.h"
 #include "Game/control/control.h"
 #include "Specific/setup.h"
@@ -9,6 +10,9 @@
 #include "Game/Lara/lara.h"
 #include "Game/animation.h"
 #include "Game/items.h"
+#include "Math/Math.h"
+
+using namespace TEN::Math;
 
 int NextBat;
 BatData Bats[NUM_BATS];
@@ -105,16 +109,16 @@ void UpdateBats()
 	if (!Objects[ID_BATS_EMITTER].loaded)
 		return;
 
-	auto* bounds = GetBoundsAccurate(LaraItem);
+	auto bounds = GameBoundingBox(LaraItem);
 
-	int x1 = LaraItem->Pose.Position.x + bounds->X1 - (bounds->X1 / 4);
-	int x2 = LaraItem->Pose.Position.x + bounds->X2 - (bounds->X2 / 4);
+	int x1 = LaraItem->Pose.Position.x + bounds.X1 - (bounds.X1 / 4);
+	int x2 = LaraItem->Pose.Position.x + bounds.X2 - (bounds.X2 / 4);
 
-	int y1 = LaraItem->Pose.Position.y + bounds->Y1 - (bounds->Y1 / 4);
-	int y2 = LaraItem->Pose.Position.y + bounds->Y1 - (bounds->Y1 / 4);
+	int y1 = LaraItem->Pose.Position.y + bounds.Y1 - (bounds.Y1 / 4);
+	int y2 = LaraItem->Pose.Position.y + bounds.Y1 - (bounds.Y1 / 4);
 
-	int z1 = LaraItem->Pose.Position.z + bounds->Z1 - (bounds->Z1 / 4);
-	int z2 = LaraItem->Pose.Position.z + bounds->Z1 - (bounds->Z1 / 4);
+	int z1 = LaraItem->Pose.Position.z + bounds.Z1 - (bounds.Z1 / 4);
+	int z2 = LaraItem->Pose.Position.z + bounds.Z1 - (bounds.Z1 / 4);
 
 	int minDistance = MAXINT;
 	int minIndex = -1;
@@ -146,10 +150,13 @@ void UpdateBats()
 			bat->ZTarget = (GetRandomControl() & 0x7F) - 64;
 		}
 
-		auto angles = GetVectorAngles(
-			LaraItem->Pose.Position.x + 8 * bat->XTarget - bat->Pose.Position.x,
-			LaraItem->Pose.Position.y - bat->LaraTarget - bat->Pose.Position.y,
-			LaraItem->Pose.Position.z + 8 * bat->ZTarget - bat->Pose.Position.z);
+		auto angles = Geometry::GetOrientToPoint(
+			bat->Pose.Position.ToVector3(),
+			Vector3(
+				LaraItem->Pose.Position.x + bat->XTarget * 8,
+				LaraItem->Pose.Position.y - bat->LaraTarget,
+				LaraItem->Pose.Position.z + bat->ZTarget * 8
+			));
 
 		int x = LaraItem->Pose.Position.x - bat->Pose.Position.x;
 		int z = LaraItem->Pose.Position.z - bat->Pose.Position.z;

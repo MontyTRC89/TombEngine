@@ -16,28 +16,32 @@ using namespace TEN::Input;
 
 namespace TEN::Entities::Switches
 {
-	Vector3Int CrowbarPos = { -89, 0, -328 }; 
-
-	OBJECT_COLLISION_BOUNDS CrowbarBounds = 
+	const auto CrowbarPos = Vector3i(-89, 0, -328);
+	const ObjectCollisionBounds CrowbarBounds = 
 	{
-		-256, 256,
-		0, 0,
-		-512, -256,
-		-ANGLE(10.0f), ANGLE(10.0f),
-		-ANGLE(30.0f), ANGLE(30.0f),
-		-ANGLE(10.0f), ANGLE(10.0f)
+		GameBoundingBox(
+			-CLICK(1), CLICK(1),
+			0, 0,
+			-SECTOR(0.5f), -CLICK(1)
+		),
+		std::pair(
+			EulerAngles(ANGLE(-10.0f), ANGLE(-30.0f), ANGLE(-10.0f)),
+			EulerAngles(ANGLE(10.0f), ANGLE(30.0f), ANGLE(10.0f))
+		)
 	};
 
-	Vector3Int CrowbarPos2 = { 89, 0, 328 }; 
-
-	OBJECT_COLLISION_BOUNDS CrowbarBounds2 = 
+	const auto CrowbarPos2 = Vector3i(89, 0, 328);
+	const ObjectCollisionBounds CrowbarBounds2 =
 	{
-		-256, 256,
-		0, 0,
-		256, 512,
-		-ANGLE(10.0f), ANGLE(10.0f),
-		-ANGLE(30.0f), ANGLE(30.0f),
-		-ANGLE(10.0f), ANGLE(10.0f)
+		GameBoundingBox(
+			-CLICK(1), CLICK(1),
+			0, 0,
+			CLICK(1), SECTOR(0.5f)
+		),
+		std::pair(
+			EulerAngles(ANGLE(-10.0f), ANGLE(-30.0f), ANGLE(-10.0f)),
+			EulerAngles(ANGLE(10.0f), ANGLE(30.0f), ANGLE(10.0f))
+		)
 	};
 
 	void CrowbarSwitchCollision(short itemNumber, ItemInfo* laraitem, CollisionInfo* coll)
@@ -58,11 +62,11 @@ namespace TEN::Entities::Switches
 			{
 				laraitem->Pose.Orientation.y ^= (short)ANGLE(180.0f);
 
-				if (TestLaraPosition(&CrowbarBounds2, switchItem, laraitem))
+				if (TestLaraPosition(CrowbarBounds2, switchItem, laraitem))
 				{
 					if (laraInfo->Control.IsMoving || g_Gui.GetInventoryItemChosen() == ID_CROWBAR_ITEM)
 					{
-						if (MoveLaraPosition(&CrowbarPos2, switchItem, laraitem))
+						if (MoveLaraPosition(CrowbarPos2, switchItem, laraitem))
 						{
 							doSwitch = 1;
 							laraitem->Animation.AnimNumber = LA_CROWBAR_USE_ON_FLOOR;
@@ -87,11 +91,11 @@ namespace TEN::Entities::Switches
 			}
 			else
 			{
-				if (TestLaraPosition(&CrowbarBounds, switchItem, laraitem))
+				if (TestLaraPosition(CrowbarBounds, switchItem, laraitem))
 				{
 					if (laraInfo->Control.IsMoving || g_Gui.GetInventoryItemChosen() == ID_CROWBAR_ITEM)
 					{
-						if (MoveLaraPosition(&CrowbarPos, switchItem, laraitem))
+						if (MoveLaraPosition(CrowbarPos, switchItem, laraitem))
 						{
 							doSwitch = 1;
 							laraitem->Animation.AnimNumber = LA_CROWBAR_USE_ON_FLOOR;

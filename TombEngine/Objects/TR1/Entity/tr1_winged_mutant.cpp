@@ -11,10 +11,9 @@
 #include "Game/misc.h"
 #include "Game/missile.h"
 #include "Game/people.h"
+#include "Math/Math.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
-#include "Specific/prng.h"
-#include "Specific/trmath.h"
 
 using namespace TEN::Math::Random;
 using std::vector;
@@ -44,7 +43,7 @@ namespace TEN::Entities::Creatures::TR1
 	const auto WingedMutantBite		  = BiteInfo(Vector3(-27.0f, 98.0f, 0.0f), 10);
 	const auto WingedMutantRocketBite = BiteInfo(Vector3(51.0f, 213.0f, 0.0f), 14);
 	const auto WingedMutantShardBite  = BiteInfo(Vector3(-35.0f, 269.0f, 0.0f), 9);
-	const vector<int> WingedMutantJoints = { WingedMutantShardBite.meshNum, WingedMutantBite.meshNum, WingedMutantRocketBite.meshNum };
+	const vector<unsigned int> WingedMutantJoints = { 9, 10, 14 };
 
 	enum WingedMutantState
 	{
@@ -235,9 +234,9 @@ namespace TEN::Entities::Creatures::TR1
 		auto* item = &g_Level.Items[itemNumber];
 		auto* creature = GetCreatureInfo(item);
 
+		short angle = 0;
 		short head = 0;
 		short torso = 0; // Only when shooting.
-		short angle = 0;
 
 		bool flyEnabled = item->TestFlags(WMUTANT_CONF_CAN_FLY, true);
 		bool flyStatus = item->TestFlags(WMUTANT_CONF_PATHFINDING_MODE, WMUTANT_PATH_AERIAL);
@@ -308,7 +307,7 @@ namespace TEN::Entities::Creatures::TR1
 
 				if (flyStatus && flyEnabled)
 					item->Animation.TargetState = WMUTANT_STATE_FLY;
-				else if (item->TestBits(JointBitType::Touch, WingedMutantJoints[1]))
+				else if (item->TouchBits.Test(WingedMutantJoints[1]))
 					item->Animation.TargetState = WMUTANT_STATE_SWIPE_ATTACK;
 				else if (AI.bite && AI.distance < WINGED_MUTANT_IDLE_JUMP_ATTACK_RANGE)
 					item->Animation.TargetState = WMUTANT_STATE_IDLE_JUMP_ATTACK;
@@ -381,7 +380,7 @@ namespace TEN::Entities::Creatures::TR1
 
 				if (flyStatus && flyEnabled)
 					item->Animation.TargetState = WMUTANT_STATE_IDLE;
-				else if (item->TestBits(JointBitType::Touch, WingedMutantJoints[1]))
+				else if (item->TouchBits.Test(WingedMutantJoints[1]))
 					item->Animation.TargetState = WMUTANT_STATE_IDLE;
 				else if (AI.bite && AI.distance < WINGED_MUTANT_RUN_JUMP_ATTACK_RANGE)
 					item->Animation.TargetState = WMUTANT_STATE_RUN_JUMP_ATTACK;
@@ -401,7 +400,7 @@ namespace TEN::Entities::Creatures::TR1
 
 			case WMUTANT_STATE_IDLE_JUMP_ATTACK:
 				if (item->Animation.RequiredState == WMUTANT_STATE_NONE &&
-					item->TestBits(JointBitType::Touch, WingedMutantJoints[1]))
+					item->TouchBits.Test(WingedMutantJoints[1]))
 				{
 					DoDamage(creature->Enemy, WINGED_MUTANT_IDLE_JUMP_ATTACK_DAMAGE);
 					CreatureEffect(item, WingedMutantBite, DoBloodSplat);
@@ -412,7 +411,7 @@ namespace TEN::Entities::Creatures::TR1
 
 			case WMUTANT_STATE_RUN_JUMP_ATTACK:
 				if (item->Animation.RequiredState == WMUTANT_STATE_NONE &&
-					item->TestBits(JointBitType::Touch, WingedMutantJoints[1]))
+					item->TouchBits.Test(WingedMutantJoints[1]))
 				{
 					DoDamage(creature->Enemy, WINGED_MUTANT_RUN_JUMP_ATTACK_DAMAGE);
 					CreatureEffect(item, WingedMutantBite, DoBloodSplat);
@@ -423,7 +422,7 @@ namespace TEN::Entities::Creatures::TR1
 
 			case WMUTANT_STATE_SWIPE_ATTACK:
 				if (item->Animation.RequiredState == WMUTANT_STATE_NONE &&
-					item->TestBits(JointBitType::Touch, WingedMutantJoints[1]))
+					item->TouchBits.Test(WingedMutantJoints[1]))
 				{
 					DoDamage(creature->Enemy, WINGED_MUTANT_SWIPE_ATTACK_DAMAGE);
 					CreatureEffect(item, WingedMutantBite, DoBloodSplat);

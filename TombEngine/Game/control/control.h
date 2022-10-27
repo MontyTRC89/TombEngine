@@ -3,13 +3,13 @@
 #include "Game/control/trigger.h"
 #include "Game/items.h"
 #include "Game/room.h"
-#include "Specific/phd_global.h"
+#include "Math/Math.h"
 
-struct BOUNDING_BOX;
+class GameBoundingBox;
 struct ItemInfo;
 struct CollisionInfo;
 class FloorInfo;
-struct ANIM_STRUCT;
+struct AnimData;
 struct MESH_INFO;
 struct ROOM_INFO;
 

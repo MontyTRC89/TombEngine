@@ -10,6 +10,7 @@
 #include "Game/Lara/lara_collide.h"
 #include "Game/Lara/lara_fire.h"
 #include "Game/Lara/lara_tests.h"
+#include "Math/Math.h"
 #include "Renderer/Renderer11.h"
 #include "Sound/sound.h"
 #include "Specific/input.h"
@@ -25,9 +26,10 @@
 #include "Objects/TR4/Vehicles/jeep.h"
 #include "Objects/TR4/Vehicles/motorbike.h"
 
-using namespace TEN::Renderer;
-using namespace TEN::Input;
 using namespace TEN::Control::Volumes;
+using namespace TEN::Input;
+using namespace TEN::Math;
+using namespace TEN::Renderer;
 
 // -----------------------------
 // HELPER FUNCTIONS
@@ -129,7 +131,7 @@ bool HandleLaraVehicle(ItemInfo* item, CollisionInfo* coll)
 	return true;
 }
 
-void ApproachLaraTargetOrientation(ItemInfo* item, Vector3Shrt targetOrient, float rate)
+void ApproachLaraTargetOrientation(ItemInfo* item, EulerAngles targetOrient, float rate)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -191,7 +193,7 @@ void DoLaraStep(ItemInfo* item, CollisionInfo* coll)
 		if (TestLaraStepUp(item, coll))
 		{
 			item->Animation.TargetState = LS_STEP_UP;
-			if (GetChange(item, &g_Level.Anims[item->Animation.AnimNumber]))
+			if (GetStateDispatch(item, g_Level.Anims[item->Animation.AnimNumber]))
 			{
 				item->Pose.Position.y += coll->Middle.Floor;
 				return;
@@ -200,7 +202,7 @@ void DoLaraStep(ItemInfo* item, CollisionInfo* coll)
 		else if (TestLaraStepDown(item, coll))
 		{
 			item->Animation.TargetState = LS_STEP_DOWN;
-			if (GetChange(item, &g_Level.Anims[item->Animation.AnimNumber]))
+			if (GetStateDispatch(item, g_Level.Anims[item->Animation.AnimNumber]))
 			{
 				item->Pose.Position.y += coll->Middle.Floor;
 				return;
@@ -335,7 +337,7 @@ short GetLaraSlideDirection(ItemInfo* item, CollisionInfo* coll)
 	// Get either:
 	// a) the surface aspect angle (extended slides), or
 	// b) the derived nearest cardinal direction from it (original slides).
-	headingAngle = GetSurfaceAspectAngle(probe.FloorTilt);
+	headingAngle = Geometry::GetSurfaceAspectAngle(probe.FloorTilt);
 	if (g_GameFlow->HasSlideExtended())
 		return headingAngle;
 	else
@@ -542,8 +544,8 @@ void ModulateLaraSlideVelocity(ItemInfo* item, CollisionInfo* coll)
 	{
 		auto probe = GetCollision(item);
 		short minSlideAngle = ANGLE(33.75f);
-		short steepness = GetSurfaceSteepnessAngle(probe.FloorTilt);
-		short direction = GetSurfaceAspectAngle(probe.FloorTilt);
+		short steepness = Geometry::GetSurfaceSteepnessAngle(probe.FloorTilt);
+		short direction = Geometry::GetSurfaceAspectAngle(probe.FloorTilt);
 
 		float velocityMultiplier = 1 / (float)ANGLE(33.75f);
 		int slideVelocity = std::min<int>(minVelocity + 10 * (steepness * velocityMultiplier), LARA_TERMINAL_VELOCITY);
@@ -560,19 +562,23 @@ void ModulateLaraSlideVelocity(ItemInfo* item, CollisionInfo* coll)
 
 void AlignLaraToSurface(ItemInfo* item, float alpha)
 {
+	// Calculate surface angles.
 	auto floorTilt = GetCollision(item).FloorTilt;
-	short aspectAngle = GetSurfaceAspectAngle(floorTilt);
-	short steepnessAngle = std::min(GetSurfaceSteepnessAngle(floorTilt), ANGLE(70.0f));
+	short aspectAngle = Geometry::GetSurfaceAspectAngle(floorTilt);
+	short steepnessAngle = std::min(Geometry::GetSurfaceSteepnessAngle(floorTilt), ANGLE(70.0f));
 
-	short deltaAngle = GetShortestAngularDistance(item->Pose.Orientation.y, aspectAngle);
+	short deltaAngle = Geometry::GetShortestAngularDistance(item->Pose.Orientation.y, aspectAngle);
 	float sinDeltaAngle = phd_sin(deltaAngle);
 	float cosDeltaAngle = phd_cos(deltaAngle);
 
-	auto extraRot = Vector3Shrt(
+	// Calculate extra rotation required.
+	auto extraRot = EulerAngles(
 		-steepnessAngle * cosDeltaAngle,
 		0,
 		steepnessAngle * sinDeltaAngle
-	) - Vector3Shrt(item->Pose.Orientation.x, 0, item->Pose.Orientation.z);
+	) - EulerAngles(item->Pose.Orientation.x, 0, item->Pose.Orientation.z);
+
+	// Apply extra rotation according to alpha.
 	item->Pose.Orientation += extraRot * alpha;
 }
 
@@ -638,7 +644,7 @@ void SetLaraVault(ItemInfo* item, CollisionInfo* coll, VaultTestResult vaultResu
 	if (vaultResult.SnapToLedge)
 	{
 		SnapItemToLedge(item, coll, 0.2f, false);
-		lara->TargetOrientation = Vector3Shrt(0, coll->NearestLedgeAngle, 0);
+		lara->TargetOrientation = EulerAngles(0, coll->NearestLedgeAngle, 0);
 	}
 
 	if (vaultResult.SetJumpVelocity)
@@ -664,14 +670,14 @@ void SetLaraFallAnimation(ItemInfo* item)
 {
 	SetAnimation(item, LA_FALL_START);
 	item->Animation.IsAirborne = true;
-	item->Animation.Velocity.y = 0;
+	item->Animation.Velocity.y = 0.0f;
 }
 
 void SetLaraFallBackAnimation(ItemInfo* item)
 {
 	SetAnimation(item, LA_FALL_BACK);
 	item->Animation.IsAirborne = true;
-	item->Animation.Velocity.y = 0;
+	item->Animation.Velocity.y = 0.0f;
 }
 
 void SetLaraMonkeyFallAnimation(ItemInfo* item)
@@ -689,8 +695,8 @@ void SetLaraMonkeyRelease(ItemInfo* item)
 	auto* lara = GetLaraInfo(item);
 
 	item->Animation.IsAirborne = true;
-	item->Animation.Velocity.z = 2;
-	item->Animation.Velocity.y = 1;
+	item->Animation.Velocity.y = 1.0f;
+	item->Animation.Velocity.z = 2.0f;
 	lara->Control.TurnRate = 0;
 	lara->Control.HandStatus = HandStatus::Free;
 }

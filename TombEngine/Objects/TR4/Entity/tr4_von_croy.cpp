@@ -13,7 +13,7 @@
 #include "Game/misc.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
-#include "Specific/prng.h"
+#include "Math/Random.h"
 #include "Specific/setup.h"
 
 using namespace TEN::Math::Random;
@@ -24,7 +24,7 @@ namespace TEN::Entities::TR4
 	#define VON_CROY_FLAG_JUMP 6
 
 	const auto VonCroyBite = BiteInfo(Vector3(0.0f, 35.0f, 130.0f), 18);
-	const vector<int> VonCroyKnifeSwapJoints = { 7, 18 };
+	const vector<unsigned int> VonCroyKnifeSwapJoints = { 7, 18 };
 
 	bool VonCroyPassedWaypoints[128];
 
@@ -142,7 +142,7 @@ namespace TEN::Entities::TR4
 		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 		item->Animation.TargetState = VON_CROY_STATE_TOGGLE_KNIFE;
 		item->Animation.ActiveState = VON_CROY_STATE_TOGGLE_KNIFE;
-		item->SetBits(JointBitType::MeshSwap, VonCroyKnifeSwapJoints);
+		item->MeshSwapBits.Set(VonCroyKnifeSwapJoints);
 
 		memset(VonCroyPassedWaypoints, 0, 128);
 	}
@@ -427,7 +427,7 @@ namespace TEN::Entities::TR4
 				probe = GetCollision(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, probe.RoomNumber);
 				if (probe.Position.Ceiling == (probe.Position.Floor - 1536))
 				{
-					if (item->TestBits(JointBitType::MeshSwap, VonCroyKnifeSwapJoints))
+					if (item->MeshSwapBits.Test(VonCroyKnifeSwapJoints))
 						item->Animation.TargetState = VON_CROY_STATE_TOGGLE_KNIFE;
 					else
 						item->Animation.TargetState = VON_CROY_STATE_START_MONKEY;
@@ -502,7 +502,7 @@ namespace TEN::Entities::TR4
 				if (Lara.Location >= item->ItemFlags[3])
 				{
 					if (!foundTarget || AI.distance >= pow(SECTOR(1.5f), 2) &&
-						(item->TestBits(JointBitType::MeshSwap, 18) || AI.distance >= pow(SECTOR(3), 2)))
+						(item->MeshSwapBits.Test(18) || AI.distance >= pow(SECTOR(3), 2)))
 					{
 						if (creature->Enemy->IsLara())
 						{
@@ -627,10 +627,10 @@ namespace TEN::Entities::TR4
 		case VON_CROY_STATE_TOGGLE_KNIFE:
 			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase)
 			{
-				if (!item->TestBits(JointBitType::MeshSwap, VonCroyKnifeSwapJoints))
-					item->SetBits(JointBitType::MeshSwap, VonCroyKnifeSwapJoints);
+				if (!item->MeshSwapBits.Test(VonCroyKnifeSwapJoints))
+					item->MeshSwapBits.Set(VonCroyKnifeSwapJoints);
 				else
-					item->ClearBits(JointBitType::MeshSwap, VonCroyKnifeSwapJoints);
+					item->MeshSwapBits.Clear(VonCroyKnifeSwapJoints);
 			}
 
 			break;
@@ -696,7 +696,7 @@ namespace TEN::Entities::TR4
 
 		case VON_CROY_STATE_KNIFE_ATTACK_HIGH:
 			creature->MaxTurn = 0;
-			ClampRotation(&item->Pose, AI.angle, ANGLE(6.0f));
+			ClampRotation(item->Pose, AI.angle, ANGLE(6.0f));
 
 			if (AI.ahead)
 			{
@@ -731,9 +731,9 @@ namespace TEN::Entities::TR4
 			creature->MaxTurn = 0;
 
 			if (item->ItemFlags[2] == 0)
-				ClampRotation(&item->Pose, laraAI.angle, ANGLE(2.8f));
+				ClampRotation(item->Pose, laraAI.angle, ANGLE(2.8f));
 			else
-				ClampRotation(&item->Pose, enemy->Pose.Orientation.y - item->Pose.Orientation.y, ANGLE(2.8f));
+				ClampRotation(item->Pose, enemy->Pose.Orientation.y - item->Pose.Orientation.y, ANGLE(2.8f));
 
 			break;
 
@@ -768,7 +768,7 @@ namespace TEN::Entities::TR4
 			}
 
 			creature->MaxTurn = 0;
-			ClampRotation(&item->Pose, AI.angle, ANGLE(6.0f));
+			ClampRotation(item->Pose, AI.angle, ANGLE(6.0f));
 
 			if ((enemy == nullptr || enemy->Flags != 0) ||
 				item->Animation.FrameNumber <= g_Level.Anims[item->Animation.AnimNumber].frameBase + 21)
@@ -811,7 +811,7 @@ namespace TEN::Entities::TR4
 
 		case VON_CROY_STATE_POINT:
 			creature->MaxTurn = 0;
-			ClampRotation(&item->Pose, AI.angle / 2, ANGLE(6.0f));
+			ClampRotation(item->Pose, AI.angle / 2, ANGLE(6.0f));
 
 			if (AI.ahead)
 			{

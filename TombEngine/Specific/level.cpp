@@ -19,6 +19,7 @@
 #include "Game/savegame.h"
 #include "Game/spotcam.h"
 #include "Objects/Generic/Doors/generic_doors.h"
+#include "Objects/Sink.h"
 #include "Renderer/Renderer11.h"
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Scripting/Include/Objects/ScriptInterfaceObjectsHandler.h"
@@ -169,7 +170,7 @@ void LoadItems()
 	{
 		for (int i = 0; i < g_Level.NumItems; i++)
 		{
-			ItemInfo* item = &g_Level.Items[i];
+			auto* item = &g_Level.Items[i];
 
 			item->Data = ITEM_DATA{};
 			item->ObjectNumber = from_underlying(ReadInt16());
@@ -188,7 +189,7 @@ void LoadItems()
 			g_GameScriptEntities->AddName(item->LuaName, i);
 			g_GameScriptEntities->TryAddColliding(i);
 
-			memcpy(&item->StartPose, &item->Pose, sizeof(PHD_3DPOS));
+			memcpy(&item->StartPose, &item->Pose, sizeof(Pose));
 		}
 
 		for (int i = 0; i < g_Level.NumItems; i++)
@@ -292,28 +293,28 @@ void LoadObjects()
 	{
 		auto* anim = &g_Level.Anims[i];
 
-		anim->framePtr = ReadInt32();
+		anim->FramePtr = ReadInt32();
 		anim->Interpolation = ReadInt32();
 		anim->ActiveState = ReadInt32();
 		anim->VelocityStart = ReadVector3();
 		anim->VelocityEnd = ReadVector3();
 		anim->frameBase = ReadInt32();
 		anim->frameEnd = ReadInt32();
-		anim->jumpAnimNum = ReadInt32();
-		anim->jumpFrameNum = ReadInt32();
-		anim->numberChanges = ReadInt32();
-		anim->changeIndex = ReadInt32();
-		anim->numberCommands = ReadInt32();
-		anim->commandIndex = ReadInt32();
+		anim->JumpAnimNum = ReadInt32();
+		anim->JumpFrameNum = ReadInt32();
+		anim->NumStateDispatches = ReadInt32();
+		anim->StateDispatchIndex = ReadInt32();
+		anim->NumCommands = ReadInt32();
+		anim->CommandIndex = ReadInt32();
 	}
 
 	int numChanges = ReadInt32();
 	g_Level.Changes.resize(numChanges);
-	ReadBytes(g_Level.Changes.data(), sizeof(CHANGE_STRUCT) * numChanges);
+	ReadBytes(g_Level.Changes.data(), sizeof(StateDispatchData) * numChanges);
 
 	int numRanges = ReadInt32();
 	g_Level.Ranges.resize(numRanges);
-	ReadBytes(g_Level.Ranges.data(), sizeof(RANGE_STRUCT) * numRanges);
+	ReadBytes(g_Level.Ranges.data(), sizeof(StateDispatchRangeData) * numRanges);
 
 	int numCommands = ReadInt32();
 	g_Level.Commands.resize(numCommands);
@@ -327,7 +328,8 @@ void LoadObjects()
 	g_Level.Frames.resize(numFrames);
 	for (int i = 0; i < numFrames; i++)
 	{
-		ANIM_FRAME* frame = &g_Level.Frames[i];
+		auto* frame = &g_Level.Frames[i];
+
 		frame->boundingBox.X1 = ReadInt16();
 		frame->boundingBox.X2 = ReadInt16();
 		frame->boundingBox.Y1 = ReadInt16();
@@ -337,18 +339,19 @@ void LoadObjects()
 		frame->offsetX = ReadInt16();
 		frame->offsetY = ReadInt16();
 		frame->offsetZ = ReadInt16();
+
 		int numAngles = ReadInt16();
 		frame->angles.resize(numAngles);
 		for (int j = 0; j < numAngles; j++)
 		{
-			Quaternion* q = &frame->angles[j];
+			auto* q = &frame->angles[j];
 			q->x = ReadFloat();
 			q->y = ReadFloat();
 			q->z = ReadFloat();
 			q->w = ReadFloat();
 		}
 	}
-	//ReadBytes(g_Level.Frames.data(), sizeof(ANIM_FRAME) * numFrames);
+	//ReadBytes(g_Level.Frames.data(), sizeof(AnimFrame) * numFrames);
 
 	int numModels = ReadInt32();
 	TENLog("Num models: " + std::to_string(numModels), LogLevel::Info);
@@ -413,24 +416,22 @@ void LoadCameras()
 	g_Level.Cameras.reserve(numCameras);
 	for (int i = 0; i < numCameras; i++)
 	{
-		auto & camera = g_Level.Cameras.emplace_back();
-		camera.x = ReadInt32();
-		camera.y = ReadInt32();
-		camera.z = ReadInt32();
-		camera.roomNumber = ReadInt32();
-		camera.flags = ReadInt32();
-		camera.speed = ReadInt32();
-		camera.luaName = ReadString();
+		auto& camera = g_Level.Cameras.emplace_back();
+		camera.Position.x = ReadInt32();
+		camera.Position.y = ReadInt32();
+		camera.Position.z = ReadInt32();
+		camera.RoomNumber = ReadInt32();
+		camera.Flags = ReadInt32();
+		camera.Speed = ReadInt32();
+		camera.LuaName = ReadString();
 
-		g_GameScriptEntities->AddName(camera.luaName, camera);
+		g_GameScriptEntities->AddName(camera.LuaName, camera);
 	}
 
 	NumberSpotcams = ReadInt32();
 
 	if (NumberSpotcams != 0)
-	{
 		ReadBytes(SpotCam, NumberSpotcams * sizeof(SPOTCAM));
-	}
 
 	int numSinks = ReadInt32();
 	TENLog("Num sinks: " + std::to_string(numSinks), LogLevel::Info);
@@ -438,15 +439,15 @@ void LoadCameras()
 	g_Level.Sinks.reserve(numSinks);
 	for (int i = 0; i < numSinks; i++)
 	{
-		auto & sink = g_Level.Sinks.emplace_back();
-		sink.x = ReadInt32();
-		sink.y = ReadInt32();
-		sink.z = ReadInt32();
-		sink.strength = ReadInt32();
-		sink.boxIndex = ReadInt32();
-		sink.luaName = ReadString();
+		auto& sink = g_Level.Sinks.emplace_back();
+		sink.Position.x = ReadInt32();
+		sink.Position.y = ReadInt32();
+		sink.Position.z = ReadInt32();
+		sink.Strength = ReadInt32();
+		sink.BoxIndex = ReadInt32();
+		sink.LuaName = ReadString();
 
-		g_GameScriptEntities->AddName(sink.luaName, sink);
+		g_GameScriptEntities->AddName(sink.LuaName, sink);
 	}
 }
 
@@ -592,7 +593,7 @@ void ReadRooms()
 
 	for (int i = 0; i < numRooms; i++)
 	{
-		auto & room = g_Level.Rooms.emplace_back();
+		auto& room = g_Level.Rooms.emplace_back();
 		
 		room.name = ReadString();
 		int numTags = ReadInt32();
@@ -895,16 +896,16 @@ void LoadSoundSources()
 	g_Level.SoundSources.reserve(numSoundSources);
 	for (int i = 0; i < numSoundSources; i++)
 	{
-		auto& source = g_Level.SoundSources.emplace_back(SOUND_SOURCE_INFO{});
+		auto& source = g_Level.SoundSources.emplace_back(SoundSourceInfo{});
 
-		source.x = ReadInt32();
-		source.y = ReadInt32();
-		source.z = ReadInt32();
-		source.soundId = ReadInt32();
-		source.flags = ReadInt32();
-		source.luaName = ReadString();
+		source.Position.x = ReadInt32();
+		source.Position.y = ReadInt32();
+		source.Position.z = ReadInt32();
+		source.SoundID = ReadInt32();
+		source.Flags = ReadInt32();
+		source.LuaName = ReadString();
 
-		g_GameScriptEntities->AddName(source.luaName, source);
+		g_GameScriptEntities->AddName(source.LuaName, source);
 	}
 }
 
@@ -946,7 +947,7 @@ void LoadAIObjects()
 	g_Level.AIObjects.reserve(nAIObjects);
 	for (int i = 0; i < nAIObjects; i++)
 	{
-		auto & obj = g_Level.AIObjects.emplace_back();
+		auto& obj = g_Level.AIObjects.emplace_back();
 
 		obj.objectNumber = (GAME_OBJECT_ID)ReadInt16();
 		obj.roomNumber = ReadInt16();
@@ -1032,7 +1033,7 @@ unsigned int _stdcall LoadLevel(void* data)
 {
 	const int levelIndex = reinterpret_cast<int>(data);
 
-	ScriptInterfaceLevel* level = g_GameFlow->GetLevel(levelIndex);
+	auto* level = g_GameFlow->GetLevel(levelIndex);
 
 	TENLog("Loading level file: " + level->FileName, LogLevel::Info);
 
@@ -1275,7 +1276,7 @@ int LoadLevelFile(int levelIndex)
 		LoadLevel, 
 		reinterpret_cast<void*>(levelIndex), 
 		0, 
-		NULL);
+		nullptr);
 
 	while (IsLevelLoading);
 
@@ -1293,7 +1294,7 @@ void LoadSprites()
 
 	for (int i = 0; i < numSprites; i++)
 	{
-		SPRITE* spr = &g_Level.Sprites[i];
+		auto* spr = &g_Level.Sprites[i];
 		spr->tile = ReadInt32();
 		spr->x1 = ReadFloat();
 		spr->y1 = ReadFloat();
@@ -1315,9 +1316,7 @@ void LoadSprites()
 		short negLength = ReadInt16();
 		short offset = ReadInt16();
 		if (spriteID >= ID_NUMBER_OBJECTS)
-		{
 			StaticObjects[spriteID - ID_NUMBER_OBJECTS].meshNumber = offset;
-		}
 		else
 		{
 			Objects[spriteID].nmeshes = negLength;

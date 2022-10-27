@@ -18,7 +18,7 @@ namespace TEN::Entities::Creatures::TR2
 	constexpr auto SHARK_BITE_ATTACK_DAMAGE = 400;
 
 	const auto SharkBite = BiteInfo(Vector3(17.0f, -22.0f, 344.0f), 12);
-	const vector<int> SharkBiteAttackJoints = { 10, 12, 13 };
+	const vector<unsigned int> SharkBiteAttackJoints = { 10, 12, 13 };
 
 	void SharkControl(short itemNumber)
 	{
@@ -97,7 +97,7 @@ namespace TEN::Entities::Creatures::TR2
 				if (AI.ahead)
 					head = AI.angle;
 
-				if (!creature->Flags && item->TestBits(JointBitType::Touch, SharkBiteAttackJoints))
+				if (!creature->Flags && item->TouchBits.Test(SharkBiteAttackJoints))
 				{
 					DoDamage(creature->Enemy, SHARK_BITE_ATTACK_DAMAGE);
 					CreatureEffect(item, SharkBite, DoBloodSplat);

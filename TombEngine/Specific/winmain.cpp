@@ -54,20 +54,20 @@ bool ArgEquals(wchar_t* incomingArg, std::string name)
 	return (lowerArg == "-" + name) || (lowerArg == "/" + name);
 }
 
-Vector2Int GetScreenResolution()
+Vector2i GetScreenResolution()
 {
 	RECT desktop;
 	const HWND hDesktop = GetDesktopWindow();
 	GetWindowRect(hDesktop, &desktop);
-	Vector2Int resolution;
+	Vector2i resolution;
 	resolution.x = desktop.right;
 	resolution.y = desktop.bottom;
 	return resolution;
 }
 
-std::vector<Vector2Int> GetAllSupportedScreenResolutions()
+std::vector<Vector2i> GetAllSupportedScreenResolutions()
 {
-	std::vector<Vector2Int> result;
+	std::vector<Vector2i> result;
 
 	DEVMODE dm = { 0 };
 	dm.dmSize = sizeof(dm);
@@ -84,7 +84,7 @@ std::vector<Vector2Int> GetAllSupportedScreenResolutions()
 		}
 		if (add)
 		{
-			Vector2Int resolution;
+			Vector2i resolution;
 			resolution.x = dm.dmPelsWidth;
 			resolution.y = dm.dmPelsHeight;
 			result.push_back(resolution);
@@ -94,7 +94,7 @@ std::vector<Vector2Int> GetAllSupportedScreenResolutions()
 	std::sort(
 		result.begin(),
 		result.end(),
-		[](Vector2Int& a, Vector2Int& b)
+		[](Vector2i& a, Vector2i& b)
 		{
 			if (a.x == b.x)
 			{
@@ -283,7 +283,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	{
 		g_GameFlow = ScriptInterfaceState::CreateFlow();
 		g_GameScriptEntities = ScriptInterfaceState::CreateObjectsHandler();
-		g_GameFlow->LoadFlowScript();
 		g_GameStringsHandler = ScriptInterfaceState::CreateStringsHandler();
 
 		// This must be loaded last as it adds metafunctions to the global
@@ -293,6 +292,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		// are added to a hierarchy in the REAL global table, not the fake
 		// hidden one.
 		g_GameScript = ScriptInterfaceState::CreateGame();
+
+		//todo Major hack. This should not be needed to leak outside of
+		//LogicHandler internals. In a future version stuff from FlowHandler
+		//should be moved to LogicHandler or vice versa to make this stuff
+		//less fragile (squidshire, 16/09/22)
+		g_GameScript->ShortenTENCalls();
+		g_GameFlow->LoadFlowScript();
 	}
 	catch (TENScriptException const& e)
 	{

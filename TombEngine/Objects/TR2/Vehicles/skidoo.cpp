@@ -17,7 +17,7 @@
 #include "Objects/TR2/Vehicles/skidoo_info.h"
 #include "Specific/input.h"
 #include "Specific/level.h"
-#include "Specific/prng.h"
+#include "Math/Random.h"
 #include "Specific/setup.h"
 #include "Sound/sound.h"
 
@@ -181,7 +181,7 @@ namespace TEN::Entities::Vehicles
 
 		DoVehicleFlareDiscard(laraItem);
 		laraItem->Pose.Position = skidooItem->Pose.Position;
-		laraItem->Pose.Orientation = Vector3Shrt(0, skidooItem->Pose.Orientation.y, 0);
+		laraItem->Pose.Orientation = EulerAngles(0, skidooItem->Pose.Orientation.y, 0);
 		lara->Control.HandStatus = HandStatus::Busy;
 		skidooItem->Collidable = true;
 	}
@@ -272,7 +272,7 @@ namespace TEN::Entities::Vehicles
 		auto* skidooItem = &g_Level.Items[lara->Vehicle];
 		auto* skidoo = GetSkidooInfo(skidooItem);
 
-		Vector3Int frontLeft, frontRight;
+		Vector3i frontLeft, frontRight;
 		auto collide = SkidooDynamics(skidooItem, laraItem);
 		auto heightFrontLeft = GetVehicleHeight(skidooItem, SKIDOO_FRONT, -SKIDOO_SIDE, true, &frontLeft);
 		auto heightFrontRight = GetVehicleHeight(skidooItem, SKIDOO_FRONT, SKIDOO_SIDE, true, &frontRight);
@@ -635,7 +635,7 @@ namespace TEN::Entities::Vehicles
 		}
 	}
 
-	int GetSkidooCollisionAnim(ItemInfo* skidooItem, Vector3Int* moved)
+	int GetSkidooCollisionAnim(ItemInfo* skidooItem, Vector3i* moved)
 	{
 		moved->x = skidooItem->Pose.Position.x - moved->x;
 		moved->z = skidooItem->Pose.Position.z - moved->z;
@@ -678,7 +678,7 @@ namespace TEN::Entities::Vehicles
 
 		if (TrInput & VEHICLE_IN_FIRE && !skidooItem->ItemFlags[0])
 		{
-			auto angles = Vector3Shrt(
+			auto angles = EulerAngles(
 				lara->RightArm.Orientation.x,
 				lara->RightArm.Orientation.y + laraItem->Pose.Orientation.y,
 				0
@@ -736,14 +736,14 @@ namespace TEN::Entities::Vehicles
 		return verticalVelocity;
 	}
 
-	short DoSkidooShift(ItemInfo* skidooItem, Vector3Int* pos, Vector3Int* old)
+	short DoSkidooShift(ItemInfo* skidooItem, Vector3i* pos, Vector3i* old)
 	{
 		int	x = pos->x / SECTOR(1);
 		int z = pos->z / SECTOR(1);
 		int xOld = old->x / SECTOR(1);
 		int zOld = old->z / SECTOR(1);
-		int shiftX = pos->x & (SECTOR(1) - 1);
-		int shiftZ = pos->z & (SECTOR(1) - 1);
+		int shiftX = pos->x & WALL_MASK;
+		int shiftZ = pos->z & WALL_MASK;
 
 		if (x == xOld)
 		{
@@ -840,7 +840,7 @@ namespace TEN::Entities::Vehicles
 	{
 		auto* skidoo = GetSkidooInfo(skidooItem);
 
-		Vector3Int frontLeftOld, frontRightOld, backLeftOld, backRightOld;
+		Vector3i frontLeftOld, frontRightOld, backLeftOld, backRightOld;
 		auto heightFrontLeftOld = GetVehicleHeight(skidooItem, SKIDOO_FRONT, -SKIDOO_SIDE, true, &frontLeftOld);
 		auto heightFrontRightOld = GetVehicleHeight(skidooItem, SKIDOO_FRONT, SKIDOO_SIDE, true, &frontRightOld);
 		auto heightBackLeftOld = GetVehicleHeight(skidooItem, -SKIDOO_FRONT, -SKIDOO_SIDE, true, &backLeftOld);
@@ -903,14 +903,14 @@ namespace TEN::Entities::Vehicles
 			skidooItem->Pose.Position.z -= slip * phd_sin(skidooItem->Pose.Orientation.y);
 		}
 
-		Vector3Int moved;
+		Vector3i moved;
 		moved.x = skidooItem->Pose.Position.x;
 		moved.z = skidooItem->Pose.Position.z;
 
 		if (!(skidooItem->Flags & IFLAG_INVISIBLE))
 			DoVehicleCollision(skidooItem, SKIDOO_RADIUS);
 
-		Vector3Int frontLeft, frontRight, backRight, backLeft;
+		Vector3i frontLeft, frontRight, backRight, backLeft;
 		rotation = 0;
 		auto heightBackLeft = GetVehicleHeight(skidooItem, -SKIDOO_FRONT, -SKIDOO_SIDE, false, &backLeft);
 		if (heightBackLeft < (backLeftOld.y - CLICK(1)))
@@ -930,7 +930,7 @@ namespace TEN::Entities::Vehicles
 
 		auto probe = GetCollision(skidooItem);
 		if (probe.Position.Floor < (skidooItem->Pose.Position.y - CLICK(1)))
-			DoSkidooShift(skidooItem, (Vector3Int*)&skidooItem->Pose, &oldPos);
+			DoSkidooShift(skidooItem, (Vector3i*)&skidooItem->Pose, &oldPos);
 
 		skidoo->ExtraRotation = rotation;
 

@@ -10,10 +10,10 @@
 #include "Game/Lara/lara_fire.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_tests.h"
+#include "Math/Random.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
-#include "Specific/prng.h"
 
 using namespace TEN::Math::Random;
 
@@ -41,14 +41,14 @@ void FlareControl(short itemNumber)
 		flareItem->Pose.Orientation.z = 0;
 	}
 
-	auto velocity = Vector3Int(
+	auto velocity = Vector3i(
 		flareItem->Animation.Velocity.z * phd_sin(flareItem->Pose.Orientation.y),
 		flareItem->Animation.Velocity.y,
 		flareItem->Animation.Velocity.z * phd_cos(flareItem->Pose.Orientation.y)
 	);
 
 	auto oldPos = flareItem->Pose.Position;
-	flareItem->Pose.Position += Vector3Int(velocity.x, 0, velocity.z);
+	flareItem->Pose.Position += Vector3i(velocity.x, 0, velocity.z);
 
 	if (TestEnvironment(ENV_FLAG_WATER, flareItem) ||
 		TestEnvironment(ENV_FLAG_SWAMP, flareItem))
@@ -75,7 +75,7 @@ void FlareControl(short itemNumber)
 	else
 		life++;
 
-	if (DoFlareLight((Vector3Int*)&flareItem->Pose, life))
+	if (DoFlareLight((Vector3i*)&flareItem->Pose, life))
 	{
 		TriggerChaffEffects(flareItem, life);
 		/* Hardcoded code */
@@ -89,8 +89,8 @@ void ReadyFlare(ItemInfo* laraItem)
 	auto* lara = GetLaraInfo(laraItem);
 
 	lara->Control.HandStatus = HandStatus::Free;
-	lara->LeftArm.Orientation = Vector3Shrt();
-	lara->RightArm.Orientation = Vector3Shrt();
+	lara->LeftArm.Orientation = EulerAngles::Zero;
+	lara->RightArm.Orientation = EulerAngles::Zero;
 	lara->LeftArm.Locked = false;
 	lara->RightArm.Locked = false;
 	lara->TargetEntity = nullptr;
@@ -281,10 +281,10 @@ void SetFlareArm(ItemInfo* laraItem, int armFrame)
 		flareAnimNum += 1;
 
 	lara->LeftArm.AnimNumber = flareAnimNum;
-	lara->LeftArm.FrameBase = g_Level.Anims[flareAnimNum].framePtr;
+	lara->LeftArm.FrameBase = g_Level.Anims[flareAnimNum].FramePtr;
 }
 
-void CreateFlare(ItemInfo* laraItem, GAME_OBJECT_ID objectNumber, bool thrown)
+void CreateFlare(ItemInfo* laraItem, GAME_OBJECT_ID objectNumber, bool isThrown)
 {
 	auto* lara = GetLaraInfo(laraItem);
 	auto itemNumber = CreateItem();
@@ -296,8 +296,7 @@ void CreateFlare(ItemInfo* laraItem, GAME_OBJECT_ID objectNumber, bool thrown)
 		flareItem->ObjectNumber = objectNumber;
 		flareItem->RoomNumber = laraItem->RoomNumber;
 
-		auto pos = Vector3Int(-16, 32, 42);
-		GetLaraJointPosition(&pos, LM_LHAND);
+		auto pos = GetJointPosition(laraItem, LM_LHAND, Vector3i(-16, 32, 42));
 
 		flareItem->Pose.Position = pos;
 
@@ -314,7 +313,7 @@ void CreateFlare(ItemInfo* laraItem, GAME_OBJECT_ID objectNumber, bool thrown)
 		}
 		else
 		{
-			if (thrown)
+			if (isThrown)
 				flareItem->Pose.Orientation.y = laraItem->Pose.Orientation.y;
 			else
 				flareItem->Pose.Orientation.y = laraItem->Pose.Orientation.y - ANGLE(45.0f);
@@ -328,7 +327,7 @@ void CreateFlare(ItemInfo* laraItem, GAME_OBJECT_ID objectNumber, bool thrown)
 		flareItem->Pose.Orientation.z = 0;
 		flareItem->Color = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
 
-		if (thrown)
+		if (isThrown)
 		{
 			flareItem->Animation.Velocity.z = laraItem->Animation.Velocity.z + 50;
 			flareItem->Animation.Velocity.y = laraItem->Animation.Velocity.y - 50;
@@ -346,7 +345,7 @@ void CreateFlare(ItemInfo* laraItem, GAME_OBJECT_ID objectNumber, bool thrown)
 		{
 			flareItem->Data = (int)0;
 			int& life = flareItem->Data;
-			if (DoFlareLight((Vector3Int*)&flareItem->Pose, lara->Flare.Life))
+			if (DoFlareLight((Vector3i*)&flareItem->Pose, lara->Flare.Life))
 				life = lara->Flare.Life | 0x8000;
 			else
 				life = lara->Flare.Life & 0x7FFF;
@@ -368,8 +367,7 @@ void DoFlareInHand(ItemInfo* laraItem, int flareLife)
 {
 	auto* lara = GetLaraInfo(laraItem);
 
-	auto pos = Vector3Int(11, 32, 41);
-	GetLaraJointPosition(&pos, LM_LHAND);
+	auto pos = GetJointPosition(laraItem, LM_LHAND, Vector3i(11, 32, 41));
 
 	if (DoFlareLight(&pos, flareLife))
 		TriggerChaffEffects(flareLife);
@@ -391,10 +389,10 @@ void DoFlareInHand(ItemInfo* laraItem, int flareLife)
 		lara->Flare.Life++;
 }
 
-int DoFlareLight(Vector3Int* pos, int flareLife)
+bool DoFlareLight(Vector3i* pos, int flareLife)
 {
 	if (flareLife >= FLARE_LIFE_MAX || flareLife == 0)
-		return 0;
+		return false;
 
 	float random = GenerateFloat();
 
@@ -443,5 +441,5 @@ int DoFlareLight(Vector3Int* pos, int flareLife)
 		result = (random < 0.3f);
 	}
 
-	return (dying || ending ? result : true);
+	return ((dying || ending) ? result : true);
 }

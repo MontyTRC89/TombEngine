@@ -1,12 +1,14 @@
 #include "framework.h"
 #include "Renderer/Renderer11.h"
-#include "Game/savegame.h"
-#include "Game/health.h"
+
 #include "Game/animation.h"
-#include "Game/gui.h"
-#include "Game/Lara/lara.h"
 #include "Game/control/control.h"
 #include "Game/control/volume.h"
+#include "Game/gui.h"
+#include "Game/health.h"
+#include "Game/Lara/lara.h"
+#include "Game/savegame.h"
+#include "Math/Math.h"
 #include "Scripting/Internal/TEN/Flow//Level/FlowLevel.h"
 #include "Specific/configuration.h"
 #include "Specific/level.h"
@@ -15,6 +17,7 @@
 #include "Specific/winmain.h"
 
 using namespace TEN::Input;
+using namespace TEN::Math;
 
 extern TEN::Renderer::RendererHUDBar* g_SFXVolumeBar;
 extern TEN::Renderer::RendererHUDBar* g_MusicVolumeBar;
@@ -544,27 +547,27 @@ namespace TEN::Renderer
 		if (!moveableObj)
 			return;
 
-		ObjectInfo* obj = &Objects[objectNum];
+		auto* obj = &Objects[objectNum];
 
 		if (obj->animIndex != -1)
 		{
-			ANIM_FRAME* frame[] = { &g_Level.Frames[g_Level.Anims[obj->animIndex].framePtr] };
+			AnimFrame* frame[] = { &g_Level.Frames[g_Level.Anims[obj->animIndex].FramePtr] };
 			UpdateAnimation(nullptr, *moveableObj, frame, 0, 0, 0xFFFFFFFF);
 		}
 
-		Vector3 pos = m_viewportToolkit.Unproject(Vector3(x, y, 1), projection, view, Matrix::Identity);
+		auto pos = m_viewportToolkit.Unproject(Vector3(x, y, 1), projection, view, Matrix::Identity);
 
-		// Set vertex buffer
+		// Set vertex buffer.
 		m_context->IASetVertexBuffers(0, 1, m_moveablesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
 		m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		m_context->IASetInputLayout(m_inputLayout.Get());
 		m_context->IASetIndexBuffer(m_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
-		// Set shaders
+		// Set shaders.
 		m_context->VSSetShader(m_vsInventory.Get(), nullptr, 0);
 		m_context->PSSetShader(m_psInventory.Get(), nullptr, 0);
 
-		// Set matrices
+		// Set matrices.
 		CCameraMatrixBuffer HudCamera;
 		HudCamera.CamDirectionWS = -Vector4::UnitZ;
 		HudCamera.ViewProjection = view * projection;
@@ -573,7 +576,7 @@ namespace TEN::Renderer
 
 		for (int n = 0; n < (*moveableObj).ObjectMeshes.size(); n++)
 		{
-			RendererMesh* mesh = (*moveableObj).ObjectMeshes[n];
+			auto* mesh = (*moveableObj).ObjectMeshes[n];
 
 			/*if (GLOBAL_invMode)
 			{
@@ -928,7 +931,7 @@ namespace TEN::Renderer
 				PrintDebugMessage("Room.y, minFloor, maxCeiling: %d %d %d ", r->y, r->minfloor, r->maxceiling);
 				PrintDebugMessage("Camera.pos: %d %d %d", Camera.pos.x, Camera.pos.y, Camera.pos.z);
 				PrintDebugMessage("Camera.target: %d %d %d", Camera.target.x, Camera.target.y, Camera.target.z);
-				PrintDebugMessage("Camera.roomNumber: %d", Camera.pos.roomNumber);
+				PrintDebugMessage("Camera.roomNumber: %d", Camera.pos.RoomNumber);
 				break;
 
 			case RENDERER_DEBUG_PAGE::LARA_STATS:

@@ -16,7 +16,7 @@
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_struct.h"
-#include "Specific/trmath.h"
+#include "Math/Math.h"
 #include "Game/misc.h"
 #include "Game/itemdata/door_data.h"
 #include "Game/collision/collide_room.h"
@@ -27,16 +27,18 @@ using namespace TEN::Input;
 
 namespace TEN::Entities::Doors
 {
-	Vector3Int CrowbarDoorPos(-412, 0, 256);
-
-	OBJECT_COLLISION_BOUNDS CrowbarDoorBounds =
+	const auto CrowbarDoorPos = Vector3i(-412, 0, 256);
+	const ObjectCollisionBounds CrowbarDoorBounds =
 	{
-		-512, 512, 
-		-1024, 0, 
-		0, 512, 
-		-ANGLE(80.0f), ANGLE(80.0f),
-		-ANGLE(80.0f), ANGLE(80.0f),
-		-ANGLE(80.0f), ANGLE(80.0f)
+		GameBoundingBox(
+			-SECTOR(0.5f), SECTOR(0.5f),
+			-SECTOR(1), 0,
+			0, SECTOR(0.5f)
+		),
+		std::pair(
+			EulerAngles(ANGLE(-80.0f), ANGLE(-80.0f), ANGLE(-80.0f)),
+			EulerAngles(ANGLE(80.0f), ANGLE(80.0f), ANGLE(80.0f))
+		)
 	};
 
 	void InitialiseDoor(short itemNumber)
@@ -179,7 +181,7 @@ namespace TEN::Entities::Doors
 				laraInfo->Control.IsMoving && laraInfo->InteractedItem == itemNumber))
 		{
 			doorItem->Pose.Orientation.y ^= ANGLE(180.0f);
-			if (TestLaraPosition(&CrowbarDoorBounds, doorItem, laraItem))
+			if (TestLaraPosition(CrowbarDoorBounds, doorItem, laraItem))
 			{
 				if (!laraInfo->Control.IsMoving)
 				{
@@ -215,7 +217,7 @@ namespace TEN::Entities::Doors
 
 				g_Gui.SetInventoryItemChosen(NO_ITEM);
 
-				if (MoveLaraPosition(&CrowbarDoorPos, doorItem, laraItem))
+				if (MoveLaraPosition(CrowbarDoorPos, doorItem, laraItem))
 				{
 					SetAnimation(laraItem, LA_DOOR_OPEN_CROWBAR);
 					doorItem->Pose.Orientation.y ^= ANGLE(180.0f);
@@ -267,12 +269,12 @@ namespace TEN::Entities::Doors
 		{
 			if (doorItem->ItemFlags[0])
 			{
-				auto* bounds = GetBoundsAccurate(doorItem);
+				auto bounds = GameBoundingBox(doorItem);
 			
 				doorItem->ItemFlags[0]--;
 				doorItem->Pose.Position.y -= TEN::Entities::Switches::COG_DOOR_SPEED;
 				
-				int y = bounds->Y1 + doorItem->ItemFlags[2] - STEP_SIZE;
+				int y = bounds.Y1 + doorItem->ItemFlags[2] - STEP_SIZE;
 				if (doorItem->Pose.Position.y < y)
 				{
 					doorItem->Pose.Position.y = y;

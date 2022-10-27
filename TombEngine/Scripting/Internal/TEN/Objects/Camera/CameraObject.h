@@ -1,18 +1,20 @@
 #pragma once
 
 #include "Objects/NamedBase.h"
-#include "Specific/phd_global.h"
 
-namespace sol {
+struct LevelCameraInfo;
+
+namespace sol
+{
 	class state;
 }
 class Vec3;
 
-class Camera : public NamedBase<Camera, LEVEL_CAMERA_INFO &>
+class Camera : public NamedBase<Camera, LevelCameraInfo &>
 {
 public:
-	using IdentifierType = std::reference_wrapper<LEVEL_CAMERA_INFO>;
-	Camera(LEVEL_CAMERA_INFO& ref);
+	using IdentifierType = std::reference_wrapper<LevelCameraInfo>;
+	Camera(LevelCameraInfo& ref);
 	~Camera() = default;
 
 	Camera& operator=(Camera const& other) = delete;
@@ -29,5 +31,5 @@ public:
 	void SetName(std::string const &);
 
 private:
-	LEVEL_CAMERA_INFO & m_camera;
+	LevelCameraInfo & m_camera;
 };

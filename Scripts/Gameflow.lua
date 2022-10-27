@@ -1,16 +1,5 @@
--- Place in this LUA script all the levels of your game
+-- Place in this Lua script all the levels of your game
 -- Title is mandatory and must be the first level.
-
--- Shorten some of the internal data types.
-
-local Flow = TEN.Flow
-local Level = Flow.Level
-local Color = TEN.Color
-local Rotation = TEN.Rotation
-local InventoryItem = Flow.InventoryItem
-local ObjID = TEN.Objects.ObjID
-local RotationAxis = Flow.RotationAxis
-local ItemAction = Flow.ItemAction
 
 -- Intro image is a splash screen which appears before actual loading screen.
 -- If you don't want it to appear, just remove this line.
@@ -22,6 +11,9 @@ Flow.SetIntroImagePath("Screens\\main.jpg")
 
 Flow.SetTitleScreenImagePath("Screens\\main.jpg")
 
+-- Disable/enable flycheat globally
+
+Flow.EnableFlyCheat(true)
 
 --------------------------------------------------
 

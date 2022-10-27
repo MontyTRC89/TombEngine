@@ -639,6 +639,8 @@ void lara_col_jump_up(ItemInfo* item, CollisionInfo* coll)
 	if (TestLaraHangJumpUp(item, coll))
 		return;
 
+	LaraDeflectTopSide(item, coll);
+
 	if (coll->Middle.Ceiling >= 0 ||
 		coll->CollisionType == CT_TOP ||
 		coll->CollisionType == CT_TOP_FRONT ||
@@ -751,7 +753,7 @@ void lara_as_swan_dive(ItemInfo* item, CollisionInfo* coll)
 		else if (TestLaraSlide(item, coll))
 			SetLaraSlideAnimation(item, coll);
 		else if ((TrInput & IN_CROUCH || TestLaraCrawlspaceDive(item, coll)) &&
-			g_GameFlow->HasCrawlspaceSwandive())
+			g_GameFlow->HasCrawlspaceDive())
 		{
 			item->Animation.TargetState = LS_CROUCH_IDLE;
 			TranslateItem(item, coll->Setup.ForwardAngle, CLICK(0.5f)); // HACK: Move forward to avoid standing up or falling out on an edge.
@@ -779,8 +781,8 @@ void lara_col_swan_dive(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	auto* bounds = GetBoundsAccurate(item);
-	int realHeight = g_GameFlow->HasCrawlspaceSwandive() ? (bounds->Height() * 0.7f) : LARA_HEIGHT;
+	auto bounds = GameBoundingBox(item);
+	int realHeight = g_GameFlow->HasCrawlspaceDive() ? (bounds.GetHeight() * 0.7f) : LARA_HEIGHT;
 
 	lara->Control.MoveAngle = item->Pose.Orientation.y;
 	coll->Setup.Height = std::max(LARA_HEIGHT_CRAWL, realHeight);

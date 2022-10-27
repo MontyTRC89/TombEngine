@@ -40,11 +40,7 @@ namespace TEN::Entities::Creatures::TR5
 		auto* item = &g_Level.Items[itemNumber];
 
 		ClearItem(itemNumber);
-
-		item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex;
-		item->Animation.TargetState = CHEF_STATE_COOKING;
-		item->Animation.ActiveState = CHEF_STATE_COOKING;
-		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+		SetAnimation(item, 0);
 		item->Pose.Position.x += 192 * phd_sin(item->Pose.Orientation.y);
 		item->Pose.Position.z += 192 * phd_cos(item->Pose.Orientation.y);
 	}
@@ -54,13 +50,13 @@ namespace TEN::Entities::Creatures::TR5
 		if (!CreatureActive(itemNumber))
 			return;
 
+		auto* item = &g_Level.Items[itemNumber];
+		auto* creature = GetCreatureInfo(item);
+
+		short angle = 0;
 		short joint0 = 0;
 		short joint1 = 0;
 		short joint2 = 0;
-		short angle = 0;
-
-		auto* item = &g_Level.Items[itemNumber];
-		auto* creature = GetCreatureInfo(item);
 
 		if (item->HitPoints <= 0)
 		{
@@ -121,7 +117,7 @@ namespace TEN::Entities::Creatures::TR5
 			case CHEF_STATE_COOKING:
 				if (abs(LaraItem->Pose.Position.y - item->Pose.Position.y) < SECTOR(1) &&
 					AI.distance < pow(SECTOR(1.5f), 2) &&
-					(item->TouchBits ||
+					(item->TouchBits.TestAny() ||
 						item->HitStatus ||
 						LaraItem->Animation.Velocity.z > 15 ||
 						TargetVisible(item, &aiLaraInfo)))

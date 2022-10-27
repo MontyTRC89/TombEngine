@@ -10,9 +10,9 @@
 #include "Game/itemdata/creature_info.h"
 #include "Game/items.h"
 #include "Game/misc.h"
+#include "Math/Math.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
-#include "Specific/prng.h"
 #include "Specific/setup.h"
 
 using namespace TEN::Math::Random;
@@ -55,7 +55,7 @@ namespace TEN::Entities::Creatures::TR5
 		item->Pose.Position.x -= CLICK(1);
 	}
 
-	static void HydraBubblesAttack(PHD_3DPOS* pos, short roomNumber, int count)
+	static void HydraBubblesAttack(Pose* pos, short roomNumber, int count)
 	{
 		short fxNumber = CreateNewEffect(roomNumber);
 		if (fxNumber != NO_ITEM)
@@ -77,7 +77,7 @@ namespace TEN::Entities::Creatures::TR5
 		}
 	}
 
-	void TriggerHydraMissileSparks(Vector3Int* pos, short xv, short yv, short zv)
+	void TriggerHydraMissileSparks(Vector3i* pos, short xv, short yv, short zv)
 	{
 		auto* spark = GetFreeParticle();
 
@@ -321,19 +321,16 @@ namespace TEN::Entities::Creatures::TR5
 			case 3:
 				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase)
 				{
-					auto pos1 = Vector3Int(0, 1024, 40);
-					GetJointAbsPosition(item, &pos1, 10);
+					auto pos1 = GetJointPosition(item, 10, Vector3i(0, 1024, 40));
+					auto pos2 = GetJointPosition(item, 10, Vector3i(0, 144, 40));
 
-					auto pos2 = Vector3Int(0, 144, 40);
-					GetJointAbsPosition(item, &pos2, 10);
-
-					auto angles = GetVectorAngles(pos1.x - pos2.x, pos1.y - pos2.y, pos1.z - pos2.z);
-					auto pos = PHD_3DPOS(pos1, angles);
+					auto orient = Geometry::GetOrientToPoint(pos2.ToVector3(), pos1.ToVector3());
+					auto pose = Pose(pos1, orient);
 					roomNumber = item->RoomNumber;
 					GetFloor(pos2.x, pos2.y, pos2.z, &roomNumber);
 
 					// TEST: uncomment this for making HYDRA not firing bubbles
-					HydraBubblesAttack(&pos, roomNumber, 1);
+					HydraBubblesAttack(&pose, roomNumber, 1);
 				}
 
 				break;

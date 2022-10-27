@@ -554,7 +554,7 @@ namespace TEN::Input
 
 		static int medipackTimeout = 0;
 
-		if (KeyMap[KC_0])
+		if (KeyMap[KC_MINUS])
 		{
 			if (medipackTimeout == 0)
 			{
@@ -581,7 +581,7 @@ namespace TEN::Input
 				}
 			}
 		}
-		else if (KeyMap[KC_9])
+		else if (KeyMap[KC_EQUALS])
 		{
 			if (medipackTimeout == 0)
 			{

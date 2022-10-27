@@ -103,7 +103,8 @@ void lara_as_vault(ItemInfo* item, CollisionInfo* coll)
 	coll->Setup.EnableSpasm = false;
 
 	EaseOutLaraHeight(item, lara->ProjectedFloorHeight - item->Pose.Position.y);
-	ApproachLaraTargetOrientation(item, lara->TargetOrientation, 2.5f);
+	item->Pose.Orientation.Lerp(lara->TargetOrientation, 0.4f);
+
 	item->Animation.TargetState = LS_IDLE;
 }
 
@@ -116,8 +117,8 @@ void lara_as_auto_jump(ItemInfo* item, CollisionInfo* coll)
 	lara->Control.CanLook = false;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
-	
-	ApproachLaraTargetOrientation(item, lara->TargetOrientation, 2.5f);
+
+	item->Pose.Orientation.Lerp(lara->TargetOrientation, 0.4f);
 }
 
 // ---------------
@@ -218,7 +219,7 @@ void lara_col_walk_forward(ItemInfo* item, CollisionInfo* coll)
 	if (LaraDeflectEdge(item, coll))
 	{
 		item->Animation.TargetState = LS_SOFT_SPLAT;
-		if (GetChange(item, &g_Level.Anims[item->Animation.AnimNumber]))
+		if (GetStateDispatch(item, g_Level.Anims[item->Animation.AnimNumber]))
 		{
 			item->Animation.ActiveState = LS_SOFT_SPLAT;
 			return;
@@ -353,7 +354,7 @@ void lara_col_run_forward(ItemInfo* item, CollisionInfo* coll)
 			coll->HitTallObject)
 		{
 			item->Animation.TargetState = LS_SPLAT;
-			if (GetChange(item, &g_Level.Anims[item->Animation.AnimNumber]))
+			if (GetStateDispatch(item, g_Level.Anims[item->Animation.AnimNumber]))
 			{
 				Rumble(0.4f, 0.15f);
 
@@ -363,7 +364,7 @@ void lara_col_run_forward(ItemInfo* item, CollisionInfo* coll)
 		}
 
 		item->Animation.TargetState = LS_SOFT_SPLAT;
-		if (GetChange(item, &g_Level.Anims[item->Animation.AnimNumber]))
+		if (GetStateDispatch(item, g_Level.Anims[item->Animation.AnimNumber]))
 		{
 			item->Animation.ActiveState = LS_SOFT_SPLAT;
 			return;
@@ -1345,7 +1346,6 @@ void lara_col_turn_left_slow(ItemInfo* item, CollisionInfo* coll)
 void lara_as_death(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
-	auto* bounds = GetBoundsAccurate(item);
 
 	item->Animation.Velocity.z = 0.0f;
 	lara->Control.CanLook = false;
@@ -1361,7 +1361,8 @@ void lara_as_death(ItemInfo* item, CollisionInfo* coll)
 		lara->Inventory.IsBusy = false;
 	}
 
-	if (bounds->Height() <= (LARA_HEIGHT * 0.75f))
+	auto bounds = GameBoundingBox(item);
+	if (bounds.GetHeight() <= (LARA_HEIGHT * 0.75f))
 		AlignLaraToSurface(item);
 
 	ModulateLaraTurnRateY(item, 0, 0, 0);
@@ -1872,7 +1873,7 @@ void lara_col_step_right(ItemInfo* item, CollisionInfo* coll)
 	if (LaraDeflectEdge(item, coll))
 	{
 		item->Animation.TargetState = LS_SOFT_SPLAT;
-		if (GetChange(item, &g_Level.Anims[item->Animation.AnimNumber]))
+		if (GetStateDispatch(item, g_Level.Anims[item->Animation.AnimNumber]))
 		{
 			item->Animation.ActiveState = LS_SOFT_SPLAT;
 			return;
@@ -1966,7 +1967,7 @@ void lara_col_step_left(ItemInfo* item, CollisionInfo* coll)
 	if (LaraDeflectEdge(item, coll))
 	{
 		item->Animation.TargetState = LS_SOFT_SPLAT;
-		if (GetChange(item, &g_Level.Anims[item->Animation.AnimNumber]))
+		if (GetStateDispatch(item, g_Level.Anims[item->Animation.AnimNumber]))
 		{
 			item->Animation.ActiveState = LS_SOFT_SPLAT;
 			return;
@@ -2222,7 +2223,7 @@ void lara_col_wade_forward(ItemInfo* item, CollisionInfo* coll)
 		ResetLaraLean(item);
 
 		item->Animation.TargetState = LS_SOFT_SPLAT;
-		if (GetChange(item, &g_Level.Anims[item->Animation.AnimNumber]))
+		if (GetStateDispatch(item, g_Level.Anims[item->Animation.AnimNumber]))
 		{
 			item->Animation.ActiveState = LS_SOFT_SPLAT;
 			return;
@@ -2353,7 +2354,7 @@ void lara_col_sprint(ItemInfo* item, CollisionInfo* coll)
 			coll->HitTallObject)
 		{
 			item->Animation.TargetState = LS_SPLAT;
-			if (GetChange(item, &g_Level.Anims[item->Animation.AnimNumber]))
+			if (GetStateDispatch(item, g_Level.Anims[item->Animation.AnimNumber]))
 			{
 				Rumble(0.5f, 0.15f);
 
@@ -2363,7 +2364,7 @@ void lara_col_sprint(ItemInfo* item, CollisionInfo* coll)
 		}
 
 		item->Animation.TargetState = LS_SOFT_SPLAT;
-		if (GetChange(item, &g_Level.Anims[item->Animation.AnimNumber]))
+		if (GetStateDispatch(item, g_Level.Anims[item->Animation.AnimNumber]))
 		{
 			item->Animation.ActiveState = LS_SOFT_SPLAT;
 			return;

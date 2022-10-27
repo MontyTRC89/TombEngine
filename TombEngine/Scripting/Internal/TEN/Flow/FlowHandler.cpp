@@ -106,6 +106,13 @@ __(not yet implemented)__
 */
 	table_flow.set_function(ScriptReserved_SetTitleScreenImagePath, &FlowHandler::SetTitleScreenImagePath, this);
 
+/*** Set FlyCheatEnabled
+Must be true or false
+@function SetFlyCheatEnabled
+@tparam bool true or false
+*/
+	table_flow.set_function(ScriptReserved_EnableFlyCheat, &FlowHandler::EnableFlyCheat, this);
+
 /*** settings.lua.
 These functions are called in settings.lua, a file which holds your local settings.
 settings.lua shouldn't be bundled with any finished levels/games.
@@ -257,6 +264,7 @@ int FlowHandler::GetLevelNumber(std::string const& fileName)
 			return i;
 	}
 
+	TENLog("Specified level filename was not found in script. Level won't be loaded. Please edit level filename in gameflow.lua.");
 	return -1;
 }
 
@@ -306,11 +314,16 @@ bool FlowHandler::IsFlyCheatEnabled() const
 	return FlyCheat;
 }
 
+void FlowHandler::EnableFlyCheat(bool flyCheat)
+{
+	FlyCheat = flyCheat;
+}
+
 bool FlowHandler::DoFlow()
 {
 	// We start with the title level, if no other index is specified
 	if (CurrentLevel == -1)
-		CurrentLevel = 0;
+		CurrentLevel = SystemNameHash = 0;
 
 	SelectedLevelForNewGame = 0;
 	SelectedSaveGame = 0;

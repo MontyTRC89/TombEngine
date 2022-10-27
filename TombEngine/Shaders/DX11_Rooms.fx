@@ -15,7 +15,7 @@ cbuffer MiscBuffer : register(b3)
 cbuffer RoomBuffer : register(b5)
 {
 	float4 AmbientColor;
-	uint Water;
+	unsigned int Water;
 };
 
 struct PixelShaderInput

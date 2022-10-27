@@ -25,7 +25,7 @@ void SpringBoardControl(short itemNumber)
 		LaraItem->Animation.ActiveState = LS_JUMP_FORWARD;
 		LaraItem->Animation.TargetState = LS_JUMP_FORWARD;
 		LaraItem->Animation.IsAirborne = true;
-		LaraItem->Animation.Velocity.y = -240;
+		LaraItem->Animation.Velocity.y = -240.0f;
 
 		item->Animation.TargetState = 1;
 	}

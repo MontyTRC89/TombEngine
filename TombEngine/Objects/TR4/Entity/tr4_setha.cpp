@@ -11,10 +11,10 @@
 #include "Game/misc.h"
 #include "Game/people.h"
 #include "Specific/level.h"
-#include "Specific/prng.h"
+#include "Math/Math.h"
 #include "Specific/setup.h"
-#include "Specific/trmath.h"
 
+using namespace TEN::Math;
 using namespace TEN::Math::Random;
 
 namespace TEN::Entities::TR4
@@ -227,7 +227,7 @@ namespace TEN::Entities::TR4
 
 				if (!creature->Flags)
 				{
-					if (item->TouchBits)
+					if (item->TouchBits.TestAny())
 					{
 						if (item->Animation.AnimNumber == Objects[item->ObjectNumber].animIndex + 16)
 						{
@@ -280,7 +280,7 @@ namespace TEN::Entities::TR4
 
 				if (!creature->Flags)
 				{
-					if (item->TouchBits)
+					if (item->TouchBits.TestAny())
 					{
 						if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 15 &&
 							item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].frameBase + 26)
@@ -492,7 +492,7 @@ namespace TEN::Entities::TR4
 		}
 	}
 
-	void SethaThrowAttack(PHD_3DPOS* pose, short roomNumber, short mesh)
+	void SethaThrowAttack(Pose* pose, short roomNumber, short mesh)
 	{
 		short fxNumber = CreateNewEffect(roomNumber);
 		if (fxNumber != -1)
@@ -520,11 +520,8 @@ namespace TEN::Entities::TR4
 
 		item->ItemFlags[0]++;
 
-		auto pos1 = Vector3Int(SethaAttack1.Position);
-		GetJointAbsPosition(item, &pos1, SethaAttack1.meshNum);
-
-		auto pos2 = Vector3Int(SethaAttack2.Position);
-		GetJointAbsPosition(item, &pos2, SethaAttack2.meshNum);
+		auto pos1 = GetJointPosition(item, SethaAttack1.meshNum, Vector3i(SethaAttack1.Position));
+		auto pos2 = GetJointPosition(item, SethaAttack2.meshNum, Vector3i(SethaAttack2.Position));
 
 		int size;
 
@@ -536,30 +533,26 @@ namespace TEN::Entities::TR4
 			{
 				for (int i = 0; i < 2; i++)
 				{
-					auto pos = Vector3Int(
+					auto pos = Vector3i(
 						(GetRandomControl() & 0x7FF) + pos1.x - SECTOR(1),
 						(GetRandomControl() & 0x7FF) + pos1.y - SECTOR(1),
 						(GetRandomControl() & 0x7FF) + pos1.z - SECTOR(1)
 					);
 
 					TriggerSethaSparks1(
-						pos.x,
-						pos.y,
-						pos.z,
+						pos.x, pos.y, pos.z,
 						(pos1.x - pos.x),
 						(pos1.y - pos.y),
 						(SECTOR(1) - (GetRandomControl() & 0x7FF)));
 
-					pos = Vector3Int(
+					pos = Vector3i(
 						(GetRandomControl() & 0x7FF) + pos2.x - SECTOR(1),
 						(GetRandomControl() & 0x7FF) + pos2.y - SECTOR(1),
 						(GetRandomControl() & 0x7FF) + pos2.z - SECTOR(1)
 					);
 
 					TriggerSethaSparks1(
-						pos.x,
-						pos.y,
-						pos.z,
+						pos.x, pos.y, pos.z,
 						(pos2.x - pos.x) * 8,
 						(pos2.y - pos.y) * 8,
 						(SECTOR(1) - (GetRandomControl() & 0x7FF)) * 8);
@@ -580,22 +573,16 @@ namespace TEN::Entities::TR4
 
 			if (item->ItemFlags[0] >= 96 && item->ItemFlags[0] <= 99)
 			{
-				auto pos = Vector3Int(SethaAttack1.Position);
-				pos.y *= 2;
-				GetJointAbsPosition(item, &pos, SethaAttack1.meshNum);
-
-				auto angles = GetVectorAngles(pos.x - pos1.x, pos.y - pos1.y, pos.z - pos1.z);
-				auto attackPose = PHD_3DPOS(pos1, angles);
+				auto pos = GetJointPosition(item, SethaAttack1.meshNum, Vector3i(SethaAttack1.Position.x, SethaAttack1.Position.y * 2, SethaAttack1.Position.z));
+				auto orient = Geometry::GetOrientToPoint(pos1.ToVector3(), pos.ToVector3());
+				auto attackPose = Pose(pos1, orient);
 				SethaThrowAttack(&attackPose, item->RoomNumber, 0);
 			}
 			else if (item->ItemFlags[0] >= 122 && item->ItemFlags[0] <= 125)
 			{
-				auto pos = Vector3Int(SethaAttack2.Position);
-				pos.y *= 2;
-				GetJointAbsPosition(item, &pos, SethaAttack2.meshNum);
-
-				auto angles = GetVectorAngles(pos.x - pos2.x, pos.y - pos2.y, pos.z - pos2.z);
-				auto attackPose = PHD_3DPOS(pos2, angles);
+				auto pos = GetJointPosition(item, SethaAttack1.meshNum, Vector3i(SethaAttack2.Position.x, SethaAttack2.Position.y * 2, SethaAttack2.Position.z));
+				auto orient = Geometry::GetOrientToPoint(pos2.ToVector3(), pos.ToVector3());
+				auto attackPose = Pose(pos2, orient);
 				SethaThrowAttack(&attackPose, item->RoomNumber, 0);
 			}
 
@@ -619,20 +606,14 @@ namespace TEN::Entities::TR4
 			{
 				if (Wibble & 4)
 				{
-					auto pos = Vector3Int(SethaAttack1.Position);
-					pos.y *= 2;
-					GetJointAbsPosition(item, &pos, SethaAttack1.meshNum);
-
-					auto angles = GetVectorAngles(pos.x - pos1.x, pos.y - pos1.y, pos.z - pos1.z);
-					auto attackPose = PHD_3DPOS(pos1, angles);
+					auto pos = GetJointPosition(item, SethaAttack1.meshNum, Vector3i(SethaAttack2.Position.x, SethaAttack2.Position.y * 2, SethaAttack2.Position.z));
+					auto orient = Geometry::GetOrientToPoint(pos1.ToVector3(), pos.ToVector3());
+					auto attackPose = Pose(pos1, orient);
 					SethaThrowAttack(&attackPose, item->RoomNumber, 0);
 
-					pos = Vector3Int(SethaAttack2.Position);
-					pos.y *= 2;
-					GetJointAbsPosition(item, &pos, SethaAttack2.meshNum);
-
-					angles = GetVectorAngles(pos.x - pos2.x, pos.y - pos2.y, pos.z - pos2.z);
-					attackPose = PHD_3DPOS(pos2, angles);
+					pos = GetJointPosition(item, SethaAttack1.meshNum, Vector3i(SethaAttack2.Position.x, SethaAttack2.Position.y * 2, SethaAttack2.Position.z));
+					orient = Geometry::GetOrientToPoint(pos2.ToVector3(), pos.ToVector3());
+					attackPose = Pose(pos2, orient);
 					SethaThrowAttack(&attackPose, item->RoomNumber, 0);
 				}
 			}
@@ -646,7 +627,7 @@ namespace TEN::Entities::TR4
 			{
 				for (int i = 0; i < 2; i++)
 				{
-					auto pos = Vector3Int(
+					auto pos = Vector3i(
 						(GetRandomControl() & 0x7FF) + pos1.x - SECTOR(1),
 						(GetRandomControl() & 0x7FF) + pos1.y - SECTOR(1),
 						(GetRandomControl() & 0x7FF) + pos1.z - SECTOR(1)
@@ -658,7 +639,7 @@ namespace TEN::Entities::TR4
 						(pos1.y - pos.y),
 						(SECTOR(1) - (GetRandomControl() & 0x7FF)));
 
-					pos = Vector3Int(
+					pos = Vector3i(
 						(GetRandomControl() & 0x7FF) + pos2.x - SECTOR(1),
 						(GetRandomControl() & 0x7FF) + pos2.y - SECTOR(1),
 						(GetRandomControl() & 0x7FF) + pos2.z - SECTOR(1)
@@ -686,12 +667,9 @@ namespace TEN::Entities::TR4
 
 			if (item->ItemFlags[0] == 102)
 			{
-				auto pos = Vector3Int(SethaAttack1.Position);
-				pos.y *= 2;
-				GetJointAbsPosition(item, &pos, SethaAttack1.meshNum);
-
-				auto angles = GetVectorAngles(pos.x - pos1.x, pos.y - pos1.y, pos.z - pos1.z);
-				auto attackPose = PHD_3DPOS(pos1, angles);
+				auto pos = GetJointPosition(item, SethaAttack1.meshNum, Vector3i(SethaAttack2.Position.x, SethaAttack2.Position.y * 2, SethaAttack2.Position.z));
+				auto orient = Geometry::GetOrientToPoint(pos1.ToVector3(), pos.ToVector3());
+				auto attackPose = Pose(pos1, orient);
 				SethaThrowAttack(&attackPose, item->RoomNumber, 0);
 			}
 

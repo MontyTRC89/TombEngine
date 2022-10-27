@@ -59,7 +59,7 @@ void SetVolumeFX(int vol)
 	GlobalFXVolume = vol;
 }
 
-bool LoadSample(char *pointer, int compSize, int uncompSize, int index)
+bool LoadSample(char* pointer, int compSize, int uncompSize, int index)
 {
 	if (index >= SOUND_MAX_SAMPLES)
 	{
@@ -67,13 +67,13 @@ bool LoadSample(char *pointer, int compSize, int uncompSize, int index)
 		return 0;
 	}
 
-	if (pointer == NULL || compSize <= 0)
+	if (pointer == nullptr || compSize <= 0)
 	{
 		TENLog("Sample size or memory address is incorrect for index " + std::to_string(index), LogLevel::Warning);
 		return 0;
 	}
 
-	// Load and uncompress sample to 32-bit float format
+	// Load and uncompress sample to 32-bit float format.
 	HSAMPLE sample = BASS_SampleLoad(true, pointer, 0, compSize, 1, SOUND_SAMPLE_FLAGS);
 
 	if (!sample)
@@ -83,7 +83,7 @@ bool LoadSample(char *pointer, int compSize, int uncompSize, int index)
 	}
 
 	// Paranoid (c) TeslaRus
-	// Try to free sample before allocating new one
+	// Try to free sample before allocating new one.
 	Sound_FreeSample(index);
 
 	BASS_SAMPLE info;
@@ -140,7 +140,7 @@ bool LoadSample(char *pointer, int compSize, int uncompSize, int index)
 	return true;
 }
 
-bool SoundEffect(int effectID, PHD_3DPOS* position, SoundEnvironment condition, float pitchMultiplier, float gainMultiplier)
+bool SoundEffect(int effectID, Pose* position, SoundEnvironment condition, float pitchMultiplier, float gainMultiplier)
 {
 	if (!g_Configuration.EnableSound)
 		return false;
@@ -154,7 +154,7 @@ bool SoundEffect(int effectID, PHD_3DPOS* position, SoundEnvironment condition, 
 	if (condition != SoundEnvironment::Always)
 	{
 		// Get current camera room's environment
-		auto cameraCondition = TestEnvironment(ENV_FLAG_WATER, Camera.pos.roomNumber) ? SoundEnvironment::Water : SoundEnvironment::Land;
+		auto cameraCondition = TestEnvironment(ENV_FLAG_WATER, Camera.pos.RoomNumber) ? SoundEnvironment::Water : SoundEnvironment::Land;
 
 		// Don't play effect if effect's environment isn't the same as camera position's environment
 		if (condition != cameraCondition)
@@ -597,7 +597,7 @@ int Sound_GetFreeSlot()
 // We use origin position as a reference, because in original TRs it's not possible to clearly
 // identify what's the source of the producing effect.
 
-int Sound_EffectIsPlaying(int effectID, PHD_3DPOS *position)
+int Sound_EffectIsPlaying(int effectID, Pose *position)
 {
 	for (int i = 0; i < SOUND_MAX_CHANNELS; i++)
 	{
@@ -630,7 +630,7 @@ int Sound_EffectIsPlaying(int effectID, PHD_3DPOS *position)
 
 // Gets the distance to the source.
 
-float Sound_DistanceToListener(PHD_3DPOS *position)
+float Sound_DistanceToListener(Pose *position)
 {
 	if (!position) return 0.0f;	// Assume sound is 2D menu sound
 	return Sound_DistanceToListener(Vector3(position->Position.x, position->Position.y, position->Position.z));
@@ -671,7 +671,7 @@ void Sound_FreeSlot(int index, unsigned int fadeout)
 
 // Update sound position in a level.
 
-bool Sound_UpdateEffectPosition(int index, PHD_3DPOS *position, bool force)
+bool Sound_UpdateEffectPosition(int index, Pose *position, bool force)
 {
 	if (index > SOUND_MAX_CHANNELS || index < 0)
 		return false;
@@ -723,7 +723,7 @@ void Sound_UpdateScene()
 	// Apply environmental effects
 
 	static int currentReverb = -1;
-	auto roomReverb = g_Configuration.EnableReverb ? g_Level.Rooms[Camera.pos.roomNumber].reverbType : (int)ReverbType::Small;
+	auto roomReverb = g_Configuration.EnableReverb ? g_Level.Rooms[Camera.pos.RoomNumber].reverbType : (int)ReverbType::Small;
 
 	if (currentReverb == -1 || roomReverb != currentReverb)
 	{
@@ -910,20 +910,20 @@ void PlaySoundSources()
 {
 	for (size_t i = 0; i < g_Level.SoundSources.size(); i++)
 	{
-		SOUND_SOURCE_INFO* sound = &g_Level.SoundSources[i];
+		const auto& sound = g_Level.SoundSources[i];
 
-		short t = sound->flags & 31;
+		short t = sound.Flags & 31;
 		short group = t & 1;
 		group += t & 2;
 		group += ((t >> 2) & 1) * 3;
 		group += ((t >> 3) & 1) * 4;
 		group += ((t >> 4) & 1) * 5;
 
-		if (!FlipStats[group] && (sound->flags & 128) == 0)
+		if (!FlipStats[group] && (sound.Flags & 128) == 0)
 			continue;
-		else if (FlipStats[group] && (sound->flags & 128) == 0)
+		else if (FlipStats[group] && (sound.Flags & 128) == 0)
 			continue;
 
-		SoundEffect(sound->soundId, (PHD_3DPOS*)&sound->x);
+		SoundEffect(sound.SoundID, (Pose*)&sound.Position);
 	}
 }

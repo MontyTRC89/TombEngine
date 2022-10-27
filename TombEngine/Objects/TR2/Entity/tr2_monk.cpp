@@ -37,9 +37,9 @@ namespace TEN::Entities::Creatures::TR2
 		auto* item = &g_Level.Items[itemNumber];
 		auto* creature = GetCreatureInfo(item);
 
-		short torso = 0;
 		short angle = 0;
 		short tilt = 0;
+		short torso = 0;
 
 		if (item->HitPoints <= 0)
 		{
@@ -205,11 +205,10 @@ namespace TEN::Entities::Creatures::TR2
 				}
 				else
 				{
-					if (!(creature->Flags & 0xf000) && enemy)
+					if (!(creature->Flags & 0xf000) && enemy != nullptr)
 					{
-						if (abs(enemy->Pose.Position.x - item->Pose.Position.x) < CLICK(2) &&
-							abs(enemy->Pose.Position.y - item->Pose.Position.y) < CLICK(2) &&
-							abs(enemy->Pose.Position.z - item->Pose.Position.z) < CLICK(2))
+						float distance = Vector3i::Distance(item->Pose.Position, enemy->Pose.Position);
+						if (distance <= CLICK(2))
 						{
 							creature->Flags |= 0x1000;
 							DoDamage(enemy, 5);

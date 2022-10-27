@@ -3,16 +3,17 @@
 
 #include "Game/items.h"
 #include "Game/room.h"
+#include "Math/Math.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
-#include "Specific/trmath.h"
 
 using namespace TEN::Floordata;
+using namespace TEN::Math;
 
 int FloorInfo::SectorPlane(int x, int z) const
 {
 	const auto point = GetSectorPoint(x, z);
-	auto vector = Vector2(point.x, point.y);
+	auto vector = point.ToVector2();
 	const auto matrix = Matrix::CreateRotationZ(FloorCollision.SplitAngle);
 	Vector2::Transform(vector, matrix, vector);
 
@@ -22,7 +23,7 @@ int FloorInfo::SectorPlane(int x, int z) const
 int FloorInfo::SectorPlaneCeiling(int x, int z) const
 {
 	const auto point = GetSectorPoint(x, z);
-	auto vector = Vector2(point.x, point.y);
+	auto vector = point.ToVector2();
 	const auto matrix = Matrix::CreateRotationZ(CeilingCollision.SplitAngle);
 	Vector2::Transform(vector, matrix, vector);
 
@@ -265,20 +266,20 @@ void FloorInfo::RemoveItem(short itemNumber)
 
 namespace TEN::Floordata
 {
-	Vector2Int GetSectorPoint(int x, int z)
+	Vector2i GetSectorPoint(int x, int z)
 	{
 		const auto xPoint = x % SECTOR(1) - SECTOR(1) / 2;
 		const auto yPoint = z % SECTOR(1) - SECTOR(1) / 2;
 
-		return Vector2Int{xPoint, yPoint};
+		return Vector2i{xPoint, yPoint};
 	}
 
-	Vector2Int GetRoomPosition(int roomNumber, int x, int z)
+	Vector2i GetRoomPosition(int roomNumber, int x, int z)
 	{
 		const auto& room = g_Level.Rooms[roomNumber];
 		const auto zRoom = (z - room.z) / SECTOR(1);
 		const auto xRoom = (x - room.x) / SECTOR(1);
-		auto pos = Vector2Int{xRoom, zRoom};
+		auto pos = Vector2i{xRoom, zRoom};
 
 		if (pos.x < 0)
 		{
@@ -301,7 +302,7 @@ namespace TEN::Floordata
 		return pos;
 	}
 
-	FloorInfo& GetFloor(int roomNumber, const Vector2Int& pos)
+	FloorInfo& GetFloor(int roomNumber, const Vector2i& pos)
 	{
 		auto& room = g_Level.Rooms[roomNumber];
 		return room.floor[room.zSize * pos.x + pos.y];
@@ -761,16 +762,16 @@ namespace TEN::Floordata
 
 	std::optional<int> GetBridgeItemIntersect(int itemNumber, int x, int y, int z, bool bottom)
 	{
-		auto item = &g_Level.Items[itemNumber];
+		auto* item = &g_Level.Items[itemNumber];
 
-		auto bounds = GetBoundsAccurate(item);
-		auto dxBounds = TO_DX_BBOX(item->Pose, bounds);
+		auto bounds = GameBoundingBox(item);
+		auto dxBounds = bounds.ToBoundingOrientedBox(item->Pose);
 
 		Vector3 pos = Vector3(x, y + (bottom ? 4 : -4), z); // Introduce slight vertical margin just in case
 
 		static float distance;
 		if (dxBounds.Intersects(pos, (bottom ? -Vector3::UnitY : Vector3::UnitY), distance))
-			return std::optional{ item->Pose.Position.y + (bottom ? bounds->Y2 : bounds->Y1) };
+			return std::optional{ item->Pose.Position.y + (bottom ? bounds.Y2 : bounds.Y1) };
 		else
 			return std::nullopt;
 	}
@@ -781,8 +782,8 @@ namespace TEN::Floordata
 	{
 		auto item = &g_Level.Items[itemNumber];
 
-		auto bounds = GetBoundsAccurate(item);
-		return item->Pose.Position.y + (bottom ? bounds->Y2 : bounds->Y1);
+		auto bounds = GameBoundingBox(item);
+		return item->Pose.Position.y + (bottom ? bounds.Y2 : bounds.Y1);
 	}
 
 	// Updates BridgeItem for all blocks which are enclosed by bridge bounds.
@@ -796,8 +797,8 @@ namespace TEN::Floordata
 			forceRemoval = true;
 
 		// Get real OBB bounds of a bridge in world space
-		auto bounds = GetBoundsAccurate(item);
-		auto dxBounds = TO_DX_BBOX(item->Pose, bounds);
+		auto bounds = GameBoundingBox(item);
+		auto dxBounds = bounds.ToBoundingOrientedBox(item->Pose);
 
 		// Get corners of a projected OBB
 		Vector3 corners[8];

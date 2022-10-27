@@ -1,16 +1,17 @@
 #pragma once
 #include <string>
 #include <functional>
-#include "room.h"
-#include "Specific/level.h"
+
 #include "Game/control/volumetriggerer.h"
+#include "Game/room.h"
+#include "Specific/level.h"
 
 typedef DWORD D3DCOLOR;
 using VarMapVal = std::variant< short,
 	std::reference_wrapper<MESH_INFO>,
-	std::reference_wrapper<LEVEL_CAMERA_INFO>,
-	std::reference_wrapper<SINK_INFO>,
-	std::reference_wrapper<SOUND_SOURCE_INFO>,
+	std::reference_wrapper<LevelCameraInfo>,
+	std::reference_wrapper<SinkInfo>,
+	std::reference_wrapper<SoundSourceInfo>,
 	std::reference_wrapper<AI_OBJECT>>;
 
 using CallbackDrawString = std::function<void(std::string const&, D3DCOLOR, int, int, int)>;
@@ -24,9 +25,10 @@ struct FuncName
 	std::string name;
 };
 
-using SavedVar = std::variant<bool, std::string, double, IndexTable, Vector3Int, FuncName>;
+using SavedVar = std::variant<bool, std::string, double, IndexTable, Vector3i, FuncName>;
 
-class ScriptInterfaceGame {
+class ScriptInterfaceGame
+{
 public:
 	virtual ~ScriptInterfaceGame() = default;
 	
@@ -37,6 +39,7 @@ public:
 	virtual void OnControlPhase(float dt) = 0;
 	virtual void OnSave() = 0;
 	virtual void OnEnd() = 0;
+	virtual void ShortenTENCalls() = 0;
 
 	virtual void FreeLevelScripts() = 0;
 	virtual void ResetScripts(bool clearGameVars) = 0;

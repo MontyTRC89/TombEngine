@@ -6,11 +6,11 @@
 #include "Game/control/los.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/tomb4fx.h"
-#include "Game/items.h"
 #include "Game/Lara/lara.h"
+#include "Game/items.h"
+#include "Math/Math.h"
 #include "Specific/level.h"
 #include "Sound/sound.h"
-#include "Specific/prng.h"
 
 using namespace TEN::Math::Random;
 
@@ -27,7 +27,7 @@ namespace TEN::Entities::Creatures::TR5
 
 	}
 
-	static void TriggerAutoGunSmoke(Vector3Int* pos, char shade)
+	void TriggerAutoGunSmoke(Vector3i* pos, char shade)
 	{
 		auto* spark = &SmokeSparks[GetFreeSmokeSpark()];
 
@@ -68,32 +68,29 @@ namespace TEN::Entities::Creatures::TR5
 
 				item->MeshBits = 1664;
 
-				auto pos1 = GameVector(0, 0, -64);
-				GetJointAbsPosition(item, (Vector3Int*)&pos1, 8);
+				auto pos1 = GameVector(GetJointPosition(item, 8, Vector3i(0, 0, -64)));
+				auto pos2 = GameVector(GetJointPosition(LaraItem, LM_HIPS));
 
-				auto pos2 = GameVector();
-				GetLaraJointPosition((Vector3Int*)&pos2, 0);
-
-				pos1.roomNumber = item->RoomNumber;
+				pos1.RoomNumber = item->RoomNumber;
 
 				int los = LOS(&pos1, &pos2);
-				Vector3Shrt angles;
 
 				// FIXME:
+				auto orient = EulerAngles::Zero;
 				if (los)
 				{
-					angles = GetVectorAngles(pos2.x - pos1.x, pos2.y - pos1.y, pos2.z - pos1.z);
-					angles.y -= item->Pose.Orientation.y;
+					orient = Geometry::GetOrientToPoint(pos1.ToVector3(), pos2.ToVector3());
+					orient.y -= item->Pose.Orientation.y;
 				}
 				else
 				{
-					angles.x = item->ItemFlags[1];
-					angles.y = item->ItemFlags[0];
+					orient.x = item->ItemFlags[1];
+					orient.y = item->ItemFlags[0];
 				}
 
 				short angle1, angle2;
-				InterpolateAngle(angles.x, &item->ItemFlags[1], &angle2, 4);
-				InterpolateAngle(angles.y, item->ItemFlags, &angle1, 4);
+				InterpolateAngle(orient.x, item->ItemFlags[1], angle2, 4);
+				InterpolateAngle(orient.y, *item->ItemFlags, angle1, 4);
 
 				data[0] = item->ItemFlags[0];
 				data[1] = item->ItemFlags[1];
@@ -111,9 +108,7 @@ namespace TEN::Entities::Creatures::TR5
 
 						if (TestProbability(0.75f))
 						{
-							auto pos2 = Vector3Int::Zero;
-							GetLaraJointPosition(&pos2, GetRandomControl() % 15);
-
+							auto pos2 = GetJointPosition(LaraItem, GetRandomControl() % 15);
 							DoBloodSplat(pos2.x, pos2.y, pos2.z, (GetRandomControl() & 3) + 3, 2 * GetRandomControl(), LaraItem->RoomNumber);
 							DoDamage(LaraItem, 20);
 						}
@@ -132,10 +127,13 @@ namespace TEN::Entities::Creatures::TR5
 							{
 								if (abs(dx) >= 12288)
 									break;
+
 								if (abs(dy) >= 12288)
 									break;
+
 								if (abs(dz) >= 12288)
 									break;
+
 								dx *= 2;
 								dy *= 2;
 								dz *= 2;
@@ -163,7 +161,7 @@ namespace TEN::Entities::Creatures::TR5
 				}
 
 				if (item->ItemFlags[2])
-					TriggerAutoGunSmoke((Vector3Int*)&pos1, item->ItemFlags[2] / 16);
+					TriggerAutoGunSmoke((Vector3i*)&pos1, item->ItemFlags[2] / 16);
 			}
 			else
 			{

@@ -2,6 +2,8 @@
 #include <vector>
 #include <SimpleMath.h>
 
+#include "Renderer/RendererRectangle.h"
+
 struct MESH_INFO;
 
 namespace TEN::Renderer

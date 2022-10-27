@@ -3,10 +3,12 @@
 #include "Game/control/volumetriggerer.h"
 #include "Game/items.h"
 #include "Game/room.h"
+#include "Sound/sound.h"
 #include "Specific/IO/ChunkId.h"
 #include "Specific/IO/ChunkReader.h"
 #include "Specific/IO/LEB128.h"
 #include "Specific/IO/Streams.h"
+#include "Specific/LevelCameraInfo.h"
 #include "Specific/newtypes.h"
 
 #define AddPtr(p, t, n) p = (t*)((char*)(p) + (ptrdiff_t)(n));
@@ -19,6 +21,7 @@ using namespace TEN::Control::Volumes;
 struct ChunkId;
 struct LEB128;
 struct SampleInfo;
+struct SinkInfo;
 struct BOX_INFO;
 struct OVERLAP;
 
@@ -54,7 +57,7 @@ struct AI_OBJECT
 {
 	GAME_OBJECT_ID objectNumber;
 	short roomNumber;
-	PHD_3DPOS pos;
+	Pose pos;
 	short triggerFlags;
 	short flags;
 	int boxNumber;
@@ -98,17 +101,17 @@ struct LEVEL
 	std::vector<short> FloorData;
 	std::vector<MESH> Meshes;
 	std::vector<int> Bones;
-	std::vector<ANIM_STRUCT> Anims;
-	std::vector<CHANGE_STRUCT> Changes;
-	std::vector<RANGE_STRUCT> Ranges;
+	std::vector<AnimData> Anims;
+	std::vector<StateDispatchData> Changes;
+	std::vector<StateDispatchRangeData> Ranges;
 	std::vector<short> Commands;
-	std::vector<ANIM_FRAME> Frames;
+	std::vector<AnimFrame> Frames;
 	std::vector<ItemInfo> Items;
 	std::vector<AI_OBJECT> AIObjects;
 	std::vector<SPRITE> Sprites;
-	std::vector<LEVEL_CAMERA_INFO> Cameras;
-	std::vector<SINK_INFO> Sinks;
-	std::vector<SOUND_SOURCE_INFO> SoundSources;
+	std::vector<LevelCameraInfo> Cameras;
+	std::vector<SinkInfo> Sinks;
+	std::vector<SoundSourceInfo> SoundSources;
 	std::vector<BOX_INFO> Boxes;
 	std::vector<OVERLAP> Overlaps;
 	std::vector<int> Zones[MAX_ZONES][2];

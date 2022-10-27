@@ -38,10 +38,10 @@ namespace TEN::Entities::TR4
         if (!TriggerActive(item))
             return;
 
-        ANIM_FRAME* framePtr[2];
+        AnimFrame* framePtr[2];
         int rate;
         SoundEffect(SFX_TR4_METAL_SCRAPE_LOOP1, &item->Pose);
-        GetFrame(LaraItem, framePtr, &rate);
+        GetFrame(LaraItem, framePtr, rate);
 
         int dy = LaraItem->Pose.Position.y + framePtr[0]->boundingBox.Y1;
         int dl = 3328 * item->ItemFlags[1] / 4096;

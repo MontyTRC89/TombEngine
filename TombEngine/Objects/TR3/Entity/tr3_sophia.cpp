@@ -25,19 +25,19 @@ namespace TEN::Entities::Creatures::TR3
 
 	enum SophiaState
 	{
-		LONDONBOSS_EMPTY,
-		LONDONBOSS_STAND,
-		LONDONBOSS_WALK,
-		LONDONBOSS_RUN,
-		LONDONBOSS_SUMMON,
-		LONDONBOSS_BIGZAP,
-		LONDONBOSS_DEATH,
-		LONDONBOSS_LAUGH,
-		LONDONBOSS_LILZAP,
-		LONDONBOSS_VAULT2,
-		LONDONBOSS_VAULT3,
-		LONDONBOSS_VAULT4,
-		LONDONBOSS_GODOWN
+		LONDONBOSS_EMPTY = 0,
+		LONDONBOSS_STAND = 1,
+		LONDONBOSS_WALK = 2,
+		LONDONBOSS_RUN = 3,
+		LONDONBOSS_SUMMON = 4,
+		LONDONBOSS_BIGZAP = 5,
+		LONDONBOSS_DEATH = 6,
+		LONDONBOSS_LAUGH = 7,
+		LONDONBOSS_LILZAP = 8,
+		LONDONBOSS_VAULT2 = 9,
+		LONDONBOSS_VAULT3 = 10,
+		LONDONBOSS_VAULT4 = 11,
+		LONDONBOSS_GODOWN = 12,
 	};
 
 	// TODO
@@ -66,7 +66,7 @@ namespace TEN::Entities::Creatures::TR3
 #define LONDONBOSS_FINAL_HEIGHT -11776
 #define BIGZAP_TIMER 600
 
-	static void TriggerLaserBolt(Vector3Int* pos, ItemInfo* item, long type, short yAngle)
+	static void TriggerLaserBolt(Vector3i* pos, ItemInfo* item, long type, short yAngle)
 	{
 
 	}
@@ -76,7 +76,7 @@ namespace TEN::Entities::Creatures::TR3
 
 	}
 
-	static void TriggerPlasmaBall(ItemInfo* item, long type, Vector3Int* pos1, short roomNumber, short angle)
+	static void TriggerPlasmaBall(ItemInfo* item, long type, Vector3i* pos1, short roomNumber, short angle)
 	{
 
 	}

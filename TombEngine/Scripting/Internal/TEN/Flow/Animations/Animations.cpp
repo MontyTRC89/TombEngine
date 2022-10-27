@@ -19,6 +19,7 @@ void Animations::Register(sol::table& parent)
 		"overhangClimb", &Animations::HasOverhangClimb,
 		"slideExtended", &Animations::HasSlideExtended,
 		"sprintJump", &Animations::HasSprintJump,
-		"pose", &Animations::HasPose
+		"pose", &Animations::HasPose,
+		"ledgeJumps", &Animations::HasLedgeJumps
 		);
 }

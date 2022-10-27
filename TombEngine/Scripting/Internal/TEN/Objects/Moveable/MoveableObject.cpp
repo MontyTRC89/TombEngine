@@ -7,7 +7,7 @@
 #include "Objects/objectslist.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
-#include "Specific/trmath.h"
+#include "Math/Math.h"
 
 #include "ScriptAssert.h"
 #include "MoveableObject.h"
@@ -171,13 +171,31 @@ void Moveable::Register(sol::table & parent)
 // @function Moveable:GetStatus
 // @treturn int a number representing the status of the object
 	ScriptReserved_GetStatus, &Moveable::GetStatus,
-		
+
+/// Set the name of the function to be called when the moveable is shot by Lara
+// Note that this will be triggered twice when shot with both pistols at once. 
+// @function Moveable:SetOnHit
+// @tparam function callback function in LevelFuncs hierarchy to call when moveable is shot
 	ScriptReserved_SetOnHit, &Moveable::SetOnHit,
 
+/// Set the function to be called called when this moveable collides with another moveable
+// @function Moveable:SetOnCollidedWithObject
+// @tparam function func callback function to be called (must be in LevelFuncs hierarchy)
 	ScriptReserved_SetOnCollidedWithObject, &Moveable::SetOnCollidedWithObject,
 
+/// Set the function called when this moveable collides with room geometry (e.g. a wall or floor)
+// @function Moveable:SetOnCollidedWithRoom
+// @tparam function func callback function to be called (must be in LevelFuncs hierarchy)
 	ScriptReserved_SetOnCollidedWithRoom, &Moveable::SetOnCollidedWithRoom,
 
+/// Set the name of the function to be called when the moveable is destroyed/killed
+// Note that enemy death often occurs at the end of an animation, and not at the exact moment
+// the enemy's HP becomes zero.
+// @function Moveable:SetOnKilled
+// @tparam function callback function in LevelFuncs hierarchy to call when enemy is killed
+// @usage
+// LevelFuncs.baddyKilled = function(theBaddy) print("You killed a baddy!") end
+// baddy:SetOnKilled(LevelFuncs.baddyKilled)
 	ScriptReserved_SetOnKilled, &Moveable::SetOnKilled,
 
 /// Retrieve the object ID
@@ -224,6 +242,20 @@ void Moveable::Register(sol::table & parent)
 // @function Moveable:GetFrame
 // @treturn int the current frame of the active animation
 	ScriptReserved_GetFrameNumber, &Moveable::GetFrameNumber,
+
+/// Set the object's velocity to specified value.
+// In most cases, only Z and Y components are used as forward and vertical velocity.
+// In some cases, primarily NPCs, X component is used as side velocity.
+// @function Moveable:SetVelocity
+// @tparam Vec3 velocity velocity represented as vector 
+	ScriptReserved_SetVelocity, &Moveable::SetVelocity,
+		
+/// Get the object's velocity.
+// In most cases, only Z and Y components are used as forward and vertical velocity.
+// In some cases, primarily NPCs, X component is used as side velocity.
+// @function Moveable:GetVelocity
+// @treturn Vec3 current object velocity
+	ScriptReserved_GetVelocity, &Moveable::GetVelocity,
 
 /// Set frame number.
 // This will move the animation to the given frame.
@@ -457,39 +489,21 @@ void SetLevelFuncCallback(TypeOrNil<LevelFunc> const & cb, std::string const & c
 
 }
 
-/// Set the name of the function to be called when the moveable is shot by Lara
-// Note that this will be triggered twice when shot with both pistols at once. 
-// @function Moveable:SetOnHit
-// @tparam function callback function in LevelFuncs hierarchy to call when moveable is shot
 void Moveable::SetOnHit(TypeOrNil<LevelFunc> const & cb)
 {
 	SetLevelFuncCallback(cb, ScriptReserved_SetOnHit, *this, m_item->LuaCallbackOnHitName);
 }
 
-/// Set the name of the function to be called when the moveable is destroyed/killed
-// Note that enemy death often occurs at the end of an animation, and not at the exact moment
-// the enemy's HP becomes zero.
-// @function Moveable:SetOnKilled
-// @tparam function callback function in LevelFuncs hierarchy to call when enemy is killed
-// @usage
-// LevelFuncs.baddyKilled = function(theBaddy) print("You killed a baddy!") end
-// baddy:SetOnKilled(LevelFuncs.baddyKilled)
 void Moveable::SetOnKilled(TypeOrNil<LevelFunc> const & cb)
 {
 	SetLevelFuncCallback(cb, ScriptReserved_SetOnKilled, *this, m_item->LuaCallbackOnKilledName);
 }
 
-/// Set the function to be called called when this moveable collides with another moveable
-// @function Moveable:SetOnCollidedWithObject
-// @tparam function func callback function to be called (must be in LevelFuncs hierarchy)
 void Moveable::SetOnCollidedWithObject(TypeOrNil<LevelFunc> const & cb)
 {
 	SetLevelFuncCallback(cb, ScriptReserved_SetOnCollidedWithObject, *this, m_item->LuaCallbackOnCollidedWithObjectName);
 }
 
-/// Set the function called when this moveable collides with room geometry (e.g. a wall or floor)
-// @function Moveable:SetOnCollidedWithRoom
-// @tparam function func callback function to be called (must be in LevelFuncs hierarchy)
 void Moveable::SetOnCollidedWithRoom(TypeOrNil<LevelFunc> const & cb)
 {
 	SetLevelFuncCallback(cb, ScriptReserved_SetOnCollidedWithRoom, *this, m_item->LuaCallbackOnCollidedWithRoomName);
@@ -553,9 +567,7 @@ void Moveable::SetPos(Vec3 const& pos, sol::optional<bool> updateRoom)
 
 Vec3 Moveable::GetJointPos(int jointIndex) const
 {
-	Vector3Int result = {};
-	GetJointAbsPosition(m_item, &result, jointIndex);
-
+	auto result = GetJointPosition(m_item, jointIndex);
 	return Vec3(result.x, result.y, result.z);
 }
 
@@ -692,6 +704,18 @@ int Moveable::GetFrameNumber() const
 	return m_item->Animation.FrameNumber - g_Level.Anims[m_item->Animation.AnimNumber].frameBase;
 }
 
+Vec3 Moveable::GetVelocity() const
+{
+	return Vec3(int(round(m_item->Animation.Velocity.x)),
+				int(round(m_item->Animation.Velocity.y)),
+				int(round(m_item->Animation.Velocity.z)));
+}
+
+void Moveable::SetVelocity(Vec3 velocity)
+{
+	m_item->Animation.Velocity = Vector3(velocity.x, velocity.y, velocity.z);
+}
+
 void Moveable::SetFrameNumber(int frameNumber)
 {
 	auto const fBase = g_Level.Anims[m_item->Animation.AnimNumber].frameBase;
@@ -766,7 +790,7 @@ bool Moveable::MeshIsVisible(int meshId) const
 	if (!MeshExists(meshId))
 		return false;
 
-	return m_item->TestBits(JointBitType::Mesh, meshId);
+	return m_item->MeshBits.Test(meshId);
 }
 
 void Moveable::ShowMesh(int meshId)
@@ -774,7 +798,7 @@ void Moveable::ShowMesh(int meshId)
 	if (!MeshExists(meshId))
 		return;
 
-	m_item->SetBits(JointBitType::Mesh, meshId);
+	m_item->MeshBits.Set(meshId);
 }
 
 void Moveable::HideMesh(int meshId)
@@ -782,7 +806,7 @@ void Moveable::HideMesh(int meshId)
 	if (!MeshExists(meshId))
 		return;
 
-	m_item->ClearBits(JointBitType::Mesh, meshId); 
+	m_item->MeshBits.Clear(meshId); 
 }
 
 void Moveable::ShatterMesh(int meshId)
@@ -798,7 +822,7 @@ bool Moveable::MeshIsSwapped(int meshId) const
 	if (!MeshExists(meshId))
 		return false;
 
-	return m_item->TestBits(JointBitType::MeshSwap, meshId);
+	return m_item->MeshSwapBits.Test(meshId);
 }
 
 void Moveable::SwapMesh(int meshId, int swapSlotId, sol::optional<int> swapMeshIndex)
@@ -834,7 +858,7 @@ void Moveable::SwapMesh(int meshId, int swapSlotId, sol::optional<int> swapMeshI
 		lara->MeshPtrs[meshId] = Objects[swapSlotId].meshIndex + swapMeshIndex.value();
 	}
 	else
-		m_item->SetBits(JointBitType::MeshSwap, meshId);
+		m_item->MeshSwapBits.Set(meshId);
 }
 
 void Moveable::UnswapMesh(int meshId)
@@ -855,7 +879,7 @@ void Moveable::UnswapMesh(int meshId)
 		lara->MeshPtrs[meshId] = Objects[ID_LARA_SKIN].meshIndex + meshId;
 	}
 	else
-		m_item->ClearBits(JointBitType::MeshSwap, meshId);
+		m_item->MeshSwapBits.Clear(meshId);
 }
 
 void Moveable::EnableItem()

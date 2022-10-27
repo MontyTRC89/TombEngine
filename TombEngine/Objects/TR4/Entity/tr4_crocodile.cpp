@@ -12,7 +12,7 @@
 #include "Game/misc.h"
 #include "Game/people.h"
 #include "Specific/level.h"
-#include "Specific/prng.h"
+#include "Math/Random.h"
 #include "Specific/setup.h"
 
 using namespace TEN::Math::Random;
@@ -35,7 +35,7 @@ namespace TEN::Entities::TR4
 	#define CROC_STATE_SWIM_TURN_RATE_MAX ANGLE(3.0f)
 
 	const auto CrocodileBite = BiteInfo(Vector3(0.0f, -100.0f, 500.0f), 9);
-	const vector<int> CrocodileBiteAttackJoints = { 8, 9 };
+	const vector<unsigned int> CrocodileBiteAttackJoints = { 8, 9 };
 
 	enum CrocodileState
 	{
@@ -246,7 +246,7 @@ namespace TEN::Entities::TR4
 					item->Animation.RequiredState = CROC_STATE_NONE_1;
 
 				if (AI.bite &&
-					item->TestBits(JointBitType::Touch, CrocodileBiteAttackJoints))
+					item->TouchBits.Test(CrocodileBiteAttackJoints))
 				{
 					if (!item->Animation.RequiredState)
 					{
@@ -274,7 +274,7 @@ namespace TEN::Entities::TR4
 					item->Animation.TargetState = item->Animation.RequiredState;
 				else if (AI.bite)
 				{
-					if (item->TestBits(JointBitType::Touch, CrocodileBiteAttackJoints))
+					if (item->TouchBits.Test(CrocodileBiteAttackJoints))
 						item->Animation.TargetState = CROC_STATE_WATER_BITE_ATTACK;
 				}
 
@@ -285,7 +285,7 @@ namespace TEN::Entities::TR4
 					item->Animation.RequiredState = CROC_STATE_NONE_1;
 
 				if (AI.bite &&
-					item->TestBits(JointBitType::Touch, CrocodileBiteAttackJoints))
+					item->TouchBits.Test(CrocodileBiteAttackJoints))
 				{
 					if (!item->Animation.RequiredState)
 					{

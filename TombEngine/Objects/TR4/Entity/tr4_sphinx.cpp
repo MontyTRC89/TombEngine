@@ -23,7 +23,7 @@ namespace TEN::Entities::TR4
 	#define SPHINX_RUN_TURN_ANGLE  ANGLE(0.33f)
 
 	const auto SphinxBite = BiteInfo(Vector3::Zero, 6);
-	const vector<int> SphinxAttackJoints = { 6 };
+	const vector<unsigned int> SphinxAttackJoints = { 6 };
 
 	enum SphinxState
 	{
@@ -188,7 +188,7 @@ namespace TEN::Entities::TR4
 
 			if (creature->Flags == 0)
 			{
-				if (item->TestBits(JointBitType::Touch, SphinxAttackJoints))
+				if (item->TouchBits.Test(SphinxAttackJoints))
 				{
 					DoDamage(creature->Enemy, SPHINX_ATTACK_DAMAGE);
 					CreatureEffect2(item, SphinxBite, 20, -1, DoBloodSplat);
@@ -229,7 +229,7 @@ namespace TEN::Entities::TR4
 			{
 				TestTriggers(item, true);
 
-				if (item->TestBits(JointBitType::Touch, SphinxAttackJoints))
+				if (item->TouchBits.Test(SphinxAttackJoints))
 				{
 					DoDamage(creature->Enemy, INT_MAX);
 					CreatureEffect2(item, SphinxBite, 50, -1, DoBloodSplat);

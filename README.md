@@ -15,6 +15,10 @@ TombEngine (TEN) is a new, open-source engine which aims to abolish all limits, 
 
 TEN is based on the Tomb Raider: Chronicles engine of the classic era and continues to build upon and replace its systems to modernize ...
 
+If you would like to participate in TEN discussion with other TEN devs whether it is contributing or bugs, then join this discord server: https://discord.gg/apjBW2NsVj and head to #tombengine channel.
+
+Tomb Engine should be used in conjuction with Tomb Editor. Tomb Editor is also open source written in C#, you can find the repository here: https://github.com/MontyTRC89/Tomb-Editor
+
 # Compiling TombEngine
 To compile TEN, ensure you have installed:
 - Microsoft Visual Studio 
@@ -48,6 +52,7 @@ We do not and have never worked for Core Design, Eidos Interactive, or Square En
 - Gancian (general coding)
 - Krystian (general coding)
 - Kubsy (Some cleanups and fixes)
+- l.m. (general coding, bug fixing)
 - Lwmte (sound refactoring, general coding, code cleanups, bug fixing)
 - Moooonyeah (Jumanji) (entity decompilation)
 - Raildex (renderer refactoring, particle coding, general coding) 
@@ -75,9 +80,11 @@ We do not and have never worked for Core Design, Eidos Interactive, or Square En
 ## Assets and Miscellaneous
 
 ### Animations
-- SrDanielPonces (Diagonal shimmy transitions)
+- SrDanielPonces (Diagonal shimmy transitions, backwards monkey swinging)
 - Krystian (Flexibility crawlspace, slope climbing animations)
 - Sezz (Additional Animations for player state refactoring) 
+- Naotheia (Underwater puzzle placement, crouch 180° turn, crawl 180° turn, water surface 180° turn)
+- JoeyQuint (Standing 180° turn, monkey swing 180° turn)
 
 ### TombEngine Wiki tutorials 
 - Kubsy (Lua Basics tutorial)
