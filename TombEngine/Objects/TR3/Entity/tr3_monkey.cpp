@@ -24,7 +24,7 @@ namespace TEN::Entities::Creatures::TR3
 	// TODO: Range constants.
 
 	const auto MonkeyBite = BiteInfo(Vector3(10.0f, 10.0f, 11.0f), 13);
-	const vector<uint> MonkeyAttackJoints = { 10, 13 };
+	const vector<unsigned int> MonkeyAttackJoints = { 10, 13 };
 
 	enum MonkeyState
 	{

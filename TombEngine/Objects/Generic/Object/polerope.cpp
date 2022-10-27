@@ -49,16 +49,17 @@ namespace TEN::Entities::Generic
 	auto VPolePos = Vector3i(0, 0, -208);
 	auto VPolePosR = Vector3i::Zero;
 
-	OBJECT_COLLISION_BOUNDS VPoleBounds = 
+	const ObjectCollisionBounds VPoleBounds = 
 	{
 		GameBoundingBox(
 			-CLICK(1), CLICK(1),
 			0, 0, 
-			-CLICK(2), CLICK(2)
+			-SECTOR(0.5f), SECTOR(0.5f)
 		),
-		ANGLE(-10.0f), ANGLE(10.0f),
-		ANGLE(-30.0f), ANGLE(30.0f),
-		ANGLE(-10.0f), ANGLE(10.0f)
+		std::pair(
+			EulerAngles(ANGLE(-10.0f), ANGLE(-30.0f), ANGLE(-10.0f)),
+			EulerAngles(ANGLE(10.0f), ANGLE(30.0f), ANGLE(10.0f))
+		)
 	};
 
 	void PoleCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
@@ -78,9 +79,9 @@ namespace TEN::Entities::Generic
 			short yOrient = poleItem->Pose.Orientation.y;
 			poleItem->Pose.Orientation.y = laraItem->Pose.Orientation.y;
 
-			if (TestLaraPosition(&VPoleBounds, poleItem, laraItem))
+			if (TestLaraPosition(VPoleBounds, poleItem, laraItem))
 			{
-				if (MoveLaraPosition(&VPolePos, poleItem, laraItem))
+				if (MoveLaraPosition(VPolePos, poleItem, laraItem))
 				{
 					SetAnimation(laraItem, LA_STAND_TO_POLE);
 					lara->Control.IsMoving = false;
@@ -129,14 +130,14 @@ namespace TEN::Entities::Generic
 					if (laraItem->Animation.ActiveState == LS_REACH)
 					{
 						VPolePosR.y = laraItem->Pose.Position.y - poleItem->Pose.Position.y + 10;
-						AlignLaraPosition(&VPolePosR, poleItem, laraItem);
+						AlignLaraPosition(VPolePosR, poleItem, laraItem);
 						SetAnimation(laraItem, LA_REACH_TO_POLE);
 					}
 					// Jumping up.
 					else
 					{
 						VPolePosR.y = laraItem->Pose.Position.y - poleItem->Pose.Position.y + 66;
-						AlignLaraPosition(&VPolePosR, poleItem, laraItem);
+						AlignLaraPosition(VPolePosR, poleItem, laraItem);
 						SetAnimation(laraItem, LA_JUMP_UP_TO_POLE);
 					}
 

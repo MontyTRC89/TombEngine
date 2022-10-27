@@ -25,7 +25,7 @@ namespace TEN::Entities::Creatures::TR5
 	// TODO: Ranges.
 
 	const auto GladiatorBite = BiteInfo(Vector3::Zero, 16);
-	const vector<uint> GladiatorAttackJoints = { 13, 14 };
+	const vector<unsigned int> GladiatorAttackJoints = { 13, 14 };
 
 	enum GladiatorState
 	{

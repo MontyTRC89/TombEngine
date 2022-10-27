@@ -24,7 +24,7 @@ namespace TEN::Entities::TR4
 	constexpr auto BIG_BEETLE_AWARE_RANGE  = SQUARE(CLICK(12));
 
 	const auto BigBeetleBite = BiteInfo(Vector3::Zero, 12);
-	const vector<uint> BigBeetleAttackJoints = { 5, 6 };
+	const vector<unsigned int> BigBeetleAttackJoints = { 5, 6 };
 
 	enum BigBeetleState
 	{

@@ -15,9 +15,9 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
+using namespace TEN::Entities::Switches;
 using namespace TEN::Gui;
 using namespace TEN::Input;
-using namespace TEN::Entities::Switches;
 
 short PuzzleItem;
 
@@ -29,29 +29,31 @@ enum class PuzzleType
 	AnimAfter 
 };
 
-OBJECT_COLLISION_BOUNDS PuzzleBounds =
+ObjectCollisionBounds PuzzleBounds =
 {
 	GameBoundingBox(
 		0, 0,
-		-256, 256,
+		-CLICK(1), CLICK(1),
 		0, 0
 	),
-	-ANGLE(10.0f), ANGLE(10.0f),
-	-ANGLE(30.0f), ANGLE(30.0f),
-	-ANGLE(10.0f), ANGLE(10.0f)
+	std::pair(
+		EulerAngles(ANGLE(-10.0f), ANGLE(-30.0f), ANGLE(-10.0f)),
+		EulerAngles(ANGLE(10.0f), ANGLE(30.0f), ANGLE(10.0f))
+	)
 };
 
-static Vector3i KeyHolePosition(0, 0, 312);
-OBJECT_COLLISION_BOUNDS KeyHoleBounds =
+const auto KeyHolePosition = Vector3i(0, 0, 312);
+const ObjectCollisionBounds KeyHoleBounds =
 {
 	GameBoundingBox(
-		-256, 256,
+		-CLICK(1), CLICK(1),
 		0, 0,
 		0, 412
 	),
-	-ANGLE(10.0f), ANGLE(10.0f),
-	-ANGLE(30.0f), ANGLE(30.0f),
-	-ANGLE(10.0f), ANGLE(10.0f)
+	std::pair(
+		EulerAngles(ANGLE(-10.0f), ANGLE(-30.0f), ANGLE(-10.0f)),
+		EulerAngles(ANGLE(10.0f), ANGLE(30.0f), ANGLE(10.0f))
+	)
 };
 
 // Puzzles
@@ -90,12 +92,12 @@ void PuzzleHoleCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* co
 		short oldYrot = receptableItem->Pose.Orientation.y;
 
 		auto bounds = GameBoundingBox(receptableItem);
-		PuzzleBounds.boundingBox.X1 = bounds.X1 - CLICK(1);
-		PuzzleBounds.boundingBox.X2 = bounds.X2 + CLICK(1);
-		PuzzleBounds.boundingBox.Z1 = bounds.Z1 - CLICK(1);;
-		PuzzleBounds.boundingBox.Z2 = bounds.Z2 + CLICK(1);;
+		PuzzleBounds.BoundingBox.X1 = bounds.X1 - CLICK(1);
+		PuzzleBounds.BoundingBox.X2 = bounds.X2 + CLICK(1);
+		PuzzleBounds.BoundingBox.Z1 = bounds.Z1 - CLICK(1);;
+		PuzzleBounds.BoundingBox.Z2 = bounds.Z2 + CLICK(1);;
 
-		if (TestLaraPosition(&PuzzleBounds, receptableItem, laraItem))
+		if (TestLaraPosition(PuzzleBounds, receptableItem, laraItem))
 		{
 			if (!laraInfo->Control.IsMoving)
 			{
@@ -118,7 +120,7 @@ void PuzzleHoleCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* co
 			if (puzzleType != PuzzleType::Cutscene)
 			{
 				auto pos = Vector3i(0, 0, bounds.Z1 - 100);
-				if (!MoveLaraPosition(&pos, receptableItem, laraItem))
+				if (!MoveLaraPosition(pos, receptableItem, laraItem))
 				{
 					laraInfo->InteractedItem = itemNumber;
 					g_Gui.SetInventoryItemChosen(NO_ITEM);
@@ -278,7 +280,7 @@ void KeyHoleCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 
 	if (actionActive || (actionReady && laraAvailable))
 	{
-		if (TestLaraPosition(&KeyHoleBounds, keyHoleItem, laraItem))
+		if (TestLaraPosition(KeyHoleBounds, keyHoleItem, laraItem))
 		{
 			if (!laraInfo->Control.IsMoving) //TROYE INVENTORY FIX ME
 			{
@@ -302,7 +304,7 @@ void KeyHoleCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 			if (laraInfo->InteractedItem != itemNumber)
 				return;
 
-			if (MoveLaraPosition(&KeyHolePosition, keyHoleItem, laraItem))
+			if (MoveLaraPosition(KeyHolePosition, keyHoleItem, laraItem))
 			{
 				if (keyHoleItem->ObjectNumber == ID_KEY_HOLE8)
 					laraItem->Animation.AnimNumber = LA_KEYCARD_USE;

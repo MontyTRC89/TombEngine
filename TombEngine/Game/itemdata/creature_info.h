@@ -38,7 +38,7 @@ struct LOTInfo
 {
 	bool Initialised;
 
-	vector<BOX_NODE> Node;
+	vector<BOX_NODE> Node = {};
 	int Head;
 	int Tail;
 
@@ -81,12 +81,12 @@ struct CreatureInfo
 {
 	short ItemNumber = -1;
 
-	LOTInfo	   LOT			  = {};
-	MoodType   Mood			  = MoodType::None;
-	ItemInfo*  Enemy		  = nullptr;
-	ItemInfo*  AITarget		  = nullptr;
-	short	   AITargetNumber = -1;
-	Vector3i Target		  = Vector3i::Zero;
+	LOTInfo	  LOT			 = {};
+	MoodType  Mood			 = MoodType::None;
+	ItemInfo* Enemy			 = nullptr;
+	ItemInfo* AITarget		 = nullptr;
+	short	  AITargetNumber = -1;
+	Vector3i  Target		 = Vector3i::Zero;
 
 	short MaxTurn = 0;
 	short JointRotation[4] = {};

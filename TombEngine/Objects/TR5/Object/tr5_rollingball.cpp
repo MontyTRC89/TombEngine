@@ -44,8 +44,6 @@ void RollingBallCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* c
 void RollingBallControl(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
-	// read flags from OCB
-	int OCB = item->TriggerFlags;
 
 	if (!TriggerActive(item))
 		return;

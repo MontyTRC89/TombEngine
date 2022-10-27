@@ -32,7 +32,7 @@ namespace TEN::Entities::Creatures::TR3
 	#define RAPTOR_ATTACK_TURN_RATE_MAX ANGLE(2.0f)
 
 	const auto RaptorBite = BiteInfo(Vector3(0.0f, 66.0f, 318.0f), 22);
-	const vector<uint> RaptorAttackJoints = { 10, 11, 12, 13, 14, 16, 17, 18, 19, 20, 21, 22, 23 };
+	const vector<unsigned int> RaptorAttackJoints = { 10, 11, 12, 13, 14, 16, 17, 18, 19, 20, 21, 22, 23 };
 
 	enum RaptorState
 	{

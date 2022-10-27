@@ -15,19 +15,19 @@ using namespace TEN::Input;
 
 namespace TEN::Entities::Switches
 {
-	OBJECT_COLLISION_BOUNDS PulleyBounds = 
+	const ObjectCollisionBounds PulleyBounds =
 	{
 		GameBoundingBox(
-			-256, 256,
+			-CLICK(1), CLICK(1),
 			0, 0,
-			-512, 512
+			-SECTOR(0.5f), SECTOR(0.5f)
 		),
-		-ANGLE(10.0f), ANGLE(10.0f),
-		-ANGLE(30.0f), ANGLE(30.0f),
-		-ANGLE(10.0f), ANGLE(10.0f)
+		std::pair(
+			EulerAngles(ANGLE(-10.0f), ANGLE(-30.0f), ANGLE(-10.0f)),
+			EulerAngles(ANGLE(10.0f), ANGLE(30.0f), ANGLE(10.0f))
+		)
 	};
-
-	Vector3i PulleyPos = { 0, 0, -148 }; 
+	const auto PulleyPos = Vector3i(0, 0, -148);
 
 	void InitialisePulleySwitch(short itemNumber)
 	{
@@ -57,7 +57,7 @@ namespace TEN::Entities::Switches
 		{
 			short oldYrot = switchItem->Pose.Orientation.y;
 			switchItem->Pose.Orientation.y = laraItem->Pose.Orientation.y;
-			if (TestLaraPosition(&PulleyBounds, switchItem, laraItem))
+			if (TestLaraPosition(PulleyBounds, switchItem, laraItem))
 			{
 				if (switchItem->ItemFlags[1])
 				{
@@ -69,7 +69,7 @@ namespace TEN::Entities::Switches
 						SayNo();
 					}
 				}
-				else if (MoveLaraPosition(&PulleyPos, switchItem, laraItem))
+				else if (MoveLaraPosition(PulleyPos, switchItem, laraItem))
 				{
 					laraItem->Animation.AnimNumber = LA_PULLEY_GRAB;
 					laraItem->Animation.ActiveState = LS_PULLEY;

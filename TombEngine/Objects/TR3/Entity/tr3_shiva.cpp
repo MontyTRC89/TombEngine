@@ -31,8 +31,8 @@ namespace TEN::Entities::Creatures::TR3
 
 	const auto ShivaBiteLeft  = BiteInfo(Vector3(0.0f, 0.0f, 920.0f), 13);
 	const auto ShivaBiteRight = BiteInfo(Vector3(0.0f, 0.0f, 920.0f), 22);
-	const vector<uint> ShivaAttackLeftJoints	 = { 10, 13 };
-	const vector<uint> ShivaAttackRightJoints = { 22, 25 };
+	const vector<unsigned int> ShivaAttackLeftJoints	 = { 10, 13 };
+	const vector<unsigned int> ShivaAttackRightJoints = { 22, 25 };
 
 	enum ShivaState
 	{

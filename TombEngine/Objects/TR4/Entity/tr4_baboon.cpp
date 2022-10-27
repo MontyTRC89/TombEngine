@@ -41,9 +41,9 @@ namespace TEN::Entities::TR4
 	#define BABOON_STATE_WALK_ANIM 14 // TODO: What is this?
 
 	const auto BaboonBite = BiteInfo(Vector3(10.0f, 10.0f, 11.0f), 4);
-	const vector<uint> BaboonAttackJoints	  = { 11, 12 };
-	const vector<uint> BaboonAttackRightJoints = { 1, 2, 3, 5, 8, 9 };
-	const vector<uint> BaboonJumpAttackJoints  = { 3, 4, 8 };
+	const vector<unsigned int> BaboonAttackJoints	  = { 11, 12 };
+	const vector<unsigned int> BaboonAttackRightJoints = { 1, 2, 3, 5, 8, 9 };
+	const vector<unsigned int> BaboonJumpAttackJoints  = { 3, 4, 8 };
 
 	BaboonRespawner BaboonRespawn;
 

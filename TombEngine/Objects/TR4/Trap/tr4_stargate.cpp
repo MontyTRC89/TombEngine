@@ -18,7 +18,7 @@ namespace TEN::Entities::Traps
 {
 	constexpr auto STARGATE_HARM_DAMAGE = 100;
 
-	const vector<uint> StargateHarmJoints = { 9, 10, 12, 13, 15, 16, 18, 19, 21, 22, 24, 25 };
+	const vector<unsigned int> StargateHarmJoints = { 9, 10, 12, 13, 15, 16, 18, 19, 21, 22, 24, 25 };
 	const vector<Vector3i> StargateBounds =
 	{
 		Vector3i(-CLICK(2), CLICK(2), -SECTOR(2)), 

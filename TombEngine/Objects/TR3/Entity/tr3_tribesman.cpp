@@ -26,8 +26,8 @@ namespace TEN::Entities::Creatures::TR3
 	const auto TribesmanAxeBite	  = BiteInfo(Vector3(0.0f, 16.0f, 265.0f), 13);
 	const auto TribesmanDartBite1 = BiteInfo(Vector3(0.0f, 0.0f, -200.0f), 13);
 	const auto TribesmanDartBite2 = BiteInfo(Vector3(8.0f, 40.0f, -248.0f), 13);
-	const vector<uint> TribesmanAxeAttackJoints	= { 13 };
-	const vector<uint> TribesmanDartAttackJoints = { 10, 13 }; // TODO: Check.
+	const vector<unsigned int> TribesmanAxeAttackJoints	= { 13 };
+	const vector<unsigned int> TribesmanDartAttackJoints = { 10, 13 }; // TODO: Check.
 
 	const unsigned char TribesmanAxeHit[13][3] =
 	{

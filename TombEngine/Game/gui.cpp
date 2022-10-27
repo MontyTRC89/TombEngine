@@ -2084,7 +2084,7 @@ namespace TEN::Gui
 			}
 
 			int n = 0;
-			ulong options;
+			unsigned long options;
 			if (!AmmoActive)
 			{
 				options = InventoryObjectTable[Rings[(int)RingTypes::Inventory]->CurrentObjectList[Rings[(int)RingTypes::Inventory]->CurrentObjectInList].InventoryItem].Options;

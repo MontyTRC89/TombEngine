@@ -294,7 +294,7 @@ namespace TEN::Gui
 		EulerAngles Orientation;
 		unsigned __int64 Options;
 		const char* ObjectName;
-		uint MeshBits;
+		unsigned int MeshBits;
 		short RotFlags;
 	};
 
@@ -315,20 +315,20 @@ namespace TEN::Gui
 
 	struct AmmoData
 	{
-		ushort AmountShotGunAmmo1;
-		ushort AmountShotGunAmmo2;
-		ushort AmountHKAmmo1;
-		ushort AmountCrossBowAmmo1;
-		ushort AmountCrossBowAmmo2;
-		ushort AmountCrossBowAmmo3;
-		ushort AmountGrenadeAmmo1;
-		ushort AmountGrenadeAmmo2;
-		ushort AmountGrenadeAmmo3;
-		ushort AmountRocketsAmmo;
-		ushort AmountHarpoonAmmo;
-		ushort AmountUziAmmo;
-		ushort AmountRevolverAmmo;
-		ushort AmountPistolsAmmo;
+		unsigned short AmountShotGunAmmo1;
+		unsigned short AmountShotGunAmmo2;
+		unsigned short AmountHKAmmo1;
+		unsigned short AmountCrossBowAmmo1;
+		unsigned short AmountCrossBowAmmo2;
+		unsigned short AmountCrossBowAmmo3;
+		unsigned short AmountGrenadeAmmo1;
+		unsigned short AmountGrenadeAmmo2;
+		unsigned short AmountGrenadeAmmo3;
+		unsigned short AmountRocketsAmmo;
+		unsigned short AmountHarpoonAmmo;
+		unsigned short AmountUziAmmo;
+		unsigned short AmountRevolverAmmo;
+		unsigned short AmountPistolsAmmo;
 		char CurrentPistolsAmmoType;
 		char CurrentUziAmmoType;
 		char CurrentRevolverAmmoType;

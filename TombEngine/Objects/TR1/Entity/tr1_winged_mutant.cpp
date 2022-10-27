@@ -43,7 +43,7 @@ namespace TEN::Entities::Creatures::TR1
 	const auto WingedMutantBite		  = BiteInfo(Vector3(-27.0f, 98.0f, 0.0f), 10);
 	const auto WingedMutantRocketBite = BiteInfo(Vector3(51.0f, 213.0f, 0.0f), 14);
 	const auto WingedMutantShardBite  = BiteInfo(Vector3(-35.0f, 269.0f, 0.0f), 9);
-	const vector<uint> WingedMutantJoints = { 9, 10, 14 };
+	const vector<unsigned int> WingedMutantJoints = { 9, 10, 14 };
 
 	enum WingedMutantState
 	{

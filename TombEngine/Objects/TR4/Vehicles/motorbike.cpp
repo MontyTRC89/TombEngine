@@ -27,9 +27,9 @@ using namespace TEN::Math::Random;
 
 namespace TEN::Entities::Vehicles
 {
-	const vector<uint> MotorbikeJoints = { 0, 1, 2, 4, 5, 6, 7, 8, 9 };
-	const vector<uint> MotorbikeBrakeLightJoints = { 10 };
-	const vector<uint> MotorbikeHeadLightJoints = { 3 };
+	const vector<unsigned int> MotorbikeJoints = { 0, 1, 2, 4, 5, 6, 7, 8, 9 };
+	const vector<unsigned int> MotorbikeBrakeLightJoints = { 10 };
+	const vector<unsigned int> MotorbikeHeadLightJoints = { 3 };
 
 	const vector<VehicleMountType> MotorbikeMountTypes =
 	{
