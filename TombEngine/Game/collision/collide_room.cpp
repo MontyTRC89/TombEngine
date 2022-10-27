@@ -298,10 +298,12 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 
 	// Parameter definition ends here, now process to actual collision tests...
 
-	// HACK: for certain ledge cases, Lara Location->roomNumber updates more properly than 
-	// item->RoomNumber, but since Location is ONLY updated for Lara, we can't use it for 
-	// all objects for now. In future, we should either update Location field for all
-	// objects or use this value as it is now.
+	// HACK: when using SetPosition animcommand, item->RoomNumber does not immediately
+	// update, but only at the end of control loop. This may cause bugs when Lara is
+	// climbing or vaulting ledges under slopes. Using Location->roomNumber solves
+	// these bugs, as it is updated immediately. But since Location->roomNumber is ONLY
+	// updated for Lara, we can't use it for all objects for now. In future, we should
+	// either update Location field for all objects or use this value as it is now.
 
 	int realRoomNumber = doPlayerCollision ? item->Location.roomNumber : item->RoomNumber;
 	
