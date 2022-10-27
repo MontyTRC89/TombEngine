@@ -136,8 +136,8 @@ namespace TEN::Input
 
 	extern short KeyboardLayout[2][KEY_COUNT];
 
-	void InitializeInput(HWND handle);
-	void DeinitializeInput();
+	void InitialiseInput(HWND handle);
+	void DeinitialiseInput();
 	void DefaultConflict();
 	void UpdateInputActions(ItemInfo* item);
 	void ClearAllActions();

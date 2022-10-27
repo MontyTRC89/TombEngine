@@ -126,7 +126,7 @@ namespace TEN::Input
 		pConstForce.envelope.fadeLevel = 0;
 	}
 
-	void InitializeInput(HWND handle)
+	void InitialiseInput(HWND handle)
 	{
 		TENLog("Initializing input system...", LogLevel::Info);
 
@@ -178,7 +178,7 @@ namespace TEN::Input
 		}
 	}
 
-	void DeinitializeInput()
+	void DeinitialiseInput()
 	{
 		if (OisKeyboard)
 			OisInputManager->destroyInputObject(OisKeyboard);

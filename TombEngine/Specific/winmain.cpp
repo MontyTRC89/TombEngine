@@ -393,7 +393,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	Sound_Init();
 
 	// Initialise input
-	InitializeInput(App.WindowHandle);
+	InitialiseInput(App.WindowHandle);
 
 	// Load level if specified in command line
 	CurrentLevel = g_GameFlow->GetLevelNumber(levelFile);
@@ -434,7 +434,7 @@ void WinClose()
 	DestroyAcceleratorTable(hAccTable);
 
 	Sound_DeInit();
-	DeinitializeInput();
+	DeinitialiseInput();
 	
 	delete g_GameScript;
 	g_GameScript = nullptr;
