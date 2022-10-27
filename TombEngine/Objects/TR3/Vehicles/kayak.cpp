@@ -33,7 +33,7 @@ namespace TEN::Entities::Vehicles
 		byte life;
 		byte pad[3];
 	};
-	const vector<uint> KayakLaraLegJoints = { LM_HIPS, LM_LTHIGH, LM_LSHIN, LM_LFOOT, LM_RTHIGH, LM_RSHIN, LM_RFOOT };
+	const vector<unsigned int> KayakLaraLegJoints = { LM_HIPS, LM_LTHIGH, LM_LSHIN, LM_LFOOT, LM_RTHIGH, LM_RSHIN, LM_RFOOT };
 	const vector<VehicleMountType> KayakMountTypes =
 	{
 		VehicleMountType::LevelStart,

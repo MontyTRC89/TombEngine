@@ -18,7 +18,7 @@ namespace TEN::Entities::Creatures::TR2
 	constexpr auto SHARK_BITE_ATTACK_DAMAGE = 400;
 
 	const auto SharkBite = BiteInfo(Vector3(17.0f, -22.0f, 344.0f), 12);
-	const vector<uint> SharkBiteAttackJoints = { 10, 12, 13 };
+	const vector<unsigned int> SharkBiteAttackJoints = { 10, 12, 13 };
 
 	void SharkControl(short itemNumber)
 	{

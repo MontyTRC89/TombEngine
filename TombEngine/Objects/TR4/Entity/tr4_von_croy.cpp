@@ -24,7 +24,7 @@ namespace TEN::Entities::TR4
 	#define VON_CROY_FLAG_JUMP 6
 
 	const auto VonCroyBite = BiteInfo(Vector3(0.0f, 35.0f, 130.0f), 18);
-	const vector<uint> VonCroyKnifeSwapJoints = { 7, 18 };
+	const vector<unsigned int> VonCroyKnifeSwapJoints = { 7, 18 };
 
 	bool VonCroyPassedWaypoints[128];
 

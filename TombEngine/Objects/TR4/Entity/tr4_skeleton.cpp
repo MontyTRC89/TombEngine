@@ -27,7 +27,7 @@ namespace TEN::Entities::TR4
 	constexpr auto SKELETON_ATTACK_DAMAGE = 80;
 
 	const auto SkeletonBite = BiteInfo(Vector3(0.0f, -16.0f, 200.0f), 11);
-	const vector<uint> SkeletonSwordAttackJoints = { 15, 16 };
+	const vector<unsigned int> SkeletonSwordAttackJoints = { 15, 16 };
 
 	// TODO: Fill in missign states.
 	enum SkeletonState

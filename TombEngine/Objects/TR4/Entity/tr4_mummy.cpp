@@ -31,7 +31,7 @@ namespace TEN::Entities::TR4
 
 	const auto MummyBite1 = BiteInfo(Vector3::Zero, 11);
 	const auto MummyBite2 = BiteInfo(Vector3::Zero, 14);
-	const vector<uint> MummySwipeAttackJoints { 11, 14 };
+	const vector<unsigned int> MummySwipeAttackJoints { 11, 14 };
 
 	enum MummyState
 	{

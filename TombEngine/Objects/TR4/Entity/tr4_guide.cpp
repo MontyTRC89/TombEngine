@@ -22,9 +22,9 @@ namespace TEN::Entities::TR4
 
 	const auto GuideBite1 = BiteInfo(Vector3(0.0f, 20.0f, 180.0f), 18);
 	const auto GuideBite2 = BiteInfo(Vector3(30.0f, 80.0f, 50.0f), 15);
-	const vector<uint> GuideLeftFingerSwapJoints = { 15 };
-	const vector<uint> GuideRightHandSwapJoints	= { 18 };
-	const vector<uint> GuideHeadSwapJoints		= { 21 };
+	const vector<unsigned int> GuideLeftFingerSwapJoints = { 15 };
+	const vector<unsigned int> GuideRightHandSwapJoints	= { 18 };
+	const vector<unsigned int> GuideHeadSwapJoints		= { 21 };
 
 	enum GuideState
 	{

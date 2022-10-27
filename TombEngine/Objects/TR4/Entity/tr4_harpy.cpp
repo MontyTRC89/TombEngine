@@ -32,8 +32,8 @@ namespace TEN::Entities::TR4
 	const auto HarpyBite3	= BiteInfo(Vector3::Zero, 15);
 	const auto HarpyAttack1 = BiteInfo(Vector3(0.0f, 128.0f, 0.0f), 2);
 	const auto HarpyAttack2 = BiteInfo(Vector3(0.0f, 128.0f, 0.0f), 4);
-	const vector<uint> HarpySwoopAttackJoints   = { 2, 4, 15 };
-	const vector<uint> HarpyStingerAttackJoints = { 2, 4 };
+	const vector<unsigned int> HarpySwoopAttackJoints   = { 2, 4, 15 };
+	const vector<unsigned int> HarpyStingerAttackJoints = { 2, 4 };
 
 	enum HarpyState
 	{

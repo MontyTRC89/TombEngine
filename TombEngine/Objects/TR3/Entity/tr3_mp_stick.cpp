@@ -20,8 +20,8 @@ namespace TEN::Entities::Creatures::TR3
 {
 	const auto MPStickBite1 = BiteInfo(Vector3(247.0f, 10.0f, 11.0f), 13);
 	const auto MPStickBite2 = BiteInfo(Vector3(0.0f, 0.0f, 100.0f), 6);
-	const vector<uint> MPStickPunchAttackJoints = { 10, 13 };
-	const vector<uint> MPStickKickAttackJoints  = { 5, 6 };
+	const vector<unsigned int> MPStickPunchAttackJoints = { 10, 13 };
+	const vector<unsigned int> MPStickKickAttackJoints  = { 5, 6 };
 
 	enum MPStickState
 	{

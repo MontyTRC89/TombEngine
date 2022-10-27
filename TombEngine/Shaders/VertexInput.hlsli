@@ -4,10 +4,10 @@ struct VertexShaderInput {
 	float2 UV: TEXCOORD0;
 	float4 Color: COLOR0;
 	float3 Tangent: TANGENT0;
-	uint AnimationFrameOffset: ANIMATIONFRAMEOFFSET;
+	unsigned int AnimationFrameOffset: ANIMATIONFRAMEOFFSET;
 	float4 Effects: EFFECTS;
 	float Bone: BLENDINDICES;
-	uint PolyIndex : POLYINDEX;
-	uint Index: DRAWINDEX;
+	unsigned int PolyIndex : POLYINDEX;
+	unsigned int Index: DRAWINDEX;
 	int Hash : HASH;
 };

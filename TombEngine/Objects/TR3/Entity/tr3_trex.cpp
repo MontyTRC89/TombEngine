@@ -22,7 +22,7 @@ namespace TEN::Entities::Creatures::TR3
 	constexpr auto TREX_ROAR_CHANCE = 0.015f;
 	constexpr auto LARA_ANIM_TREX_DEATH_ANIM = 4;
 
-	const vector<uint> TRexAttackJoints = { 12, 13 };
+	const vector<unsigned int> TRexAttackJoints = { 12, 13 };
 
 	#define TREX_WALK_TURN_RATE_MAX ANGLE(2.0f)
 	#define TREX_RUN_TURN_RATE_MAX	ANGLE(4.0f)
