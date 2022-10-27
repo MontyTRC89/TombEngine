@@ -23,18 +23,18 @@ using namespace TEN::Input;
 
 namespace TEN::Entities::Doors
 {
-	Vector3i DoubleDoorPos(0, 0, 220);
-
-	OBJECT_COLLISION_BOUNDS DoubleDoorBounds =
+	const auto DoubleDoorPos = Vector3i(0, 0, 220);
+	const ObjectCollisionBounds DoubleDoorBounds =
 	{
 		GameBoundingBox(
 			-384, 384,
 			0, 0, 
-			-1024, 512
+			-SECTOR(1), SECTOR(0.5f)
 		),
-		-ANGLE(10.0f), ANGLE(10.0f),
-		-ANGLE(30.0f), ANGLE(30.0f),
-		-ANGLE(10.0f), ANGLE(10.0f),
+		std::pair(
+			EulerAngles(ANGLE(-10.0f), ANGLE(-30.0f), ANGLE(-10.0f)),
+			EulerAngles(ANGLE(10.0f), ANGLE(30.0f), ANGLE(10.0f))
+		)
 	};
 
 	void DoubleDoorCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
@@ -53,9 +53,9 @@ namespace TEN::Entities::Doors
 		{
 			doorItem->Pose.Orientation.y ^= ANGLE(180.0f);
 
-			if (TestLaraPosition(&DoubleDoorBounds, doorItem, laraItem))
+			if (TestLaraPosition(DoubleDoorBounds, doorItem, laraItem))
 			{
-				if (MoveLaraPosition(&DoubleDoorPos, doorItem, laraItem))
+				if (MoveLaraPosition(DoubleDoorPos, doorItem, laraItem))
 				{
 					SetAnimation(laraItem, LA_DOUBLEDOOR_OPEN_PUSH);
 

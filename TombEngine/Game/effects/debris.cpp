@@ -52,10 +52,9 @@ DebrisFragment* GetFreeDebrisFragment()
 	for (auto& frag : DebrisFragments) 
 	{
 		if (!frag.active)
-		{
 			return &frag;
-		}
 	}
+
 	return nullptr;
 }
 
@@ -189,7 +188,7 @@ void ShatterObject(SHATTER_ITEM* item, MESH_INFO* mesh, int num, short roomNumbe
 	}
 }
 
-Vector3 CalculateFragmentImpactVelocity(Vector3 fragmentWorldPosition, Vector3 impactDirection, Vector3 impactLocation)
+Vector3 CalculateFragmentImpactVelocity(const Vector3& fragmentWorldPosition, const Vector3& impactDirection, const Vector3& impactLocation)
 {
 	Vector3 radiusVector = (fragmentWorldPosition - impactLocation);
 	Vector3 radiusNormVec = radiusVector;

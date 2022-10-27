@@ -27,18 +27,18 @@ using namespace TEN::Input;
 
 namespace TEN::Entities::Doors
 {
-	Vector3i CrowbarDoorPos(-412, 0, 256);
-
-	OBJECT_COLLISION_BOUNDS CrowbarDoorBounds =
+	const auto CrowbarDoorPos = Vector3i(-412, 0, 256);
+	const ObjectCollisionBounds CrowbarDoorBounds =
 	{
 		GameBoundingBox(
-			-512, 512,
-			-1024, 0, 
-			0, 512
+			-SECTOR(0.5f), SECTOR(0.5f),
+			-SECTOR(1), 0,
+			0, SECTOR(0.5f)
 		),
-		-ANGLE(80.0f), ANGLE(80.0f),
-		-ANGLE(80.0f), ANGLE(80.0f),
-		-ANGLE(80.0f), ANGLE(80.0f)
+		std::pair(
+			EulerAngles(ANGLE(-80.0f), ANGLE(-80.0f), ANGLE(-80.0f)),
+			EulerAngles(ANGLE(80.0f), ANGLE(80.0f), ANGLE(80.0f))
+		)
 	};
 
 	void InitialiseDoor(short itemNumber)
@@ -181,7 +181,7 @@ namespace TEN::Entities::Doors
 				laraInfo->Control.IsMoving && laraInfo->InteractedItem == itemNumber))
 		{
 			doorItem->Pose.Orientation.y ^= ANGLE(180.0f);
-			if (TestLaraPosition(&CrowbarDoorBounds, doorItem, laraItem))
+			if (TestLaraPosition(CrowbarDoorBounds, doorItem, laraItem))
 			{
 				if (!laraInfo->Control.IsMoving)
 				{
@@ -217,7 +217,7 @@ namespace TEN::Entities::Doors
 
 				g_Gui.SetInventoryItemChosen(NO_ITEM);
 
-				if (MoveLaraPosition(&CrowbarDoorPos, doorItem, laraItem))
+				if (MoveLaraPosition(CrowbarDoorPos, doorItem, laraItem))
 				{
 					SetAnimation(laraItem, LA_DOOR_OPEN_CROWBAR);
 					doorItem->Pose.Orientation.y ^= ANGLE(180.0f);

@@ -16,17 +16,18 @@
 
 using namespace TEN::Input;
 
-Vector3i PushableBlockPos = { 0, 0, 0 };
-static OBJECT_COLLISION_BOUNDS PushableBlockBounds = 
+static auto PushableBlockPos = Vector3i::Zero;
+ObjectCollisionBounds PushableBlockBounds = 
 {
 	GameBoundingBox(
 		0, 0,
-		-64, 0,
+		-CLICK(0.25f), 0,
 		0, 0
 	),
-	ANGLE(-10.0f), ANGLE(10.0f),
-	ANGLE(-30.0f), ANGLE(30.0f),
-	ANGLE(-10.0f), ANGLE(10.0f)
+	std::pair(
+		EulerAngles(ANGLE(-10.0f), ANGLE(-30.0f), ANGLE(-10.0f)),
+		EulerAngles(ANGLE(10.0f), ANGLE(30.0f), ANGLE(10.0f))
+	)
 };
 
 int DoPushPull = 0;
@@ -470,15 +471,15 @@ void PushableBlockCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo*
 	else
 	{
 		auto bounds = GameBoundingBox(pushableItem);
-		PushableBlockBounds.boundingBox.X1 = (bounds.X1 / 2) - 100;
-		PushableBlockBounds.boundingBox.X2 = (bounds.X2 / 2) + 100;
-		PushableBlockBounds.boundingBox.Z1 = bounds.Z1 - 200;
-		PushableBlockBounds.boundingBox.Z2 = 0;
+		PushableBlockBounds.BoundingBox.X1 = (bounds.X1 / 2) - 100;
+		PushableBlockBounds.BoundingBox.X2 = (bounds.X2 / 2) + 100;
+		PushableBlockBounds.BoundingBox.Z1 = bounds.Z1 - 200;
+		PushableBlockBounds.BoundingBox.Z2 = 0;
 
 		short rot = pushableItem->Pose.Orientation.y;
 		pushableItem->Pose.Orientation.y = (laraItem->Pose.Orientation.y + ANGLE(45.0f)) & 0xC000;
 
-		if (TestLaraPosition(&PushableBlockBounds, pushableItem, laraItem))
+		if (TestLaraPosition(PushableBlockBounds, pushableItem, laraItem))
 		{
 			unsigned short quadrant = (unsigned short)((pushableItem->Pose.Orientation.y / 0x4000) + ((rot + 0x2000) / 0x4000));
 			if (quadrant & 1)
@@ -505,7 +506,7 @@ void PushableBlockCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo*
 			}
 			else
 			{
-				if (MoveLaraPosition(&PushableBlockPos, pushableItem, laraItem))
+				if (MoveLaraPosition(PushableBlockPos, pushableItem, laraItem))
 				{
 					laraItem->Animation.AnimNumber = LA_PUSHABLE_GRAB;
 					laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
