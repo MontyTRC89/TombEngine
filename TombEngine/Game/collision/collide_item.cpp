@@ -379,11 +379,11 @@ bool TestLaraPosition(const ObjectCollisionBounds& bounds, ItemInfo* item, ItemI
 	auto pos = (laraItem->Pose.Position - item->Pose.Position).ToVector3();
 	auto rotMatrix = item->Pose.Orientation.ToRotationMatrix();
 
-	/* This solves once for all the minus sign hack of CreateFromYawPitchRoll.
-	In reality it should be the inverse, but the inverse of a rotation matrix is equal to the transpose
-	and transposing a matrix is faster.
-	It's the only piece of code that does it, because we want Lara's location relative to the identity frame
-	of the object we are test against. */
+	// This solves once for all the minus sign hack of CreateFromYawPitchRoll.
+	// In reality it should be the inverse, but the inverse of a rotation matrix is equal to the transpose
+	// and transposing a matrix is faster.
+	// It's the only piece of code that does it, because we want Lara's location relative to the identity frame
+	// of the object we are test against.
 	rotMatrix = rotMatrix.Transpose();
 
 	pos = Vector3::Transform(pos, rotMatrix);

@@ -9,7 +9,7 @@ namespace TEN::Math::Solvers
 {
 	pair<float, float> SolveQuadratic(float a, float b, float c)
 	{
-		auto result = pair<float, float>(INFINITY, INFINITY);
+		auto result = pair(INFINITY, INFINITY);
 
 		if (abs(a) < FLT_EPSILON)
 		{
