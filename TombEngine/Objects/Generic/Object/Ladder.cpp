@@ -43,7 +43,7 @@ namespace TEN::Entities::Generic
 		LS_JUMP_UP
 	};
 
-	auto LadderPos = Vector3i(0, 0, -CLICK(0.95f));
+	auto LadderMountOffset = Vector3i(0, 0, -CLICK(0.5f));
 	OBJECT_COLLISION_BOUNDS LadderBounds =
 	{
 		GameBoundingBox(
@@ -51,6 +51,10 @@ namespace TEN::Entities::Generic
 			-CLICK(1), CLICK(1),
 			-CLICK(1.5f), CLICK(1.5f)
 		),
+		/*pair(
+			EulerAngles(ANGLE(-10.0f), -LARA_GRAB_THRESHOLD, ANGLE(-10.0f)),
+			EulerAngles(ANGLE(10.0f), LARA_GRAB_THRESHOLD, ANGLE(10.0f))
+		)*/
 		ANGLE(-10.0f), ANGLE(10.0f),
 		-LARA_GRAB_THRESHOLD, LARA_GRAB_THRESHOLD,
 		ANGLE(-10.0f), ANGLE(10.0f)
@@ -71,7 +75,8 @@ namespace TEN::Entities::Generic
 		{
 			if (TestLaraPosition(&LadderBounds, &ladderItem, laraItem))
 			{
-				if (MoveLaraPosition(&LadderPos, &ladderItem, laraItem))
+				auto mountPos = Vector3i(0, 0, GameBoundingBox(&ladderItem).Z1) + LadderMountOffset;
+				if (MoveLaraPosition(&mountPos, &ladderItem, laraItem))
 				{
 					SetAnimation(laraItem, LA_LADDER_MOUNT_BOTTOM);
 					player.Control.IsMoving = false;
