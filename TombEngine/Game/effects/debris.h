@@ -82,6 +82,6 @@ extern short SmashedMeshRoom[32];
 bool ExplodeItemNode(ItemInfo* item, int node, int noXZVel, int bits);
 void ShatterObject(SHATTER_ITEM* item, MESH_INFO* mesh, int num, short roomNumber, int noZXVel);
 DebrisFragment* GetFreeDebrisFragment();
-Vector3 CalculateFragmentImpactVelocity(Vector3 fragmentWorldPosition, Vector3 impactDirection, Vector3 impactLocation);
+Vector3 CalculateFragmentImpactVelocity(const Vector3& fragmentWorldPosition, const Vector3& impactDirection, const Vector3& impactLocation);
 void DisableDebris();
 void UpdateDebris();

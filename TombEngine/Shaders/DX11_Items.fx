@@ -29,7 +29,7 @@ struct PixelShaderInput
 	float3x3 TBN: TBN;
 	float Fog: FOG;
 	float4 PositionCopy: TEXCOORD2;
-	uint Bone: BONE;
+	unsigned int Bone: BONE;
 };
 
 struct PixelShaderOutput

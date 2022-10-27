@@ -20,29 +20,30 @@ OBJECT_TEXTURE* WaterfallTextures[6];
 float WaterfallY[6];
 int lastWaterfallY = 0;
 
-Vector3i TightRopePos = { 0, 0, 0 };
-OBJECT_COLLISION_BOUNDS TightRopeBounds =
+const auto TightRopePos = Vector3i::Zero;
+const ObjectCollisionBounds TightRopeBounds =
 {
 	GameBoundingBox(
-		-256, 256,
+		-CLICK(1), CLICK(1),
 		0, 0,
-		-256, 256
+		-CLICK(1), CLICK(1)
 	),
-	ANGLE(-10.0f), ANGLE(10.0f),
-	ANGLE(-30.0f), ANGLE(30.0f),
-	ANGLE(-10.0f), ANGLE(10.0f)
+	std::pair(
+		EulerAngles(ANGLE(-10.0f), ANGLE(-30.0f), ANGLE(-10.0f)),
+		EulerAngles(ANGLE(10.0f), ANGLE(30.0f), ANGLE(10.0f))
+	)
 };
-
-OBJECT_COLLISION_BOUNDS ParallelBarsBounds =
+const ObjectCollisionBounds ParallelBarsBounds =
 {
 	GameBoundingBox(
 		-640, 640,
 		704, 832,
 		-96, 96
 	),
-	ANGLE(-10.0f), ANGLE(10.0f),
-	ANGLE(-30.0f), ANGLE(30.0f),
-	ANGLE(-10.0f), ANGLE(10.0f)
+	std::pair(
+		EulerAngles(ANGLE(-10.0f), ANGLE(-30.0f), ANGLE(-10.0f)),
+		EulerAngles(ANGLE(10.0f), ANGLE(30.0f), ANGLE(10.0f))
+	)
 };
 
 void ControlAnimatingSlots(short itemNumber)
@@ -132,9 +133,9 @@ void TightropeCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* col
 	{
 		tightropeItem->Pose.Orientation.y += -ANGLE(180.0f);
 
-		if (TestLaraPosition(&TightRopeBounds, tightropeItem, laraItem))
+		if (TestLaraPosition(TightRopeBounds, tightropeItem, laraItem))
 		{
-			if (MoveLaraPosition(&TightRopePos, tightropeItem, laraItem))
+			if (MoveLaraPosition(TightRopePos, tightropeItem, laraItem))
 			{
 				laraItem->Animation.ActiveState = LS_TIGHTROPE_ENTER;
 				laraItem->Animation.AnimNumber = LA_TIGHTROPE_START;
@@ -176,12 +177,12 @@ void HorizontalBarCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo*
 		laraItem->Animation.ActiveState == LS_REACH &&
 		laraItem->Animation.AnimNumber == LA_REACH)
 	{
-		int test1 = TestLaraPosition(&ParallelBarsBounds, barItem, laraItem);
+		int test1 = TestLaraPosition(ParallelBarsBounds, barItem, laraItem);
 		int test2 = 0;
 		if (!test1)
 		{
 			barItem->Pose.Orientation.y += -ANGLE(180.0f);
-			test2 = TestLaraPosition(&ParallelBarsBounds, barItem, laraItem);
+			test2 = TestLaraPosition(ParallelBarsBounds, barItem, laraItem);
 			barItem->Pose.Orientation.y += -ANGLE(180);
 		}
 

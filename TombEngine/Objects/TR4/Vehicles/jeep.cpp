@@ -29,8 +29,8 @@ namespace TEN::Entities::Vehicles
 	char JeepSmokeStart;
 	bool JeepNoGetOff;
 
-	const vector<uint> JeepJoints = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 15, 16 };
-	const vector<uint> JeepBrakeLightJoints = { 15, 16 };
+	const vector<unsigned int> JeepJoints = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 15, 16 };
+	const vector<unsigned int> JeepBrakeLightJoints = { 15, 16 };
 
 	const vector<VehicleMountType> JeepMountTypes =
 	{

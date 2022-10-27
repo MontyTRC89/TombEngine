@@ -25,10 +25,10 @@ namespace TEN::Entities::TR4
 	const auto HorsemanBite1 = BiteInfo(Vector3::Zero, 6);
 	const auto HorsemanBite2 = BiteInfo(Vector3::Zero, 14);
 	const auto HorsemanBite3 = BiteInfo(Vector3::Zero, 10);
-	const vector<uint> HorsemanAxeAttackJoints = { 5, 6 };
-	const vector<uint> HorsemanKickAttackJoints = { 14 };
-	const vector<uint> HorsemanMountedAttackJoints = { 5, 6, 10 };
-	const vector<uint> HorsemanShieldAttackJoints = { 10 };
+	const vector<unsigned int> HorsemanAxeAttackJoints = { 5, 6 };
+	const vector<unsigned int> HorsemanKickAttackJoints = { 14 };
+	const vector<unsigned int> HorsemanMountedAttackJoints = { 5, 6, 10 };
+	const vector<unsigned int> HorsemanShieldAttackJoints = { 10 };
 
 	const auto HorseBite1 = BiteInfo(Vector3::Zero, 13);
 	const auto HorseBite2 = BiteInfo(Vector3::Zero, 17);

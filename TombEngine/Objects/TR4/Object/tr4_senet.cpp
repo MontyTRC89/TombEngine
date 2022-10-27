@@ -19,17 +19,18 @@ char SenetDisplacement, ActiveSenetPieces[6], SenetBoard[17];
 int SenetTargetX, SenetTargetZ;
 char ActivePiece = -1;
 
-static Vector3i GameStixPosition = { 0, 0, -100 };
-OBJECT_COLLISION_BOUNDS GameStixBounds =
+const auto GameStixPosition = Vector3i(0, 0, -100);
+const ObjectCollisionBounds GameStixBounds =
 {
 	GameBoundingBox(
-		-256, 256,
+		-CLICK(1), CLICK(1),
 		-200, 200,
-		-256, 256
+		-CLICK(1), CLICK(1)
 	),
-	ANGLE(-10.0f), ANGLE(10.0f),
-	ANGLE(-30.0f), ANGLE(30.0f),
-	0, 0
+	std::pair(
+		EulerAngles(ANGLE(-10.0f), ANGLE(-30.0f), 0),
+		EulerAngles(ANGLE(10.0f), ANGLE(30.0f), 0)
+	)
 };
 
 void InitialiseGameSticks(short itemNumber)
@@ -436,9 +437,9 @@ void GameSticksCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* co
 	{
 		laraItem->Pose.Orientation.y ^= 0x8000;
 
-		if (TestLaraPosition(&GameStixBounds, item, laraItem))
+		if (TestLaraPosition(GameStixBounds, item, laraItem))
 		{
-			if (MoveLaraPosition(&GameStixPosition, item, laraItem))
+			if (MoveLaraPosition(GameStixPosition, item, laraItem))
 			{
 				laraItem->Animation.AnimNumber = LA_SENET_ROLL;
 				laraItem->Animation.FrameNumber = g_Level.Anims[LA_SENET_ROLL].frameBase;

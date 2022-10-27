@@ -24,33 +24,32 @@ namespace TEN::Entities::Switches
 		TURN_SWITCH_CLOCKWISE
 	};
 
-	OBJECT_COLLISION_BOUNDS TurnSwitchBoundsA = 
+	const auto TurnSwitchPosA = Vector3i(650, 0, -138);
+	const auto TurnSwitchPos = Vector3i(650, 0, 138);
+	const ObjectCollisionBounds TurnSwitchBoundsA = 
 	{
 		GameBoundingBox(
-			512, 896,
+			SECTOR(0.5f), CLICK(3.5f),
 			0, 0,
-			-512, 0
+			-SECTOR(0.5f), 0
 		),
-		-ANGLE(10.0f), ANGLE(10.0f),
-		-ANGLE(30.0f), ANGLE(30.0f),
-		-ANGLE(10.0f), ANGLE(10.0f)
+		std::pair(
+			EulerAngles(ANGLE(-10.0f), ANGLE(-30.0f), ANGLE(-10.0f)),
+			EulerAngles(ANGLE(10.0f), ANGLE(30.0f), ANGLE(10.0f))
+		)
 	};
-
-	Vector3i TurnSwitchPos = { 650, 0, 138 }; 
-
-	OBJECT_COLLISION_BOUNDS TurnSwitchBoundsC =
+	const ObjectCollisionBounds TurnSwitchBoundsC =
 	{
 		GameBoundingBox(
-			512, 896,
+			SECTOR(0.5f), CLICK(3.5f),
 			0, 0,
-			0, 512
+			0, SECTOR(0.5f)
 		),
-		-ANGLE(10.0f), ANGLE(10.0f),
-		-ANGLE(30.0f), ANGLE(30.0f),
-		-ANGLE(10.0f), ANGLE(10.0f)
+		std::pair(
+			EulerAngles(ANGLE(-10.0f), ANGLE(-30.0f), ANGLE(-10.0f)),
+			EulerAngles(ANGLE(10.0f), ANGLE(30.0f), ANGLE(10.0f))
+		)
 	};
-
-	Vector3i TurnSwitchPosA = { 650, 0, -138 };
 
 	void TurnSwitchCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 	{
@@ -67,9 +66,9 @@ namespace TEN::Entities::Switches
 			switchItem->Animation.ActiveState == TURN_SWITCH_STOP ||
 			laraInfo->Control.IsMoving && laraInfo->InteractedItem == itemNumber)
 		{
-			if (TestLaraPosition(&TurnSwitchBoundsA, switchItem, laraItem))
+			if (TestLaraPosition(TurnSwitchBoundsA, switchItem, laraItem))
 			{
-				if (MoveLaraPosition(&TurnSwitchPosA, switchItem, laraItem))
+				if (MoveLaraPosition(TurnSwitchPosA, switchItem, laraItem))
 				{
 					laraItem->Animation.AnimNumber = LA_TURNSWITCH_GRAB_COUNTER_CLOCKWISE;
 					laraItem->Animation.FrameNumber = g_Level.Anims[LA_TURNSWITCH_GRAB_COUNTER_CLOCKWISE].frameBase;
@@ -87,9 +86,9 @@ namespace TEN::Entities::Switches
 			else
 			{
 				laraItem->Pose.Orientation.y ^= (short)ANGLE(180.0f);
-				if (TestLaraPosition(&TurnSwitchBoundsC, switchItem, laraItem))
+				if (TestLaraPosition(TurnSwitchBoundsC, switchItem, laraItem))
 				{
-					if (MoveLaraPosition(&TurnSwitchPos, switchItem, laraItem))
+					if (MoveLaraPosition(TurnSwitchPos, switchItem, laraItem))
 					{
 						laraItem->Animation.AnimNumber = LA_TURNSWITCH_GRAB_CLOCKWISE;
 						laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;

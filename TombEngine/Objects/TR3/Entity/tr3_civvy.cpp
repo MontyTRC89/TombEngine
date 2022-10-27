@@ -37,7 +37,7 @@ namespace TEN::Entities::Creatures::TR3
 	#define CIVVY_RUN_TURN_RATE_MAX	 ANGLE(6.0f)
 
 	const auto CivvyBite = BiteInfo(Vector3::Zero, 13);
-	const vector<uint> CivvyAttackJoints = { 10, 13 };
+	const vector<unsigned int> CivvyAttackJoints = { 10, 13 };
 
 	// TODO
 	enum CivvyState

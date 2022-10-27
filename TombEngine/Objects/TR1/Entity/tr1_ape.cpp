@@ -37,7 +37,7 @@ namespace TEN::Entities::Creatures::TR1
 	#define APE_DISPLAY_ANGLE	  ANGLE(45.0f)
 
 	const auto ApeBite = BiteInfo(Vector3(0.0f, -19.0f, 75.0f), 15);
-	const vector<uint> ApeAttackJoints = { 8, 9, 10, 11, 12, 13, 14, 15 };
+	const vector<unsigned int> ApeAttackJoints = { 8, 9, 10, 11, 12, 13, 14, 15 };
 
 	enum ApeState
 	{

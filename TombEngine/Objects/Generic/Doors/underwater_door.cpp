@@ -23,18 +23,18 @@ using namespace TEN::Input;
 
 namespace TEN::Entities::Doors
 {
-	Vector3i UnderwaterDoorPos(-251, -540, -46);
-
-	OBJECT_COLLISION_BOUNDS UnderwaterDoorBounds =
+	const auto UnderwaterDoorPos = Vector3i(-251, -540, -46);
+	const ObjectCollisionBounds UnderwaterDoorBounds =
 	{
 		GameBoundingBox(
-			-256, 256,
-			-1024, 0, 
-			-1024, 0
+			-CLICK(1), CLICK(1),
+			-SECTOR(1), 0,
+			-SECTOR(1), 0
 		),
-		-ANGLE(80.0f), ANGLE(80.0f),
-		-ANGLE(80.0f), ANGLE(80.0f),
-		-ANGLE(80.0f), ANGLE(80.0f)
+		std::pair(
+			EulerAngles(ANGLE(-80.0f), ANGLE(-80.0f), ANGLE(-80.0f)),
+			EulerAngles(ANGLE(80.0f), ANGLE(80.0f), ANGLE(80.0f))
+		)
 	};
 
 	void UnderwaterDoorCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
@@ -45,15 +45,16 @@ namespace TEN::Entities::Doors
 		if (TrInput & IN_ACTION &&
 			laraItem->Animation.ActiveState == LS_UNDERWATER_IDLE &&
 			laraInfo->Control.WaterStatus == WaterStatus::Underwater &&
-			!(doorItem->Status && doorItem->Animation.IsAirborne) &&
+			doorItem->Status != ITEM_ACTIVE &&
+			!doorItem->Animation.IsAirborne &&
 			laraInfo->Control.HandStatus == HandStatus::Free ||
 			laraInfo->Control.IsMoving && laraInfo->InteractedItem == itemNumber)
 		{
 			laraItem->Pose.Orientation.y ^= ANGLE(180.0f);
 
-			if (TestLaraPosition(&UnderwaterDoorBounds, doorItem, laraItem))
+			if (TestLaraPosition(UnderwaterDoorBounds, doorItem, laraItem))
 			{
-				if (MoveLaraPosition(&UnderwaterDoorPos, doorItem, laraItem))
+				if (MoveLaraPosition(UnderwaterDoorPos, doorItem, laraItem))
 				{
 					SetAnimation(laraItem, LA_UNDERWATER_DOOR_OPEN);
 					laraItem->Animation.Velocity.y = 0;

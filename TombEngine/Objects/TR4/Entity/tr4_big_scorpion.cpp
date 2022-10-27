@@ -29,7 +29,7 @@ namespace TEN::Entities::TR4
 
 	const auto BigScorpionBite1 = BiteInfo(Vector3::Zero, 8);
 	const auto BigScorpionBite2 = BiteInfo(Vector3::Zero, 23);
-	const vector<uint> BigScorpionAttackJoints = { 8, 20, 21, 23, 24 };
+	const vector<unsigned int> BigScorpionAttackJoints = { 8, 20, 21, 23, 24 };
 
 	int CutSeqNum;
 

@@ -32,20 +32,21 @@ namespace TEN::Entities::Doors
 		STATE_PUSHPULL_KICK_DOOR_PULL = 3
 	};
 
-	Vector3i PullDoorPos(-201, 0, 322);
-	Vector3i PushDoorPos(201, 0, -702);
-	Vector3i KickDoorPos(0, 0, -917);
+	const Vector3i PullDoorPos(-201, 0, 322);
+	const Vector3i PushDoorPos(201, 0, -702);
+	const Vector3i KickDoorPos(0, 0, -917);
 
-	OBJECT_COLLISION_BOUNDS PushPullKickDoorBounds =
+	const ObjectCollisionBounds PushPullKickDoorBounds =
 	{
 		GameBoundingBox(
 			-384, 384,
 			0, 0,
-			-1024, 512
+			-SECTOR(1), SECTOR(0.5f)
 		),
-		-ANGLE(10.0f), ANGLE(10.0f),
-		-ANGLE(30.0f), ANGLE(30.0f),
-		-ANGLE(10.0f), ANGLE(10.0f),
+		std::pair(
+			EulerAngles(ANGLE(-10.0f), ANGLE(-30.0f), ANGLE(-10.0f)),
+			EulerAngles(ANGLE(10.0f), ANGLE(30.0f), ANGLE(10.0f))
+		)
 	};
 
 	void PushPullKickDoorCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
@@ -69,13 +70,13 @@ namespace TEN::Entities::Doors
 				pull = true;
 			}
 
-			if (TestLaraPosition(&PushPullKickDoorBounds, doorItem, laraItem))
+			if (TestLaraPosition(PushPullKickDoorBounds, doorItem, laraItem))
 			{
 				bool openTheDoor = false;
 
 				if (pull)
 				{
-					if (MoveLaraPosition(&PullDoorPos, doorItem, laraItem))
+					if (MoveLaraPosition(PullDoorPos, doorItem, laraItem))
 					{
 						SetAnimation(laraItem, LA_DOOR_OPEN_PULL);
 						doorItem->Animation.TargetState = STATE_PUSHPULL_KICK_DOOR_PULL;
@@ -88,7 +89,7 @@ namespace TEN::Entities::Doors
 				{
 					if (doorItem->ObjectNumber >= ID_KICK_DOOR1)
 					{
-						if (MoveLaraPosition(&KickDoorPos, doorItem, laraItem))
+						if (MoveLaraPosition(KickDoorPos, doorItem, laraItem))
 						{
 							SetAnimation(laraItem, LA_DOOR_OPEN_KICK);
 							doorItem->Animation.TargetState = STATE_PUSHPULL_KICK_DOOR_PUSH;
@@ -99,7 +100,7 @@ namespace TEN::Entities::Doors
 					}
 					else
 					{
-						if (MoveLaraPosition(&PushDoorPos, doorItem, laraItem))
+						if (MoveLaraPosition(PushDoorPos, doorItem, laraItem))
 						{
 							SetAnimation(laraItem, LA_DOOR_OPEN_PUSH);
 							doorItem->Animation.TargetState = STATE_PUSHPULL_KICK_DOOR_PUSH;

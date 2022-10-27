@@ -54,7 +54,7 @@ namespace TEN::Entities::TR4
 {
 	const auto BaddyGunBite	  = BiteInfo(Vector3(0.0f, -16.0f, 200.0f), 11);
 	const auto BaddySwordBite = BiteInfo(Vector3::Zero, 15);
-	const vector<uint> BaddySwordAttackJoints = { 14, 15, 16 };
+	const vector<unsigned int> BaddySwordAttackJoints = { 14, 15, 16 };
 
 	#define BADDY_USE_UZI	24
 

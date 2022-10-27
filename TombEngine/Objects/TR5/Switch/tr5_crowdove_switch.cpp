@@ -17,19 +17,19 @@ using namespace TEN::Input;
 
 namespace TEN::Entities::Switches
 {
-	OBJECT_COLLISION_BOUNDS CrowDoveBounds =
+	const ObjectCollisionBounds CrowDoveBounds =
 	{
 		GameBoundingBox(
-			-256, 256,
+			-CLICK(1), CLICK(1),
 			0, 0,
-			-512, 512
+			-SECTOR(0.5f), SECTOR(0.5f)
 		),
-		-ANGLE(10.0f), ANGLE(10.0f),
-		-ANGLE(30.0f), ANGLE(30.0f),
-		-ANGLE(10.0f), ANGLE(10.0f)
+		std::pair(
+			EulerAngles(ANGLE(-10.0f), ANGLE(-30.0f), ANGLE(-10.0f)),
+			EulerAngles(ANGLE(10.0f), ANGLE(30.0f), ANGLE(10.0f))
+		)
 	};
-
-	auto CrowDovePos = Vector3i(0, 0, -400);
+	const auto CrowDovePos = Vector3i(0, 0, -400);
 
 	void InitialiseCrowDoveSwitch(short itemNumber)
 	{
@@ -57,9 +57,9 @@ namespace TEN::Entities::Switches
 		{
 			int oldYrot = switchItem->Pose.Orientation.y;
 			switchItem->Pose.Orientation.y = laraItem->Pose.Orientation.y;
-			if (TestLaraPosition(&CrowDoveBounds, switchItem, laraItem))
+			if (TestLaraPosition(CrowDoveBounds, switchItem, laraItem))
 			{
-				if (MoveLaraPosition(&CrowDovePos, switchItem, laraItem))
+				if (MoveLaraPosition(CrowDovePos, switchItem, laraItem))
 				{
 					laraItem->Animation.AnimNumber = LA_DOVESWITCH_TURN;
 					laraItem->Animation.ActiveState = LS_DOVE_SWITCH;
