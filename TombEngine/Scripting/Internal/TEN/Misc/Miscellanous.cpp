@@ -180,12 +180,7 @@ namespace Misc
 	static void KeyClear(int actionIndex)
 	{
 		TrInput &= ~(1 << actionIndex);
-	}
-
-	static void KeyClearInventory()
-	{
-		TrInput &= ~(1 << 13);
-		DbInput &= ~(1 << 13);
+		DbInput &= ~(1 << actionIndex);
 	}
 
 	///Do FlipMap with specific ID
@@ -341,7 +336,6 @@ namespace Misc
 		table_misc.set_function(ScriptReserved_PlayFlyBy, &PlayFlyBy);
 
 		table_misc.set_function(ScriptReserved_ResetObjCamera, &ResetObjCamera);
-		table_misc.set_function(ScriptReserved_KeyClearInventory, &KeyClearInventory);
 
 	}
 }
