@@ -1,6 +1,6 @@
 #pragma once
-#include "Game/items.h"
 #include "Game/control/control.h"
+#include "Game/items.h"
 
 #define EffectFunction void(ItemInfo* item)
 
@@ -41,5 +41,7 @@ void MeshSwapToPour(ItemInfo* item);
 void MeshSwapFromPour(ItemInfo* item); 
 void FlashOrange(ItemInfo* item);
 void ClearSwarmEnemies(ItemInfo* item);
+void Turn90(ItemInfo* item);
+void Turn270(ItemInfo* item);
 
 void DoFlipEffect(int number, ItemInfo* item = nullptr);

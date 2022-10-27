@@ -2697,7 +2697,6 @@ bool TestLaraLadderDismountBottom(ItemInfo* item, CollisionInfo* coll)
 
 bool TestLaraLadderSideDismount(ItemInfo* item, CollisionInfo* coll, bool isGoingLeft)
 {
-	return false;
 	static constexpr int probeDist	= CLICK(1.5f);
 	static constexpr int floorBound = CLICK(0.25f);
 
@@ -2714,7 +2713,6 @@ bool TestLaraLadderSideDismount(ItemInfo* item, CollisionInfo* coll, bool isGoin
 
 	// Assess point collision.
 	if ((pointColl.Position.Floor - vPos) <= floorBound &&						  // Floor height is within upper/lower floor bound.
-		(pointColl.Position.Ceiling - vPos) < -LARA_HEIGHT &&					  // Ceiling height is within highest ceiling bound.
 		abs(pointColl.Position.Ceiling - pointColl.Position.Floor) > LARA_HEIGHT) // Space isn't too narrow.
 	{
 		return true;

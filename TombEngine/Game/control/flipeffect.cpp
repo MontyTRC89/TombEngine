@@ -3,12 +3,12 @@
 
 #include "Game/camera.h"
 #include "Game/collision/collide_room.h"
-#include "Game/control/lot.h"
+#include "Game/effects/debris.h"
+#include "Game/effects/footprint.h"
 #include "Game/effects/hair.h"
+#include "Game/control/lot.h"
 #include "Game/effects/tomb4fx.h"
 #include "Game/effects/weather.h"
-#include "Game/effects/footprint.h"
-#include "Game/effects/debris.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_fire.h"
@@ -17,16 +17,16 @@
 #include "Sound/sound.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
+#include "Objects/Effects/tr4_locusts.h"
 #include "Objects/Generic/puzzles_keys.h"
 #include "Objects/TR4/Entity/tr4_beetle_swarm.h"
-#include "Objects/TR5/Emitter/tr5_spider_emitter.h"
 #include "Objects/TR5/Emitter/tr5_rats_emitter.h"
+#include "Objects/TR5/Emitter/tr5_spider_emitter.h"
 #include "Objects/TR5/Object/tr5_pushableblock.h"
-#include "Objects/Effects/tr4_locusts.h"
 
-using std::function;
-using namespace TEN::Effects::Footprints;
 using namespace TEN::Effects::Environment;
+using namespace TEN::Effects::Footprints;
+using std::function;
 
 int FlipEffect;
 
@@ -66,8 +66,8 @@ function<EffectFunction> effect_routines[NUM_FLIPEFFECTS] =
 	ClearSwarmEnemies,			//31
 	AddLeftFootprint,			//32
 	AddRightFootprint,			//33
-	VoidEffect,					//34
-	VoidEffect,					//35
+	Turn90,						//34
+	Turn270,					//35
 	VoidEffect,					//36
 	VoidEffect,					//37
 	VoidEffect,					//38
@@ -319,7 +319,7 @@ void FloorShake(ItemInfo* item)
 		y < SECTOR(16) &&
 		z < SECTOR(16))
 	{
-		Camera.bounce = 66 * ((pow(x, 2) + pow(y, 2) + pow(z, 2)) / CLICK(1) - pow(SECTOR(1), 2)) / pow(SECTOR(1), 2);
+		Camera.bounce = 66 * ((SQUARE(x) + SQUARE(y) + SQUARE(z)) / CLICK(1) - SQUARE(SECTOR(1))) / SQUARE(SECTOR(1));
 	}
 }
 
@@ -328,6 +328,16 @@ void Turn180(ItemInfo* item)
 	item->Pose.Orientation.x = -item->Pose.Orientation.x;
 	item->Pose.Orientation.y += ANGLE(180.0f);
 	item->Pose.Orientation.z = -item->Pose.Orientation.z;
+}
+
+void Turn90(ItemInfo* item)
+{
+	item->Pose.Orientation.y += ANGLE(90.0f);
+}
+
+void Turn270(ItemInfo* item)
+{
+	item->Pose.Orientation.y -= ANGLE(90.0f);
 }
 
 void FinishLevel(ItemInfo* item)
