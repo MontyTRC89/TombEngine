@@ -111,7 +111,6 @@ static constexpr char ScriptReserved_EndLevel[]					= "EndLevel";
 static constexpr char ScriptReserved_GetSecretCount[]			= "GetSecretCount";
 static constexpr char ScriptReserved_SetSecretCount[]			= "SetSecretCount";
 static constexpr char ScriptReserved_AddSecret[]				= "AddSecret";
-static constexpr char ScriptReserved_EnableFlyCheat[]			= "EnableFlyCheat";
 
 // Flow Functions
 static constexpr char ScriptReserved_SetStrings[]			= "SetStrings";
@@ -183,7 +182,6 @@ static constexpr char ScriptReserved_UndrawWeapons[]				= "UndrawWeapons";
 static constexpr char ScriptReserved_GetLaraHandStatus[]			= "GetLaraHandStatus";
 static constexpr char ScriptReserved_GetLaraWeaponType[]			= "GetLaraWeaponType";
 static constexpr char ScriptReserved_ThrowawayTorch[]				= "ThrowawayTorch";
-static constexpr char ScriptReserved_KeyClearInventory[]			= "KeyClearInventory";
 static constexpr char ScriptReserved_SetLaraWeaponType[]			= "SetLaraWeaponType";
 
 // Enums
