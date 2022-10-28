@@ -16,7 +16,7 @@
 #include "Game/people.h"
 #include "Specific/input.h"
 #include "Specific/level.h"
-#include "Specific/prng.h"
+#include "Math/Random.h"
 #include "Specific/setup.h"
 
 using namespace TEN::Input;
@@ -26,15 +26,18 @@ namespace TEN::Entities::TR4
 {
 	const auto SASGunBite = BiteInfo(Vector3(0.0f, 300.0f, 64.0f), 7);
 
-	auto SASDragBodyPosition = Vector3Int(0, 0, -460);
-	OBJECT_COLLISION_BOUNDS SASDragBodyBounds =
+	const auto SASDragBodyPosition = Vector3i(0, 0, -460);
+	const ObjectCollisionBounds SASDragBodyBounds =
 	{
-		-256, 256,
-		-64, 100,
-		-200, -460,
-		ANGLE(-10.0f), ANGLE(10.0f),
-		ANGLE(-30.0f), ANGLE(30.0f),
-		0, 0
+		GameBoundingBox(
+			-CLICK(1), CLICK(1),
+			-CLICK(0.25f), 100,
+			-200, -460
+		),
+		std::pair(
+			EulerAngles(ANGLE(-10.0f), ANGLE(-30.0f), 0),
+			EulerAngles(ANGLE(10.0f), ANGLE(30.0f), 0)
+		)
 	};
 
 	enum SASState
@@ -123,9 +126,7 @@ namespace TEN::Entities::TR4
 		// Handle SAS firing.
 		if (creature->FiredWeapon)
 		{
-			auto pos = Vector3Int(SASGunBite.Position);
-			GetJointAbsPosition(item, &pos, SASGunBite.meshNum);
-
+			auto pos = GetJointPosition(item, SASGunBite.meshNum, Vector3i(SASGunBite.Position));
 			TriggerDynamicLight(pos.x, pos.y, pos.z, 10, 24, 16, 4);
 			creature->FiredWeapon--;
 		}
@@ -565,9 +566,7 @@ namespace TEN::Entities::TR4
 			grenadeItem->ObjectNumber = ID_GRENADE;
 			grenadeItem->RoomNumber = item->RoomNumber;
 
-			auto pos = Vector3Int(SASGunBite.Position);
-			GetJointAbsPosition(item, &pos, SASGunBite.meshNum);
-
+			auto pos = GetJointPosition(item, SASGunBite.meshNum, Vector3i(SASGunBite.Position));
 			grenadeItem->Pose.Position = pos;
 
 			auto probe = GetCollision(pos.x, pos.y, pos.z, grenadeItem->RoomNumber);
@@ -575,7 +574,7 @@ namespace TEN::Entities::TR4
 
 			if (probe.Position.Floor < grenadeItem->Pose.Position.y)
 			{
-				grenadeItem->Pose.Position = Vector3Int(item->Pose.Position.x, probe.Position.Floor, item->Pose.Position.z);
+				grenadeItem->Pose.Position = Vector3i(item->Pose.Position.x, probe.Position.Floor, item->Pose.Position.z);
 				grenadeItem->RoomNumber = item->RoomNumber;
 			}
 
@@ -678,9 +677,9 @@ namespace TEN::Entities::TR4
 		}
 		else
 		{
-			if (TestLaraPosition(&SASDragBodyBounds, item, laraItem))
+			if (TestLaraPosition(SASDragBodyBounds, item, laraItem))
 			{
-				if (MoveLaraPosition(&SASDragBodyPosition, item, laraItem))
+				if (MoveLaraPosition(SASDragBodyPosition, item, laraItem))
 				{
 					laraItem->Animation.AnimNumber = LA_DRAG_BODY;
 					laraItem->Animation.ActiveState = LS_MISC_CONTROL;

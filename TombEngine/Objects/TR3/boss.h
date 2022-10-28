@@ -1,9 +1,9 @@
 #pragma once
-#include "Specific/phd_global.h"
+#include "Math/Math.h"
 
 struct BOSS_STRUCT
 {
-	Vector3Int BeamTarget;
+	Vector3i BeamTarget;
 	bool DroppedIcon;
 	bool IsInvincible;
 	bool DrawExplode; // allow explosion geometry

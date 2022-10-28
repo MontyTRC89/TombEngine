@@ -13,7 +13,7 @@
 #include "Renderer/Renderer11Enums.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
-#include "Specific/prng.h"
+#include "Math/Random.h"
 #include "Specific/setup.h"
 
 using namespace TEN::Math::Random;
@@ -31,8 +31,8 @@ namespace TEN::Entities::Creatures::TR3
 
 	const auto ShivaBiteLeft  = BiteInfo(Vector3(0.0f, 0.0f, 920.0f), 13);
 	const auto ShivaBiteRight = BiteInfo(Vector3(0.0f, 0.0f, 920.0f), 22);
-	const vector<uint> ShivaAttackLeftJoints	 = { 10, 13 };
-	const vector<uint> ShivaAttackRightJoints = { 22, 25 };
+	const vector<unsigned int> ShivaAttackLeftJoints	 = { 10, 13 };
+	const vector<unsigned int> ShivaAttackRightJoints = { 22, 25 };
 
 	enum ShivaState
 	{
@@ -210,13 +210,13 @@ namespace TEN::Entities::Creatures::TR3
 		auto* item = &g_Level.Items[itemNumber];
 		auto* creature = GetCreatureInfo(item);
 
-		auto pos = Vector3Int(0, 0, CLICK(1));
+		auto pos = Vector3i(0, 0, CLICK(1));
 		bool isLaraAlive = LaraItem->HitPoints > 0;
 
 		short angle = 0;
 		short tilt = 0;
-		Vector3Shrt extraHeadRot = Vector3Shrt::Zero;
-		Vector3Shrt extraTorsoRot = Vector3Shrt::Zero;
+		EulerAngles extraHeadRot = EulerAngles::Zero;
+		EulerAngles extraTorsoRot = EulerAngles::Zero;
 
 		if (item->HitPoints <= 0)
 		{
@@ -247,6 +247,7 @@ namespace TEN::Entities::Creatures::TR3
 				item->MeshBits = ALL_JOINT_BITS;
 
 			int effectMesh = 0;
+			auto pos = Vector3i(0, 0, CLICK(1));
 
 			switch (item->Animation.ActiveState)
 			{
@@ -261,7 +262,7 @@ namespace TEN::Entities::Creatures::TR3
 					item->MeshBits = (item->MeshBits.ToPackedBits() * 2) + 1;
 					creature->Flags = 1;
 
-					GetJointAbsPosition(item, &pos, effectMesh++);
+					pos = GetJointPosition(item, effectMesh++, pos);
 					TriggerExplosionSparks(pos.x, pos.y, pos.z, 2, 0, 0, item->RoomNumber);
 					TriggerShivaSmoke(pos.x, pos.y, pos.z, 1);
 
@@ -432,7 +433,7 @@ namespace TEN::Entities::Creatures::TR3
 				if (AI.ahead)
 				{
 					extraHeadRot.y = AI.angle;
-					extraTorsoRot = Vector3Shrt(AI.xAngle, AI.angle, 0);
+					extraTorsoRot = EulerAngles(AI.xAngle, AI.angle, 0);
 				}
 
 				ShivaDamage(item, creature, SHIVA_GRAB_ATTACK_DAMAGE);
@@ -451,8 +452,8 @@ namespace TEN::Entities::Creatures::TR3
 
 			case SHIVA_STATE_KILL:
 				creature->MaxTurn = 0;
-				extraHeadRot = Vector3Shrt::Zero;
-				extraTorsoRot = Vector3Shrt::Zero;
+				extraHeadRot = EulerAngles::Zero;
+				extraTorsoRot = EulerAngles::Zero;
 
 				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + SHIVA_ANIM_WALK_FORWARD_TO_GUARDED_LEFT_1 ||
 					item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + SHIVA_ANIM_WALK_BACK_RIGHT ||
@@ -480,7 +481,7 @@ namespace TEN::Entities::Creatures::TR3
 			LaraItem->Animation.TargetState = LS_DEATH;
 			LaraItem->Animation.IsAirborne = false;
 			LaraItem->Pose.Position = item->Pose.Position;
-			LaraItem->Pose.Orientation = Vector3Shrt(0, item->Pose.Orientation.y, 0);
+			LaraItem->Pose.Orientation = EulerAngles(0, item->Pose.Orientation.y, 0);
 			LaraItem->HitPoints = NOT_TARGETABLE;
 			Lara.Air = -1;
 			Lara.Control.HandStatus = HandStatus::Special;

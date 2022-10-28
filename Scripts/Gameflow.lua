@@ -11,6 +11,9 @@ Flow.SetIntroImagePath("Screens\\main.jpg")
 
 Flow.SetTitleScreenImagePath("Screens\\main.jpg")
 
+-- Disable/enable flycheat globally
+
+Flow.EnableFlyCheat(true)
 
 --------------------------------------------------
 

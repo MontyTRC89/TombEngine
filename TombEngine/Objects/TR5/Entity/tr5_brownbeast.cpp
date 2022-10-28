@@ -10,7 +10,7 @@
 #include "Game/Lara/lara.h"
 #include "Sound/sound.h"
 #include "Specific/setup.h"
-#include "Specific/prng.h"
+#include "Math/Random.h"
 #include "Specific/level.h"
 
 using namespace TEN::Math::Random;
@@ -22,8 +22,8 @@ namespace TEN::Entities::Creatures::TR5
 
 	const auto BrownBeastBite1 = BiteInfo(Vector3::Zero, 16);
 	const auto BrownBeastBite2 = BiteInfo(Vector3::Zero, 22);
-	const vector<uint> BrownBeastAttackJoints1 = { 14, 15, 16, 17 };
-	const vector<uint> BrownBeastAttackJoints2 = { 20, 21, 22, 23 };
+	const vector<unsigned int> BrownBeastAttackJoints1 = { 14, 15, 16, 17 };
+	const vector<unsigned int> BrownBeastAttackJoints2 = { 20, 21, 22, 23 };
 
 	// TODO
 	enum BrownBeastState

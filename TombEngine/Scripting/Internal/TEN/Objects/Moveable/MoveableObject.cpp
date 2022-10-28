@@ -7,7 +7,7 @@
 #include "Objects/objectslist.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
-#include "Specific/trmath.h"
+#include "Math/Math.h"
 
 #include "ScriptAssert.h"
 #include "MoveableObject.h"
@@ -567,9 +567,7 @@ void Moveable::SetPos(Vec3 const& pos, sol::optional<bool> updateRoom)
 
 Vec3 Moveable::GetJointPos(int jointIndex) const
 {
-	Vector3Int result = {};
-	GetJointAbsPosition(m_item, &result, jointIndex);
-
+	auto result = GetJointPosition(m_item, jointIndex);
 	return Vec3(result.x, result.y, result.z);
 }
 

@@ -15,7 +15,7 @@
 #include "Sound/sound.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
-#include "Specific/trmath.h"
+#include "Math/Math.h"
 #include "input.h"
 
 using namespace TEN::Input;
@@ -45,14 +45,13 @@ namespace TEN::Entities::Effects
 		{ 55, 55 }
 	};
 
-	OBJECT_COLLISION_BOUNDS FireBounds =
+	ObjectCollisionBounds FireBounds =
 	{
-		0, 0, 
-		0, 0, 
-		0, 0, 
-		-ANGLE(10.0f), ANGLE(10.0f),
-		-ANGLE(30.0f), ANGLE(30.0f),
-		-ANGLE(10.0f), ANGLE(10.0f)
+		GameBoundingBox::Zero,
+		std::pair(
+			EulerAngles(ANGLE(-10.0f), ANGLE(-30.0f), ANGLE(-10.0f)),
+			EulerAngles(ANGLE(10.0f), ANGLE(30.0f), ANGLE(10.0f))
+		)
 	};
 
 	bool FlameEmitterFlags[8];
@@ -154,7 +153,7 @@ namespace TEN::Entities::Effects
 				SoundEffect(SFX_TR4_LOOP_FOR_SMALL_FIRES, &item->Pose);
 
 				if (!Lara.Burn &&
-					ItemNearLara(&item->Pose.Position, 600) &&
+					ItemNearLara(item->Pose.Position, 600) &&
 					(pow(LaraItem->Pose.Position.x - item->Pose.Position.x, 2) +
 						pow(LaraItem->Pose.Position.z - item->Pose.Position.z, 2) < pow(SECTOR(0.5f), 2)) &&
 					Lara.Control.WaterStatus != WaterStatus::FlyCheat)
@@ -274,11 +273,7 @@ namespace TEN::Entities::Effects
 		{
 			if (!(Wibble & 0xC))
 			{
-				fx->pos.Position.x = 0;
-				fx->pos.Position.y = 0;
-				fx->pos.Position.z = 0;
-
-				GetLaraJointPosition((Vector3Int*)&fx->pos, i);
+				fx->pos.Position = GetJointPosition(LaraItem, i);
 
 				// TR5 code?
 				if (Lara.BurnCount)
@@ -295,8 +290,7 @@ namespace TEN::Entities::Effects
 		byte r = (GetRandomControl() & 0x3F) + 192;
 		byte g = (GetRandomControl() & 0x1F) + 96;
 
-		auto pos = Vector3Int();
-		GetLaraJointPosition(&pos, LM_HIPS);
+		auto pos = GetJointPosition(LaraItem, LM_HIPS);
 
 		if (!Lara.BurnSmoke)
 		{
@@ -480,45 +474,21 @@ namespace TEN::Entities::Effects
 				byte g = (GetRandomControl() & 0x3F) + 192;
 				byte b = (GetRandomControl() & 0x3F) + 192;
 
-				auto src = item->Pose.Position;
-				Vector3Int dest;
+				auto origin = item->Pose.Position;
+				Vector3i target;
 
 				if (!(GlobalCounter & 3))
 				{
 					if (item->TriggerFlags == 2 || item->TriggerFlags == 4)
 					{
-						dest.x = item->Pose.Position.x + 2048 * phd_sin(item->Pose.Orientation.y + ANGLE(180));
-						dest.y = item->Pose.Position.y;
-						dest.z = item->Pose.Position.z + 2048 * phd_cos(item->Pose.Orientation.y + ANGLE(180));
+						target.x = item->Pose.Position.x + 2048 * phd_sin(item->Pose.Orientation.y + ANGLE(180.0f));
+						target.y = item->Pose.Position.y;
+						target.z = item->Pose.Position.z + 2048 * phd_cos(item->Pose.Orientation.y + ANGLE(180.0f));
 
 						if (GetRandomControl() & 3)
-						{
-							TriggerLightning(
-								&src, 
-								&dest, 
-								(GetRandomControl() & 0x1F) + 64, 
-								0, 
-								g, 
-								b, 
-								24, 
-								0, 
-								32, 
-								3);
-						}
+							TriggerLightning(&origin, &target, (GetRandomControl() & 0x1F) + 64, 0, g, b, 24, 0, 32, 3);
 						else
-						{
-							TriggerLightning(
-								&src, 
-								&dest, 
-								(GetRandomControl() & 0x1F) + 96,
-								0,
-								g, 
-								b,
-								32,
-								LI_SPLINE,
-								32, 
-								3);
-						}
+							TriggerLightning(&origin, &target, (GetRandomControl() & 0x1F) + 96, 0, g, b, 32, LI_SPLINE, 32, 3);
 					}
 				}
 
@@ -527,67 +497,32 @@ namespace TEN::Entities::Effects
 					short targetItemNumber = item->ItemFlags[((GlobalCounter >> 2) & 1) + 2];
 					auto* targetItem = &g_Level.Items[targetItemNumber];
 
-					dest = Vector3Int(0, -64, 20);
-					GetJointAbsPosition(targetItem, &dest, 0);
+					target = GetJointPosition(targetItem, 0, Vector3i(0, -64, 20));
 
 					if (!(GlobalCounter & 3))
 					{
 						if (GetRandomControl() & 3)
-						{
-							TriggerLightning(
-								&src, 
-								&dest,
-								(GetRandomControl() & 0x1F) + 64,
-								0,
-								g,
-								b,
-								24, 
-								0, 
-								32,
-								5);
-						}
+							TriggerLightning(&origin, &target, (GetRandomControl() & 0x1F) + 64, 0, g, b, 24, 0, 32, 5);
 						else
-						{
-							TriggerLightning(
-								&src,
-								&dest,
-								(GetRandomControl() & 0x1F) + 96,
-								0,
-								g,
-								b,
-								32,
-								LI_SPLINE,
-								32,
-								5);
-						}
+							TriggerLightning(&origin, &target, (GetRandomControl() & 0x1F) + 96, 0, g, b, 32, LI_SPLINE, 32, 5);
 					}
 
 					if (item->TriggerFlags != 3 || targetItem->TriggerFlags)
-						TriggerLightningGlow(dest.x, dest.y, dest.z, 64, 0, g, b);
+						TriggerLightningGlow(target.x, target.y, target.z, 64, 0, g, b);
 				}
 
 				if ((GlobalCounter & 3) == 2)
 				{
-					src = item->Pose.Position;
+					origin = item->Pose.Position;
 
-					dest = Vector3Int(
-						(GetRandomControl() & 0x1FF) + src.x - 256,
-						(GetRandomControl() & 0x1FF) + src.y - 256,
-						(GetRandomControl() & 0x1FF) + src.z - 256
+					target = Vector3i(
+						(GetRandomControl() & 0x1FF) + origin.x - 256,
+						(GetRandomControl() & 0x1FF) + origin.y - 256,
+						(GetRandomControl() & 0x1FF) + origin.z - 256
 					);
 
-					TriggerLightning(
-						&src, 
-						&dest, 
-						(GetRandomControl() & 0xF) + 16,
-						0,
-						g,
-						b,
-						24, 
-						LI_SPLINE | LI_MOVEEND,
-						32,
-						3);
-					TriggerLightningGlow(dest.x, dest.y, dest.z, 64, 0, g, b);
+					TriggerLightning(&origin, &target, (GetRandomControl() & 0xF) + 16, 0, g, b, 24, LI_SPLINE | LI_MOVEEND, 32, 3);
+					TriggerLightningGlow(target.x, target.y, target.z, 64, 0, g, b);
 				}
 			}
 			else
@@ -626,7 +561,7 @@ namespace TEN::Entities::Effects
 				TriggerDynamicLight(x, item->Pose.Position.y, z, 12, (GetRandomControl() & 0x3F) + 192, ((GetRandomControl() >> 4) & 0x1F) + 96, 0);
 
 				auto pos = item->Pose.Position;
-				if (ItemNearLara(&pos, 600))
+				if (ItemNearLara(pos, 600))
 				{
 					if ((!Lara.Burn) && Lara.Control.WaterStatus != WaterStatus::FlyCheat)
 					{
@@ -665,37 +600,37 @@ namespace TEN::Entities::Effects
 			switch (item->ObjectNumber)
 			{
 			case ID_FLAME_EMITTER:
-				FireBounds.boundingBox.X1 = -256;
-				FireBounds.boundingBox.X2 = 256;
-				FireBounds.boundingBox.Y1 = 0;
-				FireBounds.boundingBox.Y2 = 1024;
-				FireBounds.boundingBox.Z1 = -800;
-				FireBounds.boundingBox.Z2 = 800;
+				FireBounds.BoundingBox.X1 = -256;
+				FireBounds.BoundingBox.X2 = 256;
+				FireBounds.BoundingBox.Y1 = 0;
+				FireBounds.BoundingBox.Y2 = 1024;
+				FireBounds.BoundingBox.Z1 = -800;
+				FireBounds.BoundingBox.Z2 = 800;
 				break;
 
 			case ID_FLAME_EMITTER2:
-				FireBounds.boundingBox.X1 = -256;
-				FireBounds.boundingBox.X2 = 256;
-				FireBounds.boundingBox.Y1 = 0;
-				FireBounds.boundingBox.Y2 = 1024;
-				FireBounds.boundingBox.Z1 = -600;
-				FireBounds.boundingBox.Z2 = 600;
+				FireBounds.BoundingBox.X1 = -256;
+				FireBounds.BoundingBox.X2 = 256;
+				FireBounds.BoundingBox.Y1 = 0;
+				FireBounds.BoundingBox.Y2 = 1024;
+				FireBounds.BoundingBox.Z1 = -600;
+				FireBounds.BoundingBox.Z2 = 600;
 				break;
 
 			case ID_BURNING_ROOTS:
-				FireBounds.boundingBox.X1 = -384;
-				FireBounds.boundingBox.X2 = 384;
-				FireBounds.boundingBox.Y1 = 0;
-				FireBounds.boundingBox.Y2 = 2048;
-				FireBounds.boundingBox.Z1 = -384;
-				FireBounds.boundingBox.Z2 = 384;
+				FireBounds.BoundingBox.X1 = -384;
+				FireBounds.BoundingBox.X2 = 384;
+				FireBounds.BoundingBox.Y1 = 0;
+				FireBounds.BoundingBox.Y2 = 2048;
+				FireBounds.BoundingBox.Z1 = -384;
+				FireBounds.BoundingBox.Z2 = 384;
 				break;
 			}
 
 			short oldYrot = item->Pose.Orientation.y;
 			item->Pose.Orientation.y = laraItem->Pose.Orientation.y;
 
-			if (TestLaraPosition(&FireBounds, item, laraItem))
+			if (TestLaraPosition(FireBounds, item, laraItem))
 			{
 				if (item->ObjectNumber == ID_BURNING_ROOTS)
 					laraItem->Animation.AnimNumber = LA_TORCH_LIGHT_5;

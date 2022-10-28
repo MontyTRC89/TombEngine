@@ -10,8 +10,8 @@
 #include "Game/Lara/lara_fire.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Game/savegame.h"
+#include "Math/Random.h"
 #include "Sound/sound.h"
-#include "Specific/prng.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
 #include "Specific/input.h"
@@ -48,46 +48,45 @@ void AnimatePistols(ItemInfo* laraItem, LaraWeaponType weaponType)
 	{
 		if (lara->LeftArm.GunSmoke)
 		{
-			Vector3Int pos;
+			auto offset = Vector3i::Zero;
 			switch (weaponType)
 			{
 			case LaraWeaponType::Pistol:
-				pos = { 4, 128, 40 };
+				offset = Vector3i(4, 128, 40);
 				break;
 
 			case LaraWeaponType::Revolver:
-				pos = { 16, 160, 56 };
+				offset = Vector3i(16, 160, 56);
 				break;
 
 			case LaraWeaponType::Uzi:
-				pos = { 8, 140, 48 };
+				offset = Vector3i(8, 140, 48);
 				break;
 			}
 
-			GetLaraJointPosition(&pos, LM_LHAND);
+			auto pos = GetJointPosition(laraItem, LM_LHAND, offset);
 			TriggerGunSmoke(pos.x, pos.y, pos.z, 0, 0, 0, 0, weaponType, lara->LeftArm.GunSmoke);
 		}
 
 		if (lara->RightArm.GunSmoke)
 		{
-			Vector3Int pos;
-
+			auto offset = Vector3i::Zero;
 			switch (weaponType)
 			{
 			case LaraWeaponType::Pistol:
-				pos = { -16, 128, 40 };
+				offset = Vector3i(-16, 128, 40);
 				break;
 
 			case LaraWeaponType::Revolver:
-				pos = { -32, 160, 56 };
+				offset = Vector3i(-32, 160, 56);
 				break;
 
 			case LaraWeaponType::Uzi:
-				pos = { -16, 140, 48 };
+				offset = Vector3i(-16, 140, 48);
 				break;
 			}
 
-			GetLaraJointPosition(&pos, LM_RHAND);
+			auto pos = GetJointPosition(laraItem, LM_RHAND, offset);
 			TriggerGunSmoke(pos.x, pos.y, pos.z, 0, 0, 0, 0, weaponType, lara->RightArm.GunSmoke);
 		}
 	}
@@ -111,7 +110,7 @@ void AnimatePistols(ItemInfo* laraItem, LaraWeaponType weaponType)
 			{
 				if (weaponType != LaraWeaponType::Revolver)
 				{
-					auto rightArmOrient = Vector3Shrt(
+					auto rightArmOrient = EulerAngles(
 						lara->RightArm.Orientation.x,
 						lara->RightArm.Orientation.y + laraItem->Pose.Orientation.y,
 						0
@@ -194,7 +193,7 @@ void AnimatePistols(ItemInfo* laraItem, LaraWeaponType weaponType)
 		{
 			if (TrInput & IN_ACTION)
 			{
-				auto leftArmOrient = Vector3Shrt(
+				auto leftArmOrient = EulerAngles(
 					lara->LeftArm.Orientation.x,
 					lara->LeftArm.Orientation.y + laraItem->Pose.Orientation.y,
 					0
@@ -315,12 +314,13 @@ void PistolHandler(ItemInfo* laraItem, LaraWeaponType weaponType)
 	
 	if (lara->LeftArm.GunFlash || lara->RightArm.GunFlash)
 	{
-		Vector3Int pos;
-		pos.x = (byte)GetRandomControl() - 128;
-		pos.y = (GetRandomControl() & 0x7F) - 63;
-		pos.z = (byte)GetRandomControl() - 128;
-		GetLaraJointPosition(&pos, lara->LeftArm.GunFlash != 0 ? LM_LHAND : LM_RHAND);
-
+		auto pos = GetJointPosition(laraItem, 
+			(lara->LeftArm.GunFlash != 0) ? LM_LHAND : LM_RHAND,
+			Vector3i(
+				(byte)GetRandomControl() - 128,
+				(GetRandomControl() & 0x7F) - 63,
+				(byte)GetRandomControl() - 128
+			));
 		TriggerDynamicLight(pos.x+GenerateFloat(-128,128), pos.y + GenerateFloat(-128, 128), pos.z + GenerateFloat(-128, 128), GenerateFloat(8,11), (GetRandomControl() & 0x3F) + 192, (GetRandomControl() & 0x1F) + 128, GetRandomControl() & 0x3F);
 	}
 }
@@ -330,8 +330,8 @@ void ReadyPistols(ItemInfo* laraItem, LaraWeaponType weaponType)
 	auto* lara = GetLaraInfo(laraItem);
 
 	lara->Control.HandStatus = HandStatus::WeaponReady;
-	lara->LeftArm.Orientation = Vector3Shrt();
-	lara->RightArm.Orientation = Vector3Shrt();
+	lara->LeftArm.Orientation = EulerAngles::Zero;
+	lara->RightArm.Orientation = EulerAngles::Zero;
 	lara->LeftArm.FrameNumber = 0;
 	lara->RightArm.FrameNumber = 0;
 	lara->TargetEntity = nullptr;
@@ -387,7 +387,7 @@ void UndrawPistols(ItemInfo* laraItem, LaraWeaponType weaponType)
 	}
 	else if (frameLeft == 0)
 	{
-		lara->LeftArm.Orientation = Vector3Shrt();
+		lara->LeftArm.Orientation = EulerAngles::Zero;
 		frameLeft = p->RecoilAnim - 1;
 	}
 	else if (frameLeft > p->Draw1Anim && (frameLeft < p->RecoilAnim))
@@ -418,7 +418,7 @@ void UndrawPistols(ItemInfo* laraItem, LaraWeaponType weaponType)
 	}
 	else if (frameRight == 0)
 	{
-		lara->RightArm.Orientation = Vector3Shrt();
+		lara->RightArm.Orientation = EulerAngles::Zero;
 		frameRight = p->RecoilAnim - 1;
 	}
 	else if (frameRight > p->Draw1Anim && (frameRight < p->RecoilAnim))

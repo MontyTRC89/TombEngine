@@ -2,11 +2,10 @@
 #include "Game/collision/sphere.h"
 
 #include "Game/Lara/lara.h"
-#include "Game/animation.h"
 #include "Game/items.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
-#include "Specific/trmath.h"
+#include "Math/Math.h"
 #include "Renderer/Renderer11.h"
 
 using namespace TEN::Renderer;
@@ -16,7 +15,7 @@ SPHERE CreatureSpheres[MAX_SPHERES];
 
 int GetSpheres(ItemInfo* item, SPHERE* ptr, int worldSpace, Matrix local)
 {
-	if (!item)
+	if (item == nullptr)
 		return 0;
 
 	BoundingSphere spheres[MAX_SPHERES];
@@ -92,19 +91,4 @@ int TestCollision(ItemInfo* item, ItemInfo* laraItem)
 
 		return flags;
 	}
-}
-
-void GetJointAbsPosition(ItemInfo* item, Vector3Int* vec, int joint)
-{
-	// Get the real item number
-	short itemNumber = item - g_Level.Items.data();
-
-	// Use matrices done in the renderer and transform the input vector
-	auto p = vec->ToVector3();
-	g_Renderer.GetItemAbsBonePosition(itemNumber, &p, joint);
-
-	// Store the result
-	vec->x = p.x;
-	vec->y = p.y;
-	vec->z = p.z;
 }

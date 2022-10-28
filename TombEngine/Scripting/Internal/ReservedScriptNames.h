@@ -109,6 +109,7 @@ static constexpr char ScriptReserved_EndLevel[]					= "EndLevel";
 static constexpr char ScriptReserved_GetSecretCount[]			= "GetSecretCount";
 static constexpr char ScriptReserved_SetSecretCount[]			= "SetSecretCount";
 static constexpr char ScriptReserved_AddSecret[]				= "AddSecret";
+static constexpr char ScriptReserved_EnableFlyCheat[]			= "EnableFlyCheat";
 
 // Flow Functions
 static constexpr char ScriptReserved_SetStrings[]			= "SetStrings";
@@ -173,6 +174,7 @@ static constexpr char ScriptReserved_KeyPush[]						= "KeyPush";
 static constexpr char ScriptReserved_KeyClear[]						= "KeyClear";
 
 static constexpr char ScriptReserved_FlipMap[]						= "FlipMap";
+static constexpr char ScriptReserved_PlayFlyBy[]					= "PlayFlyBy";
 
 // Enums
 static constexpr char ScriptReserved_ObjID[]					= "ObjID";

@@ -9,7 +9,7 @@
 #include "Sound/sound.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
-#include "Specific/trmath.h"
+#include "Math/Math.h"
 
 namespace TEN::Entities::TR4
 {
@@ -34,8 +34,8 @@ namespace TEN::Entities::TR4
 	ContainmentType TestBoundsCollideTeethSpikes(ItemInfo* item, ItemInfo* collidingItem)
 	{
 		// Get both teeth spikes and colliding item bounds.
-		auto spikeBox = TO_DX_BBOX(item->Pose, GetBoundsAccurate(item));
-		auto itemBox = TO_DX_BBOX(collidingItem->Pose, GetBoundsAccurate(collidingItem));
+		auto spikeBox = GameBoundingBox(item).ToBoundingOrientedBox(item->Pose);
+		auto itemBox = GameBoundingBox(collidingItem).ToBoundingOrientedBox(collidingItem->Pose);
 
 		// Make intersection more forgiving by slightly reducing spike bounds.
 		spikeBox.Extents = spikeBox.Extents * TEETH_SPIKE_BOUNDS_TOLERANCE_RATIO;
@@ -59,7 +59,7 @@ namespace TEN::Entities::TR4
 		if (TriggerActive(item) && item->ItemFlags[2] == 0)
 		{
 			// Get current item bounds and radius.
-			auto* bounds = (BOUNDING_BOX*)GetBestFrame(item);
+			auto* bounds = (GameBoundingBox*)GetBestFrame(item);
 			int radius = std::max(abs(bounds->X2 - bounds->X1), abs(bounds->Z2 - bounds->Z1)) / 2;
 
 			// Play sound only if spikes are just emerging.
@@ -81,14 +81,11 @@ namespace TEN::Entities::TR4
 			if (LaraItem->Animation.ActiveState != LS_DEATH && intersection != ContainmentType::DISJOINT)
 			{
 				// Calculate spike angle to the horizon. If angle is upward, impale Lara.
-				auto normal = Vector3::Transform(Vector3::UnitY, Matrix::CreateFromYawPitchRoll(
-					TO_RAD(item->Pose.Orientation.y), 
-					TO_RAD(item->Pose.Orientation.x), 
-					TO_RAD(item->Pose.Orientation.z)));
+				auto normal = Vector3::Transform(Vector3::UnitY, item->Pose.Orientation.ToRotationMatrix());
 				float dot = Vector3::UnitX.Dot(normal);
 				float angle = acos(dot / sqrt(normal.LengthSquared() * Vector3::UnitX.LengthSquared()));
 
-				auto* laraBounds = (BOUNDING_BOX*)GetBestFrame(LaraItem);
+				auto* laraBounds = (GameBoundingBox*)GetBestFrame(LaraItem);
 
 				int bloodCount = 0;
 

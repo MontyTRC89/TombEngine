@@ -12,7 +12,6 @@
 #include "Game/misc.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
-#include "Specific/prng.h"
 #include "Specific/setup.h"
 
 using namespace TEN::Math::Random;
@@ -35,9 +34,9 @@ namespace TEN::Entities::Creatures::TR1
 
 	#define LARA_GIANT_MUTANT_DEATH 6 // TODO: Not 13? Check this.
 
-	const vector<uint> MutantAttackJoints	  = { 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25 };
-	const vector<uint> MutantAttackLeftJoint	  = { 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14 };
-	const vector<uint> MutantAttackRightJoints = { 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25 };
+	const vector<unsigned int> MutantAttackJoints	  = { 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25 };
+	const vector<unsigned int> MutantAttackLeftJoint	  = { 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14 };
+	const vector<unsigned int> MutantAttackRightJoints = { 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25 };
 
 	enum GiantMutantState
 	{
@@ -202,7 +201,7 @@ namespace TEN::Entities::Creatures::TR1
 					LaraItem->Animation.ActiveState = 46;
 					LaraItem->Animation.TargetState = 46;
 					LaraItem->Animation.IsAirborne = false;
-					LaraItem->Pose = PHD_3DPOS(item->Pose.Position, 0, item->Pose.Orientation.y, 0);
+					LaraItem->Pose = Pose(item->Pose.Position, 0, item->Pose.Orientation.y, 0);
 					LaraItem->RoomNumber = item->RoomNumber;
 					LaraItem->HitPoints = -1;
 					Lara.Air = -1;

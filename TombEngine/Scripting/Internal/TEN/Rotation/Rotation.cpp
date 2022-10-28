@@ -1,7 +1,8 @@
 #include "framework.h"
 #include "Rotation.h"
+
+#include "Math/Math.h"
 #include "ReservedScriptNames.h"
-#include "Specific/phd_global.h"
 
 /*** Represents a rotation.
 Rotations are specifed as a combination of individual
@@ -47,14 +48,14 @@ Rotation::Rotation(int aX, int aY, int aZ)
 	z = aZ;
 }
 
-void Rotation::StoreInPHDPos(PHD_3DPOS& pos) const
+void Rotation::StoreInPHDPos(Pose& pos) const
 {
 	pos.Orientation.x = x;
 	pos.Orientation.y = y;
 	pos.Orientation.z = z;
 }
 
-Rotation::Rotation(PHD_3DPOS const & pos)
+Rotation::Rotation(Pose const & pos)
 {
 	x = pos.Orientation.x;
 	y = pos.Orientation.y;

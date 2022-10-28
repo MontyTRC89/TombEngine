@@ -12,7 +12,7 @@
 #include "Game/effects/tomb4fx.h"
 #include "Game/itemdata/creature_info.h"
 #include "Game/items.h"
-#include "Specific/prng.h"
+#include "Math/Random.h"
 #include "Specific/setup.h"
 
 using namespace TEN::Effects::Environment;
@@ -41,9 +41,9 @@ namespace TEN::Entities::TR4
 	#define BABOON_STATE_WALK_ANIM 14 // TODO: What is this?
 
 	const auto BaboonBite = BiteInfo(Vector3(10.0f, 10.0f, 11.0f), 4);
-	const vector<uint> BaboonAttackJoints	  = { 11, 12 };
-	const vector<uint> BaboonAttackRightJoints = { 1, 2, 3, 5, 8, 9 };
-	const vector<uint> BaboonJumpAttackJoints  = { 3, 4, 8 };
+	const vector<unsigned int> BaboonAttackJoints	  = { 11, 12 };
+	const vector<unsigned int> BaboonAttackRightJoints = { 1, 2, 3, 5, 8, 9 };
+	const vector<unsigned int> BaboonJumpAttackJoints  = { 3, 4, 8 };
 
 	BaboonRespawner BaboonRespawn;
 
@@ -108,7 +108,7 @@ namespace TEN::Entities::TR4
 		BABOON_ANIM_ACTIVATE_SWITCH = 31
 	};
 
-	static void TriggerBaboonShockwave(PHD_3DPOS pos, short xRot)
+	static void TriggerBaboonShockwave(Pose pos, short xRot)
 	{
 		short shockwaveID = GetFreeShockwave();
 		if (shockwaveID != NO_ITEM)
@@ -131,7 +131,7 @@ namespace TEN::Entities::TR4
 
 	void BaboonDieEffect(ItemInfo* item)
 	{
-		auto pose = PHD_3DPOS(item->Pose.Position.x, item->Pose.Position.y - CLICK(0.5f), item->Pose.Position.z);
+		auto pose = Pose(item->Pose.Position.x, item->Pose.Position.y - CLICK(0.5f), item->Pose.Position.z);
 
 		// Trigger shockwave effect.
 		TriggerBaboonShockwave(pose, ANGLE(0.0f));
@@ -487,7 +487,7 @@ namespace TEN::Entities::TR4
 
 				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + 212)
 				{
-					auto pos = Vector3Int();
+					auto pos = Vector3i::Zero;
 					if (item->Pose.Orientation.y == ANGLE(270.0f))
 					{
 						pos.x = item->Pose.Position.x - SECTOR(1);

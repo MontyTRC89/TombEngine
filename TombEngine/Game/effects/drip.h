@@ -27,7 +27,7 @@ namespace TEN::Effects::Drip
 	void UpdateDripParticles();
 	void DisableDripParticles();
 	DripParticle& getFreeDrip();
-	void SpawnWetnessDrip(Vector3 pos, int room);
-	void SpawnSplashDrips(Vector3 const& pos, int num, int room);
-	void SpawnGunshellDrips(Vector3 const& pos, int room);
+	void SpawnWetnessDrip(const Vector3& pos, int room);
+	void SpawnSplashDrips(const Vector3& pos, int number, int room);
+	void SpawnGunshellDrips(const Vector3& pos, int room);
 }

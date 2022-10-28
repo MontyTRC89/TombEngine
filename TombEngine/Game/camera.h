@@ -1,6 +1,6 @@
 #pragma once
 #include "Game/items.h"
-#include "Specific/phd_global.h"
+#include "Math/Math.h"
 
 enum class CameraType
 {
@@ -38,15 +38,15 @@ struct CAMERA_INFO
 	ItemInfo* item; // size=144, offset=92
 	ItemInfo* lastItem; // size=144, offset=96
 	int mikeAtLara; // size=0, offset=104
-	Vector3Int mikePos; // size=12, offset=108
+	Vector3i mikePos; // size=12, offset=108
 };
 
 enum CAMERA_FLAGS
 {
-	CF_NONE = 0,
+	CF_NONE			 = 0,
 	CF_FOLLOW_CENTER = 1,
-	CF_NO_CHUNKY = 2,
-	CF_CHASE_OBJECT = 3,
+	CF_NO_CHUNKY	 = 2,
+	CF_CHASE_OBJECT	 = 3,
 };
 
 constexpr auto FADE_SCREEN_SPEED = 16.0f / 255.0f;
@@ -97,8 +97,8 @@ void ConfirmCameraTargetPos();
 void CalculateCamera();
 void ResetLook(ItemInfo* item, float alpha = 0.9f);
 void RumbleScreen();
-bool TestBoundsCollideCamera(BOUNDING_BOX* bounds, PHD_3DPOS* pos, short radius);
-void ItemPushCamera(BOUNDING_BOX* bounds, PHD_3DPOS* pos, short radius);
+bool TestBoundsCollideCamera(const GameBoundingBox& bounds, const Pose& pose, short radius);
+void ItemPushCamera(GameBoundingBox* bounds, Pose* pos, short radius);
 void ItemsCollideCamera();
 
 void SetScreenFadeOut(float speed);
