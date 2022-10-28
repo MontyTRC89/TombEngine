@@ -52,7 +52,7 @@ namespace TEN::Entities::Generic
 		LS_JUMP_UP
 	};
 
-	const auto LadderMountOffset = Vector3i(0, 0, -CLICK(0.55f));
+	const auto LadderMountOffset = Vector3i(0, 0, -CLICK(0.6f));
 	const ObjectCollisionBounds LadderFrontBounds =
 	{
 		GameBoundingBox(
