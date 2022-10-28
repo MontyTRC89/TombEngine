@@ -10,7 +10,7 @@
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
 #include "Specific/level.h"
-#include "Specific/prng.h"
+#include "Math/Random.h"
 #include "Specific/setup.h"
 
 using namespace TEN::Math::Random;
@@ -25,7 +25,7 @@ namespace TEN::Entities::Creatures::TR5
 
 	const auto LionBite1 = BiteInfo(Vector3(2.0f, -10.0f, 250.0f), 21);
 	const auto LionBite2 = BiteInfo(Vector3(-2.0f, -10.0f, 132.0f), 21);
-	const vector<uint> LionAttackJoints = { 3, 6, 21 };
+	const vector<unsigned int> LionAttackJoints = { 3, 6, 21 };
 
 	enum LionState
 	{

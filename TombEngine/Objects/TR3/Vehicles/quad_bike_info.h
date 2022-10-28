@@ -23,6 +23,6 @@ namespace TEN::Entities::Vehicles
 		bool DriftStarting = false;
 		bool NoDismount = false;
 
-		char Flags = NULL;
+		char Flags = 0;
 	};
 }

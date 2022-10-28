@@ -8,17 +8,17 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
+#include "Math/Math.h"
 #include "Objects/TR3/Vehicles/minecart_info.h"
 #include "Objects/Utils/VehicleHelpers.h"
 #include "Sound/sound.h"
 #include "Specific/input.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
-#include "Specific/prng.h"
 
 using namespace TEN::Effects::Spark;
 using namespace TEN::Input;
-using namespace TEN::Math::Random;
+using namespace TEN::Math;
 using std::vector;
 
 namespace TEN::Entities::Vehicles
@@ -399,11 +399,9 @@ namespace TEN::Entities::Vehicles
 			if (laraItem->Animation.AnimNumber == Objects[ID_MINECART_LARA_ANIMS].animIndex + MINECART_ANIM_DISMOUNT_LEFT &&
 				laraItem->Animation.FrameNumber == g_Level.Anims[laraItem->Animation.AnimNumber].frameEnd)
 			{
-				auto pos = Vector3Int(0, 640, 0);
-				GetLaraJointPosition(&pos, LM_HIPS);
-
+				auto pos = GetJointPosition(laraItem, LM_HIPS, Vector3i(0, 640, 0));
 				laraItem->Pose.Position = pos;
-				laraItem->Pose.Orientation = Vector3Shrt(0, minecartItem->Pose.Orientation.y + ANGLE(90.0f), 0);
+				laraItem->Pose.Orientation = EulerAngles(0, minecartItem->Pose.Orientation.y + ANGLE(90.0f), 0);
 
 				SetAnimation(laraItem, LA_STAND_SOLID);
 				lara->Control.HandStatus = HandStatus::Free;
@@ -416,11 +414,9 @@ namespace TEN::Entities::Vehicles
 			if (laraItem->Animation.AnimNumber == Objects[ID_MINECART_LARA_ANIMS].animIndex + MINECART_ANIM_DISMOUNT_RIGHT &&
 				laraItem->Animation.FrameNumber == g_Level.Anims[laraItem->Animation.AnimNumber].frameEnd)
 			{
-				auto pos = Vector3Int(0, 640, 0);
-				GetLaraJointPosition(&pos, LM_HIPS);
-
+				auto pos = GetJointPosition(laraItem, LM_HIPS, Vector3i(0, 640, 0));
 				laraItem->Pose.Position = pos;
-				laraItem->Pose.Orientation = Vector3Shrt(0, minecartItem->Pose.Orientation.y - ANGLE(90.0f), 0);
+				laraItem->Pose.Orientation = EulerAngles(0, minecartItem->Pose.Orientation.y - ANGLE(90.0f), 0);
 
 				SetAnimation(laraItem, LA_STAND_SOLID);
 				lara->Control.HandStatus = HandStatus::Free;
@@ -643,7 +639,7 @@ namespace TEN::Entities::Vehicles
 				break;
 			}
 
-			angle = mGetAngle(minecartItem->Pose.Position.x, minecartItem->Pose.Position.z, minecart->TurnX, minecart->TurnZ) & 0x3fff;
+			angle = Geometry::GetOrientToPoint(minecartItem->Pose.Position.ToVector3(), Vector3(minecart->TurnX, 0, minecart->TurnZ)).y & 0x3fff;
 
 			if (rotation < 4)
 			{
@@ -946,13 +942,12 @@ namespace TEN::Entities::Vehicles
 	{
 		for (int i = 0; i < 2; i++)
 		{
-			auto pos = Vector3Int();
-			GetJointAbsPosition(minecartItem, &pos, Wheels[(left ? 0 : 2) + i]);
+			auto pos = GetJointPosition(minecartItem, Wheels[(left ? 0 : 2) + i]);
 			TriggerFrictionSpark(&GameVector(pos.x, pos.y, pos.z, minecartItem->RoomNumber), minecartItem->Pose.Orientation, 512, 10);
 
 			if (i)
 			{
-				float mult = GenerateFloat(0.7f, 1.0f);
+				float mult = Random::GenerateFloat(0.7f, 1.0f);
 				byte r = (byte)(mult * 190.0f);
 				byte g = (byte)(mult * 100.0f);
 				TriggerDynamicLight(pos.x, pos.y, pos.z, 2, r, g, 0);

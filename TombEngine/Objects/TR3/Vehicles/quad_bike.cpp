@@ -4,22 +4,22 @@
 #include "Game/camera.h"
 #include "Game/collision/collide_item.h"
 #include "Game/effects/effects.h"
+#include "Game/effects/simple_particle.h"
 #include "Game/effects/tomb4fx.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Game/misc.h"
+#include "Math/Math.h"
 #include "Objects/TR3/Vehicles/quad_bike_info.h"
 #include "Objects/Utils/VehicleHelpers.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
 #include "Specific/input.h"
 #include "Specific/setup.h"
-#include "Specific/prng.h"
-#include "Game/effects/simple_particle.h"
 
 using namespace TEN::Input;
-using namespace TEN::Math::Random;
+using namespace TEN::Math;
 using std::vector;
 
 namespace TEN::Entities::Vehicles
@@ -204,7 +204,7 @@ namespace TEN::Entities::Vehicles
 
 		auto probe = GetCollision(quadBikeItem);
 
-		Vector3Int frontLeft, frontRight;
+		Vector3i frontLeft, frontRight;
 		auto floorHeightLeft = GetVehicleHeight(quadBikeItem, QBIKE_FRONT, -QBIKE_SIDE, false, frontLeft);
 		auto floorHeightRight = GetVehicleHeight(quadBikeItem, QBIKE_FRONT, QBIKE_SIDE, false, frontRight);
 
@@ -309,15 +309,15 @@ namespace TEN::Entities::Vehicles
 			laraItem->Animation.ActiveState != QBIKE_STATE_DISMOUNT_RIGHT &&
 			laraItem->Animation.ActiveState != QBIKE_STATE_DISMOUNT_LEFT)
 		{
-			Vector3Int pos;
+			Vector3i pos;
 			int speed = 0;
 			short angle = 0;
 
 			for (int i = 0; i < 2; i++)
 			{
-				pos = QuadBikeBites[i].Position;
-				GetJointAbsPosition(quadBikeItem, &pos, QuadBikeBites[i].meshNum);
+				pos = GetJointPosition(quadBikeItem, QuadBikeBites[i].meshNum, QuadBikeBites[i].Position);
 				angle = quadBikeItem->Pose.Orientation.y + ((i == 0) ? ANGLE(202.5f) : ANGLE(157.5f));
+
 				if (quadBikeItem->Animation.Velocity.z > 32.0f)
 				{
 					if (quadBikeItem->Animation.Velocity.z < 64.0f)
@@ -728,7 +728,7 @@ namespace TEN::Entities::Vehicles
 		DoVehicleFlareDiscard(laraItem);
 		ResetLaraFlex(laraItem);
 		laraItem->Pose.Position = quadBikeItem->Pose.Position;
-		laraItem->Pose.Orientation = Vector3Shrt(0, quadBikeItem->Pose.Orientation.y, 0);
+		laraItem->Pose.Orientation = EulerAngles(0, quadBikeItem->Pose.Orientation.y, 0);
 		lara->Control.HandStatus = HandStatus::Busy;
 		lara->HitDirection = -1;
 		quadBikeItem->HitPoints = 1;
@@ -794,11 +794,9 @@ namespace TEN::Entities::Vehicles
 
 			if (laraItem->Animation.ActiveState == QBIKE_STATE_DISMOUNT_FALL)
 			{
-				auto pos = Vector3Int();
+				auto pos = GetJointPosition(laraItem, LM_HIPS);
 
 				SetAnimation(laraItem, LA_FREEFALL);
-				GetJointAbsPosition(laraItem, &pos, LM_HIPS);
-
 				laraItem->Pose.Position = pos;
 				laraItem->Animation.IsAirborne = true;
 				laraItem->Animation.Velocity.y = quadBikeItem->Animation.Velocity.y;
@@ -949,7 +947,7 @@ namespace TEN::Entities::Vehicles
 		}
 
 		// Store old 2D position to determine movement delta later.
-		auto moved = Vector3Int(quadBikeItem->Pose.Position.x, 0, quadBikeItem->Pose.Position.z);
+		auto moved = Vector3i(quadBikeItem->Pose.Position.x, 0, quadBikeItem->Pose.Position.z);
 
 		// Process entity collision.
 		if (!(quadBikeItem->Flags & IFLAG_INVISIBLE))

@@ -10,9 +10,9 @@
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_struct.h"
 #include "Game/room.h"
+#include "Math/Math.h"
 #include "Sound/sound.h"
 #include "Specific/input.h"
-#include "Specific/prng.h"
 #include "Specific/setup.h"
 
 using namespace TEN::Input;
@@ -21,7 +21,7 @@ using namespace TEN::Math;
 namespace TEN::Entities::Vehicles
 {
 	// Deprecated.
-	int GetVehicleHeight(ItemInfo* vehicleItem, int forward, int right, bool clamp, Vector3Int& pos)
+	int GetVehicleHeight(ItemInfo* vehicleItem, int forward, int right, bool clamp, Vector3i& pos)
 	{
 		float sinX = phd_sin(vehicleItem->Pose.Orientation.x);
 		float sinY = phd_sin(vehicleItem->Pose.Orientation.y);
@@ -74,7 +74,7 @@ namespace TEN::Entities::Vehicles
 		bool hasInputAction = TrInput & IN_ACTION;
 
 		short deltaHeadingAngle = vehicleItem->Pose.Orientation.y - laraItem->Pose.Orientation.y;
-		short angleBetweenPositions = vehicleItem->Pose.Orientation.y - GetOrientBetweenPoints(laraItem->Pose.Position, vehicleItem->Pose.Position).y;
+		short angleBetweenPositions = vehicleItem->Pose.Orientation.y - Geometry::GetOrientToPoint(laraItem->Pose.Position.ToVector3(), vehicleItem->Pose.Position.ToVector3()).y;
 		bool onCorrectSide = abs(deltaHeadingAngle - angleBetweenPositions) < ANGLE(45.0f);
 
 		// Assess mount types allowed for vehicle.
@@ -226,7 +226,7 @@ namespace TEN::Entities::Vehicles
 		return false;
 	}
 
-	VehicleImpactDirection GetVehicleImpactDirection(ItemInfo* vehicleItem, const Vector3Int& prevPos)
+	VehicleImpactDirection GetVehicleImpactDirection(ItemInfo* vehicleItem, const Vector3i& prevPos)
 	{
 		auto direction = vehicleItem->Pose.Position - prevPos;
 
@@ -264,7 +264,7 @@ namespace TEN::Entities::Vehicles
 		float cosY = phd_cos(vehicleItem->Pose.Orientation.y);
 		float sinZ = phd_sin(vehicleItem->Pose.Orientation.z);
 
-		auto point = Vector3Int(
+		auto point = Vector3i(
 			vehicleItem->Pose.Position.x + (forward * sinY) + (right * cosY),
 			vehicleItem->Pose.Position.y - (forward * sinX) + (right * sinZ),
 			vehicleItem->Pose.Position.z + (forward * cosY) - (right * sinY)
@@ -282,7 +282,7 @@ namespace TEN::Entities::Vehicles
 		return VehiclePointCollision{ point, pointColl.Position.Floor, pointColl.Position.Ceiling };
 	}
 	
-	int GetVehicleWaterHeight(ItemInfo* vehicleItem, int forward, int right, bool clamp, Vector3Int& pos)
+	int GetVehicleWaterHeight(ItemInfo* vehicleItem, int forward, int right, bool clamp, Vector3i& pos)
 	{
 		auto world =
 			Matrix::CreateFromYawPitchRoll(TO_RAD(vehicleItem->Pose.Orientation.y), TO_RAD(vehicleItem->Pose.Orientation.x), TO_RAD(vehicleItem->Pose.Orientation.z)) *
@@ -291,7 +291,7 @@ namespace TEN::Entities::Vehicles
 		auto vec = Vector3(right, 0, forward);
 		vec = Vector3::Transform(vec, world);
 
-		pos = Vector3Int(vec);
+		pos = Vector3i(vec);
 		auto pointColl = GetCollision(pos.x, pos.y, pos.z, vehicleItem->RoomNumber);
 		int pointColldRoomNumber = pointColl.RoomNumber;
 
@@ -368,11 +368,11 @@ namespace TEN::Entities::Vehicles
 		}
 	}
 
-	short DoVehicleShift(ItemInfo* vehicleItem, const Vector3Int& pos, const Vector3Int& prevPos)
+	short DoVehicleShift(ItemInfo* vehicleItem, const Vector3i& pos, const Vector3i& prevPos)
 	{
 		auto alignedPos = pos / SECTOR(1);
 		auto alignedPrevPos = prevPos / SECTOR(1);
-		auto alignedShift = Vector3Int(
+		auto alignedShift = Vector3i(
 			pos.x & WALL_MASK,
 			0,
 			pos.z & WALL_MASK
@@ -411,7 +411,7 @@ namespace TEN::Entities::Vehicles
 		}
 		else
 		{
-			alignedPos = Vector3Int::Zero;
+			alignedPos = Vector3i::Zero;
 
 			auto pointColl = GetCollision(prevPos.x, pos.y, pos.z, vehicleItem->RoomNumber);
 			if (pointColl.Position.Floor < (prevPos.y - CLICK(1)))
@@ -492,7 +492,7 @@ namespace TEN::Entities::Vehicles
 					currentVelocity -= std::copysign(currentVelocity * ((waterDepth / VEHICLE_WATER_HEIGHT_MAX) / coeff), currentVelocity);
 
 					if (Random::GenerateInt(0, 32) > 28)
-						SoundEffect(SFX_TR4_LARA_WADE, &PHD_3DPOS(vehicleItem->Pose.Position), SoundEnvironment::Land, isWater ? 0.8f : 0.7f);
+						SoundEffect(SFX_TR4_LARA_WADE, &Pose(vehicleItem->Pose.Position), SoundEnvironment::Land, isWater ? 0.8f : 0.7f);
 
 					if (isWater)
 						TEN::Effects::TriggerSpeedboatFoam(vehicleItem, Vector3(0, -waterDepth / 2.0f, -radius));

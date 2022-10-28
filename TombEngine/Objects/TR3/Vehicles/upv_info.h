@@ -1,5 +1,7 @@
 #pragma once
-#include "Specific/phd_global.h"
+#include "Math/Math.h"
+
+using namespace TEN::Math;
 
 namespace TEN::Entities::Vehicles
 {
@@ -7,7 +9,7 @@ namespace TEN::Entities::Vehicles
 	{
 		float Velocity = 0.0f;
 
-		Vector3Shrt TurnRate;
+		EulerAngles TurnRate = EulerAngles::Zero;
 
 		unsigned int HarpoonTimer = 0;
 		bool HarpoonLeft = false;
@@ -15,6 +17,6 @@ namespace TEN::Entities::Vehicles
 		short LeftRudderRotation = 0;
 		short RightRudderRotation = 0;
 
-		char Flags = NULL;
+		char Flags = 0;
 	};
 }

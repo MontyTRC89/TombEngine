@@ -9,6 +9,7 @@
 #include "Game/Lara/lara_fire.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Game/effects/simple_particle.h"
+#include "Math/Math.h"
 #include "Objects/TR2/Vehicles/skidoo_info.h"
 #include "Objects/Utils/VehicleHelpers.h"
 #include "Specific/input.h"
@@ -17,6 +18,7 @@
 #include "Sound/sound.h"
 
 using namespace TEN::Input;
+using namespace TEN::Math;
 using std::vector;
 
 namespace TEN::Entities::Vehicles
@@ -139,7 +141,7 @@ namespace TEN::Entities::Vehicles
 		auto* skidooItem = &g_Level.Items[lara->Vehicle];
 		auto* skidoo = GetSkidooInfo(skidooItem);
 
-		Vector3Int frontLeft, frontRight;
+		Vector3i frontLeft, frontRight;
 		auto collide = SkidooDynamics(skidooItem, laraItem);
 		auto heightFrontLeft = GetVehicleHeight(skidooItem, SKIDOO_FRONT, -SKIDOO_SIDE, true, frontLeft);
 		auto heightFrontRight = GetVehicleHeight(skidooItem, SKIDOO_FRONT, SKIDOO_SIDE, true, frontRight);
@@ -350,7 +352,7 @@ namespace TEN::Entities::Vehicles
 		}
 
 		// Store old 2D position to determine movement delta later.
-		auto moved = Vector3Int(skidooItem->Pose.Position.x, 0, skidooItem->Pose.Position.z);
+		auto moved = Vector3i(skidooItem->Pose.Position.x, 0, skidooItem->Pose.Position.z);
 
 		// Process entity collision.
 		if (!(skidooItem->Flags & IFLAG_INVISIBLE))
@@ -661,7 +663,7 @@ namespace TEN::Entities::Vehicles
 
 		DoVehicleFlareDiscard(laraItem);
 		laraItem->Pose.Position = skidooItem->Pose.Position;
-		laraItem->Pose.Orientation = Vector3Shrt(0, skidooItem->Pose.Orientation.y, 0);
+		laraItem->Pose.Orientation = EulerAngles(0, skidooItem->Pose.Orientation.y, 0);
 		lara->Control.HandStatus = HandStatus::Busy;
 		skidooItem->Collidable = true;
 	}
@@ -791,7 +793,7 @@ namespace TEN::Entities::Vehicles
 
 		if (TrInput & VEHICLE_IN_FIRE && !skidooItem->ItemFlags[0])
 		{
-			auto angles = Vector3Shrt(
+			auto angles = EulerAngles(
 				lara->RightArm.Orientation.x,
 				lara->RightArm.Orientation.y + laraItem->Pose.Orientation.y,
 				0

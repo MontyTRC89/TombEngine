@@ -10,7 +10,7 @@ namespace TEN::Entities::Vehicles
 	MotorbikeInfo* GetMotorbikeInfo(ItemInfo* motorbikeItem);
 	void InitialiseMotorbike(short itemNumber);
 
-	int GetMotorbikeCollisionAnim(ItemInfo* motorbikeItem, Vector3Int* pos);
+	int GetMotorbikeCollisionAnim(ItemInfo* motorbikeItem, Vector3i* pos);
 	void SetLaraOnMotorbike(ItemInfo* motorbikeItem, ItemInfo* laraItem);
 
 	void MotorbikePlayerCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);

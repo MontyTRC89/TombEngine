@@ -14,7 +14,7 @@
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_struct.h"
 #include "Game/Lara/lara.h"
-#include "Specific/trmath.h"
+#include "Math/Math.h"
 #include "Game/misc.h"
 #include "Objects/Generic/Doors/pushpull_kick_door.h"
 #include "Game/collision/collide_item.h"
@@ -32,18 +32,21 @@ namespace TEN::Entities::Doors
 		STATE_PUSHPULL_KICK_DOOR_PULL = 3
 	};
 
-	Vector3Int PullDoorPos(-201, 0, 322);
-	Vector3Int PushDoorPos(201, 0, -702);
-	Vector3Int KickDoorPos(0, 0, -917);
+	const Vector3i PullDoorPos(-201, 0, 322);
+	const Vector3i PushDoorPos(201, 0, -702);
+	const Vector3i KickDoorPos(0, 0, -917);
 
-	OBJECT_COLLISION_BOUNDS PushPullKickDoorBounds =
+	const ObjectCollisionBounds PushPullKickDoorBounds =
 	{
-		-384, 384,
-		0, 0,
-		-1024, 512,
-		-ANGLE(10.0f), ANGLE(10.0f),
-		-ANGLE(30.0f), ANGLE(30.0f),
-		-ANGLE(10.0f), ANGLE(10.0f),
+		GameBoundingBox(
+			-384, 384,
+			0, 0,
+			-SECTOR(1), SECTOR(0.5f)
+		),
+		std::pair(
+			EulerAngles(ANGLE(-10.0f), ANGLE(-30.0f), ANGLE(-10.0f)),
+			EulerAngles(ANGLE(10.0f), ANGLE(30.0f), ANGLE(10.0f))
+		)
 	};
 
 	void PushPullKickDoorCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
@@ -67,13 +70,13 @@ namespace TEN::Entities::Doors
 				pull = true;
 			}
 
-			if (TestLaraPosition(&PushPullKickDoorBounds, doorItem, laraItem))
+			if (TestLaraPosition(PushPullKickDoorBounds, doorItem, laraItem))
 			{
 				bool openTheDoor = false;
 
 				if (pull)
 				{
-					if (MoveLaraPosition(&PullDoorPos, doorItem, laraItem))
+					if (MoveLaraPosition(PullDoorPos, doorItem, laraItem))
 					{
 						SetAnimation(laraItem, LA_DOOR_OPEN_PULL);
 						doorItem->Animation.TargetState = STATE_PUSHPULL_KICK_DOOR_PULL;
@@ -86,7 +89,7 @@ namespace TEN::Entities::Doors
 				{
 					if (doorItem->ObjectNumber >= ID_KICK_DOOR1)
 					{
-						if (MoveLaraPosition(&KickDoorPos, doorItem, laraItem))
+						if (MoveLaraPosition(KickDoorPos, doorItem, laraItem))
 						{
 							SetAnimation(laraItem, LA_DOOR_OPEN_KICK);
 							doorItem->Animation.TargetState = STATE_PUSHPULL_KICK_DOOR_PUSH;
@@ -97,7 +100,7 @@ namespace TEN::Entities::Doors
 					}
 					else
 					{
-						if (MoveLaraPosition(&PushDoorPos, doorItem, laraItem))
+						if (MoveLaraPosition(PushDoorPos, doorItem, laraItem))
 						{
 							SetAnimation(laraItem, LA_DOOR_OPEN_PUSH);
 							doorItem->Animation.TargetState = STATE_PUSHPULL_KICK_DOOR_PUSH;

@@ -10,7 +10,7 @@
 #include "Game/people.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
-#include "Specific/prng.h"
+#include "Math/Random.h"
 #include "Specific/setup.h"
 
 using namespace TEN::Math::Random;
@@ -37,7 +37,7 @@ namespace TEN::Entities::Creatures::TR3
 	#define CIVVY_RUN_TURN_RATE_MAX	 ANGLE(6.0f)
 
 	const auto CivvyBite = BiteInfo(Vector3::Zero, 13);
-	const vector<uint> CivvyAttackJoints = { 10, 13 };
+	const vector<unsigned int> CivvyAttackJoints = { 10, 13 };
 
 	// TODO
 	enum CivvyState
@@ -91,8 +91,8 @@ namespace TEN::Entities::Creatures::TR3
 
 		short angle = 0;
 		short tilt = 0;
-		auto extraHeadRot = Vector3Shrt::Zero;
-		auto extraTorsoRot = Vector3Shrt::Zero;
+		auto extraHeadRot = EulerAngles::Zero;
+		auto extraTorsoRot = EulerAngles::Zero;
 
 		if (item->BoxNumber != NO_BOX && (g_Level.Boxes[item->BoxNumber].flags & BLOCKED))
 		{

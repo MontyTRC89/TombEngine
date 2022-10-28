@@ -9,13 +9,13 @@ struct AnimatedFrameUV
 cbuffer AnimatedBuffer : register(b6)
 {
 	AnimatedFrameUV AnimFrames[128];
-	uint NumAnimFrames;
-	uint FPS;
-	uint Type;
-	uint padding2;
+	unsigned int NumAnimFrames;
+	unsigned int FPS;
+	unsigned int Type;
+	unsigned int padding2;
 }
 
-float2 CalculateUVRotate(float2 uv, uint frame)
+float2 CalculateUVRotate(float2 uv, unsigned int frame)
 {
 	if (FPS == 0)
 		return uv;
@@ -31,7 +31,7 @@ float2 CalculateUVRotate(float2 uv, uint frame)
 	}
 }
 
-float2 GetFrame(uint index, uint offset)
+float2 GetFrame(unsigned int index, unsigned int offset)
 {
 	float speed = FPS / 30.0f;
 	int frame = (int)(Frame * speed + offset) % NumAnimFrames;

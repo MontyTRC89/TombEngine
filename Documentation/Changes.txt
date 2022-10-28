@@ -1,16 +1,23 @@
 Version 1.0.3
 =============
 
+* Add ledge jumps (Lara object must be updated with new animations to make it work).
+* Add FlipMap and PlayFlyBy script commands and node functions.
+* Add OCB 1 for rollingball to make it silent.
+* Add FlyCheat option for disable Fly Cheat to gameflow.
+* Adjust sprint jump timing.
 * Fix dodgy weapon lock angle constraints.
 * Fix wrong shotgun ammo pickup amount.
 * Fix shotgun using 6 units of ammo with each shot.
 * Fix rocket explosions near statics.
 * Fix TR3 monkey level crash.
 * Fix occasional ejection when landing on a slope.
+* Fix occasional ejections when climbing up on a ledge under a slope.
 * Fix slow centaur projectile velocity.
-* Adjust sprint jump timing.
+* Fix search animations - allow chest and shelf animations to play properly.
 * Fix grabbing narrow ledges below ceilings.
-* Fix search animations.
+* Fix Sarcophagus and its item pickup
+* Fix Underwater Door and Double Doors be interactable again infinite times after opening.
 
 
 Version 1.0.2

@@ -9,7 +9,7 @@
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
 #include "Specific/level.h"
-#include "Specific/prng.h"
+#include "Math/Random.h"
 #include "Specific/setup.h"
 
 using namespace TEN::Math::Random;
@@ -24,8 +24,8 @@ namespace TEN::Entities::TR4
 	constexpr auto DOG_JUMP_ATTACK_RANGE = SQUARE(SECTOR(1));
 	
 	const auto DogBite = BiteInfo(Vector3(0.0f, 0.0f, 100.0f), 3.0f);
-	const vector<uint> DogJumpAttackJoints = { 3, 6, 9, 10, 13, 14 };
-	const vector<uint> DogBiteAttackJoints = { 3, 6 };
+	const vector<unsigned int> DogJumpAttackJoints = { 3, 6, 9, 10, 13, 14 };
+	const vector<unsigned int> DogBiteAttackJoints = { 3, 6 };
 
 	enum DogState
 	{

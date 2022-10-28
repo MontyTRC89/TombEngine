@@ -64,9 +64,7 @@ bool ShotLara(ItemInfo* item, AI_INFO* AI, BiteInfo gun, short extraRotation, in
 				if (random > 14)
 					random = 0;
 
-				auto pos = Vector3Int::Zero;
-				GetJointAbsPosition(enemy, &pos, random);
-
+				auto pos = GetJointPosition(enemy, random);
 				DoBloodSplat(pos.x, pos.y, pos.z, (GetRandomControl() & 3) + 4, enemy->Pose.Orientation.y, enemy->RoomNumber);
 			}
 		}
@@ -86,15 +84,13 @@ short GunMiss(int x, int y, int z, short velocity, short yRot, short roomNumber)
 		LaraItem->RoomNumber
 	);
 
-	Richochet((PHD_3DPOS*)&pos);
+	Richochet((Pose*)&pos);
 	return GunShot(x, y, z, velocity, yRot, roomNumber);
 }
 
 short GunHit(int x, int y, int z, short velocity, short yRot, short roomNumber)
 {
-	auto pos = Vector3Int::Zero;
-	GetLaraJointPosition(&pos, (25 * GetRandomControl()) >> 15);
-
+	auto pos = GetJointPosition(LaraItem, (25 * GetRandomControl()) >> 15);
 	DoBloodSplat(pos.x, pos.y, pos.z, (GetRandomControl() & 3) + 3, LaraItem->Pose.Orientation.y, LaraItem->RoomNumber);
 	return GunShot(x, y, z, velocity, yRot, roomNumber);
 }
@@ -139,7 +135,7 @@ bool Targetable(ItemInfo* item, AI_INFO* AI)
 	return LOS(&origin, &target);
 }
 
-bool TargetVisible(ItemInfo* item, AI_INFO* AI, float maxAngle)
+bool TargetVisible(ItemInfo* item, AI_INFO* AI, float maxAngleInDegrees)
 {
 	if (!item->IsCreature() || AI->distance >= SQUARE(MAX_VISIBILITY_DISTANCE))
 		return false;
@@ -154,7 +150,7 @@ bool TargetVisible(ItemInfo* item, AI_INFO* AI, float maxAngle)
 		return false;
 
 	short angle = AI->angle - creature->JointRotation[2];
-	if (angle > ANGLE(-maxAngle) && angle < ANGLE(maxAngle))
+	if (angle > ANGLE(-maxAngleInDegrees) && angle < ANGLE(maxAngleInDegrees))
 	{
 		auto& bounds = GetBestFrame(enemy)->boundingBox;
 

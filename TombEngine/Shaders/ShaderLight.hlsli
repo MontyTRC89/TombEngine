@@ -11,7 +11,7 @@
 struct ShaderLight
 {
 	float3 Position;
-	uint Type;
+	unsigned int Type;
 	float3 Color;
 	float Intensity;
 	float3 Direction;

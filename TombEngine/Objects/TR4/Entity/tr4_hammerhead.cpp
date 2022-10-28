@@ -19,7 +19,7 @@ namespace TEN::Entities::TR4
 	constexpr auto HAMMERHEAD_ATTACK_RANGE = SQUARE(SECTOR(0.66f));
 
 	const auto HammerheadBite = BiteInfo(Vector3::Zero, 12);
-	const vector<uint> HammerheadBiteAttackJoints = { 10, 12, 13 };
+	const vector<unsigned int> HammerheadBiteAttackJoints = { 10, 12, 13 };
 
 	enum HammerheadState
 	{

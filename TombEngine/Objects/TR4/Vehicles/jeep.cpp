@@ -9,6 +9,7 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
+#include "Math/Math.h"
 #include "Objects/TR4/Vehicles/jeep_info.h"
 #include "Objects/Utils/VehicleHelpers.h"
 #include "Renderer/Renderer11Enums.h"
@@ -18,6 +19,7 @@
 #include "Specific/setup.h"
 
 using namespace TEN::Input;
+using namespace TEN::Math;
 using std::vector;
 
 namespace TEN::Entities::Vehicles
@@ -51,8 +53,8 @@ namespace TEN::Entities::Vehicles
 		VehicleMountType::Left,
 		VehicleMountType::Right
 	};
-	const vector<uint> JeepJoints			= { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 15, 16 };
-	const vector<uint> JeepBrakeLightJoints = { 15, 16 };
+	const vector<unsigned int> JeepJoints			= { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 15, 16 };
+	const vector<unsigned int> JeepBrakeLightJoints = { 15, 16 };
 
 	enum JeepState
 	{
@@ -318,8 +320,7 @@ namespace TEN::Entities::Vehicles
 			short speed = 0;
 			short angle = 0;
 
-			auto pos = Vector3Int(90, 0, -500);
-			GetJointAbsPosition(jeepItem, &pos, 11);
+			auto pos = GetJointPosition(jeepItem, 11, Vector3i(90, 0, -500));
 
 			if (jeepItem->Animation.Velocity.z <= 32)
 			{
@@ -448,8 +449,8 @@ namespace TEN::Entities::Vehicles
 
 		if (TrInput & VEHICLE_IN_BRAKE)
 		{
-			auto pos = Vector3Int(0, -144, -1024);
-			GetJointAbsPosition(jeepItem, &pos, 11);
+			auto pos = GetJointPosition(jeepItem, 11, Vector3i(0, -144, -1024));
+			TriggerDynamicLight(pos.x, pos.y, pos.z, 10, 64, 0, 0);
 
 			TriggerDynamicLight(pos.x, pos.y, pos.z, 10, 64, 0, 0);
 			jeepItem->MeshBits.Set(17);
@@ -1165,8 +1166,8 @@ namespace TEN::Entities::Vehicles
 		else if (jeep->Velocity < -JEEP_REVERSE_VELOCITY_MAX)
 			jeep->Velocity = -JEEP_REVERSE_VELOCITY_MAX;
 
-		// Store old 2D position to determine movement delta later.
-		auto moved = Vector3Int(jeepItem->Pose.Position.x, 0, jeepItem->Pose.Position.z);
+		// Store previous 2D position to determine movement delta later.
+		auto moved = Vector3i(jeepItem->Pose.Position.x, 0, jeepItem->Pose.Position.z);
 
 		// Process entity collision.
 		if (!(jeepItem->Flags & IFLAG_INVISIBLE))

@@ -7,6 +7,8 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
+#include "Math/Math.h"
+#include "Objects/Sink.h"
 #include "Objects/TR3/Vehicles/kayak_info.h"
 #include "Objects/Utils/VehicleHelpers.h"
 #include "Specific/level.h"
@@ -14,6 +16,7 @@
 #include "Specific/setup.h"
 
 using namespace TEN::Input;
+using namespace TEN::Math;
 using std::vector;
 
 namespace TEN::Entities::Vehicles
@@ -134,7 +137,7 @@ namespace TEN::Entities::Vehicles
 	};
 
 	WAKE_PTS WakePts[NUM_WAKE_SPRITES][2];
-	static vector<uint> KayakLaraLegJoints = { LM_HIPS, LM_LTHIGH, LM_LSHIN, LM_LFOOT, LM_RTHIGH, LM_RSHIN, LM_RFOOT };
+	static vector<unsigned int> KayakLaraLegJoints = { LM_HIPS, LM_LTHIGH, LM_LSHIN, LM_LFOOT, LM_RTHIGH, LM_RSHIN, LM_RFOOT };
 	static vector<VehicleMountType> KayakMountTypes =
 	{
 		VehicleMountType::LevelStart,
@@ -256,7 +259,7 @@ namespace TEN::Entities::Vehicles
 		{
 			if (!kayak->TrueWater && kayakItem->Animation.Velocity.y < 20)
 			{
-				Vector3Int dest;
+				Vector3i dest;
 				char cnt = 0;
 				short MistZPos[10] = { 900, 750, 600, 450, 300, 150, 0,  -150, -300, -450 };
 				short MistXPos[10] = { 32,  96,  170, 220, 300, 400, 400, 300,  200,  64 };
@@ -621,8 +624,7 @@ namespace TEN::Entities::Vehicles
 			if (laraItem->Animation.AnimNumber == Objects[ID_KAYAK_LARA_ANIMS].animIndex + KAYAK_ANIM_DISMOUNT_LEFT &&
 				frame == 83)
 			{
-				auto vec = Vector3Int(0, 350, 500);
-				GetLaraJointPosition(&vec, LM_HIPS);
+				auto vec = GetJointPosition(laraItem, LM_HIPS, Vector3i(0, 350, 500));
 
 				SetAnimation(laraItem, LA_JUMP_FORWARD);
 				laraItem->Pose.Position = vec;
@@ -643,8 +645,7 @@ namespace TEN::Entities::Vehicles
 			if (laraItem->Animation.AnimNumber == Objects[ID_KAYAK_LARA_ANIMS].animIndex + KAYAK_ANIM_DISMOUNT_RIGHT &&
 				frame == 83)
 			{
-				auto vec = Vector3Int(0, 350, 500);
-				GetLaraJointPosition(&vec, LM_HIPS);
+				auto vec = GetJointPosition(laraItem, LM_HIPS, Vector3i(0, 350, 500));
 
 				SetAnimation(laraItem, LA_JUMP_FORWARD);
 				laraItem->Pose.Position = vec;
@@ -689,7 +690,7 @@ namespace TEN::Entities::Vehicles
 
 		kayak->OldPose = kayakItem->Pose;
 
-		Vector3Int oldPos[9];
+		Vector3i oldPos[9];
 		int height[8];
 		height[0] = GetVehicleWaterHeight(kayakItem, KAYAK_FRONT, 0, true, oldPos[0]);
 		height[1] = GetVehicleWaterHeight(kayakItem, KAYAK_FRONT / 2, -96, true, oldPos[1]);
@@ -702,7 +703,7 @@ namespace TEN::Entities::Vehicles
 
 		oldPos[8] = kayakItem->Pose.Position;
 
-		Vector3Int frontPos, leftPos, rightPos;
+		Vector3i frontPos, leftPos, rightPos;
 		int frontHeight = GetVehicleWaterHeight(kayakItem, KAYAK_FRONT, 0, false, frontPos);
 		int leftHeight = GetVehicleWaterHeight(kayakItem, KAYAK_Z, -KAYAK_X, false, leftPos);
 		int rightHeight = GetVehicleWaterHeight(kayakItem, KAYAK_Z, KAYAK_X, false, rightPos);
@@ -731,7 +732,7 @@ namespace TEN::Entities::Vehicles
 		int zOld = kayakItem->Pose.Position.z;
 
 		int rot = 0;
-		Vector3Int pos;
+		Vector3i pos;
 
 		if ((height2 = GetVehicleWaterHeight(kayakItem, -CLICK(2.5f), 0, false, pos)) < (oldPos[7].y - KAYAK_COLLIDE))
 			rot = DoVehicleShift(kayakItem, pos, oldPos[7]);
@@ -787,14 +788,14 @@ namespace TEN::Entities::Vehicles
 
 			CameraCollisionBounds(&kayakPos, 256, 0);
 			{
-				kayakItem->Pose.Position = Vector3Int(kayakPos.x, kayakPos.y, kayakPos.z);
-				kayakItem->RoomNumber = kayakPos.roomNumber;
+				kayakItem->Pose.Position = Vector3i(kayakPos.x, kayakPos.y, kayakPos.z);
+				kayakItem->RoomNumber = kayakPos.RoomNumber;
 			}
 		}
 
 		DoVehicleCollision(kayakItem, KAYAK_Z); // FIXME: kayak is thin, what should we do about it?
 
-		auto impactDirection = GetVehicleImpactDirection(kayakItem, Vector3Int(xOld, 0, zOld));
+		auto impactDirection = GetVehicleImpactDirection(kayakItem, Vector3i(xOld, 0, zOld));
 
 		int slip = 0; // Remnant?
 		if (slip || impactDirection != VehicleImpactDirection::None)
@@ -896,7 +897,7 @@ namespace TEN::Entities::Vehicles
 
 		DoVehicleFlareDiscard(laraItem);
 		laraItem->Pose.Position = kayakItem->Pose.Position;
-		laraItem->Pose.Orientation = Vector3Shrt(0, kayakItem->Pose.Orientation.y, 0);
+		laraItem->Pose.Orientation = EulerAngles(0, kayakItem->Pose.Orientation.y, 0);
 		laraItem->Animation.IsAirborne = false;
 		laraItem->Animation.Velocity.z = 0;
 		laraItem->Animation.Velocity.y = 0;
@@ -909,7 +910,7 @@ namespace TEN::Entities::Vehicles
 
 	bool TestKayakDismount(ItemInfo* kayakItem, int direction)
 	{
-		Vector3Int pos;
+		Vector3i pos;
 		int height = GetVehicleWaterHeight(kayakItem, 0, (direction < 0) ? -KAYAK_DISMOUNT_DISTANCE : KAYAK_DISMOUNT_DISTANCE, false, pos);
 
 		if ((kayakItem->Pose.Position.y - height) > 0)
@@ -988,8 +989,8 @@ namespace TEN::Entities::Vehicles
 		{
 			int sinkval = lara->WaterCurrentActive - 1;
 
-			auto target = Vector3Int(g_Level.Sinks[sinkval].Position.x, g_Level.Sinks[sinkval].Position.y, g_Level.Sinks[sinkval].Position.z);
-			int angle = (((mGetAngle(target.x, target.z, laraItem->Pose.Position.x, laraItem->Pose.Position.z) - ANGLE(90.0f))) / 16) & 4095;
+			auto target = Vector3i(g_Level.Sinks[sinkval].Position.x, g_Level.Sinks[sinkval].Position.y, g_Level.Sinks[sinkval].Position.z);
+			int angle = (((Geometry::GetOrientToPoint(target.ToVector3(), laraItem->Pose.Position.ToVector3()).y - ANGLE(90.0f))) / 16) & 4095;
 
 			int dx = target.x - laraItem->Pose.Position.x;
 			int dz = target.z - laraItem->Pose.Position.z;

@@ -23,7 +23,7 @@ namespace TEN::Entities::TR4
 	#define SPHINX_RUN_TURN_ANGLE  ANGLE(0.33f)
 
 	const auto SphinxBite = BiteInfo(Vector3::Zero, 6);
-	const vector<uint> SphinxAttackJoints = { 6 };
+	const vector<unsigned int> SphinxAttackJoints = { 6 };
 
 	enum SphinxState
 	{

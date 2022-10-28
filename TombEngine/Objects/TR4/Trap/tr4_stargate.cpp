@@ -18,17 +18,17 @@ namespace TEN::Entities::Traps
 {
 	constexpr auto STARGATE_HARM_DAMAGE = 100;
 
-	const vector<uint> StargateHarmJoints = { 9, 10, 12, 13, 15, 16, 18, 19, 21, 22, 24, 25 };
-	const vector<Vector3Int> StargateBounds =
+	const vector<unsigned int> StargateHarmJoints = { 9, 10, 12, 13, 15, 16, 18, 19, 21, 22, 24, 25 };
+	const vector<Vector3i> StargateBounds =
 	{
-		Vector3Int(-CLICK(2), CLICK(2), -SECTOR(2)), 
-		Vector3Int(-896, -96, 96),
-		Vector3Int(-CLICK(2), CLICK(2), -128),
-		Vector3Int(0, -96, 96),
-		Vector3Int(-CLICK(2), -384, -SECTOR(2)),
-		Vector3Int(0, -96, 96),
-		Vector3Int(384, CLICK(2), -SECTOR(2)),
-		Vector3Int(0, -96, 96)
+		Vector3i(-CLICK(2), CLICK(2), -SECTOR(2)), 
+		Vector3i(-896, -96, 96),
+		Vector3i(-CLICK(2), CLICK(2), -128),
+		Vector3i(0, -96, 96),
+		Vector3i(-CLICK(2), -384, -SECTOR(2)),
+		Vector3i(0, -96, 96),
+		Vector3i(384, CLICK(2), -SECTOR(2)),
+		Vector3i(0, -96, 96)
 	};
 
 	void StargateControl(short itemNumber)

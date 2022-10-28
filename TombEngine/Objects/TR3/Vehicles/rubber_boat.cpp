@@ -9,15 +9,17 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
+#include "Math/Math.h"
 #include "Objects/TR3/Vehicles/rubber_boat_info.h"
 #include "Objects/Utils/VehicleHelpers.h"
+#include "Renderer/Renderer11Enums.h"
 #include "Sound/sound.h"
 #include "Specific/input.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
-#include "Renderer/Renderer11Enums.h"
 
 using namespace TEN::Input;
+using namespace TEN::Math;
 using std::vector;
 
 namespace TEN::Entities::Vehicles
@@ -147,7 +149,7 @@ namespace TEN::Entities::Vehicles
 
 		int pitch, height, ofs;
 
-		Vector3Int frontLeft, frontRight;
+		Vector3i frontLeft, frontRight;
 		auto impactDirection = RubberBoatDynamics(itemNumber, laraItem);
 		int heightFrontLeft = GetVehicleWaterHeight(rBoatItem, RBOAT_FRONT, -RBOAT_SIDE, true, frontLeft);
 		int heightFrontRight = GetVehicleWaterHeight(rBoatItem, RBOAT_FRONT, RBOAT_SIDE, true, frontRight);
@@ -269,8 +271,7 @@ namespace TEN::Entities::Vehicles
 		else
 			height = 1;
 
-		auto prop = Vector3Int(0, 0, -80);
-		GetJointAbsPosition(rBoatItem, &prop, 2);
+		auto prop = GetJointPosition(rBoatItem, 2, Vector3i(0, 0, -80));
 
 		probedRoomNumber = GetCollision(prop.x, prop.y, prop.z, rBoatItem->RoomNumber).RoomNumber;
 
@@ -281,14 +282,15 @@ namespace TEN::Entities::Vehicles
 			TriggerRubberBoatMistEffect(prop.x, prop.y, prop.z, abs(rBoatItem->Animation.Velocity.z), rBoatItem->Pose.Orientation.y + 0x8000, 0);
 			if ((GetRandomControl() & 1) == 0)
 			{
-				PHD_3DPOS pos;
-				pos.Position.x = prop.x + (GetRandomControl() & 63) - 32;
-				pos.Position.y = prop.y + (GetRandomControl() & 15);
-				pos.Position.z = prop.z + (GetRandomControl() & 63) - 32;
+				auto pos = Vector3i(
+					prop.x + (GetRandomControl() & 63) - 32,
+					prop.y + (GetRandomControl() & 15),
+					prop.z + (GetRandomControl() & 63) - 32
+				);
 
 				short roomNumber = rBoatItem->RoomNumber;
-				GetFloor(pos.Position.x, pos.Position.y, pos.Position.z, &roomNumber);
-				CreateBubble((Vector3Int*)&pos, roomNumber, 16, 8, 0, 0, 0, 0);
+				GetFloor(pos.x, pos.y, pos.z, &roomNumber);
+				CreateBubble(&pos, roomNumber, 16, 8, 0, 0, 0, 0);
 			}
 		}
 		else
@@ -499,7 +501,7 @@ namespace TEN::Entities::Vehicles
 
 		laraItem->Pose.Position = rBoatItem->Pose.Position;
 		laraItem->Pose.Position.y -= 5;
-		laraItem->Pose.Orientation = Vector3Shrt(0, rBoatItem->Pose.Orientation.y, 0);
+		laraItem->Pose.Orientation = EulerAngles(0, rBoatItem->Pose.Orientation.y, 0);
 		laraItem->Animation.IsAirborne = false;
 		laraItem->Animation.Velocity.z = 0;
 		laraItem->Animation.Velocity.y = 0;
@@ -623,7 +625,7 @@ namespace TEN::Entities::Vehicles
 		rBoatItem->Pose.Orientation.z -= rBoat->LeanAngle;
 
 		// Get point/room collision at vehicle front and corners.
-		Vector3Int frontLeftOld, frontRightOld, backLeftOld, backRightOld, frontOld;
+		Vector3i frontLeftOld, frontRightOld, backLeftOld, backRightOld, frontOld;
 		int heightFrontLeftOld = GetVehicleWaterHeight(rBoatItem, RBOAT_FRONT, -RBOAT_SIDE, true, frontLeftOld);
 		int heightFrontRightOld = GetVehicleWaterHeight(rBoatItem, RBOAT_FRONT, RBOAT_SIDE, true, frontRightOld);
 		int heightBackLeftOld = GetVehicleWaterHeight(rBoatItem, -RBOAT_FRONT, -RBOAT_SIDE, true, backLeftOld);
@@ -657,13 +659,13 @@ namespace TEN::Entities::Vehicles
 		rBoatItem->Pose.Position.x -= slip * phd_sin(rBoatItem->Pose.Orientation.y);
 
 		// Store old 2D position to determine movement delta later.
-		auto moved = Vector3Int(rBoatItem->Pose.Position.x, 0, rBoatItem->Pose.Position.z);
+		auto moved = Vector3i(rBoatItem->Pose.Position.x, 0, rBoatItem->Pose.Position.z);
 
 		// Apply shifts.
 
 		DoRubberBoatShift(itemNumber, laraItem);
 
-		Vector3Int frontLeft, frontRight, backRight, backLeft, front;
+		Vector3i frontLeft, frontRight, backRight, backLeft, front;
 		short extraRot = 0;
 		int heightBackLeft = GetVehicleWaterHeight(rBoatItem, -RBOAT_FRONT, -RBOAT_SIDE, false, backLeft);
 		if (heightBackLeft < (backLeftOld.y - CLICK(0.5f)))

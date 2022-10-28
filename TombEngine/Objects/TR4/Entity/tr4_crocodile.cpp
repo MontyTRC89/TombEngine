@@ -12,7 +12,7 @@
 #include "Game/misc.h"
 #include "Game/people.h"
 #include "Specific/level.h"
-#include "Specific/prng.h"
+#include "Math/Random.h"
 #include "Specific/setup.h"
 
 using namespace TEN::Math::Random;
@@ -35,7 +35,7 @@ namespace TEN::Entities::TR4
 	#define CROC_STATE_SWIM_TURN_RATE_MAX ANGLE(3.0f)
 
 	const auto CrocodileBite = BiteInfo(Vector3(0.0f, -100.0f, 500.0f), 9);
-	const vector<uint> CrocodileBiteAttackJoints = { 8, 9 };
+	const vector<unsigned int> CrocodileBiteAttackJoints = { 8, 9 };
 
 	enum CrocodileState
 	{

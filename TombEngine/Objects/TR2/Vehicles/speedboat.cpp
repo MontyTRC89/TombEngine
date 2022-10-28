@@ -7,6 +7,7 @@
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Game/effects/simple_particle.h"
+#include "Math/Math.h"
 #include "Objects/TR2/Vehicles/speedboat_info.h"
 #include "Objects/Utils/VehicleHelpers.h"
 #include "Sound/sound.h"
@@ -15,6 +16,7 @@
 #include "Specific/setup.h"
 
 using namespace TEN::Input;
+using namespace TEN::Math;
 using std::vector;
 
 namespace TEN::Entities::Vehicles
@@ -139,7 +141,7 @@ namespace TEN::Entities::Vehicles
 
 		auto impactDirection = SpeedboatDynamics(itemNumber, laraItem);
 
-		Vector3Int frontLeft, frontRight;
+		Vector3i frontLeft, frontRight;
 		int heightFrontLeft = GetVehicleWaterHeight(speedboatItem, SPEEDBOAT_FRONT, -SPEEDBOAT_SIDE, true, frontLeft);
 		int heightFrontRight = GetVehicleWaterHeight(speedboatItem, SPEEDBOAT_FRONT, SPEEDBOAT_SIDE, true, frontRight);
 
@@ -457,7 +459,7 @@ namespace TEN::Entities::Vehicles
 
 		laraItem->Pose.Position = speedboatItem->Pose.Position;
 		laraItem->Pose.Position.y -= 5;
-		laraItem->Pose.Orientation = Vector3Shrt(0, speedboatItem->Pose.Orientation.y, 0);
+		laraItem->Pose.Orientation = EulerAngles(0, speedboatItem->Pose.Orientation.y, 0);
 		laraItem->Animation.IsAirborne = false;
 		laraItem->Animation.Velocity.z = 0;
 		laraItem->Animation.Velocity.y = 0;
@@ -578,7 +580,7 @@ namespace TEN::Entities::Vehicles
 		speedboatItem->Pose.Orientation.z -= speedboat->LeanAngle;
 
 		// Get point/room collision at vehicle front and corners.
-		Vector3Int frontLeftOld, frontRightOld, backLeftOld, backRightOld, frontOld;
+		Vector3i frontLeftOld, frontRightOld, backLeftOld, backRightOld, frontOld;
 		int heightFrontLeftOld = GetVehicleWaterHeight(speedboatItem, SPEEDBOAT_FRONT, -SPEEDBOAT_SIDE, true, frontLeftOld);
 		int heightFrontRightOld = GetVehicleWaterHeight(speedboatItem, SPEEDBOAT_FRONT, SPEEDBOAT_SIDE, true, frontRightOld);
 		int heightBackLeftOld = GetVehicleWaterHeight(speedboatItem, -SPEEDBOAT_FRONT, -SPEEDBOAT_SIDE, true, backLeftOld);
@@ -606,11 +608,11 @@ namespace TEN::Entities::Vehicles
 		speedboatItem->Pose.Position.z -= slip * phd_cos(speedboatItem->Pose.Orientation.y);
 
 		// Store old 2D position to determine movement delta later.
-		auto moved = Vector3Int(speedboatItem->Pose.Position.x, 0, speedboatItem->Pose.Position.z);
+		auto moved = Vector3i(speedboatItem->Pose.Position.x, 0, speedboatItem->Pose.Position.z);
 
 		DoSpeedboatBoatShift(speedboatItem, itemNumber);
 
-		Vector3Int fl, fr, br, bl, f;
+		Vector3i fl, fr, br, bl, f;
 		short rotation = 0;
 		auto heightBackLeft = GetVehicleWaterHeight(speedboatItem, -SPEEDBOAT_FRONT, -SPEEDBOAT_SIDE, false, bl);
 		if (heightBackLeft < (backLeftOld.y - CLICK(0.5f)))

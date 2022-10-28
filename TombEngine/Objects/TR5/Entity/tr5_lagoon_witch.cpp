@@ -19,7 +19,7 @@ namespace TEN::Entities::Creatures::TR5
 	constexpr auto LAGOON_WITCH_ATTACK_DAMAGE = 100;
 
 	const auto LagoonWitchBite = BiteInfo(Vector3::Zero, 7);
-	const vector<uint> LagoonWitchAttackJoints = { 6, 7, 8, 9, 14, 15, 16, 17 };
+	const vector<unsigned int> LagoonWitchAttackJoints = { 6, 7, 8, 9, 14, 15, 16, 17 };
 
 	enum LagoonWitchState
 	{
@@ -143,7 +143,7 @@ namespace TEN::Entities::Creatures::TR5
 			{
 				auto* enemy = creature->Enemy;
 
-				if (enemy)
+				if (enemy != nullptr)
 				{
 					if (enemy->Flags & 2)
 						item->ItemFlags[3] = (creature->Tosspad & 0xFF) - 1;

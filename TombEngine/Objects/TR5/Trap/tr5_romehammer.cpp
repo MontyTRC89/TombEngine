@@ -1,5 +1,6 @@
 #include "framework.h"
-#include "tr5_romehammer.h"
+#include "Objects/TR5/Trap/tr5_romehammer.h"
+
 #include "Game/items.h"
 #include "Specific/level.h"
 

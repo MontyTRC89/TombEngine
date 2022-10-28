@@ -11,15 +11,15 @@
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_one_gun.h"
+#include "Math/Math.h"
 #include "Objects/TR4/Vehicles/motorbike_info.h"
 #include "Objects/Utils/VehicleHelpers.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
-#include "Specific/prng.h"
 #include "Specific/setup.h"
 
 using namespace TEN::Input;
-using namespace TEN::Math::Random;
+using namespace TEN::Math;
 using std::vector;
 
 namespace TEN::Entities::Vehicles
@@ -113,9 +113,9 @@ namespace TEN::Entities::Vehicles
 		MOTORBIKE_ANIM_UNLOCK = 28
 	};
 
-	const vector<uint> MotorbikeJoints = { 0, 1, 2, 4, 5, 6, 7, 8, 9 };
-	const vector<uint> MotorbikeBrakeLightJoints = { 10 };
-	const vector<uint> MotorbikeHeadLightJoints = { 3 };
+	const vector<unsigned int> MotorbikeJoints			 = { 0, 1, 2, 4, 5, 6, 7, 8, 9 };
+	const vector<unsigned int> MotorbikeBrakeLightJoints = { 10 };
+	const vector<unsigned int> MotorbikeHeadLightJoints  = { 3 };
 	const vector<VehicleMountType> MotorbikeMountTypes =
 	{
 		VehicleMountType::LevelStart,
@@ -146,7 +146,7 @@ namespace TEN::Entities::Vehicles
 		motorbike->MomentumAngle = motorbikeItem->Pose.Orientation.y;
 	}
 
-	int GetMotorbikeCollisionAnim(ItemInfo* motorbikeItem, Vector3Int* pos)
+	int GetMotorbikeCollisionAnim(ItemInfo* motorbikeItem, Vector3i* pos)
 	{
 		pos->x = motorbikeItem->Pose.Position.x - pos->x;
 		pos->z = motorbikeItem->Pose.Position.z - pos->z;
@@ -432,9 +432,7 @@ namespace TEN::Entities::Vehicles
 
 			if (TrInput & VEHICLE_IN_BRAKE)
 			{
-				auto pos = Vector3Int(0, -144, -1024);
-				GetJointAbsPosition(motorbikeItem, &pos, NULL);
-
+				auto pos = GetJointPosition(motorbikeItem, 0, Vector3i(0, -144, -1024));
 				TriggerDynamicLight(pos.x, pos.y, pos.z, 10, 64, 0, 0);
 				motorbikeItem->MeshBits.Set(MotorbikeBrakeLightJoints);
 			}
@@ -947,7 +945,7 @@ namespace TEN::Entities::Vehicles
 			motorbike->Velocity -= MOTORBIKE_SLOWDOWN1;
 
 		// Store old 2D position to determine movement delta later.
-		auto moved = Vector3Int(motorbikeItem->Pose.Position.x, 0, motorbikeItem->Pose.Position.z);
+		auto moved = Vector3i(motorbikeItem->Pose.Position.x, 0, motorbikeItem->Pose.Position.z);
 
 		if (!(motorbikeItem->Flags & IFLAG_INVISIBLE))
 			DoVehicleCollision(motorbikeItem, MOTORBIKE_RADIUS);
@@ -1035,11 +1033,8 @@ namespace TEN::Entities::Vehicles
 		if (motorbike->LightPower <= 0)
 			return;
 
-		auto start = Vector3Int(0, -470, 1836);
-		GetJointAbsPosition(motorbikeItem, &start, 0);
-
-		auto target = Vector3Int(0, -470, 20780);
-		GetJointAbsPosition(motorbikeItem, &target, 0);
+		auto start = GetJointPosition(motorbikeItem, 0, Vector3i(0, -470, 1836));
+		auto target = GetJointPosition(motorbikeItem,  0, Vector3i(0, -470, 20780));
 
 		int random = (motorbike->LightPower * 2) - (GetRandomControl() & 0xF);
 
@@ -1057,8 +1052,7 @@ namespace TEN::Entities::Vehicles
 
 		if (laraItem->Animation.ActiveState != MOTORBIKE_STATE_MOUNT && laraItem->Animation.ActiveState != MOTORBIKE_STATE_DISMOUNT)
 		{
-			auto pos = Vector3Int(56, -144, -500);
-			GetJointAbsPosition(motorbikeItem, &pos, 0);
+			auto pos = GetJointPosition(motorbikeItem, 0, Vector3i(56, -144, -500));
 
 			int speed = motorbikeItem->Animation.Velocity.z;
 			if (speed > 32 && speed < 64)

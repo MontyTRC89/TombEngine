@@ -26,8 +26,8 @@ namespace TEN::Entities::Creatures::TR2
 	constexpr auto DRAGON_CONTACT_DAMAGE	  = 10;
 
 	const auto DragonMouthBite = BiteInfo(Vector3(35.0f, 171.0f, 1168.0f), 12);
-	const vector<uint> DragonSwipeAttackJointsLeft  = { 24, 25, 26, 27, 28, 29, 30 };
-	const vector<uint> DragonSwipeAttackJointsRight = { 1, 2, 3, 4, 5, 6, 7 };
+	const vector<unsigned int> DragonSwipeAttackJointsLeft  = { 24, 25, 26, 27, 28, 29, 30 };
+	const vector<unsigned int> DragonSwipeAttackJointsRight = { 1, 2, 3, 4, 5, 6, 7 };
 
 	// TODO: Organise.
 	#define DRAGON_LIVE_TIME (30 * 11)
@@ -112,11 +112,9 @@ namespace TEN::Entities::Creatures::TR2
 			explosionItem->Pose.Position.y = item->Pose.Position.y + CLICK(1);
 			explosionItem->Pose.Position.z = item->Pose.Position.z;
 			explosionItem->RoomNumber = item->RoomNumber;
-			explosionItem->Pose.Orientation.y = 0;
-			explosionItem->Pose.Orientation.x = 0;
-			explosionItem->Pose.Orientation.z = 0;
-			explosionItem->Animation.Velocity.z = 0;
-			explosionItem->Animation.Velocity.y = 0;
+			explosionItem->Pose.Orientation = EulerAngles::Zero;
+			explosionItem->Animation.Velocity.y = 0.0f;
+			explosionItem->Animation.Velocity.z = 0.0f;
 
 			InitialiseItem(ExplosionIndex);
 			AddActiveItem(ExplosionIndex);
@@ -203,8 +201,8 @@ namespace TEN::Entities::Creatures::TR2
 
 					laraItem->Pose = item->Pose;
 					laraItem->Animation.IsAirborne = false;
-					laraItem->Animation.Velocity.z = 0;
-					laraItem->Animation.Velocity.y = 0;
+					laraItem->Animation.Velocity.y = 0.0f;
+					laraItem->Animation.Velocity.z = 0.0f;
 
 					if (item->RoomNumber != laraItem->RoomNumber)
 						ItemNewRoom(Lara.ItemNumber, item->RoomNumber);
@@ -259,10 +257,7 @@ namespace TEN::Entities::Creatures::TR2
 		{
 			if (item->Animation.ActiveState != DRAGON_STATE_DEATH)
 			{
-				item->Animation.AnimNumber = Objects[ID_DRAGON_FRONT].animIndex + 21;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-				item->Animation.ActiveState = DRAGON_STATE_DEATH;
-				item->Animation.TargetState = DRAGON_STATE_DEATH;
+				SetAnimation(item, 21);
 				creature->Flags = 0;
 			}
 			else if (creature->Flags >= 0)

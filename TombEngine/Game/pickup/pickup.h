@@ -1,14 +1,14 @@
 #pragma once
 
 enum GAME_OBJECT_ID : short;
-struct BOUNDING_BOX;
+class GameBoundingBox;
 struct CollisionInfo;
 struct ItemInfo;
-struct Vector3Int;
+class Vector3i;
 
 extern int NumRPickups;
 extern short RPickups[16];
-extern Vector3Int OldPickupPos;
+extern Vector3i OldPickupPos;
 
 void InitialisePickup(short itemNumber);
 bool SetInventoryCount(GAME_OBJECT_ID objectID, int count);
@@ -18,7 +18,7 @@ int GetInventoryCount(GAME_OBJECT_ID objectID);
 void CollectCarriedItems(ItemInfo* item);
 void PickupCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);
 void RegeneratePickups();
-BOUNDING_BOX* FindPlinth(ItemInfo* item);
+GameBoundingBox* FindPlinth(ItemInfo* item);
 
 void PickupControl(short itemNumber);
 

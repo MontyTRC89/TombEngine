@@ -15,7 +15,6 @@
 #include "Game/people.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
-#include "Specific/prng.h"
 #include "Specific/setup.h"
 
 using namespace TEN::Math::Random;
@@ -32,7 +31,7 @@ namespace TEN::Entities::Creatures::TR1
 
 	const auto CentaurRocketBite = BiteInfo(Vector3(11.0f, 415.0f, 41.0f), 13);
 	const auto CentaurRearBite	 = BiteInfo(Vector3(50.0f, 30.0f, 0.0f), 5);
-	const vector<uint> CentaurAttackJoints = { 0, 3, 4, 7, 8, 16, 17 };
+	const vector<unsigned int> CentaurAttackJoints = { 0, 3, 4, 7, 8, 16, 17 };
 
 	enum CentaurState
 	{

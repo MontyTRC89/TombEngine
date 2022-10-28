@@ -18,6 +18,6 @@ namespace TEN::Entities::Vehicles
 		int FloorHeightMiddle = 0;
 		int FloorHeightFront = 0;
 
-		char Flags = NULL;
+		char Flags = 0;
 	};
 }

@@ -1,5 +1,7 @@
 #pragma once
-#include "Specific/phd_global.h"
+#include "Math/Math.h"
+
+using namespace TEN::Math;
 
 namespace TEN::Entities::Vehicles
 {
@@ -12,7 +14,7 @@ namespace TEN::Entities::Vehicles
 
 		short TurnRate = 0;
 
-		PHD_3DPOS OldPose = PHD_3DPOS();
+		Pose OldPose = Pose::Zero;
 		unsigned int LeftRightPaddleCount = 0;
 		int WaterHeight = 0;
 		bool Turn = false;
@@ -22,6 +24,6 @@ namespace TEN::Entities::Vehicles
 		int CurrentStartWake = 0;
 		int WakeShade = 0;
 
-		char Flags = NULL;
+		char Flags = 0;
 	};
 }
