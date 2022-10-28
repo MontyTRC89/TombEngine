@@ -1246,8 +1246,8 @@ struct SubsuitControlData
 
 struct LaraControlData
 {
-	short MoveAngle = 0;
-	short TurnRate = 0;
+	short MoveAngle				 = 0;
+	short TurnRate				 = 0;
 	int	  CalculatedJumpVelocity = 0;
 
 	HandStatus	  HandStatus	= HandStatus::None;
