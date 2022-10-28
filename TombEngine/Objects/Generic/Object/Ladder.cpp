@@ -21,6 +21,15 @@ using std::vector;
 
 namespace TEN::Entities::Generic
 {
+	enum class LadderMountType
+	{
+		TopFront,
+		TopBack,
+		Bottom,
+		Left,
+		Right
+	};
+
 	const vector<int> LadderMountedStates =
 	{
 		LS_LADDER_IDLE,
