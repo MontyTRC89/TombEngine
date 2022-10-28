@@ -1179,8 +1179,8 @@ struct LaraCountData
 struct LookControlData
 {
 	LookMode	Mode		= LookMode::None;
-	Vector3Shrt Orientation = Vector3Shrt::Zero;
-	Vector3Shrt	TurnRate	= Vector3Shrt::Zero;
+	EulerAngles Orientation = EulerAngles::Zero;
+	EulerAngles	TurnRate	= EulerAngles::Zero;
 };
 
 struct WeaponControlData
