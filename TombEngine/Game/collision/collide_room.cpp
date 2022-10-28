@@ -297,10 +297,20 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 	int height, ceiling;
 
 	// Parameter definition ends here, now process to actual collision tests...
+
+	// HACK: when using SetPosition animcommand, item->RoomNumber does not immediately
+	// update, but only at the end of control loop. This may cause bugs when Lara is
+	// climbing or vaulting ledges under slopes. Using Location->roomNumber solves
+	// these bugs, as it is updated immediately. But since Location->roomNumber is ONLY
+	// updated for Lara, we can't use it for all objects for now. In future, we should
+	// either update Location field for all objects or use this value as it is now.
+
+	int realRoomNumber = doPlayerCollision ? item->Location.roomNumber : item->RoomNumber;
 	
 	// TEST 1: TILT AND NEAREST LEDGE CALCULATION
 
-	auto collResult = GetCollision(probePos.x, item->Pose.Position.y, probePos.z, item->RoomNumber);
+	auto collResult = GetCollision(probePos.x, item->Pose.Position.y, probePos.z, realRoomNumber);
+
 	coll->FloorTilt = collResult.FloorTilt;
 	coll->CeilingTilt = collResult.CeilingTilt;
 	coll->NearestLedgeAngle = GetNearestLedgeAngle(item, coll, coll->NearestLedgeDistance);
@@ -311,7 +321,7 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 	
 	// TEST 2: CENTERPOINT PROBE
 
-	collResult = GetCollision(probePos.x, probePos.y, probePos.z, item->RoomNumber);
+	collResult = GetCollision(probePos.x, probePos.y, probePos.z, realRoomNumber);
 	auto topRoomNumber = collResult.RoomNumber; // Keep top room number as we need it to re-probe from origin room.
 	
 	if (doPlayerCollision)
@@ -353,7 +363,7 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 		{
 			tfLocation = item->Location;
 			tcLocation = item->Location;
-			topRoomNumber = item->RoomNumber;
+			topRoomNumber = realRoomNumber;
 		}
 
 		tfLocation = GetRoom(tfLocation, probePos.x, probePos.y, probePos.z);
@@ -414,10 +424,11 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 	{
 		coll->Front.Floor = STOP_SIZE;
 	}
-	else if (coll->Setup.BlockMonkeySwingEdge &&
-		!GetCollision(probePos.x, probePos.y + coll->Setup.Height, probePos.z, item->RoomNumber).BottomBlock->Flags.Monkeyswing)
+	else if (coll->Setup.BlockMonkeySwingEdge)			
 	{
-		coll->Front.Floor = MAX_HEIGHT;
+		auto monkeyProbe = GetCollision(probePos.x, probePos.y + coll->Setup.Height, probePos.z, realRoomNumber);
+		if (monkeyProbe.BottomBlock->Flags.Monkeyswing)
+			coll->Front.Floor = MAX_HEIGHT;
 	}
 
 	// TEST 4: MIDDLE-LEFT PROBE
