@@ -2613,8 +2613,8 @@ bool TestLaraPoleDown(ItemInfo* item, CollisionInfo* coll)
 
 bool TestLaraLadderUp(ItemInfo* item, CollisionInfo* coll)
 {
-	static constexpr auto probeDist			= CLICK(1);
-	static constexpr auto upperCeilingBound = -CLICK(0.5f);
+	static constexpr auto probeDist			= BLOCK(1, 4);
+	static constexpr auto upperCeilingBound = -BLOCK(1, 8);
 
 	int vPos = item->Pose.Position.y + GameBoundingBox(item).Y1;
 	auto pointColl = GetCollision(item, item->Pose.Orientation.y, -probeDist);
@@ -2630,8 +2630,8 @@ bool TestLaraLadderDown(ItemInfo* item, CollisionInfo* coll)
 {
 	return true;
 
-	static constexpr auto probeDist		  = CLICK(1);
-	static constexpr auto lowerFloorBound = CLICK(0.5f);
+	static constexpr auto probeDist		  = BLOCK(1, 4);
+	static constexpr auto lowerFloorBound = BLOCK(1, 8);
 
 	int vPos = item->Pose.Position.y + GameBoundingBox(item).Y2;
 	auto pointColl = GetCollision(item, item->Pose.Orientation.y, -probeDist);
@@ -2645,9 +2645,9 @@ bool TestLaraLadderDown(ItemInfo* item, CollisionInfo* coll)
 
 bool TestLaraLadderDismountTop(ItemInfo* item, CollisionInfo* coll)
 {
-	static constexpr auto probeDist			= CLICK(1);
-	static constexpr auto upperFloorBound	= -CLICK(0.25f);
-	static constexpr auto lowerCeilingBound = -CLICK(2);
+	static constexpr auto probeDist			= BLOCK(1, 4);
+	static constexpr auto upperFloorBound	= 0;
+	static constexpr auto lowerCeilingBound = -BLOCK(1, 2);
 
 	int vPos = item->Pose.Position.y + GameBoundingBox(item).Y1;
 	auto pointColl = GetCollision(item, item->Pose.Orientation.y, probeDist);
@@ -2655,8 +2655,6 @@ bool TestLaraLadderDismountTop(ItemInfo* item, CollisionInfo* coll)
 	// Check for wall.
 	if (pointColl.Position.Floor == NO_HEIGHT)
 		return false;
-
-	g_Renderer.PrintDebugMessage("%d", (pointColl.Position.Floor - vPos));
 
 	// Assess point collision.
 	if ((pointColl.Position.Floor - vPos) >= upperFloorBound &&					  // Floor height is within upper floor bound.
@@ -2671,8 +2669,8 @@ bool TestLaraLadderDismountTop(ItemInfo* item, CollisionInfo* coll)
 
 bool TestLaraLadderDismountBottom(ItemInfo* item, CollisionInfo* coll)
 {
-	static constexpr auto probeDist		  = CLICK(0.75f);
-	static constexpr auto lowerFloorBound = CLICK(0.5f);
+	static constexpr auto probeDist		  = BLOCK(3, 16);
+	static constexpr auto lowerFloorBound = BLOCK(1, 8);
 
 	int vPos = item->Pose.Position.y + GameBoundingBox(item).Y2;
 	auto pointColl = GetCollision(item, item->Pose.Orientation.y, -probeDist);
@@ -2697,8 +2695,8 @@ bool TestLaraLadderDismountBottom(ItemInfo* item, CollisionInfo* coll)
 
 bool TestLaraLadderSideDismount(ItemInfo* item, CollisionInfo* coll, bool isGoingLeft)
 {
-	static constexpr int probeDist	= CLICK(1.5f);
-	static constexpr int floorBound = CLICK(0.25f);
+	static constexpr int probeDist	= BLOCK(3, 8);
+	static constexpr int floorBound = BLOCK(1, 16);
 
 	int vPos = item->Pose.Position.y;
 	auto pointColl = GetCollision(item, item->Pose.Orientation.y + (isGoingLeft ? -ANGLE(90.0f) : ANGLE(90.0f)), probeDist);
