@@ -131,9 +131,9 @@ bool TestLaraPoleCollision(ItemInfo* item, CollisionInfo* coll, bool goingUp, fl
 bool TestLaraPoleUp(ItemInfo* item, CollisionInfo* coll);
 bool TestLaraPoleDown(ItemInfo* item, CollisionInfo* coll);
 
-bool TestLaraLadderUp(ItemInfo* item, CollisionInfo* coll);
-bool TestLaraLadderDown(ItemInfo* item, CollisionInfo* coll);
-bool TestLaraLadderDismountTop(ItemInfo* item, CollisionInfo* coll);
-bool TestLaraLadderDismountBottom(ItemInfo* item, CollisionInfo* coll);
-bool TestLaraLadderDismountLeft(ItemInfo* item, CollisionInfo* coll);
-bool TestLaraLadderDismountRight(ItemInfo* item, CollisionInfo* coll);
+bool CanClimbLadderUp(ItemInfo* item, CollisionInfo* coll);
+bool CanClimbLadderDown(ItemInfo* item, CollisionInfo* coll);
+bool CanDismountLadderTop(ItemInfo* item, CollisionInfo* coll);
+bool CanDismountLadderBottom(ItemInfo* item, CollisionInfo* coll);
+bool CanDismountLadderLeft(ItemInfo* item, CollisionInfo* coll);
+bool CanDismountLadderRight(ItemInfo* item, CollisionInfo* coll);

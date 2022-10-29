@@ -744,12 +744,12 @@ void lara_as_ladder_idle(ItemInfo* item, CollisionInfo* coll)
 
 		if (TrInput & IN_FORWARD)
 		{
-			if (TestLaraLadderDismountTop(item, coll))
+			if (CanDismountLadderTop(item, coll))
 			{
 				item->Animation.TargetState = LS_LADDER_DISMOUNT_TOP;
 				return;
 			}
-			else if (TestLaraLadderUp(item, coll))
+			else if (CanClimbLadderUp(item, coll))
 			{
 				item->Animation.TargetState = LS_LADDER_UP;
 				return;
@@ -757,24 +757,24 @@ void lara_as_ladder_idle(ItemInfo* item, CollisionInfo* coll)
 		}
 		else if (TrInput & IN_BACK)
 		{
-			if (TestLaraLadderDismountBottom(item, coll))
+			if (CanDismountLadderBottom(item, coll))
 			{
 				item->Animation.TargetState = LS_LADDER_DISMOUNT_BOTTOM;
 				return;
 			}
-			else if (TestLaraLadderDown(item, coll))
+			else if (CanClimbLadderDown(item, coll))
 			{
 				item->Animation.TargetState = LS_LADDER_DOWN;
 				return;
 			}
 		}
 
-		if (TrInput & IN_LEFT && TestLaraLadderDismountLeft(item, coll))
+		if (TrInput & IN_LEFT && CanDismountLadderLeft(item, coll))
 		{
 			item->Animation.TargetState = LS_LADDER_DISMOUNT_LEFT;
 			return;
 		}
-		else if (TrInput & IN_RIGHT && TestLaraLadderDismountRight(item, coll))
+		else if (TrInput & IN_RIGHT && CanDismountLadderRight(item, coll))
 		{
 			item->Animation.TargetState = LS_LADDER_DISMOUNT_RIGHT;
 			return;
@@ -784,7 +784,7 @@ void lara_as_ladder_idle(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (TestLaraLadderDismountBottom(item, coll))
+	if (CanDismountLadderBottom(item, coll))
 	{
 		item->Animation.TargetState = LS_LADDER_DISMOUNT_BOTTOM;
 		return;
@@ -833,12 +833,12 @@ void lara_as_ladder_up(ItemInfo* item, CollisionInfo* coll)
 
 		if (TrInput & IN_FORWARD)
 		{
-			if (TestLaraLadderDismountTop(item, coll))
+			if (CanDismountLadderTop(item, coll))
 			{
 				item->Animation.TargetState = LS_LADDER_DISMOUNT_TOP;
 				return;
 			}
-			else if (TestLaraLadderUp(item, coll))
+			else if (CanClimbLadderUp(item, coll))
 			{
 				item->Animation.TargetState = LS_LADDER_UP;
 				return;
@@ -890,12 +890,12 @@ void lara_as_ladder_down(ItemInfo* item, CollisionInfo* coll)
 
 		if (TrInput & IN_BACK)
 		{
-			if (TestLaraLadderDismountBottom(item, coll))
+			if (CanDismountLadderBottom(item, coll))
 			{
 				item->Animation.TargetState = LS_LADDER_DISMOUNT_BOTTOM;
 				return;
 			}
-			else if (TestLaraLadderDown(item, coll))
+			else if (CanClimbLadderDown(item, coll))
 			{
 				item->Animation.TargetState = LS_LADDER_DOWN;
 				return;

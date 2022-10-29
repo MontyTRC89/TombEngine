@@ -2611,7 +2611,7 @@ bool TestLaraPoleDown(ItemInfo* item, CollisionInfo* coll)
 	return (coll->Middle.Floor > 0);
 }
 
-bool TestLaraLadderUp(ItemInfo* item, CollisionInfo* coll)
+bool CanClimbLadderUp(ItemInfo* item, CollisionInfo* coll)
 {
 	static constexpr auto probeDist			= BLOCK(1, 4);
 	static constexpr auto upperCeilingBound = -BLOCK(1, 8);
@@ -2626,7 +2626,7 @@ bool TestLaraLadderUp(ItemInfo* item, CollisionInfo* coll)
 	return true;
 }
 
-bool TestLaraLadderDown(ItemInfo* item, CollisionInfo* coll)
+bool CanClimbLadderDown(ItemInfo* item, CollisionInfo* coll)
 {
 	return true;
 
@@ -2643,7 +2643,7 @@ bool TestLaraLadderDown(ItemInfo* item, CollisionInfo* coll)
 	return false;
 }
 
-bool TestLaraLadderDismountTop(ItemInfo* item, CollisionInfo* coll)
+bool CanDismountLadderTop(ItemInfo* item, CollisionInfo* coll)
 {
 	static constexpr auto probeDist			= BLOCK(1, 4);
 	static constexpr auto lowerFloorBound	= BLOCK(1, 16);
@@ -2669,7 +2669,7 @@ bool TestLaraLadderDismountTop(ItemInfo* item, CollisionInfo* coll)
 	return false;
 }
 
-bool TestLaraLadderDismountBottom(ItemInfo* item, CollisionInfo* coll)
+bool CanDismountLadderBottom(ItemInfo* item, CollisionInfo* coll)
 {
 	static constexpr auto probeDist		  = BLOCK(3, 16);
 	static constexpr auto lowerFloorBound = BLOCK(2, 9);
@@ -2679,10 +2679,6 @@ bool TestLaraLadderDismountBottom(ItemInfo* item, CollisionInfo* coll)
 
 	// Check for wall.
 	if (pointColl.Position.Floor == NO_HEIGHT)
-		return false;
-
-	// Check for floor slope.
-	if (pointColl.Position.FloorSlope)
 		return false;
 
 	// Assess point collision.
@@ -2700,15 +2696,11 @@ bool TestLaraLadderSideDismount(ItemInfo* item, CollisionInfo* coll, bool isGoin
 	static constexpr int probeDist	= BLOCK(3, 8);
 	static constexpr int floorBound = BLOCK(1, 16);
 
-	int vPos = item->Pose.Position.y;
+	int vPos = item->Pose.Position.y + GameBoundingBox(item).Y2;
 	auto pointColl = GetCollision(item, item->Pose.Orientation.y + (isGoingLeft ? -ANGLE(90.0f) : ANGLE(90.0f)), probeDist);
 
 	// Check for wall.
 	if (pointColl.Position.Floor == NO_HEIGHT)
-		return false;
-
-	// Check for floor slope.
-	if (pointColl.Position.FloorSlope)
 		return false;
 
 	// Assess point collision.
@@ -2721,12 +2713,12 @@ bool TestLaraLadderSideDismount(ItemInfo* item, CollisionInfo* coll, bool isGoin
 	return false;
 }
 
-bool TestLaraLadderDismountLeft(ItemInfo* item, CollisionInfo* coll)
+bool CanDismountLadderLeft(ItemInfo* item, CollisionInfo* coll)
 {
 	return TestLaraLadderSideDismount(item, coll, true);
 }
 
-bool TestLaraLadderDismountRight(ItemInfo* item, CollisionInfo* coll)
+bool CanDismountLadderRight(ItemInfo* item, CollisionInfo* coll)
 {
 	return TestLaraLadderSideDismount(item, coll, false);
 }

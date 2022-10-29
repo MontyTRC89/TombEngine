@@ -241,6 +241,8 @@ function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] =
 	lara_void_func,//184
 	lara_void_func,//185
 	lara_void_func,//186
+	lara_void_func,//187
+	lara_void_func,//188
 };
 
 function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] =
@@ -432,6 +434,8 @@ function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] =
 	lara_void_func,//184
 	lara_void_func,//185
 	lara_void_func,//186
+	lara_void_func,//187
+	lara_void_func,//188
 };
 
 void LaraControl(ItemInfo* item, CollisionInfo* coll)
