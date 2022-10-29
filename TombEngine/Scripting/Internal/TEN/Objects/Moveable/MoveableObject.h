@@ -19,6 +19,34 @@ enum GAME_OBJECT_ID : short;
 using aiBitsArray = std::array<int, 6>;
 using aiBitsType = sol::as_table_t<aiBitsArray>;
 
+//todo: the next unordered_map codes will be moved to the new Lara class as soon it is available.
+static const std::unordered_map<std::string, LaraWeaponType> kLaraWeaponType
+{
+	{"NONE", LaraWeaponType::None},
+	{"PISTOLS", LaraWeaponType::Pistol},
+	{"REVOLVER", LaraWeaponType::Revolver},
+	{"UZI", LaraWeaponType::Uzi},
+	{"SHOTGUN", LaraWeaponType::Shotgun},
+	{"HK", LaraWeaponType::HK},
+	{"CROSSBOW", LaraWeaponType::Crossbow},
+	{"FLARE", LaraWeaponType::Flare},
+	{"GRENADELAUNCHER", LaraWeaponType::GrenadeLauncher},
+	{"HARPOONGUN", LaraWeaponType::HarpoonGun},
+	{"ROCKETLAUNCHER", LaraWeaponType::RocketLauncher},
+	{"SNOWMOBILE", LaraWeaponType::Snowmobile},
+	{"NUMWEAPONS", LaraWeaponType::NumWeapons}
+};
+
+static const std::unordered_map<std::string, HandStatus> kHandStatus
+{
+	{"FREE", HandStatus::Free},
+	{"BUSY", HandStatus::Busy},
+	{"WEAPONDRAW", HandStatus::WeaponDraw},
+	{"WEAPONUNDRAW", HandStatus::WeaponUndraw},
+	{"WEAPONREADY", HandStatus::WeaponReady},
+	{"SPECIAL", HandStatus::Special},
+};
+
 class Moveable : public NamedBase<Moveable, short>
 {
 public:
@@ -98,10 +126,11 @@ public:
 
 	void AttachCamera(short camMeshId, short targetMeshId);
 
+
 	HandStatus GetLaraHandStatus() const;
 	LaraWeaponType GetLaraWeaponType() const;
 	void SetLaraWeaponType(LaraWeaponType weaponType, bool activate);
-	void ThrowawayTorch();
+	void ThrowAwayTorch();
 	void AnimFromObject(GAME_OBJECT_ID object, int animNumber, int stateID);
 	void UndrawWeapons();
 
