@@ -8,7 +8,8 @@ enum class CameraType
 	Fixed,
 	Look,
 	Combat,
-	Heavy
+	Heavy,
+	Object
 };
 
 struct CAMERA_INFO
