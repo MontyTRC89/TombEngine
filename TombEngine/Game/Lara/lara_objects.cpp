@@ -823,6 +823,12 @@ void lara_as_ladder_up(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
+	if (CanDismountLadderTop(item, coll))
+	{
+		item->Animation.TargetState = LS_LADDER_DISMOUNT_TOP;
+		return;
+	}
+
 	if (TrInput & IN_ACTION)
 	{
 		if (TrInput & IN_JUMP)
@@ -831,18 +837,10 @@ void lara_as_ladder_up(ItemInfo* item, CollisionInfo* coll)
 			return;
 		}
 
-		if (TrInput & IN_FORWARD)
+		if (TrInput & IN_FORWARD && CanClimbLadderUp(item, coll))
 		{
-			if (CanDismountLadderTop(item, coll))
-			{
-				item->Animation.TargetState = LS_LADDER_DISMOUNT_TOP;
-				return;
-			}
-			else if (CanClimbLadderUp(item, coll))
-			{
-				item->Animation.TargetState = LS_LADDER_UP;
-				return;
-			}
+			item->Animation.TargetState = LS_LADDER_UP;
+			return;
 		}
 
 		item->Animation.TargetState = LS_LADDER_IDLE;
