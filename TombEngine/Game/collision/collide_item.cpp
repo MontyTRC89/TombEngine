@@ -23,11 +23,11 @@
 using namespace TEN::Math;
 using namespace TEN::Renderer;
 
+constexpr auto ANIMATED_ALIGNMENT_FRAME_COUNT_THRESHOLD = 6;
+
 GameBoundingBox GlobalCollisionBounds;
 ItemInfo* CollidedItems[MAX_COLLIDED_OBJECTS];
 MESH_INFO* CollidedMeshes[MAX_COLLIDED_OBJECTS];
-
-constexpr auto ANIMATED_ALIGNMENT_FRAME_COUNT_THRESHOLD = 6;
 
 void GenericSphereBoxCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 {
@@ -526,14 +526,12 @@ bool Move3DPosTo3DPos(ItemInfo* item, Pose& fromPose, const Pose& toPose, int ve
 {
 	auto* lara = GetLaraInfo(item);
 
-	float distance = Vector3i::Distance(fromPose.Position, toPose.Position);
-
-	fromPose = AlignPoseToPose(fromPose, toPose, velocity, turnRate);
-
 	if (!lara->Control.IsMoving)
 	{
-		bool shouldAnimate = ((distance - velocity) > (velocity * ANIMATED_ALIGNMENT_FRAME_COUNT_THRESHOLD));
-		if (shouldAnimate && lara->Control.WaterStatus != WaterStatus::Underwater)
+		float distance = Vector3i::Distance(fromPose.Position, toPose.Position);
+		bool doAlignAnim = ((distance - velocity) > (velocity * ANIMATED_ALIGNMENT_FRAME_COUNT_THRESHOLD));
+		
+		if (doAlignAnim && lara->Control.WaterStatus != WaterStatus::Underwater)
 		{
 			short headingAngle = Geometry::GetOrientToPoint(fromPose.Position.ToVector3(), toPose.Position.ToVector3()).y;
 			int direction = GetQuadrant(headingAngle - fromPose.Orientation.y);
@@ -565,6 +563,7 @@ bool Move3DPosTo3DPos(ItemInfo* item, Pose& fromPose, const Pose& toPose, int ve
 		lara->Control.Count.PositionAdjust = 0;
 	}
 	
+	fromPose = AlignPoseToPose(fromPose, toPose, velocity, turnRate);
 	return (fromPose == toPose);
 }
 
