@@ -94,6 +94,7 @@ using namespace TEN::Math;
 	{
 		return ((Position == pose.Position) && (Orientation == pose.Orientation));
 	}
+
 	bool Pose::operator !=(const Pose& pose) const
 	{
 		return ((Position != pose.Position) || (Orientation != pose.Orientation));
