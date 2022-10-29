@@ -501,27 +501,6 @@ bool ItemNearTarget(const Vector3i& origin, ItemInfo* targetEntity, int radius)
 	return false;
 }
 
-Pose AlignPoseToPose(const Pose& fromPose, const Pose& toPose, float velocity, short turnRate, bool ignoreGravity)
-{
-	// Establish base pose.
-	auto newPose = fromPose;
-
-	// Translate position.
-	float distance = Vector3i::Distance(fromPose.Position, toPose.Position);
-	if (distance <= velocity)
-		newPose.Position = toPose.Position;
-	else
-	{
-		auto direction = toPose.Position.ToVector3() - fromPose.Position.ToVector3();
-		newPose.Translate(direction, velocity);
-	}
-
-	// Interpolate orientation.
-	newPose.Orientation.InterpolateConstant(toPose.Orientation, turnRate);
-	
-	return newPose;
-}
-
 bool Move3DPosTo3DPos(ItemInfo* item, Pose& fromPose, const Pose& toPose, int velocity, short turnRate)
 {
 	auto* lara = GetLaraInfo(item);
@@ -563,7 +542,7 @@ bool Move3DPosTo3DPos(ItemInfo* item, Pose& fromPose, const Pose& toPose, int ve
 		lara->Control.Count.PositionAdjust = 0;
 	}
 	
-	fromPose = AlignPoseToPose(fromPose, toPose, velocity, turnRate);
+	fromPose.Interpolate(toPose, velocity, turnRate);
 	return (fromPose == toPose);
 }
 

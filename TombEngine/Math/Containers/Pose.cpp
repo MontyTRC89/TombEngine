@@ -74,6 +74,22 @@ using namespace TEN::Math;
 		this->Position = Geometry::TranslatePoint(this->Position, direction, distance);
 	}
 
+	void Pose::Interpolate(const Pose& toPose, float velocity, short turnRate)
+	{
+		// Translate position.
+		float distance = Vector3i::Distance(Position, toPose.Position);
+		if (distance <= velocity)
+			this->Position = toPose.Position;
+		else
+		{
+			auto direction = toPose.Position.ToVector3() - Position.ToVector3();
+			this->Translate(direction, velocity);
+		}
+
+		// Interpolate orientation.
+		this->Orientation.InterpolateConstant(toPose.Orientation, turnRate);
+	}
+
 	bool Pose::operator ==(const Pose& pose) const
 	{
 		return ((Position == pose.Position) && (Orientation == pose.Orientation));
