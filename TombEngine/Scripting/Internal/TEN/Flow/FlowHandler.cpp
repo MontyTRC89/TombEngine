@@ -12,6 +12,7 @@
 #include "Objects/ScriptInterfaceObjectsHandler.h"
 #include "Strings/ScriptInterfaceStringsHandler.h"
 #include "Specific/trutils.h"
+#include "Scripting\Internal\TEN\Objects\Moveable\MoveableObject.h"
 
 /***
 Functions for use in Flow.lua, settings.lua and strings.lua
@@ -106,13 +107,6 @@ __(not yet implemented)__
 */
 	table_flow.set_function(ScriptReserved_SetTitleScreenImagePath, &FlowHandler::SetTitleScreenImagePath, this);
 
-/*** Set FlyCheatEnabled
-Must be true or false
-@function SetFlyCheatEnabled
-@tparam bool true or false
-*/
-	table_flow.set_function(ScriptReserved_EnableFlyCheat, &FlowHandler::EnableFlyCheat, this);
-
 /*** settings.lua.
 These functions are called in settings.lua, a file which holds your local settings.
 settings.lua shouldn't be bundled with any finished levels/games.
@@ -170,6 +164,9 @@ Specify which translations in the strings table correspond to which languages.
 	m_handler.MakeReadOnlyTable(table_flow, ScriptReserved_RotationAxis, kRotAxes);
 	m_handler.MakeReadOnlyTable(table_flow, ScriptReserved_ItemAction, kItemActions);
 	m_handler.MakeReadOnlyTable(table_flow, ScriptReserved_ErrorMode, kErrorModes);
+	//todo: the next two codelines will be moved to the new Lara class as soon it is available.
+	m_handler.MakeReadOnlyTable(table_flow, ScriptReserved_LaraWeaponType, kLaraWeaponType);
+	m_handler.MakeReadOnlyTable(table_flow, ScriptReserved_HandStatus, kHandStatus);
 }
 
 FlowHandler::~FlowHandler()
@@ -312,11 +309,6 @@ void FlowHandler::AddSecret(int levelSecretIndex)
 bool FlowHandler::IsFlyCheatEnabled() const
 {
 	return FlyCheat;
-}
-
-void FlowHandler::EnableFlyCheat(bool flyCheat)
-{
-	FlyCheat = flyCheat;
 }
 
 bool FlowHandler::DoFlow()
