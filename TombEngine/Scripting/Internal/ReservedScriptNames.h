@@ -124,6 +124,8 @@ static constexpr char ScriptReserved_RotationAxis[]		= "RotationAxis";
 static constexpr char ScriptReserved_ItemAction[]		= "ItemAction";
 static constexpr char ScriptReserved_ErrorMode[]		= "ErrorMode";
 static constexpr char ScriptReserved_InventoryItem[]	= "InventoryItem";
+static constexpr char ScriptReserved_LaraWeaponType[]	= "LaraWeaponType";
+static constexpr char ScriptReserved_HandStatus[]		= "HandStatus";
 
 // Functions
 static constexpr char ScriptReserved_ShowString[]					= "ShowString";
@@ -181,7 +183,7 @@ static constexpr char ScriptReserved_ResetObjCamera[]				= "ResetObjCamera";
 static constexpr char ScriptReserved_UndrawWeapons[]				= "UndrawWeapons";
 static constexpr char ScriptReserved_GetLaraHandStatus[]			= "GetLaraHandStatus";
 static constexpr char ScriptReserved_GetLaraWeaponType[]			= "GetLaraWeaponType";
-static constexpr char ScriptReserved_ThrowawayTorch[]				= "ThrowawayTorch";
+static constexpr char ScriptReserved_ThrowAwayTorch[]				= "ThrowAwayTorch";
 static constexpr char ScriptReserved_SetLaraWeaponType[]			= "SetLaraWeaponType";
 
 // Enums
