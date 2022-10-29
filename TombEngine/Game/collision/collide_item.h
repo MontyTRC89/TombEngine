@@ -1,6 +1,7 @@
 #pragma once
 #include "Math/Math.h"
 
+using namespace TEN::Math;
 using std::pair;
 
 class FloorInfo;
@@ -35,6 +36,7 @@ bool MoveLaraPosition(const Vector3i& offset, ItemInfo* item, ItemInfo* laraItem
 bool ItemNearLara(const Vector3i& origin, int radius);
 bool ItemNearTarget(const Vector3i& origin, ItemInfo* targetEntity, int radius);
 
+Pose AlignPoseToPose(const Pose& fromPose, const Pose& toPose, float velocity, short turnRate, bool ignoreGravity = false);
 bool Move3DPosTo3DPos(ItemInfo* item, Pose& fromPose, const Pose& toPose, int velocity, short turnRate);
 
 bool TestBoundsCollide(ItemInfo* item, ItemInfo* laraItem, int radius);

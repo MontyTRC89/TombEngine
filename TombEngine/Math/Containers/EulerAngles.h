@@ -24,6 +24,8 @@
 		static bool		   Compare(const EulerAngles& eulers0, const EulerAngles& eulers1, short epsilon = 2);
 		void			   Lerp(const EulerAngles& eulersTo, float alpha = 1.0f, short epsilon = 2);
 		static EulerAngles Lerp(const EulerAngles& eulersFrom, const EulerAngles& eulersTo, float alpha = 1.0f, short epsilon = 2);
+		void			   InterpolateConstant(const EulerAngles& eulersTo, short angularVel);
+		static EulerAngles InterpolateConstant(const EulerAngles& eulersFrom, const EulerAngles& eulerTo, short angularVel);
 
 		// Converters
 		Vector3	   ToDirection() const;
@@ -50,5 +52,6 @@
 		static float ClampAlpha(float alpha);
 		static bool	 Compare(short angle0, short angle1, short epsilon = 2);
 		static short Lerp(short angleFrom, short angleTo, float alpha = 1.0f, short epsilon = 2);
+		static short InterpolateConstant(short angleFrom, short angleTo, short angularVel);
 	};
 //}

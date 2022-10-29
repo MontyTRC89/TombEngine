@@ -74,6 +74,20 @@ using namespace TEN::Math;
 		return false;
 	}
 
+	void EulerAngles::InterpolateConstant(const EulerAngles& eulersTo, short angularVel)
+	{
+		*this = InterpolateConstant(*this, eulersTo, angularVel);
+	}
+	
+	EulerAngles EulerAngles::InterpolateConstant(const EulerAngles& eulersFrom, const EulerAngles& eulerTo, short angularVel)
+	{
+		return EulerAngles(
+			InterpolateConstant(eulersFrom.x, eulerTo.x, angularVel),
+			InterpolateConstant(eulersFrom.y, eulerTo.y, angularVel),
+			InterpolateConstant(eulersFrom.z, eulerTo.z, angularVel)
+		);
+	}
+
 	void EulerAngles::Lerp(const EulerAngles& eulersTo, float alpha, short epsilon)
 	{
 		*this = Lerp(*this, eulersTo, alpha, epsilon);
@@ -219,5 +233,14 @@ using namespace TEN::Math;
 
 		short difference = Geometry::GetShortestAngularDistance(angleFrom, angleTo);
 		return (short)round(angleFrom + (difference * alpha));
+	}
+
+	short EulerAngles::InterpolateConstant(short angleFrom, short angleTo, short angularVel)
+	{
+		if (Compare(angleFrom, angleTo, angularVel))
+			return angleTo;
+
+		int sign = copysign(1, Geometry::GetShortestAngularDistance(angleFrom, angleTo));
+		return (angleFrom + (angularVel * sign));
 	}
 //}

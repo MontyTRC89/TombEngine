@@ -501,26 +501,42 @@ bool ItemNearTarget(const Vector3i& origin, ItemInfo* targetEntity, int radius)
 	return false;
 }
 
+Pose AlignPoseToPose(const Pose& fromPose, const Pose& toPose, float velocity, short turnRate, bool ignoreGravity)
+{
+	// Establish base pose.
+	auto newPose = fromPose;
+
+	// Translate position.
+	float distance = Vector3i::Distance(fromPose.Position, toPose.Position);
+	if (distance <= velocity)
+		newPose.Position = toPose.Position;
+	else
+	{
+		auto direction = toPose.Position.ToVector3() - fromPose.Position.ToVector3();
+		newPose.Translate(direction, velocity);
+	}
+
+	// Interpolate orientation.
+	newPose.Orientation.InterpolateConstant(toPose.Orientation, turnRate);
+	
+	return newPose;
+}
+
 bool Move3DPosTo3DPos(ItemInfo* item, Pose& fromPose, const Pose& toPose, int velocity, short turnRate)
 {
 	auto* lara = GetLaraInfo(item);
 
-	auto direction = toPose.Position - fromPose.Position;
 	float distance = Vector3i::Distance(fromPose.Position, toPose.Position);
 
-	if (velocity < distance)
-		fromPose.Position += direction * (velocity / distance);
-	else
-		fromPose.Position = toPose.Position;
+	fromPose = AlignPoseToPose(fromPose, toPose, velocity, turnRate);
 
 	if (!lara->Control.IsMoving)
 	{
 		bool shouldAnimate = ((distance - velocity) > (velocity * ANIMATED_ALIGNMENT_FRAME_COUNT_THRESHOLD));
-
 		if (shouldAnimate && lara->Control.WaterStatus != WaterStatus::Underwater)
 		{
-			short angle = Geometry::GetOrientToPoint(fromPose.Position.ToVector3(), toPose.Position.ToVector3()).y;
-			int direction = (GetQuadrant(angle) - GetQuadrant(fromPose.Orientation.y)) & 3;
+			short headingAngle = Geometry::GetOrientToPoint(fromPose.Position.ToVector3(), toPose.Position.ToVector3()).y;
+			int direction = GetQuadrant(headingAngle - fromPose.Orientation.y);
 
 			switch (direction)
 			{
@@ -548,30 +564,7 @@ bool Move3DPosTo3DPos(ItemInfo* item, Pose& fromPose, const Pose& toPose, int ve
 		lara->Control.IsMoving = true;
 		lara->Control.Count.PositionAdjust = 0;
 	}
-
-	auto deltaOrient = toPose.Orientation - fromPose.Orientation;
-
-	if (deltaOrient.x > turnRate)
-		fromPose.Orientation.x += turnRate;
-	else if (deltaOrient.x < -turnRate)
-		fromPose.Orientation.x -= turnRate;
-	else
-		fromPose.Orientation.x = toPose.Orientation.x;
-
-	if (deltaOrient.y > turnRate)
-		fromPose.Orientation.y += turnRate;
-	else if (deltaOrient.y < -turnRate)
-		fromPose.Orientation.y -= turnRate;
-	else
-		fromPose.Orientation.y = toPose.Orientation.y;
-
-	if (deltaOrient.z > turnRate)
-		fromPose.Orientation.z += turnRate;
-	else if (deltaOrient.z < -turnRate)
-		fromPose.Orientation.z -= turnRate;
-	else
-		fromPose.Orientation.z = toPose.Orientation.z;
-
+	
 	return (fromPose == toPose);
 }
 
