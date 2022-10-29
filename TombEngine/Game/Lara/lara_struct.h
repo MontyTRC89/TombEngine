@@ -606,14 +606,14 @@ enum LaraAnim
 	LA_SHIMMY_LEFT_CORNER_INNER_45 = 360,					// Shimmy around inner left corner (45)
 	LA_SHIMMY_RIGHT_CORNER_INNER_90 = 361,				    // Shimmy around inner right corner (90)
 	LA_SHIMMY_RIGHT_CORNER_INNER_45 = 362,					// Shimmy around inner right corner (45)
-	LA_WALL_CLIMB_LEFT_CORNER_OUTER_START = 363,				// Ladder around outer left corner (1/2)
-	LA_WALL_CLIMB_LEFT_CORNER_OUTER_END = 364,					// Ladder around outer left corner (2/2)
-	LA_WALL_CLIMB_RIGHT_CORNER_OUTER_START = 365,				// Ladder around outer right corner (1/2)
-	LA_WALL_CLIMB_RIGHT_CORNER_OUTER_END = 366,					// Ladder around outer right corner (2/2)
-	LA_WALL_CLIMB_LEFT_CORNER_INNER_START = 367,				// Ladder around inner left corner (1/2)
-	LA_WALL_CLIMB_LEFT_CORNER_INNER_END = 368,					// Ladder around inner left corner (2/2)
-	LA_WALL_CLIMB_RIGHT_CORNER_INNER_START = 369,				// Ladder around inner right corner (1/2)
-	LA_WALL_CLIMB_RIGHT_CORNER_INNER_END = 370,					// Ladder around inner right corner (2/2)
+	LA_WALL_CLIMB_LEFT_CORNER_OUTER_START = 363,			// Ladder around outer left corner (1/2)
+	LA_WALL_CLIMB_LEFT_CORNER_OUTER_END = 364,				// Ladder around outer left corner (2/2)
+	LA_WALL_CLIMB_RIGHT_CORNER_OUTER_START = 365,			// Ladder around outer right corner (1/2)
+	LA_WALL_CLIMB_RIGHT_CORNER_OUTER_END = 366,				// Ladder around outer right corner (2/2)
+	LA_WALL_CLIMB_LEFT_CORNER_INNER_START = 367,			// Ladder around inner left corner (1/2)
+	LA_WALL_CLIMB_LEFT_CORNER_INNER_END = 368,				// Ladder around inner left corner (2/2)
+	LA_WALL_CLIMB_RIGHT_CORNER_INNER_START = 369,			// Ladder around inner right corner (1/2)
+	LA_WALL_CLIMB_RIGHT_CORNER_INNER_END = 370,				// Ladder around inner right corner (2/2)
 	LA_JUMP_UP_TO_ROPE_START = 371,							// Jump up > rope idle (1/2)
 	LA_TRAIN_OVERBOARD_DEATH = 372,							// Train overboard death
 	LA_JUMP_UP_TO_ROPE_END = 373,							// Jump up > rope idle (2/2)
@@ -724,7 +724,7 @@ enum LaraAnim
 	LA_VALVE_TURN = 470,									// Turn valve wheel
 	LA_CROWBAR_PRY_WALL_SLOW = 471,							// Pry item off wall slowly
 	LA_LOOT_CHEST = 472,									// Search chest on ground
-	LA_WALL_CLIMB_TO_CROUCH = 473,								// Pull up from ladder > crouch
+	LA_WALL_CLIMB_TO_CROUCH = 473,							// Pull up from ladder > crouch
 
 	// TombEngine
 	LA_VAULT_TO_CROUCH_1_STEP = 474, 						// Vault standing up 1 step > crouch
@@ -737,11 +737,11 @@ enum LaraAnim
 	LA_ONWATER_TO_CROUCH_1_STEP = 481,						// Pull up 1 step from tread > stand
 	LA_ONWATER_TO_CROUCH_0_STEP = 482,						// Pull up flat step from tread > stand
 	LA_ONWATER_TO_CROUCH_M1_STEP = 483,						// Pull up lower step from tread > stand
-	LA_WALL_CLIMB_TO_MONKEY = 484,								// Ladder idle > monkey swing idle
+	LA_WALL_CLIMB_TO_MONKEY = 484,							// Ladder idle > monkey swing idle
 	LA_ONWATER_TURN_180_START = 485,						// Tread water 180 turn (1/2)
 	LA_ONWATER_TURN_180_END = 486,							// Tread water 180 turn (2/2)
-	LA_MONKEY_TO_WALL_CLIMB_OVERHEAD_START = 487,				// Monkey idle > ladder idle, overhead (1/2)
-	LA_MONKEY_TO_WALL_CLIMB_OVERHEAD_END = 488,					// Monkey idle > ladder idle, overhead (2/2)
+	LA_MONKEY_TO_WALL_CLIMB_OVERHEAD_START = 487,			// Monkey idle > ladder idle, overhead (1/2)
+	LA_MONKEY_TO_WALL_CLIMB_OVERHEAD_END = 488,				// Monkey idle > ladder idle, overhead (2/2)
 	LA_JUMP_PREPARE_TO_STAND = 489,							// Jump prepare > stand
 	LA_MONKEY_IDLE_TO_BACK_LEFT = 490,						// Monkey swing idle > monkey swing back, left hand leading
 	LA_MONKEY_IDLE_TO_BACK_RIGHT = 491,						// Monkey swing idle > monkey swing back, right hand leading
@@ -750,11 +750,11 @@ enum LaraAnim
 	LA_MONKEY_BACK_TO_IDLE_RIGHT = 494,						// Monkey swing back > monkey swing idle, right hand leading
 	LA_REACH_TO_HANG_OSCILLATE = 495,						// Reach > hang, thin ledge
 	LA_SWANDIVE_ROLL_TO_RUN = 496,							// Swandive roll > run
-	LA_WALL_CLIMB_DISMOUNT_LEFT_START = 497,					// Ladder dismount left (1/2)
-	LA_WALL_CLIMB_DISMOUNT_LEFT_END = 498,						// Ladder dismount left (2/2)
-	LA_WALL_CLIMB_DISMOUNT_RIGHT_START = 499,					// Ladder dismount right (1/2)
-	LA_WALL_CLIMB_DISMOUNT_RIGHT_END = 500,						// Ladder dismount right (2/2)
-	LA_ONWATER_TO_WALL_CLIMB = 501,								// Tread water > ladder idle
+	LA_WALL_CLIMB_DISMOUNT_LEFT_START = 497,				// Ladder dismount left (1/2)
+	LA_WALL_CLIMB_DISMOUNT_LEFT_END = 498,					// Ladder dismount left (2/2)
+	LA_WALL_CLIMB_DISMOUNT_RIGHT_START = 499,				// Ladder dismount right (1/2)
+	LA_WALL_CLIMB_DISMOUNT_RIGHT_END = 500,					// Ladder dismount right (2/2)
+	LA_ONWATER_TO_WALL_CLIMB = 501,							// Tread water > ladder idle
 	LA_POSE_START = 502,									// Stand > AFK pose
 	LA_POSE_CONTINUE = 503,									// AFK pose (looped)
 	LA_POSE_END = 504,										// AFK pose > stand
@@ -804,6 +804,7 @@ enum LaraAnim
 	LA_RUN_TO_STAND_RIGHT_SOFT = 546,
 	LA_MONKEY_JUMP_START = 547,
 	LA_MONKEY_JUMP_CONTINUE = 548,
+
 	LA_SPRINT_JUMP_LEFT_START = 549,
 	LA_SPRINT_JUMP_LEFT_CONTINUE = 550,
 	LA_SPRINT_JUMP_LEFT_TO_REACH_1 = 551,
@@ -816,41 +817,45 @@ enum LaraAnim
 	LA_SPRINT_JUMP_RIGHT_TO_REACH_2 = 558,
 	LA_SPRINT_JUMP_RIGHT_TO_REACH_3 = 559,
 	LA_SPRINT_JUMP_RIGHT_TO_REACH_4 = 560,
+
 	LA_CROUCH_TURN_180_START = 561,
 	LA_CROUCH_TURN_180_END = 562,
 	LA_CRAWL_TURN_180_START = 653,
 	LA_CRAWL_TURN_180_END = 654,
+
 	LA_LEDGE_JUMP_UP_START = 565,
 	LA_LEDGE_JUMP_UP_END = 566,
 	LA_LEDGE_JUMP_BACK_START = 567,
 	LA_LEDGE_JUMP_BACK_END = 568,
+
+	LA_LADDER_MOUNT_TOP_FRONT = 594,
+	LA_LADDER_MOUNT_TOP_BACK = 595,
 	LA_LADDER_MOUNT_BOTTOM = 569,
-	LA_LADDER_IDLE = 570,
-	LA_LADDER_IDLE_TO_UP_LEFT = 571,
-	LA_LADDER_UP = 572,
-	LA_LADDER_UP_TO_IDLE_RIGHT = 573,
-	LA_LADDER_UP_TO_IDLE_LEFT = 574,
-	LA_LADDER_IDLE_TO_DOWN_RIGHT = 575,
-	LA_LADDER_DOWN = 576,
-	LA_LADDER_DOWN_TO_IDLE_LEFT = 577,
-	LA_LADDER_DOWN_TO_IDLE_RIGHT = 578,
-	LA_LADDER_DISMOUNT_BOTTOM_LEFT = 579,
-	LA_LADDER_DISMOUNT_BOTTOM_RIGHT = 580,
-	LA_LADDER_JUMP_BACK = 581,
+	LA_LADDER_MOUNT_LEFT = 585,
+	LA_LADDER_MOUNT_RIGHT = 586,
+	LA_LADDER_MOUNT_JUMP_UP = 590,
+	LA_LADDER_MOUNT_JUMP_REACH = 589,
 	LA_LADDER_DISMOUNT_TOP_LEFT = 582,
 	LA_LADDER_DISMOUNT_TOP_RIGHT = 583,
 	LA_LADDER_DISMOUNT_TOP_IDLE = 584,
-	LA_LADDER_MOUNT_LEFT = 585,
-	LA_LADDER_MOUNT_RIGHT = 586,
 	LA_LADDER_DISMOUNT_LEFT = 587,
 	LA_LADDER_DISMOUNT_RIGHT = 588,
-	LA_LADDER_MOUNT_JUMP_REACH = 589,
-	LA_LADDER_MOUNT_JUMP_UP = 590,
-	LA_LADDER_IDLE_TO_FREEFALL = 591,
+	LA_LADDER_DISMOUNT_BOTTOM_LEFT = 579,
+	LA_LADDER_DISMOUNT_BOTTOM_RIGHT = 580,
 	LA_LADDER_DISMOUNT_BOTTOM_IDLE = 592,
-	LA_LADDER_IDLE_TO_JUMP_UP = 593,
-	LA_LADDER_MOUNT_TOP_FRONT = 594,
-	LA_LADDER_MOUNT_TOP_BACK = 595,
+	LA_LADDER_DISMOUNT_JUMP_BACK = 581,
+	LA_LADDER_DISMOUNT_RELEASE = 593,
+	LA_LADDER_DISMOUNT_FALL = 591,
+	LA_LADDER_IDLE = 570,
+	LA_LADDER_IDLE_TO_UP_LEFT = 571,
+	LA_LADDER_IDLE_TO_DOWN_RIGHT = 575,
+	LA_LADDER_UP = 572,
+	LA_LADDER_UP_TO_IDLE_LEFT = 574,
+	LA_LADDER_UP_TO_IDLE_RIGHT = 573,
+	LA_LADDER_DOWN = 576,
+	LA_LADDER_DOWN_TO_IDLE_LEFT = 577,
+	LA_LADDER_DOWN_TO_IDLE_RIGHT = 578,
+
 	LA_LADDER_MOUNT_BOTTOM_TO_UP = 596,
 
 	NUM_LARA_ANIMS,
