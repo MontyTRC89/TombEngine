@@ -154,7 +154,6 @@ public:
 
 private:
 	ItemInfo* m_item;
-	ItemInfo* m_item2;
 	short m_num;
 	bool m_initialised;
 
