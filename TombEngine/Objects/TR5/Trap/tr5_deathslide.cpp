@@ -58,9 +58,9 @@ void DeathSlideCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* co
 	if (zipLineItem->Status != ITEM_NOT_ACTIVE)
 		return;
 
-	if (TestLaraPosition(DeathSlideBounds, zipLineItem, laraItem))
+	if (TestPlayerPosition(DeathSlideBounds, zipLineItem, laraItem))
 	{
-		AlignLaraPosition(DeathSlidePosition, zipLineItem, laraItem);
+		SnapPlayerPosition(DeathSlidePosition, zipLineItem, laraItem);
 		laraInfo->Control.HandStatus = HandStatus::Busy;
 
 		laraItem->Animation.TargetState = LS_ZIP_LINE;

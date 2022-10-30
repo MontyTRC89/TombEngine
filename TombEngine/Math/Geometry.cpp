@@ -9,6 +9,16 @@
 
 namespace TEN::Math::Geometry
 {
+	Vector3 TranslatePoint(const Vector3& point, short headingAngle, const Vector3& offset)
+	{
+		return TranslatePoint(point, headingAngle, offset.z, offset.y, offset.z);
+	}
+	
+	Vector3i TranslatePoint(const Vector3i& point, short headingAngle, const Vector3i& offset)
+	{
+		return TranslatePoint(point, headingAngle, offset.z, offset.y, offset.z);
+	}
+
 	Vector3i TranslatePoint(const Vector3i& point, short headingAngle, float forward, float down, float right)
 	{
 		return Vector3i(TranslatePoint(point.ToVector3(), headingAngle, forward, down, right));

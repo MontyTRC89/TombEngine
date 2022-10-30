@@ -52,9 +52,9 @@ namespace TEN::Entities::Doors
 		{
 			laraItem->Pose.Orientation.y ^= ANGLE(180.0f);
 
-			if (TestLaraPosition(UnderwaterDoorBounds, doorItem, laraItem))
+			if (TestPlayerPosition(UnderwaterDoorBounds, doorItem, laraItem))
 			{
-				if (MoveLaraPosition(UnderwaterDoorPos, doorItem, laraItem))
+				if (MovePlayerPosition(UnderwaterDoorPos, doorItem, laraItem))
 				{
 					SetAnimation(laraItem, LA_UNDERWATER_DOOR_OPEN);
 					laraItem->Animation.Velocity.y = 0;

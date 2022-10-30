@@ -53,9 +53,9 @@ namespace TEN::Entities::Doors
 		{
 			doorItem->Pose.Orientation.y ^= ANGLE(180.0f);
 
-			if (TestLaraPosition(DoubleDoorBounds, doorItem, laraItem))
+			if (TestPlayerPosition(DoubleDoorBounds, doorItem, laraItem))
 			{
-				if (MoveLaraPosition(DoubleDoorPos, doorItem, laraItem))
+				if (MovePlayerPosition(DoubleDoorPos, doorItem, laraItem))
 				{
 					SetAnimation(laraItem, LA_DOUBLEDOOR_OPEN_PUSH);
 

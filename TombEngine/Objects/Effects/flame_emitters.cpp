@@ -630,7 +630,7 @@ namespace TEN::Entities::Effects
 			short oldYrot = item->Pose.Orientation.y;
 			item->Pose.Orientation.y = laraItem->Pose.Orientation.y;
 
-			if (TestLaraPosition(FireBounds, item, laraItem))
+			if (TestPlayerPosition(FireBounds, item, laraItem))
 			{
 				if (item->ObjectNumber == ID_BURNING_ROOTS)
 					laraItem->Animation.AnimNumber = LA_TORCH_LIGHT_5;

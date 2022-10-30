@@ -116,10 +116,10 @@ namespace TEN::Entities::Generic
 			(player.Control.IsMoving && player.InteractedItem == itemNumber))
 		{
 			// Mount at bottom.
-			if (TestLaraPosition(LadderFrontBounds, &ladderItem, laraItem))
+			if (TestPlayerPosition(LadderFrontBounds, &ladderItem, laraItem))
 			{
 				auto mountPos = Vector3i(0, 0, GameBoundingBox(&ladderItem).Z1) + LadderMountOffset;
-				if (MoveLaraPosition(mountPos, &ladderItem, laraItem))
+				if (MovePlayerPosition(mountPos, &ladderItem, laraItem))
 				{
 					SetAnimation(laraItem, LA_LADDER_MOUNT_BOTTOM);
 					player.Control.IsMoving = false;
@@ -129,10 +129,10 @@ namespace TEN::Entities::Generic
 					player.InteractedItem = itemNumber;
 			}
 			// Mount from right.
-			else if (TestLaraPosition(LadderRightBounds, &ladderItem, laraItem))
+			else if (TestPlayerPosition(LadderRightBounds, &ladderItem, laraItem))
 			{
 				auto mountPos = Vector3i(GameBoundingBox(&ladderItem).Z1 + CLICK(0.55f), 0, 0);
-				if (MoveLaraPosition(mountPos, &ladderItem, laraItem))
+				if (MovePlayerPosition(mountPos, &ladderItem, laraItem))
 				{
 					SetAnimation(laraItem, LA_LADDER_MOUNT_RIGHT);
 					player.Control.IsMoving = false;
@@ -174,7 +174,7 @@ namespace TEN::Entities::Generic
 							bounds.Y1 - fmod(abs(bounds.Y1 - laraItem->Pose.Position.y), CLICK(1)),
 							0
 						);
-						AlignLaraPosition(offset, &ladderItem, laraItem);
+						SnapPlayerPosition(offset, &ladderItem, laraItem);
 						SetAnimation(laraItem, LA_LADDER_MOUNT_JUMP_REACH);
 					}
 					// Jumping up.

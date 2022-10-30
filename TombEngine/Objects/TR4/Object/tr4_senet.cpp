@@ -437,9 +437,9 @@ void GameSticksCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* co
 	{
 		laraItem->Pose.Orientation.y ^= 0x8000;
 
-		if (TestLaraPosition(GameStixBounds, item, laraItem))
+		if (TestPlayerPosition(GameStixBounds, item, laraItem))
 		{
-			if (MoveLaraPosition(GameStixPosition, item, laraItem))
+			if (MovePlayerPosition(GameStixPosition, item, laraItem))
 			{
 				laraItem->Animation.AnimNumber = LA_SENET_ROLL;
 				laraItem->Animation.FrameNumber = g_Level.Anims[LA_SENET_ROLL].frameBase;

@@ -79,9 +79,9 @@ namespace TEN::Entities::Switches
 					lara->Control.IsMoving &&
 					lara->InteractedItem == itemNum))
 			{
-				if (TestLaraPosition(CogSwitchBounds, switchItem, laraItem))
+				if (TestPlayerPosition(CogSwitchBounds, switchItem, laraItem))
 				{
-					if (MoveLaraPosition(CogSwitchPos, switchItem, laraItem))
+					if (MovePlayerPosition(CogSwitchPos, switchItem, laraItem))
 					{
 						ResetLaraFlex(laraItem);
 						laraItem->Animation.AnimNumber = LA_COGWHEEL_GRAB;

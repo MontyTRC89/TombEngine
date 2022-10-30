@@ -127,7 +127,7 @@ void ScalesCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 			ScalesBounds.BoundingBox.Z1 = -512;
 			ScalesBounds.BoundingBox.Z2 = 0;
 
-			if (TestLaraPosition(ScalesBounds, item, laraItem))
+			if (TestPlayerPosition(ScalesBounds, item, laraItem))
 			{
 				laraItem->Animation.AnimNumber = LA_WATERSKIN_POUR_HIGH;
 				laraItem->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;

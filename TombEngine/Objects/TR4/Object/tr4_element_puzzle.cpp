@@ -193,7 +193,7 @@ namespace TEN::Entities::TR4
 			short oldRot = puzzleItem->Pose.Orientation.y;
 			puzzleItem->Pose.Orientation.y = laraItem->Pose.Orientation.y;
 
-			if (TestLaraPosition(ElementPuzzleBounds, puzzleItem, laraItem))
+			if (TestPlayerPosition(ElementPuzzleBounds, puzzleItem, laraItem))
 			{
 				if (laraItem->Animation.AnimNumber == LA_WATERSKIN_POUR_LOW && LaraItem->ItemFlags[2] == flags)
 				{
@@ -271,7 +271,7 @@ namespace TEN::Entities::TR4
 				short oldRot = puzzleItem->Pose.Orientation.y;
 				puzzleItem->Pose.Orientation.y = laraItem->Pose.Orientation.y;
 
-				if (TestLaraPosition(ElementPuzzleBounds, puzzleItem, laraItem))
+				if (TestPlayerPosition(ElementPuzzleBounds, puzzleItem, laraItem))
 				{
 					laraItem->Animation.AnimNumber = (abs(puzzleItem->Pose.Position.y- laraItem->Pose.Position.y) >> 8) + LA_TORCH_LIGHT_3;
 					laraItem->Animation.FrameNumber = g_Level.Anims[puzzleItem->Animation.AnimNumber].frameBase;

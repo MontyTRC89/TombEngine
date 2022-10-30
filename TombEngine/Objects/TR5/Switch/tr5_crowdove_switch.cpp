@@ -57,9 +57,9 @@ namespace TEN::Entities::Switches
 		{
 			int oldYrot = switchItem->Pose.Orientation.y;
 			switchItem->Pose.Orientation.y = laraItem->Pose.Orientation.y;
-			if (TestLaraPosition(CrowDoveBounds, switchItem, laraItem))
+			if (TestPlayerPosition(CrowDoveBounds, switchItem, laraItem))
 			{
-				if (MoveLaraPosition(CrowDovePos, switchItem, laraItem))
+				if (MovePlayerPosition(CrowDovePos, switchItem, laraItem))
 				{
 					laraItem->Animation.AnimNumber = LA_DOVESWITCH_TURN;
 					laraItem->Animation.ActiveState = LS_DOVE_SWITCH;

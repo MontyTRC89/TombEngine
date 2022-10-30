@@ -63,9 +63,9 @@ namespace TEN::Entities::Switches
 			{
 				laraItem->Pose.Orientation.y ^= (short)ANGLE(180.0f);
 
-				if (TestLaraPosition(RailSwitchBounds2, switchItem, laraItem))
+				if (TestPlayerPosition(RailSwitchBounds2, switchItem, laraItem))
 				{
-					if (MoveLaraPosition(RailSwitchPos2, switchItem, laraItem))
+					if (MovePlayerPosition(RailSwitchPos2, switchItem, laraItem))
 					{
 						switchItem->Animation.TargetState = SWITCH_OFF;
 						flag = 1;
@@ -102,9 +102,9 @@ namespace TEN::Entities::Switches
 		}
 		else
 		{
-			if (TestLaraPosition(RailSwitchBounds, switchItem, laraItem))
+			if (TestPlayerPosition(RailSwitchBounds, switchItem, laraItem))
 			{
-				if (MoveLaraPosition(RailSwitchPos, switchItem, laraItem))
+				if (MovePlayerPosition(RailSwitchPos, switchItem, laraItem))
 				{
 					ResetLaraFlex(laraItem);
 					laraItem->Animation.AnimNumber = LA_LEVER_PUSH;

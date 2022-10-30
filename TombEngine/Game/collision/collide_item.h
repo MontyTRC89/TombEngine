@@ -24,19 +24,19 @@ struct ObjectCollisionBounds
 	pair<EulerAngles, EulerAngles> OrientConstraint = {};
 };
 
+// TODO: Refactor this family of functions into a more comprehensive position alignment system. -- Sezz 2022.10.30
+bool TestPlayerPosition(const ObjectCollisionBounds& bounds, ItemInfo* item, ItemInfo* laraItem);
+bool SnapPlayerPosition(const Vector3i& offset, ItemInfo* item, ItemInfo* laraItem);
+bool MovePlayerPosition(const Vector3i& offset, ItemInfo* item, ItemInfo* laraItem);
+bool AlignPlayerToPose(ItemInfo* item, const Pose& toPose, float velocity, short turnRate);
+
 void GenericSphereBoxCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);
 bool GetCollidedObjects(ItemInfo* collidingItem, int radius, bool onlyVisible, ItemInfo** collidedItems, MESH_INFO** collidedMeshes, bool ignoreLara);
 bool TestWithGlobalCollisionBounds(ItemInfo* item, ItemInfo* laraItem, CollisionInfo* coll);
 void TestForObjectOnLedge(ItemInfo* item, CollisionInfo* coll);
 
-bool TestLaraPosition(const ObjectCollisionBounds& bounds, ItemInfo* item, ItemInfo* laraItem);
-bool AlignLaraPosition(const Vector3i& offset, ItemInfo* item, ItemInfo* laraItem);
-bool MoveLaraPosition(const Vector3i& offset, ItemInfo* item, ItemInfo* laraItem);
-
 bool ItemNearLara(const Vector3i& origin, int radius);
 bool ItemNearTarget(const Vector3i& origin, ItemInfo* targetEntity, int radius);
-
-bool MovePoseToPose(ItemInfo* item, Pose& fromPose, const Pose& toPose, int velocity, short turnRate);
 
 bool TestBoundsCollide(ItemInfo* item, ItemInfo* laraItem, int radius);
 bool TestBoundsCollideStatic(ItemInfo* item, const MESH_INFO& mesh, int radius);

@@ -29,6 +29,141 @@ GameBoundingBox GlobalCollisionBounds;
 ItemInfo* CollidedItems[MAX_COLLIDED_OBJECTS];
 MESH_INFO* CollidedMeshes[MAX_COLLIDED_OBJECTS];
 
+bool TestPlayerPosition(const ObjectCollisionBounds& bounds, ItemInfo* item, ItemInfo* laraItem)
+{
+	auto deltaOrient = laraItem->Pose.Orientation - item->Pose.Orientation;
+	if (deltaOrient.x < bounds.OrientConstraint.first.x || deltaOrient.x > bounds.OrientConstraint.second.x ||
+		deltaOrient.y < bounds.OrientConstraint.first.y || deltaOrient.y > bounds.OrientConstraint.second.y ||
+		deltaOrient.z < bounds.OrientConstraint.first.z || deltaOrient.z > bounds.OrientConstraint.second.z)
+	{
+		return false;
+	}
+
+	auto pos = (laraItem->Pose.Position - item->Pose.Position).ToVector3();
+	auto rotMatrix = item->Pose.Orientation.ToRotationMatrix();
+
+	// This solves once for all the minus sign hack of CreateFromYawPitchRoll.
+	// In reality it should be the inverse, but the inverse of a rotation matrix is equal to the transpose
+	// and transposing a matrix is faster.
+	// It's the only piece of code that does it, because we want Lara's location relative to the identity frame
+	// of the object we are test against.
+	rotMatrix = rotMatrix.Transpose();
+
+	pos = Vector3::Transform(pos, rotMatrix);
+
+	if (pos.x < bounds.BoundingBox.X1 || pos.x > bounds.BoundingBox.X2 ||
+		pos.y < bounds.BoundingBox.Y1 || pos.y > bounds.BoundingBox.Y2 ||
+		pos.z < bounds.BoundingBox.Z1 || pos.z > bounds.BoundingBox.Z2)
+	{
+		return false;
+	}
+
+	return true;
+}
+
+bool SnapPlayerPosition(const Vector3i& offset, ItemInfo* item, ItemInfo* laraItem)
+{
+	static constexpr auto maxDeltaHeight = CLICK(2);
+
+	auto* lara = GetLaraInfo(laraItem);
+
+	laraItem->Pose.Orientation = item->Pose.Orientation;
+
+	auto rotMatrix = item->Pose.Orientation.ToRotationMatrix();
+	auto pos = Vector3::Transform(offset.ToVector3(), rotMatrix);
+	auto target = item->Pose.Position.ToVector3() + pos;
+
+	int height = GetCollision(target.x, target.y, target.z, laraItem->RoomNumber).Position.Floor;
+	if (abs(height - laraItem->Pose.Position.y) <= maxDeltaHeight)
+	{
+		laraItem->Pose.Position = target;
+		return true;
+	}
+
+	if (lara->Control.IsMoving)
+	{
+		lara->Control.IsMoving = false;
+		lara->Control.HandStatus = HandStatus::Free;
+	}
+
+	return false;
+}
+
+bool MovePlayerPosition(const Vector3i& offset, ItemInfo* item, ItemInfo* laraItem)
+{
+	static constexpr auto maxDeltaHeight = CLICK(2);
+	static const auto	  turnRate = ANGLE(2.0f);
+
+	auto* lara = GetLaraInfo(laraItem);
+
+	auto rotMatrix = item->Pose.Orientation.ToRotationMatrix();
+	auto pos = Vector3::Transform(offset.ToVector3(), rotMatrix);
+	auto toPose = Pose(item->Pose.Position + Vector3i(pos), item->Pose.Orientation);
+
+	if (!Objects[item->ObjectNumber].isPickup)
+		return AlignPlayerToPose(laraItem, toPose, LARA_ALIGN_VELOCITY, turnRate);
+	else
+	{
+		// Prevent picking up items which can result in so called "flare pickup bug"
+		int height = GetCollision(toPose.Position.x, toPose.Position.y, toPose.Position.z, laraItem->RoomNumber).Position.Floor;
+		if (abs(height - laraItem->Pose.Position.y) <= maxDeltaHeight)
+			return AlignPlayerToPose(laraItem, toPose, LARA_ALIGN_VELOCITY, turnRate);
+	}
+
+	if (lara->Control.IsMoving)
+	{
+		lara->Control.IsMoving = false;
+		lara->Control.HandStatus = HandStatus::Free;
+	}
+
+	return false;
+}
+
+bool AlignPlayerToPose(ItemInfo* item, const Pose& toPose, float velocity, short turnRate)
+{
+	auto* lara = GetLaraInfo(item);
+
+	if (!lara->Control.IsMoving)
+	{
+		float distance = Vector3i::Distance(item->Pose.Position, toPose.Position);
+		bool doAlignAnim = ((distance - velocity) > (velocity * ANIMATED_ALIGNMENT_FRAME_COUNT_THRESHOLD));
+
+		if (doAlignAnim && lara->Control.WaterStatus != WaterStatus::Underwater)
+		{
+			short headingAngle = Geometry::GetOrientToPoint(item->Pose.Position.ToVector3(), toPose.Position.ToVector3()).y;
+			int direction = GetQuadrant(headingAngle - item->Pose.Orientation.y);
+
+			switch (direction)
+			{
+			default:
+			case NORTH:
+				SetAnimation(item, LA_WALK);
+				break;
+
+			case SOUTH:
+				SetAnimation(item, LA_WALK_BACK);
+				break;
+
+			case EAST:
+				SetAnimation(item, LA_SIDESTEP_RIGHT);
+				break;
+
+			case WEST:
+				SetAnimation(item, LA_SIDESTEP_LEFT);
+				break;
+			}
+
+			lara->Control.HandStatus = HandStatus::Busy;
+		}
+
+		lara->Control.IsMoving = true;
+		lara->Control.Count.PositionAdjust = 0;
+	}
+
+	item->Pose.Interpolate(toPose, velocity, turnRate);
+	return (item->Pose == toPose);
+}
+
 void GenericSphereBoxCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 {
 	auto* item = &g_Level.Items[itemNumber];
@@ -366,97 +501,12 @@ void TestForObjectOnLedge(ItemInfo* item, CollisionInfo* coll)
 	}
 }
 
-bool TestLaraPosition(const ObjectCollisionBounds& bounds, ItemInfo* item, ItemInfo* laraItem)
-{
-	auto deltaOrient = laraItem->Pose.Orientation - item->Pose.Orientation;
-	if (deltaOrient.x < bounds.OrientConstraint.first.x || deltaOrient.x > bounds.OrientConstraint.second.x ||
-		deltaOrient.y < bounds.OrientConstraint.first.y || deltaOrient.y > bounds.OrientConstraint.second.y ||
-		deltaOrient.z < bounds.OrientConstraint.first.z || deltaOrient.z > bounds.OrientConstraint.second.z)
-	{
-		return false;
-	}
-
-	auto pos = (laraItem->Pose.Position - item->Pose.Position).ToVector3();
-	auto rotMatrix = item->Pose.Orientation.ToRotationMatrix();
-
-	// This solves once for all the minus sign hack of CreateFromYawPitchRoll.
-	// In reality it should be the inverse, but the inverse of a rotation matrix is equal to the transpose
-	// and transposing a matrix is faster.
-	// It's the only piece of code that does it, because we want Lara's location relative to the identity frame
-	// of the object we are test against.
-	rotMatrix = rotMatrix.Transpose();
-
-	pos = Vector3::Transform(pos, rotMatrix);
-
-	if (pos.x < bounds.BoundingBox.X1 || pos.x > bounds.BoundingBox.X2 ||
-		pos.y < bounds.BoundingBox.Y1 || pos.y > bounds.BoundingBox.Y2 ||
-		pos.z < bounds.BoundingBox.Z1 || pos.z > bounds.BoundingBox.Z2)
-	{
-		return false;
-	}
-
-	return true;
-}
-
-bool AlignLaraPosition(const Vector3i& offset, ItemInfo* item, ItemInfo* laraItem)
-{
-	auto* lara = GetLaraInfo(laraItem);
-
-	laraItem->Pose.Orientation = item->Pose.Orientation;
-
-	auto rotMatrix = item->Pose.Orientation.ToRotationMatrix();
-	auto pos = Vector3::Transform(offset.ToVector3(), rotMatrix);
-	auto target = item->Pose.Position.ToVector3() + pos;
-
-	int height = GetCollision(target.x, target.y, target.z, laraItem->RoomNumber).Position.Floor;
-	if ((laraItem->Pose.Position.y - height) <= CLICK(2))
-	{
-		laraItem->Pose.Position = Vector3i(target);
-		return true;
-	}
-
-	if (lara->Control.IsMoving)
-	{
-		lara->Control.IsMoving = false;
-		lara->Control.HandStatus = HandStatus::Free;
-	}
-
-	return false;
-}
-
-bool MoveLaraPosition(const Vector3i& offset, ItemInfo* item, ItemInfo* laraItem)
-{
-	auto* lara = GetLaraInfo(laraItem);
-
-	auto rotMatrix = item->Pose.Orientation.ToRotationMatrix();
-	auto pos = Vector3::Transform(offset.ToVector3(), rotMatrix);
-	auto target = Pose(item->Pose.Position + Vector3i(pos), item->Pose.Orientation);
-
-	if (!Objects[item->ObjectNumber].isPickup)
-		return MovePoseToPose(laraItem, laraItem->Pose, target, LARA_ALIGN_VELOCITY, ANGLE(2.0f));
-	else
-	{
-		// Prevent picking up items which can result in so called "flare pickup bug"
-		int height = GetCollision(target.Position.x, target.Position.y, target.Position.z, laraItem->RoomNumber).Position.Floor;
-		if (abs(height - laraItem->Pose.Position.y) <= CLICK(2))
-			return MovePoseToPose(laraItem, laraItem->Pose, target, LARA_ALIGN_VELOCITY, ANGLE(2.0f));
-	}
-
-	if (lara->Control.IsMoving)
-	{
-		lara->Control.IsMoving = false;
-		lara->Control.HandStatus = HandStatus::Free;
-	}
-
-	return false;
-}
-
-static bool ItemCollide(int value, int radius)
+bool ItemCollide(int value, int radius)
 {
 	return ((value >= -radius) && (value <= radius));
 }
 
-static bool ItemInRange(int x, int z, int radius)
+bool ItemInRange(int x, int z, int radius)
 {
 	return ((SQUARE(x) + SQUARE(z)) <= SQUARE(radius));
 }
@@ -499,51 +549,6 @@ bool ItemNearTarget(const Vector3i& origin, ItemInfo* targetEntity, int radius)
 		return true;
 
 	return false;
-}
-
-bool MovePoseToPose(ItemInfo* item, Pose& fromPose, const Pose& toPose, int velocity, short turnRate)
-{
-	auto* lara = GetLaraInfo(item);
-
-	if (!lara->Control.IsMoving)
-	{
-		float distance = Vector3i::Distance(fromPose.Position, toPose.Position);
-		bool doAlignAnim = ((distance - velocity) > (velocity * ANIMATED_ALIGNMENT_FRAME_COUNT_THRESHOLD));
-		
-		if (doAlignAnim && lara->Control.WaterStatus != WaterStatus::Underwater)
-		{
-			short headingAngle = Geometry::GetOrientToPoint(fromPose.Position.ToVector3(), toPose.Position.ToVector3()).y;
-			int direction = GetQuadrant(headingAngle - fromPose.Orientation.y);
-
-			switch (direction)
-			{
-			default:
-			case NORTH:
-				SetAnimation(item, LA_WALK);
-				break;
-
-			case SOUTH:
-				SetAnimation(item, LA_WALK_BACK);
-				break;
-
-			case EAST:
-				SetAnimation(item, LA_SIDESTEP_RIGHT);
-				break;
-
-			case WEST:
-				SetAnimation(item, LA_SIDESTEP_LEFT);
-				break;
-			}
-
-			lara->Control.HandStatus = HandStatus::Busy;
-		}
-
-		lara->Control.IsMoving = true;
-		lara->Control.Count.PositionAdjust = 0;
-	}
-	
-	fromPose.Interpolate(toPose, velocity, turnRate);
-	return (fromPose == toPose);
 }
 
 bool TestBoundsCollide(ItemInfo* item, ItemInfo* laraItem, int radius)

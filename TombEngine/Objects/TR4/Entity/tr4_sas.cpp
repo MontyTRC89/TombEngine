@@ -677,9 +677,9 @@ namespace TEN::Entities::TR4
 		}
 		else
 		{
-			if (TestLaraPosition(SASDragBodyBounds, item, laraItem))
+			if (TestPlayerPosition(SASDragBodyBounds, item, laraItem))
 			{
-				if (MoveLaraPosition(SASDragBodyPosition, item, laraItem))
+				if (MovePlayerPosition(SASDragBodyPosition, item, laraItem))
 				{
 					laraItem->Animation.AnimNumber = LA_DRAG_BODY;
 					laraItem->Animation.ActiveState = LS_MISC_CONTROL;

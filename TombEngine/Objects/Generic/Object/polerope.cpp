@@ -79,9 +79,9 @@ namespace TEN::Entities::Generic
 			short yOrient = poleItem->Pose.Orientation.y;
 			poleItem->Pose.Orientation.y = laraItem->Pose.Orientation.y;
 
-			if (TestLaraPosition(VPoleBounds, poleItem, laraItem))
+			if (TestPlayerPosition(VPoleBounds, poleItem, laraItem))
 			{
-				if (MoveLaraPosition(VPolePos, poleItem, laraItem))
+				if (MovePlayerPosition(VPolePos, poleItem, laraItem))
 				{
 					SetAnimation(laraItem, LA_STAND_TO_POLE);
 					lara->Control.IsMoving = false;
@@ -130,14 +130,14 @@ namespace TEN::Entities::Generic
 					if (laraItem->Animation.ActiveState == LS_REACH)
 					{
 						VPolePosR.y = laraItem->Pose.Position.y - poleItem->Pose.Position.y + 10;
-						AlignLaraPosition(VPolePosR, poleItem, laraItem);
+						SnapPlayerPosition(VPolePosR, poleItem, laraItem);
 						SetAnimation(laraItem, LA_REACH_TO_POLE);
 					}
 					// Jumping up.
 					else
 					{
 						VPolePosR.y = laraItem->Pose.Position.y - poleItem->Pose.Position.y + 66;
-						AlignLaraPosition(VPolePosR, poleItem, laraItem);
+						SnapPlayerPosition(VPolePosR, poleItem, laraItem);
 						SetAnimation(laraItem, LA_JUMP_UP_TO_POLE);
 					}
 
