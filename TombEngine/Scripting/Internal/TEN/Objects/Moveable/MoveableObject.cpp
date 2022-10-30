@@ -1097,13 +1097,10 @@ HandStatus Moveable::GetLaraHandStatus() const
 
 //Returns 0=None, 1=Pistols, 2=Revolver, 3=Uzi, 4=Shotgun, 5=HK, 6=Crossbow, 7=Flare, 8=Torch, 9=GrenadeLauncher, 10=Harpoon, 11=RocketLauncher.
 LaraWeaponType Moveable::GetLaraWeaponType() const
+LaraWeaponType Moveable::GetLaraWeaponType() const
 {
 	auto* lara = GetLaraInfo(m_item);
-	auto weap = lara->Control.Weapon.GunType;
-	if (weap == LaraWeaponType::None)
-		return  LaraWeaponType::None;
-
-	return  LaraWeaponType{ lara->Control.Weapon.GunType };
+	return LaraWeaponType { lara->Control.Weapon.GunType };
 }
 
 //Set Lara Weapon type
