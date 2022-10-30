@@ -124,7 +124,7 @@ public:
 	[[nodiscard]] short GetRoom() const;
 	void SetRoom(short room);
 
-	void AttachCamera(short camMeshId, short targetMeshId);
+	void AttachCamera(short camMeshId, Moveable& mov, short targetMeshId);
 
 
 	HandStatus GetLaraHandStatus() const;
@@ -154,6 +154,7 @@ public:
 
 private:
 	ItemInfo* m_item;
+	ItemInfo* m_item2;
 	short m_num;
 	bool m_initialised;
 
