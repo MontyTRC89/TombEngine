@@ -9,16 +9,6 @@ struct CollisionInfo;
 struct ItemInfo;
 struct MESH_INFO;
 
-struct OffsetBlend
-{
-	bool  IsActive = false;
-	float Time	   = 0.0f;
-	float Delay	   = 0.0f;
-
-	Vector3i	Position	= Vector3i::Zero;
-	EulerAngles Orientation = EulerAngles::Zero;
-};
-
 constexpr auto MAX_COLLIDED_OBJECTS = 1024;
 constexpr auto ITEM_RADIUS_YMAX = SECTOR(3);
 

@@ -17,6 +17,9 @@ constexpr auto NO_ITEM = -1;
 constexpr auto NOT_TARGETABLE = -16384;
 constexpr auto NUM_ITEMS = 1024;
 
+constexpr unsigned int ALL_JOINT_BITS = UINT_MAX;
+constexpr unsigned int NO_JOINT_BITS  = 0;
+
 enum AIObjectType
 {
 	NO_AI	  = 0,
@@ -46,14 +49,29 @@ enum ItemFlags
 	IFLAG_ACTIVATION_MASK = 0x3E00 // bits 9-13
 };
 
-constexpr unsigned int ALL_JOINT_BITS = UINT_MAX;
-constexpr unsigned int NO_JOINT_BITS  = 0;
-
-enum class JointBitType
+enum class BlendType
 {
-	Touch,
-	Mesh,
-	MeshSwap
+	None,
+	Linear,
+	Constant
+};
+
+struct OffsetBlend
+{
+	bool  IsActive	 = false;
+	bool  IsComplete = false;
+	float Delay		 = 0.0f;
+
+	BlendType	Type		= BlendType::None;
+	Vector3i	Position	= Vector3i::Zero;
+	EulerAngles Orientation = EulerAngles::Zero;
+
+	// Linear type
+	float Alpha = 0.0f;
+
+	// Constant type
+	float Velocity = 0.0f;
+	short TurnRate = 0;
 };
 
 struct EntityAnimationData
@@ -119,6 +137,8 @@ struct ItemInfo
 	std::string LuaCallbackOnCollidedWithObjectName;
 	std::string LuaCallbackOnCollidedWithRoomName;
 
+	OffsetBlend OffsetBlend = {};
+
 	bool TestOcb(short ocbFlags);
 	void RemoveOcb(short ocbFlags);
 	void ClearAllOcb();
@@ -128,6 +148,11 @@ struct ItemInfo
 
 	bool IsLara();
 	bool IsCreature();
+
+	void SetOffsetBlend(const Vector3i& pos, const EulerAngles& orient, float alpha, float delay = 0.0f);
+	void SetOffsetBlend(const Vector3i& pos, const EulerAngles& orient, float velocity, short turnRate, float delay = 0.0f);
+	void ClearOffsetBlend();
+	void DoOffsetBlend();
 };
 
 bool TestState(int refState, const std::vector<int>& stateList);

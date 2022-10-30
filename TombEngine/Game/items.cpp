@@ -58,6 +58,82 @@ bool ItemInfo::IsCreature()
 	return this->Data.is<CreatureInfo>();
 }
 
+void ItemInfo::SetOffsetBlend(const Vector3i& pos, const EulerAngles& orient, float alpha, float delay = 0.0f)
+{
+	this->OffsetBlend.Type = BlendType::Linear;
+	this->OffsetBlend.Position = pos;
+	this->OffsetBlend.Orientation = orient;
+	this->OffsetBlend.Alpha = alpha;
+	this->OffsetBlend.Delay = delay;
+}
+
+void ItemInfo::SetOffsetBlend(const Vector3i& pos, const EulerAngles& orient, float velocity, short turnRate, float delay = 0.0f)
+{
+	this->OffsetBlend.Type = BlendType::Constant;
+	this->OffsetBlend.Position = pos;
+	this->OffsetBlend.Orientation = orient;
+	this->OffsetBlend.Velocity = velocity;
+	this->OffsetBlend.TurnRate = turnRate;
+	this->OffsetBlend.Delay = delay;
+}
+
+void ItemInfo::ClearOffsetBlend()
+{
+	this->OffsetBlend = {};
+}
+
+void ItemInfo::DoOffsetBlend()
+{
+	// Blending is inactive; exit early.
+	if (!OffsetBlend.IsActive)
+		return;
+
+	// Handle blending delay.
+	if (OffsetBlend.Delay != 0.0f)
+	{
+		// TODO: Using frame time for now, but will use delta time in the future.
+		this->OffsetBlend.Delay -= 1.0f;
+		if (OffsetBlend.Delay < 0.0f)
+			this->OffsetBlend.Delay = 0.0f;
+
+		return;
+	}
+
+	// Perform blending according to type.
+	switch (OffsetBlend.Type)
+	{
+	case BlendType::Linear:
+		auto distance = Vector3i::Distance(Pose.Position, Pose.Position + OffsetBlend.Position);
+		if (distance <= OffsetBlend.Velocity)
+			this->Pose.Position = OffsetBlend.Position;
+		else
+		{
+			auto direction = OffsetBlend.Position.ToVector3() - Pose.Position.ToVector3();
+			this->Pose.Position += OffsetBlend.Position * OffsetBlend.Alpha;
+		}
+
+		this->Pose.Orientation.Lerp(OffsetBlend.Orientation, OffsetBlend.Alpha);
+		break;
+		
+	case BlendType::Constant:
+		// TODO: I'm an idiot.
+		this->Pose.Interpolate({ Pose.Position + OffsetBlend.Position, OffsetBlend.Orientation }, OffsetBlend.Velocity, OffsetBlend.TurnRate);
+		break;
+
+	default:
+		return;
+	}
+
+	// Blending is complete.
+	if (Pose.Position == OffsetBlend.Position &&
+		Pose.Orientation == OffsetBlend.Orientation)
+	{
+		this->OffsetBlend.IsActive = false;
+		this->OffsetBlend.IsComplete = true;
+		this->ClearOffsetBlend();
+	}
+}
+
 bool TestState(int refState, const vector<int>& stateList)
 {
 	for (const auto& state : stateList)
@@ -77,7 +153,7 @@ void ClearItem(short itemNumber)
 	item->StartPose = item->Pose;
 }
 
-void KillItem(short const itemNumber)
+void KillItem(short itemNumber)
 {
 	if (InItemControlLoop)
 	{
