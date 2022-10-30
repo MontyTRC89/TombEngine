@@ -1049,9 +1049,9 @@ bool Moveable::MeshExists(int index) const
 }
 
 //Attach camera and camera target to a mesh of an object.
-void  Moveable::AttachCamera(short camMeshId, short targetMeshId)
+void Moveable::AttachCamera(short camMeshId, Moveable& mov, short targetMeshId)
 {
-	ObjCamera(m_item, camMeshId, m_item, targetMeshId, true);
+	ObjCamera(m_item, camMeshId, mov.m_item, targetMeshId, true);
 }
 
 //Borrow an animtaion and state id from an object.
@@ -1138,3 +1138,4 @@ void Moveable::SetLaraWeaponType(LaraWeaponType weaponType, bool activate)
 		break;
 	}	
 }
+
