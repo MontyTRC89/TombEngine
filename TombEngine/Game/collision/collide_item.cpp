@@ -41,16 +41,9 @@ bool TestPlayerPosition(const ObjectCollisionBounds& bounds, ItemInfo* item, Ite
 
 	auto pos = (laraItem->Pose.Position - item->Pose.Position).ToVector3();
 	auto rotMatrix = item->Pose.Orientation.ToRotationMatrix();
-
-	// This solves once for all the minus sign hack of CreateFromYawPitchRoll.
-	// In reality it should be the inverse, but the inverse of a rotation matrix is equal to the transpose
-	// and transposing a matrix is faster.
-	// It's the only piece of code that does it, because we want Lara's location relative to the identity frame
-	// of the object we are test against.
-	rotMatrix = rotMatrix.Transpose();
+	rotMatrix = rotMatrix.Transpose(); // NOTE: Should be inverse, but inverse/transpose of a rotation matrix are equal and transposing is faster.
 
 	pos = Vector3::Transform(pos, rotMatrix);
-
 	if (pos.x < bounds.BoundingBox.X1 || pos.x > bounds.BoundingBox.X2 ||
 		pos.y < bounds.BoundingBox.Y1 || pos.y > bounds.BoundingBox.Y2 ||
 		pos.z < bounds.BoundingBox.Z1 || pos.z > bounds.BoundingBox.Z2)
@@ -109,6 +102,36 @@ bool MovePlayerPosition(const Vector3i& offset, ItemInfo* item, ItemInfo* laraIt
 		if (abs(height - laraItem->Pose.Position.y) <= maxDeltaHeight)
 			return AlignPlayerToPose(laraItem, toPose, LARA_ALIGN_VELOCITY, turnRate);
 	}
+
+	if (lara->Control.IsMoving)
+	{
+		lara->Control.IsMoving = false;
+		lara->Control.HandStatus = HandStatus::Free;
+	}
+
+	return false;
+}
+
+bool AlignPlayerPosition(ItemInfo* laraItem, ItemInfo* item, const Vector3i& offset, bool doSnap)
+{
+	static constexpr auto maxDeltaHeight = CLICK(2);
+	static const auto	  turnRate = ANGLE(2.0f);
+
+	auto* lara = GetLaraInfo(laraItem);
+
+	auto rotMatrix = item->Pose.Orientation.ToRotationMatrix();
+	auto pos = Vector3::Transform(offset.ToVector3(), rotMatrix);
+	auto toPose = Pose(item->Pose.Position + Vector3i(pos), item->Pose.Orientation);
+
+	if (Objects[item->ObjectNumber].isPickup)
+	{
+		// Prevent picking up items which can result in so called "flare pickup bug"
+		int height = GetCollision(toPose.Position.x, toPose.Position.y, toPose.Position.z, laraItem->RoomNumber).Position.Floor;
+		if (abs(height - laraItem->Pose.Position.y) <= maxDeltaHeight)
+			return AlignPlayerToPose(laraItem, toPose, LARA_ALIGN_VELOCITY, turnRate);
+	}
+	else
+		return AlignPlayerToPose(laraItem, toPose, LARA_ALIGN_VELOCITY, turnRate);
 
 	if (lara->Control.IsMoving)
 	{
