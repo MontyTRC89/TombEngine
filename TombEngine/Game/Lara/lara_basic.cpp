@@ -396,6 +396,12 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
+	if (lara->Control.IsMoving)
+	{
+		ModulateLaraTurnRateY(item, 0, 0, 0);
+		return;
+	}
+
 	// Handles waterskin and clockwork beetle.
 	// TODO: Hardcoding.
 	if (UseSpecialItem(item))

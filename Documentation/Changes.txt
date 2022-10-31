@@ -16,8 +16,9 @@ Version 1.0.3
 * Fix grabbing narrow ledges below ceilings.
 * Fix slow centaur projectile velocity.
 * Fix search animations - allow chest and shelf animations to play properly.
-* Fix Sarcophagus and its item pickup.
-* Fix Underwater Door and Double Doors being interactable infinite times after opening.
+* Fix sarcophagus and its item pickup.
+* Fix underwater door and double doors continuing to be interactable after opening.
+* Fix ability to turn when aligning to an object while standing.
 
 
 Version 1.0.2
