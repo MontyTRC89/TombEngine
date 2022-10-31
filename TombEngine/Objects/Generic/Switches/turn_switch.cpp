@@ -66,7 +66,7 @@ namespace TEN::Entities::Switches
 			switchItem->Animation.ActiveState == TURN_SWITCH_STOP ||
 			laraInfo->Control.IsMoving && laraInfo->InteractedItem == itemNumber)
 		{
-			if (TestPlayerEntityInteract(TurnSwitchBoundsA, switchItem, laraItem))
+			if (TestPlayerEntityInteract(switchItem, laraItem, TurnSwitchBoundsA))
 			{
 				if (AlignPlayerToEntity(switchItem, laraItem, TurnSwitchPosA))
 				{
@@ -86,7 +86,7 @@ namespace TEN::Entities::Switches
 			else
 			{
 				laraItem->Pose.Orientation.y ^= (short)ANGLE(180.0f);
-				if (TestPlayerEntityInteract(TurnSwitchBoundsC, switchItem, laraItem))
+				if (TestPlayerEntityInteract(switchItem, laraItem, TurnSwitchBoundsC))
 				{
 					if (AlignPlayerToEntity(switchItem, laraItem, TurnSwitchPos))
 					{

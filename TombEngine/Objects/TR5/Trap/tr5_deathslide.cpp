@@ -58,7 +58,7 @@ void DeathSlideCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* co
 	if (zipLineItem->Status != ITEM_NOT_ACTIVE)
 		return;
 
-	if (TestPlayerEntityInteract(DeathSlideBounds, zipLineItem, laraItem))
+	if (TestPlayerEntityInteract(zipLineItem, laraItem, DeathSlideBounds))
 	{
 		AlignPlayerToEntity(zipLineItem, laraItem, DeathSlidePosition, EulerAngles::Zero, true);
 		laraInfo->Control.HandStatus = HandStatus::Busy;

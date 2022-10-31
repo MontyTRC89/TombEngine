@@ -479,7 +479,7 @@ void PushableBlockCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo*
 		short rot = pushableItem->Pose.Orientation.y;
 		pushableItem->Pose.Orientation.y = (laraItem->Pose.Orientation.y + ANGLE(45.0f)) & 0xC000;
 
-		if (TestPlayerEntityInteract(PushableBlockBounds, pushableItem, laraItem))
+		if (TestPlayerEntityInteract(pushableItem, laraItem, PushableBlockBounds))
 		{
 			unsigned short quadrant = (unsigned short)((pushableItem->Pose.Orientation.y / 0x4000) + ((rot + 0x2000) / 0x4000));
 			if (quadrant & 1)

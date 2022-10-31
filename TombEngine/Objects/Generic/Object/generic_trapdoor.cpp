@@ -69,9 +69,9 @@ void CeilingTrapDoorCollision(short itemNumber, ItemInfo* laraItem, CollisionInf
 
 	bool itemIsAbove = trapDoorItem->Pose.Position.y <= laraItem->Pose.Position.y - LARA_HEIGHT + LARA_HEADROOM;
 
-	bool result = TestPlayerEntityInteract(CeilingTrapDoorBounds, trapDoorItem, laraItem);
+	bool result = TestPlayerEntityInteract(trapDoorItem, laraItem, CeilingTrapDoorBounds);
 	laraItem->Pose.Orientation.y += ANGLE(180.0f);
-	bool result2 = TestPlayerEntityInteract(CeilingTrapDoorBounds, trapDoorItem, laraItem);
+	bool result2 = TestPlayerEntityInteract(trapDoorItem, laraItem, CeilingTrapDoorBounds);
 	laraItem->Pose.Orientation.y += ANGLE(180.0f);
 
 	if (TrInput & IN_ACTION &&
@@ -128,7 +128,7 @@ void FloorTrapDoorCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo*
 		trapDoorItem->Status != ITEM_ACTIVE) ||
 		(laraInfo->Control.IsMoving && laraInfo->InteractedItem == itemNumber))
 	{
-		if (TestPlayerEntityInteract(FloorTrapDoorBounds, trapDoorItem, laraItem))
+		if (TestPlayerEntityInteract(trapDoorItem, laraItem, FloorTrapDoorBounds))
 		{
 			if (AlignPlayerToEntity(trapDoorItem, laraItem, FloorTrapDoorPos))
 			{

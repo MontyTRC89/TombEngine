@@ -53,7 +53,7 @@ namespace TEN::Entities::Doors
 		{
 			doorItem->Pose.Orientation.y ^= ANGLE(180.0f);
 
-			if (TestPlayerEntityInteract(DoubleDoorBounds, doorItem, laraItem))
+			if (TestPlayerEntityInteract(doorItem, laraItem, DoubleDoorBounds))
 			{
 				if (AlignPlayerToEntity(doorItem, laraItem, DoubleDoorPos))
 				{

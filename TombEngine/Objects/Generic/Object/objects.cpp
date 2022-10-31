@@ -133,7 +133,7 @@ void TightropeCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* col
 	{
 		tightropeItem->Pose.Orientation.y += -ANGLE(180.0f);
 
-		if (TestPlayerEntityInteract(TightRopeBounds, tightropeItem, laraItem))
+		if (TestPlayerEntityInteract(tightropeItem, laraItem, TightRopeBounds))
 		{
 			if (AlignPlayerToEntity(tightropeItem, laraItem, TightRopePos))
 			{
@@ -177,12 +177,12 @@ void HorizontalBarCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo*
 		laraItem->Animation.ActiveState == LS_REACH &&
 		laraItem->Animation.AnimNumber == LA_REACH)
 	{
-		int test1 = TestPlayerEntityInteract(ParallelBarsBounds, barItem, laraItem);
+		int test1 = TestPlayerEntityInteract(barItem, laraItem, ParallelBarsBounds);
 		int test2 = 0;
 		if (!test1)
 		{
 			barItem->Pose.Orientation.y += -ANGLE(180.0f);
-			test2 = TestPlayerEntityInteract(ParallelBarsBounds, barItem, laraItem);
+			test2 = TestPlayerEntityInteract(barItem, laraItem, ParallelBarsBounds);
 			barItem->Pose.Orientation.y += -ANGLE(180);
 		}
 

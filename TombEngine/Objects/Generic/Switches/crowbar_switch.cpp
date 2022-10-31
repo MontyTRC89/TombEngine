@@ -62,7 +62,7 @@ namespace TEN::Entities::Switches
 			{
 				laraitem->Pose.Orientation.y ^= (short)ANGLE(180.0f);
 
-				if (TestPlayerEntityInteract(CrowbarBounds2, switchItem, laraitem))
+				if (TestPlayerEntityInteract(switchItem, laraitem, CrowbarBounds2))
 				{
 					if (laraInfo->Control.IsMoving || g_Gui.GetInventoryItemChosen() == ID_CROWBAR_ITEM)
 					{
@@ -91,7 +91,7 @@ namespace TEN::Entities::Switches
 			}
 			else
 			{
-				if (TestPlayerEntityInteract(CrowbarBounds, switchItem, laraitem))
+				if (TestPlayerEntityInteract(switchItem, laraitem, CrowbarBounds))
 				{
 					if (laraInfo->Control.IsMoving || g_Gui.GetInventoryItemChosen() == ID_CROWBAR_ITEM)
 					{

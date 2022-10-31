@@ -96,7 +96,7 @@ void PuzzleHoleCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* co
 		PuzzleBounds.BoundingBox.Z1 = bounds.Z1 - CLICK(1);;
 		PuzzleBounds.BoundingBox.Z2 = bounds.Z2 + CLICK(1);;
 
-		if (TestPlayerEntityInteract(PuzzleBounds, receptableItem, laraItem))
+		if (TestPlayerEntityInteract(receptableItem, laraItem, PuzzleBounds))
 		{
 			if (!laraInfo->Control.IsMoving)
 			{
@@ -279,7 +279,7 @@ void KeyHoleCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 
 	if (actionActive || (actionReady && laraAvailable))
 	{
-		if (TestPlayerEntityInteract(KeyHoleBounds, keyHoleItem, laraItem))
+		if (TestPlayerEntityInteract(keyHoleItem, laraItem, KeyHoleBounds))
 		{
 			if (!laraInfo->Control.IsMoving) //TROYE INVENTORY FIX ME
 			{

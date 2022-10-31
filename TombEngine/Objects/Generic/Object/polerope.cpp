@@ -79,7 +79,7 @@ namespace TEN::Entities::Generic
 			short yOrient = poleItem->Pose.Orientation.y;
 			poleItem->Pose.Orientation.y = laraItem->Pose.Orientation.y;
 
-			if (TestPlayerEntityInteract(VPoleBounds, poleItem, laraItem))
+			if (TestPlayerEntityInteract(poleItem, laraItem, VPoleBounds))
 			{
 				if (AlignPlayerToEntity(poleItem, laraItem, VPolePos))
 				{

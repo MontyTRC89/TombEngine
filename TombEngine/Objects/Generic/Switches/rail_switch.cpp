@@ -63,7 +63,7 @@ namespace TEN::Entities::Switches
 			{
 				laraItem->Pose.Orientation.y ^= (short)ANGLE(180.0f);
 
-				if (TestPlayerEntityInteract(RailSwitchBounds2, switchItem, laraItem))
+				if (TestPlayerEntityInteract(switchItem, laraItem, RailSwitchBounds2))
 				{
 					if (AlignPlayerToEntity(switchItem, laraItem, RailSwitchPos2))
 					{
@@ -102,7 +102,7 @@ namespace TEN::Entities::Switches
 		}
 		else
 		{
-			if (TestPlayerEntityInteract(RailSwitchBounds, switchItem, laraItem))
+			if (TestPlayerEntityInteract(switchItem, laraItem, RailSwitchBounds))
 			{
 				if (AlignPlayerToEntity(switchItem, laraItem, RailSwitchPos))
 				{

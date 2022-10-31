@@ -70,7 +70,7 @@ namespace TEN::Entities::Doors
 				pull = true;
 			}
 
-			if (TestPlayerEntityInteract(PushPullKickDoorBounds, doorItem, laraItem))
+			if (TestPlayerEntityInteract(doorItem, laraItem, PushPullKickDoorBounds))
 			{
 				bool openTheDoor = false;
 

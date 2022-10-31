@@ -677,7 +677,7 @@ namespace TEN::Entities::TR4
 		}
 		else
 		{
-			if (TestPlayerEntityInteract(SASDragBodyBounds, item, laraItem))
+			if (TestPlayerEntityInteract(item, laraItem, SASDragBodyBounds))
 			{
 				if (AlignPlayerToEntity(item, laraItem, SASDragBodyPosition))
 				{

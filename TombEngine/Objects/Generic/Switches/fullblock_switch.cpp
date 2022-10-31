@@ -51,7 +51,7 @@ namespace TEN::Entities::Switches
 			return;
 		}
 
-		if (TestPlayerEntityInteract(FullBlockSwitchBounds, switchItem, laraItem))
+		if (TestPlayerEntityInteract(switchItem, laraItem, FullBlockSwitchBounds))
 		{
 			if (AlignPlayerToEntity(switchItem, laraItem, FullBlockSwitchPos))
 			{

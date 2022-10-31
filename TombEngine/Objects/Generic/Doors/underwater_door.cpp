@@ -52,7 +52,7 @@ namespace TEN::Entities::Doors
 		{
 			laraItem->Pose.Orientation.y ^= ANGLE(180.0f);
 
-			if (TestPlayerEntityInteract(UnderwaterDoorBounds, doorItem, laraItem))
+			if (TestPlayerEntityInteract(doorItem, laraItem, UnderwaterDoorBounds))
 			{
 				if (AlignPlayerToEntity(doorItem, laraItem, UnderwaterDoorPos))
 				{

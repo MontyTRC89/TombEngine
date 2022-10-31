@@ -53,7 +53,9 @@ enum class BlendType
 {
 	None,
 	Linear,
-	Constant
+	Constant,
+	ConstantToLinear,
+	Timed
 };
 
 struct OffsetBlendData
@@ -66,10 +68,7 @@ struct OffsetBlendData
 	Vector3		PosOffset	 = Vector3::Zero;
 	EulerAngles OrientOffset = EulerAngles::Zero;
 
-	// Linear type.
-	float Alpha = 0.0f;
-
-	// Constant type.
+	float Alpha	   = 0.0f;
 	float Velocity = 0.0f;
 	short TurnRate = 0;
 };
@@ -151,8 +150,8 @@ struct ItemInfo
 
 	void SetOffsetBlend(const Vector3& posOffset, const EulerAngles& orientOffset, float alpha, float delay = 0.0f);
 	void SetOffsetBlend(const Vector3& posOffset, const EulerAngles& orientOffset, float velocity, short turnRate, float delay = 0.0f);
-	void ClearOffsetBlend();
 	void DoOffsetBlend();
+	void ClearOffsetBlend();
 };
 
 bool TestState(int refState, const std::vector<int>& stateList);

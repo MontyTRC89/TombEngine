@@ -43,7 +43,7 @@ void SarcophagusCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* c
 		sarcItem->Status != ITEM_ACTIVE ||
 		laraInfo->Control.IsMoving && laraInfo->InteractedItem == itemNumber)
 	{
-		if (TestPlayerEntityInteract(SarcophagusBounds, sarcItem, laraItem))
+		if (TestPlayerEntityInteract(sarcItem, laraItem, SarcophagusBounds))
 		{
 			if (AlignPlayerToEntity(sarcItem, laraItem, SarcophagusPosition))
 			{

@@ -82,11 +82,6 @@ void ItemInfo::SetOffsetBlend(const Vector3& posOffset, const EulerAngles& orien
 	this->OffsetBlend.DelayTime = fmod(delayInSec, DELTA_TIME);
 }
 
-void ItemInfo::ClearOffsetBlend()
-{
-	this->OffsetBlend = {};
-}
-
 void ItemInfo::DoOffsetBlend()
 {
 	// TODO: Using frame time for now, but delta time should be used in the future.
@@ -148,6 +143,11 @@ void ItemInfo::DoOffsetBlend()
 		this->OffsetBlend.IsActive = false;
 		this->ClearOffsetBlend();
 	}
+}
+
+void ItemInfo::ClearOffsetBlend()
+{
+	this->OffsetBlend = {};
 }
 
 bool TestState(int refState, const vector<int>& stateList)

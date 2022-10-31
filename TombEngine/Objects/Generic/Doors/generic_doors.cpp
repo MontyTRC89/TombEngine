@@ -181,7 +181,7 @@ namespace TEN::Entities::Doors
 				laraInfo->Control.IsMoving && laraInfo->InteractedItem == itemNumber))
 		{
 			doorItem->Pose.Orientation.y ^= ANGLE(180.0f);
-			if (TestPlayerEntityInteract(CrowbarDoorBounds, doorItem, laraItem))
+			if (TestPlayerEntityInteract(doorItem, laraItem, CrowbarDoorBounds))
 			{
 				if (!laraInfo->Control.IsMoving)
 				{

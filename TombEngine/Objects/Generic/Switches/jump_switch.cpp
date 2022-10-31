@@ -39,7 +39,7 @@ namespace TEN::Entities::Switches
 			laraInfo->Control.HandStatus == HandStatus::Free &&
 			!switchItem->Animation.ActiveState)
 		{
-			if (TestPlayerEntityInteract(JumpSwitchBounds, switchItem, laraItem))
+			if (TestPlayerEntityInteract(switchItem, laraItem, JumpSwitchBounds))
 			{
 				AlignPlayerToEntity(switchItem, laraItem, JumpSwitchPos, EulerAngles::Zero, true);
 

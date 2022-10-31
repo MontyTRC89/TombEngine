@@ -117,7 +117,7 @@ namespace TEN::Entities::Generic
 			(player.Control.IsMoving && player.InteractedItem == itemNumber))
 		{
 			// Mount at bottom.
-			if (TestPlayerEntityInteract(LadderFrontBounds, &ladderItem, laraItem))
+			if (TestPlayerEntityInteract(&ladderItem, laraItem, LadderFrontBounds))
 			{
 				if (!laraItem->OffsetBlend.IsActive)
 				{
@@ -138,7 +138,7 @@ namespace TEN::Entities::Generic
 					player.InteractedItem = itemNumber;
 			}
 			// Mount from right.
-			else if (TestPlayerEntityInteract(LadderRightBounds, &ladderItem, laraItem))
+			else if (TestPlayerEntityInteract(&ladderItem, laraItem, LadderRightBounds))
 			{
 				auto mountPos = Vector3i(GameBoundingBox(&ladderItem).Z1 + CLICK(0.55f), 0, 0);
 				if (AlignPlayerToEntity(&ladderItem, laraItem, mountPos))

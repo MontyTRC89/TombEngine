@@ -86,7 +86,7 @@ namespace TEN::Entities::Switches
 				SwitchPos.z = bounds.Z1 - 64;
 			}
 
-			if (TestPlayerEntityInteract(SwitchBounds, switchItem, laraItem))
+			if (TestPlayerEntityInteract(switchItem, laraItem, SwitchBounds))
 			{
 				if (AlignPlayerToEntity(switchItem, laraItem, SwitchPos))
 				{

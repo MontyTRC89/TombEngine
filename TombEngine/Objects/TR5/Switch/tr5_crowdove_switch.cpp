@@ -57,7 +57,7 @@ namespace TEN::Entities::Switches
 		{
 			int oldYrot = switchItem->Pose.Orientation.y;
 			switchItem->Pose.Orientation.y = laraItem->Pose.Orientation.y;
-			if (TestPlayerEntityInteract(CrowDoveBounds, switchItem, laraItem))
+			if (TestPlayerEntityInteract(switchItem, laraItem, CrowDoveBounds))
 			{
 				if (AlignPlayerToEntity(switchItem, laraItem, CrowDovePos))
 				{

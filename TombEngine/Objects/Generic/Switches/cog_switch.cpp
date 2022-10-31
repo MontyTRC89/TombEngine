@@ -79,7 +79,7 @@ namespace TEN::Entities::Switches
 					lara->Control.IsMoving &&
 					lara->InteractedItem == itemNum))
 			{
-				if (TestPlayerEntityInteract(CogSwitchBounds, switchItem, laraItem))
+				if (TestPlayerEntityInteract(switchItem, laraItem, CogSwitchBounds))
 				{
 					if (AlignPlayerToEntity(switchItem, laraItem, CogSwitchPos))
 					{
