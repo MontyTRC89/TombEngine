@@ -158,7 +158,7 @@ namespace TEN::Utils
 
 	bool BitField::Test(unsigned int index) const
 	{
-		this->Test({ index });
+		return this->Test({ index });
 	}
 
 	bool BitField::TestAny() const
