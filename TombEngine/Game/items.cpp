@@ -131,7 +131,7 @@ void ItemInfo::DoOffsetBlend()
 	case BlendType::Constant:
 	{
 		// TODO: I'm an idiot.
-		this->Pose.Interpolate({ Pose.Position + OffsetBlend.PosOffset, Pose.Orientation + OffsetBlend.OrientOffset }, OffsetBlend.Velocity, OffsetBlend.TurnRate);
+		this->Pose.InterpolateConstant({ Pose.Position + OffsetBlend.PosOffset, Pose.Orientation + OffsetBlend.OrientOffset }, OffsetBlend.Velocity, OffsetBlend.TurnRate);
 
 		// Reduce offsets... how?
 		break;

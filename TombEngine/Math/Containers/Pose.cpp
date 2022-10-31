@@ -74,7 +74,7 @@ using namespace TEN::Math;
 		this->Position = Geometry::TranslatePoint(this->Position, direction, distance);
 	}
 
-	void Pose::Interpolate(const Pose& toPose, float velocity, short turnRate)
+	void Pose::InterpolateConstant(const Pose& toPose, float velocity, short turnRate)
 	{
 		// Translate position.
 		float distance = Vector3i::Distance(Position, toPose.Position);
