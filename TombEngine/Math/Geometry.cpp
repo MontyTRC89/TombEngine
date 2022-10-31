@@ -31,6 +31,9 @@ namespace TEN::Math::Geometry
 
 	Vector3 TranslatePoint(const Vector3& point, short headingAngle, float forward, float down, float right)
 	{
+		// TODO: Benchmark.
+		//return TranslatePoint(point, EulerAngles(0, headingAngle, 0), Vector3(right, down, forward));
+
 		if (forward == 0.0f && down == 0.0f && right == 0.0f)
 			return point;
 
@@ -46,6 +49,9 @@ namespace TEN::Math::Geometry
 
 	Vector3 TranslatePoint(const Vector3& point, const EulerAngles& orient, const Vector3& offset)
 	{
+		if (offset == Vector3::Zero)
+			return point;
+
 		auto rotMatrix = orient.ToRotationMatrix();
 		auto relativeOffset = Vector3::Transform(offset, rotMatrix);
 		return (point + relativeOffset);
