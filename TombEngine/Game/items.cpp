@@ -13,6 +13,7 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 #include "Sound/sound.h"
+#include "Specific/clock.h"
 
 using namespace TEN::Floordata;
 using namespace TEN::Input;
@@ -60,17 +61,17 @@ bool ItemInfo::IsCreature()
 	return this->Data.is<CreatureInfo>();
 }
 
-void ItemInfo::SetOffsetBlend(const Vector3& posOffset, const EulerAngles& orientOffset, float alpha, float delay)
+void ItemInfo::SetOffsetBlend(const Vector3& posOffset, const EulerAngles& orientOffset, float alpha, float delayInSec)
 {
 	this->OffsetBlend.IsActive = true;
 	this->OffsetBlend.Type = BlendType::Linear;
 	this->OffsetBlend.PosOffset = posOffset;
 	this->OffsetBlend.OrientOffset = orientOffset;
 	this->OffsetBlend.Alpha = alpha;
-	this->OffsetBlend.Delay = delay;
+	this->OffsetBlend.DelayTime = fmod(delayInSec, DELTA_TIME);
 }
 
-void ItemInfo::SetOffsetBlend(const Vector3& posOffset, const EulerAngles& orientOffset, float velocity, short turnRate, float delay)
+void ItemInfo::SetOffsetBlend(const Vector3& posOffset, const EulerAngles& orientOffset, float velocity, short turnRate, float delayInSec)
 {
 	this->OffsetBlend.IsActive = true;
 	this->OffsetBlend.Type = BlendType::Constant;
@@ -78,7 +79,7 @@ void ItemInfo::SetOffsetBlend(const Vector3& posOffset, const EulerAngles& orien
 	this->OffsetBlend.OrientOffset = orientOffset;
 	this->OffsetBlend.Velocity = velocity;
 	this->OffsetBlend.TurnRate = turnRate;
-	this->OffsetBlend.Delay = delay;
+	this->OffsetBlend.DelayTime = fmod(delayInSec, DELTA_TIME);
 }
 
 void ItemInfo::ClearOffsetBlend()
@@ -88,6 +89,9 @@ void ItemInfo::ClearOffsetBlend()
 
 void ItemInfo::DoOffsetBlend()
 {
+	// TODO: Using frame time for now, but delta time should be used in the future.
+	static constexpr auto deltaFrameTime = 1.0f;
+
 	g_Renderer.PrintDebugMessage("IsActive: %d", OffsetBlend.IsActive);
 	g_Renderer.PrintDebugMessage("Pos: %.3f, %.3f, %.3f", OffsetBlend.PosOffset.x, OffsetBlend.PosOffset.y, OffsetBlend.PosOffset.z);
 	g_Renderer.PrintDebugMessage("Orient: %d, %d, %d", OffsetBlend.OrientOffset.x, OffsetBlend.OrientOffset.y, OffsetBlend.OrientOffset.z);
@@ -97,12 +101,11 @@ void ItemInfo::DoOffsetBlend()
 		return;
 
 	// Handle blending delay.
-	if (OffsetBlend.Delay != 0.0f)
+	if (OffsetBlend.DelayTime != 0.0f)
 	{
-		// TODO: Using frame time for now, but will use delta time in the future.
-		this->OffsetBlend.Delay -= 1.0f;
-		if (OffsetBlend.Delay < 0.0f)
-			this->OffsetBlend.Delay = 0.0f;
+		this->OffsetBlend.DelayTime -= deltaFrameTime;
+		if (OffsetBlend.DelayTime < 0.0f)
+			this->OffsetBlend.DelayTime = 0.0f;
 
 		return;
 	}
@@ -116,6 +119,7 @@ void ItemInfo::DoOffsetBlend()
 		this->Pose.Orientation.Lerp(Pose.Orientation + OffsetBlend.OrientOffset, OffsetBlend.Alpha);
 
 		// Reduce offsets.
+		// TODO: Normalise alpha instead. Currently, final positions can be slightly off.
 		OffsetBlend.PosOffset *= 1.0f - OffsetBlend.Alpha;
 		OffsetBlend.OrientOffset *= 1.0f - OffsetBlend.Alpha;
 		break;
@@ -132,6 +136,8 @@ void ItemInfo::DoOffsetBlend()
 	default:
 		return;
 	}
+
+	this->OffsetBlend.TimeActive += deltaFrameTime;
 
 	// Blending is complete.
 	if (abs(OffsetBlend.PosOffset.x) <= FLT_EPSILON &&

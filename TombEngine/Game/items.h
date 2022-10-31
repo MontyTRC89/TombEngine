@@ -6,8 +6,8 @@
 #include "Game/animation.h"
 #include "Game/itemdata/itemdata.h"
 #include "Math/Math.h"
-#include "Specific/newtypes.h"
 #include "Specific/BitField.h"
+#include "Specific/newtypes.h"
 
 using namespace TEN::Utils;
 
@@ -59,16 +59,17 @@ enum class BlendType
 struct OffsetBlendData
 {
 	bool  IsActive	 = false;
-	float Delay		 = 0.0f;
+	float TimeActive = 0.0f;
+	float DelayTime	 = 0.0f;
 
 	BlendType	Type		 = BlendType::None;
 	Vector3		PosOffset	 = Vector3::Zero;
 	EulerAngles OrientOffset = EulerAngles::Zero;
 
-	// Linear type
+	// Linear type.
 	float Alpha = 0.0f;
 
-	// Constant type
+	// Constant type.
 	float Velocity = 0.0f;
 	short TurnRate = 0;
 };
