@@ -27,9 +27,9 @@ namespace TEN::Entities::Doors
 	const ObjectCollisionBounds UnderwaterDoorBounds =
 	{
 		GameBoundingBox(
-			-CLICK(1), CLICK(1),
-			-SECTOR(1), 0,
-			-SECTOR(1), 0
+			-BLOCK(3, 8), BLOCK(3, 8),
+			-BLOCK(1), 0,
+			-BLOCK(1), 0
 		),
 		std::pair(
 			EulerAngles(ANGLE(-80.0f), ANGLE(-80.0f), ANGLE(-80.0f)),

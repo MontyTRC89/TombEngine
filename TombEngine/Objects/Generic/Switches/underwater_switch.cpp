@@ -14,47 +14,47 @@ using namespace TEN::Input;
 
 namespace TEN::Entities::Switches
 { 
+	const auto UnderwaterSwitchPos = Vector3i(0, 0, 108);
 	const ObjectCollisionBounds UnderwaterSwitchBounds =
 	{
 		GameBoundingBox(
-			-SECTOR(1), SECTOR(1),
-			-SECTOR(1), SECTOR(1),
-			-SECTOR(1), SECTOR(0.5f)
+			-BLOCK(3, 8), BLOCK(3, 8),
+			-BLOCK(3, 8), BLOCK(3, 8),
+			-BLOCK(1), BLOCK(1, 4)
 		),
 		std::pair(
 			EulerAngles(ANGLE(-80.0f), ANGLE(-80.0f), ANGLE(-80.0f)),
 			EulerAngles(ANGLE(80.0f), ANGLE(80.0f), ANGLE(80.0f))
 		)
 	};
-	const auto UnderwaterSwitchPos = Vector3i(0, 0, 108);
 
+	const auto CeilingUnderwaterSwitchPos1 = Vector3i(0, -736, -416);
 	const ObjectCollisionBounds CeilingUnderwaterSwitchBounds1 =
 	{
 		GameBoundingBox(
-			-CLICK(1), CLICK(1),
-			-SECTOR(1.25f), -SECTOR(0.5f),
-			-SECTOR(0.5f), 0
+			-BLOCK(3, 8), BLOCK(3, 8),
+			-BLOCK(17, 16), -BLOCK(1, 2),
+			-BLOCK(1, 2), 0
 		),
 		std::pair(
 			EulerAngles(ANGLE(-80.0f), ANGLE(-80.0f), ANGLE(-80.0f)),
 			EulerAngles(ANGLE(80.0f), ANGLE(80.0f), ANGLE(80.0f))
 		)
 	};
-	const auto CeilingUnderwaterSwitchPos1 = Vector3i(0, -736, -416);
 
+	const auto CeilingUnderwaterSwitchPos2 = Vector3i(0, -736, 416);
 	const ObjectCollisionBounds CeilingUnderwaterSwitchBounds2 =
 	{
 		GameBoundingBox(
-			-CLICK(1), CLICK(1),
-			-SECTOR(1.25f), -SECTOR(0.5f),
-			0, SECTOR(0.5f)
+			-BLOCK(3, 8), BLOCK(3, 8),
+			-BLOCK(17, 16), -BLOCK(1, 2),
+			0, BLOCK(1, 2)
 		),
 		std::pair(
 			EulerAngles(ANGLE(-80.0f), ANGLE(-80.0f), ANGLE(-80.0f)),
 			EulerAngles(ANGLE(80.0f), ANGLE(80.0f), ANGLE(80.0f))
 		)
 	};
-	const auto CeilingUnderwaterSwitchPos2 = Vector3i(0, -736, 416);
 
 	void UnderwaterSwitchCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 	{
