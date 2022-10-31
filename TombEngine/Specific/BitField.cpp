@@ -73,13 +73,7 @@ namespace TEN::Utils
 
 	void BitField::Set(unsigned int index)
 	{
-		if (index >= Bits.size())
-		{
-			TENLog(string("BitField attempted to set bit at invalid index."), LogLevel::Warning);
-			return;
-		}
-
-		this->Bits[index] = true;
+		this->Set(std::vector<unsigned int> { index });
 	}
 
 	void BitField::SetAll()
@@ -103,13 +97,7 @@ namespace TEN::Utils
 	
 	void BitField::Clear(unsigned int index)
 	{
-		if (index >= Bits.size())
-		{
-			TENLog(string("BitField attempted to clear bit at invalid index."), LogLevel::Warning);
-			return;
-		}
-
-		this->Bits[index] = false;
+		this->Clear(std::vector<unsigned int> { index });
 	}
 
 	void BitField::ClearAll()
@@ -133,13 +121,7 @@ namespace TEN::Utils
 	
 	void BitField::Flip(unsigned int index)
 	{
-		if (index >= Bits.size())
-		{
-			TENLog(string("BitField attempted to flip bit at invalid index."), LogLevel::Warning);
-			return;
-		}
-
-		this->Bits[index].flip();
+		this->Flip(std::vector<unsigned int> { index });
 	}
 
 	void BitField::FlipAll()
@@ -149,51 +131,34 @@ namespace TEN::Utils
 
 	bool BitField::Test(const vector<unsigned int>& indices, bool testAny) const
 	{
-		// Test whether ANY bits at passed indices are true.
-		if (testAny)
+		for (const unsigned int& index : indices)
 		{
-			for (const unsigned int& index : indices)
+			if (index >= Bits.size())
 			{
-				if (index >= Bits.size())
-				{
-					TENLog(string("BitField attempted to test bit at invalid index."), LogLevel::Warning);
-					continue;
-				}
+				TENLog(string("BitField attempted to test bit at invalid index."), LogLevel::Warning);
+				continue;
+			}
 
+			// Test whether ANY bits at passed indices are true.
+			if (testAny)
+			{
 				if (Bits[index])
 					return true;
 			}
-
-			return false;
-		}
-		// Test whether ALL bits at passed indices are true.
-		else
-		{
-			for (const unsigned int& index : indices)
+			// Test whether ALL bits at passed indices are true.
+			else
 			{
-				if (index >= Bits.size())
-				{
-					TENLog(string("BitField attempted to test bit at invalid index."), LogLevel::Warning);
-					return false;
-				}
-
 				if (!Bits[index])
 					return false;
 			}
-
-			return true;
 		}
+
+		return (testAny ? false : true);
 	}
 
 	bool BitField::Test(unsigned int index) const
 	{
-		if (index >= Bits.size())
-		{
-			TENLog(string("BitField attempted to test bit at invalid index."), LogLevel::Warning);
-			return false;
-		}
-
-		return Bits[index];
+		return this->Test(std::vector<unsigned int> { index });
 	}
 
 	bool BitField::TestAny() const

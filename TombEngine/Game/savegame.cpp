@@ -310,7 +310,6 @@ bool SaveGame::Save(int slot)
 	inventory.add_total_flares(Lara.Inventory.TotalFlares);
 	inventory.add_total_small_medipacks(Lara.Inventory.TotalSmallMedipacks);
 	inventory.add_total_large_medipacks(Lara.Inventory.TotalLargeMedipacks);
-	inventory.add_total_secrets(Lara.Inventory.TotalSecrets);
 	auto inventoryOffset = inventory.Finish();
 
 	Save::LaraCountDataBuilder count{ fbb };
@@ -1782,7 +1781,6 @@ bool SaveGame::Load(int slot)
 	Lara.Inventory.SmallWaterskin = s->lara()->inventory()->small_waterskin();
 	Lara.Inventory.TotalFlares = s->lara()->inventory()->total_flares();
 	Lara.Inventory.TotalLargeMedipacks = s->lara()->inventory()->total_large_medipacks();
-	Lara.Inventory.TotalSecrets = s->lara()->inventory()->total_secrets();
 	Lara.Inventory.TotalSmallMedipacks = s->lara()->inventory()->total_small_medipacks();
 	Lara.ItemNumber = s->lara()->item_number();
 	Lara.LeftArm.AnimNumber = s->lara()->left_arm()->anim_number();
