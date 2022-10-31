@@ -93,15 +93,15 @@ bool MovePlayerPosition(const Vector3i& offset, ItemInfo* item, ItemInfo* laraIt
 	auto pos = Vector3::Transform(offset.ToVector3(), rotMatrix);
 	auto toPose = Pose(item->Pose.Position + Vector3i(pos), item->Pose.Orientation);
 
-	if (!Objects[item->ObjectNumber].isPickup)
-		return AlignPlayerToPose(laraItem, toPose, LARA_ALIGN_VELOCITY, turnRate);
-	else
+	if (Objects[item->ObjectNumber].isPickup)
 	{
 		// Prevent picking up items which can result in so called "flare pickup bug"
 		int height = GetCollision(toPose.Position.x, toPose.Position.y, toPose.Position.z, laraItem->RoomNumber).Position.Floor;
 		if (abs(height - laraItem->Pose.Position.y) <= maxDeltaHeight)
 			return AlignPlayerToPose(laraItem, toPose, LARA_ALIGN_VELOCITY, turnRate);
 	}
+	else
+		return AlignPlayerToPose(laraItem, toPose, LARA_ALIGN_VELOCITY, turnRate);
 
 	if (lara->Control.IsMoving)
 	{
