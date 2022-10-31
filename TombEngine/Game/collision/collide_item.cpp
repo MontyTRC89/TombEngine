@@ -61,14 +61,13 @@ bool MovePlayerPosition(const Vector3i& offset, ItemInfo* item, ItemInfo* laraIt
 
 	auto* lara = GetLaraInfo(laraItem);
 
-	auto rotMatrix = item->Pose.Orientation.ToRotationMatrix();
-	auto pos = Vector3::Transform(offset.ToVector3(), rotMatrix);
-	auto toPose = Pose(item->Pose.Position + Vector3i(pos), item->Pose.Orientation);
+	auto target = Geometry::TranslatePoint(item->Pose.Position, item->Pose.Orientation, offset);
+	auto toPose = Pose(target, item->Pose.Orientation);
 
 	bool canAlign = true;
 	if (Objects[item->ObjectNumber].isPickup)
 	{
-		// Prevent picking up items to avoid flare pickup bug.
+		// Prevent picking up items inside walls.
 		int height = GetCollision(toPose.Position.x, toPose.Position.y, toPose.Position.z, laraItem->RoomNumber).Position.Floor;
 		if (abs(height - laraItem->Pose.Position.y) > maxDeltaHeight)
 			canAlign = false;
@@ -93,7 +92,6 @@ bool MovePlayerPosition(const Vector3i& offset, ItemInfo* item, ItemInfo* laraIt
 
 	return false;
 }
-
 
 bool AlignPlayerToPose(ItemInfo* item, const Pose& toPose, float velocity, short turnRate)
 {

@@ -9,19 +9,24 @@
 
 namespace TEN::Math::Geometry
 {
-	Vector3 TranslatePoint(const Vector3& point, short headingAngle, const Vector3& offset)
-	{
-		return TranslatePoint(point, headingAngle, offset.z, offset.y, offset.z);
-	}
-	
-	Vector3i TranslatePoint(const Vector3i& point, short headingAngle, const Vector3i& offset)
-	{
-		return TranslatePoint(point, headingAngle, offset.z, offset.y, offset.z);
-	}
-
 	Vector3i TranslatePoint(const Vector3i& point, short headingAngle, float forward, float down, float right)
 	{
 		return Vector3i(TranslatePoint(point.ToVector3(), headingAngle, forward, down, right));
+	}
+
+	Vector3i TranslatePoint(const Vector3i& point, const EulerAngles& orient, const Vector3i& offset)
+	{
+		return Vector3i(TranslatePoint(point.ToVector3(), orient, offset.ToVector3()));
+	}
+
+	Vector3i TranslatePoint(const Vector3i& point, const EulerAngles& orient, float distance)
+	{
+		return Vector3i(TranslatePoint(point.ToVector3(), orient, distance));
+	}
+
+	Vector3i TranslatePoint(const Vector3i& point, const Vector3& direction, float distance)
+	{
+		return Vector3i(TranslatePoint(point.ToVector3(), direction, distance));
 	}
 
 	Vector3 TranslatePoint(const Vector3& point, short headingAngle, float forward, float down, float right)
@@ -39,9 +44,11 @@ namespace TEN::Math::Geometry
 		);
 	}
 
-	Vector3i TranslatePoint(const Vector3i& point, const EulerAngles& orient, float distance)
+	Vector3 TranslatePoint(const Vector3& point, const EulerAngles& orient, const Vector3& offset)
 	{
-		return Vector3i(TranslatePoint(point.ToVector3(), orient, distance));
+		auto rotMatrix = orient.ToRotationMatrix();
+		auto relativeOffset = Vector3::Transform(offset, rotMatrix);
+		return (point + relativeOffset);
 	}
 
 	Vector3 TranslatePoint(const Vector3& point, const EulerAngles& orient, float distance)
@@ -59,11 +66,6 @@ namespace TEN::Math::Geometry
 			point.y - (distance * sinX),
 			point.z + (distance * (cosX * cosY))
 		);
-	}
-
-	Vector3i TranslatePoint(const Vector3i& point, const Vector3& direction, float distance)
-	{
-		return Vector3i(TranslatePoint(point.ToVector3(), direction, distance));
 	}
 
 	Vector3 TranslatePoint(const Vector3& point, const Vector3& direction, float distance)

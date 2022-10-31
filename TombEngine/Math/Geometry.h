@@ -9,13 +9,14 @@ namespace TEN::Math::Geometry
 	// Since Y is assumed as the vertical axis, only the Y Euler component needs to be considered and
 	// 2D vector operations can be done in the XZ plane. Maybe revise geometry functions to each take an "up" vector argument someday.
 
-	Vector3i TranslatePoint(const Vector3i& point, short headingAngle, const Vector3i& offset);
-	Vector3	 TranslatePoint(const Vector3& point, short headingAngle, const Vector3& offset);
 	Vector3i TranslatePoint(const Vector3i& point, short headingAngle, float forward, float down = 0.0f, float right = 0.0f);
-	Vector3	 TranslatePoint(const Vector3& point, short headingAngle, float forward, float down = 0.0f, float right = 0.0f);
+	Vector3i TranslatePoint(const Vector3i& point, const EulerAngles& orient, const Vector3i& offset);
 	Vector3i TranslatePoint(const Vector3i& point, const EulerAngles& orient, float distance);
-	Vector3	 TranslatePoint(const Vector3& point, const EulerAngles& orient, float distance);
 	Vector3i TranslatePoint(const Vector3i& point, const Vector3& direction, float distance);
+
+	Vector3	 TranslatePoint(const Vector3& point, short headingAngle, float forward, float down = 0.0f, float right = 0.0f);
+	Vector3	 TranslatePoint(const Vector3& point, const EulerAngles& orient, const Vector3& offset);
+	Vector3	 TranslatePoint(const Vector3& point, const EulerAngles& orient, float distance);
 	Vector3	 TranslatePoint(const Vector3& point, const Vector3& direction, float distance);
 
 	short GetShortestAngularDistance(short fromAngle, short toAngle);
