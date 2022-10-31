@@ -64,6 +64,11 @@ using namespace TEN::Math;
 		this->Position = Geometry::TranslatePoint(this->Position, headingAngle, forward, down, right);
 	}
 
+	void Pose::Translate(const EulerAngles& orient, const Vector3i& offset)
+	{
+		this->Position = Geometry::TranslatePoint(this->Position, orient, offset);
+	}
+
 	void Pose::Translate(const EulerAngles& orient, float distance)
 	{
 		this->Position = Geometry::TranslatePoint(this->Position, orient, distance);

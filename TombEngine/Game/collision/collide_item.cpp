@@ -56,7 +56,7 @@ bool TestPlayerPosition(const ObjectCollisionBounds& bounds, ItemInfo* item, Ite
 
 bool MovePlayerPosition(const Vector3i& offset, ItemInfo* item, ItemInfo* laraItem, bool doSnap)
 {
-	static constexpr auto maxDeltaHeight = STEPUP_HEIGHT;
+	static constexpr auto maxFloorHeight = STEPUP_HEIGHT;
 	static const auto	  turnRate		 = ANGLE(2.0f);
 
 	auto* lara = GetLaraInfo(laraItem);
@@ -67,9 +67,9 @@ bool MovePlayerPosition(const Vector3i& offset, ItemInfo* item, ItemInfo* laraIt
 	bool canAlign = true;
 	if (Objects[item->ObjectNumber].isPickup)
 	{
-		// Prevent picking up items inside walls.
-		int height = GetCollision(toPose.Position.x, toPose.Position.y, toPose.Position.z, laraItem->RoomNumber).Position.Floor;
-		if (abs(height - laraItem->Pose.Position.y) > maxDeltaHeight)
+		// Prevent picking up items inside walls and off ledges.
+		int floorHeight = GetCollision(toPose.Position.x, toPose.Position.y, toPose.Position.z, laraItem->RoomNumber).Position.Floor;
+		if (abs(floorHeight - laraItem->Pose.Position.y) > maxFloorHeight)
 			canAlign = false;
 	}
 	

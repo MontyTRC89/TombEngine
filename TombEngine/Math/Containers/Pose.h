@@ -27,6 +27,7 @@
 
 		// Utilities
 		void Translate(short headingAngle, float forward, float down = 0.0f, float right = 0.0f);
+		void Translate(const EulerAngles& orient, const Vector3i& offset);
 		void Translate(const EulerAngles& orient, float distance);
 		void Translate(const Vector3& direction, float distance);
 		void InterpolateConstant(const Pose& toPose, float velocity, short turnRate);
