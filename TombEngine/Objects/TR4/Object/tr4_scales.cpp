@@ -15,7 +15,7 @@
 using namespace TEN::Entities::Switches;
 using namespace TEN::Entities::TR4;
 
-ObjectCollisionBounds ScalesBounds =
+InteractBounds ScalesBounds =
 {
 	GameBoundingBox(
 		-CLICK(5.5f), -CLICK(5.5f),
@@ -127,7 +127,7 @@ void ScalesCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 			ScalesBounds.BoundingBox.Z1 = -512;
 			ScalesBounds.BoundingBox.Z2 = 0;
 
-			if (TestPlayerPosition(ScalesBounds, item, laraItem))
+			if (TestPlayerEntityInteract(ScalesBounds, item, laraItem))
 			{
 				laraItem->Animation.AnimNumber = LA_WATERSKIN_POUR_HIGH;
 				laraItem->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;

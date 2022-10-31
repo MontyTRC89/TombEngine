@@ -14,7 +14,7 @@ using namespace TEN::Input;
 namespace TEN::Entities::Switches
 {
 	const auto RailSwitchPos = Vector3i(0, 0, -550);
-	const ObjectCollisionBounds RailSwitchBounds =
+	const InteractBounds RailSwitchBounds =
 	{
 		GameBoundingBox(
 			-CLICK(1), CLICK(1),
@@ -28,7 +28,7 @@ namespace TEN::Entities::Switches
 	};
 
 	const auto RailSwitchPos2 = Vector3i(0, 0, 550);
-	const ObjectCollisionBounds RailSwitchBounds2 =
+	const InteractBounds RailSwitchBounds2 =
 	{
 		GameBoundingBox(
 			-CLICK(1), CLICK(1),
@@ -63,9 +63,9 @@ namespace TEN::Entities::Switches
 			{
 				laraItem->Pose.Orientation.y ^= (short)ANGLE(180.0f);
 
-				if (TestPlayerPosition(RailSwitchBounds2, switchItem, laraItem))
+				if (TestPlayerEntityInteract(RailSwitchBounds2, switchItem, laraItem))
 				{
-					if (MovePlayerPosition(RailSwitchPos2, switchItem, laraItem))
+					if (AlignPlayerToEntity(switchItem, laraItem, RailSwitchPos2))
 					{
 						switchItem->Animation.TargetState = SWITCH_OFF;
 						flag = 1;
@@ -102,9 +102,9 @@ namespace TEN::Entities::Switches
 		}
 		else
 		{
-			if (TestPlayerPosition(RailSwitchBounds, switchItem, laraItem))
+			if (TestPlayerEntityInteract(RailSwitchBounds, switchItem, laraItem))
 			{
-				if (MovePlayerPosition(RailSwitchPos, switchItem, laraItem))
+				if (AlignPlayerToEntity(switchItem, laraItem, RailSwitchPos))
 				{
 					ResetLaraFlex(laraItem);
 					laraItem->Animation.AnimNumber = LA_LEVER_PUSH;

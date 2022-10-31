@@ -49,7 +49,7 @@ namespace TEN::Entities::Generic
 	auto VPolePos = Vector3i(0, 0, -208);
 	auto VPolePosR = Vector3i::Zero;
 
-	const ObjectCollisionBounds VPoleBounds = 
+	const InteractBounds VPoleBounds = 
 	{
 		GameBoundingBox(
 			-CLICK(1), CLICK(1),
@@ -79,9 +79,9 @@ namespace TEN::Entities::Generic
 			short yOrient = poleItem->Pose.Orientation.y;
 			poleItem->Pose.Orientation.y = laraItem->Pose.Orientation.y;
 
-			if (TestPlayerPosition(VPoleBounds, poleItem, laraItem))
+			if (TestPlayerEntityInteract(VPoleBounds, poleItem, laraItem))
 			{
-				if (MovePlayerPosition(VPolePos, poleItem, laraItem))
+				if (AlignPlayerToEntity(poleItem, laraItem, VPolePos))
 				{
 					SetAnimation(laraItem, LA_STAND_TO_POLE);
 					lara->Control.IsMoving = false;
@@ -130,14 +130,14 @@ namespace TEN::Entities::Generic
 					if (laraItem->Animation.ActiveState == LS_REACH)
 					{
 						VPolePosR.y = laraItem->Pose.Position.y - poleItem->Pose.Position.y + 10;
-						MovePlayerPosition(VPolePosR, poleItem, laraItem, true);
+						AlignPlayerToEntity(poleItem, laraItem, VPolePosR, EulerAngles::Zero, true);
 						SetAnimation(laraItem, LA_REACH_TO_POLE);
 					}
 					// Jumping up.
 					else
 					{
 						VPolePosR.y = laraItem->Pose.Position.y - poleItem->Pose.Position.y + 66;
-						MovePlayerPosition(VPolePosR, poleItem, laraItem, true);
+						AlignPlayerToEntity(poleItem, laraItem, VPolePosR, EulerAngles::Zero, true);
 						SetAnimation(laraItem, LA_JUMP_UP_TO_POLE);
 					}
 

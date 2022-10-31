@@ -21,7 +21,7 @@ float WaterfallY[6];
 int lastWaterfallY = 0;
 
 const auto TightRopePos = Vector3i::Zero;
-const ObjectCollisionBounds TightRopeBounds =
+const InteractBounds TightRopeBounds =
 {
 	GameBoundingBox(
 		-CLICK(1), CLICK(1),
@@ -33,7 +33,7 @@ const ObjectCollisionBounds TightRopeBounds =
 		EulerAngles(ANGLE(10.0f), ANGLE(30.0f), ANGLE(10.0f))
 	)
 };
-const ObjectCollisionBounds ParallelBarsBounds =
+const InteractBounds ParallelBarsBounds =
 {
 	GameBoundingBox(
 		-640, 640,
@@ -133,9 +133,9 @@ void TightropeCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* col
 	{
 		tightropeItem->Pose.Orientation.y += -ANGLE(180.0f);
 
-		if (TestPlayerPosition(TightRopeBounds, tightropeItem, laraItem))
+		if (TestPlayerEntityInteract(TightRopeBounds, tightropeItem, laraItem))
 		{
-			if (MovePlayerPosition(TightRopePos, tightropeItem, laraItem))
+			if (AlignPlayerToEntity(tightropeItem, laraItem, TightRopePos))
 			{
 				laraItem->Animation.ActiveState = LS_TIGHTROPE_ENTER;
 				laraItem->Animation.AnimNumber = LA_TIGHTROPE_START;
@@ -177,12 +177,12 @@ void HorizontalBarCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo*
 		laraItem->Animation.ActiveState == LS_REACH &&
 		laraItem->Animation.AnimNumber == LA_REACH)
 	{
-		int test1 = TestPlayerPosition(ParallelBarsBounds, barItem, laraItem);
+		int test1 = TestPlayerEntityInteract(ParallelBarsBounds, barItem, laraItem);
 		int test2 = 0;
 		if (!test1)
 		{
 			barItem->Pose.Orientation.y += -ANGLE(180.0f);
-			test2 = TestPlayerPosition(ParallelBarsBounds, barItem, laraItem);
+			test2 = TestPlayerEntityInteract(ParallelBarsBounds, barItem, laraItem);
 			barItem->Pose.Orientation.y += -ANGLE(180);
 		}
 

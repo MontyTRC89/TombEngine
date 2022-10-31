@@ -14,7 +14,7 @@ using namespace TEN::Input;
 
 namespace TEN::Entities::Switches
 { 
-	const ObjectCollisionBounds UnderwaterSwitchBounds =
+	const InteractBounds UnderwaterSwitchBounds =
 	{
 		GameBoundingBox(
 			-SECTOR(1), SECTOR(1),
@@ -28,7 +28,7 @@ namespace TEN::Entities::Switches
 	};
 	const auto UnderwaterSwitchPos = Vector3i(0, 0, 108);
 
-	const ObjectCollisionBounds CeilingUnderwaterSwitchBounds1 =
+	const InteractBounds CeilingUnderwaterSwitchBounds1 =
 	{
 		GameBoundingBox(
 			-CLICK(1), CLICK(1),
@@ -42,7 +42,7 @@ namespace TEN::Entities::Switches
 	};
 	const auto CeilingUnderwaterSwitchPos1 = Vector3i(0, -736, -416);
 
-	const ObjectCollisionBounds CeilingUnderwaterSwitchBounds2 =
+	const InteractBounds CeilingUnderwaterSwitchBounds2 =
 	{
 		GameBoundingBox(
 			-CLICK(1), CLICK(1),
@@ -77,12 +77,12 @@ namespace TEN::Entities::Switches
 			lara->Control.HandStatus == HandStatus::Free &&
 			laraItem->Animation.ActiveState == LS_UNDERWATER_IDLE)
 		{
-			if (TestPlayerPosition(UnderwaterSwitchBounds, switchItem, laraItem))
+			if (TestPlayerEntityInteract(UnderwaterSwitchBounds, switchItem, laraItem))
 			{
 				if (switchItem->Animation.ActiveState == SWITCH_ON ||
 					switchItem->Animation.ActiveState == SWITCH_OFF)
 				{
-					if (MovePlayerPosition(UnderwaterSwitchPos, switchItem, laraItem))
+					if (AlignPlayerToEntity(switchItem, laraItem, UnderwaterSwitchPos))
 					{
 						laraItem->Animation.Velocity.y = 0;
 						laraItem->Animation.TargetState = LS_SWITCH_DOWN;
@@ -120,9 +120,9 @@ namespace TEN::Entities::Switches
 			switchItem->Animation.ActiveState == SWITCH_OFF) ||
 			(lara->Control.IsMoving && lara->InteractedItem == itemNumber))
 		{
-			if (TestPlayerPosition(CeilingUnderwaterSwitchBounds1, switchItem, laraItem))
+			if (TestPlayerEntityInteract(CeilingUnderwaterSwitchBounds1, switchItem, laraItem))
 			{
-				if (MovePlayerPosition(CeilingUnderwaterSwitchPos1, switchItem, laraItem))
+				if (AlignPlayerToEntity(switchItem, laraItem, CeilingUnderwaterSwitchPos1))
 					flag = true;
 				else
 					lara->InteractedItem = itemNumber;
@@ -131,9 +131,9 @@ namespace TEN::Entities::Switches
 			{
 				laraItem->Pose.Orientation.y ^= (short)ANGLE(180.0f);
 
-				if (TestPlayerPosition(CeilingUnderwaterSwitchBounds2, switchItem, laraItem))
+				if (TestPlayerEntityInteract(CeilingUnderwaterSwitchBounds2, switchItem, laraItem))
 				{
-					if (MovePlayerPosition(CeilingUnderwaterSwitchPos2, switchItem, laraItem))
+					if (AlignPlayerToEntity(switchItem, laraItem, CeilingUnderwaterSwitchPos2))
 						flag = true;
 					else
 						lara->InteractedItem = itemNumber;

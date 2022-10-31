@@ -27,7 +27,7 @@ namespace TEN::Entities::TR4
 	const auto SASGunBite = BiteInfo(Vector3(0.0f, 300.0f, 64.0f), 7);
 
 	const auto SASDragBodyPosition = Vector3i(0, 0, -460);
-	const ObjectCollisionBounds SASDragBodyBounds =
+	const InteractBounds SASDragBodyBounds =
 	{
 		GameBoundingBox(
 			-CLICK(1), CLICK(1),
@@ -677,9 +677,9 @@ namespace TEN::Entities::TR4
 		}
 		else
 		{
-			if (TestPlayerPosition(SASDragBodyBounds, item, laraItem))
+			if (TestPlayerEntityInteract(SASDragBodyBounds, item, laraItem))
 			{
-				if (MovePlayerPosition(SASDragBodyPosition, item, laraItem))
+				if (AlignPlayerToEntity(item, laraItem, SASDragBodyPosition))
 				{
 					laraItem->Animation.AnimNumber = LA_DRAG_BODY;
 					laraItem->Animation.ActiveState = LS_MISC_CONTROL;

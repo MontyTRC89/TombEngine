@@ -16,7 +16,7 @@ using namespace TEN::Input;
 using namespace TEN::Renderer;
 using namespace TEN::Floordata;
 
-const ObjectCollisionBounds CeilingTrapDoorBounds =
+const InteractBounds CeilingTrapDoorBounds =
 {
 	GameBoundingBox(
 		-CLICK(1), CLICK(1),
@@ -30,7 +30,7 @@ const ObjectCollisionBounds CeilingTrapDoorBounds =
 };
 const auto CeilingTrapDoorPos = Vector3i(0, 1056, -480);
 
-const ObjectCollisionBounds FloorTrapDoorBounds =
+const InteractBounds FloorTrapDoorBounds =
 {
 	GameBoundingBox(
 		-CLICK(1), CLICK(1),
@@ -69,9 +69,9 @@ void CeilingTrapDoorCollision(short itemNumber, ItemInfo* laraItem, CollisionInf
 
 	bool itemIsAbove = trapDoorItem->Pose.Position.y <= laraItem->Pose.Position.y - LARA_HEIGHT + LARA_HEADROOM;
 
-	bool result = TestPlayerPosition(CeilingTrapDoorBounds, trapDoorItem, laraItem);
+	bool result = TestPlayerEntityInteract(CeilingTrapDoorBounds, trapDoorItem, laraItem);
 	laraItem->Pose.Orientation.y += ANGLE(180.0f);
-	bool result2 = TestPlayerPosition(CeilingTrapDoorBounds, trapDoorItem, laraItem);
+	bool result2 = TestPlayerEntityInteract(CeilingTrapDoorBounds, trapDoorItem, laraItem);
 	laraItem->Pose.Orientation.y += ANGLE(180.0f);
 
 	if (TrInput & IN_ACTION &&
@@ -82,7 +82,7 @@ void CeilingTrapDoorCollision(short itemNumber, ItemInfo* laraItem, CollisionInf
 		itemIsAbove &&
 		(result || result2))
 	{
-		MovePlayerPosition(CeilingTrapDoorPos, trapDoorItem, laraItem, true);
+		AlignPlayerToEntity(trapDoorItem, laraItem, CeilingTrapDoorPos, EulerAngles::Zero, true);
 		if (result2)
 			laraItem->Pose.Orientation.y += ANGLE(180.0f);
 		
@@ -128,9 +128,9 @@ void FloorTrapDoorCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo*
 		trapDoorItem->Status != ITEM_ACTIVE) ||
 		(laraInfo->Control.IsMoving && laraInfo->InteractedItem == itemNumber))
 	{
-		if (TestPlayerPosition(FloorTrapDoorBounds, trapDoorItem, laraItem))
+		if (TestPlayerEntityInteract(FloorTrapDoorBounds, trapDoorItem, laraItem))
 		{
-			if (MovePlayerPosition(FloorTrapDoorPos, trapDoorItem, laraItem))
+			if (AlignPlayerToEntity(trapDoorItem, laraItem, FloorTrapDoorPos))
 			{
 				ResetLaraFlex(laraItem);
 				laraItem->Animation.AnimNumber = LA_TRAPDOOR_FLOOR_OPEN;

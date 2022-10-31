@@ -36,7 +36,7 @@ namespace TEN::Entities::Doors
 	const Vector3i PushDoorPos(201, 0, -702);
 	const Vector3i KickDoorPos(0, 0, -917);
 
-	const ObjectCollisionBounds PushPullKickDoorBounds =
+	const InteractBounds PushPullKickDoorBounds =
 	{
 		GameBoundingBox(
 			-384, 384,
@@ -70,13 +70,13 @@ namespace TEN::Entities::Doors
 				pull = true;
 			}
 
-			if (TestPlayerPosition(PushPullKickDoorBounds, doorItem, laraItem))
+			if (TestPlayerEntityInteract(PushPullKickDoorBounds, doorItem, laraItem))
 			{
 				bool openTheDoor = false;
 
 				if (pull)
 				{
-					if (MovePlayerPosition(PullDoorPos, doorItem, laraItem))
+					if (AlignPlayerToEntity(doorItem, laraItem, PullDoorPos))
 					{
 						SetAnimation(laraItem, LA_DOOR_OPEN_PULL);
 						doorItem->Animation.TargetState = STATE_PUSHPULL_KICK_DOOR_PULL;
@@ -89,7 +89,7 @@ namespace TEN::Entities::Doors
 				{
 					if (doorItem->ObjectNumber >= ID_KICK_DOOR1)
 					{
-						if (MovePlayerPosition(KickDoorPos, doorItem, laraItem))
+						if (AlignPlayerToEntity(doorItem, laraItem, KickDoorPos))
 						{
 							SetAnimation(laraItem, LA_DOOR_OPEN_KICK);
 							doorItem->Animation.TargetState = STATE_PUSHPULL_KICK_DOOR_PUSH;
@@ -100,7 +100,7 @@ namespace TEN::Entities::Doors
 					}
 					else
 					{
-						if (MovePlayerPosition(PushDoorPos, doorItem, laraItem))
+						if (AlignPlayerToEntity(doorItem, laraItem, PushDoorPos))
 						{
 							SetAnimation(laraItem, LA_DOOR_OPEN_PUSH);
 							doorItem->Animation.TargetState = STATE_PUSHPULL_KICK_DOOR_PUSH;

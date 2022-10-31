@@ -23,6 +23,7 @@ namespace TEN::Entities::Generic
 {
 	enum class LadderMountType
 	{
+		None,
 		TopFront,
 		TopBack,
 		Bottom,
@@ -53,7 +54,7 @@ namespace TEN::Entities::Generic
 	};
 
 	const auto LadderMountOffset = Vector3i(0, 0, -CLICK(0.6f));
-	const ObjectCollisionBounds LadderFrontBounds =
+	const InteractBounds LadderFrontBounds =
 	{
 		GameBoundingBox(
 			-CLICK(1), CLICK(1),
@@ -65,7 +66,7 @@ namespace TEN::Entities::Generic
 			EulerAngles(ANGLE(10.0f), LARA_GRAB_THRESHOLD, ANGLE(10.0f))
 		)
 	};
-	const ObjectCollisionBounds LadderBackBounds =
+	const InteractBounds LadderBackBounds =
 	{
 		GameBoundingBox(
 			-CLICK(1), CLICK(1),
@@ -77,7 +78,7 @@ namespace TEN::Entities::Generic
 			EulerAngles(ANGLE(10.0f), ANGLE(180.0f) + LARA_GRAB_THRESHOLD, ANGLE(10.0f))
 		)
 	};
-	const ObjectCollisionBounds LadderLeftBounds =
+	const InteractBounds LadderLeftBounds =
 	{
 		GameBoundingBox(
 			-CLICK(1), CLICK(1),
@@ -89,7 +90,7 @@ namespace TEN::Entities::Generic
 			EulerAngles(ANGLE(10.0f), ANGLE(90.0f) + LARA_GRAB_THRESHOLD, ANGLE(10.0f))
 		)
 	};
-	const ObjectCollisionBounds LadderRightBounds =
+	const InteractBounds LadderRightBounds =
 	{
 		GameBoundingBox(
 			-CLICK(1), CLICK(1),
@@ -116,7 +117,7 @@ namespace TEN::Entities::Generic
 			(player.Control.IsMoving && player.InteractedItem == itemNumber))
 		{
 			// Mount at bottom.
-			if (TestPlayerPosition(LadderFrontBounds, &ladderItem, laraItem))
+			if (TestPlayerEntityInteract(LadderFrontBounds, &ladderItem, laraItem))
 			{
 				if (!laraItem->OffsetBlend.IsActive)
 				{
@@ -137,10 +138,10 @@ namespace TEN::Entities::Generic
 					player.InteractedItem = itemNumber;
 			}
 			// Mount from right.
-			else if (TestPlayerPosition(LadderRightBounds, &ladderItem, laraItem))
+			else if (TestPlayerEntityInteract(LadderRightBounds, &ladderItem, laraItem))
 			{
 				auto mountPos = Vector3i(GameBoundingBox(&ladderItem).Z1 + CLICK(0.55f), 0, 0);
-				if (MovePlayerPosition(mountPos, &ladderItem, laraItem))
+				if (AlignPlayerToEntity(&ladderItem, laraItem, mountPos))
 				{
 					SetAnimation(laraItem, LA_LADDER_MOUNT_RIGHT);
 					player.Control.IsMoving = false;
@@ -182,7 +183,7 @@ namespace TEN::Entities::Generic
 							bounds.Y1 - fmod(abs(bounds.Y1 - laraItem->Pose.Position.y), CLICK(1)),
 							0
 						);
-						MovePlayerPosition(offset, &ladderItem, laraItem, true);
+						AlignPlayerToEntity(&ladderItem, laraItem, offset, EulerAngles::Zero, true);
 						SetAnimation(laraItem, LA_LADDER_MOUNT_JUMP_REACH);
 					}
 					// Jumping up.

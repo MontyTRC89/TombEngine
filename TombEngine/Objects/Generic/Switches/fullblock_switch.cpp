@@ -14,7 +14,7 @@ using namespace TEN::Input;
 
 namespace TEN::Entities::Switches
 {
-	const ObjectCollisionBounds FullBlockSwitchBounds = 
+	const InteractBounds FullBlockSwitchBounds = 
 	{
 		GameBoundingBox(
 			-384, 384,
@@ -51,9 +51,9 @@ namespace TEN::Entities::Switches
 			return;
 		}
 
-		if (TestPlayerPosition(FullBlockSwitchBounds, switchItem, laraItem))
+		if (TestPlayerEntityInteract(FullBlockSwitchBounds, switchItem, laraItem))
 		{
-			if (MovePlayerPosition(FullBlockSwitchPos, switchItem, laraItem))
+			if (AlignPlayerToEntity(switchItem, laraItem, FullBlockSwitchPos))
 			{
 				if (switchItem->Animation.ActiveState == 1)
 				{

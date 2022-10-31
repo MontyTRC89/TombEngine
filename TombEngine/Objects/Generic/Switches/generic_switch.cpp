@@ -13,7 +13,7 @@ using namespace TEN::Input;
 
 namespace TEN::Entities::Switches
 {
-	ObjectCollisionBounds SwitchBounds = 
+	InteractBounds SwitchBounds = 
 	{
 		GameBoundingBox::Zero,
 		std::pair(
@@ -86,9 +86,9 @@ namespace TEN::Entities::Switches
 				SwitchPos.z = bounds.Z1 - 64;
 			}
 
-			if (TestPlayerPosition(SwitchBounds, switchItem, laraItem))
+			if (TestPlayerEntityInteract(SwitchBounds, switchItem, laraItem))
 			{
-				if (MovePlayerPosition(SwitchPos, switchItem, laraItem))
+				if (AlignPlayerToEntity(switchItem, laraItem, SwitchPos))
 				{
 					auto onAnim = LaraAnim::LA_WALLSWITCH_DOWN;
 					auto offAnim = LaraAnim::LA_WALLSWITCH_UP;

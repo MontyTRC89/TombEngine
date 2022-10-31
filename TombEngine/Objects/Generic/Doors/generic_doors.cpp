@@ -28,7 +28,7 @@ using namespace TEN::Input;
 namespace TEN::Entities::Doors
 {
 	const auto CrowbarDoorPos = Vector3i(-412, 0, 256);
-	const ObjectCollisionBounds CrowbarDoorBounds =
+	const InteractBounds CrowbarDoorBounds =
 	{
 		GameBoundingBox(
 			-SECTOR(0.5f), SECTOR(0.5f),
@@ -181,7 +181,7 @@ namespace TEN::Entities::Doors
 				laraInfo->Control.IsMoving && laraInfo->InteractedItem == itemNumber))
 		{
 			doorItem->Pose.Orientation.y ^= ANGLE(180.0f);
-			if (TestPlayerPosition(CrowbarDoorBounds, doorItem, laraItem))
+			if (TestPlayerEntityInteract(CrowbarDoorBounds, doorItem, laraItem))
 			{
 				if (!laraInfo->Control.IsMoving)
 				{
@@ -217,7 +217,7 @@ namespace TEN::Entities::Doors
 
 				g_Gui.SetInventoryItemChosen(NO_ITEM);
 
-				if (MovePlayerPosition(CrowbarDoorPos, doorItem, laraItem))
+				if (AlignPlayerToEntity(doorItem, laraItem, CrowbarDoorPos))
 				{
 					SetAnimation(laraItem, LA_DOOR_OPEN_CROWBAR);
 					doorItem->Pose.Orientation.y ^= ANGLE(180.0f);

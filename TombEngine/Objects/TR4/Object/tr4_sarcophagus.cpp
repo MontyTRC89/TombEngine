@@ -13,7 +13,7 @@
 using namespace TEN::Input;
 
 const auto SarcophagusPosition = Vector3i(0, 0, -300);
-const ObjectCollisionBounds SarcophagusBounds =
+const InteractBounds SarcophagusBounds =
 {
 	GameBoundingBox(
 		-SECTOR(0.5f), SECTOR(0.5f),
@@ -43,9 +43,9 @@ void SarcophagusCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* c
 		sarcItem->Status != ITEM_ACTIVE ||
 		laraInfo->Control.IsMoving && laraInfo->InteractedItem == itemNumber)
 	{
-		if (TestPlayerPosition(SarcophagusBounds, sarcItem, laraItem))
+		if (TestPlayerEntityInteract(SarcophagusBounds, sarcItem, laraItem))
 		{
-			if (MovePlayerPosition(SarcophagusPosition, sarcItem, laraItem))
+			if (AlignPlayerToEntity(sarcItem, laraItem, SarcophagusPosition))
 			{
 				laraItem->Animation.AnimNumber = LA_PICKUP_SARCOPHAGUS;
 				laraItem->Animation.ActiveState = LS_MISC_CONTROL;

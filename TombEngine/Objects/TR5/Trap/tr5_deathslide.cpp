@@ -14,7 +14,7 @@
 
 using namespace TEN::Input;
 
-const ObjectCollisionBounds DeathSlideBounds =
+const InteractBounds DeathSlideBounds =
 {
 	GameBoundingBox(
 		-CLICK(1), CLICK(1),
@@ -58,9 +58,9 @@ void DeathSlideCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* co
 	if (zipLineItem->Status != ITEM_NOT_ACTIVE)
 		return;
 
-	if (TestPlayerPosition(DeathSlideBounds, zipLineItem, laraItem))
+	if (TestPlayerEntityInteract(DeathSlideBounds, zipLineItem, laraItem))
 	{
-		MovePlayerPosition(DeathSlidePosition, zipLineItem, laraItem, true);
+		AlignPlayerToEntity(zipLineItem, laraItem, DeathSlidePosition, EulerAngles::Zero, true);
 		laraInfo->Control.HandStatus = HandStatus::Busy;
 
 		laraItem->Animation.TargetState = LS_ZIP_LINE;

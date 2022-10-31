@@ -15,7 +15,7 @@ using namespace TEN::Input;
 
 namespace TEN::Entities::Switches
 {
-	const ObjectCollisionBounds PulleyBounds =
+	const InteractBounds PulleyBounds =
 	{
 		GameBoundingBox(
 			-CLICK(1), CLICK(1),
@@ -57,7 +57,7 @@ namespace TEN::Entities::Switches
 		{
 			short oldYrot = switchItem->Pose.Orientation.y;
 			switchItem->Pose.Orientation.y = laraItem->Pose.Orientation.y;
-			if (TestPlayerPosition(PulleyBounds, switchItem, laraItem))
+			if (TestPlayerEntityInteract(PulleyBounds, switchItem, laraItem))
 			{
 				if (switchItem->ItemFlags[1])
 				{
@@ -69,7 +69,7 @@ namespace TEN::Entities::Switches
 						SayNo();
 					}
 				}
-				else if (MovePlayerPosition(PulleyPos, switchItem, laraItem))
+				else if (AlignPlayerToEntity(switchItem, laraItem, PulleyPos))
 				{
 					laraItem->Animation.AnimNumber = LA_PULLEY_GRAB;
 					laraItem->Animation.ActiveState = LS_PULLEY;

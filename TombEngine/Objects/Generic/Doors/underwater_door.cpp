@@ -24,7 +24,7 @@ using namespace TEN::Input;
 namespace TEN::Entities::Doors
 {
 	const auto UnderwaterDoorPos = Vector3i(-251, -540, -46);
-	const ObjectCollisionBounds UnderwaterDoorBounds =
+	const InteractBounds UnderwaterDoorBounds =
 	{
 		GameBoundingBox(
 			-CLICK(1), CLICK(1),
@@ -52,9 +52,9 @@ namespace TEN::Entities::Doors
 		{
 			laraItem->Pose.Orientation.y ^= ANGLE(180.0f);
 
-			if (TestPlayerPosition(UnderwaterDoorBounds, doorItem, laraItem))
+			if (TestPlayerEntityInteract(UnderwaterDoorBounds, doorItem, laraItem))
 			{
-				if (MovePlayerPosition(UnderwaterDoorPos, doorItem, laraItem))
+				if (AlignPlayerToEntity(doorItem, laraItem, UnderwaterDoorPos))
 				{
 					SetAnimation(laraItem, LA_UNDERWATER_DOOR_OPEN);
 					laraItem->Animation.Velocity.y = 0;

@@ -26,7 +26,7 @@ namespace TEN::Entities::Switches
 
 	const auto TurnSwitchPosA = Vector3i(650, 0, -138);
 	const auto TurnSwitchPos = Vector3i(650, 0, 138);
-	const ObjectCollisionBounds TurnSwitchBoundsA = 
+	const InteractBounds TurnSwitchBoundsA = 
 	{
 		GameBoundingBox(
 			SECTOR(0.5f), CLICK(3.5f),
@@ -38,7 +38,7 @@ namespace TEN::Entities::Switches
 			EulerAngles(ANGLE(10.0f), ANGLE(30.0f), ANGLE(10.0f))
 		)
 	};
-	const ObjectCollisionBounds TurnSwitchBoundsC =
+	const InteractBounds TurnSwitchBoundsC =
 	{
 		GameBoundingBox(
 			SECTOR(0.5f), CLICK(3.5f),
@@ -66,9 +66,9 @@ namespace TEN::Entities::Switches
 			switchItem->Animation.ActiveState == TURN_SWITCH_STOP ||
 			laraInfo->Control.IsMoving && laraInfo->InteractedItem == itemNumber)
 		{
-			if (TestPlayerPosition(TurnSwitchBoundsA, switchItem, laraItem))
+			if (TestPlayerEntityInteract(TurnSwitchBoundsA, switchItem, laraItem))
 			{
-				if (MovePlayerPosition(TurnSwitchPosA, switchItem, laraItem))
+				if (AlignPlayerToEntity(switchItem, laraItem, TurnSwitchPosA))
 				{
 					laraItem->Animation.AnimNumber = LA_TURNSWITCH_GRAB_COUNTER_CLOCKWISE;
 					laraItem->Animation.FrameNumber = g_Level.Anims[LA_TURNSWITCH_GRAB_COUNTER_CLOCKWISE].frameBase;
@@ -86,9 +86,9 @@ namespace TEN::Entities::Switches
 			else
 			{
 				laraItem->Pose.Orientation.y ^= (short)ANGLE(180.0f);
-				if (TestPlayerPosition(TurnSwitchBoundsC, switchItem, laraItem))
+				if (TestPlayerEntityInteract(TurnSwitchBoundsC, switchItem, laraItem))
 				{
-					if (MovePlayerPosition(TurnSwitchPos, switchItem, laraItem))
+					if (AlignPlayerToEntity(switchItem, laraItem, TurnSwitchPos))
 					{
 						laraItem->Animation.AnimNumber = LA_TURNSWITCH_GRAB_CLOCKWISE;
 						laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;

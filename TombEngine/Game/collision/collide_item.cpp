@@ -29,23 +29,23 @@ GameBoundingBox GlobalCollisionBounds;
 ItemInfo* CollidedItems[MAX_COLLIDED_OBJECTS];
 MESH_INFO* CollidedMeshes[MAX_COLLIDED_OBJECTS];
 
-bool TestPlayerPosition(const ObjectCollisionBounds& bounds, ItemInfo* item, ItemInfo* laraItem)
+bool TestPlayerEntityInteract(const InteractBounds& iBounds, ItemInfo* item, ItemInfo* laraItem)
 {
 	auto deltaOrient = laraItem->Pose.Orientation - item->Pose.Orientation;
-	if (deltaOrient.x < bounds.OrientConstraint.first.x || deltaOrient.x > bounds.OrientConstraint.second.x ||
-		deltaOrient.y < bounds.OrientConstraint.first.y || deltaOrient.y > bounds.OrientConstraint.second.y ||
-		deltaOrient.z < bounds.OrientConstraint.first.z || deltaOrient.z > bounds.OrientConstraint.second.z)
+	if (deltaOrient.x < iBounds.OrientConstraint.first.x || deltaOrient.x > iBounds.OrientConstraint.second.x ||
+		deltaOrient.y < iBounds.OrientConstraint.first.y || deltaOrient.y > iBounds.OrientConstraint.second.y ||
+		deltaOrient.z < iBounds.OrientConstraint.first.z || deltaOrient.z > iBounds.OrientConstraint.second.z)
 	{
 		return false;
 	}
 
 	auto direction = (laraItem->Pose.Position - item->Pose.Position).ToVector3();
 	auto rotMatrix = item->Pose.Orientation.ToRotationMatrix().Transpose(); // NOTE: Should be Invert(), but inverse/transpose of a rotation matrix are equal and transposing is faster.
-	auto relativePos = Vector3::Transform(direction, rotMatrix);
 	
-	if (relativePos.x < bounds.BoundingBox.X1 || relativePos.x > bounds.BoundingBox.X2 ||
-		relativePos.y < bounds.BoundingBox.Y1 || relativePos.y > bounds.BoundingBox.Y2 ||
-		relativePos.z < bounds.BoundingBox.Z1 || relativePos.z > bounds.BoundingBox.Z2)
+	auto relativePos = Vector3::Transform(direction, rotMatrix);
+	if (relativePos.x < iBounds.BoundingBox.X1 || relativePos.x > iBounds.BoundingBox.X2 ||
+		relativePos.y < iBounds.BoundingBox.Y1 || relativePos.y > iBounds.BoundingBox.Y2 ||
+		relativePos.z < iBounds.BoundingBox.Z1 || relativePos.z > iBounds.BoundingBox.Z2)
 	{
 		return false;
 	}
@@ -53,15 +53,16 @@ bool TestPlayerPosition(const ObjectCollisionBounds& bounds, ItemInfo* item, Ite
 	return true;
 }
 
-bool MovePlayerPosition(const Vector3i& offset, ItemInfo* item, ItemInfo* laraItem, bool doSnap)
+bool AlignPlayerToEntity(ItemInfo* item, ItemInfo* laraItem, const Vector3i& posOffset, const EulerAngles& orientOffset, bool doSnap)
 {
 	static constexpr auto maxFloorHeight = STEPUP_HEIGHT;
 	static const auto	  turnRate		 = ANGLE(2.0f);
 
 	auto* lara = GetLaraInfo(laraItem);
 
-	auto target = Geometry::TranslatePoint(item->Pose.Position, item->Pose.Orientation, offset);
-	auto toPose = Pose(target, item->Pose.Orientation);
+	auto targetPos = Geometry::TranslatePoint(item->Pose.Position, item->Pose.Orientation, posOffset);
+	auto targetOrient = item->Pose.Orientation + orientOffset;
+	auto toPose = Pose(targetPos, targetOrient);
 
 	bool canAlign = true;
 	if (Objects[item->ObjectNumber].isPickup)

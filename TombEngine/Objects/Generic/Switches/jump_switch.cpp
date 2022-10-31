@@ -13,7 +13,7 @@ using namespace TEN::Input;
 
 namespace TEN::Entities::Switches
 {
-	const ObjectCollisionBounds JumpSwitchBounds =  
+	const InteractBounds JumpSwitchBounds =  
 	{
 		GameBoundingBox(
 			-CLICK(0.5f), CLICK(0.5f),
@@ -39,9 +39,9 @@ namespace TEN::Entities::Switches
 			laraInfo->Control.HandStatus == HandStatus::Free &&
 			!switchItem->Animation.ActiveState)
 		{
-			if (TestPlayerPosition(JumpSwitchBounds, switchItem, laraItem))
+			if (TestPlayerEntityInteract(JumpSwitchBounds, switchItem, laraItem))
 			{
-				MovePlayerPosition(JumpSwitchPos, switchItem, laraItem, true);
+				AlignPlayerToEntity(switchItem, laraItem, JumpSwitchPos, EulerAngles::Zero, true);
 
 				laraItem->Animation.ActiveState = LS_SWITCH_DOWN;
 				laraItem->Animation.AnimNumber = LA_JUMPSWITCH_PULL;

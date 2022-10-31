@@ -17,7 +17,7 @@ using namespace TEN::Input;
 
 namespace TEN::Entities::Switches
 {
-	const ObjectCollisionBounds CrowDoveBounds =
+	const InteractBounds CrowDoveBounds =
 	{
 		GameBoundingBox(
 			-CLICK(1), CLICK(1),
@@ -57,9 +57,9 @@ namespace TEN::Entities::Switches
 		{
 			int oldYrot = switchItem->Pose.Orientation.y;
 			switchItem->Pose.Orientation.y = laraItem->Pose.Orientation.y;
-			if (TestPlayerPosition(CrowDoveBounds, switchItem, laraItem))
+			if (TestPlayerEntityInteract(CrowDoveBounds, switchItem, laraItem))
 			{
-				if (MovePlayerPosition(CrowDovePos, switchItem, laraItem))
+				if (AlignPlayerToEntity(switchItem, laraItem, CrowDovePos))
 				{
 					laraItem->Animation.AnimNumber = LA_DOVESWITCH_TURN;
 					laraItem->Animation.ActiveState = LS_DOVE_SWITCH;

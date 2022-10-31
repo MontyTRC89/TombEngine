@@ -24,7 +24,7 @@ using namespace TEN::Input;
 namespace TEN::Entities::Doors
 {
 	const auto DoubleDoorPos = Vector3i(0, 0, 220);
-	const ObjectCollisionBounds DoubleDoorBounds =
+	const InteractBounds DoubleDoorBounds =
 	{
 		GameBoundingBox(
 			-384, 384,
@@ -53,9 +53,9 @@ namespace TEN::Entities::Doors
 		{
 			doorItem->Pose.Orientation.y ^= ANGLE(180.0f);
 
-			if (TestPlayerPosition(DoubleDoorBounds, doorItem, laraItem))
+			if (TestPlayerEntityInteract(DoubleDoorBounds, doorItem, laraItem))
 			{
-				if (MovePlayerPosition(DoubleDoorPos, doorItem, laraItem))
+				if (AlignPlayerToEntity(doorItem, laraItem, DoubleDoorPos))
 				{
 					SetAnimation(laraItem, LA_DOUBLEDOOR_OPEN_PUSH);
 

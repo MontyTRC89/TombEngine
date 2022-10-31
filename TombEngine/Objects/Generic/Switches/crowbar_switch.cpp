@@ -17,7 +17,7 @@ using namespace TEN::Input;
 namespace TEN::Entities::Switches
 {
 	const auto CrowbarPos = Vector3i(-89, 0, -328);
-	const ObjectCollisionBounds CrowbarBounds = 
+	const InteractBounds CrowbarBounds = 
 	{
 		GameBoundingBox(
 			-CLICK(1), CLICK(1),
@@ -31,7 +31,7 @@ namespace TEN::Entities::Switches
 	};
 
 	const auto CrowbarPos2 = Vector3i(89, 0, 328);
-	const ObjectCollisionBounds CrowbarBounds2 =
+	const InteractBounds CrowbarBounds2 =
 	{
 		GameBoundingBox(
 			-CLICK(1), CLICK(1),
@@ -62,11 +62,11 @@ namespace TEN::Entities::Switches
 			{
 				laraitem->Pose.Orientation.y ^= (short)ANGLE(180.0f);
 
-				if (TestPlayerPosition(CrowbarBounds2, switchItem, laraitem))
+				if (TestPlayerEntityInteract(CrowbarBounds2, switchItem, laraitem))
 				{
 					if (laraInfo->Control.IsMoving || g_Gui.GetInventoryItemChosen() == ID_CROWBAR_ITEM)
 					{
-						if (MovePlayerPosition(CrowbarPos2, switchItem, laraitem))
+						if (AlignPlayerToEntity(switchItem, laraitem, CrowbarPos2))
 						{
 							doSwitch = 1;
 							laraitem->Animation.AnimNumber = LA_CROWBAR_USE_ON_FLOOR;
@@ -91,11 +91,11 @@ namespace TEN::Entities::Switches
 			}
 			else
 			{
-				if (TestPlayerPosition(CrowbarBounds, switchItem, laraitem))
+				if (TestPlayerEntityInteract(CrowbarBounds, switchItem, laraitem))
 				{
 					if (laraInfo->Control.IsMoving || g_Gui.GetInventoryItemChosen() == ID_CROWBAR_ITEM)
 					{
-						if (MovePlayerPosition(CrowbarPos, switchItem, laraitem))
+						if (AlignPlayerToEntity(switchItem, laraitem, CrowbarPos))
 						{
 							doSwitch = 1;
 							laraitem->Animation.AnimNumber = LA_CROWBAR_USE_ON_FLOOR;

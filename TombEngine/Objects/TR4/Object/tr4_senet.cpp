@@ -20,7 +20,7 @@ int SenetTargetX, SenetTargetZ;
 char ActivePiece = -1;
 
 const auto GameStixPosition = Vector3i(0, 0, -100);
-const ObjectCollisionBounds GameStixBounds =
+const InteractBounds GameStixBounds =
 {
 	GameBoundingBox(
 		-CLICK(1), CLICK(1),
@@ -437,9 +437,9 @@ void GameSticksCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* co
 	{
 		laraItem->Pose.Orientation.y ^= 0x8000;
 
-		if (TestPlayerPosition(GameStixBounds, item, laraItem))
+		if (TestPlayerEntityInteract(GameStixBounds, item, laraItem))
 		{
-			if (MovePlayerPosition(GameStixPosition, item, laraItem))
+			if (AlignPlayerToEntity(item, laraItem, GameStixPosition))
 			{
 				laraItem->Animation.AnimNumber = LA_SENET_ROLL;
 				laraItem->Animation.FrameNumber = g_Level.Anims[LA_SENET_ROLL].frameBase;

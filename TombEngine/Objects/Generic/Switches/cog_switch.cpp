@@ -17,7 +17,7 @@ using namespace TEN::Entities::Doors;
 
 namespace TEN::Entities::Switches
 {
-	const ObjectCollisionBounds CogSwitchBounds =
+	const InteractBounds CogSwitchBounds =
 	{
 		GameBoundingBox(
 			-SECTOR(0.5f), SECTOR(0.5f),
@@ -79,9 +79,9 @@ namespace TEN::Entities::Switches
 					lara->Control.IsMoving &&
 					lara->InteractedItem == itemNum))
 			{
-				if (TestPlayerPosition(CogSwitchBounds, switchItem, laraItem))
+				if (TestPlayerEntityInteract(CogSwitchBounds, switchItem, laraItem))
 				{
-					if (MovePlayerPosition(CogSwitchPos, switchItem, laraItem))
+					if (AlignPlayerToEntity(switchItem, laraItem, CogSwitchPos))
 					{
 						ResetLaraFlex(laraItem);
 						laraItem->Animation.AnimNumber = LA_COGWHEEL_GRAB;

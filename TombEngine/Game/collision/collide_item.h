@@ -18,15 +18,15 @@ extern GameBoundingBox GlobalCollisionBounds;
 extern ItemInfo* CollidedItems[MAX_COLLIDED_OBJECTS];
 extern MESH_INFO* CollidedMeshes[MAX_COLLIDED_OBJECTS];
 
-struct ObjectCollisionBounds
+struct InteractBounds
 {
 	GameBoundingBox				   BoundingBox		= GameBoundingBox::Zero;
 	pair<EulerAngles, EulerAngles> OrientConstraint = {};
 };
 
 // TODO: Refactor this family of functions into a more comprehensive position alignment system. -- Sezz 2022.10.30
-bool TestPlayerPosition(const ObjectCollisionBounds& bounds, ItemInfo* item, ItemInfo* laraItem);
-bool MovePlayerPosition(const Vector3i& offset, ItemInfo* item, ItemInfo* laraItem, bool doSnap = false);
+bool TestPlayerEntityInteract(const InteractBounds& iBounds, ItemInfo* item, ItemInfo* laraItem);
+bool AlignPlayerToEntity(ItemInfo* item, ItemInfo* laraItem, const Vector3i& posOffset = Vector3i::Zero, const EulerAngles& orientOffset = EulerAngles::Zero, bool doSnap = false);
 bool AlignPlayerToPose(ItemInfo* item, const Pose& toPose, float velocity, short turnRate);
 
 void GenericSphereBoxCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);

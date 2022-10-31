@@ -344,7 +344,7 @@ namespace TEN::Entities::Generic
 
 			torchItem->Pose.Orientation.y = laraItem->Pose.Orientation.y;
 
-			if (TestPlayerPosition(FireBounds, torchItem, laraItem))
+			if (TestPlayerEntityInteract(FireBounds, torchItem, laraItem))
 			{
 				if (torchItem->ObjectNumber == ID_BURNING_ROOTS)
 					laraItem->Animation.AnimNumber = LA_TORCH_LIGHT_5;

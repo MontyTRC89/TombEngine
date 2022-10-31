@@ -33,7 +33,7 @@ using namespace TEN::Entities::Generic;
 using namespace TEN::Input;
 
 static auto PickUpPosition = Vector3i(0, 0, -100);
-const ObjectCollisionBounds PickUpBounds =
+const InteractBounds PickUpBounds =
 {
 	GameBoundingBox(
 		-CLICK(1), CLICK(1),
@@ -47,7 +47,7 @@ const ObjectCollisionBounds PickUpBounds =
 };
 
 static auto HiddenPickUpPosition = Vector3i(0, 0, -690);
-const ObjectCollisionBounds HiddenPickUpBounds =
+const InteractBounds HiddenPickUpBounds =
 {
 	GameBoundingBox(
 		-CLICK(1), CLICK(1),
@@ -61,7 +61,7 @@ const ObjectCollisionBounds HiddenPickUpBounds =
 };
 
 static auto CrowbarPickUpPosition = Vector3i(0, 0, 215);
-const ObjectCollisionBounds CrowbarPickUpBounds =
+const InteractBounds CrowbarPickUpBounds =
 {
 	GameBoundingBox(
 		-CLICK(1), CLICK(1),
@@ -75,7 +75,7 @@ const ObjectCollisionBounds CrowbarPickUpBounds =
 };
 
 static auto JobyCrowPickUpPosition = Vector3i(-224, 0, 240);
-const ObjectCollisionBounds JobyCrowPickUpBounds =
+const InteractBounds JobyCrowPickUpBounds =
 {
 	GameBoundingBox(
 		-CLICK(2), 0,
@@ -89,7 +89,7 @@ const ObjectCollisionBounds JobyCrowPickUpBounds =
 };
 
 static auto PlinthPickUpPosition = Vector3i(0, 0, -460);
-ObjectCollisionBounds PlinthPickUpBounds =
+InteractBounds PlinthPickUpBounds =
 {
 	GameBoundingBox(
 		-CLICK(1), CLICK(1),
@@ -103,7 +103,7 @@ ObjectCollisionBounds PlinthPickUpBounds =
 };
 
 static auto PickUpPositionUW = Vector3i(0, -200, -350);
-const ObjectCollisionBounds PickUpBoundsUW =
+const InteractBounds PickUpBoundsUW =
 {
 	GameBoundingBox(
 		-CLICK(2), CLICK(2),
@@ -117,7 +117,7 @@ const ObjectCollisionBounds PickUpBoundsUW =
 };
 
 static auto SOPos = Vector3i::Zero;
-ObjectCollisionBounds SOBounds =
+InteractBounds SOBounds =
 {
 	GameBoundingBox::Zero,
 	std::pair(
@@ -130,7 +130,7 @@ short SearchCollectFrames[4] = { 180, 100, 153, 83 };
 short SearchAnims[4] = { LA_LOOT_CABINET, LA_LOOT_DRAWER, LA_LOOT_SHELF, LA_LOOT_CHEST };
 short SearchOffsets[4] = { 160, 96, 160, 112 };
 
-const ObjectCollisionBounds MSBounds =
+const InteractBounds MSBounds =
 {
 	GameBoundingBox::Zero,
 	std::pair(
@@ -364,11 +364,11 @@ void PickupCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 				item->ObjectNumber != ID_BURNING_TORCH_ITEM && 
 				laraItem->Animation.ActiveState == LS_UNDERWATER_IDLE && 
 				lara->Control.HandStatus == HandStatus::Free &&
-				TestPlayerPosition(PickUpBoundsUW, item, laraItem) || lara->Control.IsMoving && lara->InteractedItem == itemNumber)
+				TestPlayerEntityInteract(PickUpBoundsUW, item, laraItem) || lara->Control.IsMoving && lara->InteractedItem == itemNumber)
 			{
-				if (TestPlayerPosition(PickUpBoundsUW, item, laraItem))
+				if (TestPlayerEntityInteract(PickUpBoundsUW, item, laraItem))
 				{
-					if (MovePlayerPosition(PickUpPositionUW, item, laraItem))
+					if (AlignPlayerToEntity(item, laraItem, PickUpPositionUW))
 					{
 						if (item->ObjectNumber == ID_FLARE_ITEM)
 						{
@@ -452,7 +452,7 @@ void PickupCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 	{
 	// Pick up from hole in wall.
 	case 1:
-		if (lara->Control.IsLow || !TestPlayerPosition(HiddenPickUpBounds, item, laraItem))
+		if (lara->Control.IsLow || !TestPlayerEntityInteract(HiddenPickUpBounds, item, laraItem))
 		{
 			if (lara->Control.IsMoving)
 			{
@@ -466,7 +466,7 @@ void PickupCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 			item->Pose.Orientation = prevOrient;
 			return;
 		}
-		else if (MovePlayerPosition(HiddenPickUpPosition, item, laraItem))
+		else if (AlignPlayerToEntity(item, laraItem, HiddenPickUpPosition))
 		{
 			getThisItemPlease = itemNumber;
 			laraItem->Animation.AnimNumber = LA_HOLESWITCH_ACTIVATE;
@@ -481,7 +481,7 @@ void PickupCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 	case 2:
 		item->Pose.Orientation.y = prevOrient.y;
 
-		if (lara->Control.IsLow || !TestPlayerPosition(CrowbarPickUpBounds, item, laraItem))
+		if (lara->Control.IsLow || !TestPlayerEntityInteract(CrowbarPickUpBounds, item, laraItem))
 		{
 			if (!lara->Control.IsMoving)
 			{
@@ -517,7 +517,7 @@ void PickupCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 
 			g_Gui.SetInventoryItemChosen(NO_ITEM);
 		}
-		if (MovePlayerPosition(CrowbarPickUpPosition, item, laraItem))
+		if (AlignPlayerToEntity(item, laraItem, CrowbarPickUpPosition))
 		{
 			getThisItemPlease = itemNumber;
 			laraItem->Animation.AnimNumber = LA_CROWBAR_PRY_WALL_FAST;
@@ -555,13 +555,13 @@ void PickupCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 		if (abs(laraItem->Pose.Position.y - item->Pose.Position.y) > CLICK(4))
 			break;
 
-		if (TestPlayerPosition(PlinthPickUpBounds, item, laraItem) && !lara->Control.IsLow)
+		if (TestPlayerEntityInteract(PlinthPickUpBounds, item, laraItem) && !lara->Control.IsLow)
 		{
 			if (item->Pose.Position.y == laraItem->Pose.Position.y)
 				PlinthPickUpPosition.y = 0;
 			else
 				PlinthPickUpPosition.y = laraItem->Pose.Position.y - item->Pose.Position.y;
-			if (MovePlayerPosition(PlinthPickUpPosition, item, laraItem))
+			if (AlignPlayerToEntity(item, laraItem, PlinthPickUpPosition))
 			{
 				if (triggerFlags == 3 || triggerFlags == 7)
 				{
@@ -600,13 +600,13 @@ void PickupCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 	case 9:
 		item->Pose.Orientation.y = prevOrient.y;
 
-		if (!TestPlayerPosition(JobyCrowPickUpBounds, item, laraItem))
+		if (!TestPlayerEntityInteract(JobyCrowPickUpBounds, item, laraItem))
 		{
 			item->Pose.Orientation = prevOrient;
 			return;
 		}
 
-		if (MovePlayerPosition(JobyCrowPickUpPosition, item, laraItem))
+		if (AlignPlayerToEntity(item, laraItem, JobyCrowPickUpPosition))
 		{
 			getThisItemPlease = itemNumber;
 			SetAnimation(laraItem, LA_CROWBAR_PRY_WALL_SLOW);
@@ -620,7 +620,7 @@ void PickupCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 
 	// Pick up from ground.
 	default:
-		if (!TestPlayerPosition(PickUpBounds, item, laraItem))
+		if (!TestPlayerEntityInteract(PickUpBounds, item, laraItem))
 		{
 			if (!lara->Control.IsMoving)
 			{
@@ -645,7 +645,7 @@ void PickupCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 			if (item->ObjectNumber == ID_BURNING_TORCH_ITEM)
 				break;
 
-			if (!MovePlayerPosition(PickUpPosition, item, laraItem, true))
+			if (!AlignPlayerToEntity(item, laraItem, PickUpPosition, EulerAngles::Zero, true))
 				break;
 
 			if (item->ObjectNumber == ID_FLARE_ITEM)
@@ -668,7 +668,7 @@ void PickupCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 				if (item->ObjectNumber == ID_BURNING_TORCH_ITEM)
 					break;
 
-				if (!MovePlayerPosition(PickUpPosition, item, laraItem))
+				if (!AlignPlayerToEntity(item, laraItem, PickUpPosition))
 					break;
 
 				if (item->ObjectNumber == ID_FLARE_ITEM)
@@ -686,7 +686,7 @@ void PickupCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 			}
 			else
 			{
-				if (!MovePlayerPosition(PickUpPosition, item, laraItem))
+				if (!AlignPlayerToEntity(item, laraItem, PickUpPosition))
 				{
 					lara->InteractedItem = itemNumber;
 					break;
@@ -704,7 +704,7 @@ void PickupCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 				}
 				else
 				{
-					// HACK: Because of MovePlayerPosition(), we can't properly dispatch. Must be fixed later.
+					// HACK: Because of AlignPlayerToEntity(), we can't properly dispatch. Must be fixed later.
 					laraItem->Animation.AnimNumber = LA_PICKUP;
 					laraItem->Animation.ActiveState = LS_PICKUP;
 				}
@@ -994,9 +994,9 @@ void SearchObjectCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* 
 		SOBounds.BoundingBox.Z2 = bounds.Z2 + 200;
 		SOPos.z = bounds.Z1 - SearchOffsets[objectNumber];
 
-		if (TestPlayerPosition(SOBounds, item, laraItem))
+		if (TestPlayerEntityInteract(SOBounds, item, laraItem))
 		{
-			if (MovePlayerPosition(SOPos, item, laraItem))
+			if (AlignPlayerToEntity(item, laraItem, SOPos))
 			{
 				ResetLaraFlex(laraItem);
 				laraItem->Animation.AnimNumber = SearchAnims[objectNumber];

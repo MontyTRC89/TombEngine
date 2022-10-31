@@ -28,7 +28,7 @@ enum class PuzzleType
 	AnimAfter 
 };
 
-ObjectCollisionBounds PuzzleBounds =
+InteractBounds PuzzleBounds =
 {
 	GameBoundingBox(
 		0, 0,
@@ -42,7 +42,7 @@ ObjectCollisionBounds PuzzleBounds =
 };
 
 const auto KeyHolePosition = Vector3i(0, 0, 312);
-const ObjectCollisionBounds KeyHoleBounds =
+const InteractBounds KeyHoleBounds =
 {
 	GameBoundingBox(
 		-CLICK(1), CLICK(1),
@@ -96,7 +96,7 @@ void PuzzleHoleCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* co
 		PuzzleBounds.BoundingBox.Z1 = bounds.Z1 - CLICK(1);;
 		PuzzleBounds.BoundingBox.Z2 = bounds.Z2 + CLICK(1);;
 
-		if (TestPlayerPosition(PuzzleBounds, receptableItem, laraItem))
+		if (TestPlayerEntityInteract(PuzzleBounds, receptableItem, laraItem))
 		{
 			if (!laraInfo->Control.IsMoving)
 			{
@@ -119,7 +119,7 @@ void PuzzleHoleCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* co
 			if (puzzleType != PuzzleType::Cutscene)
 			{
 				auto pos = Vector3i(0, 0, bounds.Z1 - 100);
-				if (!MovePlayerPosition(pos, receptableItem, laraItem))
+				if (!AlignPlayerToEntity(receptableItem, laraItem, pos))
 				{
 					laraInfo->InteractedItem = itemNumber;
 					g_Gui.SetInventoryItemChosen(NO_ITEM);
@@ -279,7 +279,7 @@ void KeyHoleCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 
 	if (actionActive || (actionReady && laraAvailable))
 	{
-		if (TestPlayerPosition(KeyHoleBounds, keyHoleItem, laraItem))
+		if (TestPlayerEntityInteract(KeyHoleBounds, keyHoleItem, laraItem))
 		{
 			if (!laraInfo->Control.IsMoving) //TROYE INVENTORY FIX ME
 			{
@@ -303,7 +303,7 @@ void KeyHoleCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 			if (laraInfo->InteractedItem != itemNumber)
 				return;
 
-			if (MovePlayerPosition(KeyHolePosition, keyHoleItem, laraItem))
+			if (AlignPlayerToEntity(keyHoleItem, laraItem, KeyHolePosition))
 			{
 				if (keyHoleItem->ObjectNumber == ID_KEY_HOLE8)
 					laraItem->Animation.AnimNumber = LA_KEYCARD_USE;
