@@ -60,22 +60,22 @@ bool ItemInfo::IsCreature()
 	return this->Data.is<CreatureInfo>();
 }
 
-void ItemInfo::SetOffsetBlend(const Vector3i& pos, const EulerAngles& orient, float alpha, float delay)
+void ItemInfo::SetOffsetBlend(const Vector3i& posOffset, const EulerAngles& orientOffset, float alpha, float delay)
 {
 	this->OffsetBlend.IsActive = true;
 	this->OffsetBlend.Type = BlendType::Linear;
-	this->OffsetBlend.Position = pos;
-	this->OffsetBlend.Orientation = orient;
+	this->OffsetBlend.PosOffset = posOffset;
+	this->OffsetBlend.OrientOffset = orientOffset;
 	this->OffsetBlend.Alpha = alpha;
 	this->OffsetBlend.Delay = delay;
 }
 
-void ItemInfo::SetOffsetBlend(const Vector3i& pos, const EulerAngles& orient, float velocity, short turnRate, float delay)
+void ItemInfo::SetOffsetBlend(const Vector3i& posOffset, const EulerAngles& orientOffset, float velocity, short turnRate, float delay)
 {
 	this->OffsetBlend.IsActive = true;
 	this->OffsetBlend.Type = BlendType::Constant;
-	this->OffsetBlend.Position = pos;
-	this->OffsetBlend.Orientation = orient;
+	this->OffsetBlend.PosOffset = posOffset;
+	this->OffsetBlend.OrientOffset = orientOffset;
 	this->OffsetBlend.Velocity = velocity;
 	this->OffsetBlend.TurnRate = turnRate;
 	this->OffsetBlend.Delay = delay;
@@ -89,8 +89,8 @@ void ItemInfo::ClearOffsetBlend()
 void ItemInfo::DoOffsetBlend()
 {
 	g_Renderer.PrintDebugMessage("IsActive: %d", OffsetBlend.IsActive);
-	g_Renderer.PrintDebugMessage("Pos: %d, %d, %d", OffsetBlend.Position.x, OffsetBlend.Position.y, OffsetBlend.Position.z);
-	g_Renderer.PrintDebugMessage("Orient: %d, %d, %d", OffsetBlend.Orientation.x, OffsetBlend.Orientation.y, OffsetBlend.Orientation.z);
+	g_Renderer.PrintDebugMessage("Pos: %d, %d, %d", OffsetBlend.PosOffset.x, OffsetBlend.PosOffset.y, OffsetBlend.PosOffset.z);
+	g_Renderer.PrintDebugMessage("Orient: %d, %d, %d", OffsetBlend.OrientOffset.x, OffsetBlend.OrientOffset.y, OffsetBlend.OrientOffset.z);
 
 	// Blending is inactive; exit early.
 	if (!OffsetBlend.IsActive)
@@ -108,39 +108,41 @@ void ItemInfo::DoOffsetBlend()
 	}
 
 	// Perform blending according to type.
-	auto distance = Vector3i::Distance(Pose.Position, Pose.Position + OffsetBlend.Position);
 	switch (OffsetBlend.Type)
 	{
 	case BlendType::Linear:
+	{
+		auto distance = Vector3i::Distance(Pose.Position, Pose.Position + OffsetBlend.PosOffset);
 		if (distance <= OffsetBlend.Velocity)
-			this->Pose.Position = Pose.Position + OffsetBlend.Position;
+			this->Pose.Position = Pose.Position + OffsetBlend.PosOffset;
 		else
 		{
-			auto direction = OffsetBlend.Position.ToVector3() - Pose.Position.ToVector3();
-			this->Pose.Position += OffsetBlend.Position * OffsetBlend.Alpha;
+			auto direction = OffsetBlend.PosOffset.ToVector3() - Pose.Position.ToVector3();
+			this->Pose.Position += OffsetBlend.PosOffset * OffsetBlend.Alpha;
 		}
 
-		this->Pose.Orientation.Lerp(Pose.Orientation + OffsetBlend.Orientation, OffsetBlend.Alpha);
+		this->Pose.Orientation.Lerp(Pose.Orientation + OffsetBlend.OrientOffset, OffsetBlend.Alpha);
 
 		// Reduce offsets.
-		OffsetBlend.Position *= 1.0f - OffsetBlend.Alpha;
-		OffsetBlend.Orientation *= 1.0f - OffsetBlend.Alpha;
+		OffsetBlend.PosOffset *= 1.0f - OffsetBlend.Alpha;
+		OffsetBlend.OrientOffset *= 1.0f - OffsetBlend.Alpha;
 		break;
-		
+	}
 	case BlendType::Constant:
+	{
 		// TODO: I'm an idiot.
-		this->Pose.Interpolate({ Pose.Position + OffsetBlend.Position, Pose.Orientation + OffsetBlend.Orientation }, OffsetBlend.Velocity, OffsetBlend.TurnRate);
+		this->Pose.Interpolate({ Pose.Position + OffsetBlend.PosOffset, Pose.Orientation + OffsetBlend.OrientOffset }, OffsetBlend.Velocity, OffsetBlend.TurnRate);
 
 		// Reduce offsets... how?
 		break;
-
+	}
 	default:
 		return;
 	}
 
 	// Blending is complete.
-	if (OffsetBlend.Position == Vector3i::Zero &&
-		OffsetBlend.Orientation == EulerAngles::Zero)
+	if (OffsetBlend.PosOffset == Vector3i::Zero &&
+		OffsetBlend.OrientOffset == EulerAngles::Zero)
 	{
 		this->OffsetBlend.IsActive = false;
 		this->ClearOffsetBlend();

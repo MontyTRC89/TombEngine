@@ -121,13 +121,14 @@ namespace TEN::Entities::Generic
 				if (!laraItem->OffsetBlend.IsActive)
 				{
 					auto mountPos = Vector3i(0, 0, GameBoundingBox(&ladderItem).Z1) + LadderMountOffset;
+
 					// TODO: Probably could make a method for this in one of the math container objects.
 					auto rotMatrix = ladderItem.Pose.Orientation.ToRotationMatrix();
 					auto pos = Vector3::Transform(mountPos.ToVector3(), rotMatrix);
 					auto target = ladderItem.Pose.Position.ToVector3() + pos;
 					auto offset = Vector3i(target) - laraItem->Pose.Position;
 
-					laraItem->SetOffsetBlend(offset, ladderItem.Pose.Orientation, 0.4f);
+					laraItem->SetOffsetBlend(offset, ladderItem.Pose.Orientation - laraItem->Pose.Orientation, 0.4f);
 					SetAnimation(laraItem, LA_LADDER_MOUNT_BOTTOM);
 					player.Control.IsMoving = false;
 					player.Control.HandStatus = HandStatus::Busy;
