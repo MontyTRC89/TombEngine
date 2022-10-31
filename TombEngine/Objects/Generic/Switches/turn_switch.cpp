@@ -26,7 +26,7 @@ namespace TEN::Entities::Switches
 
 	const auto TurnSwitchPosA = Vector3i(650, 0, -138);
 	const auto TurnSwitchPos = Vector3i(650, 0, 138);
-	const InteractBounds TurnSwitchBoundsA = 
+	const InteractionBounds TurnSwitchBoundsA = 
 	{
 		GameBoundingBox(
 			SECTOR(0.5f), CLICK(3.5f),
@@ -38,7 +38,7 @@ namespace TEN::Entities::Switches
 			EulerAngles(ANGLE(10.0f), ANGLE(30.0f), ANGLE(10.0f))
 		)
 	};
-	const InteractBounds TurnSwitchBoundsC =
+	const InteractionBounds TurnSwitchBoundsC =
 	{
 		GameBoundingBox(
 			SECTOR(0.5f), CLICK(3.5f),

@@ -14,7 +14,7 @@ using namespace TEN::Input;
 
 namespace TEN::Entities::Switches
 {
-	const InteractBounds FullBlockSwitchBounds = 
+	const InteractionBounds FullBlockSwitchBounds = 
 	{
 		GameBoundingBox(
 			-384, 384,

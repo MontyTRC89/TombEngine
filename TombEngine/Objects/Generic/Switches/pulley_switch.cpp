@@ -15,7 +15,7 @@ using namespace TEN::Input;
 
 namespace TEN::Entities::Switches
 {
-	const InteractBounds PulleyBounds =
+	const InteractionBounds PulleyBounds =
 	{
 		GameBoundingBox(
 			-CLICK(1), CLICK(1),

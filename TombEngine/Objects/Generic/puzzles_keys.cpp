@@ -28,7 +28,7 @@ enum class PuzzleType
 	AnimAfter 
 };
 
-InteractBounds PuzzleBounds =
+InteractionBounds PuzzleBounds =
 {
 	GameBoundingBox(
 		0, 0,
@@ -42,7 +42,7 @@ InteractBounds PuzzleBounds =
 };
 
 const auto KeyHolePosition = Vector3i(0, 0, 312);
-const InteractBounds KeyHoleBounds =
+const InteractionBounds KeyHoleBounds =
 {
 	GameBoundingBox(
 		-CLICK(1), CLICK(1),

@@ -29,12 +29,12 @@ GameBoundingBox GlobalCollisionBounds;
 ItemInfo* CollidedItems[MAX_COLLIDED_OBJECTS];
 MESH_INFO* CollidedMeshes[MAX_COLLIDED_OBJECTS];
 
-bool TestPlayerEntityInteract(const InteractBounds& iBounds, ItemInfo* item, ItemInfo* laraItem)
+bool TestPlayerEntityInteract(const InteractionBounds& interactBounds, ItemInfo* item, ItemInfo* laraItem)
 {
 	auto deltaOrient = laraItem->Pose.Orientation - item->Pose.Orientation;
-	if (deltaOrient.x < iBounds.OrientConstraint.first.x || deltaOrient.x > iBounds.OrientConstraint.second.x ||
-		deltaOrient.y < iBounds.OrientConstraint.first.y || deltaOrient.y > iBounds.OrientConstraint.second.y ||
-		deltaOrient.z < iBounds.OrientConstraint.first.z || deltaOrient.z > iBounds.OrientConstraint.second.z)
+	if (deltaOrient.x < interactBounds.OrientConstraint.first.x || deltaOrient.x > interactBounds.OrientConstraint.second.x ||
+		deltaOrient.y < interactBounds.OrientConstraint.first.y || deltaOrient.y > interactBounds.OrientConstraint.second.y ||
+		deltaOrient.z < interactBounds.OrientConstraint.first.z || deltaOrient.z > interactBounds.OrientConstraint.second.z)
 	{
 		return false;
 	}
@@ -43,9 +43,9 @@ bool TestPlayerEntityInteract(const InteractBounds& iBounds, ItemInfo* item, Ite
 	auto rotMatrix = item->Pose.Orientation.ToRotationMatrix().Transpose(); // NOTE: Should be Invert(), but inverse/transpose of a rotation matrix are equal and transposing is faster.
 	
 	auto relativePos = Vector3::Transform(direction, rotMatrix);
-	if (relativePos.x < iBounds.BoundingBox.X1 || relativePos.x > iBounds.BoundingBox.X2 ||
-		relativePos.y < iBounds.BoundingBox.Y1 || relativePos.y > iBounds.BoundingBox.Y2 ||
-		relativePos.z < iBounds.BoundingBox.Z1 || relativePos.z > iBounds.BoundingBox.Z2)
+	if (relativePos.x < interactBounds.BoundingBox.X1 || relativePos.x > interactBounds.BoundingBox.X2 ||
+		relativePos.y < interactBounds.BoundingBox.Y1 || relativePos.y > interactBounds.BoundingBox.Y2 ||
+		relativePos.z < interactBounds.BoundingBox.Z1 || relativePos.z > interactBounds.BoundingBox.Z2)
 	{
 		return false;
 	}

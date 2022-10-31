@@ -21,7 +21,7 @@ float WaterfallY[6];
 int lastWaterfallY = 0;
 
 const auto TightRopePos = Vector3i::Zero;
-const InteractBounds TightRopeBounds =
+const InteractionBounds TightRopeBounds =
 {
 	GameBoundingBox(
 		-CLICK(1), CLICK(1),
@@ -33,7 +33,7 @@ const InteractBounds TightRopeBounds =
 		EulerAngles(ANGLE(10.0f), ANGLE(30.0f), ANGLE(10.0f))
 	)
 };
-const InteractBounds ParallelBarsBounds =
+const InteractionBounds ParallelBarsBounds =
 {
 	GameBoundingBox(
 		-640, 640,

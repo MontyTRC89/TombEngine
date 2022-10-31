@@ -14,7 +14,7 @@ using namespace TEN::Input;
 
 namespace TEN::Entities::Switches
 { 
-	const InteractBounds UnderwaterSwitchBounds =
+	const InteractionBounds UnderwaterSwitchBounds =
 	{
 		GameBoundingBox(
 			-SECTOR(1), SECTOR(1),
@@ -28,7 +28,7 @@ namespace TEN::Entities::Switches
 	};
 	const auto UnderwaterSwitchPos = Vector3i(0, 0, 108);
 
-	const InteractBounds CeilingUnderwaterSwitchBounds1 =
+	const InteractionBounds CeilingUnderwaterSwitchBounds1 =
 	{
 		GameBoundingBox(
 			-CLICK(1), CLICK(1),
@@ -42,7 +42,7 @@ namespace TEN::Entities::Switches
 	};
 	const auto CeilingUnderwaterSwitchPos1 = Vector3i(0, -736, -416);
 
-	const InteractBounds CeilingUnderwaterSwitchBounds2 =
+	const InteractionBounds CeilingUnderwaterSwitchBounds2 =
 	{
 		GameBoundingBox(
 			-CLICK(1), CLICK(1),

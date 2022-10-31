@@ -14,7 +14,7 @@
 
 using namespace TEN::Input;
 
-const InteractBounds DeathSlideBounds =
+const InteractionBounds DeathSlideBounds =
 {
 	GameBoundingBox(
 		-CLICK(1), CLICK(1),

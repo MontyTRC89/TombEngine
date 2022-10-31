@@ -45,7 +45,7 @@ namespace TEN::Entities::Effects
 		{ 55, 55 }
 	};
 
-	InteractBounds FireBounds =
+	InteractionBounds FireBounds =
 	{
 		GameBoundingBox::Zero,
 		std::pair(

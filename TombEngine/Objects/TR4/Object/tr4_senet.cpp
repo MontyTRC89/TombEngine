@@ -20,7 +20,7 @@ int SenetTargetX, SenetTargetZ;
 char ActivePiece = -1;
 
 const auto GameStixPosition = Vector3i(0, 0, -100);
-const InteractBounds GameStixBounds =
+const InteractionBounds GameStixBounds =
 {
 	GameBoundingBox(
 		-CLICK(1), CLICK(1),

@@ -16,7 +16,7 @@ using namespace TEN::Input;
 using namespace TEN::Renderer;
 using namespace TEN::Floordata;
 
-const InteractBounds CeilingTrapDoorBounds =
+const InteractionBounds CeilingTrapDoorBounds =
 {
 	GameBoundingBox(
 		-CLICK(1), CLICK(1),
@@ -30,7 +30,7 @@ const InteractBounds CeilingTrapDoorBounds =
 };
 const auto CeilingTrapDoorPos = Vector3i(0, 1056, -480);
 
-const InteractBounds FloorTrapDoorBounds =
+const InteractionBounds FloorTrapDoorBounds =
 {
 	GameBoundingBox(
 		-CLICK(1), CLICK(1),

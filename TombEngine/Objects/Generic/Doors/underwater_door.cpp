@@ -24,7 +24,7 @@ using namespace TEN::Input;
 namespace TEN::Entities::Doors
 {
 	const auto UnderwaterDoorPos = Vector3i(-251, -540, -46);
-	const InteractBounds UnderwaterDoorBounds =
+	const InteractionBounds UnderwaterDoorBounds =
 	{
 		GameBoundingBox(
 			-CLICK(1), CLICK(1),

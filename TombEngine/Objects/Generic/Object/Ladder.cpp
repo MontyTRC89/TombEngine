@@ -54,7 +54,7 @@ namespace TEN::Entities::Generic
 	};
 
 	const auto LadderMountOffset = Vector3i(0, 0, -CLICK(0.6f));
-	const InteractBounds LadderFrontBounds =
+	const InteractionBounds LadderFrontBounds =
 	{
 		GameBoundingBox(
 			-CLICK(1), CLICK(1),
@@ -66,7 +66,7 @@ namespace TEN::Entities::Generic
 			EulerAngles(ANGLE(10.0f), LARA_GRAB_THRESHOLD, ANGLE(10.0f))
 		)
 	};
-	const InteractBounds LadderBackBounds =
+	const InteractionBounds LadderBackBounds =
 	{
 		GameBoundingBox(
 			-CLICK(1), CLICK(1),
@@ -78,7 +78,7 @@ namespace TEN::Entities::Generic
 			EulerAngles(ANGLE(10.0f), ANGLE(180.0f) + LARA_GRAB_THRESHOLD, ANGLE(10.0f))
 		)
 	};
-	const InteractBounds LadderLeftBounds =
+	const InteractionBounds LadderLeftBounds =
 	{
 		GameBoundingBox(
 			-CLICK(1), CLICK(1),
@@ -90,7 +90,7 @@ namespace TEN::Entities::Generic
 			EulerAngles(ANGLE(10.0f), ANGLE(90.0f) + LARA_GRAB_THRESHOLD, ANGLE(10.0f))
 		)
 	};
-	const InteractBounds LadderRightBounds =
+	const InteractionBounds LadderRightBounds =
 	{
 		GameBoundingBox(
 			-CLICK(1), CLICK(1),

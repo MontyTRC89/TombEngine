@@ -24,7 +24,7 @@ using namespace TEN::Input;
 namespace TEN::Entities::Doors
 {
 	const auto DoubleDoorPos = Vector3i(0, 0, 220);
-	const InteractBounds DoubleDoorBounds =
+	const InteractionBounds DoubleDoorBounds =
 	{
 		GameBoundingBox(
 			-384, 384,

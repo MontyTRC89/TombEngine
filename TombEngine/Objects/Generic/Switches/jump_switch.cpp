@@ -13,7 +13,7 @@ using namespace TEN::Input;
 
 namespace TEN::Entities::Switches
 {
-	const InteractBounds JumpSwitchBounds =  
+	const InteractionBounds JumpSwitchBounds =  
 	{
 		GameBoundingBox(
 			-CLICK(0.5f), CLICK(0.5f),

@@ -17,7 +17,7 @@ using namespace TEN::Entities::Doors;
 
 namespace TEN::Entities::Switches
 {
-	const InteractBounds CogSwitchBounds =
+	const InteractionBounds CogSwitchBounds =
 	{
 		GameBoundingBox(
 			-SECTOR(0.5f), SECTOR(0.5f),

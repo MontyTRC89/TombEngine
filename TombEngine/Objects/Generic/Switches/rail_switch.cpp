@@ -14,7 +14,7 @@ using namespace TEN::Input;
 namespace TEN::Entities::Switches
 {
 	const auto RailSwitchPos = Vector3i(0, 0, -550);
-	const InteractBounds RailSwitchBounds =
+	const InteractionBounds RailSwitchBounds =
 	{
 		GameBoundingBox(
 			-CLICK(1), CLICK(1),
@@ -28,7 +28,7 @@ namespace TEN::Entities::Switches
 	};
 
 	const auto RailSwitchPos2 = Vector3i(0, 0, 550);
-	const InteractBounds RailSwitchBounds2 =
+	const InteractionBounds RailSwitchBounds2 =
 	{
 		GameBoundingBox(
 			-CLICK(1), CLICK(1),

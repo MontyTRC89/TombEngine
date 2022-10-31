@@ -2,11 +2,11 @@
 
 struct ItemInfo;
 struct CollisionInfo;
-struct InteractBounds;
+struct InteractionBounds;
 
 namespace TEN::Entities::Effects
 {
-	extern InteractBounds FireBounds;
+	extern InteractionBounds FireBounds;
 
 	void InitialiseFlameEmitter(short itemNumber);
 	void InitialiseFlameEmitter2(short itemNumber);
