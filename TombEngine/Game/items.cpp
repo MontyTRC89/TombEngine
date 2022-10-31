@@ -5,8 +5,9 @@
 #include "Game/collision/floordata.h"
 #include "Game/effects/effects.h"
 #include "Game/Lara/lara.h"
-#include "Math/Random.h"
+#include "Math/Math.h"
 #include "Objects/ScriptInterfaceObjectsHandler.h"
+#include "Renderer/Renderer11.h"
 #include "ScriptInterfaceGame.h"
 #include "Specific/input.h"
 #include "Specific/level.h"
@@ -15,7 +16,8 @@
 
 using namespace TEN::Floordata;
 using namespace TEN::Input;
-using namespace TEN::Math::Random;
+using namespace TEN::Math;;
+using namespace TEN::Renderer;
 
 bool ItemInfo::TestOcb(short ocbFlags)
 {
@@ -58,8 +60,9 @@ bool ItemInfo::IsCreature()
 	return this->Data.is<CreatureInfo>();
 }
 
-void ItemInfo::SetOffsetBlend(const Vector3i& pos, const EulerAngles& orient, float alpha, float delay = 0.0f)
+void ItemInfo::SetOffsetBlend(const Vector3i& pos, const EulerAngles& orient, float alpha, float delay)
 {
+	this->OffsetBlend.IsActive = true;
 	this->OffsetBlend.Type = BlendType::Linear;
 	this->OffsetBlend.Position = pos;
 	this->OffsetBlend.Orientation = orient;
@@ -67,8 +70,9 @@ void ItemInfo::SetOffsetBlend(const Vector3i& pos, const EulerAngles& orient, fl
 	this->OffsetBlend.Delay = delay;
 }
 
-void ItemInfo::SetOffsetBlend(const Vector3i& pos, const EulerAngles& orient, float velocity, short turnRate, float delay = 0.0f)
+void ItemInfo::SetOffsetBlend(const Vector3i& pos, const EulerAngles& orient, float velocity, short turnRate, float delay)
 {
+	this->OffsetBlend.IsActive = true;
 	this->OffsetBlend.Type = BlendType::Constant;
 	this->OffsetBlend.Position = pos;
 	this->OffsetBlend.Orientation = orient;
@@ -84,6 +88,10 @@ void ItemInfo::ClearOffsetBlend()
 
 void ItemInfo::DoOffsetBlend()
 {
+	g_Renderer.PrintDebugMessage("IsActive: %d", OffsetBlend.IsActive);
+	g_Renderer.PrintDebugMessage("Pos: %d, %d, %d", OffsetBlend.Position.x, OffsetBlend.Position.y, OffsetBlend.Position.z);
+	g_Renderer.PrintDebugMessage("Orient: %d, %d, %d", OffsetBlend.Orientation.x, OffsetBlend.Orientation.y, OffsetBlend.Orientation.z);
+
 	// Blending is inactive; exit early.
 	if (!OffsetBlend.IsActive)
 		return;
@@ -100,24 +108,30 @@ void ItemInfo::DoOffsetBlend()
 	}
 
 	// Perform blending according to type.
+	auto distance = Vector3i::Distance(Pose.Position, Pose.Position + OffsetBlend.Position);
 	switch (OffsetBlend.Type)
 	{
 	case BlendType::Linear:
-		auto distance = Vector3i::Distance(Pose.Position, Pose.Position + OffsetBlend.Position);
 		if (distance <= OffsetBlend.Velocity)
-			this->Pose.Position = OffsetBlend.Position;
+			this->Pose.Position = Pose.Position + OffsetBlend.Position;
 		else
 		{
 			auto direction = OffsetBlend.Position.ToVector3() - Pose.Position.ToVector3();
 			this->Pose.Position += OffsetBlend.Position * OffsetBlend.Alpha;
 		}
 
-		this->Pose.Orientation.Lerp(OffsetBlend.Orientation, OffsetBlend.Alpha);
+		this->Pose.Orientation.Lerp(Pose.Orientation + OffsetBlend.Orientation, OffsetBlend.Alpha);
+
+		// Reduce offsets.
+		OffsetBlend.Position *= 1.0f - OffsetBlend.Alpha;
+		OffsetBlend.Orientation *= 1.0f - OffsetBlend.Alpha;
 		break;
 		
 	case BlendType::Constant:
 		// TODO: I'm an idiot.
-		this->Pose.Interpolate({ Pose.Position + OffsetBlend.Position, OffsetBlend.Orientation }, OffsetBlend.Velocity, OffsetBlend.TurnRate);
+		this->Pose.Interpolate({ Pose.Position + OffsetBlend.Position, Pose.Orientation + OffsetBlend.Orientation }, OffsetBlend.Velocity, OffsetBlend.TurnRate);
+
+		// Reduce offsets... how?
 		break;
 
 	default:
@@ -125,11 +139,10 @@ void ItemInfo::DoOffsetBlend()
 	}
 
 	// Blending is complete.
-	if (Pose.Position == OffsetBlend.Position &&
-		Pose.Orientation == OffsetBlend.Orientation)
+	if (OffsetBlend.Position == Vector3i::Zero &&
+		OffsetBlend.Orientation == EulerAngles::Zero)
 	{
 		this->OffsetBlend.IsActive = false;
-		this->OffsetBlend.IsComplete = true;
 		this->ClearOffsetBlend();
 	}
 }
@@ -697,11 +710,11 @@ void DoDamage(ItemInfo* item, int damage)
 	{
 		if (damage > 0)
 		{
-			float power = item->HitPoints ? GenerateFloat(0.1f, 0.4f) : 0.5f;
+			float power = item->HitPoints ? Random::GenerateFloat(0.1f, 0.4f) : 0.5f;
 			Rumble(power, 0.15f);
 		}
 
-		if ((GlobalCounter - lastHurtTime) > (FPS * 2 + GenerateInt(0, FPS)))
+		if ((GlobalCounter - lastHurtTime) > (FPS * 2 + Random::GenerateInt(0, FPS)))
 		{
 			SoundEffect(SFX_TR4_LARA_INJURY, &LaraItem->Pose);
 			lastHurtTime = GlobalCounter;

@@ -91,6 +91,8 @@ void AnimateLara(ItemInfo* item)
 	if (!lara->Control.IsMoving)
 		TranslateItem(item, lara->Control.MoveAngle, item->Animation.Velocity.z, 0.0f, item->Animation.Velocity.x);
 
+	item->DoOffsetBlend();
+
 	// Update matrices
 	g_Renderer.UpdateLaraAnimations(true);
 }

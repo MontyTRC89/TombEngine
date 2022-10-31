@@ -56,10 +56,9 @@ enum class BlendType
 	Constant
 };
 
-struct OffsetBlend
+struct OffsetBlendData
 {
 	bool  IsActive	 = false;
-	bool  IsComplete = false;
 	float Delay		 = 0.0f;
 
 	BlendType	Type		= BlendType::None;
@@ -137,7 +136,7 @@ struct ItemInfo
 	std::string LuaCallbackOnCollidedWithObjectName;
 	std::string LuaCallbackOnCollidedWithRoomName;
 
-	OffsetBlend OffsetBlend = {};
+	OffsetBlendData OffsetBlend = {};
 
 	bool TestOcb(short ocbFlags);
 	void RemoveOcb(short ocbFlags);
