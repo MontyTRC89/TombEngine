@@ -857,7 +857,10 @@ void Sound_Init()
 void Sound_DeInit()
 {
 	if (g_Configuration.EnableSound)
+	{
+		TENLog("Shutting down BASS...", LogLevel::Info);
 		BASS_Free();
+	}
 }
 
 bool Sound_CheckBASSError(const char* message, bool verbose, ...)
