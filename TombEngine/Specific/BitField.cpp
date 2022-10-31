@@ -73,7 +73,7 @@ namespace TEN::Utils
 
 	void BitField::Set(unsigned int index)
 	{
-		this->Set({ index });
+		this->Set(std::vector<unsigned int> { index });
 	}
 
 	void BitField::SetAll()
@@ -97,7 +97,7 @@ namespace TEN::Utils
 	
 	void BitField::Clear(unsigned int index)
 	{
-		this->Clear({ index });
+		this->Clear(std::vector<unsigned int> { index });
 	}
 
 	void BitField::ClearAll()
@@ -121,7 +121,7 @@ namespace TEN::Utils
 	
 	void BitField::Flip(unsigned int index)
 	{
-		this->Flip({ index });
+		this->Flip(std::vector<unsigned int> { index });
 	}
 
 	void BitField::FlipAll()
@@ -158,7 +158,7 @@ namespace TEN::Utils
 
 	bool BitField::Test(unsigned int index) const
 	{
-		return this->Test({ index });
+		return this->Test(std::vector<unsigned int> { index });
 	}
 
 	bool BitField::TestAny() const
