@@ -112,35 +112,6 @@ bool MovePlayerPosition(const Vector3i& offset, ItemInfo* item, ItemInfo* laraIt
 	return false;
 }
 
-bool AlignPlayerPosition(ItemInfo* laraItem, ItemInfo* item, const Vector3i& offset, bool doSnap)
-{
-	static constexpr auto maxDeltaHeight = CLICK(2);
-	static const auto	  turnRate = ANGLE(2.0f);
-
-	auto* lara = GetLaraInfo(laraItem);
-
-	auto rotMatrix = item->Pose.Orientation.ToRotationMatrix();
-	auto pos = Vector3::Transform(offset.ToVector3(), rotMatrix);
-	auto toPose = Pose(item->Pose.Position + Vector3i(pos), item->Pose.Orientation);
-
-	if (Objects[item->ObjectNumber].isPickup)
-	{
-		// Prevent picking up items which can result in so called "flare pickup bug"
-		int height = GetCollision(toPose.Position.x, toPose.Position.y, toPose.Position.z, laraItem->RoomNumber).Position.Floor;
-		if (abs(height - laraItem->Pose.Position.y) <= maxDeltaHeight)
-			return AlignPlayerToPose(laraItem, toPose, LARA_ALIGN_VELOCITY, turnRate);
-	}
-	else
-		return AlignPlayerToPose(laraItem, toPose, LARA_ALIGN_VELOCITY, turnRate);
-
-	if (lara->Control.IsMoving)
-	{
-		lara->Control.IsMoving = false;
-		lara->Control.HandStatus = HandStatus::Free;
-	}
-
-	return false;
-}
 
 bool AlignPlayerToPose(ItemInfo* item, const Pose& toPose, float velocity, short turnRate)
 {
