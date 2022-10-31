@@ -182,7 +182,7 @@ namespace TEN::Entities::Generic
 							bounds.Y1 - fmod(abs(bounds.Y1 - laraItem->Pose.Position.y), CLICK(1)),
 							0
 						);
-						SnapPlayerPosition(offset, &ladderItem, laraItem);
+						MovePlayerPosition(offset, &ladderItem, laraItem, true);
 						SetAnimation(laraItem, LA_LADDER_MOUNT_JUMP_REACH);
 					}
 					// Jumping up.

@@ -54,38 +54,10 @@ bool TestPlayerPosition(const ObjectCollisionBounds& bounds, ItemInfo* item, Ite
 	return true;
 }
 
-bool SnapPlayerPosition(const Vector3i& offset, ItemInfo* item, ItemInfo* laraItem)
+bool MovePlayerPosition(const Vector3i& offset, ItemInfo* item, ItemInfo* laraItem, bool doSnap)
 {
-	static constexpr auto maxDeltaHeight = CLICK(2);
-
-	auto* lara = GetLaraInfo(laraItem);
-
-	laraItem->Pose.Orientation = item->Pose.Orientation;
-
-	auto rotMatrix = item->Pose.Orientation.ToRotationMatrix();
-	auto pos = Vector3::Transform(offset.ToVector3(), rotMatrix);
-	auto target = item->Pose.Position.ToVector3() + pos;
-
-	int height = GetCollision(target.x, target.y, target.z, laraItem->RoomNumber).Position.Floor;
-	if (abs(height - laraItem->Pose.Position.y) <= maxDeltaHeight)
-	{
-		laraItem->Pose.Position = target;
-		return true;
-	}
-
-	if (lara->Control.IsMoving)
-	{
-		lara->Control.IsMoving = false;
-		lara->Control.HandStatus = HandStatus::Free;
-	}
-
-	return false;
-}
-
-bool MovePlayerPosition(const Vector3i& offset, ItemInfo* item, ItemInfo* laraItem)
-{
-	static constexpr auto maxDeltaHeight = CLICK(2);
-	static const auto	  turnRate = ANGLE(2.0f);
+	static constexpr auto maxDeltaHeight = STEPUP_HEIGHT;
+	static const auto	  turnRate		 = ANGLE(2.0f);
 
 	auto* lara = GetLaraInfo(laraItem);
 
@@ -93,15 +65,25 @@ bool MovePlayerPosition(const Vector3i& offset, ItemInfo* item, ItemInfo* laraIt
 	auto pos = Vector3::Transform(offset.ToVector3(), rotMatrix);
 	auto toPose = Pose(item->Pose.Position + Vector3i(pos), item->Pose.Orientation);
 
+	bool canAlign = true;
 	if (Objects[item->ObjectNumber].isPickup)
 	{
-		// Prevent picking up items which can result in so called "flare pickup bug"
+		// Prevent picking up items to avoid flare pickup bug.
 		int height = GetCollision(toPose.Position.x, toPose.Position.y, toPose.Position.z, laraItem->RoomNumber).Position.Floor;
-		if (abs(height - laraItem->Pose.Position.y) <= maxDeltaHeight)
+		if (abs(height - laraItem->Pose.Position.y) > maxDeltaHeight)
+			canAlign = false;
+	}
+	
+	if (canAlign)
+	{
+		if (doSnap)
+		{
+			laraItem->Pose = toPose;
+			return true;
+		}
+		else
 			return AlignPlayerToPose(laraItem, toPose, LARA_ALIGN_VELOCITY, turnRate);
 	}
-	else
-		return AlignPlayerToPose(laraItem, toPose, LARA_ALIGN_VELOCITY, turnRate);
 
 	if (lara->Control.IsMoving)
 	{

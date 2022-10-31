@@ -41,7 +41,7 @@ namespace TEN::Entities::Switches
 		{
 			if (TestPlayerPosition(JumpSwitchBounds, switchItem, laraItem))
 			{
-				SnapPlayerPosition(JumpSwitchPos, switchItem, laraItem);
+				MovePlayerPosition(JumpSwitchPos, switchItem, laraItem, true);
 
 				laraItem->Animation.ActiveState = LS_SWITCH_DOWN;
 				laraItem->Animation.AnimNumber = LA_JUMPSWITCH_PULL;

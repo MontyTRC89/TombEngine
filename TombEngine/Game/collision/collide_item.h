@@ -26,8 +26,7 @@ struct ObjectCollisionBounds
 
 // TODO: Refactor this family of functions into a more comprehensive position alignment system. -- Sezz 2022.10.30
 bool TestPlayerPosition(const ObjectCollisionBounds& bounds, ItemInfo* item, ItemInfo* laraItem);
-bool SnapPlayerPosition(const Vector3i& offset, ItemInfo* item, ItemInfo* laraItem);
-bool MovePlayerPosition(const Vector3i& offset, ItemInfo* item, ItemInfo* laraItem);
+bool MovePlayerPosition(const Vector3i& offset, ItemInfo* item, ItemInfo* laraItem, bool doSnap = false);
 bool AlignPlayerToPose(ItemInfo* item, const Pose& toPose, float velocity, short turnRate);
 
 void GenericSphereBoxCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);

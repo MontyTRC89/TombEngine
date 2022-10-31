@@ -82,7 +82,7 @@ void CeilingTrapDoorCollision(short itemNumber, ItemInfo* laraItem, CollisionInf
 		itemIsAbove &&
 		(result || result2))
 	{
-		SnapPlayerPosition(CeilingTrapDoorPos, trapDoorItem, laraItem);
+		MovePlayerPosition(CeilingTrapDoorPos, trapDoorItem, laraItem, true);
 		if (result2)
 			laraItem->Pose.Orientation.y += ANGLE(180.0f);
 		

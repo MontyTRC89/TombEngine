@@ -130,14 +130,14 @@ namespace TEN::Entities::Generic
 					if (laraItem->Animation.ActiveState == LS_REACH)
 					{
 						VPolePosR.y = laraItem->Pose.Position.y - poleItem->Pose.Position.y + 10;
-						SnapPlayerPosition(VPolePosR, poleItem, laraItem);
+						MovePlayerPosition(VPolePosR, poleItem, laraItem, true);
 						SetAnimation(laraItem, LA_REACH_TO_POLE);
 					}
 					// Jumping up.
 					else
 					{
 						VPolePosR.y = laraItem->Pose.Position.y - poleItem->Pose.Position.y + 66;
-						SnapPlayerPosition(VPolePosR, poleItem, laraItem);
+						MovePlayerPosition(VPolePosR, poleItem, laraItem, true);
 						SetAnimation(laraItem, LA_JUMP_UP_TO_POLE);
 					}
 
