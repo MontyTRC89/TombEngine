@@ -39,14 +39,13 @@ bool TestPlayerPosition(const ObjectCollisionBounds& bounds, ItemInfo* item, Ite
 		return false;
 	}
 
-	auto pos = (laraItem->Pose.Position - item->Pose.Position).ToVector3();
-	auto rotMatrix = item->Pose.Orientation.ToRotationMatrix();
-	rotMatrix = rotMatrix.Transpose(); // NOTE: Should be inverse, but inverse/transpose of a rotation matrix are equal and transposing is faster.
-
-	pos = Vector3::Transform(pos, rotMatrix);
-	if (pos.x < bounds.BoundingBox.X1 || pos.x > bounds.BoundingBox.X2 ||
-		pos.y < bounds.BoundingBox.Y1 || pos.y > bounds.BoundingBox.Y2 ||
-		pos.z < bounds.BoundingBox.Z1 || pos.z > bounds.BoundingBox.Z2)
+	auto direction = (laraItem->Pose.Position - item->Pose.Position).ToVector3();
+	auto rotMatrix = item->Pose.Orientation.ToRotationMatrix().Transpose(); // NOTE: Should be Invert(), but inverse/transpose of a rotation matrix are equal and transposing is faster.
+	auto relativePos = Vector3::Transform(direction, rotMatrix);
+	
+	if (relativePos.x < bounds.BoundingBox.X1 || relativePos.x > bounds.BoundingBox.X2 ||
+		relativePos.y < bounds.BoundingBox.Y1 || relativePos.y > bounds.BoundingBox.Y2 ||
+		relativePos.z < bounds.BoundingBox.Z1 || relativePos.z > bounds.BoundingBox.Z2)
 	{
 		return false;
 	}
