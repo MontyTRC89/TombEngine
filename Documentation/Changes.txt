@@ -6,6 +6,10 @@ Version 1.0.3
 * Add OCB 1 for rollingball to make it silent.
 * Add FlyCheat option to gameflow script for disabling dozy mode.
 * Adjust sprint jump timing.
+* Implement sprite instancing to speed up rendering.
+* Merge portals at runtime to speed up rendering.
+* Enable dynamic lights for swarm enemies (beetles, rats and bats).
+* Re-enable underwater caustics.
 * Increase amount of maximum secrets per level from 8 to 32.
 * Fix dodgy weapon lock angle constraints.
 * Fix wrong shotgun ammo pickup amount.
