@@ -112,15 +112,7 @@ void ItemInfo::DoOffsetBlend()
 	{
 	case BlendType::Linear:
 	{
-		auto distance = Vector3i::Distance(Pose.Position, Pose.Position + OffsetBlend.PosOffset);
-		if (distance <= OffsetBlend.Velocity)
-			this->Pose.Position = Pose.Position + Vector3i(OffsetBlend.PosOffset);
-		else
-		{
-			auto direction = OffsetBlend.PosOffset - Pose.Position.ToVector3();
-			this->Pose.Position += Vector3i(OffsetBlend.PosOffset * OffsetBlend.Alpha);
-		}
-
+		this->Pose.Position += Vector3i(OffsetBlend.PosOffset * OffsetBlend.Alpha);
 		this->Pose.Orientation.Lerp(Pose.Orientation + OffsetBlend.OrientOffset, OffsetBlend.Alpha);
 
 		// Reduce offsets.
@@ -128,6 +120,7 @@ void ItemInfo::DoOffsetBlend()
 		OffsetBlend.OrientOffset *= 1.0f - OffsetBlend.Alpha;
 		break;
 	}
+
 	case BlendType::Constant:
 	{
 		// TODO: I'm an idiot.

@@ -154,7 +154,7 @@ bool AlignPlayerToPose(ItemInfo* item, const Pose& toPose, float velocity, short
 		lara->Control.Count.PositionAdjust = 0;
 	}
 
-	item->Pose.Interpolate(toPose, velocity, turnRate);
+	item->Pose.InterpolateConstant(toPose, velocity, turnRate);
 	return (item->Pose == toPose);
 }
 
