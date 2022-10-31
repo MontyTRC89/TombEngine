@@ -925,7 +925,7 @@ namespace TEN::Renderer
 			}
 			else
 			{
-				// Otherwise, add the sprite tot he current bucket
+				// Otherwise, add the sprite to the current bucket
 				currentSpriteBucket.SpritesToDraw.push_back(spr);
 			}
 		}
