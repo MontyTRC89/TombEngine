@@ -110,9 +110,9 @@ namespace TEN::Entities::Generic
 		bool isFacingLadder = Geometry::IsPointInFront(laraItem->Pose, ladderItem.Pose.Position.ToVector3());
 
 		// Mount while grounded.
-		if (TrInput & IN_ACTION && isFacingLadder &&
+		if ((TrInput & IN_ACTION && isFacingLadder &&
 			TestState(laraItem->Animation.ActiveState, LadderGroundedMountStates) &&
-			player.Control.HandStatus == HandStatus::Free ||
+			player.Control.HandStatus == HandStatus::Free) ||
 			(player.Control.IsMoving && player.InteractedItem == itemNumber))
 		{
 			// Mount at bottom.
@@ -128,7 +128,7 @@ namespace TEN::Entities::Generic
 					auto target = ladderItem.Pose.Position.ToVector3() + pos;
 					auto offset = Vector3i(target) - laraItem->Pose.Position;
 
-					laraItem->SetOffsetBlend(offset, ladderItem.Pose.Orientation - laraItem->Pose.Orientation, 0.4f);
+					laraItem->SetOffsetBlend(offset.ToVector3(), ladderItem.Pose.Orientation - laraItem->Pose.Orientation, 0.4f);
 					SetAnimation(laraItem, LA_LADDER_MOUNT_BOTTOM);
 					player.Control.IsMoving = false;
 					player.Control.HandStatus = HandStatus::Busy;

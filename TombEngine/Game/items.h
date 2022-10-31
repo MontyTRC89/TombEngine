@@ -62,7 +62,7 @@ struct OffsetBlendData
 	float Delay		 = 0.0f;
 
 	BlendType	Type		 = BlendType::None;
-	Vector3i	PosOffset	 = Vector3i::Zero;
+	Vector3		PosOffset	 = Vector3::Zero;
 	EulerAngles OrientOffset = EulerAngles::Zero;
 
 	// Linear type
@@ -148,8 +148,8 @@ struct ItemInfo
 	bool IsLara();
 	bool IsCreature();
 
-	void SetOffsetBlend(const Vector3i& posOffset, const EulerAngles& orientOffset, float alpha, float delay = 0.0f);
-	void SetOffsetBlend(const Vector3i& posOffset, const EulerAngles& orientOffset, float velocity, short turnRate, float delay = 0.0f);
+	void SetOffsetBlend(const Vector3& posOffset, const EulerAngles& orientOffset, float alpha, float delay = 0.0f);
+	void SetOffsetBlend(const Vector3& posOffset, const EulerAngles& orientOffset, float velocity, short turnRate, float delay = 0.0f);
 	void ClearOffsetBlend();
 	void DoOffsetBlend();
 };
