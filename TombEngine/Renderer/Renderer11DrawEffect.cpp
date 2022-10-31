@@ -869,12 +869,10 @@ namespace TEN::Renderer
 			{
 				if (a.Sprite != b.Sprite)
 					return (a.Sprite > b.Sprite);
-				else if ((a.Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_3D) != (b.Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_3D))
-					return (a.Type > b.Type);
 				else if (a.BlendMode != b.BlendMode)
 					return (a.BlendMode > b.BlendMode);
 				else
-					return (a.SoftParticle != b.SoftParticle);
+					return (a.Type > b.Type);
 			}
 		);
 
