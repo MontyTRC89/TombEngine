@@ -393,7 +393,8 @@ bool FlowHandler::DoFlow()
 		switch (status)
 		{
 		case GameStatus::ExitGame:
-			return true;
+			DoTheGame = false;
+			break;
 		case GameStatus::ExitToTitle:
 			CurrentLevel = 0;
 			break;
