@@ -29,6 +29,12 @@ GameBoundingBox GlobalCollisionBounds;
 ItemInfo* CollidedItems[MAX_COLLIDED_OBJECTS];
 MESH_INFO* CollidedMeshes[MAX_COLLIDED_OBJECTS];
 
+InteractionBounds::InteractionBounds(const GameBoundingBox& bounds, const pair<EulerAngles, EulerAngles>& orientConstraint)
+{
+	this->BoundingBox = bounds;
+	this->OrientConstraint = orientConstraint;
+};
+
 bool TestPlayerEntityInteract(ItemInfo* item, ItemInfo* laraItem, const InteractionBounds& interactBounds)
 {
 	auto deltaOrient = laraItem->Pose.Orientation - item->Pose.Orientation;

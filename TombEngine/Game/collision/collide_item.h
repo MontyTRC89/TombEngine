@@ -22,6 +22,8 @@ struct InteractionBounds
 {
 	GameBoundingBox				   BoundingBox		= GameBoundingBox::Zero;
 	pair<EulerAngles, EulerAngles> OrientConstraint = {};
+
+	InteractionBounds(const GameBoundingBox& bounds, const pair<EulerAngles, EulerAngles>& orientConstraint);
 };
 
 // TODO: Refactor this family of functions into a more comprehensive position alignment system. -- Sezz 2022.10.30

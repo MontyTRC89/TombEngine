@@ -26,7 +26,7 @@ namespace TEN::Entities::Generic
 		None,
 		TopFront,
 		TopBack,
-		Bottom,
+		Front,
 		Left,
 		Right
 	};
@@ -53,21 +53,10 @@ namespace TEN::Entities::Generic
 		LS_JUMP_UP
 	};
 
-	const auto LadderMountOffset = Vector3i(0, 0, -CLICK(0.6f));
-	const InteractionBounds LadderFrontBounds =
-	{
-		GameBoundingBox(
-			-CLICK(1), CLICK(1),
-			-CLICK(1), CLICK(1),
-			-CLICK(1.5f), CLICK(1.5f)
-		),
-		std::pair(
-			EulerAngles(ANGLE(-10.0f), -LARA_GRAB_THRESHOLD, ANGLE(-10.0f)),
-			EulerAngles(ANGLE(10.0f), LARA_GRAB_THRESHOLD, ANGLE(10.0f))
-		)
-	};
-	const InteractionBounds LadderBackBounds =
-	{
+	const auto LadderMountOffset = Vector3i(0, 0, -BLOCK(1, 7));
+
+	const auto LadderMountTopFrontOrient = EulerAngles(0, ANGLE(180.0f), 0);
+	const auto LadderMountTopFrontBounds = InteractionBounds(
 		GameBoundingBox(
 			-CLICK(1), CLICK(1),
 			-CLICK(1), CLICK(1),
@@ -77,9 +66,36 @@ namespace TEN::Entities::Generic
 			EulerAngles(ANGLE(-10.0f), ANGLE(180.0f) - LARA_GRAB_THRESHOLD, ANGLE(-10.0f)),
 			EulerAngles(ANGLE(10.0f), ANGLE(180.0f) + LARA_GRAB_THRESHOLD, ANGLE(10.0f))
 		)
-	};
-	const InteractionBounds LadderLeftBounds =
-	{
+	);
+	
+	const auto LadderMountTopBackOrient = EulerAngles::Zero;
+	const InteractionBounds LadderMountTopBackBounds = InteractionBounds(
+		GameBoundingBox(
+			-CLICK(1), CLICK(1),
+			-CLICK(1), CLICK(1),
+			-CLICK(1.5f), CLICK(1.5f)
+		),
+		std::pair(
+			EulerAngles(ANGLE(-10.0f), ANGLE(180.0f) - LARA_GRAB_THRESHOLD, ANGLE(-10.0f)),
+			EulerAngles(ANGLE(10.0f), ANGLE(180.0f) + LARA_GRAB_THRESHOLD, ANGLE(10.0f))
+		)
+	);
+
+	const auto LadderMountFrontOrient = EulerAngles::Zero;
+	const InteractionBounds LadderMountFrontBounds = InteractionBounds(
+		GameBoundingBox(
+			-CLICK(1), CLICK(1),
+			-CLICK(1), CLICK(1),
+			-CLICK(1.5f), CLICK(1.5f)
+		),
+		std::pair(
+			EulerAngles(ANGLE(-10.0f), -LARA_GRAB_THRESHOLD, ANGLE(-10.0f)),
+			EulerAngles(ANGLE(10.0f), LARA_GRAB_THRESHOLD, ANGLE(10.0f))
+		)
+	);
+
+	const auto LadderMountLeftOrient = EulerAngles(0, ANGLE(90.0f), 0);
+	const InteractionBounds LadderMountLeftBounds = InteractionBounds(
 		GameBoundingBox(
 			-CLICK(1), CLICK(1),
 			-CLICK(1), CLICK(1),
@@ -89,9 +105,10 @@ namespace TEN::Entities::Generic
 			EulerAngles(ANGLE(-10.0f), ANGLE(90.0f) - LARA_GRAB_THRESHOLD, ANGLE(-10.0f)),
 			EulerAngles(ANGLE(10.0f), ANGLE(90.0f) + LARA_GRAB_THRESHOLD, ANGLE(10.0f))
 		)
-	};
-	const InteractionBounds LadderRightBounds =
-	{
+	);
+
+	const auto LadderMountRightOrient = EulerAngles(0, ANGLE(-90.0f), 0);
+	const InteractionBounds LadderMountRightBounds = InteractionBounds(
 		GameBoundingBox(
 			-CLICK(1), CLICK(1),
 			-CLICK(1), CLICK(1),
@@ -101,7 +118,7 @@ namespace TEN::Entities::Generic
 			EulerAngles(ANGLE(-10.0f), ANGLE(-90.0f) - LARA_GRAB_THRESHOLD, ANGLE(-10.0f)),
 			EulerAngles(ANGLE(10.0f), ANGLE(-90.0f) + LARA_GRAB_THRESHOLD, ANGLE(10.0f))
 		)
-	};
+	);
 
 	void LadderCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 	{
@@ -117,7 +134,7 @@ namespace TEN::Entities::Generic
 			(player.Control.IsMoving && player.InteractedItem == itemNumber))
 		{
 			// Mount at bottom.
-			if (TestPlayerEntityInteract(&ladderItem, laraItem, LadderFrontBounds))
+			if (TestPlayerEntityInteract(&ladderItem, laraItem, LadderMountFrontBounds))
 			{
 				if (!laraItem->OffsetBlend.IsActive)
 				{
@@ -138,10 +155,10 @@ namespace TEN::Entities::Generic
 					player.InteractedItem = itemNumber;
 			}
 			// Mount from right.
-			else if (TestPlayerEntityInteract(&ladderItem, laraItem, LadderRightBounds))
+			else if (TestPlayerEntityInteract(&ladderItem, laraItem, LadderMountRightBounds))
 			{
 				auto mountPos = Vector3i(GameBoundingBox(&ladderItem).Z1 + CLICK(0.55f), 0, 0);
-				if (AlignPlayerToEntity(&ladderItem, laraItem, mountPos))
+				if (AlignPlayerToEntity(&ladderItem, laraItem, mountPos, LadderMountRightOrient))
 				{
 					SetAnimation(laraItem, LA_LADDER_MOUNT_RIGHT);
 					player.Control.IsMoving = false;
