@@ -880,7 +880,7 @@ void GuiController::HandleDisplaySettingsInput(bool pause)
 			CurrentSettings.conf.Width = screenResolution.x;
 			CurrentSettings.conf.Height = screenResolution.y;
 
-			memcpy(&g_Configuration, &CurrentSettings.conf, sizeof(GameConfiguration));
+			g_Configuration = CurrentSettings.conf;
 			SaveConfiguration();
 
 			// Reset screen and go back
@@ -1029,7 +1029,7 @@ void GuiController::HandleControlSettingsInput(bool pause)
 
 void GuiController::BackupOptions()
 {
-	memcpy(&CurrentSettings.conf, &g_Configuration, sizeof(GameConfiguration));
+	CurrentSettings.conf = g_Configuration;
 }
 
 void GuiController::HandleOptionsInput()
@@ -1208,7 +1208,7 @@ void GuiController::HandleOtherSettingsInput(bool pause)
 			bool indicateRumble = CurrentSettings.conf.EnableRumble && !g_Configuration.EnableRumble;
 
 			// Save the configuration
-			memcpy(&g_Configuration, &CurrentSettings.conf, sizeof(GameConfiguration));
+			g_Configuration = CurrentSettings.conf;
 			SaveConfiguration();
 
 			// Rumble if setting was changed
