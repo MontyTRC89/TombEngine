@@ -1,5 +1,6 @@
 #include "framework.h"
 #include "Renderer/Renderer11.h"
+#include "Specific/trutils.h"
 #include "Specific/winmain.h"
 #include <filesystem>
 #include <codecvt>
@@ -54,16 +55,12 @@ namespace TEN::Renderer
 
 		dxgiFactory->EnumAdapters(0, &dxgiAdapter);
 
-		DXGI_ADAPTER_DESC adapterDesc;
-		UINT stringLength;
-		char videoCardDescription[128];
+		DXGI_ADAPTER_DESC adapterDesc = {};
 
 		dxgiAdapter->GetDesc(&adapterDesc);
-		int error = wcstombs_s(&stringLength, videoCardDescription, 128, adapterDesc.Description, 128);
-
 		dxgiFactory->Release();
 		
-		return std::string(videoCardDescription);
+		return std::string(TEN::Utils::FromWchar(adapterDesc.Description));
 	}
 
 	void Renderer11::SetTextureOrDefault(Texture2D& texture, std::wstring path)
