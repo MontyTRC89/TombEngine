@@ -1145,7 +1145,6 @@ struct LaraInventoryData
 	int TotalSmallMedipacks;
 	int TotalLargeMedipacks;
 	int TotalFlares;
-	unsigned int TotalSecrets;
 
 	int Puzzles[NUM_PUZZLES];
 	int Keys[NUM_KEYS];
