@@ -138,11 +138,11 @@ namespace TEN::Entities::Generic
 			{
 				if (!laraItem->OffsetBlend.IsActive)
 				{
-					auto mountPos = Vector3i(0, 0, GameBoundingBox(&ladderItem).Z1) + LadderMountOffset;
+					auto mountOffset = Vector3i(0, 0, GameBoundingBox(&ladderItem).Z1) + LadderMountOffset;
 
-					auto target = Geometry::TranslatePoint(ladderItem.Pose.Position, ladderItem.Pose.Orientation, mountPos);
-					auto offset = (target - laraItem->Pose.Position).ToVector3();
-					laraItem->SetOffsetBlend(offset, ladderItem.Pose.Orientation - laraItem->Pose.Orientation);
+					auto targetPos = Geometry::TranslatePoint(ladderItem.Pose.Position, ladderItem.Pose.Orientation, mountOffset);
+					auto relativeOffset = (targetPos - laraItem->Pose.Position).ToVector3();
+					laraItem->SetOffsetBlend(relativeOffset, ladderItem.Pose.Orientation - laraItem->Pose.Orientation);
 
 					SetAnimation(laraItem, LA_LADDER_MOUNT_BOTTOM);
 					player.Control.IsMoving = false;
@@ -154,8 +154,9 @@ namespace TEN::Entities::Generic
 			// Mount from right.
 			else if (TestPlayerEntityInteract(&ladderItem, laraItem, LadderMountRightBounds))
 			{
-				auto mountPos = Vector3i(GameBoundingBox(&ladderItem).Z1 + CLICK(0.55f), 0, 0);
-				if (AlignPlayerToEntity(&ladderItem, laraItem, mountPos, LadderMountRightOrient))
+				auto mountOffset = Vector3i(BLOCK(1, 4), 0, 0) + Vector3i(0, 0, GameBoundingBox(&ladderItem).Z1) + LadderMountOffset;
+
+				if (AlignPlayerToEntity(&ladderItem, laraItem, mountOffset, LadderMountRightOrient))
 				{
 					SetAnimation(laraItem, LA_LADDER_MOUNT_RIGHT);
 					player.Control.IsMoving = false;
