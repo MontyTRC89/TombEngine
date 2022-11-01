@@ -20,7 +20,7 @@ using namespace TEN::Input;
 
 namespace TEN::Entities::TR4
 {
-	InteractionBounds ElementPuzzleBounds =
+	InteractionBasis ElementPuzzleBounds =
 	{
 		GameBoundingBox(
 			0, 0,

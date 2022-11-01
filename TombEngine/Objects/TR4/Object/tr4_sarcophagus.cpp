@@ -13,7 +13,7 @@
 using namespace TEN::Input;
 
 const auto SarcophagusPosition = Vector3i(0, 0, -300);
-const InteractionBounds SarcophagusBounds =
+const InteractionBasis SarcophagusBounds =
 {
 	GameBoundingBox(
 		-SECTOR(0.5f), SECTOR(0.5f),

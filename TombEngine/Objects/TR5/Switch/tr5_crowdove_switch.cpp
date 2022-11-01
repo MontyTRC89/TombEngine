@@ -17,7 +17,7 @@ using namespace TEN::Input;
 
 namespace TEN::Entities::Switches
 {
-	const InteractionBounds CrowDoveBounds =
+	const InteractionBasis CrowDoveBounds =
 	{
 		GameBoundingBox(
 			-CLICK(1), CLICK(1),

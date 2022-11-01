@@ -18,15 +18,15 @@ extern GameBoundingBox GlobalCollisionBounds;
 extern ItemInfo* CollidedItems[MAX_COLLIDED_OBJECTS];
 extern MESH_INFO* CollidedMeshes[MAX_COLLIDED_OBJECTS];
 
-class InteractionBounds
+class InteractionBasis
 {
 public:
 	// Components
-	GameBoundingBox				   BoundingBox		= GameBoundingBox::Zero;
+	GameBoundingBox				   Bounds			= GameBoundingBox::Zero;
 	pair<EulerAngles, EulerAngles> OrientConstraint = {};
 
 	// Constructors
-	InteractionBounds(const GameBoundingBox& box, const pair<EulerAngles, EulerAngles>& orientConstraint);
+	InteractionBasis(const GameBoundingBox& box, const pair<EulerAngles, EulerAngles>& orientConstraint);
 
 	// Utilities
 	bool TestEntityInteraction(const ItemInfo& entity0, const ItemInfo& entity1) const;
@@ -34,7 +34,7 @@ public:
 };
 
 // TODO: Refactor this family of functions into a more comprehensive position alignment system. -- Sezz 2022.10.30
-bool TestPlayerEntityInteract(ItemInfo* item, ItemInfo* laraItem, const InteractionBounds& interactBounds);
+bool TestPlayerEntityInteract(ItemInfo* item, ItemInfo* laraItem, const InteractionBasis& interactBounds);
 bool AlignPlayerToEntity(ItemInfo* item, ItemInfo* laraItem, const Vector3i& posOffset = Vector3i::Zero, const EulerAngles& orientOffset = EulerAngles::Zero, bool doSnapAlign = false);
 bool AlignPlayerToPose(ItemInfo* item, const Pose& toPose, float velocity, short turnRate);
 

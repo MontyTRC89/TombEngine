@@ -17,7 +17,7 @@ using namespace TEN::Input;
 namespace TEN::Entities::Switches
 {
 	const auto CrowbarPos = Vector3i(-89, 0, -328);
-	const InteractionBounds CrowbarBounds = 
+	const InteractionBasis CrowbarBounds = 
 	{
 		GameBoundingBox(
 			-CLICK(1), CLICK(1),
@@ -31,7 +31,7 @@ namespace TEN::Entities::Switches
 	};
 
 	const auto CrowbarPos2 = Vector3i(89, 0, 328);
-	const InteractionBounds CrowbarBounds2 =
+	const InteractionBasis CrowbarBounds2 =
 	{
 		GameBoundingBox(
 			-CLICK(1), CLICK(1),

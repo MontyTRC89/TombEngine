@@ -33,7 +33,7 @@ using namespace TEN::Entities::Generic;
 using namespace TEN::Input;
 
 static auto PickUpPosition = Vector3i(0, 0, -100);
-const InteractionBounds PickUpBounds =
+const InteractionBasis PickUpBounds =
 {
 	GameBoundingBox(
 		-CLICK(1), CLICK(1),
@@ -47,7 +47,7 @@ const InteractionBounds PickUpBounds =
 };
 
 static auto HiddenPickUpPosition = Vector3i(0, 0, -690);
-const InteractionBounds HiddenPickUpBounds =
+const InteractionBasis HiddenPickUpBounds =
 {
 	GameBoundingBox(
 		-CLICK(1), CLICK(1),
@@ -61,7 +61,7 @@ const InteractionBounds HiddenPickUpBounds =
 };
 
 static auto CrowbarPickUpPosition = Vector3i(0, 0, 215);
-const InteractionBounds CrowbarPickUpBounds =
+const InteractionBasis CrowbarPickUpBounds =
 {
 	GameBoundingBox(
 		-CLICK(1), CLICK(1),
@@ -75,7 +75,7 @@ const InteractionBounds CrowbarPickUpBounds =
 };
 
 static auto JobyCrowPickUpPosition = Vector3i(-224, 0, 240);
-const InteractionBounds JobyCrowPickUpBounds =
+const InteractionBasis JobyCrowPickUpBounds =
 {
 	GameBoundingBox(
 		-CLICK(2), 0,
@@ -89,7 +89,7 @@ const InteractionBounds JobyCrowPickUpBounds =
 };
 
 static auto PlinthPickUpPosition = Vector3i(0, 0, -460);
-InteractionBounds PlinthPickUpBounds =
+InteractionBasis PlinthPickUpBounds =
 {
 	GameBoundingBox(
 		-CLICK(1), CLICK(1),
@@ -103,7 +103,7 @@ InteractionBounds PlinthPickUpBounds =
 };
 
 static auto PickUpPositionUW = Vector3i(0, -200, -350);
-const InteractionBounds PickUpBoundsUW =
+const InteractionBasis PickUpBoundsUW =
 {
 	GameBoundingBox(
 		-CLICK(2), CLICK(2),
@@ -117,7 +117,7 @@ const InteractionBounds PickUpBoundsUW =
 };
 
 static auto SOPos = Vector3i::Zero;
-InteractionBounds SOBounds =
+InteractionBasis SOBounds =
 {
 	GameBoundingBox::Zero,
 	std::pair(
@@ -130,7 +130,7 @@ short SearchCollectFrames[4] = { 180, 100, 153, 83 };
 short SearchAnims[4] = { LA_LOOT_CABINET, LA_LOOT_DRAWER, LA_LOOT_SHELF, LA_LOOT_CHEST };
 short SearchOffsets[4] = { 160, 96, 160, 112 };
 
-const InteractionBounds MSBounds =
+const InteractionBasis MSBounds =
 {
 	GameBoundingBox::Zero,
 	std::pair(

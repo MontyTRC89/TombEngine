@@ -49,7 +49,7 @@ namespace TEN::Entities::Generic
 	auto VPolePos = Vector3i(0, 0, -208);
 	auto VPolePosR = Vector3i::Zero;
 
-	const InteractionBounds VPoleBounds = 
+	const InteractionBasis VPoleBounds = 
 	{
 		GameBoundingBox(
 			-CLICK(1), CLICK(1),

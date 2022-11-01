@@ -27,7 +27,7 @@ namespace TEN::Entities::TR4
 	const auto SASGunBite = BiteInfo(Vector3(0.0f, 300.0f, 64.0f), 7);
 
 	const auto SASDragBodyPosition = Vector3i(0, 0, -460);
-	const InteractionBounds SASDragBodyBounds =
+	const InteractionBasis SASDragBodyBounds =
 	{
 		GameBoundingBox(
 			-CLICK(1), CLICK(1),

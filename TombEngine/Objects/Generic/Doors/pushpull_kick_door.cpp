@@ -36,7 +36,7 @@ namespace TEN::Entities::Doors
 	const Vector3i PushDoorPos(201, 0, -702);
 	const Vector3i KickDoorPos(0, 0, -917);
 
-	const InteractionBounds PushPullKickDoorBounds =
+	const InteractionBasis PushPullKickDoorBounds =
 	{
 		GameBoundingBox(
 			-384, 384,

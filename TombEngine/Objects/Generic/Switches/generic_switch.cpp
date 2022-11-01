@@ -13,7 +13,7 @@ using namespace TEN::Input;
 
 namespace TEN::Entities::Switches
 {
-	InteractionBounds SwitchBounds = 
+	InteractionBasis SwitchBounds = 
 	{
 		GameBoundingBox::Zero,
 		std::pair(

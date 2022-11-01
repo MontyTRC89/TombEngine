@@ -17,7 +17,7 @@
 using namespace TEN::Input;
 
 static auto PushableBlockPos = Vector3i::Zero;
-InteractionBounds PushableBlockBounds = 
+InteractionBasis PushableBlockBounds = 
 {
 	GameBoundingBox(
 		0, 0,

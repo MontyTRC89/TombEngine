@@ -15,7 +15,7 @@
 using namespace TEN::Entities::Switches;
 using namespace TEN::Entities::TR4;
 
-InteractionBounds ScalesBounds =
+InteractionBasis ScalesBounds =
 {
 	GameBoundingBox(
 		-CLICK(5.5f), -CLICK(5.5f),
