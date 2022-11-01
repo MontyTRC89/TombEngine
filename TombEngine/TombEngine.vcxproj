@@ -969,6 +969,11 @@ CALL gen.bat</Command>
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</DeploymentContent>
       <FileType>Text</FileType>
     </None>
+    <None Include="Shaders\Fog.hlsli">
+      <FileType>Document</FileType>
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </EntryPointName>
+    </None>
     <None Include="Shaders\ShaderLight.hlsli">
       <DeploymentContent>true</DeploymentContent>
     </None>
