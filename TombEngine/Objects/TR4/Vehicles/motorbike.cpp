@@ -130,20 +130,20 @@ namespace TEN::Entities::Vehicles
 		MOTORBIKE_FLAG_DEATH   = (1 << 7)
 	};
 
-	MotorbikeInfo* GetMotorbikeInfo(ItemInfo* motorbikeItem)
+	MotorbikeInfo& GetMotorbikeInfo(ItemInfo* motorbikeItem)
 	{
-		return (MotorbikeInfo*)motorbikeItem->Data;
+		return *(MotorbikeInfo*)motorbikeItem->Data;
 	}
 
 	void InitialiseMotorbike(short itemNumber)
 	{
 		auto* motorbikeItem = &g_Level.Items[itemNumber];
 		motorbikeItem->Data = MotorbikeInfo();
-		auto* motorbike = GetMotorbikeInfo(motorbikeItem);
+		auto& motorbike = GetMotorbikeInfo(motorbikeItem);
 
 		motorbikeItem->MeshBits.Set(MotorbikeJoints);
 		motorbikeItem->MeshBits.Clear(MotorbikeHeadLightJoints);
-		motorbike->MomentumAngle = motorbikeItem->Pose.Orientation.y;
+		motorbike.MomentumAngle = motorbikeItem->Pose.Orientation.y;
 	}
 
 	int GetMotorbikeCollisionAnim(ItemInfo* motorbikeItem, Vector3i* pos)
@@ -171,7 +171,7 @@ namespace TEN::Entities::Vehicles
 	// TODO: Unused function?
 	void SetLaraOnMotorbike(ItemInfo* motorbikeItem, ItemInfo* laraItem)
 	{
-		auto* motorbike = GetMotorbikeInfo(motorbikeItem);
+		auto& motorbike = GetMotorbikeInfo(motorbikeItem);
 		auto* lara = GetLaraInfo(laraItem);
 
 		laraItem->Animation.AnimNumber = Objects[ID_MOTORBIKE_LARA_ANIMS].animIndex + MOTORBIKE_ANIM_IDLE;
@@ -186,13 +186,13 @@ namespace TEN::Entities::Vehicles
 		motorbikeItem->Animation.FrameNumber = laraItem->Animation.FrameNumber + (g_Level.Anims[ID_MOTORBIKE].frameBase - g_Level.Anims[ID_MOTORBIKE_LARA_ANIMS].frameBase);
 		motorbikeItem->HitPoints = 1;
 		motorbikeItem->Flags = short(IFLAG_KILLED); // hmm... maybe wrong name (it can be IFLAG_CODEBITS)?
-		motorbike->Revs = 0;
+		motorbike.Revs = 0;
 	}
 
 	void MotorbikePlayerCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 	{
 		auto* motorbikeItem = &g_Level.Items[itemNumber];
-		auto* motorbike = GetMotorbikeInfo(motorbikeItem);
+		auto& motorbike = GetMotorbikeInfo(motorbikeItem);
 		auto* lara = GetLaraInfo(laraItem);
 
 		if (laraItem->HitPoints < 0 || lara->Vehicle != NO_ITEM)
@@ -212,7 +212,7 @@ namespace TEN::Entities::Vehicles
 	{
 		auto* lara = GetLaraInfo(laraItem);
 		auto* motorbikeItem = &g_Level.Items[lara->Vehicle];
-		auto* motorbike = GetMotorbikeInfo(motorbikeItem);
+		auto& motorbike = GetMotorbikeInfo(motorbikeItem);
 
 		int collide = MotorbikeDynamics(motorbikeItem, laraItem);
 		int drive = -1;
@@ -254,40 +254,40 @@ namespace TEN::Entities::Vehicles
 			collide = 0;
 		}
 
-		if (motorbike->Velocity > 0 || motorbike->Revs)
+		if (motorbike.Velocity > 0 || motorbike.Revs)
 		{
-			motorbike->Pitch = pitch;
+			motorbike.Pitch = pitch;
 
-			if (motorbike->Pitch < -MOTORBIKE_PITCH_SLOWDOWN)
-				motorbike->Pitch = -MOTORBIKE_PITCH_SLOWDOWN;
-			else if (motorbike->Pitch > MOTORBIKE_PITCH_MAX)
-				motorbike->Pitch = MOTORBIKE_PITCH_MAX;
+			if (motorbike.Pitch < -MOTORBIKE_PITCH_SLOWDOWN)
+				motorbike.Pitch = -MOTORBIKE_PITCH_SLOWDOWN;
+			else if (motorbike.Pitch > MOTORBIKE_PITCH_MAX)
+				motorbike.Pitch = MOTORBIKE_PITCH_MAX;
 
-			SoundEffect(SFX_TR4_VEHICLE_MOTORBIKE_MOVING, &motorbikeItem->Pose, SoundEnvironment::Land, 0.7f + motorbike->Pitch / 24756.0f);
+			SoundEffect(SFX_TR4_VEHICLE_MOTORBIKE_MOVING, &motorbikeItem->Pose, SoundEnvironment::Land, 0.7f + motorbike.Pitch / 24756.0f);
 		}
 		else
 		{
 			if (drive != -1)
 			{
 				SoundEffect(SFX_TR4_VEHICLE_MOTORBIKE_IDLE, &motorbikeItem->Pose);
-				SoundEffect(SFX_TR4_VEHICLE_MOTORBIKE_MOVING, &motorbikeItem->Pose, SoundEnvironment::Land, 0.7f + motorbike->Pitch / 24756.0f, 0.5f);
+				SoundEffect(SFX_TR4_VEHICLE_MOTORBIKE_MOVING, &motorbikeItem->Pose, SoundEnvironment::Land, 0.7f + motorbike.Pitch / 24756.0f, 0.5f);
 			}
 
-			motorbike->Pitch = 0;
+			motorbike.Pitch = 0;
 		}
 
-		if (motorbike->Velocity < MOTORBIKE_ACCEL_1)
+		if (motorbike.Velocity < MOTORBIKE_ACCEL_1)
 			TriggerMotorbikeSmokeEffect(motorbikeItem, laraItem);
 
 		motorbikeItem->Floor = probe.Position.Floor;
 
-		int rotation = motorbike->Velocity / 4;
-		motorbike->LeftWheelRotation -= rotation;
-		motorbike->RightWheelsRotation -= rotation;
+		int rotation = motorbike.Velocity / 4;
+		motorbike.LeftWheelRotation -= rotation;
+		motorbike.RightWheelsRotation -= rotation;
 
 		int newY = motorbikeItem->Pose.Position.y;
 		motorbikeItem->Animation.Velocity.y = DoVehicleDynamics(probe.Position.Floor, motorbikeItem->Animation.Velocity.y, MOTORBIKE_BOUNCE_MIN, MOTORBIKE_KICK_MAX, motorbikeItem->Pose.Position.y);
-		motorbike->Velocity = DoVehicleWaterMovement(motorbikeItem, laraItem, motorbike->Velocity, MOTORBIKE_RADIUS, motorbike->TurnRate);
+		motorbike.Velocity = DoVehicleWaterMovement(motorbikeItem, laraItem, motorbike.Velocity, MOTORBIKE_RADIUS, motorbike.TurnRate);
 
 		int r1 = (pointFrontRight.Position.y + pointFrontLeft.Position.y) / 2;
 		int r2 = (pointFrontRight.Position.y + pointFrontLeft.Position.y) / 2;
@@ -338,7 +338,7 @@ namespace TEN::Entities::Vehicles
 
 		Camera.targetElevation = -ANGLE(30.0f);
 
-		if (motorbike->Flags & MOTORBIKE_FLAG_FALLING)
+		if (motorbike.Flags & MOTORBIKE_FLAG_FALLING)
 		{
 			if (motorbikeItem->Pose.Position.y == motorbikeItem->Floor)
 			{
@@ -349,7 +349,7 @@ namespace TEN::Entities::Vehicles
 
 		if (laraItem->Animation.ActiveState == MOTORBIKE_STATE_DISMOUNT)
 		{
-			motorbike->ExhaustStart = false;
+			motorbike.ExhaustStart = false;
 			DoMotorbikeDismount(laraItem);
 			return true;
 		}
@@ -360,75 +360,75 @@ namespace TEN::Entities::Vehicles
 
 	int MotorbikeUserControl(ItemInfo* motorbikeItem, ItemInfo* laraItem, int height, int* pitch)
 	{
-		auto* motorbike = GetMotorbikeInfo(motorbikeItem);
+		auto& motorbike = GetMotorbikeInfo(motorbikeItem);
 		auto* lara = GetLaraInfo(laraItem);
 
-		if (motorbike->LightPower < 127)
+		if (motorbike.LightPower < 127)
 		{
-			motorbike->LightPower += (GetRandomControl() & 7) + 3;
-			if (motorbike->LightPower > 127)
-				motorbike->LightPower = 127;
+			motorbike.LightPower += (GetRandomControl() & 7) + 3;
+			if (motorbike.LightPower > 127)
+				motorbike.LightPower = 127;
 		}
 
-		if (motorbike->Revs > 0x10)
+		if (motorbike.Revs > 0x10)
 		{
-			motorbike->Velocity += motorbike->Revs / 16;
-			motorbike->Revs -= motorbike->Revs / 80;
+			motorbike.Velocity += motorbike.Revs / 16;
+			motorbike.Revs -= motorbike.Revs / 80;
 		}
 		else
-			motorbike->Revs = 0;
+			motorbike.Revs = 0;
 
 		if ((TrInput & VEHICLE_IN_SPEED) &&
 			(TrInput & VEHICLE_IN_ACCELERATE) &&
-			(motorbike->Flags & MOTORBIKE_FLAG_NITRO))
+			(motorbike.Flags & MOTORBIKE_FLAG_NITRO))
 		{
 			if (lara->SprintEnergy > 10)
 			{
-				motorbike->Flags |= MOTORBIKE_FLAG_BOOST;
+				motorbike.Flags |= MOTORBIKE_FLAG_BOOST;
 				lara->SprintEnergy -= 2;
 
 				if (lara->SprintEnergy <= 0)
 				{
-					motorbike->Flags &= ~MOTORBIKE_FLAG_BOOST;
+					motorbike.Flags &= ~MOTORBIKE_FLAG_BOOST;
 					lara->SprintEnergy = 0;
 				}
 			}
 		}
 		else
-			motorbike->Flags &= ~MOTORBIKE_FLAG_BOOST;
+			motorbike.Flags &= ~MOTORBIKE_FLAG_BOOST;
 
 		if (motorbikeItem->Pose.Position.y >= (height - CLICK(1)))
 		{
-			if (!motorbike->Velocity && (TrInput & IN_LOOK))
+			if (!motorbike.Velocity && (TrInput & IN_LOOK))
 				LookUpDown(laraItem);
 
 			// Moving forward.
-			if (motorbike->Velocity > 0)
+			if (motorbike.Velocity > 0)
 			{
 				if (TrInput & VEHICLE_IN_LEFT)
 				{
-					if (motorbike->Velocity > MOTORBIKE_ACCEL_1)
-						motorbike->TurnRate -= MOTORBIKE_FORWARD_TURN_ANGLE;
+					if (motorbike.Velocity > MOTORBIKE_ACCEL_1)
+						motorbike.TurnRate -= MOTORBIKE_FORWARD_TURN_ANGLE;
 					else
-						motorbike->TurnRate -= MOTORBIKE_FORWARD_TURN_ANGLE * ((float)motorbike->Velocity / 8192.0f); // 45 deg.
+						motorbike.TurnRate -= MOTORBIKE_FORWARD_TURN_ANGLE * ((float)motorbike.Velocity / 8192.0f); // 45 deg.
 
-					if (motorbike->TurnRate < -MOTORBIKE_TURN_ANGLE_MAX)
-						motorbike->TurnRate = -MOTORBIKE_TURN_ANGLE_MAX;
+					if (motorbike.TurnRate < -MOTORBIKE_TURN_ANGLE_MAX)
+						motorbike.TurnRate = -MOTORBIKE_TURN_ANGLE_MAX;
 				}
 				else if (TrInput & VEHICLE_IN_RIGHT)
 				{
-					if (motorbike->Velocity > MOTORBIKE_ACCEL_1)
-						motorbike->TurnRate += MOTORBIKE_FORWARD_TURN_ANGLE;
+					if (motorbike.Velocity > MOTORBIKE_ACCEL_1)
+						motorbike.TurnRate += MOTORBIKE_FORWARD_TURN_ANGLE;
 					else
-						motorbike->TurnRate += MOTORBIKE_FORWARD_TURN_ANGLE * ((float)motorbike->Velocity / 8192.0f);
+						motorbike.TurnRate += MOTORBIKE_FORWARD_TURN_ANGLE * ((float)motorbike.Velocity / 8192.0f);
 
-					if (motorbike->TurnRate > MOTORBIKE_TURN_ANGLE_MAX)
-						motorbike->TurnRate = MOTORBIKE_TURN_ANGLE_MAX;
+					if (motorbike.TurnRate > MOTORBIKE_TURN_ANGLE_MAX)
+						motorbike.TurnRate = MOTORBIKE_TURN_ANGLE_MAX;
 				}
 			}
 			// Reversing.
-			else if (motorbike->Velocity < 0)
-				ModulateVehicleTurnRateY(motorbike->TurnRate, MOTORBIKE_BACK_TURN_ANGLE, -MOTORBIKE_TURN_ANGLE_MAX, MOTORBIKE_TURN_ANGLE_MAX, true);
+			else if (motorbike.Velocity < 0)
+				ModulateVehicleTurnRateY(motorbike.TurnRate, MOTORBIKE_BACK_TURN_ANGLE, -MOTORBIKE_TURN_ANGLE_MAX, MOTORBIKE_TURN_ANGLE_MAX, true);
 
 			if (TrInput & VEHICLE_IN_BRAKE)
 			{
@@ -441,53 +441,53 @@ namespace TEN::Entities::Vehicles
 
 			if (TrInput & VEHICLE_IN_BRAKE)
 			{
-				if (motorbike->Velocity < 0)
+				if (motorbike.Velocity < 0)
 				{
-					motorbike->Velocity += 3 * VEHICLE_VELOCITY_SCALE;
-					if (motorbike->Velocity > 0)
-						motorbike->Velocity = 0;
+					motorbike.Velocity += 3 * VEHICLE_VELOCITY_SCALE;
+					if (motorbike.Velocity > 0)
+						motorbike.Velocity = 0;
 				}
 				else
 				{
-					motorbike->Velocity -= 3 * VEHICLE_VELOCITY_SCALE;
-					if (motorbike->Velocity < 0)
-						motorbike->Velocity = 0;
+					motorbike.Velocity -= 3 * VEHICLE_VELOCITY_SCALE;
+					if (motorbike.Velocity < 0)
+						motorbike.Velocity = 0;
 				}
 			}
 			else if (TrInput & VEHICLE_IN_ACCELERATE)
 			{
-				if (motorbike->Velocity < MOTORBIKE_ACCEL_MAX)
+				if (motorbike.Velocity < MOTORBIKE_ACCEL_MAX)
 				{
-					if (motorbike->Velocity < MOTORBIKE_ACCEL_1)
-						motorbike->Velocity += ((MOTORBIKE_ACCEL_1 + MOTORBIKE_BACKING_VEL - motorbike->Velocity) / 8) + 8;
-					else if (motorbike->Velocity < MOTORBIKE_ACCEL_2)
-						motorbike->Velocity += ((MOTORBIKE_ACCEL_2 + MOTORBIKE_BACKING_VEL - motorbike->Velocity) / 16) + 4;
-					else if (motorbike->Velocity < MOTORBIKE_ACCEL_MAX)
-						motorbike->Velocity += ((MOTORBIKE_ACCEL_MAX - motorbike->Velocity) / 16) + 2;
+					if (motorbike.Velocity < MOTORBIKE_ACCEL_1)
+						motorbike.Velocity += ((MOTORBIKE_ACCEL_1 + MOTORBIKE_BACKING_VEL - motorbike.Velocity) / 8) + 8;
+					else if (motorbike.Velocity < MOTORBIKE_ACCEL_2)
+						motorbike.Velocity += ((MOTORBIKE_ACCEL_2 + MOTORBIKE_BACKING_VEL - motorbike.Velocity) / 16) + 4;
+					else if (motorbike.Velocity < MOTORBIKE_ACCEL_MAX)
+						motorbike.Velocity += ((MOTORBIKE_ACCEL_MAX - motorbike.Velocity) / 16) + 2;
 
-					if (motorbike->Flags & MOTORBIKE_FLAG_BOOST)
-						motorbike->Velocity += 1 * VEHICLE_VELOCITY_SCALE;
+					if (motorbike.Flags & MOTORBIKE_FLAG_BOOST)
+						motorbike.Velocity += 1 * VEHICLE_VELOCITY_SCALE;
 				}
 				else
-					motorbike->Velocity = MOTORBIKE_ACCEL_MAX;
+					motorbike.Velocity = MOTORBIKE_ACCEL_MAX;
 
 				// Apply friction according to turn.
-				motorbike->Velocity -= abs(motorbikeItem->Pose.Orientation.y - motorbike->MomentumAngle) / 64;
+				motorbike.Velocity -= abs(motorbikeItem->Pose.Orientation.y - motorbike.MomentumAngle) / 64;
 			}
-			else if (motorbike->Velocity > MOTORBIKE_FRICTION)
+			else if (motorbike.Velocity > MOTORBIKE_FRICTION)
 			{
-				motorbike->Velocity -= MOTORBIKE_FRICTION;
-				if (motorbike->Velocity < 0)
-					motorbike->Velocity = 0;
+				motorbike.Velocity -= MOTORBIKE_FRICTION;
+				if (motorbike.Velocity < 0)
+					motorbike.Velocity = 0;
 			}
-			else if (motorbike->Velocity < MOTORBIKE_FRICTION)
+			else if (motorbike.Velocity < MOTORBIKE_FRICTION)
 			{
-				motorbike->Velocity += MOTORBIKE_FRICTION;
-				if (motorbike->Velocity > 0)
-					motorbike->Velocity = 0;
+				motorbike.Velocity += MOTORBIKE_FRICTION;
+				if (motorbike.Velocity > 0)
+					motorbike.Velocity = 0;
 			}
 			else
-				motorbike->Velocity = 0;
+				motorbike.Velocity = 0;
 
 			if (laraItem->Animation.ActiveState == MOTORBIKE_STATE_MOVING_BACK)
 			{
@@ -497,29 +497,29 @@ namespace TEN::Entities::Vehicles
 				if (currentFrame >= frameBase + 24 &&
 					currentFrame <= frameBase + 29)
 				{
-					if (motorbike->Velocity > -MOTORBIKE_BIG_SLOWDOWN)
-						motorbike->Velocity -= MOTORBIKE_SLOWDOWN2;
+					if (motorbike.Velocity > -MOTORBIKE_BIG_SLOWDOWN)
+						motorbike.Velocity -= MOTORBIKE_SLOWDOWN2;
 				}
 			}
 
-			motorbikeItem->Animation.Velocity.z = motorbike->Velocity / VEHICLE_VELOCITY_SCALE;
+			motorbikeItem->Animation.Velocity.z = motorbike.Velocity / VEHICLE_VELOCITY_SCALE;
 
-			if (motorbike->EngineRevs > MOTORBIKE_ACCEL_MAX)
-				motorbike->EngineRevs = (GetRandomControl() & 0x1FF) + 0xBF00;
+			if (motorbike.EngineRevs > MOTORBIKE_ACCEL_MAX)
+				motorbike.EngineRevs = (GetRandomControl() & 0x1FF) + 0xBF00;
 
-			int newPitch = motorbike->Velocity;
-			if (motorbike->Velocity < 0)
+			int newPitch = motorbike.Velocity;
+			if (motorbike.Velocity < 0)
 				newPitch /= 2;
 
-			motorbike->EngineRevs += (abs(newPitch) - 0x2000 - motorbike->EngineRevs) / 8;
-			*pitch = motorbike->EngineRevs;
+			motorbike.EngineRevs += (abs(newPitch) - 0x2000 - motorbike.EngineRevs) / 8;
+			*pitch = motorbike.EngineRevs;
 		}
 		else
 		{
-			if (motorbike->EngineRevs < 0xFFFF)
-				motorbike->EngineRevs += (motorbike->EngineRevs - 0xFFFF) / 8;
+			if (motorbike.EngineRevs < 0xFFFF)
+				motorbike.EngineRevs += (motorbike.EngineRevs - 0xFFFF) / 8;
 
-			*pitch = motorbike->EngineRevs;
+			*pitch = motorbike.EngineRevs;
 		}
 
 		return 0;
@@ -527,7 +527,7 @@ namespace TEN::Entities::Vehicles
 
 	void AnimateMotorbike(ItemInfo* motorbikeItem, ItemInfo* laraItem, int collide, bool isDead)
 	{
-		auto* motorbike = GetMotorbikeInfo(motorbikeItem);
+		auto& motorbike = GetMotorbikeInfo(motorbikeItem);
 
 		if (isDead ||
 			motorbikeItem->Pose.Position.y == motorbikeItem->Floor ||
@@ -536,7 +536,7 @@ namespace TEN::Entities::Vehicles
 			laraItem->Animation.ActiveState == MOTORBIKE_STATE_NONE_6)
 		{
 			if (isDead || !collide ||
-				motorbike->Velocity <= (42 * VEHICLE_VELOCITY_SCALE) ||
+				motorbike.Velocity <= (42 * VEHICLE_VELOCITY_SCALE) ||
 				laraItem->Animation.ActiveState == MOTORBIKE_STATE_IMPACT_BACK ||
 				laraItem->Animation.ActiveState == MOTORBIKE_STATE_IMPACT_FRONT ||
 				laraItem->Animation.ActiveState == MOTORBIKE_STATE_IMPACT_LEFT ||
@@ -553,7 +553,7 @@ namespace TEN::Entities::Vehicles
 						if ((TrInput & VEHICLE_IN_RIGHT) && (TrInput & VEHICLE_IN_DISMOUNT))
 							dismount = true;
 
-						if (!dismount || motorbike->Velocity || motorbike->DisableDismount)
+						if (!dismount || motorbike.Velocity || motorbike.DisableDismount)
 						{
 							if (TrInput & VEHICLE_IN_ACCELERATE && !(TrInput & VEHICLE_IN_BRAKE))
 								laraItem->Animation.TargetState = MOTORBIKE_STATE_MOVING_FRONT;
@@ -571,12 +571,12 @@ namespace TEN::Entities::Vehicles
 				case MOTORBIKE_STATE_MOVING_FRONT:
 					if (isDead)
 					{
-						if (motorbike->Velocity <= MOTORBIKE_ACCEL_1)
+						if (motorbike.Velocity <= MOTORBIKE_ACCEL_1)
 							laraItem->Animation.TargetState = MOTORBIKE_STATE_DEATH;
 						else
 							laraItem->Animation.TargetState = MOTORBIKE_STATE_NONE_5;
 					}
-					else if ((motorbike->Velocity / VEHICLE_VELOCITY_SCALE) != 0)
+					else if ((motorbike.Velocity / VEHICLE_VELOCITY_SCALE) != 0)
 					{
 						if (TrInput & VEHICLE_IN_LEFT)
 							laraItem->Animation.TargetState = MOTORBIKE_STATE_MOVING_LEFT;
@@ -584,14 +584,14 @@ namespace TEN::Entities::Vehicles
 							laraItem->Animation.TargetState = MOTORBIKE_STATE_MOVING_RIGHT;
 						else if (TrInput & VEHICLE_IN_BRAKE)
 						{
-							if (motorbike->Velocity <= 0x5554) // 85.3f * VEHICLE_VELOCITY_SCALE
+							if (motorbike.Velocity <= 0x5554) // 85.3f * VEHICLE_VELOCITY_SCALE
 								laraItem->Animation.TargetState = MOTORBIKE_STATE_NONE_3;
 							else
 								laraItem->Animation.TargetState = MOTORBIKE_STATE_STOP;
 						}
-						else if (TrInput & VEHICLE_IN_REVERSE && motorbike->Velocity <= MOTORBIKE_BACKING_VEL)
+						else if (TrInput & VEHICLE_IN_REVERSE && motorbike.Velocity <= MOTORBIKE_BACKING_VEL)
 							laraItem->Animation.TargetState = MOTORBIKE_STATE_MOVING_BACK;
-						else if (motorbike->Velocity == 0)
+						else if (motorbike.Velocity == 0)
 							laraItem->Animation.TargetState = MOTORBIKE_STATE_IDLE;
 					}
 					else
@@ -600,14 +600,14 @@ namespace TEN::Entities::Vehicles
 					break;
 
 				case MOTORBIKE_STATE_MOVING_LEFT:
-					if ((motorbike->Velocity / VEHICLE_VELOCITY_SCALE) != 0)
+					if ((motorbike.Velocity / VEHICLE_VELOCITY_SCALE) != 0)
 					{
 						if (TrInput & VEHICLE_IN_RIGHT || !(TrInput & VEHICLE_IN_LEFT))
 							laraItem->Animation.TargetState = MOTORBIKE_STATE_MOVING_FRONT;
 					}
 					else
 						laraItem->Animation.TargetState = MOTORBIKE_STATE_IDLE;
-					if (motorbike->Velocity == 0)
+					if (motorbike.Velocity == 0)
 						laraItem->Animation.TargetState = MOTORBIKE_STATE_IDLE;
 
 					break;
@@ -621,7 +621,7 @@ namespace TEN::Entities::Vehicles
 					break;
 
 				case MOTORBIKE_STATE_MOVING_RIGHT:
-					if ((motorbike->Velocity / VEHICLE_VELOCITY_SCALE) != 0)
+					if ((motorbike.Velocity / VEHICLE_VELOCITY_SCALE) != 0)
 					{
 						if (TrInput & VEHICLE_IN_LEFT || !(TrInput & VEHICLE_IN_RIGHT))
 							laraItem->Animation.TargetState = MOTORBIKE_STATE_MOVING_FRONT;
@@ -629,7 +629,7 @@ namespace TEN::Entities::Vehicles
 					else
 						laraItem->Animation.TargetState = MOTORBIKE_STATE_IDLE;
 
-					if (motorbike->Velocity == 0)
+					if (motorbike.Velocity == 0)
 						laraItem->Animation.TargetState = MOTORBIKE_STATE_IDLE;
 
 					break;
@@ -637,7 +637,7 @@ namespace TEN::Entities::Vehicles
 				case MOTORBIKE_STATE_NONE_3:
 				case MOTORBIKE_STATE_STOP:
 				case MOTORBIKE_STATE_ACCELERATE:
-					if ((motorbike->Velocity / VEHICLE_VELOCITY_SCALE) != 0)
+					if ((motorbike.Velocity / VEHICLE_VELOCITY_SCALE) != 0)
 					{
 						if (TrInput & VEHICLE_IN_LEFT)
 							laraItem->Animation.TargetState = MOTORBIKE_STATE_MOVING_LEFT;
@@ -665,7 +665,7 @@ namespace TEN::Entities::Vehicles
 						}
 					}
 					else if (motorbikeItem->Animation.Velocity.y > 220)
-						motorbike->Flags |= MOTORBIKE_FLAG_FALLING;
+						motorbike.Flags |= MOTORBIKE_FLAG_FALLING;
 
 					break;
 
@@ -716,7 +716,7 @@ namespace TEN::Entities::Vehicles
 		}
 		else
 		{
-			if (motorbike->Velocity >= 0)
+			if (motorbike.Velocity >= 0)
 				laraItem->Animation.AnimNumber = Objects[ID_MOTORBIKE_LARA_ANIMS].animIndex + MOTORBIKE_ANIM_START_JUMP;
 			else
 				laraItem->Animation.AnimNumber = Objects[ID_MOTORBIKE_LARA_ANIMS].animIndex + MOTORBIKE_ANIM_START_FALL;
@@ -729,7 +729,7 @@ namespace TEN::Entities::Vehicles
 
 	void DoMotorbikeMount(ItemInfo* motorbikeItem, ItemInfo* laraItem, VehicleMountType mountType)
 	{
-		auto* motorbike = GetMotorbikeInfo(motorbikeItem);
+		auto& motorbike = GetMotorbikeInfo(motorbikeItem);
 		auto* lara = GetLaraInfo(laraItem);
 
 		switch (mountType)
@@ -747,7 +747,7 @@ namespace TEN::Entities::Vehicles
 			{
 				laraItem->Animation.AnimNumber = Objects[ID_MOTORBIKE_LARA_ANIMS].animIndex + MOTORBIKE_ANIM_UNLOCK;
 				g_Gui.SetInventoryItemChosen(NO_ITEM);
-				motorbike->Flags |= MOTORBIKE_FLAG_NITRO;
+				motorbike.Flags |= MOTORBIKE_FLAG_NITRO;
 			}
 			else
 				laraItem->Animation.AnimNumber = Objects[ID_MOTORBIKE_LARA_ANIMS].animIndex + MOTORBIKE_ANIM_MOUNT;*/
@@ -767,8 +767,8 @@ namespace TEN::Entities::Vehicles
 		lara->HitDirection = -1;
 		motorbikeItem->Collidable = true;
 		motorbikeItem->HitPoints = 1;
-		motorbike->Revs = 0;
-		motorbike->LightPower = 0;
+		motorbike.Revs = 0;
+		motorbike.LightPower = 0;
 
 		AnimateItem(laraItem);
 	}
@@ -836,10 +836,10 @@ namespace TEN::Entities::Vehicles
 
 	int MotorbikeDynamics(ItemInfo* motorbikeItem, ItemInfo* laraItem)
 	{
-		auto* motorbike = GetMotorbikeInfo(motorbikeItem);
+		auto& motorbike = GetMotorbikeInfo(motorbikeItem);
 		auto* lara = GetLaraInfo(laraItem);
 
-		motorbike->DisableDismount = false;
+		motorbike.DisableDismount = false;
 
 		// Get point/room collision at vehicle corners (+ back).
 		auto prevPointFrontLeft = GetVehicleCollision(motorbikeItem, MOTORBIKE_FRONT, -MOTORBIKE_SIDE, true);
@@ -852,20 +852,20 @@ namespace TEN::Entities::Vehicles
 
 		if (motorbikeItem->Pose.Position.y <= (motorbikeItem->Floor - 8))
 		{
-			ResetVehicleTurnRateY(motorbike->TurnRate, ANGLE(0.5f));
-			motorbikeItem->Pose.Orientation.y += motorbike->TurnRate + motorbike->ExtraRotation;
+			ResetVehicleTurnRateY(motorbike.TurnRate, ANGLE(0.5f));
+			motorbikeItem->Pose.Orientation.y += motorbike.TurnRate + motorbike.ExtraRotation;
 
-			motorbike->MomentumAngle += (motorbikeItem->Pose.Orientation.y - motorbike->MomentumAngle) / 32;
+			motorbike.MomentumAngle += (motorbikeItem->Pose.Orientation.y - motorbike.MomentumAngle) / 32;
 		}
 		else
 		{
-			ResetVehicleTurnRateY(motorbike->TurnRate, ANGLE(1.0f));
-			motorbikeItem->Pose.Orientation.y += motorbike->TurnRate + motorbike->ExtraRotation;
+			ResetVehicleTurnRateY(motorbike.TurnRate, ANGLE(1.0f));
+			motorbikeItem->Pose.Orientation.y += motorbike.TurnRate + motorbike.ExtraRotation;
 
-			short rotation = motorbikeItem->Pose.Orientation.y - motorbike->MomentumAngle;
-			short momentum = MOTORBIKE_MOMENTUM_TURN_ANGLE_MIN - ((2 * motorbike->Velocity) / SECTOR(1));
+			short rotation = motorbikeItem->Pose.Orientation.y - motorbike.MomentumAngle;
+			short momentum = MOTORBIKE_MOMENTUM_TURN_ANGLE_MIN - ((2 * motorbike.Velocity) / SECTOR(1));
 
-			if (!(TrInput & VEHICLE_IN_ACCELERATE) && motorbike->Velocity > 0)
+			if (!(TrInput & VEHICLE_IN_ACCELERATE) && motorbike.Velocity > 0)
 				momentum += momentum / 2;
 
 			if (rotation < -MOTORBIKE_MOMENTUM_TURN_ANGLE_MAX)
@@ -873,23 +873,23 @@ namespace TEN::Entities::Vehicles
 				if (rotation < -MOTORBIKE_MOMENTUM_TURN_ANGLE_MAX2)
 				{
 					rotation = -MOTORBIKE_MOMENTUM_TURN_ANGLE_MAX2;
-					motorbike->MomentumAngle = motorbikeItem->Pose.Orientation.y - rotation;
+					motorbike.MomentumAngle = motorbikeItem->Pose.Orientation.y - rotation;
 				}
 				else
-					motorbike->MomentumAngle -= momentum;
+					motorbike.MomentumAngle -= momentum;
 			}
 			else if (rotation > MOTORBIKE_MOMENTUM_TURN_ANGLE_MAX)
 			{
 				if (rotation > MOTORBIKE_MOMENTUM_TURN_ANGLE_MAX2)
 				{
 					rotation = MOTORBIKE_MOMENTUM_TURN_ANGLE_MAX2;
-					motorbike->MomentumAngle = motorbikeItem->Pose.Orientation.y - rotation;
+					motorbike.MomentumAngle = motorbikeItem->Pose.Orientation.y - rotation;
 				}
 				else
-					motorbike->MomentumAngle += momentum;
+					motorbike.MomentumAngle += momentum;
 			}
 			else
-				motorbike->MomentumAngle = motorbikeItem->Pose.Orientation.y;
+				motorbike.MomentumAngle = motorbikeItem->Pose.Orientation.y;
 		}
 
 		int floorHeight = GetCollision(motorbikeItem).Position.Floor;
@@ -899,7 +899,7 @@ namespace TEN::Entities::Vehicles
 		else
 			speed = motorbikeItem->Animation.Velocity.z;
 
-		TranslateItem(motorbikeItem, motorbike->MomentumAngle, speed);
+		TranslateItem(motorbikeItem, motorbike.MomentumAngle, speed);
 
 		if (motorbikeItem->Pose.Position.y >= floorHeight)
 		{
@@ -910,16 +910,16 @@ namespace TEN::Entities::Vehicles
 				if (angleX < 0)
 					angleX2 = -angleX;
 				if (angleX2 > 24)
-					motorbike->DisableDismount = true;
+					motorbike.DisableDismount = true;
 				angleX *= 16;
-				motorbike->Velocity -= angleX;
+				motorbike.Velocity -= angleX;
 			}
 
 			short angleZ = MOTORBIKE_SLIP * phd_sin(motorbikeItem->Pose.Orientation.z);
 			if (abs(angleZ) > 32)
 			{
 				short angle, absAngle;
-				motorbike->DisableDismount = true;
+				motorbike.DisableDismount = true;
 
 				if (angleZ >= 0)
 					angle = motorbikeItem->Pose.Orientation.y + ANGLE(90.0f);
@@ -931,18 +931,18 @@ namespace TEN::Entities::Vehicles
 			}
 		}
 
-		if (motorbike->Velocity <= MOTORBIKE_ACCEL || (motorbike->Flags & MOTORBIKE_FLAG_BOOST))
+		if (motorbike.Velocity <= MOTORBIKE_ACCEL || (motorbike.Flags & MOTORBIKE_FLAG_BOOST))
 		{
-			if (motorbike->Velocity <= MOTORBIKE_ACCEL_MAX)
+			if (motorbike.Velocity <= MOTORBIKE_ACCEL_MAX)
 			{
-				if (motorbike->Velocity < -MOTORBIKE_BIG_SLOWDOWN)
-					motorbike->Velocity = -MOTORBIKE_BIG_SLOWDOWN;
+				if (motorbike.Velocity < -MOTORBIKE_BIG_SLOWDOWN)
+					motorbike.Velocity = -MOTORBIKE_BIG_SLOWDOWN;
 			}
 			else
-				motorbike->Velocity = MOTORBIKE_ACCEL_MAX;
+				motorbike.Velocity = MOTORBIKE_ACCEL_MAX;
 		}
 		else
-			motorbike->Velocity -= MOTORBIKE_SLOWDOWN1;
+			motorbike.Velocity -= MOTORBIKE_SLOWDOWN1;
 
 		// Store old 2D position to determine movement delta later.
 		auto moved = Vector3i(motorbikeItem->Pose.Position.x, 0, motorbikeItem->Pose.Position.z);
@@ -992,35 +992,35 @@ namespace TEN::Entities::Vehicles
 		if (floorHeight < (motorbikeItem->Pose.Position.y - CLICK(1)))
 			DoVehicleShift(motorbikeItem, motorbikeItem->Pose.Position, oldPos);
 
-		if (!motorbike->Velocity)
+		if (!motorbike.Velocity)
 			rot2 = 0;
 
-		motorbike->WallShiftRotation = (motorbike->WallShiftRotation + rot2) / 2;
-		if (abs(motorbike->WallShiftRotation) < 2)
-			motorbike->WallShiftRotation = 0;
+		motorbike.WallShiftRotation = (motorbike.WallShiftRotation + rot2) / 2;
+		if (abs(motorbike.WallShiftRotation) < 2)
+			motorbike.WallShiftRotation = 0;
 
-		if (abs(motorbike->WallShiftRotation - motorbike->ExtraRotation) >= 4)
-			motorbike->ExtraRotation += ((motorbike->WallShiftRotation - motorbike->ExtraRotation) / 4);
+		if (abs(motorbike.WallShiftRotation - motorbike.ExtraRotation) >= 4)
+			motorbike.ExtraRotation += ((motorbike.WallShiftRotation - motorbike.ExtraRotation) / 4);
 		else
-			motorbike->ExtraRotation = motorbike->WallShiftRotation;
+			motorbike.ExtraRotation = motorbike.WallShiftRotation;
 
 		auto impactType = GetMotorbikeCollisionAnim(motorbikeItem, &moved);
 		if (impactType)
 		{
-			int newSpeed = ((motorbikeItem->Pose.Position.z - oldPos.z) * phd_cos(motorbike->MomentumAngle) + (motorbikeItem->Pose.Position.x - oldPos.x) * phd_sin(motorbike->MomentumAngle)) * 256;
+			int newSpeed = ((motorbikeItem->Pose.Position.z - oldPos.z) * phd_cos(motorbike.MomentumAngle) + (motorbikeItem->Pose.Position.x - oldPos.x) * phd_sin(motorbike.MomentumAngle)) * 256;
 			if (&g_Level.Items[lara->Vehicle] == motorbikeItem &&
-				motorbike->Velocity >= MOTORBIKE_ACCEL && newSpeed < (motorbike->Velocity - 10))
+				motorbike.Velocity >= MOTORBIKE_ACCEL && newSpeed < (motorbike.Velocity - 10))
 			{
-				DoDamage(laraItem, (motorbike->Velocity - newSpeed) / 128);
+				DoDamage(laraItem, (motorbike.Velocity - newSpeed) / 128);
 			}
 
-			if (motorbike->Velocity > 0 && newSpeed < motorbike->Velocity)
-				motorbike->Velocity = (newSpeed < 0) ? 0 : newSpeed;
-			else if (motorbike->Velocity < 0 && newSpeed > motorbike->Velocity)
-				motorbike->Velocity = (newSpeed > 0) ? 0 : newSpeed;
+			if (motorbike.Velocity > 0 && newSpeed < motorbike.Velocity)
+				motorbike.Velocity = (newSpeed < 0) ? 0 : newSpeed;
+			else if (motorbike.Velocity < 0 && newSpeed > motorbike.Velocity)
+				motorbike.Velocity = (newSpeed > 0) ? 0 : newSpeed;
 
-			if (motorbike->Velocity < -MOTORBIKE_BIG_SLOWDOWN)
-				motorbike->Velocity = -MOTORBIKE_BIG_SLOWDOWN;
+			if (motorbike.Velocity < -MOTORBIKE_BIG_SLOWDOWN)
+				motorbike.Velocity = -MOTORBIKE_BIG_SLOWDOWN;
 		}
 
 		return impactType;
@@ -1028,15 +1028,15 @@ namespace TEN::Entities::Vehicles
 
 	void DrawMotorbikeLight(ItemInfo* motorbikeItem)
 	{
-		auto* motorbike = GetMotorbikeInfo(motorbikeItem);
+		auto& motorbike = GetMotorbikeInfo(motorbikeItem);
 
-		if (motorbike->LightPower <= 0)
+		if (motorbike.LightPower <= 0)
 			return;
 
 		auto start = GetJointPosition(motorbikeItem, 0, Vector3i(0, -470, 1836));
 		auto target = GetJointPosition(motorbikeItem,  0, Vector3i(0, -470, 20780));
 
-		int random = (motorbike->LightPower * 2) - (GetRandomControl() & 0xF);
+		int random = (motorbike.LightPower * 2) - (GetRandomControl() & 0xF);
 
 		// TODO: Use target as direction vector for spotlight.
 		TriggerDynamicLight(start.x, start.y, start.z, 8, random, random / 2, 0);
@@ -1044,7 +1044,7 @@ namespace TEN::Entities::Vehicles
 
 	void TriggerMotorbikeSmokeEffect(ItemInfo* motorbikeItem, ItemInfo* laraItem)
 	{
-		auto* motorbike = GetMotorbikeInfo(motorbikeItem);
+		auto& motorbike = GetMotorbikeInfo(motorbikeItem);
 		auto* lara = GetLaraInfo(laraItem);
 
 		if (lara->Vehicle == NO_ITEM)
@@ -1061,7 +1061,7 @@ namespace TEN::Entities::Vehicles
 				return;
 			}
 
-			if (motorbike->ExhaustStart >= 16)
+			if (motorbike.ExhaustStart >= 16)
 			{
 				if (GetRandomControl() & 3)
 					speed = 0;
@@ -1069,7 +1069,7 @@ namespace TEN::Entities::Vehicles
 					speed = ((GetRandomControl() & 0xF) + (GetRandomControl() & 0x10)) * 64;
 			}
 			else
-				speed = ((GetRandomControl() & 0xF) + (GetRandomControl() & 0x10) + 2 * motorbike->ExhaustStart) * 64;
+				speed = ((GetRandomControl() & 0xF) + (GetRandomControl() & 0x10) + 2 * motorbike.ExhaustStart) * 64;
 
 			TriggerMotorbikeExhaustSmokeEffect(pos.x, pos.y, pos.z, motorbikeItem->Pose.Orientation.y - ANGLE(180.0f), speed, false);
 		}

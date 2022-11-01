@@ -7,7 +7,7 @@ struct ItemInfo;
 
 namespace TEN::Entities::Vehicles
 {
-	MotorbikeInfo* GetMotorbikeInfo(ItemInfo* motorbikeItem);
+	MotorbikeInfo& GetMotorbikeInfo(ItemInfo* motorbikeItem);
 	void InitialiseMotorbike(short itemNumber);
 
 	int GetMotorbikeCollisionAnim(ItemInfo* motorbikeItem, Vector3i* pos);
