@@ -133,7 +133,7 @@ namespace TEN::Entities::Generic
 			player.Control.HandStatus == HandStatus::Free) ||
 			(player.Control.IsMoving && player.InteractedItem == itemNumber))
 		{
-			// Mount at bottom.
+			// Mount from front.
 			if (TestPlayerEntityInteract(&ladderItem, laraItem, LadderMountFrontBounds))
 			{
 				if (!laraItem->OffsetBlend.IsActive)
@@ -146,7 +146,7 @@ namespace TEN::Entities::Generic
 					auto target = ladderItem.Pose.Position.ToVector3() + pos;
 					auto offset = Vector3i(target) - laraItem->Pose.Position;
 
-					laraItem->SetOffsetBlend(offset.ToVector3(), ladderItem.Pose.Orientation - laraItem->Pose.Orientation, 0.4f);
+					laraItem->SetOffsetBlend(offset.ToVector3(), ladderItem.Pose.Orientation - laraItem->Pose.Orientation);
 					SetAnimation(laraItem, LA_LADDER_MOUNT_BOTTOM);
 					player.Control.IsMoving = false;
 					player.Control.HandStatus = HandStatus::Busy;
