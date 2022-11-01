@@ -961,7 +961,7 @@ bool IsStandingWeapon(ItemInfo* item, LaraWeaponType weaponType)
 	return (CheckLaraWeaponType(weaponType, standingWeaponTypes) || GetLaraInfo(item)->Weapons[(int)weaponType].HasLasersight);
 }
 
-bool IsVaultState(LaraState state)
+bool IsVaultState(int state)
 {
 	static const std::vector<int> vaultStates
 	{
@@ -976,7 +976,7 @@ bool IsVaultState(LaraState state)
 	return TestState(state, vaultStates);
 }
 
-bool IsJumpState(LaraState state)
+bool IsJumpState(int state)
 {
 	static const std::vector<int> jumpStates
 	{
@@ -994,7 +994,7 @@ bool IsJumpState(LaraState state)
 	return TestState(state, jumpStates);
 }
 
-bool IsRunJumpQueueableState(LaraState state)
+bool IsRunJumpQueueableState(int state)
 {
 	static const std::vector<int> runningJumpQueuableStates
 	{
@@ -1006,7 +1006,7 @@ bool IsRunJumpQueueableState(LaraState state)
 	return TestState(state, runningJumpQueuableStates);
 }
 
-bool IsRunJumpCountableState(LaraState state)
+bool IsRunJumpCountableState(int state)
 {
 	static const std::vector<int> runningJumpTimerStates
 	{
