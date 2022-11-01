@@ -142,7 +142,7 @@ namespace TEN::Gui
 		int GetInventoryItemChosen();
 		int GetEnterInventory();
 		int GetLastInventoryItem();
-		SettingsData GetCurrentSettings();
+		SettingsData& GetCurrentSettings();
 		short GetLoadSaveSelection();
 
 		// Setters

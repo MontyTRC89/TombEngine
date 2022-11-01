@@ -139,7 +139,7 @@ namespace TEN::Gui
 		return !(IsHeld(In::Select) || IsHeld(In::Action));
 	}
 
-	SettingsData GuiController::GetCurrentSettings()
+	SettingsData& GuiController::GetCurrentSettings()
 	{
 		return CurrentSettings;
 	}
@@ -518,7 +518,7 @@ namespace TEN::Gui
 				CurrentSettings.Configuration.Width = screenResolution.x;
 				CurrentSettings.Configuration.Height = screenResolution.y;
 
-				memcpy(&g_Configuration, &CurrentSettings.Configuration, sizeof(GameConfiguration));
+				g_Configuration = CurrentSettings.Configuration;
 				SaveConfiguration();
 
 				// Reset screen and go back.
@@ -668,7 +668,7 @@ namespace TEN::Gui
 
 	void GuiController::BackupOptions()
 	{
-		memcpy(&CurrentSettings.Configuration, &g_Configuration, sizeof(GameConfiguration));
+		CurrentSettings.Configuration = g_Configuration;
 	}
 
 	void GuiController::HandleOptionsInput()
@@ -852,7 +852,7 @@ namespace TEN::Gui
 				bool indicateRumble = CurrentSettings.Configuration.EnableRumble && !g_Configuration.EnableRumble;
 
 				// Save the configuration.
-				memcpy(&g_Configuration, &CurrentSettings.Configuration, sizeof(GameConfiguration));
+				g_Configuration = CurrentSettings.Configuration;
 				SaveConfiguration();
 
 				// Rumble if setting was changed.
@@ -2881,6 +2881,9 @@ namespace TEN::Gui
 		bool exitLoop = false;
 		while (!exitLoop)
 		{
+			if (ThreadEnded)
+				return false;
+
 			OBJLIST_SPACING = PHD_CENTER_X / 2;
 
 			if (CompassNeedleAngle != 1024)
@@ -2894,9 +2897,6 @@ namespace TEN::Gui
 				SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
 				exitLoop = true;
 			}
-
-			if (ThreadEnded)
-				return true;
 
 			DrawInventory();
 			DrawCompass(item);
