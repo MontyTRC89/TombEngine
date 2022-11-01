@@ -361,6 +361,7 @@ void DrawShotgun(ItemInfo* laraItem, LaraWeaponType weaponType)
 		item->Animation.ActiveState = WEAPON_STATE_DRAW;
 		item->Status = ITEM_ACTIVE;
 		item->RoomNumber = NO_ROOM;
+		item->Pose = laraItem->Pose;
 
 		lara->RightArm.FrameBase = Objects[item->ObjectNumber].frameBase;
 		lara->LeftArm.FrameBase = lara->RightArm.FrameBase;
@@ -392,6 +393,7 @@ void UndrawShotgun(ItemInfo* laraItem, LaraWeaponType weaponType)
 
 	auto* item = &g_Level.Items[lara->Control.Weapon.WeaponItem];
 	item->Animation.TargetState = WEAPON_STATE_UNDRAW;
+	item->Pose = laraItem->Pose;
 
 	AnimateItem(item);
 

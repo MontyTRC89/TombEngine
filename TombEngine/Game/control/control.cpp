@@ -542,8 +542,6 @@ GameStatus DoLevel(int index, std::string const& ambient, bool loadFromSavegame)
 		Camera.target.y = LaraItem->Pose.Position.y;
 		Camera.target.z = LaraItem->Pose.Position.z;
 
-		int x = Lara.Control.Weapon.WeaponItem;
-
 		RequiredStartPos = false;
 		InitialiseGame = false;
 		g_GameFlow->SelectedSaveGame = 0;
