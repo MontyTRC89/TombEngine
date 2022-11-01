@@ -399,7 +399,7 @@ InventoryObject inventry_objects_list[INVENTORY_TABLE_SIZE] =
 	{ID_EXAMINE8_COMBO2, 14, 0.5f, 0, 0, 0, OPT_USE | OPT_COMBINABLE, STRING_LOAD_GAME, NO_JOINT_BITS, INV_ROT_Y},
 };
 
-SettingsData GuiController::GetCurrentSettings()
+SettingsData& GuiController::GetCurrentSettings()
 {
 	return CurrentSettings;
 }
