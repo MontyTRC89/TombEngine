@@ -2669,7 +2669,7 @@ bool CanDismountLadderTop(ItemInfo* item, CollisionInfo* coll)
 	return false;
 }
 
-bool CanDismountLadderBottom(ItemInfo* item, CollisionInfo* coll)
+bool CanDismountLadderBack(ItemInfo* item, CollisionInfo* coll)
 {
 	static constexpr auto probeDist		  = BLOCK(3, 16);
 	static constexpr auto lowerFloorBound = BLOCK(2, 9);

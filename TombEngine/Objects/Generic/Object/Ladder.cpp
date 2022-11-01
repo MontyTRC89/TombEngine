@@ -131,7 +131,7 @@ namespace TEN::Entities::Generic
 					auto relativeOffset = (targetPos - laraItem->Pose.Position).ToVector3();
 					laraItem->SetOffsetBlend(relativeOffset, ladderItem.Pose.Orientation - laraItem->Pose.Orientation);
 
-					SetAnimation(laraItem, LA_LADDER_MOUNT_BOTTOM);
+					SetAnimation(laraItem, LA_LADDER_MOUNT_FRONT);
 					player.Control.IsMoving = false;
 					player.Control.HandStatus = HandStatus::Busy;
 				}
