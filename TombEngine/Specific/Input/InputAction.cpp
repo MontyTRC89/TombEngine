@@ -44,7 +44,7 @@ namespace TEN::Input
 		return ((Value != 0.0f) && (TimeActive >= delayInFrameTime));
 	}
 
-	// To avoid desync on the second pulse, ensure initialDelayInSec is a multiple of delayInSec.
+	// NOTE: To avoid a stutter on the second pulse, ensure initialDelayInSec is a multiple of delayInSec.
 	bool InputAction::IsPulsed(float delayInSec, float initialDelayInSec) const
 	{
 		if (this->IsClicked())
