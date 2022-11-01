@@ -89,11 +89,11 @@ namespace TEN::Entities::Vehicles
 	void  DoVehicleFlareDiscard(ItemInfo* laraItem);
 
 	short ModulateVehicleTurnRate(short turnRate, short accelRate, short minTurnRate, short maxTurnRate, float axisCoeff, bool invert);
-	void  ModulateVehicleTurnRateX(short& outTurnRate, short accelRate, short minTurnRate, short maxTurnRate, bool invert = true);
-	void  ModulateVehicleTurnRateY(short& outTurnRate, short accelRate, short minTurnRate, short maxTurnRate, bool invert = false);
+	void  ModulateVehicleTurnRateX(short& turnRate, short accelRate, short minTurnRate, short maxTurnRate, bool invert = true);
+	void  ModulateVehicleTurnRateY(short& turnRate, short accelRate, short minTurnRate, short maxTurnRate, bool invert = false);
 	short ResetVehicleTurnRate(short turnRate, short decelRate);
-	void  ResetVehicleTurnRateX(short& outTurnRate, short decelRate);
-	void  ResetVehicleTurnRateY(short& outTurnRate, short decelRate);
+	void  ResetVehicleTurnRateX(short& turnRate, short decelRate);
+	void  ResetVehicleTurnRateY(short& turnRate, short decelRate);
 	void  ModulateVehicleLean(ItemInfo* vehicleItem, short baseRate, short maxAngle);
 	void  ResetVehicleLean(ItemInfo* vehicleItem, float alpha = 0.5f);
 }

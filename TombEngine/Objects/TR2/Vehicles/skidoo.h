@@ -7,7 +7,7 @@ struct ItemInfo;
 
 namespace TEN::Entities::Vehicles
 {
-	SkidooInfo* GetSkidooInfo(ItemInfo* skidooItem);
+	SkidooInfo& GetSkidooInfo(ItemInfo* skidooItem);
 	void InitialiseSkidoo(short itemNumber);
 
 	bool SkidooControl(ItemInfo* laraItem, CollisionInfo* coll);

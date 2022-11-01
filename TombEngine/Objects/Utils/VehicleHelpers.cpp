@@ -469,7 +469,7 @@ namespace TEN::Entities::Vehicles
 		return 0;
 	}
 
-	float DoVehicleWaterMovement(ItemInfo* vehicleItem, ItemInfo* laraItem, float currentVelocity, int radius, short& outTurnRate)
+	float DoVehicleWaterMovement(ItemInfo* vehicleItem, ItemInfo* laraItem, float currentVelocity, int radius, short& turnRate)
 	{
 		if (TestEnvironment(ENV_FLAG_WATER, vehicleItem) ||
 			TestEnvironment(ENV_FLAG_SWAMP, vehicleItem))
@@ -498,10 +498,10 @@ namespace TEN::Entities::Vehicles
 						TEN::Effects::TriggerSpeedboatFoam(vehicleItem, Vector3(0, -waterDepth / 2.0f, -radius));
 				}
 
-				if (outTurnRate)
+				if (turnRate)
 				{
 					float coeff = isWater ? VEHICLE_WATER_TURN_RATE_COEFF : VEHICLE_SWAMP_TURN_RATE_COEFF;
-					outTurnRate -= outTurnRate * ((waterDepth / VEHICLE_WATER_HEIGHT_MAX) / coeff);
+					turnRate -= turnRate * ((waterDepth / VEHICLE_WATER_HEIGHT_MAX) / coeff);
 				}
 			}
 			else
@@ -545,14 +545,14 @@ namespace TEN::Entities::Vehicles
 		return (newTurnRate * sign);
 	}
 
-	void ModulateVehicleTurnRateX(short& outTurnRate, short accelRate, short minTurnRate, short maxTurnRate, bool invert)
+	void ModulateVehicleTurnRateX(short& turnRate, short accelRate, short minTurnRate, short maxTurnRate, bool invert)
 	{
-		outTurnRate = ModulateVehicleTurnRate(outTurnRate, accelRate, minTurnRate, maxTurnRate, AxisMap[InputAxis::MoveVertical], invert);
+		turnRate = ModulateVehicleTurnRate(turnRate, accelRate, minTurnRate, maxTurnRate, AxisMap[InputAxis::MoveVertical], invert);
 	}
 
-	void ModulateVehicleTurnRateY(short& outTurnRate, short accelRate, short minTurnRate, short maxTurnRate, bool invert)
+	void ModulateVehicleTurnRateY(short& turnRate, short accelRate, short minTurnRate, short maxTurnRate, bool invert)
 	{
-		outTurnRate = ModulateVehicleTurnRate(outTurnRate, accelRate, minTurnRate, maxTurnRate, AxisMap[InputAxis::MoveHorizontal], invert);
+		turnRate = ModulateVehicleTurnRate(turnRate, accelRate, minTurnRate, maxTurnRate, AxisMap[InputAxis::MoveHorizontal], invert);
 	}
 
 	short ResetVehicleTurnRate(short turnRate, short decelRate)
@@ -565,14 +565,14 @@ namespace TEN::Entities::Vehicles
 			return 0;
 	}
 
-	void ResetVehicleTurnRateX(short& outTurnRate, short decelRate)
+	void ResetVehicleTurnRateX(short& turnRate, short decelRate)
 	{
-		outTurnRate = ResetVehicleTurnRate(outTurnRate, decelRate);
+		turnRate = ResetVehicleTurnRate(turnRate, decelRate);
 	}
 
-	void ResetVehicleTurnRateY(short& outTurnRate, short decelRate)
+	void ResetVehicleTurnRateY(short& turnRate, short decelRate)
 	{
-		outTurnRate = ResetVehicleTurnRate(outTurnRate, decelRate);
+		turnRate = ResetVehicleTurnRate(turnRate, decelRate);
 	}
 	
 	void ModulateVehicleLean(ItemInfo* vehicleItem, short baseRate, short maxAngle)

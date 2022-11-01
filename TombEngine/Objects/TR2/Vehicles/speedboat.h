@@ -7,7 +7,7 @@ struct ItemInfo;
 
 namespace TEN::Entities::Vehicles
 {
-	SpeedboatInfo* GetSpeedboatInfo(ItemInfo* speedboatItem);
+	SpeedboatInfo& GetSpeedboatInfo(ItemInfo* speedboatItem);
 	void InitialiseSpeedboat(short itemNumber);
 
 	void SpeedboatPlayerCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);
