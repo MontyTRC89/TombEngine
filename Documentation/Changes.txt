@@ -23,6 +23,7 @@ Version 1.0.3
 * Fix left arm lock while picking up an item with a flare in hand.
 * Fix potential crashes when exiting game.
 * Fix secret soundtrack (which filename number should be the last) not playing.
+* Fix distance fog not applying properly to additive and subtractive surfaces.
 
 
 Version 1.0.2
