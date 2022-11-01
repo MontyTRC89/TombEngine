@@ -6,6 +6,7 @@
 #include "./AlphaTestBuffer.hlsli"
 #include "./AnimatedTextures.hlsli"
 #include "./Shadows.hlsli"
+#include "./Fog.hlsli"
 
 cbuffer MiscBuffer : register(b3)
 {
@@ -26,8 +27,9 @@ struct PixelShaderInput
 	float2 UV: TEXCOORD0;
 	float4 Color: COLOR;
 	float3x3 TBN : TBN;
-	float Fog : FOG;
+	float Fog : FOGG;
 	float4 PositionCopy : TEXCOORD1;
+	unsigned int BlendMode : BLENDMODE;
 };
 
 Texture2D Texture : register(t0);
@@ -71,6 +73,7 @@ PixelShaderInput VS(VertexShaderInput input)
 	
 	output.Position = screenPos;
 	output.Normal = input.Normal;
+	output.BlendMode = input.BlendMode;
 	output.Color = float4(col, input.Color.w);
 	output.PositionCopy = screenPos;
 
@@ -183,8 +186,7 @@ PixelShaderOutput PS(PixelShaderInput input)
 		float4(input.PositionCopy.z / input.PositionCopy.w, 0.0f, 0.0f, 1.0f) :
 		float4(0.0f, 0.0f, 0.0f, 0.0f);
 
-	if (FogMaxDistance != 0)
-		output.Color.xyz = lerp(output.Color.xyz, FogColor.xyz, input.Fog);
+	output.Color = ApplyFog(output.Color, FogColor, input.Fog, input.BlendMode);
 
 	return output;
 }

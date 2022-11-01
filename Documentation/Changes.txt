@@ -21,7 +21,7 @@ Version 1.0.3
 * Fix underwater door and double doors continuing to be interactable after opening.
 * Fix ability to turn when aligning to an object while standing.
 * Fix left arm lock while picking up an item with a flare in hand.
-* Fix potential crashes when exiting game through title flyby.
+* Fix potential crashes when exiting game.
 
 
 Version 1.0.2

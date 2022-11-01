@@ -1,4 +1,5 @@
-struct VertexShaderInput {
+struct VertexShaderInput 
+{
 	float3 Position: POSITION0;
 	float3 Normal: NORMAL0;
 	float2 UV: TEXCOORD0;
@@ -9,5 +10,6 @@ struct VertexShaderInput {
 	float Bone: BLENDINDICES;
 	unsigned int PolyIndex : POLYINDEX;
 	unsigned int Index: DRAWINDEX;
+	unsigned int BlendMode: BLENDMODE;
 	int Hash : HASH;
 };
