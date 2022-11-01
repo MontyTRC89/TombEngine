@@ -435,6 +435,8 @@ void WinClose()
 
 	Sound_DeInit();
 	DeinitialiseInput();
+
+	TENLog("Cleaning up and exiting...", LogLevel::Info);
 	
 	delete g_GameScript;
 	g_GameScript = nullptr;
@@ -451,4 +453,5 @@ void WinClose()
 	ShutdownTENLog();
 
 	CoUninitialize();
+
 }
