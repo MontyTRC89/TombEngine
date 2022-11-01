@@ -59,7 +59,7 @@ bool TestPlayerEntityInteract(ItemInfo* item, ItemInfo* laraItem, const Interact
 	return true;
 }
 
-bool AlignPlayerToEntity(ItemInfo* item, ItemInfo* laraItem, const Vector3i& posOffset, const EulerAngles& orientOffset, bool doSnap)
+bool AlignPlayerToEntity(ItemInfo* item, ItemInfo* laraItem, const Vector3i& posOffset, const EulerAngles& orientOffset, bool doSnapAlign)
 {
 	static constexpr auto maxFloorHeight = STEPUP_HEIGHT;
 	static const auto	  turnRate		 = ANGLE(2.0f);
@@ -81,7 +81,7 @@ bool AlignPlayerToEntity(ItemInfo* item, ItemInfo* laraItem, const Vector3i& pos
 	
 	if (canAlign)
 	{
-		if (doSnap)
+		if (doSnapAlign)
 		{
 			laraItem->Pose = toPose;
 			return true;

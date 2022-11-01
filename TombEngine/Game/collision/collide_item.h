@@ -28,7 +28,7 @@ struct InteractionBounds
 
 // TODO: Refactor this family of functions into a more comprehensive position alignment system. -- Sezz 2022.10.30
 bool TestPlayerEntityInteract(ItemInfo* item, ItemInfo* laraItem, const InteractionBounds& interactBounds);
-bool AlignPlayerToEntity(ItemInfo* item, ItemInfo* laraItem, const Vector3i& posOffset = Vector3i::Zero, const EulerAngles& orientOffset = EulerAngles::Zero, bool doSnap = false);
+bool AlignPlayerToEntity(ItemInfo* item, ItemInfo* laraItem, const Vector3i& posOffset = Vector3i::Zero, const EulerAngles& orientOffset = EulerAngles::Zero, bool doSnapAlign = false);
 bool AlignPlayerToPose(ItemInfo* item, const Pose& toPose, float velocity, short turnRate);
 
 void GenericSphereBoxCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);
