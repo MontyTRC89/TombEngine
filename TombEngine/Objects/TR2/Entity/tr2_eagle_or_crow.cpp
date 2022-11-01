@@ -64,10 +64,10 @@ namespace TEN::Entities::Creatures::TR2
 			case 4:
 				if (item->Pose.Position.y > item->Floor)
 				{
-					item->Pose.Position.y = item->Floor;
-					item->Animation.Velocity.y = 0;
+					item->Animation.Velocity.y = 0.0f;
 					item->Animation.IsAirborne = false;
 					item->Animation.TargetState = 5;
+					item->Pose.Position.y = item->Floor;
 				}
 
 				break;
@@ -88,6 +88,7 @@ namespace TEN::Entities::Creatures::TR2
 				item->Animation.IsAirborne = true;
 				break;
 			}
+
 			item->Pose.Orientation.x = 0;
 		}
 		else
@@ -146,7 +147,7 @@ namespace TEN::Entities::Creatures::TR2
 				break;
 
 			case 6:
-				if (!creature->Flags && item->TouchBits)
+				if (!creature->Flags && item->TouchBits.TestAny())
 				{
 					DoDamage(creature->Enemy, 20);
 

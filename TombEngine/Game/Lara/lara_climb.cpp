@@ -421,36 +421,36 @@ short GetClimbFlags(FloorInfo* floor)
 	short result = 0;
 
 	if (floor->Flags.ClimbEast)
-		result |= (short)CLIMB_DIRECTION::East;
+		result |= (short)ClimbDirection::East;
 
 	if (floor->Flags.ClimbWest)
-		result |= (short)CLIMB_DIRECTION::West;
+		result |= (short)ClimbDirection::West;
 
 	if (floor->Flags.ClimbNorth)
-		result |= (short)CLIMB_DIRECTION::North;
+		result |= (short)ClimbDirection::North;
 
 	if (floor->Flags.ClimbSouth)
-		result |= (short)CLIMB_DIRECTION::South;
+		result |= (short)ClimbDirection::South;
 
 	return result;
 }
 
-CLIMB_DIRECTION GetClimbDirection(short angle)
+ClimbDirection GetClimbDirection(short angle)
 {
 	switch (GetQuadrant(angle))
 	{
 	default:
 	case NORTH:
-		return CLIMB_DIRECTION::North;
+		return ClimbDirection::North;
 
 	case EAST:
-		return CLIMB_DIRECTION::East;
+		return ClimbDirection::East;
 
 	case SOUTH:
-		return CLIMB_DIRECTION::South;
+		return ClimbDirection::South;
 
 	case WEST:
-		return CLIMB_DIRECTION::West;
+		return ClimbDirection::West;
 	}
 }
 
@@ -619,8 +619,8 @@ int LaraClimbRightCornerTest(ItemInfo* item, CollisionInfo* coll)
 	}
 	else
 	{
-		x = item->Pose.Position.x ^ (item->Pose.Position.x ^ item->Pose.Position.z) & (SECTOR(1) - 1);
-		z = item->Pose.Position.z ^ (item->Pose.Position.x ^ item->Pose.Position.z) & (SECTOR(1) - 1);
+		x = item->Pose.Position.x ^ (item->Pose.Position.x ^ item->Pose.Position.z) & WALL_MASK;
+		z = item->Pose.Position.z ^ (item->Pose.Position.x ^ item->Pose.Position.z) & WALL_MASK;
 	}
 
 	int shift = 0;
@@ -703,13 +703,13 @@ int LaraClimbLeftCornerTest(ItemInfo* item, CollisionInfo* coll)
 
 	if (angle && angle != SOUTH)
 	{
-		x = item->Pose.Position.x ^ (item->Pose.Position.x ^ item->Pose.Position.z) & (SECTOR(1) - 1);
-		z = item->Pose.Position.z ^ (item->Pose.Position.x ^ item->Pose.Position.z) & (SECTOR(1) - 1);
+		x = item->Pose.Position.x ^ (item->Pose.Position.x ^ item->Pose.Position.z) & WALL_MASK;
+		z = item->Pose.Position.z ^ (item->Pose.Position.x ^ item->Pose.Position.z) & WALL_MASK;
 	}
 	else
 	{
-		x = (item->Pose.Position.x & -SECTOR(1)) - (item->Pose.Position.z & (SECTOR(1) - 1)) + SECTOR(1);
-		z = (item->Pose.Position.z & -SECTOR(1)) - (item->Pose.Position.x & (SECTOR(1) - 1)) + SECTOR(1);
+		x = (item->Pose.Position.x & -SECTOR(1)) - (item->Pose.Position.z & WALL_MASK) + SECTOR(1);
+		z = (item->Pose.Position.z & -SECTOR(1)) - (item->Pose.Position.x & WALL_MASK) + SECTOR(1);
 	}
 
 	int shift = 0;
@@ -733,24 +733,24 @@ int LaraClimbLeftCornerTest(ItemInfo* item, CollisionInfo* coll)
 		switch (angle)
 		{
 		case NORTH:
-			x = (item->Pose.Position.x ^ ((item->Pose.Position.z ^ item->Pose.Position.x) & (SECTOR(1) - 1))) - SECTOR(1);
-			z = ((item->Pose.Position.z ^ item->Pose.Position.x) & (SECTOR(1) - 1)) ^ (item->Pose.Position.z + SECTOR(1));
+			x = (item->Pose.Position.x ^ ((item->Pose.Position.z ^ item->Pose.Position.x) & WALL_MASK)) - SECTOR(1);
+			z = ((item->Pose.Position.z ^ item->Pose.Position.x) & WALL_MASK) ^ (item->Pose.Position.z + SECTOR(1));
 			break;
 
 		case SOUTH:
-			x = ((item->Pose.Position.z ^ item->Pose.Position.x) & (SECTOR(1) - 1)) ^ (item->Pose.Position.x + SECTOR(1));
-			z = ((item->Pose.Position.z ^ item->Pose.Position.x) & (SECTOR(1) - 1)) ^ (item->Pose.Position.z - SECTOR(1));
+			x = ((item->Pose.Position.z ^ item->Pose.Position.x) & WALL_MASK) ^ (item->Pose.Position.x + SECTOR(1));
+			z = ((item->Pose.Position.z ^ item->Pose.Position.x) & WALL_MASK) ^ (item->Pose.Position.z - SECTOR(1));
 			break;
 
 		case EAST:
-			x = ((item->Pose.Position.x + SECTOR(1)) & -SECTOR(1)) - (item->Pose.Position.z & (SECTOR(1) - 1)) + SECTOR(1);
-			z = ((item->Pose.Position.z + SECTOR(1)) & -SECTOR(1)) - (item->Pose.Position.x & (SECTOR(1) - 1)) + SECTOR(1);
+			x = ((item->Pose.Position.x + SECTOR(1)) & -SECTOR(1)) - (item->Pose.Position.z & WALL_MASK) + SECTOR(1);
+			z = ((item->Pose.Position.z + SECTOR(1)) & -SECTOR(1)) - (item->Pose.Position.x & WALL_MASK) + SECTOR(1);
 			break;
 
 		case WEST:
 		default:
-			x = (item->Pose.Position.x & -SECTOR(1)) - (item->Pose.Position.z & (SECTOR(1) - 1));
-			z = (item->Pose.Position.z & -SECTOR(1)) - (item->Pose.Position.x & (SECTOR(1) - 1));
+			x = (item->Pose.Position.x & -SECTOR(1)) - (item->Pose.Position.z & WALL_MASK);
+			z = (item->Pose.Position.z & -SECTOR(1)) - (item->Pose.Position.x & WALL_MASK);
 			break;
 		}
 

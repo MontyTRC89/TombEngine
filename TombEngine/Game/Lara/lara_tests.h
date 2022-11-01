@@ -83,6 +83,8 @@ CrawlVaultTestResult TestLaraCrawlExitJump(ItemInfo* item, CollisionInfo* coll);
 CrawlVaultTestResult TestLaraCrawlVault(ItemInfo* item, CollisionInfo* coll);
 bool TestLaraCrawlToHang(ItemInfo* item, CollisionInfo* coll);
 
+bool TestLaraLedgeJump(ItemInfo* item, CollisionInfo* coll);
+
 WaterClimbOutTestResult TestLaraWaterClimbOutTolerance(ItemInfo* item, CollisionInfo* coll, WaterClimbOutTestSetup testSetup);
 WaterClimbOutTestResult TestLaraWaterClimbOutDownStep(ItemInfo* item, CollisionInfo* coll);
 WaterClimbOutTestResult TestLaraWaterClimbOutDownStepToCrouch(ItemInfo* item, CollisionInfo* coll);

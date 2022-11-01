@@ -9,7 +9,6 @@
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
 #include "Specific/level.h"
-#include "Specific/prng.h"
 #include "Specific/setup.h"
 
 using namespace TEN::Math::Random;
@@ -35,7 +34,7 @@ namespace TEN::Entities::Creatures::TR1
 	#define BEAR_RUN_TURN_RATE_MAX	ANGLE(5.0f)
 
 	const auto BearBite = BiteInfo(Vector3(0.0f, 96.0f, 335.0f), 14);
-	const vector<int> BearAttackJoints = { 2, 3, 5, 6, 14, 17 };
+	const vector<unsigned int> BearAttackJoints = { 2, 3, 5, 6, 14, 17 };
 
 	enum BearState
 	{
@@ -117,7 +116,7 @@ namespace TEN::Entities::Creatures::TR1
 			}
 			case BEAR_STATE_DEATH:
 			{
-				if (creature->Flags && item->TestBits(JointBitType::Touch, BearAttackJoints))
+				if (creature->Flags && item->TouchBits.Test(BearAttackJoints))
 				{
 					DoDamage(creature->Enemy, BEAR_SLAM_DAMAGE);
 					creature->Flags = 0;
@@ -167,7 +166,7 @@ namespace TEN::Entities::Creatures::TR1
 			case BEAR_STATE_STROLL:
 				creature->MaxTurn = BEAR_WALK_TURN_RATE_MAX;
 
-				if (isLaraDead && item->TestBits(JointBitType::Touch, BearAttackJoints) && AI.ahead)
+				if (isLaraDead && item->TouchBits.Test(BearAttackJoints) && AI.ahead)
 					item->Animation.TargetState = BEAR_STATE_IDLE;
 				else if (creature->Mood != MoodType::Bored)
 				{
@@ -187,7 +186,7 @@ namespace TEN::Entities::Creatures::TR1
 			case BEAR_STATE_RUN_FORWARD:
 				creature->MaxTurn = BEAR_RUN_TURN_RATE_MAX;
 
-				if (item->TestBits(JointBitType::Touch, BearAttackJoints))
+				if (item->TouchBits.Test(BearAttackJoints))
 					DoDamage(creature->Enemy, BEAR_RUN_DAMAGE);
 
 				if (creature->Mood == MoodType::Bored || isLaraDead)
@@ -230,7 +229,7 @@ namespace TEN::Entities::Creatures::TR1
 					item->Animation.TargetState = BEAR_STATE_REAR;
 					item->Animation.RequiredState = BEAR_STATE_STROLL;
 				}
-				else if (AI.ahead && item->TestBits(JointBitType::Touch, BearAttackJoints))
+				else if (AI.ahead && item->TouchBits.Test(BearAttackJoints))
 					item->Animation.TargetState = BEAR_STATE_REAR;
 				else if (creature->Mood == MoodType::Escape)
 				{
@@ -252,7 +251,7 @@ namespace TEN::Entities::Creatures::TR1
 
 			case BEAR_STATE_REAR_SWIPE_ATTACK:
 				if (!item->Animation.RequiredState &&
-					item->TestBits(JointBitType::Touch, BearAttackJoints))
+					item->TouchBits.Test(BearAttackJoints))
 				{
 					DoDamage(creature->Enemy, BEAR_PAT_DAMAGE);
 					item->Animation.RequiredState = BEAR_STATE_REAR;
@@ -262,7 +261,7 @@ namespace TEN::Entities::Creatures::TR1
 
 			case BEAR_STATE_RUN_SWIPE_ATTACK:
 				if (!item->Animation.RequiredState &&
-					item->TestBits(JointBitType::Touch, BearAttackJoints))
+					item->TouchBits.Test(BearAttackJoints))
 				{
 					DoDamage(creature->Enemy, BEAR_ATTACK_DAMAGE);
 					CreatureEffect(item, BearBite, DoBloodSplat);

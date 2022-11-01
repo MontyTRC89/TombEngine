@@ -11,6 +11,7 @@
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_swim.h"
 #include "Game/Lara/lara_tests.h"
+#include "Objects/Sink.h"
 #include "Specific/input.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
@@ -442,16 +443,18 @@ void LaraSnapToHeight(ItemInfo* item, CollisionInfo* coll)
 
 void GetLaraDeadlyBounds()
 {
-	BOUNDING_BOX tBounds;
-	auto* bounds = GetBoundsAccurate(LaraItem);
-	phd_RotBoundingBoxNoPersp(&LaraItem->Pose, bounds, &tBounds);
+	auto bounds = GameBoundingBox(LaraItem);
+	auto tBounds = GameBoundingBox::Zero;
+	tBounds.RotateNoPersp(LaraItem->Pose.Orientation, bounds);
 
-	DeadlyBounds[0] = LaraItem->Pose.Position.x + tBounds.X1;
-	DeadlyBounds[1] = LaraItem->Pose.Position.x + tBounds.X2;
-	DeadlyBounds[2] = LaraItem->Pose.Position.y + tBounds.Y1;
-	DeadlyBounds[3] = LaraItem->Pose.Position.y + tBounds.Y2;
-	DeadlyBounds[4] = LaraItem->Pose.Position.z + tBounds.Z1;
-	DeadlyBounds[5] = LaraItem->Pose.Position.z + tBounds.Z2;
+	DeadlyBounds = GameBoundingBox(
+		LaraItem->Pose.Position.x + tBounds.X1,
+		LaraItem->Pose.Position.x + tBounds.X2,
+		LaraItem->Pose.Position.y + tBounds.Y1,
+		LaraItem->Pose.Position.y + tBounds.Y2,
+		LaraItem->Pose.Position.z + tBounds.Z1,
+		LaraItem->Pose.Position.z + tBounds.Z2
+	);
 }
 
 void LaraJumpCollision(ItemInfo* item, CollisionInfo* coll, short moveAngle)
@@ -474,7 +477,7 @@ void LaraSurfaceCollision(ItemInfo* item, CollisionInfo* coll)
 
 	coll->Setup.ForwardAngle = lara->Control.MoveAngle;
 
-	GetCollisionInfo(coll, item, Vector3Int(0, LARA_HEIGHT_TREAD, 0));
+	GetCollisionInfo(coll, item, Vector3i(0, LARA_HEIGHT_TREAD, 0));
 	ShiftItem(item, coll);
 
 	if (coll->CollisionType & (CT_FRONT | CT_TOP | CT_TOP_FRONT | CT_CLAMP) ||
@@ -498,7 +501,7 @@ void LaraSwimCollision(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	auto oldPose = item->Pose;
+	auto prevPose = item->Pose;
 
 	if (item->Pose.Orientation.x < -ANGLE(90.0f) ||
 		item->Pose.Orientation.x > ANGLE(90.0f))
@@ -522,15 +525,15 @@ void LaraSwimCollision(ItemInfo* item, CollisionInfo* coll)
 	coll->Setup.UpperFloorBound = -CLICK(0.25f);
 	coll->Setup.Height = height;
 
-	GetCollisionInfo(coll, item, Vector3Int(0, height / 2, 0));
+	GetCollisionInfo(coll, item, Vector3i(0, height / 2, 0));
 
 	auto c1 = *coll;
 	c1.Setup.ForwardAngle += ANGLE(45.0f);
-	GetCollisionInfo(&c1, item, Vector3Int(0, height / 2, 0));
+	GetCollisionInfo(&c1, item, Vector3i(0, height / 2, 0));
 
 	auto c2 = *coll;
 	c2.Setup.ForwardAngle -= ANGLE(45.0f);
-	GetCollisionInfo(&c2, item, Vector3Int(0, height / 2, 0));
+	GetCollisionInfo(&c2, item, Vector3i(0, height / 2, 0));
 
 	ShiftItem(item, coll);
 
@@ -605,23 +608,23 @@ void LaraSwimCollision(ItemInfo* item, CollisionInfo* coll)
 		break;
 
 	case CT_CLAMP:
+		item->Animation.Velocity.y = 0.0f;
 		item->Pose.Position = coll->Setup.OldPosition;
-		item->Animation.Velocity.y = 0;
 		flag = 2;
 		break;
 	}
 
-	if (coll->Middle.Floor < 0 && coll->Middle.Floor != NO_HEIGHT)
+	if (coll->Middle.Floor < 0 &&
+		coll->Middle.Floor != NO_HEIGHT)
 	{
 		flag = 1;
 		item->Pose.Orientation.x += ANGLE(1.0f);
 		item->Pose.Position.y += coll->Middle.Floor;
 	}
 
-	if (
-		oldPose.Position == item->Pose.Position &&
-		oldPose.Orientation.x == item->Pose.Orientation.x &&
-		oldPose.Orientation.y == item->Pose.Orientation.y ||
+	if ((prevPose.Position == item->Pose.Position &&
+		prevPose.Orientation.x == item->Pose.Orientation.x &&
+		prevPose.Orientation.y == item->Pose.Orientation.y) ||
 		flag != 1)
 	{
 		if (flag == 2)
@@ -638,13 +641,13 @@ void LaraWaterCurrent(ItemInfo* item, CollisionInfo* coll)
 
 	if (lara->WaterCurrentActive)
 	{
-		auto* sink = &g_Level.Sinks[lara->WaterCurrentActive - 1];
+		const auto& sink = g_Level.Sinks[lara->WaterCurrentActive - 1];
 
-		short angle = mGetAngle(sink->Position.x, sink->Position.z, item->Pose.Position.x, item->Pose.Position.z);
-		lara->WaterCurrentPull.x += (sink->Strength * SECTOR(1) * phd_sin(angle - ANGLE(90.0f)) - lara->WaterCurrentPull.x) / 16;
-		lara->WaterCurrentPull.z += (sink->Strength * SECTOR(1) * phd_cos(angle - ANGLE(90.0f)) - lara->WaterCurrentPull.z) / 16;
+		short headingAngle = Geometry::GetOrientToPoint(item->Pose.Position.ToVector3(), sink.Position.ToVector3()).y;
+		lara->WaterCurrentPull.x += ((sink.Strength * SECTOR(1) * phd_sin(headingAngle)) - lara->WaterCurrentPull.x) / 16;
+		lara->WaterCurrentPull.z += ((sink.Strength * SECTOR(1) * phd_cos(headingAngle)) - lara->WaterCurrentPull.z) / 16;
 
-		item->Pose.Position.y += (sink->Position.y - item->Pose.Position.y) >> 4;
+		item->Pose.Position.y += (sink.Position.y - item->Pose.Position.y) / 16;
 	}
 	else
 	{
@@ -672,13 +675,13 @@ void LaraWaterCurrent(ItemInfo* item, CollisionInfo* coll)
 			return;
 	}
 
-	item->Pose.Position.x += lara->WaterCurrentPull.x >> 8;
-	item->Pose.Position.z += lara->WaterCurrentPull.z >> 8;
+	item->Pose.Position.x += lara->WaterCurrentPull.x / 256;
+	item->Pose.Position.z += lara->WaterCurrentPull.z / 256;
 	lara->WaterCurrentActive = 0;
 
 	coll->Setup.ForwardAngle = phd_atan(item->Pose.Position.z - coll->Setup.OldPosition.z, item->Pose.Position.x - coll->Setup.OldPosition.x);
 	coll->Setup.Height = LARA_HEIGHT_CRAWL;
-	GetCollisionInfo(coll, item, Vector3Int(0, 200, 0));
+	GetCollisionInfo(coll, item, Vector3i(0, 200, 0));
 
 	if (coll->CollisionType == CT_FRONT)
 	{
@@ -719,22 +722,25 @@ bool TestLaraHitCeiling(CollisionInfo* coll)
 void SetLaraHitCeiling(ItemInfo* item, CollisionInfo* coll)
 {
 	item->Animation.IsAirborne = false;
-	item->Animation.Velocity.z = 0;
-	item->Animation.Velocity.y = 0;
+	item->Animation.Velocity.y = 0.0f;
+	item->Animation.Velocity.z = 0.0f;
 	item->Pose.Position = coll->Setup.OldPosition;
 }
 
-bool TestLaraObjectCollision(ItemInfo* item, short angle, int distance, int height, int side)
+bool TestLaraObjectCollision(ItemInfo* item, short headingAngle, int forward, int down, int right)
 {
-	auto oldPose = item->Pose;
-	int sideSign = copysign(1, side);
+	auto prevPose = item->Pose;
+	int sideSign = copysign(1, right);
 
-	item->Pose.Position.x += phd_sin(item->Pose.Orientation.y + angle) * distance + phd_cos(angle + ANGLE(90.0f) * sideSign) * abs(side);
-	item->Pose.Position.y += height;
-	item->Pose.Position.z += phd_cos(item->Pose.Orientation.y + angle) * distance + phd_sin(angle + ANGLE(90.0f) * sideSign) * abs(side);
+	// TODO: Use this line?
+	//item->Pose.Translate(headingAngle, forward, down, right);
 
-	auto result = GetCollidedObjects(item, LARA_RADIUS, true, CollidedItems, CollidedMeshes, 0);
+	item->Pose.Position.x += phd_sin(item->Pose.Orientation.y + headingAngle) * forward + phd_cos(headingAngle + ANGLE(90.0f) * sideSign) * abs(right);
+	item->Pose.Position.y += down;
+	item->Pose.Position.z += phd_cos(item->Pose.Orientation.y + headingAngle) * forward + phd_sin(headingAngle + ANGLE(90.0f) * sideSign) * abs(right);
 
-	item->Pose = oldPose;
+	bool result = GetCollidedObjects(item, LARA_RADIUS, true, CollidedItems, CollidedMeshes, 0);
+
+	item->Pose = prevPose;
 	return result;
 }

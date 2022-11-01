@@ -72,6 +72,6 @@ struct HangClimbTestSetup
 struct CornerTestResult
 {
 	bool Success;
-	PHD_3DPOS ProbeResult;
-	PHD_3DPOS RealPositionResult;
+	Pose ProbeResult;
+	Pose RealPositionResult;
 };

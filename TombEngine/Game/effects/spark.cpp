@@ -3,8 +3,8 @@
 #include "Game/effects/spark.h"
 
 #include <array>
-#include "Specific/trmath.h"
-#include "Specific/prng.h"
+#include "Math/Math.h"
+#include "Math/Random.h"
 
 using namespace DirectX::SimpleMath;
 using namespace TEN::Math::Random;
@@ -45,7 +45,7 @@ namespace TEN::Effects::Spark
 		return SparkParticles[0];
 	}
 
-	void TriggerFlareSparkParticles(Vector3Int* pos, Vector3Int* vel, CVECTOR* color, int room)
+	void TriggerFlareSparkParticles(Vector3i* pos, Vector3i* vel, ColorData* color, int room)
 	{
 		auto& s = GetFreeSparkParticle();
 		s = {};
@@ -56,13 +56,13 @@ namespace TEN::Effects::Spark
 		s.width = 8.0f;
 		s.height = 48.0f;
 		s.room = room;
-		s.pos = Vector3(pos->x, pos->y, pos->z);
-		Vector3 v = Vector3(vel->x, vel->y, vel->z);
+		s.pos = pos->ToVector3();
+		auto v = vel->ToVector3();
 		v += Vector3(GenerateFloat(-64, 64), GenerateFloat(-64, 64), GenerateFloat(-64, 64));
 		v.Normalize(v);
 		s.velocity = v *GenerateFloat(17,24);
 		s.sourceColor = Vector4(1, 1, 1, 1);
-		s.destinationColor = Vector4(color->r/255.0f,color->g/255.0f,color->b/255.0f,1);
+		s.destinationColor = Vector4(color->r / 255.0f, color->g / 255.0f, color->b / 255.0f, 1.0f);
 		s.active = true;
 	}
 
@@ -78,7 +78,7 @@ namespace TEN::Effects::Spark
 			s.gravity = 1.2f;
 			s.width = 8.0f;
 			s.height = 64.0f;
-			s.room = pos->roomNumber;
+			s.room = pos->RoomNumber;
 			s.pos = Vector3(pos->x, pos->y, pos->z);
 			float ang = TO_RAD(angle);
 			Vector3 v = Vector3(sin(ang + GenerateFloat(-PI / 2, PI / 2)), GenerateFloat(-1, 1), cos(ang + GenerateFloat(-PI / 2, PI / 2)));
@@ -91,7 +91,7 @@ namespace TEN::Effects::Spark
 		}
 	}
 
-	void TriggerFrictionSpark(GameVector* pos, Vector3Shrt angle, float length, int num)
+	void TriggerFrictionSpark(GameVector* pos, EulerAngles angle, float length, int num)
 	{
 		for (int i = 0; i < num; i++) 
 		{
@@ -103,7 +103,7 @@ namespace TEN::Effects::Spark
 			s.gravity = 0.0f;
 			s.height = length;
 			s.width = GenerateFloat(16.0f, 32.0f);
-			s.room = pos->roomNumber;
+			s.room = pos->RoomNumber;
 			s.pos = Vector3(pos->x + GenerateFloat(-16, 16), pos->y + GenerateFloat(-16, 16), pos->z + GenerateFloat(-16, 16));
 			float ang = TO_RAD(angle.y);
 			float vAng = -TO_RAD(angle.x);

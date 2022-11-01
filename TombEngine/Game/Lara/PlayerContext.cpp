@@ -432,7 +432,7 @@ namespace TEN::Entities::Player
 			auto pointColl = GetCollision(PlayerItemPtr);
 
 			short aspectAngle = GetLaraSlideDirection(PlayerItemPtr, PlayerCollPtr);
-			short steepnessAngle = GetSurfaceSteepnessAngle(pointColl.FloorTilt);
+			short steepnessAngle = Geometry::GetSurfaceSteepnessAngle(pointColl.FloorTilt);
 			return (abs(short(PlayerCollPtr->Setup.ForwardAngle - aspectAngle)) <= abs(steepnessAngle));
 		}
 

@@ -10,7 +10,7 @@
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
 #include "Specific/level.h"
-#include "Specific/prng.h"
+#include "Math/Random.h"
 #include "Specific/setup.h"
 
 using namespace TEN::Math::Random;
@@ -25,7 +25,7 @@ namespace TEN::Entities::Creatures::TR5
 
 	const auto LionBite1 = BiteInfo(Vector3(2.0f, -10.0f, 250.0f), 21);
 	const auto LionBite2 = BiteInfo(Vector3(-2.0f, -10.0f, 132.0f), 21);
-	const vector<int> LionAttackJoints = { 3, 6, 21 };
+	const vector<unsigned int> LionAttackJoints = { 3, 6, 21 };
 
 	enum LionState
 	{
@@ -121,7 +121,7 @@ namespace TEN::Entities::Creatures::TR5
 
 					if (AI.ahead)
 					{
-						if (item->TestBits(JointBitType::Touch, LionAttackJoints))
+						if (item->TouchBits.Test(LionAttackJoints))
 						{
 							item->Animation.TargetState = LION_STATE_BITE_ATTACK;
 							break;
@@ -161,7 +161,7 @@ namespace TEN::Entities::Creatures::TR5
 					{
 						if (AI.ahead && AI.distance < LION_POUNCE_ATTACK_RANGE)
 							item->Animation.TargetState = LION_STATE_IDLE;
-						else if (item->TestBits(JointBitType::Touch, LionAttackJoints) && AI.ahead)
+						else if (item->TouchBits.Test(LionAttackJoints) && AI.ahead)
 							item->Animation.TargetState = LION_STATE_IDLE;
 						else if (creature->Mood != MoodType::Escape)
 						{
@@ -179,7 +179,7 @@ namespace TEN::Entities::Creatures::TR5
 
 				case LION_STATE_POUNCE_ATTACK:
 					if (!item->Animation.RequiredState &&
-						item->TestBits(JointBitType::Touch, LionAttackJoints))
+						item->TouchBits.Test(LionAttackJoints))
 					{
 						DoDamage(creature->Enemy, LION_POUNCE_ATTACK_DAMAGE);
 						CreatureEffect2(item, LionBite1, 10, item->Pose.Orientation.y, DoBloodSplat);
@@ -192,7 +192,7 @@ namespace TEN::Entities::Creatures::TR5
 					creature->MaxTurn = ANGLE(1.0f);
 
 					if (!item->Animation.RequiredState &&
-						item->TestBits(JointBitType::Touch, LionAttackJoints))
+						item->TouchBits.Test(LionAttackJoints))
 					{
 						DoDamage(creature->Enemy, LION_BITE_ATTACK_DAMAGE);
 						CreatureEffect2(item, LionBite2, 10, item->Pose.Orientation.y, DoBloodSplat);

@@ -10,7 +10,7 @@
 #include "Game/misc.h"
 #include "Game/people.h"
 #include "Specific/level.h"
-#include "Specific/prng.h"
+#include "Math/Random.h"
 #include "Specific/setup.h"
 
 using namespace TEN::Math::Random;
@@ -168,7 +168,7 @@ namespace TEN::Entities::Creatures::TR1
 					break;
 				}
 
-				if (AI.ahead && item->TestBits(JointBitType::Touch, BigRatBite.meshNum))
+				if (AI.ahead && item->TouchBits.Test(BigRatBite.meshNum))
 					item->Animation.TargetState = BIG_RAT_STATE_IDLE;
 				else if (AI.bite && AI.distance < BIG_RAT_POUNCE_ATTACK_RANGE)
 					item->Animation.TargetState = BIG_RAT_STATE_POUNCE_ATTACK;
@@ -182,7 +182,7 @@ namespace TEN::Entities::Creatures::TR1
 
 			case BIG_RAT_STATE_LAND_BITE_ATTACK:
 				if (!item->Animation.RequiredState && AI.ahead &&
-					item->TestBits(JointBitType::Touch, BigRatBite.meshNum))
+					item->TouchBits.Test(BigRatBite.meshNum))
 				{
 					DoDamage(creature->Enemy, BIG_RAT_BITE_ATTACK_DAMAGE);
 					CreatureEffect(item, BigRatBite, DoBloodSplat);
@@ -193,7 +193,7 @@ namespace TEN::Entities::Creatures::TR1
 
 			case BIG_RAT_STATE_POUNCE_ATTACK:
 				if (!item->Animation.RequiredState && AI.ahead &&
-					item->TestBits(JointBitType::Touch, BigRatBite.meshNum))
+					item->TouchBits.Test(BigRatBite.meshNum))
 				{
 					DoDamage(creature->Enemy, BIG_RAT_POUNCE_ATTACK_DAMAGE);
 					CreatureEffect(item, BigRatBite, DoBloodSplat);
@@ -217,14 +217,14 @@ namespace TEN::Entities::Creatures::TR1
 					break;
 				}
 
-				if (AI.ahead && item->TestBits(JointBitType::Touch, BigRatBite.meshNum))
+				if (AI.ahead && item->TouchBits.Test(BigRatBite.meshNum))
 					item->Animation.TargetState = BIG_RAT_STATE_SWIM_BITE_ATTACK;
 
 				break;
 
 			case BIG_RAT_STATE_SWIM_BITE_ATTACK:
 				if (!item->Animation.RequiredState && AI.ahead &&
-					item->TestBits(JointBitType::Touch, BigRatBite.meshNum))
+					item->TouchBits.Test(BigRatBite.meshNum))
 				{
 					DoDamage(creature->Enemy, BIG_RAT_BITE_ATTACK_DAMAGE);
 					CreatureEffect(item, BigRatBite, DoBloodSplat);

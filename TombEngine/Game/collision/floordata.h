@@ -1,16 +1,19 @@
 #pragma once
 #include <optional>
-#include "Specific/trmath.h"
+
+#include "Math/Math.h"
 #include "Specific/newtypes.h"
 
-constexpr auto WALL_PLANE = Vector3(0, 0, static_cast<float>(-CLICK(127)));
+using namespace TEN::Math;
 
-enum class CLIMB_DIRECTION : short
+constexpr auto WALL_PLANE = Vector3(0, 0, -CLICK(127));
+
+enum class ClimbDirection : short
 {
-	North = 0x0100,
-	East = 0x0200,
-	South = 0x0400,
-	West = 0x0800
+	North = (1 << 8),
+	East  = (1 << 9),
+	South = (1 << 10),
+	West  = (1 << 11)
 };
 
 enum class FLOOR_MATERIAL : unsigned char
@@ -39,7 +42,6 @@ enum class FLOOR_MATERIAL : unsigned char
 	Custom8 = 21,
 };
 
-
 struct SECTOR_COLLISION_INFO
 {
 	float SplitAngle;
@@ -64,17 +66,20 @@ struct SECTOR_FLAGS
 	bool MinecartRight() { return MarkBeetle; }
 	bool MinecartStop() { return MarkBeetle && MarkTriggerer; }
 
-	bool ClimbPossible(CLIMB_DIRECTION direction)
+	bool ClimbPossible(ClimbDirection direction)
 	{
 		switch (direction)
 		{
-		case CLIMB_DIRECTION::North:
+		case ClimbDirection::North:
 			return ClimbNorth;
-		case CLIMB_DIRECTION::South:
+
+		case ClimbDirection::South:
 			return ClimbSouth;
-		case CLIMB_DIRECTION::East:
+
+		case ClimbDirection::East:
 			return ClimbEast;
-		case CLIMB_DIRECTION::West:
+
+		case ClimbDirection::West:
 			return ClimbWest;
 		}
 
@@ -132,9 +137,9 @@ class FloorInfo
 
 namespace TEN::Floordata
 {
-	Vector2Int GetSectorPoint(int x, int z);
-	Vector2Int GetRoomPosition(int roomNumber, int x, int z);
-	FloorInfo& GetFloor(int roomNumber, const Vector2Int& pos);
+	Vector2i GetSectorPoint(int x, int z);
+	Vector2i GetRoomPosition(int roomNumber, int x, int z);
+	FloorInfo& GetFloor(int roomNumber, const Vector2i& pos);
 	FloorInfo& GetFloor(int roomNumber, int x, int z);
 	FloorInfo& GetFloorSide(int roomNumber, int x, int z, int* sideRoomNumber = nullptr);
 	FloorInfo& GetBottomFloor(int roomNumber, int x, int z, int* bottomRoomNumber = nullptr);

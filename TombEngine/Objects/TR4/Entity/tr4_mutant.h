@@ -1,7 +1,7 @@
 #pragma once
 
 #include "framework.h"
-#include "Specific/trmath.h"
+#include "Math/Math.h"
 
 namespace TEN::Entities::TR4 
 {

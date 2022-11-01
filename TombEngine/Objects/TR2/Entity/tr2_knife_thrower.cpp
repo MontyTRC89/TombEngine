@@ -13,7 +13,7 @@
 #include "Game/people.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
-#include "Specific/prng.h"
+#include "Math/Random.h"
 #include "Specific/setup.h"
 
 using namespace TEN::Math::Random;
@@ -101,7 +101,7 @@ namespace TEN::Entities::Creatures::TR2
 
 		fx->pos.Orientation.z += ANGLE(30.0f);
 
-		if (ItemNearLara(&fx->pos.Position, 200))
+		if (ItemNearLara(fx->pos.Position, 200))
 		{
 			DoDamage(LaraItem, KNIFE_PROJECTILE_DAMAGE);
 
@@ -128,9 +128,9 @@ namespace TEN::Entities::Creatures::TR2
 		auto* creature = GetCreatureInfo(item);
 
 		short angle = 0;
+		short tilt = 0;
 		short torso = 0;
 		short head = 0;
-		short tilt = 0;
 
 		if (item->HitPoints <= 0)
 		{

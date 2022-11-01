@@ -12,11 +12,11 @@ struct Stats
 {
 	unsigned int Timer;
 	unsigned int Distance;
-	unsigned int AmmoUsed;
 	unsigned int AmmoHits;
-	unsigned short Kills;
-	unsigned char Secrets;
-	unsigned char HealthUsed;
+	unsigned int AmmoUsed;
+	unsigned int HealthUsed;
+	unsigned int Kills;
+	unsigned int Secrets;
 };
 
 struct GameStats

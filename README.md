@@ -52,6 +52,7 @@ We do not and have never worked for Core Design, Eidos Interactive, or Square En
 - Gancian (general coding)
 - Krystian (general coding)
 - Kubsy (Some cleanups and fixes)
+- l.m. (general coding, bug fixing)
 - Lwmte (sound refactoring, general coding, code cleanups, bug fixing)
 - Moooonyeah (Jumanji) (entity decompilation)
 - Raildex (renderer refactoring, particle coding, general coding) 
@@ -62,7 +63,6 @@ We do not and have never worked for Core Design, Eidos Interactive, or Square En
 - TokyoSU (entity and vehicle decompilation)
 - Troye (general coding, refactoring)
 - WolfCheese (general coding)
-- l.m. (general coding, bug fixing)
 
 ## Testers
 - Adngel

@@ -106,6 +106,13 @@ __(not yet implemented)__
 */
 	table_flow.set_function(ScriptReserved_SetTitleScreenImagePath, &FlowHandler::SetTitleScreenImagePath, this);
 
+/*** Set FlyCheatEnabled
+Must be true or false
+@function SetFlyCheatEnabled
+@tparam bool true or false
+*/
+	table_flow.set_function(ScriptReserved_EnableFlyCheat, &FlowHandler::EnableFlyCheat, this);
+
 /*** settings.lua.
 These functions are called in settings.lua, a file which holds your local settings.
 settings.lua shouldn't be bundled with any finished levels/games.
@@ -282,29 +289,36 @@ void FlowHandler::SetSecretCount(int secretsNum)
 
 void FlowHandler::AddSecret(int levelSecretIndex)
 {
-	if (levelSecretIndex > 7)
+	static const unsigned int maxSecretIndex = CHAR_BIT * sizeof(unsigned int);
+
+	if (levelSecretIndex >= maxSecretIndex)
 	{
-		TENLog("Current maximum amount of secrets per level is 7.", LogLevel::Warning);
+		TENLog("Current maximum amount of secrets per level is" + std::to_string(maxSecretIndex) + ".", LogLevel::Warning);
 		return;
 	}
 
-	if (!(Statistics.Level.Secrets & (1 << levelSecretIndex)))
-	{
-		if (Statistics.Game.Secrets >= UCHAR_MAX)
-		{
-			TENLog("Maximum amount of game secrets is already reached!", LogLevel::Warning);
-			return;
-		}
+	if ((Statistics.Level.Secrets & (1 << levelSecretIndex)))
+		return;
 
-		PlaySecretTrack();
-		Statistics.Level.Secrets |= (1 << levelSecretIndex);
-		Statistics.Game.Secrets++;
+	if (Statistics.Game.Secrets >= UINT_MAX)
+	{
+		TENLog("Maximum amount of level secrets is already reached!", LogLevel::Warning);
+		return;
 	}
+
+	PlaySecretTrack();
+	Statistics.Level.Secrets |= (1 << levelSecretIndex);
+	Statistics.Game.Secrets++;
 }
 
 bool FlowHandler::IsFlyCheatEnabled() const
 {
 	return FlyCheat;
+}
+
+void FlowHandler::EnableFlyCheat(bool flyCheat)
+{
+	FlyCheat = flyCheat;
 }
 
 bool FlowHandler::DoFlow()
@@ -379,7 +393,8 @@ bool FlowHandler::DoFlow()
 		switch (status)
 		{
 		case GameStatus::ExitGame:
-			return true;
+			DoTheGame = false;
+			break;
 		case GameStatus::ExitToTitle:
 			CurrentLevel = 0;
 			break;

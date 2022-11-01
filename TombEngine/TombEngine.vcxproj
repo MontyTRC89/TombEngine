@@ -29,7 +29,7 @@
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -176,7 +176,19 @@ CALL gen.bat</Command>
     <ClInclude Include="Game\Lara\lara_test_structs.h" />
     <ClInclude Include="Game\Lara\PlayerContext.h" />
     <ClInclude Include="Game\Lara\PlayerContextStructs.h" />
+    <ClInclude Include="Math\Containers\GameBoundingBox.h" />
+    <ClInclude Include="Math\Solvers.h" />
     <ClInclude Include="Objects\game_object_ids.h" />
+    <ClInclude Include="Math\Containers\GameVector.h" />
+    <ClInclude Include="Math\Containers\EulerAngles.h" />
+    <ClInclude Include="Math\Constants.h" />
+    <ClInclude Include="Math\Geometry.h" />
+    <ClInclude Include="Math\Legacy.h" />
+    <ClInclude Include="Math\Math.h" />
+    <ClInclude Include="Math\Containers\Pose.h" />
+    <ClInclude Include="Math\Random.h" />
+    <ClInclude Include="Math\Containers\Vector2i.h" />
+    <ClInclude Include="Math\Containers\Vector3i.h" />
     <ClInclude Include="Objects\Generic\Object\burning_torch.h" />
     <ClInclude Include="Objects\Generic\Object\polerope.h" />
     <ClInclude Include="Objects\Generic\Object\rope.h" />
@@ -185,6 +197,7 @@ CALL gen.bat</Command>
     <ClInclude Include="Objects\Effects\flame_emitters.h" />
     <ClInclude Include="Game\effects\lara_fx.h" />
     <ClInclude Include="Objects\Generic\Traps\dart_emitter.h" />
+    <ClInclude Include="Objects\Sink.h" />
     <ClInclude Include="Objects\TR1\Entity\tr1_winged_mutant.h" />
     <ClInclude Include="Objects\TR2\Vehicles\speedboat_info.h" />
     <ClInclude Include="Game\itemdata\creature_info.h" />
@@ -205,6 +218,7 @@ CALL gen.bat</Command>
     <ClInclude Include="Objects\Utils\VehicleHelpers.h" />
     <ClInclude Include="Renderer\ConstantBuffers\AlphaTestBuffer.h" />
     <ClInclude Include="Renderer\ConstantBuffers\PostProcessBuffer.h" />
+    <ClInclude Include="Renderer\RendererRectangle.h" />
     <ClInclude Include="Renderer\Structures\RendererBone.h" />
     <ClInclude Include="Renderer\Structures\RendererDisplayMode.h" />
     <ClInclude Include="Renderer\Structures\RendererLight.h" />
@@ -264,6 +278,8 @@ CALL gen.bat</Command>
     <ClInclude Include="Scripting\ReservedScriptNames.h" />
     <ClInclude Include="Scripting\ScriptAssert.h" />
     <ClInclude Include="Scripting\ScriptUtil.h" />
+    <ClInclude Include="Specific\BitField.h" />
+    <ClInclude Include="Specific\LevelCameraInfo.h" />
     <ClInclude Include="Specific\memory\LinearArrayBuffer.h" />
     <ClInclude Include="Game\memory\MemoryPoolAllocator.h" />
     <ClInclude Include="Specific\memory\Vector.h" />
@@ -273,7 +289,6 @@ CALL gen.bat</Command>
     <ClInclude Include="Renderer\RendererTransparentFace.h" />
     <ClInclude Include="Scripting\GameScriptFog.h" />
     <ClInclude Include="Specific\fast_vector.h" />
-    <ClInclude Include="Specific\phd_global.h" />
     <ClInclude Include="Game\memory\qmalloc.h" />
     <ClInclude Include="Game\pickup\pickuputil.h" />
     <ClInclude Include="Game\pickup\pickup_ammo.h" />
@@ -282,7 +297,6 @@ CALL gen.bat</Command>
     <ClInclude Include="Game\pickup\pickup_misc_items.h" />
     <ClInclude Include="Game\pickup\pickup_weapon.h" />
     <ClInclude Include="Game\precompute\precompute.h" />
-    <ClInclude Include="Specific\prng.h" />
     <ClInclude Include="Objects\Generic\puzzles_keys.h" />
     <ClInclude Include="Game\room.h" />
     <ClInclude Include="Objects\Generic\Doors\double_doors.h" />
@@ -584,7 +598,6 @@ CALL gen.bat</Command>
     <ClInclude Include="Specific\savegame\flatbuffers\ten_savegame_generated.h" />
     <ClInclude Include="Specific\setup.h" />
     <ClInclude Include="Specific\clock.h" />
-    <ClInclude Include="Specific\trmath.h" />
     <ClInclude Include="Specific\trutils.h" />
     <ClInclude Include="Specific\winmain.h" />
     <ClInclude Include="targetver.h" />
@@ -634,6 +647,17 @@ CALL gen.bat</Command>
     <ClCompile Include="Game\pickup\pickup_misc_items.cpp" />
     <ClCompile Include="Game\pickup\pickup_weapon.cpp" />
     <ClCompile Include="Game\room.cpp" />
+    <ClCompile Include="Math\Containers\GameBoundingBox.cpp" />
+    <ClCompile Include="Math\Containers\GameVector.cpp" />
+    <ClCompile Include="Math\Containers\EulerAngles.cpp" />
+    <ClCompile Include="Math\Geometry.cpp" />
+    <ClCompile Include="Math\Containers\Pose.cpp" />
+    <ClCompile Include="Math\Legacy.cpp" />
+    <ClCompile Include="Math\Math.cpp" />
+    <ClCompile Include="Math\Random.cpp" />
+    <ClCompile Include="Math\Containers\Vector2i.cpp" />
+    <ClCompile Include="Math\Containers\Vector3i.cpp" />
+    <ClCompile Include="Math\Solvers.cpp" />
     <ClCompile Include="Objects\Generic\Object\burning_torch.cpp" />
     <ClCompile Include="Objects\Generic\Object\polerope.cpp" />
     <ClCompile Include="Objects\Generic\Object\rope.cpp" />
@@ -675,8 +699,7 @@ CALL gen.bat</Command>
     <ClCompile Include="Scripting\Internal\TEN\Strings\DisplayString\DisplayString.cpp" />
     <ClCompile Include="Scripting\Internal\TEN\Strings\StringsHandler.cpp" />
     <ClCompile Include="Scripting\Internal\TEN\Vec3\Vec3.cpp" />
-    <ClCompile Include="Specific\phd_global.cpp" />
-    <ClCompile Include="Specific\prng.cpp" />
+    <ClCompile Include="Specific\BitField.cpp" />
     <ClCompile Include="Objects\Generic\puzzles_keys.cpp" />
     <ClCompile Include="Objects\Generic\Doors\double_doors.cpp" />
     <ClCompile Include="Objects\Generic\Doors\generic_doors.cpp" />
@@ -696,7 +719,6 @@ CALL gen.bat</Command>
     <ClCompile Include="Objects\TR5\Switch\tr5_crowdove_switch.cpp" />
     <ClCompile Include="Specific\clock.cpp" />
     <ClCompile Include="Specific\RGBAColor8Byte.cpp" />
-    <ClCompile Include="Specific\trmath.cpp" />
     <ClCompile Include="Game\effects\smoke.cpp" />
     <ClCompile Include="Game\effects\spark.cpp" />
     <ClCompile Include="Objects\Generic\generic_objects.cpp" />

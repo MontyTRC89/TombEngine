@@ -2,19 +2,19 @@
 #include "Game/debug/debug.h"
 
 #include <spdlog.h>
-#include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/sinks/basic_file_sink.h>
+#include <spdlog/sinks/stdout_color_sinks.h>
 
 void InitTENLog()
 {
-	// "true" means that we create a new log file each time we run the game
-	auto file_sink = std::make_shared<spdlog::sinks::basic_file_sink_mt>("Logs/TENLog.txt", true);
+	// "true" means that we create a new log file each time we run the game.
+	auto fileSink = std::make_shared<spdlog::sinks::basic_file_sink_mt>("Logs/TENLog.txt", true);
 
 	std::shared_ptr<spdlog::logger> logger;
 
-	// Set the file and console log targets
-	auto console_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
-	logger = std::make_shared<spdlog::logger>(std::string{ "multi_sink" }, spdlog::sinks_init_list{ file_sink, console_sink });
+	// Set the file and console log targets.
+	auto consoleSink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
+	logger = std::make_shared<spdlog::logger>(std::string{ "multi_sink" }, spdlog::sinks_init_list{ fileSink, consoleSink });
 	
 	spdlog::initialize_logger(logger);
     logger->set_level(spdlog::level::info);

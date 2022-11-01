@@ -10,7 +10,6 @@
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
 #include "Specific/level.h"
-#include "Specific/prng.h"
 #include "Specific/setup.h"
 
 using namespace TEN::Math::Random;
@@ -25,7 +24,7 @@ namespace TEN::Entities::Creatures::TR3
 	// TODO: Range constants.
 
 	const auto MonkeyBite = BiteInfo(Vector3(10.0f, 10.0f, 11.0f), 13);
-	const vector<int> MonkeyAttackJoints = { 10, 13 };
+	const vector<unsigned int> MonkeyAttackJoints = { 10, 13 };
 
 	enum MonkeyState
 	{
@@ -104,8 +103,8 @@ namespace TEN::Entities::Creatures::TR3
 
 		short angle = 0;
 		short tilt = 0;
-		auto extraHeadRot = Vector3Shrt::Zero;
-		auto extraTorsoRot = Vector3Shrt::Zero;
+		auto extraHeadRot = EulerAngles::Zero;
+		auto extraTorsoRot = EulerAngles::Zero;
 
 		if (item->HitPoints <= 0)
 		{
@@ -429,7 +428,7 @@ namespace TEN::Entities::Creatures::TR3
 				}
 				else if (AI.bite && AI.distance < pow(682, 2))
 					item->Animation.TargetState = MONKEY_STATE_IDLE;
-
+				
 				break;
 
 			case MONKEY_STATE_RUN_FORWARD:
@@ -480,7 +479,7 @@ namespace TEN::Entities::Creatures::TR3
 
 				if (enemy->IsLara())
 				{
-					if (!creature->Flags && item->TestBits(JointBitType::Touch, MonkeyAttackJoints))
+					if (!creature->Flags && item->TouchBits.Test(MonkeyAttackJoints))
 					{
 						DoDamage(enemy, MONKEY_SWIPE_ATTACK_PLAYER_DAMAGE);
 						CreatureEffect(item, MonkeyBite, DoBloodSplat);
@@ -489,11 +488,10 @@ namespace TEN::Entities::Creatures::TR3
 				}
 				else
 				{
-					if (!creature->Flags && enemy)
+					if (!creature->Flags && enemy != nullptr)
 					{
-						if (abs(enemy->Pose.Position.x - item->Pose.Position.x) < CLICK(1) &&
-							abs(enemy->Pose.Position.y - item->Pose.Position.y) <= CLICK(1) &&
-							abs(enemy->Pose.Position.z - item->Pose.Position.z) < CLICK(1))
+						float distance = Vector3i::Distance(item->Pose.Position, enemy->Pose.Position);
+						if (distance <= CLICK(1))
 						{
 							DoDamage(enemy, MONKEY_SWIPE_ATTACK_CREATURE_DAMAGE);
 							CreatureEffect(item, MonkeyBite, DoBloodSplat);
@@ -522,7 +520,7 @@ namespace TEN::Entities::Creatures::TR3
 
 				if (enemy->IsLara())
 				{
-					if (!creature->Flags && item->TestBits(JointBitType::Touch, MonkeyAttackJoints))
+					if (!creature->Flags && item->TouchBits.Test(MonkeyAttackJoints))
 					{
 						DoDamage(enemy, 40);
 						CreatureEffect(item, MonkeyBite, DoBloodSplat);
@@ -533,7 +531,7 @@ namespace TEN::Entities::Creatures::TR3
 				{
 					if (!creature->Flags && enemy != nullptr)
 					{
-						if (Vector3Int::Distance(item->Pose.Position, enemy->Pose.Position) <= CLICK(1))
+						if (Vector3i::Distance(item->Pose.Position, enemy->Pose.Position) <= CLICK(1))
 						{
 							DoDamage(enemy, 20);
 							CreatureEffect(item, MonkeyBite, DoBloodSplat);
@@ -562,7 +560,7 @@ namespace TEN::Entities::Creatures::TR3
 
 				if (enemy->IsLara())
 				{
-					if (creature->Flags != 1 && item->TestBits(JointBitType::Touch, MonkeyAttackJoints))
+					if (creature->Flags != 1 && item->TouchBits.Test(MonkeyAttackJoints))
 					{
 						DoDamage(enemy, 50);
 						CreatureEffect(item, MonkeyBite, DoBloodSplat);
@@ -571,9 +569,9 @@ namespace TEN::Entities::Creatures::TR3
 				}
 				else
 				{
-					if (creature->Flags != 1 && enemy)
+					if (creature->Flags != 1 && enemy != nullptr)
 					{
-						if (Vector3Int::Distance(item->Pose.Position, creature->Enemy->Pose.Position) <= CLICK(1))
+						if (Vector3i::Distance(item->Pose.Position, enemy->Pose.Position) <= CLICK(1))
 						{
 							DoDamage(enemy, 25);
 							CreatureEffect(item, MonkeyBite, DoBloodSplat);

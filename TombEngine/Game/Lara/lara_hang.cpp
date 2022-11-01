@@ -42,6 +42,15 @@ void lara_as_hang_idle(ItemInfo* item, CollisionInfo* coll)
 
 	if (TrInput & IN_ACTION)
 	{
+		// TODO: Allow direction locking just like with standing jumps. Needs new ledge jump prepare state? -- Sezz 24.10.2022
+		if (TrInput & IN_JUMP && TestLaraLedgeJump(item, coll))
+		{
+			if (TrInput & IN_BACK)
+				item->Animation.TargetState = LS_JUMP_FORWARD;
+			else
+				item->Animation.TargetState = LS_JUMP_UP;
+		}
+
 		if (TrInput & IN_FORWARD)
 		{
 			if (TestLaraHangToCrouch(item, coll))

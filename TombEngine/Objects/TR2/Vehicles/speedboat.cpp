@@ -170,7 +170,7 @@ namespace TEN::Entities::Vehicles
 
 		laraItem->Pose.Position = speedboatItem->Pose.Position;
 		laraItem->Pose.Position.y -= 5;
-		laraItem->Pose.Orientation = Vector3Shrt(0, speedboatItem->Pose.Orientation.y, 0);
+		laraItem->Pose.Orientation = EulerAngles(0, speedboatItem->Pose.Orientation.y, 0);
 		laraItem->Animation.IsAirborne = false;
 		laraItem->Animation.Velocity.z = 0;
 		laraItem->Animation.Velocity.y = 0;
@@ -280,7 +280,7 @@ namespace TEN::Entities::Vehicles
 		}
 	}
 
-	short SpeedboatDoShift(ItemInfo* speedboatItem, Vector3Int* pos, Vector3Int* old)
+	short SpeedboatDoShift(ItemInfo* speedboatItem, Vector3i* pos, Vector3i* old)
 	{
 		int x = pos->x / SECTOR(1);
 		int z = pos->z / SECTOR(1);
@@ -288,8 +288,8 @@ namespace TEN::Entities::Vehicles
 		int xOld = old->x / SECTOR(1);
 		int zOld = old->z / SECTOR(1);
 
-		int shiftX = pos->x & (SECTOR(1) - 1);
-		int shiftZ = pos->z & (SECTOR(1) - 1);
+		int shiftX = pos->x & WALL_MASK;
+		int shiftZ = pos->z & WALL_MASK;
 
 		if (x == xOld)
 		{
@@ -376,7 +376,7 @@ namespace TEN::Entities::Vehicles
 		return 0;
 	}
 
-	int GetSpeedboatHitAnim(ItemInfo* speedboatItem, Vector3Int* moved)
+	int GetSpeedboatHitAnim(ItemInfo* speedboatItem, Vector3i* moved)
 	{
 		moved->x = speedboatItem->Pose.Position.x - moved->x;
 		moved->z = speedboatItem->Pose.Position.z - moved->z;
@@ -442,7 +442,7 @@ namespace TEN::Entities::Vehicles
 
 		speedboatItem->Pose.Orientation.z -= speedboat->LeanAngle;
 
-		Vector3Int old, frontLeftOld, frontRightOld, backLeftOld, backRightOld, frontOld;
+		Vector3i old, frontLeftOld, frontRightOld, backLeftOld, backRightOld, frontOld;
 		int heightFrontLeftOld = GetVehicleWaterHeight(speedboatItem, SPEEDBOAT_FRONT, -SPEEDBOAT_SIDE, true, &frontLeftOld);
 		int heightFrontRightOld = GetVehicleWaterHeight(speedboatItem, SPEEDBOAT_FRONT, SPEEDBOAT_SIDE, true, &frontRightOld);
 		int heightBackLeftOld = GetVehicleWaterHeight(speedboatItem, -SPEEDBOAT_FRONT, -SPEEDBOAT_SIDE, true, &backLeftOld);
@@ -471,11 +471,11 @@ namespace TEN::Entities::Vehicles
 		speedboatItem->Pose.Position.x -= slip * phd_sin(speedboatItem->Pose.Orientation.y);
 		speedboatItem->Pose.Position.z -= slip * phd_cos(speedboatItem->Pose.Orientation.y);
 
-		auto moved = Vector3Int(speedboatItem->Pose.Position.x, 0, speedboatItem->Pose.Position.z);
+		auto moved = Vector3i(speedboatItem->Pose.Position.x, 0, speedboatItem->Pose.Position.z);
 
 		SpeedboatDoBoatShift(speedboatItem, itemNumber);
 
-		Vector3Int fl, fr, br, bl, f;
+		Vector3i fl, fr, br, bl, f;
 		short rotation = 0;
 		auto heightBackLeft = GetVehicleWaterHeight(speedboatItem, -SPEEDBOAT_FRONT, -SPEEDBOAT_SIDE, false, &bl);
 		if (heightBackLeft < (backLeftOld.y - CLICK(0.5f)))
@@ -508,7 +508,7 @@ namespace TEN::Entities::Vehicles
 			height = GetFloorHeight(probe.Block, speedboatItem->Pose.Position.x, speedboatItem->Pose.Position.y - 5, speedboatItem->Pose.Position.z);
 
 		if (height < (speedboatItem->Pose.Position.y - CLICK(0.5f)))
-			SpeedboatDoShift(speedboatItem, (Vector3Int*)&speedboatItem->Pose, &old);
+			SpeedboatDoShift(speedboatItem, (Vector3i*)&speedboatItem->Pose, &old);
 
 		speedboat->ExtraRotation = rotation;
 
@@ -771,7 +771,7 @@ namespace TEN::Entities::Vehicles
 
 		int collide = SpeedboatDynamics(itemNumber, laraItem);
 
-		Vector3Int frontLeft, frontRight;
+		Vector3i frontLeft, frontRight;
 		int heightFrontLeft = GetVehicleWaterHeight(speedboatItem, SPEEDBOAT_FRONT, -SPEEDBOAT_SIDE, true, &frontLeft);
 		int heightFrontRight = GetVehicleWaterHeight(speedboatItem, SPEEDBOAT_FRONT, SPEEDBOAT_SIDE, true, &frontRight);
 

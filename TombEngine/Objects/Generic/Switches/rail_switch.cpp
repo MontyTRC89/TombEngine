@@ -13,28 +13,32 @@ using namespace TEN::Input;
 
 namespace TEN::Entities::Switches
 {
-	Vector3Int RailSwitchPos = { 0, 0, -550 };
-
-	OBJECT_COLLISION_BOUNDS RailSwitchBounds =
+	const auto RailSwitchPos = Vector3i(0, 0, -550);
+	const ObjectCollisionBounds RailSwitchBounds =
 	{
-		-256, 256,
-		0, 0,
-		-768, -512,
-		-ANGLE(10.0f), ANGLE(10.0f),
-		-ANGLE(30.0f), ANGLE(30.0f),
-		-ANGLE(10.0f), ANGLE(10.0f)
+		GameBoundingBox(
+			-CLICK(1), CLICK(1),
+			0, 0,
+			-SECTOR(0.75f), -SECTOR(0.5f)
+		),
+		std::pair(
+			EulerAngles(ANGLE(-10.0f), ANGLE(-30.0f), ANGLE(-10.0f)),
+			EulerAngles(ANGLE(10.0f), ANGLE(30.0f), ANGLE(10.0f))
+		)
 	};
 
-	Vector3Int RailSwitchPos2 = { 0, 0, 550 }; 
-
-	OBJECT_COLLISION_BOUNDS RailSwitchBounds2 =
+	const auto RailSwitchPos2 = Vector3i(0, 0, 550);
+	const ObjectCollisionBounds RailSwitchBounds2 =
 	{
-		-256, 256,
-		0, 0,
-		512, 768,
-		-ANGLE(10.0f), ANGLE(10.0f),
-		-ANGLE(30.0f), ANGLE(30.0f),
-		-ANGLE(10.0f), ANGLE(10.0f)
+		GameBoundingBox(
+			-CLICK(1), CLICK(1),
+			0, 0,
+			SECTOR(0.5f), SECTOR(0.75f)
+		),
+		std::pair(
+			EulerAngles(ANGLE(-10.0f), ANGLE(-30.0f), ANGLE(-10.0f)),
+			EulerAngles(ANGLE(10.0f), ANGLE(30.0f), ANGLE(10.0f))
+		)
 	};
 
 	void RailSwitchCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
@@ -59,9 +63,9 @@ namespace TEN::Entities::Switches
 			{
 				laraItem->Pose.Orientation.y ^= (short)ANGLE(180.0f);
 
-				if (TestLaraPosition(&RailSwitchBounds2, switchItem, laraItem))
+				if (TestLaraPosition(RailSwitchBounds2, switchItem, laraItem))
 				{
-					if (MoveLaraPosition(&RailSwitchPos2, switchItem, laraItem))
+					if (MoveLaraPosition(RailSwitchPos2, switchItem, laraItem))
 					{
 						switchItem->Animation.TargetState = SWITCH_OFF;
 						flag = 1;
@@ -98,9 +102,9 @@ namespace TEN::Entities::Switches
 		}
 		else
 		{
-			if (TestLaraPosition(&RailSwitchBounds, switchItem, laraItem))
+			if (TestLaraPosition(RailSwitchBounds, switchItem, laraItem))
 			{
-				if (MoveLaraPosition(&RailSwitchPos, switchItem, laraItem))
+				if (MoveLaraPosition(RailSwitchPos, switchItem, laraItem))
 				{
 					ResetLaraFlex(laraItem);
 					laraItem->Animation.AnimNumber = LA_LEVER_PUSH;

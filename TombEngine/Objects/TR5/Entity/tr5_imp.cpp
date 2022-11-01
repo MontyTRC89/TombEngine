@@ -11,8 +11,10 @@
 #include "Game/itemdata/creature_info.h"
 #include "Game/control/control.h"
 #include "Objects/Generic/Object/burning_torch.h"
+#include "Math/Math.h"
 
 using namespace TEN::Entities::Generic;
+using namespace TEN::Math;
 
 namespace TEN::Entities::Creatures::TR5
 {
@@ -67,26 +69,23 @@ namespace TEN::Entities::Creatures::TR5
 		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 	}
 
-	static void ImpThrowStones(ItemInfo* item)
+	void ImpThrowStones(ItemInfo* item)
 	{
-		auto pos1 = Vector3Int();
-		GetJointAbsPosition(item, &pos1, 9);
-
-		auto pos2 = Vector3Int();
-		GetLaraJointPosition(&pos2, LM_HEAD);
+		auto pos1 = GetJointPosition(item, 9);
+		auto pos2 = GetJointPosition(LaraItem, LM_HEAD);
 
 		int dx = pos1.x - pos2.x;
 		int dy = pos1.y - pos2.y;
 		int dz = pos1.z - pos2.z;
 
-		auto angles = GetVectorAngles(pos2.x - pos1.x, pos2.y - pos1.y, pos2.z - pos1.z);
-
+		auto orient = Geometry::GetOrientToPoint(pos1.ToVector3(), pos2.ToVector3());
+	
 		int distance = sqrt(pow(dx, 2) + pow(dy, 2) + pow(dz, 2));
 		if (distance < 8)
 			distance = 8;
 
-		angles.x += GetRandomControl() % (distance / 2) - (distance / 4);
-		angles.y += GetRandomControl() % (distance / 4) - (distance / 8);
+		orient.x += GetRandomControl() % (distance / 2) - (distance / 4);
+		orient.y += GetRandomControl() % (distance / 4) - (distance / 8);
 
 		short fxNumber = CreateNewEffect(item->RoomNumber);
 		if (fxNumber != NO_ITEM)
@@ -97,11 +96,7 @@ namespace TEN::Entities::Creatures::TR5
 			fx->roomNumber = item->RoomNumber;
 			fx->speed = 4 * sqrt(distance);
 
-			fx->pos.Orientation = Vector3Shrt(
-				(angles.x + distance) / 2,
-				angles.y,
-				0
-			);
+			fx->pos.Orientation = EulerAngles((orient.x + distance) / 2, orient.y, 0);
 
 			if (fx->speed < 256)
 				fx->speed = 256;

@@ -9,7 +9,7 @@
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
 #include "Specific/level.h"
-#include "Specific/prng.h"
+#include "Math/Random.h"
 #include "Specific/setup.h"
 
 using namespace TEN::Math::Random;
@@ -60,8 +60,8 @@ namespace TEN::Entities::Creatures::TR2
 		auto* item = &g_Level.Items[itemNumber];
 		auto* creature = GetCreatureInfo(item);
 
-		short head = 0;
 		short angle = 0;
+		short head = 0;
 
 		if (item->HitPoints <= 0)
 		{
@@ -131,7 +131,7 @@ namespace TEN::Entities::Creatures::TR2
 
 			case RAT_STATE_POUNCE_ATTACK:
 				if (!item->Animation.RequiredState &&
-					item->TestBits(JointBitType::Touch, RatBite.meshNum))
+					item->TouchBits.Test(RatBite.meshNum))
 				{
 					item->Animation.RequiredState = RAT_STATE_IDLE;
 					DoDamage(creature->Enemy, RAT_ATTACK_DAMAGE);
