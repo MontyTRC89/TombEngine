@@ -99,16 +99,16 @@ namespace TEN::Entities::Vehicles
 		VehicleMountType::Jump
 	};
 
-	RubberBoatInfo* GetRubberBoatInfo(ItemInfo* rBoatItem)
+	RubberBoatInfo& GetRubberBoatInfo(ItemInfo* rBoatItem)
 	{
-		return (RubberBoatInfo*)rBoatItem->Data;
+		return *(RubberBoatInfo*)rBoatItem->Data;
 	}
 
 	void InitialiseRubberBoat(short itemNumber)
 	{
 		auto* rBoatItem = &g_Level.Items[itemNumber];
 		rBoatItem->Data = RubberBoatInfo();
-		auto* rBoat = GetRubberBoatInfo(rBoatItem);
+		auto& rBoat = GetRubberBoatInfo(rBoatItem);
 	}
 
 	void RubberBoatPlayerCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
@@ -141,7 +141,7 @@ namespace TEN::Entities::Vehicles
 	void RubberBoatControl(short itemNumber)
 	{
 		auto* rBoatItem = &g_Level.Items[itemNumber];
-		auto* rBoat = GetRubberBoatInfo(rBoatItem);
+		auto& rBoat = GetRubberBoatInfo(rBoatItem);
 		auto* laraItem = LaraItem;
 		auto* lara = GetLaraInfo(laraItem);
 
@@ -162,7 +162,7 @@ namespace TEN::Entities::Vehicles
 
 		auto probe = GetCollision(rBoatItem);
 		int water = GetWaterHeight(rBoatItem->Pose.Position.x, rBoatItem->Pose.Position.y, rBoatItem->Pose.Position.z, probe.RoomNumber);
-		rBoat->Water = water;
+		rBoat.Water = water;
 
 		if (lara->Vehicle == itemNumber && laraItem->HitPoints > 0)
 		{
@@ -187,20 +187,20 @@ namespace TEN::Entities::Vehicles
 				rBoatItem->Animation.Velocity.z = 0;
 		}
 
-		ResetVehicleTurnRateY(rBoat->TurnRate, RBOAT_TURN_RATE_DECEL);
+		ResetVehicleTurnRateY(rBoat.TurnRate, RBOAT_TURN_RATE_DECEL);
 
 		height = probe.Position.Floor;
 
 		rBoatItem->Floor = height - 5;
-		if (rBoat->Water == NO_HEIGHT)
-			rBoat->Water = height;
+		if (rBoat.Water == NO_HEIGHT)
+			rBoat.Water = height;
 		else
-			rBoat->Water -= 5;
+			rBoat.Water -= 5;
 
-		rBoat->LeftVerticalVelocity = DoVehicleDynamics(heightFrontLeft, rBoat->LeftVerticalVelocity, RBOAT_BOUNCE_MIN, RBOAT_KICK_MAX, frontLeft.y);
-		rBoat->RightVerticalVelocity = DoVehicleDynamics(heightFrontRight, rBoat->RightVerticalVelocity, RBOAT_BOUNCE_MIN, RBOAT_KICK_MAX, frontRight.y);
+		rBoat.LeftVerticalVelocity = DoVehicleDynamics(heightFrontLeft, rBoat.LeftVerticalVelocity, RBOAT_BOUNCE_MIN, RBOAT_KICK_MAX, frontLeft.y);
+		rBoat.RightVerticalVelocity = DoVehicleDynamics(heightFrontRight, rBoat.RightVerticalVelocity, RBOAT_BOUNCE_MIN, RBOAT_KICK_MAX, frontRight.y);
 		ofs = rBoatItem->Animation.Velocity.y;
-		rBoatItem->Animation.Velocity.y = DoVehicleDynamics(rBoat->Water, rBoatItem->Animation.Velocity.y, RBOAT_BOUNCE_MIN, RBOAT_KICK_MAX, rBoatItem->Pose.Position.y);
+		rBoatItem->Animation.Velocity.y = DoVehicleDynamics(rBoat.Water, rBoatItem->Animation.Velocity.y, RBOAT_BOUNCE_MIN, RBOAT_KICK_MAX, rBoatItem->Pose.Position.y);
 
 		height = frontLeft.y + frontRight.y;
 		if (height < 0)
@@ -229,7 +229,7 @@ namespace TEN::Entities::Vehicles
 				ItemNewRoom(lara->ItemNumber, probe.RoomNumber);
 			}
 
-			rBoatItem->Pose.Orientation.z += rBoat->LeanAngle;
+			rBoatItem->Pose.Orientation.z += rBoat.LeanAngle;
 			laraItem->Pose = rBoatItem->Pose;
 
 			AnimateItem(laraItem);
@@ -248,16 +248,16 @@ namespace TEN::Entities::Vehicles
 			if (probe.RoomNumber != rBoatItem->RoomNumber)
 				ItemNewRoom(itemNumber, probe.RoomNumber);
 
-			rBoatItem->Pose.Orientation.z += rBoat->LeanAngle;
+			rBoatItem->Pose.Orientation.z += rBoat.LeanAngle;
 		}
 
 		pitch = rBoatItem->Animation.Velocity.z;
-		rBoat->Pitch += ((pitch - rBoat->Pitch) / 4);
+		rBoat.Pitch += ((pitch - rBoat.Pitch) / 4);
 
 		if (rBoatItem->Animation.Velocity.z > 8)
-			SoundEffect(SFX_TR3_VEHICLE_RUBBERBOAT_MOVING, &rBoatItem->Pose, SoundEnvironment::Land, 0.5f + (float)abs(rBoat->Pitch) / (float)RBOAT_NORMAL_VELOCITY_MAX);
+			SoundEffect(SFX_TR3_VEHICLE_RUBBERBOAT_MOVING, &rBoatItem->Pose, SoundEnvironment::Land, 0.5f + (float)abs(rBoat.Pitch) / (float)RBOAT_NORMAL_VELOCITY_MAX);
 		else if (drive)
-			SoundEffect(SFX_TR3_VEHICLE_RUBBERBOAT_IDLE, &rBoatItem->Pose, SoundEnvironment::Land, 0.5f + (float)abs(rBoat->Pitch) / (float)RBOAT_NORMAL_VELOCITY_MAX);
+			SoundEffect(SFX_TR3_VEHICLE_RUBBERBOAT_IDLE, &rBoatItem->Pose, SoundEnvironment::Land, 0.5f + (float)abs(rBoat.Pitch) / (float)RBOAT_NORMAL_VELOCITY_MAX);
 
 		if (lara->Vehicle != itemNumber)
 			return;
@@ -313,12 +313,12 @@ namespace TEN::Entities::Vehicles
 
 	void RubberBoatUserControl(ItemInfo* rBoatItem, ItemInfo* laraItem)
 	{
-		auto* rBoat = GetRubberBoatInfo(rBoatItem);
+		auto& rBoat = GetRubberBoatInfo(rBoatItem);
 
 		float velocity = rBoatItem->Animation.Velocity.z;
 
-		if (rBoatItem->Pose.Position.y < (rBoat->Water - CLICK(0.5f)) ||
-			rBoat->Water == NO_HEIGHT)
+		if (rBoatItem->Pose.Position.y < (rBoat.Water - CLICK(0.5f)) ||
+			rBoat.Water == NO_HEIGHT)
 		{
 			return;
 		}
@@ -344,7 +344,7 @@ namespace TEN::Entities::Vehicles
 		}
 
 		if (TrInput & (VEHICLE_IN_LEFT | VEHICLE_IN_RIGHT))
-			ModulateVehicleTurnRateY(rBoat->TurnRate, RBOAT_TURN_RATE_ACCEL, -RBOAT_TURN_RATE_MAX, RBOAT_TURN_RATE_MAX);
+			ModulateVehicleTurnRateY(rBoat.TurnRate, RBOAT_TURN_RATE_ACCEL, -RBOAT_TURN_RATE_MAX, RBOAT_TURN_RATE_MAX);
 		
 		if (TrInput & VEHICLE_IN_ACCELERATE)
 		{
@@ -383,7 +383,7 @@ namespace TEN::Entities::Vehicles
 
 	void RubberBoatAnimation(ItemInfo* rBoatItem, ItemInfo* laraItem, VehicleImpactDirection impactDirection)
 	{
-		auto* rBoat = GetRubberBoatInfo(rBoatItem);
+		auto& rBoat = GetRubberBoatInfo(rBoatItem);
 
 		if (laraItem->HitPoints <= 0)
 		{
@@ -395,7 +395,7 @@ namespace TEN::Entities::Vehicles
 				laraItem->Animation.ActiveState = RBOAT_STATE_DEATH;
 			}
 		}
-		else if (rBoatItem->Pose.Position.y < (rBoat->Water - CLICK(0.5f)) &&
+		else if (rBoatItem->Pose.Position.y < (rBoat.Water - CLICK(0.5f)) &&
 			rBoatItem->Animation.Velocity.y > 0)
 		{
 			if (laraItem->Animation.ActiveState != RBOAT_STATE_FALL)
@@ -619,10 +619,10 @@ namespace TEN::Entities::Vehicles
 	VehicleImpactDirection RubberBoatDynamics(short itemNumber, ItemInfo* laraItem)
 	{
 		auto* rBoatItem = &g_Level.Items[itemNumber];
-		auto* rBoat = GetRubberBoatInfo(rBoatItem);
+		auto& rBoat = GetRubberBoatInfo(rBoatItem);
 		auto* lara = GetLaraInfo(laraItem);
 
-		rBoatItem->Pose.Orientation.z -= rBoat->LeanAngle;
+		rBoatItem->Pose.Orientation.z -= rBoat.LeanAngle;
 
 		// Get point/room collision at vehicle front and corners.
 		Vector3i frontLeftOld, frontRightOld, backLeftOld, backRightOld, frontOld;
@@ -634,15 +634,15 @@ namespace TEN::Entities::Vehicles
 
 		auto prevPos = rBoatItem->Pose.Position;
 
-		rBoatItem->Pose.Orientation.y += rBoat->TurnRate + rBoat->ExtraRotation;
-		rBoat->LeanAngle = rBoat->TurnRate * 6;
+		rBoatItem->Pose.Orientation.y += rBoat.TurnRate + rBoat.ExtraRotation;
+		rBoat.LeanAngle = rBoat.TurnRate * 6;
 
 		rBoatItem->Pose.Position.z += rBoatItem->Animation.Velocity.z * phd_cos(rBoatItem->Pose.Orientation.y);
 		rBoatItem->Pose.Position.x += rBoatItem->Animation.Velocity.z * phd_sin(rBoatItem->Pose.Orientation.y);
 		if (rBoatItem->Animation.Velocity.z >= 0)
-			rBoat->PropellerRotation += (rBoatItem->Animation.Velocity.z * ANGLE(3.0f)) + ANGLE(2.0f);
+			rBoat.PropellerRotation += (rBoatItem->Animation.Velocity.z * ANGLE(3.0f)) + ANGLE(2.0f);
 		else
-			rBoat->PropellerRotation += ANGLE(33.0f);
+			rBoat.PropellerRotation += ANGLE(33.0f);
 
 		int slip = RBOAT_SIDE_SLIP * phd_sin(rBoatItem->Pose.Orientation.z);
 		if (!slip && rBoatItem->Pose.Orientation.z)
@@ -702,7 +702,7 @@ namespace TEN::Entities::Vehicles
 
 		DoVehicleCollision(rBoatItem, RBOAT_RADIUS);
 
-		rBoat->ExtraRotation = extraRot;
+		rBoat.ExtraRotation = extraRot;
 		auto impactDirection = GetVehicleImpactDirection(rBoatItem, moved);
 
 		if (slip || impactDirection != VehicleImpactDirection::None)

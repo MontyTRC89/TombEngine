@@ -68,9 +68,9 @@ namespace TEN::Entities::Vehicles
 		BGUN_FLAG_FIRE = (1 << 4)
 	};
 
-	BigGunInfo* GetBigGunInfo(ItemInfo* bigGunItem)
+	BigGunInfo& GetBigGunInfo(ItemInfo* bigGunItem)
 	{
-		return (BigGunInfo*)bigGunItem->Data;
+		return *(BigGunInfo*)bigGunItem->Data;
 	}
 
 	void BigGunInitialise(short itemNumber)

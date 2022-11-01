@@ -7,7 +7,7 @@ struct ItemInfo;
 
 namespace TEN::Entities::Vehicles
 {
-	KayakInfo* GetKayakInfo(ItemInfo* kayakItem);
+	KayakInfo& GetKayakInfo(ItemInfo* kayakItem);
 	void InitialiseKayak(short itemNumber);
 
 	void KayakPlayerCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);
