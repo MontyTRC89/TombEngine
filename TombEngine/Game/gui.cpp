@@ -3212,6 +3212,9 @@ bool GuiController::CallInventory(bool reset_mode)
 	bool exitLoop = false;
 	while (!exitLoop)
 	{
+		if (ThreadEnded)
+			return false;
+
 		OBJLIST_SPACING = phd_centerx >> 1;
 
 		if (compassNeedleAngle != 1024)
@@ -3225,9 +3228,6 @@ bool GuiController::CallInventory(bool reset_mode)
 			SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
 			exitLoop = true;
 		}
-
-		if (ThreadEnded)
-			return true;
 
 		DoDebouncedInput();
 		DrawInventory();
