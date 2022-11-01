@@ -29,11 +29,40 @@ GameBoundingBox GlobalCollisionBounds;
 ItemInfo* CollidedItems[MAX_COLLIDED_OBJECTS];
 MESH_INFO* CollidedMeshes[MAX_COLLIDED_OBJECTS];
 
-InteractionBounds::InteractionBounds(const GameBoundingBox& bounds, const pair<EulerAngles, EulerAngles>& orientConstraint)
+InteractionBounds::InteractionBounds(const GameBoundingBox& box, const pair<EulerAngles, EulerAngles>& orientConstraint)
 {
-	this->BoundingBox = bounds;
+	this->BoundingBox = box;
 	this->OrientConstraint = orientConstraint;
 };
+
+bool InteractionBounds::TestEntityInteraction(const ItemInfo& entity0, const ItemInfo& entity1) const
+{
+	return this->TestPoseInteraction(entity0.Pose, entity1.Pose);
+}
+
+bool InteractionBounds::TestPoseInteraction(const Pose& pose0, const Pose& pose1) const
+{
+	auto deltaOrient = pose1.Orientation - pose0.Orientation;
+	if (deltaOrient.x < OrientConstraint.first.x || deltaOrient.x > OrientConstraint.second.x ||
+		deltaOrient.y < OrientConstraint.first.y || deltaOrient.y > OrientConstraint.second.y ||
+		deltaOrient.z < OrientConstraint.first.z || deltaOrient.z > OrientConstraint.second.z)
+	{
+		return false;
+	}
+
+	auto direction = (pose1.Position - pose0.Position).ToVector3();
+	auto rotMatrix = pose0.Orientation.ToRotationMatrix().Transpose(); // NOTE: Should be Invert(), but inverse/transpose of a rotation matrix are equal and transposing is faster.
+
+	auto relativePos = Vector3::Transform(direction, rotMatrix);
+	if (relativePos.x < BoundingBox.X1 || relativePos.x > BoundingBox.X2 ||
+		relativePos.y < BoundingBox.Y1 || relativePos.y > BoundingBox.Y2 ||
+		relativePos.z < BoundingBox.Z1 || relativePos.z > BoundingBox.Z2)
+	{
+		return false;
+	}
+
+	return true;
+}
 
 bool TestPlayerEntityInteract(ItemInfo* item, ItemInfo* laraItem, const InteractionBounds& interactBounds)
 {

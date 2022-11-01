@@ -18,12 +18,19 @@ extern GameBoundingBox GlobalCollisionBounds;
 extern ItemInfo* CollidedItems[MAX_COLLIDED_OBJECTS];
 extern MESH_INFO* CollidedMeshes[MAX_COLLIDED_OBJECTS];
 
-struct InteractionBounds
+class InteractionBounds
 {
+public:
+	// Components
 	GameBoundingBox				   BoundingBox		= GameBoundingBox::Zero;
 	pair<EulerAngles, EulerAngles> OrientConstraint = {};
 
-	InteractionBounds(const GameBoundingBox& bounds, const pair<EulerAngles, EulerAngles>& orientConstraint);
+	// Constructors
+	InteractionBounds(const GameBoundingBox& box, const pair<EulerAngles, EulerAngles>& orientConstraint);
+
+	// Utilities
+	bool TestEntityInteraction(const ItemInfo& entity0, const ItemInfo& entity1) const;
+	bool TestPoseInteraction(const Pose& pose0, const Pose& pose1) const;
 };
 
 // TODO: Refactor this family of functions into a more comprehensive position alignment system. -- Sezz 2022.10.30
