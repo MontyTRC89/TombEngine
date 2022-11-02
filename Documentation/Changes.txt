@@ -12,8 +12,9 @@ Version 1.0.3
 * Fix shotgun using 6 units of ammo with each shot.
 * Fix rocket explosions near statics.
 * Fix TR3 monkey level crash.
-* Fix occasional ejection when landing on a slope.
+* Fix occasional ejections when landing on a slope.
 * Fix occasional ejections when climbing up on a ledge under a slope.
+* Fix pushables not being pushable on top of other pushables.
 * Fix grabbing narrow ledges below ceilings.
 * Fix slow centaur projectile velocity.
 * Fix search animations - allow chest and shelf animations to play properly.
@@ -24,7 +25,6 @@ Version 1.0.3
 * Fix potential crashes when exiting game.
 * Fix secret soundtrack (which filename number should be the last) not playing.
 * Fix single-hand weapons not having a sound on draw and undraw.
-
 
 Version 1.0.2
 =============
