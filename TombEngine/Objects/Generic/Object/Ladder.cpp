@@ -17,6 +17,7 @@
 
 using namespace TEN::Input;
 using namespace TEN::Math;
+using std::pair;
 using std::vector;
 
 namespace TEN::Entities::Generic
@@ -65,7 +66,7 @@ namespace TEN::Entities::Generic
 	const auto LadderMountTopFrontOrient = EulerAngles(0, ANGLE(180.0f), 0);
 	const auto LadderMountTopFrontBounds = InteractionBasis(
 		LadderInteractBasis,
-		std::pair(
+		pair(
 			EulerAngles(ANGLE(-10.0f), ANGLE(180.0f) - LARA_GRAB_THRESHOLD, ANGLE(-10.0f)),
 			EulerAngles(ANGLE(10.0f), ANGLE(180.0f) + LARA_GRAB_THRESHOLD, ANGLE(10.0f))
 		)
@@ -74,7 +75,7 @@ namespace TEN::Entities::Generic
 	const auto LadderMountTopBackOrient = EulerAngles::Zero;
 	const auto LadderMountTopBackBounds = InteractionBasis(
 		LadderInteractBasis,
-		std::pair(
+		pair(
 			EulerAngles(ANGLE(-10.0f), -LARA_GRAB_THRESHOLD, ANGLE(-10.0f)),
 			EulerAngles(ANGLE(10.0f), LARA_GRAB_THRESHOLD, ANGLE(10.0f))
 		)
@@ -83,7 +84,7 @@ namespace TEN::Entities::Generic
 	const auto LadderMountFrontOrient = EulerAngles::Zero;
 	const auto LadderMountFrontBounds = InteractionBasis(
 		LadderInteractBasis,
-		std::pair(
+		pair(
 			EulerAngles(ANGLE(-10.0f), -LARA_GRAB_THRESHOLD, ANGLE(-10.0f)),
 			EulerAngles(ANGLE(10.0f), LARA_GRAB_THRESHOLD, ANGLE(10.0f))
 		)
@@ -92,7 +93,7 @@ namespace TEN::Entities::Generic
 	const auto LadderMountLeftOrient = EulerAngles(0, ANGLE(90.0f), 0);
 	const auto LadderMountLeftBounds = InteractionBasis(
 		LadderInteractBasis,
-		std::pair(
+		pair(
 			EulerAngles(ANGLE(-10.0f), ANGLE(90.0f) - LARA_GRAB_THRESHOLD, ANGLE(-10.0f)),
 			EulerAngles(ANGLE(10.0f), ANGLE(90.0f) + LARA_GRAB_THRESHOLD, ANGLE(10.0f))
 		)
@@ -101,7 +102,7 @@ namespace TEN::Entities::Generic
 	const auto LadderMountRightOrient = EulerAngles(0, ANGLE(-90.0f), 0);
 	const auto LadderMountRightBounds = InteractionBasis(
 		LadderInteractBasis,
-		std::pair(
+		pair(
 			EulerAngles(ANGLE(-10.0f), ANGLE(-90.0f) - LARA_GRAB_THRESHOLD, ANGLE(-10.0f)),
 			EulerAngles(ANGLE(10.0f), ANGLE(-90.0f) + LARA_GRAB_THRESHOLD, ANGLE(10.0f))
 		)
