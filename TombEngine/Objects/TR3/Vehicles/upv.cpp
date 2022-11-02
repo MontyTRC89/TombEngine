@@ -22,7 +22,7 @@
 #include "Objects/Utils/VehicleHelpers.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
-#include "Specific/input.h"
+#include "Specific/Input/Input.h"
 #include "Specific/setup.h"
 
 using namespace TEN::Input;
@@ -228,9 +228,9 @@ namespace TEN::Entities::Vehicles
 		auto* lara = GetLaraInfo(laraItem);
 
 		auto& ammo = GetAmmo(laraItem, LaraWeaponType::HarpoonGun);
-		if (ammo.getCount() == 0 && !ammo.hasInfinite())
+		if (ammo.GetCount() == 0 && !ammo.HasInfinite())
 			return;
-		else if (!ammo.hasInfinite())
+		else if (!ammo.HasInfinite())
 			ammo--;
 
 		short itemNumber = CreateItem();
@@ -442,7 +442,7 @@ namespace TEN::Entities::Vehicles
 			int sinkVal = lara->WaterCurrentActive - 1;
 			target = g_Level.Sinks[sinkVal].Position;
 		
-			int angle = ((Geometry::GetOrientToPoint(target.ToVector3(), laraItem->Pose.Position.ToVector3()).y - ANGLE(90.0f)) / 16) & 4095;
+			int angle = ((Geometry::GetOrientToPoint(laraItem->Pose.Position.ToVector3(), target.ToVector3()).y) / 16) & 4095;
 
 			int dx = target.x - laraItem->Pose.Position.x;
 			int dz = target.z - laraItem->Pose.Position.z;

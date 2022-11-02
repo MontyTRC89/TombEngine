@@ -1,17 +1,17 @@
 #include "framework.h"
 #include "Game/items.h"
 
-#include "Game/control/control.h"
 #include "Game/collision/floordata.h"
+#include "Game/control/control.h"
 #include "Game/effects/effects.h"
 #include "Game/Lara/lara.h"
-#include "Math/Random.h"
+#include "Math/Math.h"
 #include "Objects/ScriptInterfaceObjectsHandler.h"
-#include "ScriptInterfaceGame.h"
-#include "Specific/input.h"
+#include "Scripting/Include/ScriptInterfaceGame.h"
+#include "Sound/sound.h"
+#include "Specific/Input/Input.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
-#include "Sound/sound.h"
 
 using namespace TEN::Floordata;
 using namespace TEN::Input;

@@ -13,7 +13,7 @@
 #include "Game/Lara/lara.h"
 #include "Game/room.h"
 #include "Sound/sound.h"
-#include "Specific/input.h"
+#include "Specific/Input/Input.h"
 #include "Specific/level.h"
 #include "tr5_light.h"
 

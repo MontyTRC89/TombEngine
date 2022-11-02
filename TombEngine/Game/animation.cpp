@@ -188,7 +188,9 @@ void PerformAnimCommands(ItemInfo* item, bool isFrameBased)
 					else
 					{
 						if (item->RoomNumber == NO_ROOM)
+						{
 							SoundEffect(cmd[1] & 0x3FFF, &item->Pose, SoundEnvironment::Always);
+						}
 						else if (TestEnvironment(ENV_FLAG_WATER, item))
 						{
 							if (always || (inWater && TestEnvironment(ENV_FLAG_WATER, Camera.pos.RoomNumber)))

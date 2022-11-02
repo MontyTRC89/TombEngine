@@ -407,8 +407,11 @@ namespace TEN::Renderer
 			case BLENDMODE_EXCLUDE:
 				m_context->OMSetBlendState(m_excludeBlendState.Get(), NULL, 0xFFFFFFFF);
 				break;
-
 			}
+
+			m_stBlending.BlendMode = static_cast<unsigned int>(blendMode);
+			m_cbBlending.updateData(m_stBlending, m_context.Get());
+			BindConstantBufferPS(CB_BLENDING, m_cbBlending.get());
 
 			lastBlendMode = blendMode;
 		}
@@ -477,14 +480,14 @@ namespace TEN::Renderer
 
 	void Renderer11::SetAlphaTest(ALPHA_TEST_MODES mode, float threshold, bool force)
 	{
-		if (m_stAlphaTest.AlphaTest != static_cast<int>(mode) ||
-			m_stAlphaTest.AlphaThreshold != threshold ||
+		if (m_stBlending.AlphaTest != static_cast<int>(mode) ||
+			m_stBlending.AlphaThreshold != threshold ||
 			force)
 		{
-			m_stAlphaTest.AlphaTest = static_cast<int>(mode);
-			m_stAlphaTest.AlphaThreshold = threshold;
-			m_cbAlphaTest.updateData(m_stAlphaTest, m_context.Get());
-			BindConstantBufferPS(CB_ALPHA_TEST, m_cbAlphaTest.get());
+			m_stBlending.AlphaTest = static_cast<int>(mode);
+			m_stBlending.AlphaThreshold = threshold;
+			m_cbBlending.updateData(m_stBlending, m_context.Get());
+			BindConstantBufferPS(CB_BLENDING, m_cbBlending.get());
 		}
 	}
 
