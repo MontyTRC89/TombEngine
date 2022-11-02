@@ -77,7 +77,7 @@ float4 PS(PixelShaderInput input) : SV_TARGET
 	float fade = (sceneDepth - particleDepth) * 300.0F;
 	output.w = min(output.w, fade);
 
-	output = ApplyFog(output, FogColor, input.Fog, input.BlendMode);
+	output = ApplyFog(output, float4(0.0f, 0.0f, 0.0f, 0.0f), input.Fog, input.BlendMode);
 
 	return output;
 }
