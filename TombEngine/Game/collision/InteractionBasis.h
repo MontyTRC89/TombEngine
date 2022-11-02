@@ -11,11 +11,11 @@ struct ItemInfo;
 	{
 	public:
 		// Components
-		GameBoundingBox				   Bounds			= GameBoundingBox::Zero;
-		pair<EulerAngles, EulerAngles> OrientConstraint = {};
+		GameBoundingBox						Bounds			 = GameBoundingBox::Zero;
+		std::pair<EulerAngles, EulerAngles> OrientConstraint = {};
 
 		// Constructors
-		InteractionBasis(const GameBoundingBox& bounds, const pair<EulerAngles, EulerAngles>& orientConstraint);
+		InteractionBasis(const GameBoundingBox& bounds, const std::pair<EulerAngles, EulerAngles>& orientConstraint);
 
 		// Utilities
 		bool TestInteraction(const ItemInfo& entity0, const ItemInfo& entity1) const;

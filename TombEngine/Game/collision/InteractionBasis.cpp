@@ -8,7 +8,7 @@ using namespace TEN::Math;
 
 //namespace TEN::Collision
 //{
-	InteractionBasis::InteractionBasis(const GameBoundingBox& bounds, const pair<EulerAngles, EulerAngles>& orientConstraint)
+	InteractionBasis::InteractionBasis(const GameBoundingBox& bounds, const std::pair<EulerAngles, EulerAngles>& orientConstraint)
 	{
 		this->Bounds = bounds;
 		this->OrientConstraint = orientConstraint;
