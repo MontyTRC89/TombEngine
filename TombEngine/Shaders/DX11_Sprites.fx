@@ -37,7 +37,8 @@ PixelShaderInput VS(VertexShaderInput input)
 	{
 		worldPosition = mul(float4(input.Position, 1.0f), billboardMatrix);
 		output.Position = mul(mul(float4(input.Position, 1.0f), billboardMatrix), ViewProjection);
-	} else 
+	} 
+	else 
 	{
 		worldPosition = float4(input.Position, 1.0f);
 		output.Position = mul(float4(input.Position, 1.0f), ViewProjection);

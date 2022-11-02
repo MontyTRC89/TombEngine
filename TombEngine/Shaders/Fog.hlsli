@@ -1,26 +1,44 @@
 #ifndef FOGSHADER
 #define FOGSHADER
 
+#include "./Math.hlsli"
+
 float4 ApplyFog(float4 sourceColor, float4 fogColor, float value, unsigned int blendMode)
 {
 	if (FogMaxDistance == 0)
 		return sourceColor;
-	
-	if (blendMode != 0 &&
-		blendMode != 1 &&
-		blendMode != 4 &&
-		blendMode != 6 &&
-		blendMode != 11)
+
+	float alphaMult = 1.0f;
+
+	switch (blendMode)
 	{
-		fogColor.w = 0.0f;
+		case 2:
+		case 9:
+		case 10:
+			alphaMult = Luma(sourceColor.xyz);
+			fogColor.w = 0.0f;
+			break;
+
+		case 5:
+		case 8:
+			alphaMult = 1.0f - Luma(sourceColor.xyz);
+			fogColor.w = 0.0f;
+			break;
+
+		case 11:
+			alphaMult = sourceColor.w;
+			break;
+
+		default:
+			break;
 	}
 
 	if (fogColor.w > sourceColor.w)
-	{
 		fogColor.w = sourceColor.w;
-	}
 	
-	return lerp(sourceColor, fogColor, value);
+	float4 result = lerp(sourceColor, fogColor, value);
+	result.w *= alphaMult;
+	return result;
 }
 
 #endif // FOGSHADER
