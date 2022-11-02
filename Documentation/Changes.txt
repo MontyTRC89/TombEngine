@@ -15,6 +15,7 @@ Version 1.0.3
 * Fix occasional ejections when landing on a slope.
 * Fix occasional ejections when climbing up on a ledge under a slope.
 * Fix pushables not being pushable on top of other pushables.
+* Fix pushables having incorrect collision when bounding box is bigger than 1 sector.
 * Fix grabbing narrow ledges below ceilings.
 * Fix slow centaur projectile velocity.
 * Fix search animations - allow chest and shelf animations to play properly.

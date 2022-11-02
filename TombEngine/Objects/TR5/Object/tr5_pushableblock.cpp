@@ -1,11 +1,13 @@
 #include "framework.h"
 #include "Objects/TR5/Object/tr5_pushableblock.h"
+
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Game/animation.h"
 #include "Game/items.h"
 #include "Game/collision/collide_room.h"
 #include "Game/collision/collide_item.h"
+#include "Game/collision/floordata.h"
 #include "Game/control/flipeffect.h"
 #include "Game/control/box.h"
 #include "Specific/level.h"
@@ -14,6 +16,7 @@
 #include "Specific/setup.h"
 #include "Objects/TR5/Object/tr5_pushableblock_info.h"
 
+using namespace TEN::Floordata;
 using namespace TEN::Input;
 
 static auto PushableBlockPos = Vector3i::Zero;
@@ -974,8 +977,9 @@ std::optional<int> PushableBlockFloor(short itemNumber, int x, int y, int z)
 {
 	const auto& item = g_Level.Items[itemNumber];
 	const auto& pushable = (PushableInfo&)item.Data;
+	auto bboxHeight = GetBridgeItemIntersect(itemNumber, x, y, z, false);
 	
-	if (item.Status != ITEM_INVISIBLE && pushable.hasFloorCeiling)
+	if (item.Status != ITEM_INVISIBLE && pushable.hasFloorCeiling && bboxHeight.has_value())
 	{
 		const auto height = item.Pose.Position.y - (item.TriggerFlags & 0x1F) * CLICK(1);
 		return std::optional{height};
@@ -987,8 +991,9 @@ std::optional<int> PushableBlockCeiling(short itemNumber, int x, int y, int z)
 {
 	const auto& item = g_Level.Items[itemNumber];
 	const auto& pushable = (PushableInfo&)item.Data;
+	auto bboxHeight = GetBridgeItemIntersect(itemNumber, x, y, z, true);
 
-	if (item.Status != ITEM_INVISIBLE && pushable.hasFloorCeiling)
+	if (item.Status != ITEM_INVISIBLE && pushable.hasFloorCeiling && bboxHeight.has_value())
 		return std::optional{item.Pose.Position.y};
 
 	return std::nullopt;
