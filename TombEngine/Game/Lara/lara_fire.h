@@ -1,8 +1,6 @@
 #pragma once
 #include "Game/Lara/lara.h"
 
-using std::pair;
-
 class EulerAngles;
 struct CollisionInfo;
 struct ItemInfo;
@@ -31,9 +29,9 @@ enum WeaponState
 
 struct WeaponInfo
 {
-	pair<EulerAngles, EulerAngles> LockOrientConstraint  = {};
-	pair<EulerAngles, EulerAngles> LeftOrientConstraint  = {};
-	pair<EulerAngles, EulerAngles> RightOrientConstraint = {};
+	std::pair<EulerAngles, EulerAngles> LockOrientConstraint  = {};
+	std::pair<EulerAngles, EulerAngles> LeftOrientConstraint  = {};
+	std::pair<EulerAngles, EulerAngles> RightOrientConstraint = {};
 
 	short AimSpeed		  = 0;
 	int	  ShotAccuracy	  = 0;
