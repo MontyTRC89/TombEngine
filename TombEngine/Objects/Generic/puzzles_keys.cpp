@@ -91,10 +91,10 @@ void PuzzleHoleCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* co
 		short oldYrot = receptableItem->Pose.Orientation.y;
 
 		auto bounds = GameBoundingBox(receptableItem);
-		PuzzleBounds.BoundingBox.X1 = bounds.X1 - CLICK(1);
-		PuzzleBounds.BoundingBox.X2 = bounds.X2 + CLICK(1);
-		PuzzleBounds.BoundingBox.Z1 = bounds.Z1 - CLICK(1);;
-		PuzzleBounds.BoundingBox.Z2 = bounds.Z2 + CLICK(1);;
+		PuzzleBounds.Bounds.X1 = bounds.X1 - CLICK(1);
+		PuzzleBounds.Bounds.X2 = bounds.X2 + CLICK(1);
+		PuzzleBounds.Bounds.Z1 = bounds.Z1 - CLICK(1);;
+		PuzzleBounds.Bounds.Z2 = bounds.Z2 + CLICK(1);;
 
 		if (TestPlayerEntityInteract(receptableItem, laraItem, PuzzleBounds))
 		{

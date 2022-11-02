@@ -185,10 +185,10 @@ namespace TEN::Entities::TR4
 		{
 			auto box = GameBoundingBox(puzzleItem);
 
-			ElementPuzzleBounds.BoundingBox.X1 = box.X1;
-			ElementPuzzleBounds.BoundingBox.X2 = box.X2;
-			ElementPuzzleBounds.BoundingBox.Z1 = box.Z1 - 200;
-			ElementPuzzleBounds.BoundingBox.Z2 = box.Z2 + 200;
+			ElementPuzzleBounds.Bounds.X1 = box.X1;
+			ElementPuzzleBounds.Bounds.X2 = box.X2;
+			ElementPuzzleBounds.Bounds.Z1 = box.Z1 - 200;
+			ElementPuzzleBounds.Bounds.Z2 = box.Z2 + 200;
 
 			short oldRot = puzzleItem->Pose.Orientation.y;
 			puzzleItem->Pose.Orientation.y = laraItem->Pose.Orientation.y;
@@ -263,10 +263,10 @@ namespace TEN::Entities::TR4
 			{
 				auto box = GameBoundingBox(puzzleItem);
 
-				ElementPuzzleBounds.BoundingBox.X1 = box.X1;
-				ElementPuzzleBounds.BoundingBox.X2 = box.X2;
-				ElementPuzzleBounds.BoundingBox.Z1 = box.Z1 - 200;
-				ElementPuzzleBounds.BoundingBox.Z2 = box.Z2 + 200;
+				ElementPuzzleBounds.Bounds.X1 = box.X1;
+				ElementPuzzleBounds.Bounds.X2 = box.X2;
+				ElementPuzzleBounds.Bounds.Z1 = box.Z1 - 200;
+				ElementPuzzleBounds.Bounds.Z2 = box.Z2 + 200;
 
 				short oldRot = puzzleItem->Pose.Orientation.y;
 				puzzleItem->Pose.Orientation.y = laraItem->Pose.Orientation.y;

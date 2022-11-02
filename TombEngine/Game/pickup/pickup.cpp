@@ -544,10 +544,10 @@ void PickupCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 			return;
 		}
 
-		PlinthPickUpBounds.BoundingBox.X1 = plinth->X1;
-		PlinthPickUpBounds.BoundingBox.X2 = plinth->X2;
-		PlinthPickUpBounds.BoundingBox.Y2 = laraItem->Pose.Position.y - item->Pose.Position.y + 100;
-		PlinthPickUpBounds.BoundingBox.Z2 = plinth->Z2 + 320;
+		PlinthPickUpBounds.Bounds.X1 = plinth->X1;
+		PlinthPickUpBounds.Bounds.X2 = plinth->X2;
+		PlinthPickUpBounds.Bounds.Y2 = laraItem->Pose.Position.y - item->Pose.Position.y + 100;
+		PlinthPickUpBounds.Bounds.Z2 = plinth->Z2 + 320;
 		PlinthPickUpPosition.z = -200 - plinth->Z2;
 
 		// HACK: Until we refactor a way plinth collision is detected, this must be here
@@ -981,17 +981,17 @@ void SearchObjectCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* 
 		auto bounds = GameBoundingBox(item);
 		if (item->ObjectNumber != ID_SEARCH_OBJECT1)
 		{
-			SOBounds.BoundingBox.X1 = bounds.X1 - CLICK(0.5f);
-			SOBounds.BoundingBox.X2 = bounds.X2 + CLICK(0.5f);
+			SOBounds.Bounds.X1 = bounds.X1 - CLICK(0.5f);
+			SOBounds.Bounds.X2 = bounds.X2 + CLICK(0.5f);
 		}
 		else
 		{
-			SOBounds.BoundingBox.X1 = bounds.X1 + CLICK(0.25f);
-			SOBounds.BoundingBox.X2 = bounds.X2 - CLICK(0.25f);
+			SOBounds.Bounds.X1 = bounds.X1 + CLICK(0.25f);
+			SOBounds.Bounds.X2 = bounds.X2 - CLICK(0.25f);
 		}
 
-		SOBounds.BoundingBox.Z1 = bounds.Z1 - 200;
-		SOBounds.BoundingBox.Z2 = bounds.Z2 + 200;
+		SOBounds.Bounds.Z1 = bounds.Z1 - 200;
+		SOBounds.Bounds.Z2 = bounds.Z2 + 200;
 		SOPos.z = bounds.Z1 - SearchOffsets[objectNumber];
 
 		if (TestPlayerEntityInteract(item, laraItem, SOBounds))

@@ -600,30 +600,30 @@ namespace TEN::Entities::Effects
 			switch (item->ObjectNumber)
 			{
 			case ID_FLAME_EMITTER:
-				FireBounds.BoundingBox.X1 = -256;
-				FireBounds.BoundingBox.X2 = 256;
-				FireBounds.BoundingBox.Y1 = 0;
-				FireBounds.BoundingBox.Y2 = 1024;
-				FireBounds.BoundingBox.Z1 = -800;
-				FireBounds.BoundingBox.Z2 = 800;
+				FireBounds.Bounds.X1 = -256;
+				FireBounds.Bounds.X2 = 256;
+				FireBounds.Bounds.Y1 = 0;
+				FireBounds.Bounds.Y2 = 1024;
+				FireBounds.Bounds.Z1 = -800;
+				FireBounds.Bounds.Z2 = 800;
 				break;
 
 			case ID_FLAME_EMITTER2:
-				FireBounds.BoundingBox.X1 = -256;
-				FireBounds.BoundingBox.X2 = 256;
-				FireBounds.BoundingBox.Y1 = 0;
-				FireBounds.BoundingBox.Y2 = 1024;
-				FireBounds.BoundingBox.Z1 = -600;
-				FireBounds.BoundingBox.Z2 = 600;
+				FireBounds.Bounds.X1 = -256;
+				FireBounds.Bounds.X2 = 256;
+				FireBounds.Bounds.Y1 = 0;
+				FireBounds.Bounds.Y2 = 1024;
+				FireBounds.Bounds.Z1 = -600;
+				FireBounds.Bounds.Z2 = 600;
 				break;
 
 			case ID_BURNING_ROOTS:
-				FireBounds.BoundingBox.X1 = -384;
-				FireBounds.BoundingBox.X2 = 384;
-				FireBounds.BoundingBox.Y1 = 0;
-				FireBounds.BoundingBox.Y2 = 2048;
-				FireBounds.BoundingBox.Z1 = -384;
-				FireBounds.BoundingBox.Z2 = 384;
+				FireBounds.Bounds.X1 = -384;
+				FireBounds.Bounds.X2 = 384;
+				FireBounds.Bounds.Y1 = 0;
+				FireBounds.Bounds.Y2 = 2048;
+				FireBounds.Bounds.Z1 = -384;
+				FireBounds.Bounds.Z2 = 384;
 				break;
 			}
 

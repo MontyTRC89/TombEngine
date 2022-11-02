@@ -122,10 +122,10 @@ void ScalesCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 			short rotY = item->Pose.Orientation.y;
 			item->Pose.Orientation.y = (short)(laraItem->Pose.Orientation.y + ANGLE(45.0f)) & 0xC000;
 
-			ScalesBounds.BoundingBox.X1 = -1408;
-			ScalesBounds.BoundingBox.X2 = -640;
-			ScalesBounds.BoundingBox.Z1 = -512;
-			ScalesBounds.BoundingBox.Z2 = 0;
+			ScalesBounds.Bounds.X1 = -1408;
+			ScalesBounds.Bounds.X2 = -640;
+			ScalesBounds.Bounds.Z1 = -512;
+			ScalesBounds.Bounds.Z2 = 0;
 
 			if (TestPlayerEntityInteract(item, laraItem, ScalesBounds))
 			{

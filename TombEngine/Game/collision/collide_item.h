@@ -22,7 +22,7 @@ class InteractionBasis
 {
 public:
 	// Components
-	GameBoundingBox				   BoundingBox			= GameBoundingBox::Zero;
+	GameBoundingBox				   Bounds			= GameBoundingBox::Zero;
 	pair<EulerAngles, EulerAngles> OrientConstraint = {};
 
 	// Constructors

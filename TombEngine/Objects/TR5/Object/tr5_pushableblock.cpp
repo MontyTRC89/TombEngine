@@ -471,10 +471,10 @@ void PushableBlockCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo*
 	else
 	{
 		auto bounds = GameBoundingBox(pushableItem);
-		PushableBlockBounds.BoundingBox.X1 = (bounds.X1 / 2) - 100;
-		PushableBlockBounds.BoundingBox.X2 = (bounds.X2 / 2) + 100;
-		PushableBlockBounds.BoundingBox.Z1 = bounds.Z1 - 200;
-		PushableBlockBounds.BoundingBox.Z2 = 0;
+		PushableBlockBounds.Bounds.X1 = (bounds.X1 / 2) - 100;
+		PushableBlockBounds.Bounds.X2 = (bounds.X2 / 2) + 100;
+		PushableBlockBounds.Bounds.Z1 = bounds.Z1 - 200;
+		PushableBlockBounds.Bounds.Z2 = 0;
 
 		short rot = pushableItem->Pose.Orientation.y;
 		pushableItem->Pose.Orientation.y = (laraItem->Pose.Orientation.y + ANGLE(45.0f)) & 0xC000;

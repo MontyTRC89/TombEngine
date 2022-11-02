@@ -66,13 +66,13 @@ namespace TEN::Entities::Switches
 			if ((switchItem->TriggerFlags == 3 || switchItem->TriggerFlags == 4) && switchItem->Animation.ActiveState == SWITCH_ON)
 				return;
 
-			SwitchBounds.BoundingBox.X1 = bounds.X1 - 256;
-			SwitchBounds.BoundingBox.X2 = bounds.X2 + 256;
+			SwitchBounds.Bounds.X1 = bounds.X1 - 256;
+			SwitchBounds.Bounds.X2 = bounds.X2 + 256;
 
 			if (switchItem->TriggerFlags)
 			{
-				SwitchBounds.BoundingBox.Z1 = bounds.Z1 - 512;
-				SwitchBounds.BoundingBox.Z2 = bounds.Z2 + 512;
+				SwitchBounds.Bounds.Z1 = bounds.Z1 - 512;
+				SwitchBounds.Bounds.Z2 = bounds.Z2 + 512;
 
 				if (switchItem->TriggerFlags == 3)
 					SwitchPos.z = bounds.Z1 - 256;
@@ -81,8 +81,8 @@ namespace TEN::Entities::Switches
 			}
 			else
 			{
-				SwitchBounds.BoundingBox.Z1 = bounds.Z1 - 200;
-				SwitchBounds.BoundingBox.Z2 = bounds.Z2 + 200;
+				SwitchBounds.Bounds.Z1 = bounds.Z1 - 200;
+				SwitchBounds.Bounds.Z2 = bounds.Z2 + 200;
 				SwitchPos.z = bounds.Z1 - 64;
 			}
 
