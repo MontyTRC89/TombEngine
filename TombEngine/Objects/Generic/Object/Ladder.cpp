@@ -155,9 +155,34 @@ namespace TEN::Entities::Generic
 				}
 				else
 					player.InteractedItem = itemNumber;
+
+				return;
 			}
+
+			// Mount from back.
+			if (LadderMountBackBasis.TestInteraction(ladderItem, *laraItem))
+			{
+				if (!laraItem->OffsetBlend.IsActive)
+				{
+					auto mountOffset = LadderMountBackOffset + Vector3i(0, 0, GameBoundingBox(&ladderItem).Z2);
+
+					auto targetPos = Geometry::TranslatePoint(ladderItem.Pose.Position, ladderItem.Pose.Orientation, mountOffset);
+					auto posOffset = (targetPos - laraItem->Pose.Position).ToVector3();
+					auto orientOffset = (ladderItem.Pose.Orientation + LadderMountBackOrient) - laraItem->Pose.Orientation;
+					laraItem->SetOffsetBlend(posOffset, orientOffset);
+
+					SetAnimation(laraItem, LA_LADDER_MOUNT_FRONT);
+					player.Control.IsMoving = false;
+					player.Control.HandStatus = HandStatus::Busy;
+				}
+				else
+					player.InteractedItem = itemNumber;
+
+				return;
+			}
+
 			// Mount from right.
-			else if (LadderMountRightBasis.TestInteraction(ladderItem, *laraItem))
+			if (LadderMountRightBasis.TestInteraction(ladderItem, *laraItem))
 			{
 				auto mountOffset = LadderMountRightOffset + Vector3i(0, 0, GameBoundingBox(&ladderItem).Z1);
 
@@ -175,14 +200,14 @@ namespace TEN::Entities::Generic
 				}
 				else
 					player.InteractedItem = itemNumber;
+
+				return;
 			}
-			else
+
+			if (player.Control.IsMoving && player.InteractedItem == itemNumber)
 			{
-				if (player.Control.IsMoving && player.InteractedItem == itemNumber)
-				{
-					player.Control.IsMoving = false;
-					player.Control.HandStatus = HandStatus::Free;
-				}
+				player.Control.HandStatus = HandStatus::Free;
+				player.Control.IsMoving = false;
 			}
 
 			return;
