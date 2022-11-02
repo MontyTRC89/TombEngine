@@ -27,7 +27,7 @@ struct PixelShaderInput
 	float2 UV: TEXCOORD0;
 	float4 Color: COLOR;
 	float3x3 TBN : TBN;
-	float Fog : FOGG;
+	float Fog : FOG;
 	float4 PositionCopy : TEXCOORD1;
 	unsigned int BlendMode : BLENDMODE;
 };
