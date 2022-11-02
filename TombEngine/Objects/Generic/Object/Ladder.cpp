@@ -30,6 +30,7 @@ namespace TEN::Entities::Generic
 		TopFront,
 		TopBack,
 		Front,
+		Back,
 		Left,
 		Right
 	};
@@ -90,6 +91,16 @@ namespace TEN::Entities::Generic
 		pair(
 			EulerAngles(ANGLE(-10.0f), -LARA_GRAB_THRESHOLD, ANGLE(-10.0f)),
 			EulerAngles(ANGLE(10.0f), LARA_GRAB_THRESHOLD, ANGLE(10.0f))
+		)
+	);
+	
+	const auto LadderMountBackOffset = LadderMountedOffset;
+	const auto LadderMountBackOrient = EulerAngles(0, ANGLE(180.0f), 0);
+	const auto LadderMountBackBasis = InteractionBasis(
+		LadderInteractBounds,
+		pair(
+			EulerAngles(ANGLE(-10.0f), ANGLE(180.0f) - LARA_GRAB_THRESHOLD, ANGLE(-10.0f)),
+			EulerAngles(ANGLE(10.0f), ANGLE(180.0f) + LARA_GRAB_THRESHOLD, ANGLE(10.0f))
 		)
 	);
 

@@ -128,6 +128,7 @@ void ItemInfo::DoOffsetBlend()
 		// Reduce offsets... how?
 		break;
 	}
+
 	default:
 		return;
 	}
