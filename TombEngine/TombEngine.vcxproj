@@ -155,6 +155,7 @@ CALL gen.bat</Command>
   <ItemGroup>
     <ClInclude Include="framework.h" />
     <ClInclude Include="Game\collision\collide_item.h" />
+    <ClInclude Include="Game\collision\InteractionBasis.h" />
     <ClInclude Include="Game\control\box.h" />
     <ClInclude Include="Game\control\los.h" />
     <ClInclude Include="Game\control\volumetriggerer.h" />
@@ -610,6 +611,7 @@ CALL gen.bat</Command>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="Game\collision\collide_item.cpp" />
+    <ClCompile Include="Game\collision\InteractionBasis.cpp" />
     <ClCompile Include="Game\control\los.cpp" />
     <ClCompile Include="Game\effects\bubble.cpp" />
     <ClCompile Include="Game\effects\chaffFX.cpp" />

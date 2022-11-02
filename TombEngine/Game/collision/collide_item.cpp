@@ -4,6 +4,7 @@
 #include "Game/animation.h"
 #include "Game/control/los.h"
 #include "Game/collision/collide_room.h"
+#include "Game/collision/InteractionBasis.h"
 #include "Game/collision/sphere.h"
 #include "Game/effects/debris.h"
 #include "Game/effects/effects.h"
@@ -20,6 +21,7 @@
 #include "Sound/sound.h"
 #include "Specific/setup.h"
 
+//using namespace TEN::Collision;
 using namespace TEN::Math;
 using namespace TEN::Renderer;
 
@@ -28,41 +30,6 @@ constexpr auto ANIMATED_ALIGNMENT_FRAME_COUNT_THRESHOLD = 6;
 GameBoundingBox GlobalCollisionBounds;
 ItemInfo* CollidedItems[MAX_COLLIDED_OBJECTS];
 MESH_INFO* CollidedMeshes[MAX_COLLIDED_OBJECTS];
-
-InteractionBasis::InteractionBasis(const GameBoundingBox& box, const pair<EulerAngles, EulerAngles>& orientConstraint)
-{
-	this->Bounds = box;
-	this->OrientConstraint = orientConstraint;
-};
-
-bool InteractionBasis::TestInteraction(const ItemInfo& entity0, const ItemInfo& entity1) const
-{
-	return this->TestInteraction(entity0.Pose, entity1.Pose);
-}
-
-bool InteractionBasis::TestInteraction(const Pose& pose0, const Pose& pose1) const
-{
-	auto deltaOrient = pose1.Orientation - pose0.Orientation;
-	if (deltaOrient.x < OrientConstraint.first.x || deltaOrient.x > OrientConstraint.second.x ||
-		deltaOrient.y < OrientConstraint.first.y || deltaOrient.y > OrientConstraint.second.y ||
-		deltaOrient.z < OrientConstraint.first.z || deltaOrient.z > OrientConstraint.second.z)
-	{
-		return false;
-	}
-
-	auto direction = (pose1.Position - pose0.Position).ToVector3();
-	auto rotMatrix = pose0.Orientation.ToRotationMatrix().Transpose(); // NOTE: Should be Invert(), but inverse/transpose of a rotation matrix are equal and transposing is faster.
-
-	auto relativePos = Vector3::Transform(direction, rotMatrix);
-	if (relativePos.x < Bounds.X1 || relativePos.x > Bounds.X2 ||
-		relativePos.y < Bounds.Y1 || relativePos.y > Bounds.Y2 ||
-		relativePos.z < Bounds.Z1 || relativePos.z > Bounds.Z2)
-	{
-		return false;
-	}
-
-	return true;
-}
 
 bool TestPlayerEntityInteract(ItemInfo* item, ItemInfo* laraItem, const InteractionBasis& interactBasis)
 {

@@ -1,9 +1,12 @@
 #pragma once
+#include "Game/collision/InteractionBasis.h"
 #include "Math/Math.h"
 
+//using namespace TEN::Collision;
 using namespace TEN::Math;
 using std::pair;
 
+class InteractionBasis;
 class FloorInfo;
 struct CollisionInfo;
 struct ItemInfo;
@@ -17,21 +20,6 @@ constexpr auto VEHICLE_COLLISION_TERMINAL_VELOCITY = 30.0f;
 extern GameBoundingBox GlobalCollisionBounds;
 extern ItemInfo* CollidedItems[MAX_COLLIDED_OBJECTS];
 extern MESH_INFO* CollidedMeshes[MAX_COLLIDED_OBJECTS];
-
-class InteractionBasis
-{
-public:
-	// Components
-	GameBoundingBox				   Bounds			= GameBoundingBox::Zero;
-	pair<EulerAngles, EulerAngles> OrientConstraint = {};
-
-	// Constructors
-	InteractionBasis(const GameBoundingBox& box, const pair<EulerAngles, EulerAngles>& orientConstraint);
-
-	// Utilities
-	bool TestInteraction(const ItemInfo& entity0, const ItemInfo& entity1) const;
-	bool TestInteraction(const Pose& pose0, const Pose& pose1) const;
-};
 
 // TODO: Refactor this family of functions into a more comprehensive position alignment system. -- Sezz 2022.10.30
 bool TestPlayerEntityInteract(ItemInfo* item, ItemInfo* laraItem, const InteractionBasis& interactBasis);
