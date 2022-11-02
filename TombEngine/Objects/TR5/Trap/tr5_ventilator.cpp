@@ -270,8 +270,8 @@ void VentilatorControl(short itemNumber)
 	}
 	else
 	{
-		auto tBounds = GameBoundingBox::Zero;
-		tBounds.RotateNoPersp(item->Pose.Orientation, bounds);
+		auto tBounds = bounds;
+		tBounds.Rotate(item->Pose.Orientation);
 
 		effectBounds.X1 = item->Pose.Position.x + tBounds.X1;
 		effectBounds.X2 = item->Pose.Position.x + tBounds.X2;

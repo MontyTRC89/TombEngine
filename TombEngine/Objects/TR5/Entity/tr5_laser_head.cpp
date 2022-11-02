@@ -498,8 +498,8 @@ namespace TEN::Entities::Creatures::TR5
 										int someIndex = 0;
 
 										auto bounds = GameBoundingBox(LaraItem);
-										auto tBounds = GameBoundingBox::Zero;
-										tBounds.RotateNoPersp(LaraItem->Pose.Orientation, bounds);
+										auto tBounds = bounds;
+										tBounds.Rotate(LaraItem->Pose.Orientation);
 
 										int x1 = LaraItem->Pose.Position.x + tBounds.X1;
 										int x2 = LaraItem->Pose.Position.x + tBounds.X2;

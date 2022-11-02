@@ -31,7 +31,7 @@ class Pose;
 		int GetDepth() const;
 
 		// Utilities
-		void RotateNoPersp(const EulerAngles& orient, const GameBoundingBox& bounds);
+		void Rotate(const EulerAngles& orient);
 
 		// Converters
 		BoundingOrientedBox ToBoundingOrientedBox(const Pose& pose) const;
