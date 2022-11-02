@@ -57,51 +57,56 @@ namespace TEN::Entities::Generic
 	};
 
 	const auto LadderMountedOffset = Vector3i(0, 0, -BLOCK(1, 7));
-	const auto LadderInteractBasis = GameBoundingBox(
+	const auto LadderInteractBounds = GameBoundingBox(
 		-BLOCK(1, 4), BLOCK(1, 4),
 		-LADDER_STEP_HEIGHT, LADDER_STEP_HEIGHT,
 		-BLOCK(3, 8), BLOCK(3, 8)
 	);
 
+	const auto LadderMountTopFrontOffset = LadderMountedOffset; // TODO
 	const auto LadderMountTopFrontOrient = EulerAngles(0, ANGLE(180.0f), 0);
-	const auto LadderMountTopFrontBounds = InteractionBasis(
-		LadderInteractBasis,
+	const auto LadderMountTopFrontBasis = InteractionBasis(
+		LadderInteractBounds,
 		pair(
 			EulerAngles(ANGLE(-10.0f), ANGLE(180.0f) - LARA_GRAB_THRESHOLD, ANGLE(-10.0f)),
 			EulerAngles(ANGLE(10.0f), ANGLE(180.0f) + LARA_GRAB_THRESHOLD, ANGLE(10.0f))
 		)
 	);
-	
+
+	const auto LadderMountTopBackOffset = LadderMountedOffset; // TODO
 	const auto LadderMountTopBackOrient = EulerAngles::Zero;
-	const auto LadderMountTopBackBounds = InteractionBasis(
-		LadderInteractBasis,
+	const auto LadderMountTopBackBasis = InteractionBasis(
+		LadderInteractBounds,
 		pair(
 			EulerAngles(ANGLE(-10.0f), -LARA_GRAB_THRESHOLD, ANGLE(-10.0f)),
 			EulerAngles(ANGLE(10.0f), LARA_GRAB_THRESHOLD, ANGLE(10.0f))
 		)
 	);
 
+	const auto LadderMountFrontOffset = LadderMountedOffset;
 	const auto LadderMountFrontOrient = EulerAngles::Zero;
-	const auto LadderMountFrontBounds = InteractionBasis(
-		LadderInteractBasis,
+	const auto LadderMountFrontBasis = InteractionBasis(
+		LadderInteractBounds,
 		pair(
 			EulerAngles(ANGLE(-10.0f), -LARA_GRAB_THRESHOLD, ANGLE(-10.0f)),
 			EulerAngles(ANGLE(10.0f), LARA_GRAB_THRESHOLD, ANGLE(10.0f))
 		)
 	);
 
+	const auto LadderMountLeftOffset = LadderMountedOffset + Vector3i(-BLOCK(1, 4), 0, 0);
 	const auto LadderMountLeftOrient = EulerAngles(0, ANGLE(90.0f), 0);
-	const auto LadderMountLeftBounds = InteractionBasis(
-		LadderInteractBasis,
+	const auto LadderMountLeftBasis = InteractionBasis(
+		LadderInteractBounds,
 		pair(
 			EulerAngles(ANGLE(-10.0f), ANGLE(90.0f) - LARA_GRAB_THRESHOLD, ANGLE(-10.0f)),
 			EulerAngles(ANGLE(10.0f), ANGLE(90.0f) + LARA_GRAB_THRESHOLD, ANGLE(10.0f))
 		)
 	);
 
+	const auto LadderMountRightOffset = LadderMountedOffset + Vector3i(BLOCK(1, 4), 0, 0);
 	const auto LadderMountRightOrient = EulerAngles(0, ANGLE(-90.0f), 0);
-	const auto LadderMountRightBounds = InteractionBasis(
-		LadderInteractBasis,
+	const auto LadderMountRightBasis = InteractionBasis(
+		LadderInteractBounds,
 		pair(
 			EulerAngles(ANGLE(-10.0f), ANGLE(-90.0f) - LARA_GRAB_THRESHOLD, ANGLE(-10.0f)),
 			EulerAngles(ANGLE(10.0f), ANGLE(-90.0f) + LARA_GRAB_THRESHOLD, ANGLE(10.0f))
@@ -122,11 +127,11 @@ namespace TEN::Entities::Generic
 			(player.Control.IsMoving && player.InteractedItem == itemNumber))
 		{
 			// Mount from front.
-			if (LadderMountFrontBounds.TestInteraction(ladderItem, *laraItem))
+			if (LadderMountFrontBasis.TestInteraction(ladderItem, *laraItem))
 			{
 				if (!laraItem->OffsetBlend.IsActive)
 				{
-					auto mountOffset = Vector3i(0, 0, GameBoundingBox(&ladderItem).Z1) + LadderMountedOffset;
+					auto mountOffset = LadderMountFrontOffset + Vector3i(0, 0, GameBoundingBox(&ladderItem).Z1);
 
 					auto targetPos = Geometry::TranslatePoint(ladderItem.Pose.Position, ladderItem.Pose.Orientation, mountOffset);
 					auto relativeOffset = (targetPos - laraItem->Pose.Position).ToVector3();
@@ -140,9 +145,9 @@ namespace TEN::Entities::Generic
 					player.InteractedItem = itemNumber;
 			}
 			// Mount from right.
-			else if (LadderMountRightBounds.TestInteraction(ladderItem, *laraItem))
+			else if (LadderMountRightBasis.TestInteraction(ladderItem, *laraItem))
 			{
-				auto mountOffset = Vector3i(BLOCK(1, 4), 0, 0) + Vector3i(0, 0, GameBoundingBox(&ladderItem).Z1) + LadderMountedOffset;
+				auto mountOffset = LadderMountRightOffset + Vector3i(0, 0, GameBoundingBox(&ladderItem).Z1);
 
 				//if (AlignPlayerToEntity(&ladderItem, laraItem, mountOffset, LadderMountRightOrient))
 				if (!laraItem->OffsetBlend.IsActive)
