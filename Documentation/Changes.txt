@@ -7,6 +7,7 @@ Version 1.0.3
 * Add FlyCheat option to gameflow script for disabling dozy mode.
 * Adjust sprint jump timing.
 * Increase amount of maximum secrets per level from 8 to 32.
+* Improve game and inventory input handling.
 * Fix dodgy weapon lock angle constraints.
 * Fix wrong shotgun ammo pickup amount.
 * Fix shotgun using 6 units of ammo with each shot.
