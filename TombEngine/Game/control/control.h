@@ -3,13 +3,13 @@
 #include "Game/control/trigger.h"
 #include "Game/items.h"
 #include "Game/room.h"
-#include "Specific/phd_global.h"
+#include "Math/Math.h"
 
-struct BOUNDING_BOX;
-struct ItemInfo;
-struct CollisionInfo;
 class FloorInfo;
+class GameBoundingBox;
 struct AnimData;
+struct CollisionInfo;
+struct ItemInfo;
 struct MESH_INFO;
 struct ROOM_INFO;
 
@@ -72,9 +72,9 @@ extern std::vector<short> OutsideRoomTable[OUTSIDE_SIZE][OUTSIDE_SIZE];
 
 int DrawPhase();
 
-GameStatus DoTitle(int index, std::string const & ambient);
-GameStatus DoLevel(int index, std::string const & ambient, bool loadFromSavegame);
-GameStatus ControlPhase(int numFrames, int demoMode);
+GameStatus DoTitle(int index, const std::string& ambient);
+GameStatus DoLevel(int index, const std::string& ambient, bool loadFromSavegame);
+GameStatus ControlPhase(int numFrames, bool demoMode);
 
 int GetRandomControl();
 int GetRandomDraw();

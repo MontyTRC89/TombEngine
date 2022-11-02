@@ -4,6 +4,7 @@
 #include <SpriteFont.h>
 #include <PrimitiveBatch.h>
 #include <d3d9types.h>
+
 #include "Renderer/Renderer11Enums.h"
 #include "Renderer/ConstantBuffers/StaticBuffer.h"
 #include "Renderer/ConstantBuffers/LightBuffer.h"
@@ -14,12 +15,12 @@
 #include "Renderer/ConstantBuffers/RoomBuffer.h"
 #include "Renderer/ConstantBuffers/ItemBuffer.h"
 #include "Renderer/ConstantBuffers/AnimatedBuffer.h"
-#include "Renderer/ConstantBuffers/AlphaTestBuffer.h"
+#include "Renderer/ConstantBuffers/BlendingBuffer.h"
 #include "Frustum.h"
 #include "RendererBucket.h"
 #include "Game/items.h"
 #include "Game/animation.h"
-#include "Game/gui.h"
+#include "Game/Gui.h"
 #include "Game/effects/effects.h"
 #include "IndexBuffer/IndexBuffer.h"
 #include "VertexBuffer/VertexBuffer.h"
@@ -41,7 +42,11 @@
 #include "Renderer/Structures/RendererStringToDraw.h"
 #include "Renderer/Structures/RendererRoom.h"
 
+class EulerAngles;
 struct CAMERA_INFO;
+struct RendererRectangle;
+
+using namespace TEN::Gui;
 
 namespace TEN::Renderer
 {
@@ -313,8 +318,8 @@ namespace TEN::Renderer
 		ConstantBuffer<CSpriteBuffer> m_cbSprite;
 		CPostProcessBuffer m_stPostProcessBuffer;
 		ConstantBuffer<CPostProcessBuffer> m_cbPostProcessBuffer;
-		CAlphaTestBuffer m_stAlphaTest;
-		ConstantBuffer<CAlphaTestBuffer> m_cbAlphaTest;
+		CBlendingBuffer m_stBlending;
+		ConstantBuffer<CBlendingBuffer> m_cbBlending;
 
 		// Sprites
 		std::unique_ptr<SpriteBatch> m_spriteBatch;
@@ -629,8 +634,7 @@ namespace TEN::Renderer
 		bool IsFullsScreen();
 		void RenderTitleImage();
 		void AddLine2D(int x1, int y1, int x2, int y2, byte r, byte g, byte b, byte a);
-		void AddLine3D(Vector3 start, Vector3 end,
-		               Vector4 color);
+		void AddLine3D(Vector3 start, Vector3 end, Vector4 color);
 		void AddBox(Vector3 min, Vector3 max, Vector4 color);
 		void AddBox(Vector3* corners, Vector4 color);
 		void AddDebugBox(BoundingOrientedBox box, Vector4 color, RENDERER_DEBUG_PAGE page);
@@ -642,12 +646,10 @@ namespace TEN::Renderer
 		void ResetAnimations();
 		void UpdateLaraAnimations(bool force);
 		void UpdateItemAnimations(int itemNumber, bool force);
-		void GetLaraAbsBonePosition(Vector3* pos, int joint);
-		void GetItemAbsBonePosition(int itemNumber, Vector3* pos, int joint);
+		void GetItemAbsBonePosition(int itemNumber, Vector3& pos, int jointIndex);
 		int  GetSpheres(short itemNumber, BoundingSphere* ptr, char worldSpace, Matrix local);
-		void GetBoneMatrix(short itemNumber, int joint, Matrix* outMatrix);
-		void DrawObjectOn2DPosition(short x, short y, short objectNum, short rotX, short rotY, short rotZ,
-		                            float scale1);
+		void GetBoneMatrix(short itemNumber, int jointIndex, Matrix* outMatrix);
+		void DrawObjectOn2DPosition(short x, short y, short objectNum, EulerAngles orient, float scale1);
 		void SetLoadingScreen(std::wstring& fileName);
 		void SetTextureOrDefault(Texture2D& texture, std::wstring path);
 		std::string GetDefaultAdapterName();

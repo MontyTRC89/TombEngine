@@ -12,11 +12,14 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_one_gun.h"
+#include "Math/Math.h"
 #include "Game/misc.h"
 #include "Game/people.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
+
+using namespace TEN::Math;
 
 namespace TEN::Entities::Creatures::TR5
 {
@@ -52,7 +55,7 @@ namespace TEN::Entities::Creatures::TR5
 		spark->dSize = spark->sSize = spark->size = (GetRandomControl() & 7) + 192;
 	}
 
-	void TriggerTorpedoBubbles(Vector3Int* pos1, Vector3Int* pos2, char factor)
+	void TriggerTorpedoBubbles(Vector3i* pos1, Vector3i* pos2, char factor)
 	{
 		auto* spark = GetFreeParticle();
 
@@ -85,7 +88,7 @@ namespace TEN::Entities::Creatures::TR5
 		spark->dSize = spark->size * 2;
 	}
 
-	void TriggerTorpedoSparks2(Vector3Int* pos1, Vector3Int* pos2, char scale)
+	void TriggerTorpedoSparks2(Vector3i* pos1, Vector3i* pos2, char scale)
 	{
 		auto* spark = GetFreeParticle();
 
@@ -130,24 +133,21 @@ namespace TEN::Entities::Creatures::TR5
 		torpedoItem->ObjectNumber = ID_TORPEDO;
 		torpedoItem->Color = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
 
-		Vector3Int pos1;
-		Vector3Int pos2;
+			auto pos1 = Vector3i::Zero;
+			auto pos2 = Vector3i::Zero;
+			for (int i = 0; i < 8; i++)
+			{
+				pos1 = GetJointPosition(item, 4, Vector3i(
+					(GetRandomControl() & 0x7F) - 414,
+					-320,
+					352
+				));
 
-		for (int i = 0; i < 8; i++)
-		{
-			auto pos1 = Vector3Int(
-				(GetRandomControl() & 0x7F) - 414,
-				-320,
-				352
-			);
-			GetJointAbsPosition(item, &pos1, 4);
-
-			auto pos2 = Vector3Int(
-				(GetRandomControl() & 0x3FF) - 862,
-				-320 - (GetRandomControl() & 0x3FF),
-				(GetRandomControl() & 0x3FF) - 160
-			);
-			GetJointAbsPosition(item, &pos2, 4);
+				pos2 = GetJointPosition(item, 4, Vector3i(
+					(GetRandomControl() & 0x3FF) - 862,
+					-320 - (GetRandomControl() & 0x3FF),
+					(GetRandomControl() & 0x3FF) - 160
+				));
 
 			TriggerTorpedoSparks2(&pos1, &pos2, 0);
 		}
@@ -159,11 +159,11 @@ namespace TEN::Entities::Creatures::TR5
 
 		InitialiseItem(itemNumber);
 
-		torpedoItem->Animation.Velocity.y = 0.0f;
-		torpedoItem->Animation.Velocity.z = 0.0f;
 		torpedoItem->Pose.Orientation.x = 0;
 		torpedoItem->Pose.Orientation.y = item->Pose.Orientation.y;
 		torpedoItem->Pose.Orientation.z = 0;
+		torpedoItem->Animation.Velocity.y = 0.0f;
+		torpedoItem->Animation.Velocity.z = 0.0f;
 		torpedoItem->ItemFlags[0] = -1;
 
 		AddActiveItem(itemNumber);
@@ -288,64 +288,38 @@ namespace TEN::Entities::Creatures::TR5
 
 		if (GlobalCounter & 1)
 		{
-			auto pos1 = Vector3Int(200, 320, 90);
-			GetJointAbsPosition(item, &pos1, 1);
-
-			auto pos2 = Vector3Int(200, 1280, 90);
-			GetJointAbsPosition(item, &pos2, 1);
-
+			auto pos1 = GetJointPosition(item, 1, Vector3i(200, 320, 90));
+			auto pos2 = GetJointPosition(item, 1, Vector3i(200, 1280, 90));
 			TriggerTorpedoBubbles(&pos1, &pos2, 0);
 
-			pos1 = Vector3Int(200, 320, -100);
-			GetJointAbsPosition(item, &pos1, 1);
-
-			pos2 = Vector3Int(200, 1280, -100);
-			GetJointAbsPosition(item, &pos2, 1);
-
+			pos1 = GetJointPosition(item, 1, Vector3i(200, 230, -100));
+			pos2 = GetJointPosition(item, 1, Vector3i(200, 1280, -100));
 			TriggerTorpedoBubbles(&pos1, &pos2, 0);
 		}
 		else
 		{
-			auto pos1 = Vector3Int(-200, 320, 90);
-			GetJointAbsPosition(item, &pos1, 2);
-
-			auto pos2 = Vector3Int(-200, 1280, 90);
-			GetJointAbsPosition(item, &pos2, 2);
-
+			auto pos1 = GetJointPosition(item, 2, Vector3i(-200, 320, 90));
+			auto pos2 = GetJointPosition(item, 2, Vector3i(-200, 1280, 90));
 			TriggerTorpedoBubbles(&pos1, &pos2, 0);
 
-			pos1 = Vector3Int(-200, 320, -100);
-			GetJointAbsPosition(item, &pos1, 2);
-
-			pos2 = Vector3Int(-200, 1280, -100);
-			GetJointAbsPosition(item, &pos2, 2);
-
+			pos1 = GetJointPosition(item, 2, Vector3i(-200, 320, -100));
+			pos2 = GetJointPosition(item, 2, Vector3i(-200, 1280, -100));
 			TriggerTorpedoBubbles(&pos1, &pos2, 0);
 		}
 
 		TriggerSubmarineSparks(itemNumber);
 
-		GameVector pos1;
-		pos1.x = 0;
-		pos1.y = -600;
-		pos1.z = -40;
-		pos1.roomNumber = item->RoomNumber;
-		GetJointAbsPosition(item, (Vector3Int*)&pos1, 0);
+		auto origin = GameVector(GetJointPosition(item, 0, Vector3i(0, -600, -40)), item->RoomNumber);
+		auto target = GameVector(GetJointPosition(item, 0, Vector3i(0, -15784, -40)));
 
-		GameVector pos2;
-		pos2.x = 0;
-		pos2.y = -15784;
-		pos2.z = -40;
-		GetJointAbsPosition(item, (Vector3Int*)&pos2, 0);
-
-		if (!LOS((GameVector*)&pos1, &pos2))
+		if (!LOS(&origin, &target))
 		{
-			int distance = sqrt(pow(pos2.x - pos1.x, 2) + pow(pos2.y - pos1.y, 2) + pow(pos2.z - pos1.z, 2));
+			int distance = sqrt(pow(target.x - origin.x, 2) + pow(target.y - origin.y, 2) + pow(target.z - origin.z, 2));
 			if (distance < SECTOR(16))
 			{
 				distance = SECTOR(16) - distance;
 				byte color = (GetRandomControl() & 0xF) + (distance / 128) + 64;
-				TriggerDynamicLight(pos2.x, pos2.y, pos2.z, (GetRandomControl() & 1) + (distance / 2048) + 12, color / 2, color, color / 2);
+				TriggerDynamicLight(target.x, target.y, target.z, (GetRandomControl() & 1) + (distance / 2048) + 12, color / 2, color, color / 2);
 			}
 		}
 
@@ -394,18 +368,8 @@ namespace TEN::Entities::Creatures::TR5
 
 		DoProjectileDynamics(itemNumber, item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, dx, item->Animation.Velocity.y, dz);
 
-		Vector3Int pos1;
-		pos1.x = 0;
-		pos1.y = 0;
-		pos1.z = (GlobalCounter & 1) != 0 ? 48 : -48;
-		GetJointAbsPosition(item, &pos1, 0);
-
-		Vector3Int pos2;
-		pos2.x = 0;
-		pos2.y = 0;
-		pos2.z = 8 * ((GlobalCounter & 1) != 0 ? 48 : -48);
-		GetJointAbsPosition(item, &pos2, 0);
-
+		auto pos1 = GetJointPosition(item, 0, Vector3i(0, 0, (GlobalCounter & 1) != 0 ? 48 : -48));
+		auto pos2 = GetJointPosition(item, 0, Vector3i(0, 0, 8 * ((GlobalCounter & 1) != 0 ? 48 : -48)));
 		TriggerTorpedoBubbles(&pos1, &pos2, 1);
 
 		if (item->ItemFlags[0] >= 300)
@@ -428,7 +392,7 @@ namespace TEN::Entities::Creatures::TR5
 
 		SoundEffect(SFX_TR5_VEHICLE_DIVESUIT_HIT, &item->Pose, SoundEnvironment::Always);
 
-		Vector3Int pos;
+		Vector3i pos;
 
 		if (item->ItemFlags[0] == NO_ITEM)
 		{
@@ -468,7 +432,7 @@ namespace TEN::Entities::Creatures::TR5
 			}
 		}
 
-		auto angles = GetVectorAngles(pos.x - item->Pose.Position.x, pos.y - item->Pose.Position.y, pos.z - item->Pose.Position.z);
+		auto orient = Geometry::GetOrientToPoint(item->Pose.Position.ToVector3(), pos.ToVector3());
 
 		if (item->Animation.Velocity.z >= 48.0f)
 		{
@@ -482,11 +446,11 @@ namespace TEN::Entities::Creatures::TR5
 
 		if (item->ItemFlags[1] - 1 < 60)
 		{
-			short dry = angles.y - item->Pose.Orientation.y;
+			short dry = orient.y - item->Pose.Orientation.y;
 			if (abs(dry) > ANGLE(180.0f))
 				dry = -dry;
 
-			short drx = angles.x - item->Pose.Orientation.x;
+			short drx = orient.x - item->Pose.Orientation.x;
 			if (abs(drx) > ANGLE(180.0f))
 				drx = -drx;
 
@@ -519,19 +483,15 @@ namespace TEN::Entities::Creatures::TR5
 
 		item->Pose.Orientation.z += 16 * item->Animation.Velocity.z;
 
-		int c = item->Animation.Velocity.z * phd_cos(item->Pose.Orientation.x);
-
-		item->Pose.Position.x += c * phd_sin(item->Pose.Orientation.y);
-		item->Pose.Position.y += item->Animation.Velocity.z * phd_sin(-item->Pose.Orientation.x);
-		item->Pose.Position.z += c * phd_cos(item->Pose.Orientation.y);
-
+		TranslateItem(item, item->Pose.Orientation, item->Animation.Velocity.z);
+		
 		auto probe = GetCollision(item);
 
 		if (item->Pose.Position.y < probe.Position.Floor &&
 			item->Pose.Position.y > probe.Position.Ceiling &&
 			TestEnvironment(ENV_FLAG_WATER, probe.RoomNumber))
 		{
-			if (ItemNearLara(&item->Pose.Position, 200))
+			if (ItemNearLara(item->Pose.Position, 200))
 			{
 				LaraItem->HitStatus = true;
 				KillItem(itemNumber);
@@ -548,15 +508,8 @@ namespace TEN::Entities::Creatures::TR5
 				if (probe.RoomNumber != item->RoomNumber)
 					ItemNewRoom(itemNumber, probe.RoomNumber);
 
-				Vector3Int pos1 = { 0, 0, -64 };
-				GetJointAbsPosition(item, &pos1, 0);
-
-				Vector3Int pos2;
-				pos2.x = 0;
-				pos2.y = 0;
-				pos2.z = -64 << ((GlobalCounter & 1) + 2);
-				GetJointAbsPosition(item, &pos2, 0);
-
+				auto pos1 = GetJointPosition(item, 0, Vector3i(0, 0, -64));
+				auto pos2 = GetJointPosition(item, 0, Vector3i(0, 0, -64 << ((GlobalCounter & 1) + 2)));
 				TriggerTorpedoBubbles(&pos1, &pos2, 1);
 			}
 		}

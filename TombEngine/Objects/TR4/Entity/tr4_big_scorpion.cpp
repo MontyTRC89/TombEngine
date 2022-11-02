@@ -12,7 +12,7 @@
 #include "Game/Lara/lara_helpers.h"
 #include "Game/misc.h"
 #include "Specific/level.h"
-#include "Specific/prng.h"
+#include "Math/Random.h"
 #include "Specific/setup.h"
 
 using namespace TEN::Math::Random;
@@ -29,7 +29,7 @@ namespace TEN::Entities::TR4
 
 	const auto BigScorpionBite1 = BiteInfo(Vector3::Zero, 8);
 	const auto BigScorpionBite2 = BiteInfo(Vector3::Zero, 23);
-	const vector<int> BigScorpionAttackJoints = { 8, 20, 21, 23, 24 };
+	const vector<unsigned int> BigScorpionAttackJoints = { 8, 20, 21, 23, 24 };
 
 	int CutSeqNum;
 
@@ -129,32 +129,24 @@ namespace TEN::Entities::TR4
 				GetAITarget(creature);
 			else
 			{
-				if (creature->HurtByLara &&
-					item->Animation.ActiveState != BSCORPION_STATE_KILL_TROOP)
-				{
+				if (creature->HurtByLara && item->Animation.ActiveState != BSCORPION_STATE_KILL_TROOP)
 					creature->Enemy = LaraItem;
-				}
 				else
 				{
 					creature->Enemy = nullptr;
-					int minDistance = INT_MAX;
+					float minDistance = FLT_MAX;
 
-					for (int i = 0; i < ActiveCreatures.size(); i++)
+					for (auto* activeCreature : ActiveCreatures)
 					{
-						auto* currentCreatureInfo = ActiveCreatures[i];
-						if (currentCreatureInfo->ItemNumber != NO_ITEM && currentCreatureInfo->ItemNumber != itemNumber)
+						if (activeCreature->ItemNumber != NO_ITEM && activeCreature->ItemNumber != itemNumber)
 						{
-							auto* currentItem = &g_Level.Items[currentCreatureInfo->ItemNumber];
+							auto* currentItem = &g_Level.Items[activeCreature->ItemNumber];
 							if (currentItem->ObjectNumber != ID_LARA)
 							{
 								if (currentItem->ObjectNumber != ID_BIG_SCORPION &&
 									(!currentItem->IsLara() || creature->HurtByLara))
 								{
-									int dx = currentItem->Pose.Position.x - item->Pose.Position.x;
-									int dy = currentItem->Pose.Position.y - item->Pose.Position.y;
-									int dz = currentItem->Pose.Position.z - item->Pose.Position.z;
-
-									int distance = SQUARE(dx) + SQUARE(dy) + SQUARE(dz);
+									int distance = Vector3i::Distance(item->Pose.Position, currentItem->Pose.Position);
 									if (distance < minDistance)
 									{
 										minDistance = distance;
@@ -250,7 +242,7 @@ namespace TEN::Entities::TR4
 						creature->MaxTurn = 0;
 					}
 				}
-				else if (item->TestBits(JointBitType::Touch, BigScorpionAttackJoints))
+				else if (item->TouchBits.Test(BigScorpionAttackJoints))
 				{
 					DoDamage(creature->Enemy, BIG_SCORPION_ATTACK_DAMAGE);
 

@@ -1,14 +1,15 @@
 #include "framework.h"
-#include "tr5_ventilator.h"
+#include "Objects/TR5/Trap/tr5_ventilator.h"
+
 #include "Game/animation.h"
-#include "Specific/level.h"
-#include "Game/control/control.h"
-#include "Game/Lara/lara.h"
 #include "Game/camera.h"
+#include "Game/control/control.h"
 #include "Game/effects/effects.h"
 #include "Game/items.h"
+#include "Game/Lara/lara.h"
+#include "Specific/level.h"
 
-static void VentilatorEffect(BOUNDING_BOX* bounds, int intensity, short rot, int speed)
+void VentilatorEffect(GameBoundingBox* bounds, int intensity, short rot, int speed)
 {
 	int x, y, z;
 
@@ -80,7 +81,7 @@ static void VentilatorEffect(BOUNDING_BOX* bounds, int intensity, short rot, int
 				}
 				else
 				{
-					int factor = 3 * bounds->Height() / 8;
+					int factor = 3 * bounds->GetHeight() / 8;
 					short angle = 2 * GetRandomControl();
 
 					spark->y = (bounds->Y1 + bounds->Y2) / 2;
@@ -165,11 +166,11 @@ void VentilatorControl(short itemNumber)
 	else
 		speed = 128;
 
-	auto* bounds = GetBoundsAccurate(item);
-	BOUNDING_BOX effectBounds;
+	auto bounds = GameBoundingBox(item);
+	auto effectBounds = GameBoundingBox::Zero;
 
-	effectBounds.Y1 = item->Pose.Position.y + bounds->Y1;
-	effectBounds.Y2 = item->Pose.Position.y + bounds->Y2;
+	effectBounds.Y1 = item->Pose.Position.y + bounds.Y1;
+	effectBounds.Y2 = item->Pose.Position.y + bounds.Y2;
 
 	if (item->ObjectNumber != ID_PROPELLER_V) // TODO: check this ID
 	{
@@ -177,10 +178,10 @@ void VentilatorControl(short itemNumber)
 		{
 			if (item->Pose.Orientation.y == -ANGLE(90.0f))
 			{
-				effectBounds.X1 = item->Pose.Position.x - bounds->Z2;
-				effectBounds.X2 = item->Pose.Position.x - bounds->Z1;
-				effectBounds.Z1 = item->Pose.Position.z + bounds->X1;
-				effectBounds.Z2 = item->Pose.Position.z + bounds->X2;
+				effectBounds.X1 = item->Pose.Position.x - bounds.Z2;
+				effectBounds.X2 = item->Pose.Position.x - bounds.Z1;
+				effectBounds.Z1 = item->Pose.Position.z + bounds.X1;
+				effectBounds.Z2 = item->Pose.Position.z + bounds.X2;
 				xChange = 0;
 				zChange = 1;
 			}
@@ -188,18 +189,18 @@ void VentilatorControl(short itemNumber)
 			{
 				if (item->Pose.Orientation.y != ANGLE(90.0f))
 				{
-					effectBounds.X1 = item->Pose.Position.x + bounds->X1;
-					effectBounds.X2 = item->Pose.Position.x + bounds->X2;
-					effectBounds.Z1 = item->Pose.Position.z + bounds->Z1;
-					effectBounds.Z2 = item->Pose.Position.z + bounds->Z2;
+					effectBounds.X1 = item->Pose.Position.x + bounds.X1;
+					effectBounds.X2 = item->Pose.Position.x + bounds.X2;
+					effectBounds.Z1 = item->Pose.Position.z + bounds.Z1;
+					effectBounds.Z2 = item->Pose.Position.z + bounds.Z2;
 					zChange = 0;
 				}
 				else
 				{
-					effectBounds.X1 = item->Pose.Position.x + bounds->Z1;
-					effectBounds.X2 = item->Pose.Position.x + bounds->Z2;
-					effectBounds.Z1 = item->Pose.Position.z - bounds->X2;
-					effectBounds.Z2 = item->Pose.Position.z - bounds->X1;
+					effectBounds.X1 = item->Pose.Position.x + bounds.Z1;
+					effectBounds.X2 = item->Pose.Position.x + bounds.Z2;
+					effectBounds.Z1 = item->Pose.Position.z - bounds.X2;
+					effectBounds.Z2 = item->Pose.Position.z - bounds.X1;
 					xChange = 0;
 					zChange = 1;
 				}
@@ -207,10 +208,10 @@ void VentilatorControl(short itemNumber)
 		}
 		else
 		{
-			effectBounds.X1 = item->Pose.Position.x - bounds->X2;
-			effectBounds.X2 = item->Pose.Position.x - bounds->X1;
-			effectBounds.Z1 = item->Pose.Position.z - bounds->Z2;
-			effectBounds.Z2 = item->Pose.Position.z - bounds->Z1;
+			effectBounds.X1 = item->Pose.Position.x - bounds.X2;
+			effectBounds.X2 = item->Pose.Position.x - bounds.X1;
+			effectBounds.Z1 = item->Pose.Position.z - bounds.Z2;
+			effectBounds.Z2 = item->Pose.Position.z - bounds.Z1;
 			zChange = 0;
 		}
 
@@ -269,13 +270,13 @@ void VentilatorControl(short itemNumber)
 	}
 	else
 	{
-		BOUNDING_BOX tbounds;
-		phd_RotBoundingBoxNoPersp(&item->Pose, bounds, &tbounds);
+		auto tBounds = GameBoundingBox::Zero;
+		tBounds.RotateNoPersp(item->Pose.Orientation, bounds);
 
-		effectBounds.X1 = item->Pose.Position.x + tbounds.X1;
-		effectBounds.X2 = item->Pose.Position.x + tbounds.X2;
-		effectBounds.Z1 = item->Pose.Position.z + tbounds.Z1;
-		effectBounds.Z2 = item->Pose.Position.z + tbounds.Z2;
+		effectBounds.X1 = item->Pose.Position.x + tBounds.X1;
+		effectBounds.X2 = item->Pose.Position.x + tBounds.X2;
+		effectBounds.Z1 = item->Pose.Position.z + tBounds.Z1;
+		effectBounds.Z2 = item->Pose.Position.z + tBounds.Z2;
 
 		VentilatorEffect(&effectBounds, 1, 0, speed);
 		VentilatorEffect(&effectBounds, -1, 0, speed);

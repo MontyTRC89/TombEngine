@@ -7,7 +7,7 @@
 #include "Objects/objectslist.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
-#include "Specific/trmath.h"
+#include "Math/Math.h"
 
 #include "ScriptAssert.h"
 #include "MoveableObject.h"
@@ -561,9 +561,7 @@ void Moveable::SetPos(Vec3 const& pos, sol::optional<bool> updateRoom)
 
 Vec3 Moveable::GetJointPos(int jointIndex) const
 {
-	Vector3Int result = {};
-	GetJointAbsPosition(m_item, &result, jointIndex);
-
+	auto result = GetJointPosition(m_item, jointIndex);
 	return Vec3(result.x, result.y, result.z);
 }
 
@@ -784,7 +782,7 @@ bool Moveable::MeshIsVisible(int meshId) const
 	if (!MeshExists(meshId))
 		return false;
 
-	return m_item->TestBits(JointBitType::Mesh, meshId);
+	return m_item->MeshBits.Test(meshId);
 }
 
 void Moveable::ShowMesh(int meshId)
@@ -792,7 +790,7 @@ void Moveable::ShowMesh(int meshId)
 	if (!MeshExists(meshId))
 		return;
 
-	m_item->SetBits(JointBitType::Mesh, meshId);
+	m_item->MeshBits.Set(meshId);
 }
 
 void Moveable::HideMesh(int meshId)
@@ -800,7 +798,7 @@ void Moveable::HideMesh(int meshId)
 	if (!MeshExists(meshId))
 		return;
 
-	m_item->ClearBits(JointBitType::Mesh, meshId); 
+	m_item->MeshBits.Clear(meshId); 
 }
 
 void Moveable::ShatterMesh(int meshId)
@@ -816,7 +814,7 @@ bool Moveable::MeshIsSwapped(int meshId) const
 	if (!MeshExists(meshId))
 		return false;
 
-	return m_item->TestBits(JointBitType::MeshSwap, meshId);
+	return m_item->MeshSwapBits.Test(meshId);
 }
 
 void Moveable::SwapMesh(int meshId, int swapSlotId, sol::optional<int> swapMeshIndex)
@@ -852,7 +850,7 @@ void Moveable::SwapMesh(int meshId, int swapSlotId, sol::optional<int> swapMeshI
 		lara->MeshPtrs[meshId] = Objects[swapSlotId].meshIndex + swapMeshIndex.value();
 	}
 	else
-		m_item->SetBits(JointBitType::MeshSwap, meshId);
+		m_item->MeshSwapBits.Set(meshId);
 }
 
 void Moveable::UnswapMesh(int meshId)
@@ -873,7 +871,7 @@ void Moveable::UnswapMesh(int meshId)
 		lara->MeshPtrs[meshId] = Objects[ID_LARA_SKIN].meshIndex + meshId;
 	}
 	else
-		m_item->ClearBits(JointBitType::MeshSwap, meshId);
+		m_item->MeshSwapBits.Clear(meshId);
 }
 
 void Moveable::EnableItem()

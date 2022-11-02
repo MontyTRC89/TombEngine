@@ -4,11 +4,11 @@
 #include "Game/control/box.h"
 #include "Game/items.h"
 #include "Game/control/lot.h"
-#include "Specific/input.h"
+#include "Specific/Input/Input.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_struct.h"
 #include "Game/Lara/lara.h"
-#include "Specific/trmath.h"
+#include "Math/Math.h"
 #include "Game/collision/collide_room.h"
 #include "Game/collision/sphere.h"
 #include "Objects/Generic/Object/rope.h"
@@ -29,15 +29,12 @@ namespace TEN::Entities::Generic
 		auto* item = &g_Level.Items[itemNumber];
 		short roomNumber = item->RoomNumber;
 
-		Vector3Int itemPos;
-		itemPos.x = item->Pose.Position.x;
-		itemPos.y = item->Pose.Position.y;
-		itemPos.z = item->Pose.Position.z;
+		auto itemPos = item->Pose.Position;
 
 		FloorInfo* floor = GetFloor(itemPos.x, itemPos.y, itemPos.z, &roomNumber);
 		itemPos.y = GetCeiling(floor, itemPos.x, itemPos.y, itemPos.z);
 
-		Vector3Int pos = { 0, 16384, 0 };
+		auto pos = Vector3i(0, 16384, 0);
 		ROPE_STRUCT rope;
 		PrepareRope(&rope, &itemPos, &pos, CLICK(0.5f), item);
 
@@ -46,7 +43,7 @@ namespace TEN::Entities::Generic
 		Ropes.push_back(rope);
 	}
 
-	void PrepareRope(ROPE_STRUCT* rope, Vector3Int* pos1, Vector3Int* pos2, int length, ItemInfo* item)
+	void PrepareRope(ROPE_STRUCT* rope, Vector3i* pos1, Vector3i* pos2, int length, ItemInfo* item)
 	{
 		rope->room = item->RoomNumber;
 		rope->position = *pos1;
@@ -87,7 +84,7 @@ namespace TEN::Entities::Generic
 		rope->active = 0;
 	}
 
-	Vector3Int* NormaliseRopeVector(Vector3Int* vec)
+	Vector3i* NormaliseRopeVector(Vector3i* vec)
 	{
 		int x = vec->x >> FP_SHIFT;
 		int y = vec->y >> FP_SHIFT;
@@ -121,19 +118,19 @@ namespace TEN::Entities::Generic
 		*z = (rope->normalisedSegment[segment].z * frame >> FP_SHIFT) + (rope->meshSegment[segment].z >> FP_SHIFT) + rope->position.z;
 	}
 
-	int DotProduct(Vector3Int* u, Vector3Int* v)
+	int DotProduct(Vector3i* u, Vector3i* v)
 	{
 		return (u->x * v->x + u->y * v->y + u->z * v->z) >> W2V_SHIFT;
 	}
 
-	void ScaleVector(Vector3Int* u, int c, Vector3Int* destination)
+	void ScaleVector(Vector3i* u, int c, Vector3i* destination)
 	{
 		destination->x = c * u->x >> W2V_SHIFT;
 		destination->y = c * u->y >> W2V_SHIFT;
 		destination->z = c * u->z >> W2V_SHIFT;
 	}
 
-	void CrossProduct(Vector3Int* u, Vector3Int* v, Vector3Int* destination)
+	void CrossProduct(Vector3i* u, Vector3i* v, Vector3i* destination)
 	{
 		destination->x = (u->y * v->z - u->z * v->y) >> W2V_SHIFT;
 		destination->y = (u->z * v->x - u->x * v->z) >> W2V_SHIFT;
@@ -177,13 +174,13 @@ namespace TEN::Entities::Generic
 			laraItem->Animation.Velocity.y > 0.0f &&
 			rope->active)
 		{
-			auto* frame = GetBoundsAccurate(laraItem);
+			auto frame = GameBoundingBox(laraItem);
 
 			int segment = RopeNodeCollision(
 				rope,
 				laraItem->Pose.Position.x,
-				laraItem->Pose.Position.y + frame->Y1 + 512,
-				laraItem->Pose.Position.z + frame->Z2 * phd_cos(laraItem->Pose.Orientation.y),
+				laraItem->Pose.Position.y + frame.Y1 + 512,
+				laraItem->Pose.Position.z + frame.Z2 * phd_cos(laraItem->Pose.Orientation.y),
 				laraItem->Animation.ActiveState == LS_REACH ? 128 : 320);
 
 			if (segment >= 0)
@@ -224,7 +221,7 @@ namespace TEN::Entities::Generic
 	void RopeDynamics(ROPE_STRUCT* rope)
 	{
 		PENDULUM* pendulumPointer;
-		Vector3Int vec, vec2;
+		Vector3i vec, vec2;
 
 		int flag = 0;
 		if (rope->coiled)
@@ -476,9 +473,9 @@ namespace TEN::Entities::Generic
 		CurrentPendulum.rope = rope;
 	}
 
-	void ModelRigidRope(ROPE_STRUCT* rope, PENDULUM* pendulumPointer, Vector3Int* ropeVelocity, Vector3Int* pendulumVelocity, int value)
+	void ModelRigidRope(ROPE_STRUCT* rope, PENDULUM* pendulumPointer, Vector3i* ropeVelocity, Vector3i* pendulumVelocity, int value)
 	{
-		Vector3Int vec;
+		Vector3i vec;
 		vec.x = pendulumPointer->position.x + pendulumVelocity->x - rope->segment[0].x;
 		vec.y = pendulumPointer->position.y + pendulumVelocity->y - rope->segment[0].y;
 		vec.z = pendulumPointer->position.z + pendulumVelocity->z - rope->segment[0].z;
@@ -491,9 +488,9 @@ namespace TEN::Entities::Generic
 		pendulumVelocity->z -= (int64_t)result * vec.z >> FP_SHIFT;
 	}
 
-	void ModelRigid(Vector3Int* segment, Vector3Int* nextSegment, Vector3Int* velocity, Vector3Int* nextVelocity, int length)
+	void ModelRigid(Vector3i* segment, Vector3i* nextSegment, Vector3i* velocity, Vector3i* nextVelocity, int length)
 	{
-		Vector3Int vec;
+		Vector3i vec;
 		vec.x = nextSegment->x + nextVelocity->x - segment->x - velocity->x;
 		vec.y = nextSegment->y + nextVelocity->y - segment->y - velocity->y;
 		vec.z = nextSegment->z + nextVelocity->z - segment->z - velocity->z;
@@ -733,7 +730,7 @@ namespace TEN::Entities::Generic
 	{
 		ROPE_STRUCT* rope;
 		short ropeY;
-		Vector3Int vec, vec2, vec3, vec4, vec5, pos, pos2, diff, diff2;
+		Vector3i vec, vec2, vec3, vec4, vec5, pos, pos2, diff, diff2;
 		int matrix[12];
 		short angle[3];
 		AnimFrame* frame;
@@ -816,7 +813,7 @@ namespace TEN::Entities::Generic
 		item->Pose.Position.y = rope->position.y + (rope->meshSegment[Lara.Control.Rope.Segment].y >> FP_SHIFT) + Lara.Control.Rope.Offset;
 		item->Pose.Position.z = rope->position.z + (rope->meshSegment[Lara.Control.Rope.Segment].z >> FP_SHIFT);
 
-		Matrix rotMatrix = Matrix::CreateFromYawPitchRoll(
+		auto rotMatrix = Matrix::CreateFromYawPitchRoll(
 			TO_RAD(angle[1]),
 			TO_RAD(angle[0]),
 			TO_RAD(angle[2])

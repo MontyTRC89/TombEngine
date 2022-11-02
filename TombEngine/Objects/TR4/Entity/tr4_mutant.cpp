@@ -9,13 +9,13 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
+#include "Math/Math.h"
 #include "Objects/Effects/tr4_locusts.h"
 #include "Objects/objectslist.h"
 #include "Renderer/Renderer11Enums.h"
-#include "Specific/prng.h"
 #include "Specific/setup.h"
-#include "Specific/trmath.h"
 
+using namespace TEN::Math;
 using namespace TEN::Math::Random;
 
 namespace TEN::Entities::TR4
@@ -63,7 +63,7 @@ namespace TEN::Entities::TR4
 		C_WEST_NORTH = 315
 	};
 
-	void TriggerCrocgodMissile(PHD_3DPOS* src, short roomNumber, short counter)
+	void TriggerCrocgodMissile(Pose* src, short roomNumber, short counter)
 	{
 		short fxNumber = NO_ITEM;
 
@@ -139,7 +139,7 @@ namespace TEN::Entities::TR4
 		sptr->dSize = size / 4;
 	}
 
-	static void ShootFireball(PHD_3DPOS* src, MissileRotationType rotationType, short roomNumber, int timer)
+	void ShootFireball(Pose* src, MissileRotationType rotationType, short roomNumber, int timer)
 	{
 		switch (rotationType)
 		{
@@ -155,7 +155,7 @@ namespace TEN::Entities::TR4
 		TriggerCrocgodMissile(src, roomNumber, timer);
 	}
 
-	static bool ShootFrame(ItemInfo* item)
+	bool ShootFrame(ItemInfo* item)
 	{
 		int frameNumber = (item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase);
 		if (frameNumber == 45 ||
@@ -181,28 +181,24 @@ namespace TEN::Entities::TR4
 		}
 
 		auto* enemy = creature->Enemy;
-		auto pos = Vector3Int::Zero;
-		GetJointAbsPosition(item, &pos, joint);
 
+		auto pos = GetJointPosition(item,joint);
 		int x = enemy->Pose.Position.x - pos.x;
 		int z = enemy->Pose.Position.z - pos.z;
 		headAngle = (short)(phd_atan(z, x) - item->Pose.Orientation.y) / 2;
 	}
 
-	static void GetTargetPosition(ItemInfo* item, PHD_3DPOS* target)
+	void GetTargetPosition(ItemInfo* originEntity, Pose* targetPose)
 	{
-		auto start = Vector3Int(0, -96, 144);
-		GetJointAbsPosition(item, &start, 9);
+		auto origin = GetJointPosition(originEntity, 9, Vector3i(0, -96, 144));
+		auto target = GetJointPosition(originEntity, 9, Vector3i(0, -128, 288));
+		auto orient = Geometry::GetOrientToPoint(origin.ToVector3(), target.ToVector3());
 
-		auto end = Vector3Int(0, -128, 288);
-		GetJointAbsPosition(item, &end, 9);
-
-		auto angles = GetVectorAngles(end.x - start.x, end.y - start.y, end.z - start.z);
-		target->Position = end;
-		target->Orientation = angles;
+		targetPose->Position = target;
+		targetPose->Orientation = orient;
 	}
 
-	static void MoveItemFront(ItemInfo* item, int distance)
+	void MoveItemFront(ItemInfo* item, int distance)
 	{
 		short angle = short(TO_DEGREES(item->Pose.Orientation.y));
 		switch (angle)
@@ -225,7 +221,7 @@ namespace TEN::Entities::TR4
 		}
 	}
 
-	static void MoveItemBack(ItemInfo* item, int distance)
+	void MoveItemBack(ItemInfo* item, int distance)
 	{
 		short angle = short(TO_DEGREES(item->Pose.Orientation.y));
 		switch (angle)
@@ -248,7 +244,7 @@ namespace TEN::Entities::TR4
 		}
 	}
 
-	static void MutantAIFix(ItemInfo* item, AI_INFO* AI)
+	void MutantAIFix(ItemInfo* item, AI_INFO* AI)
 	{
 		MoveItemFront(item, SECTOR(2));
 		item->Pose.Position.y -= CLICK(3);
@@ -317,7 +313,7 @@ namespace TEN::Entities::TR4
 			frameNumber = item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase;
 			if (frameNumber >= 94 && frameNumber <= 96)
 			{
-				PHD_3DPOS src;
+				Pose src;
 				GetTargetPosition(item, &src);
 
 				if (frameNumber == 94)
@@ -346,7 +342,7 @@ namespace TEN::Entities::TR4
 		case MUTANT_STATE_LOCUST_ATTACK_2:
 			if (ShootFrame(item))
 			{
-				PHD_3DPOS src;
+				Pose src;
 				GetTargetPosition(item, &src);
 				ShootFireball(&src, MissileRotationType::Front, item->RoomNumber, 1);
 			}

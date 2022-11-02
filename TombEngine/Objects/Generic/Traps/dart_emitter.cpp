@@ -15,7 +15,7 @@ namespace TEN::Entities::Traps
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		if (item->TouchBits)
+		if (item->TouchBits.TestAny())
 		{
 			DoDamage(LaraItem, 25);
 			DoBloodSplat(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, (GetRandomControl() & 3) + 4, LaraItem->Pose.Orientation.y, LaraItem->RoomNumber);

@@ -1,5 +1,5 @@
 #pragma once
-#include "Specific/trmath.h"
+#include "Math/Math.h"
 
 enum RENDERER_BUCKETS
 {
@@ -177,7 +177,7 @@ enum CONSTANT_BUFFERS
 	CB_SPRITE = 9,
 	CB_HUD = 10,
 	CB_HUD_BAR = 11,
-	CB_ALPHA_TEST = 12
+	CB_BLENDING = 12
 };
 
 enum ALPHA_TEST_MODES 

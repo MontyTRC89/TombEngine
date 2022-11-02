@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "Objects/Generic/Switches/pulley_switch.h"
 #include "Game/control/control.h"
-#include "Specific/input.h"
+#include "Specific/Input/Input.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Objects/Generic/Switches/generic_switch.h"
@@ -15,17 +15,19 @@ using namespace TEN::Input;
 
 namespace TEN::Entities::Switches
 {
-	OBJECT_COLLISION_BOUNDS PulleyBounds = 
+	const ObjectCollisionBounds PulleyBounds =
 	{
-		-256, 256,
-		0, 0,
-		-512, 512,
-		-ANGLE(10.0f), ANGLE(10.0f),
-		-ANGLE(30.0f), ANGLE(30.0f),
-		-ANGLE(10.0f), ANGLE(10.0f)
+		GameBoundingBox(
+			-CLICK(1), CLICK(1),
+			0, 0,
+			-SECTOR(0.5f), SECTOR(0.5f)
+		),
+		std::pair(
+			EulerAngles(ANGLE(-10.0f), ANGLE(-30.0f), ANGLE(-10.0f)),
+			EulerAngles(ANGLE(10.0f), ANGLE(30.0f), ANGLE(10.0f))
+		)
 	};
-
-	Vector3Int PulleyPos = { 0, 0, -148 }; 
+	const auto PulleyPos = Vector3i(0, 0, -148);
 
 	void InitialisePulleySwitch(short itemNumber)
 	{
@@ -55,7 +57,7 @@ namespace TEN::Entities::Switches
 		{
 			short oldYrot = switchItem->Pose.Orientation.y;
 			switchItem->Pose.Orientation.y = laraItem->Pose.Orientation.y;
-			if (TestLaraPosition(&PulleyBounds, switchItem, laraItem))
+			if (TestLaraPosition(PulleyBounds, switchItem, laraItem))
 			{
 				if (switchItem->ItemFlags[1])
 				{
@@ -67,7 +69,7 @@ namespace TEN::Entities::Switches
 						SayNo();
 					}
 				}
-				else if (MoveLaraPosition(&PulleyPos, switchItem, laraItem))
+				else if (MoveLaraPosition(PulleyPos, switchItem, laraItem))
 				{
 					laraItem->Animation.AnimNumber = LA_PULLEY_GRAB;
 					laraItem->Animation.ActiveState = LS_PULLEY;

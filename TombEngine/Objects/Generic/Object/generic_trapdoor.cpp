@@ -3,7 +3,7 @@
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Game/collision/floordata.h"
-#include "Specific/input.h"
+#include "Specific/Input/Input.h"
 #include "Game/camera.h"
 #include "Game/control/control.h"
 #include "Specific/level.h"
@@ -16,27 +16,33 @@ using namespace TEN::Input;
 using namespace TEN::Renderer;
 using namespace TEN::Floordata;
 
-OBJECT_COLLISION_BOUNDS CeilingTrapDoorBounds =
+const ObjectCollisionBounds CeilingTrapDoorBounds =
 {
-	-256, 256,
-	0, 900,
-	-768, -256,
-	-ANGLE(10.0f), ANGLE(10.0f),
-	-ANGLE(30.0f), ANGLE(30.0f),
-	-ANGLE(10.0f), ANGLE(10.0f)
+	GameBoundingBox(
+		-CLICK(1), CLICK(1),
+		0, 900,
+		-SECTOR(0.75f), -CLICK(1)
+	),
+	std::pair(
+		EulerAngles(ANGLE(-10.0f), ANGLE(-30.0f), ANGLE(-10.0f)),
+		EulerAngles(ANGLE(10.0f), ANGLE(30.0f), ANGLE(10.0f))
+	)
 };
-static Vector3Int CeilingTrapDoorPos = { 0, 1056, -480 };
+const auto CeilingTrapDoorPos = Vector3i(0, 1056, -480);
 
-OBJECT_COLLISION_BOUNDS FloorTrapDoorBounds =
+const ObjectCollisionBounds FloorTrapDoorBounds =
 {
-	-256, 256,
-	0, 0,
-	-1024, -256,
-	-ANGLE(10.0f), ANGLE(10.0f),
-	-ANGLE(30.0f), ANGLE(30.0f),
-	-ANGLE(10.0f), ANGLE(10.0f)
+	GameBoundingBox(
+		-CLICK(1), CLICK(1),
+		0, 0,
+		-SECTOR(1), -CLICK(1)
+	),
+	std::pair(
+		EulerAngles(ANGLE(-10.0f), ANGLE(-30.0f), ANGLE(-10.0f)),
+		EulerAngles(ANGLE(10.0f), ANGLE(30.0f), ANGLE(10.0f))
+	)
 };
-static Vector3Int FloorTrapDoorPos = { 0, 0, -655 };
+static auto FloorTrapDoorPos = Vector3i(0, 0, -655);
 
 void InitialiseTrapDoor(short itemNumber)
 {
@@ -63,9 +69,9 @@ void CeilingTrapDoorCollision(short itemNumber, ItemInfo* laraItem, CollisionInf
 
 	bool itemIsAbove = trapDoorItem->Pose.Position.y <= laraItem->Pose.Position.y - LARA_HEIGHT + LARA_HEADROOM;
 
-	bool result = TestLaraPosition(&CeilingTrapDoorBounds, trapDoorItem, laraItem);
+	bool result = TestLaraPosition(CeilingTrapDoorBounds, trapDoorItem, laraItem);
 	laraItem->Pose.Orientation.y += ANGLE(180.0f);
-	bool result2 = TestLaraPosition(&CeilingTrapDoorBounds, trapDoorItem, laraItem);
+	bool result2 = TestLaraPosition(CeilingTrapDoorBounds, trapDoorItem, laraItem);
 	laraItem->Pose.Orientation.y += ANGLE(180.0f);
 
 	if (TrInput & IN_ACTION &&
@@ -76,7 +82,7 @@ void CeilingTrapDoorCollision(short itemNumber, ItemInfo* laraItem, CollisionInf
 		itemIsAbove &&
 		(result || result2))
 	{
-		AlignLaraPosition(&CeilingTrapDoorPos, trapDoorItem, laraItem);
+		AlignLaraPosition(CeilingTrapDoorPos, trapDoorItem, laraItem);
 		if (result2)
 			laraItem->Pose.Orientation.y += ANGLE(180.0f);
 		
@@ -95,7 +101,7 @@ void CeilingTrapDoorCollision(short itemNumber, ItemInfo* laraItem, CollisionInf
 		ForcedFixedCamera.x = trapDoorItem->Pose.Position.x - phd_sin(trapDoorItem->Pose.Orientation.y) * 1024;
 		ForcedFixedCamera.y = trapDoorItem->Pose.Position.y + 1024;
 		ForcedFixedCamera.z = trapDoorItem->Pose.Position.z - phd_cos(trapDoorItem->Pose.Orientation.y) * 1024;
-		ForcedFixedCamera.roomNumber = trapDoorItem->RoomNumber;
+		ForcedFixedCamera.RoomNumber = trapDoorItem->RoomNumber;
 	}
 	else
 	{
@@ -122,9 +128,9 @@ void FloorTrapDoorCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo*
 		trapDoorItem->Status != ITEM_ACTIVE) ||
 		(laraInfo->Control.IsMoving && laraInfo->InteractedItem == itemNumber))
 	{
-		if (TestLaraPosition(&FloorTrapDoorBounds, trapDoorItem, laraItem))
+		if (TestLaraPosition(FloorTrapDoorBounds, trapDoorItem, laraItem))
 		{
-			if (MoveLaraPosition(&FloorTrapDoorPos, trapDoorItem, laraItem))
+			if (MoveLaraPosition(FloorTrapDoorPos, trapDoorItem, laraItem))
 			{
 				ResetLaraFlex(laraItem);
 				laraItem->Animation.AnimNumber = LA_TRAPDOOR_FLOOR_OPEN;
@@ -144,7 +150,7 @@ void FloorTrapDoorCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo*
 					ForcedFixedCamera.y = g_Level.Rooms[trapDoorItem->RoomNumber].maxceiling;
 
 				ForcedFixedCamera.z = trapDoorItem->Pose.Position.z - phd_cos(trapDoorItem->Pose.Orientation.y) * 2048;
-				ForcedFixedCamera.roomNumber = trapDoorItem->RoomNumber;
+				ForcedFixedCamera.RoomNumber = trapDoorItem->RoomNumber;
 			}
 			else
 				laraInfo->InteractedItem =itemNumber;
@@ -213,7 +219,7 @@ std::optional<int> TrapDoorFloor(short itemNumber, int x, int y, int z)
 {
 	auto* trapDoorItem = &g_Level.Items[itemNumber];
 
-	if (!trapDoorItem->MeshBits || trapDoorItem->ItemFlags[2] == 0)
+	if (!trapDoorItem->MeshBits.TestAny() || trapDoorItem->ItemFlags[2] == 0)
 		return std::nullopt;
 
 	return GetBridgeItemIntersect(itemNumber, x, y, z, false);
@@ -223,7 +229,7 @@ std::optional<int> TrapDoorCeiling(short itemNumber, int x, int y, int z)
 {
 	auto* trapDoorItem = &g_Level.Items[itemNumber];
 
-	if (!trapDoorItem->MeshBits || trapDoorItem->ItemFlags[2] == 0)
+	if (!trapDoorItem->MeshBits.TestAny() || trapDoorItem->ItemFlags[2] == 0)
 		return std::nullopt;
 
 	return GetBridgeItemIntersect(itemNumber, x, y, z, true);

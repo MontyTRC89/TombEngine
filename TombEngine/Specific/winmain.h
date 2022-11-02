@@ -9,7 +9,10 @@
 
 #include <process.h>
 #include <vector>
-#include "Specific/trmath.h"
+
+#include "Math/Math.h"
+
+using namespace TEN::Math;
 
 struct WINAPP
 {
@@ -40,5 +43,5 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 void WinClose();
 LRESULT CALLBACK WinAppProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 void CALLBACK HandleWmCommand(unsigned short wParam);
-Vector2Int GetScreenResolution();
-std::vector<Vector2Int> GetAllSupportedScreenResolutions();
+Vector2i GetScreenResolution();
+std::vector<Vector2i> GetAllSupportedScreenResolutions();

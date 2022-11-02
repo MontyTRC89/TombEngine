@@ -140,7 +140,7 @@ bool LoadSample(char* pointer, int compSize, int uncompSize, int index)
 	return true;
 }
 
-bool SoundEffect(int effectID, PHD_3DPOS* position, SoundEnvironment condition, float pitchMultiplier, float gainMultiplier)
+bool SoundEffect(int effectID, Pose* position, SoundEnvironment condition, float pitchMultiplier, float gainMultiplier)
 {
 	if (!g_Configuration.EnableSound)
 		return false;
@@ -154,7 +154,7 @@ bool SoundEffect(int effectID, PHD_3DPOS* position, SoundEnvironment condition, 
 	if (condition != SoundEnvironment::Always)
 	{
 		// Get current camera room's environment
-		auto cameraCondition = TestEnvironment(ENV_FLAG_WATER, Camera.pos.roomNumber) ? SoundEnvironment::Water : SoundEnvironment::Land;
+		auto cameraCondition = TestEnvironment(ENV_FLAG_WATER, Camera.pos.RoomNumber) ? SoundEnvironment::Water : SoundEnvironment::Land;
 
 		// Don't play effect if effect's environment isn't the same as camera position's environment
 		if (condition != cameraCondition)
@@ -597,7 +597,7 @@ int Sound_GetFreeSlot()
 // We use origin position as a reference, because in original TRs it's not possible to clearly
 // identify what's the source of the producing effect.
 
-int Sound_EffectIsPlaying(int effectID, PHD_3DPOS *position)
+int Sound_EffectIsPlaying(int effectID, Pose *position)
 {
 	for (int i = 0; i < SOUND_MAX_CHANNELS; i++)
 	{
@@ -630,7 +630,7 @@ int Sound_EffectIsPlaying(int effectID, PHD_3DPOS *position)
 
 // Gets the distance to the source.
 
-float Sound_DistanceToListener(PHD_3DPOS *position)
+float Sound_DistanceToListener(Pose *position)
 {
 	if (!position) return 0.0f;	// Assume sound is 2D menu sound
 	return Sound_DistanceToListener(Vector3(position->Position.x, position->Position.y, position->Position.z));
@@ -671,7 +671,7 @@ void Sound_FreeSlot(int index, unsigned int fadeout)
 
 // Update sound position in a level.
 
-bool Sound_UpdateEffectPosition(int index, PHD_3DPOS *position, bool force)
+bool Sound_UpdateEffectPosition(int index, Pose *position, bool force)
 {
 	if (index > SOUND_MAX_CHANNELS || index < 0)
 		return false;
@@ -723,7 +723,7 @@ void Sound_UpdateScene()
 	// Apply environmental effects
 
 	static int currentReverb = -1;
-	auto roomReverb = g_Configuration.EnableReverb ? g_Level.Rooms[Camera.pos.roomNumber].reverbType : (int)ReverbType::Small;
+	auto roomReverb = g_Configuration.EnableReverb ? g_Level.Rooms[Camera.pos.RoomNumber].reverbType : (int)ReverbType::Small;
 
 	if (currentReverb == -1 || roomReverb != currentReverb)
 	{
@@ -857,7 +857,10 @@ void Sound_Init()
 void Sound_DeInit()
 {
 	if (g_Configuration.EnableSound)
+	{
+		TENLog("Shutting down BASS...", LogLevel::Info);
 		BASS_Free();
+	}
 }
 
 bool Sound_CheckBASSError(const char* message, bool verbose, ...)
@@ -884,7 +887,7 @@ void SayNo()
 
 void PlaySecretTrack()
 {
-	if (SoundTracks.size() <= SecretSoundIndex)
+	if (SoundTracks.find(SecretSoundIndex) == SoundTracks.end())
 	{
 		TENLog("No secret soundtrack index was found!", LogLevel::Warning);
 		return;
@@ -924,6 +927,6 @@ void PlaySoundSources()
 		else if (FlipStats[group] && (sound.Flags & 128) == 0)
 			continue;
 
-		SoundEffect(sound.SoundID, (PHD_3DPOS*)&sound.Position);
+		SoundEffect(sound.SoundID, (Pose*)&sound.Position);
 	}
 }

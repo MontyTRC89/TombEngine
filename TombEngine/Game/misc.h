@@ -5,16 +5,16 @@
 #define CHK_EXI(var, flag) var & flag
 #define CHK_NOP(var, flag) !(var & flag)
 
-enum LARA_MESH_MASK
+enum LaraMeshMask
 {
-	LARA_ONLY_LEGS = (0 << 1),
-	LARA_ONLY_ARMS = (1 << 1),
-	LARA_ONLY_TORSO = (2 << 1),
-	LARA_ONLY_HEAD = (4 << 1),
-	LARA_ONLY_LEFT_ARM = (8 << 1),
-	LARA_ONLY_RIGHT_ARM = (16 << 1),
-	LARA_LEGS_TORSO_HEAD = (32 << 1),
-	LARA_LEGS_TORSO_HEAD_ARMS = (64 << 1)
+	LARA_ONLY_LEGS			  = 0,
+	LARA_ONLY_ARMS			  = (1 << 1),
+	LARA_ONLY_TORSO			  = (1 << 2),
+	LARA_ONLY_HEAD			  = (1 << 3),
+	LARA_ONLY_LEFT_ARM		  = (1 << 4),
+	LARA_ONLY_RIGHT_ARM		  = (1 << 5),
+	LARA_LEGS_TORSO_HEAD	  = (1 << 6),
+	LARA_LEGS_TORSO_HEAD_ARMS = (1 << 7)
 };
 
 CreatureInfo* GetCreatureInfo(ItemInfo* item);

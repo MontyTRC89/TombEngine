@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "tr4_sarcophagus.h"
 #include "Specific/level.h"
-#include "Specific/input.h"
+#include "Specific/Input/Input.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Game/items.h"
@@ -12,15 +12,18 @@
 
 using namespace TEN::Input;
 
-static Vector3Int SarcophagusPosition(0, 0, -300);
-OBJECT_COLLISION_BOUNDS SarcophagusBounds =
+const auto SarcophagusPosition = Vector3i(0, 0, -300);
+const ObjectCollisionBounds SarcophagusBounds =
 {
-	-512, 512,
-	-100, 100,
-	-512, 0,
-	ANGLE(-10.0f), ANGLE(10.0f),
-	ANGLE(-30.0f), ANGLE(30.0f),
-	0, 0
+	GameBoundingBox(
+		-SECTOR(0.5f), SECTOR(0.5f),
+		-100, 100,
+		-SECTOR(0.5f), 0
+	),
+		std::pair(
+			EulerAngles(ANGLE(-10.0f), ANGLE(-30.0f), 0),
+			EulerAngles(ANGLE(10.0f), ANGLE(30.0f), 0)
+		)
 };
 
 void InitialiseSarcophagus(short itemNumber)
@@ -40,9 +43,9 @@ void SarcophagusCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* c
 		sarcItem->Status != ITEM_ACTIVE ||
 		laraInfo->Control.IsMoving && laraInfo->InteractedItem == itemNumber)
 	{
-		if (TestLaraPosition(&SarcophagusBounds, sarcItem, laraItem))
+		if (TestLaraPosition(SarcophagusBounds, sarcItem, laraItem))
 		{
-			if (MoveLaraPosition(&SarcophagusPosition, sarcItem, laraItem))
+			if (MoveLaraPosition(SarcophagusPosition, sarcItem, laraItem))
 			{
 				laraItem->Animation.AnimNumber = LA_PICKUP_SARCOPHAGUS;
 				laraItem->Animation.ActiveState = LS_MISC_CONTROL;
@@ -87,7 +90,7 @@ void SarcophagusCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* c
 				if (Objects[currentItem->ObjectNumber].isPickup)
 				{
 					PickedUpObject(currentItem->ObjectNumber);
-					currentItem->Status = ITEM_ACTIVE;
+					currentItem->Status = ITEM_INVISIBLE;
 					currentItem->ItemFlags[3] = 1;
 					AddDisplayPickup(currentItem->ObjectNumber);
 				}

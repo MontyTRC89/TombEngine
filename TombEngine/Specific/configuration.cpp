@@ -6,7 +6,7 @@
 #include "Renderer/Renderer11.h"
 #include "LanguageScript.h"
 #include "Flow/ScriptInterfaceFlowHandler.h"
-#include "Specific/input.h"
+#include "Specific/Input/Input.h"
 #include "Specific/winmain.h"
 #include "Sound/sound.h"
 
@@ -59,7 +59,7 @@ void LoadSoundDevicesInCombobox(HWND handle)
 
 BOOL CALLBACK DialogProc(HWND handle, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-	Vector2Int mode;
+	Vector2i mode;
 	int selectedMode;
 
 	switch (msg)

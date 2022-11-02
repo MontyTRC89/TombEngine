@@ -11,7 +11,6 @@
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
 #include "Sound/sound.h"
-#include "Specific/prng.h"
 #include "Specific/level.h"
 
 using namespace TEN::Math::Random;
@@ -29,11 +28,11 @@ namespace TEN::Entities::Creatures::TR2
 
 	void SwordGuardianFly(ItemInfo* item)
 	{
-		Vector3Int pos;
-		pos.x = (GetRandomControl() * 256 / 32768) + item->Pose.Position.x - 128;
-		pos.y = (GetRandomControl() * 256 / 32768) + item->Pose.Position.y - 256;
-		pos.z = (GetRandomControl() * 256 / 32768) + item->Pose.Position.z - 128;
-
+		auto pos = Vector3i(
+			(GetRandomControl() * 256 / 32768) + item->Pose.Position.x - 128,
+			(GetRandomControl() * 256 / 32768) + item->Pose.Position.y - 256,
+			(GetRandomControl() * 256 / 32768) + item->Pose.Position.z - 128
+		);
 		TriggerGunSmoke(pos.x, pos.y, pos.z, 1, 1, 1, 1, LaraWeaponType::GrenadeLauncher, 32);
 		SoundEffect(SFX_TR2_WARRIOR_HOVER, &item->Pose);
 	}
@@ -68,8 +67,8 @@ namespace TEN::Entities::Creatures::TR2
 		}
 		else
 		{
-			creature->LOT.Step = STEP_SIZE;
-			creature->LOT.Drop = -STEP_SIZE;
+			creature->LOT.Step = CLICK(1);
+			creature->LOT.Drop = -CLICK(1);
 			creature->LOT.Fly = NO_FLYING;
 			creature->LOT.Zone = ZoneType::Basic;
 
@@ -80,9 +79,9 @@ namespace TEN::Entities::Creatures::TR2
 			{
 				if (AI.zoneNumber != AI.enemyZone)
 				{
-					creature->LOT.Step = WALL_SIZE * 20;
-					creature->LOT.Drop = -WALL_SIZE * 20;
-					creature->LOT.Fly = STEP_SIZE / 4;
+					creature->LOT.Step = SECTOR(20);
+					creature->LOT.Drop = -SECTOR(20);
+					creature->LOT.Fly = CLICK(0.25f);
 					creature->LOT.Zone = ZoneType::Flyer;
 					CreatureAIInfo(item, &AI);
 				}
@@ -94,7 +93,7 @@ namespace TEN::Entities::Creatures::TR2
 			angle = CreatureTurn(item, creature->MaxTurn);
 
 			if (item->Animation.ActiveState != 9)
-				item->MeshBits = 0xFFFFFFFF;
+				item->MeshBits = ALL_JOINT_BITS;
 
 			switch (item->Animation.ActiveState)
 			{
@@ -103,7 +102,7 @@ namespace TEN::Entities::Creatures::TR2
 
 				if (!creature->Flags)
 				{
-					item->MeshBits = (item->MeshBits << 1) + 1;
+					item->MeshBits = (item->MeshBits.ToPackedBits() << 1) + 1;
 					creature->Flags = 3;
 				}
 				else

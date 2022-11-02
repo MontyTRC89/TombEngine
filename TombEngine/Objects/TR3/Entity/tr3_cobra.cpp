@@ -27,7 +27,7 @@ namespace TEN::Entities::Creatures::TR3
 	constexpr auto COBRA_SLEEP_FRAME = 45;
 
 	const auto CobraBite = BiteInfo(Vector3::Zero, 13);
-	const vector<int> CobraAttackJoints = { 13 };
+	const vector<unsigned int> CobraAttackJoints = { 13 };
 
 	enum CobraState
 	{
@@ -124,7 +124,7 @@ namespace TEN::Entities::Creatures::TR3
 				if (AI.distance > COBRA_SLEEP_RANGE)
 					item->Animation.TargetState = COBRA_STATE_SLEEP;
 				else if (creature->Enemy->HitPoints > 0 && isEnemyVisible &&
-					((AI.ahead && AI.distance < COBRA_ATTACK_RANGE && AI.verticalDistance <= GetBoundsAccurate(item)->Height()) ||
+					((AI.ahead && AI.distance < COBRA_ATTACK_RANGE && AI.verticalDistance <= GameBoundingBox(item).GetHeight()) ||
 						item->HitStatus || isEnemyMoving))
 				{
 					item->Animation.TargetState = COBRA_STATE_ATTACK;
@@ -151,7 +151,7 @@ namespace TEN::Entities::Creatures::TR3
 
 			case COBRA_STATE_ATTACK:
 				if (!(creature->Flags & 1) && // 1 = is attacking.
-					item->TestBits(JointBitType::Touch, CobraAttackJoints))
+					item->TouchBits.Test(CobraAttackJoints))
 				{
 					DoDamage(creature->Enemy, COBRA_BITE_ATTACK_DAMAGE);
 					CreatureEffect(item, CobraBite, DoBloodSplat);

@@ -1,32 +1,35 @@
 #include "framework.h"
 #include "Renderer/Renderer11.h"
-#include "Game/effects/footprint.h"
-#include "Game/effects/effects.h"
-#include "Game/effects/tomb4fx.h"
-#include "Game/Lara/lara.h"
+
 #include "Game/animation.h"
 #include "Game/camera.h"
 #include "Game/collision/collide_room.h"
-#include "Game/control/control.h"
-#include "Game/effects/debris.h"
-#include "Specific/setup.h"
-#include "Game/effects/bubble.h"
-#include "Specific/level.h"
 #include "Game/control/box.h"
+#include "Game/control/control.h"
+#include "Game/effects/bubble.h"
+#include "Game/effects/debris.h"
+#include "Game/effects/drip.h"
+#include "Game/effects/effects.h"
+#include "Game/effects/explosion.h"
+#include "Game/effects/footprint.h"
+#include "Game/effects/lightning.h"
+#include "Game/effects/simple_particle.h"
 #include "Game/effects/smoke.h"
 #include "Game/effects/spark.h"
-#include "Game/effects/drip.h"
-#include "Game/effects/explosion.h"
+#include "Game/effects/tomb4fx.h"
 #include "Game/effects/weather.h"
-#include "Quad/RenderQuad.h"
-#include "Game/effects/simple_particle.h"
-#include "Renderer/RendererSprites.h"
-#include "Game/effects/lightning.h"
 #include "Game/items.h"
+#include "Game/Lara/lara.h"
 #include "Game/misc.h"
+#include "Math/Math.h"
+#include "Quad/RenderQuad.h"
+#include "Renderer/RendererSprites.h"
+#include "Specific/level.h"
+#include "Specific/setup.h"
 
 using namespace TEN::Effects::Lightning;
 using namespace TEN::Effects::Environment;
+using namespace TEN::Math;
 
 extern BLOOD_STRUCT Blood[MAX_SPARKS_BLOOD];
 extern FIRE_SPARKS FireSparks[MAX_SPARKS_FIRE];
@@ -165,20 +168,24 @@ namespace TEN::Renderer
 	{
 		for (int k = 0; k < MAX_FIRE_LIST; k++) 
 		{
-			FIRE_LIST* fire = &Fires[k];
+			auto* fire = &Fires[k];
 			if (fire->on) 
 			{
 				auto fade = fire->on == 1 ? 1.0f : (float)(255 - fire->on) / 255.0f;
 
 				for (int i = 0; i < MAX_SPARKS_FIRE; i++) 
 				{
-					FIRE_SPARKS* spark = &FireSparks[i];
+					auto* spark = &FireSparks[i];
 					if (spark->on)
-						AddSpriteBillboard(&m_sprites[spark->def], Vector3(fire->x + spark->x * fire->size / 2, fire->y + spark->y * fire->size / 2, fire->z + spark->z * fire->size / 2),
-																   Vector4(spark->r / 255.0f * fade, spark->g / 255.0f * fade, spark->b / 255.0f * fade, 1.0f),
-																   TO_RAD(spark->rotAng << 4),
-																   spark->scalar,
-																   { spark->size * fire->size, spark->size * fire->size }, BLENDMODE_ADDITIVE, view);
+					{
+						AddSpriteBillboard(
+							&m_sprites[spark->def],
+							Vector3(fire->x + spark->x * fire->size / 2, fire->y + spark->y * fire->size / 2, fire->z + spark->z * fire->size / 2),
+							Vector4(spark->r / 255.0f * fade, spark->g / 255.0f * fade, spark->b / 255.0f * fade, 1.0f),
+							TO_RAD(spark->rotAng << 4),
+							spark->scalar,
+							Vector2(spark->size * fire->size, spark->size * fire->size), BLENDMODE_ADDITIVE, view);
+					}
 				}
 			}
 		}
@@ -186,8 +193,6 @@ namespace TEN::Renderer
 
 	void Renderer11::DrawParticles(RenderView& view)
 	{
-		Vector3Int nodePos;
-
 		for (int i = 0; i < MAX_NODE; i++)
 			NodeOffsets[i].gotIt = false;
 
@@ -198,11 +203,11 @@ namespace TEN::Renderer
 			{
 				if (particle->flags & SP_DEF)
 				{
-					Vector3 pos = Vector3(particle->x, particle->y, particle->z);
+					auto pos = Vector3(particle->x, particle->y, particle->z);
 
 					if (particle->flags & SP_FX)
 					{
-						FX_INFO* fx = &EffectList[particle->fxObj];
+						auto* fx = &EffectList[particle->fxObj];
 
 						pos.x += fx->pos.Position.x;
 						pos.y += fx->pos.Position.y;
@@ -224,24 +229,28 @@ namespace TEN::Renderer
 					}
 					else
 					{
-						ItemInfo* item = &g_Level.Items[particle->fxObj];
+						auto* item = &g_Level.Items[particle->fxObj];
 
-						if (particle->flags & SP_NODEATTACH) {
-							if (NodeOffsets[particle->nodeNumber].gotIt) {
+						auto nodePos = Vector3i::Zero;
+						if (particle->flags & SP_NODEATTACH)
+						{
+							if (NodeOffsets[particle->nodeNumber].gotIt)
+							{
 								nodePos.x = NodeVectors[particle->nodeNumber].x;
 								nodePos.y = NodeVectors[particle->nodeNumber].y;
 								nodePos.z = NodeVectors[particle->nodeNumber].z;
 							}
-							else {
+							else
+							{
 								nodePos.x = NodeOffsets[particle->nodeNumber].x;
 								nodePos.y = NodeOffsets[particle->nodeNumber].y;
 								nodePos.z = NodeOffsets[particle->nodeNumber].z;
 
-								int meshNum = NodeOffsets[particle->nodeNumber].meshNum;
-								if (meshNum >= 0)
-									GetJointAbsPosition(item, &nodePos, meshNum);
+								int meshIndex = NodeOffsets[particle->nodeNumber].meshNum;
+								if (meshIndex >= 0)
+									nodePos = GetJointPosition(item, meshIndex, nodePos);
 								else
-									GetLaraJointPosition(&nodePos, -meshNum);
+									nodePos = GetJointPosition(LaraItem, -meshIndex, nodePos);
 
 								NodeOffsets[particle->nodeNumber].gotIt = true;
 
@@ -250,11 +259,9 @@ namespace TEN::Renderer
 								NodeVectors[particle->nodeNumber].z = nodePos.z;
 							}
 
-							pos.x += nodePos.x;
-							pos.y += nodePos.y;
-							pos.z += nodePos.z;
+							pos += nodePos.ToVector3();
 
-							if (particle->sLife - particle->life > (rand() & 3) + 8)
+							if ((particle->sLife - particle->life) > ((rand() & 3) + 8))
 							{
 								particle->flags &= ~SP_ITEM;
 								particle->x = pos.x;
@@ -263,29 +270,27 @@ namespace TEN::Renderer
 							}
 						}
 						else
-						{
-							pos.x += item->Pose.Position.x;
-							pos.y += item->Pose.Position.y;
-							pos.z += item->Pose.Position.z;
-						}
+							pos += item->Pose.Position.ToVector3();
 					}
 
-					// Don't allow sprites out of bounds
+					// Don't allow sprites out of bounds.
 					int spriteIndex = std::clamp(int(particle->spriteIndex), 0, int(m_sprites.size()));
 
-					AddSpriteBillboard(&m_sprites[spriteIndex],
+					AddSpriteBillboard(
+						&m_sprites[spriteIndex],
 						pos,
 						Vector4(particle->r / 255.0f, particle->g / 255.0f, particle->b / 255.0f, 1.0f),
 						TO_RAD(particle->rotAng << 4), particle->scalar,
-						{ particle->size, particle->size },
+						Vector2(particle->size, particle->size),
 						particle->blendMode, view);
 				}
 				else
 				{
-					Vector3 pos = Vector3(particle->x, particle->y, particle->z);
-					Vector3 v = Vector3(particle->xVel, particle->yVel, particle->zVel);
+					auto pos = Vector3(particle->x, particle->y, particle->z);
+					auto v = Vector3(particle->xVel, particle->yVel, particle->zVel);
 					v.Normalize();
-					AddSpriteBillboardConstrained(&m_sprites[Objects[ID_SPARK_SPRITE].meshIndex],
+					AddSpriteBillboardConstrained(
+						&m_sprites[Objects[ID_SPARK_SPRITE].meshIndex],
 						pos,
 						Vector4(particle->r / 255.0f, particle->g / 255.0f, particle->b / 255.0f, 1.0f),
 						TO_RAD(particle->rotAng << 4),
@@ -302,7 +307,7 @@ namespace TEN::Renderer
 
 		for (int i = 0; i < MAX_SPLASHES; i++) 
 		{
-			SPLASH_STRUCT& splash = Splashes[i];
+			auto& splash = Splashes[i];
 
 			if (splash.isActive) 
 			{
@@ -874,7 +879,7 @@ namespace TEN::Renderer
 				face.info.world = spriteMatrix;
 				face.info.blendMode = spr.BlendMode;
 
-				RendererRoom& room = m_rooms[FindRoomNumber(Vector3Int(spr.pos))];
+				RendererRoom& room = m_rooms[FindRoomNumber(Vector3i(spr.pos))];
 				room.TransparentFacesToDraw.push_back(face);
 			}
 			else // Draw sprites immediately

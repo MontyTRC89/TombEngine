@@ -19,13 +19,14 @@
 #include "Game/savegame.h"
 #include "Game/spotcam.h"
 #include "Objects/Generic/Doors/generic_doors.h"
+#include "Objects/Sink.h"
 #include "Renderer/Renderer11.h"
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Scripting/Include/Objects/ScriptInterfaceObjectsHandler.h"
 #include "Scripting/Include/ScriptInterfaceGame.h"
 #include "Scripting/Include/ScriptInterfaceLevel.h"
 #include "Sound/sound.h"
-#include "Specific/input.h"
+#include "Specific/Input/Input.h"
 #include "Specific/setup.h"
 #include "Specific/trutils.h"
 
@@ -188,7 +189,7 @@ void LoadItems()
 			g_GameScriptEntities->AddName(item->LuaName, i);
 			g_GameScriptEntities->TryAddColliding(i);
 
-			memcpy(&item->StartPose, &item->Pose, sizeof(PHD_3DPOS));
+			memcpy(&item->StartPose, &item->Pose, sizeof(Pose));
 		}
 
 		for (int i = 0; i < g_Level.NumItems; i++)

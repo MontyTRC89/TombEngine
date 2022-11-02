@@ -5,8 +5,8 @@
 #include "Game/control/box.h"
 #include "Game/items.h"
 #include "Game/control/lot.h"
-#include "Game/gui.h"
-#include "Specific/input.h"
+#include "Game/Gui.h"
+#include "Specific/Input/Input.h"
 #include "Game/pickup/pickup.h"
 #include "Sound/sound.h"
 #include "Game/animation.h"
@@ -14,7 +14,7 @@
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_struct.h"
 #include "Game/Lara/lara.h"
-#include "Specific/trmath.h"
+#include "Math/Math.h"
 #include "Game/misc.h"
 #include "Objects/Generic/Doors/underwater_door.h"
 #include "Game/collision/collide_item.h"
@@ -23,16 +23,18 @@ using namespace TEN::Input;
 
 namespace TEN::Entities::Doors
 {
-	Vector3Int UnderwaterDoorPos(-251, -540, -46);
-
-	OBJECT_COLLISION_BOUNDS UnderwaterDoorBounds =
+	const auto UnderwaterDoorPos = Vector3i(-251, -540, -46);
+	const ObjectCollisionBounds UnderwaterDoorBounds =
 	{
-		-256, 256, 
-		-1024, 0, 
-		-1024, 0, 
-		-ANGLE(80.0f), ANGLE(80.0f),
-		-ANGLE(80.0f), ANGLE(80.0f),
-		-ANGLE(80.0f), ANGLE(80.0f)
+		GameBoundingBox(
+			-CLICK(1), CLICK(1),
+			-SECTOR(1), 0,
+			-SECTOR(1), 0
+		),
+		std::pair(
+			EulerAngles(ANGLE(-80.0f), ANGLE(-80.0f), ANGLE(-80.0f)),
+			EulerAngles(ANGLE(80.0f), ANGLE(80.0f), ANGLE(80.0f))
+		)
 	};
 
 	void UnderwaterDoorCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
@@ -43,15 +45,16 @@ namespace TEN::Entities::Doors
 		if (TrInput & IN_ACTION &&
 			laraItem->Animation.ActiveState == LS_UNDERWATER_IDLE &&
 			laraInfo->Control.WaterStatus == WaterStatus::Underwater &&
-			!(doorItem->Status && doorItem->Animation.IsAirborne) &&
+			doorItem->Status != ITEM_ACTIVE &&
+			!doorItem->Animation.IsAirborne &&
 			laraInfo->Control.HandStatus == HandStatus::Free ||
 			laraInfo->Control.IsMoving && laraInfo->InteractedItem == itemNumber)
 		{
 			laraItem->Pose.Orientation.y ^= ANGLE(180.0f);
 
-			if (TestLaraPosition(&UnderwaterDoorBounds, doorItem, laraItem))
+			if (TestLaraPosition(UnderwaterDoorBounds, doorItem, laraItem))
 			{
-				if (MoveLaraPosition(&UnderwaterDoorPos, doorItem, laraItem))
+				if (MoveLaraPosition(UnderwaterDoorPos, doorItem, laraItem))
 				{
 					SetAnimation(laraItem, LA_UNDERWATER_DOOR_OPEN);
 					laraItem->Animation.Velocity.y = 0;

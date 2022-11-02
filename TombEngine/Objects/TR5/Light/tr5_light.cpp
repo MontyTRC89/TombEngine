@@ -5,7 +5,7 @@
 #include "Game/control/los.h"
 #include "Game/effects/effects.h"
 #include "Sound/sound.h"
-#include "Specific/trmath.h"
+#include "Math/Math.h"
 #include "Game/animation.h"
 #include "Game/items.h"
 
@@ -40,7 +40,7 @@ void TriggerAlertLight(int x, int y, int z, int r, int g, int b, int angle, shor
 	start.y = y;
 	start.z = z;
 	GetFloor(x, y, z, &room);
-	start.roomNumber = room;
+	start.RoomNumber = room;
 
 	GameVector end;
 	end.x = x + 16384 * phd_sin(16 * angle);
@@ -189,13 +189,10 @@ void BlinkingLightControl(short itemNumber)
 			item->MeshBits = 1;
 		else
 		{
-			Vector3Int pos = { 0, 0, 0 };
-			GetJointAbsPosition(item, &pos, 0);
+			auto pos = GetJointPosition(item, 0);
 
 			TriggerDynamicLight(
-				pos.x,
-				pos.y,
-				pos.z,
+				pos.x, pos.y, pos.z,
 				16,
 				8 * (item->TriggerFlags & 0x1F),
 				(item->TriggerFlags / 4) & 0xF8,

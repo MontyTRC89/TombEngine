@@ -2,23 +2,30 @@
 
 struct ItemInfo;
 struct CollisionInfo;
-struct Vector3Int;
+class Vector3i;
 
 namespace TEN::Entities::Generic
 {
 	constexpr auto ROPE_SEGMENTS = 24;
 	constexpr auto ROPE_WIDTH = 24;
 
+	enum MatrixArrayValue
+	{
+		M00, M01, M02, M03,
+		M10, M11, M12, M13,
+		M20, M21, M22, M23
+	};
+
 	struct ROPE_STRUCT
 	{
 		int room;
-		Vector3Int position;
+		Vector3i position;
 
-		Vector3Int segment[ROPE_SEGMENTS];
-		Vector3Int velocity[ROPE_SEGMENTS];
-		Vector3Int normalisedSegment[ROPE_SEGMENTS];
-		Vector3Int meshSegment[ROPE_SEGMENTS];
-		Vector3Int coords[ROPE_SEGMENTS];
+		Vector3i segment[ROPE_SEGMENTS];
+		Vector3i velocity[ROPE_SEGMENTS];
+		Vector3i normalisedSegment[ROPE_SEGMENTS];
+		Vector3i meshSegment[ROPE_SEGMENTS];
+		Vector3i coords[ROPE_SEGMENTS];
 
 		int segmentLength;
 		short active;
@@ -27,8 +34,8 @@ namespace TEN::Entities::Generic
 
 	struct PENDULUM
 	{
-		Vector3Int position;
-		Vector3Int velocity;
+		Vector3i position;
+		Vector3i velocity;
 		int node;
 		ROPE_STRUCT* rope;
 	};
@@ -39,12 +46,12 @@ namespace TEN::Entities::Generic
 	extern int RopeSwing;
 
 	void InitialiseRope(short itemNumber);
-	void PrepareRope(ROPE_STRUCT* rope, Vector3Int* pos1, Vector3Int* pos2, int length, ItemInfo* item);
-	Vector3Int* NormaliseRopeVector(Vector3Int* vec);
+	void PrepareRope(ROPE_STRUCT* rope, Vector3i* pos1, Vector3i* pos2, int length, ItemInfo* item);
+	Vector3i* NormaliseRopeVector(Vector3i* vec);
 	void GetRopePos(ROPE_STRUCT* rope, int segmentFrame, int* x, int* y, int* z);
-	int DotProduct(Vector3Int* u, Vector3Int* v);
-	void ScaleVector(Vector3Int* src, int c, Vector3Int* dest);
-	void CrossProduct(Vector3Int* u, Vector3Int* v, Vector3Int* dest);
+	int DotProduct(Vector3i* u, Vector3i* v);
+	void ScaleVector(Vector3i* src, int c, Vector3i* dest);
+	void CrossProduct(Vector3i* u, Vector3i* v, Vector3i* dest);
 	void phd_GetMatrixAngles(int* array, short* angle);
 	void RopeControl(short itemNumber);
 	void RopeCollision(short itemNumber, ItemInfo* l, CollisionInfo* coll);
@@ -53,8 +60,8 @@ namespace TEN::Entities::Generic
 	void ApplyVelocityToRope(int node, short angle, short n);
 	void SetPendulumVelocity(int x, int y, int z);
 	void SetPendulumPoint(ROPE_STRUCT* rope, int node);
-	void ModelRigidRope(ROPE_STRUCT* rope, PENDULUM* pendulumPointer, Vector3Int* ropeVelocity, Vector3Int* pendulumVelocity, int value);
-	void ModelRigid(Vector3Int* segment, Vector3Int* nextSegment, Vector3Int* velocity, Vector3Int* nextVelocity, int length);
+	void ModelRigidRope(ROPE_STRUCT* rope, PENDULUM* pendulumPointer, Vector3i* ropeVelocity, Vector3i* pendulumVelocity, int value);
+	void ModelRigid(Vector3i* segment, Vector3i* nextSegment, Vector3i* velocity, Vector3i* nextVelocity, int length);
 	void DelAlignLaraToRope(ItemInfo* item);
 	void UpdateRopeSwing(ItemInfo* item);
 	void JumpOffRope(ItemInfo* item);

@@ -1,6 +1,6 @@
 #include "framework.h"
 #include "Game/control/control.h"
-#include "Specific/input.h"
+#include "Specific/Input/Input.h"
 #include "Specific/level.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
@@ -13,17 +13,15 @@ using namespace TEN::Input;
 
 namespace TEN::Entities::Switches
 {
-	OBJECT_COLLISION_BOUNDS SwitchBounds = 
+	ObjectCollisionBounds SwitchBounds = 
 	{
-		0, 0,
-		0, 0,
-		0, 0,
-		-ANGLE(10.0f), ANGLE(10.0f),
-		-ANGLE(30.0f), ANGLE(30.0f),
-		-ANGLE(10.0f), ANGLE(10.0f)
+		GameBoundingBox::Zero,
+		std::pair(
+			EulerAngles(ANGLE(-10.0f), ANGLE(-30.0f), ANGLE(-10.0f)),
+			EulerAngles(ANGLE(10.0f), ANGLE(30.0f), ANGLE(10.0f))
+		)
 	};
-
-	Vector3Int SwitchPos = { 0, 0, 0 };
+	auto SwitchPos = Vector3i::Zero;
 
 	void SwitchControl(short itemNumber)
 	{
@@ -63,34 +61,34 @@ namespace TEN::Entities::Switches
 			switchItem->TriggerFlags >= 0 ||
 			laraInfo->Control.IsMoving && laraInfo->InteractedItem == itemNumber)
 		{
-			auto* bounds = GetBoundsAccurate(switchItem);
+			auto bounds = GameBoundingBox(switchItem);
 
 			if ((switchItem->TriggerFlags == 3 || switchItem->TriggerFlags == 4) && switchItem->Animation.ActiveState == SWITCH_ON)
 				return;
 
-			SwitchBounds.boundingBox.X1 = bounds->X1 - 256;
-			SwitchBounds.boundingBox.X2 = bounds->X2 + 256;
+			SwitchBounds.BoundingBox.X1 = bounds.X1 - 256;
+			SwitchBounds.BoundingBox.X2 = bounds.X2 + 256;
 
 			if (switchItem->TriggerFlags)
 			{
-				SwitchBounds.boundingBox.Z1 = bounds->Z1 - 512;
-				SwitchBounds.boundingBox.Z2 = bounds->Z2 + 512;
+				SwitchBounds.BoundingBox.Z1 = bounds.Z1 - 512;
+				SwitchBounds.BoundingBox.Z2 = bounds.Z2 + 512;
 
 				if (switchItem->TriggerFlags == 3)
-					SwitchPos.z = bounds->Z1 - 256;
+					SwitchPos.z = bounds.Z1 - 256;
 				else
-					SwitchPos.z = bounds->Z1 - 128;
+					SwitchPos.z = bounds.Z1 - 128;
 			}
 			else
 			{
-				SwitchBounds.boundingBox.Z1 = bounds->Z1 - 200;
-				SwitchBounds.boundingBox.Z2 = bounds->Z2 + 200;
-				SwitchPos.z = bounds->Z1 - 64;
+				SwitchBounds.BoundingBox.Z1 = bounds.Z1 - 200;
+				SwitchBounds.BoundingBox.Z2 = bounds.Z2 + 200;
+				SwitchPos.z = bounds.Z1 - 64;
 			}
 
-			if (TestLaraPosition(&SwitchBounds, switchItem, laraItem))
+			if (TestLaraPosition(SwitchBounds, switchItem, laraItem))
 			{
-				if (MoveLaraPosition(&SwitchPos, switchItem, laraItem))
+				if (MoveLaraPosition(SwitchPos, switchItem, laraItem))
 				{
 					auto onAnim = LaraAnim::LA_WALLSWITCH_DOWN;
 					auto offAnim = LaraAnim::LA_WALLSWITCH_UP;

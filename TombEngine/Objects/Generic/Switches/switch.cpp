@@ -10,17 +10,16 @@
 #include "Game/camera.h"
 #include "Specific/setup.h"
 #include "Specific/level.h"
-#include "Specific/input.h"
+#include "Specific/Input/Input.h"
 #include "Sound/sound.h"
 
 // NOTE: we need to decompile/inspect if these functions are still needed
 
 void ProcessExplodingSwitchType8(ItemInfo* item) 
 {
-	auto pos = Vector3Int();
-	GetJointAbsPosition(item, &pos, 0);
-
+	auto pos = GetJointPosition(item, 0);
 	TestTriggers(pos.x, pos.y, pos.z, item->RoomNumber, true);
+
 	ExplodeItemNode(item, Objects[item->ObjectNumber].nmeshes - 1, 0, 64);
 	item->MeshBits |= 1 << ((Objects[item->ObjectNumber].nmeshes & 0xFF) - 2);
 }

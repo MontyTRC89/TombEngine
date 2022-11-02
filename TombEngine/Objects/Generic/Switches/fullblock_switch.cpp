@@ -1,6 +1,6 @@
 #include "framework.h"
 #include "Objects/Generic/Switches/fullblock_switch.h"
-#include "Specific/input.h"
+#include "Specific/Input/Input.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Objects/Generic/Switches/generic_switch.h"
@@ -14,17 +14,19 @@ using namespace TEN::Input;
 
 namespace TEN::Entities::Switches
 {
-	OBJECT_COLLISION_BOUNDS FullBlockSwitchBounds = 
+	const ObjectCollisionBounds FullBlockSwitchBounds = 
 	{
-		-384, 384,
-		0, 256,
-		0, 512,
-		-ANGLE(10.0f), ANGLE(10.0f),
-		-ANGLE(30.0f), ANGLE(30.0f),
-		-ANGLE(10.0f), ANGLE(10.0f)
+		GameBoundingBox(
+			-384, 384,
+			0, CLICK(1),
+			0, SECTOR(0.5f)
+		),
+		std::pair(
+			EulerAngles(ANGLE(-10.0f), ANGLE(-30.0f), ANGLE(-10.0f)),
+			EulerAngles(ANGLE(10.0f), ANGLE(30.0f), ANGLE(10.0f))
+		)
 	};
-
-	Vector3Int FullBlockSwitchPos = { 0, 0, 0 };
+	const auto FullBlockSwitchPos = Vector3i::Zero;
 
 	byte SequenceUsed[6];
 	byte SequenceResults[3][3][3];
@@ -49,9 +51,9 @@ namespace TEN::Entities::Switches
 			return;
 		}
 
-		if (TestLaraPosition(&FullBlockSwitchBounds, switchItem, laraItem))
+		if (TestLaraPosition(FullBlockSwitchBounds, switchItem, laraItem))
 		{
-			if (MoveLaraPosition(&FullBlockSwitchPos, switchItem, laraItem))
+			if (MoveLaraPosition(FullBlockSwitchPos, switchItem, laraItem))
 			{
 				if (switchItem->Animation.ActiveState == 1)
 				{

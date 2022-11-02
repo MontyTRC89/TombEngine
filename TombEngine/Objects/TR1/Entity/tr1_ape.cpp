@@ -9,7 +9,7 @@
 #include "Game/misc.h"
 #include "Game/people.h"
 #include "Specific/level.h"
-#include "Specific/prng.h"
+#include "Math/Random.h"
 #include "Specific/setup.h"
 
 using namespace TEN::Math::Random;
@@ -37,7 +37,7 @@ namespace TEN::Entities::Creatures::TR1
 	#define APE_DISPLAY_ANGLE	  ANGLE(45.0f)
 
 	const auto ApeBite = BiteInfo(Vector3(0.0f, -19.0f, 75.0f), 15);
-	const vector<int> ApeAttackJoints = { 8, 9, 10, 11, 12, 13, 14, 15 };
+	const vector<unsigned int> ApeAttackJoints = { 8, 9, 10, 11, 12, 13, 14, 15 };
 
 	enum ApeState
 	{
@@ -240,7 +240,7 @@ namespace TEN::Entities::Creatures::TR1
 				{
 					item->Animation.TargetState = APE_STATE_IDLE;
 				}
-				else if (AI.ahead && item->TestBits(JointBitType::Touch, ApeAttackJoints))
+				else if (AI.ahead && item->TouchBits.Test(ApeAttackJoints))
 				{
 					item->Animation.RequiredState = APE_STATE_ATTACK;
 					item->Animation.TargetState = APE_STATE_IDLE;
@@ -288,7 +288,7 @@ namespace TEN::Entities::Creatures::TR1
 
 			case APE_STATE_ATTACK:
 				if (!item->Animation.RequiredState &&
-					item->TestBits(JointBitType::Touch, ApeAttackJoints))
+					item->TouchBits.Test(ApeAttackJoints))
 				{
 					item->Animation.RequiredState = APE_STATE_IDLE;
 					DoDamage(creatureInfo->Enemy, APE_ATTACK_DAMAGE);

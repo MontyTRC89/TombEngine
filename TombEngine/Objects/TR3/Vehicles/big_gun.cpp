@@ -16,7 +16,7 @@
 #include "Objects/Utils/VehicleHelpers.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
-#include "Specific/input.h"
+#include "Specific/Input/Input.h"
 #include "Specific/setup.h"
 
 using std::vector;
@@ -122,15 +122,13 @@ namespace TEN::Entities::Vehicles
 			projectileItem->ObjectNumber = ID_ROCKET;
 			projectileItem->RoomNumber = laraItem->RoomNumber;
 
-			auto pos = Vector3Int(0, 0, CLICK(1)); // CLICK(1) or 520?
-			GetJointAbsPosition(bigGunItem, &pos, 2);
-
+			auto pos = GetJointPosition(bigGunItem, 2, Vector3i(0, 0, CLICK(1))); // CLICK(1) or 520?
 			projectileItem->Pose.Position = pos;
 
 			InitialiseItem(itemNumber);
 
 			projectileItem->Animation.Velocity.z = 16;
-			projectileItem->Pose.Orientation = Vector3Shrt(
+			projectileItem->Pose.Orientation = EulerAngles(
 				-((bigGun->XOrientFrame - 32) * ANGLE(1.0f)),
 				bigGunItem->Pose.Orientation.y,
 				0

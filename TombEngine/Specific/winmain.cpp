@@ -18,10 +18,10 @@
 #include "LanguageScript.h"
 #include "ScriptInterfaceState.h"
 #include "ScriptInterfaceLevel.h"
-using namespace TEN::Utils;
 
 using namespace TEN::Renderer;
 using namespace TEN::Input;
+using namespace TEN::Utils;
 
 using std::exception;
 using std::string;
@@ -54,20 +54,20 @@ bool ArgEquals(wchar_t* incomingArg, std::string name)
 	return (lowerArg == "-" + name) || (lowerArg == "/" + name);
 }
 
-Vector2Int GetScreenResolution()
+Vector2i GetScreenResolution()
 {
 	RECT desktop;
 	const HWND hDesktop = GetDesktopWindow();
 	GetWindowRect(hDesktop, &desktop);
-	Vector2Int resolution;
+	Vector2i resolution;
 	resolution.x = desktop.right;
 	resolution.y = desktop.bottom;
 	return resolution;
 }
 
-std::vector<Vector2Int> GetAllSupportedScreenResolutions()
+std::vector<Vector2i> GetAllSupportedScreenResolutions()
 {
-	std::vector<Vector2Int> result;
+	std::vector<Vector2i> result;
 
 	DEVMODE dm = { 0 };
 	dm.dmSize = sizeof(dm);
@@ -84,7 +84,7 @@ std::vector<Vector2Int> GetAllSupportedScreenResolutions()
 		}
 		if (add)
 		{
-			Vector2Int resolution;
+			Vector2i resolution;
 			resolution.x = dm.dmPelsWidth;
 			resolution.y = dm.dmPelsHeight;
 			result.push_back(resolution);
@@ -94,7 +94,7 @@ std::vector<Vector2Int> GetAllSupportedScreenResolutions()
 	std::sort(
 		result.begin(),
 		result.end(),
-		[](Vector2Int& a, Vector2Int& b)
+		[](Vector2i& a, Vector2i& b)
 		{
 			if (a.x == b.x)
 			{
@@ -434,7 +434,9 @@ void WinClose()
 	DestroyAcceleratorTable(hAccTable);
 
 	Sound_DeInit();
-	DeInitialiseInput();
+	DeinitialiseInput();
+
+	TENLog("Cleaning up and exiting...", LogLevel::Info);
 	
 	delete g_GameScript;
 	g_GameScript = nullptr;
@@ -451,4 +453,5 @@ void WinClose()
 	ShutdownTENLog();
 
 	CoUninitialize();
+
 }

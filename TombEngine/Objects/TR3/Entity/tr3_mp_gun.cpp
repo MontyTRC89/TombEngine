@@ -14,7 +14,6 @@
 #include "Game/people.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
-#include "Specific/prng.h"
 #include "Specific/setup.h"
 
 using namespace TEN::Math::Random;
@@ -64,14 +63,13 @@ namespace TEN::Entities::Creatures::TR3
 		short angle = 0;
 		short tilt = 0;
 		short head = 0;
-		auto extraTorsoRot = Vector3Shrt::Zero;
+		auto extraTorsoRot = EulerAngles::Zero;
 
 		if (creature->FiredWeapon)
 		{
-			auto pos = Vector3Int(MPGunBite.Position);
-			GetJointAbsPosition(item, &pos, MPGunBite.meshNum);
-
+			auto pos = GetJointPosition(item, MPGunBite.meshNum, Vector3i(MPGunBite.Position));
 			TriggerDynamicLight(pos.x, pos.y, pos.z, (creature->FiredWeapon * 2) + 4, 24, 16, 4);
+
 			creature->FiredWeapon--;
 		}
 

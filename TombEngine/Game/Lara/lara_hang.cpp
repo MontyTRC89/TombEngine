@@ -9,7 +9,7 @@
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_overhang.h"
 #include "Game/Lara/lara_tests.h"
-#include "Specific/input.h"
+#include "Specific/Input/Input.h"
 #include "Specific/level.h"
 
 using namespace TEN::Input;
@@ -127,6 +127,15 @@ void lara_col_hang(ItemInfo* item, CollisionInfo* coll)
 			default:
 				break;
 			}
+		}
+
+		// TODO: Allow direction locking just like with standing jumps. Needs new ledge jump prepare state? -- Sezz 24.10.2022
+		if (TrInput & IN_JUMP && TestLaraLedgeJump(item, coll))
+		{
+			if (TrInput & IN_BACK)
+				item->Animation.TargetState = LS_JUMP_FORWARD;
+			else
+				item->Animation.TargetState = LS_JUMP_UP;
 		}
 	}
 

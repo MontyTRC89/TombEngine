@@ -3,10 +3,12 @@
 #include "Game/control/volumetriggerer.h"
 #include "Game/items.h"
 #include "Game/room.h"
+#include "Sound/sound.h"
 #include "Specific/IO/ChunkId.h"
 #include "Specific/IO/ChunkReader.h"
 #include "Specific/IO/LEB128.h"
 #include "Specific/IO/Streams.h"
+#include "Specific/LevelCameraInfo.h"
 #include "Specific/newtypes.h"
 
 #define AddPtr(p, t, n) p = (t*)((char*)(p) + (ptrdiff_t)(n));
@@ -19,6 +21,7 @@ using namespace TEN::Control::Volumes;
 struct ChunkId;
 struct LEB128;
 struct SampleInfo;
+struct SinkInfo;
 struct BOX_INFO;
 struct OVERLAP;
 
@@ -54,7 +57,7 @@ struct AI_OBJECT
 {
 	GAME_OBJECT_ID objectNumber;
 	short roomNumber;
-	PHD_3DPOS pos;
+	Pose pos;
 	short triggerFlags;
 	short flags;
 	int boxNumber;

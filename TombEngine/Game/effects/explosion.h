@@ -21,8 +21,8 @@ namespace TEN::Effects::Explosion
 	};
 	extern std::array<ExplosionParticle, 64> explosionParticles;
 
-	void TriggerExplosion(Vector3 const& pos, float size, bool triggerSparks, bool triggerSmoke, bool triggerShockwave, int room);
+	void TriggerExplosion(const Vector3& pos, float size, bool triggerSparks, bool triggerSmoke, bool triggerShockwave, int room);
 	void UpdateExplosionParticles();
 	ExplosionParticle& getFreeExplosionParticle();
-	void SpawnExplosionParticle(Vector3 const& pos);
+	void SpawnExplosionParticle(const Vector3& pos);
 }

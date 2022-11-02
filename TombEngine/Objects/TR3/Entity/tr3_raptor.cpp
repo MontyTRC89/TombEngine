@@ -10,7 +10,7 @@
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
 #include "Specific/level.h"
-#include "Specific/prng.h"
+#include "Math/Random.h"
 #include "Specific/setup.h"
 
 using namespace TEN::Math::Random;
@@ -32,7 +32,7 @@ namespace TEN::Entities::Creatures::TR3
 	#define RAPTOR_ATTACK_TURN_RATE_MAX ANGLE(2.0f)
 
 	const auto RaptorBite = BiteInfo(Vector3(0.0f, 66.0f, 318.0f), 22);
-	const vector<int> RaptorAttackJoints = { 10, 11, 12, 13, 14, 16, 17, 18, 19, 20, 21, 22, 23 };
+	const vector<unsigned int> RaptorAttackJoints = { 10, 11, 12, 13, 14, 16, 17, 18, 19, 20, 21, 22, 23 };
 
 	enum RaptorState
 	{
@@ -96,30 +96,26 @@ namespace TEN::Entities::Creatures::TR3
 			if (creature->Enemy == nullptr || TestProbability(RAPTOR_SWITCH_TARGET_CHANCE))
 			{
 				ItemInfo* nearestItem = nullptr;
-				int minDistance = INT_MAX;
+				float minDistance = FLT_MAX;
 
-				for (auto* currentCreature : ActiveCreatures)
+				for (auto* activeCreature : ActiveCreatures)
 				{
-					if (currentCreature->ItemNumber == NO_ITEM || currentCreature->ItemNumber == itemNumber)
+					if (activeCreature->ItemNumber == NO_ITEM || activeCreature->ItemNumber == itemNumber)
 					{
-						currentCreature++;
+						activeCreature++;
 						continue;
 					}
 
-					auto* targetItem = &g_Level.Items[currentCreature->ItemNumber];
+					auto* targetItem = &g_Level.Items[activeCreature->ItemNumber];
 
-					int x = (targetItem->Pose.Position.x - item->Pose.Position.x) / 64;
-					int y = (targetItem->Pose.Position.y - item->Pose.Position.y) / 64;
-					int z = (targetItem->Pose.Position.z - item->Pose.Position.z) / 64;
-
-					int distance = SQUARE(x) + SQUARE(y) + SQUARE(z);
+					int distance = Vector3i::Distance(item->Pose.Position, targetItem->Pose.Position);
 					if (distance < minDistance && item->HitPoints > 0)
 					{
 						nearestItem = targetItem;
 						minDistance = distance;
 					}
 
-					currentCreature++;
+					activeCreature++;
 				}
 
 				if (nearestItem != nullptr &&
@@ -129,11 +125,7 @@ namespace TEN::Entities::Creatures::TR3
 					creature->Enemy = nearestItem;
 				}
 
-				int x = (LaraItem->Pose.Position.x - item->Pose.Position.x) / 64;
-				int y = (LaraItem->Pose.Position.y - item->Pose.Position.y) / 64;
-				int z = (LaraItem->Pose.Position.z - item->Pose.Position.z) / 64;
-
-				int distance = SQUARE(x) + SQUARE(y) + SQUARE(z);
+				int distance = Vector3i::Distance(item->Pose.Position, LaraItem->Pose.Position);
 				if (distance <= minDistance)
 					creature->Enemy = LaraItem;
 			}
@@ -169,7 +161,7 @@ namespace TEN::Entities::Creatures::TR3
 					creature->Flags &= ~2;
 					item->Animation.TargetState = RAPTOR_STATE_ROAR;
 				}
-				else if (item->TestBits(JointBitType::Touch, RaptorAttackJoints) ||
+				else if (item->TouchBits.Test(RaptorAttackJoints) ||
 					(AI.distance < RAPTOR_BITE_ATTACK_RANGE && AI.bite))
 				{
 					item->Animation.TargetState = RAPTOR_STATE_BITE_ATTACK;
@@ -208,7 +200,7 @@ namespace TEN::Entities::Creatures::TR3
 				creature->Flags &= ~1;
 				tilt = angle;
 
-				if (item->TestBits(JointBitType::Touch, RaptorAttackJoints))
+				if (item->TouchBits.Test(RaptorAttackJoints))
 					item->Animation.TargetState = RAPTOR_STATE_IDLE;
 				else if (creature->Flags & 2)
 				{
@@ -247,7 +239,7 @@ namespace TEN::Entities::Creatures::TR3
 				if (creature->Enemy->IsLara())
 				{
 					if (!(creature->Flags & 1) &&
-						item->TestBits(JointBitType::Touch, RaptorAttackJoints))
+						item->TouchBits.Test(RaptorAttackJoints))
 					{
 						DoDamage(creature->Enemy, RAPTOR_ATTACK_DAMAGE);
 						CreatureEffect(item, RaptorBite, DoBloodSplat);
@@ -263,7 +255,7 @@ namespace TEN::Entities::Creatures::TR3
 				{
 					if (!(creature->Flags & 1) && creature->Enemy != nullptr)
 					{
-						if (Vector3Int::Distance(item->Pose.Position, creature->Enemy->Pose.Position) <= SECTOR(0.5f))
+						if (Vector3i::Distance(item->Pose.Position, creature->Enemy->Pose.Position) <= SECTOR(0.5f))
 						{
 							if (creature->Enemy->HitPoints <= 0)
 								creature->Flags |= 2;
@@ -284,7 +276,7 @@ namespace TEN::Entities::Creatures::TR3
 				if (creature->Enemy->IsLara())
 				{
 					if (!(creature->Flags & 1) &&
-						item->TestBits(JointBitType::Touch, RaptorAttackJoints))
+						item->TouchBits.Test(RaptorAttackJoints))
 					{
 						DoDamage(creature->Enemy, RAPTOR_ATTACK_DAMAGE);
 						CreatureEffect(item, RaptorBite, DoBloodSplat);
@@ -300,7 +292,7 @@ namespace TEN::Entities::Creatures::TR3
 				{
 					if (!(creature->Flags & 1) && creature->Enemy != nullptr)
 					{
-						if (Vector3Int::Distance(item->Pose.Position, creature->Enemy->Pose.Position) <= SECTOR(0.5f))
+						if (Vector3i::Distance(item->Pose.Position, creature->Enemy->Pose.Position) <= SECTOR(0.5f))
 						{
 							if (creature->Enemy->HitPoints <= 0)
 								creature->Flags |= 2;
@@ -321,7 +313,7 @@ namespace TEN::Entities::Creatures::TR3
 				if (creature->Enemy->IsLara())
 				{
 					if (!(creature->Flags & 1) &&
-						item->TestBits(JointBitType::Touch, RaptorAttackJoints))
+						item->TouchBits.Test(RaptorAttackJoints))
 					{
 						DoDamage(creature->Enemy, RAPTOR_ATTACK_DAMAGE);
 						CreatureEffect(item, RaptorBite, DoBloodSplat);
@@ -336,7 +328,7 @@ namespace TEN::Entities::Creatures::TR3
 				{
 					if (!(creature->Flags & 1) && creature->Enemy != nullptr)
 					{
-						if (Vector3Int::Distance(item->Pose.Position, creature->Enemy->Pose.Position) <= SECTOR(0.5f))
+						if (Vector3i::Distance(item->Pose.Position, creature->Enemy->Pose.Position) <= SECTOR(0.5f))
 						{
 							if (creature->Enemy->HitPoints <= 0)
 								creature->Flags |= 2;

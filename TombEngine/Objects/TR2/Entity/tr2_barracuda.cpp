@@ -19,7 +19,7 @@ namespace TEN::Entities::Creatures::TR2
 	constexpr auto BARRACUDA_SWIM_FAST_ATTACK_RANGE = SQUARE(SECTOR(0.34f));
 
 	const auto BarracudaBite = BiteInfo(Vector3(2.0f, -60.0f, 121.0f), 7);
-	const vector<int> BarracudaAttackJoints = { 5, 6, 7 };
+	const vector<unsigned int> BarracudaAttackJoints = { 5, 6, 7 };
 
 	enum BarracudaState
 	{
@@ -110,7 +110,7 @@ namespace TEN::Entities::Creatures::TR2
 
 				if (creature->Mood == MoodType::Bored)
 					break;
-				else if (AI.ahead && item->TestBits(JointBitType::Touch, BarracudaAttackJoints))
+				else if (AI.ahead && item->TouchBits.Test(BarracudaAttackJoints))
 					item->Animation.TargetState = BARRACUDA_STATE_IDLE;
 				else if (creature->Mood != MoodType::Stalk)
 					item->Animation.TargetState = BARRACUDA_STATE_SWIM_FAST;
@@ -137,7 +137,7 @@ namespace TEN::Entities::Creatures::TR2
 				if (AI.ahead)
 					head = AI.angle;
 
-				if (item->TestBits(JointBitType::Touch, BarracudaAttackJoints) &&
+				if (item->TouchBits.Test(BarracudaAttackJoints) &&
 					!creature->Flags)
 				{
 					DoDamage(creature->Enemy, BARRACUDA_ATTACK_DAMAGE);

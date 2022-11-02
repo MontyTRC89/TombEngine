@@ -38,14 +38,14 @@ struct ItemInfo;
 #define LARA_CRAWL_FLEX_RATE ANGLE(2.25f)
 #define LARA_CRAWL_FLEX_MAX	 ANGLE(50.0f) / 2 // 2 = hardcoded number of bones to flex (head and torso).
 
-constexpr int LARA_HEIGHT			 = CLICK(3) - 1; // Lara height in basic states.
-constexpr int LARA_HEIGHT_CRAWL		 = 350;			 // Lara height in crawl states.
-constexpr int LARA_HEIGHT_MONKEY	 = 850;			 // Lara height in monkey swing states.
-constexpr int LARA_HEIGHT_TREAD		 = 700;			 // Lara height in water treading states.
-constexpr int LARA_HEIGHT_STRETCH	 = 870;			 // Lara height in jump up and ledge hanging states.
-constexpr int LARA_HEIGHT_REACH		 = 820;			 // Lara height in reach state.
-constexpr int LARA_HEIGHT_SURFACE	 = 800;			 // Lara height when resurfacing from water.
-constexpr int LARA_HEADROOM			 = 160;			 // Reasonable space above Lara's head.
+constexpr int LARA_HEIGHT			 = CLICK(3) - 1; // Height in basic states.
+constexpr int LARA_HEIGHT_CRAWL		 = 350;			 // Height in crawl states.
+constexpr int LARA_HEIGHT_MONKEY	 = 850;			 // Height in monkey swing states.
+constexpr int LARA_HEIGHT_TREAD		 = 700;			 // Height in water tread states.
+constexpr int LARA_HEIGHT_STRETCH	 = 870;			 // Height in jump up and ledge hang states.
+constexpr int LARA_HEIGHT_REACH		 = 820;			 // Height in reach state.
+constexpr int LARA_HEIGHT_SURFACE	 = 800;			 // Height when resurfacing water.
+constexpr int LARA_HEADROOM			 = 160;			 // Reasonable space above head.
 constexpr int LARA_RADIUS			 = 100;
 constexpr int LARA_RADIUS_CRAWL		 = 200;
 constexpr int LARA_RADIUS_UNDERWATER = 300;
@@ -67,7 +67,7 @@ constexpr auto LARA_SWIM_INTERTIA_VELOCITY_MIN = 33.5f;
 constexpr auto LARA_POSITION_ADJUST_MAX_TIME = FPS * 3;	 // 30 frames * 3 = 3 seconds allowed for position adjustment.
 constexpr auto LARA_POSE_TIME				 = FPS * 30; // 30 frames * 30 = 30 seconds to AFK pose.
 constexpr auto LARA_RUN_JUMP_TIME			 = 22;		 // Frames to count before a running jump is possible.
-constexpr auto LARA_SPRINT_JUMP_TIME		 = 50;		 // Frames to count before a sprint jump is possible.
+constexpr auto LARA_SPRINT_JUMP_TIME		 = 46;		 // Frames to count before a sprint jump is possible.
 
 constexpr auto LARA_HEALTH_MAX		   = 1000.0f;
 constexpr auto LARA_HEALTH_CRITICAL	   = LARA_HEALTH_MAX / 4;

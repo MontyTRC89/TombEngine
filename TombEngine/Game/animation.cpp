@@ -7,6 +7,7 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
+#include "Math/Math.h"
 #include "Objects/Generic/Object/rope.h"
 #include "Renderer/Renderer11.h"
 #include "Sound/sound.h"
@@ -14,9 +15,8 @@
 #include "Specific/setup.h"
 
 using namespace TEN::Entities::Generic;
+using namespace TEN::Math;
 using TEN::Renderer::g_Renderer;
-
-BOUNDING_BOX InterpolatedBounds;
 
 void AnimateLara(ItemInfo* item)
 {
@@ -115,8 +115,8 @@ void PerformAnimCommands(ItemInfo* item, bool isFrameBased)
 			if (!isFrameBased)
 			{
 				TranslateItem(item, item->Pose.Orientation.y, cmd[2], cmd[1], cmd[0]);
-				auto* bounds = GetBoundsAccurate(item);
-				UpdateItemRoom(item, -bounds->Height() / 2, -cmd[0], -cmd[2]);
+				auto bounds = GameBoundingBox(item);
+				UpdateItemRoom(item, -bounds.GetHeight() / 2, -cmd[0], -cmd[2]);
 			}
 
 			cmd += 3;
@@ -179,8 +179,8 @@ void PerformAnimCommands(ItemInfo* item, bool isFrameBased)
 						auto* lara = GetLaraInfo(item);
 
 						if (always ||
-						   (onDry && (lara->WaterSurfaceDist >= -SHALLOW_WATER_START_LEVEL || lara->WaterSurfaceDist == NO_HEIGHT)) ||
-						   (inWater && lara->WaterSurfaceDist < -SHALLOW_WATER_START_LEVEL && lara->WaterSurfaceDist != NO_HEIGHT && !TestEnvironment(ENV_FLAG_SWAMP, item)))
+						   (onDry && (lara->WaterSurfaceDist >= -SHALLOW_WATER_DEPTH || lara->WaterSurfaceDist == NO_HEIGHT)) ||
+						   (inWater && lara->WaterSurfaceDist < -SHALLOW_WATER_DEPTH && lara->WaterSurfaceDist != NO_HEIGHT && !TestEnvironment(ENV_FLAG_SWAMP, item)))
 						{
 							SoundEffect(cmd[1] & 0x3FFF, &item->Pose, SoundEnvironment::Always);
 						}
@@ -188,13 +188,15 @@ void PerformAnimCommands(ItemInfo* item, bool isFrameBased)
 					else
 					{
 						if (item->RoomNumber == NO_ROOM)
+						{
 							SoundEffect(cmd[1] & 0x3FFF, &item->Pose, SoundEnvironment::Always);
+						}
 						else if (TestEnvironment(ENV_FLAG_WATER, item))
 						{
-							if (always || (inWater && TestEnvironment(ENV_FLAG_WATER, Camera.pos.roomNumber)))
+							if (always || (inWater && TestEnvironment(ENV_FLAG_WATER, Camera.pos.RoomNumber)))
 								SoundEffect(cmd[1] & 0x3FFF, &item->Pose, SoundEnvironment::Always);
 						}
-						else if (always || (onDry && !TestEnvironment(ENV_FLAG_WATER, Camera.pos.roomNumber) && !TestEnvironment(ENV_FLAG_SWAMP, Camera.pos.roomNumber)))
+						else if (always || (onDry && !TestEnvironment(ENV_FLAG_WATER, Camera.pos.RoomNumber) && !TestEnvironment(ENV_FLAG_SWAMP, Camera.pos.RoomNumber)))
 							SoundEffect(cmd[1] & 0x3FFF, &item->Pose, SoundEnvironment::Always);
 					}
 				}
@@ -320,19 +322,19 @@ bool TestLastFrame(ItemInfo* item, int animNumber)
 	return (item->Animation.FrameNumber >= anim.frameEnd);
 }
 
-void TranslateItem(ItemInfo* item, short angle, float forward, float down, float right)
+void TranslateItem(ItemInfo* item, short headingAngle, float forward, float down, float right)
 {
-	item->Pose.Position = TranslateVector(item->Pose.Position, angle, forward, down, right);
+	item->Pose.Translate(headingAngle, forward, down, right);
 }
 
-void TranslateItem(ItemInfo* item, Vector3Shrt orient, float distance)
+void TranslateItem(ItemInfo* item, const EulerAngles& orient, float distance)
 {
-	item->Pose.Position = TranslateVector(item->Pose.Position, orient, distance);
+	item->Pose.Translate(orient, distance);
 }
 
-void TranslateItem(ItemInfo* item, Vector3 direction, float distance)
+void TranslateItem(ItemInfo* item, const Vector3& direction, float distance)
 {
-	item->Pose.Position = TranslateVector(item->Pose.Position, direction, distance);
+	item->Pose.Translate(direction, distance);
 }
 
 void SetAnimation(ItemInfo* item, int animIndex, int frameToStart)
@@ -386,32 +388,11 @@ bool GetStateDispatch(ItemInfo* item, const AnimData& anim)
 	return false;
 }
 
-BOUNDING_BOX* GetBoundsAccurate(ItemInfo* item)
-{
-	int rate = 0;
-	AnimFrame* framePtr[2];
-	
-	int frac = GetFrame(item, framePtr, &rate);
-	if (frac == 0)
-		return &framePtr[0]->boundingBox;
-	else
-	{
-		InterpolatedBounds.X1 = framePtr[0]->boundingBox.X1 + (framePtr[1]->boundingBox.X1 - framePtr[0]->boundingBox.X1) * frac / rate;
-		InterpolatedBounds.X2 = framePtr[0]->boundingBox.X2 + (framePtr[1]->boundingBox.X2 - framePtr[0]->boundingBox.X2) * frac / rate;
-		InterpolatedBounds.Y1 = framePtr[0]->boundingBox.Y1 + (framePtr[1]->boundingBox.Y1 - framePtr[0]->boundingBox.Y1) * frac / rate;
-		InterpolatedBounds.Y2 = framePtr[0]->boundingBox.Y2 + (framePtr[1]->boundingBox.Y2 - framePtr[0]->boundingBox.Y2) * frac / rate;
-		InterpolatedBounds.Z1 = framePtr[0]->boundingBox.Z1 + (framePtr[1]->boundingBox.Z1 - framePtr[0]->boundingBox.Z1) * frac / rate;
-		InterpolatedBounds.Z2 = framePtr[0]->boundingBox.Z2 + (framePtr[1]->boundingBox.Z2 - framePtr[0]->boundingBox.Z2) * frac / rate;
-		return &InterpolatedBounds;
-	}
-}
-
 AnimFrame* GetBestFrame(ItemInfo* item)
 {
 	int rate = 0;
 	AnimFrame* framePtr[2];
-
-	int frac = GetFrame(item, framePtr, &rate);
+	int frac = GetFrame(item, framePtr, rate);
 
 	if (frac <= (rate >> 1))
 		return framePtr[0];
@@ -419,19 +400,19 @@ AnimFrame* GetBestFrame(ItemInfo* item)
 		return framePtr[1];
 }
 
-int GetFrame(ItemInfo* item, AnimFrame* framePtr[], int* rate)
+int GetFrame(ItemInfo* item, AnimFrame* outFramePtr[], int& outRate)
 {
 	int frame = item->Animation.FrameNumber;
 	const auto& anim = g_Level.Anims[item->Animation.AnimNumber];
 
-	framePtr[0] = framePtr[1] = &g_Level.Frames[anim.FramePtr];
-	int rate2 = *rate = anim.Interpolation & 0x00ff;
+	outFramePtr[0] = outFramePtr[1] = &g_Level.Frames[anim.FramePtr];
+	int rate2 = outRate = anim.Interpolation & 0x00ff;
 	frame -= anim.frameBase; 
 
 	int first = frame / rate2;
 	int interpolation = frame % rate2;
-	framePtr[0] += first;			// Get frame pointers...
-	framePtr[1] = framePtr[0] + 1;	// and store away.
+	outFramePtr[0] += first;			 // Get frame pointers...
+	outFramePtr[1] = outFramePtr[0] + 1; // and store away.
 
 	if (interpolation == 0)
 		return 0;
@@ -439,7 +420,7 @@ int GetFrame(ItemInfo* item, AnimFrame* framePtr[], int* rate)
 	// Clamp key frame to end if need be.
 	int second = first * rate2 + rate2;
 	if (second > anim.frameEnd)
-		*rate = anim.frameEnd - (second - rate2);
+		outRate = anim.frameEnd - (second - rate2);
 
 	return interpolation;
 }
@@ -484,31 +465,29 @@ int GetNextAnimState(int objectID, int animNumber)
 void DrawAnimatingItem(ItemInfo* item)
 {
 	// TODO: to refactor
-	// Empty stub because actually we disable items drawing when drawRoutine pointer is NULL in ObjectInfo
+	// Empty stub because actually we disable items drawing when drawRoutine pointer is nullptr in ObjectInfo
 }
 
-void GetLaraJointPosition(Vector3Int* pos, int laraMeshIndex)
-{
-	if (laraMeshIndex >= NUM_LARA_MESHES)
-		laraMeshIndex = LM_HEAD;
-
-	Vector3 p = Vector3(pos->x, pos->y, pos->z);
-	g_Renderer.GetLaraAbsBonePosition(&p, laraMeshIndex);
-
-	pos->x = p.x;
-	pos->y = p.y;
-	pos->z = p.z;
-}
-
-void ClampRotation(PHD_3DPOS* pos, short angle, short rotation)
+void ClampRotation(Pose& outPose, short angle, short rotation)
 {
 	if (angle <= rotation)
 	{
 		if (angle >= -rotation)
-			pos->Orientation.y += angle;
+			outPose.Orientation.y += angle;
 		else
-			pos->Orientation.y -= rotation;
+			outPose.Orientation.y -= rotation;
 	}
 	else
-		pos->Orientation.y += rotation;
+		outPose.Orientation.y += rotation;
+}
+
+Vector3i GetJointPosition(ItemInfo* item, int jointIndex, const Vector3i& offset)
+{
+	// Get real item number.
+	short itemNumber = item - g_Level.Items.data();
+
+	// Use matrices done in the renderer to transform the offset vector.
+	auto pos = offset.ToVector3();
+	g_Renderer.GetItemAbsBonePosition(itemNumber, pos, jointIndex);
+	return Vector3i(pos);
 }

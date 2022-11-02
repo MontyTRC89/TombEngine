@@ -1,5 +1,5 @@
 #pragma once
-#include "Specific/phd_global.h"
+#include "Math/Math.h"
 
 using std::vector;
 
@@ -38,12 +38,12 @@ struct LOTInfo
 {
 	bool Initialised;
 
-	vector<BOX_NODE> Node;
+	vector<BOX_NODE> Node = {};
 	int Head;
 	int Tail;
 
 	ZoneType Zone = ZoneType::None;
-	Vector3Int Target = Vector3Int::Zero;
+	Vector3i Target = Vector3i::Zero;
 	int SearchNumber;
 	int BlockMask;
 	short Step;
@@ -81,12 +81,12 @@ struct CreatureInfo
 {
 	short ItemNumber = -1;
 
-	LOTInfo	   LOT			  = {};
-	MoodType   Mood			  = MoodType::None;
-	ItemInfo*  Enemy		  = nullptr;
-	ItemInfo*  AITarget		  = nullptr;
-	short	   AITargetNumber = -1;
-	Vector3Int Target		  = Vector3Int::Zero;
+	LOTInfo	  LOT			 = {};
+	MoodType  Mood			 = MoodType::None;
+	ItemInfo* Enemy			 = nullptr;
+	ItemInfo* AITarget		 = nullptr;
+	short	  AITargetNumber = -1;
+	Vector3i  Target		 = Vector3i::Zero;
 
 	short MaxTurn = 0;
 	short JointRotation[4] = {};

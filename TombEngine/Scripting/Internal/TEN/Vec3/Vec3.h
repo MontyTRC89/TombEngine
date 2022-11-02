@@ -1,13 +1,13 @@
 #pragma once
 
-struct Vector3Int;
+class Vector3i;
 
 namespace sol {
 	class state;
 }
 
-struct PHD_3DPOS;
-struct GameVector;
+class Pose;
+class GameVector;
 
 class Vec3 {
 public:
@@ -16,15 +16,15 @@ public:
 	int z;
 
 	Vec3(int x, int y, int z);
-	Vec3(PHD_3DPOS const& pos);
-	Vec3(Vector3Int const& pos);
+	Vec3(Pose const& pos);
+	Vec3(Vector3i const& pos);
 
-	operator Vector3Int() const;
+	operator Vector3i() const;
 
 	[[nodiscard]] std::string ToString() const;
 
 	void ToLength(int newLength);
-	void StoreInPHDPos(PHD_3DPOS& pos) const;
+	void StoreInPHDPos(Pose& pos) const;
 	void StoreInGameVector(GameVector& vec) const;
 
 	static void Register(sol::table &);

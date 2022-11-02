@@ -3,7 +3,7 @@
 #include "Game/animation.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
-#include "Game/gui.h"
+#include "Game/Gui.h"
 #include "Game/effects/effects.h"
 #include "Game/collision/collide_item.h"
 #include "Game/Lara/lara_one_gun.h"
@@ -12,14 +12,14 @@
 #include "Game/effects/tomb4fx.h"
 #include "Game/Lara/lara_flare.h"
 #include "Game/effects/simple_particle.h"
-#include "Specific/input.h"
+#include "Specific/Input/Input.h"
 #include "Specific/setup.h"
 #include "Specific/level.h"
 #include "Sound/sound.h"
 #include "Objects/TR4/Vehicles/jeep_info.h"
 #include "Objects/Utils/VehicleHelpers.h"
 #include "Renderer/Renderer11Enums.h"
-#include "Specific/prng.h"
+#include "Math/Random.h"
 
 using namespace TEN::Input;
 using std::vector;
@@ -29,8 +29,8 @@ namespace TEN::Entities::Vehicles
 	char JeepSmokeStart;
 	bool JeepNoGetOff;
 
-	const vector<int> JeepJoints = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 15, 16 };
-	const vector<int> JeepBrakeLightJoints = { 15, 16 };
+	const vector<unsigned int> JeepJoints = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 15, 16 };
+	const vector<unsigned int> JeepBrakeLightJoints = { 15, 16 };
 
 	const vector<VehicleMountType> JeepMountTypes =
 	{
@@ -146,8 +146,8 @@ namespace TEN::Entities::Vehicles
 		jeepItem->Data = JeepInfo();
 		auto* jeep = GetJeepInfo(jeepItem);
 
-		jeepItem->SetBits(JointBitType::Mesh, JeepJoints);
-		jeepItem->ClearBits(JointBitType::Mesh, { 17 });
+		jeepItem->MeshBits.Set(JeepJoints);
+		jeepItem->MeshBits.Clear(17);
 		jeep->MomentumAngle = jeepItem->Pose.Orientation.y;
 	}
 
@@ -226,7 +226,7 @@ namespace TEN::Entities::Vehicles
 		AnimateItem(laraItem);
 	}
 
-	static int DoJeepShift(ItemInfo* jeepItem, Vector3Int* pos, Vector3Int* old)
+	static int DoJeepShift(ItemInfo* jeepItem, Vector3i* pos, Vector3i* old)
 	{
 		int x = pos->x / SECTOR(1);
 		int z = pos->z / SECTOR(1);
@@ -479,7 +479,7 @@ namespace TEN::Entities::Vehicles
 		return true;
 	}
 
-	static int GetJeepCollisionAnim(ItemInfo* jeepItem, Vector3Int* pos)
+	static int GetJeepCollisionAnim(ItemInfo* jeepItem, Vector3i* pos)
 	{
 		auto* jeep = GetJeepInfo(jeepItem);
 
@@ -511,7 +511,7 @@ namespace TEN::Entities::Vehicles
 		auto* jeep = GetJeepInfo(jeepItem);
 		auto* lara = GetLaraInfo(laraItem);
 
-		Vector3Int f_old, b_old, mm_old, mt_old, mb_old;
+		Vector3i f_old, b_old, mm_old, mt_old, mb_old;
 
 		int hf_old  = GetVehicleHeight(jeepItem, JEEP_FRONT, -JEEP_SIDE, true, &f_old);
 		int hb_old  = GetVehicleHeight(jeepItem, JEEP_FRONT, JEEP_SIDE, true, &b_old);
@@ -638,14 +638,14 @@ namespace TEN::Entities::Vehicles
 		else if (jeep->Velocity < -JEEP_REVERSE_VELOCITY_MAX)
 			jeep->Velocity = -JEEP_REVERSE_VELOCITY_MAX;
 
-		Vector3Int movedPos;
+		Vector3i movedPos;
 		movedPos.x = jeepItem->Pose.Position.x;
 		movedPos.z = jeepItem->Pose.Position.z;
 
 		if (!(jeepItem->Flags & IFLAG_INVISIBLE))
 			DoVehicleCollision(jeepItem, JEEP_FRONT);
 
-		Vector3Int f, b, mm, mt, mb;
+		Vector3i f, b, mm, mt, mb;
 	
 		int rot1 = 0;
 		int rot2 = 0;
@@ -686,7 +686,7 @@ namespace TEN::Entities::Vehicles
 		roomNumber = jeepItem->RoomNumber;
 		floor = GetFloor(jeepItem->Pose.Position.x, jeepItem->Pose.Position.y, jeepItem->Pose.Position.z, &roomNumber);
 		if (GetFloorHeight(floor, jeepItem->Pose.Position.x, jeepItem->Pose.Position.y, jeepItem->Pose.Position.z) < jeepItem->Pose.Position.y - STEP_SIZE)
-			DoJeepShift(jeepItem, (Vector3Int*)&jeepItem->Pose, &oldPos);
+			DoJeepShift(jeepItem, (Vector3i*)&jeepItem->Pose, &oldPos);
 
 		if (!jeep->Velocity)
 			rot1 = 0;
@@ -730,7 +730,7 @@ namespace TEN::Entities::Vehicles
 		auto* jeep = GetJeepInfo(jeepItem);
 
 		if (laraItem->Animation.ActiveState == JS_DISMOUNT || laraItem->Animation.TargetState == JS_DISMOUNT)
-			TrInput = 0;
+			ClearAllActions();
 	
 		if (jeep->Revs <= 16)
 			jeep->Revs = 0;
@@ -856,17 +856,16 @@ namespace TEN::Entities::Vehicles
 
 		if (TrInput & VEHICLE_IN_BRAKE)
 		{
-			auto pos = Vector3Int(0, -144, -1024);
-			GetJointAbsPosition(jeepItem, &pos, 11);
-
+			auto pos = GetJointPosition(jeepItem, 11, Vector3i(0, -144, -1024));
 			TriggerDynamicLight(pos.x, pos.y, pos.z, 10, 64, 0, 0);
-			jeepItem->SetBits(JointBitType::Mesh, { 17 });
-			jeepItem->ClearBits(JointBitType::Mesh, JeepBrakeLightJoints);
+
+			jeepItem->MeshBits.Set(17);
+			jeepItem->MeshBits.Clear(JeepBrakeLightJoints);
 		}
 		else
 		{
-			jeepItem->SetBits(JointBitType::Mesh, JeepBrakeLightJoints);
-			jeepItem->ClearBits(JointBitType::Mesh, { 17 });
+			jeepItem->MeshBits.Set(JeepBrakeLightJoints);
+			jeepItem->MeshBits.Clear({ 17 });
 		}
 	
 		*pitch = jeep->EngineRevs;
@@ -1356,7 +1355,7 @@ namespace TEN::Entities::Vehicles
 		int floorHeight = GetFloorHeight(floor, jeepItem->Pose.Position.x, jeepItem->Pose.Position.y, jeepItem->Pose.Position.z);
 		int ceiling = GetCeiling(floor, jeepItem->Pose.Position.x, jeepItem->Pose.Position.y, jeepItem->Pose.Position.z);
 
-		Vector3Int fl, fr, bc;
+		Vector3i fl, fr, bc;
 		int hfl = GetVehicleHeight(jeepItem, JEEP_FRONT, -JEEP_SIDE, true, &fl);
 		int hfr = GetVehicleHeight(jeepItem, JEEP_FRONT, JEEP_SIDE, true, &fr);
 		int hbc = GetVehicleHeight(jeepItem, -(JEEP_FRONT + 50), 0, true, &bc);
@@ -1371,7 +1370,10 @@ namespace TEN::Entities::Vehicles
 		if (laraItem->HitPoints <= 0)
 		{
 			dead = true;
-			TrInput &= ~(IN_LEFT | IN_RIGHT | IN_BACK | IN_FORWARD);
+			ClearAction(In::Forward);
+			ClearAction(In::Back);
+			ClearAction(In::Left);
+			ClearAction(In::Right);
 		}
 
 		int pitch = 0;
@@ -1486,8 +1488,7 @@ namespace TEN::Entities::Vehicles
 			short speed = 0;
 			short angle = 0;
 
-			auto pos = Vector3Int(90, 0, -500);
-			GetJointAbsPosition(jeepItem, &pos, 11);
+			auto pos = GetJointPosition(jeepItem, 11, Vector3i(90, 0, -500));
 
 			if (jeepItem->Animation.Velocity.z <= 32)
 			{

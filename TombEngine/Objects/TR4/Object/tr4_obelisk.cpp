@@ -7,7 +7,7 @@
 #include "Sound/sound.h"
 #include "Game/Lara/lara.h"
 #include "Game/effects/effects.h"
-#include "Specific/input.h"
+#include "Specific/Input/Input.h"
 #include "Game/animation.h"
 #include "Game/effects/lightning.h"
 #include "Game/effects/debris.h"
@@ -46,8 +46,8 @@ void ObeliskControl(short itemNumber)
 	auto* item = &g_Level.Items[itemNumber];
 
 	short someNumber;
-	PHD_3DPOS pos;
-	PHD_3DPOS pos2;
+	Pose pos;
+	Pose pos2;
 
 	if (TriggerActive(item))
 	{
@@ -91,8 +91,8 @@ void ObeliskControl(short itemNumber)
 					if (!(GlobalCounter & 3))
 					{
 						TriggerLightning(
-							(Vector3Int*)&pos,
-							(Vector3Int*)&pos2,
+							(Vector3i*)&pos,
+							(Vector3i*)&pos2,
 							(GetRandomControl() & 0x1F) + 32,
 							r,
 							g,
@@ -147,8 +147,8 @@ void ObeliskControl(short itemNumber)
 					}
 
 					TriggerLightning(
-						(Vector3Int*)&pos,
-						(Vector3Int*)&pos2,
+						(Vector3i*)&pos,
+						(Vector3i*)&pos2,
 						(GetRandomControl() & 0xF) + 16,
 						r,
 						g,

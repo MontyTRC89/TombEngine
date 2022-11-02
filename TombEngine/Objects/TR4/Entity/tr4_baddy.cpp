@@ -13,8 +13,8 @@
 #include "Game/Lara/lara_fire.h"
 #include "Game/misc.h"
 #include "Game/people.h"
+#include "Math/Random.h"
 #include "Specific/level.h"
-#include "Specific/prng.h"
 #include "Specific/setup.h"
 
 using namespace TEN::Math::Random;
@@ -54,7 +54,7 @@ namespace TEN::Entities::TR4
 {
 	const auto BaddyGunBite	  = BiteInfo(Vector3(0.0f, -16.0f, 200.0f), 11);
 	const auto BaddySwordBite = BiteInfo(Vector3::Zero, 15);
-	const vector<int> BaddySwordAttackJoints = { 14, 15, 16 };
+	const vector<unsigned int> BaddySwordAttackJoints = { 14, 15, 16 };
 
 	#define BADDY_USE_UZI	24
 
@@ -321,8 +321,8 @@ namespace TEN::Entities::TR4
 		auto* enemyItem = creature->Enemy;
 		auto* object = &Objects[ID_BADDY1];
 
-		short tilt = 0;
 		short angle = 0;
+		short tilt = 0;
 		short joint1 = 0;
 		short joint2 = 0;
 		short joint3 = 0;
@@ -419,12 +419,10 @@ namespace TEN::Entities::TR4
 
 		item->ItemFlags[1] = item->RoomNumber;
 
-		// Handle baddy firing
+		// Handle baddy firing.
 		if (creature->FiredWeapon)
 		{
-			auto pos = Vector3Int(BaddyGunBite.Position);
-			GetJointAbsPosition(item, &pos, BaddyGunBite.meshNum);
-
+			auto pos = GetJointPosition(item, BaddyGunBite.meshNum, Vector3i(BaddyGunBite.Position));
 			TriggerDynamicLight(pos.x, pos.y, pos.z, 4 * creature->FiredWeapon + 8, 24, 16, 4);
 			creature->FiredWeapon--;
 		}
@@ -932,7 +930,7 @@ namespace TEN::Entities::TR4
 
 				if (!currentCreature->Flags)
 				{
-					if (item->TestBits(JointBitType::Touch, BaddySwordAttackJoints))
+					if (item->TouchBits.Test(BaddySwordAttackJoints))
 					{
 						if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + FRAME_BADDY_SWORD_HIT_DAMAGE_MIN &&
 							item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].frameBase + FRAME_BADDY_SWORD_HIT_DAMAGE_MAX)
@@ -1024,7 +1022,7 @@ namespace TEN::Entities::TR4
 
 				if (!currentCreature->Flags)
 				{
-					if (item->TouchBits)
+					if (item->TouchBits.TestAny())
 					{
 						SetAnimation(LaraItem, LA_JUMP_UP);
 						LaraItem->Animation.IsAirborne = true;
@@ -1075,7 +1073,7 @@ namespace TEN::Entities::TR4
 				break;
 
 			case BADDY_STATE_CROUCH_PICKUP:
-				ClampRotation(&item->Pose, AI.angle, ANGLE(11.0f));
+				ClampRotation(item->Pose, AI.angle, ANGLE(11.0f));
 
 				if (item->Animation.FrameNumber != g_Level.Anims[item->Animation.AnimNumber].frameBase + FRAME_BADDY_CROUCH_PICKUP)
 					break;
@@ -1130,7 +1128,7 @@ namespace TEN::Entities::TR4
 					joint1 = AI.angle;
 					joint2 = AI.xAngle;
 				}
-				ClampRotation(&item->Pose, AI.angle, ANGLE(7));
+				ClampRotation(item->Pose, AI.angle, ANGLE(7));
 
 				if (!Targetable(item, &AI) ||
 					item->ItemFlags[2] < 1)
@@ -1149,7 +1147,7 @@ namespace TEN::Entities::TR4
 					joint1 = AI.angle;
 					joint2 = AI.xAngle;
 				}
-				ClampRotation(&item->Pose, AI.angle, ANGLE(7.0f));
+				ClampRotation(item->Pose, AI.angle, ANGLE(7.0f));
 
 				if (item->Animation.FrameNumber >= g_Level.Anims[item->Animation.AnimNumber].frameBase + FRAME_BADDY_FIRE_MAX ||
 					item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + FRAME_BADDY_FIRE_MIN)
@@ -1202,7 +1200,7 @@ namespace TEN::Entities::TR4
 			case BADDY_STATE_UNKNOWN_8:
 				currentCreature->MaxTurn = 0;
 
-				ClampRotation(&item->Pose, AI.angle, ANGLE(11.0f));
+				ClampRotation(item->Pose, AI.angle, ANGLE(11.0f));
 
 				if (laraAI.distance < pow(682, 2) ||
 					item != Lara.TargetEntity)
@@ -1224,7 +1222,7 @@ namespace TEN::Entities::TR4
 			case BADDY_STATE_SOMERSAULT:
 				if (item->Animation.AnimNumber == (Objects[objectNumber].animIndex + BADDY_ANIM_SOMERSAULT_END))
 				{
-					ClampRotation(&item->Pose, AI.angle, ANGLE(7.0f));
+					ClampRotation(item->Pose, AI.angle, ANGLE(7.0f));
 					break;
 				}
 

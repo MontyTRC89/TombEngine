@@ -12,11 +12,12 @@
 #include "Game/Lara/lara_helpers.h"
 #include "Game/misc.h"
 #include "Game/people.h"
+#include "Math/Math.h"
 #include "Renderer/Renderer11Enums.h"
 #include "Specific/level.h"
-#include "Specific/prng.h"
 #include "Specific/setup.h"
 
+using namespace TEN::Math;
 using namespace TEN::Math::Random;
 using std::vector;
 
@@ -31,8 +32,8 @@ namespace TEN::Entities::TR4
 	const auto HarpyBite3	= BiteInfo(Vector3::Zero, 15);
 	const auto HarpyAttack1 = BiteInfo(Vector3(0.0f, 128.0f, 0.0f), 2);
 	const auto HarpyAttack2 = BiteInfo(Vector3(0.0f, 128.0f, 0.0f), 4);
-	const vector<int> HarpySwoopAttackJoints   = { HarpyBite2.meshNum, HarpyBite1.meshNum, HarpyBite3.meshNum };
-	const vector<int> HarpyStingerAttackJoints = { HarpyAttack1.meshNum, HarpyAttack2.meshNum };
+	const vector<unsigned int> HarpySwoopAttackJoints   = { 2, 4, 15 };
+	const vector<unsigned int> HarpyStingerAttackJoints = { 2, 4 };
 
 	enum HarpyState
 	{
@@ -75,7 +76,7 @@ namespace TEN::Entities::TR4
 		HARPY_ANIM_GLIDE = 18
 	};
 
-	void TriggerHarpyMissile(PHD_3DPOS* pose, short roomNumber, short mesh)
+	void TriggerHarpyMissile(Pose* pose, short roomNumber, short mesh)
 	{
 		short fxNumber = CreateNewEffect(roomNumber);
 		if (fxNumber == -1)
@@ -185,11 +186,8 @@ namespace TEN::Entities::TR4
 	{
 		item->ItemFlags[0]++;
 
-		auto rh = Vector3Int(HarpyAttack1.Position);
-		GetJointAbsPosition(item, &rh, HarpyAttack1.meshNum);
-
-		auto lr = Vector3Int(HarpyAttack2.Position);
-		GetJointAbsPosition(item, &lr, HarpyAttack2.meshNum);
+		auto rh = GetJointPosition(item, HarpyAttack1.meshNum, Vector3i(HarpyAttack1.Position));
+		auto lr = GetJointPosition(item, HarpyAttack2.meshNum, Vector3i(HarpyAttack2.Position));
 
 		if (item->ItemFlags[0] >= 24 &&
 			item->ItemFlags[0] <= 47 &&
@@ -226,23 +224,17 @@ namespace TEN::Entities::TR4
 		{
 			if (item->ItemFlags[0] <= 65 && GlobalCounter & 1)
 			{
-				auto pos3 = Vector3Int(HarpyAttack1.Position);
-				pos3.y *= 2;
-				GetJointAbsPosition(item, &pos3, HarpyAttack1.meshNum);
-
-				auto angles = GetVectorAngles(pos3.x - rh.x, pos3.y - rh.y, pos3.z - rh.z);
-				auto pose = PHD_3DPOS(rh, angles);
+				auto pos3 = GetJointPosition(item, HarpyAttack1.meshNum, Vector3i(HarpyAttack1.Position.x, HarpyAttack1.Position.y * 2, HarpyAttack1.Position.z));
+				auto orient = Geometry::GetOrientToPoint(rh.ToVector3(), lr.ToVector3());
+				auto pose = Pose(rh, orient);
 				TriggerHarpyMissile(&pose, item->RoomNumber, 2);
 			}
 
 			if (item->ItemFlags[0] >= 61 && item->ItemFlags[0] <= 65 && !(GlobalCounter & 1))
 			{
-				auto pos3 = Vector3Int(HarpyAttack2.Position);
-				pos3.y *= 2;
-				GetJointAbsPosition(item, &pos3, HarpyAttack2.meshNum);
-
-				auto angles = GetVectorAngles(pos3.x - rh.x, pos3.y - rh.y, pos3.z - rh.z);
-				auto pose = PHD_3DPOS(rh, angles);
+				auto pos3 = GetJointPosition(item, HarpyAttack2.meshNum, Vector3i(HarpyAttack1.Position.x, HarpyAttack2.Position.y * 2, HarpyAttack2.Position.z));
+				auto orient = Geometry::GetOrientToPoint(rh.ToVector3(), lr.ToVector3());
+				auto pose = Pose(rh, orient);
 				TriggerHarpyMissile(&pose, item->RoomNumber, 2);
 			}
 		}
@@ -505,7 +497,7 @@ namespace TEN::Entities::TR4
 				item->Animation.TargetState = HARPY_STATE_FLY_FORWARD;
 				creature->MaxTurn = ANGLE(2.0f);
 
-				if (item->TestBits(JointBitType::Touch, HarpySwoopAttackJoints) ||
+				if (item->TouchBits.Test(HarpySwoopAttackJoints) ||
 					creature->Enemy != nullptr && !creature->Enemy->IsLara() &&
 					abs(creature->Enemy->Pose.Position.y - item->Pose.Position.y) <= SECTOR(1) &&
 					AI.distance < pow(SECTOR(2), 2))
@@ -524,7 +516,7 @@ namespace TEN::Entities::TR4
 				creature->MaxTurn = ANGLE(2.0f);
 
 				if (creature->Flags == 0 &&
-					(item->TestBits(JointBitType::Touch, HarpyStingerAttackJoints) ||
+					(item->TouchBits.Test(HarpyStingerAttackJoints) ||
 						creature->Enemy != nullptr && !creature->Enemy->IsLara() &&
 						abs(creature->Enemy->Pose.Position.y - item->Pose.Position.y) <= SECTOR(1) &&
 						AI.distance < pow(SECTOR(2), 2)))
