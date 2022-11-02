@@ -227,7 +227,7 @@ namespace TEN::Entities::Vehicles
 		auto UPV = GetUPVInfo(UPVItem);
 		auto* lara = GetLaraInfo(laraItem);
 
-		auto& ammo = GetAmmo(laraItem, LaraWeaponType::HarpoonGun);
+		auto& ammo = GetAmmo(*lara, LaraWeaponType::HarpoonGun);
 		if (ammo.getCount() == 0 && !ammo.hasInfinite())
 			return;
 		else if (!ammo.hasInfinite())

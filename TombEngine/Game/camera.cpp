@@ -1091,7 +1091,7 @@ void LaserSightCamera(ItemInfo* item)
 		LSHKTimer--;
 
 	bool firing = false;
-	auto& ammo = GetAmmo(item, lara->Control.Weapon.GunType);
+	auto& ammo = GetAmmo(*lara, lara->Control.Weapon.GunType);
 
 	if (!(RawInput & IN_ACTION) || WeaponDelay || !ammo)
 	{

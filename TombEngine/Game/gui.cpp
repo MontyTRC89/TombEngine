@@ -2083,7 +2083,7 @@ void GuiController::UseCurrentItem()
 					if (Lara.Control.Weapon.GunType != LaraWeaponType::Flare)
 					{
 						TrInput = IN_FLARE;
-						LaraGun(LaraItem);
+						HandleWeapon(LaraItem);
 						TrInput = 0;
 					}
 
