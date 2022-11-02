@@ -15,7 +15,7 @@
 #include "Renderer/ConstantBuffers/RoomBuffer.h"
 #include "Renderer/ConstantBuffers/ItemBuffer.h"
 #include "Renderer/ConstantBuffers/AnimatedBuffer.h"
-#include "Renderer/ConstantBuffers/AlphaTestBuffer.h"
+#include "Renderer/ConstantBuffers/BlendingBuffer.h"
 #include "Frustum.h"
 #include "RendererBucket.h"
 #include "Game/items.h"
@@ -315,8 +315,8 @@ namespace TEN::Renderer
 		ConstantBuffer<CSpriteBuffer> m_cbSprite;
 		CPostProcessBuffer m_stPostProcessBuffer;
 		ConstantBuffer<CPostProcessBuffer> m_cbPostProcessBuffer;
-		CAlphaTestBuffer m_stAlphaTest;
-		ConstantBuffer<CAlphaTestBuffer> m_cbAlphaTest;
+		CBlendingBuffer m_stBlending;
+		ConstantBuffer<CBlendingBuffer> m_cbBlending;
 
 		// Sprites
 		std::unique_ptr<SpriteBatch> m_spriteBatch;
