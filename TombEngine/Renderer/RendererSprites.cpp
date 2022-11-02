@@ -95,7 +95,7 @@ namespace TEN::Renderer
 			scale = 1.0f;
 
 		size.x *= scale;
-		size.y *= scale;
+		size.y *= scale; 
 
 		RendererSpriteToDraw spr = {};
 

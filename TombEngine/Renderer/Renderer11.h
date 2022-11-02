@@ -11,7 +11,6 @@
 #include "Game/effects/effects.h"
 #include "Specific/level.h"
 #include "Specific/fast_vector.h"
-
 #include "Renderer/Renderer11Enums.h"
 #include "Renderer/ConstantBuffers/StaticBuffer.h"
 #include "Renderer/ConstantBuffers/LightBuffer.h"
@@ -22,19 +21,17 @@
 #include "Renderer/ConstantBuffers/RoomBuffer.h"
 #include "Renderer/ConstantBuffers/ItemBuffer.h"
 #include "Renderer/ConstantBuffers/AnimatedBuffer.h"
-#include "Renderer/ConstantBuffers/AlphaTestBuffer.h"
-#include "Renderer/Frustum.h"
-#include "Renderer/RendererBucket.h"
-#include "Renderer/IndexBuffer/IndexBuffer.h"
-#include "Renderer/VertexBuffer/VertexBuffer.h"
-#include "Renderer/RenderTarget2D/RenderTarget2D.h"
+#include "Renderer/ConstantBuffers/BlendingBuffer.h"
 #include "Renderer/ConstantBuffers/CameraMatrixBuffer.h"
-#include "Renderer/Texture2D/Texture2D.h"
 #include "Renderer/ConstantBuffers/SpriteBuffer.h"
+#include "Frustum.h"
+#include "RendererBucket.h"
 #include "Renderer/RenderTargetCube/RenderTargetCube.h"
-#include "Renderer/RenderView/RenderView.h"
-#include "Renderer/ConstantBuffer/ConstantBuffer.h"
-#include "Renderer/RenderTargetCubeArray/RenderTargetCubeArray.h"
+#include "RenderView/RenderView.h"
+#include "Specific/level.h"
+#include "ConstantBuffer/ConstantBuffer.h"
+#include "RenderTargetCubeArray/RenderTargetCubeArray.h"
+#include "Specific/fast_vector.h"
 #include "Renderer/TextureBase.h"
 #include "Renderer/Texture2DArray/Texture2DArray.h"
 #include "Renderer/ConstantBuffers/InstancedSpriteBuffer.h"
@@ -43,9 +40,16 @@
 #include "Renderer/Structures/RendererLight.h"
 #include "Renderer/Structures/RendererStringToDraw.h"
 #include "Renderer/Structures/RendererRoom.h"
+#include <Renderer/VertexBuffer/VertexBuffer.h>
+#include <Renderer/IndexBuffer/IndexBuffer.h>
+#include <Renderer/Texture2D/Texture2D.h>
+#include <Renderer/RenderTarget2D/RenderTarget2D.h>
 
+class EulerAngles;
 struct CAMERA_INFO;
 struct RendererRectangle;
+
+using namespace TEN::Gui;
 
 namespace TEN::Renderer
 {
@@ -320,10 +324,10 @@ namespace TEN::Renderer
 		ConstantBuffer<CSpriteBuffer> m_cbSprite;
 		CPostProcessBuffer m_stPostProcessBuffer;
 		ConstantBuffer<CPostProcessBuffer> m_cbPostProcessBuffer;
-		CAlphaTestBuffer m_stAlphaTest;
-		ConstantBuffer<CAlphaTestBuffer> m_cbAlphaTest;
 		CInstancedSpriteBuffer m_stInstancedSpriteBuffer;
 		ConstantBuffer<CInstancedSpriteBuffer> m_cbInstancedSpriteBuffer;
+		CBlendingBuffer m_stBlending;
+		ConstantBuffer<CBlendingBuffer> m_cbBlending;
 
 		// Sprites
 		std::unique_ptr<SpriteBatch> m_spriteBatch;
@@ -655,7 +659,7 @@ namespace TEN::Renderer
 		void GetItemAbsBonePosition(int itemNumber, Vector3& pos, int jointIndex);
 		int  GetSpheres(short itemNumber, BoundingSphere* ptr, char worldSpace, Matrix local);
 		void GetBoneMatrix(short itemNumber, int jointIndex, Matrix* outMatrix);
-		void DrawObjectOn2DPosition(short x, short y, short objectNum, short rotX, short rotY, short rotZ,  float scale1);
+		void DrawObjectOn2DPosition(short x, short y, short objectNum, EulerAngles orient, float scale1);
 		void SetLoadingScreen(std::wstring& fileName);
 		void SetTextureOrDefault(Texture2D& texture, std::wstring path);
 		std::string GetDefaultAdapterName();

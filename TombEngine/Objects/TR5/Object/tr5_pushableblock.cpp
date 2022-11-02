@@ -11,7 +11,7 @@
 #include "Game/control/flipeffect.h"
 #include "Game/control/box.h"
 #include "Specific/level.h"
-#include "Specific/input.h"
+#include "Specific/Input/Input.h"
 #include "Sound/sound.h"
 #include "Specific/setup.h"
 #include "Objects/TR5/Object/tr5_pushableblock_info.h"

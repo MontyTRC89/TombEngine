@@ -3,7 +3,7 @@
 #include "./ShaderLight.hlsli"
 #include "./VertexEffects.hlsli"
 #include "./VertexInput.hlsli"
-#include "./AlphaTestBuffer.hlsli"
+#include "./Blending.hlsli"
 
 cbuffer StaticMatrixBuffer : register(b8)
 {
@@ -81,8 +81,7 @@ PixelShaderOutput PS(PixelShaderInput input)
 		float4(input.PositionCopy.z / input.PositionCopy.w, 0.0f, 0.0f, 1.0f) :
 		float4(0.0f, 0.0f, 0.0f, 0.0f);
 
-	if (FogMaxDistance != 0)
-		output.Color.xyz = lerp(output.Color.xyz, FogColor.xyz, input.Fog);
+	output.Color = DoFog(output.Color, FogColor, input.Fog);
 
 	return output;
 }

@@ -18,7 +18,7 @@
 using namespace TEN::Math::Random;
 
 constexpr auto FLARE_MAIN_COLOR = Vector3(0.8f, 0.42947f, 0.2921f);
-constexpr auto FLARE_LIFE_MAX = 60 * FPS;	// 60 * 30 frames = 60 seconds.
+constexpr auto FLARE_LIFE_MAX = 60 * FPS;
 
 void FlareControl(short itemNumber)
 {

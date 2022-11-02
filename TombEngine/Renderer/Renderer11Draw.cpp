@@ -11,7 +11,7 @@
 #include "Game/camera.h"
 #include "Game/items.h"
 #include "Game/animation.h"
-#include "Game/gui.h"
+#include "Game/Gui.h"
 #include "Game/Lara/lara.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
@@ -1431,8 +1431,8 @@ namespace TEN::Renderer
 		UpdateLaraAnimations(false);
 		UpdateItemAnimations(view);
 
-		m_stAlphaTest.AlphaTest = -1;
-		m_stAlphaTest.AlphaThreshold = -1;
+		m_stBlending.AlphaTest = -1;
+		m_stBlending.AlphaThreshold = -1;
 
 		CollectLightsForCamera();
 		RenderItemShadows(view);

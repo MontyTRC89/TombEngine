@@ -5,8 +5,8 @@
 #include "Game/control/box.h"
 #include "Game/items.h"
 #include "Game/control/lot.h"
-#include "Game/gui.h"
-#include "Specific/input.h"
+#include "Game/Gui.h"
+#include "Specific/Input/Input.h"
 #include "Game/pickup/pickup.h"
 #include "Sound/sound.h"
 #include "Game/animation.h"
@@ -23,6 +23,7 @@
 #include "Game/collision/collide_item.h"
 #include "Game/itemdata/itemdata.h"
 
+using namespace TEN::Gui;
 using namespace TEN::Input;
 
 namespace TEN::Entities::Doors

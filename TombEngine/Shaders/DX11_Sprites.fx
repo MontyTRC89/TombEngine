@@ -1,5 +1,5 @@
 #include "./CameraMatrixBuffer.hlsli"
-#include "./AlphaTestBuffer.hlsli"
+#include "./Blending.hlsli"
 #include "./VertexInput.hlsli"
 
 cbuffer SpriteBuffer: register(b9)
@@ -17,7 +17,7 @@ struct PixelShaderInput
 	float3 Normal: NORMAL;
 	float2 UV: TEXCOORD1;
 	float4 Color: COLOR;
-	float Fog : FOG;
+	float  Fog : FOG;
 	float4 PositionCopy: TEXCOORD2;
 };
 
@@ -37,7 +37,8 @@ PixelShaderInput VS(VertexShaderInput input)
 	{
 		worldPosition = mul(float4(input.Position, 1.0f), BillboardMatrix);
 		output.Position = mul(mul(float4(input.Position, 1.0f), BillboardMatrix), ViewProjection);
-	} else 
+	}
+	else 
 	{
 		worldPosition = float4(input.Position, 1.0f);
 		output.Position = mul(float4(input.Position, 1.0f), ViewProjection);
@@ -86,8 +87,7 @@ float4 PS(PixelShaderInput input) : SV_TARGET
 		output.w = min(output.w, fade);
 	}
 
-	if (FogMaxDistance != 0)
-		output.xyz = lerp(output.xyz, FogColor, input.Fog);
+	output = DoFog(output, float4(0.0f, 0.0f, 0.0f, 0.0f), input.Fog);
 
 	return output;
 }

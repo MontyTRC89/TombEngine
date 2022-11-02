@@ -15,7 +15,7 @@
 #include "Game/Lara/lara_one_gun.h"
 #include "Game/effects/simple_particle.h"
 #include "Objects/TR2/Vehicles/skidoo_info.h"
-#include "Specific/input.h"
+#include "Specific/Input/Input.h"
 #include "Specific/level.h"
 #include "Math/Random.h"
 #include "Specific/setup.h"
@@ -287,8 +287,11 @@ namespace TEN::Entities::Vehicles
 
 		if (laraItem->HitPoints <= 0)
 		{
-			TrInput &= ~(IN_LEFT | IN_RIGHT | IN_BACK | IN_FORWARD);
 			dead = true;
+			ClearAction(In::Forward);
+			ClearAction(In::Back);
+			ClearAction(In::Left);
+			ClearAction(In::Right);
 		}
 		else if (laraItem->Animation.ActiveState == SKIDOO_STATE_JUMP_OFF)
 		{

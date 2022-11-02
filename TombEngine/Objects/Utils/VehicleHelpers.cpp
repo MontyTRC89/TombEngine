@@ -11,7 +11,7 @@
 #include "Math/Random.h"
 #include "Game/room.h"
 #include "Sound/sound.h"
-#include "Specific/input.h"
+#include "Specific/Input/Input.h"
 
 using namespace TEN::Input;
 using namespace TEN::Math;
