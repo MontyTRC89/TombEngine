@@ -6,7 +6,7 @@
 #include "Game/control/lot.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/tomb4fx.h"
-#include "Game/gui.h"
+#include "Game/Gui.h"
 #include "Game/itemdata/creature_info.h"
 #include "Game/items.h"
 #include "Game/misc.h"
@@ -15,6 +15,8 @@
 #include "Sound/sound.h"
 #include "Specific/level.h"
 #include "Math/Math.h"
+
+using namespace TEN::Gui;
 
 namespace TEN::Entities::TR4
 {

@@ -434,7 +434,7 @@ void WinClose()
 	DestroyAcceleratorTable(hAccTable);
 
 	Sound_DeInit();
-	DeInitialiseInput();
+	DeinitialiseInput();
 
 	TENLog("Cleaning up and exiting...", LogLevel::Info);
 	
