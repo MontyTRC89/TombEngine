@@ -399,7 +399,7 @@ InventoryObject inventry_objects_list[INVENTORY_TABLE_SIZE] =
 	{ID_EXAMINE8_COMBO2, 14, 0.5f, 0, 0, 0, OPT_USE | OPT_COMBINABLE, STRING_LOAD_GAME, NO_JOINT_BITS, INV_ROT_Y},
 };
 
-SettingsData GuiController::GetCurrentSettings()
+SettingsData& GuiController::GetCurrentSettings()
 {
 	return CurrentSettings;
 }
@@ -880,7 +880,7 @@ void GuiController::HandleDisplaySettingsInput(bool pause)
 			CurrentSettings.conf.Width = screenResolution.x;
 			CurrentSettings.conf.Height = screenResolution.y;
 
-			memcpy(&g_Configuration, &CurrentSettings.conf, sizeof(GameConfiguration));
+			g_Configuration = CurrentSettings.conf;
 			SaveConfiguration();
 
 			// Reset screen and go back
@@ -1029,7 +1029,7 @@ void GuiController::HandleControlSettingsInput(bool pause)
 
 void GuiController::BackupOptions()
 {
-	memcpy(&CurrentSettings.conf, &g_Configuration, sizeof(GameConfiguration));
+	CurrentSettings.conf = g_Configuration;
 }
 
 void GuiController::HandleOptionsInput()
@@ -1208,7 +1208,7 @@ void GuiController::HandleOtherSettingsInput(bool pause)
 			bool indicateRumble = CurrentSettings.conf.EnableRumble && !g_Configuration.EnableRumble;
 
 			// Save the configuration
-			memcpy(&g_Configuration, &CurrentSettings.conf, sizeof(GameConfiguration));
+			g_Configuration = CurrentSettings.conf;
 			SaveConfiguration();
 
 			// Rumble if setting was changed
@@ -3212,6 +3212,9 @@ bool GuiController::CallInventory(bool reset_mode)
 	bool exitLoop = false;
 	while (!exitLoop)
 	{
+		if (ThreadEnded)
+			return false;
+
 		OBJLIST_SPACING = phd_centerx >> 1;
 
 		if (compassNeedleAngle != 1024)
@@ -3225,9 +3228,6 @@ bool GuiController::CallInventory(bool reset_mode)
 			SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
 			exitLoop = true;
 		}
-
-		if (ThreadEnded)
-			return true;
 
 		DoDebouncedInput();
 		DrawInventory();
