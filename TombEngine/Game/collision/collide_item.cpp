@@ -66,26 +66,7 @@ bool InteractionBasis::TestInteraction(const Pose& pose0, const Pose& pose1) con
 
 bool TestPlayerEntityInteract(ItemInfo* item, ItemInfo* laraItem, const InteractionBasis& interactBounds)
 {
-	auto deltaOrient = laraItem->Pose.Orientation - item->Pose.Orientation;
-	if (deltaOrient.x < interactBounds.OrientConstraint.first.x || deltaOrient.x > interactBounds.OrientConstraint.second.x ||
-		deltaOrient.y < interactBounds.OrientConstraint.first.y || deltaOrient.y > interactBounds.OrientConstraint.second.y ||
-		deltaOrient.z < interactBounds.OrientConstraint.first.z || deltaOrient.z > interactBounds.OrientConstraint.second.z)
-	{
-		return false;
-	}
-
-	auto direction = (laraItem->Pose.Position - item->Pose.Position).ToVector3();
-	auto rotMatrix = item->Pose.Orientation.ToRotationMatrix().Transpose(); // NOTE: Should be Invert(), but inverse/transpose of a rotation matrix are equal and transposing is faster.
-	
-	auto relativePos = Vector3::Transform(direction, rotMatrix);
-	if (relativePos.x < interactBounds.Bounds.X1 || relativePos.x > interactBounds.Bounds.X2 ||
-		relativePos.y < interactBounds.Bounds.Y1 || relativePos.y > interactBounds.Bounds.Y2 ||
-		relativePos.z < interactBounds.Bounds.Z1 || relativePos.z > interactBounds.Bounds.Z2)
-	{
-		return false;
-	}
-
-	return true;
+	return interactBounds.TestInteraction(*item, *laraItem);
 }
 
 bool AlignPlayerToEntity(ItemInfo* item, ItemInfo* laraItem, const Vector3i& posOffset, const EulerAngles& orientOffset, bool doSnapAlign)
