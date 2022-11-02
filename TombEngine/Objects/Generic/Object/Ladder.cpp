@@ -32,7 +32,9 @@ namespace TEN::Entities::Generic
 		Front,
 		Back,
 		Left,
-		Right
+		Right,
+		JumpReach,
+		JumpUp
 	};
 
 	const vector<int> LadderMountedStates =
@@ -257,5 +259,45 @@ namespace TEN::Entities::Generic
 		{
 			ObjectCollision(itemNumber, laraItem, coll);
 		}
+	}
+
+	LadderMountType GetLadderMountType(const ItemInfo& ladderItem, ItemInfo& laraItem)
+	{
+		const auto& player = *GetLaraInfo(&laraItem);
+
+		// Check ladder usability.
+		if (ladderItem.Flags & IFLAG_INVISIBLE)
+			return LadderMountType::None;
+
+		// Check hand status.
+		if (player.Control.HandStatus != HandStatus::Free)
+			return LadderMountType::None;
+
+		bool isFacingLadder = Geometry::IsPointInFront(laraItem.Pose, ladderItem.Pose.Position.ToVector3());
+		if (!isFacingLadder || !TestState(laraItem.Animation.ActiveState, LadderGroundedMountStates))
+			return LadderMountType::None;
+
+		if (TrInput & IN_ACTION)
+		{
+			if (LadderMountTopFrontBasis.TestInteraction(ladderItem, laraItem))
+				return LadderMountType::TopFront;
+
+			if (LadderMountTopBackBasis.TestInteraction(ladderItem, laraItem))
+				return LadderMountType::TopBack;
+
+			if (LadderMountFrontBasis.TestInteraction(ladderItem, laraItem))
+				return LadderMountType::Front;
+
+			if (LadderMountBackBasis.TestInteraction(ladderItem, laraItem))
+				return LadderMountType::Back;
+
+			if (LadderMountLeftBasis.TestInteraction(ladderItem, laraItem))
+				return LadderMountType::Left;
+
+			if (LadderMountRightBasis.TestInteraction(ladderItem, laraItem))
+				return LadderMountType::Right;
+		}
+
+		return LadderMountType::None;
 	}
 }
