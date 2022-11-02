@@ -560,7 +560,7 @@ bool TestBlockMovable(ItemInfo* item, int blockHeight)
 
 	int height = probe.Position.Floor;
 	if (((PushableInfo*)item->Data)->hasFloorCeiling)
-		height -= blockHeight;
+		height += blockHeight;
 
 	if (height != item->Pose.Position.y)
 		return false;
