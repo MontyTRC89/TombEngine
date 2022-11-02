@@ -183,7 +183,12 @@ namespace TEN::Entities::Generic
 			{
 				if (TestCollision(&ladderItem, laraItem))
 				{
-					auto mountOffset = Vector3i(0, 0, GameBoundingBox(&ladderItem).Z1) + LadderMountedOffset;
+					auto ladderBounds = GameBoundingBox(&ladderItem);
+					int ladderVPos = ladderItem.Pose.Position.y + ladderBounds.Y1;
+					int playerVPos = laraItem->Pose.Position.y - LARA_HEIGHT;
+
+					int vOffset = -abs(playerVPos - ladderVPos) / LADDER_STEP_HEIGHT;
+					auto mountOffset = Vector3i(0, vOffset, ladderBounds.Z1) + LadderMountedOffset;
 
 					if (AlignPlayerToEntity(&ladderItem, laraItem, mountOffset, LadderMountFrontOrient, true))
 					{
@@ -198,7 +203,6 @@ namespace TEN::Entities::Generic
 						laraItem->Animation.Velocity.y = 0.0f;
 						player.Control.HandStatus = HandStatus::Busy;
 					}
-
 				}
 			}
 
