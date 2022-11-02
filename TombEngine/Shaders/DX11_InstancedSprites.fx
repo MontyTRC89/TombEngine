@@ -1,5 +1,5 @@
 #include "./CameraMatrixBuffer.hlsli"
-#include "./AlphaTestBuffer.hlsli"
+#include "./Blending.hlsli"
 #include "./VertexInput.hlsli"
 #include "./InstancedSpriteBuffer.hlsli"
 #include "./Math.hlsli"
@@ -101,8 +101,7 @@ float4 PS(PixelShaderInput input, uint InstanceID : SV_InstanceID) : SV_TARGET
 		output.w = min(output.w, fade);
 	}
 
-	if (FogMaxDistance != 0)
-		output.xyz = lerp(output.xyz, FogColor, input.Fog);
+	output = DoFog(output, float4(0.0f, 0.0f, 0.0f, 0.0f), input.Fog);
 
 	return output;
 }
