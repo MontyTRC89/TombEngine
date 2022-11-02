@@ -465,7 +465,14 @@ void StartTraps()
 		object->isPickup = true;
 	}
 
-	object = &Objects[ID_LADDER];
+	object = &Objects[ID_LADDER_ONE_SIDED];
+	if (object->loaded)
+	{
+		object->collision = LadderCollision;
+		object->saveFlags = true;
+	}
+
+	object = &Objects[ID_LADDER_DOUBLE_SIDED];
 	if (object->loaded)
 	{
 		object->collision = LadderCollision;

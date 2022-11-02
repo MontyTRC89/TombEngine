@@ -1,8 +1,8 @@
 #pragma once
 #include "Objects/objectslist.h"
 #include "Math/Math.h"
-#include "Specific/level.h"
 #include "Renderer/Renderer11Enums.h"
+#include "Specific/level.h"
 
 enum class ZoneType;
 struct CollisionInfo;
