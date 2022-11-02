@@ -10,7 +10,7 @@
 #include "Game/camera.h"
 #include "Specific/setup.h"
 #include "Specific/level.h"
-#include "Specific/input.h"
+#include "Specific/Input/Input.h"
 #include "Sound/sound.h"
 
 // NOTE: we need to decompile/inspect if these functions are still needed

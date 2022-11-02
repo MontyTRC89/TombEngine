@@ -1,10 +1,10 @@
 #include "framework.h"
 #include "Objects/Generic/Switches/generic_switch.h"
-#include "Specific/input.h"
+#include "Specific/Input/Input.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Objects/Generic/Switches/crowbar_switch.h"
-#include "Game/gui.h"
+#include "Game/Gui.h"
 #include "Sound/sound.h"
 #include "Game/pickup/pickup.h"
 #include "Specific/level.h"
@@ -12,6 +12,7 @@
 #include "Game/animation.h"
 #include "Game/items.h"
 
+using namespace TEN::Gui;
 using namespace TEN::Input;
 
 namespace TEN::Entities::Switches

@@ -1,19 +1,22 @@
 #include "framework.h"
 #include "Objects/TR5/Object/tr5_pushableblock.h"
+
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Game/animation.h"
 #include "Game/items.h"
 #include "Game/collision/collide_room.h"
 #include "Game/collision/collide_item.h"
+#include "Game/collision/floordata.h"
 #include "Game/control/flipeffect.h"
 #include "Game/control/box.h"
 #include "Specific/level.h"
-#include "Specific/input.h"
+#include "Specific/Input/Input.h"
 #include "Sound/sound.h"
 #include "Specific/setup.h"
 #include "Objects/TR5/Object/tr5_pushableblock_info.h"
 
+using namespace TEN::Floordata;
 using namespace TEN::Input;
 
 static auto PushableBlockPos = Vector3i::Zero;
@@ -548,15 +551,15 @@ void PushEnd(ItemInfo* item) // Do Flipeffect 19 in anims
 		DoPushPull = -1;
 }
 
-bool TestBlockMovable(ItemInfo* item, int blokhite)
+bool TestBlockMovable(ItemInfo* item, int blockHeight)
 {
-	short roomNumber = item->RoomNumber;
-	FloorInfo* floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNumber);
+	auto probe = GetCollision(item);
 
-	if (floor->IsWall(floor->SectorPlane(item->Pose.Position.x, item->Pose.Position.z)))
+	if (probe.Block->IsWall(probe.Block->SectorPlane(item->Pose.Position.x, item->Pose.Position.z)))
 		return false;
 
-	if (floor->FloorHeight(item->Pose.Position.x, item->Pose.Position.z) != item->Pose.Position.y)
+	int height = probe.Position.Floor + blockHeight;
+	if (height != item->Pose.Position.y)
 		return false;
 
 	return true;
@@ -974,8 +977,9 @@ std::optional<int> PushableBlockFloor(short itemNumber, int x, int y, int z)
 {
 	const auto& item = g_Level.Items[itemNumber];
 	const auto& pushable = (PushableInfo&)item.Data;
+	auto bboxHeight = GetBridgeItemIntersect(itemNumber, x, y, z, false);
 	
-	if (item.Status != ITEM_INVISIBLE && pushable.hasFloorCeiling)
+	if (item.Status != ITEM_INVISIBLE && pushable.hasFloorCeiling && bboxHeight.has_value())
 	{
 		const auto height = item.Pose.Position.y - (item.TriggerFlags & 0x1F) * CLICK(1);
 		return std::optional{height};
@@ -987,8 +991,9 @@ std::optional<int> PushableBlockCeiling(short itemNumber, int x, int y, int z)
 {
 	const auto& item = g_Level.Items[itemNumber];
 	const auto& pushable = (PushableInfo&)item.Data;
+	auto bboxHeight = GetBridgeItemIntersect(itemNumber, x, y, z, true);
 
-	if (item.Status != ITEM_INVISIBLE && pushable.hasFloorCeiling)
+	if (item.Status != ITEM_INVISIBLE && pushable.hasFloorCeiling && bboxHeight.has_value())
 		return std::optional{item.Pose.Position.y};
 
 	return std::nullopt;

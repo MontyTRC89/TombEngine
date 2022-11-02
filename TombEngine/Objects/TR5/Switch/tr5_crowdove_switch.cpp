@@ -10,7 +10,7 @@
 #include "Game/Lara/lara_helpers.h"
 #include "Objects/Generic/Switches/generic_switch.h"
 #include "Sound/sound.h"
-#include "Specific/input.h"
+#include "Specific/Input/Input.h"
 #include "Specific/level.h"
 
 using namespace TEN::Input;

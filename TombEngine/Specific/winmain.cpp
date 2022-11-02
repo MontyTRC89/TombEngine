@@ -18,10 +18,10 @@
 #include "LanguageScript.h"
 #include "ScriptInterfaceState.h"
 #include "ScriptInterfaceLevel.h"
-using namespace TEN::Utils;
 
 using namespace TEN::Renderer;
 using namespace TEN::Input;
+using namespace TEN::Utils;
 
 using std::exception;
 using std::string;
@@ -434,7 +434,7 @@ void WinClose()
 	DestroyAcceleratorTable(hAccTable);
 
 	Sound_DeInit();
-	DeInitialiseInput();
+	DeinitialiseInput();
 
 	TENLog("Cleaning up and exiting...", LogLevel::Info);
 	

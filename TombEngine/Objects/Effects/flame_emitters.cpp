@@ -12,9 +12,9 @@
 #include "Game/effects/weather.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
-#include "input.h"
 #include "Math/Math.h"
 #include "Sound/sound.h"
+#include "Specific/Input/Input.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
