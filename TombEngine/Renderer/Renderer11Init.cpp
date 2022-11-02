@@ -51,10 +51,9 @@ void TEN::Renderer::Renderer11::Initialise(int w, int h, bool windowed, HWND han
 		{"BLENDINDICES", 0, DXGI_FORMAT_R32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
 		{"POLYINDEX", 0, DXGI_FORMAT_R32_UINT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
 		{"DRAWINDEX", 0, DXGI_FORMAT_R32_UINT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
-		{"BLENDMODE", 0, DXGI_FORMAT_R32_UINT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
 		{"HASH", 0, DXGI_FORMAT_R32_SINT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0}
 	};
-	Utils::throwIfFailed(m_device->CreateInputLayout(inputLayout, 12, blob->GetBufferPointer(), blob->GetBufferSize(), &m_inputLayout));
+	Utils::throwIfFailed(m_device->CreateInputLayout(inputLayout, 11, blob->GetBufferPointer(), blob->GetBufferSize(), &m_inputLayout));
 
 	m_vsRooms_Anim = Utils::compileVertexShader(m_device.Get(), L"Shaders\\DX11_Rooms.fx", "VS", "vs_4_0", &roomDefinesAnimated[0], blob);
 	m_psRooms = Utils::compilePixelShader(m_device.Get(), L"Shaders\\DX11_Rooms.fx", "PS", "ps_4_1", nullptr, blob);
@@ -93,7 +92,7 @@ void TEN::Renderer::Renderer11::Initialise(int w, int h, bool windowed, HWND han
 	m_cbRoom = CreateConstantBuffer<CRoomBuffer>();
 	m_cbAnimated = CreateConstantBuffer<CAnimatedBuffer>();
 	m_cbPostProcessBuffer = CreateConstantBuffer<CPostProcessBuffer>();
-	m_cbAlphaTest = CreateConstantBuffer<CAlphaTestBuffer>();
+	m_cbBlending = CreateConstantBuffer<CBlendingBuffer>();
 
 	//Prepare HUD Constant buffer
 	m_cbHUDBar = CreateConstantBuffer<CHUDBarBuffer>();

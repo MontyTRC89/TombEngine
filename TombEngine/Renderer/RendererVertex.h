@@ -15,7 +15,6 @@ namespace TEN::Renderer
 		float Bone;
 		unsigned int IndexInPoly;
 		unsigned int OriginalIndex;
-		unsigned int BlendMode;
 		unsigned int Hash;
 	};
 }

@@ -3,8 +3,7 @@
 #include "./ShaderLight.hlsli"
 #include "./VertexEffects.hlsli"
 #include "./VertexInput.hlsli"
-#include "./AlphaTestBuffer.hlsli"
-#include "./Fog.hlsli"
+#include "./Blending.hlsli"
 
 cbuffer StaticMatrixBuffer : register(b8)
 {
@@ -24,7 +23,6 @@ struct PixelShaderInput
 	float Sheen: SHEEN;
 	float Fog: FOG;
 	float4 PositionCopy: TEXCOORD2;
-	unsigned int BlendMode: BLENDMODE;
 };
 
 struct PixelShaderOutput
@@ -45,7 +43,6 @@ PixelShaderInput VS(VertexShaderInput input)
 
 	output.Normal = normal;
 	output.UV = input.UV;
-	output.BlendMode = input.BlendMode;
 	output.WorldPosition = worldPosition;
 	
 	float3 pos = Move(input.Position, input.Effects.xyz, input.Hash);
@@ -84,7 +81,7 @@ PixelShaderOutput PS(PixelShaderInput input)
 		float4(input.PositionCopy.z / input.PositionCopy.w, 0.0f, 0.0f, 1.0f) :
 		float4(0.0f, 0.0f, 0.0f, 0.0f);
 
-	output.Color = ApplyFog(output.Color, FogColor, input.Fog, input.BlendMode);
+	output.Color = DoFog(output.Color, FogColor, input.Fog);
 
 	return output;
 }

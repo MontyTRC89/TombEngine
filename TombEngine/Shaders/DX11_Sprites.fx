@@ -1,7 +1,6 @@
 #include "./CameraMatrixBuffer.hlsli"
-#include "./AlphaTestBuffer.hlsli"
+#include "./Blending.hlsli"
 #include "./VertexInput.hlsli"
-#include "./Fog.hlsli"
 
 cbuffer SpriteBuffer: register(b9)
 {
@@ -18,7 +17,6 @@ struct PixelShaderInput
 	float4 Color: COLOR;
 	float  Fog : FOG;
 	float4 PositionCopy: TEXCOORD2;
-	unsigned int BlendMode: BLENDMODE;
 };
 
 Texture2D Texture : register(t0);
@@ -49,7 +47,6 @@ PixelShaderInput VS(VertexShaderInput input)
 	output.Normal = input.Normal;
 	output.Color = input.Color * color;
 	output.UV = input.UV;
-	output.BlendMode = input.BlendMode;
 
 	float4 d = length(CamPositionWS - worldPosition);
 	if (FogMaxDistance == 0)
@@ -77,7 +74,7 @@ float4 PS(PixelShaderInput input) : SV_TARGET
 	float fade = (sceneDepth - particleDepth) * 300.0F;
 	output.w = min(output.w, fade);
 
-	output = ApplyFog(output, float4(0.0f, 0.0f, 0.0f, 0.0f), input.Fog, input.BlendMode);
+	output = DoFog(output, float4(0.0f, 0.0f, 0.0f, 0.0f), input.Fog);
 
 	return output;
 }

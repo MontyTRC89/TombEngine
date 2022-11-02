@@ -10,6 +10,5 @@ struct VertexShaderInput
 	float Bone: BLENDINDICES;
 	unsigned int PolyIndex : POLYINDEX;
 	unsigned int Index: DRAWINDEX;
-	unsigned int BlendMode: BLENDMODE;
 	int Hash : HASH;
 };
