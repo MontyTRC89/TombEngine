@@ -35,12 +35,12 @@ InteractionBasis::InteractionBasis(const GameBoundingBox& box, const pair<EulerA
 	this->OrientConstraint = orientConstraint;
 };
 
-bool InteractionBasis::TestEntityInteraction(const ItemInfo& entity0, const ItemInfo& entity1) const
+bool InteractionBasis::TestInteraction(const ItemInfo& entity0, const ItemInfo& entity1) const
 {
-	return this->TestPoseInteraction(entity0.Pose, entity1.Pose);
+	return this->TestInteraction(entity0.Pose, entity1.Pose);
 }
 
-bool InteractionBasis::TestPoseInteraction(const Pose& pose0, const Pose& pose1) const
+bool InteractionBasis::TestInteraction(const Pose& pose0, const Pose& pose1) const
 {
 	auto deltaOrient = pose1.Orientation - pose0.Orientation;
 	if (deltaOrient.x < OrientConstraint.first.x || deltaOrient.x > OrientConstraint.second.x ||

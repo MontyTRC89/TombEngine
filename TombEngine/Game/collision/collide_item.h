@@ -29,8 +29,8 @@ public:
 	InteractionBasis(const GameBoundingBox& box, const pair<EulerAngles, EulerAngles>& orientConstraint);
 
 	// Utilities
-	bool TestEntityInteraction(const ItemInfo& entity0, const ItemInfo& entity1) const;
-	bool TestPoseInteraction(const Pose& pose0, const Pose& pose1) const;
+	bool TestInteraction(const ItemInfo& entity0, const ItemInfo& entity1) const;
+	bool TestInteraction(const Pose& pose0, const Pose& pose1) const;
 };
 
 // TODO: Refactor this family of functions into a more comprehensive position alignment system. -- Sezz 2022.10.30

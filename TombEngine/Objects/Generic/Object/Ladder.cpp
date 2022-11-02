@@ -121,7 +121,7 @@ namespace TEN::Entities::Generic
 			(player.Control.IsMoving && player.InteractedItem == itemNumber))
 		{
 			// Mount from front.
-			if (LadderMountFrontBounds.TestEntityInteraction(ladderItem, *laraItem))
+			if (LadderMountFrontBounds.TestInteraction(ladderItem, *laraItem))
 			{
 				if (!laraItem->OffsetBlend.IsActive)
 				{
@@ -139,7 +139,7 @@ namespace TEN::Entities::Generic
 					player.InteractedItem = itemNumber;
 			}
 			// Mount from right.
-			else if (LadderMountRightBounds.TestEntityInteraction(ladderItem, *laraItem))
+			else if (LadderMountRightBounds.TestInteraction(ladderItem, *laraItem))
 			{
 				auto mountOffset = Vector3i(BLOCK(1, 4), 0, 0) + Vector3i(0, 0, GameBoundingBox(&ladderItem).Z1) + LadderMountedOffset;
 
