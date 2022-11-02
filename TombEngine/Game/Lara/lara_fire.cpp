@@ -26,7 +26,7 @@
 #include "ScriptInterfaceLevel.h"
 #include "Sound/sound.h"
 #include "Specific/configuration.h"
-#include "Specific/input.h"
+#include "Specific/Input/Input.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
@@ -771,10 +771,10 @@ FireWeaponType FireWeapon(LaraWeaponType weaponType, ItemInfo* targetEntity, Ite
 	auto* lara = GetLaraInfo(laraItem);
 	auto& ammo = GetAmmo(*lara, weaponType);
 
-	if (ammo.getCount() == 0 && !ammo.hasInfinite())
+	if (ammo.GetCount() == 0 && !ammo.HasInfinite())
 		return FireWeaponType::NoAmmo;
 
-	if (!ammo.hasInfinite())
+	if (!ammo.HasInfinite())
 		ammo--;
 
 	const auto& weapon = Weapons[(int)weaponType];
@@ -966,14 +966,14 @@ void FindNewTarget(ItemInfo* laraItem, const WeaponInfo& weaponInfo)
 				break;
 		}
 
-		if (lara->Control.HandStatus != HandStatus::Free || TrInput & IN_LOOKSWITCH)
+		if (lara->Control.HandStatus != HandStatus::Free || IsClicked(In::SwitchTarget))
 		{
-			if (!lara->TargetEntity)
+			if (lara->TargetEntity == nullptr)
 			{
 				lara->TargetEntity = bestEntity;
 				LastTargets[0] = nullptr;
 			}
-			else if (TrInput & IN_LOOKSWITCH)
+			else if (IsClicked(In::SwitchTarget))
 			{
 				lara->TargetEntity = nullptr;
 				bool flag = true;

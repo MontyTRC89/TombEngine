@@ -9,7 +9,7 @@
 #include "Game/control/control.h"
 #include "Specific/setup.h"
 #include "Specific/level.h"
-#include "Specific/input.h"
+#include "Specific/Input/Input.h"
 #include "Sound/sound.h"
 #include "Game/collision/collide_item.h"
 #include "Renderer/Renderer11Enums.h"
