@@ -6,7 +6,7 @@ namespace TEN::Renderer
 	using DirectX::SimpleMath::Matrix;
 	using DirectX::SimpleMath::Vector4;
 
-	struct alignas(4) InstancedSprite
+	struct alignas(16) InstancedSprite
 	{
 		Matrix World;
 		Vector4 Color;
@@ -15,7 +15,7 @@ namespace TEN::Renderer
 		Vector2 SpritesPadding;
 	};
 
-	struct alignas(4) CInstancedSpriteBuffer
+	struct alignas(16) CInstancedSpriteBuffer
 	{
 		InstancedSprite Sprites[INSTANCED_SPRITES_BUCKET_SIZE];
 	};
