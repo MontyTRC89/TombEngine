@@ -190,7 +190,7 @@ void DoThumbstickCamera()
 
 void LookCamera(ItemInfo* item)
 {
-	auto* player = GetLaraInfo(item);
+	const auto& player = *GetLaraInfo(item);
 
 	// TODO:
 	// - Swamp collision.
@@ -207,7 +207,7 @@ void LookCamera(ItemInfo* item)
 	float lookAtPosDist = BLOCK(1, 2);
 
 	// Define absolute camera orientation.
-	auto orient = player->Control.Look.Orientation + EulerAngles(0, item->Pose.Orientation.y, 0);
+	auto orient = player.Control.Look.Orientation + EulerAngles(0, item->Pose.Orientation.y, 0);
 
 	// Define landmarks.
 	auto pivot = Geometry::TranslatePoint(item->Pose.Position, item->Pose.Orientation.y, pivotOffset.z, pivotOffset.y, pivotOffset.x); // TODO: Use functionf from ladder branch.
