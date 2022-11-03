@@ -33,6 +33,7 @@ Version 1.0.3
 * Fix secret soundtrack (which filename number should be the last) not playing.
 * Fix distance fog not applying properly to additive and subtractive surfaces.
 * Fix single-hand weapons not having a sound on draw and undraw.
+* Fix Waterfallmist - if it is enabled previously it can now disable with antitrigger.
 
 Version 1.0.2
 =============
