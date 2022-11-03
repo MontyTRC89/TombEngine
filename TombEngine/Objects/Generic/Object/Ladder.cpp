@@ -60,7 +60,7 @@ namespace TEN::Entities::Generic
 	const auto LadderMountedOffset = Vector3i(0, 0, -BLOCK(1, 7));
 	const auto LadderInteractBounds = GameBoundingBox(
 		-BLOCK(1, 4), BLOCK(1, 4),
-		-LADDER_STEP_HEIGHT, LADDER_STEP_HEIGHT,
+		-LADDER_STEP_HEIGHT, LADDER_STEP_HEIGHT, // TODO: Adapt to bounds height.
 		-BLOCK(3, 8), BLOCK(3, 8)
 	);
 
