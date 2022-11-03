@@ -2,7 +2,9 @@
 #include "Game/collision/InteractionBasis.h"
 
 #include "Game/items.h"
+#include "Game/Lara/lara_helpers.h"
 #include "Math/Math.h"
+#include <Game/Lara/lara.h>
 
 using namespace TEN::Math;
 
@@ -14,8 +16,15 @@ using namespace TEN::Math;
 		this->OrientConstraint = orientConstraint;
 	};
 
-	bool InteractionBasis::TestInteraction(const ItemInfo& entity0, const ItemInfo& entity1) const
+	bool InteractionBasis::TestInteraction(const ItemInfo& entity0, const ItemInfo& entity1, const GameBoundingBox& boundsExtension) const
 	{
+		if (entity1.IsLara())
+		{
+			const auto& player = GetLaraInfo(entity1);
+			if (player.InteractedItem != NO_ITEM)
+				return false;
+		}
+
 		return this->TestInteraction(entity0.Pose, entity1.Pose);
 	}
 

@@ -17,8 +17,8 @@ struct ItemInfo;
 		// Constructors
 		InteractionBasis(const GameBoundingBox& bounds, const std::pair<EulerAngles, EulerAngles>& orientConstraint);
 
-		// Utilities
-		bool TestInteraction(const ItemInfo& entity0, const ItemInfo& entity1) const;
+		// Inquirers
+		bool TestInteraction(const ItemInfo& entity0, const ItemInfo& entity1, const GameBoundingBox& boundsExtension = GameBoundingBox::Zero) const;
 		bool TestInteraction(const Pose& pose0, const Pose& pose1) const;
 	};
 //}

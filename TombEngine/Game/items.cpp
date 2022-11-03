@@ -50,12 +50,12 @@ void ItemInfo::SetFlags(short id, short value)
 	ItemFlags[id] = value;
 }
 
-bool ItemInfo::IsLara()
+bool ItemInfo::IsLara() const
 {
 	return this->Data.is<LaraInfo*>();
 }
 
-bool ItemInfo::IsCreature()
+bool ItemInfo::IsCreature() const
 {
 	return this->Data.is<CreatureInfo>();
 }

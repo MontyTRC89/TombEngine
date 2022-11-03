@@ -147,8 +147,8 @@ struct ItemInfo
 	bool TestFlags(short id, short value);
 	void SetFlags(short id, short value);
 
-	bool IsLara();
-	bool IsCreature();
+	bool IsLara() const;
+	bool IsCreature() const;
 
 	void SetOffsetBlend(const Vector3& posOffset, const EulerAngles& orientOffset, float alpha = OFFSET_BLEND_ALPHA_DEFAULT, float delay = 0.0f);
 	void SetOffsetBlend(const Vector3& posOffset, const EulerAngles& orientOffset, float velocity, short turnRate, float delay = 0.0f);
