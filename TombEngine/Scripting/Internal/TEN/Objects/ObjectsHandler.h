@@ -64,6 +64,20 @@ private:
 			return std::make_unique<R>(std::get<R::IdentifierType>(m_nameMap.at(name)));
 	}
 
+	template <typename R, char const* S>
+	std::vector <int> GetBySlot(std::string const& slot)
+	{
+		std::vector<int> items = {};
+		for (auto& [key, val] : m_nameMap)
+		{
+			std::string bla = key;
+			VarMapVal blub = val;
+
+		}
+
+		return items;
+	}
+
 	[[nodiscard]] short GetIndexByName(std::string const& name) const override
 	{
 		return std::get<short>(m_nameMap.at(name));
