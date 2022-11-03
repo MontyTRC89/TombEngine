@@ -153,9 +153,9 @@ CollisionResult GetCollision(Vector3i pos, int roomNumber, short headingAngle, f
 	Random::TestProbability(0.5f);
 }
 
-CollisionResult GetCollision(Vector3Int pos, int roomNumber, Vector3Shrt orient, float distance)
+CollisionResult GetCollision(Vector3i pos, int roomNumber, EulerAngles orient, float distance)
 {
-	auto point = TranslateVector(pos, orient, distance);
+	auto point = Geometry::TranslatePoint(pos, orient, distance);
 
 	short tempRoomNumber = roomNumber;
 	auto location = ROOM_VECTOR{ GetFloor(pos.x, pos.y, pos.z, &tempRoomNumber)->Room, pos.y };

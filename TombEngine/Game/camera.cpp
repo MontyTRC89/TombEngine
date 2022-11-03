@@ -105,7 +105,7 @@ void DoLookAround(ItemInfo* item, bool invertVerticalAxis)
 
 	// Determine vertical axis coefficient.
 	float vAxisCoeff = 0.0f;
-	if (TrInput & (IN_FORWARD | IN_BACK) &&
+	if ((IsHeld(In::Forward) || IsHeld(In::Back)) &&
 		(lara->Control.Look.Mode == LookMode::Vertical || lara->Control.Look.Mode == LookMode::Free))
 	{
 		vAxisCoeff = AxisMap[InputAxis::MoveVertical];
@@ -113,7 +113,7 @@ void DoLookAround(ItemInfo* item, bool invertVerticalAxis)
 
 	// Determine horizontal axis coefficient.
 	float hAxisCoeff = 0.0f;
-	if (TrInput & (IN_LEFT | IN_RIGHT) &&
+	if ((IsHeld(In::Left) || IsHeld(In::Right)) &&
 		(lara->Control.Look.Mode == LookMode::Horizontal || lara->Control.Look.Mode == LookMode::Free))
 	{
 		hAxisCoeff = AxisMap[InputAxis::MoveHorizontal];
@@ -143,16 +143,25 @@ void DoLookAround(ItemInfo* item, bool invertVerticalAxis)
 	}
 
 	// Clear directional inputs.
-	if (lara->Control.Look.Mode == LookMode::Vertical ||
-		lara->Control.Look.Mode == LookMode::Free)
+	switch (lara->Control.Look.Mode)
 	{
+	case LookMode::Vertical:
+		ClearAction(In::Forward);
+		ClearAction(In::Back);
+		break;
+
+	case LookMode::Horizontal:
+		ClearAction(In::Left);
+		ClearAction(In::Right);
+		break;
+
+	case LookMode::Free:
 		ClearAction(In::Forward);
 		ClearAction(In::Back);
 		ClearAction(In::Left);
 		ClearAction(In::Right);
+		break;
 	}
-	else
-		TrInput &= ~(IN_LEFT | IN_RIGHT);
 
 	// Debug
 	g_Renderer.PrintDebugMessage("LookMode: %d", (int)lara->Control.Look.Mode);
@@ -1030,7 +1039,7 @@ void BinocularCamera(ItemInfo* item)
 		}
 	}
 
-	item->MeshBits = NO_JOINT_BITS;
+	item->MeshBits.ClearAll();
 	AlterFOV(7 * (ANGLE(11.5f) - BinocularRange));
 
 	short headXRot = lara->ExtraHeadRot.x * 2;
@@ -1717,7 +1726,7 @@ void UpdateFadeScreenAndCinematicBars()
 			CinematicBarsHeight = CinematicBarsDestinationHeight;
 	}
 
-	int oldScreenFadeCurrent = ScreenFadeCurrent;
+	int prevScreenFadeCurrent = ScreenFadeCurrent;
 
 	if (ScreenFadeEnd != 0 && ScreenFadeEnd >= ScreenFadeCurrent)
 	{
@@ -1725,7 +1734,7 @@ void UpdateFadeScreenAndCinematicBars()
 		if (ScreenFadeCurrent > ScreenFadeEnd)
 		{
 			ScreenFadeCurrent = ScreenFadeEnd;
-			if (oldScreenFadeCurrent >= ScreenFadeCurrent)
+			if (prevScreenFadeCurrent >= ScreenFadeCurrent)
 			{
 				ScreenFadedOut = true;
 				ScreenFading = false;
@@ -1746,39 +1755,45 @@ void UpdateFadeScreenAndCinematicBars()
 
 void HandleOptics(ItemInfo* item)
 {
+	auto* lara = GetLaraInfo(item);
+
 	bool breakOptics = true;
 
-	if (!LaserSight && BinocularOn) // Imitate pushing look key in binocular mode
+	// Imitate pushing look key in binocular mode.
+	if (!LaserSight && BinocularOn)
 	{
 		TrInput |= IN_LOOK;
 		DbInput = 0;
 	}
 
-	// We are standing, can use optics.
-	if (LaraItem->Animation.ActiveState == LS_IDLE || LaraItem->Animation.AnimNumber == LA_STAND_IDLE)
+	// Standing; can use optics.
+	if (item->Animation.ActiveState == LS_IDLE || item->Animation.AnimNumber == LA_STAND_IDLE)
 		breakOptics = false;
 
-	// We are crouching, can use optics.
-	if ((Lara.Control.IsLow || TrInput & IN_CROUCH) &&
-		(LaraItem->Animation.TargetState == LS_CROUCH_IDLE || LaraItem->Animation.AnimNumber == LA_CROUCH_IDLE))
+	// Crouching; can use optics.
+	if ((lara->Control.IsLow || !IsHeld(In::Crouch)) &&
+		(item->Animation.TargetState == LS_CROUCH_IDLE || item->Animation.AnimNumber == LA_CROUCH_IDLE))
+	{
 		breakOptics = false;
+	}
 
-	// If lasersight, and no look is pressed, exit optics.
-	if (LaserSight && !(TrInput & IN_LOOK))
+	// If lasersight, and Look is not pressed, exit optics.
+	if (LaserSight && !IsHeld(In::Look))
 		breakOptics = true;
 
-	if (!LaserSight && !breakOptics && (TrInput == IN_LOOK)) // Engage lasersight, if available.
+	// Engage lasersight if available.
+	if (!LaserSight && !breakOptics && (TrInput == IN_LOOK))
 	{
-		if (Lara.Control.HandStatus == HandStatus::WeaponReady &&
-			(Lara.Control.Weapon.GunType == LaraWeaponType::HK ||
-				(Lara.Control.Weapon.GunType == LaraWeaponType::Revolver && Lara.Weapons[(int)LaraWeaponType::Revolver].HasLasersight) ||
-				(Lara.Control.Weapon.GunType == LaraWeaponType::Crossbow && Lara.Weapons[(int)LaraWeaponType::Crossbow].HasLasersight)))
+		if (lara->Control.HandStatus == HandStatus::WeaponReady &&
+			(lara->Control.Weapon.GunType == LaraWeaponType::HK ||
+				(lara->Control.Weapon.GunType == LaraWeaponType::Revolver && lara->Weapons[(int)LaraWeaponType::Revolver].HasLasersight) ||
+				(lara->Control.Weapon.GunType == LaraWeaponType::Crossbow && lara->Weapons[(int)LaraWeaponType::Crossbow].HasLasersight)))
 		{
 			BinocularRange = 128;
 			BinocularOldCamera = Camera.oldType;
 			BinocularOn = true;
 			LaserSight = true;
-			Lara.Inventory.IsBusy = true;
+			lara->Inventory.IsBusy = true;
 			return;
 		}
 	}
@@ -1797,9 +1812,9 @@ void HandleOptics(ItemInfo* item)
 	Camera.bounce = 0;
 	AlterFOV(ANGLE(80.0f));
 
-	LaraItem->MeshBits = ALL_JOINT_BITS;
-	Lara.Inventory.IsBusy = false;
-	ResetLaraFlex(LaraItem);
+	item->MeshBits.SetAll();
+	lara->Inventory.IsBusy = false;
+	ResetLaraFlex(item);
 
-	TrInput &= ~IN_LOOK;
+	ClearAction(In::Look);
 }
