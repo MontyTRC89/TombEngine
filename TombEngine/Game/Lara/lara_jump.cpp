@@ -12,7 +12,7 @@
 #include "Game/Lara/lara_slide.h"
 #include "Flow/ScriptInterfaceFlowHandler.h"
 #include "Sound/sound.h"
-#include "Specific/input.h"
+#include "Specific/Input/Input.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
@@ -276,12 +276,12 @@ void lara_as_jump_prepare(ItemInfo* item, CollisionInfo* coll)
 	}
 
 	// JUMP key repressed without directional key; cancel directional jump lock.
-	if (DbInput & IN_JUMP && !(TrInput & IN_DIRECTION))
+	if (DbInput & IN_JUMP && !IsDirectionActionHeld())
 		lara->Control.JumpDirection = JumpDirection::None;
 
 	if (((TrInput & IN_FORWARD &&
 			!(TrInput & IN_BACK && lara->Control.JumpDirection == JumpDirection::Back)) ||	// Back jump takes priority in this exception.
-		!(TrInput & IN_DIRECTION) && lara->Control.JumpDirection == JumpDirection::Forward) &&
+		!IsDirectionActionHeld() && lara->Control.JumpDirection == JumpDirection::Forward) &&
 		TestLaraJumpForward(item, coll))
 	{
 		item->Animation.TargetState = LS_JUMP_FORWARD;
@@ -289,7 +289,7 @@ void lara_as_jump_prepare(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 	else if ((TrInput & IN_BACK ||
-		!(TrInput & IN_DIRECTION) && lara->Control.JumpDirection == JumpDirection::Back) &&
+		!IsDirectionActionHeld() && lara->Control.JumpDirection == JumpDirection::Back) &&
 		TestLaraJumpBack(item, coll))
 	{
 		item->Animation.TargetState = LS_JUMP_BACK;
@@ -298,7 +298,7 @@ void lara_as_jump_prepare(ItemInfo* item, CollisionInfo* coll)
 	}
 
 	if ((TrInput & IN_LEFT ||
-		!(TrInput & IN_DIRECTION) && lara->Control.JumpDirection == JumpDirection::Left) &&
+		!IsDirectionActionHeld() && lara->Control.JumpDirection == JumpDirection::Left) &&
 		TestLaraJumpLeft(item, coll))
 	{
 		item->Animation.TargetState = LS_JUMP_LEFT;
@@ -306,7 +306,7 @@ void lara_as_jump_prepare(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 	else if ((TrInput & IN_RIGHT ||
-		!(TrInput & IN_DIRECTION) && lara->Control.JumpDirection == JumpDirection::Right) &&
+		!IsDirectionActionHeld() && lara->Control.JumpDirection == JumpDirection::Right) &&
 		TestLaraJumpRight(item, coll))
 	{
 		item->Animation.TargetState = LS_JUMP_RIGHT;

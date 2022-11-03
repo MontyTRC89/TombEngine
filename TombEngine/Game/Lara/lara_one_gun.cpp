@@ -24,7 +24,7 @@
 #include "Objects/Generic/Switches/generic_switch.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
-#include "Specific/input.h"
+#include "Specific/Input/Input.h"
 #include "Sound/sound.h"
 
 using namespace TEN::Input;
@@ -66,7 +66,7 @@ void AnimateShotgun(ItemInfo* laraItem, LaraWeaponType weaponType)
 	bool running = (weaponType == LaraWeaponType::HK && laraItem->Animation.Velocity.z != 0.0f);
 	
 	static bool reloadHarpoonGun = false;
-	reloadHarpoonGun = (lara->Weapons[(int)weaponType].Ammo->hasInfinite() || weaponType != LaraWeaponType::HarpoonGun) ? false : reloadHarpoonGun;
+	reloadHarpoonGun = (lara->Weapons[(int)weaponType].Ammo->HasInfinite() || weaponType != LaraWeaponType::HarpoonGun) ? false : reloadHarpoonGun;
 
 	switch (item->Animation.ActiveState)
 	{
@@ -82,7 +82,7 @@ void AnimateShotgun(ItemInfo* laraItem, LaraWeaponType weaponType)
 		else
 			item->Animation.TargetState = WEAPON_STATE_RECOIL;
 
-		if (weaponType == LaraWeaponType::HarpoonGun && !lara->Weapons[(int)weaponType].Ammo->hasInfinite())
+		if (weaponType == LaraWeaponType::HarpoonGun && !lara->Weapons[(int)weaponType].Ammo->HasInfinite())
 		{
 			if (reloadHarpoonGun)
 			{
@@ -108,7 +108,7 @@ void AnimateShotgun(ItemInfo* laraItem, LaraWeaponType weaponType)
 		else
 			item->Animation.TargetState = WEAPON_STATE_AIM;
 
-		if (weaponType == LaraWeaponType::HarpoonGun && !lara->Weapons[(int)weaponType].Ammo->hasInfinite())
+		if (weaponType == LaraWeaponType::HarpoonGun && !lara->Weapons[(int)weaponType].Ammo->HasInfinite())
 		{
 			if (reloadHarpoonGun)
 			{
@@ -132,8 +132,8 @@ void AnimateShotgun(ItemInfo* laraItem, LaraWeaponType weaponType)
 					{
 						FireHarpoon(laraItem);
 
-						if (!(lara->Weapons[(int)LaraWeaponType::HarpoonGun].Ammo->getCount() % 4) &&
-							!lara->Weapons[(int)weaponType].Ammo->hasInfinite())
+						if (!(lara->Weapons[(int)LaraWeaponType::HarpoonGun].Ammo->GetCount() % 4) &&
+							!lara->Weapons[(int)weaponType].Ammo->HasInfinite())
 						{
 							reloadHarpoonGun = true;
 						}
@@ -199,8 +199,8 @@ void AnimateShotgun(ItemInfo* laraItem, LaraWeaponType weaponType)
 					{
 						FireHarpoon(laraItem);
 
-						if (!(lara->Weapons[(int)LaraWeaponType::HarpoonGun].Ammo->getCount() % 4) &&
-							!lara->Weapons[(int)weaponType].Ammo->hasInfinite())
+						if (!(lara->Weapons[(int)LaraWeaponType::HarpoonGun].Ammo->GetCount() % 4) &&
+							!lara->Weapons[(int)weaponType].Ammo->HasInfinite())
 						{
 							reloadHarpoonGun = true;
 						}
@@ -271,8 +271,8 @@ void ReadyShotgun(ItemInfo* laraItem, LaraWeaponType weaponType)
 	lara->RightArm.FrameNumber = 0;
 	lara->LeftArm.Locked = false;
 	lara->RightArm.Locked = false;
-	lara->LeftArm.FrameBase = Objects[WeaponObject(weaponType)].frameBase;
-	lara->RightArm.FrameBase = Objects[WeaponObject(weaponType)].frameBase;
+	lara->LeftArm.FrameBase = Objects[GetWeaponObjectID(weaponType)].frameBase;
+	lara->RightArm.FrameBase = Objects[GetWeaponObjectID(weaponType)].frameBase;
 	lara->TargetEntity = nullptr;
 }
 
@@ -311,8 +311,8 @@ void FireShotgun(ItemInfo* laraItem)
 
 	if (hasFired)
 	{
-		auto& ammo = GetAmmo(laraItem, LaraWeaponType::Shotgun);
-		if (!ammo.hasInfinite())
+		auto& ammo = GetAmmo(*lara, LaraWeaponType::Shotgun);
+		if (!ammo.HasInfinite())
 			ammo--;
 
 		auto pos = GetJointPosition(laraItem, LM_RHAND, Vector3i(0, 1508, 32));
@@ -347,7 +347,7 @@ void DrawShotgun(ItemInfo* laraItem, LaraWeaponType weaponType)
 	{
 		lara->Control.Weapon.WeaponItem = CreateItem();
 		item = &g_Level.Items[lara->Control.Weapon.WeaponItem];
-		item->ObjectNumber = WeaponObject(weaponType);
+		item->ObjectNumber = GetWeaponObjectID(weaponType);
 
 		if (weaponType == LaraWeaponType::RocketLauncher)
 			item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 1;
@@ -361,6 +361,7 @@ void DrawShotgun(ItemInfo* laraItem, LaraWeaponType weaponType)
 		item->Animation.ActiveState = WEAPON_STATE_DRAW;
 		item->Status = ITEM_ACTIVE;
 		item->RoomNumber = NO_ROOM;
+		item->Pose = laraItem->Pose;
 
 		lara->RightArm.FrameBase = Objects[item->ObjectNumber].frameBase;
 		lara->LeftArm.FrameBase = lara->RightArm.FrameBase;
@@ -392,6 +393,7 @@ void UndrawShotgun(ItemInfo* laraItem, LaraWeaponType weaponType)
 
 	auto* item = &g_Level.Items[lara->Control.Weapon.WeaponItem];
 	item->Animation.TargetState = WEAPON_STATE_UNDRAW;
+	item->Pose = laraItem->Pose;
 
 	AnimateItem(item);
 
@@ -428,7 +430,7 @@ void DrawShotgunMeshes(ItemInfo* laraItem, LaraWeaponType weaponType)
 	auto* lara = GetLaraInfo(laraItem);
 
 	lara->Control.Weapon.HolsterInfo.BackHolster = HolsterSlot::Empty;
-	lara->MeshPtrs[LM_RHAND] = Objects[WeaponObjectMesh(laraItem, weaponType)].meshIndex + LM_RHAND;
+	lara->MeshPtrs[LM_RHAND] = Objects[GetWeaponObjectMeshID(laraItem, weaponType)].meshIndex + LM_RHAND;
 }
 
 void UndrawShotgunMeshes(ItemInfo* laraItem, LaraWeaponType weaponType)
@@ -438,7 +440,7 @@ void UndrawShotgunMeshes(ItemInfo* laraItem, LaraWeaponType weaponType)
 	lara->MeshPtrs[LM_RHAND] = Objects[ID_LARA_SKIN].meshIndex + LM_RHAND;
 
 	if (lara->Weapons[(int)weaponType].Present)
-		lara->Control.Weapon.HolsterInfo.BackHolster = HolsterSlotForWeapon(weaponType);
+		lara->Control.Weapon.HolsterInfo.BackHolster = GetWeaponHolsterSlot(weaponType);
 	else
 		lara->Control.Weapon.HolsterInfo.BackHolster = HolsterSlot::Empty;
 }
@@ -446,8 +448,8 @@ void UndrawShotgunMeshes(ItemInfo* laraItem, LaraWeaponType weaponType)
 void FireHarpoon(ItemInfo* laraItem)
 {
 	auto* lara = GetLaraInfo(laraItem);
+	auto& ammo = GetAmmo(*lara, LaraWeaponType::HarpoonGun);
 
-	auto& ammo = GetAmmo(laraItem, LaraWeaponType::HarpoonGun);
 	if (!ammo)
 		return;
 
@@ -457,7 +459,7 @@ void FireHarpoon(ItemInfo* laraItem)
 	short itemNumber = CreateItem();
 	if (itemNumber != NO_ITEM)
 	{
-		if (!ammo.hasInfinite())
+		if (!ammo.HasInfinite())
 			ammo--;
 
 		auto* item = &g_Level.Items[itemNumber];
@@ -649,12 +651,8 @@ void HarpoonBoltControl(short itemNumber)
 void FireGrenade(ItemInfo* laraItem)
 {
 	auto* lara = GetLaraInfo(laraItem);
+	auto& ammo = GetAmmo(*lara, LaraWeaponType::GrenadeLauncher);
 
-	int x = 0;
-	int y = 0;
-	int z = 0;
-	
-	auto& ammo = GetAmmo(laraItem, LaraWeaponType::GrenadeLauncher);
 	if (!ammo)
 		return;
 
@@ -670,10 +668,8 @@ void FireGrenade(ItemInfo* laraItem)
 		item->RoomNumber = laraItem->RoomNumber;
 
 		auto jointPos = GetJointPosition(laraItem, LM_RHAND, Vector3i(0, 276, 80));
-
-		item->Pose.Position.x = x = jointPos.x;
-		item->Pose.Position.y = y = jointPos.y;
-		item->Pose.Position.z = z = jointPos.z;
+		item->Pose.Position = jointPos;
+		auto smokePos = jointPos;
 
 		int floorHeight = GetCollision(jointPos.x, jointPos.y, jointPos.z, item->RoomNumber).Position.Floor;
 		if (floorHeight < jointPos.y)
@@ -691,7 +687,7 @@ void FireGrenade(ItemInfo* laraItem)
 		if (laraItem->MeshBits.TestAny())
 		{
 			for (int i = 0; i < 5; i++)
-				TriggerGunSmoke(x, y, z, jointPos.x - x, jointPos.y - y, jointPos.z - z, 1, LaraWeaponType::GrenadeLauncher, lara->LeftArm.GunSmoke);
+				TriggerGunSmoke(smokePos.x, smokePos.y, smokePos.z, jointPos.x - smokePos.x, jointPos.y - smokePos.y, jointPos.z - smokePos.z, 1, LaraWeaponType::GrenadeLauncher, lara->LeftArm.GunSmoke);
 		}
 
 		InitialiseItem(itemNumber);
@@ -718,7 +714,7 @@ void FireGrenade(ItemInfo* laraItem)
 
 		AddActiveItem(itemNumber);
 
-		if (!ammo.hasInfinite())
+		if (!ammo.HasInfinite())
 			ammo--;
 
 		item->ItemFlags[0] = (int)lara->Weapons[(int)LaraWeaponType::GrenadeLauncher].SelectedAmmo;
@@ -1075,8 +1071,8 @@ void GrenadeControl(short itemNumber)
 void FireRocket(ItemInfo* laraItem)
 {
 	auto* lara = GetLaraInfo(laraItem);
+	auto& ammo = GetAmmo(*lara, LaraWeaponType::RocketLauncher);
 
-	auto& ammo = GetAmmo(laraItem, LaraWeaponType::RocketLauncher);
 	if (!ammo)
 		return;
 
@@ -1089,7 +1085,7 @@ void FireRocket(ItemInfo* laraItem)
 		item->ObjectNumber = ID_ROCKET;
 		item->RoomNumber = laraItem->RoomNumber;
 
-		if (!ammo.hasInfinite())
+		if (!ammo.HasInfinite())
 			ammo--;
 
 		auto jointPos = GetJointPosition(laraItem, LM_RHAND, Vector3i(0, 180, 72));
@@ -1352,8 +1348,8 @@ void RocketControl(short itemNumber)
 void FireCrossbow(ItemInfo* laraItem, Pose* pos)
 {
 	auto* lara = GetLaraInfo(laraItem);
+	auto& ammo = GetAmmo(*lara, LaraWeaponType::Crossbow);
 
-	auto& ammo = GetAmmo(laraItem, LaraWeaponType::Crossbow);
 	if (!ammo)
 		return;
 
@@ -1366,7 +1362,7 @@ void FireCrossbow(ItemInfo* laraItem, Pose* pos)
 		item->ObjectNumber = ID_CROSSBOW_BOLT;
 		item->Color = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
 
-		if (!ammo.hasInfinite())
+		if (!ammo.HasInfinite())
 			ammo--;
 
 		if (pos)
@@ -1665,8 +1661,8 @@ void FireHK(ItemInfo* laraItem, int mode)
 
 	if (FireWeapon(LaraWeaponType::HK, lara->TargetEntity, laraItem, angles) != FireWeaponType::NoAmmo)
 	{
-		auto& ammo = GetAmmo(laraItem, LaraWeaponType::HK);
-		if (!ammo.hasInfinite())
+		auto& ammo = GetAmmo(*lara, LaraWeaponType::HK);
+		if (!ammo.HasInfinite())
 			ammo--;
 
 		lara->LeftArm.GunSmoke = 12;
@@ -1681,17 +1677,17 @@ void FireHK(ItemInfo* laraItem, int mode)
 void RifleHandler(ItemInfo* laraItem, LaraWeaponType weaponType)
 {
 	auto* lara = GetLaraInfo(laraItem);
+	const auto& weapon = Weapons[(int)weaponType];
 
 	if (BinocularRange)
-		return; // Never handle weapons when in binocular mode!
+		return; // Never handle weapons while in binocular mode.
 
-	auto* weapon = &Weapons[(int)weaponType];
-	LaraGetNewTarget(laraItem, weapon);
+	FindNewTarget(laraItem, weapon);
 
 	if (TrInput & IN_ACTION)
 		LaraTargetInfo(laraItem, weapon);
 
-	AimWeapon(laraItem, weapon, &lara->LeftArm);
+	AimWeapon(laraItem, lara->LeftArm, weapon);
 
 	if (lara->LeftArm.Locked)
 	{

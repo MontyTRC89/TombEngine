@@ -437,7 +437,7 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 	else if (coll->Setup.BlockMonkeySwingEdge)			
 	{
 		auto monkeyProbe = GetCollision(probePos.x, probePos.y + coll->Setup.Height, probePos.z, realRoomNumber);
-		if (monkeyProbe.BottomBlock->Flags.Monkeyswing)
+		if (!monkeyProbe.BottomBlock->Flags.Monkeyswing)
 			coll->Front.Floor = MAX_HEIGHT;
 	}
 

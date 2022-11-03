@@ -106,4 +106,4 @@ void SetScreenFadeIn(float speed);
 void SetCinematicBars(float height, float speed);
 void ClearCinematicBars();
 void UpdateFadeScreenAndCinematicBars();
-void HandleOptics();
+void HandleOptics(ItemInfo* item);

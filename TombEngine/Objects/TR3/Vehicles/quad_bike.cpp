@@ -17,7 +17,7 @@
 #include "Objects/Utils/VehicleHelpers.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
-#include "Specific/input.h"
+#include "Specific/Input/Input.h"
 #include "Specific/setup.h"
 #include "Math/Random.h"
 #include "Game/effects/simple_particle.h"
@@ -1131,8 +1131,11 @@ namespace TEN::Entities::Vehicles
 		bool dead = false;
 		if (laraItem->HitPoints <= 0)
 		{
-			TrInput &= ~(IN_LEFT | IN_RIGHT | IN_BACK | IN_FORWARD);
 			dead = true;
+			ClearAction(In::Forward);
+			ClearAction(In::Back);
+			ClearAction(In::Left);
+			ClearAction(In::Right);
 		}
 
 		int drive = -1;

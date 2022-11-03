@@ -6,7 +6,7 @@
 #include "Game/effects/effects.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
-#include "Game/gui.h"
+#include "Game/Gui.h"
 #include "Game/collision/collide_item.h"
 #include "Game/Lara/lara_flare.h"
 #include "Game/Lara/lara_one_gun.h"
@@ -1192,8 +1192,11 @@ namespace TEN::Entities::Vehicles
 		bool isDead;
 		if (laraItem->HitPoints <= 0)
 		{
-			TrInput &= ~(IN_LEFT | IN_RIGHT | IN_BACK | IN_FORWARD);
 			isDead = true;
+			ClearAction(In::Forward);
+			ClearAction(In::Back);
+			ClearAction(In::Left);
+			ClearAction(In::Right);
 		}
 		else
 			isDead = false;

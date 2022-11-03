@@ -6,7 +6,7 @@
 #include "Sound/sound.h"
 #include "Game/savegame.h"
 #include "Flow/InventoryItem/InventoryItem.h"
-#include "Game/gui.h"
+#include "Game/Gui.h"
 #include "Logic/LevelFunc.h"
 #include "Vec3/Vec3.h"
 #include "Objects/ScriptInterfaceObjectsHandler.h"
@@ -105,6 +105,13 @@ __(not yet implemented)__
 @tparam string path the path to the image, relative to the TombEngine exe
 */
 	table_flow.set_function(ScriptReserved_SetTitleScreenImagePath, &FlowHandler::SetTitleScreenImagePath, this);
+
+/*** Total number of secrets in game.
+Must be an integer value (0 means no secrets).
+@function SetNumberOfSecrets
+@tparam int total number of secrets
+*/
+	table_flow.set_function(ScriptReserved_SetNumberOfSecrets, &FlowHandler::SetNumberOfSecrets, this);
 
 /*** Set FlyCheatEnabled
 Must be true or false
@@ -213,6 +220,11 @@ void FlowHandler::SetTitleScreenImagePath(std::string const& path)
 	TitleScreenImagePath = path;
 }
 
+void FlowHandler::SetNumberOfSecrets(int secretsNumber)
+{
+	NumberOfSecrets = secretsNumber;
+}
+
 void FlowHandler::LoadFlowScript()
 {
 	m_handler.ExecuteScript("Scripts/Gameflow.lua");
@@ -289,24 +301,26 @@ void FlowHandler::SetSecretCount(int secretsNum)
 
 void FlowHandler::AddSecret(int levelSecretIndex)
 {
-	if (levelSecretIndex > 7)
+	static const unsigned int maxSecretIndex = CHAR_BIT * sizeof(unsigned int);
+
+	if (levelSecretIndex >= maxSecretIndex)
 	{
-		TENLog("Current maximum amount of secrets per level is 7.", LogLevel::Warning);
+		TENLog("Current maximum amount of secrets per level is" + std::to_string(maxSecretIndex) + ".", LogLevel::Warning);
 		return;
 	}
 
-	if (!(Statistics.Level.Secrets & (1 << levelSecretIndex)))
-	{
-		if (Statistics.Game.Secrets >= UCHAR_MAX)
-		{
-			TENLog("Maximum amount of game secrets is already reached!", LogLevel::Warning);
-			return;
-		}
+	if ((Statistics.Level.Secrets & (1 << levelSecretIndex)))
+		return;
 
-		PlaySecretTrack();
-		Statistics.Level.Secrets |= (1 << levelSecretIndex);
-		Statistics.Game.Secrets++;
+	if (Statistics.Game.Secrets >= UINT_MAX)
+	{
+		TENLog("Maximum amount of level secrets is already reached!", LogLevel::Warning);
+		return;
 	}
+
+	PlaySecretTrack();
+	Statistics.Level.Secrets |= (1 << levelSecretIndex);
+	Statistics.Game.Secrets++;
 }
 
 bool FlowHandler::IsFlyCheatEnabled() const
@@ -361,17 +375,17 @@ bool FlowHandler::DoFlow()
 				InventoryItem* obj = &level->InventoryObjects[i];
 				if (obj->slot >= 0 && obj->slot < INVENTORY_TABLE_SIZE)
 				{
-					InventoryObject* invObj = &inventry_objects_list[obj->slot];
+					InventoryObject* invObj = &InventoryObjectTable[obj->slot];
 
-					invObj->objname = obj->name.c_str();
-					invObj->scale1 = obj->scale;
-					invObj->yoff = obj->yOffset;
-					invObj->xrot = FROM_DEGREES(obj->rot.x);
-					invObj->yrot = FROM_DEGREES(obj->rot.y);
-					invObj->zrot = FROM_DEGREES(obj->rot.z);
-					invObj->meshbits = obj->meshBits;
-					invObj->opts = obj->action;
-					invObj->rot_flags = obj->rotationFlags;
+					invObj->ObjectName = obj->name.c_str();
+					invObj->Scale1 = obj->scale;
+					invObj->YOffset = obj->yOffset;
+					invObj->Orientation.x = FROM_DEGREES(obj->rot.x);
+					invObj->Orientation.y = FROM_DEGREES(obj->rot.y);
+					invObj->Orientation.z = FROM_DEGREES(obj->rot.z);
+					invObj->MeshBits = obj->meshBits;
+					invObj->Options = obj->action;
+					invObj->RotFlags = obj->rotationFlags;
 				}
 			}
 
@@ -391,7 +405,8 @@ bool FlowHandler::DoFlow()
 		switch (status)
 		{
 		case GameStatus::ExitGame:
-			return true;
+			DoTheGame = false;
+			break;
 		case GameStatus::ExitToTitle:
 			CurrentLevel = 0;
 			break;

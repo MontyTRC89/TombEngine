@@ -26,7 +26,7 @@
 #include "ScriptInterfaceLevel.h"
 #include "Sound/sound.h"
 #include "Specific/configuration.h"
-#include "Specific/input.h"
+#include "Specific/Input/Input.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
@@ -38,230 +38,6 @@ ItemInfo* LastTargets[MAX_TARGETS];
 ItemInfo* TargetList[MAX_TARGETS];
 
 int FlashGrenadeAftershockTimer = 0;
-
-WeaponInfo Weapons[(int)LaraWeaponType::NumWeapons] =
-{
-	// No weapons
-	{
-		{ EulerAngles::Zero, EulerAngles::Zero },
-		{ EulerAngles::Zero, EulerAngles::Zero },
-		{ EulerAngles::Zero, EulerAngles::Zero },
-		0,
-		0,
-		0,
-		0,
-		0,
-		0,
-		0,
-		0,
-		0,
-		0
-	},
-
-	// Pistols
-	{
-		{ EulerAngles(ANGLE(-80.0f), ANGLE(-60.0f), 0), EulerAngles(ANGLE(80.0f), ANGLE(60.0f), 0) },
-		{ EulerAngles(ANGLE(-80.0f), ANGLE(-170.0f), 0), EulerAngles(ANGLE(80.0f), ANGLE(60.0f), 0) },
-		{ EulerAngles(ANGLE(-80.0f), ANGLE(-60.0f), 0), EulerAngles(ANGLE(80.0f), ANGLE(170.0f), 0) },
-		ANGLE(10.0f),
-		ANGLE(8.0f),
-		650,
-		SECTOR(8),
-		1,
-		9,
-		3,
-		0,
-		SFX_TR4_PISTOL_FIRE,
-		0
-	},
-
-	// Revolver
-	{
-		{ EulerAngles(ANGLE(-80.0f), ANGLE(-60.0f), 0), EulerAngles(ANGLE(80.0f), ANGLE(60.0f), 0) },
-		{ EulerAngles(ANGLE(-80.0f), ANGLE(-10.0f), 0), EulerAngles(ANGLE(80.0f), ANGLE(10.0f), 0) },
-		{ EulerAngles::Zero, EulerAngles::Zero },
-		ANGLE(10.0f),
-		ANGLE(4.0f),
-		650,
-		SECTOR(8),
-		21,
-		16,
-		3,
-		0,
-		SFX_TR4_REVOLVER_FIRE,
-		0
-	},
-
-	// Uzis
-	{
-		{ EulerAngles(ANGLE(-80.0f), ANGLE(-60.0f), 0), EulerAngles(ANGLE(80.0f), ANGLE(60.0f), 0) },
-		{ EulerAngles(ANGLE(-80.0f), ANGLE(-170.0f), 0), EulerAngles(ANGLE(80.0f), ANGLE(60.0f), 0) },
-		{ EulerAngles(ANGLE(-80.0f), ANGLE(-60.0f), 0), EulerAngles(ANGLE(80.0f), ANGLE(170.0f), 0) },
-		ANGLE(10.0f),
-		ANGLE(8.0f),
-		650,
-		SECTOR(8),
-		1,
-		3,
-		3,
-		0,
-		SFX_TR4_UZI_FIRE,
-		0
-	},
-
-	// Shotgun
-	{
-		{ EulerAngles(ANGLE(-70.0f), ANGLE(-60.0f), 0), EulerAngles(ANGLE(65.0f), ANGLE(60.0f), 0) },
-		{ EulerAngles(ANGLE(-70.0f), ANGLE(-80.0f), 0), EulerAngles(ANGLE(65.0f), ANGLE(80.0f), 0) },
-		{ EulerAngles(ANGLE(-70.0f), ANGLE(-80.0f), 0), EulerAngles(ANGLE(65.0f), ANGLE(80.0f), 0) },
-		ANGLE(10.0f),
-		0,
-		500,
-		SECTOR(8),
-		3,
-		9,
-		3,
-		9,
-		SFX_TR4_SHOTGUN_FIRE,
-		0
-	},
-
-	// HK
-	{
-		{ EulerAngles(ANGLE(-70.0f), ANGLE(-60.0f), 0), EulerAngles(ANGLE(65.0f), ANGLE(60.0f), 0) },
-		{ EulerAngles(ANGLE(-70.0f), ANGLE(-80.0f), 0), EulerAngles(ANGLE(65.0f), ANGLE(80.0f), 0) },
-		{ EulerAngles(ANGLE(-70.0f), ANGLE(-80.0f), 0), EulerAngles(ANGLE(65.0f), ANGLE(80.0f), 0) },
-		ANGLE(10.0f),
-		ANGLE(4.0f),
-		500,
-		SECTOR(12),
-		4,
-		0,
-		3,
-		16,
-		0,     // FIRE/SILENCER_FIRE
-		0
-	},
-
-	// Crossbow
-	{
-		{ EulerAngles(ANGLE(-70.0f), ANGLE(-60.0f), 0), EulerAngles(ANGLE(65.0f), ANGLE(60.0f), 0) },
-		{ EulerAngles(ANGLE(-70.0f), ANGLE(-80.0f), 0), EulerAngles(ANGLE(65.0f), ANGLE(80.0f), 0) },
-		{ EulerAngles(ANGLE(-70.0f), ANGLE(-80.0f), 0), EulerAngles(ANGLE(65.0f), ANGLE(80.0f), 0) },
-		ANGLE(10.0f),
-		ANGLE(8.0f),
-		500,
-		SECTOR(8),
-		5,
-		0,
-		2,
-		9,
-		SFX_TR4_CROSSBOW_FIRE,
-		20
-	},
-
-	// Flare
-	{
-		{ EulerAngles::Zero, EulerAngles::Zero },
-		{ EulerAngles::Zero, EulerAngles::Zero },
-		{ EulerAngles::Zero, EulerAngles::Zero },
-		0,
-		0,
-		0,
-		0,
-		0,
-		0,
-		0,
-		0,
-		0,
-		0
-	},
-
-	// Flare 2
-	{
-		{ EulerAngles(ANGLE(-55.0f), ANGLE(-30.0f), 0), EulerAngles(ANGLE(55.0f), ANGLE(30.0f), 0) },
-		{ EulerAngles(ANGLE(-55.0f), ANGLE(-30.0f), 0), EulerAngles(ANGLE(55.0f), ANGLE(30.0f), 0) },
-		{ EulerAngles(ANGLE(-55.0f), ANGLE(-30.0f), 0), EulerAngles(ANGLE(55.0f), ANGLE(30.0f), 0) },
-		ANGLE(10.0f),
-		ANGLE(8.0f),
-		400,
-		SECTOR(8),
-		3,
-		0,
-		2,
-		0,
-		SFX_TR4_UZI_FIRE,
-		0
-	},
-
-	// Grenade launcher
-	{
-		{ EulerAngles(ANGLE(-70.0f), ANGLE(-60.0f), 0), EulerAngles(ANGLE(65.0f), ANGLE(60.0f), 0) },
-		{ EulerAngles(ANGLE(-70.0f), ANGLE(-80.0f), 0), EulerAngles(ANGLE(65.0f), ANGLE(80.0f), 0) },
-		{ EulerAngles(ANGLE(-70.0f), ANGLE(-80.0f), 0), EulerAngles(ANGLE(65.0f), ANGLE(80.0f), 0) },
-		ANGLE(10.0f),
-		ANGLE(8.0f),
-		500,
-		SECTOR(8),
-		20,
-		0,
-		2,
-		9,
-		0,
-		30
-	},
-
-	// Harpoon gun
-	{
-		{ EulerAngles(ANGLE(-75.0f), ANGLE(-60.0f), 0), EulerAngles(ANGLE(75.0f), ANGLE(60.0f), 0) },
-		{ EulerAngles(ANGLE(-75.0f), ANGLE(-20.0f), 0), EulerAngles(ANGLE(75.0f), ANGLE(20.0f), 0) },
-		{ EulerAngles(ANGLE(-75.0f), ANGLE(-80.0f), 0), EulerAngles(ANGLE(75.0f), ANGLE(80.0f), 0) },
-		ANGLE(10.0f),
-		ANGLE(8.0f),
-		500,
-		SECTOR(8),
-		6,
-		0,
-		2,
-		10,
-		0,
-		0
-	},
-
-	// Rocket launcher
-	{
-		{ EulerAngles(ANGLE(-70.0f), ANGLE(-60.0f), 0), EulerAngles(ANGLE(65.0f), ANGLE(60.0f), 0) },
-		{ EulerAngles(ANGLE(-70.0f), ANGLE(-80.0f), 0), EulerAngles(ANGLE(65.0f), ANGLE(80.0f), 0) },
-		{ EulerAngles(ANGLE(-70.0f), ANGLE(-80.0f), 0), EulerAngles(ANGLE(65.0f), ANGLE(80.0f), 0) },
-		ANGLE(10.0f),
-		ANGLE(8.0f),
-		500,
-		SECTOR(8),
-		30,
-		0,
-		2,
-		12,
-		77,
-		30
-	},
-
-	// Snowmobile
-	{
-		{ EulerAngles(ANGLE(-55.0f), ANGLE(-30.0f), 0), EulerAngles(ANGLE(55.0f), ANGLE(30.0f), 0) },
-		{ EulerAngles(ANGLE(-55.0f), ANGLE(-30.0f), 0), EulerAngles(ANGLE(55.0f), ANGLE(30.0f), 0) },
-		{ EulerAngles(ANGLE(-55.0f), ANGLE(-30.0f), 0), EulerAngles(ANGLE(55.0f), ANGLE(30.0f), 0) },
-		ANGLE(10.0f),
-		ANGLE(8.0f),
-		400,
-		SECTOR(8),
-		3,
-		0,
-		0,
-		0,
-		SFX_TR4_UZI_FIRE,
-		0
-	}
-};
 
 // States in which Lara will hold an active flare out in front.
 const vector<int> FlarePoseStates =
@@ -276,7 +52,6 @@ const vector<int> FlarePoseStates =
 	LS_TURN_LEFT_FAST,
 	LS_STEP_RIGHT,
 	LS_STEP_LEFT,
-	LS_PICKUP,
 	LS_SWITCH_DOWN,
 	LS_SWITCH_UP,
 	LS_WADE_FORWARD,
@@ -286,7 +61,349 @@ const vector<int> FlarePoseStates =
 	LS_SOFT_SPLAT
 };
 
-GAME_OBJECT_ID WeaponObject(LaraWeaponType weaponType)
+WeaponInfo Weapons[(int)LaraWeaponType::NumWeapons] =
+{
+	// No weapon
+	{
+		std::pair(EulerAngles::Zero, EulerAngles::Zero),
+		std::pair(EulerAngles::Zero, EulerAngles::Zero),
+		std::pair(EulerAngles::Zero, EulerAngles::Zero),
+		0,
+		0,
+		0,
+		0.0f,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0
+	},
+
+	// Pistols
+	{
+		std::pair(EulerAngles(ANGLE(-80.0f), ANGLE(-60.0f), 0), EulerAngles(ANGLE(80.0f), ANGLE(60.0f), 0)),
+		std::pair(EulerAngles(ANGLE(-80.0f), ANGLE(-170.0f), 0), EulerAngles(ANGLE(80.0f), ANGLE(60.0f), 0)),
+		std::pair(EulerAngles(ANGLE(-80.0f), ANGLE(-60.0f), 0), EulerAngles(ANGLE(80.0f), ANGLE(170.0f), 0)),
+		ANGLE(10.0f),
+		ANGLE(8.0f),
+		650,
+		SECTOR(8),
+		1,
+		9,
+		3,
+		0,
+		SFX_TR4_PISTOL_FIRE,
+		0
+	},
+
+	// Revolver
+	{
+		std::pair(EulerAngles(ANGLE(-80.0f), ANGLE(-60.0f), 0), EulerAngles(ANGLE(80.0f), ANGLE(60.0f), 0)),
+		std::pair(EulerAngles(ANGLE(-80.0f), ANGLE(-10.0f), 0), EulerAngles(ANGLE(80.0f), ANGLE(10.0f), 0)),
+		std::pair(EulerAngles::Zero, EulerAngles::Zero),
+		ANGLE(10.0f),
+		ANGLE(4.0f),
+		650,
+		SECTOR(8),
+		21,
+		16,
+		3,
+		0,
+		SFX_TR4_REVOLVER_FIRE,
+		0
+	},
+
+	// Uzis
+	{
+		std::pair(EulerAngles(ANGLE(-80.0f), ANGLE(-60.0f), 0), EulerAngles(ANGLE(80.0f), ANGLE(60.0f), 0)),
+		std::pair(EulerAngles(ANGLE(-80.0f), ANGLE(-170.0f), 0), EulerAngles(ANGLE(80.0f), ANGLE(60.0f), 0)),
+		std::pair(EulerAngles(ANGLE(-80.0f), ANGLE(-60.0f), 0), EulerAngles(ANGLE(80.0f), ANGLE(170.0f), 0)),
+		ANGLE(10.0f),
+		ANGLE(8.0f),
+		650,
+		SECTOR(8),
+		1,
+		3,
+		3,
+		0,
+		SFX_TR4_UZI_FIRE,
+		0
+	},
+
+	// Shotgun
+	{
+		std::pair(EulerAngles(ANGLE(-70.0f), ANGLE(-60.0f), 0), EulerAngles(ANGLE(65.0f), ANGLE(60.0f), 0)),
+		std::pair(EulerAngles(ANGLE(-70.0f), ANGLE(-80.0f), 0), EulerAngles(ANGLE(65.0f), ANGLE(80.0f), 0)),
+		std::pair(EulerAngles(ANGLE(-70.0f), ANGLE(-80.0f), 0), EulerAngles(ANGLE(65.0f), ANGLE(80.0f), 0)),
+		ANGLE(10.0f),
+		0,
+		500,
+		SECTOR(8),
+		3,
+		9,
+		3,
+		9,
+		SFX_TR4_SHOTGUN_FIRE,
+		0
+	},
+
+	// HK
+	{
+		std::pair(EulerAngles(ANGLE(-70.0f), ANGLE(-60.0f), 0), EulerAngles(ANGLE(65.0f), ANGLE(60.0f), 0)),
+		std::pair(EulerAngles(ANGLE(-70.0f), ANGLE(-80.0f), 0), EulerAngles(ANGLE(65.0f), ANGLE(80.0f), 0)),
+		std::pair(EulerAngles(ANGLE(-70.0f), ANGLE(-80.0f), 0), EulerAngles(ANGLE(65.0f), ANGLE(80.0f), 0)),
+		ANGLE(10.0f),
+		ANGLE(4.0f),
+		500,
+		SECTOR(12),
+		4,
+		0,
+		3,
+		16,
+		0, // FIRE / SILENCER_FIRE
+		0
+	},
+
+	// Crossbow
+	{
+		std::pair(EulerAngles(ANGLE(-70.0f), ANGLE(-60.0f), 0), EulerAngles(ANGLE(65.0f), ANGLE(60.0f), 0)),
+		std::pair(EulerAngles(ANGLE(-70.0f), ANGLE(-80.0f), 0), EulerAngles(ANGLE(65.0f), ANGLE(80.0f), 0)),
+		std::pair(EulerAngles(ANGLE(-70.0f), ANGLE(-80.0f), 0), EulerAngles(ANGLE(65.0f), ANGLE(80.0f), 0)),
+		ANGLE(10.0f),
+		ANGLE(8.0f),
+		500,
+		SECTOR(8),
+		5,
+		0,
+		2,
+		9,
+		SFX_TR4_CROSSBOW_FIRE,
+		20
+	},
+
+	// Flare
+	{
+		std::pair(EulerAngles::Zero, EulerAngles::Zero),
+		std::pair(EulerAngles::Zero, EulerAngles::Zero),
+		std::pair(EulerAngles::Zero, EulerAngles::Zero),
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0
+	},
+
+	// Flare 2
+	{
+		std::pair(EulerAngles(ANGLE(-55.0f), ANGLE(-30.0f), 0), EulerAngles(ANGLE(55.0f), ANGLE(30.0f), 0)),
+		std::pair(EulerAngles(ANGLE(-55.0f), ANGLE(-30.0f), 0), EulerAngles(ANGLE(55.0f), ANGLE(30.0f), 0)),
+		std::pair(EulerAngles(ANGLE(-55.0f), ANGLE(-30.0f), 0), EulerAngles(ANGLE(55.0f), ANGLE(30.0f), 0)),
+		ANGLE(10.0f),
+		ANGLE(8.0f),
+		400,
+		SECTOR(8),
+		3,
+		0,
+		2,
+		0,
+		SFX_TR4_UZI_FIRE,
+		0
+	},
+
+	// Grenade launcher
+	{
+		std::pair(EulerAngles(ANGLE(-70.0f), ANGLE(-60.0f), 0), EulerAngles(ANGLE(65.0f), ANGLE(60.0f), 0)),
+		std::pair(EulerAngles(ANGLE(-70.0f), ANGLE(-80.0f), 0), EulerAngles(ANGLE(65.0f), ANGLE(80.0f), 0)),
+		std::pair(EulerAngles(ANGLE(-70.0f), ANGLE(-80.0f), 0), EulerAngles(ANGLE(65.0f), ANGLE(80.0f), 0)),
+		ANGLE(10.0f),
+		ANGLE(8.0f),
+		500,
+		SECTOR(8),
+		20,
+		0,
+		2,
+		9,
+		0,
+		30
+	},
+
+	// Harpoon gun
+	{
+		std::pair(EulerAngles(ANGLE(-75.0f), ANGLE(-60.0f), 0), EulerAngles(ANGLE(75.0f), ANGLE(60.0f), 0)),
+		std::pair(EulerAngles(ANGLE(-75.0f), ANGLE(-20.0f), 0), EulerAngles(ANGLE(75.0f), ANGLE(20.0f), 0)),
+		std::pair(EulerAngles(ANGLE(-75.0f), ANGLE(-80.0f), 0), EulerAngles(ANGLE(75.0f), ANGLE(80.0f), 0)),
+		ANGLE(10.0f),
+		ANGLE(8.0f),
+		500,
+		SECTOR(8),
+		6,
+		0,
+		2,
+		10,
+		0,
+		0
+	},
+
+	// Rocket launcher
+	{
+		std::pair(EulerAngles(ANGLE(-70.0f), ANGLE(-60.0f), 0), EulerAngles(ANGLE(65.0f), ANGLE(60.0f), 0)),
+		std::pair(EulerAngles(ANGLE(-70.0f), ANGLE(-80.0f), 0), EulerAngles(ANGLE(65.0f), ANGLE(80.0f), 0)),
+		std::pair(EulerAngles(ANGLE(-70.0f), ANGLE(-80.0f), 0), EulerAngles(ANGLE(65.0f), ANGLE(80.0f), 0)),
+		ANGLE(10.0f),
+		ANGLE(8.0f),
+		500,
+		SECTOR(8),
+		30,
+		0,
+		2,
+		12,
+		77,
+		30
+	},
+
+	// Snowmobile
+	{
+		std::pair(EulerAngles(ANGLE(-55.0f), ANGLE(-30.0f), 0), EulerAngles(ANGLE(55.0f), ANGLE(30.0f), 0)),
+		std::pair(EulerAngles(ANGLE(-55.0f), ANGLE(-30.0f), 0), EulerAngles(ANGLE(55.0f), ANGLE(30.0f), 0)),
+		std::pair(EulerAngles(ANGLE(-55.0f), ANGLE(-30.0f), 0), EulerAngles(ANGLE(55.0f), ANGLE(30.0f), 0)),
+		ANGLE(10.0f),
+		ANGLE(8.0f),
+		400,
+		SECTOR(8),
+		3,
+		0,
+		0,
+		0,
+		SFX_TR4_UZI_FIRE,
+		0
+	}
+};
+
+void InitialiseNewWeapon(ItemInfo* laraItem)
+{
+	auto* lara = GetLaraInfo(laraItem);
+
+	lara->LeftArm.FrameNumber = 0;
+	lara->RightArm.FrameNumber = 0;
+	lara->LeftArm.Orientation = EulerAngles::Zero;
+	lara->RightArm.Orientation = EulerAngles::Zero;
+	lara->TargetEntity = nullptr;
+	lara->LeftArm.Locked = false;
+	lara->RightArm.Locked = false;
+	lara->LeftArm.GunFlash = 0;
+	lara->RightArm.GunFlash = 0;
+
+	switch (lara->Control.Weapon.GunType)
+	{
+	case LaraWeaponType::Pistol:
+	case LaraWeaponType::Uzi:
+		lara->RightArm.FrameBase = Objects[ID_PISTOLS_ANIM].frameBase;
+		lara->LeftArm.FrameBase = Objects[ID_PISTOLS_ANIM].frameBase;
+
+		if (lara->Control.HandStatus != HandStatus::Free)
+			DrawPistolMeshes(laraItem, lara->Control.Weapon.GunType);
+
+		break;
+
+	case LaraWeaponType::Shotgun:
+	case LaraWeaponType::Revolver:
+	case LaraWeaponType::HK:
+	case LaraWeaponType::GrenadeLauncher:
+	case LaraWeaponType::HarpoonGun:
+	case LaraWeaponType::RocketLauncher:
+		lara->RightArm.FrameBase = Objects[GetWeaponObjectID(lara->Control.Weapon.GunType)].frameBase;
+		lara->LeftArm.FrameBase = Objects[GetWeaponObjectID(lara->Control.Weapon.GunType)].frameBase;
+
+		if (lara->Control.HandStatus != HandStatus::Free)
+			DrawShotgunMeshes(laraItem, lara->Control.Weapon.GunType);
+
+		break;
+
+	case LaraWeaponType::Flare:
+		lara->RightArm.FrameBase = Objects[ID_FLARE_ANIM].frameBase;
+		lara->LeftArm.FrameBase = Objects[ID_FLARE_ANIM].frameBase;
+
+		if (lara->Control.HandStatus != HandStatus::Free)
+			DrawFlareMeshes(laraItem);
+
+		break;
+
+	default:
+		lara->RightArm.FrameBase = g_Level.Anims[laraItem->Animation.AnimNumber].FramePtr;
+		lara->LeftArm.FrameBase = g_Level.Anims[laraItem->Animation.AnimNumber].FramePtr;
+		break;
+	}
+}
+
+Ammo& GetAmmo(LaraInfo& lara, LaraWeaponType weaponType)
+{
+	return lara.Weapons[(int)weaponType].Ammo[(int)lara.Weapons[(int)weaponType].SelectedAmmo];
+}
+
+GameVector GetTargetPoint(ItemInfo* targetEntity)
+{
+	const auto& bounds = *(GameBoundingBox*)GetBestFrame(targetEntity);
+
+	auto center = Vector3i(
+		(bounds.X1 + bounds.X2) / 2,
+		bounds.Y1 + (bounds.GetHeight() / 3),
+		(bounds.Z1 + bounds.Z2) / 2
+	);
+
+	float sinY = phd_sin(targetEntity->Pose.Orientation.y);
+	float cosY = phd_cos(targetEntity->Pose.Orientation.y);
+
+	return GameVector(
+		targetEntity->Pose.Position.x + ((center.x * cosY) + (center.z * sinY)),
+		targetEntity->Pose.Position.y + center.y,
+		targetEntity->Pose.Position.z + ((center.z * cosY) - (center.x * sinY)),
+		targetEntity->RoomNumber
+	);
+}
+
+HolsterSlot GetWeaponHolsterSlot(LaraWeaponType weaponType)
+{
+	switch (weaponType)
+	{
+	case LaraWeaponType::Pistol:
+		return HolsterSlot::Pistols;
+
+	case LaraWeaponType::Uzi:
+		return HolsterSlot::Uzis;
+
+	case LaraWeaponType::Revolver:
+		return HolsterSlot::Revolver;
+
+	case LaraWeaponType::Shotgun:
+		return HolsterSlot::Shotgun;
+
+	case LaraWeaponType::HK:
+		return HolsterSlot::HK;
+
+	case LaraWeaponType::HarpoonGun:
+		return HolsterSlot::Harpoon;
+
+	case LaraWeaponType::Crossbow:
+		return HolsterSlot::Crossbow;
+
+	case LaraWeaponType::GrenadeLauncher:
+		return HolsterSlot::GrenadeLauncher;
+
+	case LaraWeaponType::RocketLauncher:
+		return HolsterSlot::RocketLauncher;
+
+	default:
+		return HolsterSlot::Empty;
+	}
+}
+
+GAME_OBJECT_ID GetWeaponObjectID(LaraWeaponType weaponType)
 {
 	switch (weaponType)
 	{
@@ -322,58 +439,54 @@ GAME_OBJECT_ID WeaponObject(LaraWeaponType weaponType)
 	}
 }
 
-void AimWeapon(ItemInfo* laraItem, WeaponInfo* weaponInfo, ArmInfo* arm)
+GAME_OBJECT_ID GetWeaponObjectMeshID(ItemInfo* laraItem, LaraWeaponType weaponType)
 {
 	auto* lara = GetLaraInfo(laraItem);
 
-	auto targetArmOrient = EulerAngles::Zero;
-	if (arm->Locked)
-		targetArmOrient = lara->TargetArmOrient;
+	switch (weaponType)
+	{
+	case LaraWeaponType::Revolver:
+		return (lara->Weapons[(int)LaraWeaponType::Revolver].HasLasersight ? ID_LARA_REVOLVER_LASER : ID_REVOLVER_ANIM);
 
-	int speed = weaponInfo->AimSpeed;
+	case LaraWeaponType::Uzi:
+		return ID_UZI_ANIM;
 
-	// Rotate arms on y axis toward target.
-	short rotY = arm->Orientation.y;
-	if (rotY >= (targetArmOrient.y - speed) && rotY <= (targetArmOrient.y + speed))
-		rotY = targetArmOrient.y;
-	else if (rotY < targetArmOrient.y)
-		rotY += speed;
-	else
-		rotY -= speed;
-	arm->Orientation.y = rotY;
+	case LaraWeaponType::Shotgun:
+		return ID_SHOTGUN_ANIM;
 
-	// Rotate arms on x axis toward target.
-	short rotX = arm->Orientation.x;
-	if (rotX >= (targetArmOrient.x - speed) && rotX <= (targetArmOrient.x + speed))
-		rotX = targetArmOrient.x;
-	else if (rotX < targetArmOrient.x)
-		rotX += speed;
-	else
-		rotX -= speed;
-	arm->Orientation.x = rotX;
+	case LaraWeaponType::HK:
+		return ID_HK_ANIM;
 
-	// TODO: Set arms to inherit rotations of parent bones.
-	arm->Orientation.z = 0;
+	case LaraWeaponType::Crossbow:
+		return (lara->Weapons[(int)LaraWeaponType::Crossbow].HasLasersight ? ID_LARA_CROSSBOW_LASER : ID_CROSSBOW_ANIM);
+
+	case LaraWeaponType::GrenadeLauncher:
+		return ID_GRENADE_ANIM;
+
+	case LaraWeaponType::HarpoonGun:
+		return ID_HARPOON_ANIM;
+
+	case LaraWeaponType::RocketLauncher:
+		return ID_ROCKET_ANIM;
+
+	default:
+		return ID_PISTOLS_ANIM;
+	}
 }
 
-void SmashItem(short itemNumber)
-{
-	auto* item = &g_Level.Items[itemNumber];
-
-	if (item->ObjectNumber >= ID_SMASH_OBJECT1 && item->ObjectNumber <= ID_SMASH_OBJECT8)
-		SmashObject(itemNumber);
-}
-
-void LaraGun(ItemInfo* laraItem)
+void HandleWeapon(ItemInfo* laraItem)
 {
 	auto* lara = GetLaraInfo(laraItem);
 
 	if (lara->LeftArm.GunFlash > 0)
 		--lara->LeftArm.GunFlash;
+
 	if (lara->RightArm.GunFlash > 0)
 		--lara->RightArm.GunFlash;
+
 	if (lara->RightArm.GunSmoke > 0)
 		--lara->RightArm.GunSmoke;
+
 	if (lara->LeftArm.GunSmoke > 0)
 		--lara->LeftArm.GunSmoke;
 
@@ -571,7 +684,7 @@ void LaraGun(ItemInfo* laraItem)
 
 		if (TrInput & IN_ACTION)
 		{
-			if (!GetAmmo(laraItem, lara->Control.Weapon.GunType))
+			if (!GetAmmo(*lara, lara->Control.Weapon.GunType))
 			{
 				bool hasPistols = lara->Weapons[(int)LaraWeaponType::Pistol].Present && Objects[ID_PISTOLS_ITEM].loaded;
 
@@ -646,181 +759,23 @@ void LaraGun(ItemInfo* laraItem)
 	}
 }
 
-Ammo& GetAmmo(ItemInfo* laraItem, LaraWeaponType weaponType)
+void AimWeapon(ItemInfo* laraItem, ArmInfo& arm, const WeaponInfo& weaponInfo)
 {
 	auto* lara = GetLaraInfo(laraItem);
 
-	return lara->Weapons[(int)weaponType].Ammo[(int)lara->Weapons[(int)weaponType].SelectedAmmo];
+	auto targetArmOrient = arm.Locked ? lara->TargetArmOrient : EulerAngles::Zero;
+	arm.Orientation.InterpolateConstant(targetArmOrient, weaponInfo.AimSpeed);
 }
 
-void InitialiseNewWeapon(ItemInfo* laraItem)
+FireWeaponType FireWeapon(LaraWeaponType weaponType, ItemInfo* targetEntity, ItemInfo* laraItem, const EulerAngles& armOrient)
 {
 	auto* lara = GetLaraInfo(laraItem);
+	auto& ammo = GetAmmo(*lara, weaponType);
 
-	lara->LeftArm.FrameNumber = 0;
-	lara->RightArm.FrameNumber = 0;
-	lara->LeftArm.Orientation = EulerAngles::Zero;
-	lara->RightArm.Orientation = EulerAngles::Zero;
-	lara->TargetEntity = nullptr;
-	lara->LeftArm.Locked = false;
-	lara->RightArm.Locked = false;
-	lara->LeftArm.GunFlash = 0;
-	lara->RightArm.GunFlash = 0;
-
-	switch (lara->Control.Weapon.GunType)
-	{
-	case LaraWeaponType::Pistol:
-	case LaraWeaponType::Uzi:
-		lara->RightArm.FrameBase = Objects[ID_PISTOLS_ANIM].frameBase;
-		lara->LeftArm.FrameBase = Objects[ID_PISTOLS_ANIM].frameBase;
-
-		if (lara->Control.HandStatus != HandStatus::Free)
-			DrawPistolMeshes(laraItem, lara->Control.Weapon.GunType);
-
-		break;
-
-	case LaraWeaponType::Shotgun:
-	case LaraWeaponType::Revolver:
-	case LaraWeaponType::HK:
-	case LaraWeaponType::GrenadeLauncher:
-	case LaraWeaponType::HarpoonGun:
-	case LaraWeaponType::RocketLauncher:
-		lara->RightArm.FrameBase = Objects[WeaponObject(lara->Control.Weapon.GunType)].frameBase;
-		lara->LeftArm.FrameBase = Objects[WeaponObject(lara->Control.Weapon.GunType)].frameBase;
-
-		if (lara->Control.HandStatus != HandStatus::Free)
-			DrawShotgunMeshes(laraItem, lara->Control.Weapon.GunType);
-
-		break;
-
-	case LaraWeaponType::Flare:
-		lara->RightArm.FrameBase = Objects[ID_FLARE_ANIM].frameBase;
-		lara->LeftArm.FrameBase = Objects[ID_FLARE_ANIM].frameBase;
-
-		if (lara->Control.HandStatus != HandStatus::Free)
-			DrawFlareMeshes(laraItem);
-
-		break;
-
-	default:
-		lara->RightArm.FrameBase = g_Level.Anims[laraItem->Animation.AnimNumber].FramePtr;
-		lara->LeftArm.FrameBase = g_Level.Anims[laraItem->Animation.AnimNumber].FramePtr;
-		break;
-	}
-}
-
-GAME_OBJECT_ID WeaponObjectMesh(ItemInfo* laraItem, LaraWeaponType weaponType)
-{
-	auto* lara = GetLaraInfo(laraItem);
-
-	switch (weaponType)
-	{
-	case LaraWeaponType::Revolver:
-		return (lara->Weapons[(int)LaraWeaponType::Revolver].HasLasersight ? ID_LARA_REVOLVER_LASER : ID_REVOLVER_ANIM);
-
-	case LaraWeaponType::Uzi:
-		return ID_UZI_ANIM;
-
-	case LaraWeaponType::Shotgun:
-		return ID_SHOTGUN_ANIM;
-
-	case LaraWeaponType::HK:
-		return ID_HK_ANIM;
-
-	case LaraWeaponType::Crossbow:
-		return (lara->Weapons[(int)LaraWeaponType::Crossbow].HasLasersight ? ID_LARA_CROSSBOW_LASER : ID_CROSSBOW_ANIM);
-		
-	case LaraWeaponType::GrenadeLauncher:
-		return ID_GRENADE_ANIM;
-
-	case LaraWeaponType::HarpoonGun:
-		return ID_HARPOON_ANIM;
-
-	case LaraWeaponType::RocketLauncher:
-		return ID_ROCKET_ANIM;
-
-	default:
-		return ID_PISTOLS_ANIM;
-	}
-}
-
-void HitTarget(ItemInfo* laraItem, ItemInfo* targetEntity, GameVector* hitPos, int damage, int grenade)
-{	
-	auto* lara = GetLaraInfo(laraItem);
-
-	targetEntity->HitStatus = true;
-
-	if (targetEntity->IsCreature())
-		GetCreatureInfo(targetEntity)->HurtByLara = true;
-
-	const auto& object = Objects[targetEntity->ObjectNumber];
-
-	if (hitPos != nullptr)
-	{
-		if (object.hitEffect != HIT_NONE)
-		{
-			switch (object.hitEffect)
-			{
-			case HIT_BLOOD:
-				if (targetEntity->ObjectNumber == ID_BADDY2 &&
-					(targetEntity->Animation.ActiveState == 8 || GetRandomControl() & 1) &&
-					(lara->Control.Weapon.GunType == LaraWeaponType::Pistol ||
-						lara->Control.Weapon.GunType == LaraWeaponType::Shotgun ||
-						lara->Control.Weapon.GunType == LaraWeaponType::Uzi))
-				{
-					// Baddy2 gun hitting sword
-					SoundEffect(SFX_TR4_BADDY_SWORD_RICOCHET, &targetEntity->Pose);
-					TriggerRicochetSpark(hitPos, laraItem->Pose.Orientation.y, 3, 0);
-					return;
-				}
-				else
-					DoBloodSplat(hitPos->x, hitPos->y, hitPos->z, (GetRandomControl() & 3) + 3, targetEntity->Pose.Orientation.y, targetEntity->RoomNumber);
-
-				break;
-
-			case HIT_RICOCHET:
-				TriggerRicochetSpark(hitPos, laraItem->Pose.Orientation.y, 3, 0);
-				break;
-
-			case HIT_SMOKE:
-				TriggerRicochetSpark(hitPos, laraItem->Pose.Orientation.y, 3, -5);
-
-				if (targetEntity->ObjectNumber == ID_ROMAN_GOD1 ||
-					targetEntity->ObjectNumber == ID_ROMAN_GOD2)
-				{
-					SoundEffect(SFX_TR5_SWORD_GOD_HIT_METAL, &targetEntity->Pose);
-				}
-
-				break;
-			}
-		}
-	}
-
-	if (!object.undead || grenade)
-	{
-		if (targetEntity->HitPoints > 0)
-		{
-			Statistics.Level.AmmoHits++;
-			DoDamage(targetEntity, damage);
-		}
-	}
-
-	if (!targetEntity->LuaCallbackOnHitName.empty())
-	{
-		short index = g_GameScriptEntities->GetIndexByName(targetEntity->LuaName);
-		g_GameScript->ExecuteFunction(targetEntity->LuaCallbackOnHitName, index);
-	}
-}
-
-FireWeaponType FireWeapon(LaraWeaponType weaponType, ItemInfo* targetEntity, ItemInfo* laraItem, EulerAngles armOrient)
-{
-	auto* lara = GetLaraInfo(laraItem);
-
-	auto& ammo = GetAmmo(laraItem, weaponType);
-	if (ammo.getCount() == 0 && !ammo.hasInfinite())
+	if (ammo.GetCount() == 0 && !ammo.HasInfinite())
 		return FireWeaponType::NoAmmo;
 
-	if (!ammo.hasInfinite())
+	if (!ammo.HasInfinite())
 		ammo--;
 
 	const auto& weapon = Weapons[(int)weaponType];
@@ -842,7 +797,7 @@ FireWeaponType FireWeapon(LaraWeaponType weaponType, ItemInfo* targetEntity, Ite
 
 	int num = GetSpheres(targetEntity, CreatureSpheres, SPHERES_SPACE_WORLD, Matrix::Identity);
 	int bestItemNumber = NO_ITEM;
-	float bestDistance = FLT_MAX;
+	float bestDistance = INFINITY;
 
 	for (int i = 0; i < num; i++)
 	{
@@ -930,94 +885,7 @@ FireWeaponType FireWeapon(LaraWeaponType weaponType, ItemInfo* targetEntity, Ite
 	}
 }
 
-GameVector FindTargetPoint(ItemInfo* item)
-{
-	auto* bounds = (GameBoundingBox*)GetBestFrame(item);
-
-	auto center = Vector3i(
-		int(bounds->X1 + bounds->X2) / 2,
-		(int)bounds->Y1 + bounds->GetHeight() / 3,
-		int(bounds->Z1 + bounds->Z2) / 2
-	);
-
-	float sinY = phd_sin(item->Pose.Orientation.y);
-	float cosY = phd_cos(item->Pose.Orientation.y);
-
-	return GameVector(
-		item->Pose.Position.x + ((center.x * cosY) + (center.z * sinY)),
-		item->Pose.Position.y + center.y,
-		item->Pose.Position.z + ((center.z * cosY) - (center.x * sinY)),
-		item->RoomNumber
-	);
-}
-
-void LaraTargetInfo(ItemInfo* laraItem, WeaponInfo* weaponInfo)
-{
-	auto* lara = GetLaraInfo(laraItem);
-
-	if (lara->TargetEntity == nullptr)
-	{
-		lara->RightArm.Locked = false;
-		lara->LeftArm.Locked = false;
-		lara->TargetArmOrient = EulerAngles::Zero;
-		return;
-	}
-
-	auto origin = GameVector(
-		laraItem->Pose.Position.x,
-		GetJointPosition(laraItem, LM_RHAND).y, // Muzzle offset.
-		laraItem->Pose.Position.z,
-		laraItem->RoomNumber
-	);
-	auto target = FindTargetPoint(lara->TargetEntity);
-
-	auto orient = Geometry::GetOrientToPoint(origin.ToVector3(), target.ToVector3()) - laraItem->Pose.Orientation;
-
-	if (LOS(&origin, &target))
-	{
-		if (orient.x >= weaponInfo->LockOrientConstraint.first.x &&
-			orient.y >= weaponInfo->LockOrientConstraint.first.y &&
-			orient.x <= weaponInfo->LockOrientConstraint.second.x &&
-			orient.y <= weaponInfo->LockOrientConstraint.second.y)
-		{
-			lara->RightArm.Locked = true;
-			lara->LeftArm.Locked = true;
-		}
-		else
-		{
-			if (lara->LeftArm.Locked)
-			{
-				if (orient.x < weaponInfo->LeftOrientConstraint.first.x ||
-					orient.y < weaponInfo->LeftOrientConstraint.first.y ||
-					orient.x > weaponInfo->LeftOrientConstraint.second.x ||
-					orient.y > weaponInfo->LeftOrientConstraint.second.y)
-				{
-					lara->LeftArm.Locked = false;
-				}
-			}
-
-			if (lara->RightArm.Locked)
-			{
-				if (orient.x < weaponInfo->RightOrientConstraint.first.x ||
-					orient.y < weaponInfo->RightOrientConstraint.first.y ||
-					orient.x > weaponInfo->RightOrientConstraint.second.x ||
-					orient.y > weaponInfo->RightOrientConstraint.second.y)
-				{
-					lara->RightArm.Locked = false;
-				}
-			}
-		}
-	}
-	else
-	{
-		lara->RightArm.Locked = false;
-		lara->LeftArm.Locked = false;
-	}
-
-	lara->TargetArmOrient = orient;
-}
-
-void LaraGetNewTarget(ItemInfo* laraItem, WeaponInfo* weaponInfo)
+void FindNewTarget(ItemInfo* laraItem, const WeaponInfo& weaponInfo)
 {
 	if (!g_Configuration.AutoTarget)
 		return;
@@ -1038,10 +906,10 @@ void LaraGetNewTarget(ItemInfo* laraItem, WeaponInfo* weaponInfo)
 	);
 
 	ItemInfo* bestEntity = nullptr;
-	float bestDistance = FLT_MAX;
+	float bestDistance = INFINITY;
 	short bestYOrient = MAXSHORT;
 	unsigned int numTargets = 0;
-	float maxDistance = weaponInfo->TargetDist;
+	float maxDistance = weaponInfo.TargetDist;
 
 	for (auto* activeCreature : ActiveCreatures)
 	{
@@ -1051,26 +919,26 @@ void LaraGetNewTarget(ItemInfo* laraItem, WeaponInfo* weaponInfo)
 
 		auto* item = &g_Level.Items[activeCreature->ItemNumber];
 
-		// Assess whether creature is alive.
+		// Check whether creature is alive.
 		if (item->HitPoints <= 0)
 			continue;
 
-		// Assess distance.
+		// Check distance.
 		float distance = Vector3::Distance(origin.ToVector3(), item->Pose.Position.ToVector3());
 		if (distance > maxDistance)
 			continue;
 
 		// Assess line of sight.
-		auto target = FindTargetPoint(item);
+		auto target = GetTargetPoint(item);
 		if (!LOS(&origin, &target))
 			continue;
 
 		// Assess whether relative orientation falls within weapon's lock constraints.
 		auto orient = Geometry::GetOrientToPoint(origin.ToVector3(), target.ToVector3()) - (laraItem->Pose.Orientation + lara->ExtraTorsoRot);
-		if (orient.x >= weaponInfo->LockOrientConstraint.first.x &&
-			orient.y >= weaponInfo->LockOrientConstraint.first.y &&
-			orient.x <= weaponInfo->LockOrientConstraint.second.x &&
-			orient.y <= weaponInfo->LockOrientConstraint.second.y)
+		if (orient.x >= weaponInfo.LockOrientConstraint.first.x &&
+			orient.y >= weaponInfo.LockOrientConstraint.first.y &&
+			orient.x <= weaponInfo.LockOrientConstraint.second.x &&
+			orient.y <= weaponInfo.LockOrientConstraint.second.y)
 		{
 			TargetList[numTargets] = item;
 			++numTargets;
@@ -1099,14 +967,14 @@ void LaraGetNewTarget(ItemInfo* laraItem, WeaponInfo* weaponInfo)
 				break;
 		}
 
-		if (lara->Control.HandStatus != HandStatus::Free || TrInput & IN_LOOKSWITCH)
+		if (lara->Control.HandStatus != HandStatus::Free || IsClicked(In::SwitchTarget))
 		{
-			if (!lara->TargetEntity)
+			if (lara->TargetEntity == nullptr)
 			{
 				lara->TargetEntity = bestEntity;
 				LastTargets[0] = nullptr;
 			}
-			else if (TrInput & IN_LOOKSWITCH)
+			else if (IsClicked(In::SwitchTarget))
 			{
 				lara->TargetEntity = nullptr;
 				bool flag = true;
@@ -1153,38 +1021,144 @@ void LaraGetNewTarget(ItemInfo* laraItem, WeaponInfo* weaponInfo)
 	LaraTargetInfo(laraItem, weaponInfo);
 }
 
-HolsterSlot HolsterSlotForWeapon(LaraWeaponType weaponType)
+void LaraTargetInfo(ItemInfo* laraItem, const WeaponInfo& weaponInfo)
 {
-	switch (weaponType)
+	auto* lara = GetLaraInfo(laraItem);
+
+	if (lara->TargetEntity == nullptr)
 	{
-		case LaraWeaponType::Pistol:
-			return HolsterSlot::Pistols;
-
-		case LaraWeaponType::Uzi:
-			return HolsterSlot::Uzis;
-
-		case LaraWeaponType::Revolver:
-			return HolsterSlot::Revolver;
-
-		case LaraWeaponType::Shotgun:
-			return HolsterSlot::Shotgun;
-
-		case LaraWeaponType::HK:
-			return HolsterSlot::HK;
-
-		case LaraWeaponType::HarpoonGun:
-			return HolsterSlot::Harpoon;
-
-		case LaraWeaponType::Crossbow:
-			return HolsterSlot::Crossbow;
-
-		case LaraWeaponType::GrenadeLauncher:
-			return HolsterSlot::GrenadeLauncher;
-
-		case LaraWeaponType::RocketLauncher:
-			return HolsterSlot::RocketLauncher;
-
-		default:
-			return HolsterSlot::Empty;
+		lara->RightArm.Locked = false;
+		lara->LeftArm.Locked = false;
+		lara->TargetArmOrient = EulerAngles::Zero;
+		return;
 	}
+
+	auto origin = GameVector(
+		laraItem->Pose.Position.x,
+		GetJointPosition(laraItem, LM_RHAND).y, // Muzzle offset.
+		laraItem->Pose.Position.z,
+		laraItem->RoomNumber
+	);
+	auto target = GetTargetPoint(lara->TargetEntity);
+
+	auto orient = Geometry::GetOrientToPoint(origin.ToVector3(), target.ToVector3()) - laraItem->Pose.Orientation;
+
+	if (LOS(&origin, &target))
+	{
+		if (orient.x >= weaponInfo.LockOrientConstraint.first.x &&
+			orient.y >= weaponInfo.LockOrientConstraint.first.y &&
+			orient.x <= weaponInfo.LockOrientConstraint.second.x &&
+			orient.y <= weaponInfo.LockOrientConstraint.second.y)
+		{
+			lara->RightArm.Locked = true;
+			lara->LeftArm.Locked = true;
+		}
+		else
+		{
+			if (lara->LeftArm.Locked)
+			{
+				if (orient.x < weaponInfo.LeftOrientConstraint.first.x ||
+					orient.y < weaponInfo.LeftOrientConstraint.first.y ||
+					orient.x > weaponInfo.LeftOrientConstraint.second.x ||
+					orient.y > weaponInfo.LeftOrientConstraint.second.y)
+				{
+					lara->LeftArm.Locked = false;
+				}
+			}
+
+			if (lara->RightArm.Locked)
+			{
+				if (orient.x < weaponInfo.RightOrientConstraint.first.x ||
+					orient.y < weaponInfo.RightOrientConstraint.first.y ||
+					orient.x > weaponInfo.RightOrientConstraint.second.x ||
+					orient.y > weaponInfo.RightOrientConstraint.second.y)
+				{
+					lara->RightArm.Locked = false;
+				}
+			}
+		}
+	}
+	else
+	{
+		lara->RightArm.Locked = false;
+		lara->LeftArm.Locked = false;
+	}
+
+	lara->TargetArmOrient = orient;
+}
+
+void HitTarget(ItemInfo* laraItem, ItemInfo* targetEntity, GameVector* hitPos, int damage, int grenade)
+{
+	auto* lara = GetLaraInfo(laraItem);
+
+	targetEntity->HitStatus = true;
+
+	if (targetEntity->IsCreature())
+		GetCreatureInfo(targetEntity)->HurtByLara = true;
+
+	const auto& object = Objects[targetEntity->ObjectNumber];
+
+	if (hitPos != nullptr)
+	{
+		if (object.hitEffect != HIT_NONE)
+		{
+			switch (object.hitEffect)
+			{
+			case HIT_BLOOD:
+				if (targetEntity->ObjectNumber == ID_BADDY2 &&
+					(targetEntity->Animation.ActiveState == 8 || GetRandomControl() & 1) &&
+					(lara->Control.Weapon.GunType == LaraWeaponType::Pistol ||
+						lara->Control.Weapon.GunType == LaraWeaponType::Shotgun ||
+						lara->Control.Weapon.GunType == LaraWeaponType::Uzi))
+				{
+					// Baddy2 gun hitting sword
+					SoundEffect(SFX_TR4_BADDY_SWORD_RICOCHET, &targetEntity->Pose);
+					TriggerRicochetSpark(hitPos, laraItem->Pose.Orientation.y, 3, 0);
+					return;
+				}
+				else
+					DoBloodSplat(hitPos->x, hitPos->y, hitPos->z, (GetRandomControl() & 3) + 3, targetEntity->Pose.Orientation.y, targetEntity->RoomNumber);
+
+				break;
+
+			case HIT_RICOCHET:
+				TriggerRicochetSpark(hitPos, laraItem->Pose.Orientation.y, 3, 0);
+				break;
+
+			case HIT_SMOKE:
+				TriggerRicochetSpark(hitPos, laraItem->Pose.Orientation.y, 3, -5);
+
+				if (targetEntity->ObjectNumber == ID_ROMAN_GOD1 ||
+					targetEntity->ObjectNumber == ID_ROMAN_GOD2)
+				{
+					SoundEffect(SFX_TR5_SWORD_GOD_HIT_METAL, &targetEntity->Pose);
+				}
+
+				break;
+			}
+		}
+	}
+
+	if (!object.undead || grenade)
+	{
+		if (targetEntity->HitPoints > 0)
+		{
+			Statistics.Level.AmmoHits++;
+			DoDamage(targetEntity, damage);
+		}
+	}
+
+	if (!targetEntity->LuaCallbackOnHitName.empty())
+	{
+		short index = g_GameScriptEntities->GetIndexByName(targetEntity->LuaName);
+		g_GameScript->ExecuteFunction(targetEntity->LuaCallbackOnHitName, index);
+	}
+}
+
+void SmashItem(short itemNumber)
+{
+	const auto& item = g_Level.Items[itemNumber];
+
+	if (item.ObjectNumber >= ID_SMASH_OBJECT1 && item.ObjectNumber <= ID_SMASH_OBJECT8)
+		SmashObject(itemNumber);
 }

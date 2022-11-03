@@ -3,7 +3,7 @@
 #include "Game/animation.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
-#include "Game/gui.h"
+#include "Game/Gui.h"
 #include "Game/effects/effects.h"
 #include "Game/collision/collide_item.h"
 #include "Game/Lara/lara_one_gun.h"
@@ -12,7 +12,7 @@
 #include "Game/effects/tomb4fx.h"
 #include "Game/Lara/lara_flare.h"
 #include "Game/effects/simple_particle.h"
-#include "Specific/input.h"
+#include "Specific/Input/Input.h"
 #include "Specific/setup.h"
 #include "Specific/level.h"
 #include "Sound/sound.h"
@@ -731,7 +731,7 @@ namespace TEN::Entities::Vehicles
 		auto* lara = GetLaraInfo(laraItem);
 
 		if (laraItem->Animation.ActiveState == JS_DISMOUNT || laraItem->Animation.TargetState == JS_DISMOUNT)
-			TrInput = 0;
+			ClearAllActions();
 	
 		if (jeep->Revs <= 16)
 			jeep->Revs = 0;
@@ -1370,7 +1370,10 @@ namespace TEN::Entities::Vehicles
 		if (laraItem->HitPoints <= 0)
 		{
 			dead = true;
-			TrInput &= ~(IN_LEFT | IN_RIGHT | IN_BACK | IN_FORWARD);
+			ClearAction(In::Forward);
+			ClearAction(In::Back);
+			ClearAction(In::Left);
+			ClearAction(In::Right);
 		}
 
 		int pitch = 0;

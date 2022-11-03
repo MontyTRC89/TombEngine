@@ -310,12 +310,10 @@ bool SaveGame::Save(int slot)
 	inventory.add_total_flares(Lara.Inventory.TotalFlares);
 	inventory.add_total_small_medipacks(Lara.Inventory.TotalSmallMedipacks);
 	inventory.add_total_large_medipacks(Lara.Inventory.TotalLargeMedipacks);
-	inventory.add_total_secrets(Lara.Inventory.TotalSecrets);
 	auto inventoryOffset = inventory.Finish();
 
 	Save::LaraCountDataBuilder count{ fbb };
 	count.add_death(Lara.Control.Count.Death);
-	count.add_no_cheat(Lara.Control.Count.NoCheat);
 	count.add_pose(Lara.Control.Count.Pose);
 	count.add_position_adjust(Lara.Control.Count.PositionAdjust);
 	count.add_run_jump(Lara.Control.Count.Run);
@@ -399,8 +397,8 @@ bool SaveGame::Save(int slot)
 		for (int j = 0; j < (int)WeaponAmmoType::NumAmmoTypes; j++)
 		{
 			Save::AmmoInfoBuilder ammo{ fbb };
-			ammo.add_count(info->Ammo[j].getCount());
-			ammo.add_is_infinite(info->Ammo[j].hasInfinite());
+			ammo.add_count(info->Ammo[j].GetCount());
+			ammo.add_is_infinite(info->Ammo[j].HasInfinite());
 			auto ammoOffset = ammo.Finish();
 			ammos.push_back(ammoOffset);
 		}
@@ -1723,7 +1721,6 @@ bool SaveGame::Load(int slot)
 	Lara.Control.CanMonkeySwing = s->lara()->control()->can_monkey_swing();
 	Lara.Control.CanClimbLadder = s->lara()->control()->is_climbing_ladder();
 	Lara.Control.Count.Death = s->lara()->control()->count()->death();
-	Lara.Control.Count.NoCheat = s->lara()->control()->count()->no_cheat();
 	Lara.Control.Count.Pose = s->lara()->control()->count()->pose();
 	Lara.Control.Count.PositionAdjust = s->lara()->control()->count()->position_adjust();
 	Lara.Control.Count.Run = s->lara()->control()->count()->run_jump();
@@ -1780,7 +1777,6 @@ bool SaveGame::Load(int slot)
 	Lara.Inventory.SmallWaterskin = s->lara()->inventory()->small_waterskin();
 	Lara.Inventory.TotalFlares = s->lara()->inventory()->total_flares();
 	Lara.Inventory.TotalLargeMedipacks = s->lara()->inventory()->total_large_medipacks();
-	Lara.Inventory.TotalSecrets = s->lara()->inventory()->total_secrets();
 	Lara.Inventory.TotalSmallMedipacks = s->lara()->inventory()->total_small_medipacks();
 	Lara.ItemNumber = s->lara()->item_number();
 	Lara.LeftArm.AnimNumber = s->lara()->left_arm()->anim_number();
@@ -1846,7 +1842,7 @@ bool SaveGame::Load(int slot)
 
 		for (int j = 0; j < info->ammo()->size(); j++)
 		{
-			Lara.Weapons[i].Ammo[j].setInfinite(info->ammo()->Get(j)->is_infinite());
+			Lara.Weapons[i].Ammo[j].SetInfinite(info->ammo()->Get(j)->is_infinite());
 			Lara.Weapons[i].Ammo[j] = info->ammo()->Get(j)->count();
 		}
 

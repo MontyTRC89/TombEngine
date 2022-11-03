@@ -13,8 +13,8 @@ namespace TEN::Renderer
 		unsigned char AnimationFrameOffset;
 		DirectX::SimpleMath::Vector4 Effects;
 		float Bone;
-		int IndexInPoly;
-		int OriginalIndex;
-		int Hash;
+		unsigned int IndexInPoly;
+		unsigned int OriginalIndex;
+		unsigned int Hash;
 	};
 }

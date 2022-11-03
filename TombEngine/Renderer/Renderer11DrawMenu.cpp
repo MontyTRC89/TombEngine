@@ -4,7 +4,7 @@
 #include "Game/animation.h"
 #include "Game/control/control.h"
 #include "Game/control/volume.h"
-#include "Game/gui.h"
+#include "Game/Gui.h"
 #include "Game/health.h"
 #include "Game/Lara/lara.h"
 #include "Game/savegame.h"
@@ -99,14 +99,14 @@ namespace TEN::Renderer
 		auto title_option = g_Gui.GetSelectedOption();
 
 		char stringBuffer[32] = {};
-		auto screenResolution = g_Configuration.SupportedScreenResolutions[g_Gui.GetCurrentSettings().selectedScreenResolution];
+		auto screenResolution = g_Configuration.SupportedScreenResolutions[g_Gui.GetCurrentSettings().SelectedScreenResolution];
 		sprintf(stringBuffer, "%d x %d", screenResolution.x, screenResolution.y);
 
-		auto* shadowMode = g_Gui.GetCurrentSettings().conf.ShadowType != ShadowMode::None ? 
-			(g_Gui.GetCurrentSettings().conf.ShadowType == ShadowMode::Lara ? STRING_SHADOWS_PLAYER : STRING_SHADOWS_ALL) : STRING_SHADOWS_NONE;
+		auto* shadowMode = g_Gui.GetCurrentSettings().Configuration.ShadowType != ShadowMode::None ?
+			(g_Gui.GetCurrentSettings().Configuration.ShadowType == ShadowMode::Lara ? STRING_SHADOWS_PLAYER : STRING_SHADOWS_ALL) : STRING_SHADOWS_NONE;
 
 		const char* antialiasMode;
-		switch (g_Gui.GetCurrentSettings().conf.Antialiasing)
+		switch (g_Gui.GetCurrentSettings().Configuration.Antialiasing)
 		{
 			default:
 			case AntialiasingMode::None:
@@ -161,7 +161,7 @@ namespace TEN::Renderer
 
 			// Windowed mode
 			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_WINDOWED), PRINTSTRING_COLOR_ORANGE, SF(title_option == 1));
-			AddString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().conf.Windowed), PRINTSTRING_COLOR_WHITE, SF(title_option == 1));
+			AddString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().Configuration.Windowed), PRINTSTRING_COLOR_WHITE, SF(title_option == 1));
 			GetNextLinePosition(&y);
 
 			// Enable dynamic shadows
@@ -171,7 +171,7 @@ namespace TEN::Renderer
 
 			// Enable caustics
 			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_CAUSTICS), PRINTSTRING_COLOR_ORANGE, SF(title_option == 3));
-			AddString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().conf.EnableCaustics), PRINTSTRING_COLOR_WHITE, SF(title_option == 3));
+			AddString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().Configuration.EnableCaustics), PRINTSTRING_COLOR_WHITE, SF(title_option == 3));
 			GetNextLinePosition(&y);
 
 			// Enable antialiasing
@@ -198,7 +198,7 @@ namespace TEN::Renderer
 
 			// Enable sound special effects
 			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_REVERB), PRINTSTRING_COLOR_ORANGE, SF(title_option == 0));
-			AddString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().conf.EnableReverb), PRINTSTRING_COLOR_WHITE, SF(title_option == 0));
+			AddString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().Configuration.EnableReverb), PRINTSTRING_COLOR_WHITE, SF(title_option == 0));
 			GetNextLinePosition(&y);
 
 			// Initialise bars, if not yet done. Must be done here because we're calculating Y coord on the fly.
@@ -207,28 +207,28 @@ namespace TEN::Renderer
 
 			// Music volume
 			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_MUSIC_VOLUME), PRINTSTRING_COLOR_ORANGE, SF(title_option == 1));
-			DrawBar(g_Gui.GetCurrentSettings().conf.MusicVolume / 100.0f, g_MusicVolumeBar, ID_SFX_BAR_TEXTURE, 0, false);
+			DrawBar(g_Gui.GetCurrentSettings().Configuration.MusicVolume / 100.0f, g_MusicVolumeBar, ID_SFX_BAR_TEXTURE, 0, false);
 			GetNextLinePosition(&y);
 
 			// Sound FX volume
 			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_SFX_VOLUME), PRINTSTRING_COLOR_ORANGE, SF(title_option == 2));
-			DrawBar(g_Gui.GetCurrentSettings().conf.SfxVolume / 100.0f, g_SFXVolumeBar, ID_SFX_BAR_TEXTURE, 0, false);
+			DrawBar(g_Gui.GetCurrentSettings().Configuration.SfxVolume / 100.0f, g_SFXVolumeBar, ID_SFX_BAR_TEXTURE, 0, false);
 			GetNextBlockPosition(&y);
 
 
 			// Auto targeting
 			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_AUTOTARGET), PRINTSTRING_COLOR_ORANGE, SF(title_option == 3));
-			AddString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().conf.AutoTarget), PRINTSTRING_COLOR_WHITE, SF(title_option == 3));
+			AddString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().Configuration.AutoTarget), PRINTSTRING_COLOR_WHITE, SF(title_option == 3));
 			GetNextLinePosition(&y);
 
 			// Vibration
 			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_RUMBLE), PRINTSTRING_COLOR_ORANGE, SF(title_option == 4));
-			AddString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().conf.EnableRumble), PRINTSTRING_COLOR_WHITE, SF(title_option == 4));
+			AddString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().Configuration.EnableRumble), PRINTSTRING_COLOR_WHITE, SF(title_option == 4));
 			GetNextLinePosition(&y);
 
 			// Thumbstick camera
 			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_THUMBSTICK_CAMERA), PRINTSTRING_COLOR_ORANGE, SF(title_option == 5));
-			AddString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().conf.EnableThumbstickCameraControl), PRINTSTRING_COLOR_WHITE, SF(title_option == 5));
+			AddString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().Configuration.EnableThumbstickCameraControl), PRINTSTRING_COLOR_WHITE, SF(title_option == 5));
 			GetNextBlockPosition(&y);
 
 
@@ -252,9 +252,9 @@ namespace TEN::Renderer
 			// Control listing
 			for (int k = 0; k < KEY_COUNT; k++)
 			{
-				AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(controlmsgs[k]), PRINTSTRING_COLOR_WHITE, SF(title_option == k));
+				AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(ControlStrings[k]), PRINTSTRING_COLOR_WHITE, SF(title_option == k));
 
-				if (g_Gui.GetCurrentSettings().waitingForkey && title_option == k)
+				if (g_Gui.GetCurrentSettings().WaitingForKey && title_option == k)
 					AddString(MenuRightSideEntry, y, g_GameFlow->GetString(STRING_WAITING_FOR_KEY), PRINTSTRING_COLOR_YELLOW, SF(true));
 				else
 				{
@@ -476,23 +476,26 @@ namespace TEN::Renderer
 		GetNextLinePosition(&y);
 
 		// Secrets found
-		sprintf(buffer, "%d / 36", Statistics.Game.Secrets);
-		AddString(MenuRightSideEntry, y, buffer, PRINTSTRING_COLOR_WHITE, SF());
-		AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_SECRETS_FOUND), PRINTSTRING_COLOR_WHITE, SF());
+		if (g_GameFlow->NumberOfSecrets > 0)
+		{
+			sprintf(buffer, "%d / %d", Statistics.Game.Secrets, g_GameFlow->NumberOfSecrets);
+			AddString(MenuRightSideEntry, y, buffer, PRINTSTRING_COLOR_WHITE, SF());
+			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_SECRETS_FOUND), PRINTSTRING_COLOR_WHITE, SF());
+		}
 
 		DrawAllStrings();
 	}
 
 	void Renderer11::RenderNewInventory()
 	{
-		g_Gui.DrawCurrentObjectList((int)RingTypes::Inventory);
+		g_Gui.DrawCurrentObjectList(LaraItem, (int)RingTypes::Inventory);
 
-		if (g_Gui.GetRings((int)RingTypes::Ammo)->ringactive)
-			g_Gui.DrawCurrentObjectList((int)RingTypes::Ammo);
+		if (g_Gui.GetRings((int)RingTypes::Ammo)->RingActive)
+			g_Gui.DrawCurrentObjectList(LaraItem, (int)RingTypes::Ammo);
 
 		g_Gui.DrawAmmoSelector();
 		g_Gui.FadeAmmoSelector();
-		g_Gui.DrawCompass();
+		g_Gui.DrawCompass(LaraItem);
 
 		DrawAllStrings();
 	}
@@ -504,12 +507,11 @@ namespace TEN::Renderer
 		m_context->OMGetRenderTargets(1, nullptr, &dsv);
 		m_context->ClearDepthStencilView(dsv, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
-		DrawObjectOn2DPosition(700 + PickupX, 450, objectNum, 0, m_pickupRotation, 0, 0.5f); // TODO: + PickupY
+		DrawObjectOn2DPosition(700 + PickupX, 450, objectNum, EulerAngles(0, m_pickupRotation, 0), 0.5f); // TODO: + PickupY
 		m_pickupRotation += 45 * 360 / 30;
 	}
 
-	void Renderer11::DrawObjectOn2DPosition(short x, short y, short objectNum, short rotX, short rotY, short rotZ,
-		float scale1)
+	void Renderer11::DrawObjectOn2DPosition(short x, short y, short objectNum, EulerAngles orient, float scale1)
 	{
 		Matrix translation;
 		Matrix rotation;
@@ -532,15 +534,12 @@ namespace TEN::Renderer
 
 		if (index != -1)
 		{
-			auto objme = &inventry_objects_list[index];
-			y += objme->yoff;
-			rotX += objme->xrot;
-			rotY += objme->yrot;
-			rotZ += objme->zrot;
+			auto& invObject = InventoryObjectTable[index];
+			y += invObject.YOffset;
+			orient += invObject.Orientation;
 		}
 
-		view = Matrix::CreateLookAt(Vector3(0.0f, 0.0f, 2048.0f), Vector3(0.0f, 0.0f, 0.0f),
-			Vector3(0.0f, -1.0f, 0.0f));
+		view = Matrix::CreateLookAt(Vector3(0.0f, 0.0f, 2048.0f), Vector3(0.0f, 0.0f, 0.0f), Vector3(0.0f, -1.0f, 0.0f));
 		projection = Matrix::CreateOrthographic(m_screenWidth, m_screenHeight, -1024.0f, 1024.0f);
 
 		auto& moveableObj = m_moveableObjects[objectNum];
@@ -582,7 +581,7 @@ namespace TEN::Renderer
 			{
 				InventoryObject* objme;
 
-				objme = &inventry_objects_list[g_Gui.ConvertObjectToInventoryItem(objectNum)];
+				objme = &InventoryObjectTable[g_Gui.ConvertObjectToInventoryItem(objectNum)];
 
 				if (!(objme->meshbits & (1 << n)))
 					continue;
@@ -590,7 +589,7 @@ namespace TEN::Renderer
 
 			// Finish the world matrix
 			translation = Matrix::CreateTranslation(pos.x, pos.y, pos.z + 1024.0f);
-			rotation = Matrix::CreateFromYawPitchRoll(TO_RAD(rotY), TO_RAD(rotX), TO_RAD(rotZ));
+			rotation = orient.ToRotationMatrix();
 			scale = Matrix::CreateScale(scale1);
 
 			world = scale * rotation;
@@ -665,24 +664,24 @@ namespace TEN::Renderer
 
 	void Renderer11::DrawExamines()
 	{
-		static short xrot = 0, yrot = 0, zrot = 0;
+		static EulerAngles orient = EulerAngles::Zero;
 		static float scaler = 1.2f;
-		float saved_scale;
-		short inv_item = g_Gui.GetRings((int)RingTypes::Inventory)->current_object_list[g_Gui.GetRings(
-			(int)RingTypes::Inventory)->curobjinlist].invitem;
-		InventoryObject* obj = &inventry_objects_list[inv_item];
 
-		if (TrInput & IN_LEFT)
-			yrot += ANGLE(3);
+		short invItem = g_Gui.GetRings((int)RingTypes::Inventory)->CurrentObjectList[g_Gui.GetRings((int)RingTypes::Inventory)->CurrentObjectInList].InventoryItem;
 
-		if (TrInput & IN_RIGHT)
-			yrot -= ANGLE(3);
+		auto& object = InventoryObjectTable[invItem];
 
 		if (TrInput & IN_FORWARD)
-			xrot += ANGLE(3);
+			orient.x += ANGLE(3.0f);
 
 		if (TrInput & IN_BACK)
-			xrot -= ANGLE(3);
+			orient.x -= ANGLE(3.0f);
+
+		if (TrInput & IN_LEFT)
+			orient.y += ANGLE(3.0f);
+
+		if (TrInput & IN_RIGHT)
+			orient.y -= ANGLE(3.0f);
 
 		if (TrInput & IN_SPRINT)
 			scaler += 0.03f;
@@ -696,23 +695,24 @@ namespace TEN::Renderer
 		if (scaler < 0.8f)
 			scaler = 0.8f;
 
-		saved_scale = obj->scale1;
-		obj->scale1 = scaler;
-		DrawObjectOn2DPosition(400, 300, g_Gui.ConvertInventoryItemToObject(inv_item), xrot, yrot, zrot, obj->scale1);
-		obj->scale1 = saved_scale;
+		float savedScale = object.Scale1;
+		object.Scale1 = scaler;
+		DrawObjectOn2DPosition(400, 300, g_Gui.ConvertInventoryItemToObject(invItem), orient, object.Scale1);
+		object.Scale1 = savedScale;
 	}
 
 	void Renderer11::DrawDiary()
 	{
-		InventoryObject* obj = &inventry_objects_list[INV_OBJECT_OPEN_DIARY];
-		short currentPage = Lara.Inventory.Diary.currentPage;
-		DrawObjectOn2DPosition(400, 300, g_Gui.ConvertInventoryItemToObject(INV_OBJECT_OPEN_DIARY), obj->xrot,
-			obj->yrot, obj->zrot, obj->scale1);
+		unsigned int currentPage = Lara.Inventory.Diary.CurrentPage;
 
-		for (int i = 0; i < MaxStringsPerPage; i++)
+		const auto& object = InventoryObjectTable[INV_OBJECT_OPEN_DIARY];
+
+		DrawObjectOn2DPosition(400, 300, g_Gui.ConvertInventoryItemToObject(INV_OBJECT_OPEN_DIARY), object.Orientation, object.Scale1);
+
+		for (size_t i = 0; i < MAX_DIARY_STRINGS_PER_PAGE; i++)
 		{
-			if (!Lara.Inventory.Diary.Pages[Lara.Inventory.Diary.currentPage].Strings[i].x && !Lara.Inventory.Diary.Pages[Lara.Inventory.Diary.currentPage].
-				Strings[i].y && !Lara.Inventory.Diary.Pages[Lara.Inventory.Diary.currentPage].Strings[i].stringID)
+			if (!Lara.Inventory.Diary.Pages[Lara.Inventory.Diary.CurrentPage].Strings[i].Position.x && !Lara.Inventory.Diary.Pages[Lara.Inventory.Diary.CurrentPage].
+				Strings[i].Position.y && !Lara.Inventory.Diary.Pages[Lara.Inventory.Diary.CurrentPage].Strings[i].StringID)
 				break;
 
 			//AddString(Lara.Diary.Pages[currentPage].Strings[i].x, Lara.Diary.Pages[currentPage].Strings[i].y, g_GameFlow->GetString(Lara.Diary.Pages[currentPage].Strings[i].stringID), PRINTSTRING_COLOR_WHITE, 0);
@@ -758,8 +758,8 @@ namespace TEN::Renderer
 
 		if (CurrentLevel == 0)
 		{
-			Menu title_menu = g_Gui.GetMenuToDisplay();
-			bool drawLogo = (title_menu == Menu::Title || title_menu == Menu::Options);
+			auto titleMenu = g_Gui.GetMenuToDisplay();
+			bool drawLogo = (titleMenu == Menu::Title || titleMenu == Menu::Options);
 
 			if (drawLogo)
 			{
@@ -782,7 +782,7 @@ namespace TEN::Renderer
 				m_spriteBatch->End();
 			}
 
-			RenderTitleMenu(title_menu);
+			RenderTitleMenu(titleMenu);
 		}
 		else
 		{

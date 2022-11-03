@@ -83,13 +83,13 @@ bool TryModifyWeapon(LaraInfo& lara, GAME_OBJECT_ID objectID, std::optional<int>
 		}
 
 		if (HolsterType::Hips == weaponPickup.Holster &&
-			lara.Control.Weapon.HolsterInfo.LeftHolster == HolsterSlotForWeapon(weaponPickup.LaraWeaponType))
+			lara.Control.Weapon.HolsterInfo.LeftHolster == GetWeaponHolsterSlot(weaponPickup.LaraWeaponType))
 		{
 			lara.Control.Weapon.HolsterInfo.LeftHolster = HolsterSlot::Empty;
 			lara.Control.Weapon.HolsterInfo.RightHolster = HolsterSlot::Empty;
 		}
 		else if (HolsterType::Back == weaponPickup.Holster &&
-			lara.Control.Weapon.HolsterInfo.BackHolster == HolsterSlotForWeapon(weaponPickup.LaraWeaponType))
+			lara.Control.Weapon.HolsterInfo.BackHolster == GetWeaponHolsterSlot(weaponPickup.LaraWeaponType))
 		{
 			lara.Control.Weapon.HolsterInfo.BackHolster = HolsterSlot::Empty;
 		}

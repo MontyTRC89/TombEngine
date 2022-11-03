@@ -18,7 +18,7 @@
 using namespace TEN::Math::Random;
 
 constexpr auto FLARE_MAIN_COLOR = Vector3(0.8f, 0.42947f, 0.2921f);
-constexpr auto FLARE_LIFE_MAX = 60 * FPS;	// 60 * 30 frames = 60 seconds.
+constexpr auto FLARE_LIFE_MAX = 60 * FPS;
 
 void FlareControl(short itemNumber)
 {
@@ -47,7 +47,7 @@ void FlareControl(short itemNumber)
 		flareItem->Animation.Velocity.z * phd_cos(flareItem->Pose.Orientation.y)
 	);
 
-	auto oldPos = flareItem->Pose.Position;
+	auto prevPos = flareItem->Pose.Position;
 	flareItem->Pose.Position += Vector3i(velocity.x, 0, velocity.z);
 
 	if (TestEnvironment(ENV_FLAG_WATER, flareItem) ||
@@ -60,7 +60,7 @@ void FlareControl(short itemNumber)
 		flareItem->Animation.Velocity.y += 6;
 
 	flareItem->Pose.Position.y += flareItem->Animation.Velocity.y;
-	DoProjectileDynamics(itemNumber, oldPos.x, oldPos.y, oldPos.z, velocity.x, velocity.y, velocity.z);
+	DoProjectileDynamics(itemNumber, prevPos.x, prevPos.y, prevPos.z, velocity.x, velocity.y, velocity.z);
 
 	int& life = flareItem->Data;
 	life &= 0x7FFF;
@@ -75,7 +75,7 @@ void FlareControl(short itemNumber)
 	else
 		life++;
 
-	if (DoFlareLight((Vector3i*)&flareItem->Pose, life))
+	if (DoFlareLight(flareItem->Pose.Position, life))
 	{
 		TriggerChaffEffects(flareItem, life);
 		/* Hardcoded code */
@@ -345,7 +345,7 @@ void CreateFlare(ItemInfo* laraItem, GAME_OBJECT_ID objectNumber, bool isThrown)
 		{
 			flareItem->Data = (int)0;
 			int& life = flareItem->Data;
-			if (DoFlareLight((Vector3i*)&flareItem->Pose, lara->Flare.Life))
+			if (DoFlareLight(flareItem->Pose.Position, lara->Flare.Life))
 				life = lara->Flare.Life | 0x8000;
 			else
 				life = lara->Flare.Life & 0x7FFF;
@@ -369,7 +369,7 @@ void DoFlareInHand(ItemInfo* laraItem, int flareLife)
 
 	auto pos = GetJointPosition(laraItem, LM_LHAND, Vector3i(11, 32, 41));
 
-	if (DoFlareLight(&pos, flareLife))
+	if (DoFlareLight(pos, flareLife))
 		TriggerChaffEffects(flareLife);
 
 	/* Hardcoded code */
@@ -389,22 +389,24 @@ void DoFlareInHand(ItemInfo* laraItem, int flareLife)
 		lara->Flare.Life++;
 }
 
-bool DoFlareLight(Vector3i* pos, int flareLife)
+bool DoFlareLight(const Vector3i& pos, int flareLife)
 {
 	if (flareLife >= FLARE_LIFE_MAX || flareLife == 0)
 		return false;
 
-	float random = GenerateFloat();
+	float randomFloat = GenerateFloat();
 
-	int x = pos->x + (random * 120);
-	int y = pos->y + (random * 120) - CLICK(1);
-	int z = pos->z + (random * 120);
+	auto lightPos = Vector3i(
+		randomFloat * 120,
+		(randomFloat * 120) - CLICK(1),
+		randomFloat * 120
+	) + pos;
 
 	bool result = false;
-	bool ending = (flareLife > (FLARE_LIFE_MAX - 90));
-	bool dying  = (flareLife > (FLARE_LIFE_MAX - 5));
+	bool isEnding = (flareLife > (FLARE_LIFE_MAX - 90));
+	bool isDying  = (flareLife > (FLARE_LIFE_MAX - 5));
 
-	if (dying)
+	if (isDying)
 	{
 		int falloff = 6 * (1.0f - (flareLife / FLARE_LIFE_MAX));
 
@@ -412,11 +414,11 @@ bool DoFlareLight(Vector3i* pos, int flareLife)
 		int g = FLARE_MAIN_COLOR.y * 255;
 		int b = FLARE_MAIN_COLOR.z * 255;
 
-		TriggerDynamicLight(x, y, z, falloff, r, g, b);
+		TriggerDynamicLight(lightPos.x, lightPos.y, lightPos.z, falloff, r, g, b);
 
-		result = (random < 0.9f);
+		result = (randomFloat < 0.9f);
 	}
-	else if (ending)
+	else if (isEnding)
 	{
 		float multiplier = GenerateFloat(0.05f, 1.0f);
 		int falloff = 8 * multiplier;
@@ -424,9 +426,9 @@ bool DoFlareLight(Vector3i* pos, int flareLife)
 		int r = FLARE_MAIN_COLOR.x * 255 * multiplier;
 		int g = FLARE_MAIN_COLOR.y * 255 * multiplier;
 		int b = FLARE_MAIN_COLOR.z * 255 * multiplier;
-		TriggerDynamicLight(x, y, z, falloff, r, g, b);
+		TriggerDynamicLight(lightPos.x, lightPos.y, lightPos.z, falloff, r, g, b);
 
-		result = (random < 0.4f);
+		result = (randomFloat < 0.4f);
 	}
 	else
 	{
@@ -436,10 +438,10 @@ bool DoFlareLight(Vector3i* pos, int flareLife)
 		int r = FLARE_MAIN_COLOR.x * 255 * multiplier;
 		int g = FLARE_MAIN_COLOR.y * 255 * multiplier;
 		int b = FLARE_MAIN_COLOR.z * 255 * multiplier;
-		TriggerDynamicLight(x, y, z, falloff, r, g, b);
+		TriggerDynamicLight(lightPos.x, lightPos.y, lightPos.z, falloff, r, g, b);
 
-		result = (random < 0.3f);
+		result = (randomFloat < 0.3f);
 	}
 
-	return ((dying || ending) ? result : true);
+	return ((isDying || isEnding) ? result : true);
 }

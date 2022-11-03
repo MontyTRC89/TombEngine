@@ -17,7 +17,7 @@
 #include "Math/Math.h"
 #include "Objects/Generic/Object/burning_torch.h"
 #include "Sound/sound.h"
-#include "Specific/input.h"
+#include "Specific/Input/Input.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
@@ -146,7 +146,10 @@ void DoLookAround(ItemInfo* item, bool invertVerticalAxis)
 	if (lara->Control.Look.Mode == LookMode::Vertical ||
 		lara->Control.Look.Mode == LookMode::Free)
 	{
-		TrInput &= ~IN_DIRECTION;
+		ClearAction(In::Forward);
+		ClearAction(In::Back);
+		ClearAction(In::Left);
+		ClearAction(In::Right);
 	}
 	else
 		TrInput &= ~(IN_LEFT | IN_RIGHT);
@@ -878,6 +881,9 @@ void BounceCamera(ItemInfo* item, short bounce, short maxDistance)
 void LaserSightCamera(ItemInfo* item)
 {
 	auto* lara = GetLaraInfo(item);
+	auto& ammo = GetAmmo(*lara, lara->Control.Weapon.GunType);
+
+	bool isFiring = false;
 
 	if (WeaponDelay)
 		WeaponDelay--;
@@ -885,12 +891,9 @@ void LaserSightCamera(ItemInfo* item)
 	if (LSHKTimer)
 		LSHKTimer--;
 
-	bool isFiring = false;
-	auto& ammo = GetAmmo(item, lara->Control.Weapon.GunType);
-
-	if (!(RawInput & IN_ACTION) || WeaponDelay || !ammo)
+	if (!IsHeld(In::Action) || WeaponDelay || !ammo)
 	{
-		if (!(RawInput & IN_ACTION))
+		if (!IsHeld(In::Action))
 		{
 			LSHKShotsFired = 0;
 			Camera.bounce = 0;
@@ -904,7 +907,7 @@ void LaserSightCamera(ItemInfo* item)
 			WeaponDelay = 16;
 			Statistics.Game.AmmoUsed++;
 
-			if (!ammo.hasInfinite())
+			if (!ammo.HasInfinite())
 				(ammo)--;
 
 			Camera.bounce = -16 - (GetRandomControl() & 0x1F);
@@ -996,7 +999,7 @@ void LaserSightCamera(ItemInfo* item)
 				}
 			}
 
-			if (!ammo.hasInfinite())
+			if (!ammo.HasInfinite())
 				(ammo)--;
 		}
 	}
@@ -1010,10 +1013,12 @@ void BinocularCamera(ItemInfo* item)
 
 	if (!LaserSight)
 	{
-		// TODO: Some of these inputs should ideally be blocked. @Sezz 2022.05.19
-		if (RawInput & (IN_DESELECT | IN_OPTION | IN_LOOK | IN_DRAW | IN_FLARE | IN_WALK | IN_JUMP))
+		if (IsClicked(In::Deselect) ||
+			IsClicked(In::DrawWeapon) ||
+			IsClicked(In::Look) ||
+			IsHeld(In::Flare))
 		{
-			item->MeshBits = ALL_JOINT_BITS;
+			item->MeshBits.SetAll();
 			lara->Inventory.IsBusy = false;
 			lara->ExtraHeadRot = EulerAngles::Zero;
 			lara->ExtraTorsoRot = EulerAngles::Zero;
@@ -1113,21 +1118,8 @@ void BinocularCamera(ItemInfo* item)
 
 	Camera.oldType = Camera.type;
 
-	int range = 0;
-	int flags = 0;
-
-	if (!(RawInput & IN_WALK))
-	{
-		range = 64;
-		flags = 0x10000;
-	}
-	else
-	{
-		range = 32;
-		flags = 0x8000;
-	}
-
-	if (RawInput & IN_SPRINT)
+	int range = IsHeld(In::Walk) ? ANGLE(0.18f) : ANGLE(0.35f);
+	if (IsHeld(In::Sprint) && !IsHeld(In::Crouch))
 	{
 		BinocularRange -= range;
 		if (BinocularRange < ANGLE(0.7f))
@@ -1135,7 +1127,7 @@ void BinocularCamera(ItemInfo* item)
 		else
 			SoundEffect(SFX_TR4_BINOCULARS_ZOOM, nullptr, SoundEnvironment::Land, 0.9f);
 	}
-	else if (RawInput & IN_CROUCH)
+	else if (IsHeld(In::Crouch) && !IsHeld(In::Sprint))
 	{
 		BinocularRange += range;
 		if (BinocularRange > ANGLE(8.5f))
@@ -1144,17 +1136,17 @@ void BinocularCamera(ItemInfo* item)
 			SoundEffect(SFX_TR4_BINOCULARS_ZOOM, nullptr, SoundEnvironment::Land, 1.0f);
 	}
 
-	if (!LaserSight)
+	if (LaserSight)
+		LaserSightCamera(item);
+	else
 	{
 		auto origin = Camera.pos.ToVector3i();
 		auto target = Camera.target.ToVector3i();
 		GetTargetOnLOS(&Camera.pos, &Camera.target, false, false);
 
-		if (RawInput & IN_ACTION)
+		if (IsHeld(In::Action))
 			LaraTorch(&origin, &target, lara->ExtraHeadRot.y, 192);
 	}
-	else
-		LaserSightCamera(item);
 }
 
 void ConfirmCameraTargetPos()
@@ -1752,7 +1744,7 @@ void UpdateFadeScreenAndCinematicBars()
 	}
 }
 
-void HandleOptics()
+void HandleOptics(ItemInfo* item)
 {
 	bool breakOptics = true;
 
@@ -1770,10 +1762,6 @@ void HandleOptics()
 	if ((Lara.Control.IsLow || TrInput & IN_CROUCH) &&
 		(LaraItem->Animation.TargetState == LS_CROUCH_IDLE || LaraItem->Animation.AnimNumber == LA_CROUCH_IDLE))
 		breakOptics = false;
-
-	// If any input but optic controls (directions + action), immediately exit optics.
-	if ((TrInput & ~IN_OPTIC_CONTROLS) != IN_NONE)
-		breakOptics = true;
 
 	// If lasersight, and no look is pressed, exit optics.
 	if (LaserSight && !(TrInput & IN_LOOK))
