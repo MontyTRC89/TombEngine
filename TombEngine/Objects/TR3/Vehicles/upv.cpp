@@ -227,7 +227,7 @@ namespace TEN::Entities::Vehicles
 		auto UPV = GetUPVInfo(UPVItem);
 		auto* lara = GetLaraInfo(laraItem);
 
-		auto& ammo = GetAmmo(laraItem, LaraWeaponType::HarpoonGun);
+		auto& ammo = GetAmmo(*lara, LaraWeaponType::HarpoonGun);
 		if (ammo.GetCount() == 0 && !ammo.HasInfinite())
 			return;
 		else if (!ammo.HasInfinite())

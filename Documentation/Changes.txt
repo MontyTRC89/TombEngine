@@ -5,6 +5,7 @@ Version 1.0.3
 * Add FlipMap and PlayFlyBy script commands and node functions.
 * Add OCB 1 for rollingball to make it silent.
 * Add FlyCheat option to gameflow script for disabling dozy mode.
+* Add SetNumberOfSecrets option to gameflow script to set overall amount of secrets.
 * Adjust sprint jump timing.
 * Implement sprite instancing to speed up rendering.
 * Merge portals at runtime to speed up rendering.
@@ -19,7 +20,7 @@ Version 1.0.3
 * Fix TR3 monkey level crash.
 * Fix occasional ejections when landing on a slope.
 * Fix occasional ejections when climbing up on a ledge under a slope.
-* Fix pushables not being pushable on top of other pushables.
+* Fix pushables not being pushable on top of bridges and other pushables.
 * Fix pushables having incorrect collision when bounding box is bigger than 1 sector.
 * Fix grabbing narrow ledges below ceilings.
 * Fix slow centaur projectile velocity.

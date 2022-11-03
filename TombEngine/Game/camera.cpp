@@ -1083,7 +1083,7 @@ void BounceCamera(ItemInfo* item, short bounce, short maxDistance)
 void LaserSightCamera(ItemInfo* item)
 {
 	auto* lara = GetLaraInfo(item);
-	auto& ammo = GetAmmo(item, lara->Control.Weapon.GunType);
+	auto& ammo = GetAmmo(*lara, lara->Control.Weapon.GunType);
 
 	bool firing = false;
 
