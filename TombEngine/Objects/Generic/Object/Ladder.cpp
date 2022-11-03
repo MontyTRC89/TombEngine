@@ -142,12 +142,8 @@ namespace TEN::Entities::Generic
 			{
 				if (!laraItem->OffsetBlend.IsActive)
 				{
-					auto mountOffset = LadderMountFrontBasis.PosOffset + Vector3i(0, 0, GameBoundingBox(&ladderItem).Z1);
-
-					auto targetPos = Geometry::TranslatePoint(ladderItem.Pose.Position, ladderItem.Pose.Orientation, mountOffset);
-					auto posOffset = (targetPos - laraItem->Pose.Position).ToVector3();
-					auto orientOffset = (ladderItem.Pose.Orientation + LadderMountFrontBasis.OrientOffset) - laraItem->Pose.Orientation;
-					laraItem->SetOffsetBlend(posOffset, orientOffset);
+					auto boundsOffset = Vector3i(0, 0, GameBoundingBox(&ladderItem).Z1);
+					LadderMountFrontBasis.SetEntityOffsetBlend(ladderItem, *laraItem, boundsOffset);
 
 					SetAnimation(laraItem, LA_LADDER_MOUNT_FRONT);
 					player.Control.IsMoving = false;

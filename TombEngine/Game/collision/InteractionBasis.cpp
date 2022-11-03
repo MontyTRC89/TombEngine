@@ -67,4 +67,17 @@ using namespace TEN::Math;
 
 		return true;
 	}
+
+	void InteractionBasis::SetEntityOffsetBlend(ItemInfo& entity0, ItemInfo& entity1, const Vector3i extraPosOffset, const EulerAngles& extraOrientOffset) const
+	{
+		auto finalPosOffset = PosOffset + extraPosOffset;
+		auto finalOrientOffset = OrientOffset + extraOrientOffset;
+
+		auto targetPos = Geometry::TranslatePoint(entity0.Pose.Position, entity0.Pose.Orientation, finalPosOffset);
+		auto targetOrient = entity0.Pose.Orientation + finalOrientOffset;
+
+		auto absPosOffset = (targetPos - entity1.Pose.Position).ToVector3();
+		auto absOrientOffset = targetOrient - entity1.Pose.Orientation;
+		entity1.SetOffsetBlend(absPosOffset, absOrientOffset);
+	}
 //}
