@@ -196,27 +196,30 @@ void LookCamera(ItemInfo* item)
 	// - Room probing.
 	// - Swamp collision.
 
-	// Define camera orientation.
+	auto pivotOffset = Vector3();
+
+	// Define absolute camera orientation.
 	auto orient = lara->Control.Look.Orientation + EulerAngles(0, item->Pose.Orientation.y, 0);
 
 	// Define landmarks.
-	auto pivot = Geometry::TranslatePoint(item->Pose.Position, item->Pose.Orientation.y, CLICK(0.25f), -(LaraCollision.Setup.Height + CLICK(0.25f)));
-	auto idealPos = Geometry::TranslatePoint(pivot, orient, -std::max(Camera.targetDistance * 0.5f, SECTOR(0.5f)));
-	auto lookAtPos = Geometry::TranslatePoint(pivot, orient, CLICK(0.75f));
+	auto pivot = Geometry::TranslatePoint(item->Pose.Position, item->Pose.Orientation.y, BLOCK(1, 8), -(LaraCollision.Setup.Height + BLOCK(1, 8)));
+	auto idealPos = Geometry::TranslatePoint(pivot, orient, -std::max<float>(Camera.targetDistance * 0.5f, BLOCK(1, 2)));
+	auto lookAtPos = Geometry::TranslatePoint(pivot, orient, BLOCK(3, 8));
 
 	// Determine best position.
-	auto origin = GameVector(pivot, GetCollision(item, item->Pose.Orientation.y, CLICK(0.25f), -(LaraCollision.Setup.Height + CLICK(0.25f))).RoomNumber);
-	auto target = GameVector(idealPos, GetCollision(origin.ToVector3i(), origin.RoomNumber, orient, -std::max(Camera.targetDistance * 0.5f, SECTOR(0.5f))).RoomNumber);
+	auto origin = GameVector(pivot, GetCollision(item, item->Pose.Orientation.y, BLOCK(1, 8), -(LaraCollision.Setup.Height + BLOCK(1, 8))).RoomNumber);
+	auto target = GameVector(idealPos, GetCollision(origin.ToVector3i(), origin.RoomNumber, orient, -std::max<float>(Camera.targetDistance * 0.5f, BLOCK(1, 2))).RoomNumber);
 
 	// Handle room and object collisions.
 	LOSAndReturnTarget(&origin, &target, 0);
-	CameraCollisionBounds(&target, CLICK(1) - CLICK(0.25f) / 2, true);
-	idealPos = target.ToVector3i();
+	CameraCollisionBounds(&target, BLOCK(1, 4) - BLOCK(1, 16), true);
 	ItemsCollideCamera();
 
+	// Doesn't seem necessary? Can use player's room number.
+	//auto lookAt = GameVector(lookAtPos, GetCollision(origin.ToVector3i(), origin.RoomNumber, orient, BLOCK(3, 8)).RoomNumber);
+
 	// Smoothly update camera position.
-	//MoveCamera(&GameVector(Camera.target.ToVector3i() + (lookAtPos - Camera.target.ToVector3i()) * 0.25f, item->RoomNumber), Camera.speed);
-	Camera.pos = GameVector(Camera.pos.ToVector3i() + (idealPos - Camera.pos.ToVector3i()) * 0.25f, Camera.pos.RoomNumber);
+	MoveCamera(&target, Camera.speed);
 	Camera.target = GameVector(Camera.target.ToVector3i() + (lookAtPos - Camera.target.ToVector3i()) * 0.25f, item->RoomNumber);
 
 	LookAt(&Camera, 0);
