@@ -38,7 +38,7 @@ const auto LOOKCAM_ORIENT_CONSTRAINT = std::pair<EulerAngles, EulerAngles>(
 	EulerAngles(ANGLE(60.0f), ANGLE(90.0f), 0)
 );
 
-const auto LOOKCAM_TURN_RATE_ACCEL = ANGLE(1.0f);
+const auto LOOKCAM_TURN_RATE_ACCEL = ANGLE(0.75f);
 const auto LOOKCAM_TURN_RATE_MAX   = ANGLE(4.0f);
 
 const auto THUMBCAM_VERTICAL_CONSTRAINT_ANGLE	= ANGLE(120.0f);
@@ -127,12 +127,13 @@ void DoLookAround(ItemInfo* item, bool invertVerticalAxis)
 	player.Control.Look.TurnRate.x = ModulateLaraTurnRate(player.Control.Look.TurnRate.x, LOOKCAM_TURN_RATE_ACCEL, 0, turnRateMax, vAxisCoeff, invertVerticalAxis);
 	player.Control.Look.TurnRate.y = ModulateLaraTurnRate(player.Control.Look.TurnRate.y, LOOKCAM_TURN_RATE_ACCEL, 0, turnRateMax, hAxisCoeff, false);
 
-	// Apply and constrain turn rates.
+	// Apply turn rates.
 	player.Control.Look.Orientation += player.Control.Look.TurnRate;
 	player.Control.Look.Orientation.x = std::clamp<short>(player.Control.Look.Orientation.x, LOOKCAM_ORIENT_CONSTRAINT.first.x, LOOKCAM_ORIENT_CONSTRAINT.second.x);
 	player.Control.Look.Orientation.y = std::clamp<short>(player.Control.Look.Orientation.y, LOOKCAM_ORIENT_CONSTRAINT.first.y, LOOKCAM_ORIENT_CONSTRAINT.second.y);
 
 	// Visually adapt head and torso orientations.
+	// TODO: "Rubber band" effect.
 	player.ExtraHeadRot = player.Control.Look.Orientation / 2;
 
 	if (player.Control.HandStatus != HandStatus::Busy &&
@@ -142,7 +143,13 @@ void DoLookAround(ItemInfo* item, bool invertVerticalAxis)
 		player.ExtraTorsoRot = player.ExtraHeadRot;
 	}
 
-	// Clear directional inputs.
+	ClearLookAroundActions(item);
+}
+
+void ClearLookAroundActions(ItemInfo* item)
+{
+	const auto& player = *GetLaraInfo(item);
+
 	switch (player.Control.Look.Mode)
 	{
 	case LookMode::Vertical:
@@ -162,13 +169,6 @@ void DoLookAround(ItemInfo* item, bool invertVerticalAxis)
 		ClearAction(In::Right);
 		break;
 	}
-
-	// Debug
-	g_Renderer.PrintDebugMessage("LookMode: %d", (int)player.Control.Look.Mode);
-	g_Renderer.PrintDebugMessage("LookCam.x: %.3f", TO_DEGREES(player.Control.Look.Orientation.x));
-	g_Renderer.PrintDebugMessage("LookCam.y: %.3f", TO_DEGREES(player.Control.Look.Orientation.y));
-	g_Renderer.PrintDebugMessage("hAxisCoeff: %f", hAxisCoeff);
-	g_Renderer.PrintDebugMessage("vAxisCoeff: %f", vAxisCoeff);
 }
 
 void DoThumbstickCamera()
@@ -190,29 +190,37 @@ void DoThumbstickCamera()
 
 void LookCamera(ItemInfo* item)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* player = GetLaraInfo(item);
 
 	// TODO:
-	// - Room probing.
 	// - Swamp collision.
+	// - Set modes in states.
+	// - Check main Lara control functions.
 
-	auto pivotOffset = Vector3();
+	static constexpr auto cameraAlpha	 = 0.25f;
+	static constexpr auto cameraCollPush = BLOCK(1, 4) - BLOCK(1, 16);
+
+	// Determine offsets.
+	float verticalOffset = -LaraCollision.Setup.Height + ((LaraCollision.Setup.Height == LARA_HEIGHT_MONKEY) ? BLOCK(1, 4) : -BLOCK(1, 8));
+	auto pivotOffset = Vector3(0.0f, verticalOffset, BLOCK(1, 16));
+	float idealPosDist = -std::max<float>(Camera.targetDistance * 0.5f, BLOCK(3, 4));
+	float lookAtPosDist = BLOCK(1, 2);
 
 	// Define absolute camera orientation.
-	auto orient = lara->Control.Look.Orientation + EulerAngles(0, item->Pose.Orientation.y, 0);
+	auto orient = player->Control.Look.Orientation + EulerAngles(0, item->Pose.Orientation.y, 0);
 
 	// Define landmarks.
-	auto pivot = Geometry::TranslatePoint(item->Pose.Position, item->Pose.Orientation.y, BLOCK(1, 8), -(LaraCollision.Setup.Height + BLOCK(1, 8)));
-	auto idealPos = Geometry::TranslatePoint(pivot, orient, -std::max<float>(Camera.targetDistance * 0.5f, BLOCK(1, 2)));
-	auto lookAtPos = Geometry::TranslatePoint(pivot, orient, BLOCK(3, 8));
+	auto pivot = Geometry::TranslatePoint(item->Pose.Position, item->Pose.Orientation.y, pivotOffset.z, pivotOffset.y, pivotOffset.x); // TODO: Use functionf from ladder branch.
+	auto idealPos = Geometry::TranslatePoint(pivot, orient, idealPosDist);
+	auto lookAtPos = Geometry::TranslatePoint(pivot, orient, lookAtPosDist);
 
 	// Determine best position.
-	auto origin = GameVector(pivot, GetCollision(item, item->Pose.Orientation.y, BLOCK(1, 8), -(LaraCollision.Setup.Height + BLOCK(1, 8))).RoomNumber);
-	auto target = GameVector(idealPos, GetCollision(origin.ToVector3i(), origin.RoomNumber, orient, -std::max<float>(Camera.targetDistance * 0.5f, BLOCK(1, 2))).RoomNumber);
+	auto origin = GameVector(pivot, GetCollision(item, item->Pose.Orientation.y, pivotOffset.z, pivotOffset.y).RoomNumber);
+	auto target = GameVector(idealPos, GetCollision(origin.ToVector3i(), origin.RoomNumber, orient, idealPosDist).RoomNumber);
 
 	// Handle room and object collisions.
 	LOSAndReturnTarget(&origin, &target, 0);
-	CameraCollisionBounds(&target, BLOCK(1, 4) - BLOCK(1, 16), true);
+	CameraCollisionBounds(&target, cameraCollPush, true);
 	ItemsCollideCamera();
 
 	// Doesn't seem necessary? Can use player's room number.
@@ -220,7 +228,7 @@ void LookCamera(ItemInfo* item)
 
 	// Smoothly update camera position.
 	MoveCamera(&target, Camera.speed);
-	Camera.target = GameVector(Camera.target.ToVector3i() + (lookAtPos - Camera.target.ToVector3i()) * 0.25f, item->RoomNumber);
+	Camera.target = GameVector(Camera.target.ToVector3i() + (lookAtPos - Camera.target.ToVector3i()) * cameraAlpha, item->RoomNumber);
 
 	LookAt(&Camera, 0);
 
