@@ -1,8 +1,5 @@
 #pragma once
 
-using std::string;
-using std::vector;
-
 namespace TEN::Utils
 {
 	// TODO: Switch to std::span container type as parameter whenever we update to C++20.
@@ -12,39 +9,39 @@ namespace TEN::Utils
 	{
 	private:
 		// Components
-		vector<bool> Bits = {};
+		std::vector<bool> Bits = {};
 
 	public:
 		// Constructors
 		BitField();
 		BitField(unsigned int size);
 		BitField(unsigned int size, unsigned int packedBits);
-		BitField(const string& bitString);
-
+		BitField(const std::string& bitString);
+		
 		// Getters
 		unsigned int GetSize() const;
 		unsigned int GetCount() const;
 
 		// Setters
-		void Set(const vector<unsigned int>& indices);
+		void Set(const std::vector<unsigned int>& indices);
 		void Set(unsigned int index);
 		void SetAll();
-		void Clear(const vector<unsigned int>& indices);
+		void Clear(const std::vector<unsigned int>& indices);
 		void Clear(unsigned int index);
 		void ClearAll();
-		void Flip(const vector<unsigned int>& indices);
+		void Flip(const std::vector<unsigned int>& indices);
 		void Flip(unsigned int index);
 		void FlipAll();
 
 		// Inquirers
-		bool Test(const vector<unsigned int>& indices, bool testAny = true) const;
+		bool Test(const std::vector<unsigned int>& indices, bool testAny = true) const;
 		bool Test(unsigned int index) const;
 		bool TestAny() const;
 		bool TestAll() const;
 
 		// Converters
 		unsigned int ToPackedBits() const;
-		string		 ToString() const;
+		std::string	 ToString() const;
 
 		// Operators
 		// NOTE: packedBits will not be assessed in full if the size of the given BitField object is less than BIT_FIELD_SIZE_MAX.
