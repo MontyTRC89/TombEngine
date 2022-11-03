@@ -38,11 +38,11 @@ const auto LOOKCAM_ORIENT_CONSTRAINT = std::pair<EulerAngles, EulerAngles>(
 	EulerAngles(ANGLE(60.0f), ANGLE(90.0f), 0)
 );
 
-#define LOOKCAM_TURN_RATE_ACCEL ANGLE(1.0f)
-#define LOOKCAM_TURN_RATE_MAX	ANGLE(4.0f)
+const auto LOOKCAM_TURN_RATE_ACCEL = ANGLE(1.0f);
+const auto LOOKCAM_TURN_RATE_MAX   = ANGLE(4.0f);
 
-#define THUMBCAM_VERTICAL_CONSTRAINT_ANGLE   ANGLE(120.0f)
-#define THUMBCAM_HORIZONTAL_CONSTRAINT_ANGLE ANGLE(80.0f)
+const auto THUMBCAM_VERTICAL_CONSTRAINT_ANGLE	= ANGLE(120.0f);
+const auto THUMBCAM_HORIZONTAL_CONSTRAINT_ANGLE = ANGLE(80.0f);
 
 struct OLD_CAMERA
 {
@@ -99,14 +99,14 @@ float CinematicBarsSpeed = 0;
 
 void DoLookAround(ItemInfo* item, bool invertVerticalAxis)
 {
-	auto* lara = GetLaraInfo(item);
+	auto& player = *GetLaraInfo(item);
 
 	Camera.type = CameraType::Look;
 
 	// Determine vertical axis coefficient.
 	float vAxisCoeff = 0.0f;
 	if ((IsHeld(In::Forward) || IsHeld(In::Back)) &&
-		(lara->Control.Look.Mode == LookMode::Vertical || lara->Control.Look.Mode == LookMode::Free))
+		(player.Control.Look.Mode == LookMode::Vertical || player.Control.Look.Mode == LookMode::Free))
 	{
 		vAxisCoeff = AxisMap[InputAxis::MoveVertical];
 	}
@@ -114,7 +114,7 @@ void DoLookAround(ItemInfo* item, bool invertVerticalAxis)
 	// Determine horizontal axis coefficient.
 	float hAxisCoeff = 0.0f;
 	if ((IsHeld(In::Left) || IsHeld(In::Right)) &&
-		(lara->Control.Look.Mode == LookMode::Horizontal || lara->Control.Look.Mode == LookMode::Free))
+		(player.Control.Look.Mode == LookMode::Horizontal || player.Control.Look.Mode == LookMode::Free))
 	{
 		hAxisCoeff = AxisMap[InputAxis::MoveHorizontal];
 	}
@@ -124,26 +124,26 @@ void DoLookAround(ItemInfo* item, bool invertVerticalAxis)
 	if (BinocularRange)
 		turnRateMax *= (BinocularRange - ANGLE(10.0f)) / ANGLE(17.0f);
 
-	lara->Control.Look.TurnRate.x = ModulateLaraTurnRate(lara->Control.Look.TurnRate.x, LOOKCAM_TURN_RATE_ACCEL, 0, turnRateMax, vAxisCoeff, invertVerticalAxis);
-	lara->Control.Look.TurnRate.y = ModulateLaraTurnRate(lara->Control.Look.TurnRate.y, LOOKCAM_TURN_RATE_ACCEL, 0, turnRateMax, hAxisCoeff, false);
+	player.Control.Look.TurnRate.x = ModulateLaraTurnRate(player.Control.Look.TurnRate.x, LOOKCAM_TURN_RATE_ACCEL, 0, turnRateMax, vAxisCoeff, invertVerticalAxis);
+	player.Control.Look.TurnRate.y = ModulateLaraTurnRate(player.Control.Look.TurnRate.y, LOOKCAM_TURN_RATE_ACCEL, 0, turnRateMax, hAxisCoeff, false);
 
 	// Apply and constrain turn rates.
-	lara->Control.Look.Orientation += lara->Control.Look.TurnRate;
-	lara->Control.Look.Orientation.x = std::clamp<short>(lara->Control.Look.Orientation.x, LOOKCAM_ORIENT_CONSTRAINT.first.x, LOOKCAM_ORIENT_CONSTRAINT.second.x);
-	lara->Control.Look.Orientation.y = std::clamp<short>(lara->Control.Look.Orientation.y, LOOKCAM_ORIENT_CONSTRAINT.first.y, LOOKCAM_ORIENT_CONSTRAINT.second.y);
+	player.Control.Look.Orientation += player.Control.Look.TurnRate;
+	player.Control.Look.Orientation.x = std::clamp<short>(player.Control.Look.Orientation.x, LOOKCAM_ORIENT_CONSTRAINT.first.x, LOOKCAM_ORIENT_CONSTRAINT.second.x);
+	player.Control.Look.Orientation.y = std::clamp<short>(player.Control.Look.Orientation.y, LOOKCAM_ORIENT_CONSTRAINT.first.y, LOOKCAM_ORIENT_CONSTRAINT.second.y);
 
 	// Visually adapt head and torso orientations.
-	lara->ExtraHeadRot = lara->Control.Look.Orientation / 2;
+	player.ExtraHeadRot = player.Control.Look.Orientation / 2;
 
-	if (lara->Control.HandStatus != HandStatus::Busy &&
-		!lara->LeftArm.Locked && !lara->RightArm.Locked &&
-		lara->Vehicle == NO_ITEM)
+	if (player.Control.HandStatus != HandStatus::Busy &&
+		!player.LeftArm.Locked && !player.RightArm.Locked &&
+		player.Vehicle == NO_ITEM)
 	{
-		lara->ExtraTorsoRot = lara->ExtraHeadRot;
+		player.ExtraTorsoRot = player.ExtraHeadRot;
 	}
 
 	// Clear directional inputs.
-	switch (lara->Control.Look.Mode)
+	switch (player.Control.Look.Mode)
 	{
 	case LookMode::Vertical:
 		ClearAction(In::Forward);
@@ -164,9 +164,9 @@ void DoLookAround(ItemInfo* item, bool invertVerticalAxis)
 	}
 
 	// Debug
-	g_Renderer.PrintDebugMessage("LookMode: %d", (int)lara->Control.Look.Mode);
-	g_Renderer.PrintDebugMessage("LookCam.x: %.3f", TO_DEGREES(lara->Control.Look.Orientation.x));
-	g_Renderer.PrintDebugMessage("LookCam.y: %.3f", TO_DEGREES(lara->Control.Look.Orientation.y));
+	g_Renderer.PrintDebugMessage("LookMode: %d", (int)player.Control.Look.Mode);
+	g_Renderer.PrintDebugMessage("LookCam.x: %.3f", TO_DEGREES(player.Control.Look.Orientation.x));
+	g_Renderer.PrintDebugMessage("LookCam.y: %.3f", TO_DEGREES(player.Control.Look.Orientation.y));
 	g_Renderer.PrintDebugMessage("hAxisCoeff: %f", hAxisCoeff);
 	g_Renderer.PrintDebugMessage("vAxisCoeff: %f", vAxisCoeff);
 }
