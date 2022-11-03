@@ -84,9 +84,9 @@ namespace TEN::Entities::Generic
 		)
 	);
 
-	const auto LadderMountFrontOffset = LadderMountedOffset;
-	const auto LadderMountFrontOrient = EulerAngles::Zero;
 	const auto LadderMountFrontBasis = InteractionBasis(
+		LadderMountedOffset,
+		EulerAngles::Zero,
 		LadderInteractBounds,
 		std::pair(
 			EulerAngles(ANGLE(-10.0f), -LARA_GRAB_THRESHOLD, ANGLE(-10.0f)),
@@ -142,11 +142,11 @@ namespace TEN::Entities::Generic
 			{
 				if (!laraItem->OffsetBlend.IsActive)
 				{
-					auto mountOffset = LadderMountFrontOffset + Vector3i(0, 0, GameBoundingBox(&ladderItem).Z1);
+					auto mountOffset = LadderMountFrontBasis.PosOffset + Vector3i(0, 0, GameBoundingBox(&ladderItem).Z1);
 
 					auto targetPos = Geometry::TranslatePoint(ladderItem.Pose.Position, ladderItem.Pose.Orientation, mountOffset);
 					auto posOffset = (targetPos - laraItem->Pose.Position).ToVector3();
-					auto orientOffset = (ladderItem.Pose.Orientation + LadderMountFrontOrient) - laraItem->Pose.Orientation;
+					auto orientOffset = (ladderItem.Pose.Orientation + LadderMountFrontBasis.OrientOffset) - laraItem->Pose.Orientation;
 					laraItem->SetOffsetBlend(posOffset, orientOffset);
 
 					SetAnimation(laraItem, LA_LADDER_MOUNT_FRONT);
@@ -232,7 +232,7 @@ namespace TEN::Entities::Generic
 					int vOffset = -abs(playerVPos - ladderVPos) / LADDER_STEP_HEIGHT;
 					auto mountOffset = Vector3i(0, vOffset, ladderBounds.Z1) + LadderMountedOffset;
 
-					if (AlignPlayerToEntity(&ladderItem, laraItem, mountOffset, LadderMountFrontOrient, true))
+					if (AlignPlayerToEntity(&ladderItem, laraItem, mountOffset, LadderMountFrontBasis.OrientOffset, true))
 					{
 						// Reaching.
 						if (laraItem->Animation.ActiveState == LS_REACH)
