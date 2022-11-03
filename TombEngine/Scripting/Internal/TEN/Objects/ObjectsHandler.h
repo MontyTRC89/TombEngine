@@ -65,14 +65,20 @@ private:
 	}
 
 	template <typename R, char const* S>
-	std::vector <int> GetBySlot(std::string const& slot)
+	std::vector <string> GetBySlot(int slot)
 	{
-		std::vector<int> items = {};
+		std::vector<string> items = {};
 		for (auto& [key, val] : m_nameMap)
 		{
-			std::string bla = key;
-			VarMapVal blub = val;
+			if (std::holds_alternative<std::reference_wrapper<MESH_INFO>>(val))
+			{
+				auto meshInfo = std::get<std::reference_wrapper<MESH_INFO>>(val).get();
+				int staticNumber = meshInfo.staticNumber;
+				int slotNr = slot;
 
+				if (staticNumber == slotNr)
+					items.push_back(key);
+			}
 		}
 
 		return items;
