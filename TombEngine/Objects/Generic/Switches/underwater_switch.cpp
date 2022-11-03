@@ -1,14 +1,15 @@
 #include "framework.h"
-#include "Specific/Input/Input.h"
-#include "Game/Lara/lara.h"
-#include "Game/Lara/lara_helpers.h"
 #include "Objects/Generic/Switches/underwater_switch.h"
-#include "Objects/Generic/Switches/generic_switch.h"
+
+#include "Game/animation.h"
 #include "Game/camera.h"
 #include "Game/collision/collide_item.h"
-#include "Specific/level.h"
-#include "Game/animation.h"
 #include "Game/items.h"
+#include "Game/Lara/lara.h"
+#include "Game/Lara/lara_helpers.h"
+#include "Objects/Generic/Switches/generic_switch.h"
+#include "Specific/Input/Input.h"
+#include "Specific/level.h"
 
 using namespace TEN::Input;
 
@@ -20,7 +21,7 @@ namespace TEN::Entities::Switches
 		GameBoundingBox(
 			-BLOCK(3, 8), BLOCK(3, 8),
 			-BLOCK(3, 8), BLOCK(3, 8),
-			-BLOCK(1), BLOCK(1, 4)
+			0, BLOCK(3, 4)
 		),
 		std::pair(
 			EulerAngles(ANGLE(-80.0f), ANGLE(-80.0f), ANGLE(-80.0f)),
@@ -110,7 +111,7 @@ namespace TEN::Entities::Switches
 		auto* lara = GetLaraInfo(laraItem);
 		auto* switchItem = &g_Level.Items[itemNumber];
 
-		bool flag = false;
+		bool doInteraction = false;
 
 		if ((TrInput & IN_ACTION &&
 			laraItem->Animation.ActiveState == LS_UNDERWATER_IDLE &&
@@ -123,7 +124,7 @@ namespace TEN::Entities::Switches
 			if (TestLaraPosition(CeilingUnderwaterSwitchBounds1, switchItem, laraItem))
 			{
 				if (MoveLaraPosition(CeilingUnderwaterSwitchPos1, switchItem, laraItem))
-					flag = true;
+					doInteraction = true;
 				else
 					lara->InteractedItem = itemNumber;
 			}
@@ -134,7 +135,7 @@ namespace TEN::Entities::Switches
 				if (TestLaraPosition(CeilingUnderwaterSwitchBounds2, switchItem, laraItem))
 				{
 					if (MoveLaraPosition(CeilingUnderwaterSwitchPos2, switchItem, laraItem))
-						flag = true;
+						doInteraction = true;
 					else
 						lara->InteractedItem = itemNumber;
 				}
@@ -142,7 +143,7 @@ namespace TEN::Entities::Switches
 				laraItem->Pose.Orientation.y ^= (short)ANGLE(180.0f);
 			}
 
-			if (flag)
+			if (doInteraction)
 			{
 				SetAnimation(laraItem, LA_UNDERWATER_CEILING_SWITCH_PULL);
 				laraItem->Animation.Velocity.y = 0;
