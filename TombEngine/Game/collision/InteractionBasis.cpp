@@ -18,12 +18,12 @@ using namespace TEN::Math;
 
 	bool InteractionBasis::TestInteraction(const ItemInfo& entity0, const ItemInfo& entity1, const GameBoundingBox& boundsExtension) const
 	{
-		if (entity1.IsLara())
+		/*if (entity1.IsLara())
 		{
 			const auto& player = GetLaraInfo(entity1);
 			if (player.InteractedItem != NO_ITEM)
 				return false;
-		}
+		}*/
 
 		return this->TestInteraction(entity0.Pose, entity1.Pose);
 	}

@@ -7,6 +7,7 @@
 #include "Game/Lara/lara.h"
 #include "Math/Math.h"
 #include "Objects/ScriptInterfaceObjectsHandler.h"
+#include "Renderer/Renderer11.h"
 #include "Scripting/Include/ScriptInterfaceGame.h"
 #include "Sound/sound.h"
 #include "Specific/Input/Input.h"
