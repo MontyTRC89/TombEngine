@@ -11,14 +11,12 @@ using namespace TEN::Math;
 
 namespace TEN::Gui
 {
-	/*
-	* To add an object to the inventory, introduce entries to the
-	* InventoryObjectTypes and InventoryObjectTable arrays at corresponding indices.
-	* 
-	* NOTE: Also add the object to the proper list construction function.
-	* If it's a weapon, add its ammo handling (variables at the beginning of the file).
-	* If it's combineable, add necessary data to the CombineTable awway and increment MAX_COMBINES.
-	*/
+	// To add an object to the inventory, introduce entries to the
+	// InventoryObjectTypes and InventoryObjectTable arrays at corresponding indices.
+	// 
+	// NOTE: Also add the object to the proper list construction function.
+	// If it's a weapon, add its ammo handling (variables at the beginning of the file).
+	// If it's combineable, add necessary data to the CombineTable awway and increment MAX_COMBINES.
 
 	InventoryObject InventoryObjectTable[INVENTORY_TABLE_SIZE] =
 	{
