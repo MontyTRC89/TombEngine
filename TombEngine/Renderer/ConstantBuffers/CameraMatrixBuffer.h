@@ -17,6 +17,8 @@ namespace TEN
 			//--
 			alignas(16) Matrix Projection;
 			//--
+			alignas(16) Matrix InverseProjection;
+			//--
 			alignas(16) Vector4 CamPositionWS;
 			//--
 			alignas(16) Vector4 CamDirectionWS;
@@ -31,6 +33,9 @@ namespace TEN
 			alignas(16) Vector4 FogColor;
 			alignas(4) int FogMinDistance;
 			alignas(4) int FogMaxDistance;
+
+			alignas(4) float NearPlane;
+			alignas(4) float FarPlane;
 		};
 	}
 }
