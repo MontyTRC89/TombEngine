@@ -558,7 +558,10 @@ bool TestBlockMovable(ItemInfo* item, int blockHeight)
 	if (probe.Block->IsWall(probe.Block->SectorPlane(item->Pose.Position.x, item->Pose.Position.z)))
 		return false;
 
-	int height = probe.Position.Floor + blockHeight;
+	int height = probe.Position.Floor;
+	if (((PushableInfo*)item->Data)->hasFloorCeiling)
+		height += blockHeight;
+
 	if (height != item->Pose.Position.y)
 		return false;
 

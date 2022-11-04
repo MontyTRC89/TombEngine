@@ -235,7 +235,7 @@ void ObjectObjects()
 		obj = &Objects[objNum];
 		if (obj->loaded)
 		{
-			obj->control = ControlWaterfall;
+			obj->control = nullptr;
 			obj->saveFlags = true;
 		}
 	}
@@ -243,14 +243,14 @@ void ObjectObjects()
 	obj = &Objects[ID_WATERFALLSS1];
 	if (obj->loaded)
 	{
-		obj->control = ControlWaterfall;
+		obj->control = nullptr;
 		obj->saveFlags = true;
 	}
 
 	obj = &Objects[ID_WATERFALLSS2];
 	if (obj->loaded)
 	{
-		obj->control = ControlWaterfall;
+		obj->control = nullptr;
 		obj->saveFlags = true;
 	}
 

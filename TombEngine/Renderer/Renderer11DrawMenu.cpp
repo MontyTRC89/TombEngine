@@ -476,9 +476,12 @@ namespace TEN::Renderer
 		GetNextLinePosition(&y);
 
 		// Secrets found
-		sprintf(buffer, "%d / 36", Statistics.Game.Secrets);
-		AddString(MenuRightSideEntry, y, buffer, PRINTSTRING_COLOR_WHITE, SF());
-		AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_SECRETS_FOUND), PRINTSTRING_COLOR_WHITE, SF());
+		if (g_GameFlow->NumberOfSecrets > 0)
+		{
+			sprintf(buffer, "%d / %d", Statistics.Game.Secrets, g_GameFlow->NumberOfSecrets);
+			AddString(MenuRightSideEntry, y, buffer, PRINTSTRING_COLOR_WHITE, SF());
+			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_SECRETS_FOUND), PRINTSTRING_COLOR_WHITE, SF());
+		}
 
 		DrawAllStrings();
 	}
@@ -902,8 +905,9 @@ namespace TEN::Renderer
 				PrintDebugMessage("    For rooms: %d", m_numRoomsDrawCalls);
 				PrintDebugMessage("    For movables: %d", m_numMoveablesDrawCalls);
 				PrintDebugMessage("    For statics: %d", m_numStaticsDrawCalls);
-				PrintDebugMessage("    For sprites: %d", m_numSpritesDrawCalls);
+				PrintDebugMessage("    For sprites: %d (%d instanced)", m_numSpritesDrawCalls, m_numInstancedSpritesDrawCalls);
 				PrintDebugMessage("Total triangles: %d", m_numPolygons);
+				PrintDebugMessage("Total sprites: %d", view.spritesToDraw.size());
 				PrintDebugMessage("Transparent faces draw calls: %d", m_numTransparentDrawCalls);
 				PrintDebugMessage("    For rooms: %d", m_numRoomsTransparentDrawCalls);
 				PrintDebugMessage("    For movables: %d", m_numMoveablesTransparentDrawCalls);

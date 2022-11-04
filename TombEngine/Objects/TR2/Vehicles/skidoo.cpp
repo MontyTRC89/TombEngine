@@ -674,10 +674,10 @@ namespace TEN::Entities::Vehicles
 	{
 		auto* skidoo = GetSkidooInfo(skidooItem);
 		auto* lara = GetLaraInfo(laraItem);
-		auto* weapon = &Weapons[(int)LaraWeaponType::Snowmobile];
+		auto& weapon = Weapons[(int)LaraWeaponType::Snowmobile];
 
-		LaraGetNewTarget(laraItem, weapon);
-		AimWeapon(laraItem, weapon, &lara->RightArm);
+		FindNewTarget(laraItem, weapon);
+		AimWeapon(laraItem, lara->RightArm, weapon);
 
 		if (TrInput & VEHICLE_IN_FIRE && !skidooItem->ItemFlags[0])
 		{
@@ -691,7 +691,7 @@ namespace TEN::Entities::Vehicles
 				(int)FireWeapon(LaraWeaponType::Pistol, lara->TargetEntity, laraItem, angles))
 			{
 				skidoo->FlashTimer = 2;
-				SoundEffect(weapon->SampleNum, &laraItem->Pose);
+				SoundEffect(weapon.SampleNum, &laraItem->Pose);
 				skidooItem->ItemFlags[0] = 4;
 			}
 		}
