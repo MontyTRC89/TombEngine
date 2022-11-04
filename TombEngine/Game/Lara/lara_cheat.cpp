@@ -114,6 +114,17 @@ void LaraCheatGetStuff(ItemInfo* item)
 	if (Objects[ID_WATERSKIN2_EMPTY].loaded)
 		lara->Inventory.BigWaterskin = 1;
 
+	if (Objects[ID_PISTOLS_ITEM].loaded)
+	{
+		auto& weapon = lara->Weapons[(int)LaraWeaponType::Uzi];
+
+		weapon.Present = true;
+		weapon.SelectedAmmo = WeaponAmmoType::Ammo1;
+		weapon.HasLasersight = false;
+		weapon.HasSilencer = false;
+		weapon.Ammo[(int)WeaponAmmoType::Ammo1].SetInfinite(true);
+	}
+
 	if (Objects[ID_REVOLVER_ITEM].loaded)
 	{
 		auto& weapon = lara->Weapons[(int)LaraWeaponType::Revolver];
@@ -145,6 +156,7 @@ void LaraCheatGetStuff(ItemInfo* item)
 		weapon.HasLasersight = false;
 		weapon.HasSilencer = false;
 		weapon.Ammo[(int)WeaponAmmoType::Ammo1].SetInfinite(true);
+		weapon.Ammo[(int)WeaponAmmoType::Ammo2].SetInfinite(true);
 	}
 
 	if (Objects[ID_HARPOON_ITEM].loaded)
