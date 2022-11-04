@@ -1135,7 +1135,7 @@ void TriggerWaterfallMist(const ItemInfo& item)
 
 	while (true)
 	{
-		int offset = (step * currentStep) + ((GetRandomControl() & 0x3F) - 32);
+		int offset = (step * currentStep) + (Random::GenerateInt(0, 64) - 32);
 
 		if (offset > width)
 			break;
@@ -1145,7 +1145,7 @@ void TriggerWaterfallMist(const ItemInfo& item)
 			auto* spark = GetFreeParticle();
 			spark->on = true;
 
-			char colorOffset = (GetRandomControl() & 0x1F) - 0x0F;
+			char colorOffset = (Random::GenerateInt(0, 32)) - 16;
 			spark->sR = std::clamp(int(item.Color.x / 2.0f * float(UCHAR_MAX)) + colorOffset, 0, UCHAR_MAX);
 			spark->sG = std::clamp(int(item.Color.y / 2.0f * float(UCHAR_MAX)) + colorOffset, 0, UCHAR_MAX);
 			spark->sB = std::clamp(int(item.Color.z / 2.0f * float(UCHAR_MAX)) + colorOffset, 0, UCHAR_MAX);
@@ -1155,24 +1155,24 @@ void TriggerWaterfallMist(const ItemInfo& item)
 
 			spark->colFadeSpeed = 1;
 			spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
-			spark->life = spark->sLife = (GetRandomControl() & 0x0F) + 15;
+			spark->life = spark->sLife = Random::GenerateInt(0, 16) + 16;
 			spark->fadeToBlack = spark->life - 6;
 
-			spark->x = offset * sign * phd_sin(angle) + (GetRandomControl() & 0xF) + item.Pose.Position.x - 8;
-			spark->y = (GetRandomControl() & 0xF) + item.Pose.Position.y - 8;
-			spark->z = offset * sign * phd_cos(angle) + (GetRandomControl() & 0xF) + item.Pose.Position.z - 8;
+			spark->x = offset * sign * phd_sin(angle) + Random::GenerateInt(0, 16) + item.Pose.Position.x - 8;
+			spark->y = Random::GenerateInt(0, 16) + item.Pose.Position.y - 8;
+			spark->z = offset * sign * phd_cos(angle) + Random::GenerateInt(0, 16) + item.Pose.Position.z - 8;
 
 			spark->xVel = 0;
-			spark->yVel = (GetRandomControl() & 0x7F) + 128;
+			spark->yVel = Random::GenerateInt(0, 128) + 64;
 			spark->zVel = 0;
 
 			spark->friction = 0;
 			spark->rotAng = GetRandomControl() & 0xFFF;
 			spark->scalar = scale;
 			spark->maxYvel = 0;
-			spark->rotAdd = (GetRandomControl() & 0x1F) - 16;
+			spark->rotAdd = Random::GenerateInt(0, 32) - 16;
 			spark->gravity = -spark->yVel >> 2;
-			spark->sSize = spark->size = (GetRandomControl() & 3) + size;
+			spark->sSize = spark->size = Random::GenerateInt(0, 3) * scale + size;
 			spark->dSize = 2 * spark->size;
 
 			spark->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + (Random::GenerateInt(0, 100) > 95 ? 17 : 0);
