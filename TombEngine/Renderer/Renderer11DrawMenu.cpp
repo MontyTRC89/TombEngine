@@ -905,8 +905,9 @@ namespace TEN::Renderer
 				PrintDebugMessage("    For rooms: %d", m_numRoomsDrawCalls);
 				PrintDebugMessage("    For movables: %d", m_numMoveablesDrawCalls);
 				PrintDebugMessage("    For statics: %d", m_numStaticsDrawCalls);
-				PrintDebugMessage("    For sprites: %d", m_numSpritesDrawCalls);
+				PrintDebugMessage("    For sprites: %d (%d instanced)", m_numSpritesDrawCalls, m_numInstancedSpritesDrawCalls);
 				PrintDebugMessage("Total triangles: %d", m_numPolygons);
+				PrintDebugMessage("Total sprites: %d", view.spritesToDraw.size());
 				PrintDebugMessage("Transparent faces draw calls: %d", m_numTransparentDrawCalls);
 				PrintDebugMessage("    For rooms: %d", m_numRoomsTransparentDrawCalls);
 				PrintDebugMessage("    For movables: %d", m_numMoveablesTransparentDrawCalls);

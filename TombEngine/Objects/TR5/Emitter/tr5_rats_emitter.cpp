@@ -260,7 +260,7 @@ void UpdateRats()
 
 				auto* room = &g_Level.Rooms[rat->RoomNumber];
 
-				if (TestEnvironment(ENV_FLAG_WATER, room->flags))
+				if (TestEnvironment(ENV_FLAG_WATER, room))
 				{
 					rat->Pose.Position.y = room->maxceiling + 50;
 					rat->Velocity = 16;

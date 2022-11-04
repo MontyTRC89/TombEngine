@@ -15,5 +15,4 @@ private:
 
 	void NormalizePlane(int32_t side);
 	std::array<std::array<float, 4>, 6> m_frustum = {};
-
 };

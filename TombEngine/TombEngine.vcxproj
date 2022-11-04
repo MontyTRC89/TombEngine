@@ -216,8 +216,11 @@ CALL gen.bat</Command>
     <ClInclude Include="Game\Lara\lara_tests.h" />
     <ClInclude Include="Objects\TR5\Trap\tr5_wreckingball.h" />
     <ClInclude Include="Objects\Utils\VehicleHelpers.h" />
+    <ClInclude Include="Renderer\ConstantBuffers\AlphaTestBuffer.h" />
+    <ClInclude Include="Renderer\ConstantBuffers\InstancedSpriteBuffer.h" />
     <ClInclude Include="Renderer\ConstantBuffers\BlendingBuffer.h" />
     <ClInclude Include="Renderer\ConstantBuffers\PostProcessBuffer.h" />
+    <ClInclude Include="Renderer\RendererSpriteVertex.h" />
     <ClInclude Include="Renderer\RendererRectangle.h" />
     <ClInclude Include="Renderer\Structures\RendererBone.h" />
     <ClInclude Include="Renderer\Structures\RendererDisplayMode.h" />
@@ -972,6 +975,7 @@ CALL gen.bat</Command>
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</DeploymentContent>
       <FileType>Text</FileType>
     </None>
+    <None Include="Shaders\InstancedSpriteBuffer.hlsli" />
     <None Include="Shaders\Blending.hlsli" />
     <None Include="Shaders\ShaderLight.hlsli">
       <DeploymentContent>true</DeploymentContent>
@@ -1062,6 +1066,19 @@ CALL gen.bat</Command>
       <FileType>Document</FileType>
     </None>
     <None Include="Shaders\DX11_Inventory.fx">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</DeploymentContent>
+      <FileType>Document</FileType>
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">PS</EntryPointName>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">4.1</ShaderModel>
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">PS</EntryPointName>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">4.1</ShaderModel>
+    </None>
+    <None Include="Shaders\DX11_InstancedSprites.fx">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</DeploymentContent>
