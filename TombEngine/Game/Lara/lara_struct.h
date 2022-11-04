@@ -5,6 +5,7 @@
 #include "Objects/objectslist.h"
 
 using namespace TEN::Entities::Player;
+using namespace TEN::Math;
 
 struct CreatureInfo;
 struct FX_INFO;
@@ -1111,8 +1112,8 @@ constexpr int MAX_DIARY_STRINGS_PER_PAGE = 8;
 
 struct DiaryString
 {
-	Vector2i Position;
-	int		 StringID;
+	Vector2i Position = Vector2i::Zero;
+	int		 StringID = 0;
 };
 
 struct DiaryPage
