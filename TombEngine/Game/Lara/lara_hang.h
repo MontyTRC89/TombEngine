@@ -9,8 +9,8 @@ struct CollisionInfo;
 // State Control & Collision Functions
 // -----------------------------------
 
-void lara_as_hang(ItemInfo* item, CollisionInfo* coll);
-void lara_col_hang(ItemInfo* item, CollisionInfo* coll);
+void lara_as_hang_idle(ItemInfo* item, CollisionInfo* coll);
+void lara_col_hang_idle(ItemInfo* item, CollisionInfo* coll);
 void lara_as_shimmy_left(ItemInfo* item, CollisionInfo* coll);
 void lara_col_shimmy_left(ItemInfo* item, CollisionInfo* coll);
 void lara_as_shimmy_right(ItemInfo* item, CollisionInfo* coll);

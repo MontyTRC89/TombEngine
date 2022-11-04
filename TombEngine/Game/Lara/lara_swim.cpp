@@ -27,7 +27,7 @@ void lara_as_underwater_idle(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	LaraType laraType = g_GameFlow->GetLevel(CurrentLevel)->GetLaraType();
+	auto laraType = g_GameFlow->GetLevel(CurrentLevel)->GetLaraType();
 
 	if (item->HitPoints <= 0)
 	{
@@ -35,9 +35,8 @@ void lara_as_underwater_idle(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	auto level = g_GameFlow->GetLevel(CurrentLevel);
-
-	if ((TrInput & IN_ROLL || (TrInput & IN_FORWARD && TrInput & IN_BACK)) && laraType != LaraType::Divesuit)
+	if ((TrInput & IN_ROLL || (TrInput & IN_FORWARD && TrInput & IN_BACK)) &&
+		laraType != LaraType::Divesuit)
 	{
 		SetAnimation(item, LA_UNDERWATER_ROLL_180_START);
 		return;

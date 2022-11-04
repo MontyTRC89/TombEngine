@@ -176,6 +176,8 @@ CALL gen.bat</Command>
     <ClInclude Include="Game\Lara\lara_jump.h" />
     <ClInclude Include="Game\Lara\lara_overhang.h" />
     <ClInclude Include="Game\Lara\lara_test_structs.h" />
+    <ClInclude Include="Game\Lara\PlayerContext.h" />
+    <ClInclude Include="Game\Lara\PlayerContextStructs.h" />
     <ClInclude Include="Math\Containers\GameBoundingBox.h" />
     <ClInclude Include="Math\Solvers.h" />
     <ClInclude Include="Objects\game_object_ids.h" />
@@ -642,6 +644,7 @@ CALL gen.bat</Command>
     <ClCompile Include="Game\Lara\lara_slide.cpp" />
     <ClCompile Include="Game\Lara\lara_tests.cpp" />
     <ClCompile Include="Game\effects\lightning.cpp" />
+    <ClCompile Include="Game\Lara\PlayerContext.cpp" />
     <ClCompile Include="Game\misc.cpp" />
     <ClCompile Include="Game\Gui.cpp" />
     <ClCompile Include="Game\effects\simple_particle.cpp" />

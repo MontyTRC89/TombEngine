@@ -385,7 +385,7 @@ void lara_col_slopeclimb(ItemInfo* item, CollisionInfo* coll)
 				if (!probeWall.Block->IsWall((up.x - slopeData.Offset.x), (up.z - slopeData.Offset.z)) &&
 					(probeNow.Position.Ceiling - probeWall.Position.Ceiling) > CLICK(0.5f)) // No wall or downward ceiling step.
 				{
-					TranslateItem(item, 0, -CLICK(1), -CLICK(1));
+					TranslateItem(item, item->Pose.Orientation.y, 0, -CLICK(1), -CLICK(1));
 					SetAnimation(item, item->Animation.AnimNumber == LA_OVERHANG_IDLE_LEFT ? LA_OVERHANG_CLIMB_UP_LEFT : LA_OVERHANG_CLIMB_UP_RIGHT);
 					//item->TargetState = 62;
 				}
@@ -645,7 +645,7 @@ void lara_as_slopeclimbup(ItemInfo* item, CollisionInfo* coll)
 		int length = GetFrameCount(item->Animation.AnimNumber);
 		int dPos = CLICK(1) - (frame * CLICK(1) / length);
 
-		TranslateItem(item, 0, dPos, dPos);
+		TranslateItem(item, item->Pose.Orientation.y, 0, dPos, dPos);
 		if (item->Animation.AnimNumber == LA_OVERHANG_CLIMB_UP_LEFT)
 			SetAnimation(item, frame <= 2 * length / 3 ? LA_OVERHANG_DROP_LEFT : LA_OVERHANG_DROP_RIGHT);
 		else
@@ -675,7 +675,7 @@ void lara_as_slopeclimbdown(ItemInfo* item, CollisionInfo* coll)
 		int length = GetFrameCount(item->Animation.AnimNumber);
 		int dPos = frame * CLICK(1) / length;
 
-		TranslateItem(item, 0, dPos, dPos);
+		TranslateItem(item, item->Pose.Orientation.y, 0, dPos, dPos);
 		if (item->Animation.AnimNumber == LA_OVERHANG_CLIMB_DOWN_LEFT)
 			SetAnimation(item, frame <= length / 2 ? LA_OVERHANG_DROP_LEFT : LA_OVERHANG_DROP_RIGHT);
 		else
@@ -819,7 +819,7 @@ void lara_as_sclimbend(ItemInfo* item, CollisionInfo* coll)
 // For Existing State Control and Collision
 // ----------------------------------------
 
-// Extends LS_HANG (10)
+// Extends LS_HANG_IDLE (10)
 void SlopeHangExtra(ItemInfo* item, CollisionInfo* coll)
 {
 	if (!g_GameFlow->HasOverhangClimb())
@@ -840,7 +840,7 @@ void SlopeHangExtra(ItemInfo* item, CollisionInfo* coll)
 			if ((probeDown.CeilingTilt.x / 3) == (slopeData.Goal.x / 3) ||
 				(probeDown.CeilingTilt.y / 3) == (slopeData.Goal.y / 3))
 			{
-				item->Animation.TargetState = LS_HANG;
+				item->Animation.TargetState = LS_HANG_IDLE;
 				if (TrInput & IN_FORWARD)
 					SetAnimation(item, LA_LADDER_SHIMMY_UP);
 				/*else if (TrInput & IN_BACK)
