@@ -65,7 +65,20 @@ private:
 	}
 
 	template <typename R, char const* S>
-	std::vector <string> GetBySlot(int slot)
+	std::vector <string> GetBySlotName(std::string const& name)
+	{
+		std::vector<string> items = {};
+		for (auto& [key, val] : m_nameMap)
+		{
+			
+
+		}
+
+		return items;
+	}
+
+	template <typename R, char const* S>
+	std::vector <string> GetById(int slot)
 	{
 		std::vector<string> items = {};
 		for (auto& [key, val] : m_nameMap)

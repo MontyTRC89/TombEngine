@@ -45,7 +45,7 @@ ObjectsHandler::ObjectsHandler(sol::state* lua, sol::table & parent) :
 	@tparam string slot the unique slot of the Moveable like ANIMATING1
 	@treturn table of Moveables referencing the given slot.
 	*/
-	m_table_objects.set_function(ScriptReserved_GetMoveablesBySlot, &ObjectsHandler::GetBySlot<Moveable, ScriptReserved_Moveable>, this);
+	m_table_objects.set_function(ScriptReserved_GetMoveablesBySlot, &ObjectsHandler::GetBySlotName<Moveable, ScriptReserved_Moveable>, this);
 
 	/***
 	Get statics by its slot.
@@ -53,7 +53,7 @@ ObjectsHandler::ObjectsHandler(sol::state* lua, sol::table & parent) :
 	@tparam int slot the unique slot of the mesh like 10
 	@treturn table of Statics referencing the given slot id.
 	*/
-	m_table_objects.set_function(ScriptReserved_GetStaticsBySlot, &ObjectsHandler::GetBySlot<Static, ScriptReserved_Static>, this);
+	m_table_objects.set_function(ScriptReserved_GetStaticsById, &ObjectsHandler::GetById<Static, ScriptReserved_Static>, this);
 
 	/***
 	Get a Camera by its name.
