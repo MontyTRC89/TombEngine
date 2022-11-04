@@ -1099,84 +1099,81 @@ void ControlWaterfallMist(short itemNumber)
 	if (!TriggerActive(item))
 		return;
 
-	int x = item->Pose.Position.x - phd_sin(item->Pose.Orientation.y + ANGLE(180.0f)) * CLICK(2) + phd_sin(item->Pose.Orientation.y - ANGLE(90.0f)) * CLICK(1);
-	int z = item->Pose.Position.z - phd_cos(item->Pose.Orientation.y + ANGLE(180.0f)) * CLICK(2) + phd_cos(item->Pose.Orientation.y - ANGLE(90.0f)) * CLICK(1);
+	int size  = 64;
+	int width = 1;
 
-	TriggerWaterfallMist(x, item->Pose.Position.y, z, item->Pose.Orientation.y + ANGLE(180.0f));
+	if (item->TriggerFlags != 0)
+	{
+		size = item->TriggerFlags % 100;
+		width = round(item->TriggerFlags / 100) * 100;
+	}
+	
+	TriggerWaterfallMist(item->Pose.Position, item->Color, width, size, item->Pose.Orientation.y + ANGLE(180.0f));
 	SoundEffect(SFX_TR4_WATERFALL_LOOP, &item->Pose);
 }
 
-void TriggerWaterfallMist(int x, int y, int z, int angle)
+void TriggerWaterfallMist(Vector3i pos, Vector4 color, int width, int size, short angle)
 {
-	int dh = 0;
-	int ang1 = angle;
-	int ang2 = angle;
-	int dl;
+	float step = size * 0.75f;
+	int steps = int((width / 2) / step);
+	int currentStep = 0;
 
-	// CHECK THIS LOOP CONDITIONS
-	for (ang1 = angle; ; ang1 *= 2)
+	while (true)
 	{
-		auto* spark = GetFreeParticle();
-		spark->on = 1;
-		spark->sR = 64;
-		spark->sG = 64;
-		spark->sB = 64;
-		spark->dR = 64;
-		spark->dG = 64;
-		spark->dB = 64;
-		spark->colFadeSpeed = 1;
-		spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
-		spark->life = spark->sLife = (GetRandomControl() & 3) + 6;
-		spark->fadeToBlack = spark->life - 4;
-		dl = ((dh + (GlobalCounter << 6)) % 1536) + (GetRandomControl() & 0x3F) - 32;
-		spark->x = dl * phd_sin(ang1) + (GetRandomControl() & 0xF) + x - 8;
-		spark->y = (GetRandomControl() & 0xF) + y - 8;
-		spark->z = dl * phd_cos(ang1) + (GetRandomControl() & 0xF) + z - 8;
-		spark->xVel = 0;
-		spark->zVel = 0;
-		spark->friction = 0;
-		spark->flags = 538;
-		spark->yVel = (GetRandomControl() & 0x7F) + 128;
-		spark->rotAng = GetRandomControl() & 0xFFF;
-		spark->scalar = 3;
-		spark->maxYvel = 0;
-		spark->rotAdd = (GetRandomControl() & 0x1F) - 16;
-		spark->gravity = -spark->yVel >> 2;
-		spark->sSize = spark->size = (GetRandomControl() & 3) + 16;
-		spark->dSize = 2 * spark->size;
+		int offset = (step * currentStep) + ((GetRandomControl() & 0x3F) - 32);
 
-		dh += 256;
-		if (dh > 1536)
+		if (offset > width)
 			break;
-	}
 
-	auto* spark = GetFreeParticle();
-	spark->on = 1;
-	spark->sR = 96;
-	spark->sG = 96;
-	spark->sB = 96;
-	spark->dR = 96;
-	spark->dG = 96;
-	spark->dB = 96;
-	spark->colFadeSpeed = 1;
-	spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
-	spark->life = spark->sLife = (GetRandomControl() & 3) + 6;
-	spark->fadeToBlack = spark->life - 1;
-	dl = GetRandomControl() % 1408 + 64;
-	spark->x = dl * phd_sin(ang1) + (GetRandomControl() & 0x1F) + x - 16;
-	spark->y = (GetRandomControl() & 0xF) + y - 8;
-	spark->xVel = 0;
-	spark->zVel = 0;
-	spark->z = dl * phd_cos(ang1) + (GetRandomControl() & 0x1F) + z - 16;
-	spark->friction = 0;
-	spark->flags = 10;
-	spark->yVel = GetRandomControl() & 0x100 + (GetRandomControl() & 0x7F) + 128;
-	spark->scalar = 2;
-	spark->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + 17;
-	spark->gravity = 0;
-	spark->maxYvel = 0;
-	spark->sSize = spark->size = (GetRandomControl() & 7) + 8;
-	spark->dSize = spark->size * 2;
+		for (int sign = -1; sign <= 1; sign += 2)
+		{
+			for (int pass = 0; pass < 3; pass++)
+			{
+				auto* spark = GetFreeParticle();
+				spark->on = true;
+
+				char colorOffset = (GetRandomControl() & 0x1F) - 0x0F;
+				spark->sR = std::clamp(int(color.x / 2.0f * UCHAR_MAX) + colorOffset, 0, UCHAR_MAX);
+				spark->sG = std::clamp(int(color.y / 2.0f * UCHAR_MAX) + colorOffset, 0, UCHAR_MAX);
+				spark->sB = std::clamp(int(color.z / 2.0f * UCHAR_MAX) + colorOffset, 0, UCHAR_MAX);
+				spark->dR = std::clamp(int(color.x / 2.0f * UCHAR_MAX) + colorOffset, 0, UCHAR_MAX);
+				spark->dG = std::clamp(int(color.y / 2.0f * UCHAR_MAX) + colorOffset, 0, UCHAR_MAX);
+				spark->dB = std::clamp(int(color.z / 2.0f * UCHAR_MAX) + colorOffset, 0, UCHAR_MAX);
+
+				spark->colFadeSpeed = 1;
+				spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+				spark->life = spark->sLife = (GetRandomControl() & 0x0F) + 25;
+				spark->fadeToBlack = spark->life - 6;
+
+				spark->x = offset * sign * phd_sin(angle) + (GetRandomControl() & 0xF) + pos.x - 8;
+				spark->y = (GetRandomControl() & 0xF) + pos.y - 8;
+				spark->z = offset * sign * phd_cos(angle) + (GetRandomControl() & 0xF) + pos.z - 8;
+
+				spark->xVel = 0;
+				spark->yVel = (GetRandomControl() & 0x7F) + 128;
+				spark->zVel = 0;
+
+				spark->friction = 0;
+				spark->rotAng = GetRandomControl() & 0xFFF;
+				spark->scalar = 3;
+				spark->maxYvel = 0;
+				spark->rotAdd = (GetRandomControl() & 0x1F) - 16;
+				spark->gravity = -spark->yVel >> 2;
+				spark->sSize = spark->size = (GetRandomControl() & 3) + size;
+				spark->dSize = 2 * spark->size;
+
+				spark->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex;
+				spark->flags = 538;
+			}
+
+			if (sign == 1)
+			{
+				currentStep++;
+				if (currentStep == 1)
+					break;
+			}
+		}
+	}
 }
 
 void KillAllCurrentItems(short itemNumber)
