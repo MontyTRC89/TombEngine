@@ -16,7 +16,7 @@
 #include "Game/Lara/lara_monkey.h"
 #include "Math/Math.h"
 #include "Renderer/Renderer11.h"
-#include "Specific/input.h"
+#include "Specific/Input/Input.h"
 #include "Specific/level.h"
 
 using namespace TEN::Floordata;

@@ -1,4 +1,5 @@
-struct VertexShaderInput {
+struct VertexShaderInput 
+{
 	float3 Position: POSITION0;
 	float3 Normal: NORMAL0;
 	float2 UV: TEXCOORD0;

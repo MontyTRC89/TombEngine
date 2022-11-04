@@ -61,7 +61,7 @@ void InitialiseLara(bool restore)
 	if (weapon == LaraWeaponType::Pistol)
 	{
 		Lara.Weapons[(int)LaraWeaponType::Pistol].Present = true;
-		Lara.Weapons[(int)LaraWeaponType::Pistol].Ammo[(int)WeaponAmmoType::Ammo1].setInfinite(true);
+		Lara.Weapons[(int)LaraWeaponType::Pistol].Ammo[(int)WeaponAmmoType::Ammo1].SetInfinite(true);
 	}
 	else if (weapon == LaraWeaponType::HK)
 	{

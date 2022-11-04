@@ -2,17 +2,20 @@
 #include "Game/Lara/lara_cheat.h"
 
 #include <OISKeyboard.h>
+
+#include "Flow/ScriptInterfaceFlowHandler.h"
 #include "Game/collision/collide_room.h"
 #include "Game/effects/effects.h"
+#include "Game/GuiObjects.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
-#include "Flow/ScriptInterfaceFlowHandler.h"
 #include "Sound/sound.h"
-#include "Specific/input.h"
+#include "Specific/Input/Input.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
+using namespace TEN::Gui;
 using namespace TEN::Input;
 
 void lara_as_swimcheat(ItemInfo* item, CollisionInfo* coll)
@@ -56,7 +59,8 @@ void LaraCheatyBits(ItemInfo* item)
 
 	if (g_GameFlow->IsFlyCheatEnabled())
 	{
-		if (KeyMap[OIS::KeyCode::KC_O])
+		static bool dbFlyCheat = true;
+		if (KeyMap[OIS::KeyCode::KC_O] && dbFlyCheat)
 		{
 			if (lara->Vehicle == NO_ITEM)
 			{
@@ -68,8 +72,8 @@ void LaraCheatyBits(ItemInfo* item)
 				if (lara->Control.WaterStatus != WaterStatus::FlyCheat)
 				{
 					SetAnimation(item, LA_DOZY);
-					item->Animation.Velocity.y = 30;
 					item->Animation.IsAirborne = false;
+					item->Animation.Velocity.y = 30;
 					item->Pose.Orientation.x = ANGLE(30.0f);
 					item->HitPoints = LARA_HEALTH_MAX;
 
@@ -80,16 +84,11 @@ void LaraCheatyBits(ItemInfo* item)
 					lara->Air = LARA_AIR_MAX;
 				}
 			}
-			else if (!lara->Control.Count.NoCheat)
-			{
-				lara->Control.Count.NoCheat = 15;
+			else
 				SayNo();
-			}
 		}
+		dbFlyCheat = KeyMap[OIS::KeyCode::KC_O] ? false : true;
 	}
-
-	if (lara->Control.Count.NoCheat)
-		lara->Control.Count.NoCheat--;
 }
 
 void LaraCheatGetStuff(ItemInfo* item)
@@ -107,7 +106,7 @@ void LaraCheatGetStuff(ItemInfo* item)
 		lara->Inventory.HasLasersight = true;
 
 	if (Objects[ID_CLOCKWORK_BEETLE].loaded)
-		lara->Inventory.BeetleComponents |= 1;
+		lara->Inventory.BeetleComponents |= BEETLECOMP_FLAG_BEETLE;
 
 	if (Objects[ID_WATERSKIN1_EMPTY].loaded)
 		lara->Inventory.SmallWaterskin = 1;
@@ -123,7 +122,7 @@ void LaraCheatGetStuff(ItemInfo* item)
 		weapon.SelectedAmmo = WeaponAmmoType::Ammo1;
 		weapon.HasLasersight = false;
 		weapon.HasSilencer = false;
-		weapon.Ammo[(int)WeaponAmmoType::Ammo1].setInfinite(true);
+		weapon.Ammo[(int)WeaponAmmoType::Ammo1].SetInfinite(true);
 	}
 
 	if (Objects[ID_UZI_ITEM].loaded)
@@ -134,7 +133,7 @@ void LaraCheatGetStuff(ItemInfo* item)
 		weapon.SelectedAmmo = WeaponAmmoType::Ammo1;
 		weapon.HasLasersight = false;
 		weapon.HasSilencer = false;
-		weapon.Ammo[(int)WeaponAmmoType::Ammo1].setInfinite(true);
+		weapon.Ammo[(int)WeaponAmmoType::Ammo1].SetInfinite(true);
 	}
 
 	if (Objects[ID_SHOTGUN_ITEM].loaded)
@@ -145,7 +144,7 @@ void LaraCheatGetStuff(ItemInfo* item)
 		weapon.SelectedAmmo = WeaponAmmoType::Ammo1;
 		weapon.HasLasersight = false;
 		weapon.HasSilencer = false;
-		weapon.Ammo[(int)WeaponAmmoType::Ammo1].setInfinite(true);
+		weapon.Ammo[(int)WeaponAmmoType::Ammo1].SetInfinite(true);
 	}
 
 	if (Objects[ID_HARPOON_ITEM].loaded)
@@ -156,7 +155,7 @@ void LaraCheatGetStuff(ItemInfo* item)
 		weapon.SelectedAmmo = WeaponAmmoType::Ammo1;
 		weapon.HasLasersight = false;
 		weapon.HasSilencer = false;
-		weapon.Ammo[(int)WeaponAmmoType::Ammo1].setInfinite(true);
+		weapon.Ammo[(int)WeaponAmmoType::Ammo1].SetInfinite(true);
 	}
 
 	if (Objects[ID_GRENADE_GUN_ITEM].loaded)
@@ -166,9 +165,9 @@ void LaraCheatGetStuff(ItemInfo* item)
 		weapon.Present = true;
 		weapon.SelectedAmmo = WeaponAmmoType::Ammo1;
 		weapon.HasSilencer = false;
-		weapon.Ammo[(int)WeaponAmmoType::Ammo1].setInfinite(true);
-		weapon.Ammo[(int)WeaponAmmoType::Ammo2].setInfinite(true);
-		weapon.Ammo[(int)WeaponAmmoType::Ammo3].setInfinite(true);
+		weapon.Ammo[(int)WeaponAmmoType::Ammo1].SetInfinite(true);
+		weapon.Ammo[(int)WeaponAmmoType::Ammo2].SetInfinite(true);
+		weapon.Ammo[(int)WeaponAmmoType::Ammo3].SetInfinite(true);
 	}
 
 	if (Objects[ID_ROCKET_LAUNCHER_ITEM].loaded)
@@ -179,7 +178,7 @@ void LaraCheatGetStuff(ItemInfo* item)
 		weapon.SelectedAmmo = WeaponAmmoType::Ammo1;
 		weapon.HasLasersight = false;
 		weapon.HasSilencer = false;
-		weapon.Ammo[(int)WeaponAmmoType::Ammo1].setInfinite(true);
+		weapon.Ammo[(int)WeaponAmmoType::Ammo1].SetInfinite(true);
 	}
 
 	if (Objects[ID_HK_ITEM].loaded)
@@ -190,7 +189,7 @@ void LaraCheatGetStuff(ItemInfo* item)
 		weapon.SelectedAmmo = WeaponAmmoType::Ammo1;
 		weapon.HasLasersight = false;
 		weapon.HasSilencer = false;
-		weapon.Ammo[(int)WeaponAmmoType::Ammo1].setInfinite(true);
+		weapon.Ammo[(int)WeaponAmmoType::Ammo1].SetInfinite(true);
 	}
 
 	if (Objects[ID_CROSSBOW_ITEM].loaded)
@@ -201,9 +200,9 @@ void LaraCheatGetStuff(ItemInfo* item)
 		weapon.SelectedAmmo = WeaponAmmoType::Ammo1;
 		weapon.HasLasersight = false;
 		weapon.HasSilencer = false;
-		weapon.Ammo[(int)WeaponAmmoType::Ammo1].setInfinite(true);
-		weapon.Ammo[(int)WeaponAmmoType::Ammo2].setInfinite(true);
-		weapon.Ammo[(int)WeaponAmmoType::Ammo3].setInfinite(true);
+		weapon.Ammo[(int)WeaponAmmoType::Ammo1].SetInfinite(true);
+		weapon.Ammo[(int)WeaponAmmoType::Ammo2].SetInfinite(true);
+		weapon.Ammo[(int)WeaponAmmoType::Ammo3].SetInfinite(true);
 	}
 }
 
@@ -214,7 +213,7 @@ void DelsGiveLaraItemsCheat(ItemInfo* item)
 	for (int i = 0; i < 8; ++i)
 	{
 		if (Objects[ID_PUZZLE_ITEM1 + i].loaded)
-			lara->Inventory.Puzzles[i] = 1;
+			lara->Inventory.Puzzles[i] = true;
 
 		lara->Inventory.PuzzlesCombo[2 * i] = false;
 		lara->Inventory.PuzzlesCombo[2 * i + 1] = false;
@@ -223,7 +222,7 @@ void DelsGiveLaraItemsCheat(ItemInfo* item)
 	for (int i = 0; i < 8; ++i)
 	{
 		if (Objects[ID_KEY_ITEM1 + i].loaded)
-			lara->Inventory.Keys[i] = 1;
+			lara->Inventory.Keys[i] = true;
 
 		lara->Inventory.KeysCombo[2 * i] = false;
 		lara->Inventory.KeysCombo[2 * i + 1] = false;
@@ -232,10 +231,9 @@ void DelsGiveLaraItemsCheat(ItemInfo* item)
 	for (int i = 0; i < 3; ++i)
 	{
 		if (Objects[ID_PICKUP_ITEM1 + i].loaded)
-			lara->Inventory.Pickups[i] = 1;
+			lara->Inventory.Pickups[i] = true;
 
 		lara->Inventory.PickupsCombo[2 * i] = false;
 		lara->Inventory.PickupsCombo[2 * i + 1] = false;
 	}
-	/* Hardcoded code */
 }

@@ -5,6 +5,12 @@
 #include <PrimitiveBatch.h>
 #include <d3d9types.h>
 
+#include "Game/items.h"
+#include "Game/animation.h"
+#include "Game/gui.h"
+#include "Game/effects/effects.h"
+#include "Specific/level.h"
+#include "Specific/fast_vector.h"
 #include "Renderer/Renderer11Enums.h"
 #include "Renderer/ConstantBuffers/StaticBuffer.h"
 #include "Renderer/ConstantBuffers/LightBuffer.h"
@@ -15,20 +21,12 @@
 #include "Renderer/ConstantBuffers/RoomBuffer.h"
 #include "Renderer/ConstantBuffers/ItemBuffer.h"
 #include "Renderer/ConstantBuffers/AnimatedBuffer.h"
-#include "Renderer/ConstantBuffers/AlphaTestBuffer.h"
+#include "Renderer/ConstantBuffers/BlendingBuffer.h"
+#include "Renderer/ConstantBuffers/CameraMatrixBuffer.h"
+#include "Renderer/ConstantBuffers/SpriteBuffer.h"
 #include "Frustum.h"
 #include "RendererBucket.h"
-#include "Game/items.h"
-#include "Game/animation.h"
-#include "Game/gui.h"
-#include "Game/effects/effects.h"
-#include "IndexBuffer/IndexBuffer.h"
-#include "VertexBuffer/VertexBuffer.h"
-#include "RenderTarget2D/RenderTarget2D.h"
-#include "ConstantBuffers/CameraMatrixBuffer.h"
-#include "Texture2D/Texture2D.h"
-#include "ConstantBuffers/SpriteBuffer.h"
-#include "RenderTargetCube/RenderTargetCube.h"
+#include "Renderer/RenderTargetCube/RenderTargetCube.h"
 #include "RenderView/RenderView.h"
 #include "Specific/level.h"
 #include "ConstantBuffer/ConstantBuffer.h"
@@ -36,14 +34,22 @@
 #include "Specific/fast_vector.h"
 #include "Renderer/TextureBase.h"
 #include "Renderer/Texture2DArray/Texture2DArray.h"
+#include "Renderer/ConstantBuffers/InstancedSpriteBuffer.h"
 #include "Renderer/ConstantBuffers/PostProcessBuffer.h"
 #include "Renderer/Structures/RendererBone.h"
 #include "Renderer/Structures/RendererLight.h"
 #include "Renderer/Structures/RendererStringToDraw.h"
 #include "Renderer/Structures/RendererRoom.h"
+#include <Renderer/VertexBuffer/VertexBuffer.h>
+#include <Renderer/IndexBuffer/IndexBuffer.h>
+#include <Renderer/Texture2D/Texture2D.h>
+#include <Renderer/RenderTarget2D/RenderTarget2D.h>
 
+class EulerAngles;
 struct CAMERA_INFO;
 struct RendererRectangle;
+
+using namespace TEN::Gui;
 
 namespace TEN::Renderer
 {
@@ -160,6 +166,7 @@ namespace TEN::Renderer
 
 	struct RendererSprite
 	{
+		int Index;
 		int Width;
 		int Height;
 		Vector2 UV[4];
@@ -274,6 +281,8 @@ namespace TEN::Renderer
 		ComPtr<ID3D11PixelShader> m_psSky;
 		ComPtr<ID3D11VertexShader> m_vsSprites;
 		ComPtr<ID3D11PixelShader> m_psSprites;
+		ComPtr<ID3D11VertexShader> m_vsInstancedSprites;
+		ComPtr<ID3D11PixelShader> m_psInstancedSprites;
 		ComPtr<ID3D11VertexShader> m_vsSolid;
 		ComPtr<ID3D11PixelShader> m_psSolid;
 		ComPtr<ID3D11VertexShader> m_vsInventory;
@@ -315,8 +324,10 @@ namespace TEN::Renderer
 		ConstantBuffer<CSpriteBuffer> m_cbSprite;
 		CPostProcessBuffer m_stPostProcessBuffer;
 		ConstantBuffer<CPostProcessBuffer> m_cbPostProcessBuffer;
-		CAlphaTestBuffer m_stAlphaTest;
-		ConstantBuffer<CAlphaTestBuffer> m_cbAlphaTest;
+		CInstancedSpriteBuffer m_stInstancedSpriteBuffer;
+		ConstantBuffer<CInstancedSpriteBuffer> m_cbInstancedSpriteBuffer;
+		CBlendingBuffer m_stBlending;
+		ConstantBuffer<CBlendingBuffer> m_cbBlending;
 
 		// Sprites
 		std::unique_ptr<SpriteBatch> m_spriteBatch;
@@ -392,6 +403,7 @@ namespace TEN::Renderer
 		int m_numMoveablesDrawCalls = 0;
 		int m_numStaticsDrawCalls = 0;
 		int m_numSpritesDrawCalls = 0;
+		int m_numInstancedSpritesDrawCalls = 0;
 		int m_numTransparentDrawCalls = 0;
 		int m_numRoomsTransparentDrawCalls = 0;
 		int m_numMoveablesTransparentDrawCalls = 0;
@@ -552,15 +564,16 @@ namespace TEN::Renderer
 		float CalculateFrameRate();
 
 		void AddSpriteBillboard(RendererSprite* sprite, Vector3 pos, Vector4 color, float rotation, float scale,
-		                        Vector2 size, BLEND_MODES blendMode, RenderView& view);
+		                        Vector2 size, BLEND_MODES blendMode, bool softParticles, RenderView& view);
 		void AddSpriteBillboardConstrained(RendererSprite* sprite, Vector3 pos, Vector4 color, float rotation,
 		                                   float scale, Vector2 size, BLEND_MODES blendMode, Vector3 constrainAxis,
-		                                   RenderView& view);
+										   bool softParticles, RenderView& view);
 		void AddSpriteBillboardConstrainedLookAt(RendererSprite* sprite, Vector3 pos, Vector4 color, float rotation,
 		                                         float scale, Vector2 size, BLEND_MODES blendMode, Vector3 lookAtAxis,
-		                                         RenderView& view);
+												 bool softParticles, RenderView& view);
 		void AddSprite3D(RendererSprite* sprite, Vector3 vtx1, Vector3 vtx2, Vector3 vtx3, Vector3 vtx4, Vector4 color,
-		                 float rotation, float scale, Vector2 size, BLEND_MODES blendMode, RenderView& view);
+		                 float rotation, float scale, Vector2 size, BLEND_MODES blendMode, bool softParticles, RenderView& view);
+		Matrix GetWorldMatrixForSprite(RendererSpriteToDraw* spr, RenderView& view);
 
 		RendererMesh* GetMesh(int meshIndex);
 		Texture2D CreateDefaultNormalTexture();
@@ -646,7 +659,7 @@ namespace TEN::Renderer
 		void GetItemAbsBonePosition(int itemNumber, Vector3& pos, int jointIndex);
 		int  GetSpheres(short itemNumber, BoundingSphere* ptr, char worldSpace, Matrix local);
 		void GetBoneMatrix(short itemNumber, int jointIndex, Matrix* outMatrix);
-		void DrawObjectOn2DPosition(short x, short y, short objectNum, short rotX, short rotY, short rotZ,  float scale1);
+		void DrawObjectOn2DPosition(short x, short y, short objectNum, EulerAngles orient, float scale1);
 		void SetLoadingScreen(std::wstring& fileName);
 		void SetTextureOrDefault(Texture2D& texture, std::wstring path);
 		std::string GetDefaultAdapterName();

@@ -3,8 +3,6 @@
 
 namespace TEN::Renderer
 {
-	constexpr float EPSILON = 0.00001f;
-
 	RenderView::RenderView(CAMERA_INFO* cam, float roll, float fov, float nearPlane, float farPlane, int w, int h) : camera(cam, roll, fov, nearPlane, farPlane, w, h) 
 	{
 		viewport = {};
@@ -33,11 +31,14 @@ namespace TEN::Renderer
 		bufferToFill.Projection = camera.Projection;
 		bufferToFill.View = camera.View;
 		bufferToFill.ViewProjection = camera.ViewProjection;
+		bufferToFill.InverseProjection = camera.Projection.Invert();   
 		bufferToFill.CamDirectionWS = Vector4(camera.WorldDirection);
 		bufferToFill.CamPositionWS = Vector4(camera.WorldPosition);
 		bufferToFill.ViewSize = camera.ViewSize;
 		bufferToFill.InvViewSize = camera.InvViewSize;
 		bufferToFill.RoomNumber = camera.RoomNumber;
+		bufferToFill.NearPlane = camera.NearPlane;
+		bufferToFill.FarPlane = camera.FarPlane;
 	}
 
 	void RenderView::clear() 
@@ -67,9 +68,11 @@ namespace TEN::Renderer
 		View = Matrix::CreateLookAt(WorldPosition, target, up);
 		Projection = Matrix::CreatePerspectiveFieldOfView(fov, w / (float)h, n, f);
 		ViewProjection = View * Projection;
-		ViewSize = { (float)w,(float)h };
-		InvViewSize = { 1.0f / w,1.0f / h };
-		frustum.Update(View, Projection);
+		ViewSize = { (float)w, (float)h };
+		InvViewSize = { 1.0f / w, 1.0f / h };
+		Frustum.Update(View, Projection);
+		NearPlane = n;
+		FarPlane = f;
 	}
 
 	RenderViewCamera::RenderViewCamera(const Vector3& pos, const Vector3& dir, const Vector3& up, int room, int width, int height, float fov, float n, float f) 
@@ -77,12 +80,14 @@ namespace TEN::Renderer
 		RoomNumber = room;
 		WorldPosition = pos;
 		WorldDirection = dir;
-		View = Matrix::CreateLookAt(pos, pos + dir*10240, up);
+		View = Matrix::CreateLookAt(pos, pos + dir * 10240, up);
 		float aspect = (float)width / (float)height;
 		Projection = Matrix::CreatePerspectiveFieldOfView(fov, aspect, n, f);
 		ViewProjection = View * Projection;
-		ViewSize = { (float)width,(float)height };
-		InvViewSize = { 1.0f / width,1.0f / height };
-		frustum.Update(View, Projection);
+		ViewSize = { (float)width, (float)height };
+		InvViewSize = { 1.0f / width, 1.0f / height };
+		Frustum.Update(View, Projection);
+		NearPlane = n;
+		FarPlane = f;
 	}
 }

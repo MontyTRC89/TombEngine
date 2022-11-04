@@ -887,7 +887,7 @@ void SayNo()
 
 void PlaySecretTrack()
 {
-	if (SoundTracks.size() <= SecretSoundIndex)
+	if (SoundTracks.find(SecretSoundIndex) == SoundTracks.end())
 	{
 		TENLog("No secret soundtrack index was found!", LogLevel::Warning);
 		return;
