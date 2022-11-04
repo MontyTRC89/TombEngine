@@ -1719,6 +1719,22 @@ bool TestBoundsCollideCamera(const GameBoundingBox& bounds, const Pose& pose, sh
 	return sphere.Intersects(bounds.ToBoundingOrientedBox(pose));
 }
 
+bool TestPointInView(Vector3i position, float radius, int roomNumber)
+{
+	if (roomNumber >= 0)
+	{
+		auto& roomList = g_Level.Rooms[Camera.pos.RoomNumber].neighbors;
+		if (std::find(roomList.begin(), roomList.end(), roomNumber) == roomList.end())
+			return false;
+	}
+
+	float levelFarView = g_GameFlow->GetLevel(CurrentLevel)->GetFarView() * float(SECTOR(1));
+	auto sphere1 = BoundingSphere(Camera.pos.ToVector3(), levelFarView);
+	auto sphere2 = BoundingSphere(position.ToVector3(), radius);
+
+	return sphere1.Intersects(sphere2);
+}
+
 void ItemPushCamera(GameBoundingBox* bounds, Pose* pos, short radius)
 {
 	int dx = Camera.pos.x - pos->Position.x;
