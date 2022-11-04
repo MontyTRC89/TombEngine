@@ -368,7 +368,7 @@ bool SaveGame::Save(int slot)
 
 	Save::LaraControlDataBuilder control{ fbb };
 	control.add_move_angle(Lara.Control.MoveAngle);
-	control.add_turn_rate(Lara.Control.TurnRate.y);
+	control.add_turn_rate(Lara.Control.TurnRate);
 	control.add_calculated_jump_velocity(Lara.Control.CalculatedJumpVelocity);
 	control.add_jump_direction((int)Lara.Control.JumpDirection);
 	control.add_hand_status((int)Lara.Control.HandStatus);
@@ -1734,7 +1734,7 @@ bool SaveGame::Load(int slot)
 	Lara.Control.CanLook = s->lara()->control()->can_look();
 	Lara.Control.MoveAngle = s->lara()->control()->move_angle();
 	Lara.Control.RunJumpQueued = s->lara()->control()->run_jump_queued();
-	Lara.Control.TurnRate.y = s->lara()->control()->turn_rate();
+	Lara.Control.TurnRate = s->lara()->control()->turn_rate();
 	Lara.Control.Locked = s->lara()->control()->locked();
 	Lara.Control.HandStatus = (HandStatus)s->lara()->control()->hand_status();
 	Lara.Control.Weapon.GunType = (LaraWeaponType)s->lara()->control()->weapon()->gun_type();

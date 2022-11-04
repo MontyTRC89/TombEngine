@@ -26,7 +26,6 @@
 	constexpr inline auto QTR_BLOCK = [](auto x)			{ return BLOCK(x, 4); };
 
 	constexpr inline auto STEPUP_HEIGHT		  = BLOCK(3, 8);
-	constexpr inline auto CRAWL_STEPUP_HEIGHT = BLOCK(1, 4) - 1;
 	constexpr inline auto BAD_JUMP_CEILING	  = BLOCK(3, 16);
 	constexpr inline auto SHALLOW_WATER_DEPTH = BLOCK(1, 8);
 	constexpr inline auto WADE_DEPTH		  = STEPUP_HEIGHT;

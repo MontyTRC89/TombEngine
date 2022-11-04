@@ -36,7 +36,7 @@ void lara_as_swimcheat(ItemInfo* item, CollisionInfo* coll)
 		TriggerDynamicLight(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, 31, 150, 150, 150);
 
 	if (TrInput & IN_OPTION)
-		lara->Control.TurnRate.y = -ANGLE(12.0f);
+		lara->Control.TurnRate = -ANGLE(12.0f);
 
 	if (TrInput & IN_JUMP)
 	{

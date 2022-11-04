@@ -767,8 +767,10 @@ namespace TEN::Entities::Vehicles
 
 				auto vec = GetJointPosition(laraItem, LM_HIPS);
 
+				laraItem->Pose.Position.x = vec.x;
 				//laraItem->Pose.Position.y += -heightFromWater + 1; // Doesn't work as intended.
-				laraItem->Pose.Position = vec;
+				laraItem->Pose.Position.y = vec.y;
+				laraItem->Pose.Position.z = vec.z;
 
 				SetAnimation(laraItem, LA_ONWATER_IDLE);
 				laraItem->Animation.IsAirborne = false;

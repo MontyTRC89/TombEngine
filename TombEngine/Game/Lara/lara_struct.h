@@ -1,10 +1,7 @@
 #pragma once
-#include "Game/Lara/PlayerContext.h"
-#include "Objects/objectslist.h"
 #include "Math/Math.h"
 #include "Objects/objectslist.h"
 
-using namespace TEN::Entities::Player;
 using namespace TEN::Math;
 
 struct CreatureInfo;
@@ -40,7 +37,7 @@ enum LaraState
 	LS_TURN_LEFT_SLOW = 7,
 	LS_DEATH = 8,
 	LS_FREEFALL = 9,
-	LS_HANG_IDLE = 10,
+	LS_HANG = 10,
 	LS_REACH = 11,
 	LS_SPLAT = 12,
 	LS_UNDERWATER_IDLE = 13,
@@ -121,7 +118,7 @@ enum LaraState
 	LS_CRAWL_TURN_LEFT = 84,
 	LS_CRAWL_TURN_RIGHT = 85,
 	LS_CRAWL_BACK = 86,
-	LS_HANG_TO_CROUCH = 87,
+	LS_HANG_TO_CRAWL = 87,
 	LS_CRAWL_TO_HANG = 88,
 	LS_MISC_CONTROL = 89,
 
@@ -1112,8 +1109,8 @@ constexpr int MAX_DIARY_STRINGS_PER_PAGE = 8;
 
 struct DiaryString
 {
-	Vector2i Position = Vector2i::Zero;
-	int		 StringID = 0;
+	Vector2i Position;
+	int		StringID;
 };
 
 struct DiaryPage
@@ -1236,7 +1233,7 @@ struct SubsuitControlData
 struct LaraControlData
 {
 	short MoveAngle;
-	EulerAngles TurnRate;
+	short TurnRate;
 	int CalculatedJumpVelocity;
 	JumpDirection JumpDirection;
 	HandStatus HandStatus;
@@ -1267,8 +1264,6 @@ struct LaraInfo
 	CarriedWeaponInfo Weapons[(int)LaraWeaponType::NumWeapons];
 	FlareData Flare;
 	TorchData Torch;
-
-	PlayerContext Context;
 
 	EulerAngles ExtraHeadRot;
 	EulerAngles ExtraTorsoRot;

@@ -10,16 +10,12 @@ struct ItemInfo;
 
 // Lean rates
 #define LARA_LEAN_RATE ANGLE(1.5f)
-#define LARA_SWIM_LEAN_RATE ANGLE(2.0f)
-
-// Lean maxes
 #define LARA_LEAN_MAX  ANGLE(11.0f)
 
 // Turn rate acceleration rates
 #define LARA_TURN_RATE_ACCEL			ANGLE(0.25f)
 #define LARA_CRAWL_MOVE_TURN_RATE_ACCEL	ANGLE(0.15f)
 #define LARA_POLE_TURN_RATE_ACCEL		ANGLE(0.25f)
-#define LARA_SWIM_TURN_RATE_ACCEL		ANGLE(0.55f)
 #define LARA_SUBSUIT_TURN_RATE_ACCEL	ANGLE(0.25f)
 
 // Turn rate maxes

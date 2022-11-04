@@ -1,5 +1,22 @@
 #pragma once
 
+struct MoveTestSetup
+{
+	short Angle;
+	int	LowerFloorBound;
+	int UpperFloorBound;
+	bool CheckSlopeDown = true;
+	bool CheckSlopeUp = true;
+	bool CheckDeath = true;
+};
+
+struct MonkeyMoveTestSetup
+{
+	short Angle;
+	int LowerCeilingBound;
+	int UpperCeilingBound;
+};
+
 struct VaultTestSetup
 {
 	int LowerFloorBound;
@@ -39,34 +56,11 @@ struct CrawlVaultTestResult
 	LaraState TargetState;
 };
 
-struct WaterClimbOutTestSetup
+struct JumpTestSetup
 {
-	int LowerFloorBound;
-	int UpperFloorBound;
-	int ClampMin;
-	int ClampMax;
-	int GapMin;
-};
-
-struct WaterClimbOutTestResult
-{
-	bool Success;
-	int Height;
-	LaraState TargetState;
-};
-
-struct LedgeHangTestResult
-{
-	bool Success;
-	int Height;
-};
-
-struct HangClimbTestSetup
-{
-	int ClampMin;
-	int ClampMax;
-	int GapMin;
-	bool CheckSlope;
+	short Angle;
+	int Distance = int(CLICK(0.85f));
+	bool CheckWadeStatus = true;
 };
 
 struct CornerTestResult

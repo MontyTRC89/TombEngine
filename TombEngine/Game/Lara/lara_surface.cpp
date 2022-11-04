@@ -74,13 +74,7 @@ void lara_as_surface_idle(ItemInfo* item, CollisionInfo* coll)
 
 	if (TrInput & IN_FORWARD)
 	{
-		auto climbOutContext = TestLaraWaterClimbOut(item, coll);
-
-		if (TrInput & IN_ACTION && climbOutContext.Success)
-			SetContextWaterClimbOut(item, coll, climbOutContext);
-		else
-			item->Animation.TargetState = LS_ONWATER_FORWARD;
-		
+		item->Animation.TargetState = LS_ONWATER_FORWARD;
 		return;
 	}
 	else if (TrInput & IN_BACK)
@@ -128,39 +122,15 @@ void lara_as_surface_swim_forward(ItemInfo* item, CollisionInfo* coll)
 	if (TrInput & (IN_LEFT | IN_RIGHT))
 		ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL * 1.25f, 0, LARA_MED_TURN_RATE_MAX);
 
+	if (!(TrInput & IN_FORWARD))
+		item->Animation.TargetState = LS_ONWATER_IDLE;
+
 	if (DbInput & IN_JUMP)
 		SetLaraSwimDiveAnimation(item);
 
-	// TODO
-	/*if (TrInput & IN_ROLL || (TrInput & IN_FORWARD && TrInput & IN_BACK))
-	{
-		item->Animation.TargetState = LS_ROLL_FORWARD;
-		return;
-	}*/
-
-	if (TrInput & IN_FORWARD)
-	{
-		auto climbOutContext = TestLaraWaterClimbOut(item, coll);
-		
-		if (TrInput & IN_ACTION && climbOutContext.Success)
-		{
-			//item->Animation.TargetState = climbOutContext.TargetState; // TODO
-			SetContextWaterClimbOut(item, coll, climbOutContext);
-			return;
-		}
-		else
-		{
-			item->Animation.TargetState = LS_ONWATER_FORWARD;
-
-			item->Animation.Velocity.y += LARA_SWIM_VELOCITY_ACCEL;
-			if (item->Animation.Velocity.y > LARA_TREAD_VELOCITY_MAX)
-				item->Animation.Velocity.y = LARA_TREAD_VELOCITY_MAX;
-		}
-
-		return;
-	}
-	
-	item->Animation.TargetState = LS_ONWATER_IDLE;
+	item->Animation.Velocity.y += LARA_SWIM_VELOCITY_ACCEL;
+	if (item->Animation.Velocity.y > LARA_TREAD_VELOCITY_MAX)
+		item->Animation.Velocity.y = LARA_TREAD_VELOCITY_MAX;
 }
 
 // State:		LS_ONWATER_FORWARD (34)
@@ -172,7 +142,7 @@ void lara_col_surface_swim_forward(ItemInfo* item, CollisionInfo* coll)
 	lara->Control.MoveAngle = item->Pose.Orientation.y;
 	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
 	LaraSurfaceCollision(item, coll);
-
+	TestLaraWaterClimbOut(item, coll);
 	TestLaraLadderClimbOut(item, coll);
 }
 
@@ -194,22 +164,15 @@ void lara_as_surface_swim_left(ItemInfo* item, CollisionInfo* coll)
 			ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL * 1.25f, 0, LARA_SLOW_MED_TURN_RATE_MAX);
 	}
 
+	if (!(TrInput & IN_LSTEP || (TrInput & IN_WALK && TrInput & IN_LEFT)))
+		item->Animation.TargetState = LS_ONWATER_IDLE;
+
 	if (DbInput & IN_JUMP)
 		SetLaraSwimDiveAnimation(item);
 
-	if (TrInput & IN_LSTEP || (TrInput & IN_WALK && TrInput & IN_LEFT))
-	{
-		item->Animation.TargetState = LS_ONWATER_LEFT;
-
-		item->Animation.Velocity.y += LARA_SWIM_VELOCITY_ACCEL;
-		if (item->Animation.Velocity.y > LARA_TREAD_VELOCITY_MAX)
-			item->Animation.Velocity.y = LARA_TREAD_VELOCITY_MAX;
-
-		return;
-
-	}
-
-	item->Animation.TargetState = LS_ONWATER_IDLE;
+	item->Animation.Velocity.y += LARA_SWIM_VELOCITY_ACCEL;
+	if (item->Animation.Velocity.y > LARA_TREAD_VELOCITY_MAX)
+		item->Animation.Velocity.y = LARA_TREAD_VELOCITY_MAX;
 }
 
 // State:		LS_ONWATER_LEFT (48)
@@ -240,21 +203,15 @@ void lara_as_surface_swim_right(ItemInfo* item, CollisionInfo* coll)
 			ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL * 1.25f, 0, LARA_SLOW_MED_TURN_RATE_MAX);
 	}
 
+	if (!(TrInput & IN_RSTEP || (TrInput & IN_WALK && TrInput & IN_RIGHT)))
+		item->Animation.TargetState = LS_ONWATER_IDLE;
+
 	if (DbInput & IN_JUMP)
 		SetLaraSwimDiveAnimation(item);
 
-	if (TrInput & IN_RSTEP || (TrInput & IN_WALK && TrInput & IN_RIGHT))
-	{
-		item->Animation.TargetState = LS_ONWATER_RIGHT;
-
-		item->Animation.Velocity.y += LARA_SWIM_VELOCITY_ACCEL;
-		if (item->Animation.Velocity.y > LARA_TREAD_VELOCITY_MAX)
-			item->Animation.Velocity.y = LARA_TREAD_VELOCITY_MAX;
-
-		return;
-	}
-
-	item->Animation.TargetState = LS_ONWATER_IDLE;
+	item->Animation.Velocity.y += LARA_SWIM_VELOCITY_ACCEL;
+	if (item->Animation.Velocity.y > LARA_TREAD_VELOCITY_MAX)
+		item->Animation.Velocity.y = LARA_TREAD_VELOCITY_MAX;
 }
 
 // State:		LS_ONWATER_RIGHT (49)
@@ -285,18 +242,12 @@ void lara_as_surface_swim_back(ItemInfo* item, CollisionInfo* coll)
 	if (DbInput & IN_JUMP)
 		SetLaraSwimDiveAnimation(item);
 
-	if (TrInput & IN_BACK)
-	{
-		item->Animation.TargetState = LS_ONWATER_BACK;
+	if (!(TrInput & IN_BACK))
+		item->Animation.TargetState = LS_ONWATER_IDLE;
 
-		item->Animation.Velocity.y += LARA_SWIM_VELOCITY_ACCEL;
-		if (item->Animation.Velocity.y > LARA_TREAD_VELOCITY_MAX)
-			item->Animation.Velocity.y = LARA_TREAD_VELOCITY_MAX;
-
-		return;
-	}
-
-	item->Animation.TargetState = LS_ONWATER_IDLE;
+	item->Animation.Velocity.y += LARA_SWIM_VELOCITY_ACCEL;
+	if (item->Animation.Velocity.y > LARA_TREAD_VELOCITY_MAX)
+		item->Animation.Velocity.y = LARA_TREAD_VELOCITY_MAX;
 }
 
 // State:		LS_ONWATER_BACK (47)
@@ -313,14 +264,8 @@ void lara_col_surface_swim_back(ItemInfo* item, CollisionInfo* coll)
 // Collision:	lara_default_col()
 void lara_as_surface_climb_out(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
-
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
 	Camera.flags = CF_FOLLOW_CENTER;
-	Camera.laraNode = LM_HIPS; // Forces the camera to follow Lara instead of snapping.
-
-	EaseOutLaraHeight(item, lara->ProjectedFloorHeight - item->Pose.Position.y);
-	item->Pose.Orientation.Lerp(lara->TargetOrientation, 0.4f);
-	item->Animation.TargetState = LS_IDLE;
+	Camera.laraNode = LM_HIPS;	// Forces the camera to follow Lara instead of snapping.
 }

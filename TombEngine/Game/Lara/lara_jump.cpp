@@ -229,18 +229,24 @@ void lara_col_reach(ItemInfo* item, CollisionInfo* coll)
 		item->Animation.IsAirborne = true;
 
 	lara->Control.MoveAngle = item->Pose.Orientation.y;
-	coll->Setup.Height = LARA_HEIGHT;
+
+	// HACK: height is altered according to VerticalVelocity to fix "issues" with physically impossible
+	// 6-click high ceiling running jumps. While TEN model is physically correct, original engines
+	// allowed certain margin of deflection due to bug caused by hacky inclusion of headroom in coll checks.
+
+	coll->Setup.Height = item->Animation.Velocity.y > 0 ? LARA_HEIGHT_REACH : LARA_HEIGHT;
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = 0;
 	coll->Setup.LowerCeilingBound = BAD_JUMP_CEILING;
 	coll->Setup.ForwardAngle = lara->Control.MoveAngle;
+	coll->Setup.Radius = coll->Setup.Radius * 1.2f;
 	coll->Setup.Mode = CollisionProbeMode::FreeForward;
 	GetCollisionInfo(coll, item);
 
 	// Overhang hook.
 	SlopeReachExtra(item, coll);
 
-	if (DoLaraLedgeHang(item, coll))
+	if (TestLaraHangJump(item, coll))
 		return;
 
 	LaraSlideEdgeJump(item, coll);
@@ -269,17 +275,17 @@ void lara_as_jump_prepare(ItemInfo* item, CollisionInfo* coll)
 		lara->Control.JumpDirection = JumpDirection::None;
 
 	if (((TrInput & IN_FORWARD &&
-			!(TrInput & IN_BACK && lara->Control.JumpDirection == JumpDirection::Back)) || // Back jump takes priority in this exception.
+			!(TrInput & IN_BACK && lara->Control.JumpDirection == JumpDirection::Back)) ||	// Back jump takes priority in this exception.
 		!IsDirectionActionHeld() && lara->Control.JumpDirection == JumpDirection::Forward) &&
-		lara->Context.CanJumpForward())
+		TestLaraJumpForward(item, coll))
 	{
 		item->Animation.TargetState = LS_JUMP_FORWARD;
 		lara->Control.JumpDirection = JumpDirection::Forward;
 		return;
 	}
 	else if ((TrInput & IN_BACK ||
-		IsDirectionActionHeld() && lara->Control.JumpDirection == JumpDirection::Back) &&
-		lara->Context.CanJumpBackward())
+		!IsDirectionActionHeld() && lara->Control.JumpDirection == JumpDirection::Back) &&
+		TestLaraJumpBack(item, coll))
 	{
 		item->Animation.TargetState = LS_JUMP_BACK;
 		lara->Control.JumpDirection = JumpDirection::Back;
@@ -288,7 +294,7 @@ void lara_as_jump_prepare(ItemInfo* item, CollisionInfo* coll)
 
 	if ((TrInput & IN_LEFT ||
 		!IsDirectionActionHeld() && lara->Control.JumpDirection == JumpDirection::Left) &&
-		lara->Context.CanJumpLeft())
+		TestLaraJumpLeft(item, coll))
 	{
 		item->Animation.TargetState = LS_JUMP_LEFT;
 		lara->Control.JumpDirection = JumpDirection::Left;
@@ -296,7 +302,7 @@ void lara_as_jump_prepare(ItemInfo* item, CollisionInfo* coll)
 	}
 	else if ((TrInput & IN_RIGHT ||
 		!IsDirectionActionHeld() && lara->Control.JumpDirection == JumpDirection::Right) &&
-		lara->Context.CanJumpRight())
+		TestLaraJumpRight(item, coll))
 	{
 		item->Animation.TargetState = LS_JUMP_RIGHT;
 		lara->Control.JumpDirection = JumpDirection::Right;
@@ -304,7 +310,7 @@ void lara_as_jump_prepare(ItemInfo* item, CollisionInfo* coll)
 	}
 
 	// No directional key pressed AND no directional lock; commit to jump up.
-	if (lara->Context.CanJumpUp())
+	if (TestLaraJumpUp(item, coll))
 	{
 		item->Animation.TargetState = LS_JUMP_UP;
 		lara->Control.JumpDirection = JumpDirection::Up;
@@ -630,7 +636,7 @@ void lara_col_jump_up(ItemInfo* item, CollisionInfo* coll)
 	coll->Setup.Mode = CollisionProbeMode::FreeForward;
 	GetCollisionInfo(coll, item);
 
-	if (DoLaraLedgeHang(item, coll))
+	if (TestLaraHangJumpUp(item, coll))
 		return;
 
 	LaraDeflectTopSide(item, coll);
@@ -746,7 +752,7 @@ void lara_as_swan_dive(ItemInfo* item, CollisionInfo* coll)
 			item->Animation.TargetState = LS_DEATH;
 		else if (TestLaraSlide(item, coll))
 			SetLaraSlideAnimation(item, coll);
-		else if ((TrInput & IN_CROUCH || lara->Context.CanCrawlspaceDive()) &&
+		else if ((TrInput & IN_CROUCH || TestLaraCrawlspaceDive(item, coll)) &&
 			g_GameFlow->HasCrawlspaceDive())
 		{
 			item->Animation.TargetState = LS_CROUCH_IDLE;

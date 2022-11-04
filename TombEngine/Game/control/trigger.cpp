@@ -370,7 +370,7 @@ void TestTriggers(FloorInfo* floor, int x, int y, int z, bool heavy, int heavyFl
 			return;
 
 		case TRIGGER_TYPES::CLIMB_T:
-			if (LaraItem->Animation.ActiveState == LS_HANG_IDLE ||
+			if (LaraItem->Animation.ActiveState == LS_HANG ||
 				LaraItem->Animation.ActiveState == LS_LADDER_IDLE ||
 				LaraItem->Animation.ActiveState == LS_LADDER_UP ||
 				LaraItem->Animation.ActiveState == LS_LADDER_LEFT ||
