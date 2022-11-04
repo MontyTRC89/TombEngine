@@ -1098,22 +1098,37 @@ void ControlWaterfallMist(short itemNumber)
 
 	if (!TriggerActive(item))
 		return;
-
-	int size  = 64;
-	int width = 1;
-
-	if (item->TriggerFlags != 0)
-	{
-		size = item->TriggerFlags % 100;
-		width = round(item->TriggerFlags / 100) * 100;
-	}
 	
-	TriggerWaterfallMist(item->Pose.Position, item->Color, width, size, item->Pose.Orientation.y + ANGLE(180.0f));
+	TriggerWaterfallMist(*item);
 	SoundEffect(SFX_TR4_WATERFALL_LOOP, &item->Pose);
 }
 
-void TriggerWaterfallMist(Vector3i pos, Vector4 color, int width, int size, short angle)
+void TriggerWaterfallMist(const ItemInfo& item)
 {
+	static const int scale = 3;
+
+	int size = 64;
+	int width = 1;
+	short angle = item.Pose.Orientation.y + ANGLE(180.0f);
+
+	if (item.TriggerFlags != 0)
+	{
+		size = item.TriggerFlags % 100;
+		width = std::clamp(int(round(item.TriggerFlags / 100) * 100), 0, SECTOR(8));
+	}
+
+	float cos = phd_cos(angle);
+	float sin = phd_sin(angle);
+
+	int maxPosX =  width * phd_sin(angle) + item.Pose.Position.x;
+	int maxPosZ =  width * phd_cos(angle) + item.Pose.Position.z;
+	int minPosX = -width * phd_sin(angle) + item.Pose.Position.x;
+	int minPosZ = -width * phd_cos(angle) + item.Pose.Position.z;
+
+	if (!TestPointInView(Vector3i(maxPosX, item.Pose.Position.y, maxPosZ), size * scale, item.RoomNumber) &&
+		!TestPointInView(Vector3i(minPosX, item.Pose.Position.y, minPosZ), size * scale, item.RoomNumber))
+		return;
+
 	float step = size * 0.75f;
 	int steps = int((width / 2) / step);
 	int currentStep = 0;
@@ -1133,21 +1148,21 @@ void TriggerWaterfallMist(Vector3i pos, Vector4 color, int width, int size, shor
 				spark->on = true;
 
 				char colorOffset = (GetRandomControl() & 0x1F) - 0x0F;
-				spark->sR = std::clamp(int(color.x / 2.0f * UCHAR_MAX) + colorOffset, 0, UCHAR_MAX);
-				spark->sG = std::clamp(int(color.y / 2.0f * UCHAR_MAX) + colorOffset, 0, UCHAR_MAX);
-				spark->sB = std::clamp(int(color.z / 2.0f * UCHAR_MAX) + colorOffset, 0, UCHAR_MAX);
-				spark->dR = std::clamp(int(color.x / 2.0f * UCHAR_MAX) + colorOffset, 0, UCHAR_MAX);
-				spark->dG = std::clamp(int(color.y / 2.0f * UCHAR_MAX) + colorOffset, 0, UCHAR_MAX);
-				spark->dB = std::clamp(int(color.z / 2.0f * UCHAR_MAX) + colorOffset, 0, UCHAR_MAX);
+				spark->sR = std::clamp(int(item.Color.x / 2.0f * UCHAR_MAX) + colorOffset, 0, UCHAR_MAX);
+				spark->sG = std::clamp(int(item.Color.y / 2.0f * UCHAR_MAX) + colorOffset, 0, UCHAR_MAX);
+				spark->sB = std::clamp(int(item.Color.z / 2.0f * UCHAR_MAX) + colorOffset, 0, UCHAR_MAX);
+				spark->dR = std::clamp(int(item.Color.x / 2.0f * UCHAR_MAX) + colorOffset, 0, UCHAR_MAX);
+				spark->dG = std::clamp(int(item.Color.y / 2.0f * UCHAR_MAX) + colorOffset, 0, UCHAR_MAX);
+				spark->dB = std::clamp(int(item.Color.z / 2.0f * UCHAR_MAX) + colorOffset, 0, UCHAR_MAX);
 
 				spark->colFadeSpeed = 1;
 				spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
 				spark->life = spark->sLife = (GetRandomControl() & 0x0F) + 25;
 				spark->fadeToBlack = spark->life - 6;
 
-				spark->x = offset * sign * phd_sin(angle) + (GetRandomControl() & 0xF) + pos.x - 8;
-				spark->y = (GetRandomControl() & 0xF) + pos.y - 8;
-				spark->z = offset * sign * phd_cos(angle) + (GetRandomControl() & 0xF) + pos.z - 8;
+				spark->x = offset * sign * phd_sin(angle) + (GetRandomControl() & 0xF) + item.Pose.Position.x - 8;
+				spark->y = (GetRandomControl() & 0xF) + item.Pose.Position.y - 8;
+				spark->z = offset * sign * phd_cos(angle) + (GetRandomControl() & 0xF) + item.Pose.Position.z - 8;
 
 				spark->xVel = 0;
 				spark->yVel = (GetRandomControl() & 0x7F) + 128;
@@ -1155,14 +1170,14 @@ void TriggerWaterfallMist(Vector3i pos, Vector4 color, int width, int size, shor
 
 				spark->friction = 0;
 				spark->rotAng = GetRandomControl() & 0xFFF;
-				spark->scalar = 3;
+				spark->scalar = scale;
 				spark->maxYvel = 0;
 				spark->rotAdd = (GetRandomControl() & 0x1F) - 16;
 				spark->gravity = -spark->yVel >> 2;
 				spark->sSize = spark->size = (GetRandomControl() & 3) + size;
 				spark->dSize = 2 * spark->size;
 
-				spark->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex;
+				spark->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + (Random::GenerateInt(0, 100) > 90 ? 17 : 0);
 				spark->flags = 538;
 			}
 
