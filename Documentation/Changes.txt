@@ -28,6 +28,7 @@ Version 1.0.3
 * Fix search animations - allow chest and shelf animations to play properly.
 * Fix sarcophagus and its item pickup.
 * Fix underwater door and double doors continuing to be interactable after opening.
+* Fix underwater door being interactable when Underwater Switch is on the same square as underwater door (interference)
 * Fix ability to turn when aligning to an object while standing.
 * Fix left arm lock while picking up an item with a flare in hand.
 * Fix potential crashes when exiting game.
