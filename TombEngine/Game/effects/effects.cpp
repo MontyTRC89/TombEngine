@@ -1120,10 +1120,10 @@ void TriggerWaterfallMist(const ItemInfo& item)
 	float cos = phd_cos(angle);
 	float sin = phd_sin(angle);
 
-	int maxPosX =  width * phd_sin(angle) + item.Pose.Position.x;
-	int maxPosZ =  width * phd_cos(angle) + item.Pose.Position.z;
-	int minPosX = -width * phd_sin(angle) + item.Pose.Position.x;
-	int minPosZ = -width * phd_cos(angle) + item.Pose.Position.z;
+	int maxPosX =  width * sin + item.Pose.Position.x;
+	int maxPosZ =  width * cos + item.Pose.Position.z;
+	int minPosX = -width * sin + item.Pose.Position.x;
+	int minPosZ = -width * cos + item.Pose.Position.z;
 
 	if (!TestPointInView(Vector3i(maxPosX, item.Pose.Position.y, maxPosZ), size * scale, item.RoomNumber) &&
 		!TestPointInView(Vector3i(minPosX, item.Pose.Position.y, minPosZ), size * scale, item.RoomNumber))
