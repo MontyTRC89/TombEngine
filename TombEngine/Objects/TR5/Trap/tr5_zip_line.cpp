@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "Objects/TR5/Trap/tr5_deathslide.h"
+#include "Objects/TR5/Trap/tr5_zip_line.h"
 
 #include "Game/animation.h"
 #include "Game/collision/collide_item.h"

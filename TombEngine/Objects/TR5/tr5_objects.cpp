@@ -57,7 +57,7 @@
 
 // Traps
 #include "tr5_ventilator.h"
-#include "tr5_deathslide.h"
+#include "tr5_zip_line.h"
 #include "Objects/Effects/tr5_electricity.h"
 #include "tr5_romehammer.h"
 #include "tr5_fallingceiling.h"
