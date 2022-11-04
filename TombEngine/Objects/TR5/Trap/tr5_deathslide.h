@@ -1,7 +1,7 @@
 #pragma once
-#include "Game/items.h"
 #include "Game/collision/collide_room.h"
+#include "Game/items.h"
 
-void InitialiseDeathSlide(short itemNumber);
-void DeathSlideCollision(short itemNumber, ItemInfo* l, CollisionInfo* coll);
-void ControlDeathSlide(short itemNumber);
+void InitialiseZipLine(short itemNumber);
+void ZipLineCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);
+void ControlZipLine(short itemNumber);

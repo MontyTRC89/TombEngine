@@ -1062,9 +1062,9 @@ static void StartTrap(ObjectInfo *obj)
 	obj = &Objects[ID_ZIPLINE_HANDLE];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseDeathSlide;
-		obj->collision = DeathSlideCollision;
-		obj->control = ControlDeathSlide;
+		obj->initialise = InitialiseZipLine;
+		obj->collision = ZipLineCollision;
+		obj->control = ControlZipLine;
 		obj->saveAnim = true;
 		obj->saveFlags = true;
 		obj->savePosition = true;
