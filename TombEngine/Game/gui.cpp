@@ -1802,7 +1802,7 @@ namespace TEN::Gui
 							ClearAllActions();
 							ActionMap[(int)In::Flare].Update(1.0f);
 
-							LaraGun(item);
+							HandleWeapon(item);
 							ClearAllActions();
 						}
 

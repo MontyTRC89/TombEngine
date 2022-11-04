@@ -125,7 +125,7 @@ bool HandleLaraVehicle(ItemInfo* item, CollisionInfo* coll)
 
 		// Boats are processed like normal items in loop.
 	default:
-		LaraGun(item);
+		HandleWeapon(item);
 	}
 
 	return true;

@@ -55,6 +55,7 @@ public:
 	void				AddSecret(int levelSecretIndex);
 	void				SetIntroImagePath(std::string const& path);
 	void				SetTitleScreenImagePath(std::string const& path);
+	void				SetNumberOfSecrets(int secretsNumber);
 	bool				IsFlyCheatEnabled() const;
 	void				EnableFlyCheat(bool flyCheat);
 	bool				CanPlayAnyLevel() const;

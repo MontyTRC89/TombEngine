@@ -1,23 +1,22 @@
 #include "./CameraMatrixBuffer.hlsli"
 #include "./Blending.hlsli"
 #include "./VertexInput.hlsli"
+#include "./InstancedSpriteBuffer.hlsli"
+#include "./Math.hlsli"
 
 cbuffer SpriteBuffer: register(b9)
 {
-	float4x4 BillboardMatrix;
-	float4 Color;
-	float IsBillboard;
-	float IsSoftParticle;
-	float2 SpritesPadding;
+	float4x4 billboardMatrix;
+	float4 color;
+	bool isBillboard;
 }
 
 struct PixelShaderInput
 {
 	float4 Position: SV_POSITION;
-	float3 Normal: NORMAL;
 	float2 UV: TEXCOORD1;
 	float4 Color: COLOR;
-	float  Fog : FOG;
+	float Fog : FOG;
 	float4 PositionCopy: TEXCOORD2;
 };
 
@@ -27,27 +26,26 @@ SamplerState Sampler : register(s0);
 Texture2D DepthMap : register(t6);
 SamplerState DepthMapSampler : register(s6);
 
-PixelShaderInput VS(VertexShaderInput input)
+PixelShaderInput VS(VertexShaderInput input, uint InstanceID : SV_InstanceID)
 {
 	PixelShaderInput output;
 
 	float4 worldPosition;
 
-	if (IsBillboard) 
+	if (Sprites[InstanceID].IsBillboard == 1)
 	{
-		worldPosition = mul(float4(input.Position, 1.0f), BillboardMatrix);
-		output.Position = mul(mul(float4(input.Position, 1.0f), BillboardMatrix), ViewProjection);
+		worldPosition = mul(float4(input.Position, 1.0f), Sprites[InstanceID].World);
+		output.Position = mul(mul(float4(input.Position, 1.0f), Sprites[InstanceID].World), ViewProjection);
 	}
-	else 
+	else
 	{
 		worldPosition = float4(input.Position, 1.0f);
 		output.Position = mul(float4(input.Position, 1.0f), ViewProjection);
 	}
 
 	output.PositionCopy = output.Position;
-	
-	output.Normal = input.Normal;
-	output.Color = input.Color * Color;
+
+	output.Color = Sprites[InstanceID].Color;
 	output.UV = input.UV;
 
 	float4 d = length(CamPositionWS - worldPosition);
@@ -59,18 +57,34 @@ PixelShaderInput VS(VertexShaderInput input)
 	return output;
 }
 
+// TODO: From NVIDIA SDK, check if it can be useful instead of linear ramp
+float Contrast(float Input, float ContrastPower)
+{
+#if 1
+	//piecewise contrast function
+	bool IsAboveHalf = Input > 0.5;
+	float ToRaise = saturate(2 * (IsAboveHalf ? 1 - Input : Input));
+	float Output = 0.5 * pow(ToRaise, ContrastPower);
+	Output = IsAboveHalf ? 1 - Output : Output;
+	return Output;
+#else
+	// another solution to create a kind of contrast function
+	return 1.0 - exp2(-2 * pow(2.0 * saturate(Input), ContrastPower));
+#endif
+}
+
 float LinearizeDepth(float depth)
 {
 	return (2.0f * NearPlane) / (FarPlane + NearPlane - depth * (FarPlane - NearPlane));
 }
 
-float4 PS(PixelShaderInput input) : SV_TARGET
+float4 PS(PixelShaderInput input, uint InstanceID : SV_InstanceID) : SV_TARGET
 {
 	float4 output = Texture.Sample(Sampler, input.UV) * input.Color;
 
 	DoAlphaTest(output);
 
-	if (IsSoftParticle == 1)
+	if (Sprites[InstanceID].IsSoftParticle == 1)
 	{
 		float particleDepth = input.PositionCopy.z / input.PositionCopy.w;
 		input.PositionCopy.xy /= input.PositionCopy.w;
