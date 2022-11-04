@@ -16,4 +16,4 @@ void SetFlareArm(ItemInfo* laraItem, int armFrame);
 void CreateFlare(ItemInfo* laraItem, GAME_OBJECT_ID objectNumber, bool isThrown);
 void DrawFlareInAir(ItemInfo* flareItem);
 void DoFlareInHand(ItemInfo* laraItem, int flareLife);
-bool DoFlareLight(Vector3i* pos, int flareLife);
+bool DoFlareLight(const Vector3i& pos, int flareLife);

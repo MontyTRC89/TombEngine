@@ -23,7 +23,7 @@
 #include "Objects/Utils/VehicleHelpers.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
-#include "Specific/input.h"
+#include "Specific/Input/Input.h"
 #include "Specific/setup.h"
 
 using namespace TEN::Input;
@@ -720,10 +720,10 @@ namespace TEN::Entities::Vehicles
 		auto upv = GetUpvInfo(upvItem);
 		auto* lara = GetLaraInfo(laraItem);
 
-		auto& ammo = GetAmmo(laraItem, LaraWeaponType::HarpoonGun);
-		if (ammo.getCount() == 0 && !ammo.hasInfinite())
+		auto& ammo = GetAmmo(*lara, LaraWeaponType::HarpoonGun);
+		if (ammo.GetCount() == 0 && !ammo.HasInfinite())
 			return;
-		else if (!ammo.hasInfinite())
+		else if (!ammo.HasInfinite())
 			ammo--;
 
 		short itemNumber = CreateItem();

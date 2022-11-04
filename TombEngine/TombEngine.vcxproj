@@ -164,6 +164,8 @@ CALL gen.bat</Command>
     <ClInclude Include="Game\control\volume.h" />
     <ClInclude Include="Game\debug\debug.h" />
     <ClInclude Include="Game\effects\lightning.h" />
+    <ClInclude Include="Game\GuiObjects.h" />
+    <ClInclude Include="Specific\Input\InputAction.h" />
     <ClInclude Include="Game\itemdata\door_data.h" />
     <ClInclude Include="Game\effects\drip.h" />
     <ClInclude Include="Game\effects\explosion.h" />
@@ -215,7 +217,10 @@ CALL gen.bat</Command>
     <ClInclude Include="Objects\TR5\Trap\tr5_wreckingball.h" />
     <ClInclude Include="Objects\Utils\VehicleHelpers.h" />
     <ClInclude Include="Renderer\ConstantBuffers\AlphaTestBuffer.h" />
+    <ClInclude Include="Renderer\ConstantBuffers\InstancedSpriteBuffer.h" />
+    <ClInclude Include="Renderer\ConstantBuffers\BlendingBuffer.h" />
     <ClInclude Include="Renderer\ConstantBuffers\PostProcessBuffer.h" />
+    <ClInclude Include="Renderer\RendererSpriteVertex.h" />
     <ClInclude Include="Renderer\RendererRectangle.h" />
     <ClInclude Include="Renderer\Structures\RendererBone.h" />
     <ClInclude Include="Renderer\Structures\RendererDisplayMode.h" />
@@ -281,7 +286,7 @@ CALL gen.bat</Command>
     <ClInclude Include="Specific\memory\LinearArrayBuffer.h" />
     <ClInclude Include="Game\memory\MemoryPoolAllocator.h" />
     <ClInclude Include="Specific\memory\Vector.h" />
-    <ClInclude Include="Game\gui.h" />
+    <ClInclude Include="Game\Gui.h" />
     <ClInclude Include="Game\effects\simple_particle.h" />
     <ClInclude Include="Renderer\TextureBase.h" />
     <ClInclude Include="Renderer\RendererTransparentFace.h" />
@@ -587,7 +592,7 @@ CALL gen.bat</Command>
     <ClInclude Include="Game\effects\tomb4fx.h" />
     <ClInclude Include="Objects\objectslist.h" />
     <ClInclude Include="Game\memory\malloc.h" />
-    <ClInclude Include="Specific\input.h" />
+    <ClInclude Include="Specific\Input\Input.h" />
     <ClInclude Include="Specific\IO\Streams.h" />
     <ClInclude Include="Specific\level.h" />
     <ClInclude Include="Specific\newtypes.h" />
@@ -620,6 +625,8 @@ CALL gen.bat</Command>
     <ClCompile Include="Game\effects\weather.cpp" />
     <ClCompile Include="Game\collision\floordata.cpp" />
     <ClCompile Include="Game\effects\footprint.cpp" />
+    <ClCompile Include="Game\GuiObjects.cpp" />
+    <ClCompile Include="Specific\Input\InputAction.cpp" />
     <ClCompile Include="Game\itemdata\itemdata.cpp" />
     <ClCompile Include="Game\Lara\lara_basic.cpp" />
     <ClCompile Include="Game\Lara\lara_cheat.cpp" />
@@ -636,7 +643,7 @@ CALL gen.bat</Command>
     <ClCompile Include="Game\Lara\lara_tests.cpp" />
     <ClCompile Include="Game\effects\lightning.cpp" />
     <ClCompile Include="Game\misc.cpp" />
-    <ClCompile Include="Game\gui.cpp" />
+    <ClCompile Include="Game\Gui.cpp" />
     <ClCompile Include="Game\effects\simple_particle.cpp" />
     <ClCompile Include="Game\pickup\pickup_ammo.cpp" />
     <ClCompile Include="Game\pickup\pickup_consumable.cpp" />
@@ -942,7 +949,7 @@ CALL gen.bat</Command>
     <ClCompile Include="Objects\TR4\Entity\tr4_skeleton.cpp" />
     <ClCompile Include="Objects\TR3\Entity\tr3_tribesman.cpp" />
     <ClCompile Include="Specific\configuration.cpp" />
-    <ClCompile Include="Specific\input.cpp" />
+    <ClCompile Include="Specific\Input\Input.cpp" />
     <ClCompile Include="Specific\IO\ChunkId.cpp" />
     <ClCompile Include="Specific\IO\ChunkReader.cpp" />
     <ClCompile Include="Specific\IO\Streams.cpp" />
@@ -960,7 +967,6 @@ CALL gen.bat</Command>
     <None Include="packages.config" />
     <None Include="Resources.aps" />
     <None Include="RuleSet.ruleset" />
-    <None Include="Shaders\AlphaTestBuffer.hlsli" />
     <None Include="Shaders\AnimatedTextures.hlsli" />
     <None Include="Shaders\CameraMatrixBuffer.hlsli">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
@@ -969,6 +975,8 @@ CALL gen.bat</Command>
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</DeploymentContent>
       <FileType>Text</FileType>
     </None>
+    <None Include="Shaders\InstancedSpriteBuffer.hlsli" />
+    <None Include="Shaders\Blending.hlsli" />
     <None Include="Shaders\ShaderLight.hlsli">
       <DeploymentContent>true</DeploymentContent>
     </None>
@@ -983,24 +991,6 @@ CALL gen.bat</Command>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resources.rc" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Shaders\DX11\Test.fx">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</DeploymentContent>
-      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</DeploymentContent>
-      <FileType>Document</FileType>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Shaders\DX11_Test.fx">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</DeploymentContent>
-      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</DeploymentContent>
-      <FileType>Document</FileType>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <Image Include="ten.ico" />
@@ -1076,6 +1066,19 @@ CALL gen.bat</Command>
       <FileType>Document</FileType>
     </None>
     <None Include="Shaders\DX11_Inventory.fx">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</DeploymentContent>
+      <FileType>Document</FileType>
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">PS</EntryPointName>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">4.1</ShaderModel>
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">PS</EntryPointName>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">4.1</ShaderModel>
+    </None>
+    <None Include="Shaders\DX11_InstancedSprites.fx">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</DeploymentContent>

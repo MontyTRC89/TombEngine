@@ -6,7 +6,7 @@
 #include "Game/effects/effects.h"
 #include "Game/effects/simple_particle.h"
 #include "Game/effects/tomb4fx.h"
-#include "Game/gui.h"
+#include "Game/Gui.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
@@ -15,6 +15,7 @@
 #include "Objects/TR4/Vehicles/motorbike_info.h"
 #include "Objects/Utils/VehicleHelpers.h"
 #include "Sound/sound.h"
+#include "Specific/Input/Input.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
@@ -231,8 +232,11 @@ namespace TEN::Entities::Vehicles
 		bool isDead = false;
 		if (laraItem->HitPoints <= 0)
 		{
-			TrInput &= ~(IN_LEFT | IN_RIGHT | IN_BACK | IN_FORWARD);
 			isDead = true;
+			ClearAction(In::Forward);
+			ClearAction(In::Back);
+			ClearAction(In::Left);
+			ClearAction(In::Right);
 		}
 
 		int pitch = 0;

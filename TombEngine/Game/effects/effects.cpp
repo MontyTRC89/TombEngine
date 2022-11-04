@@ -1096,6 +1096,9 @@ void ControlWaterfallMist(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
 
+	if (!TriggerActive(item))
+		return;
+
 	int x = item->Pose.Position.x - phd_sin(item->Pose.Orientation.y + ANGLE(180.0f)) * CLICK(2) + phd_sin(item->Pose.Orientation.y - ANGLE(90.0f)) * CLICK(1);
 	int z = item->Pose.Position.z - phd_cos(item->Pose.Orientation.y + ANGLE(180.0f)) * CLICK(2) + phd_cos(item->Pose.Orientation.y - ANGLE(90.0f)) * CLICK(1);
 

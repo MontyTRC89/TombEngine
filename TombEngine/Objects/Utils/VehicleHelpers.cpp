@@ -12,7 +12,7 @@
 #include "Game/room.h"
 #include "Math/Math.h"
 #include "Sound/sound.h"
-#include "Specific/input.h"
+#include "Specific/Input/Input.h"
 #include "Specific/setup.h"
 
 using namespace TEN::Input;

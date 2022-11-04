@@ -12,7 +12,7 @@
 #include "Math/Math.h"
 #include "Objects/TR2/Vehicles/skidoo_info.h"
 #include "Objects/Utils/VehicleHelpers.h"
-#include "Specific/input.h"
+#include "Specific/Input/Input.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
 #include "Sound/sound.h"
@@ -156,8 +156,11 @@ namespace TEN::Entities::Vehicles
 
 		if (laraItem->HitPoints <= 0)
 		{
-			TrInput &= ~(IN_LEFT | IN_RIGHT | IN_BACK | IN_FORWARD);
-			isDead = true;
+			dead = true;
+			ClearAction(In::Forward);
+			ClearAction(In::Back);
+			ClearAction(In::Left);
+			ClearAction(In::Right);
 		}
 		else if (laraItem->Animation.ActiveState == SKIDOO_STATE_DISMOUNT_FALL)
 		{

@@ -31,6 +31,7 @@ namespace TEN::Renderer
 			m_rooms[i].EffectsToDraw.clear();
 			m_rooms[i].TransparentFacesToDraw.clear();
 			m_rooms[i].StaticsToDraw.clear();
+			m_rooms[i].LightsToDraw.clear();
 			m_rooms[i].Visited = false;
 			m_rooms[i].Clip = RendererRectangle(m_screenWidth, m_screenHeight, 0, 0);
 			m_rooms[i].ClipTest = RendererRectangle(m_screenWidth, m_screenHeight, 0, 0);
@@ -374,7 +375,7 @@ namespace TEN::Renderer
 				bool inFrustum = false;
 				for (int i = 0; !inFrustum, i < cnt; i++)
 					// Blow up sphere radius by half for cases of too small calculated spheres.
-					if (renderView.camera.frustum.SphereInFrustum(spheres[i].Center, spheres[i].Radius * 1.5f))
+					if (renderView.camera.Frustum.SphereInFrustum(spheres[i].Center, spheres[i].Radius * 1.5f))
 						inFrustum = true;
 				
 				if (!inFrustum)
@@ -428,7 +429,7 @@ namespace TEN::Renderer
 
 			const auto& bounds = GetBoundsAccurate(*mesh, true).ToBoundingOrientedBox(mesh->pos);
 			auto length = Vector3(bounds.Extents).Length();
-			if (!renderView.camera.frustum.SphereInFrustum(bounds.Center, length))
+			if (!renderView.camera.Frustum.SphereInFrustum(bounds.Center, length))
 				continue;
 
 			std::vector<RendererLight*> lights;
@@ -706,6 +707,7 @@ namespace TEN::Renderer
 				continue;
 
 			renderView.lightsToDraw.push_back(light);
+			room.LightsToDraw.push_back(light);
 		}
 	}
 

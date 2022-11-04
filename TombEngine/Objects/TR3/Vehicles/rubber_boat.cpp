@@ -14,7 +14,7 @@
 #include "Objects/Utils/VehicleHelpers.h"
 #include "Renderer/Renderer11Enums.h"
 #include "Sound/sound.h"
-#include "Specific/input.h"
+#include "Specific/Input/Input.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
 

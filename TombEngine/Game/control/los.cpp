@@ -13,7 +13,7 @@
 #include "Objects/ScriptInterfaceObjectsHandler.h"
 #include "ScriptInterfaceGame.h"
 #include "Sound/sound.h"
-#include "Specific/input.h"
+#include "Specific/Input/Input.h"
 #include "Specific/setup.h"
 
 int NumberLosRooms;

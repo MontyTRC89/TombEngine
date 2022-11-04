@@ -28,7 +28,7 @@
 #include "Game/control/volume.h"
 #include "Game/effects/lara_fx.h"
 #include "Game/effects/tomb4fx.h"
-#include "Game/gui.h"
+#include "Game/Gui.h"
 #include "Game/items.h"
 #include "Game/misc.h"
 #include "Game/savegame.h"
@@ -698,7 +698,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 		}
 		else if (lara->Air < LARA_AIR_MAX && item->HitPoints >= 0)
 		{
-			if (lara->Vehicle == NO_ITEM)	// Only for UPV.
+			if (lara->Vehicle == NO_ITEM) // Only for UPV.
 			{
 				lara->Air += 10;
 				if (lara->Air > LARA_AIR_MAX)
@@ -770,6 +770,9 @@ void LaraAboveWater(ItemInfo* item, CollisionInfo* coll)
 	if (TrInput & IN_LOOK && lara->Control.CanLook &&
 		lara->ExtraAnim == NO_ITEM)
 	{
+		if (BinocularOn)
+			LookUpDown(item);
+
 		LookLeftRight(item);
 	}
 	else if (coll->Setup.Height > LARA_HEIGHT - LARA_HEADROOM) // TEMP HACK: Look feature will need a dedicated refactor; ResetLook() interferes with crawl flexing. @Sezz 2021.12.10
@@ -801,7 +804,7 @@ void LaraAboveWater(ItemInfo* item, CollisionInfo* coll)
 	}
 
 	// Handle weapons.
-	LaraGun(item);
+	HandleWeapon(item);
 
 	// Handle breath.
 	LaraBreath(item);
@@ -879,7 +882,7 @@ void LaraWaterSurface(ItemInfo* item, CollisionInfo* coll)
 
 	UpdateItemRoom(item, LARA_RADIUS);
 
-	LaraGun(item);
+	HandleWeapon(item);
 
 	ProcessSectorFlags(item);
 	TestTriggers(item, false);
@@ -968,7 +971,7 @@ void LaraUnderwater(ItemInfo* item, CollisionInfo* coll)
 
 	UpdateItemRoom(item, 0);
 
-	LaraGun(item);
+	HandleWeapon(item);
 
 	ProcessSectorFlags(item);
 	TestTriggers(item, false);

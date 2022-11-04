@@ -12,7 +12,7 @@
 #include "Game/Lara/lara_collide.h"
 #include "Game/Lara/lara_flare.h"
 #include "Game/Lara/lara_helpers.h"
-#include "Specific/input.h"
+#include "Specific/Input/Input.h"
 #include "Specific/level.h"
 #include "Flow/ScriptInterfaceFlowHandler.h"
 

@@ -1,6 +1,6 @@
 #pragma once
-#include "Specific/input.h"
 #include "Math/Math.h"
+#include "Specific/Input/Input.h"
 #include "Renderer/Renderer11Enums.h"
 
 using namespace TEN::Math;
