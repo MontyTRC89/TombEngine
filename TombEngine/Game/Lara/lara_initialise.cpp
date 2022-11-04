@@ -28,6 +28,7 @@ void InitialiseLara(bool restore)
 
 	ZeroMemory(&Lara, sizeof(LaraInfo));
 
+	Lara.Context = PlayerContext(LaraItem, &LaraCollision);
 	Lara.Control.CanLook = true;
 	Lara.ItemNumber = itemNumber;
 	Lara.HitDirection = -1;

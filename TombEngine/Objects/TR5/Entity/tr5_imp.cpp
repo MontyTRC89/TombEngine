@@ -143,15 +143,15 @@ namespace TEN::Entities::Creatures::TR5
 
 				int d1 = item->Pose.Position.y - LaraItem->Pose.Position.y + CLICK(1.5f);
 
-				if (LaraItem->Animation.ActiveState == LS_CROUCH_IDLE ||
-					LaraItem->Animation.ActiveState == LS_CROUCH_ROLL ||
-					LaraItem->Animation.ActiveState > LS_MONKEY_TURN_180 &&
-					LaraItem->Animation.ActiveState < LS_HANG_TO_CRAWL ||
-					LaraItem->Animation.ActiveState == LS_CROUCH_TURN_LEFT ||
-					LaraItem->Animation.ActiveState == LS_CROUCH_TURN_RIGHT)
-				{
-					d1 = item->Pose.Position.y - LaraItem->Pose.Position.y;
-				}
+			if (LaraItem->Animation.ActiveState == LS_CROUCH_IDLE ||
+				LaraItem->Animation.ActiveState == LS_CROUCH_ROLL ||
+				LaraItem->Animation.ActiveState > LS_MONKEY_TURN_180 &&
+				LaraItem->Animation.ActiveState < LS_HANG_TO_CROUCH ||
+				LaraItem->Animation.ActiveState == LS_CROUCH_TURN_LEFT ||
+				LaraItem->Animation.ActiveState == LS_CROUCH_TURN_RIGHT)
+			{
+				d1 = item->Pose.Position.y - LaraItem->Pose.Position.y;
+			}
 
 				int d2 = sqrt(AI.distance);
 

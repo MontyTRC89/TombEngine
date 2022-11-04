@@ -401,12 +401,14 @@ void UndrawShotgun(ItemInfo* laraItem, LaraWeaponType weaponType)
 	{
 		lara->Control.HandStatus = HandStatus::Free;
 		lara->TargetEntity = nullptr;
-		lara->RightArm.Locked = false;
 		lara->LeftArm.Locked = false;
+		lara->RightArm.Locked = false;
+
 		KillItem(lara->Control.Weapon.WeaponItem);
+
 		lara->Control.Weapon.WeaponItem = NO_ITEM;
-		lara->RightArm.FrameNumber = 0;
 		lara->LeftArm.FrameNumber = 0;
+		lara->RightArm.FrameNumber = 0;
 	}
 	else if (item->Animation.ActiveState == WEAPON_STATE_UNDRAW)
 	{
@@ -420,9 +422,8 @@ void UndrawShotgun(ItemInfo* laraItem, LaraWeaponType weaponType)
 	lara->RightArm.FrameBase = g_Level.Anims[item->Animation.AnimNumber].FramePtr;
 	lara->LeftArm.FrameBase = g_Level.Anims[item->Animation.AnimNumber].FramePtr;
 	lara->RightArm.FrameNumber = item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase;
-	lara->LeftArm.FrameNumber = item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase;
-	lara->RightArm.AnimNumber = item->Animation.AnimNumber;
 	lara->LeftArm.AnimNumber = lara->RightArm.AnimNumber;
+	lara->RightArm.AnimNumber = item->Animation.AnimNumber;
 }
 
 void DrawShotgunMeshes(ItemInfo* laraItem, LaraWeaponType weaponType)

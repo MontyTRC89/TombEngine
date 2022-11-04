@@ -41,8 +41,8 @@ void HandleLaraMovementParameters(ItemInfo* item, CollisionInfo* coll)
 	auto* lara = GetLaraInfo(item);
 
 	// Update AFK pose timer.
-	if (lara->Control.Count.Pose < LARA_POSE_TIME && TestLaraPose(item, coll) &&
-		!(TrInput & IN_LOOK || IsOpticActionHeld()) &&
+	if (lara->Control.Count.Pose < LARA_POSE_TIME && lara->Context.CanAFKPose() &&
+		!(IsHeld(In::Look) || IsOpticActionHeld()) &&
 		g_GameFlow->HasAFKPose())
 	{
 		lara->Control.Count.Pose++;
@@ -73,9 +73,9 @@ void HandleLaraMovementParameters(ItemInfo* item, CollisionInfo* coll)
 	}
 
 	// Apply and reset turn rate.
-	item->Pose.Orientation.y += lara->Control.TurnRate;
+	item->Pose.Orientation.y += lara->Control.TurnRate.y;
 	if (!(TrInput & (IN_LEFT | IN_RIGHT)))
-		lara->Control.TurnRate = 0;
+		lara->Control.TurnRate.y = 0;
 
 	lara->Control.IsLow = false;
 }
@@ -310,6 +310,52 @@ LaraInfo*& GetLaraInfo(ItemInfo* item)
 	}
 }
 
+LaraState GetLaraCornerShimmyState(ItemInfo* item, CollisionInfo* coll)
+{
+	if (TrInput & IN_LEFT)
+	{
+		switch (TestLaraHangCorner(item, coll, -90.0f))
+		{
+		case CornerType::Inner:
+			return LS_SHIMMY_INNER_LEFT;
+
+		case CornerType::Outer:
+			return LS_SHIMMY_OUTER_LEFT;
+		}
+
+		switch (TestLaraHangCorner(item, coll, -45.0f))
+		{
+		case CornerType::Inner:
+			return LS_SHIMMY_45_INNER_LEFT;
+
+		case CornerType::Outer:
+			return LS_SHIMMY_45_OUTER_LEFT;
+		}
+	}
+	else if (TrInput & IN_RIGHT)
+	{
+		switch (TestLaraHangCorner(item, coll, 90.0f))
+		{
+		case CornerType::Inner:
+			return LS_SHIMMY_INNER_RIGHT;
+
+		case CornerType::Outer:
+			return LS_SHIMMY_OUTER_RIGHT;
+		}
+
+		switch (TestLaraHangCorner(item, coll, 45.0f))
+		{
+		case CornerType::Inner:
+			return LS_SHIMMY_45_INNER_RIGHT;
+
+		case CornerType::Outer:
+			return LS_SHIMMY_45_OUTER_RIGHT;
+		}
+	}
+
+	return (LaraState)-1;
+}
+
 short GetLaraSlideDirection(ItemInfo* item, CollisionInfo* coll)
 {
 	short headingAngle = coll->Setup.ForwardAngle;
@@ -347,7 +393,7 @@ void ModulateLaraTurnRateX(ItemInfo* item, short accelRate, short minTurnRate, s
 {
 	auto* lara = GetLaraInfo(item);
 
-	//lara->Control.TurnRate.x = ModulateLaraTurnRate(lara->Control.TurnRate.x, accelRate, minTurnRate, maxTurnRate, AxisMap[InputAxis::MoveVertical], invert);
+	lara->Control.TurnRate.x = ModulateLaraTurnRate(lara->Control.TurnRate.x, accelRate, minTurnRate, maxTurnRate, AxisMap[InputAxis::MoveVertical], invert);
 }
 
 void ModulateLaraTurnRateY(ItemInfo* item, short accelRate, short minTurnRate, short maxTurnRate, bool invert)
@@ -361,24 +407,19 @@ void ModulateLaraTurnRateY(ItemInfo* item, short accelRate, short minTurnRate, s
 		axisCoeff = std::min(1.2f, abs(axisCoeff)) * sign;
 	}
 
-	lara->Control.TurnRate/*.y*/ = ModulateLaraTurnRate(lara->Control.TurnRate/*.y*/, accelRate, minTurnRate, maxTurnRate, axisCoeff, invert);
+	lara->Control.TurnRate.y = ModulateLaraTurnRate(lara->Control.TurnRate.y, accelRate, minTurnRate, maxTurnRate, axisCoeff, invert);
 }
 
 void ModulateLaraSwimTurnRates(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	/*if (TrInput & (IN_FORWARD | IN_BACK))
-		ModulateLaraTurnRateX(item, 0, 0, 0);*/
-
-	if (TrInput & IN_FORWARD)
-		item->Pose.Orientation.x -= ANGLE(3.0f);
-	else if (TrInput & IN_BACK)
-		item->Pose.Orientation.x += ANGLE(3.0f);
+	if (TrInput & (IN_FORWARD | IN_BACK))
+		ModulateLaraTurnRateX(item, LARA_SWIM_TURN_RATE_ACCEL, 0, LARA_MED_TURN_RATE_MAX);
 
 	if (TrInput & (IN_LEFT | IN_RIGHT))
 	{
-		ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_MED_TURN_RATE_MAX);
+		ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_MED_FAST_TURN_RATE_MAX);
 
 		// TODO: ModulateLaraLean() doesn't really work here. -- Sezz 2022.06.22
 		if (TrInput & IN_LEFT)
@@ -460,10 +501,10 @@ void UpdateLaraSubsuitAngles(ItemInfo* item)
 	lara->Control.Subsuit.Velocity[0] += abs(lara->Control.Subsuit.XRot >> 3);
 	lara->Control.Subsuit.Velocity[1] += abs(lara->Control.Subsuit.XRot >> 3);
 
-	if (lara->Control.TurnRate > 0)
-		lara->Control.Subsuit.Velocity[0] += 2 * abs(lara->Control.TurnRate);
-	else if (lara->Control.TurnRate < 0)
-		lara->Control.Subsuit.Velocity[1] += 2 * abs(lara->Control.TurnRate);
+	if (lara->Control.TurnRate.y > 0)
+		lara->Control.Subsuit.Velocity[0] += 2 * abs(lara->Control.TurnRate.y);
+	else if (lara->Control.TurnRate.y < 0)
+		lara->Control.Subsuit.Velocity[1] += 2 * abs(lara->Control.TurnRate.y);
 
 	if (lara->Control.Subsuit.Velocity[0] > SECTOR(1.5f))
 		lara->Control.Subsuit.Velocity[0] = SECTOR(1.5f);
@@ -572,26 +613,26 @@ void SetLaraJumpDirection(ItemInfo* item, CollisionInfo* coll)
 	auto* lara = GetLaraInfo(item);
 
 	if (TrInput & IN_FORWARD &&
-		TestLaraJumpForward(item, coll))
+		lara->Context.CanJumpForward())
 	{
 		lara->Control.JumpDirection = JumpDirection::Forward;
 	}
 	else if (TrInput & IN_BACK &&
-		TestLaraJumpBack(item, coll))
+		lara->Context.CanJumpBackward())
 	{
 		lara->Control.JumpDirection = JumpDirection::Back;
 	}
 	else if (TrInput & IN_LEFT &&
-		TestLaraJumpLeft(item, coll))
+		lara->Context.CanJumpLeft())
 	{
 		lara->Control.JumpDirection = JumpDirection::Left;
 	}
 	else if (TrInput & IN_RIGHT &&
-		TestLaraJumpRight(item, coll))
+		lara->Context.CanJumpRight())
 	{
 		lara->Control.JumpDirection = JumpDirection::Right;
 	}
-	else if (TestLaraJumpUp(item, coll)) USE_FEATURE_IF_CPP20([[likely]])
+	else if (lara->Context.CanJumpUp()) USE_FEATURE_IF_CPP20([[likely]])
 		lara->Control.JumpDirection = JumpDirection::Up;
 	else
 		lara->Control.JumpDirection = JumpDirection::None;
@@ -607,7 +648,7 @@ void SetLaraRunJumpQueue(ItemInfo* item, CollisionInfo* coll)
 	int distance = SECTOR(1);
 	auto probe = GetCollision(item, item->Pose.Orientation.y, distance, -coll->Setup.Height);
 
-	if ((TestLaraRunJumpForward(item, coll) ||													// Area close ahead is permissive...
+	if ((lara->Context.CanRunJumpForward() ||													// Area close ahead is permissive...
 		(probe.Position.Ceiling - y) < -(coll->Setup.Height + (LARA_HEADROOM * 0.8f)) ||		// OR ceiling height far ahead is permissive
 		(probe.Position.Floor - y) >= CLICK(0.5f)) &&											// OR there is a drop below far ahead.
 		probe.Position.Floor != NO_HEIGHT)
@@ -624,7 +665,7 @@ void SetLaraVault(ItemInfo* item, CollisionInfo* coll, VaultTestResult vaultResu
 
 	lara->ProjectedFloorHeight = vaultResult.Height;
 	lara->Control.HandStatus = vaultResult.SetBusyHands ? HandStatus::Busy : lara->Control.HandStatus;
-	lara->Control.TurnRate = 0;
+	lara->Control.TurnRate.y = 0;
 
 	if (vaultResult.SnapToLedge)
 	{
@@ -642,6 +683,24 @@ void SetLaraVault(ItemInfo* item, CollisionInfo* coll, VaultTestResult vaultResu
 
 		lara->Control.CalculatedJumpVelocity = -3 - sqrt(-9600 - 12 * height); // TODO: Find a better formula for this that won't require the above block.
 	}
+}
+
+void SetContextWaterClimbOut(ItemInfo* item, CollisionInfo* coll, WaterClimbOutTestResult climbOutContext)
+{
+	auto* lara = GetLaraInfo(item);
+
+	UpdateItemRoom(item, -LARA_HEIGHT / 2);
+	SnapItemToLedge(item, coll, 1.7f, false);
+
+	item->Animation.ActiveState = LS_ONWATER_EXIT;
+	item->Animation.IsAirborne = false;
+	item->Animation.Velocity.z = 0;
+	item->Animation.Velocity.y = 0;
+	lara->ProjectedFloorHeight = climbOutContext.Height;
+	lara->TargetOrientation = EulerAngles(0, coll->NearestLedgeAngle, 0);
+	lara->Control.TurnRate.y = 0;
+	lara->Control.HandStatus = HandStatus::Busy;
+	lara->Control.WaterStatus = WaterStatus::Dry;
 }
 
 void SetLaraLand(ItemInfo* item, CollisionInfo* coll)
@@ -682,7 +741,7 @@ void SetLaraMonkeyRelease(ItemInfo* item)
 	item->Animation.IsAirborne = true;
 	item->Animation.Velocity.y = 1.0f;
 	item->Animation.Velocity.z = 2.0f;
-	lara->Control.TurnRate = 0;
+	lara->Control.TurnRate.y = 0;
 	lara->Control.HandStatus = HandStatus::Free;
 }
 
@@ -733,7 +792,7 @@ void SetLaraSlideAnimation(ItemInfo* item, CollisionInfo* coll)
 
 	LaraSnapToHeight(item, coll);
 	lara->Control.MoveAngle = angle;
-	lara->Control.TurnRate = 0;
+	lara->Control.TurnRate.y = 0;
 	oldAngle = angle;
 }
 
@@ -746,7 +805,7 @@ void newSetLaraSlideAnimation(ItemInfo* item, CollisionInfo* coll)
 	if (!g_GameFlow->HasSlideExtended())
 		item->Pose.Orientation.y = headinAngle;
 
-	// Snap to height upon slide entrance.
+	// Snap to height upon entering slide.
 	if (item->Animation.ActiveState != LS_SLIDE_FORWARD &&
 		item->Animation.ActiveState != LS_SLIDE_BACK)
 	{
@@ -769,6 +828,39 @@ void newSetLaraSlideAnimation(ItemInfo* item, CollisionInfo* coll)
 
 		SetAnimation(item, LA_SLIDE_BACK_START);
 	}
+}
+
+void SetLaraHang(ItemInfo* item)
+{
+	auto* lara = GetLaraInfo(item);
+
+	ResetLaraFlex(item);
+	item->Animation.IsAirborne = false;
+	item->Animation.Velocity.z = 0;
+	item->Animation.Velocity.y = 0;
+	lara->Control.HandStatus = HandStatus::Busy;
+	lara->ExtraTorsoRot = EulerAngles();
+}
+
+void SetLaraHangReleaseAnimation(ItemInfo* item)
+{
+	auto* lara = GetLaraInfo(item);
+
+	if (lara->Control.CanClimbLadder)
+	{
+		SetAnimation(item, LA_FALL_START);
+		item->Pose.Position.y += CLICK(1);
+	}
+	else
+	{
+		SetAnimation(item, LA_JUMP_UP, 9);
+		item->Pose.Position.y += GameBoundingBox(item).Y2 * 1.8f;
+	}
+
+	item->Animation.IsAirborne = true;
+	item->Animation.Velocity.z = 2;
+	item->Animation.Velocity.y = 1;
+	lara->Control.HandStatus = HandStatus::Free;
 }
 
 void SetLaraCornerAnimation(ItemInfo* item, CollisionInfo* coll, bool flip)
@@ -809,6 +901,44 @@ void SetLaraSwimDiveAnimation(ItemInfo* item)
 	item->Animation.Velocity.y = LARA_SWIM_VELOCITY_MAX * 0.4f;
 	item->Pose.Orientation.x = -ANGLE(45.0f);
 	lara->Control.WaterStatus = WaterStatus::Underwater;
+}
+
+// TODO: Make it less stupid in the future. Do it according to a curve?
+void ResetLaraTurnRate(ItemInfo* item, bool divesuit)
+{
+	auto* lara = GetLaraInfo(item);
+
+	// Reset x axis turn rate.
+	int sign = copysign(1, lara->Control.TurnRate.x);
+	if (abs(lara->Control.TurnRate.x) > ANGLE(2.0f))
+		lara->Control.TurnRate.x -= ANGLE(2.0f) * sign;
+	else if (abs(lara->Control.TurnRate.x) > ANGLE(0.5f))
+		lara->Control.TurnRate.x -= ANGLE(0.5f) * sign;
+	else
+		lara->Control.TurnRate.x = 0;
+
+	// Ease rotation near poles.
+	if (item->Pose.Orientation.x >= ANGLE(80.0f) && lara->Control.TurnRate.x > 0 ||
+		item->Pose.Orientation.x <= ANGLE(80.0f) && lara->Control.TurnRate.x < 0)
+	{
+		item->Pose.Orientation.x += std::min<short>(abs(lara->Control.TurnRate.x), (ANGLE(90.0f) - abs(item->Pose.Orientation.x)) / 3) * sign;
+	}
+	else
+		item->Pose.Orientation.x += lara->Control.TurnRate.x;
+
+	// Reset y axis turn rate.
+	sign = copysign(1, lara->Control.TurnRate.y);
+	if (abs(lara->Control.TurnRate.y) > ANGLE(2.0f) && !divesuit)
+		lara->Control.TurnRate.y -= ANGLE(2.0f) * sign;
+	else if (abs(lara->Control.TurnRate.y) > ANGLE(0.5f))
+		lara->Control.TurnRate.y -= ANGLE(0.5f) * sign;
+	else
+		lara->Control.TurnRate.y = 0;
+
+	item->Pose.Orientation.y += lara->Control.TurnRate.y;
+
+	// Nothing uses z axis turn rate at this point; keep it at zero.
+	lara->Control.TurnRate.z = 0;
 }
 
 void ResetLaraLean(ItemInfo* item, float rate, bool resetRoll, bool resetPitch)

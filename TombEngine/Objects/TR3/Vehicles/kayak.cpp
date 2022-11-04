@@ -598,9 +598,7 @@ namespace TEN::Entities::Vehicles
 		height[6] = GetVehicleWaterHeight(kayakItem, -320, 128, true, &oldPos[6]);
 		height[7] = GetVehicleWaterHeight(kayakItem, -640, 0, true, &oldPos[7]);
 
-		oldPos[8].x = kayakItem->Pose.Position.x;
-		oldPos[8].y = kayakItem->Pose.Position.y;
-		oldPos[8].z = kayakItem->Pose.Position.z;
+		oldPos[8] = kayakItem->Pose.Position;
  
 		Vector3i frontPos, leftPos, rightPos;
 		int frontHeight = GetVehicleWaterHeight(kayakItem, 1024, 0, false, &frontPos);
@@ -1141,13 +1139,11 @@ namespace TEN::Entities::Vehicles
 							item->ObjectNumber == ID_DARTS &&
 							item->Animation.ActiveState != 1))
 					{
-						int x = kayakItem->Pose.Position.x - item->Pose.Position.x;
-						int y = kayakItem->Pose.Position.y - item->Pose.Position.y;
-						int z = kayakItem->Pose.Position.z - item->Pose.Position.z;
+						auto distance = kayakItem->Pose.Position - item->Pose.Position;
 
-						if (x > -2048 && x < 2048 &&
-							y > -2048 && y < 2048 &&
-							z > -2048 && z < 2048)
+						if (distance.x > -SECTOR(2) && distance.x < SECTOR(2) &&
+							distance.y > -SECTOR(2) && distance.y < SECTOR(2) &&
+							distance.z > -SECTOR(2) && distance.z < SECTOR(2))
 						{
 							if (TestBoundsCollide(item, kayakItem, KAYAK_TO_ENTITY_RADIUS))
 							{

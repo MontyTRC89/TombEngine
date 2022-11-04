@@ -1,6 +1,8 @@
 #include "framework.h"
 #include "Game/Lara/lara.h"
 
+#include <ois/OISKeyboard.h>
+
 #include "Game/Lara/lara_basic.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_jump.h"
@@ -35,10 +37,11 @@
 #include "Flow/ScriptInterfaceFlowHandler.h"
 #include "ScriptInterfaceLevel.h"
 #include "Sound/sound.h"
+#include "Specific/Input/Input.h"
 #include "Renderer/Renderer11.h"
 
-using namespace TEN::Effects::Lara;
 using namespace TEN::Control::Volumes;
+using namespace TEN::Effects::Lara;
 using namespace TEN::Input;
 using std::function;
 using TEN::Renderer::g_Renderer;
@@ -56,11 +59,11 @@ function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] =
 	lara_as_jump_forward,//33
 	lara_as_pose,//4
 	lara_as_run_back,//5
-	lara_as_turn_right_slow,//6
-	lara_as_turn_left_slow,//7
+	lara_as_turn_slow,//6
+	lara_as_turn_slow,//7
 	lara_as_death,//8
 	lara_as_freefall,//9
-	lara_as_hang,
+	lara_as_hang_idle,
 	lara_as_reach,
 	lara_as_splat,
 	lara_as_underwater_idle,//13
@@ -70,7 +73,7 @@ function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] =
 	lara_as_underwater_swim_forward,//17
 	lara_as_underwater_inertia,//18
 	lara_as_controlled_no_look,//19
-	lara_as_turn_right_fast,//20
+	lara_as_turn_fast,//20
 	lara_as_step_right,//21
 	lara_as_step_left,//22
 	lara_as_roll_180_back,//23
@@ -206,7 +209,7 @@ function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] =
 	lara_as_slopefall,//149
 	lara_as_climb_stepoff_left,
 	lara_as_climb_stepoff_right,
-	lara_as_turn_left_fast,
+	lara_as_turn_fast,
 	lara_as_controlled,
 	lara_as_controlled,
 	lara_as_controlled,//155
@@ -238,11 +241,11 @@ function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] =
 	lara_col_jump_forward,//3
 	lara_col_idle,//4
 	lara_col_run_back,
-	lara_col_turn_right_slow,
-	lara_col_turn_left_slow,
+	lara_col_turn_slow,
+	lara_col_turn_slow,
 	lara_col_death,
 	lara_col_freefall,//9
-	lara_col_hang,
+	lara_col_hang_idle,
 	lara_col_reach,
 	lara_col_splat,
 	lara_col_underwater_idle,
@@ -252,7 +255,7 @@ function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] =
 	lara_col_underwater_swim_forward,
 	lara_col_underwater_inertia,
 	lara_default_col,//19
-	lara_col_turn_right_fast,
+	lara_col_turn_fast,
 	lara_col_step_right,
 	lara_col_step_left,
 	lara_col_roll_180_back,
@@ -384,7 +387,7 @@ function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] =
 	lara_default_col,     // lara_col_slopefall
 	lara_default_col,
 	lara_default_col,
-	lara_col_turn_left_fast,
+	lara_col_turn_fast,
 	lara_default_col,
 	lara_default_col,
 	lara_default_col,
@@ -586,7 +589,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 					else
 					{
 						SetAnimation(item, LA_UNDERWATER_RESURFACE);
-						ResetLaraLean(item);
+						//ResetLaraLean(item);
 						ResetLaraFlex(item);
 						item->Animation.Velocity.y = 0.0f;
 						item->Pose.Position.y = waterHeight;
@@ -600,7 +603,8 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 			else
 			{
 				SetAnimation(item, LA_UNDERWATER_RESURFACE);
-				ResetLaraLean(item);
+				//ResetLaraLean(item);
+				item->Pose.Orientation.x -= ANGLE(90.0f);
 				ResetLaraFlex(item);
 				item->Animation.Velocity.y = 0.0f;
 				item->Pose.Position.y = waterHeight + 1;
@@ -633,6 +637,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 				item->Animation.Velocity.y = 0.0f;
 			}
 
+			ResetLaraLean(item, 6.0f);
 			break;
 
 		case WaterStatus::Wade:
@@ -788,20 +793,38 @@ void LaraAboveWater(ItemInfo* item, CollisionInfo* coll)
 	if (HandleLaraVehicle(item, coll))
 		return;
 
-	// Handle current Lara status.
-	lara_control_routines[item->Animation.ActiveState](item, coll);
-	HandleLaraMovementParameters(item, coll);
-	AnimateLara(item);
+	// Temp. debug stuff
 
-	if (lara->ExtraAnim == NO_ITEM)
+	// Kill Lara.
+	//if (KeyMap[DIK_D])
+	//	item->HitPoints = 0;
+
+	static bool doRoutines = true;
+	static bool dbT = false;
+	if (KeyMap[OIS::KeyCode::KC_T] && !dbT)
+		doRoutines = !doRoutines;
+	dbT = KeyMap[OIS::KeyCode::KC_T] ? true : false;
+
+	static bool dbU = false;
+	if (doRoutines || KeyMap[OIS::KeyCode::KC_U] && !dbU)
 	{
-		// Check for collision with items.
-		DoObjectCollision(item, coll);
+		lara_control_routines[item->Animation.ActiveState](item, coll);
+		HandleLaraMovementParameters(item, coll);
+		AnimateLara(item);
+
+		if (lara->ExtraAnim == NO_ITEM)
+		{
+			// Check for collision with items.
+			DoObjectCollision(item, coll);
+
+		}
 
 		// Handle Lara collision.
 		if (lara->Vehicle == NO_ITEM)
 			lara_collision_routines[item->Animation.ActiveState](item, coll);
 	}
+	dbU = KeyMap[OIS::KeyCode::KC_U] ? true : false;
+
 
 	// Handle weapons.
 	HandleWeapon(item);
@@ -858,9 +881,9 @@ void LaraWaterSurface(ItemInfo* item, CollisionInfo* coll)
 
 	// TODO: Subsuit gradually slows down at rate of 0.5 degrees. @Sezz 2022.06.23
 	// Apply and reset turn rate.
-	item->Pose.Orientation.y += lara->Control.TurnRate;
+	item->Pose.Orientation.y += lara->Control.TurnRate.y;
 	if (!(TrInput & (IN_LEFT | IN_RIGHT)))
-		lara->Control.TurnRate = 0;
+		lara->Control.TurnRate.y = 0;
 
 	if (level->GetLaraType() == LaraType::Divesuit)
 		UpdateLaraSubsuitAngles(item);
@@ -928,9 +951,13 @@ void LaraUnderwater(ItemInfo* item, CollisionInfo* coll)
 
 	// TODO: Subsuit gradually slowed down at rate of 0.5 degrees. @Sezz 2022.06.23
 	// Apply and reset turn rate.
-	item->Pose.Orientation.y += lara->Control.TurnRate;
+	item->Pose.Orientation.x += lara->Control.TurnRate.x;
+	if (!(TrInput & (IN_FORWARD | IN_BACK)))
+		lara->Control.TurnRate.x = 0;
+
+	item->Pose.Orientation.y += lara->Control.TurnRate.y;
 	if (!(TrInput & (IN_LEFT | IN_RIGHT)))
-		lara->Control.TurnRate = 0;
+		lara->Control.TurnRate.y = 0;
 
 	if (level->GetLaraType() == LaraType::Divesuit)
 		UpdateLaraSubsuitAngles(item);
@@ -938,24 +965,24 @@ void LaraUnderwater(ItemInfo* item, CollisionInfo* coll)
 	if (!lara->Control.IsMoving && !(TrInput & (IN_LEFT | IN_RIGHT)))
 		ResetLaraLean(item, 8.0f, true, false);
 
-	if (item->Pose.Orientation.x < -ANGLE(85.0f))
-		item->Pose.Orientation.x = -ANGLE(85.0f);
-	else if (item->Pose.Orientation.x > ANGLE(85.0f))
-		item->Pose.Orientation.x = ANGLE(85.0f);
+	// Clamp x axis rotation.
+	if (item->Pose.Orientation.x < -ANGLE(90.0f))
+		item->Pose.Orientation.x = -ANGLE(90.0f);
+	else if (item->Pose.Orientation.x > ANGLE(90.0f))
+		item->Pose.Orientation.x = ANGLE(90.0f);
 
 	if (level->GetLaraType() == LaraType::Divesuit)
 	{
-		if (item->Pose.Orientation.z > ANGLE(44.0f))
-			item->Pose.Orientation.z = ANGLE(44.0f);
-		else if (item->Pose.Orientation.z < -ANGLE(44.0f))
-			item->Pose.Orientation.z = -ANGLE(44.0f);
+		if (item->Pose.Orientation.z > ANGLE(45.0f))
+			item->Pose.Orientation.z = ANGLE(45.0f);
+		else if (item->Pose.Orientation.z < -ANGLE(45.0f))
+			item->Pose.Orientation.z = -ANGLE(45.0f);
 	}
 	else
 	{
-		if (item->Pose.Orientation.z > ANGLE(22.0f))
-			item->Pose.Orientation.z = ANGLE(22.0f);
-		else if (item->Pose.Orientation.z < -ANGLE(22.0f))
-			item->Pose.Orientation.z = -ANGLE(22.0f);
+		// Reset lean.
+		if (!lara->Control.IsMoving || (lara->Control.IsMoving && !(TrInput & (IN_LEFT | IN_RIGHT))))
+			ResetLaraLean(item, 6.0f, true, false);
 	}
 
 	if (lara->WaterCurrentActive && lara->Control.WaterStatus != WaterStatus::FlyCheat)
