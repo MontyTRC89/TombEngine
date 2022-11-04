@@ -137,8 +137,8 @@ namespace TEN::Entities::Vehicles
 
 	bool SkidooControl(ItemInfo* laraItem, CollisionInfo* coll)
 	{
-		auto* lara = GetLaraInfo(laraItem);
-		auto* skidooItem = &g_Level.Items[lara->Vehicle];
+		auto& lara = *GetLaraInfo(laraItem);
+		auto* skidooItem = &g_Level.Items[lara.Vehicle];
 		auto& skidoo = GetSkidooInfo(skidooItem);
 
 		Vector3i frontLeft, frontRight;
@@ -156,7 +156,7 @@ namespace TEN::Entities::Vehicles
 
 		if (laraItem->HitPoints <= 0)
 		{
-			dead = true;
+			isDead = true;
 			ClearAction(In::Forward);
 			ClearAction(In::Back);
 			ClearAction(In::Left);
@@ -229,8 +229,8 @@ namespace TEN::Entities::Vehicles
 		{
 			if (probe.RoomNumber != skidooItem->RoomNumber)
 			{
-				ItemNewRoom(lara->Vehicle, probe.RoomNumber);
-				ItemNewRoom(lara->ItemNumber, probe.RoomNumber);
+				ItemNewRoom(lara.Vehicle, probe.RoomNumber);
+				ItemNewRoom(lara.ItemNumber, probe.RoomNumber);
 			}
 
 			AnimateItem(laraItem);
@@ -245,8 +245,8 @@ namespace TEN::Entities::Vehicles
 
 		if (probe.RoomNumber != skidooItem->RoomNumber)
 		{
-			ItemNewRoom(lara->Vehicle, probe.RoomNumber);
-			ItemNewRoom(lara->ItemNumber, probe.RoomNumber);
+			ItemNewRoom(lara.Vehicle, probe.RoomNumber);
+			ItemNewRoom(lara.ItemNumber, probe.RoomNumber);
 		}
 
 		if (laraItem->Animation.ActiveState != SKIDOO_STATE_DRIVE_DEATH)
@@ -296,7 +296,7 @@ namespace TEN::Entities::Vehicles
 	{
 		auto& skidoo = GetSkidooInfo(skidooItem);
 
-		// Get point/room collision at vehicle corners.
+		// Get point collision at vehicle corners.
 		auto prevPointFrontLeft = GetVehicleCollision(skidooItem, SKIDOO_FRONT, -SKIDOO_SIDE, true);
 		auto prevPointFrontRight = GetVehicleCollision(skidooItem, SKIDOO_FRONT, SKIDOO_SIDE, true);
 		auto prevPointBackLeft = GetVehicleCollision(skidooItem, -SKIDOO_FRONT, -SKIDOO_SIDE, true);
@@ -354,7 +354,7 @@ namespace TEN::Entities::Vehicles
 			skidooItem->Pose.Position.z -= slip * phd_sin(skidooItem->Pose.Orientation.y);
 		}
 
-		// Store old 2D position to determine movement delta later.
+		// Store previous 2D position to determine movement delta later.
 		auto moved = Vector3i(skidooItem->Pose.Position.x, 0, skidooItem->Pose.Position.z);
 
 		// Process entity collision.
@@ -622,9 +622,9 @@ namespace TEN::Entities::Vehicles
 	void SkidooPlayerCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 	{
 		auto* skidooItem = &g_Level.Items[itemNumber];
-		auto* lara = GetLaraInfo(laraItem);
+		auto& lara = *GetLaraInfo(laraItem);
 
-		if (laraItem->HitPoints < 0 || lara->Vehicle != NO_ITEM)
+		if (laraItem->HitPoints < 0 || lara.Vehicle != NO_ITEM)
 			return;
 
 		auto mountType = GetVehicleMountType(skidooItem, laraItem, coll, SkidooMountTypes, SKIDOO_MOUNT_DISTANCE);
@@ -632,14 +632,14 @@ namespace TEN::Entities::Vehicles
 			ObjectCollision(itemNumber, laraItem, coll);
 		else
 		{
-			lara->Vehicle = itemNumber;
+			lara.Vehicle = itemNumber;
 			DoSkidooMount(skidooItem, laraItem, mountType);
 		}
 	}
 
 	void DoSkidooMount(ItemInfo* skidooItem, ItemInfo* laraItem, VehicleMountType mountType)
 	{
-		auto* lara = GetLaraInfo(laraItem);
+		auto& lara = *GetLaraInfo(laraItem);
 
 		switch (mountType)
 		{
@@ -667,7 +667,7 @@ namespace TEN::Entities::Vehicles
 		DoVehicleFlareDiscard(laraItem);
 		laraItem->Pose.Position = skidooItem->Pose.Position;
 		laraItem->Pose.Orientation = EulerAngles(0, skidooItem->Pose.Orientation.y, 0);
-		lara->Control.HandStatus = HandStatus::Busy;
+		lara.Control.HandStatus = HandStatus::Busy;
 		skidooItem->Collidable = true;
 	}
 
@@ -690,9 +690,9 @@ namespace TEN::Entities::Vehicles
 
 	bool DoSkidooDismount(ItemInfo* skidooItem, ItemInfo* laraItem)
 	{
-		auto* lara = GetLaraInfo(laraItem);
+		auto& lara = *GetLaraInfo(laraItem);
 
-		if (lara->Vehicle != NO_ITEM)
+		if (lara.Vehicle != NO_ITEM)
 		{
 			if ((laraItem->Animation.ActiveState == SKIDOO_STATE_DISMOUNT_RIGHT || laraItem->Animation.ActiveState == SKIDOO_STATE_DISMOUNT_LEFT) &&
 				laraItem->Animation.FrameNumber == g_Level.Anims[laraItem->Animation.AnimNumber].frameEnd)
@@ -706,8 +706,8 @@ namespace TEN::Entities::Vehicles
 				TranslateItem(laraItem, laraItem->Pose.Orientation.y, -SKIDOO_DISMOUNT_DISTANCE);
 				laraItem->Pose.Orientation.x = 0;
 				laraItem->Pose.Orientation.z = 0;
-				lara->Control.HandStatus = HandStatus::Free;
-				lara->Vehicle = NO_ITEM;
+				lara.Control.HandStatus = HandStatus::Free;
+				lara.Vehicle = NO_ITEM;
 			}
 			else if (laraItem->Animation.ActiveState == SKIDOO_STATE_DISMOUNT_FALL &&
 				(skidooItem->Pose.Position.y == skidooItem->Floor || TestLastFrame(laraItem)))
@@ -733,8 +733,8 @@ namespace TEN::Entities::Vehicles
 				laraItem->Pose.Orientation.x = 0;
 				laraItem->Pose.Orientation.z = 0;
 				laraItem->Animation.IsAirborne = true;
-				lara->Control.MoveAngle = skidooItem->Pose.Orientation.y;
-				lara->Control.HandStatus = HandStatus::Free;
+				lara.Control.MoveAngle = skidooItem->Pose.Orientation.y;
+				lara.Control.HandStatus = HandStatus::Free;
 				skidooItem->Collidable = false;
 				skidooItem->Flags |= IFLAG_INVISIBLE;
 
@@ -784,25 +784,25 @@ namespace TEN::Entities::Vehicles
 	void HandleSkidooGuns(ItemInfo* skidooItem, ItemInfo* laraItem)
 	{
 		auto& skidoo = GetSkidooInfo(skidooItem);
-		auto* lara = GetLaraInfo(laraItem);
-		auto* weapon = &Weapons[(int)LaraWeaponType::Snowmobile];
+		auto& lara = *GetLaraInfo(laraItem);
+		const auto& weapon = Weapons[(int)LaraWeaponType::Snowmobile];
 
-		LaraGetNewTarget(laraItem, weapon);
-		AimWeapon(laraItem, weapon, &lara->RightArm);
+		FindNewTarget(laraItem, weapon);
+		AimWeapon(laraItem, lara.RightArm, weapon);
 
 		if (TrInput & VEHICLE_IN_FIRE && !skidooItem->ItemFlags[0])
 		{
 			auto angles = EulerAngles(
-				lara->RightArm.Orientation.x,
-				lara->RightArm.Orientation.y + laraItem->Pose.Orientation.y,
+				lara.RightArm.Orientation.x,
+				lara.RightArm.Orientation.y + laraItem->Pose.Orientation.y,
 				0
 			);
 
-			if ((int)FireWeapon(LaraWeaponType::Pistol, lara->TargetEntity, laraItem, angles) +
-				(int)FireWeapon(LaraWeaponType::Pistol, lara->TargetEntity, laraItem, angles))
+			if ((int)FireWeapon(LaraWeaponType::Pistol, lara.TargetEntity, laraItem, angles) +
+				(int)FireWeapon(LaraWeaponType::Pistol, lara.TargetEntity, laraItem, angles))
 			{
 				skidoo.FlashTimer = 2;
-				SoundEffect(weapon->SampleNum, &laraItem->Pose);
+				SoundEffect(weapon.SampleNum, &laraItem->Pose);
 				skidooItem->ItemFlags[0] = 4;
 			}
 		}
