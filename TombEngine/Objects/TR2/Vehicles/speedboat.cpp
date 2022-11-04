@@ -17,7 +17,6 @@
 
 using namespace TEN::Input;
 using namespace TEN::Math;
-using std::vector;
 
 namespace TEN::Entities::Vehicles
 {
@@ -46,9 +45,9 @@ namespace TEN::Entities::Vehicles
 	constexpr auto SPEEDBOAT_MOUNT_DISTANCE    = CLICK(2.25f);
 	constexpr auto SPEEDBOAT_DISMOUNT_DISTANCE = SECTOR(1);
 
-	#define SPEEDBOAT_TURN_RATE_ACCEL ANGLE(0.5f)
-	#define SPEEDBOAT_TURN_RATE_DECEL ANGLE(0.25f)
-	#define SPEEDBOAT_TURN_RATE_MAX	  ANGLE(4.0f)
+	const auto SPEEDBOAT_TURN_RATE_ACCEL = ANGLE(0.5f);
+	const auto SPEEDBOAT_TURN_RATE_DECEL = ANGLE(0.25f);
+	const auto SPEEDBOAT_TURN_RATE_MAX	 = ANGLE(4.0f);
 
 	enum SpeedboatState
 	{
@@ -85,7 +84,7 @@ namespace TEN::Entities::Vehicles
 		SPEEDBOAT_ANIM_DEATH = 18
 	};
 
-	const vector<VehicleMountType> SpeedboatMountTypes =
+	const auto SpeedboatMountTypes = std::vector<VehicleMountType>
 	{
 		VehicleMountType::LevelStart,
 		VehicleMountType::Left,

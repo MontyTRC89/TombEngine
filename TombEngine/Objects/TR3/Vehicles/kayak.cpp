@@ -17,7 +17,6 @@
 
 using namespace TEN::Input;
 using namespace TEN::Math;
-using std::vector;
 
 namespace TEN::Entities::Vehicles
 {
@@ -50,17 +49,17 @@ namespace TEN::Entities::Vehicles
 	#define KAYAK_MOUNT_RIGHT_FRAME	GetFrameNumber(KAYAK_ANIM_MOUNT_LEFT, 0)
 
 	// TODO: Very confusing.
-	#define KAYAK_TURN_RATE_FRICTION_DECEL ANGLE(0.03f)
-	#define KAYAK_TURN_RATE_DEFLECT ANGLE(0.05f)
-	#define KAYAK_TURN_RATE_FORWARD_ACCEL ANGLE(0.7f)
-	#define KAYAK_TURN_RATE_LR_ACCEL ANGLE(1.0f)
-	#define KAYAK_TURN_RATE_LR_MAX ANGLE(1.0f)
-	#define KAYAK_TURN_ROTATION ANGLE(0.18f)
-	#define KAYAK_TURN_RATE_MAX ANGLE(1.4f)
-	#define KAYAK_TURN_RATE_HOLD_ACCEL ANGLE(1.4f)
-	#define KAYAK_TURN_RATE_HOLD_MAX ANGLE(1.4f)
+	const auto KAYAK_TURN_RATE_FRICTION_DECEL = ANGLE(0.03f);
+	const auto KAYAK_TURN_RATE_DEFLECT		  = ANGLE(0.05f);
+	const auto KAYAK_TURN_RATE_FORWARD_ACCEL  = ANGLE(0.7f);
+	const auto KAYAK_TURN_RATE_LR_ACCEL		  = ANGLE(1.0f);
+	const auto KAYAK_TURN_RATE_LR_MAX		  = ANGLE(1.0f);
+	const auto KAYAK_TURN_ROTATION			  = ANGLE(0.18f);
+	const auto KAYAK_TURN_RATE_MAX			  = ANGLE(1.4f);
+	const auto KAYAK_TURN_RATE_HOLD_ACCEL	  = ANGLE(1.4f);
+	const auto KAYAK_TURN_RATE_HOLD_MAX		  = ANGLE(1.4f);
 
-	// TODO: Kayak control is fairly unique. Keep this? @Sezz 2022.06.25
+	// TODO: Kayak control is fairly unique. Keep this? -- Sezz 2022.06.25
 	constexpr auto KAYAK_IN_FORWARD	   = IN_FORWARD;
 	constexpr auto KAYAK_IN_BACK	   = IN_BACK;
 	constexpr auto KAYAK_IN_LEFT	   = IN_LEFT;
@@ -137,8 +136,8 @@ namespace TEN::Entities::Vehicles
 	};
 
 	WAKE_PTS WakePts[NUM_WAKE_SPRITES][2];
-	static vector<unsigned int> KayakLaraLegJoints = { LM_HIPS, LM_LTHIGH, LM_LSHIN, LM_LFOOT, LM_RTHIGH, LM_RSHIN, LM_RFOOT };
-	static vector<VehicleMountType> KayakMountTypes =
+	const std::vector<unsigned int> KayakLaraLegJoints = { LM_HIPS, LM_LTHIGH, LM_LSHIN, LM_LFOOT, LM_RTHIGH, LM_RSHIN, LM_RFOOT };
+	const std::vector<VehicleMountType> KayakMountTypes =
 	{
 		VehicleMountType::LevelStart,
 		VehicleMountType::Left,

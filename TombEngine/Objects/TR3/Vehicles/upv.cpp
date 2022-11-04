@@ -28,7 +28,6 @@
 
 using namespace TEN::Input;
 using namespace TEN::Math;
-using std::vector;
 
 // TODO:
 // Redo water surface dismount.
@@ -140,7 +139,7 @@ namespace TEN::Entities::Vehicles
 		UPV_BITE_RIGHT_RUDDER_LEFT  = 5	 // Unused.
 	};
 
-	BiteInfo UpvBites[6] =
+	const BiteInfo UpvBites[6] =
 	{
 		{ 0, 0, 0, 3 },
 		{ 0, 96, 256, 0 },
@@ -149,7 +148,7 @@ namespace TEN::Entities::Vehicles
 		{ 128, 0, -64, 2 },
 		{ 0, 0, -64, 2 }
 	};
-	const vector<VehicleMountType> UpvMountTypes =
+	const auto UpvMountTypes = std::vector<VehicleMountType>
 	{
 		VehicleMountType::LevelStart,
 		VehicleMountType::Back

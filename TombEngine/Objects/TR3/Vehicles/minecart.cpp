@@ -19,7 +19,6 @@
 using namespace TEN::Effects::Spark;
 using namespace TEN::Input;
 using namespace TEN::Math;
-using std::vector;
 
 namespace TEN::Entities::Vehicles
 {
@@ -48,7 +47,7 @@ namespace TEN::Entities::Vehicles
 	constexpr auto MINECART_NUM_HITS			= 25;
 	constexpr auto MINECART_WRENCH_TOGGLE_FRAME = 20;
 
-	#define MINECART_TERMINAL_ANGLE ANGLE(22.0f)
+	const auto MINECART_TERMINAL_ANGLE = ANGLE(22.0f);
 
 	#define MINECART_IN_DUCK	IN_CROUCH
 	#define MINECART_IN_SWIPE	(IN_ACTION | IN_DRAW)
@@ -143,7 +142,7 @@ namespace TEN::Entities::Vehicles
 	};
 
 	int Wheels[4] = { 2, 3, 1, 4 };
-	const vector<VehicleMountType> MinecartMountTypes =
+	const auto MinecartMountTypes = std::vector<VehicleMountType>
 	{
 		VehicleMountType::LevelStart,
 		VehicleMountType::Left,

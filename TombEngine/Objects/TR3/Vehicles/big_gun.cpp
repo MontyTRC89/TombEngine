@@ -22,7 +22,6 @@
 
 using namespace TEN::Input;
 using namespace TEN::Math;
-using std::vector;
 
 namespace TEN::Entities::Vehicles
 {
@@ -33,12 +32,12 @@ namespace TEN::Entities::Vehicles
 	constexpr auto BGUN_X_ORIENT_NUM_FRAMES = 59;
 	constexpr auto BGUN_X_ORIENT_MIDDLE_FRAME = 30;
 
-	#define BGUN_TURN_RATE_ACCEL ANGLE(0.5f)
-	#define BGUN_TURN_RATE_MAX	 ANGLE(4.0f)
-	#define BGUN_X_ORIENT_STEP	 (ANGLE(80.0f) / BGUN_X_ORIENT_NUM_FRAMES)
-	#define BGUN_X_ORIENT_MAX	 ANGLE(40.0f)
+	const auto BGUN_TURN_RATE_ACCEL = ANGLE(0.5f);
+	const auto BGUN_TURN_RATE_MAX	= ANGLE(4.0f);
+	const auto BGUN_X_ORIENT_STEP	= ANGLE(80.0f) / BGUN_X_ORIENT_NUM_FRAMES;
+	const auto BGUN_X_ORIENT_MAX	= ANGLE(40.0f);
 
-	const vector<VehicleMountType> BigGunMountTypes =
+	const auto BigGunMountTypes = std::vector<VehicleMountType>
 	{
 		VehicleMountType::LevelStart,
 		VehicleMountType::Back
@@ -77,10 +76,10 @@ namespace TEN::Entities::Vehicles
 	{
 		auto* bigGunItem = &g_Level.Items[itemNumber];
 		bigGunItem->Data = BigGunInfo();
-		auto* bigGun = GetBigGunInfo(bigGunItem);
+		auto& bigGun = GetBigGunInfo(bigGunItem);
 
-		bigGun->BaseOrientation = bigGunItem->Pose.Orientation;
-		bigGun->XOrientFrame = BGUN_X_ORIENT_MIDDLE_FRAME;
+		bigGun.BaseOrientation = bigGunItem->Pose.Orientation;
+		bigGun.XOrientFrame = BGUN_X_ORIENT_MIDDLE_FRAME;
 	}
 
 	static bool BigGunTestMount(ItemInfo* bigGunItem, ItemInfo* laraItem)
@@ -113,7 +112,7 @@ namespace TEN::Entities::Vehicles
 	void BigGunFire(ItemInfo* bigGunItem, ItemInfo* laraItem)
 	{
 		auto* lara = GetLaraInfo(laraItem);
-		auto* bigGun = GetBigGunInfo(bigGunItem);
+		auto& bigGun = GetBigGunInfo(bigGunItem);
 
 		short itemNumber = CreateItem();
 		auto* projectileItem = &g_Level.Items[itemNumber];
@@ -130,7 +129,7 @@ namespace TEN::Entities::Vehicles
 
 			projectileItem->Animation.Velocity.z = 16;
 			projectileItem->Pose.Orientation = EulerAngles(
-				-((bigGun->XOrientFrame - 32) * ANGLE(1.0f)),
+				-((bigGun.XOrientFrame - 32) * ANGLE(1.0f)),
 				bigGunItem->Pose.Orientation.y,
 				0
 			);
@@ -150,7 +149,7 @@ namespace TEN::Entities::Vehicles
 	void BigGunCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 	{
 		auto* bigGunItem = &g_Level.Items[itemNumber];
-		auto* bigGun = GetBigGunInfo(bigGunItem);
+		auto& bigGun = GetBigGunInfo(bigGunItem);
 		auto* lara = GetLaraInfo(laraItem);
 
 		if (laraItem->HitPoints <= 0 || lara->Vehicle != NO_ITEM)
@@ -169,8 +168,8 @@ namespace TEN::Entities::Vehicles
 			laraItem->Pose = bigGunItem->Pose;
 			lara->Control.HandStatus = HandStatus::Busy;
 			bigGunItem->HitPoints = 1;
-			bigGun->XOrientFrame = BGUN_X_ORIENT_MIDDLE_FRAME;
-			bigGun->Flags = 0;
+			bigGun.XOrientFrame = BGUN_X_ORIENT_MIDDLE_FRAME;
+			bigGun.Flags = 0;
 		}
 		else
 			ObjectCollision(itemNumber, laraItem, coll);
@@ -180,108 +179,108 @@ namespace TEN::Entities::Vehicles
 	{
 		auto* lara = GetLaraInfo(laraItem);
 		auto* bigGunItem = &g_Level.Items[lara->Vehicle];
-		auto* bigGun = GetBigGunInfo(bigGunItem);
+		auto& bigGun = GetBigGunInfo(bigGunItem);
 
-		if (bigGun->Flags & BGUN_FLAG_UP_DOWN)
+		if (bigGun.Flags & BGUN_FLAG_UP_DOWN)
 		{
-			if (bigGun->IsBarrelRotating)
-				bigGun->BarrelRotation--;
+			if (bigGun.IsBarrelRotating)
+				bigGun.BarrelRotation--;
 
-			if (!bigGun->BarrelRotation)
-				bigGun->IsBarrelRotating = false;
+			if (!bigGun.BarrelRotation)
+				bigGun.IsBarrelRotating = false;
 
 			if (TrInput & VEHICLE_IN_DISMOUNT || laraItem->HitPoints <= 0)
-				bigGun->Flags = BGUN_FLAG_AUTO_ROT;
+				bigGun.Flags = BGUN_FLAG_AUTO_ROT;
 			else
 			{
-				if (TrInput & (VEHICLE_IN_ACCELERATE | VEHICLE_IN_FIRE) && !bigGun->FireCount)
+				if (TrInput & (VEHICLE_IN_ACCELERATE | VEHICLE_IN_FIRE) && !bigGun.FireCount)
 				{
 					BigGunFire(bigGunItem, laraItem);
-					bigGun->FireCount = BGUN_RECOIL_TIME;
-					bigGun->BarrelRotation = BGUN_RECOIL_Z;
-					bigGun->IsBarrelRotating = true;
+					bigGun.FireCount = BGUN_RECOIL_TIME;
+					bigGun.BarrelRotation = BGUN_RECOIL_Z;
+					bigGun.IsBarrelRotating = true;
 				}
 
 				if (TrInput & VEHICLE_IN_UP)
 				{
-					if (bigGun->TurnRate.x < 0)
-						bigGun->TurnRate.x /= 2;
+					if (bigGun.TurnRate.x < 0)
+						bigGun.TurnRate.x /= 2;
 
-					bigGun->TurnRate.x += BGUN_TURN_RATE_ACCEL;
-					if (bigGun->TurnRate.x > (BGUN_TURN_RATE_MAX / 2))
-						bigGun->TurnRate.x = (BGUN_TURN_RATE_MAX / 2);
+					bigGun.TurnRate.x += BGUN_TURN_RATE_ACCEL;
+					if (bigGun.TurnRate.x > (BGUN_TURN_RATE_MAX / 2))
+						bigGun.TurnRate.x = (BGUN_TURN_RATE_MAX / 2);
 				}
 				else if (TrInput & VEHICLE_IN_DOWN)
 				{
-					if (bigGun->TurnRate.x > 0)
-						bigGun->TurnRate.x /= 2;
+					if (bigGun.TurnRate.x > 0)
+						bigGun.TurnRate.x /= 2;
 
-					bigGun->TurnRate.x -= BGUN_TURN_RATE_ACCEL;
-					if (bigGun->TurnRate.x < (-BGUN_TURN_RATE_MAX / 2))
-						bigGun->TurnRate.x = (-BGUN_TURN_RATE_MAX / 2);
+					bigGun.TurnRate.x -= BGUN_TURN_RATE_ACCEL;
+					if (bigGun.TurnRate.x < (-BGUN_TURN_RATE_MAX / 2))
+						bigGun.TurnRate.x = (-BGUN_TURN_RATE_MAX / 2);
 				}
 				else
 				{
-					bigGun->TurnRate.x -= bigGun->TurnRate.x / 3;
-					if (abs(bigGun->TurnRate.x) < BGUN_TURN_RATE_ACCEL)
-						bigGun->TurnRate.x = 0;
+					bigGun.TurnRate.x -= bigGun.TurnRate.x / 3;
+					if (abs(bigGun.TurnRate.x) < BGUN_TURN_RATE_ACCEL)
+						bigGun.TurnRate.x = 0;
 				}
 
 				if (TrInput & VEHICLE_IN_LEFT)
 				{
-					if (bigGun->TurnRate.y > 0)
-						bigGun->TurnRate.y /= 2;
+					if (bigGun.TurnRate.y > 0)
+						bigGun.TurnRate.y /= 2;
 
-					bigGun->TurnRate.y -= BGUN_TURN_RATE_ACCEL;
-					if (bigGun->TurnRate.y < -BGUN_TURN_RATE_MAX)
-						bigGun->TurnRate.y = -BGUN_TURN_RATE_MAX;
+					bigGun.TurnRate.y -= BGUN_TURN_RATE_ACCEL;
+					if (bigGun.TurnRate.y < -BGUN_TURN_RATE_MAX)
+						bigGun.TurnRate.y = -BGUN_TURN_RATE_MAX;
 				}
 				else if (TrInput & VEHICLE_IN_RIGHT)
 				{
-					if (bigGun->TurnRate.y < 0)
-						bigGun->TurnRate.y /= 2;
+					if (bigGun.TurnRate.y < 0)
+						bigGun.TurnRate.y /= 2;
 
-					bigGun->TurnRate.y += BGUN_TURN_RATE_ACCEL;
-					if (bigGun->TurnRate.y > BGUN_TURN_RATE_MAX)
-						bigGun->TurnRate.y = BGUN_TURN_RATE_MAX;
+					bigGun.TurnRate.y += BGUN_TURN_RATE_ACCEL;
+					if (bigGun.TurnRate.y > BGUN_TURN_RATE_MAX)
+						bigGun.TurnRate.y = BGUN_TURN_RATE_MAX;
 				}
 				else
 				{
-					bigGun->TurnRate.y -= bigGun->TurnRate.y / 3;
-					if (abs(bigGun->TurnRate.y) < BGUN_TURN_RATE_ACCEL)
-						bigGun->TurnRate.y = 0;
+					bigGun.TurnRate.y -= bigGun.TurnRate.y / 3;
+					if (abs(bigGun.TurnRate.y) < BGUN_TURN_RATE_ACCEL)
+						bigGun.TurnRate.y = 0;
 				}
 
-				bigGun->Rotation.x += bigGun->TurnRate.x;
-				bigGun->Rotation.y += bigGun->TurnRate.y;
+				bigGun.Rotation.x += bigGun.TurnRate.x;
+				bigGun.Rotation.y += bigGun.TurnRate.y;
 
-				if (bigGun->Rotation.x > BGUN_X_ORIENT_MAX)
-					bigGun->Rotation.x = BGUN_X_ORIENT_MAX;
-				else if (bigGun->Rotation.x < -BGUN_X_ORIENT_MAX)
-					bigGun->Rotation.x = -BGUN_X_ORIENT_MAX;
+				if (bigGun.Rotation.x > BGUN_X_ORIENT_MAX)
+					bigGun.Rotation.x = BGUN_X_ORIENT_MAX;
+				else if (bigGun.Rotation.x < -BGUN_X_ORIENT_MAX)
+					bigGun.Rotation.x = -BGUN_X_ORIENT_MAX;
 
-				bigGun->XOrientFrame = (int)round((bigGun->Rotation.x + BGUN_X_ORIENT_MAX) / BGUN_X_ORIENT_STEP);
+				bigGun.XOrientFrame = (int)round((bigGun.Rotation.x + BGUN_X_ORIENT_MAX) / BGUN_X_ORIENT_STEP);
 			}
 		}
 
-		if (bigGun->Flags & BGUN_FLAG_AUTO_ROT)
+		if (bigGun.Flags & BGUN_FLAG_AUTO_ROT)
 		{
-			if (bigGun->XOrientFrame == BGUN_X_ORIENT_MIDDLE_FRAME)
+			if (bigGun.XOrientFrame == BGUN_X_ORIENT_MIDDLE_FRAME)
 			{
 				laraItem->Animation.AnimNumber = Objects[ID_LARA_BIGGUN_ANIM].animIndex + BGUN_ANIM_DISMOUNT;
 				laraItem->Animation.FrameNumber = g_Level.Anims[Objects[ID_BIGGUN].animIndex + BGUN_ANIM_DISMOUNT].frameBase;
 				laraItem->Animation.ActiveState = BGUN_STATE_DISMOUNT;
 				laraItem->Animation.TargetState = BGUN_STATE_DISMOUNT;
-				bigGun->TurnRate.y = 0;
-				bigGun->IsBarrelRotating = false;
-				bigGun->Flags = BGUN_FLAG_DISMOUNT;
+				bigGun.TurnRate.y = 0;
+				bigGun.IsBarrelRotating = false;
+				bigGun.Flags = BGUN_FLAG_DISMOUNT;
 			}
-			else if (bigGun->Rotation.x > 0)
-				bigGun->Rotation.x -= BGUN_X_ORIENT_STEP;
-			else if (bigGun->Rotation.x < 0)
-				bigGun->Rotation.x += BGUN_X_ORIENT_STEP;
+			else if (bigGun.Rotation.x > 0)
+				bigGun.Rotation.x -= BGUN_X_ORIENT_STEP;
+			else if (bigGun.Rotation.x < 0)
+				bigGun.Rotation.x += BGUN_X_ORIENT_STEP;
 
-			bigGun->XOrientFrame = (int)round((bigGun->Rotation.x + BGUN_X_ORIENT_MAX) / BGUN_X_ORIENT_STEP);
+			bigGun.XOrientFrame = (int)round((bigGun.Rotation.x + BGUN_X_ORIENT_MAX) / BGUN_X_ORIENT_STEP);
 		}
 
 		switch (laraItem->Animation.ActiveState)
@@ -292,7 +291,7 @@ namespace TEN::Entities::Vehicles
 			bigGunItem->Animation.AnimNumber = Objects[ID_BIGGUN].animIndex + (laraItem->Animation.AnimNumber - Objects[ID_LARA_BIGGUN_ANIM].animIndex);
 			bigGunItem->Animation.FrameNumber = g_Level.Anims[bigGunItem->Animation.AnimNumber].frameBase + (laraItem->Animation.FrameNumber - g_Level.Anims[laraItem->Animation.AnimNumber].frameBase);
 
-			if (bigGun->Flags & BGUN_FLAG_DISMOUNT && TestLastFrame(laraItem))
+			if (bigGun.Flags & BGUN_FLAG_DISMOUNT && TestLastFrame(laraItem))
 			{
 				SetAnimation(laraItem, LA_STAND_IDLE);
 				lara->Vehicle = NO_ITEM;
@@ -306,21 +305,21 @@ namespace TEN::Entities::Vehicles
 			bigGunItem->Animation.AnimNumber = Objects[ID_BIGGUN].animIndex + (laraItem->Animation.AnimNumber - Objects[ID_LARA_BIGGUN_ANIM].animIndex);
 			bigGunItem->Animation.FrameNumber = g_Level.Anims[bigGunItem->Animation.AnimNumber].frameBase + (laraItem->Animation.FrameNumber - g_Level.Anims[laraItem->Animation.AnimNumber].frameBase);
 			
-			if (bigGun->FireCount > 0)
-				bigGun->FireCount--;
+			if (bigGun.FireCount > 0)
+				bigGun.FireCount--;
 			else
-				bigGun->FireCount = 0;
+				bigGun.FireCount = 0;
 
-			bigGun->Flags = BGUN_FLAG_UP_DOWN;
+			bigGun.Flags = BGUN_FLAG_UP_DOWN;
 
 			laraItem->Animation.AnimNumber = Objects[ID_LARA_BIGGUN_ANIM].animIndex + BGUN_ANIM_ROTATE_VERTICALLY;
-			laraItem->Animation.FrameNumber = g_Level.Anims[Objects[ID_BIGGUN].animIndex + BGUN_ANIM_ROTATE_VERTICALLY].frameBase + bigGun->XOrientFrame;
+			laraItem->Animation.FrameNumber = g_Level.Anims[Objects[ID_BIGGUN].animIndex + BGUN_ANIM_ROTATE_VERTICALLY].frameBase + bigGun.XOrientFrame;
 			break;
 		}
 
-		Camera.targetElevation = -(bigGun->Rotation.x + ANGLE(15.0f));
+		Camera.targetElevation = -(bigGun.Rotation.x + ANGLE(15.0f));
 
-		bigGunItem->Pose.Orientation.y = bigGun->BaseOrientation.y + bigGun->Rotation.y;
+		bigGunItem->Pose.Orientation.y = bigGun.BaseOrientation.y + bigGun.Rotation.y;
 		laraItem->Pose.Orientation.y = bigGunItem->Pose.Orientation.y;
 		coll->Setup.EnableObjectPush = false;
 		coll->Setup.EnableSpasm = false;

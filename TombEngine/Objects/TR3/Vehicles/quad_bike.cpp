@@ -20,7 +20,6 @@
 
 using namespace TEN::Input;
 using namespace TEN::Math;
-using std::vector;
 
 namespace TEN::Entities::Vehicles
 {
@@ -49,14 +48,14 @@ namespace TEN::Entities::Vehicles
 	constexpr auto QBIKE_MOUNT_DISTANCE	   = CLICK(2);
 	constexpr auto QBIKE_DISMOUNT_DISTANCE = 385; // Precise offset derived from animation.
 
-	#define QBIKE_TURN_RATE_ACCEL		  ANGLE(2.5f)
-	#define QBIKE_TURN_RATE_DECEL		  ANGLE(2.0f)
-	#define QBIKE_TURN_RATE_MAX			  ANGLE(5.0f)
-	#define QBIKE_DRIFT_TURN_RATE_ACCEL	  ANGLE(2.75f)
-	#define QBIKE_DRIFT_TURN_RATE_MAX	  ANGLE(8.0f)
-	#define QBIKE_MOMENTUM_TURN_RATE_MIN  ANGLE(3.0f)
-	#define QBIKE_MOMENTUM_TURN_RATE_MAX  ANGLE(1.5f)
-	#define QBIKE_MOMENTUM_TURN_RATE_MAX2 ANGLE(150.0f) // TODO: Resolve this naming clash!
+	const auto QBIKE_TURN_RATE_ACCEL		 = ANGLE(2.5f);
+	const auto QBIKE_TURN_RATE_DECEL		 = ANGLE(2.0f);
+	const auto QBIKE_TURN_RATE_MAX			 = ANGLE(5.0f);
+	const auto QBIKE_DRIFT_TURN_RATE_ACCEL	 = ANGLE(2.75f);
+	const auto QBIKE_DRIFT_TURN_RATE_MAX	 = ANGLE(8.0f);
+	const auto QBIKE_MOMENTUM_TURN_RATE_MIN	 = ANGLE(3.0f);
+	const auto QBIKE_MOMENTUM_TURN_RATE_MAX	 = ANGLE(1.5f);
+	const auto QBIKE_MOMENTUM_TURN_RATE_MAX2 = ANGLE(150.0f); // TODO: Resolve this naming clash!
 
 	enum QuadBikeState
 	{
@@ -141,13 +140,13 @@ namespace TEN::Entities::Vehicles
 		{ 90, 180, -32, 6 },
 		{ -90, 180, -32, 7 }
 	};
-	const vector<VehicleMountType> QuadBikeMountTypes =
+	const auto QuadBikeMountTypes = std::vector<VehicleMountType>
 	{
 		VehicleMountType::LevelStart,
 		VehicleMountType::Left,
 		VehicleMountType::Right
 	};
-	const vector<VehicleDismountType> QuadBikeDismountTypes =
+	const auto QuadBikeDismountTypes = std::vector<VehicleDismountType>
 	{
 		VehicleDismountType::Left,
 		VehicleDismountType::Right,

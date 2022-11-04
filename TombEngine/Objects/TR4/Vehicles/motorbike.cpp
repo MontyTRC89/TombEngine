@@ -21,7 +21,6 @@
 
 using namespace TEN::Input;
 using namespace TEN::Math;
-using std::vector;
 
 namespace TEN::Entities::Vehicles
 {
@@ -114,10 +113,10 @@ namespace TEN::Entities::Vehicles
 		MOTORBIKE_ANIM_UNLOCK = 28
 	};
 
-	const vector<unsigned int> MotorbikeJoints			 = { 0, 1, 2, 4, 5, 6, 7, 8, 9 };
-	const vector<unsigned int> MotorbikeBrakeLightJoints = { 10 };
-	const vector<unsigned int> MotorbikeHeadLightJoints  = { 3 };
-	const vector<VehicleMountType> MotorbikeMountTypes =
+	const auto MotorbikeJoints			 = std::vector<unsigned int>{ 0, 1, 2, 4, 5, 6, 7, 8, 9 };
+	const auto MotorbikeBrakeLightJoints = std::vector<unsigned int>{ 10 };
+	const auto MotorbikeHeadLightJoints  = std::vector<unsigned int>{ 3 };
+	const auto MotorbikeMountTypes		 = std::vector<VehicleMountType>
 	{
 		VehicleMountType::LevelStart,
 		VehicleMountType::Right

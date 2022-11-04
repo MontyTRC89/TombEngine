@@ -19,7 +19,6 @@
 
 using namespace TEN::Input;
 using namespace TEN::Math;
-using std::vector;
 
 namespace TEN::Entities::Vehicles
 {
@@ -49,11 +48,11 @@ namespace TEN::Entities::Vehicles
 	constexpr auto SKIDOO_DAMAGE_START		= 140;
 	constexpr auto SKIDOO_DAMAGE_LENGTH		= 14;
 
-	#define SKIDOO_TURN_RATE_ACCEL			ANGLE(2.5f)
-	#define SKIDOO_TURN_RATE_DECEL			ANGLE(2.0f)
-	#define SKIDOO_TURN_RATE_MAX			ANGLE(6.0f)
-	#define SKIDOO_MOMENTUM_TURN_RATE_ACCEL	ANGLE(3.0f)
-	#define SKIDOO_MOMENTUM_TURN_RATE_MAX	ANGLE(150.0f)
+	const auto SKIDOO_TURN_RATE_ACCEL		   = ANGLE(2.5f);
+	const auto SKIDOO_TURN_RATE_DECEL		   = ANGLE(2.0f);
+	const auto SKIDOO_TURN_RATE_MAX			   = ANGLE(6.0f);
+	const auto SKIDOO_MOMENTUM_TURN_RATE_ACCEL = ANGLE(3.0f);
+	const auto SKIDOO_MOMENTUM_TURN_RATE_MAX   = ANGLE(150.0f);
 
 	enum SkidooState
 	{
@@ -99,13 +98,13 @@ namespace TEN::Entities::Vehicles
 		SKIDOO_ANIM_FALL_DEATH = 22
 	};
 
-	const vector<VehicleMountType> SkidooMountTypes =
+	const auto SkidooMountTypes = std::vector<VehicleMountType>
 	{
 		VehicleMountType::LevelStart,
 		VehicleMountType::Left,
 		VehicleMountType::Right
 	};
-	const vector<VehicleDismountType> SkidooDismountTypes =
+	const auto SkidooDismountTypes = std::vector<VehicleDismountType>
 	{
 		VehicleDismountType::Left,
 		VehicleDismountType::Right,

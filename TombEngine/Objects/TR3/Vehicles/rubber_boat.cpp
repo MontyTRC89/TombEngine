@@ -20,7 +20,6 @@
 
 using namespace TEN::Input;
 using namespace TEN::Math;
-using std::vector;
 
 namespace TEN::Entities::Vehicles
 {
@@ -46,9 +45,9 @@ namespace TEN::Entities::Vehicles
 	constexpr auto RBOAT_BOUNCE_MIN = 0;
 	constexpr auto RBOAT_KICK_MAX = -80;
 
-	#define RBOAT_TURN_RATE_ACCEL ANGLE(0.5f)
-	#define RBOAT_TURN_RATE_DECEL ANGLE(0.25f)
-	#define RBOAT_TURN_RATE_MAX	  ANGLE(4.0f)
+	const auto RBOAT_TURN_RATE_ACCEL = ANGLE(0.5f);
+	const auto RBOAT_TURN_RATE_DECEL = ANGLE(0.25f);
+	const auto RBOAT_TURN_RATE_MAX	 = ANGLE(4.0f);
 
 	enum RubberBoatState
 	{
@@ -91,7 +90,7 @@ namespace TEN::Entities::Vehicles
 		RBOAT_ANIM_TURN_RIGHT_START = 22
 	};
 
-	const vector<VehicleMountType> RubberBoatMountTypes =
+	const auto RubberBoatMountTypes = std::vector<VehicleMountType>
 	{
 		VehicleMountType::LevelStart,
 		VehicleMountType::Left,

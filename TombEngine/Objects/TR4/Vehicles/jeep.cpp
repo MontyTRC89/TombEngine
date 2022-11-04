@@ -20,7 +20,6 @@
 
 using namespace TEN::Input;
 using namespace TEN::Math;
-using std::vector;
 
 namespace TEN::Entities::Vehicles
 {
@@ -41,20 +40,20 @@ namespace TEN::Entities::Vehicles
 	constexpr auto JEEP_BOUNCE_MIN		  = 32;
 	constexpr auto JEEP_KICK_MAX		  = -80;
 
-	#define JEEP_TURN_RATE_DECEL ANGLE(0.5f)
+	const auto JEEP_TURN_RATE_DECEL = ANGLE(0.5f);
 
 	// TODO: Simpler toggle.
 	constexpr auto JEEP_IN_TOGGLE_REVERSE = IN_SPRINT;
 	constexpr auto JEEP_IN_TOGGLE_FORWARD = IN_WALK;
 
-	const vector<VehicleMountType> JeepMountTypes =
+	const auto JeepMountTypes = std::vector<VehicleMountType>
 	{
 		VehicleMountType::LevelStart,
 		VehicleMountType::Left,
 		VehicleMountType::Right
 	};
-	const vector<unsigned int> JeepJoints			= { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 15, 16 };
-	const vector<unsigned int> JeepBrakeLightJoints = { 15, 16 };
+	const auto JeepJoints			= std::vector<unsigned int>{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 15, 16 };
+	const auto JeepBrakeLightJoints = std::vector<unsigned int>{ 15, 16 };
 
 	enum JeepState
 	{
