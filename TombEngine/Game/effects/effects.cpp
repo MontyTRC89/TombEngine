@@ -1158,9 +1158,9 @@ void TriggerWaterfallMist(const ItemInfo& item)
 			spark->life = spark->sLife = Random::GenerateInt(0, 16) + 16;
 			spark->fadeToBlack = spark->life - 6;
 
-			spark->x = offset * sign * phd_sin(angle) + Random::GenerateInt(0, 16) + item.Pose.Position.x - 8;
+			spark->x = offset * sign * sin + Random::GenerateInt(0, 16) + item.Pose.Position.x - 8;
 			spark->y = Random::GenerateInt(0, 16) + item.Pose.Position.y - 8;
-			spark->z = offset * sign * phd_cos(angle) + Random::GenerateInt(0, 16) + item.Pose.Position.z - 8;
+			spark->z = offset * sign * cos + Random::GenerateInt(0, 16) + item.Pose.Position.z - 8;
 
 			spark->xVel = 0;
 			spark->yVel = Random::GenerateInt(0, 128) + 64;
