@@ -1125,9 +1125,16 @@ void TriggerWaterfallMist(const ItemInfo& item)
 	int minPosX = -width * sin + item.Pose.Position.x;
 	int minPosZ = -width * cos + item.Pose.Position.z;
 
-	if (!TestPointInView(Vector3i(maxPosX, item.Pose.Position.y, maxPosZ), size * scale, item.RoomNumber) &&
-		!TestPointInView(Vector3i(minPosX, item.Pose.Position.y, minPosZ), size * scale, item.RoomNumber))
+	float fadeMin = GetParticleDistanceFade(Vector3i(minPosX, item.Pose.Position.y, minPosZ));
+	float fadeMax = GetParticleDistanceFade(Vector3i(maxPosX, item.Pose.Position.y, maxPosZ));
+
+	if (fadeMin == fadeMax && fadeMin == 0.0f)
 		return;
+
+	float finalFade = (fadeMin == fadeMax >= 1.0f) ? 1.0f : std::max(fadeMin, fadeMax);
+
+	auto startColor = item.Color / 2.0f * finalFade * float(UCHAR_MAX);
+	auto endColor   = item.Color / 4.0f * finalFade * float(UCHAR_MAX);
 
 	float step = size * 0.75f;
 	int steps = int((width / 2) / step);
@@ -1146,12 +1153,12 @@ void TriggerWaterfallMist(const ItemInfo& item)
 			spark->on = true;
 
 			char colorOffset = (Random::GenerateInt(0, 32)) - 16;
-			spark->sR = std::clamp(int(item.Color.x / 2.0f * float(UCHAR_MAX)) + colorOffset, 0, UCHAR_MAX);
-			spark->sG = std::clamp(int(item.Color.y / 2.0f * float(UCHAR_MAX)) + colorOffset, 0, UCHAR_MAX);
-			spark->sB = std::clamp(int(item.Color.z / 2.0f * float(UCHAR_MAX)) + colorOffset, 0, UCHAR_MAX);
-			spark->dR = std::clamp(int(item.Color.x / 4.0f * float(UCHAR_MAX)) + colorOffset, 0, UCHAR_MAX);
-			spark->dG = std::clamp(int(item.Color.y / 4.0f * float(UCHAR_MAX)) + colorOffset, 0, UCHAR_MAX);
-			spark->dB = std::clamp(int(item.Color.z / 4.0f * float(UCHAR_MAX)) + colorOffset, 0, UCHAR_MAX);
+			spark->sR = std::clamp(int(startColor.x) + colorOffset, 0, UCHAR_MAX);
+			spark->sG = std::clamp(int(startColor.y) + colorOffset, 0, UCHAR_MAX);
+			spark->sB = std::clamp(int(startColor.z) + colorOffset, 0, UCHAR_MAX);
+			spark->dR = std::clamp(int(endColor.x)   + colorOffset, 0, UCHAR_MAX);
+			spark->dG = std::clamp(int(endColor.y)   + colorOffset, 0, UCHAR_MAX);
+			spark->dB = std::clamp(int(endColor.z)   + colorOffset, 0, UCHAR_MAX);
 
 			spark->colFadeSpeed = 1;
 			spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
