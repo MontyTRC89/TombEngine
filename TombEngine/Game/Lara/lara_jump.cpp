@@ -37,7 +37,7 @@ void lara_as_jump_forward(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->Control.Look.Mode = LookMode::Free;
+	lara->Control.Look.Mode = LookMode::Horizontal;
 
 	// Update running jump counter in preparation for possible jump action soon after landing.
 	lara->Control.Count.Run++;
@@ -181,7 +181,7 @@ void lara_as_reach(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->Control.Look.Mode = LookMode::Free;
+	lara->Control.Look.Mode = LookMode::Horizontal;
 	Camera.targetAngle = ANGLE(85.0f);
 
 	if (item->HitPoints <= 0)
@@ -395,7 +395,7 @@ void lara_as_jump_back(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->Control.Look.Mode = LookMode::Free;
+	lara->Control.Look.Mode = LookMode::Horizontal;
 	Camera.targetAngle = ANGLE(135.0f);
 
 	if (item->HitPoints <= 0)
@@ -455,7 +455,7 @@ void lara_as_jump_right(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->Control.Look.Mode = LookMode::Free;
+	lara->Control.Look.Mode = LookMode::Vertical;
 
 	if (item->HitPoints <= 0)
 	{
@@ -512,7 +512,7 @@ void lara_as_jump_left(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->Control.Look.Mode = LookMode::Free;
+	lara->Control.Look.Mode = LookMode::Vertical;
 
 	if (item->HitPoints <= 0)
 	{
@@ -724,7 +724,7 @@ void lara_as_swan_dive(ItemInfo* item, CollisionInfo* coll)
 	auto* lara = GetLaraInfo(item);
 
 	lara->Control.HandStatus = HandStatus::Busy;
-	lara->Control.Look.Mode = LookMode::Free;
+	lara->Control.Look.Mode = LookMode::Horizontal;
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpasm = false;
 

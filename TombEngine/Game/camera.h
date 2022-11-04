@@ -71,16 +71,10 @@ extern float CinematicBarsDestinationHeight;
 extern float CinematicBarsHeight;
 extern float CinematicBarsSpeed;
 
-// Temporary placement.
-// ------------------------------
-
 void DoLookAround(ItemInfo* item, bool invertVerticalAxis = true);
 void ClearLookAroundActions(ItemInfo* item);
-
 void DoThumbstickCamera();
 void LookCamera(ItemInfo* item);
-
-// ------------------------------
 
 void LookAt(CAMERA_INFO* cam, short roll);
 void AlterFOV(int value);

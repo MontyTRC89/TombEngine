@@ -73,7 +73,7 @@ void lara_as_underwater_swim_forward(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->Control.Look.Mode = LookMode::Free;
+	lara->Control.Look.Mode = LookMode::Horizontal;
 
 	auto laraType = g_GameFlow->GetLevel(CurrentLevel)->GetLaraType();
 
@@ -115,7 +115,7 @@ void lara_as_underwater_inertia(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->Control.Look.Mode = LookMode::Free;
+	lara->Control.Look.Mode = LookMode::Horizontal;
 
 	auto laraType = g_GameFlow->GetLevel(CurrentLevel)->GetLaraType();
 

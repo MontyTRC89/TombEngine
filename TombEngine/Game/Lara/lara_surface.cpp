@@ -150,6 +150,8 @@ void lara_as_surface_swim_left(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
+	lara->Control.Look.Mode = LookMode::Vertical;
+
 	if (item->HitPoints <= 0)
 	{
 		item->Animation.TargetState = LS_WATER_DEATH;
@@ -188,6 +190,8 @@ void lara_col_surface_swim_left(ItemInfo* item, CollisionInfo* coll)
 void lara_as_surface_swim_right(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
+
+	lara->Control.Look.Mode = LookMode::Vertical;
 
 	if (item->HitPoints <= 0)
 	{
@@ -228,6 +232,8 @@ void lara_as_surface_swim_back(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
+	lara->Control.Look.Mode = LookMode::Horizontal;
+
 	if (item->HitPoints <= 0)
 	{
 		item->Animation.TargetState = LS_WATER_DEATH;
@@ -262,6 +268,9 @@ void lara_col_surface_swim_back(ItemInfo* item, CollisionInfo* coll)
 // Collision:	lara_default_col()
 void lara_as_surface_climb_out(ItemInfo* item, CollisionInfo* coll)
 {
+	auto* lara = GetLaraInfo(item);
+
+	lara->Control.Look.Mode = LookMode::None;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
 	Camera.flags = CF_FOLLOW_CENTER;

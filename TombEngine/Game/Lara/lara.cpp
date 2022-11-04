@@ -443,7 +443,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 	if (!lara->Control.Locked)
 		lara->LocationPad = -1;
 
-	auto oldPos = item->Pose.Position;
+	auto prevPos = item->Pose.Position;
 
 	if (lara->Control.HandStatus == HandStatus::Busy &&
 		item->Animation.AnimNumber == LA_STAND_IDLE &&
@@ -742,7 +742,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 		break;
 	}
 
-	Statistics.Game.Distance += (int)round(Vector3::Distance(oldPos.ToVector3(), item->Pose.Position.ToVector3()));
+	Statistics.Game.Distance += (int)round(Vector3i::Distance(prevPos, item->Pose.Position));
 }
 
 void LaraAboveWater(ItemInfo* item, CollisionInfo* coll)
@@ -768,9 +768,8 @@ void LaraAboveWater(ItemInfo* item, CollisionInfo* coll)
 	coll->Setup.PrevFrameNumber = item->Animation.FrameNumber;
 	coll->Setup.PrevState = item->Animation.ActiveState;
 
-	// ------------------------------------
-
-	if (TrInput & IN_LOOK && lara->Control.Look.Mode != LookMode::None &&
+	// Handle look around.
+	if (IsHeld(In::Look) && lara->Control.Look.Mode != LookMode::None &&
 		lara->ExtraAnim == NO_ITEM)
 	{
 		DoLookAround(item);
@@ -778,8 +777,6 @@ void LaraAboveWater(ItemInfo* item, CollisionInfo* coll)
 	else //if (!lara->Control.IsFlexing)
 		ResetLook(item); // TODO: Extend ResetLaraFlex() to be a catch-all function.
 	lara->Control.Look.Mode = LookMode::None;
-
-	// ------------------------------------
 
 	UpdateItemRoom(item, -LARA_HEIGHT / 2);
 
@@ -797,7 +794,7 @@ void LaraAboveWater(ItemInfo* item, CollisionInfo* coll)
 		// Check for collision with items.
 		DoObjectCollision(item, coll);
 
-		// Handle Lara collision.
+		// Handle player collision.
 		if (lara->Vehicle == NO_ITEM)
 			lara_collision_routines[item->Animation.ActiveState](item, coll);
 	}
@@ -811,7 +808,7 @@ void LaraAboveWater(ItemInfo* item, CollisionInfo* coll)
 	// Test for flags and triggers.
 	ProcessSectorFlags(item);
 	TestTriggers(item, false);
-	TestVolumes(Lara.ItemNumber);
+	TestVolumes(lara->ItemNumber);
 
 	DrawNearbyPathfinding(GetCollision(item).BottomBlock->Box);
 }

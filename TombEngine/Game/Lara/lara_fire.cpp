@@ -907,7 +907,7 @@ void FindNewTarget(ItemInfo* laraItem, const WeaponInfo& weaponInfo)
 
 	ItemInfo* bestEntity = nullptr;
 	float bestDistance = INFINITY;
-	short bestYOrient = MAXSHORT;
+	short bestYOrient = SHRT_MAX;
 	unsigned int numTargets = 0;
 	float maxDistance = weaponInfo.TargetDist;
 

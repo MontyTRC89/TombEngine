@@ -210,6 +210,9 @@ void lara_col_hang(ItemInfo* item, CollisionInfo* coll)
 // Collision:	lara_col_shimmy_left()
 void lara_as_shimmy_left(ItemInfo* item, CollisionInfo* coll)
 {
+	auto* lara = GetLaraInfo(item);
+
+	lara->Control.Look.Mode = LookMode::Vertical;
 	coll->Setup.Mode = CollisionProbeMode::FreeFlat;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
@@ -237,6 +240,9 @@ void lara_col_shimmy_left(ItemInfo* item, CollisionInfo* coll)
 // Collision:	lara_col_shimmy_right()
 void lara_as_shimmy_right(ItemInfo* item, CollisionInfo* coll)
 {
+	auto* lara = GetLaraInfo(item);
+
+	lara->Control.Look.Mode = LookMode::Vertical;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
 	coll->Setup.Mode = CollisionProbeMode::FreeFlat;

@@ -201,13 +201,20 @@ void LookCamera(ItemInfo* item)
 	static constexpr auto cameraCollPush = BLOCK(1, 4) - BLOCK(1, 16);
 
 	// Determine offsets.
-	float verticalOffset = -LaraCollision.Setup.Height + ((LaraCollision.Setup.Height == LARA_HEIGHT_MONKEY) ? BLOCK(1, 4) : -BLOCK(1, 8));
-	auto pivotOffset = Vector3(0.0f, verticalOffset, BLOCK(1, 16));
+	float verticalOffset = -LaraCollision.Setup.Height;
+	if (LaraCollision.Setup.Height == LARA_HEIGHT_MONKEY)
+		verticalOffset += BLOCK(1, 4);
+	else if (LaraCollision.Setup.Height == LARA_HEIGHT_TREAD)
+		verticalOffset += BLOCK(1, 2);
+	else
+		verticalOffset += -BLOCK(1, 8);
+
+	auto pivotOffset = Vector3(0.0f, verticalOffset, 0.0f);
 	float idealPosDist = -std::max<float>(Camera.targetDistance * 0.5f, BLOCK(3, 4));
 	float lookAtPosDist = BLOCK(1, 2);
 
-	// Define absolute camera orientation.
-	auto orient = player.Control.Look.Orientation + EulerAngles(0, item->Pose.Orientation.y, 0);
+	// Define absolute camera orientation. TODO: Twisting at poles is an issue.
+	auto orient = player.Control.Look.Orientation + EulerAngles(item->Pose.Orientation.x, item->Pose.Orientation.y, 0);
 
 	// Define landmarks.
 	auto pivot = Geometry::TranslatePoint(item->Pose.Position, item->Pose.Orientation.y, pivotOffset.z, pivotOffset.y, pivotOffset.x); // TODO: Use functionf from ladder branch.

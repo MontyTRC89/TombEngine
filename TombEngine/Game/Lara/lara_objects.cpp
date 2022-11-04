@@ -1045,6 +1045,7 @@ void lara_as_zip_line(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
+	lara->Control.Look.Mode = LookMode::Free;
 	Camera.targetAngle = ANGLE(70.0f);
 
 	if (!(TrInput & IN_ACTION))
