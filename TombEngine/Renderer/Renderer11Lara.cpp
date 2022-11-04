@@ -46,7 +46,7 @@ bool shouldAnimateUpperBody(const LaraWeaponType& weapon)
 	case LaraWeaponType::HK:
 	{
 		// Animate upper body if Lara is shooting from shoulder OR if Lara is standing still/turning
-		int baseAnim = Objects[WeaponObject(weapon)].animIndex;
+		int baseAnim = Objects[GetWeaponObjectID(weapon)].animIndex;
 		if (laraInfo.RightArm.AnimNumber - baseAnim == 0 ||
 			laraInfo.RightArm.AnimNumber - baseAnim == 2 ||
 			laraInfo.RightArm.AnimNumber - baseAnim == 4)

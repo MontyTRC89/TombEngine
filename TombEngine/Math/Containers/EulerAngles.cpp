@@ -74,20 +74,6 @@ using namespace TEN::Math;
 		return false;
 	}
 
-	void EulerAngles::InterpolateConstant(const EulerAngles& eulersTo, short angularVel)
-	{
-		*this = InterpolateConstant(*this, eulersTo, angularVel);
-	}
-	
-	EulerAngles EulerAngles::InterpolateConstant(const EulerAngles& eulersFrom, const EulerAngles& eulerTo, short angularVel)
-	{
-		return EulerAngles(
-			InterpolateConstant(eulersFrom.x, eulerTo.x, angularVel),
-			InterpolateConstant(eulersFrom.y, eulerTo.y, angularVel),
-			InterpolateConstant(eulersFrom.z, eulerTo.z, angularVel)
-		);
-	}
-
 	void EulerAngles::Lerp(const EulerAngles& eulersTo, float alpha, short epsilon)
 	{
 		*this = Lerp(*this, eulersTo, alpha, epsilon);
@@ -99,6 +85,20 @@ using namespace TEN::Math;
 			Lerp(eulersFrom.x, eulersTo.x, alpha, epsilon),
 			Lerp(eulersFrom.y, eulersTo.y, alpha, epsilon),
 			Lerp(eulersFrom.z, eulersTo.z, alpha, epsilon)
+		);
+	}
+
+	void EulerAngles::InterpolateConstant(const EulerAngles& eulersTo, short angularVel)
+	{
+		*this = InterpolateConstant(*this, eulersTo, angularVel);
+	}
+
+	EulerAngles EulerAngles::InterpolateConstant(const EulerAngles& eulersFrom, const EulerAngles& eulerTo, short angularVel)
+	{
+		return EulerAngles(
+			InterpolateConstant(eulersFrom.x, eulerTo.x, angularVel),
+			InterpolateConstant(eulersFrom.y, eulerTo.y, angularVel),
+			InterpolateConstant(eulersFrom.z, eulerTo.z, angularVel)
 		);
 	}
 

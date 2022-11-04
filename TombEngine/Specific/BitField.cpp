@@ -3,9 +3,6 @@
 
 #include <limits>
 
-using std::string;
-using std::vector;
-
 namespace TEN::Utils
 {
 	constexpr auto BIT_FIELD_SIZE_MAX = std::numeric_limits<unsigned int>::digits;
@@ -34,7 +31,7 @@ namespace TEN::Utils
 		}
 	}
 
-	BitField::BitField(const string& bitString)
+	BitField::BitField(const std::string& bitString)
 	{
 		for (const char& bit : bitString)
 			this->Bits.push_back((bit == '1') ? true : false);
@@ -57,13 +54,13 @@ namespace TEN::Utils
 		return count;
 	}
 
-	void BitField::Set(const vector<unsigned int>& indices)
+	void BitField::Set(const std::vector<unsigned int>& indices)
 	{
 		for (const unsigned int& index : indices)
 		{
 			if (index >= Bits.size())
 			{
-				TENLog(string("BitField attempted to set bit at invalid index."), LogLevel::Warning);
+				TENLog(std::string("BitField attempted to set bit at invalid index."), LogLevel::Warning);
 				continue;
 			}
 			
@@ -81,13 +78,13 @@ namespace TEN::Utils
 		this->Fill(true);
 	}
 
-	void BitField::Clear(const vector<unsigned int>& indices)
+	void BitField::Clear(const std::vector<unsigned int>& indices)
 	{
 		for (const unsigned int& index : indices)
 		{
 			if (index >= Bits.size())
 			{
-				TENLog(string("BitField attempted to clear bit at invalid index."), LogLevel::Warning);
+				TENLog(std::string("BitField attempted to clear bit at invalid index."), LogLevel::Warning);
 				continue;
 			}
 
@@ -105,13 +102,13 @@ namespace TEN::Utils
 		this->Fill(false);
 	}
 	
-	void BitField::Flip(const vector<unsigned int>& indices)
+	void BitField::Flip(const std::vector<unsigned int>& indices)
 	{
 		for (const unsigned int& index : indices)
 		{
 			if (index >= Bits.size())
 			{
-				TENLog(string("BitField attempted to flip bit at invalid index."), LogLevel::Warning);
+				TENLog(std::string("BitField attempted to flip bit at invalid index."), LogLevel::Warning);
 				continue;
 			}
 
@@ -129,13 +126,13 @@ namespace TEN::Utils
 		this->Bits.flip();
 	}
 
-	bool BitField::Test(const vector<unsigned int>& indices, bool testAny) const
+	bool BitField::Test(const std::vector<unsigned int>& indices, bool testAny) const
 	{
 		for (const unsigned int& index : indices)
 		{
 			if (index >= Bits.size())
 			{
-				TENLog(string("BitField attempted to test bit at invalid index."), LogLevel::Warning);
+				TENLog(std::string("BitField attempted to test bit at invalid index."), LogLevel::Warning);
 				continue;
 			}
 
@@ -198,9 +195,9 @@ namespace TEN::Utils
 		return packedBits;
 	}
 
-	string BitField::ToString() const
+	std::string BitField::ToString() const
 	{
-		auto bitString = string();
+		auto bitString = std::string();
 		for (const bool& bit : this->Bits)
 			bitString += bit ? '1' : '0';
 

@@ -834,7 +834,7 @@ void LaraAboveWater(ItemInfo* item, CollisionInfo* coll)
 	}
 
 	// Handle weapons.
-	LaraGun(item);
+	HandleWeapon(item);
 
 	// Handle breath.
 	LaraBreath(item);
@@ -912,7 +912,7 @@ void LaraWaterSurface(ItemInfo* item, CollisionInfo* coll)
 
 	UpdateItemRoom(item, LARA_RADIUS);
 
-	LaraGun(item);
+	HandleWeapon(item);
 
 	ProcessSectorFlags(item);
 	TestTriggers(item, false);
@@ -1001,7 +1001,7 @@ void LaraUnderwater(ItemInfo* item, CollisionInfo* coll)
 
 	UpdateItemRoom(item, 0);
 
-	LaraGun(item);
+	HandleWeapon(item);
 
 	ProcessSectorFlags(item);
 	TestTriggers(item, false);

@@ -214,7 +214,7 @@ namespace TEN::Effects::Footprints
 		footprint.Position[1] = p1;
 		footprint.Position[2] = p2;
 		footprint.Position[3] = p3;
-		footprint.StartOpacity = 0.25f;
+		footprint.StartOpacity = 0.5f;
 		footprint.LifeStartFading = FPS * 10;
 		footprint.Life = FPS * 20;
 		footprint.Active = true;

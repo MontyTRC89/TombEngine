@@ -24,6 +24,7 @@ namespace TEN::Renderer
 		BLEND_MODES BlendMode;
 		DirectX::SimpleMath::Vector3 ConstrainAxis;
 		DirectX::SimpleMath::Vector3 LookAtAxis;
+		bool SoftParticle;
 	};
 	
 	using namespace DirectX::SimpleMath;
