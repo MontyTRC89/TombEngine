@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "Objects/TR2/Vehicles/skidoo.h"
+#include "Objects/TR2/Vehicles/Skidoo.h"
 
 #include "Game/camera.h"
 #include "Game/collision/collide_item.h"
@@ -10,7 +10,7 @@
 #include "Game/Lara/lara_helpers.h"
 #include "Game/effects/simple_particle.h"
 #include "Math/Math.h"
-#include "Objects/TR2/Vehicles/skidoo_info.h"
+#include "Objects/TR2/Vehicles/SkidooInfo.h"
 #include "Objects/Utils/VehicleHelpers.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"

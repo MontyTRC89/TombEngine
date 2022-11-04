@@ -34,8 +34,8 @@
 #include "Objects/TR2/Trap/tr2_killerstatue.h"
 
 // Vehicles
-#include "Objects/TR2/Vehicles/speedboat.h"
-#include "Objects/TR2/Vehicles/skidoo.h"
+#include "Objects/TR2/Vehicles/Speedboat.h"
+#include "Objects/TR2/Vehicles/Skidoo.h"
 
 using namespace TEN::Entities::Creatures::TR2;
 

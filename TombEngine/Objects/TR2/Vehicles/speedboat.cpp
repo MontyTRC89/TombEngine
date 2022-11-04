@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "Objects/TR2/Vehicles/speedboat.h"
+#include "Objects/TR2/Vehicles/Speedboat.h"
 
 #include "Game/camera.h"
 #include "Game/collision/collide_item.h"
@@ -8,7 +8,7 @@
 #include "Game/Lara/lara_helpers.h"
 #include "Game/effects/simple_particle.h"
 #include "Math/Math.h"
-#include "Objects/TR2/Vehicles/speedboat_info.h"
+#include "Objects/TR2/Vehicles/SpeedboatInfo.h"
 #include "Objects/Utils/VehicleHelpers.h"
 #include "Sound/sound.h"
 #include "Specific/Input/Input.h"

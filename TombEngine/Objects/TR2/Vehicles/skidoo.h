@@ -1,5 +1,5 @@
 #pragma once
-#include "Objects/TR2/Vehicles/skidoo_info.h"
+#include "Objects/TR2/Vehicles/SkidooInfo.h"
 #include "Objects/Utils/VehicleHelpers.h"
 
 struct CollisionInfo;
