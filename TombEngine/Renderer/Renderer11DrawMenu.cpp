@@ -355,7 +355,7 @@ namespace TEN::Renderer
 			GetNextBlockPosition(&y);
 
 			// Statistics
-			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_STATISTICS), PRINTSTRING_COLOR_WHITE, SF_Center(pause_option == 0));
+			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_VIEW), PRINTSTRING_COLOR_WHITE, SF_Center(pause_option == 0));
 			GetNextLinePosition(&y);
 
 			// Options
@@ -408,7 +408,7 @@ namespace TEN::Renderer
 
 			if (!save.Present)
 			{
-				AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_UNUSED), PRINTSTRING_COLOR_WHITE, SF_Center(selection == n));
+				AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_EMPTY), PRINTSTRING_COLOR_WHITE, SF_Center(selection == n));
 			}
 			else
 			{
@@ -444,7 +444,7 @@ namespace TEN::Renderer
 		auto y = MenuVerticalStatisticsTitle;
 
 		// Title
-		AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_STATISTICS), PRINTSTRING_COLOR_ORANGE, SF_Center());
+		AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_VIEW), PRINTSTRING_COLOR_ORANGE, SF_Center());
 		GetNextBlockPosition(&y);
 
 		// Level name

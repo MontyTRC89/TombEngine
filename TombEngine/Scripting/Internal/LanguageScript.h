@@ -1,6 +1,6 @@
 #pragma once
 
-// Define std::string ids
+// std::string ID macros
 #define STRING_WINDOW_TITLE				"window_title"
 #define STRING_PASSPORT					"passport"
 #define STRING_LARA_HOME				"lara_home"
@@ -36,7 +36,7 @@
 #define STRING_BINOCULARS				"binoculars"
 #define STRING_HEADSET					"headset"
 #define STRING_FLARES					"flares"
-#define STRING_TIMEX					"timex"
+#define STRING_STATISTICS				"statistics"
 #define STRING_CROWBAR					"crowbar"
 #define STRING_USE						"use"
 #define STRING_COMBINE					"combine"
@@ -119,9 +119,9 @@
 #define STRING_EQUIP					"equip"
 #define STRING_COMBINE_WITH				"combine_with"
 #define STRING_EXAMINE					"examine"
-#define STRING_STATISTICS				"statistics"
+#define STRING_VIEW						"view"
 #define STRING_CHOOSE_WEAPON			"choose_weapon"
-#define STRING_UNUSED					"unused"
+#define STRING_EMPTY					"empty"
 #define STRING_SAVEGAME_TIMESTAMP		"savegame_timestamp"
 #define STRING_TIME_TAKEN				"time_taken"
 #define STRING_DISTANCE_TRAVELLED		"distance_travelled"
