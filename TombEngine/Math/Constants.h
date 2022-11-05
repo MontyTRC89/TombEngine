@@ -24,13 +24,6 @@
 	constexpr inline auto SECTOR = [](auto x) { return BLOCK(x); }; // TODO: Replace with BLOCK() at some point.
 	constexpr inline auto CLICK	 = [](auto x) { return ((BLOCK(1) / 4) * x); };
 
-	// TODO: Move these constants to lara.h.
-	constexpr inline auto STEPUP_HEIGHT		  = (int)CLICK(3.0f / 2);
-	constexpr inline auto BAD_JUMP_CEILING	  = (int)CLICK(6.0f / 8);
-	constexpr inline auto SHALLOW_WATER_DEPTH = (int)CLICK(1.0f / 2);
-	constexpr inline auto WADE_DEPTH		  = STEPUP_HEIGHT;
-	constexpr inline auto SWIM_DEPTH		  = CLICK(3) - 38;
-
 	constexpr inline auto GRID_SNAP_SIZE = (int)CLICK(1.0f / 2);
 	constexpr inline auto STEP_SIZE		 = CLICK(1);
 	constexpr inline auto STOP_SIZE		 = CLICK(2);
@@ -39,6 +32,4 @@
 
 	constexpr inline auto FPS					  = 30;
 	constexpr inline auto PREDICTIVE_SCALE_FACTOR = 14;
-	constexpr inline auto SLOPE_DIFFERENCE		  = 60;
-
 //}
