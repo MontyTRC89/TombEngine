@@ -26,10 +26,11 @@ using namespace TEN::Effects::Environment;
 using namespace TEN::Entities::Generic;
 using namespace TEN::Input;
 
-constexpr auto COLL_CHECK_THRESHOLD   = SECTOR(4);
-constexpr auto COLL_CANCEL_THRESHOLD  = SECTOR(2);
-constexpr auto COLL_DISCARD_THRESHOLD = CLICK(0.5f);
-constexpr auto CAMERA_RADIUS          = CLICK(1);
+constexpr auto PARTICLE_FADE_THRESHOLD = SECTOR(14);
+constexpr auto COLL_CHECK_THRESHOLD    = SECTOR(4);
+constexpr auto COLL_CANCEL_THRESHOLD   = SECTOR(2);
+constexpr auto COLL_DISCARD_THRESHOLD  = CLICK(0.5f);
+constexpr auto CAMERA_RADIUS           = CLICK(1);
 
 constexpr auto THUMBCAM_VERTICAL_CONSTRAINT_ANGLE   = 120.0f;
 constexpr auto THUMBCAM_HORIZONTAL_CONSTRAINT_ANGLE = 80.0f;
@@ -1719,20 +1720,14 @@ bool TestBoundsCollideCamera(const GameBoundingBox& bounds, const Pose& pose, sh
 	return sphere.Intersects(bounds.ToBoundingOrientedBox(pose));
 }
 
-bool TestPointInView(Vector3i position, float radius, int roomNumber)
+float GetParticleDistanceFade(Vector3i position)
 {
-	if (roomNumber >= 0)
-	{
-		auto& roomList = g_Level.Rooms[Camera.pos.RoomNumber].neighbors;
-		if (std::find(roomList.begin(), roomList.end(), roomNumber) == roomList.end())
-			return false;
-	}
+	float distance = Vector3::Distance(Camera.pos.ToVector3(), position.ToVector3());
 
-	float levelFarView = g_GameFlow->GetLevel(CurrentLevel)->GetFarView() * float(SECTOR(1));
-	auto sphere1 = BoundingSphere(Camera.pos.ToVector3(), levelFarView);
-	auto sphere2 = BoundingSphere(position.ToVector3(), radius);
+	if (distance <= PARTICLE_FADE_THRESHOLD)
+		return 1.0f;
 
-	return sphere1.Intersects(sphere2);
+	return std::clamp(1.0f - ((distance - PARTICLE_FADE_THRESHOLD) / COLL_CHECK_THRESHOLD), 0.0f, 1.0f);
 }
 
 void ItemPushCamera(GameBoundingBox* bounds, Pose* pos, short radius)

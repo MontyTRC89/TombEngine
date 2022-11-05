@@ -90,7 +90,6 @@ void LookLeftRight(ItemInfo* item);
 void LookUpDown(ItemInfo* item);
 void ResetLook(ItemInfo* item);
 void RumbleScreen();
-bool TestPointInView(Vector3i position, float radius, int roomNumber);
 bool TestBoundsCollideCamera(const GameBoundingBox& bounds, const Pose& pose, short radius);
 void ItemPushCamera(GameBoundingBox* bounds, Pose* pos, short radius);
 void ItemsCollideCamera();
@@ -101,3 +100,5 @@ void SetCinematicBars(float height, float speed);
 void ClearCinematicBars();
 void UpdateFadeScreenAndCinematicBars();
 void HandleOptics(ItemInfo* item);
+
+float GetParticleDistanceFade(Vector3i position);

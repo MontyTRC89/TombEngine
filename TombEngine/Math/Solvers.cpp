@@ -3,13 +3,11 @@
 
 #include "Math/Constants.h"
 
-using std::pair;
-
 namespace TEN::Math::Solvers
 {
-	pair<float, float> SolveQuadratic(float a, float b, float c)
+	std::pair<float, float> SolveQuadratic(float a, float b, float c)
 	{
-		auto result = pair(INFINITY, INFINITY);
+		auto result = std::pair(INFINITY, INFINITY);
 
 		if (abs(a) < FLT_EPSILON)
 		{
