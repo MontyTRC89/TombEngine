@@ -259,7 +259,7 @@ namespace TEN::Entities::Creatures::TR1
 				break;
 
 			case NATLA_STATE_AIM:
-				if (item->Animation.RequiredState)
+				if (item->Animation.RequiredState != NO_STATE)
 					item->Animation.TargetState = item->Animation.RequiredState;
 				else if (shoot)
 					item->Animation.TargetState = NATLA_STATE_SHOOT;
@@ -269,7 +269,7 @@ namespace TEN::Entities::Creatures::TR1
 				break;
 
 			case NATLA_STATE_SHOOT:
-				if (!item->Animation.RequiredState)
+				if (item->Animation.RequiredState == NO_STATE)
 				{
 					short FXNumber = CreatureEffect(item, NatlaGunBite, BombGun);
 					if (FXNumber != NO_ITEM)

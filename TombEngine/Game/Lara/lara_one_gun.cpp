@@ -820,7 +820,7 @@ void GrenadeControl(short itemNumber)
 		if (item->Animation.Velocity.z)
 		{
 			item->Pose.Orientation.z += (short((item->Animation.Velocity.z / 16) + 3.0f) * ANGLE(1.0f));
-			if (item->Animation.RequiredState)
+			if (item->Animation.RequiredState != NO_STATE)
 				item->Pose.Orientation.y += (short((item->Animation.Velocity.z / 4) + 3.0f) * ANGLE(1.0f));
 			else
 				item->Pose.Orientation.x += (short((item->Animation.Velocity.z / 4) + 3.0f) * ANGLE(1.0f));
@@ -835,7 +835,7 @@ void GrenadeControl(short itemNumber)
 		if (item->Animation.Velocity.z)
 		{
 			item->Pose.Orientation.z += (short((item->Animation.Velocity.z / 4) + 7.0f) * ANGLE(1.0f));
-			if (item->Animation.RequiredState)
+			if (item->Animation.RequiredState != NO_STATE)
 				item->Pose.Orientation.y += (short((item->Animation.Velocity.z / 2) + 7.0f) * ANGLE(1.0f));
 			else
 				item->Pose.Orientation.x += (short((item->Animation.Velocity.z / 2) + 7.0f) * ANGLE(1.0f));

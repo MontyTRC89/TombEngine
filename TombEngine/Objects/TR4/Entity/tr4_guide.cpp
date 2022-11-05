@@ -287,7 +287,7 @@ namespace TEN::Entities::TR4
 				joint2 = AI.angle / 2;
 			}
 
-			if (item->Animation.RequiredState)
+			if (item->Animation.RequiredState != NO_STATE)
 				item->Animation.TargetState = item->Animation.RequiredState;
 			else if (goalNode >= item->ItemFlags[3] ||
 				item->ItemFlags[1] != 2)

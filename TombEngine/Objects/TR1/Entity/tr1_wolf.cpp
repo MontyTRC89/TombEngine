@@ -37,7 +37,7 @@ namespace TEN::Entities::Creatures::TR1
 
 	enum WolfState
 	{
-		WOLF_STATE_NONE = 0,
+		// No state 0.
 		WOLF_STATE_IDLE = 1,
 		WOLF_STATE_WALK = 2,
 		WOLF_STATE_RUN = 3,
@@ -120,7 +120,7 @@ namespace TEN::Entities::Creatures::TR1
 				break;
 
 			case WOLF_STATE_IDLE:
-				if (item->Animation.RequiredState)
+				if (item->Animation.RequiredState != NO_STATE)
 					item->Animation.TargetState = item->Animation.RequiredState;
 				else
 					item->Animation.TargetState = WOLF_STATE_WALK;
@@ -132,7 +132,7 @@ namespace TEN::Entities::Creatures::TR1
 				if (creature->Mood != MoodType::Bored)
 				{
 					item->Animation.TargetState = WOLF_STATE_STALK;
-					item->Animation.RequiredState = WOLF_STATE_NONE;
+					item->Animation.RequiredState = NO_STATE;
 				}
 				else if (Random::TestProbability(WOLF_SLEEP_CHANCE))
 				{
@@ -143,7 +143,7 @@ namespace TEN::Entities::Creatures::TR1
 				break;
 
 			case WOLF_STATE_CROUCH:
-				if (item->Animation.RequiredState)
+				if (item->Animation.RequiredState != NO_STATE)
 					item->Animation.TargetState = item->Animation.RequiredState;
 				else if (creature->Mood == MoodType::Escape)
 					item->Animation.TargetState = WOLF_STATE_RUN;
@@ -200,7 +200,7 @@ namespace TEN::Entities::Creatures::TR1
 					else
 					{
 						item->Animation.TargetState = WOLF_STATE_ATTACK;
-						item->Animation.RequiredState = WOLF_STATE_NONE;
+						item->Animation.RequiredState = NO_STATE;
 					}
 				}
 				else if (creature->Mood == MoodType::Stalk &&
@@ -217,7 +217,7 @@ namespace TEN::Entities::Creatures::TR1
 			case WOLF_STATE_ATTACK:
 				tilt = angle;
 
-				if (!item->Animation.RequiredState &&
+				if (item->Animation.RequiredState == NO_STATE &&
 					item->TouchBits.Test(WolfAttackJoints))
 				{
 					item->Animation.RequiredState = WOLF_STATE_RUN;

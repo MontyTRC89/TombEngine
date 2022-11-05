@@ -105,7 +105,7 @@ namespace TEN::Entities::Creatures::TR5
 				case LION_STATE_IDLE:
 					creature->MaxTurn = 0;
 
-					if (item->Animation.RequiredState)
+					if (item->Animation.RequiredState != NO_STATE)
 					{
 						item->Animation.TargetState = item->Animation.RequiredState;
 						break;
@@ -178,7 +178,7 @@ namespace TEN::Entities::Creatures::TR5
 					break;
 
 				case LION_STATE_POUNCE_ATTACK:
-					if (!item->Animation.RequiredState &&
+					if (item->Animation.RequiredState == NO_STATE &&
 						item->TouchBits.Test(LionAttackJoints))
 					{
 						DoDamage(creature->Enemy, LION_POUNCE_ATTACK_DAMAGE);
@@ -191,7 +191,7 @@ namespace TEN::Entities::Creatures::TR5
 				case LION_STATE_BITE_ATTACK:
 					creature->MaxTurn = ANGLE(1.0f);
 
-					if (!item->Animation.RequiredState &&
+					if (item->Animation.RequiredState == NO_STATE &&
 						item->TouchBits.Test(LionAttackJoints))
 					{
 						DoDamage(creature->Enemy, LION_BITE_ATTACK_DAMAGE);

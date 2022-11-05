@@ -360,12 +360,12 @@ namespace TEN::Entities::TR4
 						else
 							item->Animation.TargetState = BABOON_STATE_RUN_FORWARD;
 					}
-					else if (item->Animation.RequiredState)
+					else if (item->Animation.RequiredState != NO_STATE)
 						item->Animation.TargetState = item->Animation.RequiredState;
 					else if (TestProbability(0.5f))
 						item->Animation.TargetState = BABOON_STATE_SIT_IDLE;
 				}
-				else if (item->Animation.RequiredState)
+				else if (item->Animation.RequiredState != NO_STATE)
 					item->Animation.TargetState = item->Animation.RequiredState;
 				else if (TestProbability(0.25f))
 					item->Animation.TargetState = BABOON_STATE_WALK_FORWARD;
@@ -398,7 +398,7 @@ namespace TEN::Entities::TR4
 						// NOTE: It's not true to the original functionality, but to avoid repetitive actions,
 						// the SIT_IDLE state was given a higher chance of occurring. The EAT state was also added here. -- TokyoSU
 
-						if (item->Animation.RequiredState)
+						if (item->Animation.RequiredState != NO_STATE)
 							item->Animation.TargetState = item->Animation.RequiredState;
 						else if (TestProbability(0.5f))
 							item->Animation.TargetState = BABOON_STATE_SIT_IDLE;
@@ -414,7 +414,7 @@ namespace TEN::Entities::TR4
 					}
 					else if ((item->AIBits & FOLLOW) && AI.distance > BABOON_IDLE_RANGE)
 					{
-						if (item->Animation.RequiredState)
+						if (item->Animation.RequiredState != NO_STATE)
 							item->Animation.TargetState = item->Animation.RequiredState;
 						else
 							item->Animation.TargetState = BABOON_STATE_WALK_FORWARD;

@@ -10,14 +10,13 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
+#include "Math/Math.h"
 #include "Renderer/Renderer11Enums.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
-#include "Math/Random.h"
 #include "Specific/setup.h"
 
-using namespace TEN::Math::Random;
-using std::vector;
+using namespace TEN::Math;
 
 namespace TEN::Entities::Creatures::TR3
 {
@@ -26,13 +25,13 @@ namespace TEN::Entities::Creatures::TR3
 
 	constexpr auto LARA_ANIM_SHIVA_DEATH = 7;
 
-	#define SHIVA_WALK_TURN_RATE_MAX   ANGLE(4.0f)
-	#define SHIVA_ATTACK_TURN_RATE_MAX ANGLE(4.0f)
+	const auto SHIVA_WALK_TURN_RATE_MAX	  = ANGLE(4.0f);
+	const auto SHIVA_ATTACK_TURN_RATE_MAX = ANGLE(4.0f);
 
 	const auto ShivaBiteLeft  = BiteInfo(Vector3(0.0f, 0.0f, 920.0f), 13);
 	const auto ShivaBiteRight = BiteInfo(Vector3(0.0f, 0.0f, 920.0f), 22);
-	const vector<unsigned int> ShivaAttackLeftJoints	 = { 10, 13 };
-	const vector<unsigned int> ShivaAttackRightJoints = { 22, 25 };
+	const auto ShivaAttackLeftJoints  = std::vector<unsigned int>{ 10, 13 };
+	const auto ShivaAttackRightJoints = std::vector<unsigned int>{ 22, 25 };
 
 	enum ShivaState
 	{
@@ -308,7 +307,7 @@ namespace TEN::Entities::Creatures::TR3
 				}
 				else if (creature->Mood == MoodType::Bored)
 				{
-					if (TestProbability(0.0325f))
+					if (Random::TestProbability(0.0325f))
 						item->Animation.TargetState = SHIVA_STATE_WALK_FORWARD;
 				}
 				else if (AI.bite && AI.distance < pow(SECTOR(1.25f), 2))

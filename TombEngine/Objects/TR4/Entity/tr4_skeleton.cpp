@@ -414,7 +414,7 @@ namespace TEN::Entities::TR4
 							item->AIBits & FOLLOW &&
 							(creature->ReachedGoal || laraAI.distance > pow(SECTOR(2), 2)))
 						{
-							if (item->Animation.RequiredState)
+							if (item->Animation.RequiredState != NO_STATE)
 								item->Animation.TargetState = item->Animation.RequiredState;
 							else if (TestProbability(0.0155f))
 								item->Animation.TargetState = 15;

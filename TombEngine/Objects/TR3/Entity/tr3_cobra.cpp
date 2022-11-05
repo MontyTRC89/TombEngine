@@ -12,8 +12,6 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-using std::vector;
-
 namespace TEN::Entities::Creatures::TR3
 {
 	constexpr auto COBRA_BITE_ATTACK_DAMAGE	 = 80;
@@ -27,7 +25,7 @@ namespace TEN::Entities::Creatures::TR3
 	constexpr auto COBRA_SLEEP_FRAME = 45;
 
 	const auto CobraBite = BiteInfo(Vector3::Zero, 13);
-	const vector<unsigned int> CobraAttackJoints = { 13 };
+	const auto CobraAttackJoints = std::vector<unsigned int>{ 13 };
 
 	enum CobraState
 	{

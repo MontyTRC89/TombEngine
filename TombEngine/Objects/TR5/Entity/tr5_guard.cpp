@@ -426,7 +426,7 @@ namespace TEN::Entities::Creatures::TR5
 
 				if (item->ObjectNumber == ID_SCIENTIST && item == Lara.TargetEntity)
 					item->Animation.TargetState = GUARD_STATE_SURRENDER;
-				else if (item->Animation.RequiredState)
+				else if (item->Animation.RequiredState != NO_STATE)
 					item->Animation.TargetState = item->Animation.RequiredState;
 				else if (item->AIBits & GUARD)
 				{

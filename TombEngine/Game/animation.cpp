@@ -238,7 +238,7 @@ void AnimateItem(ItemInfo* item)
 
 		item->Animation.ActiveState = animPtr->ActiveState;
 		if (item->Animation.RequiredState == item->Animation.ActiveState)
-			item->Animation.RequiredState = 0;
+			item->Animation.RequiredState = NO_STATE;
 	}
 
 	if (item->Animation.FrameNumber > animPtr->frameEnd)
@@ -256,7 +256,7 @@ void AnimateItem(ItemInfo* item)
 		}
 
 		if (item->Animation.RequiredState == item->Animation.ActiveState)
-			item->Animation.RequiredState = 0;
+			item->Animation.RequiredState = NO_STATE;
 	}
 
 	int frameCount = animPtr->frameEnd - animPtr->frameBase;

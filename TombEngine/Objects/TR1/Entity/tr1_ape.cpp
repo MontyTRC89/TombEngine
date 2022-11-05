@@ -201,7 +201,7 @@ namespace TEN::Entities::Creatures::TR1
 					creatureInfo->Flags -= APE_FLAG_TURN_RIGHT;
 				}
 
-				if (item->Animation.RequiredState)
+				if (item->Animation.RequiredState != NO_STATE)
 					item->Animation.TargetState = item->Animation.RequiredState;
 				else if (AI.bite && AI.distance < APE_ATTACK_RANGE)
 					item->Animation.TargetState = APE_STATE_ATTACK;
@@ -286,7 +286,7 @@ namespace TEN::Entities::Creatures::TR1
 				break;
 
 			case APE_STATE_ATTACK:
-				if (!item->Animation.RequiredState &&
+				if (item->Animation.RequiredState == NO_STATE &&
 					item->TouchBits.Test(ApeAttackJoints))
 				{
 					item->Animation.RequiredState = APE_STATE_IDLE;

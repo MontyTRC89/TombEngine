@@ -354,7 +354,7 @@ namespace TEN::Entities::Creatures::TR5
 						joint1 = AI.xAngle;
 					}
 
-					if (item->Animation.RequiredState)
+					if (item->Animation.RequiredState != NO_STATE)
 						item->Animation.TargetState = item->Animation.RequiredState;
 					else
 					{

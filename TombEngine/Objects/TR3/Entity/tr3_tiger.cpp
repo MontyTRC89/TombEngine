@@ -8,12 +8,11 @@
 #include "Game/itemdata/creature_info.h"
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
+#include "Math/Math.h"
 #include "Specific/level.h"
-#include "Math/Random.h"
 #include "Specific/setup.h"
 
-using namespace TEN::Math::Random;
-using std::vector;
+using namespace TEN::Math;
 
 namespace TEN::Entities::Creatures::TR3
 {
@@ -27,11 +26,11 @@ namespace TEN::Entities::Creatures::TR3
 	constexpr auto TIGER_ROAR_CHANCE = 1.0f / 340;
 
 	const auto TigerBite = BiteInfo(Vector3(19.0f, -13.0f, 3.0f), 26);
-	const vector<unsigned int> TigerAttackJoints = { 14, 15, 16, 18, 19, 20, 21, 22, 23, 24, 25, 26 };
+	const auto TigerAttackJoints = std::vector<unsigned int>{ 14, 15, 16, 18, 19, 20, 21, 22, 23, 24, 25, 26 };
 
-	#define TIGER_WALK_TURN_RATE_MAX		  ANGLE(3.0f)
-	#define TIGER_RUN_TURN_RATE_MAX			  ANGLE(6.0f)
-	#define TIGER_POUNCE_ATTACK_TURN_RATE_MAX ANGLE(3.0f)
+	const auto TIGER_WALK_TURN_RATE_MAX			 = ANGLE(3.0f);
+	const auto TIGER_RUN_TURN_RATE_MAX			 = ANGLE(6.0f);
+	const auto TIGER_POUNCE_ATTACK_TURN_RATE_MAX = ANGLE(3.0f);
 
 	enum TigerState
 	{
@@ -112,9 +111,9 @@ namespace TEN::Entities::Creatures::TR3
 				}
 				else if (creature->Mood == MoodType::Bored)
 				{
-					if (TestProbability(TIGER_ROAR_CHANCE))
+					if (Random::TestProbability(TIGER_ROAR_CHANCE))
 						item->Animation.TargetState = TIGER_STATE_ROAR;
-					else if (TestProbability(TIGER_WALK_CHANCE))
+					else if (Random::TestProbability(TIGER_WALK_CHANCE))
 						item->Animation.TargetState = TIGER_STATE_WALK_FORWARD;
 				}
 				else if (AI.bite && AI.distance < TIGER_BITE_ATTACK_RANGE)
@@ -124,9 +123,9 @@ namespace TEN::Entities::Creatures::TR3
 					item->Animation.TargetState = TIGER_STATE_POUNCE_ATTACK;
 					creature->MaxTurn = TIGER_POUNCE_ATTACK_TURN_RATE_MAX;
 				}
-				else if (item->Animation.RequiredState)
+				else if (item->Animation.RequiredState != NO_STATE)
 					item->Animation.TargetState = item->Animation.RequiredState;
-				else if (creature->Mood != MoodType::Attack && TestProbability(TIGER_ROAR_CHANCE))
+				else if (creature->Mood != MoodType::Attack && Random::TestProbability(TIGER_ROAR_CHANCE))
 					item->Animation.TargetState = TIGER_STATE_ROAR;
 				else
 					item->Animation.TargetState = TIGER_STATE_RUN_FORWARD;
@@ -141,7 +140,7 @@ namespace TEN::Entities::Creatures::TR3
 				{
 					item->Animation.TargetState = TIGER_STATE_RUN_FORWARD;
 				}
-				else if (TestProbability(TIGER_ROAR_CHANCE))
+				else if (Random::TestProbability(TIGER_ROAR_CHANCE))
 				{
 					item->Animation.TargetState = TIGER_STATE_IDLE;
 					item->Animation.RequiredState = TIGER_STATE_ROAR;
@@ -163,7 +162,7 @@ namespace TEN::Entities::Creatures::TR3
 					else
 						item->Animation.TargetState = TIGER_STATE_RUN_SWIPE_ATTACK;
 				}
-				else if (creature->Mood != MoodType::Attack && TestProbability(TIGER_ROAR_CHANCE))
+				else if (creature->Mood != MoodType::Attack && Random::TestProbability(TIGER_ROAR_CHANCE))
 				{
 					item->Animation.TargetState = TIGER_STATE_IDLE;
 					item->Animation.RequiredState = TIGER_STATE_ROAR;

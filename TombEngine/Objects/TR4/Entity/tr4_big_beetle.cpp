@@ -146,7 +146,7 @@ namespace TEN::Entities::TR4
 			case BBEETLE_STATE_FLY_FORWARD:
 				creature->MaxTurn = ANGLE(7.0f);
 
-				if (item->Animation.RequiredState)
+				if (item->Animation.RequiredState != NO_STATE)
 					item->Animation.TargetState = item->Animation.RequiredState;
 				else if (AI.ahead && AI.distance < BIG_BEETLE_ATTACK_RANGE)
 					item->Animation.TargetState = BBEETLE_STATE_FLY_IDLE;
@@ -196,7 +196,7 @@ namespace TEN::Entities::TR4
 			case BBEETLE_STATE_FLY_IDLE:
 				creature->MaxTurn = ANGLE(7.0f);
 
-				if (item->Animation.RequiredState)
+				if (item->Animation.RequiredState != NO_STATE)
 					item->Animation.TargetState = item->Animation.RequiredState;
 				else if (!item->HitStatus && item->AIBits != MODIFY &&
 					TestProbability(0.99f) &&

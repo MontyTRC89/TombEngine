@@ -9,11 +9,11 @@
 #include "Game/itemdata/creature_info.h"
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
+#include "Math/Math.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-using namespace TEN::Math::Random;
-using std::vector;
+using namespace TEN::Math;
 
 namespace TEN::Entities::Creatures::TR3
 {
@@ -24,7 +24,7 @@ namespace TEN::Entities::Creatures::TR3
 	// TODO: Range constants.
 
 	const auto MonkeyBite = BiteInfo(Vector3(10.0f, 10.0f, 11.0f), 13);
-	const vector<unsigned int> MonkeyAttackJoints = { 10, 13 };
+	const auto MonkeyAttackJoints = std::vector<unsigned int>{ 10, 13 };
 
 	enum MonkeyState
 	{
@@ -215,9 +215,9 @@ namespace TEN::Entities::Creatures::TR3
 				if (item->AIBits & GUARD)
 				{
 					extraTorsoRot.y = AIGuard(creature);
-					if (TestProbability(0.06f))
+					if (Random::TestProbability(0.06f))
 					{
-						if (TestProbability(0.5f))
+						if (Random::TestProbability(0.5f))
 							item->Animation.TargetState = MONKEY_STATE_SIT_EAT;
 						else
 							item->Animation.TargetState = MONKEY_STATE_SIT_SCRATCH;
@@ -231,13 +231,13 @@ namespace TEN::Entities::Creatures::TR3
 					item->Animation.TargetState = MONKEY_STATE_IDLE;
 				else if (creature->Mood == MoodType::Bored)
 				{
-					if (item->Animation.RequiredState)
+					if (item->Animation.RequiredState != NO_STATE)
 						item->Animation.TargetState = item->Animation.RequiredState;
-					else if (TestProbability(0.06f))
+					else if (Random::TestProbability(0.06f))
 						item->Animation.TargetState = MONKEY_STATE_WALK_FORWARD;
-					else if (TestProbability(0.06f))
+					else if (Random::TestProbability(0.06f))
 					{
-						if (TestProbability(0.5f))
+						if (Random::TestProbability(0.5f))
 							item->Animation.TargetState = MONKEY_STATE_SIT_EAT;
 						else
 							item->Animation.TargetState = MONKEY_STATE_SIT_SCRATCH;
@@ -246,7 +246,7 @@ namespace TEN::Entities::Creatures::TR3
 				else if ((item->AIBits & FOLLOW) &&
 					(creature->ReachedGoal || laraAI.distance > pow(SECTOR(2), 2)))
 				{
-					if (item->Animation.RequiredState)
+					if (item->Animation.RequiredState != NO_STATE)
 						item->Animation.TargetState = item->Animation.RequiredState;
 					else if (AI.ahead)
 						item->Animation.TargetState = MONKEY_STATE_SIT;
@@ -271,9 +271,9 @@ namespace TEN::Entities::Creatures::TR3
 				{
 					extraTorsoRot.y = AIGuard(creature);
 
-					if (TestProbability(0.06f))
+					if (Random::TestProbability(0.06f))
 					{
-						if (TestProbability(0.5f))
+						if (Random::TestProbability(0.5f))
 							item->Animation.TargetState = MONKEY_STATE_POUND_GROUND;
 						else
 							item->Animation.TargetState = MONKEY_STATE_SIT;
@@ -292,13 +292,13 @@ namespace TEN::Entities::Creatures::TR3
 				}
 				else if (creature->Mood == MoodType::Bored)
 				{
-					if (item->Animation.RequiredState)
+					if (item->Animation.RequiredState != NO_STATE)
 						item->Animation.TargetState = item->Animation.RequiredState;
-					else if (TestProbability(0.06f))
+					else if (Random::TestProbability(0.06f))
 						item->Animation.TargetState = MONKEY_STATE_WALK_FORWARD;
-					else if (TestProbability(0.06f))
+					else if (Random::TestProbability(0.06f))
 					{
-						if (TestProbability(0.5f))
+						if (Random::TestProbability(0.5f))
 							item->Animation.TargetState = MONKEY_STATE_POUND_GROUND;
 						else
 							item->Animation.TargetState = MONKEY_STATE_SIT;
@@ -307,7 +307,7 @@ namespace TEN::Entities::Creatures::TR3
 				else if (item->AIBits & FOLLOW &&
 					(creature->ReachedGoal || laraAI.distance > pow(SECTOR(2), 2)))
 				{
-					if (item->Animation.RequiredState)
+					if (item->Animation.RequiredState != NO_STATE)
 						item->Animation.TargetState = item->Animation.RequiredState;
 					else if (AI.ahead)
 						item->Animation.TargetState = MONKEY_STATE_SIT;
@@ -423,7 +423,7 @@ namespace TEN::Entities::Creatures::TR3
 					item->Animation.TargetState = MONKEY_STATE_RUN_FORWARD;
 				else if (creature->Mood == MoodType::Bored)
 				{
-					if (TestProbability(1.0f / 128))
+					if (Random::TestProbability(1.0f / 128))
 						item->Animation.TargetState = MONKEY_STATE_SIT;
 				}
 				else if (AI.bite && AI.distance < pow(682, 2))

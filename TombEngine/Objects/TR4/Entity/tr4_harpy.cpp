@@ -410,7 +410,7 @@ namespace TEN::Entities::TR4
 				creature->MaxTurn = ANGLE(7.0f);
 				creature->Flags = 0;
 
-				if (item->Animation.RequiredState)
+				if (item->Animation.RequiredState != NO_STATE)
 				{
 					item->Animation.TargetState = item->Animation.RequiredState;
 					if (item->Animation.RequiredState == HARPY_STATE_FLAME_ATTACK)

@@ -13,21 +13,38 @@
 #include "Game/items.h"
 #include "Game/itemdata/creature_info.h"
 #include "Objects/TR3/boss.h"
+#include "Renderer/Renderer11Enums.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
-#include "Renderer/Renderer11Enums.h"
 
 using namespace TEN::Effects::Lara;
 
 namespace TEN::Entities::Creatures::TR3
 {
-	static BOSS_STRUCT BossData;
-
+	constexpr auto TONY_HEALTH_MAX = 100;
 	constexpr auto TONY_TRIGGER_RANGE = SECTOR(16);
 
-	#define TONY_HITS 100
-	#define TONY_TURN ANGLE(2.0f)
+	const auto TONY_TURN = ANGLE(2.0f);
+
+	static BOSS_STRUCT BossData;
+
+	enum TonyState
+	{
+		TONY_STATE_WAIT,
+		TONY_STATE_RISE,
+		TONY_STATE_FLOAT,
+		TONY_STATE_ZAPP,
+		TONY_STATE_ROCKZAPP,
+		TONY_STATE_BIGBOOM,
+		TONY_STATE_DEATH
+	};
+
+	// TODO
+	enum TonyAnim
+	{
+
+	};
 
 	enum TonyFlameType
 	{
@@ -50,23 +67,6 @@ namespace TEN::Entities::Creatures::TR3
 		short yRot;
 		short room_number;
 		TonyFlameType type;
-	};
-
-	enum TonyState
-	{
-		TONY_STATE_WAIT,
-		TONY_STATE_RISE,
-		TONY_STATE_FLOAT,
-		TONY_STATE_ZAPP,
-		TONY_STATE_ROCKZAPP,
-		TONY_STATE_BIGBOOM,
-		TONY_STATE_DEATH
-	};
-
-	// TODO
-	enum TonyAnim
-	{
-
 	};
 
 	void InitialiseTony(short itemNumber)
@@ -563,7 +563,7 @@ namespace TEN::Entities::Creatures::TR3
 		else
 		{
 			if (item->ItemFlags[3] != 2)
-				item->HitPoints = TONY_HITS;
+				item->HitPoints = TONY_HEALTH_MAX;
 
 			AI_INFO AI;
 			CreatureAIInfo(item, &AI);

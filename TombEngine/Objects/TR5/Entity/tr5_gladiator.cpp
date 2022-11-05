@@ -176,7 +176,7 @@ namespace TEN::Entities::Creatures::TR5
 						if (creature->Mood == MoodType::Bored ||
 							(item->AIBits & FOLLOW && (creature->ReachedGoal || distance > pow(SECTOR(2), 2))))
 						{
-							if (item->Animation.RequiredState)
+							if (item->Animation.RequiredState != NO_STATE)
 								item->Animation.TargetState = item->Animation.RequiredState;
 							else if (TestProbability(1.0f / 64))
 								item->Animation.TargetState = GLADIATOR_STATE_IDLE;

@@ -124,7 +124,7 @@ namespace TEN::Entities::Creatures::TR2
 			case 1:
 				creature->Flags = 0;
 
-				if (item->Animation.RequiredState)
+				if (item->Animation.RequiredState != NO_STATE)
 					item->Animation.TargetState = item->Animation.RequiredState;
 				if (creature->Mood == MoodType::Bored)
 					item->Animation.TargetState = 2;

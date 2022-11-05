@@ -10,8 +10,6 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-using std::vector;
-
 namespace TEN::Entities::Creatures::TR2
 {
 	constexpr auto BARRACUDA_ATTACK_DAMAGE = 100;
@@ -19,7 +17,7 @@ namespace TEN::Entities::Creatures::TR2
 	constexpr auto BARRACUDA_SWIM_FAST_ATTACK_RANGE = SQUARE(SECTOR(0.34f));
 
 	const auto BarracudaBite = BiteInfo(Vector3(2.0f, -60.0f, 121.0f), 7);
-	const vector<unsigned int> BarracudaAttackJoints = { 5, 6, 7 };
+	const auto BarracudaAttackJoints = std::vector<unsigned int>{ 5, 6, 7 };
 
 	enum BarracudaState
 	{

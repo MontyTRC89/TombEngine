@@ -8,12 +8,11 @@
 #include "Game/itemdata/creature_info.h"
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
+#include "Math/Math.h"
 #include "Specific/level.h"
-#include "Math/Random.h"
 #include "Specific/setup.h"
 
-using namespace TEN::Math::Random;
-using std::vector;
+using namespace TEN::Math;
 
 namespace TEN::Entities::Creatures::TR3
 {
@@ -22,13 +21,14 @@ namespace TEN::Entities::Creatures::TR3
 	constexpr auto TREX_ROAR_CHANCE = 0.015f;
 	constexpr auto LARA_ANIM_TREX_DEATH_ANIM = 4;
 
-	const vector<unsigned int> TRexAttackJoints = { 12, 13 };
+	const auto TRexAttackJoints = std::vector<unsigned int>{ 12, 13 };
 
-	#define TREX_WALK_TURN_RATE_MAX ANGLE(2.0f)
-	#define TREX_RUN_TURN_RATE_MAX	ANGLE(4.0f)
+	const auto TREX_WALK_TURN_RATE_MAX = ANGLE(2.0f);
+	const auto TREX_RUN_TURN_RATE_MAX  = ANGLE(4.0f);
 
 	enum TRexState
 	{
+		// No state 0.
 		TREX_STATE_IDLE = 1,
 		TREX_STATE_WALK_FORWARD = 2,
 		TREX_STATE_RUN_FORWARD = 3,
@@ -129,7 +129,7 @@ namespace TEN::Entities::Creatures::TR3
 			switch (item->Animation.ActiveState)
 			{
 			case TREX_STATE_IDLE:
-				if (item->Animation.RequiredState)
+				if (item->Animation.RequiredState != NO_STATE)
 					item->Animation.TargetState = item->Animation.RequiredState;
 				else if (AI.distance < pow(1500, 2) && AI.bite)
 					item->Animation.TargetState = TREX_STATE_ATTACK;
@@ -145,7 +145,7 @@ namespace TEN::Entities::Creatures::TR3
 
 				if (creature->Mood != MoodType::Bored || !creature->Flags)
 					item->Animation.TargetState = TREX_STATE_IDLE;
-				else if (AI.ahead && TestProbability(TREX_ROAR_CHANCE))
+				else if (AI.ahead && Random::TestProbability(TREX_ROAR_CHANCE))
 				{
 					item->Animation.TargetState = TREX_STATE_IDLE;
 					item->Animation.RequiredState = TREX_STATE_ROAR;
@@ -161,7 +161,7 @@ namespace TEN::Entities::Creatures::TR3
 				else if (creature->Flags)
 					item->Animation.TargetState = TREX_STATE_IDLE;
 				else if (creature->Mood != MoodType::Escape &&
-					AI.ahead && TestProbability(TREX_ROAR_CHANCE))
+					AI.ahead && Random::TestProbability(TREX_ROAR_CHANCE))
 				{
 					item->Animation.TargetState = TREX_STATE_IDLE;
 					item->Animation.RequiredState = TREX_STATE_ROAR;

@@ -154,7 +154,7 @@ namespace TEN::Entities::Creatures::TR1
 					else
 						item->Animation.TargetState = BEAR_STATE_STROLL;
 				}
-				else if (item->Animation.RequiredState)
+				else if (item->Animation.RequiredState != NO_STATE)
 					item->Animation.TargetState = item->Animation.RequiredState;
 				else if (creature->Mood == MoodType::Bored)
 					item->Animation.TargetState = BEAR_STATE_STROLL;
@@ -191,7 +191,7 @@ namespace TEN::Entities::Creatures::TR1
 
 				if (creature->Mood == MoodType::Bored || isLaraDead)
 					item->Animation.TargetState = BEAR_STATE_IDLE;
-				else if (AI.ahead && !item->Animation.RequiredState)
+				else if (AI.ahead && item->Animation.RequiredState == NO_STATE)
 				{
 					if (AI.distance < pow(BEAR_REAR_RANGE, 2) &&
 						Random::TestProbability(BEAR_REAR_CHANCE) &&
@@ -212,7 +212,7 @@ namespace TEN::Entities::Creatures::TR1
 					item->Animation.RequiredState = BEAR_STATE_STROLL;
 					item->Animation.TargetState = BEAR_STATE_IDLE;
 				}
-				else if (item->Animation.RequiredState)
+				else if (item->Animation.RequiredState != NO_STATE)
 					item->Animation.TargetState = item->Animation.RequiredState;
 				else if (creature->Mood == MoodType::Bored || creature->Mood == MoodType::Escape)
 					item->Animation.TargetState = BEAR_STATE_IDLE;
@@ -250,7 +250,7 @@ namespace TEN::Entities::Creatures::TR1
 				break;
 
 			case BEAR_STATE_REAR_SWIPE_ATTACK:
-				if (!item->Animation.RequiredState &&
+				if (item->Animation.RequiredState == NO_STATE &&
 					item->TouchBits.Test(BearAttackJoints))
 				{
 					DoDamage(creature->Enemy, BEAR_PAT_DAMAGE);
@@ -260,7 +260,7 @@ namespace TEN::Entities::Creatures::TR1
 				break;
 
 			case BEAR_STATE_RUN_SWIPE_ATTACK:
-				if (!item->Animation.RequiredState &&
+				if (item->Animation.RequiredState == NO_STATE &&
 					item->TouchBits.Test(BearAttackJoints))
 				{
 					DoDamage(creature->Enemy, BEAR_ATTACK_DAMAGE);

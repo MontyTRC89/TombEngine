@@ -46,7 +46,7 @@ namespace TEN::Entities::Creatures::TR1
 
 	enum WingedMutantState
 	{
-		WMUTANT_STATE_NONE = 0,
+		// No state 0.
 		WMUTANT_STATE_IDLE = 1,
 		WMUTANT_STATE_WALK_FORWARD = 2,
 		WMUTANT_STATE_RUN_FORWARD = 3,
@@ -398,7 +398,7 @@ namespace TEN::Entities::Creatures::TR1
 				break;
 
 			case WMUTANT_STATE_IDLE_JUMP_ATTACK:
-				if (item->Animation.RequiredState == WMUTANT_STATE_NONE &&
+				if (item->Animation.RequiredState == NO_STATE &&
 					item->TouchBits.Test(WingedMutantJoints[1]))
 				{
 					DoDamage(creature->Enemy, WINGED_MUTANT_IDLE_JUMP_ATTACK_DAMAGE);
@@ -409,7 +409,7 @@ namespace TEN::Entities::Creatures::TR1
 				break;
 
 			case WMUTANT_STATE_RUN_JUMP_ATTACK:
-				if (item->Animation.RequiredState == WMUTANT_STATE_NONE &&
+				if (item->Animation.RequiredState == NO_STATE &&
 					item->TouchBits.Test(WingedMutantJoints[1]))
 				{
 					DoDamage(creature->Enemy, WINGED_MUTANT_RUN_JUMP_ATTACK_DAMAGE);
@@ -420,7 +420,7 @@ namespace TEN::Entities::Creatures::TR1
 				break;
 
 			case WMUTANT_STATE_SWIPE_ATTACK:
-				if (item->Animation.RequiredState == WMUTANT_STATE_NONE &&
+				if (item->Animation.RequiredState == NO_STATE &&
 					item->TouchBits.Test(WingedMutantJoints[1]))
 				{
 					DoDamage(creature->Enemy, WINGED_MUTANT_SWIPE_ATTACK_DAMAGE);

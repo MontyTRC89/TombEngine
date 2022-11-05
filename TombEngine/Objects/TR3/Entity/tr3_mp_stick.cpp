@@ -9,19 +9,19 @@
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
 #include "Game/people.h"
+#include "Math/Math.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-using namespace TEN::Math::Random;
-using std::vector;
+using namespace TEN::Math;
 
 namespace TEN::Entities::Creatures::TR3
 {
 	const auto MPStickBite1 = BiteInfo(Vector3(247.0f, 10.0f, 11.0f), 13);
 	const auto MPStickBite2 = BiteInfo(Vector3(0.0f, 0.0f, 100.0f), 6);
-	const vector<unsigned int> MPStickPunchAttackJoints = { 10, 13 };
-	const vector<unsigned int> MPStickKickAttackJoints  = { 5, 6 };
+	const auto MPStickPunchAttackJoints = std::vector<unsigned int>{ 10, 13 };
+	const auto MPStickKickAttackJoints  = std::vector<unsigned int>{ 5, 6 };
 
 	enum MPStickState
 	{
@@ -179,7 +179,7 @@ namespace TEN::Entities::Creatures::TR3
 				if (item->AIBits & GUARD)
 				{
 					head = AIGuard(creature);
-					if (TestProbability(1.0f / 256))
+					if (Random::TestProbability(1.0f / 256))
 					{
 						if (item->Animation.ActiveState == MPSTICK_STATE_STOP)
 							item->Animation.TargetState = MPSTICK_STATE_WAIT;
@@ -202,7 +202,7 @@ namespace TEN::Entities::Creatures::TR3
 				else if (creature->Mood == MoodType::Bored ||
 					(item->AIBits & FOLLOW && (creature->ReachedGoal || laraAI.distance > pow(SECTOR(2), 2))))
 				{
-					if (item->Animation.RequiredState)
+					if (item->Animation.RequiredState != NO_STATE)
 						item->Animation.TargetState = item->Animation.RequiredState;
 					else if (AI.ahead)
 						item->Animation.TargetState = MPSTICK_STATE_STOP;
@@ -234,7 +234,7 @@ namespace TEN::Entities::Creatures::TR3
 					item->Animation.TargetState = MPSTICK_STATE_RUN;
 				else if (creature->Mood == MoodType::Bored)
 				{
-					if (TestProbability(1.0f / 128))
+					if (Random::TestProbability(1.0f / 128))
 					{
 						item->Animation.RequiredState = MPSTICK_STATE_WAIT;
 						item->Animation.TargetState = MPSTICK_STATE_STOP;

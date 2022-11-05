@@ -212,7 +212,7 @@ namespace TEN::Entities::TR4
 					break;
 				}
 
-				if (item->Animation.RequiredState)
+				if (item->Animation.RequiredState != NO_STATE)
 					item->Animation.TargetState = item->Animation.RequiredState;
 				else if (AI.bite && AI.distance < CROC_ATTACK_RANGE)
 					item->Animation.TargetState = CROC_STATE_IDLE;
@@ -232,7 +232,7 @@ namespace TEN::Entities::TR4
 					break;
 				}
 
-				if (item->Animation.RequiredState)
+				if (item->Animation.RequiredState != NO_STATE)
 					item->Animation.TargetState = item->Animation.RequiredState;
 				else if (AI.bite && AI.distance < CROC_ATTACK_RANGE)
 					item->Animation.TargetState = CROC_STATE_IDLE;
@@ -248,7 +248,7 @@ namespace TEN::Entities::TR4
 				if (AI.bite &&
 					item->TouchBits.Test(CrocodileBiteAttackJoints))
 				{
-					if (!item->Animation.RequiredState)
+					if (item->Animation.RequiredState == NO_STATE)
 					{
 						CreatureEffect2(item, CrocodileBite, 10, -1, DoBloodSplat);
 						DoDamage(creature->Enemy, CROC_ATTACK_DAMAGE);
@@ -270,7 +270,7 @@ namespace TEN::Entities::TR4
 					break;
 				}
 
-				if (item->Animation.RequiredState)
+				if (item->Animation.RequiredState != NO_STATE)
 					item->Animation.TargetState = item->Animation.RequiredState;
 				else if (AI.bite)
 				{
@@ -287,7 +287,7 @@ namespace TEN::Entities::TR4
 				if (AI.bite &&
 					item->TouchBits.Test(CrocodileBiteAttackJoints))
 				{
-					if (!item->Animation.RequiredState)
+					if (item->Animation.RequiredState == NO_STATE)
 					{
 						CreatureEffect2(item, CrocodileBite, 10, -1, DoBloodSplat);
 						DoDamage(creature->Enemy, CROC_ATTACK_DAMAGE);

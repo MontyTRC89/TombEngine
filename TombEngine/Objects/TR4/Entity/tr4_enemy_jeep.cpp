@@ -163,7 +163,7 @@ namespace TEN::Entities::TR4
 				if (item->ItemFlags[0] < 0)
 					item->ItemFlags[0] = 0;
 
-				if (item->Animation.RequiredState)
+				if (item->Animation.RequiredState != NO_STATE)
 					item->Animation.TargetState = item->Animation.RequiredState;
 				else if (AI.distance > pow(SECTOR(1), 2) || Lara.Location >= item->ItemFlags[3])
 					item->Animation.TargetState = 1;

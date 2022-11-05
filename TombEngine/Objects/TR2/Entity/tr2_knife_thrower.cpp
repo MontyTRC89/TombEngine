@@ -11,12 +11,12 @@
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
 #include "Game/people.h"
+#include "Math/Math.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
-#include "Math/Random.h"
 #include "Specific/setup.h"
 
-using namespace TEN::Math::Random;
+using namespace TEN::Math;
 
 namespace TEN::Entities::Creatures::TR2
 {
@@ -183,7 +183,7 @@ namespace TEN::Entities::Creatures::TR2
 				{
 					if (AI.distance < pow(SECTOR(2.5f), 2) || AI.zoneNumber != AI.enemyZone)
 						item->Animation.TargetState = KTHROWER_STATE_IDLE;
-					else if (TestProbability(0.5f))
+					else if (Random::TestProbability(0.5f))
 						item->Animation.TargetState = KTHROWER_STATE_WALK_KNIFE_ATTACK_LEFT_START;
 					else
 						item->Animation.TargetState = KTHROWER_STATE_WALK_KNIFE_ATTACK_RIGHT_START;

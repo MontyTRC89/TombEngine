@@ -154,7 +154,7 @@ namespace TEN::Entities::Creatures::TR5
 				if (AI.ahead)
 					joint1 = AI.xAngle;
 
-				if (item->Animation.RequiredState)
+				if (item->Animation.RequiredState != NO_STATE)
 					item->Animation.TargetState = item->Animation.RequiredState;
 				else if (item->AIBits & AMBUSH)
 					item->Animation.TargetState = STATE_TR5_LARSON_RUN;

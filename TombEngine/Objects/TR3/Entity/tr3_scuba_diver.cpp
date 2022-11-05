@@ -17,12 +17,13 @@ namespace TEN::Entities::Creatures::TR3
 {
 	constexpr auto SCUBA_DIVER_ATTACK_DAMAGE = 50;
 
-	#define SCUBA_DIVER_SWIM_TURN_RATE_MAX ANGLE(3.0f)
+	const auto SCUBA_DIVER_SWIM_TURN_RATE_MAX = ANGLE(3.0f);
 
 	const auto ScubaGunBite = BiteInfo(Vector3(17.0f, 164.0f, 44.0f), 18);
 
 	enum ScubaDiverState
 	{
+		// No state 0.
 		SDIVER_STATE_SWIM = 1,
 		SDIVER_STATE_TREAD_WATER_IDLE = 2,
 		SDIVER_STATE_SWIM_SHOOT = 3,
