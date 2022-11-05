@@ -217,7 +217,7 @@ namespace TEN::Renderer
 
 
 			// Auto targeting
-			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_AUTOTARGET), PRINTSTRING_COLOR_ORANGE, SF(title_option == 3));
+			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_AUTO_TARGET), PRINTSTRING_COLOR_ORANGE, SF(title_option == 3));
 			AddString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().Configuration.AutoTarget), PRINTSTRING_COLOR_WHITE, SF(title_option == 3));
 			GetNextLinePosition(&y);
 
@@ -466,7 +466,7 @@ namespace TEN::Renderer
 		// Ammo used
 		sprintf(buffer, "%d", Statistics.Game.AmmoUsed);
 		AddString(MenuRightSideEntry, y, buffer, PRINTSTRING_COLOR_WHITE, SF());
-		AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_USED_AMMOS), PRINTSTRING_COLOR_WHITE, SF());
+		AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_AMMO_USED), PRINTSTRING_COLOR_WHITE, SF());
 		GetNextLinePosition(&y);
 
 		// Medipacks used
