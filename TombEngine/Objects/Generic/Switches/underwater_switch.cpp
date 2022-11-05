@@ -19,9 +19,9 @@ namespace TEN::Entities::Switches
 	const ObjectCollisionBounds UnderwaterSwitchBounds =
 	{
 		GameBoundingBox(
-			-BLOCK(3, 8), BLOCK(3, 8),
-			-BLOCK(3, 8), BLOCK(3, 8),
-			0, BLOCK(3, 4)
+			-BLOCK(3.0f / 8), BLOCK(3.0f / 8),
+			-BLOCK(3.0f / 8), BLOCK(3.0f / 8),
+			0, BLOCK(3.0f / 4)
 		),
 		std::pair(
 			EulerAngles(ANGLE(-80.0f), ANGLE(-80.0f), ANGLE(-80.0f)),
@@ -33,9 +33,9 @@ namespace TEN::Entities::Switches
 	const ObjectCollisionBounds CeilingUnderwaterSwitchBounds1 =
 	{
 		GameBoundingBox(
-			-BLOCK(3, 8), BLOCK(3, 8),
-			-BLOCK(17, 16), -BLOCK(1, 2),
-			-BLOCK(1, 2), 0
+			-BLOCK(3.0f / 8), BLOCK(3.0f / 8),
+			-BLOCK(17.0f / 16), -BLOCK(1.0f / 2),
+			-BLOCK(1.0f / 2), 0
 		),
 		std::pair(
 			EulerAngles(ANGLE(-80.0f), ANGLE(-80.0f), ANGLE(-80.0f)),
@@ -47,9 +47,9 @@ namespace TEN::Entities::Switches
 	const ObjectCollisionBounds CeilingUnderwaterSwitchBounds2 =
 	{
 		GameBoundingBox(
-			-BLOCK(3, 8), BLOCK(3, 8),
-			-BLOCK(17, 16), -BLOCK(1, 2),
-			0, BLOCK(1, 2)
+			-BLOCK(3.0f / 8), BLOCK(3.0f / 8),
+			-BLOCK(17.0f / 16), -BLOCK(1.0f / 2),
+			0, BLOCK(1.0f / 2)
 		),
 		std::pair(
 			EulerAngles(ANGLE(-80.0f), ANGLE(-80.0f), ANGLE(-80.0f)),
