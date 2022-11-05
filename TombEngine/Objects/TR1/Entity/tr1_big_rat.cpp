@@ -9,12 +9,11 @@
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
 #include "Game/people.h"
+#include "Math/Math.h"
 #include "Specific/level.h"
-#include "Math/Random.h"
 #include "Specific/setup.h"
 
-using namespace TEN::Math::Random;
-using std::vector;
+using namespace TEN::Math;
 
 namespace TEN::Entities::Creatures::TR1
 {
@@ -31,8 +30,8 @@ namespace TEN::Entities::Creatures::TR1
 	constexpr auto BIG_RAT_SWIM_UP_DOWN_SPEED = 32;
 	constexpr auto BIG_RAT_WATER_SURFACE_OFFSET = 10;
 
-	#define BIG_RAT_RUN_TURN_RATE_MAX  ANGLE(6.0f)
-	#define BIG_RAT_SWIM_TURN_RATE_MAX ANGLE(3.0f)
+	const auto BIG_RAT_RUN_TURN_RATE_MAX  = ANGLE(6.0f);
+	const auto BIG_RAT_SWIM_TURN_RATE_MAX = ANGLE(3.0f);
 
 	const auto BigRatBite = BiteInfo(Vector3(0.0f, -11.0f, 108.0f), 3);
 
@@ -172,7 +171,7 @@ namespace TEN::Entities::Creatures::TR1
 					item->Animation.TargetState = BIG_RAT_STATE_IDLE;
 				else if (AI.bite && AI.distance < BIG_RAT_POUNCE_ATTACK_RANGE)
 					item->Animation.TargetState = BIG_RAT_STATE_POUNCE_ATTACK;
-				else if (AI.ahead && TestProbability(BIG_RAT_REAR_POSE_CHANCE))
+				else if (AI.ahead && Random::TestProbability(BIG_RAT_REAR_POSE_CHANCE))
 				{
 					item->Animation.TargetState = BIG_RAT_STATE_IDLE;
 					item->Animation.RequiredState = BIG_RAT_STATE_REAR_POSE;
@@ -203,7 +202,7 @@ namespace TEN::Entities::Creatures::TR1
 				break;
 
 			case BIG_RAT_STATE_REAR_POSE:
-				if (creature->Mood != MoodType::Bored || TestProbability(BIG_RAT_REAR_POSE_CHANCE))
+				if (creature->Mood != MoodType::Bored || Random::TestProbability(BIG_RAT_REAR_POSE_CHANCE))
 					item->Animation.TargetState = BIG_RAT_STATE_IDLE;
 
 				break;

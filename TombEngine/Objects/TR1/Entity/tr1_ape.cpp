@@ -8,12 +8,11 @@
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
 #include "Game/people.h"
+#include "Math/Math.h"
 #include "Specific/level.h"
-#include "Math/Random.h"
 #include "Specific/setup.h"
 
-using namespace TEN::Math::Random;
-using std::vector;
+using namespace TEN::Math;
 
 namespace TEN::Entities::Creatures::TR1
 {
@@ -33,15 +32,15 @@ namespace TEN::Entities::Creatures::TR1
 
 	constexpr auto APE_SHIFT = 75;
 
-	#define APE_RUN_TURN_RATE_MAX ANGLE(5.0f)
-	#define APE_DISPLAY_ANGLE	  ANGLE(45.0f)
+	const auto APE_RUN_TURN_RATE_MAX = ANGLE(5.0f);
+	const auto APE_DISPLAY_ANGLE	 = ANGLE(45.0f);
 
 	const auto ApeBite = BiteInfo(Vector3(0.0f, -19.0f, 75.0f), 15);
-	const vector<unsigned int> ApeAttackJoints = { 8, 9, 10, 11, 12, 13, 14, 15 };
+	const auto ApeAttackJoints = std::vector<unsigned int>{ 8, 9, 10, 11, 12, 13, 14, 15 };
 
 	enum ApeState
 	{
-		APE_STATE_NONE = 0,
+		// No state 0.
 		APE_STATE_IDLE = 1,
 		APE_STATE_WALK_FORWARD = 2,
 		APE_STATE_RUN_FORWARD = 3,
@@ -170,7 +169,7 @@ namespace TEN::Entities::Creatures::TR1
 		if (item->HitPoints <= 0)
 		{
 			if (item->Animation.ActiveState != APE_STATE_DEATH)
-				SetAnimation(item, ApeDeathAnims[GenerateInt(0, ApeDeathAnims.size() - 1)]);
+				SetAnimation(item, ApeDeathAnims[Random::GenerateInt(0, ApeDeathAnims.size() - 1)]);
 		}
 		else
 		{
@@ -209,13 +208,13 @@ namespace TEN::Entities::Creatures::TR1
 				else if (!(creatureInfo->Flags & APE_FLAG_ATTACK) &&
 					AI.zoneNumber == AI.enemyZone && AI.ahead)
 				{
-					if (TestProbability(APE_IDLE_JUMP_CHANCE))
+					if (Random::TestProbability(APE_IDLE_JUMP_CHANCE))
 						item->Animation.TargetState = APE_STATE_JUMP;
-					else if (TestProbability(APE_IDLE_POUND_CHEST_CHANCE))
+					else if (Random::TestProbability(APE_IDLE_POUND_CHEST_CHANCE))
 						item->Animation.TargetState = APE_STATE_POUND_CHEST;
-					else if (TestProbability(APE_IDLE_POUND_GROUND_CHANCE))
+					else if (Random::TestProbability(APE_IDLE_POUND_GROUND_CHANCE))
 						item->Animation.TargetState = APE_STATE_POUND_GROUND;
-					else if (TestProbability(APE_IDLE_RUN_LEFT_CHANCE))
+					else if (Random::TestProbability(APE_IDLE_RUN_LEFT_CHANCE))
 					{
 						item->Animation.TargetState = APE_STATE_RUN_LEFT;
 						creatureInfo->MaxTurn = 0;
@@ -247,17 +246,17 @@ namespace TEN::Entities::Creatures::TR1
 				}
 				else if (creatureInfo->Mood != MoodType::Escape)
 				{
-					if (TestProbability(APE_RUN_JUMP_CHANCE))
+					if (Random::TestProbability(APE_RUN_JUMP_CHANCE))
 					{
 						item->Animation.RequiredState = APE_STATE_JUMP;
 						item->Animation.TargetState = APE_STATE_IDLE;
 					}
-					else if (TestProbability(APE_RUN_POUND_CHEST_CHANCE))
+					else if (Random::TestProbability(APE_RUN_POUND_CHEST_CHANCE))
 					{
 						item->Animation.RequiredState = APE_STATE_POUND_CHEST;
 						item->Animation.TargetState = APE_STATE_IDLE;
 					}
-					else if (TestProbability(APE_RUN_POUND_GROUND_CHANCE))
+					else if (Random::TestProbability(APE_RUN_POUND_GROUND_CHANCE))
 					{
 						item->Animation.RequiredState = APE_STATE_POUND_GROUND;
 						item->Animation.TargetState = APE_STATE_IDLE;

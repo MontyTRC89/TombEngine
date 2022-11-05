@@ -6,15 +6,16 @@
 #include "Game/control/box.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/tomb4fx.h"
-#include "Game/items.h"
 #include "Game/itemdata/creature_info.h"
+#include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
+#include "Math/Math.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-using namespace TEN::Math::Random;
+using namespace TEN::Math;
 
 namespace TEN::Entities::Creatures::TR1
 {
@@ -33,9 +34,9 @@ namespace TEN::Entities::Creatures::TR1
 
 	constexpr auto LARA_GIANT_MUTANT_DEATH = 6;
 
-	const std::vector<unsigned int> MutantAttackJoints		= { 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25 };
-	const std::vector<unsigned int> MutantAttackLeftJoint	= { 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14 };
-	const std::vector<unsigned int> MutantAttackRightJoints = { 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25 };
+	const auto MutantAttackJoints	   = std::vector<unsigned int>{ 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25 };
+	const auto MutantAttackLeftJoint   = std::vector<unsigned int>{ 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14 };
+	const auto MutantAttackRightJoints = std::vector<unsigned int>{ 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25 };
 
 	enum GiantMutantState
 	{
@@ -117,7 +118,7 @@ namespace TEN::Entities::Creatures::TR1
 						else
 							item->Animation.TargetState = MUTANT_STATE_FORWARD;
 					}
-					else if (TestProbability(0.5f))
+					else if (Random::TestProbability(1.0f / 2))
 						item->Animation.TargetState = MUTANT_STATE_ATTACK_1;
 					else
 						item->Animation.TargetState = MUTANT_STATE_ATTACK_2;
