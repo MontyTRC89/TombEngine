@@ -110,7 +110,7 @@ namespace TEN::Entities::TR4
 				else if (LaraItem->Pose.Position.y >= (item->Pose.Position.y - SECTOR(1)))
 				{
 					if (AI.distance < pow(SECTOR(2.5f), 2) &&
-						AI.ahead && TestProbability(0.5f) &&
+						AI.ahead && TestProbability(1.0f / 2) &&
 						Targetable(item, &AI))
 					{
 						item->Animation.TargetState = 11;
@@ -121,7 +121,7 @@ namespace TEN::Entities::TR4
 						ceiling < (item->Pose.Position.y - SECTOR(1.75f)) &&
 						height4 != NO_HEIGHT &&
 						height4 > (item->Pose.Position.y - SECTOR(1)) &&
-						TestProbability(0.5f))
+						TestProbability(1.0f / 2))
 					{
 						item->Pose.Position.y -= SECTOR(1.5f);
 						if (Targetable(item, &AI))
@@ -259,7 +259,7 @@ namespace TEN::Entities::TR4
 				if (item->Animation.AnimNumber == Objects[item->Animation.AnimNumber].animIndex + 17 &&
 					item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameEnd)
 				{
-					if (TestProbability(0.5f))
+					if (TestProbability(1.0f / 2))
 						item->Animation.RequiredState = 10;
 				}
 
@@ -477,7 +477,7 @@ namespace TEN::Entities::TR4
 			spark->flags = SP_NODEATTACH | SP_EXPDEF | SP_ITEM | SP_ROTATE | SP_SCALE | SP_DEF;
 			spark->rotAng = GetRandomControl() & 0xFFF;
 
-			if (TestProbability(0.5f))
+			if (TestProbability(1.0f / 2))
 				spark->rotAdd = -32 - (GetRandomControl() & 0x1F);
 			else
 				spark->rotAdd = (GetRandomControl() & 0x1F) + 32;

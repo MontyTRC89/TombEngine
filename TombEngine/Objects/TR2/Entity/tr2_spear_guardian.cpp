@@ -181,7 +181,7 @@ namespace TEN::Entities::Creatures::TR2
 				{
 					if (AI.distance < pow(SECTOR(1.5f), 2))
 						item->Animation.TargetState = 7;
-					else if (Random::TestProbability(0.5f))
+					else if (Random::TestProbability(1.0f / 2))
 						item->Animation.TargetState = 9;
 					else
 						item->Animation.TargetState = 11;
@@ -201,7 +201,7 @@ namespace TEN::Entities::Creatures::TR2
 					break;
 				else if (creature->Mood == MoodType::Bored)
 				{
-					if (Random::TestProbability(0.5f))
+					if (Random::TestProbability(1.0f / 2))
 						item->Animation.TargetState = 1;
 					else
 						item->Animation.TargetState = 2;
@@ -301,7 +301,7 @@ namespace TEN::Entities::Creatures::TR2
 
 				if (AI.ahead && AI.distance < pow(SECTOR(1), 2))
 				{
-					if (Random::TestProbability(0.5f))
+					if (Random::TestProbability(1.0f / 2))
 						item->Animation.TargetState = 1;
 					else
 						item->Animation.TargetState = 2;
@@ -332,7 +332,7 @@ namespace TEN::Entities::Creatures::TR2
 
 				if (AI.ahead && AI.distance < pow(SECTOR(1), 2))
 				{
-					if (Random::TestProbability(0.5f))
+					if (Random::TestProbability(1.0f / 2))
 						item->Animation.TargetState = 1;
 					else
 						item->Animation.TargetState = 2;

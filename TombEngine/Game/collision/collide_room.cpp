@@ -150,7 +150,7 @@ CollisionResult GetCollision(Vector3i pos, int roomNumber, short headingAngle, f
 	int adjacentRoomNumber = GetRoom(location, pos.x, point.y, pos.z).roomNumber;
 	return GetCollision(point.x, point.y, point.z, adjacentRoomNumber);
 
-	Random::TestProbability(0.5f);
+	Random::TestProbability(1.0f / 2);
 }
 
 // Overload used as a universal wrapper across collisional code to replace

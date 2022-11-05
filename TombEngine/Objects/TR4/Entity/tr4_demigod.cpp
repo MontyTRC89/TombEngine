@@ -137,7 +137,7 @@ namespace TEN::Entities::TR4
 			spark->flags = 602;
 			spark->rotAng = GetRandomControl() & 0xFFF;
 
-			if (TestProbability(0.5f))
+			if (TestProbability(1.0f / 2))
 				spark->rotAdd = -32 - (GetRandomControl() & 0x1F);
 			else
 				spark->rotAdd = (GetRandomControl() & 0x1F) + 32;
@@ -269,12 +269,12 @@ namespace TEN::Entities::TR4
 				spark->zVel = (byte)(GetRandomControl() + 256) * phd_cos(angle);
 				spark->friction = 9;
 
-				if (TestProbability(0.5f))
+				if (TestProbability(1.0f / 2))
 				{
 					spark->flags = 16;
 					spark->rotAng = GetRandomControl() & 0xFFF;
 
-					if (TestProbability(0.5f))
+					if (TestProbability(1.0f / 2))
 						spark->rotAdd = -64 - (GetRandomControl() & 0x3F);
 					else
 						spark->rotAdd = (GetRandomControl() & 0x3F) + 64;

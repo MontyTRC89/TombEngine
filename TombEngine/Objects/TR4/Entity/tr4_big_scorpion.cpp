@@ -182,7 +182,7 @@ namespace TEN::Entities::TR4
 					creature->MaxTurn = ANGLE(2.0f);
 
 					// If chanced upon or the troop is close to death, do pincer attack.
-					if (TestProbability(0.5f) ||
+					if (TestProbability(1.0f / 2) ||
 						(creature->Enemy != nullptr && creature->Enemy->HitPoints <= 15 && creature->Enemy->ObjectNumber == ID_TROOPS))
 					{
 						item->Animation.TargetState = BSCORPION_STATE_PINCER_ATTACK;

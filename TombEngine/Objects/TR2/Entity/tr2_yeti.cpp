@@ -98,7 +98,7 @@ namespace TEN::Entities::Creatures::TR2
 					else if (Random::TestProbability(0.025f))
 						item->Animation.TargetState = 3;
 				}
-				else if (AI.ahead && AI.distance < pow(SECTOR(0.5f), 2) && Random::TestProbability(0.5f))
+				else if (AI.ahead && AI.distance < pow(SECTOR(0.5f), 2) && Random::TestProbability(1.0f / 2))
 					item->Animation.TargetState = 4;
 				else if (AI.ahead && AI.distance < pow(CLICK(1), 2))
 					item->Animation.TargetState = 5;

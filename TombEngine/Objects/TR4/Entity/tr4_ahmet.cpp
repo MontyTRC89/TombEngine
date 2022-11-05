@@ -12,14 +12,13 @@
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
 #include "Game/people.h"
+#include "Math/Math.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
-#include "Math/Random.h"
 #include "Specific/setup.h"
 
 using namespace TEN::Effects::Environment;
-using namespace TEN::Math::Random;
-using std::vector;
+using namespace TEN::Math;
 
 namespace TEN::Entities::TR4
 {
@@ -31,16 +30,16 @@ namespace TEN::Entities::TR4
 	constexpr auto AHMET_IDLE_RANGE   = SQUARE(SECTOR(1.25f));
 	constexpr auto AHMET_RUN_RANGE    = SQUARE(SECTOR(2.5f));
 
-	#define AHMET_WALK_FORWARD_TURN_ANGLE ANGLE(5.0f)
-	#define AHMET_RUN_FORWARD_TURN_ANGLE  ANGLE(8.0f)
-	#define AHMET_VIEW_ANGLE			  ANGLE(45.0f)
-	#define AHMET_ENEMY_ANGLE			  ANGLE(90.0f)
+	const auto AHMET_WALK_FORWARD_TURN_ANGLE = ANGLE(5.0f);
+	const auto AHMET_RUN_FORWARD_TURN_ANGLE	 = ANGLE(8.0f);
+	const auto AHMET_VIEW_ANGLE				 = ANGLE(45.0f);
+	const auto AHMET_ENEMY_ANGLE			 = ANGLE(90.0f);
 	
 	const auto AhmetBiteLeft  = BiteInfo(Vector3::Zero, 16);
 	const auto AhmetBiteRight = BiteInfo(Vector3::Zero, 22);
 	const auto AhmetBiteJaw	  = BiteInfo(Vector3::Zero, 11);
-	const vector<unsigned int> AhmetSwipeAttackLeftJoints  = { 14, 15, 16, 17 };
-	const vector<unsigned int> AhmetSwipeAttackRightJoints = { 20, 21, 22, 23 };
+	const auto AhmetSwipeAttackLeftJoints  = std::vector<unsigned int>{ 14, 15, 16, 17 };
+	const auto AhmetSwipeAttackRightJoints = std::vector<unsigned int>{ 20, 21, 22, 23 };
 
 	enum AhmetState
 	{
@@ -226,7 +225,7 @@ namespace TEN::Entities::TR4
 							item->Animation.TargetState = AHMET_STATE_WALK_FORWARD;
 					}
 				}
-				else if (TestProbability(0.5f))
+				else if (Random::TestProbability(1.0f / 2))
 					item->Animation.TargetState = AHMET_STATE_JUMP_BITE_ATTACK;
 				else
 					item->Animation.TargetState = AHMET_STATE_JUMP_SWIPE_ATTACK;

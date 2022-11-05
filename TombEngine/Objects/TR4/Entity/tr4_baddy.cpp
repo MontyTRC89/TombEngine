@@ -13,12 +13,11 @@
 #include "Game/Lara/lara_fire.h"
 #include "Game/misc.h"
 #include "Game/people.h"
-#include "Math/Random.h"
+#include "Math/Math.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-using namespace TEN::Math::Random;
-using std::vector;
+using namespace TEN::Math;
 
 /*
 ID_BADDY1
@@ -52,11 +51,11 @@ ID_BADDY2
 
 namespace TEN::Entities::TR4
 {
+	constexpr auto BADDY_USE_UZI = 24;
+
 	const auto BaddyGunBite	  = BiteInfo(Vector3(0.0f, -16.0f, 200.0f), 11);
 	const auto BaddySwordBite = BiteInfo(Vector3::Zero, 15);
-	const vector<unsigned int> BaddySwordAttackJoints = { 14, 15, 16 };
-
-	#define BADDY_USE_UZI	24
+	const auto BaddySwordAttackJoints = std::vector<unsigned int>{ 14, 15, 16 };
 
 	enum BaddyState
 	{
@@ -769,7 +768,7 @@ namespace TEN::Entities::TR4
 							item->Animation.TargetState = BADDY_STATE_HOLSTER_GUN;
 						else if (AI.distance >= pow(SECTOR(0.5f), 2))
 							item->Animation.TargetState = BADDY_STATE_SWORD_HIT_FRONT;
-						else if (TestProbability(0.5f))
+						else if (Random::TestProbability(1.0f / 2))
 							item->Animation.TargetState = BADDY_STATE_SWORD_HIT_LEFT;
 						else
 							item->Animation.TargetState = BADDY_STATE_SWORD_HIT_RIGHT;
@@ -863,7 +862,7 @@ namespace TEN::Entities::TR4
 				if (AI.ahead)
 					joint3 = AI.angle;
 				
-				if (GenerateInt(0, 30) > 20 &&
+				if (Random::GenerateInt(0, 30) > 20 &&
 					objectNumber == ID_BADDY2 &&
 					item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + FRAME_BADDY_RUN_TO_SOMERSAULT &&
 					height3 == height1 &&
@@ -1213,7 +1212,7 @@ namespace TEN::Entities::TR4
 			case BADDY_STATE_BLIND:
 				if (!FlashGrenadeAftershockTimer)
 				{
-					if (TestProbability(1.0f / 128))
+					if (Random::TestProbability(1.0f / 128))
 						item->Animation.TargetState = BADDY_STATE_IDLE;
 				}
 

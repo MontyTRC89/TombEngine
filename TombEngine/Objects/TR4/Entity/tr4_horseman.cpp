@@ -178,7 +178,7 @@ namespace TEN::Entities::TR4
 			spark->gravity = (random / 128) & 0x1F;
 			spark->rotAng = random / 8;
 
-			if (TestProbability(0.5f))
+			if (TestProbability(1.0f / 2))
 				spark->rotAdd = -16 - (random & 0xF);
 			else
 				spark->rotAdd = spark->sB;

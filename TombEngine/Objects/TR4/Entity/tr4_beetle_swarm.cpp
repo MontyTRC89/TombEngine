@@ -66,7 +66,7 @@ namespace TEN::Entities::TR4
 				item->TriggerFlags--;
 				if (item->ItemFlags[2])
 				{
-					if (TestProbability(0.5f))
+					if (TestProbability(1.0f / 2))
 						item->ItemFlags[2]--;
 				}
 

@@ -106,7 +106,7 @@ namespace TEN::Entities::Creatures::TR5
 		spark->flags = SP_EXPDEF | SP_ROTATE | SP_DEF | SP_SCALE;
 		spark->rotAng = GetRandomControl() & 0xFFF;
 
-		if (TestProbability(0.5f))
+		if (TestProbability(1.0f / 2))
 			spark->rotAdd = -32 - (GetRandomControl() & 0x1F);
 		else
 			spark->rotAdd = (GetRandomControl() & 0x1F) + 32;

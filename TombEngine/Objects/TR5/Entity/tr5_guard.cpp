@@ -1033,7 +1033,7 @@ namespace TEN::Entities::Creatures::TR5
 				creature->Flags = 0;
 				if (!TargetVisible(item, &AI) ||
 					item->HitStatus &&
-					TestProbability(0.5f))
+					TestProbability(1.0f / 2))
 				{
 					item->Animation.TargetState = SNIPER_STATE_COVER;
 				}

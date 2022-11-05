@@ -103,12 +103,12 @@ namespace TEN::Entities::Creatures::TR5
 				{
 					if (distance <= pow(SECTOR(1), 2))
 					{
-						if (TestProbability(0.5f))
+						if (TestProbability(1.0f / 2))
 							item->Animation.TargetState = 4;
 						else
 							item->Animation.TargetState = 6;
 					}
-					else if (TestProbability(0.5f))
+					else if (TestProbability(1.0f / 2))
 						item->Animation.TargetState = 2;
 					else
 						item->Animation.TargetState = 3;

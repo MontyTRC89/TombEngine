@@ -124,7 +124,7 @@ namespace TEN::Entities::TR4
 		sptr->flags = SP_EXPDEF | SP_ROTATE | SP_DEF | SP_SCALE;
 		sptr->rotAng = GetRandomControl() & 0xFFF;
 
-		if (TestProbability(0.5f))
+		if (TestProbability(1.0f / 2))
 			sptr->rotAdd = (GetRandomControl() & 0x1F) - 32;
 		else
 			sptr->rotAdd = (GetRandomControl() & 0x1F) + 32;

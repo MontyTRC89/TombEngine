@@ -222,7 +222,7 @@ namespace TEN::Entities::Creatures::TR3
 				{
 					if (Random::TestProbability(0.25f))
 						item->Animation.TargetState = MPGUN_STATE_SHOOT_1;
-					else if (Random::TestProbability(0.5f))
+					else if (Random::TestProbability(1.0f / 2))
 						item->Animation.TargetState = MPGUN_STATE_SHOOT_2;
 					else
 						item->Animation.TargetState = MPGUN_STATE_AIM_3;

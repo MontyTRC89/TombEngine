@@ -113,7 +113,7 @@ namespace TEN::Entities::TR4
 				{
 					creature->MaxTurn = ANGLE(6.0f);
 
-					if (TestProbability(0.5f))
+					if (TestProbability(1.0f / 2))
 						item->Animation.TargetState = SSCORPION_STATE_ATTACK_1;
 					else
 						item->Animation.TargetState = SSCORPION_STATE_ATTACK_2;

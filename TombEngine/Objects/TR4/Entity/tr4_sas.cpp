@@ -227,9 +227,9 @@ namespace TEN::Entities::TR4
 						if (AI.distance < pow(SECTOR(3), 2) ||
 							AI.zoneNumber != AI.enemyZone)
 						{
-							if (TestProbability(0.5f))
+							if (TestProbability(1.0f / 2))
 								item->Animation.TargetState = SAS_STATE_SIGHT_AIM;
-							else if (TestProbability(0.5f))
+							else if (TestProbability(1.0f / 2))
 								item->Animation.TargetState = SAS_STATE_HOLD_AIM;
 							else
 								item->Animation.TargetState = SAS_STATE_KNEEL_AIM;
@@ -408,7 +408,7 @@ namespace TEN::Entities::TR4
 							item->Animation.TargetState = SAS_STATE_SIGHT_SHOOT;
 						else if (item->Animation.ActiveState == SAS_STATE_KNEEL_AIM)
 							item->Animation.TargetState = SAS_STATE_KNEEL_SHOOT;
-						else if (TestProbability(0.5f))
+						else if (TestProbability(1.0f / 2))
 							item->Animation.TargetState = SAS_STATE_HOLD_SHOOT;
 						else
 							item->Animation.TargetState = SAS_STATE_HOLD_PREPARE_GRENADE;

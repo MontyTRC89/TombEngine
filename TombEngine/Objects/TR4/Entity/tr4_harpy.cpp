@@ -130,7 +130,7 @@ namespace TEN::Entities::TR4
 			spark->flags = SP_SCALE | SP_ROTATE | SP_ITEM | SP_EXPDEF | SP_NODEATTACH;
 			spark->rotAng = GetRandomControl() & 0xFFF;
 
-			if (TestProbability(0.5f))
+			if (TestProbability(1.0f / 2))
 				spark->rotAdd = -32 - (GetRandomControl() & 0x1F);
 			else
 				spark->rotAdd = (GetRandomControl() & 0x1F) + 32;
@@ -396,7 +396,7 @@ namespace TEN::Entities::TR4
 				if (creature->Enemy != LaraItem ||
 					!Targetable(item, &AI) ||
 					AI.distance <= pow(SECTOR(3.5f), 2) ||
-					TestProbability(0.5f))
+					TestProbability(1.0f / 2))
 				{
 					item->Animation.TargetState = HARPY_STATE_FLY_FORWARD;
 					break;
@@ -429,7 +429,7 @@ namespace TEN::Entities::TR4
 				{
 					if (AI.distance >= pow(341, 2))
 					{
-						if (AI.ahead && TestProbability(0.5f) &&
+						if (AI.ahead && TestProbability(1.0f / 2) &&
 							AI.distance >= pow(SECTOR(2), 2) &&
 							AI.distance > pow(SECTOR(3.5f), 2))
 						{
@@ -445,7 +445,7 @@ namespace TEN::Entities::TR4
 					break;
 				}
 
-				if (TestProbability(0.5f))
+				if (TestProbability(1.0f / 2))
 				{
 					item->Animation.TargetState = HARPY_STATE_FLY_FORWARD_SPIN;
 					break;
@@ -461,7 +461,7 @@ namespace TEN::Entities::TR4
 				{
 					if (AI.ahead && AI.distance >= pow(SECTOR(2), 2) &&
 						AI.distance > pow(SECTOR(3.5f), 2) &&
-						TestProbability(0.5f))
+						TestProbability(1.0f / 2))
 					{
 						item->Animation.TargetState = HARPY_STATE_FLAME_ATTACK;
 						item->ItemFlags[0] = 0;
@@ -541,7 +541,7 @@ namespace TEN::Entities::TR4
 					item->Animation.TargetState = HARPY_STATE_FLY_FORWARD;
 					item->Animation.RequiredState = HARPY_STATE_FLAME_ATTACK;
 				}
-				else if (TestProbability(0.5f))
+				else if (TestProbability(1.0f / 2))
 					item->Animation.TargetState = HARPY_STATE_IDLE;
 
 				break;

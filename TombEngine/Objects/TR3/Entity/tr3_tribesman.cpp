@@ -170,7 +170,7 @@ namespace TEN::Entities::Creatures::TR3
 					item->Animation.TargetState = TRIBESMAN_STATE_CROUCH_AXE_ATTACK;
 				else if (AI.ahead && AI.distance < pow(SECTOR(1), 2))
 				{
-					if (Random::TestProbability(0.5f))
+					if (Random::TestProbability(1.0f / 2))
 						item->Animation.TargetState = TRIBESMAN_STATE_WALK_FORWARD;
 					else
 						item->Animation.TargetState = TRIBESMAN_STATE_CROUCH_AXE_ATTACK;
@@ -256,7 +256,7 @@ namespace TEN::Entities::Creatures::TR3
 
 					if (Random::TestProbability(1.0f / 128))
 					{
-						if (Random::TestProbability(0.5f))
+						if (Random::TestProbability(1.0f / 2))
 							item->Animation.TargetState = TRIBESMAN_STATE_CROUCH_IDLE;
 						else
 							item->Animation.TargetState = TRIBESMAN_STATE_IDLE;
@@ -266,7 +266,7 @@ namespace TEN::Entities::Creatures::TR3
 					item->Animation.TargetState = TRIBESMAN_STATE_IDLE;
 				else if (AI.bite || AI.distance < pow(SECTOR(2), 2))
 				{
-					if (Random::TestProbability(0.5f))
+					if (Random::TestProbability(1.0f / 2))
 						item->Animation.TargetState = TRIBESMAN_STATE_RUN_AXE_ATTACK_HIGH;
 					else if (Random::TestProbability(0.25f))
 						item->Animation.TargetState = TRIBESMAN_STATE_RUN_AXE_ATTACK_LOW;

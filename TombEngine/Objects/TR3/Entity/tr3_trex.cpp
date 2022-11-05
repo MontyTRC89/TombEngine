@@ -18,13 +18,14 @@ namespace TEN::Entities::Creatures::TR3
 {
 	constexpr auto TREX_CONTACT_DAMAGE	   = 1;
 	constexpr auto TREX_RUN_CONTACT_DAMAGE = 10;
-	constexpr auto TREX_ROAR_CHANCE = 0.015f;
-	constexpr auto LARA_ANIM_TREX_DEATH_ANIM = 4;
+	constexpr auto TREX_ROAR_CHANCE	= 1.0f / 64;
 
-	const auto TRexAttackJoints = std::vector<unsigned int>{ 12, 13 };
+	constexpr auto LARA_ANIM_TREX_DEATH_ANIM = 4;
 
 	const auto TREX_WALK_TURN_RATE_MAX = ANGLE(2.0f);
 	const auto TREX_RUN_TURN_RATE_MAX  = ANGLE(4.0f);
+
+	const auto TRexAttackJoints = std::vector<unsigned int>{ 12, 13 };
 
 	enum TRexState
 	{

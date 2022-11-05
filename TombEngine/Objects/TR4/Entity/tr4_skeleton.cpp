@@ -143,7 +143,7 @@ namespace TEN::Entities::TR4
 			spark->flags = 26;
 			spark->rotAng = GetRandomControl() & 0xFFF;
 
-			if (TestProbability(0.5f))
+			if (TestProbability(1.0f / 2))
 				spark->rotAdd = -16 - (GetRandomControl() & 0xF);
 			else
 				spark->rotAdd = (GetRandomControl() & 0xF) + 16;
@@ -364,7 +364,7 @@ namespace TEN::Entities::TR4
 				{
 					if (TestProbability(0.0155f))
 					{
-						if (TestProbability(0.5f))
+						if (TestProbability(1.0f / 2))
 							item->Animation.TargetState = 3;
 						else
 							item->Animation.TargetState = 4;
@@ -421,7 +421,7 @@ namespace TEN::Entities::TR4
 						}
 						else if (Lara.TargetEntity == item &&
 							laraAI.angle && laraAI.distance < pow(SECTOR(2), 2) &&
-							TestProbability(0.5f) &&
+							TestProbability(1.0f / 2) &&
 							(Lara.Control.Weapon.GunType == LaraWeaponType::Shotgun || TestProbability(0.06f)) &&
 							item->MeshBits == -1)
 						{
@@ -431,7 +431,7 @@ namespace TEN::Entities::TR4
 						{
 							if (TestProbability(0.75f) && LaraItem->HitPoints > 0)
 							{
-								if (TestProbability(0.5f))
+								if (TestProbability(1.0f / 2))
 									item->Animation.TargetState = SKELETON_STATE_ATTACK_1;
 								else
 									item->Animation.TargetState = SKELETON_STATE_ATTACK_2;
@@ -441,7 +441,7 @@ namespace TEN::Entities::TR4
 						}
 						else if (item->HitStatus || item->Animation.RequiredState)
 						{
-							if (TestProbability(0.5f))
+							if (TestProbability(1.0f / 2))
 							{
 								item->Animation.TargetState = SKELETON_STATE_AVOID_ATTACK_1;
 								item->Animation.RequiredState = item->Animation.TargetState;
@@ -469,7 +469,7 @@ namespace TEN::Entities::TR4
 				else if (item->HitStatus)
 				{
 					item->Animation.TargetState = 2;
-					if (TestProbability(0.5f))
+					if (TestProbability(1.0f / 2))
 						item->Animation.RequiredState = 5;
 					else
 						item->Animation.RequiredState = 6;

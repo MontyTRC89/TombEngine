@@ -180,11 +180,11 @@ namespace TEN::Entities::TR4
 
 					if (TestProbability(1.0f / 30))
 					{
-						if (TestProbability(0.5f))
+						if (TestProbability(1.0f / 2))
 							item->ItemFlags[1] = 0;
 						else
 						{
-							if (TestProbability(0.5f))
+							if (TestProbability(1.0f / 2))
 								item->ItemFlags[1] = 12;
 							else
 								item->ItemFlags[1] = -12;

@@ -186,7 +186,7 @@ namespace TEN::Entities::Creatures::TR5
 
 						if (Lara.TargetEntity == item &&
 							unknown && distance < pow(SECTOR(1.5f), 2) &&
-							TestProbability(0.5f) &&
+							TestProbability(1.0f / 2) &&
 							(Lara.Control.Weapon.GunType == LaraWeaponType::Shotgun || TestProbability(0.06f)) &&
 							item->MeshBits == -1)
 						{
@@ -196,7 +196,7 @@ namespace TEN::Entities::Creatures::TR5
 
 						if (AI.bite && AI.distance < pow(819, 2))
 						{
-							if (TestProbability(0.5f))
+							if (TestProbability(1.0f / 2))
 								item->Animation.TargetState = GLADIATOR_STATE_SWORD_ATTACK_1;
 							else
 								item->Animation.TargetState = GLADIATOR_STATE_SWORD_ATTACK_2;
