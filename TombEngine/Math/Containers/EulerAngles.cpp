@@ -217,7 +217,7 @@ float EulerAngles::ClampAlpha(float alpha)
 
 bool EulerAngles::Compare(short angle0, short angle1, short epsilon)
 {
-	short difference = Geometry::GetShortestAngularDistance(angle0, angle1);
+	short difference = Geometry::GetShortestAngle(angle0, angle1);
 	if (abs(difference) <= epsilon)
 		return true;
 
@@ -231,7 +231,7 @@ short EulerAngles::Lerp(short angleFrom, short angleTo, float alpha, short epsil
 	if (Compare(angleFrom, angleTo, epsilon))
 		return angleTo;
 
-	short difference = Geometry::GetShortestAngularDistance(angleFrom, angleTo);
+	short difference = Geometry::GetShortestAngle(angleFrom, angleTo);
 	return (short)round(angleFrom + (difference * alpha));
 }
 
@@ -240,7 +240,7 @@ short EulerAngles::InterpolateConstant(short angleFrom, short angleTo, short ang
 	if (Compare(angleFrom, angleTo, angularVel))
 		return angleTo;
 
-	int sign = copysign(1, Geometry::GetShortestAngularDistance(angleFrom, angleTo));
+	int sign = copysign(1, Geometry::GetShortestAngle(angleFrom, angleTo));
 	return (angleFrom + (angularVel * sign));
 }
 //}
