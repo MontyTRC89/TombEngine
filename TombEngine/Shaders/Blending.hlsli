@@ -46,25 +46,21 @@ float4 DoFog(float4 sourceColor, float4 fogColor, float value)
 	if (FogMaxDistance == 0)
 		return sourceColor;
 
-	float alphaMult = 1.0f;
-
 	switch (BlendMode)
 	{
 		case BLENDMODE_ADDITIVE:
 		case BLENDMODE_SCREEN:
 		case BLENDMODE_LIGHTEN:
-			alphaMult = Luma(sourceColor.xyz);
-			fogColor.w = 0.0f;
+			fogColor.xyz *= Luma(sourceColor.xyz);
 			break;
 
 		case BLENDMODE_SUBTRACTIVE:
 		case BLENDMODE_EXCLUDE:
-			alphaMult = 1.0f - Luma(sourceColor.xyz);
-			fogColor.w = 0.0f;
+			fogColor.xyz *= 1.0f - Luma(sourceColor.xyz);
 			break;
 
 		case BLENDMODE_ALPHABLEND:
-			alphaMult = sourceColor.w;
+			fogColor.w = sourceColor.w;
 			break;
 
 		default:
@@ -75,7 +71,6 @@ float4 DoFog(float4 sourceColor, float4 fogColor, float value)
 		fogColor.w = sourceColor.w;
 	
 	float4 result = lerp(sourceColor, fogColor, value);
-	result.w *= alphaMult;
 	return result;
 }
 

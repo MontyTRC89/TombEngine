@@ -369,7 +369,7 @@ namespace TEN::Renderer
 								Vector3(x2Outer, yOuter, z2Outer), 
 								Vector3(x2Inner, yInner, z2Inner), 
 								Vector3(xInner, yInner, zInner), Vector4(color / 255.0f, color / 255.0f, color / 255.0f, 1.0f), 
-								0, 1, { 0, 0 }, BLENDMODE_ADDITIVE, true, view);
+								0, 1, { 0, 0 }, BLENDMODE_ADDITIVE, false, view);
 				}
 			}
 		}

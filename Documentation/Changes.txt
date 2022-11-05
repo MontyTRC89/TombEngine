@@ -36,6 +36,7 @@ Version 1.0.3
 * Fix distance fog not applying properly to additive and subtractive surfaces.
 * Fix single-hand weapons not having a sound on draw and undraw.
 * Fix waterfall mist - it can now be disabled with antitrigger.
+* Fix Lara immediately playing underwater lever pull animation after interacting with underwater ceiling lever
 
 Version 1.0.2
 =============
