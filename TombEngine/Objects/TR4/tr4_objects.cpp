@@ -799,18 +799,6 @@ namespace TEN::Entities
 			obj->ZoneType = ZoneType::Basic;
 		}
 
-		obj = &Objects[ID_SAS_DRAG_BLOKE];
-		if (obj->loaded)
-		{
-			obj->control = AnimatingControl;
-			obj->collision = SasDragBlokeCollision;
-			obj->hitEffect = HIT_BLOOD;
-			obj->saveFlags = true;
-			obj->savePosition = true;
-			obj->saveAnim = true;
-			obj->ZoneType = ZoneType::Basic;
-		}
-
 		obj = &Objects[ID_ENEMY_JEEP];
 		if (obj->loaded)
 		{

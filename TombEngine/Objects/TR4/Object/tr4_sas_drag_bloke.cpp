@@ -19,8 +19,8 @@ const auto DragSasBounds = ObjectCollisionBounds
 {
 	GameBoundingBox(
 		-BLOCK(1.0f / 4), BLOCK(1.0f / 4),
-		-100, 100,
-		-BLOCK(1.0f / 4), -460
+		-100, 100, 
+		-BLOCK(1.0f / 2), -460
 	),
 		std::pair(
 			EulerAngles(ANGLE(-10.0f), ANGLE(-30.0f), 0),
