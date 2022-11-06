@@ -28,18 +28,10 @@ const auto DragSasBounds = ObjectCollisionBounds
 		)
 };
 
-
-void InitialiseDragSAS(short itemNumber)
-{
-
-}
-
 void DragSASCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 {
 	auto* item = &g_Level.Items[itemNumber];
 	auto* laraInfo = GetLaraInfo(laraItem);
-
-	long x, z;
 
 	if (TrInput & IN_ACTION &&
 		laraItem->Animation.ActiveState == LS_IDLE &&
