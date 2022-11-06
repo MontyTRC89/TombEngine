@@ -5,7 +5,6 @@
 //using namespace TEN::Collision;
 using namespace TEN::Math;
 
-class InteractionBasis;
 class FloorInfo;
 struct CollisionInfo;
 struct ItemInfo;

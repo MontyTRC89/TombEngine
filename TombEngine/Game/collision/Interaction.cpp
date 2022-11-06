@@ -42,15 +42,11 @@ using namespace TEN::Math;
 
 	bool TestEntityInteraction(const ItemInfo& entityFrom, const ItemInfo& entityTo, const InteractionBasis& basis, const GameBoundingBox& boundsExtension)
 	{
-		// TODO: If player is already performing an interaction, don't interfere by allowing a new one.
-		/*if (entity1.IsLara())
-		{
-			const auto& player = GetLaraInfo(entity1);
-			if (player.InteractedItem != NO_ITEM)
-				return false;
-		}*/
+		// Avoid overriding active interactions. NOTE: For now, only checks offset blending status.
+		if (entityFrom.OffsetBlend.IsActive)
+			return false;
 
-		// Check whether interacting entity's orientation is within interaction constraint.
+		// Check whether entityFrom's orientation is within interaction constraint.
 		auto deltaOrient = entityFrom.Pose.Orientation - entityTo.Pose.Orientation;
 		if (deltaOrient.x < basis.OrientConstraint.first.x || deltaOrient.x > basis.OrientConstraint.second.x ||
 			deltaOrient.y < basis.OrientConstraint.first.y || deltaOrient.y > basis.OrientConstraint.second.y ||
@@ -63,7 +59,7 @@ using namespace TEN::Math;
 		auto rotMatrix = entityTo.Pose.Orientation.ToRotationMatrix().Transpose(); // NOTE: Should be Invert(), but inverse/transpose of a rotation matrix are equal and transposing is faster.
 		auto relPos = Vector3::Transform(direction, rotMatrix);
 
-		// Check whether interacting entity is inside interaction bounds.
+		// Check whether entityFrom is inside interaction bounds.
 		static auto bounds = basis.Bounds + boundsExtension;
 		if (relPos.x < bounds.X1 || relPos.x > bounds.X2 ||
 			relPos.y < bounds.Y1 || relPos.y > bounds.Y2 ||

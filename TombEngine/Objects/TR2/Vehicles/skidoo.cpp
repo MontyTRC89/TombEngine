@@ -143,13 +143,14 @@ namespace TEN::Entities::Vehicles
 			return;
 
 		auto mountType = GetVehicleMountType(skidooItem, laraItem, coll, SkidooMountTypes, SKIDOO_MOUNT_DISTANCE);
-		if (mountType == VehicleMountType::None)
-			ObjectCollision(itemNumber, laraItem, coll);
-		else
+		if (mountType != VehicleMountType::None)
 		{
 			lara->Vehicle = itemNumber;
 			DoSkidooMount(skidooItem, laraItem, mountType);
+			return;
 		}
+
+		ObjectCollision(itemNumber, laraItem, coll);
 	}
 
 	void DoSkidooMount(ItemInfo* skidooItem, ItemInfo* laraItem, VehicleMountType mountType)

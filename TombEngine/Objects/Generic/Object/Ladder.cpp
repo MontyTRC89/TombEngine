@@ -124,6 +124,14 @@ namespace TEN::Entities::Generic
 		auto& ladderItem = g_Level.Items[itemNumber];
 		auto& player = *GetLaraInfo(laraItem);
 
+		// TODO!! This will be MUCH cleaner.
+		/*auto mountType = GetLadderMountType(ladderItem, *laraItem);
+		if (mountType != LadderMountType::None)
+		{
+			PerformLadderMount(ladderItem, *laraItem, mountType);
+			return;
+		}*/
+
 		bool isFacingLadder = Geometry::IsPointInFront(laraItem->Pose, ladderItem.Pose.Position.ToVector3());
 
 		// Mount while grounded.
@@ -259,43 +267,77 @@ namespace TEN::Entities::Generic
 		}
 	}
 
-	LadderMountType GetLadderMountType(const ItemInfo& ladderItem, ItemInfo& laraItem)
+	bool TestLadderMount(const ItemInfo& ladderItem, ItemInfo& laraItem)
 	{
 		const auto& player = *GetLaraInfo(&laraItem);
 
+		// Check for Action input action.
+		if (!IsHeld(In::Action))
+			return false;
+
 		// Check ladder usability.
 		if (ladderItem.Flags & IFLAG_INVISIBLE)
-			return LadderMountType::None;
+			return false;
 
 		// Check hand status.
 		if (player.Control.HandStatus != HandStatus::Free)
+			return false;
+
+		// Check active player state.
+		if (!TestState(laraItem.Animation.ActiveState, LadderGroundedMountStates))
+			return false;
+
+		return true;
+	}
+
+	LadderMountType GetLadderMountType(ItemInfo& ladderItem, ItemInfo& laraItem)
+	{
+		const auto& player = *GetLaraInfo(&laraItem);
+
+		// Assesss ladder mountability.
+		if (!TestLadderMount(ladderItem, laraItem))
 			return LadderMountType::None;
 
-		bool isFacingLadder = Geometry::IsPointInFront(laraItem.Pose, ladderItem.Pose.Position.ToVector3());
-		if (!isFacingLadder || !TestState(laraItem.Animation.ActiveState, LadderGroundedMountStates))
-			return LadderMountType::None;
+		// Define extension for height of interaction bounds.
+		// TODO: Please get height of full ladder stack. Must probe above and below for ladder objects. Steal from vertical pole?
+		static auto ladderBounds = GameBoundingBox(&ladderItem);
+		auto boundsExtension = GameBoundingBox(0, 0, ladderBounds.Y1, ladderBounds.Y2 + LADDER_STEP_HEIGHT, 0, 0);
 
-		if (IsHeld(In::Action))
-		{
-			if (TestEntityInteraction(ladderItem, laraItem, LadderMountTopFrontBasis))
-				return LadderMountType::TopFront;
+		if (TestEntityInteraction(ladderItem, laraItem, LadderMountTopFrontBasis, boundsExtension))
+			return LadderMountType::TopFront;
 
-			if (TestEntityInteraction(ladderItem, laraItem, LadderMountTopBackBasis))
-				return LadderMountType::TopBack;
+		if (TestEntityInteraction(ladderItem, laraItem, LadderMountTopBackBasis, boundsExtension))
+			return LadderMountType::TopBack;
 
-			if (TestEntityInteraction(ladderItem, laraItem, LadderMountFrontBasis))
-				return LadderMountType::Front;
+		if (TestEntityInteraction(ladderItem, laraItem, LadderMountFrontBasis, boundsExtension))
+			return LadderMountType::Front;
 
-			if (TestEntityInteraction(ladderItem, laraItem, LadderMountBackBasis))
-				return LadderMountType::Back;
+		if (TestEntityInteraction(ladderItem, laraItem, LadderMountBackBasis, boundsExtension))
+			return LadderMountType::Back;
 
-			if (TestEntityInteraction(ladderItem, laraItem, LadderMountLeftBasis))
-				return LadderMountType::Left;
+		if (TestEntityInteraction(ladderItem, laraItem, LadderMountLeftBasis, boundsExtension))
+			return LadderMountType::Left;
 
-			if (TestEntityInteraction(ladderItem, laraItem, LadderMountRightBasis))
-				return LadderMountType::Right;
-		}
+		if (TestEntityInteraction(ladderItem, laraItem, LadderMountRightBasis, boundsExtension))
+			return LadderMountType::Right;
 
 		return LadderMountType::None;
+	}
+
+	void DoLadderMount(const ItemInfo& ladderItem, ItemInfo& laraItem, LadderMountType mountType)
+	{
+		/*switch (mountType)
+		{
+		default:
+		case LadderMountType::None:
+			return;
+
+		case LadderMountType::TopFront:
+		case LadderMountType::TopBack:
+		case LadderMountType::Front:
+		case LadderMountType::Back:
+		case LadderMountType::Left:
+		case LadderMountType::Right:
+		}*/
 	}
 }
