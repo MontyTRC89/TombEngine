@@ -74,17 +74,14 @@ void DragSASCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 		if (item->Status == ITEM_ACTIVE)
 		{
 
-			/*
-			TODO: Implement Drag_sas_bloke being able to trigger stuff - Kubsy 06/11/22
-			if (item->frameNumber == &g_Level.Anims[item->Animation.AnimNumber].frameEnd)
+			if (TestLastFrame(item))
 			{
-				auto triggerPoint = item->Pose.Position;
-				triggerPoint = Geometry::TranslatePoint(triggerPoint, item->Pose.Orientation.y + ANGLE(180.0f), -100);
-				TestTriggers(x, y, z, roomNumber, heavy, heavyFlags);
+				auto pos = GetJointPosition(item, 0);
+				TestTriggers(pos.x, pos.y, pos.z, item->RoomNumber, true);
 				RemoveActiveItem(itemNumber);
-				item->Status = ITEM_INACTIVE;
+				item->Status = ITEM_DEACTIVATED;
 			}
-			*/
+
 			return;
 		}
 		ObjectCollision(itemNumber, laraItem, coll);
