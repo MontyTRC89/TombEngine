@@ -215,11 +215,11 @@ using namespace TEN::Math;
 		return ((abs(alpha) > 1.0f) ? 1.0f : abs(alpha));
 	}
 
-	bool EulerAngles::Compare(short angle0, short angle1, short epsilon)
-	{
-		short difference = Geometry::GetShortestAngularDistance(angle0, angle1);
-		if (abs(difference) <= epsilon)
-			return true;
+bool EulerAngles::Compare(short angle0, short angle1, short epsilon)
+{
+	short difference = Geometry::GetShortestAngle(angle0, angle1);
+	if (abs(difference) <= epsilon)
+		return true;
 
 		return false;
 	}
@@ -231,16 +231,16 @@ using namespace TEN::Math;
 		if (Compare(angleFrom, angleTo, epsilon))
 			return angleTo;
 
-		short difference = Geometry::GetShortestAngularDistance(angleFrom, angleTo);
-		return (short)round(angleFrom + (difference * alpha));
-	}
+	short difference = Geometry::GetShortestAngle(angleFrom, angleTo);
+	return (short)round(angleFrom + (difference * alpha));
+}
 
 	short EulerAngles::InterpolateConstant(short angleFrom, short angleTo, short angularVel)
 	{
 		if (Compare(angleFrom, angleTo, angularVel))
 			return angleTo;
 
-		int sign = copysign(1, Geometry::GetShortestAngularDistance(angleFrom, angleTo));
-		return (angleFrom + (angularVel * sign));
-	}
+	int sign = copysign(1, Geometry::GetShortestAngle(angleFrom, angleTo));
+	return (angleFrom + (angularVel * sign));
+}
 //}

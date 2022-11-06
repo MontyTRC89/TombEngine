@@ -9,9 +9,13 @@ struct CollisionInfo;
 struct ItemInfo;
 
 constexpr auto DEFAULT_RADIUS = 10;
-constexpr auto ROT_X = 0x0004;
-constexpr auto ROT_Y = 0x0008;
-constexpr auto ROT_Z = 0x0010;
+
+enum JointRotationFlags
+{
+	ROT_X = (1 << 2),
+	ROT_Y = (1 << 3),
+	ROT_Z = (1 << 4)
+};
 
 enum HitEffectEnum
 {
@@ -70,7 +74,7 @@ struct ObjectInfo
 	int meshSwapSlot;
 	DWORD explodableMeshbits;
 
-	// Use ROT_X/Y/Z to allow bone to be rotated with CreatureJoint()
+	// Use ROT_X/Y/Z to allow bone to be rotated with CreatureJoint().
 	void SetBoneRotation(int boneID, int flags)
 	{
 		g_Level.Bones[boneIndex + boneID * 4] |= flags;
@@ -87,7 +91,7 @@ struct STATIC_INFO
 	int shatterSound;
 };
 
-#define MAX_STATICS 1000
+constexpr auto MAX_STATICS = 1000;
 constexpr auto SF_NO_COLLISION = 0x01;
 constexpr auto SF_SHATTERABLE = 0x02;
 constexpr auto GRAVITY = 6.0f;

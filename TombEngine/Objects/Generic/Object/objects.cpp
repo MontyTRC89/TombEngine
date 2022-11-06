@@ -16,10 +16,6 @@
 
 using namespace TEN::Input;
 
-OBJECT_TEXTURE* WaterfallTextures[6];
-float WaterfallY[6];
-int lastWaterfallY = 0;
-
 const auto TightRopePos = Vector3i::Zero;
 const InteractionBasis TightRopeBounds =
 {
@@ -66,29 +62,6 @@ void ControlTriggerTriggerer(short itemNumber)
 			floor->Flags.MarkTriggererActive = true;
 		else
 			floor->Flags.MarkTriggererActive = false;
-	}
-}
-
-void ControlWaterfall(short itemNumber)
-{
-	auto* item = &g_Level.Items[itemNumber];
-
-	int dx = item->Pose.Position.x - LaraItem->Pose.Position.x;
-	int dy = item->Pose.Position.y - LaraItem->Pose.Position.y;
-	int dz = item->Pose.Position.z - LaraItem->Pose.Position.z;
-
-	if (dx >= -16384 && dx <= 16384 && dy >= -16384 && dy <= 16384 && dz >= -16384 && dz <= 16384)
-	{
-		if (!(Wibble & 0xC))
-		{
-			TriggerWaterfallMist(
-				item->Pose.Position.x + 68 * phd_sin(item->Pose.Orientation.y),
-				item->Pose.Position.y,
-				item->Pose.Position.z + 68 * phd_cos(item->Pose.Orientation.y),
-				item->Pose.Orientation.y >> 4);
-		}
-
-		SoundEffect(SFX_TR4_WATERFALL_LOOP, &item->Pose);
 	}
 }
 

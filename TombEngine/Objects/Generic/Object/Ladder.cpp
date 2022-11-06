@@ -20,7 +20,7 @@ using namespace TEN::Math;
 
 namespace TEN::Entities::Generic
 {
-	constexpr auto LADDER_STEP_HEIGHT = BLOCK(1, 8);
+	constexpr auto LADDER_STEP_HEIGHT = BLOCK(1.0f / 8);
 
 	enum class LadderMountType
 	{
@@ -57,11 +57,11 @@ namespace TEN::Entities::Generic
 		LS_JUMP_UP
 	};
 
-	const auto LadderMountedOffset = Vector3i(0, 0, -BLOCK(1, 7));
+	const auto LadderMountedOffset = Vector3i(0, 0, -BLOCK(1.0f / 7));
 	const auto LadderInteractBounds = GameBoundingBox(
-		-BLOCK(1, 4), BLOCK(1, 4),
+		-BLOCK(1.0f / 4), BLOCK(1.0f / 4),
 		-LADDER_STEP_HEIGHT, LADDER_STEP_HEIGHT, // TODO: Adapt to bounds height.
-		-BLOCK(3, 8), BLOCK(3, 8)
+		-BLOCK(3.0f / 8), BLOCK(3.0f / 8)
 	);
 
 	const auto LadderMountTopFrontOffset = LadderMountedOffset; // TODO
@@ -104,7 +104,7 @@ namespace TEN::Entities::Generic
 		)
 	);
 
-	const auto LadderMountLeftOffset = LadderMountedOffset + Vector3i(-BLOCK(1, 4), 0, 0);
+	const auto LadderMountLeftOffset = LadderMountedOffset + Vector3i(-BLOCK(1.0f / 4), 0, 0);
 	const auto LadderMountLeftOrient = EulerAngles(0, ANGLE(90.0f), 0);
 	const auto LadderMountLeftBasis = InteractionBasis(
 		LadderInteractBounds,
@@ -114,7 +114,7 @@ namespace TEN::Entities::Generic
 		)
 	);
 
-	const auto LadderMountRightOffset = LadderMountedOffset + Vector3i(BLOCK(1, 4), 0, 0);
+	const auto LadderMountRightOffset = LadderMountedOffset + Vector3i(BLOCK(1.0f / 4), 0, 0);
 	const auto LadderMountRightOrient = EulerAngles(0, ANGLE(-90.0f), 0);
 	const auto LadderMountRightBasis = InteractionBasis(
 		LadderInteractBounds,

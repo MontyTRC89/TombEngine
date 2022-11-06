@@ -15,8 +15,7 @@
 #include "Sound/sound.h"
 #include "Specific/level.h"
 
-using namespace TEN::Math::Random;
-using std::vector;
+using namespace TEN::Math;
 
 namespace TEN::Entities::Creatures::TR1
 {
@@ -37,13 +36,13 @@ namespace TEN::Entities::Creatures::TR1
 	constexpr auto WINGED_MUTANT_SHARD_VELOCITY = 250;
 	constexpr auto WINGED_MUTANT_BOMB_VELOCITY  = 220;
 
-	#define WINGED_MUTANT_WALK_FORWARD_TURN_RATE_MAX ANGLE(2.0f)
-	#define WINGED_MUTANT_RUN_FORWARD_TURN_RATE_MAX	 ANGLE(6.0f)
+	const auto WINGED_MUTANT_WALK_FORWARD_TURN_RATE_MAX = ANGLE(2.0f);
+	const auto WINGED_MUTANT_RUN_FORWARD_TURN_RATE_MAX	= ANGLE(6.0f);
 
 	const auto WingedMutantBite		  = BiteInfo(Vector3(-27.0f, 98.0f, 0.0f), 10);
 	const auto WingedMutantRocketBite = BiteInfo(Vector3(51.0f, 213.0f, 0.0f), 14);
 	const auto WingedMutantShardBite  = BiteInfo(Vector3(-35.0f, 269.0f, 0.0f), 9);
-	const vector<unsigned int> WingedMutantJoints = { 9, 10, 14 };
+	const auto WingedMutantJoints = std::vector<unsigned int>{ 9, 10, 14 };
 
 	enum WingedMutantState
 	{
@@ -338,7 +337,7 @@ namespace TEN::Entities::Creatures::TR1
 					if (AI.distance < WINGED_MUTANT_WALK_RANGE)
 					{
 						if (AI.zoneNumber == AI.enemyZone ||
-							TestProbability(WINGED_MUTANT_UNPOSE_CHANCE))
+							Random::TestProbability(WINGED_MUTANT_UNPOSE_CHANCE))
 						{
 							item->Animation.TargetState = WMUTANT_STATE_WALK_FORWARD;
 						}
@@ -346,7 +345,7 @@ namespace TEN::Entities::Creatures::TR1
 					else
 						item->Animation.TargetState = WMUTANT_STATE_IDLE;
 				}
-				else if (creature->Mood == MoodType::Bored && TestProbability(WINGED_MUTANT_UNPOSE_CHANCE))
+				else if (creature->Mood == MoodType::Bored && Random::TestProbability(WINGED_MUTANT_UNPOSE_CHANCE))
 					item->Animation.TargetState = WMUTANT_STATE_WALK_FORWARD;
 				else if (creature->Mood == MoodType::Attack ||
 					creature->Mood == MoodType::Escape)
@@ -364,7 +363,7 @@ namespace TEN::Entities::Creatures::TR1
 				else if (creature->Mood == MoodType::Bored ||
 					(creature->Mood == MoodType::Stalk && AI.zoneNumber != AI.enemyZone))
 				{
-					if (TestProbability(WINGED_MUTANT_POSE_CHANCE))
+					if (Random::TestProbability(WINGED_MUTANT_POSE_CHANCE))
 						item->Animation.TargetState = WMUTANT_STATE_POSE;
 				}
 				else if (creature->Mood == MoodType::Stalk &&

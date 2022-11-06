@@ -19,7 +19,7 @@ namespace TEN::Math::Geometry
 	Vector3	 TranslatePoint(const Vector3& point, const EulerAngles& orient, float distance);
 	Vector3	 TranslatePoint(const Vector3& point, const Vector3& direction, float distance);
 
-	short GetShortestAngularDistance(short fromAngle, short toAngle);
+	short GetShortestAngle(short fromAngle, short toAngle);
 	short GetSurfaceSteepnessAngle(Vector2 tilt);
 	short GetSurfaceAspectAngle(Vector2 tilt);
 
