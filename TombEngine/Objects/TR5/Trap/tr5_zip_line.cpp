@@ -58,10 +58,9 @@ void ZipLineCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 		return;
 	}
 
-	if (TestPlayerEntityInteract(zipLineItem, laraItem, DeathSlideBounds))
+	if (TestEntityInteraction(*laraItem, zipLineItem, ZipLineMountBasis))
 	{
-		AlignPlayerToEntity(zipLineItem, laraItem, ZipLineMountedOffset, EulerAngles::Zero, true);
-		AlignLaraPosition(ZipLineMountedOffset, &zipLineItem, laraItem);
+		AlignPlayerToEntity(&zipLineItem, laraItem, ZipLineMountedOffset, EulerAngles::Zero, true);
 		lara.Control.HandStatus = HandStatus::Busy;
 
 		laraItem->Animation.TargetState = LS_ZIP_LINE;

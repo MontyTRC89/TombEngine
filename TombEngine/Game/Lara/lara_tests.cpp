@@ -2613,8 +2613,8 @@ bool TestLaraPoleDown(ItemInfo* item, CollisionInfo* coll)
 
 bool CanClimbLadderUp(ItemInfo* item, CollisionInfo* coll)
 {
-	static constexpr auto probeDist			= BLOCK(1, 4);
-	static constexpr auto upperCeilingBound = -BLOCK(1, 8);
+	static constexpr auto probeDist			= BLOCK(1.0f / 4);
+	static constexpr auto upperCeilingBound = -BLOCK(1.0f / 8);
 
 	int vPos = item->Pose.Position.y + GameBoundingBox(item).Y1;
 	auto pointColl = GetCollision(item, item->Pose.Orientation.y, -probeDist);
@@ -2630,8 +2630,8 @@ bool CanClimbLadderDown(ItemInfo* item, CollisionInfo* coll)
 {
 	return true;
 
-	static constexpr auto probeDist		  = BLOCK(1, 4);
-	static constexpr auto lowerFloorBound = BLOCK(1, 8);
+	static constexpr auto probeDist		  = BLOCK(1.0f / 4);
+	static constexpr auto lowerFloorBound = BLOCK(1.0f / 8);
 
 	int vPos = item->Pose.Position.y + GameBoundingBox(item).Y2;
 	auto pointColl = GetCollision(item, item->Pose.Orientation.y, -probeDist);
@@ -2645,10 +2645,10 @@ bool CanClimbLadderDown(ItemInfo* item, CollisionInfo* coll)
 
 bool CanDismountLadderTop(ItemInfo* item, CollisionInfo* coll)
 {
-	static constexpr auto probeDist			= BLOCK(1, 4);
-	static constexpr auto lowerFloorBound	= BLOCK(1, 16);
+	static constexpr auto probeDist			= BLOCK(1.0f / 4);
+	static constexpr auto lowerFloorBound	= BLOCK(1.0f / 16);
 	static constexpr auto upperFloorBound	= 0;
-	static constexpr auto upperCeilingBound = -BLOCK(1, 2);
+	static constexpr auto upperCeilingBound = -BLOCK(1.0f / 2);
 
 	int vPos = item->Pose.Position.y + GameBoundingBox(item).Y1;
 	auto pointColl = GetCollision(item, item->Pose.Orientation.y, probeDist);
@@ -2671,8 +2671,8 @@ bool CanDismountLadderTop(ItemInfo* item, CollisionInfo* coll)
 
 bool CanDismountLadderBack(ItemInfo* item, CollisionInfo* coll)
 {
-	static constexpr auto probeDist		  = BLOCK(3, 16);
-	static constexpr auto lowerFloorBound = BLOCK(2, 9);
+	static constexpr auto probeDist		  = BLOCK(3.0f / 16);
+	static constexpr auto lowerFloorBound = BLOCK(2.0f / 9);
 
 	int vPos = item->Pose.Position.y + GameBoundingBox(item).Y2;
 	auto pointColl = GetCollision(item, item->Pose.Orientation.y, -probeDist);
@@ -2693,8 +2693,8 @@ bool CanDismountLadderBack(ItemInfo* item, CollisionInfo* coll)
 
 bool TestLaraLadderSideDismount(ItemInfo* item, CollisionInfo* coll, bool isGoingLeft)
 {
-	static constexpr int probeDist	= BLOCK(3, 8);
-	static constexpr int floorBound = BLOCK(1, 16);
+	static constexpr int probeDist	= BLOCK(3.0f / 8);
+	static constexpr int floorBound = BLOCK(1.0f / 16);
 
 	int vPos = item->Pose.Position.y + GameBoundingBox(item).Y2;
 	auto pointColl = GetCollision(item, item->Pose.Orientation.y + (isGoingLeft ? -ANGLE(90.0f) : ANGLE(90.0f)), probeDist);

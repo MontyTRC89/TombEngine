@@ -31,9 +31,10 @@ GameBoundingBox GlobalCollisionBounds;
 ItemInfo* CollidedItems[MAX_COLLIDED_OBJECTS];
 MESH_INFO* CollidedMeshes[MAX_COLLIDED_OBJECTS];
 
+// TODO: Remove this temp. wrapper.
 bool TestPlayerEntityInteract(ItemInfo* item, ItemInfo* laraItem, const InteractionBasis& interactBasis)
 {
-	return interactBasis.TestInteraction(*item, *laraItem);
+	return TestEntityInteraction(*laraItem, *item, interactBasis);
 }
 
 bool AlignPlayerToEntity(ItemInfo* item, ItemInfo* laraItem, const Vector3i& posOffset, const EulerAngles& orientOffset, bool doSnapAlign)

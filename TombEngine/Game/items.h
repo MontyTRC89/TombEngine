@@ -20,8 +20,6 @@ constexpr auto NUM_ITEMS = 1024;
 constexpr unsigned int ALL_JOINT_BITS = UINT_MAX;
 constexpr unsigned int NO_JOINT_BITS  = 0;
 
-constexpr auto OFFSET_BLEND_ALPHA_DEFAULT = 0.4f;
-
 enum AIObjectType
 {
 	NO_AI	  = 0,
@@ -150,7 +148,8 @@ struct ItemInfo
 	bool IsLara() const;
 	bool IsCreature() const;
 
-	void SetOffsetBlend(const Vector3& posOffset, const EulerAngles& orientOffset, float alpha = OFFSET_BLEND_ALPHA_DEFAULT, float delay = 0.0f);
+	void SetOffsetBlendTimed(const Vector3& posOffset, const EulerAngles& orientOffset, float time = 1.0f, float delay = 0.0f);
+	void SetOffsetBlend(const Vector3& posOffset, const EulerAngles& orientOffset, float alpha = 0.4f, float delay = 0.0f);
 	void SetOffsetBlend(const Vector3& posOffset, const EulerAngles& orientOffset, float velocity, short turnRate, float delay = 0.0f);
 	void DoOffsetBlend();
 	void ClearOffsetBlend();
