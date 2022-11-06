@@ -14,7 +14,7 @@ struct ItemInfo;
 		Vector3i							PosOffset		 = Vector3i::Zero;
 		EulerAngles							OrientOffset	 = EulerAngles::Zero;
 		GameBoundingBox						Bounds			 = GameBoundingBox::Zero;
-		std::pair<EulerAngles, EulerAngles> OrientConstraint = {};
+		std::pair<EulerAngles, EulerAngles> OrientConstraint = std::pair(EulerAngles::Zero, EulerAngles::Zero);
 
 		InteractionBasis(const Vector3i& posOffset, const EulerAngles& orientOffset, const GameBoundingBox& bounds, const std::pair<EulerAngles, EulerAngles>& orientConstraint);
 		InteractionBasis(const Vector3i& posOffset, const GameBoundingBox& bounds, const std::pair<EulerAngles, EulerAngles>& orientConstraint);

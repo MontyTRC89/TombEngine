@@ -127,13 +127,16 @@ namespace TEN::Entities::Generic
 		bool isFacingLadder = Geometry::IsPointInFront(laraItem->Pose, ladderItem.Pose.Position.ToVector3());
 
 		// Mount while grounded.
-		if ((TrInput & IN_ACTION && isFacingLadder &&
+		if ((IsHeld(In::Action) && isFacingLadder &&
 			TestState(laraItem->Animation.ActiveState, LadderGroundedMountStates) &&
 			player.Control.HandStatus == HandStatus::Free) ||
 			(player.Control.IsMoving && player.InteractedItem == itemNumber))
 		{
+			auto ladderBounds = GameBoundingBox(&ladderItem);
+			auto boundsExtension = GameBoundingBox(0, 0, ladderBounds.Y1, ladderBounds.Y2 + LADDER_STEP_HEIGHT, 0, 0);
+
 			// Mount from front.
-			if (TestEntityInteraction(*laraItem, ladderItem, LadderMountFrontBasis))
+			if (TestEntityInteraction(*laraItem, ladderItem, LadderMountFrontBasis, boundsExtension))
 			{
 				if (!laraItem->OffsetBlend.IsActive)
 				{
@@ -151,7 +154,7 @@ namespace TEN::Entities::Generic
 			}
 
 			// Mount from back.
-			if (TestEntityInteraction(*laraItem, ladderItem, LadderMountBackBasis))
+			if (TestEntityInteraction(*laraItem, ladderItem, LadderMountBackBasis, boundsExtension))
 			{
 				if (!laraItem->OffsetBlend.IsActive)
 				{
@@ -173,7 +176,7 @@ namespace TEN::Entities::Generic
 			}
 
 			// Mount from right.
-			if (TestEntityInteraction(*laraItem, ladderItem, LadderMountRightBasis))
+			if (TestEntityInteraction(*laraItem, ladderItem, LadderMountRightBasis, boundsExtension))
 			{
 				auto mountOffset = LadderMountRightBasis.PosOffset + Vector3i(0, 0, GameBoundingBox(&ladderItem).Z1);
 
@@ -266,7 +269,7 @@ namespace TEN::Entities::Generic
 		if (!isFacingLadder || !TestState(laraItem.Animation.ActiveState, LadderGroundedMountStates))
 			return LadderMountType::None;
 
-		if (TrInput & IN_ACTION)
+		if (IsHeld(In::Action))
 		{
 			if (TestEntityInteraction(ladderItem, laraItem, LadderMountTopFrontBasis))
 				return LadderMountType::TopFront;
