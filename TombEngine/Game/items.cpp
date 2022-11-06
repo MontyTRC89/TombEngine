@@ -68,7 +68,7 @@ void ItemInfo::SetOffsetBlend(const Vector3& posOffset, const EulerAngles& orien
 	this->OffsetBlend.PosOffset = posOffset;
 	this->OffsetBlend.OrientOffset = orientOffset;
 	this->OffsetBlend.Alpha = alpha;
-	this->OffsetBlend.DelayTime = fmod(delayInSec, DELTA_TIME);
+	this->OffsetBlend.DelayTime = std::floor(delayInSec / DELTA_TIME);
 }
 
 void ItemInfo::SetOffsetBlend(const Vector3& posOffset, const EulerAngles& orientOffset, float velocity, short turnRate, float delayInSec)
@@ -79,7 +79,7 @@ void ItemInfo::SetOffsetBlend(const Vector3& posOffset, const EulerAngles& orien
 	this->OffsetBlend.OrientOffset = orientOffset;
 	this->OffsetBlend.Velocity = velocity;
 	this->OffsetBlend.TurnRate = turnRate;
-	this->OffsetBlend.DelayTime = fmod(delayInSec, DELTA_TIME);
+	this->OffsetBlend.DelayTime = std::floor(delayInSec / DELTA_TIME);
 }
 
 void ItemInfo::DoOffsetBlend()

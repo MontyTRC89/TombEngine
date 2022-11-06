@@ -138,12 +138,12 @@ namespace TEN::Entities::Generic
 			(player.Control.IsMoving && player.InteractedItem == itemNumber))
 		{
 			// Mount from front.
-			if (LadderMountFrontBasis.TestInteraction(ladderItem, *laraItem))
+			if (TestEntityInteraction(*laraItem, ladderItem, LadderMountFrontBasis))
 			{
 				if (!laraItem->OffsetBlend.IsActive)
 				{
 					auto boundsOffset = Vector3i(0, 0, GameBoundingBox(&ladderItem).Z1);
-					LadderMountFrontBasis.SetEntityOffsetBlend(ladderItem, *laraItem, boundsOffset);
+					SetEntityInteraction(*laraItem, ladderItem, LadderMountFrontBasis, boundsOffset);
 
 					SetAnimation(laraItem, LA_LADDER_MOUNT_FRONT);
 					player.Control.IsMoving = false;
@@ -156,7 +156,7 @@ namespace TEN::Entities::Generic
 			}
 
 			// Mount from back.
-			if (LadderMountBackBasis.TestInteraction(ladderItem, *laraItem))
+			if (TestEntityInteraction(*laraItem, ladderItem, LadderMountBackBasis))
 			{
 				if (!laraItem->OffsetBlend.IsActive)
 				{
@@ -178,7 +178,7 @@ namespace TEN::Entities::Generic
 			}
 
 			// Mount from right.
-			if (LadderMountRightBasis.TestInteraction(ladderItem, *laraItem))
+			if (TestEntityInteraction(*laraItem, ladderItem, LadderMountRightBasis))
 			{
 				auto mountOffset = LadderMountRightOffset + Vector3i(0, 0, GameBoundingBox(&ladderItem).Z1);
 
@@ -273,22 +273,22 @@ namespace TEN::Entities::Generic
 
 		if (TrInput & IN_ACTION)
 		{
-			if (LadderMountTopFrontBasis.TestInteraction(ladderItem, laraItem))
+			if (TestEntityInteraction(ladderItem, laraItem, LadderMountTopFrontBasis))
 				return LadderMountType::TopFront;
 
-			if (LadderMountTopBackBasis.TestInteraction(ladderItem, laraItem))
+			if (TestEntityInteraction(ladderItem, laraItem, LadderMountTopBackBasis))
 				return LadderMountType::TopBack;
 
-			if (LadderMountFrontBasis.TestInteraction(ladderItem, laraItem))
+			if (TestEntityInteraction(ladderItem, laraItem, LadderMountFrontBasis))
 				return LadderMountType::Front;
 
-			if (LadderMountBackBasis.TestInteraction(ladderItem, laraItem))
+			if (TestEntityInteraction(ladderItem, laraItem, LadderMountBackBasis))
 				return LadderMountType::Back;
 
-			if (LadderMountLeftBasis.TestInteraction(ladderItem, laraItem))
+			if (TestEntityInteraction(ladderItem, laraItem, LadderMountLeftBasis))
 				return LadderMountType::Left;
 
-			if (LadderMountRightBasis.TestInteraction(ladderItem, laraItem))
+			if (TestEntityInteraction(ladderItem, laraItem, LadderMountRightBasis))
 				return LadderMountType::Right;
 		}
 
