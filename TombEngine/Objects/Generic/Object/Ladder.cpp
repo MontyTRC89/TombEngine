@@ -64,26 +64,24 @@ namespace TEN::Entities::Generic
 		-BLOCK(3.0f / 8), BLOCK(3.0f / 8)
 	);
 
-	const auto LadderMountTopFrontOffset = LadderMountedOffset; // TODO
-	const auto LadderMountTopFrontOrient = EulerAngles(0, ANGLE(180.0f), 0);
 	const auto LadderMountTopFrontBasis = InteractionBasis(
+		LadderMountedOffset, // TODO
+		EulerAngles(0, ANGLE(180.0f), 0),
 		LadderInteractBounds,
 		std::pair(
 			EulerAngles(ANGLE(-10.0f), ANGLE(180.0f) - LARA_GRAB_THRESHOLD, ANGLE(-10.0f)),
 			EulerAngles(ANGLE(10.0f), ANGLE(180.0f) + LARA_GRAB_THRESHOLD, ANGLE(10.0f))
 		)
 	);
-
-	const auto LadderMountTopBackOffset = LadderMountedOffset; // TODO
-	const auto LadderMountTopBackOrient = EulerAngles::Zero;
 	const auto LadderMountTopBackBasis = InteractionBasis(
+		LadderMountedOffset, // TODO
+		EulerAngles::Zero,
 		LadderInteractBounds,
 		std::pair(
 			EulerAngles(ANGLE(-10.0f), -LARA_GRAB_THRESHOLD, ANGLE(-10.0f)),
 			EulerAngles(ANGLE(10.0f), LARA_GRAB_THRESHOLD, ANGLE(10.0f))
 		)
 	);
-
 	const auto LadderMountFrontBasis = InteractionBasis(
 		LadderMountedOffset,
 		EulerAngles::Zero,
@@ -93,30 +91,27 @@ namespace TEN::Entities::Generic
 			EulerAngles(ANGLE(10.0f), LARA_GRAB_THRESHOLD, ANGLE(10.0f))
 		)
 	);
-	
-	const auto LadderMountBackOffset = LadderMountedOffset;
-	const auto LadderMountBackOrient = EulerAngles(0, ANGLE(180.0f), 0);
 	const auto LadderMountBackBasis = InteractionBasis(
+		LadderMountedOffset,
+		EulerAngles(0, ANGLE(180.0f), 0),
 		LadderInteractBounds,
 		std::pair(
 			EulerAngles(ANGLE(-10.0f), ANGLE(180.0f) - LARA_GRAB_THRESHOLD, ANGLE(-10.0f)),
 			EulerAngles(ANGLE(10.0f), ANGLE(180.0f) + LARA_GRAB_THRESHOLD, ANGLE(10.0f))
 		)
 	);
-
-	const auto LadderMountLeftOffset = LadderMountedOffset + Vector3i(-BLOCK(1.0f / 4), 0, 0);
-	const auto LadderMountLeftOrient = EulerAngles(0, ANGLE(90.0f), 0);
 	const auto LadderMountLeftBasis = InteractionBasis(
+		LadderMountedOffset + Vector3i(-BLOCK(1.0f / 4), 0, 0),
+		EulerAngles(0, ANGLE(90.0f), 0),
 		LadderInteractBounds,
 		std::pair(
 			EulerAngles(ANGLE(-10.0f), ANGLE(90.0f) - LARA_GRAB_THRESHOLD, ANGLE(-10.0f)),
 			EulerAngles(ANGLE(10.0f), ANGLE(90.0f) + LARA_GRAB_THRESHOLD, ANGLE(10.0f))
 		)
 	);
-
-	const auto LadderMountRightOffset = LadderMountedOffset + Vector3i(BLOCK(1.0f / 4), 0, 0);
-	const auto LadderMountRightOrient = EulerAngles(0, ANGLE(-90.0f), 0);
 	const auto LadderMountRightBasis = InteractionBasis(
+		LadderMountedOffset + Vector3i(BLOCK(1.0f / 4), 0, 0),
+		EulerAngles(0, ANGLE(-90.0f), 0),
 		LadderInteractBounds,
 		std::pair(
 			EulerAngles(ANGLE(-10.0f), ANGLE(-90.0f) - LARA_GRAB_THRESHOLD, ANGLE(-10.0f)),
@@ -160,11 +155,11 @@ namespace TEN::Entities::Generic
 			{
 				if (!laraItem->OffsetBlend.IsActive)
 				{
-					auto mountOffset = LadderMountBackOffset + Vector3i(0, 0, GameBoundingBox(&ladderItem).Z2);
+					auto mountOffset = LadderMountBackBasis.PosOffset + Vector3i(0, 0, GameBoundingBox(&ladderItem).Z2);
 
 					auto targetPos = Geometry::TranslatePoint(ladderItem.Pose.Position, ladderItem.Pose.Orientation, mountOffset);
 					auto posOffset = (targetPos - laraItem->Pose.Position).ToVector3();
-					auto orientOffset = (ladderItem.Pose.Orientation + LadderMountBackOrient) - laraItem->Pose.Orientation;
+					auto orientOffset = (ladderItem.Pose.Orientation + LadderMountBackBasis.OrientOffset) - laraItem->Pose.Orientation;
 					laraItem->SetOffsetBlend(posOffset, orientOffset);
 
 					SetAnimation(laraItem, LA_LADDER_MOUNT_FRONT);
@@ -180,14 +175,14 @@ namespace TEN::Entities::Generic
 			// Mount from right.
 			if (TestEntityInteraction(*laraItem, ladderItem, LadderMountRightBasis))
 			{
-				auto mountOffset = LadderMountRightOffset + Vector3i(0, 0, GameBoundingBox(&ladderItem).Z1);
+				auto mountOffset = LadderMountRightBasis.PosOffset + Vector3i(0, 0, GameBoundingBox(&ladderItem).Z1);
 
 				//if (AlignPlayerToEntity(&ladderItem, laraItem, mountOffset, LadderMountRightOrient))
 				if (!laraItem->OffsetBlend.IsActive)
 				{
 					auto targetPos = Geometry::TranslatePoint(ladderItem.Pose.Position, ladderItem.Pose.Orientation, mountOffset);
 					auto posOffset = (targetPos - laraItem->Pose.Position).ToVector3();
-					auto orientOffset = (ladderItem.Pose.Orientation + LadderMountRightOrient) - laraItem->Pose.Orientation;
+					auto orientOffset = (ladderItem.Pose.Orientation + LadderMountRightBasis.OrientOffset) - laraItem->Pose.Orientation;
 					laraItem->SetOffsetBlend(posOffset, orientOffset);
 
 					SetAnimation(laraItem, LA_LADDER_MOUNT_RIGHT);
