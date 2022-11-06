@@ -167,318 +167,280 @@ namespace TEN::Entities::Creatures::TR5
 
 	void CyborgControl(short itemNumber)
 	{
-		if (CreatureActive(itemNumber))
+		if (!CreatureActive(itemNumber))
+			return;
+
+		auto* item = &g_Level.Items[itemNumber];
+		auto* object = &Objects[item->ObjectNumber];
+		auto* creature = GetCreatureInfo(item);
+
+		short angle = 0;
+		short joint0 = 0;
+		short joint1 = 0;
+		short joint2 = 0;
+
+		int x = item->Pose.Position.x;
+		int z = item->Pose.Position.z;
+
+		int dx = 808 * phd_sin(item->Pose.Orientation.y);
+		int dz = 808 * phd_cos(item->Pose.Orientation.y);
+
+		x += dx;
+		z += dz;
+		int height1 = GetCollision(x, item->Pose.Position.y, z, item->RoomNumber).Position.Floor;
+
+		x += dx;
+		z += dz;
+		int height2 = GetCollision(x, item->Pose.Position.y, z, item->RoomNumber).Position.Floor;
+
+		x += dx;
+		z += dz;
+		auto probe = GetCollision(x, item->Pose.Position.y, z, item->RoomNumber);
+		short roomNumber = probe.RoomNumber;
+		int height3 = probe.Position.Floor;
+
+		bool canJump1block = true;
+		if (item->BoxNumber == LaraItem->BoxNumber ||
+			item->Pose.Position.y >= (height1 - CLICK(1.5f)) ||
+			item->Pose.Position.y >= (height2 + CLICK(2)) ||
+			item->Pose.Position.y <= (height2 - CLICK(2)))
 		{
-			auto* item = &g_Level.Items[itemNumber];
-			auto* object = &Objects[item->ObjectNumber];
-			auto* creature = GetCreatureInfo(item);
+			canJump1block = false;
+		}
 
-			short angle = 0;
-			short joint0 = 0;
-			short joint1 = 0;
-			short joint2 = 0;
+		bool canJump2blocks = true;
+		if (item->BoxNumber == LaraItem->BoxNumber ||
+			item->Pose.Position.y >= (height1 - CLICK(1.5f)) ||
+			item->Pose.Position.y >= (height2 - CLICK(1.5f)) ||
+			item->Pose.Position.y >= (height3 + CLICK(2)) ||
+			item->Pose.Position.y <= (height3 - CLICK(2)))
+		{
+			canJump2blocks = false;
+		}
 
-			int x = item->Pose.Position.x;
-			int z = item->Pose.Position.z;
+		if (creature->FiredWeapon)
+		{
+			auto pos = GetJointPosition(item, CyborgGunBite.meshNum, Vector3i(CyborgGunBite.Position));
+			TriggerDynamicLight(pos.x, pos.y, pos.z, 2 * creature->FiredWeapon + 10, 192, 128, 32);
+			creature->FiredWeapon--;
+		}
 
-			int dx = 808 * phd_sin(item->Pose.Orientation.y);
-			int dz = 808 * phd_cos(item->Pose.Orientation.y);
+		if (item->AIBits)
+			GetAITarget(creature);
+		else
+			creature->Enemy = LaraItem;
 
-			x += dx;
-			z += dz;
-			int height1 = GetCollision(x, item->Pose.Position.y, z, item->RoomNumber).Position.Floor;
+		AI_INFO AI;
+		CreatureAIInfo(item, &AI);
 
-			x += dx;
-			z += dz;
-			int height2 = GetCollision(x, item->Pose.Position.y, z, item->RoomNumber).Position.Floor;
-
-			x += dx;
-			z += dz;
-			auto probe = GetCollision(x, item->Pose.Position.y, z, item->RoomNumber);
-			short roomNumber = probe.RoomNumber;
-			int height3 = probe.Position.Floor;
-
-			bool canJump1block = true;
-			if (item->BoxNumber == LaraItem->BoxNumber ||
-				item->Pose.Position.y >= (height1 - CLICK(1.5f)) ||
-				item->Pose.Position.y >= (height2 + CLICK(2)) ||
-				item->Pose.Position.y <= (height2 - CLICK(2)))
+		if (item->HitStatus)
+		{
+			if (!(GetRandomControl() & 7))
 			{
-				canJump1block = false;
+				if (item->ItemFlags[0] < 11)
+				{
+					item->MeshSwapBits |= 1 << HitmanJoints[item->ItemFlags[0]];
+					item->ItemFlags[0]++;
+				}
 			}
+		}
 
-			bool canJump2blocks = true;
-			if (item->BoxNumber == LaraItem->BoxNumber ||
-				item->Pose.Position.y >= (height1 - CLICK(1.5f)) ||
-				item->Pose.Position.y >= (height2 - CLICK(1.5f)) ||
-				item->Pose.Position.y >= (height3 + CLICK(2)) ||
-				item->Pose.Position.y <= (height3 - CLICK(2)))
+		byte random = (byte)GetRandomControl();
+		if (g_Level.Rooms[item->RoomNumber].flags & ENV_FLAG_WATER)
+			random &= 31;
+
+		if (random < item->ItemFlags[0])
+		{
+			auto pos = GetJointPosition(item, HitmanJoints[random], Vector3i(0, 0, 50));
+
+			TriggerLightningGlow(pos.x, pos.y, pos.z, 48, 32, 32, 64);
+			TriggerHitmanSparks(pos.x, pos.y, pos.z, -1, -1, -1);
+			TriggerDynamicLight(pos.x, pos.y, pos.z, (GetRandomControl() & 3) + 16, 31, 63, 127);
+
+			SoundEffect(SFX_TR5_HITMAN_SPARKS_SHORT, &item->Pose);
+
+			if (random == 5 || random == 7 || random == 10)
 			{
-				canJump2blocks = false;
-			}
+				auto pos2 = Vector3i::Zero;
 
-			if (creature->FiredWeapon)
+				switch (random)
+				{
+				case 5:
+					pos2 = GetJointPosition(item, 15, Vector3i(0, 0, 50));
+					break;
+
+				case 7:
+					pos2 = GetJointPosition(item, 6, Vector3i(0, 0, 50));
+
+					if (TestEnvironment(ENV_FLAG_WATER, item) && item->HitPoints > 0)
+					{
+						DropEntityPickups(item);
+						DoDamage(item, INT_MAX);
+						item->Animation.ActiveState = CYBORG_STATE_DEATH;
+						item->Animation.AnimNumber = object->animIndex + 69;
+						item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+					}
+
+					break;
+
+				case 10:
+					pos2 = GetJointPosition(item, 12, Vector3i(0, 0, 50));
+					break;
+				}
+
+				TriggerLightning(&pos, &pos2, Random::GenerateInt(0, 7) + 8, 
+					32, 64, 128, 24, (LI_SPLINE | LI_THINOUT | LI_THININ), 64, 3);
+			}
+		}
+
+		if (item->HitPoints > 0)
+		{
+			AI_INFO laraAI;
+			if (creature->Enemy == LaraItem)
 			{
-				auto pos = GetJointPosition(item, CyborgGunBite.meshNum, Vector3i(CyborgGunBite.Position));
-				TriggerDynamicLight(pos.x, pos.y, pos.z, 2 * creature->FiredWeapon + 10, 192, 128, 32);
-				creature->FiredWeapon--;
+				laraAI.angle = AI.angle;
+				laraAI.distance = AI.distance;
 			}
-
-			if (item->AIBits)
-				GetAITarget(creature);
 			else
-				creature->Enemy = LaraItem;
-
-			AI_INFO AI;
-			CreatureAIInfo(item, &AI);
-
-			if (item->HitStatus)
 			{
-				if (!(GetRandomControl() & 7))
+				int dx = LaraItem->Pose.Position.x - item->Pose.Position.x;
+				int dz = LaraItem->Pose.Position.z - item->Pose.Position.z;
+				laraAI.angle = phd_atan(dz, dx) - item->Pose.Orientation.y;
+				laraAI.distance = pow(dx, 2) + pow(dz, 2);
+			}
+
+			GetCreatureMood(item, &AI, creature->Enemy != LaraItem);
+
+			if (TestEnvironment(ENV_FLAG_NO_LENSFLARE, item)) // Gassed room?
+			{
+				if (!(GlobalCounter & 7))
+					item->HitPoints--;
+
+				creature->Mood = MoodType::Escape;
+
+				if (item->HitPoints <= 0)
 				{
-					if (item->ItemFlags[0] < 11)
-					{
-						item->MeshSwapBits |= 1 << HitmanJoints[item->ItemFlags[0]];
-						item->ItemFlags[0]++;
-					}
+					item->Animation.ActiveState = CYBORG_STATE_GASSED;
+					item->Animation.AnimNumber = object->animIndex + 68;
+					item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 				}
 			}
 
-			byte random = (byte)GetRandomControl();
-			if (g_Level.Rooms[item->RoomNumber].flags & ENV_FLAG_WATER)
-				random &= 31;
-			if (random < item->ItemFlags[0])
+			CreatureMood(item, &AI, creature->Enemy != LaraItem);
+
+			angle = CreatureTurn(item, creature->MaxTurn);
+
+			if (laraAI.distance < pow(SECTOR(2), 2) &&
+				LaraItem->Animation.Velocity.z > 20 ||
+				item->HitStatus ||
+				TargetVisible(item, &laraAI))
 			{
-				auto pos = GetJointPosition(item, HitmanJoints[random], Vector3i(0, 0, 50));
-
-				TriggerLightningGlow(pos.x, pos.y, pos.z, 48, 32, 32, 64);
-				TriggerHitmanSparks(pos.x, pos.y, pos.z, -1, -1, -1);
-				TriggerDynamicLight(pos.x, pos.y, pos.z, (GetRandomControl() & 3) + 16, 31, 63, 127);
-
-				SoundEffect(SFX_TR5_HITMAN_SPARKS_SHORT, &item->Pose);
-
-				if (random == 5 || random == 7 || random == 10)
+				if (!(item->AIBits & FOLLOW))
 				{
-					auto pos2 = Vector3i::Zero;
-					switch (random)
+					creature->Enemy = LaraItem;
+					AlertAllGuards(itemNumber);
+				}
+			}
+
+			int height;
+
+			switch (item->Animation.ActiveState)
+			{
+			case CYBORG_STATE_IDLE:
+				creature->MaxTurn = 0;
+				creature->Flags = 0;
+				creature->LOT.IsJumping = false;
+				joint2 = laraAI.angle;
+
+				if (AI.ahead && item->AIBits != GUARD)
+				{
+					joint0 = AI.angle / 2;
+					joint1 = AI.xAngle;
+				}
+
+				if (item->Animation.RequiredState)
+					item->Animation.TargetState = item->Animation.RequiredState;
+				else
+				{
+					if (item->AIBits & GUARD)
 					{
-					case 5:
-						GetJointPosition(item, 15, Vector3i(0, 0, 50));
-						break;
+						joint2 = AIGuard(creature);
 
-					case 7:
-						GetJointPosition(item, 6, Vector3i(0, 0, 50));
-
-						if (TestEnvironment(ENV_FLAG_WATER, item) && item->HitPoints > 0)
+						if (item->AIBits & PATROL1)
 						{
-							DropEntityPickups(item);
-							DoDamage(item, INT_MAX);
-							item->Animation.ActiveState = CYBORG_STATE_DEATH;
-							item->Animation.AnimNumber = object->animIndex + 69;
-							item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+							item->TriggerFlags--;
+							if (item->TriggerFlags < 1)
+								item->AIBits |= PATROL1;
 						}
-
-						break;
-
-					case 10:
-						GetJointPosition(item, 12, Vector3i(0, 0, 50));
-						break;
 					}
+					else if (Targetable(item, &AI))
+					{
+						if (AI.distance < pow(SECTOR(4), 2) || AI.zoneNumber != AI.enemyZone)
+							item->Animation.TargetState = CYBORG_STATE_AIM;
+						else if (item->AIBits != MODIFY)
+							item->Animation.TargetState = CYBORG_STATE_WALK;
+					}
+					else
+					{
+						if (item->AIBits & PATROL1)
+							item->Animation.TargetState = CYBORG_STATE_WALK;
+						else
+						{
+							if (canJump1block || canJump2blocks)
+							{
+								item->Animation.AnimNumber = object->animIndex + 22;
+								item->Animation.ActiveState = CYBORG_STATE_JUMP;
+								item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+								creature->MaxTurn = 0;
 
-					//TriggerEnergyArc((Vector3i*)& src, (Vector3i*)& src.x_rot, (GetRandomControl() & 7) + 8, 404701055, 13, 64, 3);
+								if (canJump2blocks)
+									item->Animation.TargetState = CYBORG_STATE_JUMP_2_BLOCKS;
+
+								creature->LOT.IsJumping = true;
+							}
+							else if (!creature->MonkeySwingAhead)
+							{
+								if (creature->Mood != MoodType::Bored)
+								{
+									if (AI.distance < pow(SECTOR(3), 2) || item->AIBits & FOLLOW)
+										item->Animation.TargetState = CYBORG_STATE_WALK;
+									else
+										item->Animation.TargetState = CYBORG_STATE_RUN;
+								}
+								else
+									item->Animation.TargetState = CYBORG_STATE_IDLE;
+							}
+							else
+							{
+								probe = GetCollision(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, roomNumber);
+								roomNumber = probe.RoomNumber;
+								height = probe.Position.Floor;
+
+								if (probe.Position.Ceiling == height - SECTOR(1.5f))
+									item->Animation.TargetState = CYBORG_STATE_START_END_MONKEY;
+								else
+									item->Animation.TargetState = CYBORG_STATE_WALK;
+							}
+						}
+					}
 				}
-			}
 
-			if (item->HitPoints > 0)
-			{
-				AI_INFO laraAI;
-				if (creature->Enemy == LaraItem)
+				break;
+
+			case CYBORG_STATE_WALK:
+				creature->MaxTurn = ANGLE(5.0f);
+				creature->LOT.IsJumping = false;
+
+				if (Targetable(item, &AI) &&
+					(AI.distance < pow(SECTOR(4), 2) ||
+						AI.zoneNumber != AI.enemyZone))
 				{
-					laraAI.angle = AI.angle;
-					laraAI.distance = AI.distance;
+					item->Animation.TargetState = CYBORG_STATE_IDLE;
+					item->Animation.RequiredState = CYBORG_STATE_AIM;
 				}
 				else
 				{
-					int dx = LaraItem->Pose.Position.x - item->Pose.Position.x;
-					int dz = LaraItem->Pose.Position.z - item->Pose.Position.z;
-					laraAI.angle = phd_atan(dz, dx) - item->Pose.Orientation.y;
-					laraAI.distance = pow(dx, 2) + pow(dz, 2);
-				}
-
-				GetCreatureMood(item, &AI, creature->Enemy != LaraItem);
-
-				if (TestEnvironment(ENV_FLAG_NO_LENSFLARE, item)) // Gassed room?
-				{
-					if (!(GlobalCounter & 7))
-						item->HitPoints--;
-
-					creature->Mood = MoodType::Escape;
-
-					if (item->HitPoints <= 0)
-					{
-						item->Animation.ActiveState = CYBORG_STATE_GASSED;
-						item->Animation.AnimNumber = object->animIndex + 68;
-						item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-					}
-				}
-
-				CreatureMood(item, &AI, creature->Enemy != LaraItem);
-
-				angle = CreatureTurn(item, creature->MaxTurn);
-
-				if (laraAI.distance < pow(SECTOR(2), 2) &&
-					LaraItem->Animation.Velocity.z > 20 ||
-					item->HitStatus ||
-					TargetVisible(item, &laraAI))
-				{
-					if (!(item->AIBits & FOLLOW))
-					{
-						creature->Enemy = LaraItem;
-						AlertAllGuards(itemNumber);
-					}
-				}
-
-				int height;
-
-				switch (item->Animation.ActiveState)
-				{
-				case CYBORG_STATE_IDLE:
-					creature->MaxTurn = 0;
-					creature->Flags = 0;
-					creature->LOT.IsJumping = false;
-					joint2 = laraAI.angle;
-
-					if (AI.ahead && item->AIBits != GUARD)
-					{
-						joint0 = AI.angle / 2;
-						joint1 = AI.xAngle;
-					}
-
-					if (item->Animation.RequiredState)
-						item->Animation.TargetState = item->Animation.RequiredState;
-					else
-					{
-						if (item->AIBits & GUARD)
-						{
-							joint2 = AIGuard(creature);
-
-							if (item->AIBits & PATROL1)
-							{
-								item->TriggerFlags--;
-								if (item->TriggerFlags < 1)
-									item->AIBits |= PATROL1;
-							}
-						}
-						else if (Targetable(item, &AI))
-						{
-							if (AI.distance < pow(SECTOR(4), 2) || AI.zoneNumber != AI.enemyZone)
-								item->Animation.TargetState = CYBORG_STATE_AIM;
-							else if (item->AIBits != MODIFY)
-								item->Animation.TargetState = CYBORG_STATE_WALK;
-						}
-						else
-						{
-							if (item->AIBits & PATROL1)
-								item->Animation.TargetState = CYBORG_STATE_WALK;
-							else
-							{
-								if (canJump1block || canJump2blocks)
-								{
-									item->Animation.AnimNumber = object->animIndex + 22;
-									item->Animation.ActiveState = CYBORG_STATE_JUMP;
-									item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-									creature->MaxTurn = 0;
-
-									if (canJump2blocks)
-										item->Animation.TargetState = CYBORG_STATE_JUMP_2_BLOCKS;
-
-									creature->LOT.IsJumping = true;
-								}
-								else if (!creature->MonkeySwingAhead)
-								{
-									if (creature->Mood != MoodType::Bored)
-									{
-										if (AI.distance < pow(SECTOR(3), 2) || item->AIBits & FOLLOW)
-											item->Animation.TargetState = CYBORG_STATE_WALK;
-										else
-											item->Animation.TargetState = CYBORG_STATE_RUN;
-									}
-									else
-										item->Animation.TargetState = CYBORG_STATE_IDLE;
-								}
-								else
-								{
-									probe = GetCollision(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, roomNumber);
-									roomNumber = probe.RoomNumber;
-									height = probe.Position.Floor;
-
-									if (probe.Position.Ceiling == height - SECTOR(1.5f))
-										item->Animation.TargetState = CYBORG_STATE_START_END_MONKEY;
-									else
-										item->Animation.TargetState = CYBORG_STATE_WALK;
-								}
-							}
-						}
-					}
-
-					break;
-
-				case CYBORG_STATE_WALK:
-					creature->MaxTurn = ANGLE(5.0f);
-					creature->LOT.IsJumping = false;
-
-					if (Targetable(item, &AI) &&
-						(AI.distance < pow(SECTOR(4), 2) ||
-							AI.zoneNumber != AI.enemyZone))
-					{
-						item->Animation.TargetState = CYBORG_STATE_IDLE;
-						item->Animation.RequiredState = CYBORG_STATE_AIM;
-					}
-					else
-					{
-						if (canJump1block || canJump2blocks)
-						{
-							item->Animation.AnimNumber = object->animIndex + 22;
-							item->Animation.ActiveState = CYBORG_STATE_JUMP;
-							item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-							creature->MaxTurn = 0;
-
-							if (canJump2blocks)
-								item->Animation.TargetState = CYBORG_STATE_JUMP_2_BLOCKS;
-
-							creature->LOT.IsJumping = true;
-						}
-						else if (!creature->MonkeySwingAhead)
-						{
-							if (AI.distance >= pow(SECTOR(1), 2))
-							{
-								if (AI.distance > pow(SECTOR(3), 2))
-								{
-									if (!item->AIBits)
-										item->Animation.TargetState = CYBORG_STATE_RUN;
-								}
-							}
-							else
-								item->Animation.TargetState = CYBORG_STATE_IDLE;
-						}
-						else
-							item->Animation.TargetState = CYBORG_STATE_IDLE;
-					}
-
-					break;
-
-				case CYBORG_STATE_RUN:
-					creature->MaxTurn = ANGLE(10.0f);
-					creature->LOT.IsJumping = false;
-
-					if (Targetable(item, &AI) &&
-						(AI.distance < pow(SECTOR(4), 2) ||
-							AI.zoneNumber != AI.enemyZone))
-					{
-						item->Animation.TargetState = CYBORG_STATE_IDLE;
-						item->Animation.RequiredState = CYBORG_STATE_AIM;
-					}
-					else if (canJump1block || canJump2blocks)
+					if (canJump1block || canJump2blocks)
 					{
 						item->Animation.AnimNumber = object->animIndex + 22;
 						item->Animation.ActiveState = CYBORG_STATE_JUMP;
@@ -490,224 +452,265 @@ namespace TEN::Entities::Creatures::TR5
 
 						creature->LOT.IsJumping = true;
 					}
-					else
+					else if (!creature->MonkeySwingAhead)
 					{
-						if (creature->MonkeySwingAhead)
-							item->Animation.TargetState = CYBORG_STATE_IDLE;
-						else if (AI.distance < pow(SECTOR(3), 2))
-							item->Animation.TargetState = CYBORG_STATE_WALK;
-					}
-
-					break;
-
-				case CYBORG_STATE_START_END_MONKEY:
-					creature->MaxTurn = 0;
-
-					if (item->BoxNumber == creature->LOT.TargetBox ||
-						!creature->MonkeySwingAhead)
-					{
-						probe = GetCollision(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, roomNumber);
-						roomNumber = probe.RoomNumber;
-						height = probe.Position.Floor;
-
-						if (probe.Position.Ceiling == height - SECTOR(1.5f), 2)
-							item->Animation.TargetState = CYBORG_STATE_IDLE;
-					}
-					else
-						item->Animation.TargetState = CYBORG_STATE_MONKEY;
-
-					break;
-
-				case CYBORG_STATE_MONKEY:
-					creature->MaxTurn = ANGLE(5.0f);
-					creature->LOT.IsMonkeying = true;
-					creature->LOT.IsJumping = true;
-
-					if (item->BoxNumber == creature->LOT.TargetBox ||
-						!creature->MonkeySwingAhead)
-					{
-						probe = GetCollision(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, roomNumber);
-						roomNumber = probe.RoomNumber;
-						height = probe.Position.Floor;
-
-						if (probe.Position.Ceiling == height - SECTOR(1.5f), 2)
-							item->Animation.TargetState = CYBORG_STATE_START_END_MONKEY;
-					}
-
-					break;
-
-				case CYBORG_STATE_AIM:
-					creature->MaxTurn = 0;
-					creature->Flags = 0;
-					joint0 = laraAI.angle / 2;
-					joint2 = laraAI.angle / 2;
-
-					if (AI.ahead)
-						joint1 = AI.xAngle;
-
-					if (abs(AI.angle) >= ANGLE(2.0f))
-					{
-						if (AI.angle >= 0)
-							item->Pose.Orientation.y += ANGLE(2.0f);
+						if (AI.distance >= pow(SECTOR(1), 2))
+						{
+							if (AI.distance > pow(SECTOR(3), 2))
+							{
+								if (!item->AIBits)
+									item->Animation.TargetState = CYBORG_STATE_RUN;
+							}
+						}
 						else
-							item->Pose.Orientation.y -= ANGLE(2.0f);
+							item->Animation.TargetState = CYBORG_STATE_IDLE;
 					}
-					else
-						item->Pose.Orientation.y += AI.angle;
-
-					if (Targetable(item, &AI) &&
-						(AI.distance < pow(SECTOR(4), 2) ||
-							AI.zoneNumber != AI.enemyZone))
-						item->Animation.TargetState = CYBORG_STATE_FIRE;
 					else
 						item->Animation.TargetState = CYBORG_STATE_IDLE;
+				}
 
-					break;
+				break;
 
-				case CYBORG_STATE_FIRE:
-					joint0 = laraAI.angle / 2;
-					joint2 = laraAI.angle / 2;
+			case CYBORG_STATE_RUN:
+				creature->MaxTurn = ANGLE(10.0f);
+				creature->LOT.IsJumping = false;
 
-					if (AI.ahead)
-						joint1 = AI.xAngle;
-
+				if (Targetable(item, &AI) &&
+					(AI.distance < pow(SECTOR(4), 2) ||
+						AI.zoneNumber != AI.enemyZone))
+				{
+					item->Animation.TargetState = CYBORG_STATE_IDLE;
+					item->Animation.RequiredState = CYBORG_STATE_AIM;
+				}
+				else if (canJump1block || canJump2blocks)
+				{
+					item->Animation.AnimNumber = object->animIndex + 22;
+					item->Animation.ActiveState = CYBORG_STATE_JUMP;
+					item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 					creature->MaxTurn = 0;
 
-					if (abs(AI.angle) >= ANGLE(2.0f))
-					{
-						if (AI.angle >= 0)
-							item->Pose.Orientation.y += ANGLE(2.0f);
-						else
-							item->Pose.Orientation.y -= ANGLE(2.0f);
-					}
+					if (canJump2blocks)
+						item->Animation.TargetState = CYBORG_STATE_JUMP_2_BLOCKS;
+
+					creature->LOT.IsJumping = true;
+				}
+				else
+				{
+					if (creature->MonkeySwingAhead)
+						item->Animation.TargetState = CYBORG_STATE_IDLE;
+					else if (AI.distance < pow(SECTOR(3), 2))
+						item->Animation.TargetState = CYBORG_STATE_WALK;
+				}
+
+				break;
+
+			case CYBORG_STATE_START_END_MONKEY:
+				creature->MaxTurn = 0;
+
+				if (item->BoxNumber == creature->LOT.TargetBox ||
+					!creature->MonkeySwingAhead)
+				{
+					probe = GetCollision(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, roomNumber);
+					roomNumber = probe.RoomNumber;
+					height = probe.Position.Floor;
+
+					if (probe.Position.Ceiling == height - SECTOR(1.5f), 2)
+						item->Animation.TargetState = CYBORG_STATE_IDLE;
+				}
+				else
+					item->Animation.TargetState = CYBORG_STATE_MONKEY;
+
+				break;
+
+			case CYBORG_STATE_MONKEY:
+				creature->MaxTurn = ANGLE(5.0f);
+				creature->LOT.IsMonkeying = true;
+				creature->LOT.IsJumping = true;
+
+				if (item->BoxNumber == creature->LOT.TargetBox ||
+					!creature->MonkeySwingAhead)
+				{
+					probe = GetCollision(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, roomNumber);
+					roomNumber = probe.RoomNumber;
+					height = probe.Position.Floor;
+
+					if (probe.Position.Ceiling == height - SECTOR(1.5f), 2)
+						item->Animation.TargetState = CYBORG_STATE_START_END_MONKEY;
+				}
+
+				break;
+
+			case CYBORG_STATE_AIM:
+				creature->MaxTurn = 0;
+				creature->Flags = 0;
+				joint0 = laraAI.angle / 2;
+				joint2 = laraAI.angle / 2;
+
+				if (AI.ahead)
+					joint1 = AI.xAngle;
+
+				if (abs(AI.angle) >= ANGLE(2.0f))
+				{
+					if (AI.angle >= 0)
+						item->Pose.Orientation.y += ANGLE(2.0f);
 					else
-						item->Pose.Orientation.y += AI.angle;
+						item->Pose.Orientation.y -= ANGLE(2.0f);
+				}
+				else
+					item->Pose.Orientation.y += AI.angle;
 
-					if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 6 &&
-						item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].frameBase + 16 &&
-						((byte)item->Animation.FrameNumber - (byte)g_Level.Anims[item->Animation.AnimNumber].frameBase) & 1)
-					{
-						creature->FiredWeapon = 1;
-						ShotLara(item, &AI, CyborgGunBite, joint0, 12);
-					}
+				if (Targetable(item, &AI) &&
+					(AI.distance < pow(SECTOR(4), 2) ||
+						AI.zoneNumber != AI.enemyZone))
+					item->Animation.TargetState = CYBORG_STATE_FIRE;
+				else
+					item->Animation.TargetState = CYBORG_STATE_IDLE;
 
-					break;
+				break;
 
-				default:
-					break;
+			case CYBORG_STATE_FIRE:
+				joint0 = laraAI.angle / 2;
+				joint2 = laraAI.angle / 2;
+
+				if (AI.ahead)
+					joint1 = AI.xAngle;
+
+				creature->MaxTurn = 0;
+
+				if (abs(AI.angle) >= ANGLE(2.0f))
+				{
+					if (AI.angle >= 0)
+						item->Pose.Orientation.y += ANGLE(2.0f);
+					else
+						item->Pose.Orientation.y -= ANGLE(2.0f);
+				}
+				else
+					item->Pose.Orientation.y += AI.angle;
+
+				if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 6 &&
+					item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].frameBase + 16 &&
+					((byte)item->Animation.FrameNumber - (byte)g_Level.Anims[item->Animation.AnimNumber].frameBase) & 1)
+				{
+					creature->FiredWeapon = 1;
+					ShotLara(item, &AI, CyborgGunBite, joint0, 12);
+				}
+
+				break;
+
+			default:
+				break;
+			}
+		}
+		else if (item->Animation.ActiveState == 43 && !Lara.Burn)
+		{
+			auto pos = GetJointPosition(LaraItem, LM_LFOOT);
+
+			short roomNumberLeft = LaraItem->RoomNumber;
+			GetFloor(pos.x, pos.y, pos.z, &roomNumberLeft);
+
+			pos = GetJointPosition(LaraItem, LM_RFOOT);
+			short roomNumberRight = LaraItem->RoomNumber;
+			GetFloor(pos.x, pos.y, pos.z, &roomNumberRight);
+
+			auto* roomRight = &g_Level.Rooms[roomNumberRight];
+			auto* roomLeft = &g_Level.Rooms[roomNumberLeft];
+
+			short flipNumber = g_Level.Rooms[item->RoomNumber].flipNumber;
+
+			if (TestEnvironment(ENV_FLAG_WATER, roomRight->flags) ||
+				TestEnvironment(ENV_FLAG_WATER, roomLeft->flags))
+			{
+				if (roomLeft->flipNumber == flipNumber || roomRight->flipNumber == flipNumber)
+				{
+					LaraBurn(creature->Enemy);
+					DoDamage(creature->Enemy, INT_MAX);
+					Lara.BurnCount = 48;
+					Lara.BurnBlue = 1;
 				}
 			}
-			else if (item->Animation.ActiveState == 43 && !Lara.Burn)
+		}
+
+		CreatureJoint(item, 0, joint0);
+		CreatureJoint(item, 1, joint1);
+		CreatureJoint(item, 2, joint2);
+
+		if (creature->ReachedGoal)
+		{
+			if (creature->Enemy)
 			{
-				auto pos = GetJointPosition(LaraItem, LM_LFOOT);
+				TestTriggers(
+					creature->Enemy->Pose.Position.x,
+					creature->Enemy->Pose.Position.y,
+					creature->Enemy->Pose.Position.z, roomNumber, true);
 
-				short roomNumberLeft = LaraItem->RoomNumber;
-				GetFloor(pos.x, pos.y, pos.z, &roomNumberLeft);
+				item->Animation.RequiredState = CYBORG_STATE_WALK;
 
-				pos = GetJointPosition(LaraItem, LM_RFOOT);
-				short roomNumberRight = LaraItem->RoomNumber;
-				GetFloor(pos.x, pos.y, pos.z, &roomNumberRight);
+				if (creature->Enemy->Flags & 2)
+					item->ItemFlags[3] = (creature->Tosspad & 0xFF) - 1;
 
-				auto* roomRight = &g_Level.Rooms[roomNumberRight];
-				auto* roomLeft = &g_Level.Rooms[roomNumberLeft];
-
-				short flipNumber = g_Level.Rooms[item->RoomNumber].flipNumber;
-
-				if (TestEnvironment(ENV_FLAG_WATER, roomRight->flags) ||
-					TestEnvironment(ENV_FLAG_WATER, roomLeft->flags))
+				if (creature->Enemy->Flags & 8)
 				{
-					if (roomLeft->flipNumber == flipNumber || roomRight->flipNumber == flipNumber)
-					{
-						LaraBurn(creature->Enemy);
-						DoDamage(creature->Enemy, INT_MAX);
-						Lara.BurnCount = 48;
-						Lara.BurnBlue = 1;
-					}
+					item->Animation.RequiredState = CYBORG_STATE_IDLE;
+					item->TriggerFlags = 300;
+					item->AIBits = GUARD | PATROL1;
 				}
+
+				item->ItemFlags[3]++;
+				creature->ReachedGoal = false;
+				creature->Enemy = nullptr;
 			}
+		}
 
-			CreatureJoint(item, 0, joint0);
-			CreatureJoint(item, 1, joint1);
-			CreatureJoint(item, 2, joint2);
-
-			if (creature->ReachedGoal)
+		if (item->Animation.ActiveState >= 15 || item->Animation.ActiveState == 5)
+			CreatureAnimation(itemNumber, angle, 0);
+		else
+		{
+			switch (CreatureVault(itemNumber, angle, 2, 260) + 4)
 			{
-				if (creature->Enemy)
-				{
-					TestTriggers(
-						creature->Enemy->Pose.Position.x,
-						creature->Enemy->Pose.Position.y,
-						creature->Enemy->Pose.Position.z, roomNumber, true);
+			case 0:
+				item->Animation.AnimNumber = object->animIndex + 35;
+				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+				item->Animation.ActiveState = 25;
+				creature->MaxTurn = 0;
+				break;
 
-					item->Animation.RequiredState = CYBORG_STATE_WALK;
+			case 1:
+				item->Animation.AnimNumber = object->animIndex + 41;
+				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+				item->Animation.ActiveState = 24;
+				creature->MaxTurn = 0;
+				break;
 
-					if (creature->Enemy->Flags & 2)
-						item->ItemFlags[3] = (creature->Tosspad & 0xFF) - 1;
+			case 2:
+				item->Animation.AnimNumber = object->animIndex + 42;
+				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+				item->Animation.ActiveState = 23;
+				creature->MaxTurn = 0;
+				break;
 
-					if (creature->Enemy->Flags & 8)
-					{
-						item->Animation.RequiredState = CYBORG_STATE_IDLE;
-						item->TriggerFlags = 300;
-						item->AIBits = GUARD | PATROL1;
-					}
+			case 6:
+				item->Animation.AnimNumber = object->animIndex + 29;
+				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+				item->Animation.ActiveState = 19;
+				creature->MaxTurn = 0;
+				break;
 
-					item->ItemFlags[3]++;
-					creature->ReachedGoal = false;
-					creature->Enemy = nullptr;
-				}
-			}
+			case 7:
+				item->Animation.AnimNumber = object->animIndex + 28;
+				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+				item->Animation.ActiveState = 18;
+				creature->MaxTurn = 0;
+				break;
 
-			if (item->Animation.ActiveState >= 15 || item->Animation.ActiveState == 5)
-				CreatureAnimation(itemNumber, angle, 0);
-			else
-			{
-				switch (CreatureVault(itemNumber, angle, 2, 260) + 4)
-				{
-				case 0:
-					item->Animation.AnimNumber = object->animIndex + 35;
-					item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-					item->Animation.ActiveState = 25;
-					creature->MaxTurn = 0;
-					break;
+			case 8:
+				item->Animation.AnimNumber = object->animIndex + 27;
+				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+				item->Animation.ActiveState = 17;
+				creature->MaxTurn = 0;
+				break;
 
-				case 1:
-					item->Animation.AnimNumber = object->animIndex + 41;
-					item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-					item->Animation.ActiveState = 24;
-					creature->MaxTurn = 0;
-					break;
-
-				case 2:
-					item->Animation.AnimNumber = object->animIndex + 42;
-					item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-					item->Animation.ActiveState = 23;
-					creature->MaxTurn = 0;
-					break;
-
-				case 6:
-					item->Animation.AnimNumber = object->animIndex + 29;
-					item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-					item->Animation.ActiveState = 19;
-					creature->MaxTurn = 0;
-					break;
-
-				case 7:
-					item->Animation.AnimNumber = object->animIndex + 28;
-					item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-					item->Animation.ActiveState = 18;
-					creature->MaxTurn = 0;
-					break;
-
-				case 8:
-					item->Animation.AnimNumber = object->animIndex + 27;
-					item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-					item->Animation.ActiveState = 17;
-					creature->MaxTurn = 0;
-					break;
-
-				default:
-					return;
-				}
+			default:
+				return;
 			}
 		}
 	}
