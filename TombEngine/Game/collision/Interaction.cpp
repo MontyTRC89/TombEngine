@@ -64,7 +64,7 @@ using namespace TEN::Math;
 		auto relPos = Vector3::Transform(direction, rotMatrix);
 
 		// Check whether interacting entity is inside interaction bounds.
-		auto bounds = basis.Bounds + boundsExtension;
+		static auto bounds = basis.Bounds + boundsExtension;
 		if (relPos.x < bounds.X1 || relPos.x > bounds.X2 ||
 			relPos.y < bounds.Y1 || relPos.y > bounds.Y2 ||
 			relPos.z < bounds.Z1 || relPos.z > bounds.Z2)

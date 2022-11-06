@@ -183,7 +183,13 @@ namespace TEN::Entities::Generic
 				//if (AlignPlayerToEntity(&ladderItem, laraItem, mountOffset, LadderMountRightOrient))
 				if (!laraItem->OffsetBlend.IsActive)
 				{
-					auto targetPos = Geometry::TranslatePoint(ladderItem.Pose.Position, ladderItem.Pose.Orientation, mountOffset);
+					auto heightOffset = Vector3i(
+						0,
+						0,//fmod(ladderItem.Pose.Position.y - laraItem->Pose.Position.y, LADDER_STEP_HEIGHT) * LADDER_STEP_HEIGHT,
+						0
+					);
+
+					auto targetPos = Geometry::TranslatePoint(ladderItem.Pose.Position + heightOffset, ladderItem.Pose.Orientation, mountOffset);
 					auto posOffset = (targetPos - laraItem->Pose.Position).ToVector3();
 					auto orientOffset = (ladderItem.Pose.Orientation + LadderMountRightBasis.OrientOffset) - laraItem->Pose.Orientation;
 					laraItem->SetOffsetBlend(posOffset, orientOffset);
