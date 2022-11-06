@@ -185,7 +185,7 @@ namespace TEN::Entities::Generic
 				{
 					auto heightOffset = Vector3i(
 						0,
-						0,//fmod(ladderItem.Pose.Position.y - laraItem->Pose.Position.y, LADDER_STEP_HEIGHT) * LADDER_STEP_HEIGHT,
+						round(laraItem->Pose.Position.y / ladderItem.Pose.Position.y) * LADDER_STEP_HEIGHT, // Target closest step on ladder.
 						0
 					);
 
