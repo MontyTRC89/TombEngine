@@ -1,7 +1,11 @@
 #include "framework.h"
-#include "Game/collision/InteractionBasis.h"
+#include "Game/collision/Interaction.h"
 
+#include "Game/collision/collide_room.h"
+#include "Game/control/control.h"
 #include "Game/items.h"
+#include "Game/Lara/lara.h"
+#include "Game/Lara/lara_helpers.h"
 #include "Math/Math.h"
 
 using namespace TEN::Math;
@@ -82,5 +86,56 @@ using namespace TEN::Math;
 		auto absPosOffset = (targetPos - entityFrom.Pose.Position).ToVector3();
 		auto absOrientOffset = targetOrient - entityFrom.Pose.Orientation;
 		entityFrom.SetOffsetBlend(absPosOffset, absOrientOffset);
+	}
+
+	void SetPlayerAlignAnimation(ItemInfo& playerEntity, const ItemInfo& entity)
+	{
+		auto& lara = *GetLaraInfo(&playerEntity);
+
+		// Check water status.
+		if (lara.Control.WaterStatus == WaterStatus::Underwater ||
+			lara.Control.WaterStatus == WaterStatus::TreadWater)
+		{
+			return;
+		}
+
+		// Check if already aligning.
+		if (lara.Control.IsMoving)
+			return;
+
+		float distance = Vector3i::Distance(playerEntity.Pose.Position, entity.Pose.Position);
+		bool doAlignAnim = ((distance - LARA_ALIGN_VELOCITY) > (LARA_ALIGN_VELOCITY * ANIMATED_ALIGNMENT_FRAME_COUNT_THRESHOLD));
+
+		// Skip animating if very close to the object.
+		if (!doAlignAnim)
+			return;
+
+		short headingAngle = Geometry::GetOrientToPoint(playerEntity.Pose.Position.ToVector3(), entity.Pose.Position.ToVector3()).y;
+		int direction = GetQuadrant(headingAngle - playerEntity.Pose.Orientation.y);
+
+		// Set appropriate animation.
+		switch (direction)
+		{
+		default:
+		case NORTH:
+			SetAnimation(&playerEntity, LA_WALK);
+			break;
+
+		case SOUTH:
+			SetAnimation(&playerEntity, LA_WALK_BACK);
+			break;
+
+		case EAST:
+			SetAnimation(&playerEntity, LA_SIDESTEP_RIGHT);
+			break;
+
+		case WEST:
+			SetAnimation(&playerEntity, LA_SIDESTEP_LEFT);
+			break;
+		}
+
+		lara.Control.HandStatus = HandStatus::Busy;
+		lara.Control.IsMoving = true;
+		lara.Control.Count.PositionAdjust = 0;
 	}
 //}

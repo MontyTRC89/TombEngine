@@ -7,6 +7,8 @@ struct ItemInfo;
 
 //namespace TEN::Collision
 //{
+	constexpr auto ANIMATED_ALIGNMENT_FRAME_COUNT_THRESHOLD = 6;
+
 	struct InteractionBasis
 	{
 		Vector3i							PosOffset		 = Vector3i::Zero;
@@ -22,4 +24,8 @@ struct ItemInfo;
 
 	bool TestEntityInteraction(const ItemInfo& entityFrom, const ItemInfo& entityTo, const InteractionBasis& basis, const GameBoundingBox& boundsExtension = GameBoundingBox::Zero);
 	void SetEntityInteraction(ItemInfo& entityFrom, const ItemInfo& entityTo, const InteractionBasis& basis, const Vector3i& extraPosOffset = Vector3i::Zero, const EulerAngles& extraOrientOffset = EulerAngles::Zero);
+	void SetPlayerAlignAnimation(ItemInfo& playerEntity, const ItemInfo& entity);
+
+	bool AlignPlayerToEntity(ItemInfo& playerEntity, const ItemInfo& entity, const Vector3i& posOffset = Vector3i::Zero, const EulerAngles& orientOffset = EulerAngles::Zero, bool doSnapAlign = false);
+	bool AlignPlayerToPose(ItemInfo* item, const Pose& toPose, float velocity, short turnRate);
 //}

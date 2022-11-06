@@ -1,10 +1,9 @@
 #pragma once
-#include "Game/collision/InteractionBasis.h"
+#include "Game/collision/Interaction.h"
 #include "Math/Math.h"
 
 //using namespace TEN::Collision;
 using namespace TEN::Math;
-using std::pair;
 
 class InteractionBasis;
 class FloorInfo;

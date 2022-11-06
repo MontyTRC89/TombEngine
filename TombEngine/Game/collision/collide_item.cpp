@@ -4,7 +4,7 @@
 #include "Game/animation.h"
 #include "Game/control/los.h"
 #include "Game/collision/collide_room.h"
-#include "Game/collision/InteractionBasis.h"
+#include "Game/collision/Interaction.h"
 #include "Game/collision/sphere.h"
 #include "Game/effects/debris.h"
 #include "Game/effects/effects.h"
@@ -24,8 +24,6 @@
 //using namespace TEN::Collision;
 using namespace TEN::Math;
 using namespace TEN::Renderer;
-
-constexpr auto ANIMATED_ALIGNMENT_FRAME_COUNT_THRESHOLD = 6;
 
 GameBoundingBox GlobalCollisionBounds;
 ItemInfo* CollidedItems[MAX_COLLIDED_OBJECTS];
