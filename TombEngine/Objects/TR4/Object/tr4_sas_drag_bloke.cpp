@@ -71,19 +71,18 @@ void DragSASCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 	}
 	else
 	{
-		if (item->Status == ITEM_ACTIVE)
+		if (item->Status != ITEM_ACTIVE)
 		{
-
-			if (TestLastFrame(item))
-			{
-				auto pos = GetJointPosition(item, 0);
-				TestTriggers(pos.x, pos.y, pos.z, item->RoomNumber, true);
-				RemoveActiveItem(itemNumber);
-				item->Status = ITEM_DEACTIVATED;
-			}
-
+			ObjectCollision(itemNumber, laraItem, coll);
 			return;
 		}
-		ObjectCollision(itemNumber, laraItem, coll);
+
+		if (!TestLastFrame(item))
+			return;
+
+		auto pos = GetJointPosition(item, 0);
+		TestTriggers(pos.x, pos.y, pos.z, item->RoomNumber, true);
+		RemoveActiveItem(itemNumber);
+		item->Status = ITEM_DEACTIVATED;
 	}
 }
