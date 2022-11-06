@@ -11,4 +11,6 @@ namespace TEN::Entities::Generic
 	bool			TestLadderMount(const ItemInfo& ladderItem, ItemInfo& laraItem);
 	LadderMountType GetLadderMountType(ItemInfo& ladderItem, ItemInfo& laraItem);
 	void			DoLadderMount(const ItemInfo& ladderItem, ItemInfo& laraItem, LadderMountType mountType);
+
+	void DisplayLadderDebug(ItemInfo& ladderItem);
 }

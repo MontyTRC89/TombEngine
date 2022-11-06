@@ -12,11 +12,13 @@
 #include "Game/Lara/lara_struct.h"
 #include "Game/Lara/lara_tests.h"
 #include "Math/Math.h"
+#include "Renderer/Renderer11.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
 
 using namespace TEN::Input;
 using namespace TEN::Math;
+using namespace TEN::Renderer;
 
 namespace TEN::Entities::Generic
 {
@@ -57,78 +59,90 @@ namespace TEN::Entities::Generic
 		LS_JUMP_UP
 	};
 
-	const auto LadderMountedBaseOffset = Vector3i(0, 0, -BLOCK(1.0f / 7));
-	const auto LadderInteractBaseBounds = GameBoundingBox(
+	const auto LadderMountedOffset2D = Vector3i(0, 0, -BLOCK(1.0f / 7));
+	const auto LadderInteractBounds2D = GameBoundingBox(
 		-BLOCK(1.0f / 4), BLOCK(1.0f / 4),
 		0, 0,
 		-BLOCK(3.0f / 8), BLOCK(3.0f / 8)
 	);
 
 	const auto LadderMountTopFrontBasis = InteractionBasis(
-		LadderMountedBaseOffset, // TODO
+		LadderMountedOffset2D, // TODO
 		EulerAngles(0, ANGLE(180.0f), 0),
-		LadderInteractBaseBounds,
+		LadderInteractBounds2D,
 		std::pair(
 			EulerAngles(ANGLE(-10.0f), ANGLE(180.0f) - LARA_GRAB_THRESHOLD, ANGLE(-10.0f)),
 			EulerAngles(ANGLE(10.0f), ANGLE(180.0f) + LARA_GRAB_THRESHOLD, ANGLE(10.0f))
 		)
 	);
 	const auto LadderMountTopBackBasis = InteractionBasis(
-		LadderMountedBaseOffset, // TODO
+		LadderMountedOffset2D, // TODO
 		EulerAngles::Zero,
-		LadderInteractBaseBounds,
+		LadderInteractBounds2D,
 		std::pair(
 			EulerAngles(ANGLE(-10.0f), -LARA_GRAB_THRESHOLD, ANGLE(-10.0f)),
 			EulerAngles(ANGLE(10.0f), LARA_GRAB_THRESHOLD, ANGLE(10.0f))
 		)
 	);
 	const auto LadderMountFrontBasis = InteractionBasis(
-		LadderMountedBaseOffset,
+		LadderMountedOffset2D,
 		EulerAngles::Zero,
-		LadderInteractBaseBounds,
+		LadderInteractBounds2D,
 		std::pair(
 			EulerAngles(ANGLE(-10.0f), -LARA_GRAB_THRESHOLD, ANGLE(-10.0f)),
 			EulerAngles(ANGLE(10.0f), LARA_GRAB_THRESHOLD, ANGLE(10.0f))
 		)
 	);
 	const auto LadderMountBackBasis = InteractionBasis(
-		LadderMountedBaseOffset,
+		LadderMountedOffset2D,
 		EulerAngles(0, ANGLE(180.0f), 0),
-		LadderInteractBaseBounds,
+		LadderInteractBounds2D,
 		std::pair(
 			EulerAngles(ANGLE(-10.0f), ANGLE(180.0f) - LARA_GRAB_THRESHOLD, ANGLE(-10.0f)),
 			EulerAngles(ANGLE(10.0f), ANGLE(180.0f) + LARA_GRAB_THRESHOLD, ANGLE(10.0f))
 		)
 	);
 	const auto LadderMountLeftBasis = InteractionBasis(
-		LadderMountedBaseOffset + Vector3i(-BLOCK(1.0f / 4), 0, 0),
+		LadderMountedOffset2D + Vector3i(-BLOCK(1.0f / 4), 0, 0),
 		EulerAngles(0, ANGLE(90.0f), 0),
-		LadderInteractBaseBounds,
+		LadderInteractBounds2D,
 		std::pair(
 			EulerAngles(ANGLE(-10.0f), ANGLE(90.0f) - LARA_GRAB_THRESHOLD, ANGLE(-10.0f)),
 			EulerAngles(ANGLE(10.0f), ANGLE(90.0f) + LARA_GRAB_THRESHOLD, ANGLE(10.0f))
 		)
 	);
 	const auto LadderMountRightBasis = InteractionBasis(
-		LadderMountedBaseOffset + Vector3i(BLOCK(1.0f / 4), 0, 0),
+		LadderMountedOffset2D + Vector3i(BLOCK(1.0f / 4), 0, 0),
 		EulerAngles(0, ANGLE(-90.0f), 0),
-		LadderInteractBaseBounds,
+		LadderInteractBounds2D,
 		std::pair(
 			EulerAngles(ANGLE(-10.0f), ANGLE(-90.0f) - LARA_GRAB_THRESHOLD, ANGLE(-10.0f)),
 			EulerAngles(ANGLE(10.0f), ANGLE(-90.0f) + LARA_GRAB_THRESHOLD, ANGLE(10.0f))
 		)
 	);
 
+	void DisplayLadderDebug(ItemInfo& ladderItem)
+	{
+		auto ladderBounds = GameBoundingBox(&ladderItem);
+		auto ladderInteractBounds = LadderInteractBounds2D + GameBoundingBox(0, 0, ladderBounds.Y1, ladderBounds.Y2, 0, 0);
+
+		// Render interaction bounds.
+		auto box = ladderInteractBounds.ToBoundingOrientedBox(ladderItem.Pose);
+		g_Renderer.AddDebugBox(box, Vector4(0, 1, 1, 1), RENDERER_DEBUG_PAGE::NO_PAGE);
+	}
+
 	void LadderCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 	{
 		auto& ladderItem = g_Level.Items[itemNumber];
-		auto& player = *GetLaraInfo(laraItem);
+		auto& lara = *GetLaraInfo(laraItem);
+
+		DisplayLadderDebug(ladderItem);
 
 		// TODO!! This will be MUCH cleaner.
 		/*auto mountType = GetLadderMountType(ladderItem, *laraItem);
 		if (mountType != LadderMountType::None)
 		{
-			PerformLadderMount(ladderItem, *laraItem, mountType);
+			DoLadderMount(ladderItem, *laraItem, mountType);
 			return;
 		}*/
 
@@ -137,8 +151,8 @@ namespace TEN::Entities::Generic
 		// Mount while grounded.
 		if ((IsHeld(In::Action) && isFacingLadder &&
 			TestState(laraItem->Animation.ActiveState, LadderGroundedMountStates) &&
-			player.Control.HandStatus == HandStatus::Free) ||
-			(player.Control.IsMoving && player.InteractedItem == itemNumber))
+			lara.Control.HandStatus == HandStatus::Free) ||
+			(lara.Control.IsMoving && lara.InteractedItem == itemNumber))
 		{
 			auto ladderBounds = GameBoundingBox(&ladderItem);
 			auto boundsExtension = GameBoundingBox(0, 0, ladderBounds.Y1, ladderBounds.Y2 + LADDER_STEP_HEIGHT, 0, 0);
@@ -152,11 +166,11 @@ namespace TEN::Entities::Generic
 					SetEntityInteraction(*laraItem, ladderItem, LadderMountFrontBasis, boundsOffset);
 
 					SetAnimation(laraItem, LA_LADDER_MOUNT_FRONT);
-					player.Control.IsMoving = false;
-					player.Control.HandStatus = HandStatus::Busy;
+					lara.Control.IsMoving = false;
+					lara.Control.HandStatus = HandStatus::Busy;
 				}
 				else
-					player.InteractedItem = itemNumber;
+					lara.InteractedItem = itemNumber;
 
 				return;
 			}
@@ -174,11 +188,11 @@ namespace TEN::Entities::Generic
 					laraItem->SetOffsetBlend(posOffset, orientOffset);
 
 					SetAnimation(laraItem, LA_LADDER_MOUNT_FRONT);
-					player.Control.IsMoving = false;
-					player.Control.HandStatus = HandStatus::Busy;
+					lara.Control.IsMoving = false;
+					lara.Control.HandStatus = HandStatus::Busy;
 				}
 				else
-					player.InteractedItem = itemNumber;
+					lara.InteractedItem = itemNumber;
 
 				return;
 			}
@@ -203,19 +217,19 @@ namespace TEN::Entities::Generic
 					laraItem->SetOffsetBlend(posOffset, orientOffset);
 
 					SetAnimation(laraItem, LA_LADDER_MOUNT_RIGHT);
-					player.Control.IsMoving = false;
-					player.Control.HandStatus = HandStatus::Busy;
+					lara.Control.IsMoving = false;
+					lara.Control.HandStatus = HandStatus::Busy;
 				}
 				else
-					player.InteractedItem = itemNumber;
+					lara.InteractedItem = itemNumber;
 
 				return;
 			}
 
-			if (player.Control.IsMoving && player.InteractedItem == itemNumber)
+			if (lara.Control.IsMoving && lara.InteractedItem == itemNumber)
 			{
-				player.Control.HandStatus = HandStatus::Free;
-				player.Control.IsMoving = false;
+				lara.Control.HandStatus = HandStatus::Free;
+				lara.Control.IsMoving = false;
 			}
 
 			return;
@@ -226,7 +240,7 @@ namespace TEN::Entities::Generic
 			TestState(laraItem->Animation.ActiveState, LadderAirborneMountStates) &&
 			laraItem->Animation.IsAirborne &&
 			laraItem->Animation.Velocity.y > 0.0f &&
-			player.Control.HandStatus == HandStatus::Free)
+			lara.Control.HandStatus == HandStatus::Free)
 		{
 			// Test bounds collision.
 			if (TestBoundsCollide(&ladderItem, laraItem, coll->Setup.Radius))//LARA_RADIUS + (int)round(abs(laraItem->Animation.Velocity.z))))
@@ -238,7 +252,7 @@ namespace TEN::Entities::Generic
 					int playerVPos = laraItem->Pose.Position.y - LARA_HEIGHT;
 
 					int vOffset = -abs(playerVPos - ladderVPos) / LADDER_STEP_HEIGHT;
-					auto mountOffset = Vector3i(0, vOffset, ladderBounds.Z1) + LadderMountedBaseOffset;
+					auto mountOffset = Vector3i(0, vOffset, ladderBounds.Z1) + LadderMountedOffset2D;
 
 					if (AlignPlayerToEntity(&ladderItem, laraItem, mountOffset, LadderMountFrontBasis.OrientOffset, true))
 					{
@@ -251,7 +265,7 @@ namespace TEN::Entities::Generic
 
 						laraItem->Animation.IsAirborne = false;
 						laraItem->Animation.Velocity.y = 0.0f;
-						player.Control.HandStatus = HandStatus::Busy;
+						lara.Control.HandStatus = HandStatus::Busy;
 					}
 				}
 			}
@@ -269,7 +283,7 @@ namespace TEN::Entities::Generic
 
 	bool TestLadderMount(const ItemInfo& ladderItem, ItemInfo& laraItem)
 	{
-		const auto& player = *GetLaraInfo(&laraItem);
+		const auto& lara = *GetLaraInfo(&laraItem);
 
 		// Check for Action input action.
 		if (!IsHeld(In::Action))
@@ -280,7 +294,7 @@ namespace TEN::Entities::Generic
 			return false;
 
 		// Check hand status.
-		if (player.Control.HandStatus != HandStatus::Free)
+		if (lara.Control.HandStatus != HandStatus::Free)
 			return false;
 
 		// Check active player state.
@@ -292,7 +306,7 @@ namespace TEN::Entities::Generic
 
 	LadderMountType GetLadderMountType(ItemInfo& ladderItem, ItemInfo& laraItem)
 	{
-		const auto& player = *GetLaraInfo(&laraItem);
+		const auto& lara = *GetLaraInfo(&laraItem);
 
 		// Assesss ladder mountability.
 		if (!TestLadderMount(ladderItem, laraItem))
