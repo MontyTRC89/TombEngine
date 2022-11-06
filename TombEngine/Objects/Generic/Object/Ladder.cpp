@@ -57,62 +57,62 @@ namespace TEN::Entities::Generic
 		LS_JUMP_UP
 	};
 
-	const auto LadderMountedOffset = Vector3i(0, 0, -BLOCK(1.0f / 7));
-	const auto LadderInteractBounds = GameBoundingBox(
+	const auto LadderMountedBaseOffset = Vector3i(0, 0, -BLOCK(1.0f / 7));
+	const auto LadderInteractBaseBounds = GameBoundingBox(
 		-BLOCK(1.0f / 4), BLOCK(1.0f / 4),
-		-LADDER_STEP_HEIGHT, LADDER_STEP_HEIGHT, // TODO: Adapt to bounds height.
+		0, 0,
 		-BLOCK(3.0f / 8), BLOCK(3.0f / 8)
 	);
 
 	const auto LadderMountTopFrontBasis = InteractionBasis(
-		LadderMountedOffset, // TODO
+		LadderMountedBaseOffset, // TODO
 		EulerAngles(0, ANGLE(180.0f), 0),
-		LadderInteractBounds,
+		LadderInteractBaseBounds,
 		std::pair(
 			EulerAngles(ANGLE(-10.0f), ANGLE(180.0f) - LARA_GRAB_THRESHOLD, ANGLE(-10.0f)),
 			EulerAngles(ANGLE(10.0f), ANGLE(180.0f) + LARA_GRAB_THRESHOLD, ANGLE(10.0f))
 		)
 	);
 	const auto LadderMountTopBackBasis = InteractionBasis(
-		LadderMountedOffset, // TODO
+		LadderMountedBaseOffset, // TODO
 		EulerAngles::Zero,
-		LadderInteractBounds,
+		LadderInteractBaseBounds,
 		std::pair(
 			EulerAngles(ANGLE(-10.0f), -LARA_GRAB_THRESHOLD, ANGLE(-10.0f)),
 			EulerAngles(ANGLE(10.0f), LARA_GRAB_THRESHOLD, ANGLE(10.0f))
 		)
 	);
 	const auto LadderMountFrontBasis = InteractionBasis(
-		LadderMountedOffset,
+		LadderMountedBaseOffset,
 		EulerAngles::Zero,
-		LadderInteractBounds,
+		LadderInteractBaseBounds,
 		std::pair(
 			EulerAngles(ANGLE(-10.0f), -LARA_GRAB_THRESHOLD, ANGLE(-10.0f)),
 			EulerAngles(ANGLE(10.0f), LARA_GRAB_THRESHOLD, ANGLE(10.0f))
 		)
 	);
 	const auto LadderMountBackBasis = InteractionBasis(
-		LadderMountedOffset,
+		LadderMountedBaseOffset,
 		EulerAngles(0, ANGLE(180.0f), 0),
-		LadderInteractBounds,
+		LadderInteractBaseBounds,
 		std::pair(
 			EulerAngles(ANGLE(-10.0f), ANGLE(180.0f) - LARA_GRAB_THRESHOLD, ANGLE(-10.0f)),
 			EulerAngles(ANGLE(10.0f), ANGLE(180.0f) + LARA_GRAB_THRESHOLD, ANGLE(10.0f))
 		)
 	);
 	const auto LadderMountLeftBasis = InteractionBasis(
-		LadderMountedOffset + Vector3i(-BLOCK(1.0f / 4), 0, 0),
+		LadderMountedBaseOffset + Vector3i(-BLOCK(1.0f / 4), 0, 0),
 		EulerAngles(0, ANGLE(90.0f), 0),
-		LadderInteractBounds,
+		LadderInteractBaseBounds,
 		std::pair(
 			EulerAngles(ANGLE(-10.0f), ANGLE(90.0f) - LARA_GRAB_THRESHOLD, ANGLE(-10.0f)),
 			EulerAngles(ANGLE(10.0f), ANGLE(90.0f) + LARA_GRAB_THRESHOLD, ANGLE(10.0f))
 		)
 	);
 	const auto LadderMountRightBasis = InteractionBasis(
-		LadderMountedOffset + Vector3i(BLOCK(1.0f / 4), 0, 0),
+		LadderMountedBaseOffset + Vector3i(BLOCK(1.0f / 4), 0, 0),
 		EulerAngles(0, ANGLE(-90.0f), 0),
-		LadderInteractBounds,
+		LadderInteractBaseBounds,
 		std::pair(
 			EulerAngles(ANGLE(-10.0f), ANGLE(-90.0f) - LARA_GRAB_THRESHOLD, ANGLE(-10.0f)),
 			EulerAngles(ANGLE(10.0f), ANGLE(-90.0f) + LARA_GRAB_THRESHOLD, ANGLE(10.0f))
@@ -221,7 +221,7 @@ namespace TEN::Entities::Generic
 					int playerVPos = laraItem->Pose.Position.y - LARA_HEIGHT;
 
 					int vOffset = -abs(playerVPos - ladderVPos) / LADDER_STEP_HEIGHT;
-					auto mountOffset = Vector3i(0, vOffset, ladderBounds.Z1) + LadderMountedOffset;
+					auto mountOffset = Vector3i(0, vOffset, ladderBounds.Z1) + LadderMountedBaseOffset;
 
 					if (AlignPlayerToEntity(&ladderItem, laraItem, mountOffset, LadderMountFrontBasis.OrientOffset, true))
 					{
