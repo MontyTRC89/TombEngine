@@ -57,13 +57,13 @@ using namespace TEN::Math;
 
 		auto direction = (entityFrom.Pose.Position - entityTo.Pose.Position).ToVector3();
 		auto rotMatrix = entityTo.Pose.Orientation.ToRotationMatrix().Transpose(); // NOTE: Should be Invert(), but inverse/transpose of a rotation matrix are equal and transposing is faster.
-		auto relativePos = Vector3::Transform(direction, rotMatrix);
+		auto relPos = Vector3::Transform(direction, rotMatrix);
 
 		// Check whether interacting entity is inside interaction bounds.
 		auto bounds = basis.Bounds + boundsExtension;
-		if (relativePos.x < bounds.X1 || relativePos.x > bounds.X2 ||
-			relativePos.y < bounds.Y1 || relativePos.y > bounds.Y2 ||
-			relativePos.z < bounds.Z1 || relativePos.z > bounds.Z2)
+		if (relPos.x < bounds.X1 || relPos.x > bounds.X2 ||
+			relPos.y < bounds.Y1 || relPos.y > bounds.Y2 ||
+			relPos.z < bounds.Z1 || relPos.z > bounds.Z2)
 		{
 			return false;
 		}
