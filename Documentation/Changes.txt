@@ -28,7 +28,7 @@ Version 1.0.3
 * Fix search animations - allow chest and shelf animations to play properly.
 * Fix sarcophagus and its item pickup.
 * Fix underwater door and double doors continuing to be interactable after opening.
-* Fix underwater door being interactable when Underwater Switch is on the same square as underwater door (interference)
+* Fix underwater door being interactable when underwater switch is on the same square.
 * Fix ability to turn when aligning to an object while standing.
 * Fix left arm lock while picking up an item with a flare in hand.
 * Fix potential crashes when exiting game.
@@ -36,7 +36,7 @@ Version 1.0.3
 * Fix distance fog not applying properly to additive and subtractive surfaces.
 * Fix single-hand weapons not having a sound on draw and undraw.
 * Fix waterfall mist - it can now be disabled with antitrigger.
-* Fix Lara immediately playing underwater lever pull animation after interacting with underwater ceiling lever
+* Fix underwater lever pull animation playing after interacting with underwater ceiling switch.
 
 Version 1.0.2
 =============
