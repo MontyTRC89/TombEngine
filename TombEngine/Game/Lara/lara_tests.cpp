@@ -2693,7 +2693,7 @@ bool CanDismountLadderBack(ItemInfo* item, CollisionInfo* coll)
 
 bool TestLaraLadderSideDismount(ItemInfo* item, CollisionInfo* coll, bool isGoingLeft)
 {
-	static constexpr int probeDist	= BLOCK(3.0f / 8);
+	static constexpr int probeDist	= BLOCK(1.0f / 4);
 	static constexpr int floorBound = BLOCK(1.0f / 16);
 
 	int vPos = item->Pose.Position.y + GameBoundingBox(item).Y2;

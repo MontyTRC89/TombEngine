@@ -129,41 +129,21 @@ namespace TEN::Entities::Generic
 		DisplayLadderDebug(ladderItem);
 
 		// TODO!! This will be MUCH cleaner.
-		/*auto mountType = GetLadderMountType(ladderItem, *laraItem);
+		auto mountType = GetLadderMountType(ladderItem, *laraItem);
 		if (mountType != LadderMountType::None)
 		{
-			DoLadderMount(ladderItem, *laraItem, mountType);
-			return;
-		}*/
-
-		bool isFacingLadder = Geometry::IsPointInFront(laraItem->Pose, ladderItem.Pose.Position.ToVector3());
-
+			DoLadderMount(itemNumber, ladderItem, *laraItem, (LadderMountType)mountType);
+			//return;
+		}
+		
 		// Mount while grounded.
-		if ((IsHeld(In::Action) && isFacingLadder &&
+		if ((IsHeld(In::Action) &&
 			TestState(laraItem->Animation.ActiveState, LadderGroundedMountStates) &&
 			lara.Control.HandStatus == HandStatus::Free) ||
 			(lara.Control.IsMoving && lara.InteractedItem == itemNumber))
 		{
 			auto ladderBounds = GameBoundingBox(&ladderItem);
 			auto boundsExtension = GameBoundingBox(0, 0, ladderBounds.Y1, ladderBounds.Y2 + LADDER_STEP_HEIGHT, 0, 0);
-
-			// Mount from front.
-			if (TestEntityInteraction(*laraItem, ladderItem, LadderMountFrontBasis, boundsExtension))
-			{
-				if (!laraItem->OffsetBlend.IsActive)
-				{
-					auto boundsOffset = Vector3i(0, 0, GameBoundingBox(&ladderItem).Z1);
-					SetEntityInteraction(*laraItem, ladderItem, LadderMountFrontBasis, boundsOffset);
-
-					SetAnimation(laraItem, LA_LADDER_MOUNT_FRONT);
-					lara.Control.IsMoving = false;
-					lara.Control.HandStatus = HandStatus::Busy;
-				}
-				else
-					lara.InteractedItem = itemNumber;
-
-				return;
-			}
 
 			// Mount from back.
 			if (TestEntityInteraction(*laraItem, ladderItem, LadderMountBackBasis, boundsExtension))
@@ -187,35 +167,6 @@ namespace TEN::Entities::Generic
 				return;
 			}
 
-			// Mount from right.
-			if (TestEntityInteraction(*laraItem, ladderItem, LadderMountRightBasis, boundsExtension))
-			{
-				auto mountOffset = LadderMountRightBasis.PosOffset + Vector3i(0, 0, GameBoundingBox(&ladderItem).Z1);
-
-				//if (AlignPlayerToEntity(&ladderItem, laraItem, mountOffset, LadderMountRightOrient))
-				if (!laraItem->OffsetBlend.IsActive)
-				{
-					auto heightOffset = Vector3i(
-						0,
-						round(laraItem->Pose.Position.y / ladderItem.Pose.Position.y) * LADDER_STEP_HEIGHT, // Target closest step on ladder.
-						0
-					);
-
-					auto targetPos = Geometry::TranslatePoint(ladderItem.Pose.Position + heightOffset, ladderItem.Pose.Orientation, mountOffset);
-					auto posOffset = (targetPos - laraItem->Pose.Position).ToVector3();
-					auto orientOffset = (ladderItem.Pose.Orientation + LadderMountRightBasis.OrientOffset) - laraItem->Pose.Orientation;
-					laraItem->SetOffsetBlend(posOffset, orientOffset);
-
-					SetAnimation(laraItem, LA_LADDER_MOUNT_RIGHT);
-					lara.Control.IsMoving = false;
-					lara.Control.HandStatus = HandStatus::Busy;
-				}
-				else
-					lara.InteractedItem = itemNumber;
-
-				return;
-			}
-
 			if (lara.Control.IsMoving && lara.InteractedItem == itemNumber)
 			{
 				lara.Control.HandStatus = HandStatus::Free;
@@ -226,7 +177,7 @@ namespace TEN::Entities::Generic
 		}
 
 		// Mount while airborne.
-		if (TrInput & IN_ACTION && isFacingLadder &&
+		if (IsHeld(In::Action) &&
 			TestState(laraItem->Animation.ActiveState, LadderAirborneMountStates) &&
 			laraItem->Animation.IsAirborne &&
 			laraItem->Animation.Velocity.y > 0.0f &&
@@ -291,7 +242,17 @@ namespace TEN::Entities::Generic
 			return LadderMountType::TopBack;
 
 		if (TestEntityInteraction(laraItem, ladderItem, LadderMountFrontBasis, boundsExtension))
+		{
+			if (laraItem.Animation.IsAirborne && laraItem.Animation.Velocity.y > 0.0f)
+			{
+				if (laraItem.Animation.ActiveState == LS_JUMP_UP)
+					return LadderMountType::JumpUp;
+				else if (laraItem.Animation.ActiveState == LS_REACH)
+					return LadderMountType::JumpReach;
+			}
+
 			return LadderMountType::Front;
+		}
 
 		if (TestEntityInteraction(laraItem, ladderItem, LadderMountBackBasis, boundsExtension))
 			return LadderMountType::Back;
@@ -325,6 +286,8 @@ namespace TEN::Entities::Generic
 		if (!TestState(laraItem.Animation.ActiveState, LadderGroundedMountStates))
 			return false;
 
+		// Check that the ladder is in front.
+
 		return true;
 	}
 
@@ -336,7 +299,9 @@ namespace TEN::Entities::Generic
 		if (laraItem.OffsetBlend.IsActive)
 			lara.InteractedItem = itemNumber;
 
-		/*switch (mountType)
+		auto ladderBounds = GameBoundingBox(&ladderItem);
+
+		switch (mountType)
 		{
 		default:
 		case LadderMountType::None:
@@ -346,7 +311,7 @@ namespace TEN::Entities::Generic
 		case LadderMountType::TopBack:
 		case LadderMountType::Front:
 		{
-			auto boundsOffset = Vector3i(0, 0, GameBoundingBox(&ladderItem).Z1);
+			auto boundsOffset = Vector3i(0, 0, ladderBounds.Z1);
 			SetEntityInteraction(laraItem, ladderItem, LadderMountFrontBasis, boundsOffset);
 
 			SetAnimation(&laraItem, LA_LADDER_MOUNT_FRONT);
@@ -356,9 +321,23 @@ namespace TEN::Entities::Generic
 		case LadderMountType::Back:
 		case LadderMountType::Left:
 		case LadderMountType::Right:
+		{
+			auto boundsOffset = Vector3i(0, 0, GameBoundingBox(&ladderItem).Z1) +
+				Vector3i(
+				0,
+				round(laraItem.Pose.Position.y / ladderItem.Pose.Position.y) * LADDER_STEP_HEIGHT, // Target closest step on ladder.
+				0
+			);
+			SetEntityInteraction(laraItem, ladderItem, LadderMountRightBasis, boundsOffset);
+
+			SetAnimation(&laraItem, LA_LADDER_MOUNT_RIGHT);
+			break;
+		}
+
 		case LadderMountType::JumpUp:
 		case LadderMountType::JumpReach:
-		}*/
+			break;
+		}
 
 		lara.Control.IsMoving = false;
 		lara.Control.HandStatus = HandStatus::Busy;
