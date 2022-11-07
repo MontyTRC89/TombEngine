@@ -729,6 +729,7 @@ void lara_as_ladder_idle(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
+	//lara->Control.Look.Mode = LookMode::Free;
 	coll->Setup.EnableSpasm = false;
 	coll->Setup.EnableObjectPush = false;
 
@@ -738,18 +739,18 @@ void lara_as_ladder_idle(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (TrInput & IN_LOOK && lara->Control.CanLook)
+	if (IsHeld(In::Look) && lara->Control.CanLook)
 		LookUpDown(item);
 
-	if (TrInput & IN_ACTION)
+	if (IsHeld(In::Action))
 	{
-		if (TrInput & IN_JUMP)
+		if (IsHeld(In::Jump))
 		{
 			item->Animation.TargetState = LS_JUMP_BACK;
 			return;
 		}
 
-		if (TrInput & IN_FORWARD)
+		if (IsHeld(In::Forward))
 		{
 			if (CanDismountLadderTop(item, coll))
 			{
@@ -762,7 +763,7 @@ void lara_as_ladder_idle(ItemInfo* item, CollisionInfo* coll)
 				return;
 			}
 		}
-		else if (TrInput & IN_BACK)
+		else if (IsHeld(In::Back))
 		{
 			if (CanDismountLadderBack(item, coll))
 			{
@@ -776,12 +777,12 @@ void lara_as_ladder_idle(ItemInfo* item, CollisionInfo* coll)
 			}
 		}
 
-		if (TrInput & IN_LEFT && CanDismountLadderLeft(item, coll))
+		if (IsHeld(In::Left) && CanDismountLadderLeft(item, coll))
 		{
 			item->Animation.TargetState = LS_LADDER_DISMOUNT_LEFT;
 			return;
 		}
-		else if (TrInput & IN_RIGHT && CanDismountLadderRight(item, coll))
+		else if (IsHeld(In::Right) && CanDismountLadderRight(item, coll))
 		{
 			item->Animation.TargetState = LS_LADDER_DISMOUNT_RIGHT;
 			return;
@@ -821,6 +822,9 @@ void lara_col_ladder_idle(ItemInfo* item, CollisionInfo* coll)
 // Collision: lara_col_ladder_up()
 void lara_as_ladder_up(ItemInfo* item, CollisionInfo* coll)
 {
+	auto* lara = GetLaraInfo(item);
+
+	//lara->Control.Look.Mode = LookMode::Horizonal;
 	coll->Setup.EnableSpasm = false;
 	coll->Setup.EnableObjectPush = false;
 
@@ -836,15 +840,15 @@ void lara_as_ladder_up(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (TrInput & IN_ACTION)
+	if (IsHeld(In::Action))
 	{
-		if (TrInput & IN_JUMP)
+		if (IsHeld(In::Jump))
 		{
 			item->Animation.TargetState = LS_LADDER_IDLE;
 			return;
 		}
 
-		if (TrInput & IN_FORWARD && CanClimbLadderUp(item, coll))
+		if (IsHeld(In::Forward) && CanClimbLadderUp(item, coll))
 		{
 			item->Animation.TargetState = LS_LADDER_UP;
 			return;
@@ -876,6 +880,9 @@ void lara_col_ladder_up(ItemInfo* item, CollisionInfo* coll)
 // Collisiom: lara_col_ladder_down()
 void lara_as_ladder_down(ItemInfo* item, CollisionInfo* coll)
 {
+	auto* lara = GetLaraInfo(item);
+
+	//lara->Control.Look.Mode = LookMode::Horizonal;
 	coll->Setup.EnableSpasm = false;
 	coll->Setup.EnableObjectPush = false;
 
@@ -885,15 +892,15 @@ void lara_as_ladder_down(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (TrInput & IN_ACTION)
+	if (IsHeld(In::Action))
 	{
-		if (TrInput & IN_JUMP)
+		if (IsHeld(In::Jump))
 		{
 			item->Animation.TargetState = LS_LADDER_IDLE;
 			return;
 		}
 
-		if (TrInput & IN_BACK)
+		if (IsHeld(In::Back))
 		{
 			if (CanDismountLadderBack(item, coll))
 			{
