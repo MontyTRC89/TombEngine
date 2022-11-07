@@ -853,7 +853,7 @@ namespace TEN::Entities
 		if (obj->loaded)
 		{
 			obj->control = AnimatingControl;
-			obj->collision = DragSASCollision;
+			obj->collision = DragSasCollision;
 			obj->savePosition = true;
 			obj->saveFlags = true;
 			obj->saveAnim = true;

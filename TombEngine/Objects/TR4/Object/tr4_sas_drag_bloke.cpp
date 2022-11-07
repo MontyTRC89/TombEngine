@@ -1,15 +1,16 @@
 #include "framework.h"
-#include "tr4_sas_drag_bloke.h"
-#include "Specific/level.h"
-#include "Specific/Input/Input.h"
+#include "Objects/TR4/Object/tr4_sas_drag_bloke.h"
+
+#include "Game/collision/collide_item.h"
+#include "Game/health.h"
+#include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
-#include "Game/items.h"
 #include "Game/pickup/pickup.h"
-#include "Specific/setup.h"
-#include "Game/health.h"
 #include "Math/Math.h"
-#include "Game/collision/collide_item.h"
+#include "Specific/Input/Input.h"
+#include "Specific/level.h"
+#include "Specific/setup.h"
 
 using namespace TEN::Input;
 using namespace TEN::Math;
@@ -28,37 +29,39 @@ const auto DragSasBounds = ObjectCollisionBounds
 		)
 };
 
-void DragSASCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
+void DragSasCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 {
 	auto* item = &g_Level.Items[itemNumber];
-	auto* laraInfo = GetLaraInfo(laraItem);
+	auto* lara = GetLaraInfo(laraItem);
 
 	if (TrInput & IN_ACTION &&
 		laraItem->Animation.ActiveState == LS_IDLE &&
 		laraItem->Animation.AnimNumber == LA_STAND_IDLE &&
-		laraInfo->Control.HandStatus == HandStatus::Free &&
+		lara->Control.HandStatus == HandStatus::Free &&
 		!(laraItem->Animation.IsAirborne) &&
 		!(item->Flags & IFLAG_ACTIVATION_MASK) ||
-		laraInfo->Control.IsMoving && laraInfo->InteractedItem == itemNumber)
+		lara->Control.IsMoving && lara->InteractedItem == itemNumber)
 	{
 		if (TestLaraPosition(DragSasBounds, item, laraItem))
 		{
 			if (MoveLaraPosition(DragSASPosition, item, laraItem))
 			{
-
 				laraItem->Animation.AnimNumber = LA_DRAG_BODY;
 				laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
 				laraItem->Animation.ActiveState = LS_MISC_CONTROL;
+
 				item->Flags |= IFLAG_ACTIVATION_MASK;
 				item->Status = ITEM_ACTIVE;
-				laraInfo->Control.IsMoving = false;
+
+				lara->Control.IsMoving = false;
 				ResetLaraFlex(laraItem);
-				laraInfo->Control.HandStatus = HandStatus::Busy;
+				lara->Control.HandStatus = HandStatus::Busy;
+
 				AddActiveItem(itemNumber);
 				item->Pose.Orientation.y;
 			}
 			else
-				laraInfo->InteractedItem == itemNumber;
+				lara->InteractedItem == itemNumber;
 		}
 	}
 	else
