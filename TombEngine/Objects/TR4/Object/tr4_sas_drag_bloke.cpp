@@ -15,7 +15,7 @@
 using namespace TEN::Input;
 using namespace TEN::Math;
 
-const auto DragSASPosition = Vector3i(0, 0, -460);
+const auto DragSasPosition = Vector3i(0, 0, -460);
 const auto DragSasBounds = ObjectCollisionBounds 
 {
 	GameBoundingBox(
@@ -24,8 +24,8 @@ const auto DragSasBounds = ObjectCollisionBounds
 		-BLOCK(1.0f / 2), -460
 	),
 		std::pair(
-			EulerAngles(ANGLE(-10.0f), ANGLE(-30.0f), 0),
-			EulerAngles(ANGLE(10.0f), ANGLE(30.0f), 0)
+			EulerAngles(ANGLE(-10.0f), ANGLE(-30.0f), ANGLE(-10.0f)),
+			EulerAngles(ANGLE(10.0f), ANGLE(30.0f), ANGLE(10.0f))
 		)
 };
 
@@ -34,34 +34,30 @@ void DragSasCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 	auto* item = &g_Level.Items[itemNumber];
 	auto* lara = GetLaraInfo(laraItem);
 
-	if (TrInput & IN_ACTION &&
+	if ((IsHeld(In::Action) &&
 		laraItem->Animation.ActiveState == LS_IDLE &&
 		laraItem->Animation.AnimNumber == LA_STAND_IDLE &&
+		!laraItem->Animation.IsAirborne &&
 		lara->Control.HandStatus == HandStatus::Free &&
-		!(laraItem->Animation.IsAirborne) &&
-		!(item->Flags & IFLAG_ACTIVATION_MASK) ||
-		lara->Control.IsMoving && lara->InteractedItem == itemNumber)
+		!(item->Flags & IFLAG_ACTIVATION_MASK)) ||
+		(lara->Control.IsMoving && lara->InteractedItem == itemNumber))
 	{
 		if (TestLaraPosition(DragSasBounds, item, laraItem))
 		{
-			if (MoveLaraPosition(DragSASPosition, item, laraItem))
+			if (MoveLaraPosition(DragSasPosition, item, laraItem))
 			{
-				laraItem->Animation.AnimNumber = LA_DRAG_BODY;
-				laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
-				laraItem->Animation.ActiveState = LS_MISC_CONTROL;
-
+				AddActiveItem(itemNumber);
+				item->Pose.Orientation.y;
 				item->Flags |= IFLAG_ACTIVATION_MASK;
 				item->Status = ITEM_ACTIVE;
 
-				lara->Control.IsMoving = false;
+				SetAnimation(laraItem, LA_DRAG_BODY);
 				ResetLaraFlex(laraItem);
 				lara->Control.HandStatus = HandStatus::Busy;
-
-				AddActiveItem(itemNumber);
-				item->Pose.Orientation.y;
+				lara->Control.IsMoving = false;
 			}
 			else
-				lara->InteractedItem == itemNumber;
+				lara->InteractedItem = itemNumber;
 		}
 	}
 	else

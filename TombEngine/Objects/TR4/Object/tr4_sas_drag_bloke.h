@@ -1,5 +1,6 @@
 #pragma once
-#include "Game/items.h"
-#include "Game/collision/collide_room.h"
+
+struct CollisionInfo;
+struct ItemInfo;
 
 void DragSasCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);
