@@ -232,7 +232,7 @@ namespace TEN::Entities::Generic
 
 		// Define extension for height of interaction bounds.
 		// TODO: Please get height of full ladder stack. Must probe above and below for ladder objects. Steal from vertical pole?
-		static auto ladderBounds = GameBoundingBox(&ladderItem);
+		auto ladderBounds = GameBoundingBox(&ladderItem); // TODO: Make this static to optimise?
 		auto boundsExtension = GameBoundingBox(0, 0, ladderBounds.Y1, ladderBounds.Y2 + LADDER_STEP_HEIGHT, 0, 0);
 
 		if (TestEntityInteraction(laraItem, ladderItem, LadderMountTopFrontBasis, boundsExtension))

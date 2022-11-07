@@ -42,8 +42,16 @@ using namespace TEN::Math;
 
 	bool TestEntityInteraction(const ItemInfo& entityFrom, const ItemInfo& entityTo, const InteractionBasis& basis, const GameBoundingBox& boundsExtension)
 	{
-		// Avoid overriding active interactions. NOTE: For now, only checks offset blending status.
+		// Avoid overriding active interactions. NOTE: For now, can only check offset blending status.
 		if (entityFrom.OffsetBlend.IsActive)
+			return false;
+
+		auto orientConstraintAverage = (basis.OrientConstraint.first + basis.OrientConstraint.second) / 2;
+		auto poseFrom = Pose(entityFrom.Pose.Position, entityFrom.Pose.Orientation + orientConstraintAverage);
+
+		// TODO: May interfere with pickups?
+		// Check whether entityFrom is aligned toward entityTo.
+		if (!Geometry::IsPointInFront(poseFrom, entityTo.Pose.Position.ToVector3()))
 			return false;
 
 		// Check whether entityFrom's orientation is within interaction constraint.
@@ -60,7 +68,7 @@ using namespace TEN::Math;
 		auto relPos = Vector3::Transform(direction, rotMatrix);
 
 		// Check whether entityFrom is inside interaction bounds.
-		static auto bounds = basis.Bounds + boundsExtension;
+		auto bounds = basis.Bounds + boundsExtension; // TODO: Make this static to optimise?
 		if (relPos.x < bounds.X1 || relPos.x > bounds.X2 ||
 			relPos.y < bounds.Y1 || relPos.y > bounds.Y2 ||
 			relPos.z < bounds.Z1 || relPos.z > bounds.Z2)
