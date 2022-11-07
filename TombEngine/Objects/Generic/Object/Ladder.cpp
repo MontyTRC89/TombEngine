@@ -37,13 +37,13 @@ namespace TEN::Entities::Generic
 		JumpUp
 	};
 
-	const std::vector<int> LadderMountedStates =
+	const auto LadderMountedStates = std::vector<int>
 	{
 		LS_LADDER_IDLE,
 		LS_LADDER_UP,
 		LS_LADDER_DOWN
 	};
-	const std::vector<int> LadderGroundedMountStates =
+	const auto LadderGroundedMountStates = std::vector<int>
 	{
 		LS_IDLE,
 		LS_TURN_LEFT_SLOW,
@@ -53,7 +53,7 @@ namespace TEN::Entities::Generic
 		LS_WALK_FORWARD,
 		LS_RUN_FORWARD
 	};
-	const std::vector<int> LadderAirborneMountStates =
+	const auto LadderAirborneMountStates = std::vector<int>
 	{
 		LS_REACH,
 		LS_JUMP_UP
@@ -317,29 +317,35 @@ namespace TEN::Entities::Generic
 		static auto ladderBounds = GameBoundingBox(&ladderItem);
 		auto boundsExtension = GameBoundingBox(0, 0, ladderBounds.Y1, ladderBounds.Y2 + LADDER_STEP_HEIGHT, 0, 0);
 
-		if (TestEntityInteraction(ladderItem, laraItem, LadderMountTopFrontBasis, boundsExtension))
+		if (TestEntityInteraction(laraItem, ladderItem, LadderMountTopFrontBasis, boundsExtension))
 			return LadderMountType::TopFront;
 
-		if (TestEntityInteraction(ladderItem, laraItem, LadderMountTopBackBasis, boundsExtension))
+		if (TestEntityInteraction(laraItem, ladderItem, LadderMountTopBackBasis, boundsExtension))
 			return LadderMountType::TopBack;
 
-		if (TestEntityInteraction(ladderItem, laraItem, LadderMountFrontBasis, boundsExtension))
+		if (TestEntityInteraction(laraItem, ladderItem, LadderMountFrontBasis, boundsExtension))
 			return LadderMountType::Front;
 
-		if (TestEntityInteraction(ladderItem, laraItem, LadderMountBackBasis, boundsExtension))
+		if (TestEntityInteraction(laraItem, ladderItem, LadderMountBackBasis, boundsExtension))
 			return LadderMountType::Back;
 
-		if (TestEntityInteraction(ladderItem, laraItem, LadderMountLeftBasis, boundsExtension))
+		if (TestEntityInteraction(laraItem, ladderItem, LadderMountLeftBasis, boundsExtension))
 			return LadderMountType::Left;
 
-		if (TestEntityInteraction(ladderItem, laraItem, LadderMountRightBasis, boundsExtension))
+		if (TestEntityInteraction(laraItem, ladderItem, LadderMountRightBasis, boundsExtension))
 			return LadderMountType::Right;
 
 		return LadderMountType::None;
 	}
 
-	void DoLadderMount(const ItemInfo& ladderItem, ItemInfo& laraItem, LadderMountType mountType)
+	void DoLadderMount(int itemNumber, ItemInfo& ladderItem, ItemInfo& laraItem, LadderMountType mountType)
 	{
+		auto& lara = *GetLaraInfo(&laraItem);
+
+		// Avoid interference if already interacting.
+		if (laraItem.OffsetBlend.IsActive)
+			lara.InteractedItem = itemNumber;
+
 		/*switch (mountType)
 		{
 		default:
@@ -349,9 +355,22 @@ namespace TEN::Entities::Generic
 		case LadderMountType::TopFront:
 		case LadderMountType::TopBack:
 		case LadderMountType::Front:
+		{
+			auto boundsOffset = Vector3i(0, 0, GameBoundingBox(&ladderItem).Z1);
+			SetEntityInteraction(laraItem, ladderItem, LadderMountFrontBasis, boundsOffset);
+
+			SetAnimation(&laraItem, LA_LADDER_MOUNT_FRONT);
+			break;
+		}
+
 		case LadderMountType::Back:
 		case LadderMountType::Left:
 		case LadderMountType::Right:
+		case LadderMountType::JumpUp:
+		case LadderMountType::JumpReach:
 		}*/
+
+		lara.Control.IsMoving = false;
+		lara.Control.HandStatus = HandStatus::Busy;
 	}
 }
