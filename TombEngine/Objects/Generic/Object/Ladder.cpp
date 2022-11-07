@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "Objects/Generic/Object/polerope.h"
+#include "Objects/Generic/Object/Ladder.h"
 
 #include "Game/collision/collide_item.h"
 #include "Game/collision/sphere.h"
@@ -120,16 +120,6 @@ namespace TEN::Entities::Generic
 			EulerAngles(ANGLE(10.0f), ANGLE(-90.0f) + LARA_GRAB_THRESHOLD, ANGLE(10.0f))
 		)
 	);
-
-	void DisplayLadderDebug(ItemInfo& ladderItem)
-	{
-		auto ladderBounds = GameBoundingBox(&ladderItem);
-		auto ladderInteractBounds = LadderInteractBounds2D + GameBoundingBox(0, 0, ladderBounds.Y1, ladderBounds.Y2, 0, 0);
-
-		// Render interaction bounds.
-		auto box = ladderInteractBounds.ToBoundingOrientedBox(ladderItem.Pose);
-		g_Renderer.AddDebugBox(box, Vector4(0, 1, 1, 1), RENDERER_DEBUG_PAGE::NO_PAGE);
-	}
 
 	void LadderCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 	{
@@ -281,29 +271,6 @@ namespace TEN::Entities::Generic
 		}
 	}
 
-	bool TestLadderMount(const ItemInfo& ladderItem, ItemInfo& laraItem)
-	{
-		const auto& lara = *GetLaraInfo(&laraItem);
-
-		// Check for Action input action.
-		if (!IsHeld(In::Action))
-			return false;
-
-		// Check ladder usability.
-		if (ladderItem.Flags & IFLAG_INVISIBLE)
-			return false;
-
-		// Check hand status.
-		if (lara.Control.HandStatus != HandStatus::Free)
-			return false;
-
-		// Check active player state.
-		if (!TestState(laraItem.Animation.ActiveState, LadderGroundedMountStates))
-			return false;
-
-		return true;
-	}
-
 	LadderMountType GetLadderMountType(ItemInfo& ladderItem, ItemInfo& laraItem)
 	{
 		const auto& lara = *GetLaraInfo(&laraItem);
@@ -336,6 +303,29 @@ namespace TEN::Entities::Generic
 			return LadderMountType::Right;
 
 		return LadderMountType::None;
+	}
+
+	bool TestLadderMount(const ItemInfo& ladderItem, ItemInfo& laraItem)
+	{
+		const auto& lara = *GetLaraInfo(&laraItem);
+
+		// Check for Action input action.
+		if (!IsHeld(In::Action))
+			return false;
+
+		// Check ladder usability.
+		if (ladderItem.Flags & IFLAG_INVISIBLE)
+			return false;
+
+		// Check hand status.
+		if (lara.Control.HandStatus != HandStatus::Free)
+			return false;
+
+		// Check active player state.
+		if (!TestState(laraItem.Animation.ActiveState, LadderGroundedMountStates))
+			return false;
+
+		return true;
 	}
 
 	void DoLadderMount(int itemNumber, ItemInfo& ladderItem, ItemInfo& laraItem, LadderMountType mountType)
@@ -372,5 +362,18 @@ namespace TEN::Entities::Generic
 
 		lara.Control.IsMoving = false;
 		lara.Control.HandStatus = HandStatus::Busy;
+	}
+
+	void DisplayLadderDebug(ItemInfo& ladderItem)
+	{
+		// Render collision bounds.
+		auto ladderBounds = GameBoundingBox(&ladderItem);
+		auto collBox = ladderBounds.ToBoundingOrientedBox(ladderItem.Pose);
+		g_Renderer.AddDebugBox(collBox, Vector4(1, 0, 0, 1), RENDERER_DEBUG_PAGE::NO_PAGE);
+
+		// Render interaction bounds.
+		auto ladderInteractBounds = LadderInteractBounds2D + GameBoundingBox(0, 0, ladderBounds.Y1, ladderBounds.Y2, 0, 0);
+		auto interactBox = ladderInteractBounds.ToBoundingOrientedBox(ladderItem.Pose);
+		g_Renderer.AddDebugBox(interactBox, Vector4(0, 1, 1, 1), RENDERER_DEBUG_PAGE::NO_PAGE);
 	}
 }
