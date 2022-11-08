@@ -77,6 +77,7 @@ struct OffsetBlendData
 	void SetTimedConstant(const Vector3& posOffset, const EulerAngles& orientOffset, float timeInSec, float delayInSec = 0.0f);
 
 	void Clear();
+	void DisplayDebug();
 };
 
 struct EntityAnimationData

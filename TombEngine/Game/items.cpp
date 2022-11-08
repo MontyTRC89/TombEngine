@@ -20,6 +20,32 @@ using namespace TEN::Input;
 using namespace TEN::Math;;
 using namespace TEN::Renderer;
 
+void OffsetBlendData::SetLinear(const Vector3& posOffset, const EulerAngles& orientOffset, float alpha, float delayInSec)
+{
+	this->Type = BlendType::Linear;
+	this->IsActive = true;
+	this->PosOffset = posOffset;
+	this->OrientOffset = orientOffset;
+	this->Alpha = alpha;
+	this->DelayTime = std::floor(delayInSec / DELTA_TIME);
+}
+
+void OffsetBlendData::SetConstant(const Vector3& posOffset, const EulerAngles& orientOffset, float velocity, short turnRate, float delayInSec)
+{
+	this->Type = BlendType::Constant;
+	this->IsActive = true;
+	this->PosOffset = posOffset;
+	this->OrientOffset = orientOffset;
+	this->Velocity = velocity;
+	this->TurnRate = turnRate;
+	this->DelayTime = std::floor(delayInSec / DELTA_TIME);
+}
+
+void OffsetBlendData::SetTimedConstant(const Vector3& posOffset, const EulerAngles& orientOffset, float timeInSec, float delayInSec)
+{
+
+}
+
 void OffsetBlendData::Clear()
 {
 	this->Type = BlendType::None;
@@ -32,6 +58,16 @@ void OffsetBlendData::Clear()
 	this->Velocity = 0.0f;
 	this->TurnRate= 0;
 	this->Time = 0.0f;
+}
+
+void OffsetBlendData::DisplayDebug()
+{
+	g_Renderer.PrintDebugMessage("Type: %d", (int)Type);
+	g_Renderer.PrintDebugMessage("IsActive: %d", IsActive);
+	g_Renderer.PrintDebugMessage("TimeAcive: %.3f", TimeActive);
+	g_Renderer.PrintDebugMessage("DelayTime: %.3f", DelayTime);
+	g_Renderer.PrintDebugMessage("Pos: %.3f, %.3f, %.3f", PosOffset.x, PosOffset.y, PosOffset.z);
+	g_Renderer.PrintDebugMessage("Orient: %d, %d, %d", OrientOffset.x, OrientOffset.y, OrientOffset.z);
 }
 
 bool ItemInfo::TestOcb(short ocbFlags)
@@ -75,46 +111,18 @@ bool ItemInfo::IsCreature() const
 	return this->Data.is<CreatureInfo>();
 }
 
-void OffsetBlendData::SetLinear(const Vector3& posOffset, const EulerAngles& orientOffset, float alpha, float delayInSec)
-{
-	this->Type = BlendType::Linear;
-	this->IsActive = true;
-	this->PosOffset = posOffset;
-	this->OrientOffset = orientOffset;
-	this->Alpha = alpha;
-	this->DelayTime = std::floor(delayInSec / DELTA_TIME);
-}
-
-void OffsetBlendData::SetConstant(const Vector3& posOffset, const EulerAngles& orientOffset, float velocity, short turnRate, float delayInSec)
-{
-	this->Type = BlendType::Constant;
-	this->IsActive = true;
-	this->PosOffset = posOffset;
-	this->OrientOffset = orientOffset;
-	this->Velocity = velocity;
-	this->TurnRate = turnRate;
-	this->DelayTime = std::floor(delayInSec / DELTA_TIME);
-}
-
-void OffsetBlendData::SetTimedConstant(const Vector3& posOffset, const EulerAngles& orientOffset, float timeInSec, float delayInSec)
-{
-
-}
-
 void ItemInfo::DoOffsetBlend()
 {
 	// TODO: Using frame time for now, but delta time should be used in the future.
 	static constexpr auto deltaFrameTime = 1.0f;
 
-	g_Renderer.PrintDebugMessage("IsActive: %d", OffsetBlend.IsActive);
-	g_Renderer.PrintDebugMessage("Pos: %.3f, %.3f, %.3f", OffsetBlend.PosOffset.x, OffsetBlend.PosOffset.y, OffsetBlend.PosOffset.z);
-	g_Renderer.PrintDebugMessage("Orient: %d, %d, %d", OffsetBlend.OrientOffset.x, OffsetBlend.OrientOffset.y, OffsetBlend.OrientOffset.z);
+	this->OffsetBlend.DisplayDebug();
 
 	// Blending is inactive; exit early.
 	if (!OffsetBlend.IsActive)
 		return;
 
-	// Handle blending delay.
+	// Handle delay.
 	if (OffsetBlend.DelayTime != 0.0f)
 	{
 		this->OffsetBlend.DelayTime -= deltaFrameTime;
@@ -155,9 +163,7 @@ void ItemInfo::DoOffsetBlend()
 	this->OffsetBlend.TimeActive += deltaFrameTime;
 
 	// Blending is complete.
-	if (abs(OffsetBlend.PosOffset.x) < 0.5f &&
-		abs(OffsetBlend.PosOffset.y) < 0.5f &&
-		abs(OffsetBlend.PosOffset.z) < 0.5f &&
+	if (Geometry::ComparePoints(OffsetBlend.PosOffset, Vector3::Zero, 0.5f - FLT_EPSILON) &&
 		OffsetBlend.OrientOffset == EulerAngles::Zero)
 	{
 		this->OffsetBlend.IsActive = false;

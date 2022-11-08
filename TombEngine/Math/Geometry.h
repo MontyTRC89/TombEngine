@@ -27,6 +27,7 @@ namespace TEN::Math::Geometry
 	Vector3		GetClosestPointOnLine(const Vector3& origin, const Vector3& linePoint0, const Vector3& linePoint1);
 	EulerAngles GetOrientToPoint(const Vector3& origin, const Vector3& target);
 
+	bool ComparePoints(const Vector3& origin, const Vector3& target, float epsilon = FLT_EPSILON);
 	bool IsPointInFront(const Pose& pose, const Vector3& target);
 	bool IsPointInFront(const Vector3& origin, const Vector3& target, const EulerAngles& orient);
 	bool IsPointInFront(const Vector3& origin, const Vector3& target, const Vector3& refPoint);

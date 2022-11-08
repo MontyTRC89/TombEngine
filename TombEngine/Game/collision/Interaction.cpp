@@ -96,7 +96,7 @@ using namespace TEN::Math;
 	{
 		auto& lara = *GetLaraInfo(&playerEntity);
 
-		// Check whether already aligning.
+		// Check if already aligning.
 		if (lara.Control.IsMoving)
 			return;
 

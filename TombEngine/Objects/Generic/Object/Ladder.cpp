@@ -77,7 +77,6 @@ namespace TEN::Entities::Generic
 	);
 	const auto LadderMountTopBackBasis = InteractionBasis(
 		LadderMountedOffset2D, // TODO
-		EulerAngles::Zero,
 		LadderInteractBounds2D,
 		std::pair(
 			EulerAngles(ANGLE(-10.0f), -LARA_GRAB_THRESHOLD, ANGLE(-10.0f)),
@@ -86,7 +85,6 @@ namespace TEN::Entities::Generic
 	);
 	const auto LadderMountFrontBasis = InteractionBasis(
 		LadderMountedOffset2D,
-		EulerAngles::Zero,
 		LadderInteractBounds2D,
 		std::pair(
 			EulerAngles(ANGLE(-10.0f), -LARA_GRAB_THRESHOLD, ANGLE(-10.0f)),
