@@ -6,11 +6,10 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Specific/level.h"
-#include "Math/Random.h"
-#include "Specific/setup.h"
 #include "Math/Math.h"
+#include "Specific/setup.h"
 
-using namespace TEN::Math::Random;
+using namespace TEN::Math;
 
 namespace TEN::Entities::TR4
 {
@@ -61,12 +60,12 @@ namespace TEN::Entities::TR4
 
 		if (item->TriggerFlags)
 		{
-			if (!item->ItemFlags[2] || TestProbability(0.06f))
+			if (!item->ItemFlags[2] || Random::TestProbability(0.06f))
 			{
 				item->TriggerFlags--;
 				if (item->ItemFlags[2])
 				{
-					if (TestProbability(1.0f / 2))
+					if (Random::TestProbability(1.0f / 2))
 						item->ItemFlags[2]--;
 				}
 

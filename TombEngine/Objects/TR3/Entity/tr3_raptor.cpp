@@ -95,7 +95,7 @@ namespace TEN::Entities::Creatures::TR3
 			if (creature->Enemy == nullptr || Random::TestProbability(RAPTOR_SWITCH_TARGET_CHANCE))
 			{
 				ItemInfo* nearestItem = nullptr;
-				float minDistance = FLT_MAX;
+				float minDistance = INFINITY;
 
 				for (auto* activeCreature : ActiveCreatures)
 				{

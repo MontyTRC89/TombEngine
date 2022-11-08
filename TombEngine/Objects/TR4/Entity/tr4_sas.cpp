@@ -3,6 +3,7 @@
 
 #include "Game/animation.h"
 #include "Game/collision/collide_item.h"
+#include "Game/collision/collide_room.h"
 #include "Game/control/box.h"
 #include "Game/control/control.h"
 #include "Game/effects/effects.h"
@@ -14,35 +15,21 @@
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_one_gun.h"
 #include "Game/people.h"
+#include "Math/Math.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
-#include "Math/Random.h"
 #include "Specific/setup.h"
 
 using namespace TEN::Input;
-using namespace TEN::Math::Random;
+using namespace TEN::Math;
 
 namespace TEN::Entities::TR4
 {
 	const auto SASGunBite = BiteInfo(Vector3(0.0f, 300.0f, 64.0f), 7);
 
-	const auto SASDragBodyPosition = Vector3i(0, 0, -460);
-	const ObjectCollisionBounds SASDragBodyBounds =
-	{
-		GameBoundingBox(
-			-CLICK(1), CLICK(1),
-			-CLICK(0.25f), 100,
-			-200, -460
-		),
-		std::pair(
-			EulerAngles(ANGLE(-10.0f), ANGLE(-30.0f), 0),
-			EulerAngles(ANGLE(10.0f), ANGLE(30.0f), 0)
-		)
-	};
-
 	enum SASState
 	{
-		SAS_STATE_NONE = 0,
+		// No state 0.
 		SAS_STATE_IDLE = 1,
 		SAS_STATE_WALK = 2,
 		SAS_STATE_RUN = 3,
@@ -227,9 +214,9 @@ namespace TEN::Entities::TR4
 						if (AI.distance < pow(SECTOR(3), 2) ||
 							AI.zoneNumber != AI.enemyZone)
 						{
-							if (TestProbability(1.0f / 2))
+							if (Random::TestProbability(1.0f / 2))
 								item->Animation.TargetState = SAS_STATE_SIGHT_AIM;
-							else if (TestProbability(1.0f / 2))
+							else if (Random::TestProbability(1.0f / 2))
 								item->Animation.TargetState = SAS_STATE_HOLD_AIM;
 							else
 								item->Animation.TargetState = SAS_STATE_KNEEL_AIM;
@@ -408,7 +395,7 @@ namespace TEN::Entities::TR4
 							item->Animation.TargetState = SAS_STATE_SIGHT_SHOOT;
 						else if (item->Animation.ActiveState == SAS_STATE_KNEEL_AIM)
 							item->Animation.TargetState = SAS_STATE_KNEEL_SHOOT;
-						else if (TestProbability(1.0f / 2))
+						else if (Random::TestProbability(1.0f / 2))
 							item->Animation.TargetState = SAS_STATE_HOLD_SHOOT;
 						else
 							item->Animation.TargetState = SAS_STATE_HOLD_PREPARE_GRENADE;
@@ -587,14 +574,14 @@ namespace TEN::Entities::TR4
 			grenadeItem->Pose.Orientation.y = angle2 + item->Pose.Orientation.y;
 			grenadeItem->Pose.Orientation.z = 0;
 
-			if (TestProbability(0.75f))
+			if (Random::TestProbability(0.75f))
 				grenadeItem->ItemFlags[0] = (int)GrenadeType::Normal;
 			else
 				grenadeItem->ItemFlags[0] = (int)GrenadeType::Super;
 
 			grenadeItem->Animation.ActiveState = grenadeItem->Pose.Orientation.x;
 			grenadeItem->Animation.TargetState = grenadeItem->Pose.Orientation.y;
-			grenadeItem->Animation.RequiredState = 0;
+			grenadeItem->Animation.RequiredState = NO_STATE;
 			grenadeItem->Animation.Velocity.z = 128;
 			grenadeItem->Animation.Velocity.y = -128 * phd_sin(grenadeItem->Pose.Orientation.x);
 			grenadeItem->HitPoints = 120;
@@ -628,7 +615,7 @@ namespace TEN::Entities::TR4
 
 		if (item->Animation.ActiveState == 1)
 		{
-			if (TestProbability(1.0f / 128))
+			if (Random::TestProbability(1.0f / 128))
 			{
 				item->Animation.TargetState = 2;
 				AnimateItem(item);
@@ -637,64 +624,12 @@ namespace TEN::Entities::TR4
 				item->Animation.TargetState = 3;
 		}
 		else if (item->Animation.ActiveState == 4 &&
-			TestProbability(1.0f / 128))
+			Random::TestProbability(1.0f / 128))
 		{
 			item->Animation.TargetState = 5;
 			AnimateItem(item);
 		}
 		else
 			AnimateItem(item);
-	}
-
-	void SasDragBlokeCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
-	{
-		auto* item = &g_Level.Items[itemNumber];
-
-		if ((!(TrInput & IN_ACTION) ||
-			laraItem->Animation.IsAirborne ||
-			laraItem->Animation.ActiveState != LS_IDLE ||
-			laraItem->Animation.AnimNumber != LA_STAND_IDLE ||
-			Lara.Control.HandStatus != HandStatus::Free ||
-			item->Flags & 0x3E00) &&
-			(!(Lara.Control.IsMoving) || Lara.InteractedItem != itemNumber))
-		{
-			if (item->Status == ITEM_ACTIVE)
-			{
-				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameEnd)
-				{
-					int x = laraItem->Pose.Position.x - 512 * phd_sin(laraItem->Pose.Orientation.y);
-					int y = laraItem->Pose.Position.y;
-					int z = laraItem->Pose.Position.z - 512 * phd_cos(laraItem->Pose.Orientation.y);
-
-					TestTriggers(x, y, z, laraItem->RoomNumber, true);
-
-					RemoveActiveItem(itemNumber);
-					item->Status = ITEM_NOT_ACTIVE;
-				}
-			}
-
-			ObjectCollision(itemNumber, laraItem, coll);
-		}
-		else
-		{
-			if (TestLaraPosition(SASDragBodyBounds, item, laraItem))
-			{
-				if (MoveLaraPosition(SASDragBodyPosition, item, laraItem))
-				{
-					laraItem->Animation.AnimNumber = LA_DRAG_BODY;
-					laraItem->Animation.ActiveState = LS_MISC_CONTROL;
-					laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
-					laraItem->Pose.Orientation.y = item->Pose.Orientation.y;
-					ResetLaraFlex(laraItem);
-					Lara.Control.IsMoving = false;
-					Lara.Control.HandStatus = HandStatus::Busy;
-					item->Flags |= 0x3E00;
-					item->Status = ITEM_ACTIVE;
-					AddActiveItem(itemNumber);
-				}
-				else
-					Lara.InteractedItem = itemNumber;
-			}
-		}
 	}
 }

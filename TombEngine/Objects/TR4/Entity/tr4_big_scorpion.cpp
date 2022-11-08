@@ -11,12 +11,11 @@
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Game/misc.h"
+#include "Math/Math.h"
 #include "Specific/level.h"
-#include "Math/Random.h"
 #include "Specific/setup.h"
 
-using namespace TEN::Math::Random;
-using std::vector;
+using namespace TEN::Math;
 
 namespace TEN::Entities::TR4
 {
@@ -29,7 +28,7 @@ namespace TEN::Entities::TR4
 
 	const auto BigScorpionBite1 = BiteInfo(Vector3::Zero, 8);
 	const auto BigScorpionBite2 = BiteInfo(Vector3::Zero, 23);
-	const vector<unsigned int> BigScorpionAttackJoints = { 8, 20, 21, 23, 24 };
+	const auto BigScorpionAttackJoints = std::vector<unsigned int>{ 8, 20, 21, 23, 24 };
 
 	int CutSeqNum;
 
@@ -182,7 +181,7 @@ namespace TEN::Entities::TR4
 					creature->MaxTurn = ANGLE(2.0f);
 
 					// If chanced upon or the troop is close to death, do pincer attack.
-					if (TestProbability(1.0f / 2) ||
+					if (Random::TestProbability(1.0f / 2) ||
 						(creature->Enemy != nullptr && creature->Enemy->HitPoints <= 15 && creature->Enemy->ObjectNumber == ID_TROOPS))
 					{
 						item->Animation.TargetState = BSCORPION_STATE_PINCER_ATTACK;

@@ -15,19 +15,18 @@
 #include "Game/misc.h"
 #include "Game/people.h"
 #include "Sound/sound.h"
+#include "Math/Math.h"
 #include "Specific/level.h"
-#include "Math/Random.h"
 #include "Specific/setup.h"
 
-using namespace TEN::Math::Random;
-using std::vector;
+using namespace TEN::Math;
 
 namespace TEN::Entities::TR4
 {
 	constexpr auto SKELETON_ATTACK_DAMAGE = 80;
 
 	const auto SkeletonBite = BiteInfo(Vector3(0.0f, -16.0f, 200.0f), 11);
-	const vector<unsigned int> SkeletonSwordAttackJoints = { 15, 16 };
+	const auto SkeletonSwordAttackJoints = std::vector<unsigned int>{ 15, 16 };
 
 	// TODO: Fill in missign states.
 	enum SkeletonState
@@ -143,7 +142,7 @@ namespace TEN::Entities::TR4
 			spark->flags = 26;
 			spark->rotAng = GetRandomControl() & 0xFFF;
 
-			if (TestProbability(1.0f / 2))
+			if (Random::TestProbability(1.0f / 2))
 				spark->rotAdd = -16 - (GetRandomControl() & 0xF);
 			else
 				spark->rotAdd = (GetRandomControl() & 0xF) + 16;
@@ -347,7 +346,7 @@ namespace TEN::Entities::TR4
 			switch (item->Animation.ActiveState)
 			{
 			case SKELETON_STATE_IDLE:
-				if (TestProbability(0.06f))
+				if (Random::TestProbability(0.06f))
 					item->Animation.TargetState = 2;
 				
 				break;
@@ -358,13 +357,13 @@ namespace TEN::Entities::TR4
 				creature->Flags = 0;
 
 				if (item->AIBits & GUARD ||
-					TestProbability(1.0f / 30) &&
+					Random::TestProbability(1.0f / 30) &&
 					(AI.distance > pow(SECTOR(1), 2) ||
 						creature->Mood != MoodType::Attack))
 				{
-					if (TestProbability(0.0155f))
+					if (Random::TestProbability(0.0155f))
 					{
-						if (TestProbability(1.0f / 2))
+						if (Random::TestProbability(1.0f / 2))
 							item->Animation.TargetState = 3;
 						else
 							item->Animation.TargetState = 4;
@@ -416,22 +415,22 @@ namespace TEN::Entities::TR4
 						{
 							if (item->Animation.RequiredState != NO_STATE)
 								item->Animation.TargetState = item->Animation.RequiredState;
-							else if (TestProbability(0.0155f))
+							else if (Random::TestProbability(0.0155f))
 								item->Animation.TargetState = 15;
 						}
 						else if (Lara.TargetEntity == item &&
 							laraAI.angle && laraAI.distance < pow(SECTOR(2), 2) &&
-							TestProbability(1.0f / 2) &&
-							(Lara.Control.Weapon.GunType == LaraWeaponType::Shotgun || TestProbability(0.06f)) &&
+							Random::TestProbability(1.0f / 2) &&
+							(Lara.Control.Weapon.GunType == LaraWeaponType::Shotgun || Random::TestProbability(0.06f)) &&
 							item->MeshBits == -1)
 						{
 							item->Animation.TargetState = SKELETON_STATE_USE_SHIELD;
 						}
 						else if (AI.bite && AI.distance < pow(682, 2))
 						{
-							if (TestProbability(0.75f) && LaraItem->HitPoints > 0)
+							if (Random::TestProbability(0.75f) && LaraItem->HitPoints > 0)
 							{
-								if (TestProbability(1.0f / 2))
+								if (Random::TestProbability(1.0f / 2))
 									item->Animation.TargetState = SKELETON_STATE_ATTACK_1;
 								else
 									item->Animation.TargetState = SKELETON_STATE_ATTACK_2;
@@ -439,9 +438,9 @@ namespace TEN::Entities::TR4
 							else
 								item->Animation.TargetState = SKELETON_STATE_ATTACK_3;
 						}
-						else if (item->HitStatus || item->Animation.RequiredState)
+						else if (item->HitStatus || item->Animation.RequiredState != NO_STATE)
 						{
-							if (TestProbability(1.0f / 2))
+							if (Random::TestProbability(1.0f / 2))
 							{
 								item->Animation.TargetState = SKELETON_STATE_AVOID_ATTACK_1;
 								item->Animation.RequiredState = item->Animation.TargetState;
@@ -469,7 +468,7 @@ namespace TEN::Entities::TR4
 				else if (item->HitStatus)
 				{
 					item->Animation.TargetState = 2;
-					if (TestProbability(1.0f / 2))
+					if (Random::TestProbability(1.0f / 2))
 						item->Animation.RequiredState = 5;
 					else
 						item->Animation.RequiredState = 6;
@@ -500,7 +499,7 @@ namespace TEN::Entities::TR4
 						else
 							item->Animation.TargetState = 2;
 					}
-					else if (TestProbability(0.0155f))
+					else if (Random::TestProbability(0.0155f))
 						item->Animation.TargetState = 2;
 				}
 
@@ -574,7 +573,7 @@ namespace TEN::Entities::TR4
 						creature->Flags = 1;
 					}
 				}
-				if (TestProbability(0.0155f) || LaraItem->HitPoints <= 0)
+				if (Random::TestProbability(0.0155f) || LaraItem->HitPoints <= 0)
 					item->Animation.TargetState = 11;
 				
 				break;
@@ -639,7 +638,7 @@ namespace TEN::Entities::TR4
 					if (item->MeshBits == -1 && laraAI.angle &&
 						Lara.Control.Weapon.GunType == LaraWeaponType::Shotgun)
 					{
-						if (TestProbability(0.75f))
+						if (Random::TestProbability(0.75f))
 							item->Animation.TargetState = 17;
 						else
 							ExplodeItemNode(item, 11, 1, -24);
@@ -647,7 +646,7 @@ namespace TEN::Entities::TR4
 					else
 						item->Animation.TargetState = 2;
 				}
-				else if (Lara.TargetEntity != item || item->MeshBits != -1 || Lara.Control.Weapon.GunType != LaraWeaponType::Shotgun || TestProbability(1.0f / 128))
+				else if (Lara.TargetEntity != item || item->MeshBits != -1 || Lara.Control.Weapon.GunType != LaraWeaponType::Shotgun || Random::TestProbability(1.0f / 128))
 					item->Animation.TargetState = 2;
 				
 				break;
@@ -707,7 +706,7 @@ namespace TEN::Entities::TR4
 
 				if (GetCollision(item).Position.Floor <= (item->Pose.Position.y + SECTOR(1)))
 				{
-					if (TestProbability(1.0f / 30))
+					if (Random::TestProbability(1.0f / 30))
 						item->Animation.TargetState = 14;
 				}
 				else

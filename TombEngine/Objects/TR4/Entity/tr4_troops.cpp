@@ -12,11 +12,11 @@
 #include "Game/itemdata/creature_info.h"
 #include "Game/animation.h"
 #include "Game/misc.h"
+#include "Math/Math.h"
 #include "Specific/level.h"
-#include "Math/Random.h"
 #include "Specific/setup.h"
 
-using namespace TEN::Math::Random;
+using namespace TEN::Math;
 
 namespace TEN::Entities::TR4
 {
@@ -24,6 +24,7 @@ namespace TEN::Entities::TR4
 
 	enum TroopState
 	{
+		// No state 0.
 		TROOP_STATE_IDLE = 1,
 		TROOP_STATE_WALK = 2,
 		TROOP_STATE_RUN = 3,
@@ -229,7 +230,7 @@ namespace TEN::Entities::TR4
 				{
 					joint2 = AIGuard(creature);
 
-					// TODO: Use TestProbability().
+					// TODO: Use Random::TestProbability().
 					if (!GetRandomControl())
 					{
 						if (item->Animation.ActiveState == TROOP_STATE_IDLE)
@@ -249,7 +250,7 @@ namespace TEN::Entities::TR4
 				{
 					if (AI.distance < pow(SECTOR(3), 2) || AI.zoneNumber != AI.enemyZone)
 					{
-						if (TestProbability(1.0f / 2))
+						if (Random::TestProbability(1.0f / 2))
 							item->Animation.TargetState = TROOP_STATE_AIM_3;
 						else
 							item->Animation.TargetState = TROOP_STATE_AIM_1;
@@ -348,7 +349,7 @@ namespace TEN::Entities::TR4
 
 				if (item->AIBits & GUARD)
 				{
-					// TODO: Use TestProbability().
+					// TODO: Use Random::TestProbability().
 					joint2 = AIGuard(creature);
 					if (!GetRandomControl())
 						item->Animation.TargetState = TROOP_STATE_IDLE;
@@ -443,7 +444,7 @@ namespace TEN::Entities::TR4
 				break;
 
 			case TROOP_STATE_FLASHED:
-				if (!FlashGrenadeAftershockTimer && TestProbability(1.0f / 128))
+				if (!FlashGrenadeAftershockTimer && Random::TestProbability(1.0f / 128))
 					item->Animation.TargetState = TROOP_STATE_GUARD;
 
 				break;

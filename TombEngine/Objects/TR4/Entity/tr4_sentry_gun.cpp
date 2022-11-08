@@ -11,10 +11,10 @@
 #include "Game/items.h"
 #include "Game/misc.h"
 #include "Game/people.h"
+#include "Math/Math.h"
 #include "Objects/objectslist.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
-#include "Math/Math.h"
 
 using namespace TEN::Gui;
 

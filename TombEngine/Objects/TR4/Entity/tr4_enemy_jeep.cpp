@@ -12,13 +12,12 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
+#include "Math/Math.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
-#include "Math/Random.h"
 #include "Specific/setup.h"
-#include "Math/Math.h"
 
-using namespace TEN::Math::Random;
+using namespace TEN::Math;
 
 namespace TEN::Entities::TR4
 {
@@ -47,14 +46,14 @@ namespace TEN::Entities::TR4
 			for (int i = 0; i < 5; i++)
 				TriggerGunSmoke(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, 0, 0, 0, 1, LaraWeaponType::GrenadeLauncher, 32);
 
-			if (TestProbability(0.75f))
+			if (Random::TestProbability(0.75f))
 				grenadeItem->ItemFlags[0] = 1;
 			else
 				grenadeItem->ItemFlags[0] = 2;
 
 			grenadeItem->Animation.ActiveState = grenadeItem->Pose.Orientation.x;
 			grenadeItem->Animation.TargetState = grenadeItem->Pose.Orientation.y;
-			grenadeItem->Animation.RequiredState = 0;
+			grenadeItem->Animation.RequiredState = NO_STATE;
 			grenadeItem->Animation.Velocity.z = 32;
 			grenadeItem->Animation.Velocity.y = -32 * phd_sin(grenadeItem->Pose.Orientation.x);
 			grenadeItem->HitPoints = 120;

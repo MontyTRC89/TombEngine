@@ -14,21 +14,19 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-using std::vector;
-
 namespace TEN::Entities::TR4
 {
 	constexpr auto GUIDE_ATTACK_DAMAGE = 20;
 
 	const auto GuideBite1 = BiteInfo(Vector3(0.0f, 20.0f, 180.0f), 18);
 	const auto GuideBite2 = BiteInfo(Vector3(30.0f, 80.0f, 50.0f), 15);
-	const vector<unsigned int> GuideLeftFingerSwapJoints = { 15 };
-	const vector<unsigned int> GuideRightHandSwapJoints	= { 18 };
-	const vector<unsigned int> GuideHeadSwapJoints		= { 21 };
+	const auto GuideLeftFingerSwapJoints = std::vector<unsigned int>{ 15 };
+	const auto GuideRightHandSwapJoints	 = std::vector<unsigned int>{ 18 };
+	const auto GuideHeadSwapJoints		 = std::vector<unsigned int>{ 21 };
 
 	enum GuideState
 	{
-		GUIDE_STATE_NONE = 0,
+		// No state 0.
 		GUIDE_STATE_IDLE = 1,
 		GUIDE_STATE_WALK_FORWARD = 2,
 		GUIDE_STATE_RUN_FORWARD = 3,

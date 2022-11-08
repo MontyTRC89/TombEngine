@@ -9,11 +9,10 @@
 #include "Game/control/lot.h"
 #include "Game/itemdata/creature_info.h"
 #include "Game/items.h"
-#include "Math/Random.h"
-#include "Specific/setup.h"
 #include "Math/Math.h"
+#include "Specific/setup.h"
 
-using namespace TEN::Math::Random;
+using namespace TEN::Math;
 
 namespace TEN::Entities::TR4
 {
@@ -23,7 +22,7 @@ namespace TEN::Entities::TR4
 	constexpr auto BAT_ATTACK_RANGE		   = SQUARE(CLICK(1));
 	constexpr auto BAT_AWARE_RANGE		   = SQUARE(SECTOR(5));
 
-	#define BAT_ANGLE ANGLE(20.0f)
+	const auto BAT_ANGLE = ANGLE(20.0f);
 
 	const auto BatBite = BiteInfo(Vector3(0.0f, 16.0f, 45.0f), 4);
 
@@ -102,7 +101,7 @@ namespace TEN::Entities::TR4
 				break;
 
 			case BAT_STATE_FLY:
-				if (AI.distance < BAT_ATTACK_RANGE || TestProbability(1.0f / 64))
+				if (AI.distance < BAT_ATTACK_RANGE || Random::TestProbability(1.0f / 64))
 					creature->Flags = 0;
 
 				if (!creature->Flags)

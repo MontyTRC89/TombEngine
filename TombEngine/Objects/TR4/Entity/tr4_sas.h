@@ -1,5 +1,6 @@
 #pragma once
-#include "Game/collision/collide_room.h"
+
+struct ItemInfo;
 
 namespace TEN::Entities::TR4
 {
@@ -7,6 +8,5 @@ namespace TEN::Entities::TR4
 	void SasControl(short itemNumber);
 	void InitialiseInjuredSas(short itemNumber);
 	void InjuredSasControl(short itemNumber);
-	void SasDragBlokeCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);
 	void SasFireGrenade(ItemInfo* item, short angle1, short angle2);
 }

@@ -13,13 +13,12 @@
 #include "Game/Lara/lara_helpers.h"
 #include "Game/misc.h"
 #include "Game/people.h"
-#include "Math/Random.h"
+#include "Math/Math.h"
 #include "Renderer/Renderer11Enums.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
 using namespace TEN::Math;
-using namespace TEN::Math::Random;
 
 namespace TEN::Entities::TR4
 {
@@ -137,7 +136,7 @@ namespace TEN::Entities::TR4
 			spark->flags = 602;
 			spark->rotAng = GetRandomControl() & 0xFFF;
 
-			if (TestProbability(1.0f / 2))
+			if (Random::TestProbability(1.0f / 2))
 				spark->rotAdd = -32 - (GetRandomControl() & 0x1F);
 			else
 				spark->rotAdd = (GetRandomControl() & 0x1F) + 32;
@@ -269,12 +268,12 @@ namespace TEN::Entities::TR4
 				spark->zVel = (byte)(GetRandomControl() + 256) * phd_cos(angle);
 				spark->friction = 9;
 
-				if (TestProbability(1.0f / 2))
+				if (Random::TestProbability(1.0f / 2))
 				{
 					spark->flags = 16;
 					spark->rotAng = GetRandomControl() & 0xFFF;
 
-					if (TestProbability(1.0f / 2))
+					if (Random::TestProbability(1.0f / 2))
 						spark->rotAdd = -64 - (GetRandomControl() & 0x3F);
 					else
 						spark->rotAdd = (GetRandomControl() & 0x3F) + 64;
@@ -484,7 +483,7 @@ namespace TEN::Entities::TR4
 
 					if (item->ObjectNumber == ID_DEMIGOD3)
 					{
-						if (TestProbability(0.25f))
+						if (Random::TestProbability(0.25f))
 						{
 							item->Animation.TargetState = DEMIGOD3_STATE_RADIAL_AIM;
 							break;

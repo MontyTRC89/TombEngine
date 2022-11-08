@@ -11,25 +11,25 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
+#include "Math/Math.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
-#include "Math/Random.h"
 #include "Specific/setup.h"
 
-using namespace TEN::Math::Random;
-using std::vector;
+using namespace TEN::Math;
 
 namespace TEN::Entities::TR4
 {
-	#define VON_CROY_FLAG_JUMP 6
+	constexpr auto VON_CROY_FLAG_JUMP = 6;
 
 	const auto VonCroyBite = BiteInfo(Vector3(0.0f, 35.0f, 130.0f), 18);
-	const vector<unsigned int> VonCroyKnifeSwapJoints = { 7, 18 };
+	const auto VonCroyKnifeSwapJoints = std::vector<unsigned int>{ 7, 18 };
 
 	bool VonCroyPassedWaypoints[128];
 
 	enum VonCroyState
 	{
+		// No state 0.
 		VON_CROY_STATE_IDLE = 1,
 		VON_CROY_STATE_WALK = 2,
 		VON_CROY_STATE_RUN = 3,
@@ -829,7 +829,7 @@ namespace TEN::Entities::TR4
 			{
 				item->Animation.TargetState = VON_CROY_STATE_IDLE;
 
-				if (TestProbability(0.97f))
+				if (Random::TestProbability(0.97f))
 					break;
 			}
 

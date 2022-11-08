@@ -16,7 +16,6 @@
 #include "Specific/setup.h"
 
 using namespace TEN::Math;
-using namespace TEN::Math::Random;
 
 namespace TEN::Entities::TR4
 {
@@ -124,7 +123,7 @@ namespace TEN::Entities::TR4
 		sptr->flags = SP_EXPDEF | SP_ROTATE | SP_DEF | SP_SCALE;
 		sptr->rotAng = GetRandomControl() & 0xFFF;
 
-		if (TestProbability(1.0f / 2))
+		if (Random::TestProbability(1.0f / 2))
 			sptr->rotAdd = (GetRandomControl() & 0x1F) - 32;
 		else
 			sptr->rotAdd = (GetRandomControl() & 0x1F) + 32;
@@ -299,11 +298,11 @@ namespace TEN::Entities::TR4
 		case MUTANT_STATE_IDLE:
 			if (AI.ahead)
 			{
-				if (TestProbability(0.28f) && AI.distance <= MUTANT_PROJECTILE_ATTACK_RANGE)
+				if (Random::TestProbability(0.28f) && AI.distance <= MUTANT_PROJECTILE_ATTACK_RANGE)
 					item->Animation.TargetState = MUTANT_STATE_PROJECTILE_ATTACK;
-				else if (TestProbability(0.28f) && AI.distance <= MUTANT_LOCUST_ATTACK_1_RANGE)
+				else if (Random::TestProbability(0.28f) && AI.distance <= MUTANT_LOCUST_ATTACK_1_RANGE)
 					item->Animation.TargetState = MUTANT_STATE_LOCUST_ATTACK_1;
-				else if (TestProbability(0.28f) && AI.distance <= MUTANT_LOCUST_ATTACK_2_RANGE)
+				else if (Random::TestProbability(0.28f) && AI.distance <= MUTANT_LOCUST_ATTACK_2_RANGE)
 					item->Animation.TargetState = MUTANT_STATE_LOCUST_ATTACK_2;
 			}
 

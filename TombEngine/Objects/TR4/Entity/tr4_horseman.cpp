@@ -11,24 +11,22 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
+#include "Math/Math.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
-#include "Math/Random.h"
 #include "Specific/setup.h"
-#include "Math/Math.h"
 
-using namespace TEN::Math::Random;
-using std::vector;
+using namespace TEN::Math;
 
 namespace TEN::Entities::TR4
 {
 	const auto HorsemanBite1 = BiteInfo(Vector3::Zero, 6);
 	const auto HorsemanBite2 = BiteInfo(Vector3::Zero, 14);
 	const auto HorsemanBite3 = BiteInfo(Vector3::Zero, 10);
-	const vector<unsigned int> HorsemanAxeAttackJoints = { 5, 6 };
-	const vector<unsigned int> HorsemanKickAttackJoints = { 14 };
-	const vector<unsigned int> HorsemanMountedAttackJoints = { 5, 6, 10 };
-	const vector<unsigned int> HorsemanShieldAttackJoints = { 10 };
+	const auto HorsemanAxeAttackJoints	   = std::vector<unsigned int>{ 5, 6 };
+	const auto HorsemanKickAttackJoints	   = std::vector<unsigned int>{ 14 };
+	const auto HorsemanMountedAttackJoints = std::vector<unsigned int>{ 5, 6, 10 };
+	const auto HorsemanShieldAttackJoints  = std::vector<unsigned int>{ 10 };
 
 	const auto HorseBite1 = BiteInfo(Vector3::Zero, 13);
 	const auto HorseBite2 = BiteInfo(Vector3::Zero, 17);
@@ -36,7 +34,7 @@ namespace TEN::Entities::TR4
 
 	enum HorsemanState
 	{
-		HORSEMAN_STATE_NONE = 0,
+		// No state 0.
 		HORSEMAN_STATE_MOUNTED_RUN_FORWARD = 1,
 		HORSEMAN_STATE_MOUNTED_WALK_FORWARD = 2,
 		HORSEMAN_STATE_MOUNTED_IDLE = 3,
@@ -178,7 +176,7 @@ namespace TEN::Entities::TR4
 			spark->gravity = (random / 128) & 0x1F;
 			spark->rotAng = random / 8;
 
-			if (TestProbability(1.0f / 2))
+			if (Random::TestProbability(1.0f / 2))
 				spark->rotAdd = -16 - (random & 0xF);
 			else
 				spark->rotAdd = spark->sB;
@@ -361,7 +359,7 @@ namespace TEN::Entities::TR4
 								auto pos = GetJointPosition(item, SPHERES_SPACE_WORLD, Vector3i(0, -128, 80));
 								HorsemanSparks(&pos, item->Pose.Orientation.y, 7);
 							}
-							else if (TestProbability(0.125f))
+							else if (Random::TestProbability(0.125f))
 							{
 								if (item->Animation.ActiveState == HORSEMAN_STATE_SHIELD)
 									item->Animation.TargetState = HORSEMAN_STATE_IDLE;
