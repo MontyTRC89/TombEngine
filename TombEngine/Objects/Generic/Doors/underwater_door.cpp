@@ -1,23 +1,24 @@
 #include "framework.h"
-#include "Objects/Generic/Doors/generic_doors.h"
-#include "Specific/level.h"
-#include "Game/control/control.h"
+#include "Objects/Generic/Doors/underwater_door.h"
+
+#include "Game/animation.h"
+#include "Game/collision/collide_item.h"
+#include "Game/collision/sphere.h"
 #include "Game/control/box.h"
-#include "Game/items.h"
+#include "Game/control/control.h"
 #include "Game/control/lot.h"
 #include "Game/Gui.h"
-#include "Specific/Input/Input.h"
-#include "Game/pickup/pickup.h"
-#include "Sound/sound.h"
-#include "Game/animation.h"
-#include "Game/collision/sphere.h"
+#include "Game/items.h"
+#include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_struct.h"
-#include "Game/Lara/lara.h"
-#include "Math/Math.h"
 #include "Game/misc.h"
-#include "Objects/Generic/Doors/underwater_door.h"
-#include "Game/collision/collide_item.h"
+#include "Game/pickup/pickup.h"
+#include "Math/Math.h"
+#include "Objects/Generic/Doors/generic_doors.h"
+#include "Sound/sound.h"
+#include "Specific/Input/Input.h"
+#include "Specific/level.h"
 
 using namespace TEN::Input;
 
@@ -27,9 +28,9 @@ namespace TEN::Entities::Doors
 	const InteractionBasis UnderwaterDoorBounds =
 	{
 		GameBoundingBox(
-			-CLICK(1), CLICK(1),
-			-SECTOR(1), 0,
-			-SECTOR(1), 0
+			-BLOCK(3.0f / 4), BLOCK(3.0f / 4),
+			-BLOCK(1), 0,
+			-BLOCK(1.0f / 2), 0
 		),
 		std::pair(
 			EulerAngles(ANGLE(-80.0f), ANGLE(-80.0f), ANGLE(-80.0f)),

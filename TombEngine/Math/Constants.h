@@ -24,12 +24,14 @@
 	constexpr inline auto SECTOR = [](auto x) { return BLOCK(x); }; // TODO: Replace with BLOCK() at some point.
 	constexpr inline auto CLICK	 = [](auto x) { return ((BLOCK(1) / 4) * x); };
 
-	constexpr inline auto GRID_SNAP_SIZE = (int)CLICK(1.0f / 2);
 	constexpr inline auto STEP_SIZE		 = CLICK(1);
 	constexpr inline auto STOP_SIZE		 = CLICK(2);
 	constexpr inline auto WALL_SIZE		 = BLOCK(1);
 	constexpr inline auto WALL_MASK		 = BLOCK(1) - 1;
+	constexpr inline auto GRID_SNAP_SIZE = (int)BLOCK(1.0f / 8);
 
-	constexpr inline auto FPS					  = 30;
+	constexpr inline auto FPS = 30; // TODO: Move this to clock.h.
+
+	// Legacy constants
 	constexpr inline auto PREDICTIVE_SCALE_FACTOR = 14;
 //}
