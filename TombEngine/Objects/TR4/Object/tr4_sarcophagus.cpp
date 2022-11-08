@@ -26,11 +26,6 @@ const ObjectCollisionBounds SarcophagusBounds =
 		)
 };
 
-void InitialiseSarcophagus(short itemNumber)
-{
-
-}
-
 void SarcophagusCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 {
 	auto* laraInfo = GetLaraInfo(laraItem);
