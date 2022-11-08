@@ -12,11 +12,12 @@
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
 #include "Game/people.h"
+#include "Math/Math.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-using namespace TEN::Math::Random;
+using namespace TEN::Math;
 
 namespace TEN::Entities::Creatures::TR5
 {
@@ -26,6 +27,7 @@ namespace TEN::Entities::Creatures::TR5
 
 	enum GuardState
 	{
+		// No state 0.
 		GUARD_STATE_IDLE = 1,
 		GUARD_STATE_TURN_180 = 2,
 		GUARD_STATE_FIRE_SINGLE = 3,
@@ -346,7 +348,7 @@ namespace TEN::Entities::Creatures::TR5
 				if (item->ObjectNumber == ID_SWAT_PLUS)
 				{
 					item->ItemFlags[0]++;
-					if (item->ItemFlags[0] > 60 && TestProbability(0.06f))
+					if (item->ItemFlags[0] > 60 && Random::TestProbability(0.06f))
 					{
 						SoundEffect(SFX_TR5_BIO_BREATHE_OUT, &item->Pose);
 						item->ItemFlags[0] = 0;
@@ -830,7 +832,7 @@ namespace TEN::Entities::Creatures::TR5
 
 			case GUARD_STATE_USE_COMPUTER:
 				if ((item->ObjectNumber != ID_SCIENTIST || item != Lara.TargetEntity) &&
-					(TestProbability(0.992f) || item->TriggerFlags >= 10 || item->TriggerFlags == 9))
+					(Random::TestProbability(0.992f) || item->TriggerFlags >= 10 || item->TriggerFlags == 9))
 				{
 					if (item->AIBits & GUARD)
 					{
@@ -850,7 +852,7 @@ namespace TEN::Entities::Creatures::TR5
 				break;
 
 			case GUARD_STATE_SURRENDER:
-				if (item != Lara.TargetEntity && TestProbability(1.0f / 64))
+				if (item != Lara.TargetEntity && Random::TestProbability(1.0f / 64))
 				{
 					if (item->TriggerFlags == 7 || item->TriggerFlags == 9)
 						item->Animation.RequiredState = GUARD_STATE_USE_COMPUTER;
@@ -1033,11 +1035,11 @@ namespace TEN::Entities::Creatures::TR5
 				creature->Flags = 0;
 				if (!TargetVisible(item, &AI) ||
 					item->HitStatus &&
-					TestProbability(1.0f / 2))
+					Random::TestProbability(1.0f / 2))
 				{
 					item->Animation.TargetState = SNIPER_STATE_COVER;
 				}
-				else if (TestProbability(1.0f / 30))
+				else if (Random::TestProbability(1.0f / 30))
 					item->Animation.TargetState = SNIPER_STATE_FIRE;
 			
 				break;

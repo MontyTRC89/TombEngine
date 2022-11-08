@@ -1,5 +1,6 @@
 #pragma once
-#include "Math/Math.h"
+
+class Vector3i;
 
 namespace TEN::Entities::Creatures::TR5
 {

@@ -1,23 +1,24 @@
 #include "framework.h"
-#include "tr5_cyborg.h"
-#include "Game/items.h"
+#include "Objects/TR5/Entity/tr5_cyborg.h"
+
+#include "Game/animation.h"
 #include "Game/collision/collide_room.h"
 #include "Game/control/box.h"
 #include "Game/effects/effects.h"
-#include "Game/people.h"
-#include "Game/animation.h"
+#include "Game/effects/lara_fx.h"
+#include "Game/effects/lightning.h"
 #include "Game/effects/tomb4fx.h"
+#include "Game/itemdata/creature_info.h"
+#include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
-#include "Specific/setup.h"
-#include "Specific/level.h"
+#include "Game/people.h"
 #include "Sound/sound.h"
-#include "Game/itemdata/creature_info.h"
-#include "Game/effects/lightning.h"
-#include "Game/effects/lara_fx.h"
+#include "Specific/level.h"
+#include "Specific/setup.h"
 
-	using namespace TEN::Effects::Lara;
-	using namespace TEN::Effects::Lightning;
+using namespace TEN::Effects::Lara;
+using namespace TEN::Effects::Lightning;
 
 namespace TEN::Entities::Creatures::TR5
 {
@@ -26,6 +27,7 @@ namespace TEN::Entities::Creatures::TR5
 
 	enum CyborgState
 	{
+		// No state 0.
 		CYBORG_STATE_IDLE = 1,
 		CYBORG_STATE_WALK = 2,
 		CYBORG_STATE_RUN = 3,

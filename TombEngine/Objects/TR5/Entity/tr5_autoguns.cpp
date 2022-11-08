@@ -12,7 +12,7 @@
 #include "Specific/level.h"
 #include "Sound/sound.h"
 
-using namespace TEN::Math::Random;
+using namespace TEN::Math;
 
 namespace TEN::Entities::Creatures::TR5
 {
@@ -106,7 +106,7 @@ namespace TEN::Entities::Creatures::TR5
 
 						TriggerDynamicLight(pos1.x, pos1.y, pos1.z, 10, (GetRandomControl() & 0x1F) + 192, (GetRandomControl() & 0x1F) + 128, 0);
 
-						if (TestProbability(0.75f))
+						if (Random::TestProbability(0.75f))
 						{
 							auto pos2 = GetJointPosition(LaraItem, GetRandomControl() % 15);
 							DoBloodSplat(pos2.x, pos2.y, pos2.z, (GetRandomControl() & 3) + 3, 2 * GetRandomControl(), LaraItem->RoomNumber);

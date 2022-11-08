@@ -20,6 +20,7 @@ namespace TEN::Entities::Creatures::TR5
 	// TODO
 	enum ChefState
 	{
+		// No state 0.
 		CHEF_STATE_COOKING = 1,
 		CHEF_STATE_TURN_180 = 2,
 		CHEF_STATE_ATTACK = 3,

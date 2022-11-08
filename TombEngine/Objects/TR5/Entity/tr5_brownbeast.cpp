@@ -9,12 +9,11 @@
 #include "Game/misc.h"
 #include "Game/Lara/lara.h"
 #include "Sound/sound.h"
+#include "Math/Math.h"
 #include "Specific/setup.h"
-#include "Math/Random.h"
 #include "Specific/level.h"
 
-using namespace TEN::Math::Random;
-using std::vector;
+using namespace TEN::Math;
 
 namespace TEN::Entities::Creatures::TR5
 {
@@ -22,8 +21,8 @@ namespace TEN::Entities::Creatures::TR5
 
 	const auto BrownBeastBite1 = BiteInfo(Vector3::Zero, 16);
 	const auto BrownBeastBite2 = BiteInfo(Vector3::Zero, 22);
-	const vector<unsigned int> BrownBeastAttackJoints1 = { 14, 15, 16, 17 };
-	const vector<unsigned int> BrownBeastAttackJoints2 = { 20, 21, 22, 23 };
+	const auto BrownBeastAttackJoints1 = std::vector<unsigned int>{ 14, 15, 16, 17 };
+	const auto BrownBeastAttackJoints2 = std::vector<unsigned int>{ 20, 21, 22, 23 };
 
 	// TODO
 	enum BrownBeastState
@@ -103,12 +102,12 @@ namespace TEN::Entities::Creatures::TR5
 				{
 					if (distance <= pow(SECTOR(1), 2))
 					{
-						if (TestProbability(1.0f / 2))
+						if (Random::TestProbability(1.0f / 2))
 							item->Animation.TargetState = 4;
 						else
 							item->Animation.TargetState = 6;
 					}
-					else if (TestProbability(1.0f / 2))
+					else if (Random::TestProbability(1.0f / 2))
 						item->Animation.TargetState = 2;
 					else
 						item->Animation.TargetState = 3;

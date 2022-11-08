@@ -1,17 +1,18 @@
 #include "framework.h"
-#include "tr5_imp.h"
-#include "Game/items.h"
+#include "Objects/TR5/Entity/tr5_imp.h"
+
 #include "Game/animation.h"
-#include "Game/effects/effects.h"
 #include "Game/control/box.h"
+#include "Game/control/control.h"
+#include "Game/effects/effects.h"
+#include "Game/itemdata/creature_info.h"
+#include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
-#include "Specific/setup.h"
-#include "Specific/level.h"
-#include "Game/itemdata/creature_info.h"
-#include "Game/control/control.h"
-#include "Objects/Generic/Object/burning_torch.h"
 #include "Math/Math.h"
+#include "Objects/Generic/Object/burning_torch.h"
+#include "Specific/level.h"
+#include "Specific/setup.h"
 
 using namespace TEN::Entities::Generic;
 using namespace TEN::Math;
