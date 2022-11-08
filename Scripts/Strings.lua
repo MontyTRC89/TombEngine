@@ -1,3 +1,8 @@
+--[[
+NOTE: It's possible to expand string entry tables with extra language variations
+corresponding to languages in the table at the end of this file.
+--]]
+
 local strings =
 {
 	window_title = { "TombEngine" },
