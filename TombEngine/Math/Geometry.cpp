@@ -137,12 +137,6 @@ namespace TEN::Math::Geometry
 		return EulerAngles(target - origin);
 	}
 
-	bool ComparePoints(const Vector3& origin, const Vector3& target, float epsilon)
-	{
-		auto difference = target - origin;
-		return ((abs(difference.x) <= epsilon) && (abs(difference.y) <= epsilon) && (abs(difference.z) <= epsilon));
-	}
-
 	bool IsPointInFront(const Pose& pose, const Vector3& target)
 	{
 		return IsPointInFront(pose.Position.ToVector3(), target, pose.Orientation);

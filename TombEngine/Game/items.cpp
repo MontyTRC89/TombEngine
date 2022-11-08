@@ -163,10 +163,9 @@ void ItemInfo::DoOffsetBlend()
 	this->OffsetBlend.TimeActive += deltaFrameTime;
 
 	// Blending is complete.
-	if (Geometry::ComparePoints(OffsetBlend.PosOffset, Vector3::Zero, 0.5f - FLT_EPSILON) &&
+	if (OffsetBlend.PosOffset.Length() < (0.5f - FLT_EPSILON) &&
 		OffsetBlend.OrientOffset == EulerAngles::Zero)
 	{
-		this->OffsetBlend.IsActive = false;
 		this->OffsetBlend.Clear();
 	}
 }
