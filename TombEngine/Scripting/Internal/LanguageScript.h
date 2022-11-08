@@ -109,7 +109,7 @@
 #define STRING_TITLE_SETTINGS			"settings"
 #define STRING_TITLE_CHOOSE_AMMO		"choose_ammo"
 #define STRING_TITLE_COMBINE			"combine"
-#define STRING_WAITING_FOR_KEY			"waiting_for_key"
+#define STRING_WAITING_FOR_INPUT		"waiting_for_input"
 #define STRING_WINDOWED					"windowed"
 #define STRING_OK						"ok"
 #define STRING_CANCEL					"cancel"
