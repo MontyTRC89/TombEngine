@@ -89,12 +89,16 @@ using namespace TEN::Math;
 
 		auto absPosOffset = (targetPos - entityFrom.Pose.Position).ToVector3();
 		auto absOrientOffset = targetOrient - entityFrom.Pose.Orientation;
-		entityFrom.SetOffsetBlend(absPosOffset, absOrientOffset);
+		entityFrom.OffsetBlend.SetLinear(absPosOffset, absOrientOffset, 0.4f);
 	}
 
 	void SetPlayerAlignAnimation(ItemInfo& playerEntity, const ItemInfo& entity)
 	{
 		auto& lara = *GetLaraInfo(&playerEntity);
+
+		// Check whether already aligning.
+		if (lara.Control.IsMoving)
+			return;
 
 		// Check water status.
 		if (lara.Control.WaterStatus == WaterStatus::Underwater ||
@@ -102,10 +106,6 @@ using namespace TEN::Math;
 		{
 			return;
 		}
-
-		// Check if already aligning.
-		if (lara.Control.IsMoving)
-			return;
 
 		float distance = Vector3i::Distance(playerEntity.Pose.Position, entity.Pose.Position);
 		bool doAlignAnim = ((distance - LARA_ALIGN_VELOCITY) > (LARA_ALIGN_VELOCITY * ANIMATED_ALIGNMENT_FRAME_COUNT_THRESHOLD));

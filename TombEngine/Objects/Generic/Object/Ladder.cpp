@@ -155,7 +155,7 @@ namespace TEN::Entities::Generic
 					auto targetPos = Geometry::TranslatePoint(ladderItem.Pose.Position, ladderItem.Pose.Orientation, mountOffset);
 					auto posOffset = (targetPos - laraItem->Pose.Position).ToVector3();
 					auto orientOffset = (ladderItem.Pose.Orientation + LadderMountBackBasis.OrientOffset) - laraItem->Pose.Orientation;
-					laraItem->SetOffsetBlend(posOffset, orientOffset);
+					laraItem->OffsetBlend.SetLinear(posOffset, orientOffset, 0.4f);
 
 					SetAnimation(laraItem, LA_LADDER_MOUNT_FRONT);
 					lara.Control.IsMoving = false;

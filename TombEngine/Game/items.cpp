@@ -10,15 +10,29 @@
 #include "Renderer/Renderer11.h"
 #include "Scripting/Include/ScriptInterfaceGame.h"
 #include "Sound/sound.h"
+#include "Specific/clock.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
-#include "Specific/clock.h"
 
 using namespace TEN::Floordata;
 using namespace TEN::Input;
 using namespace TEN::Math;;
 using namespace TEN::Renderer;
+
+void OffsetBlendData::Clear()
+{
+	this->Type = BlendType::None;
+	this->IsActive = false;
+	this->TimeActive = 0.0f;
+	this->DelayTime = 0.0f;
+	this->PosOffset = Vector3::Zero;
+	this->OrientOffset = EulerAngles::Zero;
+	this->Alpha = 0.0f;
+	this->Velocity = 0.0f;
+	this->TurnRate= 0;
+	this->Time = 0.0f;
+}
 
 bool ItemInfo::TestOcb(short ocbFlags)
 {
@@ -61,25 +75,30 @@ bool ItemInfo::IsCreature() const
 	return this->Data.is<CreatureInfo>();
 }
 
-void ItemInfo::SetOffsetBlend(const Vector3& posOffset, const EulerAngles& orientOffset, float alpha, float delayInSec)
+void OffsetBlendData::SetLinear(const Vector3& posOffset, const EulerAngles& orientOffset, float alpha, float delayInSec)
 {
-	this->OffsetBlend.IsActive = true;
-	this->OffsetBlend.Type = BlendType::Linear;
-	this->OffsetBlend.PosOffset = posOffset;
-	this->OffsetBlend.OrientOffset = orientOffset;
-	this->OffsetBlend.Alpha = alpha;
-	this->OffsetBlend.DelayTime = std::floor(delayInSec / DELTA_TIME);
+	this->Type = BlendType::Linear;
+	this->IsActive = true;
+	this->PosOffset = posOffset;
+	this->OrientOffset = orientOffset;
+	this->Alpha = alpha;
+	this->DelayTime = std::floor(delayInSec / DELTA_TIME);
 }
 
-void ItemInfo::SetOffsetBlend(const Vector3& posOffset, const EulerAngles& orientOffset, float velocity, short turnRate, float delayInSec)
+void OffsetBlendData::SetConstant(const Vector3& posOffset, const EulerAngles& orientOffset, float velocity, short turnRate, float delayInSec)
 {
-	this->OffsetBlend.IsActive = true;
-	this->OffsetBlend.Type = BlendType::Constant;
-	this->OffsetBlend.PosOffset = posOffset;
-	this->OffsetBlend.OrientOffset = orientOffset;
-	this->OffsetBlend.Velocity = velocity;
-	this->OffsetBlend.TurnRate = turnRate;
-	this->OffsetBlend.DelayTime = std::floor(delayInSec / DELTA_TIME);
+	this->Type = BlendType::Constant;
+	this->IsActive = true;
+	this->PosOffset = posOffset;
+	this->OrientOffset = orientOffset;
+	this->Velocity = velocity;
+	this->TurnRate = turnRate;
+	this->DelayTime = std::floor(delayInSec / DELTA_TIME);
+}
+
+void OffsetBlendData::SetTimedConstant(const Vector3& posOffset, const EulerAngles& orientOffset, float timeInSec, float delayInSec)
+{
+
 }
 
 void ItemInfo::DoOffsetBlend()
@@ -136,19 +155,14 @@ void ItemInfo::DoOffsetBlend()
 	this->OffsetBlend.TimeActive += deltaFrameTime;
 
 	// Blending is complete.
-	if (abs(OffsetBlend.PosOffset.x) <= FLT_EPSILON &&
-		abs(OffsetBlend.PosOffset.y) <= FLT_EPSILON &&
-		abs(OffsetBlend.PosOffset.z) <= FLT_EPSILON &&
+	if (abs(OffsetBlend.PosOffset.x) < 0.5f &&
+		abs(OffsetBlend.PosOffset.y) < 0.5f &&
+		abs(OffsetBlend.PosOffset.z) < 0.5f &&
 		OffsetBlend.OrientOffset == EulerAngles::Zero)
 	{
 		this->OffsetBlend.IsActive = false;
-		this->ClearOffsetBlend();
+		this->OffsetBlend.Clear();
 	}
-}
-
-void ItemInfo::ClearOffsetBlend()
-{
-	this->OffsetBlend = {};
 }
 
 bool TestState(int refState, const vector<int>& stateList)

@@ -26,6 +26,6 @@ struct ItemInfo;
 	void SetEntityInteraction(ItemInfo& entityFrom, const ItemInfo& entityTo, const InteractionBasis& basis, const Vector3i& extraPosOffset = Vector3i::Zero, const EulerAngles& extraOrientOffset = EulerAngles::Zero);
 	void SetPlayerAlignAnimation(ItemInfo& playerEntity, const ItemInfo& entity);
 
-	bool AlignPlayerToEntity(ItemInfo& playerEntity, const ItemInfo& entity, const Vector3i& posOffset = Vector3i::Zero, const EulerAngles& orientOffset = EulerAngles::Zero, bool doSnapAlign = false);
-	bool AlignPlayerToPose(ItemInfo* item, const Pose& toPose, float velocity, short turnRate);
+	//bool AlignPlayerToEntity(ItemInfo& playerEntity, const ItemInfo& entity, const Vector3i& posOffset = Vector3i::Zero, const EulerAngles& orientOffset = EulerAngles::Zero, bool doSnapAlign = false);
+	//bool AlignPlayerToPose(ItemInfo* item, const Pose& toPose, float velocity, short turnRate);
 //}

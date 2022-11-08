@@ -54,23 +54,29 @@ enum class BlendType
 	None,
 	Linear,
 	Constant,
-	ConstantToLinear,
-	Timed
+	TimedConstant
 };
 
 struct OffsetBlendData
 {
-	bool  IsActive	 = false;
-	float TimeActive = 0.0f;
-	float DelayTime	 = 0.0f;
+	BlendType Type		 = BlendType::None;
+	bool	  IsActive	 = false;
+	float	  TimeActive = 0.0f;
+	float	  DelayTime	 = 0.0f;
 
-	BlendType	Type		 = BlendType::None;
 	Vector3		PosOffset	 = Vector3::Zero;
 	EulerAngles OrientOffset = EulerAngles::Zero;
 
 	float Alpha	   = 0.0f;
 	float Velocity = 0.0f;
 	short TurnRate = 0;
+	float Time	   = 0.0f;
+
+	void SetLinear(const Vector3& posOffset, const EulerAngles& orientOffset, float alpha, float delayInSec = 0.0f);
+	void SetConstant(const Vector3& posOffset, const EulerAngles& orientOffset, float velocity, short turnRate, float delayInSec = 0.0f);
+	void SetTimedConstant(const Vector3& posOffset, const EulerAngles& orientOffset, float timeInSec, float delayInSec = 0.0f);
+
+	void Clear();
 };
 
 struct EntityAnimationData
@@ -148,11 +154,7 @@ struct ItemInfo
 	bool IsLara() const;
 	bool IsCreature() const;
 
-	void SetOffsetBlendTimed(const Vector3& posOffset, const EulerAngles& orientOffset, float time = 1.0f, float delay = 0.0f);
-	void SetOffsetBlend(const Vector3& posOffset, const EulerAngles& orientOffset, float alpha = 0.4f, float delay = 0.0f);
-	void SetOffsetBlend(const Vector3& posOffset, const EulerAngles& orientOffset, float velocity, short turnRate, float delay = 0.0f);
 	void DoOffsetBlend();
-	void ClearOffsetBlend();
 };
 
 bool TestState(int refState, const std::vector<int>& stateList);
