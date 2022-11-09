@@ -24,10 +24,10 @@ using namespace TEN::Math::Random;
 
 namespace TEN::Entities::TR4
 {
-	const auto SASGunBite = BiteInfo(Vector3(0.0f, 300.0f, 64.0f), 7);
+	const auto SasGunBite = BiteInfo(Vector3(0.0f, 300.0f, 64.0f), 7);
 
-	const auto SASDragBodyPosition = Vector3i(0, 0, -460);
-	const auto DragSasBounds = ObjectCollisionBounds
+	const auto SasDragBodyPosition = Vector3i(0, 0, -460);
+	const auto SasDragBounds = ObjectCollisionBounds
 	{
 		GameBoundingBox(
 			-BLOCK(1.0f / 4), BLOCK(1.0f / 4),
@@ -40,7 +40,7 @@ namespace TEN::Entities::TR4
 		)
 	};
 
-	enum SASState
+	enum SasState
 	{
 		SAS_STATE_NONE = 0,
 		SAS_STATE_IDLE = 1,
@@ -62,7 +62,7 @@ namespace TEN::Entities::TR4
 		SAS_STATE_BLIND = 17
 	};
 
-	enum SASAnim
+	enum SasAnim
 	{
 		SAS_ANIM_WALK = 0,
 		SAS_ANIM_RUN = 1,
@@ -126,7 +126,7 @@ namespace TEN::Entities::TR4
 		// Handle SAS firing.
 		if (creature->FiredWeapon)
 		{
-			auto pos = GetJointPosition(item, SASGunBite.meshNum, Vector3i(SASGunBite.Position));
+			auto pos = GetJointPosition(item, SasGunBite.meshNum, Vector3i(SasGunBite.Position));
 			TriggerDynamicLight(pos.x, pos.y, pos.z, 10, 24, 16, 4);
 			creature->FiredWeapon--;
 		}
@@ -511,7 +511,7 @@ namespace TEN::Entities::TR4
 					creature->Flags -= 1;
 				else
 				{
-					ShotLara(item, &AI, SASGunBite, joint0, 15);
+					ShotLara(item, &AI, SasGunBite, joint0, 15);
 					creature->Flags = 5;
 					creature->FiredWeapon = 3;
 				}
@@ -566,7 +566,7 @@ namespace TEN::Entities::TR4
 			grenadeItem->ObjectNumber = ID_GRENADE;
 			grenadeItem->RoomNumber = item->RoomNumber;
 
-			auto pos = GetJointPosition(item, SASGunBite.meshNum, Vector3i(SASGunBite.Position));
+			auto pos = GetJointPosition(item, SasGunBite.meshNum, Vector3i(SasGunBite.Position));
 			grenadeItem->Pose.Position = pos;
 
 			auto probe = GetCollision(pos.x, pos.y, pos.z, grenadeItem->RoomNumber);
@@ -659,9 +659,9 @@ namespace TEN::Entities::TR4
 			!(item->Flags & IFLAG_ACTIVATION_MASK)) ||
 			lara->Control.IsMoving && lara->InteractedItem == itemNumber)
 		{
-			if (TestLaraPosition(DragSasBounds, item, laraItem))
+			if (TestLaraPosition(SasDragBounds, item, laraItem))
 			{
-				if (MoveLaraPosition(SASDragBodyPosition, item, laraItem))
+				if (MoveLaraPosition(SasDragBodyPosition, item, laraItem))
 				{
 					SetAnimation(laraItem, LA_DRAG_BODY);
 					ResetLaraFlex(laraItem);
