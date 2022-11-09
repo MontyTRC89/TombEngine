@@ -1,30 +1,36 @@
 #include "framework.h"
 #include "Objects/TR5/Object/tr5_pushableblock.h"
+
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Game/animation.h"
 #include "Game/items.h"
 #include "Game/collision/collide_room.h"
 #include "Game/collision/collide_item.h"
+#include "Game/collision/floordata.h"
 #include "Game/control/flipeffect.h"
 #include "Game/control/box.h"
 #include "Specific/level.h"
-#include "Specific/input.h"
+#include "Specific/Input/Input.h"
 #include "Sound/sound.h"
 #include "Specific/setup.h"
 #include "Objects/TR5/Object/tr5_pushableblock_info.h"
 
+using namespace TEN::Floordata;
 using namespace TEN::Input;
 
-Vector3Int PushableBlockPos = { 0, 0, 0 };
-static OBJECT_COLLISION_BOUNDS PushableBlockBounds = 
+static auto PushableBlockPos = Vector3i::Zero;
+ObjectCollisionBounds PushableBlockBounds = 
 {
-	0, 0,
-	-64, 0,
-	0, 0,
-	ANGLE(-10.0f), ANGLE(10.0f),
-	ANGLE(-30.0f), ANGLE(30.0f),
-	ANGLE(-10.0f), ANGLE(10.0f)
+	GameBoundingBox(
+		0, 0,
+		-CLICK(0.25f), 0,
+		0, 0
+	),
+	std::pair(
+		EulerAngles(ANGLE(-10.0f), ANGLE(-30.0f), ANGLE(-10.0f)),
+		EulerAngles(ANGLE(10.0f), ANGLE(30.0f), ANGLE(10.0f))
+	)
 };
 
 int DoPushPull = 0;
@@ -112,7 +118,7 @@ void InitialisePushableBlock(short itemNumber)
 		height = (OCB & 0x1F) * CLICK(1);
 	}
 	else
-		height = -GetBoundsAccurate(item)->Y1;
+		height = -GameBoundingBox(item).Y1;
 
 	info->height = height;
 
@@ -130,7 +136,7 @@ void PushableBlockControl(short itemNumber)
 
 	Lara.InteractedItem = itemNumber;
 
-	Vector3Int pos = { 0, 0, 0 };
+	Vector3i pos = { 0, 0, 0 };
 
 	short quadrant = (unsigned short)(LaraItem->Pose.Orientation.y + ANGLE(45.0f)) / ANGLE(90.0f);
 
@@ -192,7 +198,7 @@ void PushableBlockControl(short itemNumber)
 		return;
 	}
 
-	int displaceBox = GetBoundsAccurate(LaraItem)->Z2 - 80; // move pushable based on bbox->Z2 of Lara
+	int displaceBox = GameBoundingBox(LaraItem).Z2 - 80; // move pushable based on bbox->Z2 of Lara
 
 	switch (LaraItem->Animation.AnimNumber)
 	{
@@ -467,22 +473,22 @@ void PushableBlockCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo*
 	}
 	else
 	{
-		auto* bounds = GetBoundsAccurate(pushableItem);
-		PushableBlockBounds.boundingBox.X1 = (bounds->X1 / 2) - 100;
-		PushableBlockBounds.boundingBox.X2 = (bounds->X2 / 2) + 100;
-		PushableBlockBounds.boundingBox.Z1 = bounds->Z1 - 200;
-		PushableBlockBounds.boundingBox.Z2 = 0;
+		auto bounds = GameBoundingBox(pushableItem);
+		PushableBlockBounds.BoundingBox.X1 = (bounds.X1 / 2) - 100;
+		PushableBlockBounds.BoundingBox.X2 = (bounds.X2 / 2) + 100;
+		PushableBlockBounds.BoundingBox.Z1 = bounds.Z1 - 200;
+		PushableBlockBounds.BoundingBox.Z2 = 0;
 
 		short rot = pushableItem->Pose.Orientation.y;
 		pushableItem->Pose.Orientation.y = (laraItem->Pose.Orientation.y + ANGLE(45.0f)) & 0xC000;
 
-		if (TestLaraPosition(&PushableBlockBounds, pushableItem, laraItem))
+		if (TestLaraPosition(PushableBlockBounds, pushableItem, laraItem))
 		{
 			unsigned short quadrant = (unsigned short)((pushableItem->Pose.Orientation.y / 0x4000) + ((rot + 0x2000) / 0x4000));
 			if (quadrant & 1)
-				PushableBlockPos.z = bounds->X1 - 35;
+				PushableBlockPos.z = bounds.X1 - 35;
 			else
-				PushableBlockPos.z = bounds->Z1 - 35;
+				PushableBlockPos.z = bounds.Z1 - 35;
 
 			if (pushableInfo->hasFloorCeiling)
 			{					
@@ -503,7 +509,7 @@ void PushableBlockCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo*
 			}
 			else
 			{
-				if (MoveLaraPosition(&PushableBlockPos, pushableItem, laraItem))
+				if (MoveLaraPosition(PushableBlockPos, pushableItem, laraItem))
 				{
 					laraItem->Animation.AnimNumber = LA_PUSHABLE_GRAB;
 					laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
@@ -545,15 +551,18 @@ void PushEnd(ItemInfo* item) // Do Flipeffect 19 in anims
 		DoPushPull = -1;
 }
 
-bool TestBlockMovable(ItemInfo* item, int blokhite)
+bool TestBlockMovable(ItemInfo* item, int blockHeight)
 {
-	short roomNumber = item->RoomNumber;
-	FloorInfo* floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNumber);
+	auto probe = GetCollision(item);
 
-	if (floor->IsWall(floor->SectorPlane(item->Pose.Position.x, item->Pose.Position.z)))
+	if (probe.Block->IsWall(probe.Block->SectorPlane(item->Pose.Position.x, item->Pose.Position.z)))
 		return false;
 
-	if (floor->FloorHeight(item->Pose.Position.x, item->Pose.Position.z) != item->Pose.Position.y)
+	int height = probe.Position.Floor;
+	if (((PushableInfo*)item->Data)->hasFloorCeiling)
+		height += blockHeight;
+
+	if (height != item->Pose.Position.y)
 		return false;
 
 	return true;
@@ -971,8 +980,9 @@ std::optional<int> PushableBlockFloor(short itemNumber, int x, int y, int z)
 {
 	const auto& item = g_Level.Items[itemNumber];
 	const auto& pushable = (PushableInfo&)item.Data;
+	auto bboxHeight = GetBridgeItemIntersect(itemNumber, x, y, z, false);
 	
-	if (item.Status != ITEM_INVISIBLE && pushable.hasFloorCeiling)
+	if (item.Status != ITEM_INVISIBLE && pushable.hasFloorCeiling && bboxHeight.has_value())
 	{
 		const auto height = item.Pose.Position.y - (item.TriggerFlags & 0x1F) * CLICK(1);
 		return std::optional{height};
@@ -984,8 +994,9 @@ std::optional<int> PushableBlockCeiling(short itemNumber, int x, int y, int z)
 {
 	const auto& item = g_Level.Items[itemNumber];
 	const auto& pushable = (PushableInfo&)item.Data;
+	auto bboxHeight = GetBridgeItemIntersect(itemNumber, x, y, z, true);
 
-	if (item.Status != ITEM_INVISIBLE && pushable.hasFloorCeiling)
+	if (item.Status != ITEM_INVISIBLE && pushable.hasFloorCeiling && bboxHeight.has_value())
 		return std::optional{item.Pose.Position.y};
 
 	return std::nullopt;

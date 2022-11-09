@@ -2,74 +2,74 @@
 #include "Game/control/control.h"
 
 #include <process.h>
-#include "Game/collision/collide_room.h"
-#include "Game/pickup/pickup.h"
+
 #include "Game/camera.h"
-#include "Game/Lara/lara.h"
-#include "Game/items.h"
+#include "Game/collision/collide_room.h"
+#include "Game/collision/sphere.h"
 #include "Game/control/flipeffect.h"
-#include "Game/gui.h"
-#include "Game/control/volume.h"
 #include "Game/control/lot.h"
-#include "Game/health.h"
-#include "Game/savegame.h"
-#include "Game/room.h"
-#include "Game/effects/hair.h"
-#include "Game/effects/effects.h"
-#include "Game/effects/tomb4fx.h"
+#include "Game/control/volume.h"
 #include "Game/effects/debris.h"
+#include "Game/effects/drip.h"
+#include "Game/effects/effects.h"
+#include "Game/effects/explosion.h"
 #include "Game/effects/footprint.h"
+#include "Game/effects/hair.h"
+#include "Game/effects/lightning.h"
+#include "Game/effects/simple_particle.h"
 #include "Game/effects/smoke.h"
 #include "Game/effects/spark.h"
-#include "Game/effects/explosion.h"
-#include "Game/effects/drip.h"
+#include "Game/effects/tomb4fx.h"
 #include "Game/effects/weather.h"
-#include "Game/effects/lightning.h"
-#include "Game/spotcam.h"
-#include "Game/effects/simple_particle.h"
-#include "Game/collision/sphere.h"
-#include "Game/Lara/lara_one_gun.h"
+#include "Game/Gui.h"
+#include "Game/Lara/lara.h"
 #include "Game/Lara/lara_cheat.h"
 #include "Game/Lara/lara_helpers.h"
+#include "Game/Lara/lara_one_gun.h"
+#include "Game/health.h"
+#include "Game/items.h"
+#include "Game/pickup/pickup.h"
+#include "Game/room.h"
+#include "Game/savegame.h"
+#include "Game/spotcam.h"
+#include "Math/Random.h"
 #include "Objects/Effects/tr4_locusts.h"
 #include "Objects/Generic/Object/objects.h"
 #include "Objects/Generic/Object/rope.h"
 #include "Objects/Generic/Switches/generic_switch.h"
 #include "Objects/TR4/Entity/tr4_beetle_swarm.h"
-#include "Objects/TR5/Emitter/tr5_rats_emitter.h"
 #include "Objects/TR5/Emitter/tr5_bats_emitter.h"
+#include "Objects/TR5/Emitter/tr5_rats_emitter.h"
 #include "Objects/TR5/Emitter/tr5_spider_emitter.h"
+#include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
+#include "Scripting/Include/Objects/ScriptInterfaceObjectsHandler.h"
+#include "Scripting/Include/ScriptInterfaceGame.h"
+#include "Scripting/Include/Strings/ScriptInterfaceStringsHandler.h"
 #include "Sound/sound.h"
+#include "Specific/Input/Input.h"
 #include "Specific/clock.h"
-#include "Specific/input.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
-#include "Specific/prng.h"
 #include "Specific/winmain.h"
-#include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
-#include "Scripting/Include/ScriptInterfaceGame.h"
-#include "Scripting/Include/Objects/ScriptInterfaceObjectsHandler.h"
-#include "Scripting/Include/Strings/ScriptInterfaceStringsHandler.h"
 
-using std::vector;
-using std::unordered_map;
-using std::string;
-
-using namespace TEN::Effects::Footprints;
-using namespace TEN::Effects::Explosion;
-using namespace TEN::Effects::Spark;
-using namespace TEN::Effects::Smoke;
-using namespace TEN::Effects::Drip;
-using namespace TEN::Effects::Lightning;
-using namespace TEN::Effects::Environment;
 using namespace TEN::Effects;
+using namespace TEN::Effects::Drip;
+using namespace TEN::Effects::Environment;
+using namespace TEN::Effects::Explosion;
+using namespace TEN::Effects::Footprints;
 using namespace TEN::Entities::Generic;
+using namespace TEN::Effects::Lightning;
+using namespace TEN::Effects::Smoke;
+using namespace TEN::Effects::Spark;
 using namespace TEN::Entities::Switches;
 using namespace TEN::Entities::TR4;
-using namespace TEN::Renderer;
-using namespace TEN::Math::Random;
 using namespace TEN::Floordata;
 using namespace TEN::Input;
+using namespace TEN::Math::Random;
+using namespace TEN::Renderer;
+using std::string;
+using std::unordered_map;
+using std::vector;
 
 int GameTimer       = 0;
 int GlobalCounter   = 0;
@@ -101,9 +101,9 @@ int DrawPhase()
 	return Camera.numberFrames;
 }
 
-GameStatus ControlPhase(int numFrames, int demoMode)
+GameStatus ControlPhase(int numFrames, bool demoMode)
 {
-	ScriptInterfaceLevel* level = g_GameFlow->GetLevel(CurrentLevel);
+	auto* level = g_GameFlow->GetLevel(CurrentLevel);
 
 	RegeneratePickups();
 
@@ -115,55 +115,53 @@ GameStatus ControlPhase(int numFrames, int demoMode)
 
 	g_GameStringsHandler->ProcessDisplayStrings(DELTA_TIME);
 	
-	bool firstTime = true;
+	bool isFirstTime = true;
 	static int framesCount = 0;
 
 	for (framesCount += numFrames; framesCount > 0; framesCount -= 2)
 	{
 		GlobalCounter++;
 
-		// Poll the keyboard and update input variables
+		// Poll keyboard and update input variables.
 		if (CurrentLevel != 0)
-			UpdateInput();
+			UpdateInputActions(LaraItem);
 
 		// Has Lara control been disabled?
 		if (Lara.Control.Locked || CurrentLevel == 0)
-		{
-			if (CurrentLevel != 0)
-				DbInput = 0;
-			TrInput &= IN_LOOK;
-		}
+			ClearAction(In::Look);
 
 		// This might not be the exact amount of time that has passed, but giving it a
 		// value of 1/30 keeps it in lock-step with the rest of the game logic,
 		// which assumes 30 iterations per second.
-
 		g_GameScript->OnControlPhase(DELTA_TIME);
 
 		if (CurrentLevel != 0)
 		{
 			// Does the player want to enter inventory?
-			if (TrInput & IN_SAVE && LaraItem->HitPoints > 0 && g_Gui.GetInventoryMode() != InventoryMode::Save)
+			if (IsClicked(In::Save) && LaraItem->HitPoints > 0 &&
+				g_Gui.GetInventoryMode() != InventoryMode::Save)
 			{
 				StopAllSounds();
 				StopRumble();
 
 				g_Gui.SetInventoryMode(InventoryMode::Save);
 
-				if (g_Gui.CallInventory(false))
+				if (g_Gui.CallInventory(LaraItem, false))
 					return GameStatus::SaveGame;
 			}
-			else if (TrInput & IN_LOAD && g_Gui.GetInventoryMode() != InventoryMode::Load)
+			else if (IsClicked(In::Load) &&
+				g_Gui.GetInventoryMode() != InventoryMode::Load)
 			{
 				StopAllSounds();
 				StopRumble();
 
 				g_Gui.SetInventoryMode(InventoryMode::Load);
 
-				if (g_Gui.CallInventory(false))
+				if (g_Gui.CallInventory(LaraItem, false))
 					return GameStatus::LoadGame;
 			}
-			else if (TrInput & IN_PAUSE && g_Gui.GetInventoryMode() != InventoryMode::Pause && LaraItem->HitPoints > 0)
+			else if (IsClicked(In::Pause) && LaraItem->HitPoints > 0 &&
+				g_Gui.GetInventoryMode() != InventoryMode::Pause)
 			{
 				StopAllSounds();
 				StopRumble();
@@ -173,13 +171,13 @@ GameStatus ControlPhase(int numFrames, int demoMode)
 				g_Gui.SetMenuToDisplay(Menu::Pause);
 				g_Gui.SetSelectedOption(0);
 			}
-			else if ((DbInput & IN_OPTION || g_Gui.GetEnterInventory() != NO_ITEM) &&
+			else if ((IsClicked(In::Option) || g_Gui.GetEnterInventory() != NO_ITEM) &&
 				LaraItem->HitPoints > 0 && !BinocularOn)
 			{
 				StopAllSounds();
 				StopRumble();
 
-				if (g_Gui.CallInventory(true))
+				if (g_Gui.CallInventory(LaraItem, true))
 					return GameStatus::LoadGame;
 			}
 		}
@@ -189,7 +187,7 @@ GameStatus ControlPhase(int numFrames, int demoMode)
 			g_Gui.DrawInventory();
 			g_Renderer.Synchronize();
 
-			if (g_Gui.DoPauseMenu() == InventoryResult::ExitToTitle)
+			if (g_Gui.DoPauseMenu(LaraItem) == InventoryResult::ExitToTitle)
 				return GameStatus::ExitToTitle;
 		}
 
@@ -197,28 +195,22 @@ GameStatus ControlPhase(int numFrames, int demoMode)
 		if (CurrentLevel != 0 && LevelComplete)
 			return GameStatus::LevelComplete;
 
-		int oldInput = TrInput;
-
 		// Is Lara dead?
-		if (CurrentLevel != 0 && (Lara.Control.Count.Death > 300 || Lara.Control.Count.Death > 60 && TrInput))
+		if (CurrentLevel != 0 &&
+			(Lara.Control.Count.Death > 300 || Lara.Control.Count.Death > 60 && !NoAction()))
 		{
 			return GameStatus::ExitToTitle; // Maybe do game over menu like some PSX versions have??
 		}
 
-		if (demoMode && TrInput == -1)
-		{
-			oldInput = 0;
-			TrInput = 0;
-		}
+		// TODO: When demo mode is implemented, check whether this is correct. -- Sezz 2022.11.01
+		if (demoMode)
+			ClearAllActions();
 
-		if (CurrentLevel == 0)
-			TrInput = 0;
-
-		// Handle lasersight and binocular
+		// Handle  binoculars and lasersight.
 		if (CurrentLevel != 0)
-			HandleOptics();
+			HandleOptics(LaraItem);
 
-		// Update all items
+		// Update all items.
 		InItemControlLoop = true;
 
 		short itemNumber = NextItemActive;
@@ -353,11 +345,11 @@ GameStatus ControlPhase(int numFrames, int demoMode)
 		HealthBarTimer--;
 		GameTimer++;
 
-		// Add renderer objects on the first processed frame
-		if (firstTime)
+		// Add renderer objects on the first processed frame.
+		if (isFirstTime)
 		{
 			g_Renderer.Lock();
-			firstTime = false;
+			isFirstTime = false;
 		}
 	}
 
@@ -397,20 +389,20 @@ GameStatus DoTitle(int index, std::string const& ambient)
 	if (!LoadLevelFile(index))
 		return GameStatus::ExitGame;
 
-	InventoryResult inventoryResult;
+	InventoryResult invResult;
 
 	g_GameStringsHandler->ClearDisplayStrings();
 	g_GameScript->ResetScripts(true);
 
 	if (g_GameFlow->TitleType == TITLE_TYPE::FLYBY)
 	{
-		// Initialise items, effects, lots, camera
+		// Initialize items, effects, lots, camera.
 		InitialiseFXArray(true);
 		InitialisePickupDisplay();
 		InitialiseCamera();
 
-		// Run the level script
-		ScriptInterfaceLevel* level = g_GameFlow->GetLevel(index);
+		// Run level script.
+		auto* level = g_GameFlow->GetLevel(index);
 
 		if (!level->ScriptFileName.empty())
 		{
@@ -432,15 +424,15 @@ GameStatus DoTitle(int index, std::string const& ambient)
 
 		Statistics.Level.Timer = 0;
 
-		// Initialise flyby cameras
+		// Initialize flyby cameras.
 		InitSpotCamSequences();
 		InitialiseSpotCam(0);
 		UseSpotCam = true;
 
-		// Play background music
+		// Play background music.
 		// MERGE: PlaySoundTrack(index);
 
-		// Initialise menu
+		// Initialize menu.
 		g_Gui.SetMenuToDisplay(Menu::Title);
 		g_Gui.SetSelectedOption(0);
 
@@ -454,29 +446,29 @@ GameStatus DoTitle(int index, std::string const& ambient)
 
 		ControlPhase(2, 0);
 
-		int frames = 0;
-		auto status = InventoryResult::None;
+		int numFrames = 0;
+		auto invStatus = InventoryResult::None;
 
-		while (status == InventoryResult::None && DoTheGame)
+		while (invStatus == InventoryResult::None && DoTheGame)
 		{
 			g_Renderer.RenderTitle();
 
-			UpdateInput();
+			UpdateInputActions(LaraItem);
 
-			status = g_Gui.TitleOptions();
+			invStatus = g_Gui.TitleOptions(LaraItem);
 
-			if (status != InventoryResult::None)
+			if (invStatus != InventoryResult::None)
 				break;
 
 			Camera.numberFrames = g_Renderer.Synchronize();
-			frames = Camera.numberFrames;
-			ControlPhase(frames, 0);
+			numFrames = Camera.numberFrames;
+			ControlPhase(numFrames, 0);
 		}
 
-		inventoryResult = status;
+		invResult = invStatus;
 	}
 	else
-		inventoryResult = g_Gui.TitleOptions();
+		invResult = g_Gui.TitleOptions(LaraItem);
 
 	StopSoundTracks();
 
@@ -484,7 +476,7 @@ GameStatus DoTitle(int index, std::string const& ambient)
 	g_GameScript->FreeLevelScripts();
 	g_GameScriptEntities->FreeEntities();
 
-	switch (inventoryResult)
+	switch (invResult)
 	{
 	case InventoryResult::NewGame:
 		return GameStatus::NewGame;
@@ -501,11 +493,11 @@ GameStatus DoTitle(int index, std::string const& ambient)
 
 GameStatus DoLevel(int index, std::string const& ambient, bool loadFromSavegame)
 {
-	// Load the level and fall back to title, if load was unsuccessful
+	// Load the level. Fall back to title if unsuccessful.
 	if (!LoadLevelFile(index))
 		return GameStatus::ExitToTitle;
 
-	// Initialise items, effects, lots, camera
+	// Initialize items, effects, lots, and camera.
 	InitialiseFXArray(true);
 	InitialisePickupDisplay();
 	InitialiseCamera();
@@ -513,7 +505,7 @@ GameStatus DoLevel(int index, std::string const& ambient, bool loadFromSavegame)
 	g_GameStringsHandler->ClearDisplayStrings();
 	g_GameScript->ResetScripts(loadFromSavegame);
 
-	// Run the level script
+	// Run level script.
 	ScriptInterfaceLevel* level = g_GameFlow->GetLevel(index);
 
 	if (!level->ScriptFileName.empty())
@@ -526,7 +518,7 @@ GameStatus DoLevel(int index, std::string const& ambient, bool loadFromSavegame)
 		});
 	}
 
-	// Play default background music
+	// Play default background music.
 	PlaySoundTrack(ambient, SoundTrackType::BGM);
 
 	// Restore the game?
@@ -542,15 +534,13 @@ GameStatus DoLevel(int index, std::string const& ambient, bool loadFromSavegame)
 		Camera.target.y = LaraItem->Pose.Position.y;
 		Camera.target.z = LaraItem->Pose.Position.z;
 
-		int x = Lara.Control.Weapon.WeaponItem;
-
 		RequiredStartPos = false;
 		InitialiseGame = false;
 		g_GameFlow->SelectedSaveGame = 0;
 	}
 	else
 	{
-		// If not loading a savegame, then clear all the infos
+		// If not loading a savegame, clear all info.
 		Statistics.Level = {};
 		RequiredStartPos = false;
 
@@ -566,7 +556,7 @@ GameStatus DoLevel(int index, std::string const& ambient, bool loadFromSavegame)
 	g_Gui.SetInventoryItemChosen(NO_ITEM);
 	g_Gui.SetEnterInventory(NO_ITEM);
 
-	// Initialise flyby cameras
+	// Initialize flyby cameras.
 	InitSpotCamSequences();
 
 	InitialiseHair();
@@ -580,14 +570,14 @@ GameStatus DoLevel(int index, std::string const& ambient, bool loadFromSavegame)
 
 	int nFrames = 2;
 
-	// First control phase
+	// First control phase.
 	g_Renderer.ResetAnimations();
 	GameStatus result = ControlPhase(nFrames, 0);
 
-	// Fade in screen
+	// Fade in screen.
 	SetScreenFadeIn(FADE_SCREEN_SPEED);
 
-	// The game loop, finally!
+	// Run the game loop.
 	while (DoTheGame)
 	{
 		result = ControlPhase(nFrames, 0);
@@ -600,7 +590,7 @@ GameStatus DoLevel(int index, std::string const& ambient, bool loadFromSavegame)
 			g_GameScript->FreeLevelScripts();
 			g_GameScriptEntities->FreeEntities();
 
-			// Here is the only way for exiting from the loop
+			// Here is the only way to exit the loop.
 			StopAllSounds();
 			StopSoundTracks();
 			StopRumble();
@@ -640,7 +630,8 @@ void UpdateShatters()
 
 		floor->Stopper = false;
 		SmashedMesh[SmashedMeshCount] = 0;
-	} while (SmashedMeshCount != 0);
+	}
+	while (SmashedMeshCount != 0);
 }
 
 void KillMoveItems()
@@ -689,36 +680,34 @@ int GetRandomDraw()
 
 void CleanUp()
 {
-	// Reset oscillator seed
+	// Reset oscillator seed.
 	Wibble = 0;
 
-	// Needs to be cleared or otherwise controls will lockup if user will exit to title
-	// while playing flyby with locked controls
+	// Needs to be cleared, otherwise controls will lock if user exits to title while playing flyby with locked controls.
 	Lara.Control.Locked = false;
 
-	// Weather.Clear resets lightning and wind parameters so user won't see prev weather in new level
+	// Resets lightning and wind parameters to avoid holding over previous weather to new level.
 	Weather.Clear();
 
-	// Needs to be cleared because otherwise a list of active creatures from previous level
-	// will spill into new level
+	// Needs to be cleared, otherwise a list of active creatures from previous level will spill into new level.
 	ActiveCreatures.clear();
 
-	// Clear ropes
+	// Clear ropes.
 	Ropes.clear();
 
-	// Clear camera data
+	// Clear camera data.
 	ClearSpotCamSequences();
 	ClearCinematicBars();
 
-	// Clear all kinds of particles
+	// Clear all kinds of particles.
 	DisableSmokeParticles();
 	DisableDripParticles();
 	DisableBubbles();
 	DisableDebris();
 
-	// Clear swarm enemies
+	// Clear swarm enemies.
 	ClearSwarmEnemies(nullptr);
 
-	// Clear soundtrack masks
+	// Clear soundtrack masks.
 	ClearSoundTrackMasks();
 }

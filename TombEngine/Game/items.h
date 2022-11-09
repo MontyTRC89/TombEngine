@@ -5,9 +5,9 @@
 
 #include "Game/animation.h"
 #include "Game/itemdata/itemdata.h"
+#include "Math/Math.h"
 #include "Specific/newtypes.h"
 #include "Specific/BitField.h"
-#include "Specific/phd_global.h"
 
 using namespace TEN::Utils;
 
@@ -39,11 +39,11 @@ enum ItemStatus
 
 enum ItemFlags
 {
-	IFLAG_CLEAR_BODY	  = (1 << 7),  // 0x0080
-	IFLAG_INVISIBLE		  = (1 << 8),  // 0x0100
-	IFLAG_REVERSE		  = (1 << 14), // 0x4000
-	IFLAG_KILLED		  = (1 << 15), // 0x8000
-	IFLAG_ACTIVATION_MASK = 0x3E00	   // bits 9-13
+	IFLAG_CLEAR_BODY	  = (1 << 7),
+	IFLAG_INVISIBLE		  = (1 << 8),
+	IFLAG_REVERSE		  = (1 << 14),
+	IFLAG_KILLED		  = (1 << 15),
+	IFLAG_ACTIVATION_MASK = 0x3E00 // bits 9-13
 };
 
 constexpr unsigned int ALL_JOINT_BITS = UINT_MAX;
@@ -65,7 +65,7 @@ struct EntityAnimationData
 	int RequiredState = -1; // TODO: Phase out this weird feature.
 
 	bool IsAirborne	= false;
-	Vector3 Velocity = Vector3::Zero; // CONVENTION: +X is right, +Y is down, +Z is forward.
+	Vector3 Velocity = Vector3::Zero; // CONVENTION: +X = right, +Y = down, +Z = forward
 	std::vector<BoneMutator> Mutator = {};
 };
 
@@ -83,8 +83,8 @@ struct ItemInfo
 
 	ITEM_DATA Data;
 	EntityAnimationData Animation;
-	PHD_3DPOS StartPose;
-	PHD_3DPOS Pose;
+	Pose StartPose;
+	Pose Pose;
 	ROOM_VECTOR Location;
 	short RoomNumber;
 	int Floor;

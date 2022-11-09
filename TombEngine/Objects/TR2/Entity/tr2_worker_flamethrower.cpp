@@ -14,11 +14,11 @@
 #include "Game/people.h"
 #include "Specific/setup.h"
 #include "Specific/level.h"
-#include "Specific/trmath.h"
+#include "Math/Math.h"
 
 namespace TEN::Entities::Creatures::TR2
 {
-	const auto WorkerFlamethrowerOffset = Vector3Int(0, 140, 0);
+	const auto WorkerFlamethrowerOffset = Vector3i(0, 140, 0);
 	const auto WorkerFlamethrowerBite = BiteInfo(Vector3(0.0f, 250.0f, 32.0f), 9);
 
 	// TODO
@@ -51,29 +51,20 @@ namespace TEN::Entities::Creatures::TR2
 		if (!CreatureActive(itemNumber))
 			return;
 
-		Vector3Int pos;
-
 		auto* item = &g_Level.Items[itemNumber];
 		auto* creature = GetCreatureInfo(item);
 
-		short tilt = 0;
 		short angle = 0;
-		short headX = 0;
-		short headY = 0;
-		short torsoX = 0;
-		short torsoY = 0;
+		short tilt = 0;
+		auto extraHeadRot = EulerAngles::Zero;
+		auto extraTorsoRot = EulerAngles::Zero;
 
-		pos = Vector3Int(WorkerFlamethrowerBite.Position);
-		GetJointAbsPosition(item, &pos, WorkerFlamethrowerBite.meshNum);
+		auto pos = GetJointPosition(item, WorkerFlamethrowerBite.meshNum, Vector3i(WorkerFlamethrowerBite.Position));
 
 		if (item->HitPoints <= 0)
 		{
 			if (item->Animation.ActiveState != 7)
-			{
-				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 19;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-				item->Animation.ActiveState = 7;
-			}
+				SetAnimation(item, 19);
 		}
 		else
 		{
@@ -104,8 +95,8 @@ namespace TEN::Entities::Creatures::TR2
 
 				if (AI.ahead)
 				{
-					headX = AI.xAngle;
-					headY = AI.angle;
+					extraHeadRot.x = AI.xAngle;
+					extraHeadRot.y = AI.angle;
 				}
 
 				if (creature->Mood == MoodType::Escape)
@@ -134,8 +125,8 @@ namespace TEN::Entities::Creatures::TR2
 
 				if (AI.ahead)
 				{
-					headX = AI.xAngle;
-					headY = AI.angle;
+					extraHeadRot.x = AI.xAngle;
+					extraHeadRot.y = AI.angle;
 				}
 
 				if (creature->Mood == MoodType::Escape)
@@ -162,8 +153,8 @@ namespace TEN::Entities::Creatures::TR2
 
 				if (AI.ahead)
 				{
-					headX = AI.xAngle;
-					headY = AI.angle;
+					extraHeadRot.x = AI.xAngle;
+					extraHeadRot.y = AI.angle;
 				}
 
 				if (creature->Mood != MoodType::Escape)
@@ -179,8 +170,8 @@ namespace TEN::Entities::Creatures::TR2
 			case 4:
 				if (AI.ahead)
 				{
-					headX = AI.xAngle;
-					headY = AI.angle;
+					extraHeadRot.x = AI.xAngle;
+					extraHeadRot.y = AI.angle;
 				}
 
 				if (Targetable(item, &AI))
@@ -199,8 +190,8 @@ namespace TEN::Entities::Creatures::TR2
 			case 6:
 				if (AI.ahead)
 				{
-					torsoX = AI.xAngle;
-					torsoY = AI.angle;
+					extraTorsoRot.x = AI.xAngle;
+					extraTorsoRot.y = AI.angle;
 				}
 
 				if (item->Animation.TargetState != 1 &&
@@ -217,8 +208,8 @@ namespace TEN::Entities::Creatures::TR2
 
 				if (AI.ahead)
 				{
-					torsoX = AI.xAngle;
-					torsoY = AI.angle;
+					extraTorsoRot.x = AI.xAngle;
+					extraTorsoRot.y = AI.angle;
 				}
 
 				if (Targetable(item, &AI))
@@ -231,10 +222,10 @@ namespace TEN::Entities::Creatures::TR2
 		}
 
 		CreatureTilt(item, tilt);
-		CreatureJoint(item, 0, torsoY);
-		CreatureJoint(item, 1, torsoX);
-		CreatureJoint(item, 2, headY);
-		CreatureJoint(item, 3, headX);
+		CreatureJoint(item, 0, extraTorsoRot.y);
+		CreatureJoint(item, 1, extraTorsoRot.x);
+		CreatureJoint(item, 2, extraHeadRot.y);
+		CreatureJoint(item, 3, extraHeadRot.x);
 		CreatureAnimation(itemNumber, angle, tilt);
 	}
 }

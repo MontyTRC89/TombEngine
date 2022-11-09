@@ -8,12 +8,11 @@
 #include "Game/misc.h"
 #include "Game/missile.h"
 #include "Game/people.h"
+#include "Math/Math.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
-#include "Specific/prng.h"
-#include "Specific/trmath.h"
 
-using namespace TEN::Math::Random;
+using namespace TEN::Math;
 
 namespace TEN::Entities::Creatures::TR1
 {
@@ -25,19 +24,19 @@ namespace TEN::Entities::Creatures::TR1
 	constexpr auto NATLA_TIMER = 0x7FFF;
 	constexpr auto NATLA_GUN_VELOCITY = 400;
 
-	constexpr auto NATLA_LAND_CHANCE = 0.008f;
+	constexpr auto NATLA_LAND_CHANCE = 1.0f / 128;
 
-	#define NATLA_TURN_NEAR_DEATH_SPEED ANGLE(6.0f)
-	#define NATLA_TURN_SPEED ANGLE(5.0f)
-	#define NATLA_FLY_ANGLE_SPEED ANGLE(5.0f)
-	#define NATLA_SHOOT_ANGLE ANGLE(30.0f)
+	const auto NATLA_TURN_NEAR_DEATH_SPEED = ANGLE(6.0f);
+	const auto NATLA_TURN_SPEED = ANGLE(5.0f);
+	const auto NATLA_FLY_ANGLE_SPEED = ANGLE(5.0f);
+	const auto NATLA_SHOOT_ANGLE = ANGLE(30.0f);
 
 	const auto NatlaGunBite = BiteInfo(Vector3(5.0f, 220.0f, 7.0f), 4);
 
 	enum NatlaState
 	{
-		NATLA_STATE_NONE,
-		NATLA_STATE_IDLE,
+		// No state 0.
+		NATLA_STATE_IDLE = 1,
 		NATLA_STATE_FLY,
 		NATLA_STATE_RUN,
 		NATLA_STATE_AIM,
@@ -57,8 +56,8 @@ namespace TEN::Entities::Creatures::TR1
 		auto* creature = GetCreatureInfo(item);
 
 		short head = 0;
-		short angle = 0;
 		short tilt = 0;
+		short angle = 0;
 		short facing = 0;
 		short gun = creature->JointRotation[0] * 7 / 8;
 
@@ -187,7 +186,7 @@ namespace TEN::Entities::Creatures::TR1
 
 			if (item->Animation.ActiveState == NATLA_STATE_FLY && (creature->Flags & NATLA_FLYMODE))
 			{
-				if (creature->Flags & NATLA_FLYMODE && shoot && TestProbability(NATLA_LAND_CHANCE))
+				if (creature->Flags & NATLA_FLYMODE && shoot && Random::TestProbability(NATLA_LAND_CHANCE))
 					creature->Flags -= NATLA_FLYMODE;
 
 				if (!(creature->Flags & NATLA_FLYMODE))

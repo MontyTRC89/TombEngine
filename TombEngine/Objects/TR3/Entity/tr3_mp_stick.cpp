@@ -11,7 +11,6 @@
 #include "Game/people.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
-#include "Specific/prng.h"
 #include "Specific/setup.h"
 
 using namespace TEN::Math::Random;
@@ -21,8 +20,8 @@ namespace TEN::Entities::Creatures::TR3
 {
 	const auto MPStickBite1 = BiteInfo(Vector3(247.0f, 10.0f, 11.0f), 13);
 	const auto MPStickBite2 = BiteInfo(Vector3(0.0f, 0.0f, 100.0f), 6);
-	const vector<uint> MPStickPunchAttackJoints = { 10, 13 };
-	const vector<uint> MPStickKickAttackJoints  = { 5, 6 };
+	const vector<unsigned int> MPStickPunchAttackJoints = { 10, 13 };
+	const vector<unsigned int> MPStickKickAttackJoints  = { 5, 6 };
 
 	enum MPStickState
 	{
@@ -70,7 +69,7 @@ namespace TEN::Entities::Creatures::TR3
 		short angle = 0;
 		short tilt = 0;
 		short head = 0;
-		auto extraTorsoRot = Vector3Shrt::Zero;
+		auto extraTorsoRot = EulerAngles::Zero;
 
 		if (item->BoxNumber != NO_BOX && (g_Level.Boxes[item->BoxNumber].flags & BLOCKED))
 		{
@@ -351,7 +350,7 @@ namespace TEN::Entities::Creatures::TR3
 				{
 					if (!creature->Flags && enemy != nullptr)
 					{
-						if (Vector3Int::Distance(item->Pose.Position, creature->Enemy->Pose.Position) <= SECTOR(0.25f))
+						if (Vector3i::Distance(item->Pose.Position, creature->Enemy->Pose.Position) <= SECTOR(0.25f))
 						{
 							DoDamage(enemy, 5);
 							CreatureEffect(item, MPStickBite1, DoBloodSplat);
@@ -386,7 +385,7 @@ namespace TEN::Entities::Creatures::TR3
 				{
 					if (!creature->Flags && creature->Enemy != nullptr)
 					{
-						if (Vector3Int::Distance(item->Pose.Position, creature->Enemy->Pose.Position) <= SECTOR(0.25f))
+						if (Vector3i::Distance(item->Pose.Position, creature->Enemy->Pose.Position) <= SECTOR(0.25f))
 						{
 							DoDamage(creature->Enemy, 5);
 							CreatureEffect(item, MPStickBite1, DoBloodSplat);
@@ -424,7 +423,7 @@ namespace TEN::Entities::Creatures::TR3
 				{
 					if (creature->Flags != 2 && creature->Enemy)
 					{
-						if (Vector3Int::Distance(item->Pose.Position, creature->Enemy->Pose.Position) <= SECTOR(0.25f))
+						if (Vector3i::Distance(item->Pose.Position, creature->Enemy->Pose.Position) <= SECTOR(0.25f))
 						{
 							DoDamage(creature->Enemy, 6);
 							CreatureEffect(item, MPStickBite1, DoBloodSplat);
@@ -458,7 +457,7 @@ namespace TEN::Entities::Creatures::TR3
 					if (!creature->Flags != 1 && creature->Enemy &&
 						item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 8)
 					{
-						if (Vector3Int::Distance(item->Pose.Position, creature->Enemy->Pose.Position) <= SECTOR(0.25f))
+						if (Vector3i::Distance(item->Pose.Position, creature->Enemy->Pose.Position) <= SECTOR(0.25f))
 						{
 							DoDamage(creature->Enemy, 9);
 							CreatureEffect(item, MPStickBite2, DoBloodSplat);

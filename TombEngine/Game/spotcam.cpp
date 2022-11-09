@@ -9,7 +9,7 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
-#include "Specific/input.h"
+#include "Specific/Input/Input.h"
 
 using namespace TEN::Input;
 using namespace TEN::Renderer;
@@ -22,11 +22,11 @@ int SpotcamTimer;
 bool SpotcamPaused;
 int SpotcamLoopCnt;
 int CameraFade;
-Vector3Int LaraFixedPosition;
+Vector3i LaraFixedPosition;
 int InitialCameraRoom;
 int LastFOV;
-Vector3Int InitialCameraPosition;
-Vector3Int InitialCameraTarget;
+Vector3i InitialCameraPosition;
+Vector3i InitialCameraTarget;
 int CurrentSplinePosition;
 int SplineToCamera;
 int FirstCamera;
@@ -144,7 +144,7 @@ void InitialiseSpotCam(short Sequence)
 	InitialCameraTarget.z = Camera.target.z;
 
 	LaraHealth = LaraItem->HitPoints;
-	InitialCameraRoom = Camera.pos.roomNumber;
+	InitialCameraRoom = Camera.pos.RoomNumber;
 
 	LaraFixedPosition.x = LaraItem->Pose.Position.x;
 	LaraFixedPosition.y = LaraItem->Pose.Position.y;
@@ -480,11 +480,11 @@ void CalculateSpotCameras()
 		auto outsideRoom = IsRoomOutside(cpx, cpy, cpz);
 		if (outsideRoom == NO_ROOM)
 		{
-			Camera.pos.roomNumber = SpotCam[CurrentSplineCamera].roomNumber;
-			GetFloor(Camera.pos.x, Camera.pos.y, Camera.pos.z, &Camera.pos.roomNumber);
+			Camera.pos.RoomNumber = SpotCam[CurrentSplineCamera].roomNumber;
+			GetFloor(Camera.pos.x, Camera.pos.y, Camera.pos.z, &Camera.pos.RoomNumber);
 		}
 		else
-			Camera.pos.roomNumber = outsideRoom;
+			Camera.pos.RoomNumber = outsideRoom;
 
 		AlterFOV(cfov);
 
@@ -505,13 +505,13 @@ void CalculateSpotCameras()
 			Camera.type = CameraType::Heavy;
 			if (CurrentLevel != 0)
 			{
-				TestTriggers(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.roomNumber, true);
+				TestTriggers(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.RoomNumber, true);
 				TestVolumes(&Camera);
 			}
 			else
 			{
-				TestTriggers(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.roomNumber, false);
-				TestTriggers(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.roomNumber, true);
+				TestTriggers(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.RoomNumber, false);
+				TestTriggers(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.RoomNumber, true);
 				TestVolumes(&Camera);
 			}
 
@@ -641,13 +641,13 @@ void CalculateSpotCameras()
 						Camera.type = CameraType::Heavy;
 						if (CurrentLevel)
 						{
-							TestTriggers(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.roomNumber, true);
+							TestTriggers(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.RoomNumber, true);
 							TestVolumes(&Camera);
 						}
 						else
 						{
-							TestTriggers(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.roomNumber, false);
-							TestTriggers(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.roomNumber, true);
+							TestTriggers(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.RoomNumber, false);
+							TestTriggers(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.RoomNumber, true);
 							TestVolumes(&Camera);
 						}
 
@@ -672,7 +672,7 @@ void CalculateSpotCameras()
 						Camera.target.x = InitialCameraTarget.x;
 						Camera.target.y = InitialCameraTarget.y;
 						Camera.target.z = InitialCameraTarget.z;
-						Camera.pos.roomNumber = InitialCameraRoom;
+						Camera.pos.RoomNumber = InitialCameraRoom;
 					}
 
 					SpotcamOverlay = false;

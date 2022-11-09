@@ -6,7 +6,7 @@
 #include "Game/control/lot.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/tomb4fx.h"
-#include "Game/gui.h"
+#include "Game/Gui.h"
 #include "Game/itemdata/creature_info.h"
 #include "Game/items.h"
 #include "Game/misc.h"
@@ -14,11 +14,13 @@
 #include "Objects/objectslist.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
-#include "Specific/trmath.h"
+#include "Math/Math.h"
+
+using namespace TEN::Gui;
 
 namespace TEN::Entities::TR4
 {
-	const auto SentryGunFlameOffset = Vector3Int(-140, 0, 0);
+	const auto SentryGunFlameOffset = Vector3i(-140, 0, 0);
 	const auto SentryGunBite = BiteInfo(Vector3::Zero, 8);
 
 	void InitialiseSentryGun(short itemNumber)
@@ -49,9 +51,7 @@ namespace TEN::Entities::TR4
 		{
 			if (item->ItemFlags[0])
 			{
-				auto pos = Vector3Int(SentryGunBite.Position);
-				GetJointAbsPosition(item, &pos, SentryGunBite.meshNum);
-
+				auto pos = GetJointPosition(item, SentryGunBite.meshNum, Vector3i(SentryGunBite.Position));
 				TriggerDynamicLight(pos.x, pos.y, pos.z, 4 * item->ItemFlags[0] + 12, 24, 16, 4);
 				item->ItemFlags[0]--;
 			}

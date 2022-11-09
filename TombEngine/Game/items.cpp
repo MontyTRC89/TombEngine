@@ -1,17 +1,17 @@
 #include "framework.h"
 #include "Game/items.h"
 
-#include "Game/control/control.h"
 #include "Game/collision/floordata.h"
+#include "Game/control/control.h"
 #include "Game/effects/effects.h"
 #include "Game/Lara/lara.h"
-#include "ScriptInterfaceGame.h"
-#include "Specific/setup.h"
-#include "Specific/level.h"
-#include "Specific/input.h"
+#include "Math/Math.h"
 #include "Objects/ScriptInterfaceObjectsHandler.h"
+#include "Scripting/Include/ScriptInterfaceGame.h"
 #include "Sound/sound.h"
-#include "Specific/prng.h"
+#include "Specific/Input/Input.h"
+#include "Specific/level.h"
+#include "Specific/setup.h"
 
 using namespace TEN::Floordata;
 using namespace TEN::Input;
@@ -521,7 +521,7 @@ short SpawnItem(ItemInfo* item, GAME_OBJECT_ID objectNumber)
 
 		spawn->ObjectNumber = objectNumber;
 		spawn->RoomNumber = item->RoomNumber;
-		memcpy(&spawn->Pose, &item->Pose, sizeof(PHD_3DPOS));
+		memcpy(&spawn->Pose, &item->Pose, sizeof(Pose));
 
 		InitialiseItem(itemNumber);
 
@@ -555,7 +555,7 @@ int GlobalItemReplace(short search, GAME_OBJECT_ID replace)
 // Offset values may be used to account for the quirk of room traversal only being able to occur at portals.
 void UpdateItemRoom(ItemInfo* item, int height, int xOffset, int zOffset)
 {
-	auto point = TranslateVector(item->Pose.Position, item->Pose.Orientation.y, zOffset, height, xOffset);
+	auto point = Geometry::TranslatePoint(item->Pose.Position, item->Pose.Orientation.y, zOffset, height, xOffset);
 
 	// Hacky L-shaped Location traversal.
 	item->Location = GetRoom(item->Location, point.x, point.y, point.z);

@@ -8,12 +8,11 @@
 #include "Game/itemdata/creature_info.h"
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
+#include "Math/Math.h"
 #include "Specific/level.h"
-#include "Specific/prng.h"
 #include "Specific/setup.h"
 
-using namespace TEN::Math::Random;
-using std::vector;
+using namespace TEN::Math;
 
 namespace TEN::Entities::Creatures::TR1
 {
@@ -29,12 +28,12 @@ namespace TEN::Entities::Creatures::TR1
 
 	constexpr auto WOLF_SLEEP_FRAME = 96;
 
-	#define WOLF_WALK_TURN_RATE_MAX	 ANGLE(2.0f)
-	#define WOLF_RUN_TURN_RATE_MAX	 ANGLE(5.0f)
-	#define WOLF_STALK_TURN_RATE_MAX ANGLE(2.0f)
+	const auto WOLF_WALK_TURN_RATE_MAX	= ANGLE(2.0f);
+	const auto WOLF_RUN_TURN_RATE_MAX	= ANGLE(5.0f);
+	const auto WOLF_STALK_TURN_RATE_MAX = ANGLE(2.0f);
 
 	const auto WolfBite = BiteInfo(Vector3(0.0f, -14.0f, 174.0f), 6);
-	const vector<uint> WolfAttackJoints = { 0, 1, 2, 3, 6, 8, 9, 10, 12, 13, 14 };
+	const auto WolfAttackJoints = std::vector<unsigned int>{ 0, 1, 2, 3, 6, 8, 9, 10, 12, 13, 14 };
 
 	enum WolfState
 	{
@@ -75,9 +74,9 @@ namespace TEN::Entities::Creatures::TR1
 		auto* item = &g_Level.Items[itemNumber];
 		auto* creature = GetCreatureInfo(item);
 
-		short head = 0;
 		short angle = 0;
 		short tilt = 0;
+		short head = 0;
 
 		if (item->HitPoints <= 0)
 		{
@@ -112,7 +111,7 @@ namespace TEN::Entities::Creatures::TR1
 					item->Animation.RequiredState = WOLF_STATE_CROUCH;
 					item->Animation.TargetState = WOLF_STATE_IDLE;
 				}
-				else if (TestProbability(WOLF_WAKE_CHANCE))
+				else if (Random::TestProbability(WOLF_WAKE_CHANCE))
 				{
 					item->Animation.RequiredState = WOLF_STATE_WALK;
 					item->Animation.TargetState = WOLF_STATE_IDLE;
@@ -135,7 +134,7 @@ namespace TEN::Entities::Creatures::TR1
 					item->Animation.TargetState = WOLF_STATE_STALK;
 					item->Animation.RequiredState = WOLF_STATE_NONE;
 				}
-				else if (TestProbability(WOLF_SLEEP_CHANCE))
+				else if (Random::TestProbability(WOLF_SLEEP_CHANCE))
 				{
 					item->Animation.RequiredState = WOLF_STATE_SLEEP;
 					item->Animation.TargetState = WOLF_STATE_IDLE;
@@ -176,7 +175,7 @@ namespace TEN::Entities::Creatures::TR1
 						item->Animation.TargetState = WOLF_STATE_RUN;
 					}
 				}
-				else if (TestProbability(WOLF_HOWL_CHANCE))
+				else if (Random::TestProbability(WOLF_HOWL_CHANCE))
 				{
 					item->Animation.RequiredState = WOLF_STATE_HOWL;
 					item->Animation.TargetState = WOLF_STATE_CROUCH;

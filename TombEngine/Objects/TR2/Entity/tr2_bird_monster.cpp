@@ -8,7 +8,7 @@
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
 #include "Specific/level.h"
-#include "Specific/prng.h"
+#include "Math/Random.h"
 #include "Specific/setup.h"
 
 using namespace TEN::Math::Random;
@@ -24,8 +24,8 @@ namespace TEN::Entities::Creatures::TR2
 
 	const auto BirdMonsterBiteLeft	= BiteInfo(Vector3(0.0f, 224.0f, 0.0f), 19);
 	const auto BirdMonsterBiteRight = BiteInfo(Vector3(0.0f, 224.0f, 0.0f), 22);
-	const vector<uint> BirdMonsterAttackLeftJoints  = { 18, 19 };
-	const vector<uint> BirdMonsterAttackRightJoints = { 21, 22 };
+	const vector<unsigned int> BirdMonsterAttackLeftJoints  = { 18, 19 };
+	const vector<unsigned int> BirdMonsterAttackRightJoints = { 21, 22 };
 
 	enum BirdMonsterState
 	{

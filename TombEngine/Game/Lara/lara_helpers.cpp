@@ -10,9 +10,10 @@
 #include "Game/Lara/lara_collide.h"
 #include "Game/Lara/lara_fire.h"
 #include "Game/Lara/lara_tests.h"
+#include "Math/Math.h"
 #include "Renderer/Renderer11.h"
 #include "Sound/sound.h"
-#include "Specific/input.h"
+#include "Specific/Input/Input.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
@@ -25,9 +26,10 @@
 #include "Objects/TR4/Vehicles/jeep.h"
 #include "Objects/TR4/Vehicles/motorbike.h"
 
-using namespace TEN::Renderer;
-using namespace TEN::Input;
 using namespace TEN::Control::Volumes;
+using namespace TEN::Input;
+using namespace TEN::Math;
+using namespace TEN::Renderer;
 
 // -----------------------------
 // HELPER FUNCTIONS
@@ -40,7 +42,7 @@ void HandleLaraMovementParameters(ItemInfo* item, CollisionInfo* coll)
 
 	// Update AFK pose timer.
 	if (lara->Control.Count.Pose < LARA_POSE_TIME && TestLaraPose(item, coll) &&
-		!(TrInput & (IN_WAKE | IN_LOOK)) &&
+		!(TrInput & IN_LOOK || IsOpticActionHeld()) &&
 		g_GameFlow->HasAFKPose())
 	{
 		lara->Control.Count.Pose++;
@@ -123,60 +125,45 @@ bool HandleLaraVehicle(ItemInfo* item, CollisionInfo* coll)
 
 		// Boats are processed like normal items in loop.
 	default:
-		LaraGun(item);
+		HandleWeapon(item);
 	}
 
 	return true;
 }
 
-void ApproachLaraTargetOrientation(ItemInfo* item, Vector3Shrt targetOrient, float rate)
-{
-	auto* lara = GetLaraInfo(item);
-
-	if (!rate)
-	{
-		TENLog(std::string("ApproachLaraTargetOrientation() attempted division by zero."), LogLevel::Warning);
-		return;
-	}
-
-	rate = abs(rate);
-
-	if (abs((short)(targetOrient.x - item->Pose.Orientation.x)) > ANGLE(0.1f))
-		item->Pose.Orientation.x += (short)(targetOrient.x - item->Pose.Orientation.x) / rate;
-	else
-		item->Pose.Orientation.x = targetOrient.x;
-
-	if (abs((short)(targetOrient.y - item->Pose.Orientation.y)) > ANGLE(0.1f))
-		item->Pose.Orientation.y += (short)(targetOrient.y - item->Pose.Orientation.y) / rate;
-	else
-		item->Pose.Orientation.y = targetOrient.y;
-
-	if (abs((short)(targetOrient.z - item->Pose.Orientation.z)) > ANGLE(0.1f))
-		item->Pose.Orientation.z += (short)(targetOrient.z - item->Pose.Orientation.z) / rate;
-	else
-		item->Pose.Orientation.z = targetOrient.z;
-}
-
-// TODO: This approach may cause undesirable artefacts where an object pushes Lara rapidly up/down a slope or a platform rapidly ascends/descends.
-// Nobody panic. I have ideas. @Sezz 2022.03.24
+// TODO: This approach may cause undesirable artefacts where a platform rapidly ascends/descends or the player gets pushed.
+// Potential solutions:
+// 1. Consider floor tilt when translating objects.
+// 2. Object parenting. -- Sezz 2022.10.28
 void EaseOutLaraHeight(ItemInfo* item, int height)
 {
+	static constexpr int   rate				 = 50;
+	static constexpr float easingAlpha		 = 0.35f;
+	static constexpr int   constantThreshold = STEPUP_HEIGHT / 2;
+
+	// Check for walls.
 	if (height == NO_HEIGHT)
 		return;
 
-	// Translate Lara to new height.
-	static constexpr int rate = 50;
-	int threshold = std::max(abs(item->Animation.Velocity.z) * 1.5f, CLICK(0.25f) / 4);
-	int sign = std::copysign(1, height);
-
-	if (TestEnvironment(ENV_FLAG_SWAMP, item) && height > 0)
-		item->Pose.Position.y += SWAMP_GRAVITY;
-	else if (abs(height) > (STEPUP_HEIGHT / 2))		// Outer range.
-		item->Pose.Position.y += rate * sign;
-	else if (abs(height) <= (STEPUP_HEIGHT / 2) &&	// Inner range.
-		abs(height) >= threshold)
+	// Swamp case.
+	if (TestEnvironment(ENV_FLAG_SWAMP, item))
 	{
-		item->Pose.Position.y += std::max<int>(abs(height / 2.75), threshold) * sign;
+		item->Pose.Position.y += (height > 0) ? SWAMP_GRAVITY : height;
+		return;
+	}
+
+	int easingThreshold = std::max(abs(item->Animation.Velocity.z) * 1.5f, BLOCK(1.0f / 64));
+
+	// Regular case.
+	if (abs(height) > constantThreshold)
+	{
+		int sign = std::copysign(1, height);
+		item->Pose.Position.y += rate * sign;
+	}
+	else if (abs(height) > easingThreshold)
+	{
+		int vPos = item->Pose.Position.y;
+		item->Pose.Position.y = (int)round(Lerp(vPos, vPos + height, easingAlpha));
 	}
 	else
 		item->Pose.Position.y += height;
@@ -335,7 +322,7 @@ short GetLaraSlideDirection(ItemInfo* item, CollisionInfo* coll)
 	// Get either:
 	// a) the surface aspect angle (extended slides), or
 	// b) the derived nearest cardinal direction from it (original slides).
-	headingAngle = GetSurfaceAspectAngle(probe.FloorTilt);
+	headingAngle = Geometry::GetSurfaceAspectAngle(probe.FloorTilt);
 	if (g_GameFlow->HasSlideExtended())
 		return headingAngle;
 	else
@@ -542,8 +529,8 @@ void ModulateLaraSlideVelocity(ItemInfo* item, CollisionInfo* coll)
 	{
 		auto probe = GetCollision(item);
 		short minSlideAngle = ANGLE(33.75f);
-		short steepness = GetSurfaceSteepnessAngle(probe.FloorTilt);
-		short direction = GetSurfaceAspectAngle(probe.FloorTilt);
+		short steepness = Geometry::GetSurfaceSteepnessAngle(probe.FloorTilt);
+		short direction = Geometry::GetSurfaceAspectAngle(probe.FloorTilt);
 
 		float velocityMultiplier = 1 / (float)ANGLE(33.75f);
 		int slideVelocity = std::min<int>(minVelocity + 10 * (steepness * velocityMultiplier), LARA_TERMINAL_VELOCITY);
@@ -560,19 +547,23 @@ void ModulateLaraSlideVelocity(ItemInfo* item, CollisionInfo* coll)
 
 void AlignLaraToSurface(ItemInfo* item, float alpha)
 {
+	// Calculate surface angles.
 	auto floorTilt = GetCollision(item).FloorTilt;
-	short aspectAngle = GetSurfaceAspectAngle(floorTilt);
-	short steepnessAngle = std::min(GetSurfaceSteepnessAngle(floorTilt), ANGLE(70.0f));
+	short aspectAngle = Geometry::GetSurfaceAspectAngle(floorTilt);
+	short steepnessAngle = std::min(Geometry::GetSurfaceSteepnessAngle(floorTilt), ANGLE(70.0f));
 
-	short deltaAngle = GetShortestAngularDistance(item->Pose.Orientation.y, aspectAngle);
+	short deltaAngle = Geometry::GetShortestAngle(item->Pose.Orientation.y, aspectAngle);
 	float sinDeltaAngle = phd_sin(deltaAngle);
 	float cosDeltaAngle = phd_cos(deltaAngle);
 
-	auto extraRot = Vector3Shrt(
+	// Calculate extra rotation required.
+	auto extraRot = EulerAngles(
 		-steepnessAngle * cosDeltaAngle,
 		0,
 		steepnessAngle * sinDeltaAngle
-	) - Vector3Shrt(item->Pose.Orientation.x, 0, item->Pose.Orientation.z);
+	) - EulerAngles(item->Pose.Orientation.x, 0, item->Pose.Orientation.z);
+
+	// Apply extra rotation according to alpha.
 	item->Pose.Orientation += extraRot * alpha;
 }
 
@@ -638,7 +629,7 @@ void SetLaraVault(ItemInfo* item, CollisionInfo* coll, VaultTestResult vaultResu
 	if (vaultResult.SnapToLedge)
 	{
 		SnapItemToLedge(item, coll, 0.2f, false);
-		lara->TargetOrientation = Vector3Shrt(0, coll->NearestLedgeAngle, 0);
+		lara->TargetOrientation = EulerAngles(0, coll->NearestLedgeAngle, 0);
 	}
 
 	if (vaultResult.SetJumpVelocity)

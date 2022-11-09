@@ -13,13 +13,12 @@
 #include "Game/misc.h"
 #include "Game/missile.h"
 #include "Game/people.h"
+#include "Math/Math.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
-#include "Specific/prng.h"
 #include "Specific/setup.h"
 
-using namespace TEN::Math::Random;
-using std::vector;
+using namespace TEN::Math;
 
 namespace TEN::Entities::Creatures::TR1
 {
@@ -28,11 +27,11 @@ namespace TEN::Entities::Creatures::TR1
 	constexpr auto CENTAUR_REAR_CHANCE = 1.0f / 340;
 	constexpr auto CENTAUR_BOMB_VELOCITY = CLICK(1);
 
-	#define CENTAUR_TURN_RATE_MAX ANGLE(4.0f)
+	const auto CENTAUR_TURN_RATE_MAX = ANGLE(4.0f);
 
 	const auto CentaurRocketBite = BiteInfo(Vector3(11.0f, 415.0f, 41.0f), 13);
 	const auto CentaurRearBite	 = BiteInfo(Vector3(50.0f, 30.0f, 0.0f), 5);
-	const vector<uint> CentaurAttackJoints = { 0, 3, 4, 7, 8, 16, 17 };
+	const auto CentaurAttackJoints = std::vector<unsigned int>{ 0, 3, 4, 7, 8, 16, 17 };
 
 	enum CentaurState
 	{
@@ -105,7 +104,7 @@ namespace TEN::Entities::Creatures::TR1
 					item->Animation.TargetState = CENTAUR_STATE_IDLE;
 					item->Animation.RequiredState = CENTAUR_STATE_AIM;
 				}
-				else if (TestProbability(CENTAUR_REAR_CHANCE))
+				else if (Random::TestProbability(CENTAUR_REAR_CHANCE))
 				{
 					item->Animation.TargetState = CENTAUR_STATE_IDLE;
 					item->Animation.RequiredState = CENTAUR_STATE_WARNING;

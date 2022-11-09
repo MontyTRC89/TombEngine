@@ -6,14 +6,17 @@
 #include "Game/control/control.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
+#include "Math/Math.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
+
+using namespace TEN::Math;
 
 namespace TEN::Effects::Footprints
 {
 	std::deque<FOOTPRINT_STRUCT> footprints = std::deque<FOOTPRINT_STRUCT>();
 
-	bool CheckFootOnFloor(ItemInfo const & item, int mesh, Vector3& outFootprintPosition) 
+	bool CheckFootOnFloor(const ItemInfo& item, int mesh, Vector3& outFootprintPosition)
 	{
 		int x = item.Pose.Position.x;
 		int y = item.Pose.Position.y;
@@ -21,10 +24,8 @@ namespace TEN::Effects::Footprints
 		short roomNumber = item.RoomNumber;
 
 		auto floor = GetFloor(x, y, z, &roomNumber);
-		auto pos = Vector3Int(0, FOOT_HEIGHT_OFFSET, 0);
-
-		GetLaraJointPosition(&pos, mesh);
-		int height = GetFloorHeight(floor, pos.x, pos.y - STEP_SIZE, pos.z);
+		auto pos = GetJointPosition(LaraItem, mesh, Vector3i(0, FOOT_HEIGHT_OFFSET, 0));
+		int height = GetFloorHeight(floor, pos.x, pos.y - CLICK(1), pos.z);
 
 		outFootprintPosition.x = pos.x;
 		outFootprintPosition.y = height - 8;
@@ -40,19 +41,19 @@ namespace TEN::Effects::Footprints
 
 		auto foot = rightFoot ? LM_RFOOT : LM_LFOOT;
 
-		// Don't process actual footprint placement if foot isn't on floor
+		// Don't process actual footprint placement if foot isn't on floor.
 		auto footPos = Vector3();
 		if (!CheckFootOnFloor(*item, foot, footPos))
 			return;
 
-		// Randomize foot position slightly to avoid patterns
+		// Slightly randomize foot position to avoid patterns.
 		footPos.x += (GetRandomControl() & 10) - 5;
 		footPos.z += (GetRandomControl() & 10) - 5;
 
 		auto result = GetCollision(footPos.x, footPos.y - STEP_SIZE, footPos.z, item->RoomNumber);
 		auto floor = result.BottomBlock;
 
-		// Don't process material if foot has hit bridge object
+		// Don't process material if foot has hit bridge object.
 		if (result.Position.Bridge >= 0)
 			return;
 
@@ -149,7 +150,7 @@ namespace TEN::Effects::Footprints
 			break;
 		}
 
-		// HACK: must be here until reference wad2 is revised
+		// HACK: Must be here until reference WAD2 is revised.
 		if (fx != SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS)
 			SoundEffect(fx, &item->Pose);
 
@@ -161,17 +162,19 @@ namespace TEN::Effects::Footprints
 			floor->Material != FLOOR_MATERIAL::Custom1 &&
 			floor->Material != FLOOR_MATERIAL::Custom3 &&
 			floor->Material != FLOOR_MATERIAL::Custom4)
+		{
 			return;
+		}
 
-		// Calculate footprint tilts
+		// Calculate footprint tilts.
 		auto plane = floor->FloorCollision.Planes[floor->SectorPlane(footPos.x, footPos.z)];
-		auto c = phd_cos(item->Pose.Orientation.y + ANGLE(180));
-		auto s = phd_sin(item->Pose.Orientation.y + ANGLE(180));
+		auto c = phd_cos(item->Pose.Orientation.y + ANGLE(180.0f));
+		auto s = phd_sin(item->Pose.Orientation.y + ANGLE(180.0f));
 		auto yRot = TO_RAD(item->Pose.Orientation.y);
 		auto xRot = plane.x * s + plane.y * c;
 		auto zRot = plane.y * s - plane.x * c;
 
-		// Calculate footprint positions
+		// Calculate footprint positions.
 		auto p0 = Vector3( FOOTPRINT_SIZE, 0,  FOOTPRINT_SIZE);
 		auto p1 = Vector3(-FOOTPRINT_SIZE, 0,  FOOTPRINT_SIZE);
 		auto p2 = Vector3(-FOOTPRINT_SIZE, 0, -FOOTPRINT_SIZE);
@@ -211,7 +214,7 @@ namespace TEN::Effects::Footprints
 		footprint.Position[1] = p1;
 		footprint.Position[2] = p2;
 		footprint.Position[3] = p3;
-		footprint.StartOpacity = 0.25f;
+		footprint.StartOpacity = 0.5f;
 		footprint.LifeStartFading = FPS * 10;
 		footprint.Life = FPS * 20;
 		footprint.Active = true;

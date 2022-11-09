@@ -1,17 +1,19 @@
 #include "framework.h"
-#include "ReservedScriptNames.h"
-#include "ScriptUtil.h"
-#include "Vec3/Vec3.h"
+
 #include "Game/camera.h"
 #include "Game/collision/collide_room.h"
 #include "Game/control/los.h"
-#include "Game/effects/tomb4fx.h"
 #include "Game/effects/explosion.h"
+#include "Game/effects/tomb4fx.h"
 #include "Game/effects/weather.h"
+#include "Game/room.h"
+#include "Game/spotcam.h"
+#include "ReservedScriptNames.h"
+#include "ScriptUtil.h"
 #include "Sound/sound.h"
 #include "Specific/configuration.h"
-#include "Specific/input.h"
-#include "Game/room.h"
+#include "Specific/Input/Input.h"
+#include "Vec3/Vec3.h"
 
 /***
 Functions that don't fit in the other modules.
@@ -47,11 +49,11 @@ namespace Misc
 	{
 		GameVector vec1, vec2;
 		pos1.StoreInGameVector(vec1);
-		vec1.roomNumber = roomNumber1;
+		vec1.RoomNumber = roomNumber1;
 		pos2.StoreInGameVector(vec2);
 
 		MESH_INFO* mesh;
-		Vector3Int vector;
+		Vector3i vector;
 		return LOS(&vec1, &vec2) && (ObjectOnLOS2(&vec1, &vec2, &vector, &mesh) == NO_LOS_ITEM);
 	}
 
@@ -156,7 +158,7 @@ namespace Misc
 	////@tparam[opt] Vec3 position The 3D position of the sound, i.e. where the sound "comes from". If not given, the sound will not be positional.
 	static void PlaySoundEffect(int id, sol::optional<Vec3> p)
 	{
-		SoundEffect(id, p.has_value() ? &PHD_3DPOS(p.value().x, p.value().y, p.value().z) : nullptr, SoundEnvironment::Always);
+		SoundEffect(id, p.has_value() ? &Pose(p.value().x, p.value().y, p.value().z) : nullptr, SoundEnvironment::Always);
 	}
 
 	static bool KeyIsHeld(int actionIndex)
@@ -185,6 +187,15 @@ namespace Misc
 	static void FlipMap(int flipmap)
 	{
 		DoFlipMap(flipmap);
+	}
+
+	///Enable FlyBy with specific ID
+	//@function PlayFlyBy
+	//@tparam short flyby (ID of flyby)
+	static void PlayFlyBy(short flyby)
+	{
+		UseSpotCam = true;
+		InitialiseSpotCam(flyby);
 	}
 
 	///Calculate the distance between two positions.
@@ -308,6 +319,8 @@ namespace Misc
 		table_misc.set_function(ScriptReserved_ScreenToPercent, &ScreenToPercent);
 
 		table_misc.set_function(ScriptReserved_FlipMap, &FlipMap);
+
+		table_misc.set_function(ScriptReserved_PlayFlyBy, &PlayFlyBy);
 
 	}
 }

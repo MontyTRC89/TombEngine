@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "Objects/Generic/Switches/cog_switch.h"
 #include "Game/control/control.h"
-#include "Specific/input.h"
+#include "Specific/Input/Input.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Objects/Generic/Switches/generic_switch.h"
@@ -17,16 +17,19 @@ using namespace TEN::Entities::Doors;
 
 namespace TEN::Entities::Switches
 {
-	OBJECT_COLLISION_BOUNDS CogSwitchBounds =
+	const ObjectCollisionBounds CogSwitchBounds =
 	{
-		-512, 512,
-		0, 0,
-		-1536, -512,
-		-ANGLE(10.0f), ANGLE(10.0f),
-		-ANGLE(30.0f), ANGLE(30.0f),
-		-ANGLE(10.0f), ANGLE(10.0f)
+		GameBoundingBox(
+			-SECTOR(0.5f), SECTOR(0.5f),
+			0, 0,
+			-SECTOR(1.5f), -SECTOR(0.5f)
+		),
+		std::pair(
+			EulerAngles(ANGLE(-10.0f), ANGLE(-30.0f), ANGLE(-10.0f)),
+			EulerAngles(ANGLE(10.0f), ANGLE(30.0f), ANGLE(10.0f))
+		)
 	};
-	Vector3Int CogSwitchPos(0, 0, -856);
+	const auto CogSwitchPos = Vector3i(0, 0, -856);
 
 	void CogSwitchCollision(short itemNum, ItemInfo* laraItem, CollisionInfo* coll)
 	{
@@ -76,9 +79,9 @@ namespace TEN::Entities::Switches
 					lara->Control.IsMoving &&
 					lara->InteractedItem == itemNum))
 			{
-				if (TestLaraPosition(&CogSwitchBounds, switchItem, laraItem))
+				if (TestLaraPosition(CogSwitchBounds, switchItem, laraItem))
 				{
-					if (MoveLaraPosition(&CogSwitchPos, switchItem, laraItem))
+					if (MoveLaraPosition(CogSwitchPos, switchItem, laraItem))
 					{
 						ResetLaraFlex(laraItem);
 						laraItem->Animation.AnimNumber = LA_COGWHEEL_GRAB;

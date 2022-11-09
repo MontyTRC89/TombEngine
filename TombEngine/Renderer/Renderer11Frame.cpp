@@ -1,5 +1,6 @@
 #include "framework.h"
 #include "Renderer/Renderer11.h"
+
 #include "Game/animation.h"
 #include "Game/camera.h"
 #include "Game/collision/sphere.h"
@@ -7,9 +8,12 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/spotcam.h"
+#include "Math/Math.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
 #include "RenderView/RenderView.h"
+
+using namespace TEN::Math;
 
 namespace TEN::Renderer
 {
@@ -27,6 +31,7 @@ namespace TEN::Renderer
 			m_rooms[i].EffectsToDraw.clear();
 			m_rooms[i].TransparentFacesToDraw.clear();
 			m_rooms[i].StaticsToDraw.clear();
+			m_rooms[i].LightsToDraw.clear();
 			m_rooms[i].Visited = false;
 			m_rooms[i].Clip = RendererRectangle(m_screenWidth, m_screenHeight, 0, 0);
 			m_rooms[i].ClipTest = RendererRectangle(m_screenWidth, m_screenHeight, 0, 0);
@@ -284,8 +289,8 @@ namespace TEN::Renderer
 			{
 				ROOM_DOOR* portal = &nativeRoom->doors[i];
 
-				Vector3Int n = Vector3Int(portal->normal.x, portal->normal.y, portal->normal.z);
-				Vector3Int v = Vector3Int(
+				Vector3i n = Vector3i(portal->normal.x, portal->normal.y, portal->normal.z);
+				Vector3i v = Vector3i(
 					Camera.pos.x - (nativeRoom->x + portal->vertices[0].x),
 					Camera.pos.y - (nativeRoom->y + portal->vertices[0].y),
 					Camera.pos.z - (nativeRoom->z + portal->vertices[0].z));
@@ -300,8 +305,8 @@ namespace TEN::Renderer
 
 	void Renderer11::GetVisibleObjects(RenderView& renderView, bool onlyRooms)
 	{
-		RendererRoom* room = &m_rooms[Camera.pos.roomNumber];
-		ROOM_INFO* nativeRoom = &g_Level.Rooms[Camera.pos.roomNumber];
+		RendererRoom* room = &m_rooms[Camera.pos.RoomNumber];
+		ROOM_INFO* nativeRoom = &g_Level.Rooms[Camera.pos.RoomNumber];
 
 		room->ClipTest = RendererRectangle(0, 0, m_screenWidth, m_screenHeight);
 		m_outside = nativeRoom->flags & ENV_FLAG_OUTSIDE;
@@ -310,7 +315,7 @@ namespace TEN::Renderer
 		room->BoundActive = 2;
 
 		// Initialise bounds list
-		m_boundList[0] = Camera.pos.roomNumber;
+		m_boundList[0] = Camera.pos.RoomNumber;
 		m_boundStart = 0;
 		m_boundEnd = 1;
 
@@ -370,7 +375,7 @@ namespace TEN::Renderer
 				bool inFrustum = false;
 				for (int i = 0; !inFrustum, i < cnt; i++)
 					// Blow up sphere radius by half for cases of too small calculated spheres.
-					if (renderView.camera.frustum.SphereInFrustum(spheres[i].Center, spheres[i].Radius * 1.5f))
+					if (renderView.camera.Frustum.SphereInFrustum(spheres[i].Center, spheres[i].Radius * 1.5f))
 						inFrustum = true;
 				
 				if (!inFrustum)
@@ -384,9 +389,7 @@ namespace TEN::Renderer
 			newItem->Color = item->Color;
 			newItem->Position = item->Pose.Position.ToVector3();
 			newItem->Translation = Matrix::CreateTranslation(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z);
-			newItem->Rotation = Matrix::CreateFromYawPitchRoll(TO_RAD(item->Pose.Orientation.y),
-															   TO_RAD(item->Pose.Orientation.x),
-															   TO_RAD(item->Pose.Orientation.z));
+			newItem->Rotation = item->Pose.Orientation.ToRotationMatrix();
 			newItem->Scale = Matrix::CreateScale(1.0f);
 			newItem->World = newItem->Rotation * newItem->Translation;
 
@@ -411,7 +414,7 @@ namespace TEN::Renderer
 		int numStatics = r->mesh.size();
 		for (int i = 0; i < numStatics; i++)
 		{
-			auto mesh = &r->mesh[i];
+			auto* mesh = &r->mesh[i];
 			
 			if (!(mesh->flags & StaticMeshFlags::SM_VISIBLE))
 				continue;
@@ -424,16 +427,16 @@ namespace TEN::Renderer
 			if (obj.ObjectMeshes.size() == 0)
 				continue;
 
-			auto bounds = TO_DX_BBOX(mesh->pos, GetBoundsAccurate(mesh, true));
+			const auto& bounds = GetBoundsAccurate(*mesh, true).ToBoundingOrientedBox(mesh->pos);
 			auto length = Vector3(bounds.Extents).Length();
-			if (!renderView.camera.frustum.SphereInFrustum(bounds.Center, length))
+			if (!renderView.camera.Frustum.SphereInFrustum(bounds.Center, length))
 				continue;
 
 			std::vector<RendererLight*> lights;
 			if (obj.ObjectMeshes.front()->LightMode != LIGHT_MODES::LIGHT_MODE_STATIC)
 				CollectLights(mesh->pos.Position.ToVector3(), ITEM_LIGHT_COLLECTION_RADIUS, room.RoomNumber, NO_ROOM, false, lights);
 
-			Matrix world = (Matrix::CreateFromYawPitchRoll(TO_RAD(mesh->pos.Orientation.y), TO_RAD(mesh->pos.Orientation.x), TO_RAD(mesh->pos.Orientation.z)) *
+			Matrix world = (mesh->pos.Orientation.ToRotationMatrix() *
 							Matrix::CreateScale(mesh->scale) *
 							Matrix::CreateTranslation(mesh->pos.Position.x, mesh->pos.Position.y, mesh->pos.Position.z));
 
@@ -616,7 +619,7 @@ namespace TEN::Renderer
 	void Renderer11::CollectLightsForCamera()
 	{
 		std::vector<RendererLight*> lightsToDraw;
-		CollectLights(Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z), CAMERA_LIGHT_COLLECTION_RADIUS, Camera.pos.roomNumber, NO_ROOM, true, lightsToDraw);
+		CollectLights(Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z), CAMERA_LIGHT_COLLECTION_RADIUS, Camera.pos.RoomNumber, NO_ROOM, true, lightsToDraw);
 
 		if (lightsToDraw.size() > 0 && lightsToDraw.front()->CastShadows)
 			shadowLight = lightsToDraw.front();
@@ -704,6 +707,7 @@ namespace TEN::Renderer
 				continue;
 
 			renderView.lightsToDraw.push_back(light);
+			room.LightsToDraw.push_back(light);
 		}
 	}
 
@@ -728,7 +732,7 @@ namespace TEN::Renderer
 			RendererEffect *newEffect = &m_effects[fxNum];
 
 			Matrix translation = Matrix::CreateTranslation(fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z);
-			Matrix rotation = Matrix::CreateFromYawPitchRoll(TO_RAD(fx->pos.Orientation.y), TO_RAD(fx->pos.Orientation.x), TO_RAD(fx->pos.Orientation.z));
+			Matrix rotation = fx->pos.Orientation.ToRotationMatrix();
 
 			newEffect->ObjectNumber = fx->objectNumber;
 			newEffect->RoomNumber = fx->roomNumber;

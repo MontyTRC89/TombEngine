@@ -23,7 +23,7 @@
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>v143</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
@@ -76,6 +76,7 @@
       <BufferSecurityCheck>false</BufferSecurityCheck>
       <AdditionalOptions>/Zc:__cplusplus /experimental:external /external:anglebrackets</AdditionalOptions>
       <DisableSpecificWarnings>4244;5051;4018;4554;4996;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -164,6 +165,9 @@ CALL gen.bat</Command>
     <ClInclude Include="Game\control\volume.h" />
     <ClInclude Include="Game\debug\debug.h" />
     <ClInclude Include="Game\effects\lightning.h" />
+    <ClInclude Include="Game\GuiObjects.h" />
+    <ClInclude Include="Objects\TR4\Object\tr4_sas_drag_bloke.h" />
+    <ClInclude Include="Specific\Input\InputAction.h" />
     <ClInclude Include="Game\itemdata\door_data.h" />
     <ClInclude Include="Game\effects\drip.h" />
     <ClInclude Include="Game\effects\explosion.h" />
@@ -174,7 +178,19 @@ CALL gen.bat</Command>
     <ClInclude Include="Game\Lara\lara_jump.h" />
     <ClInclude Include="Game\Lara\lara_overhang.h" />
     <ClInclude Include="Game\Lara\lara_test_structs.h" />
+    <ClInclude Include="Math\Containers\GameBoundingBox.h" />
+    <ClInclude Include="Math\Solvers.h" />
     <ClInclude Include="Objects\game_object_ids.h" />
+    <ClInclude Include="Math\Containers\GameVector.h" />
+    <ClInclude Include="Math\Containers\EulerAngles.h" />
+    <ClInclude Include="Math\Constants.h" />
+    <ClInclude Include="Math\Geometry.h" />
+    <ClInclude Include="Math\Legacy.h" />
+    <ClInclude Include="Math\Math.h" />
+    <ClInclude Include="Math\Containers\Pose.h" />
+    <ClInclude Include="Math\Random.h" />
+    <ClInclude Include="Math\Containers\Vector2i.h" />
+    <ClInclude Include="Math\Containers\Vector3i.h" />
     <ClInclude Include="Objects\Generic\Object\burning_torch.h" />
     <ClInclude Include="Objects\Generic\Object\polerope.h" />
     <ClInclude Include="Objects\Generic\Object\rope.h" />
@@ -183,6 +199,7 @@ CALL gen.bat</Command>
     <ClInclude Include="Objects\Effects\flame_emitters.h" />
     <ClInclude Include="Game\effects\lara_fx.h" />
     <ClInclude Include="Objects\Generic\Traps\dart_emitter.h" />
+    <ClInclude Include="Objects\Sink.h" />
     <ClInclude Include="Objects\TR1\Entity\tr1_winged_mutant.h" />
     <ClInclude Include="Objects\TR2\Vehicles\speedboat_info.h" />
     <ClInclude Include="Game\itemdata\creature_info.h" />
@@ -202,7 +219,11 @@ CALL gen.bat</Command>
     <ClInclude Include="Objects\TR5\Trap\tr5_wreckingball.h" />
     <ClInclude Include="Objects\Utils\VehicleHelpers.h" />
     <ClInclude Include="Renderer\ConstantBuffers\AlphaTestBuffer.h" />
+    <ClInclude Include="Renderer\ConstantBuffers\InstancedSpriteBuffer.h" />
+    <ClInclude Include="Renderer\ConstantBuffers\BlendingBuffer.h" />
     <ClInclude Include="Renderer\ConstantBuffers\PostProcessBuffer.h" />
+    <ClInclude Include="Renderer\RendererSpriteVertex.h" />
+    <ClInclude Include="Renderer\RendererRectangle.h" />
     <ClInclude Include="Renderer\Structures\RendererBone.h" />
     <ClInclude Include="Renderer\Structures\RendererDisplayMode.h" />
     <ClInclude Include="Renderer\Structures\RendererLight.h" />
@@ -263,16 +284,16 @@ CALL gen.bat</Command>
     <ClInclude Include="Scripting\ScriptAssert.h" />
     <ClInclude Include="Scripting\ScriptUtil.h" />
     <ClInclude Include="Specific\BitField.h" />
+    <ClInclude Include="Specific\LevelCameraInfo.h" />
     <ClInclude Include="Specific\memory\LinearArrayBuffer.h" />
     <ClInclude Include="Game\memory\MemoryPoolAllocator.h" />
     <ClInclude Include="Specific\memory\Vector.h" />
-    <ClInclude Include="Game\gui.h" />
+    <ClInclude Include="Game\Gui.h" />
     <ClInclude Include="Game\effects\simple_particle.h" />
     <ClInclude Include="Renderer\TextureBase.h" />
     <ClInclude Include="Renderer\RendererTransparentFace.h" />
     <ClInclude Include="Scripting\GameScriptFog.h" />
     <ClInclude Include="Specific\fast_vector.h" />
-    <ClInclude Include="Specific\phd_global.h" />
     <ClInclude Include="Game\memory\qmalloc.h" />
     <ClInclude Include="Game\pickup\pickuputil.h" />
     <ClInclude Include="Game\pickup\pickup_ammo.h" />
@@ -281,7 +302,6 @@ CALL gen.bat</Command>
     <ClInclude Include="Game\pickup\pickup_misc_items.h" />
     <ClInclude Include="Game\pickup\pickup_weapon.h" />
     <ClInclude Include="Game\precompute\precompute.h" />
-    <ClInclude Include="Specific\prng.h" />
     <ClInclude Include="Objects\Generic\puzzles_keys.h" />
     <ClInclude Include="Game\room.h" />
     <ClInclude Include="Objects\Generic\Doors\double_doors.h" />
@@ -359,7 +379,7 @@ CALL gen.bat</Command>
     <ClInclude Include="Objects\TR5\Object\tr5_missile.h" />
     <ClInclude Include="Objects\TR5\Object\tr5_pushableblock.h" />
     <ClInclude Include="Objects\TR5\Object\tr5_twoblockplatform.h" />
-    <ClInclude Include="Objects\TR5\Trap\tr5_deathslide.h" />
+    <ClInclude Include="Objects\TR5\Trap\tr5_zip_line.h" />
     <ClInclude Include="Objects\TR5\Trap\tr5_romehammer.h" />
     <ClInclude Include="Objects\TR4\Trap\tr4_teethspike.h" />
     <ClInclude Include="Objects\TR5\Trap\tr5_ventilator.h" />
@@ -574,7 +594,7 @@ CALL gen.bat</Command>
     <ClInclude Include="Game\effects\tomb4fx.h" />
     <ClInclude Include="Objects\objectslist.h" />
     <ClInclude Include="Game\memory\malloc.h" />
-    <ClInclude Include="Specific\input.h" />
+    <ClInclude Include="Specific\Input\Input.h" />
     <ClInclude Include="Specific\IO\Streams.h" />
     <ClInclude Include="Specific\level.h" />
     <ClInclude Include="Specific\newtypes.h" />
@@ -583,7 +603,6 @@ CALL gen.bat</Command>
     <ClInclude Include="Specific\savegame\flatbuffers\ten_savegame_generated.h" />
     <ClInclude Include="Specific\setup.h" />
     <ClInclude Include="Specific\clock.h" />
-    <ClInclude Include="Specific\trmath.h" />
     <ClInclude Include="Specific\trutils.h" />
     <ClInclude Include="Specific\winmain.h" />
     <ClInclude Include="targetver.h" />
@@ -608,6 +627,9 @@ CALL gen.bat</Command>
     <ClCompile Include="Game\effects\weather.cpp" />
     <ClCompile Include="Game\collision\floordata.cpp" />
     <ClCompile Include="Game\effects\footprint.cpp" />
+    <ClCompile Include="Game\GuiObjects.cpp" />
+    <ClCompile Include="Objects\TR4\Object\tr4_sas_drag_bloke.cpp" />
+    <ClCompile Include="Specific\Input\InputAction.cpp" />
     <ClCompile Include="Game\itemdata\itemdata.cpp" />
     <ClCompile Include="Game\Lara\lara_basic.cpp" />
     <ClCompile Include="Game\Lara\lara_cheat.cpp" />
@@ -624,7 +646,7 @@ CALL gen.bat</Command>
     <ClCompile Include="Game\Lara\lara_tests.cpp" />
     <ClCompile Include="Game\effects\lightning.cpp" />
     <ClCompile Include="Game\misc.cpp" />
-    <ClCompile Include="Game\gui.cpp" />
+    <ClCompile Include="Game\Gui.cpp" />
     <ClCompile Include="Game\effects\simple_particle.cpp" />
     <ClCompile Include="Game\pickup\pickup_ammo.cpp" />
     <ClCompile Include="Game\pickup\pickup_consumable.cpp" />
@@ -632,6 +654,17 @@ CALL gen.bat</Command>
     <ClCompile Include="Game\pickup\pickup_misc_items.cpp" />
     <ClCompile Include="Game\pickup\pickup_weapon.cpp" />
     <ClCompile Include="Game\room.cpp" />
+    <ClCompile Include="Math\Containers\GameBoundingBox.cpp" />
+    <ClCompile Include="Math\Containers\GameVector.cpp" />
+    <ClCompile Include="Math\Containers\EulerAngles.cpp" />
+    <ClCompile Include="Math\Geometry.cpp" />
+    <ClCompile Include="Math\Containers\Pose.cpp" />
+    <ClCompile Include="Math\Legacy.cpp" />
+    <ClCompile Include="Math\Math.cpp" />
+    <ClCompile Include="Math\Random.cpp" />
+    <ClCompile Include="Math\Containers\Vector2i.cpp" />
+    <ClCompile Include="Math\Containers\Vector3i.cpp" />
+    <ClCompile Include="Math\Solvers.cpp" />
     <ClCompile Include="Objects\Generic\Object\burning_torch.cpp" />
     <ClCompile Include="Objects\Generic\Object\polerope.cpp" />
     <ClCompile Include="Objects\Generic\Object\rope.cpp" />
@@ -674,8 +707,6 @@ CALL gen.bat</Command>
     <ClCompile Include="Scripting\Internal\TEN\Strings\StringsHandler.cpp" />
     <ClCompile Include="Scripting\Internal\TEN\Vec3\Vec3.cpp" />
     <ClCompile Include="Specific\BitField.cpp" />
-    <ClCompile Include="Specific\phd_global.cpp" />
-    <ClCompile Include="Specific\prng.cpp" />
     <ClCompile Include="Objects\Generic\puzzles_keys.cpp" />
     <ClCompile Include="Objects\Generic\Doors\double_doors.cpp" />
     <ClCompile Include="Objects\Generic\Doors\generic_doors.cpp" />
@@ -695,7 +726,6 @@ CALL gen.bat</Command>
     <ClCompile Include="Objects\TR5\Switch\tr5_crowdove_switch.cpp" />
     <ClCompile Include="Specific\clock.cpp" />
     <ClCompile Include="Specific\RGBAColor8Byte.cpp" />
-    <ClCompile Include="Specific\trmath.cpp" />
     <ClCompile Include="Game\effects\smoke.cpp" />
     <ClCompile Include="Game\effects\spark.cpp" />
     <ClCompile Include="Objects\Generic\generic_objects.cpp" />
@@ -740,7 +770,7 @@ CALL gen.bat</Command>
     <ClCompile Include="Objects\TR5\Object\tr5_teleporter.cpp" />
     <ClCompile Include="Objects\TR5\Switch\tr5_raisingcog.cpp" />
     <ClCompile Include="Objects\TR5\Object\tr5_twoblockplatform.cpp" />
-    <ClCompile Include="Objects\TR5\Trap\tr5_deathslide.cpp" />
+    <ClCompile Include="Objects\TR5\Trap\tr5_zip_line.cpp" />
     <ClCompile Include="Objects\TR5\Trap\tr5_romehammer.cpp" />
     <ClCompile Include="Objects\TR4\Trap\tr4_teethspike.cpp" />
     <ClCompile Include="Objects\TR5\Trap\tr5_ventilator.cpp" />
@@ -922,7 +952,7 @@ CALL gen.bat</Command>
     <ClCompile Include="Objects\TR4\Entity\tr4_skeleton.cpp" />
     <ClCompile Include="Objects\TR3\Entity\tr3_tribesman.cpp" />
     <ClCompile Include="Specific\configuration.cpp" />
-    <ClCompile Include="Specific\input.cpp" />
+    <ClCompile Include="Specific\Input\Input.cpp" />
     <ClCompile Include="Specific\IO\ChunkId.cpp" />
     <ClCompile Include="Specific\IO\ChunkReader.cpp" />
     <ClCompile Include="Specific\IO\Streams.cpp" />
@@ -940,7 +970,6 @@ CALL gen.bat</Command>
     <None Include="packages.config" />
     <None Include="Resources.aps" />
     <None Include="RuleSet.ruleset" />
-    <None Include="Shaders\AlphaTestBuffer.hlsli" />
     <None Include="Shaders\AnimatedTextures.hlsli" />
     <None Include="Shaders\CameraMatrixBuffer.hlsli">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
@@ -949,6 +978,8 @@ CALL gen.bat</Command>
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</DeploymentContent>
       <FileType>Text</FileType>
     </None>
+    <None Include="Shaders\InstancedSpriteBuffer.hlsli" />
+    <None Include="Shaders\Blending.hlsli" />
     <None Include="Shaders\ShaderLight.hlsli">
       <DeploymentContent>true</DeploymentContent>
     </None>
@@ -963,24 +994,6 @@ CALL gen.bat</Command>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resources.rc" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Shaders\DX11\Test.fx">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</DeploymentContent>
-      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</DeploymentContent>
-      <FileType>Document</FileType>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Shaders\DX11_Test.fx">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</DeploymentContent>
-      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</DeploymentContent>
-      <FileType>Document</FileType>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <Image Include="ten.ico" />
@@ -1056,6 +1069,19 @@ CALL gen.bat</Command>
       <FileType>Document</FileType>
     </None>
     <None Include="Shaders\DX11_Inventory.fx">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</DeploymentContent>
+      <FileType>Document</FileType>
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">PS</EntryPointName>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">4.1</ShaderModel>
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">PS</EntryPointName>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">4.1</ShaderModel>
+    </None>
+    <None Include="Shaders\DX11_InstancedSprites.fx">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</DeploymentContent>

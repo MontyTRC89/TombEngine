@@ -55,17 +55,20 @@ public:
 	void				AddSecret(int levelSecretIndex);
 	void				SetIntroImagePath(std::string const& path);
 	void				SetTitleScreenImagePath(std::string const& path);
+	void				SetNumberOfSecrets(int secretsNumber);
 	bool				IsFlyCheatEnabled() const;
+	void				EnableFlyCheat(bool flyCheat);
 	bool				CanPlayAnyLevel() const;
 
 	bool HasCrawlExtended() const override { return Anims.HasCrawlExtended; }
 	bool HasCrouchRoll() const override { return Anims.HasCrouchRoll; }
-	bool HasCrawlspaceSwandive() const override { return Anims.HasCrawlspaceDive; }
+	bool HasCrawlspaceDive() const override { return Anims.HasCrawlspaceDive; }
 	bool HasMonkeyAutoJump() const override { return Anims.HasMonkeyAutoJump; }
 	bool HasAFKPose() const override { return Anims.HasPose; }
 	bool HasOverhangClimb() const override { return Anims.HasOverhangClimb; }
 	bool HasSlideExtended() const override { return Anims.HasSlideExtended; }
 	bool HasSprintJump() const override { return Anims.HasSprintJump; }
+	bool HasLedgeJumps() const override { return Anims.HasLedgeJumps; }
 	bool DoFlow() override;
 };
 

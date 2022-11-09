@@ -1,8 +1,5 @@
 #pragma once
 
-using std::string;
-using std::vector;
-
 namespace TEN::Utils
 {
 	// TODO: Switch to std::span container type as parameter whenever we update to C++20.
@@ -12,49 +9,49 @@ namespace TEN::Utils
 	{
 	private:
 		// Components
-		vector<bool> Bits = {};
+		std::vector<bool> Bits = {};
 
 	public:
 		// Constructors
 		BitField();
-		BitField(uint size);
-		BitField(uint size, uint packedBits);
-		BitField(const string& bitString);
-
+		BitField(unsigned int size);
+		BitField(unsigned int size, unsigned int packedBits);
+		BitField(const std::string& bitString);
+		
 		// Getters
-		uint GetSize() const;
-		uint GetCount() const;
+		unsigned int GetSize() const;
+		unsigned int GetCount() const;
 
 		// Setters
-		void Set(const vector<uint>& indices);
-		void Set(uint index);
+		void Set(const std::vector<unsigned int>& indices);
+		void Set(unsigned int index);
 		void SetAll();
-		void Clear(const vector<uint>& indices);
-		void Clear(uint index);
+		void Clear(const std::vector<unsigned int>& indices);
+		void Clear(unsigned int index);
 		void ClearAll();
-		void Flip(const vector<uint>& indices);
-		void Flip(uint index);
+		void Flip(const std::vector<unsigned int>& indices);
+		void Flip(unsigned int index);
 		void FlipAll();
 
 		// Inquirers
-		bool Test(const vector<uint>& indices, bool testAny = true) const;
-		bool Test(uint index) const;
+		bool Test(const std::vector<unsigned int>& indices, bool testAny = true) const;
+		bool Test(unsigned int index) const;
 		bool TestAny() const;
 		bool TestAll() const;
 
 		// Converters
-		uint   ToPackedBits() const;
-		string ToString() const;
+		unsigned int ToPackedBits() const;
+		std::string	 ToString() const;
 
 		// Operators
 		// NOTE: packedBits will not be assessed in full if the size of the given BitField object is less than BIT_FIELD_SIZE_MAX.
-		bool	  operator ==(uint packedBits) const;
-		bool	  operator !=(uint packedBits) const;
-		BitField& operator =(uint packedBits);
-		BitField& operator &=(uint packedBits);
-		BitField& operator |=(uint packedBits);
-		uint	  operator &(uint packedBits) const;
-		uint	  operator |(uint packedBits) const;
+		bool		 operator ==(unsigned int packedBits) const;
+		bool		 operator !=(unsigned int packedBits) const;
+		BitField&	 operator =(unsigned int packedBits);
+		BitField&	 operator &=(unsigned int packedBits);
+		BitField&	 operator |=(unsigned int packedBits);
+		unsigned int operator &(unsigned int packedBits) const;
+		unsigned int operator |(unsigned int packedBits) const;
 
 	private:
 		// Helpers

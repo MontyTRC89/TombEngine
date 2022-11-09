@@ -9,9 +9,9 @@
 #include "Game/misc.h"
 #include "Game/people.h"
 #include "Specific/level.h"
-#include "Specific/prng.h"
+#include "Math/Random.h"
 #include "Specific/setup.h"
-#include "Specific/trmath.h"
+#include "Math/Math.h"
 
 using namespace TEN::Math::Random;
 using std::vector;
@@ -24,7 +24,7 @@ namespace TEN::Entities::TR4
 	constexpr auto BIG_BEETLE_AWARE_RANGE  = SQUARE(CLICK(12));
 
 	const auto BigBeetleBite = BiteInfo(Vector3::Zero, 12);
-	const vector<uint> BigBeetleAttackJoints = { 5, 6 };
+	const vector<unsigned int> BigBeetleAttackJoints = { 5, 6 };
 
 	enum BigBeetleState
 	{
