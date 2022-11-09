@@ -651,31 +651,27 @@ namespace TEN::Entities::TR4
 		auto* item = &g_Level.Items[itemNumber];
 		auto* lara = GetLaraInfo(laraItem);
 
-		if (TrInput & IN_ACTION &&
+		if ((IsHeld(In::Action) &&
 			laraItem->Animation.ActiveState == LS_IDLE &&
 			laraItem->Animation.AnimNumber == LA_STAND_IDLE &&
 			lara->Control.HandStatus == HandStatus::Free &&
-			!(laraItem->Animation.IsAirborne) &&
-			!(item->Flags & IFLAG_ACTIVATION_MASK) ||
+			!laraItem->Animation.IsAirborne &&
+			!(item->Flags & IFLAG_ACTIVATION_MASK)) ||
 			lara->Control.IsMoving && lara->InteractedItem == itemNumber)
 		{
 			if (TestLaraPosition(DragSasBounds, item, laraItem))
 			{
 				if (MoveLaraPosition(SASDragBodyPosition, item, laraItem))
 				{
-					laraItem->Animation.AnimNumber = LA_DRAG_BODY;
-					laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
-					laraItem->Animation.ActiveState = LS_MISC_CONTROL;
-
-					item->Flags |= IFLAG_ACTIVATION_MASK;
-					item->Status = ITEM_ACTIVE;
-
-					lara->Control.IsMoving = false;
+					SetAnimation(laraItem, LA_DRAG_BODY);
 					ResetLaraFlex(laraItem);
+					laraItem->Pose.Orientation.y = item->Pose.Orientation.y;
 					lara->Control.HandStatus = HandStatus::Busy;
+					lara->Control.IsMoving = false;
 
 					AddActiveItem(itemNumber);
-					item->Pose.Orientation.y;
+					item->Flags |= IFLAG_ACTIVATION_MASK;
+					item->Status = ITEM_ACTIVE;
 				}
 				else
 					lara->InteractedItem = itemNumber;
