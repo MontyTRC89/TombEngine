@@ -692,8 +692,6 @@ namespace TEN::Entities::TR4
 
 			auto pos = GetJointPosition(item, 0);
 			TestTriggers(pos.x, pos.y, pos.z, item->RoomNumber, true);
-			TestVolumes(itemNumber);
-
 			RemoveActiveItem(itemNumber);
 			item->Status = ITEM_DEACTIVATED;
 		}
