@@ -34,10 +34,10 @@ namespace TEN::Entities::TR4
 			-100, 100,
 			-BLOCK(1.0f / 2), -460
 		),
-			std::pair(
-				EulerAngles(ANGLE(-10.0f), ANGLE(-30.0f), 0),
-				EulerAngles(ANGLE(10.0f), ANGLE(30.0f), 0)
-			)
+		std::pair(
+			EulerAngles(ANGLE(-10.0f), ANGLE(-30.0f), 0),
+			EulerAngles(ANGLE(10.0f), ANGLE(30.0f), 0)
+		)
 	};
 
 	enum SASState
