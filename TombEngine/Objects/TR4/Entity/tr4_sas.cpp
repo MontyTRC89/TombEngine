@@ -27,17 +27,17 @@ namespace TEN::Entities::TR4
 	const auto SASGunBite = BiteInfo(Vector3(0.0f, 300.0f, 64.0f), 7);
 
 	const auto SASDragBodyPosition = Vector3i(0, 0, -460);
-	const ObjectCollisionBounds SASDragBodyBounds =
+	const auto DragSasBounds = ObjectCollisionBounds
 	{
 		GameBoundingBox(
-			-CLICK(1), CLICK(1),
-			-CLICK(0.25f), 100,
-			-200, -460
+			-BLOCK(1.0f / 4), BLOCK(1.0f / 4),
+			-100, 100,
+			-BLOCK(1.0f / 2), -460
 		),
-		std::pair(
-			EulerAngles(ANGLE(-10.0f), ANGLE(-30.0f), 0),
-			EulerAngles(ANGLE(10.0f), ANGLE(30.0f), 0)
-		)
+			std::pair(
+				EulerAngles(ANGLE(-10.0f), ANGLE(-30.0f), 0),
+				EulerAngles(ANGLE(10.0f), ANGLE(30.0f), 0)
+			)
 	};
 
 	enum SASState
@@ -346,7 +346,7 @@ namespace TEN::Entities::TR4
 				}
 				else
 					item->Animation.TargetState = SAS_STATE_IDLE;
-				
+
 				break;
 
 			case SAS_STATE_RUN:
@@ -649,52 +649,53 @@ namespace TEN::Entities::TR4
 	void SasDragBlokeCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 	{
 		auto* item = &g_Level.Items[itemNumber];
+		auto* lara = GetLaraInfo(laraItem);
 
-		if ((!(TrInput & IN_ACTION) ||
-			laraItem->Animation.IsAirborne ||
-			laraItem->Animation.ActiveState != LS_IDLE ||
-			laraItem->Animation.AnimNumber != LA_STAND_IDLE ||
-			Lara.Control.HandStatus != HandStatus::Free ||
-			item->Flags & 0x3E00) &&
-			(!(Lara.Control.IsMoving) || Lara.InteractedItem != itemNumber))
+		if (TrInput & IN_ACTION &&
+			laraItem->Animation.ActiveState == LS_IDLE &&
+			laraItem->Animation.AnimNumber == LA_STAND_IDLE &&
+			lara->Control.HandStatus == HandStatus::Free &&
+			!(laraItem->Animation.IsAirborne) &&
+			!(item->Flags & IFLAG_ACTIVATION_MASK) ||
+			lara->Control.IsMoving && lara->InteractedItem == itemNumber)
 		{
-			if (item->Status == ITEM_ACTIVE)
-			{
-				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameEnd)
-				{
-					int x = laraItem->Pose.Position.x - 512 * phd_sin(laraItem->Pose.Orientation.y);
-					int y = laraItem->Pose.Position.y;
-					int z = laraItem->Pose.Position.z - 512 * phd_cos(laraItem->Pose.Orientation.y);
-
-					TestTriggers(x, y, z, laraItem->RoomNumber, true);
-
-					RemoveActiveItem(itemNumber);
-					item->Status = ITEM_NOT_ACTIVE;
-				}
-			}
-
-			ObjectCollision(itemNumber, laraItem, coll);
-		}
-		else
-		{
-			if (TestLaraPosition(SASDragBodyBounds, item, laraItem))
+			if (TestLaraPosition(DragSasBounds, item, laraItem))
 			{
 				if (MoveLaraPosition(SASDragBodyPosition, item, laraItem))
 				{
 					laraItem->Animation.AnimNumber = LA_DRAG_BODY;
-					laraItem->Animation.ActiveState = LS_MISC_CONTROL;
 					laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
-					laraItem->Pose.Orientation.y = item->Pose.Orientation.y;
-					ResetLaraFlex(laraItem);
-					Lara.Control.IsMoving = false;
-					Lara.Control.HandStatus = HandStatus::Busy;
-					item->Flags |= 0x3E00;
+					laraItem->Animation.ActiveState = LS_MISC_CONTROL;
+
+					item->Flags |= IFLAG_ACTIVATION_MASK;
 					item->Status = ITEM_ACTIVE;
+
+					lara->Control.IsMoving = false;
+					ResetLaraFlex(laraItem);
+					lara->Control.HandStatus = HandStatus::Busy;
+
 					AddActiveItem(itemNumber);
+					item->Pose.Orientation.y;
 				}
 				else
-					Lara.InteractedItem = itemNumber;
+					lara->InteractedItem = itemNumber;
 			}
+		}
+		else
+		{
+			if (item->Status != ITEM_ACTIVE)
+			{
+				ObjectCollision(itemNumber, laraItem, coll);
+				return;
+			}
+
+			if (!TestLastFrame(item))
+				return;
+
+			auto pos = GetJointPosition(item, 0);
+			TestTriggers(pos.x, pos.y, pos.z, item->RoomNumber, true);
+			RemoveActiveItem(itemNumber);
+			item->Status = ITEM_DEACTIVATED;
 		}
 	}
 }
