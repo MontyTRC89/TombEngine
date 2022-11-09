@@ -5,6 +5,7 @@
 #include "Game/collision/collide_item.h"
 #include "Game/control/box.h"
 #include "Game/control/control.h"
+#include "Game/control/volume.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/tomb4fx.h"
 #include "Game/itemdata/creature_info.h"
@@ -21,6 +22,7 @@
 
 using namespace TEN::Input;
 using namespace TEN::Math::Random;
+using namespace TEN::Control::Volumes;
 
 namespace TEN::Entities::TR4
 {
@@ -690,6 +692,8 @@ namespace TEN::Entities::TR4
 
 			auto pos = GetJointPosition(item, 0);
 			TestTriggers(pos.x, pos.y, pos.z, item->RoomNumber, true);
+			TestVolumes(itemNumber);
+
 			RemoveActiveItem(itemNumber);
 			item->Status = ITEM_DEACTIVATED;
 		}
