@@ -67,6 +67,7 @@ struct EntityAnimationData
 	bool IsAirborne	= false;
 	Vector3 Velocity = Vector3::Zero; // CONVENTION: +X = right, +Y = down, +Z = forward
 };
+
 struct EntityModelData
 {
 	int BaseMesh;
