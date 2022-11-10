@@ -54,7 +54,7 @@ bool ItemInfo::TestMeshSwapFlags(unsigned int flags)
 	{
 		if (flags & (1 << i))
 		{
-			if (Model.MeshIndex[i] != Model.BaseMesh + i)
+			if (Model.MeshIndex[i] == Model.BaseMesh + i)
 				return false;
 		}
 	}
@@ -71,11 +71,15 @@ bool ItemInfo::TestMeshSwapFlags(const std::vector<unsigned int> flags)
 
 void ItemInfo::SetMeshSwapFlags(unsigned int flags, bool clear)
 {
+	bool meshSwapPresent = Objects[ObjectNumber].meshSwapSlot != -1 && 
+						   Objects[Objects[ObjectNumber].meshSwapSlot].loaded;
+
+
 	for (size_t i = 0; i < Model.MeshIndex.size(); i++)
 	{
-		if (flags & (1 << i))
+		if (meshSwapPresent && (flags & (1 << i)))
 		{
-			if (clear || !Objects[Objects[ObjectNumber].meshSwapSlot].loaded)
+			if (clear)
 				Model.MeshIndex[i] = Model.BaseMesh + i;
 			else
 				Model.MeshIndex[i] = Objects[Objects[ObjectNumber].meshSwapSlot].meshIndex + i;
@@ -478,7 +482,6 @@ void InitialiseItem(short itemNumber)
 
 	item->TouchBits = NO_JOINT_BITS;
 	item->AfterDeath = 0;
-	item->SetMeshSwapFlags(NO_JOINT_BITS);
 
 	if (item->Flags & IFLAG_INVISIBLE)
 	{
