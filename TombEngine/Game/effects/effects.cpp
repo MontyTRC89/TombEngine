@@ -1128,10 +1128,10 @@ void TriggerWaterfallMist(const ItemInfo& item)
 	float fadeMin = GetParticleDistanceFade(Vector3i(minPosX, item.Pose.Position.y, minPosZ));
 	float fadeMax = GetParticleDistanceFade(Vector3i(maxPosX, item.Pose.Position.y, maxPosZ));
 
-	if (fadeMin == fadeMax && fadeMin == 0.0f)
+	if ((fadeMin == 0.0f) && (fadeMin == fadeMax))
 		return;
 
-	float finalFade = (fadeMin == fadeMax >= 1.0f) ? 1.0f : std::max(fadeMin, fadeMax);
+	float finalFade = ((fadeMin >= 1.0f) && (fadeMin == fadeMax)) ? 1.0f : std::max(fadeMin, fadeMax);
 
 	auto startColor = item.Color / 4.0f * finalFade * float(UCHAR_MAX);
 	auto endColor   = item.Color / 8.0f * finalFade * float(UCHAR_MAX);
