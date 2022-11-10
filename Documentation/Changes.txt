@@ -6,7 +6,6 @@ Version 1.0.3
 * Add FlyCheat option to gameflow script for disabling dozy mode.
 * Add SetNumberOfSecrets option to gameflow script to set overall amount of secrets.
 * Add OCB 1 for rollingball to make it silent.
-* Adjust sprint jump timing.
 * Customize waterfall mist colour and OCB (XXYY, where XX is width, and YY is size).
 * Implement sprite instancing to speed up rendering.
 * Merge portals at runtime to speed up rendering.
@@ -14,6 +13,7 @@ Version 1.0.3
 * Re-enable underwater caustics.
 * Increase amount of maximum secrets per level from 8 to 32.
 * Improve game and inventory input handling.
+* Adjust sprint jump timing.
 * Fix dodgy weapon lock angle constraints.
 * Fix wrong shotgun ammo pickup amount.
 * Fix shotgun using 6 units of ammo with each shot.
@@ -27,7 +27,9 @@ Version 1.0.3
 * Fix slow centaur projectile velocity.
 * Fix search animations - allow chest and shelf animations to play properly.
 * Fix sarcophagus and its item pickup.
+* Fix SAS_DRAG_BLOKE object interaction.
 * Fix underwater door and double doors continuing to be interactable after opening.
+* Fix underwater door being interactable when underwater switch is on the same square.
 * Fix ability to turn when aligning to an object while standing.
 * Fix left arm lock while picking up an item with a flare in hand.
 * Fix potential crashes when exiting game.
@@ -35,6 +37,7 @@ Version 1.0.3
 * Fix distance fog not applying properly to additive and subtractive surfaces.
 * Fix single-hand weapons not having a sound on draw and undraw.
 * Fix waterfall mist - it can now be disabled with antitrigger.
+* Fix underwater lever pull animation playing after interacting with underwater ceiling switch.
 
 Version 1.0.2
 =============

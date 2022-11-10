@@ -617,7 +617,7 @@ void AlignLaraToSurface(ItemInfo* item, float alpha)
 	short aspectAngle = Geometry::GetSurfaceAspectAngle(floorTilt);
 	short steepnessAngle = std::min(Geometry::GetSurfaceSteepnessAngle(floorTilt), ANGLE(70.0f));
 
-	short deltaAngle = Geometry::GetShortestAngularDistance(item->Pose.Orientation.y, aspectAngle);
+	short deltaAngle = Geometry::GetShortestAngle(item->Pose.Orientation.y, aspectAngle);
 	float sinDeltaAngle = phd_sin(deltaAngle);
 	float cosDeltaAngle = phd_cos(deltaAngle);
 
