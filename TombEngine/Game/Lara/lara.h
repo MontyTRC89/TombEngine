@@ -81,6 +81,7 @@ constexpr auto LARA_SPRINT_ENERGY_MAX  = 120.0f;
 constexpr auto LARA_POISON_POTENCY_MAX = 64.0f;
 
 constexpr auto STEPUP_HEIGHT	   = (int)CLICK(3.0f / 2);
+constexpr auto CRAWL_STEPUP_HEIGHT = CLICK(1) - 1;
 constexpr auto BAD_JUMP_CEILING	   = (int)CLICK(6.0f / 8);
 constexpr auto SHALLOW_WATER_DEPTH = (int)CLICK(1.0f / 2);
 constexpr auto WADE_DEPTH		   = STEPUP_HEIGHT;
