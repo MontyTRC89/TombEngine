@@ -12,7 +12,7 @@ struct LevelCameraInfo
 	int		 RoomNumber = 0;
 	int		 Flags		= 0;
 	int		 Speed		= 1;
-	string	 Name		= "";
+	string	 LuaName	= "";
 
 	LevelCameraInfo()
 	{

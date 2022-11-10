@@ -123,7 +123,7 @@ void ObjectsHandler::TestCollidingObjects()
 	for (const auto idOne : m_collidingItems)
 	{
 		auto item = &g_Level.Items[idOne];
-		if (!item->Callbacks.OnObjectCollided.empty())
+		if (!item->LuaCallbackOnCollidedWithObjectName.empty())
 		{
 			//test against other moveables
 			GetCollidedObjects(item, 0, true, CollidedItems, nullptr, 0);
@@ -131,17 +131,17 @@ void ObjectsHandler::TestCollidingObjects()
 			while (CollidedItems[i])
 			{
 				short idTwo = CollidedItems[i] - &g_Level.Items[0];
-				g_GameScript->ExecuteFunction(item->Callbacks.OnObjectCollided, idOne, idTwo);
+				g_GameScript->ExecuteFunction(item->LuaCallbackOnCollidedWithObjectName, idOne, idTwo);
 				++i;
 			}
 		}
 
-		if (!item->Callbacks.OnRoomCollided.empty())
+		if (!item->LuaCallbackOnCollidedWithRoomName.empty())
 		{
 			//test against room geometry
 			if (TestItemRoomCollisionAABB(item))
 			{
-				g_GameScript->ExecuteFunction(item->Callbacks.OnRoomCollided, idOne);
+				g_GameScript->ExecuteFunction(item->LuaCallbackOnCollidedWithRoomName, idOne);
 			}
 		}
 	}

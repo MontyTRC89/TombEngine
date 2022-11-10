@@ -73,7 +73,7 @@ void Camera::SetPos(Vec3 const& pos)
 
 std::string Camera::GetName() const
 {
-	return m_camera.Name;
+	return m_camera.LuaName;
 }
 
 void Camera::SetName(std::string const & id) 
@@ -86,8 +86,8 @@ void Camera::SetName(std::string const & id)
 	if (s_callbackSetName(id, m_camera))
 	{
 		// remove the old name if we have one
-		s_callbackRemoveName(m_camera.Name);
-		m_camera.Name = id;
+		s_callbackRemoveName(m_camera.LuaName);
+		m_camera.LuaName = id;
 	}
 	else
 	{

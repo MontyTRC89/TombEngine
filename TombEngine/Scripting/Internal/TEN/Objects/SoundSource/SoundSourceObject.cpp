@@ -71,7 +71,7 @@ void SoundSource::SetPos(Vec3 const& pos)
 
 std::string SoundSource::GetName() const
 {
-	return m_soundSource.Name;
+	return m_soundSource.LuaName;
 }
 
 void SoundSource::SetName(std::string const& id) 
@@ -84,8 +84,8 @@ void SoundSource::SetName(std::string const& id)
 	if (s_callbackSetName(id, m_soundSource))
 	{
 		// remove the old name if we have one
-		s_callbackRemoveName(m_soundSource.Name);
-		m_soundSource.Name = id;
+		s_callbackRemoveName(m_soundSource.LuaName);
+		m_soundSource.LuaName = id;
 	}
 	else
 	{

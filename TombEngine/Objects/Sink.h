@@ -11,7 +11,7 @@ struct SinkInfo
 	Vector3i Position = Vector3i::Zero;
 	int		 Strength = 0;
 	int		 BoxIndex = 0;
-	string	 Name  = "";
+	string	 LuaName  = "";
 
 	SinkInfo()
 	{

@@ -447,7 +447,7 @@ void Moveable::Init()
 {
 	bool cond = IsPointInRoom(m_item->Pose.Position, m_item->RoomNumber);
 	std::string err{ "Position of item \"{}\" does not match its room ID." };
-	if (!ScriptAssertF(cond, err, m_item->Name))
+	if (!ScriptAssertF(cond, err, m_item->LuaName))
 	{
 		ScriptWarn("Resetting to the center of the room.");
 		auto center = GetRoomCenter(m_item->RoomNumber);
@@ -482,7 +482,7 @@ void SetLevelFuncCallback(TypeOrNil<LevelFunc> const & cb, std::string const & c
 	}
 	else
 	{
-		ScriptAssert(false, "Tried giving " + mov.m_item->Name
+		ScriptAssert(false, "Tried giving " + mov.m_item->LuaName
 			+ " a non-LevelFunc object as an arg to "
 			+ callerName);
 	}
@@ -491,27 +491,27 @@ void SetLevelFuncCallback(TypeOrNil<LevelFunc> const & cb, std::string const & c
 
 void Moveable::SetOnHit(TypeOrNil<LevelFunc> const & cb)
 {
-	SetLevelFuncCallback(cb, ScriptReserved_SetOnHit, *this, m_item->Callbacks.OnHit);
+	SetLevelFuncCallback(cb, ScriptReserved_SetOnHit, *this, m_item->LuaCallbackOnHitName);
 }
 
 void Moveable::SetOnKilled(TypeOrNil<LevelFunc> const & cb)
 {
-	SetLevelFuncCallback(cb, ScriptReserved_SetOnKilled, *this, m_item->Callbacks.OnKilled);
+	SetLevelFuncCallback(cb, ScriptReserved_SetOnKilled, *this, m_item->LuaCallbackOnKilledName);
 }
 
 void Moveable::SetOnCollidedWithObject(TypeOrNil<LevelFunc> const & cb)
 {
-	SetLevelFuncCallback(cb, ScriptReserved_SetOnCollidedWithObject, *this, m_item->Callbacks.OnObjectCollided);
+	SetLevelFuncCallback(cb, ScriptReserved_SetOnCollidedWithObject, *this, m_item->LuaCallbackOnCollidedWithObjectName);
 }
 
 void Moveable::SetOnCollidedWithRoom(TypeOrNil<LevelFunc> const & cb)
 {
-	SetLevelFuncCallback(cb, ScriptReserved_SetOnCollidedWithRoom, *this, m_item->Callbacks.OnRoomCollided);
+	SetLevelFuncCallback(cb, ScriptReserved_SetOnCollidedWithRoom, *this, m_item->LuaCallbackOnCollidedWithRoomName);
 }
 
 std::string Moveable::GetName() const
 {
-	return m_item->Name;
+	return m_item->LuaName;
 }
 
 bool Moveable::SetName(std::string const & id) 
@@ -524,11 +524,11 @@ bool Moveable::SetName(std::string const & id)
 	if (s_callbackSetName(id, m_num))
 	{
 		// remove the old name if we have one
-		if (id != m_item->Name)
+		if (id != m_item->LuaName)
 		{
-			if(!m_item->Name.empty())
-				s_callbackRemoveName(m_item->Name);
-			m_item->Name = id;
+			if(!m_item->LuaName.empty())
+				s_callbackRemoveName(m_item->LuaName);
+			m_item->LuaName = id;
 		}
 	}
 	else
@@ -980,7 +980,7 @@ void Moveable::Destroy()
 	if (m_num > NO_ITEM) 
 	{
 		dynamic_cast<ObjectsHandler*>(g_GameScriptEntities)->RemoveMoveableFromMap(m_item, this);
-		s_callbackRemoveName(m_item->Name);
+		s_callbackRemoveName(m_item->LuaName);
 		KillItem(m_num);
 	}
 
@@ -991,7 +991,7 @@ bool Moveable::MeshExists(int index) const
 {
 	if (index < 0 || index >= Objects[m_item->ObjectNumber].nmeshes)
 	{
-		ScriptAssertF(false, "Mesh index {} does not exist in moveable '{}'", index, m_item->Name);
+		ScriptAssertF(false, "Mesh index {} does not exist in moveable '{}'", index, m_item->LuaName);
 		return false;
 	}
 
