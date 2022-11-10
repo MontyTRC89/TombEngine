@@ -17,7 +17,6 @@
 #include "Sound/sound.h"
 
 using namespace OIS;
-using std::vector;
 using TEN::Renderer::g_Renderer;
 
 // Big TODO: Entire input system shouldn't be left exposed like this.
@@ -79,15 +78,15 @@ namespace TEN::Input
 	Effect*		   OisEffect	   = nullptr;
 
 	// Globals
-	RumbleData			RumbleInfo = {};
-	vector<InputAction>	ActionMap  = {};
-	vector<bool>		KeyMap	   = {};
-	vector<float>		AxisMap    = {};
+	RumbleData				 RumbleInfo = {};
+	std::vector<InputAction> ActionMap  = {};
+	std::vector<bool>		 KeyMap		= {};
+	std::vector<float>		 AxisMap	= {};
 
 	int DbInput = 0;
 	int TrInput = 0;
 
-	vector<int>DefaultBindings =
+	auto DefaultBindings = std::vector<int>
 	{
 		KC_UP, KC_DOWN, KC_LEFT, KC_RIGHT, KC_PERIOD, KC_SLASH, KC_RSHIFT, KC_RMENU, KC_RCONTROL, KC_SPACE, KC_COMMA, KC_NUMPAD0, KC_END, KC_ESCAPE, KC_P, KC_PGUP, KC_PGDOWN,
 		/*KC_RCONTROL, KC_DOWN, KC_SLASH, KC_RSHIFT, KC_RMENU, KC_SPACE,*/
