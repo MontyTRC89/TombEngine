@@ -164,22 +164,22 @@ namespace Misc
 
 	static bool KeyIsHeld(int actionIndex)
 	{
-		return (TrInput & (1 << actionIndex)) != 0;
+		return IsHeld((In)actionIndex);
 	}
 
 	static bool KeyIsHit(int actionIndex)
 	{
-		return (DbInput & (1 << actionIndex)) != 0;
+		return IsClicked((In)actionIndex);
 	}
 
 	static void KeyPush(int actionIndex)
 	{
-		TrInput |= (1 << actionIndex);
+		ActionMap[(int)actionIndex].Update(true);
 	}
 
 	static void KeyClear(int actionIndex)
 	{
-		TrInput &= ~(1 << actionIndex);
+		ClearAction((In)actionIndex);
 	}
 
 	///Do FlipMap with specific ID
