@@ -25,15 +25,15 @@ namespace TEN::Entities::TR4
 	constexpr auto AHMET_SWIPE_ATTACK_DAMAGE = 80;
 	constexpr auto AHMET_BITE_ATTACK_DAMAGE	 = 120;
 
-	constexpr auto AHMET_ATTACK_RANGE = SQUARE(SECTOR(0.67f));
-	constexpr auto AHMET_AWARE_RANGE  = SQUARE(SECTOR(1));
-	constexpr auto AHMET_IDLE_RANGE   = SQUARE(SECTOR(1.25f));
-	constexpr auto AHMET_RUN_RANGE    = SQUARE(SECTOR(2.5f));
+	constexpr auto AHMET_ATTACK_RANGE = SQUARE(BLOCK(0.67f));
+	constexpr auto AHMET_AWARE_RANGE  = SQUARE(BLOCK(1));
+	constexpr auto AHMET_IDLE_RANGE   = SQUARE(BLOCK(1.25f));
+	constexpr auto AHMET_RUN_RANGE    = SQUARE(BLOCK(2.5f));
 
-	const auto AHMET_WALK_FORWARD_TURN_ANGLE = ANGLE(5.0f);
-	const auto AHMET_RUN_FORWARD_TURN_ANGLE	 = ANGLE(8.0f);
-	const auto AHMET_VIEW_ANGLE				 = ANGLE(45.0f);
-	const auto AHMET_ENEMY_ANGLE			 = ANGLE(90.0f);
+	constexpr auto AHMET_WALK_FORWARD_TURN_ANGLE = ANGLE(5.0f);
+	constexpr auto AHMET_RUN_FORWARD_TURN_ANGLE	 = ANGLE(8.0f);
+	constexpr auto AHMET_VIEW_ANGLE				 = ANGLE(45.0f);
+	constexpr auto AHMET_ENEMY_ANGLE			 = ANGLE(90.0f);
 	
 	const auto AhmetBiteLeft  = BiteInfo(Vector3::Zero, 16);
 	const auto AhmetBiteRight = BiteInfo(Vector3::Zero, 22);

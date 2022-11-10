@@ -18,9 +18,9 @@ namespace TEN::Entities::Creatures::TR3
 {
 	constexpr auto TIGER_ATTACK_DAMAGE = 90;
 
-	constexpr auto TIGER_BITE_ATTACK_RANGE	 = SQUARE(SECTOR(0.33f));
-	constexpr auto TIGER_POUNCE_ATTACK_RANGE = SQUARE(SECTOR(1));
-	constexpr auto TIGER_RUN_ATTACK_RANGE	 = SQUARE(SECTOR(1.5f));
+	constexpr auto TIGER_BITE_ATTACK_RANGE	 = SQUARE(BLOCK(0.33f));
+	constexpr auto TIGER_POUNCE_ATTACK_RANGE = SQUARE(BLOCK(1));
+	constexpr auto TIGER_RUN_ATTACK_RANGE	 = SQUARE(BLOCK(1.5f));
 
 	constexpr auto TIGER_WALK_CHANCE = 1.0f / 32;
 	constexpr auto TIGER_ROAR_CHANCE = 1.0f / 340;
@@ -28,9 +28,9 @@ namespace TEN::Entities::Creatures::TR3
 	const auto TigerBite = BiteInfo(Vector3(19.0f, -13.0f, 3.0f), 26);
 	const auto TigerAttackJoints = std::vector<unsigned int>{ 14, 15, 16, 18, 19, 20, 21, 22, 23, 24, 25, 26 };
 
-	const auto TIGER_WALK_TURN_RATE_MAX			 = ANGLE(3.0f);
-	const auto TIGER_RUN_TURN_RATE_MAX			 = ANGLE(6.0f);
-	const auto TIGER_POUNCE_ATTACK_TURN_RATE_MAX = ANGLE(3.0f);
+	constexpr auto TIGER_WALK_TURN_RATE_MAX			 = ANGLE(3.0f);
+	constexpr auto TIGER_RUN_TURN_RATE_MAX			 = ANGLE(6.0f);
+	constexpr auto TIGER_POUNCE_ATTACK_TURN_RATE_MAX = ANGLE(3.0f);
 
 	enum TigerState
 	{

@@ -19,18 +19,18 @@ namespace TEN::Entities::Creatures::TR1
 	constexpr auto WOLF_BITE_DAMAGE	 = 100;
 	constexpr auto WOLF_LUNGE_DAMAGE = 50;
 
-	constexpr auto WOLF_ATTACK_RANGE = SQUARE(SECTOR(1.5f));
-	constexpr auto WOLF_STALK_RANGE	 = SQUARE(SECTOR(2));
+	constexpr auto WOLF_ATTACK_RANGE = SQUARE(BLOCK(1.5f));
+	constexpr auto WOLF_STALK_RANGE	 = SQUARE(BLOCK(2));
 
-	constexpr auto WOLF_WAKE_CHANCE	 = 1.0f / 1000;
-	constexpr auto WOLF_SLEEP_CHANCE = 1.0f / 1000;
+	constexpr auto WOLF_WAKE_CHANCE	 = 1.0f / 1024;
+	constexpr auto WOLF_SLEEP_CHANCE = 1.0f / 1024;
 	constexpr auto WOLF_HOWL_CHANCE  = 1.0f / 85;
 
 	constexpr auto WOLF_SLEEP_FRAME = 96;
 
-	const auto WOLF_WALK_TURN_RATE_MAX	= ANGLE(2.0f);
-	const auto WOLF_RUN_TURN_RATE_MAX	= ANGLE(5.0f);
-	const auto WOLF_STALK_TURN_RATE_MAX = ANGLE(2.0f);
+	constexpr auto WOLF_WALK_TURN_RATE_MAX	= ANGLE(2.0f);
+	constexpr auto WOLF_RUN_TURN_RATE_MAX	= ANGLE(5.0f);
+	constexpr auto WOLF_STALK_TURN_RATE_MAX = ANGLE(2.0f);
 
 	const auto WolfBite = BiteInfo(Vector3(0.0f, -14.0f, 174.0f), 6);
 	const auto WolfAttackJoints = std::vector<unsigned int>{ 0, 1, 2, 3, 6, 8, 9, 10, 12, 13, 14 };

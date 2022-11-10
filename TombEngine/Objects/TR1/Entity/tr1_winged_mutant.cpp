@@ -23,11 +23,11 @@ namespace TEN::Entities::Creatures::TR1
 	constexpr auto WINGED_MUTANT_RUN_JUMP_ATTACK_DAMAGE  = 100;
 	constexpr auto WINGED_MUTANT_SWIPE_ATTACK_DAMAGE     = 200;
 
-	constexpr auto WINGED_MUTANT_WALK_RANGE				= SQUARE(SECTOR(4.5f));
+	constexpr auto WINGED_MUTANT_WALK_RANGE				= SQUARE(BLOCK(4.5f));
 	constexpr auto WINGED_MUTANT_SWIPE_ATTACK_RANGE		= SQUARE(CLICK(1.17f));
 	constexpr auto WINGED_MUTANT_RUN_JUMP_ATTACK_RANGE	= SQUARE(CLICK(2.34f));
-	constexpr auto WINGED_MUTANT_IDLE_JUMP_ATTACK_RANGE = SQUARE(SECTOR(2.5f));
-	constexpr auto WINGED_MUTANT_ATTACK_RANGE			= SQUARE(SECTOR(3.75f));
+	constexpr auto WINGED_MUTANT_IDLE_JUMP_ATTACK_RANGE = SQUARE(BLOCK(2.5f));
+	constexpr auto WINGED_MUTANT_ATTACK_RANGE			= SQUARE(BLOCK(3.75f));
 
 	constexpr auto WINGED_MUTANT_POSE_CHANCE   = 1.0f / 400;
 	constexpr auto WINGED_MUTANT_UNPOSE_CHANCE = 1.0f / 164;
@@ -36,8 +36,8 @@ namespace TEN::Entities::Creatures::TR1
 	constexpr auto WINGED_MUTANT_SHARD_VELOCITY = 250;
 	constexpr auto WINGED_MUTANT_BOMB_VELOCITY  = 220;
 
-	const auto WINGED_MUTANT_WALK_FORWARD_TURN_RATE_MAX = ANGLE(2.0f);
-	const auto WINGED_MUTANT_RUN_FORWARD_TURN_RATE_MAX	= ANGLE(6.0f);
+	constexpr auto WINGED_MUTANT_WALK_FORWARD_TURN_RATE_MAX = ANGLE(2.0f);
+	constexpr auto WINGED_MUTANT_RUN_FORWARD_TURN_RATE_MAX	= ANGLE(6.0f);
 
 	const auto WingedMutantBite		  = BiteInfo(Vector3(-27.0f, 98.0f, 0.0f), 10);
 	const auto WingedMutantRocketBite = BiteInfo(Vector3(51.0f, 213.0f, 0.0f), 14);

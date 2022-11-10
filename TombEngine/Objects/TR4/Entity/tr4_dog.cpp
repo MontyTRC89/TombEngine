@@ -19,8 +19,8 @@ namespace TEN::Entities::TR4
 	constexpr auto DOG_BITE_ATTACK_DAMAGE = 10;
 	constexpr auto DOG_JUMP_ATTACK_DAMAGE = 20;
 
-	constexpr auto DOG_BITE_ATTACK_RANGE = SQUARE(SECTOR(0.55));
-	constexpr auto DOG_JUMP_ATTACK_RANGE = SQUARE(SECTOR(1));
+	constexpr auto DOG_BITE_ATTACK_RANGE = SQUARE(BLOCK(0.55));
+	constexpr auto DOG_JUMP_ATTACK_RANGE = SQUARE(BLOCK(1));
 	
 	const auto DogBite = BiteInfo(Vector3(0.0f, 0.0f, 100.0f), 3.0f);
 	const auto DogJumpAttackJoints = std::vector<unsigned int>{ 3, 6, 9, 10, 13, 14 };

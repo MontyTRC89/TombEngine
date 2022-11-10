@@ -16,10 +16,10 @@ using namespace TEN::Math;
 namespace TEN::Entities::Creatures::TR2
 {
 	constexpr auto BIRD_MONSTER_ATTACK_DAMAGE = 200;
-	constexpr auto BIRD_MONSTER_SLAM_CRUSH_ATTACK_RANGE = SQUARE(SECTOR(1));
-	constexpr auto BIRD_MONSTER_PUNCH_ATTACK_RANGE		= SQUARE(SECTOR(2));
+	constexpr auto BIRD_MONSTER_SLAM_CRUSH_ATTACK_RANGE = SQUARE(BLOCK(1));
+	constexpr auto BIRD_MONSTER_PUNCH_ATTACK_RANGE		= SQUARE(BLOCK(2));
 
-	const auto BIRD_MONSTER_WALK_TURN_RATE_MAX = ANGLE(4.0f);
+	constexpr auto BIRD_MONSTER_WALK_TURN_RATE_MAX = ANGLE(4.0f);
 
 	const auto BirdMonsterBiteLeft	= BiteInfo(Vector3(0.0f, 224.0f, 0.0f), 19);
 	const auto BirdMonsterBiteRight = BiteInfo(Vector3(0.0f, 224.0f, 0.0f), 22);

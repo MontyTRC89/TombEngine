@@ -19,9 +19,9 @@ using namespace TEN::Math;
 
 namespace TEN::Entities::TR4
 {
-	constexpr auto MUTANT_PROJECTILE_ATTACK_RANGE = SQUARE(SECTOR(10));
-	constexpr auto MUTANT_LOCUST_ATTACK_1_RANGE	  = SQUARE(SECTOR(15));
-	constexpr auto MUTANT_LOCUST_ATTACK_2_RANGE   = SQUARE(SECTOR(30));
+	constexpr auto MUTANT_PROJECTILE_ATTACK_RANGE = SQUARE(BLOCK(10));
+	constexpr auto MUTANT_LOCUST_ATTACK_1_RANGE	  = SQUARE(BLOCK(15));
+	constexpr auto MUTANT_LOCUST_ATTACK_2_RANGE   = SQUARE(BLOCK(30));
 
 	enum MutantState
 	{

@@ -23,11 +23,11 @@ using namespace TEN::Math;
 namespace TEN::Entities::Creatures::TR1
 {
 	constexpr auto CENTAUR_REAR_DAMAGE = 200;
-	constexpr auto CENTAUR_REAR_RANGE = SECTOR(1.5f);
+	constexpr auto CENTAUR_REAR_RANGE = BLOCK(1.5f);
 	constexpr auto CENTAUR_REAR_CHANCE = 1.0f / 340;
 	constexpr auto CENTAUR_BOMB_VELOCITY = CLICK(1);
 
-	const auto CENTAUR_TURN_RATE_MAX = ANGLE(4.0f);
+	constexpr auto CENTAUR_TURN_RATE_MAX = ANGLE(4.0f);
 
 	const auto CentaurRocketBite = BiteInfo(Vector3(11.0f, 415.0f, 41.0f), 13);
 	const auto CentaurRearBite	 = BiteInfo(Vector3(50.0f, 30.0f, 0.0f), 5);

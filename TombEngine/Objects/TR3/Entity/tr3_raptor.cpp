@@ -20,15 +20,15 @@ namespace TEN::Entities::Creatures::TR3
 	constexpr auto RAPTOR_ATTACK_DAMAGE = 100;
 
 	constexpr auto RAPTOR_BITE_ATTACK_RANGE = SQUARE(585);
-	constexpr auto RAPTOR_JUMP_ATTACK_RANGE = SQUARE(SECTOR(1.5f));
-	constexpr auto RAPTOR_RUN_ATTACK_RANGE	= SQUARE(SECTOR(1.5f));
+	constexpr auto RAPTOR_JUMP_ATTACK_RANGE = SQUARE(BLOCK(1.5f));
+	constexpr auto RAPTOR_RUN_ATTACK_RANGE	= SQUARE(BLOCK(1.5f));
 
 	constexpr auto RAPTOR_ROAR_CHANCE		   = 1.0f / 256;
 	constexpr auto RAPTOR_SWITCH_TARGET_CHANCE = 1.0f / 128;
 
-	const auto RAPTOR_WALK_TURN_RATE_MAX   = ANGLE(2.0f);
-	const auto RAPTOR_RUN_TURN_RATE_MAX	   = ANGLE(2.0f);
-	const auto RAPTOR_ATTACK_TURN_RATE_MAX = ANGLE(2.0f);
+	constexpr auto RAPTOR_WALK_TURN_RATE_MAX   = ANGLE(2.0f);
+	constexpr auto RAPTOR_RUN_TURN_RATE_MAX	   = ANGLE(2.0f);
+	constexpr auto RAPTOR_ATTACK_TURN_RATE_MAX = ANGLE(2.0f);
 
 	const auto RaptorBite = BiteInfo(Vector3(0.0f, 66.0f, 318.0f), 22);
 	const auto RaptorAttackJoints = std::vector<unsigned int>{ 10, 11, 12, 13, 14, 16, 17, 18, 19, 20, 21, 22, 23 };

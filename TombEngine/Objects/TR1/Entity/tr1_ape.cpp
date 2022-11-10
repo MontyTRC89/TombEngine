@@ -18,8 +18,8 @@ namespace TEN::Entities::Creatures::TR1
 {
 	constexpr auto APE_ATTACK_DAMAGE = 200;
 
-	constexpr auto APE_ATTACK_RANGE = SQUARE(SECTOR(0.42f));
-	constexpr auto APE_PANIC_RANGE	= SQUARE(SECTOR(2));
+	constexpr auto APE_ATTACK_RANGE = SQUARE(BLOCK(0.42f));
+	constexpr auto APE_PANIC_RANGE	= SQUARE(BLOCK(2));
 
 	constexpr auto APE_IDLE_JUMP_CHANCE			= 1.0f / 6;
 	constexpr auto APE_IDLE_POUND_CHEST_CHANCE  = 1.0f / 3;

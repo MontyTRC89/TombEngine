@@ -21,17 +21,17 @@ namespace TEN::Entities::TR4
 {
 	constexpr auto CROC_ATTACK_DAMAGE = 120;
 
-	constexpr auto CROC_ALERT_RANGE		 = SQUARE(SECTOR(1.5f));
-	constexpr auto CROC_VISIBILITY_RANGE = SQUARE(SECTOR(5));
-	constexpr auto CROC_STATE_RUN_RANGE  = SQUARE(SECTOR(1));
-	constexpr auto CROC_MAXRUN_RANGE	 = SQUARE(SECTOR(1.5f));
+	constexpr auto CROC_ALERT_RANGE		 = SQUARE(BLOCK(1.5f));
+	constexpr auto CROC_VISIBILITY_RANGE = SQUARE(BLOCK(5));
+	constexpr auto CROC_STATE_RUN_RANGE  = SQUARE(BLOCK(1));
+	constexpr auto CROC_MAXRUN_RANGE	 = SQUARE(BLOCK(1.5f));
 	constexpr auto CROC_ATTACK_RANGE	 = SQUARE(CLICK(3)); // NOTE: It's CLICK(3) in TR4, but the crocodile does not go near Lara to do damage in certain cases.
 
 	constexpr auto CROC_SWIM_SPEED	  = 16;
 
-	const auto CROC_STATE_WALK_TURN_RATE_MAX = ANGLE(3.0f);
-	const auto CROC_STATE_RUN_TURN_RATE_MAX	 = ANGLE(5.0f);
-	const auto CROC_STATE_SWIM_TURN_RATE_MAX = ANGLE(3.0f);
+	constexpr auto CROC_STATE_WALK_TURN_RATE_MAX = ANGLE(3.0f);
+	constexpr auto CROC_STATE_RUN_TURN_RATE_MAX	 = ANGLE(5.0f);
+	constexpr auto CROC_STATE_SWIM_TURN_RATE_MAX = ANGLE(3.0f);
 
 	const auto CrocodileBite = BiteInfo(Vector3(0.0f, -100.0f, 500.0f), 9);
 	const auto CrocodileBiteAttackJoints = std::vector<unsigned int>{ 8, 9 };

@@ -20,20 +20,20 @@ namespace TEN::Entities::Creatures::TR3
 	constexpr auto CIVVY_ATTACK_DAMAGE = 40;
 	constexpr auto CIVVY_SWIPE_DAMAGE  = 50;
 
-	constexpr auto CIVVY_ATTACK0_RANGE = SQUARE(SECTOR(3));
-	constexpr auto CIVVY_ATTACK1_RANGE = SQUARE(SECTOR(0.67f));
-	constexpr auto CIVVY_ATTACK2_RANGE = SQUARE(SECTOR(1));
-	constexpr auto CIVVY_WALK_RANGE	   = SQUARE(SECTOR(1));
-	constexpr auto CIVVY_ESCAPE_RANGE  = SQUARE(SECTOR(3));
-	constexpr auto CIVVY_AWARE_RANGE   = SQUARE(SECTOR(1));
+	constexpr auto CIVVY_ATTACK0_RANGE = SQUARE(BLOCK(3));
+	constexpr auto CIVVY_ATTACK1_RANGE = SQUARE(BLOCK(0.67f));
+	constexpr auto CIVVY_ATTACK2_RANGE = SQUARE(BLOCK(1));
+	constexpr auto CIVVY_WALK_RANGE	   = SQUARE(BLOCK(1));
+	constexpr auto CIVVY_ESCAPE_RANGE  = SQUARE(BLOCK(3));
+	constexpr auto CIVVY_AWARE_RANGE   = SQUARE(BLOCK(1));
 
 	constexpr auto CIVVY_WAIT_CHANCE	   = 1.0f / 128;
 	constexpr auto CIVVY_STATE_WALK_CHANCE = 1.0f / 128; // Unused.
 
 	constexpr auto CIVVY_VAULT_SHIFT = 260;
 
-	const auto CIVVY_WALK_TURN_RATE_MAX = ANGLE(5.0f);
-	const auto CIVVY_RUN_TURN_RATE_MAX	= ANGLE(6.0f);
+	constexpr auto CIVVY_WALK_TURN_RATE_MAX = ANGLE(5.0f);
+	constexpr auto CIVVY_RUN_TURN_RATE_MAX	= ANGLE(6.0f);
 
 	const auto CivvyBite = BiteInfo(Vector3::Zero, 13);
 	const auto CivvyAttackJoints = std::vector<unsigned int>{ 10, 13 };

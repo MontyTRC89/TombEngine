@@ -13,14 +13,13 @@
 #include "Specific/setup.h"
 
 using namespace TEN::Math;
-using std::vector;
 
 namespace TEN::Entities::Creatures::TR2
 {
 	const auto YetiBiteLeft	 = BiteInfo(Vector3(12.0f, 101.0f, 19.0f), 13);
 	const auto YetiBiteRight = BiteInfo(Vector3(12.0f, 101.0f, 19.0f), 10);
-	const vector<unsigned int> YetiAttackJoints1 = { 10, 12 }; // TODO: Rename.
-	const vector<unsigned int> YetiAttackJoints2 = { 8, 9, 10 };
+	const auto YetiAttackJoints1 = std::vector<unsigned int>{ 10, 12 }; // TODO: Rename.
+	const auto YetiAttackJoints2 = std::vector<unsigned int>{ 8, 9, 10 };
 
 	// TODO
 	enum YetiState

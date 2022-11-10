@@ -25,8 +25,8 @@ namespace TEN::Entities::Creatures::TR3
 
 	constexpr auto LARA_ANIM_SHIVA_DEATH = 7;
 
-	const auto SHIVA_WALK_TURN_RATE_MAX	  = ANGLE(4.0f);
-	const auto SHIVA_ATTACK_TURN_RATE_MAX = ANGLE(4.0f);
+	constexpr auto SHIVA_WALK_TURN_RATE_MAX	  = ANGLE(4.0f);
+	constexpr auto SHIVA_ATTACK_TURN_RATE_MAX = ANGLE(4.0f);
 
 	const auto ShivaBiteLeft  = BiteInfo(Vector3(0.0f, 0.0f, 920.0f), 13);
 	const auto ShivaBiteRight = BiteInfo(Vector3(0.0f, 0.0f, 920.0f), 22);

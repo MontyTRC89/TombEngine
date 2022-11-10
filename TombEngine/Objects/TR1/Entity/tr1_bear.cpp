@@ -21,17 +21,17 @@ namespace TEN::Entities::Creatures::TR1
 	constexpr auto BEAR_SLAM_DAMAGE	  = 200;
 	constexpr auto BEAR_PAT_DAMAGE	  = 400;
 
-	constexpr auto BEAR_ATTACK_RANGE			= SECTOR(1);
-	constexpr auto BEAR_REAR_RANGE				= SECTOR(2);
-	constexpr auto BEAR_REAR_SWIPE_ATTACK_RANGE = SECTOR(0.6f);
-	constexpr auto BEAR_EAT_RANGE				= CLICK(3);
+	constexpr auto BEAR_ATTACK_RANGE			= BLOCK(1);
+	constexpr auto BEAR_REAR_RANGE				= BLOCK(2);
+	constexpr auto BEAR_REAR_SWIPE_ATTACK_RANGE = BLOCK(3.0f / 5);
+	constexpr auto BEAR_EAT_RANGE				= BLOCK(3.0f / 4);
 	
 	constexpr auto BEAR_ROAR_CHANCE = 1.0f / 400;
 	constexpr auto BEAR_REAR_CHANCE = 1.0f / 40;
 	constexpr auto BEAR_DROP_CHANCE = 1.0f / 22;
 
-	const auto BEAR_WALK_TURN_RATE_MAX = ANGLE(2.0f);
-	const auto BEAR_RUN_TURN_RATE_MAX  = ANGLE(5.0f);
+	constexpr auto BEAR_WALK_TURN_RATE_MAX = ANGLE(2.0f);
+	constexpr auto BEAR_RUN_TURN_RATE_MAX  = ANGLE(5.0f);
 
 	const auto BearBite = BiteInfo(Vector3(0.0f, 96.0f, 335.0f), 14);
 	const auto BearAttackJoints = std::vector<unsigned int>{ 2, 3, 5, 6, 14, 17 };

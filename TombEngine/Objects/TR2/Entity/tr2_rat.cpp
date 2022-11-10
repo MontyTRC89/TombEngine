@@ -23,7 +23,7 @@ namespace TEN::Entities::Creatures::TR2
 	constexpr auto RAT_IDLE_CHANCE	 = 0.08f;
 	constexpr auto RAT_WALK_CHANCE	 = 0.92f;
 
-	const auto RAT_TURN_RATE_MAX = ANGLE(6.0f);
+	constexpr auto RAT_TURN_RATE_MAX = ANGLE(6.0f);
 
 	const auto RatBite = BiteInfo(Vector3(0.0f, 0.0f, 57.0f), 2);
 

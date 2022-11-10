@@ -21,7 +21,7 @@ namespace TEN::Entities::TR4
 	constexpr auto SMALL_SCORPION_STINGER_ATTACK_DAMAGE	 = 20;
 	constexpr auto SMALL_SCORPION_STINGER_POISON_POTENCY = 2;
 
-	constexpr auto SMALL_SCORPION_ATTACK_RANGE = SQUARE(SECTOR(0.31));
+	constexpr auto SMALL_SCORPION_ATTACK_RANGE = SQUARE(BLOCK(0.31));
 
 	const auto SmallScorpionBite1 = BiteInfo(Vector3::Zero, 0);
 	const auto SmallScorpionBite2 = BiteInfo(Vector3::Zero, 23);

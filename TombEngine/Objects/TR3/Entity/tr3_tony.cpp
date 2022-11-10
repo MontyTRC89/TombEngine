@@ -23,9 +23,9 @@ using namespace TEN::Effects::Lara;
 namespace TEN::Entities::Creatures::TR3
 {
 	constexpr auto TONY_HEALTH_MAX = 100;
-	constexpr auto TONY_TRIGGER_RANGE = SECTOR(16);
+	constexpr auto TONY_TRIGGER_RANGE = BLOCK(16);
 
-	const auto TONY_TURN = ANGLE(2.0f);
+	constexpr auto TONY_TURN = ANGLE(2.0f);
 
 	static BOSS_STRUCT BossData;
 

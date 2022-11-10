@@ -20,18 +20,18 @@ namespace TEN::Entities::Creatures::TR1
 	constexpr auto BIG_RAT_BITE_ATTACK_DAMAGE	= 20;
 	constexpr auto BIG_RAT_POUNCE_ATTACK_DAMAGE = 25;
 
-	constexpr auto BIG_RAT_ALERT_RANGE			   = SQUARE(SECTOR(1.5f));
-	constexpr auto BIG_RAT_VISIBILITY_RANGE		   = SQUARE(SECTOR(5));
-	constexpr auto BIG_RAT_LAND_BITE_ATTACK_RANGE  = SQUARE(SECTOR(0.34f));
-	constexpr auto BIG_RAT_POUNCE_ATTACK_RANGE	   = SQUARE(SECTOR(0.5f));
-	constexpr auto BIG_RAT_WATER_BITE_ATTACK_RANGE = SQUARE(SECTOR(0.3f));
+	constexpr auto BIG_RAT_ALERT_RANGE			   = SQUARE(BLOCK(1.5f));
+	constexpr auto BIG_RAT_VISIBILITY_RANGE		   = SQUARE(BLOCK(5));
+	constexpr auto BIG_RAT_LAND_BITE_ATTACK_RANGE  = SQUARE(BLOCK(0.34f));
+	constexpr auto BIG_RAT_POUNCE_ATTACK_RANGE	   = SQUARE(BLOCK(0.5f));
+	constexpr auto BIG_RAT_WATER_BITE_ATTACK_RANGE = SQUARE(BLOCK(0.3f));
 
 	constexpr auto BIG_RAT_REAR_POSE_CHANCE = 1.0f / 128;
 	constexpr auto BIG_RAT_SWIM_UP_DOWN_SPEED = 32;
 	constexpr auto BIG_RAT_WATER_SURFACE_OFFSET = 10;
 
-	const auto BIG_RAT_RUN_TURN_RATE_MAX  = ANGLE(6.0f);
-	const auto BIG_RAT_SWIM_TURN_RATE_MAX = ANGLE(3.0f);
+	constexpr auto BIG_RAT_RUN_TURN_RATE_MAX  = ANGLE(6.0f);
+	constexpr auto BIG_RAT_SWIM_TURN_RATE_MAX = ANGLE(3.0f);
 
 	const auto BigRatBite = BiteInfo(Vector3(0.0f, -11.0f, 108.0f), 3);
 

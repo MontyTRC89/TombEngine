@@ -22,22 +22,22 @@ namespace TEN::Entities::TR4
 {
 	constexpr auto BABOON_ATTACK_DAMAGE = 70;
 
-	constexpr auto BABOON_ATTACK_RANGE		  = SQUARE(SECTOR(0.34f));
-	constexpr auto BABOON_ATTACK_READY_RANGE  = SQUARE(SECTOR(0.67f));
-	constexpr auto BABOON_JUMP_ATTACK_2_RANGE = SQUARE(SECTOR(0.67f));
-	constexpr auto BABOON_IDLE_RANGE		  = SQUARE(SECTOR(1));
-	constexpr auto BABOON_ROLL_FORWARD_RANGE  = SQUARE(SECTOR(1));
-	constexpr auto BABOON_FOLLOW_RANGE		  = SQUARE(SECTOR(2));
+	constexpr auto BABOON_ATTACK_RANGE		  = SQUARE(BLOCK(0.34f));
+	constexpr auto BABOON_ATTACK_READY_RANGE  = SQUARE(BLOCK(0.67f));
+	constexpr auto BABOON_JUMP_ATTACK_2_RANGE = SQUARE(BLOCK(0.67f));
+	constexpr auto BABOON_IDLE_RANGE		  = SQUARE(BLOCK(1));
+	constexpr auto BABOON_ROLL_FORWARD_RANGE  = SQUARE(BLOCK(1));
+	constexpr auto BABOON_FOLLOW_RANGE		  = SQUARE(BLOCK(2));
+
+	constexpr auto BABOON_ATTACK_ANGLE			  = ANGLE(7.0f);
+	constexpr auto BABOON_WALK_FORWARD_TURN_ANGLE = ANGLE(7.0f);
+	constexpr auto BABOON_RUN_FORWARD_TURN_ANGLE  = ANGLE(11.0f);
+
+	constexpr auto BABOON_STATE_WALK_ANIM = 14; // TODO: What is this?
 
 	constexpr auto NO_BABOON			   = -1;
 	constexpr auto NO_BABOON_COUNT		   = -2;
 	constexpr auto NO_CROWBAR_SWITCH_FOUND = -1;
-
-	constexpr auto BABOON_STATE_WALK_ANIM = 14; // TODO: What is this?
-
-	const auto BABOON_ATTACK_ANGLE			  = ANGLE(7.0f);
-	const auto BABOON_WALK_FORWARD_TURN_ANGLE = ANGLE(7.0f);
-	const auto BABOON_RUN_FORWARD_TURN_ANGLE  = ANGLE(11.0f);
 
 	const auto BaboonBite = BiteInfo(Vector3(10.0f, 10.0f, 11.0f), 4);
 	const auto BaboonAttackJoints	   = std::vector<unsigned int>{ 11, 12 };

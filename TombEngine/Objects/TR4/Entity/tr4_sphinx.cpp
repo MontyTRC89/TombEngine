@@ -17,8 +17,8 @@ namespace TEN::Entities::TR4
 {
 	constexpr auto SPHINX_ATTACK_DAMAGE = 200;
 
-	const auto SPHINX_WALK_TURN_ANGLE = ANGLE(3.0f);
-	const auto SPHINX_RUN_TURN_ANGLE  = ANGLE(0.33f);
+	constexpr auto SPHINX_WALK_TURN_ANGLE = ANGLE(3.0f);
+	constexpr auto SPHINX_RUN_TURN_ANGLE  = ANGLE(0.33f);
 
 	const auto SphinxBite = BiteInfo(Vector3::Zero, 6);
 	const auto SphinxAttackJoints = std::vector<unsigned int>{ 6 };

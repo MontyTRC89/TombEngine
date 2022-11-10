@@ -9,12 +9,11 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
+#include "Math/Math.h"
 #include "Specific/level.h"
-#include "Math/Random.h"
 #include "Specific/setup.h"
 
-using namespace TEN::Math::Random;
-using std::vector;
+using namespace TEN::Math;
 
 namespace TEN::Entities::Creatures::TR5
 {
@@ -25,7 +24,7 @@ namespace TEN::Entities::Creatures::TR5
 
 	const auto LionBite1 = BiteInfo(Vector3(2.0f, -10.0f, 250.0f), 21);
 	const auto LionBite2 = BiteInfo(Vector3(-2.0f, -10.0f, 132.0f), 21);
-	const vector<unsigned int> LionAttackJoints = { 3, 6, 21 };
+	const auto LionAttackJoints = std::vector<unsigned int>{ 3, 6, 21 };
 
 	enum LionState
 	{
@@ -84,7 +83,7 @@ namespace TEN::Entities::Creatures::TR5
 				item->HitPoints = 0;
 
 				if (item->Animation.ActiveState != LION_STATE_DEATH)
-					SetAnimation(item, LionDeathAnims[GenerateInt(0, LionDeathAnims.size() - 1)]);
+					SetAnimation(item, LionDeathAnims[Random::GenerateInt(0, LionDeathAnims.size() - 1)]);
 			}
 			else
 			{
@@ -142,7 +141,7 @@ namespace TEN::Entities::Creatures::TR5
 
 					if (creature->Mood == MoodType::Bored)
 					{
-						if (TestProbability(1.0f / 256))
+						if (Random::TestProbability(1.0f / 256))
 						{
 							item->Animation.TargetState = LION_STATE_IDLE;
 							item->Animation.RequiredState = LION_STATE_ROAR;
@@ -165,7 +164,7 @@ namespace TEN::Entities::Creatures::TR5
 							item->Animation.TargetState = LION_STATE_IDLE;
 						else if (creature->Mood != MoodType::Escape)
 						{
-							if (TestProbability(1.0f / 256))
+							if (Random::TestProbability(1.0f / 256))
 							{
 								item->Animation.TargetState = LION_STATE_IDLE;
 								item->Animation.RequiredState = LION_STATE_ROAR;

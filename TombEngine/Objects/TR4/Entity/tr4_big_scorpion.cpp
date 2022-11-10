@@ -23,8 +23,8 @@ namespace TEN::Entities::TR4
 	constexpr auto BIG_SCORPION_TROOP_ATTACK_DAMAGE	   = 15;
 	constexpr auto BIG_SCORPION_STINGER_POISON_POTENCY = 16;
 
-	constexpr auto BIG_SCORPION_ATTACK_RANGE = SQUARE(SECTOR(1.35));
-	constexpr auto BIG_SCORPION_RUN_RANGE	 = SQUARE(SECTOR(2));
+	constexpr auto BIG_SCORPION_ATTACK_RANGE = SQUARE(BLOCK(1.35));
+	constexpr auto BIG_SCORPION_RUN_RANGE	 = SQUARE(BLOCK(2));
 
 	const auto BigScorpionBite1 = BiteInfo(Vector3::Zero, 8);
 	const auto BigScorpionBite2 = BiteInfo(Vector3::Zero, 23);

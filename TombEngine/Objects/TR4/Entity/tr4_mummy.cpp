@@ -18,15 +18,15 @@ namespace TEN::Entities::TR4
 {
 	constexpr auto MUMMY_SWIPE_ATTACK_DAMAGE = 100;
 
-	constexpr auto MUMMY_IDLE_SWIPE_ATTACK_RANGE = SQUARE(SECTOR(0.5f));
-	constexpr auto MUMMY_WALK_SWIPE_ATTACK_RANGE = SQUARE(SECTOR(0.67f));
-	constexpr auto MUMMY_ACTIVATE_RANGE			 = SQUARE(SECTOR(1));
-	constexpr auto MUMMY_RECOIL_RANGE			 = SQUARE(SECTOR(3));
-	constexpr auto MUMMY_ARMS_UP_RANGE			 = SQUARE(SECTOR(3));
-	constexpr auto MUMMY_AWARE_RANGE			 = SQUARE(SECTOR(7));
+	constexpr auto MUMMY_IDLE_SWIPE_ATTACK_RANGE = SQUARE(BLOCK(0.5f));
+	constexpr auto MUMMY_WALK_SWIPE_ATTACK_RANGE = SQUARE(BLOCK(0.67f));
+	constexpr auto MUMMY_ACTIVATE_RANGE			 = SQUARE(BLOCK(1));
+	constexpr auto MUMMY_RECOIL_RANGE			 = SQUARE(BLOCK(3));
+	constexpr auto MUMMY_ARMS_UP_RANGE			 = SQUARE(BLOCK(3));
+	constexpr auto MUMMY_AWARE_RANGE			 = SQUARE(BLOCK(7));
 
-	const auto MUMMY_WALK_TURN_RATE_MAX	  = ANGLE(7.0f);
-	const auto MUMMY_ATTACK_TURN_RATE_MAX = ANGLE(7.0f);
+	constexpr auto MUMMY_WALK_TURN_RATE_MAX	  = ANGLE(7.0f);
+	constexpr auto MUMMY_ATTACK_TURN_RATE_MAX = ANGLE(7.0f);
 
 	const auto MummyBite1 = BiteInfo(Vector3::Zero, 11);
 	const auto MummyBite2 = BiteInfo(Vector3::Zero, 14);
