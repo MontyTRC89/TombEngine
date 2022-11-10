@@ -140,31 +140,6 @@ namespace TEN::Entities::Generic
 			lara.Control.HandStatus == HandStatus::Free) ||
 			(lara.Control.IsMoving && lara.InteractedItem == itemNumber))
 		{
-			auto ladderBounds = GameBoundingBox(&ladderItem);
-			auto boundsExtension = GameBoundingBox(0, 0, ladderBounds.Y1, ladderBounds.Y2 + LADDER_STEP_HEIGHT, 0, 0);
-
-			// Mount from back.
-			if (TestEntityInteraction(*laraItem, ladderItem, LadderMountBackBasis, boundsExtension))
-			{
-				if (!laraItem->OffsetBlend.IsActive)
-				{
-					auto mountOffset = LadderMountBackBasis.PosOffset + Vector3i(0, 0, GameBoundingBox(&ladderItem).Z2);
-
-					auto targetPos = Geometry::TranslatePoint(ladderItem.Pose.Position, ladderItem.Pose.Orientation, mountOffset);
-					auto posOffset = (targetPos - laraItem->Pose.Position).ToVector3();
-					auto orientOffset = (ladderItem.Pose.Orientation + LadderMountBackBasis.OrientOffset) - laraItem->Pose.Orientation;
-					laraItem->OffsetBlend.SetLinear(posOffset, orientOffset, 0.4f);
-
-					SetAnimation(laraItem, LA_LADDER_MOUNT_FRONT);
-					lara.Control.IsMoving = false;
-					lara.Control.HandStatus = HandStatus::Busy;
-				}
-				else
-					lara.InteractedItem = itemNumber;
-
-				return;
-			}
-
 			if (lara.Control.IsMoving && lara.InteractedItem == itemNumber)
 			{
 				lara.Control.HandStatus = HandStatus::Free;
@@ -252,10 +227,10 @@ namespace TEN::Entities::Generic
 			return LadderMountType::Front;
 		}
 
-		/*if (TestEntityInteraction(laraItem, ladderItem, LadderMountBackBasis, boundsExtension))
+		if (TestEntityInteraction(laraItem, ladderItem, LadderMountBackBasis, boundsExtension))
 			return LadderMountType::Back;
 
-		if (TestEntityInteraction(laraItem, ladderItem, LadderMountLeftBasis, boundsExtension))
+		/*if (TestEntityInteraction(laraItem, ladderItem, LadderMountLeftBasis, boundsExtension))
 			return LadderMountType::Left;*/
 
 		if (TestEntityInteraction(laraItem, ladderItem, LadderMountRightBasis, boundsExtension))
@@ -317,27 +292,30 @@ namespace TEN::Entities::Generic
 		{
 			auto boundsOffset = Vector3i(0, 0, ladderBounds.Z1);
 			SetEntityInteraction(laraItem, ladderItem, LadderMountFrontBasis, boundsOffset);
-
 			SetAnimation(&laraItem, LA_LADDER_MOUNT_FRONT);
 			break;
 		}
 
 		case LadderMountType::Back:
+		{
+			auto boundsOffset = Vector3i(0, 0, ladderBounds.Z2);
+			SetEntityInteraction(laraItem, ladderItem, LadderMountBackBasis, boundsOffset);
+			SetAnimation(&laraItem, LA_LADDER_MOUNT_FRONT);
 			break;
+		}
 
 		case LadderMountType::Left:
 			break;
 
 		case LadderMountType::Right:
 		{
-			auto boundsOffset = Vector3i(0, 0, GameBoundingBox(&ladderItem).Z1) +
+			auto boundsOffset = Vector3i(0, 0, ladderBounds.Z1)/* +
 				Vector3i(
 				0,
 				round(laraItem.Pose.Position.y / ladderItem.Pose.Position.y) * LADDER_STEP_HEIGHT, // Target closest step on ladder.
 				0
-			);
+			)*/;
 			SetEntityInteraction(laraItem, ladderItem, LadderMountRightBasis, boundsOffset);
-
 			SetAnimation(&laraItem, LA_LADDER_MOUNT_RIGHT);
 			break;
 		}
