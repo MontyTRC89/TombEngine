@@ -1,7 +1,6 @@
 #include "framework.h"
 #include "Game/Lara/lara_tests.h"
 
-#include "Flow/ScriptInterfaceFlowHandler.h"
 #include "Game/animation.h"
 #include "Game/collision/collide_item.h"
 #include "Game/collision/collide_room.h"
@@ -16,6 +15,7 @@
 #include "Game/Lara/lara_monkey.h"
 #include "Math/Math.h"
 #include "Renderer/Renderer11.h"
+#include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
 

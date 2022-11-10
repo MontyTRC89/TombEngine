@@ -1,7 +1,6 @@
 #include "framework.h"
 #include "Game/Lara/lara_basic.h"
 
-#include "Flow/ScriptInterfaceFlowHandler.h"
 #include "Game/animation.h"
 #include "Game/camera.h"
 #include "Game/collision/collide_room.h"
@@ -15,6 +14,7 @@
 #include "Game/Lara/lara_helpers.h"
 #include "Game/pickup/pickup.h"
 #include "Sound/sound.h"
+#include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"

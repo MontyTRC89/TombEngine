@@ -1,7 +1,6 @@
 #include "framework.h"
 #include "Game/Lara/PlayerContext.h"
 
-#include "Flow/ScriptInterfaceFlowHandler.h"
 #include "Game/collision/collide_room.h"
 #include "Game/control/los.h"
 #include "Game/items.h"
@@ -9,6 +8,7 @@
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_tests.h"
 #include "Game/Lara/PlayerContextStructs.h"
+#include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Specific/Input/Input.h"
 
 using namespace TEN::Input;

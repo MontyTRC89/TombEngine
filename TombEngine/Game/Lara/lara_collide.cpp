@@ -12,10 +12,10 @@
 #include "Game/Lara/lara_swim.h"
 #include "Game/Lara/lara_tests.h"
 #include "Objects/Sink.h"
+#include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
-#include "Flow/ScriptInterfaceFlowHandler.h"
 #include "ScriptInterfaceLevel.h"
 
 using namespace TEN::Input;

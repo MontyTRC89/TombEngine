@@ -1,7 +1,6 @@
 #include "framework.h"
 #include "Game/Lara/lara_monkey.h"
 
-#include "Flow/ScriptInterfaceFlowHandler.h"
 #include "Game/camera.h"
 #include "Game/collision/floordata.h"
 #include "Game/collision/collide_room.h"
@@ -13,6 +12,7 @@
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_overhang.h"
 #include "Game/Lara/lara_tests.h"
+#include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
 

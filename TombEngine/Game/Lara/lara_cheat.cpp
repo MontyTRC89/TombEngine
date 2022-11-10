@@ -3,7 +3,6 @@
 
 #include <OISKeyboard.h>
 
-#include "Flow/ScriptInterfaceFlowHandler.h"
 #include "Game/collision/collide_room.h"
 #include "Game/effects/effects.h"
 #include "Game/GuiObjects.h"
@@ -11,6 +10,7 @@
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Sound/sound.h"
+#include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
