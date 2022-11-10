@@ -33,8 +33,8 @@ namespace TEN::Entities::Generic
 		Back,
 		Left,
 		Right,
-		JumpReach,
-		JumpUp
+		JumpUp,
+		JumpReach
 	};
 
 	const auto LadderMountedStates = std::vector<int>
@@ -59,7 +59,7 @@ namespace TEN::Entities::Generic
 		LS_JUMP_UP
 	};
 
-	const auto LadderMountedOffset2D = Vector3i(0, 0, -BLOCK(1.0f / 7));
+	const auto LadderMountedOffset2D = Vector3i(0, 0, -LARA_RADIUS * 1.5f);
 	const auto LadderInteractBounds2D = GameBoundingBox(
 		-BLOCK(1.0f / 4), BLOCK(1.0f / 4),
 		0, 0,
@@ -233,11 +233,11 @@ namespace TEN::Entities::Generic
 		auto ladderBounds = GameBoundingBox(&ladderItem); // TODO: Make this static to optimise?
 		auto boundsExtension = GameBoundingBox(0, 0, ladderBounds.Y1, ladderBounds.Y2 + LADDER_STEP_HEIGHT, 0, 0);
 
-		if (TestEntityInteraction(laraItem, ladderItem, LadderMountTopFrontBasis, boundsExtension))
+		/*if (TestEntityInteraction(laraItem, ladderItem, LadderMountTopFrontBasis, boundsExtension))
 			return LadderMountType::TopFront;
 
 		if (TestEntityInteraction(laraItem, ladderItem, LadderMountTopBackBasis, boundsExtension))
-			return LadderMountType::TopBack;
+			return LadderMountType::TopBack;*/
 
 		if (TestEntityInteraction(laraItem, ladderItem, LadderMountFrontBasis, boundsExtension))
 		{
@@ -252,11 +252,11 @@ namespace TEN::Entities::Generic
 			return LadderMountType::Front;
 		}
 
-		if (TestEntityInteraction(laraItem, ladderItem, LadderMountBackBasis, boundsExtension))
+		/*if (TestEntityInteraction(laraItem, ladderItem, LadderMountBackBasis, boundsExtension))
 			return LadderMountType::Back;
 
 		if (TestEntityInteraction(laraItem, ladderItem, LadderMountLeftBasis, boundsExtension))
-			return LadderMountType::Left;
+			return LadderMountType::Left;*/
 
 		if (TestEntityInteraction(laraItem, ladderItem, LadderMountRightBasis, boundsExtension))
 			return LadderMountType::Right;
@@ -297,6 +297,8 @@ namespace TEN::Entities::Generic
 		if (laraItem.OffsetBlend.IsActive)
 			lara.InteractedItem = itemNumber;
 
+		ModulateLaraTurnRateY(&laraItem, 0, 0, 0);
+
 		auto ladderBounds = GameBoundingBox(&ladderItem);
 
 		switch (mountType)
@@ -306,7 +308,11 @@ namespace TEN::Entities::Generic
 			return;
 
 		case LadderMountType::TopFront:
+			break;
+
 		case LadderMountType::TopBack:
+			break;
+
 		case LadderMountType::Front:
 		{
 			auto boundsOffset = Vector3i(0, 0, ladderBounds.Z1);
@@ -317,7 +323,11 @@ namespace TEN::Entities::Generic
 		}
 
 		case LadderMountType::Back:
+			break;
+
 		case LadderMountType::Left:
+			break;
+
 		case LadderMountType::Right:
 		{
 			auto boundsOffset = Vector3i(0, 0, GameBoundingBox(&ladderItem).Z1) +
@@ -333,6 +343,8 @@ namespace TEN::Entities::Generic
 		}
 
 		case LadderMountType::JumpUp:
+			break;
+
 		case LadderMountType::JumpReach:
 			break;
 		}

@@ -47,7 +47,7 @@ using namespace TEN::Math;
 			return false;
 
 		auto orientConstraintAverage = (basis.OrientConstraint.first + basis.OrientConstraint.second) / 2;
-		auto poseFrom = Pose(entityFrom.Pose.Position, entityFrom.Pose.Orientation + orientConstraintAverage);
+		auto poseFrom = Pose(entityFrom.Pose.Position, entityFrom.Pose.Orientation - orientConstraintAverage); // TODO: Check sign.
 
 		// TODO: May interfere with pickups?
 		// Check whether entityFrom is aligned toward entityTo.
