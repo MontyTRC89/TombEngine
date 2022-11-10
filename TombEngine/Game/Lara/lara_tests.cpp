@@ -23,7 +23,6 @@ using namespace TEN::Floordata;
 using namespace TEN::Input;
 using namespace TEN::Math;
 using namespace TEN::Renderer;
-using std::vector;
 
 // -----------------------------
 // TEST FUNCTIONS
@@ -923,7 +922,7 @@ void GetTightropeFallOff(ItemInfo* item, int regularity)
 }
 #endif
 
-bool TestLaraWeaponType(LaraWeaponType refWeaponType, const vector<LaraWeaponType>& weaponTypeList)
+bool TestLaraWeaponType(LaraWeaponType refWeaponType, const std::vector<LaraWeaponType>& weaponTypeList)
 {
 	for (const auto& weaponType : weaponTypeList)
 	{
@@ -1609,7 +1608,11 @@ CrawlVaultTestResult TestLaraCrawlExitJump(ItemInfo* item, CollisionInfo* coll)
 
 CrawlVaultTestResult TestLaraCrawlVault(ItemInfo* item, CollisionInfo* coll)
 {
-	if (!(TrInput & (IN_ACTION | IN_JUMP)))
+	if (!(IsHeld(In::Action) || IsHeld(In::Jump)))
+		return CrawlVaultTestResult{ false };
+
+	// Check whether extended crawl mechanics are enabled.
+	if (!g_GameFlow->HasCrawlExtended())
 		return CrawlVaultTestResult{ false };
 
 	// Crawl vault exit down 1 step.

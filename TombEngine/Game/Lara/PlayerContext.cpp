@@ -239,17 +239,21 @@ namespace TEN::Entities::Player::Context
 	bool CanCrouchRoll(ItemInfo* item, CollisionInfo* coll)
 	{
 		static const float maxWaterHeight	 = -CLICK(1);
-		static const float maxProbeDistance	 = SECTOR(1);
-		static const float distanceIncrement = CLICK(1);
+		static const float maxProbeDistance	 = BLOCK(1);
+		static const float distanceIncrement = BLOCK(1.0f / 4);
 
 		const auto& player = *GetLaraInfo(item);
 
-		// 1. Check water depth.
+		// 1. Check whether crouch roll is enabled.
+		if (!g_GameFlow->HasCrouchRoll())
+			return false;
+
+		// 2. Check water depth.
 		if (player.WaterSurfaceDist < maxWaterHeight)
 			return false;
 
 		// TODO: Extend point collision struct to also find water depths.
-		// 2. Assess continuity of path.
+		// 3. Assess continuity of path.
 		float distance = 0.0f;
 		auto pointCollA = GetCollision(item);
 		while (distance < maxProbeDistance)
