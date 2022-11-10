@@ -68,12 +68,12 @@ struct EntityAnimationData
 	Vector3 Velocity = Vector3::Zero; // CONVENTION: +X = right, +Y = down, +Z = forward
 };
 
-struct EntityLuaData
+struct EntityCallbackData
 {
-	std::string CallbackOnKilledName;
-	std::string CallbackOnHitName;
-	std::string CallbackOnCollidedWithObjectName;
-	std::string CallbackOnCollidedWithRoomName;
+	std::string OnKilled;
+	std::string OnHit;
+	std::string OnObjectCollided;
+	std::string OnRoomCollided;
 };
 
 struct EntityModelData
@@ -98,7 +98,7 @@ struct ItemInfo
 
 	ITEM_DATA Data;
 	EntityAnimationData Animation;
-	EntityLuaData Lua;
+	EntityCallbackData Callbacks;
 	EntityModelData Model;
 
 	Pose StartPose;

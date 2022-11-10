@@ -491,22 +491,22 @@ void SetLevelFuncCallback(TypeOrNil<LevelFunc> const & cb, std::string const & c
 
 void Moveable::SetOnHit(TypeOrNil<LevelFunc> const & cb)
 {
-	SetLevelFuncCallback(cb, ScriptReserved_SetOnHit, *this, m_item->Lua.CallbackOnHitName);
+	SetLevelFuncCallback(cb, ScriptReserved_SetOnHit, *this, m_item->Callbacks.OnHit);
 }
 
 void Moveable::SetOnKilled(TypeOrNil<LevelFunc> const & cb)
 {
-	SetLevelFuncCallback(cb, ScriptReserved_SetOnKilled, *this, m_item->Lua.CallbackOnKilledName);
+	SetLevelFuncCallback(cb, ScriptReserved_SetOnKilled, *this, m_item->Callbacks.OnKilled);
 }
 
 void Moveable::SetOnCollidedWithObject(TypeOrNil<LevelFunc> const & cb)
 {
-	SetLevelFuncCallback(cb, ScriptReserved_SetOnCollidedWithObject, *this, m_item->Lua.CallbackOnCollidedWithObjectName);
+	SetLevelFuncCallback(cb, ScriptReserved_SetOnCollidedWithObject, *this, m_item->Callbacks.OnObjectCollided);
 }
 
 void Moveable::SetOnCollidedWithRoom(TypeOrNil<LevelFunc> const & cb)
 {
-	SetLevelFuncCallback(cb, ScriptReserved_SetOnCollidedWithRoom, *this, m_item->Lua.CallbackOnCollidedWithRoomName);
+	SetLevelFuncCallback(cb, ScriptReserved_SetOnCollidedWithRoom, *this, m_item->Callbacks.OnRoomCollided);
 }
 
 std::string Moveable::GetName() const
