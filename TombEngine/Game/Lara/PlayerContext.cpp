@@ -326,7 +326,7 @@ namespace TEN::Entities::Player::Context
 		Context::MonkeyMovementSetup contextSetup =
 		{
 			item->Pose.Orientation.y,
-			CLICK(1.25f), -CLICK(1.25f) // Defined by monkey forward state.
+			MONKEY_STEPUP_HEIGHT, -MONKEY_STEPUP_HEIGHT // Defined by monkey forward state.
 		};
 		return TestMonkeyMovementSetup(item, coll, contextSetup);
 	}
@@ -336,7 +336,7 @@ namespace TEN::Entities::Player::Context
 		Context::MonkeyMovementSetup contextSetup =
 		{
 			item->Pose.Orientation.y + ANGLE(180.0f),
-			CLICK(1.25f), -CLICK(1.25f) // Defined by monkey backward state.
+			MONKEY_STEPUP_HEIGHT, -MONKEY_STEPUP_HEIGHT // Defined by monkey backward state.
 		};
 		return TestMonkeyMovementSetup(item, coll, contextSetup);
 	}
