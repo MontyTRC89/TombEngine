@@ -73,7 +73,7 @@ void Sink::SetPos(Vec3 const& pos)
 
 std::string Sink::GetName() const
 {
-	return m_sink.LuaName;
+	return m_sink.Name;
 }
 
 void Sink::SetName(std::string const & id) 
@@ -86,8 +86,8 @@ void Sink::SetName(std::string const & id)
 	if (s_callbackSetName(id, m_sink))
 	{
 		// remove the old name if we have one
-		s_callbackRemoveName(m_sink.LuaName);
-		m_sink.LuaName = id;
+		s_callbackRemoveName(m_sink.Name);
+		m_sink.Name = id;
 	}
 	else
 	{
