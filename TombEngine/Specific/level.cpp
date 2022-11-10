@@ -184,9 +184,9 @@ void LoadItems()
 			item->Color = ReadVector4();
 			item->TriggerFlags = ReadInt16();
 			item->Flags = ReadInt16();
-			item->LuaName = ReadString();
+			item->Name = ReadString();
 
-			g_GameScriptEntities->AddName(item->LuaName, i);
+			g_GameScriptEntities->AddName(item->Name, i);
 			g_GameScriptEntities->TryAddColliding(i);
 
 			memcpy(&item->StartPose, &item->Pose, sizeof(Pose));
@@ -423,9 +423,9 @@ void LoadCameras()
 		camera.RoomNumber = ReadInt32();
 		camera.Flags = ReadInt32();
 		camera.Speed = ReadInt32();
-		camera.LuaName = ReadString();
+		camera.Name = ReadString();
 
-		g_GameScriptEntities->AddName(camera.LuaName, camera);
+		g_GameScriptEntities->AddName(camera.Name, camera);
 	}
 
 	NumberSpotcams = ReadInt32();
@@ -445,9 +445,9 @@ void LoadCameras()
 		sink.Position.z = ReadInt32();
 		sink.Strength = ReadInt32();
 		sink.BoxIndex = ReadInt32();
-		sink.LuaName = ReadString();
+		sink.Name = ReadString();
 
-		g_GameScriptEntities->AddName(sink.LuaName, sink);
+		g_GameScriptEntities->AddName(sink.Name, sink);
 	}
 }
 
@@ -795,7 +795,7 @@ void ReadRooms()
 			volume.Scale.y = ReadFloat();
 			volume.Scale.z = ReadFloat();
 
-			volume.LuaName = ReadString();
+			volume.Name = ReadString();
 			volume.EventSetIndex = ReadInt32();
 
 			volume.Status = TriggerStatus::Outside;
@@ -903,9 +903,9 @@ void LoadSoundSources()
 		source.Position.z = ReadInt32();
 		source.SoundID = ReadInt32();
 		source.Flags = ReadInt32();
-		source.LuaName = ReadString();
+		source.Name = ReadString();
 
-		g_GameScriptEntities->AddName(source.LuaName, source);
+		g_GameScriptEntities->AddName(source.Name, source);
 	}
 }
 

@@ -48,6 +48,50 @@ void ItemInfo::SetFlags(short id, short value)
 	ItemFlags[id] = value;
 }
 
+bool ItemInfo::TestMeshSwapFlags(unsigned int flags)
+{
+	for (size_t i = 0; i < Model.MeshIndex.size(); i++)
+	{
+		if (flags & (1 << i))
+		{
+			if (Model.MeshIndex[i] != Model.BaseMesh + i)
+				return false;
+		}
+	}
+
+	return true;
+}
+
+bool ItemInfo::TestMeshSwapFlags(const std::vector<unsigned int> flags)
+{
+	BitField bits = {};
+	bits.Set(flags);
+	return TestMeshSwapFlags(bits.ToPackedBits());
+}
+
+void ItemInfo::SetMeshSwapFlags(unsigned int flags, bool clear)
+{
+	for (size_t i = 0; i < Model.MeshIndex.size(); i++)
+	{
+		if (flags & (1 << i))
+		{
+			if (clear || !Objects[Objects[ObjectNumber].meshSwapSlot].loaded)
+				Model.MeshIndex[i] = Model.BaseMesh + i;
+			else
+				Model.MeshIndex[i] = Objects[Objects[ObjectNumber].meshSwapSlot].meshIndex + i;
+		}
+		else
+			Model.MeshIndex[i] = Model.BaseMesh + i;
+	}
+}
+
+void ItemInfo::SetMeshSwapFlags(const std::vector<unsigned int> flags, bool clear)
+{
+	BitField bits = {};
+	bits.Set(flags);
+	SetMeshSwapFlags(bits.ToPackedBits(), clear);
+}
+
 bool ItemInfo::IsLara()
 {
 	return this->Data.is<LaraInfo*>();
@@ -133,14 +177,14 @@ void KillItem(short const itemNumber)
 
 		g_GameScriptEntities->NotifyKilled(item);
 		g_GameScriptEntities->TryRemoveColliding(itemNumber, true);
-		if (!item->LuaCallbackOnKilledName.empty())
-			g_GameScript->ExecuteFunction(item->LuaCallbackOnKilledName, itemNumber);
+		if (!item->Lua.CallbackOnKilledName.empty())
+			g_GameScript->ExecuteFunction(item->Lua.CallbackOnKilledName, itemNumber);
 
-		item->LuaName.clear();
-		item->LuaCallbackOnKilledName.clear();
-		item->LuaCallbackOnHitName.clear();
-		item->LuaCallbackOnCollidedWithObjectName.clear();
-		item->LuaCallbackOnCollidedWithRoomName.clear();
+		item->Name.clear();
+		item->Lua.CallbackOnKilledName.clear();
+		item->Lua.CallbackOnHitName.clear();
+		item->Lua.CallbackOnCollidedWithObjectName.clear();
+		item->Lua.CallbackOnCollidedWithRoomName.clear();
 
 		if (itemNumber >= g_Level.NumItems)
 		{
@@ -385,9 +429,9 @@ void RemoveActiveItem(short itemNumber)
 		}
 
 		g_GameScriptEntities->NotifyKilled(&item);
-		if (!item.LuaCallbackOnKilledName.empty())
+		if (!item.Lua.CallbackOnKilledName.empty())
 		{
-			g_GameScript->ExecuteFunction(item.LuaCallbackOnKilledName, itemNumber);
+			g_GameScript->ExecuteFunction(item.Lua.CallbackOnKilledName, itemNumber);
 		}
 	}
 }
@@ -434,7 +478,7 @@ void InitialiseItem(short itemNumber)
 
 	item->TouchBits = NO_JOINT_BITS;
 	item->AfterDeath = 0;
-	item->MeshSwapBits = NO_JOINT_BITS;
+	item->SetMeshSwapFlags(NO_JOINT_BITS);
 
 	if (item->Flags & IFLAG_INVISIBLE)
 	{
@@ -463,12 +507,21 @@ void InitialiseItem(short itemNumber)
 
 	if (Objects[item->ObjectNumber].nmeshes > 0)
 	{
-		item->Animation.Mutator.resize(Objects[item->ObjectNumber].nmeshes);
-		for (int i = 0; i < item->Animation.Mutator.size(); i++)
-			item->Animation.Mutator[i] = {};
+		item->Model.BaseMesh = Objects[item->ObjectNumber].meshIndex;
+
+		item->Model.MeshIndex.resize(Objects[item->ObjectNumber].nmeshes);
+		for (int i = 0; i < item->Model.MeshIndex.size(); i++)
+			item->Model.MeshIndex[i] = item->Model.BaseMesh + i;
+
+		item->Model.Mutator.resize(Objects[item->ObjectNumber].nmeshes);
+		for (int i = 0; i < item->Model.Mutator.size(); i++)
+			item->Model.Mutator[i] = {};
 	}
 	else
-		item->Animation.Mutator.clear();
+	{
+		item->Model.Mutator.clear();
+		item->Model.MeshIndex.clear();
+	}
 
 	if (Objects[item->ObjectNumber].initialise != NULL)
 		Objects[item->ObjectNumber].initialise(itemNumber);
