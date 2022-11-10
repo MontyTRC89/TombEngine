@@ -32,8 +32,8 @@ namespace TEN::Entities::Creatures::TR1
 
 	constexpr auto APE_SHIFT = 75;
 
-	const auto APE_RUN_TURN_RATE_MAX = ANGLE(5.0f);
-	const auto APE_DISPLAY_ANGLE	 = ANGLE(45.0f);
+	constexpr auto APE_RUN_TURN_RATE_MAX = ANGLE(5.0f);
+	constexpr auto APE_DISPLAY_ANGLE	 = ANGLE(45.0f);
 
 	const auto ApeBite = BiteInfo(Vector3(0.0f, -19.0f, 75.0f), 15);
 	const auto ApeAttackJoints = std::vector<unsigned int>{ 8, 9, 10, 11, 12, 13, 14, 15 };

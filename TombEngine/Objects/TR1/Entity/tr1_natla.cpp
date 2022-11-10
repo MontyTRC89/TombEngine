@@ -10,6 +10,7 @@
 #include "Game/people.h"
 #include "Math/Math.h"
 #include "Sound/sound.h"
+#include "Specific/clock.h"
 #include "Specific/level.h"
 
 using namespace TEN::Math;

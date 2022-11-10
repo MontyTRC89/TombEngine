@@ -29,9 +29,4 @@
 	constexpr inline auto WALL_SIZE		 = BLOCK(1);
 	constexpr inline auto WALL_MASK		 = BLOCK(1) - 1;
 	constexpr inline auto GRID_SNAP_SIZE = (int)BLOCK(1.0f / 8);
-
-	constexpr inline auto FPS = 30; // TODO: Move this to clock.h.
-
-	// Legacy constants
-	constexpr inline auto PREDICTIVE_SCALE_FACTOR = 14;
 //}

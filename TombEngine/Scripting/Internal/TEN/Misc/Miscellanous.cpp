@@ -11,6 +11,7 @@
 #include "ReservedScriptNames.h"
 #include "ScriptUtil.h"
 #include "Sound/sound.h"
+#include "Specific/clock.h"
 #include "Specific/configuration.h"
 #include "Specific/Input/Input.h"
 #include "Vec3/Vec3.h"
@@ -262,8 +263,8 @@ namespace Misc
 		return std::make_tuple(resX, resY);
 	}
 
-
-	void Register(sol::state * state, sol::table & parent) {
+	void Register(sol::state * state, sol::table & parent)
+	{
 		sol::table table_misc{ state->lua_state(), sol::create };
 		parent.set(ScriptReserved_Misc, table_misc);
 
@@ -321,6 +322,5 @@ namespace Misc
 		table_misc.set_function(ScriptReserved_FlipMap, &FlipMap);
 
 		table_misc.set_function(ScriptReserved_PlayFlyBy, &PlayFlyBy);
-
 	}
 }

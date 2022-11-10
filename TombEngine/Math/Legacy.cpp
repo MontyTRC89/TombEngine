@@ -5,31 +5,6 @@
 
 #include "Math/Constants.h"
 
-short ANGLE(float angle)
-{
-	return (angle * (65536.0f / 360.0f));
-}
-
-short FROM_DEGREES(float angle)
-{
-	return (angle * (65536.0f / 360.0f));
-}
-
-short FROM_RAD(float angle)
-{
-	return ((angle / RADIAN) * (65536.0f / 360.0f));
-}
-
-float TO_DEGREES(short angle)
-{
-	return lround(angle * (360.0f / 65536.0f));
-}
-
-float TO_RAD(short angle)
-{
-	return ((angle * (360.0f / 65536.0f)) * RADIAN);
-}
-
 float phd_sin(short a)
 {
 	return sin(TO_RAD(a));

@@ -1,6 +1,6 @@
 #pragma once
 #include "Math/Math.h"
-#include "Math/Math.h"
+#include "Specific/clock.h"
 
 constexpr auto MAX_SPOTCAMS = 256;
 constexpr auto SPOTCAM_CINEMATIC_BARS_HEIGHT = 1.0f / 16;
