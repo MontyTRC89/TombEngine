@@ -1268,8 +1268,6 @@ struct LaraInfo
 	FlareData Flare;
 	TorchData Torch;
 
-	PlayerContext Context;
-
 	EulerAngles ExtraHeadRot;
 	EulerAngles ExtraTorsoRot;
 	short WaterCurrentActive;

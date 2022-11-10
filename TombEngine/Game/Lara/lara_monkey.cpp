@@ -70,12 +70,12 @@ void lara_as_monkey_idle(ItemInfo* item, CollisionInfo* coll)
 			return;
 		}
 
-		if (TrInput & IN_FORWARD && lara->Context.CanMonkeyForward())
+		if (TrInput & IN_FORWARD && Context::CanMonkeyForward(item, coll))
 		{
 			item->Animation.TargetState = LS_MONKEY_FORWARD;
 			return;
 		}
-		else if (TrInput & IN_BACK && lara->Context.CanMonkeyBackward())
+		else if (TrInput & IN_BACK && Context::CanMonkeyBackward(item, coll))
 		{
 			item->Animation.TargetState = LS_MONKEY_BACK;
 			return;
@@ -83,7 +83,7 @@ void lara_as_monkey_idle(ItemInfo* item, CollisionInfo* coll)
 
 		if (TrInput & IN_LSTEP || (TrInput & IN_WALK && TrInput & IN_LEFT))
 		{
-			if (lara->Context.CanMonkeyShimmyLeft())
+			if (Context::CanMonkeyShimmyLeft(item, coll))
 				item->Animation.TargetState = LS_MONKEY_SHIMMY_LEFT;
 			else
 				item->Animation.TargetState = LS_MONKEY_IDLE;
@@ -92,7 +92,7 @@ void lara_as_monkey_idle(ItemInfo* item, CollisionInfo* coll)
 		}
 		else if (TrInput & IN_RSTEP || (TrInput & IN_WALK && TrInput & IN_RIGHT))
 		{
-			if (lara->Context.CanMonkeyShimmyRight())
+			if (Context::CanMonkeyShimmyRight(item, coll))
 				item->Animation.TargetState = LS_MONKEY_SHIMMY_RIGHT;
 			else
 				item->Animation.TargetState = LS_MONKEY_IDLE;
@@ -499,12 +499,12 @@ void lara_as_monkey_turn_left(ItemInfo* item, CollisionInfo* coll)
 			return;
 		}
 
-		if (TrInput & IN_FORWARD && lara->Context.CanMonkeyForward())
+		if (TrInput & IN_FORWARD && Context::CanMonkeyForward(item, coll))
 		{
 			item->Animation.TargetState = LS_MONKEY_FORWARD;
 			return;
 		}
-		else if (TrInput & IN_BACK && lara->Context.CanMonkeyBackward())
+		else if (TrInput & IN_BACK && Context::CanMonkeyBackward(item, coll))
 		{
 			item->Animation.TargetState = LS_MONKEY_BACK;
 			return;
@@ -512,7 +512,7 @@ void lara_as_monkey_turn_left(ItemInfo* item, CollisionInfo* coll)
 
 		if (TrInput & IN_LSTEP || (TrInput & IN_WALK && TrInput & IN_LEFT))
 		{
-			if (lara->Context.CanMonkeyShimmyLeft())
+			if (Context::CanMonkeyShimmyLeft(item, coll))
 				item->Animation.TargetState = LS_MONKEY_SHIMMY_LEFT;
 			else
 				item->Animation.TargetState = LS_MONKEY_IDLE;
@@ -521,7 +521,7 @@ void lara_as_monkey_turn_left(ItemInfo* item, CollisionInfo* coll)
 		}
 		else if (TrInput & IN_RSTEP || (TrInput & IN_WALK && TrInput & IN_RIGHT))
 		{
-			if (lara->Context.CanMonkeyShimmyRight())
+			if (Context::CanMonkeyShimmyRight(item, coll))
 				item->Animation.TargetState = LS_MONKEY_SHIMMY_RIGHT;
 			else
 				item->Animation.TargetState = LS_MONKEY_IDLE;
@@ -578,12 +578,12 @@ void lara_as_monkey_turn_right(ItemInfo* item, CollisionInfo* coll)
 			return;
 		}
 
-		if (TrInput & IN_FORWARD && lara->Context.CanMonkeyForward())
+		if (TrInput & IN_FORWARD && Context::CanMonkeyForward(item, coll))
 		{
 			item->Animation.TargetState = LS_MONKEY_FORWARD;
 			return;
 		}
-		else if (TrInput & IN_BACK && lara->Context.CanMonkeyBackward())
+		else if (TrInput & IN_BACK && Context::CanMonkeyBackward(item, coll))
 		{
 			item->Animation.TargetState = LS_MONKEY_BACK;
 			return;
@@ -591,7 +591,7 @@ void lara_as_monkey_turn_right(ItemInfo* item, CollisionInfo* coll)
 
 		if (TrInput & IN_LSTEP || (TrInput & IN_WALK && TrInput & IN_LEFT))
 		{
-			if (lara->Context.CanMonkeyShimmyLeft())
+			if (Context::CanMonkeyShimmyLeft(item, coll))
 				item->Animation.TargetState = LS_MONKEY_SHIMMY_LEFT;
 			else
 				item->Animation.TargetState = LS_MONKEY_IDLE;
@@ -600,7 +600,7 @@ void lara_as_monkey_turn_right(ItemInfo* item, CollisionInfo* coll)
 		}
 		else if (TrInput & IN_RSTEP || (TrInput & IN_WALK && TrInput & IN_RIGHT))
 		{
-			if (lara->Context.CanMonkeyShimmyRight())
+			if (Context::CanMonkeyShimmyRight(item, coll))
 				item->Animation.TargetState = LS_MONKEY_SHIMMY_RIGHT;
 			else
 				item->Animation.TargetState = LS_MONKEY_IDLE;

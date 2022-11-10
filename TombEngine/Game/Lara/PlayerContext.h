@@ -4,79 +4,64 @@
 struct CollisionInfo;
 struct ItemInfo;
 
-namespace TEN::Entities::Player
+namespace TEN::Entities::Player::Context
 {
-	class PlayerContext
-	{
-	private:
-		// Private player pointers
-		// TODO: Bad idea or okay?
-		ItemInfo*	   PlayerItemPtr = nullptr;
-		CollisionInfo* PlayerCollPtr = nullptr;
+	// Basic movement
+	bool CanAFKPose(ItemInfo* item, CollisionInfo* coll);
+	bool CanTurn180(ItemInfo* item, CollisionInfo* coll);
+	bool CanTurnFast(ItemInfo* item, CollisionInfo* coll);
+	bool CanRunForward(ItemInfo* item, CollisionInfo* coll);
+	bool CanRunBackward(ItemInfo* item, CollisionInfo* coll);
+	bool CanWalkForward(ItemInfo* item, CollisionInfo* coll);
+	bool CanWalkBackward(ItemInfo* item, CollisionInfo* coll);
+	bool CanSidestepLeft(ItemInfo* item, CollisionInfo* coll);
+	bool CanSidestepRight(ItemInfo* item, CollisionInfo* coll);
+	bool CanWadeForward(ItemInfo* item, CollisionInfo* coll);
+	bool CanWadeBackward(ItemInfo* item, CollisionInfo* coll);
 
-	public:
-		// Constructors
-		PlayerContext();
-		PlayerContext(ItemInfo* item, CollisionInfo* coll);
+	// Crouch and crawl movement
+	bool IsInNarrowSpace(ItemInfo* item, CollisionInfo* coll);
+	bool CanCrouch(ItemInfo* item, CollisionInfo* coll);
+	bool CanCrouchToCrawl(ItemInfo* item, CollisionInfo* coll);
+	bool CanCrouchRoll(ItemInfo* item, CollisionInfo* coll);
+	bool CanCrawlForward(ItemInfo* item, CollisionInfo* coll);
+	bool CanCrawlBackward(ItemInfo* item, CollisionInfo* coll);
 
-		// Basic ground movement
-		bool CanAFKPose();
-		bool CanTurn180();
-		bool CanTurnFast();
-		bool CanRunForward();
-		bool CanRunBackward();
-		bool CanWalkForward();
-		bool CanWalkBackward();
-		bool CanSidestepLeft();
-		bool CanSidestepRight();
-		bool CanWadeForward();
-		bool CanWadeBackward();
+	// Monkey swing movement
+	bool CanGrabMonkeySwing(ItemInfo* item, CollisionInfo* coll);
+	bool CanMonkeyForward(ItemInfo* item, CollisionInfo* coll);
+	bool CanMonkeyBackward(ItemInfo* item, CollisionInfo* coll);
+	bool CanMonkeyShimmyLeft(ItemInfo* item, CollisionInfo* coll);
+	bool CanMonkeyShimmyRight(ItemInfo* item, CollisionInfo* coll);
 
-		// Crouch and crawl movement
-		bool IsInNarrowSpace();
-		bool CanCrouch();
-		bool CanCrouchToCrawl();
-		bool CanCrouchRoll();
-		bool CanCrawlForward();
-		bool CanCrawlBackward();
+	// Jump movement
+	bool CanPerformJump(ItemInfo* item, CollisionInfo* coll);
+	bool CanJumpUp(ItemInfo* item, CollisionInfo* coll);
+	bool CanJumpForward(ItemInfo* item, CollisionInfo* coll);
+	bool CanJumpBackward(ItemInfo* item, CollisionInfo* coll);
+	bool CanJumpLeft(ItemInfo* item, CollisionInfo* coll);
+	bool CanJumpRight(ItemInfo* item, CollisionInfo* coll);
+	bool CanRunJumpForward(ItemInfo* item, CollisionInfo* coll);
+	bool CanSprintJumpForward(ItemInfo* item, CollisionInfo* coll);
+	bool CanSlideJumpForward(ItemInfo* item, CollisionInfo* coll);
+	bool CanCrawlspaceDive(ItemInfo* item, CollisionInfo* coll);
 
-		// Monkey swing movement
-		bool CanGrabMonkeySwing();
-		bool CanMonkeyForward();
-		bool CanMonkeyBackward();
-		bool CanMonkeyShimmyLeft();
-		bool CanMonkeyShimmyRight();
+	// Vault movement
+	Context::Vault GetVaultUp2Steps(ItemInfo* item, CollisionInfo* coll);
 
-		// Jump movement
-		bool CanPerformJump();
-		bool CanJumpUp();
-		bool CanJumpForward();
-		bool CanJumpBackward();
-		bool CanJumpLeft();
-		bool CanJumpRight();
-		bool CanRunJumpForward();
-		bool CanSprintJumpForward();
-		bool CanSlideJumpForward();
-		bool CanCrawlspaceDive();
+	// Crawl vault movement
+	// Water tread climb out movement
 
-		// Vault movement
-		Context::Vault GetVaultUp2Steps();
+	// Helper inquirers
+	bool TestSidestep(ItemInfo* item, CollisionInfo* coll, bool isGoingRight);
+	bool TestMonkeyShimmy(ItemInfo* item, CollisionInfo* coll, bool isGoingRight);
+	bool TestDirectionalStandingJump(ItemInfo* item, CollisionInfo* coll, short relativeHeadingAngle);
 
-		// Crawl vault movement
-		// Water tread climb out movement
+	// Context setup inquirers
+	bool TestGroundMovementSetup(ItemInfo* item, CollisionInfo* coll, const Context::GroundMovementSetup& contextSetup, bool useCrawlSetup = false);
+	bool TestMonkeyMovementSetup(ItemInfo* item, CollisionInfo* coll, const Context::MonkeyMovementSetup& contextSetup);
+	bool TestJumpMovementSetup(ItemInfo* item, CollisionInfo* coll, const Context::JumpSetup& contextSetup);
 
-	private:
-		// Helper inquirers
-		bool TestSidestep(bool isGoingRight);
-		bool TestMonkeyShimmy(bool isGoingRight);
-		bool TestDirectionalStandingJump(short relativeHeadingAngle);
-
-		// Context setup inquirers
-		bool TestGroundMovementSetup(const Context::GroundMovementSetup& contextSetup, bool useCrawlSetup = false);
-		bool TestMonkeyMovementSetup(const Context::MonkeyMovementSetup& contextSetup);
-		bool TestJumpMovementSetup(const Context::JumpSetup& contextSetup);
-
-		// Context getters
-		Context::Vault GetVault(const Context::VaultSetup& contextSetup);
-	};
+	// Context getters
+	Context::Vault GetVault(ItemInfo* item, CollisionInfo* coll, const Context::VaultSetup& contextSetup);
 }

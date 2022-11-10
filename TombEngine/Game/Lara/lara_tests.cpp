@@ -253,7 +253,7 @@ bool DoLaraLedgeHang(ItemInfo* item, CollisionInfo* coll)
 		return false;
 
 	// Grab monkey swing.
-	if (lara->Context.CanGrabMonkeySwing())
+	if (Context::CanGrabMonkeySwing(item, coll))
 	{
 		if (item->Animation.ActiveState == LS_JUMP_UP)
 			SetAnimation(item, LA_JUMP_UP_TO_MONKEY);
@@ -1381,7 +1381,7 @@ VaultTestResult TestLaraVault(ItemInfo* item, CollisionInfo* coll)
 		}
 
 		// Vault to stand up two steps.
-		auto vaultContext = lara->Context.GetVaultUp2Steps();
+		auto vaultContext = Context::GetVaultUp2Steps(item, coll);
 		if (vaultContext.Success)
 		{
 			return VaultTestResult

@@ -271,7 +271,7 @@ void lara_as_jump_prepare(ItemInfo* item, CollisionInfo* coll)
 	if (((TrInput & IN_FORWARD &&
 			!(TrInput & IN_BACK && lara->Control.JumpDirection == JumpDirection::Back)) || // Back jump takes priority in this exception.
 		!IsDirectionActionHeld() && lara->Control.JumpDirection == JumpDirection::Forward) &&
-		lara->Context.CanJumpForward())
+		Context::CanJumpForward(item, coll))
 	{
 		item->Animation.TargetState = LS_JUMP_FORWARD;
 		lara->Control.JumpDirection = JumpDirection::Forward;
@@ -279,7 +279,7 @@ void lara_as_jump_prepare(ItemInfo* item, CollisionInfo* coll)
 	}
 	else if ((TrInput & IN_BACK ||
 		IsDirectionActionHeld() && lara->Control.JumpDirection == JumpDirection::Back) &&
-		lara->Context.CanJumpBackward())
+		Context::CanJumpBackward(item, coll))
 	{
 		item->Animation.TargetState = LS_JUMP_BACK;
 		lara->Control.JumpDirection = JumpDirection::Back;
@@ -288,7 +288,7 @@ void lara_as_jump_prepare(ItemInfo* item, CollisionInfo* coll)
 
 	if ((TrInput & IN_LEFT ||
 		!IsDirectionActionHeld() && lara->Control.JumpDirection == JumpDirection::Left) &&
-		lara->Context.CanJumpLeft())
+		Context::CanJumpLeft(item, coll))
 	{
 		item->Animation.TargetState = LS_JUMP_LEFT;
 		lara->Control.JumpDirection = JumpDirection::Left;
@@ -296,7 +296,7 @@ void lara_as_jump_prepare(ItemInfo* item, CollisionInfo* coll)
 	}
 	else if ((TrInput & IN_RIGHT ||
 		!IsDirectionActionHeld() && lara->Control.JumpDirection == JumpDirection::Right) &&
-		lara->Context.CanJumpRight())
+		Context::CanJumpRight(item, coll))
 	{
 		item->Animation.TargetState = LS_JUMP_RIGHT;
 		lara->Control.JumpDirection = JumpDirection::Right;
@@ -304,7 +304,7 @@ void lara_as_jump_prepare(ItemInfo* item, CollisionInfo* coll)
 	}
 
 	// No directional key pressed AND no directional lock; commit to jump up.
-	if (lara->Context.CanJumpUp())
+	if (Context::CanJumpUp(item, coll))
 	{
 		item->Animation.TargetState = LS_JUMP_UP;
 		lara->Control.JumpDirection = JumpDirection::Up;
@@ -743,16 +743,20 @@ void lara_as_swan_dive(ItemInfo* item, CollisionInfo* coll)
 		DoLaraFallDamage(item);
 
 		if (item->HitPoints <= 0)
+		{
 			item->Animation.TargetState = LS_DEATH;
+		}
 		else if (TestLaraSlide(item, coll))
+		{
 			SetLaraSlideAnimation(item, coll);
-		else if ((TrInput & IN_CROUCH || lara->Context.CanCrawlspaceDive()) &&
+		}
+		else if ((TrInput & IN_CROUCH || Context::CanCrawlspaceDive(item, coll)) &&
 			g_GameFlow->HasCrawlspaceDive())
 		{
 			item->Animation.TargetState = LS_CROUCH_IDLE;
 			TranslateItem(item, coll->Setup.ForwardAngle, CLICK(0.5f)); // HACK: Move forward to avoid standing up or falling out on an edge.
 		}
-		else USE_FEATURE_IF_CPP20([[likely]])
+		else
 			item->Animation.TargetState = LS_IDLE;
 
 		SetLaraLand(item, coll);

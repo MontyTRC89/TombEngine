@@ -13,38 +13,32 @@
 
 using namespace TEN::Input;
 
-namespace TEN::Entities::Player
+namespace TEN::Entities::Player::Context
 {
-	PlayerContext::PlayerContext()
+	bool CanAFKPose(ItemInfo* item, CollisionInfo* coll)
 	{
-	}
+		const auto& player = *GetLaraInfo(item);
 
-	PlayerContext::PlayerContext(ItemInfo* item, CollisionInfo* coll)
-	{
-		PlayerItemPtr = item;
-		PlayerCollPtr = coll;
-	}
-
-	bool PlayerContext::CanAFKPose()
-	{
-		auto* player = GetLaraInfo(PlayerItemPtr);
-
-		// Assess whether AFK pose is enabled.
+		// Check whether AFK pose is enabled.
 		if (!g_GameFlow->HasAFKPose())
 			return false;
 
-		// Assess wade and hand status.
-		if (player->Control.WaterStatus == WaterStatus::Wade &&
-			player->Control.HandStatus == HandStatus::Free)
+		// Check AFK pose timer.
+		if (player.Control.Count.Pose < LARA_POSE_TIME)
+			return false;
+
+		// Check water and hand status.
+		if (player.Control.HandStatus == HandStatus::Free &&
+			player.Control.WaterStatus != WaterStatus::Wade)
 		{
 			return false;
 		}
 
 		// Assess context.
-		if (!(TrInput & (IN_FLARE | IN_DRAW)) &&						// Avoid unsightly concurrent actions.
-			(player->Control.Weapon.GunType != LaraWeaponType::Flare || // Flare is not being handled.
-				player->Flare.Life) &&
-			player->Vehicle == NO_ITEM)									// Not in a vehicle.
+		if (!(IsHeld(In::Flare) || IsHeld(In::DrawWeapon)) &&		   // Avoid unsightly concurrent actions.
+			(player.Control.Weapon.GunType != LaraWeaponType::Flare || // Not handling flare.
+				player.Flare.Life) &&
+			player.Vehicle == NO_ITEM)								   // Not in a vehicle.
 		{
 			return true;
 		}
@@ -52,20 +46,20 @@ namespace TEN::Entities::Player
 		return false;
 	}
 
-	bool PlayerContext::CanTurn180()
+	bool CanTurn180(ItemInfo* item, CollisionInfo* coll)
 	{
-		auto* lara = GetLaraInfo(PlayerItemPtr);
+		const auto& lara = *GetLaraInfo(item);
 
-		return (lara->Control.WaterStatus == WaterStatus::Wade || TestEnvironment(ENV_FLAG_SWAMP, PlayerItemPtr));
+		return (lara.Control.WaterStatus == WaterStatus::Wade || TestEnvironment(ENV_FLAG_SWAMP, item));
 	}
 
-	bool PlayerContext::CanTurnFast()
+	bool CanTurnFast(ItemInfo* item, CollisionInfo* coll)
 	{
-		auto* player = GetLaraInfo(PlayerItemPtr);
+		const auto& player = *GetLaraInfo(item);
 
-		if (player->Control.WaterStatus == WaterStatus::Dry &&
-			((player->Control.HandStatus == HandStatus::WeaponReady && player->Control.Weapon.GunType != LaraWeaponType::Torch) ||
-				(player->Control.HandStatus == HandStatus::WeaponDraw && player->Control.Weapon.GunType != LaraWeaponType::Flare)))
+		if (player.Control.WaterStatus == WaterStatus::Dry &&
+			((player.Control.HandStatus == HandStatus::WeaponReady && player.Control.Weapon.GunType != LaraWeaponType::Torch) ||
+				(player.Control.HandStatus == HandStatus::WeaponDraw && player.Control.Weapon.GunType != LaraWeaponType::Flare)))
 		{
 			return true;
 		}
@@ -73,115 +67,118 @@ namespace TEN::Entities::Player
 		return false;
 	}
 
-	bool PlayerContext::CanRunForward()
+	bool CanRunForward(ItemInfo* item, CollisionInfo* coll)
 	{
 		Context::GroundMovementSetup contextSetup =
 		{
-			PlayerItemPtr->Pose.Orientation.y,
+			item->Pose.Orientation.y,
 			NO_LOWER_BOUND, -STEPUP_HEIGHT, // Defined by run forward state.
 			false, true, false
 		};
-		return this->TestGroundMovementSetup(contextSetup);
+		return TestGroundMovementSetup(item, coll, contextSetup);
 	}
 
-	bool PlayerContext::CanRunBackward()
+	bool CanRunBackward(ItemInfo* item, CollisionInfo* coll)
 	{
 		Context::GroundMovementSetup contextSetup =
 		{
-			PlayerItemPtr->Pose.Orientation.y + ANGLE(180.0f),
+			item->Pose.Orientation.y + ANGLE(180.0f),
 			NO_LOWER_BOUND, -STEPUP_HEIGHT, // Defined by run backward state.
 			false, false, false
 		};
-		return this->TestGroundMovementSetup(contextSetup);
+		return TestGroundMovementSetup(item, coll, contextSetup);
 	}
 
-	bool PlayerContext::CanWalkForward()
+	bool CanWalkForward(ItemInfo* item, CollisionInfo* coll)
 	{
 		Context::GroundMovementSetup contextSetup =
 		{
-			PlayerItemPtr->Pose.Orientation.y,
+			item->Pose.Orientation.y,
 			STEPUP_HEIGHT, -STEPUP_HEIGHT, // Defined by walk forward state.
 		};
-		return this->TestGroundMovementSetup(contextSetup);
+		return TestGroundMovementSetup(item, coll, contextSetup);
 	}
 
-	bool PlayerContext::CanWalkBackward()
+	bool CanWalkBackward(ItemInfo* item, CollisionInfo* coll)
 	{
 		Context::GroundMovementSetup contextSetup =
 		{
-			PlayerItemPtr->Pose.Orientation.y + ANGLE(180.0f),
+			item->Pose.Orientation.y + ANGLE(180.0f),
 			STEPUP_HEIGHT, -STEPUP_HEIGHT // Defined by walk backward state.
 		};
-		return this->TestGroundMovementSetup(contextSetup);
+		return TestGroundMovementSetup(item, coll, contextSetup);
 	}
 
-	bool PlayerContext::CanSidestepLeft()
+	bool CanSidestepLeft(ItemInfo* item, CollisionInfo* coll)
 	{
-		return this->TestSidestep(false);
+		return TestSidestep(item, coll, false);
 	}
 
-	bool PlayerContext::CanSidestepRight()
+	bool CanSidestepRight(ItemInfo* item, CollisionInfo* coll)
 	{
-		return this->TestSidestep(true);
+		return TestSidestep(item, coll, true);
 	}
 
-	bool PlayerContext::CanWadeForward()
+	bool CanWadeForward(ItemInfo* item, CollisionInfo* coll)
 	{
-		auto* player = GetLaraInfo(PlayerItemPtr);
+		const auto& player = *GetLaraInfo(item);
 
-		// Assess wade status.
-		if (player->Control.WaterStatus != WaterStatus::Wade)
+		// Check water status.
+		if (player.Control.WaterStatus != WaterStatus::Wade)
 			return false;
 
-		if (TestEnvironment(ENV_FLAG_SWAMP, PlayerItemPtr))
+		// Swamp case.
+		if (TestEnvironment(ENV_FLAG_SWAMP, item))
 		{
 			Context::GroundMovementSetup contextSetup =
 			{
-				PlayerItemPtr->Pose.Orientation.y,
+				item->Pose.Orientation.y,
 				NO_LOWER_BOUND, -STEPUP_HEIGHT, // Defined by wade forward state.
 				false, false, false
 			};
-			return this->TestGroundMovementSetup(contextSetup);
+			return TestGroundMovementSetup(item, coll, contextSetup);
 		}
-
-		// TODO: More specific test for wading in water.
-		return this->CanRunForward();
+		// Regular case.
+		else
+			return CanRunForward(item, coll); // TODO: More specific test for wading in water.
 	}
 
-	bool PlayerContext::CanWadeBackward()
+	bool CanWadeBackward(ItemInfo* item, CollisionInfo* coll)
 	{
-		auto* player = GetLaraInfo(PlayerItemPtr);
+		const auto& player = *GetLaraInfo(item);
 
-		// Assess wade status.
-		if (player->Control.WaterStatus != WaterStatus::Wade)
+		// Check water status.
+		if (player.Control.WaterStatus != WaterStatus::Wade)
 			return false;
 
-		if (TestEnvironment(ENV_FLAG_SWAMP, PlayerItemPtr))
+		// Swamp case.
+		if (TestEnvironment(ENV_FLAG_SWAMP, item))
 		{
 			Context::GroundMovementSetup contextSetup =
 			{
-				PlayerItemPtr->Pose.Orientation.y + ANGLE(180.0f),
+				item->Pose.Orientation.y + ANGLE(180.0f),
 				NO_LOWER_BOUND, -STEPUP_HEIGHT, // Defined by walk backward state.
 				false, false, false
 			};
-			return this->TestGroundMovementSetup(contextSetup);
+			return TestGroundMovementSetup(item, coll, contextSetup);
 		}
-
-		// TODO: More specific test for wading in water.
-		return this->CanWalkBackward();
+		// Regular case.
+		else
+			return CanWalkBackward(item, coll); // TODO: More specific test for wading in water.
 	}
 
-	bool PlayerContext::IsInNarrowSpace()
+	bool IsInNarrowSpace(ItemInfo* item, CollisionInfo* coll)
 	{
+		static const std::vector<int> crouchStates = { LS_CROUCH_IDLE, LS_CROUCH_TURN_LEFT, LS_CROUCH_TURN_RIGHT };
+
 		// HACK: coll->Setup.Radius is only set to LARA_RADIUS_CRAWL in lara_col functions, then reset by LaraAboveWater(),
 		// meaning that for tests called in lara_as functions it will store the wrong radius. -- Sezz 2021.11.05
-		static const std::vector<int> crouchStates = { LS_CROUCH_IDLE, LS_CROUCH_TURN_LEFT, LS_CROUCH_TURN_RIGHT };
-		float radius = TestState(PlayerItemPtr->Animation.ActiveState, crouchStates) ? LARA_RADIUS_CRAWL : LARA_RADIUS;
+		float radius = TestState(item->Animation.ActiveState, crouchStates) ? LARA_RADIUS_CRAWL : LARA_RADIUS;
 
 		// Assess center point collision.
-		auto pointCollCenter = GetCollision(PlayerItemPtr, 0, 0.0f, -LARA_HEIGHT / 2);
+		auto pointCollCenter = GetCollision(item, 0, 0.0f, -LARA_HEIGHT / 2);
 		if (abs(pointCollCenter.Position.Ceiling - pointCollCenter.Position.Floor) < LARA_HEIGHT ||	// Center space is narrow enough.
-			abs(PlayerCollPtr->Middle.Ceiling - LARA_HEIGHT_CRAWL) < LARA_HEIGHT)					// Consider statics overhead detected by GetCollisionInfo().
+			abs(coll->Middle.Ceiling - LARA_HEIGHT_CRAWL) < LARA_HEIGHT)					// Consider statics overhead detected by GetCollisionInfo().
 		{
 			return true;
 		}
@@ -189,7 +186,7 @@ namespace TEN::Entities::Player
 		// TODO: Check whether < or <= and > or >=.
 
 		// Assess front point collision.
-		auto pointCollFront = GetCollision(PlayerItemPtr, PlayerItemPtr->Pose.Orientation.y, radius, -PlayerCollPtr->Setup.Height);
+		auto pointCollFront = GetCollision(item, item->Pose.Orientation.y, radius, -coll->Setup.Height);
 		if (abs(pointCollFront.Position.Ceiling - pointCollFront.Position.Floor) < LARA_HEIGHT &&		  // Front space is narrow enough.
 			abs(pointCollFront.Position.Ceiling - pointCollFront.Position.Floor) > LARA_HEIGHT_CRAWL &&	  // Front space not too narrow.
 			abs(pointCollFront.Position.Floor - pointCollCenter.Position.Floor) <= CRAWL_STEPUP_HEIGHT && // Front floor is within upper/lower floor bounds.
@@ -199,7 +196,7 @@ namespace TEN::Entities::Player
 		}
 
 		// Assess back point collision.
-		auto pointCollBack = GetCollision(PlayerItemPtr, PlayerItemPtr->Pose.Orientation.y, -radius, -PlayerCollPtr->Setup.Height);
+		auto pointCollBack = GetCollision(item, item->Pose.Orientation.y, -radius, -coll->Setup.Height);
 		if (abs(pointCollBack.Position.Ceiling - pointCollBack.Position.Floor) < LARA_HEIGHT &&			 // Back space is narrow enough.
 			abs(pointCollBack.Position.Ceiling - pointCollBack.Position.Floor) > LARA_HEIGHT_CRAWL &&	 // Back space not too narrow.
 			abs(pointCollBack.Position.Floor - pointCollCenter.Position.Floor) <= CRAWL_STEPUP_HEIGHT && // Back floor is within upper/lower floor bounds.
@@ -211,12 +208,12 @@ namespace TEN::Entities::Player
 		return false;
 	}
 
-	bool PlayerContext::CanCrouch()
+	bool CanCrouch(ItemInfo* item, CollisionInfo* coll)
 	{
-		auto* player = GetLaraInfo(PlayerItemPtr);
+		const auto& player = *GetLaraInfo(item);
 
-		if (player->Control.WaterStatus != WaterStatus::Wade &&
-			(player->Control.HandStatus == HandStatus::Free || !IsStandingWeapon(PlayerItemPtr, player->Control.Weapon.GunType)))
+		if (player.Control.WaterStatus != WaterStatus::Wade &&
+			(player.Control.HandStatus == HandStatus::Free || !IsStandingWeapon(item, player.Control.Weapon.GunType)))
 		{
 			return true;
 		}
@@ -224,14 +221,14 @@ namespace TEN::Entities::Player
 		return false;
 	}
 
-	bool PlayerContext::CanCrouchToCrawl()
+	bool CanCrouchToCrawl(ItemInfo* item, CollisionInfo* coll)
 	{
-		const auto& player = GetLaraInfo(PlayerItemPtr);
+		const auto& player = *GetLaraInfo(item);
 
 		if (!(TrInput & (IN_FLARE | IN_DRAW)) &&						// Avoid unsightly concurrent actions.
-			player->Control.HandStatus == HandStatus::Free &&			// Hands are free.
-			(player->Control.Weapon.GunType != LaraWeaponType::Flare || // Not handling flare. TODO: Should be allowed, but the flare animation bugs out right now. -- Sezz 2022.03.18
-				player->Flare.Life))
+			player.Control.HandStatus == HandStatus::Free &&			// Hands are free.
+			(player.Control.Weapon.GunType != LaraWeaponType::Flare || // Not handling flare. TODO: Should be allowed, but the flare animation bugs out right now. -- Sezz 2022.03.18
+				player.Flare.Life))
 		{
 			return true;
 		}
@@ -239,26 +236,26 @@ namespace TEN::Entities::Player
 		return false;
 	}
 
-	bool PlayerContext::CanCrouchRoll()
+	bool CanCrouchRoll(ItemInfo* item, CollisionInfo* coll)
 	{
 		static const float maxWaterHeight	 = -CLICK(1);
 		static const float maxProbeDistance	 = SECTOR(1);
 		static const float distanceIncrement = CLICK(1);
 
-		const auto& player = GetLaraInfo(PlayerItemPtr);
+		const auto& player = *GetLaraInfo(item);
 
 		// 1. Check water depth.
-		if (player->WaterSurfaceDist < maxWaterHeight)
+		if (player.WaterSurfaceDist < maxWaterHeight)
 			return false;
 
 		// TODO: Extend point collision struct to also find water depths.
 		// 2. Assess continuity of path.
 		float distance = 0.0f;
-		auto pointCollA = GetCollision(PlayerItemPtr);
+		auto pointCollA = GetCollision(item);
 		while (distance < maxProbeDistance)
 		{
 			distance += distanceIncrement;
-			auto pointCollB = GetCollision(PlayerItemPtr, PlayerItemPtr->Pose.Orientation.y, distance, -LARA_HEIGHT_CRAWL);
+			auto pointCollB = GetCollision(item, item->Pose.Orientation.y, distance, -LARA_HEIGHT_CRAWL);
 
 			if (abs(pointCollA.Position.Floor - pointCollB.Position.Floor) > CRAWL_STEPUP_HEIGHT ||	 // Avoid floor height differences beyond crawl stepup threshold.
 				abs(pointCollB.Position.Ceiling - pointCollB.Position.Floor) <= LARA_HEIGHT_CRAWL || // Avoid narrow spaces.
@@ -273,41 +270,41 @@ namespace TEN::Entities::Player
 		return true;
 	}
 
-	bool PlayerContext::CanCrawlForward()
+	bool CanCrawlForward(ItemInfo* item, CollisionInfo* coll)
 	{
 		Context::GroundMovementSetup contextSetup =
 		{
-			PlayerItemPtr->Pose.Orientation.y,
+			item->Pose.Orientation.y,
 			CRAWL_STEPUP_HEIGHT, -CRAWL_STEPUP_HEIGHT // Defined by crawl forward state.
 		};
-		return this->TestGroundMovementSetup(contextSetup, true);
+		return TestGroundMovementSetup(item, coll, contextSetup, true);
 	}
 
-	bool PlayerContext::CanCrawlBackward()
+	bool CanCrawlBackward(ItemInfo* item, CollisionInfo* coll)
 	{
 		Context::GroundMovementSetup contextSetup =
 		{
-			PlayerItemPtr->Pose.Orientation.y + ANGLE(180.0f),
+			item->Pose.Orientation.y + ANGLE(180.0f),
 			CRAWL_STEPUP_HEIGHT, -CRAWL_STEPUP_HEIGHT // Defined by crawl backward state.
 		};
-		return this->TestGroundMovementSetup(contextSetup, true);
+		return TestGroundMovementSetup(item, coll, contextSetup, true);
 	}
 
-	bool PlayerContext::CanGrabMonkeySwing()
+	bool CanGrabMonkeySwing(ItemInfo* item, CollisionInfo* coll)
 	{
 		static const float monkeySwingGrabTolerance = CLICK(0.5f);
 
-		auto* player = GetLaraInfo(PlayerItemPtr);
+		const auto& player = *GetLaraInfo(item);
 
 		// 1. Check for monkey swing ceiling.
-		if (!player->Control.CanMonkeySwing)
+		if (!player.Control.CanMonkeySwing)
 			return false;
 
-		int vPos = PlayerItemPtr->Pose.Position.y - LARA_HEIGHT_MONKEY;
-		auto pointColl = GetCollision(PlayerItemPtr);
+		int vPos = item->Pose.Position.y - LARA_HEIGHT_MONKEY;
+		auto pointColl = GetCollision(item);
 
 		// 2. Assess collision with ceiling.
-		if ((pointColl.Position.Ceiling - vPos) < 0 & PlayerCollPtr->CollisionType != CT_TOP && PlayerCollPtr->CollisionType != CT_TOP_FRONT)
+		if ((pointColl.Position.Ceiling - vPos) < 0 & coll->CollisionType != CT_TOP && coll->CollisionType != CT_TOP_FRONT)
 			return false;
 
 		// 3. Assess point collision.
@@ -320,42 +317,42 @@ namespace TEN::Entities::Player
 		return false;
 	}
 
-	bool PlayerContext::CanMonkeyForward()
+	bool CanMonkeyForward(ItemInfo* item, CollisionInfo* coll)
 	{
 		Context::MonkeyMovementSetup contextSetup =
 		{
-			PlayerItemPtr->Pose.Orientation.y,
+			item->Pose.Orientation.y,
 			CLICK(1.25f), -CLICK(1.25f) // Defined by monkey forward state.
 		};
-		return TestMonkeyMovementSetup(contextSetup);
+		return TestMonkeyMovementSetup(item, coll, contextSetup);
 	}
 
-	bool PlayerContext::CanMonkeyBackward()
+	bool CanMonkeyBackward(ItemInfo* item, CollisionInfo* coll)
 	{
 		Context::MonkeyMovementSetup contextSetup =
 		{
-			PlayerItemPtr->Pose.Orientation.y + ANGLE(180.0f),
+			item->Pose.Orientation.y + ANGLE(180.0f),
 			CLICK(1.25f), -CLICK(1.25f) // Defined by monkey backward state.
 		};
-		return TestMonkeyMovementSetup(contextSetup);
+		return TestMonkeyMovementSetup(item, coll, contextSetup);
 	}
 
-	bool PlayerContext::CanMonkeyShimmyLeft()
+	bool CanMonkeyShimmyLeft(ItemInfo* item, CollisionInfo* coll)
 	{
-		return this->TestMonkeyShimmy(false);
+		return TestMonkeyShimmy(item, coll, false);
 	}
 	
-	bool PlayerContext::CanMonkeyShimmyRight()
+	bool CanMonkeyShimmyRight(ItemInfo* item, CollisionInfo* coll)
 	{
-		return this->TestMonkeyShimmy(true);
+		return TestMonkeyShimmy(item, coll, true);
 	}
 
-	bool PlayerContext::CanPerformJump()
+	bool CanPerformJump(ItemInfo* item, CollisionInfo* coll)
 	{
-		return !TestEnvironment(ENV_FLAG_SWAMP, PlayerItemPtr);
+		return !TestEnvironment(ENV_FLAG_SWAMP, item);
 	}
 
-	bool PlayerContext::CanJumpUp()
+	bool CanJumpUp(ItemInfo* item, CollisionInfo* coll)
 	{
 		static const Context::JumpSetup contextSetup =
 		{
@@ -363,140 +360,139 @@ namespace TEN::Entities::Player
 			0.0f,
 			false
 		};
-		return TestJumpMovementSetup(contextSetup);
+		return TestJumpMovementSetup(item, coll, contextSetup);
 	}
 
-	bool PlayerContext::CanJumpForward()
+	bool CanJumpForward(ItemInfo* item, CollisionInfo* coll)
 	{
-		return this->TestDirectionalStandingJump(ANGLE(0.0f));
+		return TestDirectionalStandingJump(item, coll, ANGLE(0.0f));
 	}
 
-	bool PlayerContext::CanJumpBackward()
+	bool CanJumpBackward(ItemInfo* item, CollisionInfo* coll)
 	{
-		return this->TestDirectionalStandingJump(ANGLE(180.0f));
+		return TestDirectionalStandingJump(item, coll, ANGLE(180.0f));
 	}
 
-	bool PlayerContext::CanJumpLeft()
+	bool CanJumpLeft(ItemInfo* item, CollisionInfo* coll)
 	{
-		return this->TestDirectionalStandingJump(ANGLE(-90.0f));
+		return TestDirectionalStandingJump(item, coll, ANGLE(-90.0f));
 	}
 
-	bool PlayerContext::CanJumpRight()
+	bool CanJumpRight(ItemInfo* item, CollisionInfo* coll)
 	{
-		return this->TestDirectionalStandingJump(ANGLE(90.0f));
+		return TestDirectionalStandingJump(item, coll, ANGLE(90.0f));
 	}
 
-	bool PlayerContext::CanRunJumpForward()
+	bool CanRunJumpForward(ItemInfo* item, CollisionInfo* coll)
 	{
-		auto* player = GetLaraInfo(PlayerItemPtr);
+		const auto& player = *GetLaraInfo(item);
 
 		// Check run timer.
-		if (player->Control.Count.Run < LARA_RUN_JUMP_TIME)
+		if (player.Control.Count.Run < LARA_RUN_JUMP_TIME)
 			return false;
 
 		Context::JumpSetup contextSetup
 		{
-			PlayerItemPtr->Pose.Orientation.y,
+			item->Pose.Orientation.y,
 			CLICK(1.5f)
 		};
-		return TestJumpMovementSetup(contextSetup);
+		return TestJumpMovementSetup(item, coll, contextSetup);
 	}
 	
-	bool PlayerContext::CanSprintJumpForward()
+	bool CanSprintJumpForward(ItemInfo* item, CollisionInfo* coll)
 	{
-		auto* player = GetLaraInfo(PlayerItemPtr);
+		const auto& player = *GetLaraInfo(item);
 
 		// Check for jump state dispatch.
-		if (!HasStateDispatch(PlayerItemPtr, LS_JUMP_FORWARD))
+		if (!HasStateDispatch(item, LS_JUMP_FORWARD))
 			return false;
 
 		// Check run timer.
-		if (player->Control.Count.Run < LARA_SPRINT_JUMP_TIME)
+		if (player.Control.Count.Run < LARA_SPRINT_JUMP_TIME)
 			return false;
 
 		Context::JumpSetup contextSetup
 		{
-			PlayerItemPtr->Pose.Orientation.y,
+			item->Pose.Orientation.y,
 			CLICK(1.8f)
 		};
-		return TestJumpMovementSetup(contextSetup);
+		return TestJumpMovementSetup(item, coll, contextSetup);
 	}
 
-	bool PlayerContext::CanSlideJumpForward()
+	bool CanSlideJumpForward(ItemInfo* item, CollisionInfo* coll)
 	{
 		return true;
 
+		if (!g_GameFlow->HasSlideExtended())
+			return true;
+		
 		// TODO: Broken on diagonal slides?
-		if (g_GameFlow->HasSlideExtended())
-		{
-			auto pointColl = GetCollision(PlayerItemPtr);
 
-			short aspectAngle = GetLaraSlideDirection(PlayerItemPtr, PlayerCollPtr);
-			short steepnessAngle = Geometry::GetSurfaceSteepnessAngle(pointColl.FloorTilt);
-			return (abs(short(PlayerCollPtr->Setup.ForwardAngle - aspectAngle)) <= abs(steepnessAngle));
-		}
+		auto pointColl = GetCollision(item);
 
-		return true;
+		short aspectAngle = GetLaraSlideDirection(item, coll);
+		short steepnessAngle = Geometry::GetSurfaceSteepnessAngle(pointColl.FloorTilt);
+		return (abs(short(coll->Setup.ForwardAngle - aspectAngle)) <= abs(steepnessAngle));
 	}
 
-	bool PlayerContext::CanCrawlspaceDive()
+	bool CanCrawlspaceDive(ItemInfo* item, CollisionInfo* coll)
 	{
-		auto pointColl = GetCollision(PlayerItemPtr, PlayerCollPtr->Setup.ForwardAngle, PlayerCollPtr->Setup.Radius, -PlayerCollPtr->Setup.Height);
-		return (abs(pointColl.Position.Ceiling - pointColl.Position.Floor) < LARA_HEIGHT || this->IsInNarrowSpace());
+		auto pointColl = GetCollision(item, coll->Setup.ForwardAngle, coll->Setup.Radius, -coll->Setup.Height);
+		return (abs(pointColl.Position.Ceiling - pointColl.Position.Floor) < LARA_HEIGHT || IsInNarrowSpace(item, coll));
 	}
 
-	bool PlayerContext::TestSidestep(bool isGoingRight)
+	bool TestSidestep(ItemInfo* item, CollisionInfo* coll, bool isGoingRight)
 	{
-		auto* player = GetLaraInfo(PlayerItemPtr);
+		const auto& player = *GetLaraInfo(item);
 
 		// TODO: Make specific condition for wading in water.
-		if (player->Control.WaterStatus == WaterStatus::Wade &&
-			TestEnvironment(ENV_FLAG_SWAMP, PlayerItemPtr))
+		if (player.Control.WaterStatus == WaterStatus::Wade &&
+			TestEnvironment(ENV_FLAG_SWAMP, item))
 		{
 			Context::GroundMovementSetup contextSetup =
 			{
-				PlayerItemPtr->Pose.Orientation.y + (isGoingRight ? ANGLE(90.0f) : ANGLE(-90.0f)),
+				item->Pose.Orientation.y + (isGoingRight ? ANGLE(90.0f) : ANGLE(-90.0f)),
 				NO_LOWER_BOUND, -CLICK(0.8f), // Upper bound defined by sidestep left/right states.
 				false, false, false
 			};
-			return this->TestGroundMovementSetup(contextSetup);
+			return TestGroundMovementSetup(item, coll, contextSetup);
 		}
 		else
 		{
 			Context::GroundMovementSetup contextSetup =
 			{
-				PlayerItemPtr->Pose.Orientation.y + (isGoingRight ? ANGLE(90.0f) : ANGLE(-90.0f)),
+				item->Pose.Orientation.y + (isGoingRight ? ANGLE(90.0f) : ANGLE(-90.0f)),
 				CLICK(0.8f), -CLICK(0.8f) // Defined by sidestep left/right states.
 			};
-			return this->TestGroundMovementSetup(contextSetup);
+			return TestGroundMovementSetup(item, coll, contextSetup);
 		}
 	}
 
-	bool PlayerContext::TestMonkeyShimmy(bool isGoingRight)
+	bool TestMonkeyShimmy(ItemInfo* item, CollisionInfo* coll, bool isGoingRight)
 	{
 		Context::MonkeyMovementSetup contextSetup =
 		{
-			PlayerItemPtr->Pose.Orientation.y + (isGoingRight ? ANGLE(90.0f) : ANGLE(-90.0f)),
+			item->Pose.Orientation.y + (isGoingRight ? ANGLE(90.0f) : ANGLE(-90.0f)),
 			CLICK(0.5f), -CLICK(0.5f) // Defined by monkey shimmy left/right states.
 		};
-		return TestMonkeyMovementSetup(contextSetup);
+		return TestMonkeyMovementSetup(item, coll, contextSetup);
 	}
 
-	bool PlayerContext::TestDirectionalStandingJump(short relativeHeadingAngle)
+	bool TestDirectionalStandingJump(ItemInfo* item, CollisionInfo* coll, short relativeHeadingAngle)
 	{
 		// Check for swamp.
-		if (TestEnvironment(ENV_FLAG_SWAMP, PlayerItemPtr))
+		if (TestEnvironment(ENV_FLAG_SWAMP, item))
 			return false;
 
 		Context::JumpSetup contextSetup =
 		{
-			PlayerItemPtr->Pose.Orientation.y + relativeHeadingAngle,
+			item->Pose.Orientation.y + relativeHeadingAngle,
 			CLICK(0.85f)
 		};
-		return TestJumpMovementSetup(contextSetup);
+		return TestJumpMovementSetup(item, coll, contextSetup);
 	}
 
-	Context::Vault PlayerContext::GetVaultUp2Steps()
+	Context::Vault GetVaultUp2Steps(ItemInfo* item, CollisionInfo* coll)
 	{
 		static const Context::VaultSetup contextSetup =
 		{
@@ -505,13 +501,13 @@ namespace TEN::Entities::Player
 			CLICK(1)
 		};
 
-		auto vaultContext = this->GetVault(contextSetup);
+		auto vaultContext = GetVault(item, coll, contextSetup);
 		vaultContext.TargetState = LS_VAULT_2_STEPS;
 
 		if (!vaultContext.Success)
 			return vaultContext;
 
-		vaultContext.Success = HasStateDispatch(PlayerItemPtr, vaultContext.TargetState);
+		vaultContext.Success = HasStateDispatch(item, vaultContext.TargetState);
 		vaultContext.Height += CLICK(2);
 		vaultContext.SetBusyHands = true;
 		vaultContext.DoLedgeSnap = true;
@@ -519,17 +515,17 @@ namespace TEN::Entities::Player
 		return vaultContext;
 	}
 
-	bool PlayerContext::TestGroundMovementSetup(const Context::GroundMovementSetup& contextSetup, bool useCrawlSetup)
+	bool TestGroundMovementSetup(ItemInfo* item, CollisionInfo* coll, const Context::GroundMovementSetup& contextSetup, bool useCrawlSetup)
 	{
-		// HACK: PlayerCollPtr->Setup.Radius and PlayerCollPtr->Setup.Height are set only in lara_col functions, then reset by LaraAboveWater() to defaults.
+		// HACK: coll->Setup.Radius and coll->Setup.Height are set only in lara_col functions, then reset by LaraAboveWater() to defaults.
 		// This means they will store the wrong values for any move context assessments conducted in crouch/crawl lara_as functions.
 		// When states become objects, a dedicated state init function should eliminate the need for the useCrawlSetup parameter. -- Sezz 2022.03.16
-		int playerRadius = useCrawlSetup ? LARA_RADIUS_CRAWL : PlayerCollPtr->Setup.Radius;
-		int playerHeight = useCrawlSetup ? LARA_HEIGHT_CRAWL : PlayerCollPtr->Setup.Height;
+		int playerRadius = useCrawlSetup ? LARA_RADIUS_CRAWL : coll->Setup.Radius;
+		int playerHeight = useCrawlSetup ? LARA_HEIGHT_CRAWL : coll->Setup.Height;
 
-		int vPos = PlayerItemPtr->Pose.Position.y;
+		int vPos = item->Pose.Position.y;
 		int vPosTop = vPos - playerHeight;
-		auto pointColl = GetCollision(PlayerItemPtr, contextSetup.HeadingAngle, OFFSET_RADIUS(playerRadius), -playerHeight);
+		auto pointColl = GetCollision(item, contextSetup.HeadingAngle, OFFSET_RADIUS(playerRadius), -playerHeight);
 
 		// 1. Check for wall.
 		if (pointColl.Position.Floor == NO_HEIGHT)
@@ -545,30 +541,30 @@ namespace TEN::Entities::Player
 
 		// Raycast setup at upper floor bound.
 		auto originA = GameVector(
-			PlayerItemPtr->Pose.Position.x,
+			item->Pose.Position.x,
 			(vPos + contextSetup.UpperFloorBound) - 1,
-			PlayerItemPtr->Pose.Position.z,
-			PlayerItemPtr->RoomNumber
+			item->Pose.Position.z,
+			item->RoomNumber
 		);
 		auto targetA = GameVector(
 			pointColl.Coordinates.x,
 			(vPos + contextSetup.UpperFloorBound) - 1,
 			pointColl.Coordinates.z,
-			PlayerItemPtr->RoomNumber
+			item->RoomNumber
 		);
 
 		// Raycast setup at lowest ceiling bound (player height).
 		auto originB = GameVector(
-			PlayerItemPtr->Pose.Position.x,
+			item->Pose.Position.x,
 			vPosTop + 1,
-			PlayerItemPtr->Pose.Position.z,
-			PlayerItemPtr->RoomNumber
+			item->Pose.Position.z,
+			item->RoomNumber
 		);
 		auto targetB = GameVector(
 			pointColl.Coordinates.x,
 			vPosTop + 1,
 			pointColl.Coordinates.z,
-			PlayerItemPtr->RoomNumber
+			item->RoomNumber
 		);
 
 		// 3. Assess raycast collision.
@@ -587,14 +583,14 @@ namespace TEN::Entities::Player
 		return false;
 	}
 
-	bool PlayerContext::TestMonkeyMovementSetup(const Context::MonkeyMovementSetup& contextSetup)
+	bool TestMonkeyMovementSetup(ItemInfo* item, CollisionInfo* coll, const Context::MonkeyMovementSetup& contextSetup)
 	{
 		// HACK: Have to make the height explicit for now (see comment in above function). -- Sezz 2022.07.28
 		static const int playerHeight = LARA_HEIGHT_MONKEY;
 
-		int vPos = PlayerItemPtr->Pose.Position.y;
+		int vPos = item->Pose.Position.y;
 		int vPosTop = vPos - playerHeight;
-		auto pointColl = GetCollision(PlayerItemPtr, contextSetup.HeadingAngle, OFFSET_RADIUS(PlayerCollPtr->Setup.Radius));
+		auto pointColl = GetCollision(item, contextSetup.HeadingAngle, OFFSET_RADIUS(coll->Setup.Radius));
 
 		// 1. Check for wall.
 		if (pointColl.Position.Ceiling == NO_HEIGHT)
@@ -604,32 +600,32 @@ namespace TEN::Entities::Player
 		if (pointColl.Position.CeilingSlope)
 			return false;
 
-		// Raycast setup at highest floor bound (player base)
+		// Raycast setup at highest floor bound (player base).
 		auto originA = GameVector(
-			PlayerItemPtr->Pose.Position.x,
+			item->Pose.Position.x,
 			vPos - 1,
-			PlayerItemPtr->Pose.Position.z,
-			PlayerItemPtr->RoomNumber
+			item->Pose.Position.z,
+			item->RoomNumber
 		);
 		auto targetA = GameVector(
 			pointColl.Coordinates.x,
 			vPos - 1,
 			pointColl.Coordinates.z,
-			PlayerItemPtr->RoomNumber
+			item->RoomNumber
 		);
 		
 		// Raycast setup at lower ceiling bound.
 		auto originB = GameVector(
-			PlayerItemPtr->Pose.Position.x,
+			item->Pose.Position.x,
 			(vPosTop + contextSetup.LowerCeilingBound) + 1,
-			PlayerItemPtr->Pose.Position.z,
-			PlayerItemPtr->RoomNumber
+			item->Pose.Position.z,
+			item->RoomNumber
 		);
 		auto targetB = GameVector(
 			pointColl.Coordinates.x,
 			(vPosTop + contextSetup.LowerCeilingBound) + 1,
 			pointColl.Coordinates.z,
-			PlayerItemPtr->RoomNumber
+			item->RoomNumber
 		);
 
 		// 3. Assess raycast collision.
@@ -649,33 +645,33 @@ namespace TEN::Entities::Player
 		return false;
 	}
 
-	bool PlayerContext::TestJumpMovementSetup(const Context::JumpSetup& contextSetup)
+	bool TestJumpMovementSetup(ItemInfo* item, CollisionInfo* coll, const Context::JumpSetup& contextSetup)
 	{
-		auto* player = GetLaraInfo(PlayerItemPtr);
+		const auto& player = *GetLaraInfo(item);
 
-		int vPos = PlayerItemPtr->Pose.Position.y;
-		auto pointColl = GetCollision(PlayerItemPtr, contextSetup.HeadingAngle, contextSetup.Distance, -PlayerCollPtr->Setup.Height);
+		int vPos = item->Pose.Position.y;
+		auto pointColl = GetCollision(item, contextSetup.HeadingAngle, contextSetup.Distance, -coll->Setup.Height);
 
 		// 1. Check for wall.
 		if (pointColl.Position.Floor == NO_HEIGHT)
 			return false;
 
-		bool isSwamp = TestEnvironment(ENV_FLAG_SWAMP, PlayerItemPtr);
-		bool isWading = contextSetup.TestWadeStatus ? (player->Control.WaterStatus == WaterStatus::Wade) : false;
+		bool isSwamp = TestEnvironment(ENV_FLAG_SWAMP, item);
+		bool isWading = contextSetup.TestWadeStatus ? (player.Control.WaterStatus == WaterStatus::Wade) : false;
 
 		// 2. Check for swamp or wade status (if applicable).
 		if (isSwamp || isWading)
 			return false;
 
 		// 3. Check for corner.
-		if (TestLaraFacingCorner(PlayerItemPtr, contextSetup.HeadingAngle, contextSetup.Distance))
+		if (TestLaraFacingCorner(item, contextSetup.HeadingAngle, contextSetup.Distance))
 			return false;
 
 		// 4. Assess point collision.
-		if ((pointColl.Position.Floor - vPos) >= -STEPUP_HEIGHT &&											  // Floor is within highest floor bound.
-			((pointColl.Position.Ceiling - vPos) < -(PlayerCollPtr->Setup.Height + (LARA_HEADROOM * 0.8f)) || // Ceiling is within lowest ceiling bound... 
-				((pointColl.Position.Ceiling - vPos) < -PlayerCollPtr->Setup.Height &&								// OR ceiling is level with Lara's head...
-					(pointColl.Position.Floor - vPos) >= CLICK(0.5f))))												// AND there is a drop below.
+		if ((pointColl.Position.Floor - vPos) >= -STEPUP_HEIGHT &&									 // Floor is within highest floor bound.
+			((pointColl.Position.Ceiling - vPos) < -(coll->Setup.Height + (LARA_HEADROOM * 0.8f)) || // Ceiling is within lowest ceiling bound... 
+				((pointColl.Position.Ceiling - vPos) < -coll->Setup.Height &&							// OR ceiling is level with Lara's head...
+					(pointColl.Position.Floor - vPos) >= CLICK(1.0f / 2))))								// AND there is a drop below.
 		{
 			return true;
 		}
@@ -683,17 +679,17 @@ namespace TEN::Entities::Player
 		return false;
 	}
 
-	Context::Vault PlayerContext::GetVault(const Context::VaultSetup& contextSetup)
+	Context::Vault GetVault(ItemInfo* item, CollisionInfo* coll, const Context::VaultSetup& contextSetup)
 	{
-		auto* player = GetLaraInfo(PlayerItemPtr);
+		const auto& player = *GetLaraInfo(item);
 
-		auto pointCollFront = GetCollision(PlayerItemPtr, PlayerCollPtr->NearestLedgeAngle, OFFSET_RADIUS(PlayerCollPtr->Setup.Radius), -PlayerCollPtr->Setup.Height);
-		auto pointCollCenter = GetCollision(PlayerItemPtr, 0, 0, --PlayerCollPtr->Setup.Height / 2);
+		auto pointCollFront = GetCollision(item, coll->NearestLedgeAngle, OFFSET_RADIUS(coll->Setup.Radius), -coll->Setup.Height);
+		auto pointCollCenter = GetCollision(item, 0, 0, -coll->Setup.Height / 2);
 
-		bool isSwamp = TestEnvironment(ENV_FLAG_SWAMP, PlayerItemPtr);
-		bool isSwampTooDeep = contextSetup.TestSwampDepth ? (isSwamp && player->WaterSurfaceDist < -CLICK(3)) : isSwamp;
+		bool isSwamp = TestEnvironment(ENV_FLAG_SWAMP, item);
+		bool isSwampTooDeep = contextSetup.TestSwampDepth ? (isSwamp && player.WaterSurfaceDist < -CLICK(3)) : isSwamp;
 		
-		int vPos = isSwamp ? PlayerItemPtr->Pose.Position.y : pointCollCenter.Position.Floor; // HACK: Avoid cheese when in the midst of performing a step. Can be done better. @Sezz 2022.04.08	
+		int vPos = isSwamp ? item->Pose.Position.y : pointCollCenter.Position.Floor; // HACK: Avoid cheese when in the midst of performing a step. Can be done better. @Sezz 2022.04.08	
 
 		// 1. Check swamp depth (if applicable).
 		if (isSwampTooDeep)
@@ -706,13 +702,13 @@ namespace TEN::Entities::Player
 
 		// 2. Raise vertical position of point collision probe by increments of 1/8th blocks to find potential vault ledge.
 		int vOffset = contextSetup.LowerFloorBound;
-		while (((pointCollFront.Position.Ceiling - vPos) > -PlayerCollPtr->Setup.Height ||					 // Ceiling is below Lara's height...
+		while (((pointCollFront.Position.Ceiling - vPos) > -coll->Setup.Height ||					 // Ceiling is below Lara's height...
 			abs(pointCollFront.Position.Ceiling - pointCollFront.Position.Floor) <= contextSetup.ClampMin/* ||	// OR clamp is too small...
 			abs(pointCollFront.Position.Ceiling - pointCollFront.Position.Floor) > contextSetup.ClampMax*/) &&	// OR clamp is too large (future-proofing; not possible right now).
-			vOffset > (contextSetup.UpperFloorBound - PlayerCollPtr->Setup.Height))							 // Offset is not too high.
+			vOffset > (contextSetup.UpperFloorBound - coll->Setup.Height))							 // Offset is not too high.
 		{
-			pointCollFront = GetCollision(PlayerItemPtr, PlayerCollPtr->NearestLedgeAngle, OFFSET_RADIUS(PlayerCollPtr->Setup.Radius), vOffset);
-			vOffset -= std::max<int>(CLICK(0.5f), contextSetup.ClampMin);
+			pointCollFront = GetCollision(item, coll->NearestLedgeAngle, OFFSET_RADIUS(coll->Setup.Radius), vOffset);
+			vOffset -= std::max(CLICK(1.0f / 2), contextSetup.ClampMin);
 		}
 
 		// 3. Check for walls.
