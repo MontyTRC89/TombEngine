@@ -34,6 +34,9 @@ using namespace TEN::Entities::Switches;
 using namespace TEN::Effects::Environment;
 using namespace TEN::Math;
 
+constexpr int HK_BURST_MODE_SHOT_COUNT = 5;
+constexpr int HK_BURST_MODE_SHOT_INTERVAL = 12;
+
 enum class CrossbowBoltType
 {
 	Normal,
@@ -1659,15 +1662,15 @@ void FireHK(ItemInfo* laraItem, int mode)
 	);
 	
 	if (weapon.Weaponmode == LaraWeaponTypeCarried::WTYPE_AMMO_1)
-		weapon.Interval = 12;
+		weapon.Interval = HK_BURST_MODE_SHOT_INTERVAL;
 	else if (weapon.Weaponmode == LaraWeaponTypeCarried::WTYPE_AMMO_2)
 	{
 		weapon.ShotsFired++;
 
-		if (weapon.ShotsFired == 5)
+		if (weapon.ShotsFired == HK_BURST_MODE_SHOT_COUNT)
 		{
 			weapon.ShotsFired = 0;
-			weapon.Interval = 12;
+			weapon.Interval = HK_BURST_MODE_SHOT_INTERVAL;
 		}
 	}
 
@@ -1752,7 +1755,7 @@ void LasersightWeaponHandler(ItemInfo* item, LaraWeaponType weaponType)
 				(lara->Control.Weapon.GunType == LaraWeaponType::HK) &&
 				(weapon.SelectedAmmo == WeaponAmmoType::Ammo1))
 			{
-				weapon.Interval = 12;
+				weapon.Interval = HK_BURST_MODE_SHOT_INTERVAL;
 				firing = true;
 				SoundEffect(SFX_TR4_EXPLOSION1, nullptr, SoundEnvironment::Land, 1.0f, 0.4f);
 				SoundEffect(SFX_TR4_HK_FIRE, nullptr);
@@ -1764,10 +1767,10 @@ void LasersightWeaponHandler(ItemInfo* item, LaraWeaponType weaponType)
 			{
 				if (!weapon.Flag)
 				{
-					if (++weapon.ShotsFired == 5)
+					if (++weapon.ShotsFired == HK_BURST_MODE_SHOT_COUNT)
 					{
 						weapon.ShotsFired = 0;
-						weapon.Interval = 12;
+						weapon.Interval = HK_BURST_MODE_SHOT_INTERVAL;
 					}
 					weapon.Flag = 4;
 					firing = true;
