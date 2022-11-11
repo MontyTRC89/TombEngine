@@ -142,7 +142,7 @@ namespace TEN::Entities::TR4
 		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 		item->Animation.TargetState = VON_CROY_STATE_TOGGLE_KNIFE;
 		item->Animation.ActiveState = VON_CROY_STATE_TOGGLE_KNIFE;
-		item->MeshSwapBits.Set(VonCroyKnifeSwapJoints);
+		item->SetMeshSwapFlags(VonCroyKnifeSwapJoints);
 
 		memset(VonCroyPassedWaypoints, 0, 128);
 	}
@@ -427,7 +427,7 @@ namespace TEN::Entities::TR4
 				probe = GetCollision(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, probe.RoomNumber);
 				if (probe.Position.Ceiling == (probe.Position.Floor - 1536))
 				{
-					if (item->MeshSwapBits.Test(VonCroyKnifeSwapJoints))
+					if (item->TestMeshSwapFlags(VonCroyKnifeSwapJoints))
 						item->Animation.TargetState = VON_CROY_STATE_TOGGLE_KNIFE;
 					else
 						item->Animation.TargetState = VON_CROY_STATE_START_MONKEY;
@@ -502,7 +502,7 @@ namespace TEN::Entities::TR4
 				if (Lara.Location >= item->ItemFlags[3])
 				{
 					if (!foundTarget || AI.distance >= pow(SECTOR(1.5f), 2) &&
-						(item->MeshSwapBits.Test(18) || AI.distance >= pow(SECTOR(3), 2)))
+						(item->TestMeshSwapFlags(18) || AI.distance >= pow(SECTOR(3), 2)))
 					{
 						if (creature->Enemy->IsLara())
 						{
@@ -627,10 +627,7 @@ namespace TEN::Entities::TR4
 		case VON_CROY_STATE_TOGGLE_KNIFE:
 			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase)
 			{
-				if (!item->MeshSwapBits.Test(VonCroyKnifeSwapJoints))
-					item->MeshSwapBits.Set(VonCroyKnifeSwapJoints);
-				else
-					item->MeshSwapBits.Clear(VonCroyKnifeSwapJoints);
+				item->SetMeshSwapFlags(VonCroyKnifeSwapJoints, item->TestMeshSwapFlags(VonCroyKnifeSwapJoints));
 			}
 
 			break;
