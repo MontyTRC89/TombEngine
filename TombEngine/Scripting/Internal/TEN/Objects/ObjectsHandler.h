@@ -65,13 +65,22 @@ private:
 	}
 
 	template <typename R, char const* S>
-	std::vector <string> GetBySlotName(std::string const& name)
+	std::vector <string> GetBySlotName(std::string const& slotName)
 	{
 		std::vector<string> items = {};
 		for (auto& [key, val] : m_nameMap)
 		{
-			
+			if (key == "baddy2_3")
+			{
+				auto* item = &g_Level.Items[GetIndexByName(key)];
+				GAME_OBJECT_ID objectNumber = item->ObjectNumber;
 
+				if (kObjIDs[theString] == key)
+				{
+					items.push_back(key);
+				}
+			}
+			
 		}
 
 		return items;
