@@ -510,7 +510,7 @@ enum LaraAnim
 	LA_CRAWL_TURN_RIGHT = 270,										// Crawl rotate right (looped)
 	LA_MONKEY_TURN_LEFT = 271,										// Monkey swing rotate left
 	LA_MONKEY_TURN_RIGHT = 272,										// Monkey swing rotate right
-	LA_CROUCH_TO_CRAWL_CONTINUE = 273,								// Crouch > crawl (2/3)
+	LA_MONKEY_RELEASE = 273,										// Monkey swing > jump up
 	LA_CRAWL_TO_CROUCH_CONTINUE = 274,								// Crawl > crouch (2/3)
 	LA_CRAWL_IDLE_TO_CRAWL_BACK = 275,								// Crawl > crawl back
 	LA_CRAWL_BACK = 276,											// Crawl back (looped)
@@ -822,15 +822,13 @@ enum LaraAnim
 	LA_LEDGE_JUMP_BACK_START = 567,
 	LA_LEDGE_JUMP_BACK_END = 568,
 
-	// RESERVED. PLEASE DO NOT ADD ANIMS HERE.
-
-	LA_MONKEY_RELEASE = 597,
+	// UP TO 596 IS RESERVED. PLEASE DO NOT ADD ANIMS HERE.
 
 	NUM_LARA_ANIMS
 
 	// TRASHED ANIMS (please reuse slots before going any higher and remove entries from this list as you go):
 	// 102
-	// 273, 274, 278, 280,
+	// 274, 278, 280,
 	// 343, 345,
 	// 364, 366, 368, 370,
 };
