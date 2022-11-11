@@ -83,7 +83,7 @@ most can just be ignored (see usage).
 	@return reference to new Moveable object
 	@usage 
 	local item = Moveable(
-		TEN.ObjID.PISTOLS_ITEM, -- object id
+		TEN.Objects.ObjID.PISTOLS_ITEM, -- object id
 		"test", -- name
 		Vec3(18907, 0, 21201)
 		)
