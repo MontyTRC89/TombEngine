@@ -682,7 +682,6 @@ void HandleWeapon(ItemInfo* laraItem)
 			Camera.type = CameraType::Combat;
 		}
 
-		if (TrInput & IN_ACTION)
 		if (TrInput & IN_ACTION && !LaserSight)
 		{
 			if (!GetAmmo(*lara, lara->Control.Weapon.GunType))
