@@ -29,6 +29,10 @@ Version 1.0.3
 * Fix distance fog not applying properly to additive and subtractive surfaces.
 * Fix single-hand weapons not having a sound on draw and undraw.
 
+Lua API changes:
+* A new class has been added, LaraObject, for Lara-specific functions. The built-in "Lara" variable now uses this class.
+* SetOnFire and GetOnFire have been added to LaraObject.
+
 Version 1.0.2
 =============
 
