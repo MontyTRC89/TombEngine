@@ -170,14 +170,12 @@ void AnimateShotgun(ItemInfo* laraItem, LaraWeaponType weaponType)
 
 							SoundEffect(SFX_TR4_EXPLOSION1, &laraItem->Pose, SoundEnvironment::Land, 1.0f, 0.4f);
 							SoundEffect(SFX_TR4_HK_FIRE, &laraItem->Pose);
-
 						}
 					}
 					else
 						FireShotgun(laraItem);
 					if (weaponType != LaraWeaponType::HK)
 						item->Animation.TargetState = WEAPON_STATE_RECOIL;
-					
 				}
 				else if (lara->LeftArm.Locked)
 					item->Animation.TargetState = WEAPON_STATE_AIM;
