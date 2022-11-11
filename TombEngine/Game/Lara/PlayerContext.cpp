@@ -536,7 +536,7 @@ namespace TEN::Entities::Player::Context
 		static const auto contextSetup = Context::VaultSetup
 		{
 			-STEPUP_HEIGHT, -CLICK(5.0f / 2), // Floor range.
-			LARA_HEIGHT, -INFINITY,			  // Space range.
+			LARA_HEIGHT, INFINITY,			  // Space range.
 			CLICK(1)
 		};
 
