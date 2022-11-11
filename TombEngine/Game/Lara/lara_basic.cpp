@@ -1220,13 +1220,14 @@ void lara_as_step_right(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	// Walk locks orientation.
+	// Walk action locks orientation.
 	if (IsHeld(In::Walk))
-		ResetLaraTurnRateY(item);
-	else
 	{
-		if (IsHeld(In::Left) || IsHeld(In::Right))
-			ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_SLOW_TURN_RATE_MAX);
+		ResetLaraTurnRateY(item);
+	}
+	else if (IsHeld(In::Left) || IsHeld(In::Right))
+	{
+		ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_SLOW_TURN_RATE_MAX);
 	}
 
 	if (IsHeld(In::RightStep) || (IsHeld(In::Walk) && IsHeld(In::Right)))
@@ -1315,13 +1316,14 @@ void lara_as_step_left(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	// Walk locks orientation.
+	// Walk action locks orientation.
 	if (IsHeld(In::Walk))
-		ResetLaraTurnRateY(item);
-	else
 	{
-		if (IsHeld(In::Left) || IsHeld(In::Right))
-			ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_SLOW_TURN_RATE_MAX);
+		ResetLaraTurnRateY(item);
+	}
+	else if (IsHeld(In::Left) || IsHeld(In::Right))
+	{
+		ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_SLOW_TURN_RATE_MAX);
 	}
 
 	if (IsHeld(In::LeftStep) || (IsHeld(In::Walk) && IsHeld(In::Left)))

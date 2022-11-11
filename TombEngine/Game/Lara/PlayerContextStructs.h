@@ -86,4 +86,25 @@ namespace TEN::Entities::Player::Context
 		int	 Height		 = 0;
 		int	 TargetState = NO_STATE;
 	};
+
+	struct LedgeHang
+	{
+		bool Success = false;
+		int	 Height	 = 0;
+	};
+
+	struct HangClimbSetup
+	{
+		float ClampMin;
+		float ClampMax;
+		float GapMin;
+		bool CheckSlope;
+	};
+
+	struct CornerShimmy
+	{
+		bool Success;
+		Pose ProbeResult;
+		Pose RealPositionResult;
+	};
 }

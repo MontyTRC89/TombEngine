@@ -2,11 +2,11 @@
 
 struct VaultTestSetup
 {
-	float LowerFloorBound = 0.0f;
-	float UpperFloorBound = 0.0f;
-	float ClampMin		  = 0.0f;
-	float ClampMax		  = 0.0f;
-	float GapMin		  = 0.0f;
+	int LowerFloorBound = 0.0f;
+	int UpperFloorBound = 0.0f;
+	int ClampMin		  = 0.0f;
+	int ClampMax		  = 0.0f;
+	int GapMin		  = 0.0f;
 
 	bool TestSwampDepth = true;
 };
@@ -25,13 +25,13 @@ struct VaultTestResult
 
 struct CrawlVaultTestSetup
 {
-	float LowerFloorBound = 0.0f;
-	float UpperFloorBound = 0.0f;
-	float ClampMin		  = 0.0f;
-	float GapMin		  = 0.0f;
-	float CrossDist		  = 0.0f;
-	float DestDist		  = 0.0f;
-	float FloorBound	  = 0.0f;
+	int LowerFloorBound = 0.0f;
+	int UpperFloorBound = 0.0f;
+	int ClampMin		  = 0.0f;
+	int GapMin		  = 0.0f;
+	int CrossDist		  = 0.0f;
+	int DestDist		  = 0.0f;
+	int FloorBound	  = 0.0f;
 
 	bool CheckSlope = true;
 	bool CheckDeath = true;
