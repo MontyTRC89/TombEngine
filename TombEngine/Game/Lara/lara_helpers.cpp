@@ -764,7 +764,6 @@ void SetLaraMonkeyRelease(ItemInfo* item)
 	item->Animation.Velocity.y = 1.0f;
 	item->Animation.Velocity.z = 2.0f;
 	lara.Control.TurnRate.y = 0;
-	lara.Control.HandStatus = HandStatus::Free;
 }
 
 // temp

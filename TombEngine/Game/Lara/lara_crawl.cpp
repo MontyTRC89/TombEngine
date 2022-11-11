@@ -23,6 +23,21 @@ using namespace TEN::Input;
 // Control & Collision Functions
 // -----------------------------
 
+// State:	  LS_CRAWL_VAULT (194)
+// Collision: lara_void_func()
+void lara_as_crawl_vault(ItemInfo* item, CollisionInfo* coll)
+{
+	auto& lara = *GetLaraInfo(item);
+
+	lara.Control.CanLook = false;
+	coll->Setup.EnableObjectPush = false;
+	coll->Setup.EnableSpasm = false;
+	Camera.targetDistance = BLOCK(1);
+	Camera.flags = CF_FOLLOW_CENTER;
+
+	item->Animation.TargetState = LS_CRAWL_IDLE;
+}
+
 // -------
 // CROUCH:
 // -------

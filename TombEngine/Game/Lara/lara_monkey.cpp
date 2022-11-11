@@ -140,7 +140,7 @@ void lara_col_monkey_idle(ItemInfo* item, CollisionInfo* coll)
 	coll->Setup.Height = LARA_HEIGHT_MONKEY;
 	GetCollisionInfo(coll, item);
 	
-	// HACK: Prevent ShiftItem() from causing an instantaneous snap, thereby interfering with DoLaraMonkeyStep(), when going down a step. @Sezz 2022.01.28
+	// HACK: Prevent ShiftItem() from interfering with DoLaraMonkeyStep() when going down a step. -- Sezz 2022.01.28
 	if (coll->Shift.y >= 0 && coll->Shift.y <= MONKEY_STEPUP_HEIGHT)
 		coll->Shift.y = 0;
 	ShiftItem(item, coll);

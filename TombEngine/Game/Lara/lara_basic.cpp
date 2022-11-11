@@ -91,10 +91,8 @@ void lara_as_controlled_no_look(ItemInfo* item, CollisionInfo* coll)
 	coll->Setup.EnableSpasm = false;
 }
 
-// State:		LS_VAULT (164),
-//				LS_VAULT_2_STEPS (165), LS_VAULT_3_STEPS (166),
-//				VAULT_1_STEP_CROUCH (167), VAULT_2_STEPS_CROUCH (168), VAULT_3_STEPS_CROUCH (169)
-// Collision:	lara_void_func()
+// State:	  LS_VAULT (164)
+// Collision: lara_void_func()
 void lara_as_vault(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& lara = *GetLaraInfo(item);
