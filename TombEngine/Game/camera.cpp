@@ -26,10 +26,11 @@ using namespace TEN::Effects::Environment;
 using namespace TEN::Entities::Generic;
 using namespace TEN::Input;
 
-constexpr auto COLL_CHECK_THRESHOLD   = SECTOR(4);
-constexpr auto COLL_CANCEL_THRESHOLD  = SECTOR(2);
-constexpr auto COLL_DISCARD_THRESHOLD = CLICK(0.5f);
-constexpr auto CAMERA_RADIUS          = CLICK(1);
+constexpr auto PARTICLE_FADE_THRESHOLD = SECTOR(14);
+constexpr auto COLL_CHECK_THRESHOLD    = SECTOR(4);
+constexpr auto COLL_CANCEL_THRESHOLD   = SECTOR(2);
+constexpr auto COLL_DISCARD_THRESHOLD  = CLICK(0.5f);
+constexpr auto CAMERA_RADIUS           = CLICK(1);
 
 constexpr auto THUMBCAM_VERTICAL_CONSTRAINT_ANGLE   = 120.0f;
 constexpr auto THUMBCAM_HORIZONTAL_CONSTRAINT_ANGLE = 80.0f;
@@ -1083,7 +1084,7 @@ void BounceCamera(ItemInfo* item, short bounce, short maxDistance)
 void LaserSightCamera(ItemInfo* item)
 {
 	auto* lara = GetLaraInfo(item);
-	auto& ammo = GetAmmo(item, lara->Control.Weapon.GunType);
+	auto& ammo = GetAmmo(*lara, lara->Control.Weapon.GunType);
 
 	bool firing = false;
 
@@ -1717,6 +1718,16 @@ bool TestBoundsCollideCamera(const GameBoundingBox& bounds, const Pose& pose, sh
 {
 	auto sphere = BoundingSphere(Camera.pos.ToVector3(), radius);
 	return sphere.Intersects(bounds.ToBoundingOrientedBox(pose));
+}
+
+float GetParticleDistanceFade(Vector3i position)
+{
+	float distance = Vector3::Distance(Camera.pos.ToVector3(), position.ToVector3());
+
+	if (distance <= PARTICLE_FADE_THRESHOLD)
+		return 1.0f;
+
+	return std::clamp(1.0f - ((distance - PARTICLE_FADE_THRESHOLD) / COLL_CHECK_THRESHOLD), 0.0f, 1.0f);
 }
 
 void ItemPushCamera(GameBoundingBox* bounds, Pose* pos, short radius)

@@ -11,19 +11,17 @@ using namespace TEN::Math;
 
 namespace TEN::Gui
 {
-	/*
-	* To add an object to the inventory, introduce entries to the
-	* InventoryObjectTypes and InventoryObjectTable arrays at corresponding indices.
-	* 
-	* NOTE: Also add the object to the proper list construction function.
-	* If it's a weapon, add its ammo handling (variables at the beginning of the file).
-	* If it's combineable, add necessary data to the CombineTable awway and increment MAX_COMBINES.
-	*/
+	// To add an object to the inventory, introduce entries to the
+	// InventoryObjectTypes and InventoryObjectTable arrays at corresponding indices.
+	// 
+	// NOTE: Also add the object to the proper list construction function.
+	// If it's a weapon, add its ammo handling (variables at the beginning of the file).
+	// If it's combineable, add necessary data to the CombineTable awway and increment MAX_COMBINES.
 
 	InventoryObject InventoryObjectTable[INVENTORY_TABLE_SIZE] =
 	{
 		// Weapons
-		{ ID_PISTOLS_ITEM, 6, 0.5f, EulerAngles(ANGLE(244.0f), ANGLE(90.0f), ANGLE(276.0f)), OPT_EQUIP | OPT_COMBINABLE | OPT_CHOOSE_AMMO_PISTOLS, STRING_PISTOLS, NO_JOINT_BITS,  INV_ROT_Y },
+		{ ID_PISTOLS_ITEM, 6, 0.5f, EulerAngles(ANGLE(244.0f), ANGLE(90.0f), ANGLE(276.0f)), OPT_EQUIP | OPT_COMBINABLE | OPT_CHOOSE_AMMO_PISTOLS, STRING_PISTOLS, NO_JOINT_BITS, INV_ROT_Y },
 		{ ID_PISTOLS_AMMO_ITEM, 4, 0.5f, EulerAngles::Zero, OPT_USE, STRING_PISTOLS_AMMO, NO_JOINT_BITS, INV_ROT_Y },
 		{ ID_UZI_ITEM, -4, 0.5f, EulerAngles(ANGLE(135.0f), ANGLE(-90.0f), ANGLE(90.0f)), OPT_EQUIP | OPT_COMBINABLE | OPT_CHOOSE_AMMO_UZI, STRING_UZI , NO_JOINT_BITS, INV_ROT_Y },
 		{ ID_UZI_AMMO_ITEM, 5, 0.5f, EulerAngles(ANGLE(29.5f), 0, 0), OPT_USE, STRING_UZI_AMMO, NO_JOINT_BITS, INV_ROT_Y },

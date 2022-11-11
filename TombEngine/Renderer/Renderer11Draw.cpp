@@ -396,7 +396,7 @@ namespace TEN::Renderer
 					{ 32,
 					Vector3::Distance(pos1, pos2) },
 					BLENDMODE_ALPHATEST,
-					d, view);
+					d, false, view);
 			}
 		}
 	}
@@ -554,6 +554,8 @@ namespace TEN::Renderer
 					m_cbStatic.updateData(m_stStatic, m_context.Get());
 					BindConstantBufferVS(CB_STATIC, m_cbStatic.get());
 
+					BindLights(m_rooms[rat->RoomNumber].LightsToDraw);
+
 					for (int b = 0; b < mesh->Buckets.size(); b++)
 					{
 						RendererBucket* bucket = &mesh->Buckets[b];
@@ -611,6 +613,8 @@ namespace TEN::Renderer
 						m_cbStatic.updateData(m_stStatic, m_context.Get());
 						BindConstantBufferVS(CB_STATIC, m_cbStatic.get());
 
+						BindLights(m_rooms[bat->RoomNumber].LightsToDraw);
+
 						DrawIndexedTriangles(bucket->NumIndices, bucket->StartIndex, 0);
 
 						m_numMoveablesDrawCalls++;
@@ -653,6 +657,8 @@ namespace TEN::Renderer
 					m_stStatic.AmbientLight = m_rooms[beetle->RoomNumber].AmbientLight;
 					m_cbStatic.updateData(m_stStatic, m_context.Get());
 					BindConstantBufferVS(CB_STATIC, m_cbStatic.get());
+
+					BindLights(m_rooms[beetle->RoomNumber].LightsToDraw);
 
 					for (int b = 0; b < mesh->Buckets.size(); b++)
 					{
@@ -1963,7 +1969,7 @@ namespace TEN::Renderer
 		int meshIndex = Objects[ID_CAUSTICS_TEXTURES].meshIndex;
 		int causticsFrame = nmeshes ? meshIndex + ((GlobalCounter) % nmeshes) : 0;
 
-		// BindTexture(TEXTURE_CAUSTICS, m_sprites[causticsFrame].Texture, SAMPLER_NONE);
+		BindTexture(TEXTURE_CAUSTICS, m_sprites[causticsFrame].Texture, SAMPLER_NONE);
 
 		// Set shadow map data
 		if (shadowLight != nullptr)
@@ -1996,8 +2002,10 @@ namespace TEN::Renderer
 
 			BindLights(view.lightsToDraw);
 
-			// TODO: make caustics optional in Tomb Editor
-			m_stMisc.Caustics = false; // (nativeRoom->flags & ENV_FLAG_WATER);
+			m_stMisc.Caustics = (nativeRoom->flags & ENV_FLAG_WATER);
+			m_cbMisc.updateData(m_stMisc, m_context.Get());
+			BindConstantBufferPS(CB_MISC, m_cbMisc.get());
+			BindConstantBufferVS(CB_MISC, m_cbMisc.get());
 
 			m_stRoom.AmbientColor = room->AmbientLight;
 			m_stRoom.Water = (nativeRoom->flags & ENV_FLAG_WATER) != 0 ? 1 : 0;
