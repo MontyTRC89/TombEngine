@@ -371,7 +371,7 @@ void lara_col_jump_prepare(ItemInfo* item, CollisionInfo* coll)
 
 	ShiftItem(item, coll);
 
-	if (TestLaraStep(item, coll))
+	if (Context::CanPerformStep(item, coll))
 	{
 		DoLaraStep(item, coll);
 		return;

@@ -9,8 +9,12 @@ namespace TEN::Entities::Player::Context
 	// ------------------
 	// CONTEXT ASSESSMENT
 	// ------------------
-	
+
 	// Basic movement
+	bool CanPerformStep(ItemInfo* item, CollisionInfo* coll);
+	bool CanStepUp(ItemInfo* item, CollisionInfo* coll);
+	bool CanStepDown(ItemInfo* item, CollisionInfo* coll);
+	bool CanFall(ItemInfo* item, CollisionInfo* coll);
 	bool CanSlide(ItemInfo* item, CollisionInfo* coll);
 	bool CanAFKPose(ItemInfo* item, CollisionInfo* coll);
 	bool CanTurn180(ItemInfo* item, CollisionInfo* coll);
@@ -33,16 +37,16 @@ namespace TEN::Entities::Player::Context
 	bool CanCrawlBackward(ItemInfo* item, CollisionInfo* coll);
 
 	// Monkey swing movement
-	bool CanGrabMonkeySwing(ItemInfo* item, CollisionInfo* coll);
+	bool CanPerformMonkeyStep(ItemInfo* item, CollisionInfo* coll);
 	bool CanFallFromMonkeySwing(ItemInfo* item, CollisionInfo* coll);
-	bool CanMonkeySwingForward(ItemInfo* item, CollisionInfo* coll);
-	bool CanMonkeySwingBackward(ItemInfo* item, CollisionInfo* coll);
-	bool CanMonkeySwingShimmyLeft(ItemInfo* item, CollisionInfo* coll);
-	bool CanMonkeySwingShimmyRight(ItemInfo* item, CollisionInfo* coll);
+	bool CanGrabMonkeySwing(ItemInfo* item, CollisionInfo* coll);
+	bool CanMonkeyForward(ItemInfo* item, CollisionInfo* coll);
+	bool CanMonkeyBackward(ItemInfo* item, CollisionInfo* coll);
+	bool CanMonkeyShimmyLeft(ItemInfo* item, CollisionInfo* coll);
+	bool CanMonkeyShimmyRight(ItemInfo* item, CollisionInfo* coll);
 
 	// Jump movement
 	bool CanLand(ItemInfo* item, CollisionInfo* coll);
-	bool CanFall(ItemInfo* item, CollisionInfo* coll);
 	bool CanPerformJump(ItemInfo* item, CollisionInfo* coll);
 	bool CanJumpUp(ItemInfo* item, CollisionInfo* coll);
 	bool CanJumpForward(ItemInfo* item, CollisionInfo* coll);
@@ -62,15 +66,15 @@ namespace TEN::Entities::Player::Context
 
 	// ----------------------------------------------------------------------------------------------------------------------
 	
-	// Helper inquirers
+	// Helpers
 	bool TestSidestep(ItemInfo* item, CollisionInfo* coll, bool isGoingRight);
 	bool TestMonkeyShimmy(ItemInfo* item, CollisionInfo* coll, bool isGoingRight);
 	bool TestDirectionalStandingJump(ItemInfo* item, CollisionInfo* coll, short relativeHeadingAngle);
 
-	// Context setup inquirers
+	// Context setup testers
 	bool TestGroundMovementSetup(ItemInfo* item, CollisionInfo* coll, const Context::GroundMovementSetup& contextSetup, bool useCrawlSetup = false);
 	bool TestMonkeyMovementSetup(ItemInfo* item, CollisionInfo* coll, const Context::MonkeyMovementSetup& contextSetup);
-	bool TestJumpMovementSetup(ItemInfo* item, CollisionInfo* coll, const Context::JumpSetup& contextSetup);
+	bool TestJumpSetup(ItemInfo* item, CollisionInfo* coll, const Context::JumpSetup& contextSetup);
 
 	// Context getters
 	Context::Vault GetVault(ItemInfo* item, CollisionInfo* coll, const Context::VaultSetup& contextSetup);

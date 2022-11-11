@@ -231,7 +231,7 @@ void lara_col_walk_forward(ItemInfo* item, CollisionInfo* coll)
 		LaraCollideStop(item, coll);
 	}
 
-	if (TestLaraStep(item, coll) && coll->CollisionType != CT_FRONT)
+	if (Context::CanPerformStep(item, coll) && coll->CollisionType != CT_FRONT)
 	{
 		DoLaraStep(item, coll);
 		return;
@@ -381,7 +381,7 @@ void lara_col_run_forward(ItemInfo* item, CollisionInfo* coll)
 		LaraCollideStop(item, coll);
 	}
 
-	if (TestLaraStep(item, coll) && coll->CollisionType != CT_FRONT)
+	if (Context::CanPerformStep(item, coll) && coll->CollisionType != CT_FRONT)
 	{
 		DoLaraStep(item, coll);
 		return;
@@ -613,7 +613,7 @@ void lara_col_idle(ItemInfo* item, CollisionInfo* coll)
 
 	ShiftItem(item, coll);
 
-	if (TestLaraStep(item, coll))
+	if (Context::CanPerformStep(item, coll))
 	{
 		DoLaraStep(item, coll);
 		return;
@@ -714,7 +714,7 @@ void lara_col_run_back(ItemInfo* item, CollisionInfo* coll)
 	if (LaraDeflectEdge(item, coll))
 		LaraCollideStop(item, coll);
 
-	if (TestLaraStep(item, coll))
+	if (Context::CanPerformStep(item, coll))
 	{
 		DoLaraStep(item, coll);
 		return;
@@ -922,7 +922,7 @@ void lara_col_death(ItemInfo* item, CollisionInfo* coll)
 
 	ShiftItem(item, coll);
 
-	if (TestLaraStep(item, coll))
+	if (Context::CanPerformStep(item, coll))
 	{
 		DoLaraStep(item, coll);
 		return;
@@ -956,7 +956,7 @@ void lara_col_splat(ItemInfo* item, CollisionInfo* coll)
 
 	ShiftItem(item, coll);
 
-	if (TestLaraStep(item, coll))
+	if (Context::CanPerformStep(item, coll))
 	{
 		DoLaraStep(item, coll);
 		return;
@@ -1050,7 +1050,7 @@ void lara_col_walk_back(ItemInfo* item, CollisionInfo* coll)
 	if (LaraDeflectEdge(item, coll))
 		LaraCollideStop(item, coll);
 
-	if (TestLaraStep(item, coll))
+	if (Context::CanPerformStep(item, coll))
 	{
 		DoLaraStep(item, coll);
 		return;
@@ -1273,7 +1273,7 @@ void lara_col_step_right(ItemInfo* item, CollisionInfo* coll)
 		LaraCollideStop(item, coll);
 	}
 
-	if (TestLaraStep(item, coll) || isSwamp)
+	if (Context::CanPerformStep(item, coll) || isSwamp)
 	{
 		DoLaraStep(item, coll);
 		return;
@@ -1369,7 +1369,7 @@ void lara_col_step_left(ItemInfo* item, CollisionInfo* coll)
 		LaraCollideStop(item, coll);
 	}
 
-	if (TestLaraStep(item, coll) || isSwamp)
+	if (Context::CanPerformStep(item, coll) || isSwamp)
 	{
 		DoLaraStep(item, coll);
 		return;
@@ -1444,7 +1444,7 @@ void lara_col_roll_180_back(ItemInfo* item, CollisionInfo* coll)
 
 	ShiftItem(item, coll);
 
-	if (TestLaraStep(item, coll))
+	if (Context::CanPerformStep(item, coll))
 	{
 		DoLaraStep(item, coll);
 		return;
@@ -1499,7 +1499,7 @@ void lara_col_roll_180_forward(ItemInfo* item, CollisionInfo* coll)
 
 	ShiftItem(item, coll);
 
-	if (TestLaraStep(item, coll))
+	if (Context::CanPerformStep(item, coll))
 	{
 		DoLaraStep(item, coll);
 		return;
@@ -1599,7 +1599,7 @@ void lara_col_wade_forward(ItemInfo* item, CollisionInfo* coll)
 		LaraCollideStop(item, coll);
 	}
 
-	if (TestLaraStep(item, coll) || isSwamp)
+	if (Context::CanPerformStep(item, coll) || isSwamp)
 	{
 		DoLaraStep(item, coll);
 		return;
@@ -1748,7 +1748,7 @@ void lara_col_sprint(ItemInfo* item, CollisionInfo* coll)
 	if (TestAndDoLaraLadderClimb(item, coll))
 		return;
 
-	if (TestLaraStep(item, coll) && coll->CollisionType != CT_FRONT)
+	if (Context::CanPerformStep(item, coll) && coll->CollisionType != CT_FRONT)
 	{
 		DoLaraStep(item, coll);
 		return;
@@ -1801,7 +1801,7 @@ void lara_col_sprint_dive(ItemInfo* item, CollisionInfo* coll)
 
 	ShiftItem(item, coll);
 
-	if (TestLaraStep(item, coll))
+	if (Context::CanPerformStep(item, coll))
 	{
 		DoLaraStep(item, coll);
 		return;

@@ -651,21 +651,19 @@ bool TestHangSwingIn(ItemInfo* item, CollisionInfo* coll)
 
 bool TestLaraHangSideways(ItemInfo* item, CollisionInfo* coll, short angle)
 {
+	static constexpr auto sidewayTestDistance = 16;
+
 	auto* lara = GetLaraInfo(item);
 
-	auto oldPos = item->Pose;
+	auto prevPose = item->Pose;
 
 	lara->Control.MoveAngle = item->Pose.Orientation.y + angle;
 
-	static constexpr auto sidewayTestDistance = 16;
-	item->Pose.Position.x += phd_sin(lara->Control.MoveAngle) * sidewayTestDistance;
-	item->Pose.Position.z += phd_cos(lara->Control.MoveAngle) * sidewayTestDistance;
-
+	TranslateItem(item, lara->Control.MoveAngle, sidewayTestDistance);
 	coll->Setup.OldPosition.y = item->Pose.Position.y;
-
 	bool res = TestLaraHang(item, coll);
 
-	item->Pose = oldPos;
+	item->Pose = prevPose;
 
 	return !res;
 }
@@ -675,19 +673,19 @@ bool TestLaraWall(ItemInfo* item, int distance, int height, int side)
 	float sinY = phd_sin(item->Pose.Orientation.y);
 	float cosY = phd_cos(item->Pose.Orientation.y);
 
-	auto start = GameVector(
+	auto origin = GameVector(
 		item->Pose.Position.x + (side * cosY),
 		item->Pose.Position.y + height,
-		item->Pose.Position.z + (-side * sinY),
+		item->Pose.Position.z - (side * sinY),
 		item->RoomNumber);
 
-	auto end = GameVector(
+	auto target = GameVector(
 		item->Pose.Position.x + (distance * sinY) + (side * cosY),
 		item->Pose.Position.y + height,
-		item->Pose.Position.z + (distance * cosY) + (-side * sinY),
+		item->Pose.Position.z + (distance * cosY) - (side * sinY),
 		item->RoomNumber);
 
-	return !LOS(&start, &end);
+	return !LOS(&origin, &target);
 }
 
 bool TestLaraFacingCorner(ItemInfo* item, short angle, int distance)
@@ -695,57 +693,57 @@ bool TestLaraFacingCorner(ItemInfo* item, short angle, int distance)
 	short angleLeft = angle - ANGLE(15.0f);
 	short angleRight = angle + ANGLE(15.0f);
 
-	auto start = GameVector(
+	auto origin = GameVector(
 		item->Pose.Position.x,
 		item->Pose.Position.y - STEPUP_HEIGHT,
 		item->Pose.Position.z,
 		item->RoomNumber);
 
-	auto end1 = GameVector(
+	auto target1 = GameVector(
 		item->Pose.Position.x + distance * phd_sin(angleLeft),
 		item->Pose.Position.y - STEPUP_HEIGHT,
 		item->Pose.Position.z + distance * phd_cos(angleLeft),
 		item->RoomNumber);
 
-	auto end2 = GameVector(
+	auto target2 = GameVector(
 		item->Pose.Position.x + distance * phd_sin(angleRight),
 		item->Pose.Position.y - STEPUP_HEIGHT,
 		item->Pose.Position.z + distance * phd_cos(angleRight),
 		item->RoomNumber);
 
-	bool result1 = LOS(&start, &end1);
-	bool result2 = LOS(&start, &end2);
+	bool result1 = LOS(&origin, &target1);
+	bool result2 = LOS(&origin, &target2);
 	return (!result1 && !result2);
 }
 
 bool LaraPositionOnLOS(ItemInfo* item, short angle, int distance)
 {
-	auto start1 = GameVector(
+	auto origin1 = GameVector(
 		item->Pose.Position.x,
 		item->Pose.Position.y - LARA_HEADROOM,
 		item->Pose.Position.z,
 		item->RoomNumber);
 
-	auto start2 = GameVector(
+	auto origin2 = GameVector(
 		item->Pose.Position.x,
 		item->Pose.Position.y - LARA_HEIGHT + LARA_HEADROOM,
 		item->Pose.Position.z,
 		item->RoomNumber);
 	
-	auto end1 = GameVector(
+	auto target1 = GameVector(
 		item->Pose.Position.x + distance * phd_sin(angle),
 		item->Pose.Position.y - LARA_HEADROOM,
 		item->Pose.Position.z + distance * phd_cos(angle),
 		item->RoomNumber);
 
-	auto end2 = GameVector(
+	auto target2 = GameVector(
 		item->Pose.Position.x + distance * phd_sin(angle),
 		item->Pose.Position.y - LARA_HEIGHT + LARA_HEADROOM,
 		item->Pose.Position.z + distance * phd_cos(angle),
 		item->RoomNumber);
 
-	auto result1 = LOS(&start1, &end1);
-	auto result2 = LOS(&start2, &end2);
+	auto result1 = LOS(&origin1, &target1);
+	auto result2 = LOS(&origin2, &target2);
 
 	return (result1 && result2);
 }
@@ -946,7 +944,7 @@ bool CheckLaraWeaponType(LaraWeaponType referenceWeaponType, const std::vector<L
 
 bool IsStandingWeapon(ItemInfo* item, LaraWeaponType weaponType)
 {
-	static const std::vector<LaraWeaponType> standingWeaponTypes
+	static const auto standingWeaponTypes = std::vector<LaraWeaponType>
 	{
 		LaraWeaponType::Shotgun,
 		LaraWeaponType::HK,
@@ -962,7 +960,7 @@ bool IsStandingWeapon(ItemInfo* item, LaraWeaponType weaponType)
 
 bool IsVaultState(int state)
 {
-	static const std::vector<int> vaultStates
+	static const auto vaultStates = std::vector<int>
 	{
 		LS_VAULT,
 		LS_VAULT_2_STEPS,
@@ -977,7 +975,7 @@ bool IsVaultState(int state)
 
 bool IsJumpState(int state)
 {
-	static const std::vector<int> jumpStates
+	static const auto jumpStates = std::vector<int>
 	{
 		LS_JUMP_FORWARD,
 		LS_JUMP_BACK,
@@ -995,7 +993,7 @@ bool IsJumpState(int state)
 
 bool IsRunJumpQueueableState(int state)
 {
-	static const std::vector<int> runningJumpQueuableStates
+	static const auto runningJumpQueuableStates = std::vector<int>
 	{
 		LS_RUN_FORWARD,
 		LS_SPRINT,
@@ -1007,7 +1005,7 @@ bool IsRunJumpQueueableState(int state)
 
 bool IsRunJumpCountableState(int state)
 {
-	static const std::vector<int> runningJumpTimerStates
+	static const auto runningJumpTimerStates = std::vector<int>
 	{
 		LS_WALK_FORWARD,
 		LS_RUN_FORWARD,
@@ -1016,59 +1014,6 @@ bool IsRunJumpCountableState(int state)
 		LS_JUMP_FORWARD
 	};
 	return TestState(state, runningJumpTimerStates);
-}
-
-bool TestLaraStep(ItemInfo* item, CollisionInfo* coll)
-{
-	auto* lara = GetLaraInfo(item);
-
-	if (abs(coll->Middle.Floor) > 0 &&
-		(coll->Middle.Floor <= STEPUP_HEIGHT ||					// Within lower floor bound...
-			lara->Control.WaterStatus == WaterStatus::Wade) &&		// OR Lara is wading.
-		coll->Middle.Floor >= -STEPUP_HEIGHT &&					// Within upper floor bound.
-		coll->Middle.Floor != NO_HEIGHT)
-	{
-		return true;
-	}
-
-	return false;
-}
-
-bool TestLaraStepUp(ItemInfo* item, CollisionInfo* coll)
-{
-	if (coll->Middle.Floor < -CLICK(0.5f) &&	// Within lower floor bound.
-		coll->Middle.Floor >= -STEPUP_HEIGHT)	// Within upper floor bound.
-	{
-		return true;
-	}
-
-	return false;
-}
-
-bool TestLaraStepDown(ItemInfo* item, CollisionInfo* coll)
-{
-	if (coll->Middle.Floor <= STEPUP_HEIGHT &&	// Within lower floor bound.
-		coll->Middle.Floor > CLICK(0.5f))		// Within upper floor bound.
-	{
-		return true;
-	}
-
-	return false;
-}
-
-bool TestLaraMonkeyStep(ItemInfo* item, CollisionInfo* coll)
-{
-	int y = item->Pose.Position.y - LARA_HEIGHT_MONKEY;
-	auto probe = GetCollision(item);
-
-	if ((probe.Position.Ceiling - y) <= CLICK(1.25f) &&		// Within lower ceiling bound.
-		(probe.Position.Ceiling - y) >= -CLICK(1.25f) &&	// Within upper ceiling bound.
-		probe.Position.Ceiling != NO_HEIGHT)
-	{
-		return true;
-	}
-
-	return false;
 }
 
 VaultTestResult TestLaraVaultTolerance(ItemInfo* item, CollisionInfo* coll, VaultTestSetup testSetup)

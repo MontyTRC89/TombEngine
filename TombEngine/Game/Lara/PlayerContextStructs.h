@@ -33,8 +33,8 @@ namespace TEN::Entities::Player::Context
 	{
 		float LowerFloorBound = 0.0f;
 		float UpperFloorBound = 0.0f;
-		float ClampMin		  = 0.0f;
-		float ClampMax		  = 0.0f;
+		float SpaceMin		  = 0.0f;
+		float SpaceMax		  = 0.0f;
 		float GapMin		  = 0.0f;
 
 		bool TestSwampDepth = true;
@@ -55,7 +55,7 @@ namespace TEN::Entities::Player::Context
 	{
 		float LowerFloorBound = 0.0f;
 		float UpperFloorBound = 0.0f;
-		float ClampMin		  = 0.0f;
+		float SpaceMin		  = 0.0f;
 		float GapMin		  = 0.0f;
 		float CrossDist		  = 0.0f;
 		float DestDist		  = 0.0f;

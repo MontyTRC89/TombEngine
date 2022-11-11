@@ -53,11 +53,6 @@ bool IsJumpState(int state);
 bool IsRunJumpQueueableState(int state);
 bool IsRunJumpCountableState(int state);
 
-bool TestLaraStep(ItemInfo* item, CollisionInfo* coll);
-bool TestLaraStepUp(ItemInfo* item, CollisionInfo* coll);
-bool TestLaraStepDown(ItemInfo* item, CollisionInfo* coll);
-bool TestLaraMonkeyStep(ItemInfo* item, CollisionInfo* coll);
-
 VaultTestResult TestLaraVaultTolerance(ItemInfo* item, CollisionInfo* coll, VaultTestSetup testSetup);
 VaultTestResult TestLaraVault3Steps(ItemInfo* item, CollisionInfo* coll);
 VaultTestResult TestLaraVault1StepToCrouch(ItemInfo* item, CollisionInfo* coll);

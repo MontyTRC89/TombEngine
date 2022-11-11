@@ -173,25 +173,30 @@ void EaseOutLaraHeight(ItemInfo* item, int height)
 // Try implementing leg IK as a substitute to make step animations obsolete. @Sezz 2021.10.09
 void DoLaraStep(ItemInfo* item, CollisionInfo* coll)
 {
-	if (!TestEnvironment(ENV_FLAG_SWAMP, item))
+	// Swamp case.
+	if (TestEnvironment(ENV_FLAG_SWAMP, item))
 	{
-		if (TestLaraStepUp(item, coll))
+		EaseOutLaraHeight(item, coll->Middle.Floor);
+		return;
+	}
+
+	// Regular case.
+	if (Context::CanStepUp(item, coll))
+	{
+		item->Animation.TargetState = LS_STEP_UP;
+		if (GetStateDispatch(item, g_Level.Anims[item->Animation.AnimNumber]))
 		{
-			item->Animation.TargetState = LS_STEP_UP;
-			if (GetStateDispatch(item, g_Level.Anims[item->Animation.AnimNumber]))
-			{
-				item->Pose.Position.y += coll->Middle.Floor;
-				return;
-			}
+			item->Pose.Position.y += coll->Middle.Floor;
+			return;
 		}
-		else if (TestLaraStepDown(item, coll))
+	}
+	else if (Context::CanStepDown(item, coll))
+	{
+		item->Animation.TargetState = LS_STEP_DOWN;
+		if (GetStateDispatch(item, g_Level.Anims[item->Animation.AnimNumber]))
 		{
-			item->Animation.TargetState = LS_STEP_DOWN;
-			if (GetStateDispatch(item, g_Level.Anims[item->Animation.AnimNumber]))
-			{
-				item->Pose.Position.y += coll->Middle.Floor;
-				return;
-			}
+			item->Pose.Position.y += coll->Middle.Floor;
+			return;
 		}
 	}
 

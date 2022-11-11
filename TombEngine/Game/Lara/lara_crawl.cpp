@@ -153,7 +153,7 @@ void lara_col_crouch_idle(ItemInfo* item, CollisionInfo* coll)
 
 	ShiftItem(item, coll);
 	
-	if (TestLaraStep(item, coll))
+	if (Context::CanPerformStep(item, coll))
 	{
 		DoLaraStep(item, coll);
 		return;
@@ -228,7 +228,7 @@ void lara_col_crouch_roll(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (TestLaraStep(item, coll))
+	if (Context::CanPerformStep(item, coll))
 	{
 		DoLaraStep(item, coll);
 		return;
@@ -522,7 +522,7 @@ void lara_col_crawl_idle(ItemInfo* item, CollisionInfo* coll)
 
 	ShiftItem(item, coll);
 	
-	if (TestLaraStep(item, coll))
+	if (Context::CanPerformStep(item, coll))
 	{
 		DoLaraStep(item, coll);
 		return;
@@ -616,7 +616,7 @@ void lara_col_crawl_forward(ItemInfo* item, CollisionInfo* coll)
 
 	ShiftItem(item, coll);
 
-	if (TestLaraStep(item, coll))
+	if (Context::CanPerformStep(item, coll))
 	{
 		DoLaraStep(item, coll);
 		return;
@@ -703,7 +703,7 @@ void lara_col_crawl_back(ItemInfo* item, CollisionInfo* coll)
 
 	ShiftItem(item, coll);
 
-	if (TestLaraStep(item, coll))
+	if (Context::CanPerformStep(item, coll))
 	{
 		DoLaraStep(item, coll);
 		return;

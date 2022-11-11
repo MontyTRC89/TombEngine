@@ -80,12 +80,12 @@ void lara_as_monkey_idle(ItemInfo* item, CollisionInfo* coll)
 			return;
 		}
 
-		if (IsHeld(In::Forward) && Context::CanMonkeySwingForward(item, coll))
+		if (IsHeld(In::Forward) && Context::CanMonkeyForward(item, coll))
 		{
 			item->Animation.TargetState = LS_MONKEY_FORWARD;
 			return;
 		}
-		else if (IsHeld(In::Back) && Context::CanMonkeySwingBackward(item, coll))
+		else if (IsHeld(In::Back) && Context::CanMonkeyBackward(item, coll))
 		{
 			item->Animation.TargetState = LS_MONKEY_BACK;
 			return;
@@ -93,7 +93,7 @@ void lara_as_monkey_idle(ItemInfo* item, CollisionInfo* coll)
 
 		if (IsHeld(In::LeftStep) || (IsHeld(In::Walk) && IsHeld(In::Left)))
 		{
-			if (Context::CanMonkeySwingShimmyLeft(item, coll))
+			if (Context::CanMonkeyShimmyLeft(item, coll))
 				item->Animation.TargetState = LS_MONKEY_SHIMMY_LEFT;
 			else
 				item->Animation.TargetState = LS_MONKEY_IDLE;
@@ -102,7 +102,7 @@ void lara_as_monkey_idle(ItemInfo* item, CollisionInfo* coll)
 		}
 		else if (IsHeld(In::RightStep) || (IsHeld(In::Walk) && IsHeld(In::Right)))
 		{
-			if (Context::CanMonkeySwingShimmyRight(item, coll))
+			if (Context::CanMonkeyShimmyRight(item, coll))
 				item->Animation.TargetState = LS_MONKEY_SHIMMY_RIGHT;
 			else
 				item->Animation.TargetState = LS_MONKEY_IDLE;
@@ -154,7 +154,7 @@ void lara_col_monkey_idle(ItemInfo* item, CollisionInfo* coll)
 		coll->Shift.y = 0;
 	ShiftItem(item, coll);
 
-	if (TestLaraMonkeyStep(item, coll))
+	if (Context::CanPerformMonkeyStep(item, coll))
 	{
 		DoLaraMonkeyStep(item, coll);
 		return;
@@ -241,7 +241,7 @@ void lara_col_monkey_forward(ItemInfo* item, CollisionInfo* coll)
 	if (LaraDeflectEdgeMonkey(item, coll))
 		LaraCollideStopMonkey(item, coll);
 
-	if (TestLaraMonkeyStep(item, coll))
+	if (Context::CanPerformMonkeyStep(item, coll))
 	{
 		DoLaraMonkeyStep(item, coll);
 		return;
@@ -329,7 +329,7 @@ void lara_col_monkey_back(ItemInfo* item, CollisionInfo* coll)
 	if (LaraDeflectEdgeMonkey(item, coll))
 		LaraCollideStopMonkey(item, coll);
 
-	if (TestLaraMonkeyStep(item, coll))
+	if (Context::CanPerformMonkeyStep(item, coll))
 	{
 		DoLaraMonkeyStep(item, coll);
 		return;
@@ -411,7 +411,7 @@ void lara_col_monkey_shimmy_left(ItemInfo* item, CollisionInfo* coll)
 	if (LaraDeflectEdgeMonkey(item, coll))
 		LaraCollideStopMonkey(item, coll);
 
-	if (TestLaraMonkeyStep(item, coll))
+	if (Context::CanPerformMonkeyStep(item, coll))
 	{
 		DoLaraMonkeyStep(item, coll);
 		return;
@@ -493,7 +493,7 @@ void lara_col_monkey_shimmy_right(ItemInfo* item, CollisionInfo* coll)
 	if (LaraDeflectEdgeMonkey(item, coll))
 		LaraCollideStopMonkey(item, coll);
 
-	if (TestLaraMonkeyStep(item, coll))
+	if (Context::CanPerformMonkeyStep(item, coll))
 	{
 		DoLaraMonkeyStep(item, coll);
 		return;
@@ -555,12 +555,12 @@ void lara_as_monkey_turn(ItemInfo* item, CollisionInfo* coll)
 			return;
 		}
 
-		if (IsHeld(In::Forward) && Context::CanMonkeySwingForward(item, coll))
+		if (IsHeld(In::Forward) && Context::CanMonkeyForward(item, coll))
 		{
 			item->Animation.TargetState = LS_MONKEY_FORWARD;
 			return;
 		}
-		else if (IsHeld(In::Back) && Context::CanMonkeySwingBackward(item, coll))
+		else if (IsHeld(In::Back) && Context::CanMonkeyBackward(item, coll))
 		{
 			item->Animation.TargetState = LS_MONKEY_BACK;
 			return;
@@ -568,7 +568,7 @@ void lara_as_monkey_turn(ItemInfo* item, CollisionInfo* coll)
 
 		if (IsHeld(In::LeftStep) || (IsHeld(In::Walk) && IsHeld(In::Left)))
 		{
-			if (Context::CanMonkeySwingShimmyLeft(item, coll))
+			if (Context::CanMonkeyShimmyLeft(item, coll))
 				item->Animation.TargetState = LS_MONKEY_SHIMMY_LEFT;
 			else
 				item->Animation.TargetState = LS_MONKEY_IDLE;
@@ -577,7 +577,7 @@ void lara_as_monkey_turn(ItemInfo* item, CollisionInfo* coll)
 		}
 		else if (IsHeld(In::RightStep) || (IsHeld(In::Walk) && IsHeld(In::Right)))
 		{
-			if (Context::CanMonkeySwingShimmyRight(item, coll))
+			if (Context::CanMonkeyShimmyRight(item, coll))
 				item->Animation.TargetState = LS_MONKEY_SHIMMY_RIGHT;
 			else
 				item->Animation.TargetState = LS_MONKEY_IDLE;
