@@ -18,22 +18,22 @@ namespace TEN::Entities::Player::Context
 	{
 		const auto& player = *GetLaraInfo(item);
 
-		// Check whether AFK pose is enabled.
+		// 1. Check whether AFK pose is enabled.
 		if (!g_GameFlow->HasAFKPose())
 			return false;
 
-		// Check AFK pose timer.
+		// 2. Check AFK pose timer.
 		if (player.Control.Count.Pose < LARA_POSE_TIME)
 			return false;
 
-		// Check hand and water status.
+		// 3. Check hand and water status.
 		if (player.Control.HandStatus != HandStatus::Free ||
 			player.Control.WaterStatus == WaterStatus::Wade)
 		{
 			return false;
 		}
 
-		// Assess context.
+		// 4. Assess context.
 		if (!(IsHeld(In::Flare) || IsHeld(In::DrawWeapon)) &&		   // Avoid unsightly concurrent actions.
 			(player.Control.Weapon.GunType != LaraWeaponType::Flare || // Not handling flare.
 				player.Flare.Life) &&
