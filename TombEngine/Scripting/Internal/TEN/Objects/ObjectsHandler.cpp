@@ -10,6 +10,7 @@
 #include "collision/collide_item.h"
 #include "collision/collide_room.h"
 #include "ScriptInterfaceGame.h"
+#include "Lara/LaraObject.h"
 
 /***
 Moveables, statics, cameras, and so on.
@@ -71,6 +72,7 @@ ObjectsHandler::ObjectsHandler(sol::state* lua, sol::table & parent) :
 	*/
 	m_table_objects.set_function(ScriptReserved_GetAIObjectByName, &ObjectsHandler::GetByName<AIObject, ScriptReserved_AIObject>, this);
 
+	LaraObject::Register(m_table_objects);
 
 	Moveable::Register(m_table_objects);
 	Moveable::SetNameCallbacks(
@@ -149,7 +151,7 @@ void ObjectsHandler::TestCollidingObjects()
 
 void ObjectsHandler::AssignLara()
 {
-	m_table_objects.set("Lara", Moveable(Lara.ItemNumber, false));
+	m_table_objects.set(ScriptReserved_Lara, LaraObject(Lara.ItemNumber, false));
 }
 
 

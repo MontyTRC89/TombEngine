@@ -22,7 +22,7 @@
 /***
 Represents any object inside the game world.
 Examples include traps, enemies, doors,
-pickups, and Lara herself.
+pickups, and Lara herself (see also @{Objects.LaraObject} for Lara-specific features).
 
 @tenclass Objects.Moveable
 @pragma nostrip

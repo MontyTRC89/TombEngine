@@ -12,6 +12,7 @@ static constexpr char ScriptReserved_Effects[]			= "Effects";
 
 // Classes
 static constexpr char ScriptReserved_Moveable[]			= "Moveable";
+static constexpr char ScriptReserved_Lara[]				= "Lara";
 static constexpr char ScriptReserved_Static[]			= "Static";
 static constexpr char ScriptReserved_Camera[]			= "Camera";
 static constexpr char ScriptReserved_Sink[]				= "Sink";
@@ -83,6 +84,8 @@ static constexpr char ScriptReserved_SetRoom[]				= "SetRoom";
 static constexpr char ScriptReserved_GetStrength[]			= "GetStrength";
 static constexpr char ScriptReserved_SetStrength[]			= "SetStrength";
 static constexpr char ScriptReserved_GetValid[]				= "GetValid";
+static constexpr char ScriptReserved_SetOnFire[]			= "SetOnFire";
+static constexpr char ScriptReserved_GetOnFire[]			= "GetOnFire";
 static constexpr char ScriptReserved_Destroy[]				= "Destroy";
 static constexpr char ScriptReserved_GetKey[]				= "GetKey";
 static constexpr char ScriptReserved_SetKey[]				= "SetKey";
@@ -186,3 +189,6 @@ static constexpr char ScriptReserved_LevelVars[]	= "LevelVars";
 static constexpr char ScriptReserved_GameVars[]		= "GameVars";
 static constexpr char ScriptReserved_LevelFuncs[]	= "LevelFuncs";
 static constexpr char ScriptReserved_Engine[]		= "Engine";
+
+// Internal
+static constexpr char ScriptReserved_LaraObject[]				= "LaraObject";
