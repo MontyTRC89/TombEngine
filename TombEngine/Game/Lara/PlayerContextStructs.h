@@ -1,4 +1,5 @@
 #pragma once
+#include "Game/animation.h"
 
 namespace TEN::Entities::Player::Context
 {
@@ -43,7 +44,7 @@ namespace TEN::Entities::Player::Context
 	{
 		bool Success	 = false;
 		int	 Height		 = 0;
-		int	 TargetState = -1;
+		int	 TargetState = NO_STATE;
 
 		bool SetBusyHands	 = false;
 		bool DoLedgeSnap	 = false;
@@ -67,7 +68,7 @@ namespace TEN::Entities::Player::Context
 	struct CrawlVault
 	{
 		bool Success	 = false;
-		int	 TargetState = -1;
+		int	 TargetState = NO_STATE;
 	};
 
 	struct WaterClimbOutSetup
@@ -83,6 +84,6 @@ namespace TEN::Entities::Player::Context
 	{
 		bool Success	 = false;
 		int	 Height		 = 0;
-		int	 TargetState = -1;
+		int	 TargetState = NO_STATE;
 	};
 }

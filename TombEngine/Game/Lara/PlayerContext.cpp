@@ -7,7 +7,6 @@
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_tests.h"
-#include "Game/Lara/PlayerContextStructs.h"
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Specific/Input/Input.h"
 
@@ -27,9 +26,9 @@ namespace TEN::Entities::Player::Context
 		if (player.Control.Count.Pose < LARA_POSE_TIME)
 			return false;
 
-		// Check water and hand status.
-		if (player.Control.HandStatus == HandStatus::Free &&
-			player.Control.WaterStatus != WaterStatus::Wade)
+		// Check hand and water status.
+		if (player.Control.HandStatus != HandStatus::Free ||
+			player.Control.WaterStatus == WaterStatus::Wade)
 		{
 			return false;
 		}
@@ -69,10 +68,10 @@ namespace TEN::Entities::Player::Context
 
 	bool CanRunForward(ItemInfo* item, CollisionInfo* coll)
 	{
-		Context::GroundMovementSetup contextSetup =
+		auto contextSetup = Context::GroundMovementSetup
 		{
 			item->Pose.Orientation.y,
-			NO_LOWER_BOUND, -STEPUP_HEIGHT, // Defined by run forward state.
+			INFINITY, -STEPUP_HEIGHT, // Defined by run forward state.
 			false, true, false
 		};
 		return TestGroundMovementSetup(item, coll, contextSetup);
@@ -80,10 +79,10 @@ namespace TEN::Entities::Player::Context
 
 	bool CanRunBackward(ItemInfo* item, CollisionInfo* coll)
 	{
-		Context::GroundMovementSetup contextSetup =
+		auto contextSetup = Context::GroundMovementSetup
 		{
-			item->Pose.Orientation.y + ANGLE(180.0f),
-			NO_LOWER_BOUND, -STEPUP_HEIGHT, // Defined by run backward state.
+			short(item->Pose.Orientation.y + ANGLE(180.0f)),
+			INFINITY, -STEPUP_HEIGHT, // Defined by run backward state.
 			false, false, false
 		};
 		return TestGroundMovementSetup(item, coll, contextSetup);
@@ -91,7 +90,7 @@ namespace TEN::Entities::Player::Context
 
 	bool CanWalkForward(ItemInfo* item, CollisionInfo* coll)
 	{
-		Context::GroundMovementSetup contextSetup =
+		auto contextSetup = Context::GroundMovementSetup
 		{
 			item->Pose.Orientation.y,
 			STEPUP_HEIGHT, -STEPUP_HEIGHT, // Defined by walk forward state.
@@ -101,9 +100,9 @@ namespace TEN::Entities::Player::Context
 
 	bool CanWalkBackward(ItemInfo* item, CollisionInfo* coll)
 	{
-		Context::GroundMovementSetup contextSetup =
+		auto contextSetup = Context::GroundMovementSetup
 		{
-			item->Pose.Orientation.y + ANGLE(180.0f),
+			short(item->Pose.Orientation.y + ANGLE(180.0f)),
 			STEPUP_HEIGHT, -STEPUP_HEIGHT // Defined by walk backward state.
 		};
 		return TestGroundMovementSetup(item, coll, contextSetup);
@@ -130,10 +129,10 @@ namespace TEN::Entities::Player::Context
 		// Swamp case.
 		if (TestEnvironment(ENV_FLAG_SWAMP, item))
 		{
-			Context::GroundMovementSetup contextSetup =
+			auto contextSetup = Context::GroundMovementSetup
 			{
 				item->Pose.Orientation.y,
-				NO_LOWER_BOUND, -STEPUP_HEIGHT, // Defined by wade forward state.
+				INFINITY, -STEPUP_HEIGHT, // Defined by wade forward state.
 				false, false, false
 			};
 			return TestGroundMovementSetup(item, coll, contextSetup);
@@ -154,10 +153,10 @@ namespace TEN::Entities::Player::Context
 		// Swamp case.
 		if (TestEnvironment(ENV_FLAG_SWAMP, item))
 		{
-			Context::GroundMovementSetup contextSetup =
+			auto contextSetup = Context::GroundMovementSetup
 			{
-				item->Pose.Orientation.y + ANGLE(180.0f),
-				NO_LOWER_BOUND, -STEPUP_HEIGHT, // Defined by walk backward state.
+				short(item->Pose.Orientation.y + ANGLE(180.0f)),
+				INFINITY, -STEPUP_HEIGHT, // Defined by walk backward state.
 				false, false, false
 			};
 			return TestGroundMovementSetup(item, coll, contextSetup);
@@ -178,7 +177,7 @@ namespace TEN::Entities::Player::Context
 		// Assess center point collision.
 		auto pointCollCenter = GetCollision(item, 0, 0.0f, -LARA_HEIGHT / 2);
 		if (abs(pointCollCenter.Position.Ceiling - pointCollCenter.Position.Floor) < LARA_HEIGHT ||	// Center space is narrow enough.
-			abs(coll->Middle.Ceiling - LARA_HEIGHT_CRAWL) < LARA_HEIGHT)					// Consider statics overhead detected by GetCollisionInfo().
+			abs(coll->Middle.Ceiling - LARA_HEIGHT_CRAWL) < LARA_HEIGHT)							// Consider statics overhead detected by GetCollisionInfo().
 		{
 			return true;
 		}
@@ -276,7 +275,7 @@ namespace TEN::Entities::Player::Context
 
 	bool CanCrawlForward(ItemInfo* item, CollisionInfo* coll)
 	{
-		Context::GroundMovementSetup contextSetup =
+		auto contextSetup = Context::GroundMovementSetup
 		{
 			item->Pose.Orientation.y,
 			CRAWL_STEPUP_HEIGHT, -CRAWL_STEPUP_HEIGHT // Defined by crawl forward state.
@@ -286,9 +285,9 @@ namespace TEN::Entities::Player::Context
 
 	bool CanCrawlBackward(ItemInfo* item, CollisionInfo* coll)
 	{
-		Context::GroundMovementSetup contextSetup =
+		auto contextSetup = Context::GroundMovementSetup
 		{
-			item->Pose.Orientation.y + ANGLE(180.0f),
+			short(item->Pose.Orientation.y + ANGLE(180.0f)),
 			CRAWL_STEPUP_HEIGHT, -CRAWL_STEPUP_HEIGHT // Defined by crawl backward state.
 		};
 		return TestGroundMovementSetup(item, coll, contextSetup, true);
@@ -323,7 +322,7 @@ namespace TEN::Entities::Player::Context
 
 	bool CanMonkeyForward(ItemInfo* item, CollisionInfo* coll)
 	{
-		Context::MonkeyMovementSetup contextSetup =
+		auto contextSetup = Context::MonkeyMovementSetup
 		{
 			item->Pose.Orientation.y,
 			MONKEY_STEPUP_HEIGHT, -MONKEY_STEPUP_HEIGHT // Defined by monkey forward state.
@@ -333,9 +332,9 @@ namespace TEN::Entities::Player::Context
 
 	bool CanMonkeyBackward(ItemInfo* item, CollisionInfo* coll)
 	{
-		Context::MonkeyMovementSetup contextSetup =
+		auto contextSetup = Context::MonkeyMovementSetup
 		{
-			item->Pose.Orientation.y + ANGLE(180.0f),
+			short(item->Pose.Orientation.y + ANGLE(180.0f)),
 			MONKEY_STEPUP_HEIGHT, -MONKEY_STEPUP_HEIGHT // Defined by monkey backward state.
 		};
 		return TestMonkeyMovementSetup(item, coll, contextSetup);
@@ -358,7 +357,7 @@ namespace TEN::Entities::Player::Context
 
 	bool CanJumpUp(ItemInfo* item, CollisionInfo* coll)
 	{
-		static const Context::JumpSetup contextSetup =
+		static const auto contextSetup = Context::JumpSetup
 		{
 			0,
 			0.0f,
@@ -395,10 +394,10 @@ namespace TEN::Entities::Player::Context
 		if (player.Control.Count.Run < LARA_RUN_JUMP_TIME)
 			return false;
 
-		Context::JumpSetup contextSetup
+		auto contextSetup = Context::JumpSetup
 		{
 			item->Pose.Orientation.y,
-			CLICK(1.5f)
+			CLICK(3.0f / 2)
 		};
 		return TestJumpMovementSetup(item, coll, contextSetup);
 	}
@@ -415,7 +414,7 @@ namespace TEN::Entities::Player::Context
 		if (player.Control.Count.Run < LARA_SPRINT_JUMP_TIME)
 			return false;
 
-		Context::JumpSetup contextSetup
+		auto contextSetup = Context::JumpSetup
 		{
 			item->Pose.Orientation.y,
 			CLICK(1.8f)
@@ -425,8 +424,10 @@ namespace TEN::Entities::Player::Context
 
 	bool CanSlideJumpForward(ItemInfo* item, CollisionInfo* coll)
 	{
+		// TODO: Get back to this project. -- Sezz 2022.11.11
 		return true;
 
+		// Check whether extended slide mechanics are enabled.
 		if (!g_GameFlow->HasSlideExtended())
 			return true;
 		
@@ -450,23 +451,22 @@ namespace TEN::Entities::Player::Context
 		const auto& player = *GetLaraInfo(item);
 
 		// TODO: Make specific condition for wading in water.
-		if (player.Control.WaterStatus == WaterStatus::Wade &&
-			TestEnvironment(ENV_FLAG_SWAMP, item))
+		if (player.Control.WaterStatus == WaterStatus::Wade && TestEnvironment(ENV_FLAG_SWAMP, item))
 		{
-			Context::GroundMovementSetup contextSetup =
+			auto contextSetup = Context::GroundMovementSetup
 			{
-				item->Pose.Orientation.y + (isGoingRight ? ANGLE(90.0f) : ANGLE(-90.0f)),
-				NO_LOWER_BOUND, -CLICK(0.8f), // Upper bound defined by sidestep left/right states.
+				short(item->Pose.Orientation.y + (isGoingRight ? ANGLE(90.0f) : ANGLE(-90.0f))),
+				INFINITY, -CLICK(5.0f / 4), // Upper bound defined by sidestep left/right states.
 				false, false, false
 			};
 			return TestGroundMovementSetup(item, coll, contextSetup);
 		}
 		else
 		{
-			Context::GroundMovementSetup contextSetup =
+			auto contextSetup = Context::GroundMovementSetup
 			{
-				item->Pose.Orientation.y + (isGoingRight ? ANGLE(90.0f) : ANGLE(-90.0f)),
-				CLICK(0.8f), -CLICK(0.8f) // Defined by sidestep left/right states.
+				short(item->Pose.Orientation.y + (isGoingRight ? ANGLE(90.0f) : ANGLE(-90.0f))),
+				CLICK(5.0f / 4), -CLICK(5.0f / 4) // Defined by sidestep left/right states.
 			};
 			return TestGroundMovementSetup(item, coll, contextSetup);
 		}
@@ -474,10 +474,10 @@ namespace TEN::Entities::Player::Context
 
 	bool TestMonkeyShimmy(ItemInfo* item, CollisionInfo* coll, bool isGoingRight)
 	{
-		Context::MonkeyMovementSetup contextSetup =
+		auto contextSetup = Context::MonkeyMovementSetup
 		{
-			item->Pose.Orientation.y + (isGoingRight ? ANGLE(90.0f) : ANGLE(-90.0f)),
-			CLICK(0.5f), -CLICK(0.5f) // Defined by monkey shimmy left/right states.
+			short(item->Pose.Orientation.y + (isGoingRight ? ANGLE(90.0f) : ANGLE(-90.0f))),
+			CLICK(1.0f / 2), -CLICK(1.0f / 2) // Defined by monkey shimmy left/right states.
 		};
 		return TestMonkeyMovementSetup(item, coll, contextSetup);
 	}
@@ -488,9 +488,9 @@ namespace TEN::Entities::Player::Context
 		if (TestEnvironment(ENV_FLAG_SWAMP, item))
 			return false;
 
-		Context::JumpSetup contextSetup =
+		auto contextSetup = Context::JumpSetup
 		{
-			item->Pose.Orientation.y + relativeHeadingAngle,
+			short(item->Pose.Orientation.y + relativeHeadingAngle),
 			CLICK(0.85f)
 		};
 		return TestJumpMovementSetup(item, coll, contextSetup);
@@ -498,10 +498,10 @@ namespace TEN::Entities::Player::Context
 
 	Context::Vault GetVaultUp2Steps(ItemInfo* item, CollisionInfo* coll)
 	{
-		static const Context::VaultSetup contextSetup =
+		static const auto contextSetup = Context::VaultSetup
 		{
-			-STEPUP_HEIGHT, -CLICK(2.5f), // Floor range.
-			LARA_HEIGHT, -MAX_HEIGHT,	  // Space range.
+			-STEPUP_HEIGHT, -CLICK(5.0f / 2), // Floor range.
+			LARA_HEIGHT, -INFINITY,			  // Space range.
 			CLICK(1)
 		};
 
@@ -576,9 +576,9 @@ namespace TEN::Entities::Player::Context
 			return false;
 
 		// 4. Assess point collision.
-		if ((pointColl.Position.Floor - vPos) <= contextSetup.LowerFloorBound &&	   // Floor is within lower floor bound.
-			(pointColl.Position.Floor - vPos) >= contextSetup.UpperFloorBound &&	   // Floor is within upper floor bound.
-			(pointColl.Position.Ceiling - vPos) < -playerHeight &&					   // Ceiling is within lowest ceiling bound (player height).
+		if ((pointColl.Position.Floor - vPos) <= contextSetup.LowerFloorBound &&	   // Floor height is within lower floor bound.
+			(pointColl.Position.Floor - vPos) >= contextSetup.UpperFloorBound &&	   // Floor height is within upper floor bound.
+			(pointColl.Position.Ceiling - vPos) < -playerHeight &&					   // Ceiling height is within lowest ceiling bound (player height).
 			abs(pointColl.Position.Ceiling - pointColl.Position.Floor) > playerHeight) // Space is not too narrow.
 		{
 			return true;

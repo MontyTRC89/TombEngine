@@ -2,50 +2,54 @@
 
 struct VaultTestSetup
 {
-	int LowerFloorBound;
-	int UpperFloorBound;
-	int ClampMin;
-	int ClampMax;
-	int GapMin;
-	bool CheckSwampDepth = true;
+	float LowerFloorBound = 0.0f;
+	float UpperFloorBound = 0.0f;
+	float ClampMin		  = 0.0f;
+	float ClampMax		  = 0.0f;
+	float GapMin		  = 0.0f;
+
+	bool TestSwampDepth = true;
 };
 
 struct VaultTestResult
 {
-	bool Success;
-	int Height;
-	bool SetBusyHands;
-	bool SnapToLedge;
-	bool SetJumpVelocity;
-	LaraState TargetState;
+	bool Success	 = false;
+	int	 Height		 = 0;
+
+	bool SetBusyHands	 = false;
+	bool SnapToLedge	 = false;
+	bool SetJumpVelocity = false;
+
+	int	 TargetState = NO_STATE;
 };
 
 struct CrawlVaultTestSetup
 {
-	int LowerFloorBound;
-	int UpperFloorBound;
-	int ClampMin;
-	int GapMin;
-	int CrossDist;
-	int DestDist;
-	int FloorBound;
+	float LowerFloorBound = 0.0f;
+	float UpperFloorBound = 0.0f;
+	float ClampMin		  = 0.0f;
+	float GapMin		  = 0.0f;
+	float CrossDist		  = 0.0f;
+	float DestDist		  = 0.0f;
+	float FloorBound	  = 0.0f;
+
 	bool CheckSlope = true;
 	bool CheckDeath = true;
 };
 
 struct CrawlVaultTestResult
 {
-	bool Success;
-	LaraState TargetState;
+	bool Success	 = false;
+	int	 TargetState = NO_STATE;
 };
 
 struct WaterClimbOutTestSetup
 {
-	int LowerFloorBound;
-	int UpperFloorBound;
-	int ClampMin;
-	int ClampMax;
-	int GapMin;
+	float LowerFloorBound = 0.0f;
+	float UpperFloorBound = 0.0f;
+	float ClampMin = 0.0f;
+	float ClampMax = 0.0f;
+	float GapMin = 0.0f;
 };
 
 struct WaterClimbOutTestResult
@@ -63,9 +67,9 @@ struct LedgeHangTestResult
 
 struct HangClimbTestSetup
 {
-	int ClampMin;
-	int ClampMax;
-	int GapMin;
+	float ClampMin;
+	float ClampMax;
+	float GapMin;
 	bool CheckSlope;
 };
 

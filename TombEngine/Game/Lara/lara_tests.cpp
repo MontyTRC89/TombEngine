@@ -1147,7 +1147,7 @@ VaultTestResult TestLaraVaultTolerance(ItemInfo* item, CollisionInfo* coll, Vaul
 	auto probeMiddle = GetCollision(item);
 
 	bool isSwamp = TestEnvironment(ENV_FLAG_SWAMP, item);
-	bool swampTooDeep = testSetup.CheckSwampDepth ? (isSwamp && lara->WaterSurfaceDist < -CLICK(3)) : isSwamp;
+	bool swampTooDeep = testSetup.TestSwampDepth ? (isSwamp && lara->WaterSurfaceDist < -CLICK(3)) : isSwamp;
 	int y = isSwamp ? item->Pose.Position.y : probeMiddle.Position.Floor; // HACK: Avoid cheese when in the midst of performing a step. Can be done better. @Sezz 2022.04.08	
 
 	// Check swamp depth (if applicable).
@@ -1704,12 +1704,12 @@ WaterClimbOutTestResult TestLaraWaterClimbOutTolerance(ItemInfo* item, Collision
 WaterClimbOutTestResult TestLaraWaterClimbOutDownStep(ItemInfo* item, CollisionInfo* coll)
 {
 	// Floor range: [CLICK(1.25f) - 4, CLICK(0.5f))
-	// Clamp range: (LARA_HEIGHT, -MAX_HEIGHT]
+	// Clamp range: (LARA_HEIGHT, -INFINITY]
 
 	WaterClimbOutTestSetup testSetup
 	{
 		CLICK(1.25f) - 4, CLICK(0.5f),
-		LARA_HEIGHT, -MAX_HEIGHT,
+		LARA_HEIGHT, -INFINITY,
 		CLICK(1),
 	};
 
@@ -1738,12 +1738,12 @@ WaterClimbOutTestResult TestLaraWaterClimbOutDownStepToCrouch(ItemInfo* item, Co
 WaterClimbOutTestResult TestLaraWaterClimbOutFlatStep(ItemInfo* item, CollisionInfo* coll)
 {
 	// Floor range: [CLICK(0.5f), -CLICK(1))
-	// Clamp range: (LARA_HEIGHT, -MAX_HEIGHT]
+	// Clamp range: (LARA_HEIGHT, -INFINITY]
 
 	WaterClimbOutTestSetup testSetup
 	{
 		CLICK(0.5f), -CLICK(1),
-		LARA_HEIGHT, -MAX_HEIGHT,
+		LARA_HEIGHT, -INFINITY,
 		CLICK(1),
 	};
 
@@ -1768,12 +1768,12 @@ WaterClimbOutTestResult TestLaraWaterClimbOutFlatStepToCrouch(ItemInfo* item, Co
 WaterClimbOutTestResult TestLaraWaterClimbOutUpStep(ItemInfo* item, CollisionInfo* coll)
 {
 	// Floor range: [-CLICK(1), -CLICK(2))
-	// Clamp range: (LARA_HEIGHT, -MAX_HEIGHT]
+	// Clamp range: (LARA_HEIGHT, -INFINITY]
 
 	WaterClimbOutTestSetup testSetup
 	{
 		-CLICK(1), -CLICK(2),
-		LARA_HEIGHT, -MAX_HEIGHT,
+		LARA_HEIGHT, -INFINITY,
 		CLICK(1),
 	};
 
@@ -2025,7 +2025,7 @@ bool TestLaraHangToStand(ItemInfo* item, CollisionInfo* coll)
 {
 	HangClimbTestSetup testSetup
 	{
-		LARA_HEIGHT, -MAX_HEIGHT,
+		LARA_HEIGHT, -INFINITY,
 		CLICK(1),
 		false
 	};
