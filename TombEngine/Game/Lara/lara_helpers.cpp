@@ -137,18 +137,18 @@ bool HandleLaraVehicle(ItemInfo* item, CollisionInfo* coll)
 // 2. Object parenting. -- Sezz 2022.10.28
 void EaseOutLaraHeight(ItemInfo* item, int height)
 {
-	static constexpr int   rate				 = 50;
-	static constexpr float easingAlpha		 = 0.35f;
-	static constexpr int   constantThreshold = STEPUP_HEIGHT / 2;
+	static constexpr auto rate				= 50;
+	static constexpr auto easingAlpha		= 0.35f;
+	static constexpr auto constantThreshold = STEPUP_HEIGHT / 2;
 
 	// Check for walls.
 	if (height == NO_HEIGHT)
 		return;
 
 	// Swamp case.
-	if (TestEnvironment(ENV_FLAG_SWAMP, item))
+	if (TestEnvironment(ENV_FLAG_SWAMP, item) && height > 0)
 	{
-		item->Pose.Position.y += (height > 0) ? SWAMP_GRAVITY : height;
+		item->Pose.Position.y += SWAMP_GRAVITY;
 		return;
 	}
 

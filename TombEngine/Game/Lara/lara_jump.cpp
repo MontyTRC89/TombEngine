@@ -44,7 +44,7 @@ void lara_as_jump_forward(ItemInfo* item, CollisionInfo* coll)
 
 	if (item->HitPoints <= 0)
 	{
-		if (TestLaraLand(item, coll))
+		if (Context::CanLand(item, coll))
 		{
 			item->Animation.TargetState = LS_DEATH;
 			SetLaraLand(item, coll);
@@ -56,13 +56,13 @@ void lara_as_jump_forward(ItemInfo* item, CollisionInfo* coll)
 	if (TrInput & (IN_LEFT | IN_RIGHT))
 		ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_JUMP_TURN_RATE_MAX);
 
-	if (TestLaraLand(item, coll))
+	if (Context::CanLand(item, coll))
 	{
 		DoLaraFallDamage(item);
 
 		if (item->HitPoints <= 0) USE_FEATURE_IF_CPP20([[unlikely]])
 			item->Animation.TargetState = LS_DEATH;
-		else if (TestLaraSlide(item, coll))
+		else if (Context::CanSlide(item, coll))
 			SetLaraSlideAnimation(item, coll);
 		else if (TrInput & IN_FORWARD && !(TrInput & IN_WALK) &&
 			lara->Control.WaterStatus != WaterStatus::Wade)
@@ -138,13 +138,13 @@ void lara_as_freefall(ItemInfo* item, CollisionInfo* coll)
 		SoundEffect(SFX_TR4_LARA_FALL, &item->Pose);
 	}
 
-	if (TestLaraLand(item, coll))
+	if (Context::CanLand(item, coll))
 	{
 		DoLaraFallDamage(item);
 
 		if (item->HitPoints <= 0)
 			item->Animation.TargetState = LS_DEATH;
-		else if (TestLaraSlide(item, coll))
+		else if (Context::CanSlide(item, coll))
 			SetLaraSlideAnimation(item, coll);
 		else USE_FEATURE_IF_CPP20([[likely]])
 			item->Animation.TargetState = LS_IDLE;
@@ -183,7 +183,7 @@ void lara_as_reach(ItemInfo* item, CollisionInfo* coll)
 
 	if (item->HitPoints <= 0)
 	{
-		if (TestLaraLand(item, coll))
+		if (Context::CanLand(item, coll))
 		{
 			item->Animation.TargetState = LS_DEATH;
 			SetLaraLand(item, coll);
@@ -195,13 +195,13 @@ void lara_as_reach(ItemInfo* item, CollisionInfo* coll)
 	if (TrInput & (IN_LEFT | IN_RIGHT))
 		ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_JUMP_TURN_RATE_MAX / 2);
 
-	if (TestLaraLand(item, coll))
+	if (Context::CanLand(item, coll))
 	{
 		DoLaraFallDamage(item);
 
 		if (item->HitPoints <= 0)
 			item->Animation.TargetState = LS_DEATH;
-		else if (TestLaraSlide(item, coll))
+		else if (Context::CanSlide(item, coll))
 			SetLaraSlideAnimation(item, coll);
 		else USE_FEATURE_IF_CPP20([[likely]])
 			item->Animation.TargetState = LS_IDLE;
@@ -356,13 +356,13 @@ void lara_col_jump_prepare(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (TestLaraFall(item, coll))
+	if (Context::CanFall(item, coll))
 	{
 		SetLaraFallAnimation(item);
 		return;
 	}
 
-	if (TestLaraSlide(item, coll))
+	if (Context::CanSlide(item, coll))
 	{
 		SetLaraSlideAnimation(item, coll);
 		SetLaraLand(item, coll);
@@ -389,7 +389,7 @@ void lara_as_jump_back(ItemInfo* item, CollisionInfo* coll)
 
 	if (item->HitPoints <= 0)
 	{
-		if (TestLaraLand(item, coll))
+		if (Context::CanLand(item, coll))
 		{
 			item->Animation.TargetState = LS_DEATH;
 			SetLaraLand(item, coll);
@@ -401,13 +401,13 @@ void lara_as_jump_back(ItemInfo* item, CollisionInfo* coll)
 	if (TrInput & (IN_LEFT | IN_RIGHT))
 		ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_JUMP_TURN_RATE_MAX);
 
-	if (TestLaraLand(item, coll))
+	if (Context::CanLand(item, coll))
 	{
 		DoLaraFallDamage(item);
 
 		if (item->HitPoints <= 0)
 			item->Animation.TargetState = LS_DEATH;
-		else if (TestLaraSlide(item, coll))
+		else if (Context::CanSlide(item, coll))
 			SetLaraSlideAnimation(item, coll);
 		else USE_FEATURE_IF_CPP20([[likely]])
 			item->Animation.TargetState = LS_IDLE;
@@ -448,7 +448,7 @@ void lara_as_jump_right(ItemInfo* item, CollisionInfo* coll)
 
 	if (item->HitPoints <= 0)
 	{
-		if (TestLaraLand(item, coll))
+		if (Context::CanLand(item, coll))
 		{
 			item->Animation.TargetState = LS_DEATH;
 			SetLaraLand(item, coll);
@@ -457,13 +457,13 @@ void lara_as_jump_right(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (TestLaraLand(item, coll))
+	if (Context::CanLand(item, coll))
 	{
 		DoLaraFallDamage(item);
 
 		if (item->HitPoints <= 0)
 			item->Animation.TargetState = LS_DEATH;
-		else if (TestLaraSlide(item, coll))
+		else if (Context::CanSlide(item, coll))
 			SetLaraSlideAnimation(item, coll);
 		else USE_FEATURE_IF_CPP20([[likely]])
 			item->Animation.TargetState = LS_IDLE;
@@ -505,7 +505,7 @@ void lara_as_jump_left(ItemInfo* item, CollisionInfo* coll)
 
 	if (item->HitPoints <= 0)
 	{
-		if (TestLaraLand(item, coll))
+		if (Context::CanLand(item, coll))
 		{
 			item->Animation.TargetState = LS_DEATH;
 			SetLaraLand(item, coll);
@@ -514,13 +514,13 @@ void lara_as_jump_left(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (TestLaraLand(item, coll))
+	if (Context::CanLand(item, coll))
 	{
 		DoLaraFallDamage(item);
 
 		if (item->HitPoints <= 0)
 			item->Animation.TargetState = LS_DEATH;
-		else if (TestLaraSlide(item, coll))
+		else if (Context::CanSlide(item, coll))
 			SetLaraSlideAnimation(item, coll);
 		else USE_FEATURE_IF_CPP20([[likely]])
 			item->Animation.TargetState = LS_IDLE;
@@ -562,7 +562,7 @@ void lara_as_jump_up(ItemInfo* item, CollisionInfo* coll)
 
 	if (item->HitPoints <= 0)
 	{
-		if (TestLaraLand(item, coll))
+		if (Context::CanLand(item, coll))
 		{
 			item->Animation.TargetState = LS_DEATH;
 			SetLaraLand(item, coll);
@@ -571,11 +571,11 @@ void lara_as_jump_up(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (TestLaraLand(item, coll))
+	if (Context::CanLand(item, coll))
 	{
 		if (item->HitPoints <= 0)
 			item->Animation.TargetState = LS_DEATH;
-		else if (TestLaraSlide(item, coll))
+		else if (Context::CanSlide(item, coll))
 			SetLaraSlideAnimation(item, coll);
 		else USE_FEATURE_IF_CPP20([[likely]])
 			item->Animation.TargetState = LS_IDLE;
@@ -654,7 +654,7 @@ void lara_as_fall_back(ItemInfo* item, CollisionInfo* coll)
 
 	if (item->HitPoints <= 0)
 	{
-		if (TestLaraLand(item, coll))
+		if (Context::CanLand(item, coll))
 		{
 			item->Animation.TargetState = LS_DEATH;
 			SetLaraLand(item, coll);
@@ -666,13 +666,13 @@ void lara_as_fall_back(ItemInfo* item, CollisionInfo* coll)
 	if (TrInput & (IN_LEFT | IN_RIGHT))
 		ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_JUMP_TURN_RATE_MAX / 2);
 
-	if (TestLaraLand(item, coll))
+	if (Context::CanLand(item, coll))
 	{
 		DoLaraFallDamage(item);
 
 		if (item->HitPoints <= 0)
 			item->Animation.TargetState = LS_DEATH;
-		else if (TestLaraSlide(item, coll))
+		else if (Context::CanSlide(item, coll))
 			SetLaraSlideAnimation(item, coll);
 		else USE_FEATURE_IF_CPP20([[likely]])
 			item->Animation.TargetState = LS_IDLE;
@@ -717,7 +717,7 @@ void lara_as_swan_dive(ItemInfo* item, CollisionInfo* coll)
 
 	if (item->HitPoints <= 0)
 	{
-		if (TestLaraLand(item, coll))
+		if (Context::CanLand(item, coll))
 		{
 			item->Animation.TargetState = LS_DEATH;
 			SetLaraLand(item, coll);
@@ -738,7 +738,7 @@ void lara_as_swan_dive(ItemInfo* item, CollisionInfo* coll)
 		ModulateLaraLean(item, coll, LARA_LEAN_RATE / 2, LARA_LEAN_MAX);
 	}
 
-	if (TestLaraLand(item, coll))
+	if (Context::CanLand(item, coll))
 	{
 		DoLaraFallDamage(item);
 
@@ -746,7 +746,7 @@ void lara_as_swan_dive(ItemInfo* item, CollisionInfo* coll)
 		{
 			item->Animation.TargetState = LS_DEATH;
 		}
-		else if (TestLaraSlide(item, coll))
+		else if (Context::CanSlide(item, coll))
 		{
 			SetLaraSlideAnimation(item, coll);
 		}
@@ -810,7 +810,7 @@ void lara_as_freefall_dive(ItemInfo* item, CollisionInfo* coll)
 
 	if (item->HitPoints <= 0)
 	{
-		if (TestLaraLand(item, coll))
+		if (Context::CanLand(item, coll))
 		{
 			item->Animation.TargetState = LS_DEATH;
 			SetLaraLand(item, coll);
@@ -819,7 +819,7 @@ void lara_as_freefall_dive(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (TestLaraLand(item, coll))
+	if (Context::CanLand(item, coll))
 	{
 		if (item->Animation.Velocity.y >= LARA_DIVE_DEATH_VELOCITY ||
 			item->HitPoints <= 0)
@@ -827,7 +827,7 @@ void lara_as_freefall_dive(ItemInfo* item, CollisionInfo* coll)
 			item->Animation.TargetState = LS_DEATH;
 			Rumble(0.5f, 0.2f);
 		}
-		else if (TestLaraSlide(item, coll))
+		else if (Context::CanSlide(item, coll))
 			SetLaraSlideAnimation(item, coll);
 		else USE_FEATURE_IF_CPP20([[likely]])
 			item->Animation.TargetState = LS_IDLE;

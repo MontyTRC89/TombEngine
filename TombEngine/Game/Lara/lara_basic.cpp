@@ -204,13 +204,13 @@ void lara_col_walk_forward(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (TestLaraFall(item, coll))
+	if (Context::CanFall(item, coll))
 	{
 		SetLaraFallAnimation(item);
 		return;
 	}
 
-	if (TestLaraSlide(item, coll))
+	if (Context::CanSlide(item, coll))
 	{
 		SetLaraSlideAnimation(item, coll);
 		return;
@@ -339,13 +339,13 @@ void lara_col_run_forward(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (TestLaraFall(item, coll))
+	if (Context::CanFall(item, coll))
 	{
 		SetLaraFallAnimation(item);
 		return;
 	}
 
-	if (TestLaraSlide(item, coll))
+	if (Context::CanSlide(item, coll))
 	{
 		SetLaraSlideAnimation(item, coll);
 		return;
@@ -596,13 +596,13 @@ void lara_col_idle(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}*/
 
-	if (TestLaraFall(item, coll))
+	if (Context::CanFall(item, coll))
 	{
 		SetLaraFallAnimation(item);
 		return;
 	}
 
-	if (TestLaraSlide(item, coll))
+	if (Context::CanSlide(item, coll))
 	{
 		SetLaraSlideAnimation(item, coll);
 		return;
@@ -705,7 +705,7 @@ void lara_col_run_back(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (TestLaraSlide(item, coll))
+	if (Context::CanSlide(item, coll))
 	{
 		SetLaraSlideAnimation(item, coll);
 		return;
@@ -1035,13 +1035,13 @@ void lara_col_walk_back(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (TestLaraFall(item, coll))
+	if (Context::CanFall(item, coll))
 	{
 		SetLaraFallAnimation(item);
 		return;
 	}
 
-	if (TestLaraSlide(item, coll))
+	if (Context::CanSlide(item, coll))
 	{
 		SetLaraSlideAnimation(item, coll);
 		return;
@@ -1249,13 +1249,13 @@ void lara_col_step_right(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (TestLaraFall(item, coll))
+	if (Context::CanFall(item, coll))
 	{
 		SetLaraFallAnimation(item);
 		return;
 	}
 
-	if (TestLaraSlide(item, coll))
+	if (Context::CanSlide(item, coll))
 	{
 		SetLaraSlideAnimation(item, coll);
 		return;
@@ -1345,13 +1345,13 @@ void lara_col_step_left(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (TestLaraFall(item, coll))
+	if (Context::CanFall(item, coll))
 	{
 		SetLaraFallAnimation(item);
 		return;
 	}
 
-	if (TestLaraSlide(item, coll))
+	if (Context::CanSlide(item, coll))
 	{
 		SetLaraSlideAnimation(item, coll);
 		return;
@@ -1430,7 +1430,7 @@ void lara_col_roll_180_back(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (TestLaraSlide(item, coll))
+	if (Context::CanSlide(item, coll))
 	{
 		SetLaraSlideAnimation(item, coll);
 		return;
@@ -1485,13 +1485,13 @@ void lara_col_roll_180_forward(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (TestLaraFall(item, coll))
+	if (Context::CanFall(item, coll))
 	{
 		SetLaraFallAnimation(item);
 		return;
 	}
 
-	if (TestLaraSlide(item, coll))
+	if (Context::CanSlide(item, coll))
 	{
 		SetLaraSlideAnimation(item, coll);
 		return;
@@ -1706,13 +1706,13 @@ void lara_col_sprint(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (TestLaraFall(item, coll))
+	if (Context::CanFall(item, coll))
 	{
 		SetLaraFallAnimation(item);
 		return;
 	}
 
-	if (TestLaraSlide(item, coll))
+	if (Context::CanSlide(item, coll))
 	{
 		SetLaraSlideAnimation(item, coll);
 		return;
@@ -1790,7 +1790,7 @@ void lara_col_sprint_dive(ItemInfo* item, CollisionInfo* coll)
 
 	LaraDeflectEdgeJump(item, coll);
 
-	if (TestLaraFall(item, coll))
+	if (Context::CanFall(item, coll))
 	{
 		SetLaraFallAnimation(item);
 		return;

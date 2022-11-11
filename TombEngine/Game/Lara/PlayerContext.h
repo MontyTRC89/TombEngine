@@ -6,7 +6,12 @@ struct ItemInfo;
 
 namespace TEN::Entities::Player::Context
 {
+	// ------------------
+	// CONTEXT ASSESSMENT
+	// ------------------
+	
 	// Basic movement
+	bool CanSlide(ItemInfo* item, CollisionInfo* coll);
 	bool CanAFKPose(ItemInfo* item, CollisionInfo* coll);
 	bool CanTurn180(ItemInfo* item, CollisionInfo* coll);
 	bool CanTurnFast(ItemInfo* item, CollisionInfo* coll);
@@ -36,6 +41,8 @@ namespace TEN::Entities::Player::Context
 	bool CanMonkeySwingShimmyRight(ItemInfo* item, CollisionInfo* coll);
 
 	// Jump movement
+	bool CanLand(ItemInfo* item, CollisionInfo* coll);
+	bool CanFall(ItemInfo* item, CollisionInfo* coll);
 	bool CanPerformJump(ItemInfo* item, CollisionInfo* coll);
 	bool CanJumpUp(ItemInfo* item, CollisionInfo* coll);
 	bool CanJumpForward(ItemInfo* item, CollisionInfo* coll);
@@ -53,6 +60,8 @@ namespace TEN::Entities::Player::Context
 	// Crawl vault movement
 	// Water tread climb out movement
 
+	// ----------------------------------------------------------------------------------------------------------------------
+	
 	// Helper inquirers
 	bool TestSidestep(ItemInfo* item, CollisionInfo* coll, bool isGoingRight);
 	bool TestMonkeyShimmy(ItemInfo* item, CollisionInfo* coll, bool isGoingRight);

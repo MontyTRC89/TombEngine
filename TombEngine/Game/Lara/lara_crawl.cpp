@@ -138,14 +138,14 @@ void lara_col_crouch_idle(ItemInfo* item, CollisionInfo* coll)
 	coll->Setup.BlockFloorSlopeDown = true;
 	GetCollisionInfo(coll, item);
 
-	if (TestLaraFall(item, coll))
+	if (Context::CanFall(item, coll))
 	{
 		SetLaraFallAnimation(item);
 		lara.Control.HandStatus = HandStatus::Free;
 		return;
 	}
 
-	if (TestLaraSlide(item, coll))
+	if (Context::CanSlide(item, coll))
 	{
 		SetLaraSlideAnimation(item, coll);
 		return;
@@ -206,7 +206,7 @@ void lara_col_crouch_roll(ItemInfo* item, CollisionInfo* coll)
 	if (LaraDeflectEdgeCrawl(item, coll))
 		item->Pose.Position = coll->Setup.OldPosition;
 
-	if (TestLaraFall(item, coll))
+	if (Context::CanFall(item, coll))
 	{
 		SetLaraFallAnimation(item);
 		lara.Control.HandStatus = HandStatus::Free;
@@ -214,7 +214,7 @@ void lara_col_crouch_roll(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (TestLaraSlide(item, coll))
+	if (Context::CanSlide(item, coll))
 	{
 		SetLaraSlideAnimation(item, coll);
 		return;
@@ -508,13 +508,13 @@ void lara_col_crawl_idle(ItemInfo* item, CollisionInfo* coll)
 	coll->Setup.BlockFloorSlopeDown = true;
 	GetCollisionInfo(coll, item);
 
-	if (TestLaraFall(item, coll))
+	if (Context::CanFall(item, coll))
 	{
 		SetLaraFallAnimation(item);
 		return;
 	}
 
-	if (TestLaraSlide(item, coll))
+	if (Context::CanSlide(item, coll))
 	{
 		SetLaraSlideAnimation(item, coll);
 		return;
@@ -602,13 +602,13 @@ void lara_col_crawl_forward(ItemInfo* item, CollisionInfo* coll)
 	if (LaraDeflectEdgeCrawl(item, coll))
 		LaraCollideStopCrawl(item, coll);
 	
-	if (TestLaraFall(item, coll))
+	if (Context::CanFall(item, coll))
 	{
 		SetLaraFallAnimation(item);
 		return;
 	}
 	
-	if (TestLaraSlide(item, coll))
+	if (Context::CanSlide(item, coll))
 	{
 		SetLaraSlideAnimation(item, coll);
 		return;
@@ -689,13 +689,13 @@ void lara_col_crawl_back(ItemInfo* item, CollisionInfo* coll)
 	if (LaraDeflectEdgeCrawl(item, coll))
 		LaraCollideStopCrawl(item, coll);
 
-	if (TestLaraFall(item, coll))
+	if (Context::CanFall(item, coll))
 	{
 		SetLaraFallAnimation(item);
 		return;
 	}
 
-	if (TestLaraSlide(item, coll))
+	if (Context::CanSlide(item, coll))
 	{
 		SetLaraSlideAnimation(item, coll);
 		return;

@@ -36,7 +36,7 @@ void lara_as_slide_forward(ItemInfo* item, CollisionInfo* coll)
 	if (TrInput & IN_LOOK)
 		LookUpDown(item);
 
-	if (TestLaraSlide(item, coll))
+	if (Context::CanSlide(item, coll))
 	{
 		/*short direction = GetLaraSlideDirection(item, coll);
 
@@ -107,14 +107,14 @@ void lara_col_slide_forward(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (TestLaraFall(item, coll) && !TestEnvironment(ENV_FLAG_SWAMP, item))
+	if (Context::CanFall(item, coll) && !TestEnvironment(ENV_FLAG_SWAMP, item))
 	{
 		SetLaraFallAnimation(item);
 		StopSoundEffect(SFX_TR4_LARA_SLIPPING);
 		return;
 	}
 
-	if (TestLaraSlide(item, coll))
+	if (Context::CanSlide(item, coll))
 		SetLaraSlideAnimation(item, coll);
 
 	LaraDeflectEdge(item, coll);
@@ -145,7 +145,7 @@ void lara_as_slide_back(ItemInfo* item, CollisionInfo* coll)
 	if (TrInput & IN_LOOK)
 		LookUpDown(item);
 
-	if (TestLaraSlide(item, coll))
+	if (Context::CanSlide(item, coll))
 	{
 		/*short direction = GetLaraSlideDirection(item, coll) + ANGLE(180.0f);
 
@@ -212,14 +212,14 @@ void lara_col_slide_back(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (TestLaraFall(item, coll) && !TestEnvironment(ENV_FLAG_SWAMP, item))
+	if (Context::CanFall(item, coll) && !TestEnvironment(ENV_FLAG_SWAMP, item))
 	{
 		SetLaraFallBackAnimation(item);
 		StopSoundEffect(SFX_TR4_LARA_SLIPPING);
 		return;
 	}
 
-	if (TestLaraSlide(item, coll))
+	if (Context::CanSlide(item, coll))
 		SetLaraSlideAnimation(item, coll);
 
 	LaraDeflectEdge(item, coll);

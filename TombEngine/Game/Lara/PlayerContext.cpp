@@ -14,6 +14,27 @@ using namespace TEN::Input;
 
 namespace TEN::Entities::Player::Context
 {
+	bool CanSlide(ItemInfo* item, CollisionInfo* coll)
+	{
+		static constexpr auto floorBound = STEPUP_HEIGHT;
+
+		// 1. Check for swamp.
+		if (TestEnvironment(ENV_FLAG_SWAMP, item))
+			return false;
+
+		int vPos = item->Pose.Position.y;
+		auto pointColl = GetCollision(item, 0, 0, -coll->Setup.Height / 2);
+
+		// 2. Assess point collision.
+		if (abs(pointColl.Position.Floor - vPos) <= floorBound && // Floor height is within upper/lower floor bound.
+			pointColl.Position.FloorSlope)						  // Floor is a slope.
+		{
+			return true;
+		}
+
+		return false;
+	}
+
 	bool CanAFKPose(ItemInfo* item, CollisionInfo* coll)
 	{
 		const auto& player = *GetLaraInfo(item);
@@ -322,6 +343,46 @@ namespace TEN::Entities::Player::Context
 		}
 
 		return false;
+	}
+
+	bool CanLand(ItemInfo* item, CollisionInfo* coll)
+	{
+		// 1. Check airborne status and Y velocity.
+		if (!item->Animation.IsAirborne || item->Animation.Velocity.y < 0.0f)
+			return false;
+
+		// 2. Check for swamp.
+		if (TestEnvironment(ENV_FLAG_SWAMP, item))
+			return true;
+
+		int vPos = item->Pose.Position.y;
+		auto pointColl = GetCollision(item);
+
+		// 3. Assess point collision.
+		if ((pointColl.Position.Floor - vPos) <= item->Animation.Velocity.y)
+			return true;
+
+		return false;
+	}
+
+	bool CanFall(ItemInfo* item, CollisionInfo* coll)
+	{
+		static constexpr auto lowerFloorBound = STEPUP_HEIGHT;
+
+		const auto& player = *GetLaraInfo(item);
+
+		// 1. Check wade status.
+		if (player.Control.WaterStatus == WaterStatus::Wade)
+			return false;
+
+		int vPos = item->Pose.Position.y;
+		auto pointColl = GetCollision(item, 0, 0, -(coll->Setup.Height / 2));
+
+		// 2. Assess point collision.
+		if ((pointColl.Position.Floor - vPos) <= lowerFloorBound)
+			return false;
+
+		return true;
 	}
 
 	bool CanFallFromMonkeySwing(ItemInfo* item, CollisionInfo* coll)

@@ -1018,53 +1018,6 @@ bool IsRunJumpCountableState(int state)
 	return TestState(state, runningJumpTimerStates);
 }
 
-bool TestLaraSlide(ItemInfo* item, CollisionInfo* coll)
-{
-	int yPos = item->Pose.Position.y;
-	auto pointColl = GetCollision(item, 0, 0, -(coll->Setup.Height / 2));
-
-	if (TestEnvironment(ENV_FLAG_SWAMP, item))
-		return false;
-
-	if (abs(pointColl.Position.Floor - yPos) <= STEPUP_HEIGHT &&
-		pointColl.Position.FloorSlope)
-	{
-		return true;
-	}
-
-	return false;
-}
-
-bool TestLaraLand(ItemInfo* item, CollisionInfo* coll)
-{
-	int heightFromFloor = GetCollision(item).Position.Floor - item->Pose.Position.y;
-
-	if (item->Animation.IsAirborne && item->Animation.Velocity.y >= 0.0f &&
-		(heightFromFloor <= item->Animation.Velocity.y ||
-			TestEnvironment(ENV_FLAG_SWAMP, item)))
-	{
-		return true;
-	}
-	
-	return false;
-}
-
-bool TestLaraFall(ItemInfo* item, CollisionInfo* coll)
-{
-	auto* lara = GetLaraInfo(item);
-
-	int yPos = item->Pose.Position.y;
-	auto pointColl = GetCollision(item, 0, 0, -(coll->Setup.Height / 2));
-
-	if ((pointColl.Position.Floor - yPos) <= STEPUP_HEIGHT ||
-		lara->Control.WaterStatus == WaterStatus::Wade)	// TODO: This causes a legacy floor snap bug when Lara wades off a ledge into a dry room. @Sezz 2021.09.26
-	{
-		return false;
-	}
-
-	return true;
-}
-
 bool TestLaraStep(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
