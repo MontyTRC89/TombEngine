@@ -1083,131 +1083,7 @@ void BounceCamera(ItemInfo* item, short bounce, short maxDistance)
 
 void LaserSightCamera(ItemInfo* item)
 {
-	auto* lara = GetLaraInfo(item);
-	auto& ammo = GetAmmo(*lara, lara->Control.Weapon.GunType);
 
-	bool firing = false;
-
-	if (WeaponDelay)
-		WeaponDelay--;
-
-	if (LSHKTimer)
-		LSHKTimer--;
-
-	if (!IsHeld(In::Action) || WeaponDelay || !ammo)
-	{
-		if (!IsHeld(In::Action))
-		{
-			LSHKShotsFired = 0;
-			Camera.bounce = 0;
-		}
-	}
-	else
-	{
-		if (lara->Control.Weapon.GunType == LaraWeaponType::Revolver)
-		{
-			firing = true;
-			WeaponDelay = 16;
-			Statistics.Game.AmmoUsed++;
-
-			if (!ammo.HasInfinite())
-				(ammo)--;
-
-			Camera.bounce = -16 - (GetRandomControl() & 0x1F);
-		}
-		else if (lara->Control.Weapon.GunType == LaraWeaponType::Crossbow)
-		{
-			firing = true;
-			WeaponDelay = 32;
-		}
-		else
-		{
-			if (lara->Weapons[(int)LaraWeaponType::HK].SelectedAmmo == WeaponAmmoType::Ammo1)
-			{
-				WeaponDelay = 12;
-				firing = true;
-
-				if (lara->Weapons[(int)LaraWeaponType::HK].HasSilencer)
-					SoundEffect(SFX_TR4_HK_SILENCED, nullptr);
-				else
-				{
-					SoundEffect(SFX_TR4_EXPLOSION1, nullptr, SoundEnvironment::Land, 1.0f, 0.4f);
-					SoundEffect(SFX_TR4_HK_FIRE, nullptr);
-				}
-
-				Camera.bounce = -16 - (GetRandomControl() & 0x1F);
-			}
-			else if (lara->Weapons[(int)LaraWeaponType::HK].SelectedAmmo == WeaponAmmoType::Ammo2)
-			{
-				if (!LSHKTimer)
-				{
-					if (++LSHKShotsFired == 5)
-					{
-						LSHKShotsFired = 0;
-						WeaponDelay = 12;
-					}
-
-					LSHKTimer = 4;
-					firing = true;
-
-					if (lara->Weapons[(int)LaraWeaponType::HK].HasSilencer)
-						SoundEffect(SFX_TR4_HK_SILENCED, nullptr);
-					else
-					{
-						SoundEffect(SFX_TR4_EXPLOSION1, nullptr, SoundEnvironment::Land, 1.0f, 0.4f);
-						SoundEffect(SFX_TR4_HK_FIRE, nullptr);
-					}
-
-					Camera.bounce = -16 - (GetRandomControl() & 0x1F);
-				}
-				else
-				{
-					Camera.bounce = -16 - (GetRandomControl() & 0x1F);
-
-					if (lara->Weapons[(int)LaraWeaponType::HK].HasSilencer)
-						SoundEffect(SFX_TR4_HK_SILENCED, nullptr);
-					else
-					{
-						SoundEffect(SFX_TR4_EXPLOSION1, nullptr, SoundEnvironment::Land, 1.0f, 0.4f);
-						SoundEffect(SFX_TR4_HK_FIRE, nullptr);
-					}
-
-					Camera.bounce = -16 - (GetRandomControl() & 0x1F);
-				}
-			}
-			else
-			{
-				if (LSHKTimer)
-				{
-					if (lara->Weapons[(int)LaraWeaponType::HK].HasSilencer)
-						SoundEffect(SFX_TR4_HK_SILENCED, nullptr);
-					else
-					{
-						SoundEffect(SFX_TR4_EXPLOSION1, nullptr, SoundEnvironment::Land, 1.0f, 0.4f);
-						SoundEffect(SFX_TR4_HK_FIRE, nullptr);
-					}
-				}
-				else
-				{
-					LSHKTimer = 4;
-					firing = true;
-
-					if (lara->Weapons[(int)LaraWeaponType::HK].HasSilencer)
-						SoundEffect(SFX_TR4_HK_SILENCED, nullptr);
-					else
-					{
-						SoundEffect(SFX_TR4_EXPLOSION1, nullptr, SoundEnvironment::Land, 1.0f, 0.4f);
-						SoundEffect(SFX_TR4_HK_FIRE, nullptr);
-					}
-				}
-			}
-
-			if (!ammo.HasInfinite())
-				(ammo)--;
-		}
-	}
-
-	GetTargetOnLOS(&Camera.pos, &Camera.target, true, firing);
 }
 
 void BinocularCamera(ItemInfo* item)
@@ -2079,7 +1955,7 @@ void HandleOptics(ItemInfo* item)
 	if (!LaserSight && !breakOptics && (TrInput == IN_LOOK)) // Engage lasersight, if available.
 	{
 		if (Lara.Control.HandStatus == HandStatus::WeaponReady &&
-			(Lara.Control.Weapon.GunType == LaraWeaponType::HK ||
+			((Lara.Control.Weapon.GunType == LaraWeaponType::HK && Lara.Weapons[(int)LaraWeaponType::HK].HasLasersight) ||
 				(Lara.Control.Weapon.GunType == LaraWeaponType::Revolver && Lara.Weapons[(int)LaraWeaponType::Revolver].HasLasersight) ||
 				(Lara.Control.Weapon.GunType == LaraWeaponType::Crossbow && Lara.Weapons[(int)LaraWeaponType::Crossbow].HasLasersight)))
 		{

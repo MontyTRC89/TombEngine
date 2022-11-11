@@ -1075,6 +1075,10 @@ struct CarriedWeaponInfo
 	WeaponAmmoType SelectedAmmo; // WeaponAmmoType_enum
 	bool HasLasersight; // TODO: Duplicated in LaraInventoryData.
 	bool HasSilencer;	// TODO: Duplicated in LaraInventoryData.
+	LaraWeaponTypeCarried Weaponmode;
+	int Interval;
+	int ShotsFired;
+	int Flag;
 };
 
 struct ArmInfo

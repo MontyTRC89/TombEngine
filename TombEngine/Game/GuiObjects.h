@@ -29,8 +29,11 @@ namespace TEN::Gui
 		INV_OBJECT_CROSSBOW_AMMO_2,
 		INV_OBJECT_CROSSBOW_AMMO_3,
 		INV_OBJECT_HK,
-		INV_OBJECT_HK_SILENCER,
+		INV_OBJECT_HK_LASER,
 		INV_OBJECT_HK_AMMO,
+		INV_HK_MODE1,
+		INV_HK_MODE2,
+		INV_HK_MODE3,
 		INV_OBJECT_GRENADE_LAUNCHER,
 		INV_OBJECT_GRENADE_AMMO_1,
 		INV_OBJECT_GRENADE_AMMO_2,
@@ -355,7 +358,7 @@ namespace TEN::Gui
 
 	void CombineRevolverLasersight(ItemInfo* item, bool flag);
 	void CombineCrossbowLasersight(ItemInfo* item, bool flag);
-	void CombineHKSilencer(ItemInfo* item, bool flag);
+	void CombineHKLasersight(ItemInfo* item, bool flag);
 	void CombinePuzzleItem1(ItemInfo* item, bool flag);
 	void CombinePuzzleItem2(ItemInfo* item, bool flag);
 	void CombinePuzzleItem3(ItemInfo* item, bool flag);

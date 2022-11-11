@@ -19,7 +19,7 @@
 #define STRING_REVOLVER					"revolver"
 #define STRING_REVOLVER_LASER			"revolver_laser"
 #define STRING_HK						"hk"
-#define STRING_HK_SILENCED				"hk_silenced"
+#define STRING_HK_LASER					"hk_silenced"
 #define STRING_SHOTGUN_AMMO1			"shotgun_ammo1"
 #define STRING_SHOTGUN_AMMO2			"shotgun_ammo2"
 #define STRING_HK_SNIPER_MODE			"hk_sniper_mode"
