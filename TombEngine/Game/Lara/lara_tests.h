@@ -56,7 +56,6 @@ bool IsRunJumpCountableState(int state);
 bool TestLaraSlide(ItemInfo* item, CollisionInfo* coll);
 bool TestLaraLand(ItemInfo* item, CollisionInfo* coll);
 bool TestLaraFall(ItemInfo* item, CollisionInfo* coll);
-bool TestLaraMonkeyFall(ItemInfo* item, CollisionInfo* coll);
 
 bool TestLaraStep(ItemInfo* item, CollisionInfo* coll);
 bool TestLaraStepUp(ItemInfo* item, CollisionInfo* coll);

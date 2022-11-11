@@ -746,16 +746,6 @@ void SetLaraFallBackAnimation(ItemInfo* item)
 	item->Animation.Velocity.y = 0.0f;
 }
 
-void SetLaraMonkeyFallAnimation(ItemInfo* item)
-{
-	// HACK: Disallow release during 180 turn action.
-	if (item->Animation.ActiveState == LS_MONKEY_TURN_180)
-		return;
-
-	SetAnimation(item, LA_MONKEY_TO_FREEFALL);
-	SetLaraMonkeyRelease(item);
-}
-
 void SetLaraMonkeyRelease(ItemInfo* item)
 {
 	auto& lara = *GetLaraInfo(item);

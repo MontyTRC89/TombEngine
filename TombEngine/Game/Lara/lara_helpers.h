@@ -47,7 +47,6 @@ void SetContextWaterClimbOut(ItemInfo* item, CollisionInfo* coll, WaterClimbOutT
 void SetLaraLand(ItemInfo* item, CollisionInfo* coll);
 void SetLaraFallAnimation(ItemInfo* item);
 void SetLaraFallBackAnimation(ItemInfo* item);
-void SetLaraMonkeyFallAnimation(ItemInfo* item);
 void SetLaraMonkeyRelease(ItemInfo* item);
 void SetLaraSlideAnimation(ItemInfo* item, CollisionInfo* coll);
 void SetLaraHang(ItemInfo* item);

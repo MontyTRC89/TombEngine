@@ -839,17 +839,10 @@ void lara_as_turn_slow(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (IsHeld(In::Left))
+	if (IsHeld(In::Left) && item->Animation.ActiveState == LS_TURN_LEFT_SLOW)
 	{
-		// TODO: This hasn't worked since TR1.
-		/*if (IsHeld(In::Walk))
-		{
-			item->Animation.TargetState = LS_TURN_LEFT_SLOW;
-
-			if (lara.Control.TurnRate.y < -LARA_SLOW_TURN_RATE_MAX)
-				lara.Control.TurnRate.y = -LARA_SLOW_TURN_RATE_MAX;
-		}
-		else */if (lara.Control.TurnRate.y < -LARA_SLOW_MED_TURN_RATE_MAX && lara.Control.WaterStatus != WaterStatus::Wade)
+		if (lara.Control.TurnRate.y < -LARA_SLOW_MED_TURN_RATE_MAX &&
+			lara.Control.WaterStatus != WaterStatus::Wade)
 		{
 			item->Animation.TargetState = LS_TURN_LEFT_FAST;
 		}
@@ -858,17 +851,10 @@ void lara_as_turn_slow(ItemInfo* item, CollisionInfo* coll)
 
 		return;
 	}
-	else if (IsHeld(In::Right))
+	else if (IsHeld(In::Right) && item->Animation.ActiveState == LS_TURN_RIGHT_SLOW)
 	{
-		// TODO: This hasn't worked since TR1.
-		/*if (IsHeld(In::Walk))
-		{
-			item->Animation.TargetState = LS_TURN_RIGHT_SLOW;
-
-			if (lara.Control.TurnRate > LARA_SLOW_TURN_RATE_MAX)
-				lara.Control.TurnRate = LARA_SLOW_TURN_RATE_MAX;
-		}
-		else */if (lara.Control.TurnRate.y > LARA_SLOW_MED_TURN_RATE_MAX && lara.Control.WaterStatus != WaterStatus::Wade)
+		if (lara.Control.TurnRate.y > LARA_SLOW_MED_TURN_RATE_MAX &&
+			lara.Control.WaterStatus != WaterStatus::Wade)
 		{
 			item->Animation.TargetState = LS_TURN_RIGHT_FAST;
 		}
@@ -1071,8 +1057,8 @@ void lara_col_walk_back(ItemInfo* item, CollisionInfo* coll)
 	}
 }
 
-// State:		LS_TURN_RIGHT_FAST (20), LS_TURN_LEFT_FAST (152)
-// Collision:	lara_col_turn_fast()
+// State:	  LS_TURN_RIGHT_FAST (20), LS_TURN_LEFT_FAST (152)
+// Collision: lara_col_turn_fast()
 void lara_as_turn_fast(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& lara = *GetLaraInfo(item);
@@ -1177,12 +1163,12 @@ void lara_as_turn_fast(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (IsHeld(In::Left))
+	if (IsHeld(In::Left) && item->Animation.ActiveState == LS_TURN_LEFT_FAST)
 	{
 		item->Animation.TargetState = LS_TURN_LEFT_FAST;
 		return;
 	}
-	else if (IsHeld(In::Right))
+	else if (IsHeld(In::Right) && item->Animation.ActiveState == LS_TURN_RIGHT_FAST)
 	{
 		item->Animation.TargetState = LS_TURN_RIGHT_FAST;
 		return;

@@ -29,10 +29,11 @@ namespace TEN::Entities::Player::Context
 
 	// Monkey swing movement
 	bool CanGrabMonkeySwing(ItemInfo* item, CollisionInfo* coll);
-	bool CanMonkeyForward(ItemInfo* item, CollisionInfo* coll);
-	bool CanMonkeyBackward(ItemInfo* item, CollisionInfo* coll);
-	bool CanMonkeyShimmyLeft(ItemInfo* item, CollisionInfo* coll);
-	bool CanMonkeyShimmyRight(ItemInfo* item, CollisionInfo* coll);
+	bool CanFallFromMonkeySwing(ItemInfo* item, CollisionInfo* coll);
+	bool CanMonkeySwingForward(ItemInfo* item, CollisionInfo* coll);
+	bool CanMonkeySwingBackward(ItemInfo* item, CollisionInfo* coll);
+	bool CanMonkeySwingShimmyLeft(ItemInfo* item, CollisionInfo* coll);
+	bool CanMonkeySwingShimmyRight(ItemInfo* item, CollisionInfo* coll);
 
 	// Jump movement
 	bool CanPerformJump(ItemInfo* item, CollisionInfo* coll);

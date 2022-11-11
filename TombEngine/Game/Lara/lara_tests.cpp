@@ -1065,26 +1065,6 @@ bool TestLaraFall(ItemInfo* item, CollisionInfo* coll)
 	return true;
 }
 
-bool TestLaraMonkeyFall(ItemInfo* item, CollisionInfo* coll)
-{
-	auto* lara = GetLaraInfo(item);
-
-	int y = item->Pose.Position.y - LARA_HEIGHT_MONKEY;
-	auto probe = GetCollision(item);
-
-	if (!lara->Control.CanMonkeySwing ||					// No monkey sector.
-		(probe.Position.Ceiling - y) > CLICK(1.25f) ||		// Outside lower bound.
-		(probe.Position.Ceiling - y) < -CLICK(1.25f) ||		// Outside upper bound.
-		(probe.Position.CeilingSlope &&						// Is ceiling slope (if applicable).
-			!g_GameFlow->HasOverhangClimb()) ||
-		probe.Position.Ceiling == NO_HEIGHT)
-	{
-		return true;
-	}
-
-	return false;
-}
-
 bool TestLaraStep(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);

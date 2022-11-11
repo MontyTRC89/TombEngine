@@ -224,8 +224,8 @@ namespace TEN::Entities::Player::Context
 	{
 		const auto& player = *GetLaraInfo(item);
 
-		if (!(TrInput & (IN_FLARE | IN_DRAW)) &&						// Avoid unsightly concurrent actions.
-			player.Control.HandStatus == HandStatus::Free &&			// Hands are free.
+		if (!(TrInput & (IN_FLARE | IN_DRAW)) &&					   // Avoid unsightly concurrent actions.
+			player.Control.HandStatus == HandStatus::Free &&		   // Hands are free.
 			(player.Control.Weapon.GunType != LaraWeaponType::Flare || // Not handling flare. TODO: Should be allowed, but the flare animation bugs out right now. -- Sezz 2022.03.18
 				player.Flare.Life))
 		{
@@ -237,9 +237,9 @@ namespace TEN::Entities::Player::Context
 
 	bool CanCrouchRoll(ItemInfo* item, CollisionInfo* coll)
 	{
-		static const float maxWaterHeight	 = -CLICK(1);
-		static const float maxProbeDistance	 = BLOCK(1);
-		static const float distanceIncrement = BLOCK(1.0f / 4);
+		static constexpr auto maxWaterHeight = -CLICK(1);
+		static constexpr auto maxProbeDist	 = BLOCK(1);
+		static constexpr auto distIncrement	 = BLOCK(1.0f / 4);
 
 		const auto& player = *GetLaraInfo(item);
 
@@ -255,9 +255,9 @@ namespace TEN::Entities::Player::Context
 		// 3. Assess continuity of path.
 		float distance = 0.0f;
 		auto pointCollA = GetCollision(item);
-		while (distance < maxProbeDistance)
+		while (distance < maxProbeDist)
 		{
-			distance += distanceIncrement;
+			distance += distIncrement;
 			auto pointCollB = GetCollision(item, item->Pose.Orientation.y, distance, -LARA_HEIGHT_CRAWL);
 
 			if (abs(pointCollA.Position.Floor - pointCollB.Position.Floor) > CRAWL_STEPUP_HEIGHT ||	 // Avoid floor height differences beyond crawl stepup threshold.
@@ -295,7 +295,7 @@ namespace TEN::Entities::Player::Context
 
 	bool CanGrabMonkeySwing(ItemInfo* item, CollisionInfo* coll)
 	{
-		static const float monkeySwingGrabTolerance = CLICK(0.5f);
+		static const float grabHeightTolerance = CLICK(1.0f / 2);
 
 		const auto& player = *GetLaraInfo(item);
 
@@ -303,15 +303,19 @@ namespace TEN::Entities::Player::Context
 		if (!player.Control.CanMonkeySwing)
 			return false;
 
-		int vPos = item->Pose.Position.y - LARA_HEIGHT_MONKEY;
+		int vPosTop = item->Pose.Position.y - LARA_HEIGHT_MONKEY;
 		auto pointColl = GetCollision(item);
 
 		// 2. Assess collision with ceiling.
-		if ((pointColl.Position.Ceiling - vPos) < 0 & coll->CollisionType != CT_TOP && coll->CollisionType != CT_TOP_FRONT)
+		if ((pointColl.Position.Ceiling - vPosTop) < 0 &&
+			coll->CollisionType != CollisionType::CT_TOP &&
+			coll->CollisionType != CollisionType::CT_TOP_FRONT)
+		{
 			return false;
+		}
 
 		// 3. Assess point collision.
-		if ((pointColl.Position.Ceiling - vPos) <= monkeySwingGrabTolerance &&
+		if ((pointColl.Position.Ceiling - vPosTop) <= grabHeightTolerance &&
 			abs(pointColl.Position.Ceiling - pointColl.Position.Floor) > LARA_HEIGHT_MONKEY)
 		{
 			return true;
@@ -320,7 +324,38 @@ namespace TEN::Entities::Player::Context
 		return false;
 	}
 
-	bool CanMonkeyForward(ItemInfo* item, CollisionInfo* coll)
+	bool CanFallFromMonkeySwing(ItemInfo* item, CollisionInfo* coll)
+	{
+		static constexpr auto ceilingBound = CLICK(5.0f / 4);
+
+		auto& player = *GetLaraInfo(item);
+
+		// 1. Check for monkey swing ceiling.
+		if (!player.Control.CanMonkeySwing)
+			return true;
+
+		int vPosTop = item->Pose.Position.y - LARA_HEIGHT_MONKEY;
+		auto pointColl = GetCollision(item);
+
+		// 2. Check for wall.
+		if (pointColl.Position.Ceiling == NO_HEIGHT)
+			return true;
+
+		// 3. Check ceiling slope if overhang climb is disabled.
+		if (pointColl.Position.CeilingSlope && !g_GameFlow->HasOverhangClimb())
+			return true;
+
+		// 4. Assess point collision.
+		if ((pointColl.Position.Ceiling - vPosTop) > ceilingBound || // Ceiling height is below lower bound.
+			(pointColl.Position.Ceiling - vPosTop) < -ceilingBound)	 // Ceiling height is beyond upper bound.
+		{
+			return true;
+		}
+
+		return false;
+	}
+
+	bool CanMonkeySwingForward(ItemInfo* item, CollisionInfo* coll)
 	{
 		auto contextSetup = Context::MonkeyMovementSetup
 		{
@@ -330,7 +365,7 @@ namespace TEN::Entities::Player::Context
 		return TestMonkeyMovementSetup(item, coll, contextSetup);
 	}
 
-	bool CanMonkeyBackward(ItemInfo* item, CollisionInfo* coll)
+	bool CanMonkeySwingBackward(ItemInfo* item, CollisionInfo* coll)
 	{
 		auto contextSetup = Context::MonkeyMovementSetup
 		{
@@ -340,12 +375,12 @@ namespace TEN::Entities::Player::Context
 		return TestMonkeyMovementSetup(item, coll, contextSetup);
 	}
 
-	bool CanMonkeyShimmyLeft(ItemInfo* item, CollisionInfo* coll)
+	bool CanMonkeySwingShimmyLeft(ItemInfo* item, CollisionInfo* coll)
 	{
 		return TestMonkeyShimmy(item, coll, false);
 	}
 	
-	bool CanMonkeyShimmyRight(ItemInfo* item, CollisionInfo* coll)
+	bool CanMonkeySwingShimmyRight(ItemInfo* item, CollisionInfo* coll)
 	{
 		return TestMonkeyShimmy(item, coll, true);
 	}
