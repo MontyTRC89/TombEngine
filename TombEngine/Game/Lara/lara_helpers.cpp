@@ -634,7 +634,7 @@ void ModulateLaraSlideVelocity(ItemInfo* item, CollisionInfo* coll)
 
 void AlignLaraToSurface(ItemInfo* item, float alpha)
 {
-	// Calculate surface angles.
+	// Determine surface angles.
 	auto floorNormal = Geometry::GetFloorNormal(GetCollision(item).FloorTilt);
 	short aspectAngle = Geometry::GetSurfaceAspectAngle(floorNormal);
 	short slopeAngle = std::min(Geometry::GetSurfaceSlopeAngle(floorNormal), ANGLE(70.0f));
