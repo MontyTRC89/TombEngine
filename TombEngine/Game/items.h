@@ -49,13 +49,6 @@ enum ItemFlags
 constexpr unsigned int ALL_JOINT_BITS = UINT_MAX;
 constexpr unsigned int NO_JOINT_BITS  = 0;
 
-enum class JointBitType
-{
-	Touch,
-	Mesh,
-	MeshSwap
-};
-
 struct EntityAnimationData
 {
 	int AnimNumber	  = -1;

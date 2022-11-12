@@ -6,9 +6,10 @@ struct ItemInfo;
 
 namespace TEN::Entities::Player::Context
 {
-	// ------------------
-	// CONTEXT ASSESSMENT
-	// ------------------
+	// -----------------------------
+	// CONTEXT ASSESSMENT FUNCTIONS
+	// For State Control & Collision
+	// -----------------------------
 
 	// Basic movement
 	bool CanPerformStep(ItemInfo* item, CollisionInfo* coll);

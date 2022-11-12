@@ -429,16 +429,20 @@ void LaraResetGravityStatus(ItemInfo* item, CollisionInfo* coll)
 	if (coll->Middle.Floor <= STEPUP_HEIGHT)
 	{
 		item->Animation.IsAirborne = false;
-		item->Animation.Velocity.y = 0;
+		item->Animation.Velocity.y = 0.0f;
 	}
 }
 
 void LaraSnapToHeight(ItemInfo* item, CollisionInfo* coll)
 {
 	if (TestEnvironment(ENV_FLAG_SWAMP, item) && coll->Middle.Floor > 0)
+	{
 		item->Pose.Position.y += SWAMP_GRAVITY;
+	}
 	else if (coll->Middle.Floor != NO_HEIGHT)
+	{
 		item->Pose.Position.y += coll->Middle.Floor;
+	}
 }
 
 void GetLaraDeadlyBounds()
@@ -469,6 +473,9 @@ void LaraJumpCollision(ItemInfo* item, CollisionInfo* coll, short moveAngle)
 	GetCollisionInfo(coll, item);
 
 	LaraDeflectEdgeJump(item, coll);
+
+	if (Context::CanLand(item, coll) && Context::CanSlide(item, coll))
+		SetLaraSlideAnimation(item, coll);
 }
 
 void LaraSurfaceCollision(ItemInfo* item, CollisionInfo* coll)
@@ -483,13 +490,17 @@ void LaraSurfaceCollision(ItemInfo* item, CollisionInfo* coll)
 	if (coll->CollisionType & (CT_FRONT | CT_TOP | CT_TOP_FRONT | CT_CLAMP) ||
 		coll->Middle.Floor < 0 && coll->Middle.FloorSlope)
 	{
-		item->Animation.Velocity.y = 0;
+		item->Animation.Velocity.y = 0.0f;
 		item->Pose.Position = coll->Setup.OldPosition;
 	}
 	else if (coll->CollisionType == CT_LEFT)
+	{
 		item->Pose.Orientation.y += ANGLE(5.0f);
+	}
 	else if (coll->CollisionType == CT_RIGHT)
+	{
 		item->Pose.Orientation.y -= ANGLE(5.0f);
+	}
 
 	if (GetWaterHeight(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, item->RoomNumber) - item->Pose.Position.y > -100)
 		TestLaraWaterStepOut(item, coll);

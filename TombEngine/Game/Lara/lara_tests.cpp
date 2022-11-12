@@ -107,9 +107,9 @@ bool TestLaraHang(ItemInfo* item, CollisionInfo* coll)
 
 	// Determine direction of Lara's shimmying (0 if she just hangs still)
 	int climbDirection = 0;
-	if (lara->Control.MoveAngle == (short)(item->Pose.Orientation.y - ANGLE(90.0f)))
+	if (lara->Control.MoveAngle == short(item->Pose.Orientation.y - ANGLE(90.0f)))
 		climbDirection = -1;
-	else if (lara->Control.MoveAngle == (short)(item->Pose.Orientation.y + ANGLE(90.0f)))
+	else if (lara->Control.MoveAngle == short(item->Pose.Orientation.y + ANGLE(90.0f)))
 		climbDirection = 1;
 
 	// Temporarily move item a bit closer to the wall to get more precise coll results
@@ -248,7 +248,7 @@ bool DoLaraLedgeHang(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	if (!(TrInput & IN_ACTION) || lara->Control.HandStatus != HandStatus::Free || coll->HitStatic)
+	if (!IsHeld(In::Action) || lara->Control.HandStatus != HandStatus::Free || coll->HitStatic)
 		return false;
 
 	// Grab monkey swing.
@@ -272,9 +272,13 @@ bool DoLaraLedgeHang(ItemInfo* item, CollisionInfo* coll)
 		//return true;
 
 		if (item->Animation.ActiveState == LS_JUMP_UP)
+		{
 			SetAnimation(item, LA_REACH_TO_HANG, 12);
+		}
 		else if (TestHangSwingIn(item, coll))
+		{
 			SetAnimation(item, LA_REACH_TO_HANG_OSCILLATE);
+		}
 		else
 			SetAnimation(item, LA_REACH_TO_HANG);
 
@@ -290,9 +294,13 @@ bool DoLaraLedgeHang(ItemInfo* item, CollisionInfo* coll)
 	if (ladder)
 	{
 		if (item->Animation.ActiveState == LS_JUMP_UP)
+		{
 			SetAnimation(item, LA_REACH_TO_HANG, 12);
+		}
 		else if (TestHangSwingIn(item, coll))
+		{
 			SetAnimation(item, LA_REACH_TO_HANG_OSCILLATE);
+		}
 		else
 			SetAnimation(item, LA_REACH_TO_HANG);
 
@@ -1748,25 +1756,24 @@ WaterClimbOutTestResult TestLaraWaterClimbOut(ItemInfo* item, CollisionInfo* col
 
 LedgeHangTestResult TestLaraLedgeHang(ItemInfo* item, CollisionInfo* coll)
 {
-	static const float handRoomTolerance = CLICK(0.1f);
-
-	int y = item->Pose.Position.y - coll->Setup.Height;
-	auto probeFront = GetCollision(item, item->Pose.Orientation.y, OFFSET_RADIUS(coll->Setup.Radius), -coll->Setup.Height + std::min(item->Animation.Velocity.y, 0.0f));
-	auto probeMiddle = GetCollision(item);
+	static constexpr auto handRoomTolerance = CLICK(0.1f);
 
 	if (!TestValidLedge(item, coll, true))
 		return LedgeHangTestResult{ false };
 
+	int vPosTop = item->Pose.Position.y - coll->Setup.Height;
+	auto pointCollCenter = GetCollision(item);
+	auto pointCollFront = GetCollision(item, item->Pose.Orientation.y, OFFSET_RADIUS(coll->Setup.Radius), -coll->Setup.Height + std::min(item->Animation.Velocity.y, 0.0f));
+
 	int sign = copysign(1, item->Animation.Velocity.y);
 	if (
-		// TODO: Will need to modify this when ledge grabs are made to occur from control functions.
-		(probeFront.Position.Floor * sign) >= (y * sign) &&									// Ledge is lower/higher than player's current position.
-		(probeFront.Position.Floor * sign) <= ((y + item->Animation.Velocity.y) * sign) &&	// Ledge is higher/lower than player's projected position.
+		(pointCollFront.Position.Floor * sign) >= (vPosTop * sign) &&								 // Ledge is lower/higher than player's current position.
+		(pointCollFront.Position.Floor * sign) <= ((vPosTop + item->Animation.Velocity.y) * sign) && // Ledge is higher/lower than player's projected position.
 		
-		abs(probeFront.Position.Ceiling - probeFront.Position.Floor) >= handRoomTolerance && // Adequate hand room.
-		abs(probeFront.Position.Floor - probeMiddle.Position.Floor) >= LARA_HEIGHT_STRETCH)	 // Ledge high enough.
+		abs(pointCollFront.Position.Ceiling - pointCollFront.Position.Floor) >= handRoomTolerance && // Hand room is adequate.
+		abs(pointCollFront.Position.Floor - pointCollCenter.Position.Floor) >= LARA_HEIGHT_STRETCH)	 // Ledge is high enough.
 	{
-		return LedgeHangTestResult{ true, probeFront.Position.Floor };
+		return LedgeHangTestResult{ true, pointCollFront.Position.Floor };
 	}
 
 	return LedgeHangTestResult{ false };

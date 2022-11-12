@@ -14,9 +14,14 @@ using namespace TEN::Input;
 
 namespace TEN::Entities::Player::Context
 {
+	// -----------------------------
+	// CONTEXT ASSESSMENT FUNCTIONS
+	// For State Control & Collision
+	// -----------------------------
+
 	bool CanPerformStep(ItemInfo* item, CollisionInfo* coll)
 	{
-		auto& player = *GetLaraInfo(item);
+		const auto& player = *GetLaraInfo(item);
 
 		if (abs(coll->Middle.Floor) > 0 &&
 			(coll->Middle.Floor <= STEPUP_HEIGHT ||					// Within lower floor bound...
@@ -316,7 +321,7 @@ namespace TEN::Entities::Player::Context
 	{
 		const auto& player = *GetLaraInfo(item);
 
-		if (!(TrInput & (IN_FLARE | IN_DRAW)) &&					   // Avoid unsightly concurrent actions.
+		if (!(IsHeld(In::Flare) || IsHeld(In::DrawWeapon)) &&		   // Avoid unsightly concurrent actions.
 			player.Control.HandStatus == HandStatus::Free &&		   // Hands are free.
 			(player.Control.Weapon.GunType != LaraWeaponType::Flare || // Not handling flare. TODO: Should be allowed, but the flare animation bugs out right now. -- Sezz 2022.03.18
 				player.Flare.Life))

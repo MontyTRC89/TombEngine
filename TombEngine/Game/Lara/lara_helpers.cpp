@@ -287,25 +287,29 @@ void DoLaraTightropeBalanceRegen(ItemInfo* item)
 
 void DoLaraFallDamage(ItemInfo* item)
 {
-	if (item->Animation.Velocity.y >= LARA_DAMAGE_VELOCITY)
-	{
-		if (item->Animation.Velocity.y >= LARA_DEATH_VELOCITY)
-			item->HitPoints = 0;
-		else USE_FEATURE_IF_CPP20([[likely]])
-		{
-			float base = item->Animation.Velocity.y - (LARA_DAMAGE_VELOCITY - 1);
-			item->HitPoints -= LARA_HEALTH_MAX * (pow(base, 2) / 196);
-		}
+	if (item->Animation.Velocity.y < LARA_DAMAGE_VELOCITY)
+		return;
 
-		float rumblePower = ((float)item->Animation.Velocity.y / (float)LARA_DEATH_VELOCITY) * 0.7f;
-		Rumble(rumblePower, 0.3f);
+	if (item->Animation.Velocity.y >= LARA_DEATH_VELOCITY)
+	{
+		item->HitPoints = 0;
 	}
+	else
+	{
+		float base = item->Animation.Velocity.y - (LARA_DAMAGE_VELOCITY - 1);
+		item->HitPoints -= LARA_HEALTH_MAX * (SQUARE(base) / 196);
+	}
+
+	float rumblePower = (item->Animation.Velocity.y / LARA_DEATH_VELOCITY) * 0.7f;
+	Rumble(rumblePower, 0.3f);
 }
 
 LaraInfo*& GetLaraInfo(ItemInfo* item)
 {
 	if (item->ObjectNumber == ID_LARA)
+	{
 		return (LaraInfo*&)item->Data;
+	}
 	else
 	{
 		TENLog(std::string("Attempted to fetch LaraInfo data from entity with object ID ") + std::to_string(item->ObjectNumber), LogLevel::Warning);
@@ -721,8 +725,8 @@ void SetContextWaterClimbOut(ItemInfo* item, CollisionInfo* coll, WaterClimbOutT
 
 	item->Animation.ActiveState = LS_ONWATER_EXIT;
 	item->Animation.IsAirborne = false;
-	item->Animation.Velocity.z = 0;
-	item->Animation.Velocity.y = 0;
+	item->Animation.Velocity.y = 0.0f;
+	item->Animation.Velocity.z = 0.0f;
 	lara.ProjectedFloorHeight = climbOutContext.Height;
 	lara.TargetOrientation = EulerAngles(0, coll->NearestLedgeAngle, 0);
 	lara.Control.TurnRate.y = 0;
@@ -839,7 +843,7 @@ void newSetLaraSlideAnimation(ItemInfo* item, CollisionInfo* coll)
 	// Slide backward.
 	else
 	{
-		if (item->Animation.ActiveState == LS_SLIDE_BACK && abs((short)(deltaAngle - ANGLE(180.0f))) <= -ANGLE(180.0f))
+		if (item->Animation.ActiveState == LS_SLIDE_BACK && abs(short(deltaAngle - ANGLE(180.0f))) <= -ANGLE(180.0f))
 			return;
 
 		SetAnimation(item, LA_SLIDE_BACK_START);
@@ -852,10 +856,10 @@ void SetLaraHang(ItemInfo* item)
 
 	ResetLaraFlex(item);
 	item->Animation.IsAirborne = false;
-	item->Animation.Velocity.z = 0;
-	item->Animation.Velocity.y = 0;
+	item->Animation.Velocity.y = 0.0f;
+	item->Animation.Velocity.z = 0.0f;
 	lara.Control.HandStatus = HandStatus::Busy;
-	lara.ExtraTorsoRot = EulerAngles();
+	lara.ExtraTorsoRot = EulerAngles::Zero;
 }
 
 void SetLaraHangReleaseAnimation(ItemInfo* item)
