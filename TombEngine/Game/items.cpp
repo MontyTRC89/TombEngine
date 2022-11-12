@@ -526,7 +526,7 @@ void InitialiseItem(short itemNumber)
 		item->Model.MeshIndex.clear();
 	}
 
-	if (Objects[item->ObjectNumber].initialise != NULL)
+	if (Objects[item->ObjectNumber].initialise != nullptr)
 		Objects[item->ObjectNumber].initialise(itemNumber);
 }
 
