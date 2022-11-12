@@ -96,22 +96,13 @@ namespace TEN::Math::Geometry
 		return FROM_RAD(acos(normal.Dot(Vector3::Down))); // Up.
 	}
 
-	// FIXME
 	short GetSurfaceAspectAngle(const Vector3& normal)
 	{
 		if (normal == Vector3::Down) // Up.
 			return 0;
 
-		return FROM_RAD(acos(normal.z / sqrt(SQUARE(normal.x) + SQUARE(normal.z))));
-	}
-	
-	// TODO: Remove. Above version doesn't work properly yet, so keeping just in case.
-	short GetSurfaceAspectAngle(const Vector2& tilt)
-	{
-		if (tilt == Vector2::Zero)
-			return 0;
-
-		return FROM_RAD(atan2(-tilt.x, -tilt.y));
+		return FROM_RAD(atan2(normal.x, normal.z));
+		//return FROM_RAD(acos(normal.z / sqrt(SQUARE(normal.x) + SQUARE(normal.z))));
 	}
 
 	float GetDistanceToLine(const Vector3& origin, const Vector3& linePoint0, const Vector3& linePoint1)

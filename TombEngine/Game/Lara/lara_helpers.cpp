@@ -389,7 +389,7 @@ short GetLaraSlideHeadingAngle(ItemInfo* item, CollisionInfo* coll)
 
 		// Confirm angles are intersecting.
 		if (Geometry::TestAngleIntersection(aspectAngle, projAspectAngle, creaseAspectAngle))
-			headingAngle = creaseAspectAngle;// +ANGLE(180.0f); // TODO: Signs are wrong somewhere. Add 180 for now.
+			headingAngle = creaseAspectAngle + ANGLE(180.0f); // TODO: Signs are wrong somewhere. Add 180 for now.
 	}
 
 	// Check whether extended slope mechanics are enabled.
