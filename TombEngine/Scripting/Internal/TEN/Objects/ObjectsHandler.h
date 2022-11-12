@@ -65,9 +65,9 @@ private:
 	}
 
 	template <typename R, char const* S>
-	std::vector <string> GetBySlotName(GAME_OBJECT_ID objID)
+	std::vector <std::unique_ptr<R>> GetMoveablesBySlot(GAME_OBJECT_ID objID)
 	{
-		std::vector<string> items = {};
+		std::vector<std::unique_ptr<R>> items = {};
 		for (auto& [key, val] : m_nameMap)
 		{
 			if (!std::holds_alternative<std::reference_wrapper<MESH_INFO>>(val))
@@ -78,7 +78,7 @@ private:
 
 				if (objID == objectNumber)
 				{
-					items.push_back(key);
+					items.push_back(std::make_unique<R>(std::get<R::IdentifierType>(m_nameMap.at(key))));
 				}
 			}
 		}
@@ -87,9 +87,9 @@ private:
 	}
 
 	template <typename R, char const* S>
-	std::vector <string> GetById(int slot)
+	std::vector <std::unique_ptr<R>> GetStaticsById(int slot)
 	{
-		std::vector<string> items = {};
+		std::vector<std::unique_ptr<R>> items = {};
 		for (auto& [key, val] : m_nameMap)
 		{
 			if (std::holds_alternative<std::reference_wrapper<MESH_INFO>>(val))
@@ -99,7 +99,7 @@ private:
 				int slotNr = slot;
 
 				if (staticNumber == slotNr)
-					items.push_back(key);
+					items.push_back(std::make_unique<R>(std::get<R::IdentifierType>(m_nameMap.at(key))));
 			}
 		}
 
