@@ -1300,7 +1300,6 @@ struct LaraInfo
 	bool BurnSmoke;
 
 	byte Wet[NUM_LARA_MESHES];
-	int MeshPtrs[NUM_LARA_MESHES];
 	signed char Location;
 	signed char HighestLocation;
 	signed char LocationPad;

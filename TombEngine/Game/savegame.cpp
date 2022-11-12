@@ -228,11 +228,6 @@ bool SaveGame::Save(int slot)
 		examinesCombo.push_back(Lara.Inventory.ExaminesCombo[i]);
 	auto examinesComboOffset = fbb.CreateVector(examinesCombo);
 
-	std::vector<int> meshPtrs;
-	for (int i = 0; i < 15; i++)
-		meshPtrs.push_back(Lara.MeshPtrs[i]);
-	auto meshPtrsOffset = fbb.CreateVector(meshPtrs);
-
 	std::vector<byte> wet;
 	for (int i = 0; i < 15; i++)
 		wet.push_back(Lara.Wet[i] == 1);
@@ -440,7 +435,6 @@ bool SaveGame::Save(int slot)
 	lara.add_left_arm(leftArmOffset);
 	lara.add_location(Lara.Location);
 	lara.add_location_pad(Lara.LocationPad);
-	lara.add_mesh_ptrs(meshPtrsOffset);
 	lara.add_poison_potency(Lara.PoisonPotency);
 	lara.add_projected_floor_height(Lara.ProjectedFloorHeight);
 	lara.add_right_arm(rightArmOffset);
@@ -472,6 +466,11 @@ bool SaveGame::Save(int slot)
 		for (int i = 0; i < 7; i++)
 			itemFlags.push_back(itemToSerialize.ItemFlags[i]);
 		auto itemFlagsOffset = fbb.CreateVector(itemFlags);
+
+		std::vector<int> meshPointers;
+		for (auto p : itemToSerialize.Model.MeshIndex)
+			meshPointers.push_back(p);
+		auto meshPointerOffset = fbb.CreateVector(meshPointers);
 				
 		flatbuffers::Offset<Save::Creature> creatureOffset;
 		flatbuffers::Offset<Save::QuadBike> quadOffset;
@@ -628,6 +627,8 @@ bool SaveGame::Save(int slot)
 		serializedItem.add_hit_points(itemToSerialize.HitPoints);
 		serializedItem.add_item_flags(itemFlagsOffset);
 		serializedItem.add_mesh_bits(itemToSerialize.MeshBits.ToPackedBits());
+		serializedItem.add_mesh_pointers(meshPointerOffset);
+		serializedItem.add_base_mesh(itemToSerialize.Model.BaseMesh);
 		serializedItem.add_object_id(itemToSerialize.ObjectNumber);
 		serializedItem.add_pose(&FromPHD(itemToSerialize.Pose));
 		serializedItem.add_required_state(itemToSerialize.Animation.RequiredState);
@@ -645,7 +646,6 @@ bool SaveGame::Save(int slot)
 		serializedItem.add_ai_bits(itemToSerialize.AIBits);
 		serializedItem.add_collidable(itemToSerialize.Collidable);
 		serializedItem.add_looked_at(itemToSerialize.LookedAt);
-		serializedItem.add_swap_mesh_flags(itemToSerialize.MeshSwapBits.ToPackedBits());
 
 		if (Objects[itemToSerialize.ObjectNumber].intelligent 
 			&& itemToSerialize.Data.is<CreatureInfo>())
@@ -1388,7 +1388,10 @@ bool SaveGame::Load(int slot)
 
 		// Mesh stuff
 		item->MeshBits = savedItem->mesh_bits();
-		item->MeshSwapBits = savedItem->swap_mesh_flags();
+
+		item->Model.BaseMesh = savedItem->base_mesh();
+		for (int j = 0; j < savedItem->mesh_pointers()->size(); j++)
+			item->Model.MeshIndex[j] = savedItem->mesh_pointers()->Get(j);
 
 		if (item->ObjectNumber >= ID_SMASH_OBJECT1 && item->ObjectNumber <= ID_SMASH_OBJECT8 &&
 			(item->Flags & ONESHOT))
@@ -1700,11 +1703,6 @@ bool SaveGame::Load(int slot)
 	for (int i = 0; i < s->lara()->inventory()->examines_combo()->size(); i++)
 	{
 		Lara.Inventory.ExaminesCombo[i] = s->lara()->inventory()->examines_combo()->Get(i);
-	}
-
-	for (int i = 0; i < s->lara()->mesh_ptrs()->size(); i++)
-	{
-		Lara.MeshPtrs[i] = s->lara()->mesh_ptrs()->Get(i);
 	}
 
 	for (int i = 0; i < NUM_LARA_MESHES; i++)

@@ -69,7 +69,7 @@ namespace TEN::Renderer
 						if (!nativeItem.MeshBits.Test(sphereMeshes[i]))
 							continue;
 
-						auto& mesh = g_Level.Meshes[Lara.MeshPtrs[sphereMeshes[i]]];
+						auto& mesh = g_Level.Meshes[nativeItem.Model.MeshIndex[sphereMeshes[i]]];
 						auto offset = Vector3i(mesh.sphere.Center.x, mesh.sphere.Center.y, mesh.sphere.Center.z);
 
 						// Push foot spheres a little lower.
@@ -225,7 +225,7 @@ namespace TEN::Renderer
 
 			for (int k = 0; k < skin.ObjectMeshes.size(); k++)
 			{
-				auto* mesh = item->ObjectNumber == ID_LARA ? GetMesh(Lara.MeshPtrs[k]) : skin.ObjectMeshes[k];
+				auto* mesh = GetMesh(item->MeshIndex[k]);
 
 				for (auto& bucket : mesh->Buckets)
 				{
@@ -1711,7 +1711,6 @@ namespace TEN::Renderer
 		ItemInfo* nativeItem = &g_Level.Items[item->ItemNumber];
 		RendererRoom* room = &m_rooms[item->RoomNumber];
 		RendererObject& moveableObj = *m_moveableObjects[item->ObjectNumber];
-		ObjectInfo* obj = &Objects[item->ObjectNumber];
 
 		// Bind item main properties
 		m_stItem.World = item->World;
@@ -1733,17 +1732,7 @@ namespace TEN::Renderer
 			if (!(nativeItem->MeshBits & (1 << k)))
 				continue;
 
-			RendererMesh* mesh = moveableObj.ObjectMeshes[k];
-
-			// Do the swapmesh
-			if (obj->meshSwapSlot != -1 && m_moveableObjects[obj->meshSwapSlot].has_value() && ((nativeItem->MeshSwapBits.ToPackedBits() >> k) & 1))
-			{
-				RendererObject& swapMeshObj = *m_moveableObjects[obj->meshSwapSlot];
-				if (swapMeshObj.ObjectMeshes.size() > k)
-					mesh = swapMeshObj.ObjectMeshes[k];
-			}
-
-			DrawMoveableMesh(item, mesh, room, k, transparent);
+			DrawMoveableMesh(item, GetMesh(item->MeshIndex[k]), room, k, transparent);
 		}
 	}
 

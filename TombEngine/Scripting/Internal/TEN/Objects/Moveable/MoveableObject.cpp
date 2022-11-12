@@ -822,7 +822,7 @@ bool Moveable::MeshIsSwapped(int meshId) const
 	if (!MeshExists(meshId))
 		return false;
 
-	return m_item->MeshSwapBits.Test(meshId);
+	return m_item->Model.MeshIndex[meshId] == m_item->Model.BaseMesh + meshId;
 }
 
 void Moveable::SwapMesh(int meshId, int swapSlotId, sol::optional<int> swapMeshIndex)
@@ -833,32 +833,26 @@ void Moveable::SwapMesh(int meshId, int swapSlotId, sol::optional<int> swapMeshI
 	if (!swapMeshIndex.has_value())
 		 swapMeshIndex = meshId;
 
-	// TODO: After beta, we should refactor whole meshswap workflow,
-	// because currently Lara and other objects use different convention -- Lwmte, 09.07.22
 
-	if (m_item->IsLara())
+	if (swapSlotId <= -1 || swapSlotId >= ID_NUMBER_OBJECTS)
 	{
-		if (swapSlotId <= -1)
-			return;
-
-		auto* lara = GetLaraInfo(m_item);
-
-		if (swapSlotId >= ID_NUMBER_OBJECTS || !Objects[swapSlotId].loaded)
-		{
-			TENLog("Specified slot does not exist in level!", LogLevel::Error);
-			return;
-		}
-
-		if (swapMeshIndex.value() >= Objects[swapSlotId].nmeshes)
-		{
-			TENLog("Specified meshswap index does not exist in meshswap slot!", LogLevel::Error);
-			return;
-		}
-
-		lara->MeshPtrs[meshId] = Objects[swapSlotId].meshIndex + swapMeshIndex.value();
+		TENLog("Specified meshswap slot ID is incorrect!", LogLevel::Error);
+		return;
 	}
-	else
-		m_item->MeshSwapBits.Set(meshId);
+
+	if (!Objects[swapSlotId].loaded)
+	{
+		TENLog("Object in specified meshswap slot doesn't exist in level!", LogLevel::Error);
+		return;
+	}
+
+	if (swapMeshIndex.value() >= Objects[swapSlotId].nmeshes)
+	{
+		TENLog("Specified meshswap index does not exist in meshswap slot!", LogLevel::Error);
+		return;
+	}
+
+	m_item->Model.MeshIndex[meshId] = Objects[swapSlotId].meshIndex + swapMeshIndex.value();
 }
 
 void Moveable::UnswapMesh(int meshId)
@@ -866,20 +860,7 @@ void Moveable::UnswapMesh(int meshId)
 	if (!MeshExists(meshId))
 		return;
 
-	if (m_item->IsLara())
-	{
-		auto* lara = GetLaraInfo(m_item);
-
-		if (meshId >= NUM_LARA_MESHES)
-		{
-			TENLog("Specified mesh index does not exist!", LogLevel::Error);
-			return;
-		}
-
-		lara->MeshPtrs[meshId] = Objects[ID_LARA_SKIN].meshIndex + meshId;
-	}
-	else
-		m_item->MeshSwapBits.Clear(meshId);
+	m_item->Model.MeshIndex[meshId] = m_item->Model.BaseMesh + meshId;
 }
 
 void Moveable::EnableItem()
