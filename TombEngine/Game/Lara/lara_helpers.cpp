@@ -42,8 +42,7 @@ void HandleLaraMovementParameters(ItemInfo* item, CollisionInfo* coll)
 
 	// Update AFK pose timer.
 	if (lara.Control.Count.Pose < LARA_POSE_TIME && Context::CanAFKPose(item, coll) &&
-		!(IsHeld(In::Look) || IsOpticActionHeld()) &&
-		g_GameFlow->HasAFKPose())
+		!(IsHeld(In::Look) || IsOpticActionHeld()))
 	{
 		lara.Control.Count.Pose++;
 	}
@@ -51,11 +50,11 @@ void HandleLaraMovementParameters(ItemInfo* item, CollisionInfo* coll)
 		lara.Control.Count.Pose = 0;
 
 	// Reset running jump timer.
-	if (!IsRunJumpCountableState((LaraState)item->Animation.ActiveState))
+	if (!IsRunJumpCountableState(item->Animation.ActiveState))
 		lara.Control.Count.Run = 0;
 
 	// Reset running jump action queue.
-	if (!IsRunJumpQueueableState((LaraState)item->Animation.ActiveState))
+	if (!IsRunJumpQueueableState(item->Animation.ActiveState))
 		lara.Control.RunJumpQueued = false;
 
 	// Reset lean.
@@ -75,7 +74,7 @@ void HandleLaraMovementParameters(ItemInfo* item, CollisionInfo* coll)
 	// Apply and reset turn rate.
 	item->Pose.Orientation.y += lara.Control.TurnRate.y;
 	if (!(IsHeld(In::Left) || IsHeld(In::Right)))
-		lara.Control.TurnRate.y = 0;
+		ResetLaraTurnRateY(item);
 
 	lara.Control.IsLow = false;
 }
