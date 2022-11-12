@@ -15,6 +15,7 @@ Version 1.0.3
 * Increase amount of maximum secrets per level from 8 to 32.
 * Improve game and inventory input handling.
 * Adjust sprint jump timing.
+* Fix going into inventory and load/save dialogs during fade-ins and fade-outs.
 * Fix dodgy weapon lock angle constraints.
 * Fix wrong shotgun ammo pickup amount.
 * Fix shotgun using 6 units of ammo with each shot.
