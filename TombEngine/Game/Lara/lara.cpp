@@ -499,8 +499,9 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 	if (!lara.Control.Locked)
 		lara.LocationPad = -1;
 
-	auto oldPos = item->Pose.Position;
-
+	auto prevPos = item->Pose.Position;
+	
+	// Free hands failsafe.
 	if (lara.Control.HandStatus == HandStatus::Busy &&
 		item->Animation.AnimNumber == LA_STAND_IDLE &&
 		item->Animation.ActiveState == LS_IDLE &&
@@ -510,8 +511,11 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 		lara.Control.HandStatus = HandStatus::Free;
 	}
 
-	if (lara.SprintEnergy < LARA_SPRINT_ENERGY_MAX && item->Animation.ActiveState != LS_SPRINT)
+	if (lara.SprintEnergy < LARA_SPRINT_ENERGY_MAX &&
+		item->Animation.ActiveState != LS_SPRINT)
+	{
 		lara.SprintEnergy++;
+	}
 
 	RumbleLaraHealthCondition(item);
 
@@ -800,7 +804,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 		break;
 	}
 
-	Statistics.Game.Distance += (int)round(Vector3::Distance(oldPos.ToVector3(), item->Pose.Position.ToVector3()));
+	Statistics.Game.Distance += (int)round(Vector3::Distance(prevPos.ToVector3(), item->Pose.Position.ToVector3()));
 }
 
 void LaraAboveWater(ItemInfo* item, CollisionInfo* coll)

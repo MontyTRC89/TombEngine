@@ -46,8 +46,8 @@
 #include "Scripting/Include/ScriptInterfaceGame.h"
 #include "Scripting/Include/Strings/ScriptInterfaceStringsHandler.h"
 #include "Sound/sound.h"
-#include "Specific/Input/Input.h"
 #include "Specific/clock.h"
+#include "Specific/Input/Input.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
 #include "Specific/winmain.h"
@@ -57,23 +57,20 @@ using namespace TEN::Effects::Drip;
 using namespace TEN::Effects::Environment;
 using namespace TEN::Effects::Explosion;
 using namespace TEN::Effects::Footprints;
-using namespace TEN::Entities::Generic;
 using namespace TEN::Effects::Lightning;
 using namespace TEN::Effects::Smoke;
 using namespace TEN::Effects::Spark;
+using namespace TEN::Entities::Generic;
 using namespace TEN::Entities::Switches;
 using namespace TEN::Entities::TR4;
 using namespace TEN::Floordata;
 using namespace TEN::Input;
-using namespace TEN::Math::Random;
+using namespace TEN::Math;
 using namespace TEN::Renderer;
-using std::string;
-using std::unordered_map;
-using std::vector;
 
-int GameTimer       = 0;
-int GlobalCounter   = 0;
-int Wibble          = 0;
+int GameTimer	  = 0;
+int GlobalCounter = 0;
+int Wibble		  = 0;
 
 bool InitialiseGame;
 bool DoTheGame;
@@ -670,12 +667,12 @@ void KillMoveEffects()
 
 int GetRandomControl()
 {
-	return GenerateInt();
+	return Random::GenerateInt();
 }
 
 int GetRandomDraw()
 {
-	return GenerateInt();
+	return Random::GenerateInt();
 }
 
 void CleanUp()

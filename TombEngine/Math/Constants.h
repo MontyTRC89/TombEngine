@@ -21,8 +21,9 @@
 	constexpr inline auto DEEP_WATER = INT_MAX - 1; // NOTE: -1 prevents issues with sign change.
 
 	constexpr inline auto BLOCK	 = [](auto x) { return (BLOCK_UNIT * x); };
-	constexpr inline auto SECTOR = [](auto x) { return BLOCK(x); }; // TODO: Replace with BLOCK() at some point.
-	constexpr inline auto CLICK	 = [](auto x) { return ((BLOCK(1) / 4) * x); };
+	constexpr inline auto SECTOR = [](auto x) { return BLOCK(x); };				// TODO: Replace with BLOCK() at some point.
+	constexpr inline auto STEP	 = [](auto x) { return ((BLOCK(1) / 4) * x); };
+	constexpr inline auto CLICK	 = [](auto x) { return STEP(x); };				// TODO: Replace with STEP() at some point? Step or """"click"""", but not both.
 
 	constexpr inline auto STEP_SIZE		 = CLICK(1);
 	constexpr inline auto STOP_SIZE		 = CLICK(2);
