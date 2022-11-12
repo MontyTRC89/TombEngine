@@ -374,30 +374,27 @@ short GetLaraSlideHeadingAngle(ItemInfo* item, CollisionInfo* coll)
 	auto projSurfaceNormal = Geometry::GetFloorNormal(GetCollision(item, aspectAngle, item->Animation.Velocity.z).FloorTilt);
 	short projAspectAngle = Geometry::GetSurfaceAspectAngle(projSurfaceNormal);
 
-	short headingAngle = aspectAngle;
-
 	// Handle crease in slope.
 	if (aspectAngle != projAspectAngle)
 	{
-		// Intersection line of two planes is parallel to cross product of their normal vectors.
-		// Cross surface normals of both slopes to get direction vector of crease.
+		// Cross normals of both slope surfaces to get crease normal between them.
 		auto intersection = surfaceNormal.Cross(projSurfaceNormal);
 		if (intersection.y < 0.0f)
 			intersection = -intersection;
 
-		// TODO: Check why int casts are required. Weird behaviour.
+		// TODO: Check why int casts are required. Weird behaviour occurs.
 		short creaseAspectAngle = FROM_RAD(atan2((int)intersection.x, (int)intersection.z));
 
-		// Confirm angles are intersecting.
+		// Confirm aspect angles are intersecting.
 		if (Geometry::TestAngleIntersection(aspectAngle, projAspectAngle, creaseAspectAngle))
-			headingAngle = creaseAspectAngle + ANGLE(180.0f); // TODO: Signs are wrong somewhere. Add 180 for now.
+			return (creaseAspectAngle + ANGLE(180.0f)); // TODO: Signs are wrong somewhere. Add 180 for now.
 	}
 
 	// Check whether extended slope mechanics are enabled.
-	//if (!g_GameFlow->HasSlideExtended())
-	//	return (GetQuadrant(headingAngle) * ANGLE(90.0f));
+	if (g_GameFlow->HasSlideExtended())
+		return aspectAngle;
 
-	return headingAngle;
+	return (GetQuadrant(aspectAngle) * ANGLE(90.0f));
 }
 
 short ModulateLaraTurnRate(short turnRate, short accelRate, short minTurnRate, short maxTurnRate, float axisCoeff, bool invert)
