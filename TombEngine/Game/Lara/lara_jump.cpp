@@ -10,20 +10,22 @@
 #include "Game/Lara/lara_basic.h"
 #include "Game/Lara/lara_overhang.h"
 #include "Game/Lara/lara_slide.h"
-#include "Flow/ScriptInterfaceFlowHandler.h"
+#include "Game/Lara/PlayerContext.h"
+#include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Sound/sound.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
 using namespace TEN::Input;
+using namespace TEN::Entities::Player;
 
 // -----------------------------
 // JUMP
 // Control & Collision Functions
 // -----------------------------
 
-// TODO: Unused? Naming is also completely mismatched.
+// TODO: This state is unused. Names are also completely mismatched.
 // State:	  LS_GRAB_TO_FALL
 // Collision: lara_void_func()
 void lara_col_land(ItemInfo* item, CollisionInfo* coll)
@@ -216,9 +218,6 @@ void lara_col_reach(ItemInfo* item, CollisionInfo* coll)
 	coll->Setup.Mode = CollisionProbeMode::FreeForward;
 	GetCollisionInfo(coll, item);
 
-	if (Context::CanLand(item, coll) && Context::CanSlide(item, coll))
-		SetLaraSlideAnimation(item, coll);
-
 	// Overhang hook.
 	SlopeReachExtra(item, coll);
 
@@ -342,13 +341,6 @@ void lara_col_jump_prepare(ItemInfo* item, CollisionInfo* coll)
 	if (Context::CanFall(item, coll))
 	{
 		SetLaraFallAnimation(item);
-		return;
-	}
-
-	if (Context::CanSlide(item, coll))
-	{
-		SetLaraSlideAnimation(item, coll);
-		SetLaraLand(item, coll);
 		return;
 	}
 

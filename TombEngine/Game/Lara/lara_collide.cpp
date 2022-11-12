@@ -473,9 +473,6 @@ void LaraJumpCollision(ItemInfo* item, CollisionInfo* coll, short moveAngle)
 	GetCollisionInfo(coll, item);
 
 	LaraDeflectEdgeJump(item, coll);
-
-	if (Context::CanLand(item, coll) && Context::CanSlide(item, coll))
-		SetLaraSlideAnimation(item, coll);
 }
 
 void LaraSurfaceCollision(ItemInfo* item, CollisionInfo* coll)

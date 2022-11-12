@@ -12,11 +12,13 @@
 #include "Game/Lara/lara_collide.h"
 #include "Game/Lara/lara_flare.h"
 #include "Game/Lara/lara_helpers.h"
+#include "Game/Lara/PlayerContext.h"
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
 
 using namespace TEN::Input;
+using namespace TEN::Entities::Player;
 
 // -----------------------------
 // CROUCH & CRAWL
@@ -42,8 +44,8 @@ void lara_as_crawl_vault(ItemInfo* item, CollisionInfo* coll)
 // CROUCH:
 // -------
 
-// State:		LS_CROUCH_IDLE (71)
-// Collision:	lara_col_crouch_idle()
+// State:	  LS_CROUCH_IDLE (71)
+// Collision: lara_col_crouch_idle()
 void lara_as_crouch_idle(ItemInfo* item, CollisionInfo* coll)
 {
 	// TODO: Deplete air meter if Lara's head is below the water. Original implementation had a weird buffer zone before
@@ -117,8 +119,8 @@ void lara_as_crouch_idle(ItemInfo* item, CollisionInfo* coll)
 	item->Animation.TargetState = LS_IDLE;
 }
 
-// State:		LS_CROUCH_IDLE (71)
-// Control:		lara_as_crouch_idle()
+// State:	LS_CROUCH_IDLE (71)
+// Control: lara_as_crouch_idle()
 void lara_col_crouch_idle(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& lara = *GetLaraInfo(item);
@@ -160,8 +162,8 @@ void lara_col_crouch_idle(ItemInfo* item, CollisionInfo* coll)
 	}
 }
 
-// State:		LS_CROUCH_ROLL (72)
-// Collision:	lara_as_crouch_roll()
+// State:	  LS_CROUCH_ROLL (72)
+// Collision: lara_as_crouch_roll()
 void lara_as_crouch_roll(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& lara = *GetLaraInfo(item);
@@ -182,8 +184,8 @@ void lara_as_crouch_roll(ItemInfo* item, CollisionInfo* coll)
 	item->Animation.TargetState = LS_CROUCH_IDLE;
 }
 
-// State:		LS_CROUCH_ROLL (72)
-// Control:		lara_as_crouch_roll()
+// State:	LS_CROUCH_ROLL (72)
+// Control: lara_as_crouch_roll()
 void lara_col_crouch_roll(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& lara = *GetLaraInfo(item);
@@ -235,8 +237,8 @@ void lara_col_crouch_roll(ItemInfo* item, CollisionInfo* coll)
 	}
 }
 
-// State:		LS_CROUCH_TURN_LEFT (105)
-// Collision:	lara_col_crouch_turn_left()
+// State:	  LS_CROUCH_TURN_LEFT (105)
+// Collision: lara_col_crouch_turn_left()
 void lara_as_crouch_turn_left(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& lara = *GetLaraInfo(item);
@@ -283,15 +285,15 @@ void lara_as_crouch_turn_left(ItemInfo* item, CollisionInfo* coll)
 	item->Animation.TargetState = LS_IDLE;
 }
 
-// State:		LS_CRAWL_TURN_LEFT (105)
-// Control:		lara_as_crouch_turn_left()
+// State:	LS_CRAWL_TURN_LEFT (105)
+// Control: lara_as_crouch_turn_left()
 void lara_col_crouch_turn_left(ItemInfo* item, CollisionInfo* coll)
 {
 	lara_col_crouch_idle(item, coll);
 }
 
-// State:		LS_CROUCH_TURN_RIGHT (106)
-// Collision:	lara_col_crouch_turn_right()
+// State:	  LS_CROUCH_TURN_RIGHT (106)
+// Collision: lara_col_crouch_turn_right()
 void lara_as_crouch_turn_right(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& lara = *GetLaraInfo(item);
@@ -338,15 +340,15 @@ void lara_as_crouch_turn_right(ItemInfo* item, CollisionInfo* coll)
 	item->Animation.TargetState = LS_IDLE;
 }
 
-// State:		LS_CRAWL_TURN_RIGHT (106)
-// Control:		lara_as_crouch_turn_right()
+// State:	LS_CRAWL_TURN_RIGHT (106)
+// Control: lara_as_crouch_turn_right()
 void lara_col_crouch_turn_right(ItemInfo* item, CollisionInfo* coll)
 {
 	lara_col_crouch_idle(item, coll);
 }
 
-// State:		LS_CROUCH_TURN_180 (171)
-// Collision:	lara_col_crouch_turn_180()
+// State:	  LS_CROUCH_TURN_180 (171)
+// Collision: lara_col_crouch_turn_180()
 void lara_as_crouch_turn_180(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& lara = *GetLaraInfo(item);
@@ -371,8 +373,8 @@ void lara_as_crouch_turn_180(ItemInfo* item, CollisionInfo* coll)
 	item->Animation.TargetState = LS_CROUCH_IDLE;
 }
 
-// State:		LS_CROUCH_TURN_180 (171)
-// Control:		lara_as_crouch_turn_180()
+// State:	LS_CROUCH_TURN_180 (171)
+// Control: lara_as_crouch_turn_180()
 void lara_col_crouch_turn_180(ItemInfo* item, CollisionInfo* coll)
 {
 	lara_col_crouch_idle(item, coll);
@@ -382,8 +384,8 @@ void lara_col_crouch_turn_180(ItemInfo* item, CollisionInfo* coll)
 // CRAWL:
 // ------
 
-// State:		LS_CRAWL_IDLE (80)
-// Collision:	lara_col_crawl_idle()
+// State:	  LS_CRAWL_IDLE (80)
+// Collision: lara_col_crawl_idle()
 void lara_as_crawl_idle(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& lara = *GetLaraInfo(item);
@@ -485,13 +487,13 @@ void lara_as_crawl_idle(ItemInfo* item, CollisionInfo* coll)
 	lara.Control.HandStatus = HandStatus::Free;
 }
 
-// State:		LS_CRAWL_IDLE (80)
-// Control:		lara_as_crawl_idle()
+// State:	LS_CRAWL_IDLE (80)
+// Control: lara_as_crawl_idle()
 void lara_col_crawl_idle(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& lara = *GetLaraInfo(item);
 
-	item->Animation.Velocity.y = 0;
+	item->Animation.Velocity.y = 0.0;
 	item->Animation.IsAirborne = false;
 	lara.Control.KeepLow = Context::IsInNarrowSpace(item, coll);
 	lara.Control.IsLow = true;
@@ -529,8 +531,8 @@ void lara_col_crawl_idle(ItemInfo* item, CollisionInfo* coll)
 	}
 }
 
-// State:		LS_CRAWL_FORWARD (81)
-// Collision:	lara_col_crawl_forward()
+// State:	  LS_CRAWL_FORWARD (81)
+// Collision: lara_col_crawl_forward()
 void lara_as_crawl_forward(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& lara = *GetLaraInfo(item);
@@ -575,8 +577,8 @@ void lara_as_crawl_forward(ItemInfo* item, CollisionInfo* coll)
 	item->Animation.TargetState = LS_CRAWL_IDLE;
 }
 
-// State:		LS_CRAWL_FORWARD (81)
-// Control:		lara_as_crawl_forward()
+// State:	LS_CRAWL_FORWARD (81)
+// Control: lara_as_crawl_forward()
 void lara_col_crawl_forward(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& lara = *GetLaraInfo(item);
@@ -623,8 +625,8 @@ void lara_col_crawl_forward(ItemInfo* item, CollisionInfo* coll)
 	}
 }
 
-// State:		LS_CRAWL_BACK (86)
-// Collision:	lara_col_crawl_back()
+// State:	  LS_CRAWL_BACK (86)
+// Collision: lara_col_crawl_back()
 void lara_as_crawl_back(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& lara = *GetLaraInfo(item);
@@ -664,13 +666,13 @@ void lara_as_crawl_back(ItemInfo* item, CollisionInfo* coll)
 	item->Animation.TargetState = LS_CRAWL_IDLE;
 }
 
-// State:		LS_CRAWL_BACK (86)
-// Control:		lara_as_crawl_back()
+// State:	LS_CRAWL_BACK (86)
+// Control: lara_as_crawl_back()
 void lara_col_crawl_back(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& lara = *GetLaraInfo(item);
 
-	item->Animation.Velocity.y = 0;
+	item->Animation.Velocity.y = 0.0f;
 	item->Animation.IsAirborne = false;
 	lara.Control.KeepLow = Context::IsInNarrowSpace(item, coll);
 	lara.Control.IsLow = true;
@@ -710,8 +712,8 @@ void lara_col_crawl_back(ItemInfo* item, CollisionInfo* coll)
 	}
 }
 
-// State:		LS_CRAWL_TURN_LEFT (84)
-// Collision:	lara_col_crawl_turn_left()
+// State:	  LS_CRAWL_TURN_LEFT (84)
+// Collision: lara_col_crawl_turn_left()
 void lara_as_crawl_turn_left(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& lara = *GetLaraInfo(item);
@@ -763,15 +765,15 @@ void lara_as_crawl_turn_left(ItemInfo* item, CollisionInfo* coll)
 	item->Animation.TargetState = LS_CRAWL_IDLE;
 }
 
-// State:		LS_CRAWL_TURN_LEFT (84)
-// Control:		lara_as_crawl_turn_left()
+// State:	LS_CRAWL_TURN_LEFT (84)
+// Control: lara_as_crawl_turn_left()
 void lara_col_crawl_turn_left(ItemInfo* item, CollisionInfo* coll)
 {
 	lara_col_crawl_idle(item, coll);
 }
 
-// State:		LS_CRAWL_TURN_RIGHT (85)
-// Collision:	lara_col_crawl_turn_right()
+// State:	  LS_CRAWL_TURN_RIGHT (85)
+// Collision: lara_col_crawl_turn_right()
 void lara_as_crawl_turn_right(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& lara = *GetLaraInfo(item);
@@ -823,15 +825,15 @@ void lara_as_crawl_turn_right(ItemInfo* item, CollisionInfo* coll)
 	item->Animation.TargetState = LS_CRAWL_IDLE;
 }
 
-// State:		LS_CRAWL_TURN_RIGHT (85)
-// Control:		lara_as_crawl_turn_right()
+// State:	LS_CRAWL_TURN_RIGHT (85)
+// Control: lara_as_crawl_turn_right()
 void lara_col_crawl_turn_right(ItemInfo* item, CollisionInfo* coll)
 {
 	lara_col_crawl_idle(item, coll);
 }
 
-// State:		LS_CRAWL_TURN_180 (172)
-// Collision:	lara_col_crawl_turn_180()
+// State:	  LS_CRAWL_TURN_180 (172)
+// Collision: lara_col_crawl_turn_180()
 void lara_as_crawl_turn_180(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& lara = *GetLaraInfo(item);
@@ -851,8 +853,8 @@ void lara_as_crawl_turn_180(ItemInfo* item, CollisionInfo* coll)
 	lara.Control.HandStatus = HandStatus::Free;
 }
 
-// State:		LS_CRAWL_TURN_180 (172)
-// Control:		lara_as_crawl_turn_180()
+// State:	LS_CRAWL_TURN_180 (172)
+// Control: lara_as_crawl_turn_180()
 void lara_col_crawl_turn_180(ItemInfo* item, CollisionInfo* coll)
 {
 	lara_col_crawl_idle(item, coll);

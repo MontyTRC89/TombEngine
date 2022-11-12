@@ -9,8 +9,8 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
-#include "Sound/sound.h"
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
+#include "Sound/sound.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
@@ -22,23 +22,23 @@ void lara_as_swimcheat(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	if (TrInput & IN_FORWARD)
+	if (IsHeld(In::Forward))
 		item->Pose.Orientation.x -= ANGLE(3.0f);
-	else if (TrInput & IN_BACK)
+	else if (IsHeld(In::Back))
 		item->Pose.Orientation.x += ANGLE(3.0f);
 
-	if (TrInput & IN_LEFT)
+	if (IsHeld(In::Left))
 		ModulateLaraTurnRateY(item, ANGLE(3.4f), 0, ANGLE(6.0f));
-	else if (TrInput & IN_RIGHT)
+	else if (IsHeld(In::Right))
 		ModulateLaraTurnRateY(item, ANGLE(3.4f), 0, ANGLE(6.0f));
 
-	if (TrInput & IN_ACTION)
+	if (IsHeld(In::Action))
 		TriggerDynamicLight(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, 31, 150, 150, 150);
 
-	if (TrInput & IN_OPTION)
+	if (IsHeld(In::Option))
 		lara->Control.TurnRate.y = -ANGLE(12.0f);
 
-	if (TrInput & IN_JUMP)
+	if (IsHeld(In::Jump))
 	{
 		item->Animation.Velocity.y += LARA_SWIM_VELOCITY_ACCEL * 2;
 		if (item->Animation.Velocity.y > LARA_SWIM_VELOCITY_MAX * 2)
@@ -49,7 +49,7 @@ void lara_as_swimcheat(ItemInfo* item, CollisionInfo* coll)
 		if (item->Animation.Velocity.y >= LARA_SWIM_VELOCITY_ACCEL)
 			item->Animation.Velocity.y -= item->Animation.Velocity.y / 8;
 		else
-			item->Animation.Velocity.y = 0;
+			item->Animation.Velocity.y = 0.0f;
 	}
 }
 
@@ -73,7 +73,7 @@ void LaraCheatyBits(ItemInfo* item)
 				{
 					SetAnimation(item, LA_DOZY);
 					item->Animation.IsAirborne = false;
-					item->Animation.Velocity.y = 30;
+					item->Animation.Velocity.y = 30.0f;
 					item->Pose.Orientation.x = ANGLE(30.0f);
 					item->HitPoints = LARA_HEALTH_MAX;
 

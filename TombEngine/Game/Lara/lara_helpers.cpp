@@ -216,7 +216,8 @@ void DoLaraCrawlToHangSnap(ItemInfo* item, CollisionInfo* coll)
 	SnapItemToLedge(item, coll);
 	LaraResetGravityStatus(item, coll);
 
-	// Bridges behave differently.
+	// NOTE: Bridges behave differently.
+	// TODO: Crawl-to-hang completely fails on bridges.
 	if (coll->Middle.Bridge < 0)
 	{
 		TranslateItem(item, item->Pose.Orientation.y, -LARA_RADIUS_CRAWL);
@@ -227,18 +228,18 @@ void DoLaraCrawlToHangSnap(ItemInfo* item, CollisionInfo* coll)
 void DoLaraTightropeBalance(ItemInfo* item)
 {
 	auto& lara = *GetLaraInfo(item);
-	const int factor = ((lara.Control.Tightrope.TimeOnTightrope >> 7) & 0xFF) * 128;
 
 	if (IsHeld(In::Left))
 		lara.Control.Tightrope.Balance += ANGLE(1.4f);
 	if (IsHeld(In::Right))
 		lara.Control.Tightrope.Balance -= ANGLE(1.4f);
 
+	int factor = ((lara.Control.Tightrope.TimeOnTightrope >> 7) & 0xFF) * 128;
 	if (lara.Control.Tightrope.Balance < 0)
 	{
 		lara.Control.Tightrope.Balance -= factor;
-		if (lara.Control.Tightrope.Balance <= -ANGLE(45.0f))
-			lara.Control.Tightrope.Balance = -ANGLE(45.0f);
+		if (lara.Control.Tightrope.Balance <= ANGLE(-45.0f))
+			lara.Control.Tightrope.Balance = ANGLE(-45.0f);
 
 	}
 	else if (lara.Control.Tightrope.Balance > 0)
@@ -248,7 +249,7 @@ void DoLaraTightropeBalance(ItemInfo* item)
 			lara.Control.Tightrope.Balance = ANGLE(45.0f);
 	}
 	else
-		lara.Control.Tightrope.Balance = GetRandomControl() & 1 ? -1 : 1;
+		lara.Control.Tightrope.Balance = Random::TestProbability(1.0f / 2) ? -1 : 1;
 }
 
 void DoLaraTightropeLean(ItemInfo* item)
@@ -278,7 +279,7 @@ void DoLaraTightropeBalanceRegen(ItemInfo* item)
 
 	if (lara.Control.Tightrope.Balance < 0)
 	{
-		if (lara.Control.Tightrope.Balance >= -ANGLE(0.75f))
+		if (lara.Control.Tightrope.Balance >= ANGLE(-0.75f))
 			lara.Control.Tightrope.Balance = 0;
 		else
 			lara.Control.Tightrope.Balance += ANGLE(0.75f);
@@ -458,9 +459,9 @@ void ModulateLaraSubsuitSwimTurnRates(ItemInfo* item)
 {
 	auto& lara = *GetLaraInfo(item);
 
-	if (IsHeld(In::Forward) && item->Pose.Orientation.x > -ANGLE(85.0f))
+	if (IsHeld(In::Forward) && item->Pose.Orientation.x > ANGLE(-85.0f))
 	{
-		lara.Control.Subsuit.DXRot = -ANGLE(45.0f);
+		lara.Control.Subsuit.DXRot = ANGLE(-45.0f);
 	}
 	else if (IsHeld(In::Back) && item->Pose.Orientation.x < ANGLE(85.0f))
 	{
@@ -523,8 +524,8 @@ void UpdateLaraSubsuitAngles(ItemInfo* item)
 	if (lara.Control.Subsuit.DXRot != 0)
 	{
 		short rotation = lara.Control.Subsuit.DXRot >> 3;
-		if (rotation < -ANGLE(2.0f))
-			rotation = -ANGLE(2.0f);
+		if (rotation < ANGLE(-2.0f))
+			rotation = ANGLE(-2.0f);
 		else if (rotation > ANGLE(2.0f))
 			rotation = ANGLE(2.0f);
 
@@ -780,7 +781,7 @@ void SetLaraSlideAnimation(ItemInfo* item, CollisionInfo* coll)
 
 	short angle = ANGLE(0.0f);
 	if (coll->FloorTilt.x > 2)
-		angle = -ANGLE(90.0f);
+		angle = ANGLE(-90.0f);
 	else if (coll->FloorTilt.x < -2)
 		angle = ANGLE(90.0f);
 
@@ -793,7 +794,7 @@ void SetLaraSlideAnimation(ItemInfo* item, CollisionInfo* coll)
 
 	ShiftItem(item, coll);
 
-	if (delta < -ANGLE(90.0f) || delta > ANGLE(90.0f))
+	if (delta < ANGLE(-90.0f) || delta > ANGLE(90.0f))
 	{
 		if (item->Animation.ActiveState == LS_SLIDE_BACK && oldAngle == angle)
 			return;
@@ -843,7 +844,7 @@ void newSetLaraSlideAnimation(ItemInfo* item, CollisionInfo* coll)
 	// Slide backward.
 	else
 	{
-		if (item->Animation.ActiveState == LS_SLIDE_BACK && abs(short(deltaAngle - ANGLE(180.0f))) <= -ANGLE(180.0f))
+		if (item->Animation.ActiveState == LS_SLIDE_BACK && abs(short(deltaAngle - ANGLE(180.0f))) <= ANGLE(-180.0f))
 			return;
 
 		SetAnimation(item, LA_SLIDE_BACK_START);
@@ -919,7 +920,7 @@ void SetLaraSwimDiveAnimation(ItemInfo* item)
 	SetAnimation(item, LA_ONWATER_DIVE);
 	item->Animation.TargetState = LS_UNDERWATER_SWIM_FORWARD;
 	item->Animation.Velocity.y = LARA_SWIM_VELOCITY_MAX * 0.4f;
-	item->Pose.Orientation.x = -ANGLE(45.0f);
+	item->Pose.Orientation.x = ANGLE(-45.0f);
 	lara.Control.WaterStatus = WaterStatus::Underwater;
 }
 

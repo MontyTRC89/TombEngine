@@ -12,19 +12,21 @@
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_overhang.h"
 #include "Game/Lara/lara_tests.h"
+#include "Game/Lara/PlayerContext.h"
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
 
 using namespace TEN::Input;
+using namespace TEN::Entities::Player;
 
 // -----------------------------
 // MONKEY SWING
 // Control & Collision Functions
 // -----------------------------
 
-// State:		LS_MONKEY_IDLE (75)
-// Collision:	lara_col_monkey_idle()
+// State:	  LS_MONKEY_IDLE (75)
+// Collision: lara_col_monkey_idle()
 void lara_as_monkey_idle(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& lara = *GetLaraInfo(item);
@@ -32,7 +34,7 @@ void lara_as_monkey_idle(ItemInfo* item, CollisionInfo* coll)
 	lara.ExtraTorsoRot = EulerAngles::Zero;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
-	Camera.targetElevation = -ANGLE(5.0f);
+	Camera.targetElevation = ANGLE(-5.0f);
 
 	if (item->HitPoints <= 0)
 	{
@@ -130,8 +132,8 @@ void lara_as_monkey_idle(ItemInfo* item, CollisionInfo* coll)
 		SetLaraMonkeyRelease(item);
 }
 
-// State:		LS_MONKEY_IDLE (75)
-// Control:		lara_as_monkey_idle()
+// State:	LS_MONKEY_IDLE (75)
+// Control: lara_as_monkey_idle()
 void lara_col_monkey_idle(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& lara = *GetLaraInfo(item);
@@ -161,8 +163,8 @@ void lara_col_monkey_idle(ItemInfo* item, CollisionInfo* coll)
 	}
 }
 
-// State:		LS_MONKEY_FORWARD (76)
-// Collision:	lara_col_monkey_forward()
+// State:	  LS_MONKEY_FORWARD (76)
+// Collision: lara_col_monkey_forward()
 void lara_as_monkey_forward(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& lara = *GetLaraInfo(item);
@@ -170,7 +172,7 @@ void lara_as_monkey_forward(ItemInfo* item, CollisionInfo* coll)
 	lara.ExtraTorsoRot = EulerAngles::Zero;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
-	Camera.targetElevation = -ANGLE(5.0f);
+	Camera.targetElevation = ANGLE(-5.0f);
 
 	if (item->HitPoints <= 0)
 	{
@@ -220,8 +222,8 @@ void lara_as_monkey_forward(ItemInfo* item, CollisionInfo* coll)
 		SetLaraMonkeyRelease(item);
 }
 
-// State:		LS_MONKEY_FORWARD (76)
-// Control:		lara_as_monkey_forward()
+// State:	LS_MONKEY_FORWARD (76)
+// Control: lara_as_monkey_forward()
 void lara_col_monkey_forward(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& lara = *GetLaraInfo(item);
@@ -248,8 +250,8 @@ void lara_col_monkey_forward(ItemInfo* item, CollisionInfo* coll)
 	}
 }
 
-// State:		LS_MONKEY_BACK (163)
-// Collision:	lara_col_monkey_back()
+// State:	  LS_MONKEY_BACK (163)
+// Collision: lara_col_monkey_back()
 void lara_as_monkey_back(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& lara = *GetLaraInfo(item);
@@ -257,7 +259,7 @@ void lara_as_monkey_back(ItemInfo* item, CollisionInfo* coll)
 	lara.ExtraTorsoRot = EulerAngles::Zero;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
-	Camera.targetElevation = -ANGLE(5.0f);
+	Camera.targetElevation = ANGLE(-5.0f);
 
 	if (item->HitPoints <= 0)
 	{
@@ -308,8 +310,8 @@ void lara_as_monkey_back(ItemInfo* item, CollisionInfo* coll)
 		SetLaraMonkeyRelease(item);
 }
 
-// State:		LS_MONKEY_BACK (163)
-// Control:		lara_as_monkey_back()
+// State:	LS_MONKEY_BACK (163)
+// Control: lara_as_monkey_back()
 void lara_col_monkey_back(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& lara = *GetLaraInfo(item);
@@ -336,8 +338,8 @@ void lara_col_monkey_back(ItemInfo* item, CollisionInfo* coll)
 	}
 }
 
-// State:		LS_MONKEY_SHIMMY_LEFT (77)
-// Collision:	lara_col_monkey_shimmy_left()
+// State:	  LS_MONKEY_SHIMMY_LEFT (77)
+// Collision: lara_col_monkey_shimmy_left()
 void lara_as_monkey_shimmy_left(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& lara = *GetLaraInfo(item);
@@ -345,7 +347,7 @@ void lara_as_monkey_shimmy_left(ItemInfo* item, CollisionInfo* coll)
 	lara.ExtraTorsoRot = EulerAngles::Zero;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
-	Camera.targetElevation = -ANGLE(5.0f);
+	Camera.targetElevation = ANGLE(-5.0f);
 
 	if (item->HitPoints <= 0)
 	{
@@ -390,8 +392,8 @@ void lara_as_monkey_shimmy_left(ItemInfo* item, CollisionInfo* coll)
 		SetLaraMonkeyRelease(item);
 }
 
-// State:		LS_MONKEY_SHIMMY_LEFT (7)
-// Control:		lara_as_monkey_shimmy_left()
+// State:	LS_MONKEY_SHIMMY_LEFT (7)
+// Control: lara_as_monkey_shimmy_left()
 void lara_col_monkey_shimmy_left(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& lara = *GetLaraInfo(item);
@@ -418,8 +420,8 @@ void lara_col_monkey_shimmy_left(ItemInfo* item, CollisionInfo* coll)
 	}
 }
 
-// State:		LS_MONKEY_SHIMMY_RIGHT (78)
-// Collision:	lara_col_monkey_shimmy_right()
+// State:	  LS_MONKEY_SHIMMY_RIGHT (78)
+// Collision: lara_col_monkey_shimmy_right()
 void lara_as_monkey_shimmy_right(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& lara = *GetLaraInfo(item);
@@ -427,7 +429,7 @@ void lara_as_monkey_shimmy_right(ItemInfo* item, CollisionInfo* coll)
 	lara.ExtraTorsoRot = EulerAngles::Zero;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
-	Camera.targetElevation = -ANGLE(5.0f);
+	Camera.targetElevation = ANGLE(-5.0f);
 
 	if (item->HitPoints <= 0)
 	{
@@ -472,8 +474,8 @@ void lara_as_monkey_shimmy_right(ItemInfo* item, CollisionInfo* coll)
 		SetLaraMonkeyRelease(item);
 }
 
-// State:		LS_MONKEY_SHIMMY_RIGHT (78)
-// Control:		lara_as_monkey_shimmy_right()
+// State:	LS_MONKEY_SHIMMY_RIGHT (78)
+// Control: lara_as_monkey_shimmy_right()
 void lara_col_monkey_shimmy_right(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& lara = *GetLaraInfo(item);
@@ -500,21 +502,21 @@ void lara_col_monkey_shimmy_right(ItemInfo* item, CollisionInfo* coll)
 	}
 }
 
-// State:		LS_MONKEY_TURN_180 (79)
-// Collision:	lara_as_monkey_turn_180()
+// State:	  LS_MONKEY_TURN_180 (79)
+// Collision: lara_as_monkey_turn_180()
 void lara_as_monkey_turn_180(ItemInfo* item, CollisionInfo* coll)
 {
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
-	Camera.targetElevation = -ANGLE(5.0f);
+	Camera.targetElevation = ANGLE(-5.0f);
 
 	ResetLaraTurnRateY(item);
 
 	item->Animation.TargetState = LS_MONKEY_IDLE;
 }
 
-// State:		LS_MONKEY_TURN_180 (79)
-// Control:		lara_as_monkey_turn_180()
+// State:	LS_MONKEY_TURN_180 (79)
+// Control: lara_as_monkey_turn_180()
 void lara_col_monkey_turn_180(ItemInfo* item, CollisionInfo* coll)
 {
 	lara_col_monkey_idle(item, coll);
@@ -529,7 +531,7 @@ void lara_as_monkey_turn(ItemInfo* item, CollisionInfo* coll)
 	lara.ExtraTorsoRot = EulerAngles::Zero;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
-	Camera.targetElevation = -ANGLE(5.0f);
+	Camera.targetElevation = ANGLE(-5.0f);
 
 	if (item->HitPoints <= 0)
 	{

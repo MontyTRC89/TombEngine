@@ -12,14 +12,16 @@
 #include "Game/Lara/lara_slide.h"
 #include "Game/Lara/lara_monkey.h"
 #include "Game/Lara/lara_helpers.h"
+#include "Game/Lara/PlayerContext.h"
 #include "Game/pickup/pickup.h"
-#include "Sound/sound.h"
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
+#include "Sound/sound.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
 using namespace TEN::Input;
+using namespace TEN::Entities::Player;
 
 // ------------------------------
 // BASIC MOVEMENT & MISCELLANEOUS
