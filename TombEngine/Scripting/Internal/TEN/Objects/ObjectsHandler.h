@@ -76,9 +76,7 @@ private:
 				GAME_OBJECT_ID objectNumber = item->ObjectNumber;
 
 				if (objID == objectNumber)
-				{
 					items.push_back(GetByName<Moveable, ScriptReserved_Moveable>(key));
-				}
 			}
 		}
 
