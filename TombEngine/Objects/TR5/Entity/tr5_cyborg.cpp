@@ -239,7 +239,7 @@ namespace TEN::Entities::Creatures::TR5
 			{
 				if (item->ItemFlags[0] < 11)
 				{
-					item->MeshSwapBits |= 1 << HitmanJoints[item->ItemFlags[0]];
+					item->SetMeshSwapFlags(1 << HitmanJoints[item->ItemFlags[0]]);
 					item->ItemFlags[0]++;
 				}
 			}

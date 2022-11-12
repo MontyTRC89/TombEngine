@@ -129,7 +129,7 @@ namespace TEN::Entities::Generic
 				}
 				else if (lara->LeftArm.FrameNumber == 12)
 				{
-					lara->MeshPtrs[LM_LHAND] = Objects[ID_LARA_SKIN].meshIndex + LM_LHAND;
+					laraItem->Model.MeshIndex[LM_LHAND] = laraItem->Model.BaseMesh + LM_LHAND;
 					CreateFlare(laraItem, ID_BURNING_TORCH_ITEM, true);
 				}
 			}
@@ -149,7 +149,7 @@ namespace TEN::Entities::Generic
 			}
 			else if (lara->LeftArm.FrameNumber == 36)
 			{
-				lara->MeshPtrs[LM_LHAND] = Objects[ID_LARA_SKIN].meshIndex + LM_LHAND;
+				laraItem->Model.MeshIndex[LM_LHAND] = laraItem->Model.BaseMesh + LM_LHAND;
 				CreateFlare(laraItem, ID_BURNING_TORCH_ITEM, false);
 			}
 		}
@@ -200,7 +200,7 @@ namespace TEN::Entities::Generic
 		lara->LeftArm.FrameNumber = 0;
 		lara->LeftArm.FrameBase = g_Level.Anims[lara->LeftArm.AnimNumber].FramePtr;
 
-		lara->MeshPtrs[LM_LHAND] = Objects[ID_LARA_TORCH_ANIM].meshIndex + LM_LHAND;
+		laraItem->Model.MeshIndex[LM_LHAND] = Objects[ID_LARA_TORCH_ANIM].meshIndex + LM_LHAND;
 	}
 
 	void TorchControl(short itemNumber)

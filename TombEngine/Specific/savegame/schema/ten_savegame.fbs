@@ -39,8 +39,11 @@ table Item {
 	collidable: bool;
 	looked_at: bool;
 	ai_bits: int32;
-	swap_mesh_flags: int32;
 	data: TEN.Save.ItemData;
+	
+	base_mesh: int32;
+	mesh_pointers: [int32];
+
 	lua_name: string;
 	lua_on_killed_name: string;
 	lua_on_hit_name: string;
@@ -255,7 +258,6 @@ table Lara {
 	burn_blue: int32;
 	burn_smoke: bool;
 	wet: [bool];
-	mesh_ptrs: [int32];
 	location: int32;
 	highest_location: int32;
 	location_pad: int32;

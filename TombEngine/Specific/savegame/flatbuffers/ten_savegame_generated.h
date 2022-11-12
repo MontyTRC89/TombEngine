@@ -450,8 +450,9 @@ struct ItemT : public flatbuffers::NativeTable {
   bool collidable = false;
   bool looked_at = false;
   int32_t ai_bits = 0;
-  int32_t swap_mesh_flags = 0;
   TEN::Save::ItemDataUnion data{};
+  int32_t base_mesh = 0;
+  std::vector<int32_t> mesh_pointers{};
   std::string lua_name{};
   std::string lua_on_killed_name{};
   std::string lua_on_hit_name{};
@@ -495,14 +496,15 @@ struct Item FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     VT_COLLIDABLE = 60,
     VT_LOOKED_AT = 62,
     VT_AI_BITS = 64,
-    VT_SWAP_MESH_FLAGS = 66,
-    VT_DATA_TYPE = 68,
-    VT_DATA = 70,
-    VT_LUA_NAME = 72,
-    VT_LUA_ON_KILLED_NAME = 74,
-    VT_LUA_ON_HIT_NAME = 76,
-    VT_LUA_ON_COLLIDED_WITH_OBJECT_NAME = 78,
-    VT_LUA_ON_COLLIDED_WITH_ROOM_NAME = 80
+    VT_DATA_TYPE = 66,
+    VT_DATA = 68,
+    VT_BASE_MESH = 70,
+    VT_MESH_POINTERS = 72,
+    VT_LUA_NAME = 74,
+    VT_LUA_ON_KILLED_NAME = 76,
+    VT_LUA_ON_HIT_NAME = 78,
+    VT_LUA_ON_COLLIDED_WITH_OBJECT_NAME = 80,
+    VT_LUA_ON_COLLIDED_WITH_ROOM_NAME = 82
   };
   int32_t active_state() const {
     return GetField<int32_t>(VT_ACTIVE_STATE, 0);
@@ -597,9 +599,6 @@ struct Item FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   int32_t ai_bits() const {
     return GetField<int32_t>(VT_AI_BITS, 0);
   }
-  int32_t swap_mesh_flags() const {
-    return GetField<int32_t>(VT_SWAP_MESH_FLAGS, 0);
-  }
   TEN::Save::ItemData data_type() const {
     return static_cast<TEN::Save::ItemData>(GetField<uint8_t>(VT_DATA_TYPE, 0));
   }
@@ -673,6 +672,12 @@ struct Item FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   const TEN::Save::Minecart *data_as_Minecart() const {
     return data_type() == TEN::Save::ItemData::Minecart ? static_cast<const TEN::Save::Minecart *>(data()) : nullptr;
   }
+  int32_t base_mesh() const {
+    return GetField<int32_t>(VT_BASE_MESH, 0);
+  }
+  const flatbuffers::Vector<int32_t> *mesh_pointers() const {
+    return GetPointer<const flatbuffers::Vector<int32_t> *>(VT_MESH_POINTERS);
+  }
   const flatbuffers::String *lua_name() const {
     return GetPointer<const flatbuffers::String *>(VT_LUA_NAME);
   }
@@ -722,10 +727,12 @@ struct Item FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyField<uint8_t>(verifier, VT_COLLIDABLE) &&
            VerifyField<uint8_t>(verifier, VT_LOOKED_AT) &&
            VerifyField<int32_t>(verifier, VT_AI_BITS) &&
-           VerifyField<int32_t>(verifier, VT_SWAP_MESH_FLAGS) &&
            VerifyField<uint8_t>(verifier, VT_DATA_TYPE) &&
            VerifyOffset(verifier, VT_DATA) &&
            VerifyItemData(verifier, data(), data_type()) &&
+           VerifyField<int32_t>(verifier, VT_BASE_MESH) &&
+           VerifyOffset(verifier, VT_MESH_POINTERS) &&
+           verifier.VerifyVector(mesh_pointers()) &&
            VerifyOffset(verifier, VT_LUA_NAME) &&
            verifier.VerifyString(lua_name()) &&
            VerifyOffset(verifier, VT_LUA_ON_KILLED_NAME) &&
@@ -928,14 +935,17 @@ struct ItemBuilder {
   void add_ai_bits(int32_t ai_bits) {
     fbb_.AddElement<int32_t>(Item::VT_AI_BITS, ai_bits, 0);
   }
-  void add_swap_mesh_flags(int32_t swap_mesh_flags) {
-    fbb_.AddElement<int32_t>(Item::VT_SWAP_MESH_FLAGS, swap_mesh_flags, 0);
-  }
   void add_data_type(TEN::Save::ItemData data_type) {
     fbb_.AddElement<uint8_t>(Item::VT_DATA_TYPE, static_cast<uint8_t>(data_type), 0);
   }
   void add_data(flatbuffers::Offset<void> data) {
     fbb_.AddOffset(Item::VT_DATA, data);
+  }
+  void add_base_mesh(int32_t base_mesh) {
+    fbb_.AddElement<int32_t>(Item::VT_BASE_MESH, base_mesh, 0);
+  }
+  void add_mesh_pointers(flatbuffers::Offset<flatbuffers::Vector<int32_t>> mesh_pointers) {
+    fbb_.AddOffset(Item::VT_MESH_POINTERS, mesh_pointers);
   }
   void add_lua_name(flatbuffers::Offset<flatbuffers::String> lua_name) {
     fbb_.AddOffset(Item::VT_LUA_NAME, lua_name);
@@ -996,9 +1006,10 @@ inline flatbuffers::Offset<Item> CreateItem(
     bool collidable = false,
     bool looked_at = false,
     int32_t ai_bits = 0,
-    int32_t swap_mesh_flags = 0,
     TEN::Save::ItemData data_type = TEN::Save::ItemData::NONE,
     flatbuffers::Offset<void> data = 0,
+    int32_t base_mesh = 0,
+    flatbuffers::Offset<flatbuffers::Vector<int32_t>> mesh_pointers = 0,
     flatbuffers::Offset<flatbuffers::String> lua_name = 0,
     flatbuffers::Offset<flatbuffers::String> lua_on_killed_name = 0,
     flatbuffers::Offset<flatbuffers::String> lua_on_hit_name = 0,
@@ -1010,8 +1021,9 @@ inline flatbuffers::Offset<Item> CreateItem(
   builder_.add_lua_on_hit_name(lua_on_hit_name);
   builder_.add_lua_on_killed_name(lua_on_killed_name);
   builder_.add_lua_name(lua_name);
+  builder_.add_mesh_pointers(mesh_pointers);
+  builder_.add_base_mesh(base_mesh);
   builder_.add_data(data);
-  builder_.add_swap_mesh_flags(swap_mesh_flags);
   builder_.add_ai_bits(ai_bits);
   builder_.add_status(status);
   builder_.add_next_item_active(next_item_active);
@@ -1085,15 +1097,17 @@ inline flatbuffers::Offset<Item> CreateItemDirect(
     bool collidable = false,
     bool looked_at = false,
     int32_t ai_bits = 0,
-    int32_t swap_mesh_flags = 0,
     TEN::Save::ItemData data_type = TEN::Save::ItemData::NONE,
     flatbuffers::Offset<void> data = 0,
+    int32_t base_mesh = 0,
+    const std::vector<int32_t> *mesh_pointers = nullptr,
     const char *lua_name = nullptr,
     const char *lua_on_killed_name = nullptr,
     const char *lua_on_hit_name = nullptr,
     const char *lua_on_collided_with_object_name = nullptr,
     const char *lua_on_collided_with_room_name = nullptr) {
   auto item_flags__ = item_flags ? _fbb.CreateVector<int32_t>(*item_flags) : 0;
+  auto mesh_pointers__ = mesh_pointers ? _fbb.CreateVector<int32_t>(*mesh_pointers) : 0;
   auto lua_name__ = lua_name ? _fbb.CreateString(lua_name) : 0;
   auto lua_on_killed_name__ = lua_on_killed_name ? _fbb.CreateString(lua_on_killed_name) : 0;
   auto lua_on_hit_name__ = lua_on_hit_name ? _fbb.CreateString(lua_on_hit_name) : 0;
@@ -1132,9 +1146,10 @@ inline flatbuffers::Offset<Item> CreateItemDirect(
       collidable,
       looked_at,
       ai_bits,
-      swap_mesh_flags,
       data_type,
       data,
+      base_mesh,
+      mesh_pointers__,
       lua_name__,
       lua_on_killed_name__,
       lua_on_hit_name__,
@@ -3338,7 +3353,6 @@ struct LaraT : public flatbuffers::NativeTable {
   int32_t burn_blue = 0;
   bool burn_smoke = false;
   std::vector<bool> wet{};
-  std::vector<int32_t> mesh_ptrs{};
   int32_t location = 0;
   int32_t highest_location = 0;
   int32_t location_pad = 0;
@@ -3381,10 +3395,9 @@ struct Lara FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     VT_BURN_BLUE = 62,
     VT_BURN_SMOKE = 64,
     VT_WET = 66,
-    VT_MESH_PTRS = 68,
-    VT_LOCATION = 70,
-    VT_HIGHEST_LOCATION = 72,
-    VT_LOCATION_PAD = 74
+    VT_LOCATION = 68,
+    VT_HIGHEST_LOCATION = 70,
+    VT_LOCATION_PAD = 72
   };
   int32_t item_number() const {
     return GetField<int32_t>(VT_ITEM_NUMBER, 0);
@@ -3482,9 +3495,6 @@ struct Lara FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   const flatbuffers::Vector<uint8_t> *wet() const {
     return GetPointer<const flatbuffers::Vector<uint8_t> *>(VT_WET);
   }
-  const flatbuffers::Vector<int32_t> *mesh_ptrs() const {
-    return GetPointer<const flatbuffers::Vector<int32_t> *>(VT_MESH_PTRS);
-  }
   int32_t location() const {
     return GetField<int32_t>(VT_LOCATION, 0);
   }
@@ -3538,8 +3548,6 @@ struct Lara FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyField<uint8_t>(verifier, VT_BURN_SMOKE) &&
            VerifyOffset(verifier, VT_WET) &&
            verifier.VerifyVector(wet()) &&
-           VerifyOffset(verifier, VT_MESH_PTRS) &&
-           verifier.VerifyVector(mesh_ptrs()) &&
            VerifyField<int32_t>(verifier, VT_LOCATION) &&
            VerifyField<int32_t>(verifier, VT_HIGHEST_LOCATION) &&
            VerifyField<int32_t>(verifier, VT_LOCATION_PAD) &&
@@ -3650,9 +3658,6 @@ struct LaraBuilder {
   void add_wet(flatbuffers::Offset<flatbuffers::Vector<uint8_t>> wet) {
     fbb_.AddOffset(Lara::VT_WET, wet);
   }
-  void add_mesh_ptrs(flatbuffers::Offset<flatbuffers::Vector<int32_t>> mesh_ptrs) {
-    fbb_.AddOffset(Lara::VT_MESH_PTRS, mesh_ptrs);
-  }
   void add_location(int32_t location) {
     fbb_.AddElement<int32_t>(Lara::VT_LOCATION, location, 0);
   }
@@ -3707,7 +3712,6 @@ inline flatbuffers::Offset<Lara> CreateLara(
     int32_t burn_blue = 0,
     bool burn_smoke = false,
     flatbuffers::Offset<flatbuffers::Vector<uint8_t>> wet = 0,
-    flatbuffers::Offset<flatbuffers::Vector<int32_t>> mesh_ptrs = 0,
     int32_t location = 0,
     int32_t highest_location = 0,
     int32_t location_pad = 0) {
@@ -3715,7 +3719,6 @@ inline flatbuffers::Offset<Lara> CreateLara(
   builder_.add_location_pad(location_pad);
   builder_.add_highest_location(highest_location);
   builder_.add_location(location);
-  builder_.add_mesh_ptrs(mesh_ptrs);
   builder_.add_wet(wet);
   builder_.add_burn_blue(burn_blue);
   builder_.add_burn_count(burn_count);
@@ -3790,14 +3793,12 @@ inline flatbuffers::Offset<Lara> CreateLaraDirect(
     int32_t burn_blue = 0,
     bool burn_smoke = false,
     const std::vector<uint8_t> *wet = nullptr,
-    const std::vector<int32_t> *mesh_ptrs = nullptr,
     int32_t location = 0,
     int32_t highest_location = 0,
     int32_t location_pad = 0) {
   auto weapons__ = weapons ? _fbb.CreateVector<flatbuffers::Offset<TEN::Save::CarriedWeaponInfo>>(*weapons) : 0;
   auto target_arm_angles__ = target_arm_angles ? _fbb.CreateVector<int32_t>(*target_arm_angles) : 0;
   auto wet__ = wet ? _fbb.CreateVector<uint8_t>(*wet) : 0;
-  auto mesh_ptrs__ = mesh_ptrs ? _fbb.CreateVector<int32_t>(*mesh_ptrs) : 0;
   return TEN::Save::CreateLara(
       _fbb,
       item_number,
@@ -3832,7 +3833,6 @@ inline flatbuffers::Offset<Lara> CreateLaraDirect(
       burn_blue,
       burn_smoke,
       wet__,
-      mesh_ptrs__,
       location,
       highest_location,
       location_pad);
@@ -6652,9 +6652,10 @@ inline void Item::UnPackTo(ItemT *_o, const flatbuffers::resolver_function_t *_r
   { auto _e = collidable(); _o->collidable = _e; }
   { auto _e = looked_at(); _o->looked_at = _e; }
   { auto _e = ai_bits(); _o->ai_bits = _e; }
-  { auto _e = swap_mesh_flags(); _o->swap_mesh_flags = _e; }
   { auto _e = data_type(); _o->data.type = _e; }
   { auto _e = data(); if (_e) _o->data.value = TEN::Save::ItemDataUnion::UnPack(_e, data_type(), _resolver); }
+  { auto _e = base_mesh(); _o->base_mesh = _e; }
+  { auto _e = mesh_pointers(); if (_e) { _o->mesh_pointers.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->mesh_pointers[_i] = _e->Get(_i); } } }
   { auto _e = lua_name(); if (_e) _o->lua_name = _e->str(); }
   { auto _e = lua_on_killed_name(); if (_e) _o->lua_on_killed_name = _e->str(); }
   { auto _e = lua_on_hit_name(); if (_e) _o->lua_on_hit_name = _e->str(); }
@@ -6701,9 +6702,10 @@ inline flatbuffers::Offset<Item> CreateItem(flatbuffers::FlatBufferBuilder &_fbb
   auto _collidable = _o->collidable;
   auto _looked_at = _o->looked_at;
   auto _ai_bits = _o->ai_bits;
-  auto _swap_mesh_flags = _o->swap_mesh_flags;
   auto _data_type = _o->data.type;
   auto _data = _o->data.Pack(_fbb);
+  auto _base_mesh = _o->base_mesh;
+  auto _mesh_pointers = _fbb.CreateVector(_o->mesh_pointers);
   auto _lua_name = _o->lua_name.empty() ? _fbb.CreateSharedString("") : _fbb.CreateString(_o->lua_name);
   auto _lua_on_killed_name = _o->lua_on_killed_name.empty() ? _fbb.CreateSharedString("") : _fbb.CreateString(_o->lua_on_killed_name);
   auto _lua_on_hit_name = _o->lua_on_hit_name.empty() ? _fbb.CreateSharedString("") : _fbb.CreateString(_o->lua_on_hit_name);
@@ -6742,9 +6744,10 @@ inline flatbuffers::Offset<Item> CreateItem(flatbuffers::FlatBufferBuilder &_fbb
       _collidable,
       _looked_at,
       _ai_bits,
-      _swap_mesh_flags,
       _data_type,
       _data,
+      _base_mesh,
+      _mesh_pointers,
       _lua_name,
       _lua_on_killed_name,
       _lua_on_hit_name,
@@ -7504,7 +7507,6 @@ inline void Lara::UnPackTo(LaraT *_o, const flatbuffers::resolver_function_t *_r
   { auto _e = burn_blue(); _o->burn_blue = _e; }
   { auto _e = burn_smoke(); _o->burn_smoke = _e; }
   { auto _e = wet(); if (_e) { _o->wet.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->wet[_i] = _e->Get(_i) != 0; } } }
-  { auto _e = mesh_ptrs(); if (_e) { _o->mesh_ptrs.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->mesh_ptrs[_i] = _e->Get(_i); } } }
   { auto _e = location(); _o->location = _e; }
   { auto _e = highest_location(); _o->highest_location = _e; }
   { auto _e = location_pad(); _o->location_pad = _e; }
@@ -7550,7 +7552,6 @@ inline flatbuffers::Offset<Lara> CreateLara(flatbuffers::FlatBufferBuilder &_fbb
   auto _burn_blue = _o->burn_blue;
   auto _burn_smoke = _o->burn_smoke;
   auto _wet = _fbb.CreateVector(_o->wet);
-  auto _mesh_ptrs = _fbb.CreateVector(_o->mesh_ptrs);
   auto _location = _o->location;
   auto _highest_location = _o->highest_location;
   auto _location_pad = _o->location_pad;
@@ -7588,7 +7589,6 @@ inline flatbuffers::Offset<Lara> CreateLara(flatbuffers::FlatBufferBuilder &_fbb
       _burn_blue,
       _burn_smoke,
       _wet,
-      _mesh_ptrs,
       _location,
       _highest_location,
       _location_pad);
