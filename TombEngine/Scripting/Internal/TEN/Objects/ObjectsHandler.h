@@ -72,7 +72,6 @@ private:
 		{
 			if (!std::holds_alternative<std::reference_wrapper<MESH_INFO>>(val))
 			{
-				short test = GetIndexByName(key);
 				auto* item = &g_Level.Items[GetIndexByName(key)];
 				GAME_OBJECT_ID objectNumber = item->ObjectNumber;
 
