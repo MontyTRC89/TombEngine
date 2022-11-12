@@ -376,7 +376,7 @@ short GetLaraSlideHeadingAngle(ItemInfo* item, CollisionInfo* coll)
 
 	short headingAngle = aspectAngle;
 
-	// Handle slope crease.
+	// Handle crease in slope.
 	if (aspectAngle != projAspectAngle)
 	{
 		// Intersection line of two planes is parallel to cross product of their normal vectors.
@@ -385,7 +385,8 @@ short GetLaraSlideHeadingAngle(ItemInfo* item, CollisionInfo* coll)
 		if (intersection.y < 0.0f)
 			intersection = -intersection;
 
-		short creaseAspectAngle = phd_atan(intersection.z, intersection.x);
+		// TODO: Check why int casts are required. Weird behaviour.
+		short creaseAspectAngle = FROM_RAD(atan2((int)intersection.x, (int)intersection.z));
 
 		// Confirm angles are intersecting.
 		if (Geometry::TestAngleIntersection(aspectAngle, projAspectAngle, creaseAspectAngle))

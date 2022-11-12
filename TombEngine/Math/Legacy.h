@@ -17,7 +17,7 @@ float TO_RAD(short angle);
 
 float phd_sin(short a);
 float phd_cos(short a);
-int	  phd_atan(int dz, int dx);
+int	  phd_atan(int y, int x);
 
 void InterpolateAngle(short angle, short& rotation, short& outAngle, int shift);
 void GetMatrixFromTrAngle(Matrix& matrix, short* framePtr, int index);

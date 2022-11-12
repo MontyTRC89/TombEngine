@@ -41,9 +41,9 @@ float phd_cos(short a)
 }
 
 // NOTE: Order of parameters is inverted!
-int phd_atan(int x, int y)
+int phd_atan(int y, int x)
 {
-	return FROM_RAD(atan2(y, x));
+	return FROM_RAD(atan2(x, y));
 }
 
 void InterpolateAngle(short angle, short& rotation, short& outAngle, int shift)
