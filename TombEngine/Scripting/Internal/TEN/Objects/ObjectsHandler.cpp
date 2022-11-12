@@ -49,7 +49,7 @@ ObjectsHandler::ObjectsHandler(sol::state* lua, sol::table & parent) :
 
 	/***
 	Get statics by its slot.
-	@function GetStaticsBySlot
+	@function GetStaticsById
 	@tparam int slot the unique slot of the mesh like 10
 	@treturn table of Statics referencing the given slot id.
 	*/
