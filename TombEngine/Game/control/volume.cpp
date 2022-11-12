@@ -154,7 +154,7 @@ namespace TEN::Control::Volumes
 		else if (Objects[item->ObjectNumber].intelligent)
 			TestVolumes(item->RoomNumber, bBox, TriggerVolumeActivators::NPC, itemNumber);
 		else
-			TestVolumes(item->RoomNumber, bBox, TriggerVolumeActivators::Movable, itemNumber);
+			TestVolumes(item->RoomNumber, bBox, TriggerVolumeActivators::Moveable, itemNumber);
 	}
 
 	void InitialiseNodeScripts()

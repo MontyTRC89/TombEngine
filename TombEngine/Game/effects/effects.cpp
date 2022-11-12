@@ -1120,22 +1120,29 @@ void TriggerWaterfallMist(const ItemInfo& item)
 	float cos = phd_cos(angle);
 	float sin = phd_sin(angle);
 
-	int maxPosX =  width * phd_sin(angle) + item.Pose.Position.x;
-	int maxPosZ =  width * phd_cos(angle) + item.Pose.Position.z;
-	int minPosX = -width * phd_sin(angle) + item.Pose.Position.x;
-	int minPosZ = -width * phd_cos(angle) + item.Pose.Position.z;
+	int maxPosX =  width * sin + item.Pose.Position.x;
+	int maxPosZ =  width * cos + item.Pose.Position.z;
+	int minPosX = -width * sin + item.Pose.Position.x;
+	int minPosZ = -width * cos + item.Pose.Position.z;
 
-	if (!TestPointInView(Vector3i(maxPosX, item.Pose.Position.y, maxPosZ), size * scale, item.RoomNumber) &&
-		!TestPointInView(Vector3i(minPosX, item.Pose.Position.y, minPosZ), size * scale, item.RoomNumber))
+	float fadeMin = GetParticleDistanceFade(Vector3i(minPosX, item.Pose.Position.y, minPosZ));
+	float fadeMax = GetParticleDistanceFade(Vector3i(maxPosX, item.Pose.Position.y, maxPosZ));
+
+	if ((fadeMin == 0.0f) && (fadeMin == fadeMax))
 		return;
 
-	float step = size * 0.75f;
+	float finalFade = ((fadeMin >= 1.0f) && (fadeMin == fadeMax)) ? 1.0f : std::max(fadeMin, fadeMax);
+
+	auto startColor = item.Color / 4.0f * finalFade * float(UCHAR_MAX);
+	auto endColor   = item.Color / 8.0f * finalFade * float(UCHAR_MAX);
+
+	float step = size * scale;
 	int steps = int((width / 2) / step);
 	int currentStep = 0;
 
 	while (true)
 	{
-		int offset = (step * currentStep) + (Random::GenerateInt(0, 64) - 32);
+		int offset = (step * currentStep) + Random::GenerateInt(-32, 32);
 
 		if (offset > width)
 			break;
@@ -1145,32 +1152,32 @@ void TriggerWaterfallMist(const ItemInfo& item)
 			auto* spark = GetFreeParticle();
 			spark->on = true;
 
-			char colorOffset = (Random::GenerateInt(0, 32)) - 16;
-			spark->sR = std::clamp(int(item.Color.x / 2.0f * float(UCHAR_MAX)) + colorOffset, 0, UCHAR_MAX);
-			spark->sG = std::clamp(int(item.Color.y / 2.0f * float(UCHAR_MAX)) + colorOffset, 0, UCHAR_MAX);
-			spark->sB = std::clamp(int(item.Color.z / 2.0f * float(UCHAR_MAX)) + colorOffset, 0, UCHAR_MAX);
-			spark->dR = std::clamp(int(item.Color.x / 4.0f * float(UCHAR_MAX)) + colorOffset, 0, UCHAR_MAX);
-			spark->dG = std::clamp(int(item.Color.y / 4.0f * float(UCHAR_MAX)) + colorOffset, 0, UCHAR_MAX);
-			spark->dB = std::clamp(int(item.Color.z / 4.0f * float(UCHAR_MAX)) + colorOffset, 0, UCHAR_MAX);
+			char colorOffset = (Random::GenerateInt(-8, 8));
+			spark->sR = std::clamp(int(startColor.x) + colorOffset, 0, UCHAR_MAX);
+			spark->sG = std::clamp(int(startColor.y) + colorOffset, 0, UCHAR_MAX);
+			spark->sB = std::clamp(int(startColor.z) + colorOffset, 0, UCHAR_MAX);
+			spark->dR = std::clamp(int(endColor.x)   + colorOffset, 0, UCHAR_MAX);
+			spark->dG = std::clamp(int(endColor.y)   + colorOffset, 0, UCHAR_MAX);
+			spark->dB = std::clamp(int(endColor.z)   + colorOffset, 0, UCHAR_MAX);
 
 			spark->colFadeSpeed = 1;
 			spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
-			spark->life = spark->sLife = Random::GenerateInt(0, 16) + 16;
+			spark->life = spark->sLife = Random::GenerateInt(8, 12);
 			spark->fadeToBlack = spark->life - 6;
 
-			spark->x = offset * sign * phd_sin(angle) + Random::GenerateInt(0, 16) + item.Pose.Position.x - 8;
+			spark->x = offset * sign * sin + Random::GenerateInt(-8, 8) + item.Pose.Position.x;
 			spark->y = Random::GenerateInt(0, 16) + item.Pose.Position.y - 8;
-			spark->z = offset * sign * phd_cos(angle) + Random::GenerateInt(0, 16) + item.Pose.Position.z - 8;
+			spark->z = offset * sign * cos + Random::GenerateInt(-8, 8) + item.Pose.Position.z;
 
 			spark->xVel = 0;
-			spark->yVel = Random::GenerateInt(0, 128) + 64;
+			spark->yVel = Random::GenerateInt(-64, 64);
 			spark->zVel = 0;
 
 			spark->friction = 0;
 			spark->rotAng = GetRandomControl() & 0xFFF;
 			spark->scalar = scale;
 			spark->maxYvel = 0;
-			spark->rotAdd = Random::GenerateInt(0, 32) - 16;
+			spark->rotAdd = Random::GenerateInt(-16, 16);
 			spark->gravity = -spark->yVel >> 2;
 			spark->sSize = spark->size = Random::GenerateInt(0, 3) * scale + size;
 			spark->dSize = 2 * spark->size;

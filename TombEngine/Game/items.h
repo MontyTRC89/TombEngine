@@ -66,6 +66,12 @@ struct EntityAnimationData
 
 	bool IsAirborne	= false;
 	Vector3 Velocity = Vector3::Zero; // CONVENTION: +X = right, +Y = down, +Z = forward
+};
+
+struct EntityModelData
+{
+	int BaseMesh;
+	std::vector<int> MeshIndex = {};
 	std::vector<BoneMutator> Mutator = {};
 };
 
@@ -83,6 +89,7 @@ struct ItemInfo
 
 	ITEM_DATA Data;
 	EntityAnimationData Animation;
+	EntityModelData Model;
 	Pose StartPose;
 	Pose Pose;
 	ROOM_VECTOR Location;
@@ -101,7 +108,6 @@ struct ItemInfo
 
 	BitField TouchBits	  = BitField();
 	BitField MeshBits	  = BitField();
-	BitField MeshSwapBits = BitField();
 
 	unsigned short Flags; // ItemFlags enum
 	short ItemFlags[8];
@@ -125,6 +131,11 @@ struct ItemInfo
 
 	bool TestFlags(short id, short value);
 	void SetFlags(short id, short value);
+
+	bool TestMeshSwapFlags(unsigned int flags);
+	bool TestMeshSwapFlags(const std::vector<unsigned int> flags);
+	void SetMeshSwapFlags(unsigned int flags, bool clear = false);
+	void SetMeshSwapFlags(const std::vector<unsigned int> flags, bool clear = false);
 
 	bool IsLara();
 	bool IsCreature();

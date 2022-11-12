@@ -14,7 +14,7 @@
 #define STRING_EXIT_TO_TITLE			"exit_to_title"	
 #define STRING_OPTIONS					"options"
 #define STRING_UZI						"uzi"
-#define STRING_PISTOLS					"pistols_ammo"
+#define STRING_PISTOLS					"pistols"
 #define STRING_SHOTGUN					"shotgun"
 #define STRING_REVOLVER					"revolver"
 #define STRING_REVOLVER_LASER			"revolver_laser"
