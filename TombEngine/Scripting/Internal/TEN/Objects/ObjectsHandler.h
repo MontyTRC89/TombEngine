@@ -78,7 +78,7 @@ private:
 
 				if (objID == objectNumber)
 				{
-					items.push_back(std::make_unique<R>(std::get<R::IdentifierType>(m_nameMap.at(key))));
+					items.push_back(GetByName<Moveable, ScriptReserved_Moveable>(key));
 				}
 			}
 		}
@@ -99,7 +99,7 @@ private:
 				int slotNr = slot;
 
 				if (staticNumber == slotNr)
-					items.push_back(std::make_unique<R>(std::get<R::IdentifierType>(m_nameMap.at(key))));
+					items.push_back(GetByName<Static, ScriptReserved_Moveable>(key));
 			}
 		}
 
