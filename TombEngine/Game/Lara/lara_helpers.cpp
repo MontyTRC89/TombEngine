@@ -366,73 +366,35 @@ LaraState GetLaraCornerShimmyState(ItemInfo* item, CollisionInfo* coll)
 	return (LaraState)-1;
 }
 
-// TODO: Move these later.
-//------------------------------
-
-Vector3 GetFloorNormal(Vector2 tilt)
+short GetLaraSlideHeadingAngle(ItemInfo* item, CollisionInfo* coll)
 {
-	auto normal = Vector3(-tilt.x, -1.0f, -tilt.y);
-	normal.Normalize();
-	return normal;
-}
+	auto surfaceNormal = Geometry::GetFloorNormal(GetCollision(item).FloorTilt);
+	short aspectAngle = Geometry::GetSurfaceAspectAngle(surfaceNormal);
 
-Vector3 GetCeilingNormal(Vector2 tilt)
-{
-	auto normal = Vector3(-tilt.x, 1.0f, -tilt.y);
-	normal.Normalize();
-	return normal;
-}
-
-bool TestAngleIntersection(short angle0, short angle1, short refAngle)
-{
-	short deltaAngle0 = Geometry::GetShortestAngle(angle0, refAngle);
-	short deltaAngle1 = Geometry::GetShortestAngle(angle1, refAngle);
-
-	if (deltaAngle0 > 0 && deltaAngle1 < 0)
-	{
-		return true;
-	}
-	else if (deltaAngle0 < 0 && deltaAngle1 > 0)
-	{
-		return true;
-	}
-
-	return false;
-}
-
-//------------------------------
-
-short GetLaraSlideDirection(ItemInfo* item, CollisionInfo* coll)
-{
-	auto floorTilt = GetCollision(item).FloorTilt;
-	short aspectAngle = Geometry::GetSurfaceAspectAngle(floorTilt);
-
-	auto projFloorTilt = GetCollision(item, aspectAngle, item->Animation.Velocity.z).FloorTilt;
-	short projAspectAngle = Geometry::GetSurfaceAspectAngle(projFloorTilt);
+	auto projSurfaceNormal = Geometry::GetFloorNormal(GetCollision(item, aspectAngle, item->Animation.Velocity.z).FloorTilt);
+	short projAspectAngle = Geometry::GetSurfaceAspectAngle(projSurfaceNormal);
 
 	short headingAngle = aspectAngle;
 
-	// Handle crease in slope.
+	// Handle slope crease.
 	if (aspectAngle != projAspectAngle)
 	{
-		auto surfaceNormal = GetFloorNormal(floorTilt);
-		auto projSurfaceNormal = GetFloorNormal(projFloorTilt);
-
 		// Intersection line of two planes is parallel to cross product of their normal vectors.
 		// Cross surface normals of both slopes to get direction vector of crease.
 		auto intersection = surfaceNormal.Cross(projSurfaceNormal);
 		if (intersection.y < 0.0f)
 			intersection = -intersection;
 
-		short creaseHeadingAngle = phd_atan(intersection.z, intersection.x);
+		short creaseAspectAngle = phd_atan(intersection.z, intersection.x);
 
 		// Confirm angles are intersecting.
-		if (TestAngleIntersection(aspectAngle, projAspectAngle, creaseHeadingAngle))
-			headingAngle = creaseHeadingAngle + ANGLE(180.0f); // TODO: Signs are wrong somewhere. Add 180 for now.
+		if (Geometry::TestAngleIntersection(aspectAngle, projAspectAngle, creaseAspectAngle))
+			headingAngle = creaseAspectAngle;// +ANGLE(180.0f); // TODO: Signs are wrong somewhere. Add 180 for now.
 	}
 
-	if (!g_GameFlow->HasSlideExtended())
-		return (GetQuadrant(headingAngle) * ANGLE(90.0f));
+	// Check whether extended slope mechanics are enabled.
+	//if (!g_GameFlow->HasSlideExtended())
+	//	return (GetQuadrant(headingAngle) * ANGLE(90.0f));
 
 	return headingAngle;
 }
@@ -647,20 +609,20 @@ void ModulateLaraCrawlFlex(ItemInfo* item, short baseRate, short maxAngle)
 // TODO: Unused; I will pick this back up later. -- Sezz 2022.06.22
 void ModulateLaraSlideVelocity(ItemInfo* item, CollisionInfo* coll)
 {
-	auto& lara = *GetLaraInfo(item);
+	constexpr auto minVelocity = 50;
+	constexpr auto maxVelocity = LARA_TERMINAL_VELOCITY;
 
-	constexpr int minVelocity = 50;
-	constexpr int maxVelocity = LARA_TERMINAL_VELOCITY;
+	auto& lara = *GetLaraInfo(item);
 
 	if (g_GameFlow->HasSlideExtended())
 	{
-		auto probe = GetCollision(item);
+		auto pointColl = GetCollision(item);
 		short minSlideAngle = ANGLE(33.75f);
-		short steepness = Geometry::GetSurfaceSteepnessAngle(probe.FloorTilt);
-		short direction = Geometry::GetSurfaceAspectAngle(probe.FloorTilt);
+		short aspectAngle = Geometry::GetSurfaceAspectAngle(Geometry::GetFloorNormal(pointColl.FloorTilt));
+		short slopeAngle = Geometry::GetSurfaceSlopeAngle(Geometry::GetFloorNormal(pointColl.FloorTilt));
 
 		float velocityMultiplier = 1 / (float)ANGLE(33.75f);
-		int slideVelocity = std::min<int>(minVelocity + 10 * (steepness * velocityMultiplier), LARA_TERMINAL_VELOCITY);
+		int slideVelocity = std::min<int>(minVelocity + 10 * (slopeAngle * velocityMultiplier), LARA_TERMINAL_VELOCITY);
 		//short deltaAngle = abs((short)(direction - item->Pose.Orientation.y));
 
 		g_Renderer.PrintDebugMessage("%d", slideVelocity);
@@ -675,9 +637,9 @@ void ModulateLaraSlideVelocity(ItemInfo* item, CollisionInfo* coll)
 void AlignLaraToSurface(ItemInfo* item, float alpha)
 {
 	// Calculate surface angles.
-	auto floorTilt = GetCollision(item).FloorTilt;
-	short aspectAngle = Geometry::GetSurfaceAspectAngle(floorTilt);
-	short steepnessAngle = std::min(Geometry::GetSurfaceSteepnessAngle(floorTilt), ANGLE(70.0f));
+	auto floorNormal = Geometry::GetFloorNormal(GetCollision(item).FloorTilt);
+	short aspectAngle = Geometry::GetSurfaceAspectAngle(floorNormal);
+	short slopeAngle = std::min(Geometry::GetSurfaceSlopeAngle(floorNormal), ANGLE(70.0f));
 
 	short deltaAngle = Geometry::GetShortestAngle(item->Pose.Orientation.y, aspectAngle);
 	float sinDeltaAngle = phd_sin(deltaAngle);
@@ -685,9 +647,9 @@ void AlignLaraToSurface(ItemInfo* item, float alpha)
 
 	// Calculate extra rotation required.
 	auto extraRot = EulerAngles(
-		-steepnessAngle * cosDeltaAngle,
+		-slopeAngle * cosDeltaAngle,
 		0,
-		steepnessAngle * sinDeltaAngle
+		slopeAngle * sinDeltaAngle
 	) - EulerAngles(item->Pose.Orientation.x, 0, item->Pose.Orientation.z);
 
 	// Apply extra rotation according to alpha.
@@ -844,7 +806,7 @@ void SetLaraSlideAnimation(ItemInfo* item, CollisionInfo* coll)
 	else if (coll->FloorTilt.y < -2 && -coll->FloorTilt.y > abs(coll->FloorTilt.x))
 		angle = ANGLE(0.0f);*/
 
-	short angle = GetLaraSlideDirection(item, coll);
+	short angle = GetLaraSlideHeadingAngle(item, coll);
 
 	short delta = angle - item->Pose.Orientation.y;
 
@@ -876,7 +838,7 @@ void SetLaraSlideAnimation(ItemInfo* item, CollisionInfo* coll)
 // TODO: Do it later.
 void newSetLaraSlideAnimation(ItemInfo* item, CollisionInfo* coll)
 {
-	short headingAngle = GetLaraSlideDirection(item, coll);
+	short headingAngle = GetLaraSlideHeadingAngle(item, coll);
 	short deltaAngle = Geometry::GetShortestAngle(item->Pose.Orientation.y, headingAngle);
 
 	if (!g_GameFlow->HasSlideExtended())

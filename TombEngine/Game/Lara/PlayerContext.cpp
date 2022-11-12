@@ -606,9 +606,9 @@ namespace TEN::Entities::Player::Context
 
 		auto pointColl = GetCollision(item);
 
-		short aspectAngle = GetLaraSlideDirection(item, coll);
-		short steepnessAngle = Geometry::GetSurfaceSteepnessAngle(pointColl.FloorTilt);
-		return (abs(short(coll->Setup.ForwardAngle - aspectAngle)) <= abs(steepnessAngle));
+		short aspectAngle = GetLaraSlideHeadingAngle(item, coll);
+		short slopeAngle = Geometry::GetSurfaceSlopeAngle(Geometry::GetFloorNormal(pointColl.FloorTilt));
+		return (abs(short(coll->Setup.ForwardAngle - aspectAngle)) <= abs(slopeAngle));
 	}
 
 	bool CanCrawlspaceDive(ItemInfo* item, CollisionInfo* coll)

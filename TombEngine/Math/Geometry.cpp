@@ -14,6 +14,16 @@ namespace TEN::Math::Geometry
 		return Vector3i(TranslatePoint(point.ToVector3(), headingAngle, forward, down, right));
 	}
 
+	Vector3i TranslatePoint(const Vector3i& point, const EulerAngles& orient, float distance)
+	{
+		return Vector3i(TranslatePoint(point.ToVector3(), orient, distance));
+	}
+
+	Vector3i TranslatePoint(const Vector3i& point, const Vector3& direction, float distance)
+	{
+		return Vector3i(TranslatePoint(point.ToVector3(), direction, distance));
+	}
+
 	Vector3 TranslatePoint(const Vector3& point, short headingAngle, float forward, float down, float right)
 	{
 		if (forward == 0.0f && down == 0.0f && right == 0.0f)
@@ -27,11 +37,6 @@ namespace TEN::Math::Geometry
 			point.y + down,
 			point.z + ((forward * cosHeading) - (right * sinHeading))
 		);
-	}
-
-	Vector3i TranslatePoint(const Vector3i& point, const EulerAngles& orient, float distance)
-	{
-		return Vector3i(TranslatePoint(point.ToVector3(), orient, distance));
 	}
 
 	Vector3 TranslatePoint(const Vector3& point, const EulerAngles& orient, float distance)
@@ -51,11 +56,6 @@ namespace TEN::Math::Geometry
 		);
 	}
 
-	Vector3i TranslatePoint(const Vector3i& point, const Vector3& direction, float distance)
-	{
-		return Vector3i(TranslatePoint(point.ToVector3(), direction, distance));
-	}
-
 	Vector3 TranslatePoint(const Vector3& point, const Vector3& direction, float distance)
 	{
 		if (distance == 0.0f)
@@ -66,6 +66,20 @@ namespace TEN::Math::Geometry
 		return (point + (directionNorm * distance));
 	}
 
+	Vector3 GetFloorNormal(const Vector2& tilt)
+	{
+		auto normal = Vector3(-tilt.x / 4, -1.0f, -tilt.y / 4);
+		normal.Normalize();
+		return normal;
+	}
+
+	Vector3 GetCeilingNormal(const Vector2& tilt)
+	{
+		auto normal = Vector3(-tilt.x / 4, 1.0f, -tilt.y / 4);
+		normal.Normalize();
+		return normal;
+	}
+
 	short GetShortestAngle(short fromAngle, short toAngle)
 	{
 		if (fromAngle == toAngle)
@@ -74,14 +88,25 @@ namespace TEN::Math::Geometry
 		return short(toAngle - fromAngle);
 	}
 
-	short GetSurfaceSteepnessAngle(Vector2 tilt)
+	short GetSurfaceSlopeAngle(const Vector3& normal)
 	{
-		static const short qtrBlockAngleIncrement = ANGLE(45.0f) / 4;
+		if (normal == Vector3::Down) // Up.
+			return 0;
 
-		return (short)sqrt(SQUARE(tilt.x * qtrBlockAngleIncrement) + SQUARE(tilt.y * qtrBlockAngleIncrement));
+		return FROM_RAD(acos(normal.Dot(Vector3::Down))); // Up.
 	}
 
-	short GetSurfaceAspectAngle(Vector2 tilt)
+	// FIXME
+	short GetSurfaceAspectAngle(const Vector3& normal)
+	{
+		if (normal == Vector3::Down) // Up.
+			return 0;
+
+		return FROM_RAD(acos(normal.z / sqrt(SQUARE(normal.x) + SQUARE(normal.z))));
+	}
+	
+	// TODO: Remove. Above version doesn't work properly yet, so keeping just in case.
+	short GetSurfaceAspectAngle(const Vector2& tilt)
 	{
 		if (tilt == Vector2::Zero)
 			return 0;
@@ -198,6 +223,19 @@ namespace TEN::Math::Geometry
 
 		float dot = headingNormal.Dot(targetDirection);
 		if (dot > 0.0f)
+			return true;
+
+		return false;
+	}
+
+	bool TestAngleIntersection(short fromAngle, short toAngle, short refAngle)
+	{
+		short deltaAngle0 = Geometry::GetShortestAngle(fromAngle, refAngle);
+		short deltaAngle1 = Geometry::GetShortestAngle(toAngle, refAngle);
+
+		if (deltaAngle0 > 0 && deltaAngle1 < 0)
+			return true;
+		else if (deltaAngle0 < 0 && deltaAngle1 > 0)
 			return true;
 
 		return false;

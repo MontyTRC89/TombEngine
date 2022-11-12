@@ -461,6 +461,13 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
+	// DEBUG: Draw line representing floor normal at player position.
+	auto normal = Geometry::GetFloorNormal(GetCollision(item).FloorTilt);
+	g_Renderer.AddLine3D(
+		item->Pose.Position.ToVector3(),
+		Geometry::TranslatePoint(item->Pose.Position.ToVector3(), normal, BLOCK(1)),
+		Vector4(0, 0, 1, 1));
+
 	if (lara->Control.Weapon.HasFired)
 	{
 		AlertNearbyGuards(item);
