@@ -1078,7 +1078,7 @@ struct CarriedWeaponInfo
 	LaraWeaponTypeCarried Weaponmode;
 	int Interval;
 	int ShotsFired;
-	int Flag;
+	int Timer;
 };
 
 struct ArmInfo
