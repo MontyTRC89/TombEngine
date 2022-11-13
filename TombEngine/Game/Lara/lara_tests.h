@@ -3,10 +3,8 @@
 #include "Game/Lara/lara_struct.h"
 #include "Game/Lara/lara_test_structs.h"
 
-using std::vector;
-
-struct ItemInfo;
 struct CollisionInfo;
+struct ItemInfo;
 
 // -----------------------------
 // TEST FUNCTIONS
@@ -26,7 +24,6 @@ bool TestLaraNearClimbableWall(ItemInfo* item, FloorInfo* floor = nullptr);
 bool TestLaraValidHangPosition(ItemInfo* item, CollisionInfo* coll);
 CornerType TestLaraHangCorner(ItemInfo* item, CollisionInfo* coll, float testAngle);
 CornerTestResult TestItemAtNextCornerPosition(ItemInfo* item, CollisionInfo* coll, float angle, bool outer);
-bool TestHangSwingIn(ItemInfo* item, CollisionInfo* coll);
 bool TestLaraHangSideways(ItemInfo* item, CollisionInfo* coll, short angle);
 
 bool TestLaraWall(ItemInfo* item, int distance, int height, int side = 0);
@@ -46,7 +43,7 @@ void TestLaraWaterDepth(ItemInfo* item, CollisionInfo* coll);
 void GetTightropeFallOff(ItemInfo* item, int regularity);
 #endif
 
-bool TestLaraWeaponType(LaraWeaponType refWeaponType, const vector<LaraWeaponType>& weaponTypeList);
+bool TestLaraWeaponType(LaraWeaponType refWeaponType, const std::vector<LaraWeaponType>& weaponTypeList);
 bool IsStandingWeapon(ItemInfo* item, LaraWeaponType weaponType);
 bool IsVaultState(int state);
 bool IsJumpState(int state);
@@ -73,8 +70,6 @@ CrawlVaultTestResult TestLaraCrawlExitJump(ItemInfo* item, CollisionInfo* coll);
 CrawlVaultTestResult TestLaraCrawlVault(ItemInfo* item, CollisionInfo* coll);
 bool TestLaraCrawlToHang(ItemInfo* item, CollisionInfo* coll);
 
-bool TestLaraLedgeJump(ItemInfo* item, CollisionInfo* coll);
-
 WaterClimbOutTestResult TestLaraWaterClimbOutTolerance(ItemInfo* item, CollisionInfo* coll, WaterClimbOutTestSetup testSetup);
 WaterClimbOutTestResult TestLaraWaterClimbOutDownStep(ItemInfo* item, CollisionInfo* coll);
 WaterClimbOutTestResult TestLaraWaterClimbOutDownStepToCrouch(ItemInfo* item, CollisionInfo* coll);
@@ -85,15 +80,6 @@ WaterClimbOutTestResult TestLaraWaterClimbOutUpStepToCrouch(ItemInfo* item, Coll
 WaterClimbOutTestResult TestLaraWaterClimbOut(ItemInfo* item, CollisionInfo* coll);
 
 LedgeHangTestResult TestLaraLedgeHang(ItemInfo* item, CollisionInfo* coll);
-bool TestLaraShimmyLeft(ItemInfo* item, CollisionInfo* coll);
-bool TestLaraShimmyRight(ItemInfo* item, CollisionInfo* coll);
-bool TestLaraLadderShimmyUp(ItemInfo* item, CollisionInfo* coll);
-bool TestLaraLadderShimmyDown(ItemInfo* item, CollisionInfo* coll);
-bool TestLaraHangClimbTolerance(ItemInfo* item, CollisionInfo* coll, HangClimbTestSetup testSetup);
-bool TestLaraHangToCrouch(ItemInfo* item, CollisionInfo* coll);
-bool TestLaraHangToStand(ItemInfo* item, CollisionInfo* coll);
-
-bool TestLaraTightropeDismount(ItemInfo* item, CollisionInfo* coll);
 
 bool TestLaraPoleCollision(ItemInfo* item, CollisionInfo* coll, bool isGoingUp, float offset = 0.0f);
 bool TestLaraPoleUp(ItemInfo* item, CollisionInfo* coll);

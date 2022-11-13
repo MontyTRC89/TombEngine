@@ -11,7 +11,7 @@ namespace TEN::Entities::Player::Context
 	// For State Control & Collision
 	// -----------------------------
 
-	// Basic movement
+	// Basic contexts
 	bool CanPerformStep(ItemInfo* item, CollisionInfo* coll);
 	bool CanStepUp(ItemInfo* item, CollisionInfo* coll);
 	bool CanStepDown(ItemInfo* item, CollisionInfo* coll);
@@ -29,7 +29,7 @@ namespace TEN::Entities::Player::Context
 	bool CanWadeForward(ItemInfo* item, CollisionInfo* coll);
 	bool CanWadeBackward(ItemInfo* item, CollisionInfo* coll);
 
-	// Crouch and crawl movement
+	// Crouch and crawl contexts
 	bool IsInNarrowSpace(ItemInfo* item, CollisionInfo* coll);
 	bool CanCrouch(ItemInfo* item, CollisionInfo* coll);
 	bool CanCrouchToCrawl(ItemInfo* item, CollisionInfo* coll);
@@ -37,7 +37,7 @@ namespace TEN::Entities::Player::Context
 	bool CanCrawlForward(ItemInfo* item, CollisionInfo* coll);
 	bool CanCrawlBackward(ItemInfo* item, CollisionInfo* coll);
 
-	// Monkey swing movement
+	// Monkey swing contexts
 	bool CanPerformMonkeyStep(ItemInfo* item, CollisionInfo* coll);
 	bool CanFallFromMonkeySwing(ItemInfo* item, CollisionInfo* coll);
 	bool CanGrabMonkeySwing(ItemInfo* item, CollisionInfo* coll);
@@ -46,7 +46,17 @@ namespace TEN::Entities::Player::Context
 	bool CanMonkeyShimmyLeft(ItemInfo* item, CollisionInfo* coll);
 	bool CanMonkeyShimmyRight(ItemInfo* item, CollisionInfo* coll);
 
-	// Jump movement
+	// Ledge contexts
+	bool CanSwingOnLedge(ItemInfo* item, CollisionInfo* coll);
+	bool CanPerformLedgeJump(ItemInfo* item, CollisionInfo* coll);
+	bool CanClimbLedgeToCrouch(ItemInfo* item, CollisionInfo* coll);
+	bool CanClimbLedgeToStand(ItemInfo* item, CollisionInfo* coll);
+	bool CanLedgeShimmyLeft(ItemInfo* item, CollisionInfo* coll);
+	bool CanLedgeShimmyRight(ItemInfo* item, CollisionInfo* coll);
+	bool CanWallShimmyUp(ItemInfo* item, CollisionInfo* coll);
+	bool CanWallShimmyDown(ItemInfo* item, CollisionInfo* coll);
+
+	// Jump contexts
 	bool CanLand(ItemInfo* item, CollisionInfo* coll);
 	bool CanPerformJump(ItemInfo* item, CollisionInfo* coll);
 	bool CanJumpUp(ItemInfo* item, CollisionInfo* coll);
@@ -59,22 +69,26 @@ namespace TEN::Entities::Player::Context
 	bool CanSlideJumpForward(ItemInfo* item, CollisionInfo* coll);
 	bool CanCrawlspaceDive(ItemInfo* item, CollisionInfo* coll);
 
-	// Vault movement
+	// Object interaction contexts
+	bool CanDismountTightrope(ItemInfo* item, CollisionInfo* coll);
+
+	// Vault contexts
 	Context::Vault GetVaultUp2Steps(ItemInfo* item, CollisionInfo* coll);
 
-	// Crawl vault movement
-	// Water tread climb out movement
+	// Crawl vault contexts
+	// Water climb out contexts
 
-	// ----------------------------------------------------------------------------------------------------------------------
+	// -------------------------------------------------------------------------------------------------
 	
-	// Helpers
+	// Context helpers
 	bool TestSidestep(ItemInfo* item, CollisionInfo* coll, bool isGoingRight);
 	bool TestMonkeyShimmy(ItemInfo* item, CollisionInfo* coll, bool isGoingRight);
-	bool TestDirectionalStandingJump(ItemInfo* item, CollisionInfo* coll, short relativeHeadingAngle);
+	bool TestDirectionalStandingJump(ItemInfo* item, CollisionInfo* coll, short relHeadingAngle);
 
-	// Context setup testers
-	bool TestGroundMovementSetup(ItemInfo* item, CollisionInfo* coll, const Context::GroundMovementSetup& contextSetup, bool useCrawlSetup = false);
-	bool TestMonkeyMovementSetup(ItemInfo* item, CollisionInfo* coll, const Context::MonkeyMovementSetup& contextSetup);
+	// Context setup inquirers
+	bool TestGroundSetup(ItemInfo* item, CollisionInfo* coll, const Context::GroundSetup& contextSetup, bool useCrawlSetup = false);
+	bool TestMonkeySwingSetup(ItemInfo* item, CollisionInfo* coll, const Context::MonkeySwingSetup& contextSetup);
+	bool TestLedgeClimbSetup(ItemInfo* item, CollisionInfo* coll, const Context::LedgeClimbSetup& contextSetup);
 	bool TestJumpSetup(ItemInfo* item, CollisionInfo* coll, const Context::JumpSetup& contextSetup);
 
 	// Context getters

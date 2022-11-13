@@ -25,7 +25,7 @@ void DoLaraTightropeBalanceRegen(ItemInfo* item);
 void DoLaraFallDamage(ItemInfo* item);
 
 LaraInfo*& GetLaraInfo(ItemInfo* item);
-LaraState GetLaraCornerShimmyState(ItemInfo* item, CollisionInfo* coll);
+int GetLaraCornerShimmyState(ItemInfo* item, CollisionInfo* coll);
 short GetLaraSlideHeadingAngle(ItemInfo* item, CollisionInfo* coll);
 
 short ModulateLaraTurnRate(short turnRate, short accelRate, short minTurnRate, short maxTurnRate, float axisCoeff, bool invert);

@@ -65,14 +65,6 @@ struct LedgeHangTestResult
 	int Height;
 };
 
-struct HangClimbTestSetup
-{
-	float ClampMin;
-	float ClampMax;
-	float GapMin;
-	bool CheckSlope;
-};
-
 struct CornerTestResult
 {
 	bool Success;

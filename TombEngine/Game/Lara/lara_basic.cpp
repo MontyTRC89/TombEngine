@@ -20,8 +20,8 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-using namespace TEN::Input;
 using namespace TEN::Entities::Player;
+using namespace TEN::Input;
 
 // ------------------------------
 // BASIC MOVEMENT & MISCELLANEOUS
@@ -1636,14 +1636,14 @@ void lara_as_sprint(ItemInfo* item, CollisionInfo* coll)
 
 	if (IsHeld(In::Jump) || lara.Control.RunJumpQueued)
 	{
-		if (IsHeld(In::Walk) || !g_GameFlow->HasSprintJump())
-		{
-			item->Animation.TargetState = LS_SPRINT_DIVE;
-			return;
-		}
-		else if (IsHeld(In::Sprint) && Context::CanSprintJumpForward(item, coll))
+		if ((IsHeld(In::Sprint) && !IsHeld(In::Walk)) && Context::CanSprintJumpForward(item, coll))
 		{
 			item->Animation.TargetState = LS_JUMP_FORWARD;
+			return;
+		}
+		else
+		{
+			item->Animation.TargetState = LS_SPRINT_DIVE;
 			return;
 		}
 

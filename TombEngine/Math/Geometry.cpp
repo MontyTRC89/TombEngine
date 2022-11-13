@@ -221,8 +221,8 @@ namespace TEN::Math::Geometry
 
 	bool TestAngleIntersection(short fromAngle, short toAngle, short refAngle)
 	{
-		short deltaAngle0 = Geometry::GetShortestAngle(fromAngle, refAngle);
-		short deltaAngle1 = Geometry::GetShortestAngle(toAngle, refAngle);
+		short deltaAngle0 = GetShortestAngle(fromAngle, refAngle);
+		short deltaAngle1 = GetShortestAngle(toAngle, refAngle);
 
 		if (deltaAngle0 > 0 && deltaAngle1 < 0)
 			return true;

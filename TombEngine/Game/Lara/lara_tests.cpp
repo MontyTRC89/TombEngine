@@ -275,7 +275,7 @@ bool DoLaraLedgeHang(ItemInfo* item, CollisionInfo* coll)
 		{
 			SetAnimation(item, LA_REACH_TO_HANG, 12);
 		}
-		else if (TestHangSwingIn(item, coll))
+		else if (Context::CanSwingOnLedge(item, coll))
 		{
 			SetAnimation(item, LA_REACH_TO_HANG_OSCILLATE);
 		}
@@ -297,7 +297,7 @@ bool DoLaraLedgeHang(ItemInfo* item, CollisionInfo* coll)
 		{
 			SetAnimation(item, LA_REACH_TO_HANG, 12);
 		}
-		else if (TestHangSwingIn(item, coll))
+		else if (Context::CanSwingOnLedge(item, coll))
 		{
 			SetAnimation(item, LA_REACH_TO_HANG_OSCILLATE);
 		}
@@ -638,23 +638,6 @@ CornerTestResult TestItemAtNextCornerPosition(ItemInfo* item, CollisionInfo* col
 	}
 
 	return result;
-}
-
-bool TestHangSwingIn(ItemInfo* item, CollisionInfo* coll)
-{
-	auto* lara = GetLaraInfo(item);
-
-	int y = item->Pose.Position.y;
-	auto probe = GetCollision(item, item->Pose.Orientation.y, OFFSET_RADIUS(coll->Setup.Radius));
-
-	if ((probe.Position.Floor - y) > 0 &&
-		(probe.Position.Ceiling - y) < -CLICK(1.6f) &&
-		probe.Position.Floor != NO_HEIGHT)
-	{
-		return true;
-	}
-
-	return false;
 }
 
 bool TestLaraHangSideways(ItemInfo* item, CollisionInfo* coll, short angle)
@@ -1550,16 +1533,21 @@ CrawlVaultTestResult TestLaraCrawlVault(ItemInfo* item, CollisionInfo* coll)
 
 bool TestLaraCrawlToHang(ItemInfo* item, CollisionInfo* coll)
 {
-	int y = item->Pose.Position.y;
-	int distance = CLICK(1.2f);
-	auto probe = GetCollision(item, item->Pose.Orientation.y + ANGLE(180.0f), distance, -LARA_HEIGHT_CRAWL);
+	// 1. Check whether an object is in the way.
+	bool objectCollided = TestLaraObjectCollision(item, item->Pose.Orientation.y, -CLICK(1.2f), -LARA_HEIGHT_CRAWL);
+	if (objectCollided)
+		return false;
 
-	bool objectCollided = TestLaraObjectCollision(item, item->Pose.Orientation.y + ANGLE(180.0f), CLICK(1.2f), -LARA_HEIGHT_CRAWL);
+	int vPos = item->Pose.Position.y;
+	auto pointColl = GetCollision(item, item->Pose.Orientation.y, -CLICK(1.2f), -LARA_HEIGHT_CRAWL);
 
-	if (!objectCollided &&										// No obstruction.
-		(probe.Position.Floor - y) >= LARA_HEIGHT_STRETCH &&	// Highest floor bound.
-		(probe.Position.Ceiling - y) <= -CLICK(0.75f) &&		// Gap is optically permissive.
-		probe.Position.Floor != NO_HEIGHT)
+	// 2. Check for wall.
+	if (pointColl.Position.Floor == NO_HEIGHT)
+		return false;
+
+	// 3. Assess point collision.
+	if ((pointColl.Position.Floor - vPos) >= LARA_HEIGHT_STRETCH &&	// Floor height is within highest floor bound.
+		(pointColl.Position.Ceiling - vPos) <= -CLICK(0.75f))		// Gap is visually permissive.
 	{
 		return true;
 	}
@@ -1777,158 +1765,6 @@ LedgeHangTestResult TestLaraLedgeHang(ItemInfo* item, CollisionInfo* coll)
 	}
 
 	return LedgeHangTestResult{ false };
-}
-
-bool TestLaraShimmyLeft(ItemInfo* item, CollisionInfo* coll)
-{
-	if (TestLaraHangSideways(item, coll, -ANGLE(90.0f)))
-		return true;
-
-	return false;
-}
-
-bool TestLaraShimmyRight(ItemInfo* item, CollisionInfo* coll)
-{
-	if (TestLaraHangSideways(item, coll, ANGLE(90.0f)))
-		return true;
-
-	return false;
-}
-
-bool TestLaraLadderShimmyUp(ItemInfo* item, CollisionInfo* coll)
-{
-	auto* lara = GetLaraInfo(item);
-
-	int y = item->Pose.Position.y - LARA_HEIGHT_STRETCH;
-	auto probeLeft = GetCollision(item, item->Pose.Orientation.y - ANGLE(90.0f), coll->Setup.Radius);
-	auto probeRight = GetCollision(item, item->Pose.Orientation.y + ANGLE(90.0f), coll->Setup.Radius);
-	auto probeMiddle = GetCollision(item);
-
-	if (lara->Control.CanClimbLadder &&
-		(probeLeft.Position.Ceiling - y) <= -CLICK(1) &&
-		(probeRight.Position.Ceiling - y) <= -CLICK(1) &&
-		(probeMiddle.Position.Ceiling - y) <= -CLICK(1))
-	{
-		return true;
-	}
-
-	return false;
-}
-
-bool TestLaraLadderShimmyDown(ItemInfo* item, CollisionInfo* coll)
-{
-	auto* lara = GetLaraInfo(item);
-
-	int y = item->Pose.Position.y;
-	auto probeMiddle = GetCollision(item);
-
-	if (lara->Control.CanClimbLadder &&
-		(probeMiddle.Position.Floor - y) >= CLICK(1))
-	{
-		return true;
-	}
-
-	return false;
-}
-
-bool TestLaraHangClimbTolerance(ItemInfo* item, CollisionInfo* coll, HangClimbTestSetup testSetup)
-{
-	int y = item->Pose.Position.y - LARA_HEIGHT_STRETCH;
-	int height = LARA_HEIGHT_STRETCH + CLICK(0.5f);
-	auto probeFront = GetCollision(item, item->Pose.Orientation.y, coll->Setup.Radius, -height);
-	auto probeMiddle = GetCollision(item);
-
-	bool isSlope = testSetup.CheckSlope ? probeFront.Position.FloorSlope : false;
-
-	// Check for object.
-	TestForObjectOnLedge(item, coll);
-	if (coll->HitStatic)
-		return false;
-
-	// Check for slope (if applicable).
-	if (isSlope)
-		return false;
-
-	// Assess climb feasibility.
-	if (TestValidLedge(item, coll) &&
-		abs(probeFront.Position.Floor - y) <= CLICK(1) &&
-		abs(probeFront.Position.Ceiling - probeFront.Position.Floor) > testSetup.ClampMin &&	// Within clamp min.
-		abs(probeFront.Position.Ceiling - probeFront.Position.Floor) <= testSetup.ClampMax &&	// Within clamp max.
-		abs(probeMiddle.Position.Ceiling - probeFront.Position.Floor) >= testSetup.GapMin)		// Gap is optically permissive.
-	{
-		return true;
-	}
-
-	return false;
-}
-
-bool TestLaraLedgeJump(ItemInfo* item, CollisionInfo* coll)
-{
-	static const int minLedgeHeight = CLICK(2);
-
-	if (!g_GameFlow->HasLedgeJumps())
-		return false;
-
-	int vPos = item->Pose.Position.y - coll->Setup.Height;
-	auto pointColl = GetCollision(item);
-
-	// Assess point collision.
-	if ((pointColl.Position.Ceiling - vPos) >= -coll->Setup.Height) // Ceiling isn't too low.
-		return false;
-
-	auto origin = GameVector(
-		item->Pose.Position.x,
-		(item->Pose.Position.y - coll->Setup.Height) + minLedgeHeight,
-		item->Pose.Position.z,
-		item->RoomNumber
-	);
-	auto target = GameVector(
-		Geometry::TranslatePoint(Vector3i(origin.x, origin.y, origin.z), item->Pose.Orientation.y, OFFSET_RADIUS(coll->Setup.Radius)),
-		item->RoomNumber
-	);
-
-	// Assess ray collision.
-	if (LOS(&origin, &target)) // Ledge isn't too thin.
-		return false;
-
-	return true;
-}
-
-bool TestLaraHangToCrouch(ItemInfo* item, CollisionInfo* coll)
-{
-	HangClimbTestSetup testSetup
-	{
-		LARA_HEIGHT_CRAWL, LARA_HEIGHT,
-		CLICK(1),
-		true
-	};
-
-	return TestLaraHangClimbTolerance(item, coll, testSetup);
-}
-
-bool TestLaraHangToStand(ItemInfo* item, CollisionInfo* coll)
-{
-	HangClimbTestSetup testSetup
-	{
-		LARA_HEIGHT, -INFINITY,
-		CLICK(1),
-		false
-	};
-
-	return TestLaraHangClimbTolerance(item, coll, testSetup);
-}
-
-bool TestLaraTightropeDismount(ItemInfo* item, CollisionInfo* coll)
-{
-	auto probe = GetCollision(item);
-
-	if (probe.Position.Floor == item->Pose.Position.y &&
-		GetLaraInfo(item)->Control.Tightrope.CanDismount)
-	{
-		return true;
-	}
-
-	return false;
 }
 
 bool TestLaraPoleCollision(ItemInfo* item, CollisionInfo* coll, bool isGoingUp, float offset)

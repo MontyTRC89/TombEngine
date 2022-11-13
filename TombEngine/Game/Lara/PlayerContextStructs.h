@@ -3,7 +3,7 @@
 
 namespace TEN::Entities::Player::Context
 {
-	struct GroundMovementSetup
+	struct GroundSetup
 	{
 		short HeadingAngle	  = 0;
 		float LowerFloorBound = 0.0f;
@@ -14,11 +14,21 @@ namespace TEN::Entities::Player::Context
 		bool TestDeathFloor = true;
 	};
 
-	struct MonkeyMovementSetup
+	struct MonkeySwingSetup
 	{
 		short HeadingAngle		= 0;
 		float LowerCeilingBound = 0.0f;
 		float UpperCeilingBound = 0.0f;
+	};
+
+	struct LedgeClimbSetup
+	{
+		short HeadingAngle = 0;
+		float SpaceMin	   = 0.0f;
+		float SpaceMax	   = 0.0f;
+		float GapMin	   = 0.0f;
+
+		bool CheckSlope = false;
 	};
 
 	struct JumpSetup
@@ -91,14 +101,6 @@ namespace TEN::Entities::Player::Context
 	{
 		bool Success = false;
 		int	 Height	 = 0;
-	};
-
-	struct HangClimbSetup
-	{
-		float ClampMin;
-		float ClampMax;
-		float GapMin;
-		bool CheckSlope;
 	};
 
 	struct CornerShimmy

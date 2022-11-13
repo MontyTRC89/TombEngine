@@ -320,9 +320,9 @@ LaraInfo*& GetLaraInfo(ItemInfo* item)
 	}
 }
 
-LaraState GetLaraCornerShimmyState(ItemInfo* item, CollisionInfo* coll)
+int GetLaraCornerShimmyState(ItemInfo* item, CollisionInfo* coll)
 {
-	if (IsHeld(In::Left))
+	if (IsHeld(In::Left) || IsHeld(In::LeftStep))
 	{
 		switch (TestLaraHangCorner(item, coll, -90.0f))
 		{
@@ -342,7 +342,7 @@ LaraState GetLaraCornerShimmyState(ItemInfo* item, CollisionInfo* coll)
 			return LS_SHIMMY_45_OUTER_LEFT;
 		}
 	}
-	else if (IsHeld(In::Right))
+	else if (IsHeld(In::Right) || IsHeld(In::RightStep))
 	{
 		switch (TestLaraHangCorner(item, coll, 90.0f))
 		{
@@ -363,7 +363,7 @@ LaraState GetLaraCornerShimmyState(ItemInfo* item, CollisionInfo* coll)
 		}
 	}
 
-	return (LaraState)-1;
+	return NO_STATE;
 }
 
 short GetLaraSlideHeadingAngle(ItemInfo* item, CollisionInfo* coll)
@@ -700,14 +700,13 @@ void SetLaraRunJumpQueue(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& lara = *GetLaraInfo(item);
 
-	int y = item->Pose.Position.y;
-	int distance = SECTOR(1);
-	auto probe = GetCollision(item, item->Pose.Orientation.y, distance, -coll->Setup.Height);
+	int vPos = item->Pose.Position.y;
+	auto pointColl = GetCollision(item, item->Pose.Orientation.y, BLOCK(1), -coll->Setup.Height);
 
-	if ((Context::CanRunJumpForward(item, coll) ||										 // Area close ahead is permissive...
-		(probe.Position.Ceiling - y) < -(coll->Setup.Height + (LARA_HEADROOM * 0.8f)) ||	// OR ceiling height far ahead is permissive
-		(probe.Position.Floor - y) >= CLICK(0.5f)) &&										// OR there is a drop below far ahead.
-		probe.Position.Floor != NO_HEIGHT)
+	if ((Context::CanRunJumpForward(item, coll) ||												// Area close ahead is permissive...
+		(pointColl.Position.Ceiling - vPos) < -(coll->Setup.Height + (LARA_HEADROOM * 0.8f)) ||	// OR ceiling height far ahead is permissive..
+		(pointColl.Position.Floor - vPos) >= CLICK(1.0f / 2)) &&									// OR there is a drop below far ahead.
+		pointColl.Position.Floor != NO_HEIGHT)
 	{
 		lara.Control.RunJumpQueued = IsRunJumpQueueableState((LaraState)item->Animation.TargetState);
 	}
@@ -907,8 +906,8 @@ void SetLaraHangReleaseAnimation(ItemInfo* item)
 	}
 
 	item->Animation.IsAirborne = true;
-	item->Animation.Velocity.z = 2;
-	item->Animation.Velocity.y = 1;
+	item->Animation.Velocity.y = 1.0f;
+	item->Animation.Velocity.z = 2.0f;
 	lara.Control.HandStatus = HandStatus::Free;
 }
 

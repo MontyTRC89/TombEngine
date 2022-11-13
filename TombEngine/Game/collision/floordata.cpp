@@ -780,23 +780,22 @@ namespace TEN::Floordata
 
 	int GetBridgeBorder(int itemNumber, bool bottom)
 	{
-		auto item = &g_Level.Items[itemNumber];
+		auto* item = &g_Level.Items[itemNumber];
 
 		auto bounds = GameBoundingBox(item);
-		return item->Pose.Position.y + (bottom ? bounds.Y2 : bounds.Y1);
+		return (item->Pose.Position.y + (bottom ? bounds.Y2 : bounds.Y1));
 	}
 
 	// Updates BridgeItem for all blocks which are enclosed by bridge bounds.
-
 	void UpdateBridgeItem(int itemNumber, bool forceRemoval)
 	{
-		auto item = &g_Level.Items[itemNumber];
+		auto* item = &g_Level.Items[itemNumber];
 
-		// Force removal if object was killed
+		// Force removal if object was killed.
 		if (item->Flags & IFLAG_KILLED)
 			forceRemoval = true;
 
-		// Get real OBB bounds of a bridge in world space
+		// Get real OBB bounds of a bridge in world space.
 		auto bounds = GameBoundingBox(item);
 		auto dxBounds = bounds.ToBoundingOrientedBox(item->Pose);
 
@@ -812,8 +811,9 @@ namespace TEN::Floordata
 		auto maxX =  ceil((std::max(std::max(std::max(corners[0].x, corners[1].x), corners[4].x), corners[5].x) - room->x) / SECTOR(1));
 		auto maxZ =  ceil((std::max(std::max(std::max(corners[0].z, corners[1].z), corners[4].z), corners[5].z) - room->z) / SECTOR(1));
 
-		// Run through all blocks enclosed in AABB
+		// Run through all blocks enclosed in AABB.
 		for (int x = 0; x < room->xSize; x++)
+		{
 			for (int z = 0; z < room->zSize; z++)
 			{
 				auto pX = room->x + (x * WALL_SIZE) + (WALL_SIZE / 2);
@@ -821,22 +821,23 @@ namespace TEN::Floordata
 				auto offX = pX - item->Pose.Position.x;
 				auto offZ = pZ - item->Pose.Position.z;
 
-				// Clean previous bridge state
+				// Clean previous bridge state.
 				RemoveBridge(itemNumber, offX, offZ);
 
-				// If we're in sweeping mode, don't try to re-add block
+				// If we're in sweeping mode, don't attempt re-adding block.
 				if (forceRemoval)
 					continue;
 
-				// If block isn't in enclosed AABB space, ignore precise check
+				// If block isn't in enclosed AABB space, ignore precise check.
 				if (x < minX || z < minZ || x > maxX || z > maxZ)
 					continue;
 
-				// Block is in enclosed AABB space, do more precise test.
+				// Block is in enclosed AABB space; do more precise test.
 				// Construct a block bounding box within same plane as bridge bounding box and test intersection.
 				auto blockBox = BoundingOrientedBox(Vector3(pX, dxBounds.Center.y, pZ), Vector3(WALL_SIZE / 2), Vector4::UnitY);
 				if (dxBounds.Intersects(blockBox))
-					AddBridge(itemNumber, offX, offZ); // Intersects, try to add bridge to this block.
+					AddBridge(itemNumber, offX, offZ); // Intersects; try adding bridge to this block.
 			}
+		}
 	}
 }
