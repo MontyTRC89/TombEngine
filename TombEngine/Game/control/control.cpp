@@ -132,7 +132,7 @@ GameStatus ControlPhase(int numFrames, bool demoMode)
 		// which assumes 30 iterations per second.
 		g_GameScript->OnControlPhase(DELTA_TIME);
 
-		if (CurrentLevel != 0)
+		if (CurrentLevel != 0 && !ScreenFading)
 		{
 			// Does the player want to enter inventory?
 			if (IsClicked(In::Save) && LaraItem->HitPoints > 0 &&
@@ -158,7 +158,7 @@ GameStatus ControlPhase(int numFrames, bool demoMode)
 					return GameStatus::LoadGame;
 			}
 			else if (IsClicked(In::Pause) && LaraItem->HitPoints > 0 &&
-				g_Gui.GetInventoryMode() != InventoryMode::Pause)
+					 g_Gui.GetInventoryMode() != InventoryMode::Pause)
 			{
 				StopAllSounds();
 				StopRumble();

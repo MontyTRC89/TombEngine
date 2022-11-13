@@ -115,7 +115,7 @@ struct SoundSourceInfo
 	Vector3i Position = Vector3i::Zero;
 	int		 SoundID = 0;
 	int		 Flags = 0;
-	string	 LuaName = "";
+	string	 Name = "";
 
 	SoundSourceInfo()
 	{

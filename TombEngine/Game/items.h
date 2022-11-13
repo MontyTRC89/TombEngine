@@ -68,10 +68,19 @@ struct EntityModelData
 	std::vector<BoneMutator> Mutator = {};
 };
 
+struct EntityCallbackData
+{
+	std::string OnKilled;
+	std::string OnHit;
+	std::string OnObjectCollided;
+	std::string OnRoomCollided;
+};
+
 //todo we need to find good "default states" for a lot of these - squidshire 25/05/2022
 struct ItemInfo
 {
 	GAME_OBJECT_ID ObjectNumber;
+	std::string Name;
 
 	int Status;	// ItemStatus enum.
 	bool Active;
@@ -82,7 +91,9 @@ struct ItemInfo
 
 	ITEM_DATA Data;
 	EntityAnimationData Animation;
+	EntityCallbackData Callbacks;
 	EntityModelData Model;
+	
 	Pose StartPose;
 	Pose Pose;
 	ROOM_VECTOR Location;
@@ -110,13 +121,6 @@ struct ItemInfo
 	uint8_t AIBits; // AIObjectType enum.
 	short AfterDeath;
 	short CarriedItem;
-
-	// Lua
-	std::string LuaName;
-	std::string LuaCallbackOnKilledName;
-	std::string LuaCallbackOnHitName;
-	std::string LuaCallbackOnCollidedWithObjectName;
-	std::string LuaCallbackOnCollidedWithRoomName;
 
 	bool TestOcb(short ocbFlags);
 	void RemoveOcb(short ocbFlags);

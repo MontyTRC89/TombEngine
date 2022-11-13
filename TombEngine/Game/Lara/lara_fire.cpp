@@ -1147,10 +1147,10 @@ void HitTarget(ItemInfo* laraItem, ItemInfo* targetEntity, GameVector* hitPos, i
 		}
 	}
 
-	if (!targetEntity->LuaCallbackOnHitName.empty())
+	if (!targetEntity->Callbacks.OnHit.empty())
 	{
-		short index = g_GameScriptEntities->GetIndexByName(targetEntity->LuaName);
-		g_GameScript->ExecuteFunction(targetEntity->LuaCallbackOnHitName, index);
+		short index = g_GameScriptEntities->GetIndexByName(targetEntity->Name);
+		g_GameScript->ExecuteFunction(targetEntity->Callbacks.OnHit, index);
 	}
 }
 
