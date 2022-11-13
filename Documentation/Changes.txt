@@ -42,6 +42,7 @@ Version 1.0.3
 * Fix single-hand weapons not having a sound on draw and undraw.
 * Fix waterfall mist - it can now be disabled with antitrigger.
 * Fix underwater lever pull animation playing after interacting with underwater ceiling switch.
+* Fix Killer statue not triggering.
 
 Version 1.0.2
 =============
