@@ -31,6 +31,8 @@ short GetLaraSlideHeadingAngle(ItemInfo* item, CollisionInfo* coll);
 short ModulateLaraTurnRate(short turnRate, short accelRate, short minTurnRate, short maxTurnRate, float axisCoeff, bool invert);
 void ModulateLaraTurnRateX(ItemInfo* item, short accelRate, short minTurnRate, short maxTurnRate, bool invert = true);
 void ModulateLaraTurnRateY(ItemInfo* item, short accelRate, short minTurnRate, short maxTurnRate, bool invert = false);
+short ResetLaraTurnRate(short turnRate, short decelRate = SHRT_MAX);
+void ResetLaraTurnRateX(ItemInfo* item, short decelRate = SHRT_MAX);
 void ResetLaraTurnRateY(ItemInfo* item, short decelRate = SHRT_MAX);
 void ModulateLaraSwimTurnRates(ItemInfo* item, CollisionInfo* coll);
 void ModulateLaraSubsuitSwimTurnRates(ItemInfo* item);

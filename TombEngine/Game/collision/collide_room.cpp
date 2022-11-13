@@ -200,16 +200,12 @@ CollisionResult GetCollision(FloorInfo* floor, int x, int y, int z)
 	result.FloorTilt = floor->TiltXZ(x, z, true);
 	result.CeilingTilt = floor->TiltXZ(x, z, false);
 
-	// Split, bridge and slope data
+	// Split, bridge, and slope data.
 	result.Position.DiagonalStep = floor->FloorIsDiagonalStep();
 	result.Position.SplitAngle = floor->FloorCollision.SplitAngle;
 	result.Position.Bridge = result.BottomBlock->InsideBridge(x, result.Position.Floor, z, true, false);
-	result.Position.FloorSlope = result.Position.Bridge < 0 && (abs(result.FloorTilt.x) >= 3 || (abs(result.FloorTilt.y) >= 3));
-	result.Position.CeilingSlope = abs(result.CeilingTilt.x) >= 4 || abs(result.CeilingTilt.y) >= 4; // TODO: Fix on bridges placed beneath ceiling slopes. @Sezz 2022.01.29
-
-	// TODO: check if we need to keep here this slope vs. bridge check from legacy GetTiltType
-	/*if ((y + CLICK(2)) < (floor->FloorHeight(x, z)))
-		result.FloorTilt = Vector2::Zero;*/
+	result.Position.FloorSlope = ((result.Position.Bridge < 0) && (Geometry::GetSurfaceSlopeAngle(Geometry::GetFloorNormal(result.FloorTilt)) >= ANGLE(33.75f)));
+	result.Position.CeilingSlope = (Geometry::GetSurfaceSlopeAngle(Geometry::GetCeilingNormal(result.CeilingTilt)) >= ANGLE(45.0f)); // TODO: Fix on bridges placed beneath ceiling slopes. -- Sezz 2022.01.29
 
 	return result;
 }

@@ -8,6 +8,7 @@
 #include "Game/Lara/lara_collide.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_tests.h"
+#include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Sound/sound.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
@@ -23,9 +24,9 @@ using namespace TEN::Input;
 // Collision:	lara_col_slide_forward()
 void lara_as_slide_forward(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto& lara = *GetLaraInfo(item);
 
-	Camera.targetElevation = -ANGLE(45.0f);
+	Camera.targetElevation = ANGLE(-45.0f);
 
 	if (item->HitPoints <= 0)
 	{
@@ -33,40 +34,28 @@ void lara_as_slide_forward(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (TrInput & IN_LOOK)
+	if (IsHeld(In::Look))
 		LookUpDown(item);
 
 	if (Context::CanSlide(item, coll))
 	{
-		/*short direction = GetLaraSlideDirection(item, coll);
+		short slideAngle = GetLaraSlideHeadingAngle(item, coll);
 
-		if (g_GameFlow->Animations.HasSlideExtended)
+		if (g_GameFlow->HasSlideExtended())
 		{
-			ApproachLaraTargetOrientation(item, direction, 12);
-			ModulateLaraSlideVelocity(item, coll);
+			item->Pose.Orientation.Lerp(EulerAngles(0, slideAngle, 0), 0.1f);
+			//ModulateLaraSlideVelocity(item, coll);
 
-			// TODO: Prepped for another time.
-			if (TrInput & IN_LEFT)
+			if (IsHeld(In::Left) || IsHeld(In::Right))
 			{
-				lara->Control.TurnRate -= LARA_TURN_RATE_ACCEL;
-				if (lara->Control.TurnRate.y < -LARA_SLIDE_TURN_RATE_MAX)
-					lara->Control.TurnRate.y = -LARA_SLIDE_TURN_RATE_MAX;
-
-				DoLaraLean(item, coll, -LARA_LEAN_MAX, LARA_LEAN_RATE / 3 * 2);
-			}
-			else if (TrInput & IN_RIGHT)
-			{
-				lara->Control.TurnRate += LARA_TURN_RATE_ACCEL;
-				if (lara->Control.TurnRate.y > LARA_SLIDE_TURN_RATE_MAX)
-					lara->Control.TurnRate.y = LARA_SLIDE_TURN_RATE_MAX;
-
-				DoLaraLean(item, coll, LARA_LEAN_MAX, LARA_LEAN_RATE / 3 * 2);
+				ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_SLIDE_TURN_RATE_MAX);
+				ModulateLaraLean(item, coll, LARA_LEAN_RATE * 0.6f, LARA_LEAN_MAX);
 			}
 		}
 		else
-			ApproachLaraTargetOrientation(item, direction);*/
+			item->Pose.Orientation.Lerp(EulerAngles(0, slideAngle, 0));
 
-		if (TrInput & IN_JUMP && Context::CanSlideJumpForward(item, coll))
+		if (IsHeld(In::Jump) && Context::CanSlideJumpForward(item, coll))
 		{
 			item->Animation.TargetState = LS_JUMP_FORWARD;
 			StopSoundEffect(SFX_TR4_LARA_SLIPPING);
@@ -77,7 +66,7 @@ void lara_as_slide_forward(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (TrInput & IN_FORWARD)
+	if (IsHeld(In::Forward))
 		item->Animation.TargetState = LS_RUN_FORWARD;
 	else
 		item->Animation.TargetState = LS_IDLE;
@@ -90,15 +79,15 @@ void lara_as_slide_forward(ItemInfo* item, CollisionInfo* coll)
 // Control:		lara_as_slide_forward()
 void lara_col_slide_forward(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto& lara = *GetLaraInfo(item);
 
 	item->Animation.IsAirborne = false;
-	lara->Control.MoveAngle = item->Pose.Orientation.y;
-	coll->Setup.Height = LARA_HEIGHT_CRAWL;	// HACK: Behaves better with clamps.
+	lara.Control.MoveAngle = item->Pose.Orientation.y;
+	coll->Setup.Height = LARA_HEIGHT_CRAWL;	// HACK: Behaves better with narrow spaces.
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
 	coll->Setup.LowerCeilingBound = 0;
-	coll->Setup.ForwardAngle = lara->Control.MoveAngle;
+	coll->Setup.ForwardAngle = lara.Control.MoveAngle;
 	GetCollisionInfo(coll, item);
 
 	if (TestLaraHitCeiling(coll))
@@ -131,9 +120,9 @@ void lara_col_slide_forward(ItemInfo* item, CollisionInfo* coll)
 // Collision:	lara_col_slide_back()
 void lara_as_slide_back(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto& lara = *GetLaraInfo(item);
 
-	Camera.targetElevation = -ANGLE(45.0f);
+	Camera.targetElevation = ANGLE(-45.0f);
 	Camera.targetAngle = ANGLE(135.0f);
 
 	if (item->HitPoints <= 0)
@@ -142,7 +131,7 @@ void lara_as_slide_back(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (TrInput & IN_LOOK)
+	if (IsHeld(In::Look))
 		LookUpDown(item);
 
 	if (Context::CanSlide(item, coll))
@@ -155,19 +144,19 @@ void lara_as_slide_back(ItemInfo* item, CollisionInfo* coll)
 			ModulateLaraSlideVelocity(item, coll);
 
 			// TODO: Prepped for another time.
-			if (TrInput & IN_LEFT)
+			if (IsHeld(In::Left))
 			{
-				lara->Control.TurnRate -= LARA_TURN_RATE_ACCEL;
-				if (lara->Control.TurnRate.y < -LARA_SLIDE_TURN_RATE_MAX)
-					lara->Control.TurnRate.y = -LARA_SLIDE_TURN_RATE_MAX;
+				lara.Control.TurnRate -= LARA_TURN_RATE_ACCEL;
+				if (lara.Control.TurnRate.y < -LARA_SLIDE_TURN_RATE_MAX)
+					lara.Control.TurnRate.y = -LARA_SLIDE_TURN_RATE_MAX;
 
 				DoLaraLean(item, coll, LARA_LEAN_MAX, LARA_LEAN_RATE / 3 * 2);
 			}
-			else if (TrInput & IN_RIGHT)
+			else if (IsHeld(In::Right))
 			{
-				lara->Control.TurnRate += LARA_TURN_RATE_ACCEL;
-				if (lara->Control.TurnRate.y > LARA_SLIDE_TURN_RATE_MAX)
-					lara->Control.TurnRate.y = LARA_SLIDE_TURN_RATE_MAX;
+				lara.Control.TurnRate += LARA_TURN_RATE_ACCEL;
+				if (lara.Control.TurnRate.y > LARA_SLIDE_TURN_RATE_MAX)
+					lara.Control.TurnRate.y = LARA_SLIDE_TURN_RATE_MAX;
 
 				DoLaraLean(item, coll, -LARA_LEAN_MAX, LARA_LEAN_RATE / 3 * 2);
 			}
@@ -175,7 +164,7 @@ void lara_as_slide_back(ItemInfo* item, CollisionInfo* coll)
 		else
 			ApproachLaraTargetOrientation(item, direction);*/
 
-		if (TrInput & IN_JUMP && Context::CanSlideJumpForward(item, coll))
+		if (IsHeld(In::Jump) && Context::CanSlideJumpForward(item, coll))
 		{
 			item->Animation.TargetState = LS_JUMP_BACK;
 			StopSoundEffect(SFX_TR4_LARA_SLIPPING);
@@ -195,15 +184,15 @@ void lara_as_slide_back(ItemInfo* item, CollisionInfo* coll)
 // Control:		lara_as_slide_back()
 void lara_col_slide_back(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto& lara = *GetLaraInfo(item);
 
 	item->Animation.IsAirborne = false;
-	lara->Control.MoveAngle = item->Pose.Orientation.y + ANGLE(180.0f);
-	coll->Setup.Height = LARA_HEIGHT_CRAWL;	// HACK: Behaves better with clamps.
+	lara.Control.MoveAngle = item->Pose.Orientation.y + ANGLE(180.0f);
+	coll->Setup.Height = LARA_HEIGHT_CRAWL;	// HACK: Behaves better with narrow spaces.
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
 	coll->Setup.LowerCeilingBound = 0;
-	coll->Setup.ForwardAngle = lara->Control.MoveAngle;
+	coll->Setup.ForwardAngle = lara.Control.MoveAngle;
 	GetCollisionInfo(coll, item);
 
 	if (TestLaraHitCeiling(coll))

@@ -1,7 +1,6 @@
 #include "framework.h"
 #include "Game/Lara/lara_helpers.h"
 
-#include "Flow/ScriptInterfaceFlowHandler.h"
 #include "Game/collision/collide_room.h"
 #include "Game/control/control.h"
 #include "Game/control/volume.h"
@@ -12,6 +11,7 @@
 #include "Game/Lara/lara_tests.h"
 #include "Math/Math.h"
 #include "Renderer/Renderer11.h"
+#include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Sound/sound.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
@@ -122,9 +122,10 @@ bool HandleLaraVehicle(ItemInfo* item, CollisionInfo* coll)
 		BigGunControl(item, coll);
 		break;
 
-		// Boats are processed like normal items in loop.
+	// Boats are processed like normal items in loop.
 	default:
 		HandleWeapon(item);
+		break;
 	}
 
 	return true;
@@ -431,16 +432,28 @@ void ModulateLaraTurnRateY(ItemInfo* item, short accelRate, short minTurnRate, s
 	lara.Control.TurnRate.y = ModulateLaraTurnRate(lara.Control.TurnRate.y, accelRate, minTurnRate, maxTurnRate, axisCoeff, invert);
 }
 
+short ResetLaraTurnRate(short turnRate, short decelRate)
+{
+	int sign = std::copysign(1, turnRate);
+
+	if (abs(turnRate) > decelRate)
+		return (turnRate - (decelRate * sign));
+	
+	return 0;
+}
+
+void ResetLaraTurnRateX(ItemInfo* item, short decelRate)
+{
+	auto& lara = *GetLaraInfo(item);
+
+	lara.Control.TurnRate.x = ResetLaraTurnRate(lara.Control.TurnRate.x, decelRate);
+}
+
 void ResetLaraTurnRateY(ItemInfo* item, short decelRate)
 {
 	auto& lara = *GetLaraInfo(item);
 
-	int sign = std::copysign(1, lara.Control.TurnRate.y);
-
-	if (abs(lara.Control.TurnRate.y) > decelRate)
-		lara.Control.TurnRate.y -= decelRate * sign;
-	else
-		lara.Control.TurnRate.y = 0;
+	lara.Control.TurnRate.y = ResetLaraTurnRate(lara.Control.TurnRate.y, decelRate);
 }
 
 void ModulateLaraSwimTurnRates(ItemInfo* item, CollisionInfo* coll)

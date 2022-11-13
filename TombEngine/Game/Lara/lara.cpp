@@ -774,8 +774,9 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 	case WaterStatus::Underwater:
 		if (item->HitPoints >= 0)
 		{
-			auto level = g_GameFlow->GetLevel(CurrentLevel);
-			if (level->GetLaraType() != LaraType::Divesuit)
+			const auto& level = *g_GameFlow->GetLevel(CurrentLevel);
+
+			if (level.GetLaraType() != LaraType::Divesuit)
 				lara.Air--;
 
 			if (lara.Air < 0)
@@ -829,7 +830,7 @@ void LaraAboveWater(ItemInfo* item, CollisionInfo* coll)
 	coll->Setup.OldFrameNumber = item->Animation.FrameNumber;
 	coll->Setup.OldState = item->Animation.ActiveState;
 
-	if (TrInput & IN_LOOK && lara.Control.CanLook &&
+	if (IsHeld(In::Look) && lara.Control.CanLook &&
 		lara.ExtraAnim == NO_ITEM)
 	{
 		if (BinocularOn)
@@ -924,7 +925,7 @@ void LaraWaterSurface(ItemInfo* item, CollisionInfo* coll)
 
 	coll->Setup.OldPosition = item->Pose.Position;
 
-	if (TrInput & IN_LOOK && lara.Control.CanLook)
+	if (IsHeld(In::Look) && lara.Control.CanLook)
 		LookLeftRight(item);
 	else
 		ResetLook(item);
@@ -934,19 +935,19 @@ void LaraWaterSurface(ItemInfo* item, CollisionInfo* coll)
 
 	lara_control_routines[item->Animation.ActiveState](item, coll);
 
-	auto level = g_GameFlow->GetLevel(CurrentLevel);
+	const auto& level = *g_GameFlow->GetLevel(CurrentLevel);
 
 	// TODO: Subsuit gradually slows down at rate of 0.5 degrees. @Sezz 2022.06.23
 	// Apply and reset turn rate.
 	item->Pose.Orientation.y += lara.Control.TurnRate.y;
-	if (!(TrInput & (IN_LEFT | IN_RIGHT)))
+	if (!(IsHeld(In::Left) || IsHeld(In::Right)))
 		lara.Control.TurnRate.y = 0;
 
-	if (level->GetLaraType() == LaraType::Divesuit)
+	if (level.GetLaraType() == LaraType::Divesuit)
 		UpdateLaraSubsuitAngles(item);
 
 	// Reset lean.
-	if (!lara.Control.IsMoving && !(TrInput & (IN_LEFT | IN_RIGHT)))
+	if (!lara.Control.IsMoving && !(IsHeld(In::Left) || IsHeld(In::Right)))
 		ResetLaraLean(item, 8.0f);
 
 	if (lara.WaterCurrentActive && lara.Control.WaterStatus != WaterStatus::FlyCheat)
@@ -994,7 +995,7 @@ void LaraUnderwater(ItemInfo* item, CollisionInfo* coll)
 
 	coll->Setup.OldPosition = item->Pose.Position;
 
-	if (TrInput & IN_LOOK && lara.Control.CanLook)
+	if (IsHeld(In::Look) && lara.Control.CanLook)
 		LookLeftRight(item);
 	else
 		ResetLook(item);
@@ -1004,41 +1005,34 @@ void LaraUnderwater(ItemInfo* item, CollisionInfo* coll)
 
 	lara_control_routines[item->Animation.ActiveState](item, coll);
 
-	auto* level = g_GameFlow->GetLevel(CurrentLevel);
+	const auto& level = *g_GameFlow->GetLevel(CurrentLevel);
 
-	// TODO: Subsuit gradually slowed down at rate of 0.5 degrees. @Sezz 2022.06.23
-	// Apply and reset turn rate.
+	// Apply and reset turn rates.
 	item->Pose.Orientation.x += lara.Control.TurnRate.x;
-	if (!(TrInput & (IN_FORWARD | IN_BACK)))
-		lara.Control.TurnRate.x = 0;
+	if (!(IsHeld(In::Forward) || IsHeld(In::Back)))
+		ResetLaraTurnRateX(item, ANGLE(0.5f));
 
 	item->Pose.Orientation.y += lara.Control.TurnRate.y;
-	if (!(TrInput & (IN_LEFT | IN_RIGHT)))
-		lara.Control.TurnRate.y = 0;
+	if (!(IsHeld(In::Left) || IsHeld(In::Right)))
+		ResetLaraTurnRateY(item, ANGLE(0.5f));
 
-	if (level->GetLaraType() == LaraType::Divesuit)
+	if (level.GetLaraType() == LaraType::Divesuit)
 		UpdateLaraSubsuitAngles(item);
 
-	if (!lara.Control.IsMoving && !(TrInput & (IN_LEFT | IN_RIGHT)))
+	if (!lara.Control.IsMoving && !(IsHeld(In::Left) || IsHeld(In::Right)))
 		ResetLaraLean(item, 8.0f, true, false);
 
-	// Clamp x axis rotation.
-	if (item->Pose.Orientation.x < -ANGLE(90.0f))
-		item->Pose.Orientation.x = -ANGLE(90.0f);
-	else if (item->Pose.Orientation.x > ANGLE(90.0f))
-		item->Pose.Orientation.x = ANGLE(90.0f);
+	// Clamp X axis rotation.
+	item->Pose.Orientation.x = std::clamp(item->Pose.Orientation.x, ANGLE(-90.0f), ANGLE(90.0f));
 
-	if (level->GetLaraType() == LaraType::Divesuit)
+	if (level.GetLaraType() == LaraType::Divesuit)
 	{
-		if (item->Pose.Orientation.z > ANGLE(45.0f))
-			item->Pose.Orientation.z = ANGLE(45.0f);
-		else if (item->Pose.Orientation.z < -ANGLE(45.0f))
-			item->Pose.Orientation.z = -ANGLE(45.0f);
+		item->Pose.Orientation.z = std::clamp(item->Pose.Orientation.z, ANGLE(-45.0f), ANGLE(45.0f));
 	}
 	else
 	{
 		// Reset lean.
-		if (!lara.Control.IsMoving || (lara.Control.IsMoving && !(TrInput & (IN_LEFT | IN_RIGHT))))
+		if (!lara.Control.IsMoving || (lara.Control.IsMoving && !(IsHeld(In::Left) || IsHeld(In::Right))))
 			ResetLaraLean(item, 6.0f, true, false);
 	}
 
@@ -1069,7 +1063,7 @@ void LaraCheat(ItemInfo* item, CollisionInfo* coll)
 	item->HitPoints = LARA_HEALTH_MAX;
 	LaraUnderwater(item, coll);
 
-	if (TrInput & IN_WALK && !(TrInput & IN_LOOK))
+	if (IsHeld(In::Walk) && !IsHeld(In::Look))
 	{
 		if (TestEnvironment(ENV_FLAG_WATER, item) || (lara.WaterSurfaceDist > 0 && lara.WaterSurfaceDist != NO_HEIGHT))
 		{
