@@ -395,6 +395,7 @@ namespace TEN::Renderer
 																   j, MoveablesIds[i] == ID_LARA_SKIN_JOINTS,
 																   MoveablesIds[i] == ID_HAIR, &lastVertex, &lastIndex);
 					moveable.ObjectMeshes.push_back(mesh);
+					m_meshes.push_back(mesh);
 				}
 
 				if (objNum == ID_IMP_ROCK || objNum == ID_ENERGY_BUBBLES || objNum == ID_BUBBLES || objNum == ID_BODY_PART)
@@ -678,6 +679,7 @@ namespace TEN::Renderer
 			RendererMesh *mesh = GetRendererMeshFromTrMesh(&staticObject, &g_Level.Meshes[obj->meshNumber], 0, false, false, &lastVertex, &lastIndex);
 
 			staticObject.ObjectMeshes.push_back(mesh);
+			m_meshes.push_back(mesh);
 
 			m_staticObjects[StaticObjectsIds[i]] = staticObject;
 		}
@@ -856,8 +858,6 @@ namespace TEN::Renderer
 
 			mesh->Buckets.push_back(bucket);
 		}
-
-		m_meshes.push_back(mesh);
 
 		return mesh;
 	}

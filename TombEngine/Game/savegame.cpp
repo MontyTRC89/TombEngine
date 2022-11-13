@@ -456,11 +456,11 @@ bool SaveGame::Save(int slot)
 	{
 		ObjectInfo* obj = &Objects[itemToSerialize.ObjectNumber];
 
-		auto luaNameOffset = fbb.CreateString(itemToSerialize.LuaName);
-		auto luaOnKilledNameOffset = fbb.CreateString(itemToSerialize.LuaCallbackOnKilledName);
-		auto luaOnHitNameOffset = fbb.CreateString(itemToSerialize.LuaCallbackOnHitName);
-		auto luaOnCollidedObjectNameOffset = fbb.CreateString(itemToSerialize.LuaCallbackOnCollidedWithObjectName);
-		auto luaOnCollidedRoomNameOffset = fbb.CreateString(itemToSerialize.LuaCallbackOnCollidedWithRoomName);
+		auto luaNameOffset = fbb.CreateString(itemToSerialize.Name);
+		auto luaOnKilledNameOffset = fbb.CreateString(itemToSerialize.Callbacks.OnKilled);
+		auto luaOnHitNameOffset = fbb.CreateString(itemToSerialize.Callbacks.OnHit);
+		auto luaOnCollidedObjectNameOffset = fbb.CreateString(itemToSerialize.Callbacks.OnObjectCollided);
+		auto luaOnCollidedRoomNameOffset = fbb.CreateString(itemToSerialize.Callbacks.OnRoomCollided);
 
 		std::vector<int> itemFlags;
 		for (int i = 0; i < 7; i++)
@@ -1195,6 +1195,9 @@ bool SaveGame::Load(int slot)
 	const Save::SaveGame* s = Save::GetSaveGame(buffer.get());
 
 	// Statistics
+	LastSaveGame = s->header()->count();
+	GameTimer = s->header()->timer();
+
 	Statistics.Game.AmmoHits = s->game()->ammo_hits();
 	Statistics.Game.AmmoUsed = s->game()->ammo_used();
 	Statistics.Game.Distance = s->game()->distance();
@@ -1325,14 +1328,14 @@ bool SaveGame::Load(int slot)
 
 		ObjectInfo* obj = &Objects[item->ObjectNumber];
 		
-		item->LuaName = savedItem->lua_name()->str();
-		if (!item->LuaName.empty())
-			g_GameScriptEntities->AddName(item->LuaName, i);
+		item->Name = savedItem->lua_name()->str();
+		if (!item->Name.empty())
+			g_GameScriptEntities->AddName(item->Name, i);
 
-		item->LuaCallbackOnKilledName = savedItem->lua_on_killed_name()->str();
-		item->LuaCallbackOnHitName = savedItem->lua_on_hit_name()->str();
-		item->LuaCallbackOnCollidedWithObjectName = savedItem->lua_on_collided_with_object_name()->str();
-		item->LuaCallbackOnCollidedWithRoomName = savedItem->lua_on_collided_with_room_name()->str();
+		item->Callbacks.OnKilled = savedItem->lua_on_killed_name()->str();
+		item->Callbacks.OnHit = savedItem->lua_on_hit_name()->str();
+		item->Callbacks.OnObjectCollided = savedItem->lua_on_collided_with_object_name()->str();
+		item->Callbacks.OnRoomCollided = savedItem->lua_on_collided_with_room_name()->str();
 
 		g_GameScriptEntities->TryAddColliding(i);
 
@@ -1390,6 +1393,7 @@ bool SaveGame::Load(int slot)
 		item->MeshBits = savedItem->mesh_bits();
 
 		item->Model.BaseMesh = savedItem->base_mesh();
+		item->Model.MeshIndex.resize(savedItem->mesh_pointers()->size());
 		for (int j = 0; j < savedItem->mesh_pointers()->size(); j++)
 			item->Model.MeshIndex[j] = savedItem->mesh_pointers()->Get(j);
 

@@ -115,8 +115,12 @@ void PerformAnimCommands(ItemInfo* item, bool isFrameBased)
 			if (!isFrameBased)
 			{
 				TranslateItem(item, item->Pose.Orientation.y, commandPtr[2], commandPtr[1], commandPtr[0]);
-				auto bounds = GameBoundingBox(item);
-				UpdateItemRoom(item, -bounds.GetHeight() / 2, -commandPtr[0], -commandPtr[2]);
+
+				if (item->IsLara())
+				{
+					auto bounds = GameBoundingBox(item);
+					UpdateItemRoom(item, -bounds.GetHeight() / 2, -commandPtr[0], -commandPtr[2]);
+				}
 			}
 
 			commandPtr += 3;
