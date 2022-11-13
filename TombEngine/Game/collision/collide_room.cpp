@@ -1,20 +1,23 @@
 #include "framework.h"
 #include "Game/collision/collide_room.h"
 
+#include "Game/animation.h"
+#include "Game/collision/collide_item.h"
 #include "Game/control/box.h"
 #include "Game/control/los.h"
-#include "Game/collision/collide_item.h"
-#include "Game/animation.h"
-#include "Game/Lara/lara.h"
 #include "Game/items.h"
+#include "Game/Lara/lara.h"
 #include "Game/room.h"
 #include "Math/Math.h"
-#include "Sound/sound.h"
 #include "Renderer/Renderer11.h"
+#include "Sound/sound.h"
 
 using namespace TEN::Floordata;
 using namespace TEN::Math;
 using namespace TEN::Renderer;
+
+const auto SLIPPERY_FLOOR_ANGLE	  = ANGLE(33.75f);
+const auto SLIPPERY_CEILING_ANGLE = ANGLE(45.0f);
 
 void ShiftItem(ItemInfo* item, CollisionInfo* coll)
 {
@@ -200,12 +203,20 @@ CollisionResult GetCollision(FloorInfo* floor, int x, int y, int z)
 	result.FloorTilt = floor->TiltXZ(x, z, true);
 	result.CeilingTilt = floor->TiltXZ(x, z, false);
 
-	// Split, bridge, and slope data.
+	// Split and bridge.
 	result.Position.DiagonalStep = floor->FloorIsDiagonalStep();
 	result.Position.SplitAngle = floor->FloorCollision.SplitAngle;
 	result.Position.Bridge = result.BottomBlock->InsideBridge(x, result.Position.Floor, z, true, false);
-	result.Position.FloorSlope = ((result.Position.Bridge < 0) && (Geometry::GetSurfaceSlopeAngle(Geometry::GetFloorNormal(result.FloorTilt)) >= ANGLE(33.75f)));
-	result.Position.CeilingSlope = (Geometry::GetSurfaceSlopeAngle(Geometry::GetCeilingNormal(result.CeilingTilt)) >= ANGLE(45.0f)); // TODO: Fix on bridges placed beneath ceiling slopes. -- Sezz 2022.01.29
+
+	// Floor slope status.
+	// TODO: Can't get tilts of bridges. -- Sezz 2022.11.13
+	auto floorNormal = Geometry::GetFloorNormal(result.FloorTilt);
+	result.Position.FloorSlope = ((Geometry::GetSurfaceSlopeAngle(floorNormal) >= SLIPPERY_FLOOR_ANGLE) && (result.Position.Bridge < 0));
+
+	// Ceiling slope status.
+	// TODO: Bridge ceilings inherit room ceiling's tilt. -- Sezz 2022.01.29
+	auto ceilingNormal = Geometry::GetFloorNormal(result.CeilingTilt);
+	result.Position.CeilingSlope = (Geometry::GetSurfaceSlopeAngle(ceilingNormal) >= SLIPPERY_CEILING_ANGLE);
 
 	return result;
 }
