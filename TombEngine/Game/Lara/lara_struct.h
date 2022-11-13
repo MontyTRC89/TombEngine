@@ -1076,9 +1076,6 @@ struct CarriedWeaponInfo
 	bool HasLasersight; // TODO: Duplicated in LaraInventoryData.
 	bool HasSilencer;	// TODO: Duplicated in LaraInventoryData.
 	LaraWeaponTypeCarried Weaponmode;
-	int Interval;
-	int ShotsFired;
-	int Timer;
 };
 
 struct ArmInfo
@@ -1186,6 +1183,10 @@ struct WeaponControlData
 	LaraWeaponType RequestGunType;
 	LaraWeaponType LastGunType;
 	HolsterInfo HolsterInfo;
+	
+	int Interval;
+	int ShotsFired;
+	int Timer;
 };
 
 struct RopeControlData
