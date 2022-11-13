@@ -34,13 +34,13 @@ constexpr auto COLL_CANCEL_THRESHOLD   = SECTOR(2);
 constexpr auto COLL_DISCARD_THRESHOLD  = CLICK(0.5f);
 constexpr auto CAMERA_RADIUS           = CLICK(1);
 
+const auto LOOKCAM_TURN_RATE_ACCEL = ANGLE(0.75f);
+const auto LOOKCAM_TURN_RATE_MAX   = ANGLE(4.0f);
+
 const auto LOOKCAM_ORIENT_CONSTRAINT = std::pair<EulerAngles, EulerAngles>(
 	EulerAngles(ANGLE(-70.0f), ANGLE(-90.0f), 0),
 	EulerAngles(ANGLE(60.0f), ANGLE(90.0f), 0)
 );
-
-const auto LOOKCAM_TURN_RATE_ACCEL = ANGLE(0.75f);
-const auto LOOKCAM_TURN_RATE_MAX   = ANGLE(4.0f);
 
 const auto THUMBCAM_VERTICAL_CONSTRAINT_ANGLE	= ANGLE(120.0f);
 const auto THUMBCAM_HORIZONTAL_CONSTRAINT_ANGLE = ANGLE(80.0f);
@@ -130,13 +130,12 @@ void DoLookAround(ItemInfo* item, bool invertVerticalAxis)
 
 	// Apply turn rates.
 	player.Control.Look.Orientation += player.Control.Look.TurnRate;
-	player.Control.Look.Orientation.x = std::clamp<short>(player.Control.Look.Orientation.x, LOOKCAM_ORIENT_CONSTRAINT.first.x, LOOKCAM_ORIENT_CONSTRAINT.second.x);
-	player.Control.Look.Orientation.y = std::clamp<short>(player.Control.Look.Orientation.y, LOOKCAM_ORIENT_CONSTRAINT.first.y, LOOKCAM_ORIENT_CONSTRAINT.second.y);
+	player.Control.Look.Orientation.x = std::clamp(player.Control.Look.Orientation.x, LOOKCAM_ORIENT_CONSTRAINT.first.x, LOOKCAM_ORIENT_CONSTRAINT.second.x);
+	player.Control.Look.Orientation.y = std::clamp(player.Control.Look.Orientation.y, LOOKCAM_ORIENT_CONSTRAINT.first.y, LOOKCAM_ORIENT_CONSTRAINT.second.y);
 
 	// Visually adapt head and torso orientations.
 	// TODO: "Rubber band" effect.
 	player.ExtraHeadRot = player.Control.Look.Orientation / 2;
-
 	if (player.Control.HandStatus != HandStatus::Busy &&
 		!player.LeftArm.Locked && !player.RightArm.Locked &&
 		player.Vehicle == NO_ITEM)
@@ -169,6 +168,9 @@ void ClearLookAroundActions(ItemInfo* item)
 		ClearAction(In::Left);
 		ClearAction(In::Right);
 		break;
+
+	default:
+		break;
 	}
 }
 
@@ -199,26 +201,29 @@ void LookCamera(ItemInfo* item)
 	// - Check main Lara control functions.
 
 	static constexpr auto cameraAlpha	 = 0.25f;
-	static constexpr auto cameraCollPush = BLOCK(1, 4) - BLOCK(1, 16);
+	static constexpr auto cameraCollPush = BLOCK(1.0f / 4) - BLOCK(1.0f / 16);
 
 	// Determine offsets.
 	float verticalOffset = -LaraCollision.Setup.Height;
 	if (LaraCollision.Setup.Height == LARA_HEIGHT_MONKEY)
-		verticalOffset += BLOCK(1, 4);
+		verticalOffset += BLOCK(1.0f / 4);
 	else if (LaraCollision.Setup.Height == LARA_HEIGHT_TREAD)
-		verticalOffset += BLOCK(1, 2);
+		verticalOffset += BLOCK(1.0f / 2);
 	else
-		verticalOffset += -BLOCK(1, 8);
+		verticalOffset += -BLOCK(1.0f / 8);
 
 	auto pivotOffset = Vector3(0.0f, verticalOffset, 0.0f);
-	float idealPosDist = -std::max<float>(Camera.targetDistance * 0.5f, BLOCK(3, 4));
-	float lookAtPosDist = BLOCK(1, 2);
+	float idealPosDist = -std::max(Camera.targetDistance * 0.5f, BLOCK(3.0f / 4));
+	float lookAtPosDist = BLOCK(1.0f / 2);
 
-	// Define absolute camera orientation. TODO: Twisting at poles is an issue.
-	auto orient = player.Control.Look.Orientation + EulerAngles(item->Pose.Orientation.x, item->Pose.Orientation.y, 0);
+	// Define absolute camera orientation.
+	auto orient = player.Control.Look.Orientation +
+		EulerAngles(item->Pose.Orientation.x, item->Pose.Orientation.y, 0) +
+		EulerAngles(0, Camera.targetAngle, 0);
+	orient.x = std::clamp(orient.x, LOOKCAM_ORIENT_CONSTRAINT.first.x, LOOKCAM_ORIENT_CONSTRAINT.second.x);
 
 	// Define landmarks.
-	auto pivot = Geometry::TranslatePoint(item->Pose.Position, item->Pose.Orientation.y, pivotOffset.z, pivotOffset.y, pivotOffset.x); // TODO: Use functionf from ladder branch.
+	auto pivot = Geometry::TranslatePoint(item->Pose.Position, item->Pose.Orientation.y, pivotOffset.z, pivotOffset.y, pivotOffset.x); // TODO: Use overload from ladder branch.
 	auto idealPos = Geometry::TranslatePoint(pivot, orient, idealPosDist);
 	auto lookAtPos = Geometry::TranslatePoint(pivot, orient, lookAtPosDist);
 
