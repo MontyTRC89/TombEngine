@@ -441,7 +441,7 @@ void Moveable::Init()
 {
 	bool cond = IsPointInRoom(m_item->Pose.Position, m_item->RoomNumber);
 	std::string err{ "Position of item \"{}\" does not match its room ID." };
-	if (!ScriptAssertF(cond, err, m_item->LuaName))
+	if (!ScriptAssertF(cond, err, m_item->Name))
 	{
 		ScriptWarn("Resetting to the center of the room.");
 		auto center = GetRoomCenter(m_item->RoomNumber);
@@ -476,7 +476,7 @@ void SetLevelFuncCallback(TypeOrNil<LevelFunc> const & cb, std::string const & c
 	}
 	else
 	{
-		ScriptAssert(false, "Tried giving " + mov.m_item->LuaName
+		ScriptAssert(false, "Tried giving " + mov.m_item->Name
 			+ " a non-LevelFunc object as an arg to "
 			+ callerName);
 	}
@@ -485,27 +485,27 @@ void SetLevelFuncCallback(TypeOrNil<LevelFunc> const & cb, std::string const & c
 
 void Moveable::SetOnHit(TypeOrNil<LevelFunc> const & cb)
 {
-	SetLevelFuncCallback(cb, ScriptReserved_SetOnHit, *this, m_item->LuaCallbackOnHitName);
+	SetLevelFuncCallback(cb, ScriptReserved_SetOnHit, *this, m_item->Callbacks.OnHit);
 }
 
 void Moveable::SetOnKilled(TypeOrNil<LevelFunc> const & cb)
 {
-	SetLevelFuncCallback(cb, ScriptReserved_SetOnKilled, *this, m_item->LuaCallbackOnKilledName);
+	SetLevelFuncCallback(cb, ScriptReserved_SetOnKilled, *this, m_item->Callbacks.OnKilled);
 }
 
 void Moveable::SetOnCollidedWithObject(TypeOrNil<LevelFunc> const & cb)
 {
-	SetLevelFuncCallback(cb, ScriptReserved_SetOnCollidedWithObject, *this, m_item->LuaCallbackOnCollidedWithObjectName);
+	SetLevelFuncCallback(cb, ScriptReserved_SetOnCollidedWithObject, *this, m_item->Callbacks.OnObjectCollided);
 }
 
 void Moveable::SetOnCollidedWithRoom(TypeOrNil<LevelFunc> const & cb)
 {
-	SetLevelFuncCallback(cb, ScriptReserved_SetOnCollidedWithRoom, *this, m_item->LuaCallbackOnCollidedWithRoomName);
+	SetLevelFuncCallback(cb, ScriptReserved_SetOnCollidedWithRoom, *this, m_item->Callbacks.OnRoomCollided);
 }
 
 std::string Moveable::GetName() const
 {
-	return m_item->LuaName;
+	return m_item->Name;
 }
 
 bool Moveable::SetName(std::string const & id) 
@@ -518,11 +518,11 @@ bool Moveable::SetName(std::string const & id)
 	if (s_callbackSetName(id, m_num))
 	{
 		// remove the old name if we have one
-		if (id != m_item->LuaName)
+		if (id != m_item->Name)
 		{
-			if(!m_item->LuaName.empty())
-				s_callbackRemoveName(m_item->LuaName);
-			m_item->LuaName = id;
+			if(!m_item->Name.empty())
+				s_callbackRemoveName(m_item->Name);
+			m_item->Name = id;
 		}
 	}
 	else
@@ -814,7 +814,7 @@ bool Moveable::MeshIsSwapped(int meshId) const
 	if (!MeshExists(meshId))
 		return false;
 
-	return m_item->MeshSwapBits.Test(meshId);
+	return m_item->Model.MeshIndex[meshId] == m_item->Model.BaseMesh + meshId;
 }
 
 void Moveable::SwapMesh(int meshId, int swapSlotId, sol::optional<int> swapMeshIndex)
@@ -825,32 +825,26 @@ void Moveable::SwapMesh(int meshId, int swapSlotId, sol::optional<int> swapMeshI
 	if (!swapMeshIndex.has_value())
 		 swapMeshIndex = meshId;
 
-	// TODO: After beta, we should refactor whole meshswap workflow,
-	// because currently Lara and other objects use different convention -- Lwmte, 09.07.22
 
-	if (m_item->IsLara())
+	if (swapSlotId <= -1 || swapSlotId >= ID_NUMBER_OBJECTS)
 	{
-		if (swapSlotId <= -1)
-			return;
-
-		auto* lara = GetLaraInfo(m_item);
-
-		if (swapSlotId >= ID_NUMBER_OBJECTS || !Objects[swapSlotId].loaded)
-		{
-			TENLog("Specified slot does not exist in level!", LogLevel::Error);
-			return;
-		}
-
-		if (swapMeshIndex.value() >= Objects[swapSlotId].nmeshes)
-		{
-			TENLog("Specified meshswap index does not exist in meshswap slot!", LogLevel::Error);
-			return;
-		}
-
-		lara->MeshPtrs[meshId] = Objects[swapSlotId].meshIndex + swapMeshIndex.value();
+		TENLog("Specified meshswap slot ID is incorrect!", LogLevel::Error);
+		return;
 	}
-	else
-		m_item->MeshSwapBits.Set(meshId);
+
+	if (!Objects[swapSlotId].loaded)
+	{
+		TENLog("Object in specified meshswap slot doesn't exist in level!", LogLevel::Error);
+		return;
+	}
+
+	if (swapMeshIndex.value() >= Objects[swapSlotId].nmeshes)
+	{
+		TENLog("Specified meshswap index does not exist in meshswap slot!", LogLevel::Error);
+		return;
+	}
+
+	m_item->Model.MeshIndex[meshId] = Objects[swapSlotId].meshIndex + swapMeshIndex.value();
 }
 
 void Moveable::UnswapMesh(int meshId)
@@ -858,20 +852,7 @@ void Moveable::UnswapMesh(int meshId)
 	if (!MeshExists(meshId))
 		return;
 
-	if (m_item->IsLara())
-	{
-		auto* lara = GetLaraInfo(m_item);
-
-		if (meshId >= NUM_LARA_MESHES)
-		{
-			TENLog("Specified mesh index does not exist!", LogLevel::Error);
-			return;
-		}
-
-		lara->MeshPtrs[meshId] = Objects[ID_LARA_SKIN].meshIndex + meshId;
-	}
-	else
-		m_item->MeshSwapBits.Clear(meshId);
+	m_item->Model.MeshIndex[meshId] = m_item->Model.BaseMesh + meshId;
 }
 
 void Moveable::EnableItem()
@@ -991,7 +972,7 @@ void Moveable::Destroy()
 	if (m_num > NO_ITEM) 
 	{
 		dynamic_cast<ObjectsHandler*>(g_GameScriptEntities)->RemoveMoveableFromMap(m_item, this);
-		s_callbackRemoveName(m_item->LuaName);
+		s_callbackRemoveName(m_item->Name);
 		KillItem(m_num);
 	}
 
@@ -1002,7 +983,7 @@ bool Moveable::MeshExists(int index) const
 {
 	if (index < 0 || index >= Objects[m_item->ObjectNumber].nmeshes)
 	{
-		ScriptAssertF(false, "Mesh index {} does not exist in moveable '{}'", index, m_item->LuaName);
+		ScriptAssertF(false, "Mesh index {} does not exist in moveable '{}'", index, m_item->Name);
 		return false;
 	}
 

@@ -32,8 +32,8 @@ void InitialiseFallingBlock(short itemNumber)
 	TEN::Floordata::UpdateBridgeItem(itemNumber);
 
 	// Set mutators to 0 by default
-	for (int i = 0; i < item->Animation.Mutator.size(); i++)
-		item->Animation.Mutator[i].Rotation = Vector3::Zero;
+	for (int i = 0; i < item->Model.Mutator.size(); i++)
+		item->Model.Mutator[i].Rotation = Vector3::Zero;
 }
 
 void FallingBlockCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
@@ -70,23 +70,23 @@ void FallingBlockControl(short itemNumber)
 			if (item->ItemFlags[0] < FALLINGBLOCK_DELAY)
 			{
 				// Subtly shake all meshes separately.
-				for (int i = 0; i < item->Animation.Mutator.size(); i++)
+				for (int i = 0; i < item->Model.Mutator.size(); i++)
 				{
-					item->Animation.Mutator[i].Rotation.x = RADIAN * GenerateFloat(-FALLINGBLOCK_WIBBLE, FALLINGBLOCK_WIBBLE);
-					item->Animation.Mutator[i].Rotation.y = RADIAN * GenerateFloat(-FALLINGBLOCK_WIBBLE, FALLINGBLOCK_WIBBLE);
-					item->Animation.Mutator[i].Rotation.z = RADIAN * GenerateFloat(-FALLINGBLOCK_WIBBLE, FALLINGBLOCK_WIBBLE);
+					item->Model.Mutator[i].Rotation.x = RADIAN * GenerateFloat(-FALLINGBLOCK_WIBBLE, FALLINGBLOCK_WIBBLE);
+					item->Model.Mutator[i].Rotation.y = RADIAN * GenerateFloat(-FALLINGBLOCK_WIBBLE, FALLINGBLOCK_WIBBLE);
+					item->Model.Mutator[i].Rotation.z = RADIAN * GenerateFloat(-FALLINGBLOCK_WIBBLE, FALLINGBLOCK_WIBBLE);
 				}
 			}
 			else
 			{
 				// Make rotational falling movement with some random seed.
-				for (int i = 0; i < item->Animation.Mutator.size(); i++)
+				for (int i = 0; i < item->Model.Mutator.size(); i++)
 				{
 					auto rotSpeed = i % 2 ? FALLINGBLOCK_FALL_ROTATION_SPEED : -FALLINGBLOCK_FALL_ROTATION_SPEED;
 					rotSpeed += i % 3 ? rotSpeed / 2 : rotSpeed;
-					item->Animation.Mutator[i].Rotation.x += RADIAN * rotSpeed + (RADIAN * GenerateFloat(-1, 1));
-					item->Animation.Mutator[i].Rotation.y += RADIAN * rotSpeed + (RADIAN * GenerateFloat(-1, 1));
-					item->Animation.Mutator[i].Rotation.z += RADIAN * rotSpeed + (RADIAN * GenerateFloat(-1, 1));
+					item->Model.Mutator[i].Rotation.x += RADIAN * rotSpeed + (RADIAN * GenerateFloat(-1, 1));
+					item->Model.Mutator[i].Rotation.y += RADIAN * rotSpeed + (RADIAN * GenerateFloat(-1, 1));
+					item->Model.Mutator[i].Rotation.z += RADIAN * rotSpeed + (RADIAN * GenerateFloat(-1, 1));
 				}
 
 				if (item->ItemFlags[0] == FALLINGBLOCK_DELAY)

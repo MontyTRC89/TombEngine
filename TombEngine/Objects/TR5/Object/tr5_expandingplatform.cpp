@@ -290,9 +290,9 @@ void ExpandingPlatformUpdateMutators(short itemNumber)
 	if (item->Pose.Orientation.y == ANGLE(180.0f)) zTranslate = -offset + width;
 	if (item->Pose.Orientation.y == ANGLE(270.0f)) zTranslate =  width  - offset;
 
-	for (int i = 0; i < item->Animation.Mutator.size(); i++)
+	for (int i = 0; i < item->Model.Mutator.size(); i++)
 	{
-		item->Animation.Mutator[i].Offset = Vector3(0, 0, zTranslate);
-		item->Animation.Mutator[i].Scale = Vector3(1.0f, 1.0f, item->ItemFlags[1] / 4096.0f);
+		item->Model.Mutator[i].Offset = Vector3(0, 0, zTranslate);
+		item->Model.Mutator[i].Scale = Vector3(1.0f, 1.0f, item->ItemFlags[1] / 4096.0f);
 	}
 }

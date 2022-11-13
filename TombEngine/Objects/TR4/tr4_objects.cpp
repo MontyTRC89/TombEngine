@@ -46,7 +46,6 @@
 #include "tr4_hammer.h"
 
 // Objects
-#include "tr4_sas_drag_bloke.h"
 #include "tr4_sarcophagus.h"
 #include "tr4_senet.h"
 #include "Objects/TR4/Object/tr4_clockwork_beetle.h"
@@ -853,7 +852,7 @@ namespace TEN::Entities
 		if (obj->loaded)
 		{
 			obj->control = AnimatingControl;
-			obj->collision = DragSasCollision;
+			obj->collision = SasDragBlokeCollision;
 			obj->savePosition = true;
 			obj->saveFlags = true;
 			obj->saveAnim = true;

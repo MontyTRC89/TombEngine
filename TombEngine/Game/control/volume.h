@@ -29,7 +29,7 @@ enum TriggerVolumeActivators
 {
 	Player = 1,
 	NPC = 2,
-	Movable = 4,
+	Moveable = 4,
 	Static = 8,
 	Flyby = 16,
 	PhysicalObject = 32	// Future-proofing for Bullet.
@@ -38,7 +38,7 @@ enum TriggerVolumeActivators
 struct TriggerVolume
 {
 	TriggerVolumeType Type;
-	std::string LuaName;
+	std::string Name = "";
 	int EventSetIndex;
 
 	Vector3 Position;
