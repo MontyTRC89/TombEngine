@@ -1195,6 +1195,9 @@ bool SaveGame::Load(int slot)
 	const Save::SaveGame* s = Save::GetSaveGame(buffer.get());
 
 	// Statistics
+	LastSaveGame = s->header()->count();
+	GameTimer = s->header()->timer();
+
 	Statistics.Game.AmmoHits = s->game()->ammo_hits();
 	Statistics.Game.AmmoUsed = s->game()->ammo_used();
 	Statistics.Game.Distance = s->game()->distance();

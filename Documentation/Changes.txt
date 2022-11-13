@@ -16,6 +16,7 @@ Version 1.0.3
 * Improve game and inventory input handling.
 * Adjust sprint jump timing.
 * Fix going into inventory and load/save dialogs during fade-ins and fade-outs.
+* Fix savegames not preserving save number and game timer.
 * Fix dodgy weapon lock angle constraints.
 * Fix wrong shotgun ammo pickup amount.
 * Fix shotgun using 6 units of ammo with each shot.
