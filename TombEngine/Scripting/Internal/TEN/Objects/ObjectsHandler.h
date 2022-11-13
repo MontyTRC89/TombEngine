@@ -64,40 +64,39 @@ private:
 			return std::make_unique<R>(std::get<R::IdentifierType>(m_nameMap.at(name)));
 	}
 
-	template <typename R, char const* S>
+	template <typename R>
 	std::vector <std::unique_ptr<R>> GetMoveablesBySlot(GAME_OBJECT_ID objID)
 	{
 		std::vector<std::unique_ptr<R>> items = {};
 		for (auto& [key, val] : m_nameMap)
 		{
-			if (!std::holds_alternative<std::reference_wrapper<MESH_INFO>>(val))
-			{
-				auto* item = &g_Level.Items[GetIndexByName(key)];
-				GAME_OBJECT_ID objectNumber = item->ObjectNumber;
+			if (!std::holds_alternative<short>(val))
+				continue;
 
-				if (objID == objectNumber)
-					items.push_back(GetByName<Moveable, ScriptReserved_Moveable>(key));
-			}
+			auto* item = &g_Level.Items[GetIndexByName(key)];
+
+			if (objID == item->ObjectNumber)
+				items.push_back(GetByName<Moveable, ScriptReserved_Moveable>(key));
+			
 		}
 
 		return items;
 	}
 
-	template <typename R, char const* S>
-	std::vector <std::unique_ptr<R>> GetStaticsById(int slot)
+	template <typename R>
+	std::vector <std::unique_ptr<R>> GetStaticsBySlot(int slot)
 	{
 		std::vector<std::unique_ptr<R>> items = {};
 		for (auto& [key, val] : m_nameMap)
 		{
-			if (std::holds_alternative<std::reference_wrapper<MESH_INFO>>(val))
-			{
-				auto meshInfo = std::get<std::reference_wrapper<MESH_INFO>>(val).get();
-				int staticNumber = meshInfo.staticNumber;
-				int slotNr = slot;
+			if (!std::holds_alternative<std::reference_wrapper<MESH_INFO>>(val))
+				continue;
+			
+			auto meshInfo = std::get<std::reference_wrapper<MESH_INFO>>(val).get();
 
-				if (staticNumber == slotNr)
-					items.push_back(GetByName<Static, ScriptReserved_Moveable>(key));
-			}
+			if (meshInfo.staticNumber == slot)
+				items.push_back(GetByName<Static, ScriptReserved_Static>(key));
+			
 		}
 
 		return items;
