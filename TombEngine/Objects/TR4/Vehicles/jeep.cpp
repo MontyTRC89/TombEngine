@@ -232,8 +232,8 @@ namespace TEN::Entities::Vehicles
 		int z = pos->z / SECTOR(1);
 		int oldX = old->x / SECTOR(1);
 		int oldZ = old->z / SECTOR(1);
-		int shiftX = pos->x & (WALL_SIZE - 1);
-		int shiftZ = pos->z & (WALL_SIZE - 1);
+		int shiftX = pos->x & WALL_MASK;
+		int shiftZ = pos->z & WALL_MASK;
 
 		if (x == oldX)
 		{
@@ -249,7 +249,7 @@ namespace TEN::Entities::Vehicles
 			}
 			else
 			{
-				jeepItem->Pose.Position.z += WALL_SIZE - 1 - shiftZ;
+				jeepItem->Pose.Position.z += WALL_MASK - shiftZ;
 				return (jeepItem->Pose.Position.x - pos->x);
 			}
 		}
@@ -263,7 +263,7 @@ namespace TEN::Entities::Vehicles
 			}
 			else
 			{
-				jeepItem->Pose.Position.x += WALL_SIZE - 1 - shiftX;
+				jeepItem->Pose.Position.x += WALL_MASK - shiftX;
 				return (pos->z - jeepItem->Pose.Position.z);
 			}
 		}
@@ -280,7 +280,7 @@ namespace TEN::Entities::Vehicles
 			if (pos->z > old->z)
 				z = -1 - shiftZ;
 			else
-				z = WALL_SIZE + 1 - shiftZ;
+				z = BLOCK(1) + 1 - shiftZ;
 		}
 
 		roomNumber = jeepItem->RoomNumber;
@@ -292,7 +292,7 @@ namespace TEN::Entities::Vehicles
 			if (pos->x > old->x)
 				x = -1 - shiftX;
 			else
-				x = WALL_SIZE + 1 - shiftX;
+				x = BLOCK(1) + 1 - shiftX;
 		}
 
 		if (x && z)
@@ -386,7 +386,7 @@ namespace TEN::Entities::Vehicles
 		if (probe.Position.FloorSlope || probe.Position.Floor == NO_HEIGHT)
 			return false;
 
-		if (abs(probe.Position.Floor - jeepItem->Pose.Position.y) > WALL_SIZE / 2)
+		if (abs(probe.Position.Floor - jeepItem->Pose.Position.y) > BLOCK(1.0f / 2))
 			return false;
 
 		if ((probe.Position.Ceiling - jeepItem->Pose.Position.y) > -LARA_HEIGHT ||

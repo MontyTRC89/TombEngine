@@ -82,31 +82,31 @@ namespace TEN::Entities::Traps
 			switch (item->Pose.Orientation.y)
 			{
 			case 0:
-				z = WALL_SIZE / 2;
+				z = BLOCK(1.0f / 2);
 				break;
 
 			case 0x4000:
-				x = WALL_SIZE / 2;
+				x = BLOCK(1.0f / 2);
 				break;
 
 			case -0x8000:
-				z = -WALL_SIZE / 2;
+				z = -BLOCK(1.0f / 2);
 				break;
 
 			case -0x4000:
-				x = -WALL_SIZE / 2;
+				x = -BLOCK(1.0f / 2);
 				break;
 			}
 
 			dartItem->Pose.Position.x = x + item->Pose.Position.x;
-			dartItem->Pose.Position.y = item->Pose.Position.y - WALL_SIZE / 2;
+			dartItem->Pose.Position.y = item->Pose.Position.y - BLOCK(1.0f / 2);
 			dartItem->Pose.Position.z = z + item->Pose.Position.z;
 
 			InitialiseItem(dartItemNumber);
 
 			dartItem->Pose.Orientation.x = 0;
-			dartItem->Pose.Orientation.y = item->Pose.Orientation.y + -ANGLE(180);
-			dartItem->Animation.Velocity.z = 256;
+			dartItem->Pose.Orientation.y = item->Pose.Orientation.y + ANGLE(-180.0f);
+			dartItem->Animation.Velocity.z = BLOCK(1.0f / 4);
 
 			int xf = 0;
 			int zf = 0;

@@ -684,8 +684,8 @@ namespace TEN::Renderer
 		RendererRoom& room = m_rooms[roomNumber];
 		ROOM_INFO* r = &g_Level.Rooms[roomNumber];
 		
-		Vector3 boxMin = Vector3(r->x + WALL_SIZE, r->maxceiling - STEP_SIZE, r->z + WALL_SIZE);
-		Vector3 boxMax = Vector3(r->x + (r->xSize - 1) * WALL_SIZE, r->minfloor + STEP_SIZE, r->z + (r->zSize - 1) * WALL_SIZE);
+		Vector3 boxMin = Vector3(r->x + BLOCK(1), r->maxceiling - CLICK(1), r->z + BLOCK(1));
+		Vector3 boxMax = Vector3(r->x + (r->xSize - 1) * BLOCK(1), r->minfloor + CLICK(1), r->z + (r->zSize - 1) * BLOCK(1));
 
 		// Collect dynamic lights for rooms
 		for (int i = 0; i < dynamicLights.size(); i++)

@@ -167,7 +167,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->HitPoints = 120;
 		obj->hitEffect = HIT_BLOOD;
 		obj->pivotLength = 400;
-		obj->radius = WALL_SIZE / 3;
+		obj->radius = BLOCK(1.0f / 3);
 		obj->intelligent = true;
 		obj->savePosition = true;
 		obj->saveHitpoints = true;
@@ -186,7 +186,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->shadowType = ShadowMode::All;
 		obj->hitEffect = HIT_BLOOD;
 		obj->pivotLength = 150;
-		obj->radius = WALL_SIZE / 3;
+		obj->radius = BLOCK(1.0f / 3);
 		obj->HitPoints = 50;
 		obj->intelligent = true;
 		obj->saveAnim = true;

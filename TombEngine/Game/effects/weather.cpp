@@ -301,9 +301,9 @@ namespace TEN::Effects::Environment
 
 			// Check if particle got out of room bounds
 
-			if (p.Position.y <= (r.maxceiling - STEP_SIZE) || p.Position.y >= (r.minfloor + STEP_SIZE) ||
-				p.Position.z <= (r.z + WALL_SIZE - STEP_SIZE) || p.Position.z >= (r.z + ((r.zSize - 1) << 10) + STEP_SIZE) ||
-				p.Position.x <= (r.x + WALL_SIZE - STEP_SIZE) || p.Position.x >= (r.x + ((r.xSize - 1) << 10) + STEP_SIZE))
+			if (p.Position.y <= (r.maxceiling - CLICK(1)) || p.Position.y >= (r.minfloor + CLICK(1)) ||
+				p.Position.z <= (r.z + BLOCK(3.0f / 4)) || p.Position.z >= (r.z + ((r.zSize - 1) << 10) + BLOCK(1.0f / 4)) ||
+				p.Position.x <= (r.x + BLOCK(3.0f / 4)) || p.Position.x >= (r.x + ((r.xSize - 1) << 10) + BLOCK(1.0f / 4)))
 			{
 				if (!collisionCalculated)
 				{
@@ -474,10 +474,10 @@ namespace TEN::Effects::Environment
 
 				auto xPos = Camera.pos.x + ((int)(phd_cos(angle) * radius));
 				auto zPos = Camera.pos.z + ((int)(phd_sin(angle) * radius));
-				auto yPos = Camera.pos.y - (WALL_SIZE * 4 + GenerateInt() & (WALL_SIZE * 4 - 1));
+				auto yPos = Camera.pos.y - (BLOCK(4) + GenerateInt() & (BLOCK(4) - 1));
 				
 				auto outsideRoom = IsRoomOutside(xPos, yPos, zPos);
-
+				
 				if (outsideRoom == NO_ROOM)
 					continue;
 

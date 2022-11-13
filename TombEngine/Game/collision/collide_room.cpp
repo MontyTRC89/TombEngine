@@ -949,10 +949,10 @@ short GetNearestLedgeAngle(ItemInfo* item, CollisionInfo* coll, float& distance)
 			auto ffpZ = eZ + frontFloorProbeOffset * c;
 
 			// Calculate block min/max points to filter out out-of-bounds checks.
-			float minX = floor(ffpX / WALL_SIZE) * WALL_SIZE - 1.0f;
-			float minZ = floor(ffpZ / WALL_SIZE) * WALL_SIZE - 1.0f;
-			float maxX =  ceil(ffpX / WALL_SIZE) * WALL_SIZE + 1.0f;
-			float maxZ =  ceil(ffpZ / WALL_SIZE) * WALL_SIZE + 1.0f;
+			float minX = floor(ffpX / BLOCK(1)) * BLOCK(1) - 1.0f;
+			float minZ = floor(ffpZ / BLOCK(1)) * BLOCK(1) - 1.0f;
+			float maxX =  ceil(ffpX / BLOCK(1)) * BLOCK(1) + 1.0f;
+			float maxZ =  ceil(ffpZ / BLOCK(1)) * BLOCK(1) + 1.0f;
 
 			// Get front floor block
 			auto room = GetRoom(item->Location, ffpX, y, ffpZ).roomNumber;
@@ -1146,7 +1146,7 @@ short GetNearestLedgeAngle(ItemInfo* item, CollisionInfo* coll, float& distance)
 
 		// A case when all 3 results are different (no priority) or prioritized result is a long-distance misfire.
 
-		if (finalDistance[h] == FLT_MAX || finalDistance[h] > WALL_SIZE / 2)
+		if (finalDistance[h] == FLT_MAX || finalDistance[h] > BLOCK(1.0f / 2))
 		{
 			// Prioritize angle which is similar to coll setup's forward angle.
 			// This helps to solve some borderline cases with diagonal shimmying,
