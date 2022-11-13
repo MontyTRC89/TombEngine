@@ -1027,7 +1027,7 @@ namespace TEN::Entities::Vehicles
 				!(kayak->Flags & 0x80))
 			{
 				kayak->Flags |= 0x80;
-				lara->MeshPtrs[LM_RHAND] = Objects[ID_KAYAK_LARA_ANIMS].meshIndex + LM_RHAND;
+				laraItem->Model.MeshIndex[LM_RHAND] = Objects[ID_KAYAK_LARA_ANIMS].meshIndex + LM_RHAND;
 				laraItem->MeshBits.Clear(KayakLaraLegJoints);
 			}
 
@@ -1039,7 +1039,7 @@ namespace TEN::Entities::Vehicles
 				kayak->Flags & 0x80)
 			{
 				kayak->Flags &= ~0x80;
-				lara->MeshPtrs[LM_RHAND] = Objects[ID_LARA_SKIN].meshIndex + LM_RHAND;
+				laraItem->Model.MeshIndex[LM_RHAND] = laraItem->Model.BaseMesh + LM_RHAND;
 				laraItem->MeshBits.Set(KayakLaraLegJoints);
 			}
 

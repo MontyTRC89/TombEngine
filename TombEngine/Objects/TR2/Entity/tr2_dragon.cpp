@@ -213,7 +213,7 @@ namespace TEN::Entities::Creatures::TR2
 					Lara.Control.HandStatus = HandStatus::Busy;
 					Lara.HitDirection = -1;
 
-					Lara.MeshPtrs[LM_RHAND] = Objects[ID_LARA_EXTRA_ANIMS].meshIndex + LM_RHAND;
+					laraItem->Model.MeshIndex[LM_RHAND] = Objects[ID_LARA_EXTRA_ANIMS].meshIndex + LM_RHAND;
 
 					((CreatureInfo*)g_Level.Items[(short)item->Data].Data)->Flags = -1;
 

@@ -102,3 +102,5 @@ void SetCinematicBars(float height, float speed);
 void ClearCinematicBars();
 void UpdateFadeScreenAndCinematicBars();
 void HandleOptics(ItemInfo* item);
+
+float GetParticleDistanceFade(Vector3i position);

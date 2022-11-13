@@ -66,7 +66,7 @@ namespace TEN::Math::Geometry
 		return (point + (directionNorm * distance));
 	}
 
-	short GetShortestAngularDistance(short fromAngle, short toAngle)
+	short GetShortestAngle(short fromAngle, short toAngle)
 	{
 		if (fromAngle == toAngle)
 			return 0;

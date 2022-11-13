@@ -99,12 +99,11 @@ void InitialiseLaraMeshes(ItemInfo* item)
 {
 	auto* lara = GetLaraInfo(item);
 
+	// Override base mesh and mesh indices to Lara skin.
+
+	item->Model.BaseMesh = Objects[ID_LARA_SKIN].meshIndex;
 	for (int i = 0; i < NUM_LARA_MESHES; i++)
-	{
-		//Meshes[i] = Meshes[MESHES(ID_LARA_SKIN, i)];
-		//LARA_MESHES(ID_LARA, MESHES(ID_LARA_SKIN, i));
-		lara->MeshPtrs[i] = Objects[ID_LARA_SKIN].meshIndex + i;
-	}
+		item->Model.MeshIndex[i] = item->Model.BaseMesh + i;
 
 	/* Hardcoded code */
 

@@ -311,37 +311,37 @@ namespace TEN::Entities::Creatures::TR5
 		auto* item = &g_Level.Items[itemNumber];
 		auto* creature = GetCreatureInfo(item);
 
-		int prevMeshSwapBits = item->MeshSwapBits.ToPackedBits();
+		auto prevMeshSwapBits = item->Model.MeshIndex;
 
 		// At determined HP values, roman statues sheds material.
-		if (item->HitPoints < 1 && !(item->MeshSwapBits & 0x10000))
+		if (item->HitPoints < 1 && !item->TestMeshSwapFlags(0x10000))
 		{
 			ExplodeItemNode(item, 16, 0, 8);
 			item->MeshBits |= 0x10000;
-			item->MeshSwapBits |= 0x10000;
+			item->SetMeshSwapFlags(0x10000);
 		}
-		else if (item->HitPoints < 75 && !(item->MeshSwapBits & 0x100))
+		else if (item->HitPoints < 75 && !item->TestMeshSwapFlags(0x100))
 		{
 			ExplodeItemNode(item, 8, 0, 8);
 			item->MeshBits |= 0x100;
-			item->MeshSwapBits |= 0x100;
+			item->SetMeshSwapFlags(0x100);
 		}
-		else if (item->HitPoints < 150 && !(item->MeshSwapBits & 0x400))
+		else if (item->HitPoints < 150 && !item->TestMeshSwapFlags(0x400))
 		{
 			ExplodeItemNode(item, 10, 0, 32);
 			ExplodeItemNode(item, 11, 0, 32);
 			item->MeshBits |= 0x400u;
-			item->MeshSwapBits |= 0x400;
+			item->SetMeshSwapFlags(0x400);
 		}
-		else if (item->HitPoints < 225 && !(item->MeshSwapBits & 0x10))
+		else if (item->HitPoints < 225 && !item->TestMeshSwapFlags(0x10))
 		{
 			ExplodeItemNode(item, 4, 0, 8);
 			item->MeshBits |= 0x10;
-			item->MeshSwapBits |= 0x10;
+			item->SetMeshSwapFlags(0x10);
 		}
 
 		// Play hit animation.
-		if (prevMeshSwapBits != item->MeshSwapBits.ToPackedBits())
+		if (prevMeshSwapBits != item->Model.MeshIndex)
 		{
 			item->Animation.TargetState = STATUE_STATE_HIT;
 			item->Animation.ActiveState = STATUE_STATE_HIT;
@@ -859,7 +859,7 @@ namespace TEN::Entities::Creatures::TR5
 		CreatureJoint(item, 1, joint1);
 		CreatureJoint(item, 2, joint2);
 
-		if (item->MeshSwapBits & 0x400)
+		if (item->TestMeshSwapFlags(0x400))
 		{
 			auto pos = Vector3i(
 				(GetRandomControl() & 0x1F) - 16,
@@ -869,7 +869,7 @@ namespace TEN::Entities::Creatures::TR5
 			RomanStatueHitEffect(item, &pos, 10);
 		}
 
-		if (item->MeshSwapBits & 0x10)
+		if (item->TestMeshSwapFlags(0x10))
 		{
 			auto pos = Vector3i(
 				-40,
@@ -879,7 +879,7 @@ namespace TEN::Entities::Creatures::TR5
 			RomanStatueHitEffect(item, &pos, 4);
 		}
 
-		if (item->MeshSwapBits & 0x100)
+		if (item->TestMeshSwapFlags(0x100))
 		{
 			auto pos = Vector3i(
 				(GetRandomControl() & 0x3F) + 54,

@@ -1,60 +1,61 @@
 #include "framework.h"
-#include "Specific/Input/Input.h"
-#include "Game/Lara/lara.h"
-#include "Game/Lara/lara_helpers.h"
 #include "Objects/Generic/Switches/underwater_switch.h"
-#include "Objects/Generic/Switches/generic_switch.h"
+
+#include "Game/animation.h"
 #include "Game/camera.h"
 #include "Game/collision/collide_item.h"
-#include "Specific/level.h"
-#include "Game/animation.h"
 #include "Game/items.h"
+#include "Game/Lara/lara.h"
+#include "Game/Lara/lara_helpers.h"
+#include "Objects/Generic/Switches/generic_switch.h"
+#include "Specific/Input/Input.h"
+#include "Specific/level.h"
 
 using namespace TEN::Input;
 
 namespace TEN::Entities::Switches
 { 
+	const auto UnderwaterSwitchPos = Vector3i(0, 0, 108);
 	const ObjectCollisionBounds UnderwaterSwitchBounds =
 	{
 		GameBoundingBox(
-			-SECTOR(1), SECTOR(1),
-			-SECTOR(1), SECTOR(1),
-			-SECTOR(1), SECTOR(0.5f)
+			-BLOCK(3.0f / 8), BLOCK(3.0f / 8),
+			-BLOCK(3.0f / 8), BLOCK(3.0f / 8),
+			0, BLOCK(3.0f / 4)
 		),
 		std::pair(
 			EulerAngles(ANGLE(-80.0f), ANGLE(-80.0f), ANGLE(-80.0f)),
 			EulerAngles(ANGLE(80.0f), ANGLE(80.0f), ANGLE(80.0f))
 		)
 	};
-	const auto UnderwaterSwitchPos = Vector3i(0, 0, 108);
 
+	const auto CeilingUnderwaterSwitchPos1 = Vector3i(0, -736, -416);
 	const ObjectCollisionBounds CeilingUnderwaterSwitchBounds1 =
 	{
 		GameBoundingBox(
-			-CLICK(1), CLICK(1),
-			-SECTOR(1.25f), -SECTOR(0.5f),
-			-SECTOR(0.5f), 0
+			-BLOCK(3.0f / 8), BLOCK(3.0f / 8),
+			-BLOCK(17.0f / 16), -BLOCK(1.0f / 2),
+			-BLOCK(1.0f / 2), 0
 		),
 		std::pair(
 			EulerAngles(ANGLE(-80.0f), ANGLE(-80.0f), ANGLE(-80.0f)),
 			EulerAngles(ANGLE(80.0f), ANGLE(80.0f), ANGLE(80.0f))
 		)
 	};
-	const auto CeilingUnderwaterSwitchPos1 = Vector3i(0, -736, -416);
 
+	const auto CeilingUnderwaterSwitchPos2 = Vector3i(0, -736, 416);
 	const ObjectCollisionBounds CeilingUnderwaterSwitchBounds2 =
 	{
 		GameBoundingBox(
-			-CLICK(1), CLICK(1),
-			-SECTOR(1.25f), -SECTOR(0.5f),
-			0, SECTOR(0.5f)
+			-BLOCK(3.0f / 8), BLOCK(3.0f / 8),
+			-BLOCK(17.0f / 16), -BLOCK(1.0f / 2),
+			0, BLOCK(1.0f / 2)
 		),
 		std::pair(
 			EulerAngles(ANGLE(-80.0f), ANGLE(-80.0f), ANGLE(-80.0f)),
 			EulerAngles(ANGLE(80.0f), ANGLE(80.0f), ANGLE(80.0f))
 		)
 	};
-	const auto CeilingUnderwaterSwitchPos2 = Vector3i(0, -736, 416);
 
 	void UnderwaterSwitchCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 	{
@@ -110,7 +111,7 @@ namespace TEN::Entities::Switches
 		auto* lara = GetLaraInfo(laraItem);
 		auto* switchItem = &g_Level.Items[itemNumber];
 
-		bool flag = false;
+		bool doInteraction = false;
 
 		if ((TrInput & IN_ACTION &&
 			laraItem->Animation.ActiveState == LS_UNDERWATER_IDLE &&
@@ -123,7 +124,7 @@ namespace TEN::Entities::Switches
 			if (TestLaraPosition(CeilingUnderwaterSwitchBounds1, switchItem, laraItem))
 			{
 				if (MoveLaraPosition(CeilingUnderwaterSwitchPos1, switchItem, laraItem))
-					flag = true;
+					doInteraction = true;
 				else
 					lara->InteractedItem = itemNumber;
 			}
@@ -134,7 +135,7 @@ namespace TEN::Entities::Switches
 				if (TestLaraPosition(CeilingUnderwaterSwitchBounds2, switchItem, laraItem))
 				{
 					if (MoveLaraPosition(CeilingUnderwaterSwitchPos2, switchItem, laraItem))
-						flag = true;
+						doInteraction = true;
 					else
 						lara->InteractedItem = itemNumber;
 				}
@@ -142,9 +143,10 @@ namespace TEN::Entities::Switches
 				laraItem->Pose.Orientation.y ^= (short)ANGLE(180.0f);
 			}
 
-			if (flag)
+			if (doInteraction)
 			{
 				SetAnimation(laraItem, LA_UNDERWATER_CEILING_SWITCH_PULL);
+				laraItem->Animation.TargetState = LS_UNDERWATER_IDLE;
 				laraItem->Animation.Velocity.y = 0;
 				lara->Control.IsMoving = false;
 				lara->Control.HandStatus = HandStatus::Busy;

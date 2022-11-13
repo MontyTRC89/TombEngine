@@ -28,10 +28,11 @@ using namespace TEN::Entities::Generic;
 using namespace TEN::Input;
 using namespace TEN::Math;
 
-constexpr auto COLL_CHECK_THRESHOLD   = SECTOR(4);
-constexpr auto COLL_CANCEL_THRESHOLD  = SECTOR(2);
-constexpr auto COLL_DISCARD_THRESHOLD = CLICK(0.5f);
-constexpr auto CAMERA_RADIUS          = CLICK(1);
+constexpr auto PARTICLE_FADE_THRESHOLD = SECTOR(14);
+constexpr auto COLL_CHECK_THRESHOLD    = SECTOR(4);
+constexpr auto COLL_CANCEL_THRESHOLD   = SECTOR(2);
+constexpr auto COLL_DISCARD_THRESHOLD  = CLICK(0.5f);
+constexpr auto CAMERA_RADIUS           = CLICK(1);
 
 const auto LOOKCAM_ORIENT_CONSTRAINT = std::pair<EulerAngles, EulerAngles>(
 	EulerAngles(ANGLE(-70.0f), ANGLE(-90.0f), 0),
@@ -1464,6 +1465,16 @@ bool TestBoundsCollideCamera(const GameBoundingBox& bounds, const Pose& pose, sh
 {
 	auto sphere = BoundingSphere(Camera.pos.ToVector3(), radius);
 	return sphere.Intersects(bounds.ToBoundingOrientedBox(pose));
+}
+
+float GetParticleDistanceFade(Vector3i position)
+{
+	float distance = Vector3::Distance(Camera.pos.ToVector3(), position.ToVector3());
+
+	if (distance <= PARTICLE_FADE_THRESHOLD)
+		return 1.0f;
+
+	return std::clamp(1.0f - ((distance - PARTICLE_FADE_THRESHOLD) / COLL_CHECK_THRESHOLD), 0.0f, 1.0f);
 }
 
 void ItemPushCamera(GameBoundingBox* bounds, Pose* pos, short radius)

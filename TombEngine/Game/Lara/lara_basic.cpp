@@ -71,6 +71,7 @@ void lara_as_controlled(ItemInfo* item, CollisionInfo* coll)
 	lara->Control.Look.Mode = LookMode::None;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
+	Camera.flags = CF_FOLLOW_CENTER;
 
 	if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameEnd - 1)
 	{

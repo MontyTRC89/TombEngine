@@ -23,8 +23,8 @@ namespace TEN::Entities::TR4
 		auto* item = &g_Level.Items[itemNumber];
 
 		// Set mutators to 0 by default.
-		for (size_t i = 0; i < item->Animation.Mutator.size(); i++)
-			item->Animation.Mutator[i].Scale.y = 0.0f;
+		for (size_t i = 0; i < item->Model.Mutator.size(); i++)
+			item->Model.Mutator[i].Scale.y = 0.0f;
 
 		item->Status = ITEM_INVISIBLE;
 		item->ItemFlags[0] = 1024;
@@ -210,13 +210,13 @@ namespace TEN::Entities::TR4
 		}
 
 		// Update bone mutators.
-		for (size_t i = 0; i < item->Animation.Mutator.size(); i++)
+		for (size_t i = 0; i < item->Model.Mutator.size(); i++)
 		{
 			float scale = (float)item->ItemFlags[1] / 4096.0f;
 			if (scale > 0.0f)
-				item->Animation.Mutator[i].Scale = Vector3(1.0f, scale, 1.0f);
+				item->Model.Mutator[i].Scale = Vector3(1.0f, scale, 1.0f);
 			else
-				item->Animation.Mutator[i].Scale = Vector3::Zero;
+				item->Model.Mutator[i].Scale = Vector3::Zero;
 		}
 	}
 }

@@ -127,7 +127,7 @@ namespace TEN::Entities::Creatures::TR5
 			case 3:
 				item->Animation.AnimNumber = anim + 28;
 				item->Animation.TargetState = GUARD_STATE_SIT;
-				item->MeshSwapBits = 9216;
+				item->SetMeshSwapFlags(9216);
 
 				roomItemNumber = g_Level.Rooms[item->RoomNumber].itemNumber;
 				if (roomItemNumber != NO_ITEM)
@@ -161,7 +161,7 @@ namespace TEN::Entities::Creatures::TR5
 			case 4:
 				item->Animation.AnimNumber = anim + 30;
 				item->Animation.TargetState = 17;
-				item->MeshSwapBits = 8192;
+				item->SetMeshSwapFlags(8192);
 				break;
 
 			case 5:
@@ -708,7 +708,7 @@ namespace TEN::Entities::Creatures::TR5
 
 				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + 44)
 				{
-					item->MeshSwapBits = NO_JOINT_BITS;
+					item->SetMeshSwapFlags(NO_JOINT_BITS);
 
 					short currentItemNumber = g_Level.Rooms[item->RoomNumber].itemNumber;
 					if (currentItemNumber == NO_ITEM)
@@ -803,7 +803,7 @@ namespace TEN::Entities::Creatures::TR5
 					item->Pose.Position.x = currentItem->Pose.Position.x - CLICK(1);
 					item->Pose.Orientation.y = currentItem->Pose.Orientation.y;
 					item->Pose.Position.z = currentItem->Pose.Position.z + CLICK(0.5f);
-					item->MeshSwapBits = 1024;
+					item->SetMeshSwapFlags(1024);
 				}
 				else
 				{
@@ -822,7 +822,7 @@ namespace TEN::Entities::Creatures::TR5
 						currentItem->MeshBits = 0x1FFF;
 						TestTriggers(item, true);
 						item->Animation.RequiredState = GUARD_STATE_WALK;
-						item->MeshSwapBits = NO_JOINT_BITS;
+						item->SetMeshSwapFlags(NO_JOINT_BITS);
 					}
 				}
 
@@ -1085,7 +1085,7 @@ namespace TEN::Entities::Creatures::TR5
 		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 		item->Animation.TargetState = GUARD_STATE_IDLE;
 		item->Animation.ActiveState = GUARD_STATE_IDLE;
-		item->MeshSwapBits = 9216;
+		item->SetMeshSwapFlags(9216);
 	}
 
 	void Mafia2Control(short itemNumber)
@@ -1210,13 +1210,13 @@ namespace TEN::Entities::Creatures::TR5
 				}
 				if (laraAI.angle <= ANGLE(112.5f) && laraAI.angle >= -ANGLE(112.5f))
 				{
-					if (item->MeshSwapBits == 9216)
+					if (item->TestMeshSwapFlags(9216))
 					{
 						item->Animation.TargetState = MAFIA2_STATE_UNDRAW_GUNS;
 						break;
 					}
 				}
-				else if (item->MeshSwapBits == 9216)
+				else if (item->TestMeshSwapFlags(9216))
 				{
 					item->Animation.TargetState = MAFIA2_STATE_TURN_180;
 					break;
@@ -1272,13 +1272,13 @@ namespace TEN::Entities::Creatures::TR5
 					item->Pose.Orientation.y += ANGLE(2.0f);
 
 				if (item->Animation.FrameNumber != g_Level.Anims[item->Animation.AnimNumber].frameBase + 16 ||
-					item->MeshSwapBits != 9216)
+					!item->TestMeshSwapFlags(9216))
 				{
 					if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameEnd)
 						item->Pose.Orientation.y += -ANGLE(180.0f);
 				}
 				else
-					item->MeshSwapBits = 128;
+					item->SetMeshSwapFlags(128);
 			
 				break;
 
@@ -1412,9 +1412,9 @@ namespace TEN::Entities::Creatures::TR5
 					item->Pose.Orientation.y -= ANGLE(2.0f);
 
 				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + 16 &&
-					item->MeshSwapBits == 9216)
+					item->TestMeshSwapFlags(9216))
 				{
-					item->MeshSwapBits = 128;
+					item->SetMeshSwapFlags(128);
 				}
 
 				break;

@@ -66,13 +66,28 @@ struct EntityAnimationData
 
 	bool IsAirborne	= false;
 	Vector3 Velocity = Vector3::Zero; // CONVENTION: +X = right, +Y = down, +Z = forward
+};
+
+struct EntityModelData
+{
+	int BaseMesh;
+	std::vector<int> MeshIndex = {};
 	std::vector<BoneMutator> Mutator = {};
+};
+
+struct EntityCallbackData
+{
+	std::string OnKilled;
+	std::string OnHit;
+	std::string OnObjectCollided;
+	std::string OnRoomCollided;
 };
 
 //todo we need to find good "default states" for a lot of these - squidshire 25/05/2022
 struct ItemInfo
 {
 	GAME_OBJECT_ID ObjectNumber;
+	std::string Name;
 
 	int Status;	// ItemStatus enum.
 	bool Active;
@@ -83,6 +98,9 @@ struct ItemInfo
 
 	ITEM_DATA Data;
 	EntityAnimationData Animation;
+	EntityCallbackData Callbacks;
+	EntityModelData Model;
+	
 	Pose StartPose;
 	Pose Pose;
 	ROOM_VECTOR Location;
@@ -101,7 +119,6 @@ struct ItemInfo
 
 	BitField TouchBits	  = BitField();
 	BitField MeshBits	  = BitField();
-	BitField MeshSwapBits = BitField();
 
 	unsigned short Flags; // ItemFlags enum
 	short ItemFlags[8];
@@ -112,19 +129,17 @@ struct ItemInfo
 	short AfterDeath;
 	short CarriedItem;
 
-	// Lua
-	std::string LuaName;
-	std::string LuaCallbackOnKilledName;
-	std::string LuaCallbackOnHitName;
-	std::string LuaCallbackOnCollidedWithObjectName;
-	std::string LuaCallbackOnCollidedWithRoomName;
-
 	bool TestOcb(short ocbFlags);
 	void RemoveOcb(short ocbFlags);
 	void ClearAllOcb();
 
 	bool TestFlags(short id, short value);
 	void SetFlags(short id, short value);
+
+	bool TestMeshSwapFlags(unsigned int flags);
+	bool TestMeshSwapFlags(const std::vector<unsigned int> flags);
+	void SetMeshSwapFlags(unsigned int flags, bool clear = false);
+	void SetMeshSwapFlags(const std::vector<unsigned int> flags, bool clear = false);
 
 	bool IsLara();
 	bool IsCreature();

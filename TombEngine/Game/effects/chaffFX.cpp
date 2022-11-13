@@ -89,41 +89,7 @@ void TriggerChaffEffects(ItemInfo* item, Vector3i* pos, Vector3i* vel, int speed
 
 void TriggerChaffSparkles(Vector3i* pos, Vector3i* vel, ColorData* color, int age, ItemInfo* item)
 {
-	/*
-	SPARKS* sparkle;
-
-	sparkle = &Sparks[GetFreeSpark()];
-
-	sparkle->on = true;
-
-	sparkle->sR = 255;
-	sparkle->sG = 255;
-	sparkle->sB = 255;
-
-	sparkle->dR = color->r;
-	sparkle->dG = color->g;
-	sparkle->dB = color->b;
-
-	sparkle->colFadeSpeed = 3;
-	sparkle->fadeToBlack = 5;
-	sparkle->sLife = sparkle->life = 10;
-	sparkle->transType = BLEND_MODES::BLENDMODE_ADDITIVE;
-	sparkle->dynamic = true;
-
-	sparkle->x = pos->x + (GetRandomDraw() & 7) - 3;
-	sparkle->y = pos->y + (GetRandomDraw() & 7) - 3;
-	sparkle->z = pos->z + (GetRandomDraw() & 7) - 3;
-	sparkle->xVel = vel->x + ((GetRandomDraw() & 255) - 128);
-	sparkle->yVel = vel->y + ((GetRandomDraw() & 255) - 128);
-	sparkle->zVel = vel->z + ((GetRandomDraw() & 255) - 128);
-	sparkle->friction = 2 | (2 << 4);
-	sparkle->scalar = 1;
-	sparkle->size = sparkle->sSize = (GetRandomDraw() & 3) + 4;
-	sparkle->dSize = (GetRandomDraw() & 1) + 1;
-	sparkle->gravity = sparkle->maxYvel = 0;
-	sparkle->flags = SP_SCALE;
-	*/
-	TEN::Effects::Spark::TriggerFlareSparkParticles(pos, vel,color,item->RoomNumber);
+	TEN::Effects::Spark::TriggerFlareSparkParticles(pos, vel, color, item->RoomNumber);
 }
 
 void TriggerChaffSmoke(Vector3i* pos, Vector3i* vel, int speed, bool moving, bool wind)
