@@ -73,9 +73,9 @@ private:
 			if (!std::holds_alternative<short>(val))
 				continue;
 
-			auto* item = &g_Level.Items[GetIndexByName(key)];
+			auto& item = g_Level.Items[GetIndexByName(key)];
 
-			if (objID == item->ObjectNumber)
+			if (objID == item.ObjectNumber)
 				items.push_back(GetByName<Moveable, ScriptReserved_Moveable>(key));
 			
 		}
