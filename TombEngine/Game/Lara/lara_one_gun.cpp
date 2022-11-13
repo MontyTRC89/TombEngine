@@ -74,7 +74,7 @@ void AnimateShotgun(ItemInfo* laraItem, LaraWeaponType weaponType)
 
 	if (HK.Interval)
 	{
-		HK.Flag = 0;
+		HK.Timer = 0;
 		HK.Interval--;
 	}
 
@@ -82,7 +82,7 @@ void AnimateShotgun(ItemInfo* laraItem, LaraWeaponType weaponType)
 	{
 	case WEAPON_STATE_AIM:
 
-		HK.Flag = 0;
+		HK.Timer = 0;
 		HK.Interval = 0;
 		HK.ShotsFired = 0;
 
@@ -106,7 +106,7 @@ void AnimateShotgun(ItemInfo* laraItem, LaraWeaponType weaponType)
 
 	case WEAPON_STATE_UNDERWATER_AIM:
 
-		HK.Flag = 0;
+		HK.Timer = 0;
 		HK.Interval = 0;
 		HK.ShotsFired = 0;
 
@@ -165,7 +165,7 @@ void AnimateShotgun(ItemInfo* laraItem, LaraWeaponType weaponType)
 						else
 						{
 							FireHK(laraItem, 0);
-							HK.Flag = 1;
+							HK.Timer = 1;
 							item->Animation.TargetState = WEAPON_STATE_RECOIL;
 
 							SoundEffect(SFX_TR4_EXPLOSION1, &laraItem->Pose, SoundEnvironment::Land, 1.0f, 0.4f);
@@ -182,15 +182,15 @@ void AnimateShotgun(ItemInfo* laraItem, LaraWeaponType weaponType)
 			}
 
 			if (item->Animation.TargetState != WEAPON_STATE_RECOIL &&
-				HK.Flag &&
+				HK.Timer &&
 				weaponType == LaraWeaponType::HK )
 			{
 				StopSoundEffect(SFX_TR4_HK_FIRE);
 				SoundEffect(SFX_TR4_HK_STOP, &laraItem->Pose);
-				HK.Flag = 0;
+				HK.Timer = 0;
 			}
 		}
-		else if (HK.Flag)
+		else if (HK.Timer)
 		{
 				SoundEffect(SFX_TR4_EXPLOSION1, &laraItem->Pose, SoundEnvironment::Land, 1.0f, 0.4f);
 				SoundEffect(SFX_TR4_HK_FIRE, &laraItem->Pose);	
@@ -235,7 +235,7 @@ void AnimateShotgun(ItemInfo* laraItem, LaraWeaponType weaponType)
 						else
 						{
 							FireHK(laraItem, 1);
-							HK.Flag = 1;
+							HK.Timer = 1;
 							item->Animation.TargetState = WEAPON_STATE_UNDERWATER_RECOIL;
 
 							SoundEffect(SFX_TR4_EXPLOSION1, &laraItem->Pose, SoundEnvironment::Land, 1.0f, 0.4f);
@@ -252,16 +252,16 @@ void AnimateShotgun(ItemInfo* laraItem, LaraWeaponType weaponType)
 					item->Animation.TargetState = WEAPON_STATE_UNDERWATER_AIM;
 			}
 			 if (item->Animation.TargetState != WEAPON_STATE_UNDERWATER_RECOIL &&
-				  HK.Flag 
+				  HK.Timer 
 				 )
 			 {
 					StopSoundEffect(SFX_TR4_HK_FIRE);
 					SoundEffect(SFX_TR4_HK_STOP, &laraItem->Pose);
-					HK.Flag = 0;
+					HK.Timer = 0;
 			 }
 
 		}
-		else if (HK.Flag)
+		else if (HK.Timer)
 		{
 				SoundEffect(SFX_TR4_EXPLOSION1, &laraItem->Pose, SoundEnvironment::Land, 1.0f, 0.4f);
 				SoundEffect(SFX_TR4_HK_FIRE, &laraItem->Pose);
@@ -1718,8 +1718,8 @@ void LasersightWeaponHandler(ItemInfo* item, LaraWeaponType weaponType)
 	if (weapon.Interval)
 		weapon.Interval--;
 
-	if (weapon.Flag)
-		weapon.Flag--;
+	if (weapon.Timer)
+		weapon.Timer--;
 
 	if (!IsHeld(In::Action) || weapon.Interval || !ammo)
 	{
@@ -1763,14 +1763,14 @@ void LasersightWeaponHandler(ItemInfo* item, LaraWeaponType weaponType)
 				(lara->Control.Weapon.GunType == LaraWeaponType::HK) &&
 				(weapon.SelectedAmmo == WeaponAmmoType::Ammo1))
 			{
-				if (!weapon.Flag)
+				if (!weapon.Timer)
 				{
 					if (++weapon.ShotsFired == HK_BURST_MODE_SHOT_COUNT)
 					{
 						weapon.ShotsFired = 0;
 						weapon.Interval = HK_BURST_MODE_SHOT_INTERVAL;
 					}
-					weapon.Flag = 4;
+					weapon.Timer = 4;
 					firing = true;
 					SoundEffect(SFX_TR4_EXPLOSION1, nullptr, SoundEnvironment::Land, 1.0f, 0.4f);
 					SoundEffect(SFX_TR4_HK_FIRE, nullptr);
@@ -1785,14 +1785,14 @@ void LasersightWeaponHandler(ItemInfo* item, LaraWeaponType weaponType)
 			}
 			else
 			{
-				if (weapon.Flag)
+				if (weapon.Timer)
 				{
 					SoundEffect(SFX_TR4_EXPLOSION1, nullptr, SoundEnvironment::Land, 1.0f, 0.4f);
 					SoundEffect(SFX_TR4_HK_FIRE, nullptr);
 				}
 				else
 				{
-					weapon.Flag = 4;
+					weapon.Timer = 4;
 					firing = true;
 					SoundEffect(SFX_TR4_EXPLOSION1, nullptr, SoundEnvironment::Land, 1.0f, 0.4f);
 					SoundEffect(SFX_TR4_HK_FIRE, nullptr);
