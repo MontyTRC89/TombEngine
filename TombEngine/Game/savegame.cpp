@@ -1393,6 +1393,7 @@ bool SaveGame::Load(int slot)
 		item->MeshBits = savedItem->mesh_bits();
 
 		item->Model.BaseMesh = savedItem->base_mesh();
+		item->Model.MeshIndex.resize(savedItem->mesh_pointers()->size());
 		for (int j = 0; j < savedItem->mesh_pointers()->size(); j++)
 			item->Model.MeshIndex[j] = savedItem->mesh_pointers()->Get(j);
 
