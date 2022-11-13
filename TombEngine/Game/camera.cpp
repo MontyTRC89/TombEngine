@@ -206,9 +206,13 @@ void LookCamera(ItemInfo* item)
 	// Determine offsets.
 	float verticalOffset = -LaraCollision.Setup.Height;
 	if (LaraCollision.Setup.Height == LARA_HEIGHT_MONKEY)
+	{
 		verticalOffset += BLOCK(1.0f / 4);
+	}
 	else if (LaraCollision.Setup.Height == LARA_HEIGHT_TREAD)
+	{
 		verticalOffset += BLOCK(1.0f / 2);
+	}
 	else
 		verticalOffset += -BLOCK(1.0f / 8);
 
