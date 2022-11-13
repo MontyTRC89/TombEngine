@@ -2,6 +2,7 @@ Version 1.0.3
 =============
 
 * Add ledge jumps (Lara object must be updated with new animations to make it work).
+* Add GetMoveablesBySlot() and GetStaticsBySlot() to select Items via Slot.
 * Add FlipMap and PlayFlyBy script commands and node functions.
 * Allow any object slot to be used as a meshswap.
 * Add FlyCheat option to gameflow script for disabling dozy mode.
