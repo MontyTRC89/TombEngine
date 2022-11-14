@@ -2,7 +2,7 @@ Version 1.0.3
 =============
 
 * Add ledge jumps (Lara object must be updated with new animations to make it work).
-* Add GetMoveablesBySlot() and GetStaticsBySlot() to select Items via Slot.
+* Add GetMoveablesBySlot and GetStaticsBySlot script commands to select groups of items.
 * Add FlipMap and PlayFlyBy script commands and node functions.
 * Allow any object slot to be used as a meshswap.
 * Add FlyCheat option to gameflow script for disabling dozy mode.
@@ -10,7 +10,6 @@ Version 1.0.3
 * Add OCB 1 for rollingball to make it silent.
 * Customize waterfall mist colour and OCB (XXYY, where XX is width, and YY is size).
 * Implement sprite instancing to speed up rendering.
-* Merge portals at runtime to speed up rendering.
 * Enable dynamic lights for swarm enemies (beetles, rats and bats).
 * Re-enable underwater caustics.
 * Increase amount of maximum secrets per level from 8 to 32.
@@ -44,6 +43,11 @@ Version 1.0.3
 * Fix waterfall mist - it can now be disabled with antitrigger.
 * Fix underwater lever pull animation playing after interacting with underwater ceiling switch.
 * Fix Killer statue not triggering.
+
+Lua API changes:
+* A new class has been added, LaraObject, for Lara-specific functions. The built-in "Lara" variable now uses this class.
+* SetOnFire and GetOnFire have been added to LaraObject.
+* Raised the maximum value on Moveable.SetHP to 32767 (its internal numeric maximum).
 
 Version 1.0.2
 =============
