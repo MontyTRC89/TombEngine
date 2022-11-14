@@ -1326,7 +1326,7 @@ namespace TEN::Gui
 			if (lara->Weapons[(int)LaraWeaponType::HK].Present)
 			{
 				if (lara->Weapons[(int)LaraWeaponType::HK].HasLasersight)
-					InsertObjectIntoList(INV_OBJECT_HK_LASER);
+					InsertObjectIntoList(INV_OBJECT_HK_LASERSIGHT);
 				else
 					InsertObjectIntoList(INV_OBJECT_HK);
 
@@ -1337,7 +1337,7 @@ namespace TEN::Gui
 					Ammo.CurrentHKAmmoType = 2;
 			}
 			else if (Ammo.AmountHKAmmo1)
-					InsertObjectIntoList(INV_OBJECT_HK_AMMO);
+				InsertObjectIntoList(INV_OBJECT_HK_AMMO);
 
 			if (lara->Weapons[(int)LaraWeaponType::Crossbow].Present)
 			{
@@ -1527,7 +1527,7 @@ namespace TEN::Gui
 			if (lara->Weapons[(int)LaraWeaponType::HK].Present)
 			{
 				if (lara->Weapons[(int)LaraWeaponType::HK].HasLasersight)
-					InsertObjectIntoList_v2(INV_OBJECT_HK_LASER);
+					InsertObjectIntoList_v2(INV_OBJECT_HK_LASERSIGHT);
 				else
 					InsertObjectIntoList_v2(INV_OBJECT_HK);
 			}
