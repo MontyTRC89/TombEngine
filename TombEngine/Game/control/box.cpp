@@ -766,31 +766,8 @@ int CreatureAnimation(short itemNumber, short angle, short tilt)
 		item->Pose.Orientation.x = 0;
 	}
 
-	CreatureSwitchRoom(itemNumber);
+	UpdateItemRoom(itemNumber);
 	return true;
-}
-
-void CreatureSwitchRoom(short itemNumber)
-{
-	auto* item = &g_Level.Items[itemNumber];
-
-	auto roomNumber = GetCollision(item->Pose.Position.x,
-		item->Pose.Position.y - CLICK(2),
-		item->Pose.Position.z,
-		item->RoomNumber).RoomNumber;
-
-	if (roomNumber != item->RoomNumber)
-		ItemNewRoom(itemNumber, roomNumber);
-
-	if (!Objects[item->ObjectNumber].waterCreature &&
-		TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, &g_Level.Rooms[roomNumber]))
-	{
-		auto bounds = GameBoundingBox(item);
-		auto height = item->Pose.Position.y - GetWaterHeight(item);
-
-		if (abs(bounds.Y1 + bounds.Y2) < height)
-			DoDamage(item, INT_MAX);
-	}
 }
 
 void CreatureDie(short itemNumber, bool explode)

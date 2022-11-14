@@ -217,7 +217,7 @@ namespace TEN::Renderer
 
 
 			// Auto targeting
-			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_AUTOTARGET), PRINTSTRING_COLOR_ORANGE, SF(title_option == 3));
+			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_AUTO_TARGET), PRINTSTRING_COLOR_ORANGE, SF(title_option == 3));
 			AddString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().Configuration.AutoTarget), PRINTSTRING_COLOR_WHITE, SF(title_option == 3));
 			GetNextLinePosition(&y);
 
@@ -255,7 +255,7 @@ namespace TEN::Renderer
 				AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(ControlStrings[k]), PRINTSTRING_COLOR_WHITE, SF(title_option == k));
 
 				if (g_Gui.GetCurrentSettings().WaitingForKey && title_option == k)
-					AddString(MenuRightSideEntry, y, g_GameFlow->GetString(STRING_WAITING_FOR_KEY), PRINTSTRING_COLOR_YELLOW, SF(true));
+					AddString(MenuRightSideEntry, y, g_GameFlow->GetString(STRING_WAITING_FOR_INPUT), PRINTSTRING_COLOR_YELLOW, SF(true));
 				else
 				{
 					int index = KeyboardLayout[1][k] ? KeyboardLayout[1][k] : KeyboardLayout[0][k];
@@ -408,7 +408,7 @@ namespace TEN::Renderer
 
 			if (!save.Present)
 			{
-				AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_UNUSED), PRINTSTRING_COLOR_WHITE, SF_Center(selection == n));
+				AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_EMPTY), PRINTSTRING_COLOR_WHITE, SF_Center(selection == n));
 			}
 			else
 			{
@@ -444,7 +444,7 @@ namespace TEN::Renderer
 		auto y = MenuVerticalStatisticsTitle;
 
 		// Title
-		AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_STATISTICS), PRINTSTRING_COLOR_ORANGE, SF_Center());
+		AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_VIEW), PRINTSTRING_COLOR_ORANGE, SF_Center());
 		GetNextBlockPosition(&y);
 
 		// Level name
@@ -466,7 +466,7 @@ namespace TEN::Renderer
 		// Ammo used
 		sprintf(buffer, "%d", Statistics.Game.AmmoUsed);
 		AddString(MenuRightSideEntry, y, buffer, PRINTSTRING_COLOR_WHITE, SF());
-		AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_USED_AMMOS), PRINTSTRING_COLOR_WHITE, SF());
+		AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_AMMO_USED), PRINTSTRING_COLOR_WHITE, SF());
 		GetNextLinePosition(&y);
 
 		// Medipacks used

@@ -47,6 +47,11 @@ Version 1.0.3
 * Fix underwater lever pull animation playing after interacting with underwater ceiling switch.
 * Fix Killer statue not triggering.
 
+Lua API changes:
+* A new class has been added, LaraObject, for Lara-specific functions. The built-in "Lara" variable now uses this class.
+* SetOnFire and GetOnFire have been added to LaraObject.
+* Raised the maximum value on Moveable.SetHP to 32767 (its internal numeric maximum).
+
 Version 1.0.2
 =============
 
