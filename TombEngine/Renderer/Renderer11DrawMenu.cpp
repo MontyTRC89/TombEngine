@@ -355,7 +355,7 @@ namespace TEN::Renderer
 			GetNextBlockPosition(&y);
 
 			// Statistics
-			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_VIEW), PRINTSTRING_COLOR_WHITE, SF_Center(pause_option == 0));
+			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_STATISTICS), PRINTSTRING_COLOR_WHITE, SF_Center(pause_option == 0));
 			GetNextLinePosition(&y);
 
 			// Options
