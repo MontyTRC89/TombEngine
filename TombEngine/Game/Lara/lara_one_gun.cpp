@@ -1247,9 +1247,7 @@ void HandleProjectile(ItemInfo* item, ItemInfo* emitter, Vector3i prevPos, Proje
 {
 	auto pointColl = GetCollision(item);
 	bool hasHit = false;
-	bool explosive = (type == ProjectileType::Explosive ||
-					  type == ProjectileType::Grenade ||
-					  type == ProjectileType::FragGrenade);
+	bool explosive = type >= ProjectileType::Explosive;
 
 	if (type < ProjectileType::Grenade)
 	{
@@ -1292,7 +1290,7 @@ void HandleProjectile(ItemInfo* item, ItemInfo* emitter, Vector3i prevPos, Proje
 	if (item->HitPoints <= 0)
 	{
 		doExplosion = explosive;
-		doDestruction = true;
+		doDestruction = hasHit = true;
 	}
 
 	// Step 0: Check for specific collision in a small radius.
@@ -1333,9 +1331,6 @@ void HandleProjectile(ItemInfo* item, ItemInfo* emitter, Vector3i prevPos, Proje
 			hasHit = true;
 			doExplosion = explosive;
 
-			if (type == ProjectileType::FlashGrenade)
-				continue;
-
 			if (StaticObjects[currentMesh->staticNumber].shatterType == SHT_NONE)
 				continue;
 
@@ -1370,7 +1365,7 @@ void HandleProjectile(ItemInfo* item, ItemInfo* emitter, Vector3i prevPos, Proje
 					continue;
 
 				hasHit = true;
-				doDestruction = !currentObject->intelligent;
+				doDestruction = !currentObject->intelligent && !currentItem->IsLara();
 
 				if (explosive)
 				{
@@ -1388,21 +1383,15 @@ void HandleProjectile(ItemInfo* item, ItemInfo* emitter, Vector3i prevPos, Proje
 				else
 				{
 					DoDamage(currentItem, damage);
-					KillItem(item->Index);
-					break;
 				}
 
 			}
 			else if (currentItem->ObjectNumber >= ID_SMASH_OBJECT1 &&
-				currentItem->ObjectNumber <= ID_SMASH_OBJECT8)
+					 currentItem->ObjectNumber <= ID_SMASH_OBJECT8)
 			{
 				doDestruction = hasHit = true;
 
 				// Smash objects are legacy objects from TRC. Let's make them explode in the legacy way.
-				TriggerExplosionSparks(currentItem->Pose.Position.x, currentItem->Pose.Position.y, currentItem->Pose.Position.z, 3, -2, 0, currentItem->RoomNumber);
-				auto pose = Pose(currentItem->Pose.Position.x, currentItem->Pose.Position.y - 128, currentItem->Pose.Position.z);
-				TriggerShockwave(&pose, 48, 304, 96, 0, 96, 128, 24, 0, 0);
-
 				ExplodeItemNode(currentItem, 0, 0, 128);
 				short currentItemNumber = (currentItem - CollidedItems[0]);
 				SmashObject(currentItemNumber);
@@ -1414,7 +1403,7 @@ void HandleProjectile(ItemInfo* item, ItemInfo* emitter, Vector3i prevPos, Proje
 			return;
 	}
 
-	if (!doDestruction && !doExplosion)
+	if (!doDestruction && !doExplosion && !hasHit)
 		return;
 
 	if (type == ProjectileType::Harpoon)
@@ -1422,20 +1411,22 @@ void HandleProjectile(ItemInfo* item, ItemInfo* emitter, Vector3i prevPos, Proje
 
 	if (doExplosion && explosive)
 		ExplodeProjectile(item, prevPos);
-
-	if (doDestruction)
+	else if (doDestruction)
 		ExplodeItemNode(item, 0, 0, BODY_EXPLODE);
 
 	switch (type)
 	{
 	case ProjectileType::FlashGrenade:
+		hasHit = false;
 		item->ItemFlags[1] = GRENADE_FLASH_TIMEOUT;
-		return;
+		break;
 
 	case ProjectileType::FragGrenade:
+		hasHit = false;
 		item->ItemFlags[1] = GRENADE_FRAG_TIMEOUT;
 		return;
 	}
 
-	KillItem(item->Index);
+	if (hasHit)
+		KillItem(item->Index);
 }
