@@ -37,7 +37,7 @@ namespace TEN::Entities::Traps::TR1
 		auto& item = g_Level.Items[itemNumber];
 
 		item.Pose.Orientation.y = Random::GenerateAngle();
-		item.Animation.RequiredState = (Random::GenerateInt() - ANGLE(90.0f)) / 16;
+		item.Animation.TargetState = (Random::GenerateInt() - ANGLE(90.0f)) / 16; // NOTE: TargetState stores random rotation rate.
 		item.Animation.Velocity.y = DAMOCLES_SWORD_VELOCITY_MIN;
 	}
 
@@ -48,7 +48,7 @@ namespace TEN::Entities::Traps::TR1
 		if (item.Animation.IsAirborne)
 		{
 			// Calculate vertical velocity.
-			item.Pose.Orientation.y += item.Animation.RequiredState;
+			item.Pose.Orientation.y += item.Animation.TargetState; // NOTE: TargetState stores random rotation rate.
 			item.Animation.Velocity.y += (item.Animation.Velocity.y < DAMOCLES_SWORD_VELOCITY_MAX) ? GRAVITY : 1.0f;
 
 			// Translate sword toward player.
@@ -58,7 +58,7 @@ namespace TEN::Entities::Traps::TR1
 
 			if (item.Pose.Position.y > item.Floor)
 			{
-				//SoundEffect(SFX_DAMOCLES_SWORD, &item.Pose, SPM_NORMAL);
+				SoundEffect(SFX_TR1_DAMOCLES_ROOM_SWORD, &item.Pose);
 				item.Pose.Position.y = item.Floor + 10;
 				item.Animation.IsAirborne = false;
 				item.Status = ItemStatus::ITEM_DEACTIVATED;
@@ -67,17 +67,19 @@ namespace TEN::Entities::Traps::TR1
 		}
 		else if (item.Pose.Position.y != item.Floor)
 		{
-			item.Pose.Orientation.y += item.Animation.RequiredState;
+			item.Pose.Orientation.y += item.Animation.TargetState; // NOTE: TargetState stores random rotation rate.
 
+			float distanceV = LaraItem->Pose.Position.y - item.Pose.Position.y;
 			float distance2D = Vector2i::Distance(
 				Vector2i(item.Pose.Position.x, item.Pose.Position.z),
 				Vector2i(LaraItem->Pose.Position.x, LaraItem->Pose.Position.z));
 
-			if (distance2D <= DAMOCLES_SWORD_ACTIVATE_RANGE_2D &&
-				item.Pose.Position.y < LaraItem->Pose.Position.y &&
-				(LaraItem->Pose.Position.y - item.Pose.Position.y) < DAMOCLES_SWORD_ACTIVATE_RANGE_VERTICAL)
+			// Check relative position to player.
+			if (distanceV < DAMOCLES_SWORD_ACTIVATE_RANGE_VERTICAL &&
+				distance2D <= DAMOCLES_SWORD_ACTIVATE_RANGE_2D &&
+				item.Pose.Position.y < LaraItem->Pose.Position.y)
 			{
-				item.Animation.ActiveState = distance2D / 32; // ActiveState holds forward velocity.
+				item.Animation.ActiveState = distance2D / 32; // NOTE: ActiveState holds calculated forward velocity.
 				item.Animation.IsAirborne = true;
 			}
 		}
