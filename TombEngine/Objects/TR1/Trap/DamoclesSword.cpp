@@ -122,7 +122,7 @@ namespace TEN::Entities::Traps::TR1
 			auto bloodPos = Vector3i(Random::GenerateVector3InBox(bloodBounds) + bloodBounds.Center);
 
 			auto orientToPlayer = Geometry::GetOrientToPoint(item.Pose.Position.ToVector3(), LaraItem->Pose.Position.ToVector3());
-			short randAngleOffset = Random::GenerateAngle(ANGLE(-11.25f), ANGLE(-11.25f));
+			short randAngleOffset = Random::GenerateAngle(ANGLE(-11.25f), ANGLE(11.25f));
 			short bloodHeadingAngle = orientToPlayer.y + randAngleOffset;
 			
 			DoLotsOfBlood(bloodPos.x, bloodPos.y, bloodPos.z, laraItem->Animation.Velocity.z, bloodHeadingAngle, laraItem->RoomNumber, 10);
