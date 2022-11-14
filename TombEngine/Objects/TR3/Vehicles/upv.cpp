@@ -226,6 +226,9 @@ namespace TEN::Entities::Vehicles
 	{
 		auto* harpoon = FireHarpoon(laraItem);
 
+		if (harpoon == nullptr)
+			return;
+
 		auto UPV = GetUPVInfo(UPVItem);
 		harpoon->Pose.Position = GetJointPosition(UPVItem, UPV_JOINT_TURBINE, Vector3i((UPV->HarpoonLeft ? 22 : -22), 24, 230));
 		harpoon->Pose.Orientation = EulerAngles(UPVItem->Pose.Orientation.x, UPVItem->Pose.Orientation.y, 0);
