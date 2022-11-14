@@ -49,7 +49,8 @@ bool LaraObject::GetOnFire() const
 // @function LaraObject:SetPoison
 // @tparam Potency Value 
 // @usage
-// Lara:SetPoison(100)
+// Lara:SetPoison(10)
+// Max Value: 64
 void LaraObject::SetPoison(int potency = 0)
 {
 	auto* lara = GetLaraInfo(m_item);
@@ -79,6 +80,30 @@ void LaraObject::RemovePoison()
 	lara->PoisonPotency = 0;
 }
 
+/// Set Air of Lara
+// @function LaraObject:SetAir
+// @tparam Air Value 
+// @usage
+// Lara:SetAir(100)
+// Max Value: 1800
+void LaraObject::SetAir(int air = 0)
+{
+	auto* lara = GetLaraInfo(m_item);
+
+	lara->Air = air;
+}
+
+/// Get Air value of Lara
+// @function LaraObject:GetAir
+// @usage
+// Lara:GetAir()
+int LaraObject::GetAir()
+{
+	auto* lara = GetLaraInfo(m_item);
+
+	return lara->Air;
+}
+
 void LaraObject::Register(sol::table& parent)
 {
 	parent.new_usertype<LaraObject>(LUA_CLASS_NAME,
@@ -87,6 +112,8 @@ void LaraObject::Register(sol::table& parent)
 			ScriptReserved_SetPoison, &LaraObject::SetPoison,
 			ScriptReserved_GetPoison, &LaraObject::GetPoison,
 			ScriptReserved_RemovePoison, &LaraObject::RemovePoison,
+			ScriptReserved_SetAir, &LaraObject::SetAir,
+			ScriptReserved_GetAir, &LaraObject::GetAir,
 			sol::base_classes, sol::bases<Moveable>()
 		);
 }

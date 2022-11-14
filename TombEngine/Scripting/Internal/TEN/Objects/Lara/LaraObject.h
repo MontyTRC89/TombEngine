@@ -9,6 +9,8 @@ public:
 	void SetPoison(int potency);
 	int GetPoison();
 	void RemovePoison();
+	void SetAir(int air);
+	int GetAir();
 	static void Register(sol::table & parent);
 	using Moveable::Moveable;
 };
