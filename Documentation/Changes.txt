@@ -23,6 +23,7 @@ Version 1.0.3
 * Fix shotgun using 6 units of ammo with each shot.
 * Fix rocket explosions near statics.
 * Fix explosive crossbow bolts not damaging player.
+* Fix poisoned crossbow bolts not damaging enemies.
 * Fix TR3 monkey level crash.
 * Fix occasional ejections when landing on a slope.
 * Fix occasional ejections when climbing up on a ledge under a slope.
