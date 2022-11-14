@@ -24,7 +24,7 @@ constexpr auto LUA_CLASS_NAME{ ScriptReserved_LaraObject };
 void LaraObject::SetOnFire(bool onFire)
 {
 	//todo add support for other BurnTypes -squidshire 11/11/2022
-	auto lara = GetLaraInfo(m_item);
+	auto* lara = GetLaraInfo(m_item);
 	if (onFire && lara->BurnType == BurnType::None )
 	{
 		TEN::Effects::Lara::LaraBurn(m_item);
@@ -41,7 +41,7 @@ void LaraObject::SetOnFire(bool onFire)
 // @treturn bool fire true if lara is on fire, false otherwise
 bool LaraObject::GetOnFire() const
 {
-	auto lara = GetLaraInfo(m_item);
+	auto* lara = GetLaraInfo(m_item);
 	return lara->BurnType != BurnType::None;
 }
 
