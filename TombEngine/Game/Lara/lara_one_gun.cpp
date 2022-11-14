@@ -1369,8 +1369,9 @@ void HandleProjectile(ItemInfo* item, ItemInfo* emitter, Vector3i prevPos, Proje
 
 				if (explosive)
 				{
-					DoExplosiveDamage(emitter, currentItem, item, damage);
 					doExplosion = explosive;
+					if (type != ProjectileType::FlashGrenade)
+						DoExplosiveDamage(emitter, currentItem, item, damage);
 				}
 				else if (type == ProjectileType::Poison)
 				{
