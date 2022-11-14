@@ -77,7 +77,7 @@ namespace TEN::Entities::Creatures::TR5
 		SetAnimation(item, GLADIATOR_ANIM_IDLE);
 
 		if (item->TriggerFlags == 1)
-			item->MeshSwapBits = ALL_JOINT_BITS;
+			item->SetMeshSwapFlags(ALL_JOINT_BITS);
 	}
 
 	void ControlGladiator(short itemNumber)
