@@ -99,15 +99,17 @@ namespace TEN::Entities::Traps::TR1
 
 		if (item.Animation.IsAirborne)
 		{
-			DoDamage(&item, DAMOCLES_SWORD_DAMAGE);
+			DoDamage(laraItem, DAMOCLES_SWORD_DAMAGE);
 
-			auto bloodPos = Vector3i(
-				Random::GenerateInt(-BLOCK(1.0f / 16), BLOCK(1.0f / 16)),
-				Random::GenerateInt(-BLOCK(1.0f / 16), BLOCK(1.0f / 16)),
-				Random::GenerateInt(0, BLOCK(3.0f / 4))
-			) + laraItem->Pose.Position;
-			int direction = laraItem->Pose.Orientation.y + Random::GenerateAngle(ANGLE(-11.25f), ANGLE(-11.25f));
-			DoLotsOfBlood(bloodPos.x, bloodPos.y, bloodPos.z, laraItem->Animation.Velocity.z, direction, laraItem->RoomNumber, 10);
+			// TODO: Check the vector generate function. If it works, you should see blood! -- Sezz
+			auto bloodBounds = GameBoundingBox(laraItem).ToBoundingOrientedBox(laraItem->Pose);
+			auto bloodPos = Vector3i(Random::GenerateVector3InBox(bloodBounds) + bloodBounds.Center);
+
+			auto orientToPlayer = Geometry::GetOrientToPoint(item.Pose.Position.ToVector3(), LaraItem->Pose.Position.ToVector3());
+			short randAngleOffset = Random::GenerateAngle(ANGLE(-11.25f), ANGLE(-11.25f));
+			int bloodDirection = orientToPlayer.y + randAngleOffset;
+			
+			DoLotsOfBlood(bloodPos.x, bloodPos.y, bloodPos.z, laraItem->Animation.Velocity.z, bloodDirection, laraItem->RoomNumber, 10);
 		}
 	}
 }
