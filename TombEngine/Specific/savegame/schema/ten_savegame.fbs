@@ -82,7 +82,6 @@ table CarriedWeaponInfo {
 	ammo: [AmmoInfo];
 	selected_ammo: int32;
 	has_lasersight: bool;
-	has_silencer: bool;
 }
 
 table WeaponInfo {
@@ -132,7 +131,6 @@ table LaraInventoryData {
 	has_crowbar: bool;
 	has_torch: bool;
 	has_lasersight: bool;
-	has_silencer: bool;
 	total_small_medipacks: int32;
 	total_large_medipacks: int32;
 	total_flares: int32;
@@ -165,6 +163,9 @@ table WeaponControlData {
 	request_gun_type: int32;
 	last_gun_type: int32;
 	holster_info: HolsterInfo;
+	num_shots_fired: uint;
+	interval: float;
+	timer: float;
 }
 
 table RopeControlData {
