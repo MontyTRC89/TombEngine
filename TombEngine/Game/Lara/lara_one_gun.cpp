@@ -1461,19 +1461,17 @@ void HandleProjectile(ItemInfo* item, ItemInfo* emitter, Vector3i prevPos, Proje
 			return;
 	}
 
-	if (!doDestruction)
+	if (!doDestruction && !doExplosion)
 		return;
 
 	if (type == ProjectileType::Harpoon)
 		return;
 
-	ExplodeItemNode(item, 0, 0, BODY_EXPLODE);
-	KillItem(item->Index);
+	if (doDestruction)
+		ExplodeItemNode(item, 0, 0, BODY_EXPLODE);
 
-	if (!doExplosion)
-		return;
-
-	// Do explosion if needed.
-	if (explosive)
+	if (doExplosion && explosive)
 		ExplodeProjectile(item, prevPos);
+
+	KillItem(item->Index);
 }
