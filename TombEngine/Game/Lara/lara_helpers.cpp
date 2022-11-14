@@ -465,16 +465,13 @@ void ModulateLaraSwimTurnRates(ItemInfo* item, CollisionInfo* coll)
 
 	if (IsHeld(In::Left) || IsHeld(In::Right))
 	{
-		ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_MED_FAST_TURN_RATE_MAX);
+		ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_FAST_TURN_RATE_MAX);
 
 		// TODO: ModulateLaraLean() doesn't really work here. -- Sezz 2022.06.22
-		if (IsHeld(In::Left))
+		if (IsHeld(In::Left) || IsHeld(In::Right))
 		{
-			item->Pose.Orientation.z -= LARA_LEAN_RATE;
-		}
-		else if (IsHeld(In::Right))
-		{
-			item->Pose.Orientation.z += LARA_LEAN_RATE;
+			int sign = std::copysign(1, AxisMap[InputAxis::MoveHorizontal]);
+			item->Pose.Orientation.z += LARA_LEAN_RATE * sign;
 		}
 	}
 }
@@ -498,13 +495,10 @@ void ModulateLaraSubsuitSwimTurnRates(ItemInfo* item)
 	{
 		ModulateLaraTurnRateY(item, LARA_SUBSUIT_TURN_RATE_ACCEL, 0, LARA_MED_TURN_RATE_MAX);
 
-		if (IsHeld(In::Left))
+		if (IsHeld(In::Left) || IsHeld(In::Right))
 		{
-			item->Pose.Orientation.z -= LARA_LEAN_RATE;
-		}
-		else if (IsHeld(In::Right))
-		{
-			item->Pose.Orientation.z += LARA_LEAN_RATE;
+			int sign = std::copysign(1, AxisMap[InputAxis::MoveHorizontal]);
+			item->Pose.Orientation.z += LARA_LEAN_RATE * sign;
 		}
 	}
 }

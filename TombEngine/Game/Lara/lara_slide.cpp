@@ -21,8 +21,8 @@ using namespace TEN::Input;
 // Control & Collision Functions
 // -----------------------------
 
-// State:		LS_SLIDE_FORWARD (24)
-// Collision:	lara_col_slide_forward()
+// State:	  LS_SLIDE_FORWARD (24)
+// Collision: lara_col_slide_forward()
 void lara_as_slide_forward(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& lara = *GetLaraInfo(item);
@@ -76,8 +76,8 @@ void lara_as_slide_forward(ItemInfo* item, CollisionInfo* coll)
 	return;
 }
 
-// State:		LS_SLIDE_FORWARD (24)
-// Control:		lara_as_slide_forward()
+// State:	LS_SLIDE_FORWARD (24)
+// Control: lara_as_slide_forward()
 void lara_col_slide_forward(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& lara = *GetLaraInfo(item);
@@ -111,14 +111,13 @@ void lara_col_slide_forward(ItemInfo* item, CollisionInfo* coll)
 
 	if (Context::CanPerformStep(item, coll))
 	{
-		//DoLaraStep(item, coll);
-		LaraSnapToHeight(item, coll);
+		DoLaraStep(item, coll);
 		return;
 	}
 }
 
-// State:		LS_SLIDE_BACK (32)
-// Collision:	lara_col_slide_back()
+// State:	  LS_SLIDE_BACK (32)
+// Collision: lara_col_slide_back()
 void lara_as_slide_back(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& lara = *GetLaraInfo(item);
@@ -181,8 +180,8 @@ void lara_as_slide_back(ItemInfo* item, CollisionInfo* coll)
 	return;
 }
 
-// State:		LS_SLIDE_BACK (32)
-// Control:		lara_as_slide_back()
+// State:	LS_SLIDE_BACK (32)
+// Control: lara_as_slide_back()
 void lara_col_slide_back(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& lara = *GetLaraInfo(item);
@@ -216,8 +215,7 @@ void lara_col_slide_back(ItemInfo* item, CollisionInfo* coll)
 
 	if (Context::CanPerformStep(item, coll))
 	{
-		//DoLaraStep(item, coll);
-		LaraSnapToHeight(item, coll);
+		DoLaraStep(item, coll);
 		return;
 	}
 }

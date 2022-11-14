@@ -1010,11 +1010,11 @@ void LaraUnderwater(ItemInfo* item, CollisionInfo* coll)
 	// Apply and reset turn rates.
 	item->Pose.Orientation.x += lara.Control.TurnRate.x;
 	if (!(IsHeld(In::Forward) || IsHeld(In::Back)))
-		ResetLaraTurnRateX(item, ANGLE(0.5f));
+		ResetLaraTurnRateX(item, ANGLE(1.5f));
 
 	item->Pose.Orientation.y += lara.Control.TurnRate.y;
 	if (!(IsHeld(In::Left) || IsHeld(In::Right)))
-		ResetLaraTurnRateY(item, ANGLE(0.5f));
+		ResetLaraTurnRateY(item, ANGLE(1.5f));
 
 	if (level.GetLaraType() == LaraType::Divesuit)
 		UpdateLaraSubsuitAngles(item);
