@@ -224,43 +224,14 @@ namespace TEN::Entities::Vehicles
 
 	static void FireUPVHarpoon(ItemInfo* UPVItem, ItemInfo* laraItem)
 	{
+		auto* harpoon = FireHarpoon(laraItem);
+
 		auto UPV = GetUPVInfo(UPVItem);
-		auto* lara = GetLaraInfo(laraItem);
+		harpoon->Pose.Position = GetJointPosition(UPVItem, UPV_JOINT_TURBINE, Vector3i((UPV->HarpoonLeft ? 22 : -22), 24, 230));
+		harpoon->Pose.Orientation = EulerAngles(UPVItem->Pose.Orientation.x, UPVItem->Pose.Orientation.y, 0);
 
-		auto& ammo = GetAmmo(*lara, LaraWeaponType::HarpoonGun);
-		if (ammo.GetCount() == 0 && !ammo.HasInfinite())
-			return;
-		else if (!ammo.HasInfinite())
-			ammo--;
-
-		short itemNumber = CreateItem();
-
-		if (itemNumber != NO_ITEM)
-		{
-			auto* harpoonItem = &g_Level.Items[itemNumber];
-			harpoonItem->ObjectNumber = ID_HARPOON;
-			harpoonItem->Color = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
-			harpoonItem->RoomNumber = UPVItem->RoomNumber;
-
-			auto pos = GetJointPosition(UPVItem, UPV_JOINT_TURBINE, Vector3i((UPV->HarpoonLeft ? 22 : -22), 24, 230));
-			harpoonItem->Pose.Position = pos;
-			InitialiseItem(itemNumber);
-
-			harpoonItem->Pose.Orientation = EulerAngles(UPVItem->Pose.Orientation.x, UPVItem->Pose.Orientation.y, 0);
-
-			// TODO: Huh?
-			harpoonItem->Animation.Velocity.y = -UPV_HARPOON_VELOCITY * phd_sin(harpoonItem->Pose.Orientation.x);
-			harpoonItem->Animation.Velocity.z = UPV_HARPOON_VELOCITY * phd_cos(harpoonItem->Pose.Orientation.x);
-			harpoonItem->HitPoints = HARPOON_TIME;
-			harpoonItem->ItemFlags[0] = 1;
-
-			AddActiveItem(itemNumber);
-
-			SoundEffect(SFX_TR4_HARPOON_FIRE_UNDERWATER, &laraItem->Pose, SoundEnvironment::Always);
-
-			Statistics.Game.AmmoUsed++;
-			UPV->HarpoonLeft = !UPV->HarpoonLeft;
-		}
+		harpoon->ItemFlags[0] = 1;
+		UPV->HarpoonLeft = !UPV->HarpoonLeft;	
 	}
 
 	static void TriggerUPVMist(long x, long y, long z, long velocity, short angle)

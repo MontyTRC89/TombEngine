@@ -13,6 +13,7 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_one_gun.h"
+#include "Game/Lara/lara_fire.h"
 #include "Objects/Generic/Switches/generic_switch.h"
 #include "Objects/Generic/Traps/traps.h"
 #include "Objects/TR5/Shatter/tr5_smashobject.h"
@@ -133,7 +134,7 @@ void ExplosionControl(short itemNumber)
 					else if (CollidedItems[i]->ObjectNumber != ID_SWITCH_TYPE7 && CollidedItems[i]->ObjectNumber != ID_SWITCH_TYPE8)
 					{
 						if (Objects[CollidedItems[i]->ObjectNumber].intelligent)
-							DoExplosiveDamageOnBaddy(LaraItem, CollidedItems[i], item, LaraWeaponType::GrenadeLauncher);
+							DoExplosiveDamage(LaraItem, CollidedItems[i], item, Weapons[(int)LaraWeaponType::GrenadeLauncher].ExplosiveDamage);
 					}
 					else
 					{
