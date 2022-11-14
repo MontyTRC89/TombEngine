@@ -15,9 +15,7 @@ namespace TEN::Entities::Player::Context
 	bool CanPerformStep(ItemInfo* item, CollisionInfo* coll);
 	bool CanStepUp(ItemInfo* item, CollisionInfo* coll);
 	bool CanStepDown(ItemInfo* item, CollisionInfo* coll);
-	bool CanFall(ItemInfo* item, CollisionInfo* coll);
-	bool CanSlide(ItemInfo* item, CollisionInfo* coll);
-	bool CanAFKPose(ItemInfo* item, CollisionInfo* coll);
+	bool CanStrikeAFKPose(ItemInfo* item, CollisionInfo* coll);
 	bool CanTurn180(ItemInfo* item, CollisionInfo* coll);
 	bool CanTurnFast(ItemInfo* item, CollisionInfo* coll);
 	bool CanRunForward(ItemInfo* item, CollisionInfo* coll);
@@ -28,6 +26,10 @@ namespace TEN::Entities::Player::Context
 	bool CanSidestepRight(ItemInfo* item, CollisionInfo* coll);
 	bool CanWadeForward(ItemInfo* item, CollisionInfo* coll);
 	bool CanWadeBackward(ItemInfo* item, CollisionInfo* coll);
+
+	// Slide contexts
+	bool CanSlide(ItemInfo* item, CollisionInfo* coll);
+	bool CanSteerOnSlide(ItemInfo* item, CollisionInfo* coll);
 
 	// Crouch and crawl contexts
 	bool IsInNarrowSpace(ItemInfo* item, CollisionInfo* coll);
@@ -57,6 +59,7 @@ namespace TEN::Entities::Player::Context
 	bool CanWallShimmyDown(ItemInfo* item, CollisionInfo* coll);
 
 	// Jump contexts
+	bool CanFall(ItemInfo* item, CollisionInfo* coll);
 	bool CanLand(ItemInfo* item, CollisionInfo* coll);
 	bool CanPerformJump(ItemInfo* item, CollisionInfo* coll);
 	bool CanJumpUp(ItemInfo* item, CollisionInfo* coll);
@@ -66,7 +69,7 @@ namespace TEN::Entities::Player::Context
 	bool CanJumpRight(ItemInfo* item, CollisionInfo* coll);
 	bool CanRunJumpForward(ItemInfo* item, CollisionInfo* coll);
 	bool CanSprintJumpForward(ItemInfo* item, CollisionInfo* coll);
-	bool CanSlideJumpForward(ItemInfo* item, CollisionInfo* coll);
+	bool CanPerformSlideJump(ItemInfo* item, CollisionInfo* coll);
 	bool CanCrawlspaceDive(ItemInfo* item, CollisionInfo* coll);
 
 	// Object interaction contexts

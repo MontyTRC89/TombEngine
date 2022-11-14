@@ -563,7 +563,7 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 
 	// TODO: Without animation blending, the AFK state's movement lock will be rather obnoxious.
 	// TODO: Add idle breathing motion. -- Sezz 2021.10.31
-	if (Context::CanAFKPose(item, coll))
+	if (Context::CanStrikeAFKPose(item, coll))
 	{
 		item->Animation.TargetState = LS_POSE;
 		return;
@@ -637,7 +637,7 @@ void lara_as_pose(ItemInfo* item, CollisionInfo* coll)
 	if (IsHeld(In::Look))
 		LookUpDown(item);
 
-	if (Context::CanAFKPose(item, coll))
+	if (Context::CanStrikeAFKPose(item, coll))
 	{
 		if (IsHeld(In::Roll))
 		{

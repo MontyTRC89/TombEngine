@@ -40,23 +40,10 @@ void lara_as_slide_forward(ItemInfo* item, CollisionInfo* coll)
 
 	if (Context::CanSlide(item, coll))
 	{
-		short slideAngle = GetLaraSlideHeadingAngle(item, coll);
+		if ((IsHeld(In::Left) || IsHeld(In::Right)) && Context::CanSteerOnSlide(item, coll))
+			ModulateLaraSlideSteering(item, coll);
 
-		if (g_GameFlow->HasSlideExtended())
-		{
-			item->Pose.Orientation.Lerp(EulerAngles(0, slideAngle, 0), 0.1f);
-			//ModulateLaraSlideVelocity(item, coll);
-
-			if (IsHeld(In::Left) || IsHeld(In::Right))
-			{
-				ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_SLIDE_TURN_RATE_MAX);
-				ModulateLaraLean(item, coll, LARA_LEAN_RATE * 0.6f, LARA_LEAN_MAX);
-			}
-		}
-		else
-			item->Pose.Orientation.Lerp(EulerAngles(0, slideAngle, 0));
-
-		if (IsHeld(In::Jump) && Context::CanSlideJumpForward(item, coll))
+		if (IsHeld(In::Jump) && Context::CanPerformSlideJump(item, coll))
 		{
 			item->Animation.TargetState = LS_JUMP_FORWARD;
 			StopSoundEffect(SFX_TR4_LARA_SLIPPING);
@@ -136,35 +123,10 @@ void lara_as_slide_back(ItemInfo* item, CollisionInfo* coll)
 
 	if (Context::CanSlide(item, coll))
 	{
-		/*short direction = GetLaraSlideDirection(item, coll) + ANGLE(180.0f);
+		if ((IsHeld(In::Left) || IsHeld(In::Right)) && Context::CanSteerOnSlide(item, coll))
+			ModulateLaraSlideSteering(item, coll);
 
-		if (g_GameFlow->Animations.HasSlideExtended)
-		{
-			ApproachLaraTargetOrientation(item, direction, 12);
-			ModulateLaraSlideVelocity(item, coll);
-
-			// TODO: Prepped for another time.
-			if (IsHeld(In::Left))
-			{
-				lara.Control.TurnRate -= LARA_TURN_RATE_ACCEL;
-				if (lara.Control.TurnRate.y < -LARA_SLIDE_TURN_RATE_MAX)
-					lara.Control.TurnRate.y = -LARA_SLIDE_TURN_RATE_MAX;
-
-				DoLaraLean(item, coll, LARA_LEAN_MAX, LARA_LEAN_RATE / 3 * 2);
-			}
-			else if (IsHeld(In::Right))
-			{
-				lara.Control.TurnRate += LARA_TURN_RATE_ACCEL;
-				if (lara.Control.TurnRate.y > LARA_SLIDE_TURN_RATE_MAX)
-					lara.Control.TurnRate.y = LARA_SLIDE_TURN_RATE_MAX;
-
-				DoLaraLean(item, coll, -LARA_LEAN_MAX, LARA_LEAN_RATE / 3 * 2);
-			}
-		}
-		else
-			ApproachLaraTargetOrientation(item, direction);*/
-
-		if (IsHeld(In::Jump) && Context::CanSlideJumpForward(item, coll))
+		if (IsHeld(In::Jump) && Context::CanPerformSlideJump(item, coll))
 		{
 			item->Animation.TargetState = LS_JUMP_BACK;
 			StopSoundEffect(SFX_TR4_LARA_SLIPPING);

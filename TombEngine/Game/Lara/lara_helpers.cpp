@@ -41,7 +41,7 @@ void HandleLaraMovementParameters(ItemInfo* item, CollisionInfo* coll)
 	auto& lara = *GetLaraInfo(item);
 
 	// Update AFK pose timer.
-	if (lara.Control.Count.Pose < LARA_POSE_TIME && Context::CanAFKPose(item, coll) &&
+	if (lara.Control.Count.Pose < LARA_POSE_TIME && Context::CanStrikeAFKPose(item, coll) &&
 		!(IsHeld(In::Look) || IsOpticActionHeld()))
 	{
 		lara.Control.Count.Pose++;
@@ -377,7 +377,7 @@ short GetLaraSlideHeadingAngle(ItemInfo* item, CollisionInfo* coll)
 	// Handle crease in slope.
 	if (aspectAngle != projAspectAngle)
 	{
-		// Cross normals of both slope surfaces to get crease normal between them.
+		// Cross normals of slope surfaces to get the crease normal between them.
 		auto intersection = surfaceNormal.Cross(projSurfaceNormal);
 		if (intersection.y < 0.0f)
 			intersection = -intersection;
@@ -501,6 +501,18 @@ void ModulateLaraSubsuitSwimTurnRates(ItemInfo* item)
 			item->Pose.Orientation.z += LARA_LEAN_RATE * sign;
 		}
 	}
+}
+
+void ModulateSlideSteering(ItemInfo* item, CollisionInfo* coll)
+{
+	auto& lara = *GetLaraInfo(item);
+
+	short slideAngle = GetLaraSlideHeadingAngle(item, coll);
+	item->Pose.Orientation.Lerp(EulerAngles(0, slideAngle, 0), 0.1f);
+
+	ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_SLIDE_TURN_RATE_MAX);
+	ModulateLaraLean(item, coll, LARA_LEAN_RATE * 0.6f, LARA_LEAN_MAX);
+	//ModulateLaraSlideVelocity(item, coll);
 }
 
 // TODO: Simplify this function. Some members of SubsuitControlData may be unnecessary. -- Sezz 2022.06.22

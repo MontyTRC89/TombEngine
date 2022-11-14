@@ -71,48 +71,7 @@ namespace TEN::Entities::Player::Context
 		return false;
 	}
 
-	bool CanFall(ItemInfo* item, CollisionInfo* coll)
-	{
-		static constexpr auto lowerFloorBound = STEPUP_HEIGHT;
-
-		const auto& player = *GetLaraInfo(item);
-
-		// 1. Check wade status.
-		if (player.Control.WaterStatus == WaterStatus::Wade)
-			return false;
-
-		int vPos = item->Pose.Position.y;
-		auto pointColl = GetCollision(item, 0, 0, -coll->Setup.Height / 2);
-
-		// 2. Assess point collision.
-		if ((pointColl.Position.Floor - vPos) <= lowerFloorBound)
-			return false;
-
-		return true;
-	}
-
-	bool CanSlide(ItemInfo* item, CollisionInfo* coll)
-	{
-		static constexpr auto floorBound = STEPUP_HEIGHT;
-
-		// 1. Check for swamp.
-		if (TestEnvironment(ENV_FLAG_SWAMP, item))
-			return false;
-
-		int vPos = item->Pose.Position.y;
-		auto pointColl = GetCollision(item, 0, 0, -coll->Setup.Height / 2);
-
-		// 2. Assess point collision.
-		if (abs(pointColl.Position.Floor - vPos) <= floorBound && // Floor height is within upper/lower floor bound.
-			pointColl.Position.FloorSlope)						  // Floor is a slope.
-		{
-			return true;
-		}
-
-		return false;
-	}
-
-	bool CanAFKPose(ItemInfo* item, CollisionInfo* coll)
+	bool CanStrikeAFKPose(ItemInfo* item, CollisionInfo* coll)
 	{
 		const auto& player = *GetLaraInfo(item);
 
@@ -262,6 +221,32 @@ namespace TEN::Entities::Player::Context
 		// Regular case.
 		else
 			return CanWalkBackward(item, coll); // TODO: More specific test for wading in water.
+	}
+
+	bool CanSlide(ItemInfo* item, CollisionInfo* coll)
+	{
+		static constexpr auto floorBound = STEPUP_HEIGHT;
+
+		// 1. Check for swamp.
+		if (TestEnvironment(ENV_FLAG_SWAMP, item))
+			return false;
+
+		int vPos = item->Pose.Position.y;
+		auto pointColl = GetCollision(item, 0, 0, -coll->Setup.Height / 2);
+
+		// 2. Assess point collision.
+		if (abs(pointColl.Position.Floor - vPos) <= floorBound && // Floor height is within upper/lower floor bound.
+			pointColl.Position.FloorSlope)						  // Floor is a slope.
+		{
+			return true;
+		}
+
+		return false;
+	}
+
+	bool CanSteerOnSlide(ItemInfo* item, CollisionInfo* coll)
+	{
+		return g_GameFlow->HasSlideExtended();
 	}
 
 	bool IsInNarrowSpace(ItemInfo* item, CollisionInfo* coll)
@@ -640,6 +625,26 @@ namespace TEN::Entities::Player::Context
 		return false;
 	}
 
+	bool CanFall(ItemInfo* item, CollisionInfo* coll)
+	{
+		static constexpr auto lowerFloorBound = STEPUP_HEIGHT;
+
+		const auto& player = *GetLaraInfo(item);
+
+		// 1. Check wade status.
+		if (player.Control.WaterStatus == WaterStatus::Wade)
+			return false;
+
+		int vPos = item->Pose.Position.y;
+		auto pointColl = GetCollision(item, 0, 0, -coll->Setup.Height / 2);
+
+		// 2. Assess point collision.
+		if ((pointColl.Position.Floor - vPos) <= lowerFloorBound)
+			return false;
+
+		return true;
+	}
+
 	bool CanLand(ItemInfo* item, CollisionInfo* coll)
 	{
 		// 1. Check airborne status and Y velocity.
@@ -737,7 +742,7 @@ namespace TEN::Entities::Player::Context
 		return Context::TestJumpSetup(item, coll, contextSetup);
 	}
 
-	bool CanSlideJumpForward(ItemInfo* item, CollisionInfo* coll)
+	bool CanPerformSlideJump(ItemInfo* item, CollisionInfo* coll)
 	{
 		// TODO: Get back to this project. -- Sezz 2022.11.11
 		return true;
