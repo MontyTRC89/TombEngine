@@ -24,9 +24,11 @@
 #include "Specific/clock.h"
 #include "Specific/configuration.h"
 #include "Specific/level.h"
+#include "Specific/trutils.h"
 
 using namespace TEN::Input;
 using namespace TEN::Renderer;
+using namespace TEN::Utils;
 
 namespace TEN::Gui
 {
@@ -43,13 +45,13 @@ namespace TEN::Gui
 		STRING_USE,
 		STRING_CHOOSE_AMMO,
 		STRING_COMBINE,
-		STRING_SEPARE,
+		STRING_SEPARATE,
 		STRING_EQUIP,
 		STRING_COMBINE_WITH,
 		STRING_LOAD_GAME,
 		STRING_SAVE_GAME,
 		STRING_EXAMINE,
-		STRING_STATISTICS,
+		STRING_VIEW,
 		STRING_CHOOSE_WEAPON,
 		""
 	//	STRING_READ_DIARY
@@ -74,12 +76,12 @@ namespace TEN::Gui
 		STRING_CONTROLS_PAUSE,
 		STRING_CONTROLS_STEP_LEFT,
 		STRING_CONTROLS_STEP_RIGHT,
-		STRING_CONTROLS_ACCELERATE,
-		STRING_CONTROLS_REVERSE,
-		STRING_CONTROLS_SPEED,
-		STRING_CONTROLS_SLOW,
-		STRING_CONTROLS_BRAKE,
-		STRING_CONTROLS_FIRE
+		STRING_CONTROLS_V_ACCELERATE,
+		STRING_CONTROLS_V_REVERSE,
+		STRING_CONTROLS_V_SPEED,
+		STRING_CONTROLS_V_SLOW,
+		STRING_CONTROLS_V_BRAKE,
+		STRING_CONTROLS_V_FIRE
 	};
 
 	bool GuiController::GuiIsPulsed(ActionID actionID) const
@@ -2005,7 +2007,8 @@ namespace TEN::Gui
 
 		if (Rings[(int)RingTypes::Ammo]->RingActive)
 		{
-			g_Renderer.AddString(PHD_CENTER_X, PHD_CENTER_Y, g_GameFlow->GetString(OptionStrings[5]), PRINTSTRING_COLOR_WHITE, PRINTSTRING_BLINK | PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
+			auto optionString = ToUpper(std::string(OptionStrings[5]));
+			g_Renderer.AddString(PHD_CENTER_X, PHD_CENTER_Y, optionString.c_str(), PRINTSTRING_COLOR_WHITE, PRINTSTRING_BLINK | PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
 
 			if (Rings[(int)RingTypes::Inventory]->ObjectListMovement)
 				return;
@@ -2200,14 +2203,16 @@ namespace TEN::Gui
 			{
 				for (int i = 0; i < n; i++)
 				{
+					auto optionString = ToUpper(std::string(CurrentOptions[i].Text));
+
 					if (i == CurrentSelectedOption)
 					{
-						g_Renderer.AddString(PHD_CENTER_X, yPos, CurrentOptions[i].Text, PRINTSTRING_COLOR_WHITE, PRINTSTRING_BLINK | PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
+						g_Renderer.AddString(PHD_CENTER_X, yPos, optionString.c_str(), PRINTSTRING_COLOR_WHITE, PRINTSTRING_BLINK | PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
 						yPos += LINE_HEIGHT;
 					}
 					else
 					{
-						g_Renderer.AddString(PHD_CENTER_X, yPos, CurrentOptions[i].Text, PRINTSTRING_COLOR_WHITE, PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
+						g_Renderer.AddString(PHD_CENTER_X, yPos, optionString.c_str(), PRINTSTRING_COLOR_WHITE, PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
 						yPos += LINE_HEIGHT;
 					}
 				}
