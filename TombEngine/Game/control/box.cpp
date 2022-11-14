@@ -465,7 +465,7 @@ int CreatureAnimation(short itemNumber, short angle, short tilt)
 
 	AnimateItem(item);
 
-	if (creature->Poisoned && item->HitPoints > 0 && (GlobalCounter & 0x1F) == 0x1F)
+	if (creature->Poisoned && item->HitPoints > 1 && (GlobalCounter & 0x1F) == 0x1F)
 		item->HitPoints--;
 
 	if (item->Status == ITEM_DEACTIVATED)
