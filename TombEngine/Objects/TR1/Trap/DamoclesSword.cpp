@@ -54,7 +54,9 @@ namespace TEN::Entities::Traps::TR1
 			item.Animation.Velocity.y += (item.Animation.Velocity.y < DAMOCLES_SWORD_VELOCITY_MAX) ? GRAVITY : 1.0f;
 
 			// Translate sword toward player.
-			short headingAngle = item.Pose.Orientation.y - Geometry::GetOrientToPoint(item.Pose.Position.ToVector3(), LaraItem->Pose.Position.ToVector3()).y;
+			short headingAngle = Geometry::GetShortestAngle(
+				item.Pose.Orientation.y,
+				Geometry::GetOrientToPoint(item.Pose.Position.ToVector3(), LaraItem->Pose.Position.ToVector3()).y);
 			TranslateItem(&item, headingAngle, item.Animation.ActiveState); // NOTE: ActiveState stores calculated forward velocity.
 			item.Pose.Position.y += item.Animation.Velocity.y;
 
