@@ -44,7 +44,7 @@ constexpr auto GRENADE_TIME = 4 * FPS;
 constexpr auto GRENADE_Y_OFFSET = 180;
 constexpr auto GRENADE_Z_OFFSET = 80;
 
-constexpr auto PROJECTILE_HIT_RADIUS = BLOCK(0.5f);
+constexpr auto PROJECTILE_HIT_RADIUS = CLICK(0.5f);
 constexpr auto PROJECTILE_EXPLODE_RADIUS = BLOCK(1);
 
 
