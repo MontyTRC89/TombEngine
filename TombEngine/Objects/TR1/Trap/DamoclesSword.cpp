@@ -47,29 +47,40 @@ namespace TEN::Entities::Traps::TR1
 	{
 		auto& item = g_Level.Items[itemNumber];
 
+		// Fall toward player.
 		if (item.Animation.IsAirborne)
 		{
 			// Calculate vertical velocity.
 			item.Pose.Orientation.y += item.Animation.TargetState; // NOTE: TargetState stores random turn rate.
 			item.Animation.Velocity.y += (item.Animation.Velocity.y < DAMOCLES_SWORD_VELOCITY_MAX) ? GRAVITY : 1.0f;
 
-			// Translate sword toward player.
+			// Calculate relative heading angle.
 			short headingAngle = Geometry::GetShortestAngle(
 				item.Pose.Orientation.y,
 				Geometry::GetOrientToPoint(item.Pose.Position.ToVector3(), LaraItem->Pose.Position.ToVector3()).y);
+
+			// Translate sword.
 			TranslateItem(&item, headingAngle, item.Animation.ActiveState); // NOTE: ActiveState stores calculated forward velocity.
 			item.Pose.Position.y += item.Animation.Velocity.y;
 
-			if (item.Pose.Position.y > item.Floor)
+			auto pointColl = GetCollision(&item);
+
+			// Sword has reached floor.
+			if (item.Pose.Position.y > pointColl.Position.Floor)
 			{
-				SoundEffect(SFX_TR1_DAMOCLES_ROOM_SWORD, &item.Pose);
-				item.Pose.Position.y = item.Floor + 10;
 				item.Animation.IsAirborne = false;
+				item.Pose.Position.y = pointColl.Position.Floor + 10;
 				item.Status = ItemStatus::ITEM_DEACTIVATED;
+
+				SoundEffect(SFX_TR1_DAMOCLES_ROOM_SWORD, &item.Pose);
 				RemoveActiveItem(itemNumber);
 			}
+
+			return;
 		}
-		else if (item.Pose.Position.y != item.Floor)
+		
+		// Scan for player.
+		if (item.Pose.Position.y != GetCollision(&item).Position.Floor)
 		{
 			item.Pose.Orientation.y += item.Animation.TargetState; // NOTE: TargetState stores random turn rate.
 
@@ -87,6 +98,8 @@ namespace TEN::Entities::Traps::TR1
 				item.Animation.ActiveState = distance2D / 32; // NOTE: ActiveState stores calculated forward velocity.
 				item.Animation.IsAirborne = true;
 			}
+
+			return;
 		}
 	}
 
