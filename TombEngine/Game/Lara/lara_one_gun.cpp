@@ -649,9 +649,6 @@ void FireGrenade(ItemInfo* laraItem)
 void GrenadeControl(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
-	   
-	// Store previous position for later.
-	auto prevPos = item->Pose.Position;
 
 	item->Color = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
 
@@ -660,7 +657,6 @@ void GrenadeControl(short itemNumber)
 	if (TestEnvironment(ENV_FLAG_WATER, item->RoomNumber) ||
 		TestEnvironment(ENV_FLAG_SWAMP, item->RoomNumber))
 	{
-		aboveWater = false;
 		item->Animation.Velocity.y += (5.0f - item->Animation.Velocity.y) / 2;
 		item->Animation.Velocity.z -= item->Animation.Velocity.z / 4;
 
@@ -705,12 +701,14 @@ void GrenadeControl(short itemNumber)
 		TriggerRocketFire(wx + item->Pose.Position.x, wy + item->Pose.Position.y, wz + item->Pose.Position.z);
 	}
 
-	// Update grenade position.
 	auto velocity = Vector3i(
 		item->Animation.Velocity.z * phd_sin(item->Animation.TargetState),
 		item->Animation.Velocity.y,
 		item->Animation.Velocity.z * phd_cos(item->Animation.TargetState)
 	);
+
+	// Update grenade position.
+	auto prevPos = item->Pose.Position;
 	item->Pose.Position += velocity;
 
 	// Grenades that originate from first grenade when special ammo is selected.
@@ -807,12 +805,8 @@ void RocketControl(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
 
-	// Save previous position for later.
-	auto prevPos = item->Pose.Position;
-	short prevRoomNumber = item->RoomNumber;
+	// Update velocity and orientation
 
-	// Update velocity and orientation and check whether above water or underwater.
-	bool isAboveWater = false;
 	if (TestEnvironment(ENV_FLAG_WATER, item->RoomNumber))
 	{
 		if (item->Animation.Velocity.z > (ROCKET_VELOCITY / 4))
@@ -826,7 +820,6 @@ void RocketControl(short itemNumber)
 		}
 
 		item->Pose.Orientation.z += short((item->Animation.Velocity.z / 8) + 3.0f) * ANGLE(1.0f);
-		isAboveWater = false;
 	}
 	else
 	{
@@ -834,7 +827,6 @@ void RocketControl(short itemNumber)
 			item->Animation.Velocity.z += (item->Animation.Velocity.z / 4) + 4.0f;
 
 		item->Pose.Orientation.z += short((item->Animation.Velocity.z / 4) + 7.0f) * ANGLE(1.0f);
-		isAboveWater = true;
 	}
 
 	item->Color = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
@@ -867,6 +859,7 @@ void RocketControl(short itemNumber)
 	}
 
 	// Update rocket's position.
+	auto prevPos = item->Pose.Position;
 	TranslateItem(item, item->Pose.Orientation, item->Animation.Velocity.z);
 
 	HandleProjectile(item, LaraItem, prevPos, ProjectileType::Explosive, Weapons[(int)LaraWeaponType::RocketLauncher].ExplosiveDamage);
@@ -969,13 +962,6 @@ void CrossbowBoltControl(short itemNumber)
 	auto* lara = GetLaraInfo(LaraItem);
 	auto* item = &g_Level.Items[itemNumber];
 
-	// Store previous position for later
-	auto prevPos = item->Pose.Position;
-
-	bool aboveWater = false;
-	bool explode = false;
-
-	// Update speed and check if above water.
 	if (TestEnvironment(ENV_FLAG_WATER, item))
 	{
 		auto bubblePos = item->Pose.Position;
@@ -985,12 +971,9 @@ void CrossbowBoltControl(short itemNumber)
 
 		if (GlobalCounter & 1)
 			CreateBubble(&bubblePos, item->RoomNumber, 4, 7, 0, 0, 0, 0);
-
-		aboveWater = false;
 	}
-	else
-		aboveWater = true;
 
+	auto prevPos = item->Pose.Position;
 	TranslateItem(item, item->Pose.Orientation, item->Animation.Velocity.z);
 
 	int damage = (item->ItemFlags[0] == (int)ProjectileType::Explosive) ?
