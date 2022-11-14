@@ -34,6 +34,8 @@ using namespace TEN::Effects::Environment;
 using namespace TEN::Math;
 
 constexpr auto TRIGGER_TIMEOUT = 6;
+constexpr auto GRENADE_FRAG_TIMEOUT = 16;
+constexpr auto GRENADE_FLASH_TIMEOUT = 4;
 
 constexpr auto HARPOON_VELOCITY = CLICK(1);
 constexpr auto HARPOON_TIME = 10 * FPS;
@@ -41,8 +43,6 @@ constexpr auto ROCKET_VELOCITY = CLICK(2);
 constexpr auto ROCKET_TIME = 4.5f * FPS;
 constexpr auto GRENADE_VELOCITY = CLICK(0.5f);
 constexpr auto GRENADE_TIME = 4 * FPS;
-constexpr auto GRENADE_Y_OFFSET = 180;
-constexpr auto GRENADE_Z_OFFSET = 80;
 
 constexpr auto PROJECTILE_HIT_RADIUS = CLICK(0.5f);
 constexpr auto PROJECTILE_EXPLODE_RADIUS = BLOCK(1);
@@ -627,7 +627,20 @@ void FireGrenade(ItemInfo* laraItem)
 	if (!ammo.HasInfinite())
 		ammo--;
 
-	item->ItemFlags[0] = (int)lara->Weapons[(int)LaraWeaponType::GrenadeLauncher].SelectedAmmo;
+	switch (lara->Weapons[(int)LaraWeaponType::GrenadeLauncher].SelectedAmmo)
+	{
+	case WeaponAmmoType::Ammo1:
+		item->ItemFlags[0] = (int)ProjectileType::Grenade;
+		break;
+
+	case WeaponAmmoType::Ammo2:
+		item->ItemFlags[0] = (int)ProjectileType::FragGrenade;
+		break;
+
+	case WeaponAmmoType::Ammo3:
+		item->ItemFlags[0] = (int)ProjectileType::FlashGrenade;
+		break;
+	}
 
 	Statistics.Level.AmmoUsed++;
 	Statistics.Game.AmmoUsed++;
@@ -636,79 +649,6 @@ void FireGrenade(ItemInfo* laraItem)
 void GrenadeControl(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
-
-	if (item->ItemFlags[1])
-	{
-		item->ItemFlags[1]--;
-
-		if (item->ItemFlags[1])
-		{
-			if (item->ItemFlags[0] == (int)(int)GrenadeType::Flash)
-			{
-				// Flash grenades
-				int R, G, B;
-				if (item->ItemFlags[1] == 1)
-				{
-					FlashGrenadeAftershockTimer = 120;
-					R = 255;
-					G = 255;
-					B = 255;
-				}
-				else
-				{
-					R = (GetRandomControl() & 0x1F) + 224;
-					G = B = R - GetRandomControl() & 0x1F;
-				}
-
-				Weather.Flash(R, G, B, 0.03f);
-
-				TriggerFlashSmoke(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, item->RoomNumber);
-				TriggerFlashSmoke(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, item->RoomNumber);
-			}
-			else
-			{
-				// Trigger a new grenade in the case of GRENADE_SUPER until itemFlags[1] is > 0
-				short newGrenadeItemNumber = CreateItem();
-				if (newGrenadeItemNumber != NO_ITEM)
-				{
-					auto* newGrenade = &g_Level.Items[newGrenadeItemNumber];
-
-					newGrenade->Color = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
-					newGrenade->ObjectNumber = ID_GRENADE;
-					newGrenade->RoomNumber = item->RoomNumber;
-					newGrenade->Pose.Position.x = (GetRandomControl() & 0x1FF) + item->Pose.Position.x - 256;
-					newGrenade->Pose.Position.y = item->Pose.Position.y - 256;
-					newGrenade->Pose.Position.z = (GetRandomControl() & 0x1FF) + item->Pose.Position.z - 256;
-					
-					InitialiseItem(newGrenadeItemNumber);
-					
-					newGrenade->Pose.Orientation.x = (GetRandomControl() & 0x3FFF) + ANGLE(45);
-					newGrenade->Pose.Orientation.y = GetRandomControl() * 2;
-					newGrenade->Pose.Orientation.z = 0;
-					newGrenade->Animation.Velocity.z = 64.0f;
-					newGrenade->Animation.Velocity.y = -64.0f * phd_sin(newGrenade->Pose.Orientation.x);
-					newGrenade->Animation.ActiveState = newGrenade->Pose.Orientation.x;
-					newGrenade->Animation.TargetState = newGrenade->Pose.Orientation.y;
-					newGrenade->Animation.RequiredState = 0;
-					
-					AddActiveItem(newGrenadeItemNumber);
-					
-					newGrenade->Status = ITEM_INVISIBLE;
-					newGrenade->ItemFlags[2] = item->ItemFlags[2];
-					newGrenade->HitPoints = 3000; // 60; // 3000;
-					newGrenade->ItemFlags[0] = (int)(int)GrenadeType::Ultra;
-
-					if (TestEnvironment(ENV_FLAG_WATER, newGrenade->RoomNumber))
-						newGrenade->HitPoints = 1;
-				}
-			}
-
-			return;
-		}
-
-		KillItem(itemNumber);
-		return;
-	}
 	   
 	// Store previous position for later.
 	auto prevPos = item->Pose.Position;
@@ -795,7 +735,7 @@ void GrenadeControl(short itemNumber)
 		item->Pose.Orientation.y = sYOrient;
 	}
 
-	HandleProjectile(item, LaraItem, prevPos, ProjectileType::Grenade, Weapons[(int)LaraWeaponType::GrenadeLauncher].ExplosiveDamage);
+	HandleProjectile(item, LaraItem, prevPos, (ProjectileType)item->ItemFlags[0], Weapons[(int)LaraWeaponType::GrenadeLauncher].ExplosiveDamage);
 }
 
 void FireRocket(ItemInfo* laraItem)
@@ -1189,7 +1129,7 @@ void DoExplosiveDamage(ItemInfo* emitter, ItemInfo* target, ItemInfo* projectile
 	}
 }
 
-bool EmitFromProjectile(ItemInfo* projectile, ProjectileType flags)
+bool EmitFromProjectile(ItemInfo* projectile, ProjectileType type)
 {
 	if (!projectile->ItemFlags[1])
 		return false;
@@ -1202,7 +1142,7 @@ bool EmitFromProjectile(ItemInfo* projectile, ProjectileType flags)
 		return true;
 	}
 
-	if (flags == ProjectileType::FlashGrenade)
+	if (type == ProjectileType::FlashGrenade)
 	{
 		// Flash grenades
 		int r, g, b;
@@ -1222,42 +1162,42 @@ bool EmitFromProjectile(ItemInfo* projectile, ProjectileType flags)
 		Weather.Flash(r, g, b, 0.03f);
 		TriggerFlashSmoke(projectile->Pose.Position.x, projectile->Pose.Position.y, projectile->Pose.Position.z, projectile->RoomNumber);
 	}
-	else if (flags == ProjectileType::FragGrenade)
+	else if (type == ProjectileType::FragGrenade)
 	{
 		// Trigger a new fragment in the case of GRENADE_SUPER until itemFlags[1] is > 0
 		short newGrenadeItemNumber = CreateItem();
-		if (newGrenadeItemNumber != NO_ITEM)
-		{
-			auto* newGrenade = &g_Level.Items[newGrenadeItemNumber];
+		if (newGrenadeItemNumber == NO_ITEM)
+			return true;
 
-			newGrenade->Color = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
-			newGrenade->ObjectNumber = ID_GRENADE;
-			newGrenade->RoomNumber = projectile->RoomNumber;
-			newGrenade->Pose.Position.x = Random::GenerateInt(0, 512) + projectile->Pose.Position.x - CLICK(1);
-			newGrenade->Pose.Position.y = projectile->Pose.Position.y - CLICK(1);
-			newGrenade->Pose.Position.z = Random::GenerateInt(0, 512) + projectile->Pose.Position.z - CLICK(1);
+		auto* newGrenade = &g_Level.Items[newGrenadeItemNumber];
 
-			InitialiseItem(newGrenadeItemNumber);
+		newGrenade->Color = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
+		newGrenade->ObjectNumber = ID_GRENADE;
+		newGrenade->RoomNumber = projectile->RoomNumber;
+		newGrenade->Pose.Position.x = Random::GenerateInt(0, 512) + projectile->Pose.Position.x - CLICK(1);
+		newGrenade->Pose.Position.y = projectile->Pose.Position.y - CLICK(1);
+		newGrenade->Pose.Position.z = Random::GenerateInt(0, 512) + projectile->Pose.Position.z - CLICK(1);
 
-			newGrenade->Pose.Orientation.x = Random::GenerateInt(0, ANGLE(90)) + ANGLE(45);
-			newGrenade->Pose.Orientation.y = Random::GenerateInt(0, ANGLE(359));
-			newGrenade->Pose.Orientation.z = 0;
-			newGrenade->Animation.Velocity.z = 64.0f;
-			newGrenade->Animation.Velocity.y = -64.0f * phd_sin(newGrenade->Pose.Orientation.x);
-			newGrenade->Animation.ActiveState = newGrenade->Pose.Orientation.x;
-			newGrenade->Animation.TargetState = newGrenade->Pose.Orientation.y;
-			newGrenade->Animation.RequiredState = 0;
+		InitialiseItem(newGrenadeItemNumber);
 
-			AddActiveItem(newGrenadeItemNumber);
+		newGrenade->Pose.Orientation.x = Random::GenerateInt(0, ANGLE(90)) + ANGLE(45);
+		newGrenade->Pose.Orientation.y = Random::GenerateInt(0, ANGLE(359));
+		newGrenade->Pose.Orientation.z = 0;
+		newGrenade->Animation.Velocity.z = 64.0f;
+		newGrenade->Animation.Velocity.y = -64.0f * phd_sin(newGrenade->Pose.Orientation.x);
+		newGrenade->Animation.ActiveState = newGrenade->Pose.Orientation.x;
+		newGrenade->Animation.TargetState = newGrenade->Pose.Orientation.y;
+		newGrenade->Animation.RequiredState = 0;
 
-			newGrenade->Status = ITEM_INVISIBLE;
-			newGrenade->ItemFlags[2] = projectile->ItemFlags[2];
-			newGrenade->HitPoints = 3000; // 60; // 3000;
-			newGrenade->ItemFlags[0] = (int)(int)GrenadeType::Ultra;
+		AddActiveItem(newGrenadeItemNumber);
 
-			if (TestEnvironment(ENV_FLAG_WATER, newGrenade->RoomNumber))
-				newGrenade->HitPoints = 1;
-		}
+		newGrenade->Status = ITEM_INVISIBLE;
+		newGrenade->ItemFlags[3] = 1;
+		newGrenade->HitPoints = 3000;
+		newGrenade->ItemFlags[0] = (short)ProjectileType::Explosive;
+
+		if (TestEnvironment(ENV_FLAG_WATER, newGrenade->RoomNumber))
+			newGrenade->HitPoints = Random::GenerateInt(5, 15);
 	}
 
 	return true;
@@ -1307,7 +1247,7 @@ void HandleProjectile(ItemInfo* item, ItemInfo* emitter, Vector3i prevPos, Proje
 {
 	auto pointColl = GetCollision(item);
 	bool hasHit = false;
-	bool explosive = (type == ProjectileType::Explosive || 
+	bool explosive = (type == ProjectileType::Explosive ||
 					  type == ProjectileType::Grenade ||
 					  type == ProjectileType::FragGrenade);
 
@@ -1328,6 +1268,13 @@ void HandleProjectile(ItemInfo* item, ItemInfo* emitter, Vector3i prevPos, Proje
 		return;
 	}
 
+	if (type == ProjectileType::Explosive && item->ItemFlags[3])
+	{
+		TriggerFireFlame(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, -1, 1);
+		if (TestEnvironment(ENV_FLAG_WATER, item->RoomNumber))
+			hasHit = true;
+	}
+
 	bool doExplosion = false;
 	bool doDestruction = false;
 
@@ -1343,7 +1290,10 @@ void HandleProjectile(ItemInfo* item, ItemInfo* emitter, Vector3i prevPos, Proje
 
 	// Item has reached EOL, mark it to destroy.
 	if (item->HitPoints <= 0)
+	{
+		doExplosion = explosive;
 		doDestruction = true;
+	}
 
 	// Step 0: Check for specific collision in a small radius.
 	// Step 1: If exploding, try smashing all objects in the blast radius.
@@ -1361,7 +1311,7 @@ void HandleProjectile(ItemInfo* item, ItemInfo* emitter, Vector3i prevPos, Proje
 		}
 
 		// Use bigger radius for second pass, or break if projectile is not explosive.
-		int radius = PROJECTILE_HIT_RADIUS; 
+		int radius = PROJECTILE_HIT_RADIUS;
 		if (!explosive && !firstPass)
 			break;
 		else if (!firstPass)
@@ -1382,6 +1332,9 @@ void HandleProjectile(ItemInfo* item, ItemInfo* emitter, Vector3i prevPos, Proje
 
 			hasHit = true;
 			doExplosion = explosive;
+
+			if (type == ProjectileType::FlashGrenade)
+				continue;
 
 			if (StaticObjects[currentMesh->staticNumber].shatterType == SHT_NONE)
 				continue;
@@ -1405,15 +1358,15 @@ void HandleProjectile(ItemInfo* item, ItemInfo* emitter, Vector3i prevPos, Proje
 			auto* currentItem = CollidedItems[i];
 			if (!currentItem)
 				break;
-			
+
 			auto* currentObject = &Objects[currentItem->ObjectNumber];
 
 			if ((currentObject->intelligent && currentObject->collision && currentItem->Status == ITEM_ACTIVE) ||
-				 currentItem->IsLara() ||
+				currentItem->IsLara() ||
 				(currentItem->Flags & 0x40 && Objects[currentItem->ObjectNumber].explodableMeshbits))
 			{
 				// If we collide with emitter, don't process further in early launch stages.
-				if (currentItem == emitter && item->ItemFlags[2] <= TRIGGER_TIMEOUT && !hasHit)
+				if (currentItem == emitter && item->ItemFlags[2] < TRIGGER_TIMEOUT)
 					continue;
 
 				hasHit = true;
@@ -1441,7 +1394,7 @@ void HandleProjectile(ItemInfo* item, ItemInfo* emitter, Vector3i prevPos, Proje
 
 			}
 			else if (currentItem->ObjectNumber >= ID_SMASH_OBJECT1 &&
-					 currentItem->ObjectNumber <= ID_SMASH_OBJECT8)
+				currentItem->ObjectNumber <= ID_SMASH_OBJECT8)
 			{
 				doDestruction = hasHit = true;
 
@@ -1449,7 +1402,7 @@ void HandleProjectile(ItemInfo* item, ItemInfo* emitter, Vector3i prevPos, Proje
 				TriggerExplosionSparks(currentItem->Pose.Position.x, currentItem->Pose.Position.y, currentItem->Pose.Position.z, 3, -2, 0, currentItem->RoomNumber);
 				auto pose = Pose(currentItem->Pose.Position.x, currentItem->Pose.Position.y - 128, currentItem->Pose.Position.z);
 				TriggerShockwave(&pose, 48, 304, 96, 0, 96, 128, 24, 0, 0);
-				
+
 				ExplodeItemNode(currentItem, 0, 0, 128);
 				short currentItemNumber = (currentItem - CollidedItems[0]);
 				SmashObject(currentItemNumber);
@@ -1467,11 +1420,22 @@ void HandleProjectile(ItemInfo* item, ItemInfo* emitter, Vector3i prevPos, Proje
 	if (type == ProjectileType::Harpoon)
 		return;
 
+	if (doExplosion && explosive)
+		ExplodeProjectile(item, prevPos);
+
 	if (doDestruction)
 		ExplodeItemNode(item, 0, 0, BODY_EXPLODE);
 
-	if (doExplosion && explosive)
-		ExplodeProjectile(item, prevPos);
+	switch (type)
+	{
+	case ProjectileType::FlashGrenade:
+		item->ItemFlags[1] = GRENADE_FLASH_TIMEOUT;
+		return;
+
+	case ProjectileType::FragGrenade:
+		item->ItemFlags[1] = GRENADE_FRAG_TIMEOUT;
+		return;
+	}
 
 	KillItem(item->Index);
 }
