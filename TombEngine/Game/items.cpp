@@ -3,6 +3,7 @@
 
 #include "Game/collision/floordata.h"
 #include "Game/control/control.h"
+#include "Game/control/volume.h"
 #include "Game/effects/effects.h"
 #include "Game/Lara/lara.h"
 #include "Math/Math.h"
@@ -16,6 +17,7 @@
 using namespace TEN::Floordata;
 using namespace TEN::Input;
 using namespace TEN::Math::Random;
+using namespace TEN::Control::Volumes;
 
 bool ItemInfo::TestOcb(short ocbFlags)
 {
@@ -658,6 +660,57 @@ int FindItem(ItemInfo* item)
 			return i;
 
 	return -1;
+}
+
+void UpdateAllItems()
+{
+	InItemControlLoop = true;
+
+	short itemNumber = NextItemActive;
+	while (itemNumber != NO_ITEM)
+	{
+		auto* item = &g_Level.Items[itemNumber];
+		short nextItem = item->NextActive;
+
+		if (item->AfterDeath <= 128)
+		{
+			if (Objects[item->ObjectNumber].control)
+				Objects[item->ObjectNumber].control(itemNumber);
+
+			TestVolumes(itemNumber);
+
+			if (item->AfterDeath > 0 && item->AfterDeath < 128 && !(Wibble & 3))
+				item->AfterDeath++;
+			if (item->AfterDeath == 128)
+				KillItem(itemNumber);
+		}
+		else
+			KillItem(itemNumber);
+
+		itemNumber = nextItem;
+	}
+
+	InItemControlLoop = false;
+	KillMoveItems();
+}
+
+void UpdateAllEffects()
+{
+	InItemControlLoop = true;
+
+	short fxNumber = NextFxActive;
+	while (fxNumber != NO_ITEM)
+	{
+		short nextFx = EffectList[fxNumber].nextActive;
+		auto* fx = &EffectList[fxNumber];
+		if (Objects[fx->objectNumber].control)
+			Objects[fx->objectNumber].control(fxNumber);
+
+		fxNumber = nextFx;
+	}
+
+	InItemControlLoop = false;
+	KillMoveEffects();
 }
 
 void DoDamage(ItemInfo* item, int damage)

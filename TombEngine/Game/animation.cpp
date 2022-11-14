@@ -3,6 +3,7 @@
 
 #include "Game/camera.h"
 #include "Game/collision/collide_room.h"
+#include "Game/control/box.h"
 #include "Game/control/flipeffect.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
@@ -120,6 +121,10 @@ void PerformAnimCommands(ItemInfo* item, bool isFrameBased)
 				{
 					auto bounds = GameBoundingBox(item);
 					UpdateItemRoom(item, -bounds.GetHeight() / 2, -commandPtr[0], -commandPtr[2]);
+				}
+				else
+				{
+					CreatureSwitchRoom(item->Index);
 				}
 			}
 
