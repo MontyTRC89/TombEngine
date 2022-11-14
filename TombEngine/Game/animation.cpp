@@ -120,11 +120,11 @@ void PerformAnimCommands(ItemInfo* item, bool isFrameBased)
 				if (item->IsLara())
 				{
 					auto bounds = GameBoundingBox(item);
-					UpdateItemRoom(item, -bounds.GetHeight() / 2, -commandPtr[0], -commandPtr[2]);
+					UpdateLaraRoom(item, -bounds.GetHeight() / 2, -commandPtr[0], -commandPtr[2]);
 				}
 				else
 				{
-					CreatureSwitchRoom(item->Index);
+					UpdateItemRoom(item->Index);
 				}
 			}
 

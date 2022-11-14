@@ -160,7 +160,7 @@ void KillEffect(short fxNumber);
 void InitialiseItem(short itemNumber);
 void InitialiseItemArray(int totalItems);
 void KillItem(short itemNumber);
-void UpdateItemRoom(ItemInfo* item, int height, int xOffset = 0, int zOffset = 0);
+void UpdateItemRoom(short itemNumber);
 void UpdateAllItems();
 void UpdateAllEffects();
 std::vector<int> FindAllItems(short objectNumber);

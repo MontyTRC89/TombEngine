@@ -3,6 +3,7 @@
 #include "Game/items.h"
 #include "Game/control/lot.h"
 #include "Game/effects/debris.h"
+#include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Objects/objectslist.h"
 #include "Specific/level.h"
@@ -561,8 +562,14 @@ void Moveable::SetPos(Vec3 const& pos, sol::optional<bool> updateRoom)
 	pos.StoreInPHDPos(m_item->Pose);
 
 	bool willUpdate = !updateRoom.has_value() || updateRoom.value();
-	if(m_initialised && willUpdate)
-		UpdateItemRoom(m_item, pos.y);
+
+	if (m_initialised && willUpdate)
+	{
+		if (m_item->IsLara())
+			UpdateLaraRoom(m_item, pos.y);
+		else
+			UpdateItemRoom(m_item->Index);
+	}
 }
 
 Vec3 Moveable::GetJointPos(int jointIndex) const
