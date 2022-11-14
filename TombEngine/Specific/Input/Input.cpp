@@ -467,12 +467,16 @@ namespace TEN::Input
 		if (lara.Control.HandStatus == HandStatus::WeaponReady &&
 			lara.TargetEntity != nullptr)
 		{
-			if (IsHeld(In::Look))
+			if (IsClicked(In::Look))
 			{
 				ActionMap[(int)In::SwitchTarget].Update(true);
-				ActionMap[(int)In::Look].Clear();
+				//ActionMap[(int)In::Look].Clear();
 			}
+			else
+				ClearAction(In::SwitchTarget);
 		}
+		else
+			ClearAction(In::SwitchTarget);
 
 		// Handle flares.
 		if (IsClicked(In::Flare))
@@ -648,6 +652,9 @@ namespace TEN::Input
 			DbInput |= action.IsClicked() ? actionBit : 0;
 			TrInput |= action.IsHeld()	  ? actionBit : 0;
 		}
+
+		ActionMap[(int)In::Look].PrintDebugInfo();
+		ActionMap[(int)In::SwitchTarget].PrintDebugInfo();
 	}
 
 	void ClearAllActions()

@@ -1330,10 +1330,10 @@ namespace TEN::Gui
 				else
 					InsertObjectIntoList(INV_OBJECT_HK);
 
-				if (lara->Weapons[(int)LaraWeaponType::HK].Weaponmode == LaraWeaponTypeCarried::WTYPE_AMMO_2)
+				if (lara->Weapons[(int)LaraWeaponType::HK].WeaponMode == LaraWeaponTypeCarried::WTYPE_AMMO_2)
 					Ammo.CurrentHKAmmoType = 1;
 
-				if (lara->Weapons[(int)LaraWeaponType::HK].Weaponmode == LaraWeaponTypeCarried::WTYPE_AMMO_3)
+				if (lara->Weapons[(int)LaraWeaponType::HK].WeaponMode == LaraWeaponTypeCarried::WTYPE_AMMO_3)
 					Ammo.CurrentHKAmmoType = 2;
 			}
 			else if (Ammo.AmountHKAmmo1)
@@ -2400,17 +2400,17 @@ namespace TEN::Gui
 
 		if (lara->Weapons[(int)LaraWeaponType::HK].Present)
 		{
-			lara->Weapons[(int)LaraWeaponType::HK].Weaponmode = LaraWeaponTypeCarried::WTYPE_AMMO_1;
+			lara->Weapons[(int)LaraWeaponType::HK].WeaponMode = LaraWeaponTypeCarried::WTYPE_AMMO_1;
 			lara->Weapons[(int)LaraWeaponType::HK].SelectedAmmo = WeaponAmmoType::Ammo1;
 
 			if (Ammo.CurrentHKAmmoType == 1)
 			{
-				lara->Weapons[(int)LaraWeaponType::HK].Weaponmode = LaraWeaponTypeCarried::WTYPE_AMMO_2;
+				lara->Weapons[(int)LaraWeaponType::HK].WeaponMode = LaraWeaponTypeCarried::WTYPE_AMMO_2;
 				lara->Weapons[(int)LaraWeaponType::HK].SelectedAmmo = WeaponAmmoType::Ammo1;
 			}
 			else if (Ammo.CurrentHKAmmoType == 2)
 			{
-				lara->Weapons[(int)LaraWeaponType::HK].Weaponmode = LaraWeaponTypeCarried::WTYPE_AMMO_3;
+				lara->Weapons[(int)LaraWeaponType::HK].WeaponMode = LaraWeaponTypeCarried::WTYPE_AMMO_3;
 				lara->Weapons[(int)LaraWeaponType::HK].SelectedAmmo = WeaponAmmoType::Ammo1;
 			}
 		}

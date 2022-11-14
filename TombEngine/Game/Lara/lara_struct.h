@@ -1075,7 +1075,7 @@ struct CarriedWeaponInfo
 	WeaponAmmoType SelectedAmmo; // WeaponAmmoType_enum
 	bool HasLasersight; // TODO: Duplicated in LaraInventoryData.
 	bool HasSilencer;	// TODO: Duplicated in LaraInventoryData.
-	LaraWeaponTypeCarried Weaponmode;
+	LaraWeaponTypeCarried WeaponMode;
 };
 
 struct ArmInfo
@@ -1172,21 +1172,22 @@ struct LaraCountData
 
 struct WeaponControlData
 {
-	short WeaponItem;
-	bool HasFired;
-	bool Fired;
-
-	bool UziLeft;
-	bool UziRight;
-
-	LaraWeaponType GunType;
-	LaraWeaponType RequestGunType;
-	LaraWeaponType LastGunType;
-	HolsterInfo HolsterInfo;
+	LaraWeaponType GunType		  = LaraWeaponType::None;
+	LaraWeaponType RequestGunType = LaraWeaponType::None;
+	LaraWeaponType LastGunType	  = LaraWeaponType::None;
+	HolsterInfo	   HolsterInfo	  = {};
 	
-	int Interval;
-	int ShotsFired;
-	int Timer;
+	short WeaponItem = -1;
+	bool  HasFired	 = false;
+	bool  Fired		 = false;
+
+	bool UziLeft  = false;
+	bool UziRight = false;
+
+	// TODO: Interval and Timer count frame time for now, but should count delta time in the future. -- Sezz 2022.11.14
+	unsigned int NumShotsFired = 0;
+	float		 Interval	   = 0.0f;
+	float		 Timer		   = 0.0f;
 };
 
 struct RopeControlData

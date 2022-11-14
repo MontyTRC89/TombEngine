@@ -199,7 +199,7 @@ void LaraCheatGetStuff(ItemInfo* item)
 
 		weapon.Present = true;
 		weapon.SelectedAmmo = WeaponAmmoType::Ammo1;
-		weapon.Weaponmode = LaraWeaponTypeCarried::WTYPE_AMMO_1;
+		weapon.WeaponMode = LaraWeaponTypeCarried::WTYPE_AMMO_1;
 		weapon.HasLasersight = false;
 		weapon.HasSilencer = false;
 		weapon.Ammo[(int)WeaponAmmoType::Ammo1].SetInfinite(true);
