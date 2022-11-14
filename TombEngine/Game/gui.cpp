@@ -24,9 +24,11 @@
 #include "Specific/clock.h"
 #include "Specific/configuration.h"
 #include "Specific/level.h"
+#include "Specific/trutils.h"
 
 using namespace TEN::Input;
 using namespace TEN::Renderer;
+using namespace TEN::Utils;
 
 namespace TEN::Gui
 {
@@ -2005,7 +2007,8 @@ namespace TEN::Gui
 
 		if (Rings[(int)RingTypes::Ammo]->RingActive)
 		{
-			g_Renderer.AddString(PHD_CENTER_X, PHD_CENTER_Y, g_GameFlow->GetString(OptionStrings[5]), PRINTSTRING_COLOR_WHITE, PRINTSTRING_BLINK | PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
+			auto optionString = ToUpper(std::string(OptionStrings[5]));
+			g_Renderer.AddString(PHD_CENTER_X, PHD_CENTER_Y, optionString.c_str(), PRINTSTRING_COLOR_WHITE, PRINTSTRING_BLINK | PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
 
 			if (Rings[(int)RingTypes::Inventory]->ObjectListMovement)
 				return;
@@ -2200,14 +2203,16 @@ namespace TEN::Gui
 			{
 				for (int i = 0; i < n; i++)
 				{
+					auto optionString = ToUpper(std::string(CurrentOptions[i].Text));
+
 					if (i == CurrentSelectedOption)
 					{
-						g_Renderer.AddString(PHD_CENTER_X, yPos, CurrentOptions[i].Text, PRINTSTRING_COLOR_WHITE, PRINTSTRING_BLINK | PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
+						g_Renderer.AddString(PHD_CENTER_X, yPos, optionString.c_str(), PRINTSTRING_COLOR_WHITE, PRINTSTRING_BLINK | PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
 						yPos += LINE_HEIGHT;
 					}
 					else
 					{
-						g_Renderer.AddString(PHD_CENTER_X, yPos, CurrentOptions[i].Text, PRINTSTRING_COLOR_WHITE, PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
+						g_Renderer.AddString(PHD_CENTER_X, yPos, optionString.c_str(), PRINTSTRING_COLOR_WHITE, PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
 						yPos += LINE_HEIGHT;
 					}
 				}
