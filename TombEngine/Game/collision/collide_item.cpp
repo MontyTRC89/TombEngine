@@ -727,7 +727,7 @@ bool ItemPushItem(ItemInfo* item, ItemInfo* item2, CollisionInfo* coll, bool ena
 		coll->Setup.OldPosition = item2->Pose.Position;
 
 		// Commented because causes Lara to jump out of the water if she touches an object on the surface. re: "kayak bug"
-		// UpdateItemRoom(item2, -10);
+		// UpdateLaraRoom(item2, -10);
 	}
 	else
 	{
@@ -801,7 +801,7 @@ bool ItemPushStatic(ItemInfo* item, const MESH_INFO& mesh, CollisionInfo* coll)
 	{
 		coll->Setup.OldPosition = item->Pose.Position;
 		if (item->IsLara())
-			UpdateItemRoom(item, -10);
+			UpdateLaraRoom(item, -10);
 	}
 	else
 	{
