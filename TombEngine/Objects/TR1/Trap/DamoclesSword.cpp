@@ -27,7 +27,7 @@ namespace TEN::Entities::Traps::TR1
 	{
 		object->initialise = InitialiseDamoclesSword;
 		object->control = ControlDamoclesSword;
-		object->collision = CollisionDamoclesSword;
+		object->collision = CollideDamoclesSword;
 		//object->shadowSize = UNIT_SHADOW;
 		object->savePosition = true;
 		object->saveAnim = true;
@@ -103,7 +103,7 @@ namespace TEN::Entities::Traps::TR1
 		}
 	}
 
-	void CollisionDamoclesSword(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
+	void CollideDamoclesSword(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 	{
 		auto& item = g_Level.Items[itemNumber];
 

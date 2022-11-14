@@ -10,5 +10,5 @@ namespace TEN::Entities::Traps::TR1
 	void InitialiseDamoclesSword(short itemNumber);
 
 	void ControlDamoclesSword(short itemNumber);
-	void CollisionDamoclesSword(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);
+	void CollideDamoclesSword(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);
 }
