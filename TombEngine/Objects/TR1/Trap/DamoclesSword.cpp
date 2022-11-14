@@ -21,6 +21,8 @@ namespace TEN::Entities::Traps::TR1
 	constexpr auto DAMOCLES_SWORD_ACTIVATE_RANGE_2D		  = BLOCK(3.0f / 2);
 	constexpr auto DAMOCLES_SWORD_ACTIVATE_RANGE_VERTICAL = BLOCK(3);
 
+	const auto DAMOCLES_SWORD_TURN_RATE_MAX = ANGLE(5.5f);
+
 	void SetupDamoclesSword(ObjectInfo* object)
 	{
 		object->initialise = InitialiseDamoclesSword;
@@ -37,7 +39,7 @@ namespace TEN::Entities::Traps::TR1
 		auto& item = g_Level.Items[itemNumber];
 
 		item.Pose.Orientation.y = Random::GenerateAngle();
-		item.Animation.TargetState = (Random::GenerateInt() - ANGLE(90.0f)) / 16; // NOTE: TargetState stores random rotation rate.
+		item.Animation.TargetState = Random::GenerateAngle(-DAMOCLES_SWORD_TURN_RATE_MAX, DAMOCLES_SWORD_TURN_RATE_MAX); // NOTE: TargetState stores random turn rate.
 		item.Animation.Velocity.y = DAMOCLES_SWORD_VELOCITY_MIN;
 	}
 
@@ -48,12 +50,12 @@ namespace TEN::Entities::Traps::TR1
 		if (item.Animation.IsAirborne)
 		{
 			// Calculate vertical velocity.
-			item.Pose.Orientation.y += item.Animation.TargetState; // NOTE: TargetState stores random rotation rate.
+			item.Pose.Orientation.y += item.Animation.TargetState; // NOTE: TargetState stores random turn rate.
 			item.Animation.Velocity.y += (item.Animation.Velocity.y < DAMOCLES_SWORD_VELOCITY_MAX) ? GRAVITY : 1.0f;
 
 			// Translate sword toward player.
 			short headingAngle = Geometry::GetOrientToPoint(item.Pose.Position.ToVector3(), LaraItem->Pose.Position.ToVector3()).y;
-			TranslateItem(&item, headingAngle, item.Animation.ActiveState); // NOTE: ActiveState holds calculated forward velocity.
+			TranslateItem(&item, headingAngle, item.Animation.ActiveState); // NOTE: ActiveState stores calculated forward velocity.
 			item.Pose.Position.y += item.Animation.Velocity.y;
 
 			if (item.Pose.Position.y > item.Floor)
@@ -67,7 +69,7 @@ namespace TEN::Entities::Traps::TR1
 		}
 		else if (item.Pose.Position.y != item.Floor)
 		{
-			item.Pose.Orientation.y += item.Animation.TargetState; // NOTE: TargetState stores random rotation rate.
+			item.Pose.Orientation.y += item.Animation.TargetState; // NOTE: TargetState stores random turn rate.
 
 			float distanceV = LaraItem->Pose.Position.y - item.Pose.Position.y;
 			float distance2D = Vector2i::Distance(
@@ -79,7 +81,7 @@ namespace TEN::Entities::Traps::TR1
 				distance2D <= DAMOCLES_SWORD_ACTIVATE_RANGE_2D &&
 				item.Pose.Position.y < LaraItem->Pose.Position.y)
 			{
-				item.Animation.ActiveState = distance2D / 32; // NOTE: ActiveState holds calculated forward velocity.
+				item.Animation.ActiveState = distance2D / 32; // NOTE: ActiveState stores calculated forward velocity.
 				item.Animation.IsAirborne = true;
 			}
 		}
@@ -100,11 +102,11 @@ namespace TEN::Entities::Traps::TR1
 			DoDamage(&item, DAMOCLES_SWORD_DAMAGE);
 
 			auto bloodPos = Vector3i(
-				(Random::GenerateInt() - BLOCK(16)) / BLOCK(1.0f / 4),
-				(Random::GenerateInt() - BLOCK(16)) / BLOCK(1.0f / 4),
-				(Random::GenerateInt() / 44)
+				Random::GenerateInt(-BLOCK(1.0f / 16), BLOCK(1.0f / 16)),
+				Random::GenerateInt(-BLOCK(1.0f / 16), BLOCK(1.0f / 16)),
+				Random::GenerateInt(0, BLOCK(3.0f / 4))
 			) + laraItem->Pose.Position;
-			int direction = laraItem->Pose.Orientation.y + (Random::GenerateInt() - ANGLE(90.0f)) / 8;
+			int direction = laraItem->Pose.Orientation.y + Random::GenerateAngle(ANGLE(-11.25f), ANGLE(-11.25f));
 			DoLotsOfBlood(bloodPos.x, bloodPos.y, bloodPos.z, laraItem->Animation.Velocity.z, direction, laraItem->RoomNumber, 10);
 		}
 	}
