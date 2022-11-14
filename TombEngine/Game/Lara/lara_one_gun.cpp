@@ -37,8 +37,6 @@ using namespace TEN::Math;
 constexpr int HK_BURST_MODE_SHOT_COUNT = 5;
 constexpr int HK_BURST_MODE_SHOT_INTERVAL = 12;
 
-extern WeaponControlData weaponinfo;
-
 enum class CrossbowBoltType
 {
 	Normal,
@@ -50,7 +48,7 @@ void AnimateShotgun(ItemInfo* laraItem, LaraWeaponType weaponType)
 {
 	auto* lara = GetLaraInfo(laraItem);
 	auto& HK = lara->Weapons[(int)LaraWeaponType::HK]; 
-	
+	auto& weaponinfo = lara->Control.Weapon;
 
 	if (lara->LeftArm.GunSmoke > 0)
 	{
@@ -1650,6 +1648,7 @@ void FireHK(ItemInfo* laraItem, int mode)
 {
 	auto* lara = GetLaraInfo(laraItem);
 	auto& weapon = lara->Weapons[(int)LaraWeaponType::HK];
+	auto& weaponinfo = lara->Control.Weapon;
 	auto angles = EulerAngles(
 		lara->LeftArm.Orientation.x,
 		lara->LeftArm.Orientation.y + laraItem->Pose.Orientation.y,
@@ -1705,6 +1704,7 @@ void LasersightWeaponHandler(ItemInfo* item, LaraWeaponType weaponType)
 {
 	auto* lara = GetLaraInfo(item);
 	auto& weapon = lara->Weapons[(int)weaponType];
+	auto& weaponinfo = lara->Control.Weapon;
 	auto& ammo = GetAmmo(*lara, lara->Control.Weapon.GunType);
 
 	if (!LaserSight || (!weapon.HasLasersight))
