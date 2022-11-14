@@ -83,6 +83,7 @@ namespace TEN::Entities::Traps::TR1
 				distance2D <= DAMOCLES_SWORD_ACTIVATE_RANGE_2D &&
 				item.Pose.Position.y < LaraItem->Pose.Position.y)
 			{
+				// TODO: Have forward velocity also take vertical distance into account.
 				item.Animation.ActiveState = distance2D / 32; // NOTE: ActiveState stores calculated forward velocity.
 				item.Animation.IsAirborne = true;
 			}
