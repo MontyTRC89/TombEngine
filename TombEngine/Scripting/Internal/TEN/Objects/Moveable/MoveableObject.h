@@ -114,8 +114,10 @@ public:
 	friend bool operator==(Moveable const&, Moveable const&);
 	friend void SetLevelFuncCallback(TypeOrNil<LevelFunc> const& cb, std::string const & callerName, Moveable& mov, std::string& toModify);
 
-private:
+protected:
 	ItemInfo* m_item;
+
+private:
 	short m_num;
 	bool m_initialised;
 
