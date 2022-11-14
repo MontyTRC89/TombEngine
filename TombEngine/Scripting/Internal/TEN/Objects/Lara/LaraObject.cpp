@@ -45,11 +45,48 @@ bool LaraObject::GetOnFire() const
 	return lara->BurnType != BurnType::None;
 }
 
+/// Set Poison with potency of poision
+// @function LaraObject:SetPoison
+// @tparam Potency Value 
+// @usage
+// Lara:SetPoison(100)
+void LaraObject::SetPoison(int potency = 0)
+{
+	auto* lara = GetLaraInfo(m_item);
+
+	lara->PoisonPotency = potency;
+}
+
+/// Get Poison potency of Lara
+// @function LaraObject:GetPoison
+// @usage
+// Lara:GetPoison()
+int LaraObject::GetPoison()
+{
+	auto* lara = GetLaraInfo(m_item);
+
+	return lara->PoisonPotency;
+}
+
+/// Remove Poison
+// @function Moveable:RemovePoison
+// @usage
+// Lara:RemovePoison()
+void LaraObject::RemovePoison()
+{
+	auto* lara = GetLaraInfo(m_item);
+
+	lara->PoisonPotency = 0;
+}
+
 void LaraObject::Register(sol::table& parent)
 {
 	parent.new_usertype<LaraObject>(LUA_CLASS_NAME,
 			ScriptReserved_SetOnFire, &LaraObject::SetOnFire,
 			ScriptReserved_GetOnFire, &LaraObject::GetOnFire,
+			ScriptReserved_SetPoison, &LaraObject::SetPoison,
+			ScriptReserved_GetPoison, &LaraObject::GetPoison,
+			ScriptReserved_RemovePoison, &LaraObject::RemovePoison,
 			sol::base_classes, sol::bases<Moveable>()
 		);
 }
