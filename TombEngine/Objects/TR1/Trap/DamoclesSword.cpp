@@ -60,8 +60,7 @@ namespace TEN::Entities::Traps::TR1
 
 			// Translate sword.
 			short headingAngle = Geometry::GetOrientToPoint(item.Pose.Position.ToVector3(), laraItem.Pose.Position.ToVector3()).y;
-			TranslateItem(&item, headingAngle, item.ItemFlags[1]); // NOTE: ItemFlags[1] stores calculated 2D velocity.
-			item.Pose.Position.y += item.Animation.Velocity.y;
+			TranslateItem(&item, headingAngle, item.ItemFlags[1], item.Animation.Velocity.y); // NOTE: ItemFlags[1] stores calculated forward velocity.
 
 			int vPos = item.Pose.Position.y;
 			auto pointColl = GetCollision(&item);
@@ -107,7 +106,7 @@ namespace TEN::Entities::Traps::TR1
 			// Drop sword.
 			// TODO: Have 2D velocity also take vertical distance into account.
 			item.Animation.IsAirborne = true;
-			item.ItemFlags[1] = distance2D / 32; // NOTE: ItemFlags[1] stores calculated 2D velocity.
+			item.ItemFlags[1] = distance2D / 32; // NOTE: ItemFlags[1] stores calculated forward velocity.
 			return;
 		}
 	}
