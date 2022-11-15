@@ -25,12 +25,12 @@ void LaraObject::SetOnFire(bool onFire)
 {
 	//todo add support for other BurnTypes -squidshire 11/11/2022
 	auto* lara = GetLaraInfo(m_item);
-	if (onFire && lara->BurnType == BurnType::None )
+	if (onFire && lara->BurnType == BurnType::None)
 	{
 		TEN::Effects::Lara::LaraBurn(m_item);
 		lara->BurnType = BurnType::Normal;
 	}
-	else if(!onFire)
+	else if (!onFire)
 	{
 		lara->BurnType = BurnType::None;
 	}
@@ -50,21 +50,23 @@ bool LaraObject::GetOnFire() const
 // @tparam Potency Value 
 // @usage
 // Lara:SetPoison(100)
-void LaraObject::SetPoison(int potency = 0)
+void LaraObject::SetPoison(sol::optional<int> potency)
 {
 	auto* lara = GetLaraInfo(m_item);
 
-	lara->PoisonPotency = potency;
+	if (potency.has_value())
+		lara->PoisonPotency = potency.value();
+	else
+		lara->PoisonPotency = 0;
 }
 
 /// Get Poison potency of Lara
 // @function LaraObject:GetPoison
 // @usage
 // Lara:GetPoison()
-int LaraObject::GetPoison()
+int LaraObject::GetPoison() const
 {
 	auto* lara = GetLaraInfo(m_item);
-
 	return lara->PoisonPotency;
 }
 
