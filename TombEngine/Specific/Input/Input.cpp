@@ -652,9 +652,6 @@ namespace TEN::Input
 			DbInput |= action.IsClicked() ? actionBit : 0;
 			TrInput |= action.IsHeld()	  ? actionBit : 0;
 		}
-
-		ActionMap[(int)In::Look].PrintDebugInfo();
-		ActionMap[(int)In::SwitchTarget].PrintDebugInfo();
 	}
 
 	void ClearAllActions()
