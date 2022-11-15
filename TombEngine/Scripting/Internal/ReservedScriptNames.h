@@ -191,7 +191,6 @@ static constexpr char ScriptReserved_PlayFlyBy[]					= "PlayFlyBy";
 static constexpr char ScriptReserved_ObjID[]					= "ObjID";
 static constexpr char ScriptReserved_BlendID[]					= "BlendID";
 static constexpr char ScriptReserved_DisplayStringOption[]		= "DisplayStringOption";
-static constexpr char ScriptReserved_InventoryMode[]			= "Mode";
 static constexpr char ScriptReserved_CallbackPoint[]			= "CallbackPoint";
 
 static constexpr char ScriptReserved_LevelVars[]	= "LevelVars";
