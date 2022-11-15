@@ -1,9 +1,10 @@
 #include "framework.h"
 #include "LaraObject.h"
 
-#include "lara_fx.h"
-#include "lara_helpers.h"
-#include "lara_struct.h"
+#include "Game/Lara/lara.h"
+#include "Game/Lara/lara_helpers.h"
+#include "Game/Lara/lara_struct.h"
+#include "Game/effects/lara_fx.h"
 #include "ReservedScriptNames.h"
 
 /***
@@ -47,9 +48,10 @@ bool LaraObject::GetOnFire() const
 
 /// Set Poison with potency of poision
 // @function LaraObject:SetPoison
-// @tparam Potency Value 
+// @tparam Potency Value (optional, resets to 0 if not provided)
 // @usage
-// Lara:SetPoison(100)
+// Lara:SetPoison(10)
+// Max Value: 64
 void LaraObject::SetPoison(sol::optional<int> potency)
 {
 	auto* lara = GetLaraInfo(m_item);
@@ -70,6 +72,32 @@ int LaraObject::GetPoison() const
 	return lara->PoisonPotency;
 }
 
+/// Set Air of Lara
+// @function LaraObject:SetAir
+// @tparam Air Value 
+// @usage
+// Lara:SetAir(100)
+// Max Value: 1800
+void LaraObject::SetAir(sol::optional<int> air)
+{
+	auto* lara = GetLaraInfo(m_item);
+
+	if (air.has_value())
+		lara->Air = air.value();
+	else
+		lara->Air = LARA_AIR_MAX;
+}
+
+/// Get Air value of Lara
+// @function LaraObject:GetAir
+// @usage
+// Lara:GetAir()
+int LaraObject::GetAir() const
+{
+	auto* lara = GetLaraInfo(m_item);
+	return lara->Air;
+}
+
 void LaraObject::Register(sol::table& parent)
 {
 	parent.new_usertype<LaraObject>(LUA_CLASS_NAME,
@@ -77,6 +105,8 @@ void LaraObject::Register(sol::table& parent)
 			ScriptReserved_GetOnFire, &LaraObject::GetOnFire,
 			ScriptReserved_SetPoison, &LaraObject::SetPoison,
 			ScriptReserved_GetPoison, &LaraObject::GetPoison,
+			ScriptReserved_SetAir, &LaraObject::SetAir,
+			ScriptReserved_GetAir, &LaraObject::GetAir,
 			sol::base_classes, sol::bases<Moveable>()
 		);
 }
