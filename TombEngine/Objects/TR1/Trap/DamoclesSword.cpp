@@ -101,13 +101,12 @@ namespace TEN::Entities::Traps::TR1
 				return;
 
 			// Check relative position to player.
-			if (item.Pose.Position.y < laraItem.Pose.Position.y)
-			{
-				// TODO: Have 2D velocity also take vertical distance into account.
-				item.Animation.IsAirborne = true;
-				item.ItemFlags[1] = distance2D / 32; // NOTE: ItemFlags[1] stores calculated 2D velocity.
-			}
+			if (item.Pose.Position.y >= laraItem.Pose.Position.y)
+				return;
 
+			// TODO: Have 2D velocity also take vertical distance into account.
+			item.Animation.IsAirborne = true;
+			item.ItemFlags[1] = distance2D / 32; // NOTE: ItemFlags[1] stores calculated 2D velocity.
 			return;
 		}
 	}
