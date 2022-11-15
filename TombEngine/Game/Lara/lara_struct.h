@@ -848,7 +848,7 @@ enum LARA_MESHES
 
 enum class WeaponAmmoType
 {
-	None,
+	None = -1,
 	Ammo1,
 	Ammo2,
 	Ammo3,
