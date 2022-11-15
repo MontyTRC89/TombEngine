@@ -86,7 +86,7 @@ void LaraObject::RemovePoison()
 // @usage
 // Lara:SetAir(100)
 // Max Value: 1800
-void LaraObject::SetAir(int air = 0)
+void LaraObject::SetAir(int air)
 {
 	auto* lara = GetLaraInfo(m_item);
 
