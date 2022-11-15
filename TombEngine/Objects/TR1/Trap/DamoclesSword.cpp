@@ -18,6 +18,7 @@ namespace TEN::Entities::Traps::TR1
 	constexpr auto DAMOCLES_SWORD_VELOCITY_MIN = BLOCK(1.0f / 20);
 	constexpr auto DAMOCLES_SWORD_VELOCITY_MAX = BLOCK(1.0f / 8);
 
+	constexpr auto DAMOCLES_SWORD_IMPALE_DEPTH			  = BLOCK(1.0f / 8);
 	constexpr auto DAMOCLES_SWORD_ACTIVATE_RANGE_2D		  = BLOCK(3.0f / 2);
 	constexpr auto DAMOCLES_SWORD_ACTIVATE_RANGE_VERTICAL = BLOCK(3);
 
@@ -65,7 +66,7 @@ namespace TEN::Entities::Traps::TR1
 			auto pointColl = GetCollision(&item);
 
 			// Sword has reached floor.
-			if ((pointColl.Position.Floor - vPos) <= -BLOCK(1.0f / 8))
+			if ((pointColl.Position.Floor - vPos) <= -DAMOCLES_SWORD_IMPALE_DEPTH)
 			{
 				item.Animation.TargetState = 0; // NOTE: TargetState stores random turn rate.
 				item.Animation.IsAirborne = false;
@@ -128,7 +129,7 @@ namespace TEN::Entities::Traps::TR1
 			short randAngleOffset = Random::GenerateAngle(ANGLE(-11.25f), ANGLE(11.25f));
 			short bloodHeadingAngle = orientToSword.y + randAngleOffset;
 			
-			DoLotsOfBlood(bloodPos.x, bloodPos.y, bloodPos.z, laraItem->Animation.Velocity.z, bloodHeadingAngle, laraItem->RoomNumber, 10);
+			DoLotsOfBlood(bloodPos.x, bloodPos.y, bloodPos.z, laraItem->Animation.Velocity.z, bloodHeadingAngle, laraItem->RoomNumber, 20);
 		}
 	}
 }
