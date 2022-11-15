@@ -19,7 +19,7 @@ namespace TEN::Entities::Traps::TR1
 	constexpr auto DAMOCLES_SWORD_VELOCITY_MIN = BLOCK(1.0f / 20);
 	constexpr auto DAMOCLES_SWORD_VELOCITY_MAX = BLOCK(1.0f / 8);
 
-	constexpr auto DAMOCLES_SWORD_IMPALE_DEPTH			  = BLOCK(1.0f / 8);
+	constexpr auto DAMOCLES_SWORD_IMPALE_DEPTH			  = -BLOCK(1.0f / 8);
 	constexpr auto DAMOCLES_SWORD_ACTIVATE_RANGE_2D		  = BLOCK(3.0f / 2);
 	constexpr auto DAMOCLES_SWORD_ACTIVATE_RANGE_VERTICAL = BLOCK(3);
 
@@ -67,7 +67,7 @@ namespace TEN::Entities::Traps::TR1
 			auto pointColl = GetCollision(&item);
 
 			// Impale floor.
-			if ((pointColl.Position.Floor - vPos) <= -DAMOCLES_SWORD_IMPALE_DEPTH)
+			if ((pointColl.Position.Floor - vPos) <= DAMOCLES_SWORD_IMPALE_DEPTH)
 			{
 				SoundEffect(SFX_TR1_DAMOCLES_ROOM_SWORD, &item.Pose);
 				float distance = Vector3::Distance(item.Pose.Position.ToVector3(), Camera.pos.ToVector3());
