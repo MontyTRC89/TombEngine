@@ -137,49 +137,32 @@ GameStatus ControlPhase(int numFrames, bool demoMode)
 
 		if (CurrentLevel != 0 && !ScreenFading)
 		{
+			auto result = GameStatus::None;
+
 			// Does the player want to enter inventory?
 			if (IsClicked(In::Save) && LaraItem->HitPoints > 0 &&
 				g_Gui.GetInventoryMode() != InventoryMode::Save)
 			{
-				StopAllSounds();
-				StopRumble();
-
-				g_Gui.SetInventoryMode(InventoryMode::Save);
-
-				if (g_Gui.CallInventory(LaraItem, false))
-					return GameStatus::SaveGame;
+				result = g_Gui.ProcessInventory(InventoryMode::Save);
 			}
 			else if (IsClicked(In::Load) &&
 				g_Gui.GetInventoryMode() != InventoryMode::Load)
 			{
-				StopAllSounds();
-				StopRumble();
-
-				g_Gui.SetInventoryMode(InventoryMode::Load);
-
-				if (g_Gui.CallInventory(LaraItem, false))
-					return GameStatus::LoadGame;
+				result = g_Gui.ProcessInventory(InventoryMode::Load);
 			}
 			else if (IsClicked(In::Pause) && LaraItem->HitPoints > 0 &&
 					 g_Gui.GetInventoryMode() != InventoryMode::Pause)
 			{
-				StopAllSounds();
-				StopRumble();
-
-				g_Renderer.DumpGameScene();
-				g_Gui.SetInventoryMode(InventoryMode::Pause);
-				g_Gui.SetMenuToDisplay(Menu::Pause);
-				g_Gui.SetSelectedOption(0);
+				result = g_Gui.ProcessInventory(InventoryMode::Pause);
 			}
 			else if ((IsClicked(In::Option) || g_Gui.GetEnterInventory() != NO_ITEM) &&
 				LaraItem->HitPoints > 0 && !BinocularOn)
 			{
-				StopAllSounds();
-				StopRumble();
-
-				if (g_Gui.CallInventory(LaraItem, true))
-					return GameStatus::LoadGame;
+				result = g_Gui.ProcessInventory(InventoryMode::InGame);
 			}
+
+			if (result != GameStatus::None)
+				return result;
 		}
 
 		while (g_Gui.GetInventoryMode() == InventoryMode::Pause)

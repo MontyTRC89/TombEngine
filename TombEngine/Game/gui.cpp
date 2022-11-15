@@ -2865,6 +2865,56 @@ namespace TEN::Gui
 		}
 	}
 
+
+	GameStatus GuiController::ProcessInventory(InventoryMode mode)
+	{
+		StopAllSounds();
+		StopRumble();
+
+		switch (mode)
+		{
+		case InventoryMode::Pause:
+
+			g_Renderer.DumpGameScene();
+			g_Gui.SetInventoryMode(InventoryMode::Pause);
+			g_Gui.SetMenuToDisplay(Menu::Pause);
+			g_Gui.SetSelectedOption(0);
+			return GameStatus::None;
+
+		case InventoryMode::InGame:
+
+			if (g_Gui.CallInventory(LaraItem, true))
+				return GameStatus::NewGame;
+			break;
+
+		case InventoryMode::Load:
+
+			g_Gui.SetInventoryMode(InventoryMode::Load);
+
+			if (g_Gui.CallInventory(LaraItem, false))
+				return GameStatus::LoadGame;
+			break;
+
+		case InventoryMode::Save:
+
+			g_Gui.SetInventoryMode(InventoryMode::Save);
+
+			if (g_Gui.CallInventory(LaraItem, false))
+				return GameStatus::SaveGame;
+			break;
+
+		case InventoryMode::Statistics:
+
+			g_Gui.SetInventoryMode(InventoryMode::Statistics);
+
+			if (g_Gui.CallInventory(LaraItem, false))
+				return GameStatus::NewGame;
+			break;
+		}
+
+		return GameStatus::None;
+	}
+
 	bool GuiController::CallInventory(ItemInfo* item, bool resetMode)
 	{
 		auto* lara = GetLaraInfo(item);

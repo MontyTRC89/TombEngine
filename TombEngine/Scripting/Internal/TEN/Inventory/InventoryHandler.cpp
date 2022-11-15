@@ -2,7 +2,10 @@
 
 #include "InventoryHandler.h"
 #include "ReservedScriptNames.h"
-#include "pickup.h"
+#include "Game/pickup/pickup.h"
+#include "Game/gui.h"
+
+using namespace TEN::Gui;
 
 /***
 Inventory manipulation
@@ -78,6 +81,41 @@ namespace InventoryHandler
 
 	}
 
+	///Enters inventory screen.
+	//@function EnterInventoryScreen
+	static void EnterInventoryScreen()
+	{
+		g_Gui.ProcessInventory(InventoryMode::InGame);
+	}
+
+	///Enters statistics screen.
+	//@function EnterStatisticsScreen
+	static void EnterStatisticsScreen()
+	{
+		g_Gui.ProcessInventory(InventoryMode::Statistics);
+	}
+
+	///Enters pause screen.
+	//@function EnterPauseScreen
+	static void EnterPauseScreen()
+	{
+		g_Gui.ProcessInventory(InventoryMode::Pause);
+	}
+
+	///Enters load screen.
+	//@function EnterLoadScreen
+	static void EnterLoadScreen()
+	{
+		g_Gui.ProcessInventory(InventoryMode::Load);
+	}
+
+	///Enters save screen.
+	//@function EnterSaveScreen
+	static void EnterSaveScreen()
+	{
+		g_Gui.ProcessInventory(InventoryMode::Save);
+	}
+
 	void Register(sol::state* state, sol::table& parent)
 	{
 		sol::table table_inventory{ state->lua_state(), sol::create };
@@ -87,5 +125,11 @@ namespace InventoryHandler
 		table_inventory.set_function(ScriptReserved_TakeInvItem, &InventoryRemove);
 		table_inventory.set_function(ScriptReserved_GetInvItemCount, &InventoryGetCount);
 		table_inventory.set_function(ScriptReserved_SetInvItemCount, &InventorySetCount);
+
+		table_inventory.set_function(ScriptReserved_EnterInventoryScreen, &EnterInventoryScreen);
+		table_inventory.set_function(ScriptReserved_EnterStatisticsScreen, &EnterStatisticsScreen);
+		table_inventory.set_function(ScriptReserved_EnterLoadScreen, &EnterLoadScreen);
+		table_inventory.set_function(ScriptReserved_EnterSaveScreen, &EnterSaveScreen);
+		table_inventory.set_function(ScriptReserved_EnterPauseScreen, &EnterPauseScreen);
 	}
 }

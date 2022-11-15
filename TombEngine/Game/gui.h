@@ -9,6 +9,7 @@ using namespace TEN::Input;
 using namespace TEN::Math;
 
 struct ItemInfo;
+enum class GameStatus;
 
 namespace TEN::Gui
 {
@@ -121,7 +122,7 @@ namespace TEN::Gui
 		bool CanDeselect() const;
 
 	public:
-		bool CallInventory(ItemInfo* item, bool resetMode);
+		GameStatus ProcessInventory(InventoryMode mode);
 		InventoryResult TitleOptions(ItemInfo* item);
 		InventoryResult DoPauseMenu(ItemInfo* item);
 		void DrawInventory();
@@ -192,6 +193,7 @@ namespace TEN::Gui
 		int LastInvItem;
 		AmmoData Ammo;
 
+		bool CallInventory(ItemInfo* item, bool resetMode);
 		void HandleDisplaySettingsInput(bool fromPauseMenu);
 		void HandleControlSettingsInput(ItemInfo* item, bool fromPauseMenu);
 		void HandleOtherSettingsInput(bool fromPauseMenu);
