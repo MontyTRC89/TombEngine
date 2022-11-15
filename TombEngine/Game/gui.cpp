@@ -2945,7 +2945,9 @@ namespace TEN::Gui
 				CompassNeedleAngle -= 32;
 
 			UpdateInputActions(item);
-			GameTimer++;
+			
+			if (InvMode == InventoryMode::InGame)
+				GameTimer++;
 
 			if (IsClicked(In::Option))
 			{
