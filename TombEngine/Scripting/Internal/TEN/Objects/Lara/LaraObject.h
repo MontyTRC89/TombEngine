@@ -8,8 +8,8 @@ public:
 	bool GetOnFire() const;
 	void SetPoison(sol::optional<int> potency);
 	int GetPoison() const;
-	void SetAir(int air);
-	int GetAir();
+	void SetAir(sol::optional<int> air);
+	int GetAir() const;
 	static void Register(sol::table & parent);
 	using Moveable::Moveable;
 };

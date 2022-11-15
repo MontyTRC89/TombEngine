@@ -1,9 +1,10 @@
 #include "framework.h"
 #include "LaraObject.h"
 
-#include "lara_fx.h"
-#include "lara_helpers.h"
-#include "lara_struct.h"
+#include "Game/Lara/lara.h"
+#include "Game/Lara/lara_helpers.h"
+#include "Game/Lara/lara_struct.h"
+#include "Game/effects/lara_fx.h"
 #include "ReservedScriptNames.h"
 
 /***
@@ -77,21 +78,23 @@ int LaraObject::GetPoison() const
 // @usage
 // Lara:SetAir(100)
 // Max Value: 1800
-void LaraObject::SetAir(int air)
+void LaraObject::SetAir(sol::optional<int> air)
 {
 	auto* lara = GetLaraInfo(m_item);
 
-	lara->Air = air;
+	if (air.has_value())
+		lara->Air = air.value();
+	else
+		lara->Air = LARA_AIR_MAX;
 }
 
 /// Get Air value of Lara
 // @function LaraObject:GetAir
 // @usage
 // Lara:GetAir()
-int LaraObject::GetAir()
+int LaraObject::GetAir() const
 {
 	auto* lara = GetLaraInfo(m_item);
-
 	return lara->Air;
 }
 
