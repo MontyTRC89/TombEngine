@@ -1,6 +1,7 @@
 #include "framework.h"
 #include "Objects/TR1/Trap/DamoclesSword.h"
 
+#include "Game/camera.h"
 #include "Game/collision/collide_item.h"
 #include "Game/collision/collide_room.h"
 #include "Game/effects/effects.h"
@@ -68,11 +69,14 @@ namespace TEN::Entities::Traps::TR1
 			// Sword has reached floor.
 			if ((pointColl.Position.Floor - vPos) <= -DAMOCLES_SWORD_IMPALE_DEPTH)
 			{
+				SoundEffect(SFX_TR1_DAMOCLES_ROOM_SWORD, &item.Pose);
+				float distance = Vector3::Distance(item.Pose.Position.ToVector3(), Camera.pos.ToVector3());
+				Camera.bounce = -((BLOCK(4) - distance) * abs(item.Animation.Velocity.y)) / BLOCK(4);
+
 				item.Animation.TargetState = 0; // NOTE: TargetState stores random turn rate.
 				item.Animation.IsAirborne = false;
 				item.Status = ItemStatus::ITEM_DEACTIVATED;
 
-				SoundEffect(SFX_TR1_DAMOCLES_ROOM_SWORD, &item.Pose);
 				RemoveActiveItem(itemNumber);
 			}
 
