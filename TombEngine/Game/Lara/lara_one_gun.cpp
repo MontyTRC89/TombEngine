@@ -1225,6 +1225,7 @@ void HandleProjectile(ItemInfo& item, ItemInfo& emitter, const Vector3i& prevPos
 	bool hasHit = false;
 	bool hasHitNotByEmitter = false;
 	bool isExplosive = type >= ProjectileType::Explosive;
+	bool isShatterable = type != ProjectileType::Harpoon;
 
 	if (type < ProjectileType::Grenade)
 	{
@@ -1284,7 +1285,7 @@ void HandleProjectile(ItemInfo& item, ItemInfo& emitter, const Vector3i& prevPos
 		if (isFirstPass && hasHit)
 		{
 			doExplosion = isExplosive;
-			doShatter = true;
+			doShatter = isShatterable;
 			isFirstPass = false;
 		}
 
@@ -1401,9 +1402,6 @@ void HandleProjectile(ItemInfo& item, ItemInfo& emitter, const Vector3i& prevPos
 	if (!doShatter && !doExplosion && !hasHit)
 		return;
 
-	if (type == ProjectileType::Harpoon)
-		return;
-
 	if (doExplosion && isExplosive)
 		ExplodeProjectile(item, prevPos);
 	else if (doShatter)
@@ -1421,6 +1419,9 @@ void HandleProjectile(ItemInfo& item, ItemInfo& emitter, const Vector3i& prevPos
 		item.ItemFlags[1] = GRENADE_FRAG_TIMEOUT;
 		return;
 	}
+
+	if (type == ProjectileType::Harpoon)
+		return;
 
 	if (hasHit)
 		KillItem(item.Index);
