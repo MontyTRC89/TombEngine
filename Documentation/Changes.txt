@@ -11,7 +11,7 @@ Version 1.0.3
 * Increase amount of maximum secrets per level from 8 to 32.
 * Improve game and inventory input handling.
 * Adjust sprint jump timing.
-* Backport DAMOCLES_SWORD from TR1
+* Backport DAMOCLES_SWORD from TR1.
 * Fix going into inventory and load/save dialogs during fade-ins and fade-outs.
 * Fix savegames not preserving save number and game timer.
 * Fix dodgy weapon lock angle constraints.
@@ -43,13 +43,11 @@ Version 1.0.3
 
 Lua API changes:
 * A new class has been added, LaraObject, for Lara-specific functions. The built-in "Lara" variable now uses this class.
+* Add SetPoison, GetPoison, SetAir, GetAir, SetOnFire and GetOnFire to LaraObject Class.
 * Add FlipMap and PlayFlyBy script commands and node functions.
 * Add GetMoveablesBySlot and GetStaticsBySlot script commands to select groups of items.
 * Add FlyCheat option to gameflow script for disabling dozy mode.
 * Add SetNumberOfSecrets option to gameflow script to set overall amount of secrets.
-* Add SetPoison, GetPoison and RemovePoison to LaraObject Class.
-* Add SetAir and GetAir to LaraObject Class.
-* SetOnFire and GetOnFire have been added to LaraObject.
 * Raised the maximum value on Moveable.SetHP to 32767 (its internal numeric maximum).
 
 Version 1.0.2
