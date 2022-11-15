@@ -16,6 +16,7 @@ enum class GrenadeType
 
 enum class ProjectileType
 {
+	None,
 	Normal,
 	Poison,
 	Harpoon,
@@ -47,5 +48,5 @@ void FireHK(ItemInfo* laraItem, int mode);
 void RifleHandler(ItemInfo* laraItem, LaraWeaponType weaponType);
 
 void DoExplosiveDamage(ItemInfo* emitter, ItemInfo* target, ItemInfo* projectile, int damage);
-void HandleProjectile(ItemInfo* item, ItemInfo* emitter, Vector3i prevPos, ProjectileType type, int damage);
+void HandleProjectile(ItemInfo& item, ItemInfo* emitter, const Vector3i& prevPos, ProjectileType type, int damage);
 void SomeSparkEffect(int x, int y, int z, int count);
