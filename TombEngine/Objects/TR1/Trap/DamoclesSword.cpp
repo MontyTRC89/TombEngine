@@ -56,12 +56,8 @@ namespace TEN::Entities::Traps::TR1
 			// Calculate vertical velocity.
 			item.Animation.Velocity.y += (item.Animation.Velocity.y < DAMOCLES_SWORD_VELOCITY_MAX) ? GRAVITY : 1.0f;
 
-			// Calculate relative heading angle.
-			short headingAngle = Geometry::GetShortestAngle(
-				Geometry::GetOrientToPoint(item.Pose.Position.ToVector3(), laraItem.Pose.Position.ToVector3()).y,
-				item.Pose.Orientation.y);
-
 			// Translate sword.
+			short headingAngle = Geometry::GetOrientToPoint(item.Pose.Position.ToVector3(), laraItem.Pose.Position.ToVector3()).y;
 			TranslateItem(&item, headingAngle, item.Animation.ActiveState); // NOTE: ActiveState stores calculated 2D velocity.
 			item.Pose.Position.y += item.Animation.Velocity.y;
 
