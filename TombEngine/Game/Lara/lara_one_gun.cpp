@@ -710,17 +710,8 @@ void GrenadeControl(short itemNumber)
 	auto prevPos = item->Pose.Position;
 	item->Pose.Position += velocity;
 
-	// Grenades that originate from first grenade when special ammo is selected.
-	if (item->ItemFlags[0] == (int)GrenadeType::Ultra)
-	{
-		auto probe = GetCollision(item);
-		if (probe.Position.Floor < item->Pose.Position.y ||
-			probe.Position.Ceiling > item->Pose.Position.y)
-		{
-			item->HitPoints = 1;
-		}
-	}
-	else
+	// Do dynamics only for first-order grenades (not fragments, which have ProjectileType set to Explosive)
+	if (item->ItemFlags[0] != (int)ProjectileType::Explosive)
 	{
 		// Do grenade physics.
 		short sYOrient = item->Pose.Orientation.y;
@@ -1230,13 +1221,14 @@ void ExplodeProjectile(ItemInfo& item, const Vector3i& prevPos)
 void HandleProjectile(ItemInfo& item, ItemInfo& emitter, const Vector3i& prevPos, ProjectileType type, int damage)
 {
 	auto pointColl = GetCollision(&item);
+
 	bool hasHit = false;
 	bool hasHitNotByEmitter = false;
 	bool isExplosive = type >= ProjectileType::Explosive;
 
 	if (type < ProjectileType::Grenade)
 	{
-		// Check if solid wall and then decide whether to explode or not.
+		// For non-grenade projectiles, check for room collision.
 
 		if (pointColl.Position.Floor < item.Pose.Position.y ||
 			pointColl.Position.Ceiling > item.Pose.Position.y)
@@ -1253,22 +1245,23 @@ void HandleProjectile(ItemInfo& item, ItemInfo& emitter, const Vector3i& prevPos
 
 	if (type == ProjectileType::Explosive && item.ItemFlags[3])
 	{
+		// Fire trail and water collision for grenade fragments
 		TriggerFireFlame(item.Pose.Position.x, item.Pose.Position.y, item.Pose.Position.z, -1, 1);
 		if (TestEnvironment(ENV_FLAG_WATER, item.RoomNumber))
 			hasHit = true;
 	}
 
-	bool doExplosion = false;
-	bool doShatter = false;
-
 	TestProjectileNewRoom(item, pointColl);
 
-	// Decrease launch timer (only if weapon is not harpoon or harpoon has hit wall).
+	// Decrease launch timer (only if projectile is not harpoon or harpoon has hit wall).
 	if (type != ProjectileType::Harpoon || hasHit)
 		item.HitPoints--;
 
 	// Increase trigger timeout (to prevent emitter from exploding).
 	item.ItemFlags[2]++;
+
+	bool doExplosion = false;
+	bool doShatter = false;
 
 	// Item has reached EOL; mark it to destroy.
 	if (item.HitPoints <= 0)
@@ -1287,7 +1280,7 @@ void HandleProjectile(ItemInfo& item, ItemInfo& emitter, const Vector3i& prevPos
 	{
 		bool isFirstPass = (n == 0);
 
-		// Projectile is already exploding because of room collision, bypass 1st pass.
+		// Projectile is already hit because of room collision, bypass 1st pass.
 		if (isFirstPass && hasHit)
 		{
 			doExplosion = isExplosive;
@@ -1339,7 +1332,7 @@ void HandleProjectile(ItemInfo& item, ItemInfo& emitter, const Vector3i& prevPos
 			if (!currentItem)
 				break;
 #
-			// Object was already affected by collision, skip it
+			// Object was already affected by collision, skip it.
 			if (std::find(affectedObjects.begin(), affectedObjects.end(), currentItem->Index) != affectedObjects.end())
 				continue;
 
