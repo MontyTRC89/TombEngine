@@ -1033,7 +1033,8 @@ void DoLotsOfBlood(int x, int y, int z, int speed, short direction, short roomNu
 {
 	for (int i = 0; i < count; i++)
 	{
-		DoBloodSplat(x + 256 - (GetRandomControl() * 512 / 0x8000),
+		DoBloodSplat(
+			x + 256 - (GetRandomControl() * 512 / 0x8000),
 			y + 256 - (GetRandomControl() * 512 / 0x8000),
 			z + 256 - (GetRandomControl() * 512 / 0x8000),
 			speed, direction, roomNumber);
