@@ -46,6 +46,7 @@ namespace TEN::Entities::Traps::TR1
 	void ControlDamoclesSword(short itemNumber)
 	{
 		auto& item = g_Level.Items[itemNumber];
+		const auto& laraItem = *LaraItem;
 
 		// Fall toward player.
 		if (item.Animation.IsAirborne)
@@ -57,11 +58,11 @@ namespace TEN::Entities::Traps::TR1
 
 			// Calculate relative heading angle.
 			short headingAngle = Geometry::GetShortestAngle(
-				Geometry::GetOrientToPoint(item.Pose.Position.ToVector3(), LaraItem->Pose.Position.ToVector3()).y,
+				Geometry::GetOrientToPoint(item.Pose.Position.ToVector3(), laraItem.Pose.Position.ToVector3()).y,
 				item.Pose.Orientation.y);
 
 			// Translate sword.
-			TranslateItem(&item, headingAngle, item.Animation.ActiveState); // NOTE: ActiveState stores calculated forward velocity.
+			TranslateItem(&item, headingAngle, item.Animation.ActiveState); // NOTE: ActiveState stores calculated 2D velocity.
 			item.Pose.Position.y += item.Animation.Velocity.y;
 
 			int vPos = item.Pose.Position.y;
@@ -82,22 +83,27 @@ namespace TEN::Entities::Traps::TR1
 		}
 		
 		// Scan for player.
-		if (item.Pose.Position.y != GetCollision(&item).Position.Floor)
+		if (item.Pose.Position.y < GetCollision(&item).Position.Floor)
 		{
 			item.Pose.Orientation.y += item.Animation.TargetState; // NOTE: TargetState stores random turn rate.
 
-			float distanceV = LaraItem->Pose.Position.y - item.Pose.Position.y;
+			// Check vertical distance.
+			float distanceV = laraItem.Pose.Position.y - item.Pose.Position.y;
+			if (distanceV > DAMOCLES_SWORD_ACTIVATE_RANGE_VERTICAL)
+				return;
+
+			// Check 2D distance.
 			float distance2D = Vector2i::Distance(
 				Vector2i(item.Pose.Position.x, item.Pose.Position.z),
-				Vector2i(LaraItem->Pose.Position.x, LaraItem->Pose.Position.z));
+				Vector2i(laraItem.Pose.Position.x, laraItem.Pose.Position.z));
+			if (distance2D > DAMOCLES_SWORD_ACTIVATE_RANGE_2D)
+				return;
 
 			// Check relative position to player.
-			if (distanceV <= DAMOCLES_SWORD_ACTIVATE_RANGE_VERTICAL &&
-				distance2D <= DAMOCLES_SWORD_ACTIVATE_RANGE_2D &&
-				item.Pose.Position.y < LaraItem->Pose.Position.y)
+			if (item.Pose.Position.y < laraItem.Pose.Position.y)
 			{
-				// TODO: Have forward velocity also take vertical distance into account.
-				item.Animation.ActiveState = distance2D / 32; // NOTE: ActiveState stores calculated forward velocity.
+				// TODO: Have 2D velocity also take vertical distance into account.
+				item.Animation.ActiveState = distance2D / 32; // NOTE: ActiveState stores calculated 2D velocity.
 				item.Animation.IsAirborne = true;
 			}
 
@@ -122,7 +128,7 @@ namespace TEN::Entities::Traps::TR1
 			auto bloodBounds = GameBoundingBox(laraItem).ToBoundingOrientedBox(laraItem->Pose);
 			auto bloodPos = Vector3i(Random::GenerateVector3InBox(bloodBounds) + bloodBounds.Center);
 
-			auto orientToSword = Geometry::GetOrientToPoint(LaraItem->Pose.Position.ToVector3(), item.Pose.Position.ToVector3());
+			auto orientToSword = Geometry::GetOrientToPoint(laraItem->Pose.Position.ToVector3(), item.Pose.Position.ToVector3());
 			short randAngleOffset = Random::GenerateAngle(ANGLE(-11.25f), ANGLE(11.25f));
 			short bloodHeadingAngle = orientToSword.y + randAngleOffset;
 			
