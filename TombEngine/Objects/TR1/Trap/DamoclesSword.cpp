@@ -50,26 +50,28 @@ namespace TEN::Entities::Traps::TR1
 		// Fall toward player.
 		if (item.Animation.IsAirborne)
 		{
-			// Calculate vertical velocity.
 			item.Pose.Orientation.y += item.Animation.TargetState; // NOTE: TargetState stores random turn rate.
+
+			// Calculate vertical velocity.
 			item.Animation.Velocity.y += (item.Animation.Velocity.y < DAMOCLES_SWORD_VELOCITY_MAX) ? GRAVITY : 1.0f;
 
 			// Calculate relative heading angle.
 			short headingAngle = Geometry::GetShortestAngle(
-				item.Pose.Orientation.y,
-				Geometry::GetOrientToPoint(item.Pose.Position.ToVector3(), LaraItem->Pose.Position.ToVector3()).y);
+				Geometry::GetOrientToPoint(item.Pose.Position.ToVector3(), LaraItem->Pose.Position.ToVector3()).y,
+				item.Pose.Orientation.y);
 
 			// Translate sword.
 			TranslateItem(&item, headingAngle, item.Animation.ActiveState); // NOTE: ActiveState stores calculated forward velocity.
 			item.Pose.Position.y += item.Animation.Velocity.y;
 
+			int vPos = item.Pose.Position.y;
 			auto pointColl = GetCollision(&item);
 
 			// Sword has reached floor.
-			if (item.Pose.Position.y > pointColl.Position.Floor)
+			if ((pointColl.Position.Floor - vPos) >= BLOCK(1.0f / 8))
 			{
+				item.Animation.TargetState = 0; // NOTE: TargetState stores random turn rate.
 				item.Animation.IsAirborne = false;
-				item.Pose.Position.y = pointColl.Position.Floor + 10;
 				item.Status = ItemStatus::ITEM_DEACTIVATED;
 
 				SoundEffect(SFX_TR1_DAMOCLES_ROOM_SWORD, &item.Pose);
@@ -117,13 +119,12 @@ namespace TEN::Entities::Traps::TR1
 		{
 			DoDamage(laraItem, DAMOCLES_SWORD_DAMAGE);
 
-			// TODO: Check the vector generate function. If it works, you should see blood! -- Sezz
 			auto bloodBounds = GameBoundingBox(laraItem).ToBoundingOrientedBox(laraItem->Pose);
 			auto bloodPos = Vector3i(Random::GenerateVector3InBox(bloodBounds) + bloodBounds.Center);
 
-			auto orientToPlayer = Geometry::GetOrientToPoint(item.Pose.Position.ToVector3(), LaraItem->Pose.Position.ToVector3());
+			auto orientToSword = Geometry::GetOrientToPoint(LaraItem->Pose.Position.ToVector3(), item.Pose.Position.ToVector3());
 			short randAngleOffset = Random::GenerateAngle(ANGLE(-11.25f), ANGLE(11.25f));
-			short bloodHeadingAngle = orientToPlayer.y + randAngleOffset;
+			short bloodHeadingAngle = orientToSword.y + randAngleOffset;
 			
 			DoLotsOfBlood(bloodPos.x, bloodPos.y, bloodPos.z, laraItem->Animation.Velocity.z, bloodHeadingAngle, laraItem->RoomNumber, 10);
 		}
