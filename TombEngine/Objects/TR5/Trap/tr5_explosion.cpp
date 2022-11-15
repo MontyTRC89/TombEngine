@@ -134,7 +134,7 @@ void ExplosionControl(short itemNumber)
 					else if (CollidedItems[i]->ObjectNumber != ID_SWITCH_TYPE7 && CollidedItems[i]->ObjectNumber != ID_SWITCH_TYPE8)
 					{
 						if (Objects[CollidedItems[i]->ObjectNumber].intelligent)
-							DoExplosiveDamage(LaraItem, CollidedItems[i], item, Weapons[(int)LaraWeaponType::GrenadeLauncher].ExplosiveDamage);
+							DoExplosiveDamage(*LaraItem, *CollidedItems[i], *item, Weapons[(int)LaraWeaponType::GrenadeLauncher].ExplosiveDamage);
 					}
 					else
 					{

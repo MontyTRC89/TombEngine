@@ -65,9 +65,9 @@ bool ItemInfo::TestMeshSwapFlags(unsigned int flags)
 	return true;
 }
 
-bool ItemInfo::TestMeshSwapFlags(const std::vector<unsigned int> flags)
+bool ItemInfo::TestMeshSwapFlags(const std::vector<unsigned int>& flags)
 {
-	BitField bits = {};
+	auto bits = BitField();
 	bits.Set(flags);
 	return TestMeshSwapFlags(bits.ToPackedBits());
 }
@@ -76,7 +76,6 @@ void ItemInfo::SetMeshSwapFlags(unsigned int flags, bool clear)
 {
 	bool meshSwapPresent = Objects[ObjectNumber].meshSwapSlot != -1 && 
 						   Objects[Objects[ObjectNumber].meshSwapSlot].loaded;
-
 
 	for (size_t i = 0; i < Model.MeshIndex.size(); i++)
 	{
@@ -92,19 +91,19 @@ void ItemInfo::SetMeshSwapFlags(unsigned int flags, bool clear)
 	}
 }
 
-void ItemInfo::SetMeshSwapFlags(const std::vector<unsigned int> flags, bool clear)
+void ItemInfo::SetMeshSwapFlags(const std::vector<unsigned int>& flags, bool clear)
 {
-	BitField bits = {};
+	auto bits = BitField();
 	bits.Set(flags);
 	SetMeshSwapFlags(bits.ToPackedBits(), clear);
 }
 
-bool ItemInfo::IsLara()
+bool ItemInfo::IsLara() const
 {
 	return this->Data.is<LaraInfo*>();
 }
 
-bool ItemInfo::IsCreature()
+bool ItemInfo::IsCreature() const
 {
 	return this->Data.is<CreatureInfo>();
 }

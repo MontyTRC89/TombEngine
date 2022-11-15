@@ -553,7 +553,7 @@ void HarpoonBoltControl(short itemNumber)
 	}
 
 	TranslateItem(item, item->Pose.Orientation, item->Animation.Velocity.z);
-	HandleProjectile(*item, LaraItem, item->Pose.Position, ProjectileType::Harpoon, Weapons[(int)LaraWeaponType::HarpoonGun].Damage);
+	HandleProjectile(*item, *LaraItem, item->Pose.Position, ProjectileType::Harpoon, Weapons[(int)LaraWeaponType::HarpoonGun].Damage);
 }
 
 void FireGrenade(ItemInfo* laraItem)
@@ -732,7 +732,7 @@ void GrenadeControl(short itemNumber)
 		item->Pose.Orientation.y = sYOrient;
 	}
 
-	HandleProjectile(*item, LaraItem, prevPos, (ProjectileType)item->ItemFlags[0], Weapons[(int)LaraWeaponType::GrenadeLauncher].ExplosiveDamage);
+	HandleProjectile(*item, *LaraItem, prevPos, (ProjectileType)item->ItemFlags[0], Weapons[(int)LaraWeaponType::GrenadeLauncher].ExplosiveDamage);
 }
 
 void FireRocket(ItemInfo* laraItem)
@@ -861,7 +861,7 @@ void RocketControl(short itemNumber)
 	auto prevPos = item.Pose.Position;
 	TranslateItem(&item, item.Pose.Orientation, item.Animation.Velocity.z);
 
-	HandleProjectile(item, LaraItem, prevPos, ProjectileType::Explosive, Weapons[(int)LaraWeaponType::RocketLauncher].ExplosiveDamage);
+	HandleProjectile(item, *LaraItem, prevPos, ProjectileType::Explosive, Weapons[(int)LaraWeaponType::RocketLauncher].ExplosiveDamage);
 }
 
 void FireCrossbow(ItemInfo* laraItem, Pose* pos)
@@ -978,7 +978,7 @@ void CrossbowBoltControl(short itemNumber)
 	int damage = (item->ItemFlags[0] == (int)ProjectileType::Explosive) ?
 		Weapons[(int)LaraWeaponType::Crossbow].ExplosiveDamage : Weapons[(int)LaraWeaponType::Crossbow].Damage;
 
-	HandleProjectile(*item, LaraItem, prevPos, (ProjectileType)item->ItemFlags[0], damage);
+	HandleProjectile(*item, *LaraItem, prevPos, (ProjectileType)item->ItemFlags[0], damage);
 }
 
 void FireHK(ItemInfo* laraItem, int mode)
@@ -1076,42 +1076,42 @@ void RifleHandler(ItemInfo* laraItem, LaraWeaponType weaponType)
 	}
 }
 
-void DoExplosiveDamage(ItemInfo* emitter, ItemInfo* target, ItemInfo* projectile, int damage)
+void DoExplosiveDamage(ItemInfo& emitter, ItemInfo& target, ItemInfo& projectile, int damage)
 {
-	if (target->Flags & IFLAG_KILLED)
+	if (target.Flags & IFLAG_KILLED)
 		return;
 
-	if (target->HitPoints == NOT_TARGETABLE)
+	if (target.HitPoints == NOT_TARGETABLE)
 		return;
 
-	if (target != emitter && !target->IsLara() && target->HitPoints > 0)
+	if (&target != &emitter && !target.IsLara() && target.HitPoints > 0)
 	{
-		if (emitter->ItemFlags[2])
+		if (emitter.ItemFlags[2])
 			return;
 
-		emitter->HitStatus = true;
+		emitter.HitStatus = true;
 
-		HitTarget(emitter, target, nullptr, damage, 1);
+		HitTarget(&emitter, &target, nullptr, damage, 1);
 					
-		if (target != emitter)
+		if (&target != &emitter)
 		{
 			Statistics.Game.AmmoHits++;
-			if (target->HitPoints <= 0)
+			if (target.HitPoints <= 0)
 			{
 				Statistics.Level.Kills++;
-				CreatureDie((target - g_Level.Items.data()), true);
+				CreatureDie(target.Index, true);
 			}
 		}
 	}
 	else
 	{
-		DoDamage(emitter, damage * 5);
-		if (!TestEnvironment(ENV_FLAG_WATER, target->RoomNumber) && emitter->HitPoints <= 0)
-			LaraBurn(emitter);
+		DoDamage(&emitter, damage * 5);
+		if (!TestEnvironment(ENV_FLAG_WATER, target.RoomNumber) && emitter.HitPoints <= 0)
+			LaraBurn(&emitter);
 	}
 }
 
-bool CanEmitFromProjectile(ItemInfo& projectile, ProjectileType type)
+bool EmitFromProjectile(ItemInfo& projectile, ProjectileType type)
 {
 	if (!projectile.ItemFlags[1])
 		return false;
@@ -1227,7 +1227,7 @@ void ExplodeProjectile(ItemInfo& item, const Vector3i& prevPos)
 	SoundEffect(SFX_TR4_EXPLOSION2, &item.Pose);
 }
 
-void HandleProjectile(ItemInfo& item, ItemInfo* emitter, const Vector3i& prevPos, ProjectileType type, int damage)
+void HandleProjectile(ItemInfo& item, ItemInfo& emitter, const Vector3i& prevPos, ProjectileType type, int damage)
 {
 	auto pointColl = GetCollision(&item);
 	bool hasHit = false;
@@ -1244,7 +1244,7 @@ void HandleProjectile(ItemInfo& item, ItemInfo* emitter, const Vector3i& prevPos
 			hasHit = true;
 		}
 	}
-	else if (CanEmitFromProjectile(item, type))
+	else if (EmitFromProjectile(item, type))
 	{
 		// If projectile is timed grenade, try to emit from it, according to flags.
 		return;
@@ -1338,24 +1338,24 @@ void HandleProjectile(ItemInfo& item, ItemInfo* emitter, const Vector3i& prevPos
 			if (!currentItem)
 				break;
 
-			auto* currentObject = &Objects[currentItem->ObjectNumber];
+			const auto& currentObject = Objects[currentItem->ObjectNumber];
 
-			if ((currentObject->intelligent && currentObject->collision && currentItem->Status == ITEM_ACTIVE) ||
+			if ((currentObject.intelligent && currentObject.collision && currentItem->Status == ITEM_ACTIVE) ||
 				currentItem->IsLara() ||
 				(currentItem->Flags & 0x40 && Objects[currentItem->ObjectNumber].explodableMeshbits))
 			{
 				// If we collide with emitter, don't process further in early launch stages.
-				if (currentItem == emitter && item.ItemFlags[2] < TRIGGER_TIMEOUT)
+				if (currentItem == &emitter && item.ItemFlags[2] < TRIGGER_TIMEOUT)
 					continue;
 
 				hasHit = true;
-				doDestruction = !currentObject->intelligent && !currentItem->IsLara();
+				doDestruction = !currentObject.intelligent && !currentItem->IsLara();
 
 				if (isExplosive)
 				{
 					doExplosion = isExplosive;
 					if (type != ProjectileType::FlashGrenade)
-						DoExplosiveDamage(emitter, currentItem, &item, damage);
+						DoExplosiveDamage(emitter, *currentItem, item, damage);
 				}
 				else if (type == ProjectileType::Poison)
 				{

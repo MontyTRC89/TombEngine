@@ -137,12 +137,12 @@ struct ItemInfo
 	void SetFlags(short id, short value);
 
 	bool TestMeshSwapFlags(unsigned int flags);
-	bool TestMeshSwapFlags(const std::vector<unsigned int> flags);
+	bool TestMeshSwapFlags(const std::vector<unsigned int>& flags);
 	void SetMeshSwapFlags(unsigned int flags, bool clear = false);
-	void SetMeshSwapFlags(const std::vector<unsigned int> flags, bool clear = false);
+	void SetMeshSwapFlags(const std::vector<unsigned int>& flags, bool clear = false);
 
-	bool IsLara();
-	bool IsCreature();
+	bool IsLara() const;
+	bool IsCreature() const;
 };
 
 bool TestState(int refState, const std::vector<int>& stateList);
