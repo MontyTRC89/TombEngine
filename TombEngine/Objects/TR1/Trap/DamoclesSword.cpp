@@ -41,8 +41,8 @@ namespace TEN::Entities::Traps::TR1
 		auto& item = g_Level.Items[itemNumber];
 
 		item.Pose.Orientation.y = Random::GenerateAngle();
-		item.Animation.TargetState = Random::GenerateAngle(-DAMOCLES_SWORD_TURN_RATE_MAX, DAMOCLES_SWORD_TURN_RATE_MAX); // NOTE: TargetState stores random turn rate.
 		item.Animation.Velocity.y = DAMOCLES_SWORD_VELOCITY_MIN;
+		item.ItemFlags[0] = Random::GenerateAngle(-DAMOCLES_SWORD_TURN_RATE_MAX, DAMOCLES_SWORD_TURN_RATE_MAX); // NOTE: ItemFlags[0] stores random turn rate.
 	}
 
 	void ControlDamoclesSword(short itemNumber)
@@ -53,14 +53,14 @@ namespace TEN::Entities::Traps::TR1
 		// Fall toward player.
 		if (item.Animation.IsAirborne)
 		{
-			item.Pose.Orientation.y += item.Animation.TargetState; // NOTE: TargetState stores random turn rate.
+			item.Pose.Orientation.y += item.ItemFlags[0]; // NOTE: ItemFlags[0] stores random turn rate.
 
 			// Calculate vertical velocity.
 			item.Animation.Velocity.y += (item.Animation.Velocity.y < DAMOCLES_SWORD_VELOCITY_MAX) ? GRAVITY : 1.0f;
 
 			// Translate sword.
 			short headingAngle = Geometry::GetOrientToPoint(item.Pose.Position.ToVector3(), laraItem.Pose.Position.ToVector3()).y;
-			TranslateItem(&item, headingAngle, item.Animation.ActiveState); // NOTE: ActiveState stores calculated 2D velocity.
+			TranslateItem(&item, headingAngle, item.ItemFlags[1]); // NOTE: ItemFlags[1] stores calculated 2D velocity.
 			item.Pose.Position.y += item.Animation.Velocity.y;
 
 			int vPos = item.Pose.Position.y;
@@ -71,11 +71,11 @@ namespace TEN::Entities::Traps::TR1
 			{
 				SoundEffect(SFX_TR1_DAMOCLES_ROOM_SWORD, &item.Pose);
 				float distance = Vector3::Distance(item.Pose.Position.ToVector3(), Camera.pos.ToVector3());
-				Camera.bounce = -((BLOCK(4) - distance) * abs(item.Animation.Velocity.y)) / BLOCK(4);
+				Camera.bounce = -((BLOCK(7.0f / 2) - distance) * abs(item.Animation.Velocity.y)) / BLOCK(7.0f / 2);
 
-				item.Animation.TargetState = 0; // NOTE: TargetState stores random turn rate.
 				item.Animation.IsAirborne = false;
 				item.Status = ItemStatus::ITEM_DEACTIVATED;
+				item.ItemFlags[0] = 0; // NOTE: ItemFlags[0] stores random turn rate.
 
 				RemoveActiveItem(itemNumber);
 			}
@@ -86,7 +86,7 @@ namespace TEN::Entities::Traps::TR1
 		// Scan for player.
 		if (item.Pose.Position.y < GetCollision(&item).Position.Floor)
 		{
-			item.Pose.Orientation.y += item.Animation.TargetState; // NOTE: TargetState stores random turn rate.
+			item.Pose.Orientation.y += item.ItemFlags[0]; // NOTE: ItemFlags[0] stores random turn rate.
 
 			// Check vertical distance.
 			float distanceV = laraItem.Pose.Position.y - item.Pose.Position.y;
@@ -104,8 +104,8 @@ namespace TEN::Entities::Traps::TR1
 			if (item.Pose.Position.y < laraItem.Pose.Position.y)
 			{
 				// TODO: Have 2D velocity also take vertical distance into account.
-				item.Animation.ActiveState = distance2D / 32; // NOTE: ActiveState stores calculated 2D velocity.
 				item.Animation.IsAirborne = true;
+				item.ItemFlags[1] = distance2D / 32; // NOTE: ItemFlags[1] stores calculated 2D velocity.
 			}
 
 			return;
