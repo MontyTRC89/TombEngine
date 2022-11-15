@@ -66,7 +66,7 @@ namespace TEN::Entities::Traps::TR1
 			int vPos = item.Pose.Position.y;
 			auto pointColl = GetCollision(&item);
 
-			// Sword has reached floor.
+			// Impale floor.
 			if ((pointColl.Position.Floor - vPos) <= -DAMOCLES_SWORD_IMPALE_DEPTH)
 			{
 				SoundEffect(SFX_TR1_DAMOCLES_ROOM_SWORD, &item.Pose);
