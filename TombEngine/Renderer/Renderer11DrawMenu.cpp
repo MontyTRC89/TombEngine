@@ -444,7 +444,7 @@ namespace TEN::Renderer
 		auto y = MenuVerticalStatisticsTitle;
 
 		// Title
-		AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_VIEW), PRINTSTRING_COLOR_ORANGE, SF_Center());
+		AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_STATISTICS), PRINTSTRING_COLOR_ORANGE, SF_Center());
 		GetNextBlockPosition(&y);
 
 		// Level name

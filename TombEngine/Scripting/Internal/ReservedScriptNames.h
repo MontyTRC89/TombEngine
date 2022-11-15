@@ -33,7 +33,6 @@ static constexpr char ScriptReserved_Explode[]				= "Explode";
 static constexpr char ScriptReserved_Shatter[]				= "Shatter";
 static constexpr char ScriptReserved_SetPoison[]			= "SetPoison";
 static constexpr char ScriptReserved_GetPoison[]			= "GetPoison";
-static constexpr char ScriptReserved_RemovePoison[]			= "RemovePoison";
 static constexpr char ScriptReserved_SetAir[]				= "SetAir";
 static constexpr char ScriptReserved_GetAir[]				= "GetAir";
 static constexpr char ScriptReserved_GetColor[]				= "GetColor";

@@ -422,7 +422,9 @@ void RemoveActiveItem(short itemNumber)
 		g_Level.Items[itemNumber].Active = false;
 
 		if (NextItemActive == itemNumber)
+		{
 			NextItemActive = g_Level.Items[itemNumber].NextActive;
+		}
 		else
 		{
 			for (short linkNumber = NextItemActive; linkNumber != NO_ITEM; linkNumber = g_Level.Items[linkNumber].NextActive)
@@ -437,9 +439,7 @@ void RemoveActiveItem(short itemNumber)
 
 		g_GameScriptEntities->NotifyKilled(&item);
 		if (!item.Callbacks.OnKilled.empty())
-		{
 			g_GameScript->ExecuteFunction(item.Callbacks.OnKilled, itemNumber);
-		}
 	}
 }
 
