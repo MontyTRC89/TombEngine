@@ -33,7 +33,7 @@ using namespace TEN::Entities::Switches;
 using namespace TEN::Effects::Environment;
 using namespace TEN::Math;
 
-constexpr auto TRIGGER_TIMEOUT		 = 6;
+constexpr auto TRIGGER_TIMEOUT		 = 5;
 constexpr auto GRENADE_FRAG_TIMEOUT	 = 16;
 constexpr auto GRENADE_FLASH_TIMEOUT = 4;
 
@@ -1231,6 +1231,7 @@ void HandleProjectile(ItemInfo& item, ItemInfo& emitter, const Vector3i& prevPos
 {
 	auto pointColl = GetCollision(&item);
 	bool hasHit = false;
+	bool hasHitNotByEmitter = false;
 	bool isExplosive = type >= ProjectileType::Explosive;
 
 	if (type < ProjectileType::Grenade)
@@ -1241,7 +1242,7 @@ void HandleProjectile(ItemInfo& item, ItemInfo& emitter, const Vector3i& prevPos
 			pointColl.Position.Ceiling > item.Pose.Position.y)
 		{
 			item.Pose.Position = prevPos;
-			hasHit = true;
+			hasHit = hasHitNotByEmitter = true;
 		}
 	}
 	else if (EmitFromProjectile(item, type))
@@ -1258,7 +1259,7 @@ void HandleProjectile(ItemInfo& item, ItemInfo& emitter, const Vector3i& prevPos
 	}
 
 	bool doExplosion = false;
-	bool doDestruction = false;
+	bool doShatter = false;
 
 	TestProjectileNewRoom(item, pointColl);
 
@@ -1267,15 +1268,17 @@ void HandleProjectile(ItemInfo& item, ItemInfo& emitter, const Vector3i& prevPos
 		item.HitPoints--;
 
 	// Increase trigger timeout (to prevent emitter from exploding).
-	if (item.ItemFlags[2] < TRIGGER_TIMEOUT)
-		item.ItemFlags[2]++;
+	item.ItemFlags[2]++;
 
 	// Item has reached EOL; mark it to destroy.
 	if (item.HitPoints <= 0)
 	{
 		doExplosion = isExplosive;
-		doDestruction = hasHit = true;
+		doShatter = hasHit = true;
 	}
+
+	// Store list of objects which were already affected by this explosion.
+	auto affectedObjects = std::vector<int>();
 
 	// Step 0: Check for specific collision in small radius.
 	// Step 1: If exploding, try smashing all objects in blast radius.
@@ -1288,8 +1291,8 @@ void HandleProjectile(ItemInfo& item, ItemInfo& emitter, const Vector3i& prevPos
 		if (isFirstPass && hasHit)
 		{
 			doExplosion = isExplosive;
-			doDestruction = true;
-			continue;
+			doShatter = true;
+			isFirstPass = false;
 		}
 
 		// Use bigger radius for second pass, or break if projectile is not explosive.
@@ -1312,7 +1315,7 @@ void HandleProjectile(ItemInfo& item, ItemInfo& emitter, const Vector3i& prevPos
 			if (!currentMesh)
 				break;
 
-			hasHit = true;
+			hasHit = hasHitNotByEmitter = doShatter = true;
 			doExplosion = isExplosive;
 
 			if (StaticObjects[currentMesh->staticNumber].shatterType == SHT_NONE)
@@ -1321,8 +1324,6 @@ void HandleProjectile(ItemInfo& item, ItemInfo& emitter, const Vector3i& prevPos
 			currentMesh->HitPoints -= damage;
 			if (currentMesh->HitPoints <= 0)
 				ShatterObject(nullptr, currentMesh, -128, item.RoomNumber, 0);
-
-			doDestruction = true;
 
 			if (!isExplosive)
 				continue;
@@ -1337,6 +1338,10 @@ void HandleProjectile(ItemInfo& item, ItemInfo& emitter, const Vector3i& prevPos
 			auto* currentItem = CollidedItems[i];
 			if (!currentItem)
 				break;
+#
+			// Object was already affected by collision, skip it
+			if (std::find(affectedObjects.begin(), affectedObjects.end(), currentItem->Index) != affectedObjects.end())
+				continue;
 
 			const auto& currentObject = Objects[currentItem->ObjectNumber];
 
@@ -1345,11 +1350,20 @@ void HandleProjectile(ItemInfo& item, ItemInfo& emitter, const Vector3i& prevPos
 				(currentItem->Flags & 0x40 && Objects[currentItem->ObjectNumber].explodableMeshbits))
 			{
 				// If we collide with emitter, don't process further in early launch stages.
-				if (currentItem == &emitter && item.ItemFlags[2] < TRIGGER_TIMEOUT)
-					continue;
+				if (!hasHitNotByEmitter && currentItem == &emitter)
+				{
+					// Non-grenade projectiles require larger timeout
+					int timeout = type >= ProjectileType::Grenade ? TRIGGER_TIMEOUT : TRIGGER_TIMEOUT * 2;
+					if (item.ItemFlags[2] < timeout)
+						continue;
+				}
+				else
+					hasHitNotByEmitter = true;
 
 				hasHit = true;
-				doDestruction = !currentObject.intelligent && !currentItem->IsLara();
+				doShatter = !currentObject.intelligent && !currentItem->IsLara();
+
+				affectedObjects.push_back(currentItem->Index);
 
 				if (isExplosive)
 				{
@@ -1374,7 +1388,7 @@ void HandleProjectile(ItemInfo& item, ItemInfo& emitter, const Vector3i& prevPos
 			else if (currentItem->ObjectNumber >= ID_SMASH_OBJECT1 &&
 					 currentItem->ObjectNumber <= ID_SMASH_OBJECT8)
 			{
-				doDestruction = hasHit = true;
+				doShatter = hasHit = true;
 
 				// Smash objects are legacy objects from TRC. Let's make them explode in the legacy way.
 				ExplodeItemNode(currentItem, 0, 0, 128);
@@ -1386,9 +1400,12 @@ void HandleProjectile(ItemInfo& item, ItemInfo& emitter, const Vector3i& prevPos
 
 		if (isFirstPass && !hasHit)
 			return;
+
+		if (!isFirstPass)
+			break;
 	}
 
-	if (!doDestruction && !doExplosion && !hasHit)
+	if (!doShatter && !doExplosion && !hasHit)
 		return;
 
 	if (type == ProjectileType::Harpoon)
@@ -1396,7 +1413,7 @@ void HandleProjectile(ItemInfo& item, ItemInfo& emitter, const Vector3i& prevPos
 
 	if (doExplosion && isExplosive)
 		ExplodeProjectile(item, prevPos);
-	else if (doDestruction)
+	else if (doShatter)
 		ExplodeItemNode(&item, 0, 0, BODY_EXPLODE);
 
 	switch (type)
