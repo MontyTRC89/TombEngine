@@ -87,6 +87,10 @@ namespace TEN::Entities::Traps::TR1
 		{
 			item.Pose.Orientation.y += item.ItemFlags[0]; // NOTE: ItemFlags[0] stores random turn rate.
 
+			// Check vertical position to player.
+			if (item.Pose.Position.y >= laraItem.Pose.Position.y)
+				return;
+
 			// Check vertical distance.
 			float distanceV = laraItem.Pose.Position.y - item.Pose.Position.y;
 			if (distanceV > DAMOCLES_SWORD_ACTIVATE_RANGE_VERTICAL)
@@ -97,10 +101,6 @@ namespace TEN::Entities::Traps::TR1
 				Vector2i(item.Pose.Position.x, item.Pose.Position.z),
 				Vector2i(laraItem.Pose.Position.x, laraItem.Pose.Position.z));
 			if (distance2D > DAMOCLES_SWORD_ACTIVATE_RANGE_2D)
-				return;
-
-			// Check relative position to player.
-			if (item.Pose.Position.y >= laraItem.Pose.Position.y)
 				return;
 
 			// Drop sword.
