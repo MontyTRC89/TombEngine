@@ -21,7 +21,7 @@ namespace TEN::Entities::Traps::TR1
 	constexpr auto DAMOCLES_SWORD_ACTIVATE_RANGE_2D		  = BLOCK(3.0f / 2);
 	constexpr auto DAMOCLES_SWORD_ACTIVATE_RANGE_VERTICAL = BLOCK(3);
 
-	const auto DAMOCLES_SWORD_TURN_RATE_MAX = ANGLE(5.5f);
+	const auto DAMOCLES_SWORD_TURN_RATE_MAX = ANGLE(5.0f);
 
 	void SetupDamoclesSword(ObjectInfo* object)
 	{
@@ -69,7 +69,7 @@ namespace TEN::Entities::Traps::TR1
 			auto pointColl = GetCollision(&item);
 
 			// Sword has reached floor.
-			if ((pointColl.Position.Floor - vPos) >= BLOCK(1.0f / 8))
+			if ((pointColl.Position.Floor - vPos) <= -BLOCK(1.0f / 8))
 			{
 				item.Animation.TargetState = 0; // NOTE: TargetState stores random turn rate.
 				item.Animation.IsAirborne = false;
