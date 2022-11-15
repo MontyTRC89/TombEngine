@@ -68,17 +68,6 @@ int LaraObject::GetPoison()
 	return lara->PoisonPotency;
 }
 
-/// Remove Poison
-// @function Moveable:RemovePoison
-// @usage
-// Lara:RemovePoison()
-void LaraObject::RemovePoison()
-{
-	auto* lara = GetLaraInfo(m_item);
-
-	lara->PoisonPotency = 0;
-}
-
 void LaraObject::Register(sol::table& parent)
 {
 	parent.new_usertype<LaraObject>(LUA_CLASS_NAME,
@@ -86,7 +75,6 @@ void LaraObject::Register(sol::table& parent)
 			ScriptReserved_GetOnFire, &LaraObject::GetOnFire,
 			ScriptReserved_SetPoison, &LaraObject::SetPoison,
 			ScriptReserved_GetPoison, &LaraObject::GetPoison,
-			ScriptReserved_RemovePoison, &LaraObject::RemovePoison,
 			sol::base_classes, sol::bases<Moveable>()
 		);
 }
