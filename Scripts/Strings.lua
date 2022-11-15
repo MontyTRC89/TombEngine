@@ -123,7 +123,6 @@ local strings =
 	waiting_for_input = { "Waiting For Input" },
 	windowed = { "Windowed" },
 	load_game = { "Load Game" },
-	test_level = { "Test Level" },
 	waterskin_small_empty = { "Small Waterskin (Empty)" },
 	waterskin_small_1l = { "Small Waterskin (1L)" },
 	waterskin_small_2l = { "Small Waterskin (2L)" },
