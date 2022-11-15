@@ -92,7 +92,7 @@ namespace TEN::Entities::Traps::TR1
 				Vector2i(LaraItem->Pose.Position.x, LaraItem->Pose.Position.z));
 
 			// Check relative position to player.
-			if (distanceV < DAMOCLES_SWORD_ACTIVATE_RANGE_VERTICAL &&
+			if (distanceV <= DAMOCLES_SWORD_ACTIVATE_RANGE_VERTICAL &&
 				distance2D <= DAMOCLES_SWORD_ACTIVATE_RANGE_2D &&
 				item.Pose.Position.y < LaraItem->Pose.Position.y)
 			{
