@@ -25,12 +25,12 @@ void LaraObject::SetOnFire(bool onFire)
 {
 	//todo add support for other BurnTypes -squidshire 11/11/2022
 	auto* lara = GetLaraInfo(m_item);
-	if (onFire && lara->BurnType == BurnType::None )
+	if (onFire && lara->BurnType == BurnType::None)
 	{
 		TEN::Effects::Lara::LaraBurn(m_item);
 		lara->BurnType = BurnType::Normal;
 	}
-	else if(!onFire)
+	else if (!onFire)
 	{
 		lara->BurnType = BurnType::None;
 	}
@@ -45,11 +45,38 @@ bool LaraObject::GetOnFire() const
 	return lara->BurnType != BurnType::None;
 }
 
+/// Set Poison with potency of poision
+// @function LaraObject:SetPoison
+// @tparam Potency Value 
+// @usage
+// Lara:SetPoison(100)
+void LaraObject::SetPoison(sol::optional<int> potency)
+{
+	auto* lara = GetLaraInfo(m_item);
+
+	if (potency.has_value())
+		lara->PoisonPotency = potency.value();
+	else
+		lara->PoisonPotency = 0;
+}
+
+/// Get Poison potency of Lara
+// @function LaraObject:GetPoison
+// @usage
+// Lara:GetPoison()
+int LaraObject::GetPoison() const
+{
+	auto* lara = GetLaraInfo(m_item);
+	return lara->PoisonPotency;
+}
+
 void LaraObject::Register(sol::table& parent)
 {
 	parent.new_usertype<LaraObject>(LUA_CLASS_NAME,
 			ScriptReserved_SetOnFire, &LaraObject::SetOnFire,
 			ScriptReserved_GetOnFire, &LaraObject::GetOnFire,
+			ScriptReserved_SetPoison, &LaraObject::SetPoison,
+			ScriptReserved_GetPoison, &LaraObject::GetPoison,
 			sol::base_classes, sol::bases<Moveable>()
 		);
 }
