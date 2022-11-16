@@ -5,8 +5,9 @@
 #include "Game/camera.h"
 #include "Game/collision/collide_item.h"
 #include "Game/control/box.h"
-#include "Game/effects/bubble.h"
 #include "Game/control/control.h"
+#include "Game/control/los.h"
+#include "Game/effects/bubble.h"
 #include "Game/effects/debris.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/lara_fx.h"
@@ -22,16 +23,19 @@
 #include "Math/Math.h"
 #include "Objects/Generic/Object/objects.h"
 #include "Objects/Generic/Switches/generic_switch.h"
+#include "Sound/sound.h"
+#include "Specific/Input/Input.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
-#include "Specific/Input/Input.h"
-#include "Sound/sound.h"
 
-using namespace TEN::Input;
+using namespace TEN::Effects::Environment;
 using namespace TEN::Effects::Lara;
 using namespace TEN::Entities::Switches;
-using namespace TEN::Effects::Environment;
+using namespace TEN::Input;
 using namespace TEN::Math;
+
+constexpr auto HK_BURST_MODE_SHOT_COUNT	   = 5;
+constexpr auto HK_BURST_MODE_SHOT_INTERVAL = 12.0f;
 
 enum class CrossbowBoltType
 {
@@ -42,9 +46,10 @@ enum class CrossbowBoltType
 
 void AnimateShotgun(ItemInfo* laraItem, LaraWeaponType weaponType)
 {
-	auto* lara = GetLaraInfo(laraItem);
+	auto& lara = *GetLaraInfo(laraItem);
+	const auto& weapon = lara.Weapons[(int)LaraWeaponType::HK];
 
-	if (lara->LeftArm.GunSmoke > 0)
+	if (lara.LeftArm.GunSmoke > 0)
 	{
 		auto pos = Vector3i::Zero;
 		if (weaponType == LaraWeaponType::HK)
@@ -59,34 +64,41 @@ void AnimateShotgun(ItemInfo* laraItem, LaraWeaponType weaponType)
 		pos = GetJointPosition(laraItem, LM_RHAND, pos);
 
 		if (laraItem->MeshBits.TestAny())
-			TriggerGunSmoke(pos.x, pos.y, pos.z, 0, 0, 0, 0, weaponType, lara->LeftArm.GunSmoke);
+			TriggerGunSmoke(pos.x, pos.y, pos.z, 0, 0, 0, 0, weaponType, lara.LeftArm.GunSmoke);
 	}
 
-	auto* item = &g_Level.Items[lara->Control.Weapon.WeaponItem];
-	bool running = (weaponType == LaraWeaponType::HK && laraItem->Animation.Velocity.z != 0.0f);
-	
-	static bool reloadHarpoonGun = false;
-	reloadHarpoonGun = (lara->Weapons[(int)weaponType].Ammo->HasInfinite() || weaponType != LaraWeaponType::HarpoonGun) ? false : reloadHarpoonGun;
+	auto& item = g_Level.Items[lara.Control.Weapon.WeaponItem];
+	bool isRunning = (weaponType == LaraWeaponType::HK && laraItem->Animation.Velocity.z != 0.0f);
 
-	switch (item->Animation.ActiveState)
+	static bool reloadHarpoonGun = false;
+	reloadHarpoonGun = (lara.Weapons[(int)weaponType].Ammo->HasInfinite() || weaponType != LaraWeaponType::HarpoonGun) ? false : reloadHarpoonGun;
+
+	if (lara.Control.Weapon.Interval != 0.0f)
+	{
+		lara.Control.Weapon.Interval -= 1.0f;
+		lara.Control.Weapon.Timer = 0.0f;
+	}
+
+	switch (item.Animation.ActiveState)
 	{
 	case WEAPON_STATE_AIM:
-		//HKFlag = 0;
-		//HKTimer = 0;
-		//HKFlag2 = 0;
+		lara.Control.Weapon.NumShotsFired = 0;
+		lara.Control.Weapon.Interval = 0.0f;
+		lara.Control.Weapon.Timer = 0.0f;
 
-		if (lara->Control.WaterStatus == WaterStatus::Underwater || running)
-			item->Animation.TargetState = WEAPON_STATE_UNDERWATER_AIM;
-		else if ((!(TrInput & IN_ACTION) || lara->TargetEntity) && lara->LeftArm.Locked == false)
-			item->Animation.TargetState = WEAPON_STATE_UNAIM;
+		if (lara.Control.WaterStatus == WaterStatus::Underwater || isRunning)
+			item.Animation.TargetState = WEAPON_STATE_UNDERWATER_AIM;
+		else if ((!IsHeld(In::Action) || lara.TargetEntity) && lara.LeftArm.Locked == false)
+			item.Animation.TargetState = WEAPON_STATE_UNAIM;
 		else
-			item->Animation.TargetState = WEAPON_STATE_RECOIL;
+			item.Animation.TargetState = WEAPON_STATE_RECOIL;
 
-		if (weaponType == LaraWeaponType::HarpoonGun && !lara->Weapons[(int)weaponType].Ammo->HasInfinite())
+		if (weaponType == LaraWeaponType::HarpoonGun &&
+			!lara.Weapons[(int)weaponType].Ammo->HasInfinite())
 		{
 			if (reloadHarpoonGun)
 			{
-				item->Animation.TargetState = WEAPON_STATE_RELOAD;
+				item.Animation.TargetState = WEAPON_STATE_RELOAD;
 				reloadHarpoonGun = false;
 			}
 		}
@@ -94,25 +106,26 @@ void AnimateShotgun(ItemInfo* laraItem, LaraWeaponType weaponType)
 		break;
 
 	case WEAPON_STATE_UNDERWATER_AIM:
-		//HKFlag = 0;
-		//HKTimer = 0;
-		//HKFlag2 = 0;
+		lara.Control.Weapon.NumShotsFired = 0;
+		lara.Control.Weapon.Interval = 0.0f;
+		lara.Control.Weapon.Timer = 0.0f;
 
-		if (lara->Control.WaterStatus == WaterStatus::Underwater || running)
+		if (lara.Control.WaterStatus == WaterStatus::Underwater || isRunning)
 		{
-			if ((!(TrInput & IN_ACTION) || lara->TargetEntity) && lara->LeftArm.Locked == false)
-				item->Animation.TargetState = WEAPON_STATE_UNDERWATER_UNAIM;
+			if ((!IsHeld(In::Action) || lara.TargetEntity) && lara.LeftArm.Locked == false)
+				item.Animation.TargetState = WEAPON_STATE_UNDERWATER_UNAIM;
 			else
-				item->Animation.TargetState = WEAPON_STATE_UNDERWATER_RECOIL;
+				item.Animation.TargetState = WEAPON_STATE_UNDERWATER_RECOIL;
 		}
 		else
-			item->Animation.TargetState = WEAPON_STATE_AIM;
+			item.Animation.TargetState = WEAPON_STATE_AIM;
 
-		if (weaponType == LaraWeaponType::HarpoonGun && !lara->Weapons[(int)weaponType].Ammo->HasInfinite())
+		if (weaponType == LaraWeaponType::HarpoonGun &&
+			!lara.Weapons[(int)weaponType].Ammo->HasInfinite())
 		{
 			if (reloadHarpoonGun)
 			{
-				item->Animation.TargetState = WEAPON_STATE_RELOAD;
+				item.Animation.TargetState = WEAPON_STATE_RELOAD;
 				reloadHarpoonGun = false;
 			}
 		}
@@ -120,38 +133,51 @@ void AnimateShotgun(ItemInfo* laraItem, LaraWeaponType weaponType)
 		break;
 
 	case WEAPON_STATE_RECOIL:
-		if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase)
+		if (item.Animation.FrameNumber == g_Level.Anims[item.Animation.AnimNumber].frameBase)
 		{
-			item->Animation.TargetState = WEAPON_STATE_UNAIM;
+			item.Animation.TargetState = WEAPON_STATE_UNAIM;
 
-			if (lara->Control.WaterStatus != WaterStatus::Underwater && !running && !reloadHarpoonGun)
+			if (lara.Control.WaterStatus != WaterStatus::Underwater &&
+				!isRunning && !reloadHarpoonGun)
 			{
-				if (TrInput & IN_ACTION && (!lara->TargetEntity || lara->LeftArm.Locked))
+				if (IsHeld(In::Action) && (!lara.TargetEntity || lara.LeftArm.Locked))
 				{
 					if (weaponType == LaraWeaponType::HarpoonGun)
 					{
 						FireHarpoon(laraItem);
 
-						if (!(lara->Weapons[(int)LaraWeaponType::HarpoonGun].Ammo->GetCount() % 4) &&
-							!lara->Weapons[(int)weaponType].Ammo->HasInfinite())
+						if (!(lara.Weapons[(int)LaraWeaponType::HarpoonGun].Ammo->GetCount() % 4) &&
+							!lara.Weapons[(int)weaponType].Ammo->HasInfinite())
 						{
 							reloadHarpoonGun = true;
 						}
 					}
 					else if (weaponType == LaraWeaponType::RocketLauncher)
+					{
 						FireRocket(laraItem);
+					}
 					else if (weaponType == LaraWeaponType::GrenadeLauncher)
+					{
 						FireGrenade(laraItem);
+					}
 					else if (weaponType == LaraWeaponType::Crossbow)
+					{
 						FireCrossbow(laraItem, nullptr);
+					}
 					else if (weaponType == LaraWeaponType::HK)
 					{
-						FireHK(laraItem, 0);
-
-						if (lara->Weapons[(int)LaraWeaponType::HK].HasSilencer)
-							SoundEffect(SFX_TR4_HK_SILENCED, nullptr);
+						if ((weapon.WeaponMode == LaraWeaponTypeCarried::WTYPE_AMMO_1 ||
+								weapon.WeaponMode == LaraWeaponTypeCarried::WTYPE_AMMO_2) &&
+							lara.Control.Weapon.Interval)
+						{
+							item.Animation.TargetState = WEAPON_STATE_AIM;
+						}
 						else
 						{
+							FireHK(laraItem, 0);
+							lara.Control.Weapon.Timer = 1.0f;
+							item.Animation.TargetState = WEAPON_STATE_RECOIL;
+
 							SoundEffect(SFX_TR4_EXPLOSION1, &laraItem->Pose, SoundEnvironment::Land, 1.0f, 0.4f);
 							SoundEffect(SFX_TR4_HK_FIRE, &laraItem->Pose);
 						}
@@ -159,25 +185,32 @@ void AnimateShotgun(ItemInfo* laraItem, LaraWeaponType weaponType)
 					else
 						FireShotgun(laraItem);
 
-					item->Animation.TargetState = WEAPON_STATE_RECOIL;
+					if (weaponType != LaraWeaponType::HK)
+						item.Animation.TargetState = WEAPON_STATE_RECOIL;
 				}
-				else if (lara->LeftArm.Locked)
-					item->Animation.TargetState = WEAPON_STATE_AIM;
+				else if (lara.LeftArm.Locked)
+					item.Animation.TargetState = WEAPON_STATE_AIM;
 			}
 
-
-			if (item->Animation.TargetState != WEAPON_STATE_RECOIL && 
-				weaponType == LaraWeaponType::HK &&
-				!lara->Weapons[(int)LaraWeaponType::HK].HasSilencer)
+			if (item.Animation.TargetState != WEAPON_STATE_RECOIL &&
+				lara.Control.Weapon.Timer != 0.0f && weaponType == LaraWeaponType::HK)
 			{
 				StopSoundEffect(SFX_TR4_HK_FIRE);
 				SoundEffect(SFX_TR4_HK_STOP, &laraItem->Pose);
+				lara.Control.Weapon.Timer = 0.0f;
 			}
 		}
-		else if (weaponType == LaraWeaponType::Shotgun && !(TrInput & IN_ACTION) && !lara->LeftArm.Locked)
-			item->Animation.TargetState = WEAPON_STATE_UNAIM;
+		else if (lara.Control.Weapon.Timer != 0.0f)
+		{
+			SoundEffect(SFX_TR4_EXPLOSION1, &laraItem->Pose, SoundEnvironment::Land, 1.0f, 0.4f);
+			SoundEffect(SFX_TR4_HK_FIRE, &laraItem->Pose);
+		}
+		else if (weaponType == LaraWeaponType::Shotgun && !IsHeld(In::Action) && !lara.LeftArm.Locked)
+		{
+			item.Animation.TargetState = WEAPON_STATE_UNAIM;
+		}
 
-		if (item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase == 12 &&
+		if ((item.Animation.FrameNumber - g_Level.Anims[item.Animation.AnimNumber].frameBase) == 12 &&
 			weaponType == LaraWeaponType::Shotgun)
 		{
 			TriggerGunShell(1, ID_SHOTGUNSHELL, LaraWeaponType::Shotgun);
@@ -186,65 +219,67 @@ void AnimateShotgun(ItemInfo* laraItem, LaraWeaponType weaponType)
 		break;
 
 	case WEAPON_STATE_UNDERWATER_RECOIL:
-		if (item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase == 0)
+		if ((item.Animation.FrameNumber - g_Level.Anims[item.Animation.AnimNumber].frameBase) == 0)
 		{
-			item->Animation.TargetState = WEAPON_STATE_UNDERWATER_UNAIM;
+			item.Animation.TargetState = WEAPON_STATE_UNDERWATER_UNAIM;
 
-			if ((lara->Control.WaterStatus == WaterStatus::Underwater || running) && !reloadHarpoonGun)
+			if ((lara.Control.WaterStatus == WaterStatus::Underwater || isRunning) && !reloadHarpoonGun)
 			{
-				if (TrInput & IN_ACTION &&
-					(!lara->TargetEntity || lara->LeftArm.Locked))
+				if (IsHeld(In::Action) && (!lara.TargetEntity || lara.LeftArm.Locked))
 				{
 					if (weaponType == LaraWeaponType::HarpoonGun)
 					{
 						FireHarpoon(laraItem);
 
-						if (!(lara->Weapons[(int)LaraWeaponType::HarpoonGun].Ammo->GetCount() % 4) &&
-							!lara->Weapons[(int)weaponType].Ammo->HasInfinite())
+						if (!(lara.Weapons[(int)LaraWeaponType::HarpoonGun].Ammo->GetCount() % 4) &&
+							!lara.Weapons[(int)weaponType].Ammo->HasInfinite())
 						{
 							reloadHarpoonGun = true;
 						}
 					}
-					else if (weaponType == LaraWeaponType::HK)// && (/*!(lara->HKtypeCarried & 0x18) || */!HKTimer))
+					else if (weaponType == LaraWeaponType::HK)// && (/*!(lara.HKtypeCarried & 0x18) || */!HKTimer))
 					{
-						FireHK(laraItem, 1);
-						//HKFlag = 1;
-						item->Animation.TargetState = WEAPON_STATE_UNDERWATER_RECOIL;
-
-						if (lara->Weapons[(int)LaraWeaponType::HK].HasSilencer)
-							SoundEffect(SFX_TR4_HK_SILENCED, nullptr);
+						if ((weapon.WeaponMode == LaraWeaponTypeCarried::WTYPE_AMMO_1 ||
+							weapon.WeaponMode == LaraWeaponTypeCarried::WTYPE_AMMO_2) &&
+							lara.Control.Weapon.Interval != 0.0f)
+						{
+							item.Animation.TargetState = WEAPON_STATE_UNDERWATER_AIM;
+						}
 						else
 						{
+							FireHK(laraItem, 1);
+							lara.Control.Weapon.Timer = 1.0f;
+							item.Animation.TargetState = WEAPON_STATE_UNDERWATER_RECOIL;
+
 							SoundEffect(SFX_TR4_EXPLOSION1, &laraItem->Pose, SoundEnvironment::Land, 1.0f, 0.4f);
 							SoundEffect(SFX_TR4_HK_FIRE, &laraItem->Pose);
+
 						}
 					}
 					else
-						item->Animation.TargetState = WEAPON_STATE_UNDERWATER_AIM;
+						item.Animation.TargetState = WEAPON_STATE_UNDERWATER_AIM;
 
-					item->Animation.TargetState = WEAPON_STATE_UNDERWATER_RECOIL;
+					if (weaponType != LaraWeaponType::HK)
+						item.Animation.TargetState = WEAPON_STATE_UNDERWATER_RECOIL;
 				}
-				else if (lara->LeftArm.Locked)
-					item->Animation.TargetState = WEAPON_STATE_UNDERWATER_AIM;
+				else if (lara.LeftArm.Locked)
+				{
+					item.Animation.TargetState = WEAPON_STATE_UNDERWATER_AIM;
+				}
 			}
-			else if (item->Animation.TargetState != WEAPON_STATE_UNDERWATER_RECOIL &&
-				//HKFlag &&
-				!(lara->Weapons[(int)LaraWeaponType::HK].HasSilencer))
+
+			if (item.Animation.TargetState != WEAPON_STATE_UNDERWATER_RECOIL &&
+				lara.Control.Weapon.Timer)
 			{
 				StopSoundEffect(SFX_TR4_HK_FIRE);
 				SoundEffect(SFX_TR4_HK_STOP, &laraItem->Pose);
-				//HKFlag = 0;
+				lara.Control.Weapon.Timer = 0.0f;
 			}
-			/*else if (HKFlag)
-			{
-				if (lara->Weapons[(int)LaraWeaponType::HK].HasSilencer)
-					SoundEffect(SFX_HK_SILENCED, nullptr);
-				else
-				{
-					SoundEffect(SFX_TR4_EXPLOSION1, &laraItem->pos, SoundEnvironment::Land, 1.0f, 0.4f);
-					SoundEffect(SFX_HK_FIRE, &laraItem->pos);
-				}
-			}*/
+		}
+		else if (lara.Control.Weapon.Timer != 0.0f)
+		{
+			SoundEffect(SFX_TR4_EXPLOSION1, &laraItem->Pose, SoundEnvironment::Land, 1.0f, 0.4f);
+			SoundEffect(SFX_TR4_HK_FIRE, &laraItem->Pose);
 		}
 
 		break;
@@ -253,11 +288,11 @@ void AnimateShotgun(ItemInfo* laraItem, LaraWeaponType weaponType)
 		break;
 	}
 
-	AnimateItem(item);
+	AnimateItem(&item);
 
-	lara->LeftArm.FrameBase = lara->RightArm.FrameBase = g_Level.Anims[item->Animation.AnimNumber].FramePtr;
-	lara->LeftArm.FrameNumber = lara->RightArm.FrameNumber = item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase;
-	lara->LeftArm.AnimNumber = lara->RightArm.AnimNumber = item->Animation.AnimNumber;
+	lara.LeftArm.FrameBase = lara.RightArm.FrameBase = g_Level.Anims[item.Animation.AnimNumber].FramePtr;
+	lara.LeftArm.FrameNumber = lara.RightArm.FrameNumber = item.Animation.FrameNumber - g_Level.Anims[item.Animation.AnimNumber].frameBase;
+	lara.LeftArm.AnimNumber = lara.RightArm.AnimNumber = item.Animation.AnimNumber;
 }
 
 void ReadyShotgun(ItemInfo* laraItem, LaraWeaponType weaponType)
@@ -533,7 +568,7 @@ void HarpoonBoltControl(short itemNumber)
 			// Create bubbles
 			if (Wibble & 4)
 				CreateBubble((Vector3i*)&item->Pose, item->RoomNumber, 0, 0, BUBBLE_FLAG_CLUMP | BUBBLE_FLAG_HIGH_AMPLITUDE, 0, 0, 0);
-			
+
 			item->Animation.Velocity.y = -HARPOON_VELOCITY * phd_sin(item->Pose.Orientation.x) / 2;
 			item->Animation.Velocity.z = HARPOON_VELOCITY * phd_cos(item->Pose.Orientation.x) / 2;
 			aboveWater = false;
@@ -587,7 +622,7 @@ void HarpoonBoltControl(short itemNumber)
 	if (CollidedItems[0])
 	{
 		auto* currentItem = CollidedItems[0];
-		
+
 		int k = 0;
 		do
 		{
@@ -606,8 +641,7 @@ void HarpoonBoltControl(short itemNumber)
 			k++;
 			currentItem = CollidedItems[k];
 
-		}
-		while (currentItem);
+		} while (currentItem);
 	}
 
 	if (CollidedMeshes[0])
@@ -635,8 +669,7 @@ void HarpoonBoltControl(short itemNumber)
 			k++;
 			currentMesh = CollidedMeshes[k];
 
-		}
-		while (currentMesh);
+		} while (currentMesh);
 	}
 
 	// If harpoon has hit some objects then shatter itself.
@@ -662,7 +695,7 @@ void FireGrenade(ItemInfo* laraItem)
 	if (itemNumber != NO_ITEM)
 	{
 		auto* item = &g_Level.Items[itemNumber];
-		
+
 		item->Color = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
 		item->ObjectNumber = ID_GRENADE;
 		item->RoomNumber = laraItem->RoomNumber;
@@ -770,9 +803,9 @@ void GrenadeControl(short itemNumber)
 					newGrenade->Pose.Position.x = (GetRandomControl() & 0x1FF) + item->Pose.Position.x - 256;
 					newGrenade->Pose.Position.y = item->Pose.Position.y - 256;
 					newGrenade->Pose.Position.z = (GetRandomControl() & 0x1FF) + item->Pose.Position.z - 256;
-					
+
 					InitialiseItem(newGrenadeItemNumber);
-					
+
 					newGrenade->Pose.Orientation.x = (GetRandomControl() & 0x3FFF) + ANGLE(45);
 					newGrenade->Pose.Orientation.y = GetRandomControl() * 2;
 					newGrenade->Pose.Orientation.z = 0;
@@ -781,9 +814,9 @@ void GrenadeControl(short itemNumber)
 					newGrenade->Animation.ActiveState = newGrenade->Pose.Orientation.x;
 					newGrenade->Animation.TargetState = newGrenade->Pose.Orientation.y;
 					newGrenade->Animation.RequiredState = 0;
-					
+
 					AddActiveItem(newGrenadeItemNumber);
-					
+
 					newGrenade->Status = ITEM_INVISIBLE;
 					newGrenade->ItemFlags[2] = item->ItemFlags[2];
 					newGrenade->HitPoints = 3000; // 60; // 3000;
@@ -800,7 +833,7 @@ void GrenadeControl(short itemNumber)
 		KillItem(itemNumber);
 		return;
 	}
-	   
+
 	// Store previous position for later.
 	auto prevPos = item->Pose.Position;
 
@@ -896,7 +929,7 @@ void GrenadeControl(short itemNumber)
 
 	// Check if it's time to explode.
 	int radius = 0;
-	bool explode = false; 
+	bool explode = false;
 
 	if (item->HitPoints)
 	{
@@ -1010,8 +1043,7 @@ void GrenadeControl(short itemNumber)
 						k++;
 						currentMesh = CollidedMeshes[k];
 
-					}
-					while (currentMesh);
+					} while (currentMesh);
 				}
 			}
 			else
@@ -1184,9 +1216,9 @@ void RocketControl(short itemNumber)
 	TriggerRocketSmoke(wx + item->Pose.Position.x, wy + item->Pose.Position.y, wz + item->Pose.Position.z, -1);
 	TriggerRocketFire(wx + item->Pose.Position.x, wy + item->Pose.Position.y, wz + item->Pose.Position.z);
 	TriggerDynamicLight(
-		wx + item->Pose.Position.x + (GetRandomControl() & 15) - 8, 
-		wy + item->Pose.Position.y + (GetRandomControl() & 15) - 8, 
-		wz + item->Pose.Position.z + (GetRandomControl() & 15) - 8, 
+		wx + item->Pose.Position.x + (GetRandomControl() & 15) - 8,
+		wy + item->Pose.Position.y + (GetRandomControl() & 15) - 8,
+		wz + item->Pose.Position.z + (GetRandomControl() & 15) - 8,
 		14, 28 + (GetRandomControl() & 3), 16 + (GetRandomControl() & 7), (GetRandomControl() & 7));
 
 	// If underwater, generate bubbles.
@@ -1201,7 +1233,7 @@ void RocketControl(short itemNumber)
 
 	bool doExplosion = false;
 	bool hasHitRoom = false;
-	
+
 	// Check if solid wall and then decide if explode or not.
 	auto pointColl = GetCollision(item);
 	if (pointColl.Position.Floor < item->Pose.Position.y ||
@@ -1241,7 +1273,7 @@ void RocketControl(short itemNumber)
 		if (CollidedItems[0])
 		{
 			auto* currentItem = CollidedItems[0];
-			
+
 			int k = 0;
 			do
 			{
@@ -1249,7 +1281,7 @@ void RocketControl(short itemNumber)
 
 				if ((currentObject->intelligent && currentObject->collision && currentItem->Status == ITEM_ACTIVE) ||
 					currentItem->ObjectNumber == ID_LARA || (currentItem->Flags & 0x40 &&
-					(Objects[currentItem->ObjectNumber].explodableMeshbits || currentItem == LaraItem)))
+						(Objects[currentItem->ObjectNumber].explodableMeshbits || currentItem == LaraItem)))
 				{
 					// All active intelligent creatures explode if their HP is <= 0.
 					// Explosion is handled by CreatureDie().
@@ -1287,8 +1319,7 @@ void RocketControl(short itemNumber)
 				k++;
 				currentItem = CollidedItems[k];
 
-			}
-			while (currentItem);
+			} while (currentItem);
 		}
 
 		if (CollidedMeshes[0])
@@ -1315,8 +1346,7 @@ void RocketControl(short itemNumber)
 				k++;
 				currentMesh = CollidedMeshes[k];
 
-			}
-			while (currentMesh);
+			} while (currentMesh);
 		}
 	}
 
@@ -1330,7 +1360,7 @@ void RocketControl(short itemNumber)
 			TriggerShockwave(&item->Pose, 48, 304, 96, 0, 96, 128, 24, 0, 0);
 			item->Pose.Position.y += 128;
 			TriggerExplosionSparks(prevPos.x, prevPos.y, prevPos.z, 3, -2, 0, item->RoomNumber);
-			
+
 			for (int j = 0; j < 2; j++)
 				TriggerExplosionSparks(prevPos.x, prevPos.y, prevPos.z, 3, -1, 0, item->RoomNumber);
 		}
@@ -1491,7 +1521,7 @@ void CrossbowBoltControl(short itemNumber)
 
 		// Found possible collided items and statics.
 		GetCollidedObjects(item, radius, true, &CollidedItems[0], &CollidedMeshes[0], true);
-		
+
 		// If no collided items and meshes are found, then exit the loop
 		if (!CollidedItems[0] && !CollidedMeshes[0])
 			break;
@@ -1505,7 +1535,7 @@ void CrossbowBoltControl(short itemNumber)
 		if (CollidedItems[0])
 		{
 			auto* currentItem = CollidedItems[0];
-			
+
 			int k = 0;
 			do
 			{
@@ -1514,7 +1544,7 @@ void CrossbowBoltControl(short itemNumber)
 				if ((currentObj->intelligent && currentObj->collision && currentItem->Status == ITEM_ACTIVE && !currentObj->undead) ||
 					(currentItem->ObjectNumber == ID_LARA && explode) ||
 					(currentItem->Flags & 0x40 &&
-					(Objects[currentItem->ObjectNumber].explodableMeshbits || currentItem == LaraItem)))
+						(Objects[currentItem->ObjectNumber].explodableMeshbits || currentItem == LaraItem)))
 				{
 					if (explode)
 					{
@@ -1527,7 +1557,7 @@ void CrossbowBoltControl(short itemNumber)
 					else if (currentItem->ObjectNumber != ID_LARA)
 					{
 						// Normal hit
-						HitTarget(LaraItem, currentItem, (GameVector*)& item->Pose, Weapons[(int)LaraWeaponType::Crossbow].Damage << item->ItemFlags[0], 0);
+						HitTarget(LaraItem, currentItem, (GameVector*)&item->Pose, Weapons[(int)LaraWeaponType::Crossbow].Damage << item->ItemFlags[0], 0);
 
 						// Poisone ammo
 						if (item->ItemFlags[0] == (int)CrossbowBoltType::Poison)
@@ -1564,8 +1594,7 @@ void CrossbowBoltControl(short itemNumber)
 				k++;
 				currentItem = CollidedItems[k];
 
-			}
-			while (currentItem);
+			} while (currentItem);
 		}
 
 		if (CollidedMeshes[0])
@@ -1594,7 +1623,7 @@ void CrossbowBoltControl(short itemNumber)
 		explode = true;
 		radius = CROSSBOW_EXPLODE_RADIUS;
 	};
-		
+
 	if (!explode)
 	{
 		// If bolt has hit some objects then shatter itself
@@ -1631,13 +1660,28 @@ void CrossbowBoltControl(short itemNumber)
 
 void FireHK(ItemInfo* laraItem, int mode)
 {
-	auto* lara = GetLaraInfo(laraItem);
+	auto& lara = GetLaraInfo(laraItem);
+	const auto& weapon = lara->Weapons[(int)LaraWeaponType::HK];
 
 	auto angles = EulerAngles(
 		lara->LeftArm.Orientation.x,
 		lara->LeftArm.Orientation.y + laraItem->Pose.Orientation.y,
 		0
 	);
+
+	if (weapon.WeaponMode == LaraWeaponTypeCarried::WTYPE_AMMO_1)
+	{
+		lara->Control.Weapon.Interval = HK_BURST_MODE_SHOT_INTERVAL;
+	}
+	else if (weapon.WeaponMode == LaraWeaponTypeCarried::WTYPE_AMMO_2)
+	{
+		lara->Control.Weapon.NumShotsFired++;
+		if (lara->Control.Weapon.NumShotsFired == HK_BURST_MODE_SHOT_COUNT)
+		{
+			lara->Control.Weapon.NumShotsFired = 0;
+			lara->Control.Weapon.Interval = HK_BURST_MODE_SHOT_INTERVAL;
+		}
+	}
 
 	if (!lara->LeftArm.Locked)
 	{
@@ -1650,21 +1694,17 @@ void FireHK(ItemInfo* laraItem, int mode)
 
 	if (mode)
 	{
-		Weapons[(int)LaraWeaponType::HK].ShotAccuracy = 2184;
+		Weapons[(int)LaraWeaponType::HK].ShotAccuracy = ANGLE(12.0f);
 		Weapons[(int)LaraWeaponType::HK].Damage = 1;
 	}
 	else
 	{
-		Weapons[(int)LaraWeaponType::HK].ShotAccuracy = 728;
+		Weapons[(int)LaraWeaponType::HK].ShotAccuracy = ANGLE(4.0f);
 		Weapons[(int)LaraWeaponType::HK].Damage = 3;
 	}
 
 	if (FireWeapon(LaraWeaponType::HK, lara->TargetEntity, laraItem, angles) != FireWeaponType::NoAmmo)
 	{
-		auto& ammo = GetAmmo(*lara, LaraWeaponType::HK);
-		if (!ammo.HasInfinite())
-			ammo--;
-
 		lara->LeftArm.GunSmoke = 12;
 
 		TriggerGunShell(1, ID_GUNSHELL, LaraWeaponType::HK);
@@ -1674,28 +1714,137 @@ void FireHK(ItemInfo* laraItem, int mode)
 	}
 }
 
+void LasersightWeaponHandler(ItemInfo* item, LaraWeaponType weaponType)
+{
+	auto& lara = *GetLaraInfo(item);
+	auto& ammo = GetAmmo(lara, lara.Control.Weapon.GunType);
+	const auto& weapon = lara.Weapons[(int)weaponType];
+
+	if (!LaserSight || (!weapon.HasLasersight))
+		return;
+
+	bool isFiring = false;
+
+	if (lara.Control.Weapon.Interval != 0.0f)
+		lara.Control.Weapon.Interval -= 1.0f;
+
+	if (lara.Control.Weapon.Timer != 0.0f)
+		lara.Control.Weapon.Timer -= 1.0f;
+
+	if (!IsHeld(In::Action) || lara.Control.Weapon.Interval != 0.0f || !ammo)
+	{
+		if (!IsHeld(In::Action))
+		{
+			lara.Control.Weapon.NumShotsFired = 0;
+			Camera.bounce = 0;
+		}
+	}
+	else
+	{
+		if (lara.Control.Weapon.GunType == LaraWeaponType::Revolver)
+		{
+			lara.Control.Weapon.Interval = 16.0f;
+			Statistics.Game.AmmoUsed++;
+			isFiring = true;
+
+			if (!ammo.HasInfinite())
+				(ammo)--;
+
+			Camera.bounce = -16 - (GetRandomControl() & 0x1F);
+		}
+		else if (lara.Control.Weapon.GunType == LaraWeaponType::Crossbow)
+		{
+			lara.Control.Weapon.Interval = 32.0f;
+			isFiring = true;
+		}
+		else
+		{
+			if (lara.Control.Weapon.GunType == LaraWeaponType::HK &&
+				weapon.WeaponMode == LaraWeaponTypeCarried::WTYPE_AMMO_1 &&
+				weapon.SelectedAmmo == WeaponAmmoType::Ammo1)
+			{
+				lara.Control.Weapon.Interval = HK_BURST_MODE_SHOT_INTERVAL;
+				isFiring = true;
+
+				SoundEffect(SFX_TR4_EXPLOSION1, nullptr, SoundEnvironment::Land, 1.0f, 0.4f);
+				SoundEffect(SFX_TR4_HK_FIRE, nullptr);
+				Camera.bounce = -16 - (GetRandomControl() & 0x1F);
+			}
+			else if (lara.Control.Weapon.GunType == LaraWeaponType::HK &&
+				weapon.WeaponMode == LaraWeaponTypeCarried::WTYPE_AMMO_2 &&
+				weapon.SelectedAmmo == WeaponAmmoType::Ammo1)
+			{
+				if (!lara.Control.Weapon.Timer)
+				{
+					if (++lara.Control.Weapon.NumShotsFired == HK_BURST_MODE_SHOT_COUNT)
+					{
+						lara.Control.Weapon.NumShotsFired = 0;
+						lara.Control.Weapon.Interval = HK_BURST_MODE_SHOT_INTERVAL;
+					}
+
+					lara.Control.Weapon.Timer = 4.0f;
+					isFiring = true;
+
+					SoundEffect(SFX_TR4_EXPLOSION1, nullptr, SoundEnvironment::Land, 1.0f, 0.4f);
+					SoundEffect(SFX_TR4_HK_FIRE, nullptr);
+					Camera.bounce = -16 - (GetRandomControl() & 0x1F);
+				}
+				else
+				{
+					SoundEffect(SFX_TR4_EXPLOSION1, nullptr, SoundEnvironment::Land, 1.0f, 0.4f);
+					SoundEffect(SFX_TR4_HK_FIRE, nullptr);
+					Camera.bounce = -16 - (GetRandomControl() & 0x1F);
+				}
+			}
+			else
+			{
+				if (lara.Control.Weapon.Timer)
+				{
+					SoundEffect(SFX_TR4_EXPLOSION1, nullptr, SoundEnvironment::Land, 1.0f, 0.4f);
+					SoundEffect(SFX_TR4_HK_FIRE, nullptr);
+				}
+				else
+				{
+					lara.Control.Weapon.Timer = 4.0f;
+					isFiring = true;
+
+					SoundEffect(SFX_TR4_EXPLOSION1, nullptr, SoundEnvironment::Land, 1.0f, 0.4f);
+					SoundEffect(SFX_TR4_HK_FIRE, nullptr);
+					Camera.bounce = -16 - (GetRandomControl() & 0x1F);
+				}
+			}
+
+			if (!ammo.HasInfinite())
+				ammo--;
+		}
+	}
+
+	GetTargetOnLOS(&Camera.pos, &Camera.target, true, isFiring);
+}
+
 void RifleHandler(ItemInfo* laraItem, LaraWeaponType weaponType)
 {
-	auto* lara = GetLaraInfo(laraItem);
+	auto& lara = *GetLaraInfo(laraItem);
 	const auto& weapon = Weapons[(int)weaponType];
 
-	if (BinocularRange)
+	if (BinocularRange || LaserSight)
 		return; // Never handle weapons while in binocular mode.
-
-	FindNewTarget(laraItem, weapon);
-
-	if (TrInput & IN_ACTION)
-		LaraTargetInfo(laraItem, weapon);
-
-	AimWeapon(laraItem, lara->LeftArm, weapon);
-
-	if (lara->LeftArm.Locked)
 	{
-		lara->ExtraTorsoRot.x = lara->LeftArm.Orientation.x;
-		lara->ExtraTorsoRot.y = lara->LeftArm.Orientation.y;
+		FindNewTarget(laraItem, weapon);
 
-		if (Camera.oldType != CameraType::Look && !BinocularRange)
-			lara->ExtraHeadRot = EulerAngles::Zero;
+		if (TrInput & IN_ACTION)
+			LaraTargetInfo(laraItem, weapon);
+
+		AimWeapon(laraItem, lara.LeftArm, weapon);
+
+		if (lara.LeftArm.Locked)
+		{
+			lara.ExtraTorsoRot.x = lara.LeftArm.Orientation.x;
+			lara.ExtraTorsoRot.y = lara.LeftArm.Orientation.y;
+
+			if (Camera.oldType != CameraType::Look && !BinocularRange)
+				lara.ExtraHeadRot = EulerAngles::Zero;
+		}
 	}
 
 	if (weaponType == LaraWeaponType::Revolver)
@@ -1703,7 +1852,7 @@ void RifleHandler(ItemInfo* laraItem, LaraWeaponType weaponType)
 	else
 		AnimateShotgun(laraItem, weaponType);
 
-	if (lara->RightArm.GunFlash)
+	if (lara.RightArm.GunFlash)
 	{
 		if (weaponType == LaraWeaponType::Shotgun || weaponType == LaraWeaponType::HK)
 		{
@@ -1740,7 +1889,7 @@ void DoExplosiveDamageOnBaddy(ItemInfo* laraItem, ItemInfo* targetEntity, ItemIn
 		targetEntity->HitStatus = true;
 
 		HitTarget(laraItem, targetEntity, 0, Weapons[(int)weaponType].ExplosiveDamage, 1);
-					
+
 		if (targetEntity != laraItem)
 		{
 			Statistics.Game.AmmoHits++;

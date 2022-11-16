@@ -39,6 +39,9 @@ namespace TEN::Gui
 		{ ID_HK_ITEM, 0, 0.5f, EulerAngles(ANGLE(280.0f), 0, 0), OPT_EQUIP | OPT_COMBINABLE | OPT_CHOOSE_AMMO_HK, STRING_HK, 1, INV_ROT_Y },
 		{ ID_HK_ITEM, 0, 0.5f, EulerAngles(ANGLE(280.0f), ANGLE(-45.0f), 0), OPT_EQUIP | OPT_SEPERABLE | OPT_CHOOSE_AMMO_HK, STRING_HK_LASERSIGHT, NO_JOINT_BITS, INV_ROT_Y },
 		{ ID_HK_AMMO_ITEM, 3, 0.5f, EulerAngles(0, ANGLE(90.0f), 0), OPT_USE, STRING_HK_AMMO, 2, INV_ROT_Y },
+		{ ID_HK_AMMO_ITEM, 3, 0.5f, EulerAngles(0, ANGLE(90.0f), 0), OPT_USE, STRING_HK_SNIPER_MODE, 3, INV_ROT_Y },
+		{ ID_HK_AMMO_ITEM, 3, 0.5f, EulerAngles(0, ANGLE(90.0f), 0), OPT_USE, STRING_HK_BURST_MODE, 4, INV_ROT_Y },
+		{ ID_HK_AMMO_ITEM, 3, 0.5f, EulerAngles(0, ANGLE(90.0f), 0), OPT_USE, STRING_HK_RAPID_MODE, 5, INV_ROT_Y },
 		{ ID_GRENADE_GUN_ITEM, 0, 0.5f, EulerAngles(0, ANGLE(90.0f), ANGLE(65)), OPT_EQUIP | OPT_COMBINABLE | OPT_CHOOSE_AMMO_GRENADEGUN, STRING_GRENADE_LAUNCHER, NO_JOINT_BITS, INV_ROT_Y },
 		{ ID_GRENADE_AMMO1_ITEM, 3, 0.5f, EulerAngles(0, ANGLE(-90.0f), 0), OPT_USE, STRING_GRENADE_LAUNCHER_AMMO_1, NO_JOINT_BITS, INV_ROT_Y },
 		{ ID_GRENADE_AMMO2_ITEM, 3, 0.5f, EulerAngles(0, ANGLE(-90.0f), 0), OPT_USE, STRING_GRENADE_LAUNCHER_AMMO_2, NO_JOINT_BITS, INV_ROT_Y },
@@ -266,7 +269,7 @@ namespace TEN::Gui
 	{
 		{ CombineRevolverLasersight, INV_OBJECT_REVOLVER, INV_OBJECT_LASERSIGHT, INV_OBJECT_REVOLVER_LASER },
 		{ CombineCrossbowLasersight, INV_OBJECT_CROSSBOW, INV_OBJECT_LASERSIGHT, INV_OBJECT_CROSSBOW_LASER },
-		{ CombineHKSilencer, INV_OBJECT_HK, INV_OBJECT_SILENCER, INV_OBJECT_HK_SILENCER },
+		{ CombineHKLasersight, INV_OBJECT_HK, INV_OBJECT_LASERSIGHT, INV_OBJECT_HK_LASERSIGHT },
 		{ CombinePuzzleItem1, INV_OBJECT_PUZZLE1_COMBO1, INV_OBJECT_PUZZLE1_COMBO2, INV_OBJECT_PUZZLE1 },
 		{ CombinePuzzleItem2, INV_OBJECT_PUZZLE2_COMBO1, INV_OBJECT_PUZZLE2_COMBO2, INV_OBJECT_PUZZLE2 },
 		{ CombinePuzzleItem3, INV_OBJECT_PUZZLE3_COMBO1, INV_OBJECT_PUZZLE3_COMBO2, INV_OBJECT_PUZZLE3 },
@@ -372,19 +375,26 @@ namespace TEN::Gui
 		}
 	}
 
-	void CombineHKSilencer(ItemInfo* item, bool flag)
+	void CombineHKLasersight(ItemInfo* item, bool flag)
 	{
 		auto* lara = GetLaraInfo(item);
 
 		if (flag)
 		{
-			lara->Inventory.HasSilencer = true;
-			lara->Weapons[(int)LaraWeaponType::HK].HasSilencer = false;
+			lara->Inventory.HasLasersight = true;
+			lara->Weapons[(int)LaraWeaponType::HK].HasLasersight = false;
 		}
 		else
 		{
-			lara->Inventory.HasSilencer = false;
-			lara->Weapons[(int)LaraWeaponType::HK].HasSilencer = true;
+			lara->Inventory.HasLasersight = false;
+			lara->Weapons[(int)LaraWeaponType::HK].HasLasersight = true;
+		}
+
+		if (lara->Control.HandStatus != HandStatus::Free &&
+			lara->Control.Weapon.GunType == LaraWeaponType::HK)
+		{
+			UndrawShotgunMeshes(item, LaraWeaponType::HK);
+			DrawShotgunMeshes(item, LaraWeaponType::HK);
 		}
 	}
 

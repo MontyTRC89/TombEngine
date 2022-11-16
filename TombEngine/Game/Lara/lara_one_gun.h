@@ -61,6 +61,7 @@ void FireCrossBowFromLaserSight(ItemInfo* laraItem, GameVector* origin, GameVect
 
 void FireHK(ItemInfo* laraItem, int mode);
 void RifleHandler(ItemInfo* laraItem, LaraWeaponType weaponType);
+void LasersightWeaponHandler(ItemInfo* item, LaraWeaponType weaponType);
 
 void DoExplosiveDamageOnBaddy(ItemInfo* laraItem, ItemInfo* targetEntity, ItemInfo* originEntity, LaraWeaponType weaponType);
 void SomeSparkEffect(int x, int y, int z, int count);

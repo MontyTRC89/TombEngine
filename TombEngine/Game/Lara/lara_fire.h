@@ -34,7 +34,7 @@ struct WeaponInfo
 	std::pair<EulerAngles, EulerAngles> RightOrientConstraint = {};
 
 	short AimSpeed		  = 0;
-	int	  ShotAccuracy	  = 0;
+	short ShotAccuracy	  = 0;
 	int	  GunHeight		  = 0;
 	float TargetDist	  = 0.0f;
 	int	  Damage		  = 0;
