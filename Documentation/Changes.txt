@@ -47,8 +47,7 @@ Version 1.0.3
 Lua API changes:
 * A new class has been added, LaraObject, for Lara-specific functions. The built-in "Lara" variable now uses this class.
 * Add SetPoison, GetPoison, SetAir, GetAir, SetOnFire and GetOnFire to Lara object.
-* Add Misc.FlipMap and Misc.PlayFlyBy script commands and node functions.
-* Add Inventory.EnterInventoryScreen, Inventory.EnterStatisticsScreen and some other UI mode options.
+* Add Misc.FlipMap, Misc.PlayFlyBy, Misc.ShowSaveScreen and Misc.ShowStatisticsScreen script commands and node functions.
 * Add GetMoveablesBySlot and GetStaticsBySlot script commands to select groups of items.
 * Add FlyCheat option to gameflow script for disabling dozy mode.
 * Add SetNumberOfSecrets option to gameflow script to set overall amount of secrets.

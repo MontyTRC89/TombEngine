@@ -6,6 +6,7 @@
 #include "Game/effects/explosion.h"
 #include "Game/effects/tomb4fx.h"
 #include "Game/effects/weather.h"
+#include "Game/gui.h"
 #include "Game/room.h"
 #include "Game/spotcam.h"
 #include "ReservedScriptNames.h"
@@ -14,6 +15,8 @@
 #include "Specific/configuration.h"
 #include "Specific/Input/Input.h"
 #include "Vec3/Vec3.h"
+
+using namespace TEN::Gui;
 
 /***
 Functions that don't fit in the other modules.
@@ -159,6 +162,22 @@ namespace Misc
 	static void PlaySoundEffect(int id, sol::optional<Vec3> p)
 	{
 		SoundEffect(id, p.has_value() ? &Pose(p.value().x, p.value().y, p.value().z) : nullptr, SoundEnvironment::Always);
+	}
+
+	/// Enters statistics screen.
+	//@function ShowStatisticsScreen
+	static void ShowStatisticsScreen()
+	{
+		DisableFade();
+		g_Gui.ProcessInventory(InventoryMode::Statistics);
+	}
+
+	/// Enters save game screen.
+	//@function ShowSaveScreen
+	static void ShowSaveScreen()
+	{
+		DisableFade();
+		g_Gui.ProcessInventory(InventoryMode::Save);
 	}
 
 	static bool KeyIsHeld(int actionIndex)
@@ -322,5 +341,7 @@ namespace Misc
 
 		table_misc.set_function(ScriptReserved_PlayFlyBy, &PlayFlyBy);
 
+		table_misc.set_function(ScriptReserved_ShowStatisticsScreen, &ShowStatisticsScreen);
+		table_misc.set_function(ScriptReserved_ShowSaveScreen, &ShowSaveScreen);
 	}
 }

@@ -4,9 +4,6 @@
 #include "ReservedScriptNames.h"
 #include "Game/pickup/pickup.h"
 #include "Game/camera.h"
-#include "Game/gui.h"
-
-using namespace TEN::Gui;
 
 /***
 Inventory manipulation
@@ -72,22 +69,6 @@ namespace InventoryHandler
 		SetInventoryCount(slot, count);
 	}
 
-	///Enters statistics screen.
-	//@function ShowStatisticsScreen
-	static void ShowStatisticsScreen()
-	{
-		DisableFade();
-		g_Gui.ProcessInventory(InventoryMode::Statistics);
-	}
-
-	///Enters save game screen.
-	//@function ShowSaveScreen
-	static void ShowSaveScreen()
-	{
-		DisableFade();
-		g_Gui.ProcessInventory(InventoryMode::Save);
-	}
-
 	void Register(sol::state* state, sol::table& parent)
 	{
 		sol::table table_inventory{ state->lua_state(), sol::create };
@@ -97,8 +78,5 @@ namespace InventoryHandler
 		table_inventory.set_function(ScriptReserved_TakeInvItem, &InventoryRemove);
 		table_inventory.set_function(ScriptReserved_GetInvItemCount, &InventoryGetCount);
 		table_inventory.set_function(ScriptReserved_SetInvItemCount, &InventorySetCount);
-
-		table_inventory.set_function(ScriptReserved_ShowStatisticsScreen, &ShowStatisticsScreen);
-		table_inventory.set_function(ScriptReserved_ShowSaveScreen, &ShowSaveScreen);
 	}
 }
