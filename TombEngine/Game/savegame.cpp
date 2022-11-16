@@ -291,6 +291,7 @@ bool SaveGame::Save(int slot)
 	inventory.add_has_binoculars(Lara.Inventory.HasBinoculars);
 	inventory.add_has_crowbar(Lara.Inventory.HasCrowbar);
 	inventory.add_has_lasersight(Lara.Inventory.HasLasersight);
+	inventory.add_has_silencer(Lara.Inventory.HasSilencer);
 	inventory.add_has_torch(Lara.Inventory.HasTorch);
 	inventory.add_is_busy(Lara.Inventory.IsBusy);
 	inventory.add_keys(keysOffset);
@@ -405,8 +406,10 @@ bool SaveGame::Save(int slot)
 		Save::CarriedWeaponInfoBuilder serializedInfo{ fbb };
 		serializedInfo.add_ammo(ammosOffset);
 		serializedInfo.add_has_lasersight(info->HasLasersight);
+		serializedInfo.add_has_silencer(info->HasSilencer);
 		serializedInfo.add_present(info->Present);
 		serializedInfo.add_selected_ammo((int)info->SelectedAmmo);
+		serializedInfo.add_weapon_mode((int)info->WeaponMode);
 		auto serializedInfoOffset = serializedInfo.Finish();
 
 		carriedWeapons.push_back(serializedInfoOffset);
@@ -1778,6 +1781,7 @@ bool SaveGame::Load(int slot)
 	Lara.Inventory.HasBinoculars = s->lara()->inventory()->has_binoculars();
 	Lara.Inventory.HasCrowbar = s->lara()->inventory()->has_crowbar();
 	Lara.Inventory.HasLasersight = s->lara()->inventory()->has_lasersight();
+	Lara.Inventory.HasSilencer = s->lara()->inventory()->has_silencer();
 	Lara.Inventory.HasTorch = s->lara()->inventory()->has_torch();
 	Lara.Inventory.IsBusy = s->lara()->inventory()->is_busy();
 	Lara.Inventory.OldBusy = s->lara()->inventory()->old_busy();
@@ -1854,8 +1858,10 @@ bool SaveGame::Load(int slot)
 		}
 
 		Lara.Weapons[i].HasLasersight = info->has_lasersight();
+		Lara.Weapons[i].HasSilencer = info->has_silencer();
 		Lara.Weapons[i].Present = info->present();
 		Lara.Weapons[i].SelectedAmmo = (WeaponAmmoType)info->selected_ammo();
+		Lara.Weapons[i].WeaponMode = (LaraWeaponTypeCarried)info->weapon_mode();
 	}
 
 	if (Lara.BurnType != BurnType::None)

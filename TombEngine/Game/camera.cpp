@@ -1081,11 +1081,6 @@ void BounceCamera(ItemInfo* item, short bounce, short maxDistance)
 		Camera.bounce = bounce;
 }
 
-void LaserSightCamera(ItemInfo* item)
-{
-
-}
-
 void BinocularCamera(ItemInfo* item)
 {
 	auto* lara = GetLaraInfo(item);
@@ -1215,18 +1210,13 @@ void BinocularCamera(ItemInfo* item)
 			SoundEffect(SFX_TR4_BINOCULARS_ZOOM, nullptr, SoundEnvironment::Land, 1.0f);
 	}
 
-	if (LaserSight)
-		LaserSightCamera(item);
-	else
-	{
-		auto origin = Vector3i(Camera.pos.x, Camera.pos.y, Camera.pos.z);
-		auto target = Vector3i(Camera.target.x, Camera.target.y, Camera.target.z);
+	auto origin = Vector3i(Camera.pos.x, Camera.pos.y, Camera.pos.z);
+	auto target = Vector3i(Camera.target.x, Camera.target.y, Camera.target.z);
 
-		GetTargetOnLOS(&Camera.pos, &Camera.target, false, false);
+	GetTargetOnLOS(&Camera.pos, &Camera.target, false, false);
 
-		if (IsHeld(In::Action))
-			LaraTorch(&origin, &target, lara->ExtraHeadRot.y, 192);
-	}
+	if (IsHeld(In::Action))
+		LaraTorch(&origin, &target, lara->ExtraHeadRot.y, 192);
 }
 
 void ConfirmCameraTargetPos()

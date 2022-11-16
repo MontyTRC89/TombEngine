@@ -848,7 +848,6 @@ enum LARA_MESHES
 
 enum class WeaponAmmoType
 {
-	None = -1,
 	Ammo1,
 	Ammo2,
 	Ammo3,
@@ -1076,7 +1075,7 @@ struct CarriedWeaponInfo
 	bool HasSilencer   = false; // TODO: Unused and duplicated in LaraInventoryData.
 
 	Ammo Ammo[(int)WeaponAmmoType::NumAmmoTypes] = {};
-	WeaponAmmoType SelectedAmmo = WeaponAmmoType::None; // WeaponAmmoType_enum
+	WeaponAmmoType SelectedAmmo = WeaponAmmoType::Ammo1; // WeaponAmmoType_enum
 	LaraWeaponTypeCarried WeaponMode = LaraWeaponTypeCarried::WTYPE_MISSING;
 };
 
@@ -1150,8 +1149,8 @@ struct LaraInventoryData
 	bool HasBinoculars;
 	bool HasCrowbar;
 	bool HasTorch;
-	bool HasLasersight; // TODO: Duplicated in CarriedWeaponInfo.
-	bool HasSilencer; // TODO: Unused and duplicated in CarriedWeaponInfo.
+	bool HasLasersight;
+	bool HasSilencer; // TODO: Unused.
 
 	// TODO: Convert to bools.
 	int Puzzles[NUM_PUZZLES];

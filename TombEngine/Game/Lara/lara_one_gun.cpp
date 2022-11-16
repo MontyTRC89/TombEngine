@@ -1815,7 +1815,7 @@ void LasersightWeaponHandler(ItemInfo* item, LaraWeaponType weaponType)
 			}
 
 			if (!ammo.HasInfinite())
-				(ammo)--;
+				ammo--;
 		}
 	}
 

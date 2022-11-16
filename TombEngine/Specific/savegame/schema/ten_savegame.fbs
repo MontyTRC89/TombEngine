@@ -79,9 +79,11 @@ table HolsterInfo {
 
 table CarriedWeaponInfo {
 	present: bool;
+	has_lasersight: bool;
+	has_silencer: bool;
 	ammo: [AmmoInfo];
 	selected_ammo: int32;
-	has_lasersight: bool;
+	weapon_mode: int32;
 }
 
 table WeaponInfo {
@@ -131,6 +133,7 @@ table LaraInventoryData {
 	has_crowbar: bool;
 	has_torch: bool;
 	has_lasersight: bool;
+	has_silencer: bool;
 	total_small_medipacks: int32;
 	total_large_medipacks: int32;
 	total_flares: int32;
