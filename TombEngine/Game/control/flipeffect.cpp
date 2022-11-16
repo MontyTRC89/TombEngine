@@ -131,7 +131,7 @@ void AddRightFootprint(ItemInfo* item)
 
 void ResetHair(ItemInfo* item)
 {
-	InitialiseHair();
+	InitialiseHair(item);
 }
 
 void InvisibilityOff(ItemInfo* item)

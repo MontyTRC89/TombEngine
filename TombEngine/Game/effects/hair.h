@@ -19,6 +19,6 @@ struct HAIR_STRUCT
 };
 extern HAIR_STRUCT Hairs[HAIR_MAX][HAIR_SEGMENTS + 1];
 
-void InitialiseHair();
+void InitialiseHair(ItemInfo* item);
 void HairControl(ItemInfo* item, bool young);
 void HairControl(ItemInfo* item, int ponytail, AnimFrame* framePtr);

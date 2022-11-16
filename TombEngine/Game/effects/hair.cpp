@@ -19,7 +19,7 @@ using TEN::Renderer::g_Renderer;
 
 HAIR_STRUCT Hairs[HAIR_MAX][HAIR_SEGMENTS + 1];
 
-void InitialiseHair()
+void InitialiseHair(ItemInfo* item)
 {
 	bool youngLara = g_GameFlow->GetLevel(CurrentLevel)->GetLaraType() == LaraType::Young;
 
@@ -44,6 +44,9 @@ void InitialiseHair()
 			Hairs[h][i].hvel.x = Hairs[h][i].hvel.y = Hairs[h][i].hvel.z = 0;
 		}
 	}
+
+	// Immediately update hair to avoid garbage first frame
+	HairControl(item, youngLara);
 }
 
 void HairControl(ItemInfo* item, bool young)

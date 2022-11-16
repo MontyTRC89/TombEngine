@@ -375,7 +375,7 @@ GameStatus DoTitle(int index, std::string const& ambient)
 		g_Gui.SetMenuToDisplay(Menu::Title);
 		g_Gui.SetSelectedOption(0);
 
-		InitialiseHair();
+		InitialiseHair(LaraItem);
 		InitialiseNodeScripts();
 		InitialiseItemBoxData();
 
@@ -498,7 +498,7 @@ GameStatus DoLevel(int index, std::string const& ambient, bool loadFromSavegame)
 	// Initialize flyby cameras.
 	InitSpotCamSequences();
 
-	InitialiseHair();
+	InitialiseHair(LaraItem);
 	InitialiseNodeScripts();
 	InitialiseItemBoxData();
 

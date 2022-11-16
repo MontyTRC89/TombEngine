@@ -429,7 +429,6 @@ void InitialiseObjects()
 	// User defined objects
 	CustomObjects();
 
-	InitialiseHair();
 	InitialiseSpecialEffects();
 
 	NumRPickups = 0;
