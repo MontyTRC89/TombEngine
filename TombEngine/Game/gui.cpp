@@ -2007,7 +2007,7 @@ namespace TEN::Gui
 
 		if (Rings[(int)RingTypes::Ammo]->RingActive)
 		{
-			auto optionString = ToUpper(std::string(OptionStrings[5]));
+			auto optionString = std::string(OptionStrings[5]);
 			g_Renderer.AddString(PHD_CENTER_X, PHD_CENTER_Y, optionString.c_str(), PRINTSTRING_COLOR_WHITE, PRINTSTRING_BLINK | PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
 
 			if (Rings[(int)RingTypes::Inventory]->ObjectListMovement)
@@ -2203,7 +2203,7 @@ namespace TEN::Gui
 			{
 				for (int i = 0; i < n; i++)
 				{
-					auto optionString = ToUpper(std::string(CurrentOptions[i].Text));
+					auto optionString = std::string(CurrentOptions[i].Text);
 
 					if (i == CurrentSelectedOption)
 					{
