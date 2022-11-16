@@ -96,6 +96,7 @@ void ItemsCollideCamera();
 
 void SetScreenFadeOut(float speed);
 void SetScreenFadeIn(float speed);
+void DisableFade();
 void SetCinematicBars(float height, float speed);
 void ClearCinematicBars();
 void UpdateFadeScreenAndCinematicBars();

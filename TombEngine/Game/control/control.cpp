@@ -379,9 +379,9 @@ GameStatus DoTitle(int index, std::string const& ambient)
 		InitialiseNodeScripts();
 		InitialiseItemBoxData();
 
-		g_GameScript->OnStart();
-
 		SetScreenFadeIn(FADE_SCREEN_SPEED);
+
+		g_GameScript->OnStart();
 
 		ControlPhase(2, 0);
 
@@ -502,6 +502,9 @@ GameStatus DoLevel(int index, std::string const& ambient, bool loadFromSavegame)
 	InitialiseNodeScripts();
 	InitialiseItemBoxData();
 
+	// Fade in screen.
+	SetScreenFadeIn(FADE_SCREEN_SPEED);
+
 	if (loadFromSavegame)
 		g_GameScript->OnLoad();
 	else
@@ -512,9 +515,6 @@ GameStatus DoLevel(int index, std::string const& ambient, bool loadFromSavegame)
 	// First control phase.
 	g_Renderer.ResetAnimations();
 	GameStatus result = ControlPhase(nFrames, 0);
-
-	// Fade in screen.
-	SetScreenFadeIn(FADE_SCREEN_SPEED);
 
 	// Run the game loop.
 	while (DoTheGame)

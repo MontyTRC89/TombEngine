@@ -3,6 +3,7 @@
 #include "InventoryHandler.h"
 #include "ReservedScriptNames.h"
 #include "Game/pickup/pickup.h"
+#include "Game/camera.h"
 #include "Game/gui.h"
 
 using namespace TEN::Gui;
@@ -85,6 +86,7 @@ namespace InventoryHandler
 	//@function EnterInventoryScreen
 	static void EnterInventoryScreen()
 	{
+		DisableFade();
 		g_Gui.ProcessInventory(InventoryMode::InGame);
 	}
 
@@ -92,6 +94,7 @@ namespace InventoryHandler
 	//@function EnterStatisticsScreen
 	static void EnterStatisticsScreen()
 	{
+		DisableFade();
 		g_Gui.ProcessInventory(InventoryMode::Statistics);
 	}
 
@@ -99,6 +102,7 @@ namespace InventoryHandler
 	//@function EnterPauseScreen
 	static void EnterPauseScreen()
 	{
+		DisableFade();
 		g_Gui.ProcessInventory(InventoryMode::Pause);
 	}
 
@@ -106,6 +110,7 @@ namespace InventoryHandler
 	//@function EnterLoadScreen
 	static void EnterLoadScreen()
 	{
+		DisableFade();
 		g_Gui.ProcessInventory(InventoryMode::Load);
 	}
 
@@ -113,6 +118,7 @@ namespace InventoryHandler
 	//@function EnterSaveScreen
 	static void EnterSaveScreen()
 	{
+		DisableFade();
 		g_Gui.ProcessInventory(InventoryMode::Save);
 	}
 
