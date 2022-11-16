@@ -20,8 +20,8 @@ public:
 	bool TryAddColliding(short id) override
 	{
 		ItemInfo* item = &g_Level.Items[id];
-		bool hasName = !(item->LuaCallbackOnCollidedWithObjectName.empty() && item->LuaCallbackOnCollidedWithRoomName.empty());
-		if(hasName && item->Collidable && (item->Status != ITEM_INVISIBLE))
+		bool hasName = !(item->Callbacks.OnObjectCollided.empty() && item->Callbacks.OnRoomCollided.empty());
+		if (hasName && item->Collidable && (item->Status != ITEM_INVISIBLE))
 			return m_collidingItems.insert(id).second;
 
 		return false;
@@ -30,7 +30,7 @@ public:
 	bool TryRemoveColliding(short id, bool force = false) override
 	{
 		ItemInfo* item = &g_Level.Items[id];
-		bool hasName = !(item->LuaCallbackOnCollidedWithObjectName.empty() && item->LuaCallbackOnCollidedWithRoomName.empty());
+		bool hasName = !(item->Callbacks.OnObjectCollided.empty() && item->Callbacks.OnRoomCollided.empty());
 		if(!force && hasName && item->Collidable && (item->Status != ITEM_INVISIBLE))
 			return false;
 
@@ -62,6 +62,44 @@ private:
 			return nullptr;
 		else
 			return std::make_unique<R>(std::get<R::IdentifierType>(m_nameMap.at(name)));
+	}
+
+	template <typename R>
+	std::vector <std::unique_ptr<R>> GetMoveablesBySlot(GAME_OBJECT_ID objID)
+	{
+		std::vector<std::unique_ptr<R>> items = {};
+		for (auto& [key, val] : m_nameMap)
+		{
+			if (!std::holds_alternative<short>(val))
+				continue;
+
+			auto& item = g_Level.Items[GetIndexByName(key)];
+
+			if (objID == item.ObjectNumber)
+				items.push_back(GetByName<Moveable, ScriptReserved_Moveable>(key));
+			
+		}
+
+		return items;
+	}
+
+	template <typename R>
+	std::vector <std::unique_ptr<R>> GetStaticsBySlot(int slot)
+	{
+		std::vector<std::unique_ptr<R>> items = {};
+		for (auto& [key, val] : m_nameMap)
+		{
+			if (!std::holds_alternative<std::reference_wrapper<MESH_INFO>>(val))
+				continue;
+			
+			auto meshInfo = std::get<std::reference_wrapper<MESH_INFO>>(val).get();
+
+			if (meshInfo.staticNumber == slot)
+				items.push_back(GetByName<Static, ScriptReserved_Static>(key));
+			
+		}
+
+		return items;
 	}
 
 	[[nodiscard]] short GetIndexByName(std::string const& name) const override

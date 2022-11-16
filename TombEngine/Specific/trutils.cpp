@@ -5,6 +5,12 @@
 
 namespace TEN::Utils
 {
+	std::string ToUpper(std::string source)
+	{
+		std::transform(source.begin(), source.end(), source.begin(), [](unsigned char c) { return std::toupper(c); });
+		return source;
+	}
+    
 	std::string ToLower(std::string source)
 	{
 		std::transform(source.begin(), source.end(), source.begin(), [](unsigned char c) { return std::tolower(c); });
@@ -28,7 +34,7 @@ namespace TEN::Utils
 	{
 		std::vector<std::string> strings;
 
-		// String is single-line; exit early.
+		// String is single line; exit early.
 		if (source.find('\n') == std::string::npos)
 		{
 			strings.push_back(source);

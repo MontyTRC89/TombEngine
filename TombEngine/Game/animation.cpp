@@ -3,6 +3,7 @@
 
 #include "Game/camera.h"
 #include "Game/collision/collide_room.h"
+#include "Game/control/box.h"
 #include "Game/control/flipeffect.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
@@ -115,8 +116,16 @@ void PerformAnimCommands(ItemInfo* item, bool isFrameBased)
 			if (!isFrameBased)
 			{
 				TranslateItem(item, item->Pose.Orientation.y, commandPtr[2], commandPtr[1], commandPtr[0]);
-				auto bounds = GameBoundingBox(item);
-				UpdateItemRoom(item, -bounds.GetHeight() / 2, -commandPtr[0], -commandPtr[2]);
+
+				if (item->IsLara())
+				{
+					auto bounds = GameBoundingBox(item);
+					UpdateLaraRoom(item, -bounds.GetHeight() / 2, -commandPtr[0], -commandPtr[2]);
+				}
+				else
+				{
+					UpdateItemRoom(item->Index);
+				}
 			}
 
 			commandPtr += 3;

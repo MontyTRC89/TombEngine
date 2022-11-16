@@ -3,6 +3,7 @@
 #include "Game/items.h"
 #include "Game/control/lot.h"
 #include "Game/effects/debris.h"
+#include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Objects/objectslist.h"
 #include "Specific/level.h"
@@ -22,7 +23,7 @@
 /***
 Represents any object inside the game world.
 Examples include traps, enemies, doors,
-pickups, and Lara herself.
+pickups, and Lara herself (see also @{Objects.LaraObject} for Lara-specific features).
 
 @tenclass Objects.Moveable
 @pragma nostrip
@@ -83,7 +84,7 @@ most can just be ignored (see usage).
 	@return reference to new Moveable object
 	@usage 
 	local item = Moveable(
-		TEN.ObjID.PISTOLS_ITEM, -- object id
+		TEN.Objects.ObjID.PISTOLS_ITEM, -- object id
 		"test", -- name
 		Vec3(18907, 0, 21201)
 		)
@@ -266,14 +267,8 @@ void Moveable::Register(sol::table & parent)
 // @tparam int frame the new frame number
 	ScriptReserved_SetFrameNumber, &Moveable::SetFrameNumber,
 		
-/// Get current HP (hit points/health points)
-// @function Moveable:GetHP
-// @treturn int the amount of HP the moveable currently has
 	ScriptReserved_GetHP, &Moveable::GetHP,
 
-/// Set current HP (hit points/health points)
-// @function Moveable:SetHP
-// @tparam int HP the amount of HP to give the moveable
 	ScriptReserved_SetHP, &Moveable::SetHP,
 
 /// Get HP definded for that object type (hit points/health points) (Read Only).
@@ -447,7 +442,7 @@ void Moveable::Init()
 {
 	bool cond = IsPointInRoom(m_item->Pose.Position, m_item->RoomNumber);
 	std::string err{ "Position of item \"{}\" does not match its room ID." };
-	if (!ScriptAssertF(cond, err, m_item->LuaName))
+	if (!ScriptAssertF(cond, err, m_item->Name))
 	{
 		ScriptWarn("Resetting to the center of the room.");
 		auto center = GetRoomCenter(m_item->RoomNumber);
@@ -482,7 +477,7 @@ void SetLevelFuncCallback(TypeOrNil<LevelFunc> const & cb, std::string const & c
 	}
 	else
 	{
-		ScriptAssert(false, "Tried giving " + mov.m_item->LuaName
+		ScriptAssert(false, "Tried giving " + mov.m_item->Name
 			+ " a non-LevelFunc object as an arg to "
 			+ callerName);
 	}
@@ -491,27 +486,27 @@ void SetLevelFuncCallback(TypeOrNil<LevelFunc> const & cb, std::string const & c
 
 void Moveable::SetOnHit(TypeOrNil<LevelFunc> const & cb)
 {
-	SetLevelFuncCallback(cb, ScriptReserved_SetOnHit, *this, m_item->LuaCallbackOnHitName);
+	SetLevelFuncCallback(cb, ScriptReserved_SetOnHit, *this, m_item->Callbacks.OnHit);
 }
 
 void Moveable::SetOnKilled(TypeOrNil<LevelFunc> const & cb)
 {
-	SetLevelFuncCallback(cb, ScriptReserved_SetOnKilled, *this, m_item->LuaCallbackOnKilledName);
+	SetLevelFuncCallback(cb, ScriptReserved_SetOnKilled, *this, m_item->Callbacks.OnKilled);
 }
 
 void Moveable::SetOnCollidedWithObject(TypeOrNil<LevelFunc> const & cb)
 {
-	SetLevelFuncCallback(cb, ScriptReserved_SetOnCollidedWithObject, *this, m_item->LuaCallbackOnCollidedWithObjectName);
+	SetLevelFuncCallback(cb, ScriptReserved_SetOnCollidedWithObject, *this, m_item->Callbacks.OnObjectCollided);
 }
 
 void Moveable::SetOnCollidedWithRoom(TypeOrNil<LevelFunc> const & cb)
 {
-	SetLevelFuncCallback(cb, ScriptReserved_SetOnCollidedWithRoom, *this, m_item->LuaCallbackOnCollidedWithRoomName);
+	SetLevelFuncCallback(cb, ScriptReserved_SetOnCollidedWithRoom, *this, m_item->Callbacks.OnRoomCollided);
 }
 
 std::string Moveable::GetName() const
 {
-	return m_item->LuaName;
+	return m_item->Name;
 }
 
 bool Moveable::SetName(std::string const & id) 
@@ -524,11 +519,11 @@ bool Moveable::SetName(std::string const & id)
 	if (s_callbackSetName(id, m_num))
 	{
 		// remove the old name if we have one
-		if (id != m_item->LuaName)
+		if (id != m_item->Name)
 		{
-			if(!m_item->LuaName.empty())
-				s_callbackRemoveName(m_item->LuaName);
-			m_item->LuaName = id;
+			if(!m_item->Name.empty())
+				s_callbackRemoveName(m_item->Name);
+			m_item->Name = id;
 		}
 	}
 	else
@@ -561,8 +556,14 @@ void Moveable::SetPos(Vec3 const& pos, sol::optional<bool> updateRoom)
 	pos.StoreInPHDPos(m_item->Pose);
 
 	bool willUpdate = !updateRoom.has_value() || updateRoom.value();
-	if(m_initialised && willUpdate)
-		UpdateItemRoom(m_item, pos.y);
+
+	if (m_initialised && willUpdate)
+	{
+		if (m_item->IsLara())
+			UpdateLaraRoom(m_item, pos.y);
+		else
+			UpdateItemRoom(m_item->Index);
+	}
 }
 
 Vec3 Moveable::GetJointPos(int jointIndex) const
@@ -591,29 +592,27 @@ void Moveable::SetRot(Rotation const& rot)
 	m_item->Pose.Orientation.z = FROM_DEGREES(rot.z);
 }
 
+/// Get current HP (hit points/health points)
+// @function Moveable:GetHP
+// @treturn int the amount of HP the moveable currently has
 short Moveable::GetHP() const
 {
 	return m_item->HitPoints;
 }
 
+/// Set current HP (hit points/health points)
+// Clamped to [0, 32767] for "intelligent" entities (i.e. anything with AI); clamped to [-32767, 32767] otherwise.
+// @function Moveable:SetHP
+// @tparam int HP the amount of HP to give the moveable
 void Moveable::SetHP(short hp)
 {
-	if(Objects[m_item->ObjectNumber].intelligent &&
-		(hp < 0 || hp > Objects[m_item->ObjectNumber].HitPoints))
+	if(Objects[m_item->ObjectNumber].intelligent && hp < 0)
 	{
-		ScriptAssert(false, "Invalid HP value: " + std::to_string(hp));
-		if (hp < 0)
+		if (hp != NOT_TARGETABLE)
 		{
-			if (hp != NOT_TARGETABLE)
-			{
-				hp = 0;
-				ScriptWarn("Setting HP to 0.");
-			}
-		}
-		else if (hp > Objects[m_item->ObjectNumber].HitPoints)
-		{
-			hp = Objects[m_item->ObjectNumber].HitPoints;
-			ScriptWarn("Setting HP to default value (" + std::to_string(hp) + ")");
+			ScriptAssert(false, "Invalid HP value: " + std::to_string(hp));
+			ScriptWarn("Setting HP to 0.");
+			hp = 0;
 		}
 	}
 
@@ -622,7 +621,7 @@ void Moveable::SetHP(short hp)
 
 short Moveable::GetSlotHP() const
 {
-	return (Objects[m_item->ObjectNumber].HitPoints);
+	return Objects[m_item->ObjectNumber].HitPoints;
 }
 
 short Moveable::GetOCB() const
@@ -980,7 +979,7 @@ void Moveable::Destroy()
 	if (m_num > NO_ITEM) 
 	{
 		dynamic_cast<ObjectsHandler*>(g_GameScriptEntities)->RemoveMoveableFromMap(m_item, this);
-		s_callbackRemoveName(m_item->LuaName);
+		s_callbackRemoveName(m_item->Name);
 		KillItem(m_num);
 	}
 
@@ -991,7 +990,7 @@ bool Moveable::MeshExists(int index) const
 {
 	if (index < 0 || index >= Objects[m_item->ObjectNumber].nmeshes)
 	{
-		ScriptAssertF(false, "Mesh index {} does not exist in moveable '{}'", index, m_item->LuaName);
+		ScriptAssertF(false, "Mesh index {} does not exist in moveable '{}'", index, m_item->Name);
 		return false;
 	}
 

@@ -657,6 +657,17 @@ static void StartTrap(ObjectInfo* obj)
 		obj->saveAnim = true;
 		obj->saveFlags = true;
 	}
+
+	obj = &Objects[ID_STATUE_WITH_BLADE];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseKillerStatue;
+		obj->control = KillerStatueControl;
+		obj->collision = ObjectCollision;
+		obj->savePosition = true;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+	}
 }
 
 // boat, snowmobile, snowmobile gun

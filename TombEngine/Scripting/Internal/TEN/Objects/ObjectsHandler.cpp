@@ -10,6 +10,7 @@
 #include "collision/collide_item.h"
 #include "collision/collide_room.h"
 #include "ScriptInterfaceGame.h"
+#include "Lara/LaraObject.h"
 
 /***
 Moveables, statics, cameras, and so on.
@@ -38,6 +39,22 @@ ObjectsHandler::ObjectsHandler(sol::state* lua, sol::table & parent) :
 	@treturn Static a non-owning Static referencing the mesh.
 	*/
 	m_table_objects.set_function(ScriptReserved_GetStaticByName, &ObjectsHandler::GetByName<Static, ScriptReserved_Static>, this);
+
+	/***
+	Get moveables by its slot.
+	@function GetMoveablesBySlot
+	@tparam string slot the unique slot of the Moveable like ANIMATING1
+	@treturn table of Moveables referencing the given slot.
+	*/
+	m_table_objects.set_function(ScriptReserved_GetMoveablesBySlot, &ObjectsHandler::GetMoveablesBySlot<Moveable>, this);
+
+	/***
+	Get statics by its slot.
+	@function GetStaticsById
+	@tparam int slot the unique slot of the mesh like 10
+	@treturn table of Statics referencing the given slot id.
+	*/
+	m_table_objects.set_function(ScriptReserved_GetStaticsBySlot, &ObjectsHandler::GetStaticsBySlot<Static>, this);
 
 	/***
 	Get a Camera by its name.
@@ -71,6 +88,7 @@ ObjectsHandler::ObjectsHandler(sol::state* lua, sol::table & parent) :
 	*/
 	m_table_objects.set_function(ScriptReserved_GetAIObjectByName, &ObjectsHandler::GetByName<AIObject, ScriptReserved_AIObject>, this);
 
+	LaraObject::Register(m_table_objects);
 
 	Moveable::Register(m_table_objects);
 	Moveable::SetNameCallbacks(
@@ -123,7 +141,7 @@ void ObjectsHandler::TestCollidingObjects()
 	for (const auto idOne : m_collidingItems)
 	{
 		auto item = &g_Level.Items[idOne];
-		if (!item->LuaCallbackOnCollidedWithObjectName.empty())
+		if (!item->Callbacks.OnObjectCollided.empty())
 		{
 			//test against other moveables
 			GetCollidedObjects(item, 0, true, CollidedItems, nullptr, 0);
@@ -131,17 +149,17 @@ void ObjectsHandler::TestCollidingObjects()
 			while (CollidedItems[i])
 			{
 				short idTwo = CollidedItems[i] - &g_Level.Items[0];
-				g_GameScript->ExecuteFunction(item->LuaCallbackOnCollidedWithObjectName, idOne, idTwo);
+				g_GameScript->ExecuteFunction(item->Callbacks.OnObjectCollided, idOne, idTwo);
 				++i;
 			}
 		}
 
-		if (!item->LuaCallbackOnCollidedWithRoomName.empty())
+		if (!item->Callbacks.OnRoomCollided.empty())
 		{
 			//test against room geometry
 			if (TestItemRoomCollisionAABB(item))
 			{
-				g_GameScript->ExecuteFunction(item->LuaCallbackOnCollidedWithRoomName, idOne);
+				g_GameScript->ExecuteFunction(item->Callbacks.OnRoomCollided, idOne);
 			}
 		}
 	}
@@ -149,7 +167,7 @@ void ObjectsHandler::TestCollidingObjects()
 
 void ObjectsHandler::AssignLara()
 {
-	m_table_objects.set("Lara", Moveable(Lara.ItemNumber, false));
+	m_table_objects.set(ScriptReserved_Lara, LaraObject(Lara.ItemNumber, false));
 }
 
 

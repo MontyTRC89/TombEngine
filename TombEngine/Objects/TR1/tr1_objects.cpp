@@ -20,7 +20,11 @@
 #include "Objects/TR1/Entity/tr1_winged_mutant.h"
 #include "Objects/Utils/object_helper.h"
 
+// Traps
+#include "Objects/TR1/Trap/DamoclesSword.h"
+
 using namespace TEN::Entities::Creatures::TR1;
+using namespace TEN::Entities::Traps::TR1;
 
 static void StartEntity(ObjectInfo* obj)
 {
@@ -197,7 +201,6 @@ static void StartEntity(ObjectInfo* obj)
 		obj->SetBoneRotation(1, ROT_Y); // torso
 		obj->SetBoneRotation(2, ROT_Y); // head
 	}
-
 }
 
 static void StartObject(ObjectInfo* obj)
@@ -213,7 +216,9 @@ static void StartObject(ObjectInfo* obj)
 
 static void StartTrap(ObjectInfo* obj)
 {
-
+	obj = &Objects[ID_DAMOCLES_SWORD];
+	if (obj->loaded)
+		SetupDamoclesSword(obj);
 }
 
 static void StartProjectiles(ObjectInfo* obj)

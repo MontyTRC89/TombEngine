@@ -40,7 +40,7 @@
 --
 -- @luautil EventSequence
 
-local Timer = require("Timer")
+local Timer = require("Engine.Timer")
 
 local EventSequence
 

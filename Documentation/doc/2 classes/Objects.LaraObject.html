@@ -46,8 +46,8 @@
   <li><a href="../2 classes/Flow.Settings.html">Flow.Settings</a></li>
   <li><a href="../2 classes/Flow.SkyLayer.html">Flow.SkyLayer</a></li>
   <li><a href="../2 classes/Objects.AIObject.html">Objects.AIObject</a></li>
-  <li><strong>Objects.Camera</strong></li>
-  <li><a href="../2 classes/Objects.LaraObject.html">Objects.LaraObject</a></li>
+  <li><a href="../2 classes/Objects.Camera.html">Objects.Camera</a></li>
+  <li><strong>Objects.LaraObject</strong></li>
   <li><a href="../2 classes/Objects.Moveable.html">Objects.Moveable</a></li>
   <li><a href="../2 classes/Objects.Sink.html">Objects.Sink</a></li>
   <li><a href="../2 classes/Objects.SoundSource.html">Objects.SoundSource</a></li>
@@ -85,39 +85,22 @@
 
 <div id="content">
 
-<h1>Class <code>Objects.Camera</code></h1>
-<p>Basic cameras that can point at Lara or at a CAMERA_TARGET.</p>
-<p>
+<h1>Class <code>Objects.LaraObject</code></h1>
+<p>Class for extra Lara-only functions.</p>
+<p>Do not try to create an object of this type; use the built-in <em>Lara</em> variable instead.</p>
 
-</p>
+<p>In addition, LaraObject inherits all the functions of <a href="../2 classes/Objects.Moveable.html#">Moveable</a>.</p>
 
 
 <h2><a href="#Functions">Functions</a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" ><a href="#Camera:GetPosition">Camera:GetPosition()</a></td>
-	<td class="summary">Get the camera's position</td>
+	<td class="name" ><a href="#LaraObject:SetOnFire">LaraObject:SetOnFire(fire)</a></td>
+	<td class="summary">Set Lara on fire</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#Camera:SetPosition">Camera:SetPosition(position)</a></td>
-	<td class="summary">Set the camera's position</td>
-	</tr>
-	<tr>
-	<td class="name" ><a href="#Camera:GetName">Camera:GetName()</a></td>
-	<td class="summary">Get the camera's unique string identifier</td>
-	</tr>
-	<tr>
-	<td class="name" ><a href="#Camera:SetName">Camera:SetName(name)</a></td>
-	<td class="summary">Set the camera's name (its unique string identifier)</td>
-	</tr>
-	<tr>
-	<td class="name" ><a href="#Camera:GetRoom">Camera:GetRoom()</a></td>
-	<td class="summary">Get the current room of the camera</td>
-	</tr>
-	<tr>
-	<td class="name" ><a href="#Camera:SetRoom">Camera:SetRoom(ID)</a></td>
-	<td class="summary">Set room of camera
- This is used in conjunction with SetPosition to teleport the camera to a new room.</td>
+	<td class="name" ><a href="#LaraObject:GetOnFire">LaraObject:GetOnFire()</a></td>
+	<td class="summary">Get whether Lara is on fire or not</td>
 	</tr>
 </table>
 
@@ -129,38 +112,18 @@
 
     <dl class="function">
     <dt>
-    <a name = "Camera:GetPosition"></a>
-    <strong>Camera:GetPosition()</strong>
+    <a name = "LaraObject:SetOnFire"></a>
+    <strong>LaraObject:SetOnFire(fire)</strong>
     </dt>
     <dd>
-    Get the camera's position
-
-
-
-    <h3>Returns:</h3>
-    <ol>
-
-           <span class="types"><span class="type">Vec3</span></span>
-        a copy of the camera's position
-    </ol>
-
-
-
-
-</dd>
-    <dt>
-    <a name = "Camera:SetPosition"></a>
-    <strong>Camera:SetPosition(position)</strong>
-    </dt>
-    <dd>
-    Set the camera's position
+    Set Lara on fire
 
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">position</span>
-            <span class="types"><span class="type">Vec3</span></span>
-         the new position of the camera
+        <li><span class="parameter">fire</span>
+            <span class="types"><span class="type">bool</span></span>
+         true to set lara on fire, false to extinguish her
         </li>
     </ul>
 
@@ -170,83 +133,20 @@
 
 </dd>
     <dt>
-    <a name = "Camera:GetName"></a>
-    <strong>Camera:GetName()</strong>
+    <a name = "LaraObject:GetOnFire"></a>
+    <strong>LaraObject:GetOnFire()</strong>
     </dt>
     <dd>
-    Get the camera's unique string identifier
+    Get whether Lara is on fire or not
 
 
 
     <h3>Returns:</h3>
     <ol>
 
-           <span class="types"><a class="type" href="https://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
-        the camera's name
+           <span class="types"><span class="type">bool</span></span>
+        fire true if lara is on fire, false otherwise
     </ol>
-
-
-
-
-</dd>
-    <dt>
-    <a name = "Camera:SetName"></a>
-    <strong>Camera:SetName(name)</strong>
-    </dt>
-    <dd>
-    Set the camera's name (its unique string identifier)
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">name</span>
-            <span class="types"><a class="type" href="https://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
-         The camera's new name
-        </li>
-    </ul>
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "Camera:GetRoom"></a>
-    <strong>Camera:GetRoom()</strong>
-    </dt>
-    <dd>
-    Get the current room of the camera
-
-
-
-    <h3>Returns:</h3>
-    <ol>
-
-           <span class="types"><span class="type">int</span></span>
-        number representing the current room of the camera
-    </ol>
-
-
-
-
-</dd>
-    <dt>
-    <a name = "Camera:SetRoom"></a>
-    <strong>Camera:SetRoom(ID)</strong>
-    </dt>
-    <dd>
-    Set room of camera
- This is used in conjunction with SetPosition to teleport the camera to a new room.
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">ID</span>
-            <span class="types"><span class="type">int</span></span>
-         the ID of the new room
-        </li>
-    </ul>
-
 
 
 

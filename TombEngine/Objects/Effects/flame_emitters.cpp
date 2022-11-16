@@ -343,6 +343,12 @@ namespace TEN::Entities::Effects
 		if (LaraItem->RoomNumber != fx->roomNumber)
 			EffectNewRoom(fxNumber, LaraItem->RoomNumber);
 
+		if (Lara.BurnType == BurnType::None)
+		{
+			KillEffect(fxNumber);
+			Lara.Burn = false;
+		}
+
 		int waterHeight = GetWaterHeight(fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z, fx->roomNumber);
 		if (waterHeight == NO_HEIGHT || fx->pos.Position.y <= waterHeight || Lara.BurnBlue)
 		{
