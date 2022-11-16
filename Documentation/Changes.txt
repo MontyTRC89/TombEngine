@@ -5,6 +5,7 @@ Version 1.0.3
 * Allow any object slot to be used as a meshswap.
 * Add OCB 1 for rollingball to make it silent.
 * Customize waterfall mist colour and OCB (XXYY, where XX is width, and YY is size).
+* Implement HK shooting modes from TR5.
 * Implement sprite instancing to speed up rendering.
 * Enable dynamic lights for swarm enemies (beetles, rats and bats).
 * Re-enable underwater caustics.
@@ -18,6 +19,8 @@ Version 1.0.3
 * Fix wrong shotgun ammo pickup amount.
 * Fix shotgun using 6 units of ammo with each shot.
 * Fix rocket explosions near statics.
+* Fix explosive crossbow bolts not damaging player.
+* Fix poisoned crossbow bolts not damaging enemies.
 * Fix TR3 monkey level crash.
 * Fix occasional ejections when landing on a slope.
 * Fix occasional ejections when climbing up on a ledge under a slope.
@@ -27,7 +30,6 @@ Version 1.0.3
 * Fix slow centaur projectile velocity.
 * Fix search animations - allow chest and shelf animations to play properly.
 * Fix sarcophagus and its item pickup.
-* Fix SAS_DRAG_BLOKE object interaction.
 * Fix underwater door and double doors continuing to be interactable after opening.
 * Fix underwater door being interactable when underwater switch is on the same square.
 * Fix ability to turn when aligning to an object while standing.
@@ -39,7 +41,8 @@ Version 1.0.3
 * Fix single-hand weapons not having a sound on draw and undraw.
 * Fix waterfall mist - it can now be disabled with antitrigger.
 * Fix underwater lever pull animation playing after interacting with underwater ceiling switch.
-* Fix Killer statue not triggering.
+* Fix SAS_DRAG_BLOKE object interaction.
+* Fix KILLER_STATUE not triggering.
 
 Lua API changes:
 * A new class has been added, LaraObject, for Lara-specific functions. The built-in "Lara" variable now uses this class.
