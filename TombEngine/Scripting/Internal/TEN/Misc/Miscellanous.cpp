@@ -12,6 +12,7 @@
 #include "ScriptUtil.h"
 #include "Sound/sound.h"
 #include "Specific/configuration.h"
+#include "Specific/level.h"
 #include "Specific/Input/Input.h"
 #include "Vec3/Vec3.h"
 
@@ -262,6 +263,18 @@ namespace Misc
 		return std::make_tuple(resX, resY);
 	}
 
+	/// Reset object camera back to Lara and deactivate object camera.
+	//  ObjCamera @tparam camSlotId 0 for Lara
+	//  ObjCamera @tparam Mesh 0 for Laras hip mesh
+	//  ObjCamera @tparam camSlotId 0 for Lara
+	//  ObjCamera @tparam bool false to deactivate object camera
+	static void ResetObjCamera()
+	{
+		int itemNumber1 = 0;
+		ItemInfo* camSlotId = &g_Level.Items[itemNumber1];
+		ObjCamera(camSlotId, 0, camSlotId, 0, false);
+	}
+
 
 	void Register(sol::state * state, sol::table & parent) {
 		sol::table table_misc{ state->lua_state(), sol::create };
@@ -322,5 +335,6 @@ namespace Misc
 
 		table_misc.set_function(ScriptReserved_PlayFlyBy, &PlayFlyBy);
 
+		table_misc.set_function(ScriptReserved_ResetObjCamera, &ResetObjCamera);
 	}
 }

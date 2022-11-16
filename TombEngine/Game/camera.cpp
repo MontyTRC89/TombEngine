@@ -59,6 +59,7 @@ GameVector LookCamPosition;
 GameVector LookCamTarget;
 Vector3i CamOldPos;
 CAMERA_INFO Camera;
+OBJ_CAMERA_INFO ItemCamera;
 GameVector ForcedFixedCamera;
 int UseForcedFixedCamera;
 
@@ -321,6 +322,119 @@ void MoveCamera(GameVector* ideal, int speed)
 		Camera.mikePos.y = Camera.pos.y;
 		Camera.mikePos.z = Camera.pos.z + PhdPerspective * phd_cos(angle);
 		Camera.oldType = Camera.type;
+	}
+}
+
+void ObjCamera(ItemInfo* camSlotId, int camMeshId, ItemInfo* targetItem, int targetMeshId, bool cond)
+{
+	//camSlotId and targetItem stay the same object until I know how to expand targetItem to another object.
+	//activates code below ->  void CalculateCamera().
+	ItemCamera.ItemCameraOn = cond;
+
+	UpdateCameraElevation();
+
+	//get mesh 0 coordinates.	
+	auto pos = GetJointPosition(camSlotId, 0, Vector3i::Zero);
+	auto dest = Vector3(pos.x, pos.y, pos.z);
+
+	GameVector from = GameVector(dest, camSlotId->RoomNumber);
+	Camera.fixedCamera = true;
+
+	MoveObjCamera(&from, camSlotId, camMeshId, targetItem, targetMeshId);
+	Camera.timer = -1;
+}
+
+
+void MoveObjCamera(GameVector* ideal, ItemInfo* camSlotId, int camMeshId, ItemInfo* targetItem, int targetMeshId)
+{
+	int	speed = 1;
+	//Get mesh1 to attach camera to
+	//Vector3i pos = Vector3i::Zero;
+	auto pos = GetJointPosition(camSlotId, camMeshId, Vector3i::Zero);
+	//Get mesh2 to attach target to
+	//Vector3i pos2 = Vector3i::Zero;
+	auto pos2 = GetJointPosition(targetItem, targetMeshId, Vector3i::Zero);
+
+	if (OldCam.pos.Position.x != pos.x ||
+		OldCam.pos.Position.y != pos.y ||
+		OldCam.pos.Position.z != pos.z ||
+		OldCam.targetDistance != Camera.targetDistance ||
+		OldCam.targetElevation != Camera.targetElevation ||
+		OldCam.actualElevation != Camera.actualElevation ||
+		OldCam.actualAngle != Camera.actualAngle ||
+		OldCam.target.x != Camera.target.x ||
+		OldCam.target.y != Camera.target.y ||
+		OldCam.target.z != Camera.target.z ||
+		Camera.oldType != Camera.type ||
+		BinocularOn)
+	{
+		OldCam.pos.Position.x = pos.x;
+		OldCam.pos.Position.y = pos.y;
+		OldCam.pos.Position.z = pos.z;
+		OldCam.targetDistance = Camera.targetDistance;
+		OldCam.targetElevation = Camera.targetElevation;
+		OldCam.actualElevation = Camera.actualElevation;
+		OldCam.actualAngle = Camera.actualAngle;
+		OldCam.target.x = Camera.target.x;
+		OldCam.target.y = Camera.target.y;
+		OldCam.target.z = Camera.target.z;
+		LastIdeal.x = pos.x;
+		LastIdeal.y = pos.y;
+		LastIdeal.z = pos.z;
+		LastIdeal.RoomNumber = ideal->RoomNumber;
+		LastTarget.x = pos2.x;
+		LastTarget.y = pos2.y;
+		LastTarget.z = pos2.z;
+	}
+	else
+	{
+		pos.x = LastIdeal.x;
+		pos.y = LastIdeal.y;
+		pos.z = LastIdeal.z;
+		ideal->RoomNumber = LastIdeal.RoomNumber;
+		pos2.x = LastTarget.x;
+		pos2.y = LastTarget.y;
+		pos2.z = LastTarget.z;
+	}
+
+	Camera.pos.x += (ideal->x - Camera.pos.x) / speed;
+	Camera.pos.y += (ideal->y - Camera.pos.y) / speed;
+	Camera.pos.z += (ideal->z - Camera.pos.z) / speed;
+
+	Camera.pos.RoomNumber = GetCollision(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.RoomNumber).RoomNumber;
+	LookAt(&Camera, 0);
+
+	int anglex = Camera.target.x - Camera.pos.x;
+	int angley = Camera.target.y - Camera.pos.y;
+	int anglez = Camera.target.z - Camera.pos.z;
+
+	auto position = Vector3i(Camera.target.x - Camera.pos.x, Camera.target.y - Camera.pos.y, Camera.target.z - Camera.pos.z);
+
+	// write last frame camera angle to LastAngle to compare if next frame camera angle has a bigger step than 100.
+	// To make camera movement smoother a speed of 2 is used.
+	// While for big camera angle steps (cuts) -
+	// the speed is set to 1 to make the cut immediatelly.
+	constexpr int angleThresholdDegrees = 100;
+
+	if (LastTarget.x - Camera.target.x > angleThresholdDegrees ||
+		LastTarget.y - Camera.target.y > angleThresholdDegrees ||
+		LastTarget.z - Camera.target.z > angleThresholdDegrees)
+	{
+		speed = 1;
+	}
+	else
+	{
+		speed = 2;
+	}
+
+	//actual movement of the target.
+	Camera.target.x += (pos2.x - Camera.target.x) / speed;
+	Camera.target.y += (pos2.y - Camera.target.y) / speed;
+	Camera.target.z += (pos2.z - Camera.target.z) / speed;
+
+	if (ItemCamera.LastAngle != position)
+	{
+		ItemCamera.LastAngle = Vector3i(ItemCamera.LastAngle.x = anglex, ItemCamera.LastAngle.y = angley, ItemCamera.LastAngle.z = anglez);
 	}
 }
 
@@ -1259,6 +1373,11 @@ void CalculateCamera()
 	if (BinocularOn)
 	{
 		BinocularCamera(LaraItem);
+		return;
+	}
+
+	if (ItemCamera.ItemCameraOn)
+	{
 		return;
 	}
 

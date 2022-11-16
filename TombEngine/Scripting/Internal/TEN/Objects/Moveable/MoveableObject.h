@@ -96,6 +96,9 @@ public:
 	[[nodiscard]] short GetRoom() const;
 	void SetRoom(short room);
 
+	void AttachObjCamera(short camMeshId, Moveable& mov, short targetMeshId);
+	void AnimFromObject(GAME_OBJECT_ID object, int animNumber, int stateID);
+
 	void EnableItem();
 	void DisableItem();
 	void MakeInvisible();
