@@ -1867,7 +1867,6 @@ void SetScreenFadeIn(float speed)
 void DisableFade()
 {
 	ScreenFading = false;
-	ScreenFadedOut = true;
 	ScreenFadeStart = 0.0f;
 	ScreenFadeEnd = ScreenFadeCurrent = 1.0f;
 }
