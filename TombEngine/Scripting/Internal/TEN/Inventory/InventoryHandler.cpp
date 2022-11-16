@@ -82,41 +82,17 @@ namespace InventoryHandler
 
 	}
 
-	///Enters inventory screen.
-	//@function EnterInventoryScreen
-	static void EnterInventoryScreen()
-	{
-		DisableFade();
-		g_Gui.ProcessInventory(InventoryMode::InGame);
-	}
-
 	///Enters statistics screen.
-	//@function EnterStatisticsScreen
-	static void EnterStatisticsScreen()
+	//@function ShowStatisticsScreen
+	static void ShowStatisticsScreen()
 	{
 		DisableFade();
 		g_Gui.ProcessInventory(InventoryMode::Statistics);
 	}
 
-	///Enters pause screen.
-	//@function EnterPauseScreen
-	static void EnterPauseScreen()
-	{
-		DisableFade();
-		g_Gui.ProcessInventory(InventoryMode::Pause);
-	}
-
-	///Enters load screen.
-	//@function EnterLoadScreen
-	static void EnterLoadScreen()
-	{
-		DisableFade();
-		g_Gui.ProcessInventory(InventoryMode::Load);
-	}
-
-	///Enters save screen.
-	//@function EnterSaveScreen
-	static void EnterSaveScreen()
+	///Enters save game screen.
+	//@function ShowSaveScreen
+	static void ShowSaveScreen()
 	{
 		DisableFade();
 		g_Gui.ProcessInventory(InventoryMode::Save);
@@ -132,10 +108,7 @@ namespace InventoryHandler
 		table_inventory.set_function(ScriptReserved_GetInvItemCount, &InventoryGetCount);
 		table_inventory.set_function(ScriptReserved_SetInvItemCount, &InventorySetCount);
 
-		table_inventory.set_function(ScriptReserved_EnterInventoryScreen, &EnterInventoryScreen);
-		table_inventory.set_function(ScriptReserved_EnterStatisticsScreen, &EnterStatisticsScreen);
-		table_inventory.set_function(ScriptReserved_EnterLoadScreen, &EnterLoadScreen);
-		table_inventory.set_function(ScriptReserved_EnterSaveScreen, &EnterSaveScreen);
-		table_inventory.set_function(ScriptReserved_EnterPauseScreen, &EnterPauseScreen);
+		table_inventory.set_function(ScriptReserved_ShowStatisticsScreen, &ShowStatisticsScreen);
+		table_inventory.set_function(ScriptReserved_ShowSaveScreen, &ShowSaveScreen);
 	}
 }
