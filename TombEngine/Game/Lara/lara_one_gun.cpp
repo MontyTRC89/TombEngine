@@ -174,8 +174,8 @@ void AnimateShotgun(ItemInfo* laraItem, LaraWeaponType weaponType)
 					}
 					else if (weaponType == LaraWeaponType::HK)
 					{
-						if ((weapon.WeaponMode == LaraWeaponTypeCarried::WTYPE_AMMO_1 ||
-								weapon.WeaponMode == LaraWeaponTypeCarried::WTYPE_AMMO_2) &&
+						if ((weapon.WeaponMode == LaraWeaponTypeCarried::WTYPE_AMMO_2 ||
+							 weapon.WeaponMode == LaraWeaponTypeCarried::WTYPE_AMMO_3) &&
 							lara.Control.Weapon.Interval)
 						{
 							item.Animation.TargetState = WEAPON_STATE_AIM;
@@ -245,10 +245,10 @@ void AnimateShotgun(ItemInfo* laraItem, LaraWeaponType weaponType)
 							reloadHarpoonGun = true;
 						}
 					}
-					else if (weaponType == LaraWeaponType::HK)// && (/*!(lara.HKtypeCarried & 0x18) || */!HKTimer))
+					else if (weaponType == LaraWeaponType::HK)
 					{
-						if ((weapon.WeaponMode == LaraWeaponTypeCarried::WTYPE_AMMO_1 ||
-							weapon.WeaponMode == LaraWeaponTypeCarried::WTYPE_AMMO_2) &&
+						if ((weapon.WeaponMode == LaraWeaponTypeCarried::WTYPE_AMMO_2 ||
+							 weapon.WeaponMode == LaraWeaponTypeCarried::WTYPE_AMMO_3) &&
 							lara.Control.Weapon.Interval != 0.0f)
 						{
 							item.Animation.TargetState = WEAPON_STATE_UNDERWATER_AIM;
@@ -1019,7 +1019,7 @@ void FireHK(ItemInfo* laraItem, int mode)
 		0
 	);
 
-	if (weapon.WeaponMode == LaraWeaponTypeCarried::WTYPE_AMMO_1)
+	if (weapon.WeaponMode == LaraWeaponTypeCarried::WTYPE_AMMO_3)
 	{
 		lara->Control.Weapon.Interval = HK_BURST_MODE_SHOT_INTERVAL;
 	}
@@ -1110,7 +1110,7 @@ void LasersightWeaponHandler(ItemInfo* item, LaraWeaponType weaponType)
 		else
 		{
 			if (lara.Control.Weapon.GunType == LaraWeaponType::HK &&
-				weapon.WeaponMode == LaraWeaponTypeCarried::WTYPE_AMMO_1 &&
+				weapon.WeaponMode == LaraWeaponTypeCarried::WTYPE_AMMO_3 &&
 				weapon.SelectedAmmo == WeaponAmmoType::Ammo1)
 			{
 				lara.Control.Weapon.Interval = HK_BURST_MODE_SHOT_INTERVAL;
