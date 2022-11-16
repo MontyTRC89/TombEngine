@@ -16,7 +16,7 @@ namespace TEN::Effects::Footprints
 {
 	std::deque<FOOTPRINT_STRUCT> footprints = std::deque<FOOTPRINT_STRUCT>();
 
-	bool CheckFootOnFloor(const ItemInfo& item, int mesh, Vector3& outFootprintPosition)
+	bool CheckFootOnFloor(const ItemInfo& item, int mesh, Vector3& outFootprintPos)
 	{
 		int x = item.Pose.Position.x;
 		int y = item.Pose.Position.y;
@@ -27,22 +27,22 @@ namespace TEN::Effects::Footprints
 		auto pos = GetJointPosition(LaraItem, mesh, Vector3i(0, FOOT_HEIGHT_OFFSET, 0));
 		int height = GetFloorHeight(floor, pos.x, pos.y - CLICK(1), pos.z);
 
-		outFootprintPosition.x = pos.x;
-		outFootprintPosition.y = height - 8;
-		outFootprintPosition.z = pos.z;
+		outFootprintPos.x = pos.x;
+		outFootprintPos.y = height - 8;
+		outFootprintPos.z = pos.z;
 
 		return abs(pos.y - height) < 64;
 	}
 
 	void AddFootprint(ItemInfo* item, bool rightFoot)
 	{
-		if (item != LaraItem)
+		if (!item->IsLara())
 			return;
 
 		auto foot = rightFoot ? LM_RFOOT : LM_LFOOT;
 
 		// Don't process actual footprint placement if foot isn't on floor.
-		auto footPos = Vector3();
+		auto footPos = Vector3::Zero;
 		if (!CheckFootOnFloor(*item, foot, footPos))
 			return;
 
@@ -50,7 +50,7 @@ namespace TEN::Effects::Footprints
 		footPos.x += (GetRandomControl() & 10) - 5;
 		footPos.z += (GetRandomControl() & 10) - 5;
 
-		auto result = GetCollision(footPos.x, footPos.y - STEP_SIZE, footPos.z, item->RoomNumber);
+		auto result = GetCollision(footPos.x, footPos.y - CLICK(1), footPos.z, item->RoomNumber);
 		auto floor = result.BottomBlock;
 
 		// Don't process material if foot has hit bridge object.
@@ -168,11 +168,11 @@ namespace TEN::Effects::Footprints
 
 		// Calculate footprint tilts.
 		auto plane = floor->FloorCollision.Planes[floor->SectorPlane(footPos.x, footPos.z)];
-		auto c = phd_cos(item->Pose.Orientation.y + ANGLE(180.0f));
-		auto s = phd_sin(item->Pose.Orientation.y + ANGLE(180.0f));
+		auto sinY = phd_sin(item->Pose.Orientation.y + ANGLE(180.0f));
+		auto cosY = phd_cos(item->Pose.Orientation.y + ANGLE(180.0f));
 		auto yRot = TO_RAD(item->Pose.Orientation.y);
-		auto xRot = plane.x * s + plane.y * c;
-		auto zRot = plane.y * s - plane.x * c;
+		auto xRot = (plane.x * sinY) + (plane.y * cosY);
+		auto zRot = (plane.y * sinY) - (plane.x * cosY);
 
 		// Calculate footprint positions.
 		auto p0 = Vector3( FOOTPRINT_SIZE, 0,  FOOTPRINT_SIZE);
@@ -201,26 +201,28 @@ namespace TEN::Effects::Footprints
 		if ((c0.FloorTilt.y != c1.FloorTilt.y) || (c1.FloorTilt.y != c2.FloorTilt.y) || (c2.FloorTilt.y != c3.FloorTilt.y))
 			return;
 
-		// Don't process footprint placement if all foot corners aren't on the same height
-		if ((abs(c0.Position.Floor - c1.Position.Floor) > STEP_SIZE / 2) ||
-			(abs(c1.Position.Floor - c2.Position.Floor) > STEP_SIZE / 2) ||
-			(abs(c2.Position.Floor - c3.Position.Floor) > STEP_SIZE / 2) ||
-			(abs(c3.Position.Floor - c0.Position.Floor) > STEP_SIZE / 2))
+		// Don't process footprint placement if all foot corners aren't on the same height.
+		if ((abs(c0.Position.Floor - c1.Position.Floor) > CLICK(1.0f / 2)) ||
+			(abs(c1.Position.Floor - c2.Position.Floor) > CLICK(1.0f / 2)) ||
+			(abs(c2.Position.Floor - c3.Position.Floor) > CLICK(1.0f / 2)) ||
+			(abs(c3.Position.Floor - c0.Position.Floor) > CLICK(1.0f / 2)))
+		{
 			return;
+		}
 
-		// Construct footprint
-		FOOTPRINT_STRUCT footprint = {};
+		// Construct footprint.
+		auto footprint = FOOTPRINT_STRUCT{};
 		footprint.Position[0] = p0;
 		footprint.Position[1] = p1;
 		footprint.Position[2] = p2;
 		footprint.Position[3] = p3;
 		footprint.StartOpacity = 0.5f;
-		footprint.LifeStartFading = FPS * 10;
-		footprint.Life = FPS * 20;
+		footprint.LifeStartFading = 10 * FPS;
+		footprint.Life = 20 * FPS;
 		footprint.Active = true;
 		footprint.RightFoot = rightFoot;
 
-		// Add footprint
+		// Add footprint.
 		if (footprints.size() >= MAX_FOOTPRINTS)
 			footprints.pop_back();
 		footprints.push_front(footprint);
@@ -233,9 +235,8 @@ namespace TEN::Effects::Footprints
 
 		int numInvalidFootprints = 0;
 
-		for (auto i = footprints.begin(); i != footprints.end(); i++) 
+		for (auto& footprint: footprints) 
 		{
-			FOOTPRINT_STRUCT& footprint = *i;
 			footprint.Life--;
 
 			if (footprint.Life <= 0) 
@@ -256,8 +257,6 @@ namespace TEN::Effects::Footprints
 		}
 
 		for (int i = 0; i < numInvalidFootprints; i++) 
-		{
 			footprints.pop_back();
-		}
 	}
 }

@@ -16,6 +16,9 @@ namespace TEN::Math::Geometry
 	Vector3i TranslatePoint(const Vector3i& point, const Vector3& direction, float distance);
 	Vector3	 TranslatePoint(const Vector3& point, const Vector3& direction, float distance);
 
+	Vector3 GetFloorNormal(const Vector2& tilt);
+	Vector3 GetCeilingNormal(const Vector2& tilt);
+
 	short GetShortestAngle(short fromAngle, short toAngle);
 	short GetSurfaceSteepnessAngle(Vector2 tilt);
 	short GetSurfaceAspectAngle(Vector2 tilt);

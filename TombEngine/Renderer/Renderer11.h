@@ -656,6 +656,7 @@ namespace TEN::Renderer
 		void AddDebugBox(Vector3 min, Vector3 max, Vector4 color, RENDERER_DEBUG_PAGE page);
 		void AddSphere(Vector3 center, float radius, Vector4 color);
 		void AddDebugSphere(Vector3 center, float radius, Vector4 color, RENDERER_DEBUG_PAGE page);
+		void AddDebugCircle(Vector3 center, float radius, Vector4 color, RENDERER_DEBUG_PAGE page);
 		void ChangeScreenResolution(int width, int height, bool windowed);
 		void FlipRooms(short roomNumber1, short roomNumber2);
 		void ResetAnimations();

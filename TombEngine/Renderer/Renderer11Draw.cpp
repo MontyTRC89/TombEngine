@@ -875,6 +875,28 @@ namespace TEN::Renderer
 		}
 	}
 
+	void Renderer11::AddDebugCircle(Vector3 center, float radius, Vector4 color, RENDERER_DEBUG_PAGE page)
+	{
+		constexpr auto numSubdivisions = 12;
+
+		float angle = 0.0f;
+		auto prevPoint = Vector3::Zero;
+
+		for (int i = 0; i < numSubdivisions; i++)
+		{
+			float sinAngle = sin(angle);
+			float cosAngle = cos(angle);
+
+			auto point = center + Vector3(sinAngle * radius, 0.0f, cosAngle * radius);
+
+			if (i > 0)
+				AddLine3D(prevPoint, point, color);
+
+			prevPoint = point;
+			angle += PI_MUL_2 / (numSubdivisions - 1);
+		}
+	}
+
 	void Renderer11::AddBox(Vector3 min, Vector3 max, Vector4 color)
 	{
 		if (m_Locked)

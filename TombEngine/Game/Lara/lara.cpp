@@ -38,6 +38,12 @@
 #include "Sound/sound.h"
 #include "Renderer/Renderer11.h"
 
+// TEMP
+#include <ois/OISKeyboard.h>
+#include "Game/effects/Blood.h"
+using namespace TEN::Effects::Blood;
+//
+
 using namespace TEN::Control::Volumes;
 using namespace TEN::Effects::Lara;
 using namespace TEN::Floordata;
@@ -414,6 +420,22 @@ function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] =
 void LaraControl(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
+
+	// --------------------DEBUG
+
+	static bool dbBlood = true;
+	if (KeyMap[OIS::KC_B] && dbBlood)
+	{
+		auto pos = item->Pose.Position + Vector3i(0, -coll->Setup.Height, 0);
+		SpawnBloodDripSpray(pos.ToVector3(), item->RoomNumber, item->Pose.Orientation.ToDirection());
+	}
+	dbBlood = KeyMap[OIS::KC_B] ? false : true;
+
+	UpdateBloodDrips();
+	UpdateBloodStains();
+	DrawIdioticPlaceholders();
+
+	// --------------------
 
 	if (lara->Control.Weapon.HasFired)
 	{
