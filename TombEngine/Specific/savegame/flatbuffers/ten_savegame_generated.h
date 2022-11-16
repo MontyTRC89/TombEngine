@@ -1493,7 +1493,6 @@ struct CarriedWeaponInfoT : public flatbuffers::NativeTable {
   std::vector<std::unique_ptr<TEN::Save::AmmoInfoT>> ammo{};
   int32_t selected_ammo = 0;
   bool has_lasersight = false;
-  bool has_silencer = false;
 };
 
 struct CarriedWeaponInfo FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
@@ -1504,8 +1503,7 @@ struct CarriedWeaponInfo FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     VT_PRESENT = 4,
     VT_AMMO = 6,
     VT_SELECTED_AMMO = 8,
-    VT_HAS_LASERSIGHT = 10,
-    VT_HAS_SILENCER = 12
+    VT_HAS_LASERSIGHT = 10
   };
   bool present() const {
     return GetField<uint8_t>(VT_PRESENT, 0) != 0;
@@ -1519,9 +1517,6 @@ struct CarriedWeaponInfo FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   bool has_lasersight() const {
     return GetField<uint8_t>(VT_HAS_LASERSIGHT, 0) != 0;
   }
-  bool has_silencer() const {
-    return GetField<uint8_t>(VT_HAS_SILENCER, 0) != 0;
-  }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyField<uint8_t>(verifier, VT_PRESENT) &&
@@ -1530,7 +1525,6 @@ struct CarriedWeaponInfo FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            verifier.VerifyVectorOfTables(ammo()) &&
            VerifyField<int32_t>(verifier, VT_SELECTED_AMMO) &&
            VerifyField<uint8_t>(verifier, VT_HAS_LASERSIGHT) &&
-           VerifyField<uint8_t>(verifier, VT_HAS_SILENCER) &&
            verifier.EndTable();
   }
   CarriedWeaponInfoT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
@@ -1554,9 +1548,6 @@ struct CarriedWeaponInfoBuilder {
   void add_has_lasersight(bool has_lasersight) {
     fbb_.AddElement<uint8_t>(CarriedWeaponInfo::VT_HAS_LASERSIGHT, static_cast<uint8_t>(has_lasersight), 0);
   }
-  void add_has_silencer(bool has_silencer) {
-    fbb_.AddElement<uint8_t>(CarriedWeaponInfo::VT_HAS_SILENCER, static_cast<uint8_t>(has_silencer), 0);
-  }
   explicit CarriedWeaponInfoBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
@@ -1573,12 +1564,10 @@ inline flatbuffers::Offset<CarriedWeaponInfo> CreateCarriedWeaponInfo(
     bool present = false,
     flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<TEN::Save::AmmoInfo>>> ammo = 0,
     int32_t selected_ammo = 0,
-    bool has_lasersight = false,
-    bool has_silencer = false) {
+    bool has_lasersight = false) {
   CarriedWeaponInfoBuilder builder_(_fbb);
   builder_.add_selected_ammo(selected_ammo);
   builder_.add_ammo(ammo);
-  builder_.add_has_silencer(has_silencer);
   builder_.add_has_lasersight(has_lasersight);
   builder_.add_present(present);
   return builder_.Finish();
@@ -1594,16 +1583,14 @@ inline flatbuffers::Offset<CarriedWeaponInfo> CreateCarriedWeaponInfoDirect(
     bool present = false,
     const std::vector<flatbuffers::Offset<TEN::Save::AmmoInfo>> *ammo = nullptr,
     int32_t selected_ammo = 0,
-    bool has_lasersight = false,
-    bool has_silencer = false) {
+    bool has_lasersight = false) {
   auto ammo__ = ammo ? _fbb.CreateVector<flatbuffers::Offset<TEN::Save::AmmoInfo>>(*ammo) : 0;
   return TEN::Save::CreateCarriedWeaponInfo(
       _fbb,
       present,
       ammo__,
       selected_ammo,
-      has_lasersight,
-      has_silencer);
+      has_lasersight);
 }
 
 flatbuffers::Offset<CarriedWeaponInfo> CreateCarriedWeaponInfo(flatbuffers::FlatBufferBuilder &_fbb, const CarriedWeaponInfoT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
@@ -1995,7 +1982,6 @@ struct LaraInventoryDataT : public flatbuffers::NativeTable {
   bool has_crowbar = false;
   bool has_torch = false;
   bool has_lasersight = false;
-  bool has_silencer = false;
   int32_t total_small_medipacks = 0;
   int32_t total_large_medipacks = 0;
   int32_t total_flares = 0;
@@ -2025,19 +2011,18 @@ struct LaraInventoryData FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     VT_HAS_CROWBAR = 18,
     VT_HAS_TORCH = 20,
     VT_HAS_LASERSIGHT = 22,
-    VT_HAS_SILENCER = 24,
-    VT_TOTAL_SMALL_MEDIPACKS = 26,
-    VT_TOTAL_LARGE_MEDIPACKS = 28,
-    VT_TOTAL_FLARES = 30,
-    VT_TOTAL_SECRETS = 32,
-    VT_PUZZLES = 34,
-    VT_KEYS = 36,
-    VT_PICKUPS = 38,
-    VT_EXAMINES = 40,
-    VT_PUZZLES_COMBO = 42,
-    VT_KEYS_COMBO = 44,
-    VT_PICKUPS_COMBO = 46,
-    VT_EXAMINES_COMBO = 48
+    VT_TOTAL_SMALL_MEDIPACKS = 24,
+    VT_TOTAL_LARGE_MEDIPACKS = 26,
+    VT_TOTAL_FLARES = 28,
+    VT_TOTAL_SECRETS = 30,
+    VT_PUZZLES = 32,
+    VT_KEYS = 34,
+    VT_PICKUPS = 36,
+    VT_EXAMINES = 38,
+    VT_PUZZLES_COMBO = 40,
+    VT_KEYS_COMBO = 42,
+    VT_PICKUPS_COMBO = 44,
+    VT_EXAMINES_COMBO = 46
   };
   bool is_busy() const {
     return GetField<uint8_t>(VT_IS_BUSY, 0) != 0;
@@ -2068,9 +2053,6 @@ struct LaraInventoryData FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   }
   bool has_lasersight() const {
     return GetField<uint8_t>(VT_HAS_LASERSIGHT, 0) != 0;
-  }
-  bool has_silencer() const {
-    return GetField<uint8_t>(VT_HAS_SILENCER, 0) != 0;
   }
   int32_t total_small_medipacks() const {
     return GetField<int32_t>(VT_TOTAL_SMALL_MEDIPACKS, 0);
@@ -2120,7 +2102,6 @@ struct LaraInventoryData FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyField<uint8_t>(verifier, VT_HAS_CROWBAR) &&
            VerifyField<uint8_t>(verifier, VT_HAS_TORCH) &&
            VerifyField<uint8_t>(verifier, VT_HAS_LASERSIGHT) &&
-           VerifyField<uint8_t>(verifier, VT_HAS_SILENCER) &&
            VerifyField<int32_t>(verifier, VT_TOTAL_SMALL_MEDIPACKS) &&
            VerifyField<int32_t>(verifier, VT_TOTAL_LARGE_MEDIPACKS) &&
            VerifyField<int32_t>(verifier, VT_TOTAL_FLARES) &&
@@ -2182,9 +2163,6 @@ struct LaraInventoryDataBuilder {
   void add_has_lasersight(bool has_lasersight) {
     fbb_.AddElement<uint8_t>(LaraInventoryData::VT_HAS_LASERSIGHT, static_cast<uint8_t>(has_lasersight), 0);
   }
-  void add_has_silencer(bool has_silencer) {
-    fbb_.AddElement<uint8_t>(LaraInventoryData::VT_HAS_SILENCER, static_cast<uint8_t>(has_silencer), 0);
-  }
   void add_total_small_medipacks(int32_t total_small_medipacks) {
     fbb_.AddElement<int32_t>(LaraInventoryData::VT_TOTAL_SMALL_MEDIPACKS, total_small_medipacks, 0);
   }
@@ -2244,7 +2222,6 @@ inline flatbuffers::Offset<LaraInventoryData> CreateLaraInventoryData(
     bool has_crowbar = false,
     bool has_torch = false,
     bool has_lasersight = false,
-    bool has_silencer = false,
     int32_t total_small_medipacks = 0,
     int32_t total_large_medipacks = 0,
     int32_t total_flares = 0,
@@ -2274,7 +2251,6 @@ inline flatbuffers::Offset<LaraInventoryData> CreateLaraInventoryData(
   builder_.add_small_waterskin(small_waterskin);
   builder_.add_beetle_components(beetle_components);
   builder_.add_beetle_life(beetle_life);
-  builder_.add_has_silencer(has_silencer);
   builder_.add_has_lasersight(has_lasersight);
   builder_.add_has_torch(has_torch);
   builder_.add_has_crowbar(has_crowbar);
@@ -2301,7 +2277,6 @@ inline flatbuffers::Offset<LaraInventoryData> CreateLaraInventoryDataDirect(
     bool has_crowbar = false,
     bool has_torch = false,
     bool has_lasersight = false,
-    bool has_silencer = false,
     int32_t total_small_medipacks = 0,
     int32_t total_large_medipacks = 0,
     int32_t total_flares = 0,
@@ -2334,7 +2309,6 @@ inline flatbuffers::Offset<LaraInventoryData> CreateLaraInventoryDataDirect(
       has_crowbar,
       has_torch,
       has_lasersight,
-      has_silencer,
       total_small_medipacks,
       total_large_medipacks,
       total_flares,
@@ -2464,6 +2438,9 @@ struct WeaponControlDataT : public flatbuffers::NativeTable {
   int32_t request_gun_type = 0;
   int32_t last_gun_type = 0;
   std::unique_ptr<TEN::Save::HolsterInfoT> holster_info{};
+  uint32_t num_shots_fired = 0;
+  float interval = 0.0f;
+  float timer = 0.0f;
 };
 
 struct WeaponControlData FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
@@ -2479,7 +2456,10 @@ struct WeaponControlData FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     VT_GUN_TYPE = 14,
     VT_REQUEST_GUN_TYPE = 16,
     VT_LAST_GUN_TYPE = 18,
-    VT_HOLSTER_INFO = 20
+    VT_HOLSTER_INFO = 20,
+    VT_NUM_SHOTS_FIRED = 22,
+    VT_INTERVAL = 24,
+    VT_TIMER = 26
   };
   int32_t weapon_item() const {
     return GetField<int32_t>(VT_WEAPON_ITEM, 0);
@@ -2508,6 +2488,15 @@ struct WeaponControlData FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   const TEN::Save::HolsterInfo *holster_info() const {
     return GetPointer<const TEN::Save::HolsterInfo *>(VT_HOLSTER_INFO);
   }
+  uint32_t num_shots_fired() const {
+    return GetField<uint32_t>(VT_NUM_SHOTS_FIRED, 0);
+  }
+  float interval() const {
+    return GetField<float>(VT_INTERVAL, 0.0f);
+  }
+  float timer() const {
+    return GetField<float>(VT_TIMER, 0.0f);
+  }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyField<int32_t>(verifier, VT_WEAPON_ITEM) &&
@@ -2520,6 +2509,9 @@ struct WeaponControlData FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyField<int32_t>(verifier, VT_LAST_GUN_TYPE) &&
            VerifyOffset(verifier, VT_HOLSTER_INFO) &&
            verifier.VerifyTable(holster_info()) &&
+           VerifyField<uint32_t>(verifier, VT_NUM_SHOTS_FIRED) &&
+           VerifyField<float>(verifier, VT_INTERVAL) &&
+           VerifyField<float>(verifier, VT_TIMER) &&
            verifier.EndTable();
   }
   WeaponControlDataT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
@@ -2558,6 +2550,15 @@ struct WeaponControlDataBuilder {
   void add_holster_info(flatbuffers::Offset<TEN::Save::HolsterInfo> holster_info) {
     fbb_.AddOffset(WeaponControlData::VT_HOLSTER_INFO, holster_info);
   }
+  void add_num_shots_fired(uint32_t num_shots_fired) {
+    fbb_.AddElement<uint32_t>(WeaponControlData::VT_NUM_SHOTS_FIRED, num_shots_fired, 0);
+  }
+  void add_interval(float interval) {
+    fbb_.AddElement<float>(WeaponControlData::VT_INTERVAL, interval, 0.0f);
+  }
+  void add_timer(float timer) {
+    fbb_.AddElement<float>(WeaponControlData::VT_TIMER, timer, 0.0f);
+  }
   explicit WeaponControlDataBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
@@ -2579,8 +2580,14 @@ inline flatbuffers::Offset<WeaponControlData> CreateWeaponControlData(
     int32_t gun_type = 0,
     int32_t request_gun_type = 0,
     int32_t last_gun_type = 0,
-    flatbuffers::Offset<TEN::Save::HolsterInfo> holster_info = 0) {
+    flatbuffers::Offset<TEN::Save::HolsterInfo> holster_info = 0,
+    uint32_t num_shots_fired = 0,
+    float interval = 0.0f,
+    float timer = 0.0f) {
   WeaponControlDataBuilder builder_(_fbb);
+  builder_.add_timer(timer);
+  builder_.add_interval(interval);
+  builder_.add_num_shots_fired(num_shots_fired);
   builder_.add_holster_info(holster_info);
   builder_.add_last_gun_type(last_gun_type);
   builder_.add_request_gun_type(request_gun_type);
@@ -6888,7 +6895,6 @@ inline void CarriedWeaponInfo::UnPackTo(CarriedWeaponInfoT *_o, const flatbuffer
   { auto _e = ammo(); if (_e) { _o->ammo.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->ammo[_i] = std::unique_ptr<TEN::Save::AmmoInfoT>(_e->Get(_i)->UnPack(_resolver)); } } }
   { auto _e = selected_ammo(); _o->selected_ammo = _e; }
   { auto _e = has_lasersight(); _o->has_lasersight = _e; }
-  { auto _e = has_silencer(); _o->has_silencer = _e; }
 }
 
 inline flatbuffers::Offset<CarriedWeaponInfo> CarriedWeaponInfo::Pack(flatbuffers::FlatBufferBuilder &_fbb, const CarriedWeaponInfoT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
@@ -6903,14 +6909,12 @@ inline flatbuffers::Offset<CarriedWeaponInfo> CreateCarriedWeaponInfo(flatbuffer
   auto _ammo = _fbb.CreateVector<flatbuffers::Offset<TEN::Save::AmmoInfo>> (_o->ammo.size(), [](size_t i, _VectorArgs *__va) { return CreateAmmoInfo(*__va->__fbb, __va->__o->ammo[i].get(), __va->__rehasher); }, &_va );
   auto _selected_ammo = _o->selected_ammo;
   auto _has_lasersight = _o->has_lasersight;
-  auto _has_silencer = _o->has_silencer;
   return TEN::Save::CreateCarriedWeaponInfo(
       _fbb,
       _present,
       _ammo,
       _selected_ammo,
-      _has_lasersight,
-      _has_silencer);
+      _has_lasersight);
 }
 
 inline WeaponInfoT *WeaponInfo::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
@@ -7075,7 +7079,6 @@ inline void LaraInventoryData::UnPackTo(LaraInventoryDataT *_o, const flatbuffer
   { auto _e = has_crowbar(); _o->has_crowbar = _e; }
   { auto _e = has_torch(); _o->has_torch = _e; }
   { auto _e = has_lasersight(); _o->has_lasersight = _e; }
-  { auto _e = has_silencer(); _o->has_silencer = _e; }
   { auto _e = total_small_medipacks(); _o->total_small_medipacks = _e; }
   { auto _e = total_large_medipacks(); _o->total_large_medipacks = _e; }
   { auto _e = total_flares(); _o->total_flares = _e; }
@@ -7108,7 +7111,6 @@ inline flatbuffers::Offset<LaraInventoryData> CreateLaraInventoryData(flatbuffer
   auto _has_crowbar = _o->has_crowbar;
   auto _has_torch = _o->has_torch;
   auto _has_lasersight = _o->has_lasersight;
-  auto _has_silencer = _o->has_silencer;
   auto _total_small_medipacks = _o->total_small_medipacks;
   auto _total_large_medipacks = _o->total_large_medipacks;
   auto _total_flares = _o->total_flares;
@@ -7133,7 +7135,6 @@ inline flatbuffers::Offset<LaraInventoryData> CreateLaraInventoryData(flatbuffer
       _has_crowbar,
       _has_torch,
       _has_lasersight,
-      _has_silencer,
       _total_small_medipacks,
       _total_large_medipacks,
       _total_flares,
@@ -7204,6 +7205,9 @@ inline void WeaponControlData::UnPackTo(WeaponControlDataT *_o, const flatbuffer
   { auto _e = request_gun_type(); _o->request_gun_type = _e; }
   { auto _e = last_gun_type(); _o->last_gun_type = _e; }
   { auto _e = holster_info(); if (_e) _o->holster_info = std::unique_ptr<TEN::Save::HolsterInfoT>(_e->UnPack(_resolver)); }
+  { auto _e = num_shots_fired(); _o->num_shots_fired = _e; }
+  { auto _e = interval(); _o->interval = _e; }
+  { auto _e = timer(); _o->timer = _e; }
 }
 
 inline flatbuffers::Offset<WeaponControlData> WeaponControlData::Pack(flatbuffers::FlatBufferBuilder &_fbb, const WeaponControlDataT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
@@ -7223,6 +7227,9 @@ inline flatbuffers::Offset<WeaponControlData> CreateWeaponControlData(flatbuffer
   auto _request_gun_type = _o->request_gun_type;
   auto _last_gun_type = _o->last_gun_type;
   auto _holster_info = _o->holster_info ? CreateHolsterInfo(_fbb, _o->holster_info.get(), _rehasher) : 0;
+  auto _num_shots_fired = _o->num_shots_fired;
+  auto _interval = _o->interval;
+  auto _timer = _o->timer;
   return TEN::Save::CreateWeaponControlData(
       _fbb,
       _weapon_item,
@@ -7233,7 +7240,10 @@ inline flatbuffers::Offset<WeaponControlData> CreateWeaponControlData(flatbuffer
       _gun_type,
       _request_gun_type,
       _last_gun_type,
-      _holster_info);
+      _holster_info,
+      _num_shots_fired,
+      _interval,
+      _timer);
 }
 
 inline RopeControlDataT *RopeControlData::UnPack(const flatbuffers::resolver_function_t *_resolver) const {

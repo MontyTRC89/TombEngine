@@ -291,7 +291,6 @@ bool SaveGame::Save(int slot)
 	inventory.add_has_binoculars(Lara.Inventory.HasBinoculars);
 	inventory.add_has_crowbar(Lara.Inventory.HasCrowbar);
 	inventory.add_has_lasersight(Lara.Inventory.HasLasersight);
-	inventory.add_has_silencer(Lara.Inventory.HasSilencer);
 	inventory.add_has_torch(Lara.Inventory.HasTorch);
 	inventory.add_is_busy(Lara.Inventory.IsBusy);
 	inventory.add_keys(keysOffset);
@@ -324,6 +323,9 @@ bool SaveGame::Save(int slot)
 	weaponControl.add_request_gun_type((int)Lara.Control.Weapon.RequestGunType);
 	weaponControl.add_last_gun_type((int)Lara.Control.Weapon.LastGunType);
 	weaponControl.add_holster_info(holsterInfoOffset);
+	weaponControl.add_interval(Lara.Control.Weapon.Interval);
+	weaponControl.add_timer(Lara.Control.Weapon.Timer);
+	weaponControl.add_num_shots_fired(Lara.Control.Weapon.NumShotsFired);
 	auto weaponControlOffset = weaponControl.Finish();
 
 	Save::RopeControlDataBuilder ropeControl{ fbb };
@@ -403,7 +405,6 @@ bool SaveGame::Save(int slot)
 		Save::CarriedWeaponInfoBuilder serializedInfo{ fbb };
 		serializedInfo.add_ammo(ammosOffset);
 		serializedInfo.add_has_lasersight(info->HasLasersight);
-		serializedInfo.add_has_silencer(info->HasSilencer);
 		serializedInfo.add_present(info->Present);
 		serializedInfo.add_selected_ammo((int)info->SelectedAmmo);
 		auto serializedInfoOffset = serializedInfo.Finish();
@@ -1741,6 +1742,7 @@ bool SaveGame::Load(int slot)
 	Lara.Control.HandStatus = (HandStatus)s->lara()->control()->hand_status();
 	Lara.Control.Weapon.GunType = (LaraWeaponType)s->lara()->control()->weapon()->gun_type();
 	Lara.Control.Weapon.HasFired = s->lara()->control()->weapon()->has_fired();
+	Lara.Control.Weapon.Interval = s->lara()->control()->weapon()->interval();
 	Lara.Control.Weapon.Fired = s->lara()->control()->weapon()->fired();
 	Lara.Control.Weapon.LastGunType = (LaraWeaponType)s->lara()->control()->weapon()->last_gun_type();
 	Lara.Control.Weapon.RequestGunType = (LaraWeaponType)s->lara()->control()->weapon()->request_gun_type();
@@ -1748,6 +1750,8 @@ bool SaveGame::Load(int slot)
 	Lara.Control.Weapon.HolsterInfo.BackHolster = (HolsterSlot)s->lara()->control()->weapon()->holster_info()->back_holster();
 	Lara.Control.Weapon.HolsterInfo.LeftHolster = (HolsterSlot)s->lara()->control()->weapon()->holster_info()->left_holster();
 	Lara.Control.Weapon.HolsterInfo.RightHolster = (HolsterSlot)s->lara()->control()->weapon()->holster_info()->right_holster();
+	Lara.Control.Weapon.NumShotsFired = s->lara()->control()->weapon()->num_shots_fired();
+	Lara.Control.Weapon.Timer = s->lara()->control()->weapon()->timer();
 	Lara.Control.Weapon.UziLeft = s->lara()->control()->weapon()->uzi_left();
 	Lara.Control.Weapon.UziRight = s->lara()->control()->weapon()->uzi_right();
 	Lara.ExtraAnim = s->lara()->extra_anim();
@@ -1774,7 +1778,6 @@ bool SaveGame::Load(int slot)
 	Lara.Inventory.HasBinoculars = s->lara()->inventory()->has_binoculars();
 	Lara.Inventory.HasCrowbar = s->lara()->inventory()->has_crowbar();
 	Lara.Inventory.HasLasersight = s->lara()->inventory()->has_lasersight();
-	Lara.Inventory.HasSilencer = s->lara()->inventory()->has_silencer();
 	Lara.Inventory.HasTorch = s->lara()->inventory()->has_torch();
 	Lara.Inventory.IsBusy = s->lara()->inventory()->is_busy();
 	Lara.Inventory.OldBusy = s->lara()->inventory()->old_busy();
@@ -1851,7 +1854,6 @@ bool SaveGame::Load(int slot)
 		}
 
 		Lara.Weapons[i].HasLasersight = info->has_lasersight();
-		Lara.Weapons[i].HasSilencer = info->has_silencer();
 		Lara.Weapons[i].Present = info->present();
 		Lara.Weapons[i].SelectedAmmo = (WeaponAmmoType)info->selected_ammo();
 	}
