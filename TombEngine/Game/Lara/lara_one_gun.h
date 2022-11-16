@@ -45,6 +45,7 @@ void FireCrossBowFromLaserSight(ItemInfo* laraItem, GameVector* origin, GameVect
 
 void FireHK(ItemInfo* laraItem, int mode);
 void RifleHandler(ItemInfo* laraItem, LaraWeaponType weaponType);
+void LasersightWeaponHandler(ItemInfo* item, LaraWeaponType weaponType);
 
 void DoExplosiveDamage(ItemInfo& emitter, ItemInfo& target, ItemInfo& projectile, int damage);
 void HandleProjectile(ItemInfo& item, ItemInfo& emitter, const Vector3i& prevPos, ProjectileType type, int damage);

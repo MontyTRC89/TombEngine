@@ -1188,7 +1188,13 @@ namespace TEN::Gui
 
 			if (options & OPT_CHOOSE_AMMO_HK)
 			{
-				AmmoObjectList[number].InventoryItem = INV_OBJECT_HK_AMMO;
+				AmmoObjectList[number].InventoryItem = INV_HK_MODE1;
+				AmmoObjectList[number].Amount = Ammo.AmountHKAmmo1;
+				number++;
+				AmmoObjectList[number].InventoryItem = INV_HK_MODE2;
+				AmmoObjectList[number].Amount = Ammo.AmountHKAmmo1;
+				number++;
+				AmmoObjectList[number].InventoryItem = INV_HK_MODE3;
 				AmmoObjectList[number].Amount = Ammo.AmountHKAmmo1;
 				number++;
 				NumAmmoSlots = number;
@@ -1321,10 +1327,16 @@ namespace TEN::Gui
 
 			if (lara->Weapons[(int)LaraWeaponType::HK].Present)
 			{
-				if (lara->Weapons[(int)LaraWeaponType::HK].HasSilencer)
-					InsertObjectIntoList(INV_OBJECT_HK_SILENCER);
+				if (lara->Weapons[(int)LaraWeaponType::HK].HasLasersight)
+					InsertObjectIntoList(INV_OBJECT_HK_LASERSIGHT);
 				else
 					InsertObjectIntoList(INV_OBJECT_HK);
+
+				if (lara->Weapons[(int)LaraWeaponType::HK].WeaponMode == LaraWeaponTypeCarried::WTYPE_AMMO_2)
+					Ammo.CurrentHKAmmoType = 1;
+
+				if (lara->Weapons[(int)LaraWeaponType::HK].WeaponMode == LaraWeaponTypeCarried::WTYPE_AMMO_3)
+					Ammo.CurrentHKAmmoType = 2;
 			}
 			else if (Ammo.AmountHKAmmo1)
 				InsertObjectIntoList(INV_OBJECT_HK_AMMO);
@@ -1515,7 +1527,12 @@ namespace TEN::Gui
 			}
 
 			if (lara->Weapons[(int)LaraWeaponType::HK].Present)
-				InsertObjectIntoList_v2(INV_OBJECT_HK);
+			{
+				if (lara->Weapons[(int)LaraWeaponType::HK].HasLasersight)
+					InsertObjectIntoList_v2(INV_OBJECT_HK_LASERSIGHT);
+				else
+					InsertObjectIntoList_v2(INV_OBJECT_HK);
+			}
 
 			if (lara->Weapons[(int)LaraWeaponType::Crossbow].Present)
 			{
@@ -2007,7 +2024,7 @@ namespace TEN::Gui
 
 		if (Rings[(int)RingTypes::Ammo]->RingActive)
 		{
-			auto optionString = ToUpper(std::string(OptionStrings[5]));
+			auto optionString = std::string(OptionStrings[5]);
 			g_Renderer.AddString(PHD_CENTER_X, PHD_CENTER_Y, optionString.c_str(), PRINTSTRING_COLOR_WHITE, PRINTSTRING_BLINK | PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
 
 			if (Rings[(int)RingTypes::Inventory]->ObjectListMovement)
@@ -2134,7 +2151,7 @@ namespace TEN::Gui
 					n++;
 				}
 
-				if (options & (OPT_CHOOSE_AMMO_SHOTGUN | OPT_CHOOSE_AMMO_CROSSBOW | OPT_CHOOSE_AMMO_GRENADEGUN))
+				if (options & (OPT_CHOOSE_AMMO_SHOTGUN | OPT_CHOOSE_AMMO_CROSSBOW | OPT_CHOOSE_AMMO_GRENADEGUN | OPT_CHOOSE_AMMO_HK))
 				{
 					CurrentOptions[n].Type = MenuType::ChooseAmmo;
 					CurrentOptions[n].Text = g_GameFlow->GetString(OptionStrings[1]);
@@ -2182,7 +2199,7 @@ namespace TEN::Gui
 
 				options = InventoryObjectTable[Rings[(int)RingTypes::Inventory]->CurrentObjectList[Rings[(int)RingTypes::Inventory]->CurrentObjectInList].InventoryItem].Options;
 
-				if (options & (OPT_CHOOSE_AMMO_CROSSBOW | OPT_CHOOSE_AMMO_GRENADEGUN))
+				if (options & (OPT_CHOOSE_AMMO_CROSSBOW | OPT_CHOOSE_AMMO_GRENADEGUN | OPT_CHOOSE_AMMO_HK))
 				{
 					n = 3;
 					CurrentOptions[2].Type = MenuType::Ammo3;
@@ -2203,7 +2220,7 @@ namespace TEN::Gui
 			{
 				for (int i = 0; i < n; i++)
 				{
-					auto optionString = ToUpper(std::string(CurrentOptions[i].Text));
+					auto optionString = std::string(CurrentOptions[i].Text);
 
 					if (i == CurrentSelectedOption)
 					{
@@ -2384,6 +2401,23 @@ namespace TEN::Gui
 				lara->Weapons[(int)LaraWeaponType::Crossbow].SelectedAmmo = WeaponAmmoType::Ammo2;
 			else if (Ammo.CurrentCrossBowAmmoType == 2)
 				lara->Weapons[(int)LaraWeaponType::Crossbow].SelectedAmmo = WeaponAmmoType::Ammo3;
+		}
+
+		if (lara->Weapons[(int)LaraWeaponType::HK].Present)
+		{
+			lara->Weapons[(int)LaraWeaponType::HK].WeaponMode = LaraWeaponTypeCarried::WTYPE_AMMO_1;
+			lara->Weapons[(int)LaraWeaponType::HK].SelectedAmmo = WeaponAmmoType::Ammo1;
+
+			if (Ammo.CurrentHKAmmoType == 1)
+			{
+				lara->Weapons[(int)LaraWeaponType::HK].WeaponMode = LaraWeaponTypeCarried::WTYPE_AMMO_2;
+				lara->Weapons[(int)LaraWeaponType::HK].SelectedAmmo = WeaponAmmoType::Ammo1;
+			}
+			else if (Ammo.CurrentHKAmmoType == 2)
+			{
+				lara->Weapons[(int)LaraWeaponType::HK].WeaponMode = LaraWeaponTypeCarried::WTYPE_AMMO_3;
+				lara->Weapons[(int)LaraWeaponType::HK].SelectedAmmo = WeaponAmmoType::Ammo1;
+			}
 		}
 
 		if (lara->Weapons[(int)LaraWeaponType::GrenadeLauncher].Present)
