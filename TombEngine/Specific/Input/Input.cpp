@@ -467,12 +467,16 @@ namespace TEN::Input
 		if (lara.Control.HandStatus == HandStatus::WeaponReady &&
 			lara.TargetEntity != nullptr)
 		{
-			if (IsHeld(In::Look))
+			if (IsClicked(In::Look))
 			{
 				ActionMap[(int)In::SwitchTarget].Update(true);
-				ActionMap[(int)In::Look].Clear();
+				//ActionMap[(int)In::Look].Clear();
 			}
+			else
+				ClearAction(In::SwitchTarget);
 		}
+		else
+			ClearAction(In::SwitchTarget);
 
 		// Handle flares.
 		if (IsClicked(In::Flare))

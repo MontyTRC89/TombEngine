@@ -79,10 +79,11 @@ table HolsterInfo {
 
 table CarriedWeaponInfo {
 	present: bool;
-	ammo: [AmmoInfo];
-	selected_ammo: int32;
 	has_lasersight: bool;
 	has_silencer: bool;
+	ammo: [AmmoInfo];
+	selected_ammo: int32;
+	weapon_mode: int32;
 }
 
 table WeaponInfo {
@@ -165,6 +166,9 @@ table WeaponControlData {
 	request_gun_type: int32;
 	last_gun_type: int32;
 	holster_info: HolsterInfo;
+	num_shots_fired: uint;
+	interval: float;
+	timer: float;
 }
 
 table RopeControlData {
