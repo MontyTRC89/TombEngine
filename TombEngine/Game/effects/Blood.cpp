@@ -28,7 +28,6 @@ namespace TEN::Effects::Blood
 	constexpr auto BLOOD_COLOR_RED	 = Vector4(0.8f, 0.0f, 0.0f, 1.0f);
 	constexpr auto BLOOD_COLOR_BROWN = Vector4(0.4f, 0.2f, 0.0f, 1.0f);
 
-
 	std::array<BloodDrip, BLOOD_DRIP_NUM_MAX> BloodDrips  = {};
 	std::deque<BloodStain>					  BloodStains = {};
 
@@ -226,7 +225,11 @@ namespace TEN::Effects::Blood
 		}
 		
 		for (auto& stain : BloodStains)
-			g_Renderer.AddDebugCircle(stain.Position, stain.Scale / 2, stain.Color, RENDERER_DEBUG_PAGE::NO_PAGE);
+		{
+			constexpr auto numCircles = 5;
+			for (int i = 1; i < numCircles; i++)
+				g_Renderer.AddDebugCircle(stain.Position, ((stain.Scale / 2) / numCircles) * i, stain.Color, RENDERER_DEBUG_PAGE::NO_PAGE);
+		}
 
 		g_Renderer.PrintDebugMessage("Num blood drips: %d ", numActiveDrips);
 		g_Renderer.PrintDebugMessage("Num blood stains: %d ", BloodStains.size());

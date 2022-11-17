@@ -778,33 +778,35 @@ namespace TEN::Renderer
 		if (m_Locked)
 			return;
 
-		constexpr auto subdivisions = 10;
-		constexpr auto steps = 6;
-		constexpr auto step = PI / steps;
+		constexpr auto numSubdivisions = 12;
+		constexpr auto numSteps = 6;
+		constexpr auto step = PI / numSteps;
 
-		std::array<Vector3, 3> prevPoint;
+		auto prevPoints = std::array<Vector3, 3>();
 
-		for (int s = 0; s < steps; s++)
+		for (int s = 0; s < numSteps; s++)
 		{
 			auto x = sin(step * (float)s) * radius;
 			auto z = cos(step * (float)s) * radius;
-			float currAngle = 0.0f;
+			float angle = 0.0f;
 
-			for (int i = 0; i < subdivisions; i++)
+			for (int i = 0; i < numSubdivisions; i++)
 			{
-				std::array<Vector3, 3> point =
+				auto points = std::array<Vector3, 3>
 				{
-					center + Vector3(sin(currAngle) * abs(x), z, cos(currAngle) * abs(x)),
-					center + Vector3(cos(currAngle) * abs(x), sin(currAngle) * abs(x), z),
-					center + Vector3(z, sin(currAngle) * abs(x), cos(currAngle) * abs(x))
+					center + Vector3(sin(angle) * abs(x), z, cos(angle) * abs(x)),
+					center + Vector3(cos(angle) * abs(x), sin(angle) * abs(x), z),
+					center + Vector3(z, sin(angle) * abs(x), cos(angle) * abs(x))
 				};
 
 				if (i > 0)
-					for (int p = 0; p < 3; p++)
-						AddLine3D(prevPoint[p], point[p], color);
+				{
+					for (int j = 0; j < points.size(); j++)
+						AddLine3D(prevPoints[j], points[j], color);
+				}
 
-				prevPoint = point;
-				currAngle += ((PI * 2) / (subdivisions - 1));
+				prevPoints = points;
+				angle += PI_MUL_2 / (numSubdivisions - 1);
 			}
 		}
 	}
