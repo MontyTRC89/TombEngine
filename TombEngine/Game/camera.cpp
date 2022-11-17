@@ -355,60 +355,38 @@ void MoveObjCamera(GameVector* ideal, ItemInfo* camSlotId, int camMeshId, ItemIn
 	//Vector3i pos2 = Vector3i::Zero;
 	auto pos2 = GetJointPosition(targetItem, targetMeshId, Vector3i::Zero);
 
-	if (OldCam.pos.Position.x != pos.x ||
-		OldCam.pos.Position.y != pos.y ||
-		OldCam.pos.Position.z != pos.z ||
-		OldCam.targetDistance != Camera.targetDistance ||
+	if (OldCam.pos.Position != pos ||
+		OldCam.targetDistance  != Camera.targetDistance  ||
 		OldCam.targetElevation != Camera.targetElevation ||
 		OldCam.actualElevation != Camera.actualElevation ||
 		OldCam.actualAngle != Camera.actualAngle ||
-		OldCam.target.x != Camera.target.x ||
-		OldCam.target.y != Camera.target.y ||
-		OldCam.target.z != Camera.target.z ||
+		OldCam.target != Camera.target.ToVector3i() ||
 		Camera.oldType != Camera.type ||
 		BinocularOn)
 	{
-		OldCam.pos.Position.x = pos.x;
-		OldCam.pos.Position.y = pos.y;
-		OldCam.pos.Position.z = pos.z;
+		OldCam.pos.Position = pos;
 		OldCam.targetDistance = Camera.targetDistance;
 		OldCam.targetElevation = Camera.targetElevation;
 		OldCam.actualElevation = Camera.actualElevation;
 		OldCam.actualAngle = Camera.actualAngle;
-		OldCam.target.x = Camera.target.x;
-		OldCam.target.y = Camera.target.y;
-		OldCam.target.z = Camera.target.z;
-		LastIdeal.x = pos.x;
-		LastIdeal.y = pos.y;
-		LastIdeal.z = pos.z;
+		OldCam.target = Camera.target.ToVector3i();
+		LastIdeal = pos;
 		LastIdeal.RoomNumber = ideal->RoomNumber;
-		LastTarget.x = pos2.x;
-		LastTarget.y = pos2.y;
-		LastTarget.z = pos2.z;
+		LastTarget = pos2;
 	}
 	else
 	{
-		pos.x = LastIdeal.x;
-		pos.y = LastIdeal.y;
-		pos.z = LastIdeal.z;
+		pos  = LastIdeal.ToVector3i();
+		pos2 = LastTarget.ToVector3i();
 		ideal->RoomNumber = LastIdeal.RoomNumber;
-		pos2.x = LastTarget.x;
-		pos2.y = LastTarget.y;
-		pos2.z = LastTarget.z;
 	}
 
-	Camera.pos.x += (ideal->x - Camera.pos.x) / speed;
-	Camera.pos.y += (ideal->y - Camera.pos.y) / speed;
-	Camera.pos.z += (ideal->z - Camera.pos.z) / speed;
-
+	Camera.pos += (ideal->ToVector3i() - Camera.pos.ToVector3i()) / speed;
 	Camera.pos.RoomNumber = GetCollision(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.RoomNumber).RoomNumber;
 	LookAt(&Camera, 0);
 
-	int anglex = Camera.target.x - Camera.pos.x;
-	int angley = Camera.target.y - Camera.pos.y;
-	int anglez = Camera.target.z - Camera.pos.z;
-
-	auto position = Vector3i(Camera.target.x - Camera.pos.x, Camera.target.y - Camera.pos.y, Camera.target.z - Camera.pos.z);
+	auto angle = Camera.target.ToVector3i() - Camera.pos.ToVector3i();
+	auto position = Vector3i(Camera.target.ToVector3i() - Camera.pos.ToVector3i());
 
 	// write last frame camera angle to LastAngle to compare if next frame camera angle has a bigger step than 100.
 	// To make camera movement smoother a speed of 2 is used.
@@ -434,7 +412,9 @@ void MoveObjCamera(GameVector* ideal, ItemInfo* camSlotId, int camMeshId, ItemIn
 
 	if (ItemCamera.LastAngle != position)
 	{
-		ItemCamera.LastAngle = Vector3i(ItemCamera.LastAngle.x = anglex, ItemCamera.LastAngle.y = angley, ItemCamera.LastAngle.z = anglez);
+		ItemCamera.LastAngle = Vector3i(ItemCamera.LastAngle.x = angle.x, 
+										ItemCamera.LastAngle.y = angle.y, 
+										ItemCamera.LastAngle.z = angle.z);
 	}
 }
 
