@@ -101,11 +101,11 @@ int LaraObject::GetAir() const
 	return lara->Air;
 }
 
-/// Lara will undraw her weapons if they are drawn, throw away flare if she helds one in her hand.
-// @function LaraObject:UndrawWeapons
+/// Lara will undraw her weapon if it is drawn and throw away flare if she holds one in her hand.
+// @function LaraObject:UndrawWeapon
 // @usage
-// Lara:UndrawWeapons()
-void LaraObject::UndrawWeapons()
+// Lara:UndrawWeapon()
+void LaraObject::UndrawWeapon()
 {
 	auto* lara = GetLaraInfo(m_item);
 
@@ -197,7 +197,7 @@ void LaraObject::Register(sol::table& parent)
 			ScriptReserved_GetPoison, &LaraObject::GetPoison,
 			ScriptReserved_SetAir, &LaraObject::SetAir,
 			ScriptReserved_GetAir, &LaraObject::GetAir,
-			ScriptReserved_UndrawWeapons, &LaraObject::UndrawWeapons,
+			ScriptReserved_UndrawWeapon, &LaraObject::UndrawWeapon,
 			ScriptReserved_ThrowAwayTorch, &LaraObject::ThrowAwayTorch,
 			ScriptReserved_GetHandStatus, &LaraObject::GetHandStatus,
 			ScriptReserved_GetWeaponType, &LaraObject::GetWeaponType,

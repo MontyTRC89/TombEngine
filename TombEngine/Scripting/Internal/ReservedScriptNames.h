@@ -191,7 +191,7 @@ static constexpr char ScriptReserved_FlipMap[]						= "FlipMap";
 static constexpr char ScriptReserved_PlayFlyBy[]					= "PlayFlyBy";
 
 static constexpr char ScriptReserved_ResetObjCamera[]				= "ResetObjCamera";
-static constexpr char ScriptReserved_UndrawWeapons[]				= "UndrawWeapons";
+static constexpr char ScriptReserved_UndrawWeapon[]					= "UndrawWeapon";
 static constexpr char ScriptReserved_GetHandStatus[]				= "GetHandStatus";
 static constexpr char ScriptReserved_GetWeaponType[]				= "GetWeaponType";
 static constexpr char ScriptReserved_ThrowAwayTorch[]				= "ThrowAwayTorch";

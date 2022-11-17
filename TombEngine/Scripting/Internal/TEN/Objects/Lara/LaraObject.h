@@ -40,11 +40,11 @@ public:
 	int GetPoison() const;
 	void SetAir(sol::optional<int> air);
 	int GetAir() const;
-	void UndrawWeapons();
-	void ThrowAwayTorch();
 	HandStatus GetHandStatus() const;
 	LaraWeaponType GetWeaponType() const;
 	void SetWeaponType(LaraWeaponType weaponType, bool activate);
+	void UndrawWeapon();
+	void ThrowAwayTorch();
 	static void Register(sol::table & parent);
 	using Moveable::Moveable;
 };
