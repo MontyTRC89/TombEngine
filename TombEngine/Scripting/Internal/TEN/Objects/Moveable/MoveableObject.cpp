@@ -1008,7 +1008,10 @@ bool Moveable::MeshExists(int index) const
 //Attach camera and camera target to a mesh of an object.
 void Moveable::AttachObjCamera(short camMeshId, Moveable& mov, short targetMeshId)
 {
-	ObjCamera(m_item, camMeshId, mov.m_item, targetMeshId, true);
+	if ((m_item->Active || m_item->IsLara()) && (mov.m_item->Active || mov.m_item->IsLara()))
+	{
+		ObjCamera(m_item, camMeshId, mov.m_item, targetMeshId, true);
+	}
 }
 
 //Borrow an animtaion and state id from an object.
