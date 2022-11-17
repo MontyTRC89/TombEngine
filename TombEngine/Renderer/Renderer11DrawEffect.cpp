@@ -803,21 +803,24 @@ namespace TEN::Renderer
 
 	Texture2D Renderer11::CreateDefaultNormalTexture() 
 	{
-		vector<byte> data = { 128, 128, 255, 1 };
+		auto data = vector<byte>{ 128, 128, 255, 1 };
 		return Texture2D(m_device.Get(), 1, 1, data.data());
 	}
 
-	void Renderer11::DrawFootprints(RenderView& view) 
+	void Renderer11::DrawFootprints(RenderView& view)
 	{
-		for (auto i = footprints.begin(); i != footprints.end(); i++) 
+		for (auto i = Footprints.begin(); i != Footprints.end(); i++) 
 		{
-			FOOTPRINT_STRUCT& footprint = *i;
-			auto spriteIndex = Objects[ID_MISC_SPRITES].meshIndex + 1 + (int)footprint.RightFoot;
+			auto& footprint = *i;
+			int spriteIndex = Objects[ID_MISC_SPRITES].meshIndex + 1 + (int)footprint.IsRightFoot;
 
-			if (footprint.Active && g_Level.Sprites.size() > spriteIndex)
-				AddSprite3D(&m_sprites[spriteIndex],
-					footprint.Position[0], footprint.Position[1], footprint.Position[2], footprint.Position[3], 
-					Vector4(footprint.Opacity), 0, 1, { 1, 1 }, BLENDMODE_SUBTRACTIVE, false, view);
+			if (footprint.IsActive && g_Level.Sprites.size() > spriteIndex)
+			{
+				AddSprite3D(
+					&m_sprites[spriteIndex],
+					footprint.VertexPoints[0], footprint.VertexPoints[1], footprint.VertexPoints[2], footprint.VertexPoints[3],
+					Vector4(footprint.Opacity), 0.0f, 1.0f, Vector2::One, BLENDMODE_SUBTRACTIVE, false, view);
+			}
 		}
 	}
 

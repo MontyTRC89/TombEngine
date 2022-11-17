@@ -1,28 +1,33 @@
 #pragma once
 #include <deque>
+
 #include "Math/Math.h"
 
 struct ItemInfo;
 
 namespace TEN::Effects::Footprints
 {
-	constexpr size_t MAX_FOOTPRINTS = 20;
-	constexpr auto FOOTPRINT_SIZE = 64.0f;
-	constexpr int FOOT_HEIGHT_OFFSET = 64;
-
-	struct FOOTPRINT_STRUCT 
+	struct Footprint 
 	{
-		Vector3 Position[4];
-		bool RightFoot;
-		int Life;
-		int LifeStartFading;
-		float StartOpacity;
-		float Opacity;
-		bool Active;
-	};
-	extern std::deque<FOOTPRINT_STRUCT> footprints;
+		bool IsActive	 = false;
+		bool IsRightFoot = false;
 
-	bool CheckFootOnFloor(const ItemInfo& item, int mesh, Vector3& outFootprintPosition);
-	void AddFootprint(ItemInfo* item, bool rightFoot);
+		std::array<Vector3, 4> VertexPoints = {};
+
+		float Life			  = 0.0f;
+		float LifeStartFading = 0.0f;
+		float Opacity		  = 0.0f;
+		float StartOpacity	  = 0.0f;
+	};
+
+	extern std::deque<Footprint> Footprints;
+
+	void AddFootprint(ItemInfo* item, bool isRightFoot);
+	bool TestFootOnFloor(ItemInfo& item, int mesh, Vector3& outFootprintPosition);
+	//bool TestFootprintMaterial(FLOOR_MATERIAL refMaterial, const std::vector<FLOOR_MATERIAL>& materialList);
+
+	//SOUND_EFFECTS		   GetFootprintSoundEffect(FLOOR_MATERIAL material);
+	//std::array<Vector3, 4> GetFootprintVertexPoints(const ItemInfo& item, const Vector3& pos, const Vector3& normal);
+
 	void UpdateFootprints();
 }

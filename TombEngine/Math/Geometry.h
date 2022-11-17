@@ -20,8 +20,8 @@ namespace TEN::Math::Geometry
 	Vector3 GetCeilingNormal(const Vector2& tilt);
 
 	short GetShortestAngle(short fromAngle, short toAngle);
-	short GetSurfaceSteepnessAngle(Vector2 tilt);
-	short GetSurfaceAspectAngle(Vector2 tilt);
+	short GetSurfaceSlopeAngle(const Vector3& normal);
+	short GetSurfaceAspectAngle(const Vector3& normal);
 
 	float		GetDistanceToLine(const Vector3& origin, const Vector3& linePoint0, const Vector3& linePoint1);
 	Vector3		GetClosestPointOnLine(const Vector3& origin, const Vector3& linePoint0, const Vector3& linePoint1);

@@ -41,7 +41,9 @@
 // TEMP
 #include <ois/OISKeyboard.h>
 #include "Game/effects/Blood.h"
+#include <Game/effects/footprint.h>
 using namespace TEN::Effects::Blood;
+using namespace TEN::Effects::Footprints;
 //
 
 using namespace TEN::Control::Volumes;
@@ -423,6 +425,13 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 
 	// --------------------DEBUG
 
+	// Spawn footprint.
+	static bool dbFP = true;
+	if (KeyMap[OIS::KC_F] && dbFP)
+		AddFootprint(item, true);
+	dbFP= KeyMap[OIS::KC_F] ? false : true;
+
+	// Spawn blood from head.
 	static bool dbBlood = true;
 	if (KeyMap[OIS::KC_B] && dbBlood)
 	{

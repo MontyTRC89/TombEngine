@@ -322,7 +322,7 @@ short GetLaraSlideDirection(ItemInfo* item, CollisionInfo* coll)
 	// Get either:
 	// a) the surface aspect angle (extended slides), or
 	// b) the derived nearest cardinal direction from it (original slides).
-	headingAngle = Geometry::GetSurfaceAspectAngle(probe.FloorTilt);
+	headingAngle = Geometry::GetSurfaceAspectAngle(Geometry::GetFloorNormal(probe.FloorTilt));
 	if (g_GameFlow->HasSlideExtended())
 		return headingAngle;
 	else
@@ -529,14 +529,14 @@ void ModulateLaraSlideVelocity(ItemInfo* item, CollisionInfo* coll)
 	{
 		auto probe = GetCollision(item);
 		short minSlideAngle = ANGLE(33.75f);
-		short steepness = Geometry::GetSurfaceSteepnessAngle(probe.FloorTilt);
-		short direction = Geometry::GetSurfaceAspectAngle(probe.FloorTilt);
+		//short steepness = Geometry::GetSurfaceSlopeAngle(probe.FloorTilt);
+		//short direction = Geometry::GetSurfaceAspectAngle(probe.FloorTilt);
 
 		float velocityMultiplier = 1 / (float)ANGLE(33.75f);
-		int slideVelocity = std::min<int>(minVelocity + 10 * (steepness * velocityMultiplier), LARA_TERMINAL_VELOCITY);
+		//int slideVelocity = std::min<int>(minVelocity + 10 * (steepness * velocityMultiplier), LARA_TERMINAL_VELOCITY);
 		//short deltaAngle = abs((short)(direction - item->Pose.Orientation.y));
 
-		g_Renderer.PrintDebugMessage("%d", slideVelocity);
+		//g_Renderer.PrintDebugMessage("%d", slideVelocity);
 
 		//lara->ExtraVelocity.x += slideVelocity;
 		//lara->ExtraVelocity.y += slideVelocity * phd_sin(steepness);
@@ -547,10 +547,10 @@ void ModulateLaraSlideVelocity(ItemInfo* item, CollisionInfo* coll)
 
 void AlignLaraToSurface(ItemInfo* item, float alpha)
 {
-	// Calculate surface angles.
-	auto floorTilt = GetCollision(item).FloorTilt;
-	short aspectAngle = Geometry::GetSurfaceAspectAngle(floorTilt);
-	short steepnessAngle = std::min(Geometry::GetSurfaceSteepnessAngle(floorTilt), ANGLE(70.0f));
+	// Determine surface angles.
+	auto floorNormal = Geometry::GetFloorNormal(GetCollision(item).FloorTilt);
+	short aspectAngle = Geometry::GetSurfaceAspectAngle(floorNormal);
+	short slopeAngle = std::min(Geometry::GetSurfaceSlopeAngle(floorNormal), ANGLE(70.0f));
 
 	short deltaAngle = Geometry::GetShortestAngle(item->Pose.Orientation.y, aspectAngle);
 	float sinDeltaAngle = phd_sin(deltaAngle);
@@ -558,9 +558,9 @@ void AlignLaraToSurface(ItemInfo* item, float alpha)
 
 	// Calculate extra rotation required.
 	auto extraRot = EulerAngles(
-		-steepnessAngle * cosDeltaAngle,
+		-slopeAngle * cosDeltaAngle,
 		0,
-		steepnessAngle * sinDeltaAngle
+		slopeAngle * sinDeltaAngle
 	) - EulerAngles(item->Pose.Orientation.x, 0, item->Pose.Orientation.z);
 
 	// Apply extra rotation according to alpha.

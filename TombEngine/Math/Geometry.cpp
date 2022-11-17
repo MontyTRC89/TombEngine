@@ -88,19 +88,21 @@ namespace TEN::Math::Geometry
 		return short(toAngle - fromAngle);
 	}
 
-	short GetSurfaceSteepnessAngle(Vector2 tilt)
+	short GetSurfaceSlopeAngle(const Vector3& normal)
 	{
-		static const short qtrBlockAngleIncrement = ANGLE(45.0f) / 4;
-
-		return (short)sqrt(SQUARE(tilt.x * qtrBlockAngleIncrement) + SQUARE(tilt.y * qtrBlockAngleIncrement));
-	}
-
-	short GetSurfaceAspectAngle(Vector2 tilt)
-	{
-		if (tilt == Vector2::Zero)
+		if (normal == Vector3::Down) // Up.
 			return 0;
 
-		return FROM_RAD(atan2(-tilt.x, -tilt.y));
+		return FROM_RAD(acos(normal.Dot(Vector3::Down))); // Up.
+	}
+
+	short GetSurfaceAspectAngle(const Vector3& normal)
+	{
+		if (normal == Vector3::Down) // Up.
+			return 0;
+
+		return FROM_RAD(atan2(normal.x, normal.z));
+		//return FROM_RAD(acos(normal.z / sqrt(SQUARE(normal.x) + SQUARE(normal.z))));
 	}
 
 	float GetDistanceToLine(const Vector3& origin, const Vector3& linePoint0, const Vector3& linePoint1)
