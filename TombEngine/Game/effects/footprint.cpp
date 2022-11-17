@@ -14,8 +14,11 @@ using namespace TEN::Math;
 
 namespace TEN::Effects::Footprints
 {
-	constexpr auto FOOTPRINTS_NUM_MAX = 32;
-	constexpr auto FOOTPRINT_SIZE	  = 64.0f;
+	constexpr auto FOOTPRINT_LIFE_MAX		   = 20.0f * FPS;
+	constexpr auto FOOTPRINT_LIFE_START_FADING = FOOTPRINT_LIFE_MAX - (10.0f * FPS);
+	constexpr auto FOOTPRINT_OPACITY_MAX	   = 0.5f;
+
+	constexpr auto FOOTPRINT_SCALE	  = 64.0f;
 	constexpr auto FOOT_HEIGHT_OFFSET = CLICK(1.0f / 4);
 
 	const auto FootprintMaterials = std::vector<FLOOR_MATERIAL>
@@ -109,10 +112,10 @@ namespace TEN::Effects::Footprints
 
 	std::array<Vector3, 4> GetFootprintVertexPoints(const ItemInfo& item, const Vector3& pos, const Vector3& normal)
 	{
-		constexpr auto p0 = Vector3(FOOTPRINT_SIZE, 0, FOOTPRINT_SIZE);
-		constexpr auto p1 = Vector3(-FOOTPRINT_SIZE, 0, FOOTPRINT_SIZE);
-		constexpr auto p2 = Vector3(-FOOTPRINT_SIZE, 0, -FOOTPRINT_SIZE);
-		constexpr auto p3 = Vector3(FOOTPRINT_SIZE, 0, -FOOTPRINT_SIZE);
+		constexpr auto p0 = Vector3(FOOTPRINT_SCALE, 0, FOOTPRINT_SCALE);
+		constexpr auto p1 = Vector3(-FOOTPRINT_SCALE, 0, FOOTPRINT_SCALE);
+		constexpr auto p2 = Vector3(-FOOTPRINT_SCALE, 0, -FOOTPRINT_SCALE);
+		constexpr auto p3 = Vector3(FOOTPRINT_SCALE, 0, -FOOTPRINT_SCALE);
 
 		// Determine surface angles.
 		short aspectAngle = Geometry::GetSurfaceAspectAngle(normal);
@@ -163,8 +166,7 @@ namespace TEN::Effects::Footprints
 			return;
 
 		// Slightly randomize foot position to avoid patterns.
-		footPos.x += Random::GenerateInt(-5, 5);
-		footPos.z += Random::GenerateInt(-5, 5);
+		footPos += Vector3(Random::GenerateFloat(-5.0f, 5.0f), 0.0f, Random::GenerateFloat(-5.0f, 5.0f));
 
 		auto pointColl = GetCollision(footPos.x, footPos.y - CLICK(1), footPos.z, item->RoomNumber);
 		auto* floor = pointColl.BottomBlock;
@@ -174,11 +176,11 @@ namespace TEN::Effects::Footprints
 			return;
 
 		// Get footstep sound for floor material.
-		auto fx = GetFootprintSoundEffect(floor->Material);
+		auto soundEffectID = GetFootprintSoundEffect(floor->Material);
 
 		// HACK: Must be here until reference WAD2 is revised.
-		if (fx != SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS)
-			SoundEffect(fx, &item->Pose);
+		if (soundEffectID != SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS)
+			SoundEffect(soundEffectID, &item->Pose);
 
 		//if (!TestFootprintMaterial(floor->Material, FootprintMaterials))
 		//	return;
@@ -191,7 +193,7 @@ namespace TEN::Effects::Footprints
 		auto c2 = GetCollision(vertexPoints[2].x, footPos.y - CLICK(1), vertexPoints[2].z, item->RoomNumber);
 		auto c3 = GetCollision(vertexPoints[3].x, footPos.y - CLICK(1), vertexPoints[3].z, item->RoomNumber);
 
-		// Don't process footprint placement if all vertex points are outside relative height range.
+		// Don't spawn footprint if all vertex points are outside relative height range.
 		if ((abs(c0.Position.Floor - c1.Position.Floor) > CLICK(1.0f / 2)) ||
 			(abs(c1.Position.Floor - c2.Position.Floor) > CLICK(1.0f / 2)) ||
 			(abs(c2.Position.Floor - c3.Position.Floor) > CLICK(1.0f / 2)) ||
@@ -200,21 +202,7 @@ namespace TEN::Effects::Footprints
 			return;
 		}
 
-		// Construct footprint.
-		auto footprint = Footprint();
-
-		footprint.IsActive = true;
-		footprint.IsRightFoot = isRightFoot;
-		footprint.VertexPoints = vertexPoints;
-		footprint.Life = 20.0f * FPS;
-		footprint.LifeStartFading = 10.0f * FPS;
-		footprint.Opacity = 0.0f;
-		footprint.StartOpacity = 0.5f;
-
-		// Add footprint.
-		if (Footprints.size() >= FOOTPRINTS_NUM_MAX)
-			Footprints.pop_back();
-		Footprints.push_front(footprint);
+		SpawnFootprint(vertexPoints, isRightFoot);
 	}
 
 	bool TestFootOnFloor(ItemInfo& item, int mesh, Vector3& outFootprintPos)
@@ -226,6 +214,24 @@ namespace TEN::Effects::Footprints
 
 		outFootprintPos = Vector3(footPos.x, height - 4, footPos.z);
 		return (abs(footPos.y - height) < CLICK(1.0f / 4));
+	}
+
+	void SpawnFootprint(const std::array<Vector3, 4>& vertexPoints, bool isRightFoot)
+	{
+		auto footprint = Footprint();
+
+		footprint.IsActive = true;
+		footprint.IsRightFoot = isRightFoot;
+		footprint.VertexPoints = vertexPoints;
+		footprint.Life = FOOTPRINT_LIFE_MAX;
+		footprint.LifeStartFading = FOOTPRINT_LIFE_START_FADING;
+		footprint.Opacity = FOOTPRINT_OPACITY_MAX;
+		footprint.OpacityStart = footprint.Opacity;
+
+		if (Footprints.size() >= FOOTPRINTS_NUM_MAX)
+			Footprints.pop_back();
+
+		Footprints.push_front(footprint);
 	}
 
 	void UpdateFootprints()
@@ -247,13 +253,9 @@ namespace TEN::Effects::Footprints
 			}
 
 			// Update opacity.
-			if (footprint.Life > footprint.LifeStartFading) 
+			if (footprint.Life <= footprint.LifeStartFading) 
 			{
-				footprint.Opacity = footprint.StartOpacity;
-			}
-			else 
-			{
-				float opacity = Lerp(0.0f, footprint.StartOpacity, fmax(0, fmin(1, footprint.Life / (float)footprint.LifeStartFading)));
+				float opacity = Lerp(0.0f, footprint.OpacityStart, fmax(0, fmin(1, footprint.Life / (float)footprint.LifeStartFading)));
 				footprint.Opacity = opacity;
 			}
 		}

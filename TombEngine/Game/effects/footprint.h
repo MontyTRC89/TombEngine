@@ -7,6 +7,8 @@ struct ItemInfo;
 
 namespace TEN::Effects::Footprints
 {
+	constexpr auto FOOTPRINTS_NUM_MAX = 32;
+
 	struct Footprint 
 	{
 		bool IsActive	 = false;
@@ -17,7 +19,7 @@ namespace TEN::Effects::Footprints
 		float Life			  = 0.0f;
 		float LifeStartFading = 0.0f;
 		float Opacity		  = 0.0f;
-		float StartOpacity	  = 0.0f;
+		float OpacityStart	  = 0.0f;
 	};
 
 	extern std::deque<Footprint> Footprints;
@@ -29,5 +31,6 @@ namespace TEN::Effects::Footprints
 	//SOUND_EFFECTS		   GetFootprintSoundEffect(FLOOR_MATERIAL material);
 	//std::array<Vector3, 4> GetFootprintVertexPoints(const ItemInfo& item, const Vector3& pos, const Vector3& normal);
 
+	void SpawnFootprint(const std::array<Vector3, 4>& vertexPoints, bool isRightFoot);
 	void UpdateFootprints();
 }

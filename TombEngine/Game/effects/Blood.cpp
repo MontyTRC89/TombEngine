@@ -109,8 +109,9 @@ namespace TEN::Effects::Blood
 		stain.ColorStart = stain.Color;
 		stain.ColorEnd = BLOOD_COLOR_BROWN;
 		stain.Life = BLOOD_STAIN_LIFE_MAX;
+		stain.LifeStartFading = BLOOD_STAIN_LIFE_START_FADING;
 		stain.Scale = 0.0f;
-		stain.ScaleMax = scaleMax * Random::GenerateFloat(0.5f, 2.0f);
+		stain.ScaleMax = scaleMax * Random::GenerateFloat(0.2f, 2.0f);
 		stain.ScaleRate = scaleRate;
 		stain.Opacity = BLOOD_STAIN_OPACITY_START;
 		stain.OpacityStart = stain.Opacity;
@@ -219,7 +220,7 @@ namespace TEN::Effects::Blood
 			}
 
 			// Update opacity.
-			if (stain.Life <= BLOOD_STAIN_LIFE_START_FADING)
+			if (stain.Life <= stain.LifeStartFading)
 				stain.Opacity = Lerp(0.0f, stain.OpacityStart, fmax(0, fmin(1.0f, stain.Life / BLOOD_STAIN_LIFE_START_FADING)));
 		}
 	}
