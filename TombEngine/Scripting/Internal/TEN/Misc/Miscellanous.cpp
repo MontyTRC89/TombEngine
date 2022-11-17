@@ -164,7 +164,7 @@ namespace Misc
 
 	static bool CheckInput(int actionIndex)
 	{
-		if (actionIndex > KeyMap.size())
+		if (actionIndex > ActionMap.size())
 		{
 			ScriptAssertF(false, "Key index {} does not exist", actionIndex);
 			return false;
