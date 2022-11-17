@@ -62,7 +62,7 @@ void LaraObject::SetPoison(sol::optional<int> potency)
 	auto* lara = GetLaraInfo(m_item);
 
 	if (potency.has_value())
-		lara->PoisonPotency = potency.value();
+		lara->PoisonPotency = std::clamp(potency.value(), 0, (int)LARA_POISON_POTENCY_MAX);
 	else
 		lara->PoisonPotency = 0;
 }
@@ -89,7 +89,7 @@ void LaraObject::SetAir(sol::optional<int> air)
 	auto* lara = GetLaraInfo(m_item);
 
 	if (air.has_value())
-		lara->Air = air.value();
+		lara->Air = std::clamp(air.value(), 0, (int)LARA_AIR_MAX);
 	else
 		lara->Air = LARA_AIR_MAX;
 }
@@ -116,7 +116,7 @@ void LaraObject::SetSprintEnergy(sol::optional<int> value)
 	auto* lara = GetLaraInfo(m_item);
 
 	if (value.has_value())
-		lara->SprintEnergy = value.value();
+		lara->SprintEnergy = std::clamp(value.value(), 0, (int)LARA_SPRINT_ENERGY_MAX);
 	else
 		lara->SprintEnergy = LARA_SPRINT_ENERGY_MAX;
 }
