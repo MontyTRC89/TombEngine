@@ -44,7 +44,7 @@ namespace TEN::Effects::Footprints
 
 		// Don't process actual footprint placement if foot isn't on floor.
 		auto footPos = Vector3::Zero;
-		if (!TestFootOnFloor(*item, footJoint, footPos))
+		if (!TestFootHeight(*item, footJoint, footPos))
 			return;
 
 		// Slightly randomize foot position to avoid patterns.
@@ -64,25 +64,15 @@ namespace TEN::Effects::Footprints
 		if (soundEffectID != SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS)
 			SoundEffect(soundEffectID, &item->Pose);
 
+		// Check floor material.
 		if (!TestMaterial(floor->Material, FootprintMaterials))
 			return;
 
 		auto vertexPoints = GetFootprintVertexPoints(*item, footPos, Geometry::GetFloorNormal(pointColl.FloorTilt));
 
-		// Get point collision for every vertex point.
-		auto c0 = GetCollision(vertexPoints[0].x, footPos.y - CLICK(1), vertexPoints[0].z, item->RoomNumber);
-		auto c1 = GetCollision(vertexPoints[1].x, footPos.y - CLICK(1), vertexPoints[1].z, item->RoomNumber);
-		auto c2 = GetCollision(vertexPoints[2].x, footPos.y - CLICK(1), vertexPoints[2].z, item->RoomNumber);
-		auto c3 = GetCollision(vertexPoints[3].x, footPos.y - CLICK(1), vertexPoints[3].z, item->RoomNumber);
-
-		// Don't spawn footprint if all vertex points are outside relative height range.
-		if ((abs(c0.Position.Floor - c1.Position.Floor) > CLICK(1.0f / 2)) ||
-			(abs(c1.Position.Floor - c2.Position.Floor) > CLICK(1.0f / 2)) ||
-			(abs(c2.Position.Floor - c3.Position.Floor) > CLICK(1.0f / 2)) ||
-			(abs(c3.Position.Floor - c0.Position.Floor) > CLICK(1.0f / 2)))
-		{
+		// Check floor continuity.
+		if (!TestFootprintFloor(*item, footPos, vertexPoints))
 			return;
-		}
 
 		SpawnFootprint(vertexPoints, isRightFoot);
 	}
@@ -164,10 +154,10 @@ namespace TEN::Effects::Footprints
 
 	std::array<Vector3, 4> GetFootprintVertexPoints(const ItemInfo& item, const Vector3& pos, const Vector3& normal)
 	{
-		constexpr auto p0 = Vector3(FOOTPRINT_SCALE, 0, FOOTPRINT_SCALE);
-		constexpr auto p1 = Vector3(-FOOTPRINT_SCALE, 0, FOOTPRINT_SCALE);
-		constexpr auto p2 = Vector3(-FOOTPRINT_SCALE, 0, -FOOTPRINT_SCALE);
-		constexpr auto p3 = Vector3(FOOTPRINT_SCALE, 0, -FOOTPRINT_SCALE);
+		constexpr auto point0 = Vector3(FOOTPRINT_SCALE, 0, FOOTPRINT_SCALE);
+		constexpr auto point1 = Vector3(-FOOTPRINT_SCALE, 0, FOOTPRINT_SCALE);
+		constexpr auto point2 = Vector3(-FOOTPRINT_SCALE, 0, -FOOTPRINT_SCALE);
+		constexpr auto point3 = Vector3(FOOTPRINT_SCALE, 0, -FOOTPRINT_SCALE);
 
 		// Determine surface angles.
 		short aspectAngle = Geometry::GetSurfaceAspectAngle(normal);
@@ -187,10 +177,10 @@ namespace TEN::Effects::Footprints
 
 		return std::array<Vector3, 4>
 		{
-			pos + Vector3::Transform(p0, rotMatrix),
-				pos + Vector3::Transform(p1, rotMatrix),
-				pos + Vector3::Transform(p2, rotMatrix),
-				pos + Vector3::Transform(p3, rotMatrix)
+			pos + Vector3::Transform(point0, rotMatrix),
+			pos + Vector3::Transform(point1, rotMatrix),
+			pos + Vector3::Transform(point2, rotMatrix),
+			pos + Vector3::Transform(point3, rotMatrix)
 		};
 	}
 
@@ -205,15 +195,38 @@ namespace TEN::Effects::Footprints
 		return false;
 	}
 
-	bool TestFootOnFloor(ItemInfo& item, int mesh, Vector3& outFootprintPos)
+	bool TestFootHeight(ItemInfo& item, int mesh, Vector3& outFootprintPos)
 	{
+		static constexpr auto heightRange = CLICK(1.0f / 4);
 		static const auto footOffset = Vector3i(0, FOOT_HEIGHT_OFFSET, 0);
 
 		auto footPos = GetJointPosition(LaraItem, mesh, footOffset);
-		int height = GetCollision(footPos.x, footPos.y - CLICK(1), footPos.z, item.RoomNumber).Position.Floor;
+		int floorHeight = GetCollision(footPos.x, footPos.y - CLICK(1), footPos.z, item.RoomNumber).Position.Floor;
 
-		outFootprintPos = Vector3(footPos.x, height - 4, footPos.z);
-		return (abs(footPos.y - height) < CLICK(1.0f / 4));
+		outFootprintPos = Vector3(footPos.x, floorHeight - 4, footPos.z);
+		return (abs(footPos.y - floorHeight) < heightRange);
+	}
+
+	bool TestFootprintFloor(const ItemInfo& item, const Vector3& pos, const std::array<Vector3, 4>& vertexPoints)
+	{
+		static constexpr auto heightRange = CLICK(1.0f / 2);
+
+		// Get point collision for every vertex point.
+		auto pointColl0 = GetCollision(vertexPoints[0].x, pos.y - CLICK(1), vertexPoints[0].z, item.RoomNumber);
+		auto pointColl1 = GetCollision(vertexPoints[1].x, pos.y - CLICK(1), vertexPoints[1].z, item.RoomNumber);
+		auto pointColl2 = GetCollision(vertexPoints[2].x, pos.y - CLICK(1), vertexPoints[2].z, item.RoomNumber);
+		auto pointColl3 = GetCollision(vertexPoints[3].x, pos.y - CLICK(1), vertexPoints[3].z, item.RoomNumber);
+
+		// Don't spawn footprint if all vertex points are outside relative height range.
+		if ((abs(pointColl0.Position.Floor - pointColl1.Position.Floor) > heightRange) ||
+			(abs(pointColl1.Position.Floor - pointColl2.Position.Floor) > heightRange) ||
+			(abs(pointColl2.Position.Floor - pointColl3.Position.Floor) > heightRange) ||
+			(abs(pointColl3.Position.Floor - pointColl0.Position.Floor) > heightRange))
+		{
+			return false;
+		}
+
+		return true;
 	}
 
 	void SpawnFootprint(const std::array<Vector3, 4>& vertexPoints, bool isRightFoot)

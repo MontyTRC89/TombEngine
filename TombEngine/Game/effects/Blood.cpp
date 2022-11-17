@@ -167,7 +167,7 @@ namespace TEN::Effects::Blood
 			{
 				drip.IsActive = false;
 
-				auto stainPos = Vector3(drip.Position.x, pointColl.Position.Floor - 1, drip.Position.z);
+				auto stainPos = Vector3(drip.Position.x, pointColl.Position.Floor - 4, drip.Position.z);
 				auto stainNormal = Geometry::GetFloorNormal(pointColl.FloorTilt);
 
 				SpawnBloodStain(stainPos, drip.RoomNumber, stainNormal, drip.Scale, drip.Velocity.Length());
@@ -177,7 +177,7 @@ namespace TEN::Effects::Blood
 			{
 				drip.IsActive = false;
 
-				auto stainPos = Vector3(drip.Position.x, pointColl.Position.Ceiling + 1, drip.Position.z);
+				auto stainPos = Vector3(drip.Position.x, pointColl.Position.Ceiling + 4, drip.Position.z);
 				auto stainNormal = Geometry::GetCeilingNormal(pointColl.CeilingTilt);
 
 				SpawnBloodStain(stainPos, drip.RoomNumber, stainNormal, drip.Scale, drip.Velocity.Length());
