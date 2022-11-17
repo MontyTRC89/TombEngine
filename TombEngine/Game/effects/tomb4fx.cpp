@@ -794,7 +794,7 @@ int GetFreeBlood()
 	return bloodNum;
 }
 
-void TriggerBlood(int x, int y, int z, int unk, int num)
+void TriggerBlood(int x, int y, int z, int direction, int num)
 {
 	for (int i = 0; i < num; i++)
 	{
@@ -808,7 +808,7 @@ void TriggerBlood(int x, int y, int z, int unk, int num)
 		blood->x = (GetRandomControl() & 0x1F) + x - 16;
 		blood->y = (GetRandomControl() & 0x1F) + y - 16;
 		blood->z = (GetRandomControl() & 0x1F) + z - 16;
-		int a = (unk == -1 ? GetRandomControl() : (GetRandomControl() & 0x1F) + unk - 16) & 0xFFF;
+		int a = (direction == -1 ? GetRandomControl() : (GetRandomControl() & 0x1F) + direction - 16) & 0xFFF;
 		int b = GetRandomControl() & 0xF;
 		blood->zVel = b * phd_cos(a << 4) * 32;
 		blood->xVel = -b * phd_sin(a << 4) * 32;

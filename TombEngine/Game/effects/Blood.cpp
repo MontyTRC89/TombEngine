@@ -8,22 +8,26 @@
 
 #include "lara.h"
 
+#include "Game/effects/effects.h"
+#include "Game/effects/tomb4fx.h"
+
 using namespace TEN::Math;
 using namespace TEN::Renderer;
 
 namespace TEN::Effects::Blood
 {
 	constexpr auto BLOOD_DRIP_LIFE_MAX			 = 1.0f * FPS;
-	constexpr auto BLOOD_STAIN_LIFE_MAX			 = (5.0f * 60.0f) * FPS;
+	constexpr auto BLOOD_STAIN_LIFE_MAX			 = (2.0f * 60.0f) * FPS;
 	constexpr auto BLOOD_STAIN_LIFE_START_FADING = BLOOD_STAIN_LIFE_MAX - (10.0f * FPS);
 
-	constexpr auto BLOOD_DRIP_GRAVITY		 = 7.0f;
-	constexpr auto BLOOD_STAIN_OPACITY_START = 0.95f;
+	constexpr auto BLOOD_DRIP_GRAVITY_MIN	  = 5.0f;
+	constexpr auto BLOOD_DRIP_GRAVITY_MAX	  = 12.0f;
+	constexpr auto BLOOD_DRIP_SPRAY_SEMIANGLE = 60.0f;
+	constexpr auto BLOOD_STAIN_OPACITY_START  = 0.95f;
 
 	constexpr auto BLOOD_COLOR_RED	 = Vector4(0.8f, 0.0f, 0.0f, 1.0f);
 	constexpr auto BLOOD_COLOR_BROWN = Vector4(0.4f, 0.2f, 0.0f, 1.0f);
 
-	constexpr auto BLOOD_DRIP_SPRAY_CONE_SEMIANGLE = 60.0f;
 
 	std::array<BloodDrip, BLOOD_DRIP_NUM_MAX> BloodDrips  = {};
 	std::deque<BloodStain>					  BloodStains = {};
@@ -39,17 +43,17 @@ namespace TEN::Effects::Blood
 		return BloodDrips[0];
 	}
 
-	void SpawnBloodMist(const Vector3i& pos, int roomNumber)
+	void SpawnBloodMist(const Vector3& pos, const Vector3& direction, int roomNumber, unsigned int count)
 	{
-
+		TriggerBlood(pos.x, pos.y, pos.z, direction.y, count);
 	}
 
-	void SpawnBloodMistCloud(const Vector3i& pos, int roomNumber)
+	void SpawnBloodMistCloud(const Vector3& pos, int roomNumber, const Vector3& direction, float velocity, unsigned int count)
 	{
-
+		DoLotsOfBlood(pos.x, pos.y, pos.z, velocity, direction.y, roomNumber, count);
 	}
 
-	void SpawnBloodMistCloudUnderwater(const Vector3i& pos, int roomNumber)
+	void SpawnBloodMistCloudUnderwater(const Vector3& pos, int roomNumber)
 	{
 
 	}
@@ -65,15 +69,18 @@ namespace TEN::Effects::Blood
 		drip.Color = BLOOD_COLOR_RED;
 		drip.Life = BLOOD_DRIP_LIFE_MAX;
 		drip.Scale = scale;
-		drip.Gravity = BLOOD_DRIP_GRAVITY;
+		drip.Gravity = Random::GenerateFloat(BLOOD_DRIP_GRAVITY_MIN, BLOOD_DRIP_GRAVITY_MAX);
 	}
 
-	void SpawnBloodDripSpray(const Vector3& pos, int roomNumber, const Vector3& direction, unsigned int numDrips)
+	void SpawnBloodDripSpray(const Vector3& pos, int roomNumber, const Vector3& direction, const Vector3& baseVelocity, unsigned int maxCount)
 	{
+		SpawnBloodMistCloud(pos, roomNumber, baseVelocity + direction, Random::GenerateFloat(10.0f, 70.0f), maxCount * 3);
+
+		unsigned int numDrips = Random::GenerateInt(0, maxCount);
 		for (int i = 0; i < numDrips; i++)
 		{
-			float length = Random::GenerateFloat(20.0f, 70.0f);
-			auto velocity = Random::GenerateVector3InCone(direction, BLOOD_DRIP_SPRAY_CONE_SEMIANGLE, length);
+			float length = Random::GenerateFloat(10.0f, 70.0f);
+			auto velocity = baseVelocity + Random::GenerateVector3InCone(direction, BLOOD_DRIP_SPRAY_SEMIANGLE, length);
 			float scale = Random::GenerateFloat(10.0f, 20.0f);
 
 			SpawnBloodDrip(pos, roomNumber, velocity, scale);
@@ -215,7 +222,7 @@ namespace TEN::Effects::Blood
 				continue;
 
 			numActiveDrips++;
-			g_Renderer.AddDebugSphere(drip.Position, drip.Scale / 2, drip.Color, RENDERER_DEBUG_PAGE::NO_PAGE);
+			g_Renderer.AddDebugSphere(drip.Position, drip.Scale, drip.Color, RENDERER_DEBUG_PAGE::NO_PAGE);
 		}
 		
 		for (auto& stain : BloodStains)

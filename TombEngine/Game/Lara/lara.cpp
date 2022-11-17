@@ -427,7 +427,10 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 	if (KeyMap[OIS::KC_B] && dbBlood)
 	{
 		auto pos = item->Pose.Position + Vector3i(0, -coll->Setup.Height, 0);
-		SpawnBloodDripSpray(pos.ToVector3(), item->RoomNumber, item->Pose.Orientation.ToDirection());
+		auto rotMatrix = item->Pose.Orientation.ToRotationMatrix();
+		auto baseVelocity = Vector3::Transform(item->Animation.Velocity, rotMatrix);
+
+		SpawnBloodDripSpray(pos.ToVector3(), item->RoomNumber, item->Pose.Orientation.ToDirection(), baseVelocity);
 	}
 	dbBlood = KeyMap[OIS::KC_B] ? false : true;
 

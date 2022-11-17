@@ -8,7 +8,7 @@ namespace TEN::Effects::Blood
 	constexpr auto BLOOD_DRIP_NUM_MAX  = 128;
 	constexpr auto BLOOD_STAIN_NUM_MAX = 128;
 
-	constexpr auto BLOOD_DRIP_SPRAY_NUM_DEFAULT = 3;
+	constexpr auto BLOOD_DRIP_SPRAY_NUM_DEFAULT = 2;
 
 	struct BloodDrip
 	{
@@ -47,12 +47,12 @@ namespace TEN::Effects::Blood
 	extern std::array<BloodDrip, BLOOD_DRIP_NUM_MAX> BloodDrips;
 	extern std::deque<BloodStain>					 BloodStains;
 
-	void SpawnBloodMist(const Vector3i& pos, int roomNumber);
-	void SpawnBloodMistCloud(const Vector3i& pos, int roomNumber);
-	void SpawnBloodMistCloudUnderwater(const Vector3i& pos, int roomNumber);
+	void SpawnBloodMist(const Vector3& pos, const Vector3& direction, int roomNumber, unsigned int count);
+	void SpawnBloodMistCloud(const Vector3& pos, int roomNumber, const Vector3& direction, float velocity, unsigned int maxCount);
+	void SpawnBloodMistCloudUnderwater(const Vector3& pos, int roomNumber);
 
 	void SpawnBloodDrip(const Vector3& pos, int roomNumber, const Vector3& velocity, float scale);
-	void SpawnBloodDripSpray(const Vector3& pos, int roomNumber, const Vector3& direction, unsigned int numDrips = BLOOD_DRIP_SPRAY_NUM_DEFAULT);
+	void SpawnBloodDripSpray(const Vector3& pos, int roomNumber, const Vector3& direction, const Vector3& baseVelocity, unsigned int count = BLOOD_DRIP_SPRAY_NUM_DEFAULT);
 
 	void SpawnBloodStain(const Vector3& pos, int roomNumber, const Vector3& normal, float scaleMax, float scaleRate);
 
