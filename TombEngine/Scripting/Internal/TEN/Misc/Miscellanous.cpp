@@ -14,6 +14,7 @@
 #include "Specific/configuration.h"
 #include "Specific/Input/Input.h"
 #include "Vec3/Vec3.h"
+#include "ScriptAssert.h"
 
 /***
 Functions that don't fit in the other modules.
@@ -161,23 +162,46 @@ namespace Misc
 		SoundEffect(id, p.has_value() ? &Pose(p.value().x, p.value().y, p.value().z) : nullptr, SoundEnvironment::Always);
 	}
 
+	static bool CheckInput(int actionIndex)
+	{
+		if (actionIndex > KeyMap.size())
+		{
+			ScriptAssertF(false, "Key index {} does not exist", actionIndex);
+			return false;
+		}
+		else
+			return true;
+	}
+
 	static bool KeyIsHeld(int actionIndex)
 	{
+		if (!CheckInput(actionIndex))
+			return false;
+
 		return (TrInput & (1 << actionIndex)) != 0;
 	}
 
 	static bool KeyIsHit(int actionIndex)
 	{
+		if (!CheckInput(actionIndex))
+			return false;
+
 		return (DbInput & (1 << actionIndex)) != 0;
 	}
 
 	static void KeyPush(int actionIndex)
 	{
+		if (!CheckInput(actionIndex))
+			return;
+
 		TrInput |= (1 << actionIndex);
 	}
 
 	static void KeyClear(int actionIndex)
 	{
+		if (!CheckInput(actionIndex))
+			return;
+
 		TrInput &= ~(1 << actionIndex);
 	}
 
