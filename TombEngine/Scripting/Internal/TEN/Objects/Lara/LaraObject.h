@@ -10,6 +10,11 @@ public:
 	int GetPoison() const;
 	void SetAir(sol::optional<int> air);
 	int GetAir() const;
+	void SetSprintEnergy(sol::optional<int> value);
+	int GetSprintEnergy() const;
+	void SetWet(sol::optional<int> wetness);
+	int GetWet() const;
+	int GetAmmoCount() const;
 	static void Register(sol::table & parent);
 	using Moveable::Moveable;
 };
