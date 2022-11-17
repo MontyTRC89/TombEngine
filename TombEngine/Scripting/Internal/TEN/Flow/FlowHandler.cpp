@@ -108,10 +108,10 @@ __(not yet implemented)__
 
 /*** Total number of secrets in game.
 Must be an integer value (0 means no secrets).
-@function SetNumberOfSecrets
+@function SetTotalSecretCount
 @tparam int total number of secrets
 */
-	table_flow.set_function(ScriptReserved_SetNumberOfSecrets, &FlowHandler::SetNumberOfSecrets, this);
+	table_flow.set_function(ScriptReserved_SetTotalSecretCount, &FlowHandler::SetTotalSecretCount, this);
 
 /*** Set FlyCheatEnabled
 Must be true or false
@@ -220,7 +220,7 @@ void FlowHandler::SetTitleScreenImagePath(std::string const& path)
 	TitleScreenImagePath = path;
 }
 
-void FlowHandler::SetNumberOfSecrets(int secretsNumber)
+void FlowHandler::SetTotalSecretCount(int secretsNumber)
 {
 	NumberOfSecrets = secretsNumber;
 }
