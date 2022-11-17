@@ -47,6 +47,7 @@ public:
 	HandStatus GetHandStatus() const;
 	LaraWeaponType GetWeaponType() const;
 	void SetWeaponType(LaraWeaponType weaponType, bool activate);
+	int GetAmmoCount() const;
 	void UndrawWeapon();
 	void ThrowAwayTorch();
 	static void Register(sol::table & parent);
