@@ -192,10 +192,10 @@ static constexpr char ScriptReserved_PlayFlyBy[]					= "PlayFlyBy";
 
 static constexpr char ScriptReserved_ResetObjCamera[]				= "ResetObjCamera";
 static constexpr char ScriptReserved_UndrawWeapons[]				= "UndrawWeapons";
-static constexpr char ScriptReserved_GetLaraHandStatus[]			= "GetLaraHandStatus";
-static constexpr char ScriptReserved_GetLaraWeaponType[]			= "GetLaraWeaponType";
+static constexpr char ScriptReserved_GetHandStatus[]				= "GetHandStatus";
+static constexpr char ScriptReserved_GetWeaponType[]				= "GetWeaponType";
 static constexpr char ScriptReserved_ThrowAwayTorch[]				= "ThrowAwayTorch";
-static constexpr char ScriptReserved_SetLaraWeaponType[]			= "SetLaraWeaponType";
+static constexpr char ScriptReserved_SetWeaponType[]				= "SetWeaponType";
 
 // Enums
 static constexpr char ScriptReserved_ObjID[]					= "ObjID";

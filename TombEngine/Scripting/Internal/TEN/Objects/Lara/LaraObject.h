@@ -42,9 +42,9 @@ public:
 	int GetAir() const;
 	void UndrawWeapons();
 	void ThrowAwayTorch();
-	HandStatus GetLaraHandStatus() const;
-	LaraWeaponType GetLaraWeaponType() const;
-	void SetLaraWeaponType(LaraWeaponType weaponType, bool activate);
+	HandStatus GetHandStatus() const;
+	LaraWeaponType GetWeaponType() const;
+	void SetWeaponType(LaraWeaponType weaponType, bool activate);
 	static void Register(sol::table & parent);
 	using Moveable::Moveable;
 };

@@ -6,6 +6,7 @@
 #include "Game/effects/explosion.h"
 #include "Game/effects/tomb4fx.h"
 #include "Game/effects/weather.h"
+#include "Game/Lara/lara.h"
 #include "Game/room.h"
 #include "Game/spotcam.h"
 #include "ReservedScriptNames.h"
@@ -264,15 +265,10 @@ namespace Misc
 	}
 
 	/// Reset object camera back to Lara and deactivate object camera.
-	//  ObjCamera @tparam camSlotId 0 for Lara
-	//  ObjCamera @tparam Mesh 0 for Laras hip mesh
-	//  ObjCamera @tparam camSlotId 0 for Lara
-	//  ObjCamera @tparam bool false to deactivate object camera
+	//@function ResetObjCamera
 	static void ResetObjCamera()
 	{
-		int itemNumber1 = 0;
-		ItemInfo* camSlotId = &g_Level.Items[itemNumber1];
-		ObjCamera(camSlotId, 0, camSlotId, 0, false);
+		ObjCamera(LaraItem, 0, LaraItem, 0, false);
 	}
 
 
