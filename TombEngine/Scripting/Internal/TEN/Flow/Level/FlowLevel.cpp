@@ -118,7 +118,11 @@ e.g. `myLevel.laraType = LaraType.Divesuit`
 
 /// (table of @{Flow.InventoryItem}s) table of inventory object overrides
 //@mem objects
-		"objects", &Level::InventoryObjects
+		"objects", &Level::InventoryObjects,
+
+/// (int) Set Secrets for Level
+//@mem secrets
+		"secrets", &Level::Secrets
 		);
 }
 
