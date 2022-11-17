@@ -139,7 +139,7 @@ void LaraObject::SetWet(sol::optional<int> wetness)
 {
 	auto* lara = GetLaraInfo(m_item);
 
-	unsigned char value = wetness.has_value() ? (unsigned int)wetness.value() : UCHAR_MAX;
+	unsigned char value = wetness.has_value() ? (unsigned char)wetness.value() : UCHAR_MAX;
 	for (unsigned char& i : lara->Wet)
 		i = value;
 }
