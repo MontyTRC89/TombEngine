@@ -241,26 +241,26 @@ namespace TEN::Effects::Footprints
 
 		unsigned int numInvalidFootprints = 0;
 
-		for (auto& footprint: Footprints) 
+		for (auto& footprint: Footprints)
 		{
 			footprint.Life -= 1.0f;
 
 			// Despawn footprint.
-			if (footprint.Life <= 0.0f) 
+			if (footprint.Life <= 0.0f)
 			{
 				numInvalidFootprints++;
 				continue;
 			}
 
 			// Update opacity.
-			if (footprint.Life <= footprint.LifeStartFading) 
+			if (footprint.Life <= footprint.LifeStartFading)
 			{
 				float opacity = Lerp(0.0f, footprint.OpacityStart, fmax(0, fmin(1, footprint.Life / (float)footprint.LifeStartFading)));
 				footprint.Opacity = opacity;
 			}
 		}
 
-		for (int i = 0; i < numInvalidFootprints; i++) 
+		for (int i = 0; i < numInvalidFootprints; i++)
 			Footprints.pop_back();
 	}
 }
