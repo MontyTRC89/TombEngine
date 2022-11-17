@@ -127,6 +127,8 @@ ObjectsHandler::ObjectsHandler(sol::state* lua, sol::table & parent) :
 	);
 
 	m_handler.MakeReadOnlyTable(m_table_objects, ScriptReserved_ObjID, kObjIDs);
+	m_handler.MakeReadOnlyTable(m_table_objects, ScriptReserved_LaraWeaponType, LaraWeaponTypeMap);
+	m_handler.MakeReadOnlyTable(m_table_objects, ScriptReserved_HandStatus, HandStatusMap);
 }
 
 void ObjectsHandler::TestCollidingObjects()

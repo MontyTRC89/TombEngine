@@ -434,7 +434,15 @@ ScriptReserved_GetSlotHP, & Moveable::GetSlotHP,
 
 /// Destroy the moveable. This will mean it can no longer be used, except to re-initialise it with another object.
 // @function Moveable:Destroy
-	ScriptReserved_Destroy, &Moveable::Destroy);
+	ScriptReserved_Destroy, &Moveable::Destroy,
+
+/// Attach camera to an object.
+// @function Moveable:mesh 1 for camera, mesh 2 for target
+	ScriptReserved_AttachObjCamera, & Moveable::AttachObjCamera,
+
+/// Borrow animation from an object
+// @function GAME_OBJECT_ID ObjectID to take animation and stateID from, int animationnumber from object, int stateID from object
+	ScriptReserved_AnimFromObject, & Moveable::AnimFromObject);
 }
 
 
@@ -995,4 +1003,22 @@ bool Moveable::MeshExists(int index) const
 	}
 
 	return true;
+}
+
+//Attach camera and camera target to a mesh of an object.
+void Moveable::AttachObjCamera(short camMeshId, Moveable& mov, short targetMeshId)
+{
+	if ((m_item->Active || m_item->IsLara()) && (mov.m_item->Active || mov.m_item->IsLara()))
+	{
+		ObjCamera(m_item, camMeshId, mov.m_item, targetMeshId, true);
+	}
+}
+
+//Borrow an animtaion and state id from an object.
+void Moveable::AnimFromObject(GAME_OBJECT_ID object, int animNumber, int stateID)
+{
+	m_item->Animation.AnimNumber = Objects[object].animIndex + animNumber;
+	m_item->Animation.ActiveState = stateID;
+	m_item->Animation.FrameNumber = g_Level.Anims[m_item->Animation.AnimNumber].frameBase;
+	AnimateItem(m_item);
 }
