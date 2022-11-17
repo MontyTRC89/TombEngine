@@ -38,7 +38,7 @@ struct Level : public ScriptInterfaceLevel
 	int LevelFarView{ 0 };
 	bool UnlimitedAir{ false };
 	std::vector<InventoryItem> InventoryObjects;
-	int Secrets;
+	short LevelSecrets{ 0 };
 
 	RGBAColor8Byte GetFogColor() const override;
 	bool GetFogEnabled() const override;
@@ -56,4 +56,5 @@ struct Level : public ScriptInterfaceLevel
 	short GetFogMinDistance() const override;
 	short GetFogMaxDistance() const override;
 	short GetFarView() const override;
+	void SetSecrets(short secrets);
 };

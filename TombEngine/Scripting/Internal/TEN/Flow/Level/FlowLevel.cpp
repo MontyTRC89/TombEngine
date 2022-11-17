@@ -122,7 +122,7 @@ e.g. `myLevel.laraType = LaraType.Divesuit`
 
 /// (int) Set Secrets for Level
 //@mem secrets
-		"secrets", &Level::Secrets
+		"secrets", sol::property(&Level::SetSecrets)
 		);
 }
 
@@ -258,5 +258,10 @@ short Level::GetFogMaxDistance() const
 short Level::GetFarView() const
 {
 	return float(LevelFarView);
+}
+
+void Level::SetSecrets(short secrets)
+{
+	LevelSecrets = secrets;
 }
 

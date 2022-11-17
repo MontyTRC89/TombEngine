@@ -476,9 +476,9 @@ namespace TEN::Renderer
 		GetNextLinePosition(&y);
 
 		// Secrets found
-		if (g_GameFlow->NumberOfSecrets > 0)
+		if (g_GameFlow->TotalNumberOfSecrets > 0)
 		{
-			sprintf(buffer, "%d / %d", Statistics.Game.Secrets, g_GameFlow->NumberOfSecrets);
+			sprintf(buffer, "%d / %d", Statistics.Game.Secrets, g_GameFlow->TotalNumberOfSecrets);
 			AddString(MenuRightSideEntry, y, buffer, PRINTSTRING_COLOR_WHITE, SF());
 			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_SECRETS_FOUND), PRINTSTRING_COLOR_WHITE, SF());
 		}
