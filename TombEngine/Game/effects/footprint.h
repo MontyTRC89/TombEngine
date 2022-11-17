@@ -3,6 +3,8 @@
 
 #include "Math/Math.h"
 
+enum SOUND_EFFECTS;
+enum class FLOOR_MATERIAL : unsigned char;
 struct ItemInfo;
 
 namespace TEN::Effects::Footprints
@@ -25,11 +27,12 @@ namespace TEN::Effects::Footprints
 	extern std::deque<Footprint> Footprints;
 
 	void AddFootprint(ItemInfo* item, bool isRightFoot);
-	bool TestFootOnFloor(ItemInfo& item, int mesh, Vector3& outFootprintPosition);
-	//bool TestFootprintMaterial(FLOOR_MATERIAL refMaterial, const std::vector<FLOOR_MATERIAL>& materialList);
 
-	//SOUND_EFFECTS		   GetFootprintSoundEffect(FLOOR_MATERIAL material);
-	//std::array<Vector3, 4> GetFootprintVertexPoints(const ItemInfo& item, const Vector3& pos, const Vector3& normal);
+	SOUND_EFFECTS		   GetFootprintSoundEffect(FLOOR_MATERIAL material);
+	std::array<Vector3, 4> GetFootprintVertexPoints(const ItemInfo& item, const Vector3& pos, const Vector3& normal);
+
+	bool TestMaterial(FLOOR_MATERIAL refMaterial, const std::vector<FLOOR_MATERIAL>& materialList);
+	bool TestFootOnFloor(ItemInfo& item, int mesh, Vector3& outFootprintPosition);
 
 	void SpawnFootprint(const std::array<Vector3, 4>& vertexPoints, bool isRightFoot);
 	void UpdateFootprints();

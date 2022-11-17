@@ -35,6 +35,58 @@ namespace TEN::Effects::Footprints
 
 	std::deque<Footprint> Footprints = std::deque<Footprint>();
 
+	void AddFootprint(ItemInfo* item, bool isRightFoot)
+	{
+		if (!item->IsLara())
+			return;
+
+		auto footJoint = isRightFoot ? LM_RFOOT : LM_LFOOT;
+
+		// Don't process actual footprint placement if foot isn't on floor.
+		auto footPos = Vector3::Zero;
+		if (!TestFootOnFloor(*item, footJoint, footPos))
+			return;
+
+		// Slightly randomize foot position to avoid patterns.
+		footPos += Vector3(Random::GenerateFloat(-5.0f, 5.0f), 0.0f, Random::GenerateFloat(-5.0f, 5.0f));
+
+		auto pointColl = GetCollision(footPos.x, footPos.y - CLICK(1), footPos.z, item->RoomNumber);
+		auto* floor = pointColl.BottomBlock;
+
+		// Don't process material if foot hit bridge object.
+		if (pointColl.Position.Bridge >= 0)
+			return;
+
+		// Get footstep sound for floor material.
+		auto soundEffectID = GetFootprintSoundEffect(floor->Material);
+
+		// HACK: Must be here until reference WAD2 is revised.
+		if (soundEffectID != SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS)
+			SoundEffect(soundEffectID, &item->Pose);
+
+		if (!TestMaterial(floor->Material, FootprintMaterials))
+			return;
+
+		auto vertexPoints = GetFootprintVertexPoints(*item, footPos, Geometry::GetFloorNormal(pointColl.FloorTilt));
+
+		// Get point collision for every vertex point.
+		auto c0 = GetCollision(vertexPoints[0].x, footPos.y - CLICK(1), vertexPoints[0].z, item->RoomNumber);
+		auto c1 = GetCollision(vertexPoints[1].x, footPos.y - CLICK(1), vertexPoints[1].z, item->RoomNumber);
+		auto c2 = GetCollision(vertexPoints[2].x, footPos.y - CLICK(1), vertexPoints[2].z, item->RoomNumber);
+		auto c3 = GetCollision(vertexPoints[3].x, footPos.y - CLICK(1), vertexPoints[3].z, item->RoomNumber);
+
+		// Don't spawn footprint if all vertex points are outside relative height range.
+		if ((abs(c0.Position.Floor - c1.Position.Floor) > CLICK(1.0f / 2)) ||
+			(abs(c1.Position.Floor - c2.Position.Floor) > CLICK(1.0f / 2)) ||
+			(abs(c2.Position.Floor - c3.Position.Floor) > CLICK(1.0f / 2)) ||
+			(abs(c3.Position.Floor - c0.Position.Floor) > CLICK(1.0f / 2)))
+		{
+			return;
+		}
+
+		SpawnFootprint(vertexPoints, isRightFoot);
+	}
+
 	SOUND_EFFECTS GetFootprintSoundEffect(FLOOR_MATERIAL material)
 	{
 		switch (material)
@@ -136,13 +188,13 @@ namespace TEN::Effects::Footprints
 		return std::array<Vector3, 4>
 		{
 			pos + Vector3::Transform(p0, rotMatrix),
-			pos + Vector3::Transform(p1, rotMatrix),
-			pos + Vector3::Transform(p2, rotMatrix),
-			pos + Vector3::Transform(p3, rotMatrix)
+				pos + Vector3::Transform(p1, rotMatrix),
+				pos + Vector3::Transform(p2, rotMatrix),
+				pos + Vector3::Transform(p3, rotMatrix)
 		};
 	}
 
-	bool TestFootprintMaterial(FLOOR_MATERIAL refMaterial, const std::vector<FLOOR_MATERIAL>& materialList)
+	bool TestMaterial(FLOOR_MATERIAL refMaterial, const std::vector<FLOOR_MATERIAL>& materialList)
 	{
 		for (const auto& material : materialList)
 		{
@@ -151,58 +203,6 @@ namespace TEN::Effects::Footprints
 		}
 
 		return false;
-	}
-
-	void AddFootprint(ItemInfo* item, bool isRightFoot)
-	{
-		if (!item->IsLara())
-			return;
-
-		auto footJoint = isRightFoot ? LM_RFOOT : LM_LFOOT;
-
-		// Don't process actual footprint placement if foot isn't on floor.
-		auto footPos = Vector3::Zero;
-		if (!TestFootOnFloor(*item, footJoint, footPos))
-			return;
-
-		// Slightly randomize foot position to avoid patterns.
-		footPos += Vector3(Random::GenerateFloat(-5.0f, 5.0f), 0.0f, Random::GenerateFloat(-5.0f, 5.0f));
-
-		auto pointColl = GetCollision(footPos.x, footPos.y - CLICK(1), footPos.z, item->RoomNumber);
-		auto* floor = pointColl.BottomBlock;
-
-		// Don't process material if foot hit bridge object.
-		if (pointColl.Position.Bridge >= 0)
-			return;
-
-		// Get footstep sound for floor material.
-		auto soundEffectID = GetFootprintSoundEffect(floor->Material);
-
-		// HACK: Must be here until reference WAD2 is revised.
-		if (soundEffectID != SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS)
-			SoundEffect(soundEffectID, &item->Pose);
-
-		//if (!TestFootprintMaterial(floor->Material, FootprintMaterials))
-		//	return;
-
-		auto vertexPoints = GetFootprintVertexPoints(*item, footPos, Geometry::GetFloorNormal(pointColl.FloorTilt));
-
-		// Get point collision for every vertex point.
-		auto c0 = GetCollision(vertexPoints[0].x, footPos.y - CLICK(1), vertexPoints[0].z, item->RoomNumber);
-		auto c1 = GetCollision(vertexPoints[1].x, footPos.y - CLICK(1), vertexPoints[1].z, item->RoomNumber);
-		auto c2 = GetCollision(vertexPoints[2].x, footPos.y - CLICK(1), vertexPoints[2].z, item->RoomNumber);
-		auto c3 = GetCollision(vertexPoints[3].x, footPos.y - CLICK(1), vertexPoints[3].z, item->RoomNumber);
-
-		// Don't spawn footprint if all vertex points are outside relative height range.
-		if ((abs(c0.Position.Floor - c1.Position.Floor) > CLICK(1.0f / 2)) ||
-			(abs(c1.Position.Floor - c2.Position.Floor) > CLICK(1.0f / 2)) ||
-			(abs(c2.Position.Floor - c3.Position.Floor) > CLICK(1.0f / 2)) ||
-			(abs(c3.Position.Floor - c0.Position.Floor) > CLICK(1.0f / 2)))
-		{
-			return;
-		}
-
-		SpawnFootprint(vertexPoints, isRightFoot);
 	}
 
 	bool TestFootOnFloor(ItemInfo& item, int mesh, Vector3& outFootprintPos)
