@@ -47,9 +47,9 @@ namespace TEN::Effects::Blood
 	extern std::array<BloodDrip, BLOOD_DRIP_NUM_MAX> BloodDrips;
 	extern std::deque<BloodStain>					 BloodStains;
 
-	void SpawnBloodMist(const Vector3& pos, const Vector3& direction, int roomNumber, unsigned int count);
+	void SpawnBloodMist(const Vector3& pos, int roomNumber, const Vector3& direction, unsigned int count);
 	void SpawnBloodMistCloud(const Vector3& pos, int roomNumber, const Vector3& direction, float velocity, unsigned int maxCount);
-	void SpawnBloodMistCloudUnderwater(const Vector3& pos, int roomNumber);
+	void SpawnBloodMistCloudUnderwater(const Vector3& pos, int roomNumber, float velocity);
 
 	void SpawnBloodDrip(const Vector3& pos, int roomNumber, const Vector3& velocity, float scale);
 	void SpawnBloodDripSpray(const Vector3& pos, int roomNumber, const Vector3& direction, const Vector3& baseVelocity, unsigned int count = BLOOD_DRIP_SPRAY_NUM_DEFAULT);

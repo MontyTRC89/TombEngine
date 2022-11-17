@@ -17,7 +17,7 @@ using namespace TEN::Renderer;
 namespace TEN::Effects::Blood
 {
 	constexpr auto BLOOD_DRIP_LIFE_MAX			 = 1.0f * FPS;
-	constexpr auto BLOOD_STAIN_LIFE_MAX			 = (2.0f * 60.0f) * FPS;
+	constexpr auto BLOOD_STAIN_LIFE_MAX			 = (3.0f * 60.0f) * FPS;
 	constexpr auto BLOOD_STAIN_LIFE_START_FADING = BLOOD_STAIN_LIFE_MAX - (10.0f * FPS);
 
 	constexpr auto BLOOD_DRIP_GRAVITY_MIN	  = 5.0f;
@@ -42,19 +42,31 @@ namespace TEN::Effects::Blood
 		return BloodDrips[0];
 	}
 
-	void SpawnBloodMist(const Vector3& pos, const Vector3& direction, int roomNumber, unsigned int count)
+	void SpawnBloodMist(const Vector3& pos, int roomNumber, const Vector3& direction, unsigned int count)
 	{
 		TriggerBlood(pos.x, pos.y, pos.z, direction.y, count);
 	}
 
 	void SpawnBloodMistCloud(const Vector3& pos, int roomNumber, const Vector3& direction, float velocity, unsigned int count)
 	{
-		DoLotsOfBlood(pos.x, pos.y, pos.z, velocity, direction.y, roomNumber, count);
+		static const auto box = BoundingOrientedBox(pos, Vector3::One * BLOCK(1.0f / 16), Quaternion(direction, 1.0f));
+
+		if (TestEnvironment(ENV_FLAG_WATER, roomNumber))
+			return;
+
+		for (int i = 0; i < count; i++)
+		{
+			auto randPos = pos + Random::GenerateVector3InBox(box);
+			SpawnBloodMist(randPos, roomNumber, direction, count);
+		}
 	}
 
-	void SpawnBloodMistCloudUnderwater(const Vector3& pos, int roomNumber)
+	void SpawnBloodMistCloudUnderwater(const Vector3& pos, int roomNumber, float velocity)
 	{
-
+		if (!TestEnvironment(ENV_FLAG_WATER, roomNumber))
+			return;
+		
+		TriggerUnderwaterBlood(pos.x, pos.y, pos.z, velocity);
 	}
 
 	void SpawnBloodDrip(const Vector3& pos, int roomNumber, const Vector3& velocity, float scale)
