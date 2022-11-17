@@ -157,8 +157,7 @@ LaraWeaponType LaraObject::GetWeaponType() const
 // @usage
 // Lara:SetWeaponType(LaraWeaponType.WEAPONNAME, true/false)
 // @tparam LaraWeaponType NONE, PISTOLS, REVOLVER, UZI, SHOTGUN, HK, CROSSBOW, FLARE, TORCH, GRENADELAUNCHER, HARPOONGUN, ROCKETLAUNCHER.
-// @tparam bool false = let Laras new weapons holstered until you draw them, set torch unlit.
-// @tparam bool true = let her also draw the weapons , set torch lit.
+// @tparam bool activate true = let her also draw the weapons, set torch lit. false = let Laras new weapons holstered until you draw them, set torch unlit.
 void LaraObject::SetWeaponType(LaraWeaponType weaponType, bool activate)
 {
 	auto* lara = GetLaraInfo(m_item);
