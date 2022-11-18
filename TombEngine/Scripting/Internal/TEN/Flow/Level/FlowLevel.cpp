@@ -120,7 +120,7 @@ e.g. `myLevel.laraType = LaraType.Divesuit`
 //@mem objects
 		"objects", &Level::InventoryObjects,
 
-/// (int) Set Secrets for Level
+/// (short) Set Secrets for Level
 //@mem secrets
 		"secrets", sol::property(&Level::SetSecrets)
 		);
@@ -265,3 +265,7 @@ void Level::SetSecrets(short secrets)
 	LevelSecrets = secrets;
 }
 
+short Level::GetSecrets() const
+{
+	return LevelSecrets;
+}

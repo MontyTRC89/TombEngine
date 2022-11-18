@@ -475,12 +475,21 @@ namespace TEN::Renderer
 		AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_USED_MEDIPACKS), PRINTSTRING_COLOR_WHITE, SF());
 		GetNextLinePosition(&y);
 
-		// Secrets found
+		// Secrets found in Level
+		if (g_GameFlow->GetLevel(CurrentLevel)->GetSecrets() > 0)
+		{
+			sprintf(buffer, "%d / %d", Statistics.Level.Secrets, g_GameFlow->GetLevel(CurrentLevel)->GetSecrets());
+			AddString(MenuRightSideEntry, y, buffer, PRINTSTRING_COLOR_WHITE, SF());
+			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_LEVEL_SECRETS_FOUND), PRINTSTRING_COLOR_WHITE, SF());
+			GetNextLinePosition(&y);
+		}
+
+		// Secrets found total
 		if (g_GameFlow->TotalNumberOfSecrets > 0)
 		{
 			sprintf(buffer, "%d / %d", Statistics.Game.Secrets, g_GameFlow->TotalNumberOfSecrets);
 			AddString(MenuRightSideEntry, y, buffer, PRINTSTRING_COLOR_WHITE, SF());
-			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_SECRETS_FOUND), PRINTSTRING_COLOR_WHITE, SF());
+			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_TOTAL_SECRETS_FOUND), PRINTSTRING_COLOR_WHITE, SF());
 		}
 
 		DrawAllStrings();
