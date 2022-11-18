@@ -56,6 +56,14 @@ enum class JointBitType
 	MeshSwap
 };
 
+enum class BurnType
+{
+	None,
+	Normal,
+	Electric,
+	Smoke
+};
+
 struct EntityAnimationData
 {
 	int AnimNumber	  = -1;
@@ -83,6 +91,13 @@ struct EntityCallbackData
 	std::string OnRoomCollided;
 };
 
+struct BurnData
+{
+	BurnType Type = BurnType::None;
+	Vector3 Color = Vector3::One;
+	int Count = -1;
+};
+
 //todo we need to find good "default states" for a lot of these - squidshire 25/05/2022
 struct ItemInfo
 {
@@ -100,6 +115,7 @@ struct ItemInfo
 	EntityAnimationData Animation;
 	EntityCallbackData Callbacks;
 	EntityModelData Model;
+	BurnData Burn;
 	
 	Pose StartPose;
 	Pose Pose;

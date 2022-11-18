@@ -130,7 +130,7 @@ void UpdateBats()
 		if (!bat->On)
 			continue;
 
-		if ((Lara.Burn || LaraItem->HitPoints <= 0) &&
+		if ((LaraItem->Burn.Type != BurnType::None || LaraItem->HitPoints <= 0) &&
 			bat->Counter > 90 &&
 			!(GetRandomControl() & 7))
 		{

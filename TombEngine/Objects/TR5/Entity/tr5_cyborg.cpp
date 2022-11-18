@@ -601,7 +601,7 @@ namespace TEN::Entities::Creatures::TR5
 				break;
 			}
 		}
-		else if (item->Animation.ActiveState == 43 && !Lara.Burn)
+		else if (item->Animation.ActiveState == 43 && LaraItem->Burn.Type == BurnType::None)
 		{
 			auto pos = GetJointPosition(LaraItem, LM_LFOOT);
 
@@ -622,10 +622,8 @@ namespace TEN::Entities::Creatures::TR5
 			{
 				if (roomLeft->flipNumber == flipNumber || roomRight->flipNumber == flipNumber)
 				{
-					LaraBurn(creature->Enemy);
+					LaraElectricBurn(creature->Enemy);
 					DoDamage(creature->Enemy, INT_MAX);
-					Lara.BurnCount = 48;
-					Lara.BurnBlue = 1;
 				}
 			}
 		}

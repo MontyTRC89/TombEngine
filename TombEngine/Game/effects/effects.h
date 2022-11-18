@@ -217,3 +217,4 @@ void Splash(ItemInfo* item);
 void TriggerRocketFire(int x, int y, int z);
 void TriggerExplosionBubbles(int x, int y, int z, short roomNumber);
 void Richochet(Pose* pos);
+void ProcessBurn(ItemInfo* item);

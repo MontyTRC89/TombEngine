@@ -301,7 +301,7 @@ namespace TEN::Entities::Creatures::TR5
 					if (LOS(&origin, &target) &&
 						distance <= MAX_VISIBILITY_DISTANCE &&
 						LaraItem->HitPoints > 0 &&
-						!Lara.Burn &&
+						LaraItem->Burn.Type == BurnType::None &&
 						(LaserHeadData.target.x || LaserHeadData.target.y || LaserHeadData.target.z))
 					{
 						// Lock target for attacking.
@@ -423,7 +423,7 @@ namespace TEN::Entities::Creatures::TR5
 							arc &&
 							!arc->life ||
 							LaraItem->HitPoints <= 0 ||
-							Lara.Burn)
+							LaraItem->Burn.Type != BurnType::None)
 						{
 							if (arc)
 							{
@@ -493,7 +493,7 @@ namespace TEN::Entities::Creatures::TR5
 									}
 
 									// Check if Lara was hit by energy arcs
-									if (!Lara.Burn)
+									if (LaraItem->Burn.Type == BurnType::None)
 									{
 										int someIndex = 0;
 
@@ -551,11 +551,8 @@ namespace TEN::Entities::Creatures::TR5
 
 												if (x > x1 && x < x2 && y > y1 && y < y2 && z > z1 && z < z2)
 												{
-													LaraBurn(LaraItem);
+													LaraElectricBurn(LaraItem);
 													DoDamage(LaraItem, INT_MAX);
-													Lara.BurnCount = 48;
-													Lara.BurnBlue = 2;
-													LaraItem->HitPoints = 0;
 													break;
 												}
 

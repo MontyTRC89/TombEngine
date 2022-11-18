@@ -73,6 +73,9 @@ public:
 	[[nodiscard]] short GetOCB() const;
 	void SetOCB(short ocb);
 
+	[[nodiscard]] bool GetOnFire() const;
+	void SetOnFire(bool onFire);
+
 	[[nodiscard]] aiBitsType GetAIBits() const;
 	void SetAIBits(aiBitsType const & bits);
 

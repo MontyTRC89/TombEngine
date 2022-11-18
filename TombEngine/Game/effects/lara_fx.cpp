@@ -20,17 +20,19 @@ namespace TEN::Effects::Lara
 		if (!item->IsLara())
 			return;
 
-		auto* lara = GetLaraInfo(item);
+		item->Burn.Type = BurnType::Normal;
+		item->Burn.Count = -1;
+		item->Burn.Color = Vector3(0.8f, 0.5f, 0.0f);
+	}
 
-		if (!lara->Burn && !lara->BurnSmoke)
-		{
-			short fxNum = CreateNewEffect(item->RoomNumber);
-			if (fxNum != NO_ITEM)
-			{
-				EffectList[fxNum].objectNumber = ID_FLAME;
-				lara->Burn = true;
-			}
-		}
+	void LaraElectricBurn(ItemInfo* item)
+	{
+		if (!item->IsLara())
+			return;
+
+		item->Burn.Type = BurnType::Electric;
+		item->Burn.Count = 48;
+		item->Burn.Color = Vector3(0.0f, 0.2f, 0.8f);
 	}
 
 	void LavaBurn(ItemInfo* item)

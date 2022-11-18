@@ -20,6 +20,8 @@ using namespace TEN::Input;
 using namespace TEN::Math::Random;
 using namespace TEN::Control::Volumes;
 
+constexpr int ITEM_DEATH_TIMEOUT = 4 * FPS;
+
 bool ItemInfo::TestOcb(short ocbFlags)
 {
 	return ((TriggerFlags & ocbFlags) == ocbFlags);
@@ -658,16 +660,17 @@ void UpdateAllItems()
 		auto* item = &g_Level.Items[itemNumber];
 		short nextItem = item->NextActive;
 
-		if (item->AfterDeath <= 128)
+		if (item->AfterDeath <= ITEM_DEATH_TIMEOUT)
 		{
 			if (Objects[item->ObjectNumber].control)
 				Objects[item->ObjectNumber].control(itemNumber);
 
 			TestVolumes(itemNumber);
+			ProcessBurn(item);
 
-			if (item->AfterDeath > 0 && item->AfterDeath < 128 && !(Wibble & 3))
+			if (item->AfterDeath > 0 && item->AfterDeath < ITEM_DEATH_TIMEOUT && !(Wibble & 3))
 				item->AfterDeath++;
-			if (item->AfterDeath == 128)
+			if (item->AfterDeath == ITEM_DEATH_TIMEOUT)
 				KillItem(itemNumber);
 		}
 		else

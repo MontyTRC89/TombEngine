@@ -163,6 +163,16 @@ void Moveable::Register(sol::table & parent)
 // @function Moveable:Shatter
 	ScriptReserved_Shatter, &Moveable::Shatter,
 
+/// Set moveable on fire
+// @function Moveable:SetOnFire
+// @bool fire true to set moveable on fire, false to extinguish it
+	ScriptReserved_SetOnFire, &Moveable::SetOnFire,
+
+/// Get whether moveable is on fire or not
+// @function Moveable:GetOnFire
+// @treturn bool fire true if moveable is on fire, false otherwise
+	ScriptReserved_GetOnFire, &Moveable::GetOnFire,
+
 /// Get the status of object.
 // possible values:
 // <br />0 - not active 
@@ -644,6 +654,24 @@ short Moveable::GetOCB() const
 void Moveable::SetOCB(short ocb)
 {
 	m_item->TriggerFlags = ocb;
+}
+
+void Moveable::SetOnFire(bool onFire)
+{
+	//todo add support for other BurnTypes -squidshire 11/11/2022
+	if (onFire && m_item->Burn.Type == BurnType::None)
+	{
+		m_item->Burn.Type = BurnType::Normal;
+	}
+	else if (!onFire)
+	{
+		m_item->Burn.Type = BurnType::None;
+	}
+}
+
+bool Moveable::GetOnFire() const
+{
+	return m_item->Burn.Type != BurnType::None;
 }
 
 short Moveable::GetItemFlags(int index) const

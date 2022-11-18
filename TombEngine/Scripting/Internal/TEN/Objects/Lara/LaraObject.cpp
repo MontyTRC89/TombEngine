@@ -24,35 +24,6 @@ In addition, LaraObject inherits all the functions of @{Objects.Moveable|Moveabl
 constexpr auto LUA_CLASS_NAME{ ScriptReserved_LaraObject };
 using namespace TEN::Entities::Generic;
 
-/// Set Lara on fire
-// @function LaraObject:SetOnFire
-// @bool fire true to set lara on fire, false to extinguish her
-void LaraObject::SetOnFire(bool onFire)
-{
-	//todo add support for other BurnTypes -squidshire 11/11/2022
-	auto* lara = GetLaraInfo(m_item);
-	if (onFire && !lara->Burn)
-	{
-		TEN::Effects::Lara::LaraBurn(m_item);
-		lara->Burn = true;
-		lara->BurnType = BurnType::Normal;
-	}
-	else if (!onFire)
-	{
-		lara->Burn = false;
-		lara->BurnType = BurnType::None;
-	}
-}
-
-/// Get whether Lara is on fire or not
-// @function LaraObject:GetOnFire
-// @treturn bool fire true if lara is on fire, false otherwise
-bool LaraObject::GetOnFire() const
-{
-	auto* lara = GetLaraInfo(m_item);
-	return lara->BurnType != BurnType::None;
-}
-
 /// Set Lara poison potency
 // @function LaraObject:SetPoison
 // @tparam[opt] int Potency; maximum value is 64 (default 0)
@@ -274,8 +245,6 @@ void LaraObject::SetWeaponType(LaraWeaponType weaponType, bool activate)
 void LaraObject::Register(sol::table& parent)
 {
 	parent.new_usertype<LaraObject>(LUA_CLASS_NAME,
-			ScriptReserved_SetOnFire, &LaraObject::SetOnFire,
-			ScriptReserved_GetOnFire, &LaraObject::GetOnFire,
 			ScriptReserved_SetPoison, &LaraObject::SetPoison,
 			ScriptReserved_GetPoison, &LaraObject::GetPoison,
 			ScriptReserved_SetAir, &LaraObject::SetAir,

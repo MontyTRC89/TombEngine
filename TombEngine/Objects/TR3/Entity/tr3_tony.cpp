@@ -450,7 +450,7 @@ namespace TEN::Entities::Creatures::TR3
 			return;
 		}
 
-		if (!Lara.Burn)
+		if (LaraItem->Burn.Type == BurnType::None)
 		{
 			if (ItemNearLara(fx->pos.Position, 200))
 			{

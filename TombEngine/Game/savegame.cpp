@@ -419,11 +419,6 @@ bool SaveGame::Save(int slot)
 	Save::LaraBuilder lara{ fbb };
 	lara.add_air(Lara.Air);
 
-	lara.add_burn_count(Lara.BurnCount);
-	lara.add_burn_type((int)Lara.BurnType);
-	lara.add_burn(Lara.Burn);
-	lara.add_burn_blue(Lara.BurnBlue);
-	lara.add_burn_smoke(Lara.BurnSmoke);
 	lara.add_control(controlOffset);
 	lara.add_next_corner_pose(&FromPHD(Lara.NextCornerPos));
 	lara.add_extra_anim(Lara.ExtraAnim);
@@ -1719,11 +1714,6 @@ bool SaveGame::Load(int slot)
 	}
 
 	Lara.Air = s->lara()->air();
-	Lara.BurnCount = s->lara()->burn_count();
-	Lara.BurnType = (BurnType)s->lara()->burn_type();
-	Lara.Burn = s->lara()->burn();
-	Lara.BurnBlue = s->lara()->burn_blue();
-	Lara.BurnSmoke = s->lara()->burn_smoke();
 	Lara.Control.CalculatedJumpVelocity = s->lara()->control()->calculated_jump_velocity();
 	Lara.Control.CanMonkeySwing = s->lara()->control()->can_monkey_swing();
 	Lara.Control.CanClimbLadder = s->lara()->control()->is_climbing_ladder();
@@ -1862,22 +1852,6 @@ bool SaveGame::Load(int slot)
 		Lara.Weapons[i].Present = info->present();
 		Lara.Weapons[i].SelectedAmmo = (WeaponAmmoType)info->selected_ammo();
 		Lara.Weapons[i].WeaponMode = (LaraWeaponTypeCarried)info->weapon_mode();
-	}
-
-	if (Lara.BurnType != BurnType::None)
-	{
-		char flag = 0;
-		Lara.BurnType = BurnType::None;
-		if (Lara.BurnSmoke)
-		{
-			flag = 1;
-			Lara.BurnSmoke = 0;
-		}
-
-		LaraBurn(LaraItem);
-
-		if (flag)
-			Lara.BurnSmoke = 1;
 	}
 
 	// Rope

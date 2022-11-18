@@ -222,15 +222,12 @@ void ElectricityWiresControl(short itemNumber)
 
 			if (isWaterNearby || instantKill)
 			{
-				if (collItem->IsLara())
-				{
-					auto* lara = (LaraInfo*&)collItem->Data;
-					lara->BurnBlue = 1;
-					lara->BurnCount = 48;
+				collItem->Burn.Type = BurnType::Electric;
+				collItem->Burn.Count = 48;
+				collItem->Burn.Color = Vector3(0.0f, 0.2f, 0.8f);
 
-					if (!isWaterNearby)
-						LaraBurn(collItem);
-				}
+				if (!isWaterNearby)
+					LaraBurn(collItem);
 
 				if (instantKill)
 					DoDamage(collItem, INT_MAX);

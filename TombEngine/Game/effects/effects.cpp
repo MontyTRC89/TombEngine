@@ -14,6 +14,7 @@
 #include "Game/effects/weather.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
+#include "Game/Lara/lara_helpers.h"
 #include "Math/Math.h"
 #include "Objects/objectslist.h"
 #include "Renderer/Renderer11.h"
@@ -286,7 +287,7 @@ void UpdateSparks()
 			float alpha = (spark->sLife - spark->life) / (float)spark->sLife;
 			spark->size = Lerp(spark->sSize, spark->dSize, alpha);
 
-			if ((spark->flags & SP_FIRE && !Lara.Burn) || 
+			if ((spark->flags & SP_FIRE && LaraItem->Burn.Type == BurnType::None) || 
 				(spark->flags & SP_DAMAGE) || 
 				(spark->flags & SP_POISON))
 			{
@@ -1747,5 +1748,72 @@ void TriggerMetalSparks(int x, int y, int z, int xv, int yv, int zv, int additio
 			spark->size = ((r >> 8) & 0xF) + 24 >> 3;
 			spark->dSize = ((r >> 8) & 0xF) + 24;
 		}
+	}
+}
+
+void ProcessBurn(ItemInfo* item)
+{
+	if (item->Burn.Type == BurnType::None)
+		return;
+
+	if (item->Burn.Count > 0)
+	{
+		item->Burn.Count--;
+
+		if (!item->Burn.Count)
+		{
+			item->Burn.Type == BurnType::None;
+			return;
+		}
+	}
+
+	int numMeshes = Objects[item->ObjectNumber].nmeshes;
+	for (int i = 0; i < numMeshes; i++)
+	{
+		if (!(Wibble & 0xC))
+		{
+			auto pos = GetJointPosition(item, i);
+			TriggerFireFlame(pos.x, pos.y, pos.z, NO_ITEM, 255);
+		}
+	}
+
+	if (item->Burn.Type != BurnType::Smoke)
+	{
+		auto pos = GetJointPosition(item, 0);
+		TriggerDynamicLight(pos.x, pos.y, pos.z, 13,
+			std::clamp(Random::GenerateInt(-32, 32) + int(item->Burn.Color.x * UCHAR_MAX), 0, UCHAR_MAX),
+			std::clamp(Random::GenerateInt(-32, 32) + int(item->Burn.Color.y * UCHAR_MAX), 0, UCHAR_MAX),
+			std::clamp(Random::GenerateInt(-32, 32) + int(item->Burn.Color.z * UCHAR_MAX), 0, UCHAR_MAX));
+	}
+
+	int waterHeight = GetWaterHeight(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, item->RoomNumber);
+
+	if (waterHeight == NO_HEIGHT || item->Pose.Position.y <= waterHeight || item->Burn.Type == BurnType::Electric)
+	{
+		SOUND_EFFECTS sfx = SOUND_EFFECTS::SFX_TR4_LOOP_FOR_SMALL_FIRES;
+		switch (item->Burn.Type)
+		{
+		case BurnType::Smoke:
+			sfx = SOUND_EFFECTS::SFX_TR5_HISS_LOOP_SMALL;
+			break;
+
+		case BurnType::Electric:
+			sfx = SOUND_EFFECTS::SFX_TR4_LARA_ELECTRIC_CRACKLES;
+			break;
+		}
+
+		SoundEffect(sfx, &item->Pose);
+
+		if (item->IsLara() || (item->IsCreature() && item->HitPoints > 0))
+			DoDamage(item, item->IsLara() ? 7 : 1);
+	}
+	else
+	{
+		item->Burn.Type = BurnType::None;
+	}
+
+	if (item->IsLara() && GetLaraInfo(item)->Control.WaterStatus == WaterStatus::FlyCheat)
+	{
+		item->Burn.Type = BurnType::None;
 	}
 }
