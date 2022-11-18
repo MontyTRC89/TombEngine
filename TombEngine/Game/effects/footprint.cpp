@@ -15,7 +15,7 @@ using namespace TEN::Math;
 namespace TEN::Effects::Footprints
 {
 	constexpr auto FOOTPRINT_LIFE_MAX		   = 20.0f * FPS;
-	constexpr auto FOOTPRINT_LIFE_START_FADING = std::max(FOOTPRINT_LIFE_MAX - (10.0f * FPS), 10.0f * FPS);
+	constexpr auto FOOTPRINT_LIFE_START_FADING = 10.0f * FPS;
 	constexpr auto FOOTPRINT_OPACITY_MAX	   = 0.5f;
 
 	constexpr auto FOOTPRINT_SCALE	  = 64.0f;
@@ -73,7 +73,7 @@ namespace TEN::Effects::Footprints
 		if (!TestFootprintFloor(*item, footPos, vertexPoints))
 			return;
 
-		SpawnFootprint(vertexPoints, isRightFoot);
+		SpawnFootprint(isRightFoot, vertexPoints);
 	}
 
 	SOUND_EFFECTS GetFootprintSoundEffectID(FLOOR_MATERIAL material)
@@ -153,10 +153,10 @@ namespace TEN::Effects::Footprints
 
 	std::array<Vector3, 4> GetFootprintVertexPoints(const ItemInfo& item, const Vector3& pos, const Vector3& normal)
 	{
-		constexpr auto point0 = Vector3(FOOTPRINT_SCALE, 0, FOOTPRINT_SCALE);
-		constexpr auto point1 = Vector3(-FOOTPRINT_SCALE, 0, FOOTPRINT_SCALE);
-		constexpr auto point2 = Vector3(-FOOTPRINT_SCALE, 0, -FOOTPRINT_SCALE);
-		constexpr auto point3 = Vector3(FOOTPRINT_SCALE, 0, -FOOTPRINT_SCALE);
+		constexpr auto point0 = Vector3(FOOTPRINT_SCALE, 0.0f, FOOTPRINT_SCALE);
+		constexpr auto point1 = Vector3(-FOOTPRINT_SCALE, 0.0f, FOOTPRINT_SCALE);
+		constexpr auto point2 = Vector3(-FOOTPRINT_SCALE, 0.0f, -FOOTPRINT_SCALE);
+		constexpr auto point3 = Vector3(FOOTPRINT_SCALE, 0.0f, -FOOTPRINT_SCALE);
 
 		// Determine surface angles.
 		short aspectAngle = Geometry::GetSurfaceAspectAngle(normal);
@@ -228,11 +228,10 @@ namespace TEN::Effects::Footprints
 		return true;
 	}
 
-	void SpawnFootprint(const std::array<Vector3, 4>& vertexPoints, bool isRightFoot)
+	void SpawnFootprint(bool isRightFoot, const std::array<Vector3, 4>& vertexPoints)
 	{
 		auto footprint = Footprint();
 
-		footprint.IsActive = true;
 		footprint.IsRightFoot = isRightFoot;
 		footprint.VertexPoints = vertexPoints;
 		footprint.Life = FOOTPRINT_LIFE_MAX;
@@ -267,7 +266,7 @@ namespace TEN::Effects::Footprints
 			// Update opacity.
 			if (footprint.Life <= footprint.LifeStartFading)
 			{
-				float opacity = Lerp(0.0f, footprint.OpacityStart, std::max(0.0f, std::min(1.0f, footprint.Life / footprint.LifeStartFading)));
+				float opacity = Lerp(footprint.OpacityStart, 0.0f, 1.0f - (footprint.Life / footprint.LifeStartFading));
 				footprint.Opacity = opacity;
 			}
 		}

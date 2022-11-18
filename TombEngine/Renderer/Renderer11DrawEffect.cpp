@@ -6,6 +6,7 @@
 #include "Game/collision/collide_room.h"
 #include "Game/control/box.h"
 #include "Game/control/control.h"
+#include "Game/effects/Blood.h"
 #include "Game/effects/bubble.h"
 #include "Game/effects/debris.h"
 #include "Game/effects/drip.h"
@@ -62,6 +63,7 @@ BiteInfo EnemyBites[12] =
 
 namespace TEN::Renderer 
 {
+	using namespace TEN::Effects::Blood;
 	using namespace TEN::Effects::Footprints;
 	using std::vector;
 
@@ -807,13 +809,29 @@ namespace TEN::Renderer
 		return Texture2D(m_device.Get(), 1, 1, data.data());
 	}
 
+	void Renderer11::DrawBloodStains(RenderView& view)
+	{
+		for (const auto& stain : BloodStains)
+		{
+			int spriteIndex = Objects[ID_BLOOD_STAIN_SPRITES].meshIndex + 1 + stain.SpriteIndex;
+
+			if (g_Level.Sprites.size() > spriteIndex)
+			{
+				AddSprite3D(
+					&m_sprites[spriteIndex],
+					stain.VertexPoints[0], stain.VertexPoints[1], stain.VertexPoints[2], stain.VertexPoints[3],
+					stain.Color, 0.0f, 1.0f, Vector2::One, BLENDMODE_ALPHABLEND, false, view); // TODO: There might be a bug with some blend modes??
+			}
+		}
+	}
+
 	void Renderer11::DrawFootprints(RenderView& view)
 	{
-		for (auto& footprint : Footprints)
+		for (const auto& footprint : Footprints)
 		{
 			int spriteIndex = Objects[ID_MISC_SPRITES].meshIndex + 1 + (int)footprint.IsRightFoot;
 
-			if (footprint.IsActive && g_Level.Sprites.size() > spriteIndex)
+			if (g_Level.Sprites.size() > spriteIndex)
 			{
 				AddSprite3D(
 					&m_sprites[spriteIndex],

@@ -16,14 +16,15 @@ using namespace TEN::Renderer;
 
 namespace TEN::Effects::Blood
 {
-	constexpr auto BLOOD_DRIP_LIFE_MAX			 = 1.0f * FPS;
-	constexpr auto BLOOD_STAIN_LIFE_MAX			 = (3.0f * 60.0f) * FPS;
-	constexpr auto BLOOD_STAIN_LIFE_START_FADING = std::max(BLOOD_STAIN_LIFE_MAX - (10.0f * FPS), 10.0f * FPS);
+	constexpr auto BLOOD_DRIP_LIFE_MAX			 = 5.0f * FPS;
+	constexpr auto BLOOD_STAIN_LIFE_MAX			 = (3.0f * 60.0f)* FPS;
+	constexpr auto BLOOD_STAIN_LIFE_START_FADING = 10.0f * FPS;
 
-	constexpr auto BLOOD_DRIP_GRAVITY_MIN	  = 5.0f;
-	constexpr auto BLOOD_DRIP_GRAVITY_MAX	  = 12.0f;
+	constexpr auto BLOOD_DRIP_GRAVITY_MIN	  = 8.0f;
+	constexpr auto BLOOD_DRIP_GRAVITY_MAX	  = 18.0f;
 	constexpr auto BLOOD_DRIP_SPRAY_SEMIANGLE = 60.0f;
-	constexpr auto BLOOD_STAIN_OPACITY_START  = 0.95f;
+	constexpr auto BLOOD_STAIN_NUM_SPRITES	  = 15;
+	constexpr auto BLOOD_STAIN_OPACITY_MAX	  = 1.0f;
 
 	constexpr auto BLOOD_COLOR_RED	 = Vector4(0.8f, 0.0f, 0.0f, 1.0f);
 	constexpr auto BLOOD_COLOR_BROWN = Vector4(0.4f, 0.2f, 0.0f, 1.0f);
@@ -40,6 +41,42 @@ namespace TEN::Effects::Blood
 		}
 
 		return BloodDrips[0];
+	}
+
+	std::array<Vector3, 4> GetBloodStainVertexPoints(const Vector3& normal, const Vector3& pos, short orient2D, float scale)
+	{
+		constexpr auto point0 = Vector3(SQRT_2, 0.0f, SQRT_2);
+		constexpr auto point1 = Vector3(-SQRT_2, 0.0f, SQRT_2);
+		constexpr auto point2 = Vector3(-SQRT_2, 0.0f, -SQRT_2);
+		constexpr auto point3 = Vector3(SQRT_2, 0.0f, -SQRT_2);
+
+		// No scale; return early.
+		if (scale == 0.0f)
+			return std::array<Vector3, 4>{ pos, pos, pos, pos };
+
+		// Determine surface angles.
+		short aspectAngle = Geometry::GetSurfaceAspectAngle(normal);
+		short slopeAngle = Geometry::GetSurfaceSlopeAngle(normal);
+
+		short deltaAngle = Geometry::GetShortestAngle(orient2D, aspectAngle);
+		float sinDeltaAngle = phd_sin(deltaAngle);
+		float cosDeltaAngle = phd_cos(deltaAngle);
+
+		// Calculate rotation matrix.
+		auto orient = EulerAngles(
+			-slopeAngle * cosDeltaAngle,
+			0,
+			slopeAngle * sinDeltaAngle
+		) + EulerAngles(0, orient2D, 0);
+		auto rotMatrix = orient.ToRotationMatrix();
+
+		return std::array<Vector3, 4>
+		{
+			pos + Vector3::Transform(point0 * (scale / 2), rotMatrix),
+			pos + Vector3::Transform(point1 * (scale / 2), rotMatrix),
+			pos + Vector3::Transform(point2 * (scale / 2), rotMatrix),
+			pos + Vector3::Transform(point3 * (scale / 2), rotMatrix)
+		};
 	}
 
 	void SpawnBloodMist(const Vector3& pos, int roomNumber, const Vector3& direction, unsigned int count)
@@ -90,7 +127,7 @@ namespace TEN::Effects::Blood
 		unsigned int numDrips = Random::GenerateInt(0, maxCount);
 		for (int i = 0; i < numDrips; i++)
 		{
-			float length = Random::GenerateFloat(10.0f, 70.0f);
+			float length = Random::GenerateFloat(30.0f, 80.0f);
 			auto velocity = baseVelocity + Random::GenerateVector3InCone(direction, BLOOD_DRIP_SPRAY_SEMIANGLE, length);
 			float scale = Random::GenerateFloat(10.0f, 20.0f);
 
@@ -102,18 +139,21 @@ namespace TEN::Effects::Blood
 	{
 		auto stain = BloodStain();
 
+		stain.SpriteIndex = Random::GenerateInt(0, BLOOD_STAIN_NUM_SPRITES);
 		stain.Position = pos;
 		stain.RoomNumber = roomNumber;
+		stain.Orientation2D = Random::GenerateAngle();
 		stain.Normal = normal;
 		stain.Color = BLOOD_COLOR_RED;
 		stain.ColorStart = stain.Color;
 		stain.ColorEnd = BLOOD_COLOR_BROWN;
+		stain.VertexPoints = GetBloodStainVertexPoints(stain.Normal, stain.Position, stain.Orientation2D, 0.0f);
 		stain.Life = BLOOD_STAIN_LIFE_MAX;
 		stain.LifeStartFading = BLOOD_STAIN_LIFE_START_FADING;
 		stain.Scale = 0.0f;
-		stain.ScaleMax = scaleMax * Random::GenerateFloat(0.2f, 2.0f);
+		stain.ScaleMax = scaleMax;
 		stain.ScaleRate = scaleRate;
-		stain.Opacity = BLOOD_STAIN_OPACITY_START;
+		stain.Opacity = BLOOD_STAIN_OPACITY_MAX;
 		stain.OpacityStart = stain.Opacity;
 
 		if (BloodStains.size() >= BLOOD_STAIN_NUM_MAX)
@@ -203,9 +243,6 @@ namespace TEN::Effects::Blood
 				continue;
 			}
 
-			// Update color.
-			stain.Color = Vector4::Lerp(stain.ColorStart, stain.ColorEnd, 1.0f - (stain.Life / BLOOD_STAIN_LIFE_MAX));
-
 			// Update scale.
 			if (stain.ScaleRate != 0.0f)
 			{
@@ -219,9 +256,17 @@ namespace TEN::Effects::Blood
 				stain.Scale += stain.ScaleRate;
 			}
 
+			// Update vertex points.
+			stain.VertexPoints = GetBloodStainVertexPoints(stain.Normal, stain.Position, stain.Orientation2D, stain.Scale);
+
 			// Update opacity.
 			if (stain.Life <= stain.LifeStartFading)
-				stain.Opacity = Lerp(0.0f, stain.OpacityStart, fmax(0, fmin(1.0f, stain.Life / BLOOD_STAIN_LIFE_START_FADING)));
+				stain.Opacity = Lerp(stain.OpacityStart, 0.0f, 1.0f - (stain.Life / BLOOD_STAIN_LIFE_START_FADING));
+
+			// Update color.
+			stain.Color = Vector4::Lerp(stain.ColorStart, stain.ColorEnd, 1.0f - (stain.Life / BLOOD_STAIN_LIFE_MAX));
+			stain.Color.w = stain.Opacity;
+
 		}
 	}
 
@@ -239,9 +284,12 @@ namespace TEN::Effects::Blood
 		
 		for (auto& stain : BloodStains)
 		{
-			constexpr auto numCircles = 5;
+			auto target = stain.Position + (stain.Normal * 128);
+			g_Renderer.AddLine3D(stain.Position, target, Vector4::One);
+
+			/*constexpr auto numCircles = 5;
 			for (int i = 1; i < numCircles; i++)
-				g_Renderer.AddDebugCircle(stain.Position, ((stain.Scale / 2) / numCircles) * i, stain.Color, RENDERER_DEBUG_PAGE::NO_PAGE);
+				g_Renderer.AddDebugCircle(stain.Position, ((stain.Scale / 2) / numCircles) * i, stain.Color, RENDERER_DEBUG_PAGE::NO_PAGE);*/
 		}
 
 		g_Renderer.PrintDebugMessage("Num blood drips: %d ", numActiveDrips);

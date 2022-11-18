@@ -13,7 +13,6 @@ namespace TEN::Effects::Footprints
 
 	struct Footprint 
 	{
-		bool IsActive	 = false;
 		bool IsRightFoot = false;
 
 		std::array<Vector3, 4> VertexPoints = {};
@@ -35,6 +34,6 @@ namespace TEN::Effects::Footprints
 	bool TestFootHeight(ItemInfo& item, int mesh, Vector3& outFootprintPosition);
 	bool TestFootprintFloor(const ItemInfo& item, const Vector3& pos, const std::array<Vector3, 4>& vertexPoints);
 
-	void SpawnFootprint(const std::array<Vector3, 4>& vertexPoints, bool isRightFoot);
+	void SpawnFootprint(bool isRightFoot, const std::array<Vector3, 4>& vertexPoints);
 	void UpdateFootprints();
 }

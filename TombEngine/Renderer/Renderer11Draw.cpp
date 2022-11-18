@@ -1538,6 +1538,7 @@ namespace TEN::Renderer
 		DrawSimpleParticles(view);
 		DrawSparkParticles(view);
 		DrawExplosionParticles(view);
+		DrawBloodStains(view);
 		DrawFootprints(view);
 		DrawDripParticles(view);
 		DrawBlood(view);
