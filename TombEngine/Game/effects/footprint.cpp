@@ -216,7 +216,7 @@ namespace TEN::Effects::Footprints
 		auto pointColl2 = GetCollision(vertexPoints[2].x, pos.y - CLICK(1), vertexPoints[2].z, item.RoomNumber);
 		auto pointColl3 = GetCollision(vertexPoints[3].x, pos.y - CLICK(1), vertexPoints[3].z, item.RoomNumber);
 
-		// Don't spawn footprint if all vertex points are outside relative height range.
+		// Don't spawn footprint if all floor heights at vertex points are outside relative height range.
 		if ((abs(pointColl0.Position.Floor - pointColl1.Position.Floor) > heightRange) ||
 			(abs(pointColl1.Position.Floor - pointColl2.Position.Floor) > heightRange) ||
 			(abs(pointColl2.Position.Floor - pointColl3.Position.Floor) > heightRange) ||
