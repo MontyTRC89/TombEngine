@@ -13,8 +13,12 @@
 #include "Math/Random.h"
 #include "Specific/setup.h"
 
+// temp
+#include "Game/effects/Blood.h"
+using namespace TEN::Effects::Blood;
+//
+
 using namespace TEN::Math::Random;
-using std::vector;
 
 namespace TEN::Entities::TR4
 {
@@ -26,7 +30,7 @@ namespace TEN::Entities::TR4
 
 	const auto SmallScorpionBite1 = BiteInfo(Vector3::Zero, 0);
 	const auto SmallScorpionBite2 = BiteInfo(Vector3::Zero, 23);
-	const vector<unsigned int> SmallScorpionAttackJoints = { 8, 22, 23, 25, 26 };
+	const std::vector<unsigned int> SmallScorpionAttackJoints = { 8, 22, 23, 25, 26 };
 
 	enum SmallScorionState
 	{
@@ -80,10 +84,14 @@ namespace TEN::Entities::TR4
 		if (item->HitPoints <= 0)
 		{
 			item->HitPoints = 0;
+
 			if (item->Animation.ActiveState != SSCORPION_STATE_DEATH_1 &&
 				item->Animation.ActiveState != SSCORPION_STATE_DEATH_2)
 			{
 				SetAnimation(item, SSCORPION_ANIM_DEATH);
+
+				SpawnBloodDripSpray(item->Pose.Position.ToVector3(), item->RoomNumber, Vector3::Down, item->Pose.Orientation.ToDirection() * item->Animation.Velocity.Length(), 20);
+;				SpawnBloodStain(*item);
 			}
 		}
 		else
@@ -108,7 +116,9 @@ namespace TEN::Entities::TR4
 				creature->Flags = 0;
 
 				if (AI.distance > SMALL_SCORPION_ATTACK_RANGE)
+				{
 					item->Animation.TargetState = SSCORPION_STATE_WALK;
+				}
 				else if (AI.bite)
 				{
 					creature->MaxTurn = ANGLE(6.0f);
@@ -119,7 +129,9 @@ namespace TEN::Entities::TR4
 						item->Animation.TargetState = SSCORPION_STATE_ATTACK_2;
 				}
 				else if (!AI.ahead)
+				{
 					item->Animation.TargetState = SSCORPION_STATE_RUN;
+				}
 
 				break;
 

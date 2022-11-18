@@ -17,14 +17,18 @@ using namespace TEN::Renderer;
 namespace TEN::Effects::Blood
 {
 	constexpr auto BLOOD_DRIP_LIFE_MAX			 = 5.0f * FPS;
-	constexpr auto BLOOD_STAIN_LIFE_MAX			 = (3.0f * 60.0f)* FPS;
+	constexpr auto BLOOD_STAIN_LIFE_MAX			 = (4.0f * 60.0f)* FPS;
 	constexpr auto BLOOD_STAIN_LIFE_START_FADING = 10.0f * FPS;
 
-	constexpr auto BLOOD_DRIP_GRAVITY_MIN	  = 8.0f;
-	constexpr auto BLOOD_DRIP_GRAVITY_MAX	  = 18.0f;
+	constexpr auto BLOOD_DRIP_GRAVITY_MIN	  = 5.0f;
+	constexpr auto BLOOD_DRIP_GRAVITY_MAX	  = 15.0f;
 	constexpr auto BLOOD_DRIP_SPRAY_SEMIANGLE = 60.0f;
-	constexpr auto BLOOD_STAIN_NUM_SPRITES	  = 15;
-	constexpr auto BLOOD_STAIN_OPACITY_MAX	  = 1.0f;
+
+	constexpr auto BLOOD_STAIN_OPACITY_MAX		  = 0.8f;
+	constexpr auto BLOOD_STAIN_POOLING_SCALE_RATE = 0.4f;
+	constexpr auto BLOOD_STAIN_POOLING_TIME_DELAY = 10.0f;
+	constexpr auto BLOOD_STAIN_HEIGHT_OFFSET	  = 4;
+	constexpr auto BLOOD_STAIN_NUM_SPRITES		  = 11;
 
 	constexpr auto BLOOD_COLOR_RED	 = Vector4(0.8f, 0.0f, 0.0f, 1.0f);
 	constexpr auto BLOOD_COLOR_BROWN = Vector4(0.4f, 0.2f, 0.0f, 1.0f);
@@ -50,6 +54,7 @@ namespace TEN::Effects::Blood
 		constexpr auto point2 = Vector3(-SQRT_2, 0.0f, -SQRT_2);
 		constexpr auto point3 = Vector3(SQRT_2, 0.0f, -SQRT_2);
 
+		Color(4);
 		// No scale; return early.
 		if (scale == 0.0f)
 			return std::array<Vector3, 4>{ pos, pos, pos, pos };
@@ -127,7 +132,7 @@ namespace TEN::Effects::Blood
 		unsigned int numDrips = Random::GenerateInt(0, maxCount);
 		for (int i = 0; i < numDrips; i++)
 		{
-			float length = Random::GenerateFloat(30.0f, 80.0f);
+			float length = Random::GenerateFloat(40.0f, 80.0f);
 			auto velocity = baseVelocity + Random::GenerateVector3InCone(direction, BLOOD_DRIP_SPRAY_SEMIANGLE, length);
 			float scale = Random::GenerateFloat(10.0f, 20.0f);
 
@@ -135,7 +140,7 @@ namespace TEN::Effects::Blood
 		}
 	}
 
-	void SpawnBloodStain(const Vector3& pos, int roomNumber, const Vector3& normal, float scaleMax, float scaleRate)
+	void SpawnBloodStain(const Vector3& pos, int roomNumber, const Vector3& normal, float scaleMax, float scaleRate, float delayTimeInSec)
 	{
 		auto stain = BloodStain();
 
@@ -155,11 +160,23 @@ namespace TEN::Effects::Blood
 		stain.ScaleRate = scaleRate;
 		stain.Opacity = BLOOD_STAIN_OPACITY_MAX;
 		stain.OpacityStart = stain.Opacity;
+		stain.DelayTime = std::round(delayTimeInSec * FPS); // NOTE: Converted to frame time.
 
 		if (BloodStains.size() >= BLOOD_STAIN_NUM_MAX)
 			BloodStains.pop_back();
 
 		BloodStains.push_front(stain);
+	}
+
+	void SpawnBloodStain(ItemInfo& item)
+	{
+		auto pos = Vector3(item.Pose.Position.x, item.Pose.Position.y - BLOOD_STAIN_HEIGHT_OFFSET, item.Pose.Position.z);
+		auto normal = Geometry::GetFloorNormal(GetCollision(&item).FloorTilt);
+
+		auto bounds = GameBoundingBox(&item);
+		float scaleMax = (bounds.GetWidth() + bounds.GetDepth()) / 2;
+
+		SpawnBloodStain(pos, item.RoomNumber, normal, scaleMax, BLOOD_STAIN_POOLING_SCALE_RATE, BLOOD_STAIN_POOLING_TIME_DELAY);
 	}
 
 	//
@@ -207,20 +224,20 @@ namespace TEN::Effects::Blood
 			{
 				drip.IsActive = false;
 
-				auto stainPos = Vector3(drip.Position.x, pointColl.Position.Floor - 4, drip.Position.z);
-				auto stainNormal = Geometry::GetFloorNormal(pointColl.FloorTilt);
+				auto pos = Vector3(drip.Position.x, pointColl.Position.Floor - BLOOD_STAIN_HEIGHT_OFFSET, drip.Position.z);
+				auto normal = Geometry::GetFloorNormal(pointColl.FloorTilt);
 
-				SpawnBloodStain(stainPos, drip.RoomNumber, stainNormal, drip.Scale, drip.Velocity.Length());
+				SpawnBloodStain(pos, drip.RoomNumber, normal, drip.Scale, drip.Velocity.Length());
 			}
 			// Drip has hit ceiling; spawn stain.
 			else if ((pointColl.Position.Ceiling - vPos) >= 0)
 			{
 				drip.IsActive = false;
 
-				auto stainPos = Vector3(drip.Position.x, pointColl.Position.Ceiling + 4, drip.Position.z);
-				auto stainNormal = Geometry::GetCeilingNormal(pointColl.CeilingTilt);
+				auto pos = Vector3(drip.Position.x, pointColl.Position.Ceiling + BLOOD_STAIN_HEIGHT_OFFSET, drip.Position.z);
+				auto normal = Geometry::GetCeilingNormal(pointColl.CeilingTilt);
 
-				SpawnBloodStain(stainPos, drip.RoomNumber, stainNormal, drip.Scale, drip.Velocity.Length());
+				SpawnBloodStain(pos, drip.RoomNumber, normal, drip.Scale, drip.Velocity.Length());
 			}
 
 			// Spawn bloor mist cloud in water.
@@ -234,6 +251,16 @@ namespace TEN::Effects::Blood
 
 		for (auto& stain : BloodStains)
 		{
+			// Update delay time.
+			if (stain.DelayTime != 0.0f)
+			{
+				stain.DelayTime -= 1.0f;
+				if (stain.DelayTime < 0.0f)
+					stain.DelayTime = 0.0f;
+
+				continue;
+			}
+
 			stain.Life -= 1.0f;
 
 			// Despawn stain.
@@ -284,8 +311,8 @@ namespace TEN::Effects::Blood
 		
 		for (auto& stain : BloodStains)
 		{
-			auto target = stain.Position + (stain.Normal * 128);
-			g_Renderer.AddLine3D(stain.Position, target, Vector4::One);
+			//auto target = stain.Position + (stain.Normal * 128);
+			//g_Renderer.AddLine3D(stain.Position, target, Vector4::One);
 
 			/*constexpr auto numCircles = 5;
 			for (int i = 1; i < numCircles; i++)

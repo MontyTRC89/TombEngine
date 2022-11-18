@@ -6,7 +6,7 @@
 namespace TEN::Effects::Blood
 {
 	constexpr auto BLOOD_DRIP_NUM_MAX  = 128;
-	constexpr auto BLOOD_STAIN_NUM_MAX = 128;
+	constexpr auto BLOOD_STAIN_NUM_MAX = 194;
 
 	constexpr auto BLOOD_DRIP_SPRAY_NUM_MAX_DEFAULT = 2;
 
@@ -26,7 +26,7 @@ namespace TEN::Effects::Blood
 
 	struct BloodStain
 	{
-		int SpriteIndex = 0;
+		int	  SpriteIndex = 0;
 
 		Vector3	Position	  = Vector3::Zero;
 		int		RoomNumber	  = NO_ROOM;
@@ -47,6 +47,8 @@ namespace TEN::Effects::Blood
 
 		float Opacity	   = 0.0f;
 		float OpacityStart = 0.0f;
+
+		float DelayTime = 0.0f;
 	};
 
 	extern std::array<BloodDrip, BLOOD_DRIP_NUM_MAX> BloodDrips;
@@ -61,8 +63,8 @@ namespace TEN::Effects::Blood
 	void SpawnBloodDrip(const Vector3& pos, int roomNumber, const Vector3& velocity, float scale);
 	void SpawnBloodDripSpray(const Vector3& pos, int roomNumber, const Vector3& direction, const Vector3& baseVelocity, unsigned int maxCount = BLOOD_DRIP_SPRAY_NUM_MAX_DEFAULT);
 
-	void SpawnBloodStain(const Vector3& pos, int roomNumber, const Vector3& normal, float scaleMax, float scaleRate);
-	void SpawnBloodStainBeneathEntity(const ItemInfo& item, float scale);
+	void SpawnBloodStain(const Vector3& pos, int roomNumber, const Vector3& normal, float scaleMax, float scaleRate, float delayTimeInSec = 0.0f);
+	void SpawnBloodStain(ItemInfo& item);
 
 	void UpdateBloodMists();
 	void UpdateBloodDrips();
