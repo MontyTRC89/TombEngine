@@ -1762,7 +1762,7 @@ void ProcessBurn(ItemInfo* item)
 
 		if (!item->Burn.Count)
 		{
-			item->Burn.Type == BurnType::None;
+			item->Burn.Type = BurnType::None;
 			return;
 		}
 	}
