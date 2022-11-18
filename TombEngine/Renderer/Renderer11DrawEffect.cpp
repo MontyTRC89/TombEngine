@@ -809,9 +809,8 @@ namespace TEN::Renderer
 
 	void Renderer11::DrawFootprints(RenderView& view)
 	{
-		for (auto i = Footprints.begin(); i != Footprints.end(); i++) 
+		for (auto& footprint : Footprints)
 		{
-			auto& footprint = *i;
 			int spriteIndex = Objects[ID_MISC_SPRITES].meshIndex + 1 + (int)footprint.IsRightFoot;
 
 			if (footprint.IsActive && g_Level.Sprites.size() > spriteIndex)

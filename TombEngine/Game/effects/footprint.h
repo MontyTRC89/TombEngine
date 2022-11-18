@@ -28,7 +28,7 @@ namespace TEN::Effects::Footprints
 
 	void AddFootprint(ItemInfo* item, bool isRightFoot);
 
-	SOUND_EFFECTS		   GetFootprintSoundEffect(FLOOR_MATERIAL material);
+	SOUND_EFFECTS		   GetFootprintSoundEffectID(FLOOR_MATERIAL material);
 	std::array<Vector3, 4> GetFootprintVertexPoints(const ItemInfo& item, const Vector3& pos, const Vector3& normal);
 
 	bool TestMaterial(FLOOR_MATERIAL refMaterial, const std::vector<FLOOR_MATERIAL>& materialList);

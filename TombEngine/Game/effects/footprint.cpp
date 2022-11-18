@@ -15,7 +15,7 @@ using namespace TEN::Math;
 namespace TEN::Effects::Footprints
 {
 	constexpr auto FOOTPRINT_LIFE_MAX		   = 20.0f * FPS;
-	constexpr auto FOOTPRINT_LIFE_START_FADING = FOOTPRINT_LIFE_MAX - (10.0f * FPS);
+	constexpr auto FOOTPRINT_LIFE_START_FADING = std::max(FOOTPRINT_LIFE_MAX - (10.0f * FPS), 10.0f * FPS);
 	constexpr auto FOOTPRINT_OPACITY_MAX	   = 0.5f;
 
 	constexpr auto FOOTPRINT_SCALE	  = 64.0f;
@@ -33,7 +33,7 @@ namespace TEN::Effects::Footprints
 		FLOOR_MATERIAL::Custom4
 	};
 
-	std::deque<Footprint> Footprints = std::deque<Footprint>();
+	std::deque<Footprint> Footprints = {};
 
 	void AddFootprint(ItemInfo* item, bool isRightFoot)
 	{
@@ -51,21 +51,20 @@ namespace TEN::Effects::Footprints
 		footPos += Vector3(Random::GenerateFloat(-5.0f, 5.0f), 0.0f, Random::GenerateFloat(-5.0f, 5.0f));
 
 		auto pointColl = GetCollision(footPos.x, footPos.y - CLICK(1), footPos.z, item->RoomNumber);
-		auto* floor = pointColl.BottomBlock;
 
 		// Don't process material if foot hit bridge object.
 		if (pointColl.Position.Bridge >= 0)
 			return;
 
 		// Get footstep sound for floor material.
-		auto soundEffectID = GetFootprintSoundEffect(floor->Material);
+		auto soundEffectID = GetFootprintSoundEffectID(pointColl.BottomBlock->Material);
 
 		// HACK: Must be here until reference WAD2 is revised.
 		if (soundEffectID != SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS)
 			SoundEffect(soundEffectID, &item->Pose);
 
 		// Check floor material.
-		if (!TestMaterial(floor->Material, FootprintMaterials))
+		if (!TestMaterial(pointColl.BottomBlock->Material, FootprintMaterials))
 			return;
 
 		auto vertexPoints = GetFootprintVertexPoints(*item, footPos, Geometry::GetFloorNormal(pointColl.FloorTilt));
@@ -77,18 +76,21 @@ namespace TEN::Effects::Footprints
 		SpawnFootprint(vertexPoints, isRightFoot);
 	}
 
-	SOUND_EFFECTS GetFootprintSoundEffect(FLOOR_MATERIAL material)
+	SOUND_EFFECTS GetFootprintSoundEffectID(FLOOR_MATERIAL material)
 	{
 		switch (material)
 		{
 		default:
 			return SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS;
 
-		case FLOOR_MATERIAL::Concrete:
-			return SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS;
+		case FLOOR_MATERIAL::Mud:
+			return SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS_MUD;
 
-		case FLOOR_MATERIAL::Grass:
-			return SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS_GRASS;
+		case FLOOR_MATERIAL::Snow:
+			return SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS_SNOW;
+
+		case FLOOR_MATERIAL::Sand:
+			return SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS_SAND;
 
 		case FLOOR_MATERIAL::Gravel:
 			return SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS_GRAVEL;
@@ -96,35 +98,32 @@ namespace TEN::Effects::Footprints
 		case FLOOR_MATERIAL::Ice:
 			return SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS_ICE;
 
-		case FLOOR_MATERIAL::Marble:
-			return SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS_MARBLE;
-
-		case FLOOR_MATERIAL::Metal:
-			return SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS_METAL;
-
-		case FLOOR_MATERIAL::Mud:
-			return SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS_MUD;
-
-		case FLOOR_MATERIAL::OldMetal:
-			return SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS_METAL;
-
-		case FLOOR_MATERIAL::OldWood:
-			return SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS_WOOD;
-
-		case FLOOR_MATERIAL::Sand:
-			return SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS_SAND;
-
-		case FLOOR_MATERIAL::Snow:
-			return SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS_SNOW;
+		case FLOOR_MATERIAL::Water:
+			return SOUND_EFFECTS::SFX_TR4_LARA_WET_FEET;
 
 		case FLOOR_MATERIAL::Stone:
 			return SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS;
 
-		case FLOOR_MATERIAL::Water:
-			return SOUND_EFFECTS::SFX_TR4_LARA_WET_FEET;
-
 		case FLOOR_MATERIAL::Wood:
 			return SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS_WOOD;
+
+		case FLOOR_MATERIAL::Metal:
+			return SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS_METAL;
+
+		case FLOOR_MATERIAL::Marble:
+			return SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS_MARBLE;
+
+		case FLOOR_MATERIAL::Grass:
+			return SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS_GRASS;
+
+		case FLOOR_MATERIAL::Concrete:
+			return SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS;
+
+		case FLOOR_MATERIAL::OldWood:
+			return SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS_WOOD;
+
+		case FLOOR_MATERIAL::OldMetal:
+			return SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS_METAL;
 
 		case FLOOR_MATERIAL::Custom1:
 			return SOUND_EFFECTS::SFX_CUSTOM_FOOTSTEP_1;
@@ -268,7 +267,7 @@ namespace TEN::Effects::Footprints
 			// Update opacity.
 			if (footprint.Life <= footprint.LifeStartFading)
 			{
-				float opacity = Lerp(0.0f, footprint.OpacityStart, fmax(0, fmin(1, footprint.Life / (float)footprint.LifeStartFading)));
+				float opacity = Lerp(0.0f, footprint.OpacityStart, std::max(0.0f, std::min(1.0f, footprint.Life / footprint.LifeStartFading)));
 				footprint.Opacity = opacity;
 			}
 		}

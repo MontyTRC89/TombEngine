@@ -18,7 +18,7 @@ namespace TEN::Effects::Blood
 {
 	constexpr auto BLOOD_DRIP_LIFE_MAX			 = 1.0f * FPS;
 	constexpr auto BLOOD_STAIN_LIFE_MAX			 = (3.0f * 60.0f) * FPS;
-	constexpr auto BLOOD_STAIN_LIFE_START_FADING = BLOOD_STAIN_LIFE_MAX - (10.0f * FPS);
+	constexpr auto BLOOD_STAIN_LIFE_START_FADING = std::max(BLOOD_STAIN_LIFE_MAX - (10.0f * FPS), 10.0f * FPS);
 
 	constexpr auto BLOOD_DRIP_GRAVITY_MIN	  = 5.0f;
 	constexpr auto BLOOD_DRIP_GRAVITY_MAX	  = 12.0f;
