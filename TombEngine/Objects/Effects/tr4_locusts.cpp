@@ -114,7 +114,7 @@ namespace TEN::Entities::TR4
 				// NOTE: not present in original TR4 code
 				//if (locust->target == nullptr)
 				//    locust->target = LaraItem;
-				if ((LaraItem->Burn.Type != BurnType::None || LaraItem->HitPoints <= 0) && locust->counter >= 90 && !(GetRandomControl() & 7))
+				if ((LaraItem->Effect.Type != EffectType::None || LaraItem->HitPoints <= 0) && locust->counter >= 90 && !(GetRandomControl() & 7))
 					locust->counter = 90;
 
 				locust->counter--;

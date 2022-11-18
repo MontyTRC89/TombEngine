@@ -287,7 +287,7 @@ void UpdateSparks()
 			float alpha = (spark->sLife - spark->life) / (float)spark->sLife;
 			spark->size = Lerp(spark->sSize, spark->dSize, alpha);
 
-			if ((spark->flags & SP_FIRE && LaraItem->Burn.Type == BurnType::None) || 
+			if ((spark->flags & SP_FIRE && LaraItem->Effect.Type == EffectType::None) ||
 				(spark->flags & SP_DAMAGE) || 
 				(spark->flags & SP_POISON))
 			{
@@ -1753,16 +1753,16 @@ void TriggerMetalSparks(int x, int y, int z, int xv, int yv, int zv, int additio
 
 void ProcessBurn(ItemInfo* item)
 {
-	if (item->Burn.Type == BurnType::None)
+	if (item->Effect.Type == EffectType::None)
 		return;
 
-	if (item->Burn.Count > 0)
+	if (item->Effect.Count > 0)
 	{
-		item->Burn.Count--;
+		item->Effect.Count--;
 
-		if (!item->Burn.Count)
+		if (!item->Effect.Count)
 		{
-			item->Burn.Type = BurnType::None;
+			item->Effect.Type = EffectType::None;
 			return;
 		}
 	}
@@ -1777,27 +1777,27 @@ void ProcessBurn(ItemInfo* item)
 		}
 	}
 
-	if (item->Burn.Type != BurnType::Smoke)
+	if (item->Effect.Type != EffectType::Smoke)
 	{
 		auto pos = GetJointPosition(item, 0);
 		TriggerDynamicLight(pos.x, pos.y, pos.z, 13,
-			std::clamp(Random::GenerateInt(-32, 32) + int(item->Burn.Color.x * UCHAR_MAX), 0, UCHAR_MAX),
-			std::clamp(Random::GenerateInt(-32, 32) + int(item->Burn.Color.y * UCHAR_MAX), 0, UCHAR_MAX),
-			std::clamp(Random::GenerateInt(-32, 32) + int(item->Burn.Color.z * UCHAR_MAX), 0, UCHAR_MAX));
+			std::clamp(Random::GenerateInt(-32, 32) + int(item->Effect.Color.x * UCHAR_MAX), 0, UCHAR_MAX),
+			std::clamp(Random::GenerateInt(-32, 32) + int(item->Effect.Color.y * UCHAR_MAX), 0, UCHAR_MAX),
+			std::clamp(Random::GenerateInt(-32, 32) + int(item->Effect.Color.z * UCHAR_MAX), 0, UCHAR_MAX));
 	}
 
 	int waterHeight = GetWaterHeight(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, item->RoomNumber);
 
-	if (waterHeight == NO_HEIGHT || item->Pose.Position.y <= waterHeight || item->Burn.Type == BurnType::Electric)
+	if (waterHeight == NO_HEIGHT || item->Pose.Position.y <= waterHeight || item->Effect.Type == EffectType::Electric)
 	{
 		SOUND_EFFECTS sfx = SOUND_EFFECTS::SFX_TR4_LOOP_FOR_SMALL_FIRES;
-		switch (item->Burn.Type)
+		switch (item->Effect.Type)
 		{
-		case BurnType::Smoke:
+		case EffectType::Smoke:
 			sfx = SOUND_EFFECTS::SFX_TR5_HISS_LOOP_SMALL;
 			break;
 
-		case BurnType::Electric:
+		case EffectType::Electric:
 			sfx = SOUND_EFFECTS::SFX_TR4_LARA_ELECTRIC_CRACKLES;
 			break;
 		}
@@ -1809,11 +1809,11 @@ void ProcessBurn(ItemInfo* item)
 	}
 	else
 	{
-		item->Burn.Type = BurnType::None;
+		item->Effect.Type = EffectType::None;
 	}
 
 	if (item->IsLara() && GetLaraInfo(item)->Control.WaterStatus == WaterStatus::FlyCheat)
 	{
-		item->Burn.Type = BurnType::None;
+		item->Effect.Type = EffectType::None;
 	}
 }

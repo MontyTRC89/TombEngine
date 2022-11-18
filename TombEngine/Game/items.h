@@ -56,10 +56,10 @@ enum class JointBitType
 	MeshSwap
 };
 
-enum class BurnType
+enum class EffectType
 {
 	None,
-	Normal,
+	Burn,
 	Electric,
 	Smoke
 };
@@ -91,9 +91,9 @@ struct EntityCallbackData
 	std::string OnRoomCollided;
 };
 
-struct BurnData
+struct EntityEffectData
 {
-	BurnType Type = BurnType::None;
+	EffectType Type = EffectType::None;
 	Vector3 Color = Vector3::One;
 	int Count = -1;
 };
@@ -115,7 +115,7 @@ struct ItemInfo
 	EntityAnimationData Animation;
 	EntityCallbackData Callbacks;
 	EntityModelData Model;
-	BurnData Burn;
+	EntityEffectData Effect;
 	
 	Pose StartPose;
 	Pose Pose;

@@ -44,6 +44,10 @@ table Item {
 	base_mesh: int32;
 	mesh_pointers: [int32];
 
+	effect_type: int32;
+	effect_count: int32;
+	effect_color: Vector3;
+
 	lua_name: string;
 	lua_on_killed_name: string;
 	lua_on_hit_name: string;

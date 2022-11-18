@@ -222,9 +222,9 @@ void ElectricityWiresControl(short itemNumber)
 
 			if (isWaterNearby || instantKill)
 			{
-				collItem->Burn.Type = BurnType::Electric;
-				collItem->Burn.Count = 48;
-				collItem->Burn.Color = Vector3(0.0f, 0.2f, 0.8f);
+				collItem->Effect.Type = EffectType::Electric;
+				collItem->Effect.Count = 48;
+				collItem->Effect.Color = Vector3(0.0f, 0.2f, 0.8f);
 
 				if (!isWaterNearby)
 					LaraBurn(collItem);

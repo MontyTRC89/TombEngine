@@ -453,6 +453,9 @@ struct ItemT : public flatbuffers::NativeTable {
   TEN::Save::ItemDataUnion data{};
   int32_t base_mesh = 0;
   std::vector<int32_t> mesh_pointers{};
+  int32_t effect_type = 0;
+  int32_t effect_count = 0;
+  std::unique_ptr<TEN::Save::Vector3> effect_color{};
   std::string lua_name{};
   std::string lua_on_killed_name{};
   std::string lua_on_hit_name{};
@@ -500,11 +503,14 @@ struct Item FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     VT_DATA = 68,
     VT_BASE_MESH = 70,
     VT_MESH_POINTERS = 72,
-    VT_LUA_NAME = 74,
-    VT_LUA_ON_KILLED_NAME = 76,
-    VT_LUA_ON_HIT_NAME = 78,
-    VT_LUA_ON_COLLIDED_WITH_OBJECT_NAME = 80,
-    VT_LUA_ON_COLLIDED_WITH_ROOM_NAME = 82
+    VT_EFFECT_TYPE = 74,
+    VT_EFFECT_COUNT = 76,
+    VT_EFFECT_COLOR = 78,
+    VT_LUA_NAME = 80,
+    VT_LUA_ON_KILLED_NAME = 82,
+    VT_LUA_ON_HIT_NAME = 84,
+    VT_LUA_ON_COLLIDED_WITH_OBJECT_NAME = 86,
+    VT_LUA_ON_COLLIDED_WITH_ROOM_NAME = 88
   };
   int32_t active_state() const {
     return GetField<int32_t>(VT_ACTIVE_STATE, 0);
@@ -678,6 +684,15 @@ struct Item FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   const flatbuffers::Vector<int32_t> *mesh_pointers() const {
     return GetPointer<const flatbuffers::Vector<int32_t> *>(VT_MESH_POINTERS);
   }
+  int32_t effect_type() const {
+    return GetField<int32_t>(VT_EFFECT_TYPE, 0);
+  }
+  int32_t effect_count() const {
+    return GetField<int32_t>(VT_EFFECT_COUNT, 0);
+  }
+  const TEN::Save::Vector3 *effect_color() const {
+    return GetStruct<const TEN::Save::Vector3 *>(VT_EFFECT_COLOR);
+  }
   const flatbuffers::String *lua_name() const {
     return GetPointer<const flatbuffers::String *>(VT_LUA_NAME);
   }
@@ -733,6 +748,9 @@ struct Item FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyField<int32_t>(verifier, VT_BASE_MESH) &&
            VerifyOffset(verifier, VT_MESH_POINTERS) &&
            verifier.VerifyVector(mesh_pointers()) &&
+           VerifyField<int32_t>(verifier, VT_EFFECT_TYPE) &&
+           VerifyField<int32_t>(verifier, VT_EFFECT_COUNT) &&
+           VerifyField<TEN::Save::Vector3>(verifier, VT_EFFECT_COLOR) &&
            VerifyOffset(verifier, VT_LUA_NAME) &&
            verifier.VerifyString(lua_name()) &&
            VerifyOffset(verifier, VT_LUA_ON_KILLED_NAME) &&
@@ -947,6 +965,15 @@ struct ItemBuilder {
   void add_mesh_pointers(flatbuffers::Offset<flatbuffers::Vector<int32_t>> mesh_pointers) {
     fbb_.AddOffset(Item::VT_MESH_POINTERS, mesh_pointers);
   }
+  void add_effect_type(int32_t effect_type) {
+    fbb_.AddElement<int32_t>(Item::VT_EFFECT_TYPE, effect_type, 0);
+  }
+  void add_effect_count(int32_t effect_count) {
+    fbb_.AddElement<int32_t>(Item::VT_EFFECT_COUNT, effect_count, 0);
+  }
+  void add_effect_color(const TEN::Save::Vector3 *effect_color) {
+    fbb_.AddStruct(Item::VT_EFFECT_COLOR, effect_color);
+  }
   void add_lua_name(flatbuffers::Offset<flatbuffers::String> lua_name) {
     fbb_.AddOffset(Item::VT_LUA_NAME, lua_name);
   }
@@ -1010,6 +1037,9 @@ inline flatbuffers::Offset<Item> CreateItem(
     flatbuffers::Offset<void> data = 0,
     int32_t base_mesh = 0,
     flatbuffers::Offset<flatbuffers::Vector<int32_t>> mesh_pointers = 0,
+    int32_t effect_type = 0,
+    int32_t effect_count = 0,
+    const TEN::Save::Vector3 *effect_color = 0,
     flatbuffers::Offset<flatbuffers::String> lua_name = 0,
     flatbuffers::Offset<flatbuffers::String> lua_on_killed_name = 0,
     flatbuffers::Offset<flatbuffers::String> lua_on_hit_name = 0,
@@ -1021,6 +1051,9 @@ inline flatbuffers::Offset<Item> CreateItem(
   builder_.add_lua_on_hit_name(lua_on_hit_name);
   builder_.add_lua_on_killed_name(lua_on_killed_name);
   builder_.add_lua_name(lua_name);
+  builder_.add_effect_color(effect_color);
+  builder_.add_effect_count(effect_count);
+  builder_.add_effect_type(effect_type);
   builder_.add_mesh_pointers(mesh_pointers);
   builder_.add_base_mesh(base_mesh);
   builder_.add_data(data);
@@ -1101,6 +1134,9 @@ inline flatbuffers::Offset<Item> CreateItemDirect(
     flatbuffers::Offset<void> data = 0,
     int32_t base_mesh = 0,
     const std::vector<int32_t> *mesh_pointers = nullptr,
+    int32_t effect_type = 0,
+    int32_t effect_count = 0,
+    const TEN::Save::Vector3 *effect_color = 0,
     const char *lua_name = nullptr,
     const char *lua_on_killed_name = nullptr,
     const char *lua_on_hit_name = nullptr,
@@ -1150,6 +1186,9 @@ inline flatbuffers::Offset<Item> CreateItemDirect(
       data,
       base_mesh,
       mesh_pointers__,
+      effect_type,
+      effect_count,
+      effect_color,
       lua_name__,
       lua_on_killed_name__,
       lua_on_hit_name__,
@@ -6702,6 +6741,9 @@ inline void Item::UnPackTo(ItemT *_o, const flatbuffers::resolver_function_t *_r
   { auto _e = data(); if (_e) _o->data.value = TEN::Save::ItemDataUnion::UnPack(_e, data_type(), _resolver); }
   { auto _e = base_mesh(); _o->base_mesh = _e; }
   { auto _e = mesh_pointers(); if (_e) { _o->mesh_pointers.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->mesh_pointers[_i] = _e->Get(_i); } } }
+  { auto _e = effect_type(); _o->effect_type = _e; }
+  { auto _e = effect_count(); _o->effect_count = _e; }
+  { auto _e = effect_color(); if (_e) _o->effect_color = std::unique_ptr<TEN::Save::Vector3>(new TEN::Save::Vector3(*_e)); }
   { auto _e = lua_name(); if (_e) _o->lua_name = _e->str(); }
   { auto _e = lua_on_killed_name(); if (_e) _o->lua_on_killed_name = _e->str(); }
   { auto _e = lua_on_hit_name(); if (_e) _o->lua_on_hit_name = _e->str(); }
@@ -6752,6 +6794,9 @@ inline flatbuffers::Offset<Item> CreateItem(flatbuffers::FlatBufferBuilder &_fbb
   auto _data = _o->data.Pack(_fbb);
   auto _base_mesh = _o->base_mesh;
   auto _mesh_pointers = _fbb.CreateVector(_o->mesh_pointers);
+  auto _effect_type = _o->effect_type;
+  auto _effect_count = _o->effect_count;
+  auto _effect_color = _o->effect_color ? _o->effect_color.get() : 0;
   auto _lua_name = _o->lua_name.empty() ? _fbb.CreateSharedString("") : _fbb.CreateString(_o->lua_name);
   auto _lua_on_killed_name = _o->lua_on_killed_name.empty() ? _fbb.CreateSharedString("") : _fbb.CreateString(_o->lua_on_killed_name);
   auto _lua_on_hit_name = _o->lua_on_hit_name.empty() ? _fbb.CreateSharedString("") : _fbb.CreateString(_o->lua_on_hit_name);
@@ -6794,6 +6839,9 @@ inline flatbuffers::Offset<Item> CreateItem(flatbuffers::FlatBufferBuilder &_fbb
       _data,
       _base_mesh,
       _mesh_pointers,
+      _effect_type,
+      _effect_count,
+      _effect_color,
       _lua_name,
       _lua_on_killed_name,
       _lua_on_hit_name,

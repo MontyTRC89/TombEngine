@@ -153,7 +153,7 @@ namespace TEN::Entities::Effects
 
 				SoundEffect(SFX_TR4_LOOP_FOR_SMALL_FIRES, &item->Pose);
 
-				if (LaraItem->Burn.Type == BurnType::None &&
+				if (LaraItem->Effect.Type == EffectType::None &&
 					ItemNearLara(item->Pose.Position, 600) &&
 					(pow(LaraItem->Pose.Position.x - item->Pose.Position.x, 2) +
 					 pow(LaraItem->Pose.Position.z - item->Pose.Position.z, 2) < pow(SECTOR(0.5f), 2)) &&
@@ -467,7 +467,7 @@ namespace TEN::Entities::Effects
 				auto pos = item->Pose.Position;
 				if (ItemNearLara(pos, 600))
 				{
-					if (LaraItem->Burn.Type != BurnType::None && Lara.Control.WaterStatus != WaterStatus::FlyCheat)
+					if (LaraItem->Effect.Type != EffectType::None && Lara.Control.WaterStatus != WaterStatus::FlyCheat)
 					{
 						DoDamage(LaraItem, 5);
 

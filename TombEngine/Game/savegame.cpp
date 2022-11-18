@@ -645,6 +645,9 @@ bool SaveGame::Save(int slot)
 		serializedItem.add_ai_bits(itemToSerialize.AIBits);
 		serializedItem.add_collidable(itemToSerialize.Collidable);
 		serializedItem.add_looked_at(itemToSerialize.LookedAt);
+		serializedItem.add_effect_type((int)itemToSerialize.Effect.Type);
+		serializedItem.add_effect_count(itemToSerialize.Effect.Count);
+		serializedItem.add_effect_color(&FromVector3(itemToSerialize.Effect.Color));
 
 		if (Objects[itemToSerialize.ObjectNumber].intelligent 
 			&& itemToSerialize.Data.is<CreatureInfo>())
@@ -1387,6 +1390,10 @@ bool SaveGame::Load(int slot)
 		item->Animation.IsAirborne = savedItem->is_airborne();
 		item->Collidable = savedItem->collidable();
 		item->LookedAt = savedItem->looked_at();
+
+		item->Effect.Type = (EffectType)savedItem->effect_type();
+		item->Effect.Count = savedItem->effect_count();
+		item->Effect.Color = ToVector3(savedItem->effect_color());
 
 		// Mesh stuff
 		item->MeshBits = savedItem->mesh_bits();

@@ -658,21 +658,21 @@ void Moveable::SetOCB(short ocb)
 
 void Moveable::SetOnFire(bool onFire)
 {
-	//todo add support for other BurnTypes -squidshire 11/11/2022
-	if (onFire && m_item->Burn.Type == BurnType::None)
+	//todo add support for other EffectTypes -squidshire 11/11/2022
+	if (onFire && m_item->Effect.Type == EffectType::None)
 	{
-		m_item->Burn.Type = BurnType::Normal;
-		m_item->Burn.Color = Vector3(0.8f, 0.2f, 0.0f);
+		m_item->Effect.Type = EffectType::Burn;
+		m_item->Effect.Color = Vector3(0.8f, 0.2f, 0.0f);
 	}
 	else if (!onFire)
 	{
-		m_item->Burn.Type = BurnType::None;
+		m_item->Effect.Type = EffectType::None;
 	}
 }
 
 bool Moveable::GetOnFire() const
 {
-	return m_item->Burn.Type != BurnType::None;
+	return m_item->Effect.Type != EffectType::None;
 }
 
 short Moveable::GetItemFlags(int index) const

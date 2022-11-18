@@ -17,22 +17,16 @@ namespace TEN::Effects::Lara
 {
 	void LaraBurn(ItemInfo* item)
 	{
-		if (!item->IsLara())
-			return;
-
-		item->Burn.Type = BurnType::Normal;
-		item->Burn.Count = -1;
-		item->Burn.Color = Vector3(0.8f, 0.5f, 0.0f);
+		item->Effect.Type = EffectType::Burn;
+		item->Effect.Count = -1;
+		item->Effect.Color = Vector3(0.8f, 0.5f, 0.0f);
 	}
 
 	void LaraElectricBurn(ItemInfo* item)
 	{
-		if (!item->IsLara())
-			return;
-
-		item->Burn.Type = BurnType::Electric;
-		item->Burn.Count = 48;
-		item->Burn.Color = Vector3(0.0f, 0.2f, 0.8f);
+		item->Effect.Type = EffectType::Electric;
+		item->Effect.Count = 48;
+		item->Effect.Color = Vector3(0.0f, 0.2f, 0.8f);
 	}
 
 	void LavaBurn(ItemInfo* item)

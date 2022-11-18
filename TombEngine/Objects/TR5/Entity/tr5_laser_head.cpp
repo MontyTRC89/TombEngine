@@ -301,7 +301,7 @@ namespace TEN::Entities::Creatures::TR5
 					if (LOS(&origin, &target) &&
 						distance <= MAX_VISIBILITY_DISTANCE &&
 						LaraItem->HitPoints > 0 &&
-						LaraItem->Burn.Type == BurnType::None &&
+						LaraItem->Effect.Type == EffectType::None &&
 						(LaserHeadData.target.x || LaserHeadData.target.y || LaserHeadData.target.z))
 					{
 						// Lock target for attacking.
@@ -423,7 +423,7 @@ namespace TEN::Entities::Creatures::TR5
 							arc &&
 							!arc->life ||
 							LaraItem->HitPoints <= 0 ||
-							LaraItem->Burn.Type != BurnType::None)
+							LaraItem->Effect.Type != EffectType::None)
 						{
 							if (arc)
 							{
@@ -493,7 +493,7 @@ namespace TEN::Entities::Creatures::TR5
 									}
 
 									// Check if Lara was hit by energy arcs
-									if (LaraItem->Burn.Type == BurnType::None)
+									if (LaraItem->Effect.Type == EffectType::None)
 									{
 										int someIndex = 0;
 

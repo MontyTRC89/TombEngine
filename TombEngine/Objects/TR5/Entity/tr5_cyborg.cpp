@@ -601,7 +601,7 @@ namespace TEN::Entities::Creatures::TR5
 				break;
 			}
 		}
-		else if (item->Animation.ActiveState == 43 && LaraItem->Burn.Type == BurnType::None)
+		else if (item->Animation.ActiveState == 43 && LaraItem->Effect.Type == EffectType::None)
 		{
 			auto pos = GetJointPosition(LaraItem, LM_LFOOT);
 
