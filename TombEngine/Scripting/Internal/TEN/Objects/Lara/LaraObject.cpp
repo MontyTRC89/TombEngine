@@ -55,10 +55,9 @@ bool LaraObject::GetOnFire() const
 
 /// Set Lara poison potency
 // @function LaraObject:SetPoison
-// @tparam Potency Value (optional, resets to 0 if not provided)
+// @tparam[opt] int Potency; maximum value is 64 (default 0)
 // @usage
 // Lara:SetPoison(10)
-// Max Value: 64
 void LaraObject::SetPoison(sol::optional<int> potency)
 {
 	auto* lara = GetLaraInfo(m_item);
@@ -71,9 +70,9 @@ void LaraObject::SetPoison(sol::optional<int> potency)
 
 /// Get poison potency of Lara
 // @function LaraObject:GetPoison
-// @treturn int current poison value
+// @treturn int current poison potency
 // @usage
-// Lara:GetPoison()
+// local poisonPotency = Lara:GetPoison()
 int LaraObject::GetPoison() const
 {
 	auto* lara = GetLaraInfo(m_item);
@@ -82,10 +81,9 @@ int LaraObject::GetPoison() const
 
 /// Set air value of Lara
 // @function LaraObject:SetAir
-// @tparam Air Value 
+// @tparam int Air value to give Lara. Maximum value is 1800. 
 // @usage
 // Lara:SetAir(100)
-// Max Value: 1800
 void LaraObject::SetAir(sol::optional<int> air)
 {
 	auto* lara = GetLaraInfo(m_item);
@@ -100,7 +98,7 @@ void LaraObject::SetAir(sol::optional<int> air)
 // @function LaraObject:GetAir
 // @treturn int current air value
 // @usage
-// Lara:GetAir()
+// local currentAir = Lara:GetAir()
 int LaraObject::GetAir() const
 {
 	auto* lara = GetLaraInfo(m_item);
@@ -109,10 +107,9 @@ int LaraObject::GetAir() const
 
 /// Set sprint energy value of Lara
 // @function LaraObject:SetSprintEnergy
-// @tparam Sprint Value 
+// @tparam int sprint energy to give to Lara; maximum value is 120. 
 // @usage
 // Lara:SetSprintEnergy(120)
-// Max Value: 120
 void LaraObject::SetSprintEnergy(sol::optional<int> value)
 {
 	auto* lara = GetLaraInfo(m_item);
@@ -127,7 +124,7 @@ void LaraObject::SetSprintEnergy(sol::optional<int> value)
 // @function LaraObject:GetSprintEnergy
 // @treturn int current sprint value
 // @usage
-// Lara:GetSprintEnergy()
+// local sprintEnergy = Lara:GetSprintEnergy()
 int LaraObject::GetSprintEnergy() const
 {
 	auto* lara = GetLaraInfo(m_item);
@@ -136,10 +133,9 @@ int LaraObject::GetSprintEnergy() const
 
 /// Set wetness value of Lara (causes dripping)
 // @function LaraObject:SetWet
-// @tparam Wet Value 
+// @tparam int Wetness value. Maximum 255 
 // @usage
 // Lara:SetWet(100)
-// Max Value: 255
 void LaraObject::SetWet(sol::optional<int> wetness)
 {
 	auto* lara = GetLaraInfo(m_item);
@@ -153,8 +149,7 @@ void LaraObject::SetWet(sol::optional<int> wetness)
 // @function LaraObject:GetWet
 // @treturn int current wetness value
 // @usage
-// Lara:GetWet()
-// Max Value: 255
+// local dripAmount = Lara:GetWet()
 int LaraObject::GetWet() const
 {
 	auto* lara = GetLaraInfo(m_item);
@@ -165,7 +160,7 @@ int LaraObject::GetWet() const
 // @function LaraObject:GetAmmoCount
 // @treturn int current ammo count (-1 if infinite)
 // @usage
-// Lara:GetAmmoCount()
+// local equippedWeaponAmmoLeft = Lara:GetAmmoCount()
 int LaraObject::GetAmmoCount() const
 {
 	auto* lara = GetLaraInfo(m_item);
@@ -174,7 +169,7 @@ int LaraObject::GetAmmoCount() const
 }
 	
 	
-/// Lara will undraw her weapon if it is drawn and throw away flare if she holds one in her hand.
+/// Lara will undraw her weapon if it is drawn and throw away a flare if she is currently holding one.
 // @function LaraObject:UndrawWeapon
 // @usage
 // Lara:UndrawWeapon()
@@ -189,7 +184,7 @@ void LaraObject::UndrawWeapon()
 	}
 }
 
-/// Lara will throw away the torch if she helds one in her hand.
+/// Lara will throw away the torch if she currently holds one in her hand.
 // @function LaraObject:ThrowAwayTorch
 // @usage
 // Lara:ThrowAwayTorch()
@@ -203,10 +198,11 @@ void LaraObject::ThrowAwayTorch()
 	}
 }
 
+//todo make these into enums - Squidshire 18/11/2022
 /// Get actual hand status of Lara
 // @function LaraObject:GetHandStatus
 // @usage
-// Lara:GetHandStatus()
+// local handStatus = Lara:GetHandStatus()
 // @treturn 0=HandsFree, 1=Busy(climbing,etc), 2=WeaponDraw, 3=WeaponUndraw, 4=WeaponInHand.
 HandStatus LaraObject::GetHandStatus() const
 {
@@ -214,10 +210,11 @@ HandStatus LaraObject::GetHandStatus() const
 	return  HandStatus{ lara->Control.HandStatus };
 }
 
+//todo make these into enums - Squidshire 18/11/2022
 /// Get actual weapon type of Lara
 // @function LaraObject:GetWeaponType
 // @usage
-// Lara:GetWeaponType()
+// local weaponType = Lara:GetWeaponType()
 // @treturn 0=None, 1=Pistols, 2=Revolver, 3=Uzi, 4=Shotgun, 5=HK, 6=Crossbow, 7=Flare, 8=Torch, 9=GrenadeLauncher, 10=Harpoon, 11=RocketLauncher.
 LaraWeaponType LaraObject::GetWeaponType() const
 {
@@ -228,9 +225,22 @@ LaraWeaponType LaraObject::GetWeaponType() const
 /// Set Lara weapon type
 // @function LaraObject:SetWeaponType
 // @usage
-// Lara:SetWeaponType(LaraWeaponType.WEAPONNAME, true/false)
-// @tparam LaraWeaponType NONE, PISTOLS, REVOLVER, UZI, SHOTGUN, HK, CROSSBOW, FLARE, TORCH, GRENADELAUNCHER, HARPOONGUN, ROCKETLAUNCHER.
-// @tparam bool activate true = let her also draw the weapons, set torch lit. false = let Laras new weapons holstered until you draw them, set torch unlit.
+// Lara:SetWeaponType(LaraWeaponType.PISTOLS, false)
+// @tparam LaraWeaponType weaponType
+// Must be one of:
+//	NONE
+//	PISTOLS
+//	REVOLVER
+//	UZI
+//	SHOTGUN
+//	HK
+//	CROSSBOW
+//	FLARE
+//	TORCH
+//	GRENADELAUNCHER
+//	HARPOONGUN
+//	ROCKETLAUNCHER
+// @tparam bool activate true = let her also draw the weapons, set torch lit. false = let Laras new weapons remain holstered until she draws them, set torch unlit.
 void LaraObject::SetWeaponType(LaraWeaponType weaponType, bool activate)
 {
 	auto* lara = GetLaraInfo(m_item);

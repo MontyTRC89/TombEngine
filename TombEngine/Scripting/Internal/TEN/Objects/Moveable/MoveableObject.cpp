@@ -437,12 +437,16 @@ ScriptReserved_GetSlotHP, & Moveable::GetSlotHP,
 	ScriptReserved_Destroy, &Moveable::Destroy,
 
 /// Attach camera to an object.
-// @function Moveable:mesh 1 for camera, mesh 2 for target
-	ScriptReserved_AttachObjCamera, & Moveable::AttachObjCamera,
+// @function Moveable:AttachObjCamera
+// @tparam int mesh 1 for camera, mesh 2 for target
+	ScriptReserved_AttachObjCamera, &Moveable::AttachObjCamera,
 
 /// Borrow animation from an object
-// @function GAME_OBJECT_ID ObjectID to take animation and stateID from, int animationnumber from object, int stateID from object
-	ScriptReserved_AnimFromObject, & Moveable::AnimFromObject);
+// @function Moveable:AnimFromObject
+// @tparam ObjID ObjectID to take animation and stateID from,
+// @tparam int animNumber animation from object
+// @tparam int stateID state from object
+	ScriptReserved_AnimFromObject, &Moveable::AnimFromObject);
 }
 
 

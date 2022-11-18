@@ -102,6 +102,54 @@
 	<td class="name" ><a href="#LaraObject:GetOnFire">LaraObject:GetOnFire()</a></td>
 	<td class="summary">Get whether Lara is on fire or not</td>
 	</tr>
+	<tr>
+	<td class="name" ><a href="#LaraObject:SetPoison">LaraObject:SetPoison([Potency])</a></td>
+	<td class="summary">Set Lara poison potency</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#LaraObject:GetPoison">LaraObject:GetPoison()</a></td>
+	<td class="summary">Get poison potency of Lara</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#LaraObject:SetAir">LaraObject:SetAir(Air)</a></td>
+	<td class="summary">Set air value of Lara</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#LaraObject:GetAir">LaraObject:GetAir()</a></td>
+	<td class="summary">Get air value of Lara</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#LaraObject:SetSprintEnergy">LaraObject:SetSprintEnergy(sprint)</a></td>
+	<td class="summary">Set sprint energy value of Lara</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#LaraObject:GetSprintEnergy">LaraObject:GetSprintEnergy()</a></td>
+	<td class="summary">Get sprint energy value of Lara</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#LaraObject:SetWet">LaraObject:SetWet(Wetness)</a></td>
+	<td class="summary">Set wetness value of Lara (causes dripping)</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#LaraObject:GetWet">LaraObject:GetWet()</a></td>
+	<td class="summary">Get wetness value of Lara</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#LaraObject:GetAmmoCount">LaraObject:GetAmmoCount()</a></td>
+	<td class="summary">Get current weapon's ammo count</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#LaraObject:UndrawWeapon">LaraObject:UndrawWeapon()</a></td>
+	<td class="summary">Lara will undraw her weapon if it is drawn and throw away a flare if she is currently holding one.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#LaraObject:ThrowAwayTorch">LaraObject:ThrowAwayTorch()</a></td>
+	<td class="summary">Lara will throw away the torch if she currently holds one in her hand.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#LaraObject:SetWeaponType">LaraObject:SetWeaponType(weaponType, activate)</a></td>
+	<td class="summary">Set Lara weapon type</td>
+	</tr>
 </table>
 
 <br/>
@@ -152,6 +200,308 @@
 
 
 </dd>
+    <dt>
+    <a name = "LaraObject:SetPoison"></a>
+    <strong>LaraObject:SetPoison([Potency])</strong>
+    </dt>
+    <dd>
+    Set Lara poison potency
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">Potency</span>
+            <span class="types"><span class="type">int</span></span>
+        ; maximum value is 64 (default 0)
+         (<em>optional</em>)
+        </li>
+    </ul>
+
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">Lara:SetPoison(<span class="number">10</span>)</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "LaraObject:GetPoison"></a>
+    <strong>LaraObject:GetPoison()</strong>
+    </dt>
+    <dd>
+    Get poison potency of Lara
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">int</span></span>
+        current poison potency
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="keyword">local</span> poisonPotency = Lara:GetPoison()</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "LaraObject:SetAir"></a>
+    <strong>LaraObject:SetAir(Air)</strong>
+    </dt>
+    <dd>
+    Set air value of Lara
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">Air</span>
+            <span class="types"><span class="type">int</span></span>
+         value to give Lara. Maximum value is 1800.
+        </li>
+    </ul>
+
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">Lara:SetAir(<span class="number">100</span>)</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "LaraObject:GetAir"></a>
+    <strong>LaraObject:GetAir()</strong>
+    </dt>
+    <dd>
+    Get air value of Lara
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">int</span></span>
+        current air value
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="keyword">local</span> currentAir = Lara:GetAir()</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "LaraObject:SetSprintEnergy"></a>
+    <strong>LaraObject:SetSprintEnergy(sprint)</strong>
+    </dt>
+    <dd>
+    Set sprint energy value of Lara
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">sprint</span>
+            <span class="types"><span class="type">int</span></span>
+         energy to give to Lara; maximum value is 120.
+        </li>
+    </ul>
+
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">Lara:SetSprintEnergy(<span class="number">120</span>)</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "LaraObject:GetSprintEnergy"></a>
+    <strong>LaraObject:GetSprintEnergy()</strong>
+    </dt>
+    <dd>
+    Get sprint energy value of Lara
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">int</span></span>
+        current sprint value
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="keyword">local</span> sprintEnergy = Lara:GetSprintEnergy()</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "LaraObject:SetWet"></a>
+    <strong>LaraObject:SetWet(Wetness)</strong>
+    </dt>
+    <dd>
+    Set wetness value of Lara (causes dripping)
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">Wetness</span>
+            <span class="types"><span class="type">int</span></span>
+         value. Maximum 255
+        </li>
+    </ul>
+
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">Lara:SetWet(<span class="number">100</span>)</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "LaraObject:GetWet"></a>
+    <strong>LaraObject:GetWet()</strong>
+    </dt>
+    <dd>
+    Get wetness value of Lara
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">int</span></span>
+        current wetness value
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="keyword">local</span> dripAmount = Lara:GetWet()</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "LaraObject:GetAmmoCount"></a>
+    <strong>LaraObject:GetAmmoCount()</strong>
+    </dt>
+    <dd>
+    Get current weapon's ammo count
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">int</span></span>
+        current ammo count (-1 if infinite)
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="keyword">local</span> equippedWeaponAmmoLeft = Lara:GetAmmoCount()</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "LaraObject:UndrawWeapon"></a>
+    <strong>LaraObject:UndrawWeapon()</strong>
+    </dt>
+    <dd>
+    Lara will undraw her weapon if it is drawn and throw away a flare if she is currently holding one.
+
+
+
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">Lara:UndrawWeapon()</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "LaraObject:ThrowAwayTorch"></a>
+    <strong>LaraObject:ThrowAwayTorch()</strong>
+    </dt>
+    <dd>
+    Lara will throw away the torch if she currently holds one in her hand.
+
+
+
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">Lara:ThrowAwayTorch()</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "LaraObject:SetWeaponType"></a>
+    <strong>LaraObject:SetWeaponType(weaponType, activate)</strong>
+    </dt>
+    <dd>
+    Set Lara weapon type
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">weaponType</span>
+            <span class="types"><span class="type">LaraWeaponType</span></span>
+
+
+<p> Must be one of:</p>
+<pre><code>NONE
+PISTOLS
+REVOLVER
+UZI
+SHOTGUN
+HK
+CROSSBOW
+FLARE
+TORCH
+GRENADELAUNCHER
+HARPOONGUN
+ROCKETLAUNCHER
+</code></pre>
+
+        </li>
+        <li><span class="parameter">activate</span>
+            <span class="types"><span class="type">bool</span></span>
+         true = let her also draw the weapons, set torch lit. false = let Laras new weapons remain holstered until she draws them, set torch unlit.
+        </li>
+    </ul>
+
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">Lara:SetWeaponType(LaraWeaponType.PISTOLS, <span class="keyword">false</span>)</pre>
+    </ul>
+
+</dd>
 </dl>
 
 
@@ -159,7 +509,7 @@
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
-<i style="float:right;">Last updated 2022-11-11 21:01:04 </i>
+<i style="float:right;">Last updated 2022-11-18 15:30:35 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>
