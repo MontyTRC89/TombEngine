@@ -3,10 +3,12 @@
 
 #include "Game/camera.h"
 #include "Game/Lara/lara.h"
+#include "Game/Lara/lara_fire.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_struct.h"
 #include "Objects/Generic/Object/burning_torch.h"
 #include "Game/effects/lara_fx.h"
+#include "Specific/level.h"
 #include "ReservedScriptNames.h"
 
 /***
@@ -51,7 +53,7 @@ bool LaraObject::GetOnFire() const
 	return lara->BurnType != BurnType::None;
 }
 
-/// Set Poison with potency of poision
+/// Set Lara poison potency
 // @function LaraObject:SetPoison
 // @tparam Potency Value (optional, resets to 0 if not provided)
 // @usage
@@ -62,13 +64,14 @@ void LaraObject::SetPoison(sol::optional<int> potency)
 	auto* lara = GetLaraInfo(m_item);
 
 	if (potency.has_value())
-		lara->PoisonPotency = potency.value();
+		lara->PoisonPotency = std::clamp(potency.value(), 0, (int)LARA_POISON_POTENCY_MAX);
 	else
 		lara->PoisonPotency = 0;
 }
 
-/// Get Poison potency of Lara
+/// Get poison potency of Lara
 // @function LaraObject:GetPoison
+// @treturn int current poison value
 // @usage
 // Lara:GetPoison()
 int LaraObject::GetPoison() const
@@ -77,7 +80,7 @@ int LaraObject::GetPoison() const
 	return lara->PoisonPotency;
 }
 
-/// Set Air of Lara
+/// Set air value of Lara
 // @function LaraObject:SetAir
 // @tparam Air Value 
 // @usage
@@ -88,13 +91,14 @@ void LaraObject::SetAir(sol::optional<int> air)
 	auto* lara = GetLaraInfo(m_item);
 
 	if (air.has_value())
-		lara->Air = air.value();
+		lara->Air = std::clamp(air.value(), 0, (int)LARA_AIR_MAX);
 	else
 		lara->Air = LARA_AIR_MAX;
 }
 
-/// Get Air value of Lara
+/// Get air value of Lara
 // @function LaraObject:GetAir
+// @treturn int current air value
 // @usage
 // Lara:GetAir()
 int LaraObject::GetAir() const
@@ -103,6 +107,73 @@ int LaraObject::GetAir() const
 	return lara->Air;
 }
 
+/// Set sprint energy value of Lara
+// @function LaraObject:SetSprintEnergy
+// @tparam Sprint Value 
+// @usage
+// Lara:SetSprintEnergy(120)
+// Max Value: 120
+void LaraObject::SetSprintEnergy(sol::optional<int> value)
+{
+	auto* lara = GetLaraInfo(m_item);
+
+	if (value.has_value())
+		lara->SprintEnergy = std::clamp(value.value(), 0, (int)LARA_SPRINT_ENERGY_MAX);
+	else
+		lara->SprintEnergy = LARA_SPRINT_ENERGY_MAX;
+}
+
+/// Get sprint energy value of Lara
+// @function LaraObject:GetSprintEnergy
+// @treturn int current sprint value
+// @usage
+// Lara:GetSprintEnergy()
+int LaraObject::GetSprintEnergy() const
+{
+	auto* lara = GetLaraInfo(m_item);
+	return lara->SprintEnergy;
+}
+
+/// Set wetness value of Lara (causes dripping)
+// @function LaraObject:SetWet
+// @tparam Wet Value 
+// @usage
+// Lara:SetWet(100)
+// Max Value: 255
+void LaraObject::SetWet(sol::optional<int> wetness)
+{
+	auto* lara = GetLaraInfo(m_item);
+
+	unsigned char value = wetness.has_value() ? (unsigned char)wetness.value() : UCHAR_MAX;
+	for (unsigned char& i : lara->Wet)
+		i = value;
+}
+
+/// Get wetness value of Lara
+// @function LaraObject:GetWet
+// @treturn int current wetness value
+// @usage
+// Lara:GetWet()
+// Max Value: 255
+int LaraObject::GetWet() const
+{
+	auto* lara = GetLaraInfo(m_item);
+	return lara->Wet[0];
+}
+
+/// Get current weapon's ammo count
+// @function LaraObject:GetAmmoCount
+// @treturn int current ammo count (-1 if infinite)
+// @usage
+// Lara:GetAmmoCount()
+int LaraObject::GetAmmoCount() const
+{
+	auto* lara = GetLaraInfo(m_item);
+	auto& ammo = GetAmmo(Lara, Lara.Control.Weapon.GunType);
+	return (ammo.HasInfinite()) ? -1 : (int)ammo.GetCount();
+}
+	
+	
 /// Lara will undraw her weapon if it is drawn and throw away flare if she holds one in her hand.
 // @function LaraObject:UndrawWeapon
 // @usage
@@ -199,11 +270,16 @@ void LaraObject::Register(sol::table& parent)
 			ScriptReserved_GetPoison, &LaraObject::GetPoison,
 			ScriptReserved_SetAir, &LaraObject::SetAir,
 			ScriptReserved_GetAir, &LaraObject::GetAir,
+			ScriptReserved_SetWet, &LaraObject::SetWet,
+			ScriptReserved_GetWet, &LaraObject::GetWet,
+			ScriptReserved_SetSprintEnergy, &LaraObject::SetSprintEnergy,
+			ScriptReserved_GetSprintEnergy, &LaraObject::GetSprintEnergy,
 			ScriptReserved_UndrawWeapon, &LaraObject::UndrawWeapon,
 			ScriptReserved_ThrowAwayTorch, &LaraObject::ThrowAwayTorch,
 			ScriptReserved_GetHandStatus, &LaraObject::GetHandStatus,
 			ScriptReserved_GetWeaponType, &LaraObject::GetWeaponType,
 			ScriptReserved_SetWeaponType, &LaraObject::SetWeaponType,
+			ScriptReserved_GetAmmoCount, &LaraObject::GetAmmoCount,
 			sol::base_classes, sol::bases<Moveable>()
 		);
 }
