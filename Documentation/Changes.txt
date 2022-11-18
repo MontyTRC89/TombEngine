@@ -46,7 +46,18 @@ Version 1.0.3
 
 Lua API changes:
 * A new class has been added, LaraObject, for Lara-specific functions. The built-in "Lara" variable now uses this class.
-* Add Get/SetPoison, Get/SetAir, Get/SetOnFire, Get/SetSprintEnergy and GetAmmoCount to LaraObject Class.
+* Add functions for Lara object:
+  - GetPoison / SetPoison
+  - GetAir / SetAir
+  - GetOnFire / SetOnFire
+  - GetSprintEnergy / SetSprintEnergy
+  - GetWet / SetWet
+  - GetWeaponType / SetWeaponType
+  - UndrawWeapon
+  - GetAmmoCount
+  - GetHandStatus
+  - ThrowAwayTorch
+  
 * Add FlipMap and PlayFlyBy script commands and node functions.
 * Add GetMoveablesBySlot and GetStaticsBySlot script commands to select groups of items.
 * Add FlyCheat option to gameflow script for disabling dozy mode.
