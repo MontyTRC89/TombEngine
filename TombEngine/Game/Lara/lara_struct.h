@@ -985,6 +985,7 @@ public:
 
 	Ammo& operator --()
 	{
+		assert(this->Count > 0);
 		--this->Count;
 		return *this;
 	}

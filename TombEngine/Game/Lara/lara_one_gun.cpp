@@ -51,6 +51,10 @@ constexpr auto PROJECTILE_EXPLODE_RADIUS = BLOCK(1);
 constexpr auto HK_BURST_MODE_SHOT_COUNT	   = 5;
 constexpr auto HK_BURST_MODE_SHOT_INTERVAL = 12.0f;
 
+constexpr auto SHOTGUN_PELLET_COUNT = 6;
+constexpr auto SHOTGUN_NORMAL_PELLET_SCATTER = 10.0f;
+constexpr auto SHOTGUN_WIDESHOT_PELLET_SCATTER = 30.0f;
+
 
 void AnimateShotgun(ItemInfo* laraItem, LaraWeaponType weaponType)
 {
@@ -323,6 +327,10 @@ void FireShotgun(ItemInfo* laraItem)
 {
 	auto* lara = GetLaraInfo(laraItem);
 
+	auto& ammo = GetAmmo(*lara, LaraWeaponType::Shotgun);
+	if (!ammo.HasInfinite() && !ammo.GetCount())
+		return;
+
 	auto armOrient = EulerAngles(
 		lara->LeftArm.Orientation.x,
 		lara->LeftArm.Orientation.y + laraItem->Pose.Orientation.y,
@@ -338,22 +346,31 @@ void FireShotgun(ItemInfo* laraItem)
 		);
 	}
 
-	int value = (lara->Weapons[(int)LaraWeaponType::Shotgun].SelectedAmmo == WeaponAmmoType::Ammo1 ? 1820 : 5460);
 	bool hasFired = false;
-	for (int i = 0; i < 6; i++)
+	int scatter = (lara->Weapons[(int)LaraWeaponType::Shotgun].SelectedAmmo == WeaponAmmoType::Ammo1 ? 
+				  ANGLE(SHOTGUN_NORMAL_PELLET_SCATTER) : ANGLE(SHOTGUN_WIDESHOT_PELLET_SCATTER));
+
+
+	for (int i = 0; i < SHOTGUN_PELLET_COUNT; i++)
 	{
 		auto wobbledArmOrient = EulerAngles(
-			armOrient.x + value * (GetRandomControl() - ANGLE(90.0f)) / 65536,
-			armOrient.y + value * (GetRandomControl() - ANGLE(90.0f)) / 65536,
-			0
-		);
+			armOrient.x + scatter * (GetRandomControl() - ANGLE(90.0f)) / 65536,
+			armOrient.y + scatter * (GetRandomControl() - ANGLE(90.0f)) / 65536,
+			0);
 
 		if (FireWeapon(LaraWeaponType::Shotgun, lara->TargetEntity, laraItem, wobbledArmOrient) != FireWeaponType::NoAmmo)
 			hasFired = true;
+
+		// HACK: compensate for spending 6 units of shotgun ammo. -- Lwmte, 18.11.22
+		if (!ammo.HasInfinite())
+			ammo++;
 	}
 
 	if (hasFired)
 	{
+		if (!ammo.HasInfinite())
+			ammo--;
+
 		auto pos = GetJointPosition(laraItem, LM_RHAND, Vector3i(0, 1508, 32));
 		auto pos2 = GetJointPosition(laraItem, LM_RHAND, Vector3i(0, 228, 32));
 
