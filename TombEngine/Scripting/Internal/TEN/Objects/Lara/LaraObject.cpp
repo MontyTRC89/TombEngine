@@ -29,13 +29,15 @@ void LaraObject::SetOnFire(bool onFire)
 {
 	//todo add support for other BurnTypes -squidshire 11/11/2022
 	auto* lara = GetLaraInfo(m_item);
-	if (onFire && lara->BurnType == BurnType::None)
+	if (onFire && !lara->Burn)
 	{
 		TEN::Effects::Lara::LaraBurn(m_item);
+		lara->Burn = true;
 		lara->BurnType = BurnType::Normal;
 	}
 	else if (!onFire)
 	{
+		lara->Burn = false;
 		lara->BurnType = BurnType::None;
 	}
 }
