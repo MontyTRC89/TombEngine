@@ -662,6 +662,7 @@ void Moveable::SetOnFire(bool onFire)
 	if (onFire && m_item->Burn.Type == BurnType::None)
 	{
 		m_item->Burn.Type = BurnType::Normal;
+		m_item->Burn.Color = Vector3(0.8f, 0.2f, 0.0f);
 	}
 	else if (!onFire)
 	{
