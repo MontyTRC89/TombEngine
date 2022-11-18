@@ -40,9 +40,14 @@ public:
 	int GetPoison() const;
 	void SetAir(sol::optional<int> air);
 	int GetAir() const;
+	void SetSprintEnergy(sol::optional<int> value);
+	int GetSprintEnergy() const;
+	void SetWet(sol::optional<int> wetness);
+	int GetWet() const;
 	HandStatus GetHandStatus() const;
 	LaraWeaponType GetWeaponType() const;
 	void SetWeaponType(LaraWeaponType weaponType, bool activate);
+	int GetAmmoCount() const;
 	void UndrawWeapon();
 	void ThrowAwayTorch();
 	static void Register(sol::table & parent);

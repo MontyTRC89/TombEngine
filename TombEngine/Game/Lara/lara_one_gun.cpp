@@ -354,10 +354,6 @@ void FireShotgun(ItemInfo* laraItem)
 
 	if (hasFired)
 	{
-		auto& ammo = GetAmmo(*lara, LaraWeaponType::Shotgun);
-		if (!ammo.HasInfinite())
-			ammo--;
-
 		auto pos = GetJointPosition(laraItem, LM_RHAND, Vector3i(0, 1508, 32));
 		auto pos2 = GetJointPosition(laraItem, LM_RHAND, Vector3i(0, 228, 32));
 

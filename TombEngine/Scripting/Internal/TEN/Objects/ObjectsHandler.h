@@ -77,7 +77,6 @@ private:
 
 			if (objID == item.ObjectNumber)
 				items.push_back(GetByName<Moveable, ScriptReserved_Moveable>(key));
-			
 		}
 
 		return items;
@@ -96,7 +95,6 @@ private:
 
 			if (meshInfo.staticNumber == slot)
 				items.push_back(GetByName<Static, ScriptReserved_Static>(key));
-			
 		}
 
 		return items;
