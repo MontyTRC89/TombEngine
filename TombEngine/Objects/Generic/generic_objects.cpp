@@ -53,8 +53,6 @@ static void StartObject()
 		object->ceilingBorder = TrapDoorCeilingBorder;
 		object->floor = TrapDoorFloor;
 		object->ceiling = TrapDoorCeiling;
-		object->saveAnim = true;
-		object->saveFlags = true;
 	}
 
 	object = &Objects[ID_TRAPDOOR2];
@@ -67,8 +65,6 @@ static void StartObject()
 		object->ceilingBorder = TrapDoorCeilingBorder;
 		object->floor = TrapDoorFloor;
 		object->ceiling = TrapDoorCeiling;
-		object->saveAnim = true;
-		object->saveFlags = true;
 	}
 
 	object = &Objects[ID_TRAPDOOR3];
@@ -81,8 +77,6 @@ static void StartObject()
 		object->ceilingBorder = TrapDoorCeilingBorder;
 		object->floor = TrapDoorFloor;
 		object->ceiling = TrapDoorCeiling;
-		object->saveAnim = true;
-		object->saveFlags = true;
 	}
 
 	object = &Objects[ID_FLOOR_TRAPDOOR1];
@@ -95,8 +89,6 @@ static void StartObject()
 		object->ceilingBorder = TrapDoorCeilingBorder;
 		object->floor = TrapDoorFloor;
 		object->ceiling = TrapDoorCeiling;
-		object->saveAnim = true;
-		object->saveFlags = true;
 	}
 
 	object = &Objects[ID_FLOOR_TRAPDOOR2];
@@ -109,8 +101,6 @@ static void StartObject()
 		object->ceilingBorder = TrapDoorCeilingBorder;
 		object->floor = TrapDoorFloor;
 		object->ceiling = TrapDoorCeiling;
-		object->saveAnim = true;
-		object->saveFlags = true;
 	}
 
 	object = &Objects[ID_CEILING_TRAPDOOR1];
@@ -123,8 +113,6 @@ static void StartObject()
 		object->ceilingBorder = TrapDoorCeilingBorder;
 		object->floor = TrapDoorFloor;
 		object->ceiling = TrapDoorCeiling;
-		object->saveAnim = true;
-		object->saveFlags = true;
 	}
 
 	object = &Objects[ID_CEILING_TRAPDOOR2];
@@ -137,8 +125,6 @@ static void StartObject()
 		object->ceilingBorder = TrapDoorCeilingBorder;
 		object->floor = TrapDoorFloor;
 		object->ceiling = TrapDoorCeiling;
-		object->saveAnim = true;
-		object->saveFlags = true;
 	}
 
 	object = &Objects[ID_BRIDGE_FLAT];
@@ -200,8 +186,6 @@ void StartSwitches()
 		object->collision = CogSwitchCollision;
 		object->control = CogSwitchControl;
 		object->hitEffect = HIT_RICOCHET;
-		object->saveFlags = true;
-		object->saveAnim = true;
 	}
 
 	object = &Objects[ID_LEVER_SWITCH];
@@ -209,8 +193,6 @@ void StartSwitches()
 	{
 		object->collision = RailSwitchCollision;
 		object->control = SwitchControl;
-		object->saveFlags = true;
-		object->saveAnim = true;
 	}
 
 	object = &Objects[ID_JUMP_SWITCH];
@@ -218,8 +200,6 @@ void StartSwitches()
 	{
 		object->collision = JumpSwitchCollision;
 		object->control = SwitchControl;
-		object->saveFlags = true;
-		object->saveAnim = true;
 	}
 
 	for (int objectNum = ID_SWITCH_TYPE1; objectNum <= ID_SWITCH_TYPE16; objectNum++)
@@ -229,9 +209,6 @@ void StartSwitches()
 		{
 			object->collision = SwitchCollision;
 			object->control = SwitchControl;
-			object->saveFlags = true;
-			object->saveAnim = true;
-			object->saveMesh = true;
 		}
 	}
 
@@ -240,8 +217,6 @@ void StartSwitches()
 	{
 		object->collision = CrowbarSwitchCollision;
 		object->control = SwitchControl;
-		object->saveFlags = true;
-		object->saveAnim = true;
 	}
 
 	for (int objectNum = ID_UNDERWATER_SWITCH1; objectNum <= ID_UNDERWATER_SWITCH4; objectNum++)
@@ -304,9 +279,6 @@ void StartDoors()
 			object->control = DoorControl;
 			object->collision = DoorCollision;
 			object->hitEffect = HIT_RICOCHET;
-			object->saveAnim = true;
-			object->saveFlags = true;
-			object->saveMesh = true;
 		}
 	}
 
@@ -316,7 +288,6 @@ void StartDoors()
 		object->initialise = InitialiseDoor;
 		object->control = DoorControl;
 		object->hitEffect = HIT_RICOCHET;
-		object->saveFlags = true;
 	}
 
 	object = &Objects[ID_LIFT_DOORS2];
@@ -325,7 +296,6 @@ void StartDoors()
 		object->initialise = InitialiseDoor;
 		object->control = DoorControl;
 		object->hitEffect = HIT_RICOCHET;
-		object->saveFlags = true;
 	}
 
 	object = &Objects[ID_SEQUENCE_DOOR1];
@@ -335,8 +305,6 @@ void StartDoors()
 		object->collision = DoorCollision;
 		object->control = SequenceDoorControl;
 		object->hitEffect = HIT_RICOCHET;
-		object->saveAnim = true;
-		object->saveFlags = true;
 	}
 
 	for (int i = ID_DOUBLE_DOORS1; i <= ID_DOUBLE_DOORS4; i++)
@@ -348,8 +316,6 @@ void StartDoors()
 			object->collision = DoubleDoorCollision;
 			object->control = PushPullKickDoorControl;
 			object->hitEffect = HIT_RICOCHET;
-			object->saveAnim = true;
-			object->saveFlags = true;
 		}
 	}
 
@@ -362,8 +328,6 @@ void StartDoors()
 			object->collision = UnderwaterDoorCollision;
 			object->control = PushPullKickDoorControl;
 			object->hitEffect = HIT_RICOCHET;
-			object->saveAnim = true;
-			object->saveFlags = true;
 		}
 	}
 
@@ -376,8 +340,6 @@ void StartDoors()
 			object->collision = PushPullKickDoorCollision;
 			object->control = PushPullKickDoorControl;
 			object->hitEffect = HIT_RICOCHET;
-			object->saveAnim = true;
-			object->saveFlags = true;
 		}
 	}
 
@@ -386,10 +348,6 @@ void StartDoors()
 	{
 		object->initialise = InitialiseSteelDoor;
 		object->collision = SteelDoorCollision;
-		object->saveAnim = true;
-		object->saveFlags = true;
-		object->saveMesh = true;
-		object->savePosition = true;
 	}
 }
 
@@ -410,7 +368,6 @@ void StartTraps()
 	{
 		object->control = DartEmitterControl;
 		object->drawRoutine = nullptr;
-		object->saveFlags = true;
 		object->usingDrawAnimatingItem = false;
 	}
 
@@ -419,7 +376,6 @@ void StartTraps()
 	{
 		object->control = DartEmitterControl;
 		object->drawRoutine = nullptr;
-		object->saveFlags = true;
 		object->usingDrawAnimatingItem = false;
 	}
 
@@ -430,7 +386,6 @@ void StartTraps()
 		object->control = RopeControl;
 		object->collision = RopeCollision;
 		object->drawRoutine = nullptr;
-		object->saveFlags = true;
 		object->usingDrawAnimatingItem = false;
 	}
 
@@ -438,7 +393,6 @@ void StartTraps()
 	if (object->loaded)
 	{
 		object->collision = PoleCollision;
-		object->saveFlags = true;
 	}
 
 	object = &Objects[ID_BURNING_TORCH_ITEM];
@@ -446,8 +400,6 @@ void StartTraps()
 	{
 		object->control = TorchControl;
 		object->collision = PickupCollision;
-		object->saveFlags = true;
-		object->savePosition = true;
 		object->usingDrawAnimatingItem = true;
 		object->isPickup = true;
 	}
