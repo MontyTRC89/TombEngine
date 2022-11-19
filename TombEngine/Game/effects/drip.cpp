@@ -118,11 +118,11 @@ namespace TEN::Effects::Drip
 			int floorHeight = GetCollision(drip.Position.x, drip.Position.y, drip.Position.z, drip.RoomNumber).Position.Floor;
 			int waterHeight = GetWaterHeight(drip.Position.x, drip.Position.y, drip.Position.z, drip.RoomNumber);
 
-			// Land on floor.
+			// Drip hit floor; deactivate.
 			if (drip.Position.y > floorHeight)
 				drip.IsActive = false;
 
-			// Land in water.
+			// Land hit water; spawn ripple.
 			if (drip.Position.y > waterHeight)
 			{
 				drip.IsActive = false;
