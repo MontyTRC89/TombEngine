@@ -1328,16 +1328,21 @@ namespace TEN::Renderer
 	void Renderer11::DrawDripParticles(RenderView& view)
 	{
 		using TEN::Effects::Drip::DripParticle;
-		using TEN::Effects::Drip::dripParticles;
+		using TEN::Effects::Drip::DripParticles;
 		using TEN::Effects::Drip::DRIP_WIDTH;
 
-		for (int i = 0; i < dripParticles.size(); i++) 
+		for (const auto& drip : DripParticles) 
 		{
-			DripParticle& d = dripParticles[i];
-			if (!d.active) continue;
-			Vector3 v;
-			d.velocity.Normalize(v);
-			AddSpriteBillboardConstrained(&m_sprites[Objects[ID_DRIP_SPRITE].meshIndex], d.pos, d.color, 0, 1, { DRIP_WIDTH, d.height }, BLENDMODE_ADDITIVE, -v, false, view);
+			if (!drip.IsActive)
+				continue;
+
+			auto vector = Vector3::Zero;
+			drip.Velocity.Normalize(vector);
+
+			AddSpriteBillboardConstrained(
+				&m_sprites[Objects[ID_DRIP_SPRITE].meshIndex],
+				drip.Position,
+				drip.Color, 0.0f, 1.0f, Vector2(DRIP_WIDTH, drip.Height), BLENDMODE_ADDITIVE, -vector, false, view);
 		}
 	}
 
@@ -1346,11 +1351,15 @@ namespace TEN::Renderer
 		using TEN::Effects::Explosion::explosionParticles;
 		using TEN::Effects::Explosion::ExplosionParticle;
 
-		for (int i = 0; i < explosionParticles.size(); i++) 
+		for (const auto& explosion : explosionParticles) 
 		{
-			ExplosionParticle& e = explosionParticles[i];
-			if (!e.active) continue;
-			AddSpriteBillboard(&m_sprites[Objects[ID_EXPLOSION_SPRITES].meshIndex + e.sprite], e.pos, e.tint, e.rotation, 1.0f, { e.size, e.size }, BLENDMODE_ADDITIVE, true, view);
+			if (!explosion.active)
+				continue;
+
+			AddSpriteBillboard(
+				&m_sprites[Objects[ID_EXPLOSION_SPRITES].meshIndex + explosion.sprite],
+				explosion.pos,
+				explosion.tint, explosion.rotation, 1.0f, { explosion.size, explosion.size }, BLENDMODE_ADDITIVE, true, view);
 		}
 	}
 
@@ -1358,10 +1367,15 @@ namespace TEN::Renderer
 	{
 		using namespace TEN::Effects;
 
-		for(SimpleParticle& s : simpleParticles)
+		for(const auto& particle : simpleParticles)
 		{
-			if(!s.active) continue;
-			AddSpriteBillboard(&m_sprites[Objects[s.sequence].meshIndex + s.sprite], s.worldPosition, Vector4(1, 1, 1, 1), 0, 1.0f, { s.size, s.size / 2 }, BLENDMODE_ALPHABLEND, true, view);
+			if (!particle.active)
+				continue;
+
+			AddSpriteBillboard(
+				&m_sprites[Objects[particle.sequence].meshIndex + particle.sprite],
+				particle.worldPosition,
+				Vector4::One, 0.0f, 1.0f, Vector2(particle.size, particle.size / 2), BLENDMODE_ALPHABLEND, true, view);
 		}
 	}
 }

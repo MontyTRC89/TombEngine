@@ -18,8 +18,9 @@ namespace TEN::Effects::Footprints
 	constexpr auto FOOTPRINT_LIFE_START_FADING = 10.0f * FPS;
 	constexpr auto FOOTPRINT_OPACITY_MAX	   = 0.5f;
 
-	constexpr auto FOOTPRINT_SCALE	  = 64.0f;
-	constexpr auto FOOT_HEIGHT_OFFSET = CLICK(1.0f / 4);
+	constexpr auto FOOTPRINT_SCALE		   = 64.0f;
+	constexpr auto FOOTPRINT_HEIGHT_OFFSET = 4;
+	constexpr auto FOOT_HEIGHT_OFFSET	   = CLICK(1.0f / 4);
 
 	const auto FootprintMaterials = std::vector<FLOOR_MATERIAL>
 	{
@@ -194,15 +195,15 @@ namespace TEN::Effects::Footprints
 		return false;
 	}
 
-	bool TestFootHeight(ItemInfo& item, int mesh, Vector3& outFootprintPos)
+	bool TestFootHeight(ItemInfo& item, int meshIndex, Vector3& outFootprintPos)
 	{
 		static constexpr auto heightRange = CLICK(1.0f / 4);
 		static const auto footOffset = Vector3i(0, FOOT_HEIGHT_OFFSET, 0);
 
-		auto footPos = GetJointPosition(LaraItem, mesh, footOffset);
+		auto footPos = GetJointPosition(LaraItem, meshIndex, footOffset);
 		int floorHeight = GetCollision(footPos.x, footPos.y - CLICK(1), footPos.z, item.RoomNumber).Position.Floor;
 
-		outFootprintPos = Vector3(footPos.x, floorHeight - 4, footPos.z);
+		outFootprintPos = Vector3(footPos.x, floorHeight - FOOTPRINT_HEIGHT_OFFSET, footPos.z);
 		return (abs(footPos.y - floorHeight) < heightRange);
 	}
 
@@ -210,13 +211,13 @@ namespace TEN::Effects::Footprints
 	{
 		static constexpr auto heightRange = CLICK(1.0f / 2);
 
-		// Get point collision for every vertex point.
+		// Get point collision at every vertex point.
 		auto pointColl0 = GetCollision(vertexPoints[0].x, pos.y - CLICK(1), vertexPoints[0].z, item.RoomNumber);
 		auto pointColl1 = GetCollision(vertexPoints[1].x, pos.y - CLICK(1), vertexPoints[1].z, item.RoomNumber);
 		auto pointColl2 = GetCollision(vertexPoints[2].x, pos.y - CLICK(1), vertexPoints[2].z, item.RoomNumber);
 		auto pointColl3 = GetCollision(vertexPoints[3].x, pos.y - CLICK(1), vertexPoints[3].z, item.RoomNumber);
 
-		// Don't spawn footprint if all floor heights at vertex points are outside relative height range.
+		// Don't spawn footprint if floor heights at vertex points aren't within relative range.
 		if ((abs(pointColl0.Position.Floor - pointColl1.Position.Floor) > heightRange) ||
 			(abs(pointColl1.Position.Floor - pointColl2.Position.Floor) > heightRange) ||
 			(abs(pointColl2.Position.Floor - pointColl3.Position.Floor) > heightRange) ||

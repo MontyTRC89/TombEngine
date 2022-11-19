@@ -31,7 +31,7 @@ namespace TEN::Effects::Footprints
 	std::array<Vector3, 4> GetFootprintVertexPoints(const ItemInfo& item, const Vector3& pos, const Vector3& normal);
 
 	bool TestMaterial(FLOOR_MATERIAL refMaterial, const std::vector<FLOOR_MATERIAL>& materialList);
-	bool TestFootHeight(ItemInfo& item, int mesh, Vector3& outFootprintPosition);
+	bool TestFootHeight(ItemInfo& item, int meshIndex, Vector3& outFootprintPos);
 	bool TestFootprintFloor(const ItemInfo& item, const Vector3& pos, const std::array<Vector3, 4>& vertexPoints);
 
 	void SpawnFootprint(bool isRightFoot, const std::array<Vector3, 4>& vertexPoints);

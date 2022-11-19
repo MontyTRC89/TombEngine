@@ -59,7 +59,7 @@ namespace TEN::Math::Random
 			GenerateFloat(-box.Extents.z, box.Extents.z)
 		);
 
-		return Vector3::Transform(vector, rotMatrix);
+		return (box.Center + Vector3::Transform(vector, rotMatrix));
 	}
 
 	bool TestProbability(float probability)

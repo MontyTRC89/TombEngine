@@ -938,7 +938,7 @@ void SetupSplash(const SPLASH_SETUP* const setup, int room)
 		}
 	}
 
-	TEN::Effects::Drip::SpawnSplashDrips(Vector3(setup->x, setup->y - 15, setup->z), 32, room);
+	TEN::Effects::Drip::SpawnSplashDrips(Vector3(setup->x, setup->y - 15, setup->z), room, 32);
 	Pose soundPosition;
 	soundPosition.Position.x = setup->x;
 	soundPosition.Position.y = setup->y;

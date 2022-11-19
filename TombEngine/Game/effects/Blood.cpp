@@ -37,7 +37,7 @@ namespace TEN::Effects::Blood
 	std::array<BloodDrip, BLOOD_DRIP_NUM_MAX> BloodDrips  = {};
 	std::deque<BloodStain>					  BloodStains = {};
 
-	auto& GetFreeBloodDrip()
+	BloodDrip& GetFreeBloodDrip()
 	{
 		for (auto& drip : BloodDrips)
 		{
@@ -48,7 +48,7 @@ namespace TEN::Effects::Blood
 		return BloodDrips[0];
 	}
 
-	std::array<Vector3, 4> GetBloodStainVertexPoints(const Vector3& normal, const Vector3& pos, short orient2D, float scale)
+	std::array<Vector3, 4> GetBloodStainVertexPoints(const Vector3& pos, short orient2D, const Vector3& normal, float scale)
 	{
 		constexpr auto point0 = Vector3(SQRT_2, 0.0f, SQRT_2);
 		constexpr auto point1 = Vector3(-SQRT_2, 0.0f, SQRT_2);
@@ -91,14 +91,14 @@ namespace TEN::Effects::Blood
 
 	void SpawnBloodMistCloud(const Vector3& pos, int roomNumber, const Vector3& direction, float velocity, unsigned int count)
 	{
-		static const auto box = BoundingOrientedBox(pos, Vector3::One * BLOCK(1.0f / 16), Quaternion(direction, 1.0f));
-
 		if (TestEnvironment(ENV_FLAG_WATER, roomNumber))
 			return;
 
+		auto box = BoundingOrientedBox(pos, Vector3::One * BLOCK(1.0f / 16), Quaternion(direction, 1.0f));
+
 		for (int i = 0; i < count; i++)
 		{
-			auto randPos = pos + Random::GenerateVector3InBox(box);
+			auto randPos = Random::GenerateVector3InBox(box);
 			SpawnBloodMist(randPos, roomNumber, direction, count);
 		}
 	}
@@ -115,6 +115,7 @@ namespace TEN::Effects::Blood
 	{
 		auto& drip = GetFreeBloodDrip();
 
+		drip = {};
 		drip.IsActive = true;
 		drip.SpriteIndex = Objects[ID_BLOOD_STAIN_SPRITES].meshIndex + Random::GenerateInt(0, BLOOD_STAIN_NUM_SPRITES);
 		drip.Position = pos;
@@ -153,7 +154,7 @@ namespace TEN::Effects::Blood
 		stain.Color = BLOOD_COLOR_RED;
 		stain.ColorStart = stain.Color;
 		stain.ColorEnd = BLOOD_COLOR_BROWN;
-		stain.VertexPoints = GetBloodStainVertexPoints(stain.Normal, stain.Position, stain.Orientation2D, 0.0f);
+		stain.VertexPoints = GetBloodStainVertexPoints(stain.Position, stain.Orientation2D, stain.Normal, 0.0f);
 		stain.Life = BLOOD_STAIN_LIFE_MAX;
 		stain.LifeStartFading = BLOOD_STAIN_LIFE_START_FADING;
 		stain.Scale = 0.0f;
@@ -228,7 +229,7 @@ namespace TEN::Effects::Blood
 				auto pos = Vector3(drip.Position.x, pointColl.Position.Floor - BLOOD_STAIN_HEIGHT_OFFSET, drip.Position.z);
 				auto normal = Geometry::GetFloorNormal(pointColl.FloorTilt);
 
-				SpawnBloodStain(pos, drip.RoomNumber, normal, drip.Scale / 2, drip.Velocity.Length());
+				SpawnBloodStain(pos, drip.RoomNumber, normal, drip.Scale / 2, drip.Velocity.Length()); // TODO: Scale too large.
 			}
 			// Drip has hit ceiling; spawn stain.
 			else if ((pointColl.Position.Ceiling - vPos) >= 0)
@@ -284,7 +285,7 @@ namespace TEN::Effects::Blood
 			}
 
 			// Update vertex points.
-			stain.VertexPoints = GetBloodStainVertexPoints(stain.Normal, stain.Position, stain.Orientation2D, stain.Scale);
+			stain.VertexPoints = GetBloodStainVertexPoints(stain.Position, stain.Orientation2D, stain.Normal, stain.Scale);
 
 			// Update opacity.
 			if (stain.Life <= stain.LifeStartFading)

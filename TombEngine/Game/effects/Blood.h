@@ -12,8 +12,9 @@ namespace TEN::Effects::Blood
 
 	struct BloodDrip
 	{
-		bool		 IsActive	 = false;
-		unsigned int SpriteIndex = 0;
+		bool		 IsActive	   = false;
+		bool		 CanSpawnStain = false;
+		unsigned int SpriteIndex   = 0;
 
 		Vector3 Position   = Vector3::Zero;
 		int		RoomNumber = NO_ROOM;
@@ -55,7 +56,8 @@ namespace TEN::Effects::Blood
 	extern std::array<BloodDrip, BLOOD_DRIP_NUM_MAX> BloodDrips;
 	extern std::deque<BloodStain>					 BloodStains;
 
-	std::array<Vector3, 4> GetBloodStainVertexPoints(const Vector3& normal, const Vector3& pos, short orient2D, float scale);
+	BloodDrip&			   GetFreeBloodDrip();
+	std::array<Vector3, 4> GetBloodStainVertexPoints(const Vector3& pos, short orient2D, const Vector3& normal, float scale);
 
 	void SpawnBloodMist(const Vector3& pos, int roomNumber, const Vector3& direction, unsigned int count);
 	void SpawnBloodMistCloud(const Vector3& pos, int roomNumber, const Vector3& direction, float velocity, unsigned int maxCount);

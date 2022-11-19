@@ -1,33 +1,37 @@
 #pragma once
-#include <array>
-#include <d3d11.h>
-#include <SimpleMath.h>
+#include "Game/room.h"
 
 namespace TEN::Effects::Drip
 {
-	constexpr float DRIP_LIFE = 25.0f;
-	constexpr float DRIP_LIFE_LONG = 120.0f;
-	constexpr float DRIP_WIDTH = 4.0f;
-	constexpr int NUM_DRIPS = 512;
+	constexpr auto DRIPS_NUM_MAX = 512;
+	constexpr auto DRIP_LIFE	  = 25.0f;
+	constexpr auto DRIP_LIFE_LONG = 120.0f;
+	constexpr auto DRIP_WIDTH	  = 4.0f;
 
 	struct DripParticle
 	{
-		Vector3 pos;
-		Vector3 velocity;
-		Vector4 color;
-		int room;
-		float gravity;
-		float life;
-		float age;
-		float height;
-		bool active;
+		bool IsActive = false;
+
+		Vector3 Position   = Vector3::Zero;
+		int		RoomNumber = NO_ROOM;
+		Vector3 Velocity   = Vector3::Zero;
+		Vector4 Color	   = Vector4::Zero;
+
+		float Life	  = 0.0f;
+		float Age	  = 0.0f;
+		float Gravity = 0.0f;
+		float Height  = 0.0f;
 	};
-	extern std::array<DripParticle, NUM_DRIPS> dripParticles;
+
+	extern std::array<DripParticle, DRIPS_NUM_MAX> DripParticles;
+
+	DripParticle& GetFreeDrip();
+
+	void SpawnDripParticle(const Vector3& pos, int roomNumber, const Vector3& velocity, float life, float gravity);
+	void SpawnWetnessDrip(const Vector3& pos, int roomNumber); // Unused?
+	void SpawnSplashDrips(const Vector3& pos, int roomNumber, unsigned int count);
+	void SpawnGunshellDrips(const Vector3& pos, int roomNumber);
 
 	void UpdateDripParticles();
 	void DisableDripParticles();
-	DripParticle& getFreeDrip();
-	void SpawnWetnessDrip(const Vector3& pos, int room);
-	void SpawnSplashDrips(const Vector3& pos, int number, int room);
-	void SpawnGunshellDrips(const Vector3& pos, int room);
 }

@@ -14,117 +14,117 @@ using namespace TEN::Math;
 
 namespace TEN::Effects::Drip
 {
-	using namespace DirectX::SimpleMath;
+	constexpr auto DRIP_COLOR = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
 
-	std::array<DripParticle, NUM_DRIPS> dripParticles;
-	constexpr Vector4 DRIP_COLOR = Vector4(1, 1, 1, 1);
+	std::array<DripParticle, DRIPS_NUM_MAX> DripParticles = {};
 
-	void DisableDripParticles()
+	DripParticle& GetFreeDrip()
 	{
-		for (int i = 0; i < dripParticles.size(); i++)
-			dripParticles[i].active = false;
+		for (auto& drip : DripParticles)
+		{
+			if (!drip.IsActive)
+				return drip;
+		}
+
+		return DripParticles[0];
+	}
+
+	void SpawnDripParticle(const Vector3& pos, int roomNumber, const Vector3& velocity, float life, float gravity)
+	{
+		auto& drip = GetFreeDrip();
+
+		drip = {};
+		drip.IsActive = true;
+		drip.Position = pos;
+		drip.RoomNumber = roomNumber;
+		drip.Velocity = velocity;
+		drip.Life = life;
+		drip.Gravity = gravity;
+	}
+
+	void SpawnWetnessDrip(const Vector3& pos, int roomNumber)
+	{
+		SpawnDripParticle(pos, roomNumber, Vector3::Zero, DRIP_LIFE, Random::GenerateFloat(3.0f, 6.0f));
+	}
+
+	void SpawnSplashDrips(const Vector3& pos, int roomNumber, unsigned int count)
+	{
+		for (int i = 0; i < count; i++)
+		{
+			auto box = BoundingOrientedBox(pos, Vector3(128.0f, 128.0f, 128.0f), Vector4::Zero);
+			auto dripPos = Random::GenerateVector3InBox(box);
+
+			auto direction = dripPos - pos;
+			direction.Normalize();
+
+			auto velocity = (direction * 16) - Vector3(0.0f, Random::GenerateFloat(32.0f, 64.0f), 0.0f);
+
+			SpawnDripParticle(dripPos, roomNumber, velocity, DRIP_LIFE_LONG, Random::GenerateFloat(3.0f, 6.0f));
+		}
+	}
+
+	void SpawnGunshellDrips(const Vector3& pos, int roomNumber)
+	{
+		for (int i = 0; i < 4; i++)
+		{
+			auto box = BoundingOrientedBox(pos, Vector3(16.0f, 16.0f, 16.0f), Vector4::Zero);
+			auto dripPos = Random::GenerateVector3InBox(box);
+
+			auto direction = dripPos - pos;
+			direction.Normalize();
+
+			auto velocity = (direction * 16) - Vector3(0.0f, Random::GenerateFloat(16.0f, 24.0f), 0.0f);
+
+			SpawnDripParticle(dripPos, roomNumber, velocity, DRIP_LIFE_LONG, Random::GenerateFloat(2.0f, 3.0f));
+		}
 	}
 
 	void UpdateDripParticles()
 	{
-		for (int i = 0; i < dripParticles.size(); i++) 
+		for (auto& drip : DripParticles)
 		{
-			auto& drip = dripParticles[i];
-
-			if (!drip.active)
+			if (!drip.IsActive)
 				continue;
 
-			drip.age++;
-			if (drip.age > drip.life)
-				drip.active = false;
+			// Deactivate.
+			drip.Age += 1.0f;
+			if (drip.Age > drip.Life)
+				drip.IsActive = false;
 
-			drip.velocity.y += drip.gravity;
+			drip.Velocity.y += drip.Gravity;
 
-			if (TestEnvironment(ENV_FLAG_WIND, drip.room))
+			// Update velocity according to wind.
+			if (TestEnvironment(ENV_FLAG_WIND, drip.RoomNumber))
 			{
-				drip.velocity.x = Weather.Wind().x;
-				drip.velocity.z = Weather.Wind().z;
+				drip.Velocity.x = Weather.Wind().x;
+				drip.Velocity.z = Weather.Wind().z;
 			}
 
-			drip.pos += drip.velocity;
-			float normalizedAge = drip.age / drip.life;
-			drip.color = Vector4::Lerp(DRIP_COLOR, Vector4::Zero, normalizedAge);
-			drip.height = Lerp(DRIP_WIDTH / 0.15625f, 0, normalizedAge);
-			short room = drip.room;
-			FloorInfo* floor = GetFloor(drip.pos.x, drip.pos.y, drip.pos.z, &room);
-			int floorheight = floor->FloorHeight(drip.pos.x, drip.pos.z);
-			int waterHeight = GetWaterHeight(drip.pos.x, drip.pos.y, drip.pos.z, drip.room);
+			drip.Position += drip.Velocity;
+			float normalizedAge = drip.Age / drip.Life;
+			drip.Color = Vector4::Lerp(DRIP_COLOR, Vector4::Zero, normalizedAge);
+			drip.Height = Lerp(DRIP_WIDTH / 0.15625f, 0, normalizedAge);
+			short RoomNumber = drip.RoomNumber;
+			FloorInfo* floor = GetFloor(drip.Position.x, drip.Position.y, drip.Position.z, &RoomNumber);
+			int floorHeight = floor->FloorHeight(drip.Position.x, drip.Position.z);
+			int waterHeight = GetWaterHeight(drip.Position.x, drip.Position.y, drip.Position.z, drip.RoomNumber);
 
-			if (drip.pos.y > floorheight) 
-				drip.active = false;
+			// Land on floor.
+			if (drip.Position.y > floorHeight)
+				drip.IsActive = false;
 
-			if (drip.pos.y > waterHeight) 
+			// Land in water.
+			if (drip.Position.y > waterHeight)
 			{
-				drip.active = false;
-				SetupRipple(drip.pos.x, waterHeight, drip.pos.z, Random::GenerateInt(16, 24), RIPPLE_FLAG_SHORT_INIT | RIPPLE_FLAG_LOW_OPACITY);
+				drip.IsActive = false;
+				SetupRipple(drip.Position.x, waterHeight, drip.Position.z, Random::GenerateInt(16, 24), RIPPLE_FLAG_SHORT_INIT | RIPPLE_FLAG_LOW_OPACITY);
 			}
 		}
 	}
 
-	DripParticle& getFreeDrip()
+	void DisableDripParticles()
 	{
-		for (int i = 0; i < dripParticles.size(); i++)
-		{
-			if (!dripParticles[i].active)
-				return dripParticles[i];
-		}
-
-		return dripParticles[0];
-	}
-
-	void SpawnWetnessDrip(const Vector3& pos, int room)
-	{
-		auto& drip = getFreeDrip();
-		drip = {};
-		drip.active = true;
-		drip.pos = pos;
-		drip.room = room;
-		drip.life = DRIP_LIFE;
-		drip.gravity = Random::GenerateFloat(3, 6);
-	}
-
-	void SpawnSplashDrips(const Vector3& pos, int number, int room)
-	{
-		for (int i = 0; i < number; i++) 
-		{
-			auto dripPos = pos + Vector3(Random::GenerateFloat(-128, 128), Random::GenerateFloat(-128, 128), Random::GenerateFloat(-128, 128));
-			auto direction = (dripPos - pos);
-			direction.Normalize();
-
-			auto& drip = getFreeDrip();
-			drip = {};
-			drip.pos = dripPos;
-			drip.velocity = direction*16;
-			drip.velocity -= Vector3(0, Random::GenerateFloat(32, 64), 0);
-			drip.gravity = Random::GenerateFloat(3, 6);
-			drip.room = room;
-			drip.life = DRIP_LIFE_LONG;
-			drip.active = true;
-		}
-	}
-
-	void SpawnGunshellDrips(const Vector3& pos, int room)
-	{
-		for (int i = 0; i < 4; i++) 
-		{
-			auto dripPos = pos + Vector3(Random::GenerateFloat(-16, 16), Random::GenerateFloat(-16, 16), Random::GenerateFloat(-16, 16));
-			auto direction = dripPos - pos;
-			direction.Normalize();
-
-			auto& drip = getFreeDrip();
-			drip = {};
-			drip.pos = dripPos;
-			drip.velocity = direction * 16;
-			drip.velocity -= Vector3(0, Random::GenerateFloat(16, 24), 0);
-			drip.gravity = Random::GenerateFloat(2, 3);
-			drip.room = room;
-			drip.life = DRIP_LIFE_LONG;
-			drip.active = true;
-		}
+		for (auto& drip : DripParticles)
+			drip.IsActive = false;
 	}
 }
