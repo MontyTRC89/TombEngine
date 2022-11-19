@@ -647,7 +647,7 @@ bool SaveGame::Save(int slot)
 		serializedItem.add_looked_at(itemToSerialize.LookedAt);
 		serializedItem.add_effect_type((int)itemToSerialize.Effect.Type);
 		serializedItem.add_effect_count(itemToSerialize.Effect.Count);
-		serializedItem.add_effect_color(&FromVector3(itemToSerialize.Effect.Color));
+		serializedItem.add_effect_light_colour(&FromVector3(itemToSerialize.Effect.LightColor));
 
 		if (Objects[itemToSerialize.ObjectNumber].intelligent 
 			&& itemToSerialize.Data.is<CreatureInfo>())
@@ -1393,7 +1393,7 @@ bool SaveGame::Load(int slot)
 
 		item->Effect.Type = (EffectType)savedItem->effect_type();
 		item->Effect.Count = savedItem->effect_count();
-		item->Effect.Color = ToVector3(savedItem->effect_color());
+		item->Effect.LightColor = ToVector3(savedItem->effect_light_colour());
 
 		// Mesh stuff
 		item->MeshBits = savedItem->mesh_bits();

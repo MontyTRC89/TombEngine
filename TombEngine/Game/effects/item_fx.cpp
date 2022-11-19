@@ -19,14 +19,14 @@ namespace TEN::Effects::Items
 	{
 		item->Effect.Type = EffectType::Burn;
 		item->Effect.Count = -1;
-		item->Effect.Color = Vector3(0.8f, 0.5f, 0.0f);
+		item->Effect.LightColor = Vector3(0.8f, 0.5f, 0.0f);
 	}
 
 	void ItemElectricBurn(ItemInfo* item)
 	{
 		item->Effect.Type = EffectType::Electric;
 		item->Effect.Count = 48;
-		item->Effect.Color = Vector3(0.0f, 0.2f, 0.8f);
+		item->Effect.LightColor = Vector3(0.0f, 0.2f, 0.8f);
 	}
 
 	void LavaBurn(ItemInfo* item)

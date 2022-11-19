@@ -38,6 +38,18 @@ enum SpriteEnumFlag
 	SP_POISON = 0x4000
 };
 
+enum class FlameType
+{
+	Big,
+	Medium,
+	Stove,
+	Static,
+	StaticFlicker,
+	GreenPulse,
+	StoveHigh,
+	Trail
+};
+
 struct FX_INFO
 {
 	Pose pos;
@@ -194,7 +206,7 @@ void TriggerCyborgSpark(int x, int y, int z, short xv, short yv, short zv);
 void TriggerExplosionSparks(int x, int y, int z, int extraTrig, int dynamic, int uw, int roomNumber);
 void TriggerExplosionSmokeEnd(int x, int y, int z, int uw);
 void TriggerExplosionSmoke(int x, int y, int z, int uw);
-void TriggerFireFlame(int x, int y, int z, int type);
+void TriggerFireFlame(int x, int y, int z, FlameType type);
 void TriggerSuperJetFlame(ItemInfo* item, int yvel, int deadly);
 void SetupSplash(const SPLASH_SETUP* const setup, int room);
 void UpdateSplashes();

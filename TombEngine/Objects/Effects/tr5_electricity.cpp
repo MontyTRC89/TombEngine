@@ -114,7 +114,7 @@ void TriggerElectricitySparks(ItemInfo* item, int joint, int flame)
 	spark->flags = SP_NONE;
 
 	if (flame)
-		TriggerFireFlame(pos.x, pos.y, pos.z, 254);
+		TriggerFireFlame(pos.x, pos.y, pos.z, FlameType::StoveHigh);
 }
 
 bool ElectricityWireCheckDeadlyBounds(Vector3i* pos, short delta)
@@ -224,7 +224,7 @@ void ElectricityWiresControl(short itemNumber)
 			{
 				collItem->Effect.Type = EffectType::Electric;
 				collItem->Effect.Count = 48;
-				collItem->Effect.Color = Vector3(0.0f, 0.2f, 0.8f);
+				collItem->Effect.LightColor = Vector3(0.0f, 0.2f, 0.8f);
 
 				if (!isWaterNearby)
 					ItemBurn(collItem);

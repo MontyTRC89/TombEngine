@@ -94,7 +94,7 @@ struct EntityCallbackData
 struct EntityEffectData
 {
 	EffectType Type = EffectType::None;
-	Vector3 Color = Vector3::One;
+	Vector3 LightColor = Vector3::One;
 	int Count = -1;
 };
 
