@@ -661,8 +661,8 @@ void Moveable::SetOnFire(bool onFire)
 	//todo add support for other EffectTypes -squidshire 11/11/2022
 	if (onFire && m_item->Effect.Type == EffectType::None)
 	{
-		m_item->Effect.Type = EffectType::Burn;
-		m_item->Effect.Color = Vector3(0.8f, 0.2f, 0.0f);
+		m_item->Effect.Type = EffectType::Electric;
+		m_item->Effect.Color = Vector3(0.0f, 0.2f, 0.8f);
 	}
 	else if (!onFire)
 	{

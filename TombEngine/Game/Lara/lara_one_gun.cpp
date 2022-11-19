@@ -10,7 +10,7 @@
 #include "Game/effects/bubble.h"
 #include "Game/effects/debris.h"
 #include "Game/effects/effects.h"
-#include "Game/effects/lara_fx.h"
+#include "Game/effects/item_fx.h"
 #include "Game/effects/tomb4fx.h"
 #include "Game/effects/weather.h"
 #include "Game/items.h"
@@ -29,7 +29,7 @@
 #include "Specific/setup.h"
 
 using namespace TEN::Effects::Environment;
-using namespace TEN::Effects::Lara;
+using namespace TEN::Effects::Items;
 using namespace TEN::Entities::Switches;
 using namespace TEN::Input;
 using namespace TEN::Math;
@@ -1267,7 +1267,7 @@ void DoExplosiveDamage(ItemInfo& emitter, ItemInfo& target, ItemInfo& projectile
 	{
 		DoDamage(&emitter, damage * 5);
 		if (!TestEnvironment(ENV_FLAG_WATER, target.RoomNumber) && emitter.HitPoints <= 0)
-			LaraBurn(&emitter);
+			ItemBurn(&emitter);
 	}
 }
 
@@ -1416,7 +1416,7 @@ void HandleProjectile(ItemInfo& item, ItemInfo& emitter, const Vector3i& prevPos
 	if (type == ProjectileType::Explosive && item.ItemFlags[3])
 	{
 		// Fire trail and water collision for grenade fragments
-		TriggerFireFlame(item.Pose.Position.x, item.Pose.Position.y, item.Pose.Position.z, -1, 1);
+		TriggerFireFlame(item.Pose.Position.x, item.Pose.Position.y, item.Pose.Position.z, 1);
 		if (TestEnvironment(ENV_FLAG_WATER, item.RoomNumber))
 			hasHit = true;
 	}

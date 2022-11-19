@@ -6,7 +6,7 @@
 #include "Game/control/flipeffect.h"
 #include "Game/control/box.h"
 #include "Game/control/lot.h"
-#include "Game/effects/lara_fx.h"
+#include "Game/effects/item_fx.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_climb.h"
 #include "Game/Lara/lara_helpers.h"
@@ -22,7 +22,7 @@
 #include "Specific/setup.h"
 
 
-using namespace TEN::Effects::Lara;
+using namespace TEN::Effects::Items;
 using namespace TEN::Entities::Switches;
 
 int TriggerTimer;

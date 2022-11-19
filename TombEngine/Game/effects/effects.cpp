@@ -7,7 +7,7 @@
 #include "Game/effects/bubble.h"
 #include "Game/effects/drip.h"
 #include "Game/effects/explosion.h"
-#include "Game/effects/lara_fx.h"
+#include "Game/effects/item_fx.h"
 #include "Game/effects/smoke.h"
 #include "Game/effects/spark.h"
 #include "Game/effects/tomb4fx.h"
@@ -24,7 +24,7 @@
 
 using namespace TEN::Effects::Environment;
 using namespace TEN::Effects::Explosion;
-using namespace TEN::Effects::Lara;
+using namespace TEN::Effects::Items;
 using namespace TEN::Effects::Spark;
 using namespace TEN::Math;
 using TEN::Renderer::g_Renderer;
@@ -300,7 +300,7 @@ void UpdateSparks()
 						if (spark->z + ds > DeadlyBounds.Z1 && spark->z - ds < DeadlyBounds.Z2)
 						{
 							if (spark->flags & SP_FIRE)
-								LaraBurn(LaraItem);
+								ItemBurn(LaraItem);
 
 							if (spark->flags & SP_DAMAGE)
 								DoDamage(LaraItem, 2);
@@ -1086,7 +1086,7 @@ void TriggerUnderwaterBlood(int x, int y, int z, int size)
 	}
 }
 
-void Richochet(Pose* pos)
+void Ricochet(Pose* pos)
 {
 	short angle = Geometry::GetOrientToPoint(pos->Position.ToVector3(), LaraItem->Pose.Position.ToVector3()).y;
 	auto target = GameVector(pos->Position);
@@ -1464,7 +1464,7 @@ void TriggerFlashSmoke(int x, int y, int z, short roomNumber)
 	spark->mirror = mirror;
 }
 
-void TriggerFireFlame(int x, int y, int z, int fxObj, int type)
+void TriggerFireFlame(int x, int y, int z, int type)
 {
 	int dx = LaraItem->Pose.Position.x - x;
 	int dz = LaraItem->Pose.Position.z - z;
@@ -1508,37 +1508,22 @@ void TriggerFireFlame(int x, int y, int z, int fxObj, int type)
 			spark->dB = 32;
 		}
 
-		if (fxObj == -1)
+		if (type == 2 || type == -2 || type == -1)
 		{
-			if (type == 2 || type == -2 || type == -1)
-			{
-				spark->fadeToBlack = 6;
-				spark->colFadeSpeed = (GetRandomControl() & 3) + 5;
-				spark->life = spark->sLife = (type < -2 ? 0 : 8) + (GetRandomControl() & 3) + 16;
-			}
-			else
-			{
-				spark->fadeToBlack = 8;
-				spark->colFadeSpeed = (GetRandomControl() & 3) + 20;
-				spark->life = spark->sLife = (GetRandomControl() & 7) + 40;
-			}
+			spark->fadeToBlack = 6;
+			spark->colFadeSpeed = (GetRandomControl() & 3) + 5;
+			spark->life = spark->sLife = (type < -2 ? 0 : 8) + (GetRandomControl() & 3) + 16;
 		}
 		else
 		{
-			spark->fadeToBlack = 16;
-			spark->colFadeSpeed = (GetRandomControl() & 3) + 8;
-			spark->life = spark->sLife = (GetRandomControl() & 3) + 18;
+			spark->fadeToBlack = 8;
+			spark->colFadeSpeed = (GetRandomControl() & 3) + 20;
+			spark->life = spark->sLife = (GetRandomControl() & 7) + 40;
 		}
 
 		spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
 
-		if (fxObj != -1)
-		{
-			spark->x = (GetRandomControl() & 0x1F) - 16;
-			spark->y = 0;
-			spark->z = (GetRandomControl() & 0x1F) - 16;
-		}
-		else if (type && type != 1)
+		if (type && type != 1)
 		{
 			if (type < 254)
 			{
@@ -1581,19 +1566,9 @@ void TriggerFireFlame(int x, int y, int z, int fxObj, int type)
 
 		if (GetRandomControl() & 1)
 		{
-			if (fxObj == -1)
-			{
-				spark->gravity = -16 - (GetRandomControl() & 0x1F);
-				spark->maxYvel = -16 - (GetRandomControl() & 7);
-				spark->flags = 538;
-			}
-			else
-			{
-				spark->flags = 602;
-				spark->fxObj = fxObj;
-				spark->gravity = -32 - (GetRandomControl() & 0x3F);
-				spark->maxYvel = -24 - (GetRandomControl() & 7);
-			}
+			spark->gravity = -16 - (GetRandomControl() & 0x1F);
+			spark->maxYvel = -16 - (GetRandomControl() & 7);
+			spark->flags = 538;
 
 			spark->rotAng = GetRandomControl() & 0xFFF;
 
@@ -1604,19 +1579,9 @@ void TriggerFireFlame(int x, int y, int z, int fxObj, int type)
 		}
 		else
 		{
-			if (fxObj == -1)
-			{
-				spark->flags = SP_EXPDEF | SP_DEF | SP_SCALE;
-				spark->gravity = -16 - (GetRandomControl() & 0x1F);
-				spark->maxYvel = -16 - (GetRandomControl() & 7);
-			}
-			else
-			{
-				spark->flags = SP_EXPDEF | SP_DEF | SP_SCALE | SP_FX;
-				spark->fxObj = fxObj;
-				spark->gravity = -32 - (GetRandomControl() & 0x3F);
-				spark->maxYvel = -24 - (GetRandomControl() & 7);
-			}
+			spark->flags = SP_EXPDEF | SP_DEF | SP_SCALE;
+			spark->gravity = -16 - (GetRandomControl() & 0x1F);
+			spark->maxYvel = -16 - (GetRandomControl() & 7);
 		}
 
 		spark->scalar = 2;
@@ -1751,7 +1716,45 @@ void TriggerMetalSparks(int x, int y, int z, int xv, int yv, int zv, int additio
 	}
 }
 
-void ProcessBurn(ItemInfo* item)
+void TriggerElectricSparks(int x, int y, int z)
+{
+	int dx = LaraItem->Pose.Position.x - x;
+	int dz = LaraItem->Pose.Position.z - z;
+
+	if (dx >= -SECTOR(16) && dx <= SECTOR(16) &&
+		dz >= -SECTOR(16) && dz <= SECTOR(16))
+	{
+		auto* spark = GetFreeParticle();
+
+		spark->sR = -1;
+		spark->sG = -1;
+		spark->sB = -1;
+		spark->dR = -1;
+		spark->on = 1;
+		spark->colFadeSpeed = 3;
+		spark->fadeToBlack = 5;
+		spark->dG = (rand() & 127) + 64;
+		spark->dB = -64 - spark->dG;
+		spark->life = 10;
+		spark->sLife = 10;
+		spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+		spark->friction = 34;
+		spark->scalar = 1;
+		spark->flags = SP_SCALE;
+		spark->x = (rand() & 7) + x - 3;
+		spark->y = ((rand() / 8) & 7) + y - 3;
+		spark->z = ((rand() / 64) & 7) + z - 3;
+		spark->xVel = (byte)(rand() / 4) - 128;
+		spark->yVel = (byte)(rand() / 16) - 128;
+		spark->zVel = (byte)(rand() / 64) - 128;
+		spark->sSize = spark->size = ((rand() / 512) & 3) + 4;
+		spark->dSize = ((rand() / 4096) & 1) + 1;
+		spark->maxYvel = 0;
+		spark->gravity = 0;
+	}
+}
+
+void ProcessEffects(ItemInfo* item)
 {
 	if (item->Effect.Type == EffectType::None)
 		return;
@@ -1770,10 +1773,24 @@ void ProcessBurn(ItemInfo* item)
 	int numMeshes = Objects[item->ObjectNumber].nmeshes;
 	for (int i = 0; i < numMeshes; i++)
 	{
-		if (!(Wibble & 0xC))
+		if (Wibble & 0x0C)
+			continue;
+
+		auto pos = GetJointPosition(item, i);
+
+		switch (item->Effect.Type)
 		{
-			auto pos = GetJointPosition(item, i);
-			TriggerFireFlame(pos.x, pos.y, pos.z, NO_ITEM, 255);
+		case EffectType::Burn:
+			TriggerFireFlame(pos.x, pos.y, pos.z, 255);
+			break;
+
+		case EffectType::Electric:
+			TriggerFireFlame(pos.x, pos.y, pos.z, 254);
+			break;
+
+		case EffectType::Smoke:
+			TriggerRocketSmoke(pos.x, pos.y, pos.z, 0);
+			break;
 		}
 	}
 
@@ -1804,7 +1821,7 @@ void ProcessBurn(ItemInfo* item)
 
 		SoundEffect(sfx, &item->Pose);
 
-		if (item->IsLara() || (item->IsCreature() && item->HitPoints > 0))
+		if (item->IsLara() || (item->IsCreature() && item->HitPoints > 0 && Random::TestProbability(1 / 100)))
 			DoDamage(item, item->IsLara() ? 7 : 1);
 	}
 	else

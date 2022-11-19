@@ -10,7 +10,7 @@
 #include "Game/control/lot.h"
 #include "Game/control/volume.h"
 #include "Game/control/volumetriggerer.h"
-#include "Game/effects/lara_fx.h"
+#include "Game/effects/item_fx.h"
 #include "Game/effects/effects.h"
 #include "Game/items.h"
 #include "Game/itemdata/creature_info.h"
@@ -37,7 +37,7 @@
 #include "Objects/ScriptInterfaceObjectsHandler.h"
 
 using namespace TEN::Control::Volumes;
-using namespace TEN::Effects::Lara;
+using namespace TEN::Effects::Items;
 using namespace TEN::Entities::Switches;
 using namespace TEN::Entities::TR4;
 using namespace TEN::Entities::Generic;

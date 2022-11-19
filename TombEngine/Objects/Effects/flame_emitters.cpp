@@ -7,7 +7,7 @@
 #include "Game/collision/sphere.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/lightning.h"
-#include "Game/effects/lara_fx.h"
+#include "Game/effects/item_fx.h"
 #include "Game/effects/tomb4fx.h"
 #include "Game/effects/weather.h"
 #include "Game/items.h"
@@ -20,7 +20,7 @@
 #include "Specific/setup.h"
 
 using namespace TEN::Input;
-using namespace TEN::Effects::Lara;
+using namespace TEN::Effects::Items;
 using namespace TEN::Effects::Lightning;
 using namespace TEN::Effects::Environment;
 
@@ -159,7 +159,7 @@ namespace TEN::Entities::Effects
 					 pow(LaraItem->Pose.Position.z - item->Pose.Position.z, 2) < pow(SECTOR(0.5f), 2)) &&
 					Lara.Control.WaterStatus != WaterStatus::FlyCheat)
 				{
-					LaraBurn(LaraItem);
+					ItemBurn(LaraItem);
 				}
 			}
 		}
@@ -252,7 +252,7 @@ namespace TEN::Entities::Effects
 					item->Pose.Position.y = probe.Position.Floor;
 
 					if (Wibble & 7)
-						TriggerFireFlame(item->Pose.Position.x, item->Pose.Position.y - 32, item->Pose.Position.z, -1, 1);
+						TriggerFireFlame(item->Pose.Position.x, item->Pose.Position.y - 32, item->Pose.Position.z, 1);
 				}
 
 				SoundEffect(SFX_TR4_LOOP_FOR_SMALL_FIRES, &item->Pose);
@@ -450,14 +450,14 @@ namespace TEN::Entities::Effects
 					i = item->ItemFlags[1] & 7;
 					x = 16 * (Flame3xzoffs[i][0] - 32);
 					z = 16 * (Flame3xzoffs[i][1] - 32);
-					TriggerFireFlame(x + item->Pose.Position.x, item->Pose.Position.y, z + item->Pose.Position.z, -1, 2);
+					TriggerFireFlame(x + item->Pose.Position.x, item->Pose.Position.y, z + item->Pose.Position.z, 2);
 				}
 				else
 				{
 					i = item->ItemFlags[1] >> 3;
 					x = 16 * (Flame3xzoffs[i + 8][0] - 32);
 					z = 16 * (Flame3xzoffs[i + 8][1] - 32);
-					TriggerFireFlame(x + item->Pose.Position.x, item->Pose.Position.y, z + item->Pose.Position.z, -1, 2);
+					TriggerFireFlame(x + item->Pose.Position.x, item->Pose.Position.y, z + item->Pose.Position.z, 2);
 				}
 
 				SoundEffect(SFX_TR4_LOOP_FOR_SMALL_FIRES, &item->Pose);
@@ -475,7 +475,7 @@ namespace TEN::Entities::Effects
 						int dz = LaraItem->Pose.Position.z - item->Pose.Position.z;
 
 						if (SQUARE(dx) + SQUARE(dz) < SQUARE(450))
-							LaraBurn(LaraItem);
+							ItemBurn(LaraItem);
 					}
 				}
 			}

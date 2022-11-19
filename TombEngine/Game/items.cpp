@@ -666,7 +666,7 @@ void UpdateAllItems()
 				Objects[item->ObjectNumber].control(itemNumber);
 
 			TestVolumes(itemNumber);
-			ProcessBurn(item);
+			ProcessEffects(item);
 
 			if (item->AfterDeath > 0 && item->AfterDeath < ITEM_DEATH_TIMEOUT && !(Wibble & 3))
 				item->AfterDeath++;

@@ -8,7 +8,7 @@
 #include "Game/control/control.h"
 #include "Game/effects/debris.h"
 #include "Game/effects/effects.h"
-#include "Game/effects/lara_fx.h"
+#include "Game/effects/item_fx.h"
 #include "Game/effects/tomb4fx.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
@@ -21,7 +21,7 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-using namespace TEN::Effects::Lara;
+using namespace TEN::Effects::Items;
 using namespace TEN::Entities::Switches;
 
 void InitialiseExplosion(short itemNumber)
@@ -110,7 +110,7 @@ void ExplosionControl(short itemNumber)
 						DoDamage(LaraItem, distance / 16);
 
 						if (distance < CLICK(3))
-							LaraBurn(LaraItem);
+							ItemBurn(LaraItem);
 					}
 				}
 			}

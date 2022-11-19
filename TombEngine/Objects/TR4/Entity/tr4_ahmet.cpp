@@ -92,7 +92,7 @@ namespace TEN::Entities::TR4
 			int meshCount = GetSpheres(item, spheres, SPHERES_SPACE_WORLD, Matrix::Identity);
 			auto sphere = &spheres[(Wibble / 8) & 1];
 			for (int i = meshCount; i > 0; i--, sphere += 2)
-				TriggerFireFlame(sphere->x, sphere->y, sphere->z, -1, 1);
+				TriggerFireFlame(sphere->x, sphere->y, sphere->z, 1);
 		}
 
 		TriggerDynamicLight(

@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "Game/effects/lara_fx.h"
+#include "Game/effects/item_fx.h"
 
 #include "Game/collision/collide_room.h"
 #include "Game/collision/floordata.h"
@@ -13,16 +13,16 @@
 
 using namespace TEN::Effects::Smoke;
 
-namespace TEN::Effects::Lara
+namespace TEN::Effects::Items
 {
-	void LaraBurn(ItemInfo* item)
+	void ItemBurn(ItemInfo* item)
 	{
 		item->Effect.Type = EffectType::Burn;
 		item->Effect.Count = -1;
 		item->Effect.Color = Vector3(0.8f, 0.5f, 0.0f);
 	}
 
-	void LaraElectricBurn(ItemInfo* item)
+	void ItemElectricBurn(ItemInfo* item)
 	{
 		item->Effect.Type = EffectType::Electric;
 		item->Effect.Count = 48;
@@ -42,13 +42,13 @@ namespace TEN::Effects::Lara
 		{
 			item->HitPoints = -1;
 			item->HitStatus = true;
-			LaraBurn(item);
+			ItemBurn(item);
 		}
 	}
 
 	void LaraBreath(ItemInfo* item)
 	{
-		if (!item->IsLara())
+		if (item->IsLara())
 			return;
 
 		auto* lara = GetLaraInfo(item);

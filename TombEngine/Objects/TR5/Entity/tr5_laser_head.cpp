@@ -13,11 +13,11 @@
 #include "Sound/sound.h"
 #include "Objects/TR5/Entity/tr5_laserhead_info.h"
 #include "Game/effects/lightning.h"
-#include "Game/effects/lara_fx.h"
+#include "Game/effects/item_fx.h"
 #include "Game/misc.h"
 #include "Math/Math.h"
 
-using namespace TEN::Effects::Lara;
+using namespace TEN::Effects::Items;
 using namespace TEN::Effects::Lightning;
 using namespace TEN::Math;
 
@@ -551,7 +551,7 @@ namespace TEN::Entities::Creatures::TR5
 
 												if (x > x1 && x < x2 && y > y1 && y < y2 && z > z1 && z < z2)
 												{
-													LaraElectricBurn(LaraItem);
+													ItemElectricBurn(LaraItem);
 													DoDamage(LaraItem, INT_MAX);
 													break;
 												}

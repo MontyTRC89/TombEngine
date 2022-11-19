@@ -7,7 +7,7 @@
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_struct.h"
 #include "Objects/Generic/Object/burning_torch.h"
-#include "Game/effects/lara_fx.h"
+#include "Game/effects/item_fx.h"
 #include "Specific/level.h"
 #include "ReservedScriptNames.h"
 

@@ -2,10 +2,10 @@
 
 struct ItemInfo;
 
-namespace TEN::Effects::Lara
+namespace TEN::Effects::Items
 {
-	void LaraBurn(ItemInfo* item);
-	void LaraElectricBurn(ItemInfo* item);
+	void ItemBurn(ItemInfo* item);
+	void ItemElectricBurn(ItemInfo* item);
 	void LavaBurn(ItemInfo* item);
 	void LaraBreath(ItemInfo* item);
 }
