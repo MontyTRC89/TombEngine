@@ -1638,7 +1638,7 @@ void ProcessEffects(ItemInfo* item)
 
 		SoundEffect(sfx, &item->Pose);
 
-		if (item->IsLara() || (item->IsCreature() && item->HitPoints > 0 && Random::TestProbability(1 / 10.0f)))
+		if (item->IsLara() || (item->IsCreature() && item->HitPoints > 0 && Random::TestProbability(1 / 5.0f)))
 			DoDamage(item, item->IsLara() ? BURN_HEALTH_LARA : BURN_HEALTH_NPC);
 	}
 	else

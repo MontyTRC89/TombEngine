@@ -15,18 +15,24 @@ using namespace TEN::Effects::Smoke;
 
 namespace TEN::Effects::Items
 {
-	void ItemBurn(ItemInfo* item)
+	void ItemBurn(ItemInfo* item, int timeout)
 	{
 		item->Effect.Type = EffectType::Burn;
-		item->Effect.Count = -1;
+		item->Effect.Count = timeout;
 		item->Effect.LightColor = Vector3(0.8f, 0.5f, 0.0f);
 	}
 
-	void ItemElectricBurn(ItemInfo* item)
+	void ItemElectricBurn(ItemInfo* item, int timeout)
 	{
 		item->Effect.Type = EffectType::Electric;
-		item->Effect.Count = 48;
+		item->Effect.Count = timeout;
 		item->Effect.LightColor = Vector3(0.0f, 0.2f, 0.8f);
+	}
+
+	void ItemSmoke(ItemInfo* item, int timeout)
+	{
+		item->Effect.Type = EffectType::Smoke;
+		item->Effect.Count = timeout;
 	}
 
 	void LavaBurn(ItemInfo* item)
