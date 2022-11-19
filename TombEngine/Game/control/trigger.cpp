@@ -761,6 +761,11 @@ void ProcessSectorFlags(ItemInfo* item)
 			}
 		}
 		else if (Objects[item->ObjectNumber].intelligent && item->HitPoints != NOT_TARGETABLE)
-			DoDamage(item, INT_MAX); // TODO: Implement correct behaviour for other objects!
+		{
+			if (block->Material == FLOOR_MATERIAL::Water)
+				DoDamage(item, INT_MAX); // TODO: Implement correct rapids behaviour for other objects!
+			else
+				ItemBurn(item);
+		}
 	}
 }

@@ -1564,9 +1564,11 @@ void TriggerElectricSparks(int x, int y, int z)
 
 void ProcessEffects(ItemInfo* item)
 {
-	constexpr int MAX_LIGHT_FALLOFF = 13;
-	constexpr int BURN_HEALTH_LARA = 7;
-	constexpr int BURN_HEALTH_NPC = 1;
+	constexpr auto MAX_LIGHT_FALLOFF = 13;
+	constexpr auto BURN_HEALTH_LARA = 7;
+	constexpr auto BURN_HEALTH_NPC = 1;
+	constexpr auto BURN_AFTERMATH_TIMEOUT = 2 * FPS;
+	constexpr auto BURN_DAMAGE_PROBABILITY = 1 / 8.0f;
 
 	if (item->Effect.Type == EffectType::None)
 		return;
@@ -1577,8 +1579,16 @@ void ProcessEffects(ItemInfo* item)
 
 		if (!item->Effect.Count)
 		{
-			item->Effect.Type = EffectType::None;
-			return;
+			if (item->Effect.Type == EffectType::Burn)
+			{
+				item->Effect.Type = EffectType::Smoke;
+				item->Effect.Count = BURN_AFTERMATH_TIMEOUT;
+			}
+			else
+			{
+				item->Effect.Type = EffectType::None;
+				return;
+			}
 		}
 	}
 
@@ -1622,7 +1632,7 @@ void ProcessEffects(ItemInfo* item)
 	int waterHeight = GetWaterHeight(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, item->RoomNumber);
 
 	if (item->Effect.Type == EffectType::Electric ||
-	    (item->Effect.Type == EffectType::Burn && waterHeight == NO_HEIGHT || item->Pose.Position.y <= waterHeight))
+	    (item->Effect.Type == EffectType::Burn && (waterHeight == NO_HEIGHT || item->Pose.Position.y <= waterHeight)))
 	{
 		SOUND_EFFECTS sfx = SOUND_EFFECTS::SFX_TR4_LOOP_FOR_SMALL_FIRES;
 		switch (item->Effect.Type)
@@ -1638,7 +1648,7 @@ void ProcessEffects(ItemInfo* item)
 
 		SoundEffect(sfx, &item->Pose);
 
-		if (item->IsLara() || (item->IsCreature() && item->HitPoints > 0 && Random::TestProbability(1 / 5.0f)))
+		if (item->IsLara() || (item->IsCreature() && item->HitPoints > 0 && Random::TestProbability(BURN_DAMAGE_PROBABILITY)))
 			DoDamage(item, item->IsLara() ? BURN_HEALTH_LARA : BURN_HEALTH_NPC);
 	}
 	else
