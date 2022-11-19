@@ -495,9 +495,9 @@ namespace TEN::Renderer
 	{
 		D3D11_RECT rects;
 		rects.left = s.left;
-		rects.top = m_screenHeight - s.top;
+		rects.top = s.top;
 		rects.right = s.right;
-		rects.bottom = m_screenHeight - s.bottom;
+		rects.bottom = s.bottom;
 
 		m_context->RSSetScissorRects(1, &rects);
 	}
