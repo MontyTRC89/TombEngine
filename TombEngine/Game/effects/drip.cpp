@@ -98,7 +98,7 @@ namespace TEN::Effects::Drip
 			if (drip.Life <= 0.0f)
 				drip.IsActive = false;
 
-			// Let wind affect velocity.
+			// Update velocity according to wind.
 			if (TestEnvironment(ENV_FLAG_WIND, drip.RoomNumber))
 			{
 				drip.Velocity.x = Weather.Wind().x;
@@ -109,21 +109,21 @@ namespace TEN::Effects::Drip
 			drip.Velocity.y += drip.Gravity;
 			drip.Position += drip.Velocity;
 
-			float lifeAlpha = drip.Life / drip.LifeMax;
-			drip.Color = DRIP_COLOR_WHITE;// Vector4::Lerp(DRIP_COLOR_WHITE, Vector4::Zero, lifeAlpha);
-			drip.Height = DRIP_WIDTH;// Lerp(DRIP_WIDTH / 0.15625f, 0.0f, lifeAlpha);
+			float lifeAlpha = 1.0f - (drip.Life / drip.LifeMax);
+
+			// Update appearance.
+			drip.Color = Vector4::Lerp(DRIP_COLOR_WHITE, Vector4::Zero, lifeAlpha);
+			drip.Height = Lerp(DRIP_WIDTH / 0.15625f, 0, lifeAlpha);
 
 			int floorHeight = GetCollision(drip.Position.x, drip.Position.y, drip.Position.z, drip.RoomNumber).Position.Floor;
 			int waterHeight = GetWaterHeight(drip.Position.x, drip.Position.y, drip.Position.z, drip.RoomNumber);
 
-			// Hit floor; spawn ripple.
+			// Land on floor.
 			if (drip.Position.y > floorHeight)
-			{
 				drip.IsActive = false;
-				SetupRipple(drip.Position.x, floorHeight, drip.Position.z, Random::GenerateInt(8, 16), RIPPLE_FLAG_SHORT_INIT);
-			}
-			// Hit water; spawn ripple.
-			else if (drip.Position.y > waterHeight)
+
+			// Land in water.
+			if (drip.Position.y > waterHeight)
 			{
 				drip.IsActive = false;
 				SetupRipple(drip.Position.x, waterHeight, drip.Position.z, Random::GenerateInt(16, 24), RIPPLE_FLAG_SHORT_INIT | RIPPLE_FLAG_LOW_OPACITY);
