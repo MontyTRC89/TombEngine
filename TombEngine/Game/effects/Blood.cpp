@@ -25,7 +25,7 @@ namespace TEN::Effects::Blood
 	constexpr auto BLOOD_DRIP_GRAVITY_MAX	  = 15.0f;
 	constexpr auto BLOOD_DRIP_SPRAY_SEMIANGLE = 60.0f;
 
-	constexpr auto BLOOD_STAIN_OPACITY_MAX		  = 0.75f;
+	constexpr auto BLOOD_STAIN_OPACITY_MAX		  = 0.8f;
 	constexpr auto BLOOD_STAIN_POOLING_SCALE_RATE = 0.4f;
 	constexpr auto BLOOD_STAIN_POOLING_TIME_DELAY = 5.0f;
 	constexpr auto BLOOD_STAIN_HEIGHT_OFFSET	  = 4;
@@ -71,8 +71,8 @@ namespace TEN::Effects::Blood
 		auto orient = EulerAngles(
 			-slopeAngle * cosDeltaAngle,
 			0,
-			slopeAngle * sinDeltaAngle
-		) + EulerAngles(0, orient2D, 0);
+			slopeAngle * sinDeltaAngle) +
+			EulerAngles(0, orient2D, 0);
 		auto rotMatrix = orient.ToRotationMatrix();
 
 		return std::array<Vector3, 4>
@@ -136,7 +136,7 @@ namespace TEN::Effects::Blood
 		{
 			float length = Random::GenerateFloat(20.0f, 40.0f);
 			auto velocity = baseVelocity + Random::GenerateVector3InCone(direction, BLOOD_DRIP_SPRAY_SEMIANGLE, length);
-			float scale = Random::GenerateFloat(10.0f, 20.0f);
+			float scale = length / 2;
 
 			SpawnBloodDrip(pos, roomNumber, velocity, scale);
 		}
@@ -158,7 +158,7 @@ namespace TEN::Effects::Blood
 		stain.Life = BLOOD_STAIN_LIFE_MAX;
 		stain.LifeStartFading = BLOOD_STAIN_LIFE_START_FADING;
 		stain.Scale = 0.0f;
-		stain.ScaleMax = std::max(10.0f, scaleMax);
+		stain.ScaleMax = scaleMax;
 		stain.ScaleRate = scaleRate;
 		stain.Opacity = BLOOD_STAIN_OPACITY_MAX;
 		stain.OpacityStart = stain.Opacity;
@@ -170,13 +170,35 @@ namespace TEN::Effects::Blood
 		BloodStains.push_front(stain);
 	}
 
-	void SpawnBloodStain(ItemInfo& item)
+	void SpawnBloodStainFromDrip(const BloodDrip& drip, const CollisionResult& pointColl)
+	{
+		auto pos = Vector3(drip.Position.x, pointColl.Position.Floor, drip.Position.z);
+		auto normal = Vector3::Zero;
+
+		if (drip.Position.y >= pointColl.Position.Floor)
+		{
+			pos.y -= BLOOD_STAIN_HEIGHT_OFFSET;
+			normal = Geometry::GetFloorNormal(pointColl.FloorTilt);
+		}
+		else if (drip.Position.y <= pointColl.Position.Ceiling)
+		{
+			pos.y -= BLOOD_STAIN_HEIGHT_OFFSET;
+			normal = Geometry::GetFloorNormal(pointColl.CeilingTilt);
+		}
+
+		float scale = drip.Scale * 5;
+		float scaleRate = std::min(drip.Velocity.Length() / 2, scale / 2);
+
+		SpawnBloodStain(pos, drip.RoomNumber, normal, scale, scaleRate);
+	}
+
+	void SpawnBloodStainPool(ItemInfo& item)
 	{
 		auto pos = Vector3(item.Pose.Position.x, item.Pose.Position.y - BLOOD_STAIN_HEIGHT_OFFSET, item.Pose.Position.z);
 		auto normal = Geometry::GetFloorNormal(GetCollision(&item).FloorTilt);
 
 		auto bounds = GameBoundingBox(&item);
-		float scaleMax = (bounds.GetWidth() + bounds.GetDepth()) / 3;
+		float scaleMax = (bounds.GetWidth() + bounds.GetDepth()) / 2;
 
 		SpawnBloodStain(pos, item.RoomNumber, normal, scaleMax, BLOOD_STAIN_POOLING_SCALE_RATE, BLOOD_STAIN_POOLING_TIME_DELAY);
 	}
@@ -218,27 +240,12 @@ namespace TEN::Effects::Blood
 			if (pointColl.Position.Floor == NO_HEIGHT)
 			{
 				drip.IsActive = false;
-				// TODO: Spawn stains on walls and objects.
 			}
-			// Drip hit floor; spawn stain.
-			else if ((pointColl.Position.Floor - vPos) <= 0)
+			// Drip hit floor or ceiling; spawn stain.
+			else if (drip.Position.y >= pointColl.Position.Floor || drip.Position.y <= pointColl.Position.Ceiling)
 			{
 				drip.IsActive = false;
-
-				auto pos = Vector3(drip.Position.x, pointColl.Position.Floor - BLOOD_STAIN_HEIGHT_OFFSET, drip.Position.z);
-				auto normal = Geometry::GetFloorNormal(pointColl.FloorTilt);
-
-				SpawnBloodStain(pos, drip.RoomNumber, normal, drip.Scale / 2, drip.Velocity.Length()); // TODO: Scale too large.
-			}
-			// Drip hit ceiling; spawn stain.
-			else if ((pointColl.Position.Ceiling - vPos) >= 0)
-			{
-				drip.IsActive = false;
-
-				auto pos = Vector3(drip.Position.x, pointColl.Position.Ceiling + BLOOD_STAIN_HEIGHT_OFFSET, drip.Position.z);
-				auto normal = Geometry::GetCeilingNormal(pointColl.CeilingTilt);
-
-				SpawnBloodStain(pos, drip.RoomNumber, normal, drip.Scale / 2, drip.Velocity.Length());
+				SpawnBloodStainFromDrip(drip, pointColl);
 			}
 
 			// Spawn bloor mist cloud in water.
@@ -262,9 +269,8 @@ namespace TEN::Effects::Blood
 				continue;
 			}
 
-			stain.Life -= 1.0f;
-
 			// Despawn.
+			stain.Life -= 1.0f;
 			if (stain.Life <= 0.0f)
 			{
 				BloodStains.pop_back();

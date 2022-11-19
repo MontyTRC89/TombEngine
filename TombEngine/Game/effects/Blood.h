@@ -3,6 +3,8 @@
 
 #include "Game/room.h"
 
+struct CollisionResult;
+
 namespace TEN::Effects::Blood
 {
 	constexpr auto BLOOD_DRIP_NUM_MAX  = 128;
@@ -67,7 +69,8 @@ namespace TEN::Effects::Blood
 	void SpawnBloodDripSpray(const Vector3& pos, int roomNumber, const Vector3& direction, const Vector3& baseVelocity, unsigned int maxCount = BLOOD_DRIP_SPRAY_NUM_MAX_DEFAULT);
 
 	void SpawnBloodStain(const Vector3& pos, int roomNumber, const Vector3& normal, float scaleMax, float scaleRate, float delayTimeInSec = 0.0f);
-	void SpawnBloodStain(ItemInfo& item);
+	void SpawnBloodStainFromDrip(const BloodDrip& drip, const CollisionResult& pointColl);
+	void SpawnBloodStainPool(ItemInfo& item);
 
 	void UpdateBloodMists();
 	void UpdateBloodDrips();

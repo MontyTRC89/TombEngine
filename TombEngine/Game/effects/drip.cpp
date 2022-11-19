@@ -32,7 +32,7 @@ namespace TEN::Effects::Drip
 		return DripParticles[0];
 	}
 
-	void SpawnDripParticle(const Vector3& pos, int roomNumber, const Vector3& velocity, float maxLife, float gravity)
+	void SpawnDripParticle(const Vector3& pos, int roomNumber, const Vector3& velocity, float life, float gravity)
 	{
 		auto& drip = GetFreeDrip();
 
@@ -41,7 +41,7 @@ namespace TEN::Effects::Drip
 		drip.Position = pos;
 		drip.RoomNumber = roomNumber;
 		drip.Velocity = velocity;
-		drip.Life = maxLife;
+		drip.Life = life;
 		drip.LifeMax = drip.Life;
 		drip.Gravity = gravity;
 	}
