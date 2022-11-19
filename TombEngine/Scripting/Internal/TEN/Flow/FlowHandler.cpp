@@ -113,9 +113,9 @@ Must be an integer value (0 means no secrets).
 */
 	table_flow.set_function(ScriptReserved_SetTotalSecretCount, &FlowHandler::SetTotalSecretCount, this);
 
-/*** Set FlyCheatEnabled
+/*** Enable or disable DOZY mode (fly cheat).
 Must be true or false
-@function SetFlyCheatEnabled
+@function EnableFlyCheat
 @tparam bool true or false
 */
 	table_flow.set_function(ScriptReserved_EnableFlyCheat, &FlowHandler::EnableFlyCheat, this);

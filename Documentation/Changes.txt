@@ -1,15 +1,7 @@
 Version 1.0.4
 =============
 
-
-
-
-
-
-
-
-
-
+* Fix incorrect string IDs for HK and revolver with lasersight.
 
 Version 1.0.3
 =============
