@@ -2827,7 +2827,10 @@ namespace TEN::Gui
 				int y2 = 480; // Combine.
 				short objectNumber = ConvertInventoryItemToObject(Rings[ringIndex]->CurrentObjectList[n].InventoryItem);
 				float scaler = InventoryObjectTable[Rings[ringIndex]->CurrentObjectList[n].InventoryItem].Scale1;
-				g_Renderer.DrawObjectOn2DPosition(x, ringIndex == (int)RingTypes::Inventory ? y : y2, objectNumber, Rings[ringIndex]->CurrentObjectList[n].Orientation, scaler);
+				auto& orientation = Rings[ringIndex]->CurrentObjectList[n].Orientation;
+				int bits = InventoryObjectTable[Rings[ringIndex]->CurrentObjectList[n].InventoryItem].MeshBits;
+
+				g_Renderer.DrawObjectOn2DPosition(x, ringIndex == (int)RingTypes::Inventory ? y : y2, objectNumber, orientation, scaler, bits);
 
 				if (++n >= Rings[ringIndex]->NumObjectsInList)
 					n = 0;
