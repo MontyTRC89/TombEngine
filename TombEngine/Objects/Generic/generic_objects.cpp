@@ -251,8 +251,6 @@ void StartSwitches()
 		{
 			object->control = SwitchControl;
 			object->collision = UnderwaterSwitchCollision;
-			object->saveFlags = true;
-			object->saveAnim = true;
 		}
 	}
 
@@ -262,8 +260,6 @@ void StartSwitches()
 		object->initialise = InitialisePulleySwitch;
 		object->control = SwitchControl;
 		object->collision = PulleySwitchCollision;
-		object->saveFlags = true;
-		object->saveAnim = true;
 	}
 
 	object = &Objects[ID_TURN_SWITCH];
@@ -271,8 +267,6 @@ void StartSwitches()
 	{
 		object->control = TurnSwitchControl;
 		object->collision = TurnSwitchCollision;
-		object->saveFlags = true;
-		object->saveAnim = true;
 	}
 
 	object = &Objects[ID_SEQUENCE_SWITCH1];
@@ -280,8 +274,6 @@ void StartSwitches()
 	{
 		object->collision = FullBlockSwitchCollision;
 		object->control = FullBlockSwitchControl;
-		object->saveFlags = true;
-		object->saveAnim = true;
 	}
 
 	object = &Objects[ID_SEQUENCE_SWITCH2];
@@ -289,8 +281,6 @@ void StartSwitches()
 	{
 		object->collision = FullBlockSwitchCollision;
 		object->control = FullBlockSwitchControl;
-		object->saveFlags = true;
-		object->saveAnim = true;
 	}
 
 	object = &Objects[ID_SEQUENCE_SWITCH3];
@@ -298,8 +288,6 @@ void StartSwitches()
 	{
 		object->collision = FullBlockSwitchCollision;
 		object->control = FullBlockSwitchControl;
-		object->saveFlags = true;
-		object->saveAnim = true;
 	}
 }
 
