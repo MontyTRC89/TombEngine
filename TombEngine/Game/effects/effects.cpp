@@ -27,6 +27,7 @@ using namespace TEN::Effects::Explosion;
 using namespace TEN::Effects::Items;
 using namespace TEN::Effects::Spark;
 using namespace TEN::Math;
+using namespace TEN::Math::Random;
 using TEN::Renderer::g_Renderer;
 
 // New particle class
@@ -608,201 +609,6 @@ void TriggerExplosionSmoke(int x, int y, int z, int uw)
 		spark->size = spark->dSize / 4;
 	}
 }
-
-/*void TriggerFireFlame(int x, int y, int z, int fxObj, int type)
-{
-	int dx = LaraItem->pos.Position.x - x;
-	int dz = LaraItem->pos.Position.z - z;
-
-	if (dx < -16384 || dx > 16384 || dz < -16384 || dz > 16384)
-		return;
-
-	auto* spark = GetFreeParticle();
-
-	spark->on = true;
-
-	if (type == 2)
-	{
-		spark->sR = (GetRandomControl() & 0x1F) + 48;
-		spark->sG = (GetRandomControl() & 0x1F) + 48;
-		spark->sB = (GetRandomControl() & 0x3F) - 64;
-	}
-	else
-	{
-		if (type == 254)
-		{
-			spark->sR = 0;
-			spark->sB = 0;
-			spark->sG = 0;
-			spark->dR = (GetRandomControl() & 0xF) + 32;
-			spark->dB = (GetRandomControl() & 0xF) + 32;
-			spark->dG = (GetRandomControl() & 0xF) + 32;
-		}
-		else
-		{
-			spark->sR = -1;
-			spark->sB = 48;
-			spark->sG = (GetRandomControl() & 0x1F) + 48;
-
-			if (Lara.burnBlue == 1)
-			{
-				spark->sR = 48;
-				spark->sB = spark->sR;
-			}
-			else if (Lara.burnBlue == 2)
-			{
-				spark->sB = spark->sG >> 1;
-				spark->sG = -1;
-				spark->sR = 0;
-			}
-		}
-	}
-
-	if (type != 254)
-	{
-		spark->dR = (GetRandomControl() & 0x3F) - 64;
-		spark->dB = 32;
-		spark->dG = (GetRandomControl() & 0x3F) + -128;
-
-		if (Lara.burnBlue == 1)
-		{
-			spark->dR = 32;
-			spark->dB = spark->dR;
-		}
-		else if (Lara.burnBlue == 2)
-		{
-			spark->dB = spark->dG;
-			spark->dG = spark->dR;
-			spark->dR = 0;
-		}
-	}
-
-	if (fxObj == -1)
-	{
-		if (type == 2 || type == 255 || type == 254)
-		{
-			spark->fadeToBlack = 6;
-			spark->colFadeSpeed = (GetRandomControl() & 3) + 5;
-			spark->sLife = spark->life = (type < 254 ? 0 : 8) + (GetRandomControl() & 3) + 16;
-		}
-		else
-		{
-			spark->fadeToBlack = 8;
-			spark->colFadeSpeed = (GetRandomControl() & 3) + 20;
-			spark->sLife = spark->life = (GetRandomControl() & 7) + 40;
-		}
-	}
-	else
-	{
-		spark->fadeToBlack = 16;
-		spark->colFadeSpeed = (GetRandomControl() & 3) + 8;
-		spark->sLife = spark->life = (GetRandomControl() & 3) + 28;
-	}
-
-	spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
-
-	if (fxObj == -1)
-	{
-		if (type && type != 1)
-		{
-			if (type < 254)
-			{
-				spark->y = y;
-				spark->x = (GetRandomControl() & 0xF) + x - 8;
-				spark->z = (GetRandomControl() & 0xF) + z - 8;
-			}
-			else
-			{
-				spark->x = (GetRandomControl() & 0x3F) + x - 32;
-				spark->y = y;
-				spark->z = (GetRandomControl() & 0x3F) + z - 32;
-			}
-		}
-		else
-		{
-			spark->y = y;
-			spark->x = (GetRandomControl() & 0x1F) + x - 16;
-			spark->z = (GetRandomControl() & 0x1F) + z - 16;
-		}
-	}
-	else
-	{
-		spark->y = 0;
-		spark->x = (GetRandomControl() & 0x1F) - 16;
-		spark->z = (GetRandomControl() & 0x1F) - 16;
-	}
-
-	if (type == 2)
-	{
-		spark->xVel = (GetRandomControl() & 0x1F) - 16;
-		spark->yVel = -1024 - (GetRandomControl() & 0x1FF);
-		spark->friction = 68;
-		spark->zVel = (GetRandomControl() & 0x1F) - 16;
-	}
-	else
-	{
-		spark->xVel = (byte)GetRandomControl() - 128;
-		spark->yVel = -16 - ((byte)GetRandomControl() & 0xF);
-		spark->zVel = (byte)GetRandomControl() - 128;
-
-		if (type == 1)
-			spark->friction = 51;
-		else
-			spark->friction = 5;
-	}
-	if (fxObj == -1)
-	{
-		spark->gravity = -16 - (GetRandomControl() & 0x1F);
-		spark->maxYvel = -16 - (GetRandomControl() & 7);
-		spark->flags = 538;
-
-		if (type == 254)
-			spark->gravity >>= 1;
-	}
-	else
-	{
-		spark->flags = 602;
-		spark->fxObj = fxObj;
-		spark->gravity = -32 - (GetRandomControl() & 0x3F);
-		spark->maxYvel = -24 - (GetRandomControl() & 7);
-	}
-
-	spark->rotAng = GetRandomControl() & 0xFFF;
-	spark->scalar = 2;
-	spark->rotAdd = (GetRandomControl() & 0x1F) - 16;
-
-	if (type)
-	{
-		if (type == 1)
-			spark->sSize = spark->size = (GetRandomControl() & 0x1F) + 64;
-		else if (type < 254)
-		{
-			spark->maxYvel = 0;
-			spark->gravity = 0;
-			spark->sSize = spark->size = (GetRandomControl() & 0x1F) + 32;
-		}
-		else
-			spark->sSize = spark->size = (GetRandomControl() & 0xF) + 48;
-	}
-	else
-		spark->sSize = spark->size = (GetRandomControl() & 0x1F) + 128;
-
-	if (type == 2)
-		spark->dSize = spark->size / 4;
-	else
-	{
-		spark->sSize = GenerateFloat(128, 156);
-		spark->dSize = spark->sSize / 16;
-
-		if (type == 7)
-		{
-			spark->colFadeSpeed >>= 2;
-			spark->fadeToBlack >>= 2;
-			spark->life = spark->life >> 2;
-			spark->sLife = spark->life >> 2;
-		}
-	}
-}*/
 
 void TriggerSuperJetFlame(ItemInfo* item, int yvel, int deadly)
 {
@@ -1464,7 +1270,7 @@ void TriggerFlashSmoke(int x, int y, int z, short roomNumber)
 	spark->mirror = mirror;
 }
 
-void TriggerFireFlame(int x, int y, int z, int type)
+void TriggerFireFlame(int x, int y, int z, FlameType type)
 {
 	int dx = LaraItem->Pose.Position.x - x;
 	int dz = LaraItem->Pose.Position.z - z;
@@ -1476,22 +1282,22 @@ void TriggerFireFlame(int x, int y, int z, int type)
 
 		spark->on = true;
 
-		if (type == 2)
+		if (type == FlameType::Stove)
 		{
 			spark->sR = spark->sG = (GetRandomControl() & 0x1F) + 48;
 			spark->sB = (GetRandomControl() & 0x3F) - 64;
 		}
 		else
 		{
-			if (type == 254)
+			if (type == FlameType::StoveHigh)
 			{
 				spark->sR = 48;
-				spark->sG = 255;
-				spark->sB = (GetRandomControl() & 0x1F) + 48;
+				spark->sG = 48;
+				spark->sB = (GetRandomControl() & 0x1F) + 128;
 
 				spark->dR = 32;
 				spark->dG = (GetRandomControl() & 0x3F) - 64;
-				spark->dB = (GetRandomControl() & 0x3F) - 128;
+				spark->dB = (GetRandomControl() & 0x3F) + 64;
 			}
 			else
 			{
@@ -1501,18 +1307,20 @@ void TriggerFireFlame(int x, int y, int z, int type)
 			}
 		}
 
-		if (type != -2)
+		if (type != FlameType::StaticFlicker)
 		{
 			spark->dR = (GetRandomControl() & 0x3F) - 64;
 			spark->dG = (GetRandomControl() & 0x3F) + -128;
 			spark->dB = 32;
 		}
 
-		if (type == 2 || type == -2 || type == -1)
+		if (type == FlameType::Stove ||
+			type == FlameType::Static ||
+			type == FlameType::StaticFlicker)
 		{
 			spark->fadeToBlack = 6;
 			spark->colFadeSpeed = (GetRandomControl() & 3) + 5;
-			spark->life = spark->sLife = (type < -2 ? 0 : 8) + (GetRandomControl() & 3) + 16;
+			spark->life = spark->sLife = (GetRandomControl() & 3) + 24;
 		}
 		else
 		{
@@ -1523,9 +1331,9 @@ void TriggerFireFlame(int x, int y, int z, int type)
 
 		spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
 
-		if (type && type != 1)
+		if (type != FlameType::Big && type != FlameType::Medium)
 		{
-			if (type < 254)
+			if (type < FlameType::StoveHigh)
 			{
 				spark->x = (GetRandomControl() & 0xF) + x - 8;
 				spark->y = y;
@@ -1545,7 +1353,7 @@ void TriggerFireFlame(int x, int y, int z, int type)
 			spark->z = (GetRandomControl() & 0x1F) + z - 16;
 		}
 
-		if (type == 2)
+		if (type == FlameType::Stove)
 		{
 			spark->xVel = (GetRandomControl() & 0x1F) - 16;
 			spark->yVel = -1024 - (GetRandomControl() & 0x1FF);
@@ -1558,7 +1366,7 @@ void TriggerFireFlame(int x, int y, int z, int type)
 			spark->yVel = -16 - (GetRandomControl() & 0xF);
 			spark->zVel = (GetRandomControl() & 0xFF) - 128;
 
-			if (type == 1)
+			if (type == FlameType::Medium)
 				spark->friction = 51;
 			else
 				spark->friction = 5;
@@ -1586,11 +1394,11 @@ void TriggerFireFlame(int x, int y, int z, int type)
 
 		spark->scalar = 2;
 
-		if (type)
+		if (type != FlameType::Big)
 		{
-			if (type == 1)
+			if (type == FlameType::Medium)
 				spark->sSize = spark->size = (GetRandomControl() & 0x1F) + 64;
-			else if (type < 254)
+			else if (type < FlameType::StoveHigh)
 			{
 				spark->maxYvel = 0;
 				spark->gravity = 0;
@@ -1600,7 +1408,7 @@ void TriggerFireFlame(int x, int y, int z, int type)
 			{
 				spark->dSize = spark->size / 16;
 
-				if (type == 7)
+				if (type == FlameType::GreenPulse)
 				{
 					spark->colFadeSpeed >>= 2;
 					spark->fadeToBlack = spark->fadeToBlack >> 2;
@@ -1614,13 +1422,13 @@ void TriggerFireFlame(int x, int y, int z, int type)
 		else
 			spark->sSize = spark->size = (GetRandomControl() & 0x1F) + 128;
 
-		if (type == 2)
+		if (type == FlameType::Stove)
 			spark->dSize = (spark->size / 4.0f);
 		else
 		{
 			spark->dSize = (spark->size / 16.0f);
 
-			if (type == 7)
+			if (type == FlameType::GreenPulse)
 			{
 				spark->colFadeSpeed >>= 2;
 				spark->fadeToBlack = spark->fadeToBlack >> 2;
@@ -1756,6 +1564,10 @@ void TriggerElectricSparks(int x, int y, int z)
 
 void ProcessEffects(ItemInfo* item)
 {
+	constexpr int MAX_LIGHT_FALLOFF = 13;
+	constexpr int BURN_HEALTH_LARA = 7;
+	constexpr int BURN_HEALTH_NPC = 1;
+
 	if (item->Effect.Type == EffectType::None)
 		return;
 
@@ -1781,11 +1593,12 @@ void ProcessEffects(ItemInfo* item)
 		switch (item->Effect.Type)
 		{
 		case EffectType::Burn:
-			TriggerFireFlame(pos.x, pos.y, pos.z, 255);
+			if (TestProbability(1 / 2.0f))
+				TriggerFireFlame(pos.x, pos.y, pos.z, TestProbability(1 / 10.0f) ? FlameType::Trail : FlameType::Medium);
 			break;
 
 		case EffectType::Electric:
-			TriggerFireFlame(pos.x, pos.y, pos.z, 254);
+			TriggerElectricSparks(pos.x, pos.y, pos.z);
 			break;
 
 		case EffectType::Smoke:
@@ -1796,16 +1609,20 @@ void ProcessEffects(ItemInfo* item)
 
 	if (item->Effect.Type != EffectType::Smoke)
 	{
+		int falloff = item->Effect.Count < 0 ? MAX_LIGHT_FALLOFF :
+			MAX_LIGHT_FALLOFF - std::clamp(MAX_LIGHT_FALLOFF - item->Effect.Count, 0, MAX_LIGHT_FALLOFF);
+
 		auto pos = GetJointPosition(item, 0);
-		TriggerDynamicLight(pos.x, pos.y, pos.z, 13,
-			std::clamp(Random::GenerateInt(-32, 32) + int(item->Effect.Color.x * UCHAR_MAX), 0, UCHAR_MAX),
-			std::clamp(Random::GenerateInt(-32, 32) + int(item->Effect.Color.y * UCHAR_MAX), 0, UCHAR_MAX),
-			std::clamp(Random::GenerateInt(-32, 32) + int(item->Effect.Color.z * UCHAR_MAX), 0, UCHAR_MAX));
+		TriggerDynamicLight(pos.x, pos.y, pos.z, falloff,
+			std::clamp(Random::GenerateInt(-32, 32) + int(item->Effect.LightColor.x * UCHAR_MAX), 0, UCHAR_MAX),
+			std::clamp(Random::GenerateInt(-32, 32) + int(item->Effect.LightColor.y * UCHAR_MAX), 0, UCHAR_MAX),
+			std::clamp(Random::GenerateInt(-32, 32) + int(item->Effect.LightColor.z * UCHAR_MAX), 0, UCHAR_MAX));
 	}
 
 	int waterHeight = GetWaterHeight(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, item->RoomNumber);
 
-	if (waterHeight == NO_HEIGHT || item->Pose.Position.y <= waterHeight || item->Effect.Type == EffectType::Electric)
+	if (item->Effect.Type == EffectType::Electric ||
+	    (item->Effect.Type == EffectType::Burn && waterHeight == NO_HEIGHT || item->Pose.Position.y <= waterHeight))
 	{
 		SOUND_EFFECTS sfx = SOUND_EFFECTS::SFX_TR4_LOOP_FOR_SMALL_FIRES;
 		switch (item->Effect.Type)
@@ -1821,12 +1638,18 @@ void ProcessEffects(ItemInfo* item)
 
 		SoundEffect(sfx, &item->Pose);
 
-		if (item->IsLara() || (item->IsCreature() && item->HitPoints > 0 && Random::TestProbability(1 / 100)))
-			DoDamage(item, item->IsLara() ? 7 : 1);
+		if (item->IsLara() || (item->IsCreature() && item->HitPoints > 0 && Random::TestProbability(1 / 10.0f)))
+			DoDamage(item, item->IsLara() ? BURN_HEALTH_LARA : BURN_HEALTH_NPC);
 	}
 	else
 	{
-		item->Effect.Type = EffectType::None;
+		if (item->Effect.Type == EffectType::Burn)
+		{
+			item->Effect.Type = EffectType::Smoke;
+			item->Effect.Count = 10;
+		}
+		else
+			item->Effect.Type = EffectType::None;
 	}
 
 	if (item->IsLara() && GetLaraInfo(item)->Control.WaterStatus == WaterStatus::FlyCheat)
