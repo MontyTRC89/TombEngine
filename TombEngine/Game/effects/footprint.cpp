@@ -58,11 +58,11 @@ namespace TEN::Effects::Footprints
 			return;
 
 		// Get footstep sound for floor material.
-		auto soundEffectID = GetFootprintSoundEffectID(pointColl.BottomBlock->Material);
+		auto sfx = GetFootprintSoundEffectID(pointColl.BottomBlock->Material);
 
 		// HACK: Must be here until reference WAD2 is revised.
-		if (soundEffectID != SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS)
-			SoundEffect(soundEffectID, &item->Pose);
+		if (sfx != SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS)
+			SoundEffect(sfx, &item->Pose);
 
 		// Check floor material.
 		if (!TestMaterial(pointColl.BottomBlock->Material, FootprintMaterials))
@@ -171,8 +171,8 @@ namespace TEN::Effects::Footprints
 		auto orient = EulerAngles(
 			-slopeAngle * cosDeltaAngle,
 			0,
-			slopeAngle * sinDeltaAngle
-		) + EulerAngles(0, item.Pose.Orientation.y, 0);
+			slopeAngle * sinDeltaAngle) +
+			EulerAngles(0, item.Pose.Orientation.y, 0);
 		auto rotMatrix = orient.ToRotationMatrix();
 
 		return std::array<Vector3, 4>

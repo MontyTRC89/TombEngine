@@ -84,6 +84,28 @@ namespace TEN::Effects::Blood
 		};
 	}
 
+	bool TestBloodStainFloor(const BloodStain& stain)
+	{
+		static constexpr auto heightRange = CLICK(1.0f / 2);
+
+		// Get point collision at every vertex point.
+		auto pointColl0 = GetCollision(stain.VertexPoints[0].x, stain.Position.y - CLICK(1), stain.VertexPoints[0].z, stain.RoomNumber);
+		auto pointColl1 = GetCollision(stain.VertexPoints[1].x, stain.Position.y - CLICK(1), stain.VertexPoints[1].z, stain.RoomNumber);
+		auto pointColl2 = GetCollision(stain.VertexPoints[2].x, stain.Position.y - CLICK(1), stain.VertexPoints[2].z, stain.RoomNumber);
+		auto pointColl3 = GetCollision(stain.VertexPoints[3].x, stain.Position.y - CLICK(1), stain.VertexPoints[3].z, stain.RoomNumber);
+
+		// Stop scaling blood stain if floor heights at vertex points aren't within relative range.
+		if ((abs(pointColl0.Position.Floor - pointColl1.Position.Floor) > heightRange) ||
+			(abs(pointColl1.Position.Floor - pointColl2.Position.Floor) > heightRange) ||
+			(abs(pointColl2.Position.Floor - pointColl3.Position.Floor) > heightRange) ||
+			(abs(pointColl3.Position.Floor - pointColl0.Position.Floor) > heightRange))
+		{
+			return false;
+		}
+
+		return true;
+	}
+
 	void SpawnBloodMist(const Vector3& pos, int roomNumber, const Vector3& direction, unsigned int count)
 	{
 		TriggerBlood(pos.x, pos.y, pos.z, direction.y, count);
@@ -172,20 +194,8 @@ namespace TEN::Effects::Blood
 
 	void SpawnBloodStainFromDrip(const BloodDrip& drip, const CollisionResult& pointColl)
 	{
-		auto pos = Vector3(drip.Position.x, pointColl.Position.Floor, drip.Position.z);
-		auto normal = Vector3::Zero;
-
-		if (drip.Position.y >= pointColl.Position.Floor)
-		{
-			pos.y -= BLOOD_STAIN_HEIGHT_OFFSET;
-			normal = Geometry::GetFloorNormal(pointColl.FloorTilt);
-		}
-		else if (drip.Position.y <= pointColl.Position.Ceiling)
-		{
-			pos.y -= BLOOD_STAIN_HEIGHT_OFFSET;
-			normal = Geometry::GetFloorNormal(pointColl.CeilingTilt);
-		}
-
+		auto pos = Vector3(drip.Position.x, pointColl.Position.Floor - BLOOD_STAIN_HEIGHT_OFFSET, drip.Position.z);
+		auto normal = Geometry::GetFloorNormal(pointColl.FloorTilt);
 		float scale = drip.Scale * 5;
 		float scaleRate = std::min(drip.Velocity.Length() / 2, scale / 2);
 
@@ -236,13 +246,13 @@ namespace TEN::Effects::Blood
 
 			drip.RoomNumber = pointColl.RoomNumber;
 
-			// Drip hit wall; deactivate.
-			if (pointColl.Position.Floor == NO_HEIGHT)
+			// Drip hit wall or ceiling; deactivate.
+			if (pointColl.Position.Floor == NO_HEIGHT || drip.Position.y <= pointColl.Position.Ceiling)
 			{
 				drip.IsActive = false;
 			}
-			// Drip hit floor or ceiling; spawn stain.
-			else if (drip.Position.y >= pointColl.Position.Floor || drip.Position.y <= pointColl.Position.Ceiling)
+			// Drip hit floor; spawn stain.
+			else if (drip.Position.y >= pointColl.Position.Floor)
 			{
 				drip.IsActive = false;
 				SpawnBloodStainFromDrip(drip, pointColl);
@@ -280,6 +290,9 @@ namespace TEN::Effects::Blood
 			// Update scale.
 			if (stain.ScaleRate > 0.0f)
 			{
+				if (!TestBloodStainFloor(stain))
+					stain.ScaleRate = 0.0f;
+
 				stain.Scale += stain.ScaleRate;
 				if (stain.Scale >= (stain.ScaleMax * 0.8f))
 				{
