@@ -2024,8 +2024,8 @@ namespace TEN::Gui
 
 		if (Rings[(int)RingTypes::Ammo]->RingActive)
 		{
-			auto optionString = std::string(OptionStrings[5]);
-			g_Renderer.AddString(PHD_CENTER_X, PHD_CENTER_Y, optionString.c_str(), PRINTSTRING_COLOR_WHITE, PRINTSTRING_BLINK | PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
+			auto optionString = g_GameFlow->GetString(OptionStrings[5]);
+			g_Renderer.AddString(PHD_CENTER_X, PHD_CENTER_Y, optionString, PRINTSTRING_COLOR_WHITE, PRINTSTRING_BLINK | PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
 
 			if (Rings[(int)RingTypes::Inventory]->ObjectListMovement)
 				return;
@@ -2047,9 +2047,9 @@ namespace TEN::Gui
 					SoundEffect(SFX_TR4_MENU_COMBINE, nullptr, SoundEnvironment::Always);
 				}
 				else if (ammoItem >= INV_OBJECT_SMALL_WATERSKIN_EMPTY &&
-					ammoItem <= INV_OBJECT_SMALL_WATERSKIN_3L &&
-					invItem >= INV_OBJECT_BIG_WATERSKIN_EMPTY &&
-					invItem <= INV_OBJECT_BIG_WATERSKIN_5L)
+						 ammoItem <= INV_OBJECT_SMALL_WATERSKIN_3L &&
+						 invItem >= INV_OBJECT_BIG_WATERSKIN_EMPTY &&
+						 invItem <= INV_OBJECT_BIG_WATERSKIN_5L)
 				{
 					if (PerformWaterskinCombine(item, true))
 					{
@@ -2063,9 +2063,9 @@ namespace TEN::Gui
 					CombineRingFadeDir = 2;
 				}
 				else if (invItem >= INV_OBJECT_SMALL_WATERSKIN_EMPTY &&
-					invItem <= INV_OBJECT_SMALL_WATERSKIN_3L &&
-					ammoItem >= INV_OBJECT_BIG_WATERSKIN_EMPTY &&
-					ammoItem <= INV_OBJECT_BIG_WATERSKIN_5L)
+						 invItem <= INV_OBJECT_SMALL_WATERSKIN_3L &&
+						 ammoItem >= INV_OBJECT_BIG_WATERSKIN_EMPTY &&
+						 ammoItem <= INV_OBJECT_BIG_WATERSKIN_5L)
 				{
 					if (PerformWaterskinCombine(item, false))
 					{
