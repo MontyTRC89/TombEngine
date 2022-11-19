@@ -68,7 +68,7 @@ NODEOFFSET_INFO NodeOffsets[MAX_NODE] =
 	{ 0, 0, 0, 0, false }, // Empty
 };
 
-void DetatchSpark(int number, SpriteEnumFlag type)
+void DetatchSpark(int number, SpriteEnumFlags type)
 {
 	auto* sptr = &Particles[0];
 

@@ -6,19 +6,19 @@ enum class LaraWeaponType;
 struct ItemInfo;
 struct CollisionInfo;
 
-enum RIPPLE_TYPE
+enum RippleFlags
 {
-	RIPPLE_FLAG_NONE = 0x00,
-	RIPPLE_FLAG_ACTIVE = 0x01,
-	RIPPLE_FLAG_SHORT_INIT = 0x02,
-	RIPPLE_FLAG_RIPPLE_INNER = 0x04,
-	RIPPLE_FLAG_RIPPLE_MIDDLE = 0x08,
-	RIPPLE_FLAG_LOW_OPACITY = 0x10,
-	RIPPLE_FLAG_BLOOD = 0x20,
-	RIPPLE_FLAG_NO_RAND = 0x40
+	RIPPLE_FLAG_NONE		  = (0 << 0),
+	RIPPLE_FLAG_ACTIVE		  = (1 << 0),
+	RIPPLE_FLAG_SHORT_INIT	  = (1 << 1),
+	RIPPLE_FLAG_RIPPLE_INNER  = (1 << 2),
+	RIPPLE_FLAG_RIPPLE_MIDDLE = (1 << 3),
+	RIPPLE_FLAG_LOW_OPACITY	  = (1 << 4),
+	RIPPLE_FLAG_BLOOD		  = (1 << 5),
+	RIPPLE_FLAG_NO_RAND		  = (1 << 6)
 };
 
-enum SpriteEnumFlag
+enum SpriteEnumFlags
 {
 	SP_NONE = 0x0000,
 	SP_FIRE = 0x0001,
@@ -187,7 +187,7 @@ extern FX_INFO EffectList[NUM_EFFECTS];
 
 Particle* GetFreeParticle();
 
-void DetatchSpark(int num, SpriteEnumFlag type);
+void DetatchSpark(int num, SpriteEnumFlags type);
 void UpdateSparks();
 void TriggerRicochetSpark(GameVector* pos, short angle, int num, int unk);
 void TriggerCyborgSpark(int x, int y, int z, short xv, short yv, short zv);

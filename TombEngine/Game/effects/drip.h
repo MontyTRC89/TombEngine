@@ -4,9 +4,7 @@
 namespace TEN::Effects::Drip
 {
 	constexpr auto DRIPS_NUM_MAX = 512;
-	constexpr auto DRIP_LIFE	  = 25.0f;
-	constexpr auto DRIP_LIFE_LONG = 120.0f;
-	constexpr auto DRIP_WIDTH	  = 4.0f;
+	constexpr auto DRIP_WIDTH	 = 4.0f;
 
 	struct DripParticle
 	{
@@ -18,7 +16,7 @@ namespace TEN::Effects::Drip
 		Vector4 Color	   = Vector4::Zero;
 
 		float Life	  = 0.0f;
-		float Age	  = 0.0f;
+		float LifeMax = 0.0f;
 		float Gravity = 0.0f;
 		float Height  = 0.0f;
 	};
@@ -27,10 +25,10 @@ namespace TEN::Effects::Drip
 
 	DripParticle& GetFreeDrip();
 
-	void SpawnDripParticle(const Vector3& pos, int roomNumber, const Vector3& velocity, float life, float gravity);
-	void SpawnWetnessDrip(const Vector3& pos, int roomNumber); // Unused?
+	void SpawnDripParticle(const Vector3& pos, int roomNumber, const Vector3& velocity, float maxLife, float gravity);
+	void SpawnWetnessDrip(const Vector3& pos, int roomNumber);
 	void SpawnSplashDrips(const Vector3& pos, int roomNumber, unsigned int count);
-	void SpawnGunshellDrips(const Vector3& pos, int roomNumber);
+	void SpawnGunshellSplashDrips(const Vector3& pos, int roomNumber, unsigned int count);
 
 	void UpdateDripParticles();
 	void DisableDripParticles();

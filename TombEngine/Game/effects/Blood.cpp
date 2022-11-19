@@ -197,9 +197,8 @@ namespace TEN::Effects::Blood
 			if (!drip.IsActive)
 				continue;
 
-			drip.Life -= 1.0f;
-
 			// Despawn drip.
+			drip.Life -= 1.0f;
 			if (drip.Life <= 0.0f)
 			{
 				drip.IsActive = false;
@@ -215,13 +214,13 @@ namespace TEN::Effects::Blood
 
 			drip.RoomNumber = pointColl.RoomNumber;
 
-			// Drip has hit wall; deactivate.
+			// Drip hit wall; deactivate.
 			if (pointColl.Position.Floor == NO_HEIGHT)
 			{
 				drip.IsActive = false;
 				// TODO: Spawn stains on walls and objects.
 			}
-			// Drip has hit floor; spawn stain.
+			// Drip hit floor; spawn stain.
 			else if ((pointColl.Position.Floor - vPos) <= 0)
 			{
 				drip.IsActive = false;
@@ -231,7 +230,7 @@ namespace TEN::Effects::Blood
 
 				SpawnBloodStain(pos, drip.RoomNumber, normal, drip.Scale / 2, drip.Velocity.Length()); // TODO: Scale too large.
 			}
-			// Drip has hit ceiling; spawn stain.
+			// Drip hit ceiling; spawn stain.
 			else if ((pointColl.Position.Ceiling - vPos) >= 0)
 			{
 				drip.IsActive = false;

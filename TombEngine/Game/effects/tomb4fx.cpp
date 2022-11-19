@@ -20,6 +20,7 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
+using namespace TEN::Effects::Drip;
 using namespace TEN::Effects::Environment;
 using namespace TEN::Floordata;
 using namespace TEN::Math;
@@ -41,13 +42,13 @@ int NextDrip = 0;
 int NextBlood = 0;
 int NextGunShell = 0;
 
-GUNFLASH_STRUCT Gunflashes[MAX_GUNFLASH]; 
-FIRE_SPARKS FireSparks[MAX_SPARKS_FIRE]; 
-SMOKE_SPARKS SmokeSparks[MAX_SPARKS_SMOKE]; 
-GUNSHELL_STRUCT Gunshells[MAX_GUNSHELL]; 
-BLOOD_STRUCT Blood[MAX_SPARKS_BLOOD]; 
-DRIP_STRUCT Drips[MAX_DRIPS]; 
-SHOCKWAVE_STRUCT ShockWaves[MAX_SHOCKWAVE]; 
+GUNFLASH_STRUCT Gunflashes[MAX_GUNFLASH];
+FIRE_SPARKS FireSparks[MAX_SPARKS_FIRE];
+SMOKE_SPARKS SmokeSparks[MAX_SPARKS_SMOKE];
+GUNSHELL_STRUCT Gunshells[MAX_GUNSHELL];
+BLOOD_STRUCT Blood[MAX_SPARKS_BLOOD];
+DRIP_STRUCT Drips[MAX_DRIPS];
+SHOCKWAVE_STRUCT ShockWaves[MAX_SHOCKWAVE];
 FIRE_LIST Fires[MAX_FIRE_LIST];
 
 int GetFreeFireSpark()
@@ -234,9 +235,9 @@ void TriggerPilotFlame(int itemNum, int nodeIndex)
 	spark->y = (GetRandomControl() & 31) - 16;
 	spark->z = (GetRandomControl() & 31) - 16;
 
-	spark->xVel =  (GetRandomControl() & 31) - 16;
+	spark->xVel = (GetRandomControl() & 31) - 16;
 	spark->yVel = -(GetRandomControl() & 3);
-	spark->zVel =  (GetRandomControl() & 31) - 16;
+	spark->zVel = (GetRandomControl() & 31) - 16;
 
 	spark->flags = SP_SCALE | SP_DEF | SP_EXPDEF | SP_ITEM | SP_NODEATTACH;
 	spark->nodeNumber = nodeIndex;
@@ -367,8 +368,8 @@ void AddFire(int x, int y, int z, short roomNum, float size, short fade)
 		fptr++;
 		if (++i >= MAX_FIRE_LIST)
 			return;
-	}	
-	
+	}
+
 	if (fade)
 		fptr->on = fade;
 	else
@@ -465,7 +466,7 @@ void UpdateFireSparks()
 	}
 }
 
-int GetFreeSmokeSpark() 
+int GetFreeSmokeSpark()
 {
 	SMOKE_SPARKS* spark = &SmokeSparks[NextSmokeSpark];
 	int sparkNum = NextSmokeSpark;
@@ -558,25 +559,25 @@ void UpdateSmoke()
 			int dl = ((spark->sLife - spark->life) << 16) / spark->sLife;
 
 			spark->yVel += spark->gravity;
-			
+
 			if (spark->maxYvel != 0)
 			{
-				if (spark->yVel < 0) 
+				if (spark->yVel < 0)
 				{
-					if (spark->yVel < spark->maxYvel) 
+					if (spark->yVel < spark->maxYvel)
 					{
 						spark->yVel = spark->maxYvel;
 					}
 				}
-				else 
+				else
 				{
-					if (spark->yVel > spark->maxYvel) 
+					if (spark->yVel > spark->maxYvel)
 					{
 						spark->yVel = spark->maxYvel;
 					}
 				}
 			}
-			
+
 			if (spark->friction & 0xF)
 			{
 				spark->xVel -= spark->xVel >> (spark->friction & 0xF);
@@ -622,7 +623,7 @@ void TriggerGunSmoke(int x, int y, int z, short xv, short yv, short zv, byte ini
 {
 	/*
 	SMOKE_SPARKS* spark;
-	
+
 	spark = &SmokeSparks[GetFreeSmokeSpark()];
 	spark->on = true;
 	spark->sShade = 0;
@@ -709,13 +710,13 @@ void TriggerGunSmoke(int x, int y, int z, short xv, short yv, short zv, byte ini
 		spark->mirror = 0;
 	}*/
 	TEN::Effects::Smoke::TriggerGunSmokeParticles(x, y, z, xv, yv, zv, initial, weaponType, count);
-	
+
 }
 
 void TriggerShatterSmoke(int x, int y, int z)
 {
 	SMOKE_SPARKS* spark = &SmokeSparks[GetFreeSmokeSpark()];
-	
+
 	spark->on = true;
 	spark->sShade = 0;
 	spark->colFadeSpeed = 4;
@@ -730,7 +731,7 @@ void TriggerShatterSmoke(int x, int y, int z)
 	spark->yVel = 2 * (GetRandomControl() & 0x1FF) - 512;
 	spark->zVel = 2 * (GetRandomControl() & 0x1FF) - 512;
 	spark->friction = 7;
-	
+
 	if (GetRandomControl() & 1)
 	{
 		spark->flags = SP_ROTATE;
@@ -861,10 +862,10 @@ void UpdateBlood()
 			{
 				blood->shade = blood->sShade + ((blood->dShade - blood->sShade) * (((blood->sLife - blood->life) << 16) / blood->colFadeSpeed) >> 16);
 			}
-			
+
 			blood->rotAng = (blood->rotAng + blood->rotAdd) & 0xFFF;
 			blood->yVel += blood->gravity;
-						
+
 			if (blood->friction & 0xF)
 			{
 				blood->xVel -= blood->xVel >> (blood->friction & 0xF);
@@ -1048,7 +1049,7 @@ void UpdateGunShells()
 				}
 				else
 					gunshell->fallspeed = 8;
-				
+
 				gunshell->speed -= gunshell->speed >> 1;
 			}
 			else
@@ -1067,7 +1068,7 @@ void UpdateGunShells()
 				&& !(g_Level.Rooms[prevRoomNumber].flags & ENV_FLAG_WATER))
 			{
 
-				TEN::Effects::Drip::SpawnGunshellDrips(Vector3(gunshell->pos.Position.x, g_Level.Rooms[gunshell->roomNumber].maxceiling, gunshell->pos.Position.z), gunshell->roomNumber);
+				TEN::Effects::Drip::SpawnGunshellSplashDrips(Vector3(gunshell->pos.Position.x, g_Level.Rooms[gunshell->roomNumber].maxceiling, gunshell->pos.Position.z), gunshell->roomNumber, 4);
 				//AddWaterSparks(gs->pos.Position.x, g_Level.Rooms[gs->roomNumber].maxceiling, gs->pos.Position.z, 8);
 				SetupRipple(gunshell->pos.Position.x, g_Level.Rooms[gunshell->roomNumber].maxceiling, gunshell->pos.Position.z, (GetRandomControl() & 3) + 8, RIPPLE_FLAG_SHORT_INIT);
 				gunshell->fallspeed >>= 5;
@@ -1134,7 +1135,7 @@ void AddWaterSparks(int x, int y, int z, int num)
 		spark->sSize = 8;
 		spark->dSize = 32;
 		spark->scalar = 1;
-		spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;	
+		spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
 		int random = GetRandomControl() & 0xFFF;
 		spark->xVel = -phd_sin(random << 4) * 128;
 		spark->yVel = -Random::GenerateInt(128, 256);
@@ -1172,7 +1173,7 @@ int GetFreeDrip()
 	int dripNum = NextDrip;
 	short minLife = 4095;
 	short minIndex = 0;
-	short count = 0;	
+	short count = 0;
 
 	while (drip->on)
 	{
@@ -1228,7 +1229,7 @@ void UpdateDrips()
 			}
 
 			drip->yVel += drip->gravity;
-			
+
 			if (g_Level.Rooms[drip->roomNumber].flags & ENV_FLAG_WIND)
 			{
 				drip->x += Weather.Wind().x;
@@ -1236,7 +1237,7 @@ void UpdateDrips()
 			}
 
 			drip->y += drip->yVel >> 5;
-			
+
 			FloorInfo* floor = GetFloor(drip->x, drip->y, drip->z, &drip->roomNumber);
 			if (g_Level.Rooms[drip->roomNumber].flags & ENV_FLAG_WATER)
 				drip->on = false;
@@ -1258,36 +1259,16 @@ void TriggerLaraDrips(ItemInfo* item)
 	{
 		for (int i = 0; i < NUM_LARA_MESHES; i++)
 		{
-			auto pos = GetJointPosition(item, i);
-			auto room = GetRoom(item->Location, pos.x, pos.y, pos.z).roomNumber;
+			auto jointPos = GetJointPosition(item, i);
+			auto roomNumber = GetRoom(item->Location, jointPos.x, jointPos.y, jointPos.z).roomNumber;
 
-			if (g_Level.Rooms[room].flags & ENV_FLAG_WATER)
+			if (TestEnvironment(ENV_FLAG_WATER, roomNumber))
 				Lara.Wet[i] = UCHAR_MAX;
 
-			if (Lara.Wet[i] &&
-				!LaraNodeUnderwater[i] &&
+			if (Lara.Wet[i] > 0 && !LaraNodeUnderwater[i] &&
 				(GetRandomControl() & 0x1FF) < Lara.Wet[i])
 			{
-				auto* drip = &Drips[GetFreeDrip()];
-
-				auto pos = GetJointPosition(item, 
-					i,
-					Vector3i(
-						(GetRandomControl() & 0x1F) - 16,
-						(GetRandomControl() & 0xF) + 16,
-						(GetRandomControl() & 0x1F) - 16
-					));
-				drip->x = pos.x;
-				drip->y = pos.y;
-				drip->z = pos.z;
-				drip->on = 1;
-				drip->r = (GetRandomControl() & 7) + 64;
-				drip->g = (GetRandomControl() & 7) + 96;
-				drip->b = (GetRandomControl() & 7) + 128;
-				drip->yVel = (GetRandomControl() & 0x1F) + 32;
-				drip->gravity = (GetRandomControl() & 0x1F) + 32;
-				drip->life = (GetRandomControl() & 0x1F) + 8;
-				drip->roomNumber = LaraItem->RoomNumber;
+				SpawnWetnessDrip(jointPos.ToVector3(), LaraItem->RoomNumber);
 
 				if (Lara.Wet[i] >= 4)
 					Lara.Wet[i] -= 4;
@@ -1402,13 +1383,13 @@ void ExplodeVehicle(ItemInfo* laraItem, ItemInfo* vehicle)
 void ExplodingDeath(short itemNumber, short flags)
 {
 	ItemInfo* item = &g_Level.Items[itemNumber];
-	
+
 	ObjectInfo* obj;
 	if (item->IsLara() && Objects[ID_LARA_SKIN].loaded)
 		obj = &Objects[ID_LARA_SKIN];
 	else
 		obj = &Objects[item->ObjectNumber];
-	
+
 	auto world = item->Pose.Orientation.ToRotationMatrix();
 
 	for (int i = 0; i < obj->nmeshes; i++)
@@ -1422,7 +1403,7 @@ void ExplodingDeath(short itemNumber, short flags)
 
 		item->MeshBits.Clear(i);
 
-		if (i == 0 ||  ((GetRandomControl() & 3) != 0 && (flags & BODY_EXPLODE)))
+		if (i == 0 || ((GetRandomControl() & 3) != 0 && (flags & BODY_EXPLODE)))
 		{
 			short fxNumber = CreateNewEffect(item->RoomNumber);
 			if (fxNumber != NO_ITEM)
@@ -1500,7 +1481,7 @@ void TriggerShockwave(Pose* pos, short innerRad, short outerRad, int speed, unsi
 		sptr->g = g;
 		sptr->b = b;
 		sptr->life = life;
-		
+
 		SoundEffect(SFX_TR5_IMP_STONE_HIT, pos);
 	}
 }
@@ -1585,7 +1566,7 @@ void UpdateShockwaves()
 						int dx = LaraItem->Pose.Position.x - sw->x;
 						int dz = LaraItem->Pose.Position.z - sw->z;
 						int distance = sqrt(SQUARE(dx) + SQUARE(dz));
-						
+
 						if (sw->y <= LaraItem->Pose.Position.y + frame->boundingBox.Y1
 							|| sw->y >= LaraItem->Pose.Position.y + frame->boundingBox.Y2 + 256
 							|| distance <= sw->innerRad
@@ -1664,7 +1645,7 @@ void TriggerExplosionBubble(int x, int y, int z, short roomNumber)
 /*void TriggerExplosionSmokeEnd(int x, int y, int z, int unk)
 {
 	auto* spark = GetFreeParticle();
-	
+
 	spark->on = 1;
 	if (unk)
 	{
@@ -1709,7 +1690,7 @@ void TriggerExplosionBubble(int x, int y, int z, short roomNumber)
 	}
 	else
 		spark->friction = 6;
-	
+
 	spark->flags = 538;
 	spark->rotAng = GetRandomControl() & 0xFFF;
 
@@ -1786,7 +1767,7 @@ void TriggerFenceSparks(int x, int y, int z, int kill, int crane)
 	spark->maxYvel = 0;
 }
 
-void TriggerSmallSplash(int x, int y, int z, int number) 
+void TriggerSmallSplash(int x, int y, int z, int number)
 {
 	for (int i = 0; i < number; i++)
 	{
@@ -1824,6 +1805,6 @@ void TriggerSmallSplash(int x, int y, int z, int number)
 		sptr->z = z + (sptr->zVel >> 3);
 
 		sptr->maxYvel = 0;
-		sptr->gravity = (GetRandomControl() & 0xF) + 64; 
+		sptr->gravity = (GetRandomControl() & 0xF) + 64;
 	}
 }
