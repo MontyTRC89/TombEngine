@@ -800,7 +800,6 @@ namespace TEN::Renderer
 		}
 
 		SetBlendMode(BLENDMODE_OPAQUE);
-
 	}
 
 	Texture2D Renderer11::CreateDefaultNormalTexture() 
@@ -809,16 +808,28 @@ namespace TEN::Renderer
 		return Texture2D(m_device.Get(), 1, 1, data.data());
 	}
 
+	void Renderer11::DrawBloodDrips(RenderView& view)
+	{
+		for (const auto& drip : BloodDrips)
+		{
+			if (g_Level.Sprites.size() > drip.SpriteIndex)
+			{
+				AddSpriteBillboard(
+					&m_sprites[drip.SpriteIndex],
+					drip.Position,
+					drip.Color, 0.5f, 1.0f, Vector2(drip.Scale, drip.Scale) * 2, BLENDMODE_ALPHABLEND, false, view);
+			}
+		}
+	}
+
 	void Renderer11::DrawBloodStains(RenderView& view)
 	{
 		for (const auto& stain : BloodStains)
 		{
-			int spriteIndex = Objects[ID_BLOOD_STAIN_SPRITES].meshIndex + 1 + stain.SpriteIndex;
-
-			if (g_Level.Sprites.size() > spriteIndex)
+			if (g_Level.Sprites.size() > stain.SpriteIndex)
 			{
 				AddSprite3D(
-					&m_sprites[spriteIndex],
+					&m_sprites[stain.SpriteIndex],
 					stain.VertexPoints[0], stain.VertexPoints[1], stain.VertexPoints[2], stain.VertexPoints[3],
 					stain.Color, 0.0f, 1.0f, Vector2::One, BLENDMODE_ALPHABLEND, false, view); // TODO: There might be a bug with some blend modes??
 			}

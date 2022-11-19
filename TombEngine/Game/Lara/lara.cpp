@@ -439,7 +439,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 		auto rotMatrix = (item->Pose.Orientation + EulerAngles(ANGLE(60.0f), 0, 0)).ToRotationMatrix();
 		auto baseVelocity = Vector3::Transform(item->Animation.Velocity, rotMatrix);
 
-		SpawnBloodDripSpray(pos.ToVector3(), item->RoomNumber, item->Pose.Orientation.ToDirection(), baseVelocity);
+		SpawnBloodDripSpray(pos.ToVector3(), item->RoomNumber, Vector3::Up/*item->Pose.Orientation.ToDirection()*/, baseVelocity);
 	}
 	dbBlood = KeyMap[OIS::KC_B] ? false : true;
 

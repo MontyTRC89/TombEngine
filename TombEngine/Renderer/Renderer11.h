@@ -543,6 +543,7 @@ namespace TEN::Renderer
 		void DrawLaraHolsters(bool transparent);
 		void DrawMoveableMesh(RendererItem* itemToDraw, RendererMesh* mesh, RendererRoom* room, int boneIndex, bool transparent);
 		void DrawSimpleParticles(RenderView& view);
+		void DrawBloodDrips(RenderView& view);
 		void DrawBloodStains(RenderView& view);
 		void DrawFootprints(RenderView& view);
 		void DrawLoadingBar(float percent);

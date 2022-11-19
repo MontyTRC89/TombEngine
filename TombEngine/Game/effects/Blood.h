@@ -12,7 +12,8 @@ namespace TEN::Effects::Blood
 
 	struct BloodDrip
 	{
-		bool IsActive = false;
+		bool		 IsActive	 = false;
+		unsigned int SpriteIndex = 0;
 
 		Vector3 Position   = Vector3::Zero;
 		int		RoomNumber = NO_ROOM;
@@ -26,7 +27,7 @@ namespace TEN::Effects::Blood
 
 	struct BloodStain
 	{
-		int	  SpriteIndex = 0;
+		unsigned int SpriteIndex = 0;
 
 		Vector3	Position	  = Vector3::Zero;
 		int		RoomNumber	  = NO_ROOM;
