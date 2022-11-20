@@ -19,10 +19,10 @@ std::vector<short> OutsideRoomTable[OUTSIDE_SIZE][OUTSIDE_SIZE];
 
 bool ROOM_INFO::Active()
 {
-	if (flipNumber == -1)
+	if (flipNumber == NO_ROOM)
 		return true;
 
-	return !(FlipStats[flipNumber] && flippedRoom == -1);
+	return !(FlipStats[flipNumber] && flippedRoom == NO_ROOM);
 }
 
 void DoFlipMap(short group)
