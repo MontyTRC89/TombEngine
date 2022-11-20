@@ -170,7 +170,7 @@ namespace TEN::Entities::Effects
 				if (item->TriggerFlags < 8)
 					FlameEmitterFlags[item->TriggerFlags] = true;
 
-				AddFire(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, item->RoomNumber, 1.0f, 0);
+				AddFire(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, item->RoomNumber, 2.0f, 0);
 
 				TriggerDynamicLight(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z,
 									16 - (GetRandomControl() & 1),
