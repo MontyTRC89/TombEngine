@@ -108,6 +108,14 @@ bool ItemInfo::IsCreature() const
 	return this->Data.is<CreatureInfo>();
 }
 
+void ItemInfo::ResetModelToDefault()
+{
+	this->Model.BaseMesh = Objects[this->ObjectNumber].meshIndex;
+
+	for (int i = 0; i < this->Model.MeshIndex.size(); i++)
+		this->Model.MeshIndex[i] = this->Model.BaseMesh + i;
+}
+
 bool TestState(int refState, const vector<int>& stateList)
 {
 	for (const auto& state : stateList)
@@ -512,11 +520,8 @@ void InitialiseItem(short itemNumber)
 
 	if (Objects[item->ObjectNumber].nmeshes > 0)
 	{
-		item->Model.BaseMesh = Objects[item->ObjectNumber].meshIndex;
-
 		item->Model.MeshIndex.resize(Objects[item->ObjectNumber].nmeshes);
-		for (int i = 0; i < item->Model.MeshIndex.size(); i++)
-			item->Model.MeshIndex[i] = item->Model.BaseMesh + i;
+		item->ResetModelToDefault();
 
 		item->Model.Mutator.resize(Objects[item->ObjectNumber].nmeshes);
 		for (int i = 0; i < item->Model.Mutator.size(); i++)
