@@ -1,6 +1,7 @@
 Version 1.0.4
 =============
 
+* Add Flow.EnableMassPickup option in Gameflow.lua to enable/disable mass pickup.
 * Fix lasersight always displaying with revolver and crossbow.
 * Fix incorrect string IDs for item combine, HK and revolver with lasersight.
 
