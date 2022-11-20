@@ -179,21 +179,22 @@ int KeyTrigger(short itemNum)
 	return oldkey;
 }
 
-int PickupTrigger(short itemNum)
+bool PickupTrigger(short itemNum)
 {
 	ItemInfo* item = &g_Level.Items[itemNum];
 
-	if (item->Flags & IFLAG_KILLED
-		|| (item->Status != ITEM_INVISIBLE
-			|| item->ItemFlags[3] != 1
-			|| item->TriggerFlags & 0x80))
+	if (((item->Flags & IFLAG_CLEAR_BODY) && (item->Flags & IFLAG_KILLED)) ||
+		item->Status != ITEM_INVISIBLE || 
+		item->ItemFlags[3] != 1 || 
+		item->TriggerFlags & 0x80)
 	{
-		return 0;
+		return false;
 	}
 
 	KillItem(itemNum);
+	item->Flags |= IFLAG_CLEAR_BODY;
 
-	return 1;
+	return true;
 }
 
 void RefreshCamera(short type, short* data)
