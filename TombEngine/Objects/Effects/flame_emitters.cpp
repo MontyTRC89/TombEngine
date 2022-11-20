@@ -179,7 +179,8 @@ namespace TEN::Entities::Effects
 
 				SoundEffect(SFX_TR4_LOOP_FOR_SMALL_FIRES, &item->Pose);
 
-				BurnNearbyItems(item);
+				if ((Wibble & 0x04) && Random::TestProbability(1 / 2.0f))
+					BurnNearbyItems(item);
 			}
 		}
 		else
