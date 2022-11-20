@@ -945,8 +945,18 @@ void InitialisePickup(short itemNumber)
 	}
 	else
 	{
-		if (triggerFlags == 0 || triggerFlags == 3 || triggerFlags == 4 || triggerFlags == 7 || triggerFlags == 8 || triggerFlags == 11)
+		if (triggerFlags == 0 ||
+			triggerFlags == 3 ||
+			triggerFlags == 4 ||
+			triggerFlags == 7 ||
+			triggerFlags == 8 ||
+			triggerFlags == 11)
+		{
+			auto coll = GetCollision(item);
+			item->Pose.Position.y = coll.Position.Floor;
 			item->Pose.Position.y -= bounds.Y2;
+			AlignEntityToSurface(item, Vector2(Objects[item->ObjectNumber].radius));
+		}
 		
 		if ((item->TriggerFlags & 0x80) != 0)
 		{
