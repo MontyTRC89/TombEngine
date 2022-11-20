@@ -120,6 +120,13 @@ Must be true or false
 */
 	table_flow.set_function(ScriptReserved_EnableFlyCheat, &FlowHandler::EnableFlyCheat, this);
 
+/*** Enable or disable mass pickup.
+Must be true or false
+@function EnableMassPickup
+@tparam bool true or false
+*/
+	table_flow.set_function(ScriptReserved_EnableMassPickup, &FlowHandler::EnableMassPickup, this);
+
 /*** settings.lua.
 These functions are called in settings.lua, a file which holds your local settings.
 settings.lua shouldn't be bundled with any finished levels/games.
@@ -331,6 +338,16 @@ bool FlowHandler::IsFlyCheatEnabled() const
 void FlowHandler::EnableFlyCheat(bool flyCheat)
 {
 	FlyCheat = flyCheat;
+}
+
+bool FlowHandler::IsMassPickupEnabled() const
+{
+	return MassPickup;
+}
+
+void FlowHandler::EnableMassPickup(bool massPickup)
+{
+	MassPickup = massPickup;
 }
 
 bool FlowHandler::DoFlow()
