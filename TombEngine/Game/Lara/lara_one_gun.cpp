@@ -1267,7 +1267,7 @@ void DoExplosiveDamage(ItemInfo& emitter, ItemInfo& target, ItemInfo& projectile
 	{
 		DoDamage(&target, damage * 5);
 		if (!TestEnvironment(ENV_FLAG_WATER, target.RoomNumber) && target.HitPoints <= 0)
-			ItemBurn(&target);
+			LaraBurn(&target);
 	}
 }
 
