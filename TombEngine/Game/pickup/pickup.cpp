@@ -28,6 +28,7 @@
 #include "Specific/level.h"
 #include "Math/Math.h"
 #include "Specific/setup.h"
+#include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 
 using namespace TEN::Entities::Generic;
 using namespace TEN::Input;
@@ -224,6 +225,48 @@ void CollectCarriedItems(ItemInfo* item)
 	item->CarriedItem = NO_ITEM;
 }
 
+void CollectMultiplePickups(int itemNumber)
+{
+	auto* firstItem = &g_Level.Items[itemNumber];
+	GetCollidedObjects(firstItem, LARA_RADIUS, true, CollidedItems, CollidedMeshes, true);
+
+	for (int i = 0; i < MAX_COLLIDED_OBJECTS; i++)
+	{
+		auto* currentItem = CollidedItems[i];
+
+		if (!currentItem)
+			currentItem = firstItem;
+
+		if (!Objects[currentItem->ObjectNumber].isPickup)
+			continue;
+
+		AddDisplayPickup(currentItem->ObjectNumber);
+		if (currentItem->TriggerFlags & 0x100)
+		{
+			for (int i = 0; i < g_Level.NumItems; i++)
+			{
+				if (g_Level.Items[i].ObjectNumber == currentItem->ObjectNumber)
+					KillItem(i);
+			}
+		}
+
+		if (currentItem->TriggerFlags & 0xC0)
+		{
+			currentItem->Status = ITEM_INVISIBLE;
+			currentItem->Flags |= TRIGGERED;
+			currentItem->ItemFlags[3] = 1;
+		}
+
+		//currentItem->Pose.Orientation = prevOrient;
+		KillItem(currentItem->Index);
+
+		if (currentItem == firstItem)
+			break;
+	}
+
+	getThisItemPlease = NO_ITEM;
+}
+
 void DoPickup(ItemInfo* laraItem)
 {
 	if (getThisItemPlease == NO_ITEM)
@@ -301,9 +344,15 @@ void DoPickup(ItemInfo* laraItem)
 				KillItem(pickupItemNumber);
 			}
 			else if (laraItem->Animation.ActiveState == LS_PICKUP ||
-				laraItem->Animation.ActiveState == LS_PICKUP_FROM_CHEST ||
-				laraItem->Animation.ActiveState == LS_HOLE)
+					 laraItem->Animation.ActiveState == LS_PICKUP_FROM_CHEST ||
+					 laraItem->Animation.ActiveState == LS_HOLE)
 			{
+				if (g_GameFlow->IsMassPickupEnabled())
+				{
+					CollectMultiplePickups(getThisItemPlease);
+					return;
+				}
+
 				AddDisplayPickup(pickupItem->ObjectNumber);
 				if (pickupItem->TriggerFlags & 0x100)
 				{
