@@ -127,6 +127,8 @@ struct ROOM_INFO
 	std::vector<ROOM_DOOR> doors;
 
 	std::vector<int> neighbors; // TODO: Move to level struct
+
+	bool Active();
 };
 
 constexpr auto NUM_ROOMS = 1024;
