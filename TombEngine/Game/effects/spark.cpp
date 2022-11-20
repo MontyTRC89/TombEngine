@@ -126,8 +126,8 @@ namespace TEN::Effects::Spark
 			s.life = GenerateFloat(8, 15);
 			s.friction = 1.0f;
 			s.gravity = 2.0f;
-			s.height = GenerateFloat(128.0f, 256.0f);
-			s.width = GenerateFloat(16.0f, 32.0f);
+			s.height = GenerateFloat(64.0f, 256.0f);
+			s.width = GenerateFloat(8.0f, 16.0f);
 			s.room = pos->RoomNumber;
 			s.pos = Vector3(pos->x + GenerateFloat(-16, 16), pos->y + GenerateFloat(-16, 16), pos->z + GenerateFloat(-16, 16));
 			float ang = TO_RAD(angle.y);
@@ -136,7 +136,7 @@ namespace TEN::Effects::Spark
 			v.Normalize(v);
 			s.velocity = v * GenerateFloat(8, 32);
 			s.sourceColor = Vector4(0.4f, 0.6f, 1.0f, 1);
-			s.destinationColor = Vector4(0.6f, 0.6f, 0.8f, 0.5f);
+			s.destinationColor = Vector4(0.6f, 0.6f, 0.8f, 0.8f);
 			s.active = true;
 		}
 	}
