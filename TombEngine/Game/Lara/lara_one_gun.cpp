@@ -1252,6 +1252,9 @@ void DoExplosiveDamage(ItemInfo& emitter, ItemInfo& target, ItemInfo& projectile
 		emitter.HitStatus = true;
 
 		HitTarget(&emitter, &target, nullptr, damage, 1);
+
+		if (Random::TestProbability(1 / 2.0f))
+			ItemBurn(&target);
 					
 		if (&target != &emitter)
 		{
