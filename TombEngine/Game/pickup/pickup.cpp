@@ -952,14 +952,14 @@ void InitialisePickup(short itemNumber)
 			triggerFlags == 8 ||
 			triggerFlags == 11)
 		{
-			item->Pose.Position.y -= bounds.Y2;
-
 			if (triggerFlags == 0)
 			{
 				auto coll = GetCollision(item);
 				item->Pose.Position.y = coll.Position.Floor;
 				AlignEntityToSurface(item, Vector2(Objects[item->ObjectNumber].radius));
 			}
+
+			item->Pose.Position.y -= bounds.Y2;
 		}
 		
 		if ((item->TriggerFlags & 0x80) != 0)
