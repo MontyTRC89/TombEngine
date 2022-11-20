@@ -1557,7 +1557,6 @@ void ProcessEffects(ItemInfo* item)
 	int numMeshes = Objects[item->ObjectNumber].nmeshes;
 	for (int i = 0; i < numMeshes; i++)
 	{
-
 		auto pos = GetJointPosition(item, i);
 
 		switch (item->Effect.Type)
@@ -1594,29 +1593,33 @@ void ProcessEffects(ItemInfo* item)
 			std::clamp(Random::GenerateInt(-32, 32) + int(item->Effect.LightColor.z * UCHAR_MAX), 0, UCHAR_MAX));
 	}
 
+	switch (item->Effect.Type)
+	{
+	case EffectType::Smoke:
+		SoundEffect(SOUND_EFFECTS::SFX_TR5_HISS_LOOP_SMALL, &item->Pose);
+		break;
+
+	case EffectType::Electric:
+		SoundEffect(SOUND_EFFECTS::SFX_TR4_LARA_ELECTRIC_CRACKLES, &item->Pose);
+		break;
+
+	case EffectType::Burn:
+		SoundEffect(SOUND_EFFECTS::SFX_TR4_LOOP_FOR_SMALL_FIRES, &item->Pose);
+		break;
+	}
+
+	if (item->Effect.Type != EffectType::Smoke)
+	{
+		if (item->IsLara() ||
+			(item->IsCreature() && item->HitPoints > 0 && Random::TestProbability(BURN_DAMAGE_PROBABILITY)))
+		{
+			DoDamage(item, item->IsLara() ? BURN_HEALTH_LARA : BURN_HEALTH_NPC);
+		}
+	}
+
 	int waterHeight = GetWaterHeight(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, item->RoomNumber);
 
-	if (item->Effect.Type == EffectType::Electric ||
-	    (item->Effect.Type == EffectType::Burn && (waterHeight == NO_HEIGHT || item->Pose.Position.y <= waterHeight)))
-	{
-		SOUND_EFFECTS sfx = SOUND_EFFECTS::SFX_TR4_LOOP_FOR_SMALL_FIRES;
-		switch (item->Effect.Type)
-		{
-		case EffectType::Smoke:
-			sfx = SOUND_EFFECTS::SFX_TR5_HISS_LOOP_SMALL;
-			break;
-
-		case EffectType::Electric:
-			sfx = SOUND_EFFECTS::SFX_TR4_LARA_ELECTRIC_CRACKLES;
-			break;
-		}
-
-		SoundEffect(sfx, &item->Pose);
-
-		if (item->IsLara() || (item->IsCreature() && item->HitPoints > 0 && Random::TestProbability(BURN_DAMAGE_PROBABILITY)))
-			DoDamage(item, item->IsLara() ? BURN_HEALTH_LARA : BURN_HEALTH_NPC);
-	}
-	else
+	if (item->Effect.Type != EffectType::Electric && (waterHeight != NO_HEIGHT && item->Pose.Position.y > waterHeight))
 	{
 		if (item->Effect.Type == EffectType::Burn)
 		{

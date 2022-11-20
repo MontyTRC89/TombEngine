@@ -3,6 +3,7 @@
 #include "Game/items.h"
 #include "Game/control/lot.h"
 #include "Game/effects/debris.h"
+#include "Game/effects/item_fx.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Objects/objectslist.h"
@@ -19,6 +20,8 @@
 #include "Logic/LevelFunc.h"
 #include "Rotation/Rotation.h"
 #include "Vec3/Vec3.h"
+
+using namespace TEN::Effects::Items;
 
 /***
 Represents any object inside the game world.
@@ -163,15 +166,15 @@ void Moveable::Register(sol::table & parent)
 // @function Moveable:Shatter
 	ScriptReserved_Shatter, &Moveable::Shatter,
 
-/// Set moveable on fire
-// @function Moveable:SetOnFire
-// @bool fire true to set moveable on fire, false to extinguish it
-	ScriptReserved_SetOnFire, &Moveable::SetOnFire,
+/// Set effect to moveable
+// @function Moveable:SetEffect
+// @tparam EffectID effect Type of effect to assign.
+	ScriptReserved_SetEffect, &Moveable::SetEffect,
 
-/// Get whether moveable is on fire or not
-// @function Moveable:GetOnFire
-// @treturn bool fire true if moveable is on fire, false otherwise
-	ScriptReserved_GetOnFire, &Moveable::GetOnFire,
+/// Get current moveable effect
+// @function Moveable:GetEffect
+// @treturn EffectID effect type currently assigned to moveable.
+	ScriptReserved_GetEffect, &Moveable::GetEffect,
 
 /// Get the status of object.
 // possible values:
@@ -657,23 +660,32 @@ void Moveable::SetOCB(short ocb)
 	m_item->TriggerFlags = ocb;
 }
 
-void Moveable::SetOnFire(bool onFire)
+void Moveable::SetEffect(EffectType effectType)
 {
-	//todo add support for other EffectTypes -squidshire 11/11/2022
-	if (onFire)
+	switch (effectType)
 	{
-		m_item->Effect.Type = EffectType::Burn;
-		m_item->Effect.LightColor = Vector3(0.8f, 0.4f, 0.0f);
-	}
-	else if (!onFire)
-	{
-		m_item->Effect.Type = EffectType::None;
+	case EffectType::None:
+		m_item->Effect.Type = effectType;
+		break;
+
+	case EffectType::Smoke:
+		m_item->Effect.Type = effectType;
+		m_item->Effect.Count = -1;
+		break;
+
+	case EffectType::Burn:
+		ItemBurn(m_item);
+		break;
+
+	case EffectType::Electric:
+		ItemElectricBurn(m_item);
+		break;
 	}
 }
 
-bool Moveable::GetOnFire() const
+EffectType Moveable::GetEffect() const
 {
-	return m_item->Effect.Type == EffectType::Burn;
+	return m_item->Effect.Type;
 }
 
 short Moveable::GetItemFlags(int index) const
