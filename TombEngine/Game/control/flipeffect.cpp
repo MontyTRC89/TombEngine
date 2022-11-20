@@ -4,33 +4,32 @@
 #include "Game/camera.h"
 #include "Game/collision/collide_room.h"
 #include "Game/control/lot.h"
+#include "Game/effects/debris.h"
+#include "Game/effects/Footprint.h"
 #include "Game/effects/hair.h"
 #include "Game/effects/tomb4fx.h"
 #include "Game/effects/weather.h"
-#include "Game/effects/footprint.h"
-#include "Game/effects/debris.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_fire.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Game/pickup/pickup.h"
+#include "Objects/Effects/tr4_locusts.h"
+#include "Objects/Generic/puzzles_keys.h"
+#include "Objects/TR4/Entity/tr4_beetle_swarm.h"
+#include "Objects/TR5/Emitter/tr5_rats_emitter.h"
+#include "Objects/TR5/Emitter/tr5_spider_emitter.h"
+#include "Objects/TR5/Object/tr5_pushableblock.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
-#include "Objects/Generic/puzzles_keys.h"
-#include "Objects/TR4/Entity/tr4_beetle_swarm.h"
-#include "Objects/TR5/Emitter/tr5_spider_emitter.h"
-#include "Objects/TR5/Emitter/tr5_rats_emitter.h"
-#include "Objects/TR5/Object/tr5_pushableblock.h"
-#include "Objects/Effects/tr4_locusts.h"
 
-using std::function;
-using namespace TEN::Effects::Footprints;
 using namespace TEN::Effects::Environment;
+using namespace TEN::Effects::Footprints;
 
 int FlipEffect;
 
-function<EffectFunction> effect_routines[NUM_FLIPEFFECTS] =
+std::function<EffectFunction> effect_routines[NUM_FLIPEFFECTS] =
 {
 	Turn180,					//0
 	FloorShake,					//1

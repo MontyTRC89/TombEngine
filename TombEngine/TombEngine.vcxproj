@@ -175,7 +175,7 @@ CALL gen.bat</Command>
     <ClInclude Include="Game\effects\explosion.h" />
     <ClInclude Include="Game\effects\weather.h" />
     <ClInclude Include="Game\collision\floordata.h" />
-    <ClInclude Include="Game\effects\footprint.h" />
+    <ClInclude Include="Game\effects\Footprint.h" />
     <ClInclude Include="Game\Lara\lara_helpers.h" />
     <ClInclude Include="Game\Lara\lara_jump.h" />
     <ClInclude Include="Game\Lara\lara_overhang.h" />
@@ -629,7 +629,7 @@ CALL gen.bat</Command>
     <ClCompile Include="Game\effects\explosion.cpp" />
     <ClCompile Include="Game\effects\weather.cpp" />
     <ClCompile Include="Game\collision\floordata.cpp" />
-    <ClCompile Include="Game\effects\footprint.cpp" />
+    <ClCompile Include="Game\effects\Footprint.cpp" />
     <ClCompile Include="Game\GuiObjects.cpp" />
     <ClCompile Include="Objects\TR1\Trap\DamoclesSword.cpp" />
     <ClCompile Include="Scripting\Internal\TEN\Objects\Lara\LaraObject.cpp" />

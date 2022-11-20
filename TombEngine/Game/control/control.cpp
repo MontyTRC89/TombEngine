@@ -9,11 +9,12 @@
 #include "Game/control/flipeffect.h"
 #include "Game/control/lot.h"
 #include "Game/control/volume.h"
+#include "Game/effects/Blood.h"
 #include "Game/effects/debris.h"
 #include "Game/effects/drip.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/explosion.h"
-#include "Game/effects/footprint.h"
+#include "Game/effects/Footprint.h"
 #include "Game/effects/hair.h"
 #include "Game/effects/lightning.h"
 #include "Game/effects/simple_particle.h"
@@ -53,6 +54,7 @@
 #include "Specific/winmain.h"
 
 using namespace TEN::Effects;
+using namespace TEN::Effects::Blood;
 using namespace TEN::Effects::Drip;
 using namespace TEN::Effects::Environment;
 using namespace TEN::Effects::Explosion;
@@ -657,7 +659,11 @@ void CleanUp()
 
 	// Clear all kinds of particles.
 	DisableSmokeParticles();
-	DisableDripParticles();
+	ClearDripParticles();
+	ClearBloodDrips();
+	ClearBloodMists();
+	ClearBloodStains();
+	ClearFootprints();
 	DisableBubbles();
 	DisableDebris();
 

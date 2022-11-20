@@ -12,7 +12,7 @@
 #include "Game/effects/drip.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/explosion.h"
-#include "Game/effects/footprint.h"
+#include "Game/effects/Footprint.h"
 #include "Game/effects/lightning.h"
 #include "Game/effects/simple_particle.h"
 #include "Game/effects/smoke.h"

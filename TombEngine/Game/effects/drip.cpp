@@ -131,9 +131,9 @@ namespace TEN::Effects::Drip
 		}
 	}
 
-	void DisableDripParticles()
+	void ClearDripParticles()
 	{
 		for (auto& drip : DripParticles)
-			drip.IsActive = false;
+			drip = {};
 	}
 }

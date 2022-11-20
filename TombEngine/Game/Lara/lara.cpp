@@ -41,7 +41,7 @@
 // TEMP
 #include <ois/OISKeyboard.h>
 #include "Game/effects/Blood.h"
-#include <Game/effects/footprint.h>
+#include <Game/effects/Footprint.h>
 using namespace TEN::Effects::Blood;
 using namespace TEN::Effects::Footprints;
 //

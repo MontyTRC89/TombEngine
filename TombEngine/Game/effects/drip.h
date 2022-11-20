@@ -31,5 +31,5 @@ namespace TEN::Effects::Drip
 	void SpawnGunshellSplashDrips(const Vector3& pos, int roomNumber, unsigned int count);
 
 	void UpdateDripParticles();
-	void DisableDripParticles();
+	void ClearDripParticles();
 }

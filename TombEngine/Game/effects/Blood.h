@@ -8,7 +8,7 @@ struct CollisionResult;
 namespace TEN::Effects::Blood
 {
 	constexpr auto BLOOD_DRIP_NUM_MAX  = 128;
-	constexpr auto BLOOD_STAIN_NUM_MAX = 194;
+	constexpr auto BLOOD_STAIN_NUM_MAX = 192;
 
 	constexpr auto BLOOD_DRIP_SPRAY_NUM_MAX_DEFAULT = 2;
 
@@ -77,6 +77,9 @@ namespace TEN::Effects::Blood
 	void UpdateBloodMists();
 	void UpdateBloodDrips();
 	void UpdateBloodStains();
+	void ClearBloodMists();
+	void ClearBloodDrips();
+	void ClearBloodStains();
 
 	void DrawIdioticPlaceholders();
 }

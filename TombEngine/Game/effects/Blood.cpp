@@ -315,6 +315,22 @@ namespace TEN::Effects::Blood
 		}
 	}
 
+	void ClearBloodMists()
+	{
+
+	}
+
+	void ClearBloodDrips()
+	{
+		for (auto& drip : BloodDrips)
+			drip = {};
+	}
+
+	void ClearBloodStains()
+	{
+		BloodStains.clear();
+	}
+
 	void DrawIdioticPlaceholders()
 	{
 		int numActiveDrips = 0;

@@ -35,5 +35,7 @@ namespace TEN::Effects::Footprints
 	bool TestFootprintFloor(const ItemInfo& item, const Vector3& pos, const std::array<Vector3, 4>& vertexPoints);
 
 	void SpawnFootprint(bool isRightFoot, const std::array<Vector3, 4>& vertexPoints);
+
 	void UpdateFootprints();
+	void ClearFootprints();
 }

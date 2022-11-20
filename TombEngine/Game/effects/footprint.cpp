@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "Game/effects/footprint.h"
+#include "Game/effects/Footprint.h"
 
 #include "Game/animation.h"
 #include "Game/collision/collide_room.h"
@@ -274,5 +274,10 @@ namespace TEN::Effects::Footprints
 
 		for (int i = 0; i < numInvalidFootprints; i++)
 			Footprints.pop_back();
+	}
+
+	void ClearFootprints()
+	{
+		Footprints.clear();
 	}
 }
