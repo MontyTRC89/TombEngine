@@ -26,6 +26,7 @@ public:
 	int								FogOutDistance{ 0 };
 	bool							PlayAnyLevel{ true };
 	bool							FlyCheat{ true };
+	bool							MassPickup{ true };
 	bool							DebugMode{ false };
 
 	// New animation flag table
@@ -39,7 +40,7 @@ public:
 
 	void				AddLevel(Level const& level);
 	void				LoadFlowScript();
-	char const *		GetString(const char* id) const;
+	char const*			GetString(const char* id) const;
 	void				SetStrings(sol::nested<std::unordered_map<std::string, std::vector<std::string>>> && src);
 	void				SetLanguageNames(sol::as_table_t<std::vector<std::string>> && src);
 	void				SetAnimations(Animations const & src);
@@ -58,6 +59,8 @@ public:
 	void				SetTotalSecretCount(int secretsNumber);
 	bool				IsFlyCheatEnabled() const;
 	void				EnableFlyCheat(bool flyCheat);
+	bool				IsMassPickupEnabled() const;
+	void				EnableMassPickup(bool massPickup);
 	bool				CanPlayAnyLevel() const;
 
 	bool HasCrawlExtended() const override { return Anims.HasCrawlExtended; }

@@ -483,6 +483,7 @@ GAME_OBJECT_ID Moveable::GetObjectID() const
 void Moveable::SetObjectID(GAME_OBJECT_ID id) 
 {
 	m_item->ObjectNumber = id;
+	m_item->ResetModelToDefault();
 }
 
 void SetLevelFuncCallback(TypeOrNil<LevelFunc> const & cb, std::string const & callerName, Moveable & mov, std::string & toModify)

@@ -159,6 +159,8 @@ struct ItemInfo
 
 	bool IsLara() const;
 	bool IsCreature() const;
+
+	void ResetModelToDefault();
 };
 
 bool TestState(int refState, const std::vector<int>& stateList);
