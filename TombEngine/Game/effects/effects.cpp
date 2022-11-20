@@ -1524,44 +1524,6 @@ void TriggerMetalSparks(int x, int y, int z, int xv, int yv, int zv, int additio
 	}
 }
 
-void TriggerElectricSparks(int x, int y, int z)
-{
-	int dx = LaraItem->Pose.Position.x - x;
-	int dz = LaraItem->Pose.Position.z - z;
-
-	if (dx >= -SECTOR(16) && dx <= SECTOR(16) &&
-		dz >= -SECTOR(16) && dz <= SECTOR(16))
-	{
-		auto* spark = GetFreeParticle();
-
-		spark->sR = -1;
-		spark->sG = -1;
-		spark->sB = -1;
-		spark->dR = -1;
-		spark->on = 1;
-		spark->colFadeSpeed = 3;
-		spark->fadeToBlack = 5;
-		spark->dG = (rand() & 127) + 64;
-		spark->dB = -64 - spark->dG;
-		spark->life = 10;
-		spark->sLife = 10;
-		spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
-		spark->friction = 34;
-		spark->scalar = 1;
-		spark->flags = SP_SCALE;
-		spark->x = (rand() & 7) + x - 3;
-		spark->y = ((rand() / 8) & 7) + y - 3;
-		spark->z = ((rand() / 64) & 7) + z - 3;
-		spark->xVel = (byte)(rand() / 4) - 128;
-		spark->yVel = (byte)(rand() / 16) - 128;
-		spark->zVel = (byte)(rand() / 64) - 128;
-		spark->sSize = spark->size = ((rand() / 512) & 3) + 4;
-		spark->dSize = ((rand() / 4096) & 1) + 1;
-		spark->maxYvel = 0;
-		spark->gravity = 0;
-	}
-}
-
 void ProcessEffects(ItemInfo* item)
 {
 	constexpr auto MAX_LIGHT_FALLOFF = 13;
@@ -1595,24 +1557,27 @@ void ProcessEffects(ItemInfo* item)
 	int numMeshes = Objects[item->ObjectNumber].nmeshes;
 	for (int i = 0; i < numMeshes; i++)
 	{
-		if (Wibble & 0x0C)
-			continue;
 
 		auto pos = GetJointPosition(item, i);
 
 		switch (item->Effect.Type)
 		{
 		case EffectType::Burn:
-			if (TestProbability(1 / 2.0f))
+			if (TestProbability(1 / 8.0f))
 				TriggerFireFlame(pos.x, pos.y, pos.z, TestProbability(1 / 10.0f) ? FlameType::Trail : FlameType::Medium);
 			break;
 
 		case EffectType::Electric:
-			TriggerElectricSparks(pos.x, pos.y, pos.z);
+			if (TestProbability(1 / 10.0f))
+				TriggerElectricSpark(&GameVector(pos.x, pos.y, pos.z, item->RoomNumber),
+					EulerAngles(0, GenerateInt(ANGLE(0), ANGLE(359)), 0), 2);
+			if (TestProbability(1 / 64.0f))
+				TriggerRocketSmoke(pos.x, pos.y, pos.z, 0);
 			break;
 
 		case EffectType::Smoke:
-			TriggerRocketSmoke(pos.x, pos.y, pos.z, 0);
+			if (TestProbability(1 / 8.0f))
+				TriggerRocketSmoke(pos.x, pos.y, pos.z, 0);
 			break;
 		}
 	}

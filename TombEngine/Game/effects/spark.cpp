@@ -115,4 +115,29 @@ namespace TEN::Effects::Spark
 			s.active = true;
 		}
 	}
+
+	void TriggerElectricSpark(GameVector* pos, EulerAngles angle, int num)
+	{
+		for (int i = 0; i < num; i++)
+		{
+			auto& s = GetFreeSparkParticle();
+			s = {};
+			s.age = 0;
+			s.life = GenerateFloat(8, 15);
+			s.friction = 1.0f;
+			s.gravity = 2.0f;
+			s.height = GenerateFloat(128.0f, 256.0f);
+			s.width = GenerateFloat(16.0f, 32.0f);
+			s.room = pos->RoomNumber;
+			s.pos = Vector3(pos->x + GenerateFloat(-16, 16), pos->y + GenerateFloat(-16, 16), pos->z + GenerateFloat(-16, 16));
+			float ang = TO_RAD(angle.y);
+			float vAng = -TO_RAD(angle.x);
+			Vector3 v = Vector3(sin(ang), vAng + GenerateFloat(-PI / 16, PI / 16), cos(ang));
+			v.Normalize(v);
+			s.velocity = v * GenerateFloat(8, 32);
+			s.sourceColor = Vector4(0.4f, 0.6f, 1.0f, 1);
+			s.destinationColor = Vector4(0.6f, 0.6f, 0.8f, 0.5f);
+			s.active = true;
+		}
+	}
 }

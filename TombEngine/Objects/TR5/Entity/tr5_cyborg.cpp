@@ -15,9 +15,11 @@
 #include "Game/itemdata/creature_info.h"
 #include "Game/effects/lightning.h"
 #include "Game/effects/item_fx.h"
+#include "Game/effects/spark.h"
 
-	using namespace TEN::Effects::Items;
-	using namespace TEN::Effects::Lightning;
+using namespace TEN::Effects::Items;
+using namespace TEN::Effects::Lightning;
+using namespace TEN::Effects::Spark;
 
 namespace TEN::Entities::Creatures::TR5
 {
@@ -216,7 +218,8 @@ namespace TEN::Entities::Creatures::TR5
 			auto pos = GetJointPosition(item, HitmanJoints[random], Vector3i(0, 0, 50));
 
 			TriggerLightningGlow(pos.x, pos.y, pos.z, 48, 32, 32, 64);
-			TriggerElectricSparks(pos.x, pos.y, pos.z);
+			TriggerElectricSpark(&GameVector(pos.x, pos.y, pos.z, item->RoomNumber),
+				EulerAngles(Random::GenerateInt(ANGLE(0), ANGLE(35)), Random::GenerateInt(ANGLE(0), ANGLE(360)), 0), 10);
 			TriggerDynamicLight(pos.x, pos.y, pos.z, (GetRandomControl() & 3) + 16, 31, 63, 127);
 
 			SoundEffect(SFX_TR5_HITMAN_SPARKS_SHORT, &item->Pose);

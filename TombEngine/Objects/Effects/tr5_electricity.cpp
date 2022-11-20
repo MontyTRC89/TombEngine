@@ -227,7 +227,7 @@ void ElectricityWiresControl(short itemNumber)
 				collItem->Effect.LightColor = Vector3(0.0f, 0.2f, 0.8f);
 
 				if (!isWaterNearby)
-					ItemBurn(collItem);
+					ItemElectricBurn(collItem);
 
 				if (instantKill)
 					DoDamage(collItem, INT_MAX);

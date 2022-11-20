@@ -659,7 +659,7 @@ void Moveable::SetOCB(short ocb)
 void Moveable::SetOnFire(bool onFire)
 {
 	//todo add support for other EffectTypes -squidshire 11/11/2022
-	if (onFire && m_item->Effect.Type == EffectType::None)
+	if (onFire)
 	{
 		m_item->Effect.Type = EffectType::Burn;
 		m_item->Effect.LightColor = Vector3(0.8f, 0.4f, 0.0f);
@@ -672,7 +672,7 @@ void Moveable::SetOnFire(bool onFire)
 
 bool Moveable::GetOnFire() const
 {
-	return m_item->Effect.Type != EffectType::None;
+	return m_item->Effect.Type == EffectType::Burn;
 }
 
 short Moveable::GetItemFlags(int index) const
