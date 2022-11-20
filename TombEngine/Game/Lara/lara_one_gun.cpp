@@ -1249,7 +1249,7 @@ void DoExplosiveDamage(ItemInfo& emitter, ItemInfo& target, ItemInfo& projectile
 		if (emitter.ItemFlags[2])
 			return;
 
-		emitter.HitStatus = true;
+		target.HitStatus = true;
 
 		HitTarget(&emitter, &target, nullptr, damage, 1);
 					
@@ -1263,11 +1263,11 @@ void DoExplosiveDamage(ItemInfo& emitter, ItemInfo& target, ItemInfo& projectile
 			}
 		}
 	}
-	else
+	else if (target.IsLara())
 	{
-		DoDamage(&emitter, damage * 5);
-		if (!TestEnvironment(ENV_FLAG_WATER, target.RoomNumber) && emitter.HitPoints <= 0)
-			LaraBurn(&emitter);
+		DoDamage(&target, damage * 5);
+		if (!TestEnvironment(ENV_FLAG_WATER, target.RoomNumber) && target.HitPoints <= 0)
+			ItemBurn(&target);
 	}
 }
 
