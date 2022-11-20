@@ -547,23 +547,12 @@ void ModulateLaraSlideVelocity(ItemInfo* item, CollisionInfo* coll)
 
 void AlignLaraToSurface(ItemInfo* item, float alpha)
 {
-	// Determine surface angles.
+	// Determine relative orientation to floor normal.
 	auto floorNormal = Geometry::GetFloorNormal(GetCollision(item).FloorTilt);
-	short aspectAngle = Geometry::GetSurfaceAspectAngle(floorNormal);
-	short slopeAngle = std::min(Geometry::GetSurfaceSlopeAngle(floorNormal), ANGLE(70.0f));
-
-	short deltaAngle = Geometry::GetShortestAngle(item->Pose.Orientation.y, aspectAngle);
-	float sinDeltaAngle = phd_sin(deltaAngle);
-	float cosDeltaAngle = phd_cos(deltaAngle);
-
-	// Calculate extra rotation required.
-	auto extraRot = EulerAngles(
-		-slopeAngle * cosDeltaAngle,
-		0,
-		slopeAngle * sinDeltaAngle
-	) - EulerAngles(item->Pose.Orientation.x, 0, item->Pose.Orientation.z);
+	auto orient = Geometry::GetRelOrientToNormal(item->Pose.Orientation.y, floorNormal);
 
 	// Apply extra rotation according to alpha.
+	auto extraRot = orient - item->Pose.Orientation;
 	item->Pose.Orientation += extraRot * alpha;
 }
 

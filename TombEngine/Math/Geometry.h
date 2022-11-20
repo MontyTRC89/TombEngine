@@ -20,12 +20,13 @@ namespace TEN::Math::Geometry
 	Vector3 GetCeilingNormal(const Vector2& tilt);
 
 	short GetShortestAngle(short fromAngle, short toAngle);
-	short GetSurfaceSlopeAngle(const Vector3& normal);
-	short GetSurfaceAspectAngle(const Vector3& normal);
+	short GetSurfaceSlopeAngle(const Vector3& normal, const Vector3& force = Vector3::Up); // Up = Down.
+	short GetSurfaceAspectAngle(const Vector3& normal, const Vector3& force = Vector3::Up); // Up = Down.
 
 	float		GetDistanceToLine(const Vector3& origin, const Vector3& linePoint0, const Vector3& linePoint1);
 	Vector3		GetClosestPointOnLine(const Vector3& origin, const Vector3& linePoint0, const Vector3& linePoint1);
 	EulerAngles GetOrientToPoint(const Vector3& origin, const Vector3& target);
+	EulerAngles GetRelOrientToNormal(short orient2D, const Vector3& normal, const Vector3& force = Vector3::Up); // Up = Down.
 
 	bool IsPointInFront(const Pose& pose, const Vector3& target);
 	bool IsPointInFront(const Vector3& origin, const Vector3& target, const EulerAngles& orient);

@@ -88,19 +88,20 @@ namespace TEN::Math::Geometry
 		return short(toAngle - fromAngle);
 	}
 
-	short GetSurfaceSlopeAngle(const Vector3& normal)
+	short GetSurfaceSlopeAngle(const Vector3& normal, const Vector3& force)
 	{
-		if (normal == Vector3::Down) // Up.
+		if (normal == -force)
 			return 0;
 
-		return FROM_RAD(acos(normal.Dot(Vector3::Down))); // Up.
+		return FROM_RAD(acos(normal.Dot(-force)));
 	}
 
-	short GetSurfaceAspectAngle(const Vector3& normal)
+	short GetSurfaceAspectAngle(const Vector3& normal, const Vector3& force)
 	{
-		if (normal == Vector3::Down) // Up.
+		if (normal == -force)
 			return 0;
 
+		// TODO: Consider normal of downward force.
 		return FROM_RAD(atan2(normal.x, normal.z));
 		//return FROM_RAD(acos(normal.z / sqrt(SQUARE(normal.x) + SQUARE(normal.z))));
 	}
@@ -133,6 +134,25 @@ namespace TEN::Math::Geometry
 			return EulerAngles::Zero;
 
 		return EulerAngles(target - origin);
+	}
+
+	EulerAngles GetRelOrientToNormal(short orient2D, const Vector3& normal, const Vector3& force)
+	{
+		// TODO: Consider normal of downward force.
+		
+		// Determine relative angle properties of normal.
+		short aspectAngle = Geometry::GetSurfaceAspectAngle(normal);
+		short slopeAngle = Geometry::GetSurfaceSlopeAngle(normal);
+
+		short deltaAngle = Geometry::GetShortestAngle(orient2D, aspectAngle);
+		float sinDeltaAngle = phd_sin(deltaAngle);
+		float cosDeltaAngle = phd_cos(deltaAngle);
+
+		// Calculate relative orientation to normal.
+		return EulerAngles(
+			-slopeAngle * cosDeltaAngle,
+			orient2D,
+			slopeAngle * sinDeltaAngle);
 	}
 
 	bool IsPointInFront(const Pose& pose, const Vector3& target)

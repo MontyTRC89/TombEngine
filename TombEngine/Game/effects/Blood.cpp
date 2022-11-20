@@ -2,6 +2,7 @@
 #include "Game/effects/Blood.h"
 
 #include "Game/collision/collide_room.h"
+#include "Game/effects/weather.h"
 #include "Math/Math.h"
 #include "Renderer/Renderer11.h"
 #include "Specific/clock.h"
@@ -12,6 +13,7 @@
 #include "Game/effects/effects.h"
 #include "Game/effects/tomb4fx.h"
 
+using namespace TEN::Effects::Environment;
 using namespace TEN::Math;
 using namespace TEN::Renderer;
 
@@ -23,7 +25,7 @@ namespace TEN::Effects::Blood
 
 	constexpr auto BLOOD_DRIP_GRAVITY_MIN	  = 5.0f;
 	constexpr auto BLOOD_DRIP_GRAVITY_MAX	  = 15.0f;
-	constexpr auto BLOOD_DRIP_SPRAY_SEMIANGLE = 60.0f;
+	constexpr auto BLOOD_DRIP_SPRAY_SEMIANGLE = 50.0f;
 
 	constexpr auto BLOOD_STAIN_OPACITY_MAX		  = 0.8f;
 	constexpr auto BLOOD_STAIN_POOLING_SCALE_RATE = 0.4f;
@@ -50,30 +52,17 @@ namespace TEN::Effects::Blood
 
 	std::array<Vector3, 4> GetBloodStainVertexPoints(const Vector3& pos, short orient2D, const Vector3& normal, float scale)
 	{
-		constexpr auto point0 = Vector3(SQRT_2, 0.0f, SQRT_2);
-		constexpr auto point1 = Vector3(-SQRT_2, 0.0f, SQRT_2);
-		constexpr auto point2 = Vector3(-SQRT_2, 0.0f, -SQRT_2);
-		constexpr auto point3 = Vector3(SQRT_2, 0.0f, -SQRT_2);
+		static constexpr auto point0 = Vector3(SQRT_2, 0.0f, SQRT_2);
+		static constexpr auto point1 = Vector3(-SQRT_2, 0.0f, SQRT_2);
+		static constexpr auto point2 = Vector3(-SQRT_2, 0.0f, -SQRT_2);
+		static constexpr auto point3 = Vector3(SQRT_2, 0.0f, -SQRT_2);
 
 		// No scale; return early.
 		if (scale == 0.0f)
 			return std::array<Vector3, 4>{ pos, pos, pos, pos };
 
-		// Determine surface angles.
-		short aspectAngle = Geometry::GetSurfaceAspectAngle(normal);
-		short slopeAngle = Geometry::GetSurfaceSlopeAngle(normal);
-
-		short deltaAngle = Geometry::GetShortestAngle(orient2D, aspectAngle);
-		float sinDeltaAngle = phd_sin(deltaAngle);
-		float cosDeltaAngle = phd_cos(deltaAngle);
-
-		// Calculate rotation matrix.
-		auto orient = EulerAngles(
-			-slopeAngle * cosDeltaAngle,
-			0,
-			slopeAngle * sinDeltaAngle) +
-			EulerAngles(0, orient2D, 0);
-		auto rotMatrix = orient.ToRotationMatrix();
+		// Determine rotation matrix.
+		auto rotMatrix = Geometry::GetRelOrientToNormal(orient2D, normal).ToRotationMatrix();
 
 		return std::array<Vector3, 4>
 		{
@@ -153,6 +142,7 @@ namespace TEN::Effects::Blood
 	{
 		SpawnBloodMistCloud(pos, roomNumber, baseVelocity + direction, Random::GenerateFloat(10.0f, 50.0f), maxCount * 3);
 
+		// TODO: Don't randomise count this way.
 		unsigned int numDrips = Random::GenerateInt(0, maxCount);
 		for (int i = 0; i < numDrips; i++)
 		{
@@ -229,7 +219,7 @@ namespace TEN::Effects::Blood
 			if (!drip.IsActive)
 				continue;
 
-			// Despawn drip.
+			// Despawn.
 			drip.Life -= 1.0f;
 			if (drip.Life <= 0.0f)
 			{
@@ -237,28 +227,32 @@ namespace TEN::Effects::Blood
 				continue;
 			}
 
-			// Update position.
+			// Update velocity.
 			drip.Velocity.y += drip.Gravity;
+			if (TestEnvironment(ENV_FLAG_WIND, drip.RoomNumber))
+				drip.Velocity += Weather.Wind();
+
+			// Update position.
 			drip.Position += drip.Velocity;
 
-			int vPos = drip.Position.y;
+			// TODO: Round floats. Stains can spawn in walls otherwise?
 			auto pointColl = GetCollision(drip.Position.x, drip.Position.y, drip.Position.z, drip.RoomNumber);
 
 			drip.RoomNumber = pointColl.RoomNumber;
 
-			// Drip hit wall or ceiling; deactivate.
+			// Hit wall or ceiling; deactivate.
 			if (pointColl.Position.Floor == NO_HEIGHT || drip.Position.y <= pointColl.Position.Ceiling)
 			{
 				drip.IsActive = false;
 			}
-			// Drip hit floor; spawn stain.
+			// Hit floor; spawn stain.
 			else if (drip.Position.y >= pointColl.Position.Floor)
 			{
 				drip.IsActive = false;
 				SpawnBloodStainFromDrip(drip, pointColl);
 			}
 
-			// Spawn bloor mist cloud in water.
+			// Spawn blood mist cloud in water.
 		}
 	}
 

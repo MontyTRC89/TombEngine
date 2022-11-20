@@ -154,26 +154,13 @@ namespace TEN::Effects::Footprints
 
 	std::array<Vector3, 4> GetFootprintVertexPoints(const ItemInfo& item, const Vector3& pos, const Vector3& normal)
 	{
-		constexpr auto point0 = Vector3(FOOTPRINT_SCALE, 0.0f, FOOTPRINT_SCALE);
-		constexpr auto point1 = Vector3(-FOOTPRINT_SCALE, 0.0f, FOOTPRINT_SCALE);
-		constexpr auto point2 = Vector3(-FOOTPRINT_SCALE, 0.0f, -FOOTPRINT_SCALE);
-		constexpr auto point3 = Vector3(FOOTPRINT_SCALE, 0.0f, -FOOTPRINT_SCALE);
+		static constexpr auto point0 = Vector3(FOOTPRINT_SCALE, 0.0f, FOOTPRINT_SCALE);
+		static constexpr auto point1 = Vector3(-FOOTPRINT_SCALE, 0.0f, FOOTPRINT_SCALE);
+		static constexpr auto point2 = Vector3(-FOOTPRINT_SCALE, 0.0f, -FOOTPRINT_SCALE);
+		static constexpr auto point3 = Vector3(FOOTPRINT_SCALE, 0.0f, -FOOTPRINT_SCALE);
 
-		// Determine surface angles.
-		short aspectAngle = Geometry::GetSurfaceAspectAngle(normal);
-		short slopeAngle = Geometry::GetSurfaceSlopeAngle(normal);
-
-		short deltaAngle = Geometry::GetShortestAngle(item.Pose.Orientation.y, aspectAngle);
-		float sinDeltaAngle = phd_sin(deltaAngle);
-		float cosDeltaAngle = phd_cos(deltaAngle);
-
-		// Calculate rotation matrix.
-		auto orient = EulerAngles(
-			-slopeAngle * cosDeltaAngle,
-			0,
-			slopeAngle * sinDeltaAngle) +
-			EulerAngles(0, item.Pose.Orientation.y, 0);
-		auto rotMatrix = orient.ToRotationMatrix();
+		// Determine rotation matrix.
+		auto rotMatrix = Geometry::GetRelOrientToNormal(item.Pose.Orientation.y, normal).ToRotationMatrix();
 
 		return std::array<Vector3, 4>
 		{
