@@ -7,7 +7,7 @@
 #include "Game/effects/tomb4fx.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/explosion.h"
-#include "Game/effects/bubble.h"
+#include "Game/effects/Bubble.h"
 #include "Game/Lara/lara.h"
 #include "Game/items.h"
 #include "Math/Math.h"

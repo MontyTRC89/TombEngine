@@ -7,7 +7,7 @@
 #include "Game/control/box.h"
 #include "Game/control/control.h"
 #include "Game/control/los.h"
-#include "Game/effects/bubble.h"
+#include "Game/effects/Bubble.h"
 #include "Game/effects/debris.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/lara_fx.h"

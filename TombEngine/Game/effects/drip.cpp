@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "Game/effects/drip.h"
+#include "Game/effects/Drip.h"
 
 #include "Game/collision/collide_room.h"
 #include "Game/effects/effects.h"

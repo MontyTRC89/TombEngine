@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "Game/effects/bubble.h"
+#include "Game/effects/Bubble.h"
 
 #include "Game/collision/collide_room.h"
 #include "Game/control/control.h"

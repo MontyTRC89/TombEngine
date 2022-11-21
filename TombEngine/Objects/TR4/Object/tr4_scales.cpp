@@ -11,7 +11,7 @@
 #include "tr4_ahmet.h"
 #include "Objects/Generic/Switches/generic_switch.h"
 #include "Game/collision/collide_item.h"
-#include "Game/effects/drip.h"
+#include "Game/effects/Drip.h"
 
 using namespace TEN::Effects::Drip;
 using namespace TEN::Entities::Switches;

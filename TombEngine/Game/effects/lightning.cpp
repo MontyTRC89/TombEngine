@@ -2,8 +2,8 @@
 #include "Game/effects/lightning.h"
 
 #include "Game/animation.h"
-#include "Game/effects/bubble.h"
-#include "Game/effects/drip.h"
+#include "Game/effects/Bubble.h"
+#include "Game/effects/Drip.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/smoke.h"
 #include "Game/effects/tomb4fx.h"

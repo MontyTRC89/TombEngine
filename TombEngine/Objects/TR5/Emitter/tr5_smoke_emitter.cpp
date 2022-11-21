@@ -3,7 +3,7 @@
 
 #include "Game/camera.h"
 #include "Game/items.h"
-#include "Game/effects/bubble.h"
+#include "Game/effects/Bubble.h"
 #include "Game/effects/effects.h"
 #include "Game/control/control.h"
 #include "Game/control/trigger.h"
