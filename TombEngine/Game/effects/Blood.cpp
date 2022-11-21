@@ -41,13 +41,22 @@ namespace TEN::Effects::Blood
 
 	BloodDrip& GetFreeBloodDrip()
 	{
+		float shortestLife = INFINITY;
+		auto* oldestDripPtr = &BloodDrips[0];
+
 		for (auto& drip : BloodDrips)
 		{
 			if (!drip.IsActive)
 				return drip;
+
+			if (drip.Life < shortestLife)
+			{
+				shortestLife = drip.Life;
+				oldestDripPtr = &drip;
+			}
 		}
 
-		return BloodDrips[0];
+		return *oldestDripPtr;
 	}
 
 	std::array<Vector3, 4> GetBloodStainVertexPoints(const Vector3& pos, short orient2D, const Vector3& normal, float scale)
@@ -109,8 +118,8 @@ namespace TEN::Effects::Blood
 
 		for (int i = 0; i < count; i++)
 		{
-			auto randPos = Random::GenerateVector3InBox(box);
-			SpawnBloodMist(randPos, roomNumber, direction, count);
+			auto pos = Random::GenerateVector3InBox(box);
+			SpawnBloodMist(pos, roomNumber, direction, count);
 		}
 	}
 
@@ -283,6 +292,7 @@ namespace TEN::Effects::Blood
 			}
 
 			// Update scale.
+			bool updateVertexPoints = true;
 			if (stain.ScaleRate > 0.0f)
 			{
 				if (!TestBloodStainFloor(stain))
@@ -292,13 +302,17 @@ namespace TEN::Effects::Blood
 				if (stain.Scale >= (stain.ScaleMax * 0.8f))
 				{
 					stain.ScaleRate *= 0.2f;
-					if (abs(stain.Scale) <= FLT_EPSILON)
+					if (abs(stain.ScaleRate) <= FLT_EPSILON)
+					{
+						updateVertexPoints = false;
 						stain.ScaleRate = 0.0f;
+					}
 				}
 			}
 
 			// Update vertex points.
-			stain.VertexPoints = GetBloodStainVertexPoints(stain.Position, stain.Orientation2D, stain.Normal, stain.Scale);
+			if (updateVertexPoints)
+				stain.VertexPoints = GetBloodStainVertexPoints(stain.Position, stain.Orientation2D, stain.Normal, stain.Scale);
 
 			// Update opacity.
 			if (stain.Life <= stain.LifeStartFading)
