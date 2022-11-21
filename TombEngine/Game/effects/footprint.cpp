@@ -154,10 +154,10 @@ namespace TEN::Effects::Footprints
 
 	std::array<Vector3, 4> GetFootprintVertexPoints(const ItemInfo& item, const Vector3& pos, const Vector3& normal)
 	{
-		static constexpr auto point0 = Vector3(FOOTPRINT_SCALE, 0.0f, FOOTPRINT_SCALE);
-		static constexpr auto point1 = Vector3(-FOOTPRINT_SCALE, 0.0f, FOOTPRINT_SCALE);
+		static constexpr auto point0 = Vector3( FOOTPRINT_SCALE, 0.0f,  FOOTPRINT_SCALE);
+		static constexpr auto point1 = Vector3(-FOOTPRINT_SCALE, 0.0f,  FOOTPRINT_SCALE);
 		static constexpr auto point2 = Vector3(-FOOTPRINT_SCALE, 0.0f, -FOOTPRINT_SCALE);
-		static constexpr auto point3 = Vector3(FOOTPRINT_SCALE, 0.0f, -FOOTPRINT_SCALE);
+		static constexpr auto point3 = Vector3( FOOTPRINT_SCALE, 0.0f, -FOOTPRINT_SCALE);
 
 		// Determine rotation matrix.
 		auto rotMatrix = Geometry::GetRelOrientToNormal(item.Pose.Orientation.y, normal).ToRotationMatrix();
@@ -227,7 +227,7 @@ namespace TEN::Effects::Footprints
 		footprint.Opacity = FOOTPRINT_OPACITY_MAX;
 		footprint.OpacityStart = footprint.Opacity;
 
-		if (Footprints.size() >= FOOTPRINTS_NUM_MAX)
+		if (Footprints.size() >= FOOTPRINT_NUM_MAX)
 			Footprints.pop_back();
 
 		Footprints.push_front(footprint);

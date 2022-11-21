@@ -3,8 +3,8 @@
 
 namespace TEN::Effects::Drip
 {
-	constexpr auto DRIPS_NUM_MAX = 512;
-	constexpr auto DRIP_WIDTH	 = 4.0f;
+	constexpr auto DRIP_NUM_MAX = 512;
+	constexpr auto DRIP_WIDTH	= 4.0f;
 
 	struct DripParticle
 	{
@@ -21,11 +21,11 @@ namespace TEN::Effects::Drip
 		float Height  = 0.0f;
 	};
 
-	extern std::array<DripParticle, DRIPS_NUM_MAX> DripParticles;
+	extern std::array<DripParticle, DRIP_NUM_MAX> DripParticles;
 
 	DripParticle& GetFreeDrip();
 
-	void SpawnDripParticle(const Vector3& pos, int roomNumber, const Vector3& velocity, float life, float gravity);
+	void SpawnDripParticle(const Vector3& pos, int roomNumber, const Vector3& velocity, float lifeInSec, float gravity);
 	void SpawnWetnessDrip(const Vector3& pos, int roomNumber);
 	void SpawnSplashDrips(const Vector3& pos, int roomNumber, unsigned int count);
 	void SpawnGunshellSplashDrips(const Vector3& pos, int roomNumber, unsigned int count);

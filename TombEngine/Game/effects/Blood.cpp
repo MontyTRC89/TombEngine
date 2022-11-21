@@ -340,7 +340,7 @@ namespace TEN::Effects::Blood
 		BloodStains.clear();
 	}
 
-	void DrawIdioticPlaceholders()
+	void DrawBloodDebug()
 	{
 		int numActiveDrips = 0;
 		for (auto& drip : BloodDrips)
@@ -349,19 +349,6 @@ namespace TEN::Effects::Blood
 				continue;
 
 			numActiveDrips++;
-			//g_Renderer.AddDebugSphere(drip.Position, drip.Scale, drip.Color, RENDERER_DEBUG_PAGE::NO_PAGE);
-		}
-		
-		for (auto& stain : BloodStains)
-		{
-			// Normal.
-			//auto target = stain.Position + (stain.Normal * 128);
-			//g_Renderer.AddLine3D(stain.Position, target, Vector4::One);
-
-			// Heat stove.
-			/*constexpr auto numCircles = 5;
-			for (int i = 1; i < numCircles; i++)
-				g_Renderer.AddDebugCircle(stain.Position, ((stain.Scale / 2) / numCircles) * i, stain.Color, RENDERER_DEBUG_PAGE::NO_PAGE);*/
 		}
 
 		g_Renderer.PrintDebugMessage("Num blood drips: %d ", numActiveDrips);

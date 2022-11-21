@@ -14,25 +14,34 @@ using namespace TEN::Math;
 
 namespace TEN::Effects::Drip
 {
-	constexpr auto DRIP_LIFE_SHORT_MAX = 25.0f;
-	constexpr auto DRIP_LIFE_LONG_MAX  = 120.0f;
+	constexpr auto DRIP_LIFE_SHORT_MAX = 1.0f;
+	constexpr auto DRIP_LIFE_LONG_MAX  = 4.0f;
 
 	constexpr auto DRIP_COLOR_WHITE = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
 
-	std::array<DripParticle, DRIPS_NUM_MAX> DripParticles = {};
+	std::array<DripParticle, DRIP_NUM_MAX> DripParticles = {};
 
 	DripParticle& GetFreeDrip()
 	{
+		float shortestLife = INFINITY;
+		auto* oldestDripPtr = &DripParticles[0];
+
 		for (auto& drip : DripParticles)
 		{
 			if (!drip.IsActive)
 				return drip;
+
+			if (drip.Life < shortestLife)
+			{
+				shortestLife = drip.Life;
+				oldestDripPtr = &drip;
+			}
 		}
 
-		return DripParticles[0];
+		return *oldestDripPtr;
 	}
 
-	void SpawnDripParticle(const Vector3& pos, int roomNumber, const Vector3& velocity, float life, float gravity)
+	void SpawnDripParticle(const Vector3& pos, int roomNumber, const Vector3& velocity, float lifeInSec, float gravity)
 	{
 		auto& drip = GetFreeDrip();
 
@@ -41,7 +50,7 @@ namespace TEN::Effects::Drip
 		drip.Position = pos;
 		drip.RoomNumber = roomNumber;
 		drip.Velocity = velocity;
-		drip.Life = life;
+		drip.Life = std::round(lifeInSec * FPS);
 		drip.LifeMax = drip.Life;
 		drip.Gravity = gravity;
 	}
@@ -94,7 +103,7 @@ namespace TEN::Effects::Drip
 				continue;
 
 			// Deactivate.
-			drip.Life -= 1.0f;
+			drip.Life -= 1.0f; // Life tracked in frame time.
 			if (drip.Life <= 0.0f)
 				drip.IsActive = false;
 

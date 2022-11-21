@@ -271,6 +271,9 @@ GameStatus ControlPhase(int numFrames, bool demoMode)
 		UpdateBubbles();
 		UpdateDebris();
 		UpdateGunShells();
+		UpdateBloodDrips();
+		UpdateBloodMists();
+		UpdateBloodStains();
 		UpdateFootprints();
 		UpdateSplashes();
 		UpdateLightning();

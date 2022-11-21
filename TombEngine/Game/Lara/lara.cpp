@@ -444,9 +444,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 	}
 	dbBlood = KeyMap[OIS::KC_B] ? false : true;
 
-	UpdateBloodDrips();
-	UpdateBloodStains();
-	DrawIdioticPlaceholders();
+	DrawBloodDebug();
 
 	// --------------------
 

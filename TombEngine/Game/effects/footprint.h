@@ -9,7 +9,7 @@ struct ItemInfo;
 
 namespace TEN::Effects::Footprints
 {
-	constexpr auto FOOTPRINTS_NUM_MAX = 32;
+	constexpr auto FOOTPRINT_NUM_MAX = 32;
 
 	struct Footprint 
 	{
