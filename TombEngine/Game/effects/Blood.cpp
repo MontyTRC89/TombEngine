@@ -19,9 +19,9 @@ using namespace TEN::Renderer;
 
 namespace TEN::Effects::Blood
 {
-	constexpr auto BLOOD_DRIP_LIFE_MAX			 = 5.0f * FPS;
-	constexpr auto BLOOD_STAIN_LIFE_MAX			 = (5.0f * 60.0f)* FPS;
-	constexpr auto BLOOD_STAIN_LIFE_START_FADING = 20.0f * FPS;
+	constexpr auto BLOOD_DRIP_LIFE_MAX			 = 5.0f;
+	constexpr auto BLOOD_STAIN_LIFE_MAX			 = 5.0f * 60.0f;
+	constexpr auto BLOOD_STAIN_LIFE_START_FADING = 30.0f;
 
 	constexpr auto BLOOD_DRIP_GRAVITY_MIN	  = 5.0f;
 	constexpr auto BLOOD_DRIP_GRAVITY_MAX	  = 15.0f;
@@ -34,7 +34,7 @@ namespace TEN::Effects::Blood
 	constexpr auto BLOOD_STAIN_NUM_SPRITES		  = 11; // TODO: Hardcoding.
 
 	constexpr auto BLOOD_COLOR_RED	 = Vector4(0.8f, 0.0f, 0.0f, 1.0f);
-	constexpr auto BLOOD_COLOR_BROWN = Vector4(0.4f, 0.2f, 0.0f, 1.0f);
+	constexpr auto BLOOD_COLOR_BROWN = Vector4(0.3f, 0.1f, 0.0f, 1.0f);
 
 	std::array<BloodDrip, BLOOD_DRIP_NUM_MAX> BloodDrips  = {};
 	std::deque<BloodStain>					  BloodStains = {};
@@ -52,10 +52,10 @@ namespace TEN::Effects::Blood
 
 	std::array<Vector3, 4> GetBloodStainVertexPoints(const Vector3& pos, short orient2D, const Vector3& normal, float scale)
 	{
-		static constexpr auto point0 = Vector3(SQRT_2, 0.0f, SQRT_2);
-		static constexpr auto point1 = Vector3(-SQRT_2, 0.0f, SQRT_2);
+		static constexpr auto point0 = Vector3( SQRT_2, 0.0f,  SQRT_2);
+		static constexpr auto point1 = Vector3(-SQRT_2, 0.0f,  SQRT_2);
 		static constexpr auto point2 = Vector3(-SQRT_2, 0.0f, -SQRT_2);
-		static constexpr auto point3 = Vector3(SQRT_2, 0.0f, -SQRT_2);
+		static constexpr auto point3 = Vector3( SQRT_2, 0.0f, -SQRT_2);
 
 		// No scale; return early.
 		if (scale == 0.0f)
@@ -133,20 +133,21 @@ namespace TEN::Effects::Blood
 		drip.RoomNumber = roomNumber;
 		drip.Velocity = velocity;
 		drip.Color = BLOOD_COLOR_RED;
-		drip.Life = BLOOD_DRIP_LIFE_MAX;
+		drip.Life = std::round(BLOOD_DRIP_LIFE_MAX * FPS);
 		drip.Scale = scale;
 		drip.Gravity = Random::GenerateFloat(BLOOD_DRIP_GRAVITY_MIN, BLOOD_DRIP_GRAVITY_MAX);
 	}
 
-	void SpawnBloodDripSpray(const Vector3& pos, int roomNumber, const Vector3& direction, const Vector3& baseVelocity, unsigned int maxCount)
+	void SpawnBloodDripSpray(const Vector3& pos, int roomNumber, const Vector3& direction, const Vector3& baseVelocity, unsigned int count)
 	{
-		SpawnBloodMistCloud(pos, roomNumber, baseVelocity + direction, Random::GenerateFloat(10.0f, 50.0f), maxCount * 3);
+		static constexpr auto minLength = 15.0f;
+		static constexpr auto maxLength = 45.0f;
 
-		// TODO: Don't randomise count this way.
-		unsigned int numDrips = Random::GenerateInt(0, maxCount);
-		for (int i = 0; i < numDrips; i++)
+		SpawnBloodMistCloud(pos, roomNumber, baseVelocity + direction, Random::GenerateFloat(10.0f, 50.0f), count * 3);
+
+		for (int i = 0; i < count; i++)
 		{
-			float length = Random::GenerateFloat(20.0f, 40.0f);
+			float length = Random::GenerateFloat(minLength, maxLength);
 			auto velocity = baseVelocity + Random::GenerateVector3InCone(direction, BLOOD_DRIP_SPRAY_SEMIANGLE, length);
 			float scale = length / 2;
 
@@ -167,14 +168,14 @@ namespace TEN::Effects::Blood
 		stain.ColorStart = stain.Color;
 		stain.ColorEnd = BLOOD_COLOR_BROWN;
 		stain.VertexPoints = GetBloodStainVertexPoints(stain.Position, stain.Orientation2D, stain.Normal, 0.0f);
-		stain.Life = BLOOD_STAIN_LIFE_MAX;
-		stain.LifeStartFading = BLOOD_STAIN_LIFE_START_FADING;
+		stain.Life = std::round(BLOOD_STAIN_LIFE_MAX * FPS);
+		stain.LifeStartFading = std::round(BLOOD_STAIN_LIFE_START_FADING * FPS);
 		stain.Scale = 0.0f;
 		stain.ScaleMax = scaleMax;
 		stain.ScaleRate = scaleRate;
 		stain.Opacity = BLOOD_STAIN_OPACITY_MAX;
 		stain.OpacityStart = stain.Opacity;
-		stain.DelayTime = std::round(delayTimeInSec * FPS); // NOTE: Converted to frame time.
+		stain.DelayTime = std::round(delayTimeInSec * FPS);
 
 		if (BloodStains.size() >= BLOOD_STAIN_NUM_MAX)
 			BloodStains.pop_back();
@@ -220,7 +221,7 @@ namespace TEN::Effects::Blood
 				continue;
 
 			// Despawn.
-			drip.Life -= 1.0f;
+			drip.Life -= 1.0f; // Life tracked in frame time.
 			if (drip.Life <= 0.0f)
 			{
 				drip.IsActive = false;
@@ -274,7 +275,7 @@ namespace TEN::Effects::Blood
 			}
 
 			// Despawn.
-			stain.Life -= 1.0f;
+			stain.Life -= 1.0f; // Life tracked in frame time.
 			if (stain.Life <= 0.0f)
 			{
 				BloodStains.pop_back();
@@ -301,10 +302,10 @@ namespace TEN::Effects::Blood
 
 			// Update opacity.
 			if (stain.Life <= stain.LifeStartFading)
-				stain.Opacity = Lerp(stain.OpacityStart, 0.0f, 1.0f - (stain.Life / BLOOD_STAIN_LIFE_START_FADING));
+				stain.Opacity = Lerp(stain.OpacityStart, 0.0f, 1.0f - (stain.Life / std::round(BLOOD_STAIN_LIFE_START_FADING * FPS)));
 
 			// Update color.
-			stain.Color = Vector4::Lerp(stain.ColorStart, stain.ColorEnd, 1.0f - (stain.Life / BLOOD_STAIN_LIFE_MAX));
+			stain.Color = Vector4::Lerp(stain.ColorStart, stain.ColorEnd, 1.0f - (stain.Life / std::round(BLOOD_STAIN_LIFE_MAX * FPS)));
 			stain.Color.w = stain.Opacity;
 		}
 	}

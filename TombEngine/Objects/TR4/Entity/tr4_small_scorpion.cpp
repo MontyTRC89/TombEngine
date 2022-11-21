@@ -90,8 +90,10 @@ namespace TEN::Entities::TR4
 			{
 				SetAnimation(item, SSCORPION_ANIM_DEATH);
 
-				SpawnBloodDripSpray(item->Pose.Position.ToVector3(), item->RoomNumber, Vector3::Down, item->Pose.Orientation.ToDirection() * (item->Animation.Velocity.Length() + 20), 5);
-;				SpawnBloodStainPool(*item);
+				unsigned int numBloodDrips = 5;
+				auto baseVelocity = item->Pose.Orientation.ToDirection() * (item->Animation.Velocity.Length() + 20);
+				SpawnBloodDripSpray(item->Pose.Position.ToVector3(), item->RoomNumber, Vector3::Down, baseVelocity, numBloodDrips);
+				SpawnBloodStainPool(*item);
 			}
 		}
 		else

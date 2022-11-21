@@ -14,8 +14,8 @@ using namespace TEN::Math;
 
 namespace TEN::Effects::Footprints
 {
-	constexpr auto FOOTPRINT_LIFE_MAX		   = 20.0f * FPS;
-	constexpr auto FOOTPRINT_LIFE_START_FADING = 10.0f * FPS;
+	constexpr auto FOOTPRINT_LIFE_MAX		   = 20.0f;
+	constexpr auto FOOTPRINT_LIFE_START_FADING = 10.0f;
 	constexpr auto FOOTPRINT_OPACITY_MAX	   = 0.5f;
 
 	constexpr auto FOOTPRINT_SCALE		   = 64.0f;
@@ -222,8 +222,8 @@ namespace TEN::Effects::Footprints
 
 		footprint.IsRightFoot = isRightFoot;
 		footprint.VertexPoints = vertexPoints;
-		footprint.Life = FOOTPRINT_LIFE_MAX;
-		footprint.LifeStartFading = FOOTPRINT_LIFE_START_FADING;
+		footprint.Life = std::round(FOOTPRINT_LIFE_MAX * FPS);
+		footprint.LifeStartFading = std::round(FOOTPRINT_LIFE_START_FADING * FPS);
 		footprint.Opacity = FOOTPRINT_OPACITY_MAX;
 		footprint.OpacityStart = footprint.Opacity;
 
@@ -242,9 +242,8 @@ namespace TEN::Effects::Footprints
 
 		for (auto& footprint: Footprints)
 		{
-			footprint.Life -= 1.0f;
-
-			// Despawn footprint.
+			// Set to despawn.
+			footprint.Life -= 1.0f; // Life tracked in frame time.
 			if (footprint.Life <= 0.0f)
 			{
 				numInvalidFootprints++;
@@ -259,6 +258,7 @@ namespace TEN::Effects::Footprints
 			}
 		}
 
+		// Despawn.
 		for (int i = 0; i < numInvalidFootprints; i++)
 			Footprints.pop_back();
 	}

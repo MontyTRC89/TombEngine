@@ -10,12 +10,11 @@ namespace TEN::Effects::Blood
 	constexpr auto BLOOD_DRIP_NUM_MAX  = 128;
 	constexpr auto BLOOD_STAIN_NUM_MAX = 192;
 
-	constexpr auto BLOOD_DRIP_SPRAY_NUM_MAX_DEFAULT = 2;
+	constexpr auto BLOOD_DRIP_SPRAY_NUM_DEFAULT = 2;
 
 	struct BloodDrip
 	{
 		bool		 IsActive	   = false;
-		bool		 CanSpawnStain = false;
 		unsigned int SpriteIndex   = 0;
 
 		Vector3 Position   = Vector3::Zero;
@@ -64,11 +63,11 @@ namespace TEN::Effects::Blood
 	bool TestBloodStainFloor(const BloodStain& stain);
 
 	void SpawnBloodMist(const Vector3& pos, int roomNumber, const Vector3& direction, unsigned int count);
-	void SpawnBloodMistCloud(const Vector3& pos, int roomNumber, const Vector3& direction, float velocity, unsigned int maxCount);
+	void SpawnBloodMistCloud(const Vector3& pos, int roomNumber, const Vector3& direction, float velocity, unsigned int count);
 	void SpawnBloodMistCloudUnderwater(const Vector3& pos, int roomNumber, float velocity);
 
 	void SpawnBloodDrip(const Vector3& pos, int roomNumber, const Vector3& velocity, float scale);
-	void SpawnBloodDripSpray(const Vector3& pos, int roomNumber, const Vector3& direction, const Vector3& baseVelocity, unsigned int maxCount = BLOOD_DRIP_SPRAY_NUM_MAX_DEFAULT);
+	void SpawnBloodDripSpray(const Vector3& pos, int roomNumber, const Vector3& direction, const Vector3& baseVelocity, unsigned int count = BLOOD_DRIP_SPRAY_NUM_DEFAULT);
 
 	void SpawnBloodStain(const Vector3& pos, int roomNumber, const Vector3& normal, float scaleMax, float scaleRate, float delayTimeInSec = 0.0f);
 	void SpawnBloodStainFromDrip(const BloodDrip& drip, const CollisionResult& pointColl);
