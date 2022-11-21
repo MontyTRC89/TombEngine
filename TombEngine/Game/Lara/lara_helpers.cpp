@@ -556,7 +556,7 @@ void AlignLaraToSurface(ItemInfo* item, float alpha)
 	item->Pose.Orientation += extraRot * alpha;
 }
 
-void SetLaraJumpDirection(ItemInfo* item, CollisionInfo* coll) 
+void SetLaraJumpDirection(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 

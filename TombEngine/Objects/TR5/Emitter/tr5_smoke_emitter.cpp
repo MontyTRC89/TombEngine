@@ -13,6 +13,8 @@
 #include "Objects/objectslist.h"
 #include "Renderer/Renderer11Enums.h"
 
+using namespace TEN::Effects::Bubble;
+
 void InitialiseSmokeEmitter(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
@@ -70,8 +72,6 @@ void InitialiseSmokeEmitter(short itemNumber)
 
 void SmokeEmitterControl(short itemNumber)
 {
-	Vector3i pos = {};
-
 	auto* item = &g_Level.Items[itemNumber];
 
 	if (!TriggerActive(item))
@@ -83,14 +83,15 @@ void SmokeEmitterControl(short itemNumber)
 		{
 			if (!(GetRandomControl() & 3) || item->ItemFlags[1])
 			{
-				pos.x = (GetRandomControl() & 0x3F) + item->Pose.Position.x - 32;
-				pos.y = item->Pose.Position.y - (GetRandomControl() & 0x1F) - 16;
-				pos.z = (GetRandomControl() & 0x3F) + item->Pose.Position.z - 32;
+				auto pos = Vector3(
+					item->Pose.Position.x + (GetRandomControl() & 0x3F) - 32,
+					item->Pose.Position.y - (GetRandomControl() & 0x1F) - 16,
+					item->Pose.Position.z + (GetRandomControl() & 0x3F) - 32);
 
 				if (item->TriggerFlags == 1)
-					CreateBubble(&pos, item->RoomNumber, 15, 15, 0, 0, 0, 0);
+					SpawnBubble(pos, item->RoomNumber, 15, 15, 0, 0, 0, 0);
 				else
-					CreateBubble(&pos, item->RoomNumber, 8, 7, 0, 0, 0, 0);
+					SpawnBubble(pos, item->RoomNumber, 8, 7, 0, 0, 0, 0);
 
 				if (item->ItemFlags[0])
 				{

@@ -15,6 +15,7 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
+using namespace TEN::Effects::Bubble;
 using namespace TEN::Effects::Explosion;
 using namespace TEN::Math;
 
@@ -122,7 +123,7 @@ void ControlMissile(short fxNumber)
 	{
 	case ID_SCUBA_HARPOON:
 		if (TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, fx.roomNumber))
-			CreateBubble(&fx.pos.Position, fx.roomNumber, 1, 0, 0, 0, 0, 0);
+			SpawnBubble(fx.pos.Position.ToVector3(), fx.roomNumber, 1, 0, 0, 0, 0, 0);
 
 		break;
 

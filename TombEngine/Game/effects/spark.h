@@ -5,6 +5,8 @@
 
 namespace TEN::Effects::Spark
 {
+	constexpr auto SPARK_NUM_MAX = 128;
+
 	struct SparkParticle
 	{
 		Vector3 pos;
@@ -21,7 +23,8 @@ namespace TEN::Effects::Spark
 		float height;
 		bool active;
 	};
-	extern std::array<SparkParticle, 128> SparkParticles;
+
+	extern std::array<SparkParticle, SPARK_NUM_MAX> SparkParticles;
 			
 	void UpdateSparkParticles();
 	SparkParticle& GetFreeSparkParticle();

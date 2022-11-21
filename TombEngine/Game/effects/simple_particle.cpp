@@ -9,7 +9,7 @@ using namespace TEN::Math;
 
 namespace TEN::Effects
 {
-	std::array<SimpleParticle, 15> simpleParticles;
+	std::array<SimpleParticle, SIMPLE_PARTICLE_NUM_MAX> simpleParticles;
 
 	SimpleParticle& getFreeSimpleParticle()
 	{

@@ -17,7 +17,7 @@ using namespace TEN::Math;
 
 namespace TEN::Effects::Smoke
 {
-	std::array<SmokeParticle, 128> SmokeParticles;
+	std::array<SmokeParticle, SMOKE_PARTICLE_NUM_MAX> SmokeParticles;
 
 	auto& GetFreeSmokeParticle()
 	{

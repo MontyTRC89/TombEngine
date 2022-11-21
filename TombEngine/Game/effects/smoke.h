@@ -8,6 +8,8 @@ enum class LaraWeaponType;
 
 namespace TEN::Effects::Smoke
 {
+	constexpr auto SMOKE_PARTICLE_NUM_MAX = 128;
+
 	struct SmokeParticle
 	{
 		Vector4 sourceColor;
@@ -31,7 +33,8 @@ namespace TEN::Effects::Smoke
 		bool affectedByWind;
 		bool active;
 	};
-	extern std::array<SmokeParticle, 128> SmokeParticles;
+
+	extern std::array<SmokeParticle, SMOKE_PARTICLE_NUM_MAX> SmokeParticles;
 
 	void UpdateSmokeParticles();
 	void DisableSmokeParticles();

@@ -92,7 +92,7 @@ namespace TEN::Effects::Blood
 		auto pointColl2 = GetCollision(stain.VertexPoints[2].x, stain.Position.y - CLICK(1), stain.VertexPoints[2].z, stain.RoomNumber);
 		auto pointColl3 = GetCollision(stain.VertexPoints[3].x, stain.Position.y - CLICK(1), stain.VertexPoints[3].z, stain.RoomNumber);
 
-		// Stop scaling blood stain if floor heights at vertex points aren't within relative range.
+		// Stop scaling blood stain if floor heights at vertex points are outside relative range.
 		if ((abs(pointColl0.Position.Floor - pointColl1.Position.Floor) > heightRange) ||
 			(abs(pointColl1.Position.Floor - pointColl2.Position.Floor) > heightRange) ||
 			(abs(pointColl2.Position.Floor - pointColl3.Position.Floor) > heightRange) ||
@@ -230,7 +230,7 @@ namespace TEN::Effects::Blood
 				continue;
 
 			// Despawn.
-			drip.Life -= 1.0f; // Life tracked in frame time.
+			drip.Life -= 1.0f; // NOTE: Life tracked in frame time.
 			if (drip.Life <= 0.0f)
 			{
 				drip.IsActive = false;

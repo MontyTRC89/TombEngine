@@ -21,6 +21,7 @@
 #include "Specific/setup.h"
 
 using namespace TEN::Effects::Drip;
+using namespace TEN::Effects::Bubble;
 using namespace TEN::Effects::Environment;
 using namespace TEN::Floordata;
 using namespace TEN::Math;
@@ -1154,17 +1155,17 @@ void LaraBubbles(ItemInfo* item)
 {
 	SoundEffect(SFX_TR4_LARA_BUBBLES, &item->Pose, SoundEnvironment::Water);
 
-	auto level = g_GameFlow->GetLevel(CurrentLevel);
-	auto pos = Vector3i::Zero;
+	const auto& level = *g_GameFlow->GetLevel(CurrentLevel);
 
-	if (level->GetLaraType() == LaraType::Divesuit)
-		pos = GetJointPosition(item, LM_TORSO, Vector3i(0, -192, -160));
+	auto pos = Vector3::Zero;
+	if (level.GetLaraType() == LaraType::Divesuit)
+		pos = GetJointPosition(item, LM_TORSO, Vector3i(0, -192, -160)).ToVector3();
 	else
-		pos = GetJointPosition(item, LM_HEAD, Vector3i(0, -4, -64));
+		pos = GetJointPosition(item, LM_HEAD, Vector3i(0, -4, -64)).ToVector3();
 
 	int numBubbles = (GetRandomControl() & 1) + 2;
 	for (int i = 0; i < numBubbles; i++)
-		CreateBubble(&pos, item->RoomNumber, 8, 7, 0, 0, 0, 0);
+		SpawnBubble(pos, item->RoomNumber, 8, 7, 0, 0, 0, 0);
 }
 
 int GetFreeDrip()
@@ -1633,11 +1634,11 @@ void TriggerExplosionBubble(int x, int y, int z, short roomNumber)
 
 		for (int i = 0; i < 8; i++)
 		{
-			Vector3i pos;
-			pos.x = (GetRandomControl() & 0x1FF) + x - 256;
-			pos.y = (GetRandomControl() & 0x7F) + y - 64;
-			pos.z = (GetRandomControl() & 0x1FF) + z - 256;
-			CreateBubble(&pos, roomNumber, 6, 15, BUBBLE_FLAG_CLUMP | BUBBLE_FLAG_BIG_SIZE | BUBBLE_FLAG_HIGH_AMPLITUDE, 0, 0, 0);
+			auto pos = Vector3(
+				(GetRandomControl() & 0x1FF) + x - 256,
+				(GetRandomControl() & 0x7F) + y - 64,
+				(GetRandomControl() & 0x1FF) + z - 256);
+			SpawnBubble(pos, roomNumber, 6, 15, BubbleFlags::Clump | BubbleFlags::BigSize | BubbleFlags::HighAmplitude, 0, 0, 0);
 		}
 	}
 }

@@ -103,7 +103,7 @@ namespace TEN::Effects::Drip
 				continue;
 
 			// Deactivate.
-			drip.Life -= 1.0f; // Life tracked in frame time.
+			drip.Life -= 1.0f; // NOTE: Life tracked in frame time.
 			if (drip.Life <= 0.0f)
 				drip.IsActive = false;
 

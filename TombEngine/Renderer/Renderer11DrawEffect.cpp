@@ -28,6 +28,7 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
+using namespace TEN::Effects::Bubble;
 using namespace TEN::Effects::Lightning;
 using namespace TEN::Effects::Environment;
 using namespace TEN::Math;
@@ -349,22 +350,22 @@ namespace TEN::Renderer
 
 				for (int i = 0; i < NUM_POINTS; i++)
 				{
-					xInner = innerRadius * sin(alpha * i * PI / 180);
-					zInner = innerRadius * cos(alpha * i * PI / 180);
-					xOuter = outerRadius * sin(alpha * i * PI / 180);
-					zOuter = outerRadius * cos(alpha * i * PI / 180);
+					xInner = innerRadius * sin(alpha * i * RADIAN);
+					zInner = innerRadius * cos(alpha * i * RADIAN);
+					xOuter = outerRadius * sin(alpha * i * RADIAN);
+					zOuter = outerRadius * cos(alpha * i * RADIAN);
 					xInner += splash.x;
 					zInner += splash.z;
 					xOuter += splash.x;
 					zOuter += splash.z;
 					int j = (i + 1) % NUM_POINTS;
-					x2Inner = innerRadius * sin(alpha * j * PI / 180);
+					x2Inner = innerRadius * sin(alpha * j * RADIAN);
 					x2Inner += splash.x;
-					z2Inner = innerRadius * cos(alpha * j * PI / 180);
+					z2Inner = innerRadius * cos(alpha * j * RADIAN);
 					z2Inner += splash.z;
-					x2Outer = outerRadius * sin(alpha * j * PI / 180);
+					x2Outer = outerRadius * sin(alpha * j * RADIAN);
 					x2Outer += splash.x;
-					z2Outer = outerRadius * cos(alpha * j * PI / 180);
+					z2Outer = outerRadius * cos(alpha * j * RADIAN);
 					z2Outer += splash.z;
 					AddSprite3D(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + splash.spriteSequenceStart + (int)splash.animationPhase],
 						Vector3(xOuter, yOuter, zOuter),
@@ -379,32 +380,30 @@ namespace TEN::Renderer
 
 	void Renderer11::DrawBubbles(RenderView& view)
 	{
-		for (int i = 0; i < MAX_BUBBLES; i++)
+		for (const auto& bubble : Bubbles)
 		{
-			BUBBLE_STRUCT* bubble = &Bubbles[i];
-			if (bubble->active)
-			{
-				AddSpriteBillboard(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + bubble->spriteNum],
-					Vector3(bubble->worldPosition.x, bubble->worldPosition.y, bubble->worldPosition.z),
-					bubble->color,
-					bubble->rotation,
-					1.0f, { bubble->size * 0.5f, bubble->size * 0.5f }, BLENDMODE_ADDITIVE, true, view);
-			}
+			if (!bubble.IsActive)
+				continue;
+
+			AddSpriteBillboard(
+				&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + bubble.SpriteIndex],
+				bubble.Position,
+				bubble.Color, bubble.Rotation, 1.0f, Vector2(bubble.Scale, bubble.Scale) / 2, BLENDMODE_ADDITIVE, true, view);
 		}
 	}
 
 	void Renderer11::DrawDrips(RenderView& view)
 	{
-		for (int i = 0; i < MAX_DRIPS; i++)
-		{
-			DRIP_STRUCT* drip = &Drips[i];
+		using TEN::Effects::Drip::DRIP_WIDTH;
 
-			if (drip->on)
+		for (const auto& drip : Drips)
+		{
+			if (drip.on)
 			{
 				AddSpriteBillboardConstrained(&m_sprites[Objects[ID_DRIP_SPRITE].meshIndex],
-					Vector3(drip->x, drip->y, drip->z),
-					Vector4(drip->r / 255.0f, drip->g / 255.0f, drip->b / 255.0f, 1.0f),
-					0.0f, 1.0f, Vector2(TEN::Effects::Drip::DRIP_WIDTH, 24.0f), BLENDMODE_ADDITIVE, -Vector3::UnitY, false, view);
+					Vector3(drip.x, drip.y, drip.z),
+					Vector4(drip.r / 255.0f, drip.g / 255.0f, drip.b / 255.0f, 1.0f),
+					0.0f, 1.0f, Vector2(DRIP_WIDTH, 24.0f), BLENDMODE_ADDITIVE, -Vector3::UnitY, false, view);
 			}
 		}
 	}

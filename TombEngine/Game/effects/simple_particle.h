@@ -9,6 +9,8 @@ struct ItemInfo;
 
 namespace TEN::Effects
 {
+	constexpr auto SIMPLE_PARTICLE_NUM_MAX = 15;
+
 	struct SimpleParticle
 	{
 		DirectX::SimpleMath::Vector3 worldPosition;
@@ -21,7 +23,8 @@ namespace TEN::Effects
 		GAME_OBJECT_ID sequence;
 		bool active;
 	};
-	extern std::array<SimpleParticle, 15> simpleParticles;
+
+	extern std::array<SimpleParticle, SIMPLE_PARTICLE_NUM_MAX> simpleParticles;
 
 	SimpleParticle& getFreeSimpleParticle();
 	void TriggerSnowmobileSnow(ItemInfo* snowMobile);

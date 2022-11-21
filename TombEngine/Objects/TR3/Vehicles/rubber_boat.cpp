@@ -18,6 +18,7 @@
 #include "Renderer/Renderer11Enums.h"
 
 using std::vector;
+using namespace TEN::Effects::Bubble;
 using namespace TEN::Input;
 
 namespace TEN::Entities::Vehicles
@@ -974,14 +975,14 @@ namespace TEN::Entities::Vehicles
 			TriggerRubberBoatMist(prop.x, prop.y, prop.z, abs(rBoatItem->Animation.Velocity.z), rBoatItem->Pose.Orientation.y + 0x8000, 0);
 			if ((GetRandomControl() & 1) == 0)
 			{
-				Pose pos;
-				pos.Position.x = prop.x + (GetRandomControl() & 63) - 32;
-				pos.Position.y = prop.y + (GetRandomControl() & 15);
-				pos.Position.z = prop.z + (GetRandomControl() & 63) - 32;
+				auto pos = Vector3(
+					prop.x + Random::GenerateInt(-32, 32),
+					Random::GenerateInt(0, 15),
+					Random::GenerateInt(-32, 32));
 
 				short roomNumber = rBoatItem->RoomNumber;
-				GetFloor(pos.Position.x, pos.Position.y, pos.Position.z, &roomNumber);
-				CreateBubble((Vector3i*)&pos, roomNumber, 16, 8, 0, 0, 0, 0);
+				GetFloor(pos.x, pos.y, pos.z, &roomNumber);
+				SpawnBubble(pos, roomNumber, 16, 8, 0, 0, 0, 0);
 			}
 		}
 		else

@@ -48,7 +48,7 @@ namespace TEN::Effects::Footprints
 		if (!TestFootHeight(*item, footJoint, footPos))
 			return;
 
-		// Slightly randomize foot position to avoid patterns.
+		// Slightly randomize 2D footprint position to avoid patterns.
 		footPos += Vector3(Random::GenerateFloat(-5.0f, 5.0f), 0.0f, Random::GenerateFloat(-5.0f, 5.0f));
 
 		auto pointColl = GetCollision(footPos.x, footPos.y - CLICK(1), footPos.z, item->RoomNumber);
@@ -204,7 +204,7 @@ namespace TEN::Effects::Footprints
 		auto pointColl2 = GetCollision(vertexPoints[2].x, pos.y - CLICK(1), vertexPoints[2].z, item.RoomNumber);
 		auto pointColl3 = GetCollision(vertexPoints[3].x, pos.y - CLICK(1), vertexPoints[3].z, item.RoomNumber);
 
-		// Don't spawn footprint if floor heights at vertex points aren't within relative range.
+		// Don't spawn footprint if floor heights at vertex points are outside relative range.
 		if ((abs(pointColl0.Position.Floor - pointColl1.Position.Floor) > heightRange) ||
 			(abs(pointColl1.Position.Floor - pointColl2.Position.Floor) > heightRange) ||
 			(abs(pointColl2.Position.Floor - pointColl3.Position.Floor) > heightRange) ||
@@ -243,7 +243,7 @@ namespace TEN::Effects::Footprints
 		for (auto& footprint: Footprints)
 		{
 			// Set to despawn.
-			footprint.Life -= 1.0f; // Life tracked in frame time.
+			footprint.Life -= 1.0f; // NOTE: Life tracked in frame time.
 			if (footprint.Life <= 0.0f)
 			{
 				numInvalidFootprints++;

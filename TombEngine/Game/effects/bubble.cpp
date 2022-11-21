@@ -4,120 +4,121 @@
 #include "Game/collision/collide_room.h"
 #include "Game/control/control.h"
 #include "Objects/objectslist.h"
+#include "Math/Math.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
-#include "Math/Math.h"
 
 using namespace TEN::Math;
-using std::vector;
 
-extern vector<BUBBLE_STRUCT> Bubbles = vector<BUBBLE_STRUCT>(MAX_BUBBLES);
-
-void DisableBubbles()
+namespace TEN::Effects::Bubble
 {
-	for (int i = 0; i < MAX_BUBBLES; i++)
+	constexpr auto BUBBLE_COLOR_TRANSPARENT = Vector4(0, 0, 0, 1);
+
+	extern std::array<Bubble, BUBBLE_NUM_MAX> Bubbles = {};
+
+	Bubble& GetFreeBubble()
 	{
-		auto* bubble = &Bubbles[i];
-		bubble->active = false;
-	}
-}
+		auto* oldestBubblePtr = &Bubbles[0];
+		float oldestAge = 0.0f;
 
-void UpdateBubbles()
-{
-	for (int i = 0; i < MAX_BUBBLES; i++)
-	{
-		auto* bubble = &Bubbles[i];
-
-		if (!bubble->active)
-			continue;
-
-		bubble->age++;
-		float alpha = bubble->age / 15.0f;
-		alpha = fmin(alpha, 1.0f);
-
-		bubble->size = Lerp(0.0f, bubble->destinationSize, alpha);
-		bubble->color = Vector4::Lerp(bubble->sourceColor, bubble->destinationColor, alpha);
-		int ceilingHeight = g_Level.Rooms[bubble->roomNumber].maxceiling;
-		short roomNumber = bubble->roomNumber;
-
-		auto probe = GetCollision(bubble->worldPosition.x, bubble->worldPosition.y, bubble->worldPosition.z, bubble->roomNumber);
-		FloorInfo* floor = GetFloor(bubble->worldPosition.x, bubble->worldPosition.y, bubble->worldPosition.z, &roomNumber);
-
-		if (bubble->worldPosition.y > probe.Position.Floor || !floor)
+		for (auto& bubble : Bubbles)
 		{
-			bubble->active = 0;
-			continue;
+			if (!bubble.IsActive)
+				return bubble;
+
+			if (oldestAge < bubble.Life)
+			{
+				oldestAge = bubble.Life;
+				oldestBubblePtr = &bubble;
+			}
 		}
 
-		if (!TestEnvironment(ENV_FLAG_WATER, probe.RoomNumber))
-		{
-			SetupRipple(bubble->worldPosition.x, g_Level.Rooms[bubble->roomNumber].maxceiling, bubble->worldPosition.z, (GetRandomControl() & 0xF) + 48, RIPPLE_FLAG_SHORT_INIT);
-			bubble->active = false;
-			continue;
-		}
-
-		if (probe.Position.Ceiling == NO_HEIGHT || bubble->worldPosition.y <= probe.Position.Ceiling)
-		{
-			bubble->active = false;
-			continue;
-		}
-
-		bubble->wavePeriod += bubble->waveSpeed;
-		bubble->worldPositionCenter.y -= bubble->speed;
-		bubble->worldPosition = bubble->worldPositionCenter + bubble->amplitude * Vector3(sin(bubble->wavePeriod.x), sin(bubble->wavePeriod.y), sin(bubble->wavePeriod.z));
-	}
-}
-
-int GetFreeBubble()
-{
-	int oldestLifeIndex = 0;
-	int oldestAge = 0;
-
-	for (int i = 0; i < MAX_BUBBLES; i++)
-	{
-		auto* bubble = &Bubbles[i];
-
-		if (!bubble->active)
-			return i;
-
-		if (oldestAge < bubble->age)
-		{
-			oldestAge = bubble->age;
-			oldestLifeIndex = i;
-		}
+		return *oldestBubblePtr;
 	}
 
-	// In case we don't find an inactive bubble, take the oldest one.
-	return oldestLifeIndex;
-}
-
-void CreateBubble(Vector3i* pos, short roomNumber, int unk1, int unk2, int flags, int xv, int yv, int zv)
-{
-	if (TestEnvironment(ENV_FLAG_WATER, roomNumber))
+	void SpawnBubble(const Vector3& pos, int roomNumber, int unk1, int unk2, int flags, int xv, int yv, int zv)
 	{
-		auto* bubble = &Bubbles[GetFreeBubble()];
-
-		bubble->active = true;
-		bubble->size = 0;
-		bubble->age = 0;
-		bubble->speed = flags & BUBBLE_FLAG_CLUMP ? Random::GenerateFloat(8, 16) : Random::GenerateFloat(8, 12);
-		bubble->sourceColor = Vector4(0, 0, 0, 1);
+		if (!TestEnvironment(ENV_FLAG_WATER, roomNumber))
+			return;
 
 		float shade = Random::GenerateFloat(0.3f, 0.8f);
 
-		bubble->destinationColor = Vector4(shade, shade, shade, 1);
-		bubble->color = bubble->sourceColor;
-		bubble->destinationSize = flags & BUBBLE_FLAG_BIG_SIZE ? Random::GenerateFloat(256, 512) : Random::GenerateFloat(32, 128);
-		bubble->spriteNum = flags & BUBBLE_FLAG_CLUMP ? SPR_UNKNOWN1 : SPR_BUBBLES;
-		bubble->rotation = 0;
-		bubble->worldPosition = pos->ToVector3();
+		auto& bubble = GetFreeBubble();
 
-		float maxAmplitude = (flags & BUBBLE_FLAG_HIGH_AMPLITUDE) ? 256 : 32;
+		bubble = {};
+		bubble.IsActive = true;
+		bubble.SpriteIndex = (flags & BubbleFlags::Clump) ? SPR_UNKNOWN1 : SPR_BUBBLES;
 
-		bubble->amplitude = Vector3(Random::GenerateFloat(-maxAmplitude, maxAmplitude), Random::GenerateFloat(-maxAmplitude, maxAmplitude), Random::GenerateFloat(-maxAmplitude, maxAmplitude));
-		bubble->worldPositionCenter = bubble->worldPosition;
-		bubble->wavePeriod = Vector3::Zero;
-		bubble->waveSpeed = Vector3(1 / Random::GenerateFloat(8, 16), 1 / Random::GenerateFloat(8, 16), 1 / Random::GenerateFloat(8, 16));
-		bubble->roomNumber = roomNumber;
+		bubble.Scale = 0.0f;
+		bubble.Life = 0.0f;
+		bubble.Velocity = (flags & BubbleFlags::Clump) ? Random::GenerateFloat(8.0f, 16.0f) : Random::GenerateFloat(8.0f, 12.0f);
+		bubble.ColorStart = BUBBLE_COLOR_TRANSPARENT;
+
+
+		bubble.ColorEnd = Vector4(shade, shade, shade, 1.0f);
+		bubble.Color = bubble.ColorStart;
+		bubble.ScaleMax = (flags & BubbleFlags::BigSize) ? Random::GenerateFloat(256.0f, 512.0f) : Random::GenerateFloat(32.0f, 128.0f);
+		bubble.Rotation = 0.0f;
+		bubble.Position = pos;
+
+		float maxAmplitude = (flags & BubbleFlags::HighAmplitude) ? 256.0f : 32.0f;
+
+		bubble.Amplitude = Vector3(Random::GenerateFloat(-maxAmplitude, maxAmplitude), Random::GenerateFloat(-maxAmplitude, maxAmplitude), Random::GenerateFloat(-maxAmplitude, maxAmplitude));
+		bubble.PositionHome = bubble.Position;
+		bubble.WavePeriod = Vector3::Zero;
+		bubble.WaveVelocity = Vector3(1 / Random::GenerateFloat(8.0f, 16.0f), 1 / Random::GenerateFloat(8.0f, 16.0f), 1 / Random::GenerateFloat(8.0f, 16.0f));
+		bubble.RoomNumber = roomNumber;
+	}
+
+	void UpdateBubbles()
+	{
+		for (auto& bubble : Bubbles)
+		{
+			if (!bubble.IsActive)
+				continue;
+
+			bubble.Life++;
+
+			float alpha = std::min(bubble.Life / 15.0f, 1.0f);
+			bubble.Scale = Lerp(0.0f, bubble.ScaleMax, alpha);
+			bubble.Color = Vector4::Lerp(bubble.ColorStart, bubble.ColorEnd, alpha);
+
+			int ceilingHeight = g_Level.Rooms[bubble.RoomNumber].maxceiling;
+			short RoomNumber = bubble.RoomNumber;
+
+			auto pointColl = GetCollision(bubble.Position.x, bubble.Position.y, bubble.Position.z, bubble.RoomNumber);
+
+			if (bubble.Position.y > pointColl.Position.Floor ||
+				!pointColl.BottomBlock)
+			{
+				bubble.IsActive = false;
+				continue;
+			}
+
+			if (!TestEnvironment(ENV_FLAG_WATER, pointColl.RoomNumber))
+			{
+				bubble.IsActive = false;
+				SetupRipple(bubble.Position.x, g_Level.Rooms[bubble.RoomNumber].maxceiling, bubble.Position.z, (GetRandomControl() & 0xF) + 48, RIPPLE_FLAG_SHORT_INIT);
+				continue;
+			}
+
+			if (pointColl.Position.Ceiling == NO_HEIGHT ||
+				bubble.Position.y <= pointColl.Position.Ceiling)
+			{
+				bubble.IsActive = false;
+				continue;
+			}
+
+			// Update position.
+			bubble.WavePeriod += bubble.WaveVelocity;
+			bubble.PositionHome.y -= bubble.Velocity;
+			bubble.Position = bubble.PositionHome + (bubble.Amplitude * Vector3(sin(bubble.WavePeriod.x), sin(bubble.WavePeriod.y), sin(bubble.WavePeriod.z)));
+		}
+	}
+
+	void ClearBubbles()
+	{
+		for (auto& bubble : Bubbles)
+			bubble = {};
 	}
 }

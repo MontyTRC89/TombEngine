@@ -16,6 +16,7 @@
 #include "Renderer/Renderer11Enums.h"
 #include "Sound/sound.h"
 
+using namespace TEN::Effects::Bubble;
 using namespace TEN::Math::Random;
 
 #define	MAX_TRIGGER_RANGE 0x4000
@@ -162,25 +163,25 @@ void TriggerChaffSmoke(Vector3i* pos, Vector3i* vel, int speed, bool moving, boo
 
 void TriggerChaffBubbles(Vector3i* pos, int FlareRoomNumber)
 {
-	auto& bubble = Bubbles[GetFreeBubble()];
+	auto& bubble = TEN::Effects::Bubble::GetFreeBubble();
 
 	bubble = {};
-	bubble.active = true;
-	bubble.size = 0;
-	bubble.age = 0;
-	bubble.speed = GenerateFloat(4, 16);
-	bubble.sourceColor = Vector4(0, 0, 0, 0);
+	bubble.IsActive = true;
+	bubble.Scale = 0.0f;
+	bubble.Life = 0.0f;
+	bubble.Velocity = GenerateFloat(4, 16);
+	bubble.ColorStart = Vector4(0, 0, 0, 0);
 	float shade = GenerateFloat(0.3f, 0.8f);
-	bubble.destinationColor = Vector4(shade, shade, shade, 0.8f);
-	bubble.color = bubble.sourceColor;
-	bubble.destinationSize = GenerateFloat(32, 96);
-	bubble.spriteNum = SPR_BUBBLES;
-	bubble.rotation = 0;
-	bubble.worldPosition = Vector3(pos->x, pos->y, pos->z);
+	bubble.ColorEnd = Vector4(shade, shade, shade, 0.8f);
+	bubble.Color = bubble.ColorStart;
+	bubble.ScaleMax = GenerateFloat(32.0f, 96.0f);
+	bubble.SpriteIndex = SPR_BUBBLES;
+	bubble.Rotation = 0;
+	bubble.Position = pos->ToVector3();
 	float maxAmplitude = 64;
-	bubble.amplitude = Vector3(GenerateFloat(-maxAmplitude, maxAmplitude), GenerateFloat(-maxAmplitude, maxAmplitude), GenerateFloat(-maxAmplitude, maxAmplitude));
-	bubble.worldPositionCenter = bubble.worldPosition;
-	bubble.wavePeriod = Vector3(GenerateFloat(-PI, PI), GenerateFloat(-PI, PI), GenerateFloat(-PI, PI));
-	bubble.waveSpeed = Vector3(1 / GenerateFloat(8, 16), 1 / GenerateFloat(8, 16), 1 / GenerateFloat(8, 16));
-	bubble.roomNumber = FlareRoomNumber;
+	bubble.Amplitude = Vector3(GenerateFloat(-maxAmplitude, maxAmplitude), GenerateFloat(-maxAmplitude, maxAmplitude), GenerateFloat(-maxAmplitude, maxAmplitude));
+	bubble.PositionHome = bubble.Position;
+	bubble.WavePeriod = Vector3(GenerateFloat(-PI, PI), GenerateFloat(-PI, PI), GenerateFloat(-PI, PI));
+	bubble.WaveVelocity = Vector3(1 / GenerateFloat(8, 16), 1 / GenerateFloat(8, 16), 1 / GenerateFloat(8, 16));
+	bubble.RoomNumber = FlareRoomNumber;
 }
