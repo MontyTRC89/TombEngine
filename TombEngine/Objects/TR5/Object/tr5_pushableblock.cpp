@@ -212,7 +212,7 @@ void PushableBlockControl(short itemNumber)
 
 		switch (quadrant) 
 		{
-		case 0:
+		case NORTH:
 			z = info->moveZ + displaceBox;
 
 			if (abs(item->Pose.Position.z - z) < CLICK(2) && item->Pose.Position.z < z)
@@ -223,7 +223,7 @@ void PushableBlockControl(short itemNumber)
 				
 			break;
 
-		case 1:
+		case EAST:
 			x = info->moveX + displaceBox;
 
 			if (abs(item->Pose.Position.x - x) < CLICK(2) && item->Pose.Position.x < x)
@@ -234,7 +234,7 @@ void PushableBlockControl(short itemNumber)
 
 			break;
 
-		case 2:
+		case SOUTH:
 			z = info->moveZ - displaceBox;
 
 			if (abs(item->Pose.Position.z - z) < CLICK(2) && item->Pose.Position.z > z)
@@ -245,7 +245,7 @@ void PushableBlockControl(short itemNumber)
 				
 			break;
 
-		case 3:
+		case WEST:
 			x = info->moveX - displaceBox;
 
 			if (abs(item->Pose.Position.x - x) < CLICK(2) && item->Pose.Position.x > x)
