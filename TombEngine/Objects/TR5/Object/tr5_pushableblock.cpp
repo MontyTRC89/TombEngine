@@ -216,15 +216,21 @@ void PushableBlockControl(short itemNumber)
 			z = info->moveZ + displaceBox;
 
 			if (abs(item->Pose.Position.z - z) < CLICK(2) && item->Pose.Position.z < z)
+			{
 				item->Pose.Position.z = z;
-
+				PushLoop(item);
+			}
+				
 			break;
 
 		case 1:
 			x = info->moveX + displaceBox;
 
 			if (abs(item->Pose.Position.x - x) < CLICK(2) && item->Pose.Position.x < x)
+			{
 				item->Pose.Position.x = x;
+				PushLoop(item);
+			}
 
 			break;
 
@@ -232,16 +238,22 @@ void PushableBlockControl(short itemNumber)
 			z = info->moveZ - displaceBox;
 
 			if (abs(item->Pose.Position.z - z) < CLICK(2) && item->Pose.Position.z > z)
+			{
 				item->Pose.Position.z = z;
-
+				PushLoop(item);
+			}
+				
 			break;
 
 		case 3:
 			x = info->moveX - displaceBox;
 
 			if (abs(item->Pose.Position.x - x) < CLICK(2) && item->Pose.Position.x > x)
+			{
 				item->Pose.Position.x = x;
-
+				PushLoop(item);
+			}
+				
 			break;
 
 		default:
@@ -283,7 +295,10 @@ void PushableBlockControl(short itemNumber)
 				}
 			}
 			else
+			{
 				LaraItem->Animation.TargetState = LS_IDLE;
+				PushEnd(item);
+			}
 		}
 
 		break;
@@ -302,7 +317,10 @@ void PushableBlockControl(short itemNumber)
 			z = info->moveZ + displaceBox;
 
 			if (abs(item->Pose.Position.z - z) < CLICK(2) && item->Pose.Position.z > z)
+			{
 				item->Pose.Position.z = z;
+				PushLoop(item);
+			}
 
 			break;
 
@@ -310,15 +328,21 @@ void PushableBlockControl(short itemNumber)
 			x = info->moveX + displaceBox;
 
 			if (abs(item->Pose.Position.x - x) < CLICK(2) && item->Pose.Position.x > x)
+			{
 				item->Pose.Position.x = x;
-
+				PushLoop(item);
+			}
+				
 			break;
 
 		case SOUTH:
 			z = info->moveZ - displaceBox;
 
 			if (abs(item->Pose.Position.z - z) < CLICK(2) && item->Pose.Position.z < z)
+			{
 				item->Pose.Position.z = z;
+				PushLoop(item);
+			}
 
 			break;
 
@@ -326,8 +350,11 @@ void PushableBlockControl(short itemNumber)
 			x = info->moveX - displaceBox;
 
 			if (abs(item->Pose.Position.x - x) < CLICK(2) && item->Pose.Position.x < x)
+			{
 				item->Pose.Position.x = x;
-
+				PushLoop(item);
+			}
+				
 			break;
 
 		default:
@@ -335,6 +362,7 @@ void PushableBlockControl(short itemNumber)
 		}
 
 		MoveStackXZ(itemNumber);
+
 
 		if (LaraItem->Animation.FrameNumber == g_Level.Anims[LaraItem->Animation.AnimNumber].frameEnd - 1)
 		{
@@ -350,7 +378,10 @@ void PushableBlockControl(short itemNumber)
 				}
 			}
 			else
+			{
 				LaraItem->Animation.TargetState = LS_IDLE;
+				PushEnd(item);
+			}
 		}
 
 		break;
