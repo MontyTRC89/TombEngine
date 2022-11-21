@@ -112,8 +112,12 @@ namespace TEN::Effects::Drip
 			if (TestEnvironment(ENV_FLAG_WIND, drip.RoomNumber))
 				drip.Velocity += Weather.Wind();
 
+			int prevRoomNumber = drip.RoomNumber;
+			auto pointColl = GetCollision(drip.Position.x, drip.Position.y, drip.Position.z, drip.RoomNumber);
+
 			// Update position.
 			drip.Position += drip.Velocity;
+			drip.RoomNumber = pointColl.RoomNumber;
 
 			float lifeAlpha = 1.0f - (drip.Life / drip.LifeMax);
 
@@ -122,14 +126,14 @@ namespace TEN::Effects::Drip
 			drip.Height = Lerp(DRIP_WIDTH / (1 / 6.4f), 0, lifeAlpha);
 
 			// Hit water; spawn ripple.
-			int waterHeight = GetWaterHeight(drip.Position.x, drip.Position.y, drip.Position.z, drip.RoomNumber);
-			if (drip.Position.y >= waterHeight)
+			if (TestEnvironment(ENV_FLAG_WATER, drip.RoomNumber) &&
+				!TestEnvironment(ENV_FLAG_WATER, prevRoomNumber))
 			{
 				drip.IsActive = false;
+
+				int waterHeight = GetWaterHeight(drip.Position.x, drip.Position.y, drip.Position.z, drip.RoomNumber);
 				SetupRipple(drip.Position.x, waterHeight, drip.Position.z, Random::GenerateInt(16, 24), RIPPLE_FLAG_SHORT_INIT | RIPPLE_FLAG_LOW_OPACITY);
 			}
-
-			auto pointColl = GetCollision(drip.Position.x, drip.Position.y, drip.Position.z, drip.RoomNumber);
 
 			// Hit floor; deactivate. // TODO: Also spawn ripple.
 			if (drip.Position.y >= pointColl.Position.Floor)
