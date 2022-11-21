@@ -509,7 +509,6 @@ namespace TEN::Renderer
 		void DrawLightning(RenderView& view);
 		void DrawBlood(RenderView& view);
 		void DrawWeatherParticles(RenderView& view);
-		void DrawDrips(RenderView& view);
 		void DrawBubbles(RenderView& view);
 		void DrawEffects(RenderView& view, bool transparent);
 		void DrawEffect(RenderView& view, RendererEffect* effect, bool transparent);

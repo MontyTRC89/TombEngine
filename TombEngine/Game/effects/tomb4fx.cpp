@@ -39,7 +39,6 @@ int LaserSightZ;
 int NextFireSpark = 1;
 int NextSmokeSpark = 0;
 int NextBubble = 0;
-int NextDrip = 0;
 int NextBlood = 0;
 int NextGunShell = 0;
 
@@ -48,7 +47,6 @@ FIRE_SPARKS FireSparks[MAX_SPARKS_FIRE];
 SMOKE_SPARKS SmokeSparks[MAX_SPARKS_SMOKE];
 GUNSHELL_STRUCT Gunshells[MAX_GUNSHELL];
 BLOOD_STRUCT Blood[MAX_SPARKS_BLOOD];
-DRIP_STRUCT Drips[MAX_DRIPS];
 SHOCKWAVE_STRUCT ShockWaves[MAX_SHOCKWAVE];
 FIRE_LIST Fires[MAX_FIRE_LIST];
 
@@ -1166,92 +1164,6 @@ void LaraBubbles(ItemInfo* item)
 	int numBubbles = (GetRandomControl() & 1) + 2;
 	for (int i = 0; i < numBubbles; i++)
 		SpawnBubble(pos, item->RoomNumber, 8, 7, 0, 0, 0, 0);
-}
-
-int GetFreeDrip()
-{
-	auto* drip = &Drips[NextDrip];
-	int dripNum = NextDrip;
-	short minLife = 4095;
-	short minIndex = 0;
-	short count = 0;
-
-	while (drip->on)
-	{
-		if (drip->life < minLife)
-		{
-			minIndex = dripNum;
-			minLife = drip->life;
-		}
-
-		if (dripNum == MAX_DRIPS - 1)
-		{
-			drip = &Drips[0];
-			dripNum = 0;
-		}
-		else
-		{
-			dripNum++;
-			drip++;
-		}
-
-		if (++count >= MAX_DRIPS)
-		{
-			NextDrip = (minIndex + 1) % MAX_DRIPS;
-			return minIndex;
-		}
-	}
-
-	NextDrip = (dripNum + 1) % MAX_DRIPS;
-
-	return dripNum;
-}
-
-void UpdateDrips()
-{
-	for (int i = 0; i < MAX_DRIPS; i++)
-	{
-		DRIP_STRUCT* drip = &Drips[i];
-
-		if (drip->on)
-		{
-			drip->life--;
-			if (!drip->life)
-			{
-				drip->on = false;
-				continue;
-			}
-
-			if (drip->life < 16)
-			{
-				drip->r -= drip->r >> 3;
-				drip->g -= drip->g >> 3;
-				drip->b -= drip->b >> 3;
-			}
-
-			drip->yVel += drip->gravity;
-
-			if (g_Level.Rooms[drip->roomNumber].flags & ENV_FLAG_WIND)
-			{
-				drip->x += Weather.Wind().x;
-				drip->z += Weather.Wind().z;
-			}
-
-			drip->y += drip->yVel >> 5;
-
-			FloorInfo* floor = GetFloor(drip->x, drip->y, drip->z, &drip->roomNumber);
-			if (g_Level.Rooms[drip->roomNumber].flags & ENV_FLAG_WATER)
-				drip->on = false;
-
-			int height = GetFloorHeight(floor, drip->x, drip->y, drip->z);
-			if (drip->y > height)
-			{
-				if (i % 2 == 0)
-					AddWaterSparks(drip->x, drip->y, drip->z, 6);
-				drip->on = false;
-			}
-		}
-	}
 }
 
 void TriggerLaraDrips(ItemInfo* item)

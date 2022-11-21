@@ -1546,7 +1546,6 @@ namespace TEN::Renderer
 		DrawWeatherParticles(view);
 		DrawParticles(view);
 		DrawBubbles(view);
-		DrawDrips(view);
 		DrawRipples(view);
 		DrawSplashes(view);
 		DrawShockwaves(view);

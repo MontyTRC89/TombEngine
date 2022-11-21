@@ -36,7 +36,6 @@ using namespace TEN::Math;
 extern BLOOD_STRUCT Blood[MAX_SPARKS_BLOOD];
 extern FIRE_SPARKS FireSparks[MAX_SPARKS_FIRE];
 extern SMOKE_SPARKS SmokeSparks[MAX_SPARKS_SMOKE];
-extern DRIP_STRUCT Drips[MAX_DRIPS];
 extern SHOCKWAVE_STRUCT ShockWaves[MAX_SHOCKWAVE];
 extern FIRE_LIST Fires[MAX_FIRE_LIST];
 extern GUNFLASH_STRUCT Gunflashes[MAX_GUNFLASH]; // offset 0xA31D8
@@ -389,22 +388,6 @@ namespace TEN::Renderer
 				&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + bubble.SpriteIndex],
 				bubble.Position,
 				bubble.Color, bubble.Rotation, 1.0f, Vector2(bubble.Scale, bubble.Scale) / 2, BLENDMODE_ADDITIVE, true, view);
-		}
-	}
-
-	void Renderer11::DrawDrips(RenderView& view)
-	{
-		using TEN::Effects::Drip::DRIP_WIDTH;
-
-		for (const auto& drip : Drips)
-		{
-			if (drip.on)
-			{
-				AddSpriteBillboardConstrained(&m_sprites[Objects[ID_DRIP_SPRITE].meshIndex],
-					Vector3(drip.x, drip.y, drip.z),
-					Vector4(drip.r / 255.0f, drip.g / 255.0f, drip.b / 255.0f, 1.0f),
-					0.0f, 1.0f, Vector2(DRIP_WIDTH, 24.0f), BLENDMODE_ADDITIVE, -Vector3::UnitY, false, view);
-			}
 		}
 	}
 

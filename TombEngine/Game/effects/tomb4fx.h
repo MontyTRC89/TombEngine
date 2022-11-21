@@ -83,23 +83,6 @@ struct GUNSHELL_STRUCT
 	short objectNumber;
 };
 
-struct DRIP_STRUCT
-{
-	int x;
-	int y;
-	int z;
-	byte on;
-	byte r;
-	byte g;
-	byte b;
-	short yVel;
-	byte gravity;
-	byte life;
-	short roomNumber;
-	byte outside;
-	byte pad;
-};
-
 struct FIRE_LIST
 {
 	int x;
@@ -184,7 +167,6 @@ extern char LaserSightCol;
 extern int NextFireSpark;
 extern int NextSmokeSpark;
 extern int NextBubble;
-extern int NextDrip;
 extern int NextBlood;
 extern int NextSpider;
 extern int NextGunShell;
@@ -195,7 +177,6 @@ constexpr auto MAX_SPARKS_SMOKE = 32;
 constexpr auto MAX_SPARKS_BLOOD = 32;
 constexpr auto MAX_GUNFLASH = 4;
 constexpr auto MAX_GUNSHELL = 24;
-constexpr auto MAX_DRIPS = 32;
 constexpr auto MAX_SHOCKWAVE = 16;
 
 constexpr auto BODY_NO_BOUNCE     = 0x0001;
@@ -209,7 +190,6 @@ extern FIRE_SPARKS FireSparks[MAX_SPARKS_FIRE];
 extern SMOKE_SPARKS SmokeSparks[MAX_SPARKS_SMOKE];
 extern GUNSHELL_STRUCT Gunshells[MAX_GUNSHELL];
 extern BLOOD_STRUCT Blood[MAX_SPARKS_BLOOD];
-extern DRIP_STRUCT Drips[MAX_DRIPS];
 extern SHOCKWAVE_STRUCT ShockWaves[MAX_SHOCKWAVE];
 extern FIRE_LIST Fires[MAX_FIRE_LIST];
 
@@ -239,8 +219,6 @@ void TriggerGunShell(short hand, short objNum, LaraWeaponType weaponType);
 void UpdateGunShells();
 void AddWaterSparks(int x, int y, int z, int num);
 void LaraBubbles(ItemInfo* item);
-int GetFreeDrip();
-void UpdateDrips();
 void TriggerLaraDrips(ItemInfo* item);
 void ExplodingDeath(short itemNumber, short flags); // EXPLODE_ flags
 int GetFreeShockwave();

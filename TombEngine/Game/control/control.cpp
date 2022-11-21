@@ -279,7 +279,6 @@ GameStatus ControlPhase(int numFrames, bool demoMode)
 		UpdateFootprints();
 		UpdateSplashes();
 		UpdateLightning();
-		UpdateDrips();
 		UpdateRats();
 		UpdateBats();
 		UpdateSpiders();
