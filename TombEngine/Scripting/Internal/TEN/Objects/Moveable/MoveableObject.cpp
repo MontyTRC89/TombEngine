@@ -169,6 +169,7 @@ void Moveable::Register(sol::table & parent)
 /// Set effect to moveable
 // @function Moveable:SetEffect
 // @tparam EffectID effect Type of effect to assign.
+// @tparam float timeout time (in seconds) after which effect turns off (optional).
 	ScriptReserved_SetEffect, &Moveable::SetEffect,
 
 /// Get current moveable effect
@@ -660,25 +661,26 @@ void Moveable::SetOCB(short ocb)
 	m_item->TriggerFlags = ocb;
 }
 
-void Moveable::SetEffect(EffectType effectType)
+void Moveable::SetEffect(EffectType effectType, sol::optional<float> timeout)
 {
+	int realTimeout = timeout.has_value() ? int(timeout.value() * FPS) : DEFAULT_NONLETHAL_EFFECT_TIMEOUT;
+
 	switch (effectType)
 	{
 	case EffectType::None:
-		m_item->Effect.Type = effectType;
+		m_item->Effect.Type = EffectType::None;
 		break;
 
 	case EffectType::Smoke:
-		m_item->Effect.Type = effectType;
-		m_item->Effect.Count = -1;
+		ItemSmoke(m_item, realTimeout);
 		break;
 
 	case EffectType::Burn:
-		ItemBurn(m_item);
+		ItemBurn(m_item, realTimeout);
 		break;
 
 	case EffectType::Electric:
-		ItemElectricBurn(m_item);
+		ItemElectricBurn(m_item, realTimeout);
 		break;
 	}
 }

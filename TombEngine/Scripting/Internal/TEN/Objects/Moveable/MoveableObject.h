@@ -78,7 +78,7 @@ public:
 	void SetOCB(short ocb);
 
 	[[nodiscard]] EffectType GetEffect() const;
-	void SetEffect(EffectType effectType);
+	void SetEffect(EffectType effectType, sol::optional<float> timeout);
 
 	[[nodiscard]] aiBitsType GetAIBits() const;
 	void SetAIBits(aiBitsType const & bits);
