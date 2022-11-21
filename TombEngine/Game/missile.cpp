@@ -27,7 +27,7 @@ void ShootAtLara(FX_INFO& fx)
 {
 	auto target = Vector3(
 		LaraItem->Pose.Position.x,
-		LaraItem->Pose.Position.y + (GameBoundingBox(LaraItem).GetHeight() * 0.75f),
+		LaraItem->Pose.Position.y - (GameBoundingBox(LaraItem).GetHeight() * 0.75f),
 		LaraItem->Pose.Position.z
 	);
 	fx.pos.Orientation = Geometry::GetOrientToPoint(fx.pos.Position.ToVector3(), target);
