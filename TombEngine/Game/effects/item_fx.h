@@ -4,7 +4,7 @@ struct ItemInfo;
 
 namespace TEN::Effects::Items
 {
-	constexpr int DEFAULT_NONLETHAL_EFFECT_TIMEOUT = 1.5f * FPS;
+	constexpr int DEFAULT_NONLETHAL_EFFECT_TIMEOUT = 48;
 
 	void ItemBurn(ItemInfo* item, int timeout = -1);
 	void ItemElectricBurn(ItemInfo* item, int timeout = DEFAULT_NONLETHAL_EFFECT_TIMEOUT);

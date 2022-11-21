@@ -28,6 +28,7 @@ using namespace TEN::Effects::Items;
 using namespace TEN::Effects::Spark;
 using namespace TEN::Math;
 using namespace TEN::Math::Random;
+
 using TEN::Renderer::g_Renderer;
 
 // New particle class
@@ -1275,158 +1276,138 @@ void TriggerFireFlame(int x, int y, int z, FlameType type)
 	int dx = LaraItem->Pose.Position.x - x;
 	int dz = LaraItem->Pose.Position.z - z;
 
-	if (dx >= -SECTOR(16) && dx <= SECTOR(16) &&
-		dz >= -SECTOR(16) && dz <= SECTOR(16))
+	if (abs(dx) > BLOCK(16) || abs(dz) > BLOCK(16))
+		return;
+
+	auto* spark = GetFreeParticle();
+
+	spark->on = true;
+
+	if (type == FlameType::Small)
 	{
-		auto* spark = GetFreeParticle();
-
-		spark->on = true;
-
-		if (type == FlameType::Stove)
+		spark->sR = spark->sG = (GetRandomControl() & 0x1F) + 48;
+		spark->sB = (GetRandomControl() & 0x3F) - 64;
+	}
+	else
+	{
+		if (type == FlameType::SmallFast)
 		{
-			spark->sR = spark->sG = (GetRandomControl() & 0x1F) + 48;
-			spark->sB = (GetRandomControl() & 0x3F) - 64;
+			spark->sR = 48;
+			spark->sG = 48;
+			spark->sB = (GetRandomControl() & 0x1F) + 128;
+
+			spark->dR = 32;
+			spark->dG = (GetRandomControl() & 0x3F) - 64;
+			spark->dB = (GetRandomControl() & 0x3F) + 64;
 		}
 		else
 		{
-			if (type == FlameType::StoveHigh)
-			{
-				spark->sR = 48;
-				spark->sG = 48;
-				spark->sB = (GetRandomControl() & 0x1F) + 128;
-
-				spark->dR = 32;
-				spark->dG = (GetRandomControl() & 0x3F) - 64;
-				spark->dB = (GetRandomControl() & 0x3F) + 64;
-			}
-			else
-			{
-				spark->sR = 255;
-				spark->sB = 48;
-				spark->sG = (GetRandomControl() & 0x1F) + 48;
-			}
+			spark->sR = 255;
+			spark->sB = 48;
+			spark->sG = (GetRandomControl() & 0x1F) + 48;
 		}
+	}
 
-		if (type != FlameType::StaticFlicker)
-		{
-			spark->dR = (GetRandomControl() & 0x3F) - 64;
-			spark->dG = (GetRandomControl() & 0x3F) + -128;
-			spark->dB = 32;
-		}
+	if (type != FlameType::StaticFlicker)
+	{
+		spark->dR = (GetRandomControl() & 0x3F) - 64;
+		spark->dG = (GetRandomControl() & 0x3F) + -128;
+		spark->dB = 32;
+	}
 
-		if (type == FlameType::Stove ||
-			type == FlameType::Static ||
-			type == FlameType::StaticFlicker)
-		{
-			spark->fadeToBlack = 6;
-			spark->colFadeSpeed = (GetRandomControl() & 3) + 5;
-			spark->life = spark->sLife = (GetRandomControl() & 3) + 24;
-		}
-		else
-		{
-			spark->fadeToBlack = 8;
-			spark->colFadeSpeed = (GetRandomControl() & 3) + 20;
-			spark->life = spark->sLife = (GetRandomControl() & 7) + 40;
-		}
+	if (type == FlameType::Small ||
+		type == FlameType::Static ||
+		type == FlameType::StaticFlicker)
+	{
+		spark->fadeToBlack = 6;
+		spark->colFadeSpeed = (GetRandomControl() & 3) + 5;
+		spark->life = spark->sLife = (GetRandomControl() & 3) + 24;
+	}
+	else
+	{
+		spark->fadeToBlack = 8;
+		spark->colFadeSpeed = (GetRandomControl() & 3) + 20;
+		spark->life = spark->sLife = (GetRandomControl() & 7) + 40;
+	}
 
-		spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+	spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
 
-		if (type != FlameType::Big && type != FlameType::Medium)
+	if (type != FlameType::Big && type != FlameType::Medium)
+	{
+		if (type < FlameType::SmallFast)
 		{
-			if (type < FlameType::StoveHigh)
-			{
-				spark->x = (GetRandomControl() & 0xF) + x - 8;
-				spark->y = y;
-				spark->z = (GetRandomControl() & 0xF) + z - 8;
-			}
-			else
-			{
-				spark->x = (GetRandomControl() & 0x3F) + x - 32;
-				spark->y = y;
-				spark->z = (GetRandomControl() & 0x3F) + z - 32;
-			}
-		}
-		else
-		{
-			spark->x = (GetRandomControl() & 0x1F) + x - 16;
+			spark->x = (GetRandomControl() & 0xF) + x - 8;
 			spark->y = y;
-			spark->z = (GetRandomControl() & 0x1F) + z - 16;
-		}
-
-		if (type == FlameType::Stove)
-		{
-			spark->xVel = (GetRandomControl() & 0x1F) - 16;
-			spark->yVel = -1024 - (GetRandomControl() & 0x1FF);
-			spark->zVel = (GetRandomControl() & 0x1F) - 16;
-			spark->friction = 68;
+			spark->z = (GetRandomControl() & 0xF) + z - 8;
 		}
 		else
 		{
-			spark->xVel = (GetRandomControl() & 0xFF) - 128;
-			spark->yVel = -16 - (GetRandomControl() & 0xF);
-			spark->zVel = (GetRandomControl() & 0xFF) - 128;
-
-			if (type == FlameType::Medium)
-				spark->friction = 51;
-			else
-				spark->friction = 5;
+			spark->x = (GetRandomControl() & 0x3F) + x - 32;
+			spark->y = y;
+			spark->z = (GetRandomControl() & 0x3F) + z - 32;
 		}
+	}
+	else
+	{
+		spark->x = (GetRandomControl() & 0x1F) + x - 16;
+		spark->y = y;
+		spark->z = (GetRandomControl() & 0x1F) + z - 16;
+	}
+
+	if (type == FlameType::Small)
+	{
+		spark->xVel = (GetRandomControl() & 0x1F) - 16;
+		spark->yVel = -1024 - (GetRandomControl() & 0x1FF);
+		spark->zVel = (GetRandomControl() & 0x1F) - 16;
+		spark->friction = 68;
+	}
+	else
+	{
+		spark->xVel = (GetRandomControl() & 0xFF) - 128;
+		spark->yVel = -16 - (GetRandomControl() & 0xF);
+		spark->zVel = (GetRandomControl() & 0xFF) - 128;
+
+		if (type == FlameType::Medium)
+			spark->friction = 51;
+		else
+			spark->friction = 5;
+	}
+
+	if (GetRandomControl() & 1)
+	{
+		spark->gravity = -16 - (GetRandomControl() & 0x1F);
+		spark->maxYvel = -16 - (GetRandomControl() & 7);
+		spark->flags = 538;
+
+		spark->rotAng = GetRandomControl() & 0xFFF;
 
 		if (GetRandomControl() & 1)
+			spark->rotAdd = -16 - (GetRandomControl() & 0xF);
+		else
+			spark->rotAdd = (GetRandomControl() & 0xF) + 16;
+	}
+	else
+	{
+		spark->flags = SP_EXPDEF | SP_DEF | SP_SCALE;
+		spark->gravity = -16 - (GetRandomControl() & 0x1F);
+		spark->maxYvel = -16 - (GetRandomControl() & 7);
+	}
+
+	spark->scalar = 2;
+
+	if (type != FlameType::Big)
+	{
+		if (type == FlameType::Medium)
+			spark->sSize = spark->size = (GetRandomControl() & 0x1F) + 64;
+		else if (type < FlameType::SmallFast)
 		{
-			spark->gravity = -16 - (GetRandomControl() & 0x1F);
-			spark->maxYvel = -16 - (GetRandomControl() & 7);
-			spark->flags = 538;
-
-			spark->rotAng = GetRandomControl() & 0xFFF;
-
-			if (GetRandomControl() & 1)
-				spark->rotAdd = -16 - (GetRandomControl() & 0xF);
-			else
-				spark->rotAdd = (GetRandomControl() & 0xF) + 16;
+			spark->maxYvel = 0;
+			spark->gravity = 0;
+			spark->sSize = spark->size = (GetRandomControl() & 0x1F) + 32;
 		}
 		else
 		{
-			spark->flags = SP_EXPDEF | SP_DEF | SP_SCALE;
-			spark->gravity = -16 - (GetRandomControl() & 0x1F);
-			spark->maxYvel = -16 - (GetRandomControl() & 7);
-		}
-
-		spark->scalar = 2;
-
-		if (type != FlameType::Big)
-		{
-			if (type == FlameType::Medium)
-				spark->sSize = spark->size = (GetRandomControl() & 0x1F) + 64;
-			else if (type < FlameType::StoveHigh)
-			{
-				spark->maxYvel = 0;
-				spark->gravity = 0;
-				spark->sSize = spark->size = (GetRandomControl() & 0x1F) + 32;
-			}
-			else
-			{
-				spark->dSize = spark->size / 16;
-
-				if (type == FlameType::GreenPulse)
-				{
-					spark->colFadeSpeed >>= 2;
-					spark->fadeToBlack = spark->fadeToBlack >> 2;
-					spark->life = spark->life >> 2;
-					spark->sLife = spark->life >> 2;
-				}
-
-				spark->sSize = spark->size = (GetRandomControl() & 0xF) + 48;
-			}
-		}
-		else
-			spark->sSize = spark->size = (GetRandomControl() & 0x1F) + 128;
-
-		if (type == FlameType::Stove)
-			spark->dSize = (spark->size / 4.0f);
-		else
-		{
-			spark->dSize = (spark->size / 16.0f);
+			spark->dSize = spark->size / 16;
 
 			if (type == FlameType::GreenPulse)
 			{
@@ -1435,6 +1416,25 @@ void TriggerFireFlame(int x, int y, int z, FlameType type)
 				spark->life = spark->life >> 2;
 				spark->sLife = spark->life >> 2;
 			}
+
+			spark->sSize = spark->size = (GetRandomControl() & 0xF) + 48;
+		}
+	}
+	else
+		spark->sSize = spark->size = (GetRandomControl() & 0x1F) + 128;
+
+	if (type == FlameType::Small)
+		spark->dSize = (spark->size / 4.0f);
+	else
+	{
+		spark->dSize = (spark->size / 16.0f);
+
+		if (type == FlameType::GreenPulse)
+		{
+			spark->colFadeSpeed >>= 2;
+			spark->fadeToBlack = spark->fadeToBlack >> 2;
+			spark->life = spark->life >> 2;
+			spark->sLife = spark->life >> 2;
 		}
 	}
 }
@@ -1569,7 +1569,7 @@ void ProcessEffects(ItemInfo* item)
 		case EffectType::Electric:
 			if (TestProbability(1 / 10.0f))
 				TriggerElectricSpark(&GameVector(pos.x, pos.y, pos.z, item->RoomNumber),
-					EulerAngles(0, GenerateInt(ANGLE(0), ANGLE(359)), 0), 2);
+					EulerAngles(0, Random::GenerateAngle(ANGLE(0), ANGLE(359)), 0), 2);
 			if (TestProbability(1 / 64.0f))
 				TriggerRocketSmoke(pos.x, pos.y, pos.z, 0);
 			break;

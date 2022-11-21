@@ -42,11 +42,11 @@ enum class FlameType
 {
 	Big,
 	Medium,
-	Stove,
+	Small,
 	Static,
 	StaticFlicker,
 	GreenPulse,
-	StoveHigh,
+	SmallFast,
 	Trail
 };
 

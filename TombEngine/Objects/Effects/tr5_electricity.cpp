@@ -114,7 +114,7 @@ void TriggerElectricitySparks(ItemInfo* item, int joint, int flame)
 	spark->flags = SP_NONE;
 
 	if (flame)
-		TriggerFireFlame(pos.x, pos.y, pos.z, FlameType::StoveHigh);
+		TriggerFireFlame(pos.x, pos.y, pos.z, FlameType::SmallFast);
 }
 
 bool ElectricityWireCheckDeadlyBounds(Vector3i* pos, short delta)
