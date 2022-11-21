@@ -43,16 +43,16 @@ ObjectsHandler::ObjectsHandler(sol::state* lua, sol::table & parent) :
 	/***
 	Get moveables by its slot.
 	@function GetMoveablesBySlot
-	@tparam string slot the unique slot of the Moveable like ANIMATING1
-	@treturn table of Moveables referencing the given slot.
+	@tparam ObjID slot the unique slot of the Moveable, e.g. `Objects.ObjID.ANIMATING1`
+	@treturn table table of Moveables referencing the given slot.
 	*/
 	m_table_objects.set_function(ScriptReserved_GetMoveablesBySlot, &ObjectsHandler::GetMoveablesBySlot<Moveable>, this);
 
 	/***
 	Get statics by its slot.
-	@function GetStaticsById
+	@function GetStaticsBySlot
 	@tparam int slot the unique slot of the mesh like 10
-	@treturn table of Statics referencing the given slot id.
+	@treturn table table of Statics referencing the given slot ID.
 	*/
 	m_table_objects.set_function(ScriptReserved_GetStaticsBySlot, &ObjectsHandler::GetStaticsBySlot<Static>, this);
 
@@ -127,6 +127,8 @@ ObjectsHandler::ObjectsHandler(sol::state* lua, sol::table & parent) :
 	);
 
 	m_handler.MakeReadOnlyTable(m_table_objects, ScriptReserved_ObjID, kObjIDs);
+	m_handler.MakeReadOnlyTable(m_table_objects, ScriptReserved_LaraWeaponType, LaraWeaponTypeMap);
+	m_handler.MakeReadOnlyTable(m_table_objects, ScriptReserved_HandStatus, HandStatusMap);
 }
 
 void ObjectsHandler::TestCollidingObjects()

@@ -318,6 +318,9 @@ void TestForObjectOnLedge(ItemInfo* item, CollisionInfo* coll)
 
 		for (auto i : g_Level.Rooms[item->RoomNumber].neighbors)
 		{
+			if (!g_Level.Rooms[i].Active())
+				continue;
+
 			short itemNumber = g_Level.Rooms[i].itemNumber;
 			while (itemNumber != NO_ITEM)
 			{
@@ -826,6 +829,9 @@ void CollideSolidStatics(ItemInfo* item, CollisionInfo* coll)
 
 	for (auto i : g_Level.Rooms[item->RoomNumber].neighbors)
 	{
+		if (!g_Level.Rooms[i].Active())
+			continue;
+
 		for (auto& mesh : g_Level.Rooms[i].mesh)
 		{
 			// Only process meshes which are visible and solid.
@@ -1688,6 +1694,9 @@ void DoObjectCollision(ItemInfo* laraItem, CollisionInfo* coll)
 
 	for (auto i : g_Level.Rooms[laraItem->RoomNumber].neighbors)
 	{
+		if (!g_Level.Rooms[i].Active())
+			continue;
+
 		int nextItem = g_Level.Rooms[i].itemNumber;
 		while (nextItem != NO_ITEM)
 		{

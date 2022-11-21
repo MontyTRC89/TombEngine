@@ -51,6 +51,10 @@ constexpr auto PROJECTILE_EXPLODE_RADIUS = BLOCK(1);
 constexpr auto HK_BURST_MODE_SHOT_COUNT	   = 5;
 constexpr auto HK_BURST_MODE_SHOT_INTERVAL = 12.0f;
 
+constexpr auto SHOTGUN_PELLET_COUNT = 6;
+constexpr auto SHOTGUN_NORMAL_PELLET_SCATTER = 10.0f;
+constexpr auto SHOTGUN_WIDESHOT_PELLET_SCATTER = 30.0f;
+
 
 void AnimateShotgun(ItemInfo* laraItem, LaraWeaponType weaponType)
 {
@@ -323,6 +327,10 @@ void FireShotgun(ItemInfo* laraItem)
 {
 	auto* lara = GetLaraInfo(laraItem);
 
+	auto& ammo = GetAmmo(*lara, LaraWeaponType::Shotgun);
+	if (!ammo.HasInfinite() && !ammo.GetCount())
+		return;
+
 	auto armOrient = EulerAngles(
 		lara->LeftArm.Orientation.x,
 		lara->LeftArm.Orientation.y + laraItem->Pose.Orientation.y,
@@ -338,23 +346,28 @@ void FireShotgun(ItemInfo* laraItem)
 		);
 	}
 
-	int value = (lara->Weapons[(int)LaraWeaponType::Shotgun].SelectedAmmo == WeaponAmmoType::Ammo1 ? 1820 : 5460);
 	bool hasFired = false;
-	for (int i = 0; i < 6; i++)
+	int scatter = (lara->Weapons[(int)LaraWeaponType::Shotgun].SelectedAmmo == WeaponAmmoType::Ammo1 ? 
+				  ANGLE(SHOTGUN_NORMAL_PELLET_SCATTER) : ANGLE(SHOTGUN_WIDESHOT_PELLET_SCATTER));
+
+
+	for (int i = 0; i < SHOTGUN_PELLET_COUNT; i++)
 	{
 		auto wobbledArmOrient = EulerAngles(
-			armOrient.x + value * (GetRandomControl() - ANGLE(90.0f)) / 65536,
-			armOrient.y + value * (GetRandomControl() - ANGLE(90.0f)) / 65536,
-			0
-		);
+			armOrient.x + scatter * (GetRandomControl() - ANGLE(90.0f)) / 65536,
+			armOrient.y + scatter * (GetRandomControl() - ANGLE(90.0f)) / 65536,
+			0);
 
 		if (FireWeapon(LaraWeaponType::Shotgun, lara->TargetEntity, laraItem, wobbledArmOrient) != FireWeaponType::NoAmmo)
 			hasFired = true;
+
+		// HACK: compensate for spending 6 units of shotgun ammo. -- Lwmte, 18.11.22
+		if (!ammo.HasInfinite())
+			ammo++;
 	}
 
 	if (hasFired)
 	{
-		auto& ammo = GetAmmo(*lara, LaraWeaponType::Shotgun);
 		if (!ammo.HasInfinite())
 			ammo--;
 
@@ -1236,7 +1249,7 @@ void DoExplosiveDamage(ItemInfo& emitter, ItemInfo& target, ItemInfo& projectile
 		if (emitter.ItemFlags[2])
 			return;
 
-		emitter.HitStatus = true;
+		target.HitStatus = true;
 
 		HitTarget(&emitter, &target, nullptr, damage, 1);
 					
@@ -1250,11 +1263,11 @@ void DoExplosiveDamage(ItemInfo& emitter, ItemInfo& target, ItemInfo& projectile
 			}
 		}
 	}
-	else
+	else if (target.IsLara())
 	{
-		DoDamage(&emitter, damage * 5);
-		if (!TestEnvironment(ENV_FLAG_WATER, target.RoomNumber) && emitter.HitPoints <= 0)
-			LaraBurn(&emitter);
+		DoDamage(&target, damage * 5);
+		if (!TestEnvironment(ENV_FLAG_WATER, target.RoomNumber) && target.HitPoints <= 0)
+			LaraBurn(&target);
 	}
 }
 

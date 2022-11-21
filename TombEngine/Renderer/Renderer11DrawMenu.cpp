@@ -520,7 +520,7 @@ namespace TEN::Renderer
 		m_pickupRotation += 45 * 360 / 30;
 	}
 
-	void Renderer11::DrawObjectOn2DPosition(short x, short y, short objectNum, EulerAngles orient, float scale1)
+	void Renderer11::DrawObjectOn2DPosition(short x, short y, short objectNum, EulerAngles orient, float scale1, int meshBits)
 	{
 		Matrix translation;
 		Matrix rotation;
@@ -584,17 +584,10 @@ namespace TEN::Renderer
 
 		for (int n = 0; n < (*moveableObj).ObjectMeshes.size(); n++)
 		{
+			if (meshBits && !(meshBits & (1 << n)))
+				continue;
+
 			auto* mesh = (*moveableObj).ObjectMeshes[n];
-
-			/*if (GLOBAL_invMode)
-			{
-				InventoryObject* objme;
-
-				objme = &InventoryObjectTable[g_Gui.ConvertObjectToInventoryItem(objectNum)];
-
-				if (!(objme->meshbits & (1 << n)))
-					continue;
-			}*/
 
 			// Finish the world matrix
 			translation = Matrix::CreateTranslation(pos.x, pos.y, pos.z + 1024.0f);

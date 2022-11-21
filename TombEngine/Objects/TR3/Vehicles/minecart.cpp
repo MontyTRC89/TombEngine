@@ -286,6 +286,9 @@ namespace TEN::Entities::Vehicles
 	{
 		for (auto i : g_Level.Rooms[minecartItem->RoomNumber].neighbors)
 		{
+			if (!g_Level.Rooms[i].Active())
+				continue;
+
 			short itemNumber = g_Level.Rooms[i].itemNumber;
 
 			while (itemNumber != NO_ITEM)
