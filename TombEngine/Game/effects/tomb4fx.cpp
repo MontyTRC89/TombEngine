@@ -1458,7 +1458,7 @@ void ExplodingDeath(short itemNumber, short flags)
 				fx->objectNumber = ID_BODY_PART;
 				fx->color = item->Color;
 				fx->flag2 = flags;
-				fx->frameNumber = obj->meshIndex + i;
+				fx->frameNumber = item->Model.MeshIndex[i];
 			}
 		}
 		else

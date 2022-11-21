@@ -716,13 +716,12 @@ void PickupCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 				if (item->ObjectNumber == ID_FLARE_ITEM)
 				{
 					laraItem->Animation.TargetState = LS_CROUCH_IDLE;
-					lara->InteractedItem = itemNumber;
 				}
 				else
 				{
 					laraItem->Animation.TargetState = LS_PICKUP;
 				}
-
+				lara->InteractedItem = itemNumber;
 				break;
 			}
 			else

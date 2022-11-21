@@ -1125,6 +1125,9 @@ namespace TEN::Entities::Vehicles
 	{
 		for (auto i : g_Level.Rooms[kayakItem->RoomNumber].neighbors)
 		{
+			if (!g_Level.Rooms[i].Active())
+				continue;
+
 			short itemNum = g_Level.Rooms[i].itemNumber;
 
 			while (itemNum != NO_ITEM)

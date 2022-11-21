@@ -6,8 +6,6 @@
 
 struct TriggerVolume;
 
-constexpr auto MAX_FLIPMAP = 256;
-
 struct ROOM_VERTEX
 {
 	Vector3 position;
@@ -127,8 +125,11 @@ struct ROOM_INFO
 	std::vector<ROOM_DOOR> doors;
 
 	std::vector<int> neighbors; // TODO: Move to level struct
+
+	bool Active();
 };
 
+constexpr auto MAX_FLIPMAP = 256;
 constexpr auto NUM_ROOMS = 1024;
 constexpr auto NO_ROOM = -1;
 constexpr auto OUTSIDE_Z = 64;

@@ -17,6 +17,14 @@ int FlipMap[MAX_FLIPMAP];
 
 std::vector<short> OutsideRoomTable[OUTSIDE_SIZE][OUTSIDE_SIZE];
 
+bool ROOM_INFO::Active()
+{
+	if (flipNumber == NO_ROOM)
+		return true;
+
+	return !(FlipStats[flipNumber] && flippedRoom == NO_ROOM);
+}
+
 void DoFlipMap(short group)
 {
 	ROOM_INFO temp;
