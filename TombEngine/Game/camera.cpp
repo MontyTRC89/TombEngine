@@ -1774,9 +1774,12 @@ std::vector<short> FillCollideableItemList()
 
 	for (short i = 0; i < g_Level.NumItems; i++)
 	{
-		auto item = &g_Level.Items[i];
+		auto* item = &g_Level.Items[i];
 
 		if (std::find(roomList.begin(), roomList.end(), item->RoomNumber) == roomList.end())
+			continue;
+
+		if (!g_Level.Rooms[item->RoomNumber].Active())
 			continue;
 
 		if (!CheckItemCollideCamera(&g_Level.Items[i]))
@@ -1827,7 +1830,11 @@ std::vector<MESH_INFO*> FillCollideableStaticsList()
 
 	for (auto i : roomList)
 	{
-		auto room = &g_Level.Rooms[i];
+		auto* room = &g_Level.Rooms[i];
+
+		if (!room->Active())
+			continue;
+
 		for (short j = 0; j < room->mesh.size(); j++)
 		{
 			if (!CheckStaticCollideCamera(&room->mesh[j]))
