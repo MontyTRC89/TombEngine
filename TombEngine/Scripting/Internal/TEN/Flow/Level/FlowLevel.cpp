@@ -260,12 +260,12 @@ short Level::GetFarView() const
 	return float(LevelFarView);
 }
 
-void Level::SetSecrets(short secrets)
+void Level::SetSecrets(int secrets)
 {
 	LevelSecrets = secrets;
 }
 
-short Level::GetSecrets() const
+int Level::GetSecrets() const
 {
 	return LevelSecrets;
 }
