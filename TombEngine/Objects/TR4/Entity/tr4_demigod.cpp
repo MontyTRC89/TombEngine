@@ -159,7 +159,7 @@ namespace TEN::Entities::TR4
 			auto* fx = &EffectList[fxNumber];
 
 			fx->pos.Position.x = pose->Position.x;
-			fx->pos.Position.y = pose->Position.y - (GetRandomControl() & 0x3F) - 32;
+			fx->pos.Position.y = pose->Position.y - (GetRandomControl() & 0x3F) - 32; //war -
 			fx->pos.Position.z = pose->Position.z;
 
 			fx->pos.Orientation.x = pose->Orientation.x;
@@ -171,6 +171,7 @@ namespace TEN::Entities::TR4
 
 			fx->pos.Orientation.z = 0;
 
+			fx->fallspeed = 0;
 			fx->roomNumber = roomNumber;
 			fx->counter = 2 * GetRandomControl() + -ANGLE(180.0f);
 			fx->flag1 = flags;

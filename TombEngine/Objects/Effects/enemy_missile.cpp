@@ -137,7 +137,7 @@ namespace TEN::Entities::Effects
 		auto* fx = &EffectList[fxNum];
 
 		auto orient = Geometry::GetOrientToPoint(
-			Vector3(fx->pos.Position.x, fx->pos.Position.y - CLICK(1), fx->pos.Position.z),
+			Vector3(fx->pos.Position.x, fx->pos.Position.y + CLICK(1), fx->pos.Position.z),
 			LaraItem->Pose.Position.ToVector3());
 
 		int maxRotation = 0;
@@ -171,11 +171,11 @@ namespace TEN::Entities::Effects
 				fx->speed += 3;
 
 			int dy = orient.y - fx->pos.Orientation.y;
-			if (abs(dy) > ANGLE(180.0f))
+			if (abs(dy) > 0x8000)
 				dy = -dy;
 
 			int dx = orient.x - fx->pos.Orientation.x;
-			if (abs(dx) > ANGLE(180.0f))
+			if (abs(dx) > 0x8000)
 				dx = -dx;
 
 			dy >>= 3;
@@ -191,9 +191,11 @@ namespace TEN::Entities::Effects
 			else if (dx > maxRotation)
 				dx = maxRotation;
 
+			fx->pos.Orientation.x += dx;
+
 			if (fx->flag1 != 4 && (fx->flag1 != 6 || !fx->counter))
 				fx->pos.Orientation.y += dy;
-			fx->pos.Orientation.x += dx;
+			
 		}
 
 		fx->pos.Orientation.z += 16 * fx->speed;
