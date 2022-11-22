@@ -1541,7 +1541,7 @@ void ProcessEffects(ItemInfo* item)
 
 		if (!item->Effect.Count)
 		{
-			if (item->Effect.Type == EffectType::Burn)
+			if (item->Effect.Type == EffectType::Fire)
 			{
 				item->Effect.Type = EffectType::Smoke;
 				item->Effect.Count = BURN_AFTERMATH_TIMEOUT;
@@ -1561,12 +1561,12 @@ void ProcessEffects(ItemInfo* item)
 
 		switch (item->Effect.Type)
 		{
-		case EffectType::Burn:
+		case EffectType::Fire:
 			if (TestProbability(1 / 8.0f))
 				TriggerFireFlame(pos.x, pos.y, pos.z, TestProbability(1 / 10.0f) ? FlameType::Trail : FlameType::Medium);
 			break;
 
-		case EffectType::Electric:
+		case EffectType::Sparks:
 			if (TestProbability(1 / 10.0f))
 				TriggerElectricSpark(&GameVector(pos.x, pos.y, pos.z, item->RoomNumber),
 					EulerAngles(0, Random::GenerateAngle(ANGLE(0), ANGLE(359)), 0), 2);
@@ -1599,11 +1599,11 @@ void ProcessEffects(ItemInfo* item)
 		SoundEffect(SOUND_EFFECTS::SFX_TR5_HISS_LOOP_SMALL, &item->Pose);
 		break;
 
-	case EffectType::Electric:
+	case EffectType::Sparks:
 		SoundEffect(SOUND_EFFECTS::SFX_TR4_LARA_ELECTRIC_CRACKLES, &item->Pose);
 		break;
 
-	case EffectType::Burn:
+	case EffectType::Fire:
 		SoundEffect(SOUND_EFFECTS::SFX_TR4_LOOP_FOR_SMALL_FIRES, &item->Pose);
 		break;
 	}
@@ -1619,9 +1619,9 @@ void ProcessEffects(ItemInfo* item)
 
 	int waterHeight = GetWaterHeight(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, item->RoomNumber);
 
-	if (item->Effect.Type != EffectType::Electric && (waterHeight != NO_HEIGHT && item->Pose.Position.y > waterHeight))
+	if (item->Effect.Type != EffectType::Sparks && (waterHeight != NO_HEIGHT && item->Pose.Position.y > waterHeight))
 	{
-		if (item->Effect.Type == EffectType::Burn)
+		if (item->Effect.Type == EffectType::Fire)
 		{
 			item->Effect.Type = EffectType::Smoke;
 			item->Effect.Count = 10;

@@ -675,11 +675,11 @@ void Moveable::SetEffect(EffectType effectType, sol::optional<float> timeout)
 		ItemSmoke(m_item, realTimeout);
 		break;
 
-	case EffectType::Burn:
+	case EffectType::Fire:
 		ItemBurn(m_item, realTimeout);
 		break;
 
-	case EffectType::Electric:
+	case EffectType::Sparks:
 		ItemElectricBurn(m_item, realTimeout);
 		break;
 	}

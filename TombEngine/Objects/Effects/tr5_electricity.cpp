@@ -222,7 +222,7 @@ void ElectricityWiresControl(short itemNumber)
 
 			if (isWaterNearby || instantKill)
 			{
-				collItem->Effect.Type = EffectType::Electric;
+				collItem->Effect.Type = EffectType::Sparks;
 				collItem->Effect.Count = 48;
 				collItem->Effect.LightColor = Vector3(0.0f, 0.2f, 0.8f);
 

@@ -14,8 +14,8 @@ Constants for effect IDs.
 
 The following constants are inside EffectID.
 
-	BURN
-	ELECTRIC
+	FIRE
+	SPARKS
 	SMOKE
 
 @section Misc.EffectID
@@ -28,7 +28,7 @@ The following constants are inside EffectID.
 static const std::unordered_map<std::string, EffectType> kEffectIDs
 {
 	{"NONE", EffectType::None},
-	{"BURN", EffectType::Burn},
-	{"ELECTRIC", EffectType::Electric},
+	{"FIRE", EffectType::Fire},
+	{"SPARKS", EffectType::Sparks},
 	{"SMOKE", EffectType::Smoke}
 };

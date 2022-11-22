@@ -17,14 +17,14 @@ namespace TEN::Effects::Items
 {
 	void ItemBurn(ItemInfo* item, int timeout)
 	{
-		item->Effect.Type = EffectType::Burn;
+		item->Effect.Type = EffectType::Fire;
 		item->Effect.Count = timeout;
 		item->Effect.LightColor = Vector3(0.8f, 0.5f, 0.0f);
 	}
 
 	void ItemElectricBurn(ItemInfo* item, int timeout)
 	{
-		item->Effect.Type = EffectType::Electric;
+		item->Effect.Type = EffectType::Sparks;
 		item->Effect.Count = timeout;
 		item->Effect.LightColor = Vector3(0.0f, 0.2f, 0.8f);
 	}

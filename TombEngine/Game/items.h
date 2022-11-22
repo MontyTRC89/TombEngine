@@ -59,8 +59,8 @@ enum class JointBitType
 enum class EffectType
 {
 	None,
-	Burn,
-	Electric,
+	Fire,
+	Sparks,
 	Smoke
 };
 
