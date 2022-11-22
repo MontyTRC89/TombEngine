@@ -8,6 +8,7 @@ Version 1.0.4
 * Fix incorrect string IDs for item combine, HK and revolver with lasersight.
 * Fix puzzle holes not swapping to puzzle done objects.
 * Fix several collision and sound source issues in flipped rooms.
+* Fix several pushable object collision bugs.
 
 Version 1.0.3
 =============
