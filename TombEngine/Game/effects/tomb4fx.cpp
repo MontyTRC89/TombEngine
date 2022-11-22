@@ -9,6 +9,7 @@
 #include "Game/effects/Bubble.h"
 #include "Game/effects/debris.h"
 #include "Game/effects/Drip.h"
+#include "Game/effects/Ripple.h"
 #include "Game/effects/smoke.h"
 #include "Game/effects/weather.h"
 #include "Game/items.h"
@@ -23,6 +24,7 @@
 using namespace TEN::Effects::Drip;
 using namespace TEN::Effects::Bubble;
 using namespace TEN::Effects::Environment;
+using namespace TEN::Effects::Ripple;
 using namespace TEN::Floordata;
 using namespace TEN::Math;
 using std::vector;
@@ -46,7 +48,7 @@ GUNFLASH_STRUCT Gunflashes[MAX_GUNFLASH];
 FIRE_SPARKS FireSparks[MAX_SPARKS_FIRE];
 SMOKE_SPARKS SmokeSparks[MAX_SPARKS_SMOKE];
 GUNSHELL_STRUCT Gunshells[MAX_GUNSHELL];
-BLOOD_STRUCT Blood[MAX_SPARKS_BLOOD];
+BLOOD_STRUCT Bloods[MAX_SPARKS_BLOOD];
 SHOCKWAVE_STRUCT ShockWaves[MAX_SHOCKWAVE];
 FIRE_LIST Fires[MAX_FIRE_LIST];
 
@@ -758,7 +760,7 @@ void TriggerShatterSmoke(int x, int y, int z)
 
 int GetFreeBlood()
 {
-	BLOOD_STRUCT* blood = &Blood[NextBlood];
+	BLOOD_STRUCT* blood = &Bloods[NextBlood];
 	int bloodNum = NextBlood;
 	int minLife = 4095;
 	int minIndex = 0;
@@ -774,7 +776,7 @@ int GetFreeBlood()
 
 		if (bloodNum == MAX_SPARKS_BLOOD - 1)
 		{
-			blood = &Blood[0];
+			blood = &Bloods[0];
 			bloodNum = 0;
 		}
 		else
@@ -798,7 +800,7 @@ void TriggerBlood(int x, int y, int z, int direction, int num)
 {
 	for (int i = 0; i < num; i++)
 	{
-		BLOOD_STRUCT* blood = &Blood[GetFreeBlood()];
+		BLOOD_STRUCT* blood = &Bloods[GetFreeBlood()];
 		blood->on = 1;
 		blood->sShade = 0;
 		blood->colFadeSpeed = 4;
@@ -829,7 +831,7 @@ void UpdateBlood()
 {
 	for (int i = 0; i < MAX_SPARKS_BLOOD; i++)
 	{
-		BLOOD_STRUCT* blood = &Blood[i];
+		BLOOD_STRUCT* blood = &Bloods[i];
 
 		if (blood->on)
 		{
@@ -1069,7 +1071,10 @@ void UpdateGunShells()
 
 				TEN::Effects::Drip::SpawnGunshellSplashDrips(Vector3(gunshell->pos.Position.x, g_Level.Rooms[gunshell->roomNumber].maxceiling, gunshell->pos.Position.z), gunshell->roomNumber, 4);
 				//AddWaterSparks(gs->pos.Position.x, g_Level.Rooms[gs->roomNumber].maxceiling, gs->pos.Position.z, 8);
-				SetupRipple(gunshell->pos.Position.x, g_Level.Rooms[gunshell->roomNumber].maxceiling, gunshell->pos.Position.z, (GetRandomControl() & 3) + 8, RIPPLE_FLAG_SHORT_INIT);
+				SpawnRipple(
+					Vector3(gunshell->pos.Position.x, g_Level.Rooms[gunshell->roomNumber].maxceiling, gunshell->pos.Position.z),
+					(GetRandomControl() & 3) + 8,
+					{ RippleFlags::ShortInit });
 				gunshell->fallspeed >>= 5;
 				continue;
 			}

@@ -9,6 +9,7 @@
 #include "Game/effects/explosion.h"
 #include "Game/effects/lara_fx.h"
 #include "Game/effects/smoke.h"
+#include "Game/effects/Ripple.h"
 #include "Game/effects/spark.h"
 #include "Game/effects/tomb4fx.h"
 #include "Game/effects/weather.h"
@@ -25,6 +26,7 @@ using namespace TEN::Effects::Bubble;
 using namespace TEN::Effects::Environment;
 using namespace TEN::Effects::Explosion;
 using namespace TEN::Effects::Lara;
+using namespace TEN::Effects::Ripple;
 using namespace TEN::Effects::Spark;
 using namespace TEN::Math;
 using TEN::Renderer::g_Renderer;
@@ -38,7 +40,6 @@ FX_INFO EffectList[NUM_EFFECTS];
 GameBoundingBox DeadlyBounds;
 SPLASH_SETUP SplashSetup;
 SPLASH_STRUCT Splashes[MAX_SPLASHES];
-RIPPLE_STRUCT Ripples[MAX_RIPPLES];
 int SplashCount = 0;
 
 Vector3i NodeVectors[MAX_NODE];
@@ -985,45 +986,15 @@ void UpdateSplashes()
 				splash.animationPhase = fmod(splash.animationPhase, sequenceLength);
 		}
 	}
-
-	for (int i = 0; i < MAX_RIPPLES; i++)
-	{
-		auto* ripple = &Ripples[i];
-
-		if (ripple->flags & RIPPLE_FLAG_ACTIVE)
-		{
-			if (ripple->size < 252)
-			{
-				if (ripple->flags & RIPPLE_FLAG_SHORT_INIT)
-					ripple->size += 2;
-				else
-					ripple->size += 4;
-			}
-
-			if (!ripple->init)
-			{
-				ripple->life -= 3;
-				if (ripple->life > 250)
-					ripple->flags = 0;
-			}
-			else if (ripple->init < ripple->life)
-			{
-				if (ripple->flags & RIPPLE_FLAG_SHORT_INIT)
-					ripple->init += 8;
-				else
-					ripple->init += 4;
-				if (ripple->init >= ripple->life)
-					ripple->init = 0;
-			}
-		}
-	}
 }
 
 short DoBloodSplat(int x, int y, int z, short speed, short direction, short roomNumber)
 {
 	short probedRoomNumber = GetCollision(x, y, z, roomNumber).RoomNumber;
 	if (TestEnvironment(ENV_FLAG_WATER, probedRoomNumber))
-		TriggerUnderwaterBlood(x, y, z, speed);
+	{
+		SpawnUnderwaterBlood(Vector3(x, y, z), speed);
+	}
 	else
 		TriggerBlood(x, y, z, direction >> 4, speed);
 
@@ -1055,34 +1026,11 @@ void TriggerLaraBlood()
 				Vector3i(
 					(GetRandomControl() & 31) - 16,
 					(GetRandomControl() & 31) - 16,
-					(GetRandomControl() & 31) - 16
-				));
+					(GetRandomControl() & 31) - 16));
 			DoBloodSplat(vec.x, vec.y, vec.z, (GetRandomControl() & 7) + 8, 2 * GetRandomControl(), LaraItem->RoomNumber);
 		}
 
 		node <<= 1;
-	}
-}
-
-void TriggerUnderwaterBlood(int x, int y, int z, int size) 
-{
-	for (int i = 0; i < MAX_RIPPLES; i++)
-	{
-		auto* ripple = &Ripples[i];
-
-		if (!(ripple->flags & RIPPLE_FLAG_ACTIVE))
-		{
-			ripple->flags = RIPPLE_FLAG_ACTIVE | RIPPLE_FLAG_LOW_OPACITY | RIPPLE_FLAG_BLOOD;
-
-			ripple->life = 240 + (GetRandomControl() & 7);
-			ripple->init = 1;
-			ripple->size = size;
-			ripple->x = x + (GetRandomControl() & 63) - 32;
-			ripple->y = y;
-			ripple->z = z + (GetRandomControl() & 63) - 32;
-			
-			return;
-		}
 	}
 }
 
@@ -1207,33 +1155,6 @@ void TriggerDynamicLight(int x, int y, int z, short falloff, byte r, byte g, byt
 	g_Renderer.AddDynamicLight(x, y, z, falloff, r, g, b);
 }
 
-void SetupRipple(int x, int y, int z, int size, int flags)
-{
-	for (int i = 0; i < MAX_RIPPLES; i++)
-	{
-		auto* ripple = &Ripples[i];
-
-		if (!(ripple->flags & RIPPLE_FLAG_ACTIVE))
-		{
-			ripple->flags = RIPPLE_FLAG_ACTIVE | flags;
-			ripple->life = 48 + (GetRandomControl() & 15);
-			ripple->init = 1;
-			ripple->size = size;
-			ripple->x = x;
-			ripple->y = y;
-			ripple->z = z;
-
-			if (flags & RIPPLE_FLAG_NO_RAND)
-			{
-				ripple->x += (GetRandomControl() & 127) - 64;
-				ripple->z += (GetRandomControl() & 127) - 64;
-			}
-
-			return;
-		}
-	}
-}
-
 void WadeSplash(ItemInfo* item, int wh, int wd)
 {
 	auto probe1 = GetCollision(item);
@@ -1257,9 +1178,19 @@ void WadeSplash(ItemInfo* item, int wh, int wd)
 			if (!(GetRandomControl() & 0xF) || item->Animation.ActiveState != LS_IDLE)
 			{
 				if (item->Animation.ActiveState != LS_IDLE)
-					SetupRipple(item->Pose.Position.x, wh - 1, item->Pose.Position.z, 112 + (GetRandomControl() & 15), RIPPLE_FLAG_SHORT_INIT | RIPPLE_FLAG_LOW_OPACITY);
+				{
+					SpawnRipple(
+						Vector3(item->Pose.Position.x, wh - 1, item->Pose.Position.z),
+						112 + (GetRandomControl() & 15),
+						{ RippleFlags::ShortInit, RippleFlags::LowOpacity });
+				}
 				else
-					SetupRipple(item->Pose.Position.x, wh - 1, item->Pose.Position.z, 112 + (GetRandomControl() & 15), RIPPLE_FLAG_LOW_OPACITY);	
+				{
+					SpawnRipple(
+						Vector3(item->Pose.Position.x, wh - 1, item->Pose.Position.z),
+						112 + (GetRandomControl() & 15),
+						{ RippleFlags::LowOpacity });
+				}
 			}
 		}
 	}

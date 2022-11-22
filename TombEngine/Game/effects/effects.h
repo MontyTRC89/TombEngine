@@ -6,18 +6,6 @@ enum class LaraWeaponType;
 struct CollisionInfo;
 struct ItemInfo;
 
-enum RippleFlags
-{
-	RIPPLE_FLAG_NONE		  = (0 << 0),
-	RIPPLE_FLAG_ACTIVE		  = (1 << 0),
-	RIPPLE_FLAG_SHORT_INIT	  = (1 << 1),
-	RIPPLE_FLAG_RIPPLE_INNER  = (1 << 2),
-	RIPPLE_FLAG_RIPPLE_MIDDLE = (1 << 3),
-	RIPPLE_FLAG_LOW_OPACITY	  = (1 << 4),
-	RIPPLE_FLAG_BLOOD		  = (1 << 5),
-	RIPPLE_FLAG_NO_RAND		  = (1 << 6)
-};
-
 enum SpriteEnumFlags
 {
 	SP_NONE		  = (0 << 0),
@@ -71,17 +59,6 @@ struct SPLASH_SETUP
 	float splashPower;
 	float innerRadius;
 	int room;
-};
-
-struct RIPPLE_STRUCT
-{
-	int x;
-	int y;
-	int z;
-	char flags;
-	unsigned char life;
-	unsigned char size;
-	unsigned char init;
 };
 
 struct Particle
@@ -162,12 +139,10 @@ constexpr auto SD_UWEXPLOSION = 2;
 
 #define MAX_NODE 23
 #define MAX_DYNAMICS 64
-#define MAX_RIPPLES 256
 #define MAX_SPLASHES 8
 #define NUM_EFFECTS 256
 
 extern GameBoundingBox DeadlyBounds;
-
 
 // New particle class
 
@@ -178,7 +153,6 @@ extern ParticleDynamic ParticleDynamics[MAX_PARTICLE_DYNAMICS];
 
 extern SPLASH_SETUP SplashSetup;
 extern SPLASH_STRUCT Splashes[MAX_SPLASHES];
-extern RIPPLE_STRUCT Ripples[MAX_RIPPLES];
 
 extern Vector3i NodeVectors[MAX_NODE];
 extern NODEOFFSET_INFO NodeOffsets[MAX_NODE];
@@ -198,11 +172,9 @@ void TriggerFireFlame(int x, int y, int z, int fxObj, int type);
 void TriggerSuperJetFlame(ItemInfo* item, int yvel, int deadly);
 void SetupSplash(const SPLASH_SETUP* const setup, int room);
 void UpdateSplashes();
-void SetupRipple(int x, int y, int z, int size, int flags);
 void TriggerLaraBlood();
 short DoBloodSplat(int x, int y, int z, short speed, short yRot, short roomNumber);
 void DoLotsOfBlood(int x, int y, int z, int speed, short direction, short roomNumber, int count);
-void TriggerUnderwaterBlood(int x, int y, int z, int sizeme);
 void ControlWaterfallMist(short itemNumber);
 void TriggerWaterfallMist(const ItemInfo& item);
 void KillAllCurrentItems(short itemNumber);

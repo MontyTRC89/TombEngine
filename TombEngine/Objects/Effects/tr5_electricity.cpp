@@ -8,6 +8,7 @@
 #include "Game/control/control.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/lara_fx.h"
+#include "Game/effects/Ripple.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_collide.h"
@@ -17,6 +18,7 @@
 #include "Specific/setup.h"
 
 using namespace TEN::Effects::Lara;
+using namespace TEN::Effects::Ripple;
 
 void TriggerElectricityWireSparks(int x, int z, byte objNum, byte node, bool glow)
 {
@@ -202,7 +204,12 @@ void ElectricityWiresControl(short itemNumber)
 			{
 				waterTouch = true;
 				if ((GetRandomControl() & 127) < 16)
-					SetupRipple(pos.x, floor->FloorHeight(pos.x, pos.y, pos.z), pos.z, (GetRandomControl() & 7) + 32, RIPPLE_FLAG_LOW_OPACITY);
+				{
+					SpawnRipple(
+						Vector3(pos.x, floor->FloorHeight(pos.x, pos.y, pos.z), pos.z),
+						(GetRandomControl() & 7) + 32,
+						{ RippleFlags::LowOpacity });
+				}
 			}
 
 			if (pos.y < cableBottomPlane)

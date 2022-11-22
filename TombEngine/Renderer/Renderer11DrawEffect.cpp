@@ -14,6 +14,7 @@
 #include "Game/effects/explosion.h"
 #include "Game/effects/Footprint.h"
 #include "Game/effects/lightning.h"
+#include "Game/effects/Ripple.h"
 #include "Game/effects/simple_particle.h"
 #include "Game/effects/smoke.h"
 #include "Game/effects/spark.h"
@@ -29,8 +30,9 @@
 #include "Specific/setup.h"
 
 using namespace TEN::Effects::Bubble;
-using namespace TEN::Effects::Lightning;
 using namespace TEN::Effects::Environment;
+using namespace TEN::Effects::Lightning;
+using namespace TEN::Effects::Ripple;
 using namespace TEN::Math;
 
 extern BLOOD_STRUCT Blood[MAX_SPARKS_BLOOD];
@@ -41,7 +43,6 @@ extern FIRE_LIST Fires[MAX_FIRE_LIST];
 extern GUNFLASH_STRUCT Gunflashes[MAX_GUNFLASH]; // offset 0xA31D8
 extern Particle Particles[MAX_PARTICLES];
 extern SPLASH_STRUCT Splashes[MAX_SPLASHES];
-extern RIPPLE_STRUCT Ripples[MAX_RIPPLES];
 
 // TODO: EnemyBites must be eradicated and kept directly in object structs or passed to gunflash functions!
 
@@ -336,41 +337,36 @@ namespace TEN::Renderer
 
 				float innerRadius = splash.innerRad;
 				float outerRadius = splash.outerRad;
-				float xInner;
-				float zInner;
-				float xOuter;
-				float zOuter;
-				float x2Inner;
-				float z2Inner;
-				float x2Outer;
-				float z2Outer;
 				float yInner = splash.y;
 				float yOuter = splash.y - splash.height;
 
 				for (int i = 0; i < NUM_POINTS; i++)
 				{
-					xInner = innerRadius * sin(alpha * i * RADIAN);
-					zInner = innerRadius * cos(alpha * i * RADIAN);
-					xOuter = outerRadius * sin(alpha * i * RADIAN);
-					zOuter = outerRadius * cos(alpha * i * RADIAN);
+					float xInner = innerRadius * sin(alpha * i * RADIAN);
+					float zInner = innerRadius * cos(alpha * i * RADIAN);
+					float xOuter = outerRadius * sin(alpha * i * RADIAN);
+					float zOuter = outerRadius * cos(alpha * i * RADIAN);
 					xInner += splash.x;
 					zInner += splash.z;
 					xOuter += splash.x;
 					zOuter += splash.z;
 					int j = (i + 1) % NUM_POINTS;
-					x2Inner = innerRadius * sin(alpha * j * RADIAN);
+					float x2Inner = innerRadius * sin(alpha * j * RADIAN);
 					x2Inner += splash.x;
-					z2Inner = innerRadius * cos(alpha * j * RADIAN);
+					float z2Inner = innerRadius * cos(alpha * j * RADIAN);
 					z2Inner += splash.z;
-					x2Outer = outerRadius * sin(alpha * j * RADIAN);
+					float x2Outer = outerRadius * sin(alpha * j * RADIAN);
 					x2Outer += splash.x;
-					z2Outer = outerRadius * cos(alpha * j * RADIAN);
+					float z2Outer = outerRadius * cos(alpha * j * RADIAN);
 					z2Outer += splash.z;
-					AddSprite3D(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + splash.spriteSequenceStart + (int)splash.animationPhase],
+
+					AddSprite3D(
+						&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + splash.spriteSequenceStart + (int)splash.animationPhase],
 						Vector3(xOuter, yOuter, zOuter),
 						Vector3(x2Outer, yOuter, z2Outer),
 						Vector3(x2Inner, yInner, z2Inner),
-						Vector3(xInner, yInner, zInner), Vector4(color / 255.0f, color / 255.0f, color / 255.0f, 1.0f),
+						Vector3(xInner, yInner, zInner),
+						Vector4(color / 255.0f, color / 255.0f, color / 255.0f, 1.0f),
 						0, 1, { 0, 0 }, BLENDMODE_ADDITIVE, false, view);
 				}
 			}
@@ -393,77 +389,56 @@ namespace TEN::Renderer
 
 	void Renderer11::DrawRipples(RenderView& view)
 	{
-		for (int i = 0; i < MAX_RIPPLES; i++)
+		for (auto& ripple : Ripples)
 		{
-			RIPPLE_STRUCT* ripple = &Ripples[i];
+			if (!ripple.IsActive)
+				continue;
 
-			if (ripple->flags & RIPPLE_FLAG_ACTIVE)
+			Vector4 color;
+			if (ripple.Flags.Test(RippleFlags::LowOpacity))
 			{
-				int spriteId;
-				if (ripple->flags & RIPPLE_FLAG_BLOOD)
-					spriteId = 0;
-				else
-					spriteId = SPR_RIPPLES;
-
-				Vector4 color;
-				if (ripple->flags & RIPPLE_FLAG_LOW_OPACITY)
+				if (ripple.Flags.Test(RippleFlags::Blood))
 				{
-					if (ripple->flags & RIPPLE_FLAG_BLOOD)
-					{
-						if (ripple->init)
-							color = Vector4(ripple->init >> 1, 0, ripple->init >> 4, 255);
-						else
-							color = Vector4(ripple->life >> 1, 0, ripple->life >> 4, 255);
-					}
+					if (ripple.Init)
+						color = Vector4(ripple.Init / 2, 0, ripple.Init / 16, 255);
 					else
-					{
-						if (ripple->init)
-							color = Vector4(ripple->init, ripple->init, ripple->init, 255);
-						else
-							color = Vector4(ripple->life, ripple->life, ripple->life, 255);
-					}
+						color = Vector4(ripple.Life / 2, 0, ripple.Life / 16, 255);
 				}
 				else
 				{
-					if (ripple->init)
-						color = Vector4(ripple->init << 1, ripple->init << 1, ripple->init << 1, 255);
+					if (ripple.Init)
+						color = Vector4(ripple.Init, ripple.Init, ripple.Init, 255);
 					else
-						color = Vector4(ripple->life << 1, ripple->life << 1, ripple->life << 1, 255);
+						color = Vector4(ripple.Life, ripple.Life, ripple.Life, 255);
 				}
-
-				color.x = (int)std::clamp((int)color.x, 0, 255);
-				color.y = (int)std::clamp((int)color.y, 0, 255);
-				color.z = (int)std::clamp((int)color.z, 0, 255);
-
-				color /= 255.0f;
-
-				if (ripple->flags & RIPPLE_FLAG_BLOOD)
-				{
-					AddSpriteBillboard(
-						&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex],
-						Vector3(ripple->x, ripple->y, ripple->z),
-						color,
-						0,
-						1,
-						{ ripple->size * 2.0f, ripple->size * 2.0f },
-						BLENDMODE_ADDITIVE,
-						true,
-						view);
-				}
+			}
+			else
+			{
+				if (ripple.Init)
+					color = Vector4(ripple.Init * 2, ripple.Init * 2, ripple.Init * 2, 255);
 				else
-				{
-					AddSpriteBillboardConstrainedLookAt(
-						&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_RIPPLES],
-						Vector3(ripple->x, ripple->y, ripple->z),
-						color,
-						0,
-						1,
-						{ ripple->size * 2.0f, ripple->size * 2.0f },
-						BLENDMODE_ADDITIVE,
-						Vector3(0, -1, 0),
-						true,
-						view);
-				}
+					color = Vector4(ripple.Life * 2, ripple.Life * 2, ripple.Life * 2, 255);
+			}
+
+			color.x = (int)std::clamp((int)color.x, 0, 255);
+			color.y = (int)std::clamp((int)color.y, 0, 255);
+			color.z = (int)std::clamp((int)color.z, 0, 255);
+
+			color /= 255.0f;
+
+			if (ripple.Flags.Test(RippleFlags::Blood))
+			{
+				AddSpriteBillboard(
+					&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex] + ripple.SpriteIndex,
+					ripple.Position,
+					color, 0.0f, 1.0f, Vector2(ripple.Scale, ripple.Scale) * 2, BLENDMODE_ADDITIVE, true, view);
+			}
+			else
+			{
+				AddSpriteBillboardConstrainedLookAt(
+					&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex] + ripple.SpriteIndex,
+					ripple.Position,
+					color, 0.0f, 1.0f, Vector2(ripple.Scale, ripple.Scale) * 2, BLENDMODE_ADDITIVE, Vector3::Down, true, view);
 			}
 		}
 	}
@@ -537,7 +512,7 @@ namespace TEN::Renderer
 	{
 		for (int i = 0; i < 32; i++)
 		{
-			BLOOD_STRUCT* blood = &Blood[i];
+			BLOOD_STRUCT* blood = &Bloods[i];
 
 			if (blood->on)
 			{

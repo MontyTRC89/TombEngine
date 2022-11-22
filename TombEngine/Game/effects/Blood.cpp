@@ -2,6 +2,7 @@
 #include "Game/effects/Blood.h"
 
 #include "Game/collision/collide_room.h"
+#include "Game/effects/Ripple.h"
 #include "Game/effects/weather.h"
 #include "Math/Math.h"
 #include "Renderer/Renderer11.h"
@@ -14,6 +15,7 @@
 #include "Game/effects/tomb4fx.h"
 
 using namespace TEN::Effects::Environment;
+using namespace TEN::Effects::Ripple;
 using namespace TEN::Math;
 using namespace TEN::Renderer;
 
@@ -128,7 +130,7 @@ namespace TEN::Effects::Blood
 		if (!TestEnvironment(ENV_FLAG_WATER, roomNumber))
 			return;
 		
-		TriggerUnderwaterBlood(pos.x, pos.y, pos.z, velocity);
+		SpawnUnderwaterBlood(pos, velocity);
 	}
 
 	void SpawnBloodDrip(const Vector3& pos, int roomNumber, const Vector3& velocity, float scale)

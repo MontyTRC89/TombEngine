@@ -18,6 +18,7 @@
 #include "Game/effects/Footprint.h"
 #include "Game/effects/hair.h"
 #include "Game/effects/lightning.h"
+#include "Game/effects/Ripple.h"
 #include "Game/effects/simple_particle.h"
 #include "Game/effects/smoke.h"
 #include "Game/effects/spark.h"
@@ -61,10 +62,11 @@ using namespace TEN::Effects::Drip;
 using namespace TEN::Effects::Environment;
 using namespace TEN::Effects::Explosion;
 using namespace TEN::Effects::Footprints;
-using namespace TEN::Entities::Generic;
 using namespace TEN::Effects::Lightning;
+using namespace TEN::Effects::Ripple;
 using namespace TEN::Effects::Smoke;
 using namespace TEN::Effects::Spark;
+using namespace TEN::Entities::Generic;
 using namespace TEN::Entities::Switches;
 using namespace TEN::Entities::TR4;
 using namespace TEN::Floordata;
@@ -277,6 +279,7 @@ GameStatus ControlPhase(int numFrames, bool demoMode)
 		UpdateBloodMists();
 		UpdateBloodStains();
 		UpdateFootprints();
+		UpdateRipples();
 		UpdateSplashes();
 		UpdateLightning();
 		UpdateRats();
@@ -667,8 +670,9 @@ void CleanUp()
 	ClearBloodDrips();
 	ClearBloodMists();
 	ClearBloodStains();
-	ClearFootprints();
 	ClearBubbles();
+	ClearFootprints();
+	ClearRipples();
 	DisableDebris();
 
 	// Clear swarm enemies.

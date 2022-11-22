@@ -166,6 +166,7 @@ CALL gen.bat</Command>
     <ClInclude Include="Game\control\volume.h" />
     <ClInclude Include="Game\debug\debug.h" />
     <ClInclude Include="Game\effects\lightning.h" />
+    <ClInclude Include="Game\effects\Ripple.h" />
     <ClInclude Include="Game\GuiObjects.h" />
     <ClInclude Include="Objects\TR1\Trap\DamoclesSword.h" />
     <ClInclude Include="Scripting\Internal\TEN\Objects\Lara\LaraObject.h" />
@@ -627,6 +628,7 @@ CALL gen.bat</Command>
     <ClCompile Include="Game\debug\debug.cpp" />
     <ClCompile Include="Game\effects\Drip.cpp" />
     <ClCompile Include="Game\effects\explosion.cpp" />
+    <ClCompile Include="Game\effects\Ripple.cpp" />
     <ClCompile Include="Game\effects\weather.cpp" />
     <ClCompile Include="Game\collision\floordata.cpp" />
     <ClCompile Include="Game\effects\Footprint.cpp" />

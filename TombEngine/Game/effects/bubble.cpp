@@ -3,11 +3,13 @@
 
 #include "Game/collision/collide_room.h"
 #include "Game/control/control.h"
+#include "Game/effects/Ripple.h"
 #include "Objects/objectslist.h"
 #include "Math/Math.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
+using namespace TEN::Effects::Ripple;
 using namespace TEN::Math;
 
 namespace TEN::Effects::Bubble
@@ -98,7 +100,10 @@ namespace TEN::Effects::Bubble
 			if (!TestEnvironment(ENV_FLAG_WATER, pointColl.RoomNumber))
 			{
 				bubble.IsActive = false;
-				SetupRipple(bubble.Position.x, g_Level.Rooms[bubble.RoomNumber].maxceiling, bubble.Position.z, (GetRandomControl() & 0xF) + 48, RIPPLE_FLAG_SHORT_INIT);
+				SpawnRipple(
+					Vector3(bubble.Position.x, g_Level.Rooms[bubble.RoomNumber].maxceiling, bubble.Position.z),
+					Random::GenerateFloat(48.0f, 64.0f),
+					{ RippleFlags::ShortInit });
 				continue;
 			}
 

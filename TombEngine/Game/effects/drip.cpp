@@ -3,6 +3,7 @@
 
 #include "Game/collision/collide_room.h"
 #include "Game/effects/effects.h"
+#include "Game/effects/Ripple.h"
 #include "Game/effects/weather.h"
 #include "Game/room.h"
 #include "Math/Math.h"
@@ -10,6 +11,7 @@
 #include "Specific/setup.h"
 
 using namespace TEN::Effects::Environment;
+using namespace TEN::Effects::Ripple;
 using namespace TEN::Math;
 
 namespace TEN::Effects::Drip
@@ -132,7 +134,10 @@ namespace TEN::Effects::Drip
 				drip.IsActive = false;
 
 				int waterHeight = GetWaterHeight(drip.Position.x, drip.Position.y, drip.Position.z, drip.RoomNumber);
-				SetupRipple(drip.Position.x, waterHeight, drip.Position.z, Random::GenerateInt(16, 24), RIPPLE_FLAG_SHORT_INIT | RIPPLE_FLAG_LOW_OPACITY);
+				SpawnRipple(
+					Vector3(drip.Position.x, waterHeight, drip.Position.z),
+					Random::GenerateFloat(16.0f, 24.0f),
+					{ RippleFlags::ShortInit, RippleFlags::LowOpacity  });
 			}
 
 			// Hit floor; deactivate. // TODO: Also spawn ripple.
