@@ -908,15 +908,6 @@ enum class ClothType
 	Wet
 };
 
-enum class BurnType
-{
-	None,
-	Normal,
-	Smoke,
-	Blue,
-	Blue2
-};
-
 enum class WaterStatus
 {
 	Dry,
@@ -1299,13 +1290,6 @@ struct LaraInfo
 	EulerAngles TargetOrientation;
 	int WaterSurfaceDist;
 	Pose NextCornerPos;
-
-	// TODO: Use BurnType in place of Burn, BurnBlue, and BurnSmoke. Core didn't make replacing them easy.
-	BurnType BurnType;
-	unsigned int BurnCount;
-	bool Burn;
-	byte BurnBlue;
-	bool BurnSmoke;
 
 	byte Wet[NUM_LARA_MESHES];
 	signed char Location;

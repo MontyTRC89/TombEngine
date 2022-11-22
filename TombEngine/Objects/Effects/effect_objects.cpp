@@ -14,7 +14,7 @@ void InitialiseEffectsObjects()
 	// Flame is always loaded
 	obj = &Objects[ID_FLAME];
 	{
-		obj->control = FlameControl;
+		obj->control = nullptr;
 		obj->drawRoutine = nullptr;
 		obj->usingDrawAnimatingItem = false;
 	}

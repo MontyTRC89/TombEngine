@@ -38,6 +38,18 @@ enum SpriteEnumFlag
 	SP_POISON = 0x4000
 };
 
+enum class FlameType
+{
+	Big,
+	Medium,
+	Small,
+	Static,
+	StaticFlicker,
+	GreenPulse,
+	SmallFast,
+	Trail
+};
+
 struct FX_INFO
 {
 	Pose pos;
@@ -194,7 +206,7 @@ void TriggerCyborgSpark(int x, int y, int z, short xv, short yv, short zv);
 void TriggerExplosionSparks(int x, int y, int z, int extraTrig, int dynamic, int uw, int roomNumber);
 void TriggerExplosionSmokeEnd(int x, int y, int z, int uw);
 void TriggerExplosionSmoke(int x, int y, int z, int uw);
-void TriggerFireFlame(int x, int y, int z, int fxObj, int type);
+void TriggerFireFlame(int x, int y, int z, FlameType type);
 void TriggerSuperJetFlame(ItemInfo* item, int yvel, int deadly);
 void SetupSplash(const SPLASH_SETUP* const setup, int room);
 void UpdateSplashes();
@@ -209,11 +221,11 @@ void KillAllCurrentItems(short itemNumber);
 void TriggerDynamicLight(int x, int y, int z, short falloff, byte r, byte g, byte b);
 void TriggerRocketFlame(int x, int y, int z, int xv, int yv, int zv, int itemNumber);
 void TriggerRocketSmoke(int x, int y, int z, int bodyPart);
-void TriggerFireFlame(int x, int y, int z, int flag1, int flag2);
 void TriggerFlashSmoke(int x, int y, int z, short roomNumber);
 void TriggerMetalSparks(int x, int y, int z, int xv, int yv, int zv, int additional);
 void WadeSplash(ItemInfo* item, int wh, int wd);
 void Splash(ItemInfo* item);
 void TriggerRocketFire(int x, int y, int z);
 void TriggerExplosionBubbles(int x, int y, int z, short roomNumber);
-void Richochet(Pose* pos);
+void Ricochet(Pose* pos);
+void ProcessEffects(ItemInfo* item);

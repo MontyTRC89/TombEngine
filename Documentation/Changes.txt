@@ -1,6 +1,8 @@
 Version 1.0.4
 =============
 
+* Add generic assignable effects for moveables - burn, electricity and smoke.
+* Add ability to burn enemies with flame emitters, death blocks and script functions.
 * Add Flow.EnableMassPickup option in Gameflow.lua to enable/disable mass pickup.
 * Automatically align pickups to floor surface.
 * Fix legacy pickup triggers not working.
