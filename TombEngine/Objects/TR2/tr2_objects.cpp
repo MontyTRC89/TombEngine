@@ -53,12 +53,8 @@ static void StartEntity(ObjectInfo* obj)
 		obj->radius = 340;
 		obj->intelligent = true;
 		obj->waterCreature = true;
-		obj->savePosition = true;
-		obj->saveHitpoints = true;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
 		obj->ZoneType = ZoneType::Water;
-
+		
 		g_Level.Bones[obj->boneIndex + 9 * 4] |= ROT_Y;
 	}
 
@@ -74,12 +70,8 @@ static void StartEntity(ObjectInfo* obj)
 		obj->radius = 204;
 		obj->intelligent = true;
 		obj->waterCreature = true;
-		obj->savePosition = true;
-		obj->saveHitpoints = true;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
 		obj->ZoneType = ZoneType::Water;
-
+		
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
 	}
 
@@ -94,10 +86,6 @@ static void StartEntity(ObjectInfo* obj)
 		obj->hitEffect = HIT_BLOOD;
 		obj->radius = 204;
 		obj->intelligent = true;
-		obj->savePosition = true;
-		obj->saveHitpoints = true;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
 		obj->pivotLength = 0;
 		obj->ZoneType = ZoneType::Flyer;
 	}
@@ -113,10 +101,6 @@ static void StartEntity(ObjectInfo* obj)
 		obj->hitEffect = HIT_BLOOD;
 		obj->radius = 204;
 		obj->intelligent = true;
-		obj->savePosition = true;
-		obj->saveHitpoints = true;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
 		obj->pivotLength = 0;
 		obj->ZoneType = ZoneType::Flyer;
 	}
@@ -132,10 +116,6 @@ static void StartEntity(ObjectInfo* obj)
 		obj->pivotLength = 50;
 		obj->radius = 204;
 		obj->intelligent = true;
-		obj->savePosition = true;
-		obj->saveHitpoints = true;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
 	}
 
 	obj = &Objects[ID_YETI];
@@ -150,11 +130,8 @@ static void StartEntity(ObjectInfo* obj)
 		obj->radius = 128;
 		obj->pivotLength = 100;
 		obj->intelligent = true;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-		obj->saveHitpoints = true;
-		obj->savePosition = true;
 		obj->ZoneType = ZoneType::HumanClassic;
+		
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= (ROT_Y);
 		g_Level.Bones[obj->boneIndex + 14 * 4] |= (ROT_Y);
 	}
@@ -172,10 +149,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->radius = 102;
 		obj->pivotLength = 50;
 		obj->intelligent = true;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-		obj->saveHitpoints = true;
-		obj->savePosition = true;
+		
 		g_Level.Bones[obj->boneIndex + 0] |= (ROT_X | ROT_Y);
 		g_Level.Bones[obj->boneIndex + 1 * 4] |= (ROT_X | ROT_Y);
 	}
@@ -203,10 +177,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->radius = 102;
 		obj->pivotLength = 50;
 		obj->intelligent = true;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-		obj->saveHitpoints = true;
-		obj->savePosition = true;
+		
 		g_Level.Bones[obj->boneIndex + 0] |= (ROT_X | ROT_Y);
 		g_Level.Bones[obj->boneIndex + 1 * 4] |= (ROT_X | ROT_Y);
 	}
@@ -234,10 +205,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->radius = 102;
 		obj->pivotLength = 50;
 		obj->intelligent = true;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-		obj->saveHitpoints = true;
-		obj->savePosition = true;
+		
 		g_Level.Bones[obj->boneIndex + 0] |= (ROT_X | ROT_Y);
 		g_Level.Bones[obj->boneIndex + 1 * 4] |= (ROT_X | ROT_Y);
 	}
@@ -255,10 +223,6 @@ static void StartEntity(ObjectInfo* obj)
 		obj->pivotLength = 50;
 		obj->radius = 102;
 		obj->intelligent = true;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-		obj->saveHitpoints = true;
-		obj->savePosition = true;
 		//g_Level.Bones[obj->boneIndex + 5*4] |= (ROT_X | ROT_Y);
 		//g_Level.Bones[obj->boneIndex + 14*4] |= (ROT_X | ROT_Y);
 		// TODO: get the correct torso and head Bones value and assign ROT_X and ROT_Y to it !
@@ -276,10 +240,6 @@ static void StartEntity(ObjectInfo* obj)
 		obj->pivotLength = 50;
 		obj->radius = 102;
 		obj->intelligent = true;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-		obj->saveHitpoints = true;
-		obj->savePosition = true;
 		//g_Level.Bones[obj->boneIndex + 5*4] |= (ROT_X | ROT_Y);
 		//g_Level.Bones[obj->boneIndex + 14*4] |= (ROT_X | ROT_Y);
 		// TODO: get the correct torso and head Bones value and assign ROT_X and ROT_Y to it !
@@ -297,10 +257,6 @@ static void StartEntity(ObjectInfo* obj)
 		obj->pivotLength = 0;
 		obj->radius = 102;
 		obj->intelligent = true;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-		obj->saveHitpoints = true;
-		obj->savePosition = true;
 	}
 
 	obj = &Objects[ID_BIG_SPIDER];
@@ -315,10 +271,6 @@ static void StartEntity(ObjectInfo* obj)
 		obj->pivotLength = 0;
 		obj->radius = 102;
 		obj->intelligent = true;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-		obj->saveHitpoints = true;
-		obj->savePosition = true;
 	}
 
 	obj = &Objects[ID_WORKER_DUAL_REVOLVER];
@@ -333,10 +285,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->pivotLength = 0;
 		obj->radius = 102;
 		obj->intelligent = true;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-		obj->saveHitpoints = true;
-		obj->savePosition = true;
+		
 		g_Level.Bones[obj->boneIndex + 11 * 4] |= (ROT_X | ROT_Y);
 		g_Level.Bones[obj->boneIndex + 0 * 4] |= (ROT_X | ROT_Y);
 	}
@@ -353,10 +302,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->pivotLength = 0;
 		obj->radius = 341;
 		obj->intelligent = true;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-		obj->saveHitpoints = true;
-		obj->savePosition = true;
+		
 		g_Level.Bones[obj->boneIndex + 14 * 4] |= (ROT_X | ROT_Y);
 	}
 
@@ -372,10 +318,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->pivotLength = 0;
 		obj->radius = 102;
 		obj->intelligent = true;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-		obj->saveHitpoints = true;
-		obj->savePosition = true;
+		
 		g_Level.Bones[obj->boneIndex + 4 * 4] |= (ROT_X | ROT_Y);
 		g_Level.Bones[obj->boneIndex + 14 * 4] |= (ROT_X | ROT_Y);
 	}
@@ -392,10 +335,6 @@ static void StartEntity(ObjectInfo* obj)
 		obj->pivotLength = 50;
 		obj->radius = 102;
 		obj->intelligent = true;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-		obj->saveHitpoints = true;
-		obj->savePosition = true;
 		//g_Level.Bones[obj->boneIndex + 8 * 4] |= (ROT_X | ROT_Y);
 		//g_Level.Bones[obj->boneIndex + 0 * 4] |= (ROT_X | ROT_Y);
 		// TODO: find the correct for Bones (knifethrower).
@@ -417,10 +356,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->pivotLength = 0;
 		obj->radius = 102;
 		obj->intelligent = true;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-		obj->saveHitpoints = true;
-		obj->savePosition = true;
+		
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= (ROT_X | ROT_Y);
 		g_Level.Bones[obj->boneIndex + 8 * 4] |= (ROT_X | ROT_Y);
 	}
@@ -437,10 +373,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->pivotLength = 0;
 		obj->radius = 102;
 		obj->intelligent = true;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-		obj->saveHitpoints = true;
-		obj->savePosition = true;
+		
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= (ROT_X | ROT_Y);
 		g_Level.Bones[obj->boneIndex + 8 * 4] |= (ROT_X | ROT_Y);
 	}
@@ -467,10 +400,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->pivotLength = 0;
 		obj->radius = 102;
 		obj->intelligent = true;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-		obj->saveHitpoints = true;
-		obj->savePosition = true;
+		
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= (ROT_X | ROT_Y);
 		g_Level.Bones[obj->boneIndex + 8 * 4] |= (ROT_X | ROT_Y);
 	}
@@ -487,10 +417,6 @@ static void StartEntity(ObjectInfo* obj)
 		obj->pivotLength = 0;
 		obj->radius = 204;
 		obj->intelligent = true;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-		obj->saveHitpoints = true;
-		obj->savePosition = true;
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= (ROT_X | ROT_Y);
 	}
 
@@ -506,10 +432,6 @@ static void StartEntity(ObjectInfo* obj)
 		obj->pivotLength = 0;
 		obj->radius = 204;
 		obj->intelligent = true;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-		obj->saveHitpoints = true;
-		obj->savePosition = true;
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= (ROT_X | ROT_Y);
 	}
 
@@ -526,10 +448,6 @@ static void StartEntity(ObjectInfo* obj)
 		obj->pivotLength = 0;
 		obj->radius = 204;
 		obj->intelligent = true;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-		obj->saveHitpoints = true;
-		obj->savePosition = true;
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= (ROT_X | ROT_Y);
 		g_Level.Bones[obj->boneIndex + 16 * 4] |= (ROT_X | ROT_Y);
 		// TODO: Bones value is not correct (shiva) !
@@ -549,10 +467,6 @@ static void StartEntity(ObjectInfo* obj)
 		obj->pivotLength = 0;
 		obj->radius = 204;
 		obj->intelligent = true;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-		obj->saveHitpoints = true;
-		obj->savePosition = true;
 		//g_Level.Bones[obj->boneIndex + 6 * 4] |= (ROT_X | ROT_Y);
 		//g_Level.Bones[obj->boneIndex + 12 * 4] |= (ROT_X | ROT_Y);
 		// TODO: get the correct id for Bones ! (spear)
@@ -571,10 +485,6 @@ static void StartEntity(ObjectInfo* obj)
 		obj->pivotLength = 300;
 		obj->radius = 256;
 		obj->intelligent = true;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-		obj->saveHitpoints = true;
-		obj->savePosition = true;
 		g_Level.Bones[obj->boneIndex + 10 * 4] |= ROT_Z;
 	}
 
@@ -588,9 +498,6 @@ static void StartEntity(ObjectInfo* obj)
 		obj->control = DragonControl;
 		obj->hitEffect = HIT_BLOOD;
 		obj->radius = 256;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-		obj->savePosition = true;
 	}
 
 	obj = &Objects[ID_MARCO_BARTOLI];
@@ -598,8 +505,6 @@ static void StartEntity(ObjectInfo* obj)
 	{
 		obj->initialise = InitialiseBartoli;
 		obj->control = BartoliControl;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
 	}
 
 	obj = &Objects[ID_SNOWMOBILE_GUN];
@@ -613,10 +518,6 @@ static void StartEntity(ObjectInfo* obj)
 		obj->pivotLength = 0;
 		obj->radius = 256;
 		obj->intelligent = true;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-		obj->saveHitpoints = true;
-		obj->savePosition = true;
 	}
 
 	obj = &Objects[ID_SNOWMOBILE_DRIVER];
@@ -626,9 +527,6 @@ static void StartEntity(ObjectInfo* obj)
 		obj->control = SkidooManControl;
 		obj->HitPoints = 1;
 		obj->hitEffect = HIT_BLOOD;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-		obj->savePosition = true;
 	}
 }
 
@@ -645,17 +543,12 @@ static void StartTrap(ObjectInfo* obj)
 		obj->initialise = InitialiseSpinningBlade;
 		obj->control = SpinningBladeControl;
 		obj->collision = ObjectCollision;
-		obj->savePosition = true;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
 	}
 
 	obj = &Objects[ID_SPRINGBOARD];
 	if (obj->loaded)
 	{
 		obj->control = SpringBoardControl;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
 	}
 
 	obj = &Objects[ID_STATUE_WITH_BLADE];
@@ -664,9 +557,6 @@ static void StartTrap(ObjectInfo* obj)
 		obj->initialise = InitialiseKillerStatue;
 		obj->control = KillerStatueControl;
 		obj->collision = ObjectCollision;
-		obj->savePosition = true;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
 	}
 }
 
@@ -680,9 +570,6 @@ static void StartVehicles(ObjectInfo* obj)
 		obj->initialise = InitialiseSpeedboat;
 		obj->collision = SpeedboatPlayerCollision;
 		obj->control = SpeedboatControl;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-		obj->savePosition = true;
 		obj->hitEffect = HIT_RICOCHET;
 		obj->shadowType = ShadowMode::Lara;
 	}
@@ -693,9 +580,6 @@ static void StartVehicles(ObjectInfo* obj)
 		obj->initialise = InitialiseSkidoo;
 		obj->collision = SkidooPlayerCollision;
 		//obj->drawRoutine = DrawSkidoo; // TODO: create a new render for the skidoo. (with track animated)
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-		obj->savePosition = true;
 		obj->hitEffect = HIT_RICOCHET;
 		obj->shadowType = ShadowMode::Lara;
 	}
