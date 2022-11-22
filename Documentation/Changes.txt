@@ -11,6 +11,7 @@ Version 1.0.4
 * Fix puzzle holes not swapping to puzzle done objects.
 * Fix several collision and sound source issues in flipped rooms.
 * Fix several pushable object collision bugs.
+* Fix TR1 centaur bubble targetting.
 
 Version 1.0.3
 =============
