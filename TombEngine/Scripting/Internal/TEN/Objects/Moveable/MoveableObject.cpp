@@ -663,7 +663,7 @@ void Moveable::SetOCB(short ocb)
 
 void Moveable::SetEffect(EffectType effectType, sol::optional<float> timeout)
 {
-	int realTimeout = timeout.has_value() ? int(timeout.value() * FPS) : DEFAULT_NONLETHAL_EFFECT_TIMEOUT;
+	int realTimeout = timeout.has_value() ? int(timeout.value() * FPS) : -1;
 
 	switch (effectType)
 	{
