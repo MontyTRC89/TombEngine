@@ -15,6 +15,10 @@ Version 1.0.4
 * Fix several pushable sound and object collision bugs.
 * Fix TR1 centaur bubble targetting.
 
+Lua API changes:
+* Add new Moveable functions:
+	- GetEffect / SetEffect
+
 Version 1.0.3
 =============
 
