@@ -13,6 +13,7 @@ namespace TEN::Effects::Ripple
 		LowOpacity = 2,
 		Blood	   = 3,
 		NoRandom   = 4,
+		Ground	   = 5,
 
 		Count
 	};
@@ -23,6 +24,7 @@ namespace TEN::Effects::Ripple
 		unsigned int SpriteIndex = 0;
 
 		Vector3 Position = Vector3::Zero;
+		Vector3 Normal	 = Vector3::Zero;
 		Vector4 Color	 = Vector4::Zero;
 
 		float Life	  = 0.0f;
@@ -37,7 +39,7 @@ namespace TEN::Effects::Ripple
 
 	Ripple& GetFreeRipple();
 
-	void SpawnRipple(const Vector3& pos, float scale, const std::vector<unsigned int>& flags = {});
+	void SpawnRipple(const Vector3& pos, float scale, const std::vector<unsigned int>& flags = {}, const Vector3& normal = Vector3::Down);
 	void SpawnUnderwaterBlood(const Vector3& pos, float scale);
 
 	void UpdateRipples();

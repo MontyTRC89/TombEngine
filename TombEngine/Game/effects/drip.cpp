@@ -19,6 +19,8 @@ namespace TEN::Effects::Drip
 	constexpr auto DRIP_LIFE_SHORT_MAX = 1.0f;
 	constexpr auto DRIP_LIFE_LONG_MAX  = 4.0f;
 
+	constexpr auto DRIP_HEIGHT_OFFSET = 4;
+
 	constexpr auto DRIP_COLOR_WHITE = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
 
 	std::array<DripParticle, DRIP_NUM_MAX> DripParticles = {};
@@ -127,26 +129,38 @@ namespace TEN::Effects::Drip
 			drip.Color = Vector4::Lerp(DRIP_COLOR_WHITE, Vector4::Zero, lifeAlpha);
 			drip.Height = Lerp(DRIP_WIDTH / (1 / 6.4f), 0, lifeAlpha);
 
-			// Hit water; spawn ripple.
-			if (TestEnvironment(ENV_FLAG_WATER, drip.RoomNumber) &&
-				!TestEnvironment(ENV_FLAG_WATER, prevRoomNumber))
+			// Hit water.
+			if (TestEnvironment(ENV_FLAG_WATER, drip.RoomNumber))
 			{
 				drip.IsActive = false;
 
-				int waterHeight = GetWaterHeight(drip.Position.x, drip.Position.y, drip.Position.z, drip.RoomNumber);
-				SpawnRipple(
-					Vector3(drip.Position.x, waterHeight, drip.Position.z),
-					Random::GenerateFloat(16.0f, 24.0f),
-					{ RippleFlags::ShortInit, RippleFlags::LowOpacity  });
-			}
+				// Spawn ripple.
+				if (!TestEnvironment(ENV_FLAG_WATER, prevRoomNumber))
+				{
+					int waterHeight = GetWaterHeight(drip.Position.x, drip.Position.y, drip.Position.z, drip.RoomNumber);
+					SpawnRipple(
+						Vector3(drip.Position.x, waterHeight - DRIP_HEIGHT_OFFSET, drip.Position.z),
+						Random::GenerateFloat(16.0f, 24.0f),
+						{ RippleFlags::ShortInit, RippleFlags::LowOpacity });
+				}
 
-			// Hit floor; deactivate. // TODO: Also spawn ripple.
-			if (drip.Position.y >= pointColl.Position.Floor)
+			}
+			// Hit floor; spawn ripple.
+			else if (drip.Position.y >= pointColl.Position.Floor)
+			{
 				drip.IsActive = false;
-			
+
+				SpawnRipple(
+					Vector3(drip.Position.x, pointColl.Position.Floor - DRIP_HEIGHT_OFFSET, drip.Position.z),
+					Random::GenerateFloat(8.0f, 24.0f),
+					{ RippleFlags::ShortInit, RippleFlags::Ground },
+					Geometry::GetFloorNormal(pointColl.FloorTilt));
+			}
 			// Hit ceiling; deactivate.
-			if (drip.Position.y <= pointColl.Position.Ceiling)
+			else if (drip.Position.y <= pointColl.Position.Ceiling)
+			{
 				drip.IsActive = false;
+			}
 		}
 	}
 

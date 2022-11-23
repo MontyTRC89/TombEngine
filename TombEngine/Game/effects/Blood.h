@@ -8,6 +8,7 @@ struct CollisionResult;
 namespace TEN::Effects::Blood
 {
 	constexpr auto BLOOD_DRIP_NUM_MAX  = 512;
+	constexpr auto BLOOD_CLOUD_NUM_MAX = 512;
 	constexpr auto BLOOD_STAIN_NUM_MAX = 192;
 
 	constexpr auto BLOOD_DRIP_SPRAY_NUM_DEFAULT = 2;
@@ -27,6 +28,11 @@ namespace TEN::Effects::Blood
 		float Gravity = 0.0f;
 	};
 
+	struct BloodCloud
+	{
+
+	};
+
 	struct BloodStain
 	{
 		unsigned int SpriteIndex = 0;
@@ -43,19 +49,17 @@ namespace TEN::Effects::Blood
 
 		float Life			  = 0.0f;
 		float LifeStartFading = 0.0f;
-
-		float Scale		= 0.0f;
-		float ScaleMax	= 0.0f;
-		float ScaleRate = 0.0f;
-
-		float Opacity	   = 0.0f;
-		float OpacityStart = 0.0f;
-
-		float DelayTime = 0.0f;
+		float Scale			  = 0.0f;
+		float ScaleMax		  = 0.0f;
+		float ScaleRate		  = 0.0f;
+		float Opacity		  = 0.0f;
+		float OpacityStart	  = 0.0f;
+		float DelayTime		  = 0.0f;
 	};
 
-	extern std::array<BloodDrip, BLOOD_DRIP_NUM_MAX> BloodDrips;
-	extern std::deque<BloodStain>					 BloodStains;
+	extern std::array<BloodDrip, BLOOD_DRIP_NUM_MAX>   BloodDrips;
+	extern std::array<BloodCloud, BLOOD_CLOUD_NUM_MAX> BloodClouds;
+	extern std::deque<BloodStain>					   BloodStains;
 
 	BloodDrip&			   GetFreeBloodDrip();
 	std::array<Vector3, 4> GetBloodStainVertexPoints(const Vector3& pos, short orient2D, const Vector3& normal, float scale);
@@ -64,7 +68,8 @@ namespace TEN::Effects::Blood
 
 	void SpawnBloodMist(const Vector3& pos, int roomNumber, const Vector3& direction, unsigned int count);
 	void SpawnBloodMistCloud(const Vector3& pos, int roomNumber, const Vector3& direction, float velocity, unsigned int count);
-	void SpawnBloodMistCloudUnderwater(const Vector3& pos, int roomNumber, float velocity);
+
+	void SpawnBloodCloudUnderwater(const Vector3& pos, int roomNumber, float scale);
 
 	void SpawnBloodDrip(const Vector3& pos, int roomNumber, const Vector3& velocity, float scale);
 	void SpawnBloodDripSpray(const Vector3& pos, int roomNumber, const Vector3& direction, const Vector3& baseVelocity, unsigned int count = BLOOD_DRIP_SPRAY_NUM_DEFAULT);

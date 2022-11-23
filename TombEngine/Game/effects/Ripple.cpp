@@ -36,7 +36,7 @@ namespace TEN::Effects::Ripple
 		return *oldestRipplePtr;
 	}
 
-	void SpawnRipple(const Vector3& pos, float scale, const std::vector<unsigned int>& flags)
+	void SpawnRipple(const Vector3& pos, float scale, const std::vector<unsigned int>& flags, const Vector3& normal)
 	{
 		auto& ripple = GetFreeRipple();
 
@@ -44,13 +44,17 @@ namespace TEN::Effects::Ripple
 		ripple.IsActive = true;
 		ripple.SpriteIndex = SPR_RIPPLES;
 		ripple.Position = pos;
+		ripple.Normal = normal;
 		ripple.Life = Random::GenerateFloat(16.0f, 64.0f);
-		ripple.Init = 1;
+		ripple.Init = 1.0f;
 		ripple.Scale = scale;
 		ripple.Flags.Set(flags);
 
 		if (ripple.Flags.Test(RippleFlags::NoRandom))
 			ripple.Position += Vector3(Random::GenerateFloat(-64.0f, 64.0f), 0.0f, Random::GenerateFloat(-64.0f, 64.0f));
+
+		if (ripple.Flags.Test(RippleFlags::Ground))
+			ripple.Life = Random::GenerateFloat(16.0f, 24.0f);
 	}
 
 	void SpawnUnderwaterBlood(const Vector3& pos, float scale)
@@ -63,8 +67,9 @@ namespace TEN::Effects::Ripple
 		ripple.IsActive = true;
 		ripple.SpriteIndex = 0;
 		ripple.Position = pos + Vector3(Random::GenerateFloat(-32.0f, 32.0f), 0.0f, Random::GenerateFloat(-32.0f, 32.0f));
+		ripple.Normal = Vector3::Zero; // Unused by underwater blood rendering.
 		ripple.Life = Random::GenerateFloat(240.0f, 248.0f);
-		ripple.Init = 1;
+		ripple.Init = 1.0f;
 		ripple.Scale = scale;
 		ripple.Flags.Set(flags);
 	}

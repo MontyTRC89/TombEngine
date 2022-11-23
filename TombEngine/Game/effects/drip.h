@@ -14,11 +14,11 @@ namespace TEN::Effects::Drip
 		int		RoomNumber = NO_ROOM;
 		Vector3 Velocity   = Vector3::Zero;
 		Vector4 Color	   = Vector4::Zero;
+		float	Height	   = 0.0f;
 
 		float Life	  = 0.0f;
 		float LifeMax = 0.0f;
 		float Gravity = 0.0f;
-		float Height  = 0.0f;
 	};
 
 	extern std::array<DripParticle, DRIP_NUM_MAX> DripParticles;

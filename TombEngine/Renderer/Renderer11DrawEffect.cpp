@@ -438,7 +438,7 @@ namespace TEN::Renderer
 				AddSpriteBillboardConstrainedLookAt(
 					&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex] + ripple.SpriteIndex,
 					ripple.Position,
-					color, 0.0f, 1.0f, Vector2(ripple.Scale, ripple.Scale) * 2, BLENDMODE_ADDITIVE, Vector3::Down, true, view);
+					color, 0.0f, 1.0f, Vector2(ripple.Scale, ripple.Scale) * 2, BLENDMODE_ADDITIVE, ripple.Normal, true, view);
 			}
 		}
 	}

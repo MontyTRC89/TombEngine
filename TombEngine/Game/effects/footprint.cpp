@@ -20,7 +20,7 @@ namespace TEN::Effects::Footprints
 
 	constexpr auto FOOTPRINT_SCALE		   = 64.0f;
 	constexpr auto FOOTPRINT_HEIGHT_OFFSET = 4;
-	constexpr auto FOOT_HEIGHT_OFFSET	   = CLICK(1.0f / 4);
+	constexpr auto FOOT_HEIGHT_OFFSET	   = CLICK(1 / 4.0f);
 
 	const auto FootprintMaterials = std::vector<FLOOR_MATERIAL>
 	{

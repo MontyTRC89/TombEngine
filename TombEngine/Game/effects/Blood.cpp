@@ -125,12 +125,12 @@ namespace TEN::Effects::Blood
 		}
 	}
 
-	void SpawnBloodMistCloudUnderwater(const Vector3& pos, int roomNumber, float velocity)
+	void SpawnBloodCloudUnderwater(const Vector3& pos, int roomNumber, float scale)
 	{
 		if (!TestEnvironment(ENV_FLAG_WATER, roomNumber))
 			return;
 		
-		SpawnUnderwaterBlood(pos, velocity);
+		SpawnUnderwaterBlood(pos, scale);
 	}
 
 	void SpawnBloodDrip(const Vector3& pos, int roomNumber, const Vector3& velocity, float scale)
@@ -252,6 +252,12 @@ namespace TEN::Effects::Blood
 
 			drip.RoomNumber = pointColl.RoomNumber;
 
+			// Hit water; spawn blood cloud.
+			if (TestEnvironment(ENV_FLAG_WATER, drip.RoomNumber))
+			{
+				drip.IsActive = false;
+				SpawnBloodCloudUnderwater(drip.Position, drip.RoomNumber, drip.Scale * 5);
+			}
 			// Hit wall or ceiling; deactivate.
 			if (pointColl.Position.Floor == NO_HEIGHT || drip.Position.y <= pointColl.Position.Ceiling)
 			{
@@ -263,8 +269,6 @@ namespace TEN::Effects::Blood
 				drip.IsActive = false;
 				SpawnBloodStainFromDrip(drip, pointColl);
 			}
-
-			// Spawn blood mist cloud in water.
 		}
 	}
 
