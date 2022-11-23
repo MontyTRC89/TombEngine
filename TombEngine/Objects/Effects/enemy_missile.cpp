@@ -170,12 +170,12 @@ namespace TEN::Entities::Effects
 			else
 				fx->speed += 3;
 
-			int dy = orient.y - fx->pos.Orientation.y;
-			if (abs(dy) > 0x8000)
+			short dy = orient.y - fx->pos.Orientation.y;
+			if (abs(dy) > abs(ANGLE(180.0f)))
 				dy = -dy;
 
-			int dx = orient.x - fx->pos.Orientation.x;
-			if (abs(dx) > 0x8000)
+			short dx = orient.x - fx->pos.Orientation.x;
+			if (abs(dx) > abs(ANGLE(180.0f)))
 				dx = -dx;
 
 			dy >>= 3;
