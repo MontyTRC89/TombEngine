@@ -63,8 +63,7 @@ namespace TEN::Entities::Generic
 	const auto LadderInteractBounds2D = GameBoundingBox(
 		-BLOCK(1.0f / 4), BLOCK(1.0f / 4),
 		0, 0,
-		-BLOCK(3.0f / 8), BLOCK(3.0f / 8)
-	);
+		-BLOCK(3.0f / 8), BLOCK(3.0f / 8));
 
 	const auto LadderMountTopFrontBasis = InteractionBasis(
 		LadderMountedOffset2D, // TODO
@@ -72,52 +71,45 @@ namespace TEN::Entities::Generic
 		LadderInteractBounds2D,
 		std::pair(
 			EulerAngles(ANGLE(-10.0f), ANGLE(180.0f) - LARA_GRAB_THRESHOLD, ANGLE(-10.0f)),
-			EulerAngles(ANGLE(10.0f), ANGLE(180.0f) + LARA_GRAB_THRESHOLD, ANGLE(10.0f))
-		)
-	);
+			EulerAngles(ANGLE(10.0f), ANGLE(180.0f) + LARA_GRAB_THRESHOLD, ANGLE(10.0f))));
+
 	const auto LadderMountTopBackBasis = InteractionBasis(
 		LadderMountedOffset2D, // TODO
 		LadderInteractBounds2D,
 		std::pair(
 			EulerAngles(ANGLE(-10.0f), -LARA_GRAB_THRESHOLD, ANGLE(-10.0f)),
-			EulerAngles(ANGLE(10.0f), LARA_GRAB_THRESHOLD, ANGLE(10.0f))
-		)
-	);
+			EulerAngles(ANGLE(10.0f), LARA_GRAB_THRESHOLD, ANGLE(10.0f))));
+
 	const auto LadderMountFrontBasis = InteractionBasis(
 		LadderMountedOffset2D,
 		LadderInteractBounds2D,
 		std::pair(
 			EulerAngles(ANGLE(-10.0f), -LARA_GRAB_THRESHOLD, ANGLE(-10.0f)),
-			EulerAngles(ANGLE(10.0f), LARA_GRAB_THRESHOLD, ANGLE(10.0f))
-		)
-	);
+			EulerAngles(ANGLE(10.0f), LARA_GRAB_THRESHOLD, ANGLE(10.0f))));
+
 	const auto LadderMountBackBasis = InteractionBasis(
 		LadderMountedOffset2D,
 		EulerAngles(0, ANGLE(180.0f), 0),
 		LadderInteractBounds2D,
 		std::pair(
 			EulerAngles(ANGLE(-10.0f), ANGLE(180.0f) - LARA_GRAB_THRESHOLD, ANGLE(-10.0f)),
-			EulerAngles(ANGLE(10.0f), ANGLE(180.0f) + LARA_GRAB_THRESHOLD, ANGLE(10.0f))
-		)
-	);
+			EulerAngles(ANGLE(10.0f), ANGLE(180.0f) + LARA_GRAB_THRESHOLD, ANGLE(10.0f))));
+
 	const auto LadderMountLeftBasis = InteractionBasis(
 		LadderMountedOffset2D + Vector3i(-BLOCK(1.0f / 4), 0, 0),
 		EulerAngles(0, ANGLE(90.0f), 0),
 		LadderInteractBounds2D,
 		std::pair(
 			EulerAngles(ANGLE(-10.0f), ANGLE(90.0f) - LARA_GRAB_THRESHOLD, ANGLE(-10.0f)),
-			EulerAngles(ANGLE(10.0f), ANGLE(90.0f) + LARA_GRAB_THRESHOLD, ANGLE(10.0f))
-		)
-	);
+			EulerAngles(ANGLE(10.0f), ANGLE(90.0f) + LARA_GRAB_THRESHOLD, ANGLE(10.0f))));
+
 	const auto LadderMountRightBasis = InteractionBasis(
 		LadderMountedOffset2D + Vector3i(BLOCK(1.0f / 4), 0, 0),
 		EulerAngles(0, ANGLE(-90.0f), 0),
 		LadderInteractBounds2D,
 		std::pair(
 			EulerAngles(ANGLE(-10.0f), ANGLE(-90.0f) - LARA_GRAB_THRESHOLD, ANGLE(-10.0f)),
-			EulerAngles(ANGLE(10.0f), ANGLE(-90.0f) + LARA_GRAB_THRESHOLD, ANGLE(10.0f))
-		)
-	);
+			EulerAngles(ANGLE(10.0f), ANGLE(-90.0f) + LARA_GRAB_THRESHOLD, ANGLE(10.0f))));
 
 	void LadderCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 	{
