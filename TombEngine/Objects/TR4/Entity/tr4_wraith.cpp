@@ -4,7 +4,7 @@
 #include "Game/collision/collide_room.h"
 #include "Game/control/flipeffect.h"
 #include "Game/effects/effects.h"
-#include "Game/effects/lara_fx.h"
+#include "Game/effects/item_fx.h"
 #include "Game/effects/tomb4fx.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
@@ -17,7 +17,7 @@
 #include "Specific/level.h"
 #include "Math/Math.h"
 
-using namespace TEN::Effects::Lara;
+using namespace TEN::Effects::Items;
 
 namespace TEN::Entities::TR4
 {
@@ -245,7 +245,7 @@ namespace TEN::Entities::TR4
 				{
 					item->ItemFlags[1] += 400;
 					if (item->ItemFlags[1] > 8000)
-						LaraBurn(LaraItem);
+						ItemBurn(LaraItem);
 				}
 			}
 			else if (target->ObjectNumber == ID_ANIMATING10)

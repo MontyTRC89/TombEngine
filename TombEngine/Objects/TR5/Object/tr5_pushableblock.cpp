@@ -270,7 +270,6 @@ void PushableBlockControl(short itemNumber)
 				}
 			}
 
-
 			if (TrInput & IN_ACTION)
 			{
 				if (!TestBlockPush(item, blockHeight, quadrant))
@@ -553,16 +552,14 @@ void PushEnd(ItemInfo* item) // Do Flipeffect 19 in anims
 
 bool TestBlockMovable(ItemInfo* item, int blockHeight)
 {
+	UpdateBridgeItem(item->Index, true);
 	auto probe = GetCollision(item);
+	UpdateBridgeItem(item->Index);
 
 	if (probe.Block->IsWall(probe.Block->SectorPlane(item->Pose.Position.x, item->Pose.Position.z)))
 		return false;
 
-	int height = probe.Position.Floor;
-	if (((PushableInfo*)item->Data)->hasFloorCeiling)
-		height += blockHeight;
-
-	if (height != item->Pose.Position.y)
+	if (probe.Position.Floor != item->Pose.Position.y)
 		return false;
 
 	return true;

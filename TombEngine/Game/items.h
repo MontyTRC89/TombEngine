@@ -80,6 +80,14 @@ struct OffsetBlendData
 	void DisplayDebug();
 };
 
+enum class EffectType
+{
+	None,
+	Fire,
+	Sparks,
+	Smoke
+};
+
 struct EntityAnimationData
 {
 	int AnimNumber	  = -1;
@@ -90,13 +98,35 @@ struct EntityAnimationData
 
 	bool IsAirborne	= false;
 	Vector3 Velocity = Vector3::Zero; // CONVENTION: +X = right, +Y = down, +Z = forward
+};
+
+struct EntityModelData
+{
+	int BaseMesh;
+	std::vector<int> MeshIndex = {};
 	std::vector<BoneMutator> Mutator = {};
+};
+
+struct EntityCallbackData
+{
+	std::string OnKilled;
+	std::string OnHit;
+	std::string OnObjectCollided;
+	std::string OnRoomCollided;
+};
+
+struct EntityEffectData
+{
+	EffectType Type = EffectType::None;
+	Vector3 LightColor = Vector3::One;
+	int Count = -1;
 };
 
 //todo we need to find good "default states" for a lot of these - squidshire 25/05/2022
 struct ItemInfo
 {
 	GAME_OBJECT_ID ObjectNumber;
+	std::string Name;
 
 	int Status;	// ItemStatus enum.
 	bool Active;
@@ -107,6 +137,10 @@ struct ItemInfo
 
 	ITEM_DATA Data;
 	EntityAnimationData Animation;
+	EntityCallbackData Callbacks;
+	EntityModelData Model;
+	EntityEffectData Effect;
+	
 	Pose StartPose;
 	Pose Pose;
 	ROOM_VECTOR Location;
@@ -125,7 +159,6 @@ struct ItemInfo
 
 	BitField TouchBits	  = BitField();
 	BitField MeshBits	  = BitField();
-	BitField MeshSwapBits = BitField();
 
 	unsigned short Flags; // ItemFlags enum
 	short ItemFlags[8];
@@ -136,13 +169,6 @@ struct ItemInfo
 	short AfterDeath;
 	short CarriedItem;
 
-	// Lua
-	std::string LuaName;
-	std::string LuaCallbackOnKilledName;
-	std::string LuaCallbackOnHitName;
-	std::string LuaCallbackOnCollidedWithObjectName;
-	std::string LuaCallbackOnCollidedWithRoomName;
-
 	OffsetBlendData OffsetBlend = {};
 
 	bool TestOcb(short ocbFlags);
@@ -152,10 +178,17 @@ struct ItemInfo
 	bool TestFlags(short id, short value);
 	void SetFlags(short id, short value);
 
+	bool TestMeshSwapFlags(unsigned int flags);
+	bool TestMeshSwapFlags(const std::vector<unsigned int>& flags);
+	void SetMeshSwapFlags(unsigned int flags, bool clear = false);
+	void SetMeshSwapFlags(const std::vector<unsigned int>& flags, bool clear = false);
+
 	bool IsLara() const;
 	bool IsCreature() const;
 
 	void DoOffsetBlend();
+
+	void ResetModelToDefault();
 };
 
 bool TestState(int refState, const std::vector<int>& stateList);
@@ -173,7 +206,9 @@ void KillEffect(short fxNumber);
 void InitialiseItem(short itemNumber);
 void InitialiseItemArray(int totalItems);
 void KillItem(short itemNumber);
-void UpdateItemRoom(ItemInfo* item, int height, int xOffset = 0, int zOffset = 0);
+void UpdateItemRoom(short itemNumber);
+void UpdateAllItems();
+void UpdateAllEffects();
 std::vector<int> FindAllItems(short objectNumber);
 ItemInfo* FindItem(int objectNumber);
 int FindItem(ItemInfo* item);

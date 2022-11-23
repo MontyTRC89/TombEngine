@@ -286,6 +286,9 @@ namespace TEN::Entities::Vehicles
 	{
 		for (auto i : g_Level.Rooms[minecartItem->RoomNumber].neighbors)
 		{
+			if (!g_Level.Rooms[i].Active())
+				continue;
+
 			short itemNumber = g_Level.Rooms[i].itemNumber;
 
 			while (itemNumber != NO_ITEM)
@@ -741,7 +744,7 @@ namespace TEN::Entities::Vehicles
 				if (laraItem->Animation.FrameNumber == GetFrameNumber(minecartItem, MINECART_WRENCH_MESH_TOGGLE_FRAME) &&
 					minecart->Flags & MINECART_FLAG_WRENCH_MESH)
 				{
-					lara->MeshPtrs[LM_RHAND] = Objects[ID_LARA_SKIN].meshIndex + LM_RHAND;
+					laraItem->Model.MeshIndex[LM_RHAND] = laraItem->Model.BaseMesh + LM_RHAND;
 					minecart->Flags &= ~MINECART_FLAG_WRENCH_MESH;
 				}
 
@@ -790,7 +793,7 @@ namespace TEN::Entities::Vehicles
 				if (!(minecart->Flags & MINECART_FLAG_WRENCH_MESH) &&
 					laraItem->Animation.FrameNumber == GetFrameNumber(minecartItem, MINECART_WRENCH_MESH_TOGGLE_FRAME))
 				{
-					lara->MeshPtrs[LM_RHAND] = Objects[ID_MINECART_LARA_ANIMS].meshIndex + LM_RHAND;
+					laraItem->Model.MeshIndex[LM_RHAND] = Objects[ID_MINECART_LARA_ANIMS].meshIndex + LM_RHAND;
 					minecart->Flags |= MINECART_FLAG_WRENCH_MESH;
 				}
 			}

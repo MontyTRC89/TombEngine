@@ -67,29 +67,12 @@ void SarcophagusCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* c
 		}
 	}
 	else if (laraItem->Animation.AnimNumber != LA_PICKUP_SARCOPHAGUS ||
-		laraItem->Animation.FrameNumber != g_Level.Anims[LA_PICKUP_SARCOPHAGUS].frameBase + 113)
+			 laraItem->Animation.FrameNumber != g_Level.Anims[LA_PICKUP_SARCOPHAGUS].frameBase + 113)
 	{
 		ObjectCollision(itemNumber, laraItem, coll);
 	}
 	else
 	{
-		short linkNumber;
-		for (linkNumber = g_Level.Items[g_Level.Rooms[sarcItem->RoomNumber].itemNumber].NextItem; linkNumber != NO_ITEM; linkNumber = g_Level.Items[linkNumber].NextItem)
-		{
-			auto* currentItem = &g_Level.Items[linkNumber];
-
-			if (linkNumber != itemNumber &&
-				currentItem->Pose.Position.x == sarcItem->Pose.Position.x &&
-				currentItem->Pose.Position.z == sarcItem->Pose.Position.z)
-			{
-				if (Objects[currentItem->ObjectNumber].isPickup)
-				{
-					PickedUpObject(currentItem->ObjectNumber);
-					currentItem->Status = ITEM_INVISIBLE;
-					currentItem->ItemFlags[3] = 1;
-					AddDisplayPickup(currentItem->ObjectNumber);
-				}
-			}
-		}
+		CollectMultiplePickups(sarcItem->Index);
 	}
 }

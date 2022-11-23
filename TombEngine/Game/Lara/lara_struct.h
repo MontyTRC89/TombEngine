@@ -964,15 +964,6 @@ enum class ClothType
 	Wet
 };
 
-enum class BurnType
-{
-	None,
-	Normal,
-	Smoke,
-	Blue,
-	Blue2
-};
-
 enum class WaterStatus
 {
 	Dry,
@@ -1041,6 +1032,7 @@ public:
 
 	Ammo& operator --()
 	{
+		assert(this->Count > 0);
 		--this->Count;
 		return *this;
 	}
@@ -1126,11 +1118,13 @@ struct HolsterInfo
 
 struct CarriedWeaponInfo
 {
-	bool Present;
-	Ammo Ammo[(int)WeaponAmmoType::NumAmmoTypes];
-	WeaponAmmoType SelectedAmmo; // WeaponAmmoType_enum
-	bool HasLasersight; // TODO: Duplicated in LaraInventoryData.
-	bool HasSilencer;	// TODO: Duplicated in LaraInventoryData.
+	bool Present	   = false;
+	bool HasLasersight = false; // TODO: Duplicated in LaraInventoryData.
+	bool HasSilencer   = false; // TODO: Unused and duplicated in LaraInventoryData.
+
+	Ammo Ammo[(int)WeaponAmmoType::NumAmmoTypes] = {};
+	WeaponAmmoType SelectedAmmo = WeaponAmmoType::Ammo1; // WeaponAmmoType_enum
+	LaraWeaponTypeCarried WeaponMode = LaraWeaponTypeCarried::WTYPE_MISSING;
 };
 
 struct ArmInfo
@@ -1203,8 +1197,8 @@ struct LaraInventoryData
 	bool HasBinoculars;
 	bool HasCrowbar;
 	bool HasTorch;
-	bool HasLasersight; // TODO: Duplicated in CarriedWeaponInfo.
-	bool HasSilencer;	// TODO: Duplicated in CarriedWeaponInfo.
+	bool HasLasersight;
+	bool HasSilencer; // TODO: Unused.
 
 	// TODO: Convert to bools.
 	int Puzzles[NUM_PUZZLES];
@@ -1227,17 +1221,22 @@ struct LaraCountData
 
 struct WeaponControlData
 {
-	short WeaponItem;
-	bool HasFired;
-	bool Fired;
+	LaraWeaponType GunType		  = LaraWeaponType::None;
+	LaraWeaponType RequestGunType = LaraWeaponType::None;
+	LaraWeaponType LastGunType	  = LaraWeaponType::None;
+	HolsterInfo	   HolsterInfo	  = {};
+	
+	short WeaponItem = -1;
+	bool  HasFired	 = false;
+	bool  Fired		 = false;
 
-	bool UziLeft;
-	bool UziRight;
+	bool UziLeft  = false;
+	bool UziRight = false;
 
-	LaraWeaponType GunType;
-	LaraWeaponType RequestGunType;
-	LaraWeaponType LastGunType;
-	HolsterInfo HolsterInfo;
+	// TODO: Interval and Timer count frame time for now, but should count delta time in the future. -- Sezz 2022.11.14
+	unsigned int NumShotsFired = 0;
+	float		 Interval	   = 0.0f;
+	float		 Timer		   = 0.0f;
 };
 
 struct RopeControlData
@@ -1348,15 +1347,7 @@ struct LaraInfo
 	int WaterSurfaceDist;
 	Pose NextCornerPos;
 
-	// TODO: Use BurnType in place of Burn, BurnBlue, and BurnSmoke. Core didn't make replacing them easy.
-	BurnType BurnType;
-	unsigned int BurnCount;
-	bool Burn;
-	byte BurnBlue;
-	bool BurnSmoke;
-
 	byte Wet[NUM_LARA_MESHES];
-	int MeshPtrs[NUM_LARA_MESHES];
 	signed char Location;
 	signed char HighestLocation;
 	signed char LocationPad;

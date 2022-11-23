@@ -202,6 +202,10 @@ namespace TEN::Input
 
 		for (auto& axis : AxisMap)
 			axis = 0.0f;
+
+		// Clear legacy bit fields.
+		DbInput = 0;
+		TrInput = 0;
 	}
 
 	bool LayoutContainsIndex(unsigned int index)
@@ -467,12 +471,16 @@ namespace TEN::Input
 		if (lara.Control.HandStatus == HandStatus::WeaponReady &&
 			lara.TargetEntity != nullptr)
 		{
-			if (IsHeld(In::Look))
+			if (IsClicked(In::Look))
 			{
 				ActionMap[(int)In::SwitchTarget].Update(true);
-				ActionMap[(int)In::Look].Clear();
+				//ActionMap[(int)In::Look].Clear();
 			}
+			else
+				ClearAction(In::SwitchTarget);
 		}
+		else
+			ClearAction(In::SwitchTarget);
 
 		// Handle flares.
 		if (IsClicked(In::Flare))
@@ -627,10 +635,6 @@ namespace TEN::Input
 		UpdateRumble();
 		ReadKeyboard();
 		ReadGameController();
-
-		// Clear legacy bit fields.
-		DbInput = 0;
-		TrInput = 0;
 
 		// Update action map (mappable actions only).
 		for (int i = 0; i < KEY_COUNT; i++)

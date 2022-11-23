@@ -2,7 +2,9 @@
 #include "Game/items.h"
 
 #include "Game/collision/floordata.h"
+#include "Game/collision/collide_room.h"
 #include "Game/control/control.h"
+#include "Game/control/volume.h"
 #include "Game/effects/effects.h"
 #include "Game/Lara/lara.h"
 #include "Math/Math.h"
@@ -15,6 +17,7 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
+using anmespace TEN::Control::Volumes;
 using namespace TEN::Floordata;
 using namespace TEN::Input;
 using namespace TEN::Math;;
@@ -70,6 +73,8 @@ void OffsetBlendData::DisplayDebug()
 	g_Renderer.PrintDebugMessage("Orient: %d, %d, %d", OrientOffset.x, OrientOffset.y, OrientOffset.z);
 }
 
+constexpr int ITEM_DEATH_TIMEOUT = 4 * FPS;
+
 bool ItemInfo::TestOcb(short ocbFlags)
 {
 	return ((TriggerFlags & ocbFlags) == ocbFlags);
@@ -99,6 +104,53 @@ void ItemInfo::SetFlags(short id, short value)
 		return;
 
 	ItemFlags[id] = value;
+}
+
+bool ItemInfo::TestMeshSwapFlags(unsigned int flags)
+{
+	for (size_t i = 0; i < Model.MeshIndex.size(); i++)
+	{
+		if (flags & (1 << i))
+		{
+			if (Model.MeshIndex[i] == Model.BaseMesh + i)
+				return false;
+		}
+	}
+
+	return true;
+}
+
+bool ItemInfo::TestMeshSwapFlags(const std::vector<unsigned int>& flags)
+{
+	auto bits = BitField();
+	bits.Set(flags);
+	return TestMeshSwapFlags(bits.ToPackedBits());
+}
+
+void ItemInfo::SetMeshSwapFlags(unsigned int flags, bool clear)
+{
+	bool meshSwapPresent = Objects[ObjectNumber].meshSwapSlot != -1 && 
+						   Objects[Objects[ObjectNumber].meshSwapSlot].loaded;
+
+	for (size_t i = 0; i < Model.MeshIndex.size(); i++)
+	{
+		if (meshSwapPresent && (flags & (1 << i)))
+		{
+			if (clear)
+				Model.MeshIndex[i] = Model.BaseMesh + i;
+			else
+				Model.MeshIndex[i] = Objects[Objects[ObjectNumber].meshSwapSlot].meshIndex + i;
+		}
+		else
+			Model.MeshIndex[i] = Model.BaseMesh + i;
+	}
+}
+
+void ItemInfo::SetMeshSwapFlags(const std::vector<unsigned int>& flags, bool clear)
+{
+	auto bits = BitField();
+	bits.Set(flags);
+	SetMeshSwapFlags(bits.ToPackedBits(), clear);
 }
 
 bool ItemInfo::IsLara() const
@@ -168,6 +220,14 @@ void ItemInfo::DoOffsetBlend()
 	{
 		this->OffsetBlend.Clear();
 	}
+}
+
+void ItemInfo::ResetModelToDefault()
+{
+	this->Model.BaseMesh = Objects[this->ObjectNumber].meshIndex;
+
+	for (int i = 0; i < this->Model.MeshIndex.size(); i++)
+		this->Model.MeshIndex[i] = this->Model.BaseMesh + i;
 }
 
 bool TestState(int refState, const vector<int>& stateList)
@@ -245,14 +305,14 @@ void KillItem(short itemNumber)
 
 		g_GameScriptEntities->NotifyKilled(item);
 		g_GameScriptEntities->TryRemoveColliding(itemNumber, true);
-		if (!item->LuaCallbackOnKilledName.empty())
-			g_GameScript->ExecuteFunction(item->LuaCallbackOnKilledName, itemNumber);
+		if (!item->Callbacks.OnKilled.empty())
+			g_GameScript->ExecuteFunction(item->Callbacks.OnKilled, itemNumber);
 
-		item->LuaName.clear();
-		item->LuaCallbackOnKilledName.clear();
-		item->LuaCallbackOnHitName.clear();
-		item->LuaCallbackOnCollidedWithObjectName.clear();
-		item->LuaCallbackOnCollidedWithRoomName.clear();
+		item->Name.clear();
+		item->Callbacks.OnKilled.clear();
+		item->Callbacks.OnHit.clear();
+		item->Callbacks.OnObjectCollided.clear();
+		item->Callbacks.OnRoomCollided.clear();
 
 		if (itemNumber >= g_Level.NumItems)
 		{
@@ -483,7 +543,9 @@ void RemoveActiveItem(short itemNumber)
 		g_Level.Items[itemNumber].Active = false;
 
 		if (NextItemActive == itemNumber)
+		{
 			NextItemActive = g_Level.Items[itemNumber].NextActive;
+		}
 		else
 		{
 			for (short linkNumber = NextItemActive; linkNumber != NO_ITEM; linkNumber = g_Level.Items[linkNumber].NextActive)
@@ -497,10 +559,8 @@ void RemoveActiveItem(short itemNumber)
 		}
 
 		g_GameScriptEntities->NotifyKilled(&item);
-		if (!item.LuaCallbackOnKilledName.empty())
-		{
-			g_GameScript->ExecuteFunction(item.LuaCallbackOnKilledName, itemNumber);
-		}
+		if (!item.Callbacks.OnKilled.empty())
+			g_GameScript->ExecuteFunction(item.Callbacks.OnKilled, itemNumber);
 	}
 }
 
@@ -546,7 +606,6 @@ void InitialiseItem(short itemNumber)
 
 	item->TouchBits = NO_JOINT_BITS;
 	item->AfterDeath = 0;
-	item->MeshSwapBits = NO_JOINT_BITS;
 
 	if (item->Flags & IFLAG_INVISIBLE)
 	{
@@ -575,14 +634,20 @@ void InitialiseItem(short itemNumber)
 
 	if (Objects[item->ObjectNumber].nmeshes > 0)
 	{
-		item->Animation.Mutator.resize(Objects[item->ObjectNumber].nmeshes);
-		for (int i = 0; i < item->Animation.Mutator.size(); i++)
-			item->Animation.Mutator[i] = {};
+		item->Model.MeshIndex.resize(Objects[item->ObjectNumber].nmeshes);
+		item->ResetModelToDefault();
+
+		item->Model.Mutator.resize(Objects[item->ObjectNumber].nmeshes);
+		for (int i = 0; i < item->Model.Mutator.size(); i++)
+			item->Model.Mutator[i] = {};
 	}
 	else
-		item->Animation.Mutator.clear();
+	{
+		item->Model.Mutator.clear();
+		item->Model.MeshIndex.clear();
+	}
 
-	if (Objects[item->ObjectNumber].initialise != NULL)
+	if (Objects[item->ObjectNumber].initialise != nullptr)
 		Objects[item->ObjectNumber].initialise(itemNumber);
 }
 
@@ -664,20 +729,6 @@ int GlobalItemReplace(short search, GAME_OBJECT_ID replace)
 	return changed;
 }
 
-// Offset values may be used to account for the quirk of room traversal only being able to occur at portals.
-void UpdateItemRoom(ItemInfo* item, int height, int xOffset, int zOffset)
-{
-	auto point = Geometry::TranslatePoint(item->Pose.Position, item->Pose.Orientation.y, zOffset, height, xOffset);
-
-	// Hacky L-shaped Location traversal.
-	item->Location = GetRoom(item->Location, point.x, point.y, point.z);
-	item->Location = GetRoom(item->Location, item->Pose.Position.x, point.y, item->Pose.Position.z);
-	item->Floor = GetFloorHeight(item->Location, item->Pose.Position.x, item->Pose.Position.z).value_or(NO_HEIGHT);
-
-	if (item->RoomNumber != item->Location.roomNumber)
-		ItemNewRoom(item->Index, item->Location.roomNumber);
-}
-
 std::vector<int> FindAllItems(short objectNumber)
 {
 	std::vector<int> itemList;
@@ -714,6 +765,82 @@ int FindItem(ItemInfo* item)
 			return i;
 
 	return -1;
+}
+
+void UpdateAllItems()
+{
+	InItemControlLoop = true;
+
+	short itemNumber = NextItemActive;
+	while (itemNumber != NO_ITEM)
+	{
+		auto* item = &g_Level.Items[itemNumber];
+		short nextItem = item->NextActive;
+
+		if (item->AfterDeath <= ITEM_DEATH_TIMEOUT)
+		{
+			if (Objects[item->ObjectNumber].control)
+				Objects[item->ObjectNumber].control(itemNumber);
+
+			TestVolumes(itemNumber);
+			ProcessEffects(item);
+
+			if (item->AfterDeath > 0 && item->AfterDeath < ITEM_DEATH_TIMEOUT && !(Wibble & 3))
+				item->AfterDeath++;
+			if (item->AfterDeath == ITEM_DEATH_TIMEOUT)
+				KillItem(itemNumber);
+		}
+		else
+			KillItem(itemNumber);
+
+		itemNumber = nextItem;
+	}
+
+	InItemControlLoop = false;
+	KillMoveItems();
+}
+
+void UpdateAllEffects()
+{
+	InItemControlLoop = true;
+
+	short fxNumber = NextFxActive;
+	while (fxNumber != NO_ITEM)
+	{
+		short nextFx = EffectList[fxNumber].nextActive;
+		auto* fx = &EffectList[fxNumber];
+		if (Objects[fx->objectNumber].control)
+			Objects[fx->objectNumber].control(fxNumber);
+
+		fxNumber = nextFx;
+	}
+
+	InItemControlLoop = false;
+	KillMoveEffects();
+}
+
+void UpdateItemRoom(short itemNumber)
+{
+	auto* item = &g_Level.Items[itemNumber];
+
+	auto roomNumber = GetCollision(item->Pose.Position.x,
+		item->Pose.Position.y - CLICK(2),
+		item->Pose.Position.z,
+		item->RoomNumber).RoomNumber;
+
+	if (roomNumber != item->RoomNumber)
+		ItemNewRoom(itemNumber, roomNumber);
+
+	if (item->IsCreature() &&
+		!Objects[item->ObjectNumber].waterCreature &&
+		TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, &g_Level.Rooms[roomNumber]))
+	{
+		auto bounds = GameBoundingBox(item);
+		auto height = item->Pose.Position.y - GetWaterHeight(item);
+
+		if (abs(bounds.Y1 + bounds.Y2) < height)
+			DoDamage(item, INT_MAX);
+	}
 }
 
 void DoDamage(ItemInfo* item, int damage)

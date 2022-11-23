@@ -64,7 +64,7 @@ bool GetKeyTrigger(ItemInfo* item);
 int GetSwitchTrigger(ItemInfo* item, short* itemNos, int attatchedToSwitch);
 int SwitchTrigger(short itemNumber, short timer);
 int KeyTrigger(short itemNum);
-int PickupTrigger(short itemNum);
+bool PickupTrigger(short itemNum);
 void RefreshCamera(short type, short* data);
 int TriggerActive(ItemInfo* item);
 short* GetTriggerIndex(FloorInfo* floor, int x, int y, int z);

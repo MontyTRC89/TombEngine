@@ -254,6 +254,320 @@ void AlertAllGuards(short itemNumber)
 	}
 }
 
+bool CreaturePathfind(ItemInfo* item, short angle, short tilt)
+{
+	int xPos, zPos, ceiling, shiftX, shiftZ;
+	short top; 
+	
+	auto* creature = GetCreatureInfo(item);
+
+	auto* LOT = &creature->LOT;
+	int* zone = g_Level.Zones[(int)LOT->Zone][FlipStatus].data();
+
+	int boxHeight;
+	if (item->BoxNumber != NO_BOX)
+		boxHeight = g_Level.Boxes[item->BoxNumber].height;
+	else
+		boxHeight = item->Floor;
+
+	auto prevPos = item->Pose.Position;
+
+	auto bounds = GameBoundingBox(item);
+
+	int y = item->Pose.Position.y + bounds.Y1;
+
+	short roomNumber = item->RoomNumber;
+	GetFloor(prevPos.x, y, prevPos.z, &roomNumber);
+	FloorInfo* floor = GetFloor(item->Pose.Position.x, y, item->Pose.Position.z, &roomNumber);
+
+	// TODO: Check why some blocks have box = -1 assigned to them -- Lwmte, 10.11.21
+	if (floor->Box == NO_BOX)
+		return false;
+
+	int height = g_Level.Boxes[floor->Box].height;
+	int nextHeight = 0;
+
+	int nextBox;
+	if (!Objects[item->ObjectNumber].nonLot)
+		nextBox = LOT->Node[floor->Box].exitBox;
+	else
+	{
+		floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNumber);
+		height = g_Level.Boxes[floor->Box].height;
+		nextBox = floor->Box;
+	}
+
+	if (nextBox == NO_BOX)
+		nextHeight = height;
+	else
+		nextHeight = g_Level.Boxes[nextBox].height;
+
+	if (floor->Box == NO_BOX || !LOT->IsJumping && (LOT->Fly == NO_FLYING && item->BoxNumber != NO_BOX && zone[item->BoxNumber] != zone[floor->Box] || boxHeight - height > LOT->Step || boxHeight - height < LOT->Drop))
+	{
+		xPos = item->Pose.Position.x / SECTOR(1);
+		zPos = item->Pose.Position.z / SECTOR(1);
+		shiftX = prevPos.x / SECTOR(1);
+		shiftZ = prevPos.z / SECTOR(1);
+
+		if (xPos < shiftX)
+			item->Pose.Position.x = prevPos.x & (~WALL_MASK);
+		else if (xPos > shiftX)
+			item->Pose.Position.x = prevPos.x | WALL_MASK;
+
+		if (zPos < shiftZ)
+			item->Pose.Position.z = prevPos.z & (~WALL_MASK);
+		else if (zPos > shiftZ)
+			item->Pose.Position.z = prevPos.z | WALL_MASK;
+
+		floor = GetFloor(item->Pose.Position.x, y, item->Pose.Position.z, &roomNumber);
+		height = g_Level.Boxes[floor->Box].height;
+		if (!Objects[item->ObjectNumber].nonLot)
+			nextBox = LOT->Node[floor->Box].exitBox;
+		else
+		{
+			floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNumber);
+			height = g_Level.Boxes[floor->Box].height;
+			nextBox = floor->Box;
+		}
+
+		if (nextBox == NO_BOX)
+			nextHeight = height;
+		else
+			nextHeight = g_Level.Boxes[nextBox].height;
+	}
+
+	int x = item->Pose.Position.x;
+	int z = item->Pose.Position.z;
+	xPos = x & WALL_MASK;
+	zPos = z & WALL_MASK;
+	short radius = Objects[item->ObjectNumber].radius;
+	shiftX = 0;
+	shiftZ = 0;
+
+	if (zPos < radius)
+	{
+		if (BadFloor(x, y, z - radius, height, nextHeight, roomNumber, LOT))
+			shiftZ = radius - zPos;
+
+		if (xPos < radius)
+		{
+			if (BadFloor(x - radius, y, z, height, nextHeight, roomNumber, LOT))
+				shiftX = radius - xPos;
+			else if (!shiftZ && BadFloor(x - radius, y, z - radius, height, nextHeight, roomNumber, LOT))
+			{
+				if (item->Pose.Orientation.y > -ANGLE(135.0f) && item->Pose.Orientation.y < ANGLE(45.0f))
+					shiftZ = radius - zPos;
+				else
+					shiftX = radius - xPos;
+			}
+		}
+		else if (xPos > SECTOR(1) - radius)
+		{
+			if (BadFloor(x + radius, y, z, height, nextHeight, roomNumber, LOT))
+				shiftX = SECTOR(1) - radius - xPos;
+			else if (!shiftZ && BadFloor(x + radius, y, z - radius, height, nextHeight, roomNumber, LOT))
+			{
+				if (item->Pose.Orientation.y > -ANGLE(45.0f) && item->Pose.Orientation.y < ANGLE(135.0f))
+					shiftZ = radius - zPos;
+				else
+					shiftX = SECTOR(1) - radius - xPos;
+			}
+		}
+	}
+	else if (zPos > SECTOR(1) - radius)
+	{
+		if (BadFloor(x, y, z + radius, height, nextHeight, roomNumber, LOT))
+			shiftZ = SECTOR(1) - radius - zPos;
+
+		if (xPos < radius)
+		{
+			if (BadFloor(x - radius, y, z, height, nextHeight, roomNumber, LOT))
+				shiftX = radius - xPos;
+			else if (!shiftZ && BadFloor(x - radius, y, z + radius, height, nextHeight, roomNumber, LOT))
+			{
+				if (item->Pose.Orientation.y > -ANGLE(45.0f) && item->Pose.Orientation.y < ANGLE(135.0f))
+					shiftX = radius - xPos;
+				else
+					shiftZ = SECTOR(1) - radius - zPos;
+			}
+		}
+		else if (xPos > SECTOR(1) - radius)
+		{
+			if (BadFloor(x + radius, y, z, height, nextHeight, roomNumber, LOT))
+				shiftX = SECTOR(1) - radius - xPos;
+			else if (!shiftZ && BadFloor(x + radius, y, z + radius, height, nextHeight, roomNumber, LOT))
+			{
+				if (item->Pose.Orientation.y > -ANGLE(135.0f) && item->Pose.Orientation.y < ANGLE(45.0f))
+					shiftX = SECTOR(1) - radius - xPos;
+				else
+					shiftZ = SECTOR(1) - radius - zPos;
+			}
+		}
+	}
+	else if (xPos < radius)
+	{
+		if (BadFloor(x - radius, y, z, height, nextHeight, roomNumber, LOT))
+			shiftX = radius - xPos;
+	}
+	else if (xPos > SECTOR(1) - radius)
+	{
+		if (BadFloor(x + radius, y, z, height, nextHeight, roomNumber, LOT))
+			shiftX = SECTOR(1) - radius - xPos;
+	}
+
+	item->Pose.Position.x += shiftX;
+	item->Pose.Position.z += shiftZ;
+
+	if (shiftX || shiftZ)
+	{
+		floor = GetFloor(item->Pose.Position.x, y, item->Pose.Position.z, &roomNumber);
+		item->Pose.Orientation.y += angle;
+
+		if (tilt)
+			CreatureTilt(item, (tilt * 2));
+	}
+
+	short biffAngle;
+	if (item->ObjectNumber != ID_TYRANNOSAUR && item->Animation.Velocity.z && item->HitPoints > 0)
+		biffAngle = CreatureCreature(item->Index);
+	else
+		biffAngle = 0;
+
+	if (biffAngle)
+	{
+		if (abs(biffAngle) < BIFF_AVOID_TURN)
+			item->Pose.Orientation.y -= BIFF_AVOID_TURN;
+		else if (biffAngle > 0)
+			item->Pose.Orientation.y -= BIFF_AVOID_TURN;
+		else
+			item->Pose.Orientation.y += BIFF_AVOID_TURN;
+
+		return true;
+	}
+
+	if (LOT->Fly != NO_FLYING && item->HitPoints > 0)
+	{
+		int dy = creature->Target.y - item->Pose.Position.y;
+		if (dy > LOT->Fly)
+			dy = LOT->Fly;
+		else if (dy < -LOT->Fly)
+			dy = -LOT->Fly;
+
+		height = GetFloorHeight(floor, item->Pose.Position.x, y, item->Pose.Position.z);
+		if (item->Pose.Position.y + dy <= height)
+		{
+			if (Objects[item->ObjectNumber].waterCreature)
+			{
+				ceiling = GetCeiling(floor, item->Pose.Position.x, y, item->Pose.Position.z);
+
+				if (item->ObjectNumber == ID_WHALE)
+					top = CLICK(0.5f);
+				else
+					top = bounds.Y1;
+
+				if (item->Pose.Position.y + top + dy < ceiling)
+				{
+					if (item->Pose.Position.y + top < ceiling)
+					{
+						item->Pose.Position.x = prevPos.x;
+						item->Pose.Position.z = prevPos.z;
+						dy = LOT->Fly;
+					}
+					else
+						dy = 0;
+				}
+			}
+			else
+			{
+				floor = GetFloor(item->Pose.Position.x, y + CLICK(1), item->Pose.Position.z, &roomNumber);
+				if (TestEnvironment(ENV_FLAG_WATER, roomNumber) ||
+					TestEnvironment(ENV_FLAG_SWAMP, roomNumber))
+				{
+					dy = -LOT->Fly;
+				}
+			}
+		}
+		else if (item->Pose.Position.y <= height)
+		{
+			item->Pose.Position.y = height;
+			dy = 0;
+		}
+		else
+		{
+			item->Pose.Position.x = prevPos.x;
+			item->Pose.Position.z = prevPos.z;
+			dy = -LOT->Fly;
+		}
+
+		item->Pose.Position.y += dy;
+		floor = GetFloor(item->Pose.Position.x, y, item->Pose.Position.z, &roomNumber);
+		item->Floor = GetFloorHeight(floor, item->Pose.Position.x, y, item->Pose.Position.z);
+
+		angle = (item->Animation.Velocity.z) ? phd_atan(item->Animation.Velocity.z, -dy) : 0;
+		if (angle < -ANGLE(20.0f))
+			angle = -ANGLE(20.0f);
+		else if (angle > ANGLE(20.0f))
+			angle = ANGLE(20.0f);
+
+		if (angle < item->Pose.Orientation.x - ANGLE(1.0f))
+			item->Pose.Orientation.x -= ANGLE(1.0f);
+		else if (angle > item->Pose.Orientation.x + ANGLE(1.0f))
+			item->Pose.Orientation.x += ANGLE(1.0f);
+		else
+			item->Pose.Orientation.x = angle;
+	}
+	else if (LOT->IsJumping)
+	{
+		floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNumber);
+		int height2 = GetFloorHeight(floor, item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z);
+		item->Floor = height2;
+
+		if (LOT->IsMonkeying)
+		{
+			ceiling = GetCeiling(floor, item->Pose.Position.x, y, item->Pose.Position.z);
+			item->Pose.Position.y = ceiling - bounds.Y1;
+		}
+		else
+		{
+			if (item->Pose.Position.y > item->Floor)
+			{
+				if (item->Pose.Position.y > (item->Floor + CLICK(1)))
+					item->Pose.Position = prevPos;
+				else
+					item->Pose.Position.y = item->Floor;
+			}
+		}
+	}
+	else
+	{
+		floor = GetFloor(item->Pose.Position.x, y, item->Pose.Position.z, &roomNumber);
+		ceiling = GetCeiling(floor, item->Pose.Position.x, y, item->Pose.Position.z);
+
+		if (item->ObjectNumber == ID_TYRANNOSAUR || item->ObjectNumber == ID_SHIVA || item->ObjectNumber == ID_MUTANT2)
+			top = CLICK(3);
+		else
+			top = bounds.Y1; // TODO: check if Y1 or Y2
+
+		if (item->Pose.Position.y + top < ceiling)
+			item->Pose.Position = prevPos;
+
+		floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNumber);
+		item->Floor = GetFloorHeight(floor, item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z);
+
+		if (item->Pose.Position.y > item->Floor)
+			item->Pose.Position.y = item->Floor;
+		else if (item->Floor - item->Pose.Position.y > CLICK(0.25f))
+			item->Pose.Position.y += CLICK(0.25f);
+		else if (item->Pose.Position.y < item->Floor)
+			item->Pose.Position.y = item->Floor;
+
+		item->Pose.Orientation.x = 0;
+	}
+
+	UpdateItemRoom(item->Index);
+	return true;
+}
+
 void CreatureKill(ItemInfo* item, int killAnim, int killState, int laraKillState)
 {
 	item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + killAnim;
@@ -443,27 +757,18 @@ short CreatureTurn(ItemInfo* item, short maxTurn)
 
 int CreatureAnimation(short itemNumber, short angle, short tilt)
 {
-	int xPos, zPos, ceiling, shiftX, shiftZ;
-	short top;
-
 	auto* item = &g_Level.Items[itemNumber];
 
 	if (!item->IsCreature())
 		return false;
 
 	auto* creature = GetCreatureInfo(item);
-	auto* LOT = &creature->LOT;
-	int* zone = g_Level.Zones[(int)LOT->Zone][FlipStatus].data();
-
-	int boxHeight;
-	if (item->BoxNumber != NO_BOX)
-		boxHeight = g_Level.Boxes[item->BoxNumber].height;
-	else
-		boxHeight = item->Floor;
-
-	auto prevPos = item->Pose.Position;
 
 	AnimateItem(item);
+	ProcessSectorFlags(item);
+
+	if (creature->Poisoned && item->HitPoints > 1 && (GlobalCounter & 0x1F) == 0x1F)
+		item->HitPoints--;
 
 	if (item->Status == ITEM_DEACTIVATED)
 	{
@@ -471,323 +776,7 @@ int CreatureAnimation(short itemNumber, short angle, short tilt)
 		return false;
 	}
 
-	auto bounds = GameBoundingBox(item);
-
-	int y = item->Pose.Position.y + bounds.Y1;
-
-	short roomNumber = item->RoomNumber;
-	GetFloor(prevPos.x, y, prevPos.z, &roomNumber);  
-	FloorInfo* floor = GetFloor(item->Pose.Position.x, y, item->Pose.Position.z, &roomNumber);
-
-	// TODO: Check why some blocks have box = -1 assigned to them -- Lwmte, 10.11.21
-	if (floor->Box == NO_BOX)
-		return false;
-
-	int height = g_Level.Boxes[floor->Box].height;
-	int nextHeight = 0;
-
-	int nextBox;
-	if (!Objects[item->ObjectNumber].nonLot)
-		nextBox = LOT->Node[floor->Box].exitBox;
-	else
-	{
-		floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNumber);
-		height = g_Level.Boxes[floor->Box].height;
-		nextBox = floor->Box;
-	}
-
-	if (nextBox == NO_BOX)
-		nextHeight = height;
-	else
-		nextHeight = g_Level.Boxes[nextBox].height;
-
-	if (floor->Box == NO_BOX || !LOT->IsJumping && (LOT->Fly == NO_FLYING && item->BoxNumber != NO_BOX && zone[item->BoxNumber] != zone[floor->Box] ||  boxHeight - height > LOT->Step ||  boxHeight - height < LOT->Drop))
-	{
-		xPos = item->Pose.Position.x / SECTOR(1);
-		zPos = item->Pose.Position.z / SECTOR(1);
-		shiftX = prevPos.x / SECTOR(1);
-		shiftZ = prevPos.z / SECTOR(1);
-
-		if (xPos < shiftX)
-			item->Pose.Position.x = prevPos.x & (~WALL_MASK);
-		else if (xPos > shiftX)
-			item->Pose.Position.x = prevPos.x | WALL_MASK;
-
-		if (zPos < shiftZ)
-			item->Pose.Position.z = prevPos.z & (~WALL_MASK);
-		else if (zPos > shiftZ)
-			item->Pose.Position.z = prevPos.z | WALL_MASK;
-
-		floor = GetFloor(item->Pose.Position.x, y, item->Pose.Position.z, &roomNumber);
-		height = g_Level.Boxes[floor->Box].height;
-		if (!Objects[item->ObjectNumber].nonLot)
-			nextBox = LOT->Node[floor->Box].exitBox;
-		else
-		{
-			floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNumber);
-			height = g_Level.Boxes[floor->Box].height;
-			nextBox = floor->Box;
-		}
-
-		if (nextBox == NO_BOX)
-			nextHeight = height;
-		else
-			nextHeight = g_Level.Boxes[nextBox].height;
-	}
-
-	int x = item->Pose.Position.x;
-	int z = item->Pose.Position.z;
-	xPos = x & WALL_MASK;
-	zPos = z & WALL_MASK;
-	short radius = Objects[item->ObjectNumber].radius;
-	shiftX = 0;
-	shiftZ = 0;
-
-	if (zPos < radius)
-	{
-		if (BadFloor(x, y, z - radius, height, nextHeight, roomNumber, LOT))
-			shiftZ = radius - zPos;
-
-		if (xPos < radius)
-		{
-			if (BadFloor(x - radius, y, z, height, nextHeight, roomNumber, LOT))
-				shiftX = radius - xPos;
-			else if (!shiftZ && BadFloor(x - radius, y, z - radius, height, nextHeight, roomNumber, LOT))
-			{
-				if (item->Pose.Orientation.y > -ANGLE(135.0f) && item->Pose.Orientation.y < ANGLE(45.0f))
-					shiftZ = radius - zPos;
-				else
-					shiftX = radius - xPos;
-			}
-		}
-		else if (xPos > SECTOR(1) - radius)
-		{
-			if (BadFloor(x + radius, y, z, height, nextHeight, roomNumber, LOT))
-				shiftX = SECTOR(1) - radius - xPos;
-			else if (!shiftZ && BadFloor(x + radius, y, z - radius, height, nextHeight, roomNumber, LOT))
-			{
-				if (item->Pose.Orientation.y > -ANGLE(45.0f) && item->Pose.Orientation.y < ANGLE(135.0f))
-					shiftZ = radius - zPos;
-				else
-					shiftX = SECTOR(1) - radius - xPos;
-			}
-		}
-	}
-	else if (zPos > SECTOR(1) - radius)
-	{
-		if (BadFloor(x, y, z + radius, height, nextHeight, roomNumber, LOT))
-			shiftZ = SECTOR(1) - radius - zPos;
-
-		if (xPos < radius)
-		{
-			if (BadFloor(x - radius, y, z, height, nextHeight, roomNumber, LOT))
-				shiftX = radius - xPos;
-			else if (!shiftZ && BadFloor(x - radius, y, z + radius, height, nextHeight, roomNumber, LOT))
-			{
-				if (item->Pose.Orientation.y > -ANGLE(45.0f) && item->Pose.Orientation.y < ANGLE(135.0f))
-					shiftX = radius - xPos;
-				else
-					shiftZ = SECTOR(1) - radius - zPos;
-			}
-		}
-		else if (xPos > SECTOR(1) - radius)
-		{
-			if (BadFloor(x + radius, y, z, height, nextHeight, roomNumber, LOT))
-				shiftX = SECTOR(1) - radius - xPos;
-			else if (!shiftZ && BadFloor(x + radius, y, z + radius, height, nextHeight, roomNumber, LOT))
-			{
-				if (item->Pose.Orientation.y > -ANGLE(135.0f) && item->Pose.Orientation.y < ANGLE(45.0f))
-					shiftX = SECTOR(1) - radius - xPos;
-				else
-					shiftZ = SECTOR(1) - radius - zPos;
-			}
-		}
-	}
-	else if (xPos < radius)
-	{
-		if (BadFloor(x - radius, y, z, height, nextHeight, roomNumber, LOT))
-			shiftX = radius - xPos;
-	}
-	else if (xPos > SECTOR(1) - radius)
-	{
-		if (BadFloor(x + radius, y, z, height, nextHeight, roomNumber, LOT))
-			shiftX = SECTOR(1) - radius - xPos;
-	}
-
-	item->Pose.Position.x += shiftX;
-	item->Pose.Position.z += shiftZ;
-
-	if (shiftX || shiftZ)
-	{
-		floor = GetFloor(item->Pose.Position.x, y, item->Pose.Position.z, &roomNumber);
-		item->Pose.Orientation.y += angle;
-
-		if (tilt)
-			CreatureTilt(item, (tilt * 2));
-	}
-
-	short biffAngle;
-	if (item->ObjectNumber != ID_TYRANNOSAUR && item->Animation.Velocity.z && item->HitPoints > 0)
-		biffAngle = CreatureCreature(itemNumber);
-	else
-		biffAngle = 0;
-
-	if (biffAngle)
-	{
-		if (abs(biffAngle) < BIFF_AVOID_TURN)
-			item->Pose.Orientation.y -= BIFF_AVOID_TURN;
-		else if (biffAngle > 0)
-			item->Pose.Orientation.y -= BIFF_AVOID_TURN;
-		else
-			item->Pose.Orientation.y += BIFF_AVOID_TURN;
-
-		return true;
-	}
-
-	if (LOT->Fly != NO_FLYING && item->HitPoints > 0)
-	{
-		int dy = creature->Target.y - item->Pose.Position.y;
-		if (dy > LOT->Fly)
-			dy = LOT->Fly;
-		else if (dy < -LOT->Fly)
-			dy = -LOT->Fly;
-
-		height = GetFloorHeight(floor, item->Pose.Position.x, y, item->Pose.Position.z);
-		if (item->Pose.Position.y + dy <= height)
-		{
-			if (Objects[item->ObjectNumber].waterCreature)
-			{
-				ceiling = GetCeiling(floor, item->Pose.Position.x, y, item->Pose.Position.z);
-
-				if (item->ObjectNumber == ID_WHALE)
-					top = CLICK(0.5f);
-				else
-					top = bounds.Y1;
-
-				if (item->Pose.Position.y + top + dy < ceiling)
-				{
-					if (item->Pose.Position.y + top < ceiling)
-					{
-						item->Pose.Position.x = prevPos.x;
-						item->Pose.Position.z = prevPos.z;
-						dy = LOT->Fly;
-					}
-					else
-						dy = 0;
-				}
-			}
-			else
-			{
-				floor = GetFloor(item->Pose.Position.x, y + CLICK(1), item->Pose.Position.z, &roomNumber);
-				if (TestEnvironment(ENV_FLAG_WATER, roomNumber) ||
-					TestEnvironment(ENV_FLAG_SWAMP, roomNumber))
-				{
-					dy = -LOT->Fly;
-				}
-			}
-		}
-		else if (item->Pose.Position.y <= height)
-		{
-			item->Pose.Position.y = height;
-			dy = 0;
-		}
-		else
-		{
-			item->Pose.Position.x = prevPos.x;
-			item->Pose.Position.z = prevPos.z;
-			dy = -LOT->Fly;
-		}
-
-		item->Pose.Position.y += dy;
-		floor = GetFloor(item->Pose.Position.x, y, item->Pose.Position.z, &roomNumber);
-		item->Floor = GetFloorHeight(floor, item->Pose.Position.x, y, item->Pose.Position.z);
- 
-		angle = (item->Animation.Velocity.z) ? phd_atan(item->Animation.Velocity.z, -dy) : 0;
-		if (angle < -ANGLE(20.0f))
-			angle = -ANGLE(20.0f);
-		else if (angle > ANGLE(20.0f))
-			angle = ANGLE(20.0f);
-
-		if (angle < item->Pose.Orientation.x - ANGLE(1.0f))
-			item->Pose.Orientation.x -= ANGLE(1.0f);
-		else if (angle > item->Pose.Orientation.x + ANGLE(1.0f))
-			item->Pose.Orientation.x += ANGLE(1.0f);
-		else
-			item->Pose.Orientation.x = angle;
-	}
-	else if (LOT->IsJumping)
-	{
-		floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNumber);
-		int height2 = GetFloorHeight(floor, item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z);
-		item->Floor = height2;
-
-		if (LOT->IsMonkeying)
-		{
-			ceiling = GetCeiling(floor, item->Pose.Position.x, y, item->Pose.Position.z);
-			item->Pose.Position.y = ceiling - bounds.Y1;
-		}
-		else
-		{
-			if (item->Pose.Position.y > item->Floor)
-			{
-				if (item->Pose.Position.y > (item->Floor + CLICK(1)))
-					item->Pose.Position = prevPos;
-				else
-					item->Pose.Position.y = item->Floor;
-			}
-		}
-	} 
-	else
-	{
-		floor = GetFloor(item->Pose.Position.x, y, item->Pose.Position.z, &roomNumber);
-		ceiling = GetCeiling(floor, item->Pose.Position.x, y, item->Pose.Position.z);
-
-		if (item->ObjectNumber == ID_TYRANNOSAUR || item->ObjectNumber == ID_SHIVA || item->ObjectNumber == ID_MUTANT2)
-			top = CLICK(3);
-		else
-			top = bounds.Y1; // TODO: check if Y1 or Y2
-
-		if (item->Pose.Position.y + top < ceiling)
-			item->Pose.Position = prevPos;
-
-		floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNumber);
-		item->Floor = GetFloorHeight(floor, item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z);
-
-		if (item->Pose.Position.y > item->Floor)
-			item->Pose.Position.y = item->Floor;
-		else if (item->Floor - item->Pose.Position.y > CLICK(0.25f))
-			item->Pose.Position.y += CLICK(0.25f);
-		else if (item->Pose.Position.y < item->Floor)
-			item->Pose.Position.y = item->Floor;
-
-		item->Pose.Orientation.x = 0;
-	}
-
-	CreatureSwitchRoom(itemNumber);
-	return true;
-}
-
-void CreatureSwitchRoom(short itemNumber)
-{
-	auto* item = &g_Level.Items[itemNumber];
-
-	auto roomNumber = GetCollision(item->Pose.Position.x,
-		item->Pose.Position.y - CLICK(2),
-		item->Pose.Position.z,
-		item->RoomNumber).RoomNumber;
-
-	if (roomNumber != item->RoomNumber)
-		ItemNewRoom(itemNumber, roomNumber);
-
-	if (!Objects[item->ObjectNumber].waterCreature &&
-		TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, &g_Level.Rooms[roomNumber]))
-	{
-		auto bounds = GameBoundingBox(item);
-		auto height = item->Pose.Position.y - GetWaterHeight(item);
-
-		if (abs(bounds.Y1 + bounds.Y2) < height)
-			DoDamage(item, INT_MAX);
-	}
+	return CreaturePathfind(item, angle, tilt);
 }
 
 void CreatureDie(short itemNumber, bool explode)
@@ -1274,7 +1263,6 @@ void GetAITarget(CreatureInfo* creature)
 			Objects[item->ObjectNumber].waterCreature)
 		{
 			TestTriggers(enemy, true);
-			ProcessSectorFlags(enemy);
 			creature->Patrol = !creature->Patrol;
 		}
 	}
@@ -1292,7 +1280,6 @@ void GetAITarget(CreatureInfo* creature)
 			abs(enemy->Pose.Position.z - item->Pose.Position.z) < REACHED_GOAL_RADIUS)
 		{
 			TestTriggers(enemy, true);
-			ProcessSectorFlags(enemy);
 
 			creature->ReachedGoal = true;
 			creature->Enemy = LaraItem;

@@ -7,11 +7,12 @@
 #include "Game/collision/sphere.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/lightning.h"
-#include "Game/effects/lara_fx.h"
+#include "Game/effects/item_fx.h"
 #include "Game/effects/tomb4fx.h"
 #include "Game/effects/weather.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
+#include "Game/Lara/lara_helpers.h"
 #include "Math/Math.h"
 #include "Sound/sound.h"
 #include "Specific/Input/Input.h"
@@ -19,9 +20,12 @@
 #include "Specific/setup.h"
 
 using namespace TEN::Input;
-using namespace TEN::Effects::Lara;
+using namespace TEN::Effects::Items;
 using namespace TEN::Effects::Lightning;
 using namespace TEN::Effects::Environment;
+
+constexpr int FLAME_RADIUS = 128;
+constexpr int FLAME_ITEM_BURN_TIMEOUT = 3 * FPS;
 
 namespace TEN::Entities::Effects
 {
@@ -55,6 +59,29 @@ namespace TEN::Entities::Effects
 	};
 
 	bool FlameEmitterFlags[8];
+
+	void BurnNearbyItems(ItemInfo* item)
+	{
+		GetCollidedObjects(item, FLAME_RADIUS, true, &CollidedItems[0], &CollidedMeshes[0], false);
+
+		for (int i = 0; i < MAX_COLLIDED_OBJECTS; i++)
+		{
+			auto* currentItem = CollidedItems[i];
+			if (!currentItem)
+				break;
+
+			if (TestEnvironment(ENV_FLAG_WATER, currentItem->RoomNumber))
+				continue;
+
+			if ((!currentItem->IsCreature() && !currentItem->IsLara()) || currentItem->HitPoints <= 0)
+				continue;
+
+			if (currentItem->IsLara() && GetLaraInfo(item)->Control.WaterStatus == WaterStatus::FlyCheat)
+				continue;
+
+			ItemBurn(currentItem, currentItem->IsLara() ? -1 : FLAME_ITEM_BURN_TIMEOUT);
+		}
+	}
 
 	void FlameEmitterControl(short itemNumber)
 	{
@@ -143,23 +170,17 @@ namespace TEN::Entities::Effects
 				if (item->TriggerFlags < 8)
 					FlameEmitterFlags[item->TriggerFlags] = true;
 
-				AddFire(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, item->RoomNumber, 1.0f, 0);
+				AddFire(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, item->RoomNumber, 2.0f, 0);
 
 				TriggerDynamicLight(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z,
-					16 - (GetRandomControl() & 1),
-					(GetRandomControl() & 0x3F) + 192,
-					(GetRandomControl() & 0x1F) + 96, 0);
+									16 - (GetRandomControl() & 1),
+									(GetRandomControl() & 0x3F) + 192,
+									(GetRandomControl() & 0x1F) + 96, 0);
 
 				SoundEffect(SFX_TR4_LOOP_FOR_SMALL_FIRES, &item->Pose);
 
-				if (!Lara.Burn &&
-					ItemNearLara(item->Pose.Position, 600) &&
-					(pow(LaraItem->Pose.Position.x - item->Pose.Position.x, 2) +
-						pow(LaraItem->Pose.Position.z - item->Pose.Position.z, 2) < pow(SECTOR(0.5f), 2)) &&
-					Lara.Control.WaterStatus != WaterStatus::FlyCheat)
-				{
-					LaraBurn(LaraItem);
-				}
+				if ((Wibble & 0x04) && Random::TestProbability(1 / 2.0f))
+					BurnNearbyItems(item);
 			}
 		}
 		else
@@ -251,7 +272,7 @@ namespace TEN::Entities::Effects
 					item->Pose.Position.y = probe.Position.Floor;
 
 					if (Wibble & 7)
-						TriggerFireFlame(item->Pose.Position.x, item->Pose.Position.y - 32, item->Pose.Position.z, -1, 1);
+						TriggerFireFlame(item->Pose.Position.x, item->Pose.Position.y - 32, item->Pose.Position.z, FlameType::Medium);
 				}
 
 				SoundEffect(SFX_TR4_LOOP_FOR_SMALL_FIRES, &item->Pose);
@@ -262,103 +283,6 @@ namespace TEN::Entities::Effects
 				FlipMap[-item->TriggerFlags] ^= 0x3E00u;
 				item->ItemFlags[0] = 1;
 			}
-		}
-	}
-
-	void FlameControl(short fxNumber)
-	{
-		auto* fx = &EffectList[fxNumber];
-
-		for (int i = 0; i < 14; i++)
-		{
-			if (!(Wibble & 0xC))
-			{
-				fx->pos.Position = GetJointPosition(LaraItem, i);
-
-				// TR5 code?
-				if (Lara.BurnCount)
-				{
-					Lara.BurnCount--;
-					if (!Lara.BurnCount)
-						Lara.BurnSmoke = true;
-				}
-
-				TriggerFireFlame(fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z, -1, 255 - Lara.BurnSmoke);
-			}
-		}
-
-		byte r = (GetRandomControl() & 0x3F) + 192;
-		byte g = (GetRandomControl() & 0x1F) + 96;
-
-		auto pos = GetJointPosition(LaraItem, LM_HIPS);
-
-		if (!Lara.BurnSmoke)
-		{
-			if (Lara.BurnBlue == 0)
-			{
-				TriggerDynamicLight(
-					pos.x,
-					pos.y,
-					pos.z,
-					13,
-					(GetRandomControl() & 0x3F) + 192,
-					(GetRandomControl() & 0x1F) + 96,
-					0);
-			}
-			else if (Lara.BurnBlue == 1)
-			{
-				TriggerDynamicLight(
-					pos.x, 
-					pos.y, 
-					pos.z, 
-					13, 
-					0, 
-					(GetRandomControl() & 0x1F) + 96,
-					(GetRandomControl() & 0x3F) + 192);
-			}
-			else if (Lara.BurnBlue == 2)
-			{
-				TriggerDynamicLight(
-					pos.x,
-					pos.y,
-					pos.z,
-					13,
-					0,
-					(GetRandomControl() & 0x3F) + 192,
-					(GetRandomControl() & 0x1F) + 96);
-			}
-		}
-		else
-		{
-			TriggerDynamicLight(
-				pos.x,
-				pos.y,
-				pos.z, 
-				13,
-				GetRandomControl() & 0x3F,
-				(GetRandomControl() & 0x3F) + 192,
-				(GetRandomControl() & 0x1F) + 96);
-		}
-
-		if (LaraItem->RoomNumber != fx->roomNumber)
-			EffectNewRoom(fxNumber, LaraItem->RoomNumber);
-
-		int waterHeight = GetWaterHeight(fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z, fx->roomNumber);
-		if (waterHeight == NO_HEIGHT || fx->pos.Position.y <= waterHeight || Lara.BurnBlue)
-		{
-			SoundEffect(SFX_TR4_LOOP_FOR_SMALL_FIRES, &fx->pos);
-			DoDamage(LaraItem, 7);
-		}
-		else
-		{
-			KillEffect(fxNumber);
-			Lara.Burn = false;
-		}
-
-		if (Lara.Control.WaterStatus == WaterStatus::FlyCheat)
-		{
-			KillEffect(fxNumber);
-			Lara.Burn = false;
 		}
 	}
 
@@ -546,14 +470,14 @@ namespace TEN::Entities::Effects
 					i = item->ItemFlags[1] & 7;
 					x = 16 * (Flame3xzoffs[i][0] - 32);
 					z = 16 * (Flame3xzoffs[i][1] - 32);
-					TriggerFireFlame(x + item->Pose.Position.x, item->Pose.Position.y, z + item->Pose.Position.z, -1, 2);
+					TriggerFireFlame(x + item->Pose.Position.x, item->Pose.Position.y, z + item->Pose.Position.z, FlameType::Small);
 				}
 				else
 				{
 					i = item->ItemFlags[1] >> 3;
 					x = 16 * (Flame3xzoffs[i + 8][0] - 32);
 					z = 16 * (Flame3xzoffs[i + 8][1] - 32);
-					TriggerFireFlame(x + item->Pose.Position.x, item->Pose.Position.y, z + item->Pose.Position.z, -1, 2);
+					TriggerFireFlame(x + item->Pose.Position.x, item->Pose.Position.y, z + item->Pose.Position.z, FlameType::Small);
 				}
 
 				SoundEffect(SFX_TR4_LOOP_FOR_SMALL_FIRES, &item->Pose);
@@ -561,9 +485,9 @@ namespace TEN::Entities::Effects
 				TriggerDynamicLight(x, item->Pose.Position.y, z, 12, (GetRandomControl() & 0x3F) + 192, ((GetRandomControl() >> 4) & 0x1F) + 96, 0);
 
 				auto pos = item->Pose.Position;
-				if (ItemNearLara(pos, 600))
+				if (ItemNearLara(pos, FLAME_RADIUS))
 				{
-					if ((!Lara.Burn) && Lara.Control.WaterStatus != WaterStatus::FlyCheat)
+					if (LaraItem->Effect.Type != EffectType::None && Lara.Control.WaterStatus != WaterStatus::FlyCheat)
 					{
 						DoDamage(LaraItem, 5);
 
@@ -571,7 +495,7 @@ namespace TEN::Entities::Effects
 						int dz = LaraItem->Pose.Position.z - item->Pose.Position.z;
 
 						if (SQUARE(dx) + SQUARE(dz) < SQUARE(450))
-							LaraBurn(LaraItem);
+							ItemBurn(LaraItem);
 					}
 				}
 			}

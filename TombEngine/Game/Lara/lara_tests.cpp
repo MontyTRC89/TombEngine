@@ -903,7 +903,7 @@ bool TestLaraWaterStepOut(ItemInfo* item, CollisionInfo* coll)
 	}
 
 	item->Pose.Position.y += coll->Middle.Floor + CLICK(2.75f) - 9;
-	UpdateItemRoom(item, -(STEPUP_HEIGHT - 3));
+	UpdateLaraRoom(item, -(STEPUP_HEIGHT - 3));
 
 	item->Pose.Orientation.x = 0;
 	item->Pose.Orientation.z = 0;
@@ -986,7 +986,7 @@ bool TestLaraWaterClimbOut(ItemInfo* item, CollisionInfo* coll)
 			SetAnimation(item, LA_ONWATER_TO_STAND_0_STEP);
 	}
 
-	UpdateItemRoom(item, -LARA_HEIGHT / 2);
+	UpdateLaraRoom(item, -LARA_HEIGHT / 2);
 	SnapItemToLedge(item, coll, 1.7f);
 
 	item->Pose.Position.y += frontFloor - 5;
