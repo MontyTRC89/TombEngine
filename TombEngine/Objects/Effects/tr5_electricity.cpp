@@ -7,7 +7,7 @@
 #include "Game/collision/sphere.h"
 #include "Game/control/control.h"
 #include "Game/effects/effects.h"
-#include "Game/effects/lara_fx.h"
+#include "Game/effects/item_fx.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_collide.h"
@@ -16,7 +16,7 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-using namespace TEN::Effects::Lara;
+using namespace TEN::Effects::Items;
 
 void TriggerElectricityWireSparks(int x, int z, byte objNum, byte node, bool glow)
 {
@@ -114,7 +114,7 @@ void TriggerElectricitySparks(ItemInfo* item, int joint, int flame)
 	spark->flags = SP_NONE;
 
 	if (flame)
-		TriggerFireFlame(pos.x, pos.y, pos.z, -1, 254);
+		TriggerFireFlame(pos.x, pos.y, pos.z, FlameType::SmallFast);
 }
 
 bool ElectricityWireCheckDeadlyBounds(Vector3i* pos, short delta)
@@ -222,15 +222,12 @@ void ElectricityWiresControl(short itemNumber)
 
 			if (isWaterNearby || instantKill)
 			{
-				if (collItem->IsLara())
-				{
-					auto* lara = (LaraInfo*&)collItem->Data;
-					lara->BurnBlue = 1;
-					lara->BurnCount = 48;
+				collItem->Effect.Type = EffectType::Sparks;
+				collItem->Effect.Count = 48;
+				collItem->Effect.LightColor = Vector3(0.0f, 0.2f, 0.8f);
 
-					if (!isWaterNearby)
-						LaraBurn(collItem);
-				}
+				if (!isWaterNearby)
+					ItemElectricBurn(collItem);
 
 				if (instantKill)
 					DoDamage(collItem, INT_MAX);

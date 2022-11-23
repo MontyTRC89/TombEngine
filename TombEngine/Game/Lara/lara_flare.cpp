@@ -100,14 +100,14 @@ void UndrawFlareMeshes(ItemInfo* laraItem)
 {
 	auto* lara = GetLaraInfo(laraItem);
 
-	lara->MeshPtrs[LM_LHAND] = Objects[ID_LARA_SKIN].meshIndex + LM_LHAND;
+	laraItem->Model.MeshIndex[LM_LHAND] = laraItem->Model.BaseMesh + LM_LHAND;
 }
 
 void DrawFlareMeshes(ItemInfo* laraItem)
 {
 	auto* lara = GetLaraInfo(laraItem);
 
-	lara->MeshPtrs[LM_LHAND] = Objects[ID_FLARE_ANIM].meshIndex + LM_LHAND;
+	laraItem->Model.MeshIndex[LM_LHAND] = Objects[ID_FLARE_ANIM].meshIndex + LM_LHAND;
 }
 
 void UndrawFlare(ItemInfo* laraItem)

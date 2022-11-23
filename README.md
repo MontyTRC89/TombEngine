@@ -61,6 +61,7 @@ We do not and have never worked for Core Design, Eidos Interactive, or Square En
 - Squidshire (Hispidence) (Lua implementation, bug fixing)
 - Stranger1992 (sound asset refactoring and organisation, assets)
 - TokyoSU (entity and vehicle decompilation)
+- Tomo (general coding, bug fixing)
 - Troye (general coding, refactoring)
 - WolfCheese (general coding)
 

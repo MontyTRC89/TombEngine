@@ -1,6 +1,6 @@
 #pragma once
 
-// Last generated on 13/9/2022
+// Last generated on 18/11/2022
 
 #include "game_object_ids.h"
 #include <unordered_map>
@@ -364,6 +364,7 @@ The following constants are inside ObjID.
 	PUSHABLE_OBJECT_CLIMBABLE10
 	TRAIN
 	EXPLOSION
+	DAMOCLES_SWORD
 	PUZZLE_ITEM1
 	PUZZLE_ITEM2
 	PUZZLE_ITEM3
@@ -1529,6 +1530,7 @@ static const std::unordered_map<std::string, GAME_OBJECT_ID> kObjIDs {
 	{ "PUSHABLE_OBJECT_CLIMBABLE10", ID_PUSHABLE_OBJECT_CLIMBABLE10 },
 	{ "TRAIN", ID_TRAIN },
 	{ "EXPLOSION", ID_EXPLOSION },
+	{ "DAMOCLES_SWORD", ID_DAMOCLES_SWORD },
 	{ "PUZZLE_ITEM1", ID_PUZZLE_ITEM1 },
 	{ "PUZZLE_ITEM2", ID_PUZZLE_ITEM2 },
 	{ "PUZZLE_ITEM3", ID_PUZZLE_ITEM3 },

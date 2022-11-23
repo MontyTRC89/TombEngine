@@ -208,6 +208,7 @@ void PuzzleDone(ItemInfo* item, short itemNumber)
 	item->Animation.ActiveState = g_Level.Anims[item->Animation.AnimNumber].ActiveState;
 	item->Animation.TargetState = g_Level.Anims[item->Animation.AnimNumber].ActiveState;
 	item->Animation.RequiredState = 0;
+	item->ResetModelToDefault();
 
 	AddActiveItem(itemNumber);
 

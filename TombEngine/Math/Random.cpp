@@ -50,6 +50,18 @@ namespace TEN::Math::Random
 		return (vector * length);
 	}
 
+	Vector3 GenerateVector3InBox(const BoundingOrientedBox& box)
+	{
+		auto rotMatrix = Matrix::CreateFromQuaternion(box.Orientation);
+		auto vector = Vector3(
+			GenerateFloat(-box.Extents.x, box.Extents.x),
+			GenerateFloat(-box.Extents.y, box.Extents.y),
+			GenerateFloat(-box.Extents.z, box.Extents.z)
+		);
+
+		return Vector3::Transform(vector, rotMatrix);
+	}
+
 	bool TestProbability(float probability)
 	{
 		probability = std::clamp(probability, 0.0f, 1.0f);

@@ -64,18 +64,14 @@ void RollingBallControl(short itemNumber)
 
 	if (item->Pose.Position.y > dh)
 	{
-		if (abs(item->Animation.Velocity.y) > 16)
+		if (abs(item->Animation.Velocity.y) > 16.0f)
 		{
-			int distance = sqrt(
-				pow(Camera.pos.x - item->Pose.Position.x, 2) +
-				pow(Camera.pos.y - item->Pose.Position.y, 2) +
-				pow(Camera.pos.z - item->Pose.Position.z, 2));
-
+			float distance = Vector3::Distance(item->Pose.Position.ToVector3(), Camera.pos.ToVector3());
 			if (distance < 16384)
 			{
 				if ((item->TriggerFlags & 1) != 1) // Flag 1 = silent.
 				{
-					Camera.bounce = -(((16384 - distance) * abs(item->Animation.Velocity.y)) / 16384);
+					Camera.bounce = -((BLOCK(16) - distance) * abs(item->Animation.Velocity.y)) / BLOCK(16);
 					SoundEffect(SFX_TR4_BOULDER_FALL, &item->Pose);
 				}
 			}

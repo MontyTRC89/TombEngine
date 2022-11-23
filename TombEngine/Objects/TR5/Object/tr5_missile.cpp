@@ -12,10 +12,10 @@
 #include "tr5_roman_statue.h"
 #include "tr5_hydra.h"
 #include "Game/collision/collide_item.h"
-#include "Game/effects/lara_fx.h"
+#include "Game/effects/item_fx.h"
 #include "Math/Math.h"
 
-using namespace TEN::Effects::Lara;
+using namespace TEN::Effects::Items;
 using namespace TEN::Math;
 
 int DebrisFlags;
@@ -176,7 +176,7 @@ void MissileControl(short itemNumber)
 			if (LaraItem->HitPoints >= 500)
 				DoDamage(LaraItem, 300);
 			else
-				LaraBurn(LaraItem);
+				ItemBurn(LaraItem);
 			KillEffect(itemNumber);
 		}
 	}

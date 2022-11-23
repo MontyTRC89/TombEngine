@@ -135,7 +135,7 @@ GameStatus ControlPhase(int numFrames, bool demoMode)
 		// which assumes 30 iterations per second.
 		g_GameScript->OnControlPhase(DELTA_TIME);
 
-		if (CurrentLevel != 0)
+		if (CurrentLevel != 0 && !ScreenFading)
 		{
 			// Does the player want to enter inventory?
 			if (IsClicked(In::Save) && LaraItem->HitPoints > 0 &&
@@ -161,7 +161,7 @@ GameStatus ControlPhase(int numFrames, bool demoMode)
 					return GameStatus::LoadGame;
 			}
 			else if (IsClicked(In::Pause) && LaraItem->HitPoints > 0 &&
-				g_Gui.GetInventoryMode() != InventoryMode::Pause)
+					 g_Gui.GetInventoryMode() != InventoryMode::Pause)
 			{
 				StopAllSounds();
 				StopRumble();
@@ -210,52 +210,8 @@ GameStatus ControlPhase(int numFrames, bool demoMode)
 		if (CurrentLevel != 0)
 			HandleOptics(LaraItem);
 
-		// Update all items.
-		InItemControlLoop = true;
-
-		short itemNumber = NextItemActive;
-		while (itemNumber != NO_ITEM)
-		{
-			auto* item = &g_Level.Items[itemNumber];
-			short nextItem = item->NextActive;
-
-			if (item->AfterDeath <= 128)
-			{
-				if (Objects[item->ObjectNumber].control)
-					Objects[item->ObjectNumber].control(itemNumber);
-
-				TEN::Control::Volumes::TestVolumes(itemNumber);
-
-				if (item->AfterDeath > 0 && item->AfterDeath < 128 && !(Wibble & 3))
-					item->AfterDeath++;
-				if (item->AfterDeath == 128)
-					KillItem(itemNumber);
-			}
-			else
-				KillItem(itemNumber);
-
-			itemNumber = nextItem;
-		}
-
-		InItemControlLoop = false;
-		KillMoveItems();
-
-		// Update all effects
-		InItemControlLoop = true;
-
-		short fxNumber = NextFxActive;
-		while (fxNumber != NO_ITEM)
-		{
-			short nextFx = EffectList[fxNumber].nextActive;
-			auto* fx = &EffectList[fxNumber];
-			if (Objects[fx->objectNumber].control)
-				Objects[fx->objectNumber].control(fxNumber);
-
-			fxNumber = nextFx;
-		}
-
-		InItemControlLoop = false;
-		KillMoveEffects();
+		UpdateAllItems();
+		UpdateAllEffects();
 
 		if (CurrentLevel != 0)
 		{
@@ -279,6 +235,7 @@ GameStatus ControlPhase(int numFrames, bool demoMode)
 
 			// Update Lara's ponytails
 			HairControl(LaraItem, level->GetLaraType() == LaraType::Young);
+			ProcessEffects(LaraItem);
 		}
 
 		if (UseSpotCam)

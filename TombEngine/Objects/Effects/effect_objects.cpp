@@ -14,9 +14,8 @@ void InitialiseEffectsObjects()
 	// Flame is always loaded
 	obj = &Objects[ID_FLAME];
 	{
-		obj->control = FlameControl;
+		obj->control = nullptr;
 		obj->drawRoutine = nullptr;
-		obj->saveFlags = true;
 		obj->usingDrawAnimatingItem = false;
 	}
 
@@ -27,7 +26,6 @@ void InitialiseEffectsObjects()
 		obj->collision = FlameEmitterCollision;
 		obj->control = FlameEmitterControl;
 		obj->drawRoutine = nullptr;
-		obj->saveFlags = true;
 		obj->usingDrawAnimatingItem = false;
 	}
 
@@ -38,7 +36,6 @@ void InitialiseEffectsObjects()
 		obj->collision = FlameEmitterCollision;
 		obj->control = FlameEmitter2Control;
 		obj->drawRoutine = nullptr;
-		obj->saveFlags = true;
 		obj->usingDrawAnimatingItem = false;
 	}
 
@@ -48,7 +45,6 @@ void InitialiseEffectsObjects()
 		obj->initialise = InitialiseFlameEmitter3;
 		obj->control = FlameEmitter3Control;
 		obj->drawRoutine = nullptr;
-		obj->saveFlags = true;
 		obj->usingDrawAnimatingItem = false;
 	}
 
@@ -57,8 +53,5 @@ void InitialiseEffectsObjects()
 		obj->initialise = nullptr;
 		obj->collision = nullptr;
 		obj->control = ControlEnemyMissile;
-		obj->savePosition = true;
-		obj->saveFlags = true;
-		obj->saveAnim = true;
 	}
 }
