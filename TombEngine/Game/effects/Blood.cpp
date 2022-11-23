@@ -297,10 +297,13 @@ namespace TEN::Effects::Blood
 				continue;
 			}
 
+			// TODO: Refine this.
 			// Update scale.
-			bool updateVertexPoints = true;
+			bool updateVertexPoints = false;
 			if (stain.ScaleRate > 0.0f)
 			{
+				updateVertexPoints = true;
+
 				if (!TestBloodStainFloor(stain))
 					stain.ScaleRate = 0.0f;
 
@@ -309,10 +312,7 @@ namespace TEN::Effects::Blood
 				{
 					stain.ScaleRate *= 0.2f;
 					if (abs(stain.ScaleRate) <= FLT_EPSILON)
-					{
-						updateVertexPoints = false;
 						stain.ScaleRate = 0.0f;
-					}
 				}
 			}
 
