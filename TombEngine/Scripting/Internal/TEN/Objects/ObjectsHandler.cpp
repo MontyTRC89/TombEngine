@@ -10,6 +10,7 @@
 #include "collision/collide_item.h"
 #include "collision/collide_room.h"
 #include "ScriptInterfaceGame.h"
+#include "Lara/LaraObject.h"
 
 /***
 Moveables, statics, cameras, and so on.
@@ -38,6 +39,22 @@ ObjectsHandler::ObjectsHandler(sol::state* lua, sol::table & parent) :
 	@treturn Static a non-owning Static referencing the mesh.
 	*/
 	m_table_objects.set_function(ScriptReserved_GetStaticByName, &ObjectsHandler::GetByName<Static, ScriptReserved_Static>, this);
+
+	/***
+	Get moveables by its slot.
+	@function GetMoveablesBySlot
+	@tparam ObjID slot the unique slot of the Moveable, e.g. `Objects.ObjID.ANIMATING1`
+	@treturn table table of Moveables referencing the given slot.
+	*/
+	m_table_objects.set_function(ScriptReserved_GetMoveablesBySlot, &ObjectsHandler::GetMoveablesBySlot<Moveable>, this);
+
+	/***
+	Get statics by its slot.
+	@function GetStaticsBySlot
+	@tparam int slot the unique slot of the mesh like 10
+	@treturn table table of Statics referencing the given slot ID.
+	*/
+	m_table_objects.set_function(ScriptReserved_GetStaticsBySlot, &ObjectsHandler::GetStaticsBySlot<Static>, this);
 
 	/***
 	Get a Camera by its name.
@@ -71,6 +88,7 @@ ObjectsHandler::ObjectsHandler(sol::state* lua, sol::table & parent) :
 	*/
 	m_table_objects.set_function(ScriptReserved_GetAIObjectByName, &ObjectsHandler::GetByName<AIObject, ScriptReserved_AIObject>, this);
 
+	LaraObject::Register(m_table_objects);
 
 	Moveable::Register(m_table_objects);
 	Moveable::SetNameCallbacks(
@@ -109,6 +127,8 @@ ObjectsHandler::ObjectsHandler(sol::state* lua, sol::table & parent) :
 	);
 
 	m_handler.MakeReadOnlyTable(m_table_objects, ScriptReserved_ObjID, kObjIDs);
+	m_handler.MakeReadOnlyTable(m_table_objects, ScriptReserved_LaraWeaponType, LaraWeaponTypeMap);
+	m_handler.MakeReadOnlyTable(m_table_objects, ScriptReserved_HandStatus, HandStatusMap);
 }
 
 void ObjectsHandler::TestCollidingObjects()
@@ -149,7 +169,7 @@ void ObjectsHandler::TestCollidingObjects()
 
 void ObjectsHandler::AssignLara()
 {
-	m_table_objects.set("Lara", Moveable(Lara.ItemNumber, false));
+	m_table_objects.set(ScriptReserved_Lara, LaraObject(Lara.ItemNumber, false));
 }
 
 

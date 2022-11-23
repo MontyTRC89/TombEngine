@@ -789,7 +789,7 @@ bool TestLaraWaterStepOut(ItemInfo* item, CollisionInfo* coll)
 	}
 
 	item->Pose.Position.y += coll->Middle.Floor + CLICK(2.75f) - 9;
-	UpdateItemRoom(item, -(STEPUP_HEIGHT - 3));
+	UpdateLaraRoom(item, -(STEPUP_HEIGHT - 3));
 
 	item->Animation.IsAirborne = false;
 	item->Animation.Velocity.z = 0;

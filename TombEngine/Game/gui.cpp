@@ -24,9 +24,11 @@
 #include "Specific/clock.h"
 #include "Specific/configuration.h"
 #include "Specific/level.h"
+#include "Specific/trutils.h"
 
 using namespace TEN::Input;
 using namespace TEN::Renderer;
+using namespace TEN::Utils;
 
 namespace TEN::Gui
 {
@@ -43,13 +45,13 @@ namespace TEN::Gui
 		STRING_USE,
 		STRING_CHOOSE_AMMO,
 		STRING_COMBINE,
-		STRING_SEPARE,
+		STRING_SEPARATE,
 		STRING_EQUIP,
 		STRING_COMBINE_WITH,
 		STRING_LOAD_GAME,
 		STRING_SAVE_GAME,
 		STRING_EXAMINE,
-		STRING_STATISTICS,
+		STRING_VIEW,
 		STRING_CHOOSE_WEAPON,
 		""
 	//	STRING_READ_DIARY
@@ -74,12 +76,12 @@ namespace TEN::Gui
 		STRING_CONTROLS_PAUSE,
 		STRING_CONTROLS_STEP_LEFT,
 		STRING_CONTROLS_STEP_RIGHT,
-		STRING_CONTROLS_ACCELERATE,
-		STRING_CONTROLS_REVERSE,
-		STRING_CONTROLS_SPEED,
-		STRING_CONTROLS_SLOW,
-		STRING_CONTROLS_BRAKE,
-		STRING_CONTROLS_FIRE
+		STRING_CONTROLS_V_ACCELERATE,
+		STRING_CONTROLS_V_REVERSE,
+		STRING_CONTROLS_V_SPEED,
+		STRING_CONTROLS_V_SLOW,
+		STRING_CONTROLS_V_BRAKE,
+		STRING_CONTROLS_V_FIRE
 	};
 
 	bool GuiController::GuiIsPulsed(ActionID actionID) const
@@ -1186,7 +1188,13 @@ namespace TEN::Gui
 
 			if (options & OPT_CHOOSE_AMMO_HK)
 			{
-				AmmoObjectList[number].InventoryItem = INV_OBJECT_HK_AMMO;
+				AmmoObjectList[number].InventoryItem = INV_HK_MODE1;
+				AmmoObjectList[number].Amount = Ammo.AmountHKAmmo1;
+				number++;
+				AmmoObjectList[number].InventoryItem = INV_HK_MODE2;
+				AmmoObjectList[number].Amount = Ammo.AmountHKAmmo1;
+				number++;
+				AmmoObjectList[number].InventoryItem = INV_HK_MODE3;
 				AmmoObjectList[number].Amount = Ammo.AmountHKAmmo1;
 				number++;
 				NumAmmoSlots = number;
@@ -1319,10 +1327,16 @@ namespace TEN::Gui
 
 			if (lara->Weapons[(int)LaraWeaponType::HK].Present)
 			{
-				if (lara->Weapons[(int)LaraWeaponType::HK].HasSilencer)
-					InsertObjectIntoList(INV_OBJECT_HK_SILENCER);
+				if (lara->Weapons[(int)LaraWeaponType::HK].HasLasersight)
+					InsertObjectIntoList(INV_OBJECT_HK_LASERSIGHT);
 				else
 					InsertObjectIntoList(INV_OBJECT_HK);
+
+				if (lara->Weapons[(int)LaraWeaponType::HK].WeaponMode == LaraWeaponTypeCarried::WTYPE_AMMO_2)
+					Ammo.CurrentHKAmmoType = 1;
+
+				if (lara->Weapons[(int)LaraWeaponType::HK].WeaponMode == LaraWeaponTypeCarried::WTYPE_AMMO_3)
+					Ammo.CurrentHKAmmoType = 2;
 			}
 			else if (Ammo.AmountHKAmmo1)
 				InsertObjectIntoList(INV_OBJECT_HK_AMMO);
@@ -1513,7 +1527,12 @@ namespace TEN::Gui
 			}
 
 			if (lara->Weapons[(int)LaraWeaponType::HK].Present)
-				InsertObjectIntoList_v2(INV_OBJECT_HK);
+			{
+				if (lara->Weapons[(int)LaraWeaponType::HK].HasLasersight)
+					InsertObjectIntoList_v2(INV_OBJECT_HK_LASERSIGHT);
+				else
+					InsertObjectIntoList_v2(INV_OBJECT_HK);
+			}
 
 			if (lara->Weapons[(int)LaraWeaponType::Crossbow].Present)
 			{
@@ -2005,7 +2024,8 @@ namespace TEN::Gui
 
 		if (Rings[(int)RingTypes::Ammo]->RingActive)
 		{
-			g_Renderer.AddString(PHD_CENTER_X, PHD_CENTER_Y, g_GameFlow->GetString(OptionStrings[5]), PRINTSTRING_COLOR_WHITE, PRINTSTRING_BLINK | PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
+			auto optionString = g_GameFlow->GetString(OptionStrings[5]);
+			g_Renderer.AddString(PHD_CENTER_X, PHD_CENTER_Y, optionString, PRINTSTRING_COLOR_WHITE, PRINTSTRING_BLINK | PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
 
 			if (Rings[(int)RingTypes::Inventory]->ObjectListMovement)
 				return;
@@ -2027,9 +2047,9 @@ namespace TEN::Gui
 					SoundEffect(SFX_TR4_MENU_COMBINE, nullptr, SoundEnvironment::Always);
 				}
 				else if (ammoItem >= INV_OBJECT_SMALL_WATERSKIN_EMPTY &&
-					ammoItem <= INV_OBJECT_SMALL_WATERSKIN_3L &&
-					invItem >= INV_OBJECT_BIG_WATERSKIN_EMPTY &&
-					invItem <= INV_OBJECT_BIG_WATERSKIN_5L)
+						 ammoItem <= INV_OBJECT_SMALL_WATERSKIN_3L &&
+						 invItem >= INV_OBJECT_BIG_WATERSKIN_EMPTY &&
+						 invItem <= INV_OBJECT_BIG_WATERSKIN_5L)
 				{
 					if (PerformWaterskinCombine(item, true))
 					{
@@ -2043,9 +2063,9 @@ namespace TEN::Gui
 					CombineRingFadeDir = 2;
 				}
 				else if (invItem >= INV_OBJECT_SMALL_WATERSKIN_EMPTY &&
-					invItem <= INV_OBJECT_SMALL_WATERSKIN_3L &&
-					ammoItem >= INV_OBJECT_BIG_WATERSKIN_EMPTY &&
-					ammoItem <= INV_OBJECT_BIG_WATERSKIN_5L)
+						 invItem <= INV_OBJECT_SMALL_WATERSKIN_3L &&
+						 ammoItem >= INV_OBJECT_BIG_WATERSKIN_EMPTY &&
+						 ammoItem <= INV_OBJECT_BIG_WATERSKIN_5L)
 				{
 					if (PerformWaterskinCombine(item, false))
 					{
@@ -2131,7 +2151,7 @@ namespace TEN::Gui
 					n++;
 				}
 
-				if (options & (OPT_CHOOSE_AMMO_SHOTGUN | OPT_CHOOSE_AMMO_CROSSBOW | OPT_CHOOSE_AMMO_GRENADEGUN))
+				if (options & (OPT_CHOOSE_AMMO_SHOTGUN | OPT_CHOOSE_AMMO_CROSSBOW | OPT_CHOOSE_AMMO_GRENADEGUN | OPT_CHOOSE_AMMO_HK))
 				{
 					CurrentOptions[n].Type = MenuType::ChooseAmmo;
 					CurrentOptions[n].Text = g_GameFlow->GetString(OptionStrings[1]);
@@ -2179,7 +2199,7 @@ namespace TEN::Gui
 
 				options = InventoryObjectTable[Rings[(int)RingTypes::Inventory]->CurrentObjectList[Rings[(int)RingTypes::Inventory]->CurrentObjectInList].InventoryItem].Options;
 
-				if (options & (OPT_CHOOSE_AMMO_CROSSBOW | OPT_CHOOSE_AMMO_GRENADEGUN))
+				if (options & (OPT_CHOOSE_AMMO_CROSSBOW | OPT_CHOOSE_AMMO_GRENADEGUN | OPT_CHOOSE_AMMO_HK))
 				{
 					n = 3;
 					CurrentOptions[2].Type = MenuType::Ammo3;
@@ -2200,14 +2220,16 @@ namespace TEN::Gui
 			{
 				for (int i = 0; i < n; i++)
 				{
+					auto optionString = std::string(CurrentOptions[i].Text);
+
 					if (i == CurrentSelectedOption)
 					{
-						g_Renderer.AddString(PHD_CENTER_X, yPos, CurrentOptions[i].Text, PRINTSTRING_COLOR_WHITE, PRINTSTRING_BLINK | PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
+						g_Renderer.AddString(PHD_CENTER_X, yPos, optionString.c_str(), PRINTSTRING_COLOR_WHITE, PRINTSTRING_BLINK | PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
 						yPos += LINE_HEIGHT;
 					}
 					else
 					{
-						g_Renderer.AddString(PHD_CENTER_X, yPos, CurrentOptions[i].Text, PRINTSTRING_COLOR_WHITE, PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
+						g_Renderer.AddString(PHD_CENTER_X, yPos, optionString.c_str(), PRINTSTRING_COLOR_WHITE, PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
 						yPos += LINE_HEIGHT;
 					}
 				}
@@ -2379,6 +2401,23 @@ namespace TEN::Gui
 				lara->Weapons[(int)LaraWeaponType::Crossbow].SelectedAmmo = WeaponAmmoType::Ammo2;
 			else if (Ammo.CurrentCrossBowAmmoType == 2)
 				lara->Weapons[(int)LaraWeaponType::Crossbow].SelectedAmmo = WeaponAmmoType::Ammo3;
+		}
+
+		if (lara->Weapons[(int)LaraWeaponType::HK].Present)
+		{
+			lara->Weapons[(int)LaraWeaponType::HK].WeaponMode = LaraWeaponTypeCarried::WTYPE_AMMO_1;
+			lara->Weapons[(int)LaraWeaponType::HK].SelectedAmmo = WeaponAmmoType::Ammo1;
+
+			if (Ammo.CurrentHKAmmoType == 1)
+			{
+				lara->Weapons[(int)LaraWeaponType::HK].WeaponMode = LaraWeaponTypeCarried::WTYPE_AMMO_2;
+				lara->Weapons[(int)LaraWeaponType::HK].SelectedAmmo = WeaponAmmoType::Ammo1;
+			}
+			else if (Ammo.CurrentHKAmmoType == 2)
+			{
+				lara->Weapons[(int)LaraWeaponType::HK].WeaponMode = LaraWeaponTypeCarried::WTYPE_AMMO_3;
+				lara->Weapons[(int)LaraWeaponType::HK].SelectedAmmo = WeaponAmmoType::Ammo1;
+			}
 		}
 
 		if (lara->Weapons[(int)LaraWeaponType::GrenadeLauncher].Present)
@@ -2788,7 +2827,10 @@ namespace TEN::Gui
 				int y2 = 480; // Combine.
 				short objectNumber = ConvertInventoryItemToObject(Rings[ringIndex]->CurrentObjectList[n].InventoryItem);
 				float scaler = InventoryObjectTable[Rings[ringIndex]->CurrentObjectList[n].InventoryItem].Scale1;
-				g_Renderer.DrawObjectOn2DPosition(x, ringIndex == (int)RingTypes::Inventory ? y : y2, objectNumber, Rings[ringIndex]->CurrentObjectList[n].Orientation, scaler);
+				auto& orientation = Rings[ringIndex]->CurrentObjectList[n].Orientation;
+				int bits = InventoryObjectTable[Rings[ringIndex]->CurrentObjectList[n].InventoryItem].MeshBits;
+
+				g_Renderer.DrawObjectOn2DPosition(x, ringIndex == (int)RingTypes::Inventory ? y : y2, objectNumber, orientation, scaler, bits);
 
 				if (++n >= Rings[ringIndex]->NumObjectsInList)
 					n = 0;

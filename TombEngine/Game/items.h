@@ -49,6 +49,14 @@ enum ItemFlags
 constexpr unsigned int ALL_JOINT_BITS = UINT_MAX;
 constexpr unsigned int NO_JOINT_BITS  = 0;
 
+enum class EffectType
+{
+	None,
+	Fire,
+	Sparks,
+	Smoke
+};
+
 struct EntityAnimationData
 {
 	int AnimNumber	  = -1;
@@ -76,6 +84,13 @@ struct EntityCallbackData
 	std::string OnRoomCollided;
 };
 
+struct EntityEffectData
+{
+	EffectType Type = EffectType::None;
+	Vector3 LightColor = Vector3::One;
+	int Count = -1;
+};
+
 //todo we need to find good "default states" for a lot of these - squidshire 25/05/2022
 struct ItemInfo
 {
@@ -93,6 +108,7 @@ struct ItemInfo
 	EntityAnimationData Animation;
 	EntityCallbackData Callbacks;
 	EntityModelData Model;
+	EntityEffectData Effect;
 	
 	Pose StartPose;
 	Pose Pose;
@@ -130,12 +146,14 @@ struct ItemInfo
 	void SetFlags(short id, short value);
 
 	bool TestMeshSwapFlags(unsigned int flags);
-	bool TestMeshSwapFlags(const std::vector<unsigned int> flags);
+	bool TestMeshSwapFlags(const std::vector<unsigned int>& flags);
 	void SetMeshSwapFlags(unsigned int flags, bool clear = false);
-	void SetMeshSwapFlags(const std::vector<unsigned int> flags, bool clear = false);
+	void SetMeshSwapFlags(const std::vector<unsigned int>& flags, bool clear = false);
 
-	bool IsLara();
-	bool IsCreature();
+	bool IsLara() const;
+	bool IsCreature() const;
+
+	void ResetModelToDefault();
 };
 
 bool TestState(int refState, const std::vector<int>& stateList);
@@ -153,7 +171,9 @@ void KillEffect(short fxNumber);
 void InitialiseItem(short itemNumber);
 void InitialiseItemArray(int totalItems);
 void KillItem(short itemNumber);
-void UpdateItemRoom(ItemInfo* item, int height, int xOffset = 0, int zOffset = 0);
+void UpdateItemRoom(short itemNumber);
+void UpdateAllItems();
+void UpdateAllEffects();
 std::vector<int> FindAllItems(short objectNumber);
 ItemInfo* FindItem(int objectNumber);
 int FindItem(ItemInfo* item);

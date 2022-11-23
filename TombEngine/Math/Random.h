@@ -9,6 +9,7 @@ namespace TEN::Math::Random
 	Vector2 GenerateVector2(float length = 1.0f);
 	Vector3 GenerateVector3(float length = 1.0f);
 	Vector3 GenerateVector3InCone(const Vector3& direction, float semiangleInDeg, float length = 1.0f);
+	Vector3 GenerateVector3InBox(const BoundingOrientedBox& box);
 
 	bool TestProbability(float probability);
 }

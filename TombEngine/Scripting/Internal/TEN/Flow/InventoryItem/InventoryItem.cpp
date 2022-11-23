@@ -15,7 +15,7 @@ Represents the properties of an object as it appears in the inventory.
 	@function InventoryItem
 	@tparam string nameKey key for the item's (localised) name.<br />
 Corresponds to an entry in strings.lua.
-	@tparam Flow.InvItem slot slot of inventory object to change
+	@tparam ObjID slot slot of inventory object to change
 	@tparam int yOffset y-axis offset (positive values move the item down).<br />
 A value of about 100 will cause the item to display directly below its usual position.
 	@tparam float scale item size (1 being standard size).<br />

@@ -681,7 +681,7 @@ void HandleWeapon(ItemInfo* laraItem)
 			Camera.type = CameraType::Combat;
 		}
 
-		if (TrInput & IN_ACTION)
+		if (TrInput & IN_ACTION && !LaserSight)
 		{
 			if (!GetAmmo(*lara, lara->Control.Weapon.GunType))
 			{
@@ -707,6 +707,7 @@ void HandleWeapon(ItemInfo* laraItem)
 		case LaraWeaponType::HarpoonGun:
 		case LaraWeaponType::Revolver:
 			RifleHandler(laraItem, lara->Control.Weapon.GunType);
+			LasersightWeaponHandler(laraItem, lara->Control.Weapon.GunType);
 			break;
 
 		default:

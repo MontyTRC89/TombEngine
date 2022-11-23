@@ -6,7 +6,7 @@
 #include "Game/control/flipeffect.h"
 #include "Game/control/box.h"
 #include "Game/control/lot.h"
-#include "Game/effects/lara_fx.h"
+#include "Game/effects/item_fx.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_climb.h"
 #include "Game/Lara/lara_helpers.h"
@@ -22,7 +22,7 @@
 #include "Specific/setup.h"
 
 
-using namespace TEN::Effects::Lara;
+using namespace TEN::Effects::Items;
 using namespace TEN::Entities::Switches;
 
 int TriggerTimer;
@@ -179,21 +179,22 @@ int KeyTrigger(short itemNum)
 	return oldkey;
 }
 
-int PickupTrigger(short itemNum)
+bool PickupTrigger(short itemNum)
 {
 	ItemInfo* item = &g_Level.Items[itemNum];
 
-	if (item->Flags & IFLAG_KILLED
-		|| (item->Status != ITEM_INVISIBLE
-			|| item->ItemFlags[3] != 1
-			|| item->TriggerFlags & 0x80))
+	if (((item->Flags & IFLAG_CLEAR_BODY) && (item->Flags & IFLAG_KILLED)) ||
+		item->Status != ITEM_INVISIBLE || 
+		item->ItemFlags[3] != 1 || 
+		item->TriggerFlags & 0x80)
 	{
-		return 0;
+		return false;
 	}
 
 	KillItem(itemNum);
+	item->Flags |= IFLAG_CLEAR_BODY;
 
-	return 1;
+	return true;
 }
 
 void RefreshCamera(short type, short* data)
@@ -761,6 +762,11 @@ void ProcessSectorFlags(ItemInfo* item)
 			}
 		}
 		else if (Objects[item->ObjectNumber].intelligent && item->HitPoints != NOT_TARGETABLE)
-			DoDamage(item, INT_MAX); // TODO: Implement correct behaviour for other objects!
+		{
+			if (block->Material == FLOOR_MATERIAL::Water)
+				DoDamage(item, INT_MAX); // TODO: Implement correct rapids behaviour for other objects!
+			else
+				ItemBurn(item);
+		}
 	}
 }

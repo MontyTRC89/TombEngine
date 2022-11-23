@@ -26,9 +26,10 @@
 #include "Game/animation.h"
 #include "Game/camera.h"
 #include "Game/collision/collide_item.h"
+#include "Game/collision/floordata.h"
 #include "Game/control/flipeffect.h"
 #include "Game/control/volume.h"
-#include "Game/effects/lara_fx.h"
+#include "Game/effects/item_fx.h"
 #include "Game/effects/tomb4fx.h"
 #include "Game/Gui.h"
 #include "Game/items.h"
@@ -41,8 +42,10 @@
 #include "Renderer/Renderer11.h"
 
 using namespace TEN::Control::Volumes;
-using namespace TEN::Effects::Lara;
+using namespace TEN::Effects::Items;
+using namespace TEN::Floordata;
 using namespace TEN::Input;
+
 using std::function;
 using TEN::Renderer::g_Renderer;
 
@@ -557,7 +560,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 					lara.Control.WaterStatus = WaterStatus::Underwater;
 					lara.Air = LARA_AIR_MAX;
 
-					UpdateItemRoom(item, 0);
+					UpdateLaraRoom(item, 0);
 					StopSoundEffect(SFX_TR4_LARA_FALL);
 
 					if (item->Animation.ActiveState == LS_SWAN_DIVE)
@@ -652,7 +655,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 						item->Pose.Position.y = waterHeight;
 						lara.Control.WaterStatus = WaterStatus::TreadWater;
 
-						UpdateItemRoom(item, -(STEPUP_HEIGHT - 3));
+						UpdateLaraRoom(item, -(STEPUP_HEIGHT - 3));
 						SoundEffect(SFX_TR4_LARA_BREATH, &item->Pose, SoundEnvironment::Always);
 					}
 				}
@@ -667,7 +670,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 				item->Pose.Position.y = waterHeight + 1;
 				lara.Control.WaterStatus = WaterStatus::TreadWater;
 
-				UpdateItemRoom(item, 0);
+				UpdateLaraRoom(item, 0);
 				SoundEffect(SFX_TR4_LARA_BREATH, &item->Pose, SoundEnvironment::Always);
 			}
 
@@ -712,7 +715,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 					item->Pose.Position.y += 1 - heightFromWater;
 					lara.Control.WaterStatus = WaterStatus::TreadWater;
 
-					UpdateItemRoom(item, 0);
+					UpdateLaraRoom(item, 0);
 				}
 			}
 			else
@@ -845,7 +848,7 @@ void LaraAboveWater(ItemInfo* item, CollisionInfo* coll)
 	coll->Setup.Height = LARA_HEIGHT;
 	lara.Control.CanLook = true;
 
-	UpdateItemRoom(item, -LARA_HEIGHT / 2);
+	UpdateLaraRoom(item, -LARA_HEIGHT / 2);
 
 	// Process vehicles.
 	if (HandleLaraVehicle(item, coll))
@@ -961,7 +964,7 @@ void LaraWaterSurface(ItemInfo* item, CollisionInfo* coll)
 	if (lara.Vehicle == NO_ITEM)
 		lara_collision_routines[item->Animation.ActiveState](item, coll);
 
-	UpdateItemRoom(item, LARA_RADIUS);
+	UpdateLaraRoom(item, LARA_RADIUS);
 
 	HandleWeapon(item);
 
@@ -1047,7 +1050,7 @@ void LaraUnderwater(ItemInfo* item, CollisionInfo* coll)
 	if (/*lara.ExtraAnim == -1 &&*/ lara.Vehicle == NO_ITEM)
 		lara_collision_routines[item->Animation.ActiveState](item, coll);
 
-	UpdateItemRoom(item, 0);
+	UpdateLaraRoom(item, 0);
 
 	HandleWeapon(item);
 
@@ -1084,4 +1087,18 @@ void LaraCheat(ItemInfo* item, CollisionInfo* coll)
 		item->HitPoints = LARA_HEALTH_MAX;
 		lara.Control.HandStatus = HandStatus::Free;
 	}
+}
+
+// Offset values may be used to account for the quirk of room traversal only being able to occur at portals.
+void UpdateLaraRoom(ItemInfo* item, int height, int xOffset, int zOffset)
+{
+	auto point = Geometry::TranslatePoint(item->Pose.Position, item->Pose.Orientation.y, zOffset, height, xOffset);
+
+	// Hacky L-shaped Location traversal.
+	item->Location = GetRoom(item->Location, point.x, point.y, point.z);
+	item->Location = GetRoom(item->Location, item->Pose.Position.x, point.y, item->Pose.Position.z);
+	item->Floor = GetFloorHeight(item->Location, item->Pose.Position.x, item->Pose.Position.z).value_or(NO_HEIGHT);
+
+	if (item->RoomNumber != item->Location.roomNumber)
+		ItemNewRoom(item->Index, item->Location.roomNumber);
 }

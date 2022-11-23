@@ -217,7 +217,7 @@ namespace TEN::Renderer
 
 
 			// Auto targeting
-			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_AUTOTARGET), PRINTSTRING_COLOR_ORANGE, SF(title_option == 3));
+			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_AUTO_TARGET), PRINTSTRING_COLOR_ORANGE, SF(title_option == 3));
 			AddString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().Configuration.AutoTarget), PRINTSTRING_COLOR_WHITE, SF(title_option == 3));
 			GetNextLinePosition(&y);
 
@@ -255,7 +255,7 @@ namespace TEN::Renderer
 				AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(ControlStrings[k]), PRINTSTRING_COLOR_WHITE, SF(title_option == k));
 
 				if (g_Gui.GetCurrentSettings().WaitingForKey && title_option == k)
-					AddString(MenuRightSideEntry, y, g_GameFlow->GetString(STRING_WAITING_FOR_KEY), PRINTSTRING_COLOR_YELLOW, SF(true));
+					AddString(MenuRightSideEntry, y, g_GameFlow->GetString(STRING_WAITING_FOR_INPUT), PRINTSTRING_COLOR_YELLOW, SF(true));
 				else
 				{
 					int index = KeyboardLayout[1][k] ? KeyboardLayout[1][k] : KeyboardLayout[0][k];
@@ -408,7 +408,7 @@ namespace TEN::Renderer
 
 			if (!save.Present)
 			{
-				AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_UNUSED), PRINTSTRING_COLOR_WHITE, SF_Center(selection == n));
+				AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_EMPTY), PRINTSTRING_COLOR_WHITE, SF_Center(selection == n));
 			}
 			else
 			{
@@ -466,7 +466,7 @@ namespace TEN::Renderer
 		// Ammo used
 		sprintf(buffer, "%d", Statistics.Game.AmmoUsed);
 		AddString(MenuRightSideEntry, y, buffer, PRINTSTRING_COLOR_WHITE, SF());
-		AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_USED_AMMOS), PRINTSTRING_COLOR_WHITE, SF());
+		AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_AMMO_USED), PRINTSTRING_COLOR_WHITE, SF());
 		GetNextLinePosition(&y);
 
 		// Medipacks used
@@ -511,7 +511,7 @@ namespace TEN::Renderer
 		m_pickupRotation += 45 * 360 / 30;
 	}
 
-	void Renderer11::DrawObjectOn2DPosition(short x, short y, short objectNum, EulerAngles orient, float scale1)
+	void Renderer11::DrawObjectOn2DPosition(short x, short y, short objectNum, EulerAngles orient, float scale1, int meshBits)
 	{
 		Matrix translation;
 		Matrix rotation;
@@ -575,17 +575,10 @@ namespace TEN::Renderer
 
 		for (int n = 0; n < (*moveableObj).ObjectMeshes.size(); n++)
 		{
+			if (meshBits && !(meshBits & (1 << n)))
+				continue;
+
 			auto* mesh = (*moveableObj).ObjectMeshes[n];
-
-			/*if (GLOBAL_invMode)
-			{
-				InventoryObject* objme;
-
-				objme = &InventoryObjectTable[g_Gui.ConvertObjectToInventoryItem(objectNum)];
-
-				if (!(objme->meshbits & (1 << n)))
-					continue;
-			}*/
 
 			// Finish the world matrix
 			translation = Matrix::CreateTranslation(pos.x, pos.y, pos.z + 1024.0f);
