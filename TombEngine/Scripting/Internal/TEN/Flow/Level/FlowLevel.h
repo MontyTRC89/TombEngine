@@ -56,6 +56,6 @@ struct Level : public ScriptInterfaceLevel
 	short GetFogMinDistance() const override;
 	short GetFogMaxDistance() const override;
 	short GetFarView() const override;
-	void SetSecrets(short secrets);
+	void SetSecrets(int secrets);
 	int GetSecrets() const override;
 };
