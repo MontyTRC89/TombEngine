@@ -117,4 +117,3 @@ namespace TEN::Renderer
 		view.spritesToDraw.push_back(spr);
 	}
 }
-

@@ -9,6 +9,7 @@
 #include "Math/Math.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
+#include "Specific/setup.h"
 
 using namespace TEN::Math;
 
@@ -221,6 +222,7 @@ namespace TEN::Effects::Footprints
 		auto footprint = Footprint();
 
 		footprint.IsRightFoot = isRightFoot;
+		footprint.SpriteIndex = Objects[ID_MISC_SPRITES].meshIndex + 1 + (int)footprint.IsRightFoot;
 		footprint.VertexPoints = vertexPoints;
 		footprint.Life = std::round(FOOTPRINT_LIFE_MAX * FPS);
 		footprint.LifeStartFading = std::round(FOOTPRINT_LIFE_START_FADING * FPS);
