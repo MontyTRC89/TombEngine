@@ -19,21 +19,24 @@
 using namespace TEN::Floordata;
 using namespace TEN::Input;
 
+enum class PushableSoundState
+{
+	None,
+	Loop,
+	End
+};
+
 static auto PushableBlockPos = Vector3i::Zero;
 ObjectCollisionBounds PushableBlockBounds = 
 {
 	GameBoundingBox(
 		0, 0,
 		-CLICK(0.25f), 0,
-		0, 0
-	),
+		0, 0),
 	std::pair(
 		EulerAngles(ANGLE(-10.0f), ANGLE(-30.0f), ANGLE(-10.0f)),
-		EulerAngles(ANGLE(10.0f), ANGLE(30.0f), ANGLE(10.0f))
-	)
+		EulerAngles(ANGLE(10.0f), ANGLE(30.0f), ANGLE(10.0f)))
 };
-
-int DoPushPull = 0;
 
 void ClearMovableBlockSplitters(int x, int y, int z, short roomNumber)
 {
@@ -122,11 +125,12 @@ void InitialisePushableBlock(short itemNumber)
 
 	info->height = height;
 
-	info->loopSound = SFX_TR4_PUSHABLE_SOUND; // LUA
-	info->stopSound = SFX_TR4_PUSH_BLOCK_END; // LUA
-	info->fallSound = SFX_TR4_BOULDER_FALL; // LUA
+	// TODO: Attributes.
+	info->loopSound = SFX_TR4_PUSHABLE_SOUND;
+	info->stopSound = SFX_TR4_PUSH_BLOCK_END;
+	info->fallSound = SFX_TR4_BOULDER_FALL;
 
-	FindStack(itemNumber); // check for stack formation when pushables are initialised
+	FindStack(itemNumber); // Check for stack formation when pushables are initialized.
 }
 
 void PushableBlockControl(short itemNumber)
@@ -143,12 +147,14 @@ void PushableBlockControl(short itemNumber)
 	int x, z;
 	int blockHeight = GetStackHeight(item);
 
-	// do sound effects, it works for now
-	if (DoPushPull > 0)
-		SoundEffect(info->loopSound, &item->Pose, SoundEnvironment::Always);
-	else if (DoPushPull < 0)
+	// Do sound effects.
+	if (info->SoundState == PushableSoundState::Loop)
 	{
-		DoPushPull = 0;
+		SoundEffect(info->loopSound, &item->Pose, SoundEnvironment::Always);
+	}
+	else if (info->SoundState == PushableSoundState::End)
+	{
+		info->SoundState = PushableSoundState::None;
 		SoundEffect(info->stopSound, &item->Pose, SoundEnvironment::Always);
 	}
 
@@ -198,11 +204,12 @@ void PushableBlockControl(short itemNumber)
 		return;
 	}
 
-	int displaceBox = GameBoundingBox(LaraItem).Z2 - 80; // move pushable based on bbox->Z2 of Lara
+	int displaceBox = GameBoundingBox(LaraItem).Z2; // move pushable based on bbox->Z2 of Lara
 
 	switch (LaraItem->Animation.AnimNumber)
 	{
 	case LA_PUSHABLE_PUSH:
+		displaceBox -= CLICK(0.4f);
 
 		if (LaraItem->Animation.FrameNumber == g_Level.Anims[LaraItem->Animation.AnimNumber].frameBase)
 		{
@@ -212,36 +219,48 @@ void PushableBlockControl(short itemNumber)
 
 		switch (quadrant) 
 		{
-		case 0:
+		case NORTH:
 			z = info->moveZ + displaceBox;
 
 			if (abs(item->Pose.Position.z - z) < CLICK(2) && item->Pose.Position.z < z)
+			{
 				item->Pose.Position.z = z;
-
+				PushLoop(item);
+			}
+				
 			break;
 
-		case 1:
+		case EAST:
 			x = info->moveX + displaceBox;
 
 			if (abs(item->Pose.Position.x - x) < CLICK(2) && item->Pose.Position.x < x)
+			{
 				item->Pose.Position.x = x;
+				PushLoop(item);
+			}
 
 			break;
 
-		case 2:
+		case SOUTH:
 			z = info->moveZ - displaceBox;
 
 			if (abs(item->Pose.Position.z - z) < CLICK(2) && item->Pose.Position.z > z)
+			{
 				item->Pose.Position.z = z;
-
+				PushLoop(item);
+			}
+				
 			break;
 
-		case 3:
+		case WEST:
 			x = info->moveX - displaceBox;
 
 			if (abs(item->Pose.Position.x - x) < CLICK(2) && item->Pose.Position.x > x)
+			{
 				item->Pose.Position.x = x;
-
+				PushLoop(item);
+			}
+				
 			break;
 
 		default:
@@ -262,8 +281,9 @@ void PushableBlockControl(short itemNumber)
 					item->Pose.Position.z = item->Pose.Position.z & 0xFFFFFE00 | 0x200;
 					MoveStackXZ(itemNumber);
 					//SoundEffect(pushable->stopSound, &item->pos, SoundEnvironment::Always);
-					DoPushPull = 0;
 					LaraItem->Animation.TargetState = LS_IDLE;
+
+					info->SoundState = PushableSoundState::None;
 
 					item->Animation.IsAirborne = true; // do fall
 					return;
@@ -282,12 +302,16 @@ void PushableBlockControl(short itemNumber)
 				}
 			}
 			else
+			{
 				LaraItem->Animation.TargetState = LS_IDLE;
+				PushEnd(item);
+			}
 		}
 
 		break;
 
 	case LA_PUSHABLE_PULL:
+		displaceBox -= CLICK(0.2f);
 
 		if (LaraItem->Animation.FrameNumber == g_Level.Anims[LaraItem->Animation.AnimNumber].frameBase)
 		{
@@ -301,7 +325,10 @@ void PushableBlockControl(short itemNumber)
 			z = info->moveZ + displaceBox;
 
 			if (abs(item->Pose.Position.z - z) < CLICK(2) && item->Pose.Position.z > z)
+			{
 				item->Pose.Position.z = z;
+				PushLoop(item);
+			}
 
 			break;
 
@@ -309,15 +336,21 @@ void PushableBlockControl(short itemNumber)
 			x = info->moveX + displaceBox;
 
 			if (abs(item->Pose.Position.x - x) < CLICK(2) && item->Pose.Position.x > x)
+			{
 				item->Pose.Position.x = x;
-
+				PushLoop(item);
+			}
+				
 			break;
 
 		case SOUTH:
 			z = info->moveZ - displaceBox;
 
 			if (abs(item->Pose.Position.z - z) < CLICK(2) && item->Pose.Position.z < z)
+			{
 				item->Pose.Position.z = z;
+				PushLoop(item);
+			}
 
 			break;
 
@@ -325,8 +358,11 @@ void PushableBlockControl(short itemNumber)
 			x = info->moveX - displaceBox;
 
 			if (abs(item->Pose.Position.x - x) < CLICK(2) && item->Pose.Position.x < x)
+			{
 				item->Pose.Position.x = x;
-
+				PushLoop(item);
+			}
+				
 			break;
 
 		default:
@@ -334,6 +370,7 @@ void PushableBlockControl(short itemNumber)
 		}
 
 		MoveStackXZ(itemNumber);
+
 
 		if (LaraItem->Animation.FrameNumber == g_Level.Anims[LaraItem->Animation.AnimNumber].frameEnd - 1)
 		{
@@ -349,7 +386,10 @@ void PushableBlockControl(short itemNumber)
 				}
 			}
 			else
+			{
 				LaraItem->Animation.TargetState = LS_IDLE;
+				PushEnd(item);
+			}
 		}
 
 		break;
@@ -485,9 +525,9 @@ void PushableBlockCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo*
 		{
 			unsigned short quadrant = (unsigned short)((pushableItem->Pose.Orientation.y / 0x4000) + ((rot + 0x2000) / 0x4000));
 			if (quadrant & 1)
-				PushableBlockPos.z = bounds.X1 - 35;
+				PushableBlockPos.z = bounds.X1 - CLICK(0.4f);
 			else
-				PushableBlockPos.z = bounds.Z1 - 35;
+				PushableBlockPos.z = bounds.Z1 - CLICK(0.4f);
 
 			if (pushableInfo->hasFloorCeiling)
 			{					
@@ -539,15 +579,21 @@ void PushableBlockCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo*
 	}
 }
 
-void PushLoop(ItemInfo* item) // Do Flipeffect 18 in anims
+// Do flipeffect 18 in anims.
+void PushLoop(ItemInfo* item)
 {
-	DoPushPull = 1;
+	auto* info = (PushableInfo*)item->Data;
+
+	info->SoundState = PushableSoundState::Loop;
 }
 
-void PushEnd(ItemInfo* item) // Do Flipeffect 19 in anims
+// Do flipeffect 19 in anims.
+void PushEnd(ItemInfo* item)
 {
-	if (DoPushPull == 1)
-		DoPushPull = -1;
+	auto* info = (PushableInfo*)item->Data;
+
+	if (info->SoundState == PushableSoundState::Loop)
+		info->SoundState = PushableSoundState::End;
 }
 
 bool TestBlockMovable(ItemInfo* item, int blockHeight)
