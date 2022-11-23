@@ -1,3 +1,18 @@
+Version 1.0.4
+=============
+
+* Add generic assignable effects for moveables - burn, electricity and smoke.
+* Add ability to burn enemies with flame emitters, death blocks and script functions.
+* Add Flow.EnableMassPickup option in Gameflow.lua to enable/disable mass pickup.
+* Automatically align pickups to floor surface.
+* Fix legacy pickup triggers not working.
+* Fix lasersight always displaying with revolver and crossbow.
+* Fix incorrect string IDs for item combine, HK and revolver with lasersight.
+* Fix puzzle holes not swapping to puzzle done objects.
+* Fix several collision and sound source issues in flipped rooms.
+* Fix several pushable object collision bugs.
+* Fix TR1 centaur bubble targetting.
+
 Version 1.0.3
 =============
 

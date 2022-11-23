@@ -10,7 +10,7 @@
 #include "Game/effects/Bubble.h"
 #include "Game/effects/debris.h"
 #include "Game/effects/effects.h"
-#include "Game/effects/lara_fx.h"
+#include "Game/effects/item_fx.h"
 #include "Game/effects/Ripple.h"
 #include "Game/effects/tomb4fx.h"
 #include "Game/effects/weather.h"
@@ -31,7 +31,7 @@
 
 using namespace TEN::Effects::Bubble;
 using namespace TEN::Effects::Environment;
-using namespace TEN::Effects::Lara;
+using namespace TEN::Effects::Items;
 using namespace TEN::Effects::Ripple;
 using namespace TEN::Entities::Switches;
 using namespace TEN::Input;
@@ -53,6 +53,10 @@ constexpr auto PROJECTILE_EXPLODE_RADIUS = BLOCK(1);
 
 constexpr auto HK_BURST_MODE_SHOT_COUNT	   = 5;
 constexpr auto HK_BURST_MODE_SHOT_INTERVAL = 12.0f;
+
+constexpr auto SHOTGUN_PELLET_COUNT = 6;
+constexpr auto SHOTGUN_NORMAL_PELLET_SCATTER = 10.0f;
+constexpr auto SHOTGUN_WIDESHOT_PELLET_SCATTER = 30.0f;
 
 
 void AnimateShotgun(ItemInfo* laraItem, LaraWeaponType weaponType)
@@ -326,6 +330,10 @@ void FireShotgun(ItemInfo* laraItem)
 {
 	auto* lara = GetLaraInfo(laraItem);
 
+	auto& ammo = GetAmmo(*lara, LaraWeaponType::Shotgun);
+	if (!ammo.HasInfinite() && !ammo.GetCount())
+		return;
+
 	auto armOrient = EulerAngles(
 		lara->LeftArm.Orientation.x,
 		lara->LeftArm.Orientation.y + laraItem->Pose.Orientation.y,
@@ -341,22 +349,31 @@ void FireShotgun(ItemInfo* laraItem)
 		);
 	}
 
-	int value = (lara->Weapons[(int)LaraWeaponType::Shotgun].SelectedAmmo == WeaponAmmoType::Ammo1 ? 1820 : 5460);
 	bool hasFired = false;
-	for (int i = 0; i < 6; i++)
+	int scatter = (lara->Weapons[(int)LaraWeaponType::Shotgun].SelectedAmmo == WeaponAmmoType::Ammo1 ? 
+				  ANGLE(SHOTGUN_NORMAL_PELLET_SCATTER) : ANGLE(SHOTGUN_WIDESHOT_PELLET_SCATTER));
+
+
+	for (int i = 0; i < SHOTGUN_PELLET_COUNT; i++)
 	{
 		auto wobbledArmOrient = EulerAngles(
-			armOrient.x + value * (GetRandomControl() - ANGLE(90.0f)) / 65536,
-			armOrient.y + value * (GetRandomControl() - ANGLE(90.0f)) / 65536,
-			0
-		);
+			armOrient.x + scatter * (GetRandomControl() - ANGLE(90.0f)) / 65536,
+			armOrient.y + scatter * (GetRandomControl() - ANGLE(90.0f)) / 65536,
+			0);
 
 		if (FireWeapon(LaraWeaponType::Shotgun, lara->TargetEntity, laraItem, wobbledArmOrient) != FireWeaponType::NoAmmo)
 			hasFired = true;
+
+		// HACK: compensate for spending 6 units of shotgun ammo. -- Lwmte, 18.11.22
+		if (!ammo.HasInfinite())
+			ammo++;
 	}
 
 	if (hasFired)
 	{
+		if (!ammo.HasInfinite())
+			ammo--;
+
 		auto pos = GetJointPosition(laraItem, LM_RHAND, Vector3i(0, 1508, 32));
 		auto pos2 = GetJointPosition(laraItem, LM_RHAND, Vector3i(0, 228, 32));
 
@@ -1233,9 +1250,12 @@ void DoExplosiveDamage(ItemInfo& emitter, ItemInfo& target, ItemInfo& projectile
 		if (emitter.ItemFlags[2])
 			return;
 
-		emitter.HitStatus = true;
+		target.HitStatus = true;
 
 		HitTarget(&emitter, &target, nullptr, damage, 1);
+
+		if (Random::TestProbability(1 / 2.0f))
+			ItemBurn(&target);
 					
 		if (&target != &emitter)
 		{
@@ -1247,11 +1267,11 @@ void DoExplosiveDamage(ItemInfo& emitter, ItemInfo& target, ItemInfo& projectile
 			}
 		}
 	}
-	else
+	else if (target.IsLara())
 	{
-		DoDamage(&emitter, damage * 5);
-		if (!TestEnvironment(ENV_FLAG_WATER, target.RoomNumber) && emitter.HitPoints <= 0)
-			LaraBurn(&emitter);
+		DoDamage(&target, damage * 5);
+		if (!TestEnvironment(ENV_FLAG_WATER, target.RoomNumber) && target.HitPoints <= 0)
+			ItemBurn(&target);
 	}
 }
 
@@ -1400,7 +1420,7 @@ void HandleProjectile(ItemInfo& item, ItemInfo& emitter, const Vector3i& prevPos
 	if (type == ProjectileType::Explosive && item.ItemFlags[3])
 	{
 		// Fire trail and water collision for grenade fragments
-		TriggerFireFlame(item.Pose.Position.x, item.Pose.Position.y, item.Pose.Position.z, -1, 1);
+		TriggerFireFlame(item.Pose.Position.x, item.Pose.Position.y, item.Pose.Position.z, FlameType::Medium);
 		if (TestEnvironment(ENV_FLAG_WATER, item.RoomNumber))
 			hasHit = true;
 	}

@@ -27,7 +27,7 @@
 #include "Game/collision/floordata.h"
 #include "Game/control/flipeffect.h"
 #include "Game/control/volume.h"
-#include "Game/effects/lara_fx.h"
+#include "Game/effects/item_fx.h"
 #include "Game/effects/tomb4fx.h"
 #include "Game/Gui.h"
 #include "Game/items.h"
@@ -45,7 +45,7 @@ using namespace TEN::Effects::Blood;
 //
 
 using namespace TEN::Control::Volumes;
-using namespace TEN::Effects::Lara;
+using namespace TEN::Effects::Items;
 using namespace TEN::Floordata;
 using namespace TEN::Input;
 

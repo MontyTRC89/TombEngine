@@ -31,9 +31,6 @@ namespace TEN::Entities::Traps::TR1
 		object->control = ControlDamoclesSword;
 		object->collision = CollideDamoclesSword;
 		//object->shadowSize = UNIT_SHADOW;
-		object->savePosition = true;
-		object->saveAnim = true;
-		object->saveFlags = true;
 	}
 
 	void InitialiseDamoclesSword(short itemNumber)

@@ -28,17 +28,15 @@ void ShootAtLara(FX_INFO& fx)
 {
 	auto target = Vector3(
 		LaraItem->Pose.Position.x,
-		LaraItem->Pose.Position.y + (GameBoundingBox(LaraItem).GetHeight() * 0.75f),
-		LaraItem->Pose.Position.z
-	);
+		LaraItem->Pose.Position.y - (GameBoundingBox(LaraItem).GetHeight() * 0.75f),
+		LaraItem->Pose.Position.z);
 	fx.pos.Orientation = Geometry::GetOrientToPoint(fx.pos.Position.ToVector3(), target);
 
 	// Apply slight random scatter.
 	fx.pos.Orientation += EulerAngles(
 		Random::GenerateAngle(ANGLE(-1.4f), ANGLE(1.4f)),
 		Random::GenerateAngle(ANGLE(-1.4f), ANGLE(1.4f)),
-		0
-	);
+		0);
 }
 
 // TODO: Make ControlMissile() not use LaraItem global. -- TokyoSU 5/8/2022

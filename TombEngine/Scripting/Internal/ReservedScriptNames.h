@@ -93,8 +93,8 @@ static constexpr char ScriptReserved_SetRoom[]				= "SetRoom";
 static constexpr char ScriptReserved_GetStrength[]			= "GetStrength";
 static constexpr char ScriptReserved_SetStrength[]			= "SetStrength";
 static constexpr char ScriptReserved_GetValid[]				= "GetValid";
-static constexpr char ScriptReserved_SetOnFire[]			= "SetOnFire";
-static constexpr char ScriptReserved_GetOnFire[]			= "GetOnFire";
+static constexpr char ScriptReserved_SetEffect[]			= "SetEffect";
+static constexpr char ScriptReserved_GetEffect[]			= "GetEffect";
 static constexpr char ScriptReserved_Destroy[]				= "Destroy";
 static constexpr char ScriptReserved_GetKey[]				= "GetKey";
 static constexpr char ScriptReserved_SetKey[]				= "SetKey";
@@ -125,6 +125,7 @@ static constexpr char ScriptReserved_SetSecretCount[]			= "SetSecretCount";
 static constexpr char ScriptReserved_SetTotalSecretCount[]		= "SetTotalSecretCount";
 static constexpr char ScriptReserved_AddSecret[]				= "AddSecret";
 static constexpr char ScriptReserved_EnableFlyCheat[]			= "EnableFlyCheat";
+static constexpr char ScriptReserved_EnableMassPickup[]			= "EnableMassPickup";
 
 // Flow Functions
 static constexpr char ScriptReserved_SetStrings[]			= "SetStrings";
@@ -205,6 +206,7 @@ static constexpr char ScriptReserved_SetWeaponType[]				= "SetWeaponType";
 // Enums
 static constexpr char ScriptReserved_ObjID[]					= "ObjID";
 static constexpr char ScriptReserved_BlendID[]					= "BlendID";
+static constexpr char ScriptReserved_EffectID[]					= "EffectID";
 static constexpr char ScriptReserved_DisplayStringOption[]		= "DisplayStringOption";
 static constexpr char ScriptReserved_CallbackPoint[]			= "CallbackPoint";
 
