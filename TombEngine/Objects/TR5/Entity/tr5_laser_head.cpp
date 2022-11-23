@@ -10,6 +10,10 @@
 #include "Game/effects/tomb4fx.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
+#include "Sound/sound.h"
+#include "Objects/TR5/Entity/tr5_laserhead_info.h"
+#include "Game/effects/lightning.h"
+#include "Game/effects/item_fx.h"
 #include "Game/misc.h"
 #include "Game/people.h"
 #include "Math/Math.h"
@@ -18,7 +22,7 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-using namespace TEN::Effects::Lara;
+using namespace TEN::Effects::Items;
 using namespace TEN::Effects::Lightning;
 using namespace TEN::Math;
 
@@ -302,7 +306,7 @@ namespace TEN::Entities::Creatures::TR5
 					if (LOS(&origin, &target) &&
 						distance <= MAX_VISIBILITY_DISTANCE &&
 						LaraItem->HitPoints > 0 &&
-						!Lara.Burn &&
+						LaraItem->Effect.Type == EffectType::None &&
 						(LaserHeadData.target.x || LaserHeadData.target.y || LaserHeadData.target.z))
 					{
 						// Lock target for attacking.
@@ -424,7 +428,7 @@ namespace TEN::Entities::Creatures::TR5
 							arc &&
 							!arc->life ||
 							LaraItem->HitPoints <= 0 ||
-							Lara.Burn)
+							LaraItem->Effect.Type != EffectType::None)
 						{
 							if (arc)
 							{
@@ -494,7 +498,7 @@ namespace TEN::Entities::Creatures::TR5
 									}
 
 									// Check if Lara was hit by energy arcs
-									if (!Lara.Burn)
+									if (LaraItem->Effect.Type == EffectType::None)
 									{
 										int someIndex = 0;
 
@@ -552,11 +556,8 @@ namespace TEN::Entities::Creatures::TR5
 
 												if (x > x1 && x < x2 && y > y1 && y < y2 && z > z1 && z < z2)
 												{
-													LaraBurn(LaraItem);
+													ItemElectricBurn(LaraItem);
 													DoDamage(LaraItem, INT_MAX);
-													Lara.BurnCount = 48;
-													Lara.BurnBlue = 2;
-													LaraItem->HitPoints = 0;
 													break;
 												}
 

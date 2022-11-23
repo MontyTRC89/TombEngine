@@ -17,8 +17,12 @@
 #include "Scripting/Internal/TEN/Color/Color.h"
 #include "Scripting/Internal/TEN/Vec3/Vec3.h"
 #include "Sound/sound.h"
-#include "Specific/setup.h"
 #include "Specific/clock.h"
+#include "Specific/setup.h"
+#include "Game/effects/lightning.h"
+#include "Effects/BlendIDs.h"
+#include "Effects/EffectIDs.h"
+#include "ReservedScriptNames.h"
 
 /***
 Functions to generate effects.
@@ -346,6 +350,7 @@ namespace Effects
 
 		LuaHandler handler{ state };
 		handler.MakeReadOnlyTable(table_effects, ScriptReserved_BlendID, kBlendIDs);
+		handler.MakeReadOnlyTable(table_effects, ScriptReserved_EffectID, kEffectIDs);
 	}
 }
 

@@ -172,9 +172,9 @@ namespace TEN::Entities::Creatures::TR5
 				joint3 = AI.angle / 2;
 
 				if (Wibble & 0x10)
-					item->MeshSwapBits = 1024;
+					item->SetMeshSwapFlags(1024);
 				else
-					item->MeshSwapBits = NO_JOINT_BITS;
+					item->SetMeshSwapFlags(NO_JOINT_BITS);
 
 				switch (item->Animation.ActiveState)
 				{

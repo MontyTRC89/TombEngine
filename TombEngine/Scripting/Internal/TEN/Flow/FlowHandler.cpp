@@ -108,17 +108,24 @@ __(not yet implemented)__
 
 /*** Total number of secrets in game.
 Must be an integer value (0 means no secrets).
-@function SetNumberOfSecrets
+@function SetTotalSecretCount
 @tparam int total number of secrets
 */
-	table_flow.set_function(ScriptReserved_SetNumberOfSecrets, &FlowHandler::SetNumberOfSecrets, this);
+	table_flow.set_function(ScriptReserved_SetTotalSecretCount, &FlowHandler::SetTotalSecretCount, this);
 
-/*** Set FlyCheatEnabled
+/*** Enable or disable DOZY mode (fly cheat).
 Must be true or false
-@function SetFlyCheatEnabled
+@function EnableFlyCheat
 @tparam bool true or false
 */
 	table_flow.set_function(ScriptReserved_EnableFlyCheat, &FlowHandler::EnableFlyCheat, this);
+
+/*** Enable or disable mass pickup.
+Must be true or false
+@function EnableMassPickup
+@tparam bool true or false
+*/
+	table_flow.set_function(ScriptReserved_EnableMassPickup, &FlowHandler::EnableMassPickup, this);
 
 /*** settings.lua.
 These functions are called in settings.lua, a file which holds your local settings.
@@ -220,7 +227,7 @@ void FlowHandler::SetTitleScreenImagePath(std::string const& path)
 	TitleScreenImagePath = path;
 }
 
-void FlowHandler::SetNumberOfSecrets(int secretsNumber)
+void FlowHandler::SetTotalSecretCount(int secretsNumber)
 {
 	NumberOfSecrets = secretsNumber;
 }
@@ -237,7 +244,7 @@ void FlowHandler::LoadFlowScript()
 char const * FlowHandler::GetString(const char* id) const
 {
 	if (!ScriptAssert(m_translationsMap.find(id) != m_translationsMap.end(), std::string{ "Couldn't find string " } + id))
-		return "String not found";
+		return "String not found.";
 	else
 		return m_translationsMap.at(string(id)).at(0).c_str();
 }
@@ -331,6 +338,16 @@ bool FlowHandler::IsFlyCheatEnabled() const
 void FlowHandler::EnableFlyCheat(bool flyCheat)
 {
 	FlyCheat = flyCheat;
+}
+
+bool FlowHandler::IsMassPickupEnabled() const
+{
+	return MassPickup;
+}
+
+void FlowHandler::EnableMassPickup(bool massPickup)
+{
+	MassPickup = massPickup;
 }
 
 bool FlowHandler::DoFlow()

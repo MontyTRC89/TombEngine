@@ -16,9 +16,16 @@
 #include "Sound/sound.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
+#include "Specific/level.h"
+#include "Sound/sound.h"
+#include "Game/itemdata/creature_info.h"
+#include "Game/effects/lightning.h"
+#include "Game/effects/item_fx.h"
+#include "Game/effects/spark.h"
 
-using namespace TEN::Effects::Lara;
+using namespace TEN::Effects::Items;
 using namespace TEN::Effects::Lightning;
+using namespace TEN::Effects::Spark;
 
 namespace TEN::Entities::Creatures::TR5
 {
@@ -129,44 +136,6 @@ namespace TEN::Entities::Creatures::TR5
 		SetAnimation(item, CYBORG_ANIM_IDLE);
 	}
 
-	void TriggerHitmanSparks(int x, int y, int z, short xv, short yv, short zv)
-	{
-		int dx = LaraItem->Pose.Position.x - x;
-		int dz = LaraItem->Pose.Position.z - z;
-
-		if (dx >= -SECTOR(16) && dx <= SECTOR(16) &&
-			dz >= -SECTOR(16) && dz <= SECTOR(16))
-		{
-			auto* spark = GetFreeParticle();
-
-			spark->sR = -1;
-			spark->sG = -1;
-			spark->sB = -1;
-			spark->dR = -1;
-			spark->on = 1;
-			spark->colFadeSpeed = 3;
-			spark->fadeToBlack = 5;
-			spark->dG = (rand() & 127) + 64;
-			spark->dB = -64 - spark->dG;
-			spark->life = 10;
-			spark->sLife = 10;
-			spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
-			spark->friction = 34;
-			spark->scalar = 1;
-			spark->flags = SP_SCALE;
-			spark->x = (rand() & 7) + x - 3;
-			spark->y = ((rand() / 8) & 7) + y - 3;
-			spark->z = ((rand() / 64) & 7) + z - 3;
-			spark->xVel = (byte)(rand() / 4) + xv - 128;
-			spark->yVel = (byte)(rand() / 16) + yv - 128;
-			spark->zVel = (byte)(rand() / 64) + zv - 128;
-			spark->sSize = spark->size = ((rand() / 512) & 3) + 4;
-			spark->dSize = ((rand() / 4096) & 1) + 1;
-			spark->maxYvel = 0;
-			spark->gravity = 0;
-		}
-	}
-
 	void CyborgControl(short itemNumber)
 	{
 		if (!CreatureActive(itemNumber))
@@ -241,7 +210,7 @@ namespace TEN::Entities::Creatures::TR5
 			{
 				if (item->ItemFlags[0] < 11)
 				{
-					item->MeshSwapBits |= 1 << HitmanJoints[item->ItemFlags[0]];
+					item->SetMeshSwapFlags(1 << HitmanJoints[item->ItemFlags[0]]);
 					item->ItemFlags[0]++;
 				}
 			}
@@ -256,7 +225,8 @@ namespace TEN::Entities::Creatures::TR5
 			auto pos = GetJointPosition(item, HitmanJoints[random], Vector3i(0, 0, 50));
 
 			TriggerLightningGlow(pos.x, pos.y, pos.z, 48, 32, 32, 64);
-			TriggerHitmanSparks(pos.x, pos.y, pos.z, -1, -1, -1);
+			TriggerElectricSpark(&GameVector(pos.x, pos.y, pos.z, item->RoomNumber),
+				EulerAngles(Random::GenerateInt(ANGLE(0), ANGLE(35)), Random::GenerateInt(ANGLE(0), ANGLE(360)), 0), 10);
 			TriggerDynamicLight(pos.x, pos.y, pos.z, (GetRandomControl() & 3) + 16, 31, 63, 127);
 
 			SoundEffect(SFX_TR5_HITMAN_SPARKS_SHORT, &item->Pose);
@@ -603,7 +573,7 @@ namespace TEN::Entities::Creatures::TR5
 				break;
 			}
 		}
-		else if (item->Animation.ActiveState == 43 && !Lara.Burn)
+		else if (item->Animation.ActiveState == 43 && LaraItem->Effect.Type == EffectType::None)
 		{
 			auto pos = GetJointPosition(LaraItem, LM_LFOOT);
 
@@ -624,10 +594,8 @@ namespace TEN::Entities::Creatures::TR5
 			{
 				if (roomLeft->flipNumber == flipNumber || roomRight->flipNumber == flipNumber)
 				{
-					LaraBurn(creature->Enemy);
+					ItemElectricBurn(creature->Enemy);
 					DoDamage(creature->Enemy, INT_MAX);
-					Lara.BurnCount = 48;
-					Lara.BurnBlue = 1;
 				}
 			}
 		}

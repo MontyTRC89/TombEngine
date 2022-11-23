@@ -20,7 +20,11 @@
 #include "Objects/TR1/Entity/tr1_winged_mutant.h"
 #include "Objects/Utils/object_helper.h"
 
+// Traps
+#include "Objects/TR1/Trap/DamoclesSword.h"
+
 using namespace TEN::Entities::Creatures::TR1;
+using namespace TEN::Entities::Traps::TR1;
 
 static void StartEntity(ObjectInfo* obj)
 {
@@ -36,10 +40,6 @@ static void StartEntity(ObjectInfo* obj)
 		obj->pivotLength = 375;
 		obj->radius = 340;
 		obj->intelligent = true;
-		obj->savePosition = true;
-		obj->saveHitpoints = true;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
 		obj->SetBoneRotation(2, ROT_Y); // head
 	}
 
@@ -55,10 +55,6 @@ static void StartEntity(ObjectInfo* obj)
 		obj->pivotLength = 500;
 		obj->radius = 340;
 		obj->intelligent = true;
-		obj->savePosition = true;
-		obj->saveHitpoints = true;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
 		obj->SetBoneRotation(13, ROT_Y); // head
 	}
 
@@ -73,10 +69,6 @@ static void StartEntity(ObjectInfo* obj)
 		obj->pivotLength = 250;
 		obj->radius = 340;
 		obj->intelligent = true;
-		obj->savePosition = true;
-		obj->saveHitpoints = true;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
 		obj->ZoneType = ZoneType::Ape;
 	}
 
@@ -92,10 +84,6 @@ static void StartEntity(ObjectInfo* obj)
 		obj->pivotLength = 200;
 		obj->radius = 204;
 		obj->intelligent = true;
-		obj->savePosition = true;
-		obj->saveHitpoints = true;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
 		obj->waterCreature = true;
 		obj->ZoneType = ZoneType::Water;
 		obj->SetBoneRotation(1, ROT_Y); // head
@@ -112,10 +100,6 @@ static void StartEntity(ObjectInfo* obj)
 		obj->radius = 204;
 		obj->hitEffect = HIT_BLOOD;
 		obj->intelligent = true;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-		obj->savePosition = true;
-		obj->saveHitpoints = true;
 		obj->SetBoneRotation(2, ROT_X | ROT_Z);
 	}
 
@@ -130,10 +114,6 @@ static void StartEntity(ObjectInfo* obj)
 		obj->hitEffect = HIT_BLOOD;
 		obj->radius = 341;
 		obj->intelligent = true;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-		obj->savePosition = true;
-		obj->saveHitpoints = true;
 		obj->SetBoneRotation(1, ROT_Y);
 	}
 
@@ -152,9 +132,6 @@ static void StartEntity(ObjectInfo* obj)
 		obj->hitEffect = HIT_BLOOD;
 		obj->radius = 102;
 		//obj->intelligent = true;
-		obj->saveFlags = true;
-		obj->savePosition = true;
-		obj->saveHitpoints = true;
 	}
 
 	obj = &Objects[ID_CENTAUR_MUTANT];
@@ -169,10 +146,6 @@ static void StartEntity(ObjectInfo* obj)
 		obj->pivotLength = 400;
 		obj->radius = BLOCK(1.0f / 3);
 		obj->intelligent = true;
-		obj->savePosition = true;
-		obj->saveHitpoints = true;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
 		obj->ZoneType = ZoneType::Blockable;
 		obj->SetBoneRotation(10, ROT_X | ROT_Y);
 	}
@@ -189,15 +162,10 @@ static void StartEntity(ObjectInfo* obj)
 		obj->radius = BLOCK(1.0f / 3);
 		obj->HitPoints = 50;
 		obj->intelligent = true;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-		obj->saveHitpoints = true;
-		obj->savePosition = true;
 		obj->ZoneType = ZoneType::Flyer;
 		obj->SetBoneRotation(1, ROT_Y); // torso
 		obj->SetBoneRotation(2, ROT_Y); // head
 	}
-
 }
 
 static void StartObject(ObjectInfo* obj)
@@ -213,7 +181,9 @@ static void StartObject(ObjectInfo* obj)
 
 static void StartTrap(ObjectInfo* obj)
 {
-
+	obj = &Objects[ID_DAMOCLES_SWORD];
+	if (obj->loaded)
+		SetupDamoclesSword(obj);
 }
 
 static void StartProjectiles(ObjectInfo* obj)

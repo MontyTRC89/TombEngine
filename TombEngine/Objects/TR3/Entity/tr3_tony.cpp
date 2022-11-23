@@ -7,7 +7,7 @@
 #include "Game/control/lot.h"
 #include "Game/control/box.h"
 #include "Game/effects/effects.h"
-#include "Game/effects/lara_fx.h"
+#include "Game/effects/item_fx.h"
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
 #include "Game/items.h"
@@ -18,7 +18,7 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-using namespace TEN::Effects::Lara;
+using namespace TEN::Effects::Items;
 
 namespace TEN::Entities::Creatures::TR3
 {
@@ -450,14 +450,14 @@ namespace TEN::Entities::Creatures::TR3
 			return;
 		}
 
-		if (!Lara.Burn)
+		if (LaraItem->Effect.Type == EffectType::None)
 		{
 			if (ItemNearLara(fx->pos.Position, 200))
 			{
 				LaraItem->HitStatus = true;
 				KillEffect(fxNumber);
 				DoDamage(LaraItem, 200);
-				LaraBurn(LaraItem);
+				ItemBurn(LaraItem);
 				return;
 			}
 		}

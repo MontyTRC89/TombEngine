@@ -107,14 +107,14 @@ void HairControl(ItemInfo* item, int ponytail, AnimFrame* framePtr)
 		frame = framePtr;
 
 	// Get Lara's spheres in absolute coordinates for head, torso, hips, and upper arms.
-	auto* mesh = &g_Level.Meshes[lara->MeshPtrs[LM_HIPS]];
+	auto* mesh = &g_Level.Meshes[item->Model.MeshIndex[LM_HIPS]];
 	auto pos = GetJointPosition(item, LM_HIPS, Vector3i(mesh->sphere.Center.x, mesh->sphere.Center.y, mesh->sphere.Center.z));
 	sphere[0].x = pos.x;
 	sphere[0].y = pos.y;
 	sphere[0].z = pos.z;
 	sphere[0].r = (int)mesh->sphere.Radius;
 
-	mesh = &g_Level.Meshes[lara->MeshPtrs[LM_TORSO]];
+	mesh = &g_Level.Meshes[item->Model.MeshIndex[LM_TORSO]];
 	pos = GetJointPosition(item, LM_TORSO, Vector3i(mesh->sphere.Center.x - 10, mesh->sphere.Center.y, mesh->sphere.Center.z + 25));
 	sphere[1].x = pos.x;
 	sphere[1].y = pos.y;
@@ -123,21 +123,21 @@ void HairControl(ItemInfo* item, int ponytail, AnimFrame* framePtr)
 	if (youngLara)
 		sphere[1].r = sphere[1].r - ((sphere[1].r >> 2) + (sphere[1].r >> 3));
 
-	mesh = &g_Level.Meshes[lara->MeshPtrs[LM_HEAD]];
+	mesh = &g_Level.Meshes[item->Model.MeshIndex[LM_HEAD]];
 	pos = GetJointPosition(item, LM_HEAD, Vector3i(mesh->sphere.Center.x - 2, mesh->sphere.Center.y, mesh->sphere.Center.z));
 	sphere[2].x = pos.x;
 	sphere[2].y = pos.y;
 	sphere[2].z = pos.z;
 	sphere[2].r = (int)mesh->sphere.Radius;
 
-	mesh = &g_Level.Meshes[lara->MeshPtrs[LM_RINARM]];
+	mesh = &g_Level.Meshes[item->Model.MeshIndex[LM_RINARM]];
 	pos = GetJointPosition(item, LM_RINARM, Vector3i(mesh->sphere.Center.x, mesh->sphere.Center.y, mesh->sphere.Center.z));
 	sphere[3].x = pos.x;
 	sphere[3].y = pos.y;
 	sphere[3].z = pos.z;
 	sphere[3].r = int(4.0f * mesh->sphere.Radius / 3.0f); // Resizing sphere - from tomb5 
 
-	mesh = &g_Level.Meshes[lara->MeshPtrs[LM_LINARM]];
+	mesh = &g_Level.Meshes[item->Model.MeshIndex[LM_LINARM]];
 	pos = GetJointPosition(item, LM_LINARM, Vector3i(mesh->sphere.Center.x, mesh->sphere.Center.y, mesh->sphere.Center.z));
 	sphere[4].x = pos.x;
 	sphere[4].y = pos.y;

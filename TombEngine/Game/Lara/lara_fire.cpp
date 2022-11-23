@@ -641,7 +641,7 @@ void HandleWeapon(ItemInfo* laraItem)
 		break;
 
 	case HandStatus::WeaponUndraw:
-		lara->MeshPtrs[LM_HEAD] = Objects[ID_LARA_SKIN].meshIndex + LM_HEAD;
+		laraItem->Model.MeshIndex[LM_HEAD] = laraItem->Model.BaseMesh + LM_HEAD;
 
 		switch (lara->Control.Weapon.GunType)
 		{
@@ -672,9 +672,9 @@ void HandleWeapon(ItemInfo* laraItem)
 
 	case HandStatus::WeaponReady:
 		if (!(TrInput & IN_ACTION))
-			lara->MeshPtrs[LM_HEAD] = Objects[ID_LARA_SKIN].meshIndex + LM_HEAD;
+			laraItem->Model.MeshIndex[LM_HEAD] = laraItem->Model.BaseMesh + LM_HEAD;
 		else
-			lara->MeshPtrs[LM_HEAD] = Objects[ID_LARA_SCREAM].meshIndex + LM_HEAD;
+			laraItem->Model.MeshIndex[LM_HEAD] = Objects[ID_LARA_SCREAM].meshIndex + LM_HEAD;
 
 		if (Camera.type != CameraType::Look &&
 			Camera.type != CameraType::Heavy)
@@ -682,7 +682,7 @@ void HandleWeapon(ItemInfo* laraItem)
 			Camera.type = CameraType::Combat;
 		}
 
-		if (TrInput & IN_ACTION)
+		if (TrInput & IN_ACTION && !LaserSight)
 		{
 			if (!GetAmmo(*lara, lara->Control.Weapon.GunType))
 			{
@@ -708,6 +708,7 @@ void HandleWeapon(ItemInfo* laraItem)
 		case LaraWeaponType::HarpoonGun:
 		case LaraWeaponType::Revolver:
 			RifleHandler(laraItem, lara->Control.Weapon.GunType);
+			LasersightWeaponHandler(laraItem, lara->Control.Weapon.GunType);
 			break;
 
 		default:
@@ -747,7 +748,7 @@ void HandleWeapon(ItemInfo* laraItem)
 	case HandStatus::Busy:
 		if (lara->Control.Weapon.GunType == LaraWeaponType::Flare)
 		{
-			if (lara->MeshPtrs[LM_LHAND] == Objects[ID_FLARE_ANIM].meshIndex + LM_LHAND)
+			if (laraItem->Model.MeshIndex[LM_LHAND] == Objects[ID_FLARE_ANIM].meshIndex + LM_LHAND)
 			{
 				lara->Flare.ControlLeft = (lara->Vehicle != NO_ITEM || TestState(laraItem->Animation.ActiveState, FlarePoseStates));
 				DoFlareInHand(laraItem, lara->Flare.Life);
@@ -1148,10 +1149,10 @@ void HitTarget(ItemInfo* laraItem, ItemInfo* targetEntity, GameVector* hitPos, i
 		}
 	}
 
-	if (!targetEntity->LuaCallbackOnHitName.empty())
+	if (!targetEntity->Callbacks.OnHit.empty())
 	{
-		short index = g_GameScriptEntities->GetIndexByName(targetEntity->LuaName);
-		g_GameScript->ExecuteFunction(targetEntity->LuaCallbackOnHitName, index);
+		short index = g_GameScriptEntities->GetIndexByName(targetEntity->Name);
+		g_GameScript->ExecuteFunction(targetEntity->Callbacks.OnHit, index);
 	}
 }
 

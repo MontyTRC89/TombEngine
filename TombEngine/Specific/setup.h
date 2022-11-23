@@ -58,17 +58,10 @@ struct ObjectInfo
 	bool loaded;
 	bool intelligent;
 	bool nonLot;
-	bool savePosition;
-	bool saveHitpoints;
-	bool saveFlags;
-	bool saveAnim;
-	bool semiTransparent;
 	bool waterCreature;
 	bool usingDrawAnimatingItem;
 	HitEffectEnum hitEffect;
 	bool undead;
-	bool saveMesh;
-	bool friendly;
 	bool isPickup;
 	bool isPuzzleHole;
 	int meshSwapSlot;
