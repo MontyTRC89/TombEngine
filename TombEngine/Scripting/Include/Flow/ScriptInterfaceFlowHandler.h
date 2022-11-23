@@ -16,7 +16,7 @@ public:
 	int	SelectedLevelForNewGame{ 0 };
 	int SelectedSaveGame{ 0 };
 	bool EnableLoadSave{ true };
-	int NumberOfSecrets{ 0 };
+	int TotalNumberOfSecrets{ 0 };
 	std::string	TitleScreenImagePath{};
 	TITLE_TYPE TitleType{ TITLE_TYPE::FLYBY };
 
