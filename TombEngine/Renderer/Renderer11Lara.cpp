@@ -244,7 +244,9 @@ void Renderer11::UpdateLaraAnimations(bool force)
 	for (int m = 0; m < 15; m++)
 		laraObj.AnimationTransforms[m] = item->AnimationTransforms[m];
 
-	m_items[Lara.ItemNumber].DoneAnimations = true;
+	// Copy meshswap indices
+	item->MeshIndex = LaraItem->Model.MeshIndex;
+	item->DoneAnimations = true;
 }
 
 void TEN::Renderer::Renderer11::DrawLara(RenderView& view, bool transparent)
@@ -287,7 +289,7 @@ void TEN::Renderer::Renderer11::DrawLara(RenderView& view, bool transparent)
 	m_stItem.AmbientLight = item->AmbientLight;
 	memcpy(m_stItem.BonesMatrices, laraObj.AnimationTransforms.data(), sizeof(Matrix) * MAX_BONES);
 	for (int k = 0; k < laraSkin.ObjectMeshes.size(); k++)
-		m_stItem.BoneLightModes[k] = GetMesh(Lara.MeshPtrs[k])->LightMode;
+		m_stItem.BoneLightModes[k] = GetMesh(nativeItem->Model.MeshIndex[k])->LightMode;
 
 	m_cbItem.updateData(m_stItem, m_context.Get());
 	BindConstantBufferVS(CB_ITEM, m_cbItem.get());
@@ -300,8 +302,7 @@ void TEN::Renderer::Renderer11::DrawLara(RenderView& view, bool transparent)
 		if (!nativeItem->MeshBits.Test(k))
 			continue;
 
-		RendererMesh *mesh = GetMesh(Lara.MeshPtrs[k]);
-		DrawMoveableMesh(item, mesh, room, k, transparent);
+		DrawMoveableMesh(item, GetMesh(nativeItem->Model.MeshIndex[k]), room, k, transparent);
 	}
 
 	DrawLaraHolsters(transparent);

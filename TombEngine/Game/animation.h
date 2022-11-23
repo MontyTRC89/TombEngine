@@ -1,59 +1,19 @@
 #pragma once
-#include "Math/Math.h" // TODO: Including this here shouldn't be necessary.
+#include "Math/Math.h"
+
+using namespace TEN::Math;
 
 class EulerAngles;
-struct ItemInfo;
 class Pose;
 class Vector3i;
+struct ItemInfo;
 
-struct AnimFrame
-{
-	GameBoundingBox boundingBox;
-	short offsetX;
-	short offsetY;
-	short offsetZ;
-	std::vector<Quaternion> angles;
-};
-
-struct StateDispatchData
-{
-	int TargetState	 = -1;
-	int NumberRanges = 0;
-	int RangeIndex	 = -1;
-};
-
-struct StateDispatchRangeData
-{
-	int StartFrame	 = -1;
-	int EndFrame	 = -1;
-	int LinkAnimNum	 = -1;
-	int LinkFrameNum = -1;
-};
-
-struct AnimData
-{
-	int FramePtr;
-	int Interpolation;
-	int ActiveState;
-
-	// CONVENTION: +X = right, +Y = down, +Z = forward
-	Vector3 VelocityStart = Vector3::Zero;
-	Vector3 VelocityEnd	  = Vector3::Zero;
-
-	int frameBase;
-	int frameEnd;
-
-	int JumpAnimNum;
-	int JumpFrameNum;
-	int NumStateDispatches;
-	int StateDispatchIndex;
-	int NumCommands;
-	int CommandIndex;
-};
+constexpr auto NO_STATE = -1;
+constexpr auto NO_ANIM	= -1;
 
 enum class AnimCommandType
 {
-	None = 0,
+	None,
 	MoveOrigin,
 	JumpVelocity,
 	AttackReady,
@@ -62,20 +22,65 @@ enum class AnimCommandType
 	Flipeffect
 };
 
+struct AnimFrame
+{
+	GameBoundingBox boundingBox = GameBoundingBox::Zero;
+	short offsetX = 0;
+	short offsetY = 0;
+	short offsetZ = 0;
+	std::vector<Quaternion> angles = {};
+};
+
+struct StateDispatchData
+{
+	int TargetState	 = NO_STATE;
+	int NumberRanges = 0;
+	int RangeIndex	 = 0;
+};
+
+struct StateDispatchRangeData
+{
+	int StartFrame	 = 0;
+	int EndFrame	 = 0;
+	int LinkAnimNum	 = NO_ANIM;
+	int LinkFrameNum = NO_ANIM;
+};
+
+struct AnimData
+{
+	int FramePtr	  = 0;
+	int Interpolation = 0;
+	int ActiveState	  = 0;
+
+	// CONVENTION: +X = Right, +Y = Down, +Z = Forward.
+	Vector3 VelocityStart = Vector3::Zero;
+	Vector3 VelocityEnd	  = Vector3::Zero;
+
+	int frameBase = 0;
+	int frameEnd  = 0;
+
+	int JumpAnimNum		   = NO_ANIM;
+	int JumpFrameNum	   = 0;
+	int NumStateDispatches = 0;
+	int StateDispatchIndex = 0;
+	int NumCommands		   = 0;
+	int CommandIndex	   = 0;
+};
+
 struct BoneMutator
 {
 	Vector3 Offset   = Vector3::Zero;
 	Vector3 Rotation = Vector3::Zero;
 	Vector3 Scale    = Vector3::One;
 
-	bool IsEmpty() { return (Offset == Vector3::Zero) && (Rotation == Vector3::Zero) && (Scale == Vector3::One); };
+	bool IsEmpty() { return ((Offset == Vector3::Zero) && (Rotation == Vector3::Zero) && (Scale == Vector3::One)); };
 };
 
 void AnimateLara(ItemInfo* item);
 void AnimateItem(ItemInfo* item);
 
-bool HasStateDispatch(ItemInfo* item, int targetState = -1);
-bool TestLastFrame(ItemInfo* item, int animNumber = -1);
+bool HasStateDispatch(ItemInfo* item, int targetState = NO_STATE);
+bool TestLastFrame(ItemInfo* item, int animNumber = NO_ANIM);
 
 void TranslateItem(ItemInfo* item, short headingAngle, float forward, float down = 0.0f, float right = 0.0f);
 void TranslateItem(ItemInfo* item, const EulerAngles& orient, float distance);
@@ -96,3 +101,5 @@ void ClampRotation(Pose& outPose, short angle, short rotation);
 void DrawAnimatingItem(ItemInfo* item);
 
 Vector3i GetJointPosition(ItemInfo* item, int jointIndex, const Vector3i& offset = Vector3i::Zero);
+
+void PerformAnimCommands(ItemInfo* item, bool isFrameBased);

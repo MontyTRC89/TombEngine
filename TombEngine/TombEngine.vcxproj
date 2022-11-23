@@ -76,6 +76,7 @@
       <BufferSecurityCheck>false</BufferSecurityCheck>
       <AdditionalOptions>/Zc:__cplusplus /experimental:external /external:anglebrackets</AdditionalOptions>
       <DisableSpecificWarnings>4244;5051;4018;4554;4996;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -163,8 +164,12 @@ CALL gen.bat</Command>
     <ClInclude Include="Game\control\trigger.h" />
     <ClInclude Include="Game\control\volume.h" />
     <ClInclude Include="Game\debug\debug.h" />
+    <ClInclude Include="Game\effects\item_fx.h" />
     <ClInclude Include="Game\effects\lightning.h" />
     <ClInclude Include="Game\GuiObjects.h" />
+    <ClInclude Include="Objects\TR1\Trap\DamoclesSword.h" />
+    <ClInclude Include="Scripting\Internal\TEN\Effects\EffectIDs.h" />
+    <ClInclude Include="Scripting\Internal\TEN\Objects\Lara\LaraObject.h" />
     <ClInclude Include="Specific\Input\InputAction.h" />
     <ClInclude Include="Game\itemdata\door_data.h" />
     <ClInclude Include="Game\effects\drip.h" />
@@ -195,7 +200,6 @@ CALL gen.bat</Command>
     <ClInclude Include="Objects\Generic\Traps\falling_block.h" />
     <ClInclude Include="Objects\Effects\effect_objects.h" />
     <ClInclude Include="Objects\Effects\flame_emitters.h" />
-    <ClInclude Include="Game\effects\lara_fx.h" />
     <ClInclude Include="Objects\Generic\Traps\dart_emitter.h" />
     <ClInclude Include="Objects\Sink.h" />
     <ClInclude Include="Objects\TR1\Entity\tr1_winged_mutant.h" />
@@ -377,7 +381,7 @@ CALL gen.bat</Command>
     <ClInclude Include="Objects\TR5\Object\tr5_missile.h" />
     <ClInclude Include="Objects\TR5\Object\tr5_pushableblock.h" />
     <ClInclude Include="Objects\TR5\Object\tr5_twoblockplatform.h" />
-    <ClInclude Include="Objects\TR5\Trap\tr5_deathslide.h" />
+    <ClInclude Include="Objects\TR5\Trap\tr5_zip_line.h" />
     <ClInclude Include="Objects\TR5\Trap\tr5_romehammer.h" />
     <ClInclude Include="Objects\TR4\Trap\tr4_teethspike.h" />
     <ClInclude Include="Objects\TR5\Trap\tr5_ventilator.h" />
@@ -622,10 +626,13 @@ CALL gen.bat</Command>
     <ClCompile Include="Game\debug\debug.cpp" />
     <ClCompile Include="Game\effects\drip.cpp" />
     <ClCompile Include="Game\effects\explosion.cpp" />
+    <ClCompile Include="Game\effects\item_fx.cpp" />
     <ClCompile Include="Game\effects\weather.cpp" />
     <ClCompile Include="Game\collision\floordata.cpp" />
     <ClCompile Include="Game\effects\footprint.cpp" />
     <ClCompile Include="Game\GuiObjects.cpp" />
+    <ClCompile Include="Objects\TR1\Trap\DamoclesSword.cpp" />
+    <ClCompile Include="Scripting\Internal\TEN\Objects\Lara\LaraObject.cpp" />
     <ClCompile Include="Specific\Input\InputAction.cpp" />
     <ClCompile Include="Game\itemdata\itemdata.cpp" />
     <ClCompile Include="Game\Lara\lara_basic.cpp" />
@@ -668,7 +675,6 @@ CALL gen.bat</Command>
     <ClCompile Include="Objects\Generic\Traps\falling_block.cpp" />
     <ClCompile Include="Objects\Effects\effect_objects.cpp" />
     <ClCompile Include="Objects\Effects\flame_emitters.cpp" />
-    <ClCompile Include="Game\effects\lara_fx.cpp" />
     <ClCompile Include="Objects\Generic\Traps\dart_emitter.cpp" />
     <ClCompile Include="Objects\TR1\Entity\tr1_winged_mutant.cpp" />
     <ClCompile Include="Objects\TR5\Trap\tr5_wreckingball.cpp" />
@@ -767,7 +773,7 @@ CALL gen.bat</Command>
     <ClCompile Include="Objects\TR5\Object\tr5_teleporter.cpp" />
     <ClCompile Include="Objects\TR5\Switch\tr5_raisingcog.cpp" />
     <ClCompile Include="Objects\TR5\Object\tr5_twoblockplatform.cpp" />
-    <ClCompile Include="Objects\TR5\Trap\tr5_deathslide.cpp" />
+    <ClCompile Include="Objects\TR5\Trap\tr5_zip_line.cpp" />
     <ClCompile Include="Objects\TR5\Trap\tr5_romehammer.cpp" />
     <ClCompile Include="Objects\TR4\Trap\tr4_teethspike.cpp" />
     <ClCompile Include="Objects\TR5\Trap\tr5_ventilator.cpp" />

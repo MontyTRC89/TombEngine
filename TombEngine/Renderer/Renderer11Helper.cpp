@@ -120,11 +120,11 @@ namespace TEN::Renderer
 		{
 			auto* nativeItem = &g_Level.Items[item->ItemNumber];
 
-			if (nativeItem->Animation.Mutator.size() == boneIndexList.size())
+			if (nativeItem->Model.Mutator.size() == boneIndexList.size())
 			{
 				for (int i : boneIndexList)
 				{
-					auto mutator = nativeItem->Animation.Mutator[i];
+					auto mutator = nativeItem->Model.Mutator[i];
 					if (mutator.IsEmpty())
 						continue;
 
@@ -154,67 +154,72 @@ namespace TEN::Renderer
 		if (!force && itemToDraw->DoneAnimations)
 			return;
 
+		itemToDraw->DoneAnimations = true;
+
 		auto* obj = &Objects[nativeItem->ObjectNumber];
 		auto& moveableObj = *m_moveableObjects[nativeItem->ObjectNumber];
 
-		// Update animation matrices
-		if (obj->animIndex != -1 /*&& item->objectNumber != ID_HARPOON*/)
+		// Copy meshswaps
+		itemToDraw->MeshIndex = nativeItem->Model.MeshIndex;
+
+		if (obj->animIndex == -1)
+			return;
+
+		// Apply extra rotations
+		int lastJoint = 0;
+		for (int j = 0; j < moveableObj.LinearizedBones.size(); j++)
 		{
-			// Apply extra rotations
-			int lastJoint = 0;
-			for (int j = 0; j < moveableObj.LinearizedBones.size(); j++)
-			{
-				auto* currentBone = moveableObj.LinearizedBones[j];
+			auto* currentBone = moveableObj.LinearizedBones[j];
 
-				auto prevRotation = currentBone->ExtraRotation;
-				currentBone->ExtraRotation = Vector3(0.0f, 0.0f, 0.0f);
+			auto prevRotation = currentBone->ExtraRotation;
+			currentBone->ExtraRotation = Vector3(0.0f, 0.0f, 0.0f);
 				
-				nativeItem->Data.apply(
-					[&j, &currentBone](QuadBikeInfo& quadBike)
+			nativeItem->Data.apply(
+				[&j, &currentBone](QuadBikeInfo& quadBike)
+				{
+					if (j == 3 || j == 4)
+						currentBone->ExtraRotation.x = TO_RAD(quadBike.RearRot);
+					else if (j == 6 || j == 7)
 					{
-						if (j == 3 || j == 4)
-							currentBone->ExtraRotation.x = TO_RAD(quadBike.RearRot);
-						else if (j == 6 || j == 7)
-						{
-							currentBone->ExtraRotation.x = TO_RAD(quadBike.FrontRot);
-							currentBone->ExtraRotation.y = TO_RAD(quadBike.TurnRate * 2);
-						}
-					},
-					[&j, &currentBone](JeepInfo& jeep)
+						currentBone->ExtraRotation.x = TO_RAD(quadBike.FrontRot);
+						currentBone->ExtraRotation.y = TO_RAD(quadBike.TurnRate * 2);
+					}
+				},
+				[&j, &currentBone](JeepInfo& jeep)
+				{
+					switch(j)
 					{
-						switch(j)
-						{
-						case 9:
-							currentBone->ExtraRotation.x = TO_RAD(jeep.FrontRightWheelRotation);
-							currentBone->ExtraRotation.y = TO_RAD(jeep.TurnRate * 4);
-							break;
+					case 9:
+						currentBone->ExtraRotation.x = TO_RAD(jeep.FrontRightWheelRotation);
+						currentBone->ExtraRotation.y = TO_RAD(jeep.TurnRate * 4);
+						break;
 
-						case 10:
-							currentBone->ExtraRotation.x = TO_RAD(jeep.FrontLeftWheelRotation);
-							currentBone->ExtraRotation.y = TO_RAD(jeep.TurnRate * 4);
-							break;
+					case 10:
+						currentBone->ExtraRotation.x = TO_RAD(jeep.FrontLeftWheelRotation);
+						currentBone->ExtraRotation.y = TO_RAD(jeep.TurnRate * 4);
+						break;
 
-						case 12:
-							currentBone->ExtraRotation.x = TO_RAD(jeep.BackRightWheelRotation);
-							break;
+					case 12:
+						currentBone->ExtraRotation.x = TO_RAD(jeep.BackRightWheelRotation);
+						break;
 
-						case 13:
-							currentBone->ExtraRotation.x = TO_RAD(jeep.BackLeftWheelRotation);
-							break;
-						}
-					},
-					[&j, &currentBone](MotorbikeInfo& bike)
+					case 13:
+						currentBone->ExtraRotation.x = TO_RAD(jeep.BackLeftWheelRotation);
+						break;
+					}
+				},
+				[&j, &currentBone](MotorbikeInfo& bike)
+				{
+					switch (j)
 					{
-						switch (j)
-						{
-						case 2:
-							currentBone->ExtraRotation.x = TO_RAD(bike.RightWheelsRotation);
-							currentBone->ExtraRotation.y = TO_RAD(bike.TurnRate * 8);
-							break;
+					case 2:
+						currentBone->ExtraRotation.x = TO_RAD(bike.RightWheelsRotation);
+						currentBone->ExtraRotation.y = TO_RAD(bike.TurnRate * 8);
+						break;
 
-						case 4:
-							currentBone->ExtraRotation.x = TO_RAD(bike.RightWheelsRotation);
-							break;
+					case 4:
+						currentBone->ExtraRotation.x = TO_RAD(bike.RightWheelsRotation);
+						break;
 
 						case 8:
 							currentBone->ExtraRotation.x = TO_RAD(bike.LeftWheelRotation);
@@ -246,53 +251,50 @@ namespace TEN::Renderer
 							currentBone->ExtraRotation.x = TO_RAD(upv.LeftRudderRotation);
 							break;
 
-						case 2:
-							currentBone->ExtraRotation.x = TO_RAD(upv.RightRudderRotation);
-							break;
+					case 2:
+						currentBone->ExtraRotation.x = TO_RAD(upv.RightRudderRotation);
+						break;
 
-						case 3:
-							currentBone->ExtraRotation.z = TO_RAD(upv.TurbineRotation);
-							break;
-						}
-					},
-					[&j, &currentBone](BigGunInfo& big_gun)
+					case 3:
+						currentBone->ExtraRotation.z = TO_RAD(upv.TurbineRotation);
+						break;
+					}
+				},
+				[&j, &currentBone](BigGunInfo& big_gun)
+				{
+					if (j == 2)
+						currentBone->ExtraRotation.z = big_gun.BarrelRotation;
+				},
+				[&j, &currentBone, &lastJoint](CreatureInfo& creature)
+				{
+					if (currentBone->ExtraRotationFlags & ROT_Y)
 					{
-						if (j == 2)
-							currentBone->ExtraRotation.z = big_gun.BarrelRotation;
-					},
-					[&j, &currentBone, &lastJoint](CreatureInfo& creature)
+						currentBone->ExtraRotation.y = TO_RAD(creature.JointRotation[lastJoint]);
+						lastJoint++;
+					}
+
+					if (currentBone->ExtraRotationFlags & ROT_X)
 					{
-						if (currentBone->ExtraRotationFlags & ROT_Y)
-						{
-							currentBone->ExtraRotation.y = TO_RAD(creature.JointRotation[lastJoint]);
-							lastJoint++;
-						}
+						currentBone->ExtraRotation.x = TO_RAD(creature.JointRotation[lastJoint]);
+						lastJoint++;
+					}
 
-						if (currentBone->ExtraRotationFlags & ROT_X)
-						{
-							currentBone->ExtraRotation.x = TO_RAD(creature.JointRotation[lastJoint]);
-							lastJoint++;
-						}
-
-						if (currentBone->ExtraRotationFlags & ROT_Z)
-						{
-							currentBone->ExtraRotation.z = TO_RAD(creature.JointRotation[lastJoint]);
-							lastJoint++;
-						}
-					});
-			}
-
-			AnimFrame* framePtr[2];
-			int rate;
-			int frac = GetFrame(nativeItem, framePtr, rate);
-
-			UpdateAnimation(itemToDraw, moveableObj, framePtr, frac, rate, UINT_MAX);
-
-			for (int m = 0; m < obj->nmeshes; m++)
-				itemToDraw->AnimationTransforms[m] = itemToDraw->AnimationTransforms[m];
+					if (currentBone->ExtraRotationFlags & ROT_Z)
+					{
+						currentBone->ExtraRotation.z = TO_RAD(creature.JointRotation[lastJoint]);
+						lastJoint++;
+					}
+				});
 		}
 
-		itemToDraw->DoneAnimations = true;
+		AnimFrame* framePtr[2];
+		int rate;
+		int frac = GetFrame(nativeItem, framePtr, rate);
+
+		UpdateAnimation(itemToDraw, moveableObj, framePtr, frac, rate, UINT_MAX);
+
+		for (int m = 0; m < obj->nmeshes; m++)
+			itemToDraw->AnimationTransforms[m] = itemToDraw->AnimationTransforms[m];
 	}
 
 	void Renderer11::UpdateItemAnimations(RenderView& view)

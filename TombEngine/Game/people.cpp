@@ -84,7 +84,7 @@ short GunMiss(int x, int y, int z, short velocity, short yRot, short roomNumber)
 		LaraItem->RoomNumber
 	);
 
-	Richochet((Pose*)&pos);
+	Ricochet((Pose*)&pos);
 	return GunShot(x, y, z, velocity, yRot, roomNumber);
 }
 

@@ -18,9 +18,6 @@ void InitSmashObject(ObjectInfo* obj, int objectNumber)
 		obj->initialise = InitialiseSmashObject;
 		obj->collision = ObjectCollision;
 		obj->control = SmashObjectControl;
-		obj->saveFlags = true;
-		obj->saveAnim = true;
-		obj->saveMesh = true;
 	}
 }
 
@@ -31,7 +28,6 @@ void InitKeyHole(ObjectInfo* obj, int objectNumber)
 	{
 		obj->collision = KeyHoleCollision;
 		obj->hitEffect = HIT_RICOCHET;
-		obj->saveFlags = true;
 	}
 }
 
@@ -43,8 +39,6 @@ void InitPuzzleHole(ObjectInfo* obj, int objectNumber)
 		obj->collision = PuzzleHoleCollision;
 		obj->control = AnimatingControl;
 		obj->hitEffect = HIT_RICOCHET;
-		obj->saveFlags = true;
-		obj->saveAnim = true;
 		obj->isPuzzleHole = true;
 	}
 }
@@ -57,8 +51,6 @@ void InitPuzzleDone(ObjectInfo* obj, int objectNumber)
 		obj->collision = PuzzleDoneCollision;
 		obj->control = AnimatingControl;
 		obj->hitEffect = HIT_RICOCHET;
-		obj->saveFlags = true;
-		obj->saveAnim = true;
 	}
 }
 
@@ -71,9 +63,6 @@ void InitAnimating(ObjectInfo* obj, int objectNumber)
 		obj->control = AnimatingControl;
 		obj->collision = ObjectCollision;
 		obj->hitEffect = HIT_RICOCHET;
-		obj->saveFlags = true;
-		obj->saveAnim = true;
-		obj->saveMesh = true;
 		//Bones[obj->boneIndex + (0 * 4)] |= ROT_Y;
 		//Bones[obj->boneIndex + (1 * 4)] |= ROT_X;
 	}
@@ -87,8 +76,6 @@ void InitPickup(ObjectInfo* obj, int objectNumber)
 		obj->initialise = InitialisePickup;
 		obj->collision = PickupCollision;
 		obj->control = PickupControl;
-		obj->savePosition = true;
-		obj->saveFlags = true;
 		obj->isPickup = true;
 	}
 }
@@ -107,8 +94,6 @@ void InitPickupItem(ObjectInfo* obj, function<InitFunction> func, int objectNumb
 			obj->HitPoints = 256; // time
 		}
 
-		obj->saveFlags = true;
-		obj->savePosition = true;
 		if (useDrawAnimItem)
 			obj->usingDrawAnimatingItem = true;
 		else
@@ -124,9 +109,6 @@ void InitProjectile(ObjectInfo* obj, function<InitFunction> func, int objectNumb
 		obj->initialise = nullptr;
 		obj->collision = nullptr;
 		obj->control = func;
-		obj->savePosition = true;
-		obj->saveFlags = true;
-		obj->saveAnim = true;
 	}
 }
 
@@ -138,7 +120,6 @@ void InitSearchObject(ObjectInfo* obj, int objectNumber)
 		obj->initialise = InitialiseSearchObject;
 		obj->collision = SearchObjectCollision;
 		obj->control = SearchObjectControl;
-		obj->saveFlags = true;
 	}
 }
 
@@ -155,8 +136,5 @@ void InitPushableObject(ObjectInfo* obj, int objectNumber)
 		obj->floorBorder = PushableBlockFloorBorder;
 		obj->ceilingBorder = PushableBlockCeilingBorder;
 		obj->hitEffect = HIT_RICOCHET;
-		obj->saveFlags = true;
-		obj->savePosition = true;
-		obj->saveAnim = true;
 	}
 }

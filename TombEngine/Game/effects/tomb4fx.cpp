@@ -1159,7 +1159,7 @@ void LaraBubbles(ItemInfo* item)
 	if (level->GetLaraType() == LaraType::Divesuit)
 		pos = GetJointPosition(item, LM_TORSO, Vector3i(0, -192, -160));
 	else
-		GetJointPosition(item, LM_HEAD, Vector3i(0, -4, -64));
+		pos = GetJointPosition(item, LM_HEAD, Vector3i(0, -4, -64));
 
 	int numBubbles = (GetRandomControl() & 1) + 2;
 	for (int i = 0; i < numBubbles; i++)
@@ -1458,7 +1458,7 @@ void ExplodingDeath(short itemNumber, short flags)
 				fx->objectNumber = ID_BODY_PART;
 				fx->color = item->Color;
 				fx->flag2 = flags;
-				fx->frameNumber = obj->meshIndex + i;
+				fx->frameNumber = item->Model.MeshIndex[i];
 			}
 		}
 		else

@@ -369,7 +369,7 @@ namespace TEN::Renderer
 								Vector3(x2Outer, yOuter, z2Outer), 
 								Vector3(x2Inner, yInner, z2Inner), 
 								Vector3(xInner, yInner, zInner), Vector4(color / 255.0f, color / 255.0f, color / 255.0f, 1.0f), 
-								0, 1, { 0, 0 }, BLENDMODE_ADDITIVE, true, view);
+								0, 1, { 0, 0 }, BLENDMODE_ADDITIVE, false, view);
 				}
 			}
 		}
@@ -957,7 +957,7 @@ namespace TEN::Renderer
 
 				m_stInstancedSpriteBuffer.Sprites[i].World = GetWorldMatrixForSprite(&spr, view);
 				m_stInstancedSpriteBuffer.Sprites[i].Color = spr.color;
-				m_stInstancedSpriteBuffer.Sprites[i].IsBillboard = spr.Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_3D ? 0 : 1;
+				m_stInstancedSpriteBuffer.Sprites[i].IsBillboard = 1;
 				m_stInstancedSpriteBuffer.Sprites[i].IsSoftParticle = spr.SoftParticle ? 1 : 0;
 			}
 
@@ -1005,6 +1005,14 @@ namespace TEN::Renderer
 			m_cbSprite.updateData(m_stSprite, m_context.Get());
 			BindConstantBufferVS(CB_SPRITE, m_cbSprite.get());
 			BindConstantBufferPS(CB_SPRITE, m_cbSprite.get());
+
+			SetBlendMode(spriteBucket.BlendMode);
+			BindTexture(TEXTURE_COLOR_MAP, spriteBucket.Sprite->Texture, SAMPLER_LINEAR_CLAMP);
+
+			if (spriteBucket.BlendMode == BLEND_MODES::BLENDMODE_ALPHATEST)
+				SetAlphaTest(ALPHA_TEST_GREATER_THAN, ALPHA_TEST_THRESHOLD, true);
+			else
+				SetAlphaTest(ALPHA_TEST_NONE, 0);
 
 			m_primitiveBatch->Begin();
 

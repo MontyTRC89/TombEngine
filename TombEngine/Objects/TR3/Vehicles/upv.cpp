@@ -525,7 +525,7 @@ namespace TEN::Entities::Vehicles
 				laraItem->Animation.IsAirborne = false;
 				laraItem->Pose.Orientation.x = laraItem->Pose.Orientation.z = 0;
 
-				UpdateItemRoom(laraItem, 0);
+				UpdateLaraRoom(laraItem, 0);
 
 				lara->Control.WaterStatus = WaterStatus::Underwater;
 				lara->Control.HandStatus = HandStatus::Free;
@@ -563,7 +563,7 @@ namespace TEN::Entities::Vehicles
 				laraItem->Pose.Orientation.x = 0;
 				laraItem->Pose.Orientation.z = 0;
 
-				UpdateItemRoom(laraItem, -LARA_HEIGHT / 2);
+				UpdateLaraRoom(laraItem, -LARA_HEIGHT / 2);
 
 				ResetLaraFlex(laraItem);
 				lara->Control.WaterStatus = WaterStatus::TreadWater;

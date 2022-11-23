@@ -191,10 +191,10 @@ bool GetTargetOnLOS(GameVector* origin, GameVector* target, bool drawTarget, boo
 
 									DoDamage(item, Weapons[(int)Lara.Control.Weapon.GunType].Damage);
 
-									if (!item->LuaCallbackOnHitName.empty())
+									if (!item->Callbacks.OnHit.empty())
 									{
-										short index = g_GameScriptEntities->GetIndexByName(item->LuaName);
-										g_GameScript->ExecuteFunction(item->LuaCallbackOnHitName, index);
+										short index = g_GameScriptEntities->GetIndexByName(item->Name);
+										g_GameScript->ExecuteFunction(item->Callbacks.OnHit, index);
 									}
 								}
 							}

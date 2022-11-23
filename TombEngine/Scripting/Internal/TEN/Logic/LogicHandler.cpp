@@ -141,7 +141,7 @@ Will have no effect if the function was not registered as a callback
 @tparam point CallbackPoint The callback point the function was registered with. See @{AddCallback}
 @tparam func LevelFunc the function to remove; must be in the LevelFuncs hierarchy.
 @usage
-	TEN.Logic.RemoveCallback(TEN.Logic.CallbackPoint.PRECONTROLPHASE, "MyFunc")
+	TEN.Logic.RemoveCallback(TEN.Logic.CallbackPoint.PRECONTROLPHASE, LevelFuncs.MyFunc)
 */
 void LogicHandler::RemoveCallback(CallbackPoint point, LevelFunc const & lf)
 {

@@ -5,16 +5,20 @@
 
 class LevelFunc;
 
-namespace sol {
+namespace sol 
+{
 	class state;
 	template <typename T> struct as_table_t;
 }
+
 class Vec3;
 class Rotation;
 class ScriptColor;
 
 struct ItemInfo;
+
 enum GAME_OBJECT_ID : short;
+enum class EffectType;
 
 using aiBitsArray = std::array<int, 6>;
 using aiBitsType = sol::as_table_t<aiBitsArray>;
@@ -73,6 +77,9 @@ public:
 	[[nodiscard]] short GetOCB() const;
 	void SetOCB(short ocb);
 
+	[[nodiscard]] EffectType GetEffect() const;
+	void SetEffect(EffectType effectType, sol::optional<float> timeout);
+
 	[[nodiscard]] aiBitsType GetAIBits() const;
 	void SetAIBits(aiBitsType const & bits);
 
@@ -96,6 +103,9 @@ public:
 	[[nodiscard]] short GetRoom() const;
 	void SetRoom(short room);
 
+	void AttachObjCamera(short camMeshId, Moveable& mov, short targetMeshId);
+	void AnimFromObject(GAME_OBJECT_ID object, int animNumber, int stateID);
+
 	void EnableItem();
 	void DisableItem();
 	void MakeInvisible();
@@ -114,8 +124,10 @@ public:
 	friend bool operator==(Moveable const&, Moveable const&);
 	friend void SetLevelFuncCallback(TypeOrNil<LevelFunc> const& cb, std::string const & callerName, Moveable& mov, std::string& toModify);
 
-private:
+protected:
 	ItemInfo* m_item;
+
+private:
 	short m_num;
 	bool m_initialised;
 

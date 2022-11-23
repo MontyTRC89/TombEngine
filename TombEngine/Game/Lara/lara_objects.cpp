@@ -264,8 +264,16 @@ void lara_as_pulley(ItemInfo* item, CollisionInfo* coll)
 // Collision:	lara_default_col()
 void lara_as_horizontal_bar_swing(ItemInfo* item, CollisionInfo* coll)
 {
-	if (!(TrInput & IN_ACTION) || TrInput & IN_JUMP)
-		item->Animation.TargetState = LS_HORIZONTAL_BAR_LEAP;
+	if (TrInput & IN_ACTION)
+	{
+		if (TrInput & IN_JUMP)
+			item->Animation.TargetState = LS_HORIZONTAL_BAR_LEAP;
+
+		item->Animation.TargetState = LS_HORIZONTAL_BAR_SWING;
+		return;
+	}
+
+	item->Animation.TargetState = LS_HORIZONTAL_BAR_LEAP;
 }
 
 // State:		LS_HORIZONTAL_BAR_LEAP (129)
@@ -273,17 +281,17 @@ void lara_as_horizontal_bar_swing(ItemInfo* item, CollisionInfo* coll)
 void lara_as_horizontal_bar_leap(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
-	auto* barItem = &g_Level.Items[lara->InteractedItem];
+	const auto& barItem = g_Level.Items[lara->InteractedItem];
 
 	item->Animation.IsAirborne = true;
 
 	if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase)
 	{
-		int distance;
-		if (item->Pose.Orientation.y == barItem->Pose.Orientation.y)
-			distance = (barItem->TriggerFlags / 100) - 2;
+		int distance = 0;
+		if (item->Pose.Orientation.y == barItem.Pose.Orientation.y)
+			distance = (barItem.TriggerFlags / 100) - 2;
 		else
-			distance = (barItem->TriggerFlags % 100) - 2;
+			distance = (barItem.TriggerFlags % 100) - 2;
 
 		item->Animation.Velocity.z = (20 * distance) + 58;
 		item->Animation.Velocity.y = -(20 * distance + 64);
@@ -292,9 +300,8 @@ void lara_as_horizontal_bar_leap(ItemInfo* item, CollisionInfo* coll)
 	if (TestLastFrame(item))
 	{
 		SetAnimation(item, LA_REACH);
-		item->Pose.Position.x += 700 * phd_sin(item->Pose.Orientation.y);
+		TranslateItem(item, item->Pose.Orientation, 700);
 		item->Pose.Position.y -= 361;
-		item->Pose.Position.z += 700 * phd_cos(item->Pose.Orientation.y);
 	}
 }
 

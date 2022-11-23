@@ -28,6 +28,7 @@
 #include "Specific/level.h"
 #include "Math/Math.h"
 #include "Specific/setup.h"
+#include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 
 using namespace TEN::Entities::Generic;
 using namespace TEN::Input;
@@ -141,7 +142,6 @@ const ObjectCollisionBounds MSBounds =
 
 int NumRPickups;
 short RPickups[16];
-short getThisItemPlease = NO_ITEM;
 Vector3i OldPickupPos;
 
 bool SetInventoryCount(GAME_OBJECT_ID objectID, int count)
@@ -224,14 +224,58 @@ void CollectCarriedItems(ItemInfo* item)
 	item->CarriedItem = NO_ITEM;
 }
 
+void CollectMultiplePickups(int itemNumber)
+{
+	auto* firstItem = &g_Level.Items[itemNumber];
+	GetCollidedObjects(firstItem, LARA_RADIUS, true, CollidedItems, CollidedMeshes, true);
+
+	for (int i = 0; i < MAX_COLLIDED_OBJECTS; i++)
+	{
+		auto* currentItem = CollidedItems[i];
+
+		if (!currentItem)
+			currentItem = firstItem;
+
+		if (!Objects[currentItem->ObjectNumber].isPickup)
+			continue;
+
+		AddDisplayPickup(currentItem->ObjectNumber);
+		if (currentItem->TriggerFlags & 0x100)
+		{
+			for (int i = 0; i < g_Level.NumItems; i++)
+			{
+				if (g_Level.Items[i].ObjectNumber == currentItem->ObjectNumber)
+					KillItem(i);
+			}
+		}
+
+		if (currentItem->TriggerFlags & 0xC0)
+		{
+			currentItem->Status = ITEM_INVISIBLE;
+			currentItem->Flags |= TRIGGERED;
+			currentItem->ItemFlags[3] = 1;
+		}
+
+		//currentItem->Pose.Orientation = prevOrient;
+		KillItem(currentItem->Index);
+
+		if (currentItem == firstItem)
+			break;
+	}
+}
+
 void DoPickup(ItemInfo* laraItem)
 {
-	if (getThisItemPlease == NO_ITEM)
+	auto* lara = GetLaraInfo(laraItem);
+
+	if (lara->InteractedItem == NO_ITEM)
 		return;
 
-	auto* lara = GetLaraInfo(laraItem);
-	short pickupItemNumber = getThisItemPlease;
+	short pickupItemNumber = lara->InteractedItem;
 	auto* pickupItem = &g_Level.Items[pickupItemNumber];
+
+	if (!Objects[pickupItem->ObjectNumber].isPickup)
+		return;
 
 	auto prevOrient = pickupItem->Pose.Orientation;
 
@@ -243,7 +287,7 @@ void DoPickup(ItemInfo* laraItem)
 
 		KillItem(pickupItemNumber);
 		pickupItem->Pose.Orientation = prevOrient;
-		getThisItemPlease = NO_ITEM;
+		lara->InteractedItem = NO_ITEM;
 		return;
 	}
 	else if (pickupItem->ObjectNumber == ID_FLARE_ITEM)
@@ -259,7 +303,7 @@ void DoPickup(ItemInfo* laraItem)
 			KillItem(pickupItemNumber);
 
 			pickupItem->Pose.Orientation = prevOrient;
-			getThisItemPlease = NO_ITEM;
+			lara->InteractedItem = NO_ITEM;
 			return;
 		}
 		else if (laraItem->Animation.ActiveState == LS_PICKUP_FLARE)
@@ -270,7 +314,7 @@ void DoPickup(ItemInfo* laraItem)
 			lara->Control.HandStatus = HandStatus::Special;
 			lara->Flare.Life = int(pickupItem->Data) & 0x7FFF;
 			KillItem(pickupItemNumber);
-			getThisItemPlease = NO_ITEM;
+			lara->InteractedItem = NO_ITEM;
 			return;
 		}
 	}
@@ -289,7 +333,7 @@ void DoPickup(ItemInfo* laraItem)
 			}
 
 			pickupItem->Pose.Orientation = prevOrient;
-			getThisItemPlease = NO_ITEM;
+			lara->InteractedItem = NO_ITEM;
 			return;
 		}
 		else
@@ -301,9 +345,16 @@ void DoPickup(ItemInfo* laraItem)
 				KillItem(pickupItemNumber);
 			}
 			else if (laraItem->Animation.ActiveState == LS_PICKUP ||
-				laraItem->Animation.ActiveState == LS_PICKUP_FROM_CHEST ||
-				laraItem->Animation.ActiveState == LS_HOLE)
+					 laraItem->Animation.ActiveState == LS_PICKUP_FROM_CHEST ||
+					 laraItem->Animation.ActiveState == LS_HOLE)
 			{
+				if (g_GameFlow->IsMassPickupEnabled())
+				{
+					CollectMultiplePickups(lara->InteractedItem);
+					lara->InteractedItem = NO_ITEM;
+					return;
+				}
+
 				AddDisplayPickup(pickupItem->ObjectNumber);
 				if (pickupItem->TriggerFlags & 0x100)
 				{
@@ -323,13 +374,13 @@ void DoPickup(ItemInfo* laraItem)
 
 				pickupItem->Pose.Orientation = prevOrient;
 				KillItem(pickupItemNumber);
-				getThisItemPlease = NO_ITEM;
+				lara->InteractedItem = NO_ITEM;
 				return;
 			}
 		}
 	}
 
-	getThisItemPlease = NO_ITEM;
+	lara->InteractedItem = NO_ITEM;
 }
 
 void PickupCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
@@ -372,14 +423,12 @@ void PickupCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 					{
 						if (item->ObjectNumber == ID_FLARE_ITEM)
 						{
-							getThisItemPlease = itemNumber;
 							laraItem->Animation.AnimNumber = LA_UNDERWATER_PICKUP_FLARE;
 							laraItem->Animation.ActiveState = LS_PICKUP_FLARE;
 							laraItem->Animation.Velocity.y = 0;
 						}
 						else
 						{
-							getThisItemPlease = itemNumber;
 							laraItem->Animation.AnimNumber = LA_UNDERWATER_PICKUP;
 							laraItem->Animation.ActiveState = LS_PICKUP;
 						}
@@ -398,7 +447,6 @@ void PickupCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 					{
 						if (lara->InteractedItem == itemNumber)
 						{
-							getThisItemPlease = itemNumber;
 							lara->Control.IsMoving = false;
 							lara->Control.HandStatus = HandStatus::Free;
 						}
@@ -468,7 +516,6 @@ void PickupCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 		}
 		else if (MoveLaraPosition(HiddenPickUpPosition, item, laraItem))
 		{
-			getThisItemPlease = itemNumber;
 			laraItem->Animation.AnimNumber = LA_HOLESWITCH_ACTIVATE;
 			laraItem->Animation.ActiveState = LS_HOLE;
 			flag = true;
@@ -517,9 +564,9 @@ void PickupCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 
 			g_Gui.SetInventoryItemChosen(NO_ITEM);
 		}
+
 		if (MoveLaraPosition(CrowbarPickUpPosition, item, laraItem))
 		{
-			getThisItemPlease = itemNumber;
 			laraItem->Animation.AnimNumber = LA_CROWBAR_PRY_WALL_FAST;
 			laraItem->Animation.ActiveState = LS_PICKUP;
 			item->Status = ITEM_ACTIVE;
@@ -565,12 +612,10 @@ void PickupCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 			{
 				if (triggerFlags == 3 || triggerFlags == 7)
 				{
-					getThisItemPlease = itemNumber;
 					SetAnimation(laraItem, LA_PICKUP_PEDESTAL_HIGH);
 				}
 				else
 				{
-					getThisItemPlease = itemNumber;
 					SetAnimation(laraItem, LA_PICKUP_PEDESTAL_LOW);
 				}
 
@@ -608,7 +653,6 @@ void PickupCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 
 		if (MoveLaraPosition(JobyCrowPickUpPosition, item, laraItem))
 		{
-			getThisItemPlease = itemNumber;
 			SetAnimation(laraItem, LA_CROWBAR_PRY_WALL_SLOW);
 			item->Status = ITEM_ACTIVE;
 			AddActiveItem(itemNumber);
@@ -650,7 +694,6 @@ void PickupCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 
 			if (item->ObjectNumber == ID_FLARE_ITEM)
 			{
-				getThisItemPlease = itemNumber;
 				laraItem->Animation.AnimNumber = LA_CROUCH_PICKUP_FLARE;
 				laraItem->Animation.ActiveState = LS_PICKUP_FLARE;
 				lara->InteractedItem = itemNumber;
@@ -658,7 +701,6 @@ void PickupCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 				break;
 			}
 
-			getThisItemPlease = itemNumber;
 			laraItem->Animation.TargetState = LS_PICKUP;
 		}
 		else
@@ -674,14 +716,12 @@ void PickupCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 				if (item->ObjectNumber == ID_FLARE_ITEM)
 				{
 					laraItem->Animation.TargetState = LS_CROUCH_IDLE;
-					lara->InteractedItem = itemNumber;
 				}
 				else
 				{
-					getThisItemPlease = itemNumber;
 					laraItem->Animation.TargetState = LS_PICKUP;
 				}
-
+				lara->InteractedItem = itemNumber;
 				break;
 			}
 			else
@@ -691,8 +731,6 @@ void PickupCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 					lara->InteractedItem = itemNumber;
 					break;
 				}
-
-				getThisItemPlease = itemNumber;
 
 				if (item->ObjectNumber == ID_FLARE_ITEM)
 				{
@@ -906,8 +944,22 @@ void InitialisePickup(short itemNumber)
 	}
 	else
 	{
-		if (triggerFlags == 0 || triggerFlags == 3 || triggerFlags == 4 || triggerFlags == 7 || triggerFlags == 8 || triggerFlags == 11)
+		if (triggerFlags == 0 ||
+			triggerFlags == 3 ||
+			triggerFlags == 4 ||
+			triggerFlags == 7 ||
+			triggerFlags == 8 ||
+			triggerFlags == 11)
+		{
+			if (triggerFlags == 0)
+			{
+				auto coll = GetCollision(item);
+				item->Pose.Position.y = coll.Position.Floor;
+				AlignEntityToSurface(item, Vector2(Objects[item->ObjectNumber].radius));
+			}
+
 			item->Pose.Position.y -= bounds.Y2;
+		}
 		
 		if ((item->TriggerFlags & 0x80) != 0)
 		{
@@ -928,7 +980,7 @@ void InitialiseSearchObject(short itemNumber)
 	auto* item = &g_Level.Items[itemNumber];
 	if (item->ObjectNumber == ID_SEARCH_OBJECT1)
 	{
-		item->MeshSwapBits = ALL_JOINT_BITS;
+		item->SetMeshSwapFlags(ALL_JOINT_BITS);
 		item->MeshBits = 7;
 	}
 	else if (item->ObjectNumber == ID_SEARCH_OBJECT2)
@@ -1044,12 +1096,12 @@ void SearchObjectControl(short itemNumber)
 	{
 		if (frameNumber > 0)
 		{
-			item->MeshSwapBits = NO_JOINT_BITS;
+			item->SetMeshSwapFlags(NO_JOINT_BITS);
 			item->MeshBits = ALL_JOINT_BITS;
 		}
 		else
 		{
-			item->MeshSwapBits = ALL_JOINT_BITS;
+			item->SetMeshSwapFlags(ALL_JOINT_BITS);
 			item->MeshBits = 7;
 		}
 	}

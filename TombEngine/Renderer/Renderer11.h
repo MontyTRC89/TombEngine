@@ -108,19 +108,24 @@ namespace TEN::Renderer
 	{
 		int ItemNumber;
 		int ObjectNumber;
-		bool DoneAnimations;
+
 		Vector3 Position;
 		Matrix World;
 		Matrix Translation;
 		Matrix Rotation;
 		Matrix Scale;
 		Matrix AnimationTransforms[MAX_BONES];
+
 		int RoomNumber = NO_ROOM;
 		int PrevRoomNumber = NO_ROOM;
 		Vector4 Color;
 		Vector4 AmbientLight;
 		std::vector<RendererLight*> LightsToDraw;
 		float LightFade;
+
+		std::vector<int> MeshIndex;
+
+		bool DoneAnimations;
 	};
 
 	struct RendererMesh
@@ -659,7 +664,7 @@ namespace TEN::Renderer
 		void GetItemAbsBonePosition(int itemNumber, Vector3& pos, int jointIndex);
 		int  GetSpheres(short itemNumber, BoundingSphere* ptr, char worldSpace, Matrix local);
 		void GetBoneMatrix(short itemNumber, int jointIndex, Matrix* outMatrix);
-		void DrawObjectOn2DPosition(short x, short y, short objectNum, EulerAngles orient, float scale1);
+		void DrawObjectOn2DPosition(short x, short y, short objectNum, EulerAngles orient, float scale1, int meshBits = NO_JOINT_BITS);
 		void SetLoadingScreen(std::wstring& fileName);
 		void SetTextureOrDefault(Texture2D& texture, std::wstring path);
 		std::string GetDefaultAdapterName();

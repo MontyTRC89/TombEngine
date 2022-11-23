@@ -8,11 +8,11 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
+#include "Math/Math.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-using namespace TEN::Math::Random;
-using std::vector;
+using namespace TEN::Math;
 
 namespace TEN::Entities::Creatures::TR1
 {
@@ -30,11 +30,11 @@ namespace TEN::Entities::Creatures::TR1
 	constexpr auto BEAR_REAR_CHANCE = 1.0f / 40;
 	constexpr auto BEAR_DROP_CHANCE = 1.0f / 22;
 
-	#define BEAR_WALK_TURN_RATE_MAX ANGLE(2.0f)
-	#define BEAR_RUN_TURN_RATE_MAX	ANGLE(5.0f)
+	const auto BEAR_WALK_TURN_RATE_MAX = ANGLE(2.0f);
+	const auto BEAR_RUN_TURN_RATE_MAX  = ANGLE(5.0f);
 
 	const auto BearBite = BiteInfo(Vector3(0.0f, 96.0f, 335.0f), 14);
-	const vector<unsigned int> BearAttackJoints = { 2, 3, 5, 6, 14, 17 };
+	const auto BearAttackJoints = std::vector<unsigned int>{ 2, 3, 5, 6, 14, 17 };
 
 	enum BearState
 	{
@@ -175,7 +175,7 @@ namespace TEN::Entities::Creatures::TR1
 					if (creature->Mood == MoodType::Escape)
 						item->Animation.RequiredState = BEAR_STATE_STROLL;
 				}
-				else if (TestProbability(BEAR_ROAR_CHANCE))
+				else if (Random::TestProbability(BEAR_ROAR_CHANCE))
 				{
 					item->Animation.TargetState = BEAR_STATE_IDLE;
 					item->Animation.RequiredState = BEAR_STATE_ROAR;
@@ -194,7 +194,7 @@ namespace TEN::Entities::Creatures::TR1
 				else if (AI.ahead && !item->Animation.RequiredState)
 				{
 					if (AI.distance < pow(BEAR_REAR_RANGE, 2) &&
-						TestProbability(BEAR_REAR_CHANCE) &&
+						Random::TestProbability(BEAR_REAR_CHANCE) &&
 						!creature->Flags)
 					{
 						item->Animation.RequiredState = BEAR_STATE_REAR;
@@ -236,12 +236,12 @@ namespace TEN::Entities::Creatures::TR1
 					item->Animation.TargetState = BEAR_STATE_REAR;
 					item->Animation.RequiredState = BEAR_STATE_STROLL;
 				}
-				else if (creature->Mood == MoodType::Bored || TestProbability(BEAR_ROAR_CHANCE))
+				else if (creature->Mood == MoodType::Bored || Random::TestProbability(BEAR_ROAR_CHANCE))
 				{
 					item->Animation.TargetState = BEAR_STATE_REAR;
 					item->Animation.RequiredState = BEAR_STATE_ROAR;
 				}
-				else if (AI.distance > pow(BEAR_REAR_RANGE, 2) || TestProbability(BEAR_DROP_CHANCE))
+				else if (AI.distance > pow(BEAR_REAR_RANGE, 2) || Random::TestProbability(BEAR_DROP_CHANCE))
 				{
 					item->Animation.TargetState = BEAR_STATE_REAR;
 					item->Animation.RequiredState = BEAR_STATE_IDLE;

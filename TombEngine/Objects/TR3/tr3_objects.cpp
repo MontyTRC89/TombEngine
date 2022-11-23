@@ -52,10 +52,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->pivotLength = 50;
 		obj->radius = 102;
 		obj->intelligent = true;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-		obj->saveHitpoints = true;
-		obj->savePosition = true;
+		
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_X;
 		g_Level.Bones[obj->boneIndex + 13 * 4] |= ROT_Y;
@@ -72,10 +69,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->pivotLength = 200;
 		obj->radius = 340;
 		obj->intelligent = true;
-		obj->savePosition = true;
-		obj->saveHitpoints = true;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
+		
 		g_Level.Bones[obj->boneIndex + 21 * 4] |= ROT_Y;
 	}
 
@@ -91,11 +85,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->radius = 102;
 		obj->intelligent = true;
 		obj->nonLot = true;
-		obj->savePosition = true;
-		obj->saveHitpoints = true;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-
+		
 		g_Level.Bones[obj->boneIndex + 0 * 4] |= ROT_Y;
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
 	}
@@ -111,11 +101,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->radius = 341;
 		obj->pivotLength = 600;
 		obj->intelligent = true;
-		obj->savePosition = true;
-		obj->saveHitpoints = true;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-
+		
 		g_Level.Bones[obj->boneIndex + 20 * 4] |= ROT_Y;
 		g_Level.Bones[obj->boneIndex + 21 * 4] |= ROT_Y;
 		g_Level.Bones[obj->boneIndex + 23 * 4] |= ROT_Y;
@@ -132,12 +118,8 @@ static void StartEntity(ObjectInfo* obj)
 		obj->hitEffect = HIT_BLOOD;
 		obj->radius = 102;
 		obj->intelligent = true;
-		obj->savePosition = true;
-		obj->saveHitpoints = true;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
 		obj->pivotLength = 0;
-
+		
 		g_Level.Bones[obj->boneIndex + 13 * 4] |= ROT_Y;
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
 	}
@@ -152,12 +134,8 @@ static void StartEntity(ObjectInfo* obj)
 		obj->hitEffect = HIT_BLOOD;
 		obj->radius = 102;
 		obj->intelligent = true;
-		obj->savePosition = true;
-		obj->saveHitpoints = true;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
 		obj->pivotLength = 0;
-
+		
 		g_Level.Bones[obj->boneIndex + 13 * 4] |= ROT_Y;
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
 	}
@@ -173,11 +151,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->pivotLength = 1800;
 		obj->radius = 512;
 		obj->intelligent = true;
-		obj->savePosition = true;
-		obj->saveHitpoints = true;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-
+		
 		g_Level.Bones[obj->boneIndex + 10 * 4] |= ROT_Y;
 		g_Level.Bones[obj->boneIndex + 11 * 4] |= ROT_Y;
 	}
@@ -193,13 +167,9 @@ static void StartEntity(ObjectInfo* obj)
 		obj->radius = 340;
 		obj->intelligent = true;
 		obj->waterCreature = true;
-		obj->savePosition = true;
-		obj->saveHitpoints = true;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
 		obj->pivotLength = 50;
 		obj->ZoneType = ZoneType::Water;
-
+		
 		g_Level.Bones[obj->boneIndex + 10 * 4] |= ROT_Y;
 		g_Level.Bones[obj->boneIndex + 14 * 4] |= ROT_Z;
 	}
@@ -209,7 +179,7 @@ static void StartEntity(ObjectInfo* obj)
 	{
 		obj->control = ScubaHarpoonControl;
 		obj->collision = ObjectCollision;
-		obj->savePosition = true;
+		
 	}
 
 	obj = &Objects[ID_FLAMETHROWER_BADDY];
@@ -222,12 +192,8 @@ static void StartEntity(ObjectInfo* obj)
 		obj->hitEffect = HIT_BLOOD;
 		obj->radius = 102;
 		obj->intelligent = true;
-		obj->savePosition = true;
-		obj->saveHitpoints = true;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
 		obj->pivotLength = 0;
-
+		
 		g_Level.Bones[obj->boneIndex + 0 * 4] |= ROT_Y;
 		g_Level.Bones[obj->boneIndex + 0 * 4] |= ROT_X;
 		g_Level.Bones[obj->boneIndex + 7 * 4] |= ROT_Y;
@@ -244,10 +210,6 @@ static void StartEntity(ObjectInfo* obj)
 		obj->hitEffect = HIT_BLOOD;
 		obj->radius = 102;
 		obj->intelligent = true;
-		obj->savePosition = true;
-		obj->saveHitpoints = true;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
 		obj->pivotLength = 0;
 
 		g_Level.Bones[obj->boneIndex + 0 * 4] |= ROT_Y;
@@ -265,10 +227,6 @@ static void StartEntity(ObjectInfo* obj)
 		obj->hitEffect = HIT_BLOOD;
 		obj->radius = 102;
 		obj->intelligent = true;
-		obj->savePosition = true;
-		obj->saveHitpoints = true;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
 		obj->pivotLength = 0;
 		obj->biteOffset = 0;
 
@@ -288,10 +246,6 @@ static void StartEntity(ObjectInfo* obj)
 		obj->hitEffect = HIT_BLOOD;
 		obj->radius = 102;
 		obj->intelligent = true;
-		obj->savePosition = true;
-		obj->saveHitpoints = true;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
 		obj->pivotLength = 0;
 		obj->ZoneType = ZoneType::HumanClassic;
 
@@ -313,10 +267,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->pivotLength = 0;
 		obj->radius = 256;
 		obj->intelligent = true;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-		obj->saveHitpoints = true;
-		obj->savePosition = true;
+		
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= (ROT_X | ROT_Y);
 		g_Level.Bones[obj->boneIndex + 25 * 4] |= (ROT_X | ROT_Y);
 	}
@@ -334,10 +285,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->hitEffect = HIT_BLOOD;
 		obj->radius = 102;
 		obj->intelligent = true;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-		obj->savePosition = true;
-		obj->saveHitpoints = true;
+		
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_X;
 		g_Level.Bones[obj->boneIndex + 13 * 4] |= ROT_Y;
@@ -354,11 +302,8 @@ static void StartEntity(ObjectInfo* obj)
 		obj->hitEffect = HIT_BLOOD;
 		obj->radius = 102;
 		obj->intelligent = true;
-		obj->savePosition = true;
-		obj->saveHitpoints = true;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
 		obj->pivotLength = 0;
+		
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_X;
 		g_Level.Bones[obj->boneIndex + 13 * 4] |= ROT_Y;
@@ -378,9 +323,6 @@ static void StartTrap(ObjectInfo* obj)
 		obj->control = TrainControl;
 		obj->collision = TrainCollision;
 		obj->hitEffect = HIT_RICOCHET;
-		obj->savePosition = true;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
 	}
 }
 
@@ -392,9 +334,6 @@ static void StartVehicles(ObjectInfo* obj)
 		obj->initialise = InitialiseQuadBike;
 		obj->collision = QuadBikePlayerCollision;
 		obj->hitEffect = HIT_RICOCHET;
-		obj->savePosition = true;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
 		obj->shadowType = ShadowMode::Lara;
 	}
 
@@ -406,9 +345,6 @@ static void StartVehicles(ObjectInfo* obj)
 		obj->collision = RubberBoatPlayerCollision;
 		obj->drawRoutine = DrawRubberBoat;
 		obj->hitEffect = HIT_RICOCHET;
-		obj->savePosition = true;
-		obj->saveFlags = true;
-		obj->saveAnim = true;
 		obj->shadowType = ShadowMode::Lara;
 
 	}
@@ -420,9 +356,6 @@ static void StartVehicles(ObjectInfo* obj)
 		obj->collision = KayakPlayerCollision;
 		//obj->drawRoutine = KayakDraw;
 		obj->hitEffect = HIT_RICOCHET;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-		obj->savePosition = true;
 		obj->shadowType = ShadowMode::Lara;
 
 	}
@@ -433,9 +366,6 @@ static void StartVehicles(ObjectInfo* obj)
 		obj->initialise = InitialiseMinecart;
 		obj->collision = MinecartPlayerCollision;
 		obj->hitEffect = HIT_RICOCHET;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-		obj->savePosition = true;
 		obj->shadowType = ShadowMode::Lara;
 
 	}
@@ -446,9 +376,6 @@ static void StartVehicles(ObjectInfo* obj)
 		obj->initialise = BigGunInitialise;
 		obj->collision = BigGunCollision;
 		obj->hitEffect = HIT_RICOCHET;
-		obj->savePosition = true;
-		obj->saveFlags = true;
-		obj->saveAnim = true;
 		obj->shadowType = ShadowMode::Lara;
 	}
 
@@ -459,11 +386,7 @@ static void StartVehicles(ObjectInfo* obj)
 		obj->control = TriggerUpvEffects;
 		obj->collision = UpvPlayerCollision;
 		obj->hitEffect = HIT_RICOCHET;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-		obj->savePosition = true;
 		obj->shadowType = ShadowMode::Lara;
-
 	}
 }
 
