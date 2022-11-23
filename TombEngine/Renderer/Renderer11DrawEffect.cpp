@@ -769,13 +769,16 @@ namespace TEN::Renderer
 	{
 		for (const auto& drip : BloodDrips)
 		{
-			if (g_Level.Sprites.size() > drip.SpriteIndex)
-			{
-				AddSpriteBillboard(
-					&m_sprites[drip.SpriteIndex],
-					drip.Position,
-					drip.Color, 0.5f, 1.0f, Vector2(drip.Scale, drip.Scale) * 2, BLENDMODE_ALPHABLEND, false, view);
-			}
+			if (!drip.IsActive)
+				continue;
+
+			if (g_Level.Sprites.size() <= drip.SpriteIndex)
+				continue;
+
+			AddSpriteBillboard(
+				&m_sprites[drip.SpriteIndex],
+				drip.Position,
+				drip.Color, 0.5f, 1.0f, Vector2(drip.Scale, drip.Scale) * 2, BLENDMODE_ALPHABLEND, true, view);
 		}
 	}
 
@@ -783,13 +786,13 @@ namespace TEN::Renderer
 	{
 		for (const auto& stain : BloodStains)
 		{
-			if (g_Level.Sprites.size() > stain.SpriteIndex)
-			{
-				AddSprite3D(
-					&m_sprites[stain.SpriteIndex],
-					stain.VertexPoints[0], stain.VertexPoints[1], stain.VertexPoints[2], stain.VertexPoints[3],
-					stain.Color, 0.0f, 1.0f, Vector2::One, BLENDMODE_ALPHABLEND, false, view); // TODO: There might be a bug with some blend modes??
-			}
+			if (g_Level.Sprites.size() <= stain.SpriteIndex)
+				continue;
+
+			AddSprite3D(
+				&m_sprites[stain.SpriteIndex],
+				stain.VertexPoints[0], stain.VertexPoints[1], stain.VertexPoints[2], stain.VertexPoints[3],
+				stain.Color, 0.0f, 1.0f, Vector2::One, BLENDMODE_ALPHABLEND, false, view); // TODO: There might be a bug with some blend modes??
 		}
 	}
 
@@ -798,14 +801,13 @@ namespace TEN::Renderer
 		for (const auto& footprint : Footprints)
 		{
 			int spriteIndex = Objects[ID_MISC_SPRITES].meshIndex + 1 + (int)footprint.IsRightFoot;
+			if (g_Level.Sprites.size() <= spriteIndex)
+				continue;
 
-			if (g_Level.Sprites.size() > spriteIndex)
-			{
-				AddSprite3D(
-					&m_sprites[spriteIndex],
-					footprint.VertexPoints[0], footprint.VertexPoints[1], footprint.VertexPoints[2], footprint.VertexPoints[3],
-					Vector4(footprint.Opacity), 0.0f, 1.0f, Vector2::One, BLENDMODE_SUBTRACTIVE, false, view);
-			}
+			AddSprite3D(
+				&m_sprites[spriteIndex],
+				footprint.VertexPoints[0], footprint.VertexPoints[1], footprint.VertexPoints[2], footprint.VertexPoints[3],
+				Vector4(footprint.Opacity), 0.0f, 1.0f, Vector2::One, BLENDMODE_SUBTRACTIVE, false, view);
 		}
 	}
 
