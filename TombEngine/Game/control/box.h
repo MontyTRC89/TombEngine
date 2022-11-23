@@ -181,7 +181,6 @@ int StalkBox(ItemInfo* item, ItemInfo* enemy, int boxNumber);
 void CreatureAIInfo(ItemInfo* item, AI_INFO* AI);
 TARGET_TYPE CalculateTarget(Vector3i* target, ItemInfo* item, LOTInfo* LOT);
 int CreatureAnimation(short itemNumber, short angle, short tilt);
-void CreatureSwitchRoom(short itemNumber);
 void AdjustStopperFlag(ItemInfo* item, int direction, bool set);
 void InitialiseItemBoxData();
 

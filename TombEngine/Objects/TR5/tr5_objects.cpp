@@ -82,10 +82,6 @@ static void StartEntity(ObjectInfo *obj)
 		obj->initialise = InitialiseLaraLoad;
 		obj->shadowType = ShadowMode::Lara;
 		obj->HitPoints = 1000;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-		obj->saveHitpoints = true;
-		obj->savePosition = true;
 		obj->usingDrawAnimatingItem = false;
 	}
 
@@ -101,11 +97,8 @@ static void StartEntity(ObjectInfo *obj)
 		obj->radius = 102;
 		obj->pivotLength = 50;
 		obj->intelligent = true;
-		obj->savePosition = true;
-		obj->saveFlags = true;
-		obj->saveAnim = true;
-		obj->saveHitpoints = true;
 		obj->ZoneType = ZoneType::HumanClassic;
+		
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_X;
 		g_Level.Bones[obj->boneIndex + 13 * 4] |= ROT_Y;
@@ -126,11 +119,8 @@ static void StartEntity(ObjectInfo *obj)
 		obj->radius = 102;
 		obj->explodableMeshbits = 0x4000;
 		obj->intelligent = true;
-		obj->savePosition = true;
-		obj->saveFlags = true;
-		obj->saveAnim = true;
-		obj->saveHitpoints = true;
 		obj->ZoneType = ZoneType::HumanClassic;
+		
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_X;
 		g_Level.Bones[obj->boneIndex + 13 * 4] |= ROT_Y;
@@ -153,11 +143,8 @@ static void StartEntity(ObjectInfo *obj)
 		obj->radius = 102;
 		obj->explodableMeshbits = 0x4000;
 		obj->intelligent = true;
-		obj->savePosition = true;
-		obj->saveFlags = true;
-		obj->saveAnim = true;
-		obj->saveHitpoints = true;
 		obj->ZoneType = ZoneType::HumanClassic;
+		
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_X;
 		g_Level.Bones[obj->boneIndex + 13 * 4] |= ROT_Y;
@@ -183,11 +170,8 @@ static void StartEntity(ObjectInfo *obj)
 		obj->pivotLength = 50;
 		obj->radius = 102;
 		obj->intelligent = true;
-		obj->savePosition = true;
-		obj->saveFlags = true;
-		obj->saveAnim = true;
-		obj->saveHitpoints = true;
 		obj->ZoneType = ZoneType::HumanClassic;
+		
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_X;
 		g_Level.Bones[obj->boneIndex + 13 * 4] |= ROT_Y;
@@ -214,11 +198,8 @@ static void StartEntity(ObjectInfo *obj)
 		obj->radius = 102;
 		obj->explodableMeshbits = 0x4000;
 		obj->intelligent = true;
-		obj->savePosition = true;
-		obj->saveFlags = true;
-		obj->saveAnim = true;
-		obj->saveHitpoints = true;
 		obj->ZoneType = ZoneType::HumanClassic;
+		
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_X;
 		g_Level.Bones[obj->boneIndex + 13 * 4] |= ROT_Y;
@@ -243,11 +224,8 @@ static void StartEntity(ObjectInfo *obj)
 		obj->pivotLength = 50;
 		obj->radius = 102;
 		obj->intelligent = true;
-		obj->savePosition = true;
-		obj->saveFlags = true;
-		obj->saveAnim = true;
-		obj->saveHitpoints = true;
 		obj->ZoneType = ZoneType::HumanClassic;
+		
 		g_Level.Bones[Objects[69].boneIndex + 6 * 4] |= ROT_Y;
 		g_Level.Bones[Objects[69].boneIndex + 6 * 4] |= ROT_X;
 		g_Level.Bones[Objects[69].boneIndex + 13 * 4] |= ROT_Y;
@@ -274,11 +252,8 @@ static void StartEntity(ObjectInfo *obj)
 		obj->radius = 102;
 		obj->explodableMeshbits = 0x4000;
 		obj->intelligent = true;
-		obj->savePosition = true;
-		obj->saveFlags = true;
-		obj->saveAnim = true;
-		obj->saveHitpoints = true;
 		obj->ZoneType = ZoneType::HumanClassic;
+		
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_X;
 		g_Level.Bones[obj->boneIndex + 13 * 4] |= ROT_Y;
@@ -306,11 +281,8 @@ static void StartEntity(ObjectInfo *obj)
 		obj->radius = 102;
 		obj->explodableMeshbits = 0x4000;
 		obj->intelligent = true;
-		obj->savePosition = true;
-		obj->saveFlags = true;
-		obj->saveAnim = true;
-		obj->saveHitpoints = true;
 		obj->ZoneType = ZoneType::HumanClassic;
+		
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_X;
 		g_Level.Bones[obj->boneIndex + 13 * 4] |= ROT_Y;
@@ -329,13 +301,10 @@ static void StartEntity(ObjectInfo *obj)
 		obj->pivotLength = 200;
 		obj->radius = 512;
 		obj->intelligent = true;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-		obj->saveHitpoints = true;
-		obj->savePosition = true;
 		obj->waterCreature = true;
 		obj->ZoneType = ZoneType::Flyer;
 		obj->undead = true;
+		
 		g_Level.Bones[obj->boneIndex] |= ROT_X;
 		g_Level.Bones[obj->boneIndex + 4] |= ROT_X;
 	}
@@ -353,12 +322,8 @@ static void StartEntity(ObjectInfo *obj)
 		obj->radius = 102;
 		obj->biteOffset = 0;
 		obj->intelligent = true;
-		obj->savePosition = true;
-		obj->saveFlags = true;
-		obj->saveAnim = true;
-		obj->saveHitpoints = true;
 		obj->ZoneType = ZoneType::HumanClassic;
-
+		
 		g_Level.Bones[obj->boneIndex + 4 * 6] |= ROT_Y;
 		g_Level.Bones[obj->boneIndex + 4 * 6] |= ROT_X;
 		g_Level.Bones[obj->boneIndex + 4 * 13] |= ROT_Y;
@@ -377,11 +342,8 @@ static void StartEntity(ObjectInfo *obj)
 		obj->pivotLength = 50;
 		obj->radius = 341;
 		obj->intelligent = true;
-		obj->savePosition = true;
-		obj->saveFlags = true;
-		obj->saveAnim = true;
-		obj->saveHitpoints = true;
 		obj->ZoneType = ZoneType::Basic;
+		
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
 		g_Level.Bones[obj->boneIndex + 19 * 4] |= ROT_Y;
 	}
@@ -398,11 +360,8 @@ static void StartEntity(ObjectInfo *obj)
 		obj->pivotLength = 50;
 		obj->radius = 256;
 		obj->intelligent = true;
-		obj->savePosition = true;
-		obj->saveFlags = true;
-		obj->saveAnim = true;
-		obj->saveHitpoints = true;
 		obj->ZoneType = ZoneType::Basic;
+		
 		g_Level.Bones[obj->boneIndex + 19 * 4] |= ROT_Y;
 	}
 
@@ -418,11 +377,8 @@ static void StartEntity(ObjectInfo *obj)
 		obj->pivotLength = 50;
 		obj->radius = 256;
 		obj->intelligent = true;
-		obj->savePosition = true;
-		obj->saveFlags = true;
-		obj->saveAnim = true;
-		obj->saveHitpoints = true;
 		obj->ZoneType = ZoneType::Basic;
+		
 		g_Level.Bones[obj->boneIndex + 19 * 4] |= ROT_Y;
 	}
 
@@ -438,10 +394,6 @@ static void StartEntity(ObjectInfo *obj)
 		obj->pivotLength = 50;
 		obj->radius = 102;
 		obj->intelligent = true;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-		obj->saveHitpoints = true;
-		obj->savePosition = true;
 		obj->waterCreature = true;
 		obj->ZoneType = ZoneType::Flyer;
 	}
@@ -460,13 +412,9 @@ static void StartEntity(ObjectInfo *obj)
 		obj->radius = 102;
 		obj->explodableMeshbits = 0x4000;
 		obj->intelligent = true;
-		obj->savePosition = true;
-		obj->saveFlags = true;
-		obj->saveAnim = true;
-		obj->saveHitpoints = true;
 		obj->ZoneType = ZoneType::HumanClassic;
 		obj->meshSwapSlot = ID_MESHSWAP_MAFIA2;
-
+		
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_X;
 		g_Level.Bones[obj->boneIndex + 13 * 4] |= ROT_Y;
@@ -486,11 +434,8 @@ static void StartEntity(ObjectInfo *obj)
 		obj->pivotLength = 50;
 		obj->radius = 102;
 		obj->intelligent = true;
-		obj->savePosition = true;
-		obj->saveFlags = true;
-		obj->saveAnim = true;
-		obj->saveHitpoints = true;
 		obj->ZoneType = ZoneType::HumanClassic;
+		
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_X;
 		g_Level.Bones[obj->boneIndex + 7 * 4] |= ROT_Y;
@@ -510,11 +455,8 @@ static void StartEntity(ObjectInfo *obj)
 		obj->pivotLength = 50;
 		obj->radius = 102;
 		obj->intelligent = true;
-		obj->savePosition = true;
-		obj->saveFlags = true;
-		obj->saveAnim = true;
-		obj->saveHitpoints = true;
 		obj->ZoneType = ZoneType::HumanClassic;
+		
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_X;
 		g_Level.Bones[obj->boneIndex + 7 * 4] |= ROT_Y;
@@ -534,10 +476,6 @@ static void StartEntity(ObjectInfo *obj)
 		obj->pivotLength = 50;
 		obj->radius = 102;
 		obj->intelligent = true;
-		obj->savePosition = true;
-		obj->saveFlags = true;
-		obj->saveAnim = true;
-		obj->saveHitpoints = true;
 		obj->undead = true;
 		obj->ZoneType = ZoneType::HumanClassic;
 		obj->meshSwapSlot = ID_MESHSWAP_HITMAN;
@@ -562,10 +500,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->radius = 102;
 		obj->explodableMeshbits = 0x4000;
 		obj->intelligent = true;
-		obj->savePosition = true;
-		obj->saveFlags = true;
-		obj->saveAnim = true;
-		obj->saveHitpoints = true;
+		
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_X;
 		g_Level.Bones[obj->boneIndex + 13 * 4] |= ROT_Y;
@@ -586,12 +521,9 @@ static void StartEntity(ObjectInfo *obj)
 		obj->radius = 128;
 		obj->explodableMeshbits = 4;
 		obj->intelligent = true;
-		obj->savePosition = true;
-		obj->saveFlags = true;
-		obj->saveAnim = true;
-		obj->saveHitpoints = true;
 		obj->undead = true;
 		obj->ZoneType = ZoneType::HumanClassic;
+		
 		g_Level.Bones[obj->boneIndex] |= ROT_Y;
 		g_Level.Bones[obj->boneIndex] |= ROT_X;
 		g_Level.Bones[obj->boneIndex + 4] |= ROT_Y;
@@ -611,12 +543,9 @@ static void StartEntity(ObjectInfo *obj)
 		obj->radius = 102;
 		obj->biteOffset = 1024;
 		obj->intelligent = true;
-		obj->savePosition = true;
-		obj->saveFlags = true;
-		obj->saveAnim = true;
-		obj->saveHitpoints = true;
 		obj->undead = true;
 		obj->ZoneType = ZoneType::Basic;
+		
 		g_Level.Bones[obj->boneIndex + 0] |= ROT_Y;
 		g_Level.Bones[obj->boneIndex + 8 * 4] |= ROT_Y;
 		g_Level.Bones[obj->boneIndex + 8 * 4] |= ROT_X;
@@ -636,13 +565,9 @@ static void StartEntity(ObjectInfo *obj)
 		obj->pivotLength = 20;
 		obj->radius = 102;
 		obj->intelligent = true;
-		obj->savePosition = true;
-		obj->saveFlags = true;
-		obj->saveAnim = true;
-		obj->saveHitpoints = true;
 		obj->meshSwapSlot = ID_MESHSWAP_IMP;
 		obj->ZoneType = ZoneType::Basic;
-
+		
 		g_Level.Bones[obj->meshIndex + 4 * 4] |= ROT_Z;
 		g_Level.Bones[obj->meshIndex + 4 * 4] |= ROT_X;
 		g_Level.Bones[obj->meshIndex + 9 * 4] |= ROT_Z;
@@ -661,11 +586,8 @@ static void StartEntity(ObjectInfo *obj)
 		obj->HitPoints = 16;
 		obj->pivotLength = 20;
 		obj->intelligent = true;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-		obj->saveHitpoints = true;
-		obj->savePosition = true;
 		obj->ZoneType = ZoneType::Flyer;
+		
 		g_Level.Bones[obj->boneIndex + 4 * 4] |= ROT_Z;
 		g_Level.Bones[obj->boneIndex + 4 * 4] |= ROT_X;
 		g_Level.Bones[obj->boneIndex + 9 * 4] |= ROT_Z;
@@ -685,11 +607,8 @@ static void StartEntity(ObjectInfo *obj)
 		obj->pivotLength = 20;
 		obj->radius = 341;
 		obj->intelligent = true;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-		obj->saveHitpoints = true;
-		obj->savePosition = true;
 		obj->ZoneType = ZoneType::Basic;
+		
 		g_Level.Bones[obj->boneIndex + 4 * 4] |= ROT_Z;
 		g_Level.Bones[obj->boneIndex + 4 * 4] |= ROT_X;
 		g_Level.Bones[obj->boneIndex + 9 * 4] |= ROT_Z;
@@ -709,13 +628,9 @@ static void StartEntity(ObjectInfo *obj)
 		obj->pivotLength = 20;
 		obj->radius = 256;
 		obj->intelligent = true;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-		obj->saveHitpoints = true;
-		obj->savePosition = true;
 		obj->waterCreature = true;
 		obj->ZoneType = ZoneType::Basic;
-
+		
 		g_Level.Bones[obj->boneIndex + 4 * 4] |= ROT_Z;
 		g_Level.Bones[obj->boneIndex + 4 * 4] |= ROT_X;
 		g_Level.Bones[obj->boneIndex + 9 * 4] |= ROT_Z;
@@ -735,11 +650,8 @@ static void StartEntity(ObjectInfo *obj)
 		obj->pivotLength = 20;
 		obj->radius = 256;
 		obj->intelligent = true;
-		obj->savePosition = true;
-		obj->saveFlags = true;
-		obj->saveAnim = true;
-		obj->saveHitpoints = true;
 		obj->ZoneType = ZoneType::HumanClassic;
+		
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_X;
 		g_Level.Bones[obj->boneIndex + 8 * 4] |= ROT_Y;
@@ -786,10 +698,6 @@ static void StartEntity(ObjectInfo *obj)
 		obj->pivotLength = 50;
 		obj->radius = 102;
 		obj->intelligent = true;
-		obj->savePosition = true;
-		obj->saveFlags = true;
-		obj->saveAnim = true;
-		obj->saveHitpoints = true;
 		obj->ZoneType = ZoneType::HumanClassic;
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_X;
@@ -812,13 +720,8 @@ static void StartEntity(ObjectInfo *obj)
 			obj->pivotLength = 50;
 			obj->radius = 256;
 			obj->intelligent = true;
-			obj->savePosition = true;
-			obj->saveFlags = true;
-			obj->saveAnim = true;
-			obj->saveHitpoints = true;
 			obj->meshSwapSlot = ID_MESHSWAP_ROMAN_GOD1 + i;
 			obj->ZoneType = ZoneType::HumanClassic;
-
 			g_Level.Bones[obj->boneIndex + 24] |= ROT_Y;
 			g_Level.Bones[obj->boneIndex + 24] |= ROT_X;
 			g_Level.Bones[obj->boneIndex + 52] |= ROT_Y;
@@ -834,14 +737,9 @@ static void StartEntity(ObjectInfo *obj)
 		obj->control = LaserHeadControl;
 		obj->explodableMeshbits = 6;
 		obj->nonLot = true;
-		obj->savePosition = true;
-		obj->saveHitpoints = true;
-		obj->saveFlags = true;
-		obj->saveAnim = true;
 		obj->usingDrawAnimatingItem = false;
 		obj->undead = true;
 		obj->hitEffect = HIT_RICOCHET;
-		obj->saveMesh = true;
 	}
 
 	obj = &Objects[ID_AUTOGUN];
@@ -849,9 +747,6 @@ static void StartEntity(ObjectInfo *obj)
 	{
 		obj->initialise = InitialiseAutoGuns;
 		obj->control = AutoGunsControl;
-		obj->saveHitpoints = true;
-		obj->saveFlags = true;
-		obj->saveAnim = true;
 		obj->hitEffect = HIT_RICOCHET;
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_X;
@@ -862,8 +757,6 @@ static void StartEntity(ObjectInfo *obj)
 	if (obj->loaded)
 	{
 		obj->control = ControlGunShip;
-		obj->saveFlags = true;
-		obj->saveAnim = true;
 		obj->hitEffect = HIT_RICOCHET;
 		g_Level.Bones[obj->boneIndex + 0] |= ROT_Y;
 		g_Level.Bones[obj->boneIndex + 4] |= ROT_X;
@@ -875,7 +768,6 @@ static void StartEntity(ObjectInfo *obj)
 	{
 		obj->initialise = InitialiseSubmarine;
 		obj->control = SubmarineControl;
-		obj->saveAnim = true;
 		obj->ZoneType = ZoneType::Basic;
 		obj->hitEffect = HIT_RICOCHET;
 		obj->shadowType = ShadowMode::All;
@@ -902,9 +794,6 @@ static void StartObject(ObjectInfo *obj)
 		obj->ceiling = TwoBlocksPlatformCeiling;
 		obj->floorBorder = TwoBlocksPlatformFloorBorder;
 		obj->ceilingBorder = TwoBlocksPlatformCeilingBorder;
-		obj->saveFlags = true;
-		obj->savePosition = true;
-		obj->saveAnim = true;
 	}
 
 	for (int objNum = ID_RAISING_BLOCK1; objNum <= ID_RAISING_BLOCK4; objNum++)
@@ -918,7 +807,6 @@ static void StartObject(ObjectInfo *obj)
 			obj->ceiling = RaisingBlockCeiling;
 			obj->floorBorder = RaisingBlockFloorBorder;
 			obj->ceilingBorder = RaisingBlockCeilingBorder;
-			obj->saveFlags = true;
 		}
 	}
 
@@ -931,9 +819,6 @@ static void StartObject(ObjectInfo *obj)
 		obj->ceiling = ExpandingPlatformCeiling;
 		obj->floorBorder = ExpandingPlatformFloorBorder;
 		obj->ceilingBorder = ExpandingPlatformCeilingBorder;
-		obj->saveFlags = true;
-		obj->savePosition = true;
-		obj->saveAnim = true;
 	}
 
 	obj = &Objects[ID_ELECTRICAL_LIGHT];
@@ -942,7 +827,7 @@ static void StartObject(ObjectInfo *obj)
 		obj->control = ElectricalLightControl;
 		obj->drawRoutine = nullptr;
 		obj->usingDrawAnimatingItem = false;
-		obj->saveFlags = true;
+		
 	}
 
 	obj = &Objects[ID_PULSE_LIGHT];
@@ -951,14 +836,12 @@ static void StartObject(ObjectInfo *obj)
 		obj->control = PulseLightControl;
 		obj->drawRoutine = nullptr;
 		obj->usingDrawAnimatingItem = false;
-		obj->saveFlags = true;
 	}
 
 	obj = &Objects[ID_STROBE_LIGHT];
 	if (obj->loaded)
 	{
 		obj->control = StrobeLightControl;
-		obj->saveFlags = true;
 	}
 
 	obj = &Objects[ID_COLOR_LIGHT];
@@ -967,7 +850,6 @@ static void StartObject(ObjectInfo *obj)
 		obj->control = ColorLightControl;
 		obj->drawRoutine = nullptr;
 		obj->usingDrawAnimatingItem = false;
-		obj->saveFlags = true;
 	}
 
 	obj = &Objects[ID_BLINKING_LIGHT];
@@ -975,7 +857,7 @@ static void StartObject(ObjectInfo *obj)
 	{
 		obj->control = BlinkingLightControl;
 		obj->drawRoutine = nullptr;
-		obj->saveFlags = true;
+		
 	}
 
 	obj = &Objects[ID_BODY_PART];
@@ -989,7 +871,7 @@ static void StartObject(ObjectInfo *obj)
 		obj->control = SmokeEmitterControl;
 		obj->drawRoutine = nullptr;
 		obj->usingDrawAnimatingItem = false;
-		obj->saveFlags = true;
+		
 	}
 
 	obj = &Objects[ID_SMOKE_EMITTER_WHITE];
@@ -999,7 +881,6 @@ static void StartObject(ObjectInfo *obj)
 		obj->control = SmokeEmitterControl;
 		obj->drawRoutine = nullptr;
 		obj->usingDrawAnimatingItem = false;
-		obj->saveFlags = true;
 	}
 
 	obj = &Objects[ID_SMOKE_EMITTER];
@@ -1009,7 +890,6 @@ static void StartObject(ObjectInfo *obj)
 		obj->control = SmokeEmitterControl;
 		obj->drawRoutine = nullptr;
 		obj->usingDrawAnimatingItem = false;
-		obj->saveFlags = true;
 	}
 
 	obj = &Objects[ID_TELEPORTER];
@@ -1018,7 +898,6 @@ static void StartObject(ObjectInfo *obj)
 		obj->initialise = InitialiseTeleporter;
 		obj->control = ControlTeleporter;
 		obj->drawRoutine = nullptr;
-		obj->saveFlags = true;
 	}
 
 	obj = &Objects[ID_LARA_START_POS];
@@ -1033,16 +912,12 @@ static void StartObject(ObjectInfo *obj)
 		obj->initialise = InitialiseHighObject1;
 		obj->control = ControlHighObject1;
 		obj->collision = ObjectCollision;
-		obj->saveFlags = true;
-		obj->savePosition = true;
 	}
 
 	obj = &Objects[ID_GEN_SLOT1];
 	if (obj->loaded)
 	{
 		obj->control = GenSlot1Control;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
 	}
 
 	for (int objectNumber = ID_AI_GUARD; objectNumber <= ID_AI_X2; objectNumber++)
@@ -1065,9 +940,6 @@ static void StartTrap(ObjectInfo *obj)
 		obj->initialise = InitialiseZipLine;
 		obj->collision = ZipLineCollision;
 		obj->control = ControlZipLine;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-		obj->savePosition = true;
 	}
 
 	obj = &Objects[ID_PROPELLER_H];
@@ -1088,8 +960,6 @@ static void StartTrap(ObjectInfo *obj)
 	if (obj->loaded)
 	{
 		obj->control = ElectricityWiresControl;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
 	}
 
 	obj = &Objects[ID_ROME_HAMMER];
@@ -1099,8 +969,6 @@ static void StartTrap(ObjectInfo *obj)
 		obj->collision = GenericSphereBoxCollision;
 		obj->control = AnimatingControl;
 		obj->hitEffect = HIT_RICOCHET;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
 	}
 
 	obj = &Objects[ID_FALLING_CEILING];
@@ -1108,9 +976,6 @@ static void StartTrap(ObjectInfo *obj)
 	{
 		obj->collision = TrapCollision;
 		obj->control = FallingCeilingControl;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-		obj->savePosition = true;
 	}
 
 	obj = &Objects[ID_ROLLINGBALL];
@@ -1119,8 +984,6 @@ static void StartTrap(ObjectInfo *obj)
 		obj->collision = RollingBallCollision;
 		obj->control = RollingBallControl;
 		obj->hitEffect = HIT_RICOCHET;
-		obj->savePosition = true;
-		obj->saveFlags = true;
 		obj->shadowType = ShadowMode::All;
 	}
 	
@@ -1131,9 +994,6 @@ static void StartTrap(ObjectInfo *obj)
 		obj->control = ClassicRollingBallControl;
 		obj->collision = ClassicRollingBallCollision;
 		obj->hitEffect = HIT_RICOCHET;
-		obj->savePosition = true;
-		obj->saveFlags = true;
-		obj->saveAnim = true;
 	}
 
 	obj = &Objects[ID_BIG_ROLLING_BALL];
@@ -1143,9 +1003,6 @@ static void StartTrap(ObjectInfo *obj)
 		obj->control = ClassicRollingBallControl;
 		obj->initialise = InitialiseClassicRollingBall;
 		obj->hitEffect = HIT_RICOCHET;
-		obj->savePosition = true;
-		obj->saveFlags = true;
-		obj->saveAnim = true;
 	}
 
 	obj = &Objects[ID_GEN_SLOT3];
@@ -1154,8 +1011,6 @@ static void StartTrap(ObjectInfo *obj)
 		obj->initialise = InitialiseGenSlot3;
 		obj->collision = HybridCollision;
 		obj->control = AnimatingControl;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
 	}
 
 	obj = &Objects[ID_GEN_SLOT4];
@@ -1163,9 +1018,6 @@ static void StartTrap(ObjectInfo *obj)
 	{
 		//obj->initialise = InitialiseGenSlot4;
 		//obj->control = GenSlot4Control;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-		obj->savePosition = true;
 	}
 
 	obj = &Objects[ID_EXPLOSION];
@@ -1174,7 +1026,6 @@ static void StartTrap(ObjectInfo *obj)
 		obj->initialise = InitialiseExplosion;
 		obj->control = ExplosionControl;
 		obj->drawRoutine = nullptr;
-		obj->saveFlags = true;
 		obj->usingDrawAnimatingItem = false;
 	}
 }
@@ -1187,9 +1038,6 @@ static void StartSwitch(ObjectInfo *obj)
 		obj->initialise = InitialiseRaisingCog;
 		obj->control = RaisingCogControl;
 		obj->hitEffect = HIT_RICOCHET;
-		obj->saveFlags = true;
-		obj->savePosition = true;
-		obj->saveAnim = true;
 	}
 
 	obj = &Objects[ID_CROWDOVE_SWITCH];
@@ -1199,9 +1047,6 @@ static void StartSwitch(ObjectInfo *obj)
 		obj->collision = CrowDoveSwitchCollision;
 		obj->control = CrowDoveSwitchControl;
 		obj->hitEffect = HIT_RICOCHET;
-		obj->saveFlags = true;
-		obj->saveAnim = true;
-		obj->saveMesh = true;
 	}
 
 	obj = &Objects[ID_WRECKING_BALL];
@@ -1210,9 +1055,6 @@ static void StartSwitch(ObjectInfo *obj)
 		obj->initialise = InitialiseWreckingBall;
 		obj->collision = WreckingBallCollision;
 		obj->control = WreckingBallControl;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-		obj->savePosition = true;
 	}
 }
 

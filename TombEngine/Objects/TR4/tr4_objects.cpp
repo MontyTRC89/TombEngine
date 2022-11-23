@@ -98,10 +98,6 @@ namespace TEN::Entities
 			obj->pivotLength = 20;
 			obj->radius = 128;
 			obj->intelligent = true;
-			obj->savePosition = true;
-			obj->saveHitpoints = true;
-			obj->saveAnim = true;
-			obj->saveFlags = true;
 			obj->ZoneType = ZoneType::Basic;
 		}
 
@@ -117,10 +113,6 @@ namespace TEN::Entities
 			obj->pivotLength = 50;
 			obj->radius = 512;
 			obj->intelligent = true;
-			obj->savePosition = true;
-			obj->saveHitpoints = true;
-			obj->saveFlags = true;
-			obj->saveAnim = true;
 			obj->ZoneType = ZoneType::Basic;
 		}
 
@@ -136,10 +128,6 @@ namespace TEN::Entities
 			obj->pivotLength = 20;
 			obj->radius = 128;
 			obj->intelligent = true;
-			obj->savePosition = true;
-			obj->saveHitpoints = true;
-			obj->saveAnim = true;
-			obj->saveFlags = true;
 			obj->waterCreature = true;
 			obj->ZoneType = ZoneType::Water;
 		}
@@ -156,12 +144,7 @@ namespace TEN::Entities
 			obj->pivotLength = 50;
 			obj->radius = 102;
 			obj->intelligent = true;
-			obj->savePosition = true;
-			obj->saveHitpoints = true;
-			obj->saveAnim = true;
-			obj->saveFlags = true;
 			obj->ZoneType = ZoneType::Basic;
-
 			g_Level.Bones[obj->boneIndex + 48 * 4] |= ROT_Z;
 			g_Level.Bones[obj->boneIndex + 48 * 4] |= ROT_Y;
 			g_Level.Bones[obj->boneIndex + 52 * 4] |= ROT_Z;
@@ -180,10 +163,6 @@ namespace TEN::Entities
 			obj->pivotLength = 50;
 			obj->radius = 256;
 			obj->intelligent = true;
-			obj->savePosition = true;
-			obj->saveFlags = true;
-			obj->saveAnim = true;
-			obj->saveHitpoints = true;
 			obj->ZoneType = ZoneType::Basic;
 			g_Level.Bones[obj->boneIndex + 19 * 4] |= ROT_Y;
 		}
@@ -200,10 +179,6 @@ namespace TEN::Entities
 			obj->pivotLength = 10;
 			obj->radius = 102;
 			obj->intelligent = true;
-			obj->savePosition = true;
-			obj->saveHitpoints = true;
-			obj->saveAnim = true;
-			obj->saveFlags = true;
 			obj->ZoneType = ZoneType::Flyer;
 		}
 
@@ -219,12 +194,7 @@ namespace TEN::Entities
 			obj->pivotLength = 300;
 			obj->radius = 341;
 			obj->intelligent = true;
-			obj->saveAnim = true;
-			obj->saveFlags = true;
-			obj->saveHitpoints = true;
-			obj->savePosition = true;
 			obj->ZoneType = ZoneType::Basic;
-
 			g_Level.Bones[obj->boneIndex + 9 * 4] |= ROT_Y;
 		}
 
@@ -241,13 +211,8 @@ namespace TEN::Entities
 			obj->pivotLength = 50;
 			obj->radius = 102;
 			obj->intelligent = true;
-			obj->savePosition = true;
-			obj->saveHitpoints = true;
-			obj->saveAnim = true;
-			obj->saveFlags = true;
 			obj->meshSwapSlot = ID_MESHSWAP_BADDY1;
 			obj->ZoneType = ZoneType::HumanJumpAndMonkey;
-
 			g_Level.Bones[obj->boneIndex + 28 * 4] |= ROT_Y;
 			g_Level.Bones[obj->boneIndex + 28 * 4] |= ROT_X;
 			//g_Level.Bones[obj->boneIndex + 88 * 4] |= ROT_Y;
@@ -267,13 +232,8 @@ namespace TEN::Entities
 			obj->pivotLength = 50;
 			obj->radius = 102;
 			obj->intelligent = true;
-			obj->savePosition = true;
-			obj->saveHitpoints = true;
-			obj->saveAnim = true;
-			obj->saveFlags = true;
 			obj->meshSwapSlot = ID_MESHSWAP_BADDY2;
 			obj->ZoneType = ZoneType::HumanJumpAndMonkey;
-
 			g_Level.Bones[obj->boneIndex + 28 * 4] |= ROT_Y;
 			g_Level.Bones[obj->boneIndex + 28 * 4] |= ROT_X;
 			//g_Level.Bones[obj->boneIndex + 88 * 4] |= ROT_Y;
@@ -293,12 +253,7 @@ namespace TEN::Entities
 			obj->pivotLength = 50;
 			obj->radius = 102;
 			obj->intelligent = true;
-			obj->savePosition = true;
-			obj->saveHitpoints = true;
-			obj->saveAnim = true;
-			obj->saveFlags = true;
 			obj->ZoneType = ZoneType::HumanClassic;
-
 			g_Level.Bones[obj->boneIndex] |= ROT_Y;
 			g_Level.Bones[obj->boneIndex] |= ROT_X;
 			g_Level.Bones[obj->boneIndex + 28 * 4] |= ROT_Y;
@@ -316,13 +271,8 @@ namespace TEN::Entities
 			obj->hitEffect = HIT_SMOKE;
 			obj->radius = 170;
 			obj->intelligent = true;
-			obj->savePosition = true;
-			obj->saveHitpoints = true;
-			obj->saveAnim = true;
-			obj->saveFlags = true;
 			obj->undead = true;
 			obj->ZoneType = ZoneType::Basic;
-
 			g_Level.Bones[obj->boneIndex + 7 * 4] |= ROT_Y;
 			g_Level.Bones[obj->boneIndex + 7 * 4] |= ROT_X;
 
@@ -341,10 +291,6 @@ namespace TEN::Entities
 			obj->radius = 128;
 			obj->explodableMeshbits = 0xA00;
 			obj->intelligent = true;
-			obj->savePosition = true;
-			obj->saveHitpoints = true;
-			obj->saveAnim = true;
-			obj->saveFlags = true;
 			obj->undead = true;
 			obj->ZoneType = ZoneType::Skeleton;
 		}
@@ -361,12 +307,7 @@ namespace TEN::Entities
 			obj->pivotLength = 50;
 			obj->radius = 128;
 			obj->intelligent = true;
-			obj->savePosition = true;
-			obj->saveHitpoints = true;
-			obj->saveFlags = true;
-			obj->saveAnim = true;
 			obj->ZoneType = ZoneType::Basic;
-
 			g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_X | ROT_Y;
 			g_Level.Bones[obj->boneIndex + 7 * 4] |= ROT_Y;
 		}
@@ -383,10 +324,6 @@ namespace TEN::Entities
 			obj->pivotLength = 50;
 			obj->radius = 204;
 			obj->intelligent = true;
-			obj->saveHitpoints = true;
-			obj->saveFlags = true;
-			obj->saveAnim = true;
-			obj->savePosition = true;
 			obj->undead = false;
 			obj->ZoneType = ZoneType::Flyer;
 		}
@@ -403,10 +340,6 @@ namespace TEN::Entities
 			obj->pivotLength = 50;
 			obj->radius = 341;
 			obj->intelligent = true;
-			obj->savePosition = true;
-			obj->saveHitpoints = true;
-			obj->saveFlags = true;
-			obj->saveAnim = true;
 			obj->undead = true;
 			obj->ZoneType = ZoneType::Basic;
 		}
@@ -423,10 +356,6 @@ namespace TEN::Entities
 			obj->pivotLength = 50;
 			obj->radius = 341;
 			obj->intelligent = true;
-			obj->savePosition = true;
-			obj->saveHitpoints = true;
-			obj->saveFlags = true;
-			obj->saveAnim = true;
 			obj->undead = true;
 			obj->ZoneType = ZoneType::Basic;
 
@@ -446,10 +375,6 @@ namespace TEN::Entities
 			obj->pivotLength = 50;
 			obj->radius = 341;
 			obj->intelligent = true;
-			obj->savePosition = true;
-			obj->saveHitpoints = true;
-			obj->saveFlags = true;
-			obj->saveAnim = true;
 			obj->ZoneType = ZoneType::Basic;
 			g_Level.Bones[obj->boneIndex + 4 * 4] |= ROT_X | ROT_Y | ROT_Z;
 			g_Level.Bones[obj->boneIndex + 5 * 4] |= ROT_Y;
@@ -467,10 +392,6 @@ namespace TEN::Entities
 			obj->pivotLength = 50;
 			obj->radius = 341;
 			obj->intelligent = true;
-			obj->savePosition = true;
-			obj->saveHitpoints = true;
-			obj->saveFlags = true;
-			obj->saveAnim = true;
 			obj->ZoneType = ZoneType::Basic;
 			g_Level.Bones[obj->boneIndex + 4 * 4] |= ROT_X | ROT_Y | ROT_Z;
 			g_Level.Bones[obj->boneIndex + 5 * 4] |= ROT_Y;
@@ -484,7 +405,6 @@ namespace TEN::Entities
 			obj->collision = ObjectCollision;
 			obj->hitEffect = HIT_BLOOD;
 			obj->nonLot = true;
-			obj->savePosition = true;
 			obj->ZoneType = ZoneType::Basic;
 		}
 
@@ -501,11 +421,7 @@ namespace TEN::Entities
 			obj->pivotLength = 50;
 			obj->radius = 102;
 			obj->intelligent = true;
-			obj->saveHitpoints = true;
-			obj->saveAnim = true;
-			obj->saveFlags = true;
 			obj->ZoneType = ZoneType::Basic;
-
 			g_Level.Bones[obj->boneIndex] |= ROT_X | ROT_Y;
 			g_Level.Bones[obj->boneIndex + 7 * 4] |= ROT_X | ROT_Y;
 		}
@@ -523,12 +439,8 @@ namespace TEN::Entities
 			obj->pivotLength = 50;
 			obj->radius = 204;
 			obj->intelligent = true;
-			obj->saveHitpoints = true;
-			obj->saveAnim = true;
-			obj->saveFlags = true;
 			obj->explodableMeshbits = 64;
 			obj->ZoneType = ZoneType::Basic;
-
 			g_Level.Bones[obj->boneIndex + 0] |= ROT_Y;
 			g_Level.Bones[obj->boneIndex + 1 * 4] |= ROT_X;
 			g_Level.Bones[obj->boneIndex + 2 * 4] |= ROT_Z;
@@ -547,9 +459,6 @@ namespace TEN::Entities
 			obj->pivotLength = 50;
 			obj->radius = 409;
 			obj->intelligent = true;
-			obj->saveHitpoints = true;
-			obj->saveAnim = true;
-			obj->saveFlags = true;
 			obj->ZoneType = ZoneType::Flyer;
 		}
 
@@ -565,9 +474,6 @@ namespace TEN::Entities
 		obj->pivotLength = 0;
 		obj->radius = 128;
 		obj->intelligent = true;
-		obj->saveHitpoints = true;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
 		obj->meshSwapSlot = ID_MESHSWAP2;
 		obj->ZoneType = ZoneType::Basic;
 
@@ -587,12 +493,8 @@ namespace TEN::Entities
 			obj->pivotLength = 300;
 			obj->radius = 409;
 			obj->intelligent = true;
-			obj->saveHitpoints = true;
-			obj->saveAnim = true;
-			obj->saveFlags = true;
 			obj->waterCreature = true;
 			obj->ZoneType = ZoneType::Water;
-
 			g_Level.Bones[obj->boneIndex] |= ROT_Y;
 			g_Level.Bones[obj->boneIndex + 7 * 4] |= ROT_Y;
 			g_Level.Bones[obj->boneIndex + 9 * 4] |= ROT_Y;
@@ -611,9 +513,6 @@ namespace TEN::Entities
 			obj->pivotLength = 500;
 			obj->radius = 512;
 			obj->intelligent = true;
-			obj->saveHitpoints = true;
-			obj->saveAnim = true;
-			obj->saveFlags = true;
 			obj->ZoneType = ZoneType::Basic;
 		}
 
@@ -623,8 +522,6 @@ namespace TEN::Entities
 			obj->initialise = InitialiseHorse;
 			obj->control = nullptr;
 			obj->collision = ObjectCollision;
-			obj->saveAnim = true;
-			obj->saveFlags = true;
 		}
 
 		obj = &Objects[ID_HORSEMAN];
@@ -639,11 +536,6 @@ namespace TEN::Entities
 			obj->pivotLength = 500;
 			obj->radius = 409;
 			obj->intelligent = true;
-			obj->saveHitpoints = true;
-			obj->saveAnim = true;
-			obj->saveFlags = true;
-			obj->savePosition = true;
-			obj->saveMesh = true;
 			obj->ZoneType = ZoneType::Basic;
 		}
 
@@ -659,10 +551,6 @@ namespace TEN::Entities
 			obj->pivotLength = 200;
 			obj->radius = 256;
 			obj->intelligent = true;
-			obj->saveAnim = true;
-			obj->saveFlags = true;
-			obj->saveHitpoints = true;
-			obj->savePosition = true;
 			obj->ZoneType = ZoneType::Basic;
 		}
 
@@ -678,10 +566,6 @@ namespace TEN::Entities
 			obj->pivotLength = 200;
 			obj->radius = 256;
 			obj->intelligent = true;
-			obj->saveAnim = true;
-			obj->saveFlags = true;
-			obj->saveHitpoints = true;
-			obj->savePosition = true;
 			obj->ZoneType = ZoneType::Basic;
 
 			if (Objects[ID_BABOON_NORMAL].loaded)
@@ -700,10 +584,6 @@ namespace TEN::Entities
 			obj->pivotLength = 200;
 			obj->radius = 256;
 			obj->intelligent = true;
-			obj->saveAnim = true;
-			obj->saveFlags = true;
-			obj->saveHitpoints = true;
-			obj->savePosition = true;
 			obj->ZoneType = ZoneType::Basic;
 
 			if (Objects[ID_BABOON_NORMAL].loaded)
@@ -722,10 +602,6 @@ namespace TEN::Entities
 			obj->pivotLength = 50;
 			obj->radius = 128;
 			obj->intelligent = true;
-			obj->saveAnim = true;
-			obj->saveFlags = true;
-			obj->saveMesh = true;
-			obj->savePosition = true;
 			obj->undead = true;
 			obj->ZoneType = ZoneType::Water;
 			g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_Y | ROT_X;
@@ -738,7 +614,6 @@ namespace TEN::Entities
 			obj->initialise = TEN::Entities::TR4::InitialiseLocust;
 			obj->control = TEN::Entities::TR4::LocustControl;
 			obj->drawRoutine = NULL;
-			obj->saveFlags = true;
 			obj->ZoneType = ZoneType::Basic;
 		}
 
@@ -747,10 +622,6 @@ namespace TEN::Entities
 		{
 			obj->initialise = InitialiseWraith;
 			obj->control = WraithControl;
-			obj->savePosition = true;
-			obj->saveHitpoints = true;
-			obj->saveFlags = true;
-			obj->saveAnim = true;
 		}
 
 		obj = &Objects[ID_WRAITH2];
@@ -758,10 +629,6 @@ namespace TEN::Entities
 		{
 			obj->initialise = InitialiseWraith;
 			obj->control = WraithControl;
-			obj->savePosition = true;
-			obj->saveHitpoints = true;
-			obj->saveFlags = true;
-			obj->saveAnim = true;
 		}
 
 		obj = &Objects[ID_WRAITH3];
@@ -769,10 +636,6 @@ namespace TEN::Entities
 		{
 			obj->initialise = InitialiseWraith;
 			obj->control = WraithControl;
-			obj->savePosition = true;
-			obj->saveHitpoints = true;
-			obj->saveFlags = true;
-			obj->saveAnim = true;
 		}	
 
 		obj = &Objects[ID_LITTLE_BEETLE];
@@ -781,7 +644,6 @@ namespace TEN::Entities
 			obj->initialise = TEN::Entities::TR4::InitialiseBeetleSwarm;
 			obj->control = TEN::Entities::TR4::BeetleSwarmControl;
 			obj->drawRoutine = NULL;
-			obj->saveFlags = true;
 			obj->ZoneType = ZoneType::Basic;
 		}
 
@@ -792,9 +654,6 @@ namespace TEN::Entities
 			obj->control = InjuredSasControl;
 			obj->collision = ObjectCollision;
 			obj->hitEffect = HIT_BLOOD;
-			obj->saveFlags = true;
-			obj->savePosition = true;
-			obj->saveAnim = true;
 			obj->ZoneType = ZoneType::Basic;
 		}
 
@@ -804,17 +663,12 @@ namespace TEN::Entities
 			obj->initialise = InitialiseEnemyJeep;
 			obj->control = EnemyJeepControl;
 			obj->collision = CreatureCollision;
-			obj->saveFlags = true;
-			obj->savePosition = true;
-			obj->saveAnim = true;
 			obj->intelligent = true;
-			obj->saveHitpoints = true; 
 			obj->pivotLength = 500;
 			obj->shadowType = ShadowMode::All;
 			obj->radius = 512;
 			obj->HitPoints = 40;
 			obj->ZoneType = ZoneType::Basic;
-
 			g_Level.Bones[obj->boneIndex + 4 * 8] |= ROT_X;
 			g_Level.Bones[obj->boneIndex + 4 * 9] |= ROT_X;
 			g_Level.Bones[obj->boneIndex + 4 * 11] |= ROT_X;
@@ -832,13 +686,7 @@ namespace TEN::Entities
 			obj->HitPoints = 15;
 			obj->explodableMeshbits = 0x200000;
 			obj->intelligent = true;
-			obj->saveAnim = true;
-			obj->saveFlags = true;
-			obj->savePosition = true;
-			obj->saveHitpoints = true;
-			obj->saveMesh = true;
 			obj->ZoneType = ZoneType::HumanLongJumpAndMonkey;
-
 			g_Level.Bones[obj->boneIndex + 4 * 6] |= ROT_X;
 			g_Level.Bones[obj->boneIndex + 4 * 6] |= ROT_Y;
 			g_Level.Bones[obj->boneIndex + 4 * 20] |= ROT_X;
@@ -853,9 +701,6 @@ namespace TEN::Entities
 		{
 			obj->control = AnimatingControl;
 			obj->collision = SasDragBlokeCollision;
-			obj->savePosition = true;
-			obj->saveFlags = true;
-			obj->saveAnim = true;
 		}
 
 		obj = &Objects[ID_SARCOPHAGUS];
@@ -864,8 +709,6 @@ namespace TEN::Entities
 			obj->control = AnimatingControl;
 			obj->collision = SarcophagusCollision;
 			obj->hitEffect = HIT_RICOCHET;
-			obj->saveFlags = true;
-			obj->saveAnim = true;
 		}
 
 		obj = &Objects[ID_MAPPER];
@@ -873,8 +716,6 @@ namespace TEN::Entities
 		{
 			obj->initialise = InitialiseMapper;
 			obj->control = MapperControl;
-			obj->saveFlags = true;
-			obj->saveAnim = true;
 			obj->drawRoutine = nullptr;
 		}
 
@@ -884,8 +725,6 @@ namespace TEN::Entities
 			obj->initialise = InitialiseElementPuzzle;
 			obj->control = ElementPuzzleControl;
 			obj->collision = ElementPuzzleCollision;
-			obj->saveFlags = true;
-			obj->saveMesh = true;
 		}
 
 		obj = &Objects[ID_WHEEL_OF_FORTUNE];
@@ -898,8 +737,6 @@ namespace TEN::Entities
 			g_Level.Bones[obj->boneIndex + 4] |= 0x10;
 			g_Level.Bones[obj->boneIndex + 8] |= 0x10;
 			g_Level.Bones[obj->boneIndex + 12] |= 0x10;
-			obj->saveAnim = 1;
-			obj->saveFlags = 1;
 			obj->HitPoints = 1;
 		}
 
@@ -908,16 +745,12 @@ namespace TEN::Entities
 		{
 			obj->collision = ObjectCollision;
 			obj->hitEffect = HIT_RICOCHET;
-			obj->saveAnim = 1;
 		}
 
 		obj = &Objects[ID_GOD_HEAD];
 		if (obj->loaded)
 		{
 			obj->control = ControlGodHead;
-		//	obj->drawRoutine = DrawGodHead;
-		//	obj->usingDrawAnimatingItem = 0;
-			obj->saveFlags = 1;
 		}
 
 		for (int i = 0; i < 3; i++)
@@ -930,9 +763,6 @@ namespace TEN::Entities
 				obj->control = SenetControl;
 				obj->collision = ObjectCollision;
 				obj->hitEffect = HIT_RICOCHET;
-				obj->savePosition = 1;
-				obj->saveHitpoints = 1;
-				obj->saveFlags = 1;
 			}
 		}
 
@@ -962,8 +792,6 @@ namespace TEN::Entities
 			obj->initialise = InitialiseObelisk;
 			obj->control = ObeliskControl;
 			obj->collision = ObjectCollision;
-			obj->savePosition = true;
-			obj->saveFlags = true;
 		}
 	}
 
@@ -975,8 +803,6 @@ namespace TEN::Entities
 			obj->control = ChainControl;
 			obj->collision = GenericSphereBoxCollision;
 			obj->hitEffect = HIT_RICOCHET;
-			obj->saveAnim = true;
-			obj->saveFlags = true;
 		}
 
 		obj = &Objects[ID_PLOUGH];
@@ -985,8 +811,6 @@ namespace TEN::Entities
 			obj->control = PloughControl;
 			obj->collision = GenericSphereBoxCollision;
 			obj->hitEffect = HIT_RICOCHET;
-			obj->saveAnim = true;
-			obj->saveFlags = true;
 		}
 
 		obj = &Objects[ID_CATWALK_BLADE];
@@ -995,8 +819,6 @@ namespace TEN::Entities
 			obj->control = CatwalkBladeControl;
 			obj->collision = BladeCollision;
 			obj->hitEffect = HIT_RICOCHET;
-			obj->saveAnim = true;
-			obj->saveFlags = true;
 		}
 
 		obj = &Objects[ID_SETH_BLADE];
@@ -1006,8 +828,6 @@ namespace TEN::Entities
 			obj->control = SethBladeControl;
 			obj->collision = GenericSphereBoxCollision;
 			obj->hitEffect = HIT_RICOCHET;
-			obj->saveAnim = true;
-			obj->saveFlags = true;
 		}
 
 		obj = &Objects[ID_PLINTH_BLADE];
@@ -1016,8 +836,6 @@ namespace TEN::Entities
 			obj->control = PlinthBladeControl;
 			obj->collision = BladeCollision;
 			obj->hitEffect = HIT_RICOCHET;
-			obj->saveAnim = true;
-			obj->saveFlags = true;
 		}
 
 		obj = &Objects[ID_BIRD_BLADE];
@@ -1026,8 +844,6 @@ namespace TEN::Entities
 			obj->control = BirdBladeControl;
 			obj->collision = GenericSphereBoxCollision;
 			obj->hitEffect = HIT_RICOCHET;
-			obj->saveAnim = true;
-			obj->saveFlags = true;
 		}
 
 		obj = &Objects[ID_JOBY_SPIKES];
@@ -1037,7 +853,6 @@ namespace TEN::Entities
 			obj->control = JobySpikesControl;
 			obj->collision = GenericSphereBoxCollision;
 			obj->hitEffect = HIT_RICOCHET;
-			obj->saveFlags = true;
 		}
 
 		obj = &Objects[ID_MOVING_BLADE];
@@ -1046,8 +861,6 @@ namespace TEN::Entities
 			obj->control = MovingBladeControl;
 			obj->collision = BladeCollision;
 			obj->hitEffect = HIT_RICOCHET;
-			obj->saveFlags = true;
-			obj->saveAnim = true;
 		}
 
 		obj = &Objects[ID_SPIKEBALL];
@@ -1055,8 +868,6 @@ namespace TEN::Entities
 		{
 			obj->control = SpikeballControl;
 			obj->collision = GenericSphereBoxCollision;
-			obj->saveAnim = true;
-			obj->saveFlags = true;
 		}
 
 		obj = &Objects[ID_CHAIN];
@@ -1065,8 +876,6 @@ namespace TEN::Entities
 			obj->control = ChainControl;
 			obj->collision = GenericSphereBoxCollision;
 			obj->hitEffect = HIT_RICOCHET;
-			obj->saveAnim = true;
-			obj->saveFlags = true;
 		}
 
 		obj = &Objects[ID_PLOUGH];
@@ -1075,8 +884,6 @@ namespace TEN::Entities
 			obj->control = PloughControl;
 			obj->collision = GenericSphereBoxCollision;
 			obj->hitEffect = HIT_RICOCHET;
-			obj->saveAnim = true;
-			obj->saveFlags = true;
 		}
 
 		obj = &Objects[ID_FLOOR_4BLADES];
@@ -1085,8 +892,6 @@ namespace TEN::Entities
 			obj->control = FourBladesControl;
 			obj->collision = GenericSphereBoxCollision;
 			obj->hitEffect = HIT_RICOCHET;
-			obj->saveAnim = true;
-			obj->saveFlags = true;
 		}
 
 		obj = &Objects[ID_CEILING_4BLADES];
@@ -1095,8 +900,6 @@ namespace TEN::Entities
 			obj->control = FourBladesControl;
 			obj->collision = GenericSphereBoxCollision;
 			obj->hitEffect = HIT_RICOCHET;
-			obj->saveAnim = true;
-			obj->saveFlags = true;
 		}
 
 		obj = &Objects[ID_STARGATE];
@@ -1105,8 +908,6 @@ namespace TEN::Entities
 			obj->control = StargateControl;
 			obj->collision = StargateCollision;
 			obj->hitEffect = HIT_RICOCHET;
-			obj->saveAnim = true;
-			obj->saveFlags = true;
 		}
 
 		obj = &Objects[ID_SLICER_DICER];
@@ -1116,7 +917,6 @@ namespace TEN::Entities
 			obj->control = SlicerDicerControl;
 			obj->collision = BladeCollision;
 			obj->hitEffect = HIT_RICOCHET;
-			obj->saveFlags = true;
 		}
 
 		obj = &Objects[ID_MINE];
@@ -1125,9 +925,6 @@ namespace TEN::Entities
 			obj->initialise = InitialiseMine;
 			obj->control = MineControl;
 			obj->collision = MineCollision;
-			obj->saveFlags = true;
-			obj->saveAnim = true;
-			obj->savePosition = true;
 		}
 
 		obj = &Objects[ID_SPIKY_WALL];
@@ -1136,8 +933,6 @@ namespace TEN::Entities
 			obj->control = ControlSpikyWall;
 			obj->collision = ObjectCollision;
 			obj->hitEffect = HIT_RICOCHET;
-			obj->savePosition = true;
-			obj->saveFlags = true;
 		}
 
 		obj = &Objects[ID_SPIKY_CEILING];
@@ -1146,8 +941,6 @@ namespace TEN::Entities
 			obj->control = ControlSpikyCeiling;
 			obj->collision = TrapCollision;
 			obj->hitEffect = HIT_RICOCHET;
-			obj->savePosition = true;
-			obj->saveFlags = true;
 		}
 
 		obj = &Objects[ID_COG];
@@ -1156,8 +949,6 @@ namespace TEN::Entities
 			obj->control = CogControl;
 			obj->collision = CogCollision;
 			obj->hitEffect = HIT_RICOCHET;
-			obj->saveAnim = true;
-			obj->saveFlags = true;
 		}
 
 		obj = &Objects[ID_LARA_DOUBLE];
@@ -1172,10 +963,6 @@ namespace TEN::Entities
 			obj->pivotLength = 50;
 			obj->radius = 128;
 			obj->intelligent = true;
-			obj->savePosition = true;
-			obj->saveHitpoints = true;
-			obj->saveFlags = true;
-			obj->saveAnim = true;
 			obj->ZoneType = ZoneType::Basic;
 		}
 
@@ -1184,7 +971,6 @@ namespace TEN::Entities
 		{
 			obj->initialise = InitialiseTeethSpikes;
 			obj->control = ControlTeethSpikes;
-			obj->saveFlags = 1;
 		}
 
 		obj = &Objects[ID_HAMMER];
@@ -1192,8 +978,6 @@ namespace TEN::Entities
 		{
 			obj->control = HammerControl;
 			obj->collision = GenericSphereBoxCollision;
-			obj->saveFlags = 1;
-			obj->saveAnim = 1;
 		}
 	}
 
@@ -1205,11 +989,7 @@ namespace TEN::Entities
 			obj->initialise = InitialiseJeep;
 			obj->collision = JeepPlayerCollision;
 			obj->hitEffect = HIT_RICOCHET;
-			obj->savePosition = true;
-			obj->saveAnim = true;
-			obj->saveFlags = true;
 			obj->shadowType = ShadowMode::Lara;
-
 		}
 
 		obj = &Objects[ID_MOTORBIKE];
@@ -1217,13 +997,8 @@ namespace TEN::Entities
 		{
 			obj->initialise = InitialiseMotorbike;
 			obj->collision = MotorbikePlayerCollision;
-			//obj->drawRoutine = DrawMotorbike; // for wheel rotation
 			obj->hitEffect = HIT_RICOCHET;
-			obj->savePosition = true;
-			obj->saveAnim = true;
-			obj->saveFlags = true;
 			obj->shadowType = ShadowMode::Lara;
-
 		}
 	}
 

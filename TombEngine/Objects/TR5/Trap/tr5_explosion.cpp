@@ -8,11 +8,12 @@
 #include "Game/control/control.h"
 #include "Game/effects/debris.h"
 #include "Game/effects/effects.h"
-#include "Game/effects/lara_fx.h"
+#include "Game/effects/item_fx.h"
 #include "Game/effects/tomb4fx.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_one_gun.h"
+#include "Game/Lara/lara_fire.h"
 #include "Objects/Generic/Switches/generic_switch.h"
 #include "Objects/Generic/Traps/traps.h"
 #include "Objects/TR5/Shatter/tr5_smashobject.h"
@@ -20,7 +21,7 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-using namespace TEN::Effects::Lara;
+using namespace TEN::Effects::Items;
 using namespace TEN::Entities::Switches;
 
 void InitialiseExplosion(short itemNumber)
@@ -109,7 +110,7 @@ void ExplosionControl(short itemNumber)
 						DoDamage(LaraItem, distance / 16);
 
 						if (distance < CLICK(3))
-							LaraBurn(LaraItem);
+							ItemBurn(LaraItem);
 					}
 				}
 			}
@@ -133,7 +134,7 @@ void ExplosionControl(short itemNumber)
 					else if (CollidedItems[i]->ObjectNumber != ID_SWITCH_TYPE7 && CollidedItems[i]->ObjectNumber != ID_SWITCH_TYPE8)
 					{
 						if (Objects[CollidedItems[i]->ObjectNumber].intelligent)
-							DoExplosiveDamageOnBaddy(LaraItem, CollidedItems[i], item, LaraWeaponType::GrenadeLauncher);
+							DoExplosiveDamage(*LaraItem, *CollidedItems[i], *item, Weapons[(int)LaraWeaponType::GrenadeLauncher].ExplosiveDamage);
 					}
 					else
 					{

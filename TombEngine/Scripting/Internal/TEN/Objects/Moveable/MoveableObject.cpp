@@ -3,6 +3,8 @@
 #include "Game/items.h"
 #include "Game/control/lot.h"
 #include "Game/effects/debris.h"
+#include "Game/effects/item_fx.h"
+#include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Objects/objectslist.h"
 #include "Specific/level.h"
@@ -19,10 +21,12 @@
 #include "Rotation/Rotation.h"
 #include "Vec3/Vec3.h"
 
+using namespace TEN::Effects::Items;
+
 /***
 Represents any object inside the game world.
 Examples include traps, enemies, doors,
-pickups, and Lara herself.
+pickups, and Lara herself (see also @{Objects.LaraObject} for Lara-specific features).
 
 @tenclass Objects.Moveable
 @pragma nostrip
@@ -83,7 +87,7 @@ most can just be ignored (see usage).
 	@return reference to new Moveable object
 	@usage 
 	local item = Moveable(
-		TEN.ObjID.PISTOLS_ITEM, -- object id
+		TEN.Objects.ObjID.PISTOLS_ITEM, -- object id
 		"test", -- name
 		Vec3(18907, 0, 21201)
 		)
@@ -161,6 +165,17 @@ void Moveable::Register(sol::table & parent)
 /// Shatter item. This also kills and disables item.
 // @function Moveable:Shatter
 	ScriptReserved_Shatter, &Moveable::Shatter,
+
+/// Set effect to moveable
+// @function Moveable:SetEffect
+// @tparam EffectID effect Type of effect to assign.
+// @tparam float timeout time (in seconds) after which effect turns off (optional).
+	ScriptReserved_SetEffect, &Moveable::SetEffect,
+
+/// Get current moveable effect
+// @function Moveable:GetEffect
+// @treturn EffectID effect type currently assigned to moveable.
+	ScriptReserved_GetEffect, &Moveable::GetEffect,
 
 /// Get the status of object.
 // possible values:
@@ -266,14 +281,8 @@ void Moveable::Register(sol::table & parent)
 // @tparam int frame the new frame number
 	ScriptReserved_SetFrameNumber, &Moveable::SetFrameNumber,
 		
-/// Get current HP (hit points/health points)
-// @function Moveable:GetHP
-// @treturn int the amount of HP the moveable currently has
 	ScriptReserved_GetHP, &Moveable::GetHP,
 
-/// Set current HP (hit points/health points)
-// @function Moveable:SetHP
-// @tparam int HP the amount of HP to give the moveable
 	ScriptReserved_SetHP, &Moveable::SetHP,
 
 /// Get HP definded for that object type (hit points/health points) (Read Only).
@@ -439,7 +448,19 @@ ScriptReserved_GetSlotHP, & Moveable::GetSlotHP,
 
 /// Destroy the moveable. This will mean it can no longer be used, except to re-initialise it with another object.
 // @function Moveable:Destroy
-	ScriptReserved_Destroy, &Moveable::Destroy);
+	ScriptReserved_Destroy, &Moveable::Destroy,
+
+/// Attach camera to an object.
+// @function Moveable:AttachObjCamera
+// @tparam int mesh 1 for camera, mesh 2 for target
+	ScriptReserved_AttachObjCamera, &Moveable::AttachObjCamera,
+
+/// Borrow animation from an object
+// @function Moveable:AnimFromObject
+// @tparam ObjID ObjectID to take animation and stateID from,
+// @tparam int animNumber animation from object
+// @tparam int stateID state from object
+	ScriptReserved_AnimFromObject, &Moveable::AnimFromObject);
 }
 
 
@@ -466,6 +487,7 @@ GAME_OBJECT_ID Moveable::GetObjectID() const
 void Moveable::SetObjectID(GAME_OBJECT_ID id) 
 {
 	m_item->ObjectNumber = id;
+	m_item->ResetModelToDefault();
 }
 
 void SetLevelFuncCallback(TypeOrNil<LevelFunc> const & cb, std::string const & callerName, Moveable & mov, std::string & toModify)
@@ -561,8 +583,14 @@ void Moveable::SetPos(Vec3 const& pos, sol::optional<bool> updateRoom)
 	pos.StoreInPHDPos(m_item->Pose);
 
 	bool willUpdate = !updateRoom.has_value() || updateRoom.value();
-	if(m_initialised && willUpdate)
-		UpdateItemRoom(m_item, pos.y);
+
+	if (m_initialised && willUpdate)
+	{
+		if (m_item->IsLara())
+			UpdateLaraRoom(m_item, pos.y);
+		else
+			UpdateItemRoom(m_item->Index);
+	}
 }
 
 Vec3 Moveable::GetJointPos(int jointIndex) const
@@ -591,29 +619,27 @@ void Moveable::SetRot(Rotation const& rot)
 	m_item->Pose.Orientation.z = FROM_DEGREES(rot.z);
 }
 
+/// Get current HP (hit points/health points)
+// @function Moveable:GetHP
+// @treturn int the amount of HP the moveable currently has
 short Moveable::GetHP() const
 {
 	return m_item->HitPoints;
 }
 
+/// Set current HP (hit points/health points)
+// Clamped to [0, 32767] for "intelligent" entities (i.e. anything with AI); clamped to [-32767, 32767] otherwise.
+// @function Moveable:SetHP
+// @tparam int HP the amount of HP to give the moveable
 void Moveable::SetHP(short hp)
 {
-	if(Objects[m_item->ObjectNumber].intelligent &&
-		(hp < 0 || hp > Objects[m_item->ObjectNumber].HitPoints))
+	if(Objects[m_item->ObjectNumber].intelligent && hp < 0)
 	{
-		ScriptAssert(false, "Invalid HP value: " + std::to_string(hp));
-		if (hp < 0)
+		if (hp != NOT_TARGETABLE)
 		{
-			if (hp != NOT_TARGETABLE)
-			{
-				hp = 0;
-				ScriptWarn("Setting HP to 0.");
-			}
-		}
-		else if (hp > Objects[m_item->ObjectNumber].HitPoints)
-		{
-			hp = Objects[m_item->ObjectNumber].HitPoints;
-			ScriptWarn("Setting HP to default value (" + std::to_string(hp) + ")");
+			ScriptAssert(false, "Invalid HP value: " + std::to_string(hp));
+			ScriptWarn("Setting HP to 0.");
+			hp = 0;
 		}
 	}
 
@@ -622,7 +648,7 @@ void Moveable::SetHP(short hp)
 
 short Moveable::GetSlotHP() const
 {
-	return (Objects[m_item->ObjectNumber].HitPoints);
+	return Objects[m_item->ObjectNumber].HitPoints;
 }
 
 short Moveable::GetOCB() const
@@ -633,6 +659,35 @@ short Moveable::GetOCB() const
 void Moveable::SetOCB(short ocb)
 {
 	m_item->TriggerFlags = ocb;
+}
+
+void Moveable::SetEffect(EffectType effectType, sol::optional<float> timeout)
+{
+	int realTimeout = timeout.has_value() ? int(timeout.value() * FPS) : -1;
+
+	switch (effectType)
+	{
+	case EffectType::None:
+		m_item->Effect.Type = EffectType::None;
+		break;
+
+	case EffectType::Smoke:
+		ItemSmoke(m_item, realTimeout);
+		break;
+
+	case EffectType::Fire:
+		ItemBurn(m_item, realTimeout);
+		break;
+
+	case EffectType::Sparks:
+		ItemElectricBurn(m_item, realTimeout);
+		break;
+	}
+}
+
+EffectType Moveable::GetEffect() const
+{
+	return m_item->Effect.Type;
 }
 
 short Moveable::GetItemFlags(int index) const
@@ -996,4 +1051,22 @@ bool Moveable::MeshExists(int index) const
 	}
 
 	return true;
+}
+
+//Attach camera and camera target to a mesh of an object.
+void Moveable::AttachObjCamera(short camMeshId, Moveable& mov, short targetMeshId)
+{
+	if ((m_item->Active || m_item->IsLara()) && (mov.m_item->Active || mov.m_item->IsLara()))
+	{
+		ObjCamera(m_item, camMeshId, mov.m_item, targetMeshId, true);
+	}
+}
+
+//Borrow an animtaion and state id from an object.
+void Moveable::AnimFromObject(GAME_OBJECT_ID object, int animNumber, int stateID)
+{
+	m_item->Animation.AnimNumber = Objects[object].animIndex + animNumber;
+	m_item->Animation.ActiveState = stateID;
+	m_item->Animation.FrameNumber = g_Level.Anims[m_item->Animation.AnimNumber].frameBase;
+	AnimateItem(m_item);
 }

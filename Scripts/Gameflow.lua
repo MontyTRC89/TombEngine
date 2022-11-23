@@ -14,11 +14,15 @@ Flow.SetTitleScreenImagePath("Screens\\main.jpg")
 -- Set overall amount of secrets in game.
 -- If set to 0, secrets won't be displayed in statistics.
 
-Flow.SetNumberOfSecrets(5)
+Flow.SetTotalSecretCount(5)
 
 -- Disable/enable flycheat globally
 
 Flow.EnableFlyCheat(true)
+
+-- Disable/enable mass pickup (collect all pickups at once)
+
+Flow.EnableMassPickup(true)
 
 --------------------------------------------------
 

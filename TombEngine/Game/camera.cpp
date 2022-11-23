@@ -69,6 +69,7 @@ GameVector LookCamPosition;
 GameVector LookCamTarget;
 Vector3i CamOldPos;
 CAMERA_INFO Camera;
+OBJ_CAMERA_INFO ItemCamera;
 GameVector ForcedFixedCamera;
 int UseForcedFixedCamera;
 
@@ -490,6 +491,99 @@ void MoveCamera(GameVector* ideal, int speed)
 		Camera.mikePos.y = Camera.pos.y;
 		Camera.mikePos.z = Camera.pos.z + (PhdPerspective * phd_cos(angle));
 		Camera.oldType = Camera.type;
+	}
+}
+
+void ObjCamera(ItemInfo* camSlotId, int camMeshId, ItemInfo* targetItem, int targetMeshId, bool cond)
+{
+	//camSlotId and targetItem stay the same object until I know how to expand targetItem to another object.
+	//activates code below ->  void CalculateCamera().
+	ItemCamera.ItemCameraOn = cond;
+
+	UpdateCameraElevation();
+
+	//get mesh 0 coordinates.	
+	auto pos = GetJointPosition(camSlotId, 0, Vector3i::Zero);
+	auto dest = Vector3(pos.x, pos.y, pos.z);
+
+	GameVector from = GameVector(dest, camSlotId->RoomNumber);
+	Camera.fixedCamera = true;
+
+	MoveObjCamera(&from, camSlotId, camMeshId, targetItem, targetMeshId);
+	Camera.timer = -1;
+}
+
+
+void MoveObjCamera(GameVector* ideal, ItemInfo* camSlotId, int camMeshId, ItemInfo* targetItem, int targetMeshId)
+{
+	int	speed = 1;
+	//Get mesh1 to attach camera to
+	//Vector3i pos = Vector3i::Zero;
+	auto pos = GetJointPosition(camSlotId, camMeshId, Vector3i::Zero);
+	//Get mesh2 to attach target to
+	//Vector3i pos2 = Vector3i::Zero;
+	auto pos2 = GetJointPosition(targetItem, targetMeshId, Vector3i::Zero);
+
+	if (OldCam.pos.Position != pos ||
+		OldCam.targetDistance  != Camera.targetDistance  ||
+		OldCam.targetElevation != Camera.targetElevation ||
+		OldCam.actualElevation != Camera.actualElevation ||
+		OldCam.actualAngle != Camera.actualAngle ||
+		OldCam.target != Camera.target.ToVector3i() ||
+		Camera.oldType != Camera.type ||
+		BinocularOn)
+	{
+		OldCam.pos.Position = pos;
+		OldCam.targetDistance = Camera.targetDistance;
+		OldCam.targetElevation = Camera.targetElevation;
+		OldCam.actualElevation = Camera.actualElevation;
+		OldCam.actualAngle = Camera.actualAngle;
+		OldCam.target = Camera.target.ToVector3i();
+		LastIdeal = pos;
+		LastIdeal.RoomNumber = ideal->RoomNumber;
+		LastTarget = pos2;
+	}
+	else
+	{
+		pos  = LastIdeal.ToVector3i();
+		pos2 = LastTarget.ToVector3i();
+		ideal->RoomNumber = LastIdeal.RoomNumber;
+	}
+
+	Camera.pos += (ideal->ToVector3i() - Camera.pos.ToVector3i()) / speed;
+	Camera.pos.RoomNumber = GetCollision(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.RoomNumber).RoomNumber;
+	LookAt(&Camera, 0);
+
+	auto angle = Camera.target.ToVector3i() - Camera.pos.ToVector3i();
+	auto position = Vector3i(Camera.target.ToVector3i() - Camera.pos.ToVector3i());
+
+	// write last frame camera angle to LastAngle to compare if next frame camera angle has a bigger step than 100.
+	// To make camera movement smoother a speed of 2 is used.
+	// While for big camera angle steps (cuts) -
+	// the speed is set to 1 to make the cut immediatelly.
+	constexpr int angleThresholdDegrees = 100;
+
+	if (LastTarget.x - Camera.target.x > angleThresholdDegrees ||
+		LastTarget.y - Camera.target.y > angleThresholdDegrees ||
+		LastTarget.z - Camera.target.z > angleThresholdDegrees)
+	{
+		speed = 1;
+	}
+	else
+	{
+		speed = 2;
+	}
+
+	//actual movement of the target.
+	Camera.target.x += (pos2.x - Camera.target.x) / speed;
+	Camera.target.y += (pos2.y - Camera.target.y) / speed;
+	Camera.target.z += (pos2.z - Camera.target.z) / speed;
+
+	if (ItemCamera.LastAngle != position)
+	{
+		ItemCamera.LastAngle = Vector3i(ItemCamera.LastAngle.x = angle.x, 
+										ItemCamera.LastAngle.y = angle.y, 
+										ItemCamera.LastAngle.z = angle.z);
 	}
 }
 
@@ -915,135 +1009,6 @@ void BounceCamera(ItemInfo* item, short bounce, short maxDistance)
 		Camera.bounce = bounce;
 }
 
-void LaserSightCamera(ItemInfo* item)
-{
-	auto* lara = GetLaraInfo(item);
-	auto& ammo = GetAmmo(*lara, lara->Control.Weapon.GunType);
-
-	bool isFiring = false;
-
-	if (WeaponDelay)
-		WeaponDelay--;
-
-	if (LSHKTimer)
-		LSHKTimer--;
-
-	if (!IsHeld(In::Action) || WeaponDelay || !ammo)
-	{
-		if (!IsHeld(In::Action))
-		{
-			LSHKShotsFired = 0;
-			Camera.bounce = 0;
-		}
-	}
-	else
-	{
-		if (lara->Control.Weapon.GunType == LaraWeaponType::Revolver)
-		{
-			isFiring = true;
-			WeaponDelay = 16;
-			Statistics.Game.AmmoUsed++;
-
-			if (!ammo.HasInfinite())
-				(ammo)--;
-
-			Camera.bounce = -16 - (GetRandomControl() & 0x1F);
-		}
-		else if (lara->Control.Weapon.GunType == LaraWeaponType::Crossbow)
-		{
-			isFiring = true;
-			WeaponDelay = 32;
-		}
-		else
-		{
-			if (lara->Weapons[(int)LaraWeaponType::HK].SelectedAmmo == WeaponAmmoType::Ammo1)
-			{
-				WeaponDelay = 12;
-				isFiring = true;
-
-				if (lara->Weapons[(int)LaraWeaponType::HK].HasSilencer)
-					SoundEffect(SFX_TR4_HK_SILENCED, nullptr);
-				else
-				{
-					SoundEffect(SFX_TR4_EXPLOSION1, nullptr, SoundEnvironment::Land, 1.0f, 0.4f);
-					SoundEffect(SFX_TR4_HK_FIRE, nullptr);
-				}
-
-				Camera.bounce = -16 - (GetRandomControl() & 0x1F);
-			}
-			else if (lara->Weapons[(int)LaraWeaponType::HK].SelectedAmmo == WeaponAmmoType::Ammo2)
-			{
-				if (!LSHKTimer)
-				{
-					if (++LSHKShotsFired == 5)
-					{
-						LSHKShotsFired = 0;
-						WeaponDelay = 12;
-					}
-
-					LSHKTimer = 4;
-					isFiring = true;
-
-					if (lara->Weapons[(int)LaraWeaponType::HK].HasSilencer)
-						SoundEffect(SFX_TR4_HK_SILENCED, nullptr);
-					else
-					{
-						SoundEffect(SFX_TR4_EXPLOSION1, nullptr, SoundEnvironment::Land, 1.0f, 0.4f);
-						SoundEffect(SFX_TR4_HK_FIRE, nullptr);
-					}
-
-					Camera.bounce = -16 - (GetRandomControl() & 0x1F);
-				}
-				else
-				{
-					Camera.bounce = -16 - (GetRandomControl() & 0x1F);
-
-					if (lara->Weapons[(int)LaraWeaponType::HK].HasSilencer)
-						SoundEffect(SFX_TR4_HK_SILENCED, nullptr);
-					else
-					{
-						SoundEffect(SFX_TR4_EXPLOSION1, nullptr, SoundEnvironment::Land, 1.0f, 0.4f);
-						SoundEffect(SFX_TR4_HK_FIRE, nullptr);
-					}
-
-					Camera.bounce = -16 - (GetRandomControl() & 0x1F);
-				}
-			}
-			else
-			{
-				if (LSHKTimer)
-				{
-					if (lara->Weapons[(int)LaraWeaponType::HK].HasSilencer)
-						SoundEffect(SFX_TR4_HK_SILENCED, nullptr);
-					else
-					{
-						SoundEffect(SFX_TR4_EXPLOSION1, nullptr, SoundEnvironment::Land, 1.0f, 0.4f);
-						SoundEffect(SFX_TR4_HK_FIRE, nullptr);
-					}
-				}
-				else
-				{
-					LSHKTimer = 4;
-					isFiring = true;
-
-					if (lara->Weapons[(int)LaraWeaponType::HK].HasSilencer)
-						SoundEffect(SFX_TR4_HK_SILENCED, nullptr);
-					else
-					{
-						SoundEffect(SFX_TR4_EXPLOSION1, nullptr, SoundEnvironment::Land, 1.0f, 0.4f);
-						SoundEffect(SFX_TR4_HK_FIRE, nullptr);
-					}
-				}
-			}
-
-			if (!ammo.HasInfinite())
-				(ammo)--;
-		}
-	}
-
-	GetTargetOnLOS(&Camera.pos, &Camera.target, true, isFiring);
-}
-
 void BinocularCamera(ItemInfo* item)
 {
 	auto* lara = GetLaraInfo(item);
@@ -1173,17 +1138,13 @@ void BinocularCamera(ItemInfo* item)
 			SoundEffect(SFX_TR4_BINOCULARS_ZOOM, nullptr, SoundEnvironment::Land, 1.0f);
 	}
 
-	if (LaserSight)
-		LaserSightCamera(item);
-	else
-	{
-		auto origin = Camera.pos.ToVector3i();
-		auto target = Camera.target.ToVector3i();
-		GetTargetOnLOS(&Camera.pos, &Camera.target, false, false);
+	auto origin = Camera.pos.ToVector3i();
+	auto target = Camera.target.ToVector3i();
 
-		if (IsHeld(In::Action))
-			LaraTorch(&origin, &target, lara->ExtraHeadRot.y, 192);
-	}
+	GetTargetOnLOS(&Camera.pos, &Camera.target, false, false);
+
+	if (IsHeld(In::Action))
+		LaraTorch(&origin, &target, lara->ExtraHeadRot.y, 192);
 }
 
 void ConfirmCameraTargetPos()
@@ -1226,6 +1187,11 @@ void CalculateCamera()
 	if (BinocularOn)
 	{
 		BinocularCamera(LaraItem);
+		return;
+	}
+
+	if (ItemCamera.ItemCameraOn)
+	{
 		return;
 	}
 
@@ -1560,9 +1526,12 @@ std::vector<short> FillCollideableItemList()
 
 	for (short i = 0; i < g_Level.NumItems; i++)
 	{
-		auto item = &g_Level.Items[i];
+		auto* item = &g_Level.Items[i];
 
 		if (std::find(roomList.begin(), roomList.end(), item->RoomNumber) == roomList.end())
+			continue;
+
+		if (!g_Level.Rooms[item->RoomNumber].Active())
 			continue;
 
 		if (!CheckItemCollideCamera(&g_Level.Items[i]))
@@ -1609,6 +1578,9 @@ std::vector<MESH_INFO*> FillCollideableStaticsList()
 	for (int i : roomList)
 	{
 		auto* room = &g_Level.Rooms[i];
+
+		if (!room->Active())
+			continue;
 
 		for (short j = 0; j < room->mesh.size(); j++)
 		{
@@ -1823,7 +1795,7 @@ void HandleOptics(ItemInfo* item)
 	if (!LaserSight && !breakOptics && (TrInput == IN_LOOK))
 	{
 		if (lara->Control.HandStatus == HandStatus::WeaponReady &&
-			(lara->Control.Weapon.GunType == LaraWeaponType::HK ||
+			((lara->Control.Weapon.GunType == LaraWeaponType::HK && lara->Weapons[(int)LaraWeaponType::HK].HasLasersight) ||
 				(lara->Control.Weapon.GunType == LaraWeaponType::Revolver && lara->Weapons[(int)LaraWeaponType::Revolver].HasLasersight) ||
 				(lara->Control.Weapon.GunType == LaraWeaponType::Crossbow && lara->Weapons[(int)LaraWeaponType::Crossbow].HasLasersight)))
 		{

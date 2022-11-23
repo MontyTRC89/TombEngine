@@ -54,19 +54,19 @@
 	// NOTE: Previously phd_RotBoundingBoxNoPersp().
 	void GameBoundingBox::RotateNoPersp(const EulerAngles& orient, const GameBoundingBox& bounds)
 	{
-		auto world = orient.ToRotationMatrix();
-		auto bMin = Vector3(bounds.X1, bounds.Y1, bounds.Z1);
-		auto bMax = Vector3(bounds.X2, bounds.Y2, bounds.Z2);
+		auto rotMatrix = orient.ToRotationMatrix();
+		auto boxMin = Vector3(bounds.X1, bounds.Y1, bounds.Z1);
+		auto boxMax = Vector3(bounds.X2, bounds.Y2, bounds.Z2);
 
-		bMin = Vector3::Transform(bMin, world);
-		bMax = Vector3::Transform(bMax, world);
+		boxMin = Vector3::Transform(boxMin, rotMatrix);
+		boxMax = Vector3::Transform(boxMax, rotMatrix);
 
-		this->X1 = (int)round(bMin.x);
-		this->X2 = (int)round(bMax.x);
-		this->Y1 = (int)round(bMin.y);
-		this->Y2 = (int)round(bMax.y);
-		this->Z1 = (int)round(bMin.z);
-		this->Z2 = (int)round(bMax.z);
+		this->X1 = (int)round(boxMin.x);
+		this->X2 = (int)round(boxMax.x);
+		this->Y1 = (int)round(boxMin.y);
+		this->Y2 = (int)round(boxMax.y);
+		this->Z1 = (int)round(boxMin.z);
+		this->Z2 = (int)round(boxMax.z);
 	}
 
 	BoundingOrientedBox GameBoundingBox::ToBoundingOrientedBox(const Pose& pose) const
