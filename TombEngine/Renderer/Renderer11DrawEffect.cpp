@@ -64,7 +64,7 @@ BiteInfo EnemyBites[12] =
 namespace TEN::Renderer
 {
 	using namespace TEN::Effects::Blood;
-	using namespace TEN::Effects::Footprints;
+	using namespace TEN::Effects::Footprint;
 	using std::vector;
 
 	struct RendererSpriteBucket
@@ -388,7 +388,7 @@ namespace TEN::Renderer
 
 	void Renderer11::DrawRipples(RenderView& view)
 	{
-		for (auto& ripple : Ripples)
+		for (const auto& ripple : Ripples)
 		{
 			if (!ripple.IsActive)
 				continue;
@@ -428,14 +428,14 @@ namespace TEN::Renderer
 			if (ripple.Flags.Test(RippleFlags::Blood))
 			{
 				AddSpriteBillboard(
-					&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex] + ripple.SpriteIndex,
+					&m_sprites[ripple.SpriteIndex],
 					ripple.Position,
 					color, 0.0f, 1.0f, Vector2(ripple.Scale, ripple.Scale) * 2, BLENDMODE_ADDITIVE, true, view);
 			}
 			else
 			{
 				AddSpriteBillboardConstrainedLookAt(
-					&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex] + ripple.SpriteIndex,
+					&m_sprites[ripple.SpriteIndex],
 					ripple.Position,
 					color, 0.0f, 1.0f, Vector2(ripple.Scale, ripple.Scale) * 2, BLENDMODE_ADDITIVE, ripple.Normal, true, view);
 			}

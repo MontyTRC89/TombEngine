@@ -13,7 +13,7 @@
 
 using namespace TEN::Math;
 
-namespace TEN::Effects::Footprints
+namespace TEN::Effects::Footprint
 {
 	constexpr auto FOOTPRINT_LIFE_MAX		   = 20.0f;
 	constexpr auto FOOTPRINT_LIFE_START_FADING = 10.0f;

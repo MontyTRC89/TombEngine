@@ -4,6 +4,7 @@
 #include "Math/Math.h"
 #include "Specific/BitField.h"
 #include "Objects/objectslist.h"
+#include "Specific/setup.h"
 
 using namespace TEN::Math;
 
@@ -42,7 +43,7 @@ namespace TEN::Effects::Ripple
 
 		ripple = Ripple();
 		ripple.IsActive = true;
-		ripple.SpriteIndex = SPR_RIPPLES;
+		ripple.SpriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_RIPPLES;
 		ripple.Position = pos;
 		ripple.Normal = normal;
 		ripple.Life = Random::GenerateFloat(16.0f, 64.0f);
@@ -65,7 +66,7 @@ namespace TEN::Effects::Ripple
 
 		ripple = Ripple();
 		ripple.IsActive = true;
-		ripple.SpriteIndex = 0;
+		ripple.SpriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex;
 		ripple.Position = pos + Vector3(Random::GenerateFloat(-32.0f, 32.0f), 0.0f, Random::GenerateFloat(-32.0f, 32.0f));
 		ripple.Normal = Vector3::Zero; // Unused by underwater blood rendering.
 		ripple.Life = Random::GenerateFloat(240.0f, 248.0f);

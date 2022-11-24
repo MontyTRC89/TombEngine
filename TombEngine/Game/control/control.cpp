@@ -61,7 +61,7 @@ using namespace TEN::Effects::Bubble;
 using namespace TEN::Effects::Drip;
 using namespace TEN::Effects::Environment;
 using namespace TEN::Effects::Explosion;
-using namespace TEN::Effects::Footprints;
+using namespace TEN::Effects::Footprint;
 using namespace TEN::Effects::Lightning;
 using namespace TEN::Effects::Ripple;
 using namespace TEN::Effects::Smoke;

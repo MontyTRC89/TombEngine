@@ -106,7 +106,7 @@ namespace TEN::Effects::Blood
 
 	bool TestBloodStainFloor(const BloodStain& stain)
 	{
-		static constexpr auto heightRange = CLICK(1.0f / 2);
+		static constexpr auto heightRange = CLICK(1 / 2.0f);
 
 		// Get point collision at every vertex point.
 		auto pointColl0 = GetCollision(stain.VertexPoints[0].x, stain.Position.y - CLICK(1), stain.VertexPoints[0].z, stain.RoomNumber);

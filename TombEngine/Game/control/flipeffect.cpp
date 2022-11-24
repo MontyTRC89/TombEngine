@@ -25,7 +25,7 @@
 #include "Specific/setup.h"
 
 using namespace TEN::Effects::Environment;
-using namespace TEN::Effects::Footprints;
+using namespace TEN::Effects::Footprint;
 
 int FlipEffect;
 

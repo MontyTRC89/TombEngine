@@ -43,11 +43,12 @@ namespace TEN::Effects::Bubble
 		if (!TestEnvironment(ENV_FLAG_WATER, roomNumber))
 			return;
 
-		float shade = Random::GenerateFloat(0.3f, 0.8f);
-
 		auto& bubble = GetFreeBubble();
 
-		bubble = {};
+		float shade = Random::GenerateFloat(0.3f, 0.8f);
+		float maxAmplitude = (flags & BubbleFlags::HighAmplitude) ? 256.0f : 32.0f;
+
+		bubble = Bubble();
 		bubble.IsActive = true;
 		bubble.SpriteIndex = (flags & BubbleFlags::Clump) ? SPR_UNKNOWN1 : SPR_BUBBLES;
 
@@ -56,14 +57,11 @@ namespace TEN::Effects::Bubble
 		bubble.Velocity = (flags & BubbleFlags::Clump) ? Random::GenerateFloat(8.0f, 16.0f) : Random::GenerateFloat(8.0f, 12.0f);
 		bubble.ColorStart = BUBBLE_COLOR_TRANSPARENT;
 
-
 		bubble.ColorEnd = Vector4(shade, shade, shade, 1.0f);
 		bubble.Color = bubble.ColorStart;
 		bubble.ScaleMax = (flags & BubbleFlags::BigSize) ? Random::GenerateFloat(256.0f, 512.0f) : Random::GenerateFloat(32.0f, 128.0f);
 		bubble.Rotation = 0.0f;
 		bubble.Position = pos;
-
-		float maxAmplitude = (flags & BubbleFlags::HighAmplitude) ? 256.0f : 32.0f;
 
 		bubble.Amplitude = Vector3(Random::GenerateFloat(-maxAmplitude, maxAmplitude), Random::GenerateFloat(-maxAmplitude, maxAmplitude), Random::GenerateFloat(-maxAmplitude, maxAmplitude));
 		bubble.PositionHome = bubble.Position;
@@ -104,6 +102,7 @@ namespace TEN::Effects::Bubble
 					Vector3(bubble.Position.x, g_Level.Rooms[bubble.RoomNumber].maxceiling, bubble.Position.z),
 					Random::GenerateFloat(48.0f, 64.0f),
 					{ RippleFlags::ShortInit });
+
 				continue;
 			}
 
@@ -123,7 +122,6 @@ namespace TEN::Effects::Bubble
 
 	void ClearBubbles()
 	{
-		for (auto& bubble : Bubbles)
-			bubble = {};
+		Bubbles.fill(Bubble());
 	}
 }

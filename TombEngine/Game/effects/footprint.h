@@ -7,7 +7,7 @@ enum SOUND_EFFECTS;
 enum class FLOOR_MATERIAL : unsigned char;
 struct ItemInfo;
 
-namespace TEN::Effects::Footprints
+namespace TEN::Effects::Footprint
 {
 	constexpr auto FOOTPRINT_NUM_MAX = 32;
 
