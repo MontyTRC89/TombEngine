@@ -7,16 +7,39 @@ struct CollisionResult;
 
 namespace TEN::Effects::Blood
 {
-	constexpr auto BLOOD_DRIP_NUM_MAX  = 512;
-	constexpr auto BLOOD_CLOUD_NUM_MAX = 512;
+	constexpr auto BLOOD_MIST_NUM_MAX  = 256;
+	constexpr auto BLOOD_DRIP_NUM_MAX  = 256;
 	constexpr auto BLOOD_STAIN_NUM_MAX = 192;
 
 	constexpr auto BLOOD_DRIP_SPRAY_NUM_DEFAULT = 2;
 
+	struct BloodMist
+	{
+		bool		 IsActive	 = false;
+		unsigned int SpriteIndex = 0;
+
+		Vector3 Position	  = Vector3::Zero;
+		int		RoomNumber	  = NO_ROOM;
+		short	Orientation2D = 0;
+		Vector3 Velocity	  = Vector3::Zero;
+		Vector4 Color		  = Vector4::Zero;
+		
+		float Life		 = 0.0f;
+		float LifeMax	 = 0.0f;
+		float Scale		 = 0.0f;
+		float ScaleMax	 = 0.0f;
+		float ScaleMin	 = 0.0f;
+		float Opacity	 = 0.0f;
+		float OpacityMax = 0.0f;
+		float Gravity	 = 0.0f;
+		float Friction	 = 0.0f;
+		short Rotation	 = 0;
+	};
+
 	struct BloodDrip
 	{
-		bool		 IsActive	   = false;
-		unsigned int SpriteIndex   = 0;
+		bool		 IsActive	 = false;
+		unsigned int SpriteIndex = 0;
 
 		Vector3 Position   = Vector3::Zero;
 		int		RoomNumber = NO_ROOM;
@@ -26,11 +49,6 @@ namespace TEN::Effects::Blood
 		float Life	  = 0.0f;
 		float Scale	  = 0.0f;
 		float Gravity = 0.0f;
-	};
-
-	struct BloodCloud
-	{
-
 	};
 
 	struct BloodStain
@@ -53,21 +71,22 @@ namespace TEN::Effects::Blood
 		float ScaleMax		  = 0.0f;
 		float ScaleRate		  = 0.0f;
 		float Opacity		  = 0.0f;
-		float OpacityStart	  = 0.0f;
+		float OpacityMax	  = 0.0f;
 		float DelayTime		  = 0.0f;
 	};
 
-	extern std::array<BloodDrip, BLOOD_DRIP_NUM_MAX>   BloodDrips;
-	extern std::array<BloodCloud, BLOOD_CLOUD_NUM_MAX> BloodClouds;
-	extern std::deque<BloodStain>					   BloodStains;
+	extern std::array<BloodMist, BLOOD_MIST_NUM_MAX> BloodMists;
+	extern std::array<BloodDrip, BLOOD_DRIP_NUM_MAX> BloodDrips;
+	extern std::deque<BloodStain>					 BloodStains;
 
+	BloodMist&			   GetFreeBloodMist();
 	BloodDrip&			   GetFreeBloodDrip();
 	std::array<Vector3, 4> GetBloodStainVertexPoints(const Vector3& pos, short orient2D, const Vector3& normal, float scale);
 
 	bool TestBloodStainFloor(const BloodStain& stain);
 
-	void SpawnBloodMist(const Vector3& pos, int roomNumber, const Vector3& direction, unsigned int count);
-	void SpawnBloodMistCloud(const Vector3& pos, int roomNumber, const Vector3& direction, float velocity, unsigned int count);
+	void SpawnBloodMist(const Vector3& pos, int roomNumber, const Vector3& direction);
+	void SpawnBloodMistCloud(const Vector3& pos, int roomNumber, const Vector3& direction, unsigned int count);
 
 	void SpawnBloodCloudUnderwater(const Vector3& pos, int roomNumber, float scale);
 

@@ -6,6 +6,7 @@
 #include "Game/collision/collide_room.h"
 #include "Game/collision/floordata.h"
 #include "Game/effects/effects.h"
+#include "Game/effects/Blood.h"
 #include "Game/effects/Bubble.h"
 #include "Game/effects/debris.h"
 #include "Game/effects/Drip.h"
@@ -21,8 +22,9 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-using namespace TEN::Effects::Drip;
+using namespace TEN::Effects::Blood;
 using namespace TEN::Effects::Bubble;
+using namespace TEN::Effects::Drip;
 using namespace TEN::Effects::Environment;
 using namespace TEN::Effects::Ripple;
 using namespace TEN::Floordata;
@@ -41,16 +43,20 @@ int LaserSightZ;
 int NextFireSpark = 1;
 int NextSmokeSpark = 0;
 int NextBubble = 0;
-int NextBlood = 0;
 int NextGunShell = 0;
 
 GUNFLASH_STRUCT Gunflashes[MAX_GUNFLASH];
 FIRE_SPARKS FireSparks[MAX_SPARKS_FIRE];
 SMOKE_SPARKS SmokeSparks[MAX_SPARKS_SMOKE];
 GUNSHELL_STRUCT Gunshells[MAX_GUNSHELL];
-BLOOD_STRUCT Bloods[MAX_SPARKS_BLOOD];
 SHOCKWAVE_STRUCT ShockWaves[MAX_SHOCKWAVE];
 FIRE_LIST Fires[MAX_FIRE_LIST];
+
+// Temporary wrapper for the old blood spawning function.
+void TriggerBlood(int x, int y, int z, int direction, int num)
+{
+	SpawnBloodMistCloud(Vector3(x, y, z), 0, Vector3::Zero, num);
+}
 
 int GetFreeFireSpark()
 {
@@ -756,132 +762,6 @@ void TriggerShatterSmoke(int x, int y, int z)
 	spark->dSize = (GetRandomControl() & 0x3F) + 64;
 	spark->sSize = spark->dSize >> 3;
 	spark->size = spark->dSize >> 3;
-}
-
-int GetFreeBlood()
-{
-	BLOOD_STRUCT* blood = &Bloods[NextBlood];
-	int bloodNum = NextBlood;
-	int minLife = 4095;
-	int minIndex = 0;
-	int count = 0;
-
-	while (blood->on)
-	{
-		if (blood->life < minLife)
-		{
-			minIndex = bloodNum;
-			minLife = blood->life;
-		}
-
-		if (bloodNum == MAX_SPARKS_BLOOD - 1)
-		{
-			blood = &Bloods[0];
-			bloodNum = 0;
-		}
-		else
-		{
-			blood++;
-			bloodNum++;
-		}
-
-		if (++count >= MAX_SPARKS_BLOOD)
-		{
-			NextBlood = (minIndex + 1) & 31;
-			return minIndex;
-		}
-	}
-
-	NextBlood = (bloodNum + 1) & 31;
-	return bloodNum;
-}
-
-void TriggerBlood(int x, int y, int z, int direction, int num)
-{
-	for (int i = 0; i < num; i++)
-	{
-		BLOOD_STRUCT* blood = &Bloods[GetFreeBlood()];
-		blood->on = 1;
-		blood->sShade = 0;
-		blood->colFadeSpeed = 4;
-		blood->fadeToBlack = 8;
-		blood->dShade = (GetRandomControl() & 0x3F) + 48;
-		blood->life = blood->sLife = (GetRandomControl() & 7) + 24;
-		blood->x = (GetRandomControl() & 0x1F) + x - 16;
-		blood->y = (GetRandomControl() & 0x1F) + y - 16;
-		blood->z = (GetRandomControl() & 0x1F) + z - 16;
-		int a = (direction == -1 ? GetRandomControl() : (GetRandomControl() & 0x1F) + direction - 16) & 0xFFF;
-		int b = GetRandomControl() & 0xF;
-		blood->zVel = b * phd_cos(a << 4) * 32;
-		blood->xVel = -b * phd_sin(a << 4) * 32;
-		blood->friction = 4;
-		blood->yVel = -((GetRandomControl() & 0xFF) + 128);
-		blood->rotAng = GetRandomControl() & 0xFFF;
-		blood->rotAdd = (GetRandomControl() & 0x3F) + 64;
-		if (GetRandomControl() & 1)
-			blood->rotAdd = -blood->rotAdd;
-		blood->gravity = (GetRandomControl() & 0x1F) + 31;
-		int size = (GetRandomControl() & 7) + 8;
-		blood->sSize = blood->size = size;
-		blood->dSize = size >> 2;
-	}
-}
-
-void UpdateBlood()
-{
-	for (int i = 0; i < MAX_SPARKS_BLOOD; i++)
-	{
-		BLOOD_STRUCT* blood = &Bloods[i];
-
-		if (blood->on)
-		{
-			blood->life--;
-
-			if (blood->life <= 0)
-			{
-				blood->on = false;
-				continue;
-			}
-
-			if (blood->sLife - blood->life >= blood->colFadeSpeed)
-			{
-				if (blood->life >= blood->fadeToBlack)
-				{
-					blood->shade = blood->dShade;
-				}
-				else
-				{
-					blood->shade = blood->dShade * (((blood->life - blood->fadeToBlack) << 16) / blood->fadeToBlack + 0x10000) >> 16;
-					if (blood->shade < 8)
-					{
-						blood->on = false;
-						continue;
-					}
-				}
-			}
-			else
-			{
-				blood->shade = blood->sShade + ((blood->dShade - blood->sShade) * (((blood->sLife - blood->life) << 16) / blood->colFadeSpeed) >> 16);
-			}
-
-			blood->rotAng = (blood->rotAng + blood->rotAdd) & 0xFFF;
-			blood->yVel += blood->gravity;
-
-			if (blood->friction & 0xF)
-			{
-				blood->xVel -= blood->xVel >> (blood->friction & 0xF);
-				blood->zVel -= blood->zVel >> (blood->friction & 0xF);
-			}
-
-			int dl = ((blood->sLife - blood->life) << 16) / blood->sLife;
-
-			blood->x += blood->xVel >> 5;
-			blood->y += blood->yVel >> 5;
-			blood->z += blood->zVel >> 5;
-
-			blood->size = blood->sSize + (dl * (blood->dSize - blood->sSize) >> 16);
-		}
-	}
 }
 
 int GetFreeGunshell()

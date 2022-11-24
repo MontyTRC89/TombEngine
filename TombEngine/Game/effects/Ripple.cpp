@@ -40,7 +40,7 @@ namespace TEN::Effects::Ripple
 	{
 		auto& ripple = GetFreeRipple();
 
-		ripple = {};
+		ripple = Ripple();
 		ripple.IsActive = true;
 		ripple.SpriteIndex = SPR_RIPPLES;
 		ripple.Position = pos;
@@ -63,7 +63,7 @@ namespace TEN::Effects::Ripple
 
 		auto& ripple = GetFreeRipple();
 
-		ripple = {};
+		ripple = Ripple();
 		ripple.IsActive = true;
 		ripple.SpriteIndex = 0;
 		ripple.Position = pos + Vector3(Random::GenerateFloat(-32.0f, 32.0f), 0.0f, Random::GenerateFloat(-32.0f, 32.0f));
@@ -111,7 +111,6 @@ namespace TEN::Effects::Ripple
 
 	void ClearRipples()
 	{
-		for (auto& ripple : Ripples)
-			ripple = {};
+		Ripples.fill(Ripple());
 	}
 }

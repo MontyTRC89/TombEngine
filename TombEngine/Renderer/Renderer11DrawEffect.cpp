@@ -35,7 +35,6 @@ using namespace TEN::Effects::Lightning;
 using namespace TEN::Effects::Ripple;
 using namespace TEN::Math;
 
-extern BLOOD_STRUCT Blood[MAX_SPARKS_BLOOD];
 extern FIRE_SPARKS FireSparks[MAX_SPARKS_FIRE];
 extern SMOKE_SPARKS SmokeSparks[MAX_SPARKS_SMOKE];
 extern SHOCKWAVE_STRUCT ShockWaves[MAX_SHOCKWAVE];
@@ -508,23 +507,6 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer11::DrawBlood(RenderView& view)
-	{
-		for (int i = 0; i < 32; i++)
-		{
-			BLOOD_STRUCT* blood = &Bloods[i];
-
-			if (blood->on)
-			{
-				AddSpriteBillboard(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_BLOOD],
-					Vector3(blood->x, blood->y, blood->z),
-					Vector4(blood->shade / 255.0f, blood->shade * 0, blood->shade * 0, 1.0f),
-					TO_RAD(blood->rotAng << 4), 1.0f, { blood->size * 8.0f, blood->size * 8.0f },
-					BLENDMODE_ADDITIVE, true, view);
-			}
-		}
-	}
-
 	void Renderer11::DrawWeatherParticles(RenderView& view)
 	{
 		for (auto& p : Weather.GetParticles())
@@ -782,13 +764,31 @@ namespace TEN::Renderer
 		}
 	}
 
+	void Renderer11::DrawBloodMists(RenderView& view)
+	{
+		for (const auto& mist : BloodMists)
+		{
+			if (!mist.IsActive)
+				continue;
+
+			if (mist.SpriteIndex >= g_Level.Sprites.size())
+				continue;
+
+			AddSpriteBillboard(
+				&m_sprites[mist.SpriteIndex],
+				mist.Position,
+				mist.Color, TO_RAD(mist.Orientation2D), 1.0f, Vector2(mist.Scale, mist.Scale), BLENDMODE_ADDITIVE, true, view);
+		}
+	}
+
 	void Renderer11::DrawBloodStains(RenderView& view)
 	{
 		for (const auto& stain : BloodStains)
 		{
-			if (g_Level.Sprites.size() <= stain.SpriteIndex)
+			if (stain.SpriteIndex >= g_Level.Sprites.size())
 				continue;
 
+			// TODO: Try setting soft particle to true.
 			AddSprite3D(
 				&m_sprites[stain.SpriteIndex],
 				stain.VertexPoints[0], stain.VertexPoints[1], stain.VertexPoints[2], stain.VertexPoints[3],
@@ -800,7 +800,7 @@ namespace TEN::Renderer
 	{
 		for (const auto& footprint : Footprints)
 		{
-			if (g_Level.Sprites.size() <= footprint.SpriteIndex)
+			if (footprint.SpriteIndex >= g_Level.Sprites.size())
 				continue;
 
 			AddSprite3D(

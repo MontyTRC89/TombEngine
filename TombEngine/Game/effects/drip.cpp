@@ -49,7 +49,7 @@ namespace TEN::Effects::Drip
 	{
 		auto& drip = GetFreeDrip();
 
-		drip = {};
+		drip = DripParticle();
 		drip.IsActive = true;
 		drip.Position = pos;
 		drip.RoomNumber = roomNumber;
@@ -106,7 +106,7 @@ namespace TEN::Effects::Drip
 			if (!drip.IsActive)
 				continue;
 
-			// Deactivate.
+			// Despawn.
 			drip.Life -= 1.0f; // NOTE: Life tracked in frame time.
 			if (drip.Life <= 0.0f)
 				drip.IsActive = false;
@@ -166,7 +166,6 @@ namespace TEN::Effects::Drip
 
 	void ClearDripParticles()
 	{
-		for (auto& drip : DripParticles)
-			drip = {};
+		DripParticles.fill(DripParticle());
 	}
 }

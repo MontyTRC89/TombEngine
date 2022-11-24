@@ -128,32 +128,6 @@ struct FIRE_SPARKS
 	unsigned char life;
 };
 
-struct BLOOD_STRUCT
-{
-	int x;
-	int y;
-	int z;
-	short xVel;
-	short yVel;
-	short zVel;
-	short gravity;
-	short rotAng;
-	unsigned char sSize;
-	unsigned char dSize;
-	unsigned char size;
-	unsigned char friction;
-	byte rotAdd;
-	unsigned char on;
-	unsigned char sShade;
-	unsigned char dShade;
-	unsigned char shade;
-	unsigned char colFadeSpeed;
-	unsigned char fadeToBlack;
-	byte sLife;
-	byte life;
-	byte pad;
-};
-
 #define ENERGY_ARC_STRAIGHT_LINE	0
 #define ENERGY_ARC_CIRCLE			1
 #define ENERGY_ARC_NO_RANDOMIZE		1
@@ -167,14 +141,12 @@ extern char LaserSightCol;
 extern int NextFireSpark;
 extern int NextSmokeSpark;
 extern int NextBubble;
-extern int NextBlood;
 extern int NextSpider;
 extern int NextGunShell;
 
 constexpr auto MAX_SPARKS_FIRE = 20;
 constexpr auto MAX_FIRE_LIST = 32;
 constexpr auto MAX_SPARKS_SMOKE = 32;
-constexpr auto MAX_SPARKS_BLOOD = 32;
 constexpr auto MAX_GUNFLASH = 4;
 constexpr auto MAX_GUNSHELL = 24;
 constexpr auto MAX_SHOCKWAVE = 16;
@@ -189,11 +161,12 @@ extern GUNFLASH_STRUCT Gunflashes[MAX_GUNFLASH];
 extern FIRE_SPARKS FireSparks[MAX_SPARKS_FIRE];
 extern SMOKE_SPARKS SmokeSparks[MAX_SPARKS_SMOKE];
 extern GUNSHELL_STRUCT Gunshells[MAX_GUNSHELL];
-extern BLOOD_STRUCT Bloods[MAX_SPARKS_BLOOD];
 extern SHOCKWAVE_STRUCT ShockWaves[MAX_SHOCKWAVE];
 extern FIRE_LIST Fires[MAX_FIRE_LIST];
 
+// TODO: Temp. compatibility wrapper.
 void TriggerBlood(int x, int y, int z, int unk, int num);
+
 void TriggerExplosionBubble(int x, int y, int z, short roomNumber);
 int GetFreeFireSpark();
 void TriggerGlobalStaticFlame();
@@ -211,9 +184,6 @@ void UpdateSmoke();
 byte TriggerGunSmoke_SubFunction(LaraWeaponType weaponType);
 void TriggerGunSmoke(int x, int y, int z, short xv, short yv, short zv, byte initial, LaraWeaponType weaponType, byte count);
 void TriggerShatterSmoke(int x, int y, int z);
-int GetFreeBlood();
-void TriggerBlood(int x, int y, int z, int unk, int num);
-void UpdateBlood();
 int GetFreeGunshell();
 void TriggerGunShell(short hand, short objNum, LaraWeaponType weaponType);
 void UpdateGunShells();

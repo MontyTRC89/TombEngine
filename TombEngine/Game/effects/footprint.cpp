@@ -244,7 +244,7 @@ namespace TEN::Effects::Footprints
 
 		for (auto& footprint: Footprints)
 		{
-			// Set to despawn.
+			// Despawn.
 			footprint.Life -= 1.0f; // NOTE: Life tracked in frame time.
 			if (footprint.Life <= 0.0f)
 			{

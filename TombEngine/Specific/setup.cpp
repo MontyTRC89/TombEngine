@@ -306,7 +306,6 @@ void InitialiseSpecialEffects()
 	memset(&SmokeSparks, 0, MAX_SPARKS_SMOKE * sizeof(SMOKE_SPARKS));
 	memset(&Gunshells, 0, MAX_GUNSHELL * sizeof(GUNSHELL_STRUCT));
 	memset(&Gunflashes, 0, (MAX_GUNFLASH * sizeof(GUNFLASH_STRUCT)));
-	memset(&Bloods, 0, MAX_SPARKS_BLOOD * sizeof(BLOOD_STRUCT));
 	memset(&Splashes, 0, MAX_SPLASHES * sizeof(SPLASH_STRUCT));
 	memset(&ShockWaves, 0, MAX_SHOCKWAVE * sizeof(SHOCKWAVE_STRUCT));
 	memset(&Particles, 0, MAX_PARTICLES * sizeof(Particle));
@@ -321,7 +320,6 @@ void InitialiseSpecialEffects()
 	NextSmokeSpark = 0;
 	NextGunShell = 0;
 	NextBubble = 0;
-	NextBlood = 0;
 
 	TEN::Entities::TR4::ClearBeetleSwarm();
 }

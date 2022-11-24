@@ -507,7 +507,6 @@ namespace TEN::Renderer
 		void DrawParticles(RenderView& view);
 		void DrawSmokes(RenderView& view);
 		void DrawLightning(RenderView& view);
-		void DrawBlood(RenderView& view);
 		void DrawWeatherParticles(RenderView& view);
 		void DrawBubbles(RenderView& view);
 		void DrawEffects(RenderView& view, bool transparent);
@@ -543,6 +542,7 @@ namespace TEN::Renderer
 		void DrawMoveableMesh(RendererItem* itemToDraw, RendererMesh* mesh, RendererRoom* room, int boneIndex, bool transparent);
 		void DrawSimpleParticles(RenderView& view);
 		void DrawBloodDrips(RenderView& view);
+		void DrawBloodMists(RenderView& view);
 		void DrawBloodStains(RenderView& view);
 		void DrawFootprints(RenderView& view);
 		void DrawLoadingBar(float percent);
