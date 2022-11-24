@@ -185,7 +185,7 @@ namespace TEN::Effects::Footprint
 
 	bool TestFootHeight(ItemInfo& item, int meshIndex, Vector3& outFootprintPos)
 	{
-		static constexpr auto heightRange = CLICK(1.0f / 4);
+		static constexpr auto heightRange = CLICK(1 / 4.0f);
 		static const auto footOffset = Vector3i(0, FOOT_HEIGHT_OFFSET, 0);
 
 		auto footPos = GetJointPosition(LaraItem, meshIndex, footOffset);
@@ -197,7 +197,7 @@ namespace TEN::Effects::Footprint
 
 	bool TestFootprintFloor(const ItemInfo& item, const Vector3& pos, const std::array<Vector3, 4>& vertexPoints)
 	{
-		static constexpr auto heightRange = CLICK(1.0f / 2);
+		static constexpr auto heightRange = CLICK(1 / 2.0f);
 
 		// Get point collision at every vertex point.
 		auto pointColl0 = GetCollision(vertexPoints[0].x, pos.y - CLICK(1), vertexPoints[0].z, item.RoomNumber);
