@@ -1501,7 +1501,7 @@ void TriggerShockwave(Pose* pos, short innerRad, short outerRad, int speed, unsi
 		sptr->b = b;
 		sptr->life = life;
 		
-		SoundEffect(SFX_TR5_IMP_STONE_HIT, pos);
+		SoundEffect(SFX_TR4_SMASH_ROCK, pos);
 	}
 }
 
