@@ -622,14 +622,22 @@ bool TestBlockPush(ItemInfo* item, int blockHeight, unsigned short quadrant)
 	int oldZ = item->Pose.Position.z;
 	item->Pose.Position.x = x;
 	item->Pose.Position.z = z;
-	GetCollidedObjects(item, 256, true, &CollidedItems[0], nullptr, 1);
+	GetCollidedObjects(item, CLICK(1), true, &CollidedItems[0], &CollidedMeshes[0], true);
 	item->Pose.Position.x = oldX;
 	item->Pose.Position.z = oldZ;
 
-	int i = 0;
-	while (CollidedItems[i] != NULL)
+	if (CollidedMeshes[0])
+		return false;
+
+	for (int i = 0; i < MAX_COLLIDED_OBJECTS; i++)
 	{
-		if (Objects[CollidedItems[i]->ObjectNumber].floor == NULL)
+		if (!CollidedItems[i])
+			break;
+
+		if (Objects[CollidedItems[i]->ObjectNumber].isPickup)
+			continue;
+
+		if (Objects[CollidedItems[i]->ObjectNumber].floor == nullptr)
 			return false;
 		else
 		{
@@ -644,8 +652,6 @@ bool TestBlockPush(ItemInfo* item, int blockHeight, unsigned short quadrant)
 			if (object.floor(collidedIndex, xCol, yCol, zCol) == std::nullopt)
 				return false;
 		}
-
-		i++;
 	}
 
 	return true;
@@ -702,14 +708,22 @@ bool TestBlockPull(ItemInfo* item, int blockHeight, short quadrant)
 	int oldZ = item->Pose.Position.z;
 	item->Pose.Position.x = x;
 	item->Pose.Position.z = z;
-	GetCollidedObjects(item, 256, true, &CollidedItems[0], 0, 1);
+	GetCollidedObjects(item, CLICK(1), true, &CollidedItems[0], &CollidedMeshes[0], true);
 	item->Pose.Position.x = oldX;
 	item->Pose.Position.z = oldZ;
 
-	int i = 0;
-	while (CollidedItems[i] != NULL)
+	if (CollidedMeshes[0])
+		return false;
+
+	for (int i = 0; i < MAX_COLLIDED_OBJECTS; i++)
 	{
-		if (Objects[CollidedItems[i]->ObjectNumber].floor == NULL)
+		if (!CollidedItems[i])
+			break;
+
+		if (Objects[CollidedItems[i]->ObjectNumber].isPickup)
+			continue;
+
+		if (Objects[CollidedItems[i]->ObjectNumber].floor == nullptr)
 			return false;
 		else
 		{
@@ -723,8 +737,6 @@ bool TestBlockPull(ItemInfo* item, int blockHeight, short quadrant)
 			if (object.floor(collidedIndex, xCol, yCol, zCol) == std::nullopt)
 				return false;
 		}
-
-		i++;
 	}
 
 	int xAddLara = 0, zAddLara = 0;
@@ -765,31 +777,37 @@ bool TestBlockPull(ItemInfo* item, int blockHeight, short quadrant)
 	oldZ = LaraItem->Pose.Position.z;
 	LaraItem->Pose.Position.x = x;
 	LaraItem->Pose.Position.z = z;
-	GetCollidedObjects(LaraItem, 256, true, &CollidedItems[0], 0, 1);
+	GetCollidedObjects(LaraItem, LARA_RADIUS, true, &CollidedItems[0], &CollidedMeshes[0], true);
 	LaraItem->Pose.Position.x = oldX;
 	LaraItem->Pose.Position.z = oldZ;
 
-	i = 0;
-	while (CollidedItems[i] != NULL)
+	if (CollidedMeshes[0])
+		return false;
+
+	for (int i = 0; i < MAX_COLLIDED_OBJECTS; i++)
 	{
-		if (CollidedItems[i] != item) // if collided item is not pushblock in which lara embedded
+		if (!CollidedItems[i])
+			break;
+
+		if (CollidedItems[i] == item) // If collided item is not pushblock in which lara embedded
+			continue;
+
+		if (Objects[CollidedItems[i]->ObjectNumber].isPickup)
+			continue;
+
+		if (Objects[CollidedItems[i]->ObjectNumber].floor == nullptr)
+			return false;
+		else
 		{
-			if (Objects[CollidedItems[i]->ObjectNumber].floor == NULL)
+			const auto& object = Objects[CollidedItems[i]->ObjectNumber];
+			int collidedIndex = CollidedItems[i] - g_Level.Items.data();
+			int xCol = CollidedItems[i]->Pose.Position.x;
+			int yCol = CollidedItems[i]->Pose.Position.y;
+			int zCol = CollidedItems[i]->Pose.Position.z;
+
+			if (object.floor(collidedIndex, xCol, yCol, zCol) == std::nullopt)
 				return false;
-			else
-			{
-				const auto& object = Objects[CollidedItems[i]->ObjectNumber];
-				int collidedIndex = CollidedItems[i] - g_Level.Items.data();
-				int xCol = CollidedItems[i]->Pose.Position.x;
-				int yCol = CollidedItems[i]->Pose.Position.y;
-				int zCol = CollidedItems[i]->Pose.Position.z;
-
-				if (object.floor(collidedIndex, xCol, yCol, zCol) == std::nullopt)
-					return false;
-			}
 		}
-
-		i++;
 	}
 
 	return true;
