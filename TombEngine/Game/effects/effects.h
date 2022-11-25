@@ -47,7 +47,9 @@ enum class FlameType
 	StaticFlicker,
 	GreenPulse,
 	SmallFast,
-	Trail
+	Trail,
+	ColorTrail,
+	Color
 };
 
 struct FX_INFO
@@ -206,7 +208,7 @@ void TriggerCyborgSpark(int x, int y, int z, short xv, short yv, short zv);
 void TriggerExplosionSparks(int x, int y, int z, int extraTrig, int dynamic, int uw, int roomNumber);
 void TriggerExplosionSmokeEnd(int x, int y, int z, int uw);
 void TriggerExplosionSmoke(int x, int y, int z, int uw);
-void TriggerFireFlame(int x, int y, int z, FlameType type);
+void TriggerFireFlame(int x, int y, int z, FlameType type, Vector3 color1, Vector3 color2);
 void TriggerSuperJetFlame(ItemInfo* item, int yvel, int deadly);
 void SetupSplash(const SPLASH_SETUP* const setup, int room);
 void UpdateSplashes();

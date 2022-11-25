@@ -274,7 +274,7 @@ namespace TEN::Entities::Effects
 			{
 				TriggerShockwave(&fx->pos, 48, 240, 64, 64, 128, 0, 24, 0, 0);
 				TriggerExplosionSparks(oldX, oldY, oldZ, 3, -2, 2, fx->roomNumber);
-				ItemBurn(LaraItem);
+				ItemMagicBurn(LaraItem, Vector3(2, 202 ,40), Vector3(5, 221, 218),-1);
 			}
 			else if (fx->flag1)
 			{
@@ -305,7 +305,7 @@ namespace TEN::Entities::Effects
 				}
 			}
 			else
-				TriggerShockwave(&fx->pos, 24, 88, 48, 64, 128, 0, 16, (((~g_Level.Rooms[fx->roomNumber].flags) / 16) & 2) * 65536, 0);
+				TriggerShockwave(&fx->pos, 24, 88, 48, 64, 128, 0, 16, (((~g_Level.Rooms[fx->roomNumber].flags) / 16) & 2) * 65536, 2);
 		}
 		else
 		{

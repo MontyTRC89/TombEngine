@@ -177,6 +177,13 @@ void Moveable::Register(sol::table & parent)
 // @treturn EffectID effect type currently assigned to moveable.
 	ScriptReserved_GetEffect, &Moveable::GetEffect,
 
+/// Set extended effect to moveable
+// @function Moveable:SetCustomEffect
+// @tparam EffectID effect Type of effect to assign.
+// @tparam Color1 color the first color of the effect, Color2 color the second color of the effect
+// @tparam float timeout time (in seconds) after which effect turns off (optional).
+	ScriptReserved_SetCustomEffect, &Moveable::SetCustomEffect,
+
 /// Get the status of object.
 // possible values:
 // <br />0 - not active 
@@ -681,6 +688,30 @@ void Moveable::SetEffect(EffectType effectType, sol::optional<float> timeout)
 
 	case EffectType::Sparks:
 		ItemElectricBurn(m_item, realTimeout);
+		break;
+
+	case EffectType::ElectricDeath:
+		ItemBlueElectricBurn(m_item, realTimeout);
+		break;
+
+	case EffectType::LaserDeath:
+		ItemRedLaserBurn(m_item, realTimeout);
+		break;
+	}
+}
+
+void Moveable::SetCustomEffect(EffectType effectType, ScriptColor const& col1, ScriptColor const& col2, sol::optional<float> timeout)
+{
+	int realTimeout = timeout.has_value() ? int(timeout.value() * FPS) : -1;
+
+	switch (effectType)
+	{
+	case EffectType::MagicFire:
+		ItemMagicBurn(m_item, Vector3(col1.GetR(), col1.GetG(), col1.GetB()), Vector3(col2.GetR(), col2.GetG(), col2.GetB()), realTimeout);
+		break;
+
+	case EffectType::ColoredFire:
+		ItemColorBurn(m_item, Vector3(col1.GetR(), col1.GetG(), col1.GetB()), Vector3(col2.GetR(), col2.GetG(), col2.GetB()), realTimeout);
 		break;
 	}
 }

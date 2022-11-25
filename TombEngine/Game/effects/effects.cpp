@@ -1271,7 +1271,7 @@ void TriggerFlashSmoke(int x, int y, int z, short roomNumber)
 	spark->mirror = mirror;
 }
 
-void TriggerFireFlame(int x, int y, int z, FlameType type)
+void TriggerFireFlame(int x, int y, int z, FlameType type, Vector3 color1, Vector3 color2)
 {
 	int dx = LaraItem->Pose.Position.x - x;
 	int dz = LaraItem->Pose.Position.z - z;
@@ -1302,17 +1302,35 @@ void TriggerFireFlame(int x, int y, int z, FlameType type)
 		}
 		else
 		{
-			spark->sR = 255;
-			spark->sB = 48;
-			spark->sG = (GetRandomControl() & 0x1F) + 48;
+			if (type == FlameType::Color || type == FlameType::ColorTrail)
+			{
+				spark->sR = color1.x;
+				spark->sG = color1.y;
+				spark->sB = color1.z;
+			}
+			else
+			{
+				spark->sR = 255;
+				spark->sB = 48;
+				spark->sG = (GetRandomControl() & 0x1F) + 48;
+			}
 		}
 	}
 
 	if (type != FlameType::StaticFlicker)
 	{
-		spark->dR = (GetRandomControl() & 0x3F) - 64;
-		spark->dG = (GetRandomControl() & 0x3F) + -128;
-		spark->dB = 32;
+		if (type == FlameType::Color || type == FlameType:: ColorTrail)
+		{
+			spark->dR = color2.x;
+			spark->dG = color2.y;
+			spark->dB = color2.z;
+		}
+		else
+		{
+			spark->dR = (GetRandomControl() & 0x3F) - 64;
+			spark->dG = (GetRandomControl() & 0x3F) + -128;
+			spark->dB = 32;
+		}
 	}
 
 	if (type == FlameType::Small ||
@@ -1332,7 +1350,7 @@ void TriggerFireFlame(int x, int y, int z, FlameType type)
 
 	spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
 
-	if (type != FlameType::Big && type != FlameType::Medium)
+	if (type != FlameType::Big && type != FlameType::Medium && type != FlameType::Color)
 	{
 		if (type < FlameType::SmallFast)
 		{
@@ -1367,7 +1385,7 @@ void TriggerFireFlame(int x, int y, int z, FlameType type)
 		spark->yVel = -16 - (GetRandomControl() & 0xF);
 		spark->zVel = (GetRandomControl() & 0xFF) - 128;
 
-		if (type == FlameType::Medium)
+		if (type == FlameType::Medium || type == FlameType::Color)
 			spark->friction = 51;
 		else
 			spark->friction = 5;
@@ -1397,7 +1415,7 @@ void TriggerFireFlame(int x, int y, int z, FlameType type)
 
 	if (type != FlameType::Big)
 	{
-		if (type == FlameType::Medium)
+		if (type == FlameType::Medium || type == FlameType::Color)
 			spark->sSize = spark->size = (GetRandomControl() & 0x1F) + 64;
 		else if (type < FlameType::SmallFast)
 		{
@@ -1529,7 +1547,7 @@ void ProcessEffects(ItemInfo* item)
 	constexpr auto MAX_LIGHT_FALLOFF = 13;
 	constexpr auto BURN_HEALTH_LARA = 7;
 	constexpr auto BURN_HEALTH_NPC = 1;
-	constexpr auto BURN_AFTERMATH_TIMEOUT = 2 * FPS;
+	constexpr auto BURN_AFTERMATH_TIMEOUT = 4 * FPS;
 	constexpr auto BURN_DAMAGE_PROBABILITY = 1 / 8.0f;
 
 	if (item->Effect.Type == EffectType::None)
@@ -1541,7 +1559,11 @@ void ProcessEffects(ItemInfo* item)
 
 		if (!item->Effect.Count)
 		{
-			if (item->Effect.Type == EffectType::Fire)
+			if (item->Effect.Type == EffectType::Fire || 
+				item->Effect.Type == EffectType::ColoredFire || 
+				item->Effect.Type == EffectType::MagicFire || 
+				item->Effect.Type == EffectType::ElectricDeath || 
+				item->Effect.Type == EffectType::LaserDeath)
 			{
 				item->Effect.Type = EffectType::Smoke;
 				item->Effect.Count = BURN_AFTERMATH_TIMEOUT;
@@ -1563,7 +1585,17 @@ void ProcessEffects(ItemInfo* item)
 		{
 		case EffectType::Fire:
 			if (TestProbability(1 / 8.0f))
-				TriggerFireFlame(pos.x, pos.y, pos.z, TestProbability(1 / 10.0f) ? FlameType::Trail : FlameType::Medium);
+				TriggerFireFlame(pos.x, pos.y, pos.z, TestProbability(1 / 10.0f) ? FlameType::Trail : FlameType::Medium, Vector3(255, 48, 48), Vector3(255, 216, 32));
+			break;
+
+		case EffectType::ColoredFire:
+			if (TestProbability(1 / 8.0f))
+				TriggerFireFlame(pos.x, pos.y, pos.z, TestProbability(1 / 10.0f) ? FlameType::ColorTrail : FlameType::Color, item->Effect.EffectColor1, item->Effect.EffectColor2);
+			break;
+
+		case EffectType::MagicFire:
+			if (TestProbability(1 / 8.0f))
+				TriggerFireFlame(pos.x, pos.y, pos.z, TestProbability(1 / 10.0f) ? FlameType::ColorTrail : FlameType::Color, item->Effect.EffectColor1, item->Effect.EffectColor2);
 			break;
 
 		case EffectType::Sparks:
@@ -1574,8 +1606,21 @@ void ProcessEffects(ItemInfo* item)
 				TriggerRocketSmoke(pos.x, pos.y, pos.z, 0);
 			break;
 
+		case EffectType::ElectricDeath:
+			if (TestProbability(1 / 1.0f))
+				TriggerElectricSpark(&GameVector(pos.x, pos.y, pos.z, item->RoomNumber),
+					EulerAngles(0, Random::GenerateAngle(ANGLE(0), ANGLE(359)), 0), 2);
+			if (TestProbability(1 / 1.0f))
+				TriggerFireFlame(pos.x, pos.y, pos.z, TestProbability(1 / 10.0f) ? FlameType::Color : FlameType::Color, Vector3(40, 120, 255), Vector3(53, 215, 255));
+			break;
+
+		case EffectType::LaserDeath:
+			if (TestProbability(1 / 1.0f))
+				TriggerFireFlame(pos.x, pos.y, pos.z, TestProbability(1 / 10.0f) ? FlameType::Color : FlameType::Color, Vector3(255, 130, 40), Vector3(160, 30, 0));
+			break;
+
 		case EffectType::Smoke:
-			if (TestProbability(1 / 8.0f))
+			if (TestProbability(1 / 82.0f))
 				TriggerRocketSmoke(pos.x, pos.y, pos.z, 0);
 			break;
 		}
@@ -1599,11 +1644,14 @@ void ProcessEffects(ItemInfo* item)
 		SoundEffect(SOUND_EFFECTS::SFX_TR5_HISS_LOOP_SMALL, &item->Pose);
 		break;
 
+	case EffectType::ElectricDeath:
 	case EffectType::Sparks:
 		SoundEffect(SOUND_EFFECTS::SFX_TR4_LARA_ELECTRIC_CRACKLES, &item->Pose);
 		break;
 
-	case EffectType::Fire:
+	case EffectType::Fire: 
+	case EffectType::ColoredFire:
+	case EffectType::MagicFire:
 		SoundEffect(SOUND_EFFECTS::SFX_TR4_LOOP_FOR_SMALL_FIRES, &item->Pose);
 		break;
 	}
@@ -1619,9 +1667,9 @@ void ProcessEffects(ItemInfo* item)
 
 	int waterHeight = GetWaterHeight(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, item->RoomNumber);
 
-	if (item->Effect.Type != EffectType::Sparks && (waterHeight != NO_HEIGHT && item->Pose.Position.y > waterHeight))
+	if (item->Effect.Type != EffectType::MagicFire && item->Effect.Type != EffectType::Sparks && (waterHeight != NO_HEIGHT && item->Pose.Position.y > waterHeight))
 	{
-		if (item->Effect.Type == EffectType::Fire)
+		if (item->Effect.Type == EffectType::Fire || item->Effect.Type == EffectType::ColoredFire || item->Effect.Type == EffectType::MagicFire)
 		{
 			item->Effect.Type = EffectType::Smoke;
 			item->Effect.Count = 10;
@@ -1634,4 +1682,5 @@ void ProcessEffects(ItemInfo* item)
 	{
 		item->Effect.Type = EffectType::None;
 	}
+
 }

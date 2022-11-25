@@ -79,7 +79,19 @@ namespace TEN::Entities::Effects
 			if (currentItem->IsLara() && GetLaraInfo(item)->Control.WaterStatus == WaterStatus::FlyCheat)
 				continue;
 
-			ItemBurn(currentItem, currentItem->IsLara() ? -1 : FLAME_ITEM_BURN_TIMEOUT);
+			Vector3 color1 = currentItem->Effect.EffectColor1;
+			Vector3 color2 = currentItem->Effect.EffectColor2;
+
+			if (currentItem->Effect.Type == EffectType::MagicFire )
+				ItemMagicBurn(currentItem, color1, color2, currentItem->IsLara() ? -1 : FLAME_ITEM_BURN_TIMEOUT);
+
+			else if (currentItem->Effect.Type == EffectType::ColoredFire)
+				ItemColorBurn(currentItem, color1, color2, currentItem->IsLara() ? -1 : FLAME_ITEM_BURN_TIMEOUT);
+
+			else
+			{
+				ItemBurn(currentItem, currentItem->IsLara() ? -1 : FLAME_ITEM_BURN_TIMEOUT);
+			}			
 		}
 	}
 
@@ -272,7 +284,7 @@ namespace TEN::Entities::Effects
 					item->Pose.Position.y = probe.Position.Floor;
 
 					if (Wibble & 7)
-						TriggerFireFlame(item->Pose.Position.x, item->Pose.Position.y - 32, item->Pose.Position.z, FlameType::Medium);
+						TriggerFireFlame(item->Pose.Position.x, item->Pose.Position.y - 32, item->Pose.Position.z, FlameType::Medium, Vector3(255, 48, 48), Vector3(255, 216, 32));
 				}
 
 				SoundEffect(SFX_TR4_LOOP_FOR_SMALL_FIRES, &item->Pose);
@@ -470,14 +482,14 @@ namespace TEN::Entities::Effects
 					i = item->ItemFlags[1] & 7;
 					x = 16 * (Flame3xzoffs[i][0] - 32);
 					z = 16 * (Flame3xzoffs[i][1] - 32);
-					TriggerFireFlame(x + item->Pose.Position.x, item->Pose.Position.y, z + item->Pose.Position.z, FlameType::Small);
+					TriggerFireFlame(x + item->Pose.Position.x, item->Pose.Position.y, z + item->Pose.Position.z, FlameType::Small, Vector3(255, 48, 48), Vector3(255, 216, 32));
 				}
 				else
 				{
 					i = item->ItemFlags[1] >> 3;
 					x = 16 * (Flame3xzoffs[i + 8][0] - 32);
 					z = 16 * (Flame3xzoffs[i + 8][1] - 32);
-					TriggerFireFlame(x + item->Pose.Position.x, item->Pose.Position.y, z + item->Pose.Position.z, FlameType::Small);
+					TriggerFireFlame(x + item->Pose.Position.x, item->Pose.Position.y, z + item->Pose.Position.z, FlameType::Small, Vector3(255, 48, 48), Vector3(255, 216, 32));
 				}
 
 				SoundEffect(SFX_TR4_LOOP_FOR_SMALL_FIRES, &item->Pose);
