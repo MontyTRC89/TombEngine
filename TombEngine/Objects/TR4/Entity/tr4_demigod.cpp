@@ -693,7 +693,7 @@ namespace TEN::Entities::TR4
 					else
 						pos.y = height - CLICK(0.5f);
 
-					TriggerShockwave((Pose*)&pos, 24, 88, 256, 128, 128, 128, 32, 0, 2);
+					TriggerShockwave((Pose*)&pos, 24, 88, 256, 128, 128, 128, 32, 0, ShockwaveDamage::medium);
 					TriggerHammerSmoke(pos.x, pos.y + 128, pos.z, 8);
 
 					Camera.bounce = -128;

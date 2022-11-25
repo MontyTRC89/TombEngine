@@ -1479,7 +1479,7 @@ int GetFreeShockwave()
 	return -1;
 }
 
-void TriggerShockwave(Pose* pos, short innerRad, short outerRad, int speed, unsigned char r, unsigned char g, unsigned char b, unsigned char life, short angle, short flags)
+void TriggerShockwave(Pose* pos, short innerRad, short outerRad, int speed, unsigned char r, unsigned char g, unsigned char b, unsigned char life, short angle, short damage)
 {
 	int s = GetFreeShockwave();
 	SHOCKWAVE_STRUCT* sptr;
@@ -1494,7 +1494,7 @@ void TriggerShockwave(Pose* pos, short innerRad, short outerRad, int speed, unsi
 		sptr->innerRad = innerRad;
 		sptr->outerRad = outerRad;
 		sptr->xRot = angle;
-		sptr->flags = flags;
+		sptr->flags = damage;
 		sptr->speed = speed;
 		sptr->r = r;
 		sptr->g = g;

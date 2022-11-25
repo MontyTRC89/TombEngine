@@ -318,10 +318,10 @@ void SenetPieceExplosionEffect(ItemInfo* item, int color, int speed)
 	int radius = speed >= 0 ? 0xA00020 : 0x2000280;
 	int clr = color | 0x18000000;
 	item->Pose.Position.y -= STEPUP_HEIGHT;
-	TriggerShockwave(&item->Pose, radius & 0xFFFF, radius >> 16, speed, clr & 0xFF, (clr >> 8) & 0xFF, (clr >> 16) & 0xFF, 64, 0, 0);
-	TriggerShockwave(&item->Pose, radius & 0xFFFF, radius >> 16, speed, clr & 0xFF, (clr >> 8) & 0xFF, (clr >> 16) & 0xFF, 64, 0x2000, 0);
-	TriggerShockwave(&item->Pose, radius & 0xFFFF, radius >> 16, speed, clr & 0xFF, (clr >> 8) & 0xFF, (clr >> 16) & 0xFF, 64, 0x4000, 0);
-	TriggerShockwave(&item->Pose, radius & 0xFFFF, radius >> 16, speed, clr & 0xFF, (clr >> 8) & 0xFF, (clr >> 16) & 0xFF, 64, 0x6000, 0);
+	TriggerShockwave(&item->Pose, radius & 0xFFFF, radius >> 16, speed, clr & 0xFF, (clr >> 8) & 0xFF, (clr >> 16) & 0xFF, 64, 0, ShockwaveDamage::none);
+	TriggerShockwave(&item->Pose, radius & 0xFFFF, radius >> 16, speed, clr & 0xFF, (clr >> 8) & 0xFF, (clr >> 16) & 0xFF, 64, 0x2000, ShockwaveDamage::none);
+	TriggerShockwave(&item->Pose, radius & 0xFFFF, radius >> 16, speed, clr & 0xFF, (clr >> 8) & 0xFF, (clr >> 16) & 0xFF, 64, 0x4000, ShockwaveDamage::none);
+	TriggerShockwave(&item->Pose, radius & 0xFFFF, radius >> 16, speed, clr & 0xFF, (clr >> 8) & 0xFF, (clr >> 16) & 0xFF, 64, 0x6000, ShockwaveDamage::none);
 	item->Pose.Position.y += STEPUP_HEIGHT;
 }
 

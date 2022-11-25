@@ -1641,7 +1641,7 @@ void ProcessEffects(ItemInfo* item)
 	switch (item->Effect.Type)
 	{
 	case EffectType::Smoke:
-		SoundEffect(SOUND_EFFECTS::SFX_TR4_SAND_LOOP, &item->Pose);
+		SoundEffect(SOUND_EFFECTS::SFX_TR5_HISS_LOOP_SMALL, &item->Pose);
 		break;
 
 	case EffectType::ElectricDeath:
