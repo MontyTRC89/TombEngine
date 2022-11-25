@@ -281,7 +281,6 @@ void PushableBlockControl(short itemNumber)
 			else
 			{
 				LaraItem->Animation.TargetState = LS_IDLE;
-				PushEnd(item);
 			}
 		}
 
@@ -348,7 +347,6 @@ void PushableBlockControl(short itemNumber)
 			else
 			{
 				LaraItem->Animation.TargetState = LS_IDLE;
-				PushEnd(item);
 			}
 		}
 
