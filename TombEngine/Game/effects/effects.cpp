@@ -1585,7 +1585,7 @@ void ProcessEffects(ItemInfo* item)
 		{
 		case EffectType::Fire:
 			if (TestProbability(1 / 8.0f))
-				TriggerFireFlame(pos.x, pos.y, pos.z, TestProbability(1 / 10.0f) ? FlameType::Trail : FlameType::Medium, Vector3(255, 48, 48), Vector3(255, 216, 32));
+				TriggerFireFlame(pos.x, pos.y, pos.z, TestProbability(1 / 10.0f) ? FlameType::Trail : FlameType::Medium);
 			break;
 
 		case EffectType::ColoredFire:
