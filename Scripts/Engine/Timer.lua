@@ -65,7 +65,7 @@ Timer = {
 	-- @number totalTime The duration of the timer, in seconds
 	-- @bool loop if true, the timer will start again immediately after the time has elapsed
 	-- @tparam ?table|bool timerFormat If a table is given, the remaining time will be shown as a string, formatted according to the values in the table. If true, the remaining seconds, rounded up, will show at the bottom of the screen. If false, the remaining time will not be shown on screen. 
-	-- @function func The LevelFunc function to call when the time is up
+	-- @func func The LevelFunc function to call when the time is up
 	-- @param[opt] ... a variable number of arguments with which the above function will be called
 	-- @return The timer in its paused state
 	--

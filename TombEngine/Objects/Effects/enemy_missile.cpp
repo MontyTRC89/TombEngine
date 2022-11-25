@@ -6,7 +6,7 @@
 #include "Game/control/control.h"
 #include "Game/effects/debris.h"
 #include "Game/effects/effects.h"
-#include "Game/effects/lara_fx.h"
+#include "Game/effects/item_fx.h"
 #include "Game/effects/tomb4fx.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
@@ -16,7 +16,7 @@
 #include "Renderer/Renderer11Enums.h"
 #include "Specific/level.h"
 
-using namespace TEN::Effects::Lara;
+using namespace TEN::Effects::Items;
 using namespace TEN::Entities::TR4;
 using namespace TEN::Math;
 
@@ -137,7 +137,7 @@ namespace TEN::Entities::Effects
 		auto* fx = &EffectList[fxNum];
 
 		auto orient = Geometry::GetOrientToPoint(
-			Vector3(fx->pos.Position.x, fx->pos.Position.y - CLICK(1), fx->pos.Position.z),
+			Vector3(fx->pos.Position.x, fx->pos.Position.y + CLICK(1), fx->pos.Position.z),
 			LaraItem->Pose.Position.ToVector3());
 
 		int maxRotation = 0;
@@ -170,12 +170,12 @@ namespace TEN::Entities::Effects
 			else
 				fx->speed += 3;
 
-			int dy = orient.y - fx->pos.Orientation.y;
-			if (abs(dy) > ANGLE(180.0f))
+			short dy = orient.y - fx->pos.Orientation.y;
+			if (abs(dy) > abs(ANGLE(180.0f)))
 				dy = -dy;
 
-			int dx = orient.x - fx->pos.Orientation.x;
-			if (abs(dx) > ANGLE(180.0f))
+			short dx = orient.x - fx->pos.Orientation.x;
+			if (abs(dx) > abs(ANGLE(180.0f)))
 				dx = -dx;
 
 			dy >>= 3;
@@ -191,9 +191,11 @@ namespace TEN::Entities::Effects
 			else if (dx > maxRotation)
 				dx = maxRotation;
 
+			fx->pos.Orientation.x += dx;
+
 			if (fx->flag1 != 4 && (fx->flag1 != 6 || !fx->counter))
 				fx->pos.Orientation.y += dy;
-			fx->pos.Orientation.x += dx;
+			
 		}
 
 		fx->pos.Orientation.z += 16 * fx->speed;
@@ -272,7 +274,7 @@ namespace TEN::Entities::Effects
 			{
 				TriggerShockwave(&fx->pos, 48, 240, 64, 64, 128, 0, 24, 0, 0);
 				TriggerExplosionSparks(oldX, oldY, oldZ, 3, -2, 2, fx->roomNumber);
-				LaraBurn(LaraItem);
+				ItemBurn(LaraItem);
 			}
 			else if (fx->flag1)
 			{
@@ -298,7 +300,7 @@ namespace TEN::Entities::Effects
 					TriggerShockwave(&fx->pos, 48, 240, 48, 0, 112, 128, 16, 0, 0);
 					fx->pos.Position.y += 256;
 					TriggerShockwave(&fx->pos, 48, 240, 48, 0, 112, 128, 16, 0, 0);
-					LaraBurn(LaraItem);
+					ItemBurn(LaraItem);
 					break;
 				}
 			}

@@ -235,6 +235,7 @@ GameStatus ControlPhase(int numFrames, bool demoMode)
 
 			// Update Lara's ponytails
 			HairControl(LaraItem, level->GetLaraType() == LaraType::Young);
+			ProcessEffects(LaraItem);
 		}
 
 		if (UseSpotCam)

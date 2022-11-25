@@ -3,6 +3,7 @@
 #include "Game/items.h"
 #include "Game/control/lot.h"
 #include "Game/effects/debris.h"
+#include "Game/effects/item_fx.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Objects/objectslist.h"
@@ -19,6 +20,8 @@
 #include "Logic/LevelFunc.h"
 #include "Rotation/Rotation.h"
 #include "Vec3/Vec3.h"
+
+using namespace TEN::Effects::Items;
 
 /***
 Represents any object inside the game world.
@@ -162,6 +165,17 @@ void Moveable::Register(sol::table & parent)
 /// Shatter item. This also kills and disables item.
 // @function Moveable:Shatter
 	ScriptReserved_Shatter, &Moveable::Shatter,
+
+/// Set effect to moveable
+// @function Moveable:SetEffect
+// @tparam EffectID effect Type of effect to assign.
+// @tparam float timeout time (in seconds) after which effect turns off (optional).
+	ScriptReserved_SetEffect, &Moveable::SetEffect,
+
+/// Get current moveable effect
+// @function Moveable:GetEffect
+// @treturn EffectID effect type currently assigned to moveable.
+	ScriptReserved_GetEffect, &Moveable::GetEffect,
 
 /// Get the status of object.
 // possible values:
@@ -645,6 +659,35 @@ short Moveable::GetOCB() const
 void Moveable::SetOCB(short ocb)
 {
 	m_item->TriggerFlags = ocb;
+}
+
+void Moveable::SetEffect(EffectType effectType, sol::optional<float> timeout)
+{
+	int realTimeout = timeout.has_value() ? int(timeout.value() * FPS) : -1;
+
+	switch (effectType)
+	{
+	case EffectType::None:
+		m_item->Effect.Type = EffectType::None;
+		break;
+
+	case EffectType::Smoke:
+		ItemSmoke(m_item, realTimeout);
+		break;
+
+	case EffectType::Fire:
+		ItemBurn(m_item, realTimeout);
+		break;
+
+	case EffectType::Sparks:
+		ItemElectricBurn(m_item, realTimeout);
+		break;
+	}
+}
+
+EffectType Moveable::GetEffect() const
+{
+	return m_item->Effect.Type;
 }
 
 short Moveable::GetItemFlags(int index) const

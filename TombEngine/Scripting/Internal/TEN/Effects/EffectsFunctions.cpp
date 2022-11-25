@@ -16,6 +16,7 @@
 #include "Specific/setup.h"
 #include "Game/effects/lightning.h"
 #include "Effects/BlendIDs.h"
+#include "Effects/EffectIDs.h"
 #include "ReservedScriptNames.h"
 
 /***
@@ -344,6 +345,7 @@ namespace Effects
 
 		LuaHandler handler{ state };
 		handler.MakeReadOnlyTable(table_effects, ScriptReserved_BlendID, kBlendIDs);
+		handler.MakeReadOnlyTable(table_effects, ScriptReserved_EffectID, kEffectIDs);
 	}
 }
 

@@ -159,13 +159,12 @@ bool GetCollidedObjects(ItemInfo* collidingItem, int radius, bool onlyVisible, I
 					auto* item = &g_Level.Items[itemNumber];
 
 					if (item == collidingItem ||
-						item->ObjectNumber == ID_LARA && ignoreLara ||
-						item->Flags & 0x8000 ||
+						(ignoreLara && item->ObjectNumber == ID_LARA) ||
+						(onlyVisible && item->Status == ITEM_INVISIBLE) ||
+						item->Flags & IFLAG_KILLED ||
 						item->MeshBits == NO_JOINT_BITS ||
 						(Objects[item->ObjectNumber].drawRoutine == nullptr && item->ObjectNumber != ID_LARA) ||
-						(Objects[item->ObjectNumber].collision == nullptr && item->ObjectNumber != ID_LARA) ||
-						onlyVisible && item->Status == ITEM_INVISIBLE ||
-						item->ObjectNumber == ID_BURNING_FLOOR)
+						(Objects[item->ObjectNumber].collision == nullptr && item->ObjectNumber != ID_LARA))
 					{
 						itemNumber = item->NextItem;
 						continue;
@@ -298,8 +297,7 @@ bool TestWithGlobalCollisionBounds(ItemInfo* item, ItemInfo* laraItem, Collision
 
 void TestForObjectOnLedge(ItemInfo* item, CollisionInfo* coll)
 {
-	auto bounds = GameBoundingBox(item);
-	int height = abs(bounds.Y2 + bounds.Y1);
+	int height = GameBoundingBox(item).GetHeight();
 
 	for (int i = 0; i < 3; i++)
 	{
@@ -308,7 +306,7 @@ void TestForObjectOnLedge(ItemInfo* item, CollisionInfo* coll)
 
 		auto origin = Vector3(
 			item->Pose.Position.x + (sinHeading * (coll->Setup.Radius)),
-			item->Pose.Position.y - (height - CLICK(1)),
+			item->Pose.Position.y - (height + CLICK(1)),
 			item->Pose.Position.z + (cosHeading * (coll->Setup.Radius))
 		);
 		auto mxR = Matrix::CreateFromYawPitchRoll(TO_RAD(coll->Setup.ForwardAngle), 0.0f, 0.0f);
