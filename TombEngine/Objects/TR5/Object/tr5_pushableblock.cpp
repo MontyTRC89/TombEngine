@@ -214,11 +214,7 @@ void PushableBlockControl(short itemNumber)
 			z = info->moveZ + displaceBox;
 
 			if (abs(item->Pose.Position.z - z) < CLICK(2) && item->Pose.Position.z < z)
-			{
-				if (abs(item->Pose.Position.z - z))
-					PushLoop(item);
 				item->Pose.Position.z = z;
-			}
 				
 			break;
 
@@ -226,11 +222,7 @@ void PushableBlockControl(short itemNumber)
 			x = info->moveX + displaceBox;
 
 			if (abs(item->Pose.Position.x - x) < CLICK(2) && item->Pose.Position.x < x)
-			{
-				if (abs(item->Pose.Position.x - x))
-					PushLoop(item);
 				item->Pose.Position.x = x;
-			}
 
 			break;
 
@@ -238,11 +230,7 @@ void PushableBlockControl(short itemNumber)
 			z = info->moveZ - displaceBox;
 
 			if (abs(item->Pose.Position.z - z) < CLICK(2) && item->Pose.Position.z > z)
-			{
-				if (abs(item->Pose.Position.z - z))
-					PushLoop(item);
 				item->Pose.Position.z = z;
-			}
 				
 			break;
 
@@ -250,11 +238,7 @@ void PushableBlockControl(short itemNumber)
 			x = info->moveX - displaceBox;
 
 			if (abs(item->Pose.Position.x - x) < CLICK(2) && item->Pose.Position.x > x)
-			{
-				if (abs(item->Pose.Position.x - x))
-					PushLoop(item);
 				item->Pose.Position.x = x;
-			}
 				
 			break;
 
