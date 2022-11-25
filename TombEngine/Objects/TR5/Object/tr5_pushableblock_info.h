@@ -1,10 +1,10 @@
 #pragma once
 
-enum class PushableSoundState;
+enum class PushableMovementState;
 
 struct PushableInfo
 {
-	PushableSoundState SoundState;
+	PushableMovementState MovementState;
 
 	int height;				// height for collision, also in floor procedure
 	int weight;
