@@ -82,7 +82,7 @@ namespace TEN::Entities::TR4
 	const auto SethaBite2	= BiteInfo(Vector3(0.0f, 220.0f, 50.0f), 13);
 	const auto SethaAttack1 = BiteInfo(Vector3(-16.0f, 200.0f, 32.0f), 13);
 	const auto SethaAttack2 = BiteInfo(Vector3(16.0f, 200.0f, 32.0f), 17);
-	constexpr auto LARA_ANIM_SETH_DEATH_ANIM = 13;
+	constexpr auto LARA_ANIM_SETH_DEATH_ANIM = 14;
 
 	void InitialiseSetha(short itemNumber)
 	{
