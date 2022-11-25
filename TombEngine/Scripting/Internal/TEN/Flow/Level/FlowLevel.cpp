@@ -118,7 +118,11 @@ e.g. `myLevel.laraType = LaraType.Divesuit`
 
 /// (table of @{Flow.InventoryItem}s) table of inventory object overrides
 //@mem objects
-		"objects", &Level::InventoryObjects
+		"objects", &Level::InventoryObjects,
+
+/// (short) Set Secrets for Level
+//@mem secrets
+		"secrets", sol::property(&Level::SetSecrets)
 		);
 }
 
@@ -256,3 +260,12 @@ short Level::GetFarView() const
 	return float(LevelFarView);
 }
 
+void Level::SetSecrets(int secrets)
+{
+	LevelSecrets = secrets;
+}
+
+int Level::GetSecrets() const
+{
+	return LevelSecrets;
+}
