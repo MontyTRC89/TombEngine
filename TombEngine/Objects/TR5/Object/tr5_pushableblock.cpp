@@ -147,7 +147,7 @@ void PushableBlockControl(short itemNumber)
 	int x, z;
 	int blockHeight = GetStackHeight(item);
 
-	// control block falling
+	// Control block falling.
 	if (item->Animation.IsAirborne)
 	{
 		int floorHeight = GetCollision(item->Pose.Position.x, item->Pose.Position.y + 10, item->Pose.Position.z, item->RoomNumber).Position.Floor;
@@ -193,8 +193,7 @@ void PushableBlockControl(short itemNumber)
 		return;
 	}
 
-	int displaceBox = GameBoundingBox(LaraItem).Z2; // move pushable based on bbox->Z2 of Lara
-
+	int displaceBox = GameBoundingBox(LaraItem).Z2; // Move pushable based on bbox->Z2 of Lara
 	auto oldPos = item->Pose.Position;
 
 	switch (LaraItem->Animation.AnimNumber)
@@ -352,10 +351,14 @@ void PushableBlockControl(short itemNumber)
 
 		break;
 
+	case LA_PUSHABLE_GRAB:
+	case LA_PUSHABLE_RELEASE:
 	case LA_PUSHABLE_PUSH_TO_STAND:
 	case LA_PUSHABLE_PULL_TO_STAND:
-		if (LaraItem->Animation.FrameNumber == g_Level.Anims[LA_PUSHABLE_PUSH_TO_STAND].frameBase ||
-			LaraItem->Animation.FrameNumber == g_Level.Anims[LA_PUSHABLE_PULL_TO_STAND].frameBase)
+		break;
+
+	default:
+		if (item->Status == ITEM_ACTIVE)
 		{
 			item->Pose.Position.x = item->Pose.Position.x & 0xFFFFFE00 | 0x200;
 			item->Pose.Position.z = item->Pose.Position.z & 0xFFFFFE00 | 0x200;
@@ -365,10 +368,7 @@ void PushableBlockControl(short itemNumber)
 			AddBridgeStack(itemNumber);
 
 			TestTriggers(item, true, item->Flags & IFLAG_ACTIVATION_MASK);
-		}
 
-		if (LaraItem->Animation.FrameNumber == g_Level.Anims[LaraItem->Animation.AnimNumber].frameEnd)
-		{
 			RemoveActiveItem(itemNumber);
 			item->Status = ITEM_NOT_ACTIVE;
 
@@ -453,9 +453,6 @@ void PushableBlockCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo*
 			return;
 
 		if (!CheckStackLimit(pushableItem))
-			return;
-
-		if (!TestBlockMovable(pushableItem, blockHeight))
 			return;
 
 		if (TrInput & IN_FORWARD)
@@ -574,9 +571,9 @@ void PushEnd(ItemInfo* item)
 
 bool TestBlockMovable(ItemInfo* item, int blockHeight)
 {
-	UpdateBridgeItem(item->Index, true);
+	RemoveBridge(item->Index);
 	auto probe = GetCollision(item);
-	UpdateBridgeItem(item->Index);
+	AddBridge(item->Index);
 
 	if (probe.Block->IsWall(probe.Block->SectorPlane(item->Pose.Position.x, item->Pose.Position.z)))
 		return false;
@@ -589,6 +586,9 @@ bool TestBlockMovable(ItemInfo* item, int blockHeight)
 
 bool TestBlockPush(ItemInfo* item, int blockHeight, unsigned short quadrant)
 {
+	if (!TestBlockMovable(item, blockHeight))
+		return false;
+
 	auto* info = (PushableInfo*)item->Data;
 
 	int x = item->Pose.Position.x;
@@ -681,6 +681,9 @@ bool TestBlockPush(ItemInfo* item, int blockHeight, unsigned short quadrant)
 
 bool TestBlockPull(ItemInfo* item, int blockHeight, short quadrant)
 {
+	if (!TestBlockMovable(item, blockHeight))
+		return false;
+
 	int xadd = 0;
 	int zadd = 0;
 
