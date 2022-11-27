@@ -100,12 +100,10 @@ namespace TEN::Input
 	// TODO: Not needed since BRAKE is explicitly assosiated with dismounts anyway.
 	constexpr int VEHICLE_IN_DISMOUNT	= IN_JUMP | IN_ROLL;
 
-	enum InputAxis
+	enum class InputAxis
 	{
-		MoveVertical,
-		MoveHorizontal,
-		CameraVertical,
-		CameraHorizontal,
+		Move,
+		Camera,
 		Count
 	};
 
@@ -136,7 +134,7 @@ namespace TEN::Input
 	extern MouseData				MouseInfo;
 	extern std::vector<InputAction> ActionMap;
 	extern std::vector<bool>		KeyMap;
-	extern std::vector<float>		AxisMap;
+	extern std::vector<Vector2>		AxisMap;
 
 	// Legacy input bit fields.
 	extern int DbInput; // Debounce: is input clicked?

@@ -92,7 +92,7 @@ namespace TEN::Input
 	MouseData				 MouseInfo	= {};
 	std::vector<InputAction> ActionMap	= {};
 	std::vector<bool>		 KeyMap		= {};
-	std::vector<float>		 AxisMap	= {};
+	std::vector<Vector2>	 AxisMap	= {};
 
 	int DbInput = 0;
 	int TrInput = 0;
@@ -144,7 +144,7 @@ namespace TEN::Input
 			ActionMap.push_back(InputAction((ActionID)i));
 
 		KeyMap.resize(MAX_INPUT_SLOTS);
-		AxisMap.resize(InputAxis::Count);
+		AxisMap.resize((int)InputAxis::Count);
 
 		RumbleInfo = {};
 
@@ -229,7 +229,7 @@ namespace TEN::Input
 			key = false;
 
 		for (auto& axis : AxisMap)
-			axis = 0.0f;
+			axis = Vector2::Zero;
 
 		MouseInfo.Absolute = Vector2i::Zero;
 		MouseInfo.Relative = Vector2i::Zero;
@@ -277,19 +277,19 @@ namespace TEN::Input
 		{
 			if (KeyboardLayout[layout][KEY_FORWARD] == index)
 			{
-				AxisMap[(unsigned int)InputAxis::MoveVertical] = 1.0f;
+				AxisMap[(unsigned int)InputAxis::Move].y = 1.0f;
 			}
 			else if (KeyboardLayout[layout][KEY_BACK] == index)
 			{
-				AxisMap[(unsigned int)InputAxis::MoveVertical] = -1.0f;
+				AxisMap[(unsigned int)InputAxis::Move].y = -1.0f;
 			}
 			else if (KeyboardLayout[layout][KEY_LEFT] == index)
 			{
-				AxisMap[(unsigned int)InputAxis::MoveHorizontal] = -1.0f;
+				AxisMap[(unsigned int)InputAxis::Move].x = -1.0f;
 			}
 			else if (KeyboardLayout[layout][KEY_RIGHT] == index)
 			{
-				AxisMap[(unsigned int)InputAxis::MoveHorizontal] = 1.0f;
+				AxisMap[(unsigned int)InputAxis::Move].x = 1.0f;
 			}
 		}
 	}
@@ -344,27 +344,26 @@ namespace TEN::Input
 
 				if (KeyboardLayout[1][KEY_FORWARD] == usedIndex)
 				{
-					AxisMap[InputAxis::MoveVertical] = abs(scaledValue);
+					AxisMap[(int)InputAxis::Move].y = abs(scaledValue);
 				}
 				else if (KeyboardLayout[1][KEY_BACK] == usedIndex)
 				{
-					AxisMap[InputAxis::MoveVertical] = -abs(scaledValue);
+					AxisMap[(int)InputAxis::Move].y = -abs(scaledValue);
 				}
 				else if (KeyboardLayout[1][KEY_LEFT] == usedIndex)
 				{
-					AxisMap[InputAxis::MoveHorizontal] = -abs(scaledValue);
+					AxisMap[(int)InputAxis::Move].x = -abs(scaledValue);
 				}
 				else if (KeyboardLayout[1][KEY_RIGHT] == usedIndex)
 				{
-					AxisMap[InputAxis::MoveHorizontal] = abs(scaledValue);
+					AxisMap[(int)InputAxis::Move].x = abs(scaledValue);
 				}
 				else if (!LayoutContainsIndex(usedIndex))
 				{
-					unsigned int camAxisIndex = std::clamp(
-						(unsigned int)InputAxis::CameraVertical + axis % 2,
-						(unsigned int)InputAxis::CameraVertical,
-						(unsigned int)InputAxis::CameraHorizontal);
-					AxisMap[camAxisIndex] = normalizedValue;
+					if ((axis % 2) == 0)
+						AxisMap[(int)InputAxis::Camera].y = normalizedValue;
+					else
+						AxisMap[(int)InputAxis::Camera].x = normalizedValue;
 				}
 			}
 
@@ -422,14 +421,13 @@ namespace TEN::Input
 		{
 			OisKeyboard->capture();
 
+			// Poll keys.
 			for (int i = 0; i < MAX_KEYBOARD_KEYS; i++)
 			{
 				if (OisKeyboard->isKeyDown((KeyCode)i))
 				{
 					KeyMap[i] = true;
-
-					// Interpret discrete directional keypresses as max analog axis values.
-					SetDiscreteAxisValues(i);
+					SetDiscreteAxisValues(i); // Interpret discrete directional keypresses as max analog axis values.
 					continue;
 				}
 

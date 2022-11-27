@@ -544,8 +544,8 @@ void DoThumbstickCamera()
 		Camera.target.y == OldCam.target.y &&
 		Camera.target.z == OldCam.target.z))
 	{
-		Camera.targetAngle = ANGLE(THUMBCAM_VERTICAL_CONSTRAINT_ANGLE * AxisMap[InputAxis::CameraHorizontal]);
-		Camera.targetElevation = ANGLE(-10.0f + (THUMBCAM_HORIZONTAL_CONSTRAINT_ANGLE * AxisMap[InputAxis::CameraVertical]));
+		Camera.targetAngle = ANGLE(THUMBCAM_VERTICAL_CONSTRAINT_ANGLE * AxisMap[(int)InputAxis::Camera].x);
+		Camera.targetElevation = ANGLE(-10.0f + (THUMBCAM_HORIZONTAL_CONSTRAINT_ANGLE * AxisMap[(int)InputAxis::Camera].y));
 	}
 }
 
