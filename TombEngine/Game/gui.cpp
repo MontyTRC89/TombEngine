@@ -516,9 +516,9 @@ namespace TEN::Gui
 			if (SelectedOption == DisplaySettingsOption::Save)
 			{
 				// Save the configuration.
-				auto screenResolution = g_Configuration.SupportedScreenResolutions[CurrentSettings.SelectedScreenResolution];
-				CurrentSettings.Configuration.Width = screenResolution.x;
-				CurrentSettings.Configuration.Height = screenResolution.y;
+				auto screenRes = g_Configuration.SupportedScreenResolutions[CurrentSettings.SelectedScreenResolution];
+				CurrentSettings.Configuration.Width = screenRes.x;
+				CurrentSettings.Configuration.Height = screenRes.y;
 
 				g_Configuration = CurrentSettings.Configuration;
 				SaveConfiguration();
@@ -586,7 +586,7 @@ namespace TEN::Gui
 					if (selectedKey == MAX_INPUT_SLOTS)
 						selectedKey = 0;
 
-					if (selectedKey && g_KeyNames[selectedKey])
+					if (selectedKey && g_KeyNames[selectedKey] != "")
 					{
 						KeyboardLayout[1][SelectedOption] = selectedKey;
 						DefaultConflict();

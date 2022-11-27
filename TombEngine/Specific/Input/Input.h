@@ -1,16 +1,21 @@
 #pragma once
+#include "Math/Math.h"
 #include "Specific/Input/InputAction.h"
+
+using namespace TEN::Math;
 
 struct ItemInfo;
 
 namespace TEN::Input
 {
-	constexpr int MAX_KEYBOARD_KEYS    = 256;
-	constexpr int MAX_GAMEPAD_KEYS     = 16;
-	constexpr int MAX_GAMEPAD_AXES     = 6;
-	constexpr int MAX_GAMEPAD_POV_AXES = 4;
+	constexpr auto MAX_KEYBOARD_KEYS	= 256;
+	constexpr auto MAX_MOUSE_KEYS		= 8;
+	constexpr auto MAX_GAMEPAD_KEYS		= 16;
+	constexpr auto MAX_MOUSE_POV_AXES	= 4;
+	constexpr auto MAX_GAMEPAD_AXES		= 6;
+	constexpr auto MAX_GAMEPAD_POV_AXES = 4;
 
-	constexpr int MAX_INPUT_SLOTS = MAX_KEYBOARD_KEYS + MAX_GAMEPAD_KEYS + MAX_GAMEPAD_POV_AXES + MAX_GAMEPAD_AXES * 2;
+	constexpr auto MAX_INPUT_SLOTS = MAX_KEYBOARD_KEYS + MAX_MOUSE_KEYS + MAX_GAMEPAD_KEYS + MAX_MOUSE_POV_AXES + (MAX_GAMEPAD_AXES * 2) + MAX_GAMEPAD_POV_AXES;
 
 	enum InputKey
 	{
@@ -120,11 +125,18 @@ namespace TEN::Input
 		float	   FadeSpeed = 0.0f;
 	};
 
-	extern const char* g_KeyNames[];
+	struct MouseData
+	{
+		Vector2i Absolute = Vector2i::Zero;
+		Vector2i Relative = Vector2i::Zero;
+	};
 
-	extern vector<InputAction> ActionMap;
-	extern vector<bool>		   KeyMap;
-	extern vector<float>	   AxisMap;
+	extern const std::vector<std::string> g_KeyNames;
+
+	extern MouseData				MouseInfo;
+	extern std::vector<InputAction> ActionMap;
+	extern std::vector<bool>		KeyMap;
+	extern std::vector<float>		AxisMap;
 
 	// Legacy input bit fields.
 	extern int DbInput; // Debounce: is input clicked?

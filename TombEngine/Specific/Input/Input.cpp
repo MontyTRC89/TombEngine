@@ -6,27 +6,31 @@
 #include <OISInputManager.h>
 #include <OISJoyStick.h>
 #include <OISKeyboard.h>
+#include <OISMouse.h>
 
 #include "Game/camera.h"
+#include "Game/Gui.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_tests.h"
 #include "Game/savegame.h"
+#include "Math/Math.h"
 #include "Renderer/Renderer11.h"
 #include "Sound/sound.h"
 
 using namespace OIS;
-using std::vector;
+using namespace TEN::Gui;
+using namespace TEN::Math;
 using TEN::Renderer::g_Renderer;
 
 // Big TODO: Entire input system shouldn't be left exposed like this.
 
 namespace TEN::Input
 {
-	constexpr int AXIS_DEADZONE = 8000;
+	constexpr auto AXIS_DEADZONE = 8000;
 
-	const char* g_KeyNames[] =
+	const std::vector<std::string> g_KeyNames =
 	{
 			"<None>",		"Esc",			"1",			"2",			"3",			"4",			"5",			"6",
 			"7",			"8",			"9",			"0",			"-",			"+",			"Back",			"Tab",
@@ -35,37 +39,41 @@ namespace TEN::Input
 			"D",			"F",			"G",			"H",			"J",			"K",			"L",			";",
 			"'",			"`",			"Shift",		"#",			"Z",			"X",			"C",			"V",
 			"B",			"N",			"M",			",",			".",			"/",			"Shift",		"Pad X",
-			"Alt",			"Space",		"Caps Lock",	NULL,			NULL,			NULL,			NULL,			NULL,
+			"Alt",			"Space",		"Caps Lock",	"",				"",				"",				"",				"",
 
-			NULL,			NULL,			NULL,			NULL,			NULL,			"Num Lock",		"Scroll Lock",	"Pad 7",
+			"",				"",				"",				"",				"",				"Num Lock",		"Scroll Lock",	"Pad 7",
 			"Pad 8",		"Pad 9",		"Pad -",		"Pad 4",		"Pad 5",		"Pad 6",		"Pad +",		"Pad 1",
-			"Pad 2",		"Pad 3",		"Pad 0",		"Pad.",			NULL,			NULL,			"\\",			NULL,
-			NULL,			NULL,			NULL,			NULL,			NULL,			NULL,			NULL,			NULL,
-			NULL,			NULL,			NULL,			NULL,			NULL,			NULL,			NULL,			NULL,
-			NULL,			NULL,			NULL,			NULL,			NULL,			NULL,			NULL,			NULL,
-			NULL,			NULL,			NULL,			NULL,			NULL,			NULL,			NULL,			NULL,
-			NULL,			NULL,			NULL,			NULL,			NULL,			NULL,			NULL,			NULL,
+			"Pad 2",		"Pad 3",		"Pad 0",		"Pad.",			"",				"",				"\\",			"",
+			"",				"",				"",				"",				"",				"",				"",				"",
+			"",				"",				"",				"",				"",				"",				"",				"",
+			"",				"",				"",				"",				"",				"",				"",				"",
+			"",				"",				"",				"",				"",				"",				"",				"",
+			"",				"",				"",				"",				"",				"",				"",				"",
 
-			NULL,			NULL,			NULL,			NULL,			NULL,			NULL,			NULL,			NULL,
-			NULL,			NULL,			NULL,			NULL,			NULL,			NULL,			NULL,			NULL,
-			NULL,			NULL,			NULL,			NULL,			NULL,			NULL,			NULL,			NULL,
-			NULL,			NULL,			NULL,			NULL,			"Pad Enter",	"Ctrl",			NULL,			NULL,
-			NULL,			NULL,			NULL,			NULL,			NULL,			NULL,			NULL,			NULL,
-			NULL,			NULL,			"Shift",		NULL,			NULL,			NULL,			NULL,			NULL,
-			NULL,			NULL,			NULL,			NULL,			NULL,			"Pad /",		NULL,			NULL,
-			"Alt",			NULL,			NULL,			NULL,			NULL,			NULL,			NULL,			NULL,
+			"",				"",				"",				"",				"",				"",				"",				"",
+			"",				"",				"",				"",				"",				"",				"",				"",
+			"",				"",				"",				"",				"",				"",				"",				"",
+			"",				"",				"",				"",				"Pad Enter",	"Ctrl",			"",				"",
+			"",				"",				"",				"",				"",				"",				"",				"",
+			"",				"",				"Shift",		"",				"",				"",				"",				"",
+			"",				"",				"",				"",				"",				"Pad /",		"",				"",
+			"Alt",			"",				"",				"",				"",				"",				"",				"",
 
-			NULL,			NULL,			NULL,			NULL,			NULL,			NULL,			NULL,			"Home",
-			"Up",			"Page Up",		NULL,			"Left",			NULL,			"Right",		NULL,			"End",
-			"Down",			"Page Down",	"Insert",		"Del",			NULL,			NULL,			NULL,			NULL,
-			NULL,			NULL,			NULL,			NULL,			NULL,			NULL,			NULL,			NULL,
-			NULL,			NULL,			NULL,			NULL,			NULL,			NULL,			NULL,			NULL,
-			NULL,			NULL,			NULL,			NULL,			NULL,			NULL,			NULL,			NULL,
-			NULL,			NULL,			NULL,			NULL,			NULL,			NULL,			NULL,			NULL,
-			NULL,			NULL,			NULL,			NULL,			NULL,			NULL,			NULL,			NULL,
+			"",				"",				"",				"",				"",				"",				"",				"Home",
+			"Up",			"Page Up",		"",				"Left",			"",				"Right",		"",				"End",
+			"Down",			"Page Down",	"Insert",		"Del",			"",				"",				"",				"",
+			"",				"",				"",				"",				"",				"",				"",				"",
+			"",				"",				"",				"",				"",				"",				"",				"",
+			"",				"",				"",				"",				"",				"",				"",				"",
+			"",				"",				"",				"",				"",				"",				"",				"",
+			"",				"",				"",				"",				"",				"",				"",				"",
+
+			"Left-Click",	"Right-Click",	"Middle-Click",	"Mouse 4",		"Mouse 5",		"Mouse 6",		"Mouse 7",		"Mouse 8",
 
 			"Joy 1", 		"Joy 2",		"Joy 3",		"Joy 4", 		"Joy 5",		"Joy 6", 		"Joy 7",		"Joy 8",
 			"Joy 9",		"Joy 10",		"Joy 11",		"Joy 12",		"Joy 13",		"Joy 14",		"Joy 15",		"Joy 16",
+
+			"Mouse X-",		"Mouse X+",		"Mouse Y-",		"Mouse Y+",
 
 			"X-",			"X+",			"Y-",			"Y+",			"Z-",			"Z+",			"W-",			"W+",
 			"Joy LT",		"Joy LT",		"Joy RT",		"Joy RT",		"D-Pad Up",		"D-Pad Down",	"D-Pad Left",	"D-Pad Right"
@@ -74,15 +82,17 @@ namespace TEN::Input
 	// OIS interfaces
 	InputManager*  OisInputManager = nullptr;
 	Keyboard*	   OisKeyboard	   = nullptr;
+	Mouse*		   OisMouse		   = nullptr;
 	JoyStick*	   OisGamepad	   = nullptr;
 	ForceFeedback* OisRumble	   = nullptr;
 	Effect*		   OisEffect	   = nullptr;
 
 	// Globals
-	RumbleData			RumbleInfo = {};
-	vector<InputAction>	ActionMap  = {};
-	vector<bool>		KeyMap	   = {};
-	vector<float>		AxisMap    = {};
+	RumbleData				 RumbleInfo = {};
+	MouseData				 MouseInfo	= {};
+	std::vector<InputAction> ActionMap	= {};
+	std::vector<bool>		 KeyMap		= {};
+	std::vector<float>		 AxisMap	= {};
 
 	int DbInput = 0;
 	int TrInput = 0;
@@ -147,6 +157,21 @@ namespace TEN::Input
 				TENLog("Keyboard not found!", LogLevel::Warning);
 			else
 				OisKeyboard = (Keyboard*)OisInputManager->createInputObject(OISKeyboard, true);
+
+			if (OisInputManager->getNumberOfDevices(OISMouse) == 0)
+			{
+				TENLog("Mouse not found!", LogLevel::Warning);
+			}
+			else
+			{
+				OisMouse = (Mouse*)OisInputManager->createInputObject(OISMouse, true);
+
+				auto& state = OisMouse->getMouseState();
+
+				// TODO: Adapt dynamically to the set resolution.
+				state.width = 1920;// g_Gui.GetCurrentSettings().Configuration.Width;
+				state.height = 1080;// g_Gui.GetCurrentSettings().Configuration.Height;
+			}
 		}
 		catch (OIS::Exception& ex)
 		{
@@ -156,16 +181,16 @@ namespace TEN::Input
 		int numDevices = OisInputManager->getNumberOfDevices(OISJoyStick);
 		if (numDevices > 0)
 		{
-			TENLog("Found " + std::to_string(numDevices) + " connected game controller" + (numDevices > 1 ? "s." : "."), LogLevel::Info);
+			TENLog("Found " + std::to_string(numDevices) + " connected game controller" + ((numDevices > 1) ? "s." : "."), LogLevel::Info);
 
 			try
 			{
 				OisGamepad = (JoyStick*)OisInputManager->createInputObject(OISJoyStick, true);
 				TENLog("Using '" + OisGamepad->vendor() + "' device for input.", LogLevel::Info);
 
-				// Try to initialise vibration interface
+				// Try initializing vibration interface.
 				OisRumble = (ForceFeedback*)OisGamepad->queryInterface(Interface::ForceFeedback);
-				if (OisRumble)
+				if (OisRumble != nullptr)
 				{
 					TENLog("Controller supports vibration.", LogLevel::Info);
 					InitialiseEffect();
@@ -180,13 +205,16 @@ namespace TEN::Input
 
 	void DeinitialiseInput()
 	{
-		if (OisKeyboard)
+		if (OisKeyboard != nullptr)
 			OisInputManager->destroyInputObject(OisKeyboard);
 
-		if (OisGamepad)
+		if (OisMouse != nullptr)
+			OisInputManager->destroyInputObject(OisMouse);
+
+		if (OisGamepad != nullptr)
 			OisInputManager->destroyInputObject(OisGamepad);
 
-		if (OisEffect)
+		if (OisEffect != nullptr)
 		{
 			delete OisEffect;
 			OisEffect = nullptr;
@@ -203,7 +231,9 @@ namespace TEN::Input
 		for (auto& axis : AxisMap)
 			axis = 0.0f;
 
-		// Clear legacy bit fields.
+		MouseInfo.Absolute = Vector2i::Zero;
+		MouseInfo.Relative = Vector2i::Zero;
+
 		DbInput = 0;
 		TrInput = 0;
 	}
@@ -246,35 +276,43 @@ namespace TEN::Input
 		for (int layout = 0; layout <= 1; layout++)
 		{
 			if (KeyboardLayout[layout][KEY_FORWARD] == index)
+			{
 				AxisMap[(unsigned int)InputAxis::MoveVertical] = 1.0f;
+			}
 			else if (KeyboardLayout[layout][KEY_BACK] == index)
+			{
 				AxisMap[(unsigned int)InputAxis::MoveVertical] = -1.0f;
+			}
 			else if (KeyboardLayout[layout][KEY_LEFT] == index)
+			{
 				AxisMap[(unsigned int)InputAxis::MoveHorizontal] = -1.0f;
+			}
 			else if (KeyboardLayout[layout][KEY_RIGHT] == index)
+			{
 				AxisMap[(unsigned int)InputAxis::MoveHorizontal] = 1.0f;
+			}
 		}
 	}
 
 	void ReadGameController()
 	{
-		if (!OisGamepad)
+		if (OisGamepad == nullptr)
 			return;
 
 		try
 		{
 			// Poll gamepad.
 			OisGamepad->capture();
-			const JoyStickState& state = OisGamepad->getJoyStickState();
+			const auto& state = OisGamepad->getJoyStickState();
 
 			// Scan buttons.
 			for (int key = 0; key < state.mButtons.size(); key++)
-				KeyMap[MAX_KEYBOARD_KEYS + key] = state.mButtons[key];
+				KeyMap[MAX_KEYBOARD_KEYS + MAX_MOUSE_KEYS + key] = state.mButtons[key];
 
 			// Scan axes.
 			for (int axis = 0; axis < state.mAxes.size(); axis++)
 			{
-				// We don't support anything above 6 existing XBOX/PS controller axes (two sticks plus triggers).
+				// We don't support anything above 6 existing XBOX/PS controller axes (two sticks plus two triggers = 6).
 				if (axis >= MAX_GAMEPAD_AXES)
 					break;
 
@@ -283,16 +321,16 @@ namespace TEN::Input
 					continue;
 
 				// Calculate raw normalized analog value (for camera).
-				float normalizedValue = (float)(state.mAxes[axis].abs + (state.mAxes[axis].abs > 0 ? -AXIS_DEADZONE : AXIS_DEADZONE))
-					/ (float)(std::numeric_limits<short>::max() - AXIS_DEADZONE);
+				float axisValue = (state.mAxes[axis].abs > 0) ? -AXIS_DEADZONE : AXIS_DEADZONE;
+				float normalizedValue = float(state.mAxes[axis].abs + axisValue) / float(SHRT_MAX - AXIS_DEADZONE);
 
 				// Calculate scaled analog value (for movement).
 				// Minimum value of 0.2f and maximum value of 1.7f is empirically the most organic rate from tests.
 				float scaledValue = abs(normalizedValue) * 1.5f + 0.2f;
 
 				// Calculate and reset discrete input slots.
-				unsigned int negKeyIndex = MAX_KEYBOARD_KEYS + MAX_GAMEPAD_KEYS + (axis * 2);
-				unsigned int posKeyIndex = MAX_KEYBOARD_KEYS + MAX_GAMEPAD_KEYS + (axis * 2) + 1;
+				unsigned int negKeyIndex = MAX_KEYBOARD_KEYS + MAX_MOUSE_KEYS + MAX_GAMEPAD_KEYS + (axis * 2);
+				unsigned int posKeyIndex = MAX_KEYBOARD_KEYS + MAX_MOUSE_KEYS + MAX_GAMEPAD_KEYS + (axis * 2) + 1;
 				KeyMap[negKeyIndex] = false;
 				KeyMap[posKeyIndex] = false;
 
@@ -306,35 +344,41 @@ namespace TEN::Input
 				// NOTE: abs() operations are needed to avoid issues with inverted axes on different controllers.
 
 				if (KeyboardLayout[1][KEY_FORWARD] == usedIndex)
+				{
 					AxisMap[InputAxis::MoveVertical] = abs(scaledValue);
+				}
 				else if (KeyboardLayout[1][KEY_BACK] == usedIndex)
+				{
 					AxisMap[InputAxis::MoveVertical] = -abs(scaledValue);
+				}
 				else if (KeyboardLayout[1][KEY_LEFT] == usedIndex)
+				{
 					AxisMap[InputAxis::MoveHorizontal] = -abs(scaledValue);
+				}
 				else if (KeyboardLayout[1][KEY_RIGHT] == usedIndex)
+				{
 					AxisMap[InputAxis::MoveHorizontal] = abs(scaledValue);
+				}
 				else if (!LayoutContainsIndex(usedIndex))
 				{
-					unsigned int camAxisIndex = (unsigned int)std::clamp((unsigned int)InputAxis::CameraVertical + axis % 2,
+					unsigned int camAxisIndex = (unsigned int)std::clamp(
+						(unsigned int)InputAxis::CameraVertical + axis % 2,
 						(unsigned int)InputAxis::CameraVertical,
 						(unsigned int)InputAxis::CameraHorizontal);
 					AxisMap[camAxisIndex] = normalizedValue;
 				}
 			}
 
-			// Scan POVs (controllers usually have one, but scan all out of paranoia).
+			// Scan POVs. Controllers usually have one, but scan all just in case.
 			for (int pov = 0; pov < 4; pov++)
 			{
 				if (state.mPOV[pov].direction == Pov::Centered)
 					continue;
 
-				// Do 4 passes; every pass checks every POV direction. For every direction,
-				// separate keypress is registered.
-				// This is needed to allow multiple directions  pressed at the same time.
+				// Register multiple directional keypresses registered to axis movements.
+				unsigned int index = MAX_KEYBOARD_KEYS + MAX_MOUSE_KEYS + MAX_GAMEPAD_KEYS + MAX_MOUSE_POV_AXES + (MAX_GAMEPAD_AXES * 2);
 				for (int pass = 0; pass < 4; pass++)
 				{
-					unsigned int index = MAX_KEYBOARD_KEYS + MAX_GAMEPAD_KEYS + MAX_GAMEPAD_AXES * 2;
-
 					switch (pass)
 					{
 					case 0:
@@ -358,8 +402,7 @@ namespace TEN::Input
 						break;
 					}
 
-					index += pass;
-					KeyMap[index] = true;
+					KeyMap[index + pass] = true;
 					SetDiscreteAxisValues(index);
 				}
 			}
@@ -372,7 +415,7 @@ namespace TEN::Input
 
 	void ReadKeyboard()
 	{
-		if (!OisKeyboard)
+		if (OisKeyboard == nullptr)
 			return;
 
 		try
@@ -381,21 +424,82 @@ namespace TEN::Input
 
 			for (int i = 0; i < MAX_KEYBOARD_KEYS; i++)
 			{
-				if (!OisKeyboard->isKeyDown((KeyCode)i))
+				if (OisKeyboard->isKeyDown((KeyCode)i))
 				{
-					KeyMap[i] = false;
+					KeyMap[i] = true;
+
+					// Interpret discrete directional keypresses as max analog axis values.
+					SetDiscreteAxisValues(i);
 					continue;
 				}
 
-				KeyMap[i] = true;
-
-				// Register directional discrete keypresses as max analog axis values.
-				SetDiscreteAxisValues(i);
+				KeyMap[i] = false;
 			}
 		}
 		catch (OIS::Exception& ex)
 		{
 			TENLog("Unable to poll keyboard input: " + std::string(ex.eText), LogLevel::Warning);
+		}
+	}
+
+	void ReadMouse()
+	{
+		if (OisMouse == nullptr)
+			return;
+
+		try
+		{
+			OisMouse->capture();
+			const auto& state = OisMouse->getMouseState();
+
+			// Poll mouse keys.
+			for (int i = 0; i < MAX_MOUSE_KEYS; i++)
+				KeyMap[MAX_KEYBOARD_KEYS + i] = state.buttonDown((MouseButtonID)i);
+
+			// Register multiple directional keypresses registered to axis movements.
+			unsigned int index = MAX_KEYBOARD_KEYS + MAX_MOUSE_KEYS + MAX_GAMEPAD_KEYS;
+			for (int pass = 0; pass < 4; pass++)
+			{
+				switch (pass)
+				{
+				// X-.
+				case 0:
+					if (state.X.rel >= 0)
+						continue;
+					break;
+
+				// X+.
+				case 1:
+					if (state.X.rel <= 0)
+						continue;
+					break;
+
+				// Y-.
+				case 2:
+					if (state.Y.rel >= 0)
+						continue;
+					break;
+
+				// Y+.
+				case 3:
+					if (state.Y.rel <= 0)
+						continue;
+					break;
+				}
+
+				KeyMap[index + pass] = true;
+				SetDiscreteAxisValues(index);
+			}
+
+			// Poll mouse axis values.
+			MouseInfo.Absolute.x = state.X.abs;
+			MouseInfo.Absolute.y = state.Y.abs;
+			MouseInfo.Relative.x = state.X.rel;
+			MouseInfo.Relative.y = state.Y.rel;
+		}
+		catch (OIS::Exception& ex)
+		{
+			TENLog("Unable to poll mouse input: " + std::string(ex.eText), LogLevel::Warning);
 		}
 	}
 
@@ -634,6 +738,7 @@ namespace TEN::Input
 		ClearInputData();
 		UpdateRumble();
 		ReadKeyboard();
+		ReadMouse();
 		ReadGameController();
 
 		// Update action map (mappable actions only).
@@ -652,6 +757,14 @@ namespace TEN::Input
 			DbInput |= action.IsClicked() ? actionBit : 0;
 			TrInput |= action.IsHeld()	  ? actionBit : 0;
 		}
+
+		// TEMP: Mouse debug.
+		g_Renderer.PrintDebugMessage("Width: %d", OisMouse->getMouseState().width);
+		g_Renderer.PrintDebugMessage("Height: %d", OisMouse->getMouseState().height);
+		g_Renderer.PrintDebugMessage("Mouse Abs. X: %d", MouseInfo.Absolute.x);
+		g_Renderer.PrintDebugMessage("Mouse Abs. Y: %d", MouseInfo.Absolute.y);
+		g_Renderer.PrintDebugMessage("Mouse Rel. X: %d", MouseInfo.Relative.x);
+		g_Renderer.PrintDebugMessage("Mouse Rel. Y: %d", MouseInfo.Relative.y);
 	}
 
 	void ClearAllActions()
@@ -673,7 +786,7 @@ namespace TEN::Input
 		if (power == 0.0f || RumbleInfo.Power)
 			return;
 
-		RumbleInfo.FadeSpeed = power / (delayInSec * (float)FPS);
+		RumbleInfo.FadeSpeed = power / (delayInSec * FPS);
 		RumbleInfo.Power = power + RumbleInfo.FadeSpeed;
 		RumbleInfo.LastPower = RumbleInfo.Power;
 	}
@@ -683,8 +796,14 @@ namespace TEN::Input
 		if (!OisRumble || !OisEffect)
 			return;
 
-		try { OisRumble->remove(OisEffect); }
-		catch (OIS::Exception& ex) { TENLog("Error when stopping vibration effect: " + std::string(ex.eText), LogLevel::Error); }
+		try
+		{
+			OisRumble->remove(OisEffect);
+		}
+		catch (OIS::Exception& ex)
+		{
+			TENLog("Error when stopping vibration effect: " + std::string(ex.eText), LogLevel::Error);
+		}
 
 		RumbleInfo = {};
 	}
