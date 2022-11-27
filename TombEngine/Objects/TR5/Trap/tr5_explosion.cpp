@@ -88,9 +88,9 @@ void ExplosionControl(short itemNumber)
 			if (item->ItemFlags[3])
 			{
 				if (flag == 2)
-					TriggerShockwave(&pos, 48, 32 * item->ItemFlags[2] + 304, 4 * item->ItemFlags[2] + 96, 128, 96, 0, 24, 2048, ShockwaveDamage::none);
+					TriggerShockwave(&pos, 48, 32 * item->ItemFlags[2] + 304, 4 * item->ItemFlags[2] + 96, 128, 96, 0, 24, 2048, 0);
 				else
-					TriggerShockwave(&pos, 48, 32 * item->ItemFlags[2] + 304, 4 * item->ItemFlags[2] + 96, 0, 96, 128, 24, 2048, ShockwaveDamage::none);
+					TriggerShockwave(&pos, 48, 32 * item->ItemFlags[2] + 304, 4 * item->ItemFlags[2] + 96, 0, 96, 128, 24, 2048, 0);
 			}
 			else if (flag == 2)
 			{
@@ -125,7 +125,7 @@ void ExplosionControl(short itemNumber)
 					{
 						TriggerExplosionSparks(CollidedItems[i]->Pose.Position.x, CollidedItems[i]->Pose.Position.y, CollidedItems[i]->Pose.Position.z, 3, -2, 0, CollidedItems[i]->RoomNumber);
 						CollidedItems[i]->Pose.Position.y -= 128;
-						TriggerShockwave(&CollidedItems[i]->Pose, 48, 304, 96, 0, 96, 128, 24, 0, ShockwaveDamage::none);
+						TriggerShockwave(&CollidedItems[i]->Pose, 48, 304, 96, 0, 96, 128, 24, 0, 0);
 						CollidedItems[i]->Pose.Position.y += 128;
 						ExplodeItemNode(CollidedItems[i], 0, 0, 80);
 						SmashObject(CollidedItems[i] - g_Level.Items.data());
@@ -151,7 +151,7 @@ void ExplosionControl(short itemNumber)
 					{
 						TriggerExplosionSparks(CollidedMeshes[i]->pos.Position.x, CollidedMeshes[i]->pos.Position.y, CollidedMeshes[i]->pos.Position.z, 3, -2, 0, item->RoomNumber);
 						CollidedMeshes[i]->pos.Position.y -= 128;
-						TriggerShockwave(&CollidedMeshes[i]->pos, 40, 176, 64, 0, 96, 128, 16, 0, ShockwaveDamage::none);
+						TriggerShockwave(&CollidedMeshes[i]->pos, 40, 176, 64, 0, 96, 128, 16, 0, 0);
 						CollidedMeshes[i]->pos.Position.y += 128;
 						SoundEffect(GetShatterSound(CollidedMeshes[i]->staticNumber), &CollidedMeshes[i]->pos);
 						ShatterObject(NULL, CollidedMeshes[i], -128, item->RoomNumber, 0);

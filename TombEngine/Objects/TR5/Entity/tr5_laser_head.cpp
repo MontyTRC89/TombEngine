@@ -263,9 +263,9 @@ namespace TEN::Entities::Creatures::TR5
 					TriggerExplosionSparks(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, 3, -2, 2, item->RoomNumber);
 					TriggerExplosionSparks(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, 2, 0, 2, item->RoomNumber);
 
-					TriggerShockwave(&item->Pose, 32, 160, 64, 64, 128, 0, 36, 0, ShockwaveDamage::none);
-					TriggerShockwave(&item->Pose, 32, 160, 64, 64, 128, 0, 36, 0x3000, ShockwaveDamage::none);
-					TriggerShockwave(&item->Pose, 32, 160, 64, 64, 128, 0, 36, 0x6000, ShockwaveDamage::none);
+					TriggerShockwave(&item->Pose, 32, 160, 64, 64, 128, 0, 36, 0, 0);
+					TriggerShockwave(&item->Pose, 32, 160, 64, 64, 128, 0, 36, 0x3000, 0);
+					TriggerShockwave(&item->Pose, 32, 160, 64, 64, 128, 0, 36, 0x6000, 0);
 
 					g_Level.Items[creature->PuzzleItem].Pose.Position.y = item->Pose.Position.y;
 					TestTriggers(item, true);

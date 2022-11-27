@@ -1633,9 +1633,9 @@ void ProcessEffects(ItemInfo* item)
 
 		auto pos = GetJointPosition(item, 0);
 		TriggerDynamicLight(pos.x, pos.y, pos.z, falloff,
-			std::clamp(Random::GenerateInt(-32, 32) + int(item->Effect.LightColor.x * UCHAR_MAX), 0, UCHAR_MAX),
-			std::clamp(Random::GenerateInt(-32, 32) + int(item->Effect.LightColor.y * UCHAR_MAX), 0, UCHAR_MAX),
-			std::clamp(Random::GenerateInt(-32, 32) + int(item->Effect.LightColor.z * UCHAR_MAX), 0, UCHAR_MAX));
+			std::clamp(Random::GenerateInt(-32, 32) + int(item->Effect.LightColor.x), 0, UCHAR_MAX),
+			std::clamp(Random::GenerateInt(-32, 32) + int(item->Effect.LightColor.y), 0, UCHAR_MAX),
+			std::clamp(Random::GenerateInt(-32, 32) + int(item->Effect.LightColor.z), 0, UCHAR_MAX));
 	}
 
 	switch (item->Effect.Type)

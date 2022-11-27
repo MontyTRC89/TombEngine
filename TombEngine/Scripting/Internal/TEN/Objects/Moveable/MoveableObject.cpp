@@ -707,11 +707,11 @@ void Moveable::SetCustomEffect(EffectType effectType, ScriptColor const& col1, S
 	switch (effectType)
 	{
 	case EffectType::MagicFire:
-		ItemMagicBurn(m_item, Vector3(col1.GetR(), col1.GetG(), col1.GetB()), Vector3(col2.GetR(), col2.GetG(), col2.GetB()), realTimeout);
+		ItemMagicBurn(m_item, col1, col2, realTimeout);
 		break;
 
 	case EffectType::ColoredFire:
-		ItemColorBurn(m_item, Vector3(col1.GetR(), col1.GetG(), col1.GetB()), Vector3(col2.GetR(), col2.GetG(), col2.GetB()), realTimeout);
+		ItemColorBurn(m_item, col1, col2, realTimeout);
 		break;
 	}
 }

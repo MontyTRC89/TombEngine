@@ -63,7 +63,7 @@ struct SHOCKWAVE_STRUCT
 	short innerRad;
 	short outerRad;
 	short xRot;
-	short flags;
+	short damage;
 	unsigned char r;
 	unsigned char g;
 	unsigned char b;
@@ -169,14 +169,6 @@ struct BLOOD_STRUCT
 	byte sLife;
 	byte life;
 	byte pad;
-};
-
-enum ShockwaveDamage
-{
-	none,
-	high,
-	medium,
-	low
 };
 
 #define ENERGY_ARC_STRAIGHT_LINE	0

@@ -373,10 +373,10 @@ namespace TEN::Entities::TR4
 
 		item->Pose.Position.y -= 384;
 
-		TriggerShockwave(&item->Pose, inner, outer, speed, r, g, b, 24, 0, ShockwaveDamage::none);
-		TriggerShockwave(&item->Pose, inner, outer, speed, r, g, b, 24, ANGLE(45.0f), ShockwaveDamage::none);
-		TriggerShockwave(&item->Pose, inner, outer, speed, r, g, b, 24, ANGLE(90.0f), ShockwaveDamage::none);
-		TriggerShockwave(&item->Pose, inner, outer, speed, r, g, b, 24, ANGLE(135.0f), ShockwaveDamage::none);
+		TriggerShockwave(&item->Pose, inner, outer, speed, r, g, b, 24, 0, 0);
+		TriggerShockwave(&item->Pose, inner, outer, speed, r, g, b, 24, ANGLE(45.0f), 0);
+		TriggerShockwave(&item->Pose, inner, outer, speed, r, g, b, 24, ANGLE(90.0f), 0);
+		TriggerShockwave(&item->Pose, inner, outer, speed, r, g, b, 24, ANGLE(135.0f), 0);
 
 		item->Pose.Position.y += 384;
 	}

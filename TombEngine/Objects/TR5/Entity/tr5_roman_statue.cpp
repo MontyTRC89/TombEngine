@@ -619,10 +619,10 @@ namespace TEN::Entities::Creatures::TR5
 							if (item->ItemFlags[0])
 								item->ItemFlags[0]--;
 
-							TriggerShockwave((Pose*)&pos1, 16, 160, 96, 0, 64, 128, 48, 0, ShockwaveDamage::high);
+							TriggerShockwave((Pose*)&pos1, 16, 160, 96, 0, 64, 128, 48, 0, 1);
 							TriggerRomanStatueShockwaveAttackSparks(pos1.x, pos1.y, pos1.z, 128, 64, 0, 128);
 							pos1.y -= 64;
-							TriggerShockwave((Pose*)&pos1, 16, 160, 64, 0, 64, 128, 48, 0, ShockwaveDamage::high);
+							TriggerShockwave((Pose*)&pos1, 16, 160, 64, 0, 64, 128, 48, 0, 1);
 						}
 
 						deltaFrame = item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase;

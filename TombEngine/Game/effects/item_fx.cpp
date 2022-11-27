@@ -7,6 +7,7 @@
 #include "Game/effects/effects.h"
 #include "Game/effects/smoke.h"
 #include "Game/items.h"
+#include "Color/Color.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Specific/level.h"
@@ -19,48 +20,52 @@ namespace TEN::Effects::Items
 	{
 		item->Effect.Type = EffectType::Fire;
 		item->Effect.Count = timeout;
-		item->Effect.LightColor = Vector3(0.8f, 0.5f, 0.0f);
+		item->Effect.LightColor = Vector3(250, 176, 0);
 		item->Effect.EffectColor1 = Vector3(255, 48, 48);
 		item->Effect.EffectColor2 = Vector3(255, 216, 32);
 	}
 
-	void ItemColorBurn(ItemInfo* item, Vector3 color1, Vector3 color2, int timeout)
+	void ItemColorBurn(ItemInfo* item, ScriptColor const& color1, ScriptColor const& color2, int timeout)
 	{
 		item->Effect.Type = EffectType::ColoredFire;
+		Vector3 col1 = Vector3(color1.GetR(), color1.GetG(), color1.GetB());
+		Vector3 col2 = Vector3(color2.GetR(), color2.GetG(), color2.GetB());
 		item->Effect.Count = timeout;
-		item->Effect.LightColor = color1;
-		item->Effect.EffectColor1 = color1;
-		item->Effect.EffectColor2 = color2;
+		item->Effect.LightColor = col1;
+		item->Effect.EffectColor1 = col1;
+		item->Effect.EffectColor2 = col2;
 	}
 
-	void ItemMagicBurn(ItemInfo* item, Vector3 color1, Vector3 color2, int timeout)
+	void ItemMagicBurn(ItemInfo* item, ScriptColor const& color1, ScriptColor const& color2, int timeout)
 	{
 		item->Effect.Type = EffectType::MagicFire;
+		Vector3 col1 = Vector3(color1.GetR(), color1.GetG(), color1.GetB());
+		Vector3 col2 = Vector3(color2.GetR(), color2.GetG(), color2.GetB());
 		item->Effect.Count = timeout;
-		item->Effect.LightColor = color1;
-		item->Effect.EffectColor1 = color1;
-		item->Effect.EffectColor2 = color2;
+		item->Effect.LightColor = col1;
+		item->Effect.EffectColor1 = col1;
+		item->Effect.EffectColor2 = col2;
 	}
 
 	void ItemElectricBurn(ItemInfo* item, int timeout)
 	{
 		item->Effect.Type = EffectType::Sparks;
 		item->Effect.Count = timeout;
-		item->Effect.LightColor = Vector3(0.0f, 0.2f, 0.8f);
+		item->Effect.LightColor = Vector3(0, 147, 255 );
 	}
 
 	void ItemBlueElectricBurn(ItemInfo* item, int timeout)
 	{
 		item->Effect.Type = EffectType::ElectricDeath;
 		item->Effect.Count = 2;
-		item->Effect.LightColor = Vector3(0.0f, 0.4f, 1.0f);
+		item->Effect.LightColor = Vector3(0, 147, 255);
 	}
 
 	void ItemRedLaserBurn(ItemInfo* item, int timeout)
 	{
 		item->Effect.Type = EffectType::LaserDeath;
 		item->Effect.Count = 2;
-		item->Effect.LightColor = Vector3(1.0f, 0.0f, 0.0f);
+		item->Effect.LightColor = Vector3(255, 100, 0);
 	}
 
 	void ItemSmoke(ItemInfo* item, int timeout)

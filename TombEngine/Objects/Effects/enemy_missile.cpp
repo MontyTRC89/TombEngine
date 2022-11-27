@@ -224,7 +224,7 @@ namespace TEN::Entities::Effects
 
 			if (fx->flag1 == 1)
 			{
-				TriggerShockwave(&fx->pos, 32, 160, 64, 64, 128, 00, 24, (((~g_Level.Rooms[fx->roomNumber].flags) / 16) & 2) * 65536, ShockwaveDamage::none);
+				TriggerShockwave(&fx->pos, 32, 160, 64, 64, 128, 00, 24, (((~g_Level.Rooms[fx->roomNumber].flags) / 16) & 2) * 65536, 0);
 				TriggerExplosionSparks(oldX, oldY, oldZ, 3, -2, 2, fx->roomNumber);
 			}
 			else
@@ -232,9 +232,9 @@ namespace TEN::Entities::Effects
 				if (fx->flag1)
 				{
 					if (fx->flag1 == 3 || fx->flag1 == 4)
-						TriggerShockwave(&fx->pos, 32, 160, 64, 128, 64, 0, 16, 0, ShockwaveDamage::none);
+						TriggerShockwave(&fx->pos, 32, 160, 64, 128, 64, 0, 16, 0, 0);
 					else if (fx->flag1 == 5)
-						TriggerShockwave(&fx->pos, 32, 160, 64, 0, 96, 128, 16, 0, ShockwaveDamage::none);
+						TriggerShockwave(&fx->pos, 32, 160, 64, 0, 96, 128, 16, 0, 0);
 					else
 					{
 						if (fx->flag1 != 2)
@@ -242,20 +242,20 @@ namespace TEN::Entities::Effects
 							if (fx->flag1 == 6)
 							{
 								TriggerExplosionSparks(oldX, oldY, oldZ, 3, -2, 0, fx->roomNumber);
-								TriggerShockwave(&fx->pos, 48, 240, 64, 0, 96, 128, 24, 0, ShockwaveDamage::medium);
+								TriggerShockwave(&fx->pos, 48, 240, 64, 0, 96, 128, 24, 0, 2);
 								fx->pos.Position.y -= 128;
-								TriggerShockwave(&fx->pos, 48, 240, 48, 0, 112, 128, 16, 0, ShockwaveDamage::medium);
+								TriggerShockwave(&fx->pos, 48, 240, 48, 0, 112, 128, 16, 0, 2);
 								fx->pos.Position.y += 256;
-								TriggerShockwave(&fx->pos, 48, 240, 48, 0, 112, 128, 16, 0, ShockwaveDamage::medium);
+								TriggerShockwave(&fx->pos, 48, 240, 48, 0, 112, 128, 16, 0, 2);
 							}
 
 						}
 						else
-							TriggerShockwave(&fx->pos, 32, 160, 64, 0, 128, 128, 16, 0, ShockwaveDamage::none);
+							TriggerShockwave(&fx->pos, 32, 160, 64, 0, 128, 128, 16, 0, 0);
 					}
 				}
 				else
-					TriggerShockwave(&fx->pos, 32, 160, 64, 64, 128, 0, 16, 0, ShockwaveDamage::none);
+					TriggerShockwave(&fx->pos, 32, 160, 64, 64, 128, 0, 16, 0, 0);
 			}
 
 			KillEffect(fxNum);
@@ -272,9 +272,9 @@ namespace TEN::Entities::Effects
 
 			if (fx->flag1 == 1)
 			{
-				TriggerShockwave(&fx->pos, 48, 240, 64, 64, 128, 0, 24, 0, ShockwaveDamage::none);
+				TriggerShockwave(&fx->pos, 48, 240, 64, 64, 128, 0, 24, 0, 0);
 				TriggerExplosionSparks(oldX, oldY, oldZ, 3, -2, 2, fx->roomNumber);
-				ItemMagicBurn(LaraItem, Vector3(2, 202 ,40), Vector3(5, 221, 218), -1);
+				ItemMagicBurn(LaraItem, ScriptColor(2, 202 ,40), ScriptColor(5, 221, 218), -1);
 			}
 			else if (fx->flag1)
 			{
@@ -282,30 +282,30 @@ namespace TEN::Entities::Effects
 				{
 				case 3:
 				case 4:
-					TriggerShockwave(&fx->pos, 32, 160, 64, 128, 64, 0, 16, 0, ShockwaveDamage::high);
+					TriggerShockwave(&fx->pos, 32, 160, 64, 128, 64, 0, 16, 0, 1);
 					break;
 
 				case 5:
-					TriggerShockwave(&fx->pos, 32, 160, 64, 0, 96, 128, 16, 0, ShockwaveDamage::medium);
+					TriggerShockwave(&fx->pos, 32, 160, 64, 0, 96, 128, 16, 0, 2);
 					break;
 
 				case 2:
-					TriggerShockwave(&fx->pos, 32, 160, 64, 0, 128, 128, 16, 0, ShockwaveDamage::medium);
+					TriggerShockwave(&fx->pos, 32, 160, 64, 0, 128, 128, 16, 0, 2);
 					break;
 
 				case 6:
 					TriggerExplosionSparks(oldX, oldY, oldZ, 3, -2, 0, fx->roomNumber);
-					TriggerShockwave(&fx->pos, 48, 240, 64, 0, 96, 128, 24, 0, ShockwaveDamage::none);
+					TriggerShockwave(&fx->pos, 48, 240, 64, 0, 96, 128, 24, 0, 0);
 					fx->pos.Position.y -= 128;
-					TriggerShockwave(&fx->pos, 48, 240, 48, 0, 112, 128, 16, 0, ShockwaveDamage::none);
+					TriggerShockwave(&fx->pos, 48, 240, 48, 0, 112, 128, 16, 0, 0);
 					fx->pos.Position.y += 256;
-					TriggerShockwave(&fx->pos, 48, 240, 48, 0, 112, 128, 16, 0, ShockwaveDamage::none);
+					TriggerShockwave(&fx->pos, 48, 240, 48, 0, 112, 128, 16, 0, 0);
 					ItemBurn(LaraItem);
 					break;
 				}
 			}
 			else
-				TriggerShockwave(&fx->pos, 24, 88, 48, 64, 128, 0, 16, (((~g_Level.Rooms[fx->roomNumber].flags) / 16) & 2) * 65536, ShockwaveDamage::low);
+				TriggerShockwave(&fx->pos, 24, 88, 48, 64, 128, 0, 16, (((~g_Level.Rooms[fx->roomNumber].flags) / 16) & 2) * 65536, 3);
 		}
 		else
 		{

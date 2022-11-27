@@ -1494,7 +1494,7 @@ void TriggerShockwave(Pose* pos, short innerRad, short outerRad, int speed, unsi
 		sptr->innerRad = innerRad;
 		sptr->outerRad = outerRad;
 		sptr->xRot = angle;
-		sptr->flags = damage;
+		sptr->damage = damage;
 		sptr->speed = speed;
 		sptr->r = r;
 		sptr->g = g;
@@ -1578,7 +1578,7 @@ void UpdateShockwaves()
 
 				if (LaraItem->HitPoints > 0)
 				{
-					if (sw->flags & 3)
+					if (sw->damage & 3)
 					{
 						AnimFrame* frame = GetBestFrame(LaraItem);
 
@@ -1603,7 +1603,7 @@ void UpdateShockwaves()
 								angle,
 								sw->speed);
 
-							DoDamage(LaraItem, sw->speed >> (((sw->flags >> 1) & 1) + 2));
+							DoDamage(LaraItem, sw->speed >> (((sw->damage >> 1) & 1) + 2));
 						}
 					}
 				}
