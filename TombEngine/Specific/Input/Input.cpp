@@ -375,7 +375,7 @@ namespace TEN::Input
 					continue;
 
 				// Register multiple directional keypresses mapped to analog axes.
-				int index = MAX_KEYBOARD_KEYS + MAX_MOUSE_KEYS + MAX_GAMEPAD_KEYS + MAX_MOUSE_POV_AXES + (MAX_GAMEPAD_AXES * 2);
+				int baseIndex = MAX_KEYBOARD_KEYS + MAX_MOUSE_KEYS + MAX_GAMEPAD_KEYS + MAX_MOUSE_POV_AXES + (MAX_GAMEPAD_AXES * 2);
 				for (int pass = 0; pass < 4; pass++)
 				{
 					switch (pass)
@@ -401,8 +401,8 @@ namespace TEN::Input
 						break;
 					}
 
-					KeyMap[index + pass] = true;
-					SetDiscreteAxisValues(index + pass);
+					KeyMap[baseIndex + pass] = true;
+					SetDiscreteAxisValues(baseIndex + pass);
 				}
 			}
 		}
@@ -455,7 +455,7 @@ namespace TEN::Input
 				KeyMap[MAX_KEYBOARD_KEYS + i] = state.buttonDown((MouseButtonID)i);
 
 			// Register multiple directional keypresses mapped to mouse axes.
-			int index = MAX_KEYBOARD_KEYS + MAX_MOUSE_KEYS + MAX_GAMEPAD_KEYS;
+			int baseIndex = MAX_KEYBOARD_KEYS + MAX_MOUSE_KEYS + MAX_GAMEPAD_KEYS;
 			for (int pass = 0; pass < 4; pass++)
 			{
 				switch (pass)
@@ -485,8 +485,8 @@ namespace TEN::Input
 					break;
 				}
 
-				KeyMap[index + pass] = true;
-				SetDiscreteAxisValues(index + pass);
+				KeyMap[baseIndex + pass] = true;
+				SetDiscreteAxisValues(baseIndex + pass);
 			}
 
 			// Poll axes.
