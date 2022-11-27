@@ -586,7 +586,7 @@ namespace TEN::Gui
 					if (selectedKey == MAX_INPUT_SLOTS)
 						selectedKey = 0;
 
-					if (selectedKey && g_KeyNames[selectedKey].empty())
+					if (selectedKey && !g_KeyNames[selectedKey].empty())
 					{
 						KeyboardLayout[1][SelectedOption] = selectedKey;
 						DefaultConflict();
