@@ -238,7 +238,7 @@ namespace TEN::Input
 		TrInput = 0;
 	}
 
-	bool LayoutContainsIndex(unsigned int index)
+	bool LayoutContainsIndex(int index)
 	{
 		for (int l = 0; l < 2; l++)
 		{
@@ -271,25 +271,25 @@ namespace TEN::Input
 		}
 	}
 
-	void SetDiscreteAxisValues(unsigned int index)
+	void SetDiscreteAxisValues(int index)
 	{
 		for (int layout = 0; layout <= 1; layout++)
 		{
 			if (KeyboardLayout[layout][KEY_FORWARD] == index)
 			{
-				AxisMap[(unsigned int)InputAxis::Move].y = 1.0f;
+				AxisMap[(int)InputAxis::Move].y = 1.0f;
 			}
 			else if (KeyboardLayout[layout][KEY_BACK] == index)
 			{
-				AxisMap[(unsigned int)InputAxis::Move].y = -1.0f;
+				AxisMap[(int)InputAxis::Move].y = -1.0f;
 			}
 			else if (KeyboardLayout[layout][KEY_LEFT] == index)
 			{
-				AxisMap[(unsigned int)InputAxis::Move].x = -1.0f;
+				AxisMap[(int)InputAxis::Move].x = -1.0f;
 			}
 			else if (KeyboardLayout[layout][KEY_RIGHT] == index)
 			{
-				AxisMap[(unsigned int)InputAxis::Move].x = 1.0f;
+				AxisMap[(int)InputAxis::Move].x = 1.0f;
 			}
 		}
 	}
@@ -328,13 +328,13 @@ namespace TEN::Input
 				float scaledValue = abs(normalizedValue) * 1.5f + 0.2f;
 
 				// Calculate and reset discrete input slots.
-				unsigned int negKeyIndex = MAX_KEYBOARD_KEYS + MAX_MOUSE_KEYS + MAX_GAMEPAD_KEYS + (axis * 2);
-				unsigned int posKeyIndex = MAX_KEYBOARD_KEYS + MAX_MOUSE_KEYS + MAX_GAMEPAD_KEYS + (axis * 2) + 1;
+				int negKeyIndex = MAX_KEYBOARD_KEYS + MAX_MOUSE_KEYS + MAX_GAMEPAD_KEYS + (axis * 2);
+				int posKeyIndex = MAX_KEYBOARD_KEYS + MAX_MOUSE_KEYS + MAX_GAMEPAD_KEYS + (axis * 2) + 1;
 				KeyMap[negKeyIndex] = false;
 				KeyMap[posKeyIndex] = false;
 
 				// Decide on the discrete input registering based on analog value.
-				unsigned int usedIndex = normalizedValue > 0 ? negKeyIndex : posKeyIndex;
+				int usedIndex = normalizedValue > 0 ? negKeyIndex : posKeyIndex;
 				KeyMap[usedIndex] = true;
 
 				// Register analog input in certain direction.
@@ -375,7 +375,7 @@ namespace TEN::Input
 					continue;
 
 				// Register multiple directional keypresses mapped to axes.
-				unsigned int index = MAX_KEYBOARD_KEYS + MAX_MOUSE_KEYS + MAX_GAMEPAD_KEYS + MAX_MOUSE_POV_AXES + (MAX_GAMEPAD_AXES * 2);
+				int index = MAX_KEYBOARD_KEYS + MAX_MOUSE_KEYS + MAX_GAMEPAD_KEYS + MAX_MOUSE_POV_AXES + (MAX_GAMEPAD_AXES * 2);
 				for (int pass = 0; pass < 4; pass++)
 				{
 					switch (pass)
@@ -455,7 +455,7 @@ namespace TEN::Input
 				KeyMap[MAX_KEYBOARD_KEYS + i] = state.buttonDown((MouseButtonID)i);
 
 			// Register multiple directional keypresses mapped to axes.
-			unsigned int index = MAX_KEYBOARD_KEYS + MAX_MOUSE_KEYS + MAX_GAMEPAD_KEYS;
+			int index = MAX_KEYBOARD_KEYS + MAX_MOUSE_KEYS + MAX_GAMEPAD_KEYS;
 			for (int pass = 0; pass < 4; pass++)
 			{
 				switch (pass)
