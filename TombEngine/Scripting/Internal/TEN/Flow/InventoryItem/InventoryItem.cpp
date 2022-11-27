@@ -30,7 +30,7 @@ Must one of the following:
 	Z
 e.g. `myItem.rotAxisWhenCurrent = RotationAxis.X`
 	@tparam int meshBits __Not currently implemented__ (will have no effect regardless of what you set it to)
-	@tparam ItemAction action is this usable, equippable, or examinable?<br/>
+	@tparam ItemAction action is this usable, equippable, combineable or examinable?<br/>
 Must be one of:
 	EQUIP
 	USE
@@ -62,9 +62,7 @@ void InventoryItem::Register(sol::table & parent)
 // Add validation so the user can't choose something unimplemented
 void InventoryItem::SetAction(ItemOptions a_action)
 {
-	bool isSupported = (a_action == ItemOptions::OPT_EQUIP) ||
-		(a_action == ItemOptions::OPT_USE) ||
-		(a_action == ItemOptions::OPT_EXAMINABLE);
+	bool isSupported = (a_action == ItemOptions::OPT_EQUIP) ||(a_action == ItemOptions::OPT_USE) ||	(a_action == ItemOptions::OPT_EXAMINABLE) || (a_action == ItemOptions::OPT_COMBINABLE);
 
 	if (!ScriptAssert(isSupported, "Unsupported item action: " + std::to_string(a_action)))
 	{
