@@ -1578,7 +1578,7 @@ void UpdateShockwaves()
 
 				if (LaraItem->HitPoints > 0)
 				{
-					if (sw->damage & 3)
+					if (sw->damage)
 					{
 						AnimFrame* frame = GetBestFrame(LaraItem);
 
@@ -1603,7 +1603,7 @@ void UpdateShockwaves()
 								angle,
 								sw->speed);
 
-							DoDamage(LaraItem, sw->speed >> (((sw->damage >> 1) & 1) + 2));
+							DoDamage(LaraItem, sw->damage);
 						}
 					}
 				}

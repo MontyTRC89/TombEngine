@@ -698,7 +698,7 @@ namespace TEN::Entities::TR4
 			{
 				if (Wibble & 4)
 				{
-					auto pos = GetJointPosition(item, SethaAttack1.meshNum, Vector3i(SethaAttack2.Position.x, SethaAttack2.Position.y * 2, SethaAttack2.Position.z));
+					auto pos = GetJointPosition(item, SethaAttack1.meshNum, Vector3i(SethaAttack1.Position.x, SethaAttack1.Position.y * 2, SethaAttack1.Position.z));
 					auto orient = Geometry::GetOrientToPoint(pos1.ToVector3(), pos.ToVector3());
 					auto attackPose = Pose(pos1, orient);
 					SethaThrowAttack(&attackPose, item->RoomNumber, 0);
