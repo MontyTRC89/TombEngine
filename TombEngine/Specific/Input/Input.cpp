@@ -73,7 +73,7 @@ namespace TEN::Input
 			"Joy 1", 		"Joy 2",		"Joy 3",		"Joy 4", 		"Joy 5",		"Joy 6", 		"Joy 7",		"Joy 8",
 			"Joy 9",		"Joy 10",		"Joy 11",		"Joy 12",		"Joy 13",		"Joy 14",		"Joy 15",		"Joy 16",
 
-			"Mouse X-",		"Mouse X+",		"Mouse Y-",		"Mouse Y+",
+			"Mouse X-",		"Mouse X+",		"Mouse Y-",		"Mouse Y+",		"Scroll-",		"Scroll+",
 
 			"X-",			"X+",			"Y-",			"Y+",			"Z-",			"Z+",			"W-",			"W+",
 			"Joy LT",		"Joy LT",		"Joy RT",		"Joy RT",		"D-Pad Up",		"D-Pad Down",	"D-Pad Left",	"D-Pad Right"
@@ -89,10 +89,9 @@ namespace TEN::Input
 
 	// Globals
 	RumbleData				 RumbleInfo = {};
-	MouseData				 MouseInfo	= {};
 	std::vector<InputAction> ActionMap	= {};
-	std::vector<bool>		 KeyMap		= {};
 	std::vector<Vector2>	 AxisMap	= {};
+	std::vector<bool>		 KeyMap		= {};
 
 	int DbInput = 0;
 	int TrInput = 0;
@@ -159,19 +158,9 @@ namespace TEN::Input
 				OisKeyboard = (Keyboard*)OisInputManager->createInputObject(OISKeyboard, true);
 
 			if (OisInputManager->getNumberOfDevices(OISMouse) == 0)
-			{
 				TENLog("Mouse not found!", LogLevel::Warning);
-			}
 			else
-			{
 				OisMouse = (Mouse*)OisInputManager->createInputObject(OISMouse, true);
-
-				auto& state = OisMouse->getMouseState();
-
-				// TODO: Adapt dynamically to the set resolution.
-				state.width = 1920;// g_Gui.GetCurrentSettings().Configuration.Width;
-				state.height = 1080;// g_Gui.GetCurrentSettings().Configuration.Height;
-			}
 		}
 		catch (OIS::Exception& ex)
 		{
@@ -230,9 +219,6 @@ namespace TEN::Input
 
 		for (auto& axis : AxisMap)
 			axis = Vector2::Zero;
-
-		MouseInfo.Absolute = Vector2i::Zero;
-		MouseInfo.Relative = Vector2i::Zero;
 
 		DbInput = 0;
 		TrInput = 0;
@@ -296,6 +282,7 @@ namespace TEN::Input
 
 	void ReadGameController()
 	{
+		return;
 		if (OisGamepad == nullptr)
 			return;
 
@@ -456,7 +443,7 @@ namespace TEN::Input
 
 			// Register multiple directional keypresses mapped to mouse axes.
 			int baseIndex = MAX_KEYBOARD_KEYS + MAX_MOUSE_KEYS + MAX_GAMEPAD_KEYS;
-			for (int pass = 0; pass < 4; pass++)
+			for (int pass = 0; pass < 6; pass++)
 			{
 				switch (pass)
 				{
@@ -483,6 +470,18 @@ namespace TEN::Input
 					if (state.Y.rel <= 0)
 						continue;
 					break;
+
+				// Mouse Z-
+				case 4:
+					if (state.Z.rel >= 0)
+						continue;
+					break;
+
+				// Mouse Z+
+				case 5:
+					if (state.Z.rel <= 0)
+						continue;
+					break;
 				}
 
 				KeyMap[baseIndex + pass] = true;
@@ -490,10 +489,7 @@ namespace TEN::Input
 			}
 
 			// Poll axes.
-			MouseInfo.Absolute.x = state.X.abs;
-			MouseInfo.Absolute.y = state.Y.abs;
-			MouseInfo.Relative.x = state.X.rel;
-			MouseInfo.Relative.y = state.Y.rel;
+			AxisMap[(int)InputAxis::Mouse] = Vector2(state.X.rel, state.Y.rel);
 		}
 		catch (OIS::Exception& ex)
 		{
@@ -757,12 +753,8 @@ namespace TEN::Input
 		}
 
 		// TEMP: Mouse debug.
-		g_Renderer.PrintDebugMessage("Width: %d", OisMouse->getMouseState().width);
-		g_Renderer.PrintDebugMessage("Height: %d", OisMouse->getMouseState().height);
-		g_Renderer.PrintDebugMessage("Mouse Abs. X: %d", MouseInfo.Absolute.x);
-		g_Renderer.PrintDebugMessage("Mouse Abs. Y: %d", MouseInfo.Absolute.y);
-		g_Renderer.PrintDebugMessage("Mouse Rel. X: %d", MouseInfo.Relative.x);
-		g_Renderer.PrintDebugMessage("Mouse Rel. Y: %d", MouseInfo.Relative.y);
+		g_Renderer.PrintDebugMessage("Mouse X: %.3f", AxisMap[(int)InputAxis::Mouse].x);
+		g_Renderer.PrintDebugMessage("Mouse Y: %.3f", AxisMap[(int)InputAxis::Mouse].y);
 	}
 
 	void ClearAllActions()

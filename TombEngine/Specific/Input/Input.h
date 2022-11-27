@@ -11,7 +11,7 @@ namespace TEN::Input
 	constexpr auto MAX_KEYBOARD_KEYS	= 256;
 	constexpr auto MAX_MOUSE_KEYS		= 8;
 	constexpr auto MAX_GAMEPAD_KEYS		= 16;
-	constexpr auto MAX_MOUSE_POV_AXES	= 4;
+	constexpr auto MAX_MOUSE_POV_AXES	= 6;
 	constexpr auto MAX_GAMEPAD_AXES		= 6;
 	constexpr auto MAX_GAMEPAD_POV_AXES = 4;
 
@@ -104,6 +104,7 @@ namespace TEN::Input
 	{
 		Move,
 		Camera,
+		Mouse,
 		Count
 	};
 
@@ -123,18 +124,11 @@ namespace TEN::Input
 		float	   FadeSpeed = 0.0f;
 	};
 
-	struct MouseData
-	{
-		Vector2i Absolute = Vector2i::Zero;
-		Vector2i Relative = Vector2i::Zero;
-	};
-
 	extern const std::vector<std::string> g_KeyNames;
 
-	extern MouseData				MouseInfo;
 	extern std::vector<InputAction> ActionMap;
-	extern std::vector<bool>		KeyMap;
 	extern std::vector<Vector2>		AxisMap;
+	extern std::vector<bool>		KeyMap;
 
 	// Legacy input bit fields.
 	extern int DbInput; // Debounce: is input clicked?
