@@ -301,18 +301,17 @@ namespace TEN::Input
 
 		try
 		{
-			// Poll gamepad.
 			OisGamepad->capture();
 			const auto& state = OisGamepad->getJoyStickState();
 
-			// Scan buttons.
+			// Poll buttons.
 			for (int key = 0; key < state.mButtons.size(); key++)
 				KeyMap[MAX_KEYBOARD_KEYS + MAX_MOUSE_KEYS + key] = state.mButtons[key];
 
-			// Scan axes.
+			// Poll axes.
 			for (int axis = 0; axis < state.mAxes.size(); axis++)
 			{
-				// We don't support anything above 6 existing XBOX/PS controller axes (two sticks plus two triggers = 6).
+				// NOTE: We don't support anything above 6 existing XBOX/PS controller axes (two sticks plus two triggers = 6).
 				if (axis >= MAX_GAMEPAD_AXES)
 					break;
 
@@ -320,12 +319,12 @@ namespace TEN::Input
 				if (abs(state.mAxes[axis].abs) < AXIS_DEADZONE)
 					continue;
 
-				// Calculate raw normalized analog value (for camera).
+				// Calculate raw normalized analog value for camera.
 				float axisValue = (state.mAxes[axis].abs > 0) ? -AXIS_DEADZONE : AXIS_DEADZONE;
 				float normalizedValue = float(state.mAxes[axis].abs + axisValue) / float(SHRT_MAX - AXIS_DEADZONE);
 
-				// Calculate scaled analog value (for movement).
-				// Minimum value of 0.2f and maximum value of 1.7f is empirically the most organic rate from tests.
+				// Calculate scaled analog value for movement.
+				// NOTE: [0.2f, 1.7f] range gives the most organic rates.
 				float scaledValue = abs(normalizedValue) * 1.5f + 0.2f;
 
 				// Calculate and reset discrete input slots.
@@ -361,7 +360,7 @@ namespace TEN::Input
 				}
 				else if (!LayoutContainsIndex(usedIndex))
 				{
-					unsigned int camAxisIndex = (unsigned int)std::clamp(
+					unsigned int camAxisIndex = std::clamp(
 						(unsigned int)InputAxis::CameraVertical + axis % 2,
 						(unsigned int)InputAxis::CameraVertical,
 						(unsigned int)InputAxis::CameraHorizontal);
@@ -369,13 +368,14 @@ namespace TEN::Input
 				}
 			}
 
-			// Scan POVs. Controllers usually have one, but scan all just in case.
+			// Poll POVs.
+			// NOTE: Controllers usually have one, but scan all just in case.
 			for (int pov = 0; pov < 4; pov++)
 			{
 				if (state.mPOV[pov].direction == Pov::Centered)
 					continue;
 
-				// Register multiple directional keypresses mapped to axis movements.
+				// Register multiple directional keypresses mapped to axes.
 				unsigned int index = MAX_KEYBOARD_KEYS + MAX_MOUSE_KEYS + MAX_GAMEPAD_KEYS + MAX_MOUSE_POV_AXES + (MAX_GAMEPAD_AXES * 2);
 				for (int pass = 0; pass < 4; pass++)
 				{
@@ -452,11 +452,11 @@ namespace TEN::Input
 			OisMouse->capture();
 			const auto& state = OisMouse->getMouseState();
 
-			// Poll mouse keys.
+			// Poll keys.
 			for (int i = 0; i < MAX_MOUSE_KEYS; i++)
 				KeyMap[MAX_KEYBOARD_KEYS + i] = state.buttonDown((MouseButtonID)i);
 
-			// Register multiple directional keypresses mapped to axis movements.
+			// Register multiple directional keypresses mapped to axes.
 			unsigned int index = MAX_KEYBOARD_KEYS + MAX_MOUSE_KEYS + MAX_GAMEPAD_KEYS;
 			for (int pass = 0; pass < 4; pass++)
 			{
@@ -491,7 +491,7 @@ namespace TEN::Input
 				SetDiscreteAxisValues(index + pass);
 			}
 
-			// Poll mouse axis values.
+			// Poll axes.
 			MouseInfo.Absolute.x = state.X.abs;
 			MouseInfo.Absolute.y = state.Y.abs;
 			MouseInfo.Relative.x = state.X.rel;
