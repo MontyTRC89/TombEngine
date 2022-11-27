@@ -403,7 +403,7 @@ namespace TEN::Input
 					}
 
 					KeyMap[index + pass] = true;
-					SetDiscreteAxisValues(index);
+					SetDiscreteAxisValues(index + pass);
 				}
 			}
 		}
@@ -488,7 +488,7 @@ namespace TEN::Input
 				}
 
 				KeyMap[index + pass] = true;
-				SetDiscreteAxisValues(index);
+				SetDiscreteAxisValues(index + pass);
 			}
 
 			// Poll mouse axis values.
