@@ -126,6 +126,7 @@ void DisableDpiAwareness()
 		return;
 
 	setDpiAwareness(PROCESS_SYSTEM_DPI_AWARE);
+	FreeLibrary(lib);
 }
 
 void WinProcMsg()
