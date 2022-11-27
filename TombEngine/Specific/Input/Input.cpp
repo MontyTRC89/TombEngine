@@ -471,13 +471,13 @@ namespace TEN::Input
 						continue;
 					break;
 
-				// Mouse Z-
+				// Scroll-
 				case 4:
 					if (state.Z.rel >= 0)
 						continue;
 					break;
 
-				// Mouse Z+
+				// Scroll+
 				case 5:
 					if (state.Z.rel <= 0)
 						continue;
