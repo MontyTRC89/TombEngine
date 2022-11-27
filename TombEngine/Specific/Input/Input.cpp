@@ -375,29 +375,29 @@ namespace TEN::Input
 				if (state.mPOV[pov].direction == Pov::Centered)
 					continue;
 
-				// Register multiple directional keypresses registered to axis movements.
+				// Register multiple directional keypresses mapped to axis movements.
 				unsigned int index = MAX_KEYBOARD_KEYS + MAX_MOUSE_KEYS + MAX_GAMEPAD_KEYS + MAX_MOUSE_POV_AXES + (MAX_GAMEPAD_AXES * 2);
 				for (int pass = 0; pass < 4; pass++)
 				{
 					switch (pass)
 					{
 					case 0:
-						if (!(state.mPOV[pov].direction & Pov::North))
+						if ((state.mPOV[pov].direction & Pov::North) == 0)
 							continue;
 						break;
 
 					case 1:
-						if (!(state.mPOV[pov].direction & Pov::South))
+						if ((state.mPOV[pov].direction & Pov::South) == 0)
 							continue;
 						break;
 
 					case 2:
-						if (!(state.mPOV[pov].direction & Pov::West))
+						if ((state.mPOV[pov].direction & Pov::West) == 0)
 							continue;
 						break;
 
 					case 3:
-						if (!(state.mPOV[pov].direction & Pov::East))
+						if ((state.mPOV[pov].direction & Pov::East) == 0)
 							continue;
 						break;
 					}
@@ -456,31 +456,31 @@ namespace TEN::Input
 			for (int i = 0; i < MAX_MOUSE_KEYS; i++)
 				KeyMap[MAX_KEYBOARD_KEYS + i] = state.buttonDown((MouseButtonID)i);
 
-			// Register multiple directional keypresses registered to axis movements.
+			// Register multiple directional keypresses mapped to axis movements.
 			unsigned int index = MAX_KEYBOARD_KEYS + MAX_MOUSE_KEYS + MAX_GAMEPAD_KEYS;
 			for (int pass = 0; pass < 4; pass++)
 			{
 				switch (pass)
 				{
-				// X-.
+				// Mouse X-
 				case 0:
 					if (state.X.rel >= 0)
 						continue;
 					break;
 
-				// X+.
+				// Mouse X+
 				case 1:
 					if (state.X.rel <= 0)
 						continue;
 					break;
 
-				// Y-.
+				// Mouse Y-
 				case 2:
 					if (state.Y.rel >= 0)
 						continue;
 					break;
 
-				// Y+.
+				// Mouse Y+
 				case 3:
 					if (state.Y.rel <= 0)
 						continue;
