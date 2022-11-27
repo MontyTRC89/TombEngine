@@ -79,19 +79,7 @@ namespace TEN::Entities::Effects
 			if (currentItem->IsLara() && GetLaraInfo(item)->Control.WaterStatus == WaterStatus::FlyCheat)
 				continue;
 
-			Vector3 color1 = currentItem->Effect.EffectColor1;
-			Vector3 color2 = currentItem->Effect.EffectColor2;
-
-			if (currentItem->Effect.Type == EffectType::MagicFire )
-				ItemMagicBurn(currentItem, color1, color2, currentItem->IsLara() ? -1 : FLAME_ITEM_BURN_TIMEOUT);
-
-			else if (currentItem->Effect.Type == EffectType::ColoredFire)
-				ItemColorBurn(currentItem, color1, color2, currentItem->IsLara() ? -1 : FLAME_ITEM_BURN_TIMEOUT);
-
-			else
-			{
-				ItemBurn(currentItem, currentItem->IsLara() ? -1 : FLAME_ITEM_BURN_TIMEOUT);
-			}			
+				ItemBurn(currentItem, currentItem->IsLara() ? -1 : FLAME_ITEM_BURN_TIMEOUT);					
 		}
 	}
 

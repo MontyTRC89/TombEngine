@@ -700,7 +700,7 @@ void Moveable::SetEffect(EffectType effectType, sol::optional<float> timeout)
 	}
 }
 
-void Moveable::SetCustomEffect(EffectType effectType, ScriptColor const& col1, ScriptColor const& col2, sol::optional<float> timeout)
+void Moveable::SetCustomEffect(EffectType effectType, const ScriptColor& col1, const ScriptColor& col2, sol::optional<float> timeout)
 {
 	int realTimeout = timeout.has_value() ? int(timeout.value() * FPS) : -1;
 

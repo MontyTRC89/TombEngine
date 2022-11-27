@@ -208,7 +208,7 @@ void TriggerCyborgSpark(int x, int y, int z, short xv, short yv, short zv);
 void TriggerExplosionSparks(int x, int y, int z, int extraTrig, int dynamic, int uw, int roomNumber);
 void TriggerExplosionSmokeEnd(int x, int y, int z, int uw);
 void TriggerExplosionSmoke(int x, int y, int z, int uw);
-void TriggerFireFlame(int x, int y, int z, FlameType type, Vector3 color1 = Vector3(1, 1, 1), Vector3 color2 = Vector3(1, 1, 1));
+void TriggerFireFlame(int x, int y, int z, FlameType type, const Vector3& color1 = Vector3::One, const Vector3& color2 = Vector3::One);
 void TriggerSuperJetFlame(ItemInfo* item, int yvel, int deadly);
 void SetupSplash(const SPLASH_SETUP* const setup, int room);
 void UpdateSplashes();

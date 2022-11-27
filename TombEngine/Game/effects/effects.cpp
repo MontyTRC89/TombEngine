@@ -1271,7 +1271,7 @@ void TriggerFlashSmoke(int x, int y, int z, short roomNumber)
 	spark->mirror = mirror;
 }
 
-void TriggerFireFlame(int x, int y, int z, FlameType type, Vector3 color1, Vector3 color2)
+void TriggerFireFlame(int x, int y, int z, FlameType type, const Vector3& color1, const Vector3& color2)
 {
 	int dx = LaraItem->Pose.Position.x - x;
 	int dz = LaraItem->Pose.Position.z - z;
@@ -1679,8 +1679,5 @@ void ProcessEffects(ItemInfo* item)
 	}
 
 	if (item->IsLara() && GetLaraInfo(item)->Control.WaterStatus == WaterStatus::FlyCheat)
-	{
 		item->Effect.Type = EffectType::None;
-	}
-
 }

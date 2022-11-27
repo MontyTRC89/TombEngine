@@ -7,9 +7,9 @@
 #include "Game/effects/effects.h"
 #include "Game/effects/smoke.h"
 #include "Game/items.h"
-#include "Color/Color.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
+#include "Scripting/Internal/TEN/Color/Color.h"
 #include "Specific/level.h"
 
 using namespace TEN::Effects::Smoke;
@@ -25,7 +25,7 @@ namespace TEN::Effects::Items
 		item->Effect.EffectColor2 = Vector3(255, 216, 32);
 	}
 
-	void ItemColorBurn(ItemInfo* item, ScriptColor const& color1, ScriptColor const& color2, int timeout)
+	void ItemColorBurn(ItemInfo* item, const ScriptColor& color1, const ScriptColor& color2, int timeout)
 	{
 		item->Effect.Type = EffectType::ColoredFire;
 		Vector3 col1 = Vector3(color1.GetR(), color1.GetG(), color1.GetB());
@@ -36,7 +36,7 @@ namespace TEN::Effects::Items
 		item->Effect.EffectColor2 = col2;
 	}
 
-	void ItemMagicBurn(ItemInfo* item, ScriptColor const& color1, ScriptColor const& color2, int timeout)
+	void ItemMagicBurn(ItemInfo* item, const ScriptColor& color1, const ScriptColor& color2, int timeout)
 	{
 		item->Effect.Type = EffectType::MagicFire;
 		Vector3 col1 = Vector3(color1.GetR(), color1.GetG(), color1.GetB());
