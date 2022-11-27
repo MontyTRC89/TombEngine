@@ -374,7 +374,7 @@ namespace TEN::Input
 				if (state.mPOV[pov].direction == Pov::Centered)
 					continue;
 
-				// Register multiple directional keypresses mapped to axes.
+				// Register multiple directional keypresses mapped to analog axes.
 				int index = MAX_KEYBOARD_KEYS + MAX_MOUSE_KEYS + MAX_GAMEPAD_KEYS + MAX_MOUSE_POV_AXES + (MAX_GAMEPAD_AXES * 2);
 				for (int pass = 0; pass < 4; pass++)
 				{
@@ -450,11 +450,11 @@ namespace TEN::Input
 			OisMouse->capture();
 			const auto& state = OisMouse->getMouseState();
 
-			// Poll keys.
+			// Poll buttons.
 			for (int i = 0; i < MAX_MOUSE_KEYS; i++)
 				KeyMap[MAX_KEYBOARD_KEYS + i] = state.buttonDown((MouseButtonID)i);
 
-			// Register multiple directional keypresses mapped to axes.
+			// Register multiple directional keypresses mapped to mouse axes.
 			int index = MAX_KEYBOARD_KEYS + MAX_MOUSE_KEYS + MAX_GAMEPAD_KEYS;
 			for (int pass = 0; pass < 4; pass++)
 			{
