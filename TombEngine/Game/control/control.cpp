@@ -129,12 +129,13 @@ GameStatus ControlPhase(int numFrames, bool demoMode)
 		// Handle action clearing when player is locked or in title level.
 		if (Lara.Control.Locked || CurrentLevel == 0)
 		{
-			// HACK: Player is locked in cutscene; clear all actions except Deselect for skipping.
+			// HACK: Player is locked in cutscene; clear all actions.
 			if (CurrentLevel != 0)
 			{
-				auto optionAction = ActionMap[(int)In::Deselect];
+				// TODO: To allow cutscene skipping later, don't clear Deselect action.
+				//auto optionAction = ActionMap[(int)In::Deselect];
 				ClearAllActions();
-				ActionMap[(int)In::Deselect] = optionAction;
+				//ActionMap[(int)In::Deselect] = optionAction;
 			}
 
 			ClearAction(In::Look);
