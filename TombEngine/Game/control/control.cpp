@@ -124,22 +124,15 @@ GameStatus ControlPhase(int numFrames, bool demoMode)
 
 		// Poll keyboard and update input variables.
 		if (CurrentLevel != 0)
-			UpdateInputActions(LaraItem);
-
-		// Handle action clearing when player is locked or in title level.
-		if (Lara.Control.Locked || CurrentLevel == 0)
 		{
-			// HACK: Player is locked in cutscene; clear all actions.
-			if (CurrentLevel != 0)
-			{
-				// TODO: To allow cutscene skipping later, don't clear Deselect action.
-				//auto optionAction = ActionMap[(int)In::Deselect];
+			if (Lara.Control.Locked)
 				ClearAllActions();
-				//ActionMap[(int)In::Deselect] = optionAction;
-			}
-
-			ClearAction(In::Look);
+			else
+				// TODO: To allow cutscene skipping later, don't clear Deselect action.
+				UpdateInputActions(LaraItem); 
 		}
+		else
+			ClearAction(In::Look);
 
 		// This might not be the exact amount of time that has passed, but giving it a
 		// value of 1/30 keeps it in lock-step with the rest of the game logic,
