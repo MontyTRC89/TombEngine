@@ -126,9 +126,19 @@ GameStatus ControlPhase(int numFrames, bool demoMode)
 		if (CurrentLevel != 0)
 			UpdateInputActions(LaraItem);
 
-		// Has Lara control been disabled?
+		// Handle action clearing when player is locked or in title level.
 		if (Lara.Control.Locked || CurrentLevel == 0)
+		{
+			// HACK: Player is locked in cutscene; clear all actions except Deselect for skipping.
+			if (CurrentLevel != 0)
+			{
+				auto optionAction = ActionMap[(int)In::Deselect];
+				ClearAllActions();
+				ActionMap[(int)In::Deselect] = optionAction;
+			}
+
 			ClearAction(In::Look);
+		}
 
 		// This might not be the exact amount of time that has passed, but giving it a
 		// value of 1/30 keeps it in lock-step with the rest of the game logic,
