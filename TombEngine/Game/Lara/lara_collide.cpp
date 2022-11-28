@@ -37,7 +37,7 @@ bool LaraDeflectEdge(ItemInfo* item, CollisionInfo* coll)
 		return true;
 	}
 
-	if (TrInput & (IN_LEFT | IN_RIGHT))
+	if (IsHeld(In::Left) || IsHeld(In::Right))
 	{
 		ShiftItem(item, coll);
 		return false;
@@ -158,23 +158,23 @@ void LaraSlideEdgeJump(ItemInfo* item, CollisionInfo* coll)
 		break;
 
 	case CT_FRONT:
-		item->Animation.Velocity.z = 0;
+		item->Animation.Velocity.z = 0.0f;
 		break;
 
 	case CT_TOP:
 	case CT_TOP_FRONT:
-		if (item->Animation.Velocity.y <= 0)
-			item->Animation.Velocity.y = 1;
+		if (item->Animation.Velocity.y <= 0.0f)
+			item->Animation.Velocity.y = 1.0f;
 
 		break;
 
 	case CT_CLAMP:
 		TranslateItem(item, item->Pose.Orientation.y + ANGLE(180.0f), CLICK(1.5f), 0, 0);
-		item->Animation.Velocity.z = 0;
+		item->Animation.Velocity.z = 0.0f;
 		coll->Middle.Floor = 0;
 
-		if (item->Animation.Velocity.y <= 0)
-			item->Animation.Velocity.y = 16;
+		if (item->Animation.Velocity.y <= 0.0f)
+			item->Animation.Velocity.y = 16.0f;
 
 		break;
 	}
@@ -187,12 +187,12 @@ bool LaraDeflectEdgeCrawl(ItemInfo* item, CollisionInfo* coll)
 	{
 		ShiftItem(item, coll);
 
-		item->Animation.Velocity.z = 0;
+		item->Animation.Velocity.z = 0.0f;
 		item->Animation.IsAirborne = false;
 		return true;
 	}
 
-	if (TrInput & (IN_LEFT | IN_RIGHT))
+	if (IsHeld(In::Left) || IsHeld(In::Right))
 	{
 		ShiftItem(item, coll);
 		return false;
@@ -224,12 +224,12 @@ bool LaraDeflectEdgeMonkey(ItemInfo* item, CollisionInfo* coll)
 		ShiftItem(item, coll);
 
 		item->Animation.TargetState = LS_MONKEY_IDLE;
-		item->Animation.Velocity.z = 0;
+		item->Animation.Velocity.z = 0.0f;
 		item->Animation.IsAirborne = false;
 		return true;
 	}
 
-	if (TrInput & (IN_LEFT | IN_RIGHT))
+	if (IsHeld(In::Left) || IsHeld(In::Right))
 	{
 		ShiftItem(item, coll);
 		return false;
@@ -262,7 +262,7 @@ void LaraCollideStop(ItemInfo* item, CollisionInfo* coll)
 		item->Animation.AnimNumber = coll->Setup.OldAnimNumber;
 		item->Animation.FrameNumber = coll->Setup.OldFrameNumber;
 
-		if (TrInput & IN_LEFT)
+		if (IsHeld(In::Left))
 		{
 			// Prevent turn lock against walls.
 			if (item->Animation.ActiveState == LS_TURN_RIGHT_SLOW ||
@@ -273,7 +273,7 @@ void LaraCollideStop(ItemInfo* item, CollisionInfo* coll)
 			else
 				item->Animation.TargetState = LS_TURN_LEFT_SLOW;
 		}
-		else if (TrInput & IN_RIGHT)
+		else if (IsHeld(In::Right))
 		{
 			if (item->Animation.ActiveState == LS_TURN_LEFT_SLOW ||
 				item->Animation.ActiveState == LS_TURN_LEFT_FAST)
@@ -310,10 +310,14 @@ void LaraCollideStopCrawl(ItemInfo* item, CollisionInfo* coll)
 		item->Animation.AnimNumber = coll->Setup.OldAnimNumber;
 		item->Animation.FrameNumber = coll->Setup.OldFrameNumber;
 
-		if (TrInput & IN_LEFT)
+		if (IsHeld(In::Left))
+		{
 			item->Animation.TargetState = LS_CRAWL_TURN_LEFT;
-		else if (TrInput & IN_RIGHT)
+		}
+		else if (IsHeld(In::Right))
+		{
 			item->Animation.TargetState = LS_CRAWL_TURN_RIGHT;
+		}
 		else
 			item->Animation.TargetState = LS_CRAWL_IDLE;
 
@@ -345,9 +349,9 @@ void LaraCollideStopMonkey(ItemInfo* item, CollisionInfo* coll)
 		item->Animation.AnimNumber = coll->Setup.OldAnimNumber;
 		item->Animation.FrameNumber = coll->Setup.OldFrameNumber;
 
-		if (TrInput & IN_LEFT)
+		if (IsHeld(In::Left))
 			item->Animation.TargetState = LS_MONKEY_TURN_LEFT;
-		else if (TrInput & IN_RIGHT)
+		else if (IsHeld(In::Right))
 			item->Animation.TargetState = LS_MONKEY_TURN_RIGHT;
 		else
 			item->Animation.TargetState = LS_MONKEY_IDLE;
@@ -379,20 +383,20 @@ void LaraSnapToEdgeOfBlock(ItemInfo* item, CollisionInfo* coll, short angle)
 		switch (angle)
 		{
 		case NORTH:
-			item->Pose.Position.x = (coll->Setup.OldPosition.x & ~(WALL_SIZE - 1)) | (WALL_SIZE - snapDistance);
+			item->Pose.Position.x = (coll->Setup.OldPosition.x & ~WALL_MASK) | (BLOCK(1) - snapDistance);
 			return;
 
 		case EAST:
-			item->Pose.Position.z = (coll->Setup.OldPosition.z & ~(WALL_SIZE - 1)) | snapDistance;
+			item->Pose.Position.z = (coll->Setup.OldPosition.z & ~WALL_MASK) | snapDistance;
 			return;
 
 		case SOUTH:
-			item->Pose.Position.x = (coll->Setup.OldPosition.x & ~(WALL_SIZE - 1)) | snapDistance;
+			item->Pose.Position.x = (coll->Setup.OldPosition.x & ~WALL_MASK) | snapDistance;
 			return;
 
-		case WEST:
 		default:
-			item->Pose.Position.z = (coll->Setup.OldPosition.z & ~(WALL_SIZE - 1)) | (WALL_SIZE - snapDistance);
+		case WEST:
+			item->Pose.Position.z = (coll->Setup.OldPosition.z & ~WALL_MASK) | (BLOCK(1) - snapDistance);
 			return;
 		}
 	}
@@ -402,20 +406,20 @@ void LaraSnapToEdgeOfBlock(ItemInfo* item, CollisionInfo* coll, short angle)
 		switch (angle)
 		{
 		case NORTH:
-			item->Pose.Position.x = (coll->Setup.OldPosition.x & ~(WALL_SIZE - 1)) | snapDistance;
+			item->Pose.Position.x = (coll->Setup.OldPosition.x & ~WALL_MASK) | snapDistance;
 			return;
 
 		case EAST:
-			item->Pose.Position.z = (coll->Setup.OldPosition.z & ~(WALL_SIZE - 1)) | (WALL_SIZE - snapDistance);
+			item->Pose.Position.z = (coll->Setup.OldPosition.z & ~WALL_MASK) | (BLOCK(1) - snapDistance);
 			return;
 
 		case SOUTH:
-			item->Pose.Position.x = (coll->Setup.OldPosition.x & ~(WALL_SIZE - 1)) | (WALL_SIZE - snapDistance);
+			item->Pose.Position.x = (coll->Setup.OldPosition.x & ~WALL_MASK) | (BLOCK(1) - snapDistance);
 			return;
 
-		case WEST:
 		default:
-			item->Pose.Position.z = (coll->Setup.OldPosition.z & ~(WALL_SIZE - 1)) | snapDistance;
+		case WEST:
+			item->Pose.Position.z = (coll->Setup.OldPosition.z & ~WALL_MASK) | snapDistance;
 			return;
 		}
 	}
@@ -423,7 +427,7 @@ void LaraSnapToEdgeOfBlock(ItemInfo* item, CollisionInfo* coll, short angle)
 
 void LaraResetGravityStatus(ItemInfo* item, CollisionInfo* coll)
 {
-	// This routine cleans gravity status flag and VerticalVelocity, making it
+	// This routine cleans gravity status flag and Velocity.y, making it
 	// impossible to perform bugs such as QWOP and flare jump. Found by Troye -- Lwmte, 25.09.2021
 
 	if (coll->Middle.Floor <= STEPUP_HEIGHT)
@@ -457,8 +461,7 @@ void GetLaraDeadlyBounds()
 		LaraItem->Pose.Position.y + tBounds.Y1,
 		LaraItem->Pose.Position.y + tBounds.Y2,
 		LaraItem->Pose.Position.z + tBounds.Z1,
-		LaraItem->Pose.Position.z + tBounds.Z2
-	);
+		LaraItem->Pose.Position.z + tBounds.Z2);
 }
 
 void LaraJumpCollision(ItemInfo* item, CollisionInfo* coll, short moveAngle)
@@ -555,16 +558,24 @@ void LaraSwimCollision(ItemInfo* item, CollisionInfo* coll)
 			if (item->Pose.Orientation.x >= -ANGLE(25.0f))
 			{
 				if (item->Pose.Orientation.x > ANGLE(5.0f))
+				{
 					item->Pose.Orientation.x += ANGLE(0.5f);
+				}
 				else if (item->Pose.Orientation.x < -ANGLE(5.0f))
+				{
 					item->Pose.Orientation.x -= ANGLE(0.5f);
+				}
 				else if (item->Pose.Orientation.x > 0)
+				{
 					item->Pose.Orientation.x += 45;
+				}
 				else if (item->Pose.Orientation.x < 0)
+				{
 					item->Pose.Orientation.x -= 45;
+				}
 				else
 				{
-					item->Animation.Velocity.y = 0;
+					item->Animation.Velocity.y = 0.0f;
 					flag = 1;
 				}
 			}
@@ -581,13 +592,21 @@ void LaraSwimCollision(ItemInfo* item, CollisionInfo* coll)
 		}
 
 		if (c1.CollisionType == CT_LEFT)
+		{
 			item->Pose.Orientation.y += ANGLE(2.0f);
+		}
 		else if (c1.CollisionType == CT_RIGHT)
+		{
 			item->Pose.Orientation.y -= ANGLE(2.0f);
+		}
 		else if (c2.CollisionType == CT_LEFT)
+		{
 			item->Pose.Orientation.y += ANGLE(2.0f);
+		}
 		else if (c2.CollisionType == CT_RIGHT)
+		{
 			item->Pose.Orientation.y -= ANGLE(2.0f);
+		}
 
 		break;
 
@@ -601,7 +620,7 @@ void LaraSwimCollision(ItemInfo* item, CollisionInfo* coll)
 		break;
 
 	case CT_TOP_FRONT:
-		item->Animation.Velocity.y = 0;
+		item->Animation.Velocity.y = 0.0f;
 		flag = 1;
 		break;
 
@@ -694,20 +713,32 @@ void LaraWaterCurrent(ItemInfo* item, CollisionInfo* coll)
 	if (coll->CollisionType == CT_FRONT)
 	{
 		if (item->Pose.Orientation.x > ANGLE(35.0f))
+		{
 			item->Pose.Orientation.x += ANGLE(1.0f);
+		}
 		else if (item->Pose.Orientation.x < -ANGLE(35.0f))
+		{
 			item->Pose.Orientation.x -= ANGLE(1.0f);
+		}
 		else
-			item->Animation.Velocity.y = 0;
+			item->Animation.Velocity.y = 0.0f;
 	}
 	else if (coll->CollisionType == CT_TOP)
+	{
 		item->Pose.Orientation.x -= ANGLE(1.0f);
+	}
 	else if (coll->CollisionType == CT_TOP_FRONT)
-		item->Animation.Velocity.y = 0;
+	{
+		item->Animation.Velocity.y = 0.0f;
+	}
 	else if (coll->CollisionType == CT_LEFT)
+	{
 		item->Pose.Orientation.y += ANGLE(5.0f);
+	}
 	else if (coll->CollisionType == CT_RIGHT)
+	{
 		item->Pose.Orientation.y -= ANGLE(5.0f);
+	}
 
 	if (coll->Middle.Floor < 0 && coll->Middle.Floor != NO_HEIGHT)
 		item->Pose.Position.y += coll->Middle.Floor;

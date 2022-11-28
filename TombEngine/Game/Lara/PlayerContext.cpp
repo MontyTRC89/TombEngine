@@ -24,11 +24,21 @@ namespace TEN::Entities::Player::Context
 	{
 		const auto& player = *GetLaraInfo(item);
 
-		if (abs(coll->Middle.Floor) > 0 &&
-			(coll->Middle.Floor <= STEPUP_HEIGHT ||					// Within lower floor bound...
-				player.Control.WaterStatus == WaterStatus::Wade) &&		// OR Lara is wading.
-			coll->Middle.Floor >= -STEPUP_HEIGHT &&					// Within upper floor bound.
-			coll->Middle.Floor != NO_HEIGHT)
+		int vPos = item->Pose.Position.y;
+		auto pointColl = GetCollision(item);
+
+		// 1. Check for wall.
+		if (pointColl.Position.Floor == NO_HEIGHT)
+			return false;
+
+		// 2. Check whether player is already aligned with the floor.
+		if ((pointColl.Position.Floor - vPos) == 0)
+			return false;
+
+		// 3. Assess point collision.
+		if (((pointColl.Position.Floor - vPos) <= STEPUP_HEIGHT ||	// Floor height is within lower floor bound...
+				player.Control.WaterStatus == WaterStatus::Wade) &&		// OR player is wading.
+			(pointColl.Position.Floor - vPos) >= -STEPUP_HEIGHT)	// Floor height is within upper floor bound.
 		{
 			return true;
 		}
@@ -322,7 +332,7 @@ namespace TEN::Entities::Player::Context
 	{
 		static constexpr auto maxWaterHeight = -CLICK(1);
 		static constexpr auto maxProbeDist	 = BLOCK(1);
-		static constexpr auto distIncrement	 = BLOCK(1.0f / 4);
+		static constexpr auto stepDist		 = BLOCK(1.0f / 4);
 
 		const auto& player = *GetLaraInfo(item);
 
@@ -340,7 +350,7 @@ namespace TEN::Entities::Player::Context
 		auto pointCollA = GetCollision(item);
 		while (distance < maxProbeDist)
 		{
-			distance += distIncrement;
+			distance += stepDist;
 			auto pointCollB = GetCollision(item, item->Pose.Orientation.y, distance, -LARA_HEIGHT_CRAWL);
 
 			if (abs(pointCollA.Position.Floor - pointCollB.Position.Floor) > CRAWL_STEPUP_HEIGHT ||	 // Avoid floor height differences beyond crawl stepup threshold.
@@ -522,12 +532,10 @@ namespace TEN::Entities::Player::Context
 			item->Pose.Position.x,
 			(item->Pose.Position.y - LARA_HEIGHT_STRETCH) + minLedgeHeight,
 			item->Pose.Position.z,
-			item->RoomNumber
-		);
+			item->RoomNumber);
 		auto target = GameVector(
 			Geometry::TranslatePoint(origin.ToVector3i(), item->Pose.Orientation.y, OFFSET_RADIUS(coll->Setup.Radius)),
-			item->RoomNumber
-		);
+			item->RoomNumber);
 
 		// 2. Assess raycast collision.
 		if (LOS(&origin, &target))
@@ -882,28 +890,24 @@ namespace TEN::Entities::Player::Context
 			item->Pose.Position.x,
 			(vPos + contextSetup.UpperFloorBound) - 1,
 			item->Pose.Position.z,
-			item->RoomNumber
-		);
+			item->RoomNumber);
 		auto targetA = GameVector(
 			pointColl.Coordinates.x,
 			(vPos + contextSetup.UpperFloorBound) - 1,
 			pointColl.Coordinates.z,
-			item->RoomNumber
-		);
+			item->RoomNumber);
 
 		// Raycast setup at lowest ceiling bound (player height).
 		auto originB = GameVector(
 			item->Pose.Position.x,
 			vPosTop + 1,
 			item->Pose.Position.z,
-			item->RoomNumber
-		);
+			item->RoomNumber);
 		auto targetB = GameVector(
 			pointColl.Coordinates.x,
 			vPosTop + 1,
 			pointColl.Coordinates.z,
-			item->RoomNumber
-		);
+			item->RoomNumber);
 
 		// 3. Assess raycast collision.
 		if (!LOS(&originA, &targetA) || !LOS(&originB, &targetB))
@@ -943,28 +947,24 @@ namespace TEN::Entities::Player::Context
 			item->Pose.Position.x,
 			vPos - 1,
 			item->Pose.Position.z,
-			item->RoomNumber
-		);
+			item->RoomNumber);
 		auto targetA = GameVector(
 			pointColl.Coordinates.x,
 			vPos - 1,
 			pointColl.Coordinates.z,
-			item->RoomNumber
-		);
+			item->RoomNumber);
 		
 		// Raycast setup at lower ceiling bound.
 		auto originB = GameVector(
 			item->Pose.Position.x,
 			(vPosTop + contextSetup.LowerCeilingBound) + 1,
 			item->Pose.Position.z,
-			item->RoomNumber
-		);
+			item->RoomNumber);
 		auto targetB = GameVector(
 			pointColl.Coordinates.x,
 			(vPosTop + contextSetup.LowerCeilingBound) + 1,
 			pointColl.Coordinates.z,
-			item->RoomNumber
-		);
+			item->RoomNumber);
 
 		// 3. Assess raycast collision.
 		if (!LOS(&originA, &targetA) || !LOS(&originB, &targetB))
@@ -1070,7 +1070,7 @@ namespace TEN::Entities::Player::Context
 		// NOTE: Where the point collision probe finds that
 		// a) the "wall" in front is formed by a ceiling, or
 		// b) the space between the floor and ceiling is too narrow,
-		// any potentially climbable floor in a room above will be missed. The following step considers this.
+		// any potentially climbable floor in a room above will be missed. The following loop hacks around this floordata limitation.
 
 		// 2. Raise vertical position of point collision probe by increments of 1/8th blocks to find potential vault ledge.
 		int vOffset = contextSetup.LowerFloorBound;
