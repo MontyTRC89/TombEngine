@@ -1652,7 +1652,7 @@ void ProcessEffects(ItemInfo* item)
 			break;
 
 		case EffectType::Smoke:
-			if (TestProbability(1 / 82.0f))
+			if (TestProbability(1 / 64.0f))
 				TriggerRocketSmoke(pos.x, pos.y, pos.z, 0);
 			break;
 		}
