@@ -753,7 +753,7 @@ void lara_col_swan_dive(ItemInfo* item, CollisionInfo* coll)
 	if (LaraDeflectEdgeJump(item, coll))
 	{
 		// Reset position to avoid embedding inside sloped ceilings meeting the floor.
-		item->Pose.Position = coll->Setup.OldPosition;
+		item->Pose.Position = coll->Setup.PrevPosition;
 		lara.Control.HandStatus = HandStatus::Free;
 	}
 }

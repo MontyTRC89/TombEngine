@@ -717,7 +717,7 @@ bool ItemPushItem(ItemInfo* item, ItemInfo* item2, CollisionInfo* coll, bool ena
 	coll->Setup.UpperCeilingBound = MAX_HEIGHT;
 
 	auto headingAngle = coll->Setup.ForwardAngle;
-	coll->Setup.ForwardAngle = phd_atan(item2->Pose.Position.z - coll->Setup.OldPosition.z, item2->Pose.Position.x - coll->Setup.OldPosition.x);
+	coll->Setup.ForwardAngle = phd_atan(item2->Pose.Position.z - coll->Setup.PrevPosition.z, item2->Pose.Position.x - coll->Setup.PrevPosition.x);
 
 	GetCollisionInfo(coll, item2);
 
@@ -725,15 +725,15 @@ bool ItemPushItem(ItemInfo* item, ItemInfo* item2, CollisionInfo* coll, bool ena
 
 	if (coll->CollisionType == CT_NONE)
 	{
-		coll->Setup.OldPosition = item2->Pose.Position;
+		coll->Setup.PrevPosition = item2->Pose.Position;
 
 		// Commented because causes Lara to jump out of the water if she touches an object on the surface. re: "kayak bug"
 		// UpdateLaraRoom(item2, -10);
 	}
 	else
 	{
-		item2->Pose.Position.x = coll->Setup.OldPosition.x;
-		item2->Pose.Position.z = coll->Setup.OldPosition.z;
+		item2->Pose.Position.x = coll->Setup.PrevPosition.x;
+		item2->Pose.Position.z = coll->Setup.PrevPosition.z;
 	}
 
 	// If Lara is in the process of aligning to an object, cancel it.
@@ -792,7 +792,7 @@ bool ItemPushStatic(ItemInfo* item, const MESH_INFO& mesh, CollisionInfo* coll)
 	coll->Setup.LowerCeilingBound = 0;
 
 	auto prevHeadingAngle = coll->Setup.ForwardAngle;
-	coll->Setup.ForwardAngle = phd_atan(item->Pose.Position.z - coll->Setup.OldPosition.z, item->Pose.Position.x - coll->Setup.OldPosition.x);
+	coll->Setup.ForwardAngle = phd_atan(item->Pose.Position.z - coll->Setup.PrevPosition.z, item->Pose.Position.x - coll->Setup.PrevPosition.x);
 
 	GetCollisionInfo(coll, item);
 
@@ -800,14 +800,14 @@ bool ItemPushStatic(ItemInfo* item, const MESH_INFO& mesh, CollisionInfo* coll)
 
 	if (coll->CollisionType == CT_NONE)
 	{
-		coll->Setup.OldPosition = item->Pose.Position;
+		coll->Setup.PrevPosition = item->Pose.Position;
 		if (item->IsLara())
 			UpdateLaraRoom(item, -10);
 	}
 	else
 	{
-		item->Pose.Position.x = coll->Setup.OldPosition.x;
-		item->Pose.Position.z = coll->Setup.OldPosition.z;
+		item->Pose.Position.x = coll->Setup.PrevPosition.x;
+		item->Pose.Position.z = coll->Setup.PrevPosition.z;
 	}
 
 	// If Lara is in the process of aligning to an object, cancel it.
@@ -895,7 +895,7 @@ bool CollideSolidBounds(ItemInfo* item, const GameBoundingBox& box, const Pose& 
 	bool intersects = staticBounds.Intersects(collBounds);
 
 	// Check if previous item horizontal position intersects bounds.
-	auto prevCollBounds = collBox.ToBoundingOrientedBox(Pose(coll->Setup.OldPosition));
+	auto prevCollBounds = collBox.ToBoundingOrientedBox(Pose(coll->Setup.PrevPosition));
 	bool prevHorIntersects = staticBounds.Intersects(prevCollBounds);
 
 	// Draw item coll bounds.
@@ -1040,7 +1040,7 @@ bool CollideSolidBounds(ItemInfo* item, const GameBoundingBox& box, const Pose& 
 		rawShift.z = shiftRight;
 
 	// Rotate previous collision position to identity.
-	distance = (coll->Setup.OldPosition - pose.Position).ToVector3();
+	distance = (coll->Setup.PrevPosition - pose.Position).ToVector3();
 	auto ox = round((distance.x * cosY) - (distance.z * sinY)) + pose.Position.x;
 	auto oz = round((distance.x * sinY) + (distance.z * cosY)) + pose.Position.z;
 

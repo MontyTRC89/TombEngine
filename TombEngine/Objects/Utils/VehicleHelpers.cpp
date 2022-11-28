@@ -191,7 +191,7 @@ namespace TEN::Entities::Vehicles
 		CollisionInfo coll = {};
 		coll.Setup.Radius = radius * 0.8f; // HACK: Most vehicles use radius larger than needed.
 		coll.Setup.UpperCeilingBound = MAX_HEIGHT; // HACK: this needs to be set to prevent GCI result interference.
-		coll.Setup.OldPosition = vehicleItem->Pose.Position;
+		coll.Setup.PrevPosition = vehicleItem->Pose.Position;
 		coll.Setup.EnableObjectPush = true;
 
 		DoObjectCollision(vehicleItem, &coll);

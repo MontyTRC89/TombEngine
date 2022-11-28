@@ -46,7 +46,7 @@ namespace TEN::Entities::TR4
 	{
 		CollisionInfo coll = {};
 		coll.Setup.Radius = radius;
-		coll.Setup.OldPosition = trapItem->Pose.Position;
+		coll.Setup.PrevPosition = trapItem->Pose.Position;
 		coll.Setup.EnableObjectPush = false;
 
 		DoObjectCollision(trapItem, &coll);
