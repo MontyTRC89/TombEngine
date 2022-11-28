@@ -48,6 +48,7 @@ struct GameConfiguration
 	bool AutoTarget;
 	bool EnableRumble;
 	bool EnableThumbstickCameraControl;
+	float MouseSensitivity = 1.0f;
 	short KeyboardLayout[TEN::Input::KEY_COUNT];
 
 	std::vector<Vector2i> SupportedScreenResolutions;

@@ -280,125 +280,6 @@ namespace TEN::Input
 		}
 	}
 
-	void ReadGameController()
-	{
-		return;
-		if (OisGamepad == nullptr)
-			return;
-
-		try
-		{
-			OisGamepad->capture();
-			const auto& state = OisGamepad->getJoyStickState();
-
-			// Poll buttons.
-			for (int key = 0; key < state.mButtons.size(); key++)
-				KeyMap[MAX_KEYBOARD_KEYS + MAX_MOUSE_KEYS + key] = state.mButtons[key];
-
-			// Poll axes.
-			for (int axis = 0; axis < state.mAxes.size(); axis++)
-			{
-				// NOTE: We don't support anything above 6 existing XBOX/PS controller axes (two sticks plus two triggers = 6).
-				if (axis >= MAX_GAMEPAD_AXES)
-					break;
-
-				// Filter out deadzone.
-				if (abs(state.mAxes[axis].abs) < AXIS_DEADZONE)
-					continue;
-
-				// Calculate raw normalized analog value for camera.
-				float axisValue = (state.mAxes[axis].abs > 0) ? -AXIS_DEADZONE : AXIS_DEADZONE;
-				float normalizedValue = float(state.mAxes[axis].abs + axisValue) / float(SHRT_MAX - AXIS_DEADZONE);
-
-				// Calculate scaled analog value for movement.
-				// NOTE: [0.2f, 1.7f] range gives the most organic rates.
-				float scaledValue = abs(normalizedValue) * 1.5f + 0.2f;
-
-				// Calculate and reset discrete input slots.
-				int negKeyIndex = MAX_KEYBOARD_KEYS + MAX_MOUSE_KEYS + MAX_GAMEPAD_KEYS + (axis * 2);
-				int posKeyIndex = MAX_KEYBOARD_KEYS + MAX_MOUSE_KEYS + MAX_GAMEPAD_KEYS + (axis * 2) + 1;
-				KeyMap[negKeyIndex] = false;
-				KeyMap[posKeyIndex] = false;
-
-				// Decide on the discrete input registering based on analog value.
-				int usedIndex = normalizedValue > 0 ? negKeyIndex : posKeyIndex;
-				KeyMap[usedIndex] = true;
-
-				// Register analog input in certain direction.
-				// If axis is bound as directional controls, register axis as directional input.
-				// Otherwise, register as camera movement input (for future).
-				// NOTE: abs() operations are needed to avoid issues with inverted axes on different controllers.
-
-				if (KeyboardLayout[1][KEY_FORWARD] == usedIndex)
-				{
-					AxisMap[(int)InputAxis::Move].y = abs(scaledValue);
-				}
-				else if (KeyboardLayout[1][KEY_BACK] == usedIndex)
-				{
-					AxisMap[(int)InputAxis::Move].y = -abs(scaledValue);
-				}
-				else if (KeyboardLayout[1][KEY_LEFT] == usedIndex)
-				{
-					AxisMap[(int)InputAxis::Move].x = -abs(scaledValue);
-				}
-				else if (KeyboardLayout[1][KEY_RIGHT] == usedIndex)
-				{
-					AxisMap[(int)InputAxis::Move].x = abs(scaledValue);
-				}
-				else if (!LayoutContainsIndex(usedIndex))
-				{
-					if ((axis % 2) == 0)
-						AxisMap[(int)InputAxis::Camera].y = normalizedValue;
-					else
-						AxisMap[(int)InputAxis::Camera].x = normalizedValue;
-				}
-			}
-
-			// Poll POVs.
-			// NOTE: Controllers usually have one, but scan all just in case.
-			for (int pov = 0; pov < 4; pov++)
-			{
-				if (state.mPOV[pov].direction == Pov::Centered)
-					continue;
-
-				// Register multiple directional keypresses mapped to analog axes.
-				int baseIndex = MAX_KEYBOARD_KEYS + MAX_MOUSE_KEYS + MAX_GAMEPAD_KEYS + MAX_MOUSE_POV_AXES + (MAX_GAMEPAD_AXES * 2);
-				for (int pass = 0; pass < 4; pass++)
-				{
-					switch (pass)
-					{
-					case 0:
-						if ((state.mPOV[pov].direction & Pov::North) == 0)
-							continue;
-						break;
-
-					case 1:
-						if ((state.mPOV[pov].direction & Pov::South) == 0)
-							continue;
-						break;
-
-					case 2:
-						if ((state.mPOV[pov].direction & Pov::West) == 0)
-							continue;
-						break;
-
-					case 3:
-						if ((state.mPOV[pov].direction & Pov::East) == 0)
-							continue;
-						break;
-					}
-
-					KeyMap[baseIndex + pass] = true;
-					SetDiscreteAxisValues(baseIndex + pass);
-				}
-			}
-		}
-		catch (OIS::Exception& ex)
-		{
-			TENLog("Unable to poll game controller input: " + std::string(ex.eText), LogLevel::Warning);
-		}
-	}
-
 	void ReadKeyboard()
 	{
 		if (OisKeyboard == nullptr)
@@ -489,11 +370,134 @@ namespace TEN::Input
 			}
 
 			// Poll axes.
-			AxisMap[(int)InputAxis::Mouse] = Vector2(state.X.rel, state.Y.rel);
+			AxisMap[(int)InputAxis::Mouse] = Vector2(state.X.rel, state.Y.rel) * g_Configuration.MouseSensitivity;
 		}
 		catch (OIS::Exception& ex)
 		{
 			TENLog("Unable to poll mouse input: " + std::string(ex.eText), LogLevel::Warning);
+		}
+	}
+	
+	void ReadGameController()
+	{
+		return;
+		if (OisGamepad == nullptr)
+			return;
+
+		try
+		{
+			OisGamepad->capture();
+			const auto& state = OisGamepad->getJoyStickState();
+
+			// Poll buttons.
+			for (int key = 0; key < state.mButtons.size(); key++)
+				KeyMap[MAX_KEYBOARD_KEYS + MAX_MOUSE_KEYS + key] = state.mButtons[key];
+
+			// Poll axes.
+			for (int axis = 0; axis < state.mAxes.size(); axis++)
+			{
+				// NOTE: We don't support anything above 6 existing XBOX/PS controller axes (two sticks plus two triggers = 6).
+				if (axis >= MAX_GAMEPAD_AXES)
+					break;
+
+				// Filter out deadzone.
+				if (abs(state.mAxes[axis].abs) < AXIS_DEADZONE)
+					continue;
+
+				// Calculate raw normalized analog value for camera.
+				float axisValue = (state.mAxes[axis].abs > 0) ? -AXIS_DEADZONE : AXIS_DEADZONE;
+				float normalizedValue = float(state.mAxes[axis].abs + axisValue) / float(SHRT_MAX - AXIS_DEADZONE);
+
+				// Calculate scaled analog value for movement.
+				// NOTE: [0.2f, 1.7f] range gives the most organic rates.
+				float scaledValue = abs(normalizedValue) * 1.5f + 0.2f;
+
+				// Calculate and reset discrete input slots.
+				int negKeyIndex = MAX_KEYBOARD_KEYS + MAX_MOUSE_KEYS + MAX_GAMEPAD_KEYS + (axis * 2);
+				int posKeyIndex = MAX_KEYBOARD_KEYS + MAX_MOUSE_KEYS + MAX_GAMEPAD_KEYS + (axis * 2) + 1;
+				KeyMap[negKeyIndex] = false;
+				KeyMap[posKeyIndex] = false;
+
+				// Decide on the discrete input registering based on analog value.
+				int usedIndex = normalizedValue > 0 ? negKeyIndex : posKeyIndex;
+				KeyMap[usedIndex] = true;
+
+				// Register analog input in certain direction.
+				// If axis is bound as directional controls, register axis as directional input.
+				// Otherwise, register as camera movement input (for future).
+				// NOTE: abs() operations are needed to avoid issues with inverted axes on different controllers.
+
+				if (KeyboardLayout[1][KEY_FORWARD] == usedIndex)
+				{
+					AxisMap[(int)InputAxis::Move].y = abs(scaledValue);
+				}
+				else if (KeyboardLayout[1][KEY_BACK] == usedIndex)
+				{
+					AxisMap[(int)InputAxis::Move].y = -abs(scaledValue);
+				}
+				else if (KeyboardLayout[1][KEY_LEFT] == usedIndex)
+				{
+					AxisMap[(int)InputAxis::Move].x = -abs(scaledValue);
+				}
+				else if (KeyboardLayout[1][KEY_RIGHT] == usedIndex)
+				{
+					AxisMap[(int)InputAxis::Move].x = abs(scaledValue);
+				}
+				else if (!LayoutContainsIndex(usedIndex))
+				{
+					if ((axis % 2) == 0)
+						AxisMap[(int)InputAxis::Camera].y = normalizedValue;
+					else
+						AxisMap[(int)InputAxis::Camera].x = normalizedValue;
+				}
+			}
+
+			// Poll POVs.
+			// NOTE: Controllers usually have one, but scan all just in case.
+			for (int pov = 0; pov < 4; pov++)
+			{
+				if (state.mPOV[pov].direction == Pov::Centered)
+					continue;
+
+				// Register multiple directional keypresses mapped to analog axes.
+				int baseIndex = MAX_KEYBOARD_KEYS + MAX_MOUSE_KEYS + MAX_GAMEPAD_KEYS + MAX_MOUSE_POV_AXES + (MAX_GAMEPAD_AXES * 2);
+				for (int pass = 0; pass < 4; pass++)
+				{
+					switch (pass)
+					{
+					// D-Pad Up
+					case 0:
+						if ((state.mPOV[pov].direction & Pov::North) == 0)
+							continue;
+						break;
+
+					// D-Pad Down
+					case 1:
+						if ((state.mPOV[pov].direction & Pov::South) == 0)
+							continue;
+						break;
+
+					// D-Pad Left
+					case 2:
+						if ((state.mPOV[pov].direction & Pov::West) == 0)
+							continue;
+						break;
+
+					// D-Pad Right
+					case 3:
+						if ((state.mPOV[pov].direction & Pov::East) == 0)
+							continue;
+						break;
+					}
+
+					KeyMap[baseIndex + pass] = true;
+					SetDiscreteAxisValues(baseIndex + pass);
+				}
+			}
+		}
+		catch (OIS::Exception& ex)
+		{
+			TENLog("Unable to poll game controller input: " + std::string(ex.eText), LogLevel::Warning);
 		}
 	}
 
