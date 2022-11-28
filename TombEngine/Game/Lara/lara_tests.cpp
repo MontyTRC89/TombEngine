@@ -1477,11 +1477,11 @@ CrawlVaultTestResult TestLaraCrawlExitJump(ItemInfo* item, CollisionInfo* coll)
 
 CrawlVaultTestResult TestLaraCrawlVault(ItemInfo* item, CollisionInfo* coll)
 {
-	if (!(IsHeld(In::Action) || IsHeld(In::Jump)))
-		return CrawlVaultTestResult{ false };
-
 	// Check whether extended crawl mechanics are enabled.
 	if (!g_GameFlow->HasCrawlExtended())
+		return CrawlVaultTestResult{ false };
+
+	if (!(IsHeld(In::Action) || IsHeld(In::Jump)))
 		return CrawlVaultTestResult{ false };
 
 	// Crawl vault exit down 1 step.
@@ -1490,7 +1490,7 @@ CrawlVaultTestResult TestLaraCrawlVault(ItemInfo* item, CollisionInfo* coll)
 	{
 		if (TrInput & IN_CROUCH && TestLaraCrawlDownStep(item, coll).Success)
 			crawlVaultResult.TargetState = LS_CRAWL_STEP_DOWN;
-		else [[likely]]
+		else
 			crawlVaultResult.TargetState = LS_CRAWL_EXIT_STEP_DOWN;
 
 		crawlVaultResult.Success = HasStateDispatch(item, crawlVaultResult.TargetState);
@@ -1503,7 +1503,7 @@ CrawlVaultTestResult TestLaraCrawlVault(ItemInfo* item, CollisionInfo* coll)
 	{
 		if (TrInput & IN_WALK)
 			crawlVaultResult.TargetState = LS_CRAWL_EXIT_FLIP;
-		else [[likely]]
+		else
 			crawlVaultResult.TargetState = LS_CRAWL_EXIT_JUMP;
 
 		crawlVaultResult.Success = HasStateDispatch(item, crawlVaultResult.TargetState);

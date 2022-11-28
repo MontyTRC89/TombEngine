@@ -2,9 +2,9 @@
 #include "Math/Math.h"
 #include "Math/Math.h"
 
+class FloorInfo;
 struct ItemInfo;
 struct CollisionInfo;
-class FloorInfo;
 struct ROOM_INFO;
 struct MESH_INFO;
 enum RoomEnvFlags;

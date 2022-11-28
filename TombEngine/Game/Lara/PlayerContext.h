@@ -79,11 +79,19 @@ namespace TEN::Entities::Player::Context
 	Context::Vault GetVaultUp2Steps(ItemInfo* item, CollisionInfo* coll);
 
 	// Crawl vault contexts
+
 	// Water climb out contexts
+	Context::WaterClimbOut GetWaterClimbOutDownStep(ItemInfo* item, CollisionInfo* coll);
+	Context::WaterClimbOut GetWaterClimbOutDownStepToCrouch(ItemInfo* item, CollisionInfo* coll);
+	Context::WaterClimbOut GetWaterClimbOutFlatStep(ItemInfo* item, CollisionInfo* coll);
+	Context::WaterClimbOut GetWaterClimbOutFlatStepToCrouch(ItemInfo* item, CollisionInfo* coll);
+	Context::WaterClimbOut GetWaterClimbOutUpStep(ItemInfo* item, CollisionInfo* coll);
+	Context::WaterClimbOut GetWaterClimbOutUpStepToCrouch(ItemInfo* item, CollisionInfo* coll);
+	Context::WaterClimbOut GetWaterClimbOut(ItemInfo* item, CollisionInfo* coll);
 
 	// -------------------------------------------------------------------------------------------------
 	
-	// Context helpers
+	// Context assessment helpers
 	bool TestSidestep(ItemInfo* item, CollisionInfo* coll, bool isGoingRight);
 	bool TestMonkeyShimmy(ItemInfo* item, CollisionInfo* coll, bool isGoingRight);
 	bool TestDirectionalStandingJump(ItemInfo* item, CollisionInfo* coll, short relHeadingAngle);
@@ -95,5 +103,8 @@ namespace TEN::Entities::Player::Context
 	bool TestJumpSetup(ItemInfo* item, CollisionInfo* coll, const Context::JumpSetup& contextSetup);
 
 	// Context getters
-	Context::Vault GetVault(ItemInfo* item, CollisionInfo* coll, const Context::VaultSetup& contextSetup);
+	// NOTE: These are used by higher-level functions to partially fill specialized context structs.
+	// TODO: Make these into classes?
+	Context::Vault		   GetVaultBase(ItemInfo* item, CollisionInfo* coll, const Context::VaultSetup& contextSetup);
+	Context::WaterClimbOut GetWaterClimbOutBase(ItemInfo* item, CollisionInfo* coll, Context::WaterClimbOutSetup contextSetup);
 }
