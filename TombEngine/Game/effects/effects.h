@@ -48,8 +48,6 @@ enum class FlameType
 	GreenPulse,
 	SmallFast,
 	Trail,
-	ColorTrail,
-	Color
 };
 
 struct FX_INFO

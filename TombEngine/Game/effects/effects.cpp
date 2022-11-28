@@ -1283,30 +1283,61 @@ void TriggerFireFlame(int x, int y, int z, FlameType type, const Vector3& color1
 
 	spark->on = true;
 
+	int colorsR = std::clamp(int(color1.x * UCHAR_MAX), 0, UCHAR_MAX);
+	int colorsG = std::clamp(int(color1.y * UCHAR_MAX), 0, UCHAR_MAX);
+	int colorsB = std::clamp(int(color1.z * UCHAR_MAX), 0, UCHAR_MAX);
+
+	int colordR = std::clamp(int(color2.x * UCHAR_MAX), 0, UCHAR_MAX);
+	int colordG = std::clamp(int(color2.y * UCHAR_MAX), 0, UCHAR_MAX);
+	int colordB = std::clamp(int(color2.z * UCHAR_MAX), 0, UCHAR_MAX);
+
+
 	if (type == FlameType::Small)
 	{
-		spark->sR = spark->sG = (GetRandomControl() & 0x1F) + 48;
-		spark->sB = (GetRandomControl() & 0x3F) - 64;
+		if (color1 != Vector3(1.0f, 0.2f, 0.2f) && color2 != Vector3(1.0f, 0.8f, 0.1f))
+		{
+			spark->sR = colorsR;
+			spark->sG = colorsG;
+			spark->sB = colorsB;
+		}
+		else
+		{
+			spark->sR = spark->sG = (GetRandomControl() & 0x1F) + 48;
+			spark->sB = (GetRandomControl() & 0x3F) - 64;
+		}
 	}
 	else
 	{
 		if (type == FlameType::SmallFast)
 		{
-			spark->sR = 48;
-			spark->sG = 48;
-			spark->sB = (GetRandomControl() & 0x1F) + 128;
+			if (color1 != Vector3(1.0f, 0.2f, 0.2f) && color2 != Vector3(1.0f, 0.8f, 0.1f))
+			{
+				spark->sR = colorsR;
+				spark->sG = colorsG;
+				spark->sB = colorsB;
 
-			spark->dR = 32;
-			spark->dG = (GetRandomControl() & 0x3F) - 64;
-			spark->dB = (GetRandomControl() & 0x3F) + 64;
+				spark->dR = colordR;
+				spark->dG = colordG;
+				spark->dB = colordB;
+			}
+			else
+			{
+				spark->sR = 48;
+				spark->sG = 48;
+				spark->sB = (GetRandomControl() & 0x1F) + 128;
+
+				spark->dR = 32;
+				spark->dG = (GetRandomControl() & 0x3F) - 64;
+				spark->dB = (GetRandomControl() & 0x3F) + 64;
+			}
 		}
 		else
 		{
-			if (type == FlameType::Color || type == FlameType::ColorTrail)
+			if (color1 != Vector3(1.0f, 0.2f, 0.2f) && color2 != Vector3(1.0f, 0.8f, 0.1f))
 			{
-				spark->sR = color1.x;
-				spark->sG = color1.y;
-				spark->sB = color1.z;
+				spark->sR = colorsR;
+				spark->sG = colorsG;
+				spark->sB = colorsB;
 			}
 			else
 			{
@@ -1319,11 +1350,11 @@ void TriggerFireFlame(int x, int y, int z, FlameType type, const Vector3& color1
 
 	if (type != FlameType::StaticFlicker)
 	{
-		if (type == FlameType::Color || type == FlameType:: ColorTrail)
+		if (color1 != Vector3(1.0f, 0.2f, 0.2f) && color2 != Vector3(1.0f, 0.8f, 0.1f))
 		{
-			spark->dR = color2.x;
-			spark->dG = color2.y;
-			spark->dB = color2.z;
+			spark->dR = colordR;
+			spark->dG = colordG;
+			spark->dB = colordB;
 		}
 		else
 		{
@@ -1350,7 +1381,7 @@ void TriggerFireFlame(int x, int y, int z, FlameType type, const Vector3& color1
 
 	spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
 
-	if (type != FlameType::Big && type != FlameType::Medium && type != FlameType::Color)
+	if (type != FlameType::Big && type != FlameType::Medium)
 	{
 		if (type < FlameType::SmallFast)
 		{
@@ -1385,7 +1416,7 @@ void TriggerFireFlame(int x, int y, int z, FlameType type, const Vector3& color1
 		spark->yVel = -16 - (GetRandomControl() & 0xF);
 		spark->zVel = (GetRandomControl() & 0xFF) - 128;
 
-		if (type == FlameType::Medium || type == FlameType::Color)
+		if (type == FlameType::Medium)
 			spark->friction = 51;
 		else
 			spark->friction = 5;
@@ -1415,7 +1446,7 @@ void TriggerFireFlame(int x, int y, int z, FlameType type, const Vector3& color1
 
 	if (type != FlameType::Big)
 	{
-		if (type == FlameType::Medium || type == FlameType::Color)
+		if (type == FlameType::Medium)
 			spark->sSize = spark->size = (GetRandomControl() & 0x1F) + 64;
 		else if (type < FlameType::SmallFast)
 		{
@@ -1585,17 +1616,18 @@ void ProcessEffects(ItemInfo* item)
 		{
 		case EffectType::Fire:
 			if (TestProbability(1 / 8.0f))
-				TriggerFireFlame(pos.x, pos.y, pos.z, TestProbability(1 / 10.0f) ? FlameType::Trail : FlameType::Medium);
+				TriggerFireFlame(pos.x, pos.y, pos.z, TestProbability(1 / 10.0f) ? FlameType::Trail : FlameType::Medium, Vector3(1.0f, 0.2f, 0.2f), Vector3(1.0f, 0.8f, 0.1f));
 			break;
 
 		case EffectType::ColoredFire:
 			if (TestProbability(1 / 8.0f))
-				TriggerFireFlame(pos.x, pos.y, pos.z, TestProbability(1 / 10.0f) ? FlameType::ColorTrail : FlameType::Color, item->Effect.EffectColor1, item->Effect.EffectColor2);
+				
+				TriggerFireFlame(pos.x, pos.y, pos.z, TestProbability(1 / 10.0f) ? FlameType::Trail : FlameType::Medium, item->Effect.EffectColor1, item->Effect.EffectColor2);
 			break;
 
 		case EffectType::MagicFire:
 			if (TestProbability(1 / 8.0f))
-				TriggerFireFlame(pos.x, pos.y, pos.z, TestProbability(1 / 10.0f) ? FlameType::ColorTrail : FlameType::Color, item->Effect.EffectColor1, item->Effect.EffectColor2);
+				TriggerFireFlame(pos.x, pos.y, pos.z, TestProbability(1 / 10.0f) ? FlameType::Trail : FlameType::Medium, item->Effect.EffectColor1, item->Effect.EffectColor2);
 			break;
 
 		case EffectType::Sparks:
@@ -1611,12 +1643,12 @@ void ProcessEffects(ItemInfo* item)
 				TriggerElectricSpark(&GameVector(pos.x, pos.y, pos.z, item->RoomNumber),
 					EulerAngles(0, Random::GenerateAngle(ANGLE(0), ANGLE(359)), 0), 2);
 			if (TestProbability(1 / 1.0f))
-				TriggerFireFlame(pos.x, pos.y, pos.z, TestProbability(1 / 10.0f) ? FlameType::Color : FlameType::Color, Vector3(40, 120, 255), Vector3(53, 215, 255));
+				TriggerFireFlame(pos.x, pos.y, pos.z, TestProbability(1 / 10.0f) ? FlameType::Medium : FlameType::Medium, Vector3(0.2f, 0.5f, 1.0f), Vector3(0.2f, 0.8f, 1.0f));
 			break;
 
 		case EffectType::LaserDeath:
 			if (TestProbability(1 / 1.0f))
-				TriggerFireFlame(pos.x, pos.y, pos.z, TestProbability(1 / 10.0f) ? FlameType::Color : FlameType::Color, Vector3(255, 130, 40), Vector3(160, 30, 0));
+				TriggerFireFlame(pos.x, pos.y, pos.z, TestProbability(1 / 10.0f) ? FlameType::Medium : FlameType::Medium, Vector3(1.0f, 0.5f, 0.2f), Vector3(0.6f, 0.1f, 0.0f));
 			break;
 
 		case EffectType::Smoke:
@@ -1633,9 +1665,9 @@ void ProcessEffects(ItemInfo* item)
 
 		auto pos = GetJointPosition(item, 0);
 		TriggerDynamicLight(pos.x, pos.y, pos.z, falloff,
-			std::clamp(Random::GenerateInt(-32, 32) + int(item->Effect.LightColor.x), 0, UCHAR_MAX),
-			std::clamp(Random::GenerateInt(-32, 32) + int(item->Effect.LightColor.y), 0, UCHAR_MAX),
-			std::clamp(Random::GenerateInt(-32, 32) + int(item->Effect.LightColor.z), 0, UCHAR_MAX));
+			std::clamp(Random::GenerateInt(-32, 32) + int(item->Effect.LightColor.x * UCHAR_MAX), 0, UCHAR_MAX),
+			std::clamp(Random::GenerateInt(-32, 32) + int(item->Effect.LightColor.y * UCHAR_MAX), 0, UCHAR_MAX),
+			std::clamp(Random::GenerateInt(-32, 32) + int(item->Effect.LightColor.z * UCHAR_MAX), 0, UCHAR_MAX));
 	}
 
 	switch (item->Effect.Type)

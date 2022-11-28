@@ -21,16 +21,17 @@ namespace TEN::Effects::Items
 		item->Effect.Type = EffectType::Fire;
 		item->Effect.Count = timeout;
 		item->Effect.LightColor = Vector3(250, 176, 0);
-		item->Effect.EffectColor1 = Vector3(255, 48, 48);
-		item->Effect.EffectColor2 = Vector3(255, 216, 32);
+		item->Effect.EffectColor1 = Vector3(1.0f, 0.2f, 0.2f);
+		item->Effect.EffectColor2 = Vector3(1.0f, 0.8f, 0.1f);
 	}
 
 	void ItemColorBurn(ItemInfo* item, const ScriptColor& color1, const ScriptColor& color2, int timeout)
 	{
+
 		item->Effect.Type = EffectType::ColoredFire;
-		Vector3 col1 = Vector3(color1.GetR(), color1.GetG(), color1.GetB());
-		Vector3 col2 = Vector3(color2.GetR(), color2.GetG(), color2.GetB());
 		item->Effect.Count = timeout;
+		Vector3 col1 = Vector3(color1.GetR() * (1.f / 255.f), color1.GetG() * (1.f / 255.f), color1.GetB() * (1.f / 255.f));
+		Vector3 col2 = Vector3(color2.GetR() * (1.f / 255.f), color2.GetG() * (1.f / 255.f), color2.GetB() * (1.f / 255.f));
 		item->Effect.LightColor = col1;
 		item->Effect.EffectColor1 = col1;
 		item->Effect.EffectColor2 = col2;
@@ -39,8 +40,8 @@ namespace TEN::Effects::Items
 	void ItemMagicBurn(ItemInfo* item, const ScriptColor& color1, const ScriptColor& color2, int timeout)
 	{
 		item->Effect.Type = EffectType::MagicFire;
-		Vector3 col1 = Vector3(color1.GetR(), color1.GetG(), color1.GetB());
-		Vector3 col2 = Vector3(color2.GetR(), color2.GetG(), color2.GetB());
+		Vector3 col1 = Vector3(color1.GetR() * (1.f / 255.f), color1.GetG() * (1.f / 255.f), color1.GetB() * (1.f / 255.f));
+		Vector3 col2 = Vector3(color2.GetR() * (1.f / 255.f), color2.GetG() * (1.f / 255.f), color2.GetB() * (1.f / 255.f));
 		item->Effect.Count = timeout;
 		item->Effect.LightColor = col1;
 		item->Effect.EffectColor1 = col1;
