@@ -49,7 +49,8 @@ constexpr auto PROJECTILE_HIT_RADIUS	 = CLICK(0.5f);
 constexpr auto PROJECTILE_EXPLODE_RADIUS = BLOCK(1);
 
 constexpr auto HK_BURST_MODE_SHOT_COUNT	   = 5;
-constexpr auto HK_BURST_MODE_SHOT_INTERVAL = 12.0f;
+constexpr auto HK_BURST_AND_SNIPER_MODE_SHOT_INTERVAL = 12.0f;
+constexpr auto HK_RAPID_MODE_SHOT_INTERVAL = 3.0f;
 
 constexpr auto SHOTGUN_PELLET_COUNT = 6;
 constexpr auto SHOTGUN_NORMAL_PELLET_SCATTER = 10.0f;
@@ -1035,7 +1036,7 @@ void FireHK(ItemInfo* laraItem, int mode)
 
 	if (weapon.WeaponMode == LaraWeaponTypeCarried::WTYPE_AMMO_3)
 	{
-		lara->Control.Weapon.Interval = HK_BURST_MODE_SHOT_INTERVAL;
+		lara->Control.Weapon.Interval = HK_BURST_AND_SNIPER_MODE_SHOT_INTERVAL;
 	}
 	else if (weapon.WeaponMode == LaraWeaponTypeCarried::WTYPE_AMMO_2)
 	{
@@ -1043,7 +1044,7 @@ void FireHK(ItemInfo* laraItem, int mode)
 		if (lara->Control.Weapon.NumShotsFired == HK_BURST_MODE_SHOT_COUNT)
 		{
 			lara->Control.Weapon.NumShotsFired = 0;
-			lara->Control.Weapon.Interval = HK_BURST_MODE_SHOT_INTERVAL;
+			lara->Control.Weapon.Interval = HK_BURST_AND_SNIPER_MODE_SHOT_INTERVAL;
 		}
 	}
 
@@ -1112,7 +1113,7 @@ void LasersightWeaponHandler(ItemInfo* item, LaraWeaponType weaponType)
 			isFiring = true;
 
 			if (!ammo.HasInfinite())
-				(ammo)--;
+				ammo--;
 
 			Camera.bounce = -16 - (GetRandomControl() & 0x1F);
 		}
@@ -1121,64 +1122,48 @@ void LasersightWeaponHandler(ItemInfo* item, LaraWeaponType weaponType)
 			lara.Control.Weapon.Interval = 32.0f;
 			isFiring = true;
 		}
-		else
+		else if (lara.Control.Weapon.GunType == LaraWeaponType::HK)
 		{
-			if (lara.Control.Weapon.GunType == LaraWeaponType::HK &&
-				weapon.WeaponMode == LaraWeaponTypeCarried::WTYPE_AMMO_3 &&
-				weapon.SelectedAmmo == WeaponAmmoType::Ammo1)
-			{
-				lara.Control.Weapon.Interval = HK_BURST_MODE_SHOT_INTERVAL;
-				isFiring = true;
+			bool playSound = false;
 
-				SoundEffect(SFX_TR4_EXPLOSION1, nullptr, SoundEnvironment::Land, 1.0f, 0.4f);
-				SoundEffect(SFX_TR4_HK_FIRE, nullptr);
-				Camera.bounce = -16 - (GetRandomControl() & 0x1F);
+			if (weapon.WeaponMode == LaraWeaponTypeCarried::WTYPE_AMMO_3)
+			{
+				lara.Control.Weapon.Interval = HK_BURST_AND_SNIPER_MODE_SHOT_INTERVAL;
+				playSound = isFiring = true;
 			}
-			else if (lara.Control.Weapon.GunType == LaraWeaponType::HK &&
-				weapon.WeaponMode == LaraWeaponTypeCarried::WTYPE_AMMO_2 &&
-				weapon.SelectedAmmo == WeaponAmmoType::Ammo1)
+			else if (weapon.WeaponMode == LaraWeaponTypeCarried::WTYPE_AMMO_2)
 			{
 				if (!lara.Control.Weapon.Timer)
 				{
 					if (++lara.Control.Weapon.NumShotsFired == HK_BURST_MODE_SHOT_COUNT)
 					{
 						lara.Control.Weapon.NumShotsFired = 0;
-						lara.Control.Weapon.Interval = HK_BURST_MODE_SHOT_INTERVAL;
+						lara.Control.Weapon.Interval = HK_BURST_AND_SNIPER_MODE_SHOT_INTERVAL;
 					}
 
-					lara.Control.Weapon.Timer = 4.0f;
+					lara.Control.Weapon.Timer = HK_RAPID_MODE_SHOT_INTERVAL;
 					isFiring = true;
-
-					SoundEffect(SFX_TR4_EXPLOSION1, nullptr, SoundEnvironment::Land, 1.0f, 0.4f);
-					SoundEffect(SFX_TR4_HK_FIRE, nullptr);
-					Camera.bounce = -16 - (GetRandomControl() & 0x1F);
 				}
-				else
-				{
-					SoundEffect(SFX_TR4_EXPLOSION1, nullptr, SoundEnvironment::Land, 1.0f, 0.4f);
-					SoundEffect(SFX_TR4_HK_FIRE, nullptr);
-					Camera.bounce = -16 - (GetRandomControl() & 0x1F);
-				}
+				playSound = true;
 			}
 			else
 			{
-				if (lara.Control.Weapon.Timer)
+				if (!lara.Control.Weapon.Timer)
 				{
-					SoundEffect(SFX_TR4_EXPLOSION1, nullptr, SoundEnvironment::Land, 1.0f, 0.4f);
-					SoundEffect(SFX_TR4_HK_FIRE, nullptr);
-				}
-				else
-				{
-					lara.Control.Weapon.Timer = 4.0f;
+					lara.Control.Weapon.Timer = HK_RAPID_MODE_SHOT_INTERVAL;
 					isFiring = true;
-
-					SoundEffect(SFX_TR4_EXPLOSION1, nullptr, SoundEnvironment::Land, 1.0f, 0.4f);
-					SoundEffect(SFX_TR4_HK_FIRE, nullptr);
-					Camera.bounce = -16 - (GetRandomControl() & 0x1F);
 				}
+				playSound = true;
 			}
 
-			if (!ammo.HasInfinite())
+			if (playSound)
+			{
+				SoundEffect(SFX_TR4_EXPLOSION1, nullptr, SoundEnvironment::Land, 1.0f, 0.4f);
+				SoundEffect(SFX_TR4_HK_FIRE, nullptr);
+				Camera.bounce = -16 - (GetRandomControl() & 0x1F);
+			}
+
+			if (!ammo.HasInfinite() && isFiring)
 				ammo--;
 		}
 	}

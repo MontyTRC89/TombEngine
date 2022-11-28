@@ -121,10 +121,14 @@ GameStatus ControlPhase(int numFrames, bool demoMode)
 
 		// Poll keyboard and update input variables.
 		if (CurrentLevel != 0)
-			UpdateInputActions(LaraItem);
-
-		// Has Lara control been disabled?
-		if (Lara.Control.Locked || CurrentLevel == 0)
+		{
+			if (Lara.Control.Locked)
+				ClearAllActions();
+			else
+				// TODO: To allow cutscene skipping later, don't clear Deselect action.
+				UpdateInputActions(LaraItem); 
+		}
+		else
 			ClearAction(In::Look);
 
 		// This might not be the exact amount of time that has passed, but giving it a
