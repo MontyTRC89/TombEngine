@@ -133,8 +133,8 @@ namespace TEN::Effects::Blood
 		auto box = BoundingOrientedBox(pos, Vector3::One * BLOCK(1 / 16.0f), Vector4::Zero);
 
 		mist = BloodMist();
-		mist.IsActive = true;
 		mist.SpriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_BLOOD;
+		mist.IsActive = true;
 		mist.Position = Random::GenerateVector3InBox(box);
 		mist.RoomNumber = roomNumber;
 		mist.Orientation2D = Random::GenerateAngle();
@@ -179,8 +179,8 @@ namespace TEN::Effects::Blood
 		auto& drip = GetFreeBloodDrip();
 
 		drip = BloodDrip();
-		drip.IsActive = true;
 		drip.SpriteIndex = Objects[ID_BLOOD_STAIN_SPRITES].meshIndex + Random::GenerateInt(0, BLOOD_STAIN_NUM_SPRITES);
+		drip.IsActive = true;
 		drip.Position = pos;
 		drip.RoomNumber = roomNumber;
 		drip.Velocity = velocity;

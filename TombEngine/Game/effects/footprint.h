@@ -13,8 +13,8 @@ namespace TEN::Effects::Footprint
 
 	struct Footprint 
 	{
-		bool		 IsRightFoot = false;
 		unsigned int SpriteIndex = 0;
+		bool		 IsRightFoot = false;
 
 		std::array<Vector3, 4> VertexPoints = {};
 

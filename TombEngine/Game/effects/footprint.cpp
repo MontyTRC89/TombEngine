@@ -221,8 +221,8 @@ namespace TEN::Effects::Footprint
 	{
 		auto footprint = Footprint();
 
-		footprint.IsRightFoot = isRightFoot;
 		footprint.SpriteIndex = Objects[ID_MISC_SPRITES].meshIndex + 1 + (int)footprint.IsRightFoot;
+		footprint.IsRightFoot = isRightFoot;
 		footprint.VertexPoints = vertexPoints;
 		footprint.Life = std::round(FOOTPRINT_LIFE_MAX * FPS);
 		footprint.LifeStartFading = std::round(FOOTPRINT_LIFE_START_FADING * FPS);
