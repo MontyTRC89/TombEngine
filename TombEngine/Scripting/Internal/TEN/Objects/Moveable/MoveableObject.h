@@ -80,6 +80,7 @@ public:
 	[[nodiscard]] EffectType GetEffect() const;
 	void SetEffect(EffectType effectType, sol::optional<float> timeout);
 	void SetCustomEffect(EffectType effectType, const ScriptColor& col1, const ScriptColor& col2, sol::optional<float> timeout);
+	
 	[[nodiscard]] aiBitsType GetAIBits() const;
 	void SetAIBits(aiBitsType const & bits);
 

@@ -172,17 +172,17 @@ void Moveable::Register(sol::table & parent)
 // @tparam float timeout time (in seconds) after which effect turns off (optional).
 	ScriptReserved_SetEffect, &Moveable::SetEffect,
 
-/// Get current moveable effect
-// @function Moveable:GetEffect
-// @treturn EffectID effect type currently assigned to moveable.
-	ScriptReserved_GetEffect, &Moveable::GetEffect,
-
 /// Set extended effect to moveable
 // @function Moveable:SetCustomEffect
 // @tparam EffectID effect Type of effect to assign.
 // @tparam Color1 color the first color of the effect, Color2 color the second color of the effect
 // @tparam float timeout time (in seconds) after which effect turns off (optional).
 	ScriptReserved_SetCustomEffect, &Moveable::SetCustomEffect,
+
+/// Get current moveable effect
+// @function Moveable:GetEffect
+// @treturn EffectID effect type currently assigned to moveable.
+	ScriptReserved_GetEffect, &Moveable::GetEffect,
 
 /// Get the status of object.
 // possible values:

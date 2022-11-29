@@ -17,6 +17,10 @@ The following constants are inside EffectID.
 	FIRE
 	SPARKS
 	SMOKE
+	MAGICFIRE
+	COLOREDFIRE
+	ELECTRICDEATH
+	LASERDEATH
 
 @section Misc.EffectID
 */
