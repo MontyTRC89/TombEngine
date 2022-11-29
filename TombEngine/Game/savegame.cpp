@@ -1140,7 +1140,7 @@ bool SaveGame::Save(int slot)
 	sgb.add_room_items(roomItemsOffset);
 	sgb.add_flip_effect(FlipEffect);
 	sgb.add_flip_status(FlipStatus);
-	sgb.add_flip_timer(0);
+	sgb.add_current_fov(LastFOV);
 	sgb.add_static_meshes(staticMeshesOffset);
 	sgb.add_volume_states(volumeStatesOffset);
 	sgb.add_fixed_cameras(camerasOffset);
@@ -1228,7 +1228,9 @@ bool SaveGame::Load(int slot)
 	// Effects
 	FlipEffect = s->flip_effect();
 	FlipStatus = s->flip_status();
-	//FlipTimer = s->flip_timer();
+
+	// Restore camera FOV
+	AlterFOV(s->current_fov());
 
 	// Restore soundtracks
 	PlaySoundTrack(s->ambient_track()->str(), SoundTrackType::BGM, s->ambient_position());
