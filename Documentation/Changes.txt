@@ -3,6 +3,7 @@ Version 1.0.4
 
 * Add generic assignable effects for moveables - burn, electricity and smoke.
 * Add ability to burn enemies with FLAME_EMITTER_1 and death blocks.
+* Remove TRC remnant which added HK to inventory if pistols weren't available.
 * Automatically align pickups to floor surface.
 * Fix legacy pickup triggers not working in certain cases.
 * Fix crawl pickup not actually doing any pickups.
