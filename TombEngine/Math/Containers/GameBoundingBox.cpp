@@ -89,8 +89,7 @@
 		return GameBoundingBox(
 			X1 + bounds.X1, X2 + bounds.X2,
 			Y1 + bounds.Y1, Y2 + bounds.Y2,
-			Z1 + bounds.Z1, Z2 + bounds.Z2
-		);
+			Z1 + bounds.Z1, Z2 + bounds.Z2);
 	}
 
 	GameBoundingBox GameBoundingBox::operator +(const Pose& pose) const
@@ -98,8 +97,7 @@
 		return GameBoundingBox(
 			X1 + pose.Position.x, X2 + pose.Position.x,
 			Y1 + pose.Position.y, Y2 + pose.Position.y,
-			Z1 + pose.Position.z, Z2 + pose.Position.z
-		);
+			Z1 + pose.Position.z, Z2 + pose.Position.z);
 	}
 
 	GameBoundingBox GameBoundingBox::operator -(const GameBoundingBox& bounds) const
@@ -107,8 +105,7 @@
 		return GameBoundingBox(
 			X1 - bounds.X1, X2 - bounds.X2,
 			Y1 - bounds.Y1, Y2 - bounds.Y2,
-			Z1 - bounds.Z1, Z2 - bounds.Z2
-		);
+			Z1 - bounds.Z1, Z2 - bounds.Z2);
 	}
 
 	GameBoundingBox GameBoundingBox::operator -(const Pose& pose) const
@@ -116,8 +113,7 @@
 		return GameBoundingBox(
 			X1 - pose.Position.x, X2 - pose.Position.x,
 			Y1 - pose.Position.y, Y2 - pose.Position.y,
-			Z1 - pose.Position.z, Z2 - pose.Position.z
-		);
+			Z1 - pose.Position.z, Z2 - pose.Position.z);
 	}
 
 	GameBoundingBox GameBoundingBox::operator *(float scale) const
@@ -125,7 +121,6 @@
 		return GameBoundingBox(
 			X1 * scale, X2 * scale,
 			Y1 * scale, Y2 * scale,
-			Z1 * scale, Z2 * scale
-		);
+			Z1 * scale, Z2 * scale);
 	}
 //}

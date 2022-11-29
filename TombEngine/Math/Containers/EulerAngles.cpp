@@ -9,238 +9,236 @@ using namespace TEN::Math;
 
 //namespace TEN::Math
 //{
-const EulerAngles EulerAngles::Zero = EulerAngles(0, 0, 0);
+	const EulerAngles EulerAngles::Zero = EulerAngles(0, 0, 0);
 
-EulerAngles::EulerAngles()
-{
-}
-
-EulerAngles::EulerAngles(short x, short y, short z)
-{
-	this->x = x;
-	this->y = y;
-	this->z = z;
-}
-
-EulerAngles::EulerAngles(const Vector3& direction)
-{
-	auto directionNorm = direction;
-	directionNorm.Normalize();
-
-	this->x = FROM_RAD(-asin(directionNorm.y));
-	this->y = FROM_RAD(atan2(directionNorm.x, directionNorm.z));
-	this->z = 0;
-}
-
-// TODO: Check.
-EulerAngles::EulerAngles(const Quaternion& quat)
-{
-	// X axis
-	float sinX = ((quat.w * quat.y) - (quat.z * quat.x)) * 2;
-	// Use 90 degrees if out of range.
-	if (std::abs(sinX) >= 1)
-		this->x = FROM_RAD(std::copysign(PI_DIV_2, sinX));
-	else
-		this->x = FROM_RAD(asin(sinX));
-
-	// Y axis
-	float sinYCosX = ((quat.w * quat.z) + (quat.x * quat.y)) * 2;
-	float cosYCosX = 1 - (((quat.y * quat.y) * 2) + (quat.z * quat.z));
-	this->y = FROM_RAD(atan2(sinYCosX, cosYCosX));
-
-	// Z axis
-	float sinZCosX = ((quat.w * quat.x) + (quat.y * quat.z)) * 2;
-	float cosZCosX = 1 - (((quat.x * quat.x) * 2) + (quat.y * quat.y));
-	this->z = FROM_RAD(atan2(sinZCosX, cosZCosX));
-}
-
-// TODO: Check.
-EulerAngles::EulerAngles(const Matrix& rotMatrix)
-{
-	this->x = FROM_RAD(asin(rotMatrix._31));
-	this->y = FROM_RAD(-atan2(rotMatrix._21, rotMatrix._11));
-	this->z = FROM_RAD(atan2(rotMatrix._32, rotMatrix._33));
-}
-
-bool EulerAngles::Compare(const EulerAngles& eulers0, const EulerAngles& eulers1, short epsilon)
-{
-	if (Compare(eulers0.x, eulers1.x, epsilon) &&
-		Compare(eulers0.y, eulers1.y, epsilon) &&
-		Compare(eulers0.z, eulers1.z, epsilon))
+	EulerAngles::EulerAngles()
 	{
-		return true;
 	}
 
-	return false;
-}
+	EulerAngles::EulerAngles(short x, short y, short z)
+	{
+		this->x = x;
+		this->y = y;
+		this->z = z;
+	}
 
-void EulerAngles::InterpolateConstant(const EulerAngles& eulersTo, short angularVel)
-{
-	*this = InterpolateConstant(*this, eulersTo, angularVel);
-}
+	EulerAngles::EulerAngles(const Vector3& direction)
+	{
+		auto directionNorm = direction;
+		directionNorm.Normalize();
 
-EulerAngles EulerAngles::InterpolateConstant(const EulerAngles& eulersFrom, const EulerAngles& eulerTo, short angularVel)
-{
-	return EulerAngles(
-		InterpolateConstant(eulersFrom.x, eulerTo.x, angularVel),
-		InterpolateConstant(eulersFrom.y, eulerTo.y, angularVel),
-		InterpolateConstant(eulersFrom.z, eulerTo.z, angularVel)
-	);
-}
+		this->x = FROM_RAD(-asin(directionNorm.y));
+		this->y = FROM_RAD(atan2(directionNorm.x, directionNorm.z));
+		this->z = 0;
+	}
 
-void EulerAngles::Lerp(const EulerAngles& eulersTo, float alpha, short epsilon)
-{
-	*this = Lerp(*this, eulersTo, alpha, epsilon);
-}
+	// TODO: Check.
+	EulerAngles::EulerAngles(const Quaternion& quat)
+	{
+		// X axis
+		float sinX = ((quat.w * quat.y) - (quat.z * quat.x)) * 2;
+		// Use 90 degrees if out of range.
+		if (std::abs(sinX) >= 1)
+			this->x = FROM_RAD(std::copysign(PI_DIV_2, sinX));
+		else
+			this->x = FROM_RAD(asin(sinX));
 
-EulerAngles EulerAngles::Lerp(const EulerAngles& eulersFrom, const EulerAngles& eulersTo, float alpha, short epsilon)
-{
-	return EulerAngles(
-		Lerp(eulersFrom.x, eulersTo.x, alpha, epsilon),
-		Lerp(eulersFrom.y, eulersTo.y, alpha, epsilon),
-		Lerp(eulersFrom.z, eulersTo.z, alpha, epsilon)
-	);
-}
+		// Y axis
+		float sinYCosX = ((quat.w * quat.z) + (quat.x * quat.y)) * 2;
+		float cosYCosX = 1 - (((quat.y * quat.y) * 2) + (quat.z * quat.z));
+		this->y = FROM_RAD(atan2(sinYCosX, cosYCosX));
 
-Vector3 EulerAngles::ToDirection() const
-{
-	float sinX = sin(TO_RAD(x));
-	float cosX = cos(TO_RAD(x));
-	float sinY = sin(TO_RAD(y));
-	float cosY = cos(TO_RAD(y));
+		// Z axis
+		float sinZCosX = ((quat.w * quat.x) + (quat.y * quat.z)) * 2;
+		float cosZCosX = 1 - (((quat.x * quat.x) * 2) + (quat.y * quat.y));
+		this->z = FROM_RAD(atan2(sinZCosX, cosZCosX));
+	}
 
-	// Return normalized direction vector.
-	return Vector3(
-		sinY * cosX,
-		-sinX,
-		cosY * cosX
-	);
-}
+	// TODO: Check.
+	EulerAngles::EulerAngles(const Matrix& rotMatrix)
+	{
+		this->x = FROM_RAD(asin(rotMatrix._31));
+		this->y = FROM_RAD(-atan2(rotMatrix._21, rotMatrix._11));
+		this->z = FROM_RAD(atan2(rotMatrix._32, rotMatrix._33));
+	}
 
-Quaternion EulerAngles::ToQuaternion() const
-{
-	return Quaternion::CreateFromYawPitchRoll(TO_RAD(y), TO_RAD(x), TO_RAD(z));
-}
+	bool EulerAngles::Compare(const EulerAngles& eulers0, const EulerAngles& eulers1, short epsilon)
+	{
+		if (Compare(eulers0.x, eulers1.x, epsilon) &&
+			Compare(eulers0.y, eulers1.y, epsilon) &&
+			Compare(eulers0.z, eulers1.z, epsilon))
+		{
+			return true;
+		}
 
-Matrix EulerAngles::ToRotationMatrix() const
-{
-	return Matrix::CreateFromYawPitchRoll(TO_RAD(y), TO_RAD(x), TO_RAD(z));
-}
+		return false;
+	}
 
-bool EulerAngles::operator ==(const EulerAngles& eulers) const
-{
-	return ((x == eulers.x) && (y == eulers.y) && (z == eulers.z));
-}
+	void EulerAngles::InterpolateConstant(const EulerAngles& eulersTo, short angularVel)
+	{
+		*this = InterpolateConstant(*this, eulersTo, angularVel);
+	}
 
-bool EulerAngles::operator !=(const EulerAngles& eulers) const
-{
-	return ((x != eulers.x) || (y != eulers.y) || (z != eulers.z));
-}
+	EulerAngles EulerAngles::InterpolateConstant(const EulerAngles& eulersFrom, const EulerAngles& eulerTo, short angularVel)
+	{
+		return EulerAngles(
+			InterpolateConstant(eulersFrom.x, eulerTo.x, angularVel),
+			InterpolateConstant(eulersFrom.y, eulerTo.y, angularVel),
+			InterpolateConstant(eulersFrom.z, eulerTo.z, angularVel));
+	}
 
-EulerAngles& EulerAngles::operator =(const EulerAngles& eulers)
-{
-	this->x = eulers.x;
-	this->y = eulers.y;
-	this->z = eulers.z;
-	return *this;
-}
+	void EulerAngles::Lerp(const EulerAngles& eulersTo, float alpha, short epsilon)
+	{
+		*this = Lerp(*this, eulersTo, alpha, epsilon);
+	}
 
-EulerAngles& EulerAngles::operator +=(const EulerAngles& eulers)
-{
-	this->x += eulers.x;
-	this->y += eulers.y;
-	this->z += eulers.z;
-	return *this;
-}
+	EulerAngles EulerAngles::Lerp(const EulerAngles& eulersFrom, const EulerAngles& eulersTo, float alpha, short epsilon)
+	{
+		return EulerAngles(
+			Lerp(eulersFrom.x, eulersTo.x, alpha, epsilon),
+			Lerp(eulersFrom.y, eulersTo.y, alpha, epsilon),
+			Lerp(eulersFrom.z, eulersTo.z, alpha, epsilon));
+	}
 
-EulerAngles& EulerAngles::operator -=(const EulerAngles& eulers)
-{
-	this->x -= eulers.x;
-	this->y -= eulers.y;
-	this->z -= eulers.z;
-	return *this;
-}
+	Vector3 EulerAngles::ToDirection() const
+	{
+		float sinX = sin(TO_RAD(x));
+		float cosX = cos(TO_RAD(x));
+		float sinY = sin(TO_RAD(y));
+		float cosY = cos(TO_RAD(y));
 
-EulerAngles& EulerAngles::operator *=(const EulerAngles& eulers)
-{
-	this->x *= eulers.x;
-	this->y *= eulers.y;
-	this->z *= eulers.z;
-	return *this;
-}
+		// Return normalized direction vector.
+		return Vector3(
+			sinY * cosX,
+			-sinX,
+			cosY * cosX
+		);
+	}
 
-EulerAngles& EulerAngles::operator *=(float scale)
-{
-	this->x *= scale;
-	this->y *= scale;
-	this->z *= scale;
-	return *this;
-}
+	Quaternion EulerAngles::ToQuaternion() const
+	{
+		return Quaternion::CreateFromYawPitchRoll(TO_RAD(y), TO_RAD(x), TO_RAD(z));
+	}
 
-EulerAngles& EulerAngles::operator /=(float scale)
-{
-	this->x /= scale;
-	this->y /= scale;
-	this->z /= scale;
-	return *this;
-}
+	Matrix EulerAngles::ToRotationMatrix() const
+	{
+		return Matrix::CreateFromYawPitchRoll(TO_RAD(y), TO_RAD(x), TO_RAD(z));
+	}
 
-EulerAngles EulerAngles::operator +(const EulerAngles& eulers) const
-{
-	return EulerAngles(x + eulers.x, y + eulers.y, z + eulers.z);
-}
+	bool EulerAngles::operator ==(const EulerAngles& eulers) const
+	{
+		return ((x == eulers.x) && (y == eulers.y) && (z == eulers.z));
+	}
 
-EulerAngles EulerAngles::operator -(const EulerAngles& eulers) const
-{
-	return EulerAngles(x - eulers.x, y - eulers.y, z - eulers.z);
-}
+	bool EulerAngles::operator !=(const EulerAngles& eulers) const
+	{
+		return ((x != eulers.x) || (y != eulers.y) || (z != eulers.z));
+	}
 
-EulerAngles EulerAngles::operator *(const EulerAngles& eulers) const
-{
-	return EulerAngles(x * eulers.x, y * eulers.y, z * eulers.z);
-}
+	EulerAngles& EulerAngles::operator =(const EulerAngles& eulers)
+	{
+		this->x = eulers.x;
+		this->y = eulers.y;
+		this->z = eulers.z;
+		return *this;
+	}
 
-EulerAngles EulerAngles::operator *(float scale) const
-{
-	return EulerAngles((short)round(x * scale), (short)round(y * scale), (short)round(z * scale));
-}
+	EulerAngles& EulerAngles::operator +=(const EulerAngles& eulers)
+	{
+		this->x += eulers.x;
+		this->y += eulers.y;
+		this->z += eulers.z;
+		return *this;
+	}
 
-EulerAngles EulerAngles::operator /(float scale) const
-{
-	return EulerAngles((short)round(x / scale), (short)round(y / scale), (short)round(z / scale));
-}
+	EulerAngles& EulerAngles::operator -=(const EulerAngles& eulers)
+	{
+		this->x -= eulers.x;
+		this->y -= eulers.y;
+		this->z -= eulers.z;
+		return *this;
+	}
 
-float EulerAngles::ClampAlpha(float alpha)
-{
-	return ((abs(alpha) > 1.0f) ? 1.0f : abs(alpha));
-}
+	EulerAngles& EulerAngles::operator *=(const EulerAngles& eulers)
+	{
+		this->x *= eulers.x;
+		this->y *= eulers.y;
+		this->z *= eulers.z;
+		return *this;
+	}
 
-bool EulerAngles::Compare(short angle0, short angle1, short epsilon)
-{
-	short difference = Geometry::GetShortestAngle(angle0, angle1);
-	if (abs(difference) <= epsilon)
-		return true;
+	EulerAngles& EulerAngles::operator *=(float scale)
+	{
+		this->x *= scale;
+		this->y *= scale;
+		this->z *= scale;
+		return *this;
+	}
 
-	return false;
-}
+	EulerAngles& EulerAngles::operator /=(float scale)
+	{
+		this->x /= scale;
+		this->y /= scale;
+		this->z /= scale;
+		return *this;
+	}
 
-short EulerAngles::Lerp(short angleFrom, short angleTo, float alpha, short epsilon)
-{
-	alpha = ClampAlpha(alpha);
+	EulerAngles EulerAngles::operator +(const EulerAngles& eulers) const
+	{
+		return EulerAngles(x + eulers.x, y + eulers.y, z + eulers.z);
+	}
 
-	if (Compare(angleFrom, angleTo, epsilon))
-		return angleTo;
+	EulerAngles EulerAngles::operator -(const EulerAngles& eulers) const
+	{
+		return EulerAngles(x - eulers.x, y - eulers.y, z - eulers.z);
+	}
 
-	short difference = Geometry::GetShortestAngle(angleFrom, angleTo);
-	return (short)round(angleFrom + (difference * alpha));
-}
+	EulerAngles EulerAngles::operator *(const EulerAngles& eulers) const
+	{
+		return EulerAngles(x * eulers.x, y * eulers.y, z * eulers.z);
+	}
 
-short EulerAngles::InterpolateConstant(short angleFrom, short angleTo, short angularVel)
-{
-	if (Compare(angleFrom, angleTo, angularVel))
-		return angleTo;
+	EulerAngles EulerAngles::operator *(float scale) const
+	{
+		return EulerAngles((short)round(x * scale), (short)round(y * scale), (short)round(z * scale));
+	}
 
-	int sign = copysign(1, Geometry::GetShortestAngle(angleFrom, angleTo));
-	return (angleFrom + (angularVel * sign));
-}
+	EulerAngles EulerAngles::operator /(float scale) const
+	{
+		return EulerAngles((short)round(x / scale), (short)round(y / scale), (short)round(z / scale));
+	}
+
+	float EulerAngles::ClampAlpha(float alpha)
+	{
+		return ((abs(alpha) > 1.0f) ? 1.0f : abs(alpha));
+	}
+
+	bool EulerAngles::Compare(short angle0, short angle1, short epsilon)
+	{
+		short difference = Geometry::GetShortestAngle(angle0, angle1);
+		if (abs(difference) <= epsilon)
+			return true;
+
+		return false;
+	}
+
+	short EulerAngles::Lerp(short angleFrom, short angleTo, float alpha, short epsilon)
+	{
+		alpha = ClampAlpha(alpha);
+
+		if (Compare(angleFrom, angleTo, epsilon))
+			return angleTo;
+
+		short difference = Geometry::GetShortestAngle(angleFrom, angleTo);
+		return (short)round(angleFrom + (difference * alpha));
+	}
+
+	short EulerAngles::InterpolateConstant(short angleFrom, short angleTo, short angularVel)
+	{
+		if (Compare(angleFrom, angleTo, angularVel))
+			return angleTo;
+
+		int sign = copysign(1, Geometry::GetShortestAngle(angleFrom, angleTo));
+		return (angleFrom + (angularVel * sign));
+	}
 //}
