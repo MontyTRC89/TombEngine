@@ -59,7 +59,7 @@ GameVector LookCamPosition;
 GameVector LookCamTarget;
 Vector3i CamOldPos;
 CAMERA_INFO Camera;
-OBJ_CAMERA_INFO ItemCamera;
+ObjectCameraInfo ItemCamera;
 GameVector ForcedFixedCamera;
 int UseForcedFixedCamera;
 
@@ -68,12 +68,9 @@ bool BinocularOn;
 CameraType BinocularOldCamera;
 bool LaserSight;
 
-int LSHKTimer = 0;
-int LSHKShotsFired = 0;
-int WeaponDelay = 0;
-
 int PhdPerspective;
 short CurrentFOV;
+short LastFOV;
 
 int RumbleTimer = 0;
 int RumbleCounter = 0;
@@ -102,10 +99,13 @@ void LookAt(CAMERA_INFO* cam, short roll)
 	g_Renderer.UpdateCameraMatrices(cam, r, fov, levelFarView);
 }
 
-void AlterFOV(int value)
+void AlterFOV(short value, bool store)
 {
+	if (store)
+		LastFOV = value;
+
 	CurrentFOV = value;
-	PhdPerspective = g_Configuration.Width / 2 * phd_cos(CurrentFOV / 2) / phd_sin(CurrentFOV / 2);
+	PhdPerspective = g_Configuration.Width / 2 * phd_cos(value / 2) / phd_sin(value / 2);
 }
 
 short GetCurrentFOV()
@@ -148,7 +148,7 @@ void InitialiseCamera()
 	Camera.number = -1;
 	Camera.fixedCamera = false;
 
-	AlterFOV(ANGLE(80.0f));
+	AlterFOV(ANGLE(DEFAULT_FOV));
 
 	UseForcedFixedCamera = 0;
 	CalculateCamera();
@@ -1193,13 +1193,13 @@ void BinocularCamera(ItemInfo* item)
 			Camera.type = BinocularOldCamera;
 			BinocularOn = false;
 			BinocularRange = 0;
-			AlterFOV(ANGLE(80.0f));
+			AlterFOV(LastFOV);
 			return;
 		}
 	}
 
 	item->MeshBits = NO_JOINT_BITS;
-	AlterFOV(7 * (ANGLE(11.5f) - BinocularRange));
+	AlterFOV(7 * (ANGLE(11.5f) - BinocularRange), false);
 
 	short headXRot = lara->ExtraHeadRot.x * 2;
 	short headYRot = lara->ExtraHeadRot.y;
@@ -2076,7 +2076,7 @@ void HandleOptics(ItemInfo* item)
 	LaserSight = false;
 	Camera.type = BinocularOldCamera;
 	Camera.bounce = 0;
-	AlterFOV(ANGLE(80.0f));
+	AlterFOV(LastFOV);
 
 	LaraItem->MeshBits = ALL_JOINT_BITS;
 	Lara.Inventory.IsBusy = false;

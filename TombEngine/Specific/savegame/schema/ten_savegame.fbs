@@ -470,6 +470,7 @@ table SaveGame {
 	flip_effect: int32;
 	flip_timer: int32;
 	flip_status: int32;
+	current_fov: int16;
 	ambient_track: string;
 	ambient_position: uint64;
 	oneshot_track: string;

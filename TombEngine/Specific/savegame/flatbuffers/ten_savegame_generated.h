@@ -6138,6 +6138,7 @@ struct SaveGameT : public flatbuffers::NativeTable {
   int32_t flip_effect = 0;
   int32_t flip_timer = 0;
   int32_t flip_status = 0;
+  int16_t current_fov = 0;
   std::string ambient_track{};
   uint64_t ambient_position = 0;
   std::string oneshot_track{};
@@ -6183,19 +6184,20 @@ struct SaveGame FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     VT_FLIP_EFFECT = 48,
     VT_FLIP_TIMER = 50,
     VT_FLIP_STATUS = 52,
-    VT_AMBIENT_TRACK = 54,
-    VT_AMBIENT_POSITION = 56,
-    VT_ONESHOT_TRACK = 58,
-    VT_ONESHOT_POSITION = 60,
-    VT_CD_FLAGS = 62,
-    VT_ROPE = 64,
-    VT_PENDULUM = 66,
-    VT_ALTERNATE_PENDULUM = 68,
-    VT_VOLUME_STATES = 70,
-    VT_CALL_COUNTERS = 72,
-    VT_SCRIPT_VARS = 74,
-    VT_CALLBACKS_PRE_CONTROL = 76,
-    VT_CALLBACKS_POST_CONTROL = 78
+    VT_CURRENT_FOV = 54,
+    VT_AMBIENT_TRACK = 56,
+    VT_AMBIENT_POSITION = 58,
+    VT_ONESHOT_TRACK = 60,
+    VT_ONESHOT_POSITION = 62,
+    VT_CD_FLAGS = 64,
+    VT_ROPE = 66,
+    VT_PENDULUM = 68,
+    VT_ALTERNATE_PENDULUM = 70,
+    VT_VOLUME_STATES = 72,
+    VT_CALL_COUNTERS = 74,
+    VT_SCRIPT_VARS = 76,
+    VT_CALLBACKS_PRE_CONTROL = 78,
+    VT_CALLBACKS_POST_CONTROL = 80
   };
   const TEN::Save::SaveGameHeader *header() const {
     return GetPointer<const TEN::Save::SaveGameHeader *>(VT_HEADER);
@@ -6271,6 +6273,9 @@ struct SaveGame FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   }
   int32_t flip_status() const {
     return GetField<int32_t>(VT_FLIP_STATUS, 0);
+  }
+  int16_t current_fov() const {
+    return GetField<int16_t>(VT_CURRENT_FOV, 0);
   }
   const flatbuffers::String *ambient_track() const {
     return GetPointer<const flatbuffers::String *>(VT_AMBIENT_TRACK);
@@ -6367,6 +6372,7 @@ struct SaveGame FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyField<int32_t>(verifier, VT_FLIP_EFFECT) &&
            VerifyField<int32_t>(verifier, VT_FLIP_TIMER) &&
            VerifyField<int32_t>(verifier, VT_FLIP_STATUS) &&
+           VerifyField<int16_t>(verifier, VT_CURRENT_FOV) &&
            VerifyOffset(verifier, VT_AMBIENT_TRACK) &&
            verifier.VerifyString(ambient_track()) &&
            VerifyField<uint64_t>(verifier, VT_AMBIENT_POSITION) &&
@@ -6481,6 +6487,9 @@ struct SaveGameBuilder {
   void add_flip_status(int32_t flip_status) {
     fbb_.AddElement<int32_t>(SaveGame::VT_FLIP_STATUS, flip_status, 0);
   }
+  void add_current_fov(int16_t current_fov) {
+    fbb_.AddElement<int16_t>(SaveGame::VT_CURRENT_FOV, current_fov, 0);
+  }
   void add_ambient_track(flatbuffers::Offset<flatbuffers::String> ambient_track) {
     fbb_.AddOffset(SaveGame::VT_AMBIENT_TRACK, ambient_track);
   }
@@ -6558,6 +6567,7 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGame(
     int32_t flip_effect = 0,
     int32_t flip_timer = 0,
     int32_t flip_status = 0,
+    int16_t current_fov = 0,
     flatbuffers::Offset<flatbuffers::String> ambient_track = 0,
     uint64_t ambient_position = 0,
     flatbuffers::Offset<flatbuffers::String> oneshot_track = 0,
@@ -6610,6 +6620,7 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGame(
   builder_.add_level(level);
   builder_.add_game(game);
   builder_.add_header(header);
+  builder_.add_current_fov(current_fov);
   return builder_.Finish();
 }
 
@@ -6645,6 +6656,7 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGameDirect(
     int32_t flip_effect = 0,
     int32_t flip_timer = 0,
     int32_t flip_status = 0,
+    int16_t current_fov = 0,
     const char *ambient_track = nullptr,
     uint64_t ambient_position = 0,
     const char *oneshot_track = nullptr,
@@ -6706,6 +6718,7 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGameDirect(
       flip_effect,
       flip_timer,
       flip_status,
+      current_fov,
       ambient_track__,
       ambient_position,
       oneshot_track__,
@@ -8520,6 +8533,7 @@ inline void SaveGame::UnPackTo(SaveGameT *_o, const flatbuffers::resolver_functi
   { auto _e = flip_effect(); _o->flip_effect = _e; }
   { auto _e = flip_timer(); _o->flip_timer = _e; }
   { auto _e = flip_status(); _o->flip_status = _e; }
+  { auto _e = current_fov(); _o->current_fov = _e; }
   { auto _e = ambient_track(); if (_e) _o->ambient_track = _e->str(); }
   { auto _e = ambient_position(); _o->ambient_position = _e; }
   { auto _e = oneshot_track(); if (_e) _o->oneshot_track = _e->str(); }
@@ -8568,6 +8582,7 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGame(flatbuffers::FlatBufferBuild
   auto _flip_effect = _o->flip_effect;
   auto _flip_timer = _o->flip_timer;
   auto _flip_status = _o->flip_status;
+  auto _current_fov = _o->current_fov;
   auto _ambient_track = _o->ambient_track.empty() ? _fbb.CreateSharedString("") : _fbb.CreateString(_o->ambient_track);
   auto _ambient_position = _o->ambient_position;
   auto _oneshot_track = _o->oneshot_track.empty() ? _fbb.CreateSharedString("") : _fbb.CreateString(_o->oneshot_track);
@@ -8608,6 +8623,7 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGame(flatbuffers::FlatBufferBuild
       _flip_effect,
       _flip_timer,
       _flip_status,
+      _current_fov,
       _ambient_track,
       _ambient_position,
       _oneshot_track,
