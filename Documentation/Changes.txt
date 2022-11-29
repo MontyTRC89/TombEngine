@@ -4,8 +4,9 @@ Version 1.0.4
 * Add generic assignable effects for moveables - burn, electricity and smoke.
 * Add ability to burn enemies with FLAME_EMITTER_1 and death blocks.
 * Automatically align pickups to floor surface.
-* Fix demigod and harpy shooting in incorrect directions.
 * Fix legacy pickup triggers not working in certain cases.
+* Fix crawl pickup not actually doing any pickups.
+* Fix demigod and harpy shooting in incorrect directions.
 * Fix lasersight always displaying with HK, revolver and crossbow.
 * Fix rapid ammo spending in HK lasersight mode.
 * Fix incorrect string IDs for item combine, HK and revolver with lasersight.
