@@ -6,12 +6,17 @@ Version 1.0.4
 * Automatically align pickups to floor surface.
 * Fix demigod and harpy shooting in incorrect directions.
 * Fix legacy pickup triggers not working in certain cases.
-* Fix lasersight always displaying with revolver and crossbow.
+* Fix lasersight always displaying with HK, revolver and crossbow.
+* Fix rapid ammo spending in HK lasersight mode.
 * Fix incorrect string IDs for item combine, HK and revolver with lasersight.
 * Fix puzzle holes not swapping to puzzle done objects.
 * Fix several collision and sound source issues in flipped rooms.
 * Fix several pushable sound and object collision bugs.
-* Fix TR1 centaur bubble targetting.
+* Fix original bug with incorrect climb up behaviour on ladders under sloped ceilings.
+* Fix TR1 centaur bubble targeting.
+* Fix caustics not turning off in display settings.
+* Fix windowed mode not using real resolution when DPI scaling is active.
+* Fix control lock not working in flyby sequences.
 
 Lua API changes:
 * Add Flow.EnableMassPickup option in Gameflow.lua to enable/disable mass pickup.
