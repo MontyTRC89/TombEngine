@@ -58,7 +58,7 @@ void ControlBodyPart(short fxNumber)
 		!TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, fx->roomNumber))
 	{
 		if (GenerateInt(0, 10) > (abs(fx->fallspeed) > 0 ? 5 : 8))
-			TriggerFireFlame(fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z, FlameType::Big, Vector3(1.0f, 0.2f, 0.2f), Vector3(1.0f, 0.8f, 0.1f));
+			TriggerFireFlame(fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z, FlameType::Big, Vector3::Zero, Vector3::Zero);
 	}
 
 	auto probe = GetCollision(fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z, fx->roomNumber);

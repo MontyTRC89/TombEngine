@@ -274,7 +274,8 @@ namespace TEN::Entities::Effects
 			{
 				TriggerShockwave(&fx->pos, 48, 240, 64, 64, 128, 0, 24, 0, 0);
 				TriggerExplosionSparks(oldX, oldY, oldZ, 3, -2, 2, fx->roomNumber);
-				ItemMagicBurn(LaraItem, ScriptColor(2, 202 ,40), ScriptColor(5, 221, 218), -1);
+				LaraItem->Effect.Type = EffectType::MagicFire;
+				ItemColorBurn(LaraItem, Vector3(0.0f, 0.8f, 0.1f), Vector3(0.0f, 0.9f, 0.8f), -1);
 			}
 			else if (fx->flag1)
 			{

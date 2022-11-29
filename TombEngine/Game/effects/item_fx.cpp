@@ -20,53 +20,38 @@ namespace TEN::Effects::Items
 	{
 		item->Effect.Type = EffectType::Fire;
 		item->Effect.Count = timeout;
-		item->Effect.LightColor = Vector3(250, 176, 0);
-		item->Effect.EffectColor1 = Vector3(1.0f, 0.2f, 0.2f);
-		item->Effect.EffectColor2 = Vector3(1.0f, 0.8f, 0.1f);
+		item->Effect.LightColor = Vector3(0.8f, 0.5f, 0.0f);
+		item->Effect.EffectColor1 = Vector3::Zero;
+		item->Effect.EffectColor2 = Vector3::Zero;
 	}
 
-	void ItemColorBurn(ItemInfo* item, const ScriptColor& color1, const ScriptColor& color2, int timeout)
+	void ItemColorBurn(ItemInfo* item, Vector3 color1, Vector3 color2, int timeout)
 	{
-
-		item->Effect.Type = EffectType::ColoredFire;
 		item->Effect.Count = timeout;
-		Vector3 col1 = Vector3(color1.GetR() * (1.f / 255.f), color1.GetG() * (1.f / 255.f), color1.GetB() * (1.f / 255.f));
-		Vector3 col2 = Vector3(color2.GetR() * (1.f / 255.f), color2.GetG() * (1.f / 255.f), color2.GetB() * (1.f / 255.f));
-		item->Effect.LightColor = col1;
-		item->Effect.EffectColor1 = col1;
-		item->Effect.EffectColor2 = col2;
-	}
-
-	void ItemMagicBurn(ItemInfo* item, const ScriptColor& color1, const ScriptColor& color2, int timeout)
-	{
-		item->Effect.Type = EffectType::MagicFire;
-		Vector3 col1 = Vector3(color1.GetR() * (1.f / 255.f), color1.GetG() * (1.f / 255.f), color1.GetB() * (1.f / 255.f));
-		Vector3 col2 = Vector3(color2.GetR() * (1.f / 255.f), color2.GetG() * (1.f / 255.f), color2.GetB() * (1.f / 255.f));
-		item->Effect.Count = timeout;
-		item->Effect.LightColor = col1;
-		item->Effect.EffectColor1 = col1;
-		item->Effect.EffectColor2 = col2;
+		item->Effect.LightColor = color1;
+		item->Effect.EffectColor1 = color1;
+		item->Effect.EffectColor2 = color2;
 	}
 
 	void ItemElectricBurn(ItemInfo* item, int timeout)
 	{
 		item->Effect.Type = EffectType::Sparks;
 		item->Effect.Count = timeout;
-		item->Effect.LightColor = Vector3(0, 147, 255 );
+		item->Effect.LightColor = Vector3(0.0f, 0.6f, 1.0f);
 	}
 
 	void ItemBlueElectricBurn(ItemInfo* item, int timeout)
 	{
 		item->Effect.Type = EffectType::ElectricDeath;
 		item->Effect.Count = 2;
-		item->Effect.LightColor = Vector3(0, 147, 255);
+		item->Effect.LightColor = Vector3(0.0f, 0.6f, 1.0f);
 	}
 
 	void ItemRedLaserBurn(ItemInfo* item, int timeout)
 	{
 		item->Effect.Type = EffectType::LaserDeath;
 		item->Effect.Count = 2;
-		item->Effect.LightColor = Vector3(255, 100, 0);
+		item->Effect.LightColor = Vector3(1.0f, 0.4f, 0.0f);
 	}
 
 	void ItemSmoke(ItemInfo* item, int timeout)

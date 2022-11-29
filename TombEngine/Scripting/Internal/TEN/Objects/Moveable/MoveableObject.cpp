@@ -703,15 +703,19 @@ void Moveable::SetEffect(EffectType effectType, sol::optional<float> timeout)
 void Moveable::SetCustomEffect(EffectType effectType, const ScriptColor& col1, const ScriptColor& col2, sol::optional<float> timeout)
 {
 	int realTimeout = timeout.has_value() ? int(timeout.value() * FPS) : -1;
+	Vector3 color1 = Vector3(col1.GetR() * (1.f / 255.f), col1.GetG() * (1.f / 255.f), col1.GetB() * (1.f / 255.f));
+	Vector3 color2 = Vector3(col2.GetR() * (1.f / 255.f), col2.GetG() * (1.f / 255.f), col2.GetB() * (1.f / 255.f));
 
 	switch (effectType)
 	{
 	case EffectType::MagicFire:
-		ItemMagicBurn(m_item, col1, col2, realTimeout);
+		m_item->Effect.Type = EffectType::MagicFire;
+		ItemColorBurn(m_item, color1, color2, realTimeout);
 		break;
 
 	case EffectType::ColoredFire:
-		ItemColorBurn(m_item, col1, col2, realTimeout);
+		m_item->Effect.Type = EffectType::ColoredFire;
+		ItemColorBurn(m_item, color1, color2, realTimeout);
 		break;
 	}
 }

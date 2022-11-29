@@ -1294,7 +1294,7 @@ void TriggerFireFlame(int x, int y, int z, FlameType type, const Vector3& color1
 
 	if (type == FlameType::Small)
 	{
-		if (color1 != Vector3(1.0f, 0.2f, 0.2f) && color2 != Vector3(1.0f, 0.8f, 0.1f))
+		if (color1 != Vector3::Zero && color2 != Vector3::Zero)
 		{
 			spark->sR = colorsR;
 			spark->sG = colorsG;
@@ -1310,7 +1310,7 @@ void TriggerFireFlame(int x, int y, int z, FlameType type, const Vector3& color1
 	{
 		if (type == FlameType::SmallFast)
 		{
-			if (color1 != Vector3(1.0f, 0.2f, 0.2f) && color2 != Vector3(1.0f, 0.8f, 0.1f))
+			if (color1 != Vector3::Zero && color2 != Vector3::Zero)
 			{
 				spark->sR = colorsR;
 				spark->sG = colorsG;
@@ -1333,7 +1333,7 @@ void TriggerFireFlame(int x, int y, int z, FlameType type, const Vector3& color1
 		}
 		else
 		{
-			if (color1 != Vector3(1.0f, 0.2f, 0.2f) && color2 != Vector3(1.0f, 0.8f, 0.1f))
+			if (color1 != Vector3::Zero && color2 != Vector3::Zero)
 			{
 				spark->sR = colorsR;
 				spark->sG = colorsG;
@@ -1350,7 +1350,7 @@ void TriggerFireFlame(int x, int y, int z, FlameType type, const Vector3& color1
 
 	if (type != FlameType::StaticFlicker)
 	{
-		if (color1 != Vector3(1.0f, 0.2f, 0.2f) && color2 != Vector3(1.0f, 0.8f, 0.1f))
+		if (color1 != Vector3::Zero && color2 != Vector3::Zero)
 		{
 			spark->dR = colordR;
 			spark->dG = colordG;
@@ -1616,7 +1616,7 @@ void ProcessEffects(ItemInfo* item)
 		{
 		case EffectType::Fire:
 			if (TestProbability(1 / 8.0f))
-				TriggerFireFlame(pos.x, pos.y, pos.z, TestProbability(1 / 10.0f) ? FlameType::Trail : FlameType::Medium, Vector3(1.0f, 0.2f, 0.2f), Vector3(1.0f, 0.8f, 0.1f));
+				TriggerFireFlame(pos.x, pos.y, pos.z, TestProbability(1 / 10.0f) ? FlameType::Trail : FlameType::Medium, Vector3::Zero, Vector3::Zero);
 			break;
 
 		case EffectType::ColoredFire:
