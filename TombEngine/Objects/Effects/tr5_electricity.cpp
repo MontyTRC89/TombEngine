@@ -226,7 +226,7 @@ void ElectricityWiresControl(short itemNumber)
 				{
 					if (collItem->Effect.Type != EffectType::Smoke)
 					{
-						ItemBlueElectricBurn(collItem, 2);
+						ItemBlueElectricBurn(collItem, 2 *FPS);
 					}
 					else
 						ItemSmoke(collItem, -1);

@@ -1592,9 +1592,8 @@ void ProcessEffects(ItemInfo* item)
 		{
 			if (item->Effect.Type == EffectType::Fire || 
 				item->Effect.Type == EffectType::ColoredFire || 
-				item->Effect.Type == EffectType::MagicFire || 
-				item->Effect.Type == EffectType::ElectricDeath || 
-				item->Effect.Type == EffectType::LaserDeath)
+				item->Effect.Type == EffectType::ElectricIgnite || 
+				item->Effect.Type == EffectType::RedIgnite)
 			{
 				item->Effect.Type = EffectType::Smoke;
 				item->Effect.Count = BURN_AFTERMATH_TIMEOUT;
@@ -1620,14 +1619,9 @@ void ProcessEffects(ItemInfo* item)
 			break;
 
 		case EffectType::ColoredFire:
-			if (TestProbability(1 / 8.0f))
-				
-				TriggerFireFlame(pos.x, pos.y, pos.z, TestProbability(1 / 10.0f) ? FlameType::Trail : FlameType::Medium, item->Effect.EffectColor1, item->Effect.EffectColor2);
-			break;
-
-		case EffectType::MagicFire:
-			if (TestProbability(1 / 8.0f))
-				TriggerFireFlame(pos.x, pos.y, pos.z, TestProbability(1 / 10.0f) ? FlameType::Trail : FlameType::Medium, item->Effect.EffectColor1, item->Effect.EffectColor2);
+			if (TestProbability(1 / 8.0f))			
+				TriggerFireFlame(pos.x, pos.y, pos.z, TestProbability(1 / 10.0f) ? FlameType::Trail : FlameType::Medium, 
+					item->Effect.EffectColor1, item->Effect.EffectColor2);
 			break;
 
 		case EffectType::Sparks:
@@ -1638,17 +1632,19 @@ void ProcessEffects(ItemInfo* item)
 				TriggerRocketSmoke(pos.x, pos.y, pos.z, 0);
 			break;
 
-		case EffectType::ElectricDeath:
+		case EffectType::ElectricIgnite:
 			if (TestProbability(1 / 1.0f))
 				TriggerElectricSpark(&GameVector(pos.x, pos.y, pos.z, item->RoomNumber),
 					EulerAngles(0, Random::GenerateAngle(ANGLE(0), ANGLE(359)), 0), 2);
 			if (TestProbability(1 / 1.0f))
-				TriggerFireFlame(pos.x, pos.y, pos.z, TestProbability(1 / 10.0f) ? FlameType::Medium : FlameType::Medium, Vector3(0.2f, 0.5f, 1.0f), Vector3(0.2f, 0.8f, 1.0f));
+				TriggerFireFlame(pos.x, pos.y, pos.z, TestProbability(1 / 10.0f) ? FlameType::Medium : FlameType::Medium, 
+					Vector3(0.2f, 0.5f, 1.0f), Vector3(0.2f, 0.8f, 1.0f));
 			break;
 
-		case EffectType::LaserDeath:
+		case EffectType::RedIgnite:
 			if (TestProbability(1 / 1.0f))
-				TriggerFireFlame(pos.x, pos.y, pos.z, TestProbability(1 / 10.0f) ? FlameType::Medium : FlameType::Medium, Vector3(1.0f, 0.5f, 0.2f), Vector3(0.6f, 0.1f, 0.0f));
+				TriggerFireFlame(pos.x, pos.y, pos.z, TestProbability(1 / 10.0f) ? FlameType::Medium : FlameType::Medium, 
+					Vector3(1.0f, 0.5f, 0.2f), Vector3(0.6f, 0.1f, 0.0f));
 			break;
 
 		case EffectType::Smoke:
@@ -1676,14 +1672,13 @@ void ProcessEffects(ItemInfo* item)
 		SoundEffect(SOUND_EFFECTS::SFX_TR5_HISS_LOOP_SMALL, &item->Pose);
 		break;
 
-	case EffectType::ElectricDeath:
+	case EffectType::ElectricIgnite:
 	case EffectType::Sparks:
 		SoundEffect(SOUND_EFFECTS::SFX_TR4_LARA_ELECTRIC_CRACKLES, &item->Pose);
 		break;
 
 	case EffectType::Fire: 
 	case EffectType::ColoredFire:
-	case EffectType::MagicFire:
 		SoundEffect(SOUND_EFFECTS::SFX_TR4_LOOP_FOR_SMALL_FIRES, &item->Pose);
 		break;
 	}
@@ -1699,9 +1694,12 @@ void ProcessEffects(ItemInfo* item)
 
 	int waterHeight = GetWaterHeight(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, item->RoomNumber);
 
-	if (item->Effect.Type != EffectType::MagicFire && item->Effect.Type != EffectType::Sparks && (waterHeight != NO_HEIGHT && item->Pose.Position.y > waterHeight))
+	if (item->Effect.Type != EffectType::Sparks && (waterHeight != NO_HEIGHT && item->Pose.Position.y > waterHeight))
 	{
-		if (item->Effect.Type == EffectType::Fire || item->Effect.Type == EffectType::ColoredFire || item->Effect.Type == EffectType::MagicFire)
+		if (item->Effect.Type == EffectType::Fire || 
+			item->Effect.Type == EffectType::ColoredFire || 
+			item->Effect.Type == EffectType::ElectricIgnite ||
+			item->Effect.Type == EffectType::RedIgnite)
 		{
 			item->Effect.Type = EffectType::Smoke;
 			item->Effect.Count = 10;

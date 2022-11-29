@@ -172,17 +172,17 @@ void Moveable::Register(sol::table & parent)
 // @tparam float timeout time (in seconds) after which effect turns off (optional).
 	ScriptReserved_SetEffect, &Moveable::SetEffect,
 
-/// Get current moveable effect
-// @function Moveable:GetEffect
-// @treturn EffectID effect type currently assigned to moveable.
-	ScriptReserved_GetEffect, &Moveable::GetEffect,
-
 /// Set extended effect to moveable
 // @function Moveable:SetCustomEffect
 // @tparam EffectID effect Type of effect to assign.
 // @tparam Color1 color the first color of the effect, Color2 color the second color of the effect
 // @tparam float timeout time (in seconds) after which effect turns off (optional).
 	ScriptReserved_SetCustomEffect, &Moveable::SetCustomEffect,
+
+/// Get current moveable effect
+// @function Moveable:GetEffect
+// @treturn EffectID effect type currently assigned to moveable.
+	ScriptReserved_GetEffect, & Moveable::GetEffect,
 
 /// Get the status of object.
 // possible values:
@@ -690,11 +690,11 @@ void Moveable::SetEffect(EffectType effectType, sol::optional<float> timeout)
 		ItemElectricBurn(m_item, realTimeout);
 		break;
 
-	case EffectType::ElectricDeath:
+	case EffectType::ElectricIgnite:
 		ItemBlueElectricBurn(m_item, realTimeout);
 		break;
 
-	case EffectType::LaserDeath:
+	case EffectType::RedIgnite:
 		ItemRedLaserBurn(m_item, realTimeout);
 		break;
 	}
@@ -706,18 +706,7 @@ void Moveable::SetCustomEffect(EffectType effectType, const ScriptColor& col1, c
 	Vector3 color1 = Vector3(col1.GetR() * (1.f / 255.f), col1.GetG() * (1.f / 255.f), col1.GetB() * (1.f / 255.f));
 	Vector3 color2 = Vector3(col2.GetR() * (1.f / 255.f), col2.GetG() * (1.f / 255.f), col2.GetB() * (1.f / 255.f));
 
-	switch (effectType)
-	{
-	case EffectType::MagicFire:
-		m_item->Effect.Type = EffectType::MagicFire;
 		ItemColorBurn(m_item, color1, color2, realTimeout);
-		break;
-
-	case EffectType::ColoredFire:
-		m_item->Effect.Type = EffectType::ColoredFire;
-		ItemColorBurn(m_item, color1, color2, realTimeout);
-		break;
-	}
 }
 
 EffectType Moveable::GetEffect() const

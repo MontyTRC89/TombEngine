@@ -27,6 +27,7 @@ namespace TEN::Effects::Items
 
 	void ItemColorBurn(ItemInfo* item, Vector3 color1, Vector3 color2, int timeout)
 	{
+		item->Effect.Type = EffectType::ColoredFire;
 		item->Effect.Count = timeout;
 		item->Effect.LightColor = color1;
 		item->Effect.EffectColor1 = color1;
@@ -42,15 +43,15 @@ namespace TEN::Effects::Items
 
 	void ItemBlueElectricBurn(ItemInfo* item, int timeout)
 	{
-		item->Effect.Type = EffectType::ElectricDeath;
-		item->Effect.Count = 2;
+		item->Effect.Type = EffectType::ElectricIgnite;
+		item->Effect.Count = timeout /FPS;
 		item->Effect.LightColor = Vector3(0.0f, 0.6f, 1.0f);
 	}
 
 	void ItemRedLaserBurn(ItemInfo* item, int timeout)
 	{
-		item->Effect.Type = EffectType::LaserDeath;
-		item->Effect.Count = 2;
+		item->Effect.Type = EffectType::RedIgnite;
+		item->Effect.Count = timeout /FPS;
 		item->Effect.LightColor = Vector3(1.0f, 0.4f, 0.0f);
 	}
 

@@ -31,8 +31,7 @@ static const std::unordered_map<std::string, EffectType> kEffectIDs
 	{"FIRE", EffectType::Fire},
 	{"SPARKS", EffectType::Sparks},
 	{"SMOKE", EffectType::Smoke},
-	{"MAGICFIRE", EffectType::MagicFire},
 	{"COLOREDFIRE", EffectType::ColoredFire},
-	{"ELECTRICDEATH", EffectType::ElectricDeath},
-	{"LASERDEATH", EffectType::LaserDeath}
+	{"ELECTRICIGNITE", EffectType::ElectricIgnite},
+	{"REDIGNITE", EffectType::RedIgnite}
 };

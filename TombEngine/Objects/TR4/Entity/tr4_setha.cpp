@@ -492,8 +492,7 @@ namespace TEN::Entities::TR4
 				if (LaraItem->HitPoints < 0)
 				{
 					SethaKill(item, LaraItem);
-					LaraItem->Effect.Type = EffectType::MagicFire;
-					ItemColorBurn(LaraItem, Vector3(0.0f, 0.8f, 0.1f), Vector3(0.0f, 0.9f, 0.8f), -1);
+					ItemColorBurn(LaraItem, Vector3(0.0f, 0.8f, 0.1f), Vector3(0.0f, 0.9f, 0.8f), 6 *FPS);
 					creature->MaxTurn = 0;
 					return;
 				}
