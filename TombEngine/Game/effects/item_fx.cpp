@@ -21,13 +21,12 @@ namespace TEN::Effects::Items
 		item->Effect.Type = EffectType::Fire;
 		item->Effect.Count = timeout;
 		item->Effect.LightColor = Vector3(0.8f, 0.5f, 0.0f);
-		item->Effect.EffectColor1 = Vector3::Zero;
-		item->Effect.EffectColor2 = Vector3::Zero;
+		item->Effect.EffectColor1 = item->Effect.EffectColor2 = Vector3::Zero;
 	}
 
-	void ItemColorBurn(ItemInfo* item, Vector3 color1, Vector3 color2, int timeout)
+	void ItemCustomBurn(ItemInfo* item, Vector3 color1, Vector3 color2, int timeout)
 	{
-		item->Effect.Type = EffectType::ColoredFire;
+		item->Effect.Type = EffectType::Custom;
 		item->Effect.Count = timeout;
 		item->Effect.LightColor = color1;
 		item->Effect.EffectColor1 = color1;

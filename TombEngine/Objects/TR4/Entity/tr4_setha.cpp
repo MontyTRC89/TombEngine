@@ -492,7 +492,7 @@ namespace TEN::Entities::TR4
 				if (LaraItem->HitPoints < 0)
 				{
 					SethaKill(item, LaraItem);
-					ItemColorBurn(LaraItem, Vector3(0.0f, 0.8f, 0.1f), Vector3(0.0f, 0.9f, 0.8f), 6 *FPS);
+					ItemCustomBurn(LaraItem, Vector3(0.0f, 0.8f, 0.1f), Vector3(0.0f, 0.9f, 0.8f), 6 * FPS);
 					creature->MaxTurn = 0;
 					return;
 				}

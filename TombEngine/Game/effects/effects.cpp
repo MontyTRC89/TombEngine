@@ -1591,7 +1591,7 @@ void ProcessEffects(ItemInfo* item)
 		if (!item->Effect.Count)
 		{
 			if (item->Effect.Type == EffectType::Fire || 
-				item->Effect.Type == EffectType::ColoredFire || 
+				item->Effect.Type == EffectType::Custom || 
 				item->Effect.Type == EffectType::ElectricIgnite || 
 				item->Effect.Type == EffectType::RedIgnite)
 			{
@@ -1615,10 +1615,10 @@ void ProcessEffects(ItemInfo* item)
 		{
 		case EffectType::Fire:
 			if (TestProbability(1 / 8.0f))
-				TriggerFireFlame(pos.x, pos.y, pos.z, TestProbability(1 / 10.0f) ? FlameType::Trail : FlameType::Medium, Vector3::Zero, Vector3::Zero);
+				TriggerFireFlame(pos.x, pos.y, pos.z, TestProbability(1 / 10.0f) ? FlameType::Trail : FlameType::Medium);
 			break;
 
-		case EffectType::ColoredFire:
+		case EffectType::Custom:
 			if (TestProbability(1 / 8.0f))			
 				TriggerFireFlame(pos.x, pos.y, pos.z, TestProbability(1 / 10.0f) ? FlameType::Trail : FlameType::Medium, 
 					item->Effect.EffectColor1, item->Effect.EffectColor2);
@@ -1678,7 +1678,7 @@ void ProcessEffects(ItemInfo* item)
 		break;
 
 	case EffectType::Fire: 
-	case EffectType::ColoredFire:
+	case EffectType::Custom:
 		SoundEffect(SOUND_EFFECTS::SFX_TR4_LOOP_FOR_SMALL_FIRES, &item->Pose);
 		break;
 	}
@@ -1697,7 +1697,7 @@ void ProcessEffects(ItemInfo* item)
 	if (item->Effect.Type != EffectType::Sparks && (waterHeight != NO_HEIGHT && item->Pose.Position.y > waterHeight))
 	{
 		if (item->Effect.Type == EffectType::Fire || 
-			item->Effect.Type == EffectType::ColoredFire || 
+			item->Effect.Type == EffectType::Custom ||
 			item->Effect.Type == EffectType::ElectricIgnite ||
 			item->Effect.Type == EffectType::RedIgnite)
 		{

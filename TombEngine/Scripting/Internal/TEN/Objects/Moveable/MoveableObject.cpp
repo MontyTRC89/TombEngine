@@ -172,10 +172,10 @@ void Moveable::Register(sol::table & parent)
 // @tparam float timeout time (in seconds) after which effect turns off (optional).
 	ScriptReserved_SetEffect, &Moveable::SetEffect,
 
-/// Set extended effect to moveable
+/// Set custom colored burn effect to moveable
 // @function Moveable:SetCustomEffect
-// @tparam EffectID effect Type of effect to assign.
-// @tparam Color1 color the first color of the effect, Color2 color the second color of the effect
+// @tparam Color Color1 color the primary color of the effect (also used for lighting).
+// @tparam Color Color2 color the secondary color of the effect.
 // @tparam float timeout time (in seconds) after which effect turns off (optional).
 	ScriptReserved_SetCustomEffect, &Moveable::SetCustomEffect,
 
@@ -697,16 +697,18 @@ void Moveable::SetEffect(EffectType effectType, sol::optional<float> timeout)
 	case EffectType::RedIgnite:
 		ItemRedLaserBurn(m_item, realTimeout);
 		break;
+
+	case EffectType::Custom:
+		ScriptWarn("CUSTOM effect type requires additional setup. Use SetCustomEffect command instead.");
 	}
 }
 
-void Moveable::SetCustomEffect(EffectType effectType, const ScriptColor& col1, const ScriptColor& col2, sol::optional<float> timeout)
+void Moveable::SetCustomEffect(const ScriptColor& col1, const ScriptColor& col2, sol::optional<float> timeout)
 {
 	int realTimeout = timeout.has_value() ? int(timeout.value() * FPS) : -1;
 	Vector3 color1 = Vector3(col1.GetR() * (1.f / 255.f), col1.GetG() * (1.f / 255.f), col1.GetB() * (1.f / 255.f));
 	Vector3 color2 = Vector3(col2.GetR() * (1.f / 255.f), col2.GetG() * (1.f / 255.f), col2.GetB() * (1.f / 255.f));
-
-		ItemColorBurn(m_item, color1, color2, realTimeout);
+	ItemCustomBurn(m_item, color1, color2, realTimeout);
 }
 
 EffectType Moveable::GetEffect() const

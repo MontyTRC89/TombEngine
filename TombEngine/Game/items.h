@@ -62,9 +62,9 @@ enum class EffectType
 	Fire,
 	Sparks,
 	Smoke,
-	ColoredFire,
 	ElectricIgnite,
-	RedIgnite
+	RedIgnite,
+	Custom
 };
 
 struct EntityAnimationData
