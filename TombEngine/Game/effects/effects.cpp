@@ -1646,7 +1646,7 @@ void ProcessEffects(ItemInfo* item)
 			break;
 
 		case EffectType::Smoke:
-			if (TestProbability(1 / 64.0f))
+			if (TestProbability(1 / 32.0f))
 				TriggerRocketSmoke(pos.x, pos.y, pos.z, 0);
 			break;
 		}
@@ -1689,14 +1689,17 @@ void ProcessEffects(ItemInfo* item)
 			DoDamage(item, item->IsLara() ? BURN_HEALTH_LARA : BURN_HEALTH_NPC);
 		}
 	}
-
-	int waterHeight = GetWaterHeight(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, item->RoomNumber);
-
-	if (item->Effect.Type != EffectType::Sparks && item->Effect.Type != EffectType::Smoke && 
-		(waterHeight != NO_HEIGHT && item->Pose.Position.y > waterHeight))
+	
+	if (item->Effect.Type != EffectType::Sparks && item->Effect.Type != EffectType::Smoke)
 	{
-		item->Effect.Type = EffectType::Smoke;
-		item->Effect.Count = 10;
+		int waterHeight = GetWaterHeight(item);
+		int itemLevel = item->Pose.Position.y - GameBoundingBox(item).GetHeight() / 3;
+
+		if (waterHeight != NO_HEIGHT && itemLevel > waterHeight)
+		{
+			item->Effect.Type = EffectType::Smoke;
+			item->Effect.Count = 1 * FPS;
+		}
 	}
 
 	if (item->IsLara() && GetLaraInfo(item)->Control.WaterStatus == WaterStatus::FlyCheat)
