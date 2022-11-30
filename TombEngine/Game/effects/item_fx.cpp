@@ -43,14 +43,14 @@ namespace TEN::Effects::Items
 	void ItemBlueElectricBurn(ItemInfo* item, int timeout)
 	{
 		item->Effect.Type = EffectType::ElectricIgnite;
-		item->Effect.Count = timeout /FPS;
+		item->Effect.Count = timeout / FPS;
 		item->Effect.LightColor = Vector3(0.0f, 0.6f, 1.0f);
 	}
 
 	void ItemRedLaserBurn(ItemInfo* item, int timeout)
 	{
 		item->Effect.Type = EffectType::RedIgnite;
-		item->Effect.Count = timeout /FPS;
+		item->Effect.Count = timeout / FPS;
 		item->Effect.LightColor = Vector3(1.0f, 0.4f, 0.0f);
 	}
 
