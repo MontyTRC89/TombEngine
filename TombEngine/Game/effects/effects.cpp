@@ -1692,18 +1692,11 @@ void ProcessEffects(ItemInfo* item)
 
 	int waterHeight = GetWaterHeight(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, item->RoomNumber);
 
-	if (item->Effect.Type != EffectType::Sparks && (waterHeight != NO_HEIGHT && item->Pose.Position.y > waterHeight))
+	if (item->Effect.Type != EffectType::Sparks && item->Effect.Type != EffectType::Smoke && 
+		(waterHeight != NO_HEIGHT && item->Pose.Position.y > waterHeight))
 	{
-		if (item->Effect.Type == EffectType::Fire || 
-			item->Effect.Type == EffectType::Custom ||
-			item->Effect.Type == EffectType::ElectricIgnite ||
-			item->Effect.Type == EffectType::RedIgnite)
-		{
-			item->Effect.Type = EffectType::Smoke;
-			item->Effect.Count = 10;
-		}
-		else
-			item->Effect.Type = EffectType::None;
+		item->Effect.Type = EffectType::Smoke;
+		item->Effect.Count = 10;
 	}
 
 	if (item->IsLara() && GetLaraInfo(item)->Control.WaterStatus == WaterStatus::FlyCheat)
