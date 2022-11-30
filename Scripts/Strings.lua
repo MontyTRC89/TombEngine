@@ -72,6 +72,7 @@ local strings =
 	large_medipack = { "Large Medipack" },
 	lasersight = { "Lasersight" },
 	mouse_sensitivity = { "Mouse Sensitivity" },
+	mouse_smoothing = { "Mouse Smoothing" },
 	music_volume = { "Music Volume" },
 	new_game = { "New Game" },
 	none = { "None" },

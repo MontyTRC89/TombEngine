@@ -37,8 +37,10 @@ namespace TEN::Gui
 	constexpr auto PHD_CENTER_Y = REFERENCE_RES_HEIGHT / 2;
 
 	constexpr auto VOLUME_MAX = 100;
-	constexpr auto MOUSE_SENSITIVITY_MIN = 0.5f;
-	constexpr auto MOUSE_SENSITIVITY_MAX = 3.0f;
+	constexpr auto MOUSE_SENSITIVITY_MIN = 1;
+	constexpr auto MOUSE_SENSITIVITY_MAX = 35;
+	constexpr auto MOUSE_SMOOTHING_MIN	 = 0;
+	constexpr auto MOUSE_SMOOTHING_MAX	 = 5;
 
 	GuiController g_Gui;
 
@@ -717,11 +719,12 @@ namespace TEN::Gui
 			ToggleRumble,
 			ThumbstickCameraControl,
 			MouseSensitivity,
+			MouseSmoothing,
 			Apply,
 			Cancel
 		};
 
-		static const auto numOtherSettingsOptions = 7;
+		static const auto numOtherSettingsOptions = 9;
 
 		OptionCount = numOtherSettingsOptions;
 
@@ -796,9 +799,21 @@ namespace TEN::Gui
 			case OtherSettingsOption::MouseSensitivity:
 				if (CurrentSettings.Configuration.MouseSensitivity > MOUSE_SENSITIVITY_MIN)
 				{
-					CurrentSettings.Configuration.MouseSensitivity -= 0.1f;
+					CurrentSettings.Configuration.MouseSensitivity -= 1;
 					if (CurrentSettings.Configuration.MouseSensitivity < MOUSE_SENSITIVITY_MIN)
 						CurrentSettings.Configuration.MouseSensitivity = MOUSE_SENSITIVITY_MIN;
+
+					SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
+				}
+
+				break;
+
+			case OtherSettingsOption::MouseSmoothing:
+				if (CurrentSettings.Configuration.MouseSmoothing > MOUSE_SMOOTHING_MIN)
+				{
+					CurrentSettings.Configuration.MouseSmoothing -= 1;
+					if (CurrentSettings.Configuration.MouseSmoothing < MOUSE_SMOOTHING_MIN)
+						CurrentSettings.Configuration.MouseSmoothing = MOUSE_SMOOTHING_MIN;
 
 					SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 				}
@@ -840,9 +855,21 @@ namespace TEN::Gui
 			case OtherSettingsOption::MouseSensitivity:
 				if (CurrentSettings.Configuration.MouseSensitivity < MOUSE_SENSITIVITY_MAX)
 				{
-					CurrentSettings.Configuration.MouseSensitivity += 0.1f;
+					CurrentSettings.Configuration.MouseSensitivity += 1;
 					if (CurrentSettings.Configuration.MouseSensitivity > MOUSE_SENSITIVITY_MAX)
 						CurrentSettings.Configuration.MouseSensitivity = MOUSE_SENSITIVITY_MAX;
+
+					SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
+				}
+
+				break;
+
+			case OtherSettingsOption::MouseSmoothing:
+				if (CurrentSettings.Configuration.MouseSmoothing < MOUSE_SMOOTHING_MAX)
+				{
+					CurrentSettings.Configuration.MouseSmoothing += 1;
+					if (CurrentSettings.Configuration.MouseSmoothing > MOUSE_SMOOTHING_MAX)
+						CurrentSettings.Configuration.MouseSmoothing = MOUSE_SMOOTHING_MAX;
 
 					SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 				}

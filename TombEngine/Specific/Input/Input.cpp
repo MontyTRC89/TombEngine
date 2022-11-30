@@ -29,7 +29,7 @@ using TEN::Renderer::g_Renderer;
 namespace TEN::Input
 {
 	constexpr auto AXIS_SCALE			 = 1.5f;
-	constexpr auto AXIS_OFFSET			 = 0.0f;//2f;
+	constexpr auto AXIS_OFFSET			 = 0.2f;
 	constexpr auto MOUSE_AXIS_CONSTRAINT = 100.0f;
 
 	constexpr auto AXIS_DEADZONE = 8000;
@@ -143,6 +143,7 @@ namespace TEN::Input
 	{
 		TENLog("Initializing input system...", LogLevel::Info);
 
+		// Initialise maps.
 		for (int i = 0; i < (int)ActionID::Count; i++)
 			ActionMap.push_back(InputAction((ActionID)i));
 
@@ -373,17 +374,27 @@ namespace TEN::Input
 				SetDiscreteAxisValues(baseIndex + pass); // Interpret discrete directional keypresses as mouse axis values.
 			}
 
-			// Poll axes.
-			AxisMap[(int)InputAxis::Mouse] = Vector2(state.X.rel, state.Y.rel) * g_Configuration.MouseSensitivity;
+			// TODO: Toggle for analog/mouse control.
+			// Will also  need to rethink entire control system in the future to make this work properly.
+			// For now, it can be a functional but *strictly exprimental* feature for people to mess with.
 
-			// TODO: Setting for analog/mouse control.
+			// Poll axes.
+			float sensitivity = (g_Configuration.MouseSensitivity * 0.1f) + 0.4f;
+			auto rawAxes = Vector2(state.X.rel, state.Y.rel) * sensitivity;
+
 			// Translate mouse axes to normalized move axes.
-			if (AxisMap[(int)InputAxis::Mouse] != Vector2::Zero)
+			if (rawAxes != Vector2::Zero)
 			{
+				// Apply smoothing.
+				float smoothing = 1.0f - (g_Configuration.MouseSmoothing * 0.1f);
+				AxisMap[(int)InputAxis::Mouse] += (rawAxes - AxisMap[(int)InputAxis::Mouse]) * smoothing;
+
+				// Determine axis offset. ????
 				auto offset = Vector2(
 					AXIS_OFFSET * std::copysign(1, AxisMap[(int)InputAxis::Mouse].x),
 					AXIS_OFFSET * std::copysign(1, AxisMap[(int)InputAxis::Mouse].y));
 
+				// Define normalized move axes.
 				AxisMap[(int)InputAxis::Move] = Vector2(
 					(std::clamp(AxisMap[(int)InputAxis::Mouse].x, -MOUSE_AXIS_CONSTRAINT, MOUSE_AXIS_CONSTRAINT) / MOUSE_AXIS_CONSTRAINT) * AXIS_SCALE,
 					(std::clamp(AxisMap[(int)InputAxis::Mouse].y, -MOUSE_AXIS_CONSTRAINT, MOUSE_AXIS_CONSTRAINT) / MOUSE_AXIS_CONSTRAINT) * AXIS_SCALE) +
