@@ -338,16 +338,23 @@ short ModulateLaraTurnRate(short turnRate, short accelRate, short minTurnRate, s
 	short minTurnRateNorm = minTurnRate * abs(axisCoeff);
 	short maxTurnRateNorm = maxTurnRate * abs(axisCoeff);
 
-	//axisCoeff = (AxisMap[(int)InputAxis::Mouse].x / 128) * 2 * g_Configuration.MouseSensitivity;
-	//return (minTurnRateNorm + ((maxTurnRateNorm - minTurnRateNorm) * axisCoeff));
-
-	// Normalize acceleration rate according to axis coefficient.
-	short accelRateNorm = accelRate * std::max(abs(axisCoeff + 1.0f), 1.7f);
-
-	// Calculate new turn rate.
-	short newTurnRate = (turnRate + (accelRateNorm * sign)) * sign;
+	// Calculate new turn rate according to acceleration.
+	short newTurnRate = (turnRate + (accelRate * sign)) * sign;
 	newTurnRate = std::clamp(newTurnRate, minTurnRateNorm, maxTurnRateNorm);
 	return (newTurnRate * sign);
+}
+
+short ModulateLaraTurnRate(short minTurnRate, short maxTurnRate, float axisCoeff, bool invert)
+{
+	axisCoeff *= invert ? -1 : 1;
+
+	// Determine normalized turn rate range.
+	short minTurnRateNorm = minTurnRate * abs(axisCoeff);
+	short maxTurnRateNorm = maxTurnRate * abs(axisCoeff);
+
+	// Calculate new turn rate according to coefficient.
+	short deltaAngle = std::max(minTurnRateNorm, maxTurnRateNorm) - std::min(minTurnRateNorm, maxTurnRateNorm);
+	return ((minTurnRateNorm + deltaAngle) * axisCoeff);
 }
 
 // TODO: Make these two functions methods of LaraInfo someday. -- Sezz 2022.06.26
@@ -369,7 +376,11 @@ void ModulateLaraTurnRateY(ItemInfo* item, short accelRate, short minTurnRate, s
 		axisCoeff = std::min(1.2f, abs(axisCoeff)) * sign;
 	}
 
-	lara->Control.TurnRate/*.y*/ = ModulateLaraTurnRate(lara->Control.TurnRate/*.y*/, accelRate, minTurnRate, maxTurnRate, axisCoeff, invert);
+	// TODO: Setting for analog control.
+	if (false)
+		lara->Control.TurnRate/*.y*/ = ModulateLaraTurnRate(lara->Control.TurnRate/*.y*/, accelRate, minTurnRate, maxTurnRate, axisCoeff, invert);
+	else
+		lara->Control.TurnRate/*.y*/ = ModulateLaraTurnRate(minTurnRate, maxTurnRate, axisCoeff, invert);
 }
 
 void ModulateLaraSwimTurnRates(ItemInfo* item, CollisionInfo* coll)
@@ -379,16 +390,11 @@ void ModulateLaraSwimTurnRates(ItemInfo* item, CollisionInfo* coll)
 	/*if (TrInput & (IN_FORWARD | IN_BACK))
 		ModulateLaraTurnRateX(item, 0, 0, 0);*/
 
-	//float axisCoeff = (AxisMap[(int)InputAxis::Mouse].y / 128) * 2 * g_Configuration.MouseSensitivity;
-	//if (axisCoeff != 0.0f)
-	//	item->Pose.Orientation.x += ANGLE(3.0f) * axisCoeff;
+	float axisCoeff = AxisMap[(int)InputAxis::Move].x;
+	if (IsHeld(In::Forward) || IsHeld(In::Back))
+		item->Pose.Orientation.x += ANGLE(3.0f) * axisCoeff;
 
-	if (TrInput & IN_FORWARD)
-		item->Pose.Orientation.x -= ANGLE(3.0f);
-	else if (TrInput & IN_BACK)
-		item->Pose.Orientation.x += ANGLE(3.0f);
-
-	if (TrInput & (IN_LEFT | IN_RIGHT))
+	if (IsHeld(In::Left) || IsHeld(In::Right))
 	{
 		ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_MED_TURN_RATE_MAX);
 

@@ -26,6 +26,7 @@ LaraInfo*& GetLaraInfo(ItemInfo* item);
 short GetLaraSlideDirection(ItemInfo* item, CollisionInfo* coll);
 
 short ModulateLaraTurnRate(short turnRate, short accelRate, short minTurnRate, short maxTurnRate, float axisCoeff, bool invert);
+short ModulateLaraTurnRate(short minTurnRate, short maxTurnRate, float axisCoeff, bool invert);
 void ModulateLaraTurnRateX(ItemInfo* item, short accelRate, short minTurnRate, short maxTurnRate, bool invert = true);
 void ModulateLaraTurnRateY(ItemInfo* item, short accelRate, short minTurnRate, short maxTurnRate, bool invert = false);
 void ModulateLaraSwimTurnRates(ItemInfo* item, CollisionInfo* coll);

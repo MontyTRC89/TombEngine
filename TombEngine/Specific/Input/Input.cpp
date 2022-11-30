@@ -28,6 +28,10 @@ using TEN::Renderer::g_Renderer;
 
 namespace TEN::Input
 {
+	constexpr auto AXIS_SCALE			 = 1.5f;
+	constexpr auto AXIS_OFFSET			 = 0.0f;//2f;
+	constexpr auto MOUSE_AXIS_CONSTRAINT = 100.0f;
+
 	constexpr auto AXIS_DEADZONE = 8000;
 
 	const std::vector<std::string> g_KeyNames =
@@ -295,7 +299,7 @@ namespace TEN::Input
 				if (OisKeyboard->isKeyDown((KeyCode)i))
 				{
 					KeyMap[i] = true;
-					SetDiscreteAxisValues(i); // Interpret discrete directional keypresses as max analog axis values.
+					SetDiscreteAxisValues(i); // Interpret discrete directional keypresses as analog axis values.
 					continue;
 				}
 
@@ -366,12 +370,25 @@ namespace TEN::Input
 				}
 
 				KeyMap[baseIndex + pass] = true;
-				SetDiscreteAxisValues(baseIndex + pass);
+				SetDiscreteAxisValues(baseIndex + pass); // Interpret discrete directional keypresses as mouse axis values.
 			}
 
 			// Poll axes.
-			//AxisMap[(int)InputAxis::Mouse] = Vector2(std::clamp(state.X.rel, -128, 128), std::clamp(state.Y.rel, -128, 128)) * g_Configuration.MouseSensitivity;
 			AxisMap[(int)InputAxis::Mouse] = Vector2(state.X.rel, state.Y.rel) * g_Configuration.MouseSensitivity;
+
+			// TODO: Setting for analog/mouse control.
+			// Translate mouse axes to normalized move axes.
+			if (AxisMap[(int)InputAxis::Mouse] != Vector2::Zero)
+			{
+				auto offset = Vector2(
+					AXIS_OFFSET * std::copysign(1, AxisMap[(int)InputAxis::Mouse].x),
+					AXIS_OFFSET * std::copysign(1, AxisMap[(int)InputAxis::Mouse].y));
+
+				AxisMap[(int)InputAxis::Move] = Vector2(
+					(std::clamp(AxisMap[(int)InputAxis::Mouse].x, -MOUSE_AXIS_CONSTRAINT, MOUSE_AXIS_CONSTRAINT) / MOUSE_AXIS_CONSTRAINT) * AXIS_SCALE,
+					(std::clamp(AxisMap[(int)InputAxis::Mouse].y, -MOUSE_AXIS_CONSTRAINT, MOUSE_AXIS_CONSTRAINT) / MOUSE_AXIS_CONSTRAINT) * AXIS_SCALE) +
+					offset;
+			}
 		}
 		catch (OIS::Exception& ex)
 		{
@@ -407,11 +424,11 @@ namespace TEN::Input
 
 				// Calculate raw normalized analog value for camera.
 				float axisValue = (state.mAxes[axis].abs > 0) ? -AXIS_DEADZONE : AXIS_DEADZONE;
-				float normalizedValue = float(state.mAxes[axis].abs + axisValue) / float(SHRT_MAX - AXIS_DEADZONE);
+				float normalizedValue = (state.mAxes[axis].abs + axisValue) / (SHRT_MAX - AXIS_DEADZONE);
 
 				// Calculate scaled analog value for movement.
 				// NOTE: [0.2f, 1.7f] range gives the most organic rates.
-				float scaledValue = abs(normalizedValue) * 1.5f + 0.2f;
+				float scaledValue = (abs(normalizedValue) * AXIS_SCALE) + AXIS_OFFSET;
 
 				// Calculate and reset discrete input slots.
 				int negKeyIndex = MAX_KEYBOARD_KEYS + MAX_MOUSE_KEYS + MAX_GAMEPAD_KEYS + (axis * 2);
