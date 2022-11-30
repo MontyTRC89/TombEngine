@@ -1283,90 +1283,88 @@ void TriggerFireFlame(int x, int y, int z, FlameType type, const Vector3& color1
 
 	spark->on = true;
 
-	int colorsR = std::clamp(int(color1.x * UCHAR_MAX), 0, UCHAR_MAX);
-	int colorsG = std::clamp(int(color1.y * UCHAR_MAX), 0, UCHAR_MAX);
-	int colorsB = std::clamp(int(color1.z * UCHAR_MAX), 0, UCHAR_MAX);
-
-	int colordR = std::clamp(int(color2.x * UCHAR_MAX), 0, UCHAR_MAX);
-	int colordG = std::clamp(int(color2.y * UCHAR_MAX), 0, UCHAR_MAX);
-	int colordB = std::clamp(int(color2.z * UCHAR_MAX), 0, UCHAR_MAX);
-
-
-	if (type == FlameType::Small)
+	if (color1 == Vector3::Zero || color2 == Vector3::Zero)
 	{
-		if (color1 != Vector3::Zero && color2 != Vector3::Zero)
+		// Legacy default colours, for compatibility with TR4-TR5 objects.
+
+		switch (type)
 		{
-			spark->sR = colorsR;
-			spark->sG = colorsG;
-			spark->sB = colorsB;
-		}
-		else
-		{
+		case FlameType::SmallFast:
+			spark->sR = 48;
+			spark->sG = 48;
+			spark->sB = (GetRandomControl() & 0x1F) + 128;
+			spark->dR = 32;
+			spark->dG = (GetRandomControl() & 0x3F) - 64;
+			spark->dB = (GetRandomControl() & 0x3F) + 64;
+			break;
+
+		case FlameType::Small:
 			spark->sR = spark->sG = (GetRandomControl() & 0x1F) + 48;
 			spark->sB = (GetRandomControl() & 0x3F) - 64;
-		}
-	}
-	else
-	{
-		if (type == FlameType::SmallFast)
-		{
-			if (color1 != Vector3::Zero && color2 != Vector3::Zero)
-			{
-				spark->sR = colorsR;
-				spark->sG = colorsG;
-				spark->sB = colorsB;
+			break;
 
-				spark->dR = colordR;
-				spark->dG = colordG;
-				spark->dB = colordB;
-			}
-			else
-			{
-				spark->sR = 48;
-				spark->sG = 48;
-				spark->sB = (GetRandomControl() & 0x1F) + 128;
+		default:
+			spark->sR = 255;
+			spark->sB = 48;
+			spark->sG = (GetRandomControl() & 0x1F) + 48;
+			break;
+		}
 
-				spark->dR = 32;
-				spark->dG = (GetRandomControl() & 0x3F) - 64;
-				spark->dB = (GetRandomControl() & 0x3F) + 64;
-			}
-		}
-		else
-		{
-			if (color1 != Vector3::Zero && color2 != Vector3::Zero)
-			{
-				spark->sR = colorsR;
-				spark->sG = colorsG;
-				spark->sB = colorsB;
-			}
-			else
-			{
-				spark->sR = 255;
-				spark->sB = 48;
-				spark->sG = (GetRandomControl() & 0x1F) + 48;
-			}
-		}
-	}
-
-	if (type != FlameType::StaticFlicker)
-	{
-		if (color1 != Vector3::Zero && color2 != Vector3::Zero)
-		{
-			spark->dR = colordR;
-			spark->dG = colordG;
-			spark->dB = colordB;
-		}
-		else
+		if (type != FlameType::SmallFast)
 		{
 			spark->dR = (GetRandomControl() & 0x3F) - 64;
 			spark->dG = (GetRandomControl() & 0x3F) + -128;
 			spark->dB = 32;
 		}
 	}
+	else
+	{
+		// New colored flame processing.
+
+		int colorS[3] = { int(color1.x * UCHAR_MAX), int(color1.y * UCHAR_MAX), int(color1.z * UCHAR_MAX) };
+		int colorD[3] = { int(color2.x * UCHAR_MAX), int(color2.y * UCHAR_MAX), int(color2.z * UCHAR_MAX) };
+
+		// Determine weakest RGB component.
+
+		int lowestS = UCHAR_MAX;
+		int lowestD = UCHAR_MAX;
+		for (int i = 0; i < 3; i++)
+		{
+			if (lowestS > colorS[i]) lowestS = colorS[i];
+			if (lowestD > colorD[i]) lowestD = colorD[i];
+		}
+
+		// Introduce random color shift for non-weakest RGB components.
+
+		static constexpr int CHROMA_SHIFT = 32;
+		static constexpr float LUMA_SHIFT = 0.5f;
+
+		for (int i = 0; i < 3; i++)
+		{
+			if (colorS[i] != lowestS)
+				colorS[i] = int(colorS[i] + GenerateInt(-CHROMA_SHIFT, CHROMA_SHIFT));
+			if (colorD[i] != lowestD)
+				colorD[i] = int(colorS[i] + GenerateInt(-CHROMA_SHIFT, CHROMA_SHIFT));
+
+			colorS[i] = int(colorS[i] * (1.0f + GenerateFloat(-LUMA_SHIFT, 0)));
+			colorD[i] = int(colorD[i] * (1.0f + GenerateFloat(-LUMA_SHIFT, 0)));
+
+			colorS[i] =	std::clamp(colorS[i], 0, UCHAR_MAX);
+			colorD[i] =	std::clamp(colorD[i], 0, UCHAR_MAX);
+		}
+
+		spark->sR = colorS[0];
+		spark->sG = colorS[1];
+		spark->sB = colorS[2];
+
+		spark->dR = colorD[0];
+		spark->dG = colorD[1];
+		spark->dB = colorD[2];
+	}
 
 	if (type == FlameType::Small ||
-		type == FlameType::Static ||
-		type == FlameType::StaticFlicker)
+		type == FlameType::SmallFast ||
+		type == FlameType::Static)
 	{
 		spark->fadeToBlack = 6;
 		spark->colFadeSpeed = (GetRandomControl() & 3) + 5;
@@ -1458,7 +1456,7 @@ void TriggerFireFlame(int x, int y, int z, FlameType type, const Vector3& color1
 		{
 			spark->dSize = spark->size / 16;
 
-			if (type == FlameType::GreenPulse)
+			if (type == FlameType::Pulse)
 			{
 				spark->colFadeSpeed >>= 2;
 				spark->fadeToBlack = spark->fadeToBlack >> 2;
@@ -1478,7 +1476,7 @@ void TriggerFireFlame(int x, int y, int z, FlameType type, const Vector3& color1
 	{
 		spark->dSize = (spark->size / 16.0f);
 
-		if (type == FlameType::GreenPulse)
+		if (type == FlameType::Pulse)
 		{
 			spark->colFadeSpeed >>= 2;
 			spark->fadeToBlack = spark->fadeToBlack >> 2;

@@ -44,8 +44,7 @@ enum class FlameType
 	Medium,
 	Small,
 	Static,
-	StaticFlicker,
-	GreenPulse,
+	Pulse,
 	SmallFast,
 	Trail
 };
