@@ -390,7 +390,7 @@ void ModulateLaraSwimTurnRates(ItemInfo* item, CollisionInfo* coll)
 	/*if (TrInput & (IN_FORWARD | IN_BACK))
 		ModulateLaraTurnRateX(item, 0, 0, 0);*/
 
-	float axisCoeff = AxisMap[(int)InputAxis::Move].x;
+	float axisCoeff = AxisMap[(int)InputAxis::Move].y;
 	if (axisCoeff != 0.0f)
 	{
 		item->Pose.Orientation.x += ANGLE(3.0f) * axisCoeff;
