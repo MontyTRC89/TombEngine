@@ -46,8 +46,8 @@ table Item {
 
 	effect_type: int32;
 	effect_light_colour: Vector3;
-	effect_colour1: Vector3;
-	effect_colour2: Vector3;
+	effect_primary_colour: Vector3;
+	effect_secondary_colour: Vector3;
 	effect_count: int32;
 
 	lua_name: string;

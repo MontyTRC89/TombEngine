@@ -98,8 +98,8 @@ struct EntityEffectData
 {
 	EffectType Type = EffectType::None;
 	Vector3 LightColor = Vector3::One;
-	Vector3 EffectColor1 = Vector3::One;
-	Vector3 EffectColor2 = Vector3::One;
+	Vector3 PrimaryEffectColor = Vector3::One;
+	Vector3 SecondaryEffectColor = Vector3::One;
 	int Count = -1;
 };
 

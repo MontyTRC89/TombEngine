@@ -1619,7 +1619,7 @@ void ProcessEffects(ItemInfo* item)
 		case EffectType::Custom:
 			if (TestProbability(1 / 8.0f))			
 				TriggerFireFlame(pos.x, pos.y, pos.z, TestProbability(1 / 10.0f) ? FlameType::Trail : FlameType::Medium, 
-					item->Effect.EffectColor1, item->Effect.EffectColor2);
+					item->Effect.PrimaryEffectColor, item->Effect.SecondaryEffectColor);
 			break;
 
 		case EffectType::Sparks:

@@ -647,8 +647,8 @@ bool SaveGame::Save(int slot)
 		serializedItem.add_looked_at(itemToSerialize.LookedAt);
 		serializedItem.add_effect_type((int)itemToSerialize.Effect.Type);
 		serializedItem.add_effect_light_colour(&FromVector3(itemToSerialize.Effect.LightColor));
-		serializedItem.add_effect_colour1(&FromVector3(itemToSerialize.Effect.EffectColor1));
-		serializedItem.add_effect_colour2(&FromVector3(itemToSerialize.Effect.EffectColor2));
+		serializedItem.add_effect_primary_colour(&FromVector3(itemToSerialize.Effect.PrimaryEffectColor));
+		serializedItem.add_effect_secondary_colour(&FromVector3(itemToSerialize.Effect.SecondaryEffectColor));
 		serializedItem.add_effect_count(itemToSerialize.Effect.Count);
 
 		if (Objects[itemToSerialize.ObjectNumber].intelligent 
@@ -1396,8 +1396,8 @@ bool SaveGame::Load(int slot)
 		item->LookedAt = savedItem->looked_at();
 
 		item->Effect.Type = (EffectType)savedItem->effect_type();
-		item->Effect.EffectColor1 = ToVector3(savedItem->effect_colour1());
-		item->Effect.EffectColor2 = ToVector3(savedItem->effect_colour2());
+		item->Effect.PrimaryEffectColor = ToVector3(savedItem->effect_primary_colour());
+		item->Effect.SecondaryEffectColor = ToVector3(savedItem->effect_secondary_colour());
 		item->Effect.LightColor = ToVector3(savedItem->effect_light_colour());
 		item->Effect.Count = savedItem->effect_count();
 

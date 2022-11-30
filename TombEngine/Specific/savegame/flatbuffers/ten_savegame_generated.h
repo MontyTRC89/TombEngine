@@ -455,8 +455,8 @@ struct ItemT : public flatbuffers::NativeTable {
   std::vector<int32_t> mesh_pointers{};
   int32_t effect_type = 0;
   std::unique_ptr<TEN::Save::Vector3> effect_light_colour{};
-  std::unique_ptr<TEN::Save::Vector3> effect_colour1{};
-  std::unique_ptr<TEN::Save::Vector3> effect_colour2{};
+  std::unique_ptr<TEN::Save::Vector3> effect_primary_colour{};
+  std::unique_ptr<TEN::Save::Vector3> effect_secondary_colour{};
   int32_t effect_count = 0;
   std::string lua_name{};
   std::string lua_on_killed_name{};
@@ -507,8 +507,8 @@ struct Item FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     VT_MESH_POINTERS = 72,
     VT_EFFECT_TYPE = 74,
     VT_EFFECT_LIGHT_COLOUR = 76,
-    VT_EFFECT_COLOUR1 = 78,
-    VT_EFFECT_COLOUR2 = 80,
+    VT_EFFECT_PRIMARY_COLOUR = 78,
+    VT_EFFECT_SECONDARY_COLOUR = 80,
     VT_EFFECT_COUNT = 82,
     VT_LUA_NAME = 84,
     VT_LUA_ON_KILLED_NAME = 86,
@@ -694,11 +694,11 @@ struct Item FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   const TEN::Save::Vector3 *effect_light_colour() const {
     return GetStruct<const TEN::Save::Vector3 *>(VT_EFFECT_LIGHT_COLOUR);
   }
-  const TEN::Save::Vector3 *effect_colour1() const {
-    return GetStruct<const TEN::Save::Vector3 *>(VT_EFFECT_COLOUR1);
+  const TEN::Save::Vector3 *effect_primary_colour() const {
+    return GetStruct<const TEN::Save::Vector3 *>(VT_EFFECT_PRIMARY_COLOUR);
   }
-  const TEN::Save::Vector3 *effect_colour2() const {
-    return GetStruct<const TEN::Save::Vector3 *>(VT_EFFECT_COLOUR2);
+  const TEN::Save::Vector3 *effect_secondary_colour() const {
+    return GetStruct<const TEN::Save::Vector3 *>(VT_EFFECT_SECONDARY_COLOUR);
   }
   int32_t effect_count() const {
     return GetField<int32_t>(VT_EFFECT_COUNT, 0);
@@ -760,8 +760,8 @@ struct Item FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            verifier.VerifyVector(mesh_pointers()) &&
            VerifyField<int32_t>(verifier, VT_EFFECT_TYPE) &&
            VerifyField<TEN::Save::Vector3>(verifier, VT_EFFECT_LIGHT_COLOUR) &&
-           VerifyField<TEN::Save::Vector3>(verifier, VT_EFFECT_COLOUR1) &&
-           VerifyField<TEN::Save::Vector3>(verifier, VT_EFFECT_COLOUR2) &&
+           VerifyField<TEN::Save::Vector3>(verifier, VT_EFFECT_PRIMARY_COLOUR) &&
+           VerifyField<TEN::Save::Vector3>(verifier, VT_EFFECT_SECONDARY_COLOUR) &&
            VerifyField<int32_t>(verifier, VT_EFFECT_COUNT) &&
            VerifyOffset(verifier, VT_LUA_NAME) &&
            verifier.VerifyString(lua_name()) &&
@@ -983,11 +983,11 @@ struct ItemBuilder {
   void add_effect_light_colour(const TEN::Save::Vector3 *effect_light_colour) {
     fbb_.AddStruct(Item::VT_EFFECT_LIGHT_COLOUR, effect_light_colour);
   }
-  void add_effect_colour1(const TEN::Save::Vector3 *effect_colour1) {
-    fbb_.AddStruct(Item::VT_EFFECT_COLOUR1, effect_colour1);
+  void add_effect_primary_colour(const TEN::Save::Vector3 *effect_primary_colour) {
+    fbb_.AddStruct(Item::VT_EFFECT_PRIMARY_COLOUR, effect_primary_colour);
   }
-  void add_effect_colour2(const TEN::Save::Vector3 *effect_colour2) {
-    fbb_.AddStruct(Item::VT_EFFECT_COLOUR2, effect_colour2);
+  void add_effect_secondary_colour(const TEN::Save::Vector3 *effect_secondary_colour) {
+    fbb_.AddStruct(Item::VT_EFFECT_SECONDARY_COLOUR, effect_secondary_colour);
   }
   void add_effect_count(int32_t effect_count) {
     fbb_.AddElement<int32_t>(Item::VT_EFFECT_COUNT, effect_count, 0);
@@ -1057,8 +1057,8 @@ inline flatbuffers::Offset<Item> CreateItem(
     flatbuffers::Offset<flatbuffers::Vector<int32_t>> mesh_pointers = 0,
     int32_t effect_type = 0,
     const TEN::Save::Vector3 *effect_light_colour = 0,
-    const TEN::Save::Vector3 *effect_colour1 = 0,
-    const TEN::Save::Vector3 *effect_colour2 = 0,
+    const TEN::Save::Vector3 *effect_primary_colour = 0,
+    const TEN::Save::Vector3 *effect_secondary_colour = 0,
     int32_t effect_count = 0,
     flatbuffers::Offset<flatbuffers::String> lua_name = 0,
     flatbuffers::Offset<flatbuffers::String> lua_on_killed_name = 0,
@@ -1072,8 +1072,8 @@ inline flatbuffers::Offset<Item> CreateItem(
   builder_.add_lua_on_killed_name(lua_on_killed_name);
   builder_.add_lua_name(lua_name);
   builder_.add_effect_count(effect_count);
-  builder_.add_effect_colour2(effect_colour2);
-  builder_.add_effect_colour1(effect_colour1);
+  builder_.add_effect_secondary_colour(effect_secondary_colour);
+  builder_.add_effect_primary_colour(effect_primary_colour);
   builder_.add_effect_light_colour(effect_light_colour);
   builder_.add_effect_type(effect_type);
   builder_.add_mesh_pointers(mesh_pointers);
@@ -1158,8 +1158,8 @@ inline flatbuffers::Offset<Item> CreateItemDirect(
     const std::vector<int32_t> *mesh_pointers = nullptr,
     int32_t effect_type = 0,
     const TEN::Save::Vector3 *effect_light_colour = 0,
-    const TEN::Save::Vector3 *effect_colour1 = 0,
-    const TEN::Save::Vector3 *effect_colour2 = 0,
+    const TEN::Save::Vector3 *effect_primary_colour = 0,
+    const TEN::Save::Vector3 *effect_secondary_colour = 0,
     int32_t effect_count = 0,
     const char *lua_name = nullptr,
     const char *lua_on_killed_name = nullptr,
@@ -1212,8 +1212,8 @@ inline flatbuffers::Offset<Item> CreateItemDirect(
       mesh_pointers__,
       effect_type,
       effect_light_colour,
-      effect_colour1,
-      effect_colour2,
+      effect_primary_colour,
+      effect_secondary_colour,
       effect_count,
       lua_name__,
       lua_on_killed_name__,
@@ -6782,8 +6782,8 @@ inline void Item::UnPackTo(ItemT *_o, const flatbuffers::resolver_function_t *_r
   { auto _e = mesh_pointers(); if (_e) { _o->mesh_pointers.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->mesh_pointers[_i] = _e->Get(_i); } } }
   { auto _e = effect_type(); _o->effect_type = _e; }
   { auto _e = effect_light_colour(); if (_e) _o->effect_light_colour = std::unique_ptr<TEN::Save::Vector3>(new TEN::Save::Vector3(*_e)); }
-  { auto _e = effect_colour1(); if (_e) _o->effect_colour1 = std::unique_ptr<TEN::Save::Vector3>(new TEN::Save::Vector3(*_e)); }
-  { auto _e = effect_colour2(); if (_e) _o->effect_colour2 = std::unique_ptr<TEN::Save::Vector3>(new TEN::Save::Vector3(*_e)); }
+  { auto _e = effect_primary_colour(); if (_e) _o->effect_primary_colour = std::unique_ptr<TEN::Save::Vector3>(new TEN::Save::Vector3(*_e)); }
+  { auto _e = effect_secondary_colour(); if (_e) _o->effect_secondary_colour = std::unique_ptr<TEN::Save::Vector3>(new TEN::Save::Vector3(*_e)); }
   { auto _e = effect_count(); _o->effect_count = _e; }
   { auto _e = lua_name(); if (_e) _o->lua_name = _e->str(); }
   { auto _e = lua_on_killed_name(); if (_e) _o->lua_on_killed_name = _e->str(); }
@@ -6837,8 +6837,8 @@ inline flatbuffers::Offset<Item> CreateItem(flatbuffers::FlatBufferBuilder &_fbb
   auto _mesh_pointers = _fbb.CreateVector(_o->mesh_pointers);
   auto _effect_type = _o->effect_type;
   auto _effect_light_colour = _o->effect_light_colour ? _o->effect_light_colour.get() : 0;
-  auto _effect_colour1 = _o->effect_colour1 ? _o->effect_colour1.get() : 0;
-  auto _effect_colour2 = _o->effect_colour2 ? _o->effect_colour2.get() : 0;
+  auto _effect_primary_colour = _o->effect_primary_colour ? _o->effect_primary_colour.get() : 0;
+  auto _effect_secondary_colour = _o->effect_secondary_colour ? _o->effect_secondary_colour.get() : 0;
   auto _effect_count = _o->effect_count;
   auto _lua_name = _o->lua_name.empty() ? _fbb.CreateSharedString("") : _fbb.CreateString(_o->lua_name);
   auto _lua_on_killed_name = _o->lua_on_killed_name.empty() ? _fbb.CreateSharedString("") : _fbb.CreateString(_o->lua_on_killed_name);
@@ -6884,8 +6884,8 @@ inline flatbuffers::Offset<Item> CreateItem(flatbuffers::FlatBufferBuilder &_fbb
       _mesh_pointers,
       _effect_type,
       _effect_light_colour,
-      _effect_colour1,
-      _effect_colour2,
+      _effect_primary_colour,
+      _effect_secondary_colour,
       _effect_count,
       _lua_name,
       _lua_on_killed_name,
