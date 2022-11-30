@@ -334,10 +334,18 @@ short ModulateLaraTurnRate(short turnRate, short accelRate, short minTurnRate, s
 	axisCoeff *= invert ? -1 : 1;
 	int sign = std::copysign(1, axisCoeff);
 
+	// Determine normalized turn rate range.
 	short minTurnRateNorm = minTurnRate * abs(axisCoeff);
 	short maxTurnRateNorm = maxTurnRate * abs(axisCoeff);
 
-	short newTurnRate = (turnRate + (accelRate * sign)) * sign;
+	//axisCoeff = (AxisMap[(int)InputAxis::Mouse].x / 128) * 2 * g_Configuration.MouseSensitivity;
+	//return (minTurnRateNorm + ((maxTurnRateNorm - minTurnRateNorm) * axisCoeff));
+
+	// Normalize acceleration rate according to axis coefficient.
+	short accelRateNorm = accelRate * std::max(abs(axisCoeff + 1.0f), 1.7f);
+
+	// Calculate new turn rate.
+	short newTurnRate = (turnRate + (accelRateNorm * sign)) * sign;
 	newTurnRate = std::clamp(newTurnRate, minTurnRateNorm, maxTurnRateNorm);
 	return (newTurnRate * sign);
 }
@@ -370,6 +378,10 @@ void ModulateLaraSwimTurnRates(ItemInfo* item, CollisionInfo* coll)
 
 	/*if (TrInput & (IN_FORWARD | IN_BACK))
 		ModulateLaraTurnRateX(item, 0, 0, 0);*/
+
+	//float axisCoeff = (AxisMap[(int)InputAxis::Mouse].y / 128) * 2 * g_Configuration.MouseSensitivity;
+	//if (axisCoeff != 0.0f)
+	//	item->Pose.Orientation.x += ANGLE(3.0f) * axisCoeff;
 
 	if (TrInput & IN_FORWARD)
 		item->Pose.Orientation.x -= ANGLE(3.0f);

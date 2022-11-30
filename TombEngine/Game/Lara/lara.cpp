@@ -415,11 +415,6 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	// TEMP: Mouse input demo.
-	//auto rotMatrix = item->Pose.Orientation.ToRotationMatrix();
-	//item->Pose.Position += Vector3i(Vector3::Transform(Vector3(MouseInfo.Relative.x, 0, -MouseInfo.Relative.y), rotMatrix));
-	item->Pose.Orientation.y += AxisMap[(int)InputAxis::Mouse].x * 8;
-
 	if (lara->Control.Weapon.HasFired)
 	{
 		AlertNearbyGuards(item);

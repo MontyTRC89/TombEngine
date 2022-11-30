@@ -370,6 +370,7 @@ namespace TEN::Input
 			}
 
 			// Poll axes.
+			//AxisMap[(int)InputAxis::Mouse] = Vector2(std::clamp(state.X.rel, -128, 128), std::clamp(state.Y.rel, -128, 128)) * g_Configuration.MouseSensitivity;
 			AxisMap[(int)InputAxis::Mouse] = Vector2(state.X.rel, state.Y.rel) * g_Configuration.MouseSensitivity;
 		}
 		catch (OIS::Exception& ex)
@@ -419,7 +420,7 @@ namespace TEN::Input
 				KeyMap[posKeyIndex] = false;
 
 				// Decide on the discrete input registering based on analog value.
-				int usedIndex = normalizedValue > 0 ? negKeyIndex : posKeyIndex;
+				int usedIndex = (normalizedValue > 0) ? negKeyIndex : posKeyIndex;
 				KeyMap[usedIndex] = true;
 
 				// Register analog input in certain direction.

@@ -71,6 +71,7 @@ local strings =
 	lara_home = { "Lara's Home" },
 	large_medipack = { "Large Medipack" },
 	lasersight = { "Lasersight" },
+	mouse_sensitivity = { "Mouse Sensitivity" },
 	music_volume = { "Music Volume" },
 	new_game = { "New Game" },
 	none = { "None" },

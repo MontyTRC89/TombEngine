@@ -32,11 +32,13 @@ using namespace TEN::Utils;
 
 namespace TEN::Gui
 {
-	constexpr int LINE_HEIGHT = 25;
-	constexpr int PHD_CENTER_X = REFERENCE_RES_WIDTH / 2;
-	constexpr int PHD_CENTER_Y = REFERENCE_RES_HEIGHT / 2;
+	constexpr auto LINE_HEIGHT = 25;
+	constexpr auto PHD_CENTER_X = REFERENCE_RES_WIDTH / 2;
+	constexpr auto PHD_CENTER_Y = REFERENCE_RES_HEIGHT / 2;
 
-	constexpr int VOLUME_MAX = 100;
+	constexpr auto VOLUME_MAX = 100;
+	constexpr auto MOUSE_SENSITIVITY_MIN = 0.5f;
+	constexpr auto MOUSE_SENSITIVITY_MAX = 3.0f;
 
 	GuiController g_Gui;
 
@@ -714,11 +716,12 @@ namespace TEN::Gui
 			AutoTarget,
 			ToggleRumble,
 			ThumbstickCameraControl,
+			MouseSensitivity,
 			Apply,
 			Cancel
 		};
 
-		static const int numOtherSettingsOptions = 7;
+		static const auto numOtherSettingsOptions = 7;
 
 		OptionCount = numOtherSettingsOptions;
 
@@ -789,6 +792,18 @@ namespace TEN::Gui
 				}
 
 				break;
+
+			case OtherSettingsOption::MouseSensitivity:
+				if (CurrentSettings.Configuration.MouseSensitivity > MOUSE_SENSITIVITY_MIN)
+				{
+					CurrentSettings.Configuration.MouseSensitivity -= 0.1f;
+					if (CurrentSettings.Configuration.MouseSensitivity < MOUSE_SENSITIVITY_MIN)
+						CurrentSettings.Configuration.MouseSensitivity = MOUSE_SENSITIVITY_MIN;
+
+					SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
+				}
+
+				break;
 			}
 		}
 
@@ -817,6 +832,18 @@ namespace TEN::Gui
 						CurrentSettings.Configuration.SfxVolume = VOLUME_MAX;
 
 					SetVolumeFX(CurrentSettings.Configuration.SfxVolume);
+					SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
+				}
+
+				break;
+
+			case OtherSettingsOption::MouseSensitivity:
+				if (CurrentSettings.Configuration.MouseSensitivity < MOUSE_SENSITIVITY_MAX)
+				{
+					CurrentSettings.Configuration.MouseSensitivity += 0.1f;
+					if (CurrentSettings.Configuration.MouseSensitivity > MOUSE_SENSITIVITY_MAX)
+						CurrentSettings.Configuration.MouseSensitivity = MOUSE_SENSITIVITY_MAX;
+
 					SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 				}
 
