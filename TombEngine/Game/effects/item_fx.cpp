@@ -9,6 +9,7 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
+#include "Scripting/Internal/TEN/Color/Color.h"
 #include "Specific/level.h"
 
 using namespace TEN::Effects::Smoke;
@@ -20,13 +21,37 @@ namespace TEN::Effects::Items
 		item->Effect.Type = EffectType::Fire;
 		item->Effect.Count = timeout;
 		item->Effect.LightColor = Vector3(0.8f, 0.5f, 0.0f);
+		item->Effect.PrimaryEffectColor = item->Effect.SecondaryEffectColor = Vector3::Zero;
+	}
+
+	void ItemCustomBurn(ItemInfo* item, Vector3 color1, Vector3 color2, int timeout)
+	{
+		item->Effect.Type = EffectType::Custom;
+		item->Effect.Count = timeout;
+		item->Effect.LightColor = color1;
+		item->Effect.PrimaryEffectColor = color1;
+		item->Effect.SecondaryEffectColor = color2;
 	}
 
 	void ItemElectricBurn(ItemInfo* item, int timeout)
 	{
 		item->Effect.Type = EffectType::Sparks;
 		item->Effect.Count = timeout;
-		item->Effect.LightColor = Vector3(0.0f, 0.2f, 0.8f);
+		item->Effect.LightColor = Vector3(0.0f, 0.6f, 1.0f);
+	}
+
+	void ItemBlueElectricBurn(ItemInfo* item, int timeout)
+	{
+		item->Effect.Type = EffectType::ElectricIgnite;
+		item->Effect.Count = timeout / FPS;
+		item->Effect.LightColor = Vector3(0.0f, 0.6f, 1.0f);
+	}
+
+	void ItemRedLaserBurn(ItemInfo* item, int timeout)
+	{
+		item->Effect.Type = EffectType::RedIgnite;
+		item->Effect.Count = timeout / FPS;
+		item->Effect.LightColor = Vector3(1.0f, 0.4f, 0.0f);
 	}
 
 	void ItemSmoke(ItemInfo* item, int timeout)
