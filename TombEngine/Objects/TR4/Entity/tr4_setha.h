@@ -5,11 +5,12 @@ struct ItemInfo;
 
 namespace TEN::Entities::TR4
 {
-	void InitialiseSetha(short itemNumber);
-	void SethaControl(short itemNumber);
-	void TriggerSethaSparks1(int x, int y, int z, short xv, short yv, short zv);
-	void TriggerSethaSparks2(short itemNumber, char node, int size);
-	void SethaThrowAttack(Pose* pose, short roomNumber, short mesh);
-	void SethaKill(ItemInfo* sethItem, ItemInfo* laraItem);
-	void SethaAttack(int itemNumber);
+	void InitialiseSeth(short itemNumber);
+	void SethControl(short itemNumber);
+	void SethAttack(int itemNumber);
+	void SethKill(ItemInfo* sethItem, ItemInfo* laraItem);
+
+	void TriggerSethSparks1(const Vector3& pos, const Vector3& velocity);
+	void TriggerSethSparks2(short itemNumber, char node, int size);
+	void SpawnSethProjectile(Pose* pose, int roomNumber, int flags);
 }
