@@ -1652,7 +1652,7 @@ namespace TEN::Gui
 		auto* lara = GetLaraInfo(item);
 
 		CompassNeedleAngle = ANGLE(22.5f);
-		AlterFOV(ANGLE(80.0f));
+		AlterFOV(ANGLE(DEFAULT_FOV), false);
 		lara->Inventory.IsBusy = false;
 		InventoryItemChosen = NO_ITEM;
 		UseItem = false;
@@ -3061,6 +3061,8 @@ namespace TEN::Gui
 
 		if (UseItem)
 			UseCurrentItem(item);
+
+		AlterFOV(LastFOV);
 
 		lara->Inventory.IsBusy = lara->Inventory.OldBusy;
 		InvMode = InventoryMode::None;

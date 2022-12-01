@@ -110,6 +110,25 @@ std::vector<Vector2i> GetAllSupportedScreenResolutions()
 	return result;
 }
 
+void DisableDpiAwareness()
+{
+	// Don't use SHCore library directly, as it's not available on pre-win 8.1 systems.
+
+	typedef HRESULT(WINAPI* SetDpiAwarenessProc)(UINT);
+	static constexpr unsigned int PROCESS_SYSTEM_DPI_AWARE = 1;
+
+	auto lib = LoadLibrary("SHCore.dll");
+	if (lib == NULL)
+		return;
+
+	auto setDpiAwareness = (SetDpiAwarenessProc)GetProcAddress(lib, "SetProcessDpiAwareness");
+	if (setDpiAwareness == NULL)
+		return;
+
+	setDpiAwareness(PROCESS_SYSTEM_DPI_AWARE);
+	FreeLibrary(lib);
+}
+
 void WinProcMsg()
 {
 	MSG Msg;
@@ -307,6 +326,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		ShutdownTENLog();
 		return 0;
 	}
+
+	// Disable DPI scaling on Windows 8.1+ systems
+	DisableDpiAwareness();
 
 	// Setup main window
 	INITCOMMONCONTROLSEX commCtrlInit;

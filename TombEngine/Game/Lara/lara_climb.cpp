@@ -924,26 +924,32 @@ int LaraTestClimbUpPos(ItemInfo* item, int front, int right, int* shift, int* le
 	short roomNumber = item->RoomNumber;
 	FloorInfo* floor = GetFloor(x, y, z, &roomNumber);
 	int ceiling = CLICK(1) - y + GetCeiling(floor, x, y, z);
+
+	floor = GetFloor(x + xFront, y, z + zFront, &roomNumber);
+	int height = GetFloorHeight(floor, x + xFront, y, z + zFront);
+
+	if (height == NO_HEIGHT)
+	{
+		*ledge = NO_HEIGHT;
+	}
+	else
+	{
+		height -= y;
+		*ledge = height;
+	}
 	
 	if (ceiling > LADDER_CLIMB_SHIFT)
 		return 0;
 
 	if (ceiling > 0)
 		*shift = ceiling;
-
-	floor = GetFloor(x + xFront, y, z + zFront, &roomNumber);
-	int height = GetFloorHeight(floor, x + xFront, y, z + zFront);
 	
 	if (height == NO_HEIGHT)
 	{
-		*ledge = NO_HEIGHT;
 		return 1;
 	}
 	else
 	{
-		height -= y;
-		*ledge = height;
-		
 		if (height <= CLICK(0.5f))
 		{
 			if (height > 0 && height > *shift)
