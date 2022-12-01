@@ -750,7 +750,7 @@ void SetContextWaterClimbOut(ItemInfo* item, CollisionInfo* coll, WaterClimbOutT
 {
 	auto& lara = *GetLaraInfo(item);
 
-	UpdateItemRoom(item, -LARA_HEIGHT / 2);
+	UpdateLaraRoom(item, -LARA_HEIGHT / 2);
 	SnapItemToLedge(item, coll, 1.7f, false);
 
 	item->Animation.ActiveState = LS_ONWATER_EXIT;
