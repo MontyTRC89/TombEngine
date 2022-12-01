@@ -61,7 +61,10 @@ enum class EffectType
 	None,
 	Fire,
 	Sparks,
-	Smoke
+	Smoke,
+	ElectricIgnite,
+	RedIgnite,
+	Custom
 };
 
 struct EntityAnimationData
@@ -95,6 +98,8 @@ struct EntityEffectData
 {
 	EffectType Type = EffectType::None;
 	Vector3 LightColor = Vector3::One;
+	Vector3 PrimaryEffectColor = Vector3::One;
+	Vector3 SecondaryEffectColor = Vector3::One;
 	int Count = -1;
 };
 

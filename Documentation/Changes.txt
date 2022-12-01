@@ -1,17 +1,31 @@
 Version 1.0.4
 =============
 
-* Add generic assignable effects for moveables - burn, electricity and smoke.
-* Add ability to burn enemies with flame emitters, death blocks and script functions.
-* Add Flow.EnableMassPickup option in Gameflow.lua to enable/disable mass pickup.
+* Add generic assignable effects for moveables - fire, sparks, smoke and laser / electric ignite.
+* Add ability to burn enemies with FLAME_EMITTER_1 and death blocks.
+* Remove TRC remnant which added HK to inventory if pistols weren't available.
 * Automatically align pickups to floor surface.
-* Fix legacy pickup triggers not working.
-* Fix lasersight always displaying with revolver and crossbow.
+* Fix legacy pickup triggers not working in certain cases.
+* Fix crawl pickup not actually doing any pickups.
+* Fix demigod and harpy shooting in incorrect directions.
+* Fix lasersight always displaying with HK, revolver and crossbow.
+* Fix rapid ammo spending in HK lasersight mode.
 * Fix incorrect string IDs for item combine, HK and revolver with lasersight.
 * Fix puzzle holes not swapping to puzzle done objects.
 * Fix several collision and sound source issues in flipped rooms.
-* Fix several pushable object collision bugs.
-* Fix TR1 centaur bubble targetting.
+* Fix several pushable sound and object collision bugs.
+* Fix original bug with incorrect climb up behaviour on ladders under sloped ceilings.
+* Fix TR1 centaur bubble targeting.
+* Fix caustics not turning off in display settings.
+* Fix windowed mode not using real resolution when DPI scaling is active.
+* Fix control lock not working in flyby sequences.
+* Fix empty inventory when using build and play feature in TE.
+* Fix several incorrect FOV reset issues.
+
+Lua API changes:
+* Add Flow.EnableMassPickup option in Gameflow.lua to enable/disable mass pickup.
+* Add level secrets property to display level-specific secret count.
+* Add new Moveable functions: GetEffect, SetEffect and SetCustomEffect (for colored fire).
 
 Version 1.0.3
 =============
