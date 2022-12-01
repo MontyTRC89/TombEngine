@@ -1258,7 +1258,7 @@ int GetFreeShockwave()
 	return -1;
 }
 
-void TriggerShockwave(Pose* pos, short innerRad, short outerRad, int speed, unsigned char r, unsigned char g, unsigned char b, unsigned char life, short angle, short flags)
+void TriggerShockwave(Pose* pos, short innerRad, short outerRad, int speed, unsigned char r, unsigned char g, unsigned char b, unsigned char life, short angle, short damage)
 {
 	int s = GetFreeShockwave();
 	SHOCKWAVE_STRUCT* sptr;
@@ -1273,14 +1273,14 @@ void TriggerShockwave(Pose* pos, short innerRad, short outerRad, int speed, unsi
 		sptr->innerRad = innerRad;
 		sptr->outerRad = outerRad;
 		sptr->xRot = angle;
-		sptr->flags = flags;
+		sptr->damage = damage;
 		sptr->speed = speed;
 		sptr->r = r;
 		sptr->g = g;
 		sptr->b = b;
 		sptr->life = life;
-
-		SoundEffect(SFX_TR5_IMP_STONE_HIT, pos);
+		
+		SoundEffect(SFX_TR4_SMASH_ROCK, pos);
 	}
 }
 
@@ -1357,7 +1357,7 @@ void UpdateShockwaves()
 
 				if (LaraItem->HitPoints > 0)
 				{
-					if (sw->flags & 3)
+					if (sw->damage)
 					{
 						AnimFrame* frame = GetBestFrame(LaraItem);
 
@@ -1382,7 +1382,7 @@ void UpdateShockwaves()
 								angle,
 								sw->speed);
 
-							DoDamage(LaraItem, sw->speed >> (((sw->flags >> 1) & 1) + 2));
+							DoDamage(LaraItem, sw->damage);
 						}
 					}
 				}

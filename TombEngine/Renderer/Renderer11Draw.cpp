@@ -2173,7 +2173,7 @@ namespace TEN::Renderer
 			return;
 
 		if (BinocularRange)
-			AlterFOV(ANGLE(80.0f) - BinocularRange);
+			AlterFOV(ANGLE(DEFAULT_FOV) - BinocularRange, false);
 
 		UINT stride = sizeof(RendererVertex);
 		UINT offset = 0;
