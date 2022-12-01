@@ -84,7 +84,7 @@ most can just be ignored (see usage).
 	@int[opt=10] hp HP of item
 	@int[opt=0] OCB ocb of item (default 0)
 	@tparam[opt] table AIBits table with AI bits (default {0,0,0,0,0,0})
-	@return reference to new Moveable object
+	@treturn Moveable A new Moveable object (a wrapper around the new object)
 	@usage 
 	local item = Moveable(
 		TEN.Objects.ObjID.PISTOLS_ITEM, -- object id
