@@ -108,7 +108,10 @@ GameStatus ControlPhase(int numFrames, bool demoMode)
 		numFrames = 10;
 
 	if (TrackCameraInit)
+	{
 		UseSpotCam = false;
+		AlterFOV(LastFOV);
+	}
 
 	g_GameStringsHandler->ProcessDisplayStrings(DELTA_TIME);
 	
