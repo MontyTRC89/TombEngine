@@ -229,7 +229,7 @@ void FlowHandler::SetTitleScreenImagePath(std::string const& path)
 
 void FlowHandler::SetTotalSecretCount(int secretsNumber)
 {
-	NumberOfSecrets = secretsNumber;
+	TotalNumberOfSecrets = secretsNumber;
 }
 
 void FlowHandler::LoadFlowScript()

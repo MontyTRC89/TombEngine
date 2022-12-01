@@ -95,6 +95,7 @@ static constexpr char ScriptReserved_SetStrength[]			= "SetStrength";
 static constexpr char ScriptReserved_GetValid[]				= "GetValid";
 static constexpr char ScriptReserved_SetEffect[]			= "SetEffect";
 static constexpr char ScriptReserved_GetEffect[]			= "GetEffect";
+static constexpr char ScriptReserved_SetCustomEffect[]		= "SetCustomEffect";
 static constexpr char ScriptReserved_Destroy[]				= "Destroy";
 static constexpr char ScriptReserved_GetKey[]				= "GetKey";
 static constexpr char ScriptReserved_SetKey[]				= "SetKey";

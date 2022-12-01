@@ -173,9 +173,9 @@ namespace TEN::Entities::Effects
 				AddFire(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, item->RoomNumber, 2.0f, 0);
 
 				TriggerDynamicLight(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z,
-									16 - (GetRandomControl() & 1),
-									(GetRandomControl() & 0x3F) + 192,
-									(GetRandomControl() & 0x1F) + 96, 0);
+					16 - (GetRandomControl() & 1),
+					(GetRandomControl() & 0x3F) + 192,
+					(GetRandomControl() & 0x1F) + 96, 0);
 
 				SoundEffect(SFX_TR4_LOOP_FOR_SMALL_FIRES, &item->Pose);
 
@@ -256,7 +256,7 @@ namespace TEN::Entities::Effects
 					item->Pose.Position.z += phd_cos(item->Pose.Orientation.y - ANGLE(180)) * (CLICK(1) / FPS);
 
 					auto probe = GetCollision(item);
-					
+
 					if (TestEnvironment(ENV_FLAG_WATER, probe.RoomNumber) ||
 						probe.Position.Floor - item->Pose.Position.y > CLICK(2) ||
 						probe.Position.Floor == NO_HEIGHT)

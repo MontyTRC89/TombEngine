@@ -1991,7 +1991,7 @@ namespace TEN::Renderer
 
 			BindLights(view.lightsToDraw);
 
-			m_stMisc.Caustics = (nativeRoom->flags & ENV_FLAG_WATER);
+			m_stMisc.Caustics = (int)(g_Gui.GetCurrentSettings().Configuration.EnableCaustics && (nativeRoom->flags & ENV_FLAG_WATER));
 			m_cbMisc.updateData(m_stMisc, m_context.Get());
 			BindConstantBufferPS(CB_MISC, m_cbMisc.get());
 			BindConstantBufferVS(CB_MISC, m_cbMisc.get());
@@ -2148,7 +2148,7 @@ namespace TEN::Renderer
 			return;
 
 		if (BinocularRange)
-			AlterFOV(ANGLE(80.0f) - BinocularRange);
+			AlterFOV(ANGLE(DEFAULT_FOV) - BinocularRange, false);
 
 		UINT stride = sizeof(RendererVertex);
 		UINT offset = 0;

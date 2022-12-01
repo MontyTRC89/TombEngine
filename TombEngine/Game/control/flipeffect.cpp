@@ -50,8 +50,8 @@ function<EffectFunction> effect_routines[NUM_FLIPEFFECTS] =
 	DrawLeftPistol,				//15
 	ShootRightGun,				//16
 	ShootLeftGun,				//17
-	PushLoop,					//18
-	PushEnd,					//19
+	VoidEffect,					//18
+	VoidEffect,					//19
 	FlashOrange,				//20
 	InvisibilityOn,				//21
 	InvisibilityOff,			//22

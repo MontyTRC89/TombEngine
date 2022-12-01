@@ -1085,7 +1085,10 @@ unsigned int _stdcall LoadLevel(void* data)
 		if (SystemNameHash != 0 && SystemNameHash != systemHash)
 			throw std::exception("An attempt was made to use level debug feature on a different system.");
 		else
+		{
+			InitialiseGame = (SystemNameHash != 0);
 			SystemNameHash = 0;
+		}
 
 		// Read data sizes
 		ReadFileEx(&uncompressedSize, 1, 4, filePtr);
