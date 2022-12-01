@@ -3,6 +3,7 @@ Version 1.0.4
 
 * Add generic assignable effects for moveables - fire, sparks, smoke and laser / electric ignite.
 * Add ability to burn enemies with FLAME_EMITTER_1 and death blocks.
+* Activate Lara-bound volume triggers with mounted vehicles.
 * Remove TRC remnant which added HK to inventory if pistols weren't available.
 * Automatically align pickups to floor surface.
 * Fix legacy pickup triggers not working in certain cases.
@@ -23,9 +24,10 @@ Version 1.0.4
 * Fix several incorrect FOV reset issues.
 
 Lua API changes:
-* Add Flow.EnableMassPickup option in Gameflow.lua to enable/disable mass pickup.
-* Add level secrets property to display level-specific secret count.
+* Add new Lara functions: GetTarget and GetVehicle.
 * Add new Moveable functions: GetEffect, SetEffect and SetCustomEffect (for colored fire).
+* Add Flow.EnableMassPickup option in Gameflow.lua to enable/disable mass pickups.
+* Add level secrets property to display level-specific secret count.
 
 Version 1.0.3
 =============
