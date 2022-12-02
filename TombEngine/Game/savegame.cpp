@@ -646,8 +646,10 @@ bool SaveGame::Save(int slot)
 		serializedItem.add_collidable(itemToSerialize.Collidable);
 		serializedItem.add_looked_at(itemToSerialize.LookedAt);
 		serializedItem.add_effect_type((int)itemToSerialize.Effect.Type);
-		serializedItem.add_effect_count(itemToSerialize.Effect.Count);
 		serializedItem.add_effect_light_colour(&FromVector3(itemToSerialize.Effect.LightColor));
+		serializedItem.add_effect_primary_colour(&FromVector3(itemToSerialize.Effect.PrimaryEffectColor));
+		serializedItem.add_effect_secondary_colour(&FromVector3(itemToSerialize.Effect.SecondaryEffectColor));
+		serializedItem.add_effect_count(itemToSerialize.Effect.Count);
 
 		if (Objects[itemToSerialize.ObjectNumber].intelligent 
 			&& itemToSerialize.Data.is<CreatureInfo>())
@@ -1394,8 +1396,10 @@ bool SaveGame::Load(int slot)
 		item->LookedAt = savedItem->looked_at();
 
 		item->Effect.Type = (EffectType)savedItem->effect_type();
-		item->Effect.Count = savedItem->effect_count();
+		item->Effect.PrimaryEffectColor = ToVector3(savedItem->effect_primary_colour());
+		item->Effect.SecondaryEffectColor = ToVector3(savedItem->effect_secondary_colour());
 		item->Effect.LightColor = ToVector3(savedItem->effect_light_colour());
+		item->Effect.Count = savedItem->effect_count();
 
 		// Mesh stuff
 		item->MeshBits = savedItem->mesh_bits();

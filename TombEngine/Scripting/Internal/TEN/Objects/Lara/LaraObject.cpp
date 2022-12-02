@@ -170,11 +170,12 @@ void LaraObject::ThrowAwayTorch()
 }
 
 //todo make these into enums - Squidshire 18/11/2022
+
 /// Get actual hand status of Lara
 // @function LaraObject:GetHandStatus
 // @usage
 // local handStatus = Lara:GetHandStatus()
-// @treturn 0=HandsFree, 1=Busy(climbing,etc), 2=WeaponDraw, 3=WeaponUndraw, 4=WeaponInHand.
+// @treturn int hand status 0=HandsFree, 1=Busy(climbing,etc), 2=WeaponDraw, 3=WeaponUndraw, 4=WeaponInHand.
 HandStatus LaraObject::GetHandStatus() const
 {
 	auto* lara = GetLaraInfo(m_item);
@@ -182,11 +183,12 @@ HandStatus LaraObject::GetHandStatus() const
 }
 
 //todo make these into enums - Squidshire 18/11/2022
+
 /// Get actual weapon type of Lara
 // @function LaraObject:GetWeaponType
 // @usage
 // local weaponType = Lara:GetWeaponType()
-// @treturn 0=None, 1=Pistols, 2=Revolver, 3=Uzi, 4=Shotgun, 5=HK, 6=Crossbow, 7=Flare, 8=Torch, 9=GrenadeLauncher, 10=Harpoon, 11=RocketLauncher.
+// @treturn int weapon type 0=None, 1=Pistols, 2=Revolver, 3=Uzi, 4=Shotgun, 5=HK, 6=Crossbow, 7=Flare, 8=Torch, 9=GrenadeLauncher, 10=Harpoon, 11=RocketLauncher.
 LaraWeaponType LaraObject::GetWeaponType() const
 {
 	auto* lara = GetLaraInfo(m_item);

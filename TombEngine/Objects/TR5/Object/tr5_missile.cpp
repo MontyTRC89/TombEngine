@@ -41,7 +41,7 @@ void MissileControl(short itemNumber)
 	else
 	{
 		auto orient = Geometry::GetOrientToPoint(
-			Vector3(fx->pos.Position.x, fx->pos.Position.y - CLICK(1), fx->pos.Position.z),
+			Vector3(fx->pos.Position.x, fx->pos.Position.y + CLICK(1), fx->pos.Position.z),
 			LaraItem->Pose.Position.ToVector3());
 
 		int dh;
@@ -61,12 +61,12 @@ void MissileControl(short itemNumber)
 				fx->speed++;
 
 			int dy = orient.y - fx->pos.Orientation.y;
-			if (abs(dy) > ANGLE(180.0f))
+			if (abs(dy) > abs(ANGLE(180.0f)))
 				dy = -dy;
 			dy /= 8;
 
 			int dx = orient.x - fx->pos.Orientation.x;
-			if (abs(dx) > ANGLE(180.0f))
+			if (abs(dx) > abs(ANGLE(180.0f)))
 				dx = -dx;
 			dx /= 8;
 

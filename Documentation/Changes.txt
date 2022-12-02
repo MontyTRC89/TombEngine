@@ -1,8 +1,9 @@
 Version 1.0.4
 =============
 
-* Add generic assignable effects for moveables - burn, electricity and smoke.
+* Add generic assignable effects for moveables - fire, sparks, smoke and laser / electric ignite.
 * Add ability to burn enemies with FLAME_EMITTER_1 and death blocks.
+* Remove TRC remnant which added HK to inventory if pistols weren't available.
 * Automatically align pickups to floor surface.
 * Fix legacy pickup triggers not working in certain cases.
 * Fix crawl pickup not actually doing any pickups.
@@ -24,7 +25,7 @@ Version 1.0.4
 Lua API changes:
 * Add Flow.EnableMassPickup option in Gameflow.lua to enable/disable mass pickup.
 * Add level secrets property to display level-specific secret count.
-* Add new Moveable functions: GetEffect / SetEffect
+* Add new Moveable functions: GetEffect, SetEffect and SetCustomEffect (for colored fire).
 
 Version 1.0.3
 =============
