@@ -478,15 +478,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 	lara->WaterSurfaceDist = -heightFromWater;
 
 	if (lara->Vehicle == NO_ITEM)
-	{
 		WadeSplash(item, waterHeight, waterDepth);
-	}
-	else if (!g_Level.Items[lara->Vehicle].Active)
-	{
-		lara->Vehicle = NO_ITEM;
-		item->Animation.IsAirborne = true;
-		SetAnimation(item, LA_FALL_START);
-	}
 
 	if (lara->Vehicle == NO_ITEM && lara->ExtraAnim == NO_ITEM)
 	{

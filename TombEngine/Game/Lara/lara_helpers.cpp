@@ -87,6 +87,14 @@ bool HandleLaraVehicle(ItemInfo* item, CollisionInfo* coll)
 	if (lara->Vehicle == NO_ITEM)
 		return false;
 
+	if (!g_Level.Items[lara->Vehicle].Active)
+	{
+		lara->Vehicle = NO_ITEM;
+		item->Animation.IsAirborne = true;
+		SetAnimation(item, LA_FALL_START);
+		return;
+	}
+
 	TestVolumes(lara->Vehicle);
 
 	switch (g_Level.Items[lara->Vehicle].ObjectNumber)
