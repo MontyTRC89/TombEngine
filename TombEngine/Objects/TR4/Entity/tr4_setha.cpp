@@ -646,8 +646,8 @@ namespace TEN::Entities::TR4
 
 		LaraItem->Animation.AnimNumber = Objects[ID_LARA_EXTRA_ANIMS].animIndex + LARA_ANIM_SETH_DEATH;
 		LaraItem->Animation.FrameNumber = g_Level.Anims[LaraItem->Animation.AnimNumber].frameBase;
-		LaraItem->Animation.ActiveState = SETH_STATE_SINGLE_PROJECTILE_ATTACK;
-		LaraItem->Animation.TargetState = SETH_STATE_SINGLE_PROJECTILE_ATTACK;
+		LaraItem->Animation.ActiveState = 13; // TODO: Demagic state.
+		LaraItem->Animation.TargetState = 13;
 		LaraItem->Animation.IsAirborne = false;
 		LaraItem->Pose = Pose(item->Pose.Position, 0, item->Pose.Orientation.y, 0);
 
