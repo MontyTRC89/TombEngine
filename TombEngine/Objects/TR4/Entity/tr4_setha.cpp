@@ -21,17 +21,16 @@ using namespace TEN::Math;
 
 namespace TEN::Entities::TR4
 {
-	constexpr auto SETH_KNEEL_ATTACK_DAMAGE = 200;
-	constexpr auto SETH_GRAB_ATTACK_DAMAGE	= 250;
+	constexpr auto SETH_POUNCE_ATTACK_DAMAGE = 200;
+	constexpr auto SETH_KILL_ATTACK_DAMAGE	 = 250;
 
-	// TODO: Rename all of this.
-	constexpr auto SETH_IDLE_RANGE = SQUARE(BLOCK(4));
-	constexpr auto SETH_WALK_RANGE = SQUARE(BLOCK(3));
-	constexpr auto SETH_RECOIL_RANGE = SQUARE(BLOCK(2));
-	constexpr auto SETH_GRAB_ATTACK_RANGE = SQUARE(BLOCK(1));
-	constexpr auto SETH_SHOOT_RIGHT_LEFT_RANGE = SQUARE(BLOCK(2.5f));
-	constexpr auto SETH_KNEEL_ATTACK_RANGE = SQUARE(BLOCK(3));
-	constexpr auto SETH_BIG_PROJECTILE_RANGE = SQUARE(BLOCK(4));
+	constexpr auto SETH_IDLE_RANGE					 = SQUARE(BLOCK(4));
+	constexpr auto SETH_WALK_RANGE					 = SQUARE(BLOCK(3));
+	constexpr auto SETH_RECOIL_RANGE				 = SQUARE(BLOCK(2));
+	constexpr auto SETH_SINGLE_PROJECTILE_RANGE		 = SQUARE(BLOCK(4));
+	constexpr auto SETH_DUAL_PROJECTILE_ATTACK_RANGE = SQUARE(BLOCK(2.5f));
+	constexpr auto SETH_POUNCE_ATTACK_RANGE			 = SQUARE(BLOCK(3));
+	constexpr auto SETH_KILL_ATTACK_RANGE			 = SQUARE(BLOCK(1));
 
 	const auto SETH_WALK_TURN_RATE_MAX = ANGLE(7.0f);
 	const auto SETH_RUN_TURN_RATE_MAX  = ANGLE(11.0f);
@@ -39,8 +38,8 @@ namespace TEN::Entities::TR4
 	const auto SethKneelAttackJoints1 = std::vector<unsigned int>{ 13, 14, 15 };
 	const auto SethKneelAttackJoints2 = std::vector<unsigned int>{ 16, 17, 18 };
 
-	const auto SethBite1 = BiteInfo(Vector3(0.0f, 220.0f, 50.0f), 17);
-	const auto SethBite2 = BiteInfo(Vector3(0.0f, 220.0f, 50.0f), 13);
+	const auto SethBite1   = BiteInfo(Vector3(0.0f, 220.0f, 50.0f), 17);
+	const auto SethBite2   = BiteInfo(Vector3(0.0f, 220.0f, 50.0f), 13);
 	const auto SethAttack1 = BiteInfo(Vector3(-16.0f, 200.0f, 32.0f), 13);
 	const auto SethAttack2 = BiteInfo(Vector3(16.0f, 200.0f, 32.0f), 17);
 
@@ -52,52 +51,52 @@ namespace TEN::Entities::TR4
 		SETH_STATE_IDLE = 1,
 		SETH_STATE_WALK_FORWARD = 2,
 		SETH_STATE_RUN_FORWARD = 3,
-		SETH_STATE_KNEEL_ATTACK = 4,
+		SETH_STATE_POUNCE_ATTACK = 4,
 		SETH_STATE_JUMP = 5,
-		SETH_STATE_GET_SHOT = 6,
-		SETH_STATE_GET_HEAVY_SHOT = 7,
-		SETH_STATE_ATTACK_GRAB = 8,
-		SETH_STATE_ATTACK_KILL_LARA = 9,
-		SETH_STATE_REGENERATE = 10,
-		SETH_STATE_SHOOT_RIGHT_AND_LEFT = 11,
-		SETH_STATE_JUMP_AIR_SHOOT = 12,
-		SETH_STATE_BIG_PROJECTILE = 13,
-		SETH_STATE_FLY = 14,
-		SETH_STATE_FLY_AIR_SHOOT = 15,
-		SETH_STATE_FLY_GET_HEAVY_SHOT = 16
+		SETH_STATE_SOFT_RECOIL = 6,
+		SETH_STATE_HARD_RECOIL = 7,
+		SETH_STATE_KILL_ATTACK_START = 8,
+		SETH_STATE_KILL_ATTACK_END = 9,
+		SETH_STATE_HARD_RECOIL_RECOVER = 10,
+		SETH_STATE_DUAL_PROJECTILE_ATTACK = 11,
+		SETH_STATE_JUMP_PROJECTILE_ATTACK = 12,
+		SETH_STATE_SINGLE_PROJECTILE_ATTACK = 13,
+		SETH_STATE_HOVER = 14,
+		SETH_STATE_HOVER_PROJECTILE_ATTACK = 15,
+		SETH_STATE_HOVER_RECOIL = 16
 	};
 
 	enum SethAnim
 	{
-		SETH_ANIM_SHOOT_RIGHT_AND_LEFT = 0,
-		SETH_ANIM_PREPARE_JUMP = 1,
-		SETH_ANIM_JUMP = 2,
-		SETH_ANIM_JUMP_LANDING = 3,
-		SETH_ANIM_JUMP_AIR_SHOOT = 4,
-		SETH_ANIM_AIM_BIG_PROJECTILE = 5,
-		SETH_ANIM_SHOOT_BIG_PROJECTILE = 6,
-		SETH_ANIM_UNAIM_BIG_PROJECTILE = 7,
+		SETH_ANIM_DUAL_PROJECTILE_ATTACK = 0,
+		SETH_ANIM_JUMP_START = 1,
+		SETH_ANIM_JUMP_CONTINUE = 2,
+		SETH_ANIM_JUMP_END = 3,
+		SETH_ANIM_JUMP_PROJECTILE_ATTACK = 4,
+		SETH_ANIM_SINGLE_PROJECTILE_ATTACK_START = 5,
+		SETH_ANIM_SINGLE_PROJECTILE_ATTACK_CONTINUE = 6,
+		SETH_ANIM_SINGLE_PROJECTILE_ATTACK_END = 7,
 		SETH_ANIM_WALK_FORWARD = 8,
 		SETH_ANIM_WALK_FORWARD_TO_RUN = 9,
 		SETH_ANIM_RUN_FORWARD = 10,
-		SETH_ANIM_IDLE_GET_SHOT = 11,
+		SETH_ANIM_SOFT_RECOIL = 11,
 		SETH_ANIM_IDLE = 12,
-		SETH_ANIM_ATTACK_GRAB = 13,
-		SETH_ANIM_ATTACK_KILL_LARA = 14,
-		SETH_ANIM_PREPARE_KNEEL_ATTACK = 15,
-		SETH_ANIM_KNEEL_ATTACK = 16,
-		SETH_ANIM_GET_HEAVY_SHOT_SOMERSAULT = 17,
-		SETH_ANIM_GET_HEAVY_SHOT_SOMERSAULT_END = 18,
-		SETH_ANIM_REGENERATE = 19,
+		SETH_ANIM_KILL_ATTACK_START = 13,
+		SETH_ANIM_KILL_ATTACK_END = 14,
+		SETH_ANIM_POUNCE_ATTACK_START = 15,
+		SETH_ANIM_POUNCE_ATTACK_END = 16,
+		SETH_ANIM_HARD_RECOIL_START = 17,
+		SETH_ANIM_HARD_RECOIL_END = 18,
+		SETH_ANIM_HARD_RECOIL_RECOVER = 19,
 		SETH_ANIM_WALK_FORWARD_TO_IDLE = 20,
-		SETH_ANIM_IDLE_TO_WALK = 21,
+		SETH_ANIM_IDLE_TO_WALK_FORWARD = 21,
 		SETH_ANIM_RUN_FORWARD_TO_IDLE = 22,
-		SETH_ANIM_RUN_FORWARD_TO_WALK =23,
-		SETH_ANIM_FLY_AIR_SHOOT = 24,
-		SETH_ANIM_FLY_GET_HEAVY_SHOT = 25,
-		SETH_ANIM_IDLE_JUMP_TO_FLY = 26,
-		SETH_ANIM_FLY_TO_LAND = 27,
-		SETH_ANIM_FLY_IDLE = 28
+		SETH_ANIM_RUN_FORWARD_TO_WALK = 23,
+		SETH_ANIM_HOVER_PROJECTILE_ATTACK = 24,
+		SETH_ANIM_HOVER_RECOIL = 25,
+		SETH_ANIM_IDLE_TO_HOVER = 26,
+		SETH_ANIM_HOVER_IDLE_TO_LAND = 27,
+		SETH_ANIM_HOVER_IDLE = 28
 	};
 
 	void InitialiseSeth(short itemNumber)
@@ -181,17 +180,17 @@ namespace TEN::Entities::TR4
 					item->Animation.TargetState = item->Animation.RequiredState;
 					break;
 				}
-				else if (AI.distance < SETH_GRAB_ATTACK_RANGE && AI.bite)
+				else if (AI.distance < SETH_KILL_ATTACK_RANGE && AI.bite)
 				{
-					item->Animation.TargetState = SETH_STATE_ATTACK_GRAB;
+					item->Animation.TargetState = SETH_STATE_KILL_ATTACK_START;
 					break;
 				}
 				else if (LaraItem->Pose.Position.y >= (item->Pose.Position.y - BLOCK(1)))
 				{
-					if (AI.distance < SETH_SHOOT_RIGHT_LEFT_RANGE && AI.ahead &&
+					if (AI.distance < SETH_DUAL_PROJECTILE_ATTACK_RANGE && AI.ahead &&
 						 Targetable(item, &AI) && Random::TestProbability(1 / 2.0f))
 					{
-						item->Animation.TargetState = SETH_STATE_SHOOT_RIGHT_AND_LEFT;
+						item->Animation.TargetState = SETH_STATE_DUAL_PROJECTILE_ATTACK;
 						item->ItemFlags[0] = 0;
 						break;
 					}
@@ -205,7 +204,7 @@ namespace TEN::Entities::TR4
 						if (Targetable(item, &AI))
 						{
 							item->Pose.Position.y += BLOCK(3 / 2.0f);
-							item->Animation.TargetState = SETH_STATE_JUMP_AIR_SHOOT;
+							item->Animation.TargetState = SETH_STATE_JUMP_PROJECTILE_ATTACK;
 							item->ItemFlags[0] = 0;
 						}
 						else
@@ -218,22 +217,22 @@ namespace TEN::Entities::TR4
 					}
 					else
 					{
-						if (AI.distance < SETH_KNEEL_ATTACK_RANGE && AI.ahead &&
+						if (AI.distance < SETH_POUNCE_ATTACK_RANGE && AI.ahead &&
 							AI.angle < ANGLE(33.75f) && AI.angle > ANGLE(-33.75f))
 						{
 							if (Targetable(item, &AI))
 							{
-								item->Animation.TargetState = SETH_STATE_KNEEL_ATTACK;
+								item->Animation.TargetState = SETH_STATE_POUNCE_ATTACK;
 								break;
 							}
 						}
-						else if (AI.distance < SETH_BIG_PROJECTILE_RANGE &&
+						else if (AI.distance < SETH_SINGLE_PROJECTILE_RANGE &&
 							AI.angle < ANGLE(45.0f) && AI.angle > ANGLE(-45.0f) &&
 							height4 != NO_HEIGHT &&
 							height4 >= (item->Pose.Position.y - CLICK(1)) &&
 							Targetable(item, &AI))
 						{
-							item->Animation.TargetState = SETH_STATE_BIG_PROJECTILE;
+							item->Animation.TargetState = SETH_STATE_SINGLE_PROJECTILE_ATTACK;
 							item->ItemFlags[0] = 0;
 							break;
 						}
@@ -248,7 +247,7 @@ namespace TEN::Entities::TR4
 				{
 					if (creature.ReachedGoal)
 					{
-						item->Animation.TargetState = SETH_STATE_FLY;
+						item->Animation.TargetState = SETH_STATE_HOVER;
 						break;
 					}
 					else
@@ -291,10 +290,10 @@ namespace TEN::Entities::TR4
 				
 				break;
 
-			case SETH_STATE_KNEEL_ATTACK:
+			case SETH_STATE_POUNCE_ATTACK:
 				if (canJump)
 				{
-					if (item->Animation.AnimNumber == (Objects[item->ObjectNumber].animIndex + SETH_ANIM_PREPARE_KNEEL_ATTACK) &&
+					if (item->Animation.AnimNumber == (Objects[item->ObjectNumber].animIndex + SETH_ANIM_POUNCE_ATTACK_START) &&
 						item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase)
 					{
 						creature.MaxTurn = 0;
@@ -306,18 +305,18 @@ namespace TEN::Entities::TR4
 				{
 					if (item->TouchBits.TestAny())
 					{
-						if (item->Animation.AnimNumber == (Objects[item->ObjectNumber].animIndex + SETH_ANIM_KNEEL_ATTACK))
+						if (item->Animation.AnimNumber == (Objects[item->ObjectNumber].animIndex + SETH_ANIM_POUNCE_ATTACK_END))
 						{
 							if (item->TouchBits.Test(SethKneelAttackJoints1))
 							{
-								DoDamage(creature.Enemy, SETH_KNEEL_ATTACK_DAMAGE);
+								DoDamage(creature.Enemy, SETH_POUNCE_ATTACK_DAMAGE);
 								CreatureEffect2(item, SethBite1, 25, -1, DoBloodSplat);
 								creature.Flags = 1; // Flag 1 = is attacking.
 							}
 
 							if (item->TouchBits.Test(SethKneelAttackJoints2))
 							{
-								DoDamage(creature.Enemy, SETH_KNEEL_ATTACK_DAMAGE);
+								DoDamage(creature.Enemy, SETH_POUNCE_ATTACK_DAMAGE);
 								CreatureEffect2(item, SethBite2, 25, -1, DoBloodSplat);
 								creature.Flags = 1; // Flag 1 = is attacking.
 							}
@@ -332,17 +331,17 @@ namespace TEN::Entities::TR4
 				creature.ReachedGoal = true;
 				break;
 
-			case SETH_STATE_GET_HEAVY_SHOT:
-				if (item->Animation.AnimNumber == (Objects[item->Animation.AnimNumber].animIndex + SETH_ANIM_GET_HEAVY_SHOT_SOMERSAULT) &&
+			case SETH_STATE_HARD_RECOIL:
+				if (item->Animation.AnimNumber == (Objects[item->Animation.AnimNumber].animIndex + SETH_ANIM_HARD_RECOIL_START) &&
 					item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameEnd)
 				{
 					if (Random::TestProbability(1 / 2.0f))
-						item->Animation.RequiredState = SETH_STATE_REGENERATE;
+						item->Animation.RequiredState = SETH_STATE_HARD_RECOIL_RECOVER;
 				}
 
 				break;
 
-			case SETH_STATE_ATTACK_GRAB:
+			case SETH_STATE_KILL_ATTACK_START:
 				creature.MaxTurn = 0;
 
 				if (abs(AI.angle) >= ANGLE(3.0f))
@@ -359,10 +358,10 @@ namespace TEN::Entities::TR4
 				{
 					if (item->TouchBits.TestAny())
 					{
-						if (item->Animation.FrameNumber > (g_Level.Anims[item->Animation.AnimNumber].frameBase + SETH_ANIM_PREPARE_KNEEL_ATTACK) &&
-							item->Animation.FrameNumber < (g_Level.Anims[item->Animation.AnimNumber].frameBase + SETH_ANIM_IDLE_JUMP_TO_FLY))
+						if (item->Animation.FrameNumber > (g_Level.Anims[item->Animation.AnimNumber].frameBase + SETH_ANIM_POUNCE_ATTACK_START) &&
+							item->Animation.FrameNumber < (g_Level.Anims[item->Animation.AnimNumber].frameBase + SETH_ANIM_IDLE_TO_HOVER))
 						{
-							DoDamage(creature.Enemy, SETH_GRAB_ATTACK_DAMAGE);
+							DoDamage(creature.Enemy, SETH_KILL_ATTACK_DAMAGE);
 							CreatureEffect2(item, SethBite1, 25, -1, DoBloodSplat);
 							creature.Flags = 1; // Flag 1 = is attacking.
 						}
@@ -379,13 +378,13 @@ namespace TEN::Entities::TR4
 
 				break;
 
-			case SETH_STATE_SHOOT_RIGHT_AND_LEFT:
-			case SETH_STATE_JUMP_AIR_SHOOT:
-			case SETH_STATE_BIG_PROJECTILE:
-			case SETH_STATE_FLY_AIR_SHOOT:
+			case SETH_STATE_DUAL_PROJECTILE_ATTACK:
+			case SETH_STATE_JUMP_PROJECTILE_ATTACK:
+			case SETH_STATE_SINGLE_PROJECTILE_ATTACK:
+			case SETH_STATE_HOVER_PROJECTILE_ATTACK:
 				creature.MaxTurn = 0;
 
-				if (item->Animation.ActiveState == SETH_STATE_FLY_AIR_SHOOT)
+				if (item->Animation.ActiveState == SETH_STATE_HOVER_PROJECTILE_ATTACK)
 					creature.Target.y = LaraItem->Pose.Position.y;
 
 				if (abs(AI.angle) >= ANGLE(3.0f))
@@ -405,8 +404,8 @@ namespace TEN::Entities::TR4
 
 				break;
 
-			case SETH_STATE_FLY:
-				if (item->Animation.AnimNumber != (Objects[item->Animation.AnimNumber].animIndex + SETH_ANIM_IDLE_JUMP_TO_FLY))
+			case SETH_STATE_HOVER:
+				if (item->Animation.AnimNumber != (Objects[item->Animation.AnimNumber].animIndex + SETH_ANIM_IDLE_TO_HOVER))
 				{
 					item->Animation.IsAirborne = false;
 					creature.MaxTurn = 0;
@@ -428,7 +427,7 @@ namespace TEN::Entities::TR4
 				{
 					if (Targetable(item, &AI))
 					{
-						item->Animation.TargetState = SETH_STATE_FLY_AIR_SHOOT;
+						item->Animation.TargetState = SETH_STATE_HOVER_PROJECTILE_ATTACK;
 						item->ItemFlags[0] = 0;
 					}
 				}
@@ -453,17 +452,17 @@ namespace TEN::Entities::TR4
 			if ((Lara.Control.Weapon.GunType == LaraWeaponType::Shotgun || Lara.Control.Weapon.GunType == LaraWeaponType::Revolver) &&
 				AI.distance < SETH_RECOIL_RANGE && !(creature.LOT.IsJumping))
 			{
-				if (item->Animation.ActiveState != SETH_STATE_JUMP_AIR_SHOOT)
+				if (item->Animation.ActiveState != SETH_STATE_JUMP_PROJECTILE_ATTACK)
 				{
-					if (item->Animation.ActiveState <= SETH_STATE_BIG_PROJECTILE)
+					if (item->Animation.ActiveState <= SETH_STATE_SINGLE_PROJECTILE_ATTACK)
 					{
 						if (abs(height4 - item->Pose.Position.y) >= BLOCK(1 / 2.0f))
-							SetAnimation(item, SETH_ANIM_IDLE_GET_SHOT);
+							SetAnimation(item, SETH_ANIM_SOFT_RECOIL);
 						else
-							SetAnimation(item, SETH_ANIM_GET_HEAVY_SHOT_SOMERSAULT);
+							SetAnimation(item, SETH_ANIM_HARD_RECOIL_START);
 					}
 					else
-						SetAnimation(item, SETH_ANIM_FLY_GET_HEAVY_SHOT);
+						SetAnimation(item, SETH_ANIM_HOVER_RECOIL);
 				}
 			}
 		}
@@ -484,8 +483,8 @@ namespace TEN::Entities::TR4
 
 		switch (item->Animation.ActiveState)
 		{
-		case SETH_STATE_SHOOT_RIGHT_AND_LEFT:
-		case SETH_STATE_FLY_AIR_SHOOT:
+		case SETH_STATE_DUAL_PROJECTILE_ATTACK:
+		case SETH_STATE_HOVER_PROJECTILE_ATTACK:
 			if (item->ItemFlags[0] < 78 && (GetRandomControl() & 0x1F) < item->ItemFlags[0])
 			{
 				// Spawn spark particles.
@@ -544,7 +543,7 @@ namespace TEN::Entities::TR4
 
 			break;
 
-		case SETH_STATE_JUMP_AIR_SHOOT:
+		case SETH_STATE_JUMP_PROJECTILE_ATTACK:
 			size = item->ItemFlags[0] * 4;
 			if (size > 160)
 				size = 160;
@@ -578,7 +577,7 @@ namespace TEN::Entities::TR4
 
 			break;
 
-		case SETH_STATE_BIG_PROJECTILE:
+		case SETH_STATE_SINGLE_PROJECTILE_ATTACK:
 			if (item->ItemFlags[0] > 40 &&
 				item->ItemFlags[0] < 100 &&
 				(GetRandomControl() & 7) < item->ItemFlags[0] - 40)
@@ -639,12 +638,12 @@ namespace TEN::Entities::TR4
 
 	void SethKill(ItemInfo* item, ItemInfo* laraItem)
 	{
-		SetAnimation(item, SETH_ANIM_ATTACK_KILL_LARA);
+		SetAnimation(item, SETH_ANIM_KILL_ATTACK_END);
 
 		LaraItem->Animation.AnimNumber = Objects[ID_LARA_EXTRA_ANIMS].animIndex + LARA_ANIM_SETH_DEATH;
 		LaraItem->Animation.FrameNumber = g_Level.Anims[LaraItem->Animation.AnimNumber].frameBase;
-		LaraItem->Animation.ActiveState = SETH_STATE_BIG_PROJECTILE;
-		LaraItem->Animation.TargetState = SETH_STATE_BIG_PROJECTILE;
+		LaraItem->Animation.ActiveState = SETH_STATE_SINGLE_PROJECTILE_ATTACK;
+		LaraItem->Animation.TargetState = SETH_STATE_SINGLE_PROJECTILE_ATTACK;
 		LaraItem->Animation.IsAirborne = false;
 		LaraItem->Pose = Pose(item->Pose.Position, 0, item->Pose.Orientation.y, 0);
 
