@@ -343,7 +343,7 @@ void ClassicRollingBallCollision(short itemNum, ItemInfo* lara, CollisionInfo* c
 				lara->Pose.Orientation.y = item->Pose.Orientation.y;
 				lara->Pose.Orientation.x = lara->Pose.Orientation.z = 0;
 
-				SetAnimation(item, LA_BOULDER_DEATH);
+				SetAnimation(lara, LA_BOULDER_DEATH);
 						
 				Camera.flags = CF_FOLLOW_CENTER;
 				Camera.targetAngle = ANGLE(170);
