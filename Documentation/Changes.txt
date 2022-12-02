@@ -17,6 +17,7 @@ Version 1.0.4
 * Fix several pushable sound and object collision bugs.
 * Fix original bug with incorrect climb up behaviour on ladders under sloped ceilings.
 * Fix TR1 centaur bubble targeting.
+* Fix classic rollingball and big rollingball not behaving properly.
 * Fix caustics not turning off in display settings.
 * Fix windowed mode not using real resolution when DPI scaling is active.
 * Fix control lock not working in flyby sequences.
@@ -24,10 +25,12 @@ Version 1.0.4
 * Fix several incorrect FOV reset issues.
 
 Lua API changes:
-* Add new Lara functions: GetTarget and GetVehicle.
 * Add new Moveable functions: GetEffect, SetEffect and SetCustomEffect (for colored fire).
+* Add new Lara functions: GetTarget and GetVehicle.
+* Remove Lara functions: SetOnFire and GetOnFire (replaced with GetEffect and SetEffect).
 * Add Flow.EnableMassPickup option in Gameflow.lua to enable/disable mass pickups.
 * Add level secrets property to display level-specific secret count.
+* Fix action key script functions not fully working in some cases.
 
 Version 1.0.3
 =============

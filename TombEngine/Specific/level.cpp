@@ -1031,7 +1031,7 @@ bool Decompress(byte* dest, byte* src, unsigned long compressedSize, unsigned lo
 
 unsigned int _stdcall LoadLevel(void* data)
 {
-	const int levelIndex = reinterpret_cast<int>(data);
+	const int levelIndex = (int)reinterpret_cast<size_t>(data);
 
 	auto* level = g_GameFlow->GetLevel(levelIndex);
 
@@ -1277,7 +1277,7 @@ int LoadLevelFile(int levelIndex)
 		nullptr,
 		0, 
 		LoadLevel, 
-		reinterpret_cast<void*>(levelIndex), 
+		reinterpret_cast<void*>((size_t)levelIndex), 
 		0, 
 		nullptr);
 

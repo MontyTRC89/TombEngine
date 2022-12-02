@@ -387,7 +387,7 @@ void ClassicRollingBallControl(short itemNum)
 		{
 			if (!item->Animation.IsAirborne)
 			{
-				item->Animation.IsAirborne = 1;
+				item->Animation.IsAirborne = true;
 				item->Animation.Velocity.y = -10;
 			}
 		}
@@ -406,15 +406,15 @@ void ClassicRollingBallControl(short itemNum)
 
 		TestTriggers(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, roomNum, true);
 
-		if (item->Pose.Position.y >= (int)floor - 256)
+		if (item->Pose.Position.y >= item->Floor - CLICK(1))
 		{
 			item->Animation.IsAirborne = false;
 			item->Animation.Velocity.y = 0;
 			item->Pose.Position.y = item->Floor;
 			SoundEffect(SFX_TR4_ROLLING_BALL, &item->Pose);
 			dist = sqrt((SQUARE(Camera.mikePos.x - item->Pose.Position.x)) + (SQUARE(Camera.mikePos.z - item->Pose.Position.z)));
-			if (dist < 10240)
-				Camera.bounce = -40 * (10240 - dist) / 10240;
+			if (dist < BLOCK(10))
+				Camera.bounce = -40 * (BLOCK(10) - dist) / BLOCK(10);
 		}
 
 //		dist = (item->objectNumber == ID_CLASSIC_ROLLING_BALL) ? 384 : 1024;//huh?
@@ -430,8 +430,8 @@ void ClassicRollingBallControl(short itemNum)
 		}
 		else
 		{
-			dist = 1024;
-			ydist = 1024;
+			dist = BLOCK(1);
+			ydist = BLOCK(1);
 		}
 
 		x = item->Pose.Position.x + dist * phd_sin(item->Pose.Orientation.y);
@@ -444,9 +444,9 @@ void ClassicRollingBallControl(short itemNum)
 		floor = GetFloor(x, item->Pose.Position.y - ydist, z, &roomNum);
 		y2 = GetCeiling(floor, x, item->Pose.Position.y - ydist, z);
 
-		if (y1 < item->Pose.Position.y || y2 > (item->Pose.Position.y-ydist)) //there's something wrong here, this if statement returns true, executing this block, deactivating the boulders.
+		if (y1 < item->Pose.Position.y || y2 > (item->Pose.Position.y - ydist))
 		{
-			/*stupid sound crap hardcoded to object # idk*/
+			StopSoundEffect(SFX_TR4_ROLLING_BALL);
 			item->Status = ITEM_DEACTIVATED;
 			item->Pose.Position.y = item->Floor;
 			item->Pose.Position.x = oldx;
@@ -497,5 +497,4 @@ void InitialiseClassicRollingBall(short itemNum)
 	old->y = item->Pose.Position.y;
 	old->z = item->Pose.Position.z;
 	old->RoomNumber = item->RoomNumber;
-
 }
