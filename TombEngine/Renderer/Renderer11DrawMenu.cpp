@@ -478,8 +478,8 @@ namespace TEN::Renderer
 		// Secrets found in Level
 		if (g_GameFlow->GetLevel(CurrentLevel)->GetSecrets() > 0)
 		{
-			std::bitset<32> LevelSecretBitSet(Statistics.Level.Secrets);
-			sprintf(buffer, "%d / %d", LevelSecretBitSet.count(), g_GameFlow->GetLevel(CurrentLevel)->GetSecrets());
+			std::bitset<32> levelSecretBitSet(Statistics.Level.Secrets);
+			sprintf(buffer, "%d / %d", (int)levelSecretBitSet.count(), g_GameFlow->GetLevel(CurrentLevel)->GetSecrets());
 			AddString(MenuRightSideEntry, y, buffer, PRINTSTRING_COLOR_WHITE, SF());
 			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_LEVEL_SECRETS_FOUND), PRINTSTRING_COLOR_WHITE, SF());
 			GetNextLinePosition(&y);
