@@ -10,7 +10,6 @@
 #include "Game/effects/item_fx.h"
 #include "Specific/level.h"
 #include "ReservedScriptNames.h"
-#include "Scripting/Internal/TEN/Objects/ObjectsHandler.h"
 
 /***
 Class for extra Lara-only functions.
