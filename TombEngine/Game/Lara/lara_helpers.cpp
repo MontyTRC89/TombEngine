@@ -811,6 +811,24 @@ void SetLaraSwimDiveAnimation(ItemInfo* item)
 	lara->Control.WaterStatus = WaterStatus::Underwater;
 }
 
+void SetLaraVehicle(ItemInfo* item, ItemInfo* vehicle)
+{
+	auto* lara = GetLaraInfo(item);
+
+	if (vehicle == nullptr)
+	{
+		if (lara->Vehicle != NO_ITEM)
+			g_Level.Items[lara->Vehicle].Active = false;
+
+		lara->Vehicle = NO_ITEM;
+	}
+	else
+	{
+		g_Level.Items[vehicle->Index].Active = true;
+		lara->Vehicle = vehicle->Index;
+	}
+}
+
 void ResetLaraLean(ItemInfo* item, float rate, bool resetRoll, bool resetPitch)
 {
 	if (!rate)
