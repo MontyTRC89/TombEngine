@@ -94,8 +94,10 @@ namespace TEN::Input
 		bool IsReleased(float maxDelayInSec = INFINITY) const;
 
 		// Utilities
+		void Update(bool value);
 		void Update(float value);
 		void Clear();
+
 		void PrintDebugInfo() const;
 
 	private:
