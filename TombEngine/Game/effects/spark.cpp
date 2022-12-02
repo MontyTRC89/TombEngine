@@ -3,6 +3,8 @@
 #include "Game/effects/spark.h"
 
 #include <array>
+#include "Game/control/control.h"
+#include "Game/effects/effects.h"
 #include "Math/Math.h"
 #include "Math/Random.h"
 
@@ -139,5 +141,37 @@ namespace TEN::Effects::Spark
 			s.destinationColor = Vector4(0.6f, 0.6f, 0.8f, 0.8f);
 			s.active = true;
 		}
+	}
+
+	void TriggerAttackSpark(SparkOffsets* pose, Vector3 color)
+	{
+		auto* spark = GetFreeParticle();
+
+		spark->on = 1;
+		spark->sR = 0;
+		spark->sG = 0;
+		spark->sB = 0;
+		spark->dR = color.x;
+		spark->dG = color.y;
+		spark->dB = color.z;
+		spark->life = 16;
+		spark->sLife = 16;
+		spark->colFadeSpeed = 4;
+		spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+		spark->fadeToBlack = 4;
+		spark->x = pose->x;
+		spark->y = pose->y;
+		spark->z = pose->z;
+		spark->xVel = pose->vx;
+		spark->yVel = pose->vy;
+		spark->zVel = pose->vz;
+		spark->friction = 34;
+		//	spark->scalar = 1;
+		//	spark->size = (GetRandomControl() & 3) + 4;
+		//	spark->sSize = spark->size;
+		spark->maxYvel = 0;
+		spark->gravity = 0;
+		//	spark->dSize = (GetRandomControl() & 1) + 1;
+		spark->flags = SP_NONE;
 	}
 }

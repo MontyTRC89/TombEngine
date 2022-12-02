@@ -3,6 +3,8 @@
 #include <SimpleMath.h>
 #include "Math/Math.h"
 
+struct SparkOffsets;
+
 namespace TEN::Effects::Spark
 {
 	struct SparkParticle
@@ -29,4 +31,5 @@ namespace TEN::Effects::Spark
 	void TriggerRicochetSpark(GameVector* pos, short angle, int num);
 	void TriggerFrictionSpark(GameVector* pos, EulerAngles angle, float length, int num);
 	void TriggerElectricSpark(GameVector* pos, EulerAngles angle, int num);
+	void TriggerAttackSpark(SparkOffsets* pose, Vector3 color);
 }

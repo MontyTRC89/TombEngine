@@ -6,6 +6,7 @@
 #include "Game/collision/collide_room.h"
 #include "Game/control/control.h"
 #include "Game/effects/effects.h"
+#include "Game/effects/spark.h"
 #include "Game/effects/item_fx.h"
 #include "Game/itemdata/creature_info.h"
 #include "Game/items.h"
@@ -19,6 +20,7 @@
 using namespace TEN::Math;
 using namespace TEN::Math::Random;
 using namespace TEN::Effects::Items;
+using namespace TEN::Effects::Spark;
 
 namespace TEN::Entities::TR4
 {
@@ -121,91 +123,7 @@ namespace TEN::Entities::TR4
 		Camera.targetAngle = ANGLE(170.0f);
 		Camera.targetElevation = -ANGLE(25.0f);
 	}
-
-	void TriggerSethaSparks1(int x, int y, int z, short xv, short yv, short zv)
-	{
-		int dx = LaraItem->Pose.Position.x - x;
-		int dz = LaraItem->Pose.Position.z - z;
-
-		if (dx >= -SECTOR(16) && dx <= SECTOR(16) &&
-			dz >= -SECTOR(16) && dz <= SECTOR(16))
-		{
-			auto* spark = GetFreeParticle();
-
-			spark->on = 1;
-			spark->sR = 0;
-			spark->sG = 0;
-			spark->sB = 0;
-			spark->dR = 64;
-			spark->dG = (GetRandomControl() & 0x7F) + 64;
-			spark->dB = spark->dG + 32;
-			spark->life = 16;
-			spark->sLife = 16;
-			spark->colFadeSpeed = 4;
-			spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
-			spark->fadeToBlack = 4;
-			spark->x = x;
-			spark->y = y;
-			spark->z = z;
-			spark->xVel = xv;
-			spark->yVel = yv;
-			spark->zVel = zv;
-			spark->friction = 34;
-			spark->scalar = 1;
-			spark->sSize = spark->size = (GetRandomControl() & 3) + 4;
-			spark->maxYvel = 0;
-			spark->gravity = 0;
-			spark->dSize = (GetRandomControl() & 1) + 1;
-			spark->flags = 0;
-		}
-	}
-
-	void TriggerSethaSparks2(short itemNumber, char node, int size)
-	{
-		int dx = LaraItem->Pose.Position.x - g_Level.Items[itemNumber].Pose.Position.x;
-		int dz = LaraItem->Pose.Position.z - g_Level.Items[itemNumber].Pose.Position.z;
-
-		if (dx >= -SECTOR(16) && dx <= SECTOR(16) &&
-			dz >= -SECTOR(16) && dz <= SECTOR(16))
-		{
-			auto* spark = GetFreeParticle();
-
-			spark->on = 1;
-			spark->sR = 0;
-			spark->sG = 0;
-			spark->sB = 0;
-			spark->dR = 0;
-			spark->dG = (GetRandomControl() & 0x7F) + 32;
-			spark->dB = spark->dG + 64;
-			spark->fadeToBlack = 8;
-			spark->colFadeSpeed = (GetRandomControl() & 3) + 4;
-			spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
-			spark->life = spark->sLife = (GetRandomControl() & 7) + 20;
-			spark->x = (GetRandomControl() & 0xF) - 8;
-			spark->y = 0;
-			spark->z = (GetRandomControl() & 0xF) - 8;
-			spark->xVel = GetRandomControl() - 128;
-			spark->yVel = 0;
-			spark->zVel = GetRandomControl() - 128;
-			spark->friction = 5;
-			spark->flags = SP_NODEATTACH | SP_EXPDEF | SP_ITEM | SP_ROTATE | SP_SCALE | SP_DEF;
-			spark->rotAng = GetRandomControl() & 0xFFF;
-
-			if (TestProbability(0.5f))
-				spark->rotAdd = -32 - (GetRandomControl() & 0x1F);
-			else
-				spark->rotAdd = (GetRandomControl() & 0x1F) + 32;
-
-			spark->maxYvel = 0;
-			spark->gravity = (GetRandomControl() & 0x1F) + 16;
-			spark->fxObj = itemNumber;
-			spark->nodeNumber = node;
-			spark->scalar = 2;
-			spark->sSize = spark->size = GetRandomControl() & 0xF + size;
-			spark->dSize = spark->size / 16;
-		}
-	}
-
+	
 	void SethaThrowAttack(Pose* pose, short roomNumber, int flags)
 	{
 		short fxNumber = CreateNewEffect(roomNumber);
@@ -611,9 +529,17 @@ namespace TEN::Entities::TR4
 		auto* item = &g_Level.Items[itemNumber];
 
 		item->ItemFlags[0]++;
-
+		
 		auto pos1 = GetJointPosition(item, SethaAttack1.meshNum, Vector3i(SethaAttack1.Position));
 		auto pos2 = GetJointPosition(item, SethaAttack2.meshNum, Vector3i(SethaAttack2.Position));
+		int sR = 64;
+		int sG = (GetRandomControl() & 0x7F) + 64;
+		int sB = sG;
+		auto sparkColor = Vector3(sR, sG, sB);
+		int fR = 0;
+		int fG = (GetRandomControl() & 0x7F) + 64;
+		int fB = fG -32;
+		auto flameColor = Vector3(fR, fG, fB);
 
 		int size;
 
@@ -625,29 +551,8 @@ namespace TEN::Entities::TR4
 			{
 				for (int i = 0; i < 2; i++)
 				{
-					auto pos = Vector3i(
-						(GetRandomControl() & 0x7FF) + pos1.x - SECTOR(1),
-						(GetRandomControl() & 0x7FF) + pos1.y - SECTOR(1),
-						(GetRandomControl() & 0x7FF) + pos1.z - SECTOR(1)
-					);
-
-					TriggerSethaSparks1(
-						pos.x, pos.y, pos.z,
-						(pos1.x - pos.x),
-						(pos1.y - pos.y),
-						(SECTOR(1) - (GetRandomControl() & 0x7FF)));
-
-					pos = Vector3i(
-						(GetRandomControl() & 0x7FF) + pos2.x - SECTOR(1),
-						(GetRandomControl() & 0x7FF) + pos2.y - SECTOR(1),
-						(GetRandomControl() & 0x7FF) + pos2.z - SECTOR(1)
-					);
-
-					TriggerSethaSparks1(
-						pos.x, pos.y, pos.z,
-						(pos2.x - pos.x) * 8,
-						(pos2.y - pos.y) * 8,
-						(SECTOR(1) - (GetRandomControl() & 0x7FF)) * 8);
+					TriggerAttackSpark(&GetSparkOffset(pos1), sparkColor);
+					TriggerAttackSpark(&GetSparkOffset(pos2), sparkColor);
 				}
 			}
 
@@ -658,10 +563,16 @@ namespace TEN::Entities::TR4
 			if ((Wibble & 0xF) == 8)
 			{
 				if (item->ItemFlags[0] < 127)
-					TriggerSethaSparks2(itemNumber, 2, size);
+				{
+					TriggerAttackFlame(pos1.x, pos1.y, pos1.z, flameColor, size);
+					TriggerAttackFlame(pos2.x, pos2.y, pos2.z, flameColor, size);
+				}
 			}
 			else if (!(Wibble & 0xF) && item->ItemFlags[0] < 103)
-				TriggerSethaSparks2(itemNumber, 3, size);
+			{
+					TriggerAttackFlame(pos1.x, pos1.y, pos1.z, flameColor, size);
+					TriggerAttackFlame(pos2.x, pos2.y, pos2.z, flameColor, size);
+			}
 
 			if (item->ItemFlags[0] >= 96 && item->ItemFlags[0] <= 99)
 			{
@@ -688,10 +599,16 @@ namespace TEN::Entities::TR4
 			if ((Wibble & 0xF) == 8)
 			{
 				if (item->ItemFlags[0] < 132)
-					TriggerSethaSparks2(itemNumber, 2, size);
+				{
+					TriggerAttackFlame(pos1.x, pos1.y, pos1.z, flameColor, size);
+					TriggerAttackFlame(pos2.x, pos2.y, pos2.z, flameColor, size);
+				}
 			}
 			else if (!(Wibble & 0xF) && item->ItemFlags[0] < 132)
-				TriggerSethaSparks2(itemNumber, 3, size);
+			{
+				TriggerAttackFlame(pos1.x, pos1.y, pos1.z, flameColor, size);
+				TriggerAttackFlame(pos2.x, pos2.y, pos2.z, flameColor, size);
+			}
 
 			if (item->ItemFlags[0] >= 60 && item->ItemFlags[0] <= 74 ||
 				item->ItemFlags[0] >= 112 && item->ItemFlags[0] <= 124)
@@ -719,29 +636,8 @@ namespace TEN::Entities::TR4
 			{
 				for (int i = 0; i < 2; i++)
 				{
-					auto pos = Vector3i(
-						(GetRandomControl() & 0x7FF) + pos1.x - SECTOR(1),
-						(GetRandomControl() & 0x7FF) + pos1.y - SECTOR(1),
-						(GetRandomControl() & 0x7FF) + pos1.z - SECTOR(1)
-					);
-
-					TriggerSethaSparks1(
-						pos.x, pos.y, pos.z,
-						(pos1.x - pos.x),
-						(pos1.y - pos.y),
-						(SECTOR(1) - (GetRandomControl() & 0x7FF)));
-
-					pos = Vector3i(
-						(GetRandomControl() & 0x7FF) + pos2.x - SECTOR(1),
-						(GetRandomControl() & 0x7FF) + pos2.y - SECTOR(1),
-						(GetRandomControl() & 0x7FF) + pos2.z - SECTOR(1)
-					);
-
-					TriggerSethaSparks1(
-						pos.x, pos.y, pos.z,
-						(pos2.x - pos.x),
-						(pos2.y - pos.y),
-						(SECTOR(1) - (GetRandomControl() & 0x7FF)));
+					TriggerAttackSpark(&GetSparkOffset(pos1), sparkColor);
+					TriggerAttackSpark(&GetSparkOffset(pos2), sparkColor);
 				}
 			}
 
@@ -752,10 +648,16 @@ namespace TEN::Entities::TR4
 			if ((Wibble & 0xF) == 8)
 			{
 				if (item->ItemFlags[0] < 103)
-					TriggerSethaSparks2(itemNumber, 2, size);
+				{
+					TriggerAttackFlame(pos1.x, pos1.y, pos1.z, flameColor, size);
+					TriggerAttackFlame(pos2.x, pos2.y, pos2.z, flameColor, size);
+				}
 			}
 			else if (!(Wibble & 0xF) && item->ItemFlags[0] < 103)
-				TriggerSethaSparks2(itemNumber, 3, size);
+			{
+				TriggerAttackFlame(pos1.x, pos1.y, pos1.z, flameColor, size);
+				TriggerAttackFlame(pos2.x, pos2.y, pos2.z, flameColor, size);
+			}
 
 			if (item->ItemFlags[0] == 102)
 			{
