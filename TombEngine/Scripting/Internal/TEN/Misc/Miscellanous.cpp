@@ -181,6 +181,9 @@ namespace Misc
 		if (!CheckInput(actionIndex))
 			return false;
 
+		if (IsHeld((ActionID)actionIndex))
+			return true;
+
 		return (TrInput & (1 << actionIndex)) != 0;
 	}
 
@@ -188,6 +191,9 @@ namespace Misc
 	{
 		if (!CheckInput(actionIndex))
 			return false;
+
+		if (IsClicked((ActionID)actionIndex))
+			return true;
 
 		return (DbInput & (1 << actionIndex)) != 0;
 	}
@@ -197,6 +203,7 @@ namespace Misc
 		if (!CheckInput(actionIndex))
 			return;
 
+		ActionMap[actionIndex].Update(true);
 		TrInput |= (1 << actionIndex);
 	}
 
@@ -205,7 +212,7 @@ namespace Misc
 		if (!CheckInput(actionIndex))
 			return;
 
-		TrInput &= ~(1 << actionIndex);
+		ClearAction((ActionID)actionIndex);
 	}
 
 	///Do FlipMap with specific ID
