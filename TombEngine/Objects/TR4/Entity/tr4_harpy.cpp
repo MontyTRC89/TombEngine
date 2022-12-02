@@ -116,7 +116,6 @@ namespace TEN::Entities::TR4
 		int fB = 0;
 		auto flameColor = Vector3(fR, fG, fB);
 
-
 		if (item->ItemFlags[0] >= 24 &&
 			item->ItemFlags[0] <= 47 &&
 			(GetRandomControl() & 0x1F) < item->ItemFlags[0])

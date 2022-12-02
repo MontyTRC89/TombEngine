@@ -529,7 +529,7 @@ namespace TEN::Entities::TR4
 		auto* item = &g_Level.Items[itemNumber];
 
 		item->ItemFlags[0]++;
-		
+
 		auto pos1 = GetJointPosition(item, SethaAttack1.meshNum, Vector3i(SethaAttack1.Position));
 		auto pos2 = GetJointPosition(item, SethaAttack2.meshNum, Vector3i(SethaAttack2.Position));
 		int sR = 64;

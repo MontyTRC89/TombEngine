@@ -166,12 +166,8 @@ namespace TEN::Effects::Spark
 		spark->yVel = pose->vy;
 		spark->zVel = pose->vz;
 		spark->friction = 34;
-		//	spark->scalar = 1;
-		//	spark->size = (GetRandomControl() & 3) + 4;
-		//	spark->sSize = spark->size;
 		spark->maxYvel = 0;
 		spark->gravity = 0;
-		//	spark->dSize = (GetRandomControl() & 1) + 1;
 		spark->flags = SP_NONE;
 	}
 }
