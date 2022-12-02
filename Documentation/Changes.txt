@@ -31,6 +31,7 @@ Lua API changes:
 * Add Flow.EnableMassPickup option in Gameflow.lua to enable/disable mass pickups.
 * Add level secrets property to display level-specific secret count.
 * Fix action key script functions not fully working in some cases.
+* Fix mounted vehicles ignoring Disable, Shatter and Explode script commands.
 
 Version 1.0.3
 =============
