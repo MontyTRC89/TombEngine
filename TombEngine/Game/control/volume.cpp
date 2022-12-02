@@ -149,7 +149,7 @@ namespace TEN::Control::Volumes
 		g_Renderer.AddDebugBox(bBox, Vector4(1.0f, 1.0f, 0.0f, 1.0f), RENDERER_DEBUG_PAGE::LOGIC_STATS);
 #endif
 
-		if (item->ObjectNumber == ID_LARA || item->ObjectNumber == Lara.Vehicle)
+		if (item->ObjectNumber == ID_LARA || item->Index == Lara.Vehicle)
 			TestVolumes(item->RoomNumber, bBox, TriggerVolumeActivators::Player, itemNumber);
 		else if (Objects[item->ObjectNumber].intelligent)
 			TestVolumes(item->RoomNumber, bBox, TriggerVolumeActivators::NPC, itemNumber);
