@@ -92,7 +92,7 @@ bool HandleLaraVehicle(ItemInfo* item, CollisionInfo* coll)
 		lara->Vehicle = NO_ITEM;
 		item->Animation.IsAirborne = true;
 		SetAnimation(item, LA_FALL_START);
-		return;
+		return false;
 	}
 
 	TestVolumes(lara->Vehicle);
