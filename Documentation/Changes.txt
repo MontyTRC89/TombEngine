@@ -27,6 +27,7 @@ Lua API changes:
 * Add Flow.EnableMassPickup option in Gameflow.lua to enable/disable mass pickup.
 * Add level secrets property to display level-specific secret count.
 * Add new Moveable functions: GetEffect, SetEffect and SetCustomEffect (for colored fire).
+* Fix action key script functions not fully working in some cases.
 
 Version 1.0.3
 =============
