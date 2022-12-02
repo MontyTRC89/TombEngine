@@ -143,31 +143,31 @@ namespace TEN::Effects::Spark
 		}
 	}
 
-	void TriggerAttackSpark(SparkOffsets* pose, Vector3 color)
+	void TriggerAttackSpark(SparkOffsets* pose, const Vector3& color)
 	{
-		auto* spark = GetFreeParticle();
+		auto& spark = *GetFreeParticle();
 
-		spark->on = 1;
-		spark->sR = 0;
-		spark->sG = 0;
-		spark->sB = 0;
-		spark->dR = color.x;
-		spark->dG = color.y;
-		spark->dB = color.z;
-		spark->life = 16;
-		spark->sLife = 16;
-		spark->colFadeSpeed = 4;
-		spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
-		spark->fadeToBlack = 4;
-		spark->x = pose->x;
-		spark->y = pose->y;
-		spark->z = pose->z;
-		spark->xVel = pose->vx;
-		spark->yVel = pose->vy;
-		spark->zVel = pose->vz;
-		spark->friction = 34;
-		spark->maxYvel = 0;
-		spark->gravity = 0;
-		spark->flags = SP_NONE;
+		spark.on = 1;
+		spark.sR = 0;
+		spark.sG = 0;
+		spark.sB = 0;
+		spark.dR = color.x;
+		spark.dG = color.y;
+		spark.dB = color.z;
+		spark.life = 16;
+		spark.sLife = 16;
+		spark.colFadeSpeed = 4;
+		spark.blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+		spark.fadeToBlack = 4;
+		spark.x = pose->positionA.x;
+		spark.y = pose->positionA.y;
+		spark.z = pose->positionA.z;
+		spark.xVel = pose->positionB.x;
+		spark.yVel = pose->positionB.y;
+		spark.zVel = pose->positionB.z;
+		spark.friction = 34;
+		spark.maxYvel = 0;
+		spark.gravity = 0;
+		spark.flags = SP_NONE;
 	}
 }

@@ -564,14 +564,14 @@ namespace TEN::Entities::TR4
 			{
 				if (item->ItemFlags[0] < 127)
 				{
-					TriggerAttackFlame(pos1.x, pos1.y, pos1.z, flameColor, size);
-					TriggerAttackFlame(pos2.x, pos2.y, pos2.z, flameColor, size);
+					TriggerAttackFlame(pos1, flameColor, size);
+					TriggerAttackFlame(pos2, flameColor, size);
 				}
 			}
 			else if (!(Wibble & 0xF) && item->ItemFlags[0] < 103)
 			{
-					TriggerAttackFlame(pos1.x, pos1.y, pos1.z, flameColor, size);
-					TriggerAttackFlame(pos2.x, pos2.y, pos2.z, flameColor, size);
+					TriggerAttackFlame(pos1, flameColor, size);
+					TriggerAttackFlame(pos2, flameColor, size);
 			}
 
 			if (item->ItemFlags[0] >= 96 && item->ItemFlags[0] <= 99)
@@ -600,14 +600,14 @@ namespace TEN::Entities::TR4
 			{
 				if (item->ItemFlags[0] < 132)
 				{
-					TriggerAttackFlame(pos1.x, pos1.y, pos1.z, flameColor, size);
-					TriggerAttackFlame(pos2.x, pos2.y, pos2.z, flameColor, size);
+					TriggerAttackFlame(pos1, flameColor, size);
+					TriggerAttackFlame(pos2, flameColor, size);
 				}
 			}
 			else if (!(Wibble & 0xF) && item->ItemFlags[0] < 132)
 			{
-				TriggerAttackFlame(pos1.x, pos1.y, pos1.z, flameColor, size);
-				TriggerAttackFlame(pos2.x, pos2.y, pos2.z, flameColor, size);
+				TriggerAttackFlame(pos1, flameColor, size);
+				TriggerAttackFlame(pos2, flameColor, size);
 			}
 
 			if (item->ItemFlags[0] >= 60 && item->ItemFlags[0] <= 74 ||
@@ -649,14 +649,14 @@ namespace TEN::Entities::TR4
 			{
 				if (item->ItemFlags[0] < 103)
 				{
-					TriggerAttackFlame(pos1.x, pos1.y, pos1.z, flameColor, size);
-					TriggerAttackFlame(pos2.x, pos2.y, pos2.z, flameColor, size);
+					TriggerAttackFlame(pos1, flameColor, size);
+					TriggerAttackFlame(pos2, flameColor, size);
 				}
 			}
 			else if (!(Wibble & 0xF) && item->ItemFlags[0] < 103)
 			{
-				TriggerAttackFlame(pos1.x, pos1.y, pos1.z, flameColor, size);
-				TriggerAttackFlame(pos2.x, pos2.y, pos2.z, flameColor, size);
+				TriggerAttackFlame(pos1, flameColor, size);
+				TriggerAttackFlame(pos2, flameColor, size);
 			}
 
 			if (item->ItemFlags[0] == 102)

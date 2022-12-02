@@ -502,19 +502,3 @@ Vector3i GetJointPosition(ItemInfo* item, int jointIndex, const Vector3i& offset
 	return Vector3i(pos);
 }
 
-SparkOffsets GetSparkOffset(Vector3i pos)
-{
-	SparkOffsets pos1;
-
-	short random = GetRandomControl();
-	
-	pos1.x = (GetRandomControl() & 0x7FF) + pos.x - SECTOR(1);
-	pos1.y = (GetRandomControl() & 0x7FF) + pos.y - SECTOR(1);
-	pos1.z = (random & 0x7FF) + pos.z - SECTOR(1);
-
-	pos1.vx = 8 * (pos.x - pos1.x);
-	pos1.vy = 8 * (pos.y - pos1.y);
-	pos1.vz = 8 * (SECTOR(1) - (random & 0x7FF));
-
-	return pos1;
-}

@@ -134,13 +134,13 @@ namespace TEN::Entities::TR4
 		{
 			if ((Wibble & 0xF) == 8)
 			{
-				TriggerAttackFlame(lr.x, lr.y, lr.z, flameColor, size);
-				TriggerAttackFlame(rh.x, rh.y, rh.z, flameColor, size);
+				TriggerAttackFlame(lr, flameColor, size);
+				TriggerAttackFlame(rh, flameColor, size);
 			}
 			else if (!(Wibble & 0xF))
 			{
-				TriggerAttackFlame(lr.x, lr.y, lr.z, flameColor, size);
-				TriggerAttackFlame(rh.x, rh.y, rh.z, flameColor, size);
+				TriggerAttackFlame(lr, flameColor, size);
+				TriggerAttackFlame(rh, flameColor, size);
 			}
 		}
 

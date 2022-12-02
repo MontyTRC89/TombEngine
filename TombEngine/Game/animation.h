@@ -22,16 +22,6 @@ enum class AnimCommandType
 	Flipeffect
 };
 
-struct SparkOffsets
-{
-	int x;
-	int y;
-	int z;
-	int vx;
-	int vy;
-	int vz;
-};
-
 struct AnimFrame
 {
 	GameBoundingBox boundingBox = GameBoundingBox::Zero;
@@ -111,6 +101,5 @@ void ClampRotation(Pose& outPose, short angle, short rotation);
 void DrawAnimatingItem(ItemInfo* item);
 
 Vector3i GetJointPosition(ItemInfo* item, int jointIndex, const Vector3i& offset = Vector3i::Zero);
-SparkOffsets GetSparkOffset(Vector3i pos);
 
 void PerformAnimCommands(ItemInfo* item, bool isFrameBased);

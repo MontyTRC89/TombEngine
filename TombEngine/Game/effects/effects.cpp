@@ -1706,41 +1706,58 @@ void ProcessEffects(ItemInfo* item)
 		item->Effect.Type = EffectType::None;
 }
 
-void TriggerAttackFlame(int x, int y, int z, Vector3 color, int size)
+void TriggerAttackFlame(const Vector3i& pos, const Vector3& color, int size)
 {
-	auto* spark = GetFreeParticle();
+	auto& spark = *GetFreeParticle();
 
-	spark->on = true;
-	spark->sR = 0;
-	spark->sG = 0;
-	spark->sB = 0;
-	spark->dR = color.x;
-	spark->dG = color.y;
-	spark->dB = color.z;
-	spark->fadeToBlack = 8;
-	spark->colFadeSpeed = (GetRandomControl() & 3) + 4;
-	spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
-	spark->life = (GetRandomControl() & 7) + 20;
-	spark->sLife = spark->life;
-	spark->x = x + (GetRandomControl() & 0xF) - 8;
-	spark->y = y;
-	spark->z = z + (GetRandomControl() & 0xF) - 8;
-	spark->xVel = (GetRandomControl() & 0xFF) - 128;
-	spark->yVel = 0;
-	spark->zVel = (GetRandomControl() & 0xFF) - 128;
-	spark->friction = 5;
-	spark->flags = SP_EXPDEF | SP_DEF | SP_SCALE;
-	spark->rotAng = GetRandomControl() & 0xFFF;
+	spark.on = true;
+	spark.sR = 0;
+	spark.sG = 0;
+	spark.sB = 0;
+	spark.dR = color.x;
+	spark.dG = color.y;
+	spark.dB = color.z;
+	spark.fadeToBlack = 8;
+	spark.colFadeSpeed = (GetRandomControl() & 3) + 4;
+	spark.blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+	spark.life = (GetRandomControl() & 7) + 20;
+	spark.sLife = spark.life;
+	spark.x = pos.x + (GetRandomControl() & 0xF) - 8;
+	spark.y = pos.y;
+	spark.z = pos.z + (GetRandomControl() & 0xF) - 8;
+	spark.xVel = (GetRandomControl() & 0xFF) - 128;
+	spark.yVel = 0;
+	spark.zVel = (GetRandomControl() & 0xFF) - 128;
+	spark.friction = 5;
+	spark.flags = SP_EXPDEF | SP_DEF | SP_SCALE;
+	spark.rotAng = GetRandomControl() & 0xFFF;
 
 	if (TestProbability(0.5f))
-		spark->rotAdd = -32 - (GetRandomControl() & 0x1F);
+		spark.rotAdd = -32 - (GetRandomControl() & 0x1F);
 	else
-		spark->rotAdd = (GetRandomControl() & 0x1F) + 32;
+		spark.rotAdd = (GetRandomControl() & 0x1F) + 32;
 
-	spark->maxYvel = 0;
-	spark->gravity = (GetRandomControl() & 0x1F) + 16;
-	spark->scalar = 2;
-	spark->size = (GetRandomControl() & 0xF) + size;
-	spark->sSize = spark->size;
-	spark->dSize = spark->size / 4;
+	spark.maxYvel = 0;
+	spark.gravity = (GetRandomControl() & 0x1F) + 16;
+	spark.scalar = 2;
+	spark.size = (GetRandomControl() & 0xF) + size;
+	spark.sSize = spark.size;
+	spark.dSize = spark.size / 4;
+}
+
+SparkOffsets GetSparkOffset(Vector3i pos)
+{
+	SparkOffsets pos1;
+
+	short random = GetRandomControl();
+
+	pos1.positionA.x = (GetRandomControl() & 0x7FF) + pos.x - SECTOR(1);
+	pos1.positionA.y = (GetRandomControl() & 0x7FF) + pos.y - SECTOR(1);
+	pos1.positionA.z = (random & 0x7FF) + pos.z - SECTOR(1);
+
+	pos1.positionB.x = 8 * (pos.x - pos1.positionA.x);
+	pos1.positionB.y = 8 * (pos.y - pos1.positionA.y);
+	pos1.positionB.z = 8 * (SECTOR(1) - (random & 0x7FF));
+
+	return pos1;
 }
