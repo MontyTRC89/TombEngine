@@ -24,19 +24,23 @@ namespace TEN::Entities::TR4
 	constexpr auto SETH_POUNCE_ATTACK_DAMAGE = 200;
 	constexpr auto SETH_KILL_ATTACK_DAMAGE	 = 250;
 
-	constexpr auto SETH_IDLE_RANGE					 = SQUARE(BLOCK(4));
-	constexpr auto SETH_WALK_RANGE					 = SQUARE(BLOCK(3));
-	constexpr auto SETH_RECOIL_RANGE				 = SQUARE(BLOCK(2));
-	constexpr auto SETH_SINGLE_PROJECTILE_RANGE		 = SQUARE(BLOCK(4));
-	constexpr auto SETH_DUAL_PROJECTILE_ATTACK_RANGE = SQUARE(BLOCK(2.5f));
-	constexpr auto SETH_POUNCE_ATTACK_RANGE			 = SQUARE(BLOCK(3));
-	constexpr auto SETH_KILL_ATTACK_RANGE			 = SQUARE(BLOCK(1));
+	constexpr auto SETH_IDLE_RANGE					   = SQUARE(BLOCK(4));
+	constexpr auto SETH_WALK_RANGE					   = SQUARE(BLOCK(3));
+	constexpr auto SETH_RECOIL_RANGE				   = SQUARE(BLOCK(2));
+	constexpr auto SETH_POUNCE_ATTACK_RANGE			   = SQUARE(BLOCK(3));
+	constexpr auto SETH_KILL_ATTACK_RANGE			   = SQUARE(BLOCK(1));
+	constexpr auto SETH_SINGLE_PROJECTILE_ATTACK_RANGE = SQUARE(BLOCK(4));
+	constexpr auto SETH_DUAL_PROJECTILE_ATTACK_RANGE   = SQUARE(BLOCK(2.5f));
+
+	constexpr auto SETH_HARD_RECOIL_RECOVER_CHANCE	  = 1 / 2.0f;
+	constexpr auto SETH_DUAL_PROJECTILE_ATTACK_CHANCE = 1 / 2.0f;
+	constexpr auto SETH_JUMP_PROJECTILE_ATTACK_CHANCE = 1 / 2.0f;
 
 	const auto SETH_WALK_TURN_RATE_MAX = ANGLE(7.0f);
 	const auto SETH_RUN_TURN_RATE_MAX  = ANGLE(11.0f);
 
-	const auto SethKneelAttackJoints1 = std::vector<unsigned int>{ 13, 14, 15 };
-	const auto SethKneelAttackJoints2 = std::vector<unsigned int>{ 16, 17, 18 };
+	const auto SethPounceAttackJoints1 = std::vector<unsigned int>{ 13, 14, 15 };
+	const auto SethPounceAttackJoints2 = std::vector<unsigned int>{ 16, 17, 18 };
 
 	const auto SethBite1   = BiteInfo(Vector3(0.0f, 220.0f, 50.0f), 17);
 	const auto SethBite2   = BiteInfo(Vector3(0.0f, 220.0f, 50.0f), 13);
@@ -188,7 +192,7 @@ namespace TEN::Entities::TR4
 				else if (LaraItem->Pose.Position.y >= (item->Pose.Position.y - BLOCK(1)))
 				{
 					if (AI.distance < SETH_DUAL_PROJECTILE_ATTACK_RANGE && AI.ahead &&
-						 Targetable(item, &AI) && Random::TestProbability(1 / 2.0f))
+						 Targetable(item, &AI) && Random::TestProbability(SETH_DUAL_PROJECTILE_ATTACK_CHANCE))
 					{
 						item->Animation.TargetState = SETH_STATE_DUAL_PROJECTILE_ATTACK;
 						item->ItemFlags[0] = 0;
@@ -198,7 +202,7 @@ namespace TEN::Entities::TR4
 						ceiling < (item->Pose.Position.y - BLOCK(7 / 8.0f)) &&
 						height4 != NO_HEIGHT &&
 						height4 > (item->Pose.Position.y - BLOCK(1)) &&
-						Random::TestProbability(1 / 2.0f))
+						Random::TestProbability(SETH_JUMP_PROJECTILE_ATTACK_CHANCE))
 					{
 						item->Pose.Position.y -= BLOCK(3 / 2.0f);
 						if (Targetable(item, &AI))
@@ -226,7 +230,7 @@ namespace TEN::Entities::TR4
 								break;
 							}
 						}
-						else if (AI.distance < SETH_SINGLE_PROJECTILE_RANGE &&
+						else if (AI.distance < SETH_SINGLE_PROJECTILE_ATTACK_RANGE &&
 							AI.angle < ANGLE(45.0f) && AI.angle > ANGLE(-45.0f) &&
 							height4 != NO_HEIGHT &&
 							height4 >= (item->Pose.Position.y - CLICK(1)) &&
@@ -307,14 +311,14 @@ namespace TEN::Entities::TR4
 					{
 						if (item->Animation.AnimNumber == (Objects[item->ObjectNumber].animIndex + SETH_ANIM_POUNCE_ATTACK_END))
 						{
-							if (item->TouchBits.Test(SethKneelAttackJoints1))
+							if (item->TouchBits.Test(SethPounceAttackJoints1))
 							{
 								DoDamage(creature.Enemy, SETH_POUNCE_ATTACK_DAMAGE);
 								CreatureEffect2(item, SethBite1, 25, -1, DoBloodSplat);
 								creature.Flags = 1; // Flag 1 = is attacking.
 							}
 
-							if (item->TouchBits.Test(SethKneelAttackJoints2))
+							if (item->TouchBits.Test(SethPounceAttackJoints2))
 							{
 								DoDamage(creature.Enemy, SETH_POUNCE_ATTACK_DAMAGE);
 								CreatureEffect2(item, SethBite2, 25, -1, DoBloodSplat);
@@ -335,7 +339,7 @@ namespace TEN::Entities::TR4
 				if (item->Animation.AnimNumber == (Objects[item->Animation.AnimNumber].animIndex + SETH_ANIM_HARD_RECOIL_START) &&
 					item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameEnd)
 				{
-					if (Random::TestProbability(1 / 2.0f))
+					if (Random::TestProbability(SETH_HARD_RECOIL_RECOVER_CHANCE))
 						item->Animation.RequiredState = SETH_STATE_HARD_RECOIL_RECOVER;
 				}
 
