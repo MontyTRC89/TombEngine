@@ -25,15 +25,12 @@ void RollingBallCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* c
 	{
 		if (TriggerActive(ballItem) && (ballItem->ItemFlags[0] || ballItem->Animation.Velocity.y))
 		{
-			if (laraItem->Animation.IsAirborne || TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, laraItem))
-				laraItem->HitPoints = 0;
-			else
+			laraItem->HitPoints = 0;
+
+			if (!laraItem->Animation.IsAirborne && 
+				!TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, laraItem))
 			{
-				laraItem->Animation.AnimNumber = LA_BOULDER_DEATH;
-				laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
-				laraItem->Animation.TargetState = LS_DEATH;
-				laraItem->Animation.ActiveState = LS_DEATH;
-				laraItem->Animation.IsAirborne = false;
+				SetAnimation(laraItem, LA_BOULDER_DEATH);
 			}
 		}
 		else
@@ -313,8 +310,10 @@ void ClassicRollingBallCollision(short itemNum, ItemInfo* lara, CollisionInfo* c
 	{
 		if (!TestBoundsCollide(item, lara, coll->Setup.Radius))
 			return;
+
 		if (!TestCollision(item, lara))
 			return;
+
 		if (lara->Animation.IsAirborne)
 		{
 			if (coll->Setup.EnableObjectPush)
@@ -336,19 +335,20 @@ void ClassicRollingBallCollision(short itemNum, ItemInfo* lara, CollisionInfo* c
 		}
 		else
 		{
-			lara->HitStatus = 1;
+			lara->HitStatus = true;
+
 			if (lara->HitPoints > 0)
 			{
-				lara->HitPoints = -1;//?
+				lara->HitPoints = 0;
 				lara->Pose.Orientation.y = item->Pose.Orientation.y;
-				lara->Pose.Position.z = 0;
-				lara->Pose.Orientation.z = 0;	
+				lara->Pose.Orientation.x = lara->Pose.Orientation.z = 0;
 
 				SetAnimation(item, LA_BOULDER_DEATH);
 						
 				Camera.flags = CF_FOLLOW_CENTER;
 				Camera.targetAngle = ANGLE(170);
 				Camera.targetElevation = -ANGLE(25);
+
 				for (int i = 0; i < 15; i++)
 				{
 					int x = lara->Pose.Position.x + (GetRandomControl() - ANGLE(180.0f) / 256);
