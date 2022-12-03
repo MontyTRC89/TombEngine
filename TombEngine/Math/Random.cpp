@@ -24,21 +24,21 @@ namespace TEN::Math::Random
 		return (short)GenerateInt(low, high);
 	}
 
-	Vector2 GenerateVector2(float length)
+	Vector2 GenerateDirection2D()
 	{
 		auto vector = Vector2(GenerateFloat(-1.0f, 1.0f), GenerateFloat(-1.0f, 1.0f));
 		vector.Normalize();
-		return (vector * length);
+		return vector;
 	}
 
-	Vector3 GenerateVector3(float length)
+	Vector3 GenerateDirection()
 	{
 		auto vector = Vector3(GenerateFloat(-1.0f, 1.0f), GenerateFloat(-1.0f, 1.0f), GenerateFloat(-1.0f, 1.0f));
 		vector.Normalize();
-		return (vector * length);
+		return vector;
 	}
 
-	Vector3 GenerateVector3InCone(const Vector3& direction, float semiangleInDeg, float length)
+	Vector3 GenerateDirectionInCone(const Vector3& direction, float semiangleInDeg)
 	{
 		float x = GenerateFloat(-semiangleInDeg, semiangleInDeg) * RADIAN;
 		float y = GenerateFloat(-semiangleInDeg, semiangleInDeg) * RADIAN;
@@ -47,19 +47,23 @@ namespace TEN::Math::Random
 
 		auto vector = direction.TransformNormal(direction, matrix);
 		vector.Normalize();
-		return (vector * length);
+		return vector;
 	}
 
-	Vector3 GenerateVector3InBox(const BoundingOrientedBox& box)
+	Vector3 GeneratePositionInBox(const BoundingOrientedBox& box)
 	{
 		auto rotMatrix = Matrix::CreateFromQuaternion(box.Orientation);
 		auto vector = Vector3(
 			GenerateFloat(-box.Extents.x, box.Extents.x),
 			GenerateFloat(-box.Extents.y, box.Extents.y),
-			GenerateFloat(-box.Extents.z, box.Extents.z)
-		);
+			GenerateFloat(-box.Extents.z, box.Extents.z));
 
 		return (box.Center + Vector3::Transform(vector, rotMatrix));
+	}
+
+	Vector3 GeneratePositionInSphere(const BoundingSphere& sphere)
+	{
+		return (sphere.Center + (GenerateDirection() * GenerateFloat(0.0f, sphere.Radius)));
 	}
 
 	bool TestProbability(float probability)

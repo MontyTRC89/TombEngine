@@ -123,7 +123,7 @@ namespace TEN::Entities::Traps::TR1
 			DoDamage(laraItem, DAMOCLES_SWORD_DAMAGE);
 
 			auto bloodBox = GameBoundingBox(laraItem).ToBoundingOrientedBox(laraItem->Pose);
-			auto bloodPos = Vector3i(Random::GenerateVector3InBox(bloodBox));
+			auto bloodPos = Vector3i(Random::GeneratePositionInBox(bloodBox));
 
 			auto orientToSword = Geometry::GetOrientToPoint(laraItem->Pose.Position.ToVector3(), item.Pose.Position.ToVector3());
 			short randAngleOffset = Random::GenerateAngle(ANGLE(-11.25f), ANGLE(11.25f));

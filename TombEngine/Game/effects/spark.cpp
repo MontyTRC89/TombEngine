@@ -147,8 +147,8 @@ namespace TEN::Effects::Spark
 	{
 		auto& spark = *GetFreeParticle();
 
-		auto box = BoundingOrientedBox(basePos, Vector3::One * BLOCK(1), Vector4::Zero);
-		auto pos = Random::GenerateVector3InBox(box);
+		auto sphere = BoundingSphere(basePos, BLOCK(1));
+		auto pos = Random::GeneratePositionInSphere(sphere);
 		auto vel = (pos - basePos) * 8;
 
 		spark.on = true;
