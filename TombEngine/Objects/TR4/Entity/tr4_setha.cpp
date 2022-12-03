@@ -71,7 +71,7 @@ namespace TEN::Entities::TR4
 		SETH_ANIM_WALK_FORWARD_TO_IDLE = 20,
 		SETH_ANIM_IDLE_TO_WALK = 21,
 		SETH_ANIM_RUN_FORWARD_TO_IDLE = 22,
-		SETH_ANIM_RUN_FORWARD_TO_WALK =23,
+		SETH_ANIM_RUN_FORWARD_TO_WALK = 23,
 		SETH_ANIM_FLY_AIR_SHOOT = 24,
 		SETH_ANIM_FLY_GET_HEAVY_SHOT = 25,
 		SETH_ANIM_IDLE_JUMP_TO_FLY = 26,
@@ -80,8 +80,8 @@ namespace TEN::Entities::TR4
 	};
 
 
-	const auto SethaBite1	= BiteInfo(Vector3(0.0f, 220.0f, 50.0f), 17);
-	const auto SethaBite2	= BiteInfo(Vector3(0.0f, 220.0f, 50.0f), 13);
+	const auto SethaBite1 = BiteInfo(Vector3(0.0f, 220.0f, 50.0f), 17);
+	const auto SethaBite2 = BiteInfo(Vector3(0.0f, 220.0f, 50.0f), 13);
 	const auto SethaAttack1 = BiteInfo(Vector3(-16.0f, 200.0f, 32.0f), 13);
 	const auto SethaAttack2 = BiteInfo(Vector3(16.0f, 200.0f, 32.0f), 17);
 	constexpr auto LARA_ANIM_SETH_DEATH_ANIM = 14;
@@ -123,7 +123,7 @@ namespace TEN::Entities::TR4
 		Camera.targetAngle = ANGLE(170.0f);
 		Camera.targetElevation = -ANGLE(25.0f);
 	}
-	
+
 	void SethaThrowAttack(Pose* pose, short roomNumber, int flags)
 	{
 		short fxNumber = CreateNewEffect(roomNumber);
@@ -178,7 +178,7 @@ namespace TEN::Entities::TR4
 
 		bool canJump = false;
 		if ((y < (height1 - CLICK(1.5f)) || y < (height2 - CLICK(1.5f))) &&
-			(y < (height3 + CLICK(1)) && y > (height3 - CLICK(1)) || height3 == NO_HEIGHT))
+			(y < (height3 + CLICK(1)) && y >(height3 - CLICK(1)) || height3 == NO_HEIGHT))
 		{
 			canJump = true;
 		}
@@ -235,7 +235,7 @@ namespace TEN::Entities::TR4
 					else if (ceiling != NO_HEIGHT &&
 						ceiling < (item->Pose.Position.y - SECTOR(1.75f)) &&
 						height4 != NO_HEIGHT &&
-						height4 > (item->Pose.Position.y - SECTOR(1)) &&
+						height4 >(item->Pose.Position.y - SECTOR(1)) &&
 						TestProbability(0.5f))
 					{
 						item->Pose.Position.y -= SECTOR(1.5f);
@@ -286,7 +286,7 @@ namespace TEN::Entities::TR4
 				}
 				else
 				{
-					if (creature->ReachedGoal)
+					if (!creature->ReachedGoal)
 					{
 						item->Animation.TargetState = SETH_STATE_FLY;
 						break;
@@ -312,7 +312,7 @@ namespace TEN::Entities::TR4
 				}
 				else if (AI.distance > pow(SECTOR(3), 2))
 					item->Animation.TargetState = SETH_STATE_RUN_FORWARD;
-				
+
 				break;
 
 			case SETH_STATE_RUN_FORWARD:
@@ -326,7 +326,7 @@ namespace TEN::Entities::TR4
 				}
 				else if (AI.distance < pow(SECTOR(3), 2))
 					item->Animation.TargetState = SETH_STATE_WALK_FORWARD;
-				
+
 				break;
 
 			case SETH_STATE_KNEEL_ATTACK:
@@ -367,7 +367,8 @@ namespace TEN::Entities::TR4
 
 			case SETH_STATE_JUMP:
 				creature->MaxTurn = 0;
-				creature->ReachedGoal = true;
+				creature->ReachedGoal = false;
+				creature->LOT.IsJumping = true;
 				break;
 
 			case SETH_STATE_GET_HEAVY_SHOT:
@@ -432,7 +433,7 @@ namespace TEN::Entities::TR4
 						item->Pose.Orientation.y += ANGLE(3.0f);
 					else
 						item->Pose.Orientation.y -= ANGLE(3.0f);
-					
+
 					SethaAttack(itemNumber);
 				}
 				else
@@ -475,8 +476,11 @@ namespace TEN::Entities::TR4
 					item->Animation.IsAirborne = true;
 					creature->LOT.Fly = 0;
 
-					if ((item->Pose.Position.y - item->Floor) > 0)
+					if (item->Pose.Position.y >= item->Floor)
+					{
+						item->Animation.IsAirborne = false;
 						item->Animation.TargetState = SETH_STATE_IDLE;
+					}
 				}
 
 				break;
@@ -538,7 +542,7 @@ namespace TEN::Entities::TR4
 		auto sparkColor = Vector3(sR, sG, sB);
 		int fR = 0;
 		int fG = (GetRandomControl() & 0x7F) + 64;
-		int fB = fG -32;
+		int fB = fG - 32;
 		auto flameColor = Vector3(fR, fG, fB);
 
 		int size;
@@ -570,8 +574,8 @@ namespace TEN::Entities::TR4
 			}
 			else if (!(Wibble & 0xF) && item->ItemFlags[0] < 103)
 			{
-					TriggerAttackFlame(pos1, flameColor, size);
-					TriggerAttackFlame(pos2, flameColor, size);
+				TriggerAttackFlame(pos1, flameColor, size);
+				TriggerAttackFlame(pos2, flameColor, size);
 			}
 
 			if (item->ItemFlags[0] >= 96 && item->ItemFlags[0] <= 99)
