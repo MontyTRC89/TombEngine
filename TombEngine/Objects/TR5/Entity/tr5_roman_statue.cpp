@@ -473,7 +473,7 @@ namespace TEN::Entities::Creatures::TR5
 						int G = B;
 						auto sparkColor = Vector3(R, G, B);
 
-						TriggerAttackSpark(&GetSparkOffset(pos), sparkColor);
+						TriggerAttackSpark(pos.ToVector3(), sparkColor);
 					}
 				}
 

@@ -551,8 +551,8 @@ namespace TEN::Entities::TR4
 			{
 				for (int i = 0; i < 2; i++)
 				{
-					TriggerAttackSpark(&GetSparkOffset(pos1), sparkColor);
-					TriggerAttackSpark(&GetSparkOffset(pos2), sparkColor);
+					TriggerAttackSpark(pos1.ToVector3(), sparkColor);
+					TriggerAttackSpark(pos2.ToVector3(), sparkColor);
 				}
 			}
 
@@ -636,8 +636,8 @@ namespace TEN::Entities::TR4
 			{
 				for (int i = 0; i < 2; i++)
 				{
-					TriggerAttackSpark(&GetSparkOffset(pos1), sparkColor);
-					TriggerAttackSpark(&GetSparkOffset(pos2), sparkColor);
+					TriggerAttackSpark(pos1.ToVector3(), sparkColor);
+					TriggerAttackSpark(pos2.ToVector3(), sparkColor);
 				}
 			}
 

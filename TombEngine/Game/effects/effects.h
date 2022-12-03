@@ -49,12 +49,6 @@ enum class FlameType
 	Trail
 };
 
-struct SparkOffsets
-{
-	Vector3i positionA;
-	Vector3i positionB;
-};
-
 struct FX_INFO
 {
 	Pose pos;
@@ -229,7 +223,6 @@ void TriggerRocketSmoke(int x, int y, int z, int bodyPart);
 void TriggerFlashSmoke(int x, int y, int z, short roomNumber);
 void TriggerMetalSparks(int x, int y, int z, int xv, int yv, int zv, int additional);
 void TriggerAttackFlame(const Vector3i& pos, const Vector3& color, int size);
-SparkOffsets GetSparkOffset(Vector3i pos);
 void WadeSplash(ItemInfo* item, int wh, int wd);
 void Splash(ItemInfo* item);
 void TriggerRocketFire(int x, int y, int z);

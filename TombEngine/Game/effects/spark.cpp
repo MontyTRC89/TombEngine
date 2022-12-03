@@ -83,7 +83,7 @@ namespace TEN::Effects::Spark
 			s.room = pos->RoomNumber;
 			s.pos = Vector3(pos->x, pos->y, pos->z);
 			float ang = TO_RAD(angle);
-			Vector3 v = Vector3(sin(ang + GenerateFloat(-PI / 2, PI / 2)), GenerateFloat(-1, 1), cos(ang + GenerateFloat(-PI / 2, PI / 2)));
+			Vector3 v = Vector3(sin(ang + GenerateFloat(-PI_DIV_2, PI_DIV_2)), GenerateFloat(-1, 1), cos(ang + GenerateFloat(-PI_DIV_2, PI_DIV_2)));
 			v += Vector3(GenerateFloat(-64, 64), GenerateFloat(-64, 64), GenerateFloat(-64, 64));
 			v.Normalize(v);
 			s.velocity = v * GenerateFloat(17, 24);
@@ -143,11 +143,15 @@ namespace TEN::Effects::Spark
 		}
 	}
 
-	void TriggerAttackSpark(SparkOffsets* pose, const Vector3& color)
+	void TriggerAttackSpark(const Vector3& basePos, const Vector3& color)
 	{
 		auto& spark = *GetFreeParticle();
 
-		spark.on = 1;
+		auto box = BoundingOrientedBox(basePos, Vector3::One * BLOCK(1), Vector4::Zero);
+		auto pos = Random::GenerateVector3InBox(box);
+		auto vel = (pos - basePos) * 8;
+
+		spark.on = true;
 		spark.sR = 0;
 		spark.sG = 0;
 		spark.sB = 0;
@@ -159,12 +163,12 @@ namespace TEN::Effects::Spark
 		spark.colFadeSpeed = 4;
 		spark.blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
 		spark.fadeToBlack = 4;
-		spark.x = pose->positionA.x;
-		spark.y = pose->positionA.y;
-		spark.z = pose->positionA.z;
-		spark.xVel = pose->positionB.x;
-		spark.yVel = pose->positionB.y;
-		spark.zVel = pose->positionB.z;
+		spark.x = (int)round(pos.x);
+		spark.y = (int)round(pos.y);
+		spark.z = (int)round(pos.z);
+		spark.xVel = (int)round(vel.x);
+		spark.yVel = (int)round(vel.y);
+		spark.zVel = (int)round(vel.z);
 		spark.friction = 34;
 		spark.maxYvel = 0;
 		spark.gravity = 0;

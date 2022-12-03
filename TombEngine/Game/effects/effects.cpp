@@ -1732,7 +1732,7 @@ void TriggerAttackFlame(const Vector3i& pos, const Vector3& color, int size)
 	spark.flags = SP_EXPDEF | SP_DEF | SP_SCALE;
 	spark.rotAng = GetRandomControl() & 0xFFF;
 
-	if (TestProbability(0.5f))
+	if (TestProbability(1 / 2.0f))
 		spark.rotAdd = -32 - (GetRandomControl() & 0x1F);
 	else
 		spark.rotAdd = (GetRandomControl() & 0x1F) + 32;
@@ -1743,21 +1743,4 @@ void TriggerAttackFlame(const Vector3i& pos, const Vector3& color, int size)
 	spark.size = (GetRandomControl() & 0xF) + size;
 	spark.sSize = spark.size;
 	spark.dSize = spark.size / 4;
-}
-
-SparkOffsets GetSparkOffset(Vector3i pos)
-{
-	SparkOffsets pos1;
-
-	short random = GetRandomControl();
-
-	pos1.positionA.x = (GetRandomControl() & 0x7FF) + pos.x - SECTOR(1);
-	pos1.positionA.y = (GetRandomControl() & 0x7FF) + pos.y - SECTOR(1);
-	pos1.positionA.z = (random & 0x7FF) + pos.z - SECTOR(1);
-
-	pos1.positionB.x = 8 * (pos.x - pos1.positionA.x);
-	pos1.positionB.y = 8 * (pos.y - pos1.positionA.y);
-	pos1.positionB.z = 8 * (SECTOR(1) - (random & 0x7FF));
-
-	return pos1;
 }
