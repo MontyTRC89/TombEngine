@@ -3,8 +3,6 @@
 #include <SimpleMath.h>
 #include "Math/Math.h"
 
-struct SparkOffsets;
-
 namespace TEN::Effects::Spark
 {
 	struct SparkParticle
