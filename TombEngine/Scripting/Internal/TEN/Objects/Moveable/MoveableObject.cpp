@@ -794,6 +794,9 @@ Vec3 Moveable::GetVelocity() const
 
 void Moveable::SetVelocity(Vec3 velocity)
 {
+	if (m_item->IsCreature())
+		ScriptWarn("Attempt to set velocity to a creature. In may not work, as velocity is overridden by AI.");
+
 	m_item->Animation.Velocity = Vector3(velocity.x, velocity.y, velocity.z);
 }
 

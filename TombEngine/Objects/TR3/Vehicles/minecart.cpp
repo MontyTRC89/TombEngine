@@ -185,7 +185,7 @@ namespace TEN::Entities::Vehicles
 		}
 		else
 		{
-			lara->Vehicle = itemNumber;
+			SetLaraVehicle(laraItem, minecartItem);
 			DoMinecartMount(minecartItem, laraItem, mountType);
 		}
 	}
@@ -766,7 +766,7 @@ namespace TEN::Entities::Vehicles
 
 				SetAnimation(laraItem, LA_STAND_SOLID);
 				lara->Control.HandStatus = HandStatus::Free;
-				lara->Vehicle = NO_ITEM;
+				SetLaraVehicle(laraItem, nullptr);
 			}
 
 			break;
@@ -781,7 +781,7 @@ namespace TEN::Entities::Vehicles
 
 				SetAnimation(laraItem, LA_STAND_SOLID);
 				lara->Control.HandStatus = HandStatus::Free;
-				lara->Vehicle = NO_ITEM;
+				SetLaraVehicle(laraItem, nullptr);
 			}
 
 			break;
