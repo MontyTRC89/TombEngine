@@ -149,7 +149,7 @@ namespace TEN::Effects::Spark
 
 		auto sphere = BoundingSphere(basePos, BLOCK(1));
 		auto pos = Random::GeneratePositionInSphere(sphere);
-		auto vel = (pos - basePos) * 8;
+		auto vel = (basePos - pos) * 8;
 
 		spark.on = true;
 		spark.sR = 0;
