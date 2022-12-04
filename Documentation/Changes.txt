@@ -8,7 +8,7 @@ Version 1.0.4
 * Fix legacy pickup triggers not working in certain cases.
 * Fix crawl pickup not actually doing any pickups.
 * Fix demigod and harpy shooting in incorrect directions.
-* Fix sparkles and charging fire for magic enemies such as Seth and Harpy
+* Fix particle effects for seth and harpy magic attacks.
 * Fix lasersight always displaying with HK, revolver and crossbow.
 * Fix rapid ammo spending in HK lasersight mode.
 * Fix incorrect string IDs for item combine, HK and revolver with lasersight.
