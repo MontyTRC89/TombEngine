@@ -1705,3 +1705,42 @@ void ProcessEffects(ItemInfo* item)
 	if (item->IsLara() && GetLaraInfo(item)->Control.WaterStatus == WaterStatus::FlyCheat)
 		item->Effect.Type = EffectType::None;
 }
+
+void TriggerAttackFlame(const Vector3i& pos, const Vector3& color, int size)
+{
+	auto& spark = *GetFreeParticle();
+
+	spark.on = true;
+	spark.sR = 0;
+	spark.sG = 0;
+	spark.sB = 0;
+	spark.dR = color.x;
+	spark.dG = color.y;
+	spark.dB = color.z;
+	spark.fadeToBlack = 8;
+	spark.colFadeSpeed = (GetRandomControl() & 3) + 4;
+	spark.blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+	spark.life = (GetRandomControl() & 7) + 20;
+	spark.sLife = spark.life;
+	spark.x = pos.x + (GetRandomControl() & 0xF) - 8;
+	spark.y = pos.y;
+	spark.z = pos.z + (GetRandomControl() & 0xF) - 8;
+	spark.xVel = (GetRandomControl() & 0xFF) - 128;
+	spark.yVel = 0;
+	spark.zVel = (GetRandomControl() & 0xFF) - 128;
+	spark.friction = 5;
+	spark.flags = SP_EXPDEF | SP_DEF | SP_SCALE;
+	spark.rotAng = GetRandomControl() & 0xFFF;
+
+	if (TestProbability(1 / 2.0f))
+		spark.rotAdd = -32 - (GetRandomControl() & 0x1F);
+	else
+		spark.rotAdd = (GetRandomControl() & 0x1F) + 32;
+
+	spark.maxYvel = 0;
+	spark.gravity = (GetRandomControl() & 0x1F) + 16;
+	spark.scalar = 2;
+	spark.size = (GetRandomControl() & 0xF) + size;
+	spark.sSize = spark.size;
+	spark.dSize = spark.size / 4;
+}
