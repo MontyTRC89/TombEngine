@@ -50,7 +50,7 @@ namespace TEN::Math::Random
 		return vector;
 	}
 
-	Vector3 GeneratePositionInBox(const BoundingOrientedBox& box)
+	Vector3 GeneratePointInBox(const BoundingOrientedBox& box)
 	{
 		auto rotMatrix = Matrix::CreateFromQuaternion(box.Orientation);
 		auto vector = Vector3(
@@ -61,7 +61,7 @@ namespace TEN::Math::Random
 		return (box.Center + Vector3::Transform(vector, rotMatrix));
 	}
 
-	Vector3 GeneratePositionInSphere(const BoundingSphere& sphere)
+	Vector3 GeneratePointInSphere(const BoundingSphere& sphere)
 	{
 		return (sphere.Center + (GenerateDirection() * GenerateFloat(0.0f, sphere.Radius)));
 	}

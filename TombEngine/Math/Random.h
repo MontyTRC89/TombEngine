@@ -9,8 +9,8 @@ namespace TEN::Math::Random
 	Vector2 GenerateDirection2D();
 	Vector3 GenerateDirection();
 	Vector3 GenerateDirectionInCone(const Vector3& direction, float semiangleInDeg);
-	Vector3 GeneratePositionInBox(const BoundingOrientedBox& box);
-	Vector3 GeneratePositionInSphere(const BoundingSphere& sphere);
+	Vector3 GeneratePointInBox(const BoundingOrientedBox& box);
+	Vector3 GeneratePointInSphere(const BoundingSphere& sphere);
 
 	bool TestProbability(float probability);
 }

@@ -148,7 +148,7 @@ namespace TEN::Effects::Spark
 		auto& spark = *GetFreeParticle();
 
 		auto sphere = BoundingSphere(basePos, BLOCK(1));
-		auto pos = Random::GeneratePositionInSphere(sphere);
+		auto pos = Random::GeneratePointInSphere(sphere);
 		auto vel = (basePos - pos) * 8;
 
 		spark.on = true;
