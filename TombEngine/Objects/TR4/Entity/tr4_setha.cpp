@@ -286,7 +286,7 @@ namespace TEN::Entities::TR4
 				}
 				else
 				{
-					if (!creature->ReachedGoal)
+					if (creature->ReachedGoal)
 					{
 						item->Animation.TargetState = SETH_STATE_FLY;
 						break;
@@ -367,7 +367,6 @@ namespace TEN::Entities::TR4
 
 			case SETH_STATE_JUMP:
 				creature->MaxTurn = 0;
-				creature->ReachedGoal = false;
 				creature->LOT.IsJumping = true;
 				break;
 
