@@ -26,6 +26,7 @@ public:
 	virtual char const* GetString(const char* id) const = 0;
 	virtual bool IsFlyCheatEnabled() const = 0;
 	virtual bool IsMassPickupEnabled() const = 0;
+	virtual bool IsLaraInTitleEnabled() const = 0;
 	virtual bool HasCrawlExtended() const = 0;
 	virtual bool HasCrouchRoll() const = 0;
 	virtual bool HasCrawlspaceDive() const = 0;

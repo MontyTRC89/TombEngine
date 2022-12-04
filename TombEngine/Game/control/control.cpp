@@ -244,6 +244,11 @@ GameStatus ControlPhase(int numFrames, bool demoMode)
 			HairControl(LaraItem, level->GetLaraType() == LaraType::Young);
 			ProcessEffects(LaraItem);
 		}
+		else if (g_GameFlow->IsLaraInTitleEnabled())
+		{
+			AnimateLara(LaraItem);
+			HairControl(LaraItem, level->GetLaraType() == LaraType::Young);
+		}
 
 		if (UseSpotCam)
 		{
