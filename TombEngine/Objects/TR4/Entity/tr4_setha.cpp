@@ -367,7 +367,7 @@ namespace TEN::Entities::TR4
 
 			case SETH_STATE_JUMP:
 				creature->MaxTurn = 0;
-				//creature->ReachedGoal = false;
+				creature->ReachedGoal = false;
 				creature->LOT.IsJumping = true;
 				break;
 
