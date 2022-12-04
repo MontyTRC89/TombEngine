@@ -5,6 +5,7 @@ Version 1.0.4
 * Add ability to burn enemies with FLAME_EMITTER_1 and death blocks.
 * Activate Lara-bound volume triggers with mounted vehicles.
 * Remove TRC remnant which added HK to inventory if pistols weren't available.
+* Change default shatter sound to TR4_SMASH_ROCK (tomb4 default).
 * Automatically align pickups to floor surface.
 * Fix legacy pickup triggers not working in certain cases.
 * Fix crawl pickup not actually doing any pickups.
@@ -24,7 +25,6 @@ Version 1.0.4
 * Fix control lock not working in flyby sequences.
 * Fix empty inventory when using build and play feature in TE.
 * Fix several incorrect FOV reset issues.
-* Changed default shatter sound to TR4_SMASH_ROCK (ie: Tomb4 default).
 
 Lua API changes:
 * Add new Moveable functions: GetEffect, SetEffect and SetCustomEffect (for colored fire).
