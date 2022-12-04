@@ -45,7 +45,7 @@ namespace TEN::Math::Random
 		float z = GenerateFloat(-semiangleInDeg, semiangleInDeg) * RADIAN;
 		auto matrix = Matrix::CreateRotationX(x) * Matrix::CreateRotationY(y) * Matrix::CreateRotationZ(z);
 
-		auto vector = direction.TransformNormal(direction, matrix);
+		auto vector = Vector3::TransformNormal(direction, matrix);
 		vector.Normalize();
 		return vector;
 	}
