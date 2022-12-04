@@ -367,6 +367,7 @@ namespace TEN::Entities::TR4
 
 			case SETH_STATE_JUMP:
 				creature->MaxTurn = 0;
+				//creature->ReachedGoal = false;
 				creature->LOT.IsJumping = true;
 				break;
 
@@ -477,6 +478,7 @@ namespace TEN::Entities::TR4
 
 					if (item->Pose.Position.y >= item->Floor)
 					{
+						creature->ReachedGoal = false;
 						item->Animation.IsAirborne = false;
 						item->Animation.TargetState = SETH_STATE_IDLE;
 					}
