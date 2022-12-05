@@ -508,14 +508,16 @@ namespace TEN::Entities::TR4
 		int flameB = flameG - 32;
 		auto flameColor = Vector3(flameR, flameG, flameB);
 
-		int size;
+		int scale = 0;
 
 		switch (item->Animation.ActiveState)
 		{
 		case SETH_STATE_DUAL_PROJECTILE_ATTACK:
 		case SETH_STATE_HOVER_PROJECTILE_ATTACK:
-			if (item->ItemFlags[0] < 78 && (GetRandomControl() & 0x1F) < item->ItemFlags[0])
+			if (item->ItemFlags[0] < 78 &&
+				(GetRandomControl() & 0x1F) < item->ItemFlags[0])
 			{
+				// Spawn spark particles.
 				for (int i = 0; i < 2; i++)
 				{
 					TriggerAttackSpark(pos1.ToVector3(), sparkColor);
@@ -523,22 +525,22 @@ namespace TEN::Entities::TR4
 				}
 			}
 
-			size = item->ItemFlags[0] * 2;
-			if (size > 128)
-				size = 128;
+			scale = item->ItemFlags[0] * 2;
+			if (scale > 128)
+				scale = 128;
 
 			if ((Wibble & 0xF) == 8)
 			{
 				if (item->ItemFlags[0] < 127)
 				{
-					TriggerAttackFlame(pos1, flameColor, size);
-					TriggerAttackFlame(pos2, flameColor, size);
+					TriggerAttackFlame(pos1, flameColor, scale);
+					TriggerAttackFlame(pos2, flameColor, scale);
 				}
 			}
 			else if (!(Wibble & 0xF) && item->ItemFlags[0] < 103)
 			{
-				TriggerAttackFlame(pos1, flameColor, size);
-				TriggerAttackFlame(pos2, flameColor, size);
+				TriggerAttackFlame(pos1, flameColor, scale);
+				TriggerAttackFlame(pos2, flameColor, scale);
 			}
 
 			if (item->ItemFlags[0] >= 96 && item->ItemFlags[0] <= 99)
@@ -557,22 +559,22 @@ namespace TEN::Entities::TR4
 			break;
 
 		case SETH_STATE_JUMP_PROJECTILE_ATTACK:
-			size = item->ItemFlags[0] * 4;
-			if (size > 160)
-				size = 160;
+			scale = item->ItemFlags[0] * 4;
+			if (scale > 160)
+				scale = 160;
 
 			if ((Wibble & 0xF) == 8)
 			{
 				if (item->ItemFlags[0] < 132)
 				{
-					TriggerAttackFlame(pos1, flameColor, size);
-					TriggerAttackFlame(pos2, flameColor, size);
+					TriggerAttackFlame(pos1, flameColor, scale);
+					TriggerAttackFlame(pos2, flameColor, scale);
 				}
 			}
 			else if (!(Wibble & 0xF) && item->ItemFlags[0] < 132)
 			{
-				TriggerAttackFlame(pos1, flameColor, size);
-				TriggerAttackFlame(pos2, flameColor, size);
+				TriggerAttackFlame(pos1, flameColor, scale);
+				TriggerAttackFlame(pos2, flameColor, scale);
 			}
 
 			if (item->ItemFlags[0] >= 60 && item->ItemFlags[0] <= 74 ||
@@ -605,22 +607,22 @@ namespace TEN::Entities::TR4
 				}
 			}
 
-			size = item->ItemFlags[0] * 2;
-			if (size > 128)
-				size = 128;
+			scale = item->ItemFlags[0] * 2;
+			if (scale > 128)
+				scale = 128;
 
 			if ((Wibble & 0xF) == 8)
 			{
 				if (item->ItemFlags[0] < 103)
 				{
-					TriggerAttackFlame(pos1, flameColor, size);
-					TriggerAttackFlame(pos2, flameColor, size);
+					TriggerAttackFlame(pos1, flameColor, scale);
+					TriggerAttackFlame(pos2, flameColor, scale);
 				}
 			}
 			else if (!(Wibble & 0xF) && item->ItemFlags[0] < 103)
 			{
-				TriggerAttackFlame(pos1, flameColor, size);
-				TriggerAttackFlame(pos2, flameColor, size);
+				TriggerAttackFlame(pos1, flameColor, scale);
+				TriggerAttackFlame(pos2, flameColor, scale);
 			}
 
 			if (item->ItemFlags[0] == 102)
