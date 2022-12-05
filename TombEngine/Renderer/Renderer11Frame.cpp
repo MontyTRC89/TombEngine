@@ -35,13 +35,23 @@ namespace TEN::Renderer
 			m_rooms[i].Visited = false;
 			m_rooms[i].ViewPort = Vector4(-1.0f, 1.0f, 1.0f, 1.0f);
 			m_rooms[i].BoundActive = 0;
+
+			ROOM_INFO* nativeRoom = &g_Level.Rooms[i];
+
+			for (int j = 0; j < nativeRoom->doors.size(); j++)
+				nativeRoom->doors[j].visited = false;
 		}
+
+		m_checkPortalCalls = 0;
+		m_getVisibleRoomsCalls = 0;
 
 		GetVisibleRooms(NO_ROOM, Camera.pos.RoomNumber, Vector4(-1.0f, -1.0f, 1.0f, 1.0f), false, 0, onlyRooms, renderView);
 	}
 
 	bool Renderer11::CheckPortal(short parentRoomNumber, ROOM_DOOR* portal, Vector4 viewPort, Vector4* clipPort, RenderView& renderView)
 	{
+		m_checkPortalCalls++;
+
 		RendererRoom* room = &m_rooms[parentRoomNumber];
 		ROOM_INFO* nativeRoom = &g_Level.Rooms[parentRoomNumber];
 
@@ -57,7 +67,7 @@ namespace TEN::Renderer
 		int  zClip = 0;
 		Vector4 p[4];
 
-		*clipPort = Vector4(FLT_MAX, FLT_MAX, FLT_MIN, FLT_MIN);
+		*clipPort = Vector4(FLT_MAX, FLT_MAX, -FLT_MAX, -FLT_MAX);
 
 		for (int i = 0; i < 4; i++)
 		{
@@ -67,13 +77,24 @@ namespace TEN::Renderer
 				(nativeRoom->z + portal->vertices[i].z),
 				1.0f);
 
-			p[i] = Vector4::Transform(corner, renderView.camera.ViewProjection);
+			if (!portal->visited)
+			{
+				p[i] = Vector4::Transform(corner, renderView.camera.ViewProjection);
+				if (p[i].w > 0.0f)
+				{
+					p[i].x *= (1.0f / p[i].w);
+					p[i].y *= (1.0f / p[i].w);
+
+				}
+				portal->transformed[i] = p[i];
+			}
+			else
+			{
+				p[i] = portal->transformed[i];
+			}
 
 			if (p[i].w > 0.0f)
 			{
-				p[i].x *= (1.0f / p[i].w);
-				p[i].y *= (1.0f / p[i].w);
-
 				clipPort->x = std::min(clipPort->x, p[i].x);
 				clipPort->y = std::min(clipPort->y, p[i].y);
 				clipPort->z = std::max(clipPort->z, p[i].x);
@@ -82,6 +103,8 @@ namespace TEN::Renderer
 			else
 				zClip++;
 		}
+
+		portal->visited = true;
 
 		if (zClip == 4)
 			return false;
@@ -130,9 +153,11 @@ namespace TEN::Renderer
 
 	void Renderer11::GetVisibleRooms(short from, short to, Vector4 viewPort, bool water, int count, bool onlyRooms, RenderView& renderView)
 	{
+		m_getVisibleRoomsCalls++;
+
 		if (count > 32)
 		{
-			return;
+			//return;
 		}
 
 		RendererRoom* room = &m_rooms[to];

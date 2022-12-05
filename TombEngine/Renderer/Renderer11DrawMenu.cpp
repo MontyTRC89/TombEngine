@@ -919,6 +919,8 @@ namespace TEN::Renderer
 				PrintDebugMessage("Biggest room's index buffer: %d", m_biggestRoomIndexBuffer);
 				PrintDebugMessage("Total rooms transparent polygons: %d", m_numRoomsTransparentPolygons);
 				PrintDebugMessage("Rooms: %d", view.roomsToDraw.size());
+				PrintDebugMessage("    CheckPortal() calls: %d", m_checkPortalCalls);
+				PrintDebugMessage("    GetVisibleRooms() calls: %d", m_getVisibleRoomsCalls);
 				break;
 
 			case RENDERER_DEBUG_PAGE::DIMENSION_STATS:

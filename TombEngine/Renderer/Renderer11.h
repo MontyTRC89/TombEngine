@@ -453,6 +453,9 @@ namespace TEN::Renderer
 		float m_farView = DEFAULT_FAR_VIEW;
 		RendererRectangle m_outsideClip;
 
+		int m_checkPortalCalls;
+		int m_getVisibleRoomsCalls;
+
 		// Private functions
 		void BindTexture(TEXTURE_REGISTERS registerType, TextureBase* texture, SAMPLER_STATES samplerType);
 		void BindLights(std::vector<RendererLight*>& lights);
