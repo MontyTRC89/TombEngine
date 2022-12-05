@@ -26,9 +26,9 @@ namespace TEN::Entities::Creatures::TR1
 	constexpr auto BEAR_REAR_SWIPE_ATTACK_RANGE = BLOCK(3 / 5.0f);
 	constexpr auto BEAR_EAT_RANGE				= BLOCK(3 / 4.0f);
 	
-	constexpr auto BEAR_ROAR_CHANCE = 1.0f / 400;
-	constexpr auto BEAR_REAR_CHANCE = 1.0f / 40;
-	constexpr auto BEAR_DROP_CHANCE = 1.0f / 22;
+	constexpr auto BEAR_ROAR_CHANCE = 1 / 400.0f;
+	constexpr auto BEAR_REAR_CHANCE = 1 / 40.0f;
+	constexpr auto BEAR_DROP_CHANCE = 1 / 22.0f;
 
 	constexpr auto BEAR_WALK_TURN_RATE_MAX = ANGLE(2.0f);
 	constexpr auto BEAR_RUN_TURN_RATE_MAX  = ANGLE(5.0f);

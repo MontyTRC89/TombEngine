@@ -18,8 +18,8 @@ namespace TEN::Entities::TR4
 {
 	constexpr auto MUMMY_SWIPE_ATTACK_DAMAGE = 100;
 
-	constexpr auto MUMMY_IDLE_SWIPE_ATTACK_RANGE = SQUARE(BLOCK(0.5f));
-	constexpr auto MUMMY_WALK_SWIPE_ATTACK_RANGE = SQUARE(BLOCK(0.67f));
+	constexpr auto MUMMY_IDLE_SWIPE_ATTACK_RANGE = SQUARE(BLOCK(1 / 2.0f));
+	constexpr auto MUMMY_WALK_SWIPE_ATTACK_RANGE = SQUARE(BLOCK(2 / 3.0f));
 	constexpr auto MUMMY_ACTIVATE_RANGE			 = SQUARE(BLOCK(1));
 	constexpr auto MUMMY_RECOIL_RANGE			 = SQUARE(BLOCK(3));
 	constexpr auto MUMMY_ARMS_UP_RANGE			 = SQUARE(BLOCK(3));

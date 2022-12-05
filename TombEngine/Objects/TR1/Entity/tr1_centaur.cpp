@@ -23,8 +23,8 @@ using namespace TEN::Math;
 namespace TEN::Entities::Creatures::TR1
 {
 	constexpr auto CENTAUR_REAR_DAMAGE = 200;
-	constexpr auto CENTAUR_REAR_RANGE = BLOCK(1.5f);
-	constexpr auto CENTAUR_REAR_CHANCE = 1.0f / 340;
+	constexpr auto CENTAUR_REAR_RANGE = BLOCK(3 / 2.0f);
+	constexpr auto CENTAUR_REAR_CHANCE = 1 / 340.0f;
 	constexpr auto CENTAUR_BOMB_VELOCITY = CLICK(1);
 
 	constexpr auto CENTAUR_TURN_RATE_MAX = ANGLE(4.0f);

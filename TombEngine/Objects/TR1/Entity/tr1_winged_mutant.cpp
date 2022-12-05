@@ -29,10 +29,10 @@ namespace TEN::Entities::Creatures::TR1
 	constexpr auto WINGED_MUTANT_IDLE_JUMP_ATTACK_RANGE = SQUARE(BLOCK(2.5f));
 	constexpr auto WINGED_MUTANT_ATTACK_RANGE			= SQUARE(BLOCK(3.75f));
 
-	constexpr auto WINGED_MUTANT_POSE_CHANCE   = 1.0f / 400;
-	constexpr auto WINGED_MUTANT_UNPOSE_CHANCE = 1.0f / 164;
+	constexpr auto WINGED_MUTANT_POSE_CHANCE   = 1 / 400.0f;
+	constexpr auto WINGED_MUTANT_UNPOSE_CHANCE = 1 / 164.0f;
 
-	constexpr auto WINGED_MUTANT_FLY_VELOCITY	= CLICK(1) / 8;
+	constexpr auto WINGED_MUTANT_FLY_VELOCITY	= CLICK(1 / 8.0f);
 	constexpr auto WINGED_MUTANT_SHARD_VELOCITY = 250;
 	constexpr auto WINGED_MUTANT_BOMB_VELOCITY  = 220;
 
@@ -140,7 +140,7 @@ namespace TEN::Entities::Creatures::TR1
 		case WMUTANT_PATH_AERIAL:
 			creature->LOT.Step = SECTOR(30);
 			creature->LOT.Drop = -SECTOR(30);
-			creature->LOT.Fly = WINGED_MUTANT_FLY_VELOCITY;
+			creature->LOT.Fly = (int)round(WINGED_MUTANT_FLY_VELOCITY);
 			break;
 		}
 	}

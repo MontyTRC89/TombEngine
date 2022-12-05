@@ -25,7 +25,7 @@ namespace TEN::Entities::Creatures::TR1
 	constexpr auto NATLA_TIMER = 0x7FFF;
 	constexpr auto NATLA_GUN_VELOCITY = 400;
 
-	constexpr auto NATLA_LAND_CHANCE = 1.0f / 128;
+	constexpr auto NATLA_LAND_CHANCE = 1 / 128.0f;
 
 	constexpr auto NATLA_TURN_NEAR_DEATH_SPEED = ANGLE(6.0f);
 	constexpr auto NATLA_TURN_SPEED = ANGLE(5.0f);

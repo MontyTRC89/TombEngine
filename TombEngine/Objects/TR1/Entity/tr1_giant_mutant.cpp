@@ -22,11 +22,11 @@ namespace TEN::Entities::Creatures::TR1
 	constexpr auto MUTANT_ATTACK_DAMAGE	 = 500;
 	constexpr auto MUTANT_CONTACT_DAMAGE = 6;
 
-	constexpr auto MUTANT_ATTACK_RANGE = SQUARE(BLOCK(2.5f));
+	constexpr auto MUTANT_ATTACK_RANGE = SQUARE(BLOCK(5 / 2.0f));
 	constexpr auto MUTANT_CLOSE_RANGE  = SQUARE(BLOCK(2.2f));
 
 	// TODO: Chance values are unused. -- Sezz 2022.11.05
-	constexpr auto MUTANT_ATTACK_1_CHANCE = 1.0f / 3;
+	constexpr auto MUTANT_ATTACK_1_CHANCE = 1 / 3.0f;
 	constexpr auto MUTANT_ATTACK_2_CHANCE = MUTANT_ATTACK_1_CHANCE * 2;
 
 	constexpr auto MUTANT_NEED_TURN = ANGLE(45.0f);
