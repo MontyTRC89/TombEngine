@@ -1055,9 +1055,9 @@ public:
 
 struct HolsterInfo
 {
-	HolsterSlot LeftHolster;
-	HolsterSlot RightHolster;
-	HolsterSlot BackHolster;
+	HolsterSlot LeftHolster  = HolsterSlot::Empty;
+	HolsterSlot RightHolster = HolsterSlot::Empty;
+	HolsterSlot BackHolster  = HolsterSlot::Empty;
 };
 
 struct CarriedWeaponInfo
