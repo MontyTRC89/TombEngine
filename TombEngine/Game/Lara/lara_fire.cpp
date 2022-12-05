@@ -506,6 +506,10 @@ void HandleWeapon(ItemInfo* laraItem)
 		// Draw weapon.
 		if (IsHeld(In::DrawWeapon))
 		{
+			// No weapon - no any actions.
+			if (lara.Control.Weapon.LastGunType == LaraWeaponType::None)
+				return;
+
 			lara.Control.Weapon.RequestGunType = lara.Control.Weapon.LastGunType;
 		}
 		// Draw flare.
@@ -513,7 +517,7 @@ void HandleWeapon(ItemInfo* laraItem)
 		{
 			if (lara.Control.Weapon.GunType == LaraWeaponType::Flare)
 			{
-			//	if (!lara.LeftArm.FrameNumber)	// NO
+				if (!lara.LeftArm.FrameNumber)
 				{
 					lara.Control.HandStatus = HandStatus::WeaponUndraw;
 				}
