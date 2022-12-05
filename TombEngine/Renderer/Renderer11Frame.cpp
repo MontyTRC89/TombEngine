@@ -33,7 +33,7 @@ namespace TEN::Renderer
 			m_rooms[i].StaticsToDraw.clear();
 			m_rooms[i].LightsToDraw.clear();
 			m_rooms[i].Visited = false;
-			m_rooms[i].ViewPort = Vector4(-1.0f, 1.0f, 1.0f, 1.0f);
+			m_rooms[i].ViewPort = Vector4(-1.0f, -1.0f, 1.0f, 1.0f);
 			m_rooms[i].BoundActive = 0;
 
 			for (int j = 0; j < m_rooms[i].Doors.size(); j++)
