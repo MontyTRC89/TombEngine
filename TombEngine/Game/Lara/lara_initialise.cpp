@@ -64,20 +64,45 @@ void InitialiseLaraMeshes(ItemInfo* item)
 	for (int i = 0; i < NUM_LARA_MESHES; i++)
 		item->Model.MeshIndex[i] = item->Model.BaseMesh + i;
 
-	/* Hardcoded code */
-
-	if (lara->Control.Weapon.GunType == LaraWeaponType::HK)
-		lara->Control.Weapon.HolsterInfo.BackHolster = HolsterSlot::HK;
-	else if (!lara->Weapons[(int)LaraWeaponType::Shotgun].Present)
+	switch (lara->Control.Weapon.GunType)
 	{
+	case LaraWeaponType::Shotgun:
+		if (lara->Weapons[(int)LaraWeaponType::Shotgun].Present)
+			lara->Control.Weapon.HolsterInfo.BackHolster = HolsterSlot::Shotgun;
+		break;
+
+	case LaraWeaponType::Crossbow:
+		if (lara->Weapons[(int)LaraWeaponType::Crossbow].Present)
+			lara->Control.Weapon.HolsterInfo.BackHolster = HolsterSlot::Crossbow;
+		break;
+
+	case LaraWeaponType::HarpoonGun:
+		if (lara->Weapons[(int)LaraWeaponType::HarpoonGun].Present)
+			lara->Control.Weapon.HolsterInfo.BackHolster = HolsterSlot::Harpoon;
+		break;
+
+	case LaraWeaponType::GrenadeLauncher:
+		if (lara->Weapons[(int)LaraWeaponType::GrenadeLauncher].Present)
+			lara->Control.Weapon.HolsterInfo.BackHolster = HolsterSlot::GrenadeLauncher;
+		break;
+
+	case LaraWeaponType::RocketLauncher:
+		if (lara->Weapons[(int)LaraWeaponType::RocketLauncher].Present)
+			lara->Control.Weapon.HolsterInfo.BackHolster = HolsterSlot::RocketLauncher;
+		break;
+
+	case LaraWeaponType::HK:
 		if (lara->Weapons[(int)LaraWeaponType::HK].Present)
 			lara->Control.Weapon.HolsterInfo.BackHolster = HolsterSlot::HK;
-	}
-	else
+		break;
+
+	default:
 		lara->Control.Weapon.HolsterInfo.BackHolster = HolsterSlot::Empty;
+		break;
+	}
 
 	lara->Control.HandStatus = HandStatus::Free;
-	lara->TargetEntity = NULL;
+	lara->TargetEntity = nullptr;
 	lara->LeftArm.FrameNumber = 0;
 	lara->RightArm.FrameNumber = 0;
 	lara->LeftArm.Locked = false;

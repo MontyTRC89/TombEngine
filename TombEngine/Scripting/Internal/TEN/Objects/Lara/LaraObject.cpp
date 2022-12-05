@@ -138,7 +138,36 @@ int LaraObject::GetAmmoCount() const
 	auto& ammo = GetAmmo(Lara, Lara.Control.Weapon.GunType);
 	return (ammo.HasInfinite()) ? -1 : (int)ammo.GetCount();
 }
-	
+
+/// Get current vehicle, if it exists
+// @function LaraObject:GetVehicle
+// @treturn Moveable current vehicle (nil if no vehicle present)
+// @usage
+// local vehicle = Lara:GetVehicle()
+std::unique_ptr<Moveable> LaraObject::GetVehicle() const
+{
+	auto* lara = GetLaraInfo(m_item);
+
+	if (lara->Vehicle == NO_ITEM)
+		return nullptr;
+
+	return std::make_unique<Moveable>(lara->Vehicle);
+}
+
+/// Get current target enemy, if it exists
+// @function LaraObject:GetTarget
+// @treturn Moveable current target enemy (nil if no target present)
+// @usage
+// local target = Lara:GetTarget()
+std::unique_ptr<Moveable> LaraObject::GetTarget() const
+{
+	auto* lara = GetLaraInfo(m_item);
+
+	if (lara->TargetEntity == nullptr)
+		return nullptr;
+
+	return std::make_unique<Moveable>(lara->TargetEntity->Index);
+}
 	
 /// Lara will undraw her weapon if it is drawn and throw away a flare if she is currently holding one.
 // @function LaraObject:UndrawWeapon
@@ -261,6 +290,8 @@ void LaraObject::Register(sol::table& parent)
 			ScriptReserved_GetWeaponType, &LaraObject::GetWeaponType,
 			ScriptReserved_SetWeaponType, &LaraObject::SetWeaponType,
 			ScriptReserved_GetAmmoCount, &LaraObject::GetAmmoCount,
+			ScriptReserved_GetVehicle, &LaraObject::GetVehicle,
+			ScriptReserved_GetTarget, &LaraObject::GetTarget,
 			sol::base_classes, sol::bases<Moveable>()
 		);
 }

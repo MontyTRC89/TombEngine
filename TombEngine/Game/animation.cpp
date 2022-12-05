@@ -501,3 +501,4 @@ Vector3i GetJointPosition(ItemInfo* item, int jointIndex, const Vector3i& offset
 	g_Renderer.GetItemAbsBonePosition(itemNumber, pos, jointIndex);
 	return Vector3i(pos);
 }
+

@@ -7,6 +7,7 @@
 #include "Game/effects/debris.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/lightning.h"
+#include "Game/effects/spark.h"
 #include "Game/effects/tomb4fx.h"
 #include "Game/itemdata/creature_info.h"
 #include "Game/items.h"
@@ -20,6 +21,7 @@
 
 using namespace TEN::Effects::Lightning;
 using namespace TEN::Math;
+using namespace TEN::Effects::Spark;
 
 namespace TEN::Entities::Creatures::TR5
 {
@@ -467,20 +469,12 @@ namespace TEN::Entities::Creatures::TR5
 
 					for (int i = 0; i < 2; i++)
 					{
-						short random = GetRandomControl();
+						int R = 64;
+						int B = (GetRandomControl() & 0x3F) - 64;
+						int G = B;
+						auto sparkColor = Vector3(R, G, B);
 
-						int x = (GetRandomControl() & 0x7FF) + pos.x - SECTOR(1);
-						int y = (GetRandomControl() & 0x7FF) + pos.y - SECTOR(1);
-						int z = (random & 0x7FF) + pos.z - SECTOR(1);
-
-						TriggerRomanStatueScreamingSparks(
-							x,
-							y,
-							z,
-							8 * (pos.x - x),
-							8 * (pos.y - y),
-							8 * (SECTOR(1) - (random & 0x7FF)),
-							item->TriggerFlags);
+						TriggerAttackSpark(pos.ToVector3(), sparkColor);
 					}
 				}
 
