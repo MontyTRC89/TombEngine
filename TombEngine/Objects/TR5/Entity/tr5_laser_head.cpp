@@ -5,7 +5,7 @@
 #include "Game/control/los.h"
 #include "Game/effects/debris.h"
 #include "Game/effects/effects.h"
-#include "Game/effects/lara_fx.h"
+#include "Game/effects/item_fx.h"
 #include "Game/effects/lightning.h"
 #include "Game/effects/tomb4fx.h"
 #include "Game/items.h"

@@ -5,7 +5,7 @@
 #include "Game/collision/collide_room.h"
 #include "Game/control/box.h"
 #include "Game/effects/effects.h"
-#include "Game/effects/lara_fx.h"
+#include "Game/effects/item_fx.h"
 #include "Game/effects/lightning.h"
 #include "Game/effects/tomb4fx.h"
 #include "Game/itemdata/creature_info.h"
