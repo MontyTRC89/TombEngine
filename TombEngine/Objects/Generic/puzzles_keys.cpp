@@ -94,8 +94,8 @@ void PuzzleHoleCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* co
 		auto bounds = GameBoundingBox(receptableItem);
 		PuzzleBounds.BoundingBox.X1 = bounds.X1 - CLICK(1);
 		PuzzleBounds.BoundingBox.X2 = bounds.X2 + CLICK(1);
-		PuzzleBounds.BoundingBox.Z1 = bounds.Z1 - CLICK(1);;
-		PuzzleBounds.BoundingBox.Z2 = bounds.Z2 + CLICK(1);;
+		PuzzleBounds.BoundingBox.Z1 = bounds.Z1 - CLICK(1);
+		PuzzleBounds.BoundingBox.Z2 = bounds.Z2 + CLICK(1);
 
 		if (TestLaraPosition(PuzzleBounds, receptableItem, laraItem))
 		{

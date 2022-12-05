@@ -65,7 +65,7 @@ namespace TEN::Entities::TR4
 			{
 				item->Pose.Position.y -= CLICK(2);
 
-				AI_INFO AI;;
+				AI_INFO AI;
 				CreatureAIInfo(item, &AI);
 
 				item->Pose.Position.y += CLICK(2);

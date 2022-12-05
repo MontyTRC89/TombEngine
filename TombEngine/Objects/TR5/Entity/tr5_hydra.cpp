@@ -15,7 +15,7 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-using namespace TEN::Math;;
+using namespace TEN::Math;
 
 namespace TEN::Entities::Creatures::TR5
 {

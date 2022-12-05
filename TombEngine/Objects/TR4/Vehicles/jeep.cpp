@@ -419,7 +419,7 @@ namespace TEN::Entities::Vehicles
 
 		spark->colFadeSpeed = 4;
 		spark->fadeToBlack = 4;
-		spark->life = spark->sLife = (GetRandomControl() & 3) - (speed / 4096) + 20;;
+		spark->life = spark->sLife = (GetRandomControl() & 3) - (speed / 4096) + 20;
 
 		if (spark->life < 9)
 		{
