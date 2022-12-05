@@ -6,10 +6,12 @@
 #include "Game/collision/collide_room.h"
 #include "Game/control/control.h"
 #include "Game/effects/effects.h"
+#include "Game/effects/spark.h"
 #include "Game/effects/item_fx.h"
 #include "Game/itemdata/creature_info.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
+#include "Game/Lara/lara_helpers.h"
 #include "Game/misc.h"
 #include "Game/people.h"
 #include "Specific/level.h"
@@ -17,6 +19,7 @@
 #include "Specific/setup.h"
 
 using namespace TEN::Effects::Items;
+using namespace TEN::Effects::Spark;
 using namespace TEN::Math;
 
 namespace TEN::Entities::TR4
@@ -30,7 +33,7 @@ namespace TEN::Entities::TR4
 	constexpr auto SETH_POUNCE_ATTACK_RANGE			   = SQUARE(BLOCK(3));
 	constexpr auto SETH_KILL_ATTACK_RANGE			   = SQUARE(BLOCK(1));
 	constexpr auto SETH_SINGLE_PROJECTILE_ATTACK_RANGE = SQUARE(BLOCK(4));
-	constexpr auto SETH_DUAL_PROJECTILE_ATTACK_RANGE   = SQUARE(BLOCK(2.5f));
+	constexpr auto SETH_DUAL_PROJECTILE_ATTACK_RANGE   = SQUARE(BLOCK(5 / 2.0f));
 
 	constexpr auto SETH_HARD_RECOIL_RECOVER_CHANCE	  = 1 / 2.0f;
 	constexpr auto SETH_DUAL_PROJECTILE_ATTACK_CHANCE = 1 / 2.0f;
@@ -142,8 +145,8 @@ namespace TEN::Entities::TR4
 		int height3 = GetCollision(x, y, z, item->RoomNumber).Position.Floor;
 
 		bool canJump = false;
-		if ((y < (height1 - CLICK(1.5f)) || y < (height2 - CLICK(1.5f))) &&
-			(y < (height3 + CLICK(1)) && y > (height3 - CLICK(1)) || height3 == NO_HEIGHT))
+		if ((y < (height1 - CLICK(3 / 2.0f)) || y < (height2 - CLICK(3 / 2.0f))) &&
+			(y < (height3 + CLICK(1)) && y >(height3 - CLICK(1)) || height3 == NO_HEIGHT))
 		{
 			canJump = true;
 		}
@@ -176,8 +179,8 @@ namespace TEN::Entities::TR4
 			switch (item->Animation.ActiveState)
 			{
 			case SETH_STATE_IDLE:
-				creature.LOT.IsJumping = false;
 				creature.Flags = 0;
+				creature.LOT.IsJumping = false;
 
 				if (item->Animation.RequiredState)
 				{
@@ -332,7 +335,8 @@ namespace TEN::Entities::TR4
 
 			case SETH_STATE_JUMP:
 				creature.MaxTurn = 0;
-				creature.ReachedGoal = true;
+				creature.ReachedGoal = false;
+				creature.LOT.IsJumping = true;
 				break;
 
 			case SETH_STATE_HARD_RECOIL:
@@ -356,7 +360,9 @@ namespace TEN::Entities::TR4
 						item->Pose.Orientation.y -= ANGLE(3.0f);
 				}
 				else
+				{
 					item->Pose.Orientation.y += AI.angle;
+				}
 
 				if (!creature.Flags)
 				{
@@ -374,7 +380,7 @@ namespace TEN::Entities::TR4
 
 				if (LaraItem->HitPoints < 0)
 				{
-					SethKill(item, LaraItem);
+					SethKillAttack(item, LaraItem);
 					ItemCustomBurn(LaraItem, Vector3(0.0f, 0.8f, 0.1f), Vector3(0.0f, 0.9f, 0.8f), 6 * FPS);
 					creature.MaxTurn = 0;
 					return;
@@ -424,7 +430,9 @@ namespace TEN::Entities::TR4
 							item->Pose.Orientation.y -= ANGLE(3.0f);
 					}
 					else
+					{
 						item->Pose.Orientation.y += AI.angle;
+					}
 				}
 
 				if (LaraItem->Pose.Position.y <= (item->Floor - BLOCK(1 / 2.0f)))
@@ -440,8 +448,12 @@ namespace TEN::Entities::TR4
 					item->Animation.IsAirborne = true;
 					creature.LOT.Fly = 0;
 
-					if ((item->Pose.Position.y - item->Floor) > 0)
+					if (item->Pose.Position.y >= item->Floor)
+					{
+						item->Animation.IsAirborne = false;
 						item->Animation.TargetState = SETH_STATE_IDLE;
+						creature.ReachedGoal = false;
+					}
 				}
 
 				break;
@@ -466,7 +478,9 @@ namespace TEN::Entities::TR4
 							SetAnimation(item, SETH_ANIM_HARD_RECOIL_START);
 					}
 					else
+					{
 						SetAnimation(item, SETH_ANIM_HOVER_RECOIL);
+					}
 				}
 			}
 		}
@@ -483,6 +497,16 @@ namespace TEN::Entities::TR4
 		auto pos1 = GetJointPosition(item, SethAttack1.meshNum, Vector3i(SethAttack1.Position));
 		auto pos2 = GetJointPosition(item, SethAttack2.meshNum, Vector3i(SethAttack2.Position));
 
+		int sparkR = 64;
+		int sparkG = Random::GenerateInt(64, 192);
+		int sparkB = sparkG;
+		auto sparkColor = Vector3(sparkR, sparkG, sparkB);
+
+		int flameR = 0;
+		int flameG = Random::GenerateInt(64, 192);
+		int flameB = flameG - 32;
+		auto flameColor = Vector3(flameR, flameG, flameB);
+
 		int size;
 
 		switch (item->Animation.ActiveState)
@@ -491,28 +515,10 @@ namespace TEN::Entities::TR4
 		case SETH_STATE_HOVER_PROJECTILE_ATTACK:
 			if (item->ItemFlags[0] < 78 && (GetRandomControl() & 0x1F) < item->ItemFlags[0])
 			{
-				// Spawn spark particles.
 				for (int i = 0; i < 2; i++)
 				{
-					auto pos = Vector3(
-						Random::GenerateInt(-BLOCK(1), BLOCK(1)) + pos1.x,
-						Random::GenerateInt(-BLOCK(1), BLOCK(1)) + pos1.y,
-						Random::GenerateInt(-BLOCK(1), BLOCK(1)) + pos1.z);
-					auto velocity = Vector3(
-						pos1.x - pos.x,
-						pos1.y - pos.y,
-						Random::GenerateInt(-BLOCK(1), BLOCK(1)));
-					TriggerSethSparks1(pos, velocity);
-
-					pos = Vector3(
-						Random::GenerateInt(-BLOCK(1), BLOCK(1)) + pos2.x,
-						Random::GenerateInt(-BLOCK(1), BLOCK(1)) + pos2.y,
-						Random::GenerateInt(-BLOCK(1), BLOCK(1)) + pos2.z);
-					velocity = Vector3(
-						(pos2.x - pos.x) * 8,
-						(pos2.y - pos.y) * 8,
-						(Random::GenerateInt(-BLOCK(1), BLOCK(1))) * 8);
-					TriggerSethSparks1(pos, velocity);
+					TriggerAttackSpark(pos1.ToVector3(), sparkColor);
+					TriggerAttackSpark(pos2.ToVector3(), sparkColor);
 				}
 			}
 
@@ -523,26 +529,28 @@ namespace TEN::Entities::TR4
 			if ((Wibble & 0xF) == 8)
 			{
 				if (item->ItemFlags[0] < 127)
-					TriggerSethSparks2(itemNumber, 2, size);
+				{
+					TriggerAttackFlame(pos1, flameColor, size);
+					TriggerAttackFlame(pos2, flameColor, size);
+				}
 			}
 			else if (!(Wibble & 0xF) && item->ItemFlags[0] < 103)
 			{
-				TriggerSethSparks2(itemNumber, 3, size);
+				TriggerAttackFlame(pos1, flameColor, size);
+				TriggerAttackFlame(pos2, flameColor, size);
 			}
 
 			if (item->ItemFlags[0] >= 96 && item->ItemFlags[0] <= 99)
 			{
 				auto pos = GetJointPosition(item, SethAttack1.meshNum, Vector3i(SethAttack1.Position.x, SethAttack1.Position.y * 2, SethAttack1.Position.z));
 				auto orient = Geometry::GetOrientToPoint(pos1.ToVector3(), pos.ToVector3());
-				auto attackPose = Pose(pos1, orient);
-				SpawnSethProjectile(&attackPose, item->RoomNumber, 0);
+				SethProjectileAttack(Pose(pos1, orient), item->RoomNumber, 0);
 			}
 			else if (item->ItemFlags[0] >= 122 && item->ItemFlags[0] <= 125)
 			{
 				auto pos = GetJointPosition(item, SethAttack2.meshNum, Vector3i(SethAttack2.Position.x, SethAttack2.Position.y * 2, SethAttack2.Position.z));
 				auto orient = Geometry::GetOrientToPoint(pos2.ToVector3(), pos.ToVector3());
-				auto attackPose = Pose(pos2, orient);
-				SpawnSethProjectile(&attackPose, item->RoomNumber, 0);
+				SethProjectileAttack(Pose(pos2, orient), item->RoomNumber, 0);
 			}
 
 			break;
@@ -555,11 +563,15 @@ namespace TEN::Entities::TR4
 			if ((Wibble & 0xF) == 8)
 			{
 				if (item->ItemFlags[0] < 132)
-					TriggerSethSparks2(itemNumber, 2, size);
+				{
+					TriggerAttackFlame(pos1, flameColor, size);
+					TriggerAttackFlame(pos2, flameColor, size);
+				}
 			}
 			else if (!(Wibble & 0xF) && item->ItemFlags[0] < 132)
 			{
-				TriggerSethSparks2(itemNumber, 3, size);
+				TriggerAttackFlame(pos1, flameColor, size);
+				TriggerAttackFlame(pos2, flameColor, size);
 			}
 
 			if (item->ItemFlags[0] >= 60 && item->ItemFlags[0] <= 74 ||
@@ -569,13 +581,11 @@ namespace TEN::Entities::TR4
 				{
 					auto pos = GetJointPosition(item, SethAttack1.meshNum, Vector3i(SethAttack1.Position.x, SethAttack1.Position.y * 2, SethAttack1.Position.z));
 					auto orient = Geometry::GetOrientToPoint(pos1.ToVector3(), pos.ToVector3());
-					auto attackPose = Pose(pos1, orient);
-					SpawnSethProjectile(&attackPose, item->RoomNumber, 0);
+					SethProjectileAttack(Pose(pos1, orient), item->RoomNumber, 0);
 
 					pos = GetJointPosition(item, SethAttack2.meshNum, Vector3i(SethAttack2.Position.x, SethAttack2.Position.y * 2, SethAttack2.Position.z));
 					orient = Geometry::GetOrientToPoint(pos2.ToVector3(), pos.ToVector3());
-					attackPose = Pose(pos2, orient);
-					SpawnSethProjectile(&attackPose, item->RoomNumber, 0);
+					SethProjectileAttack(Pose(pos2, orient), item->RoomNumber, 0);
 				}
 			}
 
@@ -584,30 +594,13 @@ namespace TEN::Entities::TR4
 		case SETH_STATE_SINGLE_PROJECTILE_ATTACK:
 			if (item->ItemFlags[0] > 40 &&
 				item->ItemFlags[0] < 100 &&
-				(GetRandomControl() & 7) < item->ItemFlags[0] - 40)
+				(GetRandomControl() & 7) < (item->ItemFlags[0] - 40))
 			{
 				// Spawn spark particles.
 				for (int i = 0; i < 2; i++)
 				{
-					auto pos = Vector3(
-						Random::GenerateInt(-BLOCK(1), BLOCK(1)) + pos1.x,
-						Random::GenerateInt(-BLOCK(1), BLOCK(1)) + pos1.y,
-						Random::GenerateInt(-BLOCK(1), BLOCK(1)) + pos1.z);
-					auto velocity = Vector3(
-						pos1.x - pos.x,
-						pos1.y - pos.y,
-						BLOCK(1) - Random::GenerateInt(0, BLOCK(2)));
-					TriggerSethSparks1(pos, velocity);
-
-					pos = Vector3(
-						Random::GenerateInt(-BLOCK(1), BLOCK(1)) + pos2.x,
-						Random::GenerateInt(-BLOCK(1), BLOCK(1)) + pos2.y,
-						Random::GenerateInt(-BLOCK(1), BLOCK(1)) + pos2.z);
-					velocity = Vector3(
-						pos2.x - pos.x,
-						pos2.y - pos.y,
-						Random::GenerateInt(-BLOCK(1), BLOCK(1)));
-					TriggerSethSparks1(pos, velocity);
+					TriggerAttackSpark(pos1.ToVector3(), sparkColor);
+					TriggerAttackSpark(pos2.ToVector3(), sparkColor);
 				}
 			}
 
@@ -618,19 +611,22 @@ namespace TEN::Entities::TR4
 			if ((Wibble & 0xF) == 8)
 			{
 				if (item->ItemFlags[0] < 103)
-					TriggerSethSparks2(itemNumber, 2, size);
+				{
+					TriggerAttackFlame(pos1, flameColor, size);
+					TriggerAttackFlame(pos2, flameColor, size);
+				}
 			}
 			else if (!(Wibble & 0xF) && item->ItemFlags[0] < 103)
 			{
-				TriggerSethSparks2(itemNumber, 3, size);
+				TriggerAttackFlame(pos1, flameColor, size);
+				TriggerAttackFlame(pos2, flameColor, size);
 			}
 
 			if (item->ItemFlags[0] == 102)
 			{
 				auto pos = GetJointPosition(item, SethAttack1.meshNum, Vector3i(SethAttack2.Position.x, SethAttack2.Position.y * 2, SethAttack2.Position.z));
 				auto orient = Geometry::GetOrientToPoint(pos1.ToVector3(), pos.ToVector3());
-				auto attackPose = Pose(pos1, orient);
-				SpawnSethProjectile(&attackPose, item->RoomNumber, 1);
+				SethProjectileAttack(Pose(pos1, orient), item->RoomNumber, 1);
 			}
 
 			break;
@@ -640,120 +636,7 @@ namespace TEN::Entities::TR4
 		}
 	}
 
-	void SethKill(ItemInfo* item, ItemInfo* laraItem)
-	{
-		SetAnimation(item, SETH_ANIM_KILL_ATTACK_END);
-
-		LaraItem->Animation.AnimNumber = Objects[ID_LARA_EXTRA_ANIMS].animIndex + LARA_ANIM_SETH_DEATH;
-		LaraItem->Animation.FrameNumber = g_Level.Anims[LaraItem->Animation.AnimNumber].frameBase;
-		LaraItem->Animation.ActiveState = 13; // TODO: Demagic state.
-		LaraItem->Animation.TargetState = 13;
-		LaraItem->Animation.IsAirborne = false;
-		LaraItem->Pose = Pose(item->Pose.Position, 0, item->Pose.Orientation.y, 0);
-
-		if (item->RoomNumber != LaraItem->RoomNumber)
-			ItemNewRoom(Lara.ItemNumber, item->RoomNumber);
-
-		AnimateItem(LaraItem);
-		Lara.ExtraAnim = 1;
-		LaraItem->HitPoints = -1;
-		Lara.HitDirection = -1;
-		Lara.Air = -1;
-		Lara.Control.HandStatus = HandStatus::Busy;
-		Lara.Control.Weapon.GunType = LaraWeaponType::None;
-
-		Camera.pos.RoomNumber = LaraItem->RoomNumber;
-		Camera.type = CameraType::Chase;
-		Camera.flags = CF_FOLLOW_CENTER;
-		Camera.targetAngle = ANGLE(170.0f);
-		Camera.targetElevation = ANGLE(-25.0f);
-	}
-
-	void TriggerSethSparks1(const Vector3& pos, const Vector3& velocity)
-	{
-		float distance2D = Vector2::Distance(
-			Vector2(pos.x, pos.z),
-			Vector2(LaraItem->Pose.Position.x, LaraItem->Pose.Position.z));
-		if (distance2D > BLOCK(16))
-			return;
-
-		auto& spark = *GetFreeParticle();
-
-		spark.on = true;
-		spark.sR = 0;
-		spark.sG = 0;
-		spark.sB = 0;
-		spark.dR = 64;
-		spark.dG = Random::GenerateInt(128, 192);
-		spark.dB = spark.dG + 32;
-		spark.life = 16;
-		spark.sLife = 16;
-		spark.colFadeSpeed = 4;
-		spark.blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
-		spark.fadeToBlack = 4;
-		spark.x = pos.x;
-		spark.y = pos.y;
-		spark.z = pos.z;
-		spark.xVel = velocity.x;
-		spark.yVel = velocity.y;
-		spark.zVel = velocity.z;
-		spark.friction = 34;
-		spark.scalar = 1;
-		spark.sSize = spark.size = Random::GenerateInt(4, 8);
-		spark.maxYvel = 0;
-		spark.gravity = 0;
-		spark.dSize = Random::GenerateInt(1, 2);
-		spark.flags = 0;
-	}
-
-	void TriggerSethSparks2(short itemNumber, char node, int size)
-	{
-		const auto& item = g_Level.Items[itemNumber];
-
-		float distance2D = Vector2::Distance(
-			Vector2(item.Pose.Position.x, item.Pose.Position.z),
-			Vector2(LaraItem->Pose.Position.x, LaraItem->Pose.Position.z));
-		if (distance2D > BLOCK(16))
-			return;
-
-		auto& spark = *GetFreeParticle();
-
-		spark.on = true;
-		spark.sR = 0;
-		spark.sG = 0;
-		spark.sB = 0;
-		spark.dR = 0;
-		spark.dG = Random::GenerateInt(32, 160);
-		spark.dB = spark.dG + 64;
-		spark.fadeToBlack = 8;
-		spark.colFadeSpeed = (GetRandomControl() & 3) + 4;
-		spark.blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
-		spark.life = spark.sLife = (GetRandomControl() & 7) + 20;
-		spark.x = (GetRandomControl() & 0xF) - 8;
-		spark.y = 0;
-		spark.z = (GetRandomControl() & 0xF) - 8;
-		spark.xVel = GetRandomControl() - 128;
-		spark.yVel = 0;
-		spark.zVel = GetRandomControl() - 128;
-		spark.friction = 5;
-		spark.flags = SP_NODEATTACH | SP_EXPDEF | SP_ITEM | SP_ROTATE | SP_SCALE | SP_DEF;
-		spark.rotAng = Random::GenerateAngle(0, ANGLE(22.5f));
-
-		if (Random::TestProbability(1 / 2.0f))
-			spark.rotAdd = -32 - (GetRandomControl() & 0x1F);
-		else
-			spark.rotAdd = (GetRandomControl() & 0x1F) + 32;
-
-		spark.maxYvel = 0;
-		spark.gravity = (GetRandomControl() & 0x1F) + 16;
-		spark.fxObj = itemNumber;
-		spark.nodeNumber = node;
-		spark.scalar = 2;
-		spark.sSize = spark.size = GetRandomControl() & 0xF + size;
-		spark.dSize = spark.size / 16;
-	}
-
-	void SpawnSethProjectile(Pose* pose, int roomNumber, int flags)
+	void SethProjectileAttack(const Pose& pose, int roomNumber, int flags)
 	{
 		short fxNumber = CreateNewEffect(roomNumber);
 		if (fxNumber == -1)
@@ -761,19 +644,49 @@ namespace TEN::Entities::TR4
 
 		auto& fx = EffectList[fxNumber];
 
-		fx.pos = Vector3i(
-			pose->Position.x,
-			pose->Position.y - Random::GenerateInt(-32, 32),
-			pose->Position.z);
-		fx.pos.Orientation = EulerAngles(
-			pose->Orientation.x,
-			pose->Orientation.y,
-			0);
+		fx.pos.Position.x = pose.Position.x;
+		fx.pos.Position.y = pose.Position.y - Random::GenerateInt(-32, 32);
+		fx.pos.Position.z = pose.Position.z;
+
+		fx.pos.Orientation.x = pose.Orientation.x;
+		fx.pos.Orientation.y = pose.Orientation.y;
+		fx.pos.Orientation.z = 0;
 		fx.roomNumber = roomNumber;
-		fx.counter = Random::GenerateInt() * 2 + ANGLE(-180.0f);
+		fx.counter = (GetRandomControl() * 2) + ANGLE(-180.0f); // TODO: This isn't an angle.
 		fx.flag1 = flags;
 		fx.objectNumber = ID_ENERGY_BUBBLES;
-		fx.speed = (GetRandomControl() & 0x1F) - (flags == 1 ? 64 : 0) + 96;
+		fx.speed = Random::GenerateInt(0, 32) - ((flags == 1) ? 64 : 0) + 96;
 		fx.frameNumber = Objects[ID_ENERGY_BUBBLES].meshIndex + 2 * flags;
+	}
+
+	void SethKillAttack(ItemInfo* item, ItemInfo* laraItem)
+	{
+		auto& lara = *GetLaraInfo(laraItem);
+
+		SetAnimation(item, SETH_ANIM_KILL_ATTACK_END);
+
+		laraItem->Animation.AnimNumber = Objects[ID_LARA_EXTRA_ANIMS].animIndex + LARA_ANIM_SETH_DEATH;
+		laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
+		laraItem->Animation.ActiveState = 13; // TODO: Demagic state value.
+		laraItem->Animation.TargetState = 13;
+		laraItem->Animation.IsAirborne = false;
+		laraItem->Pose = Pose(item->Pose.Position, 0, item->Pose.Orientation.y, 0);
+
+		if (item->RoomNumber != laraItem->RoomNumber)
+			ItemNewRoom(lara.ItemNumber, item->RoomNumber);
+
+		AnimateItem(laraItem);
+		laraItem->HitPoints = -1;
+		lara.ExtraAnim = 1;
+		lara.HitDirection = -1;
+		lara.Air = -1;
+		lara.Control.HandStatus = HandStatus::Busy;
+		lara.Control.Weapon.GunType = LaraWeaponType::None;
+
+		Camera.pos.RoomNumber = laraItem->RoomNumber;
+		Camera.type = CameraType::Chase;
+		Camera.flags = CF_FOLLOW_CENTER;
+		Camera.targetAngle = ANGLE(170.0f);
+		Camera.targetElevation = ANGLE(-25.0f);
 	}
 }

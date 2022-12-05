@@ -47,6 +47,7 @@ void SetLaraMonkeyRelease(ItemInfo* item);
 void SetLaraSlideAnimation(ItemInfo* item, CollisionInfo* coll);
 void SetLaraCornerAnimation(ItemInfo* item, CollisionInfo* coll, bool flip);
 void SetLaraSwimDiveAnimation(ItemInfo* item);
+void SetLaraVehicle(ItemInfo* item, ItemInfo* vehicle = nullptr);
 
 void ResetLaraLean(ItemInfo* item, float rate = 1.0f, bool resetRoll = true, bool resetPitch = true);
 void ResetLaraFlex(ItemInfo* item, float rate = 1.0f);

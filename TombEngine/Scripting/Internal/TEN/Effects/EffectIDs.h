@@ -21,7 +21,7 @@ The following constants are inside EffectID.
 	LASERDEATH
 	CUSTOM
 
-@section Misc.EffectID
+@section Effects.EffectID
 */
 
 /*** Table of effect ID constants (for use Moveable:SetEffect / Moveable:GetEffect functions).

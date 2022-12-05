@@ -29,4 +29,5 @@ namespace TEN::Effects::Spark
 	void TriggerRicochetSpark(GameVector* pos, short angle, int num);
 	void TriggerFrictionSpark(GameVector* pos, EulerAngles angle, float length, int num);
 	void TriggerElectricSpark(GameVector* pos, EulerAngles angle, int num);
+	void TriggerAttackSpark(const Vector3& basePos, const Vector3& color);
 }

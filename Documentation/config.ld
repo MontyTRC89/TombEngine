@@ -1,4 +1,4 @@
-file = {"../TombEngine/Scripting/Internal", "../Scripts"}
+file = {"../TombEngine/Scripting/Internal", "../Scripts/Engine"}
 new_type("mem", "Members", false)
 new_type("files", "Script Files", true)
 new_type("entityclass", "Entity classes", true)
