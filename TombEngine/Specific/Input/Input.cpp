@@ -140,7 +140,7 @@ namespace TEN::Input
 
 		try
 		{
-			OisInputManager = InputManager::createInputSystem((int)handle);
+			OisInputManager = InputManager::createInputSystem((size_t)handle);
 			OisInputManager->enableAddOnFactory(InputManager::AddOn_All);
 
 			if (OisInputManager->getNumberOfDevices(OISKeyboard) == 0)

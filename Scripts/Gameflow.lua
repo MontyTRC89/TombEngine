@@ -20,6 +20,10 @@ Flow.SetTotalSecretCount(5)
 
 Flow.EnableFlyCheat(true)
 
+-- Disable/enable mass pickup (collect all pickups at once)
+
+Flow.EnableMassPickup(true)
+
 --------------------------------------------------
 
 -- Title level

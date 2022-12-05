@@ -475,12 +475,22 @@ namespace TEN::Renderer
 		AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_USED_MEDIPACKS), PRINTSTRING_COLOR_WHITE, SF());
 		GetNextLinePosition(&y);
 
-		// Secrets found
-		if (g_GameFlow->NumberOfSecrets > 0)
+		// Secrets found in Level
+		if (g_GameFlow->GetLevel(CurrentLevel)->GetSecrets() > 0)
 		{
-			sprintf(buffer, "%d / %d", Statistics.Game.Secrets, g_GameFlow->NumberOfSecrets);
+			std::bitset<32> levelSecretBitSet(Statistics.Level.Secrets);
+			sprintf(buffer, "%d / %d", (int)levelSecretBitSet.count(), g_GameFlow->GetLevel(CurrentLevel)->GetSecrets());
 			AddString(MenuRightSideEntry, y, buffer, PRINTSTRING_COLOR_WHITE, SF());
-			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_SECRETS_FOUND), PRINTSTRING_COLOR_WHITE, SF());
+			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_LEVEL_SECRETS_FOUND), PRINTSTRING_COLOR_WHITE, SF());
+			GetNextLinePosition(&y);
+		}
+
+		// Secrets found total
+		if (g_GameFlow->TotalNumberOfSecrets > 0)
+		{
+			sprintf(buffer, "%d / %d", Statistics.Game.Secrets, g_GameFlow->TotalNumberOfSecrets);
+			AddString(MenuRightSideEntry, y, buffer, PRINTSTRING_COLOR_WHITE, SF());
+			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_TOTAL_SECRETS_FOUND), PRINTSTRING_COLOR_WHITE, SF());
 		}
 
 		DrawAllStrings();
@@ -511,7 +521,7 @@ namespace TEN::Renderer
 		m_pickupRotation += 45 * 360 / 30;
 	}
 
-	void Renderer11::DrawObjectOn2DPosition(short x, short y, short objectNum, EulerAngles orient, float scale1)
+	void Renderer11::DrawObjectOn2DPosition(short x, short y, short objectNum, EulerAngles orient, float scale1, int meshBits)
 	{
 		Matrix translation;
 		Matrix rotation;
@@ -575,17 +585,10 @@ namespace TEN::Renderer
 
 		for (int n = 0; n < (*moveableObj).ObjectMeshes.size(); n++)
 		{
+			if (meshBits && !(meshBits & (1 << n)))
+				continue;
+
 			auto* mesh = (*moveableObj).ObjectMeshes[n];
-
-			/*if (GLOBAL_invMode)
-			{
-				InventoryObject* objme;
-
-				objme = &InventoryObjectTable[g_Gui.ConvertObjectToInventoryItem(objectNum)];
-
-				if (!(objme->meshbits & (1 << n)))
-					continue;
-			}*/
 
 			// Finish the world matrix
 			translation = Matrix::CreateTranslation(pos.x, pos.y, pos.z + 1024.0f);

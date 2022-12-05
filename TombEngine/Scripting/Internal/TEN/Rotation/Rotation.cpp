@@ -38,7 +38,7 @@ void Rotation::Register(sol::table & parent)
 @int X rotation about x axis
 @int Y rotation about y axis
 @int Z rotation about z axis
-@return A Rotation object.
+@treturn Rotation A Rotation object.
 @function Rotation
 */
 Rotation::Rotation(int aX, int aY, int aZ)

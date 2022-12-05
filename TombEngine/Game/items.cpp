@@ -20,6 +20,8 @@ using namespace TEN::Input;
 using namespace TEN::Math::Random;
 using namespace TEN::Control::Volumes;
 
+constexpr int ITEM_DEATH_TIMEOUT = 4 * FPS;
+
 bool ItemInfo::TestOcb(short ocbFlags)
 {
 	return ((TriggerFlags & ocbFlags) == ocbFlags);
@@ -106,6 +108,14 @@ bool ItemInfo::IsLara() const
 bool ItemInfo::IsCreature() const
 {
 	return this->Data.is<CreatureInfo>();
+}
+
+void ItemInfo::ResetModelToDefault()
+{
+	this->Model.BaseMesh = Objects[this->ObjectNumber].meshIndex;
+
+	for (int i = 0; i < this->Model.MeshIndex.size(); i++)
+		this->Model.MeshIndex[i] = this->Model.BaseMesh + i;
 }
 
 bool TestState(int refState, const vector<int>& stateList)
@@ -512,11 +522,8 @@ void InitialiseItem(short itemNumber)
 
 	if (Objects[item->ObjectNumber].nmeshes > 0)
 	{
-		item->Model.BaseMesh = Objects[item->ObjectNumber].meshIndex;
-
 		item->Model.MeshIndex.resize(Objects[item->ObjectNumber].nmeshes);
-		for (int i = 0; i < item->Model.MeshIndex.size(); i++)
-			item->Model.MeshIndex[i] = item->Model.BaseMesh + i;
+		item->ResetModelToDefault();
 
 		item->Model.Mutator.resize(Objects[item->ObjectNumber].nmeshes);
 		for (int i = 0; i < item->Model.Mutator.size(); i++)
@@ -658,16 +665,17 @@ void UpdateAllItems()
 		auto* item = &g_Level.Items[itemNumber];
 		short nextItem = item->NextActive;
 
-		if (item->AfterDeath <= 128)
+		if (item->AfterDeath <= ITEM_DEATH_TIMEOUT)
 		{
 			if (Objects[item->ObjectNumber].control)
 				Objects[item->ObjectNumber].control(itemNumber);
 
 			TestVolumes(itemNumber);
+			ProcessEffects(item);
 
-			if (item->AfterDeath > 0 && item->AfterDeath < 128 && !(Wibble & 3))
+			if (item->AfterDeath > 0 && item->AfterDeath < ITEM_DEATH_TIMEOUT && !(Wibble & 3))
 				item->AfterDeath++;
-			if (item->AfterDeath == 128)
+			if (item->AfterDeath == ITEM_DEATH_TIMEOUT)
 				KillItem(itemNumber);
 		}
 		else

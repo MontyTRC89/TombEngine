@@ -7,7 +7,7 @@
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_struct.h"
 #include "Objects/Generic/Object/burning_torch.h"
-#include "Game/effects/lara_fx.h"
+#include "Game/effects/item_fx.h"
 #include "Specific/level.h"
 #include "ReservedScriptNames.h"
 
@@ -23,35 +23,6 @@ In addition, LaraObject inherits all the functions of @{Objects.Moveable|Moveabl
 
 constexpr auto LUA_CLASS_NAME{ ScriptReserved_LaraObject };
 using namespace TEN::Entities::Generic;
-
-/// Set Lara on fire
-// @function LaraObject:SetOnFire
-// @bool fire true to set lara on fire, false to extinguish her
-void LaraObject::SetOnFire(bool onFire)
-{
-	//todo add support for other BurnTypes -squidshire 11/11/2022
-	auto* lara = GetLaraInfo(m_item);
-	if (onFire && !lara->Burn)
-	{
-		TEN::Effects::Lara::LaraBurn(m_item);
-		lara->Burn = true;
-		lara->BurnType = BurnType::Normal;
-	}
-	else if (!onFire)
-	{
-		lara->Burn = false;
-		lara->BurnType = BurnType::None;
-	}
-}
-
-/// Get whether Lara is on fire or not
-// @function LaraObject:GetOnFire
-// @treturn bool fire true if lara is on fire, false otherwise
-bool LaraObject::GetOnFire() const
-{
-	auto* lara = GetLaraInfo(m_item);
-	return lara->BurnType != BurnType::None;
-}
 
 /// Set Lara poison potency
 // @function LaraObject:SetPoison
@@ -167,7 +138,36 @@ int LaraObject::GetAmmoCount() const
 	auto& ammo = GetAmmo(Lara, Lara.Control.Weapon.GunType);
 	return (ammo.HasInfinite()) ? -1 : (int)ammo.GetCount();
 }
-	
+
+/// Get current vehicle, if it exists
+// @function LaraObject:GetVehicle
+// @treturn Moveable current vehicle (nil if no vehicle present)
+// @usage
+// local vehicle = Lara:GetVehicle()
+std::unique_ptr<Moveable> LaraObject::GetVehicle() const
+{
+	auto* lara = GetLaraInfo(m_item);
+
+	if (lara->Vehicle == NO_ITEM)
+		return nullptr;
+
+	return std::make_unique<Moveable>(lara->Vehicle);
+}
+
+/// Get current target enemy, if it exists
+// @function LaraObject:GetTarget
+// @treturn Moveable current target enemy (nil if no target present)
+// @usage
+// local target = Lara:GetTarget()
+std::unique_ptr<Moveable> LaraObject::GetTarget() const
+{
+	auto* lara = GetLaraInfo(m_item);
+
+	if (lara->TargetEntity == nullptr)
+		return nullptr;
+
+	return std::make_unique<Moveable>(lara->TargetEntity->Index);
+}
 	
 /// Lara will undraw her weapon if it is drawn and throw away a flare if she is currently holding one.
 // @function LaraObject:UndrawWeapon
@@ -199,11 +199,12 @@ void LaraObject::ThrowAwayTorch()
 }
 
 //todo make these into enums - Squidshire 18/11/2022
+
 /// Get actual hand status of Lara
 // @function LaraObject:GetHandStatus
 // @usage
 // local handStatus = Lara:GetHandStatus()
-// @treturn 0=HandsFree, 1=Busy(climbing,etc), 2=WeaponDraw, 3=WeaponUndraw, 4=WeaponInHand.
+// @treturn int hand status 0=HandsFree, 1=Busy(climbing,etc), 2=WeaponDraw, 3=WeaponUndraw, 4=WeaponInHand.
 HandStatus LaraObject::GetHandStatus() const
 {
 	auto* lara = GetLaraInfo(m_item);
@@ -211,11 +212,12 @@ HandStatus LaraObject::GetHandStatus() const
 }
 
 //todo make these into enums - Squidshire 18/11/2022
+
 /// Get actual weapon type of Lara
 // @function LaraObject:GetWeaponType
 // @usage
 // local weaponType = Lara:GetWeaponType()
-// @treturn 0=None, 1=Pistols, 2=Revolver, 3=Uzi, 4=Shotgun, 5=HK, 6=Crossbow, 7=Flare, 8=Torch, 9=GrenadeLauncher, 10=Harpoon, 11=RocketLauncher.
+// @treturn int weapon type 0=None, 1=Pistols, 2=Revolver, 3=Uzi, 4=Shotgun, 5=HK, 6=Crossbow, 7=Flare, 8=Torch, 9=GrenadeLauncher, 10=Harpoon, 11=RocketLauncher.
 LaraWeaponType LaraObject::GetWeaponType() const
 {
 	auto* lara = GetLaraInfo(m_item);
@@ -274,8 +276,6 @@ void LaraObject::SetWeaponType(LaraWeaponType weaponType, bool activate)
 void LaraObject::Register(sol::table& parent)
 {
 	parent.new_usertype<LaraObject>(LUA_CLASS_NAME,
-			ScriptReserved_SetOnFire, &LaraObject::SetOnFire,
-			ScriptReserved_GetOnFire, &LaraObject::GetOnFire,
 			ScriptReserved_SetPoison, &LaraObject::SetPoison,
 			ScriptReserved_GetPoison, &LaraObject::GetPoison,
 			ScriptReserved_SetAir, &LaraObject::SetAir,
@@ -290,6 +290,8 @@ void LaraObject::Register(sol::table& parent)
 			ScriptReserved_GetWeaponType, &LaraObject::GetWeaponType,
 			ScriptReserved_SetWeaponType, &LaraObject::SetWeaponType,
 			ScriptReserved_GetAmmoCount, &LaraObject::GetAmmoCount,
+			ScriptReserved_GetVehicle, &LaraObject::GetVehicle,
+			ScriptReserved_GetTarget, &LaraObject::GetTarget,
 			sol::base_classes, sol::bases<Moveable>()
 		);
 }

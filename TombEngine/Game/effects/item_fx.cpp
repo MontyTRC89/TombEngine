@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "Game/effects/lara_fx.h"
+#include "Game/effects/item_fx.h"
 
 #include "Game/collision/collide_room.h"
 #include "Game/collision/floordata.h"
@@ -9,28 +9,55 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
+#include "Scripting/Internal/TEN/Color/Color.h"
 #include "Specific/level.h"
 
 using namespace TEN::Effects::Smoke;
 
-namespace TEN::Effects::Lara
+namespace TEN::Effects::Items
 {
-	void LaraBurn(ItemInfo* item)
+	void ItemBurn(ItemInfo* item, int timeout)
 	{
-		if (!item->IsLara())
-			return;
+		item->Effect.Type = EffectType::Fire;
+		item->Effect.Count = timeout;
+		item->Effect.LightColor = Vector3(0.8f, 0.5f, 0.0f);
+		item->Effect.PrimaryEffectColor = item->Effect.SecondaryEffectColor = Vector3::Zero;
+	}
 
-		auto* lara = GetLaraInfo(item);
+	void ItemCustomBurn(ItemInfo* item, Vector3 color1, Vector3 color2, int timeout)
+	{
+		item->Effect.Type = EffectType::Custom;
+		item->Effect.Count = timeout;
+		item->Effect.LightColor = color1;
+		item->Effect.PrimaryEffectColor = color1;
+		item->Effect.SecondaryEffectColor = color2;
+	}
 
-		if (!lara->Burn && !lara->BurnSmoke)
-		{
-			short fxNum = CreateNewEffect(item->RoomNumber);
-			if (fxNum != NO_ITEM)
-			{
-				EffectList[fxNum].objectNumber = ID_FLAME;
-				lara->Burn = true;
-			}
-		}
+	void ItemElectricBurn(ItemInfo* item, int timeout)
+	{
+		item->Effect.Type = EffectType::Sparks;
+		item->Effect.Count = timeout;
+		item->Effect.LightColor = Vector3(0.0f, 0.6f, 1.0f);
+	}
+
+	void ItemBlueElectricBurn(ItemInfo* item, int timeout)
+	{
+		item->Effect.Type = EffectType::ElectricIgnite;
+		item->Effect.Count = timeout / FPS;
+		item->Effect.LightColor = Vector3(0.0f, 0.6f, 1.0f);
+	}
+
+	void ItemRedLaserBurn(ItemInfo* item, int timeout)
+	{
+		item->Effect.Type = EffectType::RedIgnite;
+		item->Effect.Count = timeout / FPS;
+		item->Effect.LightColor = Vector3(1.0f, 0.4f, 0.0f);
+	}
+
+	void ItemSmoke(ItemInfo* item, int timeout)
+	{
+		item->Effect.Type = EffectType::Smoke;
+		item->Effect.Count = timeout;
 	}
 
 	void LavaBurn(ItemInfo* item)
@@ -46,13 +73,13 @@ namespace TEN::Effects::Lara
 		{
 			item->HitPoints = -1;
 			item->HitStatus = true;
-			LaraBurn(item);
+			ItemBurn(item);
 		}
 	}
 
 	void LaraBreath(ItemInfo* item)
 	{
-		if (!item->IsLara())
+		if (item->IsLara())
 			return;
 
 		auto* lara = GetLaraInfo(item);

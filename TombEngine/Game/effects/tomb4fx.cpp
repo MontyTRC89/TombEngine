@@ -1394,8 +1394,9 @@ void ExplodeVehicle(ItemInfo* laraItem, ItemInfo* vehicle)
 	SoundEffect(SFX_TR4_EXPLOSION1, &laraItem->Pose);
 	SoundEffect(SFX_TR4_EXPLOSION2, &laraItem->Pose);
 
-	lara->Vehicle = NO_ITEM;
+	SetLaraVehicle(laraItem, nullptr);
 	SetAnimation(laraItem, LA_FALL_START);
+	laraItem->Animation.IsAirborne = true;
 	DoDamage(laraItem, INT_MAX);
 }
 
@@ -1458,7 +1459,7 @@ void ExplodingDeath(short itemNumber, short flags)
 				fx->objectNumber = ID_BODY_PART;
 				fx->color = item->Color;
 				fx->flag2 = flags;
-				fx->frameNumber = obj->meshIndex + i;
+				fx->frameNumber = item->Model.MeshIndex[i];
 			}
 		}
 		else
@@ -1479,7 +1480,7 @@ int GetFreeShockwave()
 	return -1;
 }
 
-void TriggerShockwave(Pose* pos, short innerRad, short outerRad, int speed, unsigned char r, unsigned char g, unsigned char b, unsigned char life, short angle, short flags)
+void TriggerShockwave(Pose* pos, short innerRad, short outerRad, int speed, unsigned char r, unsigned char g, unsigned char b, unsigned char life, short angle, short damage)
 {
 	int s = GetFreeShockwave();
 	SHOCKWAVE_STRUCT* sptr;
@@ -1494,14 +1495,14 @@ void TriggerShockwave(Pose* pos, short innerRad, short outerRad, int speed, unsi
 		sptr->innerRad = innerRad;
 		sptr->outerRad = outerRad;
 		sptr->xRot = angle;
-		sptr->flags = flags;
+		sptr->damage = damage;
 		sptr->speed = speed;
 		sptr->r = r;
 		sptr->g = g;
 		sptr->b = b;
 		sptr->life = life;
 		
-		SoundEffect(SFX_TR5_IMP_STONE_HIT, pos);
+		SoundEffect(SFX_TR4_SMASH_ROCK, pos);
 	}
 }
 
@@ -1578,7 +1579,7 @@ void UpdateShockwaves()
 
 				if (LaraItem->HitPoints > 0)
 				{
-					if (sw->flags & 3)
+					if (sw->damage)
 					{
 						AnimFrame* frame = GetBestFrame(LaraItem);
 
@@ -1603,7 +1604,7 @@ void UpdateShockwaves()
 								angle,
 								sw->speed);
 
-							DoDamage(LaraItem, sw->speed >> (((sw->flags >> 1) & 1) + 2));
+							DoDamage(LaraItem, sw->damage);
 						}
 					}
 				}

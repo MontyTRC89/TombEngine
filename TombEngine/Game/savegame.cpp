@@ -10,7 +10,7 @@
 #include "Game/control/lot.h"
 #include "Game/control/volume.h"
 #include "Game/control/volumetriggerer.h"
-#include "Game/effects/lara_fx.h"
+#include "Game/effects/item_fx.h"
 #include "Game/effects/effects.h"
 #include "Game/items.h"
 #include "Game/itemdata/creature_info.h"
@@ -37,7 +37,7 @@
 #include "Objects/ScriptInterfaceObjectsHandler.h"
 
 using namespace TEN::Control::Volumes;
-using namespace TEN::Effects::Lara;
+using namespace TEN::Effects::Items;
 using namespace TEN::Entities::Switches;
 using namespace TEN::Entities::TR4;
 using namespace TEN::Entities::Generic;
@@ -419,11 +419,6 @@ bool SaveGame::Save(int slot)
 	Save::LaraBuilder lara{ fbb };
 	lara.add_air(Lara.Air);
 
-	lara.add_burn_count(Lara.BurnCount);
-	lara.add_burn_type((int)Lara.BurnType);
-	lara.add_burn(Lara.Burn);
-	lara.add_burn_blue(Lara.BurnBlue);
-	lara.add_burn_smoke(Lara.BurnSmoke);
 	lara.add_control(controlOffset);
 	lara.add_next_corner_pose(&FromPHD(Lara.NextCornerPos));
 	lara.add_extra_anim(Lara.ExtraAnim);
@@ -650,6 +645,11 @@ bool SaveGame::Save(int slot)
 		serializedItem.add_ai_bits(itemToSerialize.AIBits);
 		serializedItem.add_collidable(itemToSerialize.Collidable);
 		serializedItem.add_looked_at(itemToSerialize.LookedAt);
+		serializedItem.add_effect_type((int)itemToSerialize.Effect.Type);
+		serializedItem.add_effect_light_colour(&FromVector3(itemToSerialize.Effect.LightColor));
+		serializedItem.add_effect_primary_colour(&FromVector3(itemToSerialize.Effect.PrimaryEffectColor));
+		serializedItem.add_effect_secondary_colour(&FromVector3(itemToSerialize.Effect.SecondaryEffectColor));
+		serializedItem.add_effect_count(itemToSerialize.Effect.Count);
 
 		if (Objects[itemToSerialize.ObjectNumber].intelligent 
 			&& itemToSerialize.Data.is<CreatureInfo>())
@@ -1142,7 +1142,7 @@ bool SaveGame::Save(int slot)
 	sgb.add_room_items(roomItemsOffset);
 	sgb.add_flip_effect(FlipEffect);
 	sgb.add_flip_status(FlipStatus);
-	sgb.add_flip_timer(0);
+	sgb.add_current_fov(LastFOV);
 	sgb.add_static_meshes(staticMeshesOffset);
 	sgb.add_volume_states(volumeStatesOffset);
 	sgb.add_fixed_cameras(camerasOffset);
@@ -1230,7 +1230,9 @@ bool SaveGame::Load(int slot)
 	// Effects
 	FlipEffect = s->flip_effect();
 	FlipStatus = s->flip_status();
-	//FlipTimer = s->flip_timer();
+
+	// Restore camera FOV
+	AlterFOV(s->current_fov());
 
 	// Restore soundtracks
 	PlaySoundTrack(s->ambient_track()->str(), SoundTrackType::BGM, s->ambient_position());
@@ -1392,6 +1394,12 @@ bool SaveGame::Load(int slot)
 		item->Animation.IsAirborne = savedItem->is_airborne();
 		item->Collidable = savedItem->collidable();
 		item->LookedAt = savedItem->looked_at();
+
+		item->Effect.Type = (EffectType)savedItem->effect_type();
+		item->Effect.PrimaryEffectColor = ToVector3(savedItem->effect_primary_colour());
+		item->Effect.SecondaryEffectColor = ToVector3(savedItem->effect_secondary_colour());
+		item->Effect.LightColor = ToVector3(savedItem->effect_light_colour());
+		item->Effect.Count = savedItem->effect_count();
 
 		// Mesh stuff
 		item->MeshBits = savedItem->mesh_bits();
@@ -1719,11 +1727,6 @@ bool SaveGame::Load(int slot)
 	}
 
 	Lara.Air = s->lara()->air();
-	Lara.BurnCount = s->lara()->burn_count();
-	Lara.BurnType = (BurnType)s->lara()->burn_type();
-	Lara.Burn = s->lara()->burn();
-	Lara.BurnBlue = s->lara()->burn_blue();
-	Lara.BurnSmoke = s->lara()->burn_smoke();
 	Lara.Control.CalculatedJumpVelocity = s->lara()->control()->calculated_jump_velocity();
 	Lara.Control.CanMonkeySwing = s->lara()->control()->can_monkey_swing();
 	Lara.Control.CanClimbLadder = s->lara()->control()->is_climbing_ladder();
@@ -1862,22 +1865,6 @@ bool SaveGame::Load(int slot)
 		Lara.Weapons[i].Present = info->present();
 		Lara.Weapons[i].SelectedAmmo = (WeaponAmmoType)info->selected_ammo();
 		Lara.Weapons[i].WeaponMode = (LaraWeaponTypeCarried)info->weapon_mode();
-	}
-
-	if (Lara.BurnType != BurnType::None)
-	{
-		char flag = 0;
-		Lara.BurnType = BurnType::None;
-		if (Lara.BurnSmoke)
-		{
-			flag = 1;
-			Lara.BurnSmoke = 0;
-		}
-
-		LaraBurn(LaraItem);
-
-		if (flag)
-			Lara.BurnSmoke = 1;
 	}
 
 	// Rope

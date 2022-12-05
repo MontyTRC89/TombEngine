@@ -56,6 +56,17 @@ enum class JointBitType
 	MeshSwap
 };
 
+enum class EffectType
+{
+	None,
+	Fire,
+	Sparks,
+	Smoke,
+	ElectricIgnite,
+	RedIgnite,
+	Custom
+};
+
 struct EntityAnimationData
 {
 	int AnimNumber	  = -1;
@@ -83,6 +94,15 @@ struct EntityCallbackData
 	std::string OnRoomCollided;
 };
 
+struct EntityEffectData
+{
+	EffectType Type = EffectType::None;
+	Vector3 LightColor = Vector3::Zero;
+	Vector3 PrimaryEffectColor = Vector3::Zero;
+	Vector3 SecondaryEffectColor = Vector3::Zero;
+	int Count = -1;
+};
+
 //todo we need to find good "default states" for a lot of these - squidshire 25/05/2022
 struct ItemInfo
 {
@@ -100,6 +120,7 @@ struct ItemInfo
 	EntityAnimationData Animation;
 	EntityCallbackData Callbacks;
 	EntityModelData Model;
+	EntityEffectData Effect;
 	
 	Pose StartPose;
 	Pose Pose;
@@ -143,6 +164,8 @@ struct ItemInfo
 
 	bool IsLara() const;
 	bool IsCreature() const;
+
+	void ResetModelToDefault();
 };
 
 bool TestState(int refState, const std::vector<int>& stateList);

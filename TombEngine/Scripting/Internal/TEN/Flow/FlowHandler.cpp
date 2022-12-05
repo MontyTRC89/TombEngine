@@ -113,12 +113,19 @@ Must be an integer value (0 means no secrets).
 */
 	table_flow.set_function(ScriptReserved_SetTotalSecretCount, &FlowHandler::SetTotalSecretCount, this);
 
-/*** Set FlyCheatEnabled
+/*** Enable or disable DOZY mode (fly cheat).
 Must be true or false
-@function SetFlyCheatEnabled
+@function EnableFlyCheat
 @tparam bool true or false
 */
 	table_flow.set_function(ScriptReserved_EnableFlyCheat, &FlowHandler::EnableFlyCheat, this);
+
+/*** Enable or disable mass pickup.
+Must be true or false
+@function EnableMassPickup
+@tparam bool true or false
+*/
+	table_flow.set_function(ScriptReserved_EnableMassPickup, &FlowHandler::EnableMassPickup, this);
 
 /*** settings.lua.
 These functions are called in settings.lua, a file which holds your local settings.
@@ -222,7 +229,7 @@ void FlowHandler::SetTitleScreenImagePath(std::string const& path)
 
 void FlowHandler::SetTotalSecretCount(int secretsNumber)
 {
-	NumberOfSecrets = secretsNumber;
+	TotalNumberOfSecrets = secretsNumber;
 }
 
 void FlowHandler::LoadFlowScript()
@@ -331,6 +338,16 @@ bool FlowHandler::IsFlyCheatEnabled() const
 void FlowHandler::EnableFlyCheat(bool flyCheat)
 {
 	FlyCheat = flyCheat;
+}
+
+bool FlowHandler::IsMassPickupEnabled() const
+{
+	return MassPickup;
+}
+
+void FlowHandler::EnableMassPickup(bool massPickup)
+{
+	MassPickup = massPickup;
 }
 
 bool FlowHandler::DoFlow()

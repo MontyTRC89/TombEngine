@@ -186,7 +186,7 @@ namespace TEN::Entities::Vehicles
 		}
 		else
 		{
-			lara->Vehicle = itemNumber;
+			SetLaraVehicle(laraItem, kayakItem);
 			DoKayakMount(kayakItem, laraItem, mountType);
 		}
 	}
@@ -1061,7 +1061,7 @@ namespace TEN::Entities::Vehicles
 				laraItem->Animation.Velocity.y = -50;
 				laraItem->Animation.IsAirborne = true;
 				lara->Control.HandStatus = HandStatus::Free;
-				lara->Vehicle = NO_ITEM;
+				SetLaraVehicle(laraItem, nullptr);
 				kayak->LeftRightPaddleCount = 0;
 			}
 
@@ -1082,7 +1082,7 @@ namespace TEN::Entities::Vehicles
 				laraItem->Animation.Velocity.z = 40;
 				laraItem->Animation.Velocity.y = -50;
 				lara->Control.HandStatus = HandStatus::Free;
-				lara->Vehicle = NO_ITEM;
+				SetLaraVehicle(laraItem, nullptr);
 				kayak->LeftRightPaddleCount = 0;
 			}
 		}
@@ -1125,6 +1125,9 @@ namespace TEN::Entities::Vehicles
 	{
 		for (auto i : g_Level.Rooms[kayakItem->RoomNumber].neighbors)
 		{
+			if (!g_Level.Rooms[i].Active())
+				continue;
+
 			short itemNum = g_Level.Rooms[i].itemNumber;
 
 			while (itemNum != NO_ITEM)

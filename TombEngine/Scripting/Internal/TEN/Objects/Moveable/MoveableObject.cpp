@@ -3,6 +3,7 @@
 #include "Game/items.h"
 #include "Game/control/lot.h"
 #include "Game/effects/debris.h"
+#include "Game/effects/item_fx.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Objects/objectslist.h"
@@ -19,6 +20,8 @@
 #include "Logic/LevelFunc.h"
 #include "Rotation/Rotation.h"
 #include "Vec3/Vec3.h"
+
+using namespace TEN::Effects::Items;
 
 /***
 Represents any object inside the game world.
@@ -81,7 +84,7 @@ most can just be ignored (see usage).
 	@int[opt=10] hp HP of item
 	@int[opt=0] OCB ocb of item (default 0)
 	@tparam[opt] table AIBits table with AI bits (default {0,0,0,0,0,0})
-	@return reference to new Moveable object
+	@treturn Moveable A new Moveable object (a wrapper around the new object)
 	@usage 
 	local item = Moveable(
 		TEN.Objects.ObjID.PISTOLS_ITEM, -- object id
@@ -162,6 +165,24 @@ void Moveable::Register(sol::table & parent)
 /// Shatter item. This also kills and disables item.
 // @function Moveable:Shatter
 	ScriptReserved_Shatter, &Moveable::Shatter,
+
+/// Set effect to moveable
+// @function Moveable:SetEffect
+// @tparam EffectID effect Type of effect to assign.
+// @tparam float timeout time (in seconds) after which effect turns off (optional).
+	ScriptReserved_SetEffect, &Moveable::SetEffect,
+
+/// Set custom colored burn effect to moveable
+// @function Moveable:SetCustomEffect
+// @tparam Color Color1 color the primary color of the effect (also used for lighting).
+// @tparam Color Color2 color the secondary color of the effect.
+// @tparam float timeout time (in seconds) after which effect turns off (optional).
+	ScriptReserved_SetCustomEffect, &Moveable::SetCustomEffect,
+
+/// Get current moveable effect
+// @function Moveable:GetEffect
+// @treturn EffectID effect type currently assigned to moveable.
+	ScriptReserved_GetEffect, & Moveable::GetEffect,
 
 /// Get the status of object.
 // possible values:
@@ -473,6 +494,7 @@ GAME_OBJECT_ID Moveable::GetObjectID() const
 void Moveable::SetObjectID(GAME_OBJECT_ID id) 
 {
 	m_item->ObjectNumber = id;
+	m_item->ResetModelToDefault();
 }
 
 void SetLevelFuncCallback(TypeOrNil<LevelFunc> const & cb, std::string const & callerName, Moveable & mov, std::string & toModify)
@@ -646,6 +668,54 @@ void Moveable::SetOCB(short ocb)
 	m_item->TriggerFlags = ocb;
 }
 
+void Moveable::SetEffect(EffectType effectType, sol::optional<float> timeout)
+{
+	int realTimeout = timeout.has_value() ? int(timeout.value() * FPS) : -1;
+
+	switch (effectType)
+	{
+	case EffectType::None:
+		m_item->Effect.Type = EffectType::None;
+		break;
+
+	case EffectType::Smoke:
+		ItemSmoke(m_item, realTimeout);
+		break;
+
+	case EffectType::Fire:
+		ItemBurn(m_item, realTimeout);
+		break;
+
+	case EffectType::Sparks:
+		ItemElectricBurn(m_item, realTimeout);
+		break;
+
+	case EffectType::ElectricIgnite:
+		ItemBlueElectricBurn(m_item, realTimeout);
+		break;
+
+	case EffectType::RedIgnite:
+		ItemRedLaserBurn(m_item, realTimeout);
+		break;
+
+	case EffectType::Custom:
+		ScriptWarn("CUSTOM effect type requires additional setup. Use SetCustomEffect command instead.");
+	}
+}
+
+void Moveable::SetCustomEffect(const ScriptColor& col1, const ScriptColor& col2, sol::optional<float> timeout)
+{
+	int realTimeout = timeout.has_value() ? int(timeout.value() * FPS) : -1;
+	Vector3 color1 = Vector3(col1.GetR() * (1.f / 255.f), col1.GetG() * (1.f / 255.f), col1.GetB() * (1.f / 255.f));
+	Vector3 color2 = Vector3(col2.GetR() * (1.f / 255.f), col2.GetG() * (1.f / 255.f), col2.GetB() * (1.f / 255.f));
+	ItemCustomBurn(m_item, color1, color2, realTimeout);
+}
+
+EffectType Moveable::GetEffect() const
+{
+	return m_item->Effect.Type;
+}
+
 short Moveable::GetItemFlags(int index) const
 {
 	return m_item->ItemFlags[index];
@@ -724,6 +794,9 @@ Vec3 Moveable::GetVelocity() const
 
 void Moveable::SetVelocity(Vec3 velocity)
 {
+	if (m_item->IsCreature())
+		ScriptWarn("Attempt to set velocity to a creature. In may not work, as velocity is overridden by AI.");
+
 	m_item->Animation.Velocity = Vector3(velocity.x, velocity.y, velocity.z);
 }
 

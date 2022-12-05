@@ -167,7 +167,11 @@ namespace TEN::Renderer
 			r->ItemsToDraw.reserve(MAX_ITEMS_DRAW);
 			r->EffectsToDraw.reserve(MAX_ITEMS_DRAW);
 			r->TransparentFacesToDraw.reserve(MAX_TRANSPARENT_FACES_PER_ROOM);
-			r->Neighbors = room.neighbors;
+			
+			r->Neighbors.clear();
+			for (int j : room.neighbors)
+				if (g_Level.Rooms[j].Active())
+					r->Neighbors.push_back(j);
 
 			if (room.mesh.size() > 0)
 				r->StaticsToDraw.reserve(room.mesh.size());

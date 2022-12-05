@@ -5,16 +5,20 @@
 
 class LevelFunc;
 
-namespace sol {
+namespace sol 
+{
 	class state;
 	template <typename T> struct as_table_t;
 }
+
 class Vec3;
 class Rotation;
 class ScriptColor;
 
 struct ItemInfo;
+
 enum GAME_OBJECT_ID : short;
+enum class EffectType;
 
 using aiBitsArray = std::array<int, 6>;
 using aiBitsType = sol::as_table_t<aiBitsArray>;
@@ -72,6 +76,10 @@ public:
 
 	[[nodiscard]] short GetOCB() const;
 	void SetOCB(short ocb);
+
+	[[nodiscard]] EffectType GetEffect() const;
+	void SetEffect(EffectType effectType, sol::optional<float> timeout);
+	void SetCustomEffect(const ScriptColor& col1, const ScriptColor& col2, sol::optional<float> timeout);
 
 	[[nodiscard]] aiBitsType GetAIBits() const;
 	void SetAIBits(aiBitsType const & bits);

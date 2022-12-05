@@ -906,25 +906,24 @@ int GetShatterSound(int shatterID)
 	if (shatterID < 3)
 		return SFX_TR5_SMASH_WOOD;
 	else
-		return SFX_TR5_SMASH_GLASS;
+		return SFX_TR4_SMASH_ROCK;
 }
 
 void PlaySoundSources()
 {
+	static constexpr int PLAY_ALWAYS    = 0x8000;
+	static constexpr int PLAY_BASE_ROOM = 0x4000;
+	static constexpr int PLAY_FLIP_ROOM = 0x2000;
+
 	for (size_t i = 0; i < g_Level.SoundSources.size(); i++)
 	{
 		const auto& sound = g_Level.SoundSources[i];
 
-		short t = sound.Flags & 31;
-		short group = t & 1;
-		group += t & 2;
-		group += ((t >> 2) & 1) * 3;
-		group += ((t >> 3) & 1) * 4;
-		group += ((t >> 4) & 1) * 5;
+		int group = sound.Flags & 0x1FFF;
 
-		if (!FlipStats[group] && (sound.Flags & 128) == 0)
+		if (!FlipStats[group] && (sound.Flags & PLAY_FLIP_ROOM))
 			continue;
-		else if (FlipStats[group] && (sound.Flags & 128) == 0)
+		else if (FlipStats[group] && (sound.Flags & PLAY_BASE_ROOM))
 			continue;
 
 		SoundEffect(sound.SoundID, (Pose*)&sound.Position);

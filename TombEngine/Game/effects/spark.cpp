@@ -3,6 +3,8 @@
 #include "Game/effects/spark.h"
 
 #include <array>
+#include "Game/control/control.h"
+#include "Game/effects/effects.h"
 #include "Math/Math.h"
 #include "Math/Random.h"
 
@@ -81,7 +83,7 @@ namespace TEN::Effects::Spark
 			s.room = pos->RoomNumber;
 			s.pos = Vector3(pos->x, pos->y, pos->z);
 			float ang = TO_RAD(angle);
-			Vector3 v = Vector3(sin(ang + GenerateFloat(-PI / 2, PI / 2)), GenerateFloat(-1, 1), cos(ang + GenerateFloat(-PI / 2, PI / 2)));
+			Vector3 v = Vector3(sin(ang + GenerateFloat(-PI_DIV_2, PI_DIV_2)), GenerateFloat(-1, 1), cos(ang + GenerateFloat(-PI_DIV_2, PI_DIV_2)));
 			v += Vector3(GenerateFloat(-64, 64), GenerateFloat(-64, 64), GenerateFloat(-64, 64));
 			v.Normalize(v);
 			s.velocity = v * GenerateFloat(17, 24);
@@ -114,5 +116,62 @@ namespace TEN::Effects::Spark
 			s.destinationColor = Vector4(0.4f, 0.1f, 0, 0.5f);
 			s.active = true;
 		}
+	}
+
+	void TriggerElectricSpark(GameVector* pos, EulerAngles angle, int num)
+	{
+		for (int i = 0; i < num; i++)
+		{
+			auto& s = GetFreeSparkParticle();
+			s = {};
+			s.age = 0;
+			s.life = GenerateFloat(8, 15);
+			s.friction = 1.0f;
+			s.gravity = 2.0f;
+			s.height = GenerateFloat(64.0f, 256.0f);
+			s.width = GenerateFloat(8.0f, 16.0f);
+			s.room = pos->RoomNumber;
+			s.pos = Vector3(pos->x + GenerateFloat(-16, 16), pos->y + GenerateFloat(-16, 16), pos->z + GenerateFloat(-16, 16));
+			float ang = TO_RAD(angle.y);
+			float vAng = -TO_RAD(angle.x);
+			Vector3 v = Vector3(sin(ang), vAng + GenerateFloat(-PI / 16, PI / 16), cos(ang));
+			v.Normalize(v);
+			s.velocity = v * GenerateFloat(8, 32);
+			s.sourceColor = Vector4(0.4f, 0.6f, 1.0f, 1);
+			s.destinationColor = Vector4(0.6f, 0.6f, 0.8f, 0.8f);
+			s.active = true;
+		}
+	}
+
+	void TriggerAttackSpark(const Vector3& basePos, const Vector3& color)
+	{
+		auto& spark = *GetFreeParticle();
+
+		auto sphere = BoundingSphere(basePos, BLOCK(1));
+		auto pos = Random::GeneratePointInSphere(sphere);
+		auto vel = (basePos - pos) * 8;
+
+		spark.on = true;
+		spark.sR = 0;
+		spark.sG = 0;
+		spark.sB = 0;
+		spark.dR = color.x;
+		spark.dG = color.y;
+		spark.dB = color.z;
+		spark.life = 16;
+		spark.sLife = 16;
+		spark.colFadeSpeed = 4;
+		spark.blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+		spark.fadeToBlack = 4;
+		spark.x = (int)round(pos.x);
+		spark.y = (int)round(pos.y);
+		spark.z = (int)round(pos.z);
+		spark.xVel = (int)round(vel.x);
+		spark.yVel = (int)round(vel.y);
+		spark.zVel = (int)round(vel.z);
+		spark.friction = 34;
+		spark.maxYvel = 0;
+		spark.gravity = 0;
+		spark.flags = SP_NONE;
 	}
 }

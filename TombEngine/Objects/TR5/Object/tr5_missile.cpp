@@ -12,10 +12,10 @@
 #include "tr5_roman_statue.h"
 #include "tr5_hydra.h"
 #include "Game/collision/collide_item.h"
-#include "Game/effects/lara_fx.h"
+#include "Game/effects/item_fx.h"
 #include "Math/Math.h"
 
-using namespace TEN::Effects::Lara;
+using namespace TEN::Effects::Items;
 using namespace TEN::Math;
 
 int DebrisFlags;
@@ -41,7 +41,7 @@ void MissileControl(short itemNumber)
 	else
 	{
 		auto orient = Geometry::GetOrientToPoint(
-			Vector3(fx->pos.Position.x, fx->pos.Position.y - CLICK(1), fx->pos.Position.z),
+			Vector3(fx->pos.Position.x, fx->pos.Position.y + CLICK(1), fx->pos.Position.z),
 			LaraItem->Pose.Position.ToVector3());
 
 		int dh;
@@ -61,12 +61,12 @@ void MissileControl(short itemNumber)
 				fx->speed++;
 
 			int dy = orient.y - fx->pos.Orientation.y;
-			if (abs(dy) > ANGLE(180.0f))
+			if (abs(dy) > abs(ANGLE(180.0f)))
 				dy = -dy;
 			dy /= 8;
 
 			int dx = orient.x - fx->pos.Orientation.x;
-			if (abs(dx) > ANGLE(180.0f))
+			if (abs(dx) > abs(ANGLE(180.0f)))
 				dx = -dx;
 			dx /= 8;
 
@@ -176,7 +176,7 @@ void MissileControl(short itemNumber)
 			if (LaraItem->HitPoints >= 500)
 				DoDamage(LaraItem, 300);
 			else
-				LaraBurn(LaraItem);
+				ItemBurn(LaraItem);
 			KillEffect(itemNumber);
 		}
 	}
