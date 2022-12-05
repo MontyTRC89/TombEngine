@@ -142,7 +142,7 @@ namespace TEN::Entities::TR4
 			spark->flags = 26;
 			spark->rotAng = GetRandomControl() & 0xFFF;
 
-			if (Random::TestProbability(1.0f / 2))
+			if (Random::TestProbability(1 / 2.0f))
 				spark->rotAdd = -16 - (GetRandomControl() & 0xF);
 			else
 				spark->rotAdd = (GetRandomControl() & 0xF) + 16;
@@ -357,13 +357,13 @@ namespace TEN::Entities::TR4
 				creature->Flags = 0;
 
 				if (item->AIBits & GUARD ||
-					Random::TestProbability(1.0f / 30) &&
+					Random::TestProbability(1 / 30.0f) &&
 					(AI.distance > pow(SECTOR(1), 2) ||
 						creature->Mood != MoodType::Attack))
 				{
 					if (Random::TestProbability(0.0155f))
 					{
-						if (Random::TestProbability(1.0f / 2))
+						if (Random::TestProbability(1 / 2.0f))
 							item->Animation.TargetState = 3;
 						else
 							item->Animation.TargetState = 4;
@@ -420,7 +420,7 @@ namespace TEN::Entities::TR4
 						}
 						else if (Lara.TargetEntity == item &&
 							laraAI.angle && laraAI.distance < pow(SECTOR(2), 2) &&
-							Random::TestProbability(1.0f / 2) &&
+							Random::TestProbability(1 / 2.0f) &&
 							(Lara.Control.Weapon.GunType == LaraWeaponType::Shotgun || Random::TestProbability(0.06f)) &&
 							item->MeshBits == -1)
 						{
@@ -430,7 +430,7 @@ namespace TEN::Entities::TR4
 						{
 							if (Random::TestProbability(0.75f) && LaraItem->HitPoints > 0)
 							{
-								if (Random::TestProbability(1.0f / 2))
+								if (Random::TestProbability(1 / 2.0f))
 									item->Animation.TargetState = SKELETON_STATE_ATTACK_1;
 								else
 									item->Animation.TargetState = SKELETON_STATE_ATTACK_2;
@@ -440,7 +440,7 @@ namespace TEN::Entities::TR4
 						}
 						else if (item->HitStatus || item->Animation.RequiredState != NO_STATE)
 						{
-							if (Random::TestProbability(1.0f / 2))
+							if (Random::TestProbability(1 / 2.0f))
 							{
 								item->Animation.TargetState = SKELETON_STATE_AVOID_ATTACK_1;
 								item->Animation.RequiredState = item->Animation.TargetState;
@@ -468,7 +468,7 @@ namespace TEN::Entities::TR4
 				else if (item->HitStatus)
 				{
 					item->Animation.TargetState = 2;
-					if (Random::TestProbability(1.0f / 2))
+					if (Random::TestProbability(1 / 2.0f))
 						item->Animation.RequiredState = 5;
 					else
 						item->Animation.RequiredState = 6;
@@ -646,7 +646,7 @@ namespace TEN::Entities::TR4
 					else
 						item->Animation.TargetState = 2;
 				}
-				else if (Lara.TargetEntity != item || item->MeshBits != -1 || Lara.Control.Weapon.GunType != LaraWeaponType::Shotgun || Random::TestProbability(1.0f / 128))
+				else if (Lara.TargetEntity != item || item->MeshBits != -1 || Lara.Control.Weapon.GunType != LaraWeaponType::Shotgun || Random::TestProbability(1 / 128.0f))
 					item->Animation.TargetState = 2;
 				
 				break;
@@ -706,7 +706,7 @@ namespace TEN::Entities::TR4
 
 				if (GetCollision(item).Position.Floor <= (item->Pose.Position.y + SECTOR(1)))
 				{
-					if (Random::TestProbability(1.0f / 30))
+					if (Random::TestProbability(1 / 30.0f))
 						item->Animation.TargetState = 14;
 				}
 				else

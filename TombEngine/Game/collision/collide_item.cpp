@@ -1628,7 +1628,7 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 					// Need to know which direction the wall is.
 
 					// X crossed boundary?
-					if ((x & (~WALL_MASK)) != (item->Pose.Position.x & (~WALL_MASK)))
+					if ((x & ~WALL_MASK) != (item->Pose.Position.x & ~WALL_MASK))
 					{
 						if (xv <= 0)	// Hit angle = ANGLE(270.0f).
 							item->Pose.Orientation.y = ANGLE(90.0f) + (ANGLE(270.0f) - item->Pose.Orientation.y);

@@ -176,7 +176,7 @@ namespace TEN::Entities::TR4
 			spark->gravity = (random / 128) & 0x1F;
 			spark->rotAng = random / 8;
 
-			if (Random::TestProbability(1.0f / 2))
+			if (Random::TestProbability(1 / 2.0f))
 				spark->rotAdd = -16 - (random & 0xF);
 			else
 				spark->rotAdd = spark->sB;
@@ -359,7 +359,7 @@ namespace TEN::Entities::TR4
 								auto pos = GetJointPosition(item, SPHERES_SPACE_WORLD, Vector3i(0, -128, 80));
 								HorsemanSparks(&pos, item->Pose.Orientation.y, 7);
 							}
-							else if (Random::TestProbability(0.125f))
+							else if (Random::TestProbability(1 / 8.0f))
 							{
 								if (item->Animation.ActiveState == HORSEMAN_STATE_SHIELD)
 									item->Animation.TargetState = HORSEMAN_STATE_IDLE;

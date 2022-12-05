@@ -106,7 +106,7 @@ namespace TEN::Entities::Creatures::TR2
 
 				if (AI.ahead && AI.distance < BIRD_MONSTER_SLAM_CRUSH_ATTACK_RANGE)
 				{
-					if (Random::TestProbability(1.0f / 2))
+					if (Random::TestProbability(1 / 2.0f))
 						item->Animation.TargetState = BMONSTER_STATE_SLAM_ATTACK_START;
 					else
 						item->Animation.TargetState = BMONSTER_STATE_CRUSH_ATTACK_START;

@@ -23,8 +23,8 @@ namespace TEN::Entities::Creatures::TR1
 
 	constexpr auto BEAR_ATTACK_RANGE			= BLOCK(1);
 	constexpr auto BEAR_REAR_RANGE				= BLOCK(2);
-	constexpr auto BEAR_REAR_SWIPE_ATTACK_RANGE = BLOCK(3.0f / 5);
-	constexpr auto BEAR_EAT_RANGE				= BLOCK(3.0f / 4);
+	constexpr auto BEAR_REAR_SWIPE_ATTACK_RANGE = BLOCK(3 / 5.0f);
+	constexpr auto BEAR_EAT_RANGE				= BLOCK(3 / 4.0f);
 	
 	constexpr auto BEAR_ROAR_CHANCE = 1.0f / 400;
 	constexpr auto BEAR_REAR_CHANCE = 1.0f / 40;

@@ -302,8 +302,8 @@ namespace TEN::Effects::Environment
 			// Check if particle got out of room bounds
 
 			if (p.Position.y <= (r.maxceiling - CLICK(1)) || p.Position.y >= (r.minfloor + CLICK(1)) ||
-				p.Position.z <= (r.z + BLOCK(3.0f / 4)) || p.Position.z >= (r.z + ((r.zSize - 1) << 10) + BLOCK(1.0f / 4)) ||
-				p.Position.x <= (r.x + BLOCK(3.0f / 4)) || p.Position.x >= (r.x + ((r.xSize - 1) << 10) + BLOCK(1.0f / 4)))
+				p.Position.z <= (r.z + BLOCK(3 / 4.0f)) || p.Position.z >= (r.z + ((r.zSize - 1) << 10) + BLOCK(1 / 4.0f)) ||
+				p.Position.x <= (r.x + BLOCK(3 / 4.0f)) || p.Position.x >= (r.x + ((r.xSize - 1) << 10) + BLOCK(1 / 4.0f)))
 			{
 				if (!collisionCalculated)
 				{

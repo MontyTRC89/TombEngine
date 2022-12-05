@@ -852,7 +852,7 @@ namespace TEN::Entities::Creatures::TR5
 				break;
 
 			case GUARD_STATE_SURRENDER:
-				if (item != Lara.TargetEntity && Random::TestProbability(1.0f / 64))
+				if (item != Lara.TargetEntity && Random::TestProbability(1 / 64.0f))
 				{
 					if (item->TriggerFlags == 7 || item->TriggerFlags == 9)
 						item->Animation.RequiredState = GUARD_STATE_USE_COMPUTER;
@@ -1035,11 +1035,11 @@ namespace TEN::Entities::Creatures::TR5
 				creature->Flags = 0;
 				if (!TargetVisible(item, &AI) ||
 					item->HitStatus &&
-					Random::TestProbability(1.0f / 2))
+					Random::TestProbability(1 / 2.0f))
 				{
 					item->Animation.TargetState = SNIPER_STATE_COVER;
 				}
-				else if (Random::TestProbability(1.0f / 30))
+				else if (Random::TestProbability(1 / 30.0f))
 					item->Animation.TargetState = SNIPER_STATE_FIRE;
 			
 				break;

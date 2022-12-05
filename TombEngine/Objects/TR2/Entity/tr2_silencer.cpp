@@ -134,7 +134,7 @@ namespace TEN::Entities::Creatures::TR2
 					if (Targetable(item, &AI))
 					{
 						item->Animation.TargetState = SILENCER_STATE_IDLE_FRAME;
-						item->Animation.RequiredState = Random::TestProbability(1.0f / 2) ? SILENCER_STATE_AIM_1 : SILENCER_STATE_AIM_2;
+						item->Animation.RequiredState = Random::TestProbability(1 / 2.0f) ? SILENCER_STATE_AIM_1 : SILENCER_STATE_AIM_2;
 					}
 
 					if (creature->Mood == MoodType::Attack || !AI.ahead)
@@ -181,7 +181,7 @@ namespace TEN::Entities::Creatures::TR2
 				else if (Targetable(item, &AI))
 				{
 					item->Animation.TargetState = SILENCER_STATE_IDLE_FRAME;
-					item->Animation.RequiredState = Random::TestProbability(1.0f / 2) ? SILENCER_STATE_AIM_1 : SILENCER_STATE_AIM_2;
+					item->Animation.RequiredState = Random::TestProbability(1 / 2.0f) ? SILENCER_STATE_AIM_1 : SILENCER_STATE_AIM_2;
 				}
 				else
 				{
@@ -217,7 +217,7 @@ namespace TEN::Entities::Creatures::TR2
 					break;
 				}
 				else if (creature->Mood == MoodType::Attack)
-					item->Animation.TargetState = Random::TestProbability(1.0f / 2) ? SILENCER_STATE_RUN_FORWARD : SILENCER_STATE_IDLE_FRAME;
+					item->Animation.TargetState = Random::TestProbability(1 / 2.0f) ? SILENCER_STATE_RUN_FORWARD : SILENCER_STATE_IDLE_FRAME;
 				else
 					item->Animation.TargetState = SILENCER_STATE_IDLE_FRAME;
 
@@ -236,7 +236,7 @@ namespace TEN::Entities::Creatures::TR2
 				}
 				else
 				{
-					if (creature->Mood == MoodType::Attack || Random::TestProbability(1.0f / 128))
+					if (creature->Mood == MoodType::Attack || Random::TestProbability(1 / 128.0f))
 						item->Animation.TargetState = SILENCER_STATE_IDLE_FRAME;
 
 					if (!AI.ahead)

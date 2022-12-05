@@ -225,7 +225,7 @@ namespace TEN::Entities::TR4
 							item->Animation.TargetState = AHMET_STATE_WALK_FORWARD;
 					}
 				}
-				else if (Random::TestProbability(1.0f / 2))
+				else if (Random::TestProbability(1 / 2.0f))
 					item->Animation.TargetState = AHMET_STATE_JUMP_BITE_ATTACK;
 				else
 					item->Animation.TargetState = AHMET_STATE_JUMP_SWIPE_ATTACK;

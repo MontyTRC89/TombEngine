@@ -19,7 +19,7 @@ namespace TEN::Entities::TR4
 	constexpr auto BAT_ATTACK_DAMAGE = 50;
 
 	constexpr auto BAT_UNFURL_HEIGHT_RANGE = BLOCK(0.87f);
-	constexpr auto BAT_ATTACK_RANGE		   = SQUARE(BLOCK(1.0f / 4));
+	constexpr auto BAT_ATTACK_RANGE		   = SQUARE(BLOCK(1 / 4.0f));
 	constexpr auto BAT_AWARE_RANGE		   = SQUARE(BLOCK(5));
 
 	constexpr auto BAT_ANGLE = ANGLE(20.0f);
@@ -101,7 +101,7 @@ namespace TEN::Entities::TR4
 				break;
 
 			case BAT_STATE_FLY:
-				if (AI.distance < BAT_ATTACK_RANGE || Random::TestProbability(1.0f / 64))
+				if (AI.distance < BAT_ATTACK_RANGE || Random::TestProbability(1 / 64.0f))
 					creature->Flags = 0;
 
 				if (!creature->Flags)

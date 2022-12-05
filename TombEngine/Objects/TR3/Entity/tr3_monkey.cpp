@@ -217,7 +217,7 @@ namespace TEN::Entities::Creatures::TR3
 					extraTorsoRot.y = AIGuard(creature);
 					if (Random::TestProbability(0.06f))
 					{
-						if (Random::TestProbability(1.0f / 2))
+						if (Random::TestProbability(1 / 2.0f))
 							item->Animation.TargetState = MONKEY_STATE_SIT_EAT;
 						else
 							item->Animation.TargetState = MONKEY_STATE_SIT_SCRATCH;
@@ -237,7 +237,7 @@ namespace TEN::Entities::Creatures::TR3
 						item->Animation.TargetState = MONKEY_STATE_WALK_FORWARD;
 					else if (Random::TestProbability(0.06f))
 					{
-						if (Random::TestProbability(1.0f / 2))
+						if (Random::TestProbability(1 / 2.0f))
 							item->Animation.TargetState = MONKEY_STATE_SIT_EAT;
 						else
 							item->Animation.TargetState = MONKEY_STATE_SIT_SCRATCH;
@@ -273,7 +273,7 @@ namespace TEN::Entities::Creatures::TR3
 
 					if (Random::TestProbability(0.06f))
 					{
-						if (Random::TestProbability(1.0f / 2))
+						if (Random::TestProbability(1 / 2.0f))
 							item->Animation.TargetState = MONKEY_STATE_POUND_GROUND;
 						else
 							item->Animation.TargetState = MONKEY_STATE_SIT;
@@ -298,7 +298,7 @@ namespace TEN::Entities::Creatures::TR3
 						item->Animation.TargetState = MONKEY_STATE_WALK_FORWARD;
 					else if (Random::TestProbability(0.06f))
 					{
-						if (Random::TestProbability(1.0f / 2))
+						if (Random::TestProbability(1 / 2.0f))
 							item->Animation.TargetState = MONKEY_STATE_POUND_GROUND;
 						else
 							item->Animation.TargetState = MONKEY_STATE_SIT;
@@ -423,7 +423,7 @@ namespace TEN::Entities::Creatures::TR3
 					item->Animation.TargetState = MONKEY_STATE_RUN_FORWARD;
 				else if (creature->Mood == MoodType::Bored)
 				{
-					if (Random::TestProbability(1.0f / 128))
+					if (Random::TestProbability(1 / 128.0f))
 						item->Animation.TargetState = MONKEY_STATE_SIT;
 				}
 				else if (AI.bite && AI.distance < pow(682, 2))

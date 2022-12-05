@@ -183,7 +183,7 @@ namespace TEN::Entities::Creatures::TR2
 				{
 					if (AI.distance < pow(SECTOR(2.5f), 2) || AI.zoneNumber != AI.enemyZone)
 						item->Animation.TargetState = KTHROWER_STATE_IDLE;
-					else if (Random::TestProbability(1.0f / 2))
+					else if (Random::TestProbability(1 / 2.0f))
 						item->Animation.TargetState = KTHROWER_STATE_WALK_KNIFE_ATTACK_LEFT_START;
 					else
 						item->Animation.TargetState = KTHROWER_STATE_WALK_KNIFE_ATTACK_RIGHT_START;

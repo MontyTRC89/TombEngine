@@ -250,7 +250,7 @@ namespace TEN::Entities::TR4
 				{
 					if (AI.distance < pow(SECTOR(3), 2) || AI.zoneNumber != AI.enemyZone)
 					{
-						if (Random::TestProbability(1.0f / 2))
+						if (Random::TestProbability(1 / 2.0f))
 							item->Animation.TargetState = TROOP_STATE_AIM_3;
 						else
 							item->Animation.TargetState = TROOP_STATE_AIM_1;
@@ -444,7 +444,7 @@ namespace TEN::Entities::TR4
 				break;
 
 			case TROOP_STATE_FLASHED:
-				if (!FlashGrenadeAftershockTimer && Random::TestProbability(1.0f / 128))
+				if (!FlashGrenadeAftershockTimer && Random::TestProbability(1 / 128.0f))
 					item->Animation.TargetState = TROOP_STATE_GUARD;
 
 				break;

@@ -320,7 +320,7 @@ namespace TEN::Entities::TR4
 				if (creature->Enemy != LaraItem ||
 					!Targetable(item, &AI) ||
 					AI.distance <= pow(SECTOR(3.5f), 2) ||
-					Random::TestProbability(1.0f / 2))
+					Random::TestProbability(1 / 2.0f))
 				{
 					item->Animation.TargetState = HARPY_STATE_FLY_FORWARD;
 					break;
@@ -353,7 +353,7 @@ namespace TEN::Entities::TR4
 				{
 					if (AI.distance >= pow(341, 2))
 					{
-						if (AI.ahead && Random::TestProbability(1.0f / 2) &&
+						if (AI.ahead && Random::TestProbability(1 / 2.0f) &&
 							AI.distance >= pow(SECTOR(2), 2) &&
 							AI.distance > pow(SECTOR(3.5f), 2))
 						{
@@ -369,7 +369,7 @@ namespace TEN::Entities::TR4
 					break;
 				}
 
-				if (Random::TestProbability(1.0f / 2))
+				if (Random::TestProbability(1 / 2.0f))
 				{
 					item->Animation.TargetState = HARPY_STATE_FLY_FORWARD_SPIN;
 					break;
@@ -385,7 +385,7 @@ namespace TEN::Entities::TR4
 				{
 					if (AI.ahead && AI.distance >= pow(SECTOR(2), 2) &&
 						AI.distance > pow(SECTOR(3.5f), 2) &&
-						Random::TestProbability(1.0f / 2))
+						Random::TestProbability(1 / 2.0f))
 					{
 						item->Animation.TargetState = HARPY_STATE_FLAME_ATTACK;
 						item->ItemFlags[0] = 0;
@@ -465,7 +465,7 @@ namespace TEN::Entities::TR4
 					item->Animation.TargetState = HARPY_STATE_FLY_FORWARD;
 					item->Animation.RequiredState = HARPY_STATE_FLAME_ATTACK;
 				}
-				else if (Random::TestProbability(1.0f / 2))
+				else if (Random::TestProbability(1 / 2.0f))
 					item->Animation.TargetState = HARPY_STATE_IDLE;
 
 				break;

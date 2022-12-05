@@ -150,7 +150,7 @@ CollisionResult GetCollision(Vector3i pos, int roomNumber, short headingAngle, f
 	int adjacentRoomNumber = GetRoom(location, pos.x, point.y, pos.z).roomNumber;
 	return GetCollision(point.x, point.y, point.z, adjacentRoomNumber);
 
-	Random::TestProbability(1.0f / 2);
+	Random::TestProbability(1 / 2.0f);
 }
 
 // Overload used as a universal wrapper across collisional code to replace
@@ -1146,7 +1146,7 @@ short GetNearestLedgeAngle(ItemInfo* item, CollisionInfo* coll, float& distance)
 
 		// A case when all 3 results are different (no priority) or prioritized result is a long-distance misfire.
 
-		if (finalDistance[h] == FLT_MAX || finalDistance[h] > BLOCK(1.0f / 2))
+		if (finalDistance[h] == FLT_MAX || finalDistance[h] > BLOCK(1 / 2.0f))
 		{
 			// Prioritize angle which is similar to coll setup's forward angle.
 			// This helps to solve some borderline cases with diagonal shimmying,

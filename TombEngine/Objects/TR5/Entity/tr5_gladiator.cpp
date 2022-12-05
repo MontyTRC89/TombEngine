@@ -177,7 +177,7 @@ namespace TEN::Entities::Creatures::TR5
 						{
 							if (item->Animation.RequiredState != NO_STATE)
 								item->Animation.TargetState = item->Animation.RequiredState;
-							else if (Random::TestProbability(1.0f / 64))
+							else if (Random::TestProbability(1 / 64.0f))
 								item->Animation.TargetState = GLADIATOR_STATE_IDLE;
 
 							break;
@@ -185,7 +185,7 @@ namespace TEN::Entities::Creatures::TR5
 
 						if (Lara.TargetEntity == item &&
 							unknown && distance < pow(SECTOR(1.5f), 2) &&
-							Random::TestProbability(1.0f / 2) &&
+							Random::TestProbability(1 / 2.0f) &&
 							(Lara.Control.Weapon.GunType == LaraWeaponType::Shotgun || Random::TestProbability(0.06f)) &&
 							item->MeshBits == -1)
 						{
@@ -195,7 +195,7 @@ namespace TEN::Entities::Creatures::TR5
 
 						if (AI.bite && AI.distance < pow(819, 2))
 						{
-							if (Random::TestProbability(1.0f / 2))
+							if (Random::TestProbability(1 / 2.0f))
 								item->Animation.TargetState = GLADIATOR_STATE_SWORD_ATTACK_1;
 							else
 								item->Animation.TargetState = GLADIATOR_STATE_SWORD_ATTACK_2;
@@ -234,7 +234,7 @@ namespace TEN::Entities::Creatures::TR5
 					else if (!AI.ahead || AI.distance > pow(SECTOR(1.5f), 2))
 						item->Animation.TargetState = GLADIATOR_STATE_RUN_FORWARD;
 				}
-				else if (Random::TestProbability(1.0f / 64))
+				else if (Random::TestProbability(1 / 64.0f))
 				{
 					item->Animation.TargetState = GLADIATOR_STATE_IDLE;
 					break;
@@ -300,7 +300,7 @@ namespace TEN::Entities::Creatures::TR5
 						break;
 					}
 				}
-				else if (Lara.TargetEntity != item || Random::TestProbability(1.0f / 128))
+				else if (Lara.TargetEntity != item || Random::TestProbability(1 / 128.0f))
 				{
 					item->Animation.TargetState = GLADIATOR_STATE_IDLE;
 					break;

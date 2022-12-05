@@ -122,7 +122,7 @@ namespace TEN::Entities::TR4
 						Lara.Control.Weapon.GunType != LaraWeaponType::HK &&
 						Lara.Control.Weapon.GunType != LaraWeaponType::Revolver)
 					{
-						if (Random::TestProbability(0.125f) ||
+						if (Random::TestProbability(1 / 8.0f) ||
 							Lara.Control.Weapon.GunType == LaraWeaponType::Shotgun ||
 							Lara.Control.Weapon.GunType == LaraWeaponType::HK ||
 							Lara.Control.Weapon.GunType == LaraWeaponType::Revolver)
@@ -254,7 +254,7 @@ namespace TEN::Entities::TR4
 				joint1 = 0;
 				joint2 = 0;
 
-				if (AI.distance < MUMMY_ACTIVATE_RANGE || Random::TestProbability(1.0f / 128))
+				if (AI.distance < MUMMY_ACTIVATE_RANGE || Random::TestProbability(1 / 128.0f))
 				{
 					item->Animation.TargetState = MUMMY_STATE_COLLAPSED_TO_IDLE;
 					item->HitPoints = Objects[item->ObjectNumber].HitPoints;

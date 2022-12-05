@@ -85,7 +85,7 @@ namespace TEN::Entities::TR4
 			(item->Animation.AnimNumber - object->animIndex) == KTEMPLAR_ANIM_WALK_FORWARD_LEFT_2 ||
 			(item->Animation.AnimNumber - object->animIndex) == KTEMPLAR_ANIM_WALK_FORWARD_RIGHT_2)
 		{
-			if (Random::TestProbability(1.0f / 2))
+			if (Random::TestProbability(1 / 2.0f))
 			{
 				auto pos = GetJointPosition(item, 10, Vector3i(0, 48, 448));
 				TriggerMetalSparks(pos.x, pos.y, pos.z, (GetRandomControl() & 0x1FF) - 256, -128 - (GetRandomControl() & 0x7F), (GetRandomControl() & 0x1FF) - 256, 0);
@@ -136,9 +136,9 @@ namespace TEN::Entities::TR4
 				if (Lara.TargetEntity == item)
 					item->Animation.TargetState = KTEMPLAR_STATE_SHIELD;
 			}
-			else if (Random::TestProbability(1.0f / 2))
+			else if (Random::TestProbability(1 / 2.0f))
 				item->Animation.TargetState = KTEMPLAR_STATE_SWORD_ATTACK_2;
-			else if (Random::TestProbability(1.0f / 2))
+			else if (Random::TestProbability(1 / 2.0f))
 				item->Animation.TargetState = KTEMPLAR_STATE_SWORD_ATTACK_1;
 			else
 				item->Animation.TargetState = KTEMPLAR_STATE_SWORD_ATTACK_3;
@@ -226,7 +226,7 @@ namespace TEN::Entities::TR4
 
 			if (item->HitStatus)
 			{
-				if (Random::TestProbability(1.0f / 2))
+				if (Random::TestProbability(1 / 2.0f))
 					item->Animation.TargetState = KTEMPLAR_STATE_SHIELD_HIT_1;
 				else
 					item->Animation.TargetState = KTEMPLAR_STATE_SHIELD_HIT_2;

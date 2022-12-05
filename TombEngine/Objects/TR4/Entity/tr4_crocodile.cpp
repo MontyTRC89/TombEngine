@@ -177,13 +177,13 @@ namespace TEN::Entities::TR4
 					item->Animation.TargetState = CROC_STATE_IDLE;
 					item->ItemFlags[0] += item->ItemFlags[1];
 
-					if (Random::TestProbability(1.0f / 30))
+					if (Random::TestProbability(1 / 30.0f))
 					{
-						if (Random::TestProbability(1.0f / 2))
+						if (Random::TestProbability(1 / 2.0f))
 							item->ItemFlags[1] = 0;
 						else
 						{
-							if (Random::TestProbability(1.0f / 2))
+							if (Random::TestProbability(1 / 2.0f))
 								item->ItemFlags[1] = 12;
 							else
 								item->ItemFlags[1] = -12;

@@ -118,7 +118,7 @@ namespace TEN::Entities::Creatures::TR1
 						else
 							item->Animation.TargetState = MUTANT_STATE_FORWARD;
 					}
-					else if (Random::TestProbability(1.0f / 2))
+					else if (Random::TestProbability(1 / 2.0f))
 						item->Animation.TargetState = MUTANT_STATE_ATTACK_1;
 					else
 						item->Animation.TargetState = MUTANT_STATE_ATTACK_2;

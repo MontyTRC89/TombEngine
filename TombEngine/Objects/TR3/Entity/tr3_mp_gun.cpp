@@ -222,7 +222,7 @@ namespace TEN::Entities::Creatures::TR3
 				{
 					if (Random::TestProbability(0.25f))
 						item->Animation.TargetState = MPGUN_STATE_SHOOT_1;
-					else if (Random::TestProbability(1.0f / 2))
+					else if (Random::TestProbability(1 / 2.0f))
 						item->Animation.TargetState = MPGUN_STATE_SHOOT_2;
 					else
 						item->Animation.TargetState = MPGUN_STATE_AIM_3;
@@ -433,7 +433,7 @@ namespace TEN::Entities::Creatures::TR3
 
 				if (Targetable(item, &AI))
 					item->Animation.TargetState = MPGUN_STATE_CROUCH_AIM;
-				else if (item->HitStatus || !cover || (AI.ahead && Random::TestProbability(1.0f / 30)))
+				else if (item->HitStatus || !cover || (AI.ahead && Random::TestProbability(1 / 30.0f)))
 					item->Animation.TargetState = MPGUN_STATE_STAND;
 				else
 					item->Animation.TargetState = MPGUN_STATE_CROUCH_WALK;
@@ -459,7 +459,7 @@ namespace TEN::Entities::Creatures::TR3
 
 				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase)
 				{
-					if (!ShotLara(item, &AI, MPGunBite, extraTorsoRot.y, 32) || Random::TestProbability(0.125f))
+					if (!ShotLara(item, &AI, MPGunBite, extraTorsoRot.y, 32) || Random::TestProbability(1 / 8.0f))
 						item->Animation.TargetState = MPGUN_STATE_CROUCHED;
 				}
 
@@ -471,7 +471,7 @@ namespace TEN::Entities::Creatures::TR3
 				if (AI.ahead)
 					head = AI.angle;
 
-				if (Targetable(item, &AI) || item->HitStatus || !cover || (AI.ahead && Random::TestProbability(1.0f / 30)))
+				if (Targetable(item, &AI) || item->HitStatus || !cover || (AI.ahead && Random::TestProbability(1 / 30.0f)))
 					item->Animation.TargetState = MPGUN_STATE_CROUCHED;
 
 				break;

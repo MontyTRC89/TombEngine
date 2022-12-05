@@ -32,9 +32,9 @@ namespace TEN::Entities::TR4
 	const auto SasDragBounds = ObjectCollisionBounds
 	{
 		GameBoundingBox(
-			-BLOCK(1.0f / 4), BLOCK(1.0f / 4),
+			-BLOCK(1 / 4.0f), BLOCK(1 / 4.0f),
 			-100, 100,
-			-BLOCK(1.0f / 2), -460
+			-BLOCK(1 / 2.0f), -460
 		),
 		std::pair(
 			EulerAngles(ANGLE(-10.0f), ANGLE(-30.0f), 0),
@@ -229,9 +229,9 @@ namespace TEN::Entities::TR4
 						if (AI.distance < pow(SECTOR(3), 2) ||
 							AI.zoneNumber != AI.enemyZone)
 						{
-							if (Random::TestProbability(1.0f / 2))
+							if (Random::TestProbability(1 / 2.0f))
 								item->Animation.TargetState = SAS_STATE_SIGHT_AIM;
-							else if (Random::TestProbability(1.0f / 2))
+							else if (Random::TestProbability(1 / 2.0f))
 								item->Animation.TargetState = SAS_STATE_HOLD_AIM;
 							else
 								item->Animation.TargetState = SAS_STATE_KNEEL_AIM;
@@ -410,7 +410,7 @@ namespace TEN::Entities::TR4
 							item->Animation.TargetState = SAS_STATE_SIGHT_SHOOT;
 						else if (item->Animation.ActiveState == SAS_STATE_KNEEL_AIM)
 							item->Animation.TargetState = SAS_STATE_KNEEL_SHOOT;
-						else if (Random::TestProbability(1.0f / 2))
+						else if (Random::TestProbability(1 / 2.0f))
 							item->Animation.TargetState = SAS_STATE_HOLD_SHOOT;
 						else
 							item->Animation.TargetState = SAS_STATE_HOLD_PREPARE_GRENADE;
@@ -630,7 +630,7 @@ namespace TEN::Entities::TR4
 
 		if (item->Animation.ActiveState == 1)
 		{
-			if (Random::TestProbability(1.0f / 128))
+			if (Random::TestProbability(1 / 128.0f))
 			{
 				item->Animation.TargetState = 2;
 				AnimateItem(item);
@@ -639,7 +639,7 @@ namespace TEN::Entities::TR4
 				item->Animation.TargetState = 3;
 		}
 		else if (item->Animation.ActiveState == 4 &&
-			Random::TestProbability(1.0f / 128))
+			Random::TestProbability(1 / 128.0f))
 		{
 			item->Animation.TargetState = 5;
 			AnimateItem(item);

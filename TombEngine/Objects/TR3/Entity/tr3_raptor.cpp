@@ -119,7 +119,7 @@ namespace TEN::Entities::Creatures::TR3
 
 				if (nearestItem != nullptr &&
 					(nearestItem->ObjectNumber != ID_RAPTOR ||
-						(Random::TestProbability(1.0f / 30) && minDistance < SQUARE(SECTOR(2)))))
+						(Random::TestProbability(1 / 30.0f) && minDistance < SQUARE(SECTOR(2)))))
 				{
 					creature->Enemy = nearestItem;
 				}

@@ -222,7 +222,7 @@ namespace TEN::Entities::TR4
 				else if (LaraItem->Pose.Position.y >= (item->Pose.Position.y - SECTOR(1)))
 				{
 					if (AI.distance < pow(SECTOR(2.5f), 2) &&
-						AI.ahead && Random::TestProbability(1.0f / 2) &&
+						AI.ahead && Random::TestProbability(1 / 2.0f) &&
 						Targetable(item, &AI))
 					{
 						item->Animation.TargetState = SETH_STATE_SHOOT_RIGHT_AND_LEFT;
@@ -233,7 +233,7 @@ namespace TEN::Entities::TR4
 						ceiling < (item->Pose.Position.y - SECTOR(1.75f)) &&
 						height4 != NO_HEIGHT &&
 						height4 > (item->Pose.Position.y - SECTOR(1)) &&
-						Random::TestProbability(1.0f / 2))
+						Random::TestProbability(1 / 2.0f))
 					{
 						item->Pose.Position.y -= SECTOR(1.5f);
 						if (Targetable(item, &AI))
