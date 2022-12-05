@@ -50,7 +50,8 @@ namespace TEN::Entities::TR4
 	const auto SethAttack1 = BiteInfo(Vector3(-16.0f, 200.0f, 32.0f), 13);
 	const auto SethAttack2 = BiteInfo(Vector3(16.0f, 200.0f, 32.0f), 17);
 
-	constexpr auto LARA_ANIM_SETH_DEATH = 14;
+	constexpr auto LARA_STATE_SETH_DEATH = 13;
+	constexpr auto LARA_ANIM_SETH_DEATH	 = 14;
 
 	enum SethState
 	{
@@ -652,7 +653,7 @@ namespace TEN::Entities::TR4
 		fx.pos.Orientation.y = pose.Orientation.y;
 		fx.pos.Orientation.z = 0;
 		fx.roomNumber = roomNumber;
-		fx.counter = (GetRandomControl() * 2) + ANGLE(-180.0f); // TODO: This isn't an angle.
+		fx.counter = (GetRandomControl() * 2) - ANGLE(180.0f); // TODO: This isn't an angle.
 		fx.flag1 = flags;
 		fx.objectNumber = ID_ENERGY_BUBBLES;
 		fx.speed = Random::GenerateInt(0, 32) - ((flags == 1) ? 64 : 0) + 96;
@@ -667,8 +668,8 @@ namespace TEN::Entities::TR4
 
 		laraItem->Animation.AnimNumber = Objects[ID_LARA_EXTRA_ANIMS].animIndex + LARA_ANIM_SETH_DEATH;
 		laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
-		laraItem->Animation.ActiveState = 13; // TODO: Demagic state value.
-		laraItem->Animation.TargetState = 13;
+		laraItem->Animation.ActiveState = LARA_STATE_SETH_DEATH;
+		laraItem->Animation.TargetState = LARA_STATE_SETH_DEATH;
 		laraItem->Animation.IsAirborne = false;
 		laraItem->Pose = Pose(item->Pose.Position, 0, item->Pose.Orientation.y, 0);
 
