@@ -13,6 +13,7 @@ namespace TEN::Renderer
 	struct RendererLight;
 	struct RendererEffect;
 	struct RendererTransparentFace;
+	struct RendererDoor;
 
 	struct RendererRoom
 	{
@@ -29,6 +30,7 @@ namespace TEN::Renderer
 		std::vector<RendererStatic> StaticsToDraw;
 		std::vector<RendererTransparentFace> TransparentFacesToDraw;
 		std::vector<RendererLight*> LightsToDraw;
+		std::vector<RendererDoor> Doors;
 
 		std::vector<int> Neighbors;
 	};

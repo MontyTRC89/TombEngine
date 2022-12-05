@@ -36,33 +36,36 @@ namespace TEN::Renderer
 			m_rooms[i].ViewPort = Vector4(-1.0f, 1.0f, 1.0f, 1.0f);
 			m_rooms[i].BoundActive = 0;
 
-			ROOM_INFO* nativeRoom = &g_Level.Rooms[i];
-
-			for (int j = 0; j < nativeRoom->doors.size(); j++)
-				nativeRoom->doors[j].visited = false;
+			for (int j = 0; j < m_rooms[i].Doors.size(); j++)
+			{
+				m_rooms[i].Doors[j].Visited = false;
+			}
 		}
-
-		m_checkPortalCalls = 0;
-		m_getVisibleRoomsCalls = 0;
 
 		GetVisibleRooms(NO_ROOM, Camera.pos.RoomNumber, Vector4(-1.0f, -1.0f, 1.0f, 1.0f), false, 0, onlyRooms, renderView);
 	}
 
-	bool Renderer11::CheckPortal(short parentRoomNumber, ROOM_DOOR* portal, Vector4 viewPort, Vector4* clipPort, RenderView& renderView)
+	bool Renderer11::CheckPortal(short parentRoomNumber, RendererDoor* door, Vector4 viewPort, Vector4* clipPort, RenderView& renderView)
 	{
-		m_checkPortalCalls++;
+		m_numCheckPortalCalls++;
 
 		RendererRoom* room = &m_rooms[parentRoomNumber];
 		ROOM_INFO* nativeRoom = &g_Level.Rooms[parentRoomNumber];
 
-		Vector3 n = portal->normal;
-		Vector3i v = Vector3i(
-			Camera.pos.x - (nativeRoom->x + portal->vertices[0].x),
-			Camera.pos.y - (nativeRoom->y + portal->vertices[0].y),
-			Camera.pos.z - (nativeRoom->z + portal->vertices[0].z));
+		if (!door->Visited)
+		{
+			door->CameraToDoor = Vector3(
+				Camera.pos.x - (door->AbsoluteVertices[0].x),
+				Camera.pos.y - (door->AbsoluteVertices[0].y),
+				Camera.pos.z - (door->AbsoluteVertices[0].z));
+		}
 
-		if (n.x * v.x + n.y * v.y + n.z * v.z < 0)
+		if (door->Normal.x * door->CameraToDoor.x +
+			door->Normal.y * door->CameraToDoor.y +
+			door->Normal.z * door->CameraToDoor.z < 0)
+		{
 			return false;
+		}
 
 		int  zClip = 0;
 		Vector4 p[4];
@@ -71,26 +74,20 @@ namespace TEN::Renderer
 
 		for (int i = 0; i < 4; i++)
 		{
-			Vector4 corner = Vector4(
-				(nativeRoom->x + portal->vertices[i].x),
-				(nativeRoom->y + portal->vertices[i].y),
-				(nativeRoom->z + portal->vertices[i].z),
-				1.0f);
-
-			if (!portal->visited)
+			if (!door->Visited)
 			{
-				p[i] = Vector4::Transform(corner, renderView.camera.ViewProjection);
+				p[i] = Vector4::Transform(door->AbsoluteVertices[i], renderView.camera.ViewProjection);
 				if (p[i].w > 0.0f)
 				{
 					p[i].x *= (1.0f / p[i].w);
 					p[i].y *= (1.0f / p[i].w);
 
 				}
-				portal->transformed[i] = p[i];
+				door->TransformedVertices[i] = p[i];
 			}
 			else
 			{
-				p[i] = portal->transformed[i];
+				p[i] = door->TransformedVertices[i];
 			}
 
 			if (p[i].w > 0.0f)
@@ -101,10 +98,12 @@ namespace TEN::Renderer
 				clipPort->w = std::max(clipPort->w, p[i].y);
 			}
 			else
+			{
 				zClip++;
+			}
 		}
 
-		portal->visited = true;
+		door->Visited = true;
 
 		if (zClip == 4)
 			return false;
@@ -153,7 +152,7 @@ namespace TEN::Renderer
 
 	void Renderer11::GetVisibleRooms(short from, short to, Vector4 viewPort, bool water, int count, bool onlyRooms, RenderView& renderView)
 	{
-		m_getVisibleRoomsCalls++;
+		m_numGetVisibleRoomsCalls++;
 
 		if (count > 32)
 		{
@@ -196,12 +195,12 @@ namespace TEN::Renderer
 		room->ViewPort.w = std::max(room->ViewPort.w, viewPort.w);
 
 		Vector4 clipPort;
-		for (int i = 0; i < nativeRoom->doors.size(); i++)
+		for (int i = 0; i < room->Doors.size(); i++)
 		{
-			ROOM_DOOR* p = &nativeRoom->doors[i];
+			RendererDoor* door = &room->Doors[i];
 
-			if (from != p->room && CheckPortal(to, p, viewPort, &clipPort, renderView))
-				GetVisibleRooms(to, p->room, clipPort, water, count + 1, onlyRooms, renderView);
+			if (from != door->RoomNumber && CheckPortal(to, door, viewPort, &clipPort, renderView))
+				GetVisibleRooms(to, door->RoomNumber, clipPort, water, count + 1, onlyRooms, renderView);
 		}
 	}
 

@@ -176,6 +176,30 @@ namespace TEN::Renderer
 			if (room.mesh.size() > 0)
 				r->StaticsToDraw.reserve(room.mesh.size());
 
+			if (room.doors.size() != 0)
+			{
+				r->Doors.resize(room.doors.size());
+
+				for (int l = 0; l < room.doors.size(); l++)
+				{
+					RendererDoor* door = &r->Doors[l];
+					ROOM_DOOR* oldDoor = &room.doors[l];
+
+					door->RoomNumber = oldDoor->room;
+					door->Normal = oldDoor->normal;
+
+					for (int k = 0; k < 4; k++)
+					{
+						door->AbsoluteVertices[k] = Vector4(
+							room.x + oldDoor->vertices[k].x,
+							room.y + oldDoor->vertices[k].y,
+							room.z + oldDoor->vertices[k].z,
+							1.0f
+						);
+					}
+				}
+			}
+
 			if (room.positions.size() == 0)
 				continue;
 			

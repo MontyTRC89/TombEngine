@@ -44,6 +44,7 @@
 #include <Renderer/IndexBuffer/IndexBuffer.h>
 #include <Renderer/Texture2D/Texture2D.h>
 #include <Renderer/RenderTarget2D/RenderTarget2D.h>
+#include "Renderer/Structures/RendererDoor.h"
 
 class EulerAngles;
 struct CAMERA_INFO;
@@ -453,8 +454,8 @@ namespace TEN::Renderer
 		float m_farView = DEFAULT_FAR_VIEW;
 		RendererRectangle m_outsideClip;
 
-		int m_checkPortalCalls;
-		int m_getVisibleRoomsCalls;
+		int m_numCheckPortalCalls;
+		int m_numGetVisibleRoomsCalls;
 
 		// Private functions
 		void BindTexture(TEXTURE_REGISTERS registerType, TextureBase* texture, SAMPLER_STATES samplerType);
@@ -468,7 +469,7 @@ namespace TEN::Renderer
 		void BuildHierarchyRecursive(RendererObject* obj, RendererBone* node, RendererBone* parentNode);
 		void UpdateAnimation(RendererItem* item, RendererObject& obj, AnimFrame** frmptr, short frac, short rate,
 		                     int mask, bool useObjectWorldRotation = false);
-		bool CheckPortal(short parentRoomNumber, ROOM_DOOR* portal, Vector4 viewPort, Vector4* clipPort, RenderView& renderView);
+		bool CheckPortal(short parentRoomNumber, RendererDoor* door, Vector4 viewPort, Vector4* clipPort, RenderView& renderView);
 		void GetVisibleRooms(short from, short to, Vector4 viewPort, bool water, int count, bool onlyRooms, RenderView& renderView);
 		void CollectRooms(RenderView& renderView, bool onlyRooms);
 		void CollectItems(short roomNumber, RenderView& renderView);

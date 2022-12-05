@@ -9,7 +9,7 @@
     <LocalDebuggerCommandArguments>/debug</LocalDebuggerCommandArguments>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <LocalDebuggerWorkingDirectory>$(SolutionDir)Build\$(Configuration)\</LocalDebuggerWorkingDirectory>
+    <LocalDebuggerWorkingDirectory>$(SolutionDir)Build\Debug\</LocalDebuggerWorkingDirectory>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
 </Project>
