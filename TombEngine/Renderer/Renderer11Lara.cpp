@@ -252,7 +252,11 @@ void Renderer11::UpdateLaraAnimations(bool force)
 void TEN::Renderer::Renderer11::DrawLara(RenderView& view, bool transparent)
 {
 	// Don't draw Lara if binoculars or sniper
-	if (BinocularRange || SpotcamDontDrawLara || CurrentLevel == 0)
+	if (BinocularRange || SpotcamDontDrawLara)
+		return;
+
+	// Don't draw Lara if title level and disabled
+	if (CurrentLevel == 0 && !g_GameFlow->IsLaraInTitleEnabled())
 		return;
 
 	RendererItem* item = &m_items[Lara.ItemNumber];

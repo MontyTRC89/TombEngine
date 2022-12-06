@@ -47,7 +47,7 @@ namespace TEN::Effects::Spark
 		return SparkParticles[0];
 	}
 
-	void TriggerFlareSparkParticles(Vector3i* pos, Vector3i* vel, ColorData* color, int room)
+	void TriggerFlareSparkParticles(const Vector3i& pos, const Vector3i& vel, const ColorData& color, int roomNumber)
 	{
 		auto& s = GetFreeSparkParticle();
 		s = {};
@@ -57,20 +57,20 @@ namespace TEN::Effects::Spark
 		s.gravity = 1.2f;
 		s.width = 8.0f;
 		s.height = 48.0f;
-		s.room = room;
-		s.pos = pos->ToVector3();
-		auto v = vel->ToVector3();
+		s.room = roomNumber;
+		s.pos = pos.ToVector3();
+		auto v = vel.ToVector3();
 		v += Vector3(GenerateFloat(-64, 64), GenerateFloat(-64, 64), GenerateFloat(-64, 64));
 		v.Normalize(v);
 		s.velocity = v *GenerateFloat(17,24);
 		s.sourceColor = Vector4(1, 1, 1, 1);
-		s.destinationColor = Vector4(color->r / 255.0f, color->g / 255.0f, color->b / 255.0f, 1.0f);
+		s.destinationColor = Vector4(color.r / 255.0f, color.g / 255.0f, color.b / 255.0f, 1.0f);
 		s.active = true;
 	}
 
-	void TriggerRicochetSpark(GameVector* pos, short angle, int num)
+	void TriggerRicochetSpark(const GameVector& pos, short angle, int count)
 	{
-		for (int i = 0; i < num; i++) 
+		for (int i = 0; i < count; i++) 
 		{
 			auto& s = GetFreeSparkParticle();
 			s = {};
@@ -80,8 +80,8 @@ namespace TEN::Effects::Spark
 			s.gravity = 1.2f;
 			s.width = 8.0f;
 			s.height = 64.0f;
-			s.room = pos->RoomNumber;
-			s.pos = Vector3(pos->x, pos->y, pos->z);
+			s.room = pos.RoomNumber;
+			s.pos = pos.ToVector3();
 			float ang = TO_RAD(angle);
 			Vector3 v = Vector3(sin(ang + GenerateFloat(-PI_DIV_2, PI_DIV_2)), GenerateFloat(-1, 1), cos(ang + GenerateFloat(-PI_DIV_2, PI_DIV_2)));
 			v += Vector3(GenerateFloat(-64, 64), GenerateFloat(-64, 64), GenerateFloat(-64, 64));
@@ -93,9 +93,9 @@ namespace TEN::Effects::Spark
 		}
 	}
 
-	void TriggerFrictionSpark(GameVector* pos, EulerAngles angle, float length, int num)
+	void TriggerFrictionSpark(const GameVector& pos, const EulerAngles& angle, float length, int count)
 	{
-		for (int i = 0; i < num; i++) 
+		for (int i = 0; i < count; i++)
 		{
 			auto& s = GetFreeSparkParticle();
 			s = {};
@@ -105,8 +105,8 @@ namespace TEN::Effects::Spark
 			s.gravity = 0.0f;
 			s.height = length;
 			s.width = GenerateFloat(16.0f, 32.0f);
-			s.room = pos->RoomNumber;
-			s.pos = Vector3(pos->x + GenerateFloat(-16, 16), pos->y + GenerateFloat(-16, 16), pos->z + GenerateFloat(-16, 16));
+			s.room = pos.RoomNumber;
+			s.pos = Vector3(pos.x + GenerateFloat(-16, 16), pos.y + GenerateFloat(-16, 16), pos.z + GenerateFloat(-16, 16));
 			float ang = TO_RAD(angle.y);
 			float vAng = -TO_RAD(angle.x);
 			Vector3 v = Vector3(sin(ang), vAng + GenerateFloat(-PI / 16, PI / 16), cos(ang));
@@ -118,9 +118,9 @@ namespace TEN::Effects::Spark
 		}
 	}
 
-	void TriggerElectricSpark(GameVector* pos, EulerAngles angle, int num)
+	void TriggerElectricSpark(const GameVector& pos, const EulerAngles& angle, int count)
 	{
-		for (int i = 0; i < num; i++)
+		for (int i = 0; i < count; i++)
 		{
 			auto& s = GetFreeSparkParticle();
 			s = {};
@@ -130,8 +130,8 @@ namespace TEN::Effects::Spark
 			s.gravity = 2.0f;
 			s.height = GenerateFloat(64.0f, 256.0f);
 			s.width = GenerateFloat(8.0f, 16.0f);
-			s.room = pos->RoomNumber;
-			s.pos = Vector3(pos->x + GenerateFloat(-16, 16), pos->y + GenerateFloat(-16, 16), pos->z + GenerateFloat(-16, 16));
+			s.room = pos.RoomNumber;
+			s.pos = Vector3(pos.x + GenerateFloat(-16, 16), pos.y + GenerateFloat(-16, 16), pos.z + GenerateFloat(-16, 16));
 			float ang = TO_RAD(angle.y);
 			float vAng = -TO_RAD(angle.x);
 			Vector3 v = Vector3(sin(ang), vAng + GenerateFloat(-PI / 16, PI / 16), cos(ang));

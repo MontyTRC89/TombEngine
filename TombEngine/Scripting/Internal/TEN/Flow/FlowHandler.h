@@ -26,7 +26,8 @@ public:
 	int								FogOutDistance{ 0 };
 	bool							PlayAnyLevel{ true };
 	bool							FlyCheat{ true };
-	bool							MassPickup{ true };
+	bool							MassPickup{ true }; 
+	bool							LaraInTitle{ false };
 	bool							DebugMode{ false };
 
 	// New animation flag table
@@ -59,8 +60,10 @@ public:
 	void				SetTotalSecretCount(int secretsNumber);
 	bool				IsFlyCheatEnabled() const;
 	void				EnableFlyCheat(bool flyCheat);
-	bool				IsMassPickupEnabled() const;
+	bool				IsMassPickupEnabled() const; 
 	void				EnableMassPickup(bool massPickup);
+	bool				IsLaraInTitleEnabled() const;
+	void				EnableLaraInTitle(bool laraInTitle);
 	bool				CanPlayAnyLevel() const;
 
 	bool HasCrawlExtended() const override { return Anims.HasCrawlExtended; }

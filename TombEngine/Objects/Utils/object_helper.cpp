@@ -1,12 +1,13 @@
 #include "framework.h"
-#include "Objects/Utils/object_helper.h"
-#include "Game/collision/collide_item.h"
-#include "Objects/Generic/Object/objects.h"
-#include "Game/pickup/pickup.h"
-#include "Objects/Generic/puzzles_keys.h"
-#include "Specific/level.h"
 
+#include "Game/collision/collide_item.h"
+#include "Game/Lara/lara_flare.h"
+#include "Game/pickup/pickup.h"
+#include "Objects/Utils/object_helper.h"
+#include "Objects/Generic/Object/objects.h"
+#include "Objects/Generic/puzzles_keys.h"
 #include "Objects/TR5/Object/tr5_pushableblock.h"
+#include "Specific/level.h"
 
 using std::function;
 
@@ -80,24 +81,17 @@ void InitPickup(ObjectInfo* obj, int objectNumber)
 	}
 }
 
-void InitPickupItem(ObjectInfo* obj, function<InitFunction> func, int objectNumber, bool useDrawAnimItem)
+void InitFlare(ObjectInfo* obj, int objectNumber)
 {
 	obj = &Objects[objectNumber];
 	if (obj->loaded)
 	{
 		obj->collision = PickupCollision;
-		obj->control = func;
-
-		if (objectNumber == ID_FLARE_ITEM)
-		{
-			obj->pivotLength = 256;
-			obj->HitPoints = 256; // time
-		}
-
-		if (useDrawAnimItem)
-			obj->usingDrawAnimatingItem = true;
-		else
-			obj->usingDrawAnimatingItem = false;
+		obj->control = FlareControl;
+		obj->pivotLength = 256;
+		obj->HitPoints = 256; // Time
+		obj->usingDrawAnimatingItem = false;
+		obj->isPickup = true;
 	}
 }
 

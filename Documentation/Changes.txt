@@ -24,6 +24,7 @@ Version 1.0.4
 * Fix windowed mode not using real resolution when DPI scaling is active.
 * Fix control lock not working in flyby sequences.
 * Fix empty inventory when using build and play feature in TE.
+* Fix throwing flare without drawing any weapons if there are no weapons present.
 * Fix several incorrect FOV reset issues.
 
 Lua API changes:
@@ -31,9 +32,12 @@ Lua API changes:
 * Add new Lara functions: GetTarget and GetVehicle.
 * Remove Lara functions: SetOnFire and GetOnFire (replaced with GetEffect and SetEffect).
 * Add Flow.EnableMassPickup option in Gameflow.lua to enable/disable mass pickups.
-* Add level secrets property to display level-specific secret count.
+* Add Flow.EnableLaraInTitle option in Gameflow.lua to enable/disable Lara in title flyby.
+* Add level.secrets property to display level-specific secret count.
+* Fix level.ambientTrack property not working for title flyby.
 * Fix action key script functions not fully working in some cases.
 * Fix mounted vehicles ignoring Disable, Shatter and Explode script commands.
+* Fix SetPosition command not updating room number correctly.
 
 Version 1.0.3
 =============

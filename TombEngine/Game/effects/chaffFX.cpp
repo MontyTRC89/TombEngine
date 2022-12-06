@@ -10,50 +10,47 @@
 #include "Game/effects/tomb4fx.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
+#include "Math/Math.h"
 #include "Specific/level.h"
-#include "Math/Random.h"
 #include "Specific/setup.h"
 #include "Renderer/Renderer11Enums.h"
 #include "Sound/sound.h"
 
-using namespace TEN::Math::Random;
+using namespace TEN::Math;
 
 #define	MAX_TRIGGER_RANGE 0x4000
 
-void TriggerChaffEffects(int flareAge)
+void TriggerChaffEffects(int flareLife)
 {
 	auto pos = GetJointPosition(LaraItem, LM_LHAND, Vector3i(8, 36, 32));
-	auto vect = GetJointPosition(LaraItem, LM_LHAND, Vector3i(8, 36, 1024 + (GetRandomDraw() & 255)));
+	auto vect = GetJointPosition(LaraItem, LM_LHAND, Vector3i(8, 36, 1024 + Random::GenerateInt(0, 256)));
 	auto vel = vect - pos;
-	TriggerChaffEffects(LaraItem, &pos, &vel, LaraItem->Animation.Velocity.z, (bool)(g_Level.Rooms[LaraItem->RoomNumber].flags & ENV_FLAG_WATER), flareAge);
+	TriggerChaffEffects(*LaraItem, pos, vel, LaraItem->Animation.Velocity.z, TestEnvironment(ENV_FLAG_WATER, LaraItem->RoomNumber), flareLife);
 }
 
-void TriggerChaffEffects(ItemInfo* item, int age)
+void TriggerChaffEffects(ItemInfo& item, int age)
 {
-	Matrix world =
-		Matrix::CreateTranslation(-6, 6, 32) *
-		item->Pose.Orientation.ToRotationMatrix();
+	auto world = Matrix::CreateTranslation(-6, 6, 32) * item.Pose.Orientation.ToRotationMatrix();
+	auto pos = item.Pose.Position + Vector3i(world.Translation());
 
-	auto pos = item->Pose.Position + Vector3i(world.Translation());
-
-	world =
-		Matrix::CreateTranslation(-6, 6, 32) *
+	world = Matrix::CreateTranslation(-6, 6, 32) *
 		Matrix::CreateTranslation((GetRandomDraw() & 127) - 64, (GetRandomDraw() & 127) - 64, (GetRandomDraw() & 511) + 512) *
-		item->Pose.Orientation.ToRotationMatrix();
+		item.Pose.Orientation.ToRotationMatrix();
 
 	auto vel = Vector3i(world.Translation());
-	TriggerChaffEffects(item, &pos, &vel, item->Animation.Velocity.z, TestEnvironment(ENV_FLAG_WATER, item), age);
+	TriggerChaffEffects(item, pos, vel, item.Animation.Velocity.z, TestEnvironment(ENV_FLAG_WATER, &item), age);
 }
 
-void TriggerChaffEffects(ItemInfo* item, Vector3i* pos, Vector3i* vel, int speed, bool isUnderwater, int age)
+void TriggerChaffEffects(ItemInfo& item, const Vector3i& pos, const Vector3i& vel, int speed, bool isUnderwater, int age)
 {
-	int numSparks = (int)GenerateFloat(1, 3);
+	int numSparks = Random::GenerateInt(1, 3);
+
 	for (int i = 0; i < numSparks; i++)
 	{
 		long dx, dz;
 
-		dx = item->Pose.Position.x - pos->x;
-		dz = item->Pose.Position.z - pos->z;
+		dx = item.Pose.Position.x - pos.x;
+		dz = item.Pose.Position.z - pos.z;
 
 		if (dx < -MAX_TRIGGER_RANGE || dx > MAX_TRIGGER_RANGE || dz < -MAX_TRIGGER_RANGE || dz > MAX_TRIGGER_RANGE)
 			return;
@@ -63,36 +60,37 @@ void TriggerChaffEffects(ItemInfo* item, Vector3i* pos, Vector3i* vel, int speed
 		color.g = (GetRandomDraw() & 127) + 64;
 		color.b = 192 - color.g;
 
-		TriggerChaffSparkles(pos, vel, &color, age, item);
+		TriggerChaffSparkles(pos, vel, color, age, item);
 		if (isUnderwater)
-			TriggerChaffBubbles(pos, item->RoomNumber);
+		{
+			TriggerChaffBubbles(pos, item.RoomNumber);
+		}
 		else
 		{
-			auto position = pos->ToVector3();
-			Vector3 direction = vel->ToVector3();
+			auto direction = vel.ToVector3();
 			direction.Normalize();
-			TEN::Effects::Smoke::TriggerFlareSmoke(position + direction * 20, direction, age, item->RoomNumber);
+			TEN::Effects::Smoke::TriggerFlareSmoke(pos.ToVector3() + direction * 20, direction, age, item.RoomNumber);
 		}
 	}
 
-	auto pose = item->Pose;
-	if (item->IsLara())
+	auto pose = item.Pose;
+	if (item.IsLara())
 	{
-		auto handPos = GetJointPosition(item, LM_RHAND);
+		auto handPos = GetJointPosition(&item, LM_RHAND);
 		pose.Position = handPos;
 		pose.Position.y -= 64;
 	}
 
-	auto cond = TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, pose.Position, item->RoomNumber);
+	auto cond = TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, pose.Position, item.RoomNumber);
 	SoundEffect(cond ? SFX_TR4_FLARE_BURN_UNDERWATER : SFX_TR4_FLARE_BURN_DRY, &pose, SoundEnvironment::Always, 1.0f, 0.5f);
 }
 
-void TriggerChaffSparkles(Vector3i* pos, Vector3i* vel, ColorData* color, int age, ItemInfo* item)
+void TriggerChaffSparkles(const Vector3i& pos, const Vector3i& vel, const ColorData& color, int age, const ItemInfo& item)
 {
-	TEN::Effects::Spark::TriggerFlareSparkParticles(pos, vel, color, item->RoomNumber);
+	TEN::Effects::Spark::TriggerFlareSparkParticles(pos, vel, color, item.RoomNumber);
 }
 
-void TriggerChaffSmoke(Vector3i* pos, Vector3i* vel, int speed, bool moving, bool wind)
+void TriggerChaffSmoke(const Vector3i& pos, const Vector3i& vel, int speed, bool isMoving, bool wind)
 {
 	SMOKE_SPARKS* smoke;
 
@@ -104,7 +102,7 @@ void TriggerChaffSmoke(Vector3i* pos, Vector3i* vel, int speed, bool moving, boo
 	smoke->on = true;
 
 	smoke->sShade = 0;
-	if (moving)
+	if (isMoving)
 	{
 		trans = (speed << 7) >> 5;
 		smoke->dShade = trans;
@@ -129,12 +127,12 @@ void TriggerChaffSmoke(Vector3i* pos, Vector3i* vel, int speed, bool moving, boo
 
 	smoke->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
 	
-	smoke->x = pos->x + (GetRandomControl() & 7) - 3;
-	smoke->y = pos->y + (GetRandomControl() & 7) - 3;
-	smoke->z = pos->z + (GetRandomControl() & 7) - 3;
-	smoke->xVel = vel->x + ((GetRandomDraw() & 63) - 32);
-	smoke->yVel = vel->y;
-	smoke->zVel = vel->z + ((GetRandomDraw() & 63) - 32);
+	smoke->x = pos.x + (GetRandomControl() & 7) - 3;
+	smoke->y = pos.y + (GetRandomControl() & 7) - 3;
+	smoke->z = pos.z + (GetRandomControl() & 7) - 3;
+	smoke->xVel = vel.x + ((GetRandomDraw() & 63) - 32);
+	smoke->yVel = vel.y;
+	smoke->zVel = vel.z + ((GetRandomDraw() & 63) - 32);
 	smoke->friction = 4;
 
 	if (GetRandomControl() & 1)
@@ -160,7 +158,7 @@ void TriggerChaffSmoke(Vector3i* pos, Vector3i* vel, int speed, bool moving, boo
 	smoke->size = smoke->dSize = size;
 }
 
-void TriggerChaffBubbles(Vector3i* pos, int FlareRoomNumber)
+void TriggerChaffBubbles(const Vector3i& pos, int roomNumber)
 {
 	auto& bubble = Bubbles[GetFreeBubble()];
 
@@ -168,19 +166,19 @@ void TriggerChaffBubbles(Vector3i* pos, int FlareRoomNumber)
 	bubble.active = true;
 	bubble.size = 0;
 	bubble.age = 0;
-	bubble.speed = GenerateFloat(4, 16);
+	bubble.speed = Random::GenerateFloat(4.0f, 16.0f);
 	bubble.sourceColor = Vector4(0, 0, 0, 0);
-	float shade = GenerateFloat(0.3f, 0.8f);
+	float shade = Random::GenerateFloat(0.3f, 0.8f);
 	bubble.destinationColor = Vector4(shade, shade, shade, 0.8f);
 	bubble.color = bubble.sourceColor;
-	bubble.destinationSize = GenerateFloat(32, 96);
+	bubble.destinationSize = Random::GenerateFloat(32.0f, 96.0f);
 	bubble.spriteNum = SPR_BUBBLES;
 	bubble.rotation = 0;
-	bubble.worldPosition = Vector3(pos->x, pos->y, pos->z);
+	bubble.worldPosition = pos.ToVector3();
 	float maxAmplitude = 64;
-	bubble.amplitude = Vector3(GenerateFloat(-maxAmplitude, maxAmplitude), GenerateFloat(-maxAmplitude, maxAmplitude), GenerateFloat(-maxAmplitude, maxAmplitude));
+	bubble.amplitude = Vector3(Random::GenerateFloat(-maxAmplitude, maxAmplitude), Random::GenerateFloat(-maxAmplitude, maxAmplitude), Random::GenerateFloat(-maxAmplitude, maxAmplitude));
 	bubble.worldPositionCenter = bubble.worldPosition;
-	bubble.wavePeriod = Vector3(GenerateFloat(-PI, PI), GenerateFloat(-PI, PI), GenerateFloat(-PI, PI));
-	bubble.waveSpeed = Vector3(1 / GenerateFloat(8, 16), 1 / GenerateFloat(8, 16), 1 / GenerateFloat(8, 16));
-	bubble.roomNumber = FlareRoomNumber;
+	bubble.wavePeriod = Vector3(Random::GenerateFloat(-PI, PI), Random::GenerateFloat(-PI, PI), Random::GenerateFloat(-PI, PI));
+	bubble.waveSpeed = Vector3(1 / Random::GenerateFloat(8, 16), 1 / Random::GenerateFloat(8, 16), 1 / Random::GenerateFloat(8, 16));
+	bubble.roomNumber = roomNumber;
 }
