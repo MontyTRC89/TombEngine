@@ -420,7 +420,7 @@ bool DoFlareLight(const Vector3i& pos, int flareLife)
 	auto sphere = BoundingSphere(pos.ToVector3() - Vector3(0, CLICK(1 / 2.0f), 0), BLOCK(1 / 16.0f));
 	auto lightPos = Random::GeneratePointInSphere(sphere);
 
-	bool result = false;
+	bool spawnChaff = false;
 	bool isEnding = (flareLife > (FLARE_LIFE_MAX - 90));
 	bool isDying  = (flareLife > (FLARE_LIFE_MAX - 5));
 
@@ -434,7 +434,7 @@ bool DoFlareLight(const Vector3i& pos, int flareLife)
 
 		TriggerDynamicLight(lightPos.x, lightPos.y, lightPos.z, falloff, r, g, b);
 
-		result = Random::TestProbability(0.9f);
+		spawnChaff = Random::TestProbability(0.9f);
 	}
 	else if (isEnding)
 	{
@@ -446,7 +446,7 @@ bool DoFlareLight(const Vector3i& pos, int flareLife)
 		int b = FLARE_LIGHT_COLOR.z * 255 * multiplier;
 		TriggerDynamicLight(lightPos.x, lightPos.y, lightPos.z, falloff, r, g, b);
 
-		result = Random::TestProbability(0.4f);
+		spawnChaff = Random::TestProbability(0.4f);
 	}
 	else
 	{
@@ -458,8 +458,8 @@ bool DoFlareLight(const Vector3i& pos, int flareLife)
 		int b = FLARE_LIGHT_COLOR.z * 255 * multiplier;
 		TriggerDynamicLight(lightPos.x, lightPos.y, lightPos.z, falloff, r, g, b);
 
-		result = Random::TestProbability(0.3f);
+		spawnChaff = Random::TestProbability(0.3f);
 	}
 
-	return ((isDying || isEnding) ? result : true);
+	return ((isDying || isEnding) ? spawnChaff : true);
 }
