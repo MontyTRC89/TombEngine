@@ -375,7 +375,7 @@ GameStatus DoLevel(int levelIndex, bool loadGame)
 	InitialiseFXArray(true);
 	InitialisePickupDisplay();
 	InitialiseCamera();
-	InitSpotCamSequences(title);
+	InitialiseSpotCamSequences(title);
 	InitialiseHair();
 	InitialiseNodeScripts();
 	InitialiseItemBoxData();

@@ -65,7 +65,7 @@ void ClearSpotCamSequences()
 		SpotCam[i] = {};
 }
 
-void InitSpotCamSequences(bool title)
+void InitialiseSpotCamSequences(bool title)
 {
 	TrackCameraInit = 0;
 
