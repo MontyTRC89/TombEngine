@@ -130,12 +130,12 @@ namespace TEN::Effects::Blood
 	{
 		auto& mist = GetFreeBloodMist();
 
-		auto box = BoundingOrientedBox(pos, Vector3::One * BLOCK(1 / 16.0f), Vector4::Zero);
+		auto sphere = BoundingSphere(pos, BLOCK(1 / 16.0f));
 
 		mist = BloodMist();
 		mist.SpriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_BLOOD;
 		mist.IsActive = true;
-		mist.Position = Random::GeneratePointInBox(box);
+		mist.Position = Random::GeneratePointInSphere(sphere);
 		mist.RoomNumber = roomNumber;
 		mist.Orientation2D = Random::GenerateAngle();
 		mist.Velocity = Random::GenerateDirectionInCone(direction, 20.0f) * Random::GenerateFloat(-16.0f, 16.0f);
@@ -157,11 +157,11 @@ namespace TEN::Effects::Blood
 		if (TestEnvironment(ENV_FLAG_WATER, roomNumber))
 			return;
 
-		auto box = BoundingOrientedBox(pos, Vector3::One * BLOCK(1 / 16.0f), Quaternion(direction, 1.0f));
+		auto sphere = BoundingSphere(pos, BLOCK(1 / 16.0f));
 
 		for (int i = 0; i < count; i++)
 		{
-			auto pos = Random::GeneratePointInBox(box);
+			auto pos = Random::GeneratePointInSphere(sphere);
 			SpawnBloodMist(pos, roomNumber, direction);
 		}
 	}

@@ -169,7 +169,7 @@ void UpdateSparks()
 		LaraItem->Pose.Position.x + bounds.X2,
 		LaraItem->Pose.Position.y + bounds.Y1,
 		LaraItem->Pose.Position.y + bounds.Y2,
-		LaraItem->Pose.Position.z + bounds.Z1,
+		LaraItem->Pose.Position.z + bounds.Z1,	
 		LaraItem->Pose.Position.z + bounds.Z2
 	);
 
