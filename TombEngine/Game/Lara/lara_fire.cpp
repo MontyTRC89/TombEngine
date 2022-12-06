@@ -1116,7 +1116,7 @@ void HitTarget(ItemInfo* laraItem, ItemInfo* targetEntity, GameVector* hitPos, i
 				{
 					// Baddy2 gun hitting sword
 					SoundEffect(SFX_TR4_BADDY_SWORD_RICOCHET, &targetEntity->Pose);
-					TriggerRicochetSpark(hitPos, laraItem->Pose.Orientation.y, 3, 0);
+					TriggerRicochetSpark(*hitPos, laraItem->Pose.Orientation.y, 3, 0);
 					return;
 				}
 				else
@@ -1127,11 +1127,11 @@ void HitTarget(ItemInfo* laraItem, ItemInfo* targetEntity, GameVector* hitPos, i
 				break;
 
 			case HIT_RICOCHET:
-				TriggerRicochetSpark(hitPos, laraItem->Pose.Orientation.y, 3, 0);
+				TriggerRicochetSpark(*hitPos, laraItem->Pose.Orientation.y, 3, 0);
 				break;
 
 			case HIT_SMOKE:
-				TriggerRicochetSpark(hitPos, laraItem->Pose.Orientation.y, 3, -5);
+				TriggerRicochetSpark(*hitPos, laraItem->Pose.Orientation.y, 3, -5);
 
 				if (targetEntity->ObjectNumber == ID_ROMAN_GOD1 ||
 					targetEntity->ObjectNumber == ID_ROMAN_GOD2)
