@@ -34,8 +34,10 @@ Lua API changes:
 * Add Flow.EnableMassPickup option in Gameflow.lua to enable/disable mass pickups.
 * Add Flow.EnableLaraInTitle option in Gameflow.lua to enable/disable Lara in title flyby.
 * Add level.secrets property to display level-specific secret count.
+* Fix level.ambientTrack property not working for title flyby.
 * Fix action key script functions not fully working in some cases.
 * Fix mounted vehicles ignoring Disable, Shatter and Explode script commands.
+* Fix SetPosition command not updating room number correctly.
 
 Version 1.0.3
 =============
