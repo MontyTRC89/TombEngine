@@ -67,6 +67,7 @@ using namespace TEN::Floordata;
 using namespace TEN::Input;
 using namespace TEN::Math::Random;
 using namespace TEN::Renderer;
+
 using std::string;
 using std::unordered_map;
 using std::vector;
@@ -94,16 +95,24 @@ short NextItemFree;
 short NextFxActive;
 short NextFxFree;
 
-int DrawPhase()
+int DrawPhase(bool title)
 {
-	g_Renderer.Draw();
+	if (title)
+	{
+		g_Renderer.RenderTitle();
+	}
+	else
+	{
+		g_Renderer.Render();
+	}
+
 	Camera.numberFrames = g_Renderer.Synchronize();
 	return Camera.numberFrames;
 }
 
-GameStatus ControlPhase(int numFrames, bool demoMode)
+GameStatus ControlPhase(int numFrames)
 {
-	auto* level = g_GameFlow->GetLevel(CurrentLevel);
+	bool title = CurrentLevel == 0;
 
 	RegeneratePickups();
 
@@ -126,7 +135,7 @@ GameStatus ControlPhase(int numFrames, bool demoMode)
 		GlobalCounter++;
 
 		// Poll keyboard and update input variables.
-		if (CurrentLevel != 0)
+		if (!title)
 		{
 			if (Lara.Control.Locked)
 				ClearAllActions();
@@ -142,7 +151,7 @@ GameStatus ControlPhase(int numFrames, bool demoMode)
 		// which assumes 30 iterations per second.
 		g_GameScript->OnControlPhase(DELTA_TIME);
 
-		if (CurrentLevel != 0 && !ScreenFading)
+		if (!title && !ScreenFading)
 		{
 			// Does the player want to enter inventory?
 			if (IsClicked(In::Save) && LaraItem->HitPoints > 0 &&
@@ -189,6 +198,27 @@ GameStatus ControlPhase(int numFrames, bool demoMode)
 			}
 		}
 
+		if (!title)
+		{
+			HandleOptics(LaraItem);
+
+			// Has level been completed?
+			if (LevelComplete)
+			{
+				return GameStatus::LevelComplete;
+			}
+
+			// Is Lara dead?
+			static constexpr int DEATH_NO_INPUT_TIMEOUT = 10 * FPS;
+			static constexpr int DEATH_INPUT_TIMEOUT = 5 * FPS;
+
+			if (Lara.Control.Count.Death > DEATH_NO_INPUT_TIMEOUT || 
+				Lara.Control.Count.Death > DEATH_INPUT_TIMEOUT && !NoAction())
+			{
+				return GameStatus::ExitToTitle; // Maybe do game over menu like some PSX versions have??
+			}
+		}
+
 		while (g_Gui.GetInventoryMode() == InventoryMode::Pause)
 		{
 			g_Gui.DrawInventory();
@@ -198,31 +228,15 @@ GameStatus ControlPhase(int numFrames, bool demoMode)
 				return GameStatus::ExitToTitle;
 		}
 
-		// Has level been completed?
-		if (CurrentLevel != 0 && LevelComplete)
-			return GameStatus::LevelComplete;
-
-		// Is Lara dead?
-		if (CurrentLevel != 0 &&
-			(Lara.Control.Count.Death > 300 || Lara.Control.Count.Death > 60 && !NoAction()))
-		{
-			return GameStatus::ExitToTitle; // Maybe do game over menu like some PSX versions have??
-		}
-
-		// TODO: When demo mode is implemented, check whether this is correct. -- Sezz 2022.11.01
-		if (demoMode)
-			ClearAllActions();
-
-		// Handle  binoculars and lasersight.
-		if (CurrentLevel != 0)
-			HandleOptics(LaraItem);
-
 		UpdateAllItems();
 		UpdateAllEffects();
 
-		if (CurrentLevel != 0)
+		auto* level = g_GameFlow->GetLevel(CurrentLevel);
+
+		if (!title)
 		{
 			g_GameScriptEntities->TestCollidingObjects();
+
 			// Control Lara
 			InItemControlLoop = true;
 			LaraControl(LaraItem, &LaraCollision);
@@ -253,14 +267,11 @@ GameStatus ControlPhase(int numFrames, bool demoMode)
 		if (UseSpotCam)
 		{
 			// Draw flyby cameras
-			//if (CurrentLevel != 0)
-			//	g_Renderer->EnableCinematicBars(true);
 			CalculateSpotCameras();
 		}
 		else
 		{
 			// Do the standard camera
-			//g_Renderer->EnableCinematicBars(false);
 			TrackCameraInit = false;
 			CalculateCamera();
 		}
@@ -350,133 +361,26 @@ unsigned CALLBACK GameMain(void *)
 	return true;
 }
 
-GameStatus DoTitle(int index)
-{
-	TENLog("DoTitle", LogLevel::Info);
-
-	// Load the title. Exit game if unsuccessful.
-	if (!LoadLevelFile(index))
-		return GameStatus::ExitGame;
-
-	InventoryResult invResult;
-
-	g_GameStringsHandler->ClearDisplayStrings();
-	g_GameScript->ResetScripts(true);
-
-	if (g_GameFlow->TitleType == TITLE_TYPE::FLYBY)
-	{
-		// Initialize items, effects, lots, camera.
-		InitialiseFXArray(true);
-		InitialisePickupDisplay();
-		InitialiseCamera();
-
-		// Run level script.
-		auto* level = g_GameFlow->GetLevel(index);
-
-		if (!level->ScriptFileName.empty())
-		{
-			g_GameScript->ExecuteScriptFile(level->ScriptFileName);
-			g_GameScript->InitCallbacks();
-			g_GameStringsHandler->SetCallbackDrawString([](std::string const key, D3DCOLOR col, int x, int y, int flags)
-			{
-				g_Renderer.AddString(float(x)/float(g_Configuration.Width) * REFERENCE_RES_WIDTH, float(y)/float(g_Configuration.Height) * REFERENCE_RES_HEIGHT, key.c_str(), col, flags);
-			});
-		}
-
-		RequiredStartPos = false;
-		if (InitialiseGame)
-		{
-			GameTimer = 0;
-			RequiredStartPos = false;
-			InitialiseGame = false;
-		}
-
-		Statistics.Level.Timer = 0;
-
-		// Initialize flyby cameras.
-		InitSpotCamSequences();
-		InitialiseSpotCam(0);
-		UseSpotCam = true;
-
-		// Play background music.
-		PlaySoundTrack(level->GetAmbientTrack(), SoundTrackType::BGM);
-
-		// Initialize menu.
-		g_Gui.SetMenuToDisplay(Menu::Title);
-		g_Gui.SetSelectedOption(0);
-
-		InitialiseHair();
-		InitialiseNodeScripts();
-		InitialiseItemBoxData();
-
-		g_GameScript->OnStart();
-
-		SetScreenFadeIn(FADE_SCREEN_SPEED);
-
-		ControlPhase(2, 0);
-
-		int numFrames = 0;
-		auto invStatus = InventoryResult::None;
-
-		while (invStatus == InventoryResult::None && DoTheGame)
-		{
-			g_Renderer.RenderTitle();
-
-			UpdateInputActions(LaraItem);
-
-			invStatus = g_Gui.TitleOptions(LaraItem);
-
-			if (invStatus != InventoryResult::None)
-				break;
-
-			Camera.numberFrames = g_Renderer.Synchronize();
-			numFrames = Camera.numberFrames;
-			ControlPhase(numFrames, 0);
-		}
-
-		invResult = invStatus;
-	}
-	else
-		invResult = g_Gui.TitleOptions(LaraItem);
-
-	StopSoundTracks();
-
-	g_GameScript->OnEnd();
-	g_GameScript->FreeLevelScripts();
-	g_GameScriptEntities->FreeEntities();
-
-	switch (invResult)
-	{
-	case InventoryResult::NewGame:
-		return GameStatus::NewGame;
-
-	case InventoryResult::LoadGame:
-		return GameStatus::LoadGame;
-
-	case InventoryResult::ExitGame:
-		return GameStatus::ExitGame;
-	}
-
-	return GameStatus::NewGame;
-}
-
 GameStatus DoLevel(int index, bool loadFromSavegame)
 {
+	bool title = !index;
+
+	TENLog(title ? "DoTitle" : "DoLevel", LogLevel::Info);
+
 	// Load the level. Fall back to title if unsuccessful.
 	if (!LoadLevelFile(index))
 		return GameStatus::ExitToTitle;
+
+	g_GameStringsHandler->ClearDisplayStrings();
+	g_GameScript->ResetScripts(title || loadFromSavegame);
 
 	// Initialize items, effects, lots, and camera.
 	InitialiseFXArray(true);
 	InitialisePickupDisplay();
 	InitialiseCamera();
 
-	g_GameStringsHandler->ClearDisplayStrings();
-	g_GameScript->ResetScripts(loadFromSavegame);
-
 	// Run level script.
-	ScriptInterfaceLevel* level = g_GameFlow->GetLevel(index);
-
+	auto* level = g_GameFlow->GetLevel(index);
 	if (!level->ScriptFileName.empty())
 	{
 		g_GameScript->ExecuteScriptFile(level->ScriptFileName);
@@ -489,6 +393,8 @@ GameStatus DoLevel(int index, bool loadFromSavegame)
 
 	// Play default background music.
 	PlaySoundTrack(level->GetAmbientTrack(), SoundTrackType::BGM);
+
+	RequiredStartPos = false;
 
 	// Restore the game?
 	if (loadFromSavegame)
@@ -503,7 +409,6 @@ GameStatus DoLevel(int index, bool loadFromSavegame)
 		Camera.target.y = LaraItem->Pose.Position.y;
 		Camera.target.z = LaraItem->Pose.Position.z;
 
-		RequiredStartPos = false;
 		InitialiseGame = false;
 		g_GameFlow->SelectedSaveGame = 0;
 	}
@@ -511,7 +416,6 @@ GameStatus DoLevel(int index, bool loadFromSavegame)
 	{
 		// If not loading a savegame, clear all info.
 		Statistics.Level = {};
-		RequiredStartPos = false;
 
 		if (InitialiseGame)
 		{
@@ -528,6 +432,15 @@ GameStatus DoLevel(int index, bool loadFromSavegame)
 	// Initialize flyby cameras.
 	InitSpotCamSequences();
 
+	if (title)
+	{
+		InitialiseSpotCam(0);
+		UseSpotCam = true;
+
+		g_Gui.SetMenuToDisplay(Menu::Title);
+		g_Gui.SetSelectedOption(0);
+	}
+
 	InitialiseHair();
 	InitialiseNodeScripts();
 	InitialiseItemBoxData();
@@ -537,42 +450,74 @@ GameStatus DoLevel(int index, bool loadFromSavegame)
 	else
 		g_GameScript->OnStart();
 
-	int nFrames = 2;
-
-	// First control phase.
-	g_Renderer.ResetAnimations();
-	GameStatus result = ControlPhase(nFrames, 0);
-
 	// Fade in screen.
 	SetScreenFadeIn(FADE_SCREEN_SPEED);
 
-	// Run the game loop.
+	g_Renderer.ResetAnimations();
+
+	// First control phase.
+	int numFrames = 2;
+	auto result = ControlPhase(numFrames);
+
 	while (DoTheGame)
 	{
-		result = ControlPhase(nFrames, 0);
+		result = ControlPhase(numFrames);
 
-		if (result == GameStatus::ExitToTitle ||
-			result == GameStatus::LoadGame ||
-			result == GameStatus::LevelComplete)
+		if (title)
 		{
-			g_GameScript->OnEnd();
-			g_GameScript->FreeLevelScripts();
-			g_GameScriptEntities->FreeEntities();
+			UpdateInputActions(LaraItem);
 
-			// Here is the only way to exit the loop.
-			StopAllSounds();
-			StopSoundTracks();
-			StopRumble();
+			auto invStatus = g_Gui.TitleOptions(LaraItem);
 
-			return result;
+			switch (invStatus)
+			{
+			case InventoryResult::NewGame:
+			case InventoryResult::NewGameSelectedLevel:
+				result = GameStatus::NewGame;
+				break;
+
+			case InventoryResult::LoadGame:
+				result = GameStatus::LoadGame;
+				break;
+
+			case InventoryResult::ExitGame:
+				result = GameStatus::ExitGame;
+				break;
+			}
+
+			if (invStatus != InventoryResult::None)
+				break;
+
+			g_Renderer.RenderTitle();
+			Camera.numberFrames = g_Renderer.Synchronize();
+			numFrames = Camera.numberFrames;
+		}
+		else
+		{
+			if (result == GameStatus::ExitToTitle ||
+				result == GameStatus::LoadGame ||
+				result == GameStatus::LevelComplete)
+			{
+				break;
+			}
 		}
 
-		nFrames = DrawPhase();
+		numFrames = DrawPhase(title);
 		Sound_UpdateScene();
 	}
 
-	g_GameScript->ResetScripts(true);
-	return GameStatus::ExitGame;
+	g_GameScript->OnEnd();
+	g_GameScript->FreeLevelScripts();
+	g_GameScriptEntities->FreeEntities();
+
+	if (title)
+		g_GameScript->ResetScripts(true);
+
+	StopAllSounds();
+	StopSoundTracks();
+	StopRumble();
+
+	return result;
 }
 
 void UpdateShatters()

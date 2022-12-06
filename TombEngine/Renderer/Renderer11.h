@@ -624,14 +624,14 @@ namespace TEN::Renderer
 		void DrawBar(float percent, const RendererHUDBar* bar, GAME_OBJECT_ID textureSlot, int frame, bool poison);
 		void Create();
 		void Initialise(int w, int h, bool windowed, HWND handle);
-		void Draw();
+		void Render();
+		void RenderTitle();
 		void Lock();
 		bool PrepareDataForTheRenderer();
 		void UpdateCameraMatrices(CAMERA_INFO* cam, float roll, float fov, float farView);
 		void RenderSimpleScene(ID3D11RenderTargetView* target, ID3D11DepthStencilView* depthTarget, RenderView& view);
 		void DumpGameScene();
 		void RenderInventory();
-		void RenderTitle();
 		void RenderScene(ID3D11RenderTargetView* target, ID3D11DepthStencilView* depthTarget, RenderView& view);
 		void PrintDebugMessage(LPCSTR message, ...);
 		void DrawDebugInfo(RenderView& view);

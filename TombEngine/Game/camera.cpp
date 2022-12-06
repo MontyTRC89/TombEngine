@@ -2052,8 +2052,8 @@ void HandleOptics(ItemInfo* item)
 	{
 		if (Lara.Control.HandStatus == HandStatus::WeaponReady &&
 			((Lara.Control.Weapon.GunType == LaraWeaponType::HK && Lara.Weapons[(int)LaraWeaponType::HK].HasLasersight) ||
-				(Lara.Control.Weapon.GunType == LaraWeaponType::Revolver && Lara.Weapons[(int)LaraWeaponType::Revolver].HasLasersight) ||
-				(Lara.Control.Weapon.GunType == LaraWeaponType::Crossbow && Lara.Weapons[(int)LaraWeaponType::Crossbow].HasLasersight)))
+			 (Lara.Control.Weapon.GunType == LaraWeaponType::Revolver && Lara.Weapons[(int)LaraWeaponType::Revolver].HasLasersight) ||
+			 (Lara.Control.Weapon.GunType == LaraWeaponType::Crossbow && Lara.Weapons[(int)LaraWeaponType::Crossbow].HasLasersight)))
 		{
 			BinocularRange = 128;
 			BinocularOldCamera = Camera.oldType;

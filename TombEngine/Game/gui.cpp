@@ -607,7 +607,7 @@ namespace TEN::Gui
 					g_Renderer.RenderTitle();
 					Camera.numberFrames = g_Renderer.Synchronize();
 					int numFrames = Camera.numberFrames;
-					ControlPhase(numFrames, false);
+					ControlPhase(numFrames);
 				}
 			}
 		}

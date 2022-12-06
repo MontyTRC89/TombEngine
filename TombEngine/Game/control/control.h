@@ -70,11 +70,10 @@ extern short NextFxFree;
 
 extern std::vector<short> OutsideRoomTable[OUTSIDE_SIZE][OUTSIDE_SIZE];
 
-int DrawPhase();
+GameStatus DoLevel(int index, bool loadFromSavegame = false);
+GameStatus ControlPhase(int numFrames);
 
-GameStatus DoTitle(int index);
-GameStatus DoLevel(int index, bool loadFromSavegame);
-GameStatus ControlPhase(int numFrames, bool demoMode);
+int DrawPhase(bool title);
 
 int GetRandomControl();
 int GetRandomDraw();
