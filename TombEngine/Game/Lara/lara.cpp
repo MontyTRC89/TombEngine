@@ -1012,7 +1012,7 @@ void LaraCheat(ItemInfo* item, CollisionInfo* coll)
 }
 
 // Offset values may be used to account for the quirk of room traversal only being able to occur at portals.
-void UpdateLaraRoom(ItemInfo* item, int height, int xOffset, int zOffset)
+bool UpdateLaraRoom(ItemInfo* item, int height, int xOffset, int zOffset)
 {
 	auto point = Geometry::TranslatePoint(item->Pose.Position, item->Pose.Orientation.y, zOffset, height, xOffset);
 
@@ -1022,5 +1022,10 @@ void UpdateLaraRoom(ItemInfo* item, int height, int xOffset, int zOffset)
 	item->Floor = GetFloorHeight(item->Location, item->Pose.Position.x, item->Pose.Position.z).value_or(NO_HEIGHT);
 
 	if (item->RoomNumber != item->Location.roomNumber)
+	{
 		ItemNewRoom(item->Index, item->Location.roomNumber);
+		return true;
+	}
+
+	return false;
 }
