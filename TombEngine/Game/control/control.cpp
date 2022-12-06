@@ -369,7 +369,7 @@ GameStatus DoLevel(int index, bool loadGame)
 
 	// Load the level. Fall back to title if unsuccessful.
 	if (!LoadLevelFile(index))
-		return GameStatus::ExitToTitle;
+		return title ? GameStatus::ExitGame : GameStatus::ExitToTitle;
 
 	// Initialize items, effects, lots and cameras.
 	InitialiseFXArray(true);
