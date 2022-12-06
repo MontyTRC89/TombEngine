@@ -487,10 +487,6 @@ GameStatus DoLevel(int index, bool loadFromSavegame)
 
 			if (invStatus != InventoryResult::None)
 				break;
-
-			g_Renderer.RenderTitle();
-			Camera.numberFrames = g_Renderer.Synchronize();
-			numFrames = Camera.numberFrames;
 		}
 		else
 		{
