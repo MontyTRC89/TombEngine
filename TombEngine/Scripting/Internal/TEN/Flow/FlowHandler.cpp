@@ -391,7 +391,7 @@ bool FlowHandler::DoFlow()
 		{
 			try
 			{
-				status = DoTitle(0, level->AmbientTrack);
+				status = DoTitle(0);
 			}
 			catch (TENScriptException const& e)
 			{
@@ -425,7 +425,7 @@ bool FlowHandler::DoFlow()
 
 			try
 			{
-				status = DoLevel(CurrentLevel, level->AmbientTrack, loadFromSavegame);
+				status = DoLevel(CurrentLevel, loadFromSavegame);
 			}
 			catch (TENScriptException const& e) 
 			{

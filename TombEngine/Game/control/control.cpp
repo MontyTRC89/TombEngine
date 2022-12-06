@@ -350,7 +350,7 @@ unsigned CALLBACK GameMain(void *)
 	return true;
 }
 
-GameStatus DoTitle(int index, std::string const& ambient)
+GameStatus DoTitle(int index)
 {
 	TENLog("DoTitle", LogLevel::Info);
 
@@ -399,7 +399,7 @@ GameStatus DoTitle(int index, std::string const& ambient)
 		UseSpotCam = true;
 
 		// Play background music.
-		// MERGE: PlaySoundTrack(index);
+		PlaySoundTrack(level->GetAmbientTrack(), SoundTrackType::BGM);
 
 		// Initialize menu.
 		g_Gui.SetMenuToDisplay(Menu::Title);
@@ -460,7 +460,7 @@ GameStatus DoTitle(int index, std::string const& ambient)
 	return GameStatus::NewGame;
 }
 
-GameStatus DoLevel(int index, std::string const& ambient, bool loadFromSavegame)
+GameStatus DoLevel(int index, bool loadFromSavegame)
 {
 	// Load the level. Fall back to title if unsuccessful.
 	if (!LoadLevelFile(index))
@@ -488,7 +488,7 @@ GameStatus DoLevel(int index, std::string const& ambient, bool loadFromSavegame)
 	}
 
 	// Play default background music.
-	PlaySoundTrack(ambient, SoundTrackType::BGM);
+	PlaySoundTrack(level->GetAmbientTrack(), SoundTrackType::BGM);
 
 	// Restore the game?
 	if (loadFromSavegame)

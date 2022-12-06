@@ -44,4 +44,5 @@ public:
 	virtual short GetFogMaxDistance() const = 0;
 	virtual short GetFarView() const = 0;
 	virtual int GetSecrets() const = 0;
+	virtual std::string GetAmbientTrack() const = 0;
 };
