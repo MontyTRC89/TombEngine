@@ -135,10 +135,10 @@ namespace TEN::Effects::Blood
 		mist = BloodMist();
 		mist.SpriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_BLOOD;
 		mist.IsActive = true;
-		mist.Position = Random::GenerateVector3InBox(box);
+		mist.Position = Random::GeneratePointInBox(box);
 		mist.RoomNumber = roomNumber;
 		mist.Orientation2D = Random::GenerateAngle();
-		mist.Velocity = Random::GenerateVector3InCone(direction, 20.0f, Random::GenerateFloat(-16.0f, 16.0f));
+		mist.Velocity = Random::GenerateDirectionInCone(direction, 20.0f) * Random::GenerateFloat(-16.0f, 16.0f);
 		mist.Color = BLOOD_COLOR_RED;
 		mist.Life = Random::GenerateFloat(24.0f, 32.0f);
 		mist.LifeMax = mist.Life;
@@ -161,7 +161,7 @@ namespace TEN::Effects::Blood
 
 		for (int i = 0; i < count; i++)
 		{
-			auto pos = Random::GenerateVector3InBox(box);
+			auto pos = Random::GeneratePointInBox(box);
 			SpawnBloodMist(pos, roomNumber, direction);
 		}
 	}
@@ -200,7 +200,7 @@ namespace TEN::Effects::Blood
 		for (int i = 0; i < count; i++)
 		{
 			float length = Random::GenerateFloat(minLength, maxLength);
-			auto velocity = baseVelocity + Random::GenerateVector3InCone(direction, BLOOD_DRIP_SPRAY_SEMIANGLE, length);
+			auto velocity = baseVelocity + Random::GenerateDirectionInCone(direction, BLOOD_DRIP_SPRAY_SEMIANGLE) * length;
 			float scale = length / 2;
 
 			SpawnBloodDrip(pos, roomNumber, velocity, scale);

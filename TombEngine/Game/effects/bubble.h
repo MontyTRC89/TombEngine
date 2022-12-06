@@ -19,7 +19,7 @@ namespace TEN::Effects::Bubble
 		unsigned int SpriteIndex = 0;
 
 		Vector3 Position	 = Vector3::Zero;
-		Vector3 PositionHome = Vector3::Zero;
+		Vector3 PositionBase = Vector3::Zero;
 		int		RoomNumber	 = NO_ROOM;
 		Vector4 Color		 = Vector4::Zero;
 		Vector4 ColorStart	 = Vector4::Zero;

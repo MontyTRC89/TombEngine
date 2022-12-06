@@ -64,7 +64,7 @@ namespace TEN::Effects::Bubble
 		bubble.Position = pos;
 
 		bubble.Amplitude = Vector3(Random::GenerateFloat(-maxAmplitude, maxAmplitude), Random::GenerateFloat(-maxAmplitude, maxAmplitude), Random::GenerateFloat(-maxAmplitude, maxAmplitude));
-		bubble.PositionHome = bubble.Position;
+		bubble.PositionBase = bubble.Position;
 		bubble.WavePeriod = Vector3::Zero;
 		bubble.WaveVelocity = Vector3(1 / Random::GenerateFloat(8.0f, 16.0f), 1 / Random::GenerateFloat(8.0f, 16.0f), 1 / Random::GenerateFloat(8.0f, 16.0f));
 		bubble.RoomNumber = roomNumber;
@@ -115,8 +115,8 @@ namespace TEN::Effects::Bubble
 
 			// Update position.
 			bubble.WavePeriod += bubble.WaveVelocity;
-			bubble.PositionHome.y -= bubble.Velocity;
-			bubble.Position = bubble.PositionHome + (bubble.Amplitude * Vector3(sin(bubble.WavePeriod.x), sin(bubble.WavePeriod.y), sin(bubble.WavePeriod.z)));
+			bubble.PositionBase.y -= bubble.Velocity;
+			bubble.Position = bubble.PositionBase + (bubble.Amplitude * Vector3(sin(bubble.WavePeriod.x), sin(bubble.WavePeriod.y), sin(bubble.WavePeriod.z)));
 		}
 	}
 

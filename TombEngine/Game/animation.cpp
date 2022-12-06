@@ -488,7 +488,9 @@ void ClampRotation(Pose& outPose, short angle, short rotation)
 			outPose.Orientation.y -= rotation;
 	}
 	else
+	{
 		outPose.Orientation.y += rotation;
+	}
 }
 
 Vector3i GetJointPosition(ItemInfo* item, int jointIndex, const Vector3i& offset)

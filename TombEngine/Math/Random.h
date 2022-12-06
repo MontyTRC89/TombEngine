@@ -6,10 +6,11 @@ namespace TEN::Math::Random
 	float	GenerateFloat(float low = 0.0f, float high = 1.0f);
 
 	short	GenerateAngle(short low = SHRT_MIN, short high = SHRT_MAX);
-	Vector2 GenerateVector2(float length = 1.0f);
-	Vector3 GenerateVector3(float length = 1.0f);
-	Vector3 GenerateVector3InCone(const Vector3& direction, float semiangleInDeg, float length = 1.0f);
-	Vector3 GenerateVector3InBox(const BoundingOrientedBox& box);
+	Vector2 GenerateDirection2D();
+	Vector3 GenerateDirection();
+	Vector3 GenerateDirectionInCone(const Vector3& direction, float semiangleInDeg);
+	Vector3 GeneratePointInBox(const BoundingOrientedBox& box);
+	Vector3 GeneratePointInSphere(const BoundingSphere& sphere);
 
 	bool TestProbability(float probability);
 }

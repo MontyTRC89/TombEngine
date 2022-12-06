@@ -906,7 +906,7 @@ int GetShatterSound(int shatterID)
 	if (shatterID < 3)
 		return SFX_TR5_SMASH_WOOD;
 	else
-		return SFX_TR5_SMASH_GLASS;
+		return SFX_TR4_SMASH_ROCK;
 }
 
 void PlaySoundSources()

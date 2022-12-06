@@ -147,7 +147,7 @@ namespace TEN::Effects::Smoke
 					float size = Random::GenerateFloat(48, 80);
 					s.sourceSize = size * 2;
 					s.destinationSize = size * 16;
-					s.velocity = Random::GenerateVector3InCone(direction, 25);
+					s.velocity = Random::GenerateDirectionInCone(direction, 25);
 					s.velocity *= Random::GenerateFloat(0, 32);
 				}
 				else
@@ -155,7 +155,7 @@ namespace TEN::Effects::Smoke
 					float size = Random::GenerateFloat(48, 80);
 					s.sourceSize = size;
 					s.destinationSize = size * 8;
-					s.velocity = Random::GenerateVector3InCone(direction, 3);
+					s.velocity = Random::GenerateDirectionInCone(direction, 3);
 					s.velocity *= Random::GenerateFloat(0, 16);
 				}
 			}
@@ -167,7 +167,7 @@ namespace TEN::Effects::Smoke
 				s.terminalVelocity = 0;
 				s.friction = 0.88f;
 				s.life = Random::GenerateFloat(60, 90);
-				s.velocity = Random::GenerateVector3InCone(direction, 10);
+				s.velocity = Random::GenerateDirectionInCone(direction, 10);
 				s.velocity *= Random::GenerateFloat(16, 30);
 			}
 		}
@@ -225,7 +225,7 @@ namespace TEN::Effects::Smoke
 		s.destinationColor = Vector4(0, 0, 0, 0);
 		s.sourceSize = Random::GenerateFloat(32.0f, 64.0f);
 		s.active = true;
-		s.velocity = Random::GenerateVector3() * Random::GenerateFloat(1.0f, 3.0f);
+		s.velocity = Random::GenerateDirection() * Random::GenerateFloat(1.0f, 3.0f);
 		s.affectedByWind = true;
 		s.friction = 0.979f;
 		s.gravity = -0.1f;

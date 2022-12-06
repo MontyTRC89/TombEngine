@@ -62,7 +62,7 @@ namespace TEN::Effects::Drip
 	void SpawnWetnessDrip(const Vector3& pos, int roomNumber)
 	{
 		auto box = BoundingOrientedBox(pos, Vector3::One * BLOCK(1.0f / 32), Vector4::Zero);
-		auto dripPos = Random::GenerateVector3InBox(box);
+		auto dripPos = Random::GeneratePointInBox(box);
 
 		SpawnDripParticle(dripPos, roomNumber, Vector3::Zero, DRIP_LIFE_SHORT_MAX, Random::GenerateFloat(3.0f, 6.0f));
 	}
@@ -72,7 +72,7 @@ namespace TEN::Effects::Drip
 		for (int i = 0; i < count; i++)
 		{
 			auto box = BoundingOrientedBox(pos, Vector3::One * BLOCK(1.0f / 8), Vector4::Zero);
-			auto dripPos = Random::GenerateVector3InBox(box);
+			auto dripPos = Random::GeneratePointInBox(box);
 
 			auto direction = dripPos - pos;
 			direction.Normalize();
@@ -88,7 +88,7 @@ namespace TEN::Effects::Drip
 		for (int i = 0; i < count; i++)
 		{
 			auto box = BoundingOrientedBox(pos, Vector3::One * BLOCK(1.0f / 64), Vector4::Zero);
-			auto dripPos = Random::GenerateVector3InBox(box);
+			auto dripPos = Random::GeneratePointInBox(box);
 
 			auto direction = dripPos - pos;
 			direction.Normalize();

@@ -2,7 +2,7 @@
 
 // Last generated on 31/7/2022.
 
-#include "Renderer11Enums.h"
+#include "Renderer/Renderer11Enums.h"
 #include <unordered_map>
 #include <string>
 
@@ -27,7 +27,7 @@ The following constants are inside BlendID.
 	LIGHTEN  
 	ALPHABLEND  
 
-@section Misc.BlendID
+@section Effects.BlendID
 */
 
 /*** Table of blend mode constants (for use with particles).
