@@ -199,7 +199,7 @@ WeaponInfo Weapons[(int)LaraWeaponType::NumWeapons] =
 		0
 	},
 
-	// Flare 2
+	// Torch
 	{
 		std::pair(EulerAngles(ANGLE(-55.0f), ANGLE(-30.0f), 0), EulerAngles(ANGLE(55.0f), ANGLE(30.0f), 0)),
 		std::pair(EulerAngles(ANGLE(-55.0f), ANGLE(-30.0f), 0), EulerAngles(ANGLE(55.0f), ANGLE(30.0f), 0)),
@@ -699,7 +699,7 @@ void HandleWeapon(ItemInfo* laraItem)
 		{
 		case LaraWeaponType::Pistol:
 		case LaraWeaponType::Uzi:
-			PistolHandler(laraItem, lara.Control.Weapon.GunType);
+			HandlePistols(laraItem, lara.Control.Weapon.GunType);
 			break;
 
 		case LaraWeaponType::Shotgun:
