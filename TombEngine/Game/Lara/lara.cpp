@@ -27,6 +27,7 @@
 #include "Game/collision/floordata.h"
 #include "Game/control/flipeffect.h"
 #include "Game/control/volume.h"
+#include "Game/effects/hair.h"
 #include "Game/effects/item_fx.h"
 #include "Game/effects/tomb4fx.h"
 #include "Game/Gui.h"
@@ -1008,6 +1009,40 @@ void LaraCheat(ItemInfo* item, CollisionInfo* coll)
 		InitialiseLaraMeshes(item);
 		item->HitPoints = LARA_HEALTH_MAX;
 		lara->Control.HandStatus = HandStatus::Free;
+	}
+}
+
+void UpdateLara(ItemInfo* item, bool title)
+{
+	auto* level = g_GameFlow->GetLevel(CurrentLevel);
+
+	if (!title)
+	{
+		// Control Lara
+		InItemControlLoop = true;
+		LaraControl(item, &LaraCollision);
+		InItemControlLoop = false;
+		KillMoveItems();
+
+		g_Renderer.UpdateLaraAnimations(true);
+
+		if (g_Gui.GetInventoryItemChosen() != NO_ITEM)
+		{
+			SayNo();
+			g_Gui.SetInventoryItemChosen(NO_ITEM);
+		}
+
+		LaraCheatyBits(item);
+		TriggerLaraDrips(item);
+
+		// Update Lara's ponytails
+		HairControl(item, level->GetLaraType() == LaraType::Young);
+		ProcessEffects(item);
+	}
+	else if (g_GameFlow->IsLaraInTitleEnabled())
+	{
+		AnimateLara(item);
+		HairControl(item, level->GetLaraType() == LaraType::Young);
 	}
 }
 

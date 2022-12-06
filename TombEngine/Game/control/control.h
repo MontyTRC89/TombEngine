@@ -77,6 +77,10 @@ GameStatus DoLevel(int levelIndex, bool loadGame = false);
 GameStatus DoGameLoop(int levelIndex);
 void EndGameLoop(int levelIndex);
 
+GameStatus HandleMenuCalls(bool title);
+GameStatus HandleLevelEnd();
+void HandleControls(bool title);
+
 int GetRandomControl();
 int GetRandomDraw();
 

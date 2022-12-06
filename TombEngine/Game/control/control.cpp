@@ -132,137 +132,33 @@ GameStatus ControlPhase(int numFrames)
 
 	for (framesCount += numFrames; framesCount > 0; framesCount -= 2)
 	{
-		GlobalCounter++;
-
-		// Poll keyboard and update input variables.
-		if (!title)
-		{
-			if (Lara.Control.Locked)
-				ClearAllActions();
-			else
-				// TODO: To allow cutscene skipping later, don't clear Deselect action.
-				UpdateInputActions(LaraItem); 
-		}
-		else
-			ClearAction(In::Look);
+		// Controls should be polled before OnControlPhase, so input data could be
+		// overwritten by script API methods.
+		HandleControls(title);
 
 		// This might not be the exact amount of time that has passed, but giving it a
 		// value of 1/30 keeps it in lock-step with the rest of the game logic,
 		// which assumes 30 iterations per second.
 		g_GameScript->OnControlPhase(DELTA_TIME);
 
-		if (!title && !ScreenFading)
-		{
-			// Does the player want to enter inventory?
-			if (IsClicked(In::Save) && LaraItem->HitPoints > 0 &&
-				g_Gui.GetInventoryMode() != InventoryMode::Save)
-			{
-				StopAllSounds();
-				StopRumble();
-
-				g_Gui.SetInventoryMode(InventoryMode::Save);
-
-				if (g_Gui.CallInventory(LaraItem, false))
-					return GameStatus::SaveGame;
-			}
-			else if (IsClicked(In::Load) &&
-				g_Gui.GetInventoryMode() != InventoryMode::Load)
-			{
-				StopAllSounds();
-				StopRumble();
-
-				g_Gui.SetInventoryMode(InventoryMode::Load);
-
-				if (g_Gui.CallInventory(LaraItem, false))
-					return GameStatus::LoadGame;
-			}
-			else if (IsClicked(In::Pause) && LaraItem->HitPoints > 0 &&
-					 g_Gui.GetInventoryMode() != InventoryMode::Pause)
-			{
-				StopAllSounds();
-				StopRumble();
-
-				g_Renderer.DumpGameScene();
-				g_Gui.SetInventoryMode(InventoryMode::Pause);
-				g_Gui.SetMenuToDisplay(Menu::Pause);
-				g_Gui.SetSelectedOption(0);
-			}
-			else if ((IsClicked(In::Option) || g_Gui.GetEnterInventory() != NO_ITEM) &&
-				LaraItem->HitPoints > 0 && !BinocularOn)
-			{
-				StopAllSounds();
-				StopRumble();
-
-				if (g_Gui.CallInventory(LaraItem, true))
-					return GameStatus::LoadGame;
-			}
-		}
+		auto result = HandleMenuCalls(title);
+		if (result != GameStatus::None)
+			return result;
 
 		if (!title)
 		{
 			HandleOptics(LaraItem);
 
-			// Has level been completed?
-			if (LevelComplete)
-			{
-				return GameStatus::LevelComplete;
-			}
-
-			// Is Lara dead?
-			static constexpr int DEATH_NO_INPUT_TIMEOUT = 5 * FPS;
-			static constexpr int DEATH_INPUT_TIMEOUT = 10 * FPS;
-
-			if (Lara.Control.Count.Death > DEATH_NO_INPUT_TIMEOUT || 
-				Lara.Control.Count.Death > DEATH_INPUT_TIMEOUT && !NoAction())
-			{
-				return GameStatus::ExitToTitle; // Maybe do game over menu like some PSX versions have??
-			}
+			result = HandleLevelEnd();
+			if (result != GameStatus::None)
+				return result;
 		}
 
-		while (g_Gui.GetInventoryMode() == InventoryMode::Pause)
-		{
-			g_Gui.DrawInventory();
-			g_Renderer.Synchronize();
-
-			if (g_Gui.DoPauseMenu(LaraItem) == InventoryResult::ExitToTitle)
-				return GameStatus::ExitToTitle;
-		}
-
+		UpdateLara(LaraItem, title);
 		UpdateAllItems();
 		UpdateAllEffects();
 
-		auto* level = g_GameFlow->GetLevel(CurrentLevel);
-
-		if (!title)
-		{
-			g_GameScriptEntities->TestCollidingObjects();
-
-			// Control Lara
-			InItemControlLoop = true;
-			LaraControl(LaraItem, &LaraCollision);
-			InItemControlLoop = false;
-			KillMoveItems();
-
-			g_Renderer.UpdateLaraAnimations(true);
-
-			if (g_Gui.GetInventoryItemChosen() != NO_ITEM)
-			{
-				SayNo();
-				g_Gui.SetInventoryItemChosen(NO_ITEM);
-			}
-
-			LaraCheatyBits(LaraItem);
-			TriggerLaraDrips(LaraItem);
-
-			// Update Lara's ponytails
-			HairControl(LaraItem, level->GetLaraType() == LaraType::Young);
-			ProcessEffects(LaraItem);
-		}
-		else if (g_GameFlow->IsLaraInTitleEnabled())
-		{
-			AnimateLara(LaraItem);
-			HairControl(LaraItem, level->GetLaraType() == LaraType::Young);
-		}
+		g_GameScriptEntities->TestCollidingObjects();
 
 		if (UseSpotCam)
 		{
@@ -302,28 +198,30 @@ GameStatus ControlPhase(int numFrames)
 		UpdateSpiders();
 		UpdateSparkParticles();
 		UpdateSmokeParticles();
-		updateSimpleParticles();
+		UpdateSimpleParticles();
 		UpdateDripParticles();
 		UpdateExplosionParticles();
 		UpdateShockwaves();
 		UpdateBeetleSwarm();
 		UpdateLocusts();
 
+		// Update screen overlays
+		UpdateFadeScreenAndCinematicBars();
+
 		// Rumble screen (like in submarine level of TRC)
-		if (level->Rumble)
+		if (g_GameFlow->GetLevel(CurrentLevel)->Rumble)
 			RumbleScreen();
 
 		PlaySoundSources();
 		DoFlipEffect(FlipEffect, LaraItem);
 
-		UpdateFadeScreenAndCinematicBars();
-
 		// Clear savegame loaded flag
 		JustLoaded = false;
 
 		// Update timers
-		HealthBarTimer--;
 		GameTimer++;
+		GlobalCounter++;
+		HealthBarTimer--;
 
 		// Add renderer objects on the first processed frame.
 		if (isFirstTime)
@@ -645,4 +543,100 @@ void EndGameLoop(int levelIndex)
 	StopAllSounds();
 	StopSoundTracks();
 	StopRumble();
+}
+
+void HandleControls(bool title)
+{
+	// Poll keyboard and update input variables.
+	if (!title)
+	{
+		if (Lara.Control.Locked)
+			ClearAllActions();
+		else
+			// TODO: To allow cutscene skipping later, don't clear Deselect action.
+			UpdateInputActions(LaraItem);
+	}
+	else
+		ClearAction(In::Look);
+}
+
+GameStatus HandleMenuCalls(bool title)
+{
+	auto result = GameStatus::None;
+
+	if (title || ScreenFading)
+		return result;
+
+	// Does the player want to enter inventory?
+	if (IsClicked(In::Save) && LaraItem->HitPoints > 0 &&
+		g_Gui.GetInventoryMode() != InventoryMode::Save)
+	{
+		g_Gui.SetInventoryMode(InventoryMode::Save);
+
+		if (g_Gui.CallInventory(LaraItem, false))
+			result = GameStatus::SaveGame;
+	}
+	else if (IsClicked(In::Load) &&
+			 g_Gui.GetInventoryMode() != InventoryMode::Load)
+	{
+		g_Gui.SetInventoryMode(InventoryMode::Load);
+
+		if (g_Gui.CallInventory(LaraItem, false))
+			result = GameStatus::LoadGame;
+	}
+	else if (IsClicked(In::Pause) && LaraItem->HitPoints > 0 &&
+			 g_Gui.GetInventoryMode() != InventoryMode::Pause)
+	{
+		g_Renderer.DumpGameScene();
+		g_Gui.SetInventoryMode(InventoryMode::Pause);
+		g_Gui.SetMenuToDisplay(Menu::Pause);
+		g_Gui.SetSelectedOption(0);
+
+		while (g_Gui.GetInventoryMode() == InventoryMode::Pause)
+		{
+			g_Gui.DrawInventory();
+			g_Renderer.Synchronize();
+
+			if (g_Gui.DoPauseMenu(LaraItem) == InventoryResult::ExitToTitle)
+			{
+				result = GameStatus::ExitToTitle;
+				break;
+			}
+		}
+	}
+	else if ((IsClicked(In::Option) || g_Gui.GetEnterInventory() != NO_ITEM) &&
+			 LaraItem->HitPoints > 0 && !BinocularOn)
+	{
+		if (g_Gui.CallInventory(LaraItem, true))
+			result = GameStatus::LoadGame;
+	}
+
+	if (result != GameStatus::None)
+	{
+		StopAllSounds();
+		StopRumble();
+	}
+
+	return result;
+}
+
+GameStatus HandleLevelEnd()
+{
+	// Is Lara dead?
+	static constexpr int DEATH_NO_INPUT_TIMEOUT = 5 * FPS;
+	static constexpr int DEATH_INPUT_TIMEOUT = 10 * FPS;
+
+	if (Lara.Control.Count.Death > DEATH_NO_INPUT_TIMEOUT ||
+		Lara.Control.Count.Death > DEATH_INPUT_TIMEOUT && !NoAction())
+	{
+		return GameStatus::ExitToTitle; // Maybe do game over menu like some PSX versions have??
+	}
+
+	// Has level been completed?
+	if (LevelComplete)
+	{
+		return GameStatus::LevelComplete;
+	}
+
+	return GameStatus::None;
 }
