@@ -361,7 +361,7 @@ unsigned CALLBACK GameMain(void *)
 	return true;
 }
 
-GameStatus DoLevel(int index, bool loadFromSavegame)
+GameStatus DoLevel(int index, bool loadGame)
 {
 	bool title = !index;
 
@@ -371,149 +371,30 @@ GameStatus DoLevel(int index, bool loadFromSavegame)
 	if (!LoadLevelFile(index))
 		return GameStatus::ExitToTitle;
 
-	g_GameStringsHandler->ClearDisplayStrings();
-	g_GameScript->ResetScripts(title || loadFromSavegame);
-
-	// Initialize items, effects, lots, and camera.
+	// Initialize items, effects, lots and cameras.
 	InitialiseFXArray(true);
 	InitialisePickupDisplay();
 	InitialiseCamera();
-
-	// Run level script.
-	auto* level = g_GameFlow->GetLevel(index);
-	if (!level->ScriptFileName.empty())
-	{
-		g_GameScript->ExecuteScriptFile(level->ScriptFileName);
-		g_GameScript->InitCallbacks();
-		g_GameStringsHandler->SetCallbackDrawString([](std::string const key, D3DCOLOR col, int x, int y, int flags)
-		{
-			g_Renderer.AddString(float(x)/float(g_Configuration.Width) * REFERENCE_RES_WIDTH, float(y)/float(g_Configuration.Height) * REFERENCE_RES_HEIGHT, key.c_str(), col, flags);
-		});
-	}
-
-	// Play default background music.
-	PlaySoundTrack(level->GetAmbientTrack(), SoundTrackType::BGM);
-
-	RequiredStartPos = false;
-
-	// Restore the game?
-	if (loadFromSavegame)
-	{
-		SaveGame::Load(g_GameFlow->SelectedSaveGame);
-
-		Camera.pos.x = LaraItem->Pose.Position.x + 256;
-		Camera.pos.y = LaraItem->Pose.Position.y + 256;
-		Camera.pos.z = LaraItem->Pose.Position.z + 256;
-
-		Camera.target.x = LaraItem->Pose.Position.x;
-		Camera.target.y = LaraItem->Pose.Position.y;
-		Camera.target.z = LaraItem->Pose.Position.z;
-
-		InitialiseGame = false;
-		g_GameFlow->SelectedSaveGame = 0;
-	}
-	else
-	{
-		// If not loading a savegame, clear all info.
-		Statistics.Level = {};
-
-		if (InitialiseGame)
-		{
-			// Clear all game infos as well
-			Statistics.Game = {};
-			GameTimer = 0;
-			InitialiseGame = false;
-		}
-	}
-
-	g_Gui.SetInventoryItemChosen(NO_ITEM);
-	g_Gui.SetEnterInventory(NO_ITEM);
-
-	// Initialize flyby cameras.
-	InitSpotCamSequences();
-
-	if (title)
-	{
-		InitialiseSpotCam(0);
-		UseSpotCam = true;
-
-		g_Gui.SetMenuToDisplay(Menu::Title);
-		g_Gui.SetSelectedOption(0);
-	}
-
+	InitSpotCamSequences(title);
 	InitialiseHair();
 	InitialiseNodeScripts();
 	InitialiseItemBoxData();
 
-	if (loadFromSavegame)
-		g_GameScript->OnLoad();
-	else
-		g_GameScript->OnStart();
+	// Initialize game variables and optionally load game.
+	InitialiseOrLoadGame(loadGame);
 
-	// Fade in screen.
-	SetScreenFadeIn(FADE_SCREEN_SPEED);
+	// Initialize scripting.
+	InitialiseScripting(index, loadGame);
 
-	g_Renderer.ResetAnimations();
-
-	// First control phase.
-	int numFrames = 2;
-	auto result = ControlPhase(numFrames);
-
-	while (DoTheGame)
+	// Prepare title menu, if necessary.
+	if (title)
 	{
-		result = ControlPhase(numFrames);
-
-		if (title)
-		{
-			UpdateInputActions(LaraItem);
-
-			auto invStatus = g_Gui.TitleOptions(LaraItem);
-
-			switch (invStatus)
-			{
-			case InventoryResult::NewGame:
-			case InventoryResult::NewGameSelectedLevel:
-				result = GameStatus::NewGame;
-				break;
-
-			case InventoryResult::LoadGame:
-				result = GameStatus::LoadGame;
-				break;
-
-			case InventoryResult::ExitGame:
-				result = GameStatus::ExitGame;
-				break;
-			}
-
-			if (invStatus != InventoryResult::None)
-				break;
-		}
-		else
-		{
-			if (result == GameStatus::ExitToTitle ||
-				result == GameStatus::LoadGame ||
-				result == GameStatus::LevelComplete)
-			{
-				break;
-			}
-		}
-
-		numFrames = DrawPhase(title);
-		Sound_UpdateScene();
+		g_Gui.SetMenuToDisplay(Menu::Title);
+		g_Gui.SetSelectedOption(0);
 	}
 
-	g_GameScript->OnEnd();
-	g_GameScript->FreeLevelScripts();
-	g_GameScriptEntities->FreeEntities();
-
-	if (title)
-		g_GameScript->ResetScripts(true);
-
-	StopAllSounds();
-	StopSoundTracks();
-	StopRumble();
-
-	return result;
+	// DoGameLoop returns only when level has ended.
+	return DoGameLoop(index);
 }
 
 void UpdateShatters()
@@ -620,4 +501,143 @@ void CleanUp()
 
 	// Clear soundtrack masks.
 	ClearSoundTrackMasks();
+
+	// Clear all remaining renderer data.
+	g_Renderer.ClearScene();
+}
+
+void InitialiseScripting(int index, bool loadGame)
+{
+	g_GameStringsHandler->ClearDisplayStrings();
+	g_GameScript->ResetScripts(!index || loadGame);
+
+	// Run level script.
+	auto* level = g_GameFlow->GetLevel(index);
+	if (!level->ScriptFileName.empty())
+	{
+		g_GameScript->ExecuteScriptFile(level->ScriptFileName);
+		g_GameScript->InitCallbacks();
+		g_GameStringsHandler->SetCallbackDrawString([](std::string const key, D3DCOLOR col, int x, int y, int flags)
+		{
+			g_Renderer.AddString(float(x) / float(g_Configuration.Width) * REFERENCE_RES_WIDTH,
+								 float(y) / float(g_Configuration.Height) * REFERENCE_RES_HEIGHT,
+								 key.c_str(), col, flags);
+		});
+	}
+
+	if (loadGame)
+		g_GameScript->OnLoad();
+	else
+		g_GameScript->OnStart();
+
+	// Play default background music.
+	PlaySoundTrack(level->GetAmbientTrack(), SoundTrackType::BGM);
+}
+
+void DeInitialiseScripting(int index)
+{
+	g_GameScript->OnEnd();
+	g_GameScript->FreeLevelScripts();
+	g_GameScriptEntities->FreeEntities();
+
+	if (!index)
+		g_GameScript->ResetScripts(true);
+}
+
+void InitialiseOrLoadGame(bool loadGame)
+{
+	RequiredStartPos = false;
+
+	g_Gui.SetInventoryItemChosen(NO_ITEM);
+	g_Gui.SetEnterInventory(NO_ITEM);
+
+	// Restore the game?
+	if (loadGame)
+	{
+		SaveGame::Load(g_GameFlow->SelectedSaveGame);
+
+		Camera.pos.x = LaraItem->Pose.Position.x + 256;
+		Camera.pos.y = LaraItem->Pose.Position.y + 256;
+		Camera.pos.z = LaraItem->Pose.Position.z + 256;
+
+		Camera.target.x = LaraItem->Pose.Position.x;
+		Camera.target.y = LaraItem->Pose.Position.y;
+		Camera.target.z = LaraItem->Pose.Position.z;
+
+		InitialiseGame = false;
+		g_GameFlow->SelectedSaveGame = 0;
+	}
+	else
+	{
+		// If not loading a savegame, clear all info.
+		Statistics.Level = {};
+
+		if (InitialiseGame)
+		{
+			// Clear all game infos as well
+			Statistics.Game = {};
+			GameTimer = 0;
+			InitialiseGame = false;
+		}
+	}
+}
+
+GameStatus DoGameLoop(int index)
+{
+	// Before entering actual game loop, ControlPhase must be
+	// called once to sort out various runtime shenanigangs (e.g. hair).
+
+	int numFrames = 2;
+	auto result = ControlPhase(numFrames);
+
+	while (DoTheGame)
+	{
+		result = ControlPhase(numFrames);
+
+		if (!index)
+		{
+			UpdateInputActions(LaraItem);
+
+			auto invStatus = g_Gui.TitleOptions(LaraItem);
+
+			switch (invStatus)
+			{
+			case InventoryResult::NewGame:
+			case InventoryResult::NewGameSelectedLevel:
+				result = GameStatus::NewGame;
+				break;
+
+			case InventoryResult::LoadGame:
+				result = GameStatus::LoadGame;
+				break;
+
+			case InventoryResult::ExitGame:
+				result = GameStatus::ExitGame;
+				break;
+			}
+
+			if (invStatus != InventoryResult::None)
+				break;
+		}
+		else
+		{
+			if (result == GameStatus::ExitToTitle ||
+				result == GameStatus::LoadGame ||
+				result == GameStatus::LevelComplete)
+			{
+				break;
+			}
+		}
+
+		numFrames = DrawPhase(!index);
+		Sound_UpdateScene();
+	}
+
+	DeInitialiseScripting(index);
+
+	StopAllSounds();
+	StopSoundTracks();
+	StopRumble();
+
+	return result;
 }

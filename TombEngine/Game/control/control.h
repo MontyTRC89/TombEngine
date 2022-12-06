@@ -70,7 +70,8 @@ extern short NextFxFree;
 
 extern std::vector<short> OutsideRoomTable[OUTSIDE_SIZE][OUTSIDE_SIZE];
 
-GameStatus DoLevel(int index, bool loadFromSavegame = false);
+GameStatus DoLevel(int index, bool loadGame = false);
+GameStatus DoGameLoop(int index);
 GameStatus ControlPhase(int numFrames);
 
 int DrawPhase(bool title);
@@ -83,5 +84,9 @@ void KillMoveEffects();
 void UpdateShatters();
 
 void CleanUp();
+
+void InitialiseOrLoadGame(bool loadGame);
+void InitialiseScripting(int index, bool loadGame);
+void DeInitialiseScripting(int index);
 
 unsigned CALLBACK GameMain(void*);

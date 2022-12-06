@@ -152,6 +152,9 @@ void InitialiseCamera()
 
 	UseForcedFixedCamera = 0;
 	CalculateCamera();
+
+	// Fade in screen.
+	SetScreenFadeIn(FADE_SCREEN_SPEED);
 }
 
 void MoveCamera(GameVector* ideal, int speed)

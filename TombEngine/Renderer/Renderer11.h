@@ -478,7 +478,6 @@ namespace TEN::Renderer
 		void CollectLightsForCamera();
 		void CalculateLightFades(RendererItem* item);
 		void CollectEffects(short roomNumber);
-		void ClearScene();
 		void ClearSceneItems();
 		void ClearDynamicLights();
 		void ClearShadowMap();
@@ -564,6 +563,7 @@ namespace TEN::Renderer
 		void SetCullMode(CULL_MODES cullMode, bool force = false);
 		void SetAlphaTest(ALPHA_TEST_MODES mode, float threshold, bool force = false);
 		void SetScissor(RendererRectangle rectangle);
+		void ResetAnimations();
 		void ResetScissor();
 		void ResetDebugVariables();
 		float CalculateFrameRate();
@@ -633,6 +633,7 @@ namespace TEN::Renderer
 		void DumpGameScene();
 		void RenderInventory();
 		void RenderScene(ID3D11RenderTargetView* target, ID3D11DepthStencilView* depthTarget, RenderView& view);
+		void ClearScene();
 		void PrintDebugMessage(LPCSTR message, ...);
 		void DrawDebugInfo(RenderView& view);
 		void SwitchDebugPage(bool back);
@@ -658,7 +659,6 @@ namespace TEN::Renderer
 		void AddDebugSphere(Vector3 center, float radius, Vector4 color, RENDERER_DEBUG_PAGE page);
 		void ChangeScreenResolution(int width, int height, bool windowed);
 		void FlipRooms(short roomNumber1, short roomNumber2);
-		void ResetAnimations();
 		void UpdateLaraAnimations(bool force);
 		void UpdateItemAnimations(int itemNumber, bool force);
 		void GetItemAbsBonePosition(int itemNumber, Vector3& pos, int jointIndex);
