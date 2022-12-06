@@ -127,6 +127,13 @@ Must be true or false
 */
 	table_flow.set_function(ScriptReserved_EnableMassPickup, &FlowHandler::EnableMassPickup, this);
 
+/*** Enable or disable Lara drawing in title flyby.
+Must be true or false
+@function EnableLaraInTitle
+@tparam bool true or false
+*/
+	table_flow.set_function(ScriptReserved_EnableLaraInTitle, &FlowHandler::EnableLaraInTitle, this);
+
 /*** settings.lua.
 These functions are called in settings.lua, a file which holds your local settings.
 settings.lua shouldn't be bundled with any finished levels/games.
@@ -348,6 +355,16 @@ bool FlowHandler::IsMassPickupEnabled() const
 void FlowHandler::EnableMassPickup(bool massPickup)
 {
 	MassPickup = massPickup;
+}
+
+bool FlowHandler::IsLaraInTitleEnabled() const
+{
+	return LaraInTitle;
+}
+
+void FlowHandler::EnableLaraInTitle(bool laraInTitle)
+{
+	LaraInTitle = laraInTitle;
 }
 
 bool FlowHandler::DoFlow()
