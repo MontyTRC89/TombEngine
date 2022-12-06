@@ -875,13 +875,13 @@ void Moveable::SetRoom(short room)
 		m_item->RoomNumber = room;
 	else
 	{
+		ItemNewRoom(m_num, room);
+
 		// HACK: For Lara, we need to manually force Location.roomNumber to new one,
 		// or else camera won't be updated properly.
 
 		if (m_item->IsLara())
-			m_item->RoomNumber = m_item->Location.roomNumber = room;
-
-		ItemNewRoom(m_num, room);
+			m_item->Location.roomNumber = room;
 	}
 }
 
