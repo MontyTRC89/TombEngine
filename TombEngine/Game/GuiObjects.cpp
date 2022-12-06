@@ -347,8 +347,8 @@ namespace TEN::Gui
 		if (lara->Control.HandStatus != HandStatus::Free &&
 			lara->Control.Weapon.GunType == LaraWeaponType::Revolver)
 		{
-			UndrawPistolMeshRight(item, LaraWeaponType::Revolver);
-			DrawPistolMeshes(item, LaraWeaponType::Revolver);
+			UndrawPistolMeshRight(*item, LaraWeaponType::Revolver);
+			DrawPistolMeshes(*item, LaraWeaponType::Revolver);
 		}
 	}
 
@@ -370,8 +370,8 @@ namespace TEN::Gui
 		if (lara->Control.HandStatus != HandStatus::Free &&
 			lara->Control.Weapon.GunType == LaraWeaponType::Crossbow)
 		{
-			UndrawShotgunMeshes(item, LaraWeaponType::Crossbow);
-			DrawShotgunMeshes(item, LaraWeaponType::Crossbow);
+			UndrawShotgunMeshes(*item, LaraWeaponType::Crossbow);
+			DrawShotgunMeshes(*item, LaraWeaponType::Crossbow);
 		}
 	}
 
@@ -393,8 +393,8 @@ namespace TEN::Gui
 		if (lara->Control.HandStatus != HandStatus::Free &&
 			lara->Control.Weapon.GunType == LaraWeaponType::HK)
 		{
-			UndrawShotgunMeshes(item, LaraWeaponType::HK);
-			DrawShotgunMeshes(item, LaraWeaponType::HK);
+			UndrawShotgunMeshes(*item, LaraWeaponType::HK);
+			DrawShotgunMeshes(*item, LaraWeaponType::HK);
 		}
 	}
 

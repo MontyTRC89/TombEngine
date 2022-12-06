@@ -87,9 +87,9 @@ void FlareControl(short itemNumber)
 	}
 }
 
-void ReadyFlare(ItemInfo* laraItem)
+void ReadyFlare(ItemInfo& laraItem)
 {
-	auto& lara = *GetLaraInfo(laraItem);
+	auto& lara = *GetLaraInfo(&laraItem);
 
 	lara.Control.HandStatus = HandStatus::Free;
 	lara.LeftArm.Orientation = EulerAngles::Zero;
@@ -99,41 +99,41 @@ void ReadyFlare(ItemInfo* laraItem)
 	lara.TargetEntity = nullptr;
 }
 
-void UndrawFlareMeshes(ItemInfo* laraItem)
+void UndrawFlareMeshes(ItemInfo& laraItem)
 {
-	laraItem->Model.MeshIndex[LM_LHAND] = laraItem->Model.BaseMesh + LM_LHAND;
+	laraItem.Model.MeshIndex[LM_LHAND] = laraItem.Model.BaseMesh + LM_LHAND;
 }
 
-void DrawFlareMeshes(ItemInfo* laraItem)
+void DrawFlareMeshes(ItemInfo& laraItem)
 {
-	laraItem->Model.MeshIndex[LM_LHAND] = Objects[ID_FLARE_ANIM].meshIndex + LM_LHAND;
+	laraItem.Model.MeshIndex[LM_LHAND] = Objects[ID_FLARE_ANIM].meshIndex + LM_LHAND;
 }
 
-void UndrawFlare(ItemInfo* laraItem)
+void UndrawFlare(ItemInfo& laraItem)
 {
-	auto& lara = *GetLaraInfo(laraItem);
+	auto& lara = *GetLaraInfo(&laraItem);
 
 	int flareFrame = lara.Flare.Frame;
 	int armFrame = lara.LeftArm.FrameNumber;
 
 	lara.Flare.ControlLeft = true;
 
-	if (laraItem->Animation.TargetState == LS_IDLE &&
+	if (laraItem.Animation.TargetState == LS_IDLE &&
 		lara.Vehicle == NO_ITEM)
 	{
-		if (laraItem->Animation.AnimNumber == LA_STAND_IDLE)
+		if (laraItem.Animation.AnimNumber == LA_STAND_IDLE)
 		{
-			laraItem->Animation.AnimNumber = LA_DISCARD_FLARE;
-			flareFrame = armFrame + g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
-			laraItem->Animation.FrameNumber = flareFrame;
+			laraItem.Animation.AnimNumber = LA_DISCARD_FLARE;
+			flareFrame = armFrame + g_Level.Anims[laraItem.Animation.AnimNumber].frameBase;
+			laraItem.Animation.FrameNumber = flareFrame;
 			lara.Flare.Frame = flareFrame;
 		}
 
-		if (laraItem->Animation.AnimNumber == LA_DISCARD_FLARE)
+		if (laraItem.Animation.AnimNumber == LA_DISCARD_FLARE)
 		{
 			lara.Flare.ControlLeft = false;
 
-			if (flareFrame >= (g_Level.Anims[laraItem->Animation.AnimNumber].frameBase + 31)) // 31 = Last frame.
+			if (flareFrame >= (g_Level.Anims[laraItem.Animation.AnimNumber].frameBase + 31)) // 31 = Last frame.
 			{
 				lara.Control.Weapon.RequestGunType = lara.Control.Weapon.LastGunType;
 				lara.Control.Weapon.GunType = lara.Control.Weapon.LastGunType;
@@ -144,17 +144,17 @@ void UndrawFlare(ItemInfo* laraItem)
 				lara.TargetEntity = nullptr;
 				lara.RightArm.Locked = false;
 				lara.LeftArm.Locked = false;
-				SetAnimation(laraItem, LA_STAND_IDLE);
-				lara.Flare.Frame = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
+				SetAnimation(&laraItem, LA_STAND_IDLE);
+				lara.Flare.Frame = g_Level.Anims[laraItem.Animation.AnimNumber].frameBase;
 				return;
 			}
 
 			lara.Flare.Frame++;
 		}
 	}
-	else if (laraItem->Animation.AnimNumber == LA_DISCARD_FLARE)
+	else if (laraItem.Animation.AnimNumber == LA_DISCARD_FLARE)
 	{
-		SetAnimation(laraItem, LA_STAND_IDLE);
+		SetAnimation(&laraItem, LA_STAND_IDLE);
 	}
 
 	if (armFrame >= 33 && armFrame < 72)
@@ -223,12 +223,12 @@ void UndrawFlare(ItemInfo* laraItem)
 	SetFlareArm(laraItem, lara.LeftArm.FrameNumber);
 }
 
-void DrawFlare(ItemInfo* laraItem)
+void DrawFlare(ItemInfo& laraItem)
 {
-	auto& lara = *GetLaraInfo(laraItem);
+	auto& lara = *GetLaraInfo(&laraItem);
 
-	if (laraItem->Animation.ActiveState == LS_PICKUP_FLARE ||
-		laraItem->Animation.ActiveState == LS_PICKUP)
+	if (laraItem.Animation.ActiveState == LS_PICKUP_FLARE ||
+		laraItem.Animation.ActiveState == LS_PICKUP)
 	{
 		DoFlareInHand(laraItem, lara.Flare.Life);
 		lara.Flare.ControlLeft = false;
@@ -252,7 +252,7 @@ void DrawFlare(ItemInfo* laraItem)
 		{
 			if (armFrame == 72)
 			{
-				SoundEffect(SFX_TR4_FLARE_IGNITE_DRY, &laraItem->Pose, TestEnvironment(ENV_FLAG_WATER, laraItem) ? SoundEnvironment::Water : SoundEnvironment::Land);
+				SoundEffect(SFX_TR4_FLARE_IGNITE_DRY, &laraItem.Pose, TestEnvironment(ENV_FLAG_WATER, &laraItem) ? SoundEnvironment::Water : SoundEnvironment::Land);
 				lara.Flare.Life = 1;
 			}
 
@@ -273,9 +273,9 @@ void DrawFlare(ItemInfo* laraItem)
 	}
 }
 
-void SetFlareArm(ItemInfo* laraItem, int armFrame)
+void SetFlareArm(ItemInfo& laraItem, int armFrame)
 {
-	auto& lara = *GetLaraInfo(laraItem);
+	auto& lara = *GetLaraInfo(&laraItem);
 	int flareAnimNum = Objects[ID_FLARE_ANIM].animIndex;
 
 	if (armFrame >= 95)
@@ -299,9 +299,9 @@ void SetFlareArm(ItemInfo* laraItem, int armFrame)
 	lara.LeftArm.FrameBase = g_Level.Anims[flareAnimNum].FramePtr;
 }
 
-void CreateFlare(ItemInfo* laraItem, GAME_OBJECT_ID objectNumber, bool isThrown)
+void CreateFlare(ItemInfo& laraItem, GAME_OBJECT_ID objectNumber, bool isThrown)
 {
-	const auto& lara = *GetLaraInfo(laraItem);
+	const auto& lara = *GetLaraInfo(&laraItem);
 
 	auto itemNumber = CreateItem();
 	if (itemNumber == NO_ITEM)
@@ -310,32 +310,32 @@ void CreateFlare(ItemInfo* laraItem, GAME_OBJECT_ID objectNumber, bool isThrown)
 	auto& flareItem = g_Level.Items[itemNumber];
 
 	flareItem.ObjectNumber = objectNumber;
-	flareItem.RoomNumber = laraItem->RoomNumber;
+	flareItem.RoomNumber = laraItem.RoomNumber;
 
-	auto pos = GetJointPosition(laraItem, LM_LHAND, Vector3i(-16, 32, 42));
+	auto pos = GetJointPosition(&laraItem, LM_LHAND, Vector3i(-16, 32, 42));
 
 	flareItem.Pose.Position = pos;
 
-	int floorHeight = GetCollision(pos.x, pos.y, pos.z, laraItem->RoomNumber).Position.Floor;
+	int floorHeight = GetCollision(pos.x, pos.y, pos.z, laraItem.RoomNumber).Position.Floor;
 	auto hasCollided = GetCollidedObjects(&flareItem, 0, true, CollidedItems, CollidedMeshes, true);
 	bool hasLanded = false;
 
 	if (floorHeight < pos.y || hasCollided)
 	{
 		hasLanded = true;
-		flareItem.Pose.Position.x = laraItem->Pose.Position.x + 320 * phd_sin(flareItem.Pose.Orientation.y);
-		flareItem.Pose.Position.z = laraItem->Pose.Position.z + 320 * phd_cos(flareItem.Pose.Orientation.y);
-		flareItem.Pose.Orientation.y = laraItem->Pose.Orientation.y + ANGLE(180.0f);
-		flareItem.RoomNumber = laraItem->RoomNumber;
+		flareItem.Pose.Position.x = laraItem.Pose.Position.x + 320 * phd_sin(flareItem.Pose.Orientation.y);
+		flareItem.Pose.Position.z = laraItem.Pose.Position.z + 320 * phd_cos(flareItem.Pose.Orientation.y);
+		flareItem.Pose.Orientation.y = laraItem.Pose.Orientation.y + ANGLE(180.0f);
+		flareItem.RoomNumber = laraItem.RoomNumber;
 	}
 	else
 	{
 		if (isThrown)
-			flareItem.Pose.Orientation.y = laraItem->Pose.Orientation.y;
+			flareItem.Pose.Orientation.y = laraItem.Pose.Orientation.y;
 		else
-			flareItem.Pose.Orientation.y = laraItem->Pose.Orientation.y - ANGLE(45.0f);
+			flareItem.Pose.Orientation.y = laraItem.Pose.Orientation.y - ANGLE(45.0f);
 
-		flareItem.RoomNumber = laraItem->RoomNumber;
+		flareItem.RoomNumber = laraItem.RoomNumber;
 	}
 
 	InitialiseItem(itemNumber);
@@ -346,13 +346,13 @@ void CreateFlare(ItemInfo* laraItem, GAME_OBJECT_ID objectNumber, bool isThrown)
 
 	if (isThrown)
 	{
-		flareItem.Animation.Velocity.z = laraItem->Animation.Velocity.z + 50;
-		flareItem.Animation.Velocity.y = laraItem->Animation.Velocity.y - 50;
+		flareItem.Animation.Velocity.z = laraItem.Animation.Velocity.z + 50;
+		flareItem.Animation.Velocity.y = laraItem.Animation.Velocity.y - 50;
 	}
 	else
 	{
-		flareItem.Animation.Velocity.z = laraItem->Animation.Velocity.z + 10;
-		flareItem.Animation.Velocity.y = laraItem->Animation.Velocity.y + 50;
+		flareItem.Animation.Velocity.z = laraItem.Animation.Velocity.z + 10;
+		flareItem.Animation.Velocity.y = laraItem.Animation.Velocity.y + 50;
 	}
 
 	if (hasLanded)
@@ -377,16 +377,16 @@ void CreateFlare(ItemInfo* laraItem, GAME_OBJECT_ID objectNumber, bool isThrown)
 	flareItem.Status = ITEM_ACTIVE;
 }
 
-void DrawFlareInAir(ItemInfo* flareItem)
+void DrawFlareInAir(ItemInfo& flareItem)
 {
 	TENLog("DrawFlareInAir() not implemented!", LogLevel::Warning);
 }
 
-void DoFlareInHand(ItemInfo* laraItem, int flareLife)
+void DoFlareInHand(ItemInfo& laraItem, int flareLife)
 {
-	auto& lara = *GetLaraInfo(laraItem);
+	auto& lara = *GetLaraInfo(&laraItem);
 
-	auto pos = GetJointPosition(laraItem, LM_LHAND, Vector3i(11, 32, 41));
+	auto pos = GetJointPosition(&laraItem, LM_LHAND, Vector3i(11, 32, 41));
 
 	if (DoFlareLight(pos, flareLife))
 		TriggerChaffEffects(flareLife);
@@ -396,9 +396,9 @@ void DoFlareInHand(ItemInfo* laraItem, int flareLife)
 	if (lara.Flare.Life >= FLARE_LIFE_MAX)
 	{
 		// Prevent Lara from intercepting reach/jump states with flare throws.
-		if (laraItem->Animation.IsAirborne ||
-			laraItem->Animation.TargetState == LS_JUMP_PREPARE ||
-			laraItem->Animation.TargetState == LS_JUMP_FORWARD)
+		if (laraItem.Animation.IsAirborne ||
+			laraItem.Animation.TargetState == LS_JUMP_PREPARE ||
+			laraItem.Animation.TargetState == LS_JUMP_FORWARD)
 		{
 			return;
 		}
@@ -417,12 +417,8 @@ bool DoFlareLight(const Vector3i& pos, int flareLife)
 	if (flareLife >= FLARE_LIFE_MAX || flareLife == 0)
 		return false;
 
-	float randomFloat = Random::GenerateFloat();
-
-	auto lightPos = pos + Vector3i(
-		randomFloat * 120,
-		(randomFloat * 120) - CLICK(1),
-		randomFloat * 120);
+	auto sphere = BoundingSphere(pos.ToVector3() - Vector3(0, CLICK(1 / 2.0f), 0), BLOCK(1 / 16.0f));
+	auto lightPos = Random::GeneratePointInSphere(sphere);
 
 	bool result = false;
 	bool isEnding = (flareLife > (FLARE_LIFE_MAX - 90));
@@ -438,7 +434,7 @@ bool DoFlareLight(const Vector3i& pos, int flareLife)
 
 		TriggerDynamicLight(lightPos.x, lightPos.y, lightPos.z, falloff, r, g, b);
 
-		result = (randomFloat < 0.9f);
+		result = Random::TestProbability(0.9f);
 	}
 	else if (isEnding)
 	{
@@ -450,7 +446,7 @@ bool DoFlareLight(const Vector3i& pos, int flareLife)
 		int b = FLARE_LIGHT_COLOR.z * 255 * multiplier;
 		TriggerDynamicLight(lightPos.x, lightPos.y, lightPos.z, falloff, r, g, b);
 
-		result = (randomFloat < 0.4f);
+		result = Random::TestProbability(0.4f);
 	}
 	else
 	{
@@ -462,7 +458,7 @@ bool DoFlareLight(const Vector3i& pos, int flareLife)
 		int b = FLARE_LIGHT_COLOR.z * 255 * multiplier;
 		TriggerDynamicLight(lightPos.x, lightPos.y, lightPos.z, falloff, r, g, b);
 
-		result = (randomFloat < 0.3f);
+		result = Random::TestProbability(0.3f);
 	}
 
 	return ((isDying || isEnding) ? result : true);

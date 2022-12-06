@@ -25,27 +25,27 @@ enum class ProjectileType
 	FlashGrenade
 };
 
-void AnimateShotgun(ItemInfo* laraItem, LaraWeaponType weaponType);
-void ReadyShotgun(ItemInfo* laraItem, LaraWeaponType weaponType);
-void FireShotgun(ItemInfo* laraItem);
-void DrawShotgun(ItemInfo* laraItem, LaraWeaponType weaponType);
-void UndrawShotgun(ItemInfo* laraItem, LaraWeaponType weaponType);
-void DrawShotgunMeshes(ItemInfo* laraItem, LaraWeaponType weaponType);
-void UndrawShotgunMeshes(ItemInfo* laraItem, LaraWeaponType weaponType);
+void AnimateShotgun(ItemInfo& laraItem, LaraWeaponType weaponType);
+void ReadyShotgun(ItemInfo& laraItem, LaraWeaponType weaponType);
+void FireShotgun(ItemInfo& laraItem);
+void DrawShotgun(ItemInfo& laraItem, LaraWeaponType weaponType);
+void UndrawShotgun(ItemInfo& laraItem, LaraWeaponType weaponType);
+void DrawShotgunMeshes(ItemInfo& laraItem, LaraWeaponType weaponType);
+void UndrawShotgunMeshes(ItemInfo& laraItem, LaraWeaponType weaponType);
 
-ItemInfo* FireHarpoon(ItemInfo* laraItem);
+ItemInfo* FireHarpoon(ItemInfo& laraItem);
 void HarpoonBoltControl(short itemNumber);
-void FireGrenade(ItemInfo* laraItem);
+void FireGrenade(ItemInfo& laraItem);
 void GrenadeControl(short itemNumber);
-void FireRocket(ItemInfo* laraItem);
+void FireRocket(ItemInfo& laraItem);
 void RocketControl(short itemNumber);
-void FireCrossbow(ItemInfo* laraItem, Pose* pos);
+void FireCrossbow(ItemInfo& laraItem, Pose* pos);
 void CrossbowBoltControl(short itemNumber);
-void FireCrossBowFromLaserSight(ItemInfo* laraItem, GameVector* origin, GameVector* target);
+void FireCrossBowFromLaserSight(ItemInfo& laraItem, GameVector* origin, GameVector* target);
 
-void FireHK(ItemInfo* laraItem, int mode);
-void RifleHandler(ItemInfo* laraItem, LaraWeaponType weaponType);
-void LasersightWeaponHandler(ItemInfo* item, LaraWeaponType weaponType);
+void FireHK(ItemInfo& laraItem, int mode);
+void RifleHandler(ItemInfo& laraItem, LaraWeaponType weaponType);
+void LasersightWeaponHandler(ItemInfo& item, LaraWeaponType weaponType);
 
 void DoExplosiveDamage(ItemInfo& emitter, ItemInfo& target, ItemInfo& projectile, int damage);
 void HandleProjectile(ItemInfo& item, ItemInfo& emitter, const Vector3i& prevPos, ProjectileType type, int damage);

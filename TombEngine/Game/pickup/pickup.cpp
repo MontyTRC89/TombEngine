@@ -296,10 +296,10 @@ void DoPickup(ItemInfo* laraItem)
 		{
 			lara->Control.Weapon.RequestGunType = LaraWeaponType::Flare;
 			lara->Control.Weapon.GunType = LaraWeaponType::Flare;
-			InitialiseNewWeapon(laraItem);
+			InitialiseNewWeapon(*laraItem);
 			lara->Control.HandStatus = HandStatus::Special;
 			lara->Flare.Life = int(pickupItem->Data) & 0x7FFF;
-			DrawFlareMeshes(laraItem);
+			DrawFlareMeshes(*laraItem);
 			KillItem(pickupItemNumber);
 
 			pickupItem->Pose.Orientation = prevOrient;
@@ -310,7 +310,7 @@ void DoPickup(ItemInfo* laraItem)
 		{
 			lara->Control.Weapon.RequestGunType = LaraWeaponType::Flare;
 			lara->Control.Weapon.GunType = LaraWeaponType::Flare;
-			InitialiseNewWeapon(laraItem);
+			InitialiseNewWeapon(*laraItem);
 			lara->Control.HandStatus = HandStatus::Special;
 			lara->Flare.Life = int(pickupItem->Data) & 0x7FFF;
 			KillItem(pickupItemNumber);

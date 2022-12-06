@@ -130,7 +130,7 @@ namespace TEN::Entities::Generic
 				else if (lara->LeftArm.FrameNumber == 12)
 				{
 					laraItem->Model.MeshIndex[LM_LHAND] = laraItem->Model.BaseMesh + LM_LHAND;
-					CreateFlare(laraItem, ID_BURNING_TORCH_ITEM, true);
+					CreateFlare(*laraItem, ID_BURNING_TORCH_ITEM, true);
 				}
 			}
 		}
@@ -150,7 +150,7 @@ namespace TEN::Entities::Generic
 			else if (lara->LeftArm.FrameNumber == 36)
 			{
 				laraItem->Model.MeshIndex[LM_LHAND] = laraItem->Model.BaseMesh + LM_LHAND;
-				CreateFlare(laraItem, ID_BURNING_TORCH_ITEM, false);
+				CreateFlare(*laraItem, ID_BURNING_TORCH_ITEM, false);
 			}
 		}
 		else if (lara->Torch.State == TorchState::JustLit)
@@ -189,7 +189,7 @@ namespace TEN::Entities::Generic
 		auto* lara = GetLaraInfo(laraItem);
 
 		if (lara->Control.Weapon.GunType == LaraWeaponType::Flare)
-			CreateFlare(laraItem, ID_FLARE_ITEM, false);
+			CreateFlare(*laraItem, ID_FLARE_ITEM, false);
 
 		lara->Control.HandStatus = HandStatus::WeaponReady;
 		lara->Control.Weapon.RequestGunType = LaraWeaponType::Torch;

@@ -676,8 +676,8 @@ namespace TEN::Entities::Vehicles
 		auto* lara = GetLaraInfo(laraItem);
 		auto& weapon = Weapons[(int)LaraWeaponType::Snowmobile];
 
-		FindNewTarget(laraItem, weapon);
-		AimWeapon(laraItem, lara->RightArm, weapon);
+		FindNewTarget(*laraItem, weapon);
+		AimWeapon(*laraItem, lara->RightArm, weapon);
 
 		if (TrInput & VEHICLE_IN_FIRE && !skidooItem->ItemFlags[0])
 		{
@@ -687,8 +687,8 @@ namespace TEN::Entities::Vehicles
 				0
 			);
 
-			if ((int)FireWeapon(LaraWeaponType::Pistol, lara->TargetEntity, laraItem, angles) +
-				(int)FireWeapon(LaraWeaponType::Pistol, lara->TargetEntity, laraItem, angles))
+			if ((int)FireWeapon(LaraWeaponType::Pistol, *lara->TargetEntity, *laraItem, angles) +
+				(int)FireWeapon(LaraWeaponType::Pistol, *lara->TargetEntity, *laraItem, angles))
 			{
 				skidoo->FlashTimer = 2;
 				SoundEffect(weapon.SampleNum, &laraItem->Pose);

@@ -285,18 +285,18 @@ WeaponInfo Weapons[(int)LaraWeaponType::NumWeapons] =
 	}
 };
 
-void InitialiseNewWeapon(ItemInfo* laraItem)
+void InitialiseNewWeapon(ItemInfo& laraItem)
 {
-	auto& lara = *GetLaraInfo(laraItem);
+	auto& lara = *GetLaraInfo(&laraItem);
 
-	lara.LeftArm.FrameNumber = 0;
-	lara.RightArm.FrameNumber = 0;
-	lara.LeftArm.Orientation = EulerAngles::Zero;
-	lara.RightArm.Orientation = EulerAngles::Zero;
 	lara.TargetEntity = nullptr;
-	lara.LeftArm.Locked = false;
+	lara.LeftArm.FrameNumber =
+	lara.RightArm.FrameNumber = 0;
+	lara.LeftArm.Orientation =
+	lara.RightArm.Orientation = EulerAngles::Zero;
+	lara.LeftArm.Locked =
 	lara.RightArm.Locked = false;
-	lara.LeftArm.GunFlash = 0;
+	lara.LeftArm.GunFlash =
 	lara.RightArm.GunFlash = 0;
 
 	switch (lara.Control.Weapon.GunType)
@@ -335,8 +335,8 @@ void InitialiseNewWeapon(ItemInfo* laraItem)
 		break;
 
 	default:
-		lara.RightArm.FrameBase = g_Level.Anims[laraItem->Animation.AnimNumber].FramePtr;
-		lara.LeftArm.FrameBase = g_Level.Anims[laraItem->Animation.AnimNumber].FramePtr;
+		lara.RightArm.FrameBase = g_Level.Anims[laraItem.Animation.AnimNumber].FramePtr;
+		lara.LeftArm.FrameBase = g_Level.Anims[laraItem.Animation.AnimNumber].FramePtr;
 		break;
 	}
 }
@@ -346,23 +346,23 @@ Ammo& GetAmmo(LaraInfo& lara, LaraWeaponType weaponType)
 	return lara.Weapons[(int)weaponType].Ammo[(int)lara.Weapons[(int)weaponType].SelectedAmmo];
 }
 
-GameVector GetTargetPoint(ItemInfo* targetEntity)
+GameVector GetTargetPoint(ItemInfo& targetEntity)
 {
-	const auto& bounds = *(GameBoundingBox*)GetBestFrame(targetEntity);
+	const auto& bounds = *(GameBoundingBox*)GetBestFrame(&targetEntity);
 
 	auto center = Vector3i(
 		(bounds.X1 + bounds.X2) / 2,
 		bounds.Y1 + (bounds.GetHeight() / 3),
 		(bounds.Z1 + bounds.Z2) / 2);
 
-	float sinY = phd_sin(targetEntity->Pose.Orientation.y);
-	float cosY = phd_cos(targetEntity->Pose.Orientation.y);
+	float sinY = phd_sin(targetEntity.Pose.Orientation.y);
+	float cosY = phd_cos(targetEntity.Pose.Orientation.y);
 
 	return GameVector(
-		targetEntity->Pose.Position.x + ((center.x * cosY) + (center.z * sinY)),
-		targetEntity->Pose.Position.y + center.y,
-		targetEntity->Pose.Position.z + ((center.z * cosY) - (center.x * sinY)),
-		targetEntity->RoomNumber);
+		targetEntity.Pose.Position.x + ((center.x * cosY) + (center.z * sinY)),
+		targetEntity.Pose.Position.y + center.y,
+		targetEntity.Pose.Position.z + ((center.z * cosY) - (center.x * sinY)),
+		targetEntity.RoomNumber);
 }
 
 HolsterSlot GetWeaponHolsterSlot(LaraWeaponType weaponType)
@@ -437,9 +437,9 @@ GAME_OBJECT_ID GetWeaponObjectID(LaraWeaponType weaponType)
 	}
 }
 
-GAME_OBJECT_ID GetWeaponObjectMeshID(ItemInfo* laraItem, LaraWeaponType weaponType)
+GAME_OBJECT_ID GetWeaponObjectMeshID(ItemInfo& laraItem, LaraWeaponType weaponType)
 {
-	const auto& lara = *GetLaraInfo(laraItem);
+	const auto& lara = *GetLaraInfo(&laraItem);
 
 	switch (weaponType)
 	{
@@ -472,9 +472,9 @@ GAME_OBJECT_ID GetWeaponObjectMeshID(ItemInfo* laraItem, LaraWeaponType weaponTy
 	}
 }
 
-void HandleWeapon(ItemInfo* laraItem)
+void HandleWeapon(ItemInfo& laraItem)
 {
-	auto& lara = *GetLaraInfo(laraItem);
+	auto& lara = *GetLaraInfo(&laraItem);
 
 	if (lara.LeftArm.GunFlash > 0)
 		--lara.LeftArm.GunFlash;
@@ -497,7 +497,7 @@ void HandleWeapon(ItemInfo* laraItem)
 		return;
 	}
 
-	if (laraItem->HitPoints <= 0)
+	if (laraItem.HitPoints <= 0)
 	{
 		lara.Control.HandStatus = HandStatus::Free;
 	}
@@ -590,8 +590,8 @@ void HandleWeapon(ItemInfo* laraItem)
 	}
 	else if (IsHeld(In::Flare) &&
 		lara.Control.HandStatus == HandStatus::Busy &&
-		laraItem->Animation.ActiveState == LS_CRAWL_IDLE &&
-		laraItem->Animation.AnimNumber == LA_CRAWL_IDLE)
+		laraItem.Animation.ActiveState == LS_CRAWL_IDLE &&
+		laraItem.Animation.AnimNumber == LA_CRAWL_IDLE)
 	{
 		lara.Control.Weapon.RequestGunType = LaraWeaponType::Flare;
 	}
@@ -644,7 +644,7 @@ void HandleWeapon(ItemInfo* laraItem)
 		break;
 
 	case HandStatus::WeaponUndraw:
-		laraItem->Model.MeshIndex[LM_HEAD] = laraItem->Model.BaseMesh + LM_HEAD;
+		laraItem.Model.MeshIndex[LM_HEAD] = laraItem.Model.BaseMesh + LM_HEAD;
 
 		switch (lara.Control.Weapon.GunType)
 		{
@@ -675,9 +675,9 @@ void HandleWeapon(ItemInfo* laraItem)
 
 	case HandStatus::WeaponReady:
 		if (!IsHeld(In::Action))
-			laraItem->Model.MeshIndex[LM_HEAD] = laraItem->Model.BaseMesh + LM_HEAD;
+			laraItem.Model.MeshIndex[LM_HEAD] = laraItem.Model.BaseMesh + LM_HEAD;
 		else
-			laraItem->Model.MeshIndex[LM_HEAD] = Objects[ID_LARA_SCREAM].meshIndex + LM_HEAD;
+			laraItem.Model.MeshIndex[LM_HEAD] = Objects[ID_LARA_SCREAM].meshIndex + LM_HEAD;
 
 		if (Camera.type != CameraType::Look &&
 			Camera.type != CameraType::Heavy)
@@ -722,7 +722,7 @@ void HandleWeapon(ItemInfo* laraItem)
 	case HandStatus::Free:
 		if (lara.Control.Weapon.GunType == LaraWeaponType::Flare)
 		{
-			if (lara.Vehicle != NO_ITEM || TestState(laraItem->Animation.ActiveState, FlarePoseStates))
+			if (lara.Vehicle != NO_ITEM || TestState(laraItem.Animation.ActiveState, FlarePoseStates))
 			{
 				if (lara.Flare.ControlLeft)
 				{
@@ -752,9 +752,9 @@ void HandleWeapon(ItemInfo* laraItem)
 	case HandStatus::Busy:
 		if (lara.Control.Weapon.GunType == LaraWeaponType::Flare)
 		{
-			if (laraItem->Model.MeshIndex[LM_LHAND] == Objects[ID_FLARE_ANIM].meshIndex + LM_LHAND)
+			if (laraItem.Model.MeshIndex[LM_LHAND] == Objects[ID_FLARE_ANIM].meshIndex + LM_LHAND)
 			{
-				lara.Flare.ControlLeft = (lara.Vehicle != NO_ITEM || TestState(laraItem->Animation.ActiveState, FlarePoseStates));
+				lara.Flare.ControlLeft = (lara.Vehicle != NO_ITEM || TestState(laraItem.Animation.ActiveState, FlarePoseStates));
 				DoFlareInHand(laraItem, lara.Flare.Life);
 				SetFlareArm(laraItem, lara.LeftArm.FrameNumber);
 			}
@@ -764,17 +764,17 @@ void HandleWeapon(ItemInfo* laraItem)
 	}
 }
 
-void AimWeapon(ItemInfo* laraItem, ArmInfo& arm, const WeaponInfo& weaponInfo)
+void AimWeapon(ItemInfo& laraItem, ArmInfo& arm, const WeaponInfo& weaponInfo)
 {
-	const auto& lara = *GetLaraInfo(laraItem);
+	const auto& lara = *GetLaraInfo(&laraItem);
 
 	auto targetArmOrient = arm.Locked ? lara.TargetArmOrient : EulerAngles::Zero;
 	arm.Orientation.InterpolateConstant(targetArmOrient, weaponInfo.AimSpeed);
 }
 
-FireWeaponType FireWeapon(LaraWeaponType weaponType, ItemInfo* targetEntity, ItemInfo* laraItem, const EulerAngles& armOrient)
+FireWeaponType FireWeapon(LaraWeaponType weaponType, ItemInfo& targetEntity, ItemInfo& laraItem, const EulerAngles& armOrient)
 {
-	auto& lara = *GetLaraInfo(laraItem);
+	auto& lara = *GetLaraInfo(&laraItem);
 	auto& ammo = GetAmmo(lara, weaponType);
 
 	if (ammo.GetCount() == 0 && !ammo.HasInfinite())
@@ -790,8 +790,8 @@ FireWeaponType FireWeapon(LaraWeaponType weaponType, ItemInfo* targetEntity, Ite
 		armOrient.y + (Random::GenerateAngle(0, ANGLE(180.0f)) - ANGLE(90.0f)) * weapon.ShotAccuracy / 65536,
 		0);
 
-	auto muzzleOffset = GetJointPosition(laraItem, LM_RHAND);
-	auto pos = Vector3i(laraItem->Pose.Position.x, muzzleOffset.y, laraItem->Pose.Position.z);
+	auto muzzleOffset = GetJointPosition(&laraItem, LM_RHAND);
+	auto pos = Vector3i(laraItem.Pose.Position.x, muzzleOffset.y, laraItem.Pose.Position.z);
 
 	// Calculate ray from wobbled orientation.
 	auto directionNorm = wobbledArmOrient.ToDirection();
@@ -799,7 +799,7 @@ FireWeaponType FireWeapon(LaraWeaponType weaponType, ItemInfo* targetEntity, Ite
 	auto target = origin + (directionNorm * weapon.TargetDist);
 	auto ray = Ray(origin, directionNorm);
 
-	int num = GetSpheres(targetEntity, CreatureSpheres, SPHERES_SPACE_WORLD, Matrix::Identity);
+	int num = GetSpheres(&targetEntity, CreatureSpheres, SPHERES_SPACE_WORLD, Matrix::Identity);
 	int bestItemNumber = NO_ITEM;
 	float bestDistance = INFINITY;
 
@@ -821,7 +821,7 @@ FireWeaponType FireWeapon(LaraWeaponType weaponType, ItemInfo* targetEntity, Ite
 	lara.Control.Weapon.Fired = true;
 	
 	auto vOrigin = GameVector(pos);
-	short roomNumber = laraItem->RoomNumber;
+	short roomNumber = laraItem.RoomNumber;
 	GetFloor(pos.x, pos.y, pos.z, &roomNumber);
 	vOrigin.RoomNumber = roomNumber;
 
@@ -888,12 +888,12 @@ FireWeaponType FireWeapon(LaraWeaponType weaponType, ItemInfo* targetEntity, Ite
 	}
 }
 
-void FindNewTarget(ItemInfo* laraItem, const WeaponInfo& weaponInfo)
+void FindNewTarget(ItemInfo& laraItem, const WeaponInfo& weaponInfo)
 {
 	if (!g_Configuration.AutoTarget)
 		return;
 
-	auto& lara = *GetLaraInfo(laraItem);
+	auto& lara = *GetLaraInfo(&laraItem);
 
 	if (BinocularRange)
 	{
@@ -902,10 +902,10 @@ void FindNewTarget(ItemInfo* laraItem, const WeaponInfo& weaponInfo)
 	}
 
 	auto origin = GameVector(
-		laraItem->Pose.Position.x,
-		GetJointPosition(laraItem, LM_RHAND).y, // Muzzle offset.
-		laraItem->Pose.Position.z,
-		laraItem->RoomNumber);
+		laraItem.Pose.Position.x,
+		GetJointPosition(&laraItem, LM_RHAND).y, // Muzzle offset.
+		laraItem.Pose.Position.z,
+		laraItem.RoomNumber);
 
 	ItemInfo* bestEntity = nullptr;
 	float bestDistance = INFINITY;
@@ -913,13 +913,13 @@ void FindNewTarget(ItemInfo* laraItem, const WeaponInfo& weaponInfo)
 	unsigned int numTargets = 0;
 	float maxDistance = weaponInfo.TargetDist;
 
-	for (auto* activeCreature : ActiveCreatures)
+	for (auto* activeCreaturePtr : ActiveCreatures)
 	{
 		// Continue loop if no item.
-		if (activeCreature->ItemNumber == NO_ITEM)
+		if (activeCreaturePtr->ItemNumber == NO_ITEM)
 			continue;
 
-		auto& item = g_Level.Items[activeCreature->ItemNumber];
+		auto& item = g_Level.Items[activeCreaturePtr->ItemNumber];
 
 		// Check whether creature is alive.
 		if (item.HitPoints <= 0)
@@ -931,12 +931,12 @@ void FindNewTarget(ItemInfo* laraItem, const WeaponInfo& weaponInfo)
 			continue;
 
 		// Assess line of sight.
-		auto target = GetTargetPoint(&item);
+		auto target = GetTargetPoint(item);
 		if (!LOS(&origin, &target))
 			continue;
 
 		// Assess whether relative orientation falls within weapon's lock constraints.
-		auto orient = Geometry::GetOrientToPoint(origin.ToVector3(), target.ToVector3()) - (laraItem->Pose.Orientation + lara.ExtraTorsoRot);
+		auto orient = Geometry::GetOrientToPoint(origin.ToVector3(), target.ToVector3()) - (laraItem.Pose.Orientation + lara.ExtraTorsoRot);
 		if (orient.x >= weaponInfo.LockOrientConstraint.first.x &&
 			orient.y >= weaponInfo.LockOrientConstraint.first.y &&
 			orient.x <= weaponInfo.LockOrientConstraint.second.x &&
@@ -1025,9 +1025,9 @@ void FindNewTarget(ItemInfo* laraItem, const WeaponInfo& weaponInfo)
 	LaraTargetInfo(laraItem, weaponInfo);
 }
 
-void LaraTargetInfo(ItemInfo* laraItem, const WeaponInfo& weaponInfo)
+void LaraTargetInfo(ItemInfo& laraItem, const WeaponInfo& weaponInfo)
 {
-	auto& lara = *GetLaraInfo(laraItem);
+	auto& lara = *GetLaraInfo(&laraItem);
 
 	if (lara.TargetEntity == nullptr)
 	{
@@ -1038,13 +1038,13 @@ void LaraTargetInfo(ItemInfo* laraItem, const WeaponInfo& weaponInfo)
 	}
 
 	auto origin = GameVector(
-		laraItem->Pose.Position.x,
-		GetJointPosition(laraItem, LM_RHAND).y, // Muzzle offset.
-		laraItem->Pose.Position.z,
-		laraItem->RoomNumber);
-	auto target = GetTargetPoint(lara.TargetEntity);
+		laraItem.Pose.Position.x,
+		GetJointPosition(&laraItem, LM_RHAND).y, // Muzzle offset.
+		laraItem.Pose.Position.z,
+		laraItem.RoomNumber);
+	auto target = GetTargetPoint(*lara.TargetEntity);
 
-	auto orient = Geometry::GetOrientToPoint(origin.ToVector3(), target.ToVector3()) - laraItem->Pose.Orientation;
+	auto orient = Geometry::GetOrientToPoint(origin.ToVector3(), target.ToVector3()) - laraItem.Pose.Orientation;
 
 	if (LOS(&origin, &target))
 	{
@@ -1090,16 +1090,16 @@ void LaraTargetInfo(ItemInfo* laraItem, const WeaponInfo& weaponInfo)
 	lara.TargetArmOrient = orient;
 }
 
-void HitTarget(ItemInfo* laraItem, ItemInfo* targetEntity, GameVector* hitPos, int damage, int grenade)
+void HitTarget(ItemInfo& laraItem, ItemInfo& targetEntity, GameVector* hitPos, int damage, int grenade)
 {
-	const auto& lara = *GetLaraInfo(laraItem);
+	const auto& lara = *GetLaraInfo(&laraItem);
 
-	targetEntity->HitStatus = true;
+	targetEntity.HitStatus = true;
 
-	if (targetEntity->IsCreature())
-		GetCreatureInfo(targetEntity)->HurtByLara = true;
+	if (targetEntity.IsCreature())
+		GetCreatureInfo(&targetEntity)->HurtByLara = true;
 
-	const auto& object = Objects[targetEntity->ObjectNumber];
+	const auto& object = Objects[targetEntity.ObjectNumber];
 
 	if (hitPos != nullptr)
 	{
@@ -1108,35 +1108,35 @@ void HitTarget(ItemInfo* laraItem, ItemInfo* targetEntity, GameVector* hitPos, i
 			switch (object.hitEffect)
 			{
 			case HIT_BLOOD:
-				if (targetEntity->ObjectNumber == ID_BADDY2 &&
-					(targetEntity->Animation.ActiveState == 8 || GetRandomControl() & 1) &&
+				if (targetEntity.ObjectNumber == ID_BADDY2 &&
+					(targetEntity.Animation.ActiveState == 8 || GetRandomControl() & 1) &&
 					(lara.Control.Weapon.GunType == LaraWeaponType::Pistol ||
 						lara.Control.Weapon.GunType == LaraWeaponType::Shotgun ||
 						lara.Control.Weapon.GunType == LaraWeaponType::Uzi))
 				{
 					// Baddy2 gun hitting sword
-					SoundEffect(SFX_TR4_BADDY_SWORD_RICOCHET, &targetEntity->Pose);
-					TriggerRicochetSpark(*hitPos, laraItem->Pose.Orientation.y, 3, 0);
+					SoundEffect(SFX_TR4_BADDY_SWORD_RICOCHET, &targetEntity.Pose);
+					TriggerRicochetSpark(*hitPos, laraItem.Pose.Orientation.y, 3, 0);
 					return;
 				}
 				else
 				{
-					DoBloodSplat(hitPos->x, hitPos->y, hitPos->z, (GetRandomControl() & 3) + 3, targetEntity->Pose.Orientation.y, targetEntity->RoomNumber);
+					DoBloodSplat(hitPos->x, hitPos->y, hitPos->z, (GetRandomControl() & 3) + 3, targetEntity.Pose.Orientation.y, targetEntity.RoomNumber);
 				}
 
 				break;
 
 			case HIT_RICOCHET:
-				TriggerRicochetSpark(*hitPos, laraItem->Pose.Orientation.y, 3, 0);
+				TriggerRicochetSpark(*hitPos, laraItem.Pose.Orientation.y, 3, 0);
 				break;
 
 			case HIT_SMOKE:
-				TriggerRicochetSpark(*hitPos, laraItem->Pose.Orientation.y, 3, -5);
+				TriggerRicochetSpark(*hitPos, laraItem.Pose.Orientation.y, 3, -5);
 
-				if (targetEntity->ObjectNumber == ID_ROMAN_GOD1 ||
-					targetEntity->ObjectNumber == ID_ROMAN_GOD2)
+				if (targetEntity.ObjectNumber == ID_ROMAN_GOD1 ||
+					targetEntity.ObjectNumber == ID_ROMAN_GOD2)
 				{
-					SoundEffect(SFX_TR5_SWORD_GOD_HIT_METAL, &targetEntity->Pose);
+					SoundEffect(SFX_TR5_SWORD_GOD_HIT_METAL, &targetEntity.Pose);
 				}
 
 				break;
@@ -1146,17 +1146,17 @@ void HitTarget(ItemInfo* laraItem, ItemInfo* targetEntity, GameVector* hitPos, i
 
 	if (!object.undead || grenade)
 	{
-		if (targetEntity->HitPoints > 0)
+		if (targetEntity.HitPoints > 0)
 		{
 			Statistics.Level.AmmoHits++;
-			DoDamage(targetEntity, damage);
+			DoDamage(&targetEntity, damage);
 		}
 	}
 
-	if (!targetEntity->Callbacks.OnHit.empty())
+	if (!targetEntity.Callbacks.OnHit.empty())
 	{
-		short index = g_GameScriptEntities->GetIndexByName(targetEntity->Name);
-		g_GameScript->ExecuteFunction(targetEntity->Callbacks.OnHit, index);
+		short index = g_GameScriptEntities->GetIndexByName(targetEntity.Name);
+		g_GameScript->ExecuteFunction(targetEntity.Callbacks.OnHit, index);
 	}
 }
 

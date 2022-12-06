@@ -163,7 +163,7 @@ void InitialiseLaraLevelJump(short itemNum, LaraInfo* lBackup)
 	lara->Control.HandStatus = lBackup->Control.HandStatus;
 	lara->Control.Weapon = lBackup->Control.Weapon;
 	lara->Flare = lBackup->Flare;
-	DrawFlareMeshes(item);
+	DrawFlareMeshes(*item);
 }
 
 void InitialiseLaraDefaultInventory()

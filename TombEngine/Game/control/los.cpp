@@ -168,7 +168,7 @@ bool GetTargetOnLOS(GameVector* origin, GameVector* target, bool drawTarget, boo
 								Lara.Control.Weapon.GunType == LaraWeaponType::HK))
 							{
 								if (Objects[item->ObjectNumber].intelligent)
-									HitTarget(LaraItem, item, &target2, Weapons[(int)Lara.Control.Weapon.GunType].Damage, 0);
+									HitTarget(*LaraItem, *item, &target2, Weapons[(int)Lara.Control.Weapon.GunType].Damage, 0);
 								else
 								{
 									// TR5
@@ -255,7 +255,7 @@ bool GetTargetOnLOS(GameVector* origin, GameVector* target, bool drawTarget, boo
 			else
 			{
 				if (LaserSight && isFiring)
-					FireCrossBowFromLaserSight(LaraItem, origin, &target2);
+					FireCrossBowFromLaserSight(*LaraItem, origin, &target2);
 			}
 		}
 
@@ -266,7 +266,7 @@ bool GetTargetOnLOS(GameVector* origin, GameVector* target, bool drawTarget, boo
 		if (Lara.Control.Weapon.GunType == LaraWeaponType::Crossbow)
 		{
 			if (isFiring && LaserSight)
-				FireCrossBowFromLaserSight(LaraItem, origin, &target2);
+				FireCrossBowFromLaserSight(*LaraItem, origin, &target2);
 		}
 		else
 		{

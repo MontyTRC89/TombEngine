@@ -251,8 +251,8 @@ namespace TEN::Entities::Vehicles
 
 		if (lara->Control.Weapon.GunType == LaraWeaponType::Flare)
 		{
-			CreateFlare(laraItem, ID_FLARE_ITEM, 0);
-			UndrawFlareMeshes(laraItem);
+			CreateFlare(*laraItem, ID_FLARE_ITEM, 0);
+			UndrawFlareMeshes(*laraItem);
 			lara->Control.Weapon.GunType = LaraWeaponType::None;
 			lara->Control.Weapon.RequestGunType = LaraWeaponType::None;
 			lara->Flare.ControlLeft = false;

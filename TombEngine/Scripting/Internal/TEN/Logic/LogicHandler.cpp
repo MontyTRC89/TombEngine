@@ -348,13 +348,9 @@ void LogicHandler::SetVariables(std::vector<SavedVar> const & vars)
 					// todo: should we throw a warning if the user tries to save or load a value
 					// outside of these bounds? - squidshire 30/04/2022
 					if (std::trunc(theNum) == theNum && theNum <= INT64_MAX && theNum >= INT64_MIN)
-					{
 						solTables[i][vars[first]] = static_cast<int64_t>(theNum);
-					}
 					else
-					{
 						solTables[i][vars[first]] = vars[second];
-					}
 				}
 				else if (std::holds_alternative<Vector3i>(vars[second]))
 				{
@@ -545,19 +541,19 @@ void LogicHandler::GetVariables(std::vector<SavedVar> & vars)
 
 void LogicHandler::GetCallbackStrings(std::vector<std::string>& preControl, std::vector<std::string>& postControl) const
 {
-	for (auto const& s : m_callbacksPreControl)
+	for (const auto& s : m_callbacksPreControl)
 		preControl.push_back(s);
 
-	for (auto const& s : m_callbacksPostControl)
+	for (const auto& s : m_callbacksPostControl)
 		postControl.push_back(s);
 }
 
 void LogicHandler::SetCallbackStrings(std::vector<std::string> const & preControl, std::vector<std::string> const & postControl)
 {
-	for (auto const& s : preControl)
+	for (const auto& s : preControl)
 		m_callbacksPreControl.insert(s);
 
-	for (auto const& s : postControl)
+	for (const auto& s : postControl)
 		m_callbacksPostControl.insert(s);
 }
 
@@ -579,7 +575,6 @@ void LogicHandler::ResetVariables()
 {
 	(*m_handler.GetState())["Lara"] = nullptr;
 }
-
 
 void LogicHandler::ShortenTENCalls()
 {
@@ -625,20 +620,16 @@ void LogicHandler::ExecuteFunction(std::string const& name, short idOne, short i
 	sol::protected_function func = m_levelFuncs_luaFunctions[name];
 
 	func(std::make_unique<Moveable>(idOne), std::make_unique<Moveable>(idTwo));
-
 }
 
 void LogicHandler::ExecuteFunction(std::string const& name, TEN::Control::Volumes::VolumeTriggerer triggerer, std::string const& arguments)
 {
 	sol::protected_function func = (*m_handler.GetState())[ScriptReserved_LevelFuncs][name.c_str()];
+
 	if (std::holds_alternative<short>(triggerer))
-	{
 		func(std::make_unique<Moveable>(std::get<short>(triggerer), true), arguments);
-	}
 	else
-	{
 		func(nullptr, arguments);
-	}
 }
 
 static void doCallback(sol::protected_function const & func, std::optional<float> dt = std::nullopt)
@@ -660,13 +651,13 @@ void LogicHandler::OnStart()
 
 void LogicHandler::OnLoad()
 {
-	if(m_onLoad.valid())
+	if (m_onLoad.valid())
 		doCallback(m_onLoad);
 }
 
 void LogicHandler::OnControlPhase(float dt)
 {
-	auto tryCall = [this, dt](std::string const& name)
+	auto tryCall = [this, dt](const std::string& name)
 	{
 		auto func = m_handler.GetState()->script("return " + name);
 
@@ -802,16 +793,17 @@ and provides the delta time (a float representing game time since last call) via
 
 void LogicHandler::InitCallbacks()
 {
-	auto assignCB = [this](sol::protected_function& func, std::string const & luaFunc) {
+	auto assignCB = [this](sol::protected_function& func, std::string const & luaFunc)
+	{
 		auto state = m_handler.GetState();
 		std::string fullName = std::string{ ScriptReserved_LevelFuncs } + "." + luaFunc;
 
 		sol::object theData = (*state)[ScriptReserved_LevelFuncs][luaFunc];
 
-		std::string msg{ "Level's script does not define callback " + fullName
-			+ ". Defaulting to no " + fullName + " behaviour."};
+		std::string msg{ "Level's script does not define callback " + fullName +
+			". Defaulting to no " + fullName + " behaviour."};
 
-		if(!theData.valid())
+		if (!theData.valid())
 		{
 			TENLog(msg);
 			return;
@@ -821,9 +813,8 @@ void LogicHandler::InitCallbacks()
 
 		func = m_levelFuncs_luaFunctions[fnh.m_funcName];
 
-		if (!func.valid()) {
+		if (!func.valid())
 			TENLog(msg);
-		}
 	};
 
 	assignCB(m_onStart, "OnStart");

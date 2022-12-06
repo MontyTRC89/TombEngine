@@ -48,20 +48,20 @@ struct WeaponInfo
 extern int FlashGrenadeAftershockTimer;
 extern WeaponInfo Weapons[(int)LaraWeaponType::NumWeapons];
 
-void InitialiseNewWeapon(ItemInfo* laraItem);
+void InitialiseNewWeapon(ItemInfo& laraItem);
 
 Ammo&		   GetAmmo(LaraInfo& lara, LaraWeaponType weaponType);
-GameVector	   GetTargetPoint(ItemInfo* targetEntity);
+GameVector	   GetTargetPoint(ItemInfo& targetEntity);
 HolsterSlot	   GetWeaponHolsterSlot(LaraWeaponType weaponType);
 GAME_OBJECT_ID GetWeaponObjectID(LaraWeaponType weaponType);
-GAME_OBJECT_ID GetWeaponObjectMeshID(ItemInfo* laraItem, LaraWeaponType weaponType);
+GAME_OBJECT_ID GetWeaponObjectMeshID(ItemInfo& laraItem, LaraWeaponType weaponType);
 
-void HandleWeapon(ItemInfo* laraItem);
-void AimWeapon(ItemInfo* laraItem, ArmInfo& arm, const WeaponInfo& weaponInfo);
-FireWeaponType FireWeapon(LaraWeaponType weaponType, ItemInfo* targetEntity, ItemInfo* laraItem, const EulerAngles& armOrient);
+void HandleWeapon(ItemInfo& laraItem);
+void AimWeapon(ItemInfo& laraItem, ArmInfo& arm, const WeaponInfo& weaponInfo);
+FireWeaponType FireWeapon(LaraWeaponType weaponType, ItemInfo& targetEntity, ItemInfo& laraItem, const EulerAngles& armOrient);
 
-void FindNewTarget(ItemInfo* laraItem, const WeaponInfo& weaponInfo);
-void LaraTargetInfo(ItemInfo* laraItem, const WeaponInfo& weaponInfo);
-void HitTarget(ItemInfo* laraItem, ItemInfo* targetEntity, GameVector* hitPos, int damage, int flag);
+void FindNewTarget(ItemInfo& laraItem, const WeaponInfo& weaponInfo);
+void LaraTargetInfo(ItemInfo& laraItem, const WeaponInfo& weaponInfo);
+void HitTarget(ItemInfo& laraItem, ItemInfo& targetEntity, GameVector* hitPos, int damage, int flag);
 
 void SmashItem(short itemNumber);

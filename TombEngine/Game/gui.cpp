@@ -1821,7 +1821,7 @@ namespace TEN::Gui
 							ClearAllActions();
 							ActionMap[(int)In::Flare].Update(1.0f);
 
-							HandleWeapon(item);
+							HandleWeapon(*item);
 							ClearAllActions();
 						}
 
