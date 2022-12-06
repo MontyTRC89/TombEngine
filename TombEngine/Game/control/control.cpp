@@ -361,14 +361,14 @@ unsigned CALLBACK GameMain(void *)
 	return true;
 }
 
-GameStatus DoLevel(int index, bool loadGame)
+GameStatus DoLevel(int levelIndex, bool loadGame)
 {
-	bool title = !index;
+	bool title = !levelIndex;
 
 	TENLog(title ? "DoTitle" : "DoLevel", LogLevel::Info);
 
 	// Load the level. Fall back to title if unsuccessful.
-	if (!LoadLevelFile(index))
+	if (!LoadLevelFile(levelIndex))
 		return title ? GameStatus::ExitGame : GameStatus::ExitToTitle;
 
 	// Initialize items, effects, lots and cameras.
@@ -384,7 +384,7 @@ GameStatus DoLevel(int index, bool loadGame)
 	InitialiseOrLoadGame(loadGame);
 
 	// Initialize scripting.
-	InitialiseScripting(index, loadGame);
+	InitialiseScripting(levelIndex, loadGame);
 
 	// Prepare title menu, if necessary.
 	if (title)
@@ -394,7 +394,7 @@ GameStatus DoLevel(int index, bool loadGame)
 	}
 
 	// DoGameLoop returns only when level has ended.
-	return DoGameLoop(index);
+	return DoGameLoop(levelIndex);
 }
 
 void UpdateShatters()
@@ -506,13 +506,14 @@ void CleanUp()
 	g_Renderer.ClearScene();
 }
 
-void InitialiseScripting(int index, bool loadGame)
+void InitialiseScripting(int levelIndex, bool loadGame)
 {
 	g_GameStringsHandler->ClearDisplayStrings();
-	g_GameScript->ResetScripts(!index || loadGame);
+	g_GameScript->ResetScripts(!levelIndex || loadGame);
 
-	// Run level script.
-	auto* level = g_GameFlow->GetLevel(index);
+	auto* level = g_GameFlow->GetLevel(levelIndex);
+
+	// Run level script, if exists.
 	if (!level->ScriptFileName.empty())
 	{
 		g_GameScript->ExecuteScriptFile(level->ScriptFileName);
@@ -534,13 +535,13 @@ void InitialiseScripting(int index, bool loadGame)
 	PlaySoundTrack(level->GetAmbientTrack(), SoundTrackType::BGM);
 }
 
-void DeInitialiseScripting(int index)
+void DeInitialiseScripting(int levelIndex)
 {
 	g_GameScript->OnEnd();
 	g_GameScript->FreeLevelScripts();
 	g_GameScriptEntities->FreeEntities();
 
-	if (!index)
+	if (!levelIndex)
 		g_GameScript->ResetScripts(true);
 }
 
@@ -582,7 +583,7 @@ void InitialiseOrLoadGame(bool loadGame)
 	}
 }
 
-GameStatus DoGameLoop(int index)
+GameStatus DoGameLoop(int levelIndex)
 {
 	// Before entering actual game loop, ControlPhase must be
 	// called once to sort out various runtime shenanigangs (e.g. hair).
@@ -594,7 +595,7 @@ GameStatus DoGameLoop(int index)
 	{
 		result = ControlPhase(numFrames);
 
-		if (!index)
+		if (!levelIndex)
 		{
 			UpdateInputActions(LaraItem);
 
@@ -629,15 +630,19 @@ GameStatus DoGameLoop(int index)
 			}
 		}
 
-		numFrames = DrawPhase(!index);
+		numFrames = DrawPhase(!levelIndex);
 		Sound_UpdateScene();
 	}
 
-	DeInitialiseScripting(index);
+	EndGameLoop(levelIndex);
+	return result;
+}
+
+void EndGameLoop(int levelIndex)
+{
+	DeInitialiseScripting(levelIndex);
 
 	StopAllSounds();
 	StopSoundTracks();
 	StopRumble();
-
-	return result;
 }
