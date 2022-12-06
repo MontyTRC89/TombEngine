@@ -754,13 +754,16 @@ namespace TEN::Renderer
 			if (!drip.IsActive)
 				continue;
 
-			if (g_Level.Sprites.size() <= drip.SpriteIndex)
+			if (drip.SpriteIndex >= g_Level.Sprites.size())
 				continue;
 
-			AddSpriteBillboard(
+			auto axis = -drip.Velocity;
+			axis.Normalize();
+
+			AddSpriteBillboardConstrained(
 				&m_sprites[drip.SpriteIndex],
 				drip.Position,
-				drip.Color, 0.5f, 1.0f, Vector2(drip.Scale, drip.Scale) * 2, BLENDMODE_ALPHABLEND, true, view);
+				drip.Color, 0.5f, 1.0f, Vector2(drip.Scale, drip.Scale * 4) * 2, BLENDMODE_ADDITIVE, axis, true, view);
 		}
 	}
 
@@ -792,7 +795,7 @@ namespace TEN::Renderer
 			AddSprite3D(
 				&m_sprites[stain.SpriteIndex],
 				stain.VertexPoints[0], stain.VertexPoints[1], stain.VertexPoints[2], stain.VertexPoints[3],
-				stain.Color, 0.0f, 1.0f, Vector2::One, BLENDMODE_ALPHABLEND, false, view); // TODO: There might be a bug with some blend modes??
+				stain.Color, 0.0f, 1.0f, Vector2::One, BLENDMODE_ALPHABLEND, true, view); // TODO: There might be a bug with some blend modes??
 		}
 	}
 

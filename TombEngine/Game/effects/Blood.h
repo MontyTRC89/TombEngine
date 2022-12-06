@@ -15,8 +15,8 @@ namespace TEN::Effects::Blood
 
 	struct BloodMist
 	{
-		unsigned int SpriteIndex = 0;
-		bool		 IsActive	 = false;
+		unsigned int SpriteIndex   = 0;
+		bool		 IsActive	   = false;
 
 		Vector3 Position	  = Vector3::Zero;
 		int		RoomNumber	  = NO_ROOM;
@@ -38,8 +38,9 @@ namespace TEN::Effects::Blood
 
 	struct BloodDrip
 	{
-		unsigned int SpriteIndex = 0;
-		bool		 IsActive	 = false;
+		unsigned int SpriteIndex   = 0;
+		bool		 IsActive	   = false;
+		bool		 CanSpawnStain = false;
 
 		Vector3 Position   = Vector3::Zero;
 		int		RoomNumber = NO_ROOM;
@@ -90,7 +91,7 @@ namespace TEN::Effects::Blood
 
 	void SpawnBloodCloudUnderwater(const Vector3& pos, int roomNumber, float scale);
 
-	void SpawnBloodDrip(const Vector3& pos, int roomNumber, const Vector3& velocity, float scale);
+	void SpawnBloodDrip(const Vector3& pos, int roomNumber, const Vector3& velocity, float scale, bool canSpawnStain = true);
 	void SpawnBloodDripSpray(const Vector3& pos, int roomNumber, const Vector3& direction, const Vector3& baseVelocity, unsigned int count = BLOOD_DRIP_SPRAY_NUM_DEFAULT);
 
 	void SpawnBloodStain(const Vector3& pos, int roomNumber, const Vector3& normal, float scaleMax, float scaleRate, float delayTimeInSec = 0.0f);

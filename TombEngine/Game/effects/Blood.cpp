@@ -32,7 +32,7 @@ namespace TEN::Effects::Blood
 	constexpr auto BLOOD_STAIN_POOLING_SCALE_RATE = 0.4f;
 	constexpr auto BLOOD_STAIN_POOLING_TIME_DELAY = 5.0f;
 	constexpr auto BLOOD_STAIN_HEIGHT_OFFSET	  = 4;
-	constexpr auto BLOOD_STAIN_NUM_SPRITES		  = 11; // TODO: Hardcoding.
+	constexpr auto BLOOD_STAIN_NUM_SPRITES		  = 9; // TODO: Dehardcode this index range.
 
 	constexpr auto BLOOD_COLOR_RED	 = Vector4(0.8f, 0.0f, 0.0f, 1.0f);
 	constexpr auto BLOOD_COLOR_BROWN = Vector4(0.3f, 0.1f, 0.0f, 1.0f);
@@ -174,13 +174,14 @@ namespace TEN::Effects::Blood
 		SpawnUnderwaterBlood(pos, scale);
 	}
 
-	void SpawnBloodDrip(const Vector3& pos, int roomNumber, const Vector3& velocity, float scale)
+	void SpawnBloodDrip(const Vector3& pos, int roomNumber, const Vector3& velocity, float scale, bool canSpawnStain)
 	{
 		auto& drip = GetFreeBloodDrip();
 
 		drip = BloodDrip();
-		drip.SpriteIndex = Objects[ID_BLOOD_STAIN_SPRITES].meshIndex + Random::GenerateInt(0, BLOOD_STAIN_NUM_SPRITES);
+		drip.SpriteIndex = Objects[ID_DRIP_SPRITE].meshIndex;
 		drip.IsActive = true;
+		drip.CanSpawnStain = canSpawnStain;
 		drip.Position = pos;
 		drip.RoomNumber = roomNumber;
 		drip.Velocity = velocity;
@@ -193,10 +194,22 @@ namespace TEN::Effects::Blood
 	void SpawnBloodDripSpray(const Vector3& pos, int roomNumber, const Vector3& direction, const Vector3& baseVelocity, unsigned int count)
 	{
 		static constexpr auto minLength = 15.0f;
-		static constexpr auto maxLength = 45.0f;
+		static constexpr auto maxLength = 50.0f;
 
-		SpawnBloodMistCloud(pos, roomNumber, direction, count * 3);
+		// BIG TODO: Art direction needs special attention.
+		// Combine mists, long drips, and round drips of various sizes.
 
+		// Spawn decorative drips.
+		for (int i = 0; i < count * 6; i++)
+		{
+			float length = Random::GenerateFloat(minLength, maxLength);
+			auto velocity = Random::GenerateDirectionInCone(-direction, BLOOD_DRIP_SPRAY_SEMIANGLE) * length;
+			float scale = length / 3;
+
+			SpawnBloodDrip(pos, roomNumber, velocity, scale, false);
+		}
+
+		// Spawn special drips capable of creating stains.
 		for (int i = 0; i < count; i++)
 		{
 			float length = Random::GenerateFloat(minLength, maxLength);
@@ -237,6 +250,9 @@ namespace TEN::Effects::Blood
 
 	void SpawnBloodStainFromDrip(const BloodDrip& drip, const CollisionResult& pointColl)
 	{
+		if (!drip.CanSpawnStain)
+			return;
+
 		auto pos = Vector3(drip.Position.x, pointColl.Position.Floor - BLOOD_STAIN_HEIGHT_OFFSET, drip.Position.z);
 		auto normal = Geometry::GetFloorNormal(pointColl.FloorTilt);
 		float scale = drip.Scale * 5;
