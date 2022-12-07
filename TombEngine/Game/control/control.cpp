@@ -95,9 +95,9 @@ short NextItemFree;
 short NextFxActive;
 short NextFxFree;
 
-int DrawPhase(bool title)
+int DrawPhase(bool isTitle)
 {
-	if (title)
+	if (isTitle)
 	{
 		g_Renderer.RenderTitle();
 	}
@@ -112,7 +112,7 @@ int DrawPhase(bool title)
 
 GameStatus ControlPhase(int numFrames)
 {
-	bool title = CurrentLevel == 0;
+	bool isTitle = CurrentLevel == 0;
 
 	RegeneratePickups();
 
@@ -134,7 +134,7 @@ GameStatus ControlPhase(int numFrames)
 	{
 		// Controls should be polled before OnControlPhase, so input data could be
 		// overwritten by script API methods.
-		HandleControls(title);
+		HandleControls(isTitle);
 
 		// This might not be the exact amount of time that has passed, but giving it a
 		// value of 1/30 keeps it in lock-step with the rest of the game logic,
@@ -142,16 +142,16 @@ GameStatus ControlPhase(int numFrames)
 		g_GameScript->OnControlPhase(DELTA_TIME);
 
 		// Handle inventory / pause / load / save screens.
-		auto result = HandleMenuCalls(title);
+		auto result = HandleMenuCalls(isTitle);
 		if (result != GameStatus::None)
 			return result;
 
 		// Handle global input events.
-		result = HandleGlobalInputEvents(title);
+		result = HandleGlobalInputEvents(isTitle);
 		if (result != GameStatus::None)
 			return result;
 
-		UpdateLara(LaraItem, title);
+		UpdateLara(LaraItem, isTitle);
 		UpdateAllItems();
 		UpdateAllEffects();
 
@@ -258,19 +258,19 @@ unsigned CALLBACK GameMain(void *)
 
 GameStatus DoLevel(int levelIndex, bool loadGame)
 {
-	bool title = !levelIndex;
+	bool isTitle = !levelIndex;
 
-	TENLog(title ? "DoTitle" : "DoLevel", LogLevel::Info);
+	TENLog(isTitle ? "DoTitle" : "DoLevel", LogLevel::Info);
 
 	// Load the level. Fall back to title if unsuccessful.
 	if (!LoadLevelFile(levelIndex))
-		return title ? GameStatus::ExitGame : GameStatus::ExitToTitle;
+		return isTitle ? GameStatus::ExitGame : GameStatus::ExitToTitle;
 
 	// Initialize items, effects, lots and cameras.
 	InitialiseFXArray(true);
 	InitialisePickupDisplay();
 	InitialiseCamera();
-	InitialiseSpotCamSequences(title);
+	InitialiseSpotCamSequences(isTitle);
 	InitialiseHair();
 	InitialiseNodeScripts();
 	InitialiseItemBoxData();
@@ -282,7 +282,7 @@ GameStatus DoLevel(int levelIndex, bool loadGame)
 	InitialiseScripting(levelIndex, loadGame);
 
 	// Prepare title menu, if necessary.
-	if (title)
+	if (isTitle)
 	{
 		g_Gui.SetMenuToDisplay(Menu::Title);
 		g_Gui.SetSelectedOption(0);
@@ -542,10 +542,10 @@ void EndGameLoop(int levelIndex)
 	StopRumble();
 }
 
-void HandleControls(bool title)
+void HandleControls(bool isTitle)
 {
 	// Poll keyboard and update input variables.
-	if (!title)
+	if (!isTitle)
 	{
 		if (Lara.Control.Locked)
 			ClearAllActions();
@@ -557,11 +557,11 @@ void HandleControls(bool title)
 		ClearAction(In::Look);
 }
 
-GameStatus HandleMenuCalls(bool title)
+GameStatus HandleMenuCalls(bool isTitle)
 {
 	auto result = GameStatus::None;
 
-	if (title || ScreenFading)
+	if (isTitle || ScreenFading)
 		return result;
 
 	// Does the player want to enter inventory?
@@ -617,9 +617,9 @@ GameStatus HandleMenuCalls(bool title)
 	return result;
 }
 
-GameStatus HandleGlobalInputEvents(bool title)
+GameStatus HandleGlobalInputEvents(bool isTitle)
 {
-	if (title)
+	if (isTitle)
 		return GameStatus::None;
 
 	HandleOptics(LaraItem);

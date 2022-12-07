@@ -1012,9 +1012,9 @@ void LaraCheat(ItemInfo* item, CollisionInfo* coll)
 	}
 }
 
-void UpdateLara(ItemInfo* item, bool title)
+void UpdateLara(ItemInfo* item, bool isTitle)
 {
-	if (title && !g_GameFlow->IsLaraInTitleEnabled())
+	if (isTitle && !g_GameFlow->IsLaraInTitleEnabled())
 		return;
 
 	// HACK: backup controls until proper control lock 
@@ -1024,7 +1024,7 @@ void UpdateLara(ItemInfo* item, bool title)
 	auto trInput = TrInput;
 	auto dbInput = DbInput;
 
-	if (title)
+	if (isTitle)
 		ClearAllActions();
 
 	// Control Lara
@@ -1034,7 +1034,7 @@ void UpdateLara(ItemInfo* item, bool title)
 	InItemControlLoop = false;
 	KillMoveItems();
 
-	if (title)
+	if (isTitle)
 	{
 		TrInput = trInput;
 		DbInput = dbInput;
