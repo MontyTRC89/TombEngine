@@ -902,6 +902,7 @@ namespace TEN::Renderer
 				PrintDebugMessage("GPU: %s", g_Configuration.AdapterName.c_str());
 				PrintDebugMessage("Resolution: %d x %d", m_screenWidth, m_screenHeight);
 				PrintDebugMessage("Fps: %3.2f", m_fps);
+				PrintDebugMessage("ControlPhase() time: %d", ControlPhaseTime);
 				PrintDebugMessage("Rooms collector time: %d", m_timeRoomsCollector);
 				PrintDebugMessage("Update time: %d", m_timeUpdate);
 				PrintDebugMessage("Frame time: %d", m_timeFrame);
