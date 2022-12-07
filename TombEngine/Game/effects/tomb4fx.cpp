@@ -1304,7 +1304,7 @@ void SomeSparkEffect(int x, int y, int z, int count)
 	{
 		auto* spark = GetFreeParticle();
 
-		spark->on = 1;
+		spark->on = true;
 		spark->sR = 112;
 		spark->sG = (GetRandomControl() & 0x1F) + -128;
 		spark->sB = (GetRandomControl() & 0x1F) + -128;
@@ -1341,9 +1341,9 @@ void TriggerUnderwaterExplosion(ItemInfo* item, int flag)
 		TriggerExplosionBubbles(x, y, z, item->RoomNumber);
 		TriggerExplosionSparks(x, y, z, 2, -1, 1, item->RoomNumber);
 
-		int wh = GetWaterHeight(x, y, z, item->RoomNumber);
-		if (wh != NO_HEIGHT)
-			SomeSparkEffect(x, wh, z, 8);
+		int waterHeight = GetWaterHeight(x, y, z, item->RoomNumber);
+		if (waterHeight != NO_HEIGHT)
+			SomeSparkEffect(x, waterHeight, z, 8);
 	}
 	else
 	{

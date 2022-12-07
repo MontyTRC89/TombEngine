@@ -913,13 +913,13 @@ void FindNewTarget(ItemInfo& laraItem, const WeaponInfo& weaponInfo)
 	unsigned int numTargets = 0;
 	float maxDistance = weaponInfo.TargetDist;
 
-	for (auto* activeCreaturePtr : ActiveCreatures)
+	for (auto* creaturePtr : ActiveCreatures)
 	{
 		// Continue loop if no item.
-		if (activeCreaturePtr->ItemNumber == NO_ITEM)
+		if (creaturePtr->ItemNumber == NO_ITEM)
 			continue;
 
-		auto& item = g_Level.Items[activeCreaturePtr->ItemNumber];
+		auto& item = g_Level.Items[creaturePtr->ItemNumber];
 
 		// Check whether creature is alive.
 		if (item.HitPoints <= 0)
