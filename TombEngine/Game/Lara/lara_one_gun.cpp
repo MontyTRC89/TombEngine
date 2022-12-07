@@ -171,8 +171,13 @@ void AnimateShotgun(ItemInfo& laraItem, LaraWeaponType weaponType)
 			{
 				if (IsHeld(In::Action) && (!lara.TargetEntity || lara.LeftArm.Locked))
 				{
-					if (weaponType == LaraWeaponType::HarpoonGun)
+					switch (weaponType)
 					{
+					default:
+						FireShotgun(laraItem);
+						break;
+
+					case LaraWeaponType::HarpoonGun:
 						FireHarpoon(laraItem);
 
 						if (!(lara.Weapons[(int)LaraWeaponType::HarpoonGun].Ammo->GetCount() % 4) &&
@@ -180,23 +185,24 @@ void AnimateShotgun(ItemInfo& laraItem, LaraWeaponType weaponType)
 						{
 							reloadHarpoonGun = true;
 						}
-					}
-					else if (weaponType == LaraWeaponType::RocketLauncher)
-					{
+
+						break;
+
+					case LaraWeaponType::RocketLauncher:
 						FireRocket(laraItem);
-					}
-					else if (weaponType == LaraWeaponType::GrenadeLauncher)
-					{
+						break;
+
+					case LaraWeaponType::GrenadeLauncher:
 						FireGrenade(laraItem);
-					}
-					else if (weaponType == LaraWeaponType::Crossbow)
-					{
+						break;
+
+					case LaraWeaponType::Crossbow:
 						FireCrossbow(laraItem, nullptr);
-					}
-					else if (weaponType == LaraWeaponType::HK)
-					{
+						break;
+
+					case LaraWeaponType::HK:
 						if ((weapon.WeaponMode == LaraWeaponTypeCarried::WTYPE_AMMO_2 ||
-							 weapon.WeaponMode == LaraWeaponTypeCarried::WTYPE_AMMO_3) &&
+							weapon.WeaponMode == LaraWeaponTypeCarried::WTYPE_AMMO_3) &&
 							lara.Control.Weapon.Interval)
 						{
 							item.Animation.TargetState = WEAPON_STATE_AIM;
@@ -210,10 +216,8 @@ void AnimateShotgun(ItemInfo& laraItem, LaraWeaponType weaponType)
 							SoundEffect(SFX_TR4_EXPLOSION1, &laraItem.Pose, SoundEnvironment::Land, 1.0f, 0.4f);
 							SoundEffect(SFX_TR4_HK_FIRE, &laraItem.Pose);
 						}
-					}
-					else
-					{
-						FireShotgun(laraItem);
+
+						break;
 					}
 
 					if (weaponType != LaraWeaponType::HK)
@@ -335,15 +339,15 @@ void ReadyShotgun(ItemInfo& laraItem, LaraWeaponType weaponType)
 	auto& lara = *GetLaraInfo(&laraItem);
 
 	lara.Control.HandStatus = HandStatus::WeaponReady;
-	lara.LeftArm.Orientation = EulerAngles::Zero;
-	lara.RightArm.Orientation = EulerAngles::Zero;
-	lara.LeftArm.FrameNumber = 0;
-	lara.RightArm.FrameNumber = 0;
-	lara.LeftArm.Locked = false;
-	lara.RightArm.Locked = false;
-	lara.LeftArm.FrameBase = Objects[GetWeaponObjectID(weaponType)].frameBase;
-	lara.RightArm.FrameBase = Objects[GetWeaponObjectID(weaponType)].frameBase;
 	lara.TargetEntity = nullptr;
+	lara.LeftArm.Orientation =
+	lara.RightArm.Orientation = EulerAngles::Zero;
+	lara.LeftArm.FrameNumber =
+	lara.RightArm.FrameNumber = 0;
+	lara.LeftArm.Locked =
+	lara.RightArm.Locked = false;
+	lara.LeftArm.FrameBase =
+	lara.RightArm.FrameBase = Objects[GetWeaponObjectID(weaponType)].frameBase;
 }
 
 void FireShotgun(ItemInfo& laraItem)
@@ -382,7 +386,7 @@ void FireShotgun(ItemInfo& laraItem)
 		if (FireWeapon(LaraWeaponType::Shotgun, *lara.TargetEntity, laraItem, wobbledArmOrient) != FireWeaponType::NoAmmo)
 			hasFired = true;
 
-		// HACK: compensate for spending 6 units of shotgun ammo. -- Lwmte, 18.11.22
+		// HACK: Compensate for spending 6 units of shotgun ammo. -- Lwmte, 18.11.22
 		if (!ammo.HasInfinite())
 			ammo++;
 	}
@@ -400,7 +404,12 @@ void FireShotgun(ItemInfo& laraItem)
 		if (laraItem.MeshBits != 0)
 		{
 			for (int i = 0; i < 7; i++)
-				TriggerGunSmoke(pos2.x, pos2.y, pos2.z, pos.x - pos2.x, pos.y - pos2.y, pos.z - pos2.z, 1, LaraWeaponType::Shotgun, lara.LeftArm.GunSmoke);
+			{
+				TriggerGunSmoke(
+					pos2.x, pos2.y, pos2.z,
+					pos.x - pos2.x, pos.y - pos2.y, pos.z - pos2.z,
+					1, LaraWeaponType::Shotgun, lara.LeftArm.GunSmoke);
+			}
 		}
 
 		lara.RightArm.GunFlash = Weapons[(int)LaraWeaponType::Shotgun].FlashTime;
@@ -490,30 +499,30 @@ void UndrawShotgun(ItemInfo& laraItem, LaraWeaponType weaponType)
 
 	if (item.Status == ITEM_DEACTIVATED)
 	{
-		lara.Control.HandStatus = HandStatus::Free;
-		lara.TargetEntity = nullptr;
-		lara.RightArm.Locked = false;
-		lara.LeftArm.Locked = false;
 		KillItem(lara.Control.Weapon.WeaponItem);
 		lara.Control.Weapon.WeaponItem = NO_ITEM;
+		lara.Control.HandStatus = HandStatus::Free;
+		lara.TargetEntity = nullptr;
+		lara.LeftArm.Locked =
+		lara.RightArm.Locked = false;
+		lara.LeftArm.FrameNumber =
 		lara.RightArm.FrameNumber = 0;
-		lara.LeftArm.FrameNumber = 0;
 	}
 	else if (item.Animation.ActiveState == WEAPON_STATE_UNDRAW)
 	{
-		if (item.Animation.FrameNumber - g_Level.Anims[item.Animation.AnimNumber].frameBase == 21 ||
-			(weaponType == LaraWeaponType::GrenadeLauncher && item.Animation.FrameNumber - g_Level.Anims[item.Animation.AnimNumber].frameBase == 15))
+		if ((item.Animation.FrameNumber - g_Level.Anims[item.Animation.AnimNumber].frameBase) == 21 ||
+			(weaponType == LaraWeaponType::GrenadeLauncher && (item.Animation.FrameNumber - g_Level.Anims[item.Animation.AnimNumber].frameBase) == 15))
 		{
 			UndrawShotgunMeshes(laraItem, weaponType);
 		}
 	}
 
+	lara.LeftArm.FrameBase =
 	lara.RightArm.FrameBase = g_Level.Anims[item.Animation.AnimNumber].FramePtr;
-	lara.LeftArm.FrameBase = g_Level.Anims[item.Animation.AnimNumber].FramePtr;
+	lara.LeftArm.FrameNumber =
 	lara.RightArm.FrameNumber = item.Animation.FrameNumber - g_Level.Anims[item.Animation.AnimNumber].frameBase;
-	lara.LeftArm.FrameNumber = item.Animation.FrameNumber - g_Level.Anims[item.Animation.AnimNumber].frameBase;
+	lara.LeftArm.AnimNumber =
 	lara.RightArm.AnimNumber = item.Animation.AnimNumber;
-	lara.LeftArm.AnimNumber = lara.RightArm.AnimNumber;
 }
 
 void DrawShotgunMeshes(ItemInfo& laraItem, LaraWeaponType weaponType)
@@ -887,7 +896,9 @@ void RocketControl(short itemNumber)
 	if (TestEnvironment(ENV_FLAG_WATER, item.RoomNumber))
 	{
 		if (item.Animation.Velocity.z > (ROCKET_VELOCITY / 4))
+		{
 			item.Animation.Velocity.z -= item.Animation.Velocity.z / 4;
+		}
 		else
 		{
 			item.Animation.Velocity.z += (item.Animation.Velocity.z / 4) + 4.0f;
@@ -1212,24 +1223,24 @@ void RifleHandler(ItemInfo& laraItem, LaraWeaponType weaponType)
 	auto& lara = *GetLaraInfo(&laraItem);
 	const auto& weapon = Weapons[(int)weaponType];
 
+	// Never handle weapons in binocular mode.
 	if (BinocularRange || LaserSight)
-		return; // Never handle weapons while in binocular mode.
+		return;
+
+	FindNewTarget(laraItem, weapon);
+
+	if (TrInput & IN_ACTION)
+		LaraTargetInfo(laraItem, weapon);
+
+	AimWeapon(laraItem, lara.LeftArm, weapon);
+
+	if (lara.LeftArm.Locked)
 	{
-		FindNewTarget(laraItem, weapon);
+		lara.ExtraTorsoRot.x = lara.LeftArm.Orientation.x;
+		lara.ExtraTorsoRot.y = lara.LeftArm.Orientation.y;
 
-		if (TrInput & IN_ACTION)
-			LaraTargetInfo(laraItem, weapon);
-
-		AimWeapon(laraItem, lara.LeftArm, weapon);
-
-		if (lara.LeftArm.Locked)
-		{
-			lara.ExtraTorsoRot.x = lara.LeftArm.Orientation.x;
-			lara.ExtraTorsoRot.y = lara.LeftArm.Orientation.y;
-
-			if (Camera.oldType != CameraType::Look && !BinocularRange)
-				lara.ExtraHeadRot = EulerAngles::Zero;
-		}
+		if (Camera.oldType != CameraType::Look && !BinocularRange)
+			lara.ExtraHeadRot = EulerAngles::Zero;
 	}
 
 	if (weaponType == LaraWeaponType::Revolver)

@@ -153,7 +153,9 @@ void KillItem(short const itemNumber)
 		item->Active = false;
 
 		if (NextItemActive == itemNumber)
+		{
 			NextItemActive = item->NextActive;
+		}
 		else
 		{
 			short linkNumber;
@@ -170,7 +172,9 @@ void KillItem(short const itemNumber)
 		if (item->RoomNumber != NO_ROOM)
 		{
 			if (g_Level.Rooms[item->RoomNumber].itemNumber == itemNumber)
+			{
 				g_Level.Rooms[item->RoomNumber].itemNumber = item->NextItem;
+			}
 			else
 			{
 				short linkNumber;
@@ -186,7 +190,7 @@ void KillItem(short const itemNumber)
 		}
 
 		if (item == Lara.TargetEntity)
-			Lara.TargetEntity = NULL;
+			Lara.TargetEntity = nullptr;
 
 		if (Objects[item->ObjectNumber].floor != nullptr)
 			UpdateBridgeItem(itemNumber, true);
@@ -208,7 +212,9 @@ void KillItem(short const itemNumber)
 			NextItemFree = itemNumber;
 		}
 		else
+		{
 			item->Flags |= IFLAG_KILLED;
+		}
 	}
 }
 
