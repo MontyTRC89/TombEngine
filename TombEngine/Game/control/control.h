@@ -78,7 +78,7 @@ GameStatus DoGameLoop(int levelIndex);
 void EndGameLoop(int levelIndex);
 
 GameStatus HandleMenuCalls(bool title);
-GameStatus HandleLevelEnd();
+GameStatus HandleGlobalInputEvents(bool title);
 void HandleControls(bool title);
 
 int GetRandomControl();

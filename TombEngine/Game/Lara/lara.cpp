@@ -1014,7 +1014,11 @@ void LaraCheat(ItemInfo* item, CollisionInfo* coll)
 
 void UpdateLara(ItemInfo* item, bool title)
 {
-	auto* level = g_GameFlow->GetLevel(CurrentLevel);
+	if (title && !g_GameFlow->IsLaraInTitleEnabled())
+		return;
+
+	// TODO: Disable this condition when proper control lock 
+	// is implemented -- Lwmte, 07.12.22
 
 	if (!title)
 	{
@@ -1024,26 +1028,26 @@ void UpdateLara(ItemInfo* item, bool title)
 		InItemControlLoop = false;
 		KillMoveItems();
 
-		g_Renderer.UpdateLaraAnimations(true);
+		LaraCheatyBits(item);
 
 		if (g_Gui.GetInventoryItemChosen() != NO_ITEM)
 		{
-			SayNo();
 			g_Gui.SetInventoryItemChosen(NO_ITEM);
+			SayNo();
 		}
 
-		LaraCheatyBits(item);
-		TriggerLaraDrips(item);
-
-		// Update Lara's ponytails
-		HairControl(item, level->GetLaraType() == LaraType::Young);
-		ProcessEffects(item);
+		// Update Lara's animations
+		g_Renderer.UpdateLaraAnimations(true);
 	}
-	else if (g_GameFlow->IsLaraInTitleEnabled())
+	else
 	{
 		AnimateLara(item);
-		HairControl(item, level->GetLaraType() == LaraType::Young);
 	}
+
+	// Update Lara's effects
+	TriggerLaraDrips(item);
+	HairControl(item, g_GameFlow->GetLevel(CurrentLevel)->GetLaraType() == LaraType::Young);
+	ProcessEffects(item);
 }
 
 // Offset values may be used to account for the quirk of room traversal only being able to occur at portals.

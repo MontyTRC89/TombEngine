@@ -141,18 +141,15 @@ GameStatus ControlPhase(int numFrames)
 		// which assumes 30 iterations per second.
 		g_GameScript->OnControlPhase(DELTA_TIME);
 
+		// Handle inventory / pause / load / save screens.
 		auto result = HandleMenuCalls(title);
 		if (result != GameStatus::None)
 			return result;
 
-		if (!title)
-		{
-			HandleOptics(LaraItem);
-
-			result = HandleLevelEnd();
-			if (result != GameStatus::None)
-				return result;
-		}
+		// Handle global input events.
+		result = HandleGlobalInputEvents(title);
+		if (result != GameStatus::None)
+			return result;
 
 		UpdateLara(LaraItem, title);
 		UpdateAllItems();
@@ -620,8 +617,13 @@ GameStatus HandleMenuCalls(bool title)
 	return result;
 }
 
-GameStatus HandleLevelEnd()
+GameStatus HandleGlobalInputEvents(bool title)
 {
+	if (title)
+		return GameStatus::None;
+
+	HandleOptics(LaraItem);
+
 	// Is Lara dead?
 	static constexpr int DEATH_NO_INPUT_TIMEOUT = 5 * FPS;
 	static constexpr int DEATH_INPUT_TIMEOUT = 10 * FPS;
