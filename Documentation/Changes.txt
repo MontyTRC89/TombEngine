@@ -27,6 +27,7 @@ Version 1.0.4
 * Fix empty inventory when using build and play feature in TE.
 * Fix throwing flare without drawing any weapons if there are no weapons present.
 * Fix several incorrect FOV reset issues.
+* Fix current soundtrack fading into silence if incoming one doesn't exist.
 
 Lua API changes:
 * Add new Moveable functions: GetEffect, SetEffect and SetCustomEffect (for colored fire).
