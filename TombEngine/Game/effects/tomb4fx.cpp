@@ -1064,7 +1064,7 @@ void TriggerLaraDrips(ItemInfo* item)
 				Lara.Wet[i] = UCHAR_MAX;
 
 			if (Lara.Wet[i] > 0 && !LaraNodeUnderwater[i] &&
-				(GetRandomControl() & 0x1FF) < Lara.Wet[i])
+				Random::GenerateInt(0, 512) < Lara.Wet[i])
 			{
 				SpawnWetnessDrip(jointPos.ToVector3(), LaraItem->RoomNumber);
 
