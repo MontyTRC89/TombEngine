@@ -33,10 +33,11 @@ Lua API changes:
 * Add new Moveable functions: GetEffect, SetEffect and SetCustomEffect (for colored fire).
 * Add new Lara functions: GetTarget and GetVehicle.
 * Remove Lara functions: SetOnFire and GetOnFire (replaced with GetEffect and SetEffect).
-* Add Flow.EnableMassPickup option in Gameflow.lua to enable/disable mass pickups.
-* Add Flow.EnableLaraInTitle option in Gameflow.lua to enable/disable Lara in title flyby.
-* Add Flow.EnableLevelSelect option in Gameflow.lua to enable/disable level selection.
-* Add level.secrets property to display level-specific secret count.
+* Add Gameflow.lua options:
+  - Flow.EnableMassPickup for mass pickup functionality.
+  - Flow.EnableLaraInTitle for displaying Lara in title flyby.
+  - Flow.EnableLevelSelect for title flyby level selection.
+  - level.secrets for level-specific secret count.
 * Fix level.ambientTrack property not working for title flyby.
 * Fix action key script functions not fully working in some cases.
 * Fix mounted vehicles ignoring Disable, Shatter and Explode script commands.
