@@ -24,6 +24,10 @@ Flow.EnableFlyCheat(true)
 
 Flow.EnableMassPickup(true)
 
+-- Disable/enable Lara drawing in title level
+
+Flow.EnableLaraInTitle(false)
+
 --------------------------------------------------
 
 -- Title level
