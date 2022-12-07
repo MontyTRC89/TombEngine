@@ -32,12 +32,12 @@ extern RendererHUDBar* g_AirBar;
 
 void DrawHUD(ItemInfo* item)
 {
-	if (CurrentLevel == 0 || CinematicBarsHeight > 0)
-		return;
-
 	static bool flash = false;
 	if ((GameTimer & 0x07) == 0x07)
 		flash = !flash;
+
+	if (CurrentLevel == 0 || CinematicBarsHeight > 0)
+		return;
 
 	DrawSprintBar(LaraItem);
 	DrawHealthBar(LaraItem, flash);
