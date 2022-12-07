@@ -1017,32 +1017,38 @@ void UpdateLara(ItemInfo* item, bool title)
 	if (title && !g_GameFlow->IsLaraInTitleEnabled())
 		return;
 
-	// TODO: Disable this condition when proper control lock 
+	// HACK: backup controls until proper control lock 
 	// is implemented -- Lwmte, 07.12.22
 
-	if (!title)
+	auto actionMap = ActionMap;
+	auto trInput = TrInput;
+	auto dbInput = DbInput;
+
+	if (title)
+		ClearAllActions();
+
+	// Control Lara
+	InItemControlLoop = true;
+	LaraControl(item, &LaraCollision);
+	LaraCheatyBits(item);
+	InItemControlLoop = false;
+	KillMoveItems();
+
+	if (title)
 	{
-		// Control Lara
-		InItemControlLoop = true;
-		LaraControl(item, &LaraCollision);
-		InItemControlLoop = false;
-		KillMoveItems();
-
-		LaraCheatyBits(item);
-
-		if (g_Gui.GetInventoryItemChosen() != NO_ITEM)
-		{
-			g_Gui.SetInventoryItemChosen(NO_ITEM);
-			SayNo();
-		}
-
-		// Update Lara's animations
-		g_Renderer.UpdateLaraAnimations(true);
+		TrInput = trInput;
+		DbInput = dbInput;
+		ActionMap = actionMap;
 	}
-	else
+
+	if (g_Gui.GetInventoryItemChosen() != NO_ITEM)
 	{
-		AnimateLara(item);
+		g_Gui.SetInventoryItemChosen(NO_ITEM);
+		SayNo();
 	}
+
+	// Update Lara's animations
+	g_Renderer.UpdateLaraAnimations(true);
 
 	// Update Lara's effects
 	TriggerLaraDrips(item);
