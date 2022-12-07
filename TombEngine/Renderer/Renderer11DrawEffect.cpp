@@ -517,28 +517,35 @@ namespace TEN::Renderer
 			switch (p.Type)
 			{
 			case WeatherType::None:
-				AddSpriteBillboard(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_UNDERWATERDUST],
+				AddSpriteBillboard(
+					&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_UNDERWATERDUST],
 					p.Position,
 					Vector4(1.0f, 1.0f, 1.0f, p.Transparency()),
 					0.0f, 1.0f, Vector2(p.Size),
 					BLENDMODE_ADDITIVE, true, view);
+
 				break;
 
 			case WeatherType::Snow:
-				AddSpriteBillboard(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_UNDERWATERDUST],
+				AddSpriteBillboard(
+					&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_UNDERWATERDUST],
 					p.Position,
 					Vector4(1.0f, 1.0f, 1.0f, p.Transparency()),
 					0.0f, 1.0f, Vector2(p.Size),
 					BLENDMODE_ADDITIVE, true, view);
+
 				break;
 
 			case WeatherType::Rain:
 				Vector3 v;
 				p.Velocity.Normalize(v);
-				AddSpriteBillboardConstrained(&m_sprites[Objects[ID_DRIP_SPRITE].meshIndex],
+
+				AddSpriteBillboardConstrained(
+					&m_sprites[Objects[ID_DRIP_SPRITE].meshIndex],
 					p.Position,
 					Vector4(0.8f, 1.0f, 1.0f, p.Transparency()),
 					0.0f, 1.0f, Vector2(TEN::Effects::Drip::DRIP_WIDTH, p.Size), BLENDMODE_ADDITIVE, -v, true, view);
+
 				break;
 			}
 		}
@@ -552,14 +559,14 @@ namespace TEN::Renderer
 		if (BinocularRange > 0)
 			return true;
 
-		RendererRoom const& room = m_rooms[LaraItem->RoomNumber];
-		RendererItem* item = &m_items[Lara.ItemNumber];
+		const auto& room = m_rooms[LaraItem->RoomNumber];
+		auto& item = m_items[Lara.ItemNumber];
 
 		m_stStatic.Color = Vector4::One;
 		m_stStatic.AmbientLight = room.AmbientLight;
 		m_stStatic.LightMode = LIGHT_MODES::LIGHT_MODE_STATIC;
 
-		BindLights(item->LightsToDraw); // FIXME: Is it really needed for gunflashes? -- Lwmte, 15.07.22
+		BindLights(item.LightsToDraw); // FIXME: Is it really needed for gunflashes? -- Lwmte, 15.07.22
 
 		short length = 0;
 		short zOffset = 0;
@@ -630,7 +637,7 @@ namespace TEN::Renderer
 
 				if (Lara.LeftArm.GunFlash)
 				{
-					world = item->AnimationTransforms[LM_LHAND] * item->World;
+					world = item.AnimationTransforms[LM_LHAND] * item.World;
 					world = offset * world;
 					world = rotation * world;
 
@@ -643,7 +650,7 @@ namespace TEN::Renderer
 
 				if (Lara.RightArm.GunFlash)
 				{
-					world = item->AnimationTransforms[LM_RHAND] * item->World;
+					world = item.AnimationTransforms[LM_RHAND] * item.World;
 					world = offset * world;
 					world = rotation * world;
 
@@ -760,13 +767,13 @@ namespace TEN::Renderer
 			auto axis = -drip.Velocity;
 			axis.Normalize();
 
-			float width = drip.Scale * Random::GenerateFloat(1.0f, 2.0f);
-			float height = drip.Scale * Random::GenerateFloat(4.0f, 8.0f);
+			float width = drip.Scale * Random::GenerateFloat(1.0f, 3.0f);
+			float height = drip.Scale * Random::GenerateFloat(4.0f, 12.0f);
 
 			AddSpriteBillboardConstrained(
 				&m_sprites[drip.SpriteIndex],
 				drip.Position,
-				drip.Color, 0.5f, 1.0f, Vector2(width, height), BLENDMODE_ADDITIVE, axis, true, view);
+				drip.Color, 0.5f, 1.0f, Vector2(width, height), BLENDMODE_ALPHABLEND, axis, true, view);
 		}
 	}
 
@@ -783,7 +790,7 @@ namespace TEN::Renderer
 			AddSpriteBillboard(
 				&m_sprites[mist.SpriteIndex],
 				mist.Position,
-				mist.Color, TO_RAD(mist.Orientation2D), 1.0f, Vector2(mist.Scale, mist.Scale), BLENDMODE_ADDITIVE, true, view);
+				mist.Color, TO_RAD(mist.Orientation2D), 1.0f, Vector2(mist.Scale, mist.Scale), BLENDMODE_ALPHABLEND, true, view);
 		}
 	}
 

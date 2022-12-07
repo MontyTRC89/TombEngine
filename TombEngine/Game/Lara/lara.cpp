@@ -432,7 +432,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 		auto pose = Pose(Geometry::TranslatePoint(item->Pose.Position + Vector3i(0, -BLOCK(1 / 2), 0), item->Pose.Orientation.y, BLOCK(1 / 2.0f)), item->Pose.Orientation + EulerAngles(0, ANGLE(180.0f), 0));
 		//SethaThrowAttack(&pose, item->RoomNumber, 1);
 
-		auto pos = GetJointPosition(item, LM_TORSO);
+		auto pos = GetJointPosition(item, LM_HEAD);
 		auto rotMatrix = (item->Pose.Orientation + EulerAngles(ANGLE(60.0f), 0, 0)).ToRotationMatrix();
 		auto baseVelocity = Vector3::Transform(item->Animation.Velocity, rotMatrix);
 

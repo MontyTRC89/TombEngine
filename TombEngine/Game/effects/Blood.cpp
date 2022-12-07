@@ -33,7 +33,7 @@ namespace TEN::Effects::Blood
 	constexpr auto BLOOD_STAIN_POOLING_SCALE_RATE = 0.4f;
 	constexpr auto BLOOD_STAIN_POOLING_TIME_DELAY = 5.0f;
 	constexpr auto BLOOD_STAIN_HEIGHT_OFFSET	  = 4;
-	constexpr auto BLOOD_STAIN_NUM_SPRITES		  = 9; // TODO: Dehardcode this index range.
+	constexpr auto BLOOD_STAIN_SPRITE_INDEX_MAX	  = 8; // TODO: Dehardcode this index range.
 
 	constexpr auto BLOOD_COLOR_RED	 = Vector4(0.8f, 0.0f, 0.0f, 1.0f);
 	constexpr auto BLOOD_COLOR_BROWN = Vector4(0.3f, 0.1f, 0.0f, 1.0f);
@@ -134,19 +134,19 @@ namespace TEN::Effects::Blood
 		auto sphere = BoundingSphere(pos, BLOCK(1 / 16.0f));
 
 		mist = BloodMist();
-		mist.SpriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_BLOOD;
+		mist.SpriteIndex = Objects[ID_BLOOD_MIST_SPRITES].meshIndex;
 		mist.IsActive = true;
 		mist.Position = Random::GeneratePointInSphere(sphere);
 		mist.RoomNumber = roomNumber;
 		mist.Orientation2D = Random::GenerateAngle();
 		mist.Velocity = Random::GenerateDirectionInCone(direction, 20.0f) * Random::GenerateFloat(-16.0f, 16.0f);
 		mist.Color = BLOOD_COLOR_RED;
-		mist.Life = Random::GenerateFloat(24.0f, 32.0f);
+		mist.Life = Random::GenerateFloat(0.5f, 1.0f) * FPS;
 		mist.LifeMax = mist.Life;
-		mist.Scale = Random::GenerateFloat(64.0f, 128.0f);
+		mist.Scale = Random::GenerateFloat(128.0f, 256.0f);
 		mist.ScaleMax = mist.Scale;
 		mist.ScaleMin = mist.Scale / 4;
-		mist.Opacity = 1.0f;
+		mist.Opacity = 0.8f;
 		mist.OpacityMax = mist.Opacity;
 		mist.Gravity = Random::GenerateFloat(1.0f, 2.0f);
 		mist.Friction = 4.0f;
@@ -158,7 +158,7 @@ namespace TEN::Effects::Blood
 		if (TestEnvironment(ENV_FLAG_WATER, roomNumber))
 			return;
 
-		auto sphere = BoundingSphere(pos, BLOCK(1 / 16.0f));
+		auto sphere = BoundingSphere(pos, BLOCK(1 / 8.0f));
 
 		for (int i = 0; i < count; i++)
 		{
@@ -202,10 +202,10 @@ namespace TEN::Effects::Blood
 		// BIG TODO: Art direction needs special attention.
 		// Combine mists, long drips, and round drips of various sizes.
 
-		SpawnBloodMistCloud(pos, roomNumber, direction, count * 8);
+		SpawnBloodMistCloud(pos, roomNumber, direction, count * 2);
 
 		// Spawn decorative drips.
-		for (int i = 0; i < count * 8; i++)
+		for (int i = 0; i < count * 12; i++)
 		{
 			float length = Random::GenerateFloat(minLength, maxLength);
 			auto velocity = Random::GenerateDirectionInCone(-direction, BLOOD_DRIP_SPRAY_SEMIANGLE) * length;
@@ -229,7 +229,7 @@ namespace TEN::Effects::Blood
 	{
 		auto stain = BloodStain();
 
-		stain.SpriteIndex = Objects[ID_BLOOD_STAIN_SPRITES].meshIndex + Random::GenerateInt(0, BLOOD_STAIN_NUM_SPRITES);
+		stain.SpriteIndex = Objects[ID_BLOOD_STAIN_SPRITES].meshIndex + Random::GenerateInt(0, BLOOD_STAIN_SPRITE_INDEX_MAX);
 		stain.Position = pos;
 		stain.RoomNumber = roomNumber;
 		stain.Orientation2D = Random::GenerateAngle();
@@ -305,7 +305,7 @@ namespace TEN::Effects::Blood
 			mist.Orientation2D += mist.Rotation;
 
 			// Update scale.
-			mist.Scale = Lerp(mist.ScaleMax, mist.ScaleMin, 1.0f - (mist.Life / mist.LifeMax));
+			//mist.Scale = Lerp(mist.ScaleMax, mist.ScaleMin, 1.0f - (mist.Life / mist.LifeMax));
 
 			// Update color.
 			mist.Opacity = Lerp(mist.OpacityMax, 0.0f, 1.0f - (mist.Life / mist.LifeMax));
