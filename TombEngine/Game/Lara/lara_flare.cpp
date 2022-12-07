@@ -18,7 +18,7 @@
 using namespace TEN::Math;
 
 constexpr auto FLARE_LIFE_MAX = 60 * FPS;
-constexpr auto FLARE_LIGHT_COLOR = Vector3(0.8f, 0.42947f, 0.2921f);
+constexpr auto FLARE_LIGHT_COLOR = Vector3(0.8f, 0.43f, 0.3f);
 
 void FlareControl(short itemNumber)
 {
@@ -427,12 +427,8 @@ bool DoFlareLight(const Vector3i& pos, int flareLife)
 	if (isDying)
 	{
 		int falloff = 6 * (1.0f - (flareLife / FLARE_LIFE_MAX));
-
-		int r = FLARE_LIGHT_COLOR.x * 255;
-		int g = FLARE_LIGHT_COLOR.y * 255;
-		int b = FLARE_LIGHT_COLOR.z * 255;
-
-		TriggerDynamicLight(lightPos.x, lightPos.y, lightPos.z, falloff, r, g, b);
+		auto color = FLARE_LIGHT_COLOR * 255;
+		TriggerDynamicLight(lightPos.x, lightPos.y, lightPos.z, falloff, color.x, color.y, color.z);
 
 		spawnChaff = Random::TestProbability(0.9f);
 	}
@@ -440,11 +436,8 @@ bool DoFlareLight(const Vector3i& pos, int flareLife)
 	{
 		float multiplier = Random::GenerateFloat(0.05f, 1.0f);
 		int falloff = 8 * multiplier;
-
-		int r = FLARE_LIGHT_COLOR.x * 255 * multiplier;
-		int g = FLARE_LIGHT_COLOR.y * 255 * multiplier;
-		int b = FLARE_LIGHT_COLOR.z * 255 * multiplier;
-		TriggerDynamicLight(lightPos.x, lightPos.y, lightPos.z, falloff, r, g, b);
+		auto color = (FLARE_LIGHT_COLOR * multiplier) * 255;
+		TriggerDynamicLight(lightPos.x, lightPos.y, lightPos.z, falloff, color.x, color.y, color.z);
 
 		spawnChaff = Random::TestProbability(0.4f);
 	}
@@ -452,11 +445,8 @@ bool DoFlareLight(const Vector3i& pos, int flareLife)
 	{
 		float multiplier = Random::GenerateFloat(0.6f, 0.8f);
 		int falloff = 8 * (1.0f - (flareLife / FLARE_LIFE_MAX));
-
-		int r = FLARE_LIGHT_COLOR.x * 255 * multiplier;
-		int g = FLARE_LIGHT_COLOR.y * 255 * multiplier;
-		int b = FLARE_LIGHT_COLOR.z * 255 * multiplier;
-		TriggerDynamicLight(lightPos.x, lightPos.y, lightPos.z, falloff, r, g, b);
+		auto color = (FLARE_LIGHT_COLOR * multiplier) * 255;
+		TriggerDynamicLight(lightPos.x, lightPos.y, lightPos.z, falloff, color.x, color.y, color.z);
 
 		spawnChaff = Random::TestProbability(0.3f);
 	}
