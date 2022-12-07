@@ -16,30 +16,32 @@ using namespace TEN::Renderer;
 
 short PickupX;
 short PickupY;
+short PickupVel;
 short CurrentPickup;
 DisplayPickup Pickups[MAX_COLLECTED_PICKUPS];
-short PickupVel;
-int OldHitPoints = LARA_HEALTH_MAX;
-int HealthBarTimer = 40;
-float HealthBar = OldHitPoints;
-float MutateAmount = 0;
-int FlashState = 0;
-int FlashCount = 0;
+
+float HealthBarOldValue = LARA_HEALTH_MAX;
+float HealthBarValue = HealthBarOldValue;
+float HealthBarMutateAmount = 0;
+int   HealthBarTimer = 40;
+bool  EnableSmoothHealthBar = true;
+
 extern RendererHUDBar* g_HealthBar;
 extern RendererHUDBar* g_DashBar;
 extern RendererHUDBar* g_AirBar;
-
-bool EnableSmoothHealthBar = true;
 
 void DrawHUD(ItemInfo* item)
 {
 	if (CurrentLevel == 0 || CinematicBarsHeight > 0)
 		return;
 
-	int flash = FlashIt();
-	UpdateSprintBar(LaraItem);
-	UpdateHealthBar(LaraItem, flash);
-	UpdateAirBar(LaraItem, flash);
+	static bool flash = false;
+	if ((GameTimer & 0x07) == 0x07)
+		flash = !flash;
+
+	DrawSprintBar(LaraItem);
+	DrawHealthBar(LaraItem, flash);
+	DrawAirBar(LaraItem, flash);
 	DrawAllPickups();
 }
 
@@ -62,97 +64,49 @@ void DrawHealthBarOverlay(ItemInfo* item, int value)
 void DrawHealthBar(ItemInfo* item, float value)
 {
 	auto* lara = GetLaraInfo(item);
-
-	if (CurrentLevel)
-		g_Renderer.DrawBar(value, g_HealthBar, ID_HEALTH_BAR_TEXTURE, GlobalCounter, Lara.PoisonPotency);
+	g_Renderer.DrawBar(value, g_HealthBar, ID_HEALTH_BAR_TEXTURE, GlobalCounter, lara->PoisonPotency);
 }
 
-void UpdateHealthBar(ItemInfo* item, int flash)
+void DrawHealthBar(ItemInfo* item, bool flash)
 {
 	auto* lara = GetLaraInfo(item);
 
-	auto hitPoints = item->HitPoints;
-
-	if (hitPoints < 0)
-		hitPoints = 0;
-	else if (hitPoints > LARA_HEALTH_MAX)
-		hitPoints = LARA_HEALTH_MAX;
-
-	// Smoothly transition health bar display.
-	if (EnableSmoothHealthBar)
-	{
-		if (OldHitPoints != hitPoints)
-		{
-			MutateAmount += OldHitPoints - hitPoints;
-			OldHitPoints = hitPoints;
-			HealthBarTimer = 40;
-		}
-
-		if (HealthBar - MutateAmount < 0)
-			MutateAmount = HealthBar;
-		else if (HealthBar - MutateAmount > LARA_HEALTH_MAX)
-			MutateAmount = HealthBar - LARA_HEALTH_MAX;
-
-		HealthBar -= MutateAmount / 3;
-		MutateAmount -= MutateAmount / 3;
-
-		if (MutateAmount > -0.5f && MutateAmount < 0.5f)
-		{
-			MutateAmount = 0;
-			HealthBar = hitPoints;
-		}
-	}
-	// Discretely transition health bar display.
-	else
-	{
-		if (OldHitPoints != hitPoints)
-		{
-			OldHitPoints = hitPoints;
-			HealthBar = hitPoints;
-			HealthBarTimer = 40;
-		}
-	}
-
-	if (HealthBarTimer < 0)
-		HealthBarTimer = 0;
-
 	// Flash when at critical capacity and bar is not transitioning.
-	if (HealthBar <= LARA_HEALTH_CRITICAL)
+	if (HealthBarValue <= LARA_HEALTH_CRITICAL)
 	{
 		if (!BinocularRange)
 		{
-			if (flash || MutateAmount)
-				DrawHealthBar(item, HealthBar / LARA_HEALTH_MAX);
+			if (flash || HealthBarMutateAmount)
+				DrawHealthBar(item, HealthBarValue / LARA_HEALTH_MAX);
 			else
-				DrawHealthBar(item, 0);
+				DrawHealthBar(item, 0.0f);
 		}
 		else
 		{
-			if (flash || MutateAmount)
-				DrawHealthBarOverlay(item, HealthBar / LARA_HEALTH_MAX);
+			if (flash || HealthBarMutateAmount)
+				DrawHealthBarOverlay(item, HealthBarValue / LARA_HEALTH_MAX);
 			else
 				DrawHealthBarOverlay(item, 0);
 		}
 	}
-	else if (HealthBarTimer > 0 || HealthBar <= 0 ||
-		lara->Control.HandStatus == HandStatus::WeaponReady &&
-		lara->Control.Weapon.GunType != LaraWeaponType::Torch ||
-		lara->PoisonPotency)
+	else if (HealthBarTimer > 0 || HealthBarValue <= 0 ||
+			 lara->Control.HandStatus == HandStatus::WeaponReady &&
+			 lara->Control.Weapon.GunType != LaraWeaponType::Torch ||
+			 lara->PoisonPotency)
 	{
 		if (!BinocularRange)
-			DrawHealthBar(item, HealthBar / LARA_HEALTH_MAX);
+			DrawHealthBar(item, HealthBarValue / LARA_HEALTH_MAX);
 		else
-			DrawHealthBarOverlay(item, HealthBar / LARA_HEALTH_MAX);
+			DrawHealthBarOverlay(item, HealthBarValue / LARA_HEALTH_MAX);
 	}
 }
 
 void DrawAirBar(float value)
 {
-	if (CurrentLevel)
-		g_Renderer.DrawBar(value, g_AirBar,ID_AIR_BAR_TEXTURE,0,0);
+	g_Renderer.DrawBar(value, g_AirBar,ID_AIR_BAR_TEXTURE, 0, 0);
 }
 
-void UpdateAirBar(ItemInfo* item, int flash)
+void DrawAirBar(ItemInfo* item, bool flash)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -179,7 +133,7 @@ void UpdateAirBar(ItemInfo* item, int flash)
 		if (flash)
 			DrawAirBar(air / LARA_AIR_MAX);
 		else
-			DrawAirBar(0);
+			DrawAirBar(0.0f);
 	}
 	else
 		DrawAirBar(air / LARA_AIR_MAX);
@@ -187,11 +141,10 @@ void UpdateAirBar(ItemInfo* item, int flash)
 
 void DrawSprintBar(float value)
 {
-	if (CurrentLevel)
-		g_Renderer.DrawBar(value, g_DashBar, ID_DASH_BAR_TEXTURE, 0, 0);
+	g_Renderer.DrawBar(value, g_DashBar, ID_DASH_BAR_TEXTURE, 0, 0);
 }
 
-void UpdateSprintBar(ItemInfo* item)
+void DrawSprintBar(ItemInfo* item)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -279,15 +232,52 @@ void InitialisePickupDisplay()
 	CurrentPickup = 0;
 }
 
-int FlashIt()
+void UpdateBars(ItemInfo* item)
 {
-	if (FlashCount)
-		FlashCount--;
+	if (HealthBarTimer)
+		HealthBarTimer--;
+
+	auto* lara = GetLaraInfo(item);
+
+	auto hitPoints = (float)item->HitPoints;
+
+	if (hitPoints < 0)
+		hitPoints = 0;
+	else if (hitPoints > LARA_HEALTH_MAX)
+		hitPoints = LARA_HEALTH_MAX;
+
+	// Smoothly transition health bar display.
+	if (EnableSmoothHealthBar)
+	{
+		if (HealthBarOldValue != hitPoints)
+		{
+			HealthBarMutateAmount += HealthBarOldValue - hitPoints;
+			HealthBarOldValue = hitPoints;
+			HealthBarTimer = 40;
+		}
+
+		if (HealthBarValue - HealthBarMutateAmount < 0)
+			HealthBarMutateAmount = HealthBarValue;
+		else if (HealthBarValue - HealthBarMutateAmount > LARA_HEALTH_MAX)
+			HealthBarMutateAmount = HealthBarValue - LARA_HEALTH_MAX;
+
+		HealthBarValue -= HealthBarMutateAmount / 3;
+		HealthBarMutateAmount -= HealthBarMutateAmount / 3;
+
+		if (HealthBarMutateAmount > -0.5f && HealthBarMutateAmount < 0.5f)
+		{
+			HealthBarMutateAmount = 0;
+			HealthBarValue = hitPoints;
+		}
+	}
+	// Discretely transition health bar display.
 	else
 	{
-		FlashState ^= 1;
-		FlashCount = 5;
+		if (HealthBarOldValue != hitPoints)
+		{
+			HealthBarOldValue = hitPoints;
+			HealthBarValue = hitPoints;
+			HealthBarTimer = 40;
+		}
 	}
-
-	return FlashState;
 }

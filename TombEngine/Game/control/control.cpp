@@ -116,8 +116,7 @@ GameStatus ControlPhase(int numFrames)
 
 	RegeneratePickups();
 
-	if (numFrames > 10)
-		numFrames = 10;
+	numFrames = std::clamp(numFrames, 0, 10);
 
 	if (TrackCameraInit)
 	{
@@ -202,7 +201,8 @@ GameStatus ControlPhase(int numFrames)
 		UpdateBeetleSwarm();
 		UpdateLocusts();
 
-		// Update screen overlays
+		// Update screen UI and overlays
+		UpdateBars(LaraItem);
 		UpdateFadeScreenAndCinematicBars();
 
 		// Rumble screen (like in submarine level of TRC)
@@ -218,7 +218,6 @@ GameStatus ControlPhase(int numFrames)
 		// Update timers
 		GameTimer++;
 		GlobalCounter++;
-		HealthBarTimer--;
 
 		// Add renderer objects on the first processed frame.
 		if (isFirstTime)
