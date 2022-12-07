@@ -35,6 +35,7 @@ Lua API changes:
 * Remove Lara functions: SetOnFire and GetOnFire (replaced with GetEffect and SetEffect).
 * Add Flow.EnableMassPickup option in Gameflow.lua to enable/disable mass pickups.
 * Add Flow.EnableLaraInTitle option in Gameflow.lua to enable/disable Lara in title flyby.
+* Add Flow.EnableLevelSelect option in Gameflow.lua to enable/disable level selection.
 * Add level.secrets property to display level-specific secret count.
 * Fix level.ambientTrack property not working for title flyby.
 * Fix action key script functions not fully working in some cases.

@@ -134,6 +134,13 @@ Must be true or false
 */
 	table_flow.set_function(ScriptReserved_EnableLaraInTitle, &FlowHandler::EnableLaraInTitle, this);
 
+/*** Enable or disable level selection in title flyby.
+Must be true or false
+@function EnableLevelSelect
+@tparam bool true or false
+*/
+	table_flow.set_function(ScriptReserved_EnableLevelSelect, &FlowHandler::EnableLevelSelect, this);
+
 /*** settings.lua.
 These functions are called in settings.lua, a file which holds your local settings.
 settings.lua shouldn't be bundled with any finished levels/games.
@@ -367,6 +374,11 @@ void FlowHandler::EnableLaraInTitle(bool laraInTitle)
 	LaraInTitle = laraInTitle;
 }
 
+void FlowHandler::EnableLevelSelect(bool levelSelect)
+{
+	LevelSelect = levelSelect;
+}
+
 bool FlowHandler::DoFlow()
 {
 	// We start with the title level, if no other index is specified
@@ -473,8 +485,8 @@ bool FlowHandler::DoFlow()
 	return true;
 }
 
-bool FlowHandler::CanPlayAnyLevel() const
+bool FlowHandler::IsLevelSelectEnabled() const
 {
-	return PlayAnyLevel;
+	return LevelSelect;
 }
 

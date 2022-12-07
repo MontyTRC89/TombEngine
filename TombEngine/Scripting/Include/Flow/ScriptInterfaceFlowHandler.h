@@ -38,7 +38,7 @@ public:
 	virtual bool HasLedgeJumps() const = 0;
 	virtual ScriptInterfaceLevel * GetLevel(int level) = 0;
 	virtual int	GetLevelNumber(std::string const& fileName) = 0;
-	virtual bool CanPlayAnyLevel() const = 0;
+	virtual bool IsLevelSelectEnabled() const = 0;
 	virtual bool DoFlow() = 0;
 };
 
