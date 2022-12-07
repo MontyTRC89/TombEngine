@@ -8,6 +8,7 @@ namespace TEN::Renderer
 		m_timeUpdate = 0;
 		m_timeDraw = 0;
 		m_timeFrame = 0;
+		m_timeRoomsCollector = 0;
 		m_numDrawCalls = 0;
 		m_numRoomsDrawCalls = 0;
 		m_numMoveablesDrawCalls = 0;

@@ -22,15 +22,16 @@ namespace TEN::Renderer
 		short RoomNumber;
 		Vector4 AmbientLight;
 		Vector4 ViewPort;
-		byte BoundActive;
 		std::vector<RendererBucket> Buckets;
 		std::vector<RendererLight> Lights;
+		std::vector<RendererStatic> Statics;
 		std::vector<RendererItem*> ItemsToDraw;
 		std::vector<RendererEffect*> EffectsToDraw;
-		std::vector<RendererStatic> StaticsToDraw;
+		std::vector<RendererStatic*> StaticsToDraw;
 		std::vector<RendererTransparentFace> TransparentFacesToDraw;
 		std::vector<RendererLight*> LightsToDraw;
 		std::vector<RendererDoor> Doors;
+		BoundingBox BoundingBox;
 
 		std::vector<int> Neighbors;
 	};

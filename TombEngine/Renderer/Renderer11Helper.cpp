@@ -352,12 +352,8 @@ namespace TEN::Renderer
 		gameCamera = RenderView(cam, roll, fov, 32, farView, g_Configuration.Width, g_Configuration.Height);
 	}
 
-	bool Renderer11::SphereBoxIntersection(Vector3 boxMin, Vector3 boxMax, Vector3 sphereCentre, float sphereRadius)
+	bool Renderer11::SphereBoxIntersection(BoundingBox box, Vector3 sphereCentre, float sphereRadius)
 	{
-		Vector3 centre = (boxMin + boxMax) / 2.0f;
-		Vector3 extens = boxMax - centre;
-		BoundingBox box = BoundingBox(centre, extens);
-
 		if (sphereRadius == 0.0f)
 			return box.Contains(sphereCentre);
 		else

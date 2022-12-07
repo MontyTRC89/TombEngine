@@ -977,6 +977,8 @@ namespace TEN::Renderer
 		dynamicLight.Position = Vector3(float(x), float(y), float(z));
 		dynamicLight.Out = falloff * 256.0f;
 		dynamicLight.Type = LIGHT_TYPES::LIGHT_TYPE_POINT;
+		dynamicLight.BoundingSphere = BoundingSphere(dynamicLight.Position, dynamicLight.Out);
+		dynamicLight.Luma = Luma(dynamicLight.Color);
 
 		dynamicLights.push_back(dynamicLight);
 	}
@@ -1428,6 +1430,10 @@ namespace TEN::Renderer
 		// Prepare the scene to draw
 		auto time1 = std::chrono::high_resolution_clock::now();
 		CollectRooms(view, false);
+		auto timeRoomsCollector = std::chrono::high_resolution_clock::now();
+		m_timeRoomsCollector = (std::chrono::duration_cast<ns>(timeRoomsCollector - time1)).count() / 1000000;
+		time1 = timeRoomsCollector;
+
 		UpdateLaraAnimations(false);
 		UpdateItemAnimations(view);
 
@@ -1846,7 +1852,7 @@ namespace TEN::Renderer
 		{
 			for (auto& msh : room->StaticsToDraw)
 			{
-				RendererObject& staticObj = *m_staticObjects[msh.ObjectNumber];
+				RendererObject& staticObj = *m_staticObjects[msh->ObjectNumber];
 
 				if (staticObj.ObjectMeshes.size() > 0)
 				{
@@ -1872,7 +1878,7 @@ namespace TEN::Renderer
 								RendererPolygon* p = &bucket.Polygons[j];
 
 								// As polygon distance, for moveables, we use the averaged distance
-								Vector3 centre = Vector3::Transform(p->centre, msh.World);
+								Vector3 centre = Vector3::Transform(p->centre, msh->World);
 								int distance = (centre - cameraPosition).Length();
 
 								RendererTransparentFace face;
@@ -1882,10 +1888,10 @@ namespace TEN::Renderer
 								face.info.animated = bucket.Animated;
 								face.info.texture = bucket.Texture;
 								face.info.room = room;
-								face.info.staticMesh = &msh;
+								face.info.staticMesh = msh;
 								face.info.world = m_stStatic.World;
-								face.info.position = msh.Position;
-								face.info.color = msh.Color;
+								face.info.position = msh->Pose.Position.ToVector3();
+								face.info.color = msh->Color;
 								face.info.blendMode = bucket.BlendMode;
 								face.info.bucket = &bucket;
 								room->TransparentFacesToDraw.push_back(face);
@@ -1893,8 +1899,8 @@ namespace TEN::Renderer
 						}
 						else
 						{
-							m_stStatic.World = msh.World;
-							m_stStatic.Color = msh.Color;
+							m_stStatic.World = msh->World;
+							m_stStatic.Color = msh->Color;
 							m_stStatic.AmbientLight = room->AmbientLight;
 							m_stStatic.LightMode = mesh->LightMode;
 
@@ -1902,7 +1908,7 @@ namespace TEN::Renderer
 							BindConstantBufferVS(CB_STATIC, m_cbStatic.get());
 							BindConstantBufferPS(CB_STATIC, m_cbStatic.get());
 
-							BindLights(msh.LightsToDraw);
+							BindLights(msh->LightsToDraw);
 
 							int passes = bucket.BlendMode == BLENDMODE_ALPHATEST ? 2 : 1;
 
