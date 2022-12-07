@@ -273,12 +273,12 @@ GameStatus DoLevel(int levelIndex, bool loadGame)
 	InitialiseHair();
 	InitialiseItemBoxData();
 
-	// Initialize game variables and optionally load game.
-	InitialiseOrLoadGame(loadGame);
-
 	// Initialize scripting.
 	InitialiseScripting(levelIndex, loadGame);
 	InitialiseNodeScripts();
+
+	// Initialize game variables and optionally load game.
+	InitialiseOrLoadGame(loadGame);
 
 	// Prepare title menu, if necessary.
 	if (isTitle)
@@ -420,11 +420,6 @@ void InitialiseScripting(int levelIndex, bool loadGame)
 		});
 	}
 
-	if (loadGame)
-		g_GameScript->OnLoad();
-	else
-		g_GameScript->OnStart();
-
 	// Play default background music.
 	PlaySoundTrack(level->GetAmbientTrack(), SoundTrackType::BGM);
 }
@@ -460,7 +455,9 @@ void InitialiseOrLoadGame(bool loadGame)
 		Camera.target.z = LaraItem->Pose.Position.z;
 
 		InitialiseGame = false;
+
 		g_GameFlow->SelectedSaveGame = 0;
+		g_GameScript->OnLoad();
 	}
 	else
 	{
@@ -474,6 +471,8 @@ void InitialiseOrLoadGame(bool loadGame)
 			GameTimer = 0;
 			InitialiseGame = false;
 		}
+
+		g_GameScript->OnStart();
 	}
 }
 
