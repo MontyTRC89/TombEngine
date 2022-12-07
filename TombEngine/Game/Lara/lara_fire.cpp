@@ -507,10 +507,8 @@ void HandleWeapon(ItemInfo* laraItem)
 		if (IsHeld(In::DrawWeapon))
 		{
 			// No weapon - no any actions.
-			if (lara.Control.Weapon.LastGunType == LaraWeaponType::None)
-				return;
-
-			lara.Control.Weapon.RequestGunType = lara.Control.Weapon.LastGunType;
+			if (lara.Control.Weapon.LastGunType != LaraWeaponType::None)
+				lara.Control.Weapon.RequestGunType = lara.Control.Weapon.LastGunType;
 		}
 		// Draw flare.
 		else if (IsHeld(In::Flare) && (g_GameFlow->GetLevel(CurrentLevel)->GetLaraType() != LaraType::Young))
@@ -531,7 +529,8 @@ void HandleWeapon(ItemInfo* laraItem)
 			}
 		}
 
-		if (IsHeld(In::DrawWeapon) || lara.Control.Weapon.RequestGunType != lara.Control.Weapon.GunType)
+		if ((IsHeld(In::DrawWeapon) && lara.Control.Weapon.LastGunType != LaraWeaponType::None) ||
+			lara.Control.Weapon.RequestGunType != lara.Control.Weapon.GunType)
 		{
 			if (lara.Control.IsLow && 
 				lara.Control.Weapon.RequestGunType >= LaraWeaponType::Shotgun && 
