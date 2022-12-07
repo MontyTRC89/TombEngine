@@ -151,9 +151,9 @@ GameStatus ControlPhase(int numFrames)
 		if (result != GameStatus::None)
 			return result;
 
-		UpdateLara(LaraItem, isTitle);
 		UpdateAllItems();
 		UpdateAllEffects();
+		UpdateLara(LaraItem, isTitle);
 
 		g_GameScriptEntities->TestCollidingObjects();
 
@@ -272,7 +272,6 @@ GameStatus DoLevel(int levelIndex, bool loadGame)
 	InitialiseCamera();
 	InitialiseSpotCamSequences(isTitle);
 	InitialiseHair();
-	InitialiseNodeScripts();
 	InitialiseItemBoxData();
 
 	// Initialize game variables and optionally load game.
@@ -280,6 +279,7 @@ GameStatus DoLevel(int levelIndex, bool loadGame)
 
 	// Initialize scripting.
 	InitialiseScripting(levelIndex, loadGame);
+	InitialiseNodeScripts();
 
 	// Prepare title menu, if necessary.
 	if (isTitle)
