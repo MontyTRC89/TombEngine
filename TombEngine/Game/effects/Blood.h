@@ -47,9 +47,11 @@ namespace TEN::Effects::Blood
 		Vector3 Velocity   = Vector3::Zero;
 		Vector4 Color	   = Vector4::Zero;
 
-		float Life	  = 0.0f;
-		float Scale	  = 0.0f;
-		float Gravity = 0.0f;
+		float Life			  = 0.0f;
+		float LifeStartFading = 0.0f;
+		float Scale			  = 0.0f;
+		float Opacity		  = 0.0f;
+		float Gravity		  = 0.0f;
 	};
 
 	struct BloodStain
@@ -91,7 +93,7 @@ namespace TEN::Effects::Blood
 
 	void SpawnBloodCloudUnderwater(const Vector3& pos, int roomNumber, float scale);
 
-	void SpawnBloodDrip(const Vector3& pos, int roomNumber, const Vector3& velocity, float scale, bool canSpawnStain = true);
+	void SpawnBloodDrip(const Vector3& pos, int roomNumber, const Vector3& velocity, float lifeInSec, float scale, bool canSpawnStain);
 	void SpawnBloodDripSpray(const Vector3& pos, int roomNumber, const Vector3& direction, const Vector3& baseVelocity, unsigned int count = BLOOD_DRIP_SPRAY_NUM_DEFAULT);
 
 	void SpawnBloodStain(const Vector3& pos, int roomNumber, const Vector3& normal, float scaleMax, float scaleRate, float delayTimeInSec = 0.0f);

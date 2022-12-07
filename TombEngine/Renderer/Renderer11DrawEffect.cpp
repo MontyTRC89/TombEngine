@@ -760,10 +760,13 @@ namespace TEN::Renderer
 			auto axis = -drip.Velocity;
 			axis.Normalize();
 
+			float width = drip.Scale * Random::GenerateFloat(1.0f, 2.0f);
+			float height = drip.Scale * Random::GenerateFloat(4.0f, 8.0f);
+
 			AddSpriteBillboardConstrained(
 				&m_sprites[drip.SpriteIndex],
 				drip.Position,
-				drip.Color, 0.5f, 1.0f, Vector2(drip.Scale, drip.Scale * 4) * 2, BLENDMODE_ADDITIVE, axis, true, view);
+				drip.Color, 0.5f, 1.0f, Vector2(width, height), BLENDMODE_ADDITIVE, axis, true, view);
 		}
 	}
 

@@ -21,10 +21,11 @@ using namespace TEN::Renderer;
 
 namespace TEN::Effects::Blood
 {
-	constexpr auto BLOOD_DRIP_LIFE_MAX		  = 5.0f;
-	constexpr auto BLOOD_DRIP_GRAVITY_MIN	  = 5.0f;
-	constexpr auto BLOOD_DRIP_GRAVITY_MAX	  = 15.0f;
-	constexpr auto BLOOD_DRIP_SPRAY_SEMIANGLE = 50.0f;
+	constexpr auto BLOOD_DRIP_LIFE_MAX			= 5.0f;
+	constexpr auto BLOOD_DRIP_LIFE_START_FADING = 0.5f;
+	constexpr auto BLOOD_DRIP_GRAVITY_MIN		= 5.0f;
+	constexpr auto BLOOD_DRIP_GRAVITY_MAX		= 15.0f;
+	constexpr auto BLOOD_DRIP_SPRAY_SEMIANGLE	= 50.0f;
 
 	constexpr auto BLOOD_STAIN_LIFE_MAX			  = 5.0f * 60.0f;
 	constexpr auto BLOOD_STAIN_LIFE_START_FADING  = 30.0f;
@@ -174,7 +175,7 @@ namespace TEN::Effects::Blood
 		SpawnUnderwaterBlood(pos, scale);
 	}
 
-	void SpawnBloodDrip(const Vector3& pos, int roomNumber, const Vector3& velocity, float scale, bool canSpawnStain)
+	void SpawnBloodDrip(const Vector3& pos, int roomNumber, const Vector3& velocity, float lifeInSec, float scale, bool canSpawnStain)
 	{
 		auto& drip = GetFreeBloodDrip();
 
@@ -186,7 +187,9 @@ namespace TEN::Effects::Blood
 		drip.RoomNumber = roomNumber;
 		drip.Velocity = velocity;
 		drip.Color = BLOOD_COLOR_RED;
-		drip.Life = std::round(BLOOD_DRIP_LIFE_MAX * FPS);
+		drip.Life = std::round(lifeInSec * FPS);
+		drip.LifeStartFading = std::round(BLOOD_DRIP_LIFE_START_FADING * FPS);
+		drip.Opacity = 1.0f;
 		drip.Scale = scale;
 		drip.Gravity = Random::GenerateFloat(BLOOD_DRIP_GRAVITY_MIN, BLOOD_DRIP_GRAVITY_MAX);
 	}
@@ -194,19 +197,21 @@ namespace TEN::Effects::Blood
 	void SpawnBloodDripSpray(const Vector3& pos, int roomNumber, const Vector3& direction, const Vector3& baseVelocity, unsigned int count)
 	{
 		static constexpr auto minLength = 15.0f;
-		static constexpr auto maxLength = 50.0f;
+		static constexpr auto maxLength = 45.0f;
 
 		// BIG TODO: Art direction needs special attention.
 		// Combine mists, long drips, and round drips of various sizes.
 
+		SpawnBloodMistCloud(pos, roomNumber, direction, count * 8);
+
 		// Spawn decorative drips.
-		for (int i = 0; i < count * 6; i++)
+		for (int i = 0; i < count * 8; i++)
 		{
 			float length = Random::GenerateFloat(minLength, maxLength);
 			auto velocity = Random::GenerateDirectionInCone(-direction, BLOOD_DRIP_SPRAY_SEMIANGLE) * length;
-			float scale = length / 3;
+			float scale = length / 4;
 
-			SpawnBloodDrip(pos, roomNumber, velocity, scale, false);
+			SpawnBloodDrip(pos, roomNumber, velocity, BLOOD_DRIP_LIFE_START_FADING, scale, false);
 		}
 
 		// Spawn special drips capable of creating stains.
@@ -216,7 +221,7 @@ namespace TEN::Effects::Blood
 			auto velocity = baseVelocity + Random::GenerateDirectionInCone(direction, BLOOD_DRIP_SPRAY_SEMIANGLE) * length;
 			float scale = length / 2;
 
-			SpawnBloodDrip(pos, roomNumber, velocity, scale);
+			SpawnBloodDrip(pos, roomNumber, velocity, BLOOD_DRIP_LIFE_MAX, scale, true);
 		}
 	}
 
@@ -322,6 +327,13 @@ namespace TEN::Effects::Blood
 				drip.IsActive = false;
 				continue;
 			}
+
+			// Update opacity.
+			if (drip.Life <= drip.LifeStartFading)
+				drip.Opacity = Lerp(1.0f, 0.0f, 1.0f - (drip.Life / std::round(BLOOD_DRIP_LIFE_START_FADING * FPS)));
+
+			// Update color.
+			drip.Color.w = drip.Opacity;
 
 			// Update velocity.
 			drip.Velocity.y += drip.Gravity;
