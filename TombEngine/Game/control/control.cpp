@@ -127,7 +127,7 @@ GameStatus ControlPhase(int numFrames)
 
 	for (framesCount += numFrames; framesCount > 0; framesCount -= 2)
 	{
-		// TODO: Controls should be polled before OnControlPhase, so input data could be
+		// Controls are polled before OnControlPhase, so input data could be
 		// overwritten by script API methods.
 		HandleControls(isTitle);
 
