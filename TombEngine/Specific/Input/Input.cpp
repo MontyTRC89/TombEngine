@@ -79,10 +79,11 @@ namespace TEN::Input
 	Effect*		   OisEffect	   = nullptr;
 
 	// Globals
-	RumbleData			RumbleInfo = {};
-	vector<InputAction>	ActionMap  = {};
-	vector<bool>		KeyMap	   = {};
-	vector<float>		AxisMap    = {};
+	RumbleData			RumbleInfo  = {};
+	vector<InputAction>	ActionMap   = {};
+	vector<bool>		ActionQueue = {};
+	vector<bool>		KeyMap	    = {};
+	vector<float>		AxisMap     = {};
 
 	int DbInput = 0;
 	int TrInput = 0;
@@ -131,7 +132,10 @@ namespace TEN::Input
 		TENLog("Initializing input system...", LogLevel::Info);
 
 		for (int i = 0; i < (int)ActionID::Count; i++)
+		{
 			ActionMap.push_back(InputAction((ActionID)i));
+			ActionQueue.push_back(false);
+		}
 
 		KeyMap.resize(MAX_INPUT_SLOTS);
 		AxisMap.resize(InputAxis::Count);
@@ -638,7 +642,20 @@ namespace TEN::Input
 
 		// Update action map (mappable actions only).
 		for (int i = 0; i < KEY_COUNT; i++)
-			ActionMap[i].Update(Key(i) ? true : false); // TODO: Poll analog value of key. Potentially, any can be a trigger.
+		{
+			// TODO: Poll analog value of key. Potentially, any can be a trigger.
+			ActionMap[i].Update(Key(i) ? true : false); 
+		}
+
+		// Also update action map from queue.
+		for (int i = 0; i < ActionQueue.size(); i++)
+		{
+			if (ActionQueue[i])
+			{
+				ActionMap[i].Update(true);
+				ActionQueue[i] = false;
+			}
+		}
 
 		// Additional handling.
 		HandlePlayerHotkeys(item);

@@ -204,8 +204,7 @@ namespace Misc
 		if (!CheckInput(actionIndex))
 			return;
 
-		ActionMap[actionIndex].Update(true);
-		TrInput |= (1 << actionIndex);
+		ActionQueue[actionIndex] = true;
 	}
 
 	static void KeyClear(int actionIndex)
