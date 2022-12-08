@@ -1021,13 +1021,13 @@ void UpdateLara(ItemInfo* item, bool isTitle)
 	// is implemented -- Lwmte, 07.12.22
 
 	auto actionMap = ActionMap;
-	auto trInput = TrInput;
 	auto dbInput = DbInput;
+	auto trInput = TrInput;
 
 	if (isTitle)
 		ClearAllActions();
 
-	// Control Lara
+	// Control Lara.
 	InItemControlLoop = true;
 	LaraControl(item, &LaraCollision);
 	LaraCheatyBits(item);
@@ -1036,9 +1036,9 @@ void UpdateLara(ItemInfo* item, bool isTitle)
 
 	if (isTitle)
 	{
-		TrInput = trInput;
-		DbInput = dbInput;
 		ActionMap = actionMap;
+		DbInput = dbInput;
+		TrInput = trInput;
 	}
 
 	if (g_Gui.GetInventoryItemChosen() != NO_ITEM)
@@ -1047,10 +1047,10 @@ void UpdateLara(ItemInfo* item, bool isTitle)
 		SayNo();
 	}
 
-	// Update Lara's animations
+	// Update Lara's animations.
 	g_Renderer.UpdateLaraAnimations(true);
 
-	// Update Lara's effects
+	// Update Lara's effects.
 	TriggerLaraDrips(item);
 	HairControl(item, g_GameFlow->GetLevel(CurrentLevel)->GetLaraType() == LaraType::Young);
 	ProcessEffects(item);

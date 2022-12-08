@@ -14,9 +14,9 @@ struct DisplayPickup
 void DrawHUD(ItemInfo* item);
 void DrawHealthBarOverlay(ItemInfo* item, int value);
 void DrawHealthBar(ItemInfo* item, float value);
-void DrawHealthBar(ItemInfo* item, bool flash);
+void DrawHealthBar(ItemInfo* item, bool doFlash);
 void DrawAirBar(float value);
-void DrawAirBar(ItemInfo* item, bool flash);
+void DrawAirBar(ItemInfo* item, bool doFlash);
 void DrawSprintBar(float value);
 void DrawSprintBar(ItemInfo* item);
 void UpdateBars(ItemInfo* item);

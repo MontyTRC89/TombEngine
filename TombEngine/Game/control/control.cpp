@@ -46,8 +46,8 @@
 #include "Scripting/Include/ScriptInterfaceGame.h"
 #include "Scripting/Include/Strings/ScriptInterfaceStringsHandler.h"
 #include "Sound/sound.h"
-#include "Specific/Input/Input.h"
 #include "Specific/clock.h"
+#include "Specific/Input/Input.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
 #include "Specific/winmain.h"
@@ -57,20 +57,16 @@ using namespace TEN::Effects::Drip;
 using namespace TEN::Effects::Environment;
 using namespace TEN::Effects::Explosion;
 using namespace TEN::Effects::Footprints;
-using namespace TEN::Entities::Generic;
 using namespace TEN::Effects::Lightning;
 using namespace TEN::Effects::Smoke;
 using namespace TEN::Effects::Spark;
+using namespace TEN::Entities::Generic;
 using namespace TEN::Entities::Switches;
 using namespace TEN::Entities::TR4;
 using namespace TEN::Floordata;
 using namespace TEN::Input;
 using namespace TEN::Math::Random;
 using namespace TEN::Renderer;
-
-using std::string;
-using std::unordered_map;
-using std::vector;
 
 int GameTimer       = 0;
 int GlobalCounter   = 0;
@@ -112,7 +108,7 @@ int DrawPhase(bool isTitle)
 
 GameStatus ControlPhase(int numFrames)
 {
-	bool isTitle = CurrentLevel == 0;
+	bool isTitle = (CurrentLevel == 0);
 
 	RegeneratePickups();
 
@@ -131,7 +127,7 @@ GameStatus ControlPhase(int numFrames)
 
 	for (framesCount += numFrames; framesCount > 0; framesCount -= 2)
 	{
-		// Controls should be polled before OnControlPhase, so input data could be
+		// TODO: Controls should be polled before OnControlPhase, so input data could be
 		// overwritten by script API methods.
 		HandleControls(isTitle);
 
@@ -158,26 +154,26 @@ GameStatus ControlPhase(int numFrames)
 
 		if (UseSpotCam)
 		{
-			// Draw flyby cameras
+			// Draw flyby cameras.
 			CalculateSpotCameras();
 		}
 		else
 		{
-			// Do the standard camera
+			// Do the standard camera.
 			TrackCameraInit = false;
 			CalculateCamera();
 		}
 
-		// Update oscillator seed
+		// Update oscillator seed.
 		Wibble = (Wibble + WIBBLE_SPEED) & WIBBLE_MAX;
 
-		// Smash shatters and clear stopper flags under them
+		// Smash shatters and clear stopper flags under them.
 		UpdateShatters();
 
-		// Update weather
+		// Update weather.
 		Weather.Update();
 
-		// Update special FX
+		// Update special FX.
 		UpdateSparks();
 		UpdateFireSparks();
 		UpdateSmoke();
@@ -201,21 +197,21 @@ GameStatus ControlPhase(int numFrames)
 		UpdateBeetleSwarm();
 		UpdateLocusts();
 
-		// Update screen UI and overlays
+		// Update screen UI and overlays.
 		UpdateBars(LaraItem);
 		UpdateFadeScreenAndCinematicBars();
 
-		// Rumble screen (like in submarine level of TRC)
+		// Rumble screen (like in submarine level of TRC).
 		if (g_GameFlow->GetLevel(CurrentLevel)->Rumble)
 			RumbleScreen();
 
 		PlaySoundSources();
 		DoFlipEffect(FlipEffect, LaraItem);
 
-		// Clear savegame loaded flag
+		// Clear savegame loaded flag.
 		JustLoaded = false;
 
-		// Update timers
+		// Update timers.
 		GameTimer++;
 		GlobalCounter++;
 
@@ -236,19 +232,19 @@ unsigned CALLBACK GameMain(void *)
 
 	TimeInit();
 
-	// Do a fixed time title image
+	// Do a fixed time title image.
 	if (g_GameFlow->IntroImagePath.empty())
 		TENLog("Intro image path is not set.", LogLevel::Warning);
 	else
 		g_Renderer.RenderTitleImage();
 
 
-	// Execute the LUA gameflow and play the game
+	// Execute the Lua gameflow and play the game.
 	g_GameFlow->DoFlow();
 
 	DoTheGame = false;
 
-	// Finish the thread
+	// Finish the thread.
 	PostMessage(WindowsHandle, WM_CLOSE, NULL, NULL);
 	EndThread();
 
@@ -265,7 +261,7 @@ GameStatus DoLevel(int levelIndex, bool loadGame)
 	if (!LoadLevelFile(levelIndex))
 		return isTitle ? GameStatus::ExitGame : GameStatus::ExitToTitle;
 
-	// Initialize items, effects, lots and cameras.
+	// Initialize items, effects, lots, and cameras.
 	InitialiseFXArray(true);
 	InitialisePickupDisplay();
 	InitialiseCamera();
@@ -287,7 +283,7 @@ GameStatus DoLevel(int levelIndex, bool loadGame)
 		g_Gui.SetSelectedOption(0);
 	}
 
-	// DoGameLoop returns only when level has ended.
+	// DoGameLoop() returns only when level has ended.
 	return DoGameLoop(levelIndex);
 }
 
@@ -300,7 +296,7 @@ void UpdateShatters()
 	{
 		SmashedMeshCount--;
 
-		FloorInfo* floor = GetFloor(
+		auto* floor = GetFloor(
 			SmashedMesh[SmashedMeshCount]->pos.Position.x,
 			SmashedMesh[SmashedMeshCount]->pos.Position.y,
 			SmashedMesh[SmashedMeshCount]->pos.Position.z,
@@ -407,7 +403,7 @@ void InitialiseScripting(int levelIndex, bool loadGame)
 
 	auto* level = g_GameFlow->GetLevel(levelIndex);
 
-	// Run level script, if exists.
+	// Run level script if it exists.
 	if (!level->ScriptFileName.empty())
 	{
 		g_GameScript->ExecuteScriptFile(level->ScriptFileName);
@@ -466,7 +462,7 @@ void InitialiseOrLoadGame(bool loadGame)
 
 		if (InitialiseGame)
 		{
-			// Clear all game infos as well
+			// Clear all game info as well.
 			Statistics.Game = {};
 			GameTimer = 0;
 			InitialiseGame = false;
@@ -552,7 +548,9 @@ void HandleControls(bool isTitle)
 			UpdateInputActions(LaraItem);
 	}
 	else
+	{
 		ClearAction(In::Look);
+	}
 }
 
 GameStatus HandleMenuCalls(bool isTitle)
