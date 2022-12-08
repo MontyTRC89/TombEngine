@@ -204,7 +204,7 @@ namespace Misc
 		if (!CheckInput(actionIndex))
 			return;
 
-		ActionQueue[actionIndex] = true;
+		ActionQueue[actionIndex] = QueueState::Push;
 	}
 
 	static void KeyClear(int actionIndex)
@@ -212,7 +212,7 @@ namespace Misc
 		if (!CheckInput(actionIndex))
 			return;
 
-		ClearAction((ActionID)actionIndex);
+		ActionQueue[actionIndex] = QueueState::Clear;
 	}
 
 	///Do FlipMap with specific ID

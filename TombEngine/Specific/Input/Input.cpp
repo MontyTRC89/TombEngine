@@ -81,7 +81,7 @@ namespace TEN::Input
 	// Globals
 	RumbleData			RumbleInfo  = {};
 	vector<InputAction>	ActionMap   = {};
-	vector<bool>		ActionQueue = {};
+	vector<QueueState>  ActionQueue = {};
 	vector<bool>		KeyMap	    = {};
 	vector<float>		AxisMap     = {};
 
@@ -134,7 +134,7 @@ namespace TEN::Input
 		for (int i = 0; i < (int)ActionID::Count; i++)
 		{
 			ActionMap.push_back(InputAction((ActionID)i));
-			ActionQueue.push_back(false);
+			ActionQueue.push_back(QueueState::None);
 		}
 
 		KeyMap.resize(MAX_INPUT_SLOTS);
@@ -650,10 +650,10 @@ namespace TEN::Input
 		// Also update action map from queue.
 		for (int i = 0; i < ActionQueue.size(); i++)
 		{
-			if (ActionQueue[i])
+			if (ActionQueue[i] != QueueState::None)
 			{
-				ActionMap[i].Update(true);
-				ActionQueue[i] = false;
+				ActionMap[i].Update(ActionQueue[i] == QueueState::Push);
+				ActionQueue[i] = QueueState::None;
 			}
 		}
 
