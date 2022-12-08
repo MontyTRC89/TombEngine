@@ -212,6 +212,30 @@ namespace TEN::Input
 		TrInput = 0;
 	}
 
+	void ApplyActionQueue()
+	{
+		for (int i = 0; i < KEY_COUNT; i++)
+		{
+			if (ActionQueue[i] != QueueState::None)
+			{
+				if (ActionQueue[i] == QueueState::Push)
+				{
+					ActionMap[i].Update(true);
+				}
+				else
+				{
+					ActionMap[i].Clear();
+				}
+			}
+		}
+	}
+
+	void ClearActionQueue()
+	{
+		for (auto& queue : ActionQueue)
+			queue = QueueState::None;
+	}
+
 	bool LayoutContainsIndex(unsigned int index)
 	{
 		for (int l = 0; l < 2; l++)
@@ -633,7 +657,7 @@ namespace TEN::Input
 		RumbleInfo.LastPower = RumbleInfo.Power;
 	}
 
-	void UpdateInputActions(ItemInfo* item)
+	void UpdateInputActions(ItemInfo* item, bool applyQueue)
 	{
 		ClearInputData();
 		UpdateRumble();
@@ -644,17 +668,12 @@ namespace TEN::Input
 		for (int i = 0; i < KEY_COUNT; i++)
 		{
 			// TODO: Poll analog value of key. Potentially, any can be a trigger.
-			ActionMap[i].Update(Key(i) ? true : false); 
+			ActionMap[i].Update(Key(i) ? true : false);
 		}
 
-		// Also update action map from queue.
-		for (int i = 0; i < ActionQueue.size(); i++)
+		if (applyQueue)
 		{
-			if (ActionQueue[i] != QueueState::None)
-			{
-				ActionMap[i].Update(ActionQueue[i] == QueueState::Push);
-				ActionQueue[i] = QueueState::None;
-			}
+			ApplyActionQueue();
 		}
 
 		// Additional handling.
@@ -675,6 +694,9 @@ namespace TEN::Input
 	{
 		for (auto& action : ActionMap)
 			action.Clear();
+
+		for (auto& queue : ActionQueue)
+			queue = QueueState::None;
 
 		DbInput = 0;
 		TrInput = 0;

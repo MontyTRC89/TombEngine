@@ -102,4 +102,5 @@ void LaraWaterSurface(ItemInfo* item, CollisionInfo* coll);
 void LaraUnderwater(ItemInfo* item, CollisionInfo* coll);
 void LaraCheat(ItemInfo* item, CollisionInfo* coll);
 void AnimateLara(ItemInfo* item);
+void UpdateLara(ItemInfo* item, bool isTitle);
 bool UpdateLaraRoom(ItemInfo* item, int height, int xOffset = 0, int zOffset = 0);

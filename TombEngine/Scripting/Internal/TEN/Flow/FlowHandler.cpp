@@ -389,7 +389,7 @@ bool FlowHandler::DoFlow()
 	SelectedSaveGame = 0;
 	SaveGameHeader header;
 
-	// We loop indefinitely, looking for return values of DoTitle or DoLevel
+	// We loop indefinitely, looking for return values of DoLevel
 	bool loadFromSavegame = false;
 
 	while (DoTheGame)
@@ -403,7 +403,7 @@ bool FlowHandler::DoFlow()
 		{
 			try
 			{
-				status = DoTitle(0);
+				status = DoLevel(CurrentLevel);
 			}
 			catch (TENScriptException const& e)
 			{
