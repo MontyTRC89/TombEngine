@@ -85,8 +85,7 @@ namespace TEN::Effects::Blood
 	BloodMist&			   GetFreeBloodMist();
 	BloodDrip&			   GetFreeBloodDrip();
 	std::array<Vector3, 4> GetBloodStainVertexPoints(const Vector3& pos, short orient2D, const Vector3& normal, float scale);
-
-	bool TestBloodStainFloor(const BloodStain& stain);
+	bool				   TestBloodStainFloor(const Vector3& pos, int roomNumber, const std::array<Vector3, 4>& vertexPoints);
 
 	void SpawnBloodMist(const Vector3& pos, int roomNumber, const Vector3& direction);
 	void SpawnBloodMistCloud(const Vector3& pos, int roomNumber, const Vector3& direction, unsigned int count);

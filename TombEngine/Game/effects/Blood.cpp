@@ -116,15 +116,15 @@ namespace TEN::Effects::Blood
 		};
 	}
 
-	bool TestBloodStainFloor(const BloodStain& stain)
+	bool TestBloodStainFloor(const Vector3& pos, int roomNumber, const std::array<Vector3, 4>& vertexPoints)
 	{
 		static constexpr auto heightRange = CLICK(0.5f);
 
 		// Get point collision at every vertex point.
-		auto pointColl0 = GetCollision(stain.VertexPoints[0].x, stain.Position.y - CLICK(1), stain.VertexPoints[0].z, stain.RoomNumber);
-		auto pointColl1 = GetCollision(stain.VertexPoints[1].x, stain.Position.y - CLICK(1), stain.VertexPoints[1].z, stain.RoomNumber);
-		auto pointColl2 = GetCollision(stain.VertexPoints[2].x, stain.Position.y - CLICK(1), stain.VertexPoints[2].z, stain.RoomNumber);
-		auto pointColl3 = GetCollision(stain.VertexPoints[3].x, stain.Position.y - CLICK(1), stain.VertexPoints[3].z, stain.RoomNumber);
+		auto pointColl0 = GetCollision(vertexPoints[0].x, pos.y - CLICK(1), vertexPoints[0].z, roomNumber);
+		auto pointColl1 = GetCollision(vertexPoints[1].x, pos.y - CLICK(1), vertexPoints[1].z, roomNumber);
+		auto pointColl2 = GetCollision(vertexPoints[2].x, pos.y - CLICK(1), vertexPoints[2].z, roomNumber);
+		auto pointColl3 = GetCollision(vertexPoints[3].x, pos.y - CLICK(1), vertexPoints[3].z, roomNumber);
 
 		// Stop scaling blood stain if floor heights at vertex points are outside relative range.
 		if ((abs(pointColl0.Position.Floor - pointColl1.Position.Floor) > heightRange) ||
@@ -399,28 +399,26 @@ namespace TEN::Effects::Blood
 				continue;
 			}
 
-			// TODO: Refine this.
 			// Update scale.
-			bool updateVertexPoints = false;
 			if (stain.ScaleRate > 0.0f)
 			{
-				updateVertexPoints = true;
-
-				if (!TestBloodStainFloor(stain))
-					stain.ScaleRate = 0.0f;
-
 				stain.Scale += stain.ScaleRate;
+
+				// Update scale rate.
 				if (stain.Scale >= (stain.ScaleMax * 0.8f))
 				{
 					stain.ScaleRate *= 0.2f;
 					if (abs(stain.ScaleRate) <= FLT_EPSILON)
 						stain.ScaleRate = 0.0f;
 				}
-			}
 
-			// Update vertex points.
-			if (updateVertexPoints)
-				stain.VertexPoints = GetBloodStainVertexPoints(stain.Position, stain.Orientation2D, stain.Normal, stain.Scale);
+				// Update vertex points.
+				auto vertexPoints = GetBloodStainVertexPoints(stain.Position, stain.Orientation2D, stain.Normal, stain.Scale);
+				if (TestBloodStainFloor(stain.Position, stain.RoomNumber, vertexPoints))
+					stain.VertexPoints = vertexPoints;
+				else
+					stain.ScaleRate = 0.0f;
+			}
 
 			// Update opacity.
 			if (stain.Life <= stain.LifeStartFading)
