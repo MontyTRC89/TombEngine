@@ -64,10 +64,12 @@ namespace TEN::Effects::Ripple
 
 		auto& ripple = GetFreeRipple();
 
+		auto sphere = BoundingSphere(pos, BLOCK(1 / 32.0f));
+
 		ripple = Ripple();
 		ripple.IsActive = true;
 		ripple.SpriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex;
-		ripple.Position = pos + Vector3(Random::GenerateFloat(-32.0f, 32.0f), 0.0f, Random::GenerateFloat(-32.0f, 32.0f));
+		ripple.Position = Random::GeneratePointInSphere(sphere);
 		ripple.Normal = Vector3::Zero; // Unused by underwater blood rendering.
 		ripple.Life = Random::GenerateFloat(240.0f, 248.0f);
 		ripple.Init = 1.0f;

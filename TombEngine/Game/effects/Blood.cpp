@@ -21,6 +21,17 @@ using namespace TEN::Renderer;
 
 namespace TEN::Effects::Blood
 {
+	constexpr auto BLOOD_MIST_LIFE_MIN	   = 0.5f;
+	constexpr auto BLOOD_MIST_LIFE_MAX	   = 1.0f;
+	constexpr auto BLOOD_MIST_VELOCITY_MAX = 16.0f;
+	constexpr auto BLOOD_MIST_SCALE_MIN	   = 64.0f;
+	constexpr auto BLOOD_MIST_SCALE_MAX	   = 128.0f;
+	constexpr auto BLOOD_MIST_OPACITY_MAX  = 0.7f;
+	constexpr auto BLOOD_MIST_GRAVITY_MIN  = 1.0f;
+	constexpr auto BLOOD_MIST_GRAVITY_MAX  = 2.0f;
+	constexpr auto BLOOD_MIST_FRICTION	   = 4.0f;
+	const	  auto BLOOD_MIST_ROTATION_MAX = ANGLE(10.0f);
+
 	constexpr auto BLOOD_DRIP_LIFE_MAX			= 5.0f;
 	constexpr auto BLOOD_DRIP_LIFE_START_FADING = 0.5f;
 	constexpr auto BLOOD_DRIP_GRAVITY_MIN		= 5.0f;
@@ -107,7 +118,7 @@ namespace TEN::Effects::Blood
 
 	bool TestBloodStainFloor(const BloodStain& stain)
 	{
-		static constexpr auto heightRange = CLICK(1 / 2.0f);
+		static constexpr auto heightRange = CLICK(0.5f);
 
 		// Get point collision at every vertex point.
 		auto pointColl0 = GetCollision(stain.VertexPoints[0].x, stain.Position.y - CLICK(1), stain.VertexPoints[0].z, stain.RoomNumber);
@@ -139,18 +150,18 @@ namespace TEN::Effects::Blood
 		mist.Position = Random::GeneratePointInSphere(sphere);
 		mist.RoomNumber = roomNumber;
 		mist.Orientation2D = Random::GenerateAngle();
-		mist.Velocity = Random::GenerateDirectionInCone(direction, 20.0f) * Random::GenerateFloat(-16.0f, 16.0f);
+		mist.Velocity = Random::GenerateDirectionInCone(direction, 20.0f) * Random::GenerateFloat(0.0f, BLOOD_MIST_VELOCITY_MAX);
 		mist.Color = BLOOD_COLOR_RED;
-		mist.Life = Random::GenerateFloat(0.5f, 1.0f) * FPS;
+		mist.Life = std::round(Random::GenerateFloat(BLOOD_MIST_LIFE_MIN, BLOOD_MIST_LIFE_MAX) * FPS);
 		mist.LifeMax = mist.Life;
-		mist.Scale = Random::GenerateFloat(128.0f, 256.0f);
-		mist.ScaleMax = mist.Scale;
-		mist.ScaleMin = mist.Scale / 4;
-		mist.Opacity = 0.8f;
+		mist.Scale = Random::GenerateFloat(BLOOD_MIST_SCALE_MIN, BLOOD_MIST_SCALE_MAX);
+		mist.ScaleMax = mist.Scale * 4;
+		mist.ScaleMin = mist.Scale;
+		mist.Opacity = BLOOD_MIST_OPACITY_MAX;
 		mist.OpacityMax = mist.Opacity;
-		mist.Gravity = Random::GenerateFloat(1.0f, 2.0f);
-		mist.Friction = 4.0f;
-		mist.Rotation = Random::GenerateAngle(ANGLE(-20.0f), ANGLE(20.0f));
+		mist.Gravity = Random::GenerateFloat(BLOOD_MIST_GRAVITY_MIN, BLOOD_MIST_GRAVITY_MAX);
+		mist.Friction = BLOOD_MIST_FRICTION;
+		mist.Rotation = Random::GenerateAngle(-BLOOD_MIST_ROTATION_MAX, BLOOD_MIST_ROTATION_MAX);
 	}
 
 	void SpawnBloodMistCloud(const Vector3& pos, int roomNumber, const Vector3& direction, unsigned int count)
@@ -202,7 +213,7 @@ namespace TEN::Effects::Blood
 		// BIG TODO: Art direction needs special attention.
 		// Combine mists, long drips, and round drips of various sizes.
 
-		SpawnBloodMistCloud(pos, roomNumber, direction, count * 2);
+		SpawnBloodMistCloud(pos, roomNumber, direction, count * 4);
 
 		// Spawn decorative drips.
 		for (int i = 0; i < count * 12; i++)
@@ -294,20 +305,16 @@ namespace TEN::Effects::Blood
 
 			// Update velocity.
 			mist.Velocity.y += mist.Gravity;
-			/*if (mist.friction & 0xF)
-			{
-				mist.xVel -= mist.xVel >> (mist.friction & 0xF);
-				mist.zVel -= mist.zVel >> (mist.friction & 0xF);
-			}*/
+			mist.Velocity -= mist.Velocity / mist.Friction;
 
 			// Update position.
 			mist.Position += mist.Velocity;
 			mist.Orientation2D += mist.Rotation;
 
 			// Update scale.
-			//mist.Scale = Lerp(mist.ScaleMax, mist.ScaleMin, 1.0f - (mist.Life / mist.LifeMax));
+			mist.Scale = Lerp(mist.ScaleMin, mist.ScaleMax, 1.0f - (mist.Life / mist.LifeMax));
 
-			// Update color.
+			// Update opacity.
 			mist.Opacity = Lerp(mist.OpacityMax, 0.0f, 1.0f - (mist.Life / mist.LifeMax));
 			mist.Color.w = mist.Opacity;
 		}
