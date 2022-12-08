@@ -146,6 +146,11 @@ GameStatus ControlPhase(int numFrames)
 		if (result != GameStatus::None)
 			return result;
 
+		// Queued input actions are read again and cleared after UI 
+		// interrupts are processed, so first frame after exiting UI
+		// will still register it.
+		UnqueueInputActions(true);
+
 		UpdateAllItems();
 		UpdateAllEffects();
 		UpdateLara(LaraItem, isTitle);
@@ -545,7 +550,7 @@ void HandleControls(bool isTitle)
 			ClearAllActions();
 		else
 			// TODO: To allow cutscene skipping later, don't clear Deselect action.
-			UpdateInputActions(LaraItem);
+			UpdateInputActions(LaraItem, true);
 	}
 	else
 	{
