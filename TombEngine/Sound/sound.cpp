@@ -140,6 +140,7 @@ bool LoadSample(char* pointer, int compSize, int uncompSize, int index)
 	return true;
 }
 
+// TODO: Make pose parameter a const reference.
 bool SoundEffect(int effectID, Pose* position, SoundEnvironment condition, float pitchMultiplier, float gainMultiplier)
 {
 	if (!g_Configuration.EnableSound)

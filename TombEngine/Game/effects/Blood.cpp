@@ -43,7 +43,7 @@ namespace TEN::Effects::Blood
 	constexpr auto BLOOD_STAIN_OPACITY_MAX		  = 0.8f;
 	constexpr auto BLOOD_STAIN_POOLING_SCALE_RATE = 0.4f;
 	constexpr auto BLOOD_STAIN_POOLING_TIME_DELAY = 5.0f;
-	constexpr auto BLOOD_STAIN_HEIGHT_OFFSET	  = 4;
+	constexpr auto BLOOD_STAIN_SURFACE_OFFSET	  = 4;
 	constexpr auto BLOOD_STAIN_SPRITE_INDEX_MAX	  = 8; // TODO: Dehardcode this index range.
 
 	constexpr auto BLOOD_COLOR_RED	 = Vector4(0.8f, 0.0f, 0.0f, 1.0f);
@@ -269,7 +269,7 @@ namespace TEN::Effects::Blood
 		if (!drip.CanSpawnStain)
 			return;
 
-		auto pos = Vector3(drip.Position.x, pointColl.Position.Floor - BLOOD_STAIN_HEIGHT_OFFSET, drip.Position.z);
+		auto pos = Vector3(drip.Position.x, pointColl.Position.Floor - BLOOD_STAIN_SURFACE_OFFSET, drip.Position.z);
 		auto normal = Geometry::GetFloorNormal(pointColl.FloorTilt);
 		float scale = drip.Scale * 5;
 		float scaleRate = std::min(drip.Velocity.Length() / 2, scale / 2);
@@ -280,7 +280,7 @@ namespace TEN::Effects::Blood
 	void SpawnBloodStainPool(ItemInfo& item)
 	{
 		auto pointColl = GetCollision(&item);
-		auto pos = Vector3(item.Pose.Position.x, pointColl.Position.Floor - BLOOD_STAIN_HEIGHT_OFFSET, item.Pose.Position.z);
+		auto pos = Vector3(item.Pose.Position.x, pointColl.Position.Floor - BLOOD_STAIN_SURFACE_OFFSET, item.Pose.Position.z);
 		auto normal = Geometry::GetFloorNormal(pointColl.FloorTilt);
 
 		auto bounds = GameBoundingBox(&item);

@@ -19,9 +19,9 @@ namespace TEN::Effects::Footprint
 	constexpr auto FOOTPRINT_LIFE_START_FADING = 10.0f;
 	constexpr auto FOOTPRINT_OPACITY_MAX	   = 0.5f;
 
-	constexpr auto FOOTPRINT_SCALE		   = 64.0f;
-	constexpr auto FOOTPRINT_HEIGHT_OFFSET = 4;
-	constexpr auto FOOT_HEIGHT_OFFSET	   = CLICK(1 / 4.0f);
+	constexpr auto FOOTPRINT_SCALE			= 64.0f;
+	constexpr auto FOOTPRINT_SURFACE_OFFSET = 4;
+	constexpr auto FOOT_HEIGHT_OFFSET		= CLICK(0.25f);
 
 	const auto FootprintMaterials = std::vector<FLOOR_MATERIAL>
 	{
@@ -36,47 +36,6 @@ namespace TEN::Effects::Footprint
 	};
 
 	std::deque<Footprint> Footprints = {};
-
-	void AddFootprint(ItemInfo* item, bool isRightFoot)
-	{
-		if (!item->IsLara())
-			return;
-
-		auto footJoint = isRightFoot ? LM_RFOOT : LM_LFOOT;
-
-		// Don't process actual footprint placement if foot isn't on floor.
-		auto footPos = Vector3::Zero;
-		if (!TestFootHeight(*item, footJoint, footPos))
-			return;
-
-		// Slightly randomize 2D footprint position to avoid patterns.
-		footPos += Vector3(Random::GenerateFloat(-5.0f, 5.0f), 0.0f, Random::GenerateFloat(-5.0f, 5.0f));
-
-		auto pointColl = GetCollision(footPos.x, footPos.y - CLICK(1), footPos.z, item->RoomNumber);
-
-		// Don't process material if foot hit bridge object.
-		if (pointColl.Position.Bridge >= 0)
-			return;
-
-		// Get footstep sound for floor material.
-		auto sfx = GetFootprintSoundEffectID(pointColl.BottomBlock->Material);
-
-		// HACK: Must be here until reference WAD2 is revised.
-		if (sfx != SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS)
-			SoundEffect(sfx, &item->Pose);
-
-		// Check floor material.
-		if (!TestMaterial(pointColl.BottomBlock->Material, FootprintMaterials))
-			return;
-
-		auto vertexPoints = GetFootprintVertexPoints(*item, footPos, Geometry::GetFloorNormal(pointColl.FloorTilt));
-
-		// Check floor continuity.
-		if (!TestFootprintFloor(*item, footPos, vertexPoints))
-			return;
-
-		SpawnFootprint(isRightFoot, vertexPoints);
-	}
 
 	SOUND_EFFECTS GetFootprintSoundEffectID(FLOOR_MATERIAL material)
 	{
@@ -183,7 +142,7 @@ namespace TEN::Effects::Footprint
 		return false;
 	}
 
-	bool TestFootHeight(ItemInfo& item, int meshIndex, Vector3& outFootprintPos)
+	bool TestFootHeight(const ItemInfo& item, int meshIndex, Vector3& outFootprintPos)
 	{
 		static constexpr auto heightRange = CLICK(1 / 4.0f);
 		static const auto footOffset = Vector3i(0, FOOT_HEIGHT_OFFSET, 0);
@@ -191,7 +150,7 @@ namespace TEN::Effects::Footprint
 		auto footPos = GetJointPosition(LaraItem, meshIndex, footOffset);
 		int floorHeight = GetCollision(footPos.x, footPos.y - CLICK(1), footPos.z, item.RoomNumber).Position.Floor;
 
-		outFootprintPos = Vector3(footPos.x, floorHeight - FOOTPRINT_HEIGHT_OFFSET, footPos.z);
+		outFootprintPos = Vector3(footPos.x, floorHeight - FOOTPRINT_SURFACE_OFFSET, footPos.z);
 		return (abs(footPos.y - floorHeight) < heightRange);
 	}
 
@@ -233,6 +192,50 @@ namespace TEN::Effects::Footprint
 			Footprints.pop_back();
 
 		Footprints.push_front(footprint);
+	}
+
+	void SpawnFootprint(const ItemInfo& item, bool isRightFoot)
+	{
+		if (!item.IsLara())
+			return;
+
+		auto footJoint = isRightFoot ? LM_RFOOT : LM_LFOOT;
+
+		// Don't process actual footprint placement if foot isn't on floor.
+		auto footPos = Vector3::Zero;
+		if (!TestFootHeight(item, footJoint, footPos))
+			return;
+
+		// Slightly randomize 2D footprint position to avoid patterns.
+		footPos += Vector3(Random::GenerateFloat(-5.0f, 5.0f), 0.0f, Random::GenerateFloat(-5.0f, 5.0f));
+
+		auto pointColl = GetCollision(footPos.x, footPos.y - CLICK(1), footPos.z, item.RoomNumber);
+
+		// Don't process material if foot hit bridge object.
+		if (pointColl.Position.Bridge >= 0)
+			return;
+
+		// Get footstep sound for floor material.
+		auto sfx = GetFootprintSoundEffectID(pointColl.BottomBlock->Material);
+
+		// HACK: Must be here until reference WAD2 is revised.
+		if (sfx != SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS)
+		{
+			auto poseCopy = item.Pose;
+			SoundEffect(sfx, &poseCopy);
+		}
+
+		// Check floor material.
+		if (!TestMaterial(pointColl.BottomBlock->Material, FootprintMaterials))
+			return;
+
+		auto vertexPoints = GetFootprintVertexPoints(item, footPos, Geometry::GetFloorNormal(pointColl.FloorTilt));
+
+		// Check floor continuity.
+		if (!TestFootprintFloor(item, footPos, vertexPoints))
+			return;
+
+		SpawnFootprint(isRightFoot, vertexPoints);
 	}
 
 	void UpdateFootprints()

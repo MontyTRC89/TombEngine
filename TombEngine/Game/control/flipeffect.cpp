@@ -120,12 +120,12 @@ void Puzzle(ItemInfo* item)
 
 void AddLeftFootprint(ItemInfo* item)
 {
-	AddFootprint(item, false);
+	SpawnFootprint(*item, false);
 }
 
 void AddRightFootprint(ItemInfo* item)
 {
-	AddFootprint(item, true);
+	SpawnFootprint(*item, true);
 }
 
 void ResetHair(ItemInfo* item)
