@@ -212,7 +212,7 @@ namespace TEN::Input
 		TrInput = 0;
 	}
 
-	void UnqueueInputActions(bool clearQueue)
+	void ApplyActionQueue()
 	{
 		for (int i = 0; i < KEY_COUNT; i++)
 		{
@@ -226,13 +226,14 @@ namespace TEN::Input
 				{
 					ActionMap[i].Clear();
 				}
-
-				if (clearQueue)
-				{
-					ActionQueue[i] = QueueState::None;
-				}
 			}
 		}
+	}
+
+	void ClearActionQueue()
+	{
+		for (auto& queue : ActionQueue)
+			queue = QueueState::None;
 	}
 
 	bool LayoutContainsIndex(unsigned int index)
@@ -656,7 +657,7 @@ namespace TEN::Input
 		RumbleInfo.LastPower = RumbleInfo.Power;
 	}
 
-	void UpdateInputActions(ItemInfo* item, bool queue)
+	void UpdateInputActions(ItemInfo* item, bool applyQueue)
 	{
 		ClearInputData();
 		UpdateRumble();
@@ -670,9 +671,9 @@ namespace TEN::Input
 			ActionMap[i].Update(Key(i) ? true : false);
 		}
 
-		if (queue)
+		if (applyQueue)
 		{
-			UnqueueInputActions(false);
+			ApplyActionQueue();
 		}
 
 		// Additional handling.

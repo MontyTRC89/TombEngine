@@ -149,7 +149,8 @@ GameStatus ControlPhase(int numFrames)
 		// Queued input actions are read again and cleared after UI 
 		// interrupts are processed, so first frame after exiting UI
 		// will still register it.
-		UnqueueInputActions(true);
+		ApplyActionQueue();
+		ClearActionQueue();
 
 		UpdateAllItems();
 		UpdateAllEffects();
