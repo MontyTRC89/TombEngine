@@ -24,7 +24,7 @@ private:
 public:
 	int								FogInDistance{ 0 };
 	int								FogOutDistance{ 0 };
-	bool							PlayAnyLevel{ true };
+	bool							LevelSelect{ true };
 	bool							FlyCheat{ true };
 	bool							MassPickup{ true }; 
 	bool							LaraInTitle{ false };
@@ -64,7 +64,8 @@ public:
 	void				EnableMassPickup(bool massPickup);
 	bool				IsLaraInTitleEnabled() const;
 	void				EnableLaraInTitle(bool laraInTitle);
-	bool				CanPlayAnyLevel() const;
+	bool				IsLevelSelectEnabled() const;
+	void				EnableLevelSelect(bool laraInTitle);
 
 	bool HasCrawlExtended() const override { return Anims.HasCrawlExtended; }
 	bool HasCrouchRoll() const override { return Anims.HasCrouchRoll; }

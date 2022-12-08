@@ -317,7 +317,7 @@ namespace TEN::Gui
 					switch (SelectedOption)
 					{
 					case TitleOption::NewGame:
-						if (g_GameFlow->CanPlayAnyLevel())
+						if (g_GameFlow->IsLevelSelectEnabled())
 						{
 							selectedOptionBackup = SelectedOption;
 							SelectedOption = 0;

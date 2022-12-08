@@ -19,21 +19,27 @@ Version 1.0.4
 * Fix several pushable sound and object collision bugs.
 * Fix original bug with incorrect climb up behaviour on ladders under sloped ceilings.
 * Fix TR1 centaur bubble targeting.
+* Fix occasional wrong rollingball collision in narrow pits.
 * Fix classic rollingball and big rollingball not behaving properly.
 * Fix caustics not turning off in display settings.
 * Fix windowed mode not using real resolution when DPI scaling is active.
 * Fix control lock not working in flyby sequences.
 * Fix empty inventory when using build and play feature in TE.
+* Fix non-pickupable thrown flares.
 * Fix throwing flare without drawing any weapons if there are no weapons present.
 * Fix several incorrect FOV reset issues.
+* Fix current soundtrack fading into silence if incoming one doesn't exist.
 
 Lua API changes:
 * Add new Moveable functions: GetEffect, SetEffect and SetCustomEffect (for colored fire).
 * Add new Lara functions: GetTarget and GetVehicle.
 * Remove Lara functions: SetOnFire and GetOnFire (replaced with GetEffect and SetEffect).
-* Add Flow.EnableMassPickup option in Gameflow.lua to enable/disable mass pickups.
-* Add Flow.EnableLaraInTitle option in Gameflow.lua to enable/disable Lara in title flyby.
-* Add level.secrets property to display level-specific secret count.
+* Add Gameflow.lua options:
+  - Flow.EnableMassPickup for mass pickup functionality.
+  - Flow.EnableLaraInTitle for displaying Lara in title flyby.
+  - Flow.EnableLevelSelect for title flyby level selection.
+  - level.secrets for level-specific secret count.
+  
 * Fix level.ambientTrack property not working for title flyby.
 * Fix action key script functions not fully working in some cases.
 * Fix mounted vehicles ignoring Disable, Shatter and Explode script commands.
