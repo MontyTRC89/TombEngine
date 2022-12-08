@@ -123,6 +123,7 @@ namespace TEN::Input
 	extern const char* g_KeyNames[];
 
 	extern vector<InputAction> ActionMap;
+	extern vector<bool>		   ActionQueue;
 	extern vector<bool>		   KeyMap;
 	extern vector<float>	   AxisMap;
 
