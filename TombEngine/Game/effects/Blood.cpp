@@ -279,8 +279,9 @@ namespace TEN::Effects::Blood
 
 	void SpawnBloodStainPool(ItemInfo& item)
 	{
-		auto pos = Vector3(item.Pose.Position.x, item.Pose.Position.y - BLOOD_STAIN_HEIGHT_OFFSET, item.Pose.Position.z);
-		auto normal = Geometry::GetFloorNormal(GetCollision(&item).FloorTilt);
+		auto pointColl = GetCollision(&item);
+		auto pos = Vector3(item.Pose.Position.x, pointColl.Position.Floor - BLOOD_STAIN_HEIGHT_OFFSET, item.Pose.Position.z);
+		auto normal = Geometry::GetFloorNormal(pointColl.FloorTilt);
 
 		auto bounds = GameBoundingBox(&item);
 		float scaleMax = (bounds.GetWidth() + bounds.GetDepth()) / 2;
