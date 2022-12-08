@@ -221,7 +221,7 @@ void TriggerDynamicLight(int x, int y, int z, short falloff, byte r, byte g, byt
 void TriggerRocketFlame(int x, int y, int z, int xv, int yv, int zv, int itemNumber);
 void TriggerRocketSmoke(int x, int y, int z, int bodyPart);
 void TriggerFlashSmoke(int x, int y, int z, short roomNumber);
-void TriggerMetalSparks(int x, int y, int z, int xv, int yv, int zv, int additional);
+void TriggerMetalSparks(int x, int y, int z, int xv, int yv, int zv, const Vector3& color, int additional);
 void TriggerAttackFlame(const Vector3i& pos, const Vector3& color, int size);
 void WadeSplash(ItemInfo* item, int wh, int wd);
 void Splash(ItemInfo* item);

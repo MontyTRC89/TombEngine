@@ -84,12 +84,13 @@ namespace TEN::Entities::TR4
 		if (item->Animation.AnimNumber == object->animIndex ||
 			(item->Animation.AnimNumber - object->animIndex) == KTEMPLAR_ANIM_WALK_FORWARD_RIGHT_1 ||
 			(item->Animation.AnimNumber - object->animIndex) == KTEMPLAR_ANIM_WALK_FORWARD_LEFT_2 ||
-			(item->Animation.AnimNumber - object->animIndex) == KTEMPLAR_ANIM_WALK_FORWARD_RIGHT_2)
+			(item->Animation.AnimNumber - object->animIndex) == KTEMPLAR_ANIM_WALK_FORWARD_RIGHT_2) 
 		{
 			if (TestProbability(0.5f))
 			{
+				auto col = Vector3(0.9f, 0.8f, 0.6f);
 				auto pos = GetJointPosition(item, 10, Vector3i(0, 48, 448));
-				TriggerMetalSparks(pos.x, pos.y, pos.z, (GetRandomControl() & 0x1FF) - 256, -128 - (GetRandomControl() & 0x7F), (GetRandomControl() & 0x1FF) - 256, 0);
+				TriggerMetalSparks(pos.x, pos.y, pos.z, (GetRandomControl() & 0x1FF) - 256, -128 - (GetRandomControl() & 0x7F), (GetRandomControl() & 0x1FF) - 256, col, 0);
 			}
 		}
 
@@ -177,7 +178,7 @@ namespace TEN::Entities::TR4
 				auto pos = GetJointPosition(item, LM_LINARM);
 				
 				auto* room = &g_Level.Rooms[item->RoomNumber];
-				FloorInfo* currentFloor = &room->floor[(pos.z - room->z) / SECTOR(1) + (pos.z - room->x) / SECTOR(1) * room->zSize];
+				FloorInfo* currentFloor = &room->floor[(pos.z - room->z) / SECTOR(1) + (pos.x - room->x) / SECTOR(1) * room->zSize];
 
 				if (currentFloor->Stopper)
 				{
@@ -185,9 +186,9 @@ namespace TEN::Entities::TR4
 					{
 						auto* mesh = &room->mesh[i];
 
-						if (floor(pos.x) == floor(mesh->pos.Position.x) &&
-							floor(pos.z) == floor(mesh->pos.Position.z) &&
-							StaticObjects[mesh->staticNumber].shatterType != SHT_NONE)
+						if (!((pos.x ^ mesh->pos.Position.x) & ~0x3FF) &&
+							!((pos.z ^ mesh->pos.Position.z) & ~0x3FF) &&
+							StaticObjects[mesh->staticNumber].shatterType <= SHT_NONE)
 						{
 							ShatterObject(nullptr, mesh, -64, LaraItem->RoomNumber, 0);
 							SoundEffect(SFX_TR4_SMASH_ROCK, &item->Pose);
