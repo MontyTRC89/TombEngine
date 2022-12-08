@@ -9,11 +9,6 @@
 #include "Specific/clock.h"
 #include "Specific/setup.h"
 
-#include "lara.h"
-
-#include "Game/effects/effects.h"
-#include "Game/effects/tomb4fx.h"
-
 using namespace TEN::Effects::Environment;
 using namespace TEN::Effects::Ripple;
 using namespace TEN::Math;
@@ -21,22 +16,26 @@ using namespace TEN::Renderer;
 
 namespace TEN::Effects::Blood
 {
-	constexpr auto BLOOD_MIST_LIFE_MIN	   = 0.5f;
-	constexpr auto BLOOD_MIST_LIFE_MAX	   = 1.0f;
-	constexpr auto BLOOD_MIST_VELOCITY_MAX = 16.0f;
-	constexpr auto BLOOD_MIST_SCALE_MIN	   = 64.0f;
-	constexpr auto BLOOD_MIST_SCALE_MAX	   = 128.0f;
-	constexpr auto BLOOD_MIST_OPACITY_MAX  = 0.7f;
-	constexpr auto BLOOD_MIST_GRAVITY_MIN  = 1.0f;
-	constexpr auto BLOOD_MIST_GRAVITY_MAX  = 2.0f;
-	constexpr auto BLOOD_MIST_FRICTION	   = 4.0f;
-	const	  auto BLOOD_MIST_ROTATION_MAX = ANGLE(10.0f);
+	constexpr auto BLOOD_MIST_LIFE_MAX		= 0.75f;
+	constexpr auto BLOOD_MIST_LIFE_MIN		= 0.25f;
+	constexpr auto BLOOD_MIST_VELOCITY_MAX	= 16.0f;
+	constexpr auto BLOOD_MIST_SCALE_MAX		= 128.0f;
+	constexpr auto BLOOD_MIST_SCALE_MIN		= 64.0f;
+	constexpr auto BLOOD_MIST_OPACITY_MAX	= 0.7f;
+	constexpr auto BLOOD_MIST_GRAVITY_MAX	= 2.0f;
+	constexpr auto BLOOD_MIST_GRAVITY_MIN	= 1.0f;
+	constexpr auto BLOOD_MIST_FRICTION		= 4.0f;
+	const	  auto BLOOD_MIST_ROTATION_MAX	= ANGLE(10.0f);
+	constexpr auto BLOOD_MIST_SPHERE_RADIUS = BLOCK(1 / 8.0f);
+	constexpr auto BLOOD_MIST_SEMIANGLE		= 20.0f;
 
-	constexpr auto BLOOD_DRIP_LIFE_MAX			= 5.0f;
-	constexpr auto BLOOD_DRIP_LIFE_START_FADING = 0.5f;
-	constexpr auto BLOOD_DRIP_GRAVITY_MIN		= 5.0f;
-	constexpr auto BLOOD_DRIP_GRAVITY_MAX		= 15.0f;
-	constexpr auto BLOOD_DRIP_SPRAY_SEMIANGLE	= 50.0f;
+	constexpr auto BLOOD_DRIP_LIFE_MAX			 = 5.0f;
+	constexpr auto BLOOD_DRIP_LIFE_START_FADING	 = 0.5f;
+	constexpr auto BLOOD_DRIP_GRAVITY_MIN		 = 5.0f;
+	constexpr auto BLOOD_DRIP_GRAVITY_MAX		 = 15.0f;
+	constexpr auto BLOOD_DRIP_SPRAY_VELOCITY_MAX = 45.0f;
+	constexpr auto BLOOD_DRIP_SPRAY_VELOCITY_MIN = 15.0f;
+	constexpr auto BLOOD_DRIP_SPRAY_SEMIANGLE	 = 50.0f;
 
 	constexpr auto BLOOD_STAIN_LIFE_MAX			  = 5.0f * 60.0f;
 	constexpr auto BLOOD_STAIN_LIFE_START_FADING  = 30.0f;
@@ -44,7 +43,7 @@ namespace TEN::Effects::Blood
 	constexpr auto BLOOD_STAIN_POOLING_SCALE_RATE = 0.4f;
 	constexpr auto BLOOD_STAIN_POOLING_TIME_DELAY = 5.0f;
 	constexpr auto BLOOD_STAIN_SURFACE_OFFSET	  = 4;
-	constexpr auto BLOOD_STAIN_SPRITE_INDEX_MAX	  = 8; // TODO: Dehardcode this index range.
+	constexpr auto BLOOD_STAIN_SPRITE_INDEX_MAX	  = 7; // TODO: Dehardcode this index range.
 
 	constexpr auto BLOOD_COLOR_RED	 = Vector4(0.8f, 0.0f, 0.0f, 1.0f);
 	constexpr auto BLOOD_COLOR_BROWN = Vector4(0.3f, 0.1f, 0.0f, 1.0f);
@@ -142,7 +141,7 @@ namespace TEN::Effects::Blood
 	{
 		auto& mist = GetFreeBloodMist();
 
-		auto sphere = BoundingSphere(pos, BLOCK(1 / 16.0f));
+		auto sphere = BoundingSphere(pos, BLOOD_MIST_SPHERE_RADIUS);
 
 		mist = BloodMist();
 		mist.SpriteIndex = Objects[ID_BLOOD_MIST_SPRITES].meshIndex;
@@ -150,7 +149,7 @@ namespace TEN::Effects::Blood
 		mist.Position = Random::GeneratePointInSphere(sphere);
 		mist.RoomNumber = roomNumber;
 		mist.Orientation2D = Random::GenerateAngle();
-		mist.Velocity = Random::GenerateDirectionInCone(direction, 20.0f) * Random::GenerateFloat(0.0f, BLOOD_MIST_VELOCITY_MAX);
+		mist.Velocity = Random::GenerateDirectionInCone(direction, BLOOD_MIST_SEMIANGLE) * Random::GenerateFloat(0.0f, BLOOD_MIST_VELOCITY_MAX);
 		mist.Color = BLOOD_COLOR_RED;
 		mist.Life = std::round(Random::GenerateFloat(BLOOD_MIST_LIFE_MIN, BLOOD_MIST_LIFE_MAX) * FPS);
 		mist.LifeMax = mist.Life;
@@ -169,13 +168,8 @@ namespace TEN::Effects::Blood
 		if (TestEnvironment(ENV_FLAG_WATER, roomNumber))
 			return;
 
-		auto sphere = BoundingSphere(pos, BLOCK(1 / 8.0f));
-
 		for (int i = 0; i < count; i++)
-		{
-			auto pos = Random::GeneratePointInSphere(sphere);
 			SpawnBloodMist(pos, roomNumber, direction);
-		}
 	}
 
 	void SpawnBloodCloudUnderwater(const Vector3& pos, int roomNumber, float scale)
@@ -207,18 +201,13 @@ namespace TEN::Effects::Blood
 
 	void SpawnBloodDripSpray(const Vector3& pos, int roomNumber, const Vector3& direction, const Vector3& baseVelocity, unsigned int count)
 	{
-		static constexpr auto minLength = 15.0f;
-		static constexpr auto maxLength = 45.0f;
-
-		// BIG TODO: Art direction needs special attention.
-		// Combine mists, long drips, and round drips of various sizes.
-
+		// Spawn mist.
 		SpawnBloodMistCloud(pos, roomNumber, direction, count * 4);
 
 		// Spawn decorative drips.
 		for (int i = 0; i < count * 12; i++)
 		{
-			float length = Random::GenerateFloat(minLength, maxLength);
+			float length = Random::GenerateFloat(BLOOD_DRIP_SPRAY_VELOCITY_MIN, BLOOD_DRIP_SPRAY_VELOCITY_MAX);
 			auto velocity = Random::GenerateDirectionInCone(-direction, BLOOD_DRIP_SPRAY_SEMIANGLE) * length;
 			float scale = length / 4;
 
@@ -228,7 +217,7 @@ namespace TEN::Effects::Blood
 		// Spawn special drips capable of creating stains.
 		for (int i = 0; i < count; i++)
 		{
-			float length = Random::GenerateFloat(minLength, maxLength);
+			float length = Random::GenerateFloat(BLOOD_DRIP_SPRAY_VELOCITY_MIN, BLOOD_DRIP_SPRAY_VELOCITY_MAX);
 			auto velocity = baseVelocity + Random::GenerateDirectionInCone(direction, BLOOD_DRIP_SPRAY_SEMIANGLE) * length;
 			float scale = length / 2;
 
