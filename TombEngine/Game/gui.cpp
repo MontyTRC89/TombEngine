@@ -321,7 +321,7 @@ namespace TEN::Gui
 					switch (SelectedOption)
 					{
 					case TitleOption::NewGame:
-						if (g_GameFlow->CanPlayAnyLevel())
+						if (g_GameFlow->IsLevelSelectEnabled())
 						{
 							selectedOptionBackup = SelectedOption;
 							SelectedOption = 0;
@@ -611,7 +611,7 @@ namespace TEN::Gui
 					g_Renderer.RenderTitle();
 					Camera.numberFrames = g_Renderer.Synchronize();
 					int numFrames = Camera.numberFrames;
-					ControlPhase(numFrames, false);
+					ControlPhase(numFrames);
 				}
 			}
 		}
@@ -2960,7 +2960,7 @@ namespace TEN::Gui
 	{
 		auto* lara = GetLaraInfo(item);
 
-		bool returnValue = false;
+		bool doLoad = false;
 
 		lara->Inventory.OldBusy = lara->Inventory.IsBusy;
 
@@ -3019,7 +3019,7 @@ namespace TEN::Gui
 				switch (DoLoad())
 				{
 				case LoadResult::Load:
-					returnValue = true;
+					doLoad = true;
 					exitLoop = true;
 					break;
 
@@ -3067,7 +3067,7 @@ namespace TEN::Gui
 		lara->Inventory.IsBusy = lara->Inventory.OldBusy;
 		InvMode = InventoryMode::None;
 
-		return returnValue;
+		return doLoad;
 	}
 
 	void GuiController::DoStatisticsMode()

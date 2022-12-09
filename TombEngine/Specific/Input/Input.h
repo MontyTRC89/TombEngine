@@ -108,6 +108,13 @@ namespace TEN::Input
 		Count
 	};
 
+	enum class QueueState
+	{
+		None,
+		Push,
+		Clear
+	};
+
 	enum class RumbleMode
 	{
 		None,
@@ -127,6 +134,7 @@ namespace TEN::Input
 	extern const std::vector<std::string> g_KeyNames;
 
 	extern std::vector<InputAction> ActionMap;
+	extern vector<QueueState>		ActionQueue;
 	extern std::vector<Vector2>		AxisMap;
 	extern std::vector<bool>		KeyMap;
 
@@ -139,7 +147,9 @@ namespace TEN::Input
 	void InitialiseInput(HWND handle);
 	void DeinitialiseInput();
 	void DefaultConflict();
-	void UpdateInputActions(ItemInfo* item);
+	void UpdateInputActions(ItemInfo* item, bool applyQueue = false);
+	void ApplyActionQueue();
+	void ClearActionQueue();
 	void ClearAllActions();
 	void Rumble(float power, float delayInSec = 0.3f, RumbleMode mode = RumbleMode::Both);
 	void StopRumble();

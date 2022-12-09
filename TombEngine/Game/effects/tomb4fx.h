@@ -21,10 +21,10 @@ struct SMOKE_SPARKS
 	int x;
 	int y;
 	int z;
-	short xVel;
-	short yVel;
-	short zVel;
-	short gravity;
+	int xVel;
+	int yVel;
+	int zVel;
+	int gravity;
 	short rotAng;
 	short flags;
 	byte sSize;

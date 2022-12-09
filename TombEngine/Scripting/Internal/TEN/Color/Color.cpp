@@ -40,7 +40,7 @@ void ScriptColor::Register(sol::table & parent)
 @int R red component
 @int G green component
 @int B blue component
-@return A Color object.
+@treturn Color A new Color object.
 @function Color
 */
 ScriptColor::ScriptColor(byte r, byte g, byte b) :
@@ -53,7 +53,7 @@ m_color(r, g, b)
 @int G green component
 @int B blue component
 @int A alpha component (255 is opaque, 0 is invisible)
-@return A Color object.
+@treturn Color A new Color object.
 @function Color
 */
 ScriptColor::ScriptColor(byte r, byte g, byte b, byte a) : ScriptColor(r, g, b)

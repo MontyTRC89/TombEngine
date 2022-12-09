@@ -12,7 +12,7 @@ These are things things which aren't present in the compiled level file itself.
 
 /*** Make a new Level object.
 	@function Level
-	@return a Level object
+	@treturn Level a Level object
 	*/
 void Level::Register(sol::table & parent)
 {	
@@ -268,4 +268,9 @@ void Level::SetSecrets(int secrets)
 int Level::GetSecrets() const
 {
 	return LevelSecrets;
+}
+
+std::string Level::GetAmbientTrack() const
+{
+	return AmbientTrack;
 }
