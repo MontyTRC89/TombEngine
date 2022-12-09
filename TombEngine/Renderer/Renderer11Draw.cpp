@@ -2282,7 +2282,7 @@ namespace TEN::Renderer
 		m_context->ClearDepthStencilView(depthTarget, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 	}
 
-	void Renderer11::Draw()
+	void Renderer11::Render()
 	{
 		//RenderToCubemap(m_reflectionCubemap, Vector3(LaraItem->pos.xPos, LaraItem->pos.yPos - 1024, LaraItem->pos.zPos), LaraItem->roomNumber);
 		RenderScene(m_backBufferRTV, m_depthStencilView, gameCamera);

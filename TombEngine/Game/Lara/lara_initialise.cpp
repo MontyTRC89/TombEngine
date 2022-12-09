@@ -45,13 +45,13 @@ void InitialiseLara(bool restore)
 	LaraItem->HitPoints = LARA_HEALTH_MAX;
 	Lara.Control.HandStatus = HandStatus::Free;
 
-	InitialiseLaraMeshes(LaraItem);
-	InitialiseLaraAnims(LaraItem);
-
 	if (restore)
 		InitialiseLaraLevelJump(itemNumber, &lBackup);
 	else
 		InitialiseLaraDefaultInventory();
+
+	InitialiseLaraMeshes(LaraItem);
+	InitialiseLaraAnims(LaraItem);
 }
 
 void InitialiseLaraMeshes(ItemInfo* item)

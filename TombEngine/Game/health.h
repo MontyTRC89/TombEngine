@@ -14,25 +14,18 @@ struct DisplayPickup
 void DrawHUD(ItemInfo* item);
 void DrawHealthBarOverlay(ItemInfo* item, int value);
 void DrawHealthBar(ItemInfo* item, float value);
-void UpdateHealthBar(ItemInfo* item, int flash);
+void DrawHealthBar(ItemInfo* item, bool doFlash);
 void DrawAirBar(float value);
-void UpdateAirBar(ItemInfo* item, int flash);
+void DrawAirBar(ItemInfo* item, bool doFlash);
 void DrawSprintBar(float value);
-void UpdateSprintBar(ItemInfo* item);
+void DrawSprintBar(ItemInfo* item);
+void UpdateBars(ItemInfo* item);
 void AddDisplayPickup(GAME_OBJECT_ID objectNumber);
 void DrawAllPickups();
 void InitialisePickupDisplay();
-int FlashIt();
 
 extern short PickupX;
 extern short PickupY;
-extern short CurrentPickup;
 extern DisplayPickup Pickups[MAX_COLLECTED_PICKUPS];
-extern short PickupVel;
-extern int OldHitPoints;
-extern int HealthBarTimer;
-extern float HealthBar;
-extern float MutateAmount;
-extern int FlashState;
 
 extern bool EnableSmoothHealthBar;
