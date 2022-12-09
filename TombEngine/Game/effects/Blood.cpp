@@ -252,7 +252,7 @@ namespace TEN::Effects::Blood
 		{
 			float length = Random::GenerateFloat(BLOOD_DRIP_SPRAY_VELOCITY_MIN, BLOOD_DRIP_SPRAY_VELOCITY_MAX);
 			auto velocity = Random::GenerateDirectionInCone(-direction, BLOOD_DRIP_SPRAY_SEMIANGLE) * length;
-			float scale = length / 4;
+			float scale = length * 0.25f;
 
 			SpawnBloodDrip(pos, roomNumber, velocity, BLOOD_DRIP_LIFE_START_FADING, scale, false);
 		}
@@ -262,7 +262,7 @@ namespace TEN::Effects::Blood
 		{
 			float length = Random::GenerateFloat(BLOOD_DRIP_SPRAY_VELOCITY_MIN, BLOOD_DRIP_SPRAY_VELOCITY_MAX);
 			auto velocity = baseVelocity + Random::GenerateDirectionInCone(direction, BLOOD_DRIP_SPRAY_SEMIANGLE) * length;
-			float scale = length / 2;
+			float scale = length * 0.5f;
 
 			SpawnBloodDrip(pos, roomNumber, velocity, BLOOD_DRIP_LIFE_MAX, scale, true);
 		}
@@ -306,7 +306,7 @@ namespace TEN::Effects::Blood
 
 		auto pos = Vector3(drip.Position.x, pointColl.Position.Floor - BLOOD_STAIN_SURFACE_OFFSET, drip.Position.z);
 		auto normal = Geometry::GetFloorNormal(pointColl.FloorTilt);
-		float scale = drip.Scale * 5;
+		float scale = drip.Scale * 4;
 		float scaleRate = std::min(drip.Velocity.Length() / 2, scale / 2);
 
 		SpawnBloodStain(pos, drip.RoomNumber, normal, scale, scaleRate);
