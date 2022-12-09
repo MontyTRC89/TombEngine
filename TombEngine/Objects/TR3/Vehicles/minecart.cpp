@@ -450,8 +450,8 @@ namespace TEN::Entities::Vehicles
 			minecart->Flags |= flags.MinecartLeft() ? MINECART_FLAG_TURNING_LEFT : MINECART_FLAG_TURNING_RIGHT;
 		}
 
-		if (minecart->Velocity < MINECART_VELOCITY_MIN)
-			minecart->Velocity = MINECART_VELOCITY_MIN;
+			if (minecart->Velocity < MINECART_VELOCITY_MIN)
+				minecart->Velocity = MINECART_VELOCITY_MIN;
 
 		minecart->Velocity -= minecart->Gradient * 4;
 		minecartItem->Animation.Velocity.z = minecart->Velocity / VEHICLE_VELOCITY_SCALE;
@@ -866,9 +866,6 @@ namespace TEN::Entities::Vehicles
 			break;
 		}
 
-
-
-
 		if (lara->Vehicle != NO_ITEM &&
 			!(minecart->Flags & MINECART_FLAG_NO_ANIM))
 		{
@@ -952,20 +949,21 @@ namespace TEN::Entities::Vehicles
 			MinecartToEntityCollision(minecartItem, laraItem);
 		}
 		else if (laraItem->HitPoints <= 0 && 
-			laraItem->Animation.ActiveState != MINECART_STATE_DEATH_DEFAULT && 
-			laraItem->Animation.ActiveState != MINECART_STATE_TURN_DEATH &&
-			laraItem->Animation.ActiveState != MINECART_STATE_WALL_DEATH)
-		{
-			laraItem->Animation.AnimNumber = Objects[ID_MINECART_LARA_ANIMS].animIndex + MINECART_ANIM_DEATH_DEFAULT;
-			laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
-			laraItem->Animation.ActiveState = MINECART_STATE_DEATH_DEFAULT;
-			laraItem->Animation.TargetState = MINECART_STATE_DEATH_DEFAULT;
-			laraItem->HitPoints = -1;
-			minecartItem->Animation.Velocity.z = 0;
-			minecart->Flags = (minecart->Flags & ~MINECART_FLAG_CONTROL) | (MINECART_FLAG_STOPPED | MINECART_FLAG_DEAD);
-			minecart->Velocity = 0;
-			return;
-		}
+				 laraItem->Animation.ActiveState != MINECART_STATE_DEATH_DEFAULT && 
+				 laraItem->Animation.ActiveState != MINECART_STATE_TURN_DEATH &&
+				 laraItem->Animation.ActiveState != MINECART_STATE_WALL_DEATH)
+			 {
+				 laraItem->Animation.AnimNumber = Objects[ID_MINECART_LARA_ANIMS].animIndex + MINECART_ANIM_DEATH_DEFAULT;
+				 laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
+				 laraItem->Animation.ActiveState = MINECART_STATE_DEATH_DEFAULT;
+				 laraItem->Animation.TargetState = MINECART_STATE_DEATH_DEFAULT;
+				 laraItem->HitPoints = -1;
+				 minecartItem->Animation.Velocity.z = 0;
+				 minecart->Flags = (minecart->Flags & ~MINECART_FLAG_CONTROL) | (MINECART_FLAG_STOPPED | MINECART_FLAG_DEAD);
+				 minecart->Velocity = 0;
+
+				 return;
+			 }
 	}
 
 	bool MinecartControl(ItemInfo* laraItem)
