@@ -762,13 +762,9 @@ int CreatureAnimation(short itemNumber, short angle, short tilt)
 	if (!item->IsCreature())
 		return false;
 
-	auto* creature = GetCreatureInfo(item);
-
 	AnimateItem(item);
 	ProcessSectorFlags(item);
-
-	if (creature->Poisoned && item->HitPoints > 1 && (GlobalCounter & 0x1F) == 0x1F)
-		item->HitPoints--;
+	CreatureHealth(item);
 
 	if (item->Status == ITEM_DEACTIVATED)
 	{
@@ -777,6 +773,24 @@ int CreatureAnimation(short itemNumber, short angle, short tilt)
 	}
 
 	return CreaturePathfind(item, angle, tilt);
+}
+
+void CreatureHealth(ItemInfo* item)
+{
+	auto* creature = GetCreatureInfo(item);
+
+	if (creature->Poisoned && item->HitPoints > 1 && (GlobalCounter & 0x1F) == 0x1F)
+		item->HitPoints--;
+
+	if (!Objects[item->ObjectNumber].waterCreature &&
+		TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, &g_Level.Rooms[item->RoomNumber]))
+	{
+		auto bounds = GameBoundingBox(item);
+		auto height = item->Pose.Position.y - GetWaterHeight(item);
+
+		if (abs(bounds.Y1 + bounds.Y2) < height)
+			DoDamage(item, INT_MAX);
+	}
 }
 
 void CreatureDie(short itemNumber, bool explode)

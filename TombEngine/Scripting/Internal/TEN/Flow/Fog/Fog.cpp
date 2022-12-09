@@ -39,7 +39,7 @@ void Fog::Register(sol::table & parent)
 @tparam Color color RGB color
 @tparam int Min Distance fog starts (in Sectors)
 @tparam int Max Distance fog ends (in Sectors)
-@return A fog object.
+@treturn Fog A fog object.
 @function Fog
 */
 Fog::Fog(ScriptColor const& col, short minDistance, short maxDistance)

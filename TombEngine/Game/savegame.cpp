@@ -759,6 +759,12 @@ bool SaveGame::Save(int slot)
 	}
 	auto soundtrackMapOffset = fbb.CreateVector(soundTrackMap);
 
+	// Action queue
+	std::vector<int> actionQueue;
+	for (int i = 0; i < ActionQueue.size(); i++)
+		actionQueue.push_back((int)ActionQueue[i]);
+	auto actionQueueOffset = fbb.CreateVector(actionQueue);
+
 	// Flipmaps
 	std::vector<int> flipMaps;
 	for (int i = 0; i < MAX_FLIPMAP; i++)
@@ -1137,6 +1143,7 @@ bool SaveGame::Save(int slot)
 	sgb.add_oneshot_track(oneshotTrackOffset);
 	sgb.add_oneshot_position(oneshotTrackData.second);
 	sgb.add_cd_flags(soundtrackMapOffset);
+	sgb.add_action_queue(actionQueueOffset);
 	sgb.add_flip_maps(flipMapsOffset);
 	sgb.add_flip_stats(flipStatsOffset);
 	sgb.add_room_items(roomItemsOffset);
@@ -1233,6 +1240,13 @@ bool SaveGame::Load(int slot)
 
 	// Restore camera FOV
 	AlterFOV(s->current_fov());
+
+	// Restore action queue
+	for (int i = 0; i < s->action_queue()->size(); i++)
+	{
+		assertion(i < ActionQueue.size(), "Action queue size was changed");
+		ActionQueue[i] = (QueueState)s->action_queue()->Get(i);
+	}
 
 	// Restore soundtracks
 	PlaySoundTrack(s->ambient_track()->str(), SoundTrackType::BGM, s->ambient_position());

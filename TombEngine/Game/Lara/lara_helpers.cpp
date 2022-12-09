@@ -86,7 +86,15 @@ bool HandleLaraVehicle(ItemInfo* item, CollisionInfo* coll)
 	if (lara.Vehicle == NO_ITEM)
 		return false;
 
-	TestVolumes(lara.Vehicle);
+	if (!g_Level.Items[lara->Vehicle].Active)
+	{
+		lara->Vehicle = NO_ITEM;
+		item->Animation.IsAirborne = true;
+		SetAnimation(item, LA_FALL_START);
+		return false;
+	}
+
+	TestVolumes(lara->Vehicle);
 
 	switch (g_Level.Items[lara.Vehicle].ObjectNumber)
 	{
@@ -993,6 +1001,24 @@ void ResetLaraTurnRate(ItemInfo* item, bool divesuit)
 
 	// Nothing uses z axis turn rate at this point; keep it at zero.
 	lara.Control.TurnRate.z = 0;
+}
+
+void SetLaraVehicle(ItemInfo* item, ItemInfo* vehicle)
+{
+	auto* lara = GetLaraInfo(item);
+
+	if (vehicle == nullptr)
+	{
+		if (lara->Vehicle != NO_ITEM)
+			g_Level.Items[lara->Vehicle].Active = false;
+
+		lara->Vehicle = NO_ITEM;
+	}
+	else
+	{
+		g_Level.Items[vehicle->Index].Active = true;
+		lara->Vehicle = vehicle->Index;
+	}
 }
 
 void ResetLaraLean(ItemInfo* item, float rate, bool resetRoll, bool resetPitch)

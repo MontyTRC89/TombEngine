@@ -90,9 +90,9 @@ struct EntityCallbackData
 struct EntityEffectData
 {
 	EffectType Type = EffectType::None;
-	Vector3 LightColor = Vector3::One;
-	Vector3 PrimaryEffectColor = Vector3::One;
-	Vector3 SecondaryEffectColor = Vector3::One;
+	Vector3 LightColor = Vector3::Zero;
+	Vector3 PrimaryEffectColor = Vector3::Zero;
+	Vector3 SecondaryEffectColor = Vector3::Zero;
 	int Count = -1;
 };
 
@@ -176,7 +176,7 @@ void KillEffect(short fxNumber);
 void InitialiseItem(short itemNumber);
 void InitialiseItemArray(int totalItems);
 void KillItem(short itemNumber);
-void UpdateItemRoom(short itemNumber);
+bool UpdateItemRoom(short itemNumber);
 void UpdateAllItems();
 void UpdateAllEffects();
 std::vector<int> FindAllItems(short objectNumber);

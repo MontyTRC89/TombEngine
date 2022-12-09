@@ -29,6 +29,7 @@
 #include "Game/collision/floordata.h"
 #include "Game/control/flipeffect.h"
 #include "Game/control/volume.h"
+#include "Game/effects/hair.h"
 #include "Game/effects/item_fx.h"
 #include "Game/effects/tomb4fx.h"
 #include "Game/Gui.h"
@@ -1089,8 +1090,52 @@ void LaraCheat(ItemInfo* item, CollisionInfo* coll)
 	}
 }
 
+void UpdateLara(ItemInfo* item, bool isTitle)
+{
+	if (isTitle && !g_GameFlow->IsLaraInTitleEnabled())
+		return;
+
+	// HACK: backup controls until proper control lock 
+	// is implemented -- Lwmte, 07.12.22
+
+	auto actionMap = ActionMap;
+	auto dbInput = DbInput;
+	auto trInput = TrInput;
+
+	if (isTitle)
+		ClearAllActions();
+
+	// Control Lara.
+	InItemControlLoop = true;
+	LaraControl(item, &LaraCollision);
+	LaraCheatyBits(item);
+	InItemControlLoop = false;
+	KillMoveItems();
+
+	if (isTitle)
+	{
+		ActionMap = actionMap;
+		DbInput = dbInput;
+		TrInput = trInput;
+	}
+
+	if (g_Gui.GetInventoryItemChosen() != NO_ITEM)
+	{
+		g_Gui.SetInventoryItemChosen(NO_ITEM);
+		SayNo();
+	}
+
+	// Update Lara's animations.
+	g_Renderer.UpdateLaraAnimations(true);
+
+	// Update Lara's effects.
+	TriggerLaraDrips(item);
+	HairControl(item, g_GameFlow->GetLevel(CurrentLevel)->GetLaraType() == LaraType::Young);
+	ProcessEffects(item);
+}
+
 // Offset values may be used to account for the quirk of room traversal only being able to occur at portals.
-void UpdateLaraRoom(ItemInfo* item, int height, int xOffset, int zOffset)
+bool UpdateLaraRoom(ItemInfo* item, int height, int xOffset, int zOffset)
 {
 	auto point = Geometry::TranslatePoint(item->Pose.Position, item->Pose.Orientation.y, zOffset, height, xOffset);
 
@@ -1100,5 +1145,10 @@ void UpdateLaraRoom(ItemInfo* item, int height, int xOffset, int zOffset)
 	item->Floor = GetFloorHeight(item->Location, item->Pose.Position.x, item->Pose.Position.z).value_or(NO_HEIGHT);
 
 	if (item->RoomNumber != item->Location.roomNumber)
+	{
 		ItemNewRoom(item->Index, item->Location.roomNumber);
+		return true;
+	}
+
+	return false;
 }

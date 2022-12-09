@@ -58,4 +58,5 @@ struct Level : public ScriptInterfaceLevel
 	short GetFarView() const override;
 	void SetSecrets(int secrets);
 	int GetSecrets() const override;
+	std::string GetAmbientTrack() const override;
 };

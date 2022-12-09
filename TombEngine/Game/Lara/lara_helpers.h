@@ -56,6 +56,7 @@ void SetLaraHang(ItemInfo* item);
 void SetLaraHangReleaseAnimation(ItemInfo* item);
 void SetLaraCornerAnimation(ItemInfo* item, CollisionInfo* coll, bool flip);
 void SetLaraSwimDiveAnimation(ItemInfo* item);
+void SetLaraVehicle(ItemInfo* item, ItemInfo* vehicle = nullptr);
 
 void ResetLaraTurnRate(ItemInfo* item, bool divesuit = false);
 void ResetLaraLean(ItemInfo* item, float rate = 1.0f, bool resetRoll = true, bool resetPitch = true);

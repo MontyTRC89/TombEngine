@@ -30,7 +30,9 @@ bool ShotLara(ItemInfo* item, AI_INFO* AI, BiteInfo gun, short extraRotation, in
 			hasHit = GetRandomControl() < random;
 		}
 		else
+		{
 			hasHit = false;
+		}
 		
 		isTargetable = true;
 	}
@@ -81,10 +83,9 @@ short GunMiss(int x, int y, int z, short velocity, short yRot, short roomNumber)
 		LaraItem->Pose.Position.x + ((GetRandomControl() - 0x4000) << 9) / 0x7FFF,
 		LaraItem->Floor,
 		LaraItem->Pose.Position.z + ((GetRandomControl() - 0x4000) << 9) / 0x7FFF,
-		LaraItem->RoomNumber
-	);
+		LaraItem->RoomNumber);
 
-	Ricochet((Pose*)&pos);
+	Ricochet(Pose(pos.x, pos.y, pos.z));
 	return GunShot(x, y, z, velocity, yRot, roomNumber);
 }
 
@@ -124,14 +125,12 @@ bool Targetable(ItemInfo* item, AI_INFO* AI)
 		item->Pose.Position.x,
 		(item->ObjectNumber == ID_SNIPER) ? (item->Pose.Position.y - CLICK(3)) : (item->Pose.Position.y + ((bounds.Y2 + 3 * bounds.Y1) / 4)),
 		item->Pose.Position.z,
-		item->RoomNumber
-	);
+		item->RoomNumber);
 	auto target = GameVector(
 		enemy->Pose.Position.x,
 		enemy->Pose.Position.y + ((boundsTarget.Y2 + 3 * boundsTarget.Y1) / 4),
 		enemy->Pose.Position.z,
-		enemy->RoomNumber // TODO: Check why this line didn't exist in the first place. -- TokyoSU 2022.08.05
-	);
+		enemy->RoomNumber); // TODO: Check why this line didn't exist in the first place. -- TokyoSU 2022.08.05
 	return LOS(&origin, &target);
 }
 
@@ -158,14 +157,12 @@ bool TargetVisible(ItemInfo* item, AI_INFO* AI, float maxAngleInDegrees)
 			item->Pose.Position.x,
 			item->Pose.Position.y - CLICK(3),
 			item->Pose.Position.z,
-			item->RoomNumber
-		);
+			item->RoomNumber);
 		auto target = GameVector(
 			enemy->Pose.Position.x,
 			enemy->Pose.Position.y + ((((bounds.Y1 * 2) + bounds.Y1) + bounds.Y2) / 4),
 			enemy->Pose.Position.z,
-			enemy->RoomNumber // TODO: Check why this line didn't exist before. -- TokyoSU, 10/8/2022
-		);
+			enemy->RoomNumber); // TODO: Check why this line didn't exist before. -- TokyoSU, 10/8/2022
 		return LOS(&origin, &target);
 	}
 

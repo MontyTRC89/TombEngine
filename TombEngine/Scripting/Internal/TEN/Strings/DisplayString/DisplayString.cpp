@@ -51,7 +51,7 @@ strings.lua. __Default: false__.
 	TEN.Strings.DisplayStringOption.CENTER -- see x and y parameters
 	TEN.Strings.DisplayStringOption.SHADOW -- will give the text a small shadow
 __Default: empty__
-@return A new DisplayString object.
+@treturn DisplayString A new DisplayString object.
 */
 static std::unique_ptr<DisplayString> CreateString(std::string const & key, int x, int y, ScriptColor col, TypeOrNil<bool> maybeTranslated, TypeOrNil<sol::table> flags)
 {
