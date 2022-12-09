@@ -225,7 +225,7 @@ namespace TEN::Entities::Creatures::TR5
 			auto pos = GetJointPosition(item, HitmanJoints[random], Vector3i(0, 0, 50));
 
 			TriggerLightningGlow(pos.x, pos.y, pos.z, 48, 32, 32, 64);
-			TriggerElectricSpark(&GameVector(pos.x, pos.y, pos.z, item->RoomNumber),
+			TriggerElectricSpark(GameVector(pos, item->RoomNumber),
 				EulerAngles(Random::GenerateInt(ANGLE(0), ANGLE(35)), Random::GenerateInt(ANGLE(0), ANGLE(360)), 0), 10);
 			TriggerDynamicLight(pos.x, pos.y, pos.z, (GetRandomControl() & 3) + 16, 31, 63, 127);
 

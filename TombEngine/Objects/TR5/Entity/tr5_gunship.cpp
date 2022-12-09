@@ -104,8 +104,8 @@ namespace TEN::Entities::Creatures::TR5
 
 				if (!los2)
 				{
-					TriggerRicochetSpark(&target, 2 * GetRandomControl(), 3, 0);
-					TriggerRicochetSpark(&target, 2 * GetRandomControl(), 3, 0);
+					TriggerRicochetSpark(target, 2 * GetRandomControl(), 3, 0);
+					TriggerRicochetSpark(target, 2 * GetRandomControl(), 3, 0);
 				}
 
 				if (objOnLos < 0 && GetRandomControl() & 1)
@@ -117,8 +117,8 @@ namespace TEN::Entities::Creatures::TR5
 						SoundEffect(GetShatterSound(hitMesh->staticNumber), &hitMesh->pos);
 					}
 
-					TriggerRicochetSpark((GameVector*)&hitPos, 2 * GetRandomControl(), 3, 0);
-					TriggerRicochetSpark((GameVector*)&hitPos, 2 * GetRandomControl(), 3, 0);
+					TriggerRicochetSpark(GameVector(hitPos), 2 * GetRandomControl(), 3, 0);
+					TriggerRicochetSpark(GameVector(hitPos), 2 * GetRandomControl(), 3, 0);
 				}
 			}
 			else

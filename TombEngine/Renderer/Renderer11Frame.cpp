@@ -1,6 +1,7 @@
 #include "framework.h"
 #include "Renderer/Renderer11.h"
 
+#include "Flow/ScriptInterfaceFlowHandler.h"
 #include "Game/animation.h"
 #include "Game/camera.h"
 #include "Game/collision/sphere.h"
@@ -352,7 +353,10 @@ namespace TEN::Renderer
 			if (item->Status == ITEM_INVISIBLE)
 				continue;
 
-			if (item->ObjectNumber == ID_LARA && (BinocularRange || SpotcamOverlay || SpotcamDontDrawLara || CurrentLevel == 0))
+			if (item->ObjectNumber == ID_LARA && (BinocularRange || SpotcamOverlay || SpotcamDontDrawLara))
+				continue;
+
+			if (item->ObjectNumber == ID_LARA && CurrentLevel == 0 && !g_GameFlow->IsLaraInTitleEnabled())
 				continue;
 
 			if (!m_moveableObjects[item->ObjectNumber].has_value())

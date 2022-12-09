@@ -78,10 +78,11 @@ namespace TEN::Input
 	Effect*		   OisEffect	   = nullptr;
 
 	// Globals
-	RumbleData				 RumbleInfo = {};
-	std::vector<InputAction> ActionMap  = {};
-	std::vector<bool>		 KeyMap		= {};
-	std::vector<float>		 AxisMap	= {};
+	RumbleData				 RumbleInfo  = {};
+	std::vector<InputAction> ActionMap	 = {};
+	vector<QueueState>		 ActionQueue = {};
+	std::vector<bool>		 KeyMap		 = {};
+	std::vector<float>		 AxisMap	 = {};
 
 	int DbInput = 0;
 	int TrInput = 0;
@@ -130,7 +131,10 @@ namespace TEN::Input
 		TENLog("Initializing input system...", LogLevel::Info);
 
 		for (int i = 0; i < (int)ActionID::Count; i++)
+		{
 			ActionMap.push_back(InputAction((ActionID)i));
+			ActionQueue.push_back(QueueState::None);
+		}
 
 		KeyMap.resize(MAX_INPUT_SLOTS);
 		AxisMap.resize(InputAxis::Count);
@@ -205,6 +209,30 @@ namespace TEN::Input
 		// Clear legacy bit fields.
 		DbInput = 0;
 		TrInput = 0;
+	}
+
+	void ApplyActionQueue()
+	{
+		for (int i = 0; i < KEY_COUNT; i++)
+		{
+			if (ActionQueue[i] != QueueState::None)
+			{
+				if (ActionQueue[i] == QueueState::Push)
+				{
+					ActionMap[i].Update(true);
+				}
+				else
+				{
+					ActionMap[i].Clear();
+				}
+			}
+		}
+	}
+
+	void ClearActionQueue()
+	{
+		for (auto& queue : ActionQueue)
+			queue = QueueState::None;
 	}
 
 	bool LayoutContainsIndex(unsigned int index)
@@ -628,7 +656,7 @@ namespace TEN::Input
 		RumbleInfo.LastPower = RumbleInfo.Power;
 	}
 
-	void UpdateInputActions(ItemInfo* item)
+	void UpdateInputActions(ItemInfo* item, bool applyQueue)
 	{
 		ClearInputData();
 		UpdateRumble();
@@ -637,7 +665,15 @@ namespace TEN::Input
 
 		// Update action map (mappable actions only).
 		for (int i = 0; i < KEY_COUNT; i++)
-			ActionMap[i].Update(Key(i) ? true : false); // TODO: Poll analog value of key. Potentially, any can be a trigger.
+		{
+			// TODO: Poll analog value of key. Potentially, any can be a trigger.
+			ActionMap[i].Update(Key(i) ? true : false);
+		}
+
+		if (applyQueue)
+		{
+			ApplyActionQueue();
+		}
 
 		// Additional handling.
 		HandlePlayerHotkeys(item);
@@ -657,6 +693,9 @@ namespace TEN::Input
 	{
 		for (auto& action : ActionMap)
 			action.Clear();
+
+		for (auto& queue : ActionQueue)
+			queue = QueueState::None;
 
 		DbInput = 0;
 		TrInput = 0;

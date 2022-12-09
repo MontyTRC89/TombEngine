@@ -506,14 +506,16 @@ void HandleWeapon(ItemInfo* laraItem)
 		// Draw weapon.
 		if (IsHeld(In::DrawWeapon))
 		{
-			lara.Control.Weapon.RequestGunType = lara.Control.Weapon.LastGunType;
+			// No weapon - no any actions.
+			if (lara.Control.Weapon.LastGunType != LaraWeaponType::None)
+				lara.Control.Weapon.RequestGunType = lara.Control.Weapon.LastGunType;
 		}
 		// Draw flare.
 		else if (IsHeld(In::Flare) && (g_GameFlow->GetLevel(CurrentLevel)->GetLaraType() != LaraType::Young))
 		{
 			if (lara.Control.Weapon.GunType == LaraWeaponType::Flare)
 			{
-			//	if (!lara.LeftArm.FrameNumber)	// NO
+				if (!lara.LeftArm.FrameNumber)
 				{
 					lara.Control.HandStatus = HandStatus::WeaponUndraw;
 				}
@@ -527,7 +529,8 @@ void HandleWeapon(ItemInfo* laraItem)
 			}
 		}
 
-		if (IsHeld(In::DrawWeapon) || lara.Control.Weapon.RequestGunType != lara.Control.Weapon.GunType)
+		if ((IsHeld(In::DrawWeapon) && lara.Control.Weapon.LastGunType != LaraWeaponType::None) ||
+			lara.Control.Weapon.RequestGunType != lara.Control.Weapon.GunType)
 		{
 			if (lara.Control.IsLow && 
 				lara.Control.Weapon.RequestGunType >= LaraWeaponType::Shotgun && 
@@ -1112,7 +1115,7 @@ void HitTarget(ItemInfo* laraItem, ItemInfo* targetEntity, GameVector* hitPos, i
 				{
 					// Baddy2 gun hitting sword
 					SoundEffect(SFX_TR4_BADDY_SWORD_RICOCHET, &targetEntity->Pose);
-					TriggerRicochetSpark(hitPos, laraItem->Pose.Orientation.y, 3, 0);
+					TriggerRicochetSpark(*hitPos, laraItem->Pose.Orientation.y, 3, 0);
 					return;
 				}
 				else
@@ -1123,11 +1126,11 @@ void HitTarget(ItemInfo* laraItem, ItemInfo* targetEntity, GameVector* hitPos, i
 				break;
 
 			case HIT_RICOCHET:
-				TriggerRicochetSpark(hitPos, laraItem->Pose.Orientation.y, 3, 0);
+				TriggerRicochetSpark(*hitPos, laraItem->Pose.Orientation.y, 3, 0);
 				break;
 
 			case HIT_SMOKE:
-				TriggerRicochetSpark(hitPos, laraItem->Pose.Orientation.y, 3, -5);
+				TriggerRicochetSpark(*hitPos, laraItem->Pose.Orientation.y, 3, -5);
 
 				if (targetEntity->ObjectNumber == ID_ROMAN_GOD1 ||
 					targetEntity->ObjectNumber == ID_ROMAN_GOD2)
