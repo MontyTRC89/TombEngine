@@ -420,7 +420,9 @@ namespace TEN::Effects::Blood
 			if (TestEnvironment(ENV_FLAG_WATER, drip.RoomNumber))
 			{
 				drip.IsActive = false;
-				SpawnUnderwaterBlood(drip.Position, drip.RoomNumber, drip.Scale * 5);
+
+				if (drip.CanSpawnStain)
+					SpawnUnderwaterBlood(drip.Position, drip.RoomNumber, drip.Scale * 5);
 			}
 			// Hit wall or ceiling; deactivate.
 			if (pointColl.Position.Floor == NO_HEIGHT || drip.Position.y <= pointColl.Position.Ceiling)
@@ -514,6 +516,15 @@ namespace TEN::Effects::Blood
 
 	void DrawBloodDebug()
 	{
+		int numActiveUWBlood = 0;
+		for (const auto& uwBlood : UnderwaterBloodParticles)
+		{
+			if (!uwBlood.IsActive)
+				continue;
+
+			numActiveUWBlood++;
+		}
+		
 		int numActiveMists = 0;
 		for (const auto& mist : BloodMists)
 		{
@@ -532,6 +543,7 @@ namespace TEN::Effects::Blood
 			numActiveDrips++;
 		}
 
+		g_Renderer.PrintDebugMessage("Num. underwater blood: %d ", numActiveUWBlood);
 		g_Renderer.PrintDebugMessage("Num. blood mists: %d ", numActiveMists);
 		g_Renderer.PrintDebugMessage("Num. blood drips: %d ", numActiveDrips);
 		g_Renderer.PrintDebugMessage("Num. blood stains: %d ", BloodStains.size());
