@@ -976,7 +976,7 @@ public:
 
 	Ammo& operator --()
 	{
-		assert(this->Count > 0);
+		assertion(this->Count > 0, "Ammo count is already 0!");
 		--this->Count;
 		return *this;
 	}

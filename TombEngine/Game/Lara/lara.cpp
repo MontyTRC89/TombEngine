@@ -27,6 +27,7 @@
 #include "Game/collision/floordata.h"
 #include "Game/control/flipeffect.h"
 #include "Game/control/volume.h"
+#include "Game/effects/hair.h"
 #include "Game/effects/item_fx.h"
 #include "Game/effects/tomb4fx.h"
 #include "Game/Gui.h"
@@ -1036,6 +1037,50 @@ void LaraCheat(ItemInfo* item, CollisionInfo* coll)
 		item->HitPoints = LARA_HEALTH_MAX;
 		lara->Control.HandStatus = HandStatus::Free;
 	}
+}
+
+void UpdateLara(ItemInfo* item, bool isTitle)
+{
+	if (isTitle && !g_GameFlow->IsLaraInTitleEnabled())
+		return;
+
+	// HACK: backup controls until proper control lock 
+	// is implemented -- Lwmte, 07.12.22
+
+	auto actionMap = ActionMap;
+	auto dbInput = DbInput;
+	auto trInput = TrInput;
+
+	if (isTitle)
+		ClearAllActions();
+
+	// Control Lara.
+	InItemControlLoop = true;
+	LaraControl(item, &LaraCollision);
+	LaraCheatyBits(item);
+	InItemControlLoop = false;
+	KillMoveItems();
+
+	if (isTitle)
+	{
+		ActionMap = actionMap;
+		DbInput = dbInput;
+		TrInput = trInput;
+	}
+
+	if (g_Gui.GetInventoryItemChosen() != NO_ITEM)
+	{
+		g_Gui.SetInventoryItemChosen(NO_ITEM);
+		SayNo();
+	}
+
+	// Update Lara's animations.
+	g_Renderer.UpdateLaraAnimations(true);
+
+	// Update Lara's effects.
+	TriggerLaraDrips(item);
+	HairControl(item, g_GameFlow->GetLevel(CurrentLevel)->GetLaraType() == LaraType::Young);
+	ProcessEffects(item);
 }
 
 // Offset values may be used to account for the quirk of room traversal only being able to occur at portals.

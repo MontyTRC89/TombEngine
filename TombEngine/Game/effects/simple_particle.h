@@ -26,8 +26,8 @@ namespace TEN::Effects
 
 	extern std::array<SimpleParticle, SIMPLE_PARTICLE_NUM_MAX> simpleParticles;
 
-	SimpleParticle& getFreeSimpleParticle();
+	SimpleParticle& GetFreeSimpleParticle();
 	void TriggerSnowmobileSnow(ItemInfo* snowMobile);
 	void TriggerSpeedboatFoam(ItemInfo* boat, Vector3 offset);
-	void updateSimpleParticles();
+	void UpdateSimpleParticles();
 }

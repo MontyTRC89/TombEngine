@@ -6,6 +6,7 @@ Version 1.0.4
 * Activate Lara-bound volume triggers with mounted vehicles.
 * Remove TRC remnant which added HK to inventory if pistols weren't available.
 * Change default shatter sound to TR4_SMASH_ROCK (tomb4 default).
+* Reduce AKF pose time from 30 to 20 seconds.
 * Automatically align pickups to floor surface.
 * Fix legacy pickup triggers not working in certain cases.
 * Fix crawl pickup not actually doing any pickups.

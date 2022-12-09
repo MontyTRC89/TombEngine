@@ -70,11 +70,16 @@ extern short NextFxFree;
 
 extern std::vector<short> OutsideRoomTable[OUTSIDE_SIZE][OUTSIDE_SIZE];
 
-int DrawPhase();
+int DrawPhase(bool isTitle);
 
-GameStatus DoTitle(int index);
-GameStatus DoLevel(int index, bool loadFromSavegame);
-GameStatus ControlPhase(int numFrames, bool demoMode);
+GameStatus ControlPhase(int numFrames);
+GameStatus DoLevel(int levelIndex, bool loadGame = false);
+GameStatus DoGameLoop(int levelIndex);
+void EndGameLoop(int levelIndex);
+
+GameStatus HandleMenuCalls(bool isTitle);
+GameStatus HandleGlobalInputEvents(bool isTitle);
+void HandleControls(bool isTitle);
 
 int GetRandomControl();
 int GetRandomDraw();
@@ -84,5 +89,9 @@ void KillMoveEffects();
 void UpdateShatters();
 
 void CleanUp();
+
+void InitialiseOrLoadGame(bool loadGame);
+void InitialiseScripting(int levelIndex, bool loadGame);
+void DeInitialiseScripting(int levelIndex);
 
 unsigned CALLBACK GameMain(void*);

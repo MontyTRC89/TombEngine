@@ -11,7 +11,7 @@ namespace TEN::Effects
 {
 	std::array<SimpleParticle, SIMPLE_PARTICLE_NUM_MAX> simpleParticles;
 
-	SimpleParticle& getFreeSimpleParticle()
+	SimpleParticle& GetFreeSimpleParticle()
 	{
 		for (auto& p : simpleParticles)
 			if (!p.active)
@@ -28,7 +28,7 @@ namespace TEN::Effects
 		float z = std::cos(angle + angleVariation);
 		x = x* -500 + snowMobile->Pose.Position.x;
 		z = z* -500 + snowMobile->Pose.Position.z;
-		SimpleParticle& p = getFreeSimpleParticle();
+		SimpleParticle& p = GetFreeSimpleParticle();
 		p = {};
 		p.active = true;
 		p.life = Random::GenerateFloat(8, 14);
@@ -52,7 +52,7 @@ namespace TEN::Effects
 			float z = std::cos(angle + angleVariation);
 			x = x * offset.z + z * offset.x + boat->Pose.Position.x;
 			z = z * offset.z + x * offset.x + boat->Pose.Position.z;
-			SimpleParticle& p = getFreeSimpleParticle();
+			SimpleParticle& p = GetFreeSimpleParticle();
 			p = {};
 			p.active = true;
 			p.life = Random::GenerateFloat(5, 9);
@@ -64,7 +64,7 @@ namespace TEN::Effects
 		}
 	}
 
-	void updateSimpleParticles()
+	void UpdateSimpleParticles()
 	{
 		for (auto& p : simpleParticles)
 		{
