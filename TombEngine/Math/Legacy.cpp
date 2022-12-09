@@ -50,10 +50,10 @@ void InterpolateAngle(short angle, short& rotation, short& outAngle, int shift)
 {
 	int deltaAngle = angle - rotation;
 
-	if (deltaAngle < ANGLE(-180.0f))
-		deltaAngle += ANGLE(360.0f);
-	else if (deltaAngle > ANGLE(180.0f))
-		deltaAngle -= ANGLE(360.0f);
+	if (deltaAngle < -32768)
+		deltaAngle += 65536;
+	else if (deltaAngle > 32768)
+		deltaAngle -= 65536;
 
 	if (outAngle)
 		outAngle = (short)deltaAngle;

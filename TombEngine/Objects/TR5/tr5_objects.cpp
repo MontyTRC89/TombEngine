@@ -746,7 +746,9 @@ static void StartEntity(ObjectInfo *obj)
 	{
 		obj->initialise = InitialiseAutoGuns;
 		obj->control = AutoGunsControl;
+		obj->intelligent = true;
 		obj->hitEffect = HIT_RICOCHET;
+		obj->undead = true;
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_X;
 		g_Level.Bones[obj->boneIndex + 8 * 4] |= ROT_Y;

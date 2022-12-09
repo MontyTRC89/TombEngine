@@ -6,6 +6,7 @@
 #include "Game/control/los.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/tomb4fx.h"
+#include "Game/misc.h"
 #include "Game/Lara/lara.h"
 #include "Game/items.h"
 #include "Math/Math.h"
@@ -13,14 +14,14 @@
 #include "Sound/sound.h"
 
 using namespace TEN::Math::Random;
+using namespace TEN::Math;
 
 namespace TEN::Entities::Creatures::TR5
 {
 	void InitialiseAutoGuns(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
-
-		item->MeshBits = 1024;
+		item->MeshBits = 0x680;
 		//5702 bytes!?
 		//item->data = game_malloc<uint8_t>(5702);
 		item->Data = std::array<short, 4>();
@@ -58,24 +59,27 @@ namespace TEN::Entities::Creatures::TR5
 
 	void AutoGunsControl(short itemNumber)
 	{
-		auto* item = &g_Level.Items[itemNumber];
+		auto* item = &g_Level.Items[itemNumber]; //*  und dann ein &
+		if (!TriggerActive(item))
+			return;
 
-		if (TriggerActive(item))
-		{
 			if (item->Animation.FrameNumber >= g_Level.Anims[item->Animation.AnimNumber].frameEnd)
 			{
-				std::array<short, 4>& data = item->Data;
-
-				item->MeshBits = 1664;
+				//std::array<short, 4>& data = item->Data;
+				auto* gun = GetCreatureInfo(item);
+				item->MeshBits = 0x680;
 
 				auto pos1 = GameVector(GetJointPosition(item, 8, Vector3i(0, 0, -64)));
-				auto pos2 = GameVector(GetJointPosition(LaraItem, LM_HIPS));
+				auto pos2 = GameVector(GetJointPosition(LaraItem, LM_HIPS, Vector3i::Zero));
 
 				pos1.RoomNumber = item->RoomNumber;
 
 				int los = LOS(&pos1, &pos2);
 
 				// FIXME:
+				auto start = EulerAngles(pos1.x, pos1.y, pos1.z);
+				auto laraa = EulerAngles(pos2.x, pos2.y, pos2.z);
+				auto oh = EulerAngles::Zero;
 				auto orient = EulerAngles::Zero;
 				if (los)
 				{
@@ -92,9 +96,9 @@ namespace TEN::Entities::Creatures::TR5
 				InterpolateAngle(orient.x, item->ItemFlags[1], angle2, 4);
 				InterpolateAngle(orient.y, *item->ItemFlags, angle1, 4);
 
-				data[0] = item->ItemFlags[0];
-				data[1] = item->ItemFlags[1];
-				data[2] += item->ItemFlags[2];
+				gun->JointRotation[0] = item->ItemFlags[0];//gun->JointRotation
+				gun->JointRotation[1] = item->ItemFlags[1];
+				gun->JointRotation[2] += item->ItemFlags[2];
 
 				if (abs(angle1) < ANGLE(5.6f) && abs(angle2) < ANGLE(5.6f) && los)
 				{
@@ -167,7 +171,6 @@ namespace TEN::Entities::Creatures::TR5
 			{
 				item->MeshBits = 0xFFFFFAFF;
 				AnimateItem(item);
-			}
-		}
+			}		
 	}
 }
