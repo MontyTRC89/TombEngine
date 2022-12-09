@@ -17,7 +17,7 @@ namespace TEN::Effects::Blood
 	constexpr auto UW_BLOOD_LIFE_MAX	  = 8.5f;
 	constexpr auto UW_BLOOD_LIFE_MIN	  = 8.0f;
 	constexpr auto UW_BLOOD_SCALE_MAX	  = BLOCK(0.25f);
-	constexpr auto UW_BLOOD_SPHERE_RADIUS = BLOCK(1 / 8.0f);
+	constexpr auto UW_BLOOD_SPHERE_RADIUS = BLOCK(0.25f);
 
 	constexpr auto BLOOD_MIST_LIFE_MAX		= 0.75f;
 	constexpr auto BLOOD_MIST_LIFE_MIN		= 0.25f;
@@ -161,7 +161,7 @@ namespace TEN::Effects::Blood
 		return true;
 	}
 
-	void SpawnUnderwaterBlood(const Vector3& pos, int roomNumber, float scaleMax)
+	void SpawnUnderwaterBlood(const Vector3& pos, int roomNumber, float scale)
 	{
 		auto& uwBlood = GetFreeUnderwaterBlood();
 
@@ -173,9 +173,7 @@ namespace TEN::Effects::Blood
 		uwBlood.Position = Random::GeneratePointInSphere(sphere);
 		uwBlood.Life = std::round(Random::GenerateFloat(UW_BLOOD_LIFE_MIN, UW_BLOOD_LIFE_MAX) * FPS);
 		uwBlood.Init = 1.0f;
-		uwBlood.Scale = scaleMax;
-
-		//SpawnUnderwaterBlood(pos, scaleMax);
+		uwBlood.Scale = scale;
 	}
 
 	void SpawnUnderwaterBloodCloud(const Vector3& pos, int roomNumber, float scaleMax, unsigned int count)
@@ -189,9 +187,6 @@ namespace TEN::Effects::Blood
 
 	void SpawnBloodMist(const Vector3& pos, int roomNumber, const Vector3& direction)
 	{
-		if (TestEnvironment(ENV_FLAG_WATER, roomNumber))
-			return;
-
 		auto& mist = GetFreeBloodMist();
 
 		auto sphere = BoundingSphere(pos, BLOOD_MIST_SPHERE_RADIUS);
@@ -227,9 +222,6 @@ namespace TEN::Effects::Blood
 
 	void SpawnBloodDrip(const Vector3& pos, int roomNumber, const Vector3& velocity, float lifeInSec, float scale, bool canSpawnStain)
 	{
-		if (TestEnvironment(ENV_FLAG_WATER, roomNumber))
-			return;
-
 		auto& drip = GetFreeBloodDrip();
 
 		drip = BloodDrip();
@@ -278,9 +270,6 @@ namespace TEN::Effects::Blood
 
 	void SpawnBloodStain(const Vector3& pos, int roomNumber, const Vector3& normal, float scaleMax, float scaleRate, float delayTimeInSec)
 	{
-		if (TestEnvironment(ENV_FLAG_WATER, roomNumber))
-			return;
-
 		auto stain = BloodStain();
 
 		stain.SpriteIndex = Objects[ID_BLOOD_STAIN_SPRITES].meshIndex + Random::GenerateInt(0, BLOOD_STAIN_SPRITE_INDEX_MAX);
@@ -312,6 +301,9 @@ namespace TEN::Effects::Blood
 		if (!drip.CanSpawnStain)
 			return;
 
+		if (TestEnvironment(ENV_FLAG_WATER, drip.RoomNumber))
+			return;
+
 		auto pos = Vector3(drip.Position.x, pointColl.Position.Floor - BLOOD_STAIN_SURFACE_OFFSET, drip.Position.z);
 		auto normal = Geometry::GetFloorNormal(pointColl.FloorTilt);
 		float scale = drip.Scale * 5;
@@ -339,23 +331,10 @@ namespace TEN::Effects::Blood
 			if (!uwBlood.IsActive)
 				continue;
 
-			//// Despawn.
-			//uwBlood.Life -= 1.0f; // NOTE: Life tracked in frame time.
-			//if (uwBlood.Life <= 0.0f)
-			//{
-			//	uwBlood.IsActive = false;
-			//	continue;
-			//}
-
-			// Update scale.
-			if (uwBlood.Scale < UW_BLOOD_SCALE_MAX)
-				uwBlood.Scale += 4.0f;
-
+			// Update life.
 			if (uwBlood.Init == 0.0f)
 			{
 				uwBlood.Life -= 3.0f;
-				//if (uwBlood.Life > 250.0f)
-				//	uwBlood.Flags.ClearAll();
 			}
 			else if (uwBlood.Init < uwBlood.Life)
 			{
@@ -364,6 +343,10 @@ namespace TEN::Effects::Blood
 				if (uwBlood.Init >= uwBlood.Life)
 					uwBlood.Init = 0.0f;
 			}
+
+			// Update scale.
+			if (uwBlood.Scale < UW_BLOOD_SCALE_MAX)
+				uwBlood.Scale += 4.0f;
 		}
 	}
 
