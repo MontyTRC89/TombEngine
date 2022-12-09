@@ -6,7 +6,7 @@ Version 1.0.4
 * Activate Lara-bound volume triggers with mounted vehicles.
 * Remove TRC remnant which added HK to inventory if pistols weren't available.
 * Change default shatter sound to TR4_SMASH_ROCK (tomb4 default).
-* Reduce AKF pose time from 30 to 20 seconds.
+* Reduce idle pose time from 30 to 20 seconds.
 * Automatically align pickups to floor surface.
 * Fix legacy pickup triggers not working in certain cases.
 * Fix crawl pickup not actually doing any pickups.
@@ -19,6 +19,7 @@ Version 1.0.4
 * Fix several collision and sound source issues in flipped rooms.
 * Fix several pushable sound and object collision bugs.
 * Fix original bug with incorrect climb up behaviour on ladders under sloped ceilings.
+* Fix original bug with reassigned control keys still triggering default events.
 * Fix TR1 centaur bubble targeting.
 * Fix occasional wrong rollingball collision in narrow pits.
 * Fix classic rollingball and big rollingball not behaving properly.

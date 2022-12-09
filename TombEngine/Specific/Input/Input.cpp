@@ -238,11 +238,11 @@ namespace TEN::Input
 
 	bool LayoutContainsIndex(unsigned int index)
 	{
-		for (int l = 0; l < 2; l++)
+		for (int layout = 1; layout >= 0; layout--)
 		{
 			for (int i = 0; i < KEY_COUNT; i++)
 			{
-				if (KeyboardLayout[l][i] == index)
+				if (KeyboardLayout[layout][i] == index)
 					return true;
 			}
 		}
@@ -250,11 +250,30 @@ namespace TEN::Input
 		return false;
 	}
 
+	int WrapSimilarKeys(int source)
+	{
+		// Merge right and left Ctrl, Shift, and Alt.
+
+		switch (source)
+		{
+		case KC_RCONTROL:
+			return KC_LCONTROL;
+
+		case KC_RSHIFT:
+			return KC_LSHIFT;
+
+		case KC_RMENU:
+			return KC_LMENU;
+		}
+
+		return source;
+	}
+
 	void DefaultConflict()
 	{
 		for (int i = 0; i < KEY_COUNT; i++)
 		{
-			short key = KeyboardLayout[0][i];
+			int key = WrapSimilarKeys(KeyboardLayout[0][i]);
 
 			ConflictingKeys[i] = false;
 
@@ -431,35 +450,13 @@ namespace TEN::Input
 	{
 		for (int layout = 1; layout >= 0; layout--)
 		{
-			short key = KeyboardLayout[layout][number];
+			int key = WrapSimilarKeys(KeyboardLayout[layout][number]);
+			
+			if (layout == 0 && ConflictingKeys[number])
+				continue;
 
 			if (KeyMap[key])
 				return true;
-
-			// Mirror Ctrl, Shift, and Alt.
-			switch (key)
-			{
-			case KC_RCONTROL:
-				return KeyMap[KC_LCONTROL];
-
-			case KC_LCONTROL:
-				return KeyMap[KC_RCONTROL];
-
-			case KC_RSHIFT:
-				return KeyMap[KC_LSHIFT];
-
-			case KC_LSHIFT:
-				return KeyMap[KC_RSHIFT];
-
-			case KC_RMENU:
-				return KeyMap[KC_LMENU];
-
-			case KC_LMENU:
-				return KeyMap[KC_RMENU];
-			}
-
-			if (ConflictingKeys[number])
-				return false;
 		}
 
 		return false;
@@ -663,6 +660,7 @@ namespace TEN::Input
 		UpdateRumble();
 		ReadKeyboard();
 		ReadGameController();
+		DefaultConflict();
 
 		// Update action map (mappable actions only).
 		for (int i = 0; i < KEY_COUNT; i++)
