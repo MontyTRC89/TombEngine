@@ -1142,7 +1142,7 @@ unsigned int _stdcall LoadLevel(void* data)
 
 		// Initialise the game
 		InitialiseGameFlags();
-		InitialiseLara(!(InitialiseGame || CurrentLevel == 1));
+		InitialiseLara(!(InitialiseGame || CurrentLevel <= 1));
 		InitializeNeighborRoomList();
 		GetCarriedItems();
 		GetAIPickups();

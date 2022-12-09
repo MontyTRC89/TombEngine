@@ -976,7 +976,7 @@ public:
 
 	Ammo& operator --()
 	{
-		assert(this->Count > 0);
+		assertion(this->Count > 0, "Ammo count is already 0!");
 		--this->Count;
 		return *this;
 	}
@@ -1055,9 +1055,9 @@ public:
 
 struct HolsterInfo
 {
-	HolsterSlot LeftHolster;
-	HolsterSlot RightHolster;
-	HolsterSlot BackHolster;
+	HolsterSlot LeftHolster  = HolsterSlot::Empty;
+	HolsterSlot RightHolster = HolsterSlot::Empty;
+	HolsterSlot BackHolster  = HolsterSlot::Empty;
 };
 
 struct CarriedWeaponInfo

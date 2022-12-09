@@ -20,6 +20,14 @@ Flow.SetTotalSecretCount(5)
 
 Flow.EnableFlyCheat(true)
 
+-- Disable/enable Lara drawing in title level
+
+Flow.EnableLaraInTitle(false)
+
+-- Disable/enable level selection in title level
+
+Flow.EnableLevelSelect(false)
+
 -- Disable/enable mass pickup (collect all pickups at once)
 
 Flow.EnableMassPickup(true)

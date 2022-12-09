@@ -25,9 +25,9 @@ namespace TEN::Effects::Spark
 			
 	void UpdateSparkParticles();
 	SparkParticle& GetFreeSparkParticle();
-	void TriggerFlareSparkParticles(Vector3i* pos, Vector3i* vel, ColorData* color, int room);
-	void TriggerRicochetSpark(GameVector* pos, short angle, int num);
-	void TriggerFrictionSpark(GameVector* pos, EulerAngles angle, float length, int num);
-	void TriggerElectricSpark(GameVector* pos, EulerAngles angle, int num);
+	void TriggerFlareSparkParticles(const Vector3i& pos, const Vector3i& vel, const ColorData& color, int roomNumber);
+	void TriggerRicochetSpark(const GameVector& pos, short angle, int num);
+	void TriggerFrictionSpark(const GameVector& pos, const EulerAngles& angle, float length, int count);
+	void TriggerElectricSpark(const GameVector& pos, const EulerAngles& angle, int count);
 	void TriggerAttackSpark(const Vector3& basePos, const Vector3& color);
 }
