@@ -1,5 +1,4 @@
 #pragma once
-#include "Game/room.h"
 
 namespace TEN::Effects::Drip
 {
@@ -11,7 +10,7 @@ namespace TEN::Effects::Drip
 		bool IsActive = false;
 
 		Vector3 Position   = Vector3::Zero;
-		int		RoomNumber = NO_ROOM;
+		int		RoomNumber = 0;
 		Vector3 Velocity   = Vector3::Zero;
 		Vector4 Color	   = Vector4::Zero;
 		float	Height	   = 0.0f;

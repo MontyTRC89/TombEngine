@@ -1,9 +1,8 @@
 #pragma once
 #include <deque>
 
-#include "Game/room.h"
-
 struct CollisionResult;
+struct ItemInfo;
 
 namespace TEN::Effects::Blood
 {
@@ -17,10 +16,9 @@ namespace TEN::Effects::Blood
 		unsigned int SpriteIndex = 0;
 		bool		 IsActive = false;
 
-		Vector3 Position = Vector3::Zero;
-		int		RoomNumber = NO_ROOM;
-		Vector3 Velocity = Vector3::Zero;
-		Vector4 Color = Vector4::Zero;
+		Vector3 Position   = Vector3::Zero;
+		int		RoomNumber = 0;
+		Vector4 Color	   = Vector4::Zero;
 
 		float Life	   = 0.0f;
 		float Init	   = 0.0f;
@@ -35,7 +33,7 @@ namespace TEN::Effects::Blood
 		bool		 IsActive	   = false;
 
 		Vector3 Position	  = Vector3::Zero;
-		int		RoomNumber	  = NO_ROOM;
+		int		RoomNumber	  = 0;
 		short	Orientation2D = 0;
 		Vector3 Velocity	  = Vector3::Zero;
 		Vector4 Color		  = Vector4::Zero;
@@ -59,7 +57,7 @@ namespace TEN::Effects::Blood
 		bool		 CanSpawnStain = false;
 
 		Vector3 Position   = Vector3::Zero;
-		int		RoomNumber = NO_ROOM;
+		int		RoomNumber = 0;
 		Vector3 Velocity   = Vector3::Zero;
 		Vector4 Color	   = Vector4::Zero;
 
@@ -75,7 +73,7 @@ namespace TEN::Effects::Blood
 		unsigned int SpriteIndex = 0;
 
 		Vector3	Position	  = Vector3::Zero;
-		int		RoomNumber	  = NO_ROOM;
+		int		RoomNumber	  = 0;
 		short	Orientation2D = 0;
 		Vector3 Normal		  = Vector3::Zero;
 		Vector4	Color		  = Vector4::Zero;

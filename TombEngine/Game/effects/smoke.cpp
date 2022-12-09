@@ -1,7 +1,6 @@
 #include "framework.h"
 #include "Game/effects/smoke.h"
 
-#include <algorithm>
 #include "Game/collision/collide_room.h"
 #include "Game/control/control.h"
 #include "Game/effects/weather.h"
@@ -77,16 +76,14 @@ namespace TEN::Effects::Smoke
 			s.size = Lerp(s.sourceSize, s.destinationSize, normalizedLife);
 			s.angularVelocity *= s.angularDrag;
 			s.rotation += s.angularVelocity;
-			s.color = DirectX::SimpleMath::Vector4::Lerp(s.sourceColor, s.destinationColor, normalizedLife);
+			s.color = Vector4::Lerp(s.sourceColor, s.destinationColor, normalizedLife);
 			int numSprites = -Objects[ID_SMOKE_SPRITES].nmeshes;
 			s.sprite = Lerp(0, numSprites - 1, normalizedLife);
 		}
 	}
 
-	void TriggerFlareSmoke(const DirectX::SimpleMath::Vector3& pos, DirectX::SimpleMath::Vector3& direction, int life, int room)
+	void TriggerFlareSmoke(const Vector3& pos, Vector3& direction, int life, int room)
 	{
-		using namespace DirectX::SimpleMath;
-
 		auto& s = GetFreeSmokeParticle();
 		s = {};
 		s.position = pos;

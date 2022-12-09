@@ -19,8 +19,8 @@ namespace TEN::Effects::Ripple
 
 	struct Ripple
 	{
-		bool		 IsActive	 = false;
 		unsigned int SpriteIndex = 0;
+		bool		 IsActive	 = false;
 
 		Vector3 Position = Vector3::Zero;
 		Vector3 Normal	 = Vector3::Zero;

@@ -1,6 +1,5 @@
 #pragma once
 #include "Game/effects/effects.h"
-#include "Game/room.h"
 
 namespace TEN::Effects::Bubble
 {
@@ -20,7 +19,7 @@ namespace TEN::Effects::Bubble
 
 		Vector3 Position	 = Vector3::Zero;
 		Vector3 PositionBase = Vector3::Zero;
-		int		RoomNumber	 = NO_ROOM;
+		int		RoomNumber	 = 0;
 		Vector4 Color		 = Vector4::Zero;
 		Vector4 ColorStart	 = Vector4::Zero;
 		Vector4 ColorEnd	 = Vector4::Zero;
