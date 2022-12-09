@@ -819,7 +819,7 @@ void UpdateAllEffects()
 	KillMoveEffects();
 }
 
-void UpdateItemRoom(short itemNumber)
+bool UpdateItemRoom(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
 
@@ -829,18 +829,12 @@ void UpdateItemRoom(short itemNumber)
 		item->RoomNumber).RoomNumber;
 
 	if (roomNumber != item->RoomNumber)
-		ItemNewRoom(itemNumber, roomNumber);
-
-	if (item->IsCreature() &&
-		!Objects[item->ObjectNumber].waterCreature &&
-		TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, &g_Level.Rooms[roomNumber]))
 	{
-		auto bounds = GameBoundingBox(item);
-		auto height = item->Pose.Position.y - GetWaterHeight(item);
-
-		if (abs(bounds.Y1 + bounds.Y2) < height)
-			DoDamage(item, INT_MAX);
+		ItemNewRoom(itemNumber, roomNumber);
+		return true;
 	}
+
+	return false;
 }
 
 void DoDamage(ItemInfo* item, int damage)

@@ -33,7 +33,7 @@ Must be one of:
 	USE
 	EXAMINE
 e.g. `myItem.action = ItemAction.EXAMINE`
-	@return an InventoryItem
+	@treturn InventoryItem an InventoryItem
 */
 InventoryItem::InventoryItem(std::string const& a_name, GAME_OBJECT_ID a_slot, short a_yOffset, float a_scale, Rotation const & a_rot, RotationFlags a_rotationFlags, int a_meshBits, ItemOptions a_action) :
 	name{ a_name },

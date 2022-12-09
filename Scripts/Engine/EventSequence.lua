@@ -73,7 +73,7 @@ EventSequence = {
 	-- @bool loop if true, the sequence will start again from its first timer once its final function has been called
 	-- @tparam ?table|bool timerFormat same as in Timer. This is mainly for debugging. __This will not work properly if another sequence or timer is showing a countdown.__
 	-- @param[opt] ... a variable number of pairs of arguments - a time in seconds, followed by the function (must be defined in the LevelFuncs table) to call once the time has elapsed, followed by another duration in seconds, another function name, etc. You can specify a function either by its name as a string, or by a table with the function name as the first member, followed by its arguments (see above example).
-	-- @return The inactive sequence.
+	-- @treturn EventSequence The inactive sequence.
 	Create = function(name, loop, timerFormat, ...)
 		local obj = {}
 		local mt = {}
@@ -135,7 +135,7 @@ EventSequence = {
 
 	--- Get an event sequence by its name.
 	-- @string name The label that was given to the sequence when it was created
-	-- @return The sequence
+	-- @treturn EventSequence The sequence
 	Get = function(name)
 		if LevelVars.Engine.EventSequence.sequences[name] then
 			local obj = {}
@@ -158,7 +158,7 @@ EventSequence = {
 
 	--- Get whether or not the sequence is paused
 	-- @function mySequence:IsPaused
-	-- @return true if the timer is paused, false if otherwise
+	-- @treturn bool true if the timer is paused, false if otherwise
 	IsPaused = function(t)
 		local thisES = LevelVars.Engine.EventSequence.sequences[t.name]
 		return Timer.Get(thisES.timers[thisES.currentTimer]):IsPaused()
@@ -180,7 +180,7 @@ EventSequence = {
 
 	--- Get whether or not the sequence is active
 	-- @function mySequence:IsActive
-	-- @return true if the sequence is active, false if otherwise
+	-- @treturn bool true if the sequence is active, false if otherwise
 	IsActive = function(t)
 		local thisES = LevelVars.Engine.EventSequence.sequences[t.name]
 		return Timer.Get(thisES.timers[thisES.currentTimer]):IsActive()

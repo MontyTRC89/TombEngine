@@ -1031,7 +1031,7 @@ bool Decompress(byte* dest, byte* src, unsigned long compressedSize, unsigned lo
 
 unsigned int _stdcall LoadLevel(void* data)
 {
-	const int levelIndex = reinterpret_cast<int>(data);
+	const int levelIndex = (int)reinterpret_cast<size_t>(data);
 
 	auto* level = g_GameFlow->GetLevel(levelIndex);
 
@@ -1082,11 +1082,12 @@ unsigned int _stdcall LoadLevel(void* data)
 		}
 
 		// Check system name hash and reset it if it's valid (because we use build & play feature only once)
-		if (SystemNameHash != 0 && SystemNameHash != systemHash)
-			throw std::exception("An attempt was made to use level debug feature on a different system.");
-		else
+		if (SystemNameHash != 0) 
 		{
-			InitialiseGame = (SystemNameHash != 0);
+			if (SystemNameHash != systemHash)
+				throw std::exception("An attempt was made to use level debug feature on a different system.");
+
+			InitialiseGame = true;
 			SystemNameHash = 0;
 		}
 
@@ -1141,7 +1142,7 @@ unsigned int _stdcall LoadLevel(void* data)
 
 		// Initialise the game
 		InitialiseGameFlags();
-		InitialiseLara(!(InitialiseGame || CurrentLevel == 1));
+		InitialiseLara(!(InitialiseGame || CurrentLevel <= 1));
 		InitializeNeighborRoomList();
 		GetCarriedItems();
 		GetAIPickups();
@@ -1277,7 +1278,7 @@ int LoadLevelFile(int levelIndex)
 		nullptr,
 		0, 
 		LoadLevel, 
-		reinterpret_cast<void*>(levelIndex), 
+		reinterpret_cast<void*>((size_t)levelIndex), 
 		0, 
 		nullptr);
 
