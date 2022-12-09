@@ -1718,7 +1718,7 @@ void TriggerAttackFlame(const Vector3i& pos, const Vector3& color, int scale)
 	spark.dG = color.y;
 	spark.dB = color.z;
 	spark.fadeToBlack = 8;
-	spark.colFadeSpeed = Random::GenerateInt(4, 4);
+	spark.colFadeSpeed = Random::GenerateInt(4, 8);
 	spark.blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
 	spark.life = Random::GenerateInt(20, 28);
 	spark.sLife = spark.life;
@@ -1730,7 +1730,7 @@ void TriggerAttackFlame(const Vector3i& pos, const Vector3& color, int scale)
 	spark.zVel = Random::GenerateInt(-128, 128);
 	spark.friction = 5;
 	spark.flags = SP_EXPDEF | SP_DEF | SP_SCALE;
-	spark.rotAng = Random::GenerateAngle(0, ANGLE(22.5f));
+	spark.rotAng = Random::GenerateInt(0, 4096); // NOTE: Effect angles use [0, 4096] range.
 
 	if (TestProbability(1 / 2.0f))
 		spark.rotAdd = -32 - (GetRandomControl() & 0x1F);

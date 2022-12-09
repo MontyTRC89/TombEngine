@@ -33,7 +33,7 @@ namespace TEN::Entities::TR4
 	constexpr auto SETH_POUNCE_ATTACK_RANGE			   = SQUARE(BLOCK(3));
 	constexpr auto SETH_KILL_ATTACK_RANGE			   = SQUARE(BLOCK(1));
 	constexpr auto SETH_SINGLE_PROJECTILE_ATTACK_RANGE = SQUARE(BLOCK(4));
-	constexpr auto SETH_DUAL_PROJECTILE_ATTACK_RANGE   = SQUARE(BLOCK(5 / 2.0f));
+	constexpr auto SETH_DUAL_PROJECTILE_ATTACK_RANGE   = SQUARE(BLOCK(2.5f));
 
 	constexpr auto SETH_HARD_RECOIL_RECOVER_CHANCE	  = 1 / 2.0f;
 	constexpr auto SETH_DUAL_PROJECTILE_ATTACK_CHANCE = 1 / 2.0f;
@@ -146,7 +146,7 @@ namespace TEN::Entities::TR4
 		int height3 = GetCollision(x, y, z, item->RoomNumber).Position.Floor;
 
 		bool canJump = false;
-		if ((y < (height1 - CLICK(3 / 2.0f)) || y < (height2 - CLICK(3 / 2.0f))) &&
+		if ((y < (height1 - CLICK(1.5f)) || y < (height2 - CLICK(1.5f))) &&
 			(y < (height3 + CLICK(1)) && y >(height3 - CLICK(1)) || height3 == NO_HEIGHT))
 		{
 			canJump = true;
@@ -208,16 +208,16 @@ namespace TEN::Entities::TR4
 						height4 > (item->Pose.Position.y - BLOCK(1)) &&
 						Random::TestProbability(SETH_JUMP_PROJECTILE_ATTACK_CHANCE))
 					{
-						item->Pose.Position.y -= BLOCK(3 / 2.0f);
+						item->Pose.Position.y -= BLOCK(1.5f);
 						if (Targetable(item, &AI))
 						{
-							item->Pose.Position.y += BLOCK(3 / 2.0f);
+							item->Pose.Position.y += BLOCK(1.5f);
 							item->Animation.TargetState = SETH_STATE_JUMP_PROJECTILE_ATTACK;
 							item->ItemFlags[0] = 0;
 						}
 						else
 						{
-							item->Pose.Position.y += BLOCK(3 / 2.0f);
+							item->Pose.Position.y += BLOCK(1.5f);
 							item->Animation.TargetState = SETH_STATE_WALK_FORWARD;
 						}
 
@@ -436,7 +436,7 @@ namespace TEN::Entities::TR4
 					}
 				}
 
-				if (LaraItem->Pose.Position.y <= (item->Floor - BLOCK(1 / 2.0f)))
+				if (LaraItem->Pose.Position.y <= (item->Floor - CLICK(2)))
 				{
 					if (Targetable(item, &AI))
 					{
@@ -473,7 +473,7 @@ namespace TEN::Entities::TR4
 				{
 					if (item->Animation.ActiveState <= SETH_STATE_SINGLE_PROJECTILE_ATTACK)
 					{
-						if (abs(height4 - item->Pose.Position.y) >= BLOCK(1 / 2.0f))
+						if (abs(height4 - item->Pose.Position.y) >= BLOCK(0.5f))
 							SetAnimation(item, SETH_ANIM_SOFT_RECOIL);
 						else
 							SetAnimation(item, SETH_ANIM_HARD_RECOIL_START);
@@ -514,8 +514,7 @@ namespace TEN::Entities::TR4
 		{
 		case SETH_STATE_DUAL_PROJECTILE_ATTACK:
 		case SETH_STATE_HOVER_PROJECTILE_ATTACK:
-			if (item->ItemFlags[0] < 78 &&
-				(GetRandomControl() & 0x1F) < item->ItemFlags[0])
+			if (item->ItemFlags[0] < 78 && Random::GenerateInt(0, 32) < item->ItemFlags[0])
 			{
 				// Spawn spark particles.
 				for (int i = 0; i < 2; i++)
@@ -597,7 +596,7 @@ namespace TEN::Entities::TR4
 		case SETH_STATE_SINGLE_PROJECTILE_ATTACK:
 			if (item->ItemFlags[0] > 40 &&
 				item->ItemFlags[0] < 100 &&
-				(GetRandomControl() & 7) < (item->ItemFlags[0] - 40))
+				Random::GenerateInt(0, 8) < (item->ItemFlags[0] - 40))
 			{
 				// Spawn spark particles.
 				for (int i = 0; i < 2; i++)
@@ -655,7 +654,7 @@ namespace TEN::Entities::TR4
 		fx.pos.Orientation.y = pose.Orientation.y;
 		fx.pos.Orientation.z = 0;
 		fx.roomNumber = roomNumber;
-		fx.counter = (GetRandomControl() * 2) - ANGLE(180.0f); // TODO: This isn't an angle.
+		fx.counter = (GetRandomControl() * 2) - ANGLE(180.0f); // TODO: This isn't an angle. Run tests on what it actually does.
 		fx.flag1 = flags;
 		fx.objectNumber = ID_ENERGY_BUBBLES;
 		fx.speed = Random::GenerateInt(0, 32) - ((flags == 1) ? 64 : 0) + 96;
