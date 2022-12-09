@@ -645,8 +645,10 @@ bool SaveGame::Save(int slot)
 		serializedItem.add_collidable(itemToSerialize.Collidable);
 		serializedItem.add_looked_at(itemToSerialize.LookedAt);
 		serializedItem.add_effect_type((int)itemToSerialize.Effect.Type);
-		serializedItem.add_effect_count(itemToSerialize.Effect.Count);
 		serializedItem.add_effect_light_colour(&FromVector3(itemToSerialize.Effect.LightColor));
+		serializedItem.add_effect_primary_colour(&FromVector3(itemToSerialize.Effect.PrimaryEffectColor));
+		serializedItem.add_effect_secondary_colour(&FromVector3(itemToSerialize.Effect.SecondaryEffectColor));
+		serializedItem.add_effect_count(itemToSerialize.Effect.Count);
 
 		if (Objects[itemToSerialize.ObjectNumber].intelligent 
 			&& itemToSerialize.Data.is<CreatureInfo>())
@@ -755,6 +757,12 @@ bool SaveGame::Save(int slot)
 		soundTrackMap.push_back(track.second.Mask); 
 	}
 	auto soundtrackMapOffset = fbb.CreateVector(soundTrackMap);
+
+	// Action queue
+	std::vector<int> actionQueue;
+	for (int i = 0; i < ActionQueue.size(); i++)
+		actionQueue.push_back((int)ActionQueue[i]);
+	auto actionQueueOffset = fbb.CreateVector(actionQueue);
 
 	// Flipmaps
 	std::vector<int> flipMaps;
@@ -1134,12 +1142,13 @@ bool SaveGame::Save(int slot)
 	sgb.add_oneshot_track(oneshotTrackOffset);
 	sgb.add_oneshot_position(oneshotTrackData.second);
 	sgb.add_cd_flags(soundtrackMapOffset);
+	sgb.add_action_queue(actionQueueOffset);
 	sgb.add_flip_maps(flipMapsOffset);
 	sgb.add_flip_stats(flipStatsOffset);
 	sgb.add_room_items(roomItemsOffset);
 	sgb.add_flip_effect(FlipEffect);
 	sgb.add_flip_status(FlipStatus);
-	sgb.add_flip_timer(0);
+	sgb.add_current_fov(LastFOV);
 	sgb.add_static_meshes(staticMeshesOffset);
 	sgb.add_volume_states(volumeStatesOffset);
 	sgb.add_fixed_cameras(camerasOffset);
@@ -1227,7 +1236,16 @@ bool SaveGame::Load(int slot)
 	// Effects
 	FlipEffect = s->flip_effect();
 	FlipStatus = s->flip_status();
-	//FlipTimer = s->flip_timer();
+
+	// Restore camera FOV
+	AlterFOV(s->current_fov());
+
+	// Restore action queue
+	for (int i = 0; i < s->action_queue()->size(); i++)
+	{
+		assertion(i < ActionQueue.size(), "Action queue size was changed");
+		ActionQueue[i] = (QueueState)s->action_queue()->Get(i);
+	}
 
 	// Restore soundtracks
 	PlaySoundTrack(s->ambient_track()->str(), SoundTrackType::BGM, s->ambient_position());
@@ -1391,8 +1409,10 @@ bool SaveGame::Load(int slot)
 		item->LookedAt = savedItem->looked_at();
 
 		item->Effect.Type = (EffectType)savedItem->effect_type();
-		item->Effect.Count = savedItem->effect_count();
+		item->Effect.PrimaryEffectColor = ToVector3(savedItem->effect_primary_colour());
+		item->Effect.SecondaryEffectColor = ToVector3(savedItem->effect_secondary_colour());
 		item->Effect.LightColor = ToVector3(savedItem->effect_light_colour());
+		item->Effect.Count = savedItem->effect_count();
 
 		// Mesh stuff
 		item->MeshBits = savedItem->mesh_bits();

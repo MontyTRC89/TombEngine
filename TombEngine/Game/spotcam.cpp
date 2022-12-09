@@ -24,7 +24,6 @@ int SpotcamLoopCnt;
 int CameraFade;
 Vector3i LaraFixedPosition;
 int InitialCameraRoom;
-int LastFOV;
 Vector3i InitialCameraPosition;
 Vector3i InitialCameraTarget;
 int CurrentSplinePosition;
@@ -66,10 +65,11 @@ void ClearSpotCamSequences()
 		SpotCam[i] = {};
 }
 
-void InitSpotCamSequences() 
+void InitialiseSpotCamSequences(bool startFirstSequence)
 {
-	int n = NumberSpotcams;
 	TrackCameraInit = 0;
+
+	int n = NumberSpotcams;
 	int cc = 1;
 
 	if (n != 0)
@@ -100,7 +100,11 @@ void InitSpotCamSequences()
 		SpotCamRemap[s] = ce;
 	}
 
-	return;
+	if (startFirstSequence)
+	{
+		InitialiseSpotCam(0);
+		UseSpotCam = true;
+	}
 }
 
 void InitialiseSpotCam(short Sequence)
@@ -114,7 +118,7 @@ void InitialiseSpotCam(short Sequence)
 	BinocularRange = 0;
 	LaserSight = false;
 
-	AlterFOV(ANGLE(90.0f));
+	AlterFOV(ANGLE(DEFAULT_FOV), false);
 
 	LaraItem->MeshBits = ALL_JOINT_BITS;
 
@@ -132,7 +136,6 @@ void InitialiseSpotCam(short Sequence)
 	SpotcamLoopCnt = 0;
 	Lara.Control.Locked = false;
 
-	LastFOV = CurrentFOV;
 	LaraAir = Lara.Air;
 
 	InitialCameraPosition.x = Camera.pos.x;
@@ -486,7 +489,7 @@ void CalculateSpotCameras()
 		else
 			Camera.pos.RoomNumber = outsideRoom;
 
-		AlterFOV(cfov);
+		AlterFOV(cfov, false);
 
 		LookAt(&Camera, croll);
 

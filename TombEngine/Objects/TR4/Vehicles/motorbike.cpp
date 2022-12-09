@@ -163,7 +163,7 @@ namespace TEN::Entities::Vehicles
 			ObjectCollision(itemNumber, laraItem, coll);
 		else
 		{
-			lara->Vehicle = itemNumber;
+			SetLaraVehicle(laraItem, motorbikeItem);
 			DoMotorbikeMount(motorbikeItem, laraItem, mountType);
 		}
 	}
@@ -444,7 +444,7 @@ namespace TEN::Entities::Vehicles
 				TranslateItem(laraItem, laraItem->Pose.Orientation.y, -MOTORBIKE_DISMOUNT_DISTANCE);
 				lara->Control.HandStatus = HandStatus::Free;
 				lara->SprintEnergy = LARA_SPRINT_ENERGY_MAX;
-				lara->Vehicle = NO_ITEM;
+				SetLaraVehicle(laraItem, nullptr);
 				return true;
 			}
 

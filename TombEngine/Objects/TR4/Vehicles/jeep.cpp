@@ -165,7 +165,7 @@ namespace TEN::Entities::Vehicles
 			ObjectCollision(itemNumber, laraItem, coll);
 		else
 		{
-			lara->Vehicle = itemNumber;
+			SetLaraVehicle(laraItem, jeepItem);
 			DoJeepMount(jeepItem, laraItem, mountType);
 		}
 	}
@@ -470,7 +470,7 @@ namespace TEN::Entities::Vehicles
 				SetAnimation(laraItem, LA_STAND_SOLID);
 				laraItem->Pose.Orientation.x = 0;
 				laraItem->Pose.Orientation.z = 0;
-				lara->Vehicle = NO_ITEM;
+				SetLaraVehicle(laraItem, nullptr);
 				lara->Control.HandStatus = HandStatus::Free;
 				return false;
 			}

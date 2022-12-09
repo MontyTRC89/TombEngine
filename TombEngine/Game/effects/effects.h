@@ -44,8 +44,7 @@ enum class FlameType
 	Medium,
 	Small,
 	Static,
-	StaticFlicker,
-	GreenPulse,
+	Pulse,
 	SmallFast,
 	Trail
 };
@@ -201,12 +200,12 @@ Particle* GetFreeParticle();
 
 void DetatchSpark(int num, SpriteEnumFlag type);
 void UpdateSparks();
-void TriggerRicochetSpark(GameVector* pos, short angle, int num, int unk);
+void TriggerRicochetSpark(const GameVector& pos, short angle, int count, int unk);
 void TriggerCyborgSpark(int x, int y, int z, short xv, short yv, short zv);
 void TriggerExplosionSparks(int x, int y, int z, int extraTrig, int dynamic, int uw, int roomNumber);
 void TriggerExplosionSmokeEnd(int x, int y, int z, int uw);
 void TriggerExplosionSmoke(int x, int y, int z, int uw);
-void TriggerFireFlame(int x, int y, int z, FlameType type);
+void TriggerFireFlame(int x, int y, int z, FlameType type, const Vector3& color1 = Vector3::Zero, const Vector3& color2 = Vector3::Zero);
 void TriggerSuperJetFlame(ItemInfo* item, int yvel, int deadly);
 void SetupSplash(const SPLASH_SETUP* const setup, int room);
 void UpdateSplashes();
@@ -223,9 +222,10 @@ void TriggerRocketFlame(int x, int y, int z, int xv, int yv, int zv, int itemNum
 void TriggerRocketSmoke(int x, int y, int z, int bodyPart);
 void TriggerFlashSmoke(int x, int y, int z, short roomNumber);
 void TriggerMetalSparks(int x, int y, int z, int xv, int yv, int zv, int additional);
+void TriggerAttackFlame(const Vector3i& pos, const Vector3& color, int size);
 void WadeSplash(ItemInfo* item, int wh, int wd);
 void Splash(ItemInfo* item);
 void TriggerRocketFire(int x, int y, int z);
 void TriggerExplosionBubbles(int x, int y, int z, short roomNumber);
-void Ricochet(Pose* pos);
+void Ricochet(Pose& pos);
 void ProcessEffects(ItemInfo* item);

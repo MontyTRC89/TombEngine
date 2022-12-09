@@ -42,7 +42,7 @@ struct CAMERA_INFO
 	Vector3i mikePos; // size=12, offset=108
 };
 
-struct OBJ_CAMERA_INFO
+struct ObjectCameraInfo
 {
 	GameVector LastAngle;
 	bool ItemCameraOn;
@@ -57,6 +57,7 @@ enum CAMERA_FLAGS
 };
 
 constexpr auto FADE_SCREEN_SPEED = 16.0f / 255.0f;
+constexpr auto DEFAULT_FOV = 80.0f;
 
 extern CAMERA_INFO Camera;
 extern GameVector ForcedFixedCamera;
@@ -67,6 +68,7 @@ extern CameraType BinocularOldCamera;
 extern bool LaserSight;
 extern int PhdPerspective;
 extern short CurrentFOV;
+extern short LastFOV;
 
 extern bool  ScreenFadedOut;
 extern bool  ScreenFading;
@@ -84,7 +86,7 @@ void DoThumbstickCamera();
 void LookCamera(ItemInfo* item);
 
 void LookAt(CAMERA_INFO* cam, short roll);
-void AlterFOV(int value);
+void AlterFOV(short value, bool store = true);
 short GetCurrentFOV();
 void InitialiseCamera();
 void MoveCamera(GameVector* ideal, int speed);

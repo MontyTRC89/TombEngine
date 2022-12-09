@@ -75,6 +75,11 @@ namespace TEN::Input
 		return ((Value == 0.0f) && (PrevValue != 0.0f) && (TimeActive <= maxDelayInFrameTime));
 	}
 
+	void InputAction::Update(bool value)
+	{
+		value ? this->Update(1.0f) : this->Update(0.0f);
+	}
+
 	void InputAction::Update(float value)
 	{
 		this->UpdateValue(value);

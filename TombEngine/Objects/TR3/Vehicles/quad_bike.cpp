@@ -184,7 +184,7 @@ namespace TEN::Entities::Vehicles
 			ObjectCollision(itemNumber, laraItem, coll);
 		else
 		{
-			lara->Vehicle = itemNumber;
+			SetLaraVehicle(laraItem, quadBikeItem);
 			DoQuadBikeMount(quadBikeItem, laraItem, mountType);
 		}
 	}
@@ -281,7 +281,7 @@ namespace TEN::Entities::Vehicles
 			TranslateItem(laraItem, laraItem->Pose.Orientation.y, -QBIKE_DISMOUNT_DISTANCE);
 			laraItem->Pose.Orientation.x = 0;
 			laraItem->Pose.Orientation.z = 0;
-			lara->Vehicle = NO_ITEM;
+			SetLaraVehicle(laraItem, nullptr);
 			lara->Control.HandStatus = HandStatus::Free;
 
 			if (laraItem->Animation.ActiveState == QBIKE_STATE_FALL_OFF)

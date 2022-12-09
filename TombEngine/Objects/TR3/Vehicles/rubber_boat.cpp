@@ -803,7 +803,7 @@ namespace TEN::Entities::Vehicles
 			laraItem->Animation.IsAirborne = true;
 			laraItem->Animation.Velocity.z = 20;
 			laraItem->Animation.Velocity.y = -40;
-			lara->Vehicle = NO_ITEM;
+			lara->Vehicle = NO_ITEM; // Leave vehicle itself active for inertia.
 
 			int x = laraItem->Pose.Position.x + 360 * phd_sin(laraItem->Pose.Orientation.y);
 			int y = laraItem->Pose.Position.y - 90;

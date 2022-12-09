@@ -6,6 +6,7 @@
 #include "Game/control/control.h"
 #include "Game/control/lot.h"
 #include "Game/effects/effects.h"
+#include "Game/effects/spark.h"
 #include "Game/itemdata/creature_info.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
@@ -19,6 +20,7 @@
 
 using namespace TEN::Math;
 using namespace TEN::Math::Random;
+using namespace TEN::Effects::Spark;
 using std::vector;
 
 namespace TEN::Entities::TR4
@@ -98,90 +100,6 @@ namespace TEN::Entities::TR4
 		fx->frameNumber = Objects[fx->objectNumber].meshIndex + mesh * 2;
 	}
 
-	void TriggerHarpyFlame(short itemNumber, ItemInfo* target, byte nodeNumber, short size)
-	{
-		auto* item = &g_Level.Items[itemNumber];
-
-		int dx = target->Pose.Position.x - item->Pose.Position.x;
-		int dz = target->Pose.Position.z - item->Pose.Position.z;
-
-		if (dx >= -SECTOR(16) && dx <= SECTOR(16) &&
-			dz >= -SECTOR(16) && dz <= SECTOR(16))
-		{
-			auto* spark = GetFreeParticle();
-
-			spark->on = true;
-			spark->sR = 0;
-			spark->sG = 0;
-			spark->sB = 0;
-			spark->dB = 0;
-			spark->dG = spark->dR = (GetRandomControl() & 0x7F) + 32;
-			spark->fadeToBlack = 8;
-			spark->colFadeSpeed = (GetRandomControl() & 3) + 4;
-			spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
-			spark->life = spark->sLife = (GetRandomControl() & 7) + 20;
-			spark->x = (GetRandomControl() & 0xF) - 8;
-			spark->y = 0;
-			spark->z = (GetRandomControl() & 0xF) - 8;
-			spark->xVel = (GetRandomControl() & 0xFF) - 128;
-			spark->yVel = 0;
-			spark->zVel = (GetRandomControl() & 0xFF) - 128;
-			spark->friction = 5;
-			spark->flags = SP_SCALE | SP_ROTATE | SP_ITEM | SP_EXPDEF | SP_NODEATTACH;
-			spark->rotAng = GetRandomControl() & 0xFFF;
-
-			if (TestProbability(0.5f))
-				spark->rotAdd = -32 - (GetRandomControl() & 0x1F);
-			else
-				spark->rotAdd = (GetRandomControl() & 0x1F) + 32;
-
-			spark->maxYvel = 0;
-			spark->gravity = (GetRandomControl() & 0x1F) + 16;
-			spark->fxObj = byte(itemNumber);
-			spark->nodeNumber = nodeNumber;
-			spark->scalar = 2;
-			spark->sSize = spark->size = GetRandomControl() & 0xF + size;
-			spark->dSize = spark->size / 8;
-		}
-	}
-
-	void TriggerHarpySparks(ItemInfo* target, int x, int y, int z, short xv, short yv, short zv)
-	{
-		int dx = target->Pose.Position.x - x;
-		int dz = target->Pose.Position.z - z;
-
-		if (dx >= -SECTOR(16) && dx <= SECTOR(16) &&
-			dz >= -SECTOR(16) && dz <= SECTOR(16))
-		{
-			auto* spark = GetFreeParticle();
-
-			spark->on = true;
-			spark->sR = 0;
-			spark->sG = 0;
-			spark->sB = 0;
-			spark->dR = spark->dG = (GetRandomControl() & 0x7F) + 64;
-			spark->dB = 0;
-			spark->life = 16;
-			spark->sLife = 16;
-			spark->colFadeSpeed = 4;
-			spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
-			spark->fadeToBlack = 4;
-			spark->x = x;
-			spark->y = y;
-			spark->z = z;
-			spark->xVel = xv;
-			spark->yVel = yv;
-			spark->zVel = zv;
-			spark->friction = 34;
-			spark->scalar = 1;
-			spark->sSize = spark->size = (GetRandomControl() & 3) + 4;
-			spark->maxYvel = 0;
-			spark->gravity = 0;
-			spark->dSize = (GetRandomControl() & 1) + 1;
-			spark->flags = SP_NONE;
-		}
-	}
-
 	void DoHarpyEffects(ItemInfo* item, CreatureInfo* creature, short itemNumber)
 	{
 		item->ItemFlags[0]++;
@@ -189,35 +107,41 @@ namespace TEN::Entities::TR4
 		auto rh = GetJointPosition(item, HarpyAttack1.meshNum, Vector3i(HarpyAttack1.Position));
 		auto lr = GetJointPosition(item, HarpyAttack2.meshNum, Vector3i(HarpyAttack2.Position));
 
+		int sG = (GetRandomControl() & 0x7F) + 32;
+		int sR = sG;
+		int sB = 0;
+		auto sparkColor = Vector3(sR, sG, sB);
+		int fG = (GetRandomControl() & 0x7F) + 64;
+		int fR = fG;
+		int fB = 0;
+		auto flameColor = Vector3(fR, fG, fB);
+
 		if (item->ItemFlags[0] >= 24 &&
 			item->ItemFlags[0] <= 47 &&
 			(GetRandomControl() & 0x1F) < item->ItemFlags[0])
 		{
 			for (int i = 0; i < 2; i++)
 			{
-				int dx = (GetRandomControl() & 0x7FF) + rh.x - 1024;
-				int dy = (GetRandomControl() & 0x7FF) + rh.y - 1024;
-				int dz = (GetRandomControl() & 0x7FF) + rh.z - 1024;
-
-				TriggerHarpySparks(creature->Enemy, dx, dy, dz, 8 * (rh.x - dx), 8 * (rh.y - dy), 8 * (rh.z - dz));
-
-				dx = (GetRandomControl() & 0x7FF) + lr.x - 1024;
-				dy = (GetRandomControl() & 0x7FF) + lr.y - 1024;
-				dz = (GetRandomControl() & 0x7FF) + lr.z - 1024;
-
-				TriggerHarpySparks(creature->Enemy, dx, dy, dz, 8 * (lr.x - dx), 8 * (lr.y - dy), 8 * (lr.z - dz));
+				TriggerAttackSpark(lr.ToVector3(), sparkColor);
+				TriggerAttackSpark(rh.ToVector3(), sparkColor);
 			}
 		}
 
-		int something = item->ItemFlags[0] * 2;
-		if (something > 64)
-			something = 64;
-		if (something < 80)
+		int size = item->ItemFlags[0] * 2;
+		if (size > 64)
+			size = 64;
+		if (size < 80)
 		{
 			if ((Wibble & 0xF) == 8)
-				TriggerHarpyFlame(itemNumber, creature->Enemy, 4, something);
+			{
+				TriggerAttackFlame(lr, flameColor, size);
+				TriggerAttackFlame(rh, flameColor, size);
+			}
 			else if (!(Wibble & 0xF))
-				TriggerHarpyFlame(itemNumber, creature->Enemy, 5, something);
+			{
+				TriggerAttackFlame(lr, flameColor, size);
+				TriggerAttackFlame(rh, flameColor, size);
+			}
 		}
 
 		if (item->ItemFlags[0] >= 61)
@@ -225,15 +149,15 @@ namespace TEN::Entities::TR4
 			if (item->ItemFlags[0] <= 65 && GlobalCounter & 1)
 			{
 				auto pos3 = GetJointPosition(item, HarpyAttack1.meshNum, Vector3i(HarpyAttack1.Position.x, HarpyAttack1.Position.y * 2, HarpyAttack1.Position.z));
-				auto orient = Geometry::GetOrientToPoint(rh.ToVector3(), lr.ToVector3());
+				auto orient = Geometry::GetOrientToPoint(lr.ToVector3(), rh.ToVector3());
 				auto pose = Pose(rh, orient);
 				TriggerHarpyMissile(&pose, item->RoomNumber, 2);
 			}
 
 			if (item->ItemFlags[0] >= 61 && item->ItemFlags[0] <= 65 && !(GlobalCounter & 1))
 			{
-				auto pos3 = GetJointPosition(item, HarpyAttack2.meshNum, Vector3i(HarpyAttack1.Position.x, HarpyAttack2.Position.y * 2, HarpyAttack2.Position.z));
-				auto orient = Geometry::GetOrientToPoint(rh.ToVector3(), lr.ToVector3());
+				auto pos3 = GetJointPosition(item, HarpyAttack2.meshNum, Vector3i(HarpyAttack2.Position.x, HarpyAttack2.Position.y * 2, HarpyAttack2.Position.z));
+				auto orient = Geometry::GetOrientToPoint(lr.ToVector3(), rh.ToVector3());
 				auto pose = Pose(rh, orient);
 				TriggerHarpyMissile(&pose, item->RoomNumber, 2);
 			}

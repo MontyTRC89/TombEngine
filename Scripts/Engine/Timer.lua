@@ -65,9 +65,9 @@ Timer = {
 	-- @number totalTime The duration of the timer, in seconds
 	-- @bool loop if true, the timer will start again immediately after the time has elapsed
 	-- @tparam ?table|bool timerFormat If a table is given, the remaining time will be shown as a string, formatted according to the values in the table. If true, the remaining seconds, rounded up, will show at the bottom of the screen. If false, the remaining time will not be shown on screen. 
-	-- @function func The LevelFunc function to call when the time is up
+	-- @func func The LevelFunc function to call when the time is up
 	-- @param[opt] ... a variable number of arguments with which the above function will be called
-	-- @return The timer in its paused state
+	-- @treturn Timer The timer in its paused state
 	--
 	Create = function(name, totalTime, loop, timerFormat, func, ...)
 		local obj = {}
@@ -101,7 +101,7 @@ Timer = {
 
 	--- Get a timer by its name.
 	-- @string name The label that was given to the timer when it was created
-	-- @return The timer
+	-- @treturn Timer The timer
 	Get = function(name)
 		if LevelVars.Engine.Timer.timers[name] then
 			local obj = {}
@@ -234,7 +234,7 @@ Timer = {
 
 	--- Get whether or not the timer is active
 	-- @function myTimer:IsActive
-	-- @return true if the timer is active, false if otherwise
+	-- @treturn bool true if the timer is active, false if otherwise
 	IsActive = function(t)
 		return LevelVars.Engine.Timer.timers[t.name].active
 	end;
@@ -256,14 +256,14 @@ Timer = {
 
 	--- Get whether or not the timer is paused
 	-- @function myTimer:IsPaused
-	-- @return true if the timer is paused, false if otherwise
+	-- @treturn bool true if the timer is paused, false if otherwise
 	IsPaused = function(t)
 		return LevelVars.Engine.Timer.timers[t.name].paused
 	end;
 
 	--- Get the remaining time for a timer.
 	-- @function myTimer:GetRemainingTime
-	-- @return the time in seconds remaining on the clock
+	-- @treturn float the time in seconds remaining on the clock
 	GetRemainingTime = function(t)
 		return LevelVars.Engine.Timer.timers[t.name].remainingTime
 	end;
@@ -278,7 +278,7 @@ Timer = {
 	--- Get the total time for a timer.
 	-- This is the amount of time the timer will start with, as well as when starting a new loop
 	-- @function myTimer:GetRemainingTime
-	-- @return the timer's total time
+	-- @treturn float the timer's total time
 	GetTotalTime = function(t)
 		return LevelVars.Engine.Timer.timers[t.name].totalTime
 	end;

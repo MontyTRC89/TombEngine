@@ -84,7 +84,7 @@ most can just be ignored (see usage).
 	@int[opt=10] hp HP of item
 	@int[opt=0] OCB ocb of item (default 0)
 	@tparam[opt] table AIBits table with AI bits (default {0,0,0,0,0,0})
-	@return reference to new Moveable object
+	@treturn Moveable A new Moveable object (a wrapper around the new object)
 	@usage 
 	local item = Moveable(
 		TEN.Objects.ObjID.PISTOLS_ITEM, -- object id
@@ -172,10 +172,17 @@ void Moveable::Register(sol::table & parent)
 // @tparam float timeout time (in seconds) after which effect turns off (optional).
 	ScriptReserved_SetEffect, &Moveable::SetEffect,
 
+/// Set custom colored burn effect to moveable
+// @function Moveable:SetCustomEffect
+// @tparam Color Color1 color the primary color of the effect (also used for lighting).
+// @tparam Color Color2 color the secondary color of the effect.
+// @tparam float timeout time (in seconds) after which effect turns off (optional).
+	ScriptReserved_SetCustomEffect, &Moveable::SetCustomEffect,
+
 /// Get current moveable effect
 // @function Moveable:GetEffect
 // @treturn EffectID effect type currently assigned to moveable.
-	ScriptReserved_GetEffect, &Moveable::GetEffect,
+	ScriptReserved_GetEffect, & Moveable::GetEffect,
 
 /// Get the status of object.
 // possible values:
@@ -580,16 +587,29 @@ Vec3 Moveable::GetPos() const
 // @bool[opt] updateRoom Will room changes be automatically detected? Set to false if you are using overlapping rooms (default: true)
 void Moveable::SetPos(Vec3 const& pos, sol::optional<bool> updateRoom)
 {
+	auto oldPos = m_item->Pose.Position.ToVector3();
 	pos.StoreInPHDPos(m_item->Pose);
 
 	bool willUpdate = !updateRoom.has_value() || updateRoom.value();
 
 	if (m_initialised && willUpdate)
 	{
+		bool roomUpdated = false;
+
 		if (m_item->IsLara())
-			UpdateLaraRoom(m_item, pos.y);
+			roomUpdated = UpdateLaraRoom(m_item, pos.y);
 		else
-			UpdateItemRoom(m_item->Index);
+			roomUpdated = UpdateItemRoom(m_item->Index);
+
+		// In case direct portal room update didn't happen, and distance between old and new
+		// points is significant, do a predictive room update.
+
+		if (!roomUpdated && Vector3::Distance(oldPos, m_item->Pose.Position.ToVector3()) > BLOCK(1))
+		{
+			int potentialNewRoom = FindRoomNumber(m_item->Pose.Position, m_item->RoomNumber);
+			if (potentialNewRoom != m_item->RoomNumber)
+				SetRoom(potentialNewRoom);
+		}
 	}
 }
 
@@ -682,7 +702,26 @@ void Moveable::SetEffect(EffectType effectType, sol::optional<float> timeout)
 	case EffectType::Sparks:
 		ItemElectricBurn(m_item, realTimeout);
 		break;
+
+	case EffectType::ElectricIgnite:
+		ItemBlueElectricBurn(m_item, realTimeout);
+		break;
+
+	case EffectType::RedIgnite:
+		ItemRedLaserBurn(m_item, realTimeout);
+		break;
+
+	case EffectType::Custom:
+		ScriptWarn("CUSTOM effect type requires additional setup. Use SetCustomEffect command instead.");
 	}
+}
+
+void Moveable::SetCustomEffect(const ScriptColor& col1, const ScriptColor& col2, sol::optional<float> timeout)
+{
+	int realTimeout = timeout.has_value() ? int(timeout.value() * FPS) : -1;
+	Vector3 color1 = Vector3(col1.GetR() * (1.f / 255.f), col1.GetG() * (1.f / 255.f), col1.GetB() * (1.f / 255.f));
+	Vector3 color2 = Vector3(col2.GetR() * (1.f / 255.f), col2.GetG() * (1.f / 255.f), col2.GetB() * (1.f / 255.f));
+	ItemCustomBurn(m_item, color1, color2, realTimeout);
 }
 
 EffectType Moveable::GetEffect() const
@@ -768,6 +807,9 @@ Vec3 Moveable::GetVelocity() const
 
 void Moveable::SetVelocity(Vec3 velocity)
 {
+	if (m_item->IsCreature())
+		ScriptWarn("Attempt to set velocity to a creature. In may not work, as velocity is overridden by AI.");
+
 	m_item->Animation.Velocity = Vector3(velocity.x, velocity.y, velocity.z);
 }
 
@@ -832,7 +874,15 @@ void Moveable::SetRoom(short room)
 	if (!m_initialised)
 		m_item->RoomNumber = room;
 	else
+	{
 		ItemNewRoom(m_num, room);
+
+		// HACK: For Lara, we need to manually force Location.roomNumber to new one,
+		// or else camera won't be updated properly.
+
+		if (m_item->IsLara())
+			m_item->Location.roomNumber = room;
+	}
 }
 
 short Moveable::GetStatus() const
