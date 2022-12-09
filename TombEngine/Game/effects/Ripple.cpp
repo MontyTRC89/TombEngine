@@ -10,7 +10,7 @@ using namespace TEN::Math;
 
 namespace TEN::Effects::Ripple
 {
-	constexpr auto RIPPLE_SCALE_MAX = BLOCK(1 / 4.0f);
+	constexpr auto RIPPLE_SCALE_MAX = BLOCK(0.25f);
 
 	constexpr auto RIPPLE_COLOR_WHITE = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
 	constexpr auto RIPPLE_COLOR_RED	  = Vector4(0.8f, 0.0f, 0.0f, 1.0f);
@@ -56,25 +56,6 @@ namespace TEN::Effects::Ripple
 
 		if (ripple.Flags.Test(RippleFlags::Ground))
 			ripple.Life = Random::GenerateFloat(16.0f, 24.0f);
-	}
-
-	void SpawnUnderwaterBlood(const Vector3& pos, float scale)
-	{
-		static const auto flags = std::vector<unsigned int>{ RippleFlags::LowOpacity, RippleFlags::Blood };
-
-		auto& ripple = GetFreeRipple();
-
-		auto sphere = BoundingSphere(pos, BLOCK(1 / 32.0f));
-
-		ripple = Ripple();
-		ripple.IsActive = true;
-		ripple.SpriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex;
-		ripple.Position = Random::GeneratePointInSphere(sphere);
-		ripple.Normal = Vector3::Zero; // Unused by underwater blood rendering.
-		ripple.Life = Random::GenerateFloat(240.0f, 248.0f);
-		ripple.Init = 1.0f;
-		ripple.Scale = scale;
-		ripple.Flags.Set(flags);
 	}
 
 	void UpdateRipples()

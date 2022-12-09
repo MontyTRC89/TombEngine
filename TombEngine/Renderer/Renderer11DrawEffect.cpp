@@ -393,23 +393,13 @@ namespace TEN::Renderer
 			if (!ripple.IsActive)
 				continue;
 
-			Vector4 color;
+			auto color = Vector4::Zero;
 			if (ripple.Flags.Test(RippleFlags::LowOpacity))
 			{
-				if (ripple.Flags.Test(RippleFlags::Blood))
-				{
-					if (ripple.Init)
-						color = Vector4(ripple.Init / 2, 0, ripple.Init / 16, 255);
-					else
-						color = Vector4(ripple.Life / 2, 0, ripple.Life / 16, 255);
-				}
+				if (ripple.Init)
+					color = Vector4(ripple.Init, ripple.Init, ripple.Init, 255);
 				else
-				{
-					if (ripple.Init)
-						color = Vector4(ripple.Init, ripple.Init, ripple.Init, 255);
-					else
-						color = Vector4(ripple.Life, ripple.Life, ripple.Life, 255);
-				}
+					color = Vector4(ripple.Life, ripple.Life, ripple.Life, 255);
 			}
 			else
 			{
@@ -422,23 +412,12 @@ namespace TEN::Renderer
 			color.x = (int)std::clamp((int)color.x, 0, 255);
 			color.y = (int)std::clamp((int)color.y, 0, 255);
 			color.z = (int)std::clamp((int)color.z, 0, 255);
-
 			color /= 255.0f;
 
-			if (ripple.Flags.Test(RippleFlags::Blood))
-			{
-				AddSpriteBillboard(
-					&m_sprites[ripple.SpriteIndex],
-					ripple.Position,
-					color, 0.0f, 1.0f, Vector2(ripple.Scale, ripple.Scale) * 2, BLENDMODE_ADDITIVE, true, view);
-			}
-			else
-			{
-				AddSpriteBillboardConstrainedLookAt(
-					&m_sprites[ripple.SpriteIndex],
-					ripple.Position,
-					color, 0.0f, 1.0f, Vector2(ripple.Scale, ripple.Scale) * 2, BLENDMODE_ADDITIVE, ripple.Normal, true, view);
-			}
+			AddSpriteBillboardConstrainedLookAt(
+				&m_sprites[ripple.SpriteIndex],
+				ripple.Position,
+				color, 0.0f, 1.0f, Vector2(ripple.Scale, ripple.Scale) * 2, BLENDMODE_ADDITIVE, ripple.Normal, true, view);
 		}
 	}
 
@@ -805,7 +784,32 @@ namespace TEN::Renderer
 			AddSprite3D(
 				&m_sprites[stain.SpriteIndex],
 				stain.VertexPoints[0], stain.VertexPoints[1], stain.VertexPoints[2], stain.VertexPoints[3],
-				stain.Color, 0.0f, 1.0f, Vector2::One, BLENDMODE_ALPHABLEND, true, view); // TODO: There might be a bug with some blend modes??
+				stain.Color, 0.0f, 1.0f, Vector2::One, BLENDMODE_ALPHABLEND, true, view);
+		}
+	}
+
+	void Renderer11::DrawUnderwaterBloodParticles(RenderView& view)
+	{
+		for (const auto& uwBlood : UnderwaterBloodParticles)
+		{
+			if (!uwBlood.IsActive)
+				continue;
+
+			auto color = Vector4::Zero;
+			if (uwBlood.Init)
+				color = Vector4(uwBlood.Init / 2, 0, uwBlood.Init / 16, 255);
+			else
+				color = Vector4(uwBlood.Life / 2, 0, uwBlood.Life / 16, 255);
+			
+			color.x = (int)std::clamp((int)color.x, 0, 255);
+			color.y = (int)std::clamp((int)color.y, 0, 255);
+			color.z = (int)std::clamp((int)color.z, 0, 255);
+			color /= 255.0f;
+
+			AddSpriteBillboard(
+				&m_sprites[uwBlood.SpriteIndex],
+				uwBlood.Position,
+				color, 0.0f, 1.0f, Vector2(uwBlood.Scale, uwBlood.Scale) * 2, BLENDMODE_ADDITIVE, true, view);
 		}
 	}
 

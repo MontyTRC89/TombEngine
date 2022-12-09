@@ -4,6 +4,7 @@
 #include "Flow/ScriptInterfaceFlowHandler.h"
 #include "Game/animation.h"
 #include "Game/collision/collide_room.h"
+#include "Game/effects/Blood.h"
 #include "Game/effects/Bubble.h"
 #include "Game/effects/Drip.h"
 #include "Game/effects/explosion.h"
@@ -23,6 +24,7 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
+using namespace TEN::Effects::Blood;
 using namespace TEN::Effects::Bubble;
 using namespace TEN::Effects::Environment;
 using namespace TEN::Effects::Explosion;
@@ -800,9 +802,7 @@ short DoBloodSplat(int x, int y, int z, short speed, short direction, short room
 {
 	short probedRoomNumber = GetCollision(x, y, z, roomNumber).RoomNumber;
 	if (TestEnvironment(ENV_FLAG_WATER, probedRoomNumber))
-	{
-		SpawnUnderwaterBlood(Vector3(x, y, z), speed);
-	}
+		SpawnUnderwaterBlood(Vector3(x, y, z), probedRoomNumber, speed);
 	else
 		TriggerBlood(x, y, z, direction >> 4, speed);
 

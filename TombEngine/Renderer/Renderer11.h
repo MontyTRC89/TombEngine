@@ -544,6 +544,7 @@ namespace TEN::Renderer
 		void DrawBloodDrips(RenderView& view);
 		void DrawBloodMists(RenderView& view);
 		void DrawBloodStains(RenderView& view);
+		void DrawUnderwaterBloodParticles(RenderView& view);
 		void DrawFootprints(RenderView& view);
 		void DrawLoadingBar(float percent);
 		void DrawPostprocess(ID3D11RenderTargetView* target, ID3D11DepthStencilView* depthTarget, RenderView& view);

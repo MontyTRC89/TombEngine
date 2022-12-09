@@ -2,7 +2,6 @@
 #include "Game/effects/Blood.h"
 
 #include "Game/collision/collide_room.h"
-#include "Game/effects/Ripple.h"
 #include "Game/effects/weather.h"
 #include "Math/Math.h"
 #include "Renderer/Renderer11.h"
@@ -10,12 +9,16 @@
 #include "Specific/setup.h"
 
 using namespace TEN::Effects::Environment;
-using namespace TEN::Effects::Ripple;
 using namespace TEN::Math;
 using namespace TEN::Renderer;
 
 namespace TEN::Effects::Blood
 {
+	constexpr auto UW_BLOOD_LIFE_MAX	  = 8.5f;
+	constexpr auto UW_BLOOD_LIFE_MIN	  = 8.0f;
+	constexpr auto UW_BLOOD_SCALE_MAX	  = BLOCK(0.25f);
+	constexpr auto UW_BLOOD_SPHERE_RADIUS = BLOCK(1 / 8.0f);
+
 	constexpr auto BLOOD_MIST_LIFE_MAX		= 0.75f;
 	constexpr auto BLOOD_MIST_LIFE_MIN		= 0.25f;
 	constexpr auto BLOOD_MIST_VELOCITY_MAX	= 16.0f;
@@ -48,10 +51,31 @@ namespace TEN::Effects::Blood
 	constexpr auto BLOOD_COLOR_RED	 = Vector4(0.8f, 0.0f, 0.0f, 1.0f);
 	constexpr auto BLOOD_COLOR_BROWN = Vector4(0.3f, 0.1f, 0.0f, 1.0f);
 
-	std::array<BloodMist, BLOOD_MIST_NUM_MAX> BloodMists  = {};
-	std::array<BloodDrip, BLOOD_DRIP_NUM_MAX> BloodDrips  = {};
-	std::deque<BloodStain>					  BloodStains = {};
+	std::array<UnderwaterBlood, UW_BLOOD_NUM_MAX> UnderwaterBloodParticles = {};
+	std::array<BloodMist, BLOOD_MIST_NUM_MAX>	  BloodMists			   = {};
+	std::array<BloodDrip, BLOOD_DRIP_NUM_MAX>	  BloodDrips			   = {};
+	std::deque<BloodStain>						  BloodStains			   = {};
 
+	UnderwaterBlood& GetFreeUnderwaterBlood()
+	{
+		float shortestLife = INFINITY;
+		auto* oldestUWBlood = &UnderwaterBloodParticles[0];
+
+		for (auto& uwBlood : UnderwaterBloodParticles)
+		{
+			if (!uwBlood.IsActive)
+				return uwBlood;
+
+			if (uwBlood.Life < shortestLife)
+			{
+				shortestLife = uwBlood.Life;
+				oldestUWBlood = &uwBlood;
+			}
+		}
+
+		return *oldestUWBlood;
+	}
+	
 	BloodMist& GetFreeBloodMist()
 	{
 		float shortestLife = INFINITY;
@@ -137,8 +161,37 @@ namespace TEN::Effects::Blood
 		return true;
 	}
 
+	void SpawnUnderwaterBlood(const Vector3& pos, int roomNumber, float scaleMax)
+	{
+		auto& uwBlood = GetFreeUnderwaterBlood();
+
+		auto sphere = BoundingSphere(pos, UW_BLOOD_SPHERE_RADIUS);
+
+		uwBlood = UnderwaterBlood();
+		uwBlood.IsActive = true;
+		uwBlood.SpriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex;
+		uwBlood.Position = Random::GeneratePointInSphere(sphere);
+		uwBlood.Life = std::round(Random::GenerateFloat(UW_BLOOD_LIFE_MIN, UW_BLOOD_LIFE_MAX) * FPS);
+		uwBlood.Init = 1.0f;
+		uwBlood.Scale = scaleMax;
+
+		//SpawnUnderwaterBlood(pos, scaleMax);
+	}
+
+	void SpawnUnderwaterBloodCloud(const Vector3& pos, int roomNumber, float scaleMax, unsigned int count)
+	{
+		if (!TestEnvironment(ENV_FLAG_WATER, roomNumber))
+			return;
+
+		for (int i = 0; i < count; i++)
+			SpawnUnderwaterBlood(pos, roomNumber, scaleMax);
+	}
+
 	void SpawnBloodMist(const Vector3& pos, int roomNumber, const Vector3& direction)
 	{
+		if (TestEnvironment(ENV_FLAG_WATER, roomNumber))
+			return;
+
 		auto& mist = GetFreeBloodMist();
 
 		auto sphere = BoundingSphere(pos, BLOOD_MIST_SPHERE_RADIUS);
@@ -172,16 +225,11 @@ namespace TEN::Effects::Blood
 			SpawnBloodMist(pos, roomNumber, direction);
 	}
 
-	void SpawnBloodCloudUnderwater(const Vector3& pos, int roomNumber, float scale)
-	{
-		if (!TestEnvironment(ENV_FLAG_WATER, roomNumber))
-			return;
-		
-		SpawnUnderwaterBlood(pos, scale);
-	}
-
 	void SpawnBloodDrip(const Vector3& pos, int roomNumber, const Vector3& velocity, float lifeInSec, float scale, bool canSpawnStain)
 	{
+		if (TestEnvironment(ENV_FLAG_WATER, roomNumber))
+			return;
+
 		auto& drip = GetFreeBloodDrip();
 
 		drip = BloodDrip();
@@ -201,6 +249,9 @@ namespace TEN::Effects::Blood
 
 	void SpawnBloodDripSpray(const Vector3& pos, int roomNumber, const Vector3& direction, const Vector3& baseVelocity, unsigned int count)
 	{
+		if (TestEnvironment(ENV_FLAG_WATER, roomNumber))
+			return;
+
 		// Spawn mist.
 		SpawnBloodMistCloud(pos, roomNumber, direction, count * 4);
 
@@ -227,6 +278,9 @@ namespace TEN::Effects::Blood
 
 	void SpawnBloodStain(const Vector3& pos, int roomNumber, const Vector3& normal, float scaleMax, float scaleRate, float delayTimeInSec)
 	{
+		if (TestEnvironment(ENV_FLAG_WATER, roomNumber))
+			return;
+
 		auto stain = BloodStain();
 
 		stain.SpriteIndex = Objects[ID_BLOOD_STAIN_SPRITES].meshIndex + Random::GenerateInt(0, BLOOD_STAIN_SPRITE_INDEX_MAX);
@@ -276,6 +330,41 @@ namespace TEN::Effects::Blood
 		float scaleMax = (bounds.GetWidth() + bounds.GetDepth()) / 2;
 
 		SpawnBloodStain(pos, item.RoomNumber, normal, scaleMax, BLOOD_STAIN_POOLING_SCALE_RATE, BLOOD_STAIN_POOLING_TIME_DELAY);
+	}
+
+	void UpdateUnderwaterBloodParticles()
+	{
+		for (auto& uwBlood : UnderwaterBloodParticles)
+		{
+			if (!uwBlood.IsActive)
+				continue;
+
+			//// Despawn.
+			//uwBlood.Life -= 1.0f; // NOTE: Life tracked in frame time.
+			//if (uwBlood.Life <= 0.0f)
+			//{
+			//	uwBlood.IsActive = false;
+			//	continue;
+			//}
+
+			// Update scale.
+			if (uwBlood.Scale < UW_BLOOD_SCALE_MAX)
+				uwBlood.Scale += 4.0f;
+
+			if (uwBlood.Init == 0.0f)
+			{
+				uwBlood.Life -= 3.0f;
+				//if (uwBlood.Life > 250.0f)
+				//	uwBlood.Flags.ClearAll();
+			}
+			else if (uwBlood.Init < uwBlood.Life)
+			{
+				uwBlood.Init += 4.0f;
+
+				if (uwBlood.Init >= uwBlood.Life)
+					uwBlood.Init = 0.0f;
+			}
+		}
 	}
 
 	void UpdateBloodMists()
@@ -344,11 +433,11 @@ namespace TEN::Effects::Blood
 
 			drip.RoomNumber = pointColl.RoomNumber;
 
-			// Hit water; spawn blood cloud.
+			// Hit water; spawn underwater blood.
 			if (TestEnvironment(ENV_FLAG_WATER, drip.RoomNumber))
 			{
 				drip.IsActive = false;
-				SpawnBloodCloudUnderwater(drip.Position, drip.RoomNumber, drip.Scale * 5);
+				SpawnUnderwaterBlood(drip.Position, drip.RoomNumber, drip.Scale * 5);
 			}
 			// Hit wall or ceiling; deactivate.
 			if (pointColl.Position.Floor == NO_HEIGHT || drip.Position.y <= pointColl.Position.Ceiling)
@@ -420,6 +509,11 @@ namespace TEN::Effects::Blood
 		}
 	}
 
+	void ClearUnderwaterBloodParticles()
+	{
+		UnderwaterBloodParticles.fill(UnderwaterBlood());
+	}
+	
 	void ClearBloodMists()
 	{
 		BloodMists.fill(BloodMist());

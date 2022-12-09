@@ -290,6 +290,7 @@ GameStatus ControlPhase(int numFrames, bool demoMode)
 		UpdateBloodDrips();
 		UpdateBloodMists();
 		UpdateBloodStains();
+		UpdateUnderwaterBloodParticles();
 		UpdateFootprints();
 		UpdateRipples();
 		UpdateSplashes();
@@ -682,6 +683,7 @@ void CleanUp()
 	ClearBloodDrips();
 	ClearBloodMists();
 	ClearBloodStains();
+	ClearUnderwaterBloodParticles();
 	ClearBubbles();
 	ClearFootprints();
 	ClearRipples();
