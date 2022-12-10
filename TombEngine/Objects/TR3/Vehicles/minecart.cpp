@@ -148,14 +148,14 @@ namespace TEN::Entities::Vehicles
 
 	enum MinecartFlags
 	{
-		MINECART_FLAG_WRENCH_MESH = (1 << 0),
-		MINECART_FLAG_TURNING_LEFT = (1 << 1),
-		MINECART_FLAG_TURNING_RIGHT = (1 << 2),
+		MINECART_FLAG_WRENCH_MESH	 = (1 << 0),
+		MINECART_FLAG_TURNING_LEFT	 = (1 << 1),
+		MINECART_FLAG_TURNING_RIGHT	 = (1 << 2),
 		MINECART_FLAG_DISMOUNT_RIGHT = (1 << 3),
-		MINECART_FLAG_CONTROL = (1 << 4),
-		MINECART_FLAG_STOPPED = (1 << 5),
-		MINECART_FLAG_NO_ANIM = (1 << 6),
-		MINECART_FLAG_DEAD = (1 << 7)
+		MINECART_FLAG_CONTROL		 = (1 << 4),
+		MINECART_FLAG_STOPPED		 = (1 << 5),
+		MINECART_FLAG_NO_ANIM		 = (1 << 6),
+		MINECART_FLAG_DEAD			 = (1 << 7)
 	};
 
 	MinecartInfo* GetMinecartInfo(ItemInfo* minecartItem)

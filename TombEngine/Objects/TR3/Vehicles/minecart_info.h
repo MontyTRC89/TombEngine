@@ -14,6 +14,7 @@ namespace TEN::Entities::Vehicles
 		int FallTime = 0;
 		int Gradient = 0;
 		unsigned int StopDelay = 0;
+		int FallTime = 0;
 
 		int FloorHeightMiddle = 0;
 		int FloorHeightFront = 0;
