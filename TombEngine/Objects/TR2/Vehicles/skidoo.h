@@ -22,5 +22,5 @@ namespace TEN::Entities::Vehicles
 	void DoSkidooImpact(ItemInfo& skidooItem, ItemInfo& laraItem, VehicleImpactDirection impactDirection);
 
 	void HandleSkidooGuns(ItemInfo& skidooItem, ItemInfo& laraItem);
-	void TriggerSkidooSnowEffect(ItemInfo& skidooItem);
+	void SpawnSkidooSnow(ItemInfo& skidooItem);
 }

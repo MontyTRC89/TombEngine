@@ -54,7 +54,7 @@ namespace TEN::Entities::Vehicles
 	};
 
 	// Collision struct specific to vehicles. Used to determine point collision parameters
-	// at wheels and around the base perimeter of a vehicle. May revise.
+	// at wheels and around the base perimeter. May revise.
 	struct VehiclePointCollision
 	{
 		Vector3i Position	   = Vector3i::Zero;
@@ -62,7 +62,7 @@ namespace TEN::Entities::Vehicles
 		int		 CeilingHeight = 0;
 	};
 
-	//-------------------
+	//-------------------deprecated
 
 	int GetVehicleHeight(const ItemInfo& vehicleItem, int forward, int right, bool clamp, Vector3i& pos);
 

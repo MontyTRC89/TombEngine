@@ -215,7 +215,7 @@ namespace TEN::Entities::Creatures::TR2
 	else
 	{
 		creatureInfo->JointRotation[0] = (creatureInfo->JointRotation[0] == 1) ? 2 : 1;
-		TriggerSkidooSnowEffect(*item);
+		SpawnSkidooSnow(*item);
 		SoundEffect(SFX_TR2_VEHICLE_SNOWMOBILE_IDLE, &item->Pose, SoundEnvironment::Land, 0.5f + item->Animation.Velocity.z / 100.0f); // SKIDOO_MAX_VELOCITY.  TODO: Check actual sound!
 	}
 

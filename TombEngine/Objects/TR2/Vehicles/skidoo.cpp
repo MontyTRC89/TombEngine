@@ -29,16 +29,16 @@ namespace TEN::Entities::Vehicles
 	constexpr auto SKIDOO_SLIP		= 100;
 	constexpr auto SKIDOO_SLIP_SIDE = 50;
 	
-	constexpr auto SKIDOO_VELOCITY_ACCEL		 = 10;
-	constexpr auto SKIDOO_VELOCITY_DECEL		 = 2;
-	constexpr auto SKIDOO_VELOCITY_BRAKE_DECEL	 = 5;
-	constexpr auto SKIDOO_REVERSE_VELOCITY_ACCEL = 5;
+	constexpr auto SKIDOO_VELOCITY_ACCEL		 = 10.0f;
+	constexpr auto SKIDOO_VELOCITY_DECEL		 = 2.0f;
+	constexpr auto SKIDOO_VELOCITY_BRAKE_DECEL	 = 5.0f;
+	constexpr auto SKIDOO_REVERSE_VELOCITY_ACCEL = 5.0f;
 
-	constexpr auto SKIDOO_SLOW_VELOCITY_MAX	   = 50;
-	constexpr auto SKIDOO_NORMAL_VELOCITY_MAX  = 100;
-	constexpr auto SKIDOO_FAST_VELOCITY_MAX    = 150;
-	constexpr auto SKIDOO_TURN_VELOCITY_MAX    = 15;
-	constexpr auto SKIDOO_REVERSE_VELOCITY_MAX = 30;
+	constexpr auto SKIDOO_SLOW_VELOCITY_MAX	   = 50.0f;
+	constexpr auto SKIDOO_NORMAL_VELOCITY_MAX  = 100.0f;
+	constexpr auto SKIDOO_FAST_VELOCITY_MAX    = 150.0f;
+	constexpr auto SKIDOO_TURN_VELOCITY_MAX    = 15.0f;
+	constexpr auto SKIDOO_REVERSE_VELOCITY_MAX = 30.0f;
 	
 	constexpr auto SKIDOO_STEP_HEIGHT		= CLICK(1);
 	constexpr auto SKIDOO_BOUNCE			= (SKIDOO_NORMAL_VELOCITY_MAX / 2) / 256;
@@ -287,10 +287,10 @@ namespace TEN::Entities::Vehicles
 
 		if (skidooItem.Animation.Velocity.z && skidooItem.Floor == skidooItem.Pose.Position.y)
 		{
-			TriggerSkidooSnowEffect(skidooItem);
+			SpawnSkidooSnow(skidooItem);
 
 			if (skidooItem.Animation.Velocity.z < 50)
-				TriggerSkidooSnowEffect(skidooItem);
+				SpawnSkidooSnow(skidooItem);
 		}
 
 		return DoSkidooDismount(skidooItem, laraItem);
@@ -461,7 +461,7 @@ namespace TEN::Entities::Vehicles
 			{
 				drive = true;
 
-				float maxVelocity;
+				float maxVelocity = 0.0f;
 				if (TrInput & VEHICLE_IN_SLOW)
 				{
 					maxVelocity = SKIDOO_SLOW_VELOCITY_MAX;
@@ -753,8 +753,8 @@ namespace TEN::Entities::Vehicles
 				if (skidooItem.Pose.Position.y == skidooItem.Floor)
 				{
 					laraItem.Animation.TargetState = LS_DEATH;
-					laraItem.Animation.Velocity.z = 0;
 					laraItem.Animation.Velocity.y = SKIDOO_DAMAGE_START + SKIDOO_DAMAGE_LENGTH;
+					laraItem.Animation.Velocity.z = 0.0f;
 					ExplodeVehicle(laraItem, skidooItem);
 				}
 				else
@@ -808,13 +808,11 @@ namespace TEN::Entities::Vehicles
 			break;
 		}
 		laraItem.Animation.FrameNumber = g_Level.Anims[laraItem.Animation.AnimNumber].frameBase;
-		laraItem.Animation.ActiveState = SKIDOO_STATE_IMPACT;
+		laraItem.Animation.ActiveState =
 		laraItem.Animation.TargetState = SKIDOO_STATE_IMPACT;
 
-		if (impactDirection == VehicleImpactDirection::Front)
-			SoundEffect(SFX_TR2_VEHICLE_IMPACT1, &skidooItem.Pose);
-		else
-			SoundEffect(SFX_TR2_VEHICLE_IMPACT2, &skidooItem.Pose);
+		auto sfx = (impactDirection == VehicleImpactDirection::Front) ? SFX_TR2_VEHICLE_IMPACT1 : SFX_TR2_VEHICLE_IMPACT1;
+		SoundEffect(sfx, &skidooItem.Pose);
 	}
 
 	void HandleSkidooGuns(ItemInfo& skidooItem, ItemInfo& laraItem)
@@ -846,7 +844,7 @@ namespace TEN::Entities::Vehicles
 			skidooItem.ItemFlags[0]--;
 	}
 
-	void TriggerSkidooSnowEffect(ItemInfo& skidooItem)
+	void SpawnSkidooSnow(ItemInfo& skidooItem)
 	{
 		auto material = GetCollision(&skidooItem).BottomBlock->Material;
 		if (material == FLOOR_MATERIAL::Ice || material == FLOOR_MATERIAL::Snow)

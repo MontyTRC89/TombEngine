@@ -10,9 +10,9 @@ namespace TEN::Entities::Vehicles
 		short MomentumAngle = 0;
 		short ExtraRotation = 0;
 
-		int Velocity			  = 0;
-		int LeftVerticalVelocity  = 0;
-		int RightVerticalVelocity = 0;
+		float Velocity				= 0.0f;
+		float LeftVerticalVelocity  = 0.0f;
+		float RightVerticalVelocity = 0.0f;
 
 		int Revs	   = 0;
 		int EngineRevs = 0;
