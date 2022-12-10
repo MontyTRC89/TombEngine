@@ -44,15 +44,15 @@ namespace TEN::Entities::Vehicles
 		return pointColl.Position.Floor;
 	}
 
-	VehicleMountType GetVehicleMountType(ItemInfo& vehicleItem, ItemInfo& laraItem, const CollisionInfo& coll, const vector<VehicleMountType>& allowedMountTypes, float maxDistance2D, float maxVerticalDistance)
+	VehicleMountType GetVehicleMountType(ItemInfo& vehicleItem, ItemInfo& laraItem, const CollisionInfo& coll, const std::vector<VehicleMountType>& allowedMountTypes, float maxDistance2D, float maxVerticalDistance)
 	{
 		const auto& player = *GetLaraInfo(&laraItem);
 
-		// Assess vehicle usability.
+		// Check vehicle usability.
 		if (vehicleItem.Flags & IFLAG_INVISIBLE)
 			return VehicleMountType::None;
 
-		// Assess hand status.
+		// Check hand status.
 		if (player.Control.HandStatus != HandStatus::Free)
 			return VehicleMountType::None;
 
@@ -71,18 +71,18 @@ namespace TEN::Entities::Vehicles
 		if (!TestBoundsCollide(&vehicleItem, &laraItem, coll.Setup.Radius) || !TestCollision(&vehicleItem, &laraItem))
 			return VehicleMountType::None;
 
-		bool hasInputAction = TrInput & IN_ACTION;
+		bool hasInputAction = IsHeld(In::Action);
 
 		short deltaHeadingAngle = vehicleItem.Pose.Orientation.y - laraItem.Pose.Orientation.y;
 		short angleBetweenPositions = vehicleItem.Pose.Orientation.y - Geometry::GetOrientToPoint(laraItem.Pose.Position.ToVector3(), vehicleItem.Pose.Position.ToVector3()).y;
-		bool onCorrectSide = abs(deltaHeadingAngle - angleBetweenPositions) < ANGLE(45.0f);
+		bool isOnCorrectSide = abs(deltaHeadingAngle - angleBetweenPositions) < ANGLE(45.0f);
 
 		// Assess mount types allowed for vehicle.
-		for (auto mountType : allowedMountTypes)
+		for (const auto& mountType : allowedMountTypes)
 		{
 			switch (mountType)
 			{
-			// TODO: Holding FORWARD the moment a level loads, this mount will fail. Need a better method.
+			// TODO: Holding Forward the moment a level loads, this mount will fail. Need a better method.
 			case VehicleMountType::LevelStart:
 				if (laraItem.Animation.Velocity == Vector3::Zero &&
 					laraItem.Pose.Position == vehicleItem.Pose.Position)
@@ -92,7 +92,7 @@ namespace TEN::Entities::Vehicles
 				continue;
 
 			case VehicleMountType::Front:
-				if (hasInputAction && onCorrectSide &&
+				if (hasInputAction && isOnCorrectSide &&
 					deltaHeadingAngle > ANGLE(135.0f) && deltaHeadingAngle < ANGLE(-135.0f) &&
 					!laraItem.Animation.IsAirborne)
 				{
@@ -101,7 +101,7 @@ namespace TEN::Entities::Vehicles
 				continue;
 
 			case VehicleMountType::Back:
-				if (hasInputAction && onCorrectSide &&
+				if (hasInputAction && isOnCorrectSide &&
 					abs(deltaHeadingAngle) < ANGLE(45.0f) &&
 					!laraItem.Animation.IsAirborne)
 				{
@@ -110,7 +110,7 @@ namespace TEN::Entities::Vehicles
 				continue;
 
 			case VehicleMountType::Left:
-				if (hasInputAction && onCorrectSide &&
+				if (hasInputAction && isOnCorrectSide &&
 					deltaHeadingAngle > ANGLE(-135.0f) && deltaHeadingAngle < ANGLE(-45.0f) &&
 					!laraItem.Animation.IsAirborne)
 				{
@@ -119,7 +119,7 @@ namespace TEN::Entities::Vehicles
 				continue;
 
 			case VehicleMountType::Right:
-				if (hasInputAction && onCorrectSide &&
+				if (hasInputAction && isOnCorrectSide &&
 					deltaHeadingAngle > ANGLE(45.0f) && deltaHeadingAngle < ANGLE(135.0f) &&
 					!laraItem.Animation.IsAirborne)
 				{
@@ -146,15 +146,15 @@ namespace TEN::Entities::Vehicles
 		return VehicleMountType::None;
 	}
 
-	VehicleDismountType GetVehicleDismountType(ItemInfo& vehicleItem, const vector<VehicleDismountType>& allowedDismountTypes, float distance, bool onLand)
+	VehicleDismountType GetVehicleDismountType(ItemInfo& vehicleItem, const std::vector<VehicleDismountType>& allowedDismountTypes, float distance, bool isOnLand)
 	{
 		if (!(TrInput & VEHICLE_IN_BRAKE))
 			return VehicleDismountType::None;
 		
 		// Assess dismount types allowed for vehicle.
-		for (auto dismountType : allowedDismountTypes)
+		for (const auto& dismountType : allowedDismountTypes)
 		{
-			short headingAngle;
+			short headingAngle = 0;
 			switch (dismountType)
 			{
 			case VehicleDismountType::Front:
@@ -163,7 +163,6 @@ namespace TEN::Entities::Vehicles
 					headingAngle = ANGLE(0.0f);
 					break;
 				}
-
 				continue;
 
 			case VehicleDismountType::Back:
@@ -172,7 +171,6 @@ namespace TEN::Entities::Vehicles
 					headingAngle = ANGLE(180.0f);
 					break;
 				}
-
 				continue;
 
 			case VehicleDismountType::Left:
@@ -181,7 +179,6 @@ namespace TEN::Entities::Vehicles
 					headingAngle = ANGLE(-90.0f);
 					break;
 				}
-
 				continue;
 
 			case VehicleDismountType::Right:
@@ -190,35 +187,35 @@ namespace TEN::Entities::Vehicles
 					headingAngle = ANGLE(90.0f);
 					break;
 				}
-
 				continue;
 			}
 
-			if (TestVehicleDismount(vehicleItem, dismountType, headingAngle, distance, onLand))
+			if (TestVehicleDismount(vehicleItem, dismountType, headingAngle, distance, isOnLand))
 				return dismountType;
 		}
 
 		return VehicleDismountType::None;
 	}
 
-	bool TestVehicleDismount(ItemInfo& vehicleItem, VehicleDismountType dismountType, short headingAngle, float distance, bool onLand)
+	bool TestVehicleDismount(ItemInfo& vehicleItem, VehicleDismountType dismountType, short headingAngle, float distance, bool isOnLand)
 	{
 		if (dismountType == VehicleDismountType::None)
 			return false;
+
 		auto pointColl = GetCollision(&vehicleItem, headingAngle, distance, -CLICK(2));
 
-		// Assess for walls. Check ceiling as well?
+		// Check for wall. Check ceiling as well?
 		if (pointColl.Position.Floor == NO_HEIGHT)
 			return false;
 
-		// Assess for slopes (if applicable).
-		if (pointColl.Position.FloorSlope && onLand)
+		// Check for slopes (if applicable).
+		if (pointColl.Position.FloorSlope && isOnLand)
 			return false;
 
 		// Assess feasibility of dismount.
 		if (abs(pointColl.Position.Floor - vehicleItem.Pose.Position.y) <= STEPUP_HEIGHT && // Floor is within highest step threshold.
-			(pointColl.Position.Ceiling - vehicleItem.Pose.Position.y) > -LARA_HEIGHT &&	 // Gap is optically permissive.
-			abs(pointColl.Position.Ceiling - pointColl.Position.Floor) > LARA_HEIGHT)		 // Space is not a clamp.
+			(pointColl.Position.Ceiling - vehicleItem.Pose.Position.y) > -LARA_HEIGHT &&	// Gap is visually permissive.
+			abs(pointColl.Position.Ceiling - pointColl.Position.Floor) > LARA_HEIGHT)		// Space is not too narrom.
 		{
 			return true;
 		}
@@ -267,8 +264,7 @@ namespace TEN::Entities::Vehicles
 		auto point = Vector3i(
 			vehicleItem.Pose.Position.x + (forward * sinY) + (right * cosY),
 			vehicleItem.Pose.Position.y - (forward * sinX) + (right * sinZ),
-			vehicleItem.Pose.Position.z + (forward * cosY) - (right * sinY)
-		);
+			vehicleItem.Pose.Position.z + (forward * cosY) - (right * sinY));
 
 		// Get collision a bit higher to be able to detect bridges.
 		auto pointColl = GetCollision(point.x, point.y - CLICK(2), point.z, vehicleItem.RoomNumber);
@@ -337,7 +333,9 @@ namespace TEN::Entities::Vehicles
 				verticalVelocity = 0.0f;
 			}
 			else
+			{
 				verticalVelocity += GRAVITY * weightMult;
+			}
 		}
 		// Airborne.
 		else
@@ -490,7 +488,7 @@ namespace TEN::Entities::Vehicles
 					float coeff = isWater ? VEHICLE_WATER_VELOCITY_COEFF : VEHICLE_SWAMP_VELOCITY_COEFF;
 					currentVelocity -= std::copysign(currentVelocity * ((waterDepth / VEHICLE_WATER_HEIGHT_MAX) / coeff), currentVelocity);
 
-					if (Random::GenerateInt(0, 32) > 28)
+					if (Random::TestProbability(1 / 7.0f))
 						SoundEffect(SFX_TR4_LARA_WADE, &Pose(vehicleItem.Pose.Position), SoundEnvironment::Land, isWater ? 0.8f : 0.7f);
 
 					if (isWater)
@@ -522,16 +520,16 @@ namespace TEN::Entities::Vehicles
 	// TODO: Allow flares on every vehicle. Boats have this already.
 	void DoVehicleFlareDiscard(ItemInfo& laraItem)
 	{
-		auto& lara = *GetLaraInfo(&laraItem);
+		auto& player = *GetLaraInfo(&laraItem);
 
-		if (lara.Control.Weapon.GunType != LaraWeaponType::Flare)
+		if (player.Control.Weapon.GunType != LaraWeaponType::Flare)
 			return;
 
 		CreateFlare(&laraItem, ID_FLARE_ITEM, 0);
 		UndrawFlareMeshes(&laraItem);
-		lara.Control.Weapon.GunType = LaraWeaponType::None;
-		lara.Control.Weapon.RequestGunType = LaraWeaponType::None;
-		lara.Flare.ControlLeft = false;
+		player.Control.Weapon.GunType = LaraWeaponType::None;
+		player.Control.Weapon.RequestGunType = LaraWeaponType::None;
+		player.Flare.ControlLeft = false;
 	}
 
 	// TODO: Vehicle turn rates must be affected by speed for more tactile modulation. Slower speed = slower turn rate.

@@ -6,13 +6,8 @@ struct CollisionInfo;
 struct CollisionResult;
 struct ItemInfo;
 
-using std::vector;
-
 //////////
-//////////
-// TODO: SAVEGAMES!
-//////////
-//////////
+// TODO: SAVEGAMES.
 //////////
 
 namespace TEN::Entities::Vehicles
@@ -73,9 +68,9 @@ namespace TEN::Entities::Vehicles
 
 	//-------------------
 	
-	VehicleMountType GetVehicleMountType(ItemInfo& vehicleItem, ItemInfo& laraItem, const CollisionInfo& coll, const vector<VehicleMountType>& allowedMountTypes, float maxDistance2D, float maxVerticalDistance = STEPUP_HEIGHT);
-	VehicleDismountType GetVehicleDismountType(ItemInfo& vehicleItem, const vector<VehicleDismountType>& allowedDismountTypes, float distance, bool onLand = true);
-	bool TestVehicleDismount(ItemInfo& vehicleItem, VehicleDismountType dismountType, short headingAngle, float distance, bool onLand);
+	VehicleMountType GetVehicleMountType(ItemInfo& vehicleItem, ItemInfo& laraItem, const CollisionInfo& coll, const std::vector<VehicleMountType>& allowedMountTypes, float maxDistance2D, float maxVerticalDistance = STEPUP_HEIGHT);
+	VehicleDismountType GetVehicleDismountType(ItemInfo& vehicleItem, const std::vector<VehicleDismountType>& allowedDismountTypes, float distance, bool onLand = true);
+	bool TestVehicleDismount(ItemInfo& vehicleItem, VehicleDismountType dismountType, short headingAngle, float distance, bool isOnLand);
 	VehicleImpactDirection GetVehicleImpactDirection(ItemInfo& vehicleItem, const Vector3i& prevPos);
 	
 	VehiclePointCollision GetVehicleCollision(ItemInfo& vehicleItem, int forward, int right, bool clamp);
