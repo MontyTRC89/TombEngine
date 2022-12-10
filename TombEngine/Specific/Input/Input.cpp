@@ -256,14 +256,14 @@ namespace TEN::Input
 
 		switch (source)
 		{
-		case KC_RCONTROL:
-			return KC_LCONTROL;
+		case KC_LCONTROL:
+			return KC_RCONTROL;
 
-		case KC_RSHIFT:
-			return KC_LSHIFT;
+		case KC_LSHIFT:
+			return KC_RSHIFT;
 
-		case KC_RMENU:
-			return KC_LMENU;
+		case KC_LMENU:
+			return KC_RMENU;
 		}
 
 		return source;
@@ -273,7 +273,7 @@ namespace TEN::Input
 	{
 		for (int i = 0; i < KEY_COUNT; i++)
 		{
-			int key = WrapSimilarKeys(KeyboardLayout[0][i]);
+			int key = KeyboardLayout[0][i];
 
 			ConflictingKeys[i] = false;
 
@@ -430,14 +430,14 @@ namespace TEN::Input
 			{
 				if (!OisKeyboard->isKeyDown((KeyCode)i))
 				{
-					KeyMap[i] = false;
 					continue;
 				}
 
-				KeyMap[i] = true;
+				int key = WrapSimilarKeys(i);
+				KeyMap[key] = true;
 
 				// Register directional discrete keypresses as max analog axis values.
-				SetDiscreteAxisValues(i);
+				SetDiscreteAxisValues(key);
 			}
 		}
 		catch (OIS::Exception& ex)
@@ -450,7 +450,7 @@ namespace TEN::Input
 	{
 		for (int layout = 1; layout >= 0; layout--)
 		{
-			int key = WrapSimilarKeys(KeyboardLayout[layout][number]);
+			int key = KeyboardLayout[layout][number];
 			
 			if (layout == 0 && ConflictingKeys[number])
 				continue;
