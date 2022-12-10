@@ -10,5 +10,6 @@ namespace TEN::Entities::Vehicles
 
 	void MinecartPlayerCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);
 	void DoMinecartMount(ItemInfo* minecartItem, ItemInfo* laraItem, VehicleMountType mountType);
+
 	bool MinecartControl(ItemInfo* laraItem);
 }
