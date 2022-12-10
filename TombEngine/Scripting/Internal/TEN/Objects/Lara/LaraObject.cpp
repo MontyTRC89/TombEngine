@@ -273,7 +273,7 @@ std::unique_ptr<Moveable> LaraObject::GetTarget() const
 	return std::make_unique<Moveable>(lara->TargetEntity->Index);
 }
 
-bool LaraObject::GetTorchIsLit() const
+bool LaraObject::TorchIsLit() const
 {
 	auto* lara = GetLaraInfo(m_item);
 	GetFlameTorch();
@@ -299,7 +299,7 @@ void LaraObject::Register(sol::table& parent)
 			ScriptReserved_GetAmmoCount, &LaraObject::GetAmmoCount,
 			ScriptReserved_GetVehicle, &LaraObject::GetVehicle,
 			ScriptReserved_GetTarget, &LaraObject::GetTarget,
-			ScriptReserved_GetTorchIsLit, &LaraObject::GetTorchIsLit,
+			ScriptReserved_TorchIsLit, &LaraObject::TorchIsLit,
 			sol::base_classes, sol::bases<Moveable>()
 		);
 }
