@@ -191,9 +191,9 @@ namespace TEN::Entities::TR4
 				{
 					for (auto& mesh : room.mesh)
 					{
-						if (!((pos.x ^ mesh.pos.Position.x) & ~0x3FF) &&
-							!((pos.z ^ mesh.pos.Position.z) & ~0x3FF) &&
-							StaticObjects[mesh.staticNumber].shatterType <= SHT_NONE)
+						if (abs(pos.x - mesh.pos.Position.x) < SECTOR(1) &&
+							abs(pos.z - mesh.pos.Position.z) < SECTOR(1) &&
+							StaticObjects[mesh.staticNumber].shatterType == SHT_NONE)
 						{
 							ShatterObject(nullptr, &mesh, -64, LaraItem->RoomNumber, 0);
 							SoundEffect(SFX_TR4_SMASH_ROCK, &item->Pose);
