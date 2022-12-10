@@ -84,13 +84,13 @@ namespace TEN::Entities::TR4
 		if (item->Animation.AnimNumber == object->animIndex ||
 			(item->Animation.AnimNumber - object->animIndex) == KTEMPLAR_ANIM_WALK_FORWARD_RIGHT_1 ||
 			(item->Animation.AnimNumber - object->animIndex) == KTEMPLAR_ANIM_WALK_FORWARD_LEFT_2 ||
-			(item->Animation.AnimNumber - object->animIndex) == KTEMPLAR_ANIM_WALK_FORWARD_RIGHT_2) 
+			(item->Animation.AnimNumber - object->animIndex) == KTEMPLAR_ANIM_WALK_FORWARD_RIGHT_2)
 		{
 			if (TestProbability(0.5f))
 			{
-				auto col = Vector3(0.9f, 0.8f, 0.6f);
+				auto color = Vector3(0.9f, 0.8f, 0.6f);
 				auto pos = GetJointPosition(item, 10, Vector3i(0, 48, 448));
-				TriggerMetalSparks(pos.x, pos.y, pos.z, (GetRandomControl() & 0x1FF) - 256, -128 - (GetRandomControl() & 0x7F), (GetRandomControl() & 0x1FF) - 256, col, 0);
+				TriggerMetalSparks(pos.x, pos.y, pos.z, (GetRandomControl() & 0x1FF) - 256, -128 - (GetRandomControl() & 0x7F), (GetRandomControl() & 0x1FF) - 256, color, 0);
 			}
 		}
 
@@ -182,23 +182,19 @@ namespace TEN::Entities::TR4
 
 				if (currentFloor->Stopper)
 				{
-					for (int i = 0; i < room->mesh.size(); i++)
+					for (auto& mesh : room->mesh)
 					{
-						auto* mesh = &room->mesh[i];
-
-						if (!((pos.x ^ mesh->pos.Position.x) & ~0x3FF) &&
-							!((pos.z ^ mesh->pos.Position.z) & ~0x3FF) &&
-							StaticObjects[mesh->staticNumber].shatterType <= SHT_NONE)
+						if (!((pos.x ^ mesh.pos.Position.x) & ~0x3FF) &&
+							!((pos.z ^ mesh.pos.Position.z) & ~0x3FF) &&
+							StaticObjects[mesh.staticNumber].shatterType <= SHT_NONE)
 						{
-							ShatterObject(nullptr, mesh, -64, LaraItem->RoomNumber, 0);
+							ShatterObject(nullptr, &mesh, -64, LaraItem->RoomNumber, 0);
 							SoundEffect(SFX_TR4_SMASH_ROCK, &item->Pose);
 
 							currentFloor->Stopper = false;
 
 							TestTriggers(pos.x, pos.y, pos.z, item->RoomNumber, true);
 						}
-
-						mesh++;
 					}
 				}
 

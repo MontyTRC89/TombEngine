@@ -1530,7 +1530,7 @@ void HandleProjectile(ItemInfo& item, ItemInfo& emitter, const Vector3i& prevPos
 					if (currentItem->IsLara())
 						GetLaraInfo(currentItem)->PoisonPotency += 5;
 				}
-				else 
+				else
 				{
 					DoDamage(currentItem, damage);
 				}
