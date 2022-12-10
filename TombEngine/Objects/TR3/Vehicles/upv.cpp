@@ -529,7 +529,7 @@ namespace TEN::Entities::Vehicles
 
 				lara->Control.WaterStatus = WaterStatus::Underwater;
 				lara->Control.HandStatus = HandStatus::Free;
-				lara->Vehicle = NO_ITEM;
+				SetLaraVehicle(laraItem, nullptr);
 
 				upvItem->HitPoints = 0;
 			}
@@ -568,8 +568,7 @@ namespace TEN::Entities::Vehicles
 				ResetLaraFlex(laraItem);
 				lara->Control.WaterStatus = WaterStatus::TreadWater;
 				lara->WaterSurfaceDist = -heightFromWater;
-				lara->Control.HandStatus = HandStatus::Free;
-				lara->Vehicle = NO_ITEM;
+				SetLaraVehicle(laraItem, nullptr);
 
 				upvItem->HitPoints = 0;
 			}
@@ -649,7 +648,7 @@ namespace TEN::Entities::Vehicles
 		}
 		else
 		{
-			lara->Vehicle = itemNumber;
+			SetLaraVehicle(laraItem, UPVItem);
 			DoUpvMount(upvItem, laraItem, mountType);
 		}
 	}

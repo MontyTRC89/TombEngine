@@ -203,7 +203,7 @@ namespace TEN::Entities::Vehicles
 			ObjectCollision(itemNumber, laraItem, coll);
 		else
 		{
-			lara->Vehicle = itemNumber;
+			SetLaraVehicle(laraItem, motorbikeItem);
 			DoMotorbikeMount(motorbikeItem, laraItem, mountType);
 		}
 	}

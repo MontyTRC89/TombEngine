@@ -161,7 +161,7 @@ namespace TEN::Entities::Vehicles
 			ObjectCollision(itemNumber, laraItem, coll);
 		else
 		{
-			lara->Vehicle = itemNumber;
+			SetLaraVehicle(laraItem, jeepItem);
 			DoJeepMount(jeepItem, laraItem, mountType);
 		}
 	}

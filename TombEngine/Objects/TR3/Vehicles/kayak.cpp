@@ -181,7 +181,7 @@ namespace TEN::Entities::Vehicles
 		}
 		else
 		{
-			lara->Vehicle = itemNumber;
+			SetLaraVehicle(laraItem, kayakItem);
 			DoKayakMount(kayakItem, laraItem, mountType);
 		}
 	}
@@ -634,7 +634,7 @@ namespace TEN::Entities::Vehicles
 				laraItem->Animation.Velocity.z = 40;
 				laraItem->Animation.Velocity.y = -50;
 				lara->Control.HandStatus = HandStatus::Free;
-				lara->Vehicle = NO_ITEM;
+				SetLaraVehicle(laraItem, nullptr);
 				kayak.LeftRightPaddleCount = 0;
 			}
 
@@ -655,7 +655,7 @@ namespace TEN::Entities::Vehicles
 				laraItem->Animation.Velocity.z = 40;
 				laraItem->Animation.Velocity.y = -50;
 				lara->Control.HandStatus = HandStatus::Free;
-				lara->Vehicle = NO_ITEM;
+				SetLaraVehicle(laraItem, nullptr);
 				kayak.LeftRightPaddleCount = 0;
 			}
 		}

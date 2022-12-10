@@ -43,7 +43,7 @@
 <h2>2 Classes</h2>
 <ul class="nowrap">
   <li>    <a href="../2 classes/Flow.Animations.html">Flow.Animations</a></li>
-  <li>    <here>Flow.Fog</here></li>
+  <li>    <a href="../2 classes/Flow.Fog.html">Flow.Fog</a></li>
   <li>    <a href="../2 classes/Flow.InventoryItem.html">Flow.InventoryItem</a></li>
   <li>    <a href="../2 classes/Flow.Level.html">Flow.Level</a></li>
   <li>    <a href="../2 classes/Flow.Mirror.html">Flow.Mirror</a></li>
@@ -67,7 +67,7 @@
 <h2>4 Enums</h2>
 <ul class="nowrap">
   <li>    <a href="../4 enums/Effects.BlendID.html">Effects.BlendID</a></li>
-  <li>    <a href="../4 enums/Effects.EffectID.html">Effects.EffectID</a></li>
+  <li>    <here>Effects.EffectID</here></li>
   <li>    <a href="../4 enums/Misc.ActionID.html">Misc.ActionID</a></li>
   <li>    <a href="../4 enums/Objects.ObjID.html">Objects.ObjID</a></li>
 </ul>
@@ -81,35 +81,18 @@
 
 <div id="content">
 
-<h1>Class <code>Flow.Fog</code></h1>
-<p>Fog</p>
+<h1>Enum <code>Effects.EffectID</code></h1>
+<p>Constants for effect IDs.</p>
 <p>
 
 </p>
 
 
-<h2><a href="#Members">Members</a></h2>
+<h2><a href="#Effects_EffectID_constants">Effects.EffectID constants </a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" ><a href="#color">color</a></td>
-	<td class="summary">(<a href="../3 primitive classes/Color.html#">Color</a>) RGB fog color</td>
-	</tr>
-	<tr>
-	<td class="name" ><a href="#minDistance">minDistance</a></td>
-	<td class="summary">(int) min distance.</td>
-	</tr>
-	<tr>
-	<td class="name" ><a href="#maxDistance">maxDistance</a></td>
-	<td class="summary">(int) max distance.</td>
-	</tr>
-</table>
-<h2><a href="#Functions">Functions</a></h2>
-<table class="function_list">
-	<tr>
-	<td class="name" ><a href="#Fog">Fog(color, Min, Max)</a></td>
-	<td class="summary">
-
-</td>
+	<td class="name" ><a href="#CONSTANT_STRING_HERE">CONSTANT_STRING_HERE</a></td>
+	<td class="summary">Table of effect ID constants (for use Moveable:SetEffect / Moveable:GetEffect functions).</td>
 	</tr>
 </table>
 
@@ -117,103 +100,35 @@
 <br/>
 
 
-    <h2 class="section-header "><a name="Members"></a>Members</h2>
+    <h2 class="section-header has-description"><a name="Effects_EffectID_constants"></a>Effects.EffectID constants </h2>
 
-    <dl class="function">
-    <dt>
-    <a name = "color"></a>
-    <strong>color</strong>
-    </dt>
-    <dd>
-    (<a href="../3 primitive classes/Color.html#">Color</a>) RGB fog color
+          <div class="section-description">
 
 
 
+<p>The following constants are inside EffectID.</p>
 
-
-
-
-
-</dd>
-    <dt>
-    <a name = "minDistance"></a>
-    <strong>minDistance</strong>
-    </dt>
-    <dd>
-
-<p>(int) min distance. </p>
-
-<pre><code>    This is the distance at which the fog starts
+<pre><code>FIRE
+SPARKS
+SMOKE
+ELECTRICDEATH
+LASERDEATH
+CUSTOM
 </code></pre>
 
 
-
-
-
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "maxDistance"></a>
-    <strong>maxDistance</strong>
-    </dt>
-    <dd>
-
-<p>(int) max distance. </p>
-
-<pre><code>    This is the distance at which the fog reaches the maximum strength
-</code></pre>
-
-
-
-
-
-
-
-
-
-
-</dd>
-</dl>
-    <h2 class="section-header "><a name="Functions"></a>Functions</h2>
-
+          </div>
     <dl class="function">
     <dt>
-    <a name = "Fog"></a>
-    <strong>Fog(color, Min, Max)</strong>
+    <a name = "CONSTANT_STRING_HERE"></a>
+    <strong>CONSTANT_STRING_HERE</strong>
     </dt>
     <dd>
+    Table of effect ID constants (for use Moveable:SetEffect / Moveable:GetEffect functions).
 
 
 
 
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">color</span>
-            <span class="types"><span class="type">Color</span></span>
-         RGB color
-        </li>
-        <li><span class="parameter">Min</span>
-            <span class="types"><span class="type">int</span></span>
-         Distance fog starts (in Sectors)
-        </li>
-        <li><span class="parameter">Max</span>
-            <span class="types"><span class="type">int</span></span>
-         Distance fog ends (in Sectors)
-        </li>
-    </ul>
-
-    <h3>Returns:</h3>
-    <ol>
-
-           <span class="types"><a class="type" href="../2 classes/Flow.Fog.html#Fog">Fog</a></span>
-        A fog object.
-    </ol>
 
 
 

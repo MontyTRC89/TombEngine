@@ -157,7 +157,7 @@ namespace TEN::Entities::Vehicles
 
 		if (BigGunTestMount(laraItem, bigGunItem))
 		{
-			lara->Vehicle = itemNumber;
+			SetLaraVehicle(laraItem, bigGunItem);
 
 			DoVehicleFlareDiscard(laraItem);
 			laraItem->Animation.AnimNumber = Objects[ID_LARA_BIGGUN_ANIM].animIndex + BGUN_ANIM_MOUNT;
@@ -294,7 +294,7 @@ namespace TEN::Entities::Vehicles
 			if (bigGun.Flags & BGUN_FLAG_DISMOUNT && TestLastFrame(laraItem))
 			{
 				SetAnimation(laraItem, LA_STAND_IDLE);
-				lara->Vehicle = NO_ITEM;
+				SetLaraVehicle(laraItem, nullptr);
 				lara->Control.HandStatus = HandStatus::Free;
 				bigGunItem->HitPoints = 0;
 			}
