@@ -604,7 +604,8 @@ void Moveable::SetPos(Vec3 const& pos, sol::optional<bool> updateRoom)
 		// In case direct portal room update didn't happen, and distance between old and new
 		// points is significant, do a predictive room update.
 
-		if (!roomUpdated && Vector3::Distance(oldPos, m_item->Pose.Position.ToVector3()) > BLOCK(1))
+		if (!roomUpdated && 
+			(willUpdate || Vector3::Distance(oldPos, m_item->Pose.Position.ToVector3()) > BLOCK(1)))
 		{
 			int potentialNewRoom = FindRoomNumber(m_item->Pose.Position, m_item->RoomNumber);
 			if (potentialNewRoom != m_item->RoomNumber)
