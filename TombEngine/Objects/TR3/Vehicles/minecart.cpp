@@ -59,6 +59,8 @@ namespace TEN::Entities::Vehicles
 	constexpr auto MINECART_BACK_GRADIENT = CLICK(0.5f);
 
 	constexpr auto MINECART_WRENCH_MESH_TOGGLE_FRAME = 20;
+	constexpr auto MINECART_FALLDAMAGE_DELAY = 0.2 * FPS;
+	constexpr auto MINECART_FALLDAMAGE_MULTIPLIFIER = 4;
 
 #define MINECART_TERMINAL_ANGLE ANGLE(22.0f)
 
@@ -553,9 +555,10 @@ namespace TEN::Entities::Vehicles
 			minecart->FloorHeightFront = GetVehicleHeight(minecartItem, CLICK(1), 0, false, &Vector3i());
 			minecart->Gradient = minecart->FloorHeightMiddle - minecart->FloorHeightFront;
 			
-			if (minecart->fallingTime >5)
+			if (minecart->fallingTime > MINECART_FALLDAMAGE_DELAY)
 			{
-				laraItem->HitPoints -=  minecart->fallingTime * 16;
+				DoDamage(LaraItem, ((pow(minecart->fallingTime,2) / MINECART_FALLDAMAGE_MULTIPLIFIER) + 
+										(minecart->Velocity / VEHICLE_VELOCITY_SCALE)));
 				SoundEffect(SFX_TR3_VEHICLE_QUADBIKE_FRONT_IMPACT, &minecartItem->Pose, SoundEnvironment::Always);
 			}
 
