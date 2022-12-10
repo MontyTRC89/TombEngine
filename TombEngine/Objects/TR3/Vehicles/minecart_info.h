@@ -11,13 +11,13 @@ namespace TEN::Entities::Vehicles
 		int TurnX = 0;
 		int TurnZ = 0;
 		short TurnLen = 0;
-		int fallingTime = 0;
 		int Gradient = 0;
 		unsigned int StopDelay = 0;
+		int FallTime = 0;
 
 		int FloorHeightMiddle = 0;
 		int FloorHeightFront = 0;
 
-		char Flags = NULL;
+		char Flags = 0;
 	};
 }
