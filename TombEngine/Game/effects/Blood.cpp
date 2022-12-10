@@ -44,7 +44,7 @@ namespace TEN::Effects::Blood
 	constexpr auto BLOOD_STAIN_LIFE_START_FADING  = 30.0f;
 	constexpr auto BLOOD_STAIN_OPACITY_MAX		  = 0.8f;
 	constexpr auto BLOOD_STAIN_POOLING_SCALE_RATE = 0.4f;
-	constexpr auto BLOOD_STAIN_POOLING_TIME_DELAY = 5.0f;
+	constexpr auto BLOOD_STAIN_POOLING_DELAY_TIME = 5.0f;
 	constexpr auto BLOOD_STAIN_SURFACE_OFFSET	  = 4;
 	constexpr auto BLOOD_STAIN_SPRITE_INDEX_MAX	  = 7; // TODO: Dehardcode this index range.
 
@@ -321,7 +321,7 @@ namespace TEN::Effects::Blood
 		auto bounds = GameBoundingBox(&item);
 		float scaleMax = (bounds.GetWidth() + bounds.GetDepth()) / 2;
 
-		SpawnBloodStain(pos, item.RoomNumber, normal, scaleMax, BLOOD_STAIN_POOLING_SCALE_RATE, BLOOD_STAIN_POOLING_TIME_DELAY);
+		SpawnBloodStain(pos, item.RoomNumber, normal, scaleMax, BLOOD_STAIN_POOLING_SCALE_RATE, BLOOD_STAIN_POOLING_DELAY_TIME);
 	}
 
 	void UpdateUnderwaterBloodParticles()
