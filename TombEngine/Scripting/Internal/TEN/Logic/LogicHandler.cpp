@@ -104,6 +104,7 @@ void LogicHandler::ResetGameTables()
 }
 
 /*** Register a function as a callback.
+@advancedDesc
 Possible values for CallbackPoint:
 	PRECONTROLPHASE -- will be called immediately before OnControlPhase
 	POSTCONTROLPHASE -- will be called immediately after OnControlPhase
@@ -700,6 +701,7 @@ TombEngine uses the following tables for specific things.
 /*** A table with level-specific data which will be saved and loaded.
 This is for level-specific information that you want to store in saved games.
 
+@advancedDesc
 For example, you may have a level with a custom puzzle where Lara has
 to kill exactly seven enemies to open a door to a secret. You could use
 the following line each time an enemy is killed:
@@ -722,6 +724,7 @@ __LevelVars.Engine is a reserved table used internally by TombEngine's libs. Do 
 This is for information not specific to any level, but which concerns your whole
 levelset or game, that you want to store in saved games.
 
+@advancedDesc
 For example, you may wish to have a final boss say a specific voice line based on
 a choice the player made in a previous level. In the level with the choice, you could
 write:
@@ -743,6 +746,7 @@ __GameVars.Engine is a reserved table used internally by TombEngine's libs. Do n
 
 /*** A table nested table system for level-specific functions.
 
+@advancedDesc
 This serves a few purposes: it holds the level callbacks (listed below) as well as
 any trigger functions you might have specified. For example, if you give a trigger
 a Lua name of "my_trigger" in Tomb Editor, you will have to implement it as a member
