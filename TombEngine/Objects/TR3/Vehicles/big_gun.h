@@ -9,9 +9,9 @@ namespace TEN::Entities::Vehicles
 	void BigGunInitialise(short itemNumber);
 
 	void BigGunCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);
-	bool BigGunControl(ItemInfo* laraItem, CollisionInfo* coll);
+	bool BigGunControl(ItemInfo& laraItem, CollisionInfo& coll);
 
-	static bool BigGunTestMount(ItemInfo* bigGunItem, ItemInfo* laraItem);
+	static bool BigGunTestMount(ItemInfo& bigGunItem, ItemInfo& laraItem);
 
-	void BigGunFire(ItemInfo* bigGunItem, ItemInfo* laraItem);
+	void BigGunFire(ItemInfo& bigGunItem, ItemInfo& laraItem);
 }

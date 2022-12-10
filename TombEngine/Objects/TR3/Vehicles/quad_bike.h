@@ -7,19 +7,19 @@ struct ItemInfo;
 
 namespace TEN::Entities::Vehicles
 {
-	QuadBikeInfo& GetQuadBikeInfo(ItemInfo* quadBikeItem);
+	QuadBikeInfo& GetQuadBikeInfo(ItemInfo& quadBikeItem);
 	void InitialiseQuadBike(short itemNumber);
 
 	void QuadBikePlayerCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);
-	bool QuadBikeControl(ItemInfo* laraItem, CollisionInfo* coll);
-	int QuadUserControl(ItemInfo* quadBikeItem, int height, int* pitch);
-	void AnimateQuadBike(ItemInfo* quadBikeItem, ItemInfo* laraItem, VehicleImpactDirection impactDirection, bool dead);
+	bool QuadBikeControl(ItemInfo& laraItem, CollisionInfo& coll);
+	int QuadUserControl(ItemInfo& quadBikeItem, int height, int* pitch);
+	void AnimateQuadBike(ItemInfo& quadBikeItem, ItemInfo& laraItem, VehicleImpactDirection impactDirection, bool dead);
 
-	void DoQuadBikeMount(ItemInfo* quadBikeItem, ItemInfo* laraItem, VehicleMountType mountType);
-	int TestQuadBikeDismount(ItemInfo* laraItem, int direction);
-	bool DoQuadBikeDismount(ItemInfo* quadBikeItem, ItemInfo* laraItem);
-	void DoQuadBikeImpact(ItemInfo* quadBikeItem, ItemInfo* laraItem, VehicleImpactDirection impactDirection);
+	void DoQuadBikeMount(ItemInfo& quadBikeItem, ItemInfo& laraItem, VehicleMountType mountType);
+	int TestQuadBikeDismount(ItemInfo& laraItem, int direction);
+	bool DoQuadBikeDismount(ItemInfo& quadBikeItem, ItemInfo& laraItem);
+	void DoQuadBikeImpact(ItemInfo& quadBikeItem, ItemInfo& laraItem, VehicleImpactDirection impactDirection);
 
-	VehicleImpactDirection QuadDynamics(ItemInfo* quadBikeItem, ItemInfo* laraItem);
-	void TriggerQuadBikeExhaustSmokeEffect(int x, int y, int z, short angle, int speed, int moving);
+	VehicleImpactDirection QuadDynamics(ItemInfo& quadBikeItem, ItemInfo& laraItem);
+	void SpawnQuadBikeExhaustSmoke(int x, int y, int z, short angle, int speed, int moving);
 }

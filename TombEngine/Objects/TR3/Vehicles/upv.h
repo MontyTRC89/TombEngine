@@ -7,19 +7,19 @@ struct ItemInfo;
 
 namespace TEN::Entities::Vehicles
 {
-	UpvInfo& GetUpvInfo(ItemInfo* upvItem);
+	UpvInfo& GetUpvInfo(ItemInfo& upvItem);
 	void UpvInitialise(short itemNumber);
 
-	bool UpvControl(ItemInfo* laraItem, CollisionInfo* coll);
-	void UpvUserControl(ItemInfo* upvItem, ItemInfo* laraItem);
+	bool UpvControl(ItemInfo& laraItem, CollisionInfo& coll);
+	void UpvUserControl(ItemInfo& upvItem, ItemInfo& laraItem);
 
 	void UpvPlayerCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);
-	void DoUpvMount(ItemInfo* upvItem, ItemInfo* laraItem, VehicleMountType mountType);
-	bool TestUpvDismount(ItemInfo* upvItem, ItemInfo* laraItem);
+	void DoUpvMount(ItemInfo& upvItem, ItemInfo& laraItem, VehicleMountType mountType);
+	bool TestUpvDismount(ItemInfo& upvItem, ItemInfo& laraItem);
 
-	void FireUpvHarpoon(ItemInfo* upvItem, ItemInfo* laraItem);
-	void UpvBackgroundCollision(ItemInfo* upvItem, ItemInfo* laraItem);
-	void DoUpvCurrent(ItemInfo* upvItem, ItemInfo* laraItem);
+	void FireUpvHarpoon(ItemInfo& upvItem, ItemInfo& laraItem);
+	void UpvBackgroundCollision(ItemInfo& upvItem, ItemInfo& laraItem);
+	void DoUpvCurrent(ItemInfo& upvItem, ItemInfo& laraItem);
 	void TriggerUpvEffects(short itemNumber);
 	void TriggerUpvMistEffect(long x, long y, long z, long velocity, short angle);
 }

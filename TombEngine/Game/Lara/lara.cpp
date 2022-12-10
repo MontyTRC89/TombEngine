@@ -789,7 +789,7 @@ void LaraAboveWater(ItemInfo* item, CollisionInfo* coll)
 	UpdateLaraRoom(item, -LARA_HEIGHT / 2);
 
 	// Process vehicles.
-	if (HandleLaraVehicle(item, coll))
+	if (HandleLaraVehicle(*item, *coll))
 		return;
 
 	// Handle current Lara status.

@@ -21,19 +21,19 @@ using namespace TEN::Math;
 namespace TEN::Entities::Vehicles
 {
 	// Deprecated.
-	int GetVehicleHeight(ItemInfo* vehicleItem, int forward, int right, bool clamp, Vector3i& pos)
+	int GetVehicleHeight(const ItemInfo& vehicleItem, int forward, int right, bool clamp, Vector3i& pos)
 	{
-		float sinX = phd_sin(vehicleItem->Pose.Orientation.x);
-		float sinY = phd_sin(vehicleItem->Pose.Orientation.y);
-		float cosY = phd_cos(vehicleItem->Pose.Orientation.y);
-		float sinZ = phd_sin(vehicleItem->Pose.Orientation.z);
+		float sinX = phd_sin(vehicleItem.Pose.Orientation.x);
+		float sinY = phd_sin(vehicleItem.Pose.Orientation.y);
+		float cosY = phd_cos(vehicleItem.Pose.Orientation.y);
+		float sinZ = phd_sin(vehicleItem.Pose.Orientation.z);
 
-		pos.x = vehicleItem->Pose.Position.x + (forward * sinY) + (right * cosY);
-		pos.y = vehicleItem->Pose.Position.y - (forward * sinX) + (right * sinZ);
-		pos.z = vehicleItem->Pose.Position.z + (forward * cosY) - (right * sinY);
+		pos.x = vehicleItem.Pose.Position.x + (forward * sinY) + (right * cosY);
+		pos.y = vehicleItem.Pose.Position.y - (forward * sinX) + (right * sinZ);
+		pos.z = vehicleItem.Pose.Position.z + (forward * cosY) - (right * sinY);
 
 		// Get collision a bit higher to be able to detect bridges.
-		auto pointColl = GetCollision(pos.x, pos.y - CLICK(2), pos.z, vehicleItem->RoomNumber);
+		auto pointColl = GetCollision(pos.x, pos.y - CLICK(2), pos.z, vehicleItem.RoomNumber);
 
 		if (pos.y < pointColl.Position.Ceiling || pointColl.Position.Ceiling == NO_HEIGHT)
 			return NO_HEIGHT;
@@ -44,37 +44,37 @@ namespace TEN::Entities::Vehicles
 		return pointColl.Position.Floor;
 	}
 
-	VehicleMountType GetVehicleMountType(ItemInfo* vehicleItem, ItemInfo* laraItem, CollisionInfo* coll, const vector<VehicleMountType>& allowedMountTypes, float maxDistance2D, float maxVerticalDistance)
+	VehicleMountType GetVehicleMountType(ItemInfo& vehicleItem, ItemInfo& laraItem, const CollisionInfo& coll, const vector<VehicleMountType>& allowedMountTypes, float maxDistance2D, float maxVerticalDistance)
 	{
-		auto* lara = GetLaraInfo(laraItem);
+		const auto& player = *GetLaraInfo(&laraItem);
 
 		// Assess vehicle usability.
-		if (vehicleItem->Flags & IFLAG_INVISIBLE)
+		if (vehicleItem.Flags & IFLAG_INVISIBLE)
 			return VehicleMountType::None;
 
 		// Assess hand status.
-		if (lara->Control.HandStatus != HandStatus::Free)
+		if (player.Control.HandStatus != HandStatus::Free)
 			return VehicleMountType::None;
 
 		// Assess vertical distance to vehicle.
-		if (abs(laraItem->Pose.Position.y - vehicleItem->Pose.Position.y) > maxVerticalDistance)
+		if (abs(laraItem.Pose.Position.y - vehicleItem.Pose.Position.y) > maxVerticalDistance)
 			return VehicleMountType::None;
 
 		// Assess 2D distance to vehicle.
 		float distance2D = Vector2::Distance(
-			Vector2(laraItem->Pose.Position.x, laraItem->Pose.Position.z),
-			Vector2(vehicleItem->Pose.Position.x, vehicleItem->Pose.Position.z));
+			Vector2(laraItem.Pose.Position.x, laraItem.Pose.Position.z),
+			Vector2(vehicleItem.Pose.Position.x, vehicleItem.Pose.Position.z));
 		if (distance2D > maxDistance2D)
 			return VehicleMountType::None;
 
 		// Assess object collision.
-		if (!TestBoundsCollide(vehicleItem, laraItem, coll->Setup.Radius) || !TestCollision(vehicleItem, laraItem))
+		if (!TestBoundsCollide(&vehicleItem, &laraItem, coll.Setup.Radius) || !TestCollision(&vehicleItem, &laraItem))
 			return VehicleMountType::None;
 
 		bool hasInputAction = TrInput & IN_ACTION;
 
-		short deltaHeadingAngle = vehicleItem->Pose.Orientation.y - laraItem->Pose.Orientation.y;
-		short angleBetweenPositions = vehicleItem->Pose.Orientation.y - Geometry::GetOrientToPoint(laraItem->Pose.Position.ToVector3(), vehicleItem->Pose.Position.ToVector3()).y;
+		short deltaHeadingAngle = vehicleItem.Pose.Orientation.y - laraItem.Pose.Orientation.y;
+		short angleBetweenPositions = vehicleItem.Pose.Orientation.y - Geometry::GetOrientToPoint(laraItem.Pose.Position.ToVector3(), vehicleItem.Pose.Position.ToVector3()).y;
 		bool onCorrectSide = abs(deltaHeadingAngle - angleBetweenPositions) < ANGLE(45.0f);
 
 		// Assess mount types allowed for vehicle.
@@ -84,8 +84,8 @@ namespace TEN::Entities::Vehicles
 			{
 			// TODO: Holding FORWARD the moment a level loads, this mount will fail. Need a better method.
 			case VehicleMountType::LevelStart:
-				if (laraItem->Animation.Velocity == Vector3::Zero &&
-					laraItem->Pose.Position == vehicleItem->Pose.Position)
+				if (laraItem.Animation.Velocity == Vector3::Zero &&
+					laraItem.Pose.Position == vehicleItem.Pose.Position)
 				{
 					break;
 				}
@@ -94,7 +94,7 @@ namespace TEN::Entities::Vehicles
 			case VehicleMountType::Front:
 				if (hasInputAction && onCorrectSide &&
 					deltaHeadingAngle > ANGLE(135.0f) && deltaHeadingAngle < ANGLE(-135.0f) &&
-					!laraItem->Animation.IsAirborne)
+					!laraItem.Animation.IsAirborne)
 				{
 					break;
 				}
@@ -103,7 +103,7 @@ namespace TEN::Entities::Vehicles
 			case VehicleMountType::Back:
 				if (hasInputAction && onCorrectSide &&
 					abs(deltaHeadingAngle) < ANGLE(45.0f) &&
-					!laraItem->Animation.IsAirborne)
+					!laraItem.Animation.IsAirborne)
 				{
 					break;
 				}
@@ -112,7 +112,7 @@ namespace TEN::Entities::Vehicles
 			case VehicleMountType::Left:
 				if (hasInputAction && onCorrectSide &&
 					deltaHeadingAngle > ANGLE(-135.0f) && deltaHeadingAngle < ANGLE(-45.0f) &&
-					!laraItem->Animation.IsAirborne)
+					!laraItem.Animation.IsAirborne)
 				{
 					break;
 				}
@@ -121,16 +121,16 @@ namespace TEN::Entities::Vehicles
 			case VehicleMountType::Right:
 				if (hasInputAction && onCorrectSide &&
 					deltaHeadingAngle > ANGLE(45.0f) && deltaHeadingAngle < ANGLE(135.0f) &&
-					!laraItem->Animation.IsAirborne)
+					!laraItem.Animation.IsAirborne)
 				{
 					break;
 				}
 				continue;
 
 			case VehicleMountType::Jump:
-				if (laraItem->Animation.IsAirborne &&
-					laraItem->Animation.Velocity.y > 0.0f &&
-					laraItem->Pose.Position.y < vehicleItem->Pose.Position.y)
+				if (laraItem.Animation.IsAirborne &&
+					laraItem.Animation.Velocity.y > 0.0f &&
+					laraItem.Pose.Position.y < vehicleItem.Pose.Position.y)
 				{
 					break;
 				}
@@ -146,7 +146,7 @@ namespace TEN::Entities::Vehicles
 		return VehicleMountType::None;
 	}
 
-	VehicleDismountType GetVehicleDismountType(ItemInfo* vehicleItem, const vector<VehicleDismountType>& allowedDismountTypes, float distance, bool onLand)
+	VehicleDismountType GetVehicleDismountType(ItemInfo& vehicleItem, const vector<VehicleDismountType>& allowedDismountTypes, float distance, bool onLand)
 	{
 		if (!(TrInput & VEHICLE_IN_BRAKE))
 			return VehicleDismountType::None;
@@ -201,11 +201,11 @@ namespace TEN::Entities::Vehicles
 		return VehicleDismountType::None;
 	}
 
-	bool TestVehicleDismount(ItemInfo* vehicleItem, VehicleDismountType dismountType, short headingAngle, float distance, bool onLand)
+	bool TestVehicleDismount(ItemInfo& vehicleItem, VehicleDismountType dismountType, short headingAngle, float distance, bool onLand)
 	{
 		if (dismountType == VehicleDismountType::None)
 			return false;
-		auto pointColl = GetCollision(vehicleItem, headingAngle, distance, -CLICK(2));
+		auto pointColl = GetCollision(&vehicleItem, headingAngle, distance, -CLICK(2));
 
 		// Assess for walls. Check ceiling as well?
 		if (pointColl.Position.Floor == NO_HEIGHT)
@@ -216,8 +216,8 @@ namespace TEN::Entities::Vehicles
 			return false;
 
 		// Assess feasibility of dismount.
-		if (abs(pointColl.Position.Floor - vehicleItem->Pose.Position.y) <= STEPUP_HEIGHT && // Floor is within highest step threshold.
-			(pointColl.Position.Ceiling - vehicleItem->Pose.Position.y) > -LARA_HEIGHT &&	 // Gap is optically permissive.
+		if (abs(pointColl.Position.Floor - vehicleItem.Pose.Position.y) <= STEPUP_HEIGHT && // Floor is within highest step threshold.
+			(pointColl.Position.Ceiling - vehicleItem.Pose.Position.y) > -LARA_HEIGHT &&	 // Gap is optically permissive.
 			abs(pointColl.Position.Ceiling - pointColl.Position.Floor) > LARA_HEIGHT)		 // Space is not a clamp.
 		{
 			return true;
@@ -226,14 +226,14 @@ namespace TEN::Entities::Vehicles
 		return false;
 	}
 
-	VehicleImpactDirection GetVehicleImpactDirection(ItemInfo* vehicleItem, const Vector3i& prevPos)
+	VehicleImpactDirection GetVehicleImpactDirection(ItemInfo& vehicleItem, const Vector3i& prevPos)
 	{
-		auto direction = vehicleItem->Pose.Position - prevPos;
+		auto direction = vehicleItem.Pose.Position - prevPos;
 
 		if (direction.x || direction.z)
 		{
-			float sinY = phd_sin(vehicleItem->Pose.Orientation.y);
-			float cosY = phd_cos(vehicleItem->Pose.Orientation.y);
+			float sinY = phd_sin(vehicleItem.Pose.Orientation.y);
+			float cosY = phd_cos(vehicleItem.Pose.Orientation.y);
 
 			int front = (direction.x * sinY) + (direction.z * cosY);
 			int side = (direction.x * cosY) - (direction.z * sinY);
@@ -257,21 +257,21 @@ namespace TEN::Entities::Vehicles
 		return VehicleImpactDirection::None;
 	}
 
-	VehiclePointCollision GetVehicleCollision(ItemInfo* vehicleItem, int forward, int right, bool clamp)
+	VehiclePointCollision GetVehicleCollision(ItemInfo& vehicleItem, int forward, int right, bool clamp)
 	{
-		float sinX = phd_sin(vehicleItem->Pose.Orientation.x);
-		float sinY = phd_sin(vehicleItem->Pose.Orientation.y);
-		float cosY = phd_cos(vehicleItem->Pose.Orientation.y);
-		float sinZ = phd_sin(vehicleItem->Pose.Orientation.z);
+		float sinX = phd_sin(vehicleItem.Pose.Orientation.x);
+		float sinY = phd_sin(vehicleItem.Pose.Orientation.y);
+		float cosY = phd_cos(vehicleItem.Pose.Orientation.y);
+		float sinZ = phd_sin(vehicleItem.Pose.Orientation.z);
 
 		auto point = Vector3i(
-			vehicleItem->Pose.Position.x + (forward * sinY) + (right * cosY),
-			vehicleItem->Pose.Position.y - (forward * sinX) + (right * sinZ),
-			vehicleItem->Pose.Position.z + (forward * cosY) - (right * sinY)
+			vehicleItem.Pose.Position.x + (forward * sinY) + (right * cosY),
+			vehicleItem.Pose.Position.y - (forward * sinX) + (right * sinZ),
+			vehicleItem.Pose.Position.z + (forward * cosY) - (right * sinY)
 		);
 
 		// Get collision a bit higher to be able to detect bridges.
-		auto pointColl = GetCollision(point.x, point.y - CLICK(2), point.z, vehicleItem->RoomNumber);
+		auto pointColl = GetCollision(point.x, point.y - CLICK(2), point.z, vehicleItem.RoomNumber);
 
 		if (point.y < pointColl.Position.Ceiling || pointColl.Position.Ceiling == NO_HEIGHT)
 			return VehiclePointCollision{ point, NO_HEIGHT, NO_HEIGHT};
@@ -282,17 +282,17 @@ namespace TEN::Entities::Vehicles
 		return VehiclePointCollision{ point, pointColl.Position.Floor, pointColl.Position.Ceiling };
 	}
 	
-	int GetVehicleWaterHeight(ItemInfo* vehicleItem, int forward, int right, bool clamp, Vector3i& pos)
+	int GetVehicleWaterHeight(ItemInfo& vehicleItem, int forward, int right, bool clamp, Vector3i& pos)
 	{
 		auto world =
-			Matrix::CreateFromYawPitchRoll(TO_RAD(vehicleItem->Pose.Orientation.y), TO_RAD(vehicleItem->Pose.Orientation.x), TO_RAD(vehicleItem->Pose.Orientation.z)) *
-			Matrix::CreateTranslation(vehicleItem->Pose.Position.x, vehicleItem->Pose.Position.y, vehicleItem->Pose.Position.z);
+			Matrix::CreateFromYawPitchRoll(TO_RAD(vehicleItem.Pose.Orientation.y), TO_RAD(vehicleItem.Pose.Orientation.x), TO_RAD(vehicleItem.Pose.Orientation.z)) *
+			Matrix::CreateTranslation(vehicleItem.Pose.Position.x, vehicleItem.Pose.Position.y, vehicleItem.Pose.Position.z);
 
 		auto vec = Vector3(right, 0, forward);
 		vec = Vector3::Transform(vec, world);
 
 		pos = Vector3i(vec);
-		auto pointColl = GetCollision(pos.x, pos.y, pos.z, vehicleItem->RoomNumber);
+		auto pointColl = GetCollision(pos.x, pos.y, pos.z, vehicleItem.RoomNumber);
 		int pointColldRoomNumber = pointColl.RoomNumber;
 
 		int height = GetWaterHeight(pos.x, pos.y, pos.z, pointColldRoomNumber);
@@ -312,15 +312,15 @@ namespace TEN::Entities::Vehicles
 		return height;
 	}
 
-	void DoVehicleCollision(ItemInfo* vehicleItem, int radius)
+	void DoVehicleCollision(ItemInfo& vehicleItem, int radius)
 	{
 		CollisionInfo coll = {};
 		coll.Setup.Radius = radius * 0.8f; // HACK: Most vehicles use radius larger than needed.
 		coll.Setup.UpperCeilingBound = MAX_HEIGHT; // HACK: this needs to be set to prevent GCI result interference.
-		coll.Setup.OldPosition = vehicleItem->Pose.Position;
+		coll.Setup.OldPosition = vehicleItem.Pose.Position;
 		coll.Setup.EnableObjectPush = true;
 
-		DoObjectCollision(vehicleItem, &coll);
+		DoObjectCollision(&vehicleItem, &coll);
 	}
 
 	// Motorbike and jeep had the values in their dynamics functions tweaked to make them feel heavier.
@@ -356,7 +356,7 @@ namespace TEN::Entities::Vehicles
 	}
 
 	// Temp. scaffolding function. Shifts need a rework.
-	void CalculateVehicleShift(ItemInfo* vehicleItem, short& outExtraRot, const VehiclePointCollision& prevPoint, int height, int front, int side, int step, bool clamp)
+	void CalculateVehicleShift(ItemInfo& vehicleItem, short& outExtraRot, const VehiclePointCollision& prevPoint, int height, int front, int side, int step, bool clamp)
 	{
 		auto vPointColl = GetVehicleCollision(vehicleItem, front, side, clamp);
 
@@ -368,114 +368,113 @@ namespace TEN::Entities::Vehicles
 		}
 	}
 
-	short DoVehicleShift(ItemInfo* vehicleItem, const Vector3i& pos, const Vector3i& prevPos)
+	short DoVehicleShift(ItemInfo& vehicleItem, const Vector3i& pos, const Vector3i& prevPos)
 	{
-		auto alignedPos = pos / SECTOR(1);
-		auto alignedPrevPos = prevPos / SECTOR(1);
+		auto alignedPos = pos / BLOCK(1);
+		auto alignedPrevPos = prevPos / BLOCK(1);
 		auto alignedShift = Vector3i(
 			pos.x & WALL_MASK,
 			0,
-			pos.z & WALL_MASK
-		);
+			pos.z & WALL_MASK);
 
 		if (alignedPos.x == alignedPrevPos.x)
 		{
 			if (alignedPos.z == alignedPrevPos.z)
 			{
-				vehicleItem->Pose.Position.x += (prevPos.x - pos.x);
-				vehicleItem->Pose.Position.z += (prevPos.z - pos.z);
+				vehicleItem.Pose.Position.x += (prevPos.x - pos.x);
+				vehicleItem.Pose.Position.z += (prevPos.z - pos.z);
 			}
 			else if (alignedPos.z > alignedPrevPos.z)
 			{
-				vehicleItem->Pose.Position.z -= alignedShift.z + 1;
-				return (pos.x - vehicleItem->Pose.Position.x);
+				vehicleItem.Pose.Position.z -= alignedShift.z + 1;
+				return (pos.x - vehicleItem.Pose.Position.x);
 			}
 			else
 			{
-				vehicleItem->Pose.Position.z += SECTOR(1) - alignedShift.z;
-				return (vehicleItem->Pose.Position.x - pos.x);
+				vehicleItem.Pose.Position.z += BLOCK(1) - alignedShift.z;
+				return (vehicleItem.Pose.Position.x - pos.x);
 			}
 		}
 		else if (alignedPos.z == alignedPrevPos.z)
 		{
 			if (alignedPos.x > alignedPrevPos.x)
 			{
-				vehicleItem->Pose.Position.x -= alignedShift.x + 1;
-				return (vehicleItem->Pose.Position.z - pos.z);
+				vehicleItem.Pose.Position.x -= alignedShift.x + 1;
+				return (vehicleItem.Pose.Position.z - pos.z);
 			}
 			else
 			{
-				vehicleItem->Pose.Position.x += SECTOR(1) - alignedShift.x;
-				return (pos.z - vehicleItem->Pose.Position.z);
+				vehicleItem.Pose.Position.x += BLOCK(1) - alignedShift.x;
+				return (pos.z - vehicleItem.Pose.Position.z);
 			}
 		}
 		else
 		{
 			alignedPos = Vector3i::Zero;
 
-			auto pointColl = GetCollision(prevPos.x, pos.y, pos.z, vehicleItem->RoomNumber);
+			auto pointColl = GetCollision(prevPos.x, pos.y, pos.z, vehicleItem.RoomNumber);
 			if (pointColl.Position.Floor < (prevPos.y - CLICK(1)))
 			{
 				if (pos.z > prevPos.z)
 					alignedPos.z = -alignedShift.z - 1;
 				else
-					alignedPos.z = SECTOR(1) - alignedShift.z;
+					alignedPos.z = BLOCK(1) - alignedShift.z;
 			}
 
-			pointColl = GetCollision(pos.x, pos.y, prevPos.z, vehicleItem->RoomNumber);
+			pointColl = GetCollision(pos.x, pos.y, prevPos.z, vehicleItem.RoomNumber);
 			if (pointColl.Position.Floor < (prevPos.y - CLICK(1)))
 			{
 				if (pos.x > prevPos.x)
 					alignedPos.x = -alignedShift.x - 1;
 				else
-					alignedPos.x = SECTOR(1) - alignedShift.x;
+					alignedPos.x = BLOCK(1) - alignedShift.x;
 			}
 
 			// NOTE: Commented lines are skidoo-specific. Likely unnecessary but keeping for reference. -- Sezz 2022.06.30
 			if (alignedPos.x && alignedPos.z)
 			{
-				vehicleItem->Pose.Position.z += alignedPos.z;
-				vehicleItem->Pose.Position.x += alignedPos.x;
-				//vehicleItem->Animation.Velocity -= 50.0f;
+				vehicleItem.Pose.Position.z += alignedPos.z;
+				vehicleItem.Pose.Position.x += alignedPos.x;
+				//vehicleItem.Animation.Velocity -= 50.0f;
 			}
 			else if (alignedPos.z)
 			{
-				vehicleItem->Pose.Position.z += alignedPos.z;
-				//vehicleItem->Animation.Velocity -= 50.0f;
+				vehicleItem.Pose.Position.z += alignedPos.z;
+				//vehicleItem.Animation.Velocity -= 50.0f;
 
 				if (alignedPos.z > 0)
-					return (vehicleItem->Pose.Position.x - pos.x);
+					return (vehicleItem.Pose.Position.x - pos.x);
 				else
-					return (pos.x - vehicleItem->Pose.Position.x);
+					return (pos.x - vehicleItem.Pose.Position.x);
 			}
 			else if (alignedPos.x)
 			{
-				vehicleItem->Pose.Position.x += alignedPos.x;
-				//vehicleItem->Animation.Velocity -= 50.0f;
+				vehicleItem.Pose.Position.x += alignedPos.x;
+				//vehicleItem.Animation.Velocity -= 50.0f;
 
 				if (alignedPos.x > 0)
-					return (pos.z - vehicleItem->Pose.Position.z);
+					return (pos.z - vehicleItem.Pose.Position.z);
 				else
-					return (vehicleItem->Pose.Position.z - pos.z);
+					return (vehicleItem.Pose.Position.z - pos.z);
 			}
 			else
 			{
-				vehicleItem->Pose.Position.z += prevPos.z - pos.z;
-				vehicleItem->Pose.Position.x += prevPos.x - pos.x;
-				//vehicleItem->Animation.Velocity -= 50.0f;
+				vehicleItem.Pose.Position.z += prevPos.z - pos.z;
+				vehicleItem.Pose.Position.x += prevPos.x - pos.x;
+				//vehicleItem.Animation.Velocity -= 50.0f;
 			}
 		}
 
 		return 0;
 	}
 
-	float DoVehicleWaterMovement(ItemInfo* vehicleItem, ItemInfo* laraItem, float currentVelocity, int radius, short& turnRate)
+	float DoVehicleWaterMovement(ItemInfo& vehicleItem, ItemInfo& laraItem, float currentVelocity, int radius, short& turnRate)
 	{
-		if (TestEnvironment(ENV_FLAG_WATER, vehicleItem) ||
-			TestEnvironment(ENV_FLAG_SWAMP, vehicleItem))
+		if (TestEnvironment(ENV_FLAG_WATER, &vehicleItem) ||
+			TestEnvironment(ENV_FLAG_SWAMP, &vehicleItem))
 		{
-			float waterDepth = (float)GetWaterDepth(vehicleItem);
-			float waterHeight = vehicleItem->Pose.Position.y - GetWaterHeight(vehicleItem);
+			float waterDepth = (float)GetWaterDepth(&vehicleItem);
+			float waterHeight = vehicleItem.Pose.Position.y - GetWaterHeight(&vehicleItem);
 
 			// HACK: Sometimes quadbike test position may end up under non-portal ceiling block.
 			// GetWaterDepth returns DEEP_WATER constant in that case, which is too large for our needs.
@@ -484,7 +483,7 @@ namespace TEN::Entities::Vehicles
 
 			if (waterDepth <= VEHICLE_WATER_HEIGHT_MAX)
 			{
-				bool isWater = TestEnvironment(ENV_FLAG_WATER, vehicleItem);
+				bool isWater = TestEnvironment(ENV_FLAG_WATER, &vehicleItem);
 
 				if (currentVelocity != 0.0f)
 				{
@@ -492,10 +491,10 @@ namespace TEN::Entities::Vehicles
 					currentVelocity -= std::copysign(currentVelocity * ((waterDepth / VEHICLE_WATER_HEIGHT_MAX) / coeff), currentVelocity);
 
 					if (Random::GenerateInt(0, 32) > 28)
-						SoundEffect(SFX_TR4_LARA_WADE, &Pose(vehicleItem->Pose.Position), SoundEnvironment::Land, isWater ? 0.8f : 0.7f);
+						SoundEffect(SFX_TR4_LARA_WADE, &Pose(vehicleItem.Pose.Position), SoundEnvironment::Land, isWater ? 0.8f : 0.7f);
 
 					if (isWater)
-						TEN::Effects::TriggerSpeedboatFoam(vehicleItem, Vector3(0, -waterDepth / 2.0f, -radius));
+						TEN::Effects::TriggerSpeedboatFoam(&vehicleItem, Vector3(0, -waterDepth / 2.0f, -radius));
 				}
 
 				if (turnRate)
@@ -507,9 +506,13 @@ namespace TEN::Entities::Vehicles
 			else
 			{
 				if (waterDepth > VEHICLE_WATER_HEIGHT_MAX && waterHeight > VEHICLE_WATER_HEIGHT_MAX)
+				{
 					ExplodeVehicle(laraItem, vehicleItem);
+				}
 				else if (Random::GenerateInt(0, 32) > 25)
-					Splash(vehicleItem);
+				{
+					Splash(&vehicleItem);
+				}
 			}
 		}
 
@@ -517,18 +520,18 @@ namespace TEN::Entities::Vehicles
 	}
 
 	// TODO: Allow flares on every vehicle. Boats have this already.
-	void DoVehicleFlareDiscard(ItemInfo* laraItem)
+	void DoVehicleFlareDiscard(ItemInfo& laraItem)
 	{
-		auto* lara = GetLaraInfo(laraItem);
+		auto& lara = *GetLaraInfo(&laraItem);
 
-		if (lara->Control.Weapon.GunType == LaraWeaponType::Flare)
-		{
-			CreateFlare(laraItem, ID_FLARE_ITEM, 0);
-			UndrawFlareMeshes(laraItem);
-			lara->Control.Weapon.GunType = LaraWeaponType::None;
-			lara->Control.Weapon.RequestGunType = LaraWeaponType::None;
-			lara->Flare.ControlLeft = false;
-		}
+		if (lara.Control.Weapon.GunType != LaraWeaponType::Flare)
+			return;
+
+		CreateFlare(&laraItem, ID_FLARE_ITEM, 0);
+		UndrawFlareMeshes(&laraItem);
+		lara.Control.Weapon.GunType = LaraWeaponType::None;
+		lara.Control.Weapon.RequestGunType = LaraWeaponType::None;
+		lara.Flare.ControlLeft = false;
 	}
 
 	// TODO: Vehicle turn rates must be affected by speed for more tactile modulation. Slower speed = slower turn rate.
@@ -575,19 +578,19 @@ namespace TEN::Entities::Vehicles
 		turnRate = ResetVehicleTurnRate(turnRate, decelRate);
 	}
 	
-	void ModulateVehicleLean(ItemInfo* vehicleItem, short baseRate, short maxAngle)
+	void ModulateVehicleLean(ItemInfo& vehicleItem, short baseRate, short maxAngle)
 	{
 		float axisCoeff = AxisMap[InputAxis::MoveHorizontal];
 		int sign = copysign(1, axisCoeff);
 		short maxAngleNorm = maxAngle * axisCoeff;
-		vehicleItem->Pose.Orientation.z += std::min<short>(baseRate, abs(maxAngleNorm - vehicleItem->Pose.Orientation.z) / 3) * sign;
+		vehicleItem.Pose.Orientation.z += std::min<short>(baseRate, abs(maxAngleNorm - vehicleItem.Pose.Orientation.z) / 3) * sign;
 	}
 
-	void ResetVehicleLean(ItemInfo* vehicleItem, float alpha)
+	void ResetVehicleLean(ItemInfo& vehicleItem, float alpha)
 	{
-		if (abs(vehicleItem->Pose.Orientation.z) > ANGLE(0.1f))
-			vehicleItem->Pose.Orientation.z *= alpha;
+		if (abs(vehicleItem.Pose.Orientation.z) > ANGLE(0.1f))
+			vehicleItem.Pose.Orientation.z *= alpha;
 		else
-			vehicleItem->Pose.Orientation.z = 0;
+			vehicleItem.Pose.Orientation.z = 0;
 	}
 }

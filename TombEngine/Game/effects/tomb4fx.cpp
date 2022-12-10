@@ -1371,33 +1371,32 @@ void TriggerUnderwaterExplosion(ItemInfo* item, int flag)
 	}
 }
 
-void ExplodeVehicle(ItemInfo* laraItem, ItemInfo* vehicle)
+void ExplodeVehicle(ItemInfo& laraItem, ItemInfo& vehicle)
 {
-	if (g_Level.Rooms[vehicle->RoomNumber].flags & ENV_FLAG_WATER)
+	if (TestEnvironment(ENV_FLAG_WATER, vehicle.RoomNumber))
 	{
-		TriggerUnderwaterExplosion(vehicle, 1);
+		TriggerUnderwaterExplosion(&vehicle, 1);
 	}
 	else
 	{
-		TriggerExplosionSparks(vehicle->Pose.Position.x, vehicle->Pose.Position.y, vehicle->Pose.Position.z, 3, -2, 0, vehicle->RoomNumber);
+		TriggerExplosionSparks(vehicle.Pose.Position.x, vehicle.Pose.Position.y, vehicle.Pose.Position.z, 3, -2, 0, vehicle.RoomNumber);
+		
 		for (int i = 0; i < 3; i++)
-		{
-			TriggerExplosionSparks(vehicle->Pose.Position.x, vehicle->Pose.Position.y, vehicle->Pose.Position.z, 3, -1, 0, vehicle->RoomNumber);
-		}
+			TriggerExplosionSparks(vehicle.Pose.Position.x, vehicle.Pose.Position.y, vehicle.Pose.Position.z, 3, -1, 0, vehicle.RoomNumber);
 	}
 
-	auto* lara = GetLaraInfo(laraItem);
+	const auto& lara = *GetLaraInfo(&laraItem);
 
-	ExplodingDeath(lara->Vehicle, BODY_EXPLODE | BODY_STONE_SOUND);
-	KillItem(lara->Vehicle);
-	vehicle->Status = ITEM_DEACTIVATED;
-	SoundEffect(SFX_TR4_EXPLOSION1, &laraItem->Pose);
-	SoundEffect(SFX_TR4_EXPLOSION2, &laraItem->Pose);
+	ExplodingDeath(lara.Vehicle, BODY_EXPLODE | BODY_STONE_SOUND);
+	KillItem(lara.Vehicle);
+	vehicle.Status = ITEM_DEACTIVATED;
+	SoundEffect(SFX_TR4_EXPLOSION1, &laraItem.Pose);
+	SoundEffect(SFX_TR4_EXPLOSION2, &laraItem.Pose);
 
 	SetLaraVehicle(laraItem, nullptr);
-	SetAnimation(laraItem, LA_FALL_START);
-	laraItem->Animation.IsAirborne = true;
-	DoDamage(laraItem, INT_MAX);
+	SetAnimation(&laraItem, LA_FALL_START);
+	laraItem.Animation.IsAirborne = true;
+	DoDamage(&laraItem, INT_MAX);
 }
 
 void ExplodingDeath(short itemNumber, short flags)

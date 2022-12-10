@@ -80,24 +80,24 @@ void HandleLaraMovementParameters(ItemInfo* item, CollisionInfo* coll)
 	lara->Control.IsLow = false;
 }
 
-bool HandleLaraVehicle(ItemInfo* item, CollisionInfo* coll)
+bool HandleLaraVehicle(ItemInfo& item, CollisionInfo& coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto& lara = *GetLaraInfo(&item);
 
-	if (lara->Vehicle == NO_ITEM)
+	if (lara.Vehicle == NO_ITEM)
 		return false;
 
-	if (!g_Level.Items[lara->Vehicle].Active)
+	if (!g_Level.Items[lara.Vehicle].Active)
 	{
-		lara->Vehicle = NO_ITEM;
-		item->Animation.IsAirborne = true;
-		SetAnimation(item, LA_FALL_START);
+		lara.Vehicle = NO_ITEM;
+		item.Animation.IsAirborne = true;
+		SetAnimation(&item, LA_FALL_START);
 		return false;
 	}
 
-	TestVolumes(lara->Vehicle);
+	TestVolumes(lara.Vehicle);
 
-	switch (g_Level.Items[lara->Vehicle].ObjectNumber)
+	switch (g_Level.Items[lara.Vehicle].ObjectNumber)
 	{
 	case ID_QUAD:
 		QuadBikeControl(item, coll);
@@ -133,7 +133,7 @@ bool HandleLaraVehicle(ItemInfo* item, CollisionInfo* coll)
 
 		// Boats are processed like normal items in loop.
 	default:
-		HandleWeapon(item);
+		HandleWeapon(&item);
 	}
 
 	return true;
@@ -819,21 +819,21 @@ void SetLaraSwimDiveAnimation(ItemInfo* item)
 	lara->Control.WaterStatus = WaterStatus::Underwater;
 }
 
-void SetLaraVehicle(ItemInfo* item, ItemInfo* vehicle)
+void SetLaraVehicle(ItemInfo& item, const ItemInfo* vehicle)
 {
-	auto* lara = GetLaraInfo(item);
+	auto& lara = *GetLaraInfo(&item);
 
 	if (vehicle == nullptr)
 	{
-		if (lara->Vehicle != NO_ITEM)
-			g_Level.Items[lara->Vehicle].Active = false;
+		if (lara.Vehicle != NO_ITEM)
+			g_Level.Items[lara.Vehicle].Active = false;
 
-		lara->Vehicle = NO_ITEM;
+		lara.Vehicle = NO_ITEM;
 	}
 	else
 	{
 		g_Level.Items[vehicle->Index].Active = true;
-		lara->Vehicle = vehicle->Index;
+		lara.Vehicle = vehicle->Index;
 	}
 }
 

@@ -57,6 +57,28 @@ namespace TEN::Entities::Vehicles
 	const auto QBIKE_MOMENTUM_TURN_RATE_MAX	 = ANGLE(1.5f);
 	const auto QBIKE_MOMENTUM_TURN_RATE_MAX2 = ANGLE(150.0f); // TODO: Resolve this naming clash!
 
+	BiteInfo QuadBikeBites[6] =
+	{
+		{ -56, -32, -380, 0	},
+		{ 56, -32, -380, 0 },
+		{ -8, 180, -48, 3 },
+		{ 8, 180, -48, 4 },
+		{ 90, 180, -32, 6 },
+		{ -90, 180, -32, 7 }
+	};
+	const auto QuadBikeMountTypes = std::vector<VehicleMountType>
+	{
+		VehicleMountType::LevelStart,
+		VehicleMountType::Left,
+		VehicleMountType::Right
+	};
+	const auto QuadBikeDismountTypes = std::vector<VehicleDismountType>
+	{
+		VehicleDismountType::Left,
+		VehicleDismountType::Right,
+		VehicleDismountType::Fall
+	};
+
 	enum QuadBikeState
 	{
 		QBIKE_STATE_DRIVE = 1,
@@ -131,86 +153,68 @@ namespace TEN::Entities::Vehicles
 		QBIKE_BITE_TYRE_BACK_RIGHT	= 5
 	};
 
-	BiteInfo QuadBikeBites[6] =
+	QuadBikeInfo& GetQuadBikeInfo(ItemInfo& quadBikeItem)
 	{
-		{ -56, -32, -380, 0	},
-		{ 56, -32, -380, 0 },
-		{ -8, 180, -48, 3 },
-		{ 8, 180, -48, 4 },
-		{ 90, 180, -32, 6 },
-		{ -90, 180, -32, 7 }
-	};
-	const auto QuadBikeMountTypes = std::vector<VehicleMountType>
-	{
-		VehicleMountType::LevelStart,
-		VehicleMountType::Left,
-		VehicleMountType::Right
-	};
-	const auto QuadBikeDismountTypes = std::vector<VehicleDismountType>
-	{
-		VehicleDismountType::Left,
-		VehicleDismountType::Right,
-		VehicleDismountType::Fall
-	};
-
-	QuadBikeInfo& GetQuadBikeInfo(ItemInfo* quadBikeItem)
-	{
-		return *(QuadBikeInfo*)quadBikeItem->Data;
+		return (QuadBikeInfo&)quadBikeItem.Data;
 	}
 
 	void InitialiseQuadBike(short itemNumber)
 	{
-		auto* quadBikeItem = &g_Level.Items[itemNumber];
-		quadBikeItem->Data = QuadBikeInfo();
+		auto& quadBikeItem = g_Level.Items[itemNumber];
+		quadBikeItem.Data = QuadBikeInfo();
 		auto& quadBike = GetQuadBikeInfo(quadBikeItem);
 
-		quadBike.MomentumAngle = quadBikeItem->Pose.Orientation.y;
+		quadBike.MomentumAngle = quadBikeItem.Pose.Orientation.y;
 	}
 
 	void QuadBikePlayerCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 	{
-		auto* quadBikeItem = &g_Level.Items[itemNumber];
+		auto& quadBikeItem = g_Level.Items[itemNumber];
 		auto& quadBike = GetQuadBikeInfo(quadBikeItem);
-		auto* lara = GetLaraInfo(laraItem);
+		auto& player = *GetLaraInfo(laraItem);
 
-		if (laraItem->HitPoints < 0 || lara->Vehicle != NO_ITEM)
+		if (laraItem->HitPoints < 0)
 			return;
 
-		auto mountType = GetVehicleMountType(quadBikeItem, laraItem, coll, QuadBikeMountTypes, QBIKE_MOUNT_DISTANCE);
+		if (player.Vehicle != NO_ITEM)
+			return;
+
+		auto mountType = GetVehicleMountType(quadBikeItem, *laraItem, *coll, QuadBikeMountTypes, QBIKE_MOUNT_DISTANCE);
+
 		if (mountType == VehicleMountType::None)
-			ObjectCollision(itemNumber, laraItem, coll);
-		else
 		{
-			SetLaraVehicle(laraItem, quadBikeItem);
-			DoQuadBikeMount(quadBikeItem, laraItem, mountType);
+			ObjectCollision(itemNumber, laraItem, coll);
+			return;
 		}
+
+		SetLaraVehicle(*laraItem, &quadBikeItem);
+		DoQuadBikeMount(quadBikeItem, *laraItem, mountType);
 	}
 
-	bool QuadBikeControl(ItemInfo* laraItem, CollisionInfo* coll)
+	bool QuadBikeControl(ItemInfo& laraItem, CollisionInfo& coll)
 	{
-		auto* lara = GetLaraInfo(laraItem);
-		auto* quadBikeItem = &g_Level.Items[lara->Vehicle];
+		auto& player = *GetLaraInfo(&laraItem);
+		auto& quadBikeItem = g_Level.Items[player.Vehicle];
 		auto& quadBike = GetQuadBikeInfo(quadBikeItem);
 
 		auto oldPos = GameVector(
-			quadBikeItem->Pose.Position.x,
-			quadBikeItem->Pose.Position.y,
-			quadBikeItem->Pose.Position.z,
-			quadBikeItem->RoomNumber
-		);
+			quadBikeItem.Pose.Position.x,
+			quadBikeItem.Pose.Position.y,
+			quadBikeItem.Pose.Position.z,
+			quadBikeItem.RoomNumber);
 
 		auto impactDirection = QuadDynamics(quadBikeItem, laraItem);
 
-		auto probe = GetCollision(quadBikeItem);
+		auto probe = GetCollision(&quadBikeItem);
 
 		Vector3i frontLeft, frontRight;
 		auto floorHeightLeft = GetVehicleHeight(quadBikeItem, QBIKE_FRONT, -QBIKE_SIDE, false, frontLeft);
 		auto floorHeightRight = GetVehicleHeight(quadBikeItem, QBIKE_FRONT, QBIKE_SIDE, false, frontRight);
 
-		TestTriggers(quadBikeItem, false);
+		TestTriggers(&quadBikeItem, false);
 
 		bool dead = false;
-		if (laraItem->HitPoints <= 0)
+		if (laraItem.HitPoints <= 0)
 		{
 			TrInput &= ~(IN_LEFT | IN_RIGHT | IN_BACK | IN_FORWARD);
 			dead = true;
@@ -222,7 +226,7 @@ namespace TEN::Entities::Vehicles
 			impactDirection = VehicleImpactDirection::None;
 		else
 		{
-			switch (laraItem->Animation.ActiveState)
+			switch (laraItem.Animation.ActiveState)
 			{
 			case QBIKE_STATE_MOUNT_LEFT:
 			case QBIKE_STATE_MOUNT_RIGHT:
@@ -242,21 +246,25 @@ namespace TEN::Entities::Vehicles
 		{
 			quadBike.Pitch = pitch;
 			if (quadBike.Pitch < -0x8000)
+			{
 				quadBike.Pitch = -0x8000;
+			}
 			else if (quadBike.Pitch > 0xA000)
+			{
 				quadBike.Pitch = 0xA000;
+			}
 
-			SoundEffect(SFX_TR3_VEHICLE_QUADBIKE_MOVE, &quadBikeItem->Pose, SoundEnvironment::Land, 0.5f + (float)abs(quadBike.Pitch) / (float)QBIKE_VELOCITY_MAX);
+			SoundEffect(SFX_TR3_VEHICLE_QUADBIKE_MOVE, &quadBikeItem.Pose, SoundEnvironment::Land, 0.5f + (float)abs(quadBike.Pitch) / (float)QBIKE_VELOCITY_MAX);
 		}
 		else
 		{
 			if (drive != -1)
-				SoundEffect(SFX_TR3_VEHICLE_QUADBIKE_IDLE, &quadBikeItem->Pose);
+				SoundEffect(SFX_TR3_VEHICLE_QUADBIKE_IDLE, &quadBikeItem.Pose);
 
 			quadBike.Pitch = 0;
 		}
 
-		quadBikeItem->Floor = probe.Position.Floor;
+		quadBikeItem.Floor = probe.Position.Floor;
 
 		short rotAdd = quadBike.Velocity / 4;
 		quadBike.RearRot -= rotAdd;
@@ -265,37 +273,37 @@ namespace TEN::Entities::Vehicles
 
 		quadBike.LeftVerticalVelocity = DoVehicleDynamics(floorHeightLeft, quadBike.LeftVerticalVelocity, QBIKE_BOUNCE, QBIKE_KICK, frontLeft.y);
 		quadBike.RightVerticalVelocity = DoVehicleDynamics(floorHeightRight, quadBike.RightVerticalVelocity, QBIKE_BOUNCE, QBIKE_KICK, frontRight.y);
-		quadBikeItem->Animation.Velocity.y = DoVehicleDynamics(probe.Position.Floor, quadBikeItem->Animation.Velocity.y, QBIKE_BOUNCE, QBIKE_KICK, quadBikeItem->Pose.Position.y);
+		quadBikeItem.Animation.Velocity.y = DoVehicleDynamics(probe.Position.Floor, quadBikeItem.Animation.Velocity.y, QBIKE_BOUNCE, QBIKE_KICK, quadBikeItem.Pose.Position.y);
 		quadBike.Velocity = DoVehicleWaterMovement(quadBikeItem, laraItem, quadBike.Velocity, QBIKE_RADIUS, quadBike.TurnRate);
 
 		probe.Position.Floor = (frontLeft.y + frontRight.y) / 2;
-		short xRot = phd_atan(QBIKE_FRONT, quadBikeItem->Pose.Position.y - probe.Position.Floor);
+		short xRot = phd_atan(QBIKE_FRONT, quadBikeItem.Pose.Position.y - probe.Position.Floor);
 		short zRot = phd_atan(QBIKE_SIDE, probe.Position.Floor - frontLeft.y);
 
-		quadBikeItem->Pose.Orientation.x += ((xRot - quadBikeItem->Pose.Orientation.x) / 2);
-		quadBikeItem->Pose.Orientation.z += ((zRot - quadBikeItem->Pose.Orientation.z) / 2);
+		quadBikeItem.Pose.Orientation.x += ((xRot - quadBikeItem.Pose.Orientation.x) / 2);
+		quadBikeItem.Pose.Orientation.z += ((zRot - quadBikeItem.Pose.Orientation.z) / 2);
 
 		if (!(quadBike.Flags & QBIKE_FLAG_DEAD))
 		{
-			if (probe.RoomNumber != quadBikeItem->RoomNumber)
+			if (probe.RoomNumber != quadBikeItem.RoomNumber)
 			{
-				ItemNewRoom(lara->Vehicle, probe.RoomNumber);
-				ItemNewRoom(lara->ItemNumber, probe.RoomNumber);
+				ItemNewRoom(player.Vehicle, probe.RoomNumber);
+				ItemNewRoom(player.ItemNumber, probe.RoomNumber);
 			}
 
-			laraItem->Pose = quadBikeItem->Pose;
+			laraItem.Pose = quadBikeItem.Pose;
 
 			AnimateQuadBike(quadBikeItem, laraItem, impactDirection, dead);
-			AnimateItem(laraItem);
+			AnimateItem(&laraItem);
 
-			quadBikeItem->Animation.AnimNumber = Objects[ID_QUAD].animIndex + (laraItem->Animation.AnimNumber - Objects[ID_QUAD_LARA_ANIMS].animIndex);
-			quadBikeItem->Animation.FrameNumber = g_Level.Anims[quadBikeItem->Animation.AnimNumber].frameBase + (laraItem->Animation.FrameNumber - g_Level.Anims[laraItem->Animation.AnimNumber].frameBase);
+			quadBikeItem.Animation.AnimNumber = Objects[ID_QUAD].animIndex + (laraItem.Animation.AnimNumber - Objects[ID_QUAD_LARA_ANIMS].animIndex);
+			quadBikeItem.Animation.FrameNumber = g_Level.Anims[quadBikeItem.Animation.AnimNumber].frameBase + (laraItem.Animation.FrameNumber - g_Level.Anims[laraItem.Animation.AnimNumber].frameBase);
 
 			Camera.targetElevation = -ANGLE(30.0f);
 
 			if (quadBike.Flags & QBIKE_FLAG_FALLING)
 			{
-				if (quadBikeItem->Pose.Position.y == quadBikeItem->Floor)
+				if (quadBikeItem.Pose.Position.y == quadBikeItem.Floor)
 				{
 					ExplodeVehicle(laraItem, quadBikeItem);
 					return false;
@@ -303,10 +311,10 @@ namespace TEN::Entities::Vehicles
 			}
 		}
 
-		if (laraItem->Animation.ActiveState != QBIKE_STATE_MOUNT_RIGHT &&
-			laraItem->Animation.ActiveState != QBIKE_STATE_MOUNT_LEFT &&
-			laraItem->Animation.ActiveState != QBIKE_STATE_DISMOUNT_RIGHT &&
-			laraItem->Animation.ActiveState != QBIKE_STATE_DISMOUNT_LEFT)
+		if (laraItem.Animation.ActiveState != QBIKE_STATE_MOUNT_RIGHT &&
+			laraItem.Animation.ActiveState != QBIKE_STATE_MOUNT_LEFT &&
+			laraItem.Animation.ActiveState != QBIKE_STATE_DISMOUNT_RIGHT &&
+			laraItem.Animation.ActiveState != QBIKE_STATE_DISMOUNT_LEFT)
 		{
 			Vector3i pos;
 			int speed = 0;
@@ -314,15 +322,15 @@ namespace TEN::Entities::Vehicles
 
 			for (int i = 0; i < 2; i++)
 			{
-				pos = GetJointPosition(quadBikeItem, QuadBikeBites[i].meshNum, QuadBikeBites[i].Position);
-				angle = quadBikeItem->Pose.Orientation.y + ((i == 0) ? ANGLE(202.5f) : ANGLE(157.5f));
+				pos = GetJointPosition(&quadBikeItem, QuadBikeBites[i].meshNum, QuadBikeBites[i].Position);
+				angle = quadBikeItem.Pose.Orientation.y + ((i == 0) ? ANGLE(202.5f) : ANGLE(157.5f));
 
-				if (quadBikeItem->Animation.Velocity.z > 32.0f)
+				if (quadBikeItem.Animation.Velocity.z > 32.0f)
 				{
-					if (quadBikeItem->Animation.Velocity.z < 64.0f)
+					if (quadBikeItem.Animation.Velocity.z < 64.0f)
 					{
-						speed = 64 - quadBikeItem->Animation.Velocity.z;
-						TriggerQuadBikeExhaustSmokeEffect(pos.x, pos.y, pos.z, angle, speed, 1);
+						speed = 64 - quadBikeItem.Animation.Velocity.z;
+						SpawnQuadBikeExhaustSmoke(pos.x, pos.y, pos.z, angle, speed, 1);
 					}
 				}
 				else
@@ -333,23 +341,31 @@ namespace TEN::Entities::Vehicles
 						quadBike.SmokeStart++;
 					}
 					else if (quadBike.DriftStarting)
+					{
 						speed = (abs(quadBike.Revs) * 2) + ((GetRandomControl() & 7) * 128);
+					}
 					else if ((GetRandomControl() & 3) == 0)
+					{
 						speed = ((GetRandomControl() & 15) + (GetRandomControl() & 16)) * 128;
+					}
 					else
+					{
 						speed = 0;
+					}
 
-					TriggerQuadBikeExhaustSmokeEffect(pos.x, pos.y, pos.z, angle, speed, 0);
+					SpawnQuadBikeExhaustSmoke(pos.x, pos.y, pos.z, angle, speed, 0);
 				}
 			}
 		}
 		else
+		{
 			quadBike.SmokeStart = 0;
+		}
 
 		return DoQuadBikeDismount(quadBikeItem, laraItem);
 	}
 
-	int QuadUserControl(ItemInfo* quadBikeItem, int height, int* pitch)
+	int QuadUserControl(ItemInfo& quadBikeItem, int height, int* pitch)
 	{
 		auto& quadBike = GetQuadBikeInfo(quadBikeItem);
 
@@ -361,7 +377,9 @@ namespace TEN::Entities::Vehicles
 			quadBike.CanStartDrift = true;
 		}
 		else if (quadBike.Velocity)
+		{
 			quadBike.CanStartDrift = false;
+		}
 
 		if (!(TrInput & VEHICLE_IN_SPEED))
 			quadBike.DriftStarting = false;
@@ -374,10 +392,12 @@ namespace TEN::Entities::Vehicles
 				quadBike.Revs -= (quadBike.Revs / 8);
 			}
 			else
+			{
 				quadBike.Revs = 0;
+			}
 		}
 
-		if (quadBikeItem->Pose.Position.y >= (height - CLICK(1)))
+		if (quadBikeItem.Pose.Position.y >= (height - CLICK(1)))
 		{
 			if (TrInput & IN_LOOK && !quadBike.Velocity)
 				LookUpDown(LaraItem);
@@ -392,7 +412,9 @@ namespace TEN::Entities::Vehicles
 					ModulateVehicleTurnRateY(quadBike.TurnRate, QBIKE_DRIFT_TURN_RATE_ACCEL, -QBIKE_DRIFT_TURN_RATE_MAX, QBIKE_DRIFT_TURN_RATE_MAX);
 				}
 				else
+				{
 					ModulateVehicleTurnRateY(quadBike.TurnRate, QBIKE_TURN_RATE_ACCEL, -QBIKE_TURN_RATE_MAX, QBIKE_TURN_RATE_MAX);
+				}
 			}
 
 			// Reversing / braking.
@@ -407,19 +429,23 @@ namespace TEN::Entities::Vehicles
 						quadBike.Revs = QBIKE_REVERSE_VELOCITY_MAX;
 				}
 				else if (quadBike.Velocity > 0)
+				{
 					quadBike.Velocity -= QBIKE_VELOCITY_BRAKE_DECEL;
+				}
 				else
 				{
 					if (TrInput & VEHICLE_IN_BRAKE)
 					{
 						int sign = std::copysign(1, quadBike.Velocity);
-						if (abs(quadBikeItem->Animation.Velocity.z) <= (QBIKE_VELOCITY_BRAKE_DECEL / 256))
+						if (abs(quadBikeItem.Animation.Velocity.z) <= (QBIKE_VELOCITY_BRAKE_DECEL / 256))
 							quadBike.Velocity = 0;
 						else
 							quadBike.Velocity -= QBIKE_VELOCITY_BRAKE_DECEL * sign;
 					}
 					else if (quadBike.Velocity > QBIKE_REVERSE_VELOCITY_MAX)
+					{
 						quadBike.Velocity += QBIKE_REVERSE_VELOCITY_ACCEL;
+					}
 				}
 			}
 			else if (TrInput & VEHICLE_IN_ACCELERATE)
@@ -442,17 +468,24 @@ namespace TEN::Entities::Vehicles
 						quadBike.Velocity += (2 + (QBIKE_VELOCITY_MAX - quadBike.Velocity) / 8);
 				}
 				else
+				{
 					quadBike.Velocity = QBIKE_VELOCITY_MAX;
+				}
 
-				quadBike.Velocity -= abs(quadBikeItem->Pose.Orientation.y - quadBike.MomentumAngle) / 64;
+				quadBike.Velocity -= abs(quadBikeItem.Pose.Orientation.y - quadBike.MomentumAngle) / 64;
 			}
-
 			else if (quadBike.Velocity > (1 * VEHICLE_VELOCITY_SCALE))
+			{
 				quadBike.Velocity -= (1 * VEHICLE_VELOCITY_SCALE);
+			}
 			else if (quadBike.Velocity < -(1 * VEHICLE_VELOCITY_SCALE))
+			{
 				quadBike.Velocity += (1 * VEHICLE_VELOCITY_SCALE);
+			}
 			else
+			{
 				quadBike.Velocity = 0;
+			}
 
 			if (!(TrInput & (VEHICLE_IN_ACCELERATE | VEHICLE_IN_REVERSE)) &&
 				quadBike.DriftStarting &&
@@ -464,7 +497,7 @@ namespace TEN::Entities::Vehicles
 					quadBike.Revs = 0;
 			}
 
-			quadBikeItem->Animation.Velocity.z = quadBike.Velocity / VEHICLE_VELOCITY_SCALE;
+			quadBikeItem.Animation.Velocity.z = quadBike.Velocity / VEHICLE_VELOCITY_SCALE;
 
 			if (quadBike.EngineRevs > 0x7000)
 				quadBike.EngineRevs = -0x2000;
@@ -491,31 +524,31 @@ namespace TEN::Entities::Vehicles
 		return drive;
 	}
 
-	void AnimateQuadBike(ItemInfo* quadBikeItem, ItemInfo* laraItem, VehicleImpactDirection impactDirection, bool dead)
+	void AnimateQuadBike(ItemInfo& quadBikeItem, ItemInfo& laraItem, VehicleImpactDirection impactDirection, bool dead)
 	{
 		auto& quadBike = GetQuadBikeInfo(quadBikeItem);
 
-		if (quadBikeItem->Pose.Position.y != quadBikeItem->Floor &&
-			laraItem->Animation.ActiveState != QBIKE_STATE_FALL &&
-			laraItem->Animation.ActiveState != QBIKE_STATE_LAND &&
-			laraItem->Animation.ActiveState != QBIKE_STATE_DISMOUNT_FALL &&
+		if (quadBikeItem.Pose.Position.y != quadBikeItem.Floor &&
+			laraItem.Animation.ActiveState != QBIKE_STATE_FALL &&
+			laraItem.Animation.ActiveState != QBIKE_STATE_LAND &&
+			laraItem.Animation.ActiveState != QBIKE_STATE_DISMOUNT_FALL &&
 			!dead)
 		{
 			if (quadBike.Velocity < 0)
-				laraItem->Animation.AnimNumber = Objects[ID_QUAD_LARA_ANIMS].animIndex + QBIKE_ANIM_LEAP_START;
+				laraItem.Animation.AnimNumber = Objects[ID_QUAD_LARA_ANIMS].animIndex + QBIKE_ANIM_LEAP_START;
 			else
-				laraItem->Animation.AnimNumber = Objects[ID_QUAD_LARA_ANIMS].animIndex + QBIKE_ANIM_LEAP_START_2;
+				laraItem.Animation.AnimNumber = Objects[ID_QUAD_LARA_ANIMS].animIndex + QBIKE_ANIM_LEAP_START_2;
 
-			laraItem->Animation.FrameNumber = GetFrameNumber(laraItem, laraItem->Animation.AnimNumber);
-			laraItem->Animation.ActiveState = QBIKE_STATE_FALL;
-			laraItem->Animation.TargetState = QBIKE_STATE_FALL;
+			laraItem.Animation.FrameNumber = GetFrameNumber(&laraItem, laraItem.Animation.AnimNumber);
+			laraItem.Animation.ActiveState = QBIKE_STATE_FALL;
+			laraItem.Animation.TargetState = QBIKE_STATE_FALL;
 		}
 		else if (impactDirection != VehicleImpactDirection::None &&
-			laraItem->Animation.ActiveState != QBIKE_STATE_IMPACT_FRONT &&
-			laraItem->Animation.ActiveState != QBIKE_STATE_IMPACT_BACK &&
-			laraItem->Animation.ActiveState != QBIKE_STATE_IMPACT_LEFT &&
-			laraItem->Animation.ActiveState != QBIKE_STATE_IMPACT_RIGHT &&
-			laraItem->Animation.ActiveState != QBIKE_STATE_DISMOUNT_FALL &&
+			laraItem.Animation.ActiveState != QBIKE_STATE_IMPACT_FRONT &&
+			laraItem.Animation.ActiveState != QBIKE_STATE_IMPACT_BACK &&
+			laraItem.Animation.ActiveState != QBIKE_STATE_IMPACT_LEFT &&
+			laraItem.Animation.ActiveState != QBIKE_STATE_IMPACT_RIGHT &&
+			laraItem.Animation.ActiveState != QBIKE_STATE_DISMOUNT_FALL &&
 			quadBike.Velocity > (QBIKE_VELOCITY_MAX / 3) &&
 			!dead)
 		{
@@ -523,22 +556,24 @@ namespace TEN::Entities::Vehicles
 		}
 		else
 		{
-			switch (laraItem->Animation.ActiveState)
+			switch (laraItem.Animation.ActiveState)
 			{
 			case QBIKE_STATE_IDLE:
 				if (dead)
-					laraItem->Animation.TargetState = QBIKE_STATE_BIKE_DEATH;
+					laraItem.Animation.TargetState = QBIKE_STATE_BIKE_DEATH;
 				else if (TrInput & VEHICLE_IN_DISMOUNT &&
 					quadBike.Velocity == 0 &&
 					!quadBike.NoDismount)
 				{
 					if (TrInput & VEHICLE_IN_LEFT && TestQuadBikeDismount(laraItem, -1))
-						laraItem->Animation.TargetState = QBIKE_STATE_DISMOUNT_LEFT;
+						laraItem.Animation.TargetState = QBIKE_STATE_DISMOUNT_LEFT;
 					else if (TrInput & VEHICLE_IN_RIGHT && TestQuadBikeDismount(laraItem, 1))
-						laraItem->Animation.TargetState = QBIKE_STATE_DISMOUNT_RIGHT;
+						laraItem.Animation.TargetState = QBIKE_STATE_DISMOUNT_RIGHT;
 				}
 				else if (TrInput & (VEHICLE_IN_ACCELERATE | VEHICLE_IN_REVERSE))
-					laraItem->Animation.TargetState = QBIKE_STATE_DRIVE;
+				{
+					laraItem.Animation.TargetState = QBIKE_STATE_DRIVE;
+				}
 
 				break;
 
@@ -546,37 +581,37 @@ namespace TEN::Entities::Vehicles
 				if (dead)
 				{
 					if (quadBike.Velocity > (QBIKE_VELOCITY_MAX / 2))
-						laraItem->Animation.TargetState = QBIKE_STATE_FALL_DEATH;
+						laraItem.Animation.TargetState = QBIKE_STATE_FALL_DEATH;
 					else
-						laraItem->Animation.TargetState = QBIKE_STATE_BIKE_DEATH;
+						laraItem.Animation.TargetState = QBIKE_STATE_BIKE_DEATH;
 				}
 				else if (!(TrInput & (VEHICLE_IN_ACCELERATE | VEHICLE_IN_REVERSE)) &&
 					!(quadBike.Velocity / VEHICLE_VELOCITY_SCALE))
 				{
-					laraItem->Animation.TargetState = QBIKE_STATE_IDLE;
+					laraItem.Animation.TargetState = QBIKE_STATE_IDLE;
 				}
 				else if (TrInput & VEHICLE_IN_LEFT &&
 					!quadBike.DriftStarting)
 				{
-					if (quadBikeItem->Animation.Velocity.z >= 0)
-						laraItem->Animation.TargetState = QBIKE_STATE_TURN_LEFT;
+					if (quadBikeItem.Animation.Velocity.z >= 0)
+						laraItem.Animation.TargetState = QBIKE_STATE_TURN_LEFT;
 					else
-						laraItem->Animation.TargetState = QBIKE_STATE_TURN_RIGHT;
+						laraItem.Animation.TargetState = QBIKE_STATE_TURN_RIGHT;
 				}
 				else if (TrInput & VEHICLE_IN_RIGHT &&
 					!quadBike.DriftStarting)
 				{
-					if (quadBikeItem->Animation.Velocity.z >= 0)
-						laraItem->Animation.TargetState = QBIKE_STATE_TURN_RIGHT;
+					if (quadBikeItem.Animation.Velocity.z >= 0)
+						laraItem.Animation.TargetState = QBIKE_STATE_TURN_RIGHT;
 					else
-						laraItem->Animation.TargetState = QBIKE_STATE_TURN_LEFT;
+						laraItem.Animation.TargetState = QBIKE_STATE_TURN_LEFT;
 				}
 				else if (TrInput & (VEHICLE_IN_REVERSE | VEHICLE_IN_BRAKE))
 				{
 					if (quadBike.Velocity > (QBIKE_VELOCITY_MAX / 3 * 2))
-						laraItem->Animation.TargetState = QBIKE_STATE_BRAKE;
+						laraItem.Animation.TargetState = QBIKE_STATE_BRAKE;
 					else
-						laraItem->Animation.TargetState = QBIKE_STATE_SLOW;
+						laraItem.Animation.TargetState = QBIKE_STATE_SLOW;
 				}
 
 				break;
@@ -584,55 +619,55 @@ namespace TEN::Entities::Vehicles
 			case QBIKE_STATE_BRAKE:
 			case QBIKE_STATE_SLOW:
 			case QBIKE_STATE_STOP_SLOWLY:
-				if (!quadBikeItem->Animation.Velocity.z)
-					laraItem->Animation.TargetState = QBIKE_STATE_IDLE;
+				if (!quadBikeItem.Animation.Velocity.z)
+					laraItem.Animation.TargetState = QBIKE_STATE_IDLE;
 				else if (TrInput & VEHICLE_IN_LEFT)
 				{
-					if (quadBikeItem->Animation.Velocity.z >= 0)
-						laraItem->Animation.TargetState = QBIKE_STATE_TURN_LEFT;
+					if (quadBikeItem.Animation.Velocity.z >= 0)
+						laraItem.Animation.TargetState = QBIKE_STATE_TURN_LEFT;
 					else
-						laraItem->Animation.TargetState = QBIKE_STATE_TURN_RIGHT;
+						laraItem.Animation.TargetState = QBIKE_STATE_TURN_RIGHT;
 				}
 				else if (TrInput & VEHICLE_IN_RIGHT)
 				{
-					if (quadBikeItem->Animation.Velocity.z >= 0)
-						laraItem->Animation.TargetState = QBIKE_STATE_TURN_RIGHT;
+					if (quadBikeItem.Animation.Velocity.z >= 0)
+						laraItem.Animation.TargetState = QBIKE_STATE_TURN_RIGHT;
 					else
-						laraItem->Animation.TargetState = QBIKE_STATE_TURN_LEFT;
+						laraItem.Animation.TargetState = QBIKE_STATE_TURN_LEFT;
 				}
 
 				break;
 
 			case QBIKE_STATE_TURN_LEFT:
-				if (!quadBikeItem->Animation.Velocity.z)
-					laraItem->Animation.TargetState = QBIKE_STATE_IDLE;
+				if (!quadBikeItem.Animation.Velocity.z)
+					laraItem.Animation.TargetState = QBIKE_STATE_IDLE;
 				else if (TrInput & VEHICLE_IN_RIGHT &&
-					quadBikeItem->Animation.Velocity.z > 0)
+					quadBikeItem.Animation.Velocity.z > 0)
 				{
-					laraItem->Animation.AnimNumber = Objects[ID_QUAD_LARA_ANIMS].animIndex + QBIKE_ANIM_TURN_RIGHT_START;
-					laraItem->Animation.FrameNumber = GetFrameNumber(laraItem, laraItem->Animation.AnimNumber);
-					laraItem->Animation.ActiveState = QBIKE_STATE_TURN_RIGHT;
-					laraItem->Animation.TargetState = QBIKE_STATE_TURN_RIGHT;
+					laraItem.Animation.AnimNumber = Objects[ID_QUAD_LARA_ANIMS].animIndex + QBIKE_ANIM_TURN_RIGHT_START;
+					laraItem.Animation.FrameNumber = GetFrameNumber(&laraItem, laraItem.Animation.AnimNumber);
+					laraItem.Animation.ActiveState = QBIKE_STATE_TURN_RIGHT;
+					laraItem.Animation.TargetState = QBIKE_STATE_TURN_RIGHT;
 				}
 				else if (TrInput & VEHICLE_IN_LEFT &&
-					quadBikeItem->Animation.Velocity.z < 0)
+					quadBikeItem.Animation.Velocity.z < 0)
 				{
-					laraItem->Animation.AnimNumber = Objects[ID_QUAD_LARA_ANIMS].animIndex + QBIKE_ANIM_TURN_LEFT_START;
-					laraItem->Animation.FrameNumber = GetFrameNumber(laraItem, laraItem->Animation.AnimNumber);
-					laraItem->Animation.ActiveState = QBIKE_STATE_TURN_LEFT;
-					laraItem->Animation.TargetState = QBIKE_STATE_TURN_LEFT;
+					laraItem.Animation.AnimNumber = Objects[ID_QUAD_LARA_ANIMS].animIndex + QBIKE_ANIM_TURN_LEFT_START;
+					laraItem.Animation.FrameNumber = GetFrameNumber(&laraItem, laraItem.Animation.AnimNumber);
+					laraItem.Animation.ActiveState = QBIKE_STATE_TURN_LEFT;
+					laraItem.Animation.TargetState = QBIKE_STATE_TURN_LEFT;
 				}
 				else
 				{
-					if (quadBikeItem->Animation.Velocity.z >= 0)
+					if (quadBikeItem.Animation.Velocity.z >= 0)
 					{
 						if (!(TrInput & VEHICLE_IN_LEFT))
-							laraItem->Animation.TargetState = QBIKE_STATE_DRIVE;
+							laraItem.Animation.TargetState = QBIKE_STATE_DRIVE;
 					}
 					else
 					{
 						if (!(TrInput & VEHICLE_IN_RIGHT))
-							laraItem->Animation.TargetState = QBIKE_STATE_DRIVE;
+							laraItem.Animation.TargetState = QBIKE_STATE_DRIVE;
 					}
 				}
 
@@ -640,43 +675,43 @@ namespace TEN::Entities::Vehicles
 
 			case QBIKE_STATE_TURN_RIGHT:
 				if ((quadBike.Velocity / VEHICLE_VELOCITY_SCALE) == 0)
-					laraItem->Animation.TargetState = QBIKE_STATE_IDLE;
+					laraItem.Animation.TargetState = QBIKE_STATE_IDLE;
 				else if (TrInput & VEHICLE_IN_LEFT &&
-					quadBikeItem->Animation.Velocity.z > 0)
+					quadBikeItem.Animation.Velocity.z > 0)
 				{
-					laraItem->Animation.AnimNumber = Objects[ID_QUAD_LARA_ANIMS].animIndex + QBIKE_ANIM_TURN_LEFT_START;
-					laraItem->Animation.FrameNumber = GetFrameNumber(laraItem, laraItem->Animation.AnimNumber);
-					laraItem->Animation.ActiveState = QBIKE_STATE_TURN_LEFT;
-					laraItem->Animation.TargetState = QBIKE_STATE_TURN_LEFT;
+					laraItem.Animation.AnimNumber = Objects[ID_QUAD_LARA_ANIMS].animIndex + QBIKE_ANIM_TURN_LEFT_START;
+					laraItem.Animation.FrameNumber = GetFrameNumber(&laraItem, laraItem.Animation.AnimNumber);
+					laraItem.Animation.ActiveState = QBIKE_STATE_TURN_LEFT;
+					laraItem.Animation.TargetState = QBIKE_STATE_TURN_LEFT;
 				}
 				else if (TrInput & VEHICLE_IN_RIGHT &&
-					quadBikeItem->Animation.Velocity.z < 0)
+					quadBikeItem.Animation.Velocity.z < 0)
 				{
-					laraItem->Animation.AnimNumber = Objects[ID_QUAD_LARA_ANIMS].animIndex + QBIKE_ANIM_TURN_RIGHT_START;
-					laraItem->Animation.FrameNumber = GetFrameNumber(laraItem, laraItem->Animation.AnimNumber);
-					laraItem->Animation.ActiveState = QBIKE_STATE_TURN_RIGHT;
-					laraItem->Animation.TargetState = QBIKE_STATE_TURN_RIGHT;
+					laraItem.Animation.AnimNumber = Objects[ID_QUAD_LARA_ANIMS].animIndex + QBIKE_ANIM_TURN_RIGHT_START;
+					laraItem.Animation.FrameNumber = GetFrameNumber(&laraItem, laraItem.Animation.AnimNumber);
+					laraItem.Animation.ActiveState = QBIKE_STATE_TURN_RIGHT;
+					laraItem.Animation.TargetState = QBIKE_STATE_TURN_RIGHT;
 				}
 				else
 				{
-					if (quadBikeItem->Animation.Velocity.z >= 0)
+					if (quadBikeItem.Animation.Velocity.z >= 0)
 					{
 						if (!(TrInput & VEHICLE_IN_RIGHT))
-							laraItem->Animation.TargetState = QBIKE_STATE_DRIVE;
+							laraItem.Animation.TargetState = QBIKE_STATE_DRIVE;
 					}
 					else
 					{
 						if (!(TrInput & VEHICLE_IN_LEFT))
-							laraItem->Animation.TargetState = QBIKE_STATE_DRIVE;
+							laraItem.Animation.TargetState = QBIKE_STATE_DRIVE;
 					}
 				}
 
 				break;
 
 			case QBIKE_STATE_FALL:
-				if (quadBikeItem->Pose.Position.y == quadBikeItem->Floor)
-					laraItem->Animation.TargetState = QBIKE_STATE_LAND;
-				else if (quadBikeItem->Animation.Velocity.y > QBIKE_DEATH_VERTICAL_VELOCITY_MIN)
+				if (quadBikeItem.Pose.Position.y == quadBikeItem.Floor)
+					laraItem.Animation.TargetState = QBIKE_STATE_LAND;
+				else if (quadBikeItem.Animation.Velocity.y > QBIKE_DEATH_VERTICAL_VELOCITY_MIN)
 					quadBike.Flags |= QBIKE_FLAG_FALLING;
 
 				break;
@@ -689,66 +724,66 @@ namespace TEN::Entities::Vehicles
 			case QBIKE_STATE_IMPACT_LEFT:
 			case QBIKE_STATE_IMPACT_RIGHT:
 				if (TrInput & (VEHICLE_IN_ACCELERATE | VEHICLE_IN_REVERSE))
-					laraItem->Animation.TargetState = QBIKE_STATE_DRIVE;
+					laraItem.Animation.TargetState = QBIKE_STATE_DRIVE;
 
 				break;
 			}
 		}
 	}
 
-	void DoQuadBikeMount(ItemInfo* quadBikeItem, ItemInfo* laraItem, VehicleMountType mountType)
+	void DoQuadBikeMount(ItemInfo& quadBikeItem, ItemInfo& laraItem, VehicleMountType mountType)
 	{
 		auto& quadBike = GetQuadBikeInfo(quadBikeItem);
-		auto* lara = GetLaraInfo(laraItem);
+		auto& player = *GetLaraInfo(&laraItem);
 
 		switch (mountType)
 		{
 		case VehicleMountType::LevelStart:
-			laraItem->Animation.AnimNumber = Objects[ID_QUAD_LARA_ANIMS].animIndex + QBIKE_ANIM_IDLE;
-			laraItem->Animation.ActiveState = QBIKE_STATE_IDLE;
-			laraItem->Animation.TargetState = QBIKE_STATE_IDLE;
+			laraItem.Animation.AnimNumber = Objects[ID_QUAD_LARA_ANIMS].animIndex + QBIKE_ANIM_IDLE;
+			laraItem.Animation.ActiveState = QBIKE_STATE_IDLE;
+			laraItem.Animation.TargetState = QBIKE_STATE_IDLE;
 			break;
 
 		case VehicleMountType::Left:
-			laraItem->Animation.AnimNumber = Objects[ID_QUAD_LARA_ANIMS].animIndex + QBIKE_ANIM_MOUNT_LEFT;
-			laraItem->Animation.ActiveState = QBIKE_STATE_MOUNT_LEFT;
-			laraItem->Animation.TargetState = QBIKE_STATE_MOUNT_LEFT;
+			laraItem.Animation.AnimNumber = Objects[ID_QUAD_LARA_ANIMS].animIndex + QBIKE_ANIM_MOUNT_LEFT;
+			laraItem.Animation.ActiveState = QBIKE_STATE_MOUNT_LEFT;
+			laraItem.Animation.TargetState = QBIKE_STATE_MOUNT_LEFT;
 			break;
 
 		default:
 		case VehicleMountType::Right:
-			laraItem->Animation.AnimNumber = Objects[ID_QUAD_LARA_ANIMS].animIndex + QBIKE_ANIM_MOUNT_RIGHT;
-			laraItem->Animation.ActiveState = QBIKE_STATE_MOUNT_RIGHT;
-			laraItem->Animation.TargetState = QBIKE_STATE_MOUNT_RIGHT;
+			laraItem.Animation.AnimNumber = Objects[ID_QUAD_LARA_ANIMS].animIndex + QBIKE_ANIM_MOUNT_RIGHT;
+			laraItem.Animation.ActiveState = QBIKE_STATE_MOUNT_RIGHT;
+			laraItem.Animation.TargetState = QBIKE_STATE_MOUNT_RIGHT;
 			break;
 		}
-		laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
+		laraItem.Animation.FrameNumber = g_Level.Anims[laraItem.Animation.AnimNumber].frameBase;
 
 		DoVehicleFlareDiscard(laraItem);
-		ResetLaraFlex(laraItem);
-		laraItem->Pose.Position = quadBikeItem->Pose.Position;
-		laraItem->Pose.Orientation = EulerAngles(0, quadBikeItem->Pose.Orientation.y, 0);
-		lara->Control.HandStatus = HandStatus::Busy;
-		lara->HitDirection = -1;
-		quadBikeItem->HitPoints = 1;
+		ResetLaraFlex(&laraItem);
+		laraItem.Pose.Position = quadBikeItem.Pose.Position;
+		laraItem.Pose.Orientation = EulerAngles(0, quadBikeItem.Pose.Orientation.y, 0);
+		player.Control.HandStatus = HandStatus::Busy;
+		player.HitDirection = -1;
+		quadBikeItem.HitPoints = 1;
 		quadBike.Revs = 0;
 
-		AnimateItem(laraItem);
+		AnimateItem(&laraItem);
 	}
 
-	int TestQuadBikeDismount(ItemInfo* laraItem, int direction)
+	int TestQuadBikeDismount(ItemInfo& laraItem, int direction)
 	{
-		auto* lara = GetLaraInfo(laraItem);
-		auto* quadBikeItem = &g_Level.Items[lara->Vehicle];
+		auto& player = *GetLaraInfo(&laraItem);
+		auto& quadBikeItem = g_Level.Items[player.Vehicle];
 
-		short angle = quadBikeItem->Pose.Orientation.y;
+		short angle = quadBikeItem.Pose.Orientation.y;
 		angle += (direction < 0) ? -ANGLE(90.0f) : ANGLE(90.0f);
 
-		int x = quadBikeItem->Pose.Position.x + CLICK(2) * phd_sin(angle);
-		int y = quadBikeItem->Pose.Position.y;
-		int z = quadBikeItem->Pose.Position.z + CLICK(2) * phd_cos(angle);
+		int x = quadBikeItem.Pose.Position.x + CLICK(2) * phd_sin(angle);
+		int y = quadBikeItem.Pose.Position.y;
+		int z = quadBikeItem.Pose.Position.z + CLICK(2) * phd_cos(angle);
 
-		auto collResult = GetCollision(x, y, z, quadBikeItem->RoomNumber);
+		auto collResult = GetCollision(x, y, z, quadBikeItem.RoomNumber);
 
 		if (collResult.Position.FloorSlope ||
 			collResult.Position.Floor == NO_HEIGHT)
@@ -756,10 +791,10 @@ namespace TEN::Entities::Vehicles
 			return false;
 		}
 
-		if (abs(collResult.Position.Floor - quadBikeItem->Pose.Position.y) > CLICK(2))
+		if (abs(collResult.Position.Floor - quadBikeItem.Pose.Position.y) > CLICK(2))
 			return false;
 
-		if ((collResult.Position.Ceiling - quadBikeItem->Pose.Position.y) > -LARA_HEIGHT ||
+		if ((collResult.Position.Ceiling - quadBikeItem.Pose.Position.y) > -LARA_HEIGHT ||
 			(collResult.Position.Floor - collResult.Position.Ceiling) < LARA_HEIGHT)
 		{
 			return false;
@@ -768,50 +803,50 @@ namespace TEN::Entities::Vehicles
 		return true;
 	}
 
-	bool DoQuadBikeDismount(ItemInfo* quadBikeItem, ItemInfo* laraItem)
+	bool DoQuadBikeDismount(ItemInfo& quadBikeItem, ItemInfo& laraItem)
 	{
 		auto& quadBike = GetQuadBikeInfo(quadBikeItem);
-		auto* lara = GetLaraInfo(laraItem);
+		auto& player = *GetLaraInfo(&laraItem);
 
-		if (lara->Vehicle == NO_ITEM)
+		if (player.Vehicle == NO_ITEM)
 			return true;
 
-		if ((laraItem->Animation.ActiveState == QBIKE_STATE_DISMOUNT_RIGHT || laraItem->Animation.ActiveState == QBIKE_STATE_DISMOUNT_LEFT) &&
-			TestLastFrame(laraItem))
+		if ((laraItem.Animation.ActiveState == QBIKE_STATE_DISMOUNT_RIGHT || laraItem.Animation.ActiveState == QBIKE_STATE_DISMOUNT_LEFT) &&
+			TestLastFrame(&laraItem))
 		{
-			if (laraItem->Animation.ActiveState == QBIKE_STATE_DISMOUNT_LEFT)
-				laraItem->Pose.Orientation.y += ANGLE(90.0f);
+			if (laraItem.Animation.ActiveState == QBIKE_STATE_DISMOUNT_LEFT)
+				laraItem.Pose.Orientation.y += ANGLE(90.0f);
 			else
-				laraItem->Pose.Orientation.y -= ANGLE(90.0f);
+				laraItem.Pose.Orientation.y -= ANGLE(90.0f);
 
-			SetAnimation(laraItem, LA_STAND_IDLE);
-			TranslateItem(laraItem, laraItem->Pose.Orientation.y, -QBIKE_DISMOUNT_DISTANCE);
-			laraItem->Pose.Orientation.x = 0;
-			laraItem->Pose.Orientation.z = 0;
+			SetAnimation(&laraItem, LA_STAND_IDLE);
+			TranslateItem(&laraItem, laraItem.Pose.Orientation.y, -QBIKE_DISMOUNT_DISTANCE);
+			laraItem.Pose.Orientation.x = 0;
+			laraItem.Pose.Orientation.z = 0;
 			SetLaraVehicle(laraItem, nullptr);
-			lara->Control.HandStatus = HandStatus::Free;
+			player.Control.HandStatus = HandStatus::Free;
 
-			if (laraItem->Animation.ActiveState == QBIKE_STATE_DISMOUNT_FALL)
+			if (laraItem.Animation.ActiveState == QBIKE_STATE_DISMOUNT_FALL)
 			{
-				auto pos = GetJointPosition(laraItem, LM_HIPS);
+				auto pos = GetJointPosition(&laraItem, LM_HIPS);
 
-				SetAnimation(laraItem, LA_FREEFALL);
-				laraItem->Pose.Position = pos;
-				laraItem->Animation.IsAirborne = true;
-				laraItem->Animation.Velocity.y = quadBikeItem->Animation.Velocity.y;
-				laraItem->Pose.Orientation.x = 0;
-				laraItem->Pose.Orientation.z = 0;
-				laraItem->HitPoints = 0;
-				lara->Control.HandStatus = HandStatus::Free;
-				quadBikeItem->Flags |= IFLAG_INVISIBLE;
+				SetAnimation(&laraItem, LA_FREEFALL);
+				laraItem.Pose.Position = pos;
+				laraItem.Animation.IsAirborne = true;
+				laraItem.Animation.Velocity.y = quadBikeItem.Animation.Velocity.y;
+				laraItem.Pose.Orientation.x = 0;
+				laraItem.Pose.Orientation.z = 0;
+				laraItem.HitPoints = 0;
+				player.Control.HandStatus = HandStatus::Free;
+				quadBikeItem.Flags |= IFLAG_INVISIBLE;
 
 				return false;
 			}
-			else if (laraItem->Animation.ActiveState == QBIKE_STATE_FALL_DEATH)
+			else if (laraItem.Animation.ActiveState == QBIKE_STATE_FALL_DEATH)
 			{
-				laraItem->Animation.TargetState = LS_DEATH;
-				laraItem->Animation.Velocity.z = 0;
-				laraItem->Animation.Velocity.y = DAMAGE_START + DAMAGE_LENGTH;
+				laraItem.Animation.TargetState = LS_DEATH;
+				laraItem.Animation.Velocity.z = 0;
+				laraItem.Animation.Velocity.y = DAMAGE_START + DAMAGE_LENGTH;
 				quadBike.Flags |= QBIKE_FLAG_DEAD;
 
 				return false;
@@ -823,44 +858,44 @@ namespace TEN::Entities::Vehicles
 			return true;
 	}
 
-	void DoQuadBikeImpact(ItemInfo* quadBikeItem, ItemInfo* laraItem, VehicleImpactDirection impactDirection)
+	void DoQuadBikeImpact(ItemInfo& quadBikeItem, ItemInfo& laraItem, VehicleImpactDirection impactDirection)
 	{
 		switch (impactDirection)
 		{
 		default:
 		case VehicleImpactDirection::Front:
-			laraItem->Animation.AnimNumber = Objects[ID_QUAD_LARA_ANIMS].animIndex + QBIKE_ANIM_IMPACT_FRONT;
-			laraItem->Animation.ActiveState = QBIKE_STATE_IMPACT_FRONT;
-			laraItem->Animation.TargetState = QBIKE_STATE_IMPACT_FRONT;
+			laraItem.Animation.AnimNumber = Objects[ID_QUAD_LARA_ANIMS].animIndex + QBIKE_ANIM_IMPACT_FRONT;
+			laraItem.Animation.ActiveState = QBIKE_STATE_IMPACT_FRONT;
+			laraItem.Animation.TargetState = QBIKE_STATE_IMPACT_FRONT;
 			break;
 
 		case VehicleImpactDirection::Back:
-			laraItem->Animation.AnimNumber = Objects[ID_QUAD_LARA_ANIMS].animIndex + QBIKE_ANIM_IMPACT_BACK;
-			laraItem->Animation.ActiveState = QBIKE_STATE_IMPACT_BACK;
-			laraItem->Animation.TargetState = QBIKE_STATE_IMPACT_BACK;
+			laraItem.Animation.AnimNumber = Objects[ID_QUAD_LARA_ANIMS].animIndex + QBIKE_ANIM_IMPACT_BACK;
+			laraItem.Animation.ActiveState = QBIKE_STATE_IMPACT_BACK;
+			laraItem.Animation.TargetState = QBIKE_STATE_IMPACT_BACK;
 			break;
 
 		case VehicleImpactDirection::Left:
-			laraItem->Animation.AnimNumber = Objects[ID_QUAD_LARA_ANIMS].animIndex + QBIKE_ANIM_IMPACT_LEFT;
-			laraItem->Animation.ActiveState = QBIKE_STATE_IMPACT_LEFT;
-			laraItem->Animation.TargetState = QBIKE_STATE_IMPACT_LEFT;
+			laraItem.Animation.AnimNumber = Objects[ID_QUAD_LARA_ANIMS].animIndex + QBIKE_ANIM_IMPACT_LEFT;
+			laraItem.Animation.ActiveState = QBIKE_STATE_IMPACT_LEFT;
+			laraItem.Animation.TargetState = QBIKE_STATE_IMPACT_LEFT;
 			break;
 
 		case VehicleImpactDirection::Right:
-			laraItem->Animation.AnimNumber = Objects[ID_QUAD_LARA_ANIMS].animIndex + QBIKE_ANIM_IMPACT_RIGHT;
-			laraItem->Animation.ActiveState = QBIKE_STATE_IMPACT_RIGHT;
-			laraItem->Animation.TargetState = QBIKE_STATE_IMPACT_RIGHT;
+			laraItem.Animation.AnimNumber = Objects[ID_QUAD_LARA_ANIMS].animIndex + QBIKE_ANIM_IMPACT_RIGHT;
+			laraItem.Animation.ActiveState = QBIKE_STATE_IMPACT_RIGHT;
+			laraItem.Animation.TargetState = QBIKE_STATE_IMPACT_RIGHT;
 			break;
 		}
-		laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
+		laraItem.Animation.FrameNumber = g_Level.Anims[laraItem.Animation.AnimNumber].frameBase;
 
-		SoundEffect(SFX_TR3_VEHICLE_QUADBIKE_FRONT_IMPACT, &quadBikeItem->Pose);
+		SoundEffect(SFX_TR3_VEHICLE_QUADBIKE_FRONT_IMPACT, &quadBikeItem.Pose);
 	}
 
-	VehicleImpactDirection QuadDynamics(ItemInfo* quadBikeItem, ItemInfo* laraItem)
+	VehicleImpactDirection QuadDynamics(ItemInfo& quadBikeItem, ItemInfo& laraItem)
 	{
 		auto& quadBike = GetQuadBikeInfo(quadBikeItem);
-		auto* lara = GetLaraInfo(laraItem);
+		auto& player = *GetLaraInfo(&laraItem);
 
 		// Enable dismounts.
 		quadBike.NoDismount = false;
@@ -879,25 +914,25 @@ namespace TEN::Entities::Vehicles
 		auto prevPointCenterBackLeft = GetVehicleCollision(quadBikeItem, -QBIKE_FRONT / 2, -QBIKE_SIDE, true);
 		auto prevPointCenterBackRight = GetVehicleCollision(quadBikeItem, -QBIKE_FRONT / 2, QBIKE_SIDE, true);
 
-		auto prevPos = quadBikeItem->Pose.Position;
+		auto prevPos = quadBikeItem.Pose.Position;
 
 		// Apply rotations and determine angle of momentum.
-		if (quadBikeItem->Pose.Position.y > (quadBikeItem->Floor - CLICK(1)))
+		if (quadBikeItem.Pose.Position.y > (quadBikeItem.Floor - CLICK(1)))
 		{
 			ResetVehicleTurnRateY(quadBike.TurnRate, QBIKE_TURN_RATE_DECEL);
-			quadBikeItem->Pose.Orientation.y += quadBike.TurnRate + quadBike.ExtraRotation;
+			quadBikeItem.Pose.Orientation.y += quadBike.TurnRate + quadBike.ExtraRotation;
 
 			short momentum = QBIKE_MOMENTUM_TURN_RATE_MIN - (((((QBIKE_MOMENTUM_TURN_RATE_MIN - QBIKE_MOMENTUM_TURN_RATE_MAX) * 256) / QBIKE_VELOCITY_MAX) * quadBike.Velocity) / 256);
 			if (!(TrInput & VEHICLE_IN_ACCELERATE) && quadBike.Velocity > 0)
 				momentum += momentum / 4;
 
-			short rotation = quadBikeItem->Pose.Orientation.y - quadBike.MomentumAngle;
+			short rotation = quadBikeItem.Pose.Orientation.y - quadBike.MomentumAngle;
 			if (rotation < -QBIKE_MOMENTUM_TURN_RATE_MAX)
 			{
 				if (rotation < -QBIKE_MOMENTUM_TURN_RATE_MAX2)
 				{
 					rotation = -QBIKE_MOMENTUM_TURN_RATE_MAX2;
-					quadBike.MomentumAngle = quadBikeItem->Pose.Orientation.y - rotation;
+					quadBike.MomentumAngle = quadBikeItem.Pose.Orientation.y - rotation;
 				}
 				else
 					quadBike.MomentumAngle -= momentum;
@@ -907,49 +942,50 @@ namespace TEN::Entities::Vehicles
 				if (rotation > QBIKE_MOMENTUM_TURN_RATE_MAX2)
 				{
 					rotation = QBIKE_MOMENTUM_TURN_RATE_MAX2;
-					quadBike.MomentumAngle = quadBikeItem->Pose.Orientation.y - rotation;
+					quadBike.MomentumAngle = quadBikeItem.Pose.Orientation.y - rotation;
 				}
 				else
 					quadBike.MomentumAngle += momentum;
 			}
 			else
-				quadBike.MomentumAngle = quadBikeItem->Pose.Orientation.y;
+				quadBike.MomentumAngle = quadBikeItem.Pose.Orientation.y;
 		}
 		else
-			quadBikeItem->Pose.Orientation.y += quadBike.TurnRate + quadBike.ExtraRotation;
+			quadBikeItem.Pose.Orientation.y += quadBike.TurnRate + quadBike.ExtraRotation;
 
-		auto probe = GetCollision(quadBikeItem);
+		auto probe = GetCollision(&quadBikeItem);
 		int speed = 0;
-		if (quadBikeItem->Pose.Position.y >= probe.Position.Floor)
-			speed = quadBikeItem->Animation.Velocity.z * phd_cos(quadBikeItem->Pose.Orientation.x);
+		if (quadBikeItem.Pose.Position.y >= probe.Position.Floor)
+			speed = quadBikeItem.Animation.Velocity.z * phd_cos(quadBikeItem.Pose.Orientation.x);
 		else
-			speed = quadBikeItem->Animation.Velocity.z;
+			speed = quadBikeItem.Animation.Velocity.z;
 
-		TranslateItem(quadBikeItem, quadBike.MomentumAngle, speed);
+		TranslateItem(&quadBikeItem, quadBike.MomentumAngle, speed);
 
-		int slip = QBIKE_SLIP * phd_sin(quadBikeItem->Pose.Orientation.x);
+		int slip = QBIKE_SLIP * phd_sin(quadBikeItem.Pose.Orientation.x);
 		if (abs(slip) > QBIKE_SLIP / 2)
 		{
 			if (slip > 0)
 				slip -= 10;
 			else
 				slip += 10;
-			quadBikeItem->Pose.Position.z -= slip * phd_cos(quadBikeItem->Pose.Orientation.y);
-			quadBikeItem->Pose.Position.x -= slip * phd_sin(quadBikeItem->Pose.Orientation.y);
+
+			quadBikeItem.Pose.Position.z -= slip * phd_cos(quadBikeItem.Pose.Orientation.y);
+			quadBikeItem.Pose.Position.x -= slip * phd_sin(quadBikeItem.Pose.Orientation.y);
 		}
 
-		slip = QBIKE_SLIP_SIDE * phd_sin(quadBikeItem->Pose.Orientation.z);
+		slip = QBIKE_SLIP_SIDE * phd_sin(quadBikeItem.Pose.Orientation.z);
 		if (abs(slip) > QBIKE_SLIP_SIDE / 2)
 		{
-			quadBikeItem->Pose.Position.z -= slip * phd_sin(quadBikeItem->Pose.Orientation.y);
-			quadBikeItem->Pose.Position.x += slip * phd_cos(quadBikeItem->Pose.Orientation.y);
+			quadBikeItem.Pose.Position.z -= slip * phd_sin(quadBikeItem.Pose.Orientation.y);
+			quadBikeItem.Pose.Position.x += slip * phd_cos(quadBikeItem.Pose.Orientation.y);
 		}
 
 		// Store old 2D position to determine movement delta later.
-		auto moved = Vector3i(quadBikeItem->Pose.Position.x, 0, quadBikeItem->Pose.Position.z);
+		auto moved = Vector3i(quadBikeItem.Pose.Position.x, 0, quadBikeItem.Pose.Position.z);
 
 		// Process entity collision.
-		if (!(quadBikeItem->Flags & IFLAG_INVISIBLE))
+		if (!(quadBikeItem.Flags & IFLAG_INVISIBLE))
 			DoVehicleCollision(quadBikeItem, QBIKE_RADIUS);
 
 		// Apply shifts.
@@ -989,9 +1025,9 @@ namespace TEN::Entities::Vehicles
 				extraRot += rotAdd;
 		}
 
-		probe = GetCollision(quadBikeItem);
-		if (probe.Position.Floor < quadBikeItem->Pose.Position.y - CLICK(1))
-			DoVehicleShift(quadBikeItem, quadBikeItem->Pose.Position, prevPos);
+		probe = GetCollision(&quadBikeItem);
+		if (probe.Position.Floor < quadBikeItem.Pose.Position.y - CLICK(1))
+			DoVehicleShift(quadBikeItem, quadBikeItem.Pose.Position, prevPos);
 
 		quadBike.ExtraRotation = extraRot;
 
@@ -999,14 +1035,14 @@ namespace TEN::Entities::Vehicles
 		auto impactDirection = GetVehicleImpactDirection(quadBikeItem, moved);
 		if (impactDirection != VehicleImpactDirection::None)
 		{
-			int newVelocity = (quadBikeItem->Pose.Position.z - prevPos.z) * phd_cos(quadBike.MomentumAngle) + (quadBikeItem->Pose.Position.x - prevPos.x) * phd_sin(quadBike.MomentumAngle);
+			int newVelocity = (quadBikeItem.Pose.Position.z - prevPos.z) * phd_cos(quadBike.MomentumAngle) + (quadBikeItem.Pose.Position.x - prevPos.x) * phd_sin(quadBike.MomentumAngle);
 			newVelocity *= VEHICLE_VELOCITY_SCALE;
 
-			if (&g_Level.Items[lara->Vehicle] == quadBikeItem &&
+			if (&g_Level.Items[player.Vehicle] == &quadBikeItem &&
 				quadBike.Velocity == QBIKE_VELOCITY_MAX &&
 				newVelocity < (quadBike.Velocity - 10))
 			{
-				DoDamage(laraItem, (quadBike.Velocity - newVelocity) / 128);
+				DoDamage(&laraItem, (quadBike.Velocity - newVelocity) / 128);
 			}
 
 			if (quadBike.Velocity > 0 && newVelocity < quadBike.Velocity)
@@ -1022,7 +1058,7 @@ namespace TEN::Entities::Vehicles
 		return impactDirection;
 	}
 
-	void TriggerQuadBikeExhaustSmokeEffect(int x, int y, int z, short angle, int speed, int moving)
+	void SpawnQuadBikeExhaustSmoke(int x, int y, int z, short angle, int speed, int moving)
 	{
 		auto* spark = GetFreeParticle();
 

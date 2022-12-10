@@ -4,20 +4,20 @@ namespace TEN::Entities::Vehicles
 {
 	struct MinecartInfo
 	{
-		float Velocity = 0.0f;
+		float Velocity		   = 0.0f;
 		float VerticalVelocity = 0.0f;
 
 		short TurnRot = 0;
-		int TurnX = 0;
-		int TurnZ = 0;
+		int	  TurnX	  = 0;
+		int	  TurnZ	  = 0;
 		short TurnLen = 0;
 
-		int Gradient = 0;
+		int			 Gradient  = 0;
 		unsigned int StopDelay = 0;
 
 		int FloorHeightMiddle = 0;
-		int FloorHeightFront = 0;
+		int FloorHeightFront  = 0;
 
-		char Flags = 0;
+		int Flags = 0;
 	};
 }

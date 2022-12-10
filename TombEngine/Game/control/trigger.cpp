@@ -756,7 +756,7 @@ void ProcessSectorFlags(ItemInfo* item)
 			{
 				// To allow both lava and rapids in same level, also check floor material flag.
 				if (block->Material == FLOOR_MATERIAL::Water && Objects[ID_KAYAK_LARA_ANIMS].loaded)
-					KayakLaraRapidsDrown(item);
+					KayakLaraRapidsDrown(*item);
 				else
 					LavaBurn(item);
 			}

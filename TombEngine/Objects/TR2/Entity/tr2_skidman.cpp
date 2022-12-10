@@ -215,7 +215,7 @@ namespace TEN::Entities::Creatures::TR2
 	else
 	{
 		creatureInfo->JointRotation[0] = (creatureInfo->JointRotation[0] == 1) ? 2 : 1;
-		TriggerSkidooSnowEffect(item);
+		TriggerSkidooSnowEffect(*item);
 		SoundEffect(SFX_TR2_VEHICLE_SNOWMOBILE_IDLE, &item->Pose, SoundEnvironment::Land, 0.5f + item->Animation.Velocity.z / 100.0f); // SKIDOO_MAX_VELOCITY.  TODO: Check actual sound!
 	}
 
@@ -246,7 +246,7 @@ namespace TEN::Entities::Creatures::TR2
 			item->Status = ITEM_DEACTIVATED;
 			InitialiseSkidoo(itemNumber);
 
-			((SkidooInfo*)item->Data)->Armed = true;
+			((SkidooInfo*)item->Data)->IsArmed = true;
 		}
 	}
 }

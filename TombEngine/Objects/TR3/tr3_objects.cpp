@@ -343,7 +343,7 @@ static void StartVehicles(ObjectInfo* obj)
 		obj->initialise = InitialiseRubberBoat;
 		obj->control = RubberBoatControl;
 		obj->collision = RubberBoatPlayerCollision;
-		obj->drawRoutine = DrawRubberBoat;
+		//obj->drawRoutine = DrawRubberBoat;
 		obj->hitEffect = HIT_RICOCHET;
 		obj->shadowType = ShadowMode::Lara;
 

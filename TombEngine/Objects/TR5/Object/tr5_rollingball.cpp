@@ -302,7 +302,7 @@ void RollingBallControl(short itemNumber)
 	item->Pose.Orientation.x -= ((abs(item->ItemFlags[0]) + abs(item->ItemFlags[1])) / 2) / vDivider;
 
 	TestTriggers(item, true);
-	DoVehicleCollision(item, CLICK(0.9f));
+	DoVehicleCollision(*item, CLICK(0.9f));
 }
 
 void ClassicRollingBallCollision(short itemNum, ItemInfo* lara, CollisionInfo* coll)
