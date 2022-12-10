@@ -11,21 +11,20 @@
 #include "Game/misc.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
-#include "Math/Random.h"
+#include "Math/Math.h"
 #include "Specific/setup.h"
 
-using namespace TEN::Math::Random;
-using std::vector;
+using namespace TEN::Math;
 
 namespace TEN::Entities::TR4
 {
 	constexpr auto KNIGHT_TEMPLAR_SWORD_ATTACK_DAMAGE = 120;
 
-	#define KTEMPLAR_IDLE_TURN_RATE_MAX ANGLE(2.0f)
-	#define KTEMPLAR_WALK_TURN_RATE_MAX ANGLE(7.0f)
+	const auto KTEMPLAR_IDLE_TURN_RATE_MAX = ANGLE(2.0f);
+	const auto KTEMPLAR_WALK_TURN_RATE_MAX = ANGLE(7.0f);
 
 	const auto KnightTemplarBite = BiteInfo(Vector3::Zero, 11);
-	const vector<unsigned int> KnightTemplarSwordAttackJoints = { 10, 11 };
+	const std::vector<unsigned int> KnightTemplarSwordAttackJoints = { 10, 11 };
 
 	enum KnightTemplarState
 	{
@@ -86,7 +85,7 @@ namespace TEN::Entities::TR4
 			(item->Animation.AnimNumber - object->animIndex) == KTEMPLAR_ANIM_WALK_FORWARD_LEFT_2 ||
 			(item->Animation.AnimNumber - object->animIndex) == KTEMPLAR_ANIM_WALK_FORWARD_RIGHT_2)
 		{
-			if (TestProbability(0.5f))
+			if (Random::TestProbability(1 / 2.0f))
 			{
 				auto color = Vector3(0.9f, 0.8f, 0.6f);
 				auto pos = GetJointPosition(item, 10, Vector3i(0, 48, 448));
@@ -133,16 +132,16 @@ namespace TEN::Entities::TR4
 			creature->MaxTurn = KTEMPLAR_IDLE_TURN_RATE_MAX;
 			creature->Flags = 0;
 
-			if (AI.distance > pow(BLOCK(0.67f), 2))
+			if (AI.distance > SQUARE(BLOCK(2 / 3.0f)))
 			{
 				if (Lara.TargetEntity == item)
 					item->Animation.TargetState = KTEMPLAR_STATE_SHIELD;
 			}
-			else if (TestProbability(0.5f))
+			else if (Random::TestProbability(1 / 2.0f))
 			{
 				item->Animation.TargetState = KTEMPLAR_STATE_SWORD_ATTACK_2;
 			}
-			else if (TestProbability(0.5f))
+			else if (Random::TestProbability(1 / 2.0f))
 			{
 				item->Animation.TargetState = KTEMPLAR_STATE_SWORD_ATTACK_1;
 			}
@@ -156,7 +155,7 @@ namespace TEN::Entities::TR4
 		case KTEMPLAR_STATE_WALK_FORWARD:
 			creature->MaxTurn = KTEMPLAR_WALK_TURN_RATE_MAX;
 
-			if (Lara.TargetEntity == item || AI.distance <= pow(BLOCK(0.67f), 2))
+			if (Lara.TargetEntity == item || AI.distance <= SQUARE(BLOCK(2 / 3.0f)))
 				item->Animation.TargetState = KTEMPLAR_STATE_IDLE;
 
 			break;
@@ -234,12 +233,12 @@ namespace TEN::Entities::TR4
 
 			if (item->HitStatus)
 			{
-				if (TestProbability(0.5f))
+				if (Random::TestProbability(1 / 2.0f))
 					item->Animation.TargetState = KTEMPLAR_STATE_SHIELD_HIT_1;
 				else
 					item->Animation.TargetState = KTEMPLAR_STATE_SHIELD_HIT_2;
 			}
-			else if (AI.distance <= pow(BLOCK(0.67f), 2) || Lara.TargetEntity != item)
+			else if (AI.distance <= SQUARE(BLOCK(2 / 3.0f)) || Lara.TargetEntity != item)
 			{
 				item->Animation.TargetState = KTEMPLAR_STATE_IDLE;
 			}
