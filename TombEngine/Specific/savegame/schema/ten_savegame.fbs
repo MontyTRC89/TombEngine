@@ -367,14 +367,19 @@ table EventSetCallCounters {
 }
 
 table VolumeState {
+	status: int32;
+	triggerer: int32;
+	timestamp: int32;
+}
+
+table Volume {
 	number: int32;
 	room_number: int32;
 	position: Vector3;
 	rotation: Vector4;
 	scale: Vector3;
-	state: int32;
-	triggerer: int32;
-	timeout: int32;
+	timestamp: int32;
+	queue: [VolumeState];
 }
 
 struct KeyValPair {
@@ -480,7 +485,7 @@ table SaveGame {
 	rope: Rope;
 	pendulum: Pendulum;
 	alternate_pendulum: Pendulum;
-	volume_states: [VolumeState];
+	volumes: [Volume];
 	call_counters: [EventSetCallCounters];
 	script_vars: UnionVec;
 	callbacks_pre_control: [string];

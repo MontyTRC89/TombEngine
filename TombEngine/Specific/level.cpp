@@ -798,9 +798,10 @@ void ReadRooms()
 			volume.Name = ReadString();
 			volume.EventSetIndex = ReadInt32();
 
-			volume.Status = TriggerStatus::Outside;
 			volume.Box    = BoundingOrientedBox(volume.Position, volume.Scale, volume.Rotation);
 			volume.Sphere = BoundingSphere(volume.Position, volume.Scale.x);
+
+			volume.Queue.reserve(VOLUME_ACTIVATOR_QUEUE_SIZE);
 
 			room.triggerVolumes.push_back(volume);
 		}

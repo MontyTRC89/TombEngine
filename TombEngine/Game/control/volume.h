@@ -10,12 +10,14 @@ constexpr auto NO_CALL_COUNTER = -1;
 constexpr auto VOLUME_BUSY_TIMEOUT = 10;
 constexpr auto VOLUME_LEAVE_TIMEOUT = 5;
 
+constexpr auto VOLUME_ACTIVATOR_QUEUE_SIZE = 16;
+
 enum class TriggerStatus
 {
 	Outside,
 	Entering,
 	Inside,
-	Leaving,
+	Leaving
 };
 
 enum class TriggerVolumeType
@@ -25,7 +27,7 @@ enum class TriggerVolumeType
 	Prism	// TODO: Unsupported as of now.
 };
 
-enum TriggerVolumeActivators
+enum TriggerVolumeActivatorType
 {
 	Player = 1,
 	NPC = 2,
@@ -35,10 +37,17 @@ enum TriggerVolumeActivators
 	PhysicalObject = 32	// Future-proofing for Bullet.
 };
 
+struct VolumeState
+{
+	TriggerStatus Status = TriggerStatus::Outside;
+	VolumeTriggerer Triggerer = nullptr;
+	int Timestamp = 0;
+};
+
 struct TriggerVolume
 {
 	TriggerVolumeType Type;
-	std::string Name = "";
+	std::string Name = {};
 	int EventSetIndex;
 
 	Vector3 Position;
@@ -48,15 +57,11 @@ struct TriggerVolume
 	BoundingOrientedBox Box;
 	BoundingSphere Sphere;
 
-	TriggerStatus Status = TriggerStatus::Outside;
-	VolumeTriggerer Triggerer = nullptr;
-	int Timeout = 0;
+	std::vector<VolumeState> Queue;
 };
 
 namespace TEN::Control::Volumes
 {
-	extern int CurrentCollidedVolume;
-
 	void TestVolumes(short roomNumber, BoundingOrientedBox bbox, TriggerVolumeActivators activatorType, VolumeTriggerer triggerer);
 	void TestVolumes(short itemNum);
 	void TestVolumes(short roomNumber, MESH_INFO* mesh);

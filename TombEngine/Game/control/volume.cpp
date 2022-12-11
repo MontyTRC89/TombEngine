@@ -18,12 +18,40 @@ namespace TEN::Control::Volumes
 {
 	constexpr auto CAM_SIZE = 32;
 
-	int CurrentCollidedVolume;
+	bool TestVolumeContainment(TriggerVolume& volume, BoundingOrientedBox& bbox, short roomNumber)
+	{
+		bool result = false;
+
+		switch (volume.Type)
+		{
+		case TriggerVolumeType::Box:
+			if (roomNumber == Camera.pos.RoomNumber)
+				g_Renderer.AddDebugBox(volume.Box, Vector4(1.0f, 0.0f, 1.0f, 1.0f), RENDERER_DEBUG_PAGE::LOGIC_STATS);
+			result = volume.Box.Intersects(bbox);
+			break;
+
+		case TriggerVolumeType::Sphere:
+			if (roomNumber == Camera.pos.RoomNumber)
+				g_Renderer.AddDebugSphere(volume.Sphere.Center, volume.Sphere.Radius, Vector4(1.0f, 0.0f, 1.0f, 1.0f), RENDERER_DEBUG_PAGE::LOGIC_STATS);
+			result = volume.Sphere.Intersects(bbox);
+			break;
+		}
+
+		return result;
+	}
+
+	void HandleEvent(VolumeEvent& evt, VolumeTriggerer& triggerer)
+	{
+		if (!evt.Function.empty() && evt.CallCounter != 0)
+		{
+			g_GameScript->ExecuteFunction(evt.Function, triggerer, evt.Data);
+			if (evt.CallCounter != NO_CALL_COUNTER)
+				evt.CallCounter--;
+		}
+	}
 
 	void TestVolumes(short roomNumber, BoundingOrientedBox bbox, TriggerVolumeActivators activatorType, VolumeTriggerer triggerer)
 	{
-		CurrentCollidedVolume = 0;
-
 		auto* room = &g_Level.Rooms[roomNumber];
 
 		for (size_t i = 0; i < room->triggerVolumes.size(); i++)
@@ -37,90 +65,73 @@ namespace TEN::Control::Volumes
 
 			if ((set->Activators & activatorType) != activatorType)
 				continue;
-			
-			// Determine what to do if volume is busy with another triggerer.
-			if (!std::holds_alternative<nullptr_t>(volume->Triggerer) && volume->Triggerer != triggerer)
+
+			VolumeState* entry = nullptr;
+
+			for (int j = volume->Queue.size() - 1; j >= 0; j--)
 			{
-				if (GameTimer - volume->Timeout > VOLUME_BUSY_TIMEOUT)
+				VolumeState* candidate = &volume->Queue[j];
+
+				switch (candidate->Status)
 				{
-					// We are past the busy timeout, reset current triggerer and volume status.
-					volume->Triggerer = nullptr;
-					volume->Status = TriggerStatus::Outside;
-				}
-				else
-					// We are in the same frame, triggerer is busy, leave it alone.
-					continue;
-			}
-
-			bool contains = false;
-
-			switch (volume->Type)
-			{
-			case TriggerVolumeType::Box:
-				if (roomNumber == Camera.pos.RoomNumber)
-					g_Renderer.AddDebugBox(volume->Box, Vector4(1.0f, 0.0f, 1.0f, 1.0f), RENDERER_DEBUG_PAGE::LOGIC_STATS);
-				contains = volume->Box.Intersects(bbox);
-				break;
-
-			case TriggerVolumeType::Sphere:
-				if (roomNumber == Camera.pos.RoomNumber)
-					g_Renderer.AddDebugSphere(volume->Sphere.Center, volume->Sphere.Radius, Vector4(1.0f, 0.0f, 1.0f, 1.0f), RENDERER_DEBUG_PAGE::LOGIC_STATS);
-				contains = volume->Sphere.Intersects(bbox);
-				break;
-			}
-
-			if (contains)
-			{
-				CurrentCollidedVolume = i + 1;
-
-				if (volume->Status == TriggerStatus::Outside)
-				{
-					volume->Triggerer = triggerer;
-					volume->Timeout = GameTimer;
-					volume->Status = TriggerStatus::Entering;
-					if (!set->OnEnter.Function.empty() && set->OnEnter.CallCounter != 0)
+				case TriggerStatus::Leaving:
+					if (GameTimer - candidate->Timestamp > VOLUME_BUSY_TIMEOUT)
 					{
-						g_GameScript->ExecuteFunction(set->OnEnter.Function, triggerer, set->OnEnter.Data);
-						if (set->OnEnter.CallCounter != NO_CALL_COUNTER)
-							set->OnEnter.CallCounter--;
+						candidate->Status = TriggerStatus::Outside;
 					}
+					break;
+
+				case TriggerStatus::Outside:
+					volume->Queue.erase(volume->Queue.begin() + j);
+					break;
+
+				default:
+					if (candidate->Triggerer == triggerer)
+					{
+						entry = candidate;
+					}
+					break;
+				}
+			}
+
+			if (TestVolumeContainment(*volume, bbox, roomNumber))
+			{
+				if (entry == nullptr)
+				{
+					volume->Queue.push_back(
+						VolumeState
+						{ 
+							TriggerStatus::Entering, 
+							triggerer, 
+							GameTimer 
+						});
+
+					HandleEvent(set->OnEnter, triggerer);
 				}
 				else
 				{
-					volume->Status = TriggerStatus::Inside;
-					if (!set->OnInside.Function.empty() && set->OnInside.CallCounter != 0)
-					{
-						g_GameScript->ExecuteFunction(set->OnInside.Function, triggerer, set->OnInside.Data);
-						if (set->OnInside.CallCounter != NO_CALL_COUNTER)
-							set->OnInside.CallCounter--;
-					}
+					entry->Status = TriggerStatus::Inside;
+					entry->Timestamp = GameTimer;
+
+					HandleEvent(set->OnInside, triggerer);
 				}
 			}
-			else
+			else if (entry != nullptr)
 			{
-				if (volume->Status == TriggerStatus::Inside)
-				{
-					// Only fire leave event when a certain timeout has passed.
-					// This helps to filter out borderline cases when moving around volumes.
+				// Only fire leave event when a certain timeout has passed.
+				// This helps to filter out borderline cases when moving around volumes.
 
-					if (GameTimer - volume->Timeout > VOLUME_LEAVE_TIMEOUT)
-					{
-						volume->Triggerer = nullptr;
-						volume->Status = TriggerStatus::Leaving;
-						if (!set->OnLeave.Function.empty() && set->OnLeave.CallCounter != 0)
-						{
-							g_GameScript->ExecuteFunction(set->OnLeave.Function, triggerer, set->OnLeave.Data);
-							if (set->OnLeave.CallCounter != NO_CALL_COUNTER)
-								set->OnLeave.CallCounter--;
-						}
-					}
+				if (GameTimer - entry->Timestamp > VOLUME_LEAVE_TIMEOUT)
+				{
+					entry->Status = TriggerStatus::Leaving;
+					entry->Timestamp = GameTimer;
+
+					HandleEvent(set->OnLeave, triggerer);
 				}
-				else
-					volume->Status = TriggerStatus::Outside;
 			}
 		}
 	}
-
+	
 	void TestVolumes(CAMERA_INFO* camera)
 	{
 		auto pos = Pose(camera->pos.ToVector3i(), EulerAngles::Zero);
