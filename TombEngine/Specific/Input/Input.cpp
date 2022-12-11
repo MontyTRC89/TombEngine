@@ -15,6 +15,7 @@
 #include "Game/savegame.h"
 #include "Renderer/Renderer11.h"
 #include "Sound/sound.h"
+#include "Specific/winmain.h"
 
 using namespace OIS;
 using std::vector;
@@ -598,6 +599,9 @@ namespace TEN::Input
 			g_Renderer.ToggleFullScreen();
 		}
 		dbFullscreen = ((KeyMap[KC_LMENU] || KeyMap[KC_RMENU]) && KeyMap[KC_RETURN]) ? false : true;
+
+		if (!DebugMode)
+			return;
 
 		// Handle debug page switch.
 		static bool dbDebugPage = true;

@@ -24,15 +24,8 @@ struct WINAPP
     bool isInScene;
 };
 
-extern WINAPP App;
-extern unsigned int ThreadID;
-extern uintptr_t ThreadHandle;
-extern HACCEL hAccTable;
+extern bool DebugMode;
 extern HWND WindowsHandle;
-
-#if _DEBUG
-extern std::string commit;
-#endif
 
 // return handle
 #define BeginThread(function, threadid) _beginthreadex(0, 0, &function, 0, 0, &threadid)
