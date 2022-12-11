@@ -1486,10 +1486,13 @@ void TriggerFireFlame(int x, int y, int z, FlameType type, const Vector3& color1
 	}
 }
 
-void TriggerMetalSparks(int x, int y, int z, int xv, int yv, int zv, int additional)
+void TriggerMetalSparks(int x, int y, int z, int xv, int yv, int zv, const Vector3& color, int additional)
 {
 	int dx = LaraItem->Pose.Position.x - x;
 	int dz = LaraItem->Pose.Position.z - z;
+	int colorR = std::clamp(int(color.x * UCHAR_MAX), 0, UCHAR_MAX);
+	int colorG = std::clamp(int(color.y * UCHAR_MAX), 0, UCHAR_MAX);
+	int colorB = std::clamp(int(color.z * UCHAR_MAX), 0, UCHAR_MAX);
 
 	if (dx >= -16384 && dx <= 16384 && dz >= -16384 && dz <= 16384)
 	{
@@ -1497,14 +1500,14 @@ void TriggerMetalSparks(int x, int y, int z, int xv, int yv, int zv, int additio
 
 		auto* spark = GetFreeParticle();
 
-		spark->dG = (r & 0x7F) + 64;
-		spark->dB = -64 - (r & 0x7F) + 64;
+		spark->dG =  colorG;
+		spark->dB =  colorB;
 		spark->life = 10;
 		spark->sLife = 10;
-		spark->sR = 255;
-		spark->sG = 255;
-		spark->sB = 255;
-		spark->dR = 255;
+		spark->sR = colorR;
+		spark->sG = colorG;
+		spark->sB = colorB;
+		spark->dR = colorR;
 		spark->x = (r & 7) + x - 3;
 		spark->on = 1;
 		spark->colFadeSpeed = 3;
@@ -1512,7 +1515,7 @@ void TriggerMetalSparks(int x, int y, int z, int xv, int yv, int zv, int additio
 		spark->y = ((r >> 3) & 7) + y - 3;
 		spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
 		spark->friction = 34;
-		spark->scalar = 1;
+		spark->scalar = 2;
 		spark->z = ((r >> 6) & 7) + z - 3;
 		spark->flags = 2;
 		spark->xVel = (byte)(r >> 2) + xv - 128;
