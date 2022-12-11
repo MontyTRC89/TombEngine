@@ -4,6 +4,7 @@ Version 1.0.4
 * Add generic assignable effects for moveables - fire, sparks, smoke and laser / electric ignite.
 * Add ability to burn enemies with FLAME_EMITTER_1 and death blocks.
 * Activate Lara-bound volume triggers with mounted vehicles.
+* Allow multiple individual activators for the same volume at the same time.
 * Remove TRC remnant which added HK to inventory if pistols weren't available.
 * Change default shatter sound to TR4_SMASH_ROCK (tomb4 default).
 * Reduce idle pose time from 30 to 20 seconds.
