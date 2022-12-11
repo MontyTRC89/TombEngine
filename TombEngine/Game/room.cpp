@@ -191,12 +191,9 @@ bool IsPointInRoom(Vector3i pos, int roomNumber)
 {
 	auto* room = &g_Level.Rooms[roomNumber];
 
-	int xSector = (pos.x - room->x) / SECTOR(1);
-	int zSector = (pos.z - room->z) / SECTOR(1);
-
-	if ((xSector >= 0 && xSector <= (room->xSize - 1)) &&
-		(zSector >= 0 && zSector <= (room->zSize - 1)) &&
-		(pos.y <= room->minfloor && pos.y >= room->maxceiling)) // Up is -Y, hence Y should be "less" than floor.
+	if (pos.z >= (room->z + WALL_SIZE) && pos.z <= (room->z + ((room->zSize - 1) * BLOCK(1))) &&
+		pos.x >= (room->x + WALL_SIZE) && pos.x <= (room->x + ((room->xSize - 1) * BLOCK(1))) &&
+		pos.y <= room->minfloor && pos.y > room->maxceiling) // Up is -Y, hence Y should be "less" than floor.
 	{
 		return true;
 	}
@@ -204,13 +201,21 @@ bool IsPointInRoom(Vector3i pos, int roomNumber)
 	return false;
 }
 
-int FindRoomNumber(Vector3i position)
+int FindRoomNumber(Vector3i position, int startRoom)
 {
+	if (startRoom != NO_ROOM && startRoom < g_Level.Rooms.size())
+	{
+		auto& room = g_Level.Rooms[startRoom];
+		for (auto n : room.neighbors)
+			if (n != startRoom && IsPointInRoom(position, n) && g_Level.Rooms[n].Active())
+				return n;
+	}
+
 	for (int i = 0; i < g_Level.Rooms.size(); i++)
-		if (IsPointInRoom(position, i))
+		if (IsPointInRoom(position, i) && g_Level.Rooms[i].Active())
 			return i;
 
-	return 0;
+	return (startRoom != NO_ROOM) ? startRoom : 0;
 }
 
 Vector3i GetRoomCenter(int roomNumber)

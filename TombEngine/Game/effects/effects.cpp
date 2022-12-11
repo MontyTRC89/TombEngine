@@ -392,9 +392,9 @@ void UpdateSparks()
 	}
 }
 
-void TriggerRicochetSpark(GameVector* pos, short angle, int num, int unk)
+void TriggerRicochetSpark(const GameVector& pos, short angle, int count, int unk)
 {
-	TriggerRicochetSpark(pos, angle, num);
+	TriggerRicochetSpark(pos, angle, count);
 }
 
 void TriggerCyborgSpark(int x, int y, int z, short xv, short yv, short zv)
@@ -893,12 +893,12 @@ void TriggerUnderwaterBlood(int x, int y, int z, int size)
 	}
 }
 
-void Ricochet(Pose* pos)
+void Ricochet(Pose& pose)
 {
-	short angle = Geometry::GetOrientToPoint(pos->Position.ToVector3(), LaraItem->Pose.Position.ToVector3()).y;
-	auto target = GameVector(pos->Position);
-	TriggerRicochetSpark(&target, angle / 16, 3, 0);
-	SoundEffect(SFX_TR4_WEAPON_RICOCHET, pos);
+	short angle = Geometry::GetOrientToPoint(pose.Position.ToVector3(), LaraItem->Pose.Position.ToVector3()).y;
+	auto target = GameVector(pose.Position);
+	TriggerRicochetSpark(target, angle / 16, 3, 0);
+	SoundEffect(SFX_TR4_WEAPON_RICOCHET, &pose);
 }
 
 void ControlWaterfallMist(short itemNumber)
@@ -1627,7 +1627,7 @@ void ProcessEffects(ItemInfo* item)
 
 		case EffectType::Sparks:
 			if (TestProbability(1 / 10.0f))
-				TriggerElectricSpark(&GameVector(pos.x, pos.y, pos.z, item->RoomNumber),
+				TriggerElectricSpark(GameVector(pos, item->RoomNumber),
 					EulerAngles(0, Random::GenerateAngle(ANGLE(0), ANGLE(359)), 0), 2);
 			if (TestProbability(1 / 64.0f))
 				TriggerRocketSmoke(pos.x, pos.y, pos.z, 0);
@@ -1635,7 +1635,7 @@ void ProcessEffects(ItemInfo* item)
 
 		case EffectType::ElectricIgnite:
 			if (TestProbability(1 / 1.0f))
-				TriggerElectricSpark(&GameVector(pos.x, pos.y, pos.z, item->RoomNumber),
+				TriggerElectricSpark(GameVector(pos, item->RoomNumber),
 					EulerAngles(0, Random::GenerateAngle(ANGLE(0), ANGLE(359)), 0), 2);
 			if (TestProbability(1 / 1.0f))
 				TriggerFireFlame(pos.x, pos.y, pos.z, TestProbability(1 / 10.0f) ? FlameType::Medium : FlameType::Medium, 
@@ -1709,7 +1709,7 @@ void ProcessEffects(ItemInfo* item)
 		item->Effect.Type = EffectType::None;
 }
 
-void TriggerAttackFlame(const Vector3i& pos, const Vector3& color, int size)
+void TriggerAttackFlame(const Vector3i& pos, const Vector3& color, int scale)
 {
 	auto& spark = *GetFreeParticle();
 
@@ -1721,19 +1721,19 @@ void TriggerAttackFlame(const Vector3i& pos, const Vector3& color, int size)
 	spark.dG = color.y;
 	spark.dB = color.z;
 	spark.fadeToBlack = 8;
-	spark.colFadeSpeed = (GetRandomControl() & 3) + 4;
+	spark.colFadeSpeed = Random::GenerateInt(4, 8);
 	spark.blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
-	spark.life = (GetRandomControl() & 7) + 20;
+	spark.life = Random::GenerateInt(20, 28);
 	spark.sLife = spark.life;
-	spark.x = pos.x + (GetRandomControl() & 0xF) - 8;
+	spark.x = pos.x + Random::GenerateInt(-8, 8);
 	spark.y = pos.y;
-	spark.z = pos.z + (GetRandomControl() & 0xF) - 8;
-	spark.xVel = (GetRandomControl() & 0xFF) - 128;
+	spark.z = pos.z + Random::GenerateInt(-8, 8);
+	spark.xVel = Random::GenerateInt(-128, 128);
 	spark.yVel = 0;
-	spark.zVel = (GetRandomControl() & 0xFF) - 128;
+	spark.zVel = Random::GenerateInt(-128, 128);
 	spark.friction = 5;
 	spark.flags = SP_EXPDEF | SP_DEF | SP_SCALE;
-	spark.rotAng = GetRandomControl() & 0xFFF;
+	spark.rotAng = Random::GenerateInt(0, 4096); // NOTE: Effect angles use [0, 4096] range.
 
 	if (TestProbability(1 / 2.0f))
 		spark.rotAdd = -32 - (GetRandomControl() & 0x1F);
@@ -1741,9 +1741,9 @@ void TriggerAttackFlame(const Vector3i& pos, const Vector3& color, int size)
 		spark.rotAdd = (GetRandomControl() & 0x1F) + 32;
 
 	spark.maxYvel = 0;
-	spark.gravity = (GetRandomControl() & 0x1F) + 16;
+	spark.gravity = Random::GenerateInt(16, 48);
 	spark.scalar = 2;
-	spark.size = (GetRandomControl() & 0xF) + size;
+	spark.size = Random::GenerateInt(0, 16) + scale;
 	spark.sSize = spark.size;
 	spark.dSize = spark.size / 4;
 }

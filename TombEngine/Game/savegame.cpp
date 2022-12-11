@@ -567,7 +567,7 @@ bool SaveGame::Save(int slot)
 			mineBuilder.add_floor_height_front(mine->FloorHeightFront);
 			mineBuilder.add_floor_height_middle(mine->FloorHeightMiddle);
 			mineBuilder.add_gradient(mine->Gradient);
-			mineBuilder.add_stop_delay(mine->StopDelay);
+			mineBuilder.add_stop_delay(mine->StopDelayTime);
 			mineBuilder.add_turn_len(mine->TurnLen);
 			mineBuilder.add_turn_rot(mine->TurnRot);
 			mineBuilder.add_turn_x(mine->TurnX);
@@ -758,6 +758,12 @@ bool SaveGame::Save(int slot)
 		soundTrackMap.push_back(track.second.Mask); 
 	}
 	auto soundtrackMapOffset = fbb.CreateVector(soundTrackMap);
+
+	// Action queue
+	std::vector<int> actionQueue;
+	for (int i = 0; i < ActionQueue.size(); i++)
+		actionQueue.push_back((int)ActionQueue[i]);
+	auto actionQueueOffset = fbb.CreateVector(actionQueue);
 
 	// Flipmaps
 	std::vector<int> flipMaps;
@@ -1137,6 +1143,7 @@ bool SaveGame::Save(int slot)
 	sgb.add_oneshot_track(oneshotTrackOffset);
 	sgb.add_oneshot_position(oneshotTrackData.second);
 	sgb.add_cd_flags(soundtrackMapOffset);
+	sgb.add_action_queue(actionQueueOffset);
 	sgb.add_flip_maps(flipMapsOffset);
 	sgb.add_flip_stats(flipStatsOffset);
 	sgb.add_room_items(roomItemsOffset);
@@ -1233,6 +1240,13 @@ bool SaveGame::Load(int slot)
 
 	// Restore camera FOV
 	AlterFOV(s->current_fov());
+
+	// Restore action queue
+	for (int i = 0; i < s->action_queue()->size(); i++)
+	{
+		assertion(i < ActionQueue.size(), "Action queue size was changed");
+		ActionQueue[i] = (QueueState)s->action_queue()->Get(i);
+	}
 
 	// Restore soundtracks
 	PlaySoundTrack(s->ambient_track()->str(), SoundTrackType::BGM, s->ambient_position());
@@ -1507,7 +1521,7 @@ bool SaveGame::Load(int slot)
 			minecart->FloorHeightFront = savedMine->floor_height_front();
 			minecart->FloorHeightMiddle = savedMine->floor_height_middle();
 			minecart->Gradient = savedMine->gradient();
-			minecart->StopDelay = savedMine->stop_delay();
+			minecart->StopDelayTime = savedMine->stop_delay();
 			minecart->TurnLen = savedMine->turn_len();
 			minecart->TurnRot = savedMine->turn_rot();
 			minecart->TurnX = savedMine->turn_x();

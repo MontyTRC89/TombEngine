@@ -332,8 +332,8 @@ namespace TEN::Entities
 		obj = &Objects[ID_SETHA];
 		if (obj->loaded)
 		{
-			obj->initialise = InitialiseSetha;
-			obj->control = SethaControl;
+			obj->initialise = InitialiseSeth;
+			obj->control = SethControl;
 			obj->collision = CreatureCollision;
 			obj->shadowType = ShadowMode::All;
 			obj->HitPoints = 500;

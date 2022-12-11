@@ -4,7 +4,6 @@
 #include "Game/collision/collide_item.h"
 #include "Game/control/box.h"
 #include "Game/itemdata/creature_info.h"
-#include "Game/Lara/lara_flare.h"
 #include "Game/Lara/lara_initialise.h"
 #include "Game/Lara/lara_one_gun.h"
 #include "Game/pickup/pickup.h"
@@ -777,7 +776,7 @@ static void StartEntity(ObjectInfo *obj)
 
 static void StartObject(ObjectInfo *obj)
 {
-	InitPickupItem(obj, FlareControl, ID_FLARE_ITEM);
+	InitFlare(obj, ID_FLARE_ITEM);
 
 	for (int objNumber = ID_SEARCH_OBJECT1; objNumber <= ID_SEARCH_OBJECT4; objNumber++)
 		InitSearchObject(obj, objNumber);

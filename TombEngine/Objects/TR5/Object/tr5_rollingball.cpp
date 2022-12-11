@@ -51,20 +51,23 @@ void RollingBallControl(short itemNumber)
 	int hDivider = isWater ? 64 : 32;
 	int vDivider = isWater ? 3 : 1;
 
+	int smallRadius = CLICK(0.5f);
+	int bigRadius   = CLICK(2) - 1;
+
 	item->Animation.Velocity.y += GRAVITY;
 	item->Pose.Position.x += item->ItemFlags[0] / hDivider;
 	item->Pose.Position.y += item->Animation.Velocity.y / vDivider;
 	item->Pose.Position.z += item->ItemFlags[1] / hDivider;
 	item->Animation.Velocity.z = Vector3i::Distance(item->Pose.Position, oldPos.Position);
 
-	int dh = GetCollision(item).Position.Floor - CLICK(2);
+	int dh = GetCollision(item).Position.Floor - bigRadius;
 
 	if (item->Pose.Position.y > dh)
 	{
 		if (abs(item->Animation.Velocity.y) > 16.0f)
 		{
 			float distance = Vector3::Distance(item->Pose.Position.ToVector3(), Camera.pos.ToVector3());
-			if (distance < 16384)
+			if (distance < BLOCK(16))
 			{
 				if ((item->TriggerFlags & 1) != 1) // Flag 1 = silent.
 				{
@@ -74,7 +77,7 @@ void RollingBallControl(short itemNumber)
 			}
 		}
 
-		if ((item->Pose.Position.y - dh) < CLICK(2))
+		if ((item->Pose.Position.y - dh) < bigRadius)
 			item->Pose.Position.y = dh;
 
 		if (item->Animation.Velocity.y <= 64)
@@ -89,12 +92,12 @@ void RollingBallControl(short itemNumber)
 	}
 
 	int frontX = item->Pose.Position.x;
-	int frontZ = item->Pose.Position.z + CLICK(0.5f);
+	int frontZ = item->Pose.Position.z + smallRadius;
 	int backX  = item->Pose.Position.x;
-	int backZ  = item->Pose.Position.z - CLICK(0.5f);
-	int rightX = item->Pose.Position.x + CLICK(0.5f);
+	int backZ  = item->Pose.Position.z - smallRadius;
+	int rightX = item->Pose.Position.x + smallRadius;
 	int rightZ = item->Pose.Position.z;
-	int leftX  = item->Pose.Position.x - CLICK(0.5f);
+	int leftX  = item->Pose.Position.x - smallRadius;
 	int leftZ  = item->Pose.Position.z;
 
 	auto frontFloor = GetCollision(frontX, item->Pose.Position.y, frontZ, item->RoomNumber);
@@ -102,23 +105,23 @@ void RollingBallControl(short itemNumber)
 	auto rightFloor = GetCollision(rightX, item->Pose.Position.y, rightZ, item->RoomNumber);
 	auto leftFloor  = GetCollision(leftX,  item->Pose.Position.y, leftZ,  item->RoomNumber);
 
-	int frontHeight = frontFloor.Position.Floor - CLICK(2);
-	int backHeight  = backFloor.Position.Floor  - CLICK(2);
-	int rightHeight = rightFloor.Position.Floor - CLICK(2);
-	int leftHeight  = leftFloor.Position.Floor  - CLICK(2);
+	int frontHeight = frontFloor.Position.Floor - bigRadius;
+	int backHeight  = backFloor.Position.Floor  - bigRadius;
+	int rightHeight = rightFloor.Position.Floor - bigRadius;
+	int leftHeight  = leftFloor.Position.Floor  - bigRadius;
 
-	int frontCeiling = frontFloor.Position.Ceiling + CLICK(2);
-	int backCeiling  = backFloor.Position.Ceiling  + CLICK(2);
-	int rightCeiling = rightFloor.Position.Ceiling + CLICK(2);
-	int leftCeiling  = leftFloor.Position.Ceiling  + CLICK(2);
+	int frontCeiling = frontFloor.Position.Ceiling + bigRadius;
+	int backCeiling  = backFloor.Position.Ceiling  + bigRadius;
+	int rightCeiling = rightFloor.Position.Ceiling + bigRadius;
+	int leftCeiling  = leftFloor.Position.Ceiling  + bigRadius;
 
 	frontX = item->Pose.Position.x;
-	frontZ = item->Pose.Position.z + CLICK(2);
+	frontZ = item->Pose.Position.z + bigRadius;
 	backX  = item->Pose.Position.x;
-	backZ  = item->Pose.Position.z - CLICK(2);
-	rightX = item->Pose.Position.x + CLICK(2);
+	backZ  = item->Pose.Position.z - bigRadius;
+	rightX = item->Pose.Position.x + bigRadius;
 	rightZ = item->Pose.Position.z;
-	leftX  = item->Pose.Position.x - CLICK(2);
+	leftX  = item->Pose.Position.x - bigRadius;
 	leftZ  = item->Pose.Position.z;
 
 	auto fronFarFloor  = GetCollision(frontX, item->Pose.Position.y, frontZ, item->RoomNumber);
@@ -126,15 +129,15 @@ void RollingBallControl(short itemNumber)
 	auto rightFarFloor = GetCollision(rightX, item->Pose.Position.y, rightZ, item->RoomNumber);
 	auto leftFarFloor  = GetCollision(leftX,  item->Pose.Position.y, leftZ,  item->RoomNumber);
 
-	int frontFarHeight = fronFarFloor.Position.Floor  - CLICK(2);
-	int backFarHeight  = backFarFloor.Position.Floor  - CLICK(2);
-	int rightFarHeight = rightFarFloor.Position.Floor - CLICK(2);
-	int leftFarHeight  = leftFarFloor.Position.Floor  - CLICK(2);
+	int frontFarHeight = fronFarFloor.Position.Floor  - bigRadius;
+	int backFarHeight  = backFarFloor.Position.Floor  - bigRadius;
+	int rightFarHeight = rightFarFloor.Position.Floor - bigRadius;
+	int leftFarHeight  = leftFarFloor.Position.Floor  - bigRadius;
 
-	int frontFarCeiling = fronFarFloor.Position.Ceiling  + CLICK(2);
-	int backFarCeiling  = backFarFloor.Position.Ceiling  + CLICK(2);
-	int rightFarCeiling = rightFarFloor.Position.Ceiling + CLICK(2);
-	int leftFarCeiling  = leftFarFloor.Position.Ceiling  + CLICK(2);
+	int frontFarCeiling = fronFarFloor.Position.Ceiling  + bigRadius;
+	int backFarCeiling  = backFarFloor.Position.Ceiling  + bigRadius;
+	int rightFarCeiling = rightFarFloor.Position.Ceiling + bigRadius;
+	int leftFarCeiling  = leftFarFloor.Position.Ceiling  + bigRadius;
 
 	if (item->Pose.Position.y - dh > -CLICK(1) ||
 		item->Pose.Position.y - frontFarHeight >= CLICK(2) ||

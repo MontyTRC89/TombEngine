@@ -169,7 +169,7 @@ void ObjectsHandler::TestCollidingObjects()
 
 void ObjectsHandler::AssignLara()
 {
-	m_table_objects.set(ScriptReserved_Lara, LaraObject(Lara.ItemNumber, false));
+	m_table_objects.set(ScriptReserved_Lara, LaraObject(Lara.ItemNumber, true));
 }
 
 
