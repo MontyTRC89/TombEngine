@@ -210,18 +210,12 @@ void LaraObject::SetWeaponType(LaraWeaponType weaponType, bool activate)
 	case LaraWeaponType::Flare:
 		lara->Control.Weapon.RequestGunType = LaraWeaponType::Flare;
 		break;
+
 	case LaraWeaponType::Torch:
-		if (activate == false)
-		{
-			GetFlameTorch();
-			lara->Torch.IsLit = false;
-		}
-		else
-		{
-			GetFlameTorch();
-			lara->Torch.IsLit = true;
-		}
+		GetFlameTorch();
+		lara->Torch.IsLit = activate;
 		break;
+
 	default:
 		if (activate == false)
 			lara->Control.Weapon.LastGunType = weaponType;
@@ -273,10 +267,14 @@ std::unique_ptr<Moveable> LaraObject::GetTarget() const
 	return std::make_unique<Moveable>(lara->TargetEntity->Index);
 }
 
+/// Get current light state of the torch, if it exists
+// @function LaraObject:TorchIsLit
+// @treturn bool is torch currently lit or not? (false if no torch exists)
+// @usage
+// local torchIsLit = Lara:TorchIsLit()
 bool LaraObject::TorchIsLit() const
 {
 	auto* lara = GetLaraInfo(m_item);
-	GetFlameTorch();
 	return lara->Torch.IsLit;
 }
 
