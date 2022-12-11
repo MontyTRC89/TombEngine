@@ -20,24 +20,22 @@ namespace TEN::Control::Volumes
 
 	bool TestVolumeContainment(TriggerVolume& volume, BoundingOrientedBox& bbox, short roomNumber)
 	{
-		bool result = false;
-
 		switch (volume.Type)
 		{
 		case VolumeType::Box:
 			if (roomNumber == Camera.pos.RoomNumber)
 				g_Renderer.AddDebugBox(volume.Box, Vector4(1.0f, 0.0f, 1.0f, 1.0f), RENDERER_DEBUG_PAGE::LOGIC_STATS);
-			result = volume.Box.Intersects(bbox);
-			break;
+			return volume.Box.Intersects(bbox);
 
 		case VolumeType::Sphere:
 			if (roomNumber == Camera.pos.RoomNumber)
 				g_Renderer.AddDebugSphere(volume.Sphere.Center, volume.Sphere.Radius, Vector4(1.0f, 0.0f, 1.0f, 1.0f), RENDERER_DEBUG_PAGE::LOGIC_STATS);
-			result = volume.Sphere.Intersects(bbox);
-			break;
-		}
+			return volume.Sphere.Intersects(bbox);
 
-		return result;
+		default:
+			TENLog("Unsupported volume type encountered in room " + std::to_string(roomNumber), LogLevel::Error);
+			return false;
+		}
 	}
 
 	void HandleEvent(VolumeEvent& evt, VolumeTriggerer& triggerer)
