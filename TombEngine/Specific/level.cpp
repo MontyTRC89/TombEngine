@@ -780,7 +780,7 @@ void ReadRooms()
 		{
 			TriggerVolume volume;
 
-			volume.Type = (TriggerVolumeType)ReadInt32();
+			volume.Type = (VolumeType)ReadInt32();
 
 			volume.Position.x = ReadFloat();
 			volume.Position.y = ReadFloat();

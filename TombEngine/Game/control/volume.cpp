@@ -24,13 +24,13 @@ namespace TEN::Control::Volumes
 
 		switch (volume.Type)
 		{
-		case TriggerVolumeType::Box:
+		case VolumeType::Box:
 			if (roomNumber == Camera.pos.RoomNumber)
 				g_Renderer.AddDebugBox(volume.Box, Vector4(1.0f, 0.0f, 1.0f, 1.0f), RENDERER_DEBUG_PAGE::LOGIC_STATS);
 			result = volume.Box.Intersects(bbox);
 			break;
 
-		case TriggerVolumeType::Sphere:
+		case VolumeType::Sphere:
 			if (roomNumber == Camera.pos.RoomNumber)
 				g_Renderer.AddDebugSphere(volume.Sphere.Center, volume.Sphere.Radius, Vector4(1.0f, 0.0f, 1.0f, 1.0f), RENDERER_DEBUG_PAGE::LOGIC_STATS);
 			result = volume.Sphere.Intersects(bbox);
@@ -50,7 +50,7 @@ namespace TEN::Control::Volumes
 		}
 	}
 
-	void TestVolumes(short roomNumber, BoundingOrientedBox bbox, TriggerVolumeActivatorType activatorType, VolumeTriggerer triggerer)
+	void TestVolumes(short roomNumber, BoundingOrientedBox bbox, VolumeActivatorType activatorType, VolumeTriggerer triggerer)
 	{
 		auto* room = &g_Level.Rooms[roomNumber];
 
@@ -74,14 +74,14 @@ namespace TEN::Control::Volumes
 
 				switch (candidate->Status)
 				{
-				case TriggerStatus::Leaving:
+				case VolumeStateStatus::Leaving:
 					if (GameTimer - candidate->Timestamp > VOLUME_BUSY_TIMEOUT)
 					{
-						candidate->Status = TriggerStatus::Outside;
+						candidate->Status = VolumeStateStatus::Outside;
 					}
 					break;
 
-				case TriggerStatus::Outside:
+				case VolumeStateStatus::Outside:
 					volume->Queue.erase(volume->Queue.begin() + j);
 					break;
 
@@ -101,7 +101,7 @@ namespace TEN::Control::Volumes
 					volume->Queue.push_back(
 						VolumeState
 						{ 
-							TriggerStatus::Entering, 
+							VolumeStateStatus::Entering,
 							triggerer, 
 							GameTimer 
 						});
@@ -110,7 +110,7 @@ namespace TEN::Control::Volumes
 				}
 				else
 				{
-					entry->Status = TriggerStatus::Inside;
+					entry->Status = VolumeStateStatus::Inside;
 					entry->Timestamp = GameTimer;
 
 					HandleEvent(set->OnInside, triggerer);
@@ -123,7 +123,7 @@ namespace TEN::Control::Volumes
 
 				if (GameTimer - entry->Timestamp > VOLUME_LEAVE_TIMEOUT)
 				{
-					entry->Status = TriggerStatus::Leaving;
+					entry->Status = VolumeStateStatus::Leaving;
 					entry->Timestamp = GameTimer;
 
 					HandleEvent(set->OnLeave, triggerer);
@@ -141,14 +141,14 @@ namespace TEN::Control::Volumes
 
 		auto bBox = box.ToBoundingOrientedBox(pos);
 
-		TestVolumes(camera->pos.RoomNumber, bBox, TriggerVolumeActivatorType::Flyby, camera);
+		TestVolumes(camera->pos.RoomNumber, bBox, VolumeActivatorType::Flyby, camera);
 	}
 
 	void TestVolumes(short roomNumber, MESH_INFO* mesh)
 	{
 		const auto& bBox = GetBoundsAccurate(*mesh, false).ToBoundingOrientedBox(mesh->pos);
 		
-		TestVolumes(roomNumber, bBox, TriggerVolumeActivatorType::Static, mesh);
+		TestVolumes(roomNumber, bBox, VolumeActivatorType::Static, mesh);
 	}
 
 	void TestVolumes(short itemNumber)
@@ -161,11 +161,11 @@ namespace TEN::Control::Volumes
 #endif
 
 		if (item->ObjectNumber == ID_LARA || item->Index == Lara.Vehicle)
-			TestVolumes(item->RoomNumber, bBox, TriggerVolumeActivatorType::Player, itemNumber);
+			TestVolumes(item->RoomNumber, bBox, VolumeActivatorType::Player, itemNumber);
 		else if (Objects[item->ObjectNumber].intelligent)
-			TestVolumes(item->RoomNumber, bBox, TriggerVolumeActivatorType::NPC, itemNumber);
+			TestVolumes(item->RoomNumber, bBox, VolumeActivatorType::NPC, itemNumber);
 		else
-			TestVolumes(item->RoomNumber, bBox, TriggerVolumeActivatorType::Moveable, itemNumber);
+			TestVolumes(item->RoomNumber, bBox, VolumeActivatorType::Moveable, itemNumber);
 	}
 
 	void InitialiseNodeScripts()

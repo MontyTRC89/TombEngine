@@ -12,7 +12,7 @@ constexpr auto VOLUME_LEAVE_TIMEOUT = 5;
 
 constexpr auto VOLUME_ACTIVATOR_QUEUE_SIZE = 16;
 
-enum class TriggerStatus
+enum class VolumeStateStatus
 {
 	Outside,
 	Entering,
@@ -20,14 +20,14 @@ enum class TriggerStatus
 	Leaving
 };
 
-enum class TriggerVolumeType
+enum class VolumeType
 {
 	Box,
 	Sphere,
 	Prism	// TODO: Unsupported as of now.
 };
 
-enum TriggerVolumeActivatorType
+enum VolumeActivatorType
 {
 	Player = 1,
 	NPC = 2,
@@ -39,20 +39,20 @@ enum TriggerVolumeActivatorType
 
 struct VolumeState
 {
-	TriggerStatus Status = TriggerStatus::Outside;
+	VolumeStateStatus Status = VolumeStateStatus::Outside;
 	VolumeTriggerer Triggerer = nullptr;
 	int Timestamp = 0;
 };
 
 struct TriggerVolume
 {
-	TriggerVolumeType Type;
+	VolumeType Type;
 	std::string Name = {};
 	int EventSetIndex;
 
 	Vector3 Position;
 	Quaternion Rotation;
-	Vector3 Scale;	// x used as radius if type is TriggerVolumeType::Sphere.
+	Vector3 Scale;	// x used as radius if type is VolumeType::Sphere.
 
 	BoundingOrientedBox Box;
 	BoundingSphere Sphere;
@@ -62,7 +62,7 @@ struct TriggerVolume
 
 namespace TEN::Control::Volumes
 {
-	void TestVolumes(short roomNumber, BoundingOrientedBox bbox, TriggerVolumeActivatorType activatorType, VolumeTriggerer triggerer);
+	void TestVolumes(short roomNumber, BoundingOrientedBox bbox, VolumeActivatorType activatorType, VolumeTriggerer triggerer);
 	void TestVolumes(short itemNum);
 	void TestVolumes(short roomNumber, MESH_INFO* mesh);
 	void TestVolumes(CAMERA_INFO* camera);

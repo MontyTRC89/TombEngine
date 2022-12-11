@@ -1309,7 +1309,7 @@ bool SaveGame::Load(int slot)
 			room->triggerVolumes[number].Queue.push_back(
 				VolumeState
 				{
-					(TriggerStatus)state->status(),
+					(VolumeStateStatus)state->status(),
 					(short)state->triggerer(),
 					state->timestamp()
 				});
