@@ -46,7 +46,7 @@ Version 1.0.4
 
 Lua API changes:
 * Add new Moveable functions: GetEffect, SetEffect and SetCustomEffect (for colored fire).
-* Add new Lara functions: GetTarget and GetVehicle.
+* Add new Lara functions: GetTarget, GetVehicle and TorchIsLit.
 * Remove Lara functions: SetOnFire and GetOnFire (replaced with GetEffect and SetEffect).
 * Add Gameflow.lua options:
   - Flow.EnableMassPickup for mass pickup functionality.
