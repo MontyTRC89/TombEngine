@@ -34,8 +34,8 @@ namespace TEN::Effects::Blood
 
 	constexpr auto BLOOD_DRIP_LIFE_MAX			 = 5.0f;
 	constexpr auto BLOOD_DRIP_LIFE_START_FADING	 = 0.5f;
-	constexpr auto BLOOD_DRIP_GRAVITY_MIN		 = 5.0f;
 	constexpr auto BLOOD_DRIP_GRAVITY_MAX		 = 15.0f;
+	constexpr auto BLOOD_DRIP_GRAVITY_MIN		 = 5.0f;
 	constexpr auto BLOOD_DRIP_SPRAY_VELOCITY_MAX = 45.0f;
 	constexpr auto BLOOD_DRIP_SPRAY_VELOCITY_MIN = 15.0f;
 	constexpr auto BLOOD_DRIP_SPRAY_SEMIANGLE	 = 50.0f;

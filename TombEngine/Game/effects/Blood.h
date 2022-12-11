@@ -24,7 +24,6 @@ namespace TEN::Effects::Blood
 		float Init	   = 0.0f;
 		float Scale	   = 0.0f;
 		float Opacity  = 0.0f;
-
 	};
 
 	struct BloodMist
