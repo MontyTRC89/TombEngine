@@ -31,6 +31,7 @@ Version 1.0.4
 * Fix throwing flare without drawing any weapons if there are no weapons present.
 * Fix several incorrect FOV reset issues.
 * Fix current soundtrack fading into silence if incoming one doesn't exist.
+* Fix crash if there is an attempt to display a string with missing characters.
 
 Lua API changes:
 * Add new Moveable functions: GetEffect, SetEffect and SetCustomEffect (for colored fire).
