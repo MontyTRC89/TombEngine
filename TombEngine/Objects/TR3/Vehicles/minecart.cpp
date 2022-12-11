@@ -50,8 +50,8 @@ namespace TEN::Entities::Vehicles
 	constexpr auto MINECART_BACK_GRADIENT	  = CLICK(0.5f);
 	constexpr auto MINECART_NUM_HITS		  = 25;
 
+	constexpr auto MINECART_FALL_DAMAGE_COEFF		 = 0.25f;
 	constexpr auto MINECART_FALL_DAMAGE_DELAY_TIME	 = 0.2f * FPS;
-	constexpr auto MINECART_FALL_DAMAGE_MULT		 = 4;
 	constexpr auto MINECART_WRENCH_MESH_TOGGLE_FRAME = 20;
 
 	const auto MINECART_TERMINAL_ANGLE = ANGLE(22.0f);
@@ -556,7 +556,7 @@ namespace TEN::Entities::Vehicles
 			if (minecart->FallTime > MINECART_FALL_DAMAGE_DELAY_TIME)
 			{
 				float velocity = minecart->Velocity / VEHICLE_VELOCITY_SCALE;
-				DoDamage(LaraItem, (SQUARE(minecart->FallTime) / MINECART_FALL_DAMAGE_MULT) + velocity);
+				DoDamage(LaraItem, (SQUARE(minecart->FallTime) * MINECART_FALL_DAMAGE_COEFF) + velocity);
 				SoundEffect(SFX_TR3_VEHICLE_QUADBIKE_FRONT_IMPACT, &minecartItem->Pose, SoundEnvironment::Always);
 			}
 
