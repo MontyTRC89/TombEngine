@@ -32,8 +32,7 @@ WINAPP App;
 unsigned int ThreadID;
 uintptr_t ThreadHandle;
 HACCEL hAccTable;
-byte receivedWmClose = false;
-bool Debug = false;
+bool DebugMode = false;
 HWND WindowsHandle;
 DWORD MainThreadID;
 
@@ -171,6 +170,8 @@ void CALLBACK HandleWmCommand(unsigned short wParam)
 
 LRESULT CALLBACK WinAppProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
+	static bool receivedWmClose = false;
+
 	// Disables ALT + SPACE
 	if (msg == WM_SYSCOMMAND && wParam == SC_KEYMENU)
 	{
@@ -209,7 +210,7 @@ LRESULT CALLBACK WinAppProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			if (!g_Configuration.Windowed)
 				g_Renderer.ToggleFullScreen(true);
 
-			if (!Debug && ThreadHandle > 0)
+			if (!DebugMode && ThreadHandle > 0)
 			{
 				TENLog("Resuming game thread", LogLevel::Info);
 				ResumeThread((HANDLE)ThreadHandle);
@@ -224,7 +225,7 @@ LRESULT CALLBACK WinAppProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		if (!g_Configuration.Windowed)
 			ShowWindow(hWnd, SW_MINIMIZE);
 
-		if (!Debug)
+		if (!DebugMode)
 		{
 			TENLog("Suspending game thread", LogLevel::Info);
 			SuspendThread((HANDLE)ThreadHandle);
@@ -258,7 +259,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		}
 		else if (ArgEquals(argv[i], "debug"))
 		{
-			Debug = true;
+			DebugMode = true;
 		}
 		else if (ArgEquals(argv[i], "level") && argc > (i + 1))
 		{
