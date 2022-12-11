@@ -375,6 +375,7 @@ table VolumeState {
 table Volume {
 	number: int32;
 	room_number: int32;
+	enabled: bool;
 	position: Vector3;
 	rotation: Vector4;
 	scale: Vector3;

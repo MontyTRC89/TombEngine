@@ -50,6 +50,8 @@ struct TriggerVolume
 	std::string Name = {};
 	int EventSetIndex;
 
+	bool Enabled = true;
+
 	Vector3 Position;
 	Quaternion Rotation;
 	Vector3 Scale;	// x used as radius if type is VolumeType::Sphere.

@@ -58,6 +58,9 @@ namespace TEN::Control::Volumes
 		{
 			auto* volume = &room->triggerVolumes[i];
 
+			if (!volume->Enabled)
+				continue;
+
 			if (volume->EventSetIndex == NO_EVENT_SET)
 				continue;
 

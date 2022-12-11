@@ -5222,6 +5222,7 @@ struct VolumeT : public flatbuffers::NativeTable {
   typedef Volume TableType;
   int32_t number = 0;
   int32_t room_number = 0;
+  bool enabled = false;
   std::unique_ptr<TEN::Save::Vector3> position{};
   std::unique_ptr<TEN::Save::Vector4> rotation{};
   std::unique_ptr<TEN::Save::Vector3> scale{};
@@ -5236,17 +5237,21 @@ struct Volume FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_NUMBER = 4,
     VT_ROOM_NUMBER = 6,
-    VT_POSITION = 8,
-    VT_ROTATION = 10,
-    VT_SCALE = 12,
-    VT_TIMESTAMP = 14,
-    VT_QUEUE = 16
+    VT_ENABLED = 8,
+    VT_POSITION = 10,
+    VT_ROTATION = 12,
+    VT_SCALE = 14,
+    VT_TIMESTAMP = 16,
+    VT_QUEUE = 18
   };
   int32_t number() const {
     return GetField<int32_t>(VT_NUMBER, 0);
   }
   int32_t room_number() const {
     return GetField<int32_t>(VT_ROOM_NUMBER, 0);
+  }
+  bool enabled() const {
+    return GetField<uint8_t>(VT_ENABLED, 0) != 0;
   }
   const TEN::Save::Vector3 *position() const {
     return GetStruct<const TEN::Save::Vector3 *>(VT_POSITION);
@@ -5267,6 +5272,7 @@ struct Volume FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     return VerifyTableStart(verifier) &&
            VerifyField<int32_t>(verifier, VT_NUMBER) &&
            VerifyField<int32_t>(verifier, VT_ROOM_NUMBER) &&
+           VerifyField<uint8_t>(verifier, VT_ENABLED) &&
            VerifyField<TEN::Save::Vector3>(verifier, VT_POSITION) &&
            VerifyField<TEN::Save::Vector4>(verifier, VT_ROTATION) &&
            VerifyField<TEN::Save::Vector3>(verifier, VT_SCALE) &&
@@ -5290,6 +5296,9 @@ struct VolumeBuilder {
   }
   void add_room_number(int32_t room_number) {
     fbb_.AddElement<int32_t>(Volume::VT_ROOM_NUMBER, room_number, 0);
+  }
+  void add_enabled(bool enabled) {
+    fbb_.AddElement<uint8_t>(Volume::VT_ENABLED, static_cast<uint8_t>(enabled), 0);
   }
   void add_position(const TEN::Save::Vector3 *position) {
     fbb_.AddStruct(Volume::VT_POSITION, position);
@@ -5321,6 +5330,7 @@ inline flatbuffers::Offset<Volume> CreateVolume(
     flatbuffers::FlatBufferBuilder &_fbb,
     int32_t number = 0,
     int32_t room_number = 0,
+    bool enabled = false,
     const TEN::Save::Vector3 *position = 0,
     const TEN::Save::Vector4 *rotation = 0,
     const TEN::Save::Vector3 *scale = 0,
@@ -5334,6 +5344,7 @@ inline flatbuffers::Offset<Volume> CreateVolume(
   builder_.add_position(position);
   builder_.add_room_number(room_number);
   builder_.add_number(number);
+  builder_.add_enabled(enabled);
   return builder_.Finish();
 }
 
@@ -5346,6 +5357,7 @@ inline flatbuffers::Offset<Volume> CreateVolumeDirect(
     flatbuffers::FlatBufferBuilder &_fbb,
     int32_t number = 0,
     int32_t room_number = 0,
+    bool enabled = false,
     const TEN::Save::Vector3 *position = 0,
     const TEN::Save::Vector4 *rotation = 0,
     const TEN::Save::Vector3 *scale = 0,
@@ -5356,6 +5368,7 @@ inline flatbuffers::Offset<Volume> CreateVolumeDirect(
       _fbb,
       number,
       room_number,
+      enabled,
       position,
       rotation,
       scale,
@@ -8304,6 +8317,7 @@ inline void Volume::UnPackTo(VolumeT *_o, const flatbuffers::resolver_function_t
   (void)_resolver;
   { auto _e = number(); _o->number = _e; }
   { auto _e = room_number(); _o->room_number = _e; }
+  { auto _e = enabled(); _o->enabled = _e; }
   { auto _e = position(); if (_e) _o->position = std::unique_ptr<TEN::Save::Vector3>(new TEN::Save::Vector3(*_e)); }
   { auto _e = rotation(); if (_e) _o->rotation = std::unique_ptr<TEN::Save::Vector4>(new TEN::Save::Vector4(*_e)); }
   { auto _e = scale(); if (_e) _o->scale = std::unique_ptr<TEN::Save::Vector3>(new TEN::Save::Vector3(*_e)); }
@@ -8321,6 +8335,7 @@ inline flatbuffers::Offset<Volume> CreateVolume(flatbuffers::FlatBufferBuilder &
   struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const VolumeT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
   auto _number = _o->number;
   auto _room_number = _o->room_number;
+  auto _enabled = _o->enabled;
   auto _position = _o->position ? _o->position.get() : 0;
   auto _rotation = _o->rotation ? _o->rotation.get() : 0;
   auto _scale = _o->scale ? _o->scale.get() : 0;
@@ -8330,6 +8345,7 @@ inline flatbuffers::Offset<Volume> CreateVolume(flatbuffers::FlatBufferBuilder &
       _fbb,
       _number,
       _room_number,
+      _enabled,
       _position,
       _rotation,
       _scale,

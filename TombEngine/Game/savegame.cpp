@@ -859,6 +859,7 @@ bool SaveGame::Save(int slot)
 			Save::VolumeBuilder volume{ fbb };
 			volume.add_room_number(i);
 			volume.add_number(j);
+			volume.add_enabled(currVolume.Enabled);
 			volume.add_position(&FromVector3(currVolume.Position));
 			volume.add_rotation(&FromVector4(currVolume.Rotation));
 			volume.add_scale(&FromVector3(currVolume.Scale));
@@ -1301,6 +1302,7 @@ bool SaveGame::Load(int slot)
 		auto room = &g_Level.Rooms[volume->room_number()];
 		int number = volume->number();
 
+		room->triggerVolumes[number].Enabled = volume->enabled();
 		room->triggerVolumes[number].Position = ToVector3(volume->position());
 		room->triggerVolumes[number].Rotation = ToVector4(volume->rotation());
 		room->triggerVolumes[number].Scale = ToVector3(volume->scale());
