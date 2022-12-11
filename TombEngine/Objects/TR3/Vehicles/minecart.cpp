@@ -26,10 +26,10 @@ using namespace TEN::Math;
 
 namespace TEN::Entities::Vehicles
 {
-	constexpr auto MINECART_RADIUS			  = 100;
-	constexpr auto MINECART_ENTITY_RADIUS	  = BLOCK(0.25f);
-	constexpr auto MINECART_HEIGHT			  = CLICK(2);
-	constexpr auto MINECART_GRAVITY			  = BLOCK(1) + 1;
+	constexpr auto MINECART_RADIUS		  = 100;
+	constexpr auto MINECART_ENTITY_RADIUS = BLOCK(0.25f);
+	constexpr auto MINECART_HEIGHT		  = CLICK(2);
+	constexpr auto MINECART_GRAVITY		  = BLOCK(1) + 1;
 
 	constexpr auto MINECART_VELOCITY_DECEL = 6 * VEHICLE_VELOCITY_SCALE;
 
