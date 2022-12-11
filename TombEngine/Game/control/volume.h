@@ -62,7 +62,7 @@ struct TriggerVolume
 
 namespace TEN::Control::Volumes
 {
-	void TestVolumes(short roomNumber, BoundingOrientedBox bbox, TriggerVolumeActivators activatorType, VolumeTriggerer triggerer);
+	void TestVolumes(short roomNumber, BoundingOrientedBox bbox, TriggerVolumeActivatorType activatorType, VolumeTriggerer triggerer);
 	void TestVolumes(short itemNum);
 	void TestVolumes(short roomNumber, MESH_INFO* mesh);
 	void TestVolumes(CAMERA_INFO* camera);

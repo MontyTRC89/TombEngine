@@ -50,7 +50,7 @@ namespace TEN::Control::Volumes
 		}
 	}
 
-	void TestVolumes(short roomNumber, BoundingOrientedBox bbox, TriggerVolumeActivators activatorType, VolumeTriggerer triggerer)
+	void TestVolumes(short roomNumber, BoundingOrientedBox bbox, TriggerVolumeActivatorType activatorType, VolumeTriggerer triggerer)
 	{
 		auto* room = &g_Level.Rooms[roomNumber];
 
@@ -141,14 +141,14 @@ namespace TEN::Control::Volumes
 
 		auto bBox = box.ToBoundingOrientedBox(pos);
 
-		TestVolumes(camera->pos.RoomNumber, bBox, TriggerVolumeActivators::Flyby, camera);
+		TestVolumes(camera->pos.RoomNumber, bBox, TriggerVolumeActivatorType::Flyby, camera);
 	}
 
 	void TestVolumes(short roomNumber, MESH_INFO* mesh)
 	{
 		const auto& bBox = GetBoundsAccurate(*mesh, false).ToBoundingOrientedBox(mesh->pos);
 		
-		TestVolumes(roomNumber, bBox, TriggerVolumeActivators::Static, mesh);
+		TestVolumes(roomNumber, bBox, TriggerVolumeActivatorType::Static, mesh);
 	}
 
 	void TestVolumes(short itemNumber)
@@ -161,11 +161,11 @@ namespace TEN::Control::Volumes
 #endif
 
 		if (item->ObjectNumber == ID_LARA || item->Index == Lara.Vehicle)
-			TestVolumes(item->RoomNumber, bBox, TriggerVolumeActivators::Player, itemNumber);
+			TestVolumes(item->RoomNumber, bBox, TriggerVolumeActivatorType::Player, itemNumber);
 		else if (Objects[item->ObjectNumber].intelligent)
-			TestVolumes(item->RoomNumber, bBox, TriggerVolumeActivators::NPC, itemNumber);
+			TestVolumes(item->RoomNumber, bBox, TriggerVolumeActivatorType::NPC, itemNumber);
 		else
-			TestVolumes(item->RoomNumber, bBox, TriggerVolumeActivators::Moveable, itemNumber);
+			TestVolumes(item->RoomNumber, bBox, TriggerVolumeActivatorType::Moveable, itemNumber);
 	}
 
 	void InitialiseNodeScripts()
