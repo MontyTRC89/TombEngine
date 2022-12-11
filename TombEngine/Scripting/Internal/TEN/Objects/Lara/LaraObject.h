@@ -42,12 +42,15 @@ public:
 	int GetSprintEnergy() const;
 	void SetWet(sol::optional<int> wetness);
 	int GetWet() const;
+	std::unique_ptr<Moveable> GetVehicle() const;
+	std::unique_ptr<Moveable> GetTarget() const;
 	HandStatus GetHandStatus() const;
 	LaraWeaponType GetWeaponType() const;
 	void SetWeaponType(LaraWeaponType weaponType, bool activate);
 	int GetAmmoCount() const;
 	void UndrawWeapon();
 	void ThrowAwayTorch();
+	bool TorchIsLit() const;
 	static void Register(sol::table & parent);
 	using Moveable::Moveable;
 };

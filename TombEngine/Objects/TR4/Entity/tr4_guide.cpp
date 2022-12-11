@@ -123,7 +123,7 @@ namespace TEN::Entities::TR4
 		if (item->ItemFlags[1] == 2)
 		{
 			auto pos = GetJointPosition(item, GuideBite1.meshNum, Vector3i(GuideBite1.Position));
-			TriggerFireFlame(pos.x, pos.y - 20, pos.z, FlameType::Trail, item->Effect.PrimaryEffectColor, item->Effect.SecondaryEffectColor);
+			TriggerFireFlame(pos.x, pos.y - 20, pos.z, FlameType::Trail);
 			SoundEffect(SFX_TR4_LOOP_FOR_SMALL_FIRES, &item->Pose);
 
 			short random = GetRandomControl();
@@ -143,7 +143,7 @@ namespace TEN::Entities::TR4
 						(random & 0x3F) + pos.x - 32,
 						((random / 8) & 0x3F) + pos.y - 128,
 						pos.z + ((random / 64) & 0x3F) - 32,
-						FlameType::Trail, item->Effect.PrimaryEffectColor, item->Effect.SecondaryEffectColor);
+						FlameType::Trail);
 				}
 			}
 		}
@@ -505,9 +505,7 @@ namespace TEN::Entities::TR4
 								(random & 0x3F) + pos1.x - 64,
 								((random >> 5) & 0x3F) + pos1.y - 96,
 								((random >> 10) & 0x3F) + pos1.z - 64,
-								FlameType::Trail, 
-								item->Effect.PrimaryEffectColor, 
-								item->Effect.SecondaryEffectColor);
+								FlameType::Trail);
 
 							TriggerDynamicLight(
 								pos1.x - 32,
@@ -523,7 +521,7 @@ namespace TEN::Entities::TR4
 					}
 					else
 					{
-						TriggerMetalSparks(pos1.x, pos1.y, pos1.z, -1, -1, 0, 1);
+						TriggerMetalSparks(pos1.x, pos1.y, pos1.z, -1, -1, 0, Vector3(1.0f, 1.0f, 0.3f), 1);
 						TriggerDynamicLight(
 							pos1.x, pos1.y, pos1.z,
 							10,
@@ -547,9 +545,7 @@ namespace TEN::Entities::TR4
 						(random & 0x3F) + pos1.x - 64,
 						((random >> 5) & 0x3F) + pos1.y - 96,
 						((random >> 10) & 0x3F) + pos1.z - 64,
-						FlameType::Trail, 
-						item->Effect.PrimaryEffectColor, 
-						item->Effect.SecondaryEffectColor);
+						FlameType::Trail);
 				}
 			}
 			else
@@ -561,7 +557,7 @@ namespace TEN::Entities::TR4
 					96 - ((random >> 6) & 0x1F),
 					128 - ((random >> 4) & 0x1F));
 
-				TriggerMetalSparks(pos1.x, pos1.y, pos1.z, -1, -1, 0, 1);
+				TriggerMetalSparks(pos1.x, pos1.y, pos1.z, -1, -1, 0, Vector3(1.0f, 1.0f, 0.3f), 1);
 			}
 
 			break;

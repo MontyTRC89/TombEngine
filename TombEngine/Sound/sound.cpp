@@ -407,9 +407,6 @@ void PlaySoundTrack(std::string track, SoundTrackType mode, QWORD position)
 		break;
 	}
 
-	if (channelActive)
-		BASS_ChannelSlideAttribute(BASS_Soundtrack[(int)mode].Channel, BASS_ATTRIB_VOL, -1.0f, crossfadeTime);
-	
 	auto fullTrackName = TRACKS_PATH + track + ".ogg";
 	if (!std::filesystem::exists(fullTrackName))
 	{
@@ -424,6 +421,9 @@ void PlaySoundTrack(std::string track, SoundTrackType mode, QWORD position)
 			}
 		}
 	}
+
+	if (channelActive)
+		BASS_ChannelSlideAttribute(BASS_Soundtrack[(int)mode].Channel, BASS_ATTRIB_VOL, -1.0f, crossfadeTime);
 
 	auto stream = BASS_StreamCreateFile(false, fullTrackName.c_str(), 0, 0, flags);
 
@@ -906,7 +906,7 @@ int GetShatterSound(int shatterID)
 	if (shatterID < 3)
 		return SFX_TR5_SMASH_WOOD;
 	else
-		return SFX_TR5_SMASH_GLASS;
+		return SFX_TR4_SMASH_ROCK;
 }
 
 void PlaySoundSources()

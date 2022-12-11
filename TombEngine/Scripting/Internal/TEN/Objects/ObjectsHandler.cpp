@@ -43,7 +43,7 @@ ObjectsHandler::ObjectsHandler(sol::state* lua, sol::table & parent) :
 	/***
 	Get moveables by its slot.
 	@function GetMoveablesBySlot
-	@tparam ObjID slot the unique slot of the Moveable, e.g. `Objects.ObjID.ANIMATING1`
+	@tparam Objects.ObjID slot the unique slot of the Moveable, e.g. `Objects.ObjID.ANIMATING1`
 	@treturn table table of Moveables referencing the given slot.
 	*/
 	m_table_objects.set_function(ScriptReserved_GetMoveablesBySlot, &ObjectsHandler::GetMoveablesBySlot<Moveable>, this);
@@ -169,7 +169,7 @@ void ObjectsHandler::TestCollidingObjects()
 
 void ObjectsHandler::AssignLara()
 {
-	m_table_objects.set(ScriptReserved_Lara, LaraObject(Lara.ItemNumber, false));
+	m_table_objects.set(ScriptReserved_Lara, LaraObject(Lara.ItemNumber, true));
 }
 
 

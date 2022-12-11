@@ -10,6 +10,7 @@
 #include "Game/room.h"
 #include "Game/spotcam.h"
 #include "ReservedScriptNames.h"
+#include "LuaHandler.h"
 #include "ScriptUtil.h"
 #include "Sound/sound.h"
 #include "Specific/configuration.h"
@@ -17,6 +18,7 @@
 #include "Specific/Input/Input.h"
 #include "Vec3/Vec3.h"
 #include "ScriptAssert.h"
+#include "ActionIDs.h"
 
 /***
 Functions that don't fit in the other modules.
@@ -180,6 +182,9 @@ namespace Misc
 		if (!CheckInput(actionIndex))
 			return false;
 
+		if (IsHeld((ActionID)actionIndex))
+			return true;
+
 		return (TrInput & (1 << actionIndex)) != 0;
 	}
 
@@ -187,6 +192,9 @@ namespace Misc
 	{
 		if (!CheckInput(actionIndex))
 			return false;
+
+		if (IsClicked((ActionID)actionIndex))
+			return true;
 
 		return (DbInput & (1 << actionIndex)) != 0;
 	}
@@ -196,7 +204,7 @@ namespace Misc
 		if (!CheckInput(actionIndex))
 			return;
 
-		TrInput |= (1 << actionIndex);
+		ActionQueue[actionIndex] = QueueState::Push;
 	}
 
 	static void KeyClear(int actionIndex)
@@ -204,7 +212,7 @@ namespace Misc
 		if (!CheckInput(actionIndex))
 			return;
 
-		TrInput &= ~(1 << actionIndex);
+		ActionQueue[actionIndex] = QueueState::Clear;
 	}
 
 	///Do FlipMap with specific ID
@@ -324,37 +332,37 @@ namespace Misc
 
 		/// Check if particular action key is held
 		//@function KeyIsHeld
-		//@tparam int action mapping index to check
+		//@tparam Misc.ActionID action action mapping index to check
 		table_misc.set_function(ScriptReserved_KeyIsHeld, &KeyIsHeld);
 
 		/// Check if particular action key was hit (once)
 		//@function KeyIsHit
-		//@tparam int action mapping index to check
+		//@tparam Misc.ActionID action action mapping index to check
 		table_misc.set_function(ScriptReserved_KeyIsHit, &KeyIsHit);
 
 		/// Emulate pushing of a certain action key
 		//@function KeyPush
-		//@tparam int action mapping index to push
+		//@tparam Misc.ActionID action action mapping index to push
 		table_misc.set_function(ScriptReserved_KeyPush, &KeyPush);
 
 		/// Clears particular input from action key
 		//@function KeyClear
-		//@tparam int action mapping index to clear
+		//@tparam Misc.ActionID action action mapping index to clear
 		table_misc.set_function(ScriptReserved_KeyClear, &KeyClear);
 
 		table_misc.set_function(ScriptReserved_CalculateDistance, &CalculateDistance);
-
 		table_misc.set_function(ScriptReserved_CalculateHorizontalDistance, &CalculateHorizontalDistance);
-
-		table_misc.set_function(ScriptReserved_PercentToScreen, &PercentToScreen);
 		table_misc.set_function(ScriptReserved_HasLineOfSight, &HasLineOfSight);
 
+		table_misc.set_function(ScriptReserved_PercentToScreen, &PercentToScreen);
 		table_misc.set_function(ScriptReserved_ScreenToPercent, &ScreenToPercent);
 
 		table_misc.set_function(ScriptReserved_FlipMap, &FlipMap);
-
 		table_misc.set_function(ScriptReserved_PlayFlyBy, &PlayFlyBy);
-
 		table_misc.set_function(ScriptReserved_ResetObjCamera, &ResetObjCamera);
+
+
+		LuaHandler handler{ state };
+		handler.MakeReadOnlyTable(table_misc, ScriptReserved_ActionID, kActionIDs);
 	}
 }

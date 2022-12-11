@@ -269,3 +269,8 @@ int Level::GetSecrets() const
 {
 	return LevelSecrets;
 }
+
+std::string Level::GetAmbientTrack() const
+{
+	return AmbientTrack;
+}

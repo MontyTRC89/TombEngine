@@ -74,7 +74,7 @@ bool operator==(Moveable const& first, Moveable const& second)
 associated getters and setters. If you do not know what to set for these,
 most can just be ignored (see usage).
 	@function Moveable
-	@tparam ObjID object ID
+	@tparam Objects.ObjID object ID
 	@tparam string name Lua name of the item
 	@tparam Vec3 position position in level
 	@tparam[opt] Rotation rotation rotation about x, y, and z axes (default Rotation(0, 0, 0))
@@ -168,7 +168,7 @@ void Moveable::Register(sol::table & parent)
 
 /// Set effect to moveable
 // @function Moveable:SetEffect
-// @tparam EffectID effect Type of effect to assign.
+// @tparam Effects.EffectID effect Type of effect to assign.
 // @tparam float timeout time (in seconds) after which effect turns off (optional).
 	ScriptReserved_SetEffect, &Moveable::SetEffect,
 
@@ -181,7 +181,7 @@ void Moveable::Register(sol::table & parent)
 
 /// Get current moveable effect
 // @function Moveable:GetEffect
-// @treturn EffectID effect type currently assigned to moveable.
+// @treturn Effects.EffectID effect type currently assigned to moveable.
 	ScriptReserved_GetEffect, & Moveable::GetEffect,
 
 /// Get the status of object.
@@ -464,7 +464,7 @@ ScriptReserved_GetSlotHP, & Moveable::GetSlotHP,
 
 /// Borrow animation from an object
 // @function Moveable:AnimFromObject
-// @tparam ObjID ObjectID to take animation and stateID from,
+// @tparam Objects.ObjID ObjectID to take animation and stateID from,
 // @tparam int animNumber animation from object
 // @tparam int stateID state from object
 	ScriptReserved_AnimFromObject, &Moveable::AnimFromObject);
@@ -587,16 +587,30 @@ Vec3 Moveable::GetPos() const
 // @bool[opt] updateRoom Will room changes be automatically detected? Set to false if you are using overlapping rooms (default: true)
 void Moveable::SetPos(Vec3 const& pos, sol::optional<bool> updateRoom)
 {
+	auto oldPos = m_item->Pose.Position.ToVector3();
 	pos.StoreInPHDPos(m_item->Pose);
 
 	bool willUpdate = !updateRoom.has_value() || updateRoom.value();
 
 	if (m_initialised && willUpdate)
 	{
+		bool roomUpdated = false;
+
 		if (m_item->IsLara())
-			UpdateLaraRoom(m_item, pos.y);
+			roomUpdated = UpdateLaraRoom(m_item, pos.y);
 		else
-			UpdateItemRoom(m_item->Index);
+			roomUpdated = UpdateItemRoom(m_item->Index);
+
+		// In case direct portal room update didn't happen, and distance between old and new
+		// points is significant, do a predictive room update.
+
+		if (!roomUpdated && 
+			(willUpdate || Vector3::Distance(oldPos, m_item->Pose.Position.ToVector3()) > BLOCK(1)))
+		{
+			int potentialNewRoom = FindRoomNumber(m_item->Pose.Position, m_item->RoomNumber);
+			if (potentialNewRoom != m_item->RoomNumber)
+				SetRoom(potentialNewRoom);
+		}
 	}
 }
 
@@ -794,6 +808,9 @@ Vec3 Moveable::GetVelocity() const
 
 void Moveable::SetVelocity(Vec3 velocity)
 {
+	if (m_item->IsCreature())
+		ScriptWarn("Attempt to set velocity to a creature. In may not work, as velocity is overridden by AI.");
+
 	m_item->Animation.Velocity = Vector3(velocity.x, velocity.y, velocity.z);
 }
 
@@ -858,7 +875,15 @@ void Moveable::SetRoom(short room)
 	if (!m_initialised)
 		m_item->RoomNumber = room;
 	else
+	{
 		ItemNewRoom(m_num, room);
+
+		// HACK: For Lara, we need to manually force Location.roomNumber to new one,
+		// or else camera won't be updated properly.
+
+		if (m_item->IsLara())
+			m_item->Location.roomNumber = room;
+	}
 }
 
 short Moveable::GetStatus() const

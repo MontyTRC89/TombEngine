@@ -65,10 +65,11 @@ void ClearSpotCamSequences()
 		SpotCam[i] = {};
 }
 
-void InitSpotCamSequences() 
+void InitialiseSpotCamSequences(bool startFirstSequence)
 {
-	int n = NumberSpotcams;
 	TrackCameraInit = 0;
+
+	int n = NumberSpotcams;
 	int cc = 1;
 
 	if (n != 0)
@@ -99,7 +100,11 @@ void InitSpotCamSequences()
 		SpotCamRemap[s] = ce;
 	}
 
-	return;
+	if (startFirstSequence)
+	{
+		InitialiseSpotCam(0);
+		UseSpotCam = true;
+	}
 }
 
 void InitialiseSpotCam(short Sequence)

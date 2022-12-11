@@ -87,6 +87,14 @@ bool HandleLaraVehicle(ItemInfo* item, CollisionInfo* coll)
 	if (lara->Vehicle == NO_ITEM)
 		return false;
 
+	if (!g_Level.Items[lara->Vehicle].Active)
+	{
+		lara->Vehicle = NO_ITEM;
+		item->Animation.IsAirborne = true;
+		SetAnimation(item, LA_FALL_START);
+		return false;
+	}
+
 	TestVolumes(lara->Vehicle);
 
 	switch (g_Level.Items[lara->Vehicle].ObjectNumber)
@@ -809,6 +817,24 @@ void SetLaraSwimDiveAnimation(ItemInfo* item)
 	item->Animation.Velocity.y = LARA_SWIM_VELOCITY_MAX * 0.4f;
 	item->Pose.Orientation.x = -ANGLE(45.0f);
 	lara->Control.WaterStatus = WaterStatus::Underwater;
+}
+
+void SetLaraVehicle(ItemInfo* item, ItemInfo* vehicle)
+{
+	auto* lara = GetLaraInfo(item);
+
+	if (vehicle == nullptr)
+	{
+		if (lara->Vehicle != NO_ITEM)
+			g_Level.Items[lara->Vehicle].Active = false;
+
+		lara->Vehicle = NO_ITEM;
+	}
+	else
+	{
+		g_Level.Items[vehicle->Index].Active = true;
+		lara->Vehicle = vehicle->Index;
+	}
 }
 
 void ResetLaraLean(ItemInfo* item, float rate, bool resetRoll, bool resetPitch)
