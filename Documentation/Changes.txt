@@ -8,6 +8,11 @@ Version 1.0.4
 * Change default shatter sound to TR4_SMASH_ROCK (tomb4 default).
 * Reduce idle pose time from 30 to 20 seconds.
 * Automatically align pickups to floor surface.
+* Various minecart enhancements:
+    - Fix minecart jump.
+    - Add landing/jump sound.
+    - Add minecart falldamage.
+    - Explode minecart in water below 2 click surface.
 * Fix legacy pickup triggers not working in certain cases.
 * Fix crawl pickup not actually doing any pickups.
 * Fix demigod and harpy shooting in incorrect directions.
