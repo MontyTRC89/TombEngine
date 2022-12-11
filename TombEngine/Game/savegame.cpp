@@ -838,18 +838,20 @@ bool SaveGame::Save(int slot)
 			auto& currVolume = room->triggerVolumes[j];
 
 			std::vector<flatbuffers::Offset<Save::VolumeState>> queue;
-			for (int k = 0; k < currVolume.Queue.size(); k++)
+			for (int k = 0; k < currVolume.StateQueue.size(); k++)
 			{
+				auto& entry = currVolume.StateQueue[k];
+
 				int triggerer = NO_ITEM;
-				if (std::holds_alternative<short>(currVolume.Queue[k].Triggerer))
-					triggerer = std::get<short>(currVolume.Queue[k].Triggerer);
+				if (std::holds_alternative<short>(entry.Triggerer))
+					triggerer = std::get<short>(entry.Triggerer);
 				else
 					continue;
 
 				Save::VolumeStateBuilder volstate{ fbb };
-				volstate.add_status((int)currVolume.Queue[k].Status);
+				volstate.add_status((int)entry.Status);
 				volstate.add_triggerer(triggerer);
-				volstate.add_timestamp(currVolume.Queue[k].Timestamp);
+				volstate.add_timestamp(entry.Timestamp);
 				queue.push_back(volstate.Finish());
 			}
 			auto queueOffset = fbb.CreateVector(queue);
@@ -1306,7 +1308,7 @@ bool SaveGame::Load(int slot)
 		for (int j = 0; j < volume->queue()->size(); j++)
 		{
 			auto state = volume->queue()->Get(j);
-			room->triggerVolumes[number].Queue.push_back(
+			room->triggerVolumes[number].StateQueue.push_back(
 				VolumeState
 				{
 					(VolumeStateStatus)state->status(),

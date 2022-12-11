@@ -68,9 +68,9 @@ namespace TEN::Control::Volumes
 
 			VolumeState* entry = nullptr;
 
-			for (int j = volume->Queue.size() - 1; j >= 0; j--)
+			for (int j = volume->StateQueue.size() - 1; j >= 0; j--)
 			{
-				VolumeState* candidate = &volume->Queue[j];
+				VolumeState* candidate = &volume->StateQueue[j];
 
 				switch (candidate->Status)
 				{
@@ -82,7 +82,7 @@ namespace TEN::Control::Volumes
 					break;
 
 				case VolumeStateStatus::Outside:
-					volume->Queue.erase(volume->Queue.begin() + j);
+					volume->StateQueue.erase(volume->StateQueue.begin() + j);
 					break;
 
 				default:
@@ -98,7 +98,7 @@ namespace TEN::Control::Volumes
 			{
 				if (entry == nullptr)
 				{
-					volume->Queue.push_back(
+					volume->StateQueue.push_back(
 						VolumeState
 						{ 
 							VolumeStateStatus::Entering,

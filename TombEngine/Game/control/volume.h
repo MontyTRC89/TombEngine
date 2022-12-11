@@ -10,7 +10,7 @@ constexpr auto NO_CALL_COUNTER = -1;
 constexpr auto VOLUME_BUSY_TIMEOUT = 10;
 constexpr auto VOLUME_LEAVE_TIMEOUT = 5;
 
-constexpr auto VOLUME_ACTIVATOR_QUEUE_SIZE = 16;
+constexpr auto VOLUME_STATE_QUEUE_SIZE = 16;
 
 enum class VolumeStateStatus
 {
@@ -57,7 +57,7 @@ struct TriggerVolume
 	BoundingOrientedBox Box;
 	BoundingSphere Sphere;
 
-	std::vector<VolumeState> Queue;
+	std::vector<VolumeState> StateQueue;
 };
 
 namespace TEN::Control::Volumes
