@@ -136,14 +136,14 @@
     <dd>
     Register a function as a callback.
 
-        Possible values for CallbackPoint:
+		<p>Possible values for CallbackPoint:</p>
         <pre class="example">PRECONTROLPHASE <span class="comment">-- will be called immediately before OnControlPhase
 </span>POSTCONTROLPHASE <span class="comment">-- will be called immediately after OnControlPhase
 </span></pre>
-        The order in which two functions with the same CallbackPoint are called is undefined.
+		<p>The order in which two functions with the same CallbackPoint are called is undefined.
 i.e. if you register <code>MyFunc</code> and <code>MyFunc2</code> with <code>PRECONTROLPHASE</code>, both will be called before <code>OnControlPhase</code>, but there is no guarantee whether <code>MyFunc</code> will be called before <code>MyFunc2</code>, or vice-versa.</p>
 
-<p>Any returned value will be discarded.
+<p>Any returned value will be discarded.</p>
 
 
     <h3>Parameters:</h3>
@@ -233,18 +233,18 @@ Will have no effect if the function was not registered as a callback
     A table with level-specific data which will be saved and loaded.
 This is for level-specific information that you want to store in saved games.
 
-        For example, you may have a level with a custom puzzle where Lara has
+		<p>For example, you may have a level with a custom puzzle where Lara has
 to kill exactly seven enemies to open a door to a secret. You could use
-the following line each time an enemy is killed:
+the following line each time an enemy is killed:</p>
         <pre class="example">LevelVars.enemiesKilled = LevelVars.enemiesKilled + <span class="number">1</span></pre>
-        If the player saves the level after killing three, saves, and then reloads the save
+		<p>If the player saves the level after killing three, saves, and then reloads the save
 some time later, the values <code>3</code> will be put back into <code>LevelVars.enemiesKilled.</code></p>
 
 <p><strong>This table is emptied when a level is finished.</strong> If the player needs to be able
 to return to the level (like in the Karnak and Alexandria levels in <em>The Last Revelation</em>),
 you will need to use the <a href="../1 modules/Logic.html#GameVars">GameVars</a> table, below.</p>
 
-<p><strong>LevelVars.Engine is a reserved table used internally by TombEngine's libs. Do not modify, overwrite, or add to it.</strong>
+<p><strong>LevelVars.Engine is a reserved table used internally by TombEngine's libs. Do not modify, overwrite, or add to it.</strong></p>
 
 
 
@@ -262,17 +262,17 @@ you will need to use the <a href="../1 modules/Logic.html#GameVars">GameVars</a>
 This is for information not specific to any level, but which concerns your whole
 levelset or game, that you want to store in saved games.
 
-        For example, you may wish to have a final boss say a specific voice line based on
+		<p>For example, you may wish to have a final boss say a specific voice line based on
 a choice the player made in a previous level. In the level with the choice, you could
-write:
+write:</p>
         <pre class="example">GameVars.playerSnoopedInDrawers = <span class="keyword">true</span></pre>
-        And in the script file for the level with the boss, you could write:
+		<p>And in the script file for the level with the boss, you could write:</p>
         <pre class="example"><span class="keyword">if</span> GameVars.playerSnoopedInDrawers <span class="keyword">then</span>
 	PlayAudioTrack(<span class="string">"how_dare_you.wav"</span>)
 <span class="keyword">end</span></pre>
-        Unlike <a href="../1 modules/Logic.html#LevelVars">LevelVars</a>, this table will remain intact for the entirety of the game.</p>
+		<p>Unlike <a href="../1 modules/Logic.html#LevelVars">LevelVars</a>, this table will remain intact for the entirety of the game.</p>
 
-<p><strong>GameVars.Engine is a reserved table used internally by TombEngine's libs. Do not modify, overwrite, or add to it.</strong>
+<p><strong>GameVars.Engine is a reserved table used internally by TombEngine's libs. Do not modify, overwrite, or add to it.</strong></p>
 
 
 
@@ -288,14 +288,14 @@ write:
     <dd>
     A table nested table system for level-specific functions.
 
-        This serves a few purposes: it holds the level callbacks (listed below) as well as
+		<p>This serves a few purposes: it holds the level callbacks (listed below) as well as
 any trigger functions you might have specified. For example, if you give a trigger
 a Lua name of "my_trigger" in Tomb Editor, you will have to implement it as a member
-of this table:
+of this table:</p>
         <pre class="example">LevelFuncs.my_trigger = <span class="keyword">function</span>()
 	<span class="comment">-- implementation goes here
 </span><span class="keyword">end</span></pre>
-        You can organise functions into tables within the hierarchy:
+		<p>You can organise functions into tables within the hierarchy:</p>
         <pre class="example">LevelFuncs.enemyFuncs = {}
 
 LevelFuncs.enemyFuncs.makeBaddyRunAway = <span class="keyword">function</span>()
@@ -305,11 +305,11 @@ LevelFuncs.enemyFuncs.makeBaddyRunAway = <span class="keyword">function</span>()
 LevelFuncs.enemyFuncs.makeBaddyUseMedkit = <span class="keyword">function</span>()
 	<span class="comment">-- implementation goes here
 </span><span class="keyword">end</span></pre>
-        There are two special subtables which you should <strong>not</strong> overwrite:
+		<p>There are two special subtables which you should <strong>not</strong> overwrite:</p>
         <pre class="example">LevelFuncs.Engine <span class="comment">-- this is for 'first-party' functions, i.e. ones that come with TombEngine.
 </span>LevelFuncs.External <span class="comment">-- this is for 'third-party' functions. If you write a library providing LevelFuncs functions for other builders to use in their levels, put those functions in LevelFuncs.External.YourLibraryNameHere
 </span></pre>
-
+		<p>
 <p>The following are the level callbacks. They are optional; if your level has no special
 behaviour for a particular scenario, you do not need to implement the function. For
 example, if your level does not need any special initialisation when it is loaded,
@@ -325,7 +325,7 @@ you can just leave out <code>LevelFuncs.OnStart</code>.</p>
     <li>The control loop, in which <code>OnControlPhase</code> will be called once per frame, begins.</li>
 </ol>
 
-
+</p>
 
 
     <h3>Fields:</h3>
@@ -365,7 +365,7 @@ and provides the delta time (a float representing game time since last call) via
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
-<i style="float:right;">Last updated 2022-12-09 22:06:20 </i>
+<i style="float:right;">Last updated 2022-12-11 18:38:45 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>

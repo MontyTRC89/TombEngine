@@ -1557,7 +1557,7 @@ void HandleProjectile(ItemInfo& item, ItemInfo& emitter, const Vector3i& prevPos
 				if (isExplosive)
 				{
 					doExplosion = isExplosive;
-					if (type != ProjectileType::FlashGrenade)
+					if (type != ProjectileType::FlashGrenade && !currentObject.undead)
 						DoExplosiveDamage(emitter, *currentItem, item, damage);
 				}
 				else if (type == ProjectileType::Poison)
@@ -1568,7 +1568,7 @@ void HandleProjectile(ItemInfo& item, ItemInfo& emitter, const Vector3i& prevPos
 					if (currentItem->IsLara())
 						GetLaraInfo(currentItem)->PoisonPotency += 5;
 				}
-				else
+				else if (!currentObject.undead)
 				{
 					DoDamage(currentItem, damage);
 				}

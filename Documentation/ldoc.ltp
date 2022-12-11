@@ -176,7 +176,7 @@
 #		if item.advancedDesc.formatLines[i] then
         <pre class="example">$(ldoc.prettify(item.advancedDesc.lines[i]))</pre>
 #		else
-        $(M(item.advancedDesc.lines[i]))
+		<p>$(M(item.advancedDesc.lines[i]))</p>
 #		end -- if
 #     end -- for
 #	end -- if advancedDesc

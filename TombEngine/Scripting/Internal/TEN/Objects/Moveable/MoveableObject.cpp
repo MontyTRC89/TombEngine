@@ -74,7 +74,7 @@ bool operator==(Moveable const& first, Moveable const& second)
 associated getters and setters. If you do not know what to set for these,
 most can just be ignored (see usage).
 	@function Moveable
-	@tparam ObjID object ID
+	@tparam Objects.ObjID object ID
 	@tparam string name Lua name of the item
 	@tparam Vec3 position position in level
 	@tparam[opt] Rotation rotation rotation about x, y, and z axes (default Rotation(0, 0, 0))
@@ -168,7 +168,7 @@ void Moveable::Register(sol::table & parent)
 
 /// Set effect to moveable
 // @function Moveable:SetEffect
-// @tparam EffectID effect Type of effect to assign.
+// @tparam Effects.EffectID effect Type of effect to assign.
 // @tparam float timeout time (in seconds) after which effect turns off (optional).
 	ScriptReserved_SetEffect, &Moveable::SetEffect,
 
@@ -181,7 +181,7 @@ void Moveable::Register(sol::table & parent)
 
 /// Get current moveable effect
 // @function Moveable:GetEffect
-// @treturn EffectID effect type currently assigned to moveable.
+// @treturn Effects.EffectID effect type currently assigned to moveable.
 	ScriptReserved_GetEffect, & Moveable::GetEffect,
 
 /// Get the status of object.
@@ -464,7 +464,7 @@ ScriptReserved_GetSlotHP, & Moveable::GetSlotHP,
 
 /// Borrow animation from an object
 // @function Moveable:AnimFromObject
-// @tparam ObjID ObjectID to take animation and stateID from,
+// @tparam Objects.ObjID ObjectID to take animation and stateID from,
 // @tparam int animNumber animation from object
 // @tparam int stateID state from object
 	ScriptReserved_AnimFromObject, &Moveable::AnimFromObject);
