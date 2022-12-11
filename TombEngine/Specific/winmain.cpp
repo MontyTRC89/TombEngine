@@ -274,7 +274,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	// Hide console window if mode isn't debug
 #ifndef _DEBUG
-	if (!Debug)
+	if (!DebugMode)
 		ShowWindow(GetConsoleWindow(), 0);
 #endif
 
