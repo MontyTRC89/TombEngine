@@ -1706,7 +1706,7 @@ void ProcessEffects(ItemInfo* item)
 		item->Effect.Type = EffectType::None;
 }
 
-void TriggerAttackFlame(const Vector3i& pos, const Vector3& color, int size)
+void TriggerAttackFlame(const Vector3i& pos, const Vector3& color, int scale)
 {
 	auto& spark = *GetFreeParticle();
 
@@ -1718,19 +1718,19 @@ void TriggerAttackFlame(const Vector3i& pos, const Vector3& color, int size)
 	spark.dG = color.y;
 	spark.dB = color.z;
 	spark.fadeToBlack = 8;
-	spark.colFadeSpeed = (GetRandomControl() & 3) + 4;
+	spark.colFadeSpeed = Random::GenerateInt(4, 8);
 	spark.blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
-	spark.life = (GetRandomControl() & 7) + 20;
+	spark.life = Random::GenerateInt(20, 28);
 	spark.sLife = spark.life;
-	spark.x = pos.x + (GetRandomControl() & 0xF) - 8;
+	spark.x = pos.x + Random::GenerateInt(-8, 8);
 	spark.y = pos.y;
-	spark.z = pos.z + (GetRandomControl() & 0xF) - 8;
-	spark.xVel = (GetRandomControl() & 0xFF) - 128;
+	spark.z = pos.z + Random::GenerateInt(-8, 8);
+	spark.xVel = Random::GenerateInt(-128, 128);
 	spark.yVel = 0;
-	spark.zVel = (GetRandomControl() & 0xFF) - 128;
+	spark.zVel = Random::GenerateInt(-128, 128);
 	spark.friction = 5;
 	spark.flags = SP_EXPDEF | SP_DEF | SP_SCALE;
-	spark.rotAng = GetRandomControl() & 0xFFF;
+	spark.rotAng = Random::GenerateInt(0, 4096); // NOTE: Effect angles use [0, 4096] range.
 
 	if (TestProbability(1 / 2.0f))
 		spark.rotAdd = -32 - (GetRandomControl() & 0x1F);
@@ -1738,9 +1738,9 @@ void TriggerAttackFlame(const Vector3i& pos, const Vector3& color, int size)
 		spark.rotAdd = (GetRandomControl() & 0x1F) + 32;
 
 	spark.maxYvel = 0;
-	spark.gravity = (GetRandomControl() & 0x1F) + 16;
+	spark.gravity = Random::GenerateInt(16, 48);
 	spark.scalar = 2;
-	spark.size = (GetRandomControl() & 0xF) + size;
+	spark.size = Random::GenerateInt(0, 16) + scale;
 	spark.sSize = spark.size;
 	spark.dSize = spark.size / 4;
 }
