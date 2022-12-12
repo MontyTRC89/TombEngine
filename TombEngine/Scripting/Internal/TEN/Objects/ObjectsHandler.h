@@ -107,6 +107,9 @@ private:
 
 	bool AddName(std::string const& key, VarMapVal val) override
 	{
+		if (key.empty())
+			return false;
+
 		auto p = std::pair<std::string const&, VarMapVal>{ key, val };
 		return m_nameMap.insert(p).second;
 	}

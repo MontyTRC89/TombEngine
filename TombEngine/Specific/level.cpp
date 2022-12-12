@@ -757,6 +757,8 @@ void ReadRooms()
 		for (int j = 0; j < numStatics; j++)
 		{
 			auto& mesh = room.mesh.emplace_back();
+
+			mesh.roomNumber = i;
 			mesh.pos.Position.x = ReadInt32();
 			mesh.pos.Position.y = ReadInt32();
 			mesh.pos.Position.z = ReadInt32();
@@ -770,14 +772,13 @@ void ReadRooms()
 			mesh.HitPoints = ReadInt16();
 			mesh.Name = ReadString();
 
-			mesh.roomNumber = i;
 			g_GameScriptEntities->AddName(mesh.Name, mesh);
 		}
 
 		int numTriggerVolumes = ReadInt32();
 
-		//Reserve in advance so the vector doesn't resize itself and leave anything
-		//in the script name-to-reference map obsolete.
+		// Reserve in advance so the vector doesn't resize itself and leave anything
+		// in the script name-to-reference map obsolete.
 		room.triggerVolumes.reserve(numTriggerVolumes);
 		for (int j = 0; j < numTriggerVolumes; j++)
 		{
@@ -805,8 +806,8 @@ void ReadRooms()
 			volume.Sphere = BoundingSphere(volume.Position, volume.Scale.x);
 
 			volume.StateQueue.reserve(VOLUME_STATE_QUEUE_SIZE);
-			if(!volume.Name.empty())
-				g_GameScriptEntities->AddName(volume.Name, volume);
+
+			g_GameScriptEntities->AddName(volume.Name, volume);
 		}
 
 		room.flippedRoom = ReadInt32();
