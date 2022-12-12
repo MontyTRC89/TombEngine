@@ -6,24 +6,27 @@
 #include "Game/control/los.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/tomb4fx.h"
-#include "Game/misc.h"
-#include "Game/Lara/lara.h"
 #include "Game/items.h"
+#include "Game/Lara/lara.h"
+#include "Game/misc.h"
 #include "Math/Math.h"
-#include "Specific/level.h"
 #include "Sound/sound.h"
+#include "Specific/level.h"
 
 using namespace TEN::Math;
 
 namespace TEN::Entities::Creatures::TR5
 {
-	constexpr auto AUTO_GUNS_ORIENT_LERP_ALPHA = 0.1f;
-	const auto AUTO_GUNS_AWARE_CONSTRAINT_ANGLE = ANGLE(5.6f);
+	constexpr auto AUTO_GUN_ORIENT_LERP_ALPHA	  = 0.1f;
+	const	  auto AUTO_GUN_FIRE_CONSTRAINT_ANGLE = ANGLE(5.6f);
+
+	const auto AutoGunFlashJoints = std::vector<unsigned int>{ 8 };
+	const auto AutoGunJoints1	  = std::vector<unsigned int>{ 7, 9, 10 }; // TODO: Check what these are.
 
 	void InitialiseAutoGuns(short itemNumber)
 	{
 		auto& item = g_Level.Items[itemNumber];
-		item.MeshBits = 0x680;
+		item.MeshBits.Set(AutoGunJoints1);
 		item.Data = std::array<short, 4>();
 	}
 
@@ -39,7 +42,8 @@ namespace TEN::Entities::Creatures::TR5
 		{
 			auto& autoGun = *GetCreatureInfo(&item);
 
-			item.MeshBits = 0x680;
+			item.MeshBits.ClearAll();
+			item.MeshBits.Set(AutoGunJoints1);
 
 			auto origin = GameVector(item.Pose.Position, item.RoomNumber);
 			auto target = GameVector(GetJointPosition(&laraItem, LM_TORSO, Vector3i::Zero), laraItem.RoomNumber);
@@ -49,7 +53,7 @@ namespace TEN::Entities::Creatures::TR5
 			if (los)
 				orient = Geometry::GetOrientToPoint(origin.ToVector3(), target.ToVector3());
 
-			item.Pose.Orientation.Lerp(orient, AUTO_GUNS_ORIENT_LERP_ALPHA);
+			item.Pose.Orientation.Lerp(orient, AUTO_GUN_ORIENT_LERP_ALPHA);
 			auto deltaAngle = item.Pose.Orientation - orient;
 
 			autoGun.JointRotation[0] = item.ItemFlags[0];
@@ -57,16 +61,16 @@ namespace TEN::Entities::Creatures::TR5
 			autoGun.JointRotation[2] += item.ItemFlags[2];
 
 			if (los &&
-				abs(deltaAngle.x) <= AUTO_GUNS_AWARE_CONSTRAINT_ANGLE &&
-				abs(deltaAngle.y) <= AUTO_GUNS_AWARE_CONSTRAINT_ANGLE)
+				abs(deltaAngle.x) <= AUTO_GUN_FIRE_CONSTRAINT_ANGLE &&
+				abs(deltaAngle.y) <= AUTO_GUN_FIRE_CONSTRAINT_ANGLE)
 			{
 				SoundEffect(SFX_TR4_HK_FIRE, &item.Pose, SoundEnvironment::Land, 0.8f);
 
 				if (GlobalCounter & 1)
 				{
-					item.MeshBits |= 0x100;
+					item.MeshBits.Set(AutoGunFlashJoints);
 
-					auto lightColor = Vector3((GetRandomControl() & 0x1F) + 192, (GetRandomControl() & 0x1F) + 128, 0);
+					auto lightColor = Vector3(Random::GenerateFloat(0.75f, 0.85f), Random::GenerateFloat(0.5f, 0.6f), 0.0f) * 255;
 					TriggerDynamicLight(origin.x, origin.y, origin.z, 10, lightColor.x, lightColor.y, lightColor.z);
 
 					if (Random::TestProbability(3 / 4.0f))
@@ -109,7 +113,7 @@ namespace TEN::Entities::Creatures::TR5
 				}
 				else
 				{
-					item.MeshBits &= ~0x100;
+					item.MeshBits.Clear(AutoGunFlashJoints);
 				}
 
 				if (item.ItemFlags[2] < 1024)
@@ -120,7 +124,7 @@ namespace TEN::Entities::Creatures::TR5
 				if (item.ItemFlags[2])
 					item.ItemFlags[2] -= 64;
 
-				item.MeshBits &= ~0x100;
+				item.MeshBits.Clear(AutoGunFlashJoints);
 			}
 
 			if (item.ItemFlags[2])
