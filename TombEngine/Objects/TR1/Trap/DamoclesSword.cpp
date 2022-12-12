@@ -25,11 +25,11 @@ namespace TEN::Entities::Traps::TR1
 
 	const auto DAMOCLES_SWORD_TURN_RATE_MAX = ANGLE(5.0f);
 
-	void SetupDamoclesSword(ObjectInfo* object)
+	void SetupDamoclesSword(ObjectInfo& object)
 	{
-		object->initialise = InitialiseDamoclesSword;
-		object->control = ControlDamoclesSword;
-		object->collision = CollideDamoclesSword;
+		object.initialise = InitialiseDamoclesSword;
+		object.control = ControlDamoclesSword;
+		object.collision = CollideDamoclesSword;
 		//object->shadowSize = UNIT_SHADOW;
 	}
 

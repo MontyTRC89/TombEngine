@@ -12,6 +12,7 @@
 #include "Math/Math.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
+#include "Specific/setup.h"
 
 using namespace TEN::Math;
 
@@ -21,10 +22,24 @@ namespace TEN::Entities::Creatures::TR5
 	constexpr auto AUTO_GUN_BLOOD_EFFECT_CHANCE = 3 / 4.0f;
 
 	constexpr auto AUTO_GUN_ORIENT_LERP_ALPHA	  = 0.1f;
+	const	  auto AUTO_GUN_BARREL_TURN_RATE	  = ANGLE(0.35f);
 	const	  auto AUTO_GUN_FIRE_CONSTRAINT_ANGLE = ANGLE(5.6f);
 
 	const auto AutoGunFlashJoints = std::vector<unsigned int>{ 8 };
 	const auto AutoGunJoints1	  = std::vector<unsigned int>{ 7, 9, 10 }; // TODO: Check what these are.
+
+	void SetupAutoGun(ObjectInfo& object)
+	{
+		object.initialise = InitialiseAutoGuns;
+		object.control = ControlAutoGun;
+		object.intelligent = true;
+		object.hitEffect = HIT_RICOCHET;
+		object.undead = true;
+
+		g_Level.Bones[object.boneIndex + 6 * 4] |= ROT_X;
+		g_Level.Bones[object.boneIndex + 6 * 4] |= ROT_Y;
+		g_Level.Bones[object.boneIndex + 8 * 4] |= ROT_Y;
+	}
 
 	void InitialiseAutoGuns(short itemNumber)
 	{
@@ -33,7 +48,7 @@ namespace TEN::Entities::Creatures::TR5
 		item.Data = std::array<short, 4>();
 	}
 
-	void AutoGunsControl(short itemNumber)
+	void ControlAutoGun(short itemNumber)
 	{
 		auto& item = g_Level.Items[itemNumber];
 		auto& laraItem = *LaraItem;
@@ -82,9 +97,11 @@ namespace TEN::Entities::Creatures::TR5
 					// Spawn blood.
 					if (Random::TestProbability(AUTO_GUN_BLOOD_EFFECT_CHANCE))
 					{
-						auto bloodPos = GetJointPosition(&laraItem, Random::GenerateInt(0, NUM_LARA_MESHES - 1));
-						DoBloodSplat(bloodPos.x, bloodPos.y, bloodPos.z, (GetRandomControl() & 3) + 3, 2 * GetRandomControl(), laraItem.RoomNumber);
 						DoDamage(&laraItem, AUTO_GUN_SHOT_DAMAGE);
+
+						auto bloodPos = GetJointPosition(&laraItem, Random::GenerateInt(0, NUM_LARA_MESHES - 1));
+						float bloodVel = Random::GenerateFloat(4.0f, 8.0f);
+						DoBloodSplat(bloodPos.x, bloodPos.y, bloodPos.z, bloodVel, Random::GenerateAngle(), laraItem.RoomNumber);
 					}
 					// Spawn ricochet.
 					else
@@ -116,7 +133,7 @@ namespace TEN::Entities::Creatures::TR5
 						pos.z += dz + GetRandomControl() - 128;
 
 						if (!LOS(&origin, &pos))
-							TriggerRicochetSpark(pos, 2 * GetRandomControl(), 3, 0);
+							TriggerRicochetSpark(pos, Random::GenerateAngle(), 3, 0);
 					}
 				}
 				else
@@ -124,20 +141,20 @@ namespace TEN::Entities::Creatures::TR5
 					item.MeshBits.Clear(AutoGunFlashJoints);
 				}
 
-				if (item.ItemFlags[2] < 1024)
-					item.ItemFlags[2] += 64;
+				if (item.ItemFlags[2] < AUTO_GUN_FIRE_CONSTRAINT_ANGLE)
+					item.ItemFlags[2] += AUTO_GUN_BARREL_TURN_RATE;
 			}
 			// Reset barrel.
 			else
 			{
 				if (item.ItemFlags[2])
-					item.ItemFlags[2] -= 64;
+					item.ItemFlags[2] -= AUTO_GUN_BARREL_TURN_RATE;
 
 				item.MeshBits.Clear(AutoGunFlashJoints);
 			}
 
 			if (item.ItemFlags[2])
-				TriggerAutoGunSmoke(origin.ToVector3i(), item.ItemFlags[2] / 16);
+				SpawnAutoGunSmoke(origin.ToVector3i(), item.ItemFlags[2] / 16);
 		}
 		else
 		{
@@ -146,9 +163,12 @@ namespace TEN::Entities::Creatures::TR5
 		}		
 	}
 
-	void TriggerAutoGunSmoke(const Vector3i& pos, char shade)
+	void SpawnAutoGunSmoke(const Vector3i& pos, char shade)
 	{
 		auto& spark = SmokeSparks[GetFreeSmokeSpark()];
+
+		auto sphere = BoundingSphere(pos.ToVector3(), 16.0f);
+		auto sparkPos = Random::GeneratePointInSphere(sphere);
 
 		spark.on = true;
 		spark.sShade = 0;
@@ -156,21 +176,21 @@ namespace TEN::Entities::Creatures::TR5
 		spark.colFadeSpeed = 4;
 		spark.fadeToBlack = 32;
 		spark.blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
-		spark.life = spark.sLife = (GetRandomControl() & 3) + 40;
-		spark.x = pos.x - 16 + (GetRandomControl() & 0x1F);
-		spark.y = (GetRandomControl() & 0x1F) + pos.y - 16;
+		spark.life = spark.sLife = Random::GenerateInt(40, 44);
+		spark.x = sparkPos.x;
+		spark.y = sparkPos.y;
+		spark.z = sparkPos.z;
 		spark.xVel = 0;
 		spark.yVel = 0;
 		spark.zVel = 0;
-		spark.z = (GetRandomControl() & 0x1F) + pos.z - 16;
 		spark.friction = 4;
 		spark.flags = SP_ROTATE;
-		spark.rotAng = GetRandomControl() & 0xFFF;
-		spark.rotAdd = (GetRandomControl() & 0x3F) - 31;
+		spark.rotAng = Random::GenerateInt(0, 4096);
+		spark.rotAdd = Random::GenerateInt(-32, 32);
 		spark.maxYvel = 0;
-		spark.gravity = -4 - (GetRandomControl() & 3);
+		spark.gravity = Random::GenerateInt(-4, -8);
 		spark.mirror = 0;
-		spark.dSize = (GetRandomControl() & 0xF) + 24;
+		spark.dSize = Random::GenerateInt(24, 40);
 		spark.sSize = spark.dSize / 4;
 		spark.size = spark.dSize / 4;
 	}
