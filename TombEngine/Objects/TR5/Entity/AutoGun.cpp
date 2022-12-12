@@ -27,8 +27,10 @@ namespace TEN::Entities::Creatures::TR5
 
 	constexpr auto AUTO_GUN_BARREL_JOINT_INDEX = 9;
 
-	const auto AutoGunFlashJoints = std::vector<unsigned int>{ 8 };
-	const auto AutoGunJoints1	  = std::vector<unsigned int>{ 7, 9, 10 }; // TODO: Check what these are.
+	const auto AutoGunChassisJoints		= std::vector<unsigned int>{ 0, 1, 2, 3, 4, 5, 6, 11, 12};
+	const auto AutoGunBodyJoints		= std::vector<unsigned int>{ 7, 9 };
+	const auto AutoGunClosedHatchJoints	= std::vector<unsigned int>{ 10 };
+	const auto AutoGunFlashJoints		= std::vector<unsigned int>{ 8 };
 
 	void SetupAutoGun(ObjectInfo& object)
 	{
@@ -46,8 +48,10 @@ namespace TEN::Entities::Creatures::TR5
 	void InitialiseAutoGuns(short itemNumber)
 	{
 		auto& item = g_Level.Items[itemNumber];
-		item.MeshBits.Set(AutoGunJoints1);
 		item.Data = std::array<short, 4>();
+
+		item.MeshBits.Set(AutoGunBodyJoints);
+		item.MeshBits.Set(AutoGunChassisJoints);
 	}
 
 	void ControlAutoGun(short itemNumber)
@@ -62,9 +66,9 @@ namespace TEN::Entities::Creatures::TR5
 		{
 			auto& autoGun = *GetCreatureInfo(&item);
 
-			// Reset visible meshes.
-			item.MeshBits.ClearAll();
-			item.MeshBits.Set(AutoGunJoints1);
+			// Set visible meshes.
+			item.MeshBits.Set(AutoGunClosedHatchJoints);
+			item.MeshBits.Clear(AutoGunChassisJoints);
 
 			// Assess line of sight.
 			auto origin = GameVector(item.Pose.Position, item.RoomNumber);
@@ -72,12 +76,18 @@ namespace TEN::Entities::Creatures::TR5
 			bool los = LOS(&origin, &target);
 
 			// Interpolate orientation.
-			auto targetOrient = los ? Geometry::GetOrientToPoint(origin.ToVector3(), target.ToVector3()) : item.Pose.Orientation;
-			item.Pose.Orientation.Lerp(targetOrient, AUTO_GUN_ORIENT_LERP_ALPHA);
+			auto orient = EulerAngles(item.ItemFlags[0], item.ItemFlags[1], 0);
+			auto orientTo = los ? Geometry::GetOrientToPoint(origin.ToVector3(), target.ToVector3()) : item.Pose.Orientation;
+			orient.Lerp(orientTo, AUTO_GUN_ORIENT_LERP_ALPHA);
 
-			auto deltaAngle = item.Pose.Orientation - targetOrient;
+			item.ItemFlags[0] = orient.x; // NOTE: ItemFlags[0] stores X axis orientation.
+			item.ItemFlags[1] = orient.y; // NOTE: ItemFlags[1] stores Y axis orientation.
 
-			// Rotate barrel.
+			auto deltaAngle = orient - orientTo;
+
+			// Handle joint rotation.
+			autoGun.JointRotation[0] = orient.y;
+			autoGun.JointRotation[1] = orient.x;
 			autoGun.JointRotation[2] += item.ItemFlags[2]; // NOTE: ItemFlags[2] stores barrel turn rate.
 
 			// Fire gunshot.
@@ -158,7 +168,9 @@ namespace TEN::Entities::Creatures::TR5
 		}
 		else
 		{
-			item.MeshBits = 0xFFFFFAFF; // TODO: Demagic.
+			item.MeshBits.Set(AutoGunChassisJoints);
+			item.MeshBits.Clear(AutoGunClosedHatchJoints);
+
 			AnimateItem(&item);
 		}		
 	}
