@@ -567,7 +567,7 @@ bool SaveGame::Save(int slot)
 			mineBuilder.add_floor_height_front(mine->FloorHeightFront);
 			mineBuilder.add_floor_height_middle(mine->FloorHeightMiddle);
 			mineBuilder.add_gradient(mine->Gradient);
-			mineBuilder.add_stop_delay(mine->StopDelay);
+			mineBuilder.add_stop_delay(mine->StopDelayTime);
 			mineBuilder.add_turn_len(mine->TurnLen);
 			mineBuilder.add_turn_rot(mine->TurnRot);
 			mineBuilder.add_turn_x(mine->TurnX);
@@ -1521,7 +1521,7 @@ bool SaveGame::Load(int slot)
 			minecart->FloorHeightFront = savedMine->floor_height_front();
 			minecart->FloorHeightMiddle = savedMine->floor_height_middle();
 			minecart->Gradient = savedMine->gradient();
-			minecart->StopDelay = savedMine->stop_delay();
+			minecart->StopDelayTime = savedMine->stop_delay();
 			minecart->TurnLen = savedMine->turn_len();
 			minecart->TurnRot = savedMine->turn_rot();
 			minecart->TurnX = savedMine->turn_x();

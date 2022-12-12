@@ -332,22 +332,22 @@ namespace Misc
 
 		/// Check if particular action key is held
 		//@function KeyIsHeld
-		//@tparam ActionID action action mapping index to check
+		//@tparam Misc.ActionID action action mapping index to check
 		table_misc.set_function(ScriptReserved_KeyIsHeld, &KeyIsHeld);
 
 		/// Check if particular action key was hit (once)
 		//@function KeyIsHit
-		//@tparam ActionID action action mapping index to check
+		//@tparam Misc.ActionID action action mapping index to check
 		table_misc.set_function(ScriptReserved_KeyIsHit, &KeyIsHit);
 
 		/// Emulate pushing of a certain action key
 		//@function KeyPush
-		//@tparam ActionID action action mapping index to push
+		//@tparam Misc.ActionID action action mapping index to push
 		table_misc.set_function(ScriptReserved_KeyPush, &KeyPush);
 
 		/// Clears particular input from action key
 		//@function KeyClear
-		//@tparam ActionID action action mapping index to clear
+		//@tparam Misc.ActionID action action mapping index to clear
 		table_misc.set_function(ScriptReserved_KeyClear, &KeyClear);
 
 		table_misc.set_function(ScriptReserved_CalculateDistance, &CalculateDistance);

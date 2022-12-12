@@ -876,12 +876,8 @@ namespace TEN::Renderer
 		m_context->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_STENCIL | D3D11_CLEAR_DEPTH, 1.0f, 0);
 
 		RenderInventoryScene(m_backBufferRTV, m_depthStencilView, nullptr);
-#if _DEBUG
-		AddString(0, 0, commit.c_str(), D3DCOLOR_ARGB(255, 255, 255, 255), 0);
 		DrawAllStrings();
-#else
-		DrawAllStrings();
-#endif
+
 		m_swapChain->Present(0, 0);
 	}
 
@@ -958,6 +954,11 @@ namespace TEN::Renderer
 				PrintDebugMessage("Look axis vertical: %f", AxisMap[InputAxis::CameraVertical]);
 				PrintDebugMessage("Look axis horizontal: %f", AxisMap[InputAxis::CameraHorizontal]);
 				break;
+
+			case RENDERER_DEBUG_PAGE::WIREFRAME_MODE:
+				PrintDebugMessage("Wireframe mode");
+				break;
+
 			}
 		}
 	}
@@ -972,8 +973,8 @@ namespace TEN::Renderer
 			++index;
 
 		if (index < RENDERER_DEBUG_PAGE::NO_PAGE)
-			index = 4;
-		else if (index > RENDERER_DEBUG_PAGE::LOGIC_STATS)
+			index = RENDERER_DEBUG_PAGE::WIREFRAME_MODE;
+		else if (index > RENDERER_DEBUG_PAGE::WIREFRAME_MODE)
 			index = 0;
 
 		m_numDebugPage = (RENDERER_DEBUG_PAGE)index;

@@ -307,6 +307,7 @@ namespace TEN::Entities
 			obj->pivotLength = 50;
 			obj->radius = 128;
 			obj->intelligent = true;
+			obj->undead = true;
 			obj->ZoneType = ZoneType::Basic;
 			g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_X | ROT_Y;
 			g_Level.Bones[obj->boneIndex + 7 * 4] |= ROT_Y;
@@ -331,8 +332,8 @@ namespace TEN::Entities
 		obj = &Objects[ID_SETHA];
 		if (obj->loaded)
 		{
-			obj->initialise = InitialiseSetha;
-			obj->control = SethaControl;
+			obj->initialise = InitialiseSeth;
+			obj->control = SethControl;
 			obj->collision = CreatureCollision;
 			obj->shadowType = ShadowMode::All;
 			obj->HitPoints = 500;
