@@ -42,13 +42,13 @@ namespace TEN::Entities::TR4
 	constexpr auto SETH_WALK_TURN_RATE_MAX = ANGLE(7.0f);
 	constexpr auto SETH_RUN_TURN_RATE_MAX  = ANGLE(11.0f);
 
-	const auto SethPounceAttackJoints1 = std::vector<unsigned int>{ 13, 14, 15 };
-	const auto SethPounceAttackJoints2 = std::vector<unsigned int>{ 16, 17, 18 };
-
 	const auto SethBite1   = BiteInfo(Vector3(0.0f, 220.0f, 50.0f), 17);
 	const auto SethBite2   = BiteInfo(Vector3(0.0f, 220.0f, 50.0f), 13);
 	const auto SethAttack1 = BiteInfo(Vector3(-16.0f, 200.0f, 32.0f), 13);
 	const auto SethAttack2 = BiteInfo(Vector3(16.0f, 200.0f, 32.0f), 17);
+
+	const auto SethPounceAttackJoints1 = std::vector<unsigned int>{ 13, 14, 15 };
+	const auto SethPounceAttackJoints2 = std::vector<unsigned int>{ 16, 17, 18 };
 
 	constexpr auto LARA_STATE_SETH_DEATH = 13;
 	constexpr auto LARA_ANIM_SETH_DEATH	 = 14;
