@@ -154,7 +154,7 @@ namespace TEN::Entities::Creatures::TR5
 			}
 
 			if (item.ItemFlags[2])
-				SpawnAutoGunSmoke(origin.ToVector3i(), item.ItemFlags[2] / 16);
+				SpawnAutoGunSmoke(origin.ToVector3(), item.ItemFlags[2] / 16);
 		}
 		else
 		{
@@ -163,11 +163,11 @@ namespace TEN::Entities::Creatures::TR5
 		}		
 	}
 
-	void SpawnAutoGunSmoke(const Vector3i& pos, char shade)
+	void SpawnAutoGunSmoke(const Vector3& pos, char shade)
 	{
 		auto& spark = SmokeSparks[GetFreeSmokeSpark()];
 
-		auto sphere = BoundingSphere(pos.ToVector3(), 16.0f);
+		auto sphere = BoundingSphere(pos, BLOCK(1 / 64.0f));
 		auto sparkPos = Random::GeneratePointInSphere(sphere);
 
 		spark.on = true;

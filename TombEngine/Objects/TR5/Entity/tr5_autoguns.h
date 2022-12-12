@@ -9,5 +9,5 @@ namespace TEN::Entities::Creatures::TR5
 	void InitialiseAutoGuns(short itemNumber);
 
 	void ControlAutoGun(short itemNumber);
-	void SpawnAutoGunSmoke(const Vector3i& pos, char shade);
+	void SpawnAutoGunSmoke(const Vector3& pos, char shade);
 }
