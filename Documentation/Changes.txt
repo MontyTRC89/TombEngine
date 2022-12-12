@@ -3,6 +3,7 @@ Version 1.0.4
 
 * Add generic assignable effects for moveables - fire, sparks, smoke and laser / electric ignite.
 * Add ability to burn enemies with FLAME_EMITTER_1 and death blocks.
+* Add wireframe mode and other visual debug information (switch by F10/F11 debug page scroll hotkeys).
 * Activate Lara-bound volume triggers with mounted vehicles.
 * Remove TRC remnant which added HK to inventory if pistols weren't available.
 * Change default shatter sound to TR4_SMASH_ROCK (tomb4 default).

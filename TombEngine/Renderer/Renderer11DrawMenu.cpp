@@ -954,6 +954,11 @@ namespace TEN::Renderer
 				PrintDebugMessage("Look axis vertical: %f", AxisMap[InputAxis::CameraVertical]);
 				PrintDebugMessage("Look axis horizontal: %f", AxisMap[InputAxis::CameraHorizontal]);
 				break;
+
+			case RENDERER_DEBUG_PAGE::WIREFRAME_MODE:
+				PrintDebugMessage("Wireframe mode");
+				break;
+
 			}
 		}
 	}
@@ -968,8 +973,8 @@ namespace TEN::Renderer
 			++index;
 
 		if (index < RENDERER_DEBUG_PAGE::NO_PAGE)
-			index = 4;
-		else if (index > RENDERER_DEBUG_PAGE::LOGIC_STATS)
+			index = RENDERER_DEBUG_PAGE::WIREFRAME_MODE;
+		else if (index > RENDERER_DEBUG_PAGE::WIREFRAME_MODE)
 			index = 0;
 
 		m_numDebugPage = (RENDERER_DEBUG_PAGE)index;

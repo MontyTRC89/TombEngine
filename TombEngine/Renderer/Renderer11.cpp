@@ -372,6 +372,9 @@ namespace TEN::Renderer
 
 	void Renderer11::SetBlendMode(BLEND_MODES blendMode, bool force)
 	{
+		if (m_numDebugPage == RENDERER_DEBUG_PAGE::WIREFRAME_MODE)
+			blendMode = BLENDMODE_ADDITIVE;
+
 		if (blendMode != lastBlendMode || force)
 		{
 			switch (blendMode)
@@ -432,6 +435,9 @@ namespace TEN::Renderer
 
 	void Renderer11::SetDepthState(DEPTH_STATES depthState, bool force)
 	{
+		if (m_numDebugPage == RENDERER_DEBUG_PAGE::WIREFRAME_MODE)
+			depthState = DEPTH_STATE_NONE;
+
 		if (depthState != lastDepthState || force)
 		{
 			switch (depthState)
@@ -456,6 +462,12 @@ namespace TEN::Renderer
 
 	void Renderer11::SetCullMode(CULL_MODES cullMode, bool force)
 	{
+		if (m_numDebugPage == RENDERER_DEBUG_PAGE::WIREFRAME_MODE)
+		{
+			m_context->RSSetState(m_states->Wireframe());
+			return;
+		}
+
 		if (cullMode != lastCullMode || force)
 		{
 			switch (cullMode)
@@ -471,7 +483,6 @@ namespace TEN::Renderer
 			case CULL_MODE_CW:
 				m_context->RSSetState(m_cullClockwiseRasterizerState.Get());
 				break;
-
 			}
 
 			lastCullMode = cullMode;
