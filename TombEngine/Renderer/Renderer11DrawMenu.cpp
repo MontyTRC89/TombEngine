@@ -475,12 +475,22 @@ namespace TEN::Renderer
 		AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_USED_MEDIPACKS), PRINTSTRING_COLOR_WHITE, SF());
 		GetNextLinePosition(&y);
 
-		// Secrets found
-		if (g_GameFlow->NumberOfSecrets > 0)
+		// Secrets found in Level
+		if (g_GameFlow->GetLevel(CurrentLevel)->GetSecrets() > 0)
 		{
-			sprintf(buffer, "%d / %d", Statistics.Game.Secrets, g_GameFlow->NumberOfSecrets);
+			std::bitset<32> levelSecretBitSet(Statistics.Level.Secrets);
+			sprintf(buffer, "%d / %d", (int)levelSecretBitSet.count(), g_GameFlow->GetLevel(CurrentLevel)->GetSecrets());
 			AddString(MenuRightSideEntry, y, buffer, PRINTSTRING_COLOR_WHITE, SF());
-			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_SECRETS_FOUND), PRINTSTRING_COLOR_WHITE, SF());
+			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_LEVEL_SECRETS_FOUND), PRINTSTRING_COLOR_WHITE, SF());
+			GetNextLinePosition(&y);
+		}
+
+		// Secrets found total
+		if (g_GameFlow->TotalNumberOfSecrets > 0)
+		{
+			sprintf(buffer, "%d / %d", Statistics.Game.Secrets, g_GameFlow->TotalNumberOfSecrets);
+			AddString(MenuRightSideEntry, y, buffer, PRINTSTRING_COLOR_WHITE, SF());
+			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_TOTAL_SECRETS_FOUND), PRINTSTRING_COLOR_WHITE, SF());
 		}
 
 		DrawAllStrings();
@@ -866,12 +876,8 @@ namespace TEN::Renderer
 		m_context->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_STENCIL | D3D11_CLEAR_DEPTH, 1.0f, 0);
 
 		RenderInventoryScene(m_backBufferRTV, m_depthStencilView, nullptr);
-#if _DEBUG
-		AddString(0, 0, commit.c_str(), D3DCOLOR_ARGB(255, 255, 255, 255), 0);
 		DrawAllStrings();
-#else
-		DrawAllStrings();
-#endif
+
 		m_swapChain->Present(0, 0);
 	}
 
@@ -948,6 +954,11 @@ namespace TEN::Renderer
 				PrintDebugMessage("Look axis vertical: %f", AxisMap[InputAxis::CameraVertical]);
 				PrintDebugMessage("Look axis horizontal: %f", AxisMap[InputAxis::CameraHorizontal]);
 				break;
+
+			case RENDERER_DEBUG_PAGE::WIREFRAME_MODE:
+				PrintDebugMessage("Wireframe mode");
+				break;
+
 			}
 		}
 	}
@@ -962,8 +973,8 @@ namespace TEN::Renderer
 			++index;
 
 		if (index < RENDERER_DEBUG_PAGE::NO_PAGE)
-			index = 4;
-		else if (index > RENDERER_DEBUG_PAGE::LOGIC_STATS)
+			index = RENDERER_DEBUG_PAGE::WIREFRAME_MODE;
+		else if (index > RENDERER_DEBUG_PAGE::WIREFRAME_MODE)
 			index = 0;
 
 		m_numDebugPage = (RENDERER_DEBUG_PAGE)index;

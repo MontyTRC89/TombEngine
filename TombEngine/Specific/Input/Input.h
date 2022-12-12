@@ -104,6 +104,13 @@ namespace TEN::Input
 		Count
 	};
 
+	enum class QueueState
+	{
+		None,
+		Push,
+		Clear
+	};
+
 	enum class RumbleMode
 	{
 		None,
@@ -122,9 +129,10 @@ namespace TEN::Input
 
 	extern const char* g_KeyNames[];
 
-	extern vector<InputAction> ActionMap;
-	extern vector<bool>		   KeyMap;
-	extern vector<float>	   AxisMap;
+	extern vector<InputAction>	ActionMap;
+	extern vector<QueueState>	ActionQueue;
+	extern vector<bool>			KeyMap;
+	extern vector<float>		AxisMap;
 
 	// Legacy input bit fields.
 	extern int DbInput; // Debounce: is input clicked?
@@ -135,7 +143,9 @@ namespace TEN::Input
 	void InitialiseInput(HWND handle);
 	void DeinitialiseInput();
 	void DefaultConflict();
-	void UpdateInputActions(ItemInfo* item);
+	void UpdateInputActions(ItemInfo* item, bool applyQueue = false);
+	void ApplyActionQueue();
+	void ClearActionQueue();
 	void ClearAllActions();
 	void Rumble(float power, float delayInSec = 0.3f, RumbleMode mode = RumbleMode::Both);
 	void StopRumble();

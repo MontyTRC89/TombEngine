@@ -127,6 +127,20 @@ Must be true or false
 */
 	table_flow.set_function(ScriptReserved_EnableMassPickup, &FlowHandler::EnableMassPickup, this);
 
+/*** Enable or disable Lara drawing in title flyby.
+Must be true or false
+@function EnableLaraInTitle
+@tparam bool true or false
+*/
+	table_flow.set_function(ScriptReserved_EnableLaraInTitle, &FlowHandler::EnableLaraInTitle, this);
+
+/*** Enable or disable level selection in title flyby.
+Must be true or false
+@function EnableLevelSelect
+@tparam bool true or false
+*/
+	table_flow.set_function(ScriptReserved_EnableLevelSelect, &FlowHandler::EnableLevelSelect, this);
+
 /*** settings.lua.
 These functions are called in settings.lua, a file which holds your local settings.
 settings.lua shouldn't be bundled with any finished levels/games.
@@ -229,7 +243,7 @@ void FlowHandler::SetTitleScreenImagePath(std::string const& path)
 
 void FlowHandler::SetTotalSecretCount(int secretsNumber)
 {
-	NumberOfSecrets = secretsNumber;
+	TotalNumberOfSecrets = secretsNumber;
 }
 
 void FlowHandler::LoadFlowScript()
@@ -350,6 +364,21 @@ void FlowHandler::EnableMassPickup(bool massPickup)
 	MassPickup = massPickup;
 }
 
+bool FlowHandler::IsLaraInTitleEnabled() const
+{
+	return LaraInTitle;
+}
+
+void FlowHandler::EnableLaraInTitle(bool laraInTitle)
+{
+	LaraInTitle = laraInTitle;
+}
+
+void FlowHandler::EnableLevelSelect(bool levelSelect)
+{
+	LevelSelect = levelSelect;
+}
+
 bool FlowHandler::DoFlow()
 {
 	// We start with the title level, if no other index is specified
@@ -360,7 +389,7 @@ bool FlowHandler::DoFlow()
 	SelectedSaveGame = 0;
 	SaveGameHeader header;
 
-	// We loop indefinitely, looking for return values of DoTitle or DoLevel
+	// We loop indefinitely, looking for return values of DoLevel
 	bool loadFromSavegame = false;
 
 	while (DoTheGame)
@@ -374,7 +403,7 @@ bool FlowHandler::DoFlow()
 		{
 			try
 			{
-				status = DoTitle(0, level->AmbientTrack);
+				status = DoLevel(CurrentLevel);
 			}
 			catch (TENScriptException const& e)
 			{
@@ -397,9 +426,9 @@ bool FlowHandler::DoFlow()
 					invObj->ObjectName = obj->name.c_str();
 					invObj->Scale1 = obj->scale;
 					invObj->YOffset = obj->yOffset;
-					invObj->Orientation.x = FROM_DEGREES(obj->rot.x);
-					invObj->Orientation.y = FROM_DEGREES(obj->rot.y);
-					invObj->Orientation.z = FROM_DEGREES(obj->rot.z);
+					invObj->Orientation.x = ANGLE(obj->rot.x);
+					invObj->Orientation.y = ANGLE(obj->rot.y);
+					invObj->Orientation.z = ANGLE(obj->rot.z);
 					invObj->MeshBits = obj->meshBits;
 					invObj->Options = obj->action;
 					invObj->RotFlags = obj->rotationFlags;
@@ -408,7 +437,7 @@ bool FlowHandler::DoFlow()
 
 			try
 			{
-				status = DoLevel(CurrentLevel, level->AmbientTrack, loadFromSavegame);
+				status = DoLevel(CurrentLevel, loadFromSavegame);
 			}
 			catch (TENScriptException const& e) 
 			{
@@ -456,8 +485,8 @@ bool FlowHandler::DoFlow()
 	return true;
 }
 
-bool FlowHandler::CanPlayAnyLevel() const
+bool FlowHandler::IsLevelSelectEnabled() const
 {
-	return PlayAnyLevel;
+	return LevelSelect;
 }
 

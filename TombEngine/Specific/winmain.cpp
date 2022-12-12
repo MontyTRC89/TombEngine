@@ -32,8 +32,7 @@ WINAPP App;
 unsigned int ThreadID;
 uintptr_t ThreadHandle;
 HACCEL hAccTable;
-byte receivedWmClose = false;
-bool Debug = false;
+bool DebugMode = false;
 HWND WindowsHandle;
 DWORD MainThreadID;
 
@@ -110,6 +109,25 @@ std::vector<Vector2i> GetAllSupportedScreenResolutions()
 	return result;
 }
 
+void DisableDpiAwareness()
+{
+	// Don't use SHCore library directly, as it's not available on pre-win 8.1 systems.
+
+	typedef HRESULT(WINAPI* SetDpiAwarenessProc)(UINT);
+	static constexpr unsigned int PROCESS_SYSTEM_DPI_AWARE = 1;
+
+	auto lib = LoadLibrary("SHCore.dll");
+	if (lib == NULL)
+		return;
+
+	auto setDpiAwareness = (SetDpiAwarenessProc)GetProcAddress(lib, "SetProcessDpiAwareness");
+	if (setDpiAwareness == NULL)
+		return;
+
+	setDpiAwareness(PROCESS_SYSTEM_DPI_AWARE);
+	FreeLibrary(lib);
+}
+
 void WinProcMsg()
 {
 	MSG Msg;
@@ -152,6 +170,8 @@ void CALLBACK HandleWmCommand(unsigned short wParam)
 
 LRESULT CALLBACK WinAppProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
+	static bool receivedWmClose = false;
+
 	// Disables ALT + SPACE
 	if (msg == WM_SYSCOMMAND && wParam == SC_KEYMENU)
 	{
@@ -190,7 +210,7 @@ LRESULT CALLBACK WinAppProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			if (!g_Configuration.Windowed)
 				g_Renderer.ToggleFullScreen(true);
 
-			if (!Debug && ThreadHandle > 0)
+			if (!DebugMode && ThreadHandle > 0)
 			{
 				TENLog("Resuming game thread", LogLevel::Info);
 				ResumeThread((HANDLE)ThreadHandle);
@@ -205,7 +225,7 @@ LRESULT CALLBACK WinAppProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		if (!g_Configuration.Windowed)
 			ShowWindow(hWnd, SW_MINIMIZE);
 
-		if (!Debug)
+		if (!DebugMode)
 		{
 			TENLog("Suspending game thread", LogLevel::Info);
 			SuspendThread((HANDLE)ThreadHandle);
@@ -239,7 +259,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		}
 		else if (ArgEquals(argv[i], "debug"))
 		{
-			Debug = true;
+			DebugMode = true;
 		}
 		else if (ArgEquals(argv[i], "level") && argc > (i + 1))
 		{
@@ -254,7 +274,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	// Hide console window if mode isn't debug
 #ifndef _DEBUG
-	if (!Debug)
+	if (!DebugMode)
 		ShowWindow(GetConsoleWindow(), 0);
 #endif
 
@@ -307,6 +327,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		ShutdownTENLog();
 		return 0;
 	}
+
+	// Disable DPI scaling on Windows 8.1+ systems
+	DisableDpiAwareness();
 
 	// Setup main window
 	INITCOMMONCONTROLSEX commCtrlInit;

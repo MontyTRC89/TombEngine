@@ -58,13 +58,13 @@ namespace TEN::Control::Volumes
 			{
 			case TriggerVolumeType::Box:
 				if (roomNumber == Camera.pos.RoomNumber)
-					g_Renderer.AddDebugBox(volume->Box, Vector4(1.0f, 0.0f, 1.0f, 1.0f), RENDERER_DEBUG_PAGE::LOGIC_STATS);
+					g_Renderer.AddDebugBox(volume->Box, Vector4(1.0f, 0.0f, 1.0f, 1.0f), RENDERER_DEBUG_PAGE::LARA_STATS);
 				contains = volume->Box.Intersects(bbox);
 				break;
 
 			case TriggerVolumeType::Sphere:
 				if (roomNumber == Camera.pos.RoomNumber)
-					g_Renderer.AddDebugSphere(volume->Sphere.Center, volume->Sphere.Radius, Vector4(1.0f, 0.0f, 1.0f, 1.0f), RENDERER_DEBUG_PAGE::LOGIC_STATS);
+					g_Renderer.AddDebugSphere(volume->Sphere.Center, volume->Sphere.Radius, Vector4(1.0f, 0.0f, 1.0f, 1.0f), RENDERER_DEBUG_PAGE::LARA_STATS);
 				contains = volume->Sphere.Intersects(bbox);
 				break;
 			}
@@ -145,11 +145,9 @@ namespace TEN::Control::Volumes
 		auto* item = &g_Level.Items[itemNumber];
 		auto bBox = GameBoundingBox(item).ToBoundingOrientedBox(item->Pose);
 
-#ifdef _DEBUG
-		g_Renderer.AddDebugBox(bBox, Vector4(1.0f, 1.0f, 0.0f, 1.0f), RENDERER_DEBUG_PAGE::LOGIC_STATS);
-#endif
+		g_Renderer.AddDebugBox(bBox, Vector4(1.0f, 1.0f, 0.0f, 1.0f), RENDERER_DEBUG_PAGE::LARA_STATS);
 
-		if (item->ObjectNumber == ID_LARA)
+		if (item->ObjectNumber == ID_LARA || item->Index == Lara.Vehicle)
 			TestVolumes(item->RoomNumber, bBox, TriggerVolumeActivators::Player, itemNumber);
 		else if (Objects[item->ObjectNumber].intelligent)
 			TestVolumes(item->RoomNumber, bBox, TriggerVolumeActivators::NPC, itemNumber);

@@ -933,23 +933,19 @@ namespace TEN::Renderer
 
 	void Renderer11::AddDebugBox(BoundingOrientedBox box, Vector4 color, RENDERER_DEBUG_PAGE page)
 	{
-#ifdef _DEBUG
 		if (m_numDebugPage != page)
 			return;
 
 		Vector3 corners[8];
 		box.GetCorners(corners);
 		AddBox(corners, color);
-#endif _DEBUG
 	}
 
 	void Renderer11::AddDebugBox(Vector3 min, Vector3 max, Vector4 color, RENDERER_DEBUG_PAGE page)
 	{
-#ifdef _DEBUG
 		if (m_numDebugPage != page)
 			return;
 		AddBox(min, max, color);
-#endif _DEBUG
 	}
 
 	void Renderer11::AddDynamicLight(int x, int y, int z, short falloff, byte r, byte g, byte b)
@@ -1991,7 +1987,7 @@ namespace TEN::Renderer
 
 			BindLights(view.lightsToDraw);
 
-			m_stMisc.Caustics = (nativeRoom->flags & ENV_FLAG_WATER);
+			m_stMisc.Caustics = (int)(g_Gui.GetCurrentSettings().Configuration.EnableCaustics && (nativeRoom->flags & ENV_FLAG_WATER));
 			m_cbMisc.updateData(m_stMisc, m_context.Get());
 			BindConstantBufferPS(CB_MISC, m_cbMisc.get());
 			BindConstantBufferVS(CB_MISC, m_cbMisc.get());
@@ -2148,7 +2144,7 @@ namespace TEN::Renderer
 			return;
 
 		if (BinocularRange)
-			AlterFOV(ANGLE(80.0f) - BinocularRange);
+			AlterFOV(ANGLE(DEFAULT_FOV) - BinocularRange, false);
 
 		UINT stride = sizeof(RendererVertex);
 		UINT offset = 0;
@@ -2282,7 +2278,7 @@ namespace TEN::Renderer
 		m_context->ClearDepthStencilView(depthTarget, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 	}
 
-	void Renderer11::Draw()
+	void Renderer11::Render()
 	{
 		//RenderToCubemap(m_reflectionCubemap, Vector3(LaraItem->pos.xPos, LaraItem->pos.yPos - 1024, LaraItem->pos.zPos), LaraItem->roomNumber);
 		RenderScene(m_backBufferRTV, m_depthStencilView, gameCamera);

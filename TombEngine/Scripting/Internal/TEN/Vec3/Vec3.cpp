@@ -52,7 +52,7 @@ However, this function would return it as (0, 1, 1).
 @int X x coordinate
 @int Y y coordinate
 @int Z z coordinate
-@return A Vec3 object.
+@treturn Vec3 A Vec3 object.
 @function Vec3
 */
 Vec3::Vec3(int aX, int aY, int aZ) : x{aX}, y{aY}, z{aZ}

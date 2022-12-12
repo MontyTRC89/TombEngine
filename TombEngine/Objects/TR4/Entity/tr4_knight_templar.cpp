@@ -11,21 +11,20 @@
 #include "Game/misc.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
-#include "Math/Random.h"
+#include "Math/Math.h"
 #include "Specific/setup.h"
 
-using namespace TEN::Math::Random;
-using std::vector;
+using namespace TEN::Math;
 
 namespace TEN::Entities::TR4
 {
 	constexpr auto KNIGHT_TEMPLAR_SWORD_ATTACK_DAMAGE = 120;
 
-	#define KTEMPLAR_IDLE_TURN_RATE_MAX ANGLE(2.0f)
-	#define KTEMPLAR_WALK_TURN_RATE_MAX ANGLE(7.0f)
+	const auto KTEMPLAR_IDLE_TURN_RATE_MAX = ANGLE(2.0f);
+	const auto KTEMPLAR_WALK_TURN_RATE_MAX = ANGLE(7.0f);
 
 	const auto KnightTemplarBite = BiteInfo(Vector3::Zero, 11);
-	const vector<unsigned int> KnightTemplarSwordAttackJoints = { 10, 11 };
+	const std::vector<unsigned int> KnightTemplarSwordAttackJoints = { 10, 11 };
 
 	enum KnightTemplarState
 	{
@@ -86,10 +85,11 @@ namespace TEN::Entities::TR4
 			(item->Animation.AnimNumber - object->animIndex) == KTEMPLAR_ANIM_WALK_FORWARD_LEFT_2 ||
 			(item->Animation.AnimNumber - object->animIndex) == KTEMPLAR_ANIM_WALK_FORWARD_RIGHT_2)
 		{
-			if (TestProbability(0.5f))
+			if (Random::TestProbability(1 / 2.0f))
 			{
+				auto color = Vector3(0.9f, 0.8f, 0.6f);
 				auto pos = GetJointPosition(item, 10, Vector3i(0, 48, 448));
-				TriggerMetalSparks(pos.x, pos.y, pos.z, (GetRandomControl() & 0x1FF) - 256, -128 - (GetRandomControl() & 0x7F), (GetRandomControl() & 0x1FF) - 256, 0);
+				TriggerMetalSparks(pos.x, pos.y, pos.z, (GetRandomControl() & 0x1FF) - 256, -128 - (GetRandomControl() & 0x7F), (GetRandomControl() & 0x1FF) - 256, color, 0);
 			}
 		}
 
@@ -132,24 +132,30 @@ namespace TEN::Entities::TR4
 			creature->MaxTurn = KTEMPLAR_IDLE_TURN_RATE_MAX;
 			creature->Flags = 0;
 
-			if (AI.distance > pow(SECTOR(0.67f), 2))
+			if (AI.distance > SQUARE(BLOCK(2 / 3.0f)))
 			{
 				if (Lara.TargetEntity == item)
 					item->Animation.TargetState = KTEMPLAR_STATE_SHIELD;
 			}
-			else if (TestProbability(0.5f))
+			else if (Random::TestProbability(1 / 2.0f))
+			{
 				item->Animation.TargetState = KTEMPLAR_STATE_SWORD_ATTACK_2;
-			else if (TestProbability(0.5f))
+			}
+			else if (Random::TestProbability(1 / 2.0f))
+			{
 				item->Animation.TargetState = KTEMPLAR_STATE_SWORD_ATTACK_1;
+			}
 			else
+			{
 				item->Animation.TargetState = KTEMPLAR_STATE_SWORD_ATTACK_3;
+			}
 
 			break;
 
 		case KTEMPLAR_STATE_WALK_FORWARD:
 			creature->MaxTurn = KTEMPLAR_WALK_TURN_RATE_MAX;
 
-			if (Lara.TargetEntity == item || AI.distance <= pow(SECTOR(0.67f), 2))
+			if (Lara.TargetEntity == item || AI.distance <= SQUARE(BLOCK(2 / 3.0f)))
 				item->Animation.TargetState = KTEMPLAR_STATE_IDLE;
 
 			break;
@@ -167,7 +173,9 @@ namespace TEN::Entities::TR4
 					item->Pose.Orientation.y -= ANGLE(1.0f);
 			}
 			else
+			{
 				item->Pose.Orientation.y += AI.angle;
+			}
 
 			frameNumber = item->Animation.FrameNumber;
 			frameBase = g_Level.Anims[item->Animation.AnimNumber].frameBase;
@@ -176,28 +184,24 @@ namespace TEN::Entities::TR4
 			{
 				auto pos = GetJointPosition(item, LM_LINARM);
 				
-				auto* room = &g_Level.Rooms[item->RoomNumber];
-				FloorInfo* currentFloor = &room->floor[(pos.z - room->z) / SECTOR(1) + (pos.z - room->x) / SECTOR(1) * room->zSize];
+				auto& room = g_Level.Rooms[item->RoomNumber];
+				auto& currentFloor = room.floor[(pos.z - room.z) / BLOCK(1) + (pos.x - room.x) / BLOCK(1) * room.zSize];
 
-				if (currentFloor->Stopper)
+				if (currentFloor.Stopper)
 				{
-					for (int i = 0; i < room->mesh.size(); i++)
+					for (auto& mesh : room.mesh)
 					{
-						auto* mesh = &room->mesh[i];
-
-						if (floor(pos.x) == floor(mesh->pos.Position.x) &&
-							floor(pos.z) == floor(mesh->pos.Position.z) &&
-							StaticObjects[mesh->staticNumber].shatterType != SHT_NONE)
+						if (abs(pos.x - mesh.pos.Position.x) < SECTOR(1) &&
+							abs(pos.z - mesh.pos.Position.z) < SECTOR(1) &&
+							StaticObjects[mesh.staticNumber].shatterType == SHT_NONE)
 						{
-							ShatterObject(nullptr, mesh, -64, LaraItem->RoomNumber, 0);
+							ShatterObject(nullptr, &mesh, -64, LaraItem->RoomNumber, 0);
 							SoundEffect(SFX_TR4_SMASH_ROCK, &item->Pose);
 
-							currentFloor->Stopper = false;
+							currentFloor.Stopper = false;
 
 							TestTriggers(pos.x, pos.y, pos.z, item->RoomNumber, true);
 						}
-
-						mesh++;
 					}
 				}
 
@@ -223,19 +227,25 @@ namespace TEN::Entities::TR4
 					item->Pose.Orientation.y -= ANGLE(1.0f);
 			}
 			else
+			{
 				item->Pose.Orientation.y += AI.angle;
+			}
 
 			if (item->HitStatus)
 			{
-				if (TestProbability(0.5f))
+				if (Random::TestProbability(1 / 2.0f))
 					item->Animation.TargetState = KTEMPLAR_STATE_SHIELD_HIT_1;
 				else
 					item->Animation.TargetState = KTEMPLAR_STATE_SHIELD_HIT_2;
 			}
-			else if (AI.distance <= pow(SECTOR(0.67f), 2) || Lara.TargetEntity != item)
+			else if (AI.distance <= SQUARE(BLOCK(2 / 3.0f)) || Lara.TargetEntity != item)
+			{
 				item->Animation.TargetState = KTEMPLAR_STATE_IDLE;
+			}
 			else
+			{
 				item->Animation.TargetState = KTEMPLAR_STATE_SHIELD;
+			}
 
 			break;
 

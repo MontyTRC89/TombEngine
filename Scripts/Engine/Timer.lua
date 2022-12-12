@@ -13,6 +13,7 @@
 --	end
 --	
 --	-- This function triggers the timer
+--
 --	LevelFuncs.TriggerTimer = function(obj) 
 --		local myTimer = Timer.Create("my_timer",
 --			5.0,
@@ -41,6 +42,7 @@ Timer = {
 	--
 	-- You have the option of displaying the remaining time on the clock. Timer format details:
 	--
+	--@advancedDesc
 	--	-- deciseconds are 1/10th of a second
 	--	
 	--	-- mins:secs
@@ -55,19 +57,17 @@ Timer = {
 	--	-- secs; also what is printed if you pass true instead of a table
 	--	local myTimeFormat4 = {seconds = true}
 	--
-	--__At any given time, only one timer can show its countdown__.
-	--
-	--__Do not give your timers a name beginning with __TEN, as this is reserved for timers used by other internal libaries__.
-	--
 	--Use this sparingly; in the classics, timed challenges did not have visible countdowns. For shorter timers, the gameplay benefit from showing the remaining time might not be necessary, and could interfere with the atmosphere of the level.
 	--
-	-- @string name A label to give this timer; used to retrieve the timer later
+	--At any given time, only one timer can show its countdown.
+	--
+	-- @string name A label to give this timer; used to retrieve the timer later. __Do not give your timers a name beginning with __TEN, as this is reserved for timers used by other internal libaries__.
 	-- @number totalTime The duration of the timer, in seconds
 	-- @bool loop if true, the timer will start again immediately after the time has elapsed
 	-- @tparam ?table|bool timerFormat If a table is given, the remaining time will be shown as a string, formatted according to the values in the table. If true, the remaining seconds, rounded up, will show at the bottom of the screen. If false, the remaining time will not be shown on screen. 
-	-- @function func The LevelFunc function to call when the time is up
+	-- @func func The LevelFunc function to call when the time is up
 	-- @param[opt] ... a variable number of arguments with which the above function will be called
-	-- @return The timer in its paused state
+	-- @treturn Timer The timer in its paused state
 	--
 	Create = function(name, totalTime, loop, timerFormat, func, ...)
 		local obj = {}
@@ -101,7 +101,7 @@ Timer = {
 
 	--- Get a timer by its name.
 	-- @string name The label that was given to the timer when it was created
-	-- @return The timer
+	-- @treturn Timer The timer
 	Get = function(name)
 		if LevelVars.Engine.Timer.timers[name] then
 			local obj = {}
@@ -234,7 +234,7 @@ Timer = {
 
 	--- Get whether or not the timer is active
 	-- @function myTimer:IsActive
-	-- @return true if the timer is active, false if otherwise
+	-- @treturn bool true if the timer is active, false if otherwise
 	IsActive = function(t)
 		return LevelVars.Engine.Timer.timers[t.name].active
 	end;
@@ -256,14 +256,14 @@ Timer = {
 
 	--- Get whether or not the timer is paused
 	-- @function myTimer:IsPaused
-	-- @return true if the timer is paused, false if otherwise
+	-- @treturn bool true if the timer is paused, false if otherwise
 	IsPaused = function(t)
 		return LevelVars.Engine.Timer.timers[t.name].paused
 	end;
 
 	--- Get the remaining time for a timer.
 	-- @function myTimer:GetRemainingTime
-	-- @return the time in seconds remaining on the clock
+	-- @treturn float the time in seconds remaining on the clock
 	GetRemainingTime = function(t)
 		return LevelVars.Engine.Timer.timers[t.name].remainingTime
 	end;
@@ -278,7 +278,7 @@ Timer = {
 	--- Get the total time for a timer.
 	-- This is the amount of time the timer will start with, as well as when starting a new loop
 	-- @function myTimer:GetRemainingTime
-	-- @return the timer's total time
+	-- @treturn float the timer's total time
 	GetTotalTime = function(t)
 		return LevelVars.Engine.Timer.timers[t.name].totalTime
 	end;

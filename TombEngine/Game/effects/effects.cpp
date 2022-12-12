@@ -19,6 +19,7 @@
 #include "Objects/objectslist.h"
 #include "Renderer/Renderer11.h"
 #include "Sound/sound.h"
+#include "Specific/clock.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
@@ -392,9 +393,9 @@ void UpdateSparks()
 	}
 }
 
-void TriggerRicochetSpark(GameVector* pos, short angle, int num, int unk)
+void TriggerRicochetSpark(const GameVector& pos, short angle, int count, int unk)
 {
-	TriggerRicochetSpark(pos, angle, num);
+	TriggerRicochetSpark(pos, angle, count);
 }
 
 void TriggerCyborgSpark(int x, int y, int z, short xv, short yv, short zv)
@@ -893,12 +894,12 @@ void TriggerUnderwaterBlood(int x, int y, int z, int size)
 	}
 }
 
-void Ricochet(Pose* pos)
+void Ricochet(Pose& pose)
 {
-	short angle = Geometry::GetOrientToPoint(pos->Position.ToVector3(), LaraItem->Pose.Position.ToVector3()).y;
-	auto target = GameVector(pos->Position);
-	TriggerRicochetSpark(&target, angle / 16, 3, 0);
-	SoundEffect(SFX_TR4_WEAPON_RICOCHET, pos);
+	short angle = Geometry::GetOrientToPoint(pose.Position.ToVector3(), LaraItem->Pose.Position.ToVector3()).y;
+	auto target = GameVector(pose.Position);
+	TriggerRicochetSpark(target, angle / 16, 3, 0);
+	SoundEffect(SFX_TR4_WEAPON_RICOCHET, &pose);
 }
 
 void ControlWaterfallMist(short itemNumber)
@@ -1271,7 +1272,7 @@ void TriggerFlashSmoke(int x, int y, int z, short roomNumber)
 	spark->mirror = mirror;
 }
 
-void TriggerFireFlame(int x, int y, int z, FlameType type)
+void TriggerFireFlame(int x, int y, int z, FlameType type, const Vector3& color1, const Vector3& color2)
 {
 	int dx = LaraItem->Pose.Position.x - x;
 	int dz = LaraItem->Pose.Position.z - z;
@@ -1283,41 +1284,88 @@ void TriggerFireFlame(int x, int y, int z, FlameType type)
 
 	spark->on = true;
 
-	if (type == FlameType::Small)
+	if (color1 == Vector3::Zero || color2 == Vector3::Zero)
 	{
-		spark->sR = spark->sG = (GetRandomControl() & 0x1F) + 48;
-		spark->sB = (GetRandomControl() & 0x3F) - 64;
-	}
-	else
-	{
-		if (type == FlameType::SmallFast)
+		// Legacy default colours, for compatibility with TR4-TR5 objects.
+
+		switch (type)
 		{
+		case FlameType::SmallFast:
 			spark->sR = 48;
 			spark->sG = 48;
 			spark->sB = (GetRandomControl() & 0x1F) + 128;
-
 			spark->dR = 32;
 			spark->dG = (GetRandomControl() & 0x3F) - 64;
 			spark->dB = (GetRandomControl() & 0x3F) + 64;
-		}
-		else
-		{
+			break;
+
+		case FlameType::Small:
+			spark->sR = spark->sG = (GetRandomControl() & 0x1F) + 48;
+			spark->sB = (GetRandomControl() & 0x3F) - 64;
+			break;
+
+		default:
 			spark->sR = 255;
 			spark->sB = 48;
 			spark->sG = (GetRandomControl() & 0x1F) + 48;
+			break;
+		}
+
+		if (type != FlameType::SmallFast)
+		{
+			spark->dR = (GetRandomControl() & 0x3F) - 64;
+			spark->dG = (GetRandomControl() & 0x3F) + -128;
+			spark->dB = 32;
 		}
 	}
-
-	if (type != FlameType::StaticFlicker)
+	else
 	{
-		spark->dR = (GetRandomControl() & 0x3F) - 64;
-		spark->dG = (GetRandomControl() & 0x3F) + -128;
-		spark->dB = 32;
+		// New colored flame processing.
+
+		int colorS[3] = { int(color1.x * UCHAR_MAX), int(color1.y * UCHAR_MAX), int(color1.z * UCHAR_MAX) };
+		int colorD[3] = { int(color2.x * UCHAR_MAX), int(color2.y * UCHAR_MAX), int(color2.z * UCHAR_MAX) };
+
+		// Determine weakest RGB component.
+
+		int lowestS = UCHAR_MAX;
+		int lowestD = UCHAR_MAX;
+		for (int i = 0; i < 3; i++)
+		{
+			if (lowestS > colorS[i]) lowestS = colorS[i];
+			if (lowestD > colorD[i]) lowestD = colorD[i];
+		}
+
+		// Introduce random color shift for non-weakest RGB components.
+
+		static constexpr int CHROMA_SHIFT = 32;
+		static constexpr float LUMA_SHIFT = 0.5f;
+
+		for (int i = 0; i < 3; i++)
+		{
+			if (colorS[i] != lowestS)
+				colorS[i] = int(colorS[i] + GenerateInt(-CHROMA_SHIFT, CHROMA_SHIFT));
+			if (colorD[i] != lowestD)
+				colorD[i] = int(colorD[i] + GenerateInt(-CHROMA_SHIFT, CHROMA_SHIFT));
+
+			colorS[i] = int(colorS[i] * (1.0f + GenerateFloat(-LUMA_SHIFT, 0)));
+			colorD[i] = int(colorD[i] * (1.0f + GenerateFloat(-LUMA_SHIFT, 0)));
+
+			colorS[i] =	std::clamp(colorS[i], 0, UCHAR_MAX);
+			colorD[i] =	std::clamp(colorD[i], 0, UCHAR_MAX);
+		}
+
+		spark->sR = colorS[0];
+		spark->sG = colorS[1];
+		spark->sB = colorS[2];
+
+		spark->dR = colorD[0];
+		spark->dG = colorD[1];
+		spark->dB = colorD[2];
 	}
 
 	if (type == FlameType::Small ||
-		type == FlameType::Static ||
-		type == FlameType::StaticFlicker)
+		type == FlameType::SmallFast ||
+		type == FlameType::Static)
 	{
 		spark->fadeToBlack = 6;
 		spark->colFadeSpeed = (GetRandomControl() & 3) + 5;
@@ -1409,7 +1457,7 @@ void TriggerFireFlame(int x, int y, int z, FlameType type)
 		{
 			spark->dSize = spark->size / 16;
 
-			if (type == FlameType::GreenPulse)
+			if (type == FlameType::Pulse)
 			{
 				spark->colFadeSpeed >>= 2;
 				spark->fadeToBlack = spark->fadeToBlack >> 2;
@@ -1429,7 +1477,7 @@ void TriggerFireFlame(int x, int y, int z, FlameType type)
 	{
 		spark->dSize = (spark->size / 16.0f);
 
-		if (type == FlameType::GreenPulse)
+		if (type == FlameType::Pulse)
 		{
 			spark->colFadeSpeed >>= 2;
 			spark->fadeToBlack = spark->fadeToBlack >> 2;
@@ -1439,10 +1487,13 @@ void TriggerFireFlame(int x, int y, int z, FlameType type)
 	}
 }
 
-void TriggerMetalSparks(int x, int y, int z, int xv, int yv, int zv, int additional)
+void TriggerMetalSparks(int x, int y, int z, int xv, int yv, int zv, const Vector3& color, int additional)
 {
 	int dx = LaraItem->Pose.Position.x - x;
 	int dz = LaraItem->Pose.Position.z - z;
+	int colorR = std::clamp(int(color.x * UCHAR_MAX), 0, UCHAR_MAX);
+	int colorG = std::clamp(int(color.y * UCHAR_MAX), 0, UCHAR_MAX);
+	int colorB = std::clamp(int(color.z * UCHAR_MAX), 0, UCHAR_MAX);
 
 	if (dx >= -16384 && dx <= 16384 && dz >= -16384 && dz <= 16384)
 	{
@@ -1450,14 +1501,14 @@ void TriggerMetalSparks(int x, int y, int z, int xv, int yv, int zv, int additio
 
 		auto* spark = GetFreeParticle();
 
-		spark->dG = (r & 0x7F) + 64;
-		spark->dB = -64 - (r & 0x7F) + 64;
+		spark->dG =  colorG;
+		spark->dB =  colorB;
 		spark->life = 10;
 		spark->sLife = 10;
-		spark->sR = 255;
-		spark->sG = 255;
-		spark->sB = 255;
-		spark->dR = 255;
+		spark->sR = colorR;
+		spark->sG = colorG;
+		spark->sB = colorB;
+		spark->dR = colorR;
 		spark->x = (r & 7) + x - 3;
 		spark->on = 1;
 		spark->colFadeSpeed = 3;
@@ -1465,7 +1516,7 @@ void TriggerMetalSparks(int x, int y, int z, int xv, int yv, int zv, int additio
 		spark->y = ((r >> 3) & 7) + y - 3;
 		spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
 		spark->friction = 34;
-		spark->scalar = 1;
+		spark->scalar = 2;
 		spark->z = ((r >> 6) & 7) + z - 3;
 		spark->flags = 2;
 		spark->xVel = (byte)(r >> 2) + xv - 128;
@@ -1529,7 +1580,7 @@ void ProcessEffects(ItemInfo* item)
 	constexpr auto MAX_LIGHT_FALLOFF = 13;
 	constexpr auto BURN_HEALTH_LARA = 7;
 	constexpr auto BURN_HEALTH_NPC = 1;
-	constexpr auto BURN_AFTERMATH_TIMEOUT = 2 * FPS;
+	constexpr auto BURN_AFTERMATH_TIMEOUT = 4 * FPS;
 	constexpr auto BURN_DAMAGE_PROBABILITY = 1 / 8.0f;
 
 	if (item->Effect.Type == EffectType::None)
@@ -1541,7 +1592,10 @@ void ProcessEffects(ItemInfo* item)
 
 		if (!item->Effect.Count)
 		{
-			if (item->Effect.Type == EffectType::Fire)
+			if (item->Effect.Type == EffectType::Fire || 
+				item->Effect.Type == EffectType::Custom || 
+				item->Effect.Type == EffectType::ElectricIgnite || 
+				item->Effect.Type == EffectType::RedIgnite)
 			{
 				item->Effect.Type = EffectType::Smoke;
 				item->Effect.Count = BURN_AFTERMATH_TIMEOUT;
@@ -1566,16 +1620,37 @@ void ProcessEffects(ItemInfo* item)
 				TriggerFireFlame(pos.x, pos.y, pos.z, TestProbability(1 / 10.0f) ? FlameType::Trail : FlameType::Medium);
 			break;
 
+		case EffectType::Custom:
+			if (TestProbability(1 / 8.0f))			
+				TriggerFireFlame(pos.x, pos.y, pos.z, TestProbability(1 / 10.0f) ? FlameType::Trail : FlameType::Medium, 
+					item->Effect.PrimaryEffectColor, item->Effect.SecondaryEffectColor);
+			break;
+
 		case EffectType::Sparks:
 			if (TestProbability(1 / 10.0f))
-				TriggerElectricSpark(&GameVector(pos.x, pos.y, pos.z, item->RoomNumber),
+				TriggerElectricSpark(GameVector(pos, item->RoomNumber),
 					EulerAngles(0, Random::GenerateAngle(ANGLE(0), ANGLE(359)), 0), 2);
 			if (TestProbability(1 / 64.0f))
 				TriggerRocketSmoke(pos.x, pos.y, pos.z, 0);
 			break;
 
+		case EffectType::ElectricIgnite:
+			if (TestProbability(1 / 1.0f))
+				TriggerElectricSpark(GameVector(pos, item->RoomNumber),
+					EulerAngles(0, Random::GenerateAngle(ANGLE(0), ANGLE(359)), 0), 2);
+			if (TestProbability(1 / 1.0f))
+				TriggerFireFlame(pos.x, pos.y, pos.z, TestProbability(1 / 10.0f) ? FlameType::Medium : FlameType::Medium, 
+					Vector3(0.2f, 0.5f, 1.0f), Vector3(0.2f, 0.8f, 1.0f));
+			break;
+
+		case EffectType::RedIgnite:
+			if (TestProbability(1 / 1.0f))
+				TriggerFireFlame(pos.x, pos.y, pos.z, TestProbability(1 / 10.0f) ? FlameType::Medium : FlameType::Medium, 
+					Vector3(1.0f, 0.5f, 0.2f), Vector3(0.6f, 0.1f, 0.0f));
+			break;
+
 		case EffectType::Smoke:
-			if (TestProbability(1 / 8.0f))
+			if (TestProbability(1 / 32.0f))
 				TriggerRocketSmoke(pos.x, pos.y, pos.z, 0);
 			break;
 		}
@@ -1599,11 +1674,13 @@ void ProcessEffects(ItemInfo* item)
 		SoundEffect(SOUND_EFFECTS::SFX_TR5_HISS_LOOP_SMALL, &item->Pose);
 		break;
 
+	case EffectType::ElectricIgnite:
 	case EffectType::Sparks:
 		SoundEffect(SOUND_EFFECTS::SFX_TR4_LARA_ELECTRIC_CRACKLES, &item->Pose);
 		break;
 
-	case EffectType::Fire:
+	case EffectType::Fire: 
+	case EffectType::Custom:
 		SoundEffect(SOUND_EFFECTS::SFX_TR4_LOOP_FOR_SMALL_FIRES, &item->Pose);
 		break;
 	}
@@ -1616,22 +1693,58 @@ void ProcessEffects(ItemInfo* item)
 			DoDamage(item, item->IsLara() ? BURN_HEALTH_LARA : BURN_HEALTH_NPC);
 		}
 	}
-
-	int waterHeight = GetWaterHeight(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, item->RoomNumber);
-
-	if (item->Effect.Type != EffectType::Sparks && (waterHeight != NO_HEIGHT && item->Pose.Position.y > waterHeight))
+	
+	if (item->Effect.Type != EffectType::Sparks && item->Effect.Type != EffectType::Smoke)
 	{
-		if (item->Effect.Type == EffectType::Fire)
+		int waterHeight = GetWaterHeight(item);
+		int itemLevel = item->Pose.Position.y - GameBoundingBox(item).GetHeight() / 3;
+
+		if (waterHeight != NO_HEIGHT && itemLevel > waterHeight)
 		{
 			item->Effect.Type = EffectType::Smoke;
-			item->Effect.Count = 10;
+			item->Effect.Count = 1 * FPS;
 		}
-		else
-			item->Effect.Type = EffectType::None;
 	}
 
 	if (item->IsLara() && GetLaraInfo(item)->Control.WaterStatus == WaterStatus::FlyCheat)
-	{
 		item->Effect.Type = EffectType::None;
-	}
+}
+
+void TriggerAttackFlame(const Vector3i& pos, const Vector3& color, int scale)
+{
+	auto& spark = *GetFreeParticle();
+
+	spark.on = true;
+	spark.sR = 0;
+	spark.sG = 0;
+	spark.sB = 0;
+	spark.dR = color.x;
+	spark.dG = color.y;
+	spark.dB = color.z;
+	spark.fadeToBlack = 8;
+	spark.colFadeSpeed = Random::GenerateInt(4, 8);
+	spark.blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+	spark.life = Random::GenerateInt(20, 28);
+	spark.sLife = spark.life;
+	spark.x = pos.x + Random::GenerateInt(-8, 8);
+	spark.y = pos.y;
+	spark.z = pos.z + Random::GenerateInt(-8, 8);
+	spark.xVel = Random::GenerateInt(-128, 128);
+	spark.yVel = 0;
+	spark.zVel = Random::GenerateInt(-128, 128);
+	spark.friction = 5;
+	spark.flags = SP_EXPDEF | SP_DEF | SP_SCALE;
+	spark.rotAng = Random::GenerateInt(0, 4096); // NOTE: Effect angles use [0, 4096] range.
+
+	if (TestProbability(1 / 2.0f))
+		spark.rotAdd = -32 - (GetRandomControl() & 0x1F);
+	else
+		spark.rotAdd = (GetRandomControl() & 0x1F) + 32;
+
+	spark.maxYvel = 0;
+	spark.gravity = Random::GenerateInt(16, 48);
+	spark.scalar = 2;
+	spark.size = Random::GenerateInt(0, 16) + scale;
+	spark.sSize = spark.size;
+	spark.dSize = spark.size / 4;
 }

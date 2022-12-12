@@ -521,7 +521,7 @@ namespace TEN::Entities::TR4
 					}
 					else
 					{
-						TriggerMetalSparks(pos1.x, pos1.y, pos1.z, -1, -1, 0, 1);
+						TriggerMetalSparks(pos1.x, pos1.y, pos1.z, -1, -1, 0, Vector3(1.0f, 1.0f, 0.3f), 1);
 						TriggerDynamicLight(
 							pos1.x, pos1.y, pos1.z,
 							10,
@@ -557,7 +557,7 @@ namespace TEN::Entities::TR4
 					96 - ((random >> 6) & 0x1F),
 					128 - ((random >> 4) & 0x1F));
 
-				TriggerMetalSparks(pos1.x, pos1.y, pos1.z, -1, -1, 0, 1);
+				TriggerMetalSparks(pos1.x, pos1.y, pos1.z, -1, -1, 0, Vector3(1.0f, 1.0f, 0.3f), 1);
 			}
 
 			break;

@@ -15,7 +15,7 @@ Represents the properties of an object as it appears in the inventory.
 	@function InventoryItem
 	@tparam string nameKey key for the item's (localised) name.<br />
 Corresponds to an entry in strings.lua.
-	@tparam ObjID slot slot of inventory object to change
+	@tparam Objects.ObjID slot slot of inventory object to change
 	@tparam int yOffset y-axis offset (positive values move the item down).<br />
 A value of about 100 will cause the item to display directly below its usual position.
 	@tparam float scale item size (1 being standard size).<br />
@@ -24,7 +24,10 @@ and a value of 2 will cause the item to render at twice the size.
 	@tparam Rotation rot rotation about x, y, and z axes
 	@tparam RotationAxis axis Axis to rotate about when the item is being looked at in the inventory.<br />
 Note that this is entirely separate from the `rot` field described above.
-Must be RotationAxis.X, RotationAxis.Y or RotationAxis.Z.
+Must one of the following:
+	X
+	Y
+	Z
 e.g. `myItem.rotAxisWhenCurrent = RotationAxis.X`
 	@tparam int meshBits __Not currently implemented__ (will have no effect regardless of what you set it to)
 	@tparam ItemAction action is this usable, equippable, or examinable?<br/>
@@ -33,7 +36,7 @@ Must be one of:
 	USE
 	EXAMINE
 e.g. `myItem.action = ItemAction.EXAMINE`
-	@return an InventoryItem
+	@treturn InventoryItem an InventoryItem
 */
 InventoryItem::InventoryItem(std::string const& a_name, GAME_OBJECT_ID a_slot, short a_yOffset, float a_scale, Rotation const & a_rot, RotationFlags a_rotationFlags, int a_meshBits, ItemOptions a_action) :
 	name{ a_name },

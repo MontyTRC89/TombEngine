@@ -301,9 +301,7 @@ namespace TEN::Effects::Environment
 
 			// Check if particle got out of room bounds
 
-			if (p.Position.y <= (r.maxceiling - STEP_SIZE) || p.Position.y >= (r.minfloor + STEP_SIZE) ||
-				p.Position.z <= (r.z + WALL_SIZE - STEP_SIZE) || p.Position.z >= (r.z + ((r.zSize - 1) << 10) + STEP_SIZE) ||
-				p.Position.x <= (r.x + WALL_SIZE - STEP_SIZE) || p.Position.x >= (r.x + ((r.xSize - 1) << 10) + STEP_SIZE))
+			if (!IsPointInRoom(p.Position, p.Room))
 			{
 				if (!collisionCalculated)
 				{
@@ -425,7 +423,7 @@ namespace TEN::Effects::Environment
 
 			auto part = WeatherParticle();
 
-			part.Velocity = Random::GenerateVector3() * MAX_DUST_SPEED;
+			part.Velocity = Random::GenerateDirection() * MAX_DUST_SPEED;
 
 			part.Size = GenerateFloat(MAX_DUST_SIZE / 2, MAX_DUST_SIZE);
 

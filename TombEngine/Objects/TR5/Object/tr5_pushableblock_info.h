@@ -1,7 +1,11 @@
 #pragma once
 
+enum class PushableMovementState;
+
 struct PushableInfo
 {
+	PushableMovementState MovementState;
+
 	int height;				// height for collision, also in floor procedure
 	int weight;
 	int stackLimit;

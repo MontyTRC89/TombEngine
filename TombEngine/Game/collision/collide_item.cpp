@@ -159,13 +159,12 @@ bool GetCollidedObjects(ItemInfo* collidingItem, int radius, bool onlyVisible, I
 					auto* item = &g_Level.Items[itemNumber];
 
 					if (item == collidingItem ||
-						item->ObjectNumber == ID_LARA && ignoreLara ||
-						item->Flags & 0x8000 ||
+						(ignoreLara && item->ObjectNumber == ID_LARA) ||
+						(onlyVisible && item->Status == ITEM_INVISIBLE) ||
+						item->Flags & IFLAG_KILLED ||
 						item->MeshBits == NO_JOINT_BITS ||
 						(Objects[item->ObjectNumber].drawRoutine == nullptr && item->ObjectNumber != ID_LARA) ||
-						(Objects[item->ObjectNumber].collision == nullptr && item->ObjectNumber != ID_LARA) ||
-						onlyVisible && item->Status == ITEM_INVISIBLE ||
-						item->ObjectNumber == ID_BURNING_FLOOR)
+						(Objects[item->ObjectNumber].collision == nullptr && item->ObjectNumber != ID_LARA))
 					{
 						itemNumber = item->NextItem;
 						continue;
@@ -869,7 +868,7 @@ bool CollideSolidBounds(ItemInfo* item, const GameBoundingBox& box, const Pose& 
 	itemBounds.Extents = itemBounds.Extents - Vector3(SECTOR(1));
 
 	// Draw static bounds.
-	g_Renderer.AddDebugBox(staticBounds, Vector4(1, 0.3f, 0, 1), RENDERER_DEBUG_PAGE::LOGIC_STATS);
+	g_Renderer.AddDebugBox(staticBounds, Vector4(1, 0.3f, 0, 1), RENDERER_DEBUG_PAGE::DIMENSION_STATS);
 
 	// Calculate horizontal item collision bounds according to radius.
 	GameBoundingBox collBox;
@@ -900,7 +899,7 @@ bool CollideSolidBounds(ItemInfo* item, const GameBoundingBox& box, const Pose& 
 	bool prevHorIntersects = staticBounds.Intersects(prevCollBounds);
 
 	// Draw item coll bounds.
-	g_Renderer.AddDebugBox(collBounds, intersects ? Vector4(1, 0, 0, 1) : Vector4(0, 1, 0, 1), RENDERER_DEBUG_PAGE::LOGIC_STATS);
+	g_Renderer.AddDebugBox(collBounds, intersects ? Vector4(1, 0, 0, 1) : Vector4(0, 1, 0, 1), RENDERER_DEBUG_PAGE::DIMENSION_STATS);
 
 	// Decompose static bounds into top/bottom plane vertices.
 	Vector3 corners[8];
