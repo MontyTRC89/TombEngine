@@ -10,15 +10,15 @@ namespace sol
 }
 class Vec3;
 
-class Camera : public NamedBase<Camera, LevelCameraInfo &>
+class CameraObject : public NamedBase<CameraObject, LevelCameraInfo &>
 {
 public:
 	using IdentifierType = std::reference_wrapper<LevelCameraInfo>;
-	Camera(LevelCameraInfo& ref);
-	~Camera() = default;
+	CameraObject(LevelCameraInfo& ref);
+	~CameraObject() = default;
 
-	Camera& operator=(Camera const& other) = delete;
-	Camera(Camera const& other) = delete;
+	CameraObject& operator=(CameraObject const& other) = delete;
+	CameraObject(CameraObject const& other) = delete;
 
 	static void Register(sol::table &);
 	Vec3 GetPos() const;

@@ -775,6 +775,10 @@ void ReadRooms()
 		}
 
 		int numTriggerVolumes = ReadInt32();
+
+		//Reserve in advance so the vector doesn't resize itself and leave anything
+		//in the script name-to-reference map obsolete.
+		room.triggerVolumes.reserve(numTriggerVolumes);
 		for (int j = 0; j < numTriggerVolumes; j++)
 		{
 			auto& volume = room.triggerVolumes.emplace_back();
@@ -801,8 +805,8 @@ void ReadRooms()
 			volume.Sphere = BoundingSphere(volume.Position, volume.Scale.x);
 
 			volume.StateQueue.reserve(VOLUME_STATE_QUEUE_SIZE);
-
-			g_GameScriptEntities->AddName(volume.Name, volume);
+			if(!volume.Name.empty())
+				g_GameScriptEntities->AddName(volume.Name, volume);
 		}
 
 		room.flippedRoom = ReadInt32();
