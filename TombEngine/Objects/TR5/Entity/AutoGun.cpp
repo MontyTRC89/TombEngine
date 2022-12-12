@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "Objects/TR5/Entity/tr5_autoguns.h"
+#include "Objects/TR5/Entity/AutoGun.h"
 
 #include "Game/animation.h"
 #include "Game/collision/sphere.h"
