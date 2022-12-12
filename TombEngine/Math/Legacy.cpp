@@ -1,49 +1,20 @@
 #include "framework.h"
 #include "Math/Legacy.h"
 
-#include <cmath>
-
-#include "Math/Constants.h"
-
-short ANGLE(float angle)
+float phd_sin(short x)
 {
-	return (angle * (65536.0f / 360.0f));
+	return sin(TO_RAD(x));
 }
 
-short FROM_DEGREES(float angle)
+float phd_cos(short x)
 {
-	return (angle * (65536.0f / 360.0f));
-}
-
-short FROM_RAD(float angle)
-{
-	return ((angle / RADIAN) * (65536.0f / 360.0f));
-}
-
-float TO_DEGREES(short angle)
-{
-	return lround(angle * (360.0f / 65536.0f));
-}
-
-float TO_RAD(short angle)
-{
-	return ((angle * (360.0f / 65536.0f)) * RADIAN);
-}
-
-float phd_sin(short a)
-{
-	return sin(TO_RAD(a));
-}
-
-float phd_cos(short a)
-{
-	return cos(TO_RAD(a));
+	return cos(TO_RAD(x));
 }
 
 // NOTE: Order of parameters is inverted!
-int phd_atan(int x, int y)
+int phd_atan(int y, int x)
 {
-	return FROM_RAD(atan2(y, x));
+	return FROM_RAD(atan2(x, y));
 }
 
 void InterpolateAngle(short angle, short& rotation, short& outAngle, int shift)

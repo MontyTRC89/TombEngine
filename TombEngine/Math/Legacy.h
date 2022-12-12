@@ -1,4 +1,5 @@
 #pragma once
+#include "Math/Constants.h"
 
 constexpr auto FP_SHIFT	 = 16;
 constexpr auto W2V_SHIFT = 14;
@@ -9,15 +10,29 @@ struct ColorData
 	byte cd;
 };
 
-short ANGLE(float angle);
-short FROM_DEGREES(float angle);
-short FROM_RAD(float angle);
-float TO_DEGREES(short angle);
-float TO_RAD(short angle);
+constexpr short ANGLE(float degrees)
+{
+	return (degrees * (65536.0f / 360.0f));
+}
 
-float phd_sin(short a);
-float phd_cos(short a);
-int	  phd_atan(int dz, int dx);
+constexpr short FROM_RAD(float radians)
+{
+	return ((radians / RADIAN) * (65536.0f / 360.0f));
+}
+
+constexpr float TO_DEGREES(short shortAngle)
+{
+	return (shortAngle * (360.0f / 65536.0f));
+}
+
+constexpr float TO_RAD(short shortAngle)
+{
+	return ((shortAngle * (360.0f / 65536.0f)) * RADIAN);
+}
+
+float phd_sin(short x);
+float phd_cos(short x);
+int	  phd_atan(int y, int x);
 
 void InterpolateAngle(short angle, short& rotation, short& outAngle, int shift);
 void GetMatrixFromTrAngle(Matrix& matrix, short* framePtr, int index);
