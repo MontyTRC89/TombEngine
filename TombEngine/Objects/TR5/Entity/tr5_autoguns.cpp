@@ -45,24 +45,27 @@ namespace TEN::Entities::Creatures::TR5
 		{
 			auto& autoGun = *GetCreatureInfo(&item);
 
+			// Reset visible meshes.
 			item.MeshBits.ClearAll();
 			item.MeshBits.Set(AutoGunJoints1);
 
+			// Assess line of sight.
 			auto origin = GameVector(item.Pose.Position, item.RoomNumber);
 			auto target = GameVector(GetJointPosition(&laraItem, LM_TORSO), laraItem.RoomNumber);
 			bool los = LOS(&origin, &target);
 
-			auto targetOrient = item.Pose.Orientation;
-			if (los)
-				targetOrient = Geometry::GetOrientToPoint(origin.ToVector3(), target.ToVector3());
-
+			// Interpolate orientation.
+			auto targetOrient = los ? Geometry::GetOrientToPoint(origin.ToVector3(), target.ToVector3()) : item.Pose.Orientation;
 			item.Pose.Orientation.Lerp(targetOrient, AUTO_GUN_ORIENT_LERP_ALPHA);
+
 			auto deltaAngle = item.Pose.Orientation - targetOrient;
 
+			// Rotate barrel.
 			autoGun.JointRotation[0] = item.ItemFlags[0];
 			autoGun.JointRotation[1] = item.ItemFlags[1];
 			autoGun.JointRotation[2] += item.ItemFlags[2];
 
+			// Fire gunshot.
 			if (los &&
 				abs(deltaAngle.x) <= AUTO_GUN_FIRE_CONSTRAINT_ANGLE &&
 				abs(deltaAngle.y) <= AUTO_GUN_FIRE_CONSTRAINT_ANGLE)
@@ -76,12 +79,14 @@ namespace TEN::Entities::Creatures::TR5
 					auto lightColor = Vector3(Random::GenerateFloat(0.75f, 0.85f), Random::GenerateFloat(0.5f, 0.6f), 0.0f) * 255;
 					TriggerDynamicLight(origin.x, origin.y, origin.z, 10, lightColor.x, lightColor.y, lightColor.z);
 
+					// Spawn blood.
 					if (Random::TestProbability(AUTO_GUN_BLOOD_EFFECT_CHANCE))
 					{
 						auto bloodPos = GetJointPosition(&laraItem, Random::GenerateInt(0, NUM_LARA_MESHES - 1));
 						DoBloodSplat(bloodPos.x, bloodPos.y, bloodPos.z, (GetRandomControl() & 3) + 3, 2 * GetRandomControl(), laraItem.RoomNumber);
 						DoDamage(&laraItem, AUTO_GUN_SHOT_DAMAGE);
 					}
+					// Spawn ricochet.
 					else
 					{
 						auto pos = target;
@@ -122,6 +127,7 @@ namespace TEN::Entities::Creatures::TR5
 				if (item.ItemFlags[2] < 1024)
 					item.ItemFlags[2] += 64;
 			}
+			// Reset barrel.
 			else
 			{
 				if (item.ItemFlags[2])
