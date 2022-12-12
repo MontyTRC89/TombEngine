@@ -27,7 +27,7 @@ enum class VolumeType
 	Prism	// TODO: Unsupported as of now.
 };
 
-enum VolumeActivatorType
+enum class VolumeActivatorType
 {
 	Player = 1,
 	NPC = 2,
