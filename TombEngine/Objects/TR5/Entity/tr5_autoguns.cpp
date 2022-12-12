@@ -17,6 +17,7 @@ using namespace TEN::Math;
 
 namespace TEN::Entities::Creatures::TR5
 {
+	constexpr auto AUTO_GUNS_ORIENT_LERP_ALPHA = 0.1f;
 	const auto AUTO_GUNS_AWARE_CONSTRAINT_ANGLE = ANGLE(5.6f);
 
 	void InitialiseAutoGuns(short itemNumber)
@@ -29,6 +30,7 @@ namespace TEN::Entities::Creatures::TR5
 	void AutoGunsControl(short itemNumber)
 	{
 		auto& item = g_Level.Items[itemNumber];
+		auto& laraItem = *LaraItem;
 
 		if (!TriggerActive(&item))
 			return;
@@ -39,34 +41,24 @@ namespace TEN::Entities::Creatures::TR5
 
 			item.MeshBits = 0x680;
 
-			auto pos1 = GameVector(GetJointPosition(&item, 8, Vector3i(0, 0, -64)), item.RoomNumber);
-			auto pos2 = GameVector(GetJointPosition(LaraItem, LM_HIPS, Vector3i::Zero));
+			auto origin = GameVector(item.Pose.Position, item.RoomNumber);
+			auto target = GameVector(GetJointPosition(&laraItem, LM_TORSO, Vector3i::Zero), laraItem.RoomNumber);
+			bool los = LOS(&origin, &target);
 
-			auto orient = EulerAngles::Zero;
-
-			bool los = LOS(&pos1, &pos2);
+			auto orient = item.Pose.Orientation;
 			if (los)
-			{
-				orient = Geometry::GetOrientToPoint(pos1.ToVector3(), pos2.ToVector3());
-				orient.y -= item.Pose.Orientation.y;
-			}
-			else
-			{
-				orient.x = item.ItemFlags[1];
-				orient.y = item.ItemFlags[0];
-			}
+				orient = Geometry::GetOrientToPoint(origin.ToVector3(), target.ToVector3());
 
-			short angle1, angle2;
-			InterpolateAngle(orient.x, item.ItemFlags[1], angle2, 4);
-			InterpolateAngle(orient.y, *item.ItemFlags, angle1, 4);
+			item.Pose.Orientation.Lerp(orient, AUTO_GUNS_ORIENT_LERP_ALPHA);
+			auto deltaAngle = item.Pose.Orientation - orient;
 
-			autoGun.JointRotation[0] = item.ItemFlags[0]; // autoGun->JointRotation
+			autoGun.JointRotation[0] = item.ItemFlags[0];
 			autoGun.JointRotation[1] = item.ItemFlags[1];
 			autoGun.JointRotation[2] += item.ItemFlags[2];
 
 			if (los &&
-				abs(angle1) <= AUTO_GUNS_AWARE_CONSTRAINT_ANGLE &&
-				abs(angle2) <= AUTO_GUNS_AWARE_CONSTRAINT_ANGLE)
+				abs(deltaAngle.x) <= AUTO_GUNS_AWARE_CONSTRAINT_ANGLE &&
+				abs(deltaAngle.y) <= AUTO_GUNS_AWARE_CONSTRAINT_ANGLE)
 			{
 				SoundEffect(SFX_TR4_HK_FIRE, &item.Pose, SoundEnvironment::Land, 0.8f);
 
@@ -75,24 +67,21 @@ namespace TEN::Entities::Creatures::TR5
 					item.MeshBits |= 0x100;
 
 					auto lightColor = Vector3((GetRandomControl() & 0x1F) + 192, (GetRandomControl() & 0x1F) + 128, 0);
-					TriggerDynamicLight(pos1.x, pos1.y, pos1.z, 10, lightColor.x, lightColor.y, lightColor.z);
+					TriggerDynamicLight(origin.x, origin.y, origin.z, 10, lightColor.x, lightColor.y, lightColor.z);
 
 					if (Random::TestProbability(3 / 4.0f))
 					{
-						auto pos2 = GetJointPosition(LaraItem, GetRandomControl() % 15);
-						DoBloodSplat(pos2.x, pos2.y, pos2.z, (GetRandomControl() & 3) + 3, 2 * GetRandomControl(), LaraItem->RoomNumber);
-						DoDamage(LaraItem, 20);
+						auto pos2 = GetJointPosition(&laraItem, GetRandomControl() % 15);
+						DoBloodSplat(pos2.x, pos2.y, pos2.z, (GetRandomControl() & 3) + 3, 2 * GetRandomControl(), laraItem.RoomNumber);
+						DoDamage(&laraItem, 20);
 					}
 					else
 					{
-						GameVector pos;
-						pos.x = pos2.x;
-						pos.y = pos2.y;
-						pos.z = pos2.z;
+						auto pos = target;
 
-						int dx = pos2.x - pos1.x;
-						int dy = pos2.y - pos1.y;
-						int dz = pos2.z - pos1.z;
+						int dx = target.x - origin.x;
+						int dy = target.y - origin.y;
+						int dz = target.z - origin.z;
 
 						while (true)
 						{
@@ -114,7 +103,7 @@ namespace TEN::Entities::Creatures::TR5
 						pos.y += dy + GetRandomControl() - 128;
 						pos.z += dz + GetRandomControl() - 128;
 
-						if (!LOS(&pos1, &pos))
+						if (!LOS(&origin, &pos))
 							TriggerRicochetSpark(pos, 2 * GetRandomControl(), 3, 0);
 					}
 				}
@@ -135,7 +124,7 @@ namespace TEN::Entities::Creatures::TR5
 			}
 
 			if (item.ItemFlags[2])
-				TriggerAutoGunSmoke(pos1.ToVector3i(), item.ItemFlags[2] / 16);
+				TriggerAutoGunSmoke(origin.ToVector3i(), item.ItemFlags[2] / 16);
 		}
 		else
 		{
