@@ -26,7 +26,7 @@ using namespace TEN::Control::Volumes;
 
 namespace TEN::Entities::TR4
 {
-	const auto SasGunBite = BiteInfo(Vector3(0.0f, 300.0f, 64.0f), 7);
+	const auto SasGunBite = BiteInfo(Vector3(0.0f, 550.0f, 84.0f), 7);
 
 	const auto SasDragBodyPosition = Vector3i(0, 0, -460);
 	const auto SasDragBounds = ObjectCollisionBounds
@@ -164,14 +164,15 @@ namespace TEN::Entities::TR4
 			if (Lara.Vehicle != NO_ITEM && AI.bite)
 				creature->Mood = MoodType::Escape;
 
-			CreatureMood(item, &AI, !creature->Enemy->IsLara());
-			angle = CreatureTurn(item, creature->MaxTurn);
+			CreatureMood(item, &AI, creature->Enemy->IsLara());
+			angle = CreatureTurn(item, !creature->MaxTurn);
 
 			if (item->HitStatus)
 				AlertAllGuards(itemNumber);
 
 			int angle1 = 0;
 			int angle2 = 0;
+
 
 			switch (item->Animation.ActiveState)
 			{
@@ -182,100 +183,83 @@ namespace TEN::Entities::TR4
 
 				if (item->Animation.AnimNumber == Objects[item->ObjectNumber].animIndex + SAS_ANIM_WALK_TO_STAND)
 				{
-					if (abs(AI.angle) >= ANGLE(10.0f))
-					{
-						if (AI.angle >= 0)
-							item->Pose.Orientation.y += ANGLE(10.0f);
-						else
-							item->Pose.Orientation.y -= ANGLE(10.0f);
-					}
-					else
+					if (abs(AI.angle) < ANGLE(10.0f))
 						item->Pose.Orientation.y += AI.angle;
+
+					else if (AI.angle < 0)
+						item->Pose.Orientation.y -= ANGLE(10.0f);
+					else
+						item->Pose.Orientation.y += ANGLE(10.0f);
 				}
-				else if (item->AIBits & MODIFY || Lara.Vehicle != NO_ITEM)
+				else if ((item->AIBits & MODIFY) || Lara.Vehicle != NO_ITEM)
 				{
-					if (abs(AI.angle) >= ANGLE(2.0f))
-					{
-						if (AI.angle >= 0)
-							item->Pose.Orientation.y += ANGLE(2.0f);
-						else
-							item->Pose.Orientation.y -= ANGLE(2.0f);
-					}
-					else
+					if (abs(AI.angle) < ANGLE(2.0f))
 						item->Pose.Orientation.y += AI.angle;
+
+					else if (AI.angle < 0)
+						item->Pose.Orientation.y -= ANGLE(2.0f);
+					else
+						item->Pose.Orientation.y += ANGLE(2.0f);
+
 				}
 
 				if (item->AIBits & GUARD)
 				{
 					joint2 = AIGuard(creature);
 
-					if (!GetRandomControl())
+					if (!(GetRandomControl() & 0xFF))
 					{
 						if (item->Animation.ActiveState == SAS_STATE_IDLE)
-						{
 							item->Animation.TargetState = SAS_STATE_WAIT;
-							break;
-						}
-
-						item->Animation.TargetState = SAS_STATE_IDLE;
-					}
-				}
-				else if (!(item->AIBits & PATROL1) ||
-					item->AIBits & MODIFY ||
-					Lara.Vehicle != NO_ITEM)
-				{
-					if (Targetable(item, &AI))
-					{
-						if (AI.distance < pow(SECTOR(3), 2) ||
-							AI.zoneNumber != AI.enemyZone)
-						{
-							if (TestProbability(0.5f))
-								item->Animation.TargetState = SAS_STATE_SIGHT_AIM;
-							else if (TestProbability(0.5f))
-								item->Animation.TargetState = SAS_STATE_HOLD_AIM;
-							else
-								item->Animation.TargetState = SAS_STATE_KNEEL_AIM;
-						}
-						else if (!(item->AIBits & MODIFY))
-							item->Animation.TargetState = SAS_STATE_WALK;
-					}
-					else
-					{
-						if (item->AIBits & MODIFY)
-							item->Animation.TargetState = SAS_STATE_IDLE;
 						else
-						{
-							if (creature->Mood == MoodType::Escape)
-								item->Animation.TargetState = SAS_STATE_RUN;
-							else
-							{
-								if ((creature->Alerted ||
-									creature->Mood != MoodType::Bored) &&
-									(!(item->AIBits & FOLLOW) ||
-										!creature->ReachedGoal &&
-										distance <= pow(SECTOR(2), 2)))
-								{
-									if (creature->Mood == MoodType::Bored ||
-										AI.distance <= pow(SECTOR(2), 2))
-									{
-										item->Animation.TargetState = SAS_STATE_WALK;
-										break;
-									}
-									item->Animation.TargetState = SAS_STATE_RUN;
-								}
-								else
-									item->Animation.TargetState = SAS_STATE_IDLE;
-							}
-						}
+							item->Animation.TargetState = SAS_STATE_IDLE;
 					}
 				}
-				else
+				else if ((item->AIBits & PATROL1) &&
+					!(item->AIBits & MODIFY) &&
+					Lara.Vehicle == NO_ITEM)
 				{
 					item->Animation.TargetState = SAS_STATE_WALK;
 					joint2 = 0;
 				}
+				else if (Targetable(item, &AI))
+				{
+					if (AI.distance >= pow(SECTOR(3), 2) &&
+						AI.zoneNumber == AI.enemyZone)
+					{
+						if (!(item->AIBits & MODIFY))
+							item->Animation.TargetState = SAS_STATE_WALK;
+					}
+					else if (TestProbability(0.5f))
+						item->Animation.TargetState = SAS_STATE_SIGHT_AIM;
+					else if (TestProbability(0.5f))
+						item->Animation.TargetState = SAS_STATE_HOLD_AIM;
+					else
+						item->Animation.TargetState = SAS_STATE_KNEEL_AIM;
+				}
+				else if (item->AIBits & MODIFY)
+					item->Animation.TargetState = SAS_STATE_IDLE;
+
+				else if (creature->Mood == MoodType::Escape)
+					item->Animation.TargetState = SAS_STATE_RUN;
+
+				else if ((creature->Alerted ||
+					creature->Mood != MoodType::Bored) &&
+					(!(item->AIBits & FOLLOW) ||
+						!creature->ReachedGoal &&
+						distance <= pow(SECTOR(2), 2)))
+				{
+					if (creature->Mood != MoodType::Bored &&
+						AI.distance > pow(SECTOR(2), 2))
+						item->Animation.TargetState = SAS_STATE_RUN;
+					else
+						item->Animation.TargetState = SAS_STATE_WALK;
+				}
+				else
+					item->Animation.TargetState = SAS_STATE_IDLE;
 
 				break;
+
 
 			case SAS_STATE_WAIT:
 				creature->MaxTurn = 0;
@@ -286,17 +270,16 @@ namespace TEN::Entities::TR4
 				{
 					joint2 = AIGuard(creature);
 
-					if (!GetRandomControl())
+					if (!(GetRandomControl() & 0xFF))
 						item->Animation.TargetState = SAS_STATE_IDLE;
 				}
 				else if (Targetable(item, &AI) ||
-					creature->Mood != MoodType::Bored ||
+					creature->Mood == MoodType::Bored ||
 					!AI.ahead ||
-					item->AIBits & MODIFY ||
-					Lara.Vehicle != NO_ITEM)
-				{
+					(item->AIBits & MODIFY) ||
+					Lara.Vehicle != NO_ITEM)				
 					item->Animation.TargetState = SAS_STATE_IDLE;
-				}
+				
 
 				break;
 
@@ -307,48 +290,34 @@ namespace TEN::Entities::TR4
 
 				if (item->AIBits & PATROL1)
 					item->Animation.TargetState = SAS_STATE_WALK;
-				else if (Lara.Vehicle == NO_ITEM ||
-					!(item->AIBits & MODIFY) &&
-					item->AIBits)
-				{
-					if (creature->Mood == MoodType::Escape)
-						item->Animation.TargetState = SAS_STATE_RUN;
-					else
-					{
-						if (item->AIBits & GUARD ||
-							item->AIBits & FOLLOW &&
-							(creature->ReachedGoal ||
-								distance > pow(SECTOR(2), 2)))
-						{
-							item->Animation.TargetState = SAS_STATE_IDLE;
-							break;
-						}
-						if (Targetable(item, &AI))
-						{
-							if (AI.distance < pow(SECTOR(3), 2) ||
-								AI.enemyZone != AI.zoneNumber)
-							{
-								item->Animation.TargetState = SAS_STATE_IDLE;
-								break;
-							}
+				else if (Lara.Vehicle != NO_ITEM ||
+					(item->AIBits & MODIFY) &&
+					!item->AIBits)
+					item->Animation.TargetState = SAS_STATE_IDLE;
+				else if (creature->Mood == MoodType::Escape)
+					item->Animation.TargetState = SAS_STATE_RUN;
 
-							item->Animation.TargetState = SAS_STATE_WALK_AIM;
-						}
-						else if (creature->Mood != MoodType::Bored)
-						{
-							if (AI.distance > pow(SECTOR(2), 2))
-								item->Animation.TargetState = SAS_STATE_RUN;
-						}
-						else if (AI.ahead)
-						{
-							item->Animation.TargetState = SAS_STATE_IDLE;
-							break;
-						}
-					}
-				}
-				else
+				else if ((item->AIBits & GUARD) ||
+					(item->AIBits & FOLLOW) &&
+					(creature->ReachedGoal ||
+						distance > pow(SECTOR(2), 2)))
 					item->Animation.TargetState = SAS_STATE_IDLE;
 
+				else if (Targetable(item, &AI))
+				{
+					if (AI.distance >= pow(SECTOR(3), 2) &&
+						AI.zoneNumber == AI.enemyZone)
+						item->Animation.TargetState = SAS_STATE_WALK_AIM;
+					else
+						item->Animation.TargetState = SAS_STATE_IDLE;
+				}
+				else if (creature->Mood != MoodType::Bored)
+				{
+					if (AI.distance > pow(SECTOR(2), 2))
+						item->Animation.TargetState = SAS_STATE_RUN;
+				}
+				else if (AI.ahead)
+					item->Animation.TargetState = SAS_STATE_IDLE;
 				break;
 
 			case SAS_STATE_RUN:
@@ -360,15 +329,15 @@ namespace TEN::Entities::TR4
 
 				if (Lara.Vehicle != NO_ITEM)
 				{
-					if (item->AIBits & MODIFY || !item->AIBits)
+					if ((item->AIBits & MODIFY) || !item->AIBits)
 					{
 						item->Animation.TargetState = SAS_STATE_WAIT;
 						break;
 					}
 				}
 
-				if (item->AIBits & GUARD ||
-					item->AIBits & FOLLOW &&
+				if ((item->AIBits & GUARD) ||
+					(item->AIBits & FOLLOW) &&
 					(creature->ReachedGoal ||
 						distance > pow(SECTOR(2), 2)))
 				{
@@ -384,7 +353,7 @@ namespace TEN::Entities::TR4
 					{
 						if (creature->Mood != MoodType::Bored ||
 							creature->Mood == MoodType::Stalk &&
-							item->AIBits & FOLLOW &&
+							(item->AIBits & FOLLOW) &&
 							AI.distance < pow(SECTOR(2), 2))
 						{
 							item->Animation.TargetState = SAS_STATE_WALK;
@@ -560,9 +529,10 @@ namespace TEN::Entities::TR4
 	void SasFireGrenade(ItemInfo* item, short angle1, short angle2)
 	{
 		short itemNumber = CreateItem();
+
 		if (itemNumber != NO_ITEM)
 		{
-			auto* grenadeItem = &g_Level.Items[itemNumber];
+			auto grenadeItem = &g_Level.Items[itemNumber];
 
 			grenadeItem->Color = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
 			grenadeItem->ObjectNumber = ID_GRENADE;
@@ -571,12 +541,11 @@ namespace TEN::Entities::TR4
 			auto pos = GetJointPosition(item, SasGunBite.meshNum, Vector3i(SasGunBite.Position));
 			grenadeItem->Pose.Position = pos;
 
-			auto probe = GetCollision(pos.x, pos.y, pos.z, grenadeItem->RoomNumber);
-			grenadeItem->RoomNumber = probe.RoomNumber;
+			auto probe = GetCollision(pos.x, pos.y, pos.z, grenadeItem->RoomNumber).Position.Floor;
 
-			if (probe.Position.Floor < grenadeItem->Pose.Position.y)
+			if (probe < pos.y)
 			{
-				grenadeItem->Pose.Position = Vector3i(item->Pose.Position.x, probe.Position.Floor, item->Pose.Position.z);
+				grenadeItem->Pose.Position = Vector3i(item->Pose.Position.x, pos.y, item->Pose.Position.z);
 				grenadeItem->RoomNumber = item->RoomNumber;
 			}
 
@@ -588,17 +557,17 @@ namespace TEN::Entities::TR4
 			grenadeItem->Pose.Orientation.x = angle1 + item->Pose.Orientation.x;
 			grenadeItem->Pose.Orientation.y = angle2 + item->Pose.Orientation.y;
 			grenadeItem->Pose.Orientation.z = 0;
-
-			if (TestProbability(0.75f))
-				grenadeItem->ItemFlags[0] = (int)GrenadeType::Normal;
-			else
-				grenadeItem->ItemFlags[0] = (int)GrenadeType::Super;
-
+			grenadeItem->Animation.Velocity.z = 128;
+			grenadeItem->Animation.Velocity.y = -128 * phd_sin(grenadeItem->Pose.Orientation.x);
 			grenadeItem->Animation.ActiveState = grenadeItem->Pose.Orientation.x;
 			grenadeItem->Animation.TargetState = grenadeItem->Pose.Orientation.y;
 			grenadeItem->Animation.RequiredState = 0;
-			grenadeItem->Animation.Velocity.z = 128;
-			grenadeItem->Animation.Velocity.y = -128 * phd_sin(grenadeItem->Pose.Orientation.x);
+
+			if (TestProbability(0.75f))
+				grenadeItem->ItemFlags[0] = (short)ProjectileType::Grenade;
+			else
+				grenadeItem->ItemFlags[0] = (short)ProjectileType::FragGrenade;
+
 			grenadeItem->HitPoints = 120;
 			grenadeItem->ItemFlags[2] = 1;
 

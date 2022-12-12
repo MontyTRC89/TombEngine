@@ -181,7 +181,7 @@ bool SameZone(CreatureInfo* creature, ItemInfo* target)
 short AIGuard(CreatureInfo* creature) 
 {
 	auto* item = &g_Level.Items[creature->ItemNumber];
-	if (item->AIBits & (GUARD | PATROL1))
+	if (item->AIBits & (GUARD | PATROL1)) //Was MODIFY in OG TR4
 		return 0;
 
 	int random = GetRandomControl();
@@ -1294,7 +1294,7 @@ void GetAITarget(CreatureInfo* creature)
 			abs(enemy->Pose.Position.z - item->Pose.Position.z) < REACHED_GOAL_RADIUS)
 		{
 			TestTriggers(enemy, true);
-
+			
 			creature->ReachedGoal = true;
 			creature->Enemy = LaraItem;
 			item->AIBits &= ~(AMBUSH /* | MODIFY*/);
@@ -1311,7 +1311,7 @@ void GetAITarget(CreatureInfo* creature)
 		{
 			creature->Enemy = LaraItem;
 			creature->Alerted = true;
-			//item->aiBits &= ~FOLLOW;
+			//item->AIBits &= ~FOLLOW;//
 		}
 		else if (item->HitStatus)
 			item->AIBits &= ~FOLLOW;
