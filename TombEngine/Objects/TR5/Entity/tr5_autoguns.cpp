@@ -76,9 +76,7 @@ namespace TEN::Entities::Creatures::TR5
 			auto deltaAngle = item.Pose.Orientation - targetOrient;
 
 			// Rotate barrel.
-			autoGun.JointRotation[0] = item.ItemFlags[0];
-			autoGun.JointRotation[1] = item.ItemFlags[1];
-			autoGun.JointRotation[2] += item.ItemFlags[2];
+			autoGun.JointRotation[2] += item.ItemFlags[2]; // NOTE: ItemFlags[2] stores barrel turn rate.
 
 			// Fire gunshot.
 			if (los &&
@@ -103,7 +101,7 @@ namespace TEN::Entities::Creatures::TR5
 						float bloodVel = Random::GenerateFloat(4.0f, 8.0f);
 						DoBloodSplat(bloodPos.x, bloodPos.y, bloodPos.z, bloodVel, Random::GenerateAngle(), laraItem.RoomNumber);
 					}
-					// Spawn ricochet.
+					// Spawn ricochet. TODO: Simplify.
 					else
 					{
 						auto pos = target;
@@ -147,13 +145,13 @@ namespace TEN::Entities::Creatures::TR5
 			// Reset barrel.
 			else
 			{
-				if (item.ItemFlags[2])
+				if (item.ItemFlags[2] != 0)
 					item.ItemFlags[2] -= AUTO_GUN_BARREL_TURN_RATE;
 
 				item.MeshBits.Clear(AutoGunFlashJoints);
 			}
 
-			if (item.ItemFlags[2])
+			if (item.ItemFlags[2] != 0)
 				SpawnAutoGunSmoke(origin.ToVector3(), item.ItemFlags[2] / 16);
 		}
 		else
@@ -165,33 +163,33 @@ namespace TEN::Entities::Creatures::TR5
 
 	void SpawnAutoGunSmoke(const Vector3& pos, char shade)
 	{
-		auto& spark = SmokeSparks[GetFreeSmokeSpark()];
+		auto& smoke = SmokeSparks[GetFreeSmokeSpark()];
 
 		auto sphere = BoundingSphere(pos, BLOCK(1 / 64.0f));
-		auto sparkPos = Random::GeneratePointInSphere(sphere);
+		auto smokePos = Random::GeneratePointInSphere(sphere);
 
-		spark.on = true;
-		spark.sShade = 0;
-		spark.dShade = shade;
-		spark.colFadeSpeed = 4;
-		spark.fadeToBlack = 32;
-		spark.blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
-		spark.life = spark.sLife = Random::GenerateInt(40, 44);
-		spark.x = sparkPos.x;
-		spark.y = sparkPos.y;
-		spark.z = sparkPos.z;
-		spark.xVel = 0;
-		spark.yVel = 0;
-		spark.zVel = 0;
-		spark.friction = 4;
-		spark.flags = SP_ROTATE;
-		spark.rotAng = Random::GenerateInt(0, 4096);
-		spark.rotAdd = Random::GenerateInt(-32, 32);
-		spark.maxYvel = 0;
-		spark.gravity = Random::GenerateInt(-4, -8);
-		spark.mirror = 0;
-		spark.dSize = Random::GenerateInt(24, 40);
-		spark.sSize = spark.dSize / 4;
-		spark.size = spark.dSize / 4;
+		smoke.on = true;
+		smoke.sShade = 0;
+		smoke.dShade = shade;
+		smoke.colFadeSpeed = 4;
+		smoke.fadeToBlack = 32;
+		smoke.blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+		smoke.life = smoke.sLife = Random::GenerateInt(40, 44);
+		smoke.x = smokePos.x;
+		smoke.y = smokePos.y;
+		smoke.z = smokePos.z;
+		smoke.xVel = 0;
+		smoke.yVel = 0;
+		smoke.zVel = 0;
+		smoke.friction = 4;
+		smoke.flags = SP_ROTATE;
+		smoke.rotAng = Random::GenerateInt(0, 4096);
+		smoke.rotAdd = Random::GenerateInt(-32, 32);
+		smoke.maxYvel = 0;
+		smoke.gravity = Random::GenerateInt(-4, -8);
+		smoke.mirror = 0;
+		smoke.dSize = Random::GenerateInt(24, 40);
+		smoke.sSize = smoke.dSize / 4;
+		smoke.size = smoke.dSize / 4;
 	}
 }
