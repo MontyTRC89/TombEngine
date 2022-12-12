@@ -46,21 +46,6 @@ int phd_atan(int x, int y)
 	return FROM_RAD(atan2(y, x));
 }
 
-void InterpolateAngle(short angle, short& rotation, short& outAngle, int shift)
-{
-	int deltaAngle = angle - rotation;
-
-	if (deltaAngle < -32768)
-		deltaAngle += 65536;
-	else if (deltaAngle > 32768)
-		deltaAngle -= 65536;
-
-	if (outAngle)
-		outAngle = (short)deltaAngle;
-
-	rotation += short(deltaAngle >> shift);
-}
-
 void GetMatrixFromTrAngle(Matrix& matrix, short* framePtr, int index)
 {
 	short* ptr = &framePtr[0];
