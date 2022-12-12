@@ -18,7 +18,7 @@ Version 1.0.4
     - Restored spark effects.
     - Can destroy statics in shatter slots.
 	- Fix crash when attacking.
-	
+* Fix TR5 Autogun Rotation.
 * Fix legacy pickup triggers not working in certain cases.
 * Fix crawl pickup not actually doing any pickups.
 * Fix demigod and harpy shooting in incorrect directions.
