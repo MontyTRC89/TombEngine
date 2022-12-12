@@ -25,6 +25,8 @@ namespace TEN::Entities::Creatures::TR5
 	const	  auto AUTO_GUN_BARREL_TURN_RATE	  = ANGLE(0.35f);
 	const	  auto AUTO_GUN_FIRE_CONSTRAINT_ANGLE = ANGLE(5.6f);
 
+	constexpr auto AUTO_GUN_BARREL_JOINT_INDEX = 9;
+
 	const auto AutoGunFlashJoints = std::vector<unsigned int>{ 8 };
 	const auto AutoGunJoints1	  = std::vector<unsigned int>{ 7, 9, 10 }; // TODO: Check what these are.
 
@@ -152,7 +154,7 @@ namespace TEN::Entities::Creatures::TR5
 			}
 
 			if (item.ItemFlags[2] != 0)
-				SpawnAutoGunSmoke(origin.ToVector3(), item.ItemFlags[2] / 16);
+				SpawnAutoGunSmoke(GetJointPosition(&item, AUTO_GUN_BARREL_JOINT_INDEX).ToVector3(), item.ItemFlags[2] / 16);
 		}
 		else
 		{
