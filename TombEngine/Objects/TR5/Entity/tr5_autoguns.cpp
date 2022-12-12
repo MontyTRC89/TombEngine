@@ -49,12 +49,12 @@ namespace TEN::Entities::Creatures::TR5
 			auto target = GameVector(GetJointPosition(&laraItem, LM_TORSO, Vector3i::Zero), laraItem.RoomNumber);
 			bool los = LOS(&origin, &target);
 
-			auto orient = item.Pose.Orientation;
+			auto targetOrient = item.Pose.Orientation;
 			if (los)
-				orient = Geometry::GetOrientToPoint(origin.ToVector3(), target.ToVector3());
+				targetOrient = Geometry::GetOrientToPoint(origin.ToVector3(), target.ToVector3());
 
-			item.Pose.Orientation.Lerp(orient, AUTO_GUN_ORIENT_LERP_ALPHA);
-			auto deltaAngle = item.Pose.Orientation - orient;
+			item.Pose.Orientation.Lerp(targetOrient, AUTO_GUN_ORIENT_LERP_ALPHA);
+			auto deltaAngle = item.Pose.Orientation - targetOrient;
 
 			autoGun.JointRotation[0] = item.ItemFlags[0];
 			autoGun.JointRotation[1] = item.ItemFlags[1];
