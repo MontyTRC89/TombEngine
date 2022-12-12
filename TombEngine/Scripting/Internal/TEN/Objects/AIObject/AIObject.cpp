@@ -123,7 +123,7 @@ void AIObject::SetYRot(short yRot)
 
 std::string AIObject::GetName() const
 {
-	return m_aiObject.luaName;
+	return m_aiObject.Name;
 }
 
 void AIObject::SetName(std::string const & id) 
@@ -136,8 +136,8 @@ void AIObject::SetName(std::string const & id)
 	if (s_callbackSetName(id, m_aiObject))
 	{
 		// remove the old name if we have one
-		s_callbackRemoveName(m_aiObject.luaName);
-		m_aiObject.luaName = id;
+		s_callbackRemoveName(m_aiObject.Name);
+		m_aiObject.Name = id;
 	}
 	else
 	{

@@ -6,7 +6,6 @@
 
 #include "Game/animation.h"
 #include "Game/animation.h"
-#include "Game/camera.h"
 #include "Game/control/box.h"
 #include "Game/control/control.h"
 #include "Game/control/volume.h"
@@ -757,7 +756,7 @@ void ReadRooms()
 		room.mesh.reserve(numStatics);
 		for (int j = 0; j < numStatics; j++)
 		{
-			auto & mesh = room.mesh.emplace_back();
+			auto& mesh = room.mesh.emplace_back();
 			mesh.pos.Position.x = ReadInt32();
 			mesh.pos.Position.y = ReadInt32();
 			mesh.pos.Position.z = ReadInt32();
@@ -769,16 +768,16 @@ void ReadRooms()
 			mesh.color = ReadVector4();
 			mesh.staticNumber = ReadUInt16();
 			mesh.HitPoints = ReadInt16();
-			mesh.luaName = ReadString();
+			mesh.Name = ReadString();
 
 			mesh.roomNumber = i;
-			g_GameScriptEntities->AddName(mesh.luaName, mesh);
+			g_GameScriptEntities->AddName(mesh.Name, mesh);
 		}
 
 		int numTriggerVolumes = ReadInt32();
 		for (int j = 0; j < numTriggerVolumes; j++)
 		{
-			TriggerVolume volume;
+			auto& volume = room.triggerVolumes.emplace_back();
 
 			volume.Type = (VolumeType)ReadInt32();
 
@@ -803,7 +802,7 @@ void ReadRooms()
 
 			volume.StateQueue.reserve(VOLUME_STATE_QUEUE_SIZE);
 
-			room.triggerVolumes.push_back(volume);
+			g_GameScriptEntities->AddName(volume.Name, volume);
 		}
 
 		room.flippedRoom = ReadInt32();
@@ -961,9 +960,9 @@ void LoadAIObjects()
 		obj.triggerFlags = ReadInt16();
 		obj.flags = ReadInt16();
 		obj.boxNumber = ReadInt32();
-		obj.luaName = ReadString();
+		obj.Name = ReadString();
 
-		g_GameScriptEntities->AddName(obj.luaName, obj);
+		g_GameScriptEntities->AddName(obj.Name, obj);
 	}
 }
 

@@ -190,7 +190,7 @@ void Static::SetRot(Rotation const& rot)
 
 std::string Static::GetName() const
 {
-	return m_mesh.luaName;
+	return m_mesh.Name;
 }
 
 void Static::SetName(std::string const & name) 
@@ -203,8 +203,8 @@ void Static::SetName(std::string const & name)
 	if (s_callbackSetName(name, m_mesh))
 	{
 		// remove the old name if we have one
-		s_callbackRemoveName(m_mesh.luaName);
-		m_mesh.luaName = name;
+		s_callbackRemoveName(m_mesh.Name);
+		m_mesh.Name = name;
 	}
 	else
 	{

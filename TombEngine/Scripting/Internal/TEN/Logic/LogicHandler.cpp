@@ -166,12 +166,12 @@ void LogicHandler::ResetLevelTables()
 	(*state)[ScriptReserved_LevelVars][ScriptReserved_Engine] = sol::table{ *state, sol::create };
 }
 
-sol::object LogicHandler::GetLevelFuncsMember(sol::table tab, std::string const& luaName)
+sol::object LogicHandler::GetLevelFuncsMember(sol::table tab, std::string const& name)
 {
 	std::string partName = tab.raw_get<std::string>(strKey);
 	auto & theMap = m_levelFuncs_tablesOfNames[partName];
 
-	auto fullNameIt = theMap.find(luaName);
+	auto fullNameIt = theMap.find(name);
 	if (fullNameIt != std::cend(theMap))
 	{
 		std::string_view key = fullNameIt->second;
@@ -208,21 +208,21 @@ sol::protected_function_result LogicHandler::CallLevelFunc(std::string const & n
 	return r;
 }
 
-bool LogicHandler::SetLevelFuncsMember(sol::table tab, std::string const& luaName, sol::object value)
+bool LogicHandler::SetLevelFuncsMember(sol::table tab, std::string const& name, sol::object value)
 {
 	if (sol::type::lua_nil == value.get_type())
 	{
 		std::string error{ "Tried to set " + std::string{ScriptReserved_LevelFuncs} + " member " };
-		error += luaName + " to nil; this not permitted at this time.";
+		error += name + " to nil; this not permitted at this time.";
 		return ScriptAssert(false, error);
 	}
 	else if (sol::type::function == value.get_type())
 	{
 		// Add the name to the table of names
 		auto partName = tab.raw_get<std::string>(strKey);
-		auto fullName = partName + "." + luaName;
+		auto fullName = partName + "." + name;
 		auto& parentNameTab = m_levelFuncs_tablesOfNames[partName];
-		parentNameTab.insert_or_assign(luaName, fullName);
+		parentNameTab.insert_or_assign(name, fullName);
 
 		// Create a LevelFunc userdata and add that too
 		LevelFunc levelFuncObject;
@@ -237,13 +237,13 @@ bool LogicHandler::SetLevelFuncsMember(sol::table tab, std::string const& luaNam
 	{
 		// Create and add a new name map
 		std::unordered_map<std::string, std::string> newNameMap;
-		auto fullName = tab.raw_get<std::string>(strKey) + "." + luaName;
+		auto fullName = tab.raw_get<std::string>(strKey) + "." + name;
 		m_levelFuncs_tablesOfNames.insert_or_assign(fullName, newNameMap);
 
 		// Create a new table to put in the LevelFuncs hierarchy
-		auto newLevelFuncsTab = MakeSpecialTable(m_handler.GetState(), luaName, &LogicHandler::GetLevelFuncsMember, &LogicHandler::SetLevelFuncsMember, this);
+		auto newLevelFuncsTab = MakeSpecialTable(m_handler.GetState(), name, &LogicHandler::GetLevelFuncsMember, &LogicHandler::SetLevelFuncsMember, this);
 		newLevelFuncsTab.raw_set(strKey, fullName);
-		tab.raw_set(luaName, newLevelFuncsTab);
+		tab.raw_set(name, newLevelFuncsTab);
 
 		// "populate" the new table. This will trigger the __newindex metafunction and will
 		// thus call this function recursively, handling all subtables and functions.
@@ -254,7 +254,7 @@ bool LogicHandler::SetLevelFuncsMember(sol::table tab, std::string const& luaNam
 	}
 	else{
 		std::string error{ "Failed to add " };
-		error += luaName + " to " + ScriptReserved_LevelFuncs + " or one of its tables; it must be a function or a table of functions.";
+		error += name + " to " + ScriptReserved_LevelFuncs + " or one of its tables; it must be a function or a table of functions.";
 		return ScriptAssert(false, error);
 	}
 	return true;

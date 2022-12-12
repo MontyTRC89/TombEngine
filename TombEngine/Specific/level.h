@@ -61,7 +61,7 @@ struct AI_OBJECT
 	short triggerFlags;
 	short flags;
 	int boxNumber;
-	std::string luaName;
+	std::string Name;
 };
 
 struct SPRITE
