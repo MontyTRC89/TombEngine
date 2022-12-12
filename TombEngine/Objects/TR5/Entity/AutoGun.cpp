@@ -22,8 +22,8 @@ namespace TEN::Entities::Creatures::TR5
 	constexpr auto AUTO_GUN_BLOOD_EFFECT_CHANCE = 3 / 4.0f;
 
 	constexpr auto AUTO_GUN_ORIENT_LERP_ALPHA	  = 0.1f;
-	const	  auto AUTO_GUN_BARREL_TURN_RATE	  = ANGLE(0.35f);
-	const	  auto AUTO_GUN_FIRE_CONSTRAINT_ANGLE = ANGLE(5.6f);
+	constexpr auto AUTO_GUN_BARREL_TURN_RATE	  = ANGLE(0.35f);
+	constexpr auto AUTO_GUN_FIRE_CONSTRAINT_ANGLE = ANGLE(5.6f);
 
 	constexpr auto AUTO_GUN_BARREL_JOINT_INDEX = 9;
 

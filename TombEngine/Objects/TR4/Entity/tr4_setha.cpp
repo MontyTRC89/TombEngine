@@ -39,8 +39,8 @@ namespace TEN::Entities::TR4
 	constexpr auto SETH_DUAL_PROJECTILE_ATTACK_CHANCE = 1 / 2.0f;
 	constexpr auto SETH_JUMP_PROJECTILE_ATTACK_CHANCE = 1 / 2.0f;
 
-	const auto SETH_WALK_TURN_RATE_MAX = ANGLE(7.0f);
-	const auto SETH_RUN_TURN_RATE_MAX  = ANGLE(11.0f);
+	constexpr auto SETH_WALK_TURN_RATE_MAX = ANGLE(7.0f);
+	constexpr auto SETH_RUN_TURN_RATE_MAX  = ANGLE(11.0f);
 
 	const auto SethPounceAttackJoints1 = std::vector<unsigned int>{ 13, 14, 15 };
 	const auto SethPounceAttackJoints2 = std::vector<unsigned int>{ 16, 17, 18 };

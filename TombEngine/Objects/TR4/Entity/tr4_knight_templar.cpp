@@ -20,8 +20,8 @@ namespace TEN::Entities::TR4
 {
 	constexpr auto KNIGHT_TEMPLAR_SWORD_ATTACK_DAMAGE = 120;
 
-	const auto KTEMPLAR_IDLE_TURN_RATE_MAX = ANGLE(2.0f);
-	const auto KTEMPLAR_WALK_TURN_RATE_MAX = ANGLE(7.0f);
+	constexpr auto KTEMPLAR_IDLE_TURN_RATE_MAX = ANGLE(2.0f);
+	constexpr auto KTEMPLAR_WALK_TURN_RATE_MAX = ANGLE(7.0f);
 
 	const auto KnightTemplarBite = BiteInfo(Vector3::Zero, 11);
 	const std::vector<unsigned int> KnightTemplarSwordAttackJoints = { 10, 11 };
