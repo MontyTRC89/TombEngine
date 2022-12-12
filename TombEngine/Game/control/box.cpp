@@ -1293,8 +1293,7 @@ void GetAITarget(CreatureInfo* creature)
 			abs(enemy->Pose.Position.y - item->Pose.Position.y) < REACHED_GOAL_RADIUS &&
 			abs(enemy->Pose.Position.z - item->Pose.Position.z) < REACHED_GOAL_RADIUS)
 		{
-			TestTriggers(enemy, true);
-			
+			TestTriggers(enemy, true);		
 			creature->ReachedGoal = true;
 			creature->Enemy = LaraItem;
 			item->AIBits &= ~(AMBUSH /* | MODIFY*/);
@@ -1311,7 +1310,7 @@ void GetAITarget(CreatureInfo* creature)
 		{
 			creature->Enemy = LaraItem;
 			creature->Alerted = true;
-			//item->AIBits &= ~FOLLOW;//
+			//item->aIBits &= ~FOLLOW;
 		}
 		else if (item->HitStatus)
 			item->AIBits &= ~FOLLOW;
