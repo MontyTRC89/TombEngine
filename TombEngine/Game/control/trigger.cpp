@@ -19,8 +19,8 @@
 #include "Objects/TR3/Vehicles/kayak.h"
 #include "Objects/objectslist.h"
 #include "Sound/sound.h"
+#include "Specific/clock.h"
 #include "Specific/setup.h"
-
 
 using namespace TEN::Effects::Items;
 using namespace TEN::Entities::Switches;

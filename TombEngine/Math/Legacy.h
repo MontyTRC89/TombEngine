@@ -1,8 +1,9 @@
 #pragma once
 #include "Math/Constants.h"
 
-constexpr auto FP_SHIFT	 = 16;
-constexpr auto W2V_SHIFT = 14;
+constexpr auto FP_SHIFT				   = 16;
+constexpr auto W2V_SHIFT			   = 14;
+constexpr auto PREDICTIVE_SCALE_FACTOR = 14;
 
 struct ColorData
 {
