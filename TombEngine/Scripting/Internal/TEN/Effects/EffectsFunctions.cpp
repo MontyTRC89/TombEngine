@@ -18,6 +18,7 @@
 #include "Effects/BlendIDs.h"
 #include "Effects/EffectIDs.h"
 #include "ReservedScriptNames.h"
+#include "Specific/clock.h"
 
 /***
 Functions to generate effects.
