@@ -17,6 +17,9 @@ using namespace TEN::Math;
 
 namespace TEN::Entities::Creatures::TR5
 {
+	constexpr auto AUTO_GUN_SHOT_DAMAGE			= 20;
+	constexpr auto AUTO_GUN_BLOOD_EFFECT_CHANCE = 3 / 4.0f;
+
 	constexpr auto AUTO_GUN_ORIENT_LERP_ALPHA	  = 0.1f;
 	const	  auto AUTO_GUN_FIRE_CONSTRAINT_ANGLE = ANGLE(5.6f);
 
@@ -46,7 +49,7 @@ namespace TEN::Entities::Creatures::TR5
 			item.MeshBits.Set(AutoGunJoints1);
 
 			auto origin = GameVector(item.Pose.Position, item.RoomNumber);
-			auto target = GameVector(GetJointPosition(&laraItem, LM_TORSO, Vector3i::Zero), laraItem.RoomNumber);
+			auto target = GameVector(GetJointPosition(&laraItem, LM_TORSO), laraItem.RoomNumber);
 			bool los = LOS(&origin, &target);
 
 			auto targetOrient = item.Pose.Orientation;
@@ -73,11 +76,11 @@ namespace TEN::Entities::Creatures::TR5
 					auto lightColor = Vector3(Random::GenerateFloat(0.75f, 0.85f), Random::GenerateFloat(0.5f, 0.6f), 0.0f) * 255;
 					TriggerDynamicLight(origin.x, origin.y, origin.z, 10, lightColor.x, lightColor.y, lightColor.z);
 
-					if (Random::TestProbability(3 / 4.0f))
+					if (Random::TestProbability(AUTO_GUN_BLOOD_EFFECT_CHANCE))
 					{
-						auto pos2 = GetJointPosition(&laraItem, GetRandomControl() % 15);
-						DoBloodSplat(pos2.x, pos2.y, pos2.z, (GetRandomControl() & 3) + 3, 2 * GetRandomControl(), laraItem.RoomNumber);
-						DoDamage(&laraItem, 20);
+						auto bloodPos = GetJointPosition(&laraItem, Random::GenerateInt(0, NUM_LARA_MESHES - 1));
+						DoBloodSplat(bloodPos.x, bloodPos.y, bloodPos.z, (GetRandomControl() & 3) + 3, 2 * GetRandomControl(), laraItem.RoomNumber);
+						DoDamage(&laraItem, AUTO_GUN_SHOT_DAMAGE);
 					}
 					else
 					{
@@ -132,7 +135,7 @@ namespace TEN::Entities::Creatures::TR5
 		}
 		else
 		{
-			item.MeshBits = 0xFFFFFAFF;
+			item.MeshBits = 0xFFFFFAFF; // TODO: Demagic.
 			AnimateItem(&item);
 		}		
 	}
