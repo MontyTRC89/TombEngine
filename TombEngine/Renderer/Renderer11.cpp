@@ -372,9 +372,6 @@ namespace TEN::Renderer
 
 	void Renderer11::SetBlendMode(BLEND_MODES blendMode, bool force)
 	{
-		if (m_numDebugPage == RENDERER_DEBUG_PAGE::WIREFRAME_MODE)
-			blendMode = BLENDMODE_ADDITIVE;
-
 		if (blendMode != lastBlendMode || force)
 		{
 			switch (blendMode)
@@ -435,9 +432,6 @@ namespace TEN::Renderer
 
 	void Renderer11::SetDepthState(DEPTH_STATES depthState, bool force)
 	{
-		if (m_numDebugPage == RENDERER_DEBUG_PAGE::WIREFRAME_MODE)
-			depthState = DEPTH_STATE_NONE;
-
 		if (depthState != lastDepthState || force)
 		{
 			switch (depthState)
