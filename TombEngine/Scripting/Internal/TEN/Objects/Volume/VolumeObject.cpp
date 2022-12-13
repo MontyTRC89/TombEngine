@@ -128,7 +128,7 @@ Rotation Volume::GetRot() const
 
 void Volume::SetRot(Rotation const& rot)
 {
-	auto angles = EulerAngles(FROM_DEGREES(rot.x), FROM_DEGREES(rot.y), FROM_DEGREES(rot.z));
+	auto angles = EulerAngles(ANGLE(rot.x), ANGLE(rot.y), ANGLE(rot.z));
 	m_volume.Rotation = m_volume.Box.Orientation = angles.ToQuaternion();
 }
 
