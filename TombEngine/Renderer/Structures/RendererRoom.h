@@ -32,7 +32,7 @@ namespace TEN::Renderer
 		std::vector<RendererLight*> LightsToDraw;
 		std::vector<RendererDoor> Doors;
 		BoundingBox BoundingBox;
-
+		RendererRectangle ClipBounds;
 		std::vector<int> Neighbors;
 	};
 }
