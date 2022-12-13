@@ -60,7 +60,7 @@ EulerAngles::EulerAngles(const Quaternion& quat)
 
 	// Roll (Z axis)
 	float sinR = ((quat.w * quat.z) + (quat.x * quat.y)) * 2;
-	float cosR = 1.0f - ((SQUARE(x) + SQUARE(quat.x)) * 2);
+	float cosR = 1.0f - ((SQUARE(quat.z) + SQUARE(quat.x)) * 2);
 	float roll = atan2(sinR, cosR);
 
 	*this = EulerAngles(FROM_RAD(pitch), FROM_RAD(yaw), FROM_RAD(roll));
