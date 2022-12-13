@@ -46,22 +46,22 @@ EulerAngles::EulerAngles(const Quaternion& quat)
 			*this = EulerAngles(FROM_RAD(-PI_DIV_2), 0, FROM_RAD(-atan2(quat.z, quat.w) * 2));
 	}
 
-	// Roll (X axis)
-	float sinR = ((quat.w * quat.z) + (quat.x * quat.y)) * 2;
-	float cosR = 1.0f - ((SQUARE(x) + SQUARE(quat.x)) * 2);
-	float roll = atan2(sinR, cosR);
-
-	// Pitch (Y axis)
+	// Pitch (X axis)
 	float pitch = 0.0f;
 	if (abs(sinP) >= 1.0f)
 		pitch = (sinP > 0) ? PI_DIV_2 : -PI_DIV_2;
 	else
 		pitch = asin(sinP);
 
-	// Yaw (Z axis)
+	// Yaw (Y axis)
 	float sinY = ((quat.w * quat.y) + (quat.z * quat.x)) * 2;
 	float cosY = 1.0f - ((SQUARE(quat.x) + SQUARE(quat.y)) * 2);
 	float yaw = atan2(sinY, cosY);
+
+	// Roll (Z axis)
+	float sinR = ((quat.w * quat.z) + (quat.x * quat.y)) * 2;
+	float cosR = 1.0f - ((SQUARE(x) + SQUARE(quat.x)) * 2);
+	float roll = atan2(sinR, cosR);
 
 	*this = EulerAngles(FROM_RAD(pitch), FROM_RAD(yaw), FROM_RAD(roll));
 }
