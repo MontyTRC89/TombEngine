@@ -50,7 +50,7 @@ namespace TEN::Entities::Creatures::TR5
 		auto& item = g_Level.Items[itemNumber];
 		item.Data = std::array<short, 4>();
 
-		item.Status &= ~ITEM_INVISIBLE;
+		item.Status = ITEM_NOT_ACTIVE;
 		item.MeshBits.Clear(AutoGunFlashJoints);
 		item.MeshBits.Set(AutoGunBodyJoints);
 		item.MeshBits.Set(AutoGunChassisJoints);
