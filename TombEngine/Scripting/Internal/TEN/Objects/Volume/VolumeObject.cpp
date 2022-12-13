@@ -37,6 +37,11 @@ void Volume::Register(sol::table& parent)
 		// @function Volume:Disable
 		ScriptReserved_Disable, &Volume::Disable,
 
+		/// Determine whether the volume is active or not 
+		// @function Volume:GetActive
+		// @treturn bool true if the volume is active
+		ScriptReserved_GetName, & Volume::GetActive,
+
 		/// Get the volume's position.
 		// @function Volume:GetPosition
 		// @treturn Vec3 a copy of the static's position
@@ -97,6 +102,11 @@ void Volume::Disable()
 	m_volume.Enabled = false;
 }
 
+bool Volume::GetActive() const
+{
+	return m_volume.Enabled;
+}
+
 Vec3 Volume::GetPos() const
 {
 	return Vec3{ (int)m_volume.Position.x, (int)m_volume.Position.y, (int)m_volume.Position.z };
@@ -107,6 +117,19 @@ void Volume::SetPos(Vec3 const& pos)
 	m_volume.Position.x = pos.x;
 	m_volume.Position.y = pos.y;
 	m_volume.Position.z = pos.z;
+	m_volume.Box.Center = m_volume.Sphere.Center = m_volume.Position;
+}
+
+Rotation Volume::GetRot() const
+{
+	auto angles = EulerAngles(m_volume.Rotation);
+	return Rotation(TO_DEGREES(angles.x), TO_DEGREES(angles.y), TO_DEGREES(angles.z));
+}
+
+void Volume::SetRot(Rotation const& rot)
+{
+	auto angles = EulerAngles(FROM_DEGREES(rot.x), FROM_DEGREES(rot.y), FROM_DEGREES(rot.z));
+	m_volume.Rotation = m_volume.Box.Orientation = angles.ToQuaternion();
 }
 
 Vec3 Volume::GetScale() const
@@ -116,24 +139,8 @@ Vec3 Volume::GetScale() const
 
 void Volume::SetScale(Vec3 const& scale)
 {
-	m_volume.Scale = Vector3(scale.x, scale.y, scale.z);
-}
-
-bool Volume::GetActive() const
-{
-	return m_volume.Enabled;
-}
-
-Rotation Volume::GetRot() const
-{
-	auto angles = EulerAngles(m_volume.Rotation);
-	return Rotation(angles.x, angles.y, angles.z);
-}
-
-void Volume::SetRot(Rotation const& rot)
-{
-	auto angles = EulerAngles(rot.x, rot.y, rot.z);
-	m_volume.Rotation = angles.ToQuaternion();
+	m_volume.Scale = m_volume.Box.Extents = Vector3(scale.x, scale.y, scale.z);
+	m_volume.Sphere.Radius = m_volume.Scale.x;
 }
 
 std::string Volume::GetName() const
