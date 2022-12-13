@@ -50,6 +50,9 @@ namespace TEN::Control::Volumes
 
 	void TestVolumes(short roomNumber, BoundingOrientedBox bbox, VolumeActivatorType activatorType, VolumeTriggerer triggerer)
 	{
+		if (roomNumber == NO_ROOM)
+			return;
+
 		auto* room = &g_Level.Rooms[roomNumber];
 
 		for (size_t i = 0; i < room->triggerVolumes.size(); i++)
