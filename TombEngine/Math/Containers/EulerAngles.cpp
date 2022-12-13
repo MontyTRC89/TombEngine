@@ -32,26 +32,38 @@ EulerAngles::EulerAngles(const Vector3& direction)
 	this->z = 0;
 }
 
-// TODO: Check.
 EulerAngles::EulerAngles(const Quaternion& quat)
 {
-	// X axis
-	float sinX = ((quat.w * quat.y) - (quat.z * quat.x)) * 2;
-	// Use 90 degrees if out of range.
-	if (std::abs(sinX) >= 1)
-		this->x = FROM_RAD(std::copysign(PI_DIV_2, sinX));
+	static constexpr float singularityLimit = 0.9999995f;
+
+	// Handle singularity case.
+	float sinP = 2.0f * ((quat.w * quat.x) - (quat.y * quat.z));
+	if (abs(sinP) > singularityLimit)
+	{
+		if (sinP > 0.0f)
+			*this = EulerAngles(FROM_RAD(PI_DIV_2), 0, FROM_RAD(2.0f * FROM_RAD(atan2(quat.z, quat.w))));
+		else
+			*this = EulerAngles(FROM_RAD(-PI_DIV_2), 0, FROM_RAD(-2.0f * atan2(quat.z, quat.w)));
+	}
+
+	// Roll (X axis)
+	float sinR = 2.0f * ((quat.w * quat.z) + (quat.x * quat.y));
+	float cosR = 1.0f - (2.0f * (SQUARE(x) + SQUARE(quat.x)));
+	float roll = atan2(sinR, cosR);
+
+	// Pitch (Y axis)
+	float pitch = 0.0f;
+	if (abs(sinP) >= 1.0f)
+		pitch = (sinP > 0) ? PI_DIV_2 : -PI_DIV_2;
 	else
-		this->x = FROM_RAD(asin(sinX));
+		pitch = asin(sinP);
 
-	// Y axis
-	float sinYCosX = ((quat.w * quat.z) + (quat.x * quat.y)) * 2;
-	float cosYCosX = 1 - (((quat.y * quat.y) * 2) + (quat.z * quat.z));
-	this->y = FROM_RAD(atan2(sinYCosX, cosYCosX));
+	// Yaw (Z axis)
+	float sinY = 2.0f * ((quat.w * quat.y) + (quat.z * quat.x));
+	float cosY = 1.0f - (2.0f * (SQUARE(quat.x) + SQUARE(quat.y)));
+	float yaw = atan2(sinY, cosY);
 
-	// Z axis
-	float sinZCosX = ((quat.w * quat.x) + (quat.y * quat.z)) * 2;
-	float cosZCosX = 1 - (((quat.x * quat.x) * 2) + (quat.y * quat.y));
-	this->z = FROM_RAD(atan2(sinZCosX, cosZCosX));
+	*this = EulerAngles(FROM_RAD(pitch), FROM_RAD(yaw), FROM_RAD(roll));
 }
 
 // TODO: Check.
