@@ -50,7 +50,7 @@ We do not and have never worked for Core Design, Eidos Interactive, or Square En
 - Gancian (general coding)
 - Krystian (general coding)
 - Kubsy (Some cleanups and fixes)
-- l.m. (general coding, bug fixing)
+- l.m. (general coding, Lua enhancements, bug fixing)
 - Lwmte (sound refactoring, general coding, code cleanups, bug fixing)
 - Moooonyeah (Jumanji) (entity decompilation)
 - Raildex (renderer refactoring, particle coding, general coding) 
