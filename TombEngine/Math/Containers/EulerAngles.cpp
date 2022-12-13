@@ -41,7 +41,7 @@ EulerAngles::EulerAngles(const Quaternion& quat)
 	if (abs(sinP) > singularityThreshold)
 	{
 		if (sinP > 0.0f)
-			*this = EulerAngles(FROM_RAD(PI_DIV_2), 0, FROM_RAD(FROM_RAD(atan2(quat.z, quat.w) * 2)));
+			*this = EulerAngles(FROM_RAD(PI_DIV_2), 0, FROM_RAD(atan2(quat.z, quat.w) * 2));
 		else
 			*this = EulerAngles(FROM_RAD(-PI_DIV_2), 0, FROM_RAD(-atan2(quat.z, quat.w) * 2));
 	}
