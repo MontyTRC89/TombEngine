@@ -2,15 +2,16 @@
 #include "Game/control/volume.h"
 
 #include <filesystem>
+
 #include "Game/animation.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/room.h"
 #include "Game/savegame.h"
-#include "ScriptInterfaceGame.h"
-#include "Specific/setup.h"
 #include "Renderer/Renderer11.h"
 #include "Renderer/Renderer11Enums.h"
+#include "Scripting/Include/ScriptInterfaceGame.h"
+#include "Specific/setup.h"
 
 using TEN::Renderer::g_Renderer;
 
@@ -18,19 +19,21 @@ namespace TEN::Control::Volumes
 {
 	constexpr auto CAM_SIZE = 32;
 
-	bool TestVolumeContainment(TriggerVolume& volume, BoundingOrientedBox& bbox, short roomNumber)
+	bool TestVolumeContainment(TriggerVolume& volume, const BoundingOrientedBox& box, short roomNumber)
 	{
 		switch (volume.Type)
 		{
 		case VolumeType::Box:
 			if (roomNumber == Camera.pos.RoomNumber)
 				g_Renderer.AddDebugBox(volume.Box, Vector4(1.0f, 0.0f, 1.0f, 1.0f), RENDERER_DEBUG_PAGE::LARA_STATS);
-			return volume.Box.Intersects(bbox);
+
+			return volume.Box.Intersects(box);
 
 		case VolumeType::Sphere:
 			if (roomNumber == Camera.pos.RoomNumber)
 				g_Renderer.AddDebugSphere(volume.Sphere.Center, volume.Sphere.Radius, Vector4(1.0f, 0.0f, 1.0f, 1.0f), RENDERER_DEBUG_PAGE::LARA_STATS);
-			return volume.Sphere.Intersects(bbox);
+
+			return volume.Sphere.Intersects(box);
 
 		default:
 			TENLog("Unsupported volume type encountered in room " + std::to_string(roomNumber), LogLevel::Error);
@@ -40,69 +43,65 @@ namespace TEN::Control::Volumes
 
 	void HandleEvent(VolumeEvent& evt, VolumeTriggerer& triggerer)
 	{
-		if (!evt.Function.empty() && evt.CallCounter != 0)
-		{
-			g_GameScript->ExecuteFunction(evt.Function, triggerer, evt.Data);
-			if (evt.CallCounter != NO_CALL_COUNTER)
-				evt.CallCounter--;
-		}
+		if (evt.Function.empty() || evt.CallCounter == 0)
+			return;
+
+		g_GameScript->ExecuteFunction(evt.Function, triggerer, evt.Data);
+		if (evt.CallCounter != NO_CALL_COUNTER)
+			evt.CallCounter--;
 	}
 
-	void TestVolumes(short roomNumber, BoundingOrientedBox bbox, VolumeActivatorType activatorType, VolumeTriggerer triggerer)
+	void TestVolumes(short roomNumber, const BoundingOrientedBox& box, VolumeActivatorType activatorType, VolumeTriggerer triggerer)
 	{
 		if (roomNumber == NO_ROOM)
 			return;
 
-		auto* room = &g_Level.Rooms[roomNumber];
+		auto& room = g_Level.Rooms[roomNumber];
 
-		for (size_t i = 0; i < room->triggerVolumes.size(); i++)
+		for (auto& volume : room.triggerVolumes)
 		{
-			auto* volume = &room->triggerVolumes[i];
-
-			if (!volume->Enabled)
+			if (!volume.Enabled)
 				continue;
 
-			if (volume->EventSetIndex == NO_EVENT_SET)
+			if (volume.EventSetIndex == NO_EVENT_SET)
 				continue;
 
-			auto* set = &g_Level.EventSets[volume->EventSetIndex];
+			auto& set = g_Level.EventSets[volume.EventSetIndex];
 
-			if ((set->Activators & (int)activatorType) != (int)activatorType)
+			if ((set.Activators & (int)activatorType) != (int)activatorType)
 				continue;
 
-			VolumeState* entry = nullptr;
+			VolumeState* entryPtr = nullptr;
 
-			for (int j = volume->StateQueue.size() - 1; j >= 0; j--)
+			for (int j = volume.StateQueue.size() - 1; j >= 0; j--)
 			{
-				VolumeState* candidate = &volume->StateQueue[j];
+				auto& candidate = volume.StateQueue[j];
 
-				switch (candidate->Status)
+				switch (candidate.Status)
 				{
 				case VolumeStateStatus::Leaving:
-					if (GameTimer - candidate->Timestamp > VOLUME_BUSY_TIMEOUT)
-					{
-						candidate->Status = VolumeStateStatus::Outside;
-					}
+					if ((GameTimer - candidate.Timestamp) > VOLUME_BUSY_TIMEOUT)
+						candidate.Status = VolumeStateStatus::Outside;
+				
 					break;
 
 				case VolumeStateStatus::Outside:
-					volume->StateQueue.erase(volume->StateQueue.begin() + j);
+					volume.StateQueue.erase(volume.StateQueue.begin() + j);
 					break;
 
 				default:
-					if (candidate->Triggerer == triggerer)
-					{
-						entry = candidate;
-					}
+					if (candidate.Triggerer == triggerer)
+						entryPtr = &candidate;
+					
 					break;
 				}
 			}
 
-			if (TestVolumeContainment(*volume, bbox, roomNumber))
+			if (TestVolumeContainment(volume, box, roomNumber))
 			{
-				if (entry == nullptr)
+				if (entryPtr == nullptr)
 				{
-					volume->StateQueue.push_back(
+					volume.StateQueue.push_back(
 						VolumeState
 						{ 
 							VolumeStateStatus::Entering,
@@ -110,27 +109,27 @@ namespace TEN::Control::Volumes
 							GameTimer 
 						});
 
-					HandleEvent(set->OnEnter, triggerer);
+					HandleEvent(set.OnEnter, triggerer);
 				}
 				else
 				{
-					entry->Status = VolumeStateStatus::Inside;
-					entry->Timestamp = GameTimer;
+					entryPtr->Status = VolumeStateStatus::Inside;
+					entryPtr->Timestamp = GameTimer;
 
-					HandleEvent(set->OnInside, triggerer);
+					HandleEvent(set.OnInside, triggerer);
 				}
 			}
-			else if (entry != nullptr)
+			else if (entryPtr != nullptr)
 			{
 				// Only fire leave event when a certain timeout has passed.
 				// This helps to filter out borderline cases when moving around volumes.
 
-				if (GameTimer - entry->Timestamp > VOLUME_LEAVE_TIMEOUT)
+				if ((GameTimer - entryPtr->Timestamp) > VOLUME_LEAVE_TIMEOUT)
 				{
-					entry->Status = VolumeStateStatus::Leaving;
-					entry->Timestamp = GameTimer;
+					entryPtr->Status = VolumeStateStatus::Leaving;
+					entryPtr->Timestamp = GameTimer;
 
-					HandleEvent(set->OnLeave, triggerer);
+					HandleEvent(set.OnLeave, triggerer);
 				}
 			}
 		}
@@ -138,36 +137,42 @@ namespace TEN::Control::Volumes
 	
 	void TestVolumes(CAMERA_INFO* camera)
 	{
-		auto pos = Pose(camera->pos.ToVector3i(), EulerAngles::Zero);
-		auto box = GameBoundingBox::Zero;
-		box.X1 = box.Y1 = box.Z1 =  CAM_SIZE;
-		box.X2 = box.Y2 = box.Z2 = -CAM_SIZE;
+		auto pose = Pose(camera->pos.ToVector3i(), EulerAngles::Zero);
+		auto bounds = GameBoundingBox::Zero;
+		bounds.X1 = bounds.Y1 = bounds.Z1 =  CAM_SIZE;
+		bounds.X2 = bounds.Y2 = bounds.Z2 = -CAM_SIZE;
 
-		auto bBox = box.ToBoundingOrientedBox(pos);
+		auto box = bounds.ToBoundingOrientedBox(pose);
 
-		TestVolumes(camera->pos.RoomNumber, bBox, VolumeActivatorType::Flyby, camera);
+		TestVolumes(camera->pos.RoomNumber, box, VolumeActivatorType::Flyby, camera);
 	}
 
 	void TestVolumes(short roomNumber, MESH_INFO* mesh)
 	{
-		const auto& bBox = GetBoundsAccurate(*mesh, false).ToBoundingOrientedBox(mesh->pos);
+		auto box = GetBoundsAccurate(*mesh, false).ToBoundingOrientedBox(mesh->pos);
 		
-		TestVolumes(roomNumber, bBox, VolumeActivatorType::Static, mesh);
+		TestVolumes(roomNumber, box, VolumeActivatorType::Static, mesh);
 	}
 
 	void TestVolumes(short itemNumber)
 	{
-		auto* item = &g_Level.Items[itemNumber];
-		auto bBox = GameBoundingBox(item).ToBoundingOrientedBox(item->Pose);
+		auto& item = g_Level.Items[itemNumber];
+		auto box = GameBoundingBox(&item).ToBoundingOrientedBox(item.Pose);
 
-		g_Renderer.AddDebugBox(bBox, Vector4(1.0f, 1.0f, 0.0f, 1.0f), RENDERER_DEBUG_PAGE::LARA_STATS);
+		g_Renderer.AddDebugBox(box, Vector4(1.0f, 1.0f, 0.0f, 1.0f), RENDERER_DEBUG_PAGE::LARA_STATS);
 
-		if (item->ObjectNumber == ID_LARA || item->Index == Lara.Vehicle)
-			TestVolumes(item->RoomNumber, bBox, VolumeActivatorType::Player, itemNumber);
-		else if (Objects[item->ObjectNumber].intelligent)
-			TestVolumes(item->RoomNumber, bBox, VolumeActivatorType::NPC, itemNumber);
+		if (item.ObjectNumber == ID_LARA || item.Index == Lara.Vehicle)
+		{
+			TestVolumes(item.RoomNumber, box, VolumeActivatorType::Player, itemNumber);
+		}
+		else if (Objects[item.ObjectNumber].intelligent)
+		{
+			TestVolumes(item.RoomNumber, box, VolumeActivatorType::NPC, itemNumber);
+		}
 		else
-			TestVolumes(item->RoomNumber, bBox, VolumeActivatorType::Moveable, itemNumber);
+		{
+			TestVolumes(item.RoomNumber, box, VolumeActivatorType::Moveable, itemNumber);
+		}
 	}
 
 	void InitialiseNodeScripts()
@@ -178,9 +183,11 @@ namespace TEN::Control::Volumes
 			return;
 		
 		std::vector<std::string> nodeCatalogs;
-		for (auto& path : std::filesystem::recursive_directory_iterator(nodeScriptPath))
+		for (const auto& path : std::filesystem::recursive_directory_iterator(nodeScriptPath))
+		{
 			if (path.path().extension() == ".lua")
 				nodeCatalogs.push_back(path.path().filename().string());
+		}
 
 		if (nodeCatalogs.size() == 0)
 			return;
@@ -188,13 +195,13 @@ namespace TEN::Control::Volumes
 		TENLog("Loading node scripts...", LogLevel::Info);
 
 		std::sort(nodeCatalogs.rbegin(), nodeCatalogs.rend());
-		for (auto& file : nodeCatalogs)
+		for (const auto& file : nodeCatalogs)
 			g_GameScript->ExecuteScriptFile(nodeScriptPath + file);
 
 		TENLog(std::to_string(nodeCatalogs.size()) + " node catalogs were found and loaded.", LogLevel::Info);
 
-		int nodeCount = 0;
-		for (auto& set : g_Level.EventSets)
+		unsigned int nodeCount = 0;
+		for (const auto& set : g_Level.EventSets)
 		{
 			if ((set.OnEnter.Mode == VolumeEventMode::Nodes) && (set.OnEnter.Data.size() > 0))
 			{
