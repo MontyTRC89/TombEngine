@@ -373,6 +373,8 @@ namespace TEN::Renderer
 
 		m_rooms[roomNumber1].RoomNumber = roomNumber1;
 		m_rooms[roomNumber2].RoomNumber = roomNumber2;
+
+		m_invalidateCache = true;
 	}
 
 	RendererMesh* Renderer11::GetMesh(int meshIndex)

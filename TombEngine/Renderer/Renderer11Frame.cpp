@@ -43,6 +43,8 @@ namespace TEN::Renderer
 
 		GetVisibleRooms(NO_ROOM, renderView.camera.RoomNumber, Vector4(-1.0f, -1.0f, 1.0f, 1.0f), false, 0, onlyRooms, renderView);
 
+		m_invalidateCache = false;
+
 		for (auto room : renderView.roomsToDraw)
 		{
 			room->ClipBounds.left = (room->ViewPort.x + 1.0f) * m_screenWidth * 0.5f;
@@ -327,7 +329,7 @@ namespace TEN::Renderer
 			auto* mesh = &room.Statics[i];
 			MESH_INFO* nativeMesh = &r->mesh[i];
 
-			if (nativeMesh->Dirty)
+			if (nativeMesh->Dirty || m_invalidateCache)
 			{
 				mesh->ObjectNumber = nativeMesh->staticNumber;
 				mesh->Color = nativeMesh->color;
@@ -367,7 +369,7 @@ namespace TEN::Renderer
 			std::vector<RendererLight*> cachedRoomLights;
 			if (obj.ObjectMeshes.front()->LightMode != LIGHT_MODES::LIGHT_MODE_STATIC)
 			{
-				if (mesh->CacheLights)
+				if (mesh->CacheLights || m_invalidateCache)
 				{
 					// Collect all lights and return also cached light for the next frames
 					CollectLights(mesh->Pose.Position.ToVector3(), ITEM_LIGHT_COLLECTION_RADIUS, room.RoomNumber, NO_ROOM, false, false, &cachedRoomLights, &lights);
@@ -407,25 +409,24 @@ namespace TEN::Renderer
 		// Dynamic lights have the priority
 		for (auto& light : dynamicLights)
 		{
-			float distance =
+			float distanceSquared =
 				SQUARE(position.x - light.Position.x) +
 				SQUARE(position.y - light.Position.y) +
 				SQUARE(position.z - light.Position.z);
 
 			// Collect only lights nearer than 20 sectors
-			if (distance >= SQUARE(SECTOR(20)))
+			if (distanceSquared >= SQUARE(SECTOR(20)))
 			{
 				continue;
 			}
 
 			// Check the out radius
-			if (distance > SQUARE(light.Out + radius))
+			if (distanceSquared > SQUARE(light.Out + radius))
 			{
 				continue;
 			}
 
-			distance = sqrt(distance);
-
+			float distance = sqrt(distanceSquared);
 			float attenuation = 1.0f - distance / light.Out;
 			float intensity = std::max(0.0f, attenuation * light.Intensity * light.Luma);
 
@@ -462,25 +463,24 @@ namespace TEN::Renderer
 					}
 					else if (light->Type == LIGHT_TYPE_POINT || light->Type == LIGHT_TYPE_SHADOW)
 					{
-						float distance =
+						float distanceSquared =
 							SQUARE(position.x - light->Position.x) +
 							SQUARE(position.y - light->Position.y) +
 							SQUARE(position.z - light->Position.z);
 
 						// Collect only lights nearer than 20 sectors
-						if (distance >= SQUARE(SECTOR(20)))
+						if (distanceSquared >= SQUARE(SECTOR(20)))
 						{
 							continue;
 						}
 
 						// Check the out radius
-						if (distance > SQUARE(light->Out + radius))
+						if (distanceSquared > SQUARE(light->Out + radius))
 						{
 							continue;
 						}
 
-						distance = sqrt(distance);
-
+						float distance = sqrt(distanceSquared);
 						float attenuation = 1.0f - distance / light->Out;
 						float intensity = std::max(0.0f, attenuation * light->Intensity * Luma(light->Color));
 
@@ -499,25 +499,24 @@ namespace TEN::Renderer
 					}
 					else if (light->Type == LIGHT_TYPE_SPOT)
 					{
-						float distance =
+						float distanceSquared =
 							SQUARE(position.x - light->Position.x) +
 							SQUARE(position.y - light->Position.y) +
 							SQUARE(position.z - light->Position.z);
 
 						// Collect only lights nearer than 20 sectors
-						if (distance >= SQUARE(SECTOR(20)))
+						if (distanceSquared >= SQUARE(SECTOR(20)))
 						{
 							continue;
 						}
 
 						// Check the range
-						if (distance > SQUARE(light->Out + radius))
+						if (distanceSquared > SQUARE(light->Out + radius))
 						{
 							continue;
 						}
 
-						distance = sqrt(distance);
-
+						float distance = sqrt(distanceSquared);
 						float attenuation = 1.0f - distance / light->Out;
 						float intensity = std::max(0.0f, attenuation * light->Intensity * light->Luma);
 

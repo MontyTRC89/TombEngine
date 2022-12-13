@@ -390,6 +390,7 @@ namespace TEN::Renderer
 		std::vector<RendererTransparentFace> m_transparentFaces;
 
 		std::vector<RendererRoom> m_rooms;
+		bool m_invalidateCache;
 
 		std::vector<RendererLight> dynamicLights;
 		RendererLight* shadowLight;
