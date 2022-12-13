@@ -49,7 +49,8 @@ namespace TEN::Entities::Creatures::TR5
 	{
 		auto& item = g_Level.Items[itemNumber];
 		item.Data = std::array<short, 4>();
-		item.Status -= ITEM_INVISIBLE;
+
+		item.Status &= ~ITEM_INVISIBLE;
 		item.MeshBits.Clear(AutoGunFlashJoints);
 		item.MeshBits.Set(AutoGunBodyJoints);
 		item.MeshBits.Set(AutoGunChassisJoints);
@@ -168,7 +169,7 @@ namespace TEN::Entities::Creatures::TR5
 				SpawnAutoGunSmoke(GetJointPosition(&item, AUTO_GUN_BARREL_JOINT_INDEX).ToVector3(), item.ItemFlags[2] / 16);
 		}
 		else
-		{	
+		{
 			item.MeshBits.Set(AutoGunChassisJoints);
 			item.MeshBits.Clear(AutoGunClosedHatchJoints);
 			item.MeshBits.Clear(AutoGunFlashJoints);
