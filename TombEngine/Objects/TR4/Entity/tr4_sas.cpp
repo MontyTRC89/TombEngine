@@ -145,7 +145,7 @@ namespace TEN::Entities::TR4
 
 			int distance = 0;
 			int angle = 0;
-			if (creature->Enemy = LaraItem)
+			if (creature->Enemy->IsLara())
 			{
 				angle = AI.angle;
 				distance = AI.distance;
@@ -167,7 +167,6 @@ namespace TEN::Entities::TR4
 
 
 			CreatureMood(item, &AI, !creature->Enemy->IsLara());
-
 			angle = CreatureTurn(item, creature->MaxTurn);
 
 			if (item->HitStatus)
@@ -193,7 +192,7 @@ namespace TEN::Entities::TR4
 					else
 						item->Pose.Orientation.y += ANGLE(10.0f);
 				}
-				else if (item->AIBits == MODIFY || Lara.Vehicle != NO_ITEM)
+				else if (item->AIBits & MODIFY || Lara.Vehicle != NO_ITEM)
 				{
 					if (abs(AI.angle) < ANGLE(2.0f))
 						item->Pose.Orientation.y += AI.angle;
