@@ -126,14 +126,14 @@ bool Volume::GetActive() const
 
 Rotation Volume::GetRot() const
 {
-	// TODO
-	return Rotation{};
+	auto angles = EulerAngles(m_volume.Rotation);
+	return Rotation(angles.x, angles.y, angles.z);
 }
 
 void Volume::SetRot(Rotation const& rot)
 {
-	// TODO
-	m_volume.Rotation = m_volume.Rotation;
+	auto angles = EulerAngles(rot.x, rot.y, rot.z);
+	m_volume.Rotation = angles.ToQuaternion();
 }
 
 std::string Volume::GetName() const
