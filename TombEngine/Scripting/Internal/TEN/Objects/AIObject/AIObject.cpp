@@ -111,14 +111,14 @@ void AIObject::SetObjectID(GAME_OBJECT_ID objNum)
 	m_aiObject.objectNumber = objNum;
 }
 
-short AIObject::GetYRot() const
+float AIObject::GetYRot() const
 {
-	return m_aiObject.pos.Orientation.y;
+	return TO_DEGREES(m_aiObject.pos.Orientation.y);
 }
 
-void AIObject::SetYRot(short yRot)
+void AIObject::SetYRot(float yRot)
 {
-	m_aiObject.pos.Orientation.y = yRot;
+	m_aiObject.pos.Orientation.y = ANGLE(yRot);
 }
 
 std::string AIObject::GetName() const

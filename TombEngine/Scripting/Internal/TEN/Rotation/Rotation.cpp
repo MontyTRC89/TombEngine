@@ -7,59 +7,66 @@
 /*** Represents a rotation.
 Rotations are specifed as a combination of individual
 angles, in degrees, about each axis.
-All values will be clamped to [-32768, 32767].
+All values will be clamped to [0, 360].
 @tenprimitive Rotation
 @pragma nostrip
 */
 
 void Rotation::Register(sol::table & parent)
 {
-	using ctors = sol::constructors<Rotation(int, int, int)>;
+	using ctors = sol::constructors<Rotation(float, float, float)>;
 	parent.new_usertype<Rotation>(ScriptReserved_Rotation,
 		ctors(),
 		sol::call_constructor, ctors(),
 		sol::meta_function::to_string, &Rotation::ToString,
 
-/// (int) rotation about x axis
+/// (float) rotation about x axis
 //@mem x
 		"x", &Rotation::x,
 
-/// (int) rotation about y axis
+/// (float) rotation about y axis
 //@mem y
 		"y", &Rotation::y,
 
-/// (int) rotation about z axis
+/// (float) rotation about z axis
 //@mem z
 		"z", &Rotation::z
 	);
 }
 
 /*** 
-@int X rotation about x axis
-@int Y rotation about y axis
-@int Z rotation about z axis
+@float X rotation about x axis
+@float Y rotation about y axis
+@float Z rotation about z axis
 @treturn Rotation A Rotation object.
 @function Rotation
 */
-Rotation::Rotation(int aX, int aY, int aZ)
+Rotation::Rotation(float aX, float aY, float aZ)
 {
 	x = aX;
 	y = aY;
 	z = aZ;
 }
 
-void Rotation::StoreInPHDPos(Pose& pos) const
+Rotation::Rotation(EulerAngles const& ang)
 {
-	pos.Orientation.x = x;
-	pos.Orientation.y = y;
-	pos.Orientation.z = z;
+	x = TO_DEGREES(ang.x);
+	y = TO_DEGREES(ang.y);
+	z = TO_DEGREES(ang.z);
 }
 
-Rotation::Rotation(Pose const & pos)
+Rotation::Rotation(Pose const& pos)
 {
-	x = pos.Orientation.x;
-	y = pos.Orientation.y;
-	z = pos.Orientation.z;
+	x = TO_DEGREES(pos.Orientation.x);
+	y = TO_DEGREES(pos.Orientation.y);
+	z = TO_DEGREES(pos.Orientation.z);
+}
+
+void Rotation::StoreInPHDPos(Pose& pos) const
+{
+	pos.Orientation.x = ANGLE(x);
+	pos.Orientation.y = ANGLE(y);
+	pos.Orientation.z = ANGLE(z);
 }
 
 /***

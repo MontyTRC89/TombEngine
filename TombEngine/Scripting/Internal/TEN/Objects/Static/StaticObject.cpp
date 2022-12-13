@@ -174,10 +174,11 @@ void Static::SetScale(float const& scale)
 // (e.g. 90 degrees = -270 degrees = 450 degrees)
 Rotation Static::GetRot() const
 {
-	return {
-		static_cast<int>(TO_DEGREES(m_mesh.pos.Orientation.x)) % 360,
-		static_cast<int>(TO_DEGREES(m_mesh.pos.Orientation.y)) % 360,
-		static_cast<int>(TO_DEGREES(m_mesh.pos.Orientation.z)) % 360
+	return 
+	{
+		TO_DEGREES(m_mesh.pos.Orientation.x),
+		TO_DEGREES(m_mesh.pos.Orientation.y),
+		TO_DEGREES(m_mesh.pos.Orientation.z)
 	};
 }
 
