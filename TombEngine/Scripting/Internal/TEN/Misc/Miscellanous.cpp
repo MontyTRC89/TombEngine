@@ -112,7 +112,7 @@ namespace Misc
 	//@tparam float angle in degrees (clamped to [10, 170])
 	static void SetFOV(float angle)
 	{
-		AlterFOV(FROM_DEGREES(std::clamp(abs(angle), 10.0f, 170.0f)));
+		AlterFOV(ANGLE(std::clamp(abs(angle), 10.0f, 170.0f)));
 	}
 
 	//Get field of view.

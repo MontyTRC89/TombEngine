@@ -18,6 +18,7 @@
 #include "Effects/BlendIDs.h"
 #include "Effects/EffectIDs.h"
 #include "ReservedScriptNames.h"
+#include "Specific/clock.h"
 
 /***
 Functions to generate effects.
@@ -257,7 +258,7 @@ namespace Effects
 
 		bool damage = USE_IF_HAVE(bool, hurtsLara, false);
 
-		TriggerShockwave(&p, iRad, oRad, spd, color.GetR(), color.GetG(), color.GetB(), lifeInFrames, FROM_DEGREES(ang), short(damage));
+		TriggerShockwave(&p, iRad, oRad, spd, color.GetR(), color.GetG(), color.GetB(), lifeInFrames, ANGLE(ang), short(damage));
 	}
 
 /***Emit dynamic light that lasts for a single frame.

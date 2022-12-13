@@ -635,9 +635,9 @@ Rotation Moveable::GetRot() const
 
 void Moveable::SetRot(Rotation const& rot)
 {
-	m_item->Pose.Orientation.x = FROM_DEGREES(rot.x);
-	m_item->Pose.Orientation.y = FROM_DEGREES(rot.y);
-	m_item->Pose.Orientation.z = FROM_DEGREES(rot.z);
+	m_item->Pose.Orientation.x = ANGLE(rot.x);
+	m_item->Pose.Orientation.y = ANGLE(rot.y);
+	m_item->Pose.Orientation.z = ANGLE(rot.z);
 }
 
 /// Get current HP (hit points/health points)

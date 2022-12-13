@@ -451,7 +451,7 @@ CALL gen.bat</Command>
     <ClInclude Include="Objects\TR5\Emitter\tr5_bats_emitter.h" />
     <ClInclude Include="Objects\TR5\Emitter\tr5_rats_emitter.h" />
     <ClInclude Include="Objects\TR5\Emitter\tr5_spider_emitter.h" />
-    <ClInclude Include="Objects\TR5\Entity\tr5_autoguns.h" />
+    <ClInclude Include="Objects\TR5\Entity\AutoGun.h" />
     <ClInclude Include="Objects\TR5\Entity\tr5_brownbeast.h" />
     <ClInclude Include="Objects\TR5\Entity\tr5_chef.h" />
     <ClInclude Include="Objects\TR5\Entity\tr5_cyborg.h" />
@@ -814,7 +814,7 @@ CALL gen.bat</Command>
     <ClCompile Include="Objects\TR5\Emitter\tr5_bats_emitter.cpp" />
     <ClCompile Include="Objects\TR5\Emitter\tr5_rats_emitter.cpp" />
     <ClCompile Include="Objects\TR5\Emitter\tr5_spider_emitter.cpp" />
-    <ClCompile Include="Objects\TR5\Entity\tr5_autoguns.cpp" />
+    <ClCompile Include="Objects\TR5\Entity\AutoGun.cpp" />
     <ClCompile Include="Objects\TR5\Entity\tr5_brownbeast.cpp" />
     <ClCompile Include="Objects\TR5\Entity\tr5_chef.cpp" />
     <ClCompile Include="Objects\TR5\Entity\tr5_cyborg.cpp" />

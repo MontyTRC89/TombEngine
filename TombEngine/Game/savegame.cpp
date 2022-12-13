@@ -28,12 +28,12 @@
 #include "Objects/TR5/Emitter/tr5_bats_emitter.h"
 #include "Objects/TR5/Emitter/tr5_spider_emitter.h"
 #include "Sound/sound.h"
+#include "Specific/clock.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
 #include "Specific/savegame/flatbuffers/ten_savegame_generated.h"
 #include "ScriptInterfaceLevel.h"
 #include "ScriptInterfaceGame.h"
-#include "effects/effects.h"
 #include "Objects/ScriptInterfaceObjectsHandler.h"
 
 using namespace TEN::Control::Volumes;

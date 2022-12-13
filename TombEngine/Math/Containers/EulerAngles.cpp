@@ -84,8 +84,7 @@ EulerAngles EulerAngles::InterpolateConstant(const EulerAngles& eulersFrom, cons
 	return EulerAngles(
 		InterpolateConstant(eulersFrom.x, eulerTo.x, angularVel),
 		InterpolateConstant(eulersFrom.y, eulerTo.y, angularVel),
-		InterpolateConstant(eulersFrom.z, eulerTo.z, angularVel)
-	);
+		InterpolateConstant(eulersFrom.z, eulerTo.z, angularVel));
 }
 
 void EulerAngles::Lerp(const EulerAngles& eulersTo, float alpha, short epsilon)
@@ -98,8 +97,7 @@ EulerAngles EulerAngles::Lerp(const EulerAngles& eulersFrom, const EulerAngles& 
 	return EulerAngles(
 		Lerp(eulersFrom.x, eulersTo.x, alpha, epsilon),
 		Lerp(eulersFrom.y, eulersTo.y, alpha, epsilon),
-		Lerp(eulersFrom.z, eulersTo.z, alpha, epsilon)
-	);
+		Lerp(eulersFrom.z, eulersTo.z, alpha, epsilon));
 }
 
 Vector3 EulerAngles::ToDirection() const
@@ -113,8 +111,7 @@ Vector3 EulerAngles::ToDirection() const
 	return Vector3(
 		sinY * cosX,
 		-sinX,
-		cosY * cosX
-	);
+		cosY * cosX);
 }
 
 Quaternion EulerAngles::ToQuaternion() const
