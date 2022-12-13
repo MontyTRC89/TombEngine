@@ -27,14 +27,14 @@ enum class VolumeType
 	Prism // TODO: Unsupported as of now.
 };
 
-enum class VolumeActivatorType
+enum class VolumeActivatorFlags
 {
-	Player = 1,
-	NPC = 2,
-	Moveable = 4,
-	Static = 8,
-	Flyby = 16,
-	PhysicalObject = 32 // TODO: Future-proofing for Bullet.
+	Player		   = (1 << 0),
+	NPC			   = (1 << 1),
+	Moveable	   = (1 << 2),
+	Static		   = (1 << 3),
+	Flyby		   = (1 << 4),
+	PhysicalObject = (1 << 5) // TODO: Future-proofing for Bullet.
 };
 
 struct VolumeState
@@ -64,7 +64,7 @@ struct TriggerVolume
 
 namespace TEN::Control::Volumes
 {
-	void TestVolumes(short roomNumber, const BoundingOrientedBox& box, VolumeActivatorType activatorType, VolumeTriggerer triggerer);
+	void TestVolumes(short roomNumber, const BoundingOrientedBox& box, VolumeActivatorFlags activatorFlag, VolumeTriggerer triggerer);
 	void TestVolumes(short itemNumber);
 	void TestVolumes(short roomNumber, MESH_INFO* mesh);
 	void TestVolumes(CAMERA_INFO* camera);
