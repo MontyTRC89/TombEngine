@@ -13,8 +13,6 @@ TombEngine (TEN) is a new, open-source engine which aims to abolish all limits, 
 - An enlarged 2D map, allowing for the creation of massive levels (imagine one big level may previously have been split into five!)
 - A streamlined player control scheme.
 
-TEN is based on the Tomb Raider: Chronicles engine of the classic era and continues to build upon and replace its systems to modernize ...
-
 If you would like to participate in TEN discussion with other TEN devs whether it is contributing or bugs, then join this discord server: https://discord.gg/apjBW2NsVj and head to #tombengine channel.
 
 Tomb Engine should be used in conjuction with Tomb Editor. Tomb Editor is also open source written in C#, you can find the repository here: https://github.com/MontyTRC89/Tomb-Editor
