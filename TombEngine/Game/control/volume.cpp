@@ -161,7 +161,7 @@ namespace TEN::Control::Volumes
 
 		g_Renderer.AddDebugBox(box, Vector4(1.0f, 1.0f, 0.0f, 1.0f), RENDERER_DEBUG_PAGE::LARA_STATS);
 
-		if (item.ObjectNumber == ID_LARA || item.Index == Lara.Vehicle)
+		if (item.IsLara() || item.Index == Lara.Vehicle)
 		{
 			TestVolumes(item.RoomNumber, box, VolumeActivatorFlags::Player, itemNumber);
 		}
@@ -203,19 +203,19 @@ namespace TEN::Control::Volumes
 		unsigned int nodeCount = 0;
 		for (const auto& set : g_Level.EventSets)
 		{
-			if ((set.OnEnter.Mode == VolumeEventMode::Nodes) && (set.OnEnter.Data.size() > 0))
+			if ((set.OnEnter.Mode == VolumeEventMode::Nodes) && !set.OnEnter.Data.empty())
 			{
 				g_GameScript->ExecuteString(set.OnEnter.Data);
 				nodeCount++;
 			}
 
-			if ((set.OnInside.Mode == VolumeEventMode::Nodes) && (set.OnInside.Data.size() > 0))
+			if ((set.OnInside.Mode == VolumeEventMode::Nodes) && !set.OnInside.Data.empty())
 			{
 				g_GameScript->ExecuteString(set.OnInside.Data);
 				nodeCount++;
 			}				
 
-			if ((set.OnLeave.Mode == VolumeEventMode::Nodes) && (set.OnLeave.Data.size() > 0))
+			if ((set.OnLeave.Mode == VolumeEventMode::Nodes) && !set.OnLeave.Data.empty())
 			{
 				g_GameScript->ExecuteString(set.OnLeave.Data);
 				nodeCount++;
