@@ -356,20 +356,20 @@ namespace TEN::Renderer
 
 			// Collect the lights
 			std::vector<RendererLight*> lights;
-			std::vector<RendererLight*> cachedRoomsLights;
+			std::vector<RendererLight*> cachedRoomLights;
 			if (obj.ObjectMeshes.front()->LightMode != LIGHT_MODES::LIGHT_MODE_STATIC)
 			{
 				if (mesh->CacheLights)
 				{
 					// Collect all lights and return also cached light for the next frames
-					CollectLights(mesh->Pose.Position.ToVector3(), ITEM_LIGHT_COLLECTION_RADIUS, room.RoomNumber, NO_ROOM, false, false, &cachedRoomsLights, &lights);
+					CollectLights(mesh->Pose.Position.ToVector3(), ITEM_LIGHT_COLLECTION_RADIUS, room.RoomNumber, NO_ROOM, false, false, &cachedRoomLights, &lights);
 					mesh->CacheLights = false;
-					mesh->CachedRoomsLights = cachedRoomsLights;
+					mesh->CachedRoomLights = cachedRoomLights;
 				}
 				else
 				{
 					// Collecy only dynamic lights and use cached lights from rooms
-					CollectLights(mesh->Pose.Position.ToVector3(), ITEM_LIGHT_COLLECTION_RADIUS, room.RoomNumber, NO_ROOM, false, true, &mesh->CachedRoomsLights, &lights);
+					CollectLights(mesh->Pose.Position.ToVector3(), ITEM_LIGHT_COLLECTION_RADIUS, room.RoomNumber, NO_ROOM, false, true, &mesh->CachedRoomLights, &lights);
 				}
 			}
 			mesh->LightsToDraw = lights;
@@ -379,7 +379,7 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer11::CollectLights(Vector3 position, float radius, int roomNumber, int prevRoomNumber, bool prioritizeShadowLight, bool useCachedRoomsLights, std::vector<RendererLight*>* roomsLights, std::vector<RendererLight*>* outputLights)
+	void Renderer11::CollectLights(Vector3 position, float radius, int roomNumber, int prevRoomNumber, bool prioritizeShadowLight, bool useCachedRoomLights, std::vector<RendererLight*>* roomsLights, std::vector<RendererLight*>* outputLights)
 	{
 		if (m_rooms.size() < roomNumber)
 		{
@@ -427,7 +427,7 @@ namespace TEN::Renderer
 			tempLights.push_back(&light);
 		}
 	
-		if (!useCachedRoomsLights)
+		if (!useCachedRoomLights)
 		{
 			// Check current room and also neighbour rooms
 			for (int roomToCheck : room.Neighbors)

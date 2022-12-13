@@ -97,7 +97,7 @@ namespace TEN::Renderer
 		Vector4 Color;
 		Vector4 AmbientLight;
 		std::vector<RendererLight*> LightsToDraw;
-		std::vector<RendererLight*> CachedRoomsLights;
+		std::vector<RendererLight*> CachedRoomLights;
 		bool CacheLights;
 		GameBoundingBox OriginalVisibilityBox;
 		BoundingOrientedBox VisibilityBox;
@@ -483,7 +483,7 @@ namespace TEN::Renderer
 		void CollectRooms(RenderView& renderView, bool onlyRooms);
 		void CollectItems(short roomNumber, RenderView& renderView);
 		void CollectStatics(short roomNumber, RenderView& renderView);
-		void CollectLights(Vector3 position, float radius, int roomNumber, int prevRoomNumber, bool prioritizeShadowLight, bool useCachedRoomsLights, std::vector<RendererLight*>* roomsLights, std::vector<RendererLight*>* outputLights);
+		void CollectLights(Vector3 position, float radius, int roomNumber, int prevRoomNumber, bool prioritizeShadowLight, bool useCachedRoomLights, std::vector<RendererLight*>* roomsLights, std::vector<RendererLight*>* outputLights);
 		void CollectLightsForItem(RendererItem* item);
 		void CollectLightsForEffect(short roomNumber, RendererEffect* effect);
 		void CollectLightsForRoom(short roomNumber, RenderView& renderView);
