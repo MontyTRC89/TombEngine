@@ -1,39 +1,22 @@
 #include "framework.h"
 #include "Math/Legacy.h"
 
-#include <cmath>
-
 #include "Math/Constants.h"
 
-float phd_sin(short a)
+float phd_sin(short x)
 {
-	return sin(TO_RAD(a));
+	return sin(TO_RAD(x));
 }
 
-float phd_cos(short a)
+float phd_cos(short x)
 {
-	return cos(TO_RAD(a));
+	return cos(TO_RAD(x));
 }
 
 // NOTE: Order of parameters is inverted!
-int phd_atan(int x, int y)
+int phd_atan(int y, int x)
 {
-	return FROM_RAD(atan2(y, x));
-}
-
-void InterpolateAngle(short angle, short& rotation, short& outAngle, int shift)
-{
-	int deltaAngle = angle - rotation;
-
-	if (deltaAngle < ANGLE(-180.0f))
-		deltaAngle += ANGLE(360.0f);
-	else if (deltaAngle > ANGLE(180.0f))
-		deltaAngle -= ANGLE(360.0f);
-
-	if (outAngle)
-		outAngle = (short)deltaAngle;
-
-	rotation += short(deltaAngle >> shift);
+	return FROM_RAD(atan2(x, y));
 }
 
 void GetMatrixFromTrAngle(Matrix& matrix, short* framePtr, int index)

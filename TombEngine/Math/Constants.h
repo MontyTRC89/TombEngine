@@ -27,5 +27,5 @@
 	constexpr inline auto STEP_SIZE		 = CLICK(1);
 	constexpr inline auto STOP_SIZE		 = CLICK(2);
 	constexpr inline auto WALL_MASK		 = BLOCK(1) - 1; // TODO: Rename to BLOCK_MASK?
-	constexpr inline auto GRID_SNAP_SIZE = (int)BLOCK(1.0f / 8);
+	constexpr inline auto GRID_SNAP_SIZE = (int)BLOCK(1 / 8.0f);
 //}

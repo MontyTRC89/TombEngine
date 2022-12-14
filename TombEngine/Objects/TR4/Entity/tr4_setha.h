@@ -5,9 +5,9 @@ struct ItemInfo;
 
 namespace TEN::Entities::TR4
 {
-	void InitialiseSetha(short itemNumber);
-	void SethaControl(short itemNumber);
-	void SethaThrowAttack(Pose* pose, short roomNumber, short mesh);
-	void SethaKill(ItemInfo* sethItem, ItemInfo* laraItem);
-	void SethaAttack(int itemNumber);
+	void InitialiseSeth(short itemNumber);
+	void SethControl(short itemNumber);
+	void SethProjectileAttack(const Pose& pose, int roomNumber, int flags);
+	void SethAttack(int itemNumber);
+	void SethKillAttack(ItemInfo* item, ItemInfo* laraItem);
 }

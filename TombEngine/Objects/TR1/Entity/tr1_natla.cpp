@@ -9,6 +9,7 @@
 #include "Game/missile.h"
 #include "Game/people.h"
 #include "Math/Math.h"
+#include "Specific/clock.h"
 #include "Sound/sound.h"
 #include "Specific/clock.h"
 #include "Specific/level.h"

@@ -76,6 +76,31 @@ int LaraObject::GetAir() const
 	return lara->Air;
 }
 
+/// Set wetness value of Lara (causes dripping)
+// @function LaraObject:SetWet
+// @tparam int Wetness value. Maximum 255 
+// @usage
+// Lara:SetWet(100)
+void LaraObject::SetWet(sol::optional<int> wetness)
+{
+	auto* lara = GetLaraInfo(m_item);
+
+	unsigned char value = wetness.has_value() ? (unsigned char)wetness.value() : UCHAR_MAX;
+	for (unsigned char& i : lara->Wet)
+		i = value;
+}
+
+/// Get wetness value of Lara
+// @function LaraObject:GetWet
+// @treturn int current wetness value
+// @usage
+// local dripAmount = Lara:GetWet()
+int LaraObject::GetWet() const
+{
+	auto* lara = GetLaraInfo(m_item);
+	return lara->Wet[0];
+}
+
 /// Set sprint energy value of Lara
 // @function LaraObject:SetSprintEnergy
 // @tparam int sprint energy to give to Lara; maximum value is 120. 
@@ -102,73 +127,6 @@ int LaraObject::GetSprintEnergy() const
 	return lara->SprintEnergy;
 }
 
-/// Set wetness value of Lara (causes dripping)
-// @function LaraObject:SetWet
-// @tparam int Wetness value. Maximum 255 
-// @usage
-// Lara:SetWet(100)
-void LaraObject::SetWet(sol::optional<int> wetness)
-{
-	auto* lara = GetLaraInfo(m_item);
-
-	unsigned char value = wetness.has_value() ? (unsigned char)wetness.value() : UCHAR_MAX;
-	for (unsigned char& i : lara->Wet)
-		i = value;
-}
-
-/// Get wetness value of Lara
-// @function LaraObject:GetWet
-// @treturn int current wetness value
-// @usage
-// local dripAmount = Lara:GetWet()
-int LaraObject::GetWet() const
-{
-	auto* lara = GetLaraInfo(m_item);
-	return lara->Wet[0];
-}
-
-/// Get current weapon's ammo count
-// @function LaraObject:GetAmmoCount
-// @treturn int current ammo count (-1 if infinite)
-// @usage
-// local equippedWeaponAmmoLeft = Lara:GetAmmoCount()
-int LaraObject::GetAmmoCount() const
-{
-	auto* lara = GetLaraInfo(m_item);
-	auto& ammo = GetAmmo(Lara, Lara.Control.Weapon.GunType);
-	return (ammo.HasInfinite()) ? -1 : (int)ammo.GetCount();
-}
-
-/// Get current vehicle, if it exists
-// @function LaraObject:GetVehicle
-// @treturn Moveable current vehicle (nil if no vehicle present)
-// @usage
-// local vehicle = Lara:GetVehicle()
-std::unique_ptr<Moveable> LaraObject::GetVehicle() const
-{
-	auto* lara = GetLaraInfo(m_item);
-
-	if (lara->Vehicle == NO_ITEM)
-		return nullptr;
-
-	return std::make_unique<Moveable>(lara->Vehicle);
-}
-
-/// Get current target enemy, if it exists
-// @function LaraObject:GetTarget
-// @treturn Moveable current target enemy (nil if no target present)
-// @usage
-// local target = Lara:GetTarget()
-std::unique_ptr<Moveable> LaraObject::GetTarget() const
-{
-	auto* lara = GetLaraInfo(m_item);
-
-	if (lara->TargetEntity == nullptr)
-		return nullptr;
-
-	return std::make_unique<Moveable>(lara->TargetEntity->Index);
-}
-	
 /// Lara will undraw her weapon if it is drawn and throw away a flare if she is currently holding one.
 // @function LaraObject:UndrawWeapon
 // @usage
@@ -252,18 +210,12 @@ void LaraObject::SetWeaponType(LaraWeaponType weaponType, bool activate)
 	case LaraWeaponType::Flare:
 		lara->Control.Weapon.RequestGunType = LaraWeaponType::Flare;
 		break;
+
 	case LaraWeaponType::Torch:
-		if (activate == false)
-		{
-			GetFlameTorch();
-			lara->Torch.IsLit = false;
-		}
-		else
-		{
-			GetFlameTorch();
-			lara->Torch.IsLit = true;
-		}
+		GetFlameTorch();
+		lara->Torch.IsLit = activate;
 		break;
+
 	default:
 		if (activate == false)
 			lara->Control.Weapon.LastGunType = weaponType;
@@ -271,6 +223,59 @@ void LaraObject::SetWeaponType(LaraWeaponType weaponType, bool activate)
 			lara->Control.Weapon.RequestGunType = weaponType;
 		break;
 	}
+}
+
+/// Get current weapon's ammo count
+// @function LaraObject:GetAmmoCount
+// @treturn int current ammo count (-1 if infinite)
+// @usage
+// local equippedWeaponAmmoLeft = Lara:GetAmmoCount()
+int LaraObject::GetAmmoCount() const
+{
+	auto* lara = GetLaraInfo(m_item);
+	auto& ammo = GetAmmo(Lara, Lara.Control.Weapon.GunType);
+	return (ammo.HasInfinite()) ? -1 : (int)ammo.GetCount();
+}
+
+/// Get current vehicle, if it exists
+// @function LaraObject:GetVehicle
+// @treturn Moveable current vehicle (nil if no vehicle present)
+// @usage
+// local vehicle = Lara:GetVehicle()
+std::unique_ptr<Moveable> LaraObject::GetVehicle() const
+{
+	auto* lara = GetLaraInfo(m_item);
+
+	if (lara->Vehicle == NO_ITEM)
+		return nullptr;
+
+	return std::make_unique<Moveable>(lara->Vehicle);
+}
+
+/// Get current target enemy, if it exists
+// @function LaraObject:GetTarget
+// @treturn Moveable current target enemy (nil if no target present)
+// @usage
+// local target = Lara:GetTarget()
+std::unique_ptr<Moveable> LaraObject::GetTarget() const
+{
+	auto* lara = GetLaraInfo(m_item);
+
+	if (lara->TargetEntity == nullptr)
+		return nullptr;
+
+	return std::make_unique<Moveable>(lara->TargetEntity->Index);
+}
+
+/// Get current light state of the torch, if it exists
+// @function LaraObject:TorchIsLit
+// @treturn bool is torch currently lit or not? (false if no torch exists)
+// @usage
+// local torchIsLit = Lara:TorchIsLit()
+bool LaraObject::TorchIsLit() const
+{
+	auto* lara = GetLaraInfo(m_item);
+	return lara->Torch.IsLit;
 }
 
 void LaraObject::Register(sol::table& parent)
@@ -292,6 +297,7 @@ void LaraObject::Register(sol::table& parent)
 			ScriptReserved_GetAmmoCount, &LaraObject::GetAmmoCount,
 			ScriptReserved_GetVehicle, &LaraObject::GetVehicle,
 			ScriptReserved_GetTarget, &LaraObject::GetTarget,
+			ScriptReserved_TorchIsLit, &LaraObject::TorchIsLit,
 			sol::base_classes, sol::bases<Moveable>()
 		);
 }

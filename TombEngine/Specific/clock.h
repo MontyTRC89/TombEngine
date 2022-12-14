@@ -4,8 +4,8 @@
 // This might not be the exact amount of time that has passed, but giving it a
 // value of 1/30 keeps it in lock-step with the rest of the game logic,
 // which assumes 30 iterations per second.
-static constexpr auto FPS		 = 30;
-static constexpr auto DELTA_TIME = 1.0f / FPS;
+constexpr auto FPS		  = 30;
+constexpr auto DELTA_TIME = 1.0f / FPS;
 
 int Sync();
 bool TimeInit();

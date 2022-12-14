@@ -23,6 +23,7 @@
 #include "Effects/BlendIDs.h"
 #include "Effects/EffectIDs.h"
 #include "ReservedScriptNames.h"
+#include "Specific/clock.h"
 
 /***
 Functions to generate effects.
@@ -112,7 +113,7 @@ namespace Effects
 	@tparam float rot (default 0) specifies a speed with which it will rotate (0 = no rotation, negative = anticlockwise rotation, positive = clockwise rotation).
 	@tparam Color startColor (default Color(255, 255, 255)) color at start of life
 	@tparam Color endColor (default Color(255, 255, 255)) color to fade to - at the time of writing this fade will finish long before the end of the particle's life due to internal maths
-	@tparam BlendID blendMode (default TEN.Effects.BlendID.ALPHABLEND) How will we blend this with its surroundings?
+	@tparam Effects.BlendID blendMode (default TEN.Effects.BlendID.ALPHABLEND) How will we blend this with its surroundings?
 	@tparam int startSize (default 10) Size on spawn. A value of 15 is approximately the size of Lara's head.
 	@tparam int endSize (default 0) Size on death - the particle will linearly shrink or grow to this size during its lifespan
 	@tparam float lifetime (default 2) Lifespan in seconds 
@@ -262,7 +263,7 @@ namespace Effects
 
 		bool damage = USE_IF_HAVE(bool, hurtsLara, false);
 
-		TriggerShockwave(&p, iRad, oRad, spd, color.GetR(), color.GetG(), color.GetB(), lifeInFrames, FROM_DEGREES(ang), short(damage));
+		TriggerShockwave(&p, iRad, oRad, spd, color.GetR(), color.GetG(), color.GetB(), lifeInFrames, ANGLE(ang), short(damage));
 	}
 
 /***Emit dynamic light that lasts for a single frame.

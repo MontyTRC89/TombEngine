@@ -11,34 +11,28 @@ struct ColorData
 	byte cd;
 };
 
-constexpr short ANGLE(float angle)
+constexpr short ANGLE(float degrees)
 {
-	return (angle * (65536.0f / 360.0f));
+	return (degrees * (65536.0f / 360.0f));
 }
 
-constexpr short FROM_DEGREES(float angle)
+constexpr short FROM_RAD(float radians)
 {
-	return (angle * (65536.0f / 360.0f));
+	return ((radians / RADIAN) * (65536.0f / 360.0f));
 }
 
-constexpr short FROM_RAD(float angle)
+constexpr float TO_DEGREES(short shortAngle)
 {
-	return ((angle / RADIAN) * (65536.0f / 360.0f));
+	return (shortAngle * (360.0f / 65536.0f));
 }
 
-constexpr float TO_DEGREES(short angle)
+constexpr float TO_RAD(short shortAngle)
 {
-	return (angle * (360.0f / 65536.0f));
+	return ((shortAngle * (360.0f / 65536.0f)) * RADIAN);
 }
 
-constexpr float TO_RAD(short angle)
-{
-	return ((angle * (360.0f / 65536.0f)) * RADIAN);
-}
+float phd_sin(short x);
+float phd_cos(short x);
+int	  phd_atan(int y, int x);
 
-float phd_sin(short a);
-float phd_cos(short a);
-int	  phd_atan(int dz, int dx);
-
-void InterpolateAngle(short angle, short& rotation, short& outAngle, int shift);
 void GetMatrixFromTrAngle(Matrix& matrix, short* framePtr, int index);
