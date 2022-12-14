@@ -17,7 +17,7 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-using anmespace TEN::Control::Volumes;
+using namespace TEN::Control::Volumes;
 using namespace TEN::Floordata;
 using namespace TEN::Input;
 using namespace TEN::Math;;
@@ -51,16 +51,7 @@ void OffsetBlendData::SetTimedConstant(const Vector3& posOffset, const EulerAngl
 
 void OffsetBlendData::Clear()
 {
-	this->Type = BlendType::None;
-	this->IsActive = false;
-	this->TimeActive = 0.0f;
-	this->DelayTime = 0.0f;
-	this->PosOffset = Vector3::Zero;
-	this->OrientOffset = EulerAngles::Zero;
-	this->Alpha = 0.0f;
-	this->Velocity = 0.0f;
-	this->TurnRate= 0;
-	this->Time = 0.0f;
+	*this = OffsetBlendData();
 }
 
 void OffsetBlendData::DisplayDebug()

@@ -392,9 +392,7 @@ void StartTraps()
 
 	object = &Objects[ID_POLEROPE];
 	if (object->loaded)
-	{
 		object->collision = PoleCollision;
-	}
 
 	object = &Objects[ID_BURNING_TORCH_ITEM];
 	if (object->loaded)
@@ -407,17 +405,11 @@ void StartTraps()
 
 	object = &Objects[ID_LADDER_ONE_SIDED];
 	if (object->loaded)
-	{
 		object->collision = LadderCollision;
-		object->saveFlags = true;
-	}
 
 	object = &Objects[ID_LADDER_DOUBLE_SIDED];
 	if (object->loaded)
-	{
 		object->collision = LadderCollision;
-		object->saveFlags = true;
-	}
 }
 
 void InitialiseGenericObjects()

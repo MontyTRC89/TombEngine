@@ -61,7 +61,7 @@ namespace TEN::Entities::Generic
 
 	const auto LadderMountedOffset2D = Vector3i(0, 0, -LARA_RADIUS * 1.5f);
 	const auto LadderInteractBounds2D = GameBoundingBox(
-		-BLOCK(1.0f / 4), BLOCK(1.0f / 4),
+		-BLOCK(0.25f), BLOCK(0.25f),
 		0, 0,
 		-BLOCK(3.0f / 8), BLOCK(3.0f / 8));
 
@@ -96,7 +96,7 @@ namespace TEN::Entities::Generic
 			EulerAngles(ANGLE(10.0f), ANGLE(180.0f) + LARA_GRAB_THRESHOLD, ANGLE(10.0f))));
 
 	const auto LadderMountLeftBasis = InteractionBasis(
-		LadderMountedOffset2D + Vector3i(-BLOCK(1.0f / 4), 0, 0),
+		LadderMountedOffset2D + Vector3i(-BLOCK(0.25f), 0, 0),
 		EulerAngles(0, ANGLE(90.0f), 0),
 		LadderInteractBounds2D,
 		std::pair(
@@ -104,7 +104,7 @@ namespace TEN::Entities::Generic
 			EulerAngles(ANGLE(10.0f), ANGLE(90.0f) + LARA_GRAB_THRESHOLD, ANGLE(10.0f))));
 
 	const auto LadderMountRightBasis = InteractionBasis(
-		LadderMountedOffset2D + Vector3i(BLOCK(1.0f / 4), 0, 0),
+		LadderMountedOffset2D + Vector3i(BLOCK(0.25f), 0, 0),
 		EulerAngles(0, ANGLE(-90.0f), 0),
 		LadderInteractBounds2D,
 		std::pair(
@@ -114,28 +114,34 @@ namespace TEN::Entities::Generic
 	void LadderCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 	{
 		auto& ladderItem = g_Level.Items[itemNumber];
-		auto& lara = *GetLaraInfo(laraItem);
+		auto& player = *GetLaraInfo(laraItem);
 
 		DisplayLadderDebug(ladderItem);
 
 		// TODO!! This will be MUCH cleaner.
 		auto mountType = GetLadderMountType(ladderItem, *laraItem);
-		if (mountType != LadderMountType::None)
+		if (mountType == LadderMountType::None)
 		{
-			DoLadderMount(itemNumber, ladderItem, *laraItem, (LadderMountType)mountType);
-			//return;
+			if (!TestState(laraItem->Animation.ActiveState, LadderMountedStates) &&
+				laraItem->Animation.ActiveState != LS_JUMP_BACK) // TODO: Player can jump through ladders.
+			{
+				ObjectCollision(itemNumber, laraItem, coll);
+			}
 		}
+
+		DoLadderMount(itemNumber, ladderItem, *laraItem, (LadderMountType)mountType);
+		return;
 		
 		// Mount while grounded.
 		if ((IsHeld(In::Action) &&
 			TestState(laraItem->Animation.ActiveState, LadderGroundedMountStates) &&
-			lara.Control.HandStatus == HandStatus::Free) ||
-			(lara.Control.IsMoving && lara.InteractedItem == itemNumber))
+			player.Control.HandStatus == HandStatus::Free) ||
+			(player.Control.IsMoving && player.InteractedItem == itemNumber))
 		{
-			if (lara.Control.IsMoving && lara.InteractedItem == itemNumber)
+			if (player.Control.IsMoving && player.InteractedItem == itemNumber)
 			{
-				lara.Control.HandStatus = HandStatus::Free;
-				lara.Control.IsMoving = false;
+				player.Control.HandStatus = HandStatus::Free;
+				player.Control.IsMoving = false;
 			}
 
 			return;
@@ -146,7 +152,7 @@ namespace TEN::Entities::Generic
 			TestState(laraItem->Animation.ActiveState, LadderAirborneMountStates) &&
 			laraItem->Animation.IsAirborne &&
 			laraItem->Animation.Velocity.y > 0.0f &&
-			lara.Control.HandStatus == HandStatus::Free)
+			player.Control.HandStatus == HandStatus::Free)
 		{
 			// Test bounds collision.
 			if (TestBoundsCollide(&ladderItem, laraItem, coll->Setup.Radius))//LARA_RADIUS + (int)round(abs(laraItem->Animation.Velocity.z))))
@@ -171,7 +177,7 @@ namespace TEN::Entities::Generic
 
 						laraItem->Animation.IsAirborne = false;
 						laraItem->Animation.Velocity.y = 0.0f;
-						lara.Control.HandStatus = HandStatus::Busy;
+						player.Control.HandStatus = HandStatus::Busy;
 					}
 				}
 			}
@@ -196,8 +202,8 @@ namespace TEN::Entities::Generic
 			return LadderMountType::None;
 
 		// Define extension for height of interaction bounds.
-		// TODO: Please get height of full ladder stack. Must probe above and below for ladder objects. Steal from vertical pole?
-		auto ladderBounds = GameBoundingBox(&ladderItem); // TODO: Make this static to optimise?
+		// TODO: Get height of full ladder stack. Must probe above and below for ladder objects. Steal from vertical pole?
+		auto ladderBounds = GameBoundingBox(&ladderItem);
 		auto boundsExtension = GameBoundingBox(0, 0, ladderBounds.Y1, ladderBounds.Y2 + LADDER_STEP_HEIGHT, 0, 0);
 
 		/*if (TestEntityInteraction(laraItem, ladderItem, LadderMountTopFrontBasis, boundsExtension))
@@ -211,12 +217,18 @@ namespace TEN::Entities::Generic
 			if (laraItem.Animation.IsAirborne && laraItem.Animation.Velocity.y > 0.0f)
 			{
 				if (laraItem.Animation.ActiveState == LS_JUMP_UP)
+				{
 					return LadderMountType::JumpUp;
+				}
 				else if (laraItem.Animation.ActiveState == LS_REACH)
+				{
 					return LadderMountType::JumpReach;
+				}
 			}
-
-			return LadderMountType::Front;
+			else
+			{
+				return LadderMountType::Front;
+			}
 		}
 
 		if (TestEntityInteraction(laraItem, ladderItem, LadderMountBackBasis, boundsExtension))
@@ -233,9 +245,9 @@ namespace TEN::Entities::Generic
 
 	bool TestLadderMount(const ItemInfo& ladderItem, ItemInfo& laraItem)
 	{
-		const auto& lara = *GetLaraInfo(&laraItem);
+		const auto& player = *GetLaraInfo(&laraItem);
 
-		// Check for Action input action.
+		// Check for input action.
 		if (!IsHeld(In::Action))
 			return false;
 
@@ -244,25 +256,25 @@ namespace TEN::Entities::Generic
 			return false;
 
 		// Check hand status.
-		if (lara.Control.HandStatus != HandStatus::Free)
+		if (player.Control.HandStatus != HandStatus::Free)
 			return false;
 
 		// Check active player state.
 		if (!TestState(laraItem.Animation.ActiveState, LadderGroundedMountStates))
 			return false;
 
-		// Check that the ladder is in front.
+		// TODO: Assess whether ladder is in front.
 
 		return true;
 	}
 
 	void DoLadderMount(int itemNumber, ItemInfo& ladderItem, ItemInfo& laraItem, LadderMountType mountType)
 	{
-		auto& lara = *GetLaraInfo(&laraItem);
+		auto& player = *GetLaraInfo(&laraItem);
 
 		// Avoid interference if already interacting.
 		if (laraItem.OffsetBlend.IsActive)
-			lara.InteractedItem = itemNumber;
+			player.InteractedItem = itemNumber;
 
 		ModulateLaraTurnRateY(&laraItem, 0, 0, 0);
 
@@ -319,8 +331,8 @@ namespace TEN::Entities::Generic
 			break;
 		}
 
-		lara.Control.IsMoving = false;
-		lara.Control.HandStatus = HandStatus::Busy;
+		player.Control.IsMoving = false;
+		player.Control.HandStatus = HandStatus::Busy;
 	}
 
 	void DisplayLadderDebug(ItemInfo& ladderItem)

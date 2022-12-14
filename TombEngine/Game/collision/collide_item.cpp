@@ -63,7 +63,9 @@ bool AlignPlayerToEntity(ItemInfo* item, ItemInfo* laraItem, const Vector3i& pos
 			return true;
 		}
 		else
+		{
 			return AlignPlayerToPose(laraItem, toPose, LARA_ALIGN_VELOCITY, turnRate);
+		}
 	}
 
 	if (lara->Control.IsMoving)

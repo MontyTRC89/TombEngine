@@ -661,9 +661,9 @@ namespace TEN::Entities::TR4
 			!(item->Flags & IFLAG_ACTIVATION_MASK)) ||
 			lara->Control.IsMoving && lara->InteractedItem == itemNumber)
 		{
-			if (TestLaraPosition(SasDragBounds, item, laraItem))
+			if (TestPlayerEntityInteract(item, laraItem, SasDragBounds))
 			{
-				if (MoveLaraPosition(SasDragBodyPosition, item, laraItem))
+				if (AlignPlayerToEntity(item, laraItem, SasDragBodyPosition))
 				{
 					SetAnimation(laraItem, LA_DRAG_BODY);
 					ResetLaraFlex(laraItem);
