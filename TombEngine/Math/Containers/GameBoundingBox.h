@@ -43,5 +43,6 @@ class Pose;
 		GameBoundingBox operator -(const GameBoundingBox& bounds) const;
 		GameBoundingBox operator -(const Pose& pose) const;
 		GameBoundingBox operator *(float scale) const;
+		GameBoundingBox operator /(float scale) const;
 	};
 //}
