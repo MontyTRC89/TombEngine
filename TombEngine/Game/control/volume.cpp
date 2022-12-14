@@ -22,24 +22,35 @@ namespace TEN::Control::Volumes
 
 	bool TestVolumeContainment(TriggerVolume& volume, const BoundingOrientedBox& box, short roomNumber)
 	{
+		bool result = false;
+		float color = !volume.StateQueue.empty() ? 1.0f : 0.4f;
+
 		switch (volume.Type)
 		{
 		case VolumeType::Box:
+			result = volume.Box.Intersects(box);
 			if (roomNumber == Camera.pos.RoomNumber)
-				g_Renderer.AddDebugBox(volume.Box, Vector4(1.0f, 0.0f, 1.0f, 1.0f), RENDERER_DEBUG_PAGE::LARA_STATS);
-
-			return volume.Box.Intersects(box);
+			{
+				g_Renderer.AddDebugBox(volume.Box, 
+					Vector4(color, 0.0f, color, 1.0f), RENDERER_DEBUG_PAGE::LARA_STATS);
+			}
+			break;
 
 		case VolumeType::Sphere:
+			result = volume.Sphere.Intersects(box);
 			if (roomNumber == Camera.pos.RoomNumber)
-				g_Renderer.AddDebugSphere(volume.Sphere.Center, volume.Sphere.Radius, Vector4(1.0f, 0.0f, 1.0f, 1.0f), RENDERER_DEBUG_PAGE::LARA_STATS);
-
-			return volume.Sphere.Intersects(box);
+			{
+				g_Renderer.AddDebugSphere(volume.Sphere.Center, volume.Sphere.Radius, 
+					Vector4(color, 0.0f, color, 1.0f), RENDERER_DEBUG_PAGE::LARA_STATS);
+			}
+			break;
 
 		default:
 			TENLog("Unsupported volume type encountered in room " + std::to_string(roomNumber), LogLevel::Error);
-			return false;
+			break;
 		}
+
+		return result;
 	}
 
 	BoundingOrientedBox ConstructRoughBox(ItemInfo* item, CollisionSetup* coll)

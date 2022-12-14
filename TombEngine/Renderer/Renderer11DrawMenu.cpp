@@ -954,10 +954,8 @@ namespace TEN::Renderer
 				PrintDebugMessage("Look axis horizontal: %f", AxisMap[InputAxis::CameraHorizontal]);
 				break;
 
-			case RENDERER_DEBUG_PAGE::WIREFRAME_MODE:
-				PrintDebugMessage("Wireframe mode");
+			default:
 				break;
-
 			}
 		}
 	}

@@ -811,12 +811,10 @@ namespace TEN::Renderer
 
 	void Renderer11::AddDebugSphere(Vector3 center, float radius, Vector4 color, RENDERER_DEBUG_PAGE page)
 	{
-#ifdef _DEBUG
-		if (m_numDebugPage != page)
+		if (!DebugMode || m_numDebugPage != page)
 			return;
 
 		AddSphere(center, radius, color);
-#endif _DEBUG
 	}
 
 	void Renderer11::AddBox(Vector3* corners, Vector4 color)
@@ -933,7 +931,7 @@ namespace TEN::Renderer
 
 	void Renderer11::AddDebugBox(BoundingOrientedBox box, Vector4 color, RENDERER_DEBUG_PAGE page)
 	{
-		if (m_numDebugPage != page)
+		if (!DebugMode || m_numDebugPage != page)
 			return;
 
 		Vector3 corners[8];
