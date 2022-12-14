@@ -79,27 +79,25 @@ using namespace TEN::Math;
 		*this = Lerp(*this, eulersTo, alpha, epsilon);
 	}
 
-	EulerAngles EulerAngles::Lerp(const EulerAngles& eulersFrom, const EulerAngles& eulersTo, float alpha, short epsilon)
-	{
-		return EulerAngles(
-			Lerp(eulersFrom.x, eulersTo.x, alpha, epsilon),
-			Lerp(eulersFrom.y, eulersTo.y, alpha, epsilon),
-			Lerp(eulersFrom.z, eulersTo.z, alpha, epsilon)
-		);
-	}
+EulerAngles EulerAngles::InterpolateConstant(const EulerAngles& eulersFrom, const EulerAngles& eulerTo, short angularVel)
+{
+	return EulerAngles(
+		InterpolateConstant(eulersFrom.x, eulerTo.x, angularVel),
+		InterpolateConstant(eulersFrom.y, eulerTo.y, angularVel),
+		InterpolateConstant(eulersFrom.z, eulerTo.z, angularVel));
+}
 
 	void EulerAngles::InterpolateConstant(const EulerAngles& eulersTo, short angularVel)
 	{
 		*this = InterpolateConstant(*this, eulersTo, angularVel);
 	}
 
-	EulerAngles EulerAngles::InterpolateConstant(const EulerAngles& eulersFrom, const EulerAngles& eulerTo, short angularVel)
+	EulerAngles EulerAngles::Lerp(const EulerAngles& eulersFrom, const EulerAngles& eulersTo, float alpha, short epsilon)
 	{
 		return EulerAngles(
-			InterpolateConstant(eulersFrom.x, eulerTo.x, angularVel),
-			InterpolateConstant(eulersFrom.y, eulerTo.y, angularVel),
-			InterpolateConstant(eulersFrom.z, eulerTo.z, angularVel)
-		);
+			Lerp(eulersFrom.x, eulersTo.x, alpha, epsilon),
+			Lerp(eulersFrom.y, eulersTo.y, alpha, epsilon),
+			Lerp(eulersFrom.z, eulersTo.z, alpha, epsilon));
 	}
 
 	Vector3 EulerAngles::ToDirection() const
@@ -113,8 +111,7 @@ using namespace TEN::Math;
 		return Vector3(
 			sinY * cosX,
 			-sinX,
-			cosY * cosX
-		);
+			cosY * cosX);
 	}
 
 	Quaternion EulerAngles::ToQuaternion() const

@@ -1,5 +1,6 @@
 #include "framework.h"
-#include "tr5_laser_head.h"
+#include "Objects/TR5/Entity/tr5_laser_head.h"
+
 #include "Game/items.h"
 #include "Game/effects/tomb4fx.h"
 #include "Game/effects/effects.h"
@@ -46,6 +47,21 @@ namespace TEN::Entities::Creatures::TR5
 		Vector3i(440, -832, 188),
 		Vector3i(-440, -832, -188)
 	};
+
+	void InterpolateAngle(short angle, short& rotation, short& outAngle, int shift)
+	{
+		int deltaAngle = angle - rotation;
+
+		if (deltaAngle < -32768)
+			deltaAngle += 65536;
+		else if (deltaAngle > 32768)
+			deltaAngle -= 65536;
+
+		if (outAngle)
+			outAngle = (short)deltaAngle;
+
+		rotation += short(deltaAngle >> shift);
+	}
 
 	void TriggerLaserHeadSparks(Vector3i* pos, int count, byte r, byte g, byte b, int unk)
 	{

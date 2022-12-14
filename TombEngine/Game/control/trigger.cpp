@@ -19,8 +19,8 @@
 #include "Objects/TR3/Vehicles/kayak.h"
 #include "Objects/objectslist.h"
 #include "Sound/sound.h"
+#include "Specific/clock.h"
 #include "Specific/setup.h"
-
 
 using namespace TEN::Effects::Items;
 using namespace TEN::Entities::Switches;
@@ -30,11 +30,11 @@ int KeyTriggerActive;
 
 int TriggerActive(ItemInfo* item)
 {
-	int flag;
-
-	flag = (~item->Flags & IFLAG_REVERSE) >> 14;
+	int flag = (~item->Flags & IFLAG_REVERSE) >> 14;
 	if ((item->Flags & IFLAG_ACTIVATION_MASK) != IFLAG_ACTIVATION_MASK)
+	{
 		flag = !flag;
+	}
 	else
 	{
 		if (item->Timer)
