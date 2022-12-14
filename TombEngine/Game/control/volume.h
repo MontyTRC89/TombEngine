@@ -50,7 +50,7 @@ struct TriggerVolume
 	int	 EventSetIndex = 0;
 
 	VolumeType	Type = VolumeType::Box;
-	std::string Name = "";
+	std::string Name = {};
 
 	BoundingOrientedBox Box	   = BoundingOrientedBox();
 	BoundingSphere		Sphere = BoundingSphere();

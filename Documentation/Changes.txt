@@ -46,6 +46,7 @@ Version 1.0.4
 * Fix crash if there is an attempt to display a string with missing characters.
 
 Lua API changes:
+* Add new Volume class and several methods for it.
 * Add new Moveable functions: GetEffect, SetEffect and SetCustomEffect (for colored fire).
 * Add new Lara functions: GetTarget, GetVehicle and TorchIsLit.
 * Remove Lara functions: SetOnFire and GetOnFire (replaced with GetEffect and SetEffect).
@@ -59,6 +60,7 @@ Lua API changes:
 * Fix action key script functions not fully working in some cases.
 * Fix mounted vehicles ignoring Disable, Shatter and Explode script commands.
 * Fix SetPosition command not updating room number correctly.
+* Fix Rotation class using integers under the hood which prevented using fractional rotation values.
 
 Version 1.0.3
 =============
