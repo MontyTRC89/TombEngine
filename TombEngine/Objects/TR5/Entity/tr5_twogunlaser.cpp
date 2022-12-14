@@ -31,36 +31,38 @@ namespace TEN::Entities::Creatures::TR5
 {
 
 	TWOGUNINFO twogun[2];
-	BiteInfo Guns[2] =
+
+	BiteInfo TWGuns[2] =
 	{
-		{ 0, 230, 40, 8 },
-		{ 8, 230, 40, 5 }
+		{0.0f, 230.0f, 40.0f, 8},
+		{8.0f, 230.0f, 40.0f, 5}
 	};
 
-	const auto LaserguardGun1 = BiteInfo(Vector3(0.0f, 230.0f, 40.0f), 8);
-	const auto LaserguardGun2 = BiteInfo(Vector3(8.0f, 230.0f, 40.0f), 5);
 	const auto LaserguardHead = BiteInfo(Vector3(0.0f, -200.0f, 0.0f), 2);
 
-
-	enum LaserguardState
+	enum TwogunState
 	{
-		HYDRA_STATE_IDLE = 0,
-		HYDRA_STATE_BITE_ATTACK_1 = 1,
-		HYDRA_STATE_AIM = 2,
-		HYDRA_STATE_HURT = 4,
-		HYDRA_STATE_BITE_ATTACK_2 = 7,
-		HYDRA_STATE_BITE_ATTACK_3 = 8,
-		HYDRA_STATE_BITE_ATTACK_4 = 9,
-		HYDRA_STATE_DEATH = 11
+		TWOGUN_STATE_EMPTY = -1,
+		TWOGUN_STATE_IDLE = 1,
+		TWOGUN_STATE_WALK = 2,
+		TWOGUN_STATE_SHOOT_RIGHT = 3,
+		TWOGUN_STATE_SHOOT_LEFT = 4,
+		TWOGUN_STATE_IDLE_TO_AIM = 5,
+		TWOGUN_STATE_SHOOT_BOTH = 6,
+		TWOGUN_STATE_DEATH = 7,
+		TWOGUN_STATE_TURN_180 = 8,
+		TWOGUN_STATE_MISSFIRE = 9,
+		TWOGUN_STATE_GUN_BLOCKAGE = 10,
+		TWOGUN_STATE_FALLSTAIRS = 11,
+		TWOGUN_STATE_FALLLOOP = 12,
+		TWOGUN_STATE_FALLDEATH = 13
 	};
-
-	// TODO
-	enum LaserguardAnim
+	
+	enum TwogunAnim
 	{
-		TWOGUN_ANIM_EMPTY = -1,
 		TWOGUN_ANIM_WALK = 0,
-		TWOGUN_ANIM_SHOOT_R = 1,
-		TWOGUN_ANIM_SHOOT_L = 2,
+		TWOGUN_ANIM_SHOOT_RIGHT = 1,
+		TWOGUN_ANIM_SHOOT_LEFT = 2,
 		TWOGUN_ANIM_DEATH = 3,
 		TWOGUN_ANIM_AIM_TO_WALK = 4,
 		TWOGUN_ANIM_WALK_AIM_TO_IDLE = 5,
@@ -85,41 +87,34 @@ namespace TEN::Entities::Creatures::TR5
 		SetAnimation(item, 6);
 	}
 
-	void FireTwogunWeapon(ItemInfo* item, short LeftRight, short plasma)
+	void FireTwogunWeapon(short itemNumber, short LeftRight, short plasma)
 	{
-		auto* gun = &Guns[LeftRight];
-
-		//PHD_VECTOR 	pos1, pos2, pos3;
-
-		//PHD_ANGLE		angles[2];
-
-		TWOGUNINFO* tg;
-		//sint16* bounds;
-		long lp;
-		//dx, dy, dz, dx1, dy1, dz1, x, y, z;
+		auto* gun = &TWGuns[LeftRight];
+		auto* item = &g_Level.Items[itemNumber];
 
 		auto pos1 = GetJointPosition(item, gun->meshNum, Vector3i(gun->Position));
-		auto pos2 = GetJointPosition(item, gun->meshNum, Vector3i(gun->Position.x, gun->Position.y + 4096, gun->Position.z)); //TODO placement
-		auto pos = GetJointPosition(item, gun->meshNum, Vector3i(gun->Position.x, gun->Position.y, gun->Position.z));
-		auto orient1 = Geometry::GetOrientToPoint(pos1.ToVector3(), pos.ToVector3());
-		auto orient2 = Geometry::GetOrientToPoint(pos2.ToVector3(), pos.ToVector3());
-
-		//phd_GetVectorAngles(pos2.x - pos1.x, pos2.y - pos1.y, pos2.z - pos1.z, &angles[0]);
+		auto pos2 = GetJointPosition(item, gun->meshNum, Vector3i(gun->Position.x, gun->Position.y + 4096, gun->Position.z));
+		auto orient1 = item->Pose.Orientation;
 
 		if (!plasma)
 		{
+			//TODO: Laser stuff
+			/*TWOGUNINFO* tg;
+
+			long lp;
+
 			tg = &twogun[0];
 			for (lp = 0; lp < 4; lp++, tg++)
 			{
 				if (tg->life == 0 || lp == 3)
 					break;
-			}
+			}*/
 
-			tg->pos.Position.x = pos1.x;
+			/*tg->pos.Position.x = pos1.x;
 			tg->pos.Position.y = pos1.y;
 			tg->pos.Position.z = pos1.z;
-			tg->pos.Position.y = orient1.y;// angles[0];
-			tg->pos.Position.x = orient1.x;//angles[1];
+			tg->pos.Position.y = orient1.x;// angles[0];
+			tg->pos.Position.x = orient1.y;//angles[1];
 			tg->pos.Position.z = 0;
 			tg->life = 17;
 			tg->spin = (GetRandomControl() & 31) << 11;
@@ -127,18 +122,17 @@ namespace TEN::Entities::Creatures::TR5
 			tg->r = 0;
 			tg->b = 255;
 			tg->g = 96;
-			tg->fadein = 8;
+			tg->fadein = 8;*/
 
 			//TriggerLightningGlow(tg->pos.x_pos, tg->pos.y_pos, tg->pos.z_pos, RGBME(0, (unsigned char)(tg->g >> 1), (unsigned char)(tg->b >> 1)) | ((64 + (GetRandomControl() & 3)) << 24));
 			//TriggerLightning(&pos1, &pos2, (GetRandomControl() & 7) + 8, RGBME(0, (unsigned char)tg->g, (unsigned char)tg->b) | (0x16 << 24), LI_THININ | LI_THINOUT, 80, 5);
 
 			item->ItemFlags[LeftRight] = 16;
-			//TriggerTwogunPlasma(&pos1, &angles[0], 16);
-			//TriggerTwogunPlasma(&pos1, &angles[0], 16);
-			//TriggerTwogunPlasma(&pos1, &angles[0], 16);
+			TriggerTwogunPlasma(pos1, Pose(pos1.ToVector3(), orient1), 16);
+			TriggerTwogunPlasma(pos1, Pose(pos1.ToVector3(), orient1), 16);
+			TriggerTwogunPlasma(pos1, Pose(pos1.ToVector3(), orient1), 16);
 
-			// Do some detection.
-
+			//TODO: Laser hit Lara stuff, not translated for TEN:
 		/*	if (!lara.burn && SCNoDrawLara == 0)
 			{
 				bounds = GetBoundsAccurate(LaraItem);
@@ -191,108 +185,87 @@ namespace TEN::Entities::Creatures::TR5
 		}
 
 			return;
-			
 
-			TriggerTwogunPlasma(Pose(pos1, orient1), abs(item->ItemFlags[LeftRight]));
+			TriggerTwogunPlasma(pos1, Pose(pos1.ToVector3(), orient1), abs(item->ItemFlags[LeftRight]));
 	}
 
-	void TriggerTwogunPlasma(const Pose& pos, long life)
+	void TriggerTwogunPlasma(const Vector3i& posr, const Pose& pos, float life)
 	{
-		//auto* spark = &twogun[0];
-		//auto& spark = *twogun[0];
-		//auto& spark = *GetFreeParticle();
-		auto* spark = GetFreeParticle();
-		//auto* spark = &SmokeSparks[GetFreeSmokeSpark()]
-		Vector3 sp = Vector3(pos.Position.x, pos.Position.y, pos.Position.z);
-		auto sphere = BoundingSphere(sp, BLOCK(1));
-		auto posit = Random::GeneratePointInSphere(sphere);
-		auto vel = (pos.Position - posit) * 8;
-		//spark = &spark[GetFreeSpark()];
 
-		spark->on = 1;
+		auto* sptr = GetFreeParticle();
 
-		spark->sB = (((GetRandomControl() & 127) + 128) * life) >> 4;
-		spark->sR = spark->sB - (spark->sB >> 2);
-		spark->sG = spark->sR;
+		sptr->on = true;
 
-		spark->dR = 0;
-		spark->dB = (((GetRandomControl() & 127) + 32) * life) >> 4;
-		spark->dG = spark->dB >> 2;
+		sptr->sB = (((GetRandomControl() & 127) + 128) * life) /16;
+		sptr->sR = sptr->sB - (sptr->sB >> 2);
+		sptr->sG = sptr->sR;
+		sptr->dR = 0;
+		sptr->dB = (((GetRandomControl() & 127) + 32) * life) /16;
+		sptr->dG = sptr->dB >> 2;
+		sptr->colFadeSpeed = 8 + (GetRandomControl() & 3);
+		sptr->fadeToBlack = 8;
+		sptr->sLife = sptr->life = (GetRandomControl() & 3) + 24;
 
-		spark->colFadeSpeed = 8 + (GetRandomControl() & 3);
-		spark->fadeToBlack = 8;
-		spark->sLife = spark->life = (GetRandomControl() & 3) + 24;
+		sptr->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+		sptr->x = pos.Position.x;
+		sptr->y = pos.Position.y;
+		sptr->z = pos.Position.z;
 
-		spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+		int yAng = TO_RAD(pos.Orientation.y)+ (GetRandomControl() & 32767) - 16384;;
+		int size = ((life * 64) * phd_cos(TO_RAD(pos.Orientation.x))) / 5;
 
-
-
-		float ang = TO_RAD(pos.Orientation.y);
-		float vAng = -TO_RAD(pos.Orientation.x);
-		spark->x = pos.Position.x;
-		spark->y = pos.Position.y;
-		spark->z = pos.Position.z;
-		spark->xVel = (int)round(vel.x);
-		spark->yVel = (int)round(vel.y);
-		spark->zVel = (int)round(vel.z);
-		spark->friction = 0;
-
-		spark->flags = SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF;
-		spark->rotAng = GetRandomControl() & 4095;
-		spark->rotAdd = (GetRandomControl() & 127) - 64;
-
-		spark->gravity = (GetRandomControl() & 31) + 32;
-		spark->maxYvel = 0;
-		spark->scalar = 1;
-		float size = (GetRandomControl() & 63) + 16;
-		spark->size = spark->sSize = size;
-		spark->dSize = 1;
+		sptr->xVel =  Random::GenerateInt(-128, 128) / 5;
+		sptr->yVel = life * 16 / 5;
+		sptr->zVel =  Random::GenerateInt(-128, 128) / 5;
+		sptr->friction = 0;
+		sptr->flags = SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF;
+		sptr->rotAng = GetRandomControl() & 4095;
+		sptr->rotAdd = (GetRandomControl() & 127) - 64;
+		sptr->gravity = (GetRandomControl() & 31) + 32;
+		sptr->maxYvel = 0;
+		sptr->scalar = 1;
+		sptr->size = sptr->sSize = size;
+		sptr->dSize = 1;
 	}
-
-
-	
-
 
 	void TwogunControl(short itemNumber)
 	{
 		if (!CreatureActive(itemNumber))
 			return;
 
-
-		//long dx, dz;
-		short angle, head, torso_x, torso_y, frame, base, roomNumber;
+		short angle, head, xTorso, yTorso, frame, base, roomNumber;
 
 		auto* item = &g_Level.Items[itemNumber];
 		auto* creature = GetCreatureInfo(item);
-
-		//auto& creature = *GetCreatureInfo(item);
+		auto* gun = &TWGuns[0];
 
 		angle = 0;
 		head = 0;
-		torso_x = 0;
-		torso_y = 0;
+		xTorso = 0;
+		yTorso = 0;
 
 		if (item->ItemFlags[0] || item->ItemFlags[1])
 		{
-
-			auto pos1 = GetJointPosition(item, Guns->meshNum, Vector3i(Guns->Position));
-
-			for (int i = 0; i < 2; i++)
+			for (int i = 0; i < 2; i++, gun++)
 			{
 				if (item->ItemFlags[i])
 				{
-					auto pos = GetJointPosition(item, Guns->meshNum, Vector3i(Guns->Position.x, Guns->Position.y * 2, Guns->Position.z));
-					auto orient = Geometry::GetOrientToPoint(pos1.ToVector3(), pos.ToVector3());
-					//SethProjectileAttack(Pose(pos1, orient), item->RoomNumber, 0);
-					//FireTwogunWeapon(item, i, 1);
+					FireTwogunWeapon(itemNumber, i, 1);
 
-					if (item->ItemFlags[i] <= 0)
-						item->ItemFlags[i]++;
-					else
+					if (item->ItemFlags[i] > 0)
 					{
-						TriggerDynamicLight(pos.x, pos.y, pos.z, item->ItemFlags[i] + 8, 0, (item->ItemFlags[i] << 4) >> 2, item->ItemFlags[i] << 4);
+						auto pos1 = GetJointPosition(item, gun->meshNum, gun->Position);
+						auto pos2 = GetJointPosition(item, gun->meshNum, Vector3i(gun->Position.x, gun->Position.y + 4096, gun->Position.z));
+						auto pos = Geometry::GetOrientToPoint(pos1.ToVector3(), pos2.ToVector3());
+
+						short blue = item->ItemFlags[i] << 4;
+						short green = blue >> 2;
+						short red = 0;
+						TriggerDynamicLight(pos1.x, pos1.y, pos1.z, item->ItemFlags[i] + 8, red, green, blue);
 						item->ItemFlags[i]--;
 					}
+					else
+						item->ItemFlags[i]++;
 				}
 			}
 		}
@@ -319,8 +292,8 @@ namespace TEN::Entities::Creatures::TR5
 					if (frame == base + 48 || frame == base + 15)
 					{
 						roomNumber = item->RoomNumber;
-						//GetHeight(GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &room_number),
-							//item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z);
+						GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNumber),
+						
 						TestTriggers(item, true, 0);
 					}
 
@@ -416,8 +389,8 @@ namespace TEN::Entities::Creatures::TR5
 					}
 
 					head = laraAI.angle >> 1;
-					torso_y = laraAI.angle >> 1;
-					torso_x = AI.xAngle >> 1;
+					yTorso = laraAI.angle >> 1;
+					xTorso = AI.xAngle >> 1;
 				}
 
 				if (item->AIBits & 1)
@@ -469,9 +442,9 @@ namespace TEN::Entities::Creatures::TR5
 				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase)
 				{
 					if (item->Animation.ActiveState == 4)
-						FireTwogunWeapon(item, 0, 0);
+						FireTwogunWeapon(itemNumber, 0, 0);
 					else
-						FireTwogunWeapon(item, 1, 0);
+						FireTwogunWeapon(itemNumber, 1, 0);
 				}
 
 				break;
@@ -480,8 +453,8 @@ namespace TEN::Entities::Creatures::TR5
 				creature->Flags = 0;
 				creature->MaxTurn = 0;
 				head = laraAI.angle >> 1;
-				torso_y = laraAI.angle >> 1;
-				torso_x = AI.xAngle >> 1;
+				yTorso = laraAI.angle >> 1;
+				xTorso = AI.xAngle >> 1;
 
 				if (abs(AI.angle) < 364)
 					item->Pose.Orientation.y += AI.angle;
@@ -503,8 +476,8 @@ namespace TEN::Entities::Creatures::TR5
 
 			case 6:
 				head = laraAI.angle >> 1;
-				torso_y = laraAI.angle >> 1;
-				torso_x = AI.xAngle;
+				yTorso = laraAI.angle >> 1;
+				xTorso = AI.xAngle;
 
 				if (abs(AI.angle) < 364)
 					item->Pose.Orientation.y += AI.angle;
@@ -518,8 +491,8 @@ namespace TEN::Entities::Creatures::TR5
 
 				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + 17)
 				{
-					FireTwogunWeapon(item, 0, 0);
-					FireTwogunWeapon(item, 1, 0);
+					FireTwogunWeapon(itemNumber, 0, 0);
+					FireTwogunWeapon(itemNumber, 1, 0);
 				}
 
 				break;
@@ -539,13 +512,13 @@ namespace TEN::Entities::Creatures::TR5
 				break;
 
 			case 9:
-				torso_x = AI.xAngle >> 1;
+				xTorso = AI.xAngle >> 1;
 				head = laraAI.angle >> 1;
-				torso_y = laraAI.angle >> 1;
+				yTorso = laraAI.angle >> 1;
 
 				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + 18)
 				{
-					FireTwogunWeapon(item, 0, 0);
+					FireTwogunWeapon(itemNumber, 0, 0);
 					item->ItemFlags[1] = -16;
 					item->TriggerFlags = 3;
 				}
@@ -558,17 +531,10 @@ namespace TEN::Entities::Creatures::TR5
 			}
 		}
 
-		CreatureJoint(item, 0, torso_y);
-		CreatureJoint(item, 1, torso_x);
+		CreatureJoint(item, 0, yTorso);
+		CreatureJoint(item, 1, xTorso);
 		CreatureJoint(item, 2, head);
 		CreatureAnimation(itemNumber, angle, 0);
 	}
-
-	//void inject_twogun(bool replace)
-	//{
-	//	INJECT(0x0048E3C0, ControlZipController, replace);
-	//	INJECT(0x0048CD40, InitialiseTwogun, replace);
-	//	INJECT(0x0048CDD0, TwogunControl, replace);
-	//}
 
 }

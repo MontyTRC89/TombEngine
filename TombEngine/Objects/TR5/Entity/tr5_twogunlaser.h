@@ -25,9 +25,9 @@ namespace TEN::Entities::Creatures::TR5
 	void TwogunControl(short itemNumber);
 	void UpdateTwogunLasers();
 	//void DrawTwogunLasers();
-	void TriggerTwogunPlasma(const Pose& pos, long life);
+	void TriggerTwogunPlasma(const Vector3i& posr, const Pose& pos, float life);
 
-	void FireTwogunWeapon(ItemInfo* item, short LeftRight, short plasma);
+	void FireTwogunWeapon(short itemNumber, short LeftRight, short plasma);
 
 }
 //#define ControlGunTestStation	( (void(__cdecl*)(ITEM_INFO*)) 0x0048D940 )
