@@ -4,6 +4,8 @@
 #include "Renderer/Renderer11.h"
 #include "Specific/setup.h"
 
+struct CollisionSetup;
+
 constexpr auto NO_EVENT_SET	   = -1;
 constexpr auto NO_CALL_COUNTER = -1;
 
@@ -61,7 +63,7 @@ struct TriggerVolume
 namespace TEN::Control::Volumes
 {
 	void TestVolumes(short roomNumber, const BoundingOrientedBox& box, VolumeActivatorFlags activatorFlag, VolumeTriggerer triggerer);
-	void TestVolumes(short itemNumber);
+	void TestVolumes(short itemNumber, CollisionSetup* coll = nullptr);
 	void TestVolumes(short roomNumber, MESH_INFO* mesh);
 	void TestVolumes(CAMERA_INFO* camera);
 

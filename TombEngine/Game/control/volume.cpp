@@ -4,6 +4,7 @@
 #include <filesystem>
 
 #include "Game/animation.h"
+#include "Game/collision/collide_room.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/room.h"
@@ -39,6 +40,14 @@ namespace TEN::Control::Volumes
 			TENLog("Unsupported volume type encountered in room " + std::to_string(roomNumber), LogLevel::Error);
 			return false;
 		}
+	}
+
+	BoundingOrientedBox ConstructRoughBox(ItemInfo* item, CollisionSetup* coll)
+	{
+		auto pBounds = GameBoundingBox(item).ToBoundingOrientedBox(item->Pose);
+		auto pos = Vector3(item->Pose.Position.x, pBounds.Center.y, item->Pose.Position.z);
+		auto rot = item->Pose.Orientation.ToQuaternion();
+		return BoundingOrientedBox(pos, Vector3(coll->Radius, pBounds.Extents.y, coll->Radius), rot);
 	}
 
 	void HandleEvent(VolumeEvent& evt, VolumeTriggerer& triggerer)
@@ -154,10 +163,11 @@ namespace TEN::Control::Volumes
 		TestVolumes(roomNumber, box, VolumeActivatorFlags::Static, mesh);
 	}
 
-	void TestVolumes(short itemNumber)
+	void TestVolumes(short itemNumber, CollisionSetup* coll)
 	{
 		auto& item = g_Level.Items[itemNumber];
-		auto box = GameBoundingBox(&item).ToBoundingOrientedBox(item.Pose);
+		auto box = coll ? ConstructRoughBox(&item, coll) : 
+						  GameBoundingBox(&item).ToBoundingOrientedBox(item.Pose);
 
 		g_Renderer.AddDebugBox(box, Vector4(1.0f, 1.0f, 0.0f, 1.0f), RENDERER_DEBUG_PAGE::LARA_STATS);
 
