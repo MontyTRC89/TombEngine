@@ -1,18 +1,18 @@
 #include "framework.h"
-#include "Rotation.h"
+#include "Scripting/Internal/TEN/Rotation/Rotation.h"
 
 #include "Math/Math.h"
-#include "ReservedScriptNames.h"
+#include "Scripting/Internal/ReservedScriptNames.h"
 
 /*** Represents a rotation.
 Rotations are specifed as a combination of individual
 angles, in degrees, about each axis.
-All values will be clamped to [0, 360].
+All values will be clamped to [0.0f, 360.0f].
 @tenprimitive Rotation
 @pragma nostrip
 */
 
-void Rotation::Register(sol::table & parent)
+void Rotation::Register(sol::table& parent)
 {
 	using ctors = sol::constructors<Rotation(float, float, float)>;
 	parent.new_usertype<Rotation>(ScriptReserved_Rotation,
@@ -48,25 +48,25 @@ Rotation::Rotation(float aX, float aY, float aZ)
 	z = aZ;
 }
 
-Rotation::Rotation(EulerAngles const& ang)
+Rotation::Rotation(const EulerAngles& eulers)
 {
-	x = TO_DEGREES(ang.x);
-	y = TO_DEGREES(ang.y);
-	z = TO_DEGREES(ang.z);
+	x = TO_DEGREES(eulers.x);
+	y = TO_DEGREES(eulers.y);
+	z = TO_DEGREES(eulers.z);
 }
 
-Rotation::Rotation(Pose const& pos)
+Rotation::Rotation(const Pose& pose)
 {
-	x = TO_DEGREES(pos.Orientation.x);
-	y = TO_DEGREES(pos.Orientation.y);
-	z = TO_DEGREES(pos.Orientation.z);
+	x = TO_DEGREES(pose.Orientation.x);
+	y = TO_DEGREES(pose.Orientation.y);
+	z = TO_DEGREES(pose.Orientation.z);
 }
 
-void Rotation::StoreInPHDPos(Pose& pos) const
+void Rotation::StoreInPHDPos(Pose& pose) const
 {
-	pos.Orientation.x = ANGLE(x);
-	pos.Orientation.y = ANGLE(y);
-	pos.Orientation.z = ANGLE(z);
+	pose.Orientation.x = ANGLE(x);
+	pose.Orientation.y = ANGLE(y);
+	pose.Orientation.z = ANGLE(z);
 }
 
 /***
@@ -76,6 +76,5 @@ void Rotation::StoreInPHDPos(Pose& pos) const
 */
 std::string Rotation::ToString() const
 {
-	return "{" + std::to_string(x) + ", " + std::to_string(y) + ", " + std::to_string(z) + "}";
+	return ("{" + std::to_string(x) + ", " + std::to_string(y) + ", " + std::to_string(z) + "}");
 }
-
