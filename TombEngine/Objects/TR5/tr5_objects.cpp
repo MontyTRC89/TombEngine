@@ -33,6 +33,7 @@
 #include "Objects/TR5/Entity/tr5_reaper.h"		 // OK
 #include "Objects/TR5/Entity/tr5_roman_statue.h" // OK
 #include "Objects/TR5/Entity/tr5_submarine.h"	 // OK
+#include "Objects/TR5/Entity/tr5_twogunlaser.h"  //under construction
 #include "Objects/TR5/Entity/tr5_willowwisp.h"	 // OK
 
 // Emitters
@@ -510,9 +511,9 @@ static void StartEntity(ObjectInfo *obj)
 	if (obj->loaded)
 	{
 		obj->biteOffset = 0;
-		obj->initialise = InitialiseGuardLaser;
+		obj->initialise = InitialiseTwogun;
 		obj->collision = CreatureCollision;
-		//obj->control = GuardControlLaser;
+		obj->control = TwogunControl;
 		obj->shadowType = ShadowMode::All;
 		obj->HitPoints = 24;
 		obj->hitEffect = HIT_RICOCHET;
