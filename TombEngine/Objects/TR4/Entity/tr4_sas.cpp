@@ -100,14 +100,10 @@ namespace TEN::Entities::TR4
 
 	void InitialiseSas(short itemNumber)
 	{
-		auto* item = &g_Level.Items[itemNumber];
+		auto& item = g_Level.Items[itemNumber];
 
 		ClearItem(itemNumber);
-
-		item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + SAS_ANIM_STAND;
-		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-		item->Animation.TargetState = SAS_STATE_IDLE;
-		item->Animation.ActiveState = SAS_STATE_IDLE;
+		SetAnimation(&item, SAS_ANIM_STAND);
 	}
 
 	void SasControl(short itemNumber)
@@ -201,7 +197,6 @@ namespace TEN::Entities::TR4
 						item->Pose.Orientation.y -= ANGLE(2.0f);
 					else
 						item->Pose.Orientation.y += ANGLE(2.0f);
-
 				}
 
 				if (item->AIBits & GUARD)
@@ -239,11 +234,13 @@ namespace TEN::Entities::TR4
 						item->Animation.TargetState = SAS_STATE_KNEEL_AIM;
 				}
 				else if (item->AIBits == MODIFY)
+				{
 					item->Animation.TargetState = SAS_STATE_IDLE;
-
+				}
 				else if (creature->Mood == MoodType::Escape)
+				{
 					item->Animation.TargetState = SAS_STATE_RUN;
-
+				}
 				else if ((creature->Alerted ||
 					creature->Mood != MoodType::Bored) &&
 					(!(item->AIBits & FOLLOW) ||
@@ -278,8 +275,9 @@ namespace TEN::Entities::TR4
 					!AI.ahead ||
 					item->AIBits & MODIFY ||
 					Lara.Vehicle != NO_ITEM)
-
-					item->Animation.TargetState = SAS_STATE_IDLE;				
+				{
+					item->Animation.TargetState = SAS_STATE_IDLE;
+				}
 
 				break;
 
@@ -289,24 +287,26 @@ namespace TEN::Entities::TR4
 				joint2 = angle;
 
 				if (item->AIBits & PATROL1)
+				{
 					item->Animation.TargetState = SAS_STATE_WALK;
-
+				}
 				else if (Lara.Vehicle != NO_ITEM &&
 					(item->AIBits == MODIFY ||
-					!item->AIBits))
-
+						!item->AIBits))
+				{
 					item->Animation.TargetState = SAS_STATE_IDLE;
-
+				}
 				else if (creature->Mood == MoodType::Escape)
+				{
 					item->Animation.TargetState = SAS_STATE_RUN;
-
+				}
 				else if (item->AIBits & GUARD ||
 					item->AIBits & FOLLOW &&
 					(creature->ReachedGoal ||
-					distance > pow(SECTOR(2), 2)))
-
+						distance > pow(SECTOR(2), 2)))
+				{
 					item->Animation.TargetState = SAS_STATE_IDLE;
-
+				}
 				else if (Targetable(item, &AI))
 				{
 					if (AI.distance >= pow(SECTOR(3), 2) &&
@@ -344,20 +344,23 @@ namespace TEN::Entities::TR4
 				if (item->AIBits & GUARD ||
 					item->AIBits & FOLLOW &&
 					(creature->ReachedGoal ||
-					distance > pow(SECTOR(2), 2)))
-				
+						distance > pow(SECTOR(2), 2)))
+				{
 					item->Animation.TargetState = SAS_STATE_WALK;
-			
+				}
 				else if (creature->Mood != MoodType::Escape)
 				{
 					if (Targetable(item, &AI))
+					{
 						item->Animation.TargetState = SAS_STATE_WALK;
+					}
 					else if (creature->Mood == MoodType::Bored ||
-							creature->Mood == MoodType::Stalk &&
-							!(item->AIBits & FOLLOW) &&
-							AI.distance < pow(SECTOR(2), 2))
-						
-							item->Animation.TargetState = SAS_STATE_WALK;						
+						creature->Mood == MoodType::Stalk &&
+						!(item->AIBits & FOLLOW) &&
+						AI.distance < pow(SECTOR(2), 2))
+					{
+						item->Animation.TargetState = SAS_STATE_WALK;
+					}
 				}
 
 				break;
