@@ -109,38 +109,35 @@ bool Volume::GetActive() const
 
 Vec3 Volume::GetPos() const
 {
-	return Vec3{ (int)m_volume.Position.x, (int)m_volume.Position.y, (int)m_volume.Position.z };
+	return Vec3{ (int)m_volume.Box.Center.x, (int)m_volume.Box.Center.y, (int)m_volume.Box.Center.z };
 }
 
 void Volume::SetPos(Vec3 const& pos)
 {
-	m_volume.Position.x = pos.x;
-	m_volume.Position.y = pos.y;
-	m_volume.Position.z = pos.z;
-	m_volume.Box.Center = m_volume.Sphere.Center = m_volume.Position;
+	m_volume.Box.Center = m_volume.Sphere.Center = Vector3i(pos).ToVector3();
 }
 
 Rotation Volume::GetRot() const
 {
-	auto angles = EulerAngles(m_volume.Rotation);
+	auto angles = EulerAngles(m_volume.Box.Orientation);
 	return Rotation(TO_DEGREES(angles.x), TO_DEGREES(angles.y), TO_DEGREES(angles.z));
 }
 
 void Volume::SetRot(Rotation const& rot)
 {
 	auto angles = EulerAngles(ANGLE(rot.x), ANGLE(rot.y), ANGLE(rot.z));
-	m_volume.Rotation = m_volume.Box.Orientation = angles.ToQuaternion();
+	m_volume.Box.Orientation = angles.ToQuaternion();
 }
 
 Vec3 Volume::GetScale() const
 {
-	return Vec3(m_volume.Scale);
+	return Vec3((Vector3)m_volume.Box.Extents);
 }
 
 void Volume::SetScale(Vec3 const& scale)
 {
-	m_volume.Scale = m_volume.Box.Extents = Vector3(scale.x, scale.y, scale.z);
-	m_volume.Sphere.Radius = m_volume.Scale.x;
+	m_volume.Box.Extents = Vector3(scale.x, scale.y, scale.z);
+	m_volume.Sphere.Radius = m_volume.Box.Extents.x;
 }
 
 std::string Volume::GetName() const

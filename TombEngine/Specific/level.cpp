@@ -786,24 +786,15 @@ void ReadRooms()
 
 			volume.Type = (VolumeType)ReadInt32();
 
-			volume.Position.x = ReadFloat();
-			volume.Position.y = ReadFloat();
-			volume.Position.z = ReadFloat();
-
-			volume.Rotation.x = ReadFloat();
-			volume.Rotation.y = ReadFloat();
-			volume.Rotation.z = ReadFloat();
-			volume.Rotation.w = ReadFloat();
-
-			volume.Scale.x = ReadFloat();
-			volume.Scale.y = ReadFloat();
-			volume.Scale.z = ReadFloat();
+			auto pos = Vector3{ ReadFloat(), ReadFloat(), ReadFloat() };
+			auto rot = Quaternion{ ReadFloat(), ReadFloat(), ReadFloat(), ReadFloat() };
+			auto scale = Vector3{ ReadFloat(), ReadFloat(), ReadFloat() };
 
 			volume.Name = ReadString();
 			volume.EventSetIndex = ReadInt32();
 
-			volume.Box    = BoundingOrientedBox(volume.Position, volume.Scale, volume.Rotation);
-			volume.Sphere = BoundingSphere(volume.Position, volume.Scale.x);
+			volume.Box    = BoundingOrientedBox(pos, scale, rot);
+			volume.Sphere = BoundingSphere(pos, scale.x);
 
 			volume.StateQueue.reserve(VOLUME_STATE_QUEUE_SIZE);
 

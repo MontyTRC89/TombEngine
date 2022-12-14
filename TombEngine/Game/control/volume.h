@@ -52,10 +52,6 @@ struct TriggerVolume
 	VolumeType	Type = VolumeType::Box;
 	std::string Name = "";
 
-	Vector3	   Position = Vector3::Zero;
-	Quaternion Rotation = Quaternion::Identity;
-	Vector3	   Scale	= Vector3::Zero; // NOTE: X axis is used as radius if type is VolumeType::Sphere.
-
 	BoundingOrientedBox Box	   = BoundingOrientedBox();
 	BoundingSphere		Sphere = BoundingSphere();
 

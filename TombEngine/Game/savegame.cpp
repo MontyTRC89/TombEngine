@@ -860,9 +860,9 @@ bool SaveGame::Save(int slot)
 			volume.add_room_number(i);
 			volume.add_number(j);
 			volume.add_enabled(currVolume.Enabled);
-			volume.add_position(&FromVector3(currVolume.Position));
-			volume.add_rotation(&FromVector4(currVolume.Rotation));
-			volume.add_scale(&FromVector3(currVolume.Scale));
+			volume.add_position(&FromVector3(currVolume.Box.Center));
+			volume.add_rotation(&FromVector4(currVolume.Box.Orientation));
+			volume.add_scale(&FromVector3(currVolume.Box.Extents));
 			volume.add_queue(queueOffset);
 			volumes.push_back(volume.Finish());
 		}
@@ -1303,9 +1303,11 @@ bool SaveGame::Load(int slot)
 		int number = volume->number();
 
 		room->triggerVolumes[number].Enabled = volume->enabled();
-		room->triggerVolumes[number].Position = ToVector3(volume->position());
-		room->triggerVolumes[number].Rotation = ToVector4(volume->rotation());
-		room->triggerVolumes[number].Scale = ToVector3(volume->scale());
+		room->triggerVolumes[number].Box.Center =
+		room->triggerVolumes[number].Sphere.Center = ToVector3(volume->position());
+		room->triggerVolumes[number].Box.Orientation = ToVector4(volume->rotation());
+		room->triggerVolumes[number].Box.Extents = ToVector3(volume->scale());
+		room->triggerVolumes[number].Sphere.Radius = room->triggerVolumes[number].Box.Extents.x;
 
 		for (int j = 0; j < volume->queue()->size(); j++)
 		{
