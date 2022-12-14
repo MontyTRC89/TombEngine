@@ -40,7 +40,7 @@ namespace TEN::Entities::Creatures::TR5
 
 	const auto LaserguardHead = BiteInfo(Vector3(0.0f, -200.0f, 0.0f), 2);
 
-	enum TwogunState
+	enum TwogunState //TODO: apply enum to switches in control function
 	{
 		TWOGUN_STATE_EMPTY = -1,
 		TWOGUN_STATE_IDLE = 1,
@@ -191,7 +191,6 @@ namespace TEN::Entities::Creatures::TR5
 
 	void TriggerTwogunPlasma(const Vector3i& posr, const Pose& pos, float life)
 	{
-
 		auto* sptr = GetFreeParticle();
 
 		sptr->on = true;
