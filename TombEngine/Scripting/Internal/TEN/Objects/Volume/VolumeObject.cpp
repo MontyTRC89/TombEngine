@@ -44,27 +44,27 @@ void Volume::Register(sol::table& parent)
 
 		/// Get the volume's position.
 		// @function Volume:GetPosition
-		// @treturn Vec3 a copy of the static's position
+		// @treturn Vec3 a copy of the volume's position
 		ScriptReserved_GetPosition, &Volume::GetPos,
 
 		/// Set the volume's position.
 		// @function Volume:SetPosition
-		// @tparam Vec3 position the new position of the static 
+		// @tparam Vec3 position the new position of the volume 
 		ScriptReserved_SetPosition, &Volume::SetPos,
 
 		/// Get the volume's rotation.
 		// @function Volume:GetRotation
-		// @treturn Rotation a copy of the static's rotation
+		// @treturn Rotation a copy of the volume's rotation
 		ScriptReserved_GetRotation, &Volume::GetRot,
 
 		/// Set the volume's rotation.
 		// @function Volume:SetRotation
-		// @tparam Rotation rotation the static's new rotation
+		// @tparam Rotation rotation the volume's new rotation
 		ScriptReserved_SetRotation, &Volume::SetRot,
 
 		/// Get the volume's scale (separately on all 3 axes).
 		// @function Volume:GetScale
-		// @treturn Vec3 current static scale
+		// @treturn Vec3 current volume scale
 		ScriptReserved_GetScale, &Volume::GetScale,
 
 		/// Set the volume's scale (separately on all 3 axes).
@@ -86,8 +86,9 @@ void Volume::Register(sol::table& parent)
 		// @function Volume:ClearActivators
 		ScriptReserved_ClearActivators, &Volume::ClearActivators,
 
-		/// Clear activator list for volumes (makes volume trigger everything again)
-		// @function Volume:ClearActivators
+		/// Check if specified moveable is inside the volume
+		// @function Volume:IsMoveableInside
+		// @tparam Moveable moveable which should be checked for containment
 		ScriptReserved_IsMoveableInside, &Volume::IsMoveableInside);
 }
 
