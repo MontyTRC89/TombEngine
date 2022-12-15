@@ -342,27 +342,12 @@ short ModulateLaraTurnRate(short turnRate, short accelRate, short minTurnRate, s
 	axisCoeff *= invert ? -1 : 1;
 	int sign = std::copysign(1, axisCoeff);
 
-	// Determine normalized turn rate range.
 	short minTurnRateNorm = minTurnRate * abs(axisCoeff);
 	short maxTurnRateNorm = maxTurnRate * abs(axisCoeff);
 
-	// Calculate new turn rate according to acceleration.
 	short newTurnRate = (turnRate + (accelRate * sign)) * sign;
 	newTurnRate = std::clamp(newTurnRate, minTurnRateNorm, maxTurnRateNorm);
 	return (newTurnRate * sign);
-}
-
-short ModulateLaraTurnRate(short minTurnRate, short maxTurnRate, float axisCoeff, bool invert)
-{
-	axisCoeff *= invert ? -1 : 1;
-
-	// Determine normalized turn rate range.
-	short minTurnRateNorm = minTurnRate * abs(axisCoeff);
-	short maxTurnRateNorm = maxTurnRate * abs(axisCoeff);
-
-	// Calculate new turn rate according to coefficient.
-	short deltaAngle = std::max(minTurnRateNorm, maxTurnRateNorm) - std::min(minTurnRateNorm, maxTurnRateNorm);
-	return ((minTurnRateNorm + deltaAngle) * axisCoeff);
 }
 
 // TODO: Make these two functions methods of LaraInfo someday. -- Sezz 2022.06.26
@@ -384,11 +369,7 @@ void ModulateLaraTurnRateY(ItemInfo* item, short accelRate, short minTurnRate, s
 		axisCoeff = std::min(1.2f, abs(axisCoeff)) * sign;
 	}
 
-	// TODO: Setting for analog control.
-	if (false)
-		lara->Control.TurnRate/*.y*/ = ModulateLaraTurnRate(lara->Control.TurnRate/*.y*/, accelRate, minTurnRate, maxTurnRate, axisCoeff, invert);
-	else
-		lara->Control.TurnRate/*.y*/ = ModulateLaraTurnRate(minTurnRate, maxTurnRate, axisCoeff, invert);
+	lara->Control.TurnRate/*.y*/ = ModulateLaraTurnRate(lara->Control.TurnRate/*.y*/, accelRate, minTurnRate, maxTurnRate, axisCoeff, invert);
 }
 
 void ModulateLaraSwimTurnRates(ItemInfo* item, CollisionInfo* coll)
@@ -398,18 +379,10 @@ void ModulateLaraSwimTurnRates(ItemInfo* item, CollisionInfo* coll)
 	/*if (TrInput & (IN_FORWARD | IN_BACK))
 		ModulateLaraTurnRateX(item, 0, 0, 0);*/
 
-	float axisCoeff = AxisMap[(int)InputAxis::Move].y;
-	if (axisCoeff != 0.0f)
-	{
-		item->Pose.Orientation.x += ANGLE(3.0f) * axisCoeff;
-	}
-	else
-	{
-		if (TrInput & IN_FORWARD)
-			item->Pose.Orientation.x -= ANGLE(3.0f);
-		else if (TrInput & IN_BACK)
-			item->Pose.Orientation.x += ANGLE(3.0f);
-	}
+	if (TrInput & IN_FORWARD)
+		item->Pose.Orientation.x -= ANGLE(3.0f);
+	else if (TrInput & IN_BACK)
+		item->Pose.Orientation.x += ANGLE(3.0f);
 
 	if (IsHeld(In::Left) || IsHeld(In::Right))
 	{

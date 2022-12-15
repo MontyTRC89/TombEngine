@@ -102,7 +102,7 @@ namespace TEN::Input
 	int DbInput = 0;
 	int TrInput = 0;
 
-	std::vector<int> DefaultBindings =
+	const std::vector<int> DefaultBindings =
 	{
 		KC_UP, KC_DOWN, KC_LEFT, KC_RIGHT, KC_PERIOD, KC_SLASH, KC_RSHIFT, KC_RMENU, KC_RCONTROL, KC_SPACE, KC_COMMA, KC_NUMPAD0, KC_END, KC_ESCAPE, KC_P, KC_PGUP, KC_PGDOWN,
 		/*KC_RCONTROL, KC_DOWN, KC_SLASH, KC_RSHIFT, KC_RMENU, KC_SPACE,*/
@@ -350,7 +350,9 @@ namespace TEN::Input
 				if (OisKeyboard->isKeyDown((KeyCode)i))
 				{
 					KeyMap[i] = true;
-					SetDiscreteAxisValues(i); // Interpret discrete directional keypresses as analog axis values.
+
+					// Interpret discrete directional keypresses as analog axis values.
+					SetDiscreteAxisValues(i);
 					continue;
 				}
 
@@ -421,35 +423,16 @@ namespace TEN::Input
 				}
 
 				KeyMap[baseIndex + pass] = true;
-				SetDiscreteAxisValues(baseIndex + pass); // Interpret discrete directional keypresses as mouse axis values.
-			}
 
-			// TODO: Toggle for analog/mouse control.
-			// Will also  need to rethink entire control system in the future to make this work properly.
-			// For now, it can be a functional but *strictly exprimental* feature for people to mess with.
+				// Interpret discrete directional keypresses as mouse axis values.
+				SetDiscreteAxisValues(baseIndex + pass);
+			}
 
 			// Poll axes.
+			auto rawAxes = Vector2(state.X.rel, state.Y.rel);
 			float sensitivity = (g_Configuration.MouseSensitivity * 0.1f) + 0.4f;
-			auto rawAxes = Vector2(state.X.rel, state.Y.rel) * sensitivity;
-
-			// Translate mouse axes to normalized move axes.
-			if (rawAxes != Vector2::Zero)
-			{
-				// Apply smoothing.
-				float smoothing = 1.0f - (g_Configuration.MouseSmoothing * 0.1f);
-				AxisMap[(int)InputAxis::Mouse] += (rawAxes - AxisMap[(int)InputAxis::Mouse]) * smoothing;
-
-				// Determine axis offset. ????
-				auto offset = Vector2(
-					AXIS_OFFSET * std::copysign(1, AxisMap[(int)InputAxis::Mouse].x),
-					AXIS_OFFSET * std::copysign(1, AxisMap[(int)InputAxis::Mouse].y));
-
-				// Define normalized move axes.
-				AxisMap[(int)InputAxis::Move] = Vector2(
-					(std::clamp(AxisMap[(int)InputAxis::Mouse].x, -MOUSE_AXIS_CONSTRAINT, MOUSE_AXIS_CONSTRAINT) / MOUSE_AXIS_CONSTRAINT) * AXIS_SCALE,
-					(std::clamp(AxisMap[(int)InputAxis::Mouse].y, -MOUSE_AXIS_CONSTRAINT, MOUSE_AXIS_CONSTRAINT) / MOUSE_AXIS_CONSTRAINT) * AXIS_SCALE) +
-					offset;
-			}
+			float smoothing = 1.0f - (g_Configuration.MouseSmoothing * 0.1f);
+			AxisMap[(int)InputAxis::Mouse] = (rawAxes * sensitivity) * smoothing;
 		}
 		catch (OIS::Exception& ex)
 		{
@@ -577,35 +560,6 @@ namespace TEN::Input
 		catch (OIS::Exception& ex)
 		{
 			TENLog("Unable to poll game controller input: " + std::string(ex.eText), LogLevel::Warning);
-		}
-	}
-
-	void ReadKeyboard()
-	{
-		if (!OisKeyboard)
-			return;
-
-		try
-		{
-			OisKeyboard->capture();
-
-			for (int i = 0; i < MAX_KEYBOARD_KEYS; i++)
-			{
-				if (!OisKeyboard->isKeyDown((KeyCode)i))
-				{
-					continue;
-				}
-
-				int key = WrapSimilarKeys(i);
-				KeyMap[key] = true;
-
-				// Register directional discrete keypresses as max analog axis values.
-				SetDiscreteAxisValues(key);
-			}
-		}
-		catch (OIS::Exception& ex)
-		{
-			TENLog("Unable to poll keyboard input: " + std::string(ex.eText), LogLevel::Warning);
 		}
 	}
 

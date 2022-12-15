@@ -105,6 +105,7 @@ namespace TEN::Input
 		Move,
 		Camera,
 		Mouse,
+
 		Count
 	};
 
