@@ -1,8 +1,8 @@
 #pragma once
 #include <variant>
 
-struct MESH_INFO;
 struct CAMERA_INFO;
+struct MESH_INFO;
 
 namespace TEN::Control::Volumes
 {
@@ -20,20 +20,20 @@ namespace TEN::Control::Volumes
 
 	struct VolumeEvent
 	{
-		VolumeEventMode Mode;
-		std::string Function;
-		std::string Data;
+		VolumeEventMode Mode	 = VolumeEventMode::LevelScript;
+		std::string		Function = {};
+		std::string		Data	 = {};
 
-		int CallCounter;
+		int CallCounter = 0;
 	};
 
 	struct VolumeEventSet
 	{
-		std::string Name;
-		int Activators;
+		std::string Name	   = {};
+		int			Activators = 0;
 
-		VolumeEvent OnEnter;
-		VolumeEvent OnLeave;
-		VolumeEvent OnInside;
+		VolumeEvent OnEnter	 = {};
+		VolumeEvent OnLeave	 = {};
+		VolumeEvent OnInside = {};
 	};
 };
