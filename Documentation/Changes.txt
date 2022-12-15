@@ -20,6 +20,7 @@ Version 1.0.4
     - Can destroy statics in shatter slots.
 	- Fix crash when attacking.
 * Fix TR5 Autogun Rotation.
+* Fix Choppy camera movement.
 * Fix legacy pickup triggers not working in certain cases.
 * Fix crawl pickup not actually doing any pickups.
 * Fix demigod and harpy shooting in incorrect directions.
