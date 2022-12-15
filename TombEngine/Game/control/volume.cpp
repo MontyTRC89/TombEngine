@@ -20,7 +20,7 @@ namespace TEN::Control::Volumes
 {
 	constexpr auto CAM_SIZE = 32;
 
-	bool TestVolumeContainment(TriggerVolume& volume, const BoundingOrientedBox& box, short roomNumber)
+	bool TestVolumeContainment(const TriggerVolume& volume, const BoundingOrientedBox& box, short roomNumber)
 	{
 		bool result = false;
 		float color = !volume.StateQueue.empty() ? 1.0f : 0.4f;
@@ -53,12 +53,12 @@ namespace TEN::Control::Volumes
 		return result;
 	}
 
-	BoundingOrientedBox ConstructRoughBox(ItemInfo* item, CollisionSetup* coll)
+	BoundingOrientedBox ConstructRoughBox(ItemInfo& item, const CollisionSetup& coll)
 	{
-		auto pBounds = GameBoundingBox(item).ToBoundingOrientedBox(item->Pose);
-		auto pos = Vector3(item->Pose.Position.x, pBounds.Center.y, item->Pose.Position.z);
-		auto rot = item->Pose.Orientation.ToQuaternion();
-		return BoundingOrientedBox(pos, Vector3(coll->Radius, pBounds.Extents.y, coll->Radius), rot);
+		auto pBounds = GameBoundingBox(&item).ToBoundingOrientedBox(item.Pose);
+		auto pos = Vector3(item.Pose.Position.x, pBounds.Center.y, item.Pose.Position.z);
+		auto rot = item.Pose.Orientation.ToQuaternion();
+		return BoundingOrientedBox(pos, Vector3(coll.Radius, pBounds.Extents.y, coll.Radius), rot);
 	}
 
 	void HandleEvent(VolumeEvent& evt, VolumeTriggerer& triggerer)
@@ -174,11 +174,11 @@ namespace TEN::Control::Volumes
 		TestVolumes(roomNumber, box, VolumeActivatorFlags::Static, mesh);
 	}
 
-	void TestVolumes(short itemNumber, CollisionSetup* coll)
+	void TestVolumes(short itemNumber, const CollisionSetup* coll)
 	{
 		auto& item = g_Level.Items[itemNumber];
-		auto box = coll ? ConstructRoughBox(&item, coll) : 
-						  GameBoundingBox(&item).ToBoundingOrientedBox(item.Pose);
+		auto box = (coll != nullptr) ?
+			ConstructRoughBox(item, *coll) : GameBoundingBox(&item).ToBoundingOrientedBox(item.Pose);
 
 		g_Renderer.AddDebugBox(box, Vector4(1.0f, 1.0f, 0.0f, 1.0f), RENDERER_DEBUG_PAGE::LARA_STATS);
 
