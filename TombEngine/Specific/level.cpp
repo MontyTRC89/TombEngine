@@ -972,7 +972,7 @@ void LoadEventSets()
 		auto eventSet = VolumeEventSet();
 
 		eventSet.Name = ReadString();
-		eventSet.Activators = ReadInt32();
+		eventSet.Activators = (VolumeActivatorFlags)ReadInt32();
 
 		eventSet.OnEnter.Mode = (VolumeEventMode)ReadInt32();
 		eventSet.OnEnter.Function = ReadString();

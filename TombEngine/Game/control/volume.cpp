@@ -83,7 +83,7 @@ namespace TEN::Control::Volumes
 
 			auto& set = g_Level.EventSets[volume.EventSetIndex];
 
-			if ((set.Activators & (int)activatorFlag) != (int)activatorFlag)
+			if (((int)set.Activators & (int)activatorFlag) != (int)activatorFlag)
 				continue;
 
 			VolumeState* entryPtr = nullptr;

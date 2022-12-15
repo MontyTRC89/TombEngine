@@ -7,7 +7,6 @@
 struct CollisionSetup;
 
 constexpr auto NO_EVENT_SET	   = -1;
-constexpr auto NO_CALL_COUNTER = -1;
 
 constexpr auto VOLUME_BUSY_TIMEOUT	= 10;
 constexpr auto VOLUME_LEAVE_TIMEOUT = 5;
@@ -27,16 +26,6 @@ enum class VolumeType
 	Box,
 	Sphere,
 	Prism // TODO: Unsupported as of now.
-};
-
-enum class VolumeActivatorFlags
-{
-	Player		   = (1 << 0),
-	NPC			   = (1 << 1),
-	Moveable	   = (1 << 2),
-	Static		   = (1 << 3),
-	Flyby		   = (1 << 4),
-	PhysicalObject = (1 << 5) // TODO: Future-proofing for Bullet.
 };
 
 struct VolumeState
