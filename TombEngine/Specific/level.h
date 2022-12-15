@@ -1,6 +1,6 @@
 #pragma once
 #include "Game/animation.h"
-#include "Game/control/volumetriggerer.h"
+#include "Game/control/volumeactivator.h"
 #include "Game/items.h"
 #include "Game/room.h"
 #include "Sound/sound.h"

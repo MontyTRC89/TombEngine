@@ -175,9 +175,9 @@ bool Volume::IsMoveableInside(Moveable const& moveable)
 {
 	for (auto& entry : m_volume.StateQueue)
 	{
-		if (std::holds_alternative<short>(entry.Triggerer))
+		if (std::holds_alternative<short>(entry.Activator))
 		{
-			short id = std::get<short>(entry.Triggerer);
+			short id = std::get<short>(entry.Activator);
 			auto& mov = std::make_unique<Moveable>(id);
 
 			if (mov.get() == &moveable)

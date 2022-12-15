@@ -9,7 +9,7 @@
 #include "Game/control/flipeffect.h"
 #include "Game/control/lot.h"
 #include "Game/control/volume.h"
-#include "Game/control/volumetriggerer.h"
+#include "Game/control/volumeactivator.h"
 #include "Game/effects/item_fx.h"
 #include "Game/effects/effects.h"
 #include "Game/items.h"
@@ -842,15 +842,15 @@ bool SaveGame::Save(int slot)
 			{
 				auto& entry = currVolume.StateQueue[k];
 
-				int triggerer = NO_ITEM;
-				if (std::holds_alternative<short>(entry.Triggerer))
-					triggerer = std::get<short>(entry.Triggerer);
+				int activator = NO_ITEM;
+				if (std::holds_alternative<short>(entry.Activator))
+					activator = std::get<short>(entry.Activator);
 				else
 					continue;
 
 				Save::VolumeStateBuilder volstate{ fbb };
 				volstate.add_status((int)entry.Status);
-				volstate.add_triggerer(triggerer);
+				volstate.add_activator(activator);
 				volstate.add_timestamp(entry.Timestamp);
 				queue.push_back(volstate.Finish());
 			}
@@ -1316,7 +1316,7 @@ bool SaveGame::Load(int slot)
 				VolumeState
 				{
 					(VolumeStateStatus)state->status(),
-					(short)state->triggerer(),
+					(short)state->activator(),
 					state->timestamp()
 				});
 		}

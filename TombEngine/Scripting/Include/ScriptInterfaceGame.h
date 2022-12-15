@@ -2,7 +2,7 @@
 #include <string>
 #include <functional>
 
-#include "Game/control/volumetriggerer.h"
+#include "Game/control/volumeactivator.h"
 #include "Game/room.h"
 #include "Specific/level.h"
 
@@ -46,7 +46,7 @@ public:
 	virtual void ResetScripts(bool clearGameVars) = 0;
 	virtual void ExecuteScriptFile(std::string const& luaFileName) = 0;
 	virtual void ExecuteString(std::string const& command) = 0;
-	virtual void ExecuteFunction(std::string const& luaFuncName, TEN::Control::Volumes::VolumeTriggerer, std::string const& arguments) = 0;
+	virtual void ExecuteFunction(std::string const& luaFuncName, TEN::Control::Volumes::VolumeActivator, std::string const& arguments) = 0;
 	virtual void ExecuteFunction(std::string const& luaFuncName, short idOne, short idTwo = 0) = 0;
 
 	virtual void GetVariables(std::vector<SavedVar> & vars) = 0;

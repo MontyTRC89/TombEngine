@@ -61,17 +61,17 @@ namespace TEN::Control::Volumes
 		return BoundingOrientedBox(pos, Vector3(coll.Radius, pBounds.Extents.y, coll.Radius), rot);
 	}
 
-	void HandleEvent(VolumeEvent& evt, VolumeTriggerer& triggerer)
+	void HandleEvent(VolumeEvent& evt, VolumeActivator& activator)
 	{
 		if (evt.Function.empty() || evt.CallCounter == 0)
 			return;
 
-		g_GameScript->ExecuteFunction(evt.Function, triggerer, evt.Data);
+		g_GameScript->ExecuteFunction(evt.Function, activator, evt.Data);
 		if (evt.CallCounter != NO_CALL_COUNTER)
 			evt.CallCounter--;
 	}
 
-	void TestVolumes(short roomNumber, const BoundingOrientedBox& box, VolumeActivatorFlags activatorFlag, VolumeTriggerer triggerer)
+	void TestVolumes(short roomNumber, const BoundingOrientedBox& box, VolumeActivatorFlags activatorFlag, VolumeActivator activator)
 	{
 		if (roomNumber == NO_ROOM)
 			return;
@@ -104,7 +104,7 @@ namespace TEN::Control::Volumes
 				}
 				else if (candidate.Status != VolumeStateStatus::Outside)
 				{
-					if (candidate.Triggerer == triggerer)
+					if (candidate.Activator == activator)
 						entryPtr = &candidate;
 				}
 
@@ -121,18 +121,18 @@ namespace TEN::Control::Volumes
 						VolumeState
 						{ 
 							VolumeStateStatus::Entering,
-							triggerer, 
+							activator,
 							GameTimer 
 						});
 
-					HandleEvent(set.OnEnter, triggerer);
+					HandleEvent(set.OnEnter, activator);
 				}
 				else
 				{
 					entryPtr->Status = VolumeStateStatus::Inside;
 					entryPtr->Timestamp = GameTimer;
 
-					HandleEvent(set.OnInside, triggerer);
+					HandleEvent(set.OnInside, activator);
 				}
 			}
 			else if (entryPtr != nullptr)
@@ -145,7 +145,7 @@ namespace TEN::Control::Volumes
 					entryPtr->Status = VolumeStateStatus::Leaving;
 					entryPtr->Timestamp = GameTimer;
 
-					HandleEvent(set.OnLeave, triggerer);
+					HandleEvent(set.OnLeave, activator);
 				}
 			}
 		}

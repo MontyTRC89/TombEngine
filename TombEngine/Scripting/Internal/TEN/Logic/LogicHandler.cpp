@@ -629,12 +629,12 @@ void LogicHandler::ExecuteFunction(std::string const& name, short idOne, short i
 
 }
 
-void LogicHandler::ExecuteFunction(std::string const& name, TEN::Control::Volumes::VolumeTriggerer triggerer, std::string const& arguments)
+void LogicHandler::ExecuteFunction(std::string const& name, TEN::Control::Volumes::VolumeActivator activator, std::string const& arguments)
 {
 	sol::protected_function func = (*m_handler.GetState())[ScriptReserved_LevelFuncs][name.c_str()];
-	if (std::holds_alternative<short>(triggerer))
+	if (std::holds_alternative<short>(activator))
 	{
-		func(std::make_unique<Moveable>(std::get<short>(triggerer), true), arguments);
+		func(std::make_unique<Moveable>(std::get<short>(activator), true), arguments);
 	}
 	else
 	{

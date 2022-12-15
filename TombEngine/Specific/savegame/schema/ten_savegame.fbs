@@ -368,7 +368,7 @@ table EventSetCallCounters {
 
 table VolumeState {
 	status: int32;
-	triggerer: int32;
+	activator: int32;
 	timestamp: int32;
 }
 

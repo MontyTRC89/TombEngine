@@ -1,5 +1,5 @@
 #pragma once
-#include "Game/control/volumetriggerer.h"
+#include "Game/control/volumeactivator.h"
 #include "Game/room.h"
 #include "Renderer/Renderer11.h"
 #include "Specific/setup.h"
@@ -42,7 +42,7 @@ enum class VolumeActivatorFlags
 struct VolumeState
 {
 	VolumeStateStatus Status	= VolumeStateStatus::Outside;
-	VolumeTriggerer	  Triggerer = nullptr;
+	VolumeActivator	  Activator = nullptr;
 	int				  Timestamp = 0;
 };
 
@@ -62,7 +62,7 @@ struct TriggerVolume
 
 namespace TEN::Control::Volumes
 {
-	void TestVolumes(short roomNumber, const BoundingOrientedBox& box, VolumeActivatorFlags activatorFlag, VolumeTriggerer triggerer);
+	void TestVolumes(short roomNumber, const BoundingOrientedBox& box, VolumeActivatorFlags activatorFlag, VolumeActivator activator);
 	void TestVolumes(short itemNumber, const CollisionSetup* coll = nullptr);
 	void TestVolumes(short roomNumber, MESH_INFO* mesh);
 	void TestVolumes(CAMERA_INFO* camera);
