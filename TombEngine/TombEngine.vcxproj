@@ -156,7 +156,7 @@ CALL gen.bat</Command>
     <ClInclude Include="Game\collision\collide_item.h" />
     <ClInclude Include="Game\control\box.h" />
     <ClInclude Include="Game\control\los.h" />
-    <ClInclude Include="Game\control\volumetriggerer.h" />
+    <ClInclude Include="Game\control\volumeactivator.h" />
     <ClInclude Include="Game\effects\bubble.h" />
     <ClInclude Include="Game\effects\chaffFX.h" />
     <ClInclude Include="Game\control\trigger.h" />
