@@ -1,15 +1,15 @@
 #pragma once
-
-#include "Objects/NamedBase.h"
-#include "Objects/Moveable/MoveableObject.h"
 #include "Game/Control/volume.h"
+#include "Scripting/Internal/TEN/Objects/Moveable/MoveableObject.h"
+#include "Scripting/Internal/TEN/Objects/NamedBase.h"
 
-namespace sol {
+namespace sol
+{
 	class state;
 }
 
-class Vec3;
 class Rotation;
+class Vec3;
 
 class Volume : public NamedBase<Volume, TriggerVolume&>
 {
@@ -18,8 +18,8 @@ public:
 	Volume(TriggerVolume& volume);
 	~Volume() = default;
 
-	Volume& operator=(Volume const& other) = delete;
-	Volume(Volume const& other) = delete;
+	Volume& operator =(const Volume& other) = delete;
+	Volume(const Volume& other) = delete;
 
 	static void Register(sol::table& parent);
 
@@ -27,16 +27,16 @@ public:
 	void Disable();
 	[[nodiscard]] bool GetActive() const;
 	[[nodiscard]] Rotation GetRot() const;
-	void SetRot(Rotation const& rot);
+	void SetRot(const Rotation& rot);
 	[[nodiscard]] Vec3 GetPos() const;
-	void SetPos(Vec3 const& pos);
+	void SetPos(const Vec3& pos);
 	[[nodiscard]] Vec3 GetScale() const;
-	void SetScale(Vec3 const& scale);
+	void SetScale(const Vec3& scale);
 	[[nodiscard]] std::string GetName() const;
-	void SetName(std::string const& name);
+	void SetName(const std::string& name);
 
 	void ClearActivators();
-	[[nodiscard]] bool IsMoveableInside(Moveable const& moveable);
+	[[nodiscard]] bool IsMoveableInside(const Moveable& moveable);
 
 private:
 	TriggerVolume& m_volume;

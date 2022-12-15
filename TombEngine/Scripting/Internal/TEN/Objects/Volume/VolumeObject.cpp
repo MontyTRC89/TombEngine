@@ -1,12 +1,12 @@
 #pragma once
 #include "framework.h"
+#include "Scripting/Internal/TEN/Objects/Volume/VolumeObject.h"
 
-#include "ScriptAssert.h"
-#include "VolumeObject.h"
-#include "Vec3/Vec3.h"
-#include "Rotation/Rotation.h"
-#include "ScriptUtil.h"
-#include "ReservedScriptNames.h"
+#include "Scripting/Internal/ReservedScriptNames.h"
+#include "Scripting/Internal/ScriptAssert.h"
+#include "Scripting/Internal/ScriptUtil.h"
+#include "Scripting/Internal/TEN/Vec3/Vec3.h"
+#include "Scripting/Internal/TEN/Rotation/Rotation.h"
 #include "Specific/level.h"
 
 /***
@@ -25,7 +25,7 @@ Volume::Volume(TriggerVolume& volume) : m_volume{ volume }
 void Volume::Register(sol::table& parent)
 {
 	parent.new_usertype<Volume>(ScriptReserved_Volume,
-		sol::no_constructor, // ability to spawn new ones could be added later
+		sol::no_constructor, // TODO: Ability to spawn new ones could be added later.
 		sol::meta_function::index, index_error,
 		sol::meta_function::new_index, newindex_error,
 
@@ -40,7 +40,7 @@ void Volume::Register(sol::table& parent)
 		/// Determine whether the volume is active or not 
 		// @function Volume:GetActive
 		// @treturn bool true if the volume is active
-		ScriptReserved_GetName, & Volume::GetActive,
+		ScriptReserved_GetName, &Volume::GetActive,
 
 		/// Get the volume's position.
 		// @function Volume:GetPosition
@@ -113,21 +113,21 @@ Vec3 Volume::GetPos() const
 	return Vec3{ (int)m_volume.Box.Center.x, (int)m_volume.Box.Center.y, (int)m_volume.Box.Center.z };
 }
 
-void Volume::SetPos(Vec3 const& pos)
+void Volume::SetPos(const Vec3& pos)
 {
 	m_volume.Box.Center = m_volume.Sphere.Center = Vector3i(pos).ToVector3();
 }
 
 Rotation Volume::GetRot() const
 {
-	auto angles = EulerAngles(m_volume.Box.Orientation);
-	return Rotation(TO_DEGREES(angles.x), TO_DEGREES(angles.y), TO_DEGREES(angles.z));
+	auto eulers = EulerAngles(m_volume.Box.Orientation);
+	return Rotation(TO_DEGREES(eulers.x), TO_DEGREES(eulers.y), TO_DEGREES(eulers.z));
 }
 
-void Volume::SetRot(Rotation const& rot)
+void Volume::SetRot(const Rotation& rot)
 {
-	auto angles = EulerAngles(ANGLE(rot.x), ANGLE(rot.y), ANGLE(rot.z));
-	m_volume.Box.Orientation = angles.ToQuaternion();
+	auto eulers = EulerAngles(ANGLE(rot.x), ANGLE(rot.y), ANGLE(rot.z));
+	m_volume.Box.Orientation = eulers.ToQuaternion();
 }
 
 Vec3 Volume::GetScale() const
@@ -135,7 +135,7 @@ Vec3 Volume::GetScale() const
 	return Vec3((Vector3)m_volume.Box.Extents);
 }
 
-void Volume::SetScale(Vec3 const& scale)
+void Volume::SetScale(const Vec3& scale)
 {
 	m_volume.Box.Extents = Vector3(scale.x, scale.y, scale.z);
 	m_volume.Sphere.Radius = m_volume.Box.Extents.x;
@@ -146,16 +146,14 @@ std::string Volume::GetName() const
 	return m_volume.Name;
 }
 
-void Volume::SetName(std::string const& name)
+void Volume::SetName(const std::string& name)
 {
 	if (!ScriptAssert(!name.empty(), "Name cannot be blank. Not setting name."))
-	{
 		return;
-	}
 
 	if (s_callbackSetName(name, m_volume))
 	{
-		// remove the old name if we have one
+		// Remove the old name if we have one.
 		s_callbackRemoveName(m_volume.Name);
 		m_volume.Name = name;
 	}
@@ -171,7 +169,7 @@ void Volume::ClearActivators()
 	m_volume.StateQueue.clear();
 }
 
-bool Volume::IsMoveableInside(Moveable const& moveable)
+bool Volume::IsMoveableInside(const Moveable& moveable)
 {
 	for (auto& entry : m_volume.StateQueue)
 	{
@@ -182,7 +180,7 @@ bool Volume::IsMoveableInside(Moveable const& moveable)
 
 			if (mov.get() == &moveable)
 				return true;
-		}			
+		}
 	}
 
 	return false;
