@@ -25,8 +25,7 @@ namespace TEN::Math::Geometry
 		return Vector3(
 			point.x + ((forward * sinHeading) + (right * cosHeading)),
 			point.y + down,
-			point.z + ((forward * cosHeading) - (right * sinHeading))
-		);
+			point.z + ((forward * cosHeading) - (right * sinHeading)));
 	}
 
 	Vector3i TranslatePoint(const Vector3i& point, const EulerAngles& orient, float distance)
@@ -47,8 +46,7 @@ namespace TEN::Math::Geometry
 		return Vector3(
 			point.x + (distance * (sinY * cosX)),
 			point.y - (distance * sinX),
-			point.z + (distance * (cosX * cosY))
-		);
+			point.z + (distance * (cosX * cosY)));
 	}
 
 	Vector3i TranslatePoint(const Vector3i& point, const Vector3& direction, float distance)

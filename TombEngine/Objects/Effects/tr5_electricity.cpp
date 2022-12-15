@@ -13,6 +13,7 @@
 #include "Game/Lara/lara_collide.h"
 #include "Objects/Generic/Traps/traps.h"
 #include "Sound/sound.h"
+#include "Specific/clock.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
 

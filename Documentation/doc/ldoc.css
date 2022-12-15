@@ -29,17 +29,17 @@ span.types:before { content:"("; }
 span.types:after { content:")"; }
 .type { font-weight: bold; font-style:italic }
 
-body, p, td, th { font-size: .95em; line-height: 1.2em;}
+body, td, th { font-size: .95em; line-height: 1.2em;}
+p { line-height: 1.2em;}
 
 p, ul { margin: 10px 0 0 0px;}
 
 strong { font-weight: bold;}
 
+here { font-weight: bold; color: #c8751d;}
+
 em { font-style: italic;}
-address,caption,cite,code,dfn,em,strong,th,var,optgroup {
-    font-style: inherit;
-    font-weight: inherit;
-}
+
 h1 {
     font-size: 1.5em;
     margin: 20px 0 20px 0;

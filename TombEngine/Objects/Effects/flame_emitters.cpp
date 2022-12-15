@@ -15,6 +15,7 @@
 #include "Game/Lara/lara_helpers.h"
 #include "Math/Math.h"
 #include "Sound/sound.h"
+#include "Specific/clock.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"

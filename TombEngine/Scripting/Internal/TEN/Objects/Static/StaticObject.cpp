@@ -183,9 +183,9 @@ Rotation Static::GetRot() const
 
 void Static::SetRot(Rotation const& rot)
 {
-	m_mesh.pos.Orientation.x = FROM_DEGREES(rot.x);
-	m_mesh.pos.Orientation.y = FROM_DEGREES(rot.y);
-	m_mesh.pos.Orientation.z = FROM_DEGREES(rot.z);
+	m_mesh.pos.Orientation.x = ANGLE(rot.x);
+	m_mesh.pos.Orientation.y = ANGLE(rot.y);
+	m_mesh.pos.Orientation.z = ANGLE(rot.z);
 }
 
 std::string Static::GetName() const

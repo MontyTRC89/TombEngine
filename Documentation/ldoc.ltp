@@ -35,22 +35,13 @@
 <br/>
 <h1>$(ldoc.project)</h1>
 
+<ul>
 # if not ldoc.single and module then -- reference back to project index
-<ul>
   <li><a href="../$(ldoc.output).html">Index</a></li>
-</ul>
-# end
-
-# --------- contents of module -------------
-# if module and not ldoc.no_summary and #module.items > 0 then
-<h2>Contents</h2>
-<ul>
-# for kind,items in module.kinds() do
-<li><a href="#$(no_spaces(kind))">$(kind)</a></li>
+# else
+  <li><here>Index</here></li>
 # end
 </ul>
-# end
-
 
 # if ldoc.no_summary and module and not ldoc.one then -- bang out the functions on the side
 # for kind, items in module.kinds() do
@@ -70,9 +61,9 @@
 <ul class="$(kind=='Topics' and '' or 'nowrap')">
 #  for mod in mods() do local name = display_name(mod)
 #   if mod.name == this_mod then
-  <li><strong>$(name)</strong></li>
+  <li>    <here>$(name)</here></li>
 #   else
-  <li><a href="$(ldoc.ref_to_module(mod))">$(name)</a></li>
+  <li>    <a href="$(ldoc.ref_to_module(mod))">$(name)</a></li>
 #   end
 #  end
 # end
@@ -179,6 +170,16 @@
     </dt>
     <dd>
     $(M(ldoc.descript(item),item))
+
+#	if item.advancedDesc then
+#     for i = 1, #item.advancedDesc.lines do
+#		if item.advancedDesc.formatLines[i] then
+        <pre class="example">$(ldoc.prettify(item.advancedDesc.lines[i]))</pre>
+#		else
+		<p>$(M(item.advancedDesc.lines[i]))</p>
+#		end -- if
+#     end -- for
+#	end -- if advancedDesc
 
 #   if ldoc.custom_tags then
 #    for custom in iter(ldoc.custom_tags) do
