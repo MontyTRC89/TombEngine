@@ -379,7 +379,6 @@ table Volume {
 	position: Vector3;
 	rotation: Vector4;
 	scale: Vector3;
-	timestamp: int32;
 	queue: [VolumeState];
 }
 

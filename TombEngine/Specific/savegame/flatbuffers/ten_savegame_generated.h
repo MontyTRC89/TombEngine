@@ -5226,7 +5226,6 @@ struct VolumeT : public flatbuffers::NativeTable {
   std::unique_ptr<TEN::Save::Vector3> position{};
   std::unique_ptr<TEN::Save::Vector4> rotation{};
   std::unique_ptr<TEN::Save::Vector3> scale{};
-  int32_t timestamp = 0;
   std::vector<std::unique_ptr<TEN::Save::VolumeStateT>> queue{};
 };
 
@@ -5241,8 +5240,7 @@ struct Volume FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     VT_POSITION = 10,
     VT_ROTATION = 12,
     VT_SCALE = 14,
-    VT_TIMESTAMP = 16,
-    VT_QUEUE = 18
+    VT_QUEUE = 16
   };
   int32_t number() const {
     return GetField<int32_t>(VT_NUMBER, 0);
@@ -5262,9 +5260,6 @@ struct Volume FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   const TEN::Save::Vector3 *scale() const {
     return GetStruct<const TEN::Save::Vector3 *>(VT_SCALE);
   }
-  int32_t timestamp() const {
-    return GetField<int32_t>(VT_TIMESTAMP, 0);
-  }
   const flatbuffers::Vector<flatbuffers::Offset<TEN::Save::VolumeState>> *queue() const {
     return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<TEN::Save::VolumeState>> *>(VT_QUEUE);
   }
@@ -5276,7 +5271,6 @@ struct Volume FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyField<TEN::Save::Vector3>(verifier, VT_POSITION) &&
            VerifyField<TEN::Save::Vector4>(verifier, VT_ROTATION) &&
            VerifyField<TEN::Save::Vector3>(verifier, VT_SCALE) &&
-           VerifyField<int32_t>(verifier, VT_TIMESTAMP) &&
            VerifyOffset(verifier, VT_QUEUE) &&
            verifier.VerifyVector(queue()) &&
            verifier.VerifyVectorOfTables(queue()) &&
@@ -5309,9 +5303,6 @@ struct VolumeBuilder {
   void add_scale(const TEN::Save::Vector3 *scale) {
     fbb_.AddStruct(Volume::VT_SCALE, scale);
   }
-  void add_timestamp(int32_t timestamp) {
-    fbb_.AddElement<int32_t>(Volume::VT_TIMESTAMP, timestamp, 0);
-  }
   void add_queue(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<TEN::Save::VolumeState>>> queue) {
     fbb_.AddOffset(Volume::VT_QUEUE, queue);
   }
@@ -5334,11 +5325,9 @@ inline flatbuffers::Offset<Volume> CreateVolume(
     const TEN::Save::Vector3 *position = 0,
     const TEN::Save::Vector4 *rotation = 0,
     const TEN::Save::Vector3 *scale = 0,
-    int32_t timestamp = 0,
     flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<TEN::Save::VolumeState>>> queue = 0) {
   VolumeBuilder builder_(_fbb);
   builder_.add_queue(queue);
-  builder_.add_timestamp(timestamp);
   builder_.add_scale(scale);
   builder_.add_rotation(rotation);
   builder_.add_position(position);
@@ -5361,7 +5350,6 @@ inline flatbuffers::Offset<Volume> CreateVolumeDirect(
     const TEN::Save::Vector3 *position = 0,
     const TEN::Save::Vector4 *rotation = 0,
     const TEN::Save::Vector3 *scale = 0,
-    int32_t timestamp = 0,
     const std::vector<flatbuffers::Offset<TEN::Save::VolumeState>> *queue = nullptr) {
   auto queue__ = queue ? _fbb.CreateVector<flatbuffers::Offset<TEN::Save::VolumeState>>(*queue) : 0;
   return TEN::Save::CreateVolume(
@@ -5372,7 +5360,6 @@ inline flatbuffers::Offset<Volume> CreateVolumeDirect(
       position,
       rotation,
       scale,
-      timestamp,
       queue__);
 }
 
@@ -8321,7 +8308,6 @@ inline void Volume::UnPackTo(VolumeT *_o, const flatbuffers::resolver_function_t
   { auto _e = position(); if (_e) _o->position = std::unique_ptr<TEN::Save::Vector3>(new TEN::Save::Vector3(*_e)); }
   { auto _e = rotation(); if (_e) _o->rotation = std::unique_ptr<TEN::Save::Vector4>(new TEN::Save::Vector4(*_e)); }
   { auto _e = scale(); if (_e) _o->scale = std::unique_ptr<TEN::Save::Vector3>(new TEN::Save::Vector3(*_e)); }
-  { auto _e = timestamp(); _o->timestamp = _e; }
   { auto _e = queue(); if (_e) { _o->queue.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->queue[_i] = std::unique_ptr<TEN::Save::VolumeStateT>(_e->Get(_i)->UnPack(_resolver)); } } }
 }
 
@@ -8339,7 +8325,6 @@ inline flatbuffers::Offset<Volume> CreateVolume(flatbuffers::FlatBufferBuilder &
   auto _position = _o->position ? _o->position.get() : 0;
   auto _rotation = _o->rotation ? _o->rotation.get() : 0;
   auto _scale = _o->scale ? _o->scale.get() : 0;
-  auto _timestamp = _o->timestamp;
   auto _queue = _fbb.CreateVector<flatbuffers::Offset<TEN::Save::VolumeState>> (_o->queue.size(), [](size_t i, _VectorArgs *__va) { return CreateVolumeState(*__va->__fbb, __va->__o->queue[i].get(), __va->__rehasher); }, &_va );
   return TEN::Save::CreateVolume(
       _fbb,
@@ -8349,7 +8334,6 @@ inline flatbuffers::Offset<Volume> CreateVolume(flatbuffers::FlatBufferBuilder &
       _position,
       _rotation,
       _scale,
-      _timestamp,
       _queue);
 }
 
