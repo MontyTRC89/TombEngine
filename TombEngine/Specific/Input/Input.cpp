@@ -381,7 +381,7 @@ namespace TEN::Input
 
 			// Register multiple directional keypresses mapped to mouse axes.
 			int baseIndex = MAX_KEYBOARD_KEYS + MAX_MOUSE_KEYS + MAX_GAMEPAD_KEYS;
-			for (int pass = 0; pass < 6; pass++)
+			for (int pass = 0; pass < MAX_MOUSE_POV_AXES; pass++)
 			{
 				switch (pass)
 				{
@@ -516,14 +516,14 @@ namespace TEN::Input
 
 			// Poll POVs.
 			// NOTE: Controllers usually have one, but scan all just in case.
-			for (int pov = 0; pov < 4; pov++)
+			for (int pov = 0; pov < MAX_GAMEPAD_POV_AXES; pov++)
 			{
 				if (state.mPOV[pov].direction == Pov::Centered)
 					continue;
 
 				// Register multiple directional keypresses mapped to analog axes.
 				int baseIndex = MAX_KEYBOARD_KEYS + MAX_MOUSE_KEYS + MAX_GAMEPAD_KEYS + MAX_MOUSE_POV_AXES + (MAX_GAMEPAD_AXES * 2);
-				for (int pass = 0; pass < 4; pass++)
+				for (int pass = 0; pass < MAX_GAMEPAD_POV_AXES; pass++)
 				{
 					switch (pass)
 					{
