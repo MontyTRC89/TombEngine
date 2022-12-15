@@ -135,7 +135,7 @@ namespace TEN::Entities::TR4
 			return;
 
 		auto& item = g_Level.Items[itemNumber];
-		auto& creature = *GetCreatureInfo(item.Data);
+		auto& creature = *(CreatureInfo*)item.Data;
 		auto& enemy = creature.Enemy;
 
 		short tilt = 0;
@@ -535,7 +535,7 @@ namespace TEN::Entities::TR4
 				break;
 
 			case SAS_STATE_BLIND:
-				if (!FlashGrenadeAftershockTimer && !(GetRandomControl() & 0x7F))
+				if (!FlashGrenadeAftershockTimer && !(GetRandomControl() & 0x7F)) // TODO: This is a probabliity of roughly 0.998f.
 					item.Animation.TargetState = SAS_STATE_WAIT;
 
 				break;
@@ -547,20 +547,14 @@ namespace TEN::Entities::TR4
 			if (FlashGrenadeAftershockTimer > 100 &&
 				item.Animation.ActiveState != SAS_STATE_BLIND)
 			{
-				item.Animation.AnimNumber = Objects[item.ObjectNumber].animIndex + SAS_ANIM_BLIND;
-				item.Animation.FrameNumber = g_Level.Anims[item.Animation.AnimNumber].frameBase + (GetRandomControl() & 7);
-				item.Animation.ActiveState = SAS_STATE_BLIND;
+				SetAnimation(&item, SAS_ANIM_BLIND, Random::GenerateInt(0, 8));
 				creature.MaxTurn = 0;
 			}
 		}
 		else
 		{
 			if (item.Animation.ActiveState != SAS_STATE_DEATH)
-			{
-				item.Animation.AnimNumber = Objects[item.ObjectNumber].animIndex + SAS_ANIM_DEATH;
-				item.Animation.FrameNumber = g_Level.Anims[item.Animation.AnimNumber].frameBase;
-				item.Animation.ActiveState = SAS_STATE_DEATH;
-			}
+				SetAnimation(&item, SAS_ANIM_DEATH);
 		}
 
 		CreatureTilt(&item, tilt);
@@ -602,15 +596,15 @@ namespace TEN::Entities::TR4
 	void SasDragBlokeCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 	{
 		auto& item = g_Level.Items[itemNumber];
-		auto& lara = *GetLaraInfo(laraItem);
+		auto& player = *GetLaraInfo(laraItem);
 
 		if ((IsHeld(In::Action) &&
 			laraItem->Animation.ActiveState == LS_IDLE &&
 			laraItem->Animation.AnimNumber == LA_STAND_IDLE &&
-			lara.Control.HandStatus == HandStatus::Free &&
+			player.Control.HandStatus == HandStatus::Free &&
 			!laraItem->Animation.IsAirborne &&
 			!(item.Flags & IFLAG_ACTIVATION_MASK)) ||
-			lara.Control.IsMoving && lara.InteractedItem == itemNumber)
+			player.Control.IsMoving && player.InteractedItem == itemNumber)
 		{
 			if (TestLaraPosition(SasDragBounds, &item, laraItem))
 			{
@@ -619,8 +613,8 @@ namespace TEN::Entities::TR4
 					SetAnimation(laraItem, LA_DRAG_BODY);
 					ResetLaraFlex(laraItem);
 					laraItem->Pose.Orientation.y = item.Pose.Orientation.y;
-					lara.Control.HandStatus = HandStatus::Busy;
-					lara.Control.IsMoving = false;
+					player.Control.HandStatus = HandStatus::Busy;
+					player.Control.IsMoving = false;
 
 					AddActiveItem(itemNumber);
 					item.Flags |= IFLAG_ACTIVATION_MASK;
@@ -628,7 +622,7 @@ namespace TEN::Entities::TR4
 				}
 				else
 				{
-					lara.InteractedItem = itemNumber;
+					player.InteractedItem = itemNumber;
 				}
 			}
 		}
@@ -665,9 +659,8 @@ namespace TEN::Entities::TR4
 		auto pos = GetJointPosition(&item, SasGunBite.meshNum, Vector3i(SasGunBite.Position));
 		grenadeItem->Pose.Position = pos;
 
-		auto pointColl = GetCollision(pos.x, pos.y, pos.z, grenadeItem->RoomNumber).Position.Floor;
-
-		if (pointColl < pos.y)
+		auto floorHeight = GetCollision(pos.x, pos.y, pos.z, grenadeItem->RoomNumber).Position.Floor;
+		if (floorHeight < pos.y)
 		{
 			grenadeItem->Pose.Position = Vector3i(item.Pose.Position.x, pos.y, item.Pose.Position.z);
 			grenadeItem->RoomNumber = item.RoomNumber;
@@ -678,19 +671,20 @@ namespace TEN::Entities::TR4
 
 		InitialiseItem(itemNumber);
 
-		grenadeItem->Pose.Orientation.x = angle1 + item.Pose.Orientation.x;
-		grenadeItem->Pose.Orientation.y = angle2 + item.Pose.Orientation.y;
-		grenadeItem->Pose.Orientation.z = 0;
-		grenadeItem->Animation.Velocity.z = 128;
+		grenadeItem->Pose.Orientation = EulerAngles(
+			angle1 + item.Pose.Orientation.x,
+			angle2 + item.Pose.Orientation.y,
+			0);
 		grenadeItem->Animation.Velocity.y = -128 * phd_sin(grenadeItem->Pose.Orientation.x);
+		grenadeItem->Animation.Velocity.z = 128;
 		grenadeItem->Animation.ActiveState = grenadeItem->Pose.Orientation.x;
 		grenadeItem->Animation.TargetState = grenadeItem->Pose.Orientation.y;
 		grenadeItem->Animation.RequiredState = 0;
 
 		if (Random::TestProbability(3 / 4.0f))
-			grenadeItem->ItemFlags[0] = (short)ProjectileType::Grenade;
+			grenadeItem->ItemFlags[0] = (int)ProjectileType::Grenade;
 		else
-			grenadeItem->ItemFlags[0] = (short)ProjectileType::FragGrenade;
+			grenadeItem->ItemFlags[0] = (int)ProjectileType::FragGrenade;
 
 		grenadeItem->HitPoints = 120;
 		grenadeItem->ItemFlags[2] = 1;
