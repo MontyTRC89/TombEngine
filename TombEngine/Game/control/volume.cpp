@@ -97,24 +97,20 @@ namespace TEN::Control::Volumes
 			{
 				auto& candidate = volume.StateQueue[j];
 
-				switch (candidate.Status)
+				if (candidate.Status == VolumeStateStatus::Leaving)
 				{
-				case VolumeStateStatus::Leaving:
 					if ((GameTimer - candidate.Timestamp) > VOLUME_BUSY_TIMEOUT)
 						candidate.Status = VolumeStateStatus::Outside;
-				
-					break;
-
-				case VolumeStateStatus::Outside:
-					volume.StateQueue.erase(volume.StateQueue.begin() + j);
-					break;
-
-				default:
+				}
+				else if (candidate.Status != VolumeStateStatus::Outside)
+				{
 					if (candidate.Triggerer == triggerer)
 						entryPtr = &candidate;
-					
-					break;
 				}
+
+				volume.StateQueue.erase(std::remove_if(volume.StateQueue.begin(), volume.StateQueue.end(), 
+					[](const VolumeState& obj) { return obj.Status == VolumeStateStatus::Outside; }),
+					volume.StateQueue.end());
 			}
 
 			if (TestVolumeContainment(volume, box, roomNumber))
