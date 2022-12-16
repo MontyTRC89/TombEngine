@@ -804,7 +804,7 @@ void ReadRooms()
 		room.flippedRoom = ReadInt32();
 		room.flags = ReadInt32();
 		room.meshEffect = ReadInt32();
-		room.reverbType = ReadInt32();
+		room.reverbType = (ReverbType)ReadInt32();
 		room.flipNumber = ReadInt32();
 
 		room.itemNumber = NO_ITEM;

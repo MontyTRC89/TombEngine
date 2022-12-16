@@ -470,7 +470,6 @@ ScriptReserved_GetSlotHP, & Moveable::GetSlotHP,
 	ScriptReserved_AnimFromObject, &Moveable::AnimFromObject);
 }
 
-
 void Moveable::Init()
 {
 	bool cond = IsPointInRoom(m_item->Pose.Position, m_item->RoomNumber);

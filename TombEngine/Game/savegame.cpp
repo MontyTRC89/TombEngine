@@ -151,7 +151,7 @@ bool SaveGame::Save(int slot)
 	ItemInfo itemToSerialize{};
 	FlatBufferBuilder fbb{};
 
-	std::vector<flatbuffers::Offset< Save::Item>> serializedItems{};
+	std::vector<flatbuffers::Offset<Save::Item>> serializedItems{};
 
 	// Savegame header
 	auto levelNameOffset = fbb.CreateString(g_GameFlow->GetString(g_GameFlow->GetLevel(CurrentLevel)->NameStringKey.c_str()));
@@ -450,6 +450,19 @@ bool SaveGame::Save(int slot)
 	lara.add_wet(wetOffset);
 	auto laraOffset = lara.Finish();
 
+	std::vector<flatbuffers::Offset<Save::Room>> rooms;
+	for (auto& room : g_Level.Rooms)
+	{
+		Save::RoomBuilder serializedInfo{ fbb };
+		serializedInfo.add_name(fbb.CreateString(room.name));
+		serializedInfo.add_reverb_type((int)room.reverbType);
+		serializedInfo.add_flags(room.flags);
+		auto serializedInfoOffset = serializedInfo.Finish();
+
+		rooms.push_back(serializedInfoOffset);
+	}
+	auto roomOffset = fbb.CreateVector(rooms);
+
 	int currentItemIndex = 0;
 	for (auto& itemToSerialize : g_Level.Items) 
 	{
@@ -699,7 +712,6 @@ bool SaveGame::Save(int slot)
 
 		currentItemIndex++;
 	}
-
 	auto serializedItemsOffset = fbb.CreateVector(serializedItems);
 
 	// TODO: In future, we should save only active FX, not whole array.
@@ -1143,6 +1155,7 @@ bool SaveGame::Save(int slot)
 	sgb.add_level(levelStatisticsOffset);
 	sgb.add_game(gameStatisticsOffset);
 	sgb.add_lara(laraOffset);
+	sgb.add_rooms(roomOffset);
 	sgb.add_next_item_free(NextItemFree);
 	sgb.add_next_item_active(NextItemActive);
 	sgb.add_items(serializedItemsOffset);
@@ -1235,6 +1248,15 @@ bool SaveGame::Load(int slot)
 	Statistics.Level.Kills = s->level()->kills();
 	Statistics.Level.Secrets = s->level()->secrets();
 	Statistics.Level.Timer = s->level()->timer();
+
+	// Rooms
+	for (int i = 0; i < s->rooms()->size(); i++)
+	{
+		auto room = s->rooms()->Get(i);
+		g_Level.Rooms[i].name = room->name()->str();
+		g_Level.Rooms[i].flags = room->flags();
+		g_Level.Rooms[i].reverbType = (ReverbType)room->reverb_type();
+	}
 
 	// Flipmaps
 	for (int i = 0; i < s->flip_stats()->size(); i++)
