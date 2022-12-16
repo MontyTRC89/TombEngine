@@ -460,7 +460,9 @@ ScriptReserved_GetSlotHP, & Moveable::GetSlotHP,
 
 /// Attach camera to an object.
 // @function Moveable:AttachObjCamera
-// @tparam int mesh 1 for camera, mesh 2 for target
+// @tparam int mesh of a moveable to use as a camera position
+// @tparam Moveable target moveable to attach camera to
+// @tparam int mesh of a target moveable to use as a camera target
 	ScriptReserved_AttachObjCamera, &Moveable::AttachObjCamera,
 
 /// Borrow animation from an object
