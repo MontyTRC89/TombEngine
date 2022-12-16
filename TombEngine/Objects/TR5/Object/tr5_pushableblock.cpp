@@ -199,7 +199,7 @@ void PushableBlockControl(short itemNumber)
 	switch (LaraItem->Animation.AnimNumber)
 	{
 	case LA_PUSHABLE_PUSH:
-		displaceBox -= CLICK(0.4f);
+		displaceBox -= LARA_PUSHABLE_PUSH_BBOX_Z2;
 
 		if (LaraItem->Animation.FrameNumber == g_Level.Anims[LaraItem->Animation.AnimNumber].frameBase)
 		{
@@ -286,7 +286,7 @@ void PushableBlockControl(short itemNumber)
 		break;
 
 	case LA_PUSHABLE_PULL:
-		displaceBox -= CLICK(0.2f);
+		displaceBox -= LARA_PUSHABLE_PULL_BBOX_Z2;
 
 		if (LaraItem->Animation.FrameNumber == g_Level.Anims[LaraItem->Animation.AnimNumber].frameBase)
 		{

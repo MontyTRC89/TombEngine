@@ -84,6 +84,9 @@ constexpr auto WADE_DEPTH		   = STEPUP_HEIGHT;
 constexpr auto SWIM_DEPTH		   = CLICK(3) - 38;
 constexpr auto SLOPE_DIFFERENCE	   = 60;
 
+constexpr auto LARA_PUSHABLE_PUSH_BBOX_Z2 = 1108 - BLOCK(1);
+constexpr auto LARA_PUSHABLE_PULL_BBOX_Z2 = BLOCK(1) - 944;
+
 extern LaraInfo Lara;
 extern ItemInfo* LaraItem;
 extern CollisionInfo LaraCollision;
