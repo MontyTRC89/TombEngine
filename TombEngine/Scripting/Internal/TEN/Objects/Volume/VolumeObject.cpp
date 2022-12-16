@@ -178,7 +178,7 @@ bool Volume::IsMoveableInside(const Moveable& moveable)
 			short id = std::get<short>(entry.Activator);
 			auto& mov = std::make_unique<Moveable>(id);
 
-			if (mov.get() == &moveable)
+			if (mov.get()->GetName() == moveable.GetName())
 				return true;
 		}
 	}
