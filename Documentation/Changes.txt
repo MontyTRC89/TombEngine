@@ -22,8 +22,7 @@ Version 1.0.4
 * SAS enhancements:
     - Fix grenade shooting.
     - Fix AI_MODIFY and AI_GUARD behaviour.
-* Fix TR5 Autogun Rotation.
-* Fix Choppy camera movement.
+* Fix choppy camera movement in several cases.
 * Fix Lara's vertical position when shimmying around steep slope corners.
 * Fix legacy pickup triggers not working in certain cases.
 * Fix crawl pickup not actually doing any pickups.
@@ -38,6 +37,7 @@ Version 1.0.4
 * Fix original bug with incorrect climb up behaviour on ladders under sloped ceilings.
 * Fix original bug with reassigned control keys still triggering default events.
 * Fix TR1 centaur bubble targeting.
+* Fix TR5 autogun rotation.
 * Fix occasional wrong rollingball collision in narrow pits.
 * Fix classic rollingball and big rollingball not behaving properly.
 * Fix caustics not turning off in display settings.
