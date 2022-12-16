@@ -32,7 +32,7 @@
 #include "Game/room.h"
 #include "Game/savegame.h"
 #include "Game/spotcam.h"
-#include "Math/Random.h"
+#include "Math/Math.h"
 #include "Objects/Effects/tr4_locusts.h"
 #include "Objects/Generic/Object/objects.h"
 #include "Objects/Generic/Object/rope.h"
@@ -65,7 +65,7 @@ using namespace TEN::Entities::Switches;
 using namespace TEN::Entities::TR4;
 using namespace TEN::Floordata;
 using namespace TEN::Input;
-using namespace TEN::Math::Random;
+using namespace TEN::Math;
 using namespace TEN::Renderer;
 
 int GameTimer       = 0;
@@ -357,12 +357,12 @@ void KillMoveEffects()
 
 int GetRandomControl()
 {
-	return GenerateInt();
+	return Random::GenerateInt();
 }
 
 int GetRandomDraw()
 {
-	return GenerateInt();
+	return Random::GenerateInt();
 }
 
 void CleanUp()

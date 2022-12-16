@@ -626,10 +626,11 @@ Vec3 Moveable::GetJointPos(int jointIndex) const
 // (e.g. 90 degrees = -270 degrees = 450 degrees)
 Rotation Moveable::GetRot() const
 {
-	return {
-		static_cast<int>(TO_DEGREES(m_item->Pose.Orientation.x)) % 360,
-		static_cast<int>(TO_DEGREES(m_item->Pose.Orientation.y)) % 360,
-		static_cast<int>(TO_DEGREES(m_item->Pose.Orientation.z)) % 360
+	return 
+	{
+		TO_DEGREES(m_item->Pose.Orientation.x),
+		TO_DEGREES(m_item->Pose.Orientation.y),
+		TO_DEGREES(m_item->Pose.Orientation.z)
 	};
 }
 

@@ -5,6 +5,7 @@ Version 1.0.4
 * Add ability to burn enemies with FLAME_EMITTER_1 and death blocks.
 * Add wireframe mode and other visual debug information (switch by F10/F11 debug page scroll hotkeys).
 * Activate Lara-bound volume triggers with mounted vehicles.
+* Allow multiple individual activators for the same volume at the same time.
 * Remove TRC remnant which added HK to inventory if pistols weren't available.
 * Change default shatter sound to TR4_SMASH_ROCK (tomb4 default).
 * Reduce idle pose time from 30 to 20 seconds.
@@ -50,6 +51,7 @@ Version 1.0.4
 * Fix crash if there is an attempt to display a string with missing characters.
 
 Lua API changes:
+* Add new Volume class and several methods for it.
 * Add new Moveable functions: GetEffect, SetEffect and SetCustomEffect (for colored fire).
 * Add new Lara functions: GetTarget, GetVehicle and TorchIsLit.
 * Remove Lara functions: SetOnFire and GetOnFire (replaced with GetEffect and SetEffect).
@@ -63,6 +65,7 @@ Lua API changes:
 * Fix action key script functions not fully working in some cases.
 * Fix mounted vehicles ignoring Disable, Shatter and Explode script commands.
 * Fix SetPosition command not updating room number correctly.
+* Fix Rotation class using integers under the hood which prevented using fractional rotation values.
 
 Version 1.0.3
 =============
