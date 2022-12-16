@@ -46,7 +46,7 @@ struct MESH_INFO
 	short flags;
 	Vector4 color;
 	short HitPoints;
-	std::string luaName;
+	std::string Name;
 	bool Dirty;
 };
 
@@ -145,7 +145,7 @@ void AddRoomFlipItems(ROOM_INFO* room);
 void RemoveRoomFlipItems(ROOM_INFO* room);
 bool IsObjectInRoom(short roomNumber, short objectNumber);
 bool IsPointInRoom(Vector3i pos, int roomNumber);
-int FindRoomNumber(Vector3i pos);
+int FindRoomNumber(Vector3i pos, int startRoom = NO_ROOM);
 Vector3i GetRoomCenter(int roomNumber);
 int IsRoomOutside(int x, int y, int z);
 std::set<int> GetRoomList(int roomNumber);

@@ -104,6 +104,7 @@ void LogicHandler::ResetGameTables()
 }
 
 /*** Register a function as a callback.
+@advancedDesc
 Possible values for CallbackPoint:
 	PRECONTROLPHASE -- will be called immediately before OnControlPhase
 	POSTCONTROLPHASE -- will be called immediately after OnControlPhase
@@ -165,12 +166,12 @@ void LogicHandler::ResetLevelTables()
 	(*state)[ScriptReserved_LevelVars][ScriptReserved_Engine] = sol::table{ *state, sol::create };
 }
 
-sol::object LogicHandler::GetLevelFuncsMember(sol::table tab, std::string const& luaName)
+sol::object LogicHandler::GetLevelFuncsMember(sol::table tab, std::string const& name)
 {
 	std::string partName = tab.raw_get<std::string>(strKey);
 	auto & theMap = m_levelFuncs_tablesOfNames[partName];
 
-	auto fullNameIt = theMap.find(luaName);
+	auto fullNameIt = theMap.find(name);
 	if (fullNameIt != std::cend(theMap))
 	{
 		std::string_view key = fullNameIt->second;
@@ -207,21 +208,21 @@ sol::protected_function_result LogicHandler::CallLevelFunc(std::string const & n
 	return r;
 }
 
-bool LogicHandler::SetLevelFuncsMember(sol::table tab, std::string const& luaName, sol::object value)
+bool LogicHandler::SetLevelFuncsMember(sol::table tab, std::string const& name, sol::object value)
 {
 	if (sol::type::lua_nil == value.get_type())
 	{
 		std::string error{ "Tried to set " + std::string{ScriptReserved_LevelFuncs} + " member " };
-		error += luaName + " to nil; this not permitted at this time.";
+		error += name + " to nil; this not permitted at this time.";
 		return ScriptAssert(false, error);
 	}
 	else if (sol::type::function == value.get_type())
 	{
 		// Add the name to the table of names
 		auto partName = tab.raw_get<std::string>(strKey);
-		auto fullName = partName + "." + luaName;
+		auto fullName = partName + "." + name;
 		auto& parentNameTab = m_levelFuncs_tablesOfNames[partName];
-		parentNameTab.insert_or_assign(luaName, fullName);
+		parentNameTab.insert_or_assign(name, fullName);
 
 		// Create a LevelFunc userdata and add that too
 		LevelFunc levelFuncObject;
@@ -236,13 +237,13 @@ bool LogicHandler::SetLevelFuncsMember(sol::table tab, std::string const& luaNam
 	{
 		// Create and add a new name map
 		std::unordered_map<std::string, std::string> newNameMap;
-		auto fullName = tab.raw_get<std::string>(strKey) + "." + luaName;
+		auto fullName = tab.raw_get<std::string>(strKey) + "." + name;
 		m_levelFuncs_tablesOfNames.insert_or_assign(fullName, newNameMap);
 
 		// Create a new table to put in the LevelFuncs hierarchy
-		auto newLevelFuncsTab = MakeSpecialTable(m_handler.GetState(), luaName, &LogicHandler::GetLevelFuncsMember, &LogicHandler::SetLevelFuncsMember, this);
+		auto newLevelFuncsTab = MakeSpecialTable(m_handler.GetState(), name, &LogicHandler::GetLevelFuncsMember, &LogicHandler::SetLevelFuncsMember, this);
 		newLevelFuncsTab.raw_set(strKey, fullName);
-		tab.raw_set(luaName, newLevelFuncsTab);
+		tab.raw_set(name, newLevelFuncsTab);
 
 		// "populate" the new table. This will trigger the __newindex metafunction and will
 		// thus call this function recursively, handling all subtables and functions.
@@ -253,7 +254,7 @@ bool LogicHandler::SetLevelFuncsMember(sol::table tab, std::string const& luaNam
 	}
 	else{
 		std::string error{ "Failed to add " };
-		error += luaName + " to " + ScriptReserved_LevelFuncs + " or one of its tables; it must be a function or a table of functions.";
+		error += name + " to " + ScriptReserved_LevelFuncs + " or one of its tables; it must be a function or a table of functions.";
 		return ScriptAssert(false, error);
 	}
 	return true;
@@ -628,12 +629,12 @@ void LogicHandler::ExecuteFunction(std::string const& name, short idOne, short i
 
 }
 
-void LogicHandler::ExecuteFunction(std::string const& name, TEN::Control::Volumes::VolumeTriggerer triggerer, std::string const& arguments)
+void LogicHandler::ExecuteFunction(std::string const& name, TEN::Control::Volumes::VolumeActivator activator, std::string const& arguments)
 {
 	sol::protected_function func = (*m_handler.GetState())[ScriptReserved_LevelFuncs][name.c_str()];
-	if (std::holds_alternative<short>(triggerer))
+	if (std::holds_alternative<short>(activator))
 	{
-		func(std::make_unique<Moveable>(std::get<short>(triggerer), true), arguments);
+		func(std::make_unique<Moveable>(std::get<short>(activator), true), arguments);
 	}
 	else
 	{
@@ -709,6 +710,7 @@ TombEngine uses the following tables for specific things.
 /*** A table with level-specific data which will be saved and loaded.
 This is for level-specific information that you want to store in saved games.
 
+@advancedDesc
 For example, you may have a level with a custom puzzle where Lara has
 to kill exactly seven enemies to open a door to a secret. You could use
 the following line each time an enemy is killed:
@@ -731,6 +733,7 @@ __LevelVars.Engine is a reserved table used internally by TombEngine's libs. Do 
 This is for information not specific to any level, but which concerns your whole
 levelset or game, that you want to store in saved games.
 
+@advancedDesc
 For example, you may wish to have a final boss say a specific voice line based on
 a choice the player made in a previous level. In the level with the choice, you could
 write:
@@ -752,6 +755,7 @@ __GameVars.Engine is a reserved table used internally by TombEngine's libs. Do n
 
 /*** A table nested table system for level-specific functions.
 
+@advancedDesc
 This serves a few purposes: it holds the level callbacks (listed below) as well as
 any trigger functions you might have specified. For example, if you give a trigger
 a Lua name of "my_trigger" in Tomb Editor, you will have to implement it as a member

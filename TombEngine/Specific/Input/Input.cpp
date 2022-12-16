@@ -7,7 +7,6 @@
 #include <OISJoyStick.h>
 #include <OISKeyboard.h>
 
-#include "Game/camera.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
@@ -15,8 +14,10 @@
 #include "Game/savegame.h"
 #include "Renderer/Renderer11.h"
 #include "Sound/sound.h"
+#include "Specific/winmain.h"
 
 using namespace OIS;
+
 using std::vector;
 using TEN::Renderer::g_Renderer;
 
@@ -79,10 +80,11 @@ namespace TEN::Input
 	Effect*		   OisEffect	   = nullptr;
 
 	// Globals
-	RumbleData			RumbleInfo = {};
-	vector<InputAction>	ActionMap  = {};
-	vector<bool>		KeyMap	   = {};
-	vector<float>		AxisMap    = {};
+	RumbleData			RumbleInfo  = {};
+	vector<InputAction>	ActionMap   = {};
+	vector<QueueState>  ActionQueue = {};
+	vector<bool>		KeyMap	    = {};
+	vector<float>		AxisMap     = {};
 
 	int DbInput = 0;
 	int TrInput = 0;
@@ -131,7 +133,10 @@ namespace TEN::Input
 		TENLog("Initializing input system...", LogLevel::Info);
 
 		for (int i = 0; i < (int)ActionID::Count; i++)
+		{
 			ActionMap.push_back(InputAction((ActionID)i));
+			ActionQueue.push_back(QueueState::None);
+		}
 
 		KeyMap.resize(MAX_INPUT_SLOTS);
 		AxisMap.resize(InputAxis::Count);
@@ -208,13 +213,37 @@ namespace TEN::Input
 		TrInput = 0;
 	}
 
+	void ApplyActionQueue()
+	{
+		for (int i = 0; i < KEY_COUNT; i++)
+		{
+			if (ActionQueue[i] != QueueState::None)
+			{
+				if (ActionQueue[i] == QueueState::Push)
+				{
+					ActionMap[i].Update(true);
+				}
+				else
+				{
+					ActionMap[i].Clear();
+				}
+			}
+		}
+	}
+
+	void ClearActionQueue()
+	{
+		for (auto& queue : ActionQueue)
+			queue = QueueState::None;
+	}
+
 	bool LayoutContainsIndex(unsigned int index)
 	{
-		for (int l = 0; l < 2; l++)
+		for (int layout = 1; layout >= 0; layout--)
 		{
 			for (int i = 0; i < KEY_COUNT; i++)
 			{
-				if (KeyboardLayout[l][i] == index)
+				if (KeyboardLayout[layout][i] == index)
 					return true;
 			}
 		}
@@ -222,11 +251,30 @@ namespace TEN::Input
 		return false;
 	}
 
+	int WrapSimilarKeys(int source)
+	{
+		// Merge right and left Ctrl, Shift, and Alt.
+
+		switch (source)
+		{
+		case KC_LCONTROL:
+			return KC_RCONTROL;
+
+		case KC_LSHIFT:
+			return KC_RSHIFT;
+
+		case KC_LMENU:
+			return KC_RMENU;
+		}
+
+		return source;
+	}
+
 	void DefaultConflict()
 	{
 		for (int i = 0; i < KEY_COUNT; i++)
 		{
-			short key = KeyboardLayout[0][i];
+			int key = KeyboardLayout[0][i];
 
 			ConflictingKeys[i] = false;
 
@@ -383,14 +431,14 @@ namespace TEN::Input
 			{
 				if (!OisKeyboard->isKeyDown((KeyCode)i))
 				{
-					KeyMap[i] = false;
 					continue;
 				}
 
-				KeyMap[i] = true;
+				int key = WrapSimilarKeys(i);
+				KeyMap[key] = true;
 
 				// Register directional discrete keypresses as max analog axis values.
-				SetDiscreteAxisValues(i);
+				SetDiscreteAxisValues(key);
 			}
 		}
 		catch (OIS::Exception& ex)
@@ -403,35 +451,13 @@ namespace TEN::Input
 	{
 		for (int layout = 1; layout >= 0; layout--)
 		{
-			short key = KeyboardLayout[layout][number];
+			int key = KeyboardLayout[layout][number];
+			
+			if (layout == 0 && ConflictingKeys[number])
+				continue;
 
 			if (KeyMap[key])
 				return true;
-
-			// Mirror Ctrl, Shift, and Alt.
-			switch (key)
-			{
-			case KC_RCONTROL:
-				return KeyMap[KC_LCONTROL];
-
-			case KC_LCONTROL:
-				return KeyMap[KC_RCONTROL];
-
-			case KC_RSHIFT:
-				return KeyMap[KC_LSHIFT];
-
-			case KC_LSHIFT:
-				return KeyMap[KC_RSHIFT];
-
-			case KC_RMENU:
-				return KeyMap[KC_LMENU];
-
-			case KC_LMENU:
-				return KeyMap[KC_RMENU];
-			}
-
-			if (ConflictingKeys[number])
-				return false;
 		}
 
 		return false;
@@ -574,6 +600,9 @@ namespace TEN::Input
 		}
 		dbFullscreen = ((KeyMap[KC_LMENU] || KeyMap[KC_RMENU]) && KeyMap[KC_RETURN]) ? false : true;
 
+		if (!DebugMode)
+			return;
+
 		// Handle debug page switch.
 		static bool dbDebugPage = true;
 		if ((KeyMap[KC_F10] || KeyMap[KC_F11]) && dbDebugPage)
@@ -629,16 +658,25 @@ namespace TEN::Input
 		RumbleInfo.LastPower = RumbleInfo.Power;
 	}
 
-	void UpdateInputActions(ItemInfo* item)
+	void UpdateInputActions(ItemInfo* item, bool applyQueue)
 	{
 		ClearInputData();
 		UpdateRumble();
 		ReadKeyboard();
 		ReadGameController();
+		DefaultConflict();
 
 		// Update action map (mappable actions only).
 		for (int i = 0; i < KEY_COUNT; i++)
-			ActionMap[i].Update(Key(i) ? true : false); // TODO: Poll analog value of key. Potentially, any can be a trigger.
+		{
+			// TODO: Poll analog value of key. Potentially, any can be a trigger.
+			ActionMap[i].Update(Key(i) ? true : false);
+		}
+
+		if (applyQueue)
+		{
+			ApplyActionQueue();
+		}
 
 		// Additional handling.
 		HandlePlayerHotkeys(item);
@@ -658,6 +696,9 @@ namespace TEN::Input
 	{
 		for (auto& action : ActionMap)
 			action.Clear();
+
+		for (auto& queue : ActionQueue)
+			queue = QueueState::None;
 
 		DbInput = 0;
 		TrInput = 0;

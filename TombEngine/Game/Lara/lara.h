@@ -1,6 +1,7 @@
 #pragma once
 #include "Game/control/control.h"
 #include "Game/Lara/lara_struct.h"
+#include "Specific/clock.h"
 
 struct CollisionInfo;
 struct ItemInfo;
@@ -64,8 +65,8 @@ constexpr auto LARA_TREAD_VELOCITY_MAX		   = 17.5f;
 constexpr auto LARA_SWIM_VELOCITY_MAX		   = 50.0f;
 constexpr auto LARA_SWIM_INTERTIA_VELOCITY_MIN = 33.5f;
 
-constexpr auto LARA_POSITION_ADJUST_MAX_TIME = FPS * 3;	 // 30 frames * 3 = 3 seconds allowed for position adjustment.
-constexpr auto LARA_POSE_TIME				 = FPS * 30; // 30 frames * 30 = 30 seconds to AFK pose.
+constexpr auto LARA_POSITION_ADJUST_MAX_TIME = 3 * FPS;	 // 3 seconds allowed for position adjustment.
+constexpr auto LARA_POSE_TIME				 = 20 * FPS; // 20 seconds to AFK pose.
 constexpr auto LARA_RUN_JUMP_TIME			 = 22;		 // Frames to count before a running jump is possible.
 constexpr auto LARA_SPRINT_JUMP_TIME		 = 46;		 // Frames to count before a sprint jump is possible.
 
@@ -102,4 +103,5 @@ void LaraWaterSurface(ItemInfo* item, CollisionInfo* coll);
 void LaraUnderwater(ItemInfo* item, CollisionInfo* coll);
 void LaraCheat(ItemInfo* item, CollisionInfo* coll);
 void AnimateLara(ItemInfo* item);
-void UpdateLaraRoom(ItemInfo* item, int height, int xOffset = 0, int zOffset = 0);
+void UpdateLara(ItemInfo* item, bool isTitle);
+bool UpdateLaraRoom(ItemInfo* item, int height, int xOffset = 0, int zOffset = 0);

@@ -51,7 +51,6 @@ void DrawBox(int boxIndex, Vector3 color)
 	auto  y = currBox.height - CLICK(1);
 	float z = ((float)currBox.top + (float)(currBox.bottom - currBox.top) / 2.0f) * 1024.0f;
 
-
 	auto center = Vector3(z, y, x);
 	auto corner = Vector3(currBox.bottom * SECTOR(1), currBox.height + CLICK(1), currBox.right * SECTOR(1));
 	auto extents = (corner - center) * 0.9f;
@@ -762,13 +761,9 @@ int CreatureAnimation(short itemNumber, short angle, short tilt)
 	if (!item->IsCreature())
 		return false;
 
-	auto* creature = GetCreatureInfo(item);
-
 	AnimateItem(item);
 	ProcessSectorFlags(item);
-
-	if (creature->Poisoned && item->HitPoints > 1 && (GlobalCounter & 0x1F) == 0x1F)
-		item->HitPoints--;
+	CreatureHealth(item);
 
 	if (item->Status == ITEM_DEACTIVATED)
 	{
@@ -777,6 +772,24 @@ int CreatureAnimation(short itemNumber, short angle, short tilt)
 	}
 
 	return CreaturePathfind(item, angle, tilt);
+}
+
+void CreatureHealth(ItemInfo* item)
+{
+	auto* creature = GetCreatureInfo(item);
+
+	if (creature->Poisoned && item->HitPoints > 1 && (GlobalCounter & 0x1F) == 0x1F)
+		item->HitPoints--;
+
+	if (!Objects[item->ObjectNumber].waterCreature &&
+		TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, &g_Level.Rooms[item->RoomNumber]))
+	{
+		auto bounds = GameBoundingBox(item);
+		auto height = item->Pose.Position.y - GetWaterHeight(item);
+
+		if (abs(bounds.Y1 + bounds.Y2) < height)
+			DoDamage(item, INT_MAX);
+	}
 }
 
 void CreatureDie(short itemNumber, bool explode)
@@ -1279,8 +1292,7 @@ void GetAITarget(CreatureInfo* creature)
 			abs(enemy->Pose.Position.y - item->Pose.Position.y) < REACHED_GOAL_RADIUS &&
 			abs(enemy->Pose.Position.z - item->Pose.Position.z) < REACHED_GOAL_RADIUS)
 		{
-			TestTriggers(enemy, true);
-
+			TestTriggers(enemy, true);		
 			creature->ReachedGoal = true;
 			creature->Enemy = LaraItem;
 			item->AIBits &= ~(AMBUSH /* | MODIFY*/);

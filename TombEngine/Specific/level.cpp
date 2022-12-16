@@ -6,7 +6,6 @@
 
 #include "Game/animation.h"
 #include "Game/animation.h"
-#include "Game/camera.h"
 #include "Game/control/box.h"
 #include "Game/control/control.h"
 #include "Game/control/volume.h"
@@ -757,7 +756,9 @@ void ReadRooms()
 		room.mesh.reserve(numStatics);
 		for (int j = 0; j < numStatics; j++)
 		{
-			auto & mesh = room.mesh.emplace_back();
+			auto& mesh = room.mesh.emplace_back();
+
+			mesh.roomNumber = i;
 			mesh.pos.Position.x = ReadInt32();
 			mesh.pos.Position.y = ReadInt32();
 			mesh.pos.Position.z = ReadInt32();
@@ -769,40 +770,35 @@ void ReadRooms()
 			mesh.color = ReadVector4();
 			mesh.staticNumber = ReadUInt16();
 			mesh.HitPoints = ReadInt16();
-			mesh.luaName = ReadString();
+			mesh.Name = ReadString();
 
-			mesh.roomNumber = i;
-			g_GameScriptEntities->AddName(mesh.luaName, mesh);
+			g_GameScriptEntities->AddName(mesh.Name, mesh);
 		}
 
 		int numTriggerVolumes = ReadInt32();
+
+		// Reserve in advance so the vector doesn't resize itself and leave anything
+		// in the script name-to-reference map obsolete.
+		room.triggerVolumes.reserve(numTriggerVolumes);
 		for (int j = 0; j < numTriggerVolumes; j++)
 		{
-			TriggerVolume volume;
+			auto& volume = room.triggerVolumes.emplace_back();
 
-			volume.Type = (TriggerVolumeType)ReadInt32();
+			volume.Type = (VolumeType)ReadInt32();
 
-			volume.Position.x = ReadFloat();
-			volume.Position.y = ReadFloat();
-			volume.Position.z = ReadFloat();
-
-			volume.Rotation.x = ReadFloat();
-			volume.Rotation.y = ReadFloat();
-			volume.Rotation.z = ReadFloat();
-			volume.Rotation.w = ReadFloat();
-
-			volume.Scale.x = ReadFloat();
-			volume.Scale.y = ReadFloat();
-			volume.Scale.z = ReadFloat();
+			auto pos = Vector3{ ReadFloat(), ReadFloat(), ReadFloat() };
+			auto rot = Quaternion{ ReadFloat(), ReadFloat(), ReadFloat(), ReadFloat() };
+			auto scale = Vector3{ ReadFloat(), ReadFloat(), ReadFloat() };
 
 			volume.Name = ReadString();
 			volume.EventSetIndex = ReadInt32();
 
-			volume.Status = TriggerStatus::Outside;
-			volume.Box    = BoundingOrientedBox(volume.Position, volume.Scale, volume.Rotation);
-			volume.Sphere = BoundingSphere(volume.Position, volume.Scale.x);
+			volume.Box    = BoundingOrientedBox(pos, scale, rot);
+			volume.Sphere = BoundingSphere(pos, scale.x);
 
-			room.triggerVolumes.push_back(volume);
+			volume.StateQueue.reserve(VOLUME_STATE_QUEUE_SIZE);
+
+			g_GameScriptEntities->AddName(volume.Name, volume);
 		}
 
 		room.flippedRoom = ReadInt32();
@@ -960,10 +956,18 @@ void LoadAIObjects()
 		obj.triggerFlags = ReadInt16();
 		obj.flags = ReadInt16();
 		obj.boxNumber = ReadInt32();
-		obj.luaName = ReadString();
+		obj.Name = ReadString();
 
-		g_GameScriptEntities->AddName(obj.luaName, obj);
+		g_GameScriptEntities->AddName(obj.Name, obj);
 	}
+}
+
+void LoadEvent(VolumeEvent& event)
+{
+	event.Mode = (VolumeEventMode)ReadInt32();
+	event.Function = ReadString();
+	event.Data = ReadString();
+	event.CallCounter = ReadInt32();
 }
 
 void LoadEventSets()
@@ -976,22 +980,11 @@ void LoadEventSets()
 		auto eventSet = VolumeEventSet();
 
 		eventSet.Name = ReadString();
-		eventSet.Activators = ReadInt32();
+		eventSet.Activators = (VolumeActivatorFlags)ReadInt32();
 
-		eventSet.OnEnter.Mode = (VolumeEventMode)ReadInt32();
-		eventSet.OnEnter.Function = ReadString();
-		eventSet.OnEnter.Data = ReadString();
-		eventSet.OnEnter.CallCounter = ReadInt32();
-
-		eventSet.OnInside.Mode = (VolumeEventMode)ReadInt32();
-		eventSet.OnInside.Function = ReadString();
-		eventSet.OnInside.Data = ReadString();
-		eventSet.OnInside.CallCounter = ReadInt32();
-
-		eventSet.OnLeave.Mode = (VolumeEventMode)ReadInt32();
-		eventSet.OnLeave.Function = ReadString();
-		eventSet.OnLeave.Data = ReadString();
-		eventSet.OnLeave.CallCounter = ReadInt32();
+		LoadEvent(eventSet.OnEnter);
+		LoadEvent(eventSet.OnInside);
+		LoadEvent(eventSet.OnLeave);
 
 		g_Level.EventSets.push_back(eventSet);
 	}
@@ -1142,7 +1135,7 @@ unsigned int _stdcall LoadLevel(void* data)
 
 		// Initialise the game
 		InitialiseGameFlags();
-		InitialiseLara(!(InitialiseGame || CurrentLevel == 1));
+		InitialiseLara(!(InitialiseGame || CurrentLevel <= 1));
 		InitializeNeighborRoomList();
 		GetCarriedItems();
 		GetAIPickups();

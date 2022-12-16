@@ -152,6 +152,9 @@ void InitialiseCamera()
 
 	UseForcedFixedCamera = 0;
 	CalculateCamera();
+
+	// Fade in screen.
+	SetScreenFadeIn(FADE_SCREEN_SPEED);
 }
 
 void MoveCamera(GameVector* ideal, int speed)
@@ -1873,12 +1876,8 @@ void ItemsCollideCamera()
 		if (TestBoundsCollideCamera(bounds, item->Pose, CAMERA_RADIUS))
 			ItemPushCamera(&bounds, &item->Pose, rad);
 
-#ifdef _DEBUG
-		TEN::Renderer::g_Renderer.AddDebugBox(
-			bounds.ToBoundingOrientedBox(item->Pose),
-			Vector4(1.0f, 0.0f, 0.0f, 1.0f),
-			RENDERER_DEBUG_PAGE::DIMENSION_STATS);
-#endif
+		TEN::Renderer::g_Renderer.AddDebugBox(bounds.ToBoundingOrientedBox(item->Pose),
+			Vector4(1.0f, 0.0f, 0.0f, 1.0f), RENDERER_DEBUG_PAGE::LARA_STATS);
 	}
 
 	itemList.clear(); // Done
@@ -1904,10 +1903,8 @@ void ItemsCollideCamera()
 		if (TestBoundsCollideCamera(bounds, mesh->pos, CAMERA_RADIUS))
 			ItemPushCamera(&bounds, &mesh->pos, rad);
 
-#ifdef _DEBUG
 		TEN::Renderer::g_Renderer.AddDebugBox(bounds.ToBoundingOrientedBox(mesh->pos),
-			Vector4(1.0f, 0.0f, 0.0f, 1.0f), RENDERER_DEBUG_PAGE::DIMENSION_STATS);
-#endif
+			Vector4(1.0f, 0.0f, 0.0f, 1.0f), RENDERER_DEBUG_PAGE::LARA_STATS);
 	}
 
 	staticList.clear(); // Done
@@ -2052,8 +2049,8 @@ void HandleOptics(ItemInfo* item)
 	{
 		if (Lara.Control.HandStatus == HandStatus::WeaponReady &&
 			((Lara.Control.Weapon.GunType == LaraWeaponType::HK && Lara.Weapons[(int)LaraWeaponType::HK].HasLasersight) ||
-				(Lara.Control.Weapon.GunType == LaraWeaponType::Revolver && Lara.Weapons[(int)LaraWeaponType::Revolver].HasLasersight) ||
-				(Lara.Control.Weapon.GunType == LaraWeaponType::Crossbow && Lara.Weapons[(int)LaraWeaponType::Crossbow].HasLasersight)))
+			 (Lara.Control.Weapon.GunType == LaraWeaponType::Revolver && Lara.Weapons[(int)LaraWeaponType::Revolver].HasLasersight) ||
+			 (Lara.Control.Weapon.GunType == LaraWeaponType::Crossbow && Lara.Weapons[(int)LaraWeaponType::Crossbow].HasLasersight)))
 		{
 			BinocularRange = 128;
 			BinocularOldCamera = Camera.oldType;
