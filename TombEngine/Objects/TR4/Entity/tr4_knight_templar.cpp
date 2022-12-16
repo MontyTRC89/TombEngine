@@ -2,6 +2,7 @@
 #include "Objects/TR4/Entity/tr4_knight_templar.h"
 
 #include "Game/animation.h"
+#include "Game/collision/collide_item.h"
 #include "Game/control/box.h"
 #include "Game/effects/debris.h"
 #include "Game/effects/effects.h"
@@ -55,6 +56,24 @@ namespace TEN::Entities::TR4
 		KTEMPLAR_ANIM_WALK_FORWARD_LEFT_2 = 11,
 		KTEMPLAR_ANIM_WALK_FORWARD_RIGHT_2 = 12
 	};
+
+	void SetupKnightTemplar(ObjectInfo& object)
+	{
+		object.initialise = InitialiseKnightTemplar;
+		object.control = KnightTemplarControl;
+		object.collision = CreatureCollision;
+		object.shadowType = ShadowMode::All;
+		object.HitPoints = 15;
+		object.hitEffect = HIT_SMOKE;
+		object.pivotLength = 50;
+		object.radius = 128;
+		object.intelligent = true;
+		object.undead = true;
+		object.ZoneType = ZoneType::Basic;
+
+		g_Level.Bones[object.boneIndex + 6 * 4] |= ROT_X | ROT_Y;
+		g_Level.Bones[object.boneIndex + 7 * 4] |= ROT_Y;
+	}
 
 	void InitialiseKnightTemplar(short itemNumber)
 	{

@@ -2,9 +2,14 @@
 
 struct CollisionInfo;
 struct ItemInfo;
+struct ObjectInfo;
 
 namespace TEN::Entities::TR4
 {
+	void SetupSas(ObjectInfo& object);
+	void SetupInjuredSas(ObjectInfo& object);
+	void SetupSasDraggableSas(ObjectInfo& object);
+
 	void InitialiseSas(short itemNumber);
 	void InitialiseInjuredSas(short itemNumber);
 

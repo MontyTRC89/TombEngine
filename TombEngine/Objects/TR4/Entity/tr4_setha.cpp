@@ -3,6 +3,7 @@
 
 #include "Game/animation.h"
 #include "Game/camera.h"
+#include "Game/collision/collide_item.h"
 #include "Game/collision/collide_room.h"
 #include "Game/control/control.h"
 #include "Game/effects/effects.h"
@@ -107,6 +108,21 @@ namespace TEN::Entities::TR4
 		SETH_ANIM_HOVER_IDLE_TO_LAND = 27,
 		SETH_ANIM_HOVER_IDLE = 28
 	};
+
+	void SetupSeth(ObjectInfo& object)
+	{
+		object.initialise = InitialiseSeth;
+		object.control = SethControl;
+		object.collision = CreatureCollision;
+		object.shadowType = ShadowMode::All;
+		object.HitPoints = 500;
+		object.hitEffect = HIT_NONE;
+		object.pivotLength = 50;
+		object.radius = 341;
+		object.intelligent = true;
+		object.undead = true;
+		object.ZoneType = ZoneType::Basic;
+	}
 
 	void InitialiseSeth(short itemNumber)
 	{

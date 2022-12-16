@@ -18,6 +18,7 @@
 #include "Game/people.h"
 #include "Game/misc.h"
 #include "Math/Math.h"
+#include "Objects/Generic/Object/objects.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
@@ -102,6 +103,41 @@ namespace TEN::Entities::TR4
 		SAS_ANIM_BLIND = 28,
 		SAS_ANIM_BLIND_TO_STAND = 29
 	};
+
+	void SetupSas(ObjectInfo& object)
+	{
+		object.initialise = InitialiseSas;
+		object.control = SasControl;
+		object.collision = CreatureCollision;
+		object.shadowType = ShadowMode::All;
+		object.biteOffset = 10;
+		object.HitPoints = 40;
+		object.hitEffect = HIT_BLOOD;
+		object.pivotLength = 50;
+		object.radius = 102;
+		object.intelligent = true;
+		object.ZoneType = ZoneType::HumanClassic;
+
+		g_Level.Bones[object.boneIndex] |= ROT_Y;
+		g_Level.Bones[object.boneIndex] |= ROT_X;
+		g_Level.Bones[object.boneIndex + 28 * 4] |= ROT_Y;
+		g_Level.Bones[object.boneIndex + 28 * 4] |= ROT_X;
+	}
+
+	void SetupInjuredSas(ObjectInfo& object)
+	{
+		object.initialise = InitialiseInjuredSas;
+		object.control = InjuredSasControl;
+		object.collision = ObjectCollision;
+		object.hitEffect = HIT_BLOOD;
+		object.ZoneType = ZoneType::Basic;
+	}
+
+	void SetupSasDraggableSas(ObjectInfo& object)
+	{
+		object.control = AnimatingControl;
+		object.collision = SasDragBlokeCollision;
+	}
 
 	void InitialiseSas(short itemNumber)
 	{
