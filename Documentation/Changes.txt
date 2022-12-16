@@ -19,9 +19,9 @@ Version 1.0.4
     - Restored spark effects.
     - Can destroy statics in shatter slots.
 	- Fix crash when attacking.
-* SAS fix:
-    - Fix grenade shooting
-    - Fix AI_MODIFY and AI_GUARD for SAS
+* SAS enhancements:
+    - Fix grenade shooting.
+    - Fix AI_MODIFY and AI_GUARD behaviour.
 * Fix TR5 Autogun Rotation.
 * Fix Choppy camera movement.
 * Fix Lara's vertical position when shimmying around steep slope corners.
@@ -66,6 +66,7 @@ Lua API changes:
 * Fix mounted vehicles ignoring Disable, Shatter and Explode script commands.
 * Fix SetPosition command not updating room number correctly.
 * Fix Rotation class using integers under the hood which prevented using fractional rotation values.
+* Fix distance tests failing on a very high distances.
 
 Version 1.0.3
 =============
