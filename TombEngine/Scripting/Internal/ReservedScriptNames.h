@@ -19,6 +19,7 @@ static constexpr char ScriptReserved_Sink[]				= "Sink";
 static constexpr char ScriptReserved_SoundSource[]		= "SoundSource";
 static constexpr char ScriptReserved_AIObject[]			= "AIObject";
 static constexpr char ScriptReserved_Volume[]			= "Volume";
+static constexpr char ScriptReserved_Room[]				= "Room";
 static constexpr char ScriptReserved_DisplayString[]	= "DisplayString";
 static constexpr char ScriptReserved_Vec3[]				= "Vec3";
 static constexpr char ScriptReserved_Rotation[]			= "Rotation";
@@ -115,6 +116,9 @@ static constexpr char ScriptReserved_AttachObjCamera[]		= "AttachObjCamera";
 static constexpr char ScriptReserved_AnimFromObject[]		= "AnimFromObject";
 static constexpr char ScriptReserved_ClearActivators[]		= "ClearActivators";
 static constexpr char ScriptReserved_IsMoveableInside[]		= "IsMoveableInside";
+static constexpr char ScriptReserved_GetFlag[]				= "GetFlag";
+static constexpr char ScriptReserved_SetFlag[]				= "SetFlag";
+static constexpr char ScriptReserved_IsTagPresent[]			= "IsTagPresent";
 
 // Flow Functions
 static constexpr char ScriptReserved_AddLevel[]					= "AddLevel";
@@ -171,6 +175,8 @@ static constexpr char ScriptReserved_GetSinkByName[]				= "GetSinkByName";
 static constexpr char ScriptReserved_GetAIObjectByName[]			= "GetAIObjectByName";
 static constexpr char ScriptReserved_GetSoundSourceByName[]			= "GetSoundSourceByName";
 static constexpr char ScriptReserved_GetVolumeByName[]				= "GetVolumeByName";
+static constexpr char ScriptReserved_GetRoomByNumber[]				= "GetRoomByNumber";
+static constexpr char ScriptReserved_GetRoomByName[]				= "GetRoomByName";
 static constexpr char ScriptReserved_CalculateDistance[]			= "CalculateDistance";
 static constexpr char ScriptReserved_CalculateHorizontalDistance[]	= "CalculateHorizontalDistance";
 static constexpr char ScriptReserved_ScreenToPercent[]				= "ScreenToPercent";

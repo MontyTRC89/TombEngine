@@ -5,6 +5,7 @@
 #include "Math/Math.h"
 
 struct TriggerVolume;
+enum class ReverbType;
 
 struct ROOM_VERTEX
 {
@@ -103,7 +104,7 @@ struct ROOM_INFO
 	int flippedRoom;
 	int flags;
 	int meshEffect;
-	int reverbType;
+	ReverbType reverbType;
 	int flipNumber;
 	short itemNumber;
 	short fxNumber;

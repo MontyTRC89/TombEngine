@@ -1,5 +1,6 @@
 #pragma once
 #include <variant>
+#include "Game/control/volume.h"
 
 struct CAMERA_INFO;
 struct MESH_INFO;

@@ -7,6 +7,7 @@
 #include "Game/control/volume.h"
 #include "Game/items.h"
 #include "Renderer/Renderer11.h"
+#include "Sound/sound.h"
 
 using namespace TEN::Floordata;
 using namespace TEN::Renderer;

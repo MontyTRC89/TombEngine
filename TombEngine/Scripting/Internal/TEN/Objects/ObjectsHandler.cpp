@@ -5,6 +5,7 @@
 #include "Lara/lara.h"
 #include "ObjectIDs.h"
 #include "Camera/CameraObject.h"
+#include "Room/RoomObject.h"
 #include "Sink/SinkObject.h"
 #include "SoundSource/SoundSourceObject.h"
 #include "Volume/VolumeObject.h"
@@ -97,6 +98,14 @@ ObjectsHandler::ObjectsHandler(sol::state* lua, sol::table & parent) :
 	*/
 	m_table_objects.set_function(ScriptReserved_GetVolumeByName, &ObjectsHandler::GetByName<Volume, ScriptReserved_Volume>, this);
 
+	/***
+	Get a Room by its name.
+	@function GetRoomByName
+	@tparam string name the unique name of the room as set in Tomb Editor
+	@treturn Room a non-owning Room referencing the room.
+	*/
+	m_table_objects.set_function(ScriptReserved_GetRoomByName, &ObjectsHandler::GetByName<Room, ScriptReserved_Room>, this);
+
 	LaraObject::Register(m_table_objects);
 
 	Moveable::Register(m_table_objects);
@@ -131,6 +140,12 @@ ObjectsHandler::ObjectsHandler(sol::state* lua, sol::table & parent) :
 
 	SoundSource::Register(m_table_objects);
 	SoundSource::SetNameCallbacks(
+		[this](auto && ... param) { return AddName(std::forward<decltype(param)>(param)...); },
+		[this](auto && ... param) { return RemoveName(std::forward<decltype(param)>(param)...); }
+	);
+
+	Room::Register(m_table_objects);
+	Room::SetNameCallbacks(
 		[this](auto && ... param) { return AddName(std::forward<decltype(param)>(param)...); },
 		[this](auto && ... param) { return RemoveName(std::forward<decltype(param)>(param)...); }
 	);
