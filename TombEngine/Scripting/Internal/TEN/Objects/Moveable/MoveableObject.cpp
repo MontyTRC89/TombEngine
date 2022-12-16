@@ -418,6 +418,7 @@ ScriptReserved_GetSlotHP, & Moveable::GetSlotHP,
 
 /// Get the object's joint position
 // @function Moveable:GetJointPosition
+// @tparam int index of a joint to get position
 // @treturn Vec3 a copy of the moveable's position
 	ScriptReserved_GetJointPosition, & Moveable::GetJointPos,
 
