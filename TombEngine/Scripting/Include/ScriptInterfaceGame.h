@@ -1,13 +1,14 @@
 #pragma once
-#include <string>
 #include <functional>
+#include <string>
 
 #include "Game/control/volumeactivator.h"
 #include "Game/room.h"
 #include "Specific/level.h"
 
 typedef DWORD D3DCOLOR;
-using VarMapVal = std::variant< short,
+using VarMapVal = std::variant<
+	short,
 	std::reference_wrapper<MESH_INFO>,
 	std::reference_wrapper<LevelCameraInfo>,
 	std::reference_wrapper<SinkInfo>,
@@ -16,9 +17,7 @@ using VarMapVal = std::variant< short,
 	std::reference_wrapper<AI_OBJECT>>;
 
 using CallbackDrawString = std::function<void(std::string const&, D3DCOLOR, int, int, int)>;
-
 using VarSaveType = std::variant<bool, double, std::string>;
-
 using IndexTable = std::vector<std::pair<uint32_t, uint32_t>>;
 
 struct FuncName

@@ -1,6 +1,7 @@
 #pragma once
 #include <unordered_map>
 #include <unordered_set>
+
 #include "LuaHandler.h"
 #include "Objects/ScriptInterfaceObjectsHandler.h"
 #include "Objects/Moveable/MoveableObject.h"
@@ -9,7 +10,6 @@
 
 class ObjectsHandler : public ScriptInterfaceObjectsHandler
 {
-
 public:
 	ObjectsHandler::ObjectsHandler(sol::state* lua, sol::table& parent);
 
@@ -56,7 +56,7 @@ private:
 	void AssignLara() override;
 
 	template <typename R, char const* S>
-	std::unique_ptr<R> GetByName(std::string const& name)
+	std::unique_ptr<R> GetByName(const std::string& name)
 	{
 		if (!ScriptAssertF(m_nameMap.find(name) != m_nameMap.end(), "{} name not found: {}", S, name))
 			return nullptr;
@@ -100,21 +100,21 @@ private:
 		return items;
 	}
 
-	[[nodiscard]] short GetIndexByName(std::string const& name) const override
+	[[nodiscard]] short GetIndexByName(const std::string& name) const override
 	{
 		return std::get<short>(m_nameMap.at(name));
 	}
 
-	bool AddName(std::string const& key, VarMapVal val) override
+	bool AddName(const std::string& key, VarMapVal val) override
 	{
 		if (key.empty())
 			return false;
 
-		auto p = std::pair<std::string const&, VarMapVal>{ key, val };
+		auto p = std::pair< const std::string&, VarMapVal>{ key, val };
 		return m_nameMap.insert(p).second;
 	}
 
-	bool RemoveName(std::string const& key)
+	bool RemoveName(const std::string& key)
 	{
 		return m_nameMap.erase(key);
 	}
@@ -124,5 +124,3 @@ private:
 		m_nameMap.clear();
 	}
 };
-	
-

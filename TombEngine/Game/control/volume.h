@@ -6,48 +6,53 @@
 
 struct CollisionSetup;
 
-constexpr auto NO_EVENT_SET	   = -1;
-
-constexpr auto VOLUME_BUSY_TIMEOUT	= 10;
-constexpr auto VOLUME_LEAVE_TIMEOUT = 5;
-
-constexpr auto VOLUME_STATE_QUEUE_SIZE = 16;
-
-enum class VolumeStateStatus
+namespace TEN::Control::Volumes
 {
-	Outside,
-	Entering,
-	Inside,
-	Leaving
-};
+	constexpr auto NO_EVENT_SET = -1;
 
-enum class VolumeType
-{
-	Box,
-	Sphere,
-	Prism // TODO: Unsupported as of now.
-};
+	constexpr auto VOLUME_BUSY_TIMEOUT	= 10;
+	constexpr auto VOLUME_LEAVE_TIMEOUT = 5;
 
-struct VolumeState
-{
-	VolumeStateStatus Status	= VolumeStateStatus::Outside;
-	VolumeActivator	  Activator = nullptr;
-	int				  Timestamp = 0;
-};
+	constexpr auto VOLUME_STATE_QUEUE_SIZE = 16;
 
-struct TriggerVolume
-{
-	bool Enabled	   = true;
-	int	 EventSetIndex = 0;
+	enum class VolumeStateStatus
+	{
+		Outside,
+		Entering,
+		Inside,
+		Leaving
+	};
 
-	VolumeType	Type = VolumeType::Box;
-	std::string Name = {};
+	enum class VolumeType
+	{
+		Box,
+		Sphere,
+		Prism // TODO: Unsupported as of now.
+	};
 
-	BoundingOrientedBox Box	   = BoundingOrientedBox();
-	BoundingSphere		Sphere = BoundingSphere();
+	struct VolumeState
+	{
+		VolumeStateStatus Status	= VolumeStateStatus::Outside;
+		VolumeActivator	  Activator = nullptr;
 
-	std::vector<VolumeState> StateQueue = {};
-};
+		int Timestamp = 0;
+	};
+}
+
+// TODO: Move into namespace and deal with errors.
+	struct TriggerVolume
+	{
+		bool Enabled	   = true;
+		int	 EventSetIndex = 0;
+
+		std::string Name = {};
+		VolumeType	Type = VolumeType::Box;
+
+		BoundingOrientedBox Box	   = BoundingOrientedBox();
+		BoundingSphere		Sphere = BoundingSphere();
+
+		std::vector<VolumeState> StateQueue = {};
+	};
 
 namespace TEN::Control::Volumes
 {
