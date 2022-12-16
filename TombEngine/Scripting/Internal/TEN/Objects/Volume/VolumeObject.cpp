@@ -88,7 +88,7 @@ void Volume::Register(sol::table& parent)
 
 		/// Check if specified moveable is inside the volume
 		// @function Volume:IsMoveableInside
-		// @tparam Moveable moveable which should be checked for containment
+		// @tparam Objects.Moveable Moveable which should be checked for containment
 		ScriptReserved_IsMoveableInside, &Volume::IsMoveableInside);
 }
 

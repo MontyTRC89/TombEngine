@@ -451,7 +451,7 @@ ScriptReserved_GetSlotHP, & Moveable::GetSlotHP,
 
 /// Test if the object is in a valid state (i.e. has not been destroyed through Lua or killed by Lara).
 // @function Moveable:GetValid
-// @treturn valid bool true if the object is still not destroyed
+// @treturn bool valid true if the object is still not destroyed
 	ScriptReserved_GetValid, &Moveable::GetValid,
 
 /// Destroy the moveable. This will mean it can no longer be used, except to re-initialise it with another object.
