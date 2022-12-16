@@ -18,6 +18,9 @@ Version 1.0.4
     - Restored spark effects.
     - Can destroy statics in shatter slots.
 	- Fix crash when attacking.
+* SAS fix:
+    - Fix grenade shooting
+    - Fix AI_MODIFY and AI_GUARD for SAS
 * Fix TR5 Autogun Rotation.
 * Fix Choppy camera movement.
 * Fix Lara's vertical position when shimmying around steep slope corners.
