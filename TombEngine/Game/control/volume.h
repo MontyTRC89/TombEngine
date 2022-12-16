@@ -37,25 +37,7 @@ namespace TEN::Control::Volumes
 
 		int Timestamp = 0;
 	};
-}
 
-// TODO: Move into namespace and deal with errors.
-	struct TriggerVolume
-	{
-		bool Enabled	   = true;
-		int	 EventSetIndex = 0;
-
-		std::string Name = {};
-		VolumeType	Type = VolumeType::Box;
-
-		BoundingOrientedBox Box	   = BoundingOrientedBox();
-		BoundingSphere		Sphere = BoundingSphere();
-
-		std::vector<VolumeState> StateQueue = {};
-	};
-
-namespace TEN::Control::Volumes
-{
 	void TestVolumes(short roomNumber, const BoundingOrientedBox& box, VolumeActivatorFlags activatorFlag, VolumeActivator activator);
 	void TestVolumes(short itemNumber, const CollisionSetup* coll = nullptr);
 	void TestVolumes(short roomNumber, MESH_INFO* mesh);
@@ -63,3 +45,18 @@ namespace TEN::Control::Volumes
 
 	void InitialiseNodeScripts();
 }
+
+// TODO: Move into namespace and deal with errors.
+struct TriggerVolume
+{
+	bool Enabled	   = true;
+	int	 EventSetIndex = 0;
+
+	std::string Name = {};
+	VolumeType	Type = VolumeType::Box;
+
+	BoundingOrientedBox Box	   = BoundingOrientedBox();
+	BoundingSphere		Sphere = BoundingSphere();
+
+	std::vector<VolumeState> StateQueue = {};
+};
