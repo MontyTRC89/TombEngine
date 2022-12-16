@@ -16,20 +16,20 @@ namespace TEN::Entities::Traps::TR1
 {
 	constexpr auto DAMOCLES_SWORD_DAMAGE = 100;
 
-	constexpr auto DAMOCLES_SWORD_VELOCITY_MIN = BLOCK(1.0f / 20);
-	constexpr auto DAMOCLES_SWORD_VELOCITY_MAX = BLOCK(1.0f / 8);
+	constexpr auto DAMOCLES_SWORD_VELOCITY_MIN = BLOCK(1 / 20.0f);
+	constexpr auto DAMOCLES_SWORD_VELOCITY_MAX = BLOCK(1 / 8.0f);
 
-	constexpr auto DAMOCLES_SWORD_IMPALE_DEPTH			  = -BLOCK(1.0f / 8);
-	constexpr auto DAMOCLES_SWORD_ACTIVATE_RANGE_2D		  = BLOCK(3.0f / 2);
+	constexpr auto DAMOCLES_SWORD_IMPALE_DEPTH			  = -BLOCK(1 / 8.0f);
+	constexpr auto DAMOCLES_SWORD_ACTIVATE_RANGE_2D		  = BLOCK(3 / 2.0f);
 	constexpr auto DAMOCLES_SWORD_ACTIVATE_RANGE_VERTICAL = BLOCK(3);
 
-	const auto DAMOCLES_SWORD_TURN_RATE_MAX = ANGLE(5.0f);
+	constexpr auto DAMOCLES_SWORD_TURN_RATE_MAX = ANGLE(5.0f);
 
-	void SetupDamoclesSword(ObjectInfo* object)
+	void SetupDamoclesSword(ObjectInfo& object)
 	{
-		object->initialise = InitialiseDamoclesSword;
-		object->control = ControlDamoclesSword;
-		object->collision = CollideDamoclesSword;
+		object.initialise = InitialiseDamoclesSword;
+		object.control = ControlDamoclesSword;
+		object.collision = CollideDamoclesSword;
 		//object->shadowSize = UNIT_SHADOW;
 	}
 

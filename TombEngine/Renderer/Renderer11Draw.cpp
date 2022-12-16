@@ -933,23 +933,19 @@ namespace TEN::Renderer
 
 	void Renderer11::AddDebugBox(BoundingOrientedBox box, Vector4 color, RENDERER_DEBUG_PAGE page)
 	{
-#ifdef _DEBUG
 		if (m_numDebugPage != page)
 			return;
 
 		Vector3 corners[8];
 		box.GetCorners(corners);
 		AddBox(corners, color);
-#endif _DEBUG
 	}
 
 	void Renderer11::AddDebugBox(Vector3 min, Vector3 max, Vector4 color, RENDERER_DEBUG_PAGE page)
 	{
-#ifdef _DEBUG
 		if (m_numDebugPage != page)
 			return;
 		AddBox(min, max, color);
-#endif _DEBUG
 	}
 
 	void Renderer11::AddDynamicLight(int x, int y, int z, short falloff, byte r, byte g, byte b)

@@ -28,12 +28,12 @@
 #include "Objects/TR5/Emitter/tr5_bats_emitter.h"
 #include "Objects/TR5/Emitter/tr5_spider_emitter.h"
 #include "Sound/sound.h"
+#include "Specific/clock.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
 #include "Specific/savegame/flatbuffers/ten_savegame_generated.h"
 #include "ScriptInterfaceLevel.h"
 #include "ScriptInterfaceGame.h"
-#include "effects/effects.h"
 #include "Objects/ScriptInterfaceObjectsHandler.h"
 
 using namespace TEN::Control::Volumes;
@@ -567,7 +567,7 @@ bool SaveGame::Save(int slot)
 			mineBuilder.add_floor_height_front(mine->FloorHeightFront);
 			mineBuilder.add_floor_height_middle(mine->FloorHeightMiddle);
 			mineBuilder.add_gradient(mine->Gradient);
-			mineBuilder.add_stop_delay(mine->StopDelay);
+			mineBuilder.add_stop_delay(mine->StopDelayTime);
 			mineBuilder.add_turn_len(mine->TurnLen);
 			mineBuilder.add_turn_rot(mine->TurnRot);
 			mineBuilder.add_turn_x(mine->TurnX);
@@ -1521,7 +1521,7 @@ bool SaveGame::Load(int slot)
 			minecart->FloorHeightFront = savedMine->floor_height_front();
 			minecart->FloorHeightMiddle = savedMine->floor_height_middle();
 			minecart->Gradient = savedMine->gradient();
-			minecart->StopDelay = savedMine->stop_delay();
+			minecart->StopDelayTime = savedMine->stop_delay();
 			minecart->TurnLen = savedMine->turn_len();
 			minecart->TurnRot = savedMine->turn_rot();
 			minecart->TurnX = savedMine->turn_x();

@@ -8,12 +8,13 @@ namespace TEN::Entities::Vehicles
 		float VerticalVelocity = 0.0f;
 
 		short TurnRot = 0;
+		short TurnLen = 0;
 		int	  TurnX	  = 0;
 		int	  TurnZ	  = 0;
-		short TurnLen = 0;
 
-		int			 Gradient  = 0;
-		unsigned int StopDelay = 0;
+		int Gradient	  = 0;
+		int FallTime	  = 0;
+		int StopDelayTime = 0;
 
 		int FloorHeightMiddle = 0;
 		int FloorHeightFront  = 0;

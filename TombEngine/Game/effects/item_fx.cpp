@@ -10,6 +10,7 @@
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Scripting/Internal/TEN/Color/Color.h"
+#include "Specific/clock.h"
 #include "Specific/level.h"
 
 using namespace TEN::Effects::Smoke;
@@ -21,10 +22,11 @@ namespace TEN::Effects::Items
 		item->Effect.Type = EffectType::Fire;
 		item->Effect.Count = timeout;
 		item->Effect.LightColor = Vector3(0.8f, 0.5f, 0.0f);
-		item->Effect.PrimaryEffectColor = item->Effect.SecondaryEffectColor = Vector3::Zero;
+		item->Effect.PrimaryEffectColor = Vector3::Zero;
+		item->Effect.SecondaryEffectColor = Vector3::Zero;
 	}
 
-	void ItemCustomBurn(ItemInfo* item, Vector3 color1, Vector3 color2, int timeout)
+	void ItemCustomBurn(ItemInfo* item, const Vector3& color1, const Vector3& color2, int timeout)
 	{
 		item->Effect.Type = EffectType::Custom;
 		item->Effect.Count = timeout;
@@ -93,17 +95,17 @@ namespace TEN::Effects::Items
 		switch (item->Animation.AnimNumber)
 		{
 		case LA_STAND_IDLE:
-			if (item->Animation.FrameNumber < GetFrameNumber((short)ID_LARA, LA_STAND_IDLE, 30))
+			if (item->Animation.FrameNumber < GetFrameNumber(ID_LARA, LA_STAND_IDLE, 30))
 				return;
 			break;
 
 		case LA_CROUCH_IDLE:
-			if (item->Animation.FrameNumber < GetFrameNumber((short)ID_LARA, LA_CROUCH_IDLE, 30))
+			if (item->Animation.FrameNumber < GetFrameNumber(ID_LARA, LA_CROUCH_IDLE, 30))
 				return;
 			break;
 
 		case LA_CRAWL_IDLE:
-			if (item->Animation.FrameNumber < GetFrameNumber((short)ID_LARA, LA_CRAWL_IDLE, 30))
+			if (item->Animation.FrameNumber < GetFrameNumber(ID_LARA, LA_CRAWL_IDLE, 30))
 				return;
 			break;
 
@@ -116,11 +118,12 @@ namespace TEN::Effects::Items
 		float x = std::cos(TO_RAD(item->Pose.Orientation.y)) * -64.0f;
 		auto offset = GetJointPosition(item, LM_HEAD, Vector3i(0, -4, 64));
 
-		auto seed = GetJointPosition(item, 
-			LM_HEAD,
-			Vector3i((GetRandomControl() & 7) - 4,
-				(GetRandomControl() & 7) - 8,
-				(GetRandomControl() & 7) - 4));
+		auto seed = GetJointPosition(
+			item, LM_HEAD,
+			Vector3i(
+				Random::GenerateInt(-4, 4),
+				Random::GenerateInt(-8, 0),
+				Random::GenerateInt(-4, 4)));
 
 		TriggerBreathSmoke(offset.x, offset.y, offset.z, item->Pose.Orientation.y);
 	}
