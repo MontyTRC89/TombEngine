@@ -962,6 +962,14 @@ void LoadAIObjects()
 	}
 }
 
+void LoadEvent(VolumeEvent& event)
+{
+	event.Mode = (VolumeEventMode)ReadInt32();
+	event.Function = ReadString();
+	event.Data = ReadString();
+	event.CallCounter = ReadInt32();
+}
+
 void LoadEventSets()
 {
 	int eventSetCount = ReadInt32();
@@ -974,20 +982,9 @@ void LoadEventSets()
 		eventSet.Name = ReadString();
 		eventSet.Activators = (VolumeActivatorFlags)ReadInt32();
 
-		eventSet.OnEnter.Mode = (VolumeEventMode)ReadInt32();
-		eventSet.OnEnter.Function = ReadString();
-		eventSet.OnEnter.Data = ReadString();
-		eventSet.OnEnter.CallCounter = ReadInt32();
-
-		eventSet.OnInside.Mode = (VolumeEventMode)ReadInt32();
-		eventSet.OnInside.Function = ReadString();
-		eventSet.OnInside.Data = ReadString();
-		eventSet.OnInside.CallCounter = ReadInt32();
-
-		eventSet.OnLeave.Mode = (VolumeEventMode)ReadInt32();
-		eventSet.OnLeave.Function = ReadString();
-		eventSet.OnLeave.Data = ReadString();
-		eventSet.OnLeave.CallCounter = ReadInt32();
+		LoadEvent(eventSet.OnEnter);
+		LoadEvent(eventSet.OnInside);
+		LoadEvent(eventSet.OnLeave);
 
 		g_Level.EventSets.push_back(eventSet);
 	}
