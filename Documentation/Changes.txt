@@ -5,6 +5,7 @@ Version 1.0.5
 * Fix classic rollingball not behaving properly in rooms beyond the distance of 32 blocks.
 * Fix rollingball not killing Lara under certain movement angles.
 * Fix discrepancies between statistics and save / load game time units.
+* Fix draw key incorrectly working in binoculars / lasersight mode.
 
 
 Version 1.0.4
