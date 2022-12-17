@@ -1,7 +1,7 @@
 #pragma once
 
-struct ItemInfo;
 struct CollisionInfo;
+struct ItemInfo;
 
 void ClearMovableBlockSplitters(int x, int y, int z, short roomNumber);
 void InitialisePushableBlock(short itemNumber);

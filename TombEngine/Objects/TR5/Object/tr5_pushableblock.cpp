@@ -1,20 +1,20 @@
 #include "framework.h"
 #include "Objects/TR5/Object/tr5_pushableblock.h"
 
-#include "Game/Lara/lara.h"
-#include "Game/Lara/lara_helpers.h"
 #include "Game/animation.h"
 #include "Game/items.h"
-#include "Game/collision/collide_room.h"
 #include "Game/collision/collide_item.h"
+#include "Game/collision/collide_room.h"
 #include "Game/collision/floordata.h"
-#include "Game/control/flipeffect.h"
+#include "Game/Lara/lara.h"
+#include "Game/Lara/lara_helpers.h"
 #include "Game/control/box.h"
-#include "Specific/level.h"
-#include "Specific/Input/Input.h"
-#include "Sound/sound.h"
-#include "Specific/setup.h"
+#include "Game/control/flipeffect.h"
 #include "Objects/TR5/Object/tr5_pushableblock_info.h"
+#include "Sound/sound.h"
+#include "Specific/Input/Input.h"
+#include "Specific/level.h"
+#include "Specific/setup.h"
 
 using namespace TEN::Floordata;
 using namespace TEN::Input;
@@ -44,7 +44,7 @@ void ClearMovableBlockSplitters(int x, int y, int z, short roomNumber)
 	if (floor->Box == NO_BOX)
 		return;
 
-	g_Level.Boxes[floor->Box].flags &= (~BLOCKED);
+	g_Level.Boxes[floor->Box].flags &= ~BLOCKED;
 	short height = g_Level.Boxes[floor->Box].height;
 	short baseRoomNumber = roomNumber;
 	
@@ -121,7 +121,9 @@ void InitialisePushableBlock(short itemNumber)
 		height = (OCB & 0x1F) * CLICK(1);
 	}
 	else
+	{
 		height = -GameBoundingBox(item).Y1;
+	}
 
 	pushable->height = height;
 
