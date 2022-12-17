@@ -3,6 +3,8 @@ Version 1.0.5
 
 * Fix combined items not existing in inventory upon game reload.
 
+Lua API changes:
+* Add new Room class and several methods for it.
 
 Version 1.0.4
 =============
