@@ -27,6 +27,7 @@
 #include "Objects/TR5/Emitter/tr5_rats_emitter.h"
 #include "Objects/TR5/Emitter/tr5_bats_emitter.h"
 #include "Objects/TR5/Emitter/tr5_spider_emitter.h"
+#include "Renderer/Renderer11.h"
 #include "Sound/sound.h"
 #include "Specific/clock.h"
 #include "Specific/level.h"
@@ -42,6 +43,7 @@ using namespace TEN::Entities::Switches;
 using namespace TEN::Entities::TR4;
 using namespace TEN::Entities::Generic;
 using namespace TEN::Floordata;
+using namespace TEN::Renderer;
 using namespace flatbuffers;
 
 namespace Save = TEN::Save;
@@ -139,6 +141,11 @@ Vector3 ToVector3(const Save::Vector3* vec)
 	return Vector3(vec->x(), vec->y(), vec->z());
 }
 
+Vector4 ToVector4(const Save::Vector3* vec)
+{
+	return Vector4(vec->x(), vec->y(), vec->z(), 1.0f);
+}
+
 Vector4 ToVector4(const Save::Vector4* vec)
 {
 	return Vector4(vec->x(), vec->y(), vec->z(), vec->w());
@@ -147,6 +154,7 @@ Vector4 ToVector4(const Save::Vector4* vec)
 bool SaveGame::Save(int slot)
 {
 	auto fileName = std::string(SAVEGAME_PATH) + "savegame." + std::to_string(slot);
+	TENLog("Saving to savegame: " + fileName, LogLevel::Info);
 
 	ItemInfo itemToSerialize{};
 	FlatBufferBuilder fbb{};
@@ -1220,6 +1228,7 @@ bool SaveGame::Save(int slot)
 bool SaveGame::Load(int slot)
 {
 	auto fileName = SAVEGAME_PATH + "savegame." + std::to_string(slot);
+	TENLog("Loading from savegame: " + fileName, LogLevel::Info);
 
 	std::ifstream file;
 	file.open(fileName, std::ios_base::app | std::ios_base::binary);
@@ -1260,6 +1269,7 @@ bool SaveGame::Load(int slot)
 		g_Level.Rooms[i].flags = room->flags();
 		g_Level.Rooms[i].reverbType = (ReverbType)room->reverb_type();
 		g_Level.Rooms[i].ambient = ToVector3(room->ambient());
+		g_Renderer.UpdateRoomAmbientLight(i, ToVector4(room->ambient()));
 	}
 
 	// Flipmaps
