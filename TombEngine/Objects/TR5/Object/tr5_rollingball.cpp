@@ -307,7 +307,7 @@ void RollingBallControl(short itemNumber)
 	item->Pose.Orientation.x -= ((abs(item->ItemFlags[0]) + abs(item->ItemFlags[1])) / 2) / vDivider;
 
 	TestTriggers(item, true);
-	DoVehicleCollision(item, CLICK(0.9f));
+	DoVehicleCollision(item, bigRadius * 0.9f);
 }
 
 void ClassicRollingBallCollision(short itemNum, ItemInfo* lara, CollisionInfo* coll)
@@ -413,6 +413,7 @@ void ClassicRollingBallControl(short itemNum)
 		item->Floor = GetFloorHeight(floor, item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z);
 
 		TestTriggers(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, roomNum, true);
+		DoVehicleCollision(item, CLICK(1.5f));
 
 		if (item->Pose.Position.y >= item->Floor - CLICK(1))
 		{
