@@ -1,16 +1,16 @@
 #pragma once
 #include "framework.h"
 
-#include "ScriptAssert.h"
-#include "RoomObject.h"
-#include "RoomFlags.h"
-#include "Color/Color.h"
-#include "Vec3/Vec3.h"
-#include "ScriptUtil.h"
-#include "ReservedScriptNames.h"
+#include "Scripting/Internal/ReservedScriptNames.h"
+#include "Scripting/Internal/ScriptAssert.h"
+#include "Scripting/Internal/ScriptUtil.h"
+#include "Scripting/Internal/TEN/Color/Color.h"
+#include "Scripting/Internal/TEN/Objects/Room/RoomFlags.h"
+#include "Scripting/Internal/TEN/Objects/Room/RoomObject.h"
+#include "Scripting/Internal/TEN/Vec3/Vec3.h"
+#include "Sound/sound.h"
 #include "Specific/level.h"
 #include "Specific/trutils.h"
-#include "Sound/sound.h"
 
 /***
 Rooms
@@ -85,7 +85,7 @@ ReverbType Room::GetReverbType() const
 	return m_room.reverbType;
 }
 
-void Room::SetReverbType(ReverbType const& reverb)
+void Room::SetReverbType(ReverbType reverb)
 {
 	m_room.reverbType = reverb;
 }
@@ -95,16 +95,14 @@ std::string Room::GetName() const
 	return m_room.name;
 }
 
-void Room::SetName(std::string const& name)
+void Room::SetName(const std::string& name)
 {
-	if (!ScriptAssert(!name.empty(), "Name cannot be blank. Not setting name."))
-	{
+	if (!ScriptAssert(!name.empty(), "Unable to set name. Name cannot be blank."))
 		return;
-	}
 
+	// Remove the old name if we have one.
 	if (s_callbackSetName(name, m_room))
 	{
-		// remove the old name if we have one
 		s_callbackRemoveName(m_room.name);
 		m_room.name = name;
 	}
@@ -115,12 +113,12 @@ void Room::SetName(std::string const& name)
 	}
 }
 
-bool Room::GetFlag(RoomEnvFlags const& flag) const
+bool Room::GetFlag(RoomEnvFlags flag) const
 {
-	return (m_room.flags & flag) == flag;
+	return ((m_room.flags & flag) == flag);
 }
 
-void Room::SetFlag(RoomEnvFlags const& flag, bool const& value)
+void Room::SetFlag(RoomEnvFlags flag, bool value)
 {
 	if (value)
 		m_room.flags |= flag;
@@ -128,11 +126,11 @@ void Room::SetFlag(RoomEnvFlags const& flag, bool const& value)
 		m_room.flags &= ~flag;
 }
 
-bool Room::IsTagPresent(std::string const& tag) const
+bool Room::IsTagPresent(const std::string& tag) const
 {
 	if (m_room.tags.empty())
 		return false;
 
-	return std::any_of(m_room.tags.begin(), m_room.tags.end(), 
-		[&tag](const std::string& value) { return value == tag; });
+	return std::any_of(m_room.tags.begin(), m_room.tags.end(),
+		[&tag](const std::string& value) { return (value == tag); });
 }
