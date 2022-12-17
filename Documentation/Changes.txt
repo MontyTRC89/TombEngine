@@ -5,6 +5,7 @@ Version 1.0.5
 * Fix classic rollingball not behaving properly in rooms beyond the distance of 32 blocks.
 * Fix rollingball not killing Lara under certain movement angles.
 * Fix savegame crashes when rooms with static meshes are flipped.
+* Fix discrepancies between statistics and save / load game time units.
 
 Lua API changes:
 * Add new Room class and several methods for it.
