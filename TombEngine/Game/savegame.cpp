@@ -1276,32 +1276,6 @@ bool SaveGame::Load(int slot)
 		g_Renderer.UpdateRoomAmbientLight(room->index(), ToVector4(room->ambient()));
 	}
 
-	// Effects
-	FlipEffect = s->flip_effect();
-	FlipStatus = s->flip_status();
-
-	// Restore camera FOV
-	AlterFOV(s->current_fov());
-
-	// Restore action queue
-	for (int i = 0; i < s->action_queue()->size(); i++)
-	{
-		assertion(i < ActionQueue.size(), "Action queue size was changed");
-		ActionQueue[i] = (QueueState)s->action_queue()->Get(i);
-	}
-
-	// Restore soundtracks
-	PlaySoundTrack(s->ambient_track()->str(), SoundTrackType::BGM, s->ambient_position());
-	PlaySoundTrack(s->oneshot_track()->str(), SoundTrackType::OneShot, s->oneshot_position());
-
-	// Legacy soundtrack map
-	for (int i = 0; i < s->cd_flags()->size(); i++)
-	{
-		int index = s->cd_flags()->Get(i);
-		int mask  = s->cd_flags()->Get(++i);
-		SoundTracks[index].Mask = mask;
-	}
-
 	// Static objects
 	for (int i = 0; i < s->static_meshes()->size(); i++)
 	{
@@ -1360,6 +1334,32 @@ bool SaveGame::Load(int slot)
 			DoFlipMap(i);
 
 		FlipMap[i] = s->flip_maps()->Get(i) << 8;
+	}
+
+	// Effects
+	FlipEffect = s->flip_effect();
+	FlipStatus = s->flip_status();
+
+	// Restore camera FOV
+	AlterFOV(s->current_fov());
+
+	// Restore action queue
+	for (int i = 0; i < s->action_queue()->size(); i++)
+	{
+		assertion(i < ActionQueue.size(), "Action queue size was changed");
+		ActionQueue[i] = (QueueState)s->action_queue()->Get(i);
+	}
+
+	// Restore soundtracks
+	PlaySoundTrack(s->ambient_track()->str(), SoundTrackType::BGM, s->ambient_position());
+	PlaySoundTrack(s->oneshot_track()->str(), SoundTrackType::OneShot, s->oneshot_position());
+
+	// Legacy soundtrack map
+	for (int i = 0; i < s->cd_flags()->size(); i++)
+	{
+		int index = s->cd_flags()->Get(i);
+		int mask = s->cd_flags()->Get(++i);
+		SoundTracks[index].Mask = mask;
 	}
 
 	// Cameras 
