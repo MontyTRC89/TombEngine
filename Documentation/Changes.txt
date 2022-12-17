@@ -7,6 +7,7 @@ Version 1.0.5
 * Fix savegame crashes when rooms with static meshes are flipped.
 * Fix discrepancies between statistics and save / load game time units.
 * Fix draw key incorrectly working in binoculars / lasersight mode.
+* Fix FLAME_EMITTER_3 not burning player.
 
 Lua API changes:
 * Add new Room class and several methods for it.
