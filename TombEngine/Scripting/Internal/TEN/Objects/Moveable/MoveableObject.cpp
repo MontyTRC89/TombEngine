@@ -418,6 +418,7 @@ ScriptReserved_GetSlotHP, & Moveable::GetSlotHP,
 
 /// Get the object's joint position
 // @function Moveable:GetJointPosition
+// @tparam int index of a joint to get position
 // @treturn Vec3 a copy of the moveable's position
 	ScriptReserved_GetJointPosition, & Moveable::GetJointPos,
 
@@ -450,7 +451,7 @@ ScriptReserved_GetSlotHP, & Moveable::GetSlotHP,
 
 /// Test if the object is in a valid state (i.e. has not been destroyed through Lua or killed by Lara).
 // @function Moveable:GetValid
-// @treturn valid bool true if the object is still not destroyed
+// @treturn bool valid true if the object is still not destroyed
 	ScriptReserved_GetValid, &Moveable::GetValid,
 
 /// Destroy the moveable. This will mean it can no longer be used, except to re-initialise it with another object.
@@ -459,7 +460,9 @@ ScriptReserved_GetSlotHP, & Moveable::GetSlotHP,
 
 /// Attach camera to an object.
 // @function Moveable:AttachObjCamera
-// @tparam int mesh 1 for camera, mesh 2 for target
+// @tparam int mesh of a moveable to use as a camera position
+// @tparam Moveable target moveable to attach camera to
+// @tparam int mesh of a target moveable to use as a camera target
 	ScriptReserved_AttachObjCamera, &Moveable::AttachObjCamera,
 
 /// Borrow animation from an object
@@ -626,10 +629,11 @@ Vec3 Moveable::GetJointPos(int jointIndex) const
 // (e.g. 90 degrees = -270 degrees = 450 degrees)
 Rotation Moveable::GetRot() const
 {
-	return {
-		static_cast<int>(TO_DEGREES(m_item->Pose.Orientation.x)) % 360,
-		static_cast<int>(TO_DEGREES(m_item->Pose.Orientation.y)) % 360,
-		static_cast<int>(TO_DEGREES(m_item->Pose.Orientation.z)) % 360
+	return 
+	{
+		TO_DEGREES(m_item->Pose.Orientation.x),
+		TO_DEGREES(m_item->Pose.Orientation.y),
+		TO_DEGREES(m_item->Pose.Orientation.z)
 	};
 }
 

@@ -948,17 +948,14 @@ namespace TEN::Renderer
 
 			case RENDERER_DEBUG_PAGE::LOGIC_STATS:
 				PrintDebugMessage("Target HitPoints: %d", Lara.TargetEntity ? Lara.TargetEntity->HitPoints : 0);
-				PrintDebugMessage("CollidedVolume: %d", TEN::Control::Volumes::CurrentCollidedVolume);
 				PrintDebugMessage("Move axis vertical: %f", AxisMap[InputAxis::MoveVertical]);
 				PrintDebugMessage("Move axis horizontal: %f", AxisMap[InputAxis::MoveHorizontal]);
 				PrintDebugMessage("Look axis vertical: %f", AxisMap[InputAxis::CameraVertical]);
 				PrintDebugMessage("Look axis horizontal: %f", AxisMap[InputAxis::CameraHorizontal]);
 				break;
 
-			case RENDERER_DEBUG_PAGE::WIREFRAME_MODE:
-				PrintDebugMessage("Wireframe mode");
+			default:
 				break;
-
 			}
 		}
 	}

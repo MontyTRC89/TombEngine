@@ -9,7 +9,7 @@
 #include "Game/control/flipeffect.h"
 #include "Game/control/lot.h"
 #include "Game/control/volume.h"
-#include "Game/control/volumetriggerer.h"
+#include "Game/control/volumeactivator.h"
 #include "Game/effects/item_fx.h"
 #include "Game/effects/effects.h"
 #include "Game/items.h"
@@ -811,9 +811,9 @@ bool SaveGame::Save(int slot)
 	}
 	auto flybyCamerasOffset = fbb.CreateVector(flybyCameras);
 
-	// Static meshes and volume states
+	// Static meshes and volumes
 	std::vector<flatbuffers::Offset<Save::StaticMeshInfo>> staticMeshes;
-	std::vector<flatbuffers::Offset<Save::VolumeState>> volumeStates;
+	std::vector<flatbuffers::Offset<Save::Volume>> volumes;
 	for (int i = 0; i < g_Level.Rooms.size(); i++)
 	{
 		auto* room = &g_Level.Rooms[i];
@@ -835,29 +835,40 @@ bool SaveGame::Save(int slot)
 
 		for (int j = 0; j < room->triggerVolumes.size(); j++)
 		{
-			Save::VolumeStateBuilder volumeState{ fbb };
+			auto& currVolume = room->triggerVolumes[j];
 
-			auto& volume = room->triggerVolumes[j];
+			std::vector<flatbuffers::Offset<Save::VolumeState>> queue;
+			for (int k = 0; k < currVolume.StateQueue.size(); k++)
+			{
+				auto& entry = currVolume.StateQueue[k];
 
-			volumeState.add_room_number(i);
-			volumeState.add_number(j);
+				int activator = NO_ITEM;
+				if (std::holds_alternative<short>(entry.Activator))
+					activator = std::get<short>(entry.Activator);
+				else
+					continue;
 
-			volumeState.add_position(&FromVector3(volume.Position));
-			volumeState.add_rotation(&FromVector4(volume.Rotation));
-			volumeState.add_scale(&FromVector3(volume.Scale));
+				Save::VolumeStateBuilder volstate{ fbb };
+				volstate.add_status((int)entry.Status);
+				volstate.add_activator(activator);
+				volstate.add_timestamp(entry.Timestamp);
+				queue.push_back(volstate.Finish());
+			}
+			auto queueOffset = fbb.CreateVector(queue);
 
-			int triggerer = -1;
-			if (std::holds_alternative<short>(volume.Triggerer))
-				triggerer = std::get<short>(volume.Triggerer);
-
-			volumeState.add_triggerer(triggerer);
-			volumeState.add_state((int)volume.Status);
-			volumeState.add_timeout((int)volume.Timeout);
-			volumeStates.push_back(volumeState.Finish());
+			Save::VolumeBuilder volume{ fbb };
+			volume.add_room_number(i);
+			volume.add_number(j);
+			volume.add_enabled(currVolume.Enabled);
+			volume.add_position(&FromVector3(currVolume.Box.Center));
+			volume.add_rotation(&FromVector4(currVolume.Box.Orientation));
+			volume.add_scale(&FromVector3(currVolume.Box.Extents));
+			volume.add_queue(queueOffset);
+			volumes.push_back(volume.Finish());
 		}
 	}
 	auto staticMeshesOffset = fbb.CreateVector(staticMeshes);
-	auto volumeStatesOffset = fbb.CreateVector(volumeStates);
+	auto volumesOffset = fbb.CreateVector(volumes);
 
 	// Particles
 	std::vector<flatbuffers::Offset<Save::ParticleInfo>> particles;
@@ -1151,7 +1162,7 @@ bool SaveGame::Save(int slot)
 	sgb.add_flip_status(FlipStatus);
 	sgb.add_current_fov(LastFOV);
 	sgb.add_static_meshes(staticMeshesOffset);
-	sgb.add_volume_states(volumeStatesOffset);
+	sgb.add_volumes(volumesOffset);
 	sgb.add_fixed_cameras(camerasOffset);
 	sgb.add_particles(particleOffset);
 	sgb.add_bats(batsOffset);
@@ -1285,24 +1296,30 @@ bool SaveGame::Load(int slot)
 	}
 
 	// Volumes
-	for (int i = 0; i < s->volume_states()->size(); i++)
+	for (int i = 0; i < s->volumes()->size(); i++)
 	{
-		auto volume = s->volume_states()->Get(i);
+		auto volume = s->volumes()->Get(i);
 		auto room = &g_Level.Rooms[volume->room_number()];
 		int number = volume->number();
 
-		room->triggerVolumes[number].Position = ToVector3(volume->position());
-		room->triggerVolumes[number].Rotation = ToVector4(volume->rotation());
-		room->triggerVolumes[number].Scale = ToVector3(volume->scale());
+		room->triggerVolumes[number].Enabled = volume->enabled();
+		room->triggerVolumes[number].Box.Center =
+		room->triggerVolumes[number].Sphere.Center = ToVector3(volume->position());
+		room->triggerVolumes[number].Box.Orientation = ToVector4(volume->rotation());
+		room->triggerVolumes[number].Box.Extents = ToVector3(volume->scale());
+		room->triggerVolumes[number].Sphere.Radius = room->triggerVolumes[number].Box.Extents.x;
 
-		int triggerer = volume->triggerer();
-		if (triggerer >= 0)
-			room->triggerVolumes[number].Triggerer = short(triggerer);
-		else
-			room->triggerVolumes[number].Triggerer = nullptr;
-
-		room->triggerVolumes[number].Status = TriggerStatus(volume->state());
-		room->triggerVolumes[number].Timeout = volume->timeout();
+		for (int j = 0; j < volume->queue()->size(); j++)
+		{
+			auto state = volume->queue()->Get(j);
+			room->triggerVolumes[number].StateQueue.push_back(
+				VolumeState
+				{
+					(VolumeStateStatus)state->status(),
+					(short)state->activator(),
+					state->timestamp()
+				});
+		}
 	}
 
 	// Cameras 
@@ -1720,7 +1737,7 @@ bool SaveGame::Load(int slot)
 	ZeroMemory(Lara.Inventory.PickupsCombo, NUM_PICKUPS * 2 * sizeof(int));
 	for (int i = 0; i < s->lara()->inventory()->pickups_combo()->size(); i++)
 	{
-		Lara.Inventory.Pickups[i] = s->lara()->inventory()->pickups_combo()->Get(i);
+		Lara.Inventory.PickupsCombo[i] = s->lara()->inventory()->pickups_combo()->Get(i);
 	}
 
 	ZeroMemory(Lara.Inventory.Examines, NUM_EXAMINES * sizeof(int));

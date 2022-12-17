@@ -11,11 +11,11 @@ class Vec3;
 class Rotation;
 class ScriptColor;
 
-class Static : public NamedBase<Static, MESH_INFO &>
+class Static : public NamedBase<Static, MESH_INFO&>
 {
 public:
 	using IdentifierType = std::reference_wrapper<MESH_INFO>;
-	Static(MESH_INFO & id);
+	Static(MESH_INFO& id);
 	~Static() = default;
 
 	Static& operator=(Static const& other) = delete;
