@@ -440,7 +440,7 @@ namespace TEN::Entities
 			obj->pivotLength = 50;
 			obj->radius = 204;
 			obj->intelligent = true;
-			obj->explodableMeshbits = 64;
+			obj->explodableMeshbits = 0x40;
 			obj->ZoneType = ZoneType::Basic;
 			g_Level.Bones[obj->boneIndex + 0] |= ROT_Y;
 			g_Level.Bones[obj->boneIndex + 1 * 4] |= ROT_X;

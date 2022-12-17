@@ -519,11 +519,11 @@ static void StartEntity(ObjectInfo *obj)
 		obj->hitEffect = HIT_RICOCHET;
 		obj->pivotLength = 50;
 		obj->radius = 128;
-		obj->explodableMeshbits = 4;
+		obj->explodableMeshbits = 0x4;
 		obj->intelligent = true;
 		obj->undead = true;
 		obj->ZoneType = ZoneType::HumanClassic;
-		
+
 		g_Level.Bones[obj->boneIndex] |= ROT_Y;
 		g_Level.Bones[obj->boneIndex] |= ROT_X;
 		g_Level.Bones[obj->boneIndex + 4] |= ROT_Y;

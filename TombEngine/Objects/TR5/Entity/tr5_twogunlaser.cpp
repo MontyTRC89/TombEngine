@@ -53,14 +53,13 @@ namespace TEN::Entities::Creatures::TR5
 		TWOGUN_STATE_TURN_180 = 8,
 		TWOGUN_STATE_MISSFIRE = 9,
 		TWOGUN_STATE_GUN_BLOCKAGE = 10,
-		TWOGUN_STATE_FALLSTAIRS = 11,
+		TWOGUN_STATE_FALLSTART = 11,
 		TWOGUN_STATE_FALLLOOP = 12,
 		TWOGUN_STATE_FALLDEATH = 13
 	};
 	
 	enum TwogunAnim
-	{
-		TWOGUN_ANIM_WALK = 0,
+	{TWOGUN_ANIM_WALK = 0,
 		TWOGUN_ANIM_SHOOT_RIGHT = 1,
 		TWOGUN_ANIM_SHOOT_LEFT = 2,
 		TWOGUN_ANIM_DEATH = 3,
@@ -74,9 +73,10 @@ namespace TEN::Entities::Creatures::TR5
 		TWOGUN_ANIM_TURN_180 = 11,
 		TWOGUN_ANIM_MISSFIRE = 12,
 		TWOGUN_ANIM_GUN_BLOCKAGE = 13,
-		TWOGUN_ANIM_FALLSTAIRS = 14,
+		TWOGUN_ANIM_FALLSTART = 14,
 		TWOGUN_ANIM_FALLLOOP = 15,
 		TWOGUN_ANIM_FALLDEATH = 16
+		
 	};
 
 	void InitialiseTwogun(short itemNumber)
@@ -210,7 +210,6 @@ namespace TEN::Entities::Creatures::TR5
 		sptr->y = pos.Position.y;
 		sptr->z = pos.Position.z;
 
-		int yAng = TO_RAD(pos.Orientation.y)+ (GetRandomControl() & 32767) - 16384;;
 		int size = ((life * 64) * phd_cos(TO_RAD(pos.Orientation.x))) / 5;
 
 		sptr->xVel =  Random::GenerateInt(-128, 128) / 5;
@@ -254,8 +253,6 @@ namespace TEN::Entities::Creatures::TR5
 					if (item->ItemFlags[i] > 0)
 					{
 						auto pos1 = GetJointPosition(item, gun->meshNum, gun->Position);
-						auto pos2 = GetJointPosition(item, gun->meshNum, Vector3i(gun->Position.x, gun->Position.y + 4096, gun->Position.z));
-						auto pos = Geometry::GetOrientToPoint(pos1.ToVector3(), pos2.ToVector3());
 
 						short blue = item->ItemFlags[i] << 4;
 						short green = blue >> 2;
@@ -274,17 +271,17 @@ namespace TEN::Entities::Creatures::TR5
 
 		if (item->HitPoints <= 0)
 		{
-			if (item->Animation.ActiveState != 7 && item->TriggerFlags != 1)
+			if (item->Animation.ActiveState != TWOGUN_STATE_DEATH && item->TriggerFlags != 1)
 			{
-				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 3;
+				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + TWOGUN_ANIM_DEATH;
 				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-				item->Animation.ActiveState = 7;
+				item->Animation.ActiveState = TWOGUN_STATE_DEATH;
 			}
 			else if (item->TriggerFlags == 1)
 			{
 				switch (item->Animation.ActiveState)
 				{
-				case 11:
+				case TWOGUN_STATE_FALLSTART:
 					frame = item->Animation.FrameNumber;
 					base = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 
@@ -298,7 +295,7 @@ namespace TEN::Entities::Creatures::TR5
 
 					break;
 
-				case 12:
+				case TWOGUN_STATE_FALLLOOP:
 					item->Animation.IsAirborne = true;
 
 					if (item->Pose.Position.y >= item->Floor)
@@ -306,20 +303,20 @@ namespace TEN::Entities::Creatures::TR5
 						item->Pose.Position.y = item->Floor;
 						item->Animation.IsAirborne = false;
 						item->Animation.Velocity.y = 0.0f;
-						item->Animation.TargetState = 13;
+						item->Animation.TargetState = TWOGUN_STATE_FALLDEATH;
 						CreatureEffect2(item, LaserguardHead, 10, item->Pose.Orientation.y, DoBloodSplat);
 					}
 
 					break;
 
-				case 13:
+				case TWOGUN_STATE_FALLDEATH:
 					item->Pose.Position.y = item->Floor;
 					break;
 
 				default:
-					item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 14;
+					item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + TWOGUN_ANIM_FALLSTART;
 					item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-					item->Animation.ActiveState = 11;
+					item->Animation.ActiveState = TWOGUN_STATE_FALLSTART;
 					creature->LOT.IsJumping = true;
 					auto* room = &g_Level.Rooms[item->RoomNumber];
 
@@ -371,11 +368,11 @@ namespace TEN::Entities::Creatures::TR5
 
 			switch (item->Animation.ActiveState)
 			{
-			case 1:
+			case TWOGUN_STATE_IDLE:
 				creature->Flags = 0;
 				creature->MaxTurn = 0;
 
-				if (!(item->AIBits & 1))
+				if (!(item->AIBits & GUARD))
 				{
 					if (abs(AI.angle) < 364)
 						item->Pose.Orientation.y += AI.angle;
@@ -392,55 +389,55 @@ namespace TEN::Entities::Creatures::TR5
 					xTorso = AI.xAngle >> 1;
 				}
 
-				if (item->AIBits & 1)
+				if (item->AIBits & GUARD)
 					head = AIGuard(creature);
 				else
 				{
 					if (laraAI.angle > 20480 || laraAI.angle < -20480)
-						item->Animation.TargetState = 8;
+						item->Animation.TargetState = TWOGUN_STATE_TURN_180;
 					else if (!Targetable(item, &AI))
 					{
 						if (item->TriggerFlags != 1)
-							item->Animation.TargetState = 2;
+							item->Animation.TargetState = TWOGUN_STATE_WALK;
 					}
 					else if (AI.distance < 0x900000 || AI.zoneNumber != AI.enemyZone)
-						item->Animation.TargetState = 5;
-					else if (item->AIBits != 8)
+						item->Animation.TargetState = TWOGUN_STATE_IDLE_TO_AIM;
+					else if (item->AIBits != MODIFY)
 					{
 						if (item->TriggerFlags != 1)
-							item->Animation.TargetState = 2;
+							item->Animation.TargetState = TWOGUN_STATE_WALK;
 					}
 				}
 
 				break;
 
-			case 2:
+			case TWOGUN_STATE_WALK:
 				creature->MaxTurn = 910;
 
 				if (Targetable(item, &AI) && laraAI.angle < 6144 && laraAI.angle > -6144)
 				{
 					if (item->Animation.FrameNumber >= g_Level.Anims[item->Animation.AnimNumber].frameBase + 29)
-						item->Animation.TargetState = 3;
+						item->Animation.TargetState = TWOGUN_STATE_SHOOT_RIGHT;
 					else
-						item->Animation.TargetState = 4;
+						item->Animation.TargetState = TWOGUN_STATE_SHOOT_LEFT;
 				}
 				else
 				{
 					if (laraAI.angle > 20480 || laraAI.angle < -20480)
-						item->Animation.TargetState = 1;
+						item->Animation.TargetState = TWOGUN_STATE_IDLE;
 					else
-						item->Animation.TargetState = 2;
+						item->Animation.TargetState = TWOGUN_STATE_WALK;
 				}
 
 				break;
 
-			case 3:
-			case 4:
+			case TWOGUN_STATE_SHOOT_RIGHT:
+			case TWOGUN_STATE_SHOOT_LEFT:
 				head = laraAI.angle;
 
 				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase)
 				{
-					if (item->Animation.ActiveState == 4)
+					if (item->Animation.ActiveState == TWOGUN_STATE_SHOOT_LEFT)
 						FireTwogunWeapon(itemNumber, 0, 0);
 					else
 						FireTwogunWeapon(itemNumber, 1, 0);
@@ -448,7 +445,7 @@ namespace TEN::Entities::Creatures::TR5
 
 				break;
 
-			case 5:
+			case TWOGUN_STATE_IDLE_TO_AIM:
 				creature->Flags = 0;
 				creature->MaxTurn = 0;
 				head = laraAI.angle >> 1;
@@ -463,17 +460,17 @@ namespace TEN::Entities::Creatures::TR5
 					item->Pose.Orientation.y -= 364;
 
 				if (item->TriggerFlags == 2)
-					item->Animation.TargetState = 9;
+					item->Animation.TargetState = TWOGUN_STATE_MISSFIRE;
 				else if (item->TriggerFlags == 3)
-					item->Animation.TargetState = 10;
+					item->Animation.TargetState = TWOGUN_STATE_GUN_BLOCKAGE;
 				else if (Targetable(item, &AI))
-					item->Animation.TargetState = 6;
+					item->Animation.TargetState = TWOGUN_STATE_SHOOT_BOTH;
 				else
-					item->Animation.TargetState = 1;
+					item->Animation.TargetState = TWOGUN_STATE_IDLE;
 
 				break;
 
-			case 6:
+			case TWOGUN_STATE_SHOOT_BOTH:
 				head = laraAI.angle >> 1;
 				yTorso = laraAI.angle >> 1;
 				xTorso = AI.xAngle;
@@ -496,7 +493,7 @@ namespace TEN::Entities::Creatures::TR5
 
 				break;
 
-			case 8:
+			case TWOGUN_STATE_TURN_180:
 				creature->Flags = 0;
 				creature->MaxTurn = 0;
 
@@ -510,7 +507,7 @@ namespace TEN::Entities::Creatures::TR5
 
 				break;
 
-			case 9:
+			case TWOGUN_STATE_MISSFIRE:
 				xTorso = AI.xAngle >> 1;
 				head = laraAI.angle >> 1;
 				yTorso = laraAI.angle >> 1;
@@ -524,7 +521,7 @@ namespace TEN::Entities::Creatures::TR5
 
 				break;
 
-			case 10:
+			case TWOGUN_STATE_GUN_BLOCKAGE:
 				item->TriggerFlags = 0;
 				break;
 			}
