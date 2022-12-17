@@ -810,6 +810,7 @@ void ReadRooms()
 
 		room.itemNumber = NO_ITEM;
 		room.fxNumber = NO_ITEM;
+		room.index = i;
 
 		g_GameScriptEntities->AddName(room.name, room);
 	}

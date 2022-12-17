@@ -428,6 +428,7 @@ struct KeyValPair::Traits {
 struct RoomT : public flatbuffers::NativeTable {
   typedef Room TableType;
   std::string name{};
+  std::unique_ptr<TEN::Save::Vector3> ambient{};
   int32_t flags = 0;
   int32_t reverb_type = 0;
 };
@@ -438,11 +439,15 @@ struct Room FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   struct Traits;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_NAME = 4,
-    VT_FLAGS = 6,
-    VT_REVERB_TYPE = 8
+    VT_AMBIENT = 6,
+    VT_FLAGS = 8,
+    VT_REVERB_TYPE = 10
   };
   const flatbuffers::String *name() const {
     return GetPointer<const flatbuffers::String *>(VT_NAME);
+  }
+  const TEN::Save::Vector3 *ambient() const {
+    return GetStruct<const TEN::Save::Vector3 *>(VT_AMBIENT);
   }
   int32_t flags() const {
     return GetField<int32_t>(VT_FLAGS, 0);
@@ -454,6 +459,7 @@ struct Room FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     return VerifyTableStart(verifier) &&
            VerifyOffset(verifier, VT_NAME) &&
            verifier.VerifyString(name()) &&
+           VerifyField<TEN::Save::Vector3>(verifier, VT_AMBIENT) &&
            VerifyField<int32_t>(verifier, VT_FLAGS) &&
            VerifyField<int32_t>(verifier, VT_REVERB_TYPE) &&
            verifier.EndTable();
@@ -469,6 +475,9 @@ struct RoomBuilder {
   flatbuffers::uoffset_t start_;
   void add_name(flatbuffers::Offset<flatbuffers::String> name) {
     fbb_.AddOffset(Room::VT_NAME, name);
+  }
+  void add_ambient(const TEN::Save::Vector3 *ambient) {
+    fbb_.AddStruct(Room::VT_AMBIENT, ambient);
   }
   void add_flags(int32_t flags) {
     fbb_.AddElement<int32_t>(Room::VT_FLAGS, flags, 0);
@@ -490,11 +499,13 @@ struct RoomBuilder {
 inline flatbuffers::Offset<Room> CreateRoom(
     flatbuffers::FlatBufferBuilder &_fbb,
     flatbuffers::Offset<flatbuffers::String> name = 0,
+    const TEN::Save::Vector3 *ambient = 0,
     int32_t flags = 0,
     int32_t reverb_type = 0) {
   RoomBuilder builder_(_fbb);
   builder_.add_reverb_type(reverb_type);
   builder_.add_flags(flags);
+  builder_.add_ambient(ambient);
   builder_.add_name(name);
   return builder_.Finish();
 }
@@ -507,12 +518,14 @@ struct Room::Traits {
 inline flatbuffers::Offset<Room> CreateRoomDirect(
     flatbuffers::FlatBufferBuilder &_fbb,
     const char *name = nullptr,
+    const TEN::Save::Vector3 *ambient = 0,
     int32_t flags = 0,
     int32_t reverb_type = 0) {
   auto name__ = name ? _fbb.CreateString(name) : 0;
   return TEN::Save::CreateRoom(
       _fbb,
       name__,
+      ambient,
       flags,
       reverb_type);
 }
@@ -6986,6 +6999,7 @@ inline void Room::UnPackTo(RoomT *_o, const flatbuffers::resolver_function_t *_r
   (void)_o;
   (void)_resolver;
   { auto _e = name(); if (_e) _o->name = _e->str(); }
+  { auto _e = ambient(); if (_e) _o->ambient = std::unique_ptr<TEN::Save::Vector3>(new TEN::Save::Vector3(*_e)); }
   { auto _e = flags(); _o->flags = _e; }
   { auto _e = reverb_type(); _o->reverb_type = _e; }
 }
@@ -6999,11 +7013,13 @@ inline flatbuffers::Offset<Room> CreateRoom(flatbuffers::FlatBufferBuilder &_fbb
   (void)_o;
   struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const RoomT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
   auto _name = _o->name.empty() ? _fbb.CreateSharedString("") : _fbb.CreateString(_o->name);
+  auto _ambient = _o->ambient ? _o->ambient.get() : 0;
   auto _flags = _o->flags;
   auto _reverb_type = _o->reverb_type;
   return TEN::Save::CreateRoom(
       _fbb,
       _name,
+      _ambient,
       _flags,
       _reverb_type);
 }

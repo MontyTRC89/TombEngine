@@ -31,6 +31,9 @@ public:
 	[[nodiscard]] bool GetFlag(RoomEnvFlags flag) const;
 	void SetFlag(RoomEnvFlags flag, bool value);
 
+	[[nodiscard]] ScriptColor GetAmbientLight() const;
+	void SetAmbientLight(ScriptColor color);
+
 	[[nodiscard]] ReverbType GetReverbType() const;
 	void SetReverbType(ReverbType reverbType);
 

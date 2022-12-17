@@ -8,6 +8,7 @@ struct RoomVector {
 
 table Room {
 	name: string;
+	ambient: Vector3;
 	flags: int32;
 	reverb_type: int32;
 }

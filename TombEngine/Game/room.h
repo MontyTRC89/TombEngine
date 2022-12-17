@@ -94,6 +94,7 @@ enum StaticMeshFlags : short
 
 struct ROOM_INFO
 {
+	int index;
 	int x;
 	int y;
 	int z;
