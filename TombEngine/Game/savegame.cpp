@@ -453,8 +453,10 @@ bool SaveGame::Save(int slot)
 	std::vector<flatbuffers::Offset<Save::Room>> rooms;
 	for (auto& room : g_Level.Rooms)
 	{
+		auto nameOffset = fbb.CreateString(room.name);
+
 		Save::RoomBuilder serializedInfo{ fbb };
-		serializedInfo.add_name(fbb.CreateString(room.name));
+		serializedInfo.add_name(nameOffset);
 		serializedInfo.add_reverb_type((int)room.reverbType);
 		serializedInfo.add_flags(room.flags);
 		auto serializedInfoOffset = serializedInfo.Finish();
