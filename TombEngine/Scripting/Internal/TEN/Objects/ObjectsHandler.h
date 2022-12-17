@@ -114,7 +114,7 @@ private:
 			if (std::any_of(room.tags.begin(), room.tags.end(),
 				[&tag](const std::string& value) { return value == tag; }))
 			{
-				items.push_back(GetByName<Room, ScriptReserved_Room>(key));
+				rooms.push_back(GetByName<Room, ScriptReserved_Room>(key));
 			}
 		}
 
