@@ -4,6 +4,7 @@ Version 1.0.5
 * Fix combined items not existing in inventory upon game reload.
 * Fix classic rollingball not behaving properly in rooms beyond the distance of 32 blocks.
 * Fix rollingball not killing Lara under certain movement angles.
+* Fix discrepancies between statistics and save / load game time units.
 
 
 Version 1.0.4
