@@ -239,7 +239,7 @@ int LaraObject::GetAmmoCount() const
 
 /// Get current vehicle, if it exists
 // @function LaraObject:GetVehicle
-// @treturn Moveable current vehicle (nil if no vehicle present)
+// @treturn Objects.Moveable current vehicle (nil if no vehicle present)
 // @usage
 // local vehicle = Lara:GetVehicle()
 std::unique_ptr<Moveable> LaraObject::GetVehicle() const
@@ -254,7 +254,7 @@ std::unique_ptr<Moveable> LaraObject::GetVehicle() const
 
 /// Get current target enemy, if it exists
 // @function LaraObject:GetTarget
-// @treturn Moveable current target enemy (nil if no target present)
+// @treturn Objects.Moveable current target enemy (nil if no target present)
 // @usage
 // local target = Lara:GetTarget()
 std::unique_ptr<Moveable> LaraObject::GetTarget() const

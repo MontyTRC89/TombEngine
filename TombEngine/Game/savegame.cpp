@@ -1759,7 +1759,7 @@ bool SaveGame::Load(int slot)
 	ZeroMemory(Lara.Inventory.PickupsCombo, NUM_PICKUPS * 2 * sizeof(int));
 	for (int i = 0; i < s->lara()->inventory()->pickups_combo()->size(); i++)
 	{
-		Lara.Inventory.Pickups[i] = s->lara()->inventory()->pickups_combo()->Get(i);
+		Lara.Inventory.PickupsCombo[i] = s->lara()->inventory()->pickups_combo()->Get(i);
 	}
 
 	ZeroMemory(Lara.Inventory.Examines, NUM_EXAMINES * sizeof(int));

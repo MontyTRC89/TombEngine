@@ -88,7 +88,8 @@ void Volume::Register(sol::table& parent)
 
 		/// Check if specified moveable is inside the volume
 		// @function Volume:IsMoveableInside
-		// @tparam Moveable moveable which should be checked for containment
+		// @tparam Objects.Moveable Moveable which should be checked for containment
+		// @treturn bool state of the moveable, true if contained, false if not
 		ScriptReserved_IsMoveableInside, &Volume::IsMoveableInside);
 }
 
@@ -178,7 +179,7 @@ bool Volume::IsMoveableInside(const Moveable& moveable)
 			short id = std::get<short>(entry.Activator);
 			auto& mov = std::make_unique<Moveable>(id);
 
-			if (mov.get() == &moveable)
+			if (mov.get()->GetName() == moveable.GetName())
 				return true;
 		}
 	}

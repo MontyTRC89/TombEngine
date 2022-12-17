@@ -21,7 +21,7 @@ Moveables, statics, cameras, and so on.
 @pragma nostrip
 */
 
-ObjectsHandler::ObjectsHandler(sol::state* lua, sol::table & parent) :
+ObjectsHandler::ObjectsHandler(sol::state* lua, sol::table& parent) :
 	m_handler{ lua },
 	m_table_objects(sol::table{m_handler.GetState()->lua_state(), sol::create})
 {
@@ -112,38 +112,32 @@ ObjectsHandler::ObjectsHandler(sol::state* lua, sol::table & parent) :
 	Moveable::Register(m_table_objects);
 	Moveable::SetNameCallbacks(
 		[this](auto && ... param) { return AddName(std::forward<decltype(param)>(param)...); },
-		[this](auto && ... param) { return RemoveName(std::forward<decltype(param)>(param)...); }
-	);
+		[this](auto && ... param) { return RemoveName(std::forward<decltype(param)>(param)...); });
 
 	Static::Register(m_table_objects);
 	Static::SetNameCallbacks(
 		[this](auto && ... param) { return AddName(std::forward<decltype(param)>(param)...); },
-		[this](auto && ... param) { return RemoveName(std::forward<decltype(param)>(param)...); }
-	);
+		[this](auto && ... param) { return RemoveName(std::forward<decltype(param)>(param)...); });
 
 	CameraObject::Register(m_table_objects);
 	CameraObject::SetNameCallbacks(
 		[this](auto && ... param) { return AddName(std::forward<decltype(param)>(param)...); },
-		[this](auto && ... param) { return RemoveName(std::forward<decltype(param)>(param)...); }
-	);
+		[this](auto && ... param) { return RemoveName(std::forward<decltype(param)>(param)...); });
 
 	Sink::Register(m_table_objects);
 	Sink::SetNameCallbacks(
 		[this](auto && ... param) { return AddName(std::forward<decltype(param)>(param)...); },
-		[this](auto && ... param) { return RemoveName(std::forward<decltype(param)>(param)...); }
-	);
+		[this](auto && ... param) { return RemoveName(std::forward<decltype(param)>(param)...); });
 
 	AIObject::Register(m_table_objects);
 	AIObject::SetNameCallbacks(
 		[this](auto && ... param) { return AddName(std::forward<decltype(param)>(param)...); },
-		[this](auto && ... param) { return RemoveName(std::forward<decltype(param)>(param)...); }
-	);
+		[this](auto && ... param) { return RemoveName(std::forward<decltype(param)>(param)...); }	);
 
 	SoundSource::Register(m_table_objects);
 	SoundSource::SetNameCallbacks(
 		[this](auto && ... param) { return AddName(std::forward<decltype(param)>(param)...); },
-		[this](auto && ... param) { return RemoveName(std::forward<decltype(param)>(param)...); }
-	);
+		[this](auto && ... param) { return RemoveName(std::forward<decltype(param)>(param)...); });
 
 	Room::Register(m_table_objects);
 	Room::SetNameCallbacks(
@@ -154,8 +148,7 @@ ObjectsHandler::ObjectsHandler(sol::state* lua, sol::table & parent) :
 	Volume::Register(m_table_objects);
 	Volume::SetNameCallbacks(
 		[this](auto && ... param) { return AddName(std::forward<decltype(param)>(param)...); },
-		[this](auto && ... param) { return RemoveName(std::forward<decltype(param)>(param)...); }
-	);
+		[this](auto && ... param) { return RemoveName(std::forward<decltype(param)>(param)...); });
 
 	m_handler.MakeReadOnlyTable(m_table_objects, ScriptReserved_ObjID, kObjIDs);
 	m_handler.MakeReadOnlyTable(m_table_objects, ScriptReserved_RoomFlagID, kRoomFlagIDs);
@@ -165,11 +158,9 @@ ObjectsHandler::ObjectsHandler(sol::state* lua, sol::table & parent) :
 
 void ObjectsHandler::TestCollidingObjects()
 {
-	// remove any items which can't collide
+	// Remove any items which can't collide.
 	for (const auto id : m_collidingItemsToRemove)
-	{
 		m_collidingItems.erase(id);
-	}
 	m_collidingItemsToRemove.clear();
 
 	for (const auto idOne : m_collidingItems)
@@ -177,7 +168,7 @@ void ObjectsHandler::TestCollidingObjects()
 		auto item = &g_Level.Items[idOne];
 		if (!item->Callbacks.OnObjectCollided.empty())
 		{
-			//test against other moveables
+			// Test against other moveables.
 			GetCollidedObjects(item, 0, true, CollidedItems, nullptr, 0);
 			size_t i = 0;
 			while (CollidedItems[i])
@@ -190,11 +181,9 @@ void ObjectsHandler::TestCollidingObjects()
 
 		if (!item->Callbacks.OnRoomCollided.empty())
 		{
-			//test against room geometry
+			// Test against room geometry.
 			if (TestItemRoomCollisionAABB(item))
-			{
 				g_GameScript->ExecuteFunction(item->Callbacks.OnRoomCollided, idOne);
-			}
 		}
 	}
 }
@@ -204,18 +193,17 @@ void ObjectsHandler::AssignLara()
 	m_table_objects.set(ScriptReserved_Lara, LaraObject(Lara.ItemNumber, true));
 }
 
-
 bool ObjectsHandler::NotifyKilled(ItemInfo* key)
 {
 	auto it = m_moveables.find(key);
 	if (std::end(m_moveables) != it)
 	{
 		for (auto& m : m_moveables[key])
-		{
 			m->Invalidate();
-		}
+		
 		return true;
 	}
+
 	return false;
 }
 
@@ -243,12 +231,10 @@ bool ObjectsHandler::RemoveMoveableFromMap(ItemInfo* key, Moveable* mov)
 		auto& set = m_moveables[key];
 		bool erased = static_cast<bool>(set.erase(mov));
 		if (erased && set.empty())
-		{
 			erased = erased && static_cast<bool>(m_moveables.erase(key));
-		}
+		
 		return erased;
 	}
+
 	return false;
 }
-
-

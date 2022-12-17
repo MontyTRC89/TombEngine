@@ -1,6 +1,6 @@
 #pragma once
-#include <string>
 #include <functional>
+#include <string>
 
 #include "Game/control/volumeactivator.h"
 #include "Game/room.h"
@@ -18,9 +18,7 @@ using VarMapVal = std::variant<
 	std::reference_wrapper<ROOM_INFO>>;
 
 using CallbackDrawString = std::function<void(std::string const&, D3DCOLOR, int, int, int)>;
-
 using VarSaveType = std::variant<bool, double, std::string>;
-
 using IndexTable = std::vector<std::pair<uint32_t, uint32_t>>;
 
 struct FuncName

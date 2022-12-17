@@ -35,9 +35,9 @@ void Rotation::Register(sol::table& parent)
 }
 
 /*** 
-@float X rotation about x axis
-@float Y rotation about y axis
-@float Z rotation about z axis
+@tparam float X rotation about x axis
+@tparam float Y rotation about y axis
+@tparam float Z rotation about z axis
 @treturn Rotation A Rotation object.
 @function Rotation
 */
