@@ -268,7 +268,7 @@ void PushableBlockControl(short itemNumber)
 				}
 			}
 
-			if (TrInput & IN_ACTION)
+			if (IsHeld(In::Action))
 			{
 				if (!TestBlockPush(item, blockHeight, quadrant))
 				{
@@ -417,7 +417,7 @@ void PushableBlockCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo*
 
 	int blockHeight = GetStackHeight(pushableItem);
 	
-	if ((!(TrInput & IN_ACTION) ||
+	if ((!IsHeld(In::Action) ||
 		laraItem->Animation.ActiveState != LS_IDLE ||
 		laraItem->Animation.AnimNumber != LA_STAND_IDLE ||
 		laraItem->Animation.IsAirborne ||
@@ -461,14 +461,14 @@ void PushableBlockCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo*
 		if (!CheckStackLimit(pushableItem))
 			return;
 
-		if (TrInput & IN_FORWARD)
+		if (IsHeld(In::Forward))
 		{
 			if (!TestBlockPush(pushableItem, blockHeight, quadrant) || pushable->disablePush)
 				return;
 
 			laraItem->Animation.TargetState = LS_PUSHABLE_PUSH;
 		}
-		else if (TrInput & IN_BACK)
+		else if (IsHeld(In::Back))
 		{
 			if (!TestBlockPull(pushableItem, blockHeight, quadrant) || pushable->disablePull)
 				return;
@@ -476,7 +476,9 @@ void PushableBlockCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo*
 			laraItem->Animation.TargetState = LS_PUSHABLE_PULL;
 		}
 		else
+		{
 			return;
+		}
 
 		pushableItem->Status = ITEM_ACTIVE;
 		AddActiveItem(itemNumber);
@@ -553,29 +555,29 @@ void PushableBlockCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo*
 
 void PushLoop(ItemInfo* item)
 {
-	auto* info = (PushableInfo*)item->Data;
+	auto* pushable = (PushableInfo*)item->Data;
 
-	info->MovementState = PushableMovementState::Moving;
+	pushable->MovementState = PushableMovementState::Moving;
 }
 
 void PushEnd(ItemInfo* item)
 {
-	auto* info = (PushableInfo*)item->Data;
+	auto* pushable = (PushableInfo*)item->Data;
 
-	if (info->MovementState == PushableMovementState::Moving)
-		info->MovementState = PushableMovementState::Stopping;
+	if (pushable->MovementState == PushableMovementState::Moving)
+		pushable->MovementState = PushableMovementState::Stopping;
 }
 
 bool TestBlockMovable(ItemInfo* item, int blockHeight)
 {
 	RemoveBridge(item->Index);
-	auto probe = GetCollision(item);
+	auto pointColl = GetCollision(item);
 	AddBridge(item->Index);
 
-	if (probe.Block->IsWall(probe.Block->SectorPlane(item->Pose.Position.x, item->Pose.Position.z)))
+	if (pointColl.Block->IsWall(pointColl.Block->SectorPlane(item->Pose.Position.x, item->Pose.Position.z)))
 		return false;
 
-	if (probe.Position.Floor != item->Pose.Position.y)
+	if (pointColl.Position.Floor != item->Pose.Position.y)
 		return false;
 
 	return true;
@@ -995,9 +997,9 @@ int GetStackHeight(ItemInfo* item)
 
 bool CheckStackLimit(ItemInfo* item)
 {
-	auto* info = (PushableInfo*)item->Data;
+	auto* pushable = (PushableInfo*)item->Data;
 
-	int limit = info->stackLimit;
+	int limit = pushable->stackLimit;
 	
 	int count = 1;
 	auto* stackItem = item;
