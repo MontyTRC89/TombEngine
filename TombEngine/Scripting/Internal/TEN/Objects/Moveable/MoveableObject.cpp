@@ -451,7 +451,7 @@ ScriptReserved_GetSlotHP, & Moveable::GetSlotHP,
 
 /// Test if the object is in a valid state (i.e. has not been destroyed through Lua or killed by Lara).
 // @function Moveable:GetValid
-// @treturn valid bool true if the object is still not destroyed
+// @treturn bool valid true if the object is still not destroyed
 	ScriptReserved_GetValid, &Moveable::GetValid,
 
 /// Destroy the moveable. This will mean it can no longer be used, except to re-initialise it with another object.
@@ -460,7 +460,9 @@ ScriptReserved_GetSlotHP, & Moveable::GetSlotHP,
 
 /// Attach camera to an object.
 // @function Moveable:AttachObjCamera
-// @tparam int mesh 1 for camera, mesh 2 for target
+// @tparam int mesh of a moveable to use as a camera position
+// @tparam Moveable target moveable to attach camera to
+// @tparam int mesh of a target moveable to use as a camera target
 	ScriptReserved_AttachObjCamera, &Moveable::AttachObjCamera,
 
 /// Borrow animation from an object
