@@ -473,11 +473,11 @@ void InitialiseOrLoadGame(bool loadGame)
 			GameTimer = 0;
 			InitialiseGame = false;
 
-			TENLog("Starting new game...", LogLevel::Info);
+			TENLog("Starting new game.", LogLevel::Info);
 		}
 		else
 		{
-			TENLog("Starting new level...", LogLevel::Info);
+			TENLog("Starting new level.", LogLevel::Info);
 		}
 
 		g_GameScript->OnStart();
