@@ -3,6 +3,7 @@
 
 #include "ScriptAssert.h"
 #include "RoomObject.h"
+#include "RoomFlags.h"
 #include "Color/Color.h"
 #include "Vec3/Vec3.h"
 #include "ScriptUtil.h"

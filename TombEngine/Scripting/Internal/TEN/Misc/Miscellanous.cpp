@@ -361,7 +361,6 @@ namespace Misc
 		table_misc.set_function(ScriptReserved_PlayFlyBy, &PlayFlyBy);
 		table_misc.set_function(ScriptReserved_ResetObjCamera, &ResetObjCamera);
 
-
 		LuaHandler handler{ state };
 		handler.MakeReadOnlyTable(table_misc, ScriptReserved_ActionID, kActionIDs);
 	}

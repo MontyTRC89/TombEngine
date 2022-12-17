@@ -82,6 +82,7 @@ enum RoomEnvFlags
 	ENV_FLAG_MIST			  = (1 << 8),
 	ENV_FLAG_CAUSTICS		  = (1 << 9),
 	ENV_FLAG_UNKNOWN3		  = (1 << 10),
+	ENV_FLAG_DAMAGE			  = (1 << 11),
 	ENV_FLAG_COLD			  = (1 << 12)
 };
 
