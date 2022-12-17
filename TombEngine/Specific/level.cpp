@@ -590,6 +590,7 @@ void ReadRooms()
 	int numRooms = ReadInt32();
 	TENLog("Num rooms: " + std::to_string(numRooms), LogLevel::Info);
 
+	g_Level.Rooms.reserve(numRooms);
 	for (int i = 0; i < numRooms; i++)
 	{
 		auto& room = g_Level.Rooms.emplace_back();
