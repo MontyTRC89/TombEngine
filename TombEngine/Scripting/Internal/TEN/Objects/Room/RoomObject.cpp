@@ -123,9 +123,9 @@ bool Room::GetFlag(RoomEnvFlags const& flag) const
 void Room::SetFlag(RoomEnvFlags const& flag, bool const& value)
 {
 	if (value)
-		m_room.flags |= 1 << (int)flag;
+		m_room.flags |= flag;
 	else
-		m_room.flags &= ~(1 << (int)flag);
+		m_room.flags &= ~flag;
 }
 
 bool Room::IsTagPresent(std::string const& tag) const
