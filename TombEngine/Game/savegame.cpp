@@ -158,10 +158,13 @@ bool SaveGame::Save(int slot)
 
 	Save::SaveGameHeaderBuilder sghb{ fbb };
 	sghb.add_level_name(levelNameOffset);
-	sghb.add_days((GameTimer / FPS) / 8640);
-	sghb.add_hours(((GameTimer / FPS) % 86400) / 3600);
-	sghb.add_minutes(((GameTimer / FPS) / 60) % 6);
-	sghb.add_seconds((GameTimer / FPS) % 60);
+
+	auto gameTime = GetGameTime(GameTimer);
+	sghb.add_days(gameTime.Days);
+	sghb.add_hours(gameTime.Hours);
+	sghb.add_minutes(gameTime.Minutes);
+	sghb.add_seconds(gameTime.Seconds);
+
 	sghb.add_level(CurrentLevel);
 	sghb.add_timer(GameTimer);
 	sghb.add_count(++LastSaveGame);
