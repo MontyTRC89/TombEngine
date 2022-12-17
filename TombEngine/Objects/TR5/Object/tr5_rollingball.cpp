@@ -20,21 +20,26 @@ void RollingBallCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* c
 {
 	auto* ballItem = &g_Level.Items[itemNumber];
 
-	if (TestBoundsCollide(ballItem, laraItem, coll->Setup.Radius) && 
-		TestCollision(ballItem, laraItem))
+	if (!TestBoundsCollide(ballItem, laraItem, coll->Setup.Radius) ||
+		!TestCollision(ballItem, laraItem))
 	{
-		if (TriggerActive(ballItem) && (ballItem->ItemFlags[0] || ballItem->Animation.Velocity.y))
-		{
-			laraItem->HitPoints = 0;
+		return;
+	}
 
-			if (!laraItem->Animation.IsAirborne && 
-				!TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, laraItem))
-			{
-				SetAnimation(laraItem, LA_BOULDER_DEATH);
-			}
+	if (TriggerActive(ballItem) && 
+		(ballItem->ItemFlags[0] || ballItem->ItemFlags[1] || ballItem->Animation.Velocity.y))
+	{
+		laraItem->HitPoints = 0;
+
+		if (!laraItem->Animation.IsAirborne && 
+			!TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, laraItem))
+		{
+			SetAnimation(laraItem, LA_BOULDER_DEATH);
 		}
-		else
-			ObjectCollision(itemNumber, laraItem, coll);
+	}
+	else
+	{
+		ObjectCollision(itemNumber, laraItem, coll);
 	}
 }
 
