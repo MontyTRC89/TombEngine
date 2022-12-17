@@ -468,6 +468,7 @@ bool SaveGame::Save(int slot)
 
 		Save::RoomBuilder serializedInfo{ fbb };
 		serializedInfo.add_name(nameOffset);
+		serializedInfo.add_index(room.index);
 		serializedInfo.add_reverb_type((int)room.reverbType);
 		serializedInfo.add_ambient(&FromVector3(room.ambient));
 		serializedInfo.add_flags(room.flags);
@@ -1268,11 +1269,11 @@ bool SaveGame::Load(int slot)
 	for (int i = 0; i < s->rooms()->size(); i++)
 	{
 		auto room = s->rooms()->Get(i);
-		g_Level.Rooms[i].name = room->name()->str();
-		g_Level.Rooms[i].flags = room->flags();
-		g_Level.Rooms[i].reverbType = (ReverbType)room->reverb_type();
-		g_Level.Rooms[i].ambient = ToVector3(room->ambient());
-		g_Renderer.UpdateRoomAmbientLight(i, ToVector4(room->ambient()));
+		g_Level.Rooms[room->index()].name = room->name()->str();
+		g_Level.Rooms[room->index()].flags = room->flags();
+		g_Level.Rooms[room->index()].reverbType = (ReverbType)room->reverb_type();
+		g_Level.Rooms[room->index()].ambient = ToVector3(room->ambient());
+		g_Renderer.UpdateRoomAmbientLight(room->index(), ToVector4(room->ambient()));
 	}
 
 	// Effects
