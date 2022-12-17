@@ -48,35 +48,35 @@ void ClearMovableBlockSplitters(int x, int y, int z, short roomNumber)
 	short height = g_Level.Boxes[floor->Box].height;
 	short baseRoomNumber = roomNumber;
 	
-	floor = GetFloor(x + 1024, y, z, &roomNumber);
+	floor = GetFloor(x + BLOCK(1), y, z, &roomNumber);
 	if (floor->Box != NO_BOX)
 	{
 		if (g_Level.Boxes[floor->Box].height == height && (g_Level.Boxes[floor->Box].flags & BLOCKABLE) && (g_Level.Boxes[floor->Box].flags & BLOCKED))
-			ClearMovableBlockSplitters(x + SECTOR(1), y, z, roomNumber);
+			ClearMovableBlockSplitters(x + BLOCK(1), y, z, roomNumber);
 	}
 
 	roomNumber = baseRoomNumber;
-	floor = GetFloor(x - 1024, y, z, &roomNumber);
+	floor = GetFloor(x - BLOCK(1), y, z, &roomNumber);
 	if (floor->Box != NO_BOX)
 	{
 		if (g_Level.Boxes[floor->Box].height == height && (g_Level.Boxes[floor->Box].flags & BLOCKABLE) && (g_Level.Boxes[floor->Box].flags & BLOCKED))
-			ClearMovableBlockSplitters(x - SECTOR(1), y, z, roomNumber);
+			ClearMovableBlockSplitters(x - BLOCK(1), y, z, roomNumber);
 	}
 
 	roomNumber = baseRoomNumber;
-	floor = GetFloor(x, y, z + 1024, &roomNumber);
+	floor = GetFloor(x, y, z + BLOCK(1), &roomNumber);
 	if (floor->Box != NO_BOX)
 	{
 		if (g_Level.Boxes[floor->Box].height == height && (g_Level.Boxes[floor->Box].flags & BLOCKABLE) && (g_Level.Boxes[floor->Box].flags & BLOCKED))
-			ClearMovableBlockSplitters(x, y, z + SECTOR(1), roomNumber);
+			ClearMovableBlockSplitters(x, y, z + BLOCK(1), roomNumber);
 	}
 
 	roomNumber = baseRoomNumber;
-	floor = GetFloor(x, y, z - 1024, &roomNumber);
+	floor = GetFloor(x, y, z - BLOCK(1), &roomNumber);
 	if (floor->Box != NO_BOX)
 	{
 		if (g_Level.Boxes[floor->Box].height == height && (g_Level.Boxes[floor->Box].flags & BLOCKABLE) && (g_Level.Boxes[floor->Box].flags & BLOCKED))
-			ClearMovableBlockSplitters(x, y, z - SECTOR(1), roomNumber);
+			ClearMovableBlockSplitters(x, y, z - BLOCK(1), roomNumber);
 	}
 }
 
@@ -87,48 +87,48 @@ void InitialisePushableBlock(short itemNumber)
 	
 	// allocate new pushable info
 	item->Data = PushableInfo();
-	auto* info = (PushableInfo*)item->Data;
+	auto* pushable = (PushableInfo*)item->Data;
 	
-	info->stackLimit = 3; // LUA
-	info->gravity = 8; // LUA
-	info->weight = 100; // LUA
-	info->moveX = item->Pose.Position.x;
-	info->moveZ = item->Pose.Position.z;
+	pushable->stackLimit = 3; // LUA
+	pushable->gravity = 8; // LUA
+	pushable->weight = 100; // LUA
+	pushable->moveX = item->Pose.Position.x;
+	pushable->moveZ = item->Pose.Position.z;
 
 	// read flags from OCB
 	int OCB = item->TriggerFlags;
 
-	info->canFall = OCB & 0x20;
-	info->disablePull = OCB & 0x80;
-	info->disablePush = OCB & 0x100;
-	info->disableW = info->disableE = OCB & 0x200;
-	info->disableN = info->disableS = OCB & 0x400;
+	pushable->canFall = OCB & 0x20;
+	pushable->disablePull = OCB & 0x80;
+	pushable->disablePush = OCB & 0x100;
+	pushable->disableW = pushable->disableE = OCB & 0x200;
+	pushable->disableN = pushable->disableS = OCB & 0x400;
 	
-	info->climb = 0; // maybe there will be better way to handle this than OCBs?
+	pushable->climb = 0; // maybe there will be better way to handle this than OCBs?
 	/*
 	pushable->climb |= (OCB & 0x800) ? CLIMB_WEST : 0;
 	pushable->climb |= (OCB & 0x1000) ? CLIMB_NORTH : 0;
 	pushable->climb |= (OCB & 0x2000) ? CLIMB_EAST : 0;
 	pushable->climb |= (OCB & 0x4000) ? CLIMB_SOUTH : 0;
 	*/
-	info->hasFloorCeiling = false;
+	pushable->hasFloorCeiling = false;
 
 	int height;
 	if (OCB & 0x40 && (OCB & 0x1F) >= 2)
 	{
-		info->hasFloorCeiling = true;
+		pushable->hasFloorCeiling = true;
 		TEN::Floordata::AddBridge(itemNumber);
 		height = (OCB & 0x1F) * CLICK(1);
 	}
 	else
 		height = -GameBoundingBox(item).Y1;
 
-	info->height = height;
+	pushable->height = height;
 
 	// TODO: Attributes.
-	info->loopSound = SFX_TR4_PUSHABLE_SOUND;
-	info->stopSound = SFX_TR4_PUSH_BLOCK_END;
-	info->fallSound = SFX_TR4_BOULDER_FALL;
+	pushable->loopSound = SFX_TR4_PUSHABLE_SOUND;
+	pushable->stopSound = SFX_TR4_PUSH_BLOCK_END;
+	pushable->fallSound = SFX_TR4_BOULDER_FALL;
 
 	FindStack(itemNumber); // Check for stack formation when pushables are initialized.
 }
@@ -136,11 +136,11 @@ void InitialisePushableBlock(short itemNumber)
 void PushableBlockControl(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
-	auto* info = (PushableInfo*)item->Data;
+	auto* pushable = (PushableInfo*)item->Data;
 
 	Lara.InteractedItem = itemNumber;
 
-	Vector3i pos = { 0, 0, 0 };
+	auto pos = Vector3i::Zero;
 
 	short quadrant = (unsigned short)(LaraItem->Pose.Orientation.y + ANGLE(45.0f)) / ANGLE(90.0f);
 
@@ -154,8 +154,8 @@ void PushableBlockControl(short itemNumber)
 
 		if (item->Pose.Position.y < (floorHeight - item->Animation.Velocity.y))
 		{
-			if ((item->Animation.Velocity.y + info->gravity) < 128)
-				item->Animation.Velocity.y += info->gravity;
+			if ((item->Animation.Velocity.y + pushable->gravity) < 128)
+				item->Animation.Velocity.y += pushable->gravity;
 			else
 				item->Animation.Velocity.y++;
 			item->Pose.Position.y += item->Animation.Velocity.y;
@@ -172,7 +172,7 @@ void PushableBlockControl(short itemNumber)
 				FloorShake(item);
 
 			item->Animation.Velocity.y = 0;
-			SoundEffect(info->fallSound, &item->Pose, SoundEnvironment::Always);
+			SoundEffect(pushable->fallSound, &item->Pose, SoundEnvironment::Always);
 
 			MoveStackY(itemNumber, relY);
 			AddBridgeStack(itemNumber);
@@ -183,7 +183,7 @@ void PushableBlockControl(short itemNumber)
 			RemoveActiveItem(itemNumber);
 			item->Status = ITEM_NOT_ACTIVE;
 
-			if (info->hasFloorCeiling)
+			if (pushable->hasFloorCeiling)
 			{
 				//AlterFloorHeight(item, -((item->triggerFlags - 64) * 256));
 				AdjustStopperFlag(item, item->ItemFlags[0] + 0x8000, false);
@@ -194,7 +194,7 @@ void PushableBlockControl(short itemNumber)
 	}
 
 	int displaceBox = GameBoundingBox(LaraItem).Z2; // Move pushable based on bbox->Z2 of Lara
-	auto oldPos = item->Pose.Position;
+	auto prevPos = item->Pose.Position;
 
 	switch (LaraItem->Animation.AnimNumber)
 	{
@@ -210,33 +210,33 @@ void PushableBlockControl(short itemNumber)
 		switch (quadrant) 
 		{
 		case NORTH:
-			z = info->moveZ + displaceBox;
+			z = pushable->moveZ + displaceBox;
 
-			if (abs(item->Pose.Position.z - z) < CLICK(2) && item->Pose.Position.z < z)
+			if (abs(item->Pose.Position.z - z) < BLOCK(0.5f) && item->Pose.Position.z < z)
 				item->Pose.Position.z = z;
 				
 			break;
 
 		case EAST:
-			x = info->moveX + displaceBox;
+			x = pushable->moveX + displaceBox;
 
-			if (abs(item->Pose.Position.x - x) < CLICK(2) && item->Pose.Position.x < x)
+			if (abs(item->Pose.Position.x - x) < BLOCK(0.5f) && item->Pose.Position.x < x)
 				item->Pose.Position.x = x;
 
 			break;
 
 		case SOUTH:
-			z = info->moveZ - displaceBox;
+			z = pushable->moveZ - displaceBox;
 
-			if (abs(item->Pose.Position.z - z) < CLICK(2) && item->Pose.Position.z > z)
+			if (abs(item->Pose.Position.z - z) < BLOCK(0.5f) && item->Pose.Position.z > z)
 				item->Pose.Position.z = z;
 				
 			break;
 
 		case WEST:
-			x = info->moveX - displaceBox;
+			x = pushable->moveX - displaceBox;
 
-			if (abs(item->Pose.Position.x - x) < CLICK(2) && item->Pose.Position.x > x)
+			if (abs(item->Pose.Position.x - x) < BLOCK(0.5f) && item->Pose.Position.x > x)
 				item->Pose.Position.x = x;
 				
 			break;
@@ -249,7 +249,7 @@ void PushableBlockControl(short itemNumber)
 
 		if (LaraItem->Animation.FrameNumber == g_Level.Anims[LaraItem->Animation.AnimNumber].frameEnd - 1)
 		{
-			if (info->canFall) // check if pushable is about to fall
+			if (pushable->canFall) // check if pushable is about to fall
 			{
 				int floorHeight = GetCollision(item->Pose.Position.x, item->Pose.Position.y + 10, item->Pose.Position.z, item->RoomNumber).Position.Floor;
 				if (floorHeight > item->Pose.Position.y)
@@ -259,7 +259,7 @@ void PushableBlockControl(short itemNumber)
 					MoveStackXZ(itemNumber);
 					LaraItem->Animation.TargetState = LS_IDLE;
 
-					info->MovementState = PushableMovementState::None;
+					pushable->MovementState = PushableMovementState::None;
 
 					item->Animation.IsAirborne = true; // Do fall.
 					return;
@@ -269,11 +269,13 @@ void PushableBlockControl(short itemNumber)
 			if (TrInput & IN_ACTION)
 			{
 				if (!TestBlockPush(item, blockHeight, quadrant))
+				{
 					LaraItem->Animation.TargetState = LS_IDLE;
+				}
 				else
 				{
-					item->Pose.Position.x = info->moveX = item->Pose.Position.x & 0xFFFFFE00 | 0x200;
-					item->Pose.Position.z = info->moveZ = item->Pose.Position.z & 0xFFFFFE00 | 0x200;
+					item->Pose.Position.x = pushable->moveX = item->Pose.Position.x & 0xFFFFFE00 | 0x200;
+					item->Pose.Position.z = pushable->moveZ = item->Pose.Position.z & 0xFFFFFE00 | 0x200;
 					TestTriggers(item, true, item->Flags & IFLAG_ACTIVATION_MASK);
 				}
 			}
@@ -297,29 +299,29 @@ void PushableBlockControl(short itemNumber)
 		switch (quadrant)
 		{
 		case NORTH:
-			z = info->moveZ + displaceBox;
-			if (abs(item->Pose.Position.z - z) < CLICK(2) && item->Pose.Position.z > z)
+			z = pushable->moveZ + displaceBox;
+			if (abs(item->Pose.Position.z - z) < BLOCK(0.5f) && item->Pose.Position.z > z)
 				item->Pose.Position.z = z;
 
 			break;
 
 		case EAST:
-			x = info->moveX + displaceBox;
-			if (abs(item->Pose.Position.x - x) < CLICK(2) && item->Pose.Position.x > x)
+			x = pushable->moveX + displaceBox;
+			if (abs(item->Pose.Position.x - x) < BLOCK(0.5f) && item->Pose.Position.x > x)
 				item->Pose.Position.x = x;
 
 			break;
 
 		case SOUTH:
-			z = info->moveZ - displaceBox;
-			if (abs(item->Pose.Position.z - z) < CLICK(2) && item->Pose.Position.z < z)
+			z = pushable->moveZ - displaceBox;
+			if (abs(item->Pose.Position.z - z) < BLOCK(0.5f) && item->Pose.Position.z < z)
 				item->Pose.Position.z = z;
 
 			break;
 
 		case WEST:
-			x = info->moveX - displaceBox;
-			if (abs(item->Pose.Position.x - x) < CLICK(2) && item->Pose.Position.x < x)
+			x = pushable->moveX - displaceBox;
+			if (abs(item->Pose.Position.x - x) < BLOCK(0.5f) && item->Pose.Position.x < x)
 				item->Pose.Position.x = x;
 
 			break;
@@ -332,14 +334,16 @@ void PushableBlockControl(short itemNumber)
 
 		if (LaraItem->Animation.FrameNumber == g_Level.Anims[LaraItem->Animation.AnimNumber].frameEnd - 1)
 		{
-			if (TrInput & IN_ACTION)
+			if (IsHeld(In::Action))
 			{
 				if (!TestBlockPull(item, blockHeight, quadrant))
+				{
 					LaraItem->Animation.TargetState = LS_IDLE;
+				}
 				else
 				{
-					item->Pose.Position.x = info->moveX = item->Pose.Position.x & 0xFFFFFE00 | 0x200;
-					item->Pose.Position.z = info->moveZ = item->Pose.Position.z & 0xFFFFFE00 | 0x200;
+					item->Pose.Position.x = pushable->moveX = item->Pose.Position.x & 0xFFFFFE00 | 0x200;
+					item->Pose.Position.z = pushable->moveZ = item->Pose.Position.z & 0xFFFFFE00 | 0x200;
 					TestTriggers(item, true, item->Flags & IFLAG_ACTIVATION_MASK);
 				}
 			}
@@ -372,7 +376,7 @@ void PushableBlockControl(short itemNumber)
 			RemoveActiveItem(itemNumber);
 			item->Status = ITEM_NOT_ACTIVE;
 
-			if (info->hasFloorCeiling)
+			if (pushable->hasFloorCeiling)
 			{
 				//AlterFloorHeight(item, -((item->triggerFlags - 64) * 256));
 				AdjustStopperFlag(item, item->ItemFlags[0] + 0x8000, false);
@@ -384,7 +388,7 @@ void PushableBlockControl(short itemNumber)
 
 	// Set pushable movement state.
 
-	auto distance = (oldPos - item->Pose.Position).ToVector3().Length();
+	auto distance = (prevPos - item->Pose.Position).ToVector3().Length();
 	if (distance > 0.0f)
 		PushLoop(item);
 	else
@@ -392,22 +396,22 @@ void PushableBlockControl(short itemNumber)
 
 	// Do sound effects.
 
-	if (info->MovementState == PushableMovementState::Moving)
+	if (pushable->MovementState == PushableMovementState::Moving)
 	{
-		SoundEffect(info->loopSound, &item->Pose, SoundEnvironment::Always);
+		SoundEffect(pushable->loopSound, &item->Pose, SoundEnvironment::Always);
 	}
-	else if (info->MovementState == PushableMovementState::Stopping)
+	else if (pushable->MovementState == PushableMovementState::Stopping)
 	{
-		info->MovementState = PushableMovementState::None;
-		SoundEffect(info->stopSound, &item->Pose, SoundEnvironment::Always);
+		pushable->MovementState = PushableMovementState::None;
+		SoundEffect(pushable->stopSound, &item->Pose, SoundEnvironment::Always);
 	}
 }
 
 void PushableBlockCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 {
-	auto* laraInfo = GetLaraInfo(laraItem);
+	auto* lara = GetLaraInfo(laraItem);
 	auto* pushableItem = &g_Level.Items[itemNumber];
-	auto* pushableInfo = (PushableInfo*)pushableItem->Data;
+	auto* pushable = (PushableInfo*)pushableItem->Data;
 
 	int blockHeight = GetStackHeight(pushableItem);
 	
@@ -415,16 +419,16 @@ void PushableBlockCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo*
 		laraItem->Animation.ActiveState != LS_IDLE ||
 		laraItem->Animation.AnimNumber != LA_STAND_IDLE ||
 		laraItem->Animation.IsAirborne ||
-		laraInfo->Control.HandStatus != HandStatus::Free ||
+		lara->Control.HandStatus != HandStatus::Free ||
 		pushableItem->Status == ITEM_INVISIBLE ||
 		pushableItem->TriggerFlags < 0) &&
-		(!laraInfo->Control.IsMoving || laraInfo->InteractedItem != itemNumber))
+		(!lara->Control.IsMoving || lara->InteractedItem != itemNumber))
 	{
-		if ((laraItem->Animation.ActiveState != LS_PUSHABLE_GRAB ||
-			(laraItem->Animation.FrameNumber != g_Level.Anims[LA_PUSHABLE_GRAB].frameBase + 19) ||
-			laraInfo->NextCornerPos.Position.x != itemNumber))
+		if (laraItem->Animation.ActiveState != LS_PUSHABLE_GRAB ||
+			!TestLastFrame(laraItem, LA_PUSHABLE_GRAB) ||
+			lara->NextCornerPos.Position.x != itemNumber)
 		{
-			if (!pushableInfo->hasFloorCeiling)
+			if (!pushable->hasFloorCeiling)
 				ObjectCollision(itemNumber, laraItem, coll);
 
 			return;
@@ -436,16 +440,16 @@ void PushableBlockCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo*
 		switch (quadrant)
 		{
 		case NORTH:
-			quadrantDisabled = pushableInfo->disableN;
+			quadrantDisabled = pushable->disableN;
 			break;
 		case EAST:
-			quadrantDisabled = pushableInfo->disableE;
+			quadrantDisabled = pushable->disableE;
 			break;
 		case SOUTH:
-			quadrantDisabled = pushableInfo->disableS;
+			quadrantDisabled = pushable->disableS;
 			break;
 		case WEST:
-			quadrantDisabled = pushableInfo->disableW;
+			quadrantDisabled = pushable->disableW;
 			break;
 		}
 
@@ -457,14 +461,14 @@ void PushableBlockCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo*
 
 		if (TrInput & IN_FORWARD)
 		{
-			if (!TestBlockPush(pushableItem, blockHeight, quadrant) || pushableInfo->disablePush)
+			if (!TestBlockPush(pushableItem, blockHeight, quadrant) || pushable->disablePush)
 				return;
 
 			laraItem->Animation.TargetState = LS_PUSHABLE_PUSH;
 		}
 		else if (TrInput & IN_BACK)
 		{
-			if (!TestBlockPull(pushableItem, blockHeight, quadrant) || pushableInfo->disablePull)
+			if (!TestBlockPull(pushableItem, blockHeight, quadrant) || pushable->disablePull)
 				return;
 
 			laraItem->Animation.TargetState = LS_PUSHABLE_PULL;
@@ -476,10 +480,10 @@ void PushableBlockCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo*
 		AddActiveItem(itemNumber);
 		ResetLaraFlex(laraItem);
 		
-		pushableInfo->moveX = pushableItem->Pose.Position.x;
-		pushableInfo->moveZ = pushableItem->Pose.Position.z;
+		pushable->moveX = pushableItem->Pose.Position.x;
+		pushable->moveZ = pushableItem->Pose.Position.z;
 
-		if (pushableInfo->hasFloorCeiling)
+		if (pushable->hasFloorCeiling)
 		{
 			//AlterFloorHeight(item, ((item->triggerFlags - 64) * 256));
 			AdjustStopperFlag(pushableItem, pushableItem->ItemFlags[0], false);
@@ -504,49 +508,40 @@ void PushableBlockCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo*
 			else
 				PushableBlockPos.z = bounds.Z1 - CLICK(0.4f);
 
-			if (pushableInfo->hasFloorCeiling)
+			if (pushable->hasFloorCeiling)
 			{					
 				// For now don't use auto-align function because it can collide with climb up moves of Lara
 
-				laraItem->Pose.Orientation.x = pushableItem->Pose.Orientation.x;
-				laraItem->Pose.Orientation.y = pushableItem->Pose.Orientation.y;
-				laraItem->Pose.Orientation.z = pushableItem->Pose.Orientation.z;
-
-				laraItem->Animation.AnimNumber = LA_PUSHABLE_GRAB;
-				laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
-				laraItem->Animation.ActiveState = LS_PUSHABLE_GRAB;
-				laraItem->Animation.TargetState = LS_PUSHABLE_GRAB;
-				laraInfo->Control.IsMoving = false;
-				laraInfo->Control.HandStatus = HandStatus::Busy;
-				laraInfo->NextCornerPos.Position.x = itemNumber;
+				SetAnimation(laraItem, LA_PUSHABLE_GRAB);
+				laraItem->Pose.Orientation = pushableItem->Pose.Orientation;
+				lara->Control.IsMoving = false;
+				lara->Control.HandStatus = HandStatus::Busy;
+				lara->NextCornerPos.Position.x = itemNumber;
 				pushableItem->Pose.Orientation.y = rot;
 			}
 			else
 			{
 				if (MoveLaraPosition(PushableBlockPos, pushableItem, laraItem))
 				{
-					laraItem->Animation.AnimNumber = LA_PUSHABLE_GRAB;
-					laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
-					laraItem->Animation.ActiveState = LS_PUSHABLE_GRAB;
-					laraItem->Animation.TargetState = LS_PUSHABLE_GRAB;
-					laraInfo->Control.IsMoving = false;
-					laraInfo->Control.HandStatus = HandStatus::Busy;
-					laraInfo->NextCornerPos.Position.x = itemNumber;
+					SetAnimation(laraItem, LA_PUSHABLE_GRAB);
+					lara->Control.IsMoving = false;
+					lara->Control.HandStatus = HandStatus::Busy;
+					lara->NextCornerPos.Position.x = itemNumber;
 					pushableItem->Pose.Orientation.y = rot;
 				}
 				else
 				{
-					laraInfo->InteractedItem = itemNumber;
+					lara->InteractedItem = itemNumber;
 					pushableItem->Pose.Orientation.y = rot;
 				}
 			}
 		}
 		else
 		{
-			if (laraInfo->Control.IsMoving && laraInfo->InteractedItem == itemNumber)
+			if (lara->Control.IsMoving && lara->InteractedItem == itemNumber)
 			{
-				laraInfo->Control.IsMoving = false;
-				laraInfo->Control.HandStatus = HandStatus::Free;
+				lara->Control.IsMoving = false;
+				lara->Control.HandStatus = HandStatus::Free;
 			}
 
 			pushableItem->Pose.Orientation.y = rot;
@@ -589,7 +584,7 @@ bool TestBlockPush(ItemInfo* item, int blockHeight, unsigned short quadrant)
 	if (!TestBlockMovable(item, blockHeight))
 		return false;
 
-	auto* info = (PushableInfo*)item->Data;
+	auto* pushable = (PushableInfo*)item->Data;
 
 	int x = item->Pose.Position.x;
 	int y = item->Pose.Position.y;
@@ -598,19 +593,19 @@ bool TestBlockPush(ItemInfo* item, int blockHeight, unsigned short quadrant)
 	switch (quadrant)
 	{
 	case NORTH:
-		z += SECTOR(1);
+		z += BLOCK(1);
 		break;
 
 	case EAST:
-		x += SECTOR(1);
+		x += BLOCK(1);
 		break;
 
 	case SOUTH:
-		z -= SECTOR(1);
+		z -= BLOCK(1);
 		break;
 
 	case WEST:
-		x -= SECTOR(1);
+		x -= BLOCK(1);
 		break;
 	}
 
@@ -624,7 +619,7 @@ bool TestBlockPush(ItemInfo* item, int blockHeight, unsigned short quadrant)
 		probe.Block->FloorSlope(0) != Vector2::Zero || probe.Block->FloorSlope(1) != Vector2::Zero)
 		return false;
 
-	if (info->canFall)
+	if (pushable->canFall)
 	{
 		if (probe.Position.Floor < y)
 			return false;
@@ -644,7 +639,7 @@ bool TestBlockPush(ItemInfo* item, int blockHeight, unsigned short quadrant)
 	int oldZ = item->Pose.Position.z;
 	item->Pose.Position.x = x;
 	item->Pose.Position.z = z;
-	GetCollidedObjects(item, CLICK(1), true, &CollidedItems[0], &CollidedMeshes[0], true);
+	GetCollidedObjects(item, BLOCK(0.25f), true, &CollidedItems[0], &CollidedMeshes[0], true);
 	item->Pose.Position.x = oldX;
 	item->Pose.Position.z = oldZ;
 
@@ -690,19 +685,19 @@ bool TestBlockPull(ItemInfo* item, int blockHeight, short quadrant)
 	switch (quadrant)
 	{
 	case NORTH:
-		zadd = -SECTOR(1);
+		zadd = -BLOCK(1);
 		break;
 
 	case EAST:
-		xadd = -SECTOR(1);
+		xadd = -BLOCK(1);
 		break;
 
 	case SOUTH:
-		zadd = SECTOR(1);
+		zadd = BLOCK(1);
 		break;
 
 	case WEST:
-		xadd = SECTOR(1);
+		xadd = BLOCK(1);
 		break;
 	}
 
@@ -733,7 +728,7 @@ bool TestBlockPull(ItemInfo* item, int blockHeight, short quadrant)
 	int oldZ = item->Pose.Position.z;
 	item->Pose.Position.x = x;
 	item->Pose.Position.z = z;
-	GetCollidedObjects(item, CLICK(1), true, &CollidedItems[0], &CollidedMeshes[0], true);
+	GetCollidedObjects(item, BLOCK(0.25f), true, &CollidedItems[0], &CollidedMeshes[0], true);
 	item->Pose.Position.x = oldX;
 	item->Pose.Position.z = oldZ;
 
@@ -885,9 +880,9 @@ void MoveStackY(short itemNumber, int y)
 void AddBridgeStack(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
-	auto* info = (PushableInfo*)item->Data;
+	auto* pushable = (PushableInfo*)item->Data;
 
-	if (info->hasFloorCeiling)
+	if (pushable->hasFloorCeiling)
 		TEN::Floordata::AddBridge(itemNumber);
 
 	int stackIndex = g_Level.Items[itemNumber].ItemFlags[1];
@@ -895,7 +890,7 @@ void AddBridgeStack(short itemNumber)
 	{
 		auto* stackItem = &g_Level.Items[stackIndex];
 
-		if (info->hasFloorCeiling)
+		if (pushable->hasFloorCeiling)
 			TEN::Floordata::AddBridge(stackIndex);
 
 		stackIndex = g_Level.Items[stackIndex].ItemFlags[1];
@@ -905,9 +900,9 @@ void AddBridgeStack(short itemNumber)
 void RemoveBridgeStack(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
-	auto* info = (PushableInfo*)item->Data;
+	auto* pushable = (PushableInfo*)item->Data;
 
-	if (info->hasFloorCeiling)
+	if (pushable->hasFloorCeiling)
 		TEN::Floordata::RemoveBridge(itemNumber);
 
 	int stackIndex = g_Level.Items[itemNumber].ItemFlags[1];
@@ -915,7 +910,7 @@ void RemoveBridgeStack(short itemNumber)
 	{
 		auto* stackItem = &g_Level.Items[stackIndex];
 
-		if (info->hasFloorCeiling)
+		if (pushable->hasFloorCeiling)
 			TEN::Floordata::RemoveBridge(stackIndex);
 
 		stackIndex = g_Level.Items[stackIndex].ItemFlags[1];
@@ -982,15 +977,15 @@ int FindStack(short itemNumber)
 
 int GetStackHeight(ItemInfo* item)
 {
-	auto* info = (PushableInfo*)item->Data;
+	auto* pushable = (PushableInfo*)item->Data;
 
-	int height = info->height;
+	int height = pushable->height;
 
 	auto* stackItem = item;
 	while (stackItem->ItemFlags[1] != NO_ITEM)
 	{
 		stackItem = &g_Level.Items[stackItem->ItemFlags[1]];
-		height += info->height;
+		height += pushable->height;
 	}
 
 	return height;
