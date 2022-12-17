@@ -106,7 +106,7 @@ private:
 		std::vector<std::unique_ptr<R>> rooms = {};
 		for (auto& [key, val] : m_nameMap)
 		{
-			if (!std::holds_alternative<ROOM_INFO>(val))
+			if (!std::holds_alternative<std::reference_wrapper<ROOM_INFO>>(val))
 				continue;
 
 			auto room = std::get<std::reference_wrapper<ROOM_INFO>>(val).get();
