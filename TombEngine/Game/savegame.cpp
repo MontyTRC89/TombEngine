@@ -883,7 +883,7 @@ bool SaveGame::Save(int slot)
 			auto queueOffset = fbb.CreateVector(queue);
 
 			Save::VolumeBuilder volume{ fbb };
-			volume.add_room_number(i);
+			volume.add_room_number(room->index);
 			volume.add_number(j);
 			volume.add_enabled(currVolume.Enabled);
 			volume.add_position(&FromVector3(currVolume.Box.Center));
@@ -1275,15 +1275,6 @@ bool SaveGame::Load(int slot)
 		g_Renderer.UpdateRoomAmbientLight(i, ToVector4(room->ambient()));
 	}
 
-	// Flipmaps
-	for (int i = 0; i < s->flip_stats()->size(); i++)
-	{
-		if (s->flip_stats()->Get(i) != 0)
-			DoFlipMap(i);
-
-		FlipMap[i] = s->flip_maps()->Get(i) << 8;
-	}
-
 	// Effects
 	FlipEffect = s->flip_effect();
 	FlipStatus = s->flip_status();
@@ -1359,6 +1350,15 @@ bool SaveGame::Load(int slot)
 					state->timestamp()
 				});
 		}
+	}
+
+	// Flipmaps (should be applied after statics and volumes are loaded)
+	for (int i = 0; i < s->flip_stats()->size(); i++)
+	{
+		if (s->flip_stats()->Get(i) != 0)
+			DoFlipMap(i);
+
+		FlipMap[i] = s->flip_maps()->Get(i) << 8;
 	}
 
 	// Cameras 
