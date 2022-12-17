@@ -370,8 +370,8 @@ void ClassicRollingBallCollision(short itemNum, ItemInfo* lara, CollisionInfo* c
 
 void ClassicRollingBallControl(short itemNum)
 {
-	short x, z, dist, oldx, oldz, roomNum;
-	short y1, y2, ydist;
+	short roomNum;
+	int y1, y2, ydist, x, z, dist, oldx, oldz;
 	FloorInfo* floor;
 	GameVector* old;
 	ROOM_INFO* r;
@@ -420,7 +420,6 @@ void ClassicRollingBallControl(short itemNum)
 				Camera.bounce = -40 * (BLOCK(10) - dist) / BLOCK(10);
 		}
 
-//		dist = (item->objectNumber == ID_CLASSIC_ROLLING_BALL) ? 384 : 1024;//huh?
 		if (item->ObjectNumber == ID_CLASSIC_ROLLING_BALL)
 		{
 			dist = 320;
