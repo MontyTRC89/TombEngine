@@ -39,57 +39,58 @@ namespace TEN::Entities::Generic
 
 	void InitialisePushableBlock(short itemNumber)
 	{
-		auto* item = &g_Level.Items[itemNumber];
-		item->ItemFlags[1] = NO_ITEM; // need to use itemFlags[1] to hold linked index for now
+		auto& item = g_Level.Items[itemNumber];
+		item.Data = PushableInfo();
+		auto& pushable = GetPushableInfo(item);
 
-		// allocate new pushable info
-		item->Data = PushableInfo();
-		auto* pushable = (PushableInfo*)item->Data;
+		item.ItemFlags[1] = NO_ITEM; // NOTE: ItemFlags[1] stores linked index.
 
-		pushable->stackLimit = 3; // LUA
-		pushable->gravity = 8; // LUA
-		pushable->weight = 100; // LUA
-		pushable->moveX = item->Pose.Position.x;
-		pushable->moveZ = item->Pose.Position.z;
+		pushable.moveX = item.Pose.Position.x;
+		pushable.moveZ = item.Pose.Position.z;
 
-		// read flags from OCB
-		int OCB = item->TriggerFlags;
+		// TODO: Attributes.
+		pushable.stackLimit = 3;
+		pushable.gravity = 8;
+		pushable.weight = 100;
+		pushable.loopSound = SFX_TR4_PUSHABLE_SOUND;
+		pushable.stopSound = SFX_TR4_PUSH_BLOCK_END;
+		pushable.fallSound = SFX_TR4_BOULDER_FALL;
 
-		pushable->canFall = OCB & 0x20;
-		pushable->disablePull = OCB & 0x80;
-		pushable->disablePush = OCB & 0x100;
-		pushable->disableW = pushable->disableE = OCB & 0x200;
-		pushable->disableN = pushable->disableS = OCB & 0x400;
+		// Read OCB flags.
+		int ocb = item.TriggerFlags;
 
-		pushable->climb = 0; // maybe there will be better way to handle this than OCBs?
+		pushable.canFall = ocb & 0x20;
+		pushable.disablePull = ocb & 0x80;
+		pushable.disablePush = ocb & 0x100;
+		pushable.disableW = pushable.disableE = ocb & 0x200;
+		pushable.disableN = pushable.disableS = ocb & 0x400;
+
+		// TODO: Must be a better way.
+		pushable.climb = 0;
 		/*
-		pushable->climb |= (OCB & 0x800) ? CLIMB_WEST : 0;
-		pushable->climb |= (OCB & 0x1000) ? CLIMB_NORTH : 0;
-		pushable->climb |= (OCB & 0x2000) ? CLIMB_EAST : 0;
-		pushable->climb |= (OCB & 0x4000) ? CLIMB_SOUTH : 0;
+		pushable.climb |= (OCB & 0x800) ? CLIMB_WEST : 0;
+		pushable.climb |= (OCB & 0x1000) ? CLIMB_NORTH : 0;
+		pushable.climb |= (OCB & 0x2000) ? CLIMB_EAST : 0;
+		pushable.climb |= (OCB & 0x4000) ? CLIMB_SOUTH : 0;
 		*/
-		pushable->hasFloorCeiling = false;
+		pushable.hasFloorCeiling = false;
 
 		int height;
-		if (OCB & 0x40 && (OCB & 0x1F) >= 2)
+		if (ocb & 0x40 && (ocb & 0x1F) >= 2)
 		{
-			pushable->hasFloorCeiling = true;
+			pushable.hasFloorCeiling = true;
 			TEN::Floordata::AddBridge(itemNumber);
-			height = (OCB & 0x1F) * CLICK(1);
+			height = (ocb & 0x1F) * CLICK(1);
 		}
 		else
 		{
-			height = -GameBoundingBox(item).Y1;
+			height = -GameBoundingBox(&item).Y1;
 		}
 
-		pushable->height = height;
+		pushable.height = height;
 
-		// TODO: Attributes.
-		pushable->loopSound = SFX_TR4_PUSHABLE_SOUND;
-		pushable->stopSound = SFX_TR4_PUSH_BLOCK_END;
-		pushable->fallSound = SFX_TR4_BOULDER_FALL;
-
-		FindStack(itemNumber); // Check for stack formation when pushables are initialized.
+		// Check for stack formation.
+		FindStack(itemNumber);
 	}
 
 	void ClearMovableBlockSplitters(int x, int y, int z, short roomNumber)
