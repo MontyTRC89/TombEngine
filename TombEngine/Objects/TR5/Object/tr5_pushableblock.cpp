@@ -20,6 +20,10 @@ using namespace TEN::Input;
 
 namespace TEN::Entities::Generic
 {
+	// TODO: Derive from anim data.
+	constexpr auto PUSHABLE_BOX_OFFSET_PUSH = 1108 - BLOCK(1);
+	constexpr auto PUSHABLE_BOX_OFFSET_PULL = BLOCK(1) - 944;
+
 	static auto PushableBlockPos = Vector3i::Zero;
 	ObjectCollisionBounds PushableBlockBounds = 
 	{
@@ -28,8 +32,8 @@ namespace TEN::Entities::Generic
 			-CLICK(0.25f), 0,
 			0, 0),
 		std::pair(
-			EulerAngles(ANGLE(-10.0f), ANGLE(-30.0f), ANGLE(-10.0f)),
-			EulerAngles(ANGLE(10.0f), ANGLE(30.0f), ANGLE(10.0f)))
+			EulerAngles(ANGLE(-10.0f), -LARA_GRAB_THRESHOLD, ANGLE(-10.0f)),
+			EulerAngles(ANGLE(10.0f), LARA_GRAB_THRESHOLD, ANGLE(10.0f)))
 	};
 
 	PushableInfo& GetPushableInfo(ItemInfo& item)
@@ -201,7 +205,7 @@ namespace TEN::Entities::Generic
 		switch (LaraItem->Animation.AnimNumber)
 		{
 		case LA_PUSHABLE_PUSH:
-			displaceBox -= LARA_PUSHABLE_PUSH_BBOX_Z2;
+			displaceBox -= PUSHABLE_BOX_OFFSET_PUSH;
 
 			if (LaraItem->Animation.FrameNumber == g_Level.Anims[LaraItem->Animation.AnimNumber].frameBase)
 			{
@@ -290,7 +294,7 @@ namespace TEN::Entities::Generic
 			break;
 
 		case LA_PUSHABLE_PULL:
-			displaceBox -= LARA_PUSHABLE_PULL_BBOX_Z2;
+			displaceBox -= PUSHABLE_BOX_OFFSET_PULL;
 
 			if (LaraItem->Animation.FrameNumber == g_Level.Anims[LaraItem->Animation.AnimNumber].frameBase)
 			{
