@@ -81,7 +81,7 @@ namespace TEN::Entities::Generic
 		*/
 		pushable.hasFloorCeiling = false;
 
-		int height;
+		int height = 0;
 		if (ocb & 0x40 && (ocb & 0x1F) >= 2)
 		{
 			pushable.hasFloorCeiling = true;
@@ -99,9 +99,9 @@ namespace TEN::Entities::Generic
 		FindStack(itemNumber);
 	}
 
-	void ClearMovableBlockSplitters(int x, int y, int z, short roomNumber)
+	void ClearMovableBlockSplitters(const Vector3i& pos, short roomNumber)
 	{
-		FloorInfo* floor = GetFloor(x, y, z, &roomNumber);
+		FloorInfo* floor = GetFloor(pos.x, pos.y, pos.z, &roomNumber);
 		if (floor->Box == NO_BOX)
 			return;
 
@@ -109,35 +109,35 @@ namespace TEN::Entities::Generic
 		int height = g_Level.Boxes[floor->Box].height;
 		int baseRoomNumber = roomNumber;
 	
-		floor = GetFloor(x + BLOCK(1), y, z, &roomNumber);
+		floor = GetFloor(pos.x + BLOCK(1), pos.y, pos.z, &roomNumber);
 		if (floor->Box != NO_BOX)
 		{
 			if (g_Level.Boxes[floor->Box].height == height && (g_Level.Boxes[floor->Box].flags & BLOCKABLE) && (g_Level.Boxes[floor->Box].flags & BLOCKED))
-				ClearMovableBlockSplitters(x + BLOCK(1), y, z, roomNumber);
+				ClearMovableBlockSplitters(Vector3i(pos.x + BLOCK(1), pos.y, pos.z), roomNumber);
 		}
 
 		roomNumber = baseRoomNumber;
-		floor = GetFloor(x - BLOCK(1), y, z, &roomNumber);
+		floor = GetFloor(pos.x - BLOCK(1), pos.y, pos.z, &roomNumber);
 		if (floor->Box != NO_BOX)
 		{
 			if (g_Level.Boxes[floor->Box].height == height && (g_Level.Boxes[floor->Box].flags & BLOCKABLE) && (g_Level.Boxes[floor->Box].flags & BLOCKED))
-				ClearMovableBlockSplitters(x - BLOCK(1), y, z, roomNumber);
+				ClearMovableBlockSplitters(Vector3i(pos.x - BLOCK(1), pos.y, pos.z), roomNumber);
 		}
 
 		roomNumber = baseRoomNumber;
-		floor = GetFloor(x, y, z + BLOCK(1), &roomNumber);
+		floor = GetFloor(pos.x, pos.y, pos.z + BLOCK(1), &roomNumber);
 		if (floor->Box != NO_BOX)
 		{
 			if (g_Level.Boxes[floor->Box].height == height && (g_Level.Boxes[floor->Box].flags & BLOCKABLE) && (g_Level.Boxes[floor->Box].flags & BLOCKED))
-				ClearMovableBlockSplitters(x, y, z + BLOCK(1), roomNumber);
+				ClearMovableBlockSplitters(Vector3i(pos.x, pos.y, pos.z + BLOCK(1)), roomNumber);
 		}
 
 		roomNumber = baseRoomNumber;
-		floor = GetFloor(x, y, z - BLOCK(1), &roomNumber);
+		floor = GetFloor(pos.x, pos.y, pos.z - BLOCK(1), &roomNumber);
 		if (floor->Box != NO_BOX)
 		{
 			if (g_Level.Boxes[floor->Box].height == height && (g_Level.Boxes[floor->Box].flags & BLOCKABLE) && (g_Level.Boxes[floor->Box].flags & BLOCKED))
-				ClearMovableBlockSplitters(x, y, z - BLOCK(1), roomNumber);
+				ClearMovableBlockSplitters(Vector3i(pos.x, pos.y, pos.z - BLOCK(1)), roomNumber);
 		}
 	}
 
@@ -1022,6 +1022,7 @@ namespace TEN::Entities::Generic
 			const auto height = item.Pose.Position.y - (item.TriggerFlags & 0x1F) * CLICK(1);
 			return std::optional{height};
 		}
+
 		return std::nullopt;
 	}
 
@@ -1030,9 +1031,9 @@ namespace TEN::Entities::Generic
 		auto& item = g_Level.Items[itemNumber];
 		const auto& pushable = GetPushableInfo(item);
 
-		auto bboxHeight = GetBridgeItemIntersect(itemNumber, x, y, z, true);
+		auto boxHeight = GetBridgeItemIntersect(itemNumber, x, y, z, true);
 
-		if (item.Status != ITEM_INVISIBLE && pushable.hasFloorCeiling && bboxHeight.has_value())
+		if (item.Status != ITEM_INVISIBLE && pushable.hasFloorCeiling && boxHeight.has_value())
 			return std::optional{item.Pose.Position.y};
 
 		return std::nullopt;

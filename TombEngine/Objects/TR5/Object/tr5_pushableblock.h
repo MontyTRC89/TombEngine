@@ -1,5 +1,6 @@
 #pragma once
 
+class Vector3i;
 struct CollisionInfo;
 struct ItemInfo;
 
@@ -10,7 +11,7 @@ namespace TEN::Entities::Generic
 	PushableInfo& GetPushableInfo(ItemInfo& item);
 	void InitialisePushableBlock(short itemNumber);
 
-	void ClearMovableBlockSplitters(int x, int y, int z, short roomNumber);
+	void ClearMovableBlockSplitters(const Vector3i& pos, short roomNumber);
 	void PushableBlockControl(short itemNumber);
 	void PushableBlockCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);
 	bool TestBlockMovable(ItemInfo* item, int blockHeight);
