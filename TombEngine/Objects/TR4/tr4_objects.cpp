@@ -281,8 +281,7 @@ namespace TEN::Entities
 
 		obj = &Objects[ID_KNIGHT_TEMPLAR];
 		if (obj->loaded)
-		{
-		}
+			SetupKnightTemplar(*obj);
 
 		obj = &Objects[ID_BIG_BEETLE];
 		if (obj->loaded)

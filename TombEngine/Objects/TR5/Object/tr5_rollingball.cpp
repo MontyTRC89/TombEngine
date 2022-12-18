@@ -20,21 +20,26 @@ void RollingBallCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* c
 {
 	auto* ballItem = &g_Level.Items[itemNumber];
 
-	if (TestBoundsCollide(ballItem, laraItem, coll->Setup.Radius) && 
-		TestCollision(ballItem, laraItem))
+	if (!TestBoundsCollide(ballItem, laraItem, coll->Setup.Radius) ||
+		!TestCollision(ballItem, laraItem))
 	{
-		if (TriggerActive(ballItem) && (ballItem->ItemFlags[0] || ballItem->Animation.Velocity.y))
-		{
-			laraItem->HitPoints = 0;
+		return;
+	}
 
-			if (!laraItem->Animation.IsAirborne && 
-				!TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, laraItem))
-			{
-				SetAnimation(laraItem, LA_BOULDER_DEATH);
-			}
+	if (TriggerActive(ballItem) && 
+		(ballItem->ItemFlags[0] || ballItem->ItemFlags[1] || ballItem->Animation.Velocity.y))
+	{
+		laraItem->HitPoints = 0;
+
+		if (!laraItem->Animation.IsAirborne && 
+			!TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, laraItem))
+		{
+			SetAnimation(laraItem, LA_BOULDER_DEATH);
 		}
-		else
-			ObjectCollision(itemNumber, laraItem, coll);
+	}
+	else
+	{
+		ObjectCollision(itemNumber, laraItem, coll);
 	}
 }
 
@@ -370,8 +375,8 @@ void ClassicRollingBallCollision(short itemNum, ItemInfo* lara, CollisionInfo* c
 
 void ClassicRollingBallControl(short itemNum)
 {
-	short x, z, dist, oldx, oldz, roomNum;
-	short y1, y2, ydist;
+	short roomNum;
+	int y1, y2, ydist, x, z, dist, oldx, oldz;
 	FloorInfo* floor;
 	GameVector* old;
 	ROOM_INFO* r;
@@ -420,7 +425,6 @@ void ClassicRollingBallControl(short itemNum)
 				Camera.bounce = -40 * (BLOCK(10) - dist) / BLOCK(10);
 		}
 
-//		dist = (item->objectNumber == ID_CLASSIC_ROLLING_BALL) ? 384 : 1024;//huh?
 		if (item->ObjectNumber == ID_CLASSIC_ROLLING_BALL)
 		{
 			dist = 320;

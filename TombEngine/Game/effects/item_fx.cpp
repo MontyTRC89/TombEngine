@@ -81,7 +81,7 @@ namespace TEN::Effects::Items
 
 	void LaraBreath(ItemInfo* item)
 	{
-		if (item->IsLara())
+		if (!item->IsLara())
 			return;
 
 		auto* lara = GetLaraInfo(item);
