@@ -17,6 +17,8 @@
 #include "Game/effects/item_fx.h"
 #include "Game/effects/spark.h"
 
+#include "Scripting/Internal/TEN/Objects/Moveable/MoveableObject.h"
+
 using namespace TEN::Effects::Items;
 using namespace TEN::Effects::Lightning;
 using namespace TEN::Effects::Spark;
@@ -24,7 +26,8 @@ using namespace TEN::Effects::Spark;
 namespace TEN::Entities::Creatures::TR5
 {
 	const auto CyborgGunBite = BiteInfo(Vector3(0.0f, 300.0f, 64.0f), 7);
-	byte HitmanJoints[12] = { 15, 14, 13, 6, 5, 12, 7, 4, 10, 11, 19 };
+	constexpr auto CYBORG_LIFE = 50;
+	unsigned int HitmanJoints[11] = { 15, 14, 13, 6, 5, 12, 7, 4, 10, 11, 19};
 
 	enum CyborgState
 	{
@@ -36,6 +39,14 @@ namespace TEN::Entities::Creatures::TR5
 
 		CYBORG_STATE_JUMP = 15,
 		CYBORG_STATE_JUMP_2_BLOCKS = 16,
+		CYBORG_STATE_CLIMBUP_6CLICK = 17,
+		CYBORG_STATE_CLIMBUP_4CLICK = 18,
+		CYBORG_STATE_CLIMBUP_3CLICK = 19,
+
+		CYBORG_STATE_3CLICK_JUMPDOWN = 23,
+		CYBORG_STATE_4CLICK_JUMPDOWN = 24,
+		CYBORG_STATE_6CLICK_JUMPDOWN = 25,
+		
 
 		CYBORG_STATE_AIM = 38,
 		CYBORG_STATE_FIRE = 39,
@@ -44,7 +55,7 @@ namespace TEN::Entities::Creatures::TR5
 		CYBORG_STATE_DEATH = 43
 	};
 
-	// TODO
+	// All missing animations are empty animations in WadTool
 	enum CyborgAnim
 	{
 		CYBORG_ANIM_WALK = 0,
@@ -126,7 +137,7 @@ namespace TEN::Entities::Creatures::TR5
 		auto* item = &g_Level.Items[itemNumber];
 
 		ClearItem(itemNumber);
-		SetAnimation(item, CYBORG_ANIM_IDLE);
+		SetAnimation(item, CYBORG_ANIM_IDLE);		
 	}
 
 	void CyborgControl(short itemNumber)
@@ -203,7 +214,9 @@ namespace TEN::Entities::Creatures::TR5
 			{
 				if (item->ItemFlags[0] < 11)
 				{
-					item->SetMeshSwapFlags(1 << HitmanJoints[item->ItemFlags[0]]);
+					item->Timer |= 1 << HitmanJoints[item->ItemFlags[0]];
+
+					item->SetMeshSwapFlags(item->Timer);
 					item->ItemFlags[0]++;
 				}
 			}
@@ -218,8 +231,8 @@ namespace TEN::Entities::Creatures::TR5
 			auto pos = GetJointPosition(item, HitmanJoints[random], Vector3i(0, 0, 50));
 
 			TriggerLightningGlow(pos.x, pos.y, pos.z, 48, 32, 32, 64);
-			TriggerElectricSpark(GameVector(pos, item->RoomNumber),
-				EulerAngles(Random::GenerateInt(ANGLE(0), ANGLE(35)), Random::GenerateInt(ANGLE(0), ANGLE(360)), 0), 10);
+	
+			TriggerCyborgSpark(Vector3i(pos.x, pos.y, pos.z));
 			TriggerDynamicLight(pos.x, pos.y, pos.z, (GetRandomControl() & 3) + 16, 31, 63, 127);
 
 			SoundEffect(SFX_TR5_HITMAN_SPARKS_SHORT, &item->Pose);
@@ -227,34 +240,38 @@ namespace TEN::Entities::Creatures::TR5
 			if (random == 5 || random == 7 || random == 10)
 			{
 				auto pos2 = Vector3i::Zero;
-
+				auto pointProbe = GetCollision(pos2.x, pos2.y, pos2.z, item->RoomNumber);
 				switch (random)
 				{
 				case 5:
+				
 					pos2 = GetJointPosition(item, 15, Vector3i(0, 0, 50));
 					break;
 
 				case 7:
-					pos2 = GetJointPosition(item, 6, Vector3i(0, 0, 50));
 
-					if (TestEnvironment(ENV_FLAG_WATER, item) && item->HitPoints > 0)
+					pos2 = GetJointPosition(item, 6, Vector3i(0, 0, 50));
+					pointProbe = GetCollision(pos2.x, pos2.y, pos2.z, item->RoomNumber);
+
+					if (g_Level.Rooms[pointProbe.RoomNumber].flags & ENV_FLAG_WATER && item->HitPoints > 0)
 					{
 						DropEntityPickups(item);
 						DoDamage(item, INT_MAX);
 						item->Animation.ActiveState = CYBORG_STATE_DEATH;
-						item->Animation.AnimNumber = object->animIndex + 69;
+						item->Animation.AnimNumber = object->animIndex + CYBORG_ANIM_ELECTROCUTION_DEATH;
 						item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 					}
-
+				
 					break;
 
 				case 10:
+				
 					pos2 = GetJointPosition(item, 12, Vector3i(0, 0, 50));
 					break;
 				}
 
 				TriggerLightning(&pos, &pos2, Random::GenerateInt(0, 7) + 8, 
-					32, 64, 128, 24, (LI_SPLINE | LI_THINOUT | LI_THININ), 64, 3);
+					32, 64, 128, 24, (LI_SPLINE | LI_THINOUT | LI_THININ), 6, 3);
 			}
 		}
 
@@ -273,23 +290,28 @@ namespace TEN::Entities::Creatures::TR5
 				laraAI.angle = phd_atan(dz, dx) - item->Pose.Orientation.y;
 				laraAI.distance = pow(dx, 2) + pow(dz, 2);
 			}
-
+			
 			GetCreatureMood(item, &AI, creature->Enemy != LaraItem);
 
-			if (TestEnvironment(ENV_FLAG_NO_LENSFLARE, item)) // Gassed room?
+			if (TestEnvironment(ENV_FLAG_NO_LENSFLARE, item))
 			{
 				if (!(GlobalCounter & 7))
 					item->HitPoints--;
 
 				creature->Mood = MoodType::Escape;
+				creature->Enemy = nullptr;
+				item->Animation.ActiveState = CYBORG_STATE_RUN;
 
 				if (item->HitPoints <= 0)
 				{
 					item->Animation.ActiveState = CYBORG_STATE_GASSED;
-					item->Animation.AnimNumber = object->animIndex + 68;
+					item->Animation.AnimNumber = object->animIndex + CYBORG_ANIM_CHOKE_DEATH;
 					item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 				}
 			}
+			else
+				//Keep cyborg invincible if not gassed room or water electric shock
+				item->HitPoints = CYBORG_LIFE;
 
 			CreatureMood(item, &AI, creature->Enemy != LaraItem);
 
@@ -353,7 +375,7 @@ namespace TEN::Entities::Creatures::TR5
 						{
 							if (canJump1block || canJump2blocks)
 							{
-								item->Animation.AnimNumber = object->animIndex + 22;
+								item->Animation.AnimNumber = object->animIndex + CYBORG_ANIM_LEAP_FORWARD_START;
 								item->Animation.ActiveState = CYBORG_STATE_JUMP;
 								item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 								creature->MaxTurn = 0;
@@ -407,7 +429,7 @@ namespace TEN::Entities::Creatures::TR5
 				{
 					if (canJump1block || canJump2blocks)
 					{
-						item->Animation.AnimNumber = object->animIndex + 22;
+						item->Animation.AnimNumber = object->animIndex + CYBORG_ANIM_LEAP_FORWARD_START;
 						item->Animation.ActiveState = CYBORG_STATE_JUMP;
 						item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 						creature->MaxTurn = 0;
@@ -449,7 +471,7 @@ namespace TEN::Entities::Creatures::TR5
 				}
 				else if (canJump1block || canJump2blocks)
 				{
-					item->Animation.AnimNumber = object->animIndex + 22;
+					item->Animation.AnimNumber = object->animIndex + CYBORG_ANIM_LEAP_FORWARD_START;
 					item->Animation.ActiveState = CYBORG_STATE_JUMP;
 					item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 					creature->MaxTurn = 0;
@@ -566,9 +588,12 @@ namespace TEN::Entities::Creatures::TR5
 				break;
 			}
 		}
-		else if (item->Animation.ActiveState == 43 && LaraItem->Effect.Type == EffectType::None)
+		else if (item->Animation.ActiveState == CYBORG_STATE_DEATH && LaraItem->Effect.Type == EffectType::None)
 		{
-			auto pos = GetJointPosition(LaraItem, LM_LFOOT);
+			auto pos = GetJointPosition(LaraItem, LM_RFOOT);
+			auto footProbeRight = GetCollision(pos.x, pos.y, pos.z, LaraItem->RoomNumber);
+			pos = GetJointPosition(LaraItem, LM_LFOOT);
+			auto footProbeLeft = GetCollision(pos.x, pos.y, pos.z, LaraItem->RoomNumber);
 
 			short roomNumberLeft = LaraItem->RoomNumber;
 			GetFloor(pos.x, pos.y, pos.z, &roomNumberLeft);
@@ -582,8 +607,8 @@ namespace TEN::Entities::Creatures::TR5
 
 			short flipNumber = g_Level.Rooms[item->RoomNumber].flipNumber;
 
-			if (TestEnvironment(ENV_FLAG_WATER, roomRight->flags) ||
-				TestEnvironment(ENV_FLAG_WATER, roomLeft->flags))
+			if (g_Level.Rooms[footProbeLeft.RoomNumber].flags & ENV_FLAG_WATER ||
+				g_Level.Rooms[footProbeRight.RoomNumber].flags & ENV_FLAG_WATER)
 			{
 				if (roomLeft->flipNumber == flipNumber || roomRight->flipNumber == flipNumber)
 				{
@@ -631,44 +656,44 @@ namespace TEN::Entities::Creatures::TR5
 			switch (CreatureVault(itemNumber, angle, 2, 260) + 4)
 			{
 			case 0:
-				item->Animation.AnimNumber = object->animIndex + 35;
+				item->Animation.AnimNumber = object->animIndex + CYBORG_ANIM_6CLICK_JUMPDOWN;
 				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-				item->Animation.ActiveState = 25;
+				item->Animation.ActiveState = CYBORG_STATE_6CLICK_JUMPDOWN;
 				creature->MaxTurn = 0;
 				break;
 
 			case 1:
-				item->Animation.AnimNumber = object->animIndex + 41;
+				item->Animation.AnimNumber = object->animIndex + CYBORG_ANIM_4CLICK_JUMPDOWN;
 				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-				item->Animation.ActiveState = 24;
+				item->Animation.ActiveState = CYBORG_STATE_4CLICK_JUMPDOWN;
 				creature->MaxTurn = 0;
 				break;
 
 			case 2:
-				item->Animation.AnimNumber = object->animIndex + 42;
+				item->Animation.AnimNumber = object->animIndex + CYBORG_ANIM_3CLICK_JUMPDOWN;
 				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-				item->Animation.ActiveState = 23;
+				item->Animation.ActiveState = CYBORG_STATE_3CLICK_JUMPDOWN;
 				creature->MaxTurn = 0;
 				break;
 
 			case 6:
-				item->Animation.AnimNumber = object->animIndex + 29;
+				item->Animation.AnimNumber = object->animIndex + CYBORG_ANIM_CLIMBUP_3CLICK;
 				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-				item->Animation.ActiveState = 19;
+				item->Animation.ActiveState = CYBORG_STATE_CLIMBUP_3CLICK;
 				creature->MaxTurn = 0;
 				break;
 
 			case 7:
-				item->Animation.AnimNumber = object->animIndex + 28;
+				item->Animation.AnimNumber = object->animIndex + CYBORG_ANIM_CLIMBUP_4CLICK;
 				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-				item->Animation.ActiveState = 18;
+				item->Animation.ActiveState = CYBORG_STATE_CLIMBUP_4CLICK;
 				creature->MaxTurn = 0;
 				break;
 
 			case 8:
-				item->Animation.AnimNumber = object->animIndex + 27;
+				item->Animation.AnimNumber = object->animIndex + CYBORG_ANIM_CLIMBUP_6CLICK;
 				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-				item->Animation.ActiveState = 17;
+				item->Animation.ActiveState = CYBORG_STATE_CLIMBUP_6CLICK;
 				creature->MaxTurn = 0;
 				break;
 
