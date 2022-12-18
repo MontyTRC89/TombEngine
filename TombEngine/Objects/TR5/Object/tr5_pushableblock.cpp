@@ -20,6 +20,8 @@ using namespace TEN::Input;
 
 namespace TEN::Entities::Generic
 {
+	constexpr auto PUSHABLE_RUMBLE_VELOCITY = 96.0f;
+
 	// TODO: Derive from anim data.
 	constexpr auto PUSHABLE_BOX_OFFSET_PUSH = 1108 - BLOCK(1);
 	constexpr auto PUSHABLE_BOX_OFFSET_PULL = BLOCK(1) - 944;
@@ -174,16 +176,17 @@ namespace TEN::Entities::Generic
 				int relY = floorHeight - item->Pose.Position.y;
 				item->Pose.Position.y = floorHeight;
 
-				if (item->Animation.Velocity.y >= 96)
+				if (item->Animation.Velocity.y >= PUSHABLE_RUMBLE_VELOCITY)
 					FloorShake(item);
 
-				item->Animation.Velocity.y = 0;
+				item->Animation.Velocity.y = 0.0f;
 				SoundEffect(pushable.fallSound, &item->Pose, SoundEnvironment::Always);
 
 				MoveStackY(itemNumber, relY);
 				AddBridgeStack(itemNumber);
 
-				if (FindStack(itemNumber) == NO_ITEM) // if fallen on some existing pushables, don't test triggers
+				// If fallen on top of existing pushabl, don't test triggers.
+				if (FindStack(itemNumber) == NO_ITEM)
 					TestTriggers(item, true, item->Flags & IFLAG_ACTIVATION_MASK);
 			
 				RemoveActiveItem(itemNumber);
@@ -199,7 +202,8 @@ namespace TEN::Entities::Generic
 			return;
 		}
 
-		int displaceBox = GameBoundingBox(LaraItem).Z2; // Move pushable based on bbox->Z2 of Lara
+		// Move pushable based on player bounds.Z2.
+		int displaceBox = GameBoundingBox(LaraItem).Z2;
 		auto prevPos = item->Pose.Position;
 
 		switch (LaraItem->Animation.AnimNumber)
@@ -438,8 +442,7 @@ namespace TEN::Entities::Generic
 				return;
 			}
 
-			short quadrant = (unsigned short)(LaraItem->Pose.Orientation.y + ANGLE(45.0f)) / ANGLE(90.0f);
-
+			int quadrant = GetQuadrant(LaraItem->Pose.Orientation.y);
 			bool quadrantDisabled = false;
 			switch (quadrant)
 			{
@@ -585,7 +588,7 @@ namespace TEN::Entities::Generic
 		return true;
 	}
 
-	bool TestBlockPush(ItemInfo* item, int blockHeight, unsigned short quadrant)
+	bool TestBlockPush(ItemInfo* item, int blockHeight, int quadrant)
 	{
 		if (!TestBlockMovable(item, blockHeight))
 			return false;
@@ -676,60 +679,56 @@ namespace TEN::Entities::Generic
 		return true;
 	}
 
-	bool TestBlockPull(ItemInfo* item, int blockHeight, short quadrant)
+	bool TestBlockPull(ItemInfo* item, int blockHeight, int quadrant)
 	{
 		if (!TestBlockMovable(item, blockHeight))
 			return false;
 
-		int xadd = 0;
-		int zadd = 0;
-
+		auto offset = Vector3i::Zero;
 		switch (quadrant)
 		{
 		case NORTH:
-			zadd = -BLOCK(1);
+			offset = Vector3(0, 0, -BLOCK(1));
 			break;
 
 		case EAST:
-			xadd = -BLOCK(1);
+			offset = Vector3(-BLOCK(1), 0, 0);
 			break;
 
 		case SOUTH:
-			zadd = BLOCK(1);
+			offset = Vector3(0, 0, BLOCK(1));
 			break;
 
 		case WEST:
-			xadd = BLOCK(1);
+			offset = Vector3(BLOCK(1), 0, 0);
 			break;
 		}
 
-		int x = item->Pose.Position.x + xadd;
-		int y = item->Pose.Position.y;
-		int z = item->Pose.Position.z + zadd;
+		auto pos = item->Pose.Position + offset;
 
 		short roomNumber = item->RoomNumber;
 		auto* room = &g_Level.Rooms[roomNumber];
-		if (GetSector(room, x - room->x, z - room->z)->Stopper)
+		if (GetSector(room, pos.x - room->x, pos.z - room->z)->Stopper)
 			return false;
 
-		auto probe = GetCollision(x, y - blockHeight, z, item->RoomNumber);
+		auto probe = GetCollision(pos.x, pos.y - blockHeight, pos.z, item->RoomNumber);
 
-		if (probe.Position.Floor != y)
+		if (probe.Position.Floor != pos.y)
 			return false;
 
 		if (probe.Position.FloorSlope || probe.Position.DiagonalStep ||
 			probe.Block->FloorSlope(0) != Vector2::Zero || probe.Block->FloorSlope(1) != Vector2::Zero)
 			return false;
 
-		int ceiling = y - blockHeight + 100;
+		int ceiling = pos.y - blockHeight + 100;
 
-		if (GetCollision(x, ceiling, z, item->RoomNumber).Position.Ceiling > ceiling)
+		if (GetCollision(pos.x, ceiling, pos.z, item->RoomNumber).Position.Ceiling > ceiling)
 			return false;
 
 		int oldX = item->Pose.Position.x;
 		int oldZ = item->Pose.Position.z;
-		item->Pose.Position.x = x;
-		item->Pose.Position.z = z;
+		item->Pose.Position.x = pos.x;
+		item->Pose.Position.z = pos.z;
 		GetCollidedObjects(item, BLOCK(0.25f), true, &CollidedItems[0], &CollidedMeshes[0], true);
 		item->Pose.Position.x = oldX;
 		item->Pose.Position.z = oldZ;
@@ -778,27 +777,25 @@ namespace TEN::Entities::Generic
 			break;
 		}
 
-		x = LaraItem->Pose.Position.x + xadd + xAddLara;
-		z = LaraItem->Pose.Position.z + zadd + zAddLara;
-
+		pos = LaraItem->Pose.Position + offset + Vector3i(xAddLara, 0, zAddLara);
 		roomNumber = LaraItem->RoomNumber;
 
-		probe = GetCollision(x, y - LARA_HEIGHT, z, LaraItem->RoomNumber);
+		probe = GetCollision(pos.x, pos.y - LARA_HEIGHT, pos.z, LaraItem->RoomNumber);
 
 		room = &g_Level.Rooms[roomNumber];
-		if (GetSector(room, x - room->x, z - room->z)->Stopper)
+		if (GetSector(room, pos.x - room->x, pos.z - room->z)->Stopper)
 			return false;
 
-		if (probe.Position.Floor != y)
+		if (probe.Position.Floor != pos.y)
 			return false;
 
-		if (probe.Block->CeilingHeight(x, z) > y - LARA_HEIGHT)
+		if (probe.Block->CeilingHeight(pos.x, pos.z) > pos.y - LARA_HEIGHT)
 			return false;
 
 		oldX = LaraItem->Pose.Position.x;
 		oldZ = LaraItem->Pose.Position.z;
-		LaraItem->Pose.Position.x = x;
-		LaraItem->Pose.Position.z = z;
+		LaraItem->Pose.Position.x = pos.x;
+		LaraItem->Pose.Position.z = pos.z;
 		GetCollidedObjects(LaraItem, LARA_RADIUS, true, &CollidedItems[0], &CollidedMeshes[0], true);
 		LaraItem->Pose.Position.x = oldX;
 		LaraItem->Pose.Position.z = oldZ;
@@ -999,7 +996,7 @@ namespace TEN::Entities::Generic
 
 		int limit = pushable->stackLimit;
 	
-		int count = 1;
+		unsigned int count = 1;
 		auto* stackItem = item;
 		while (stackItem->ItemFlags[1] != NO_ITEM)
 		{
@@ -1015,11 +1012,12 @@ namespace TEN::Entities::Generic
 
 	std::optional<int> PushableBlockFloor(short itemNumber, int x, int y, int z)
 	{
-		const auto& item = g_Level.Items[itemNumber];
-		const auto& pushable = (PushableInfo&)item.Data;
-		auto bboxHeight = GetBridgeItemIntersect(itemNumber, x, y, z, false);
+		auto& item = g_Level.Items[itemNumber];
+		const auto& pushable = GetPushableInfo(item);
+
+		auto boxHeight = GetBridgeItemIntersect(itemNumber, x, y, z, false);
 	
-		if (item.Status != ITEM_INVISIBLE && pushable.hasFloorCeiling && bboxHeight.has_value())
+		if (item.Status != ITEM_INVISIBLE && pushable.hasFloorCeiling && boxHeight.has_value())
 		{
 			const auto height = item.Pose.Position.y - (item.TriggerFlags & 0x1F) * CLICK(1);
 			return std::optional{height};
@@ -1029,8 +1027,9 @@ namespace TEN::Entities::Generic
 
 	std::optional<int> PushableBlockCeiling(short itemNumber, int x, int y, int z)
 	{
-		const auto& item = g_Level.Items[itemNumber];
-		const auto& pushable = (PushableInfo&)item.Data;
+		auto& item = g_Level.Items[itemNumber];
+		const auto& pushable = GetPushableInfo(item);
+
 		auto bboxHeight = GetBridgeItemIntersect(itemNumber, x, y, z, true);
 
 		if (item.Status != ITEM_INVISIBLE && pushable.hasFloorCeiling && bboxHeight.has_value())
@@ -1042,6 +1041,7 @@ namespace TEN::Entities::Generic
 	int PushableBlockFloorBorder(short itemNumber)
 	{
 		const auto& item = g_Level.Items[itemNumber];
+
 		const auto height = item.Pose.Position.y - (item.TriggerFlags & 0x1F) * CLICK(1);
 		return height;
 	}
@@ -1049,6 +1049,7 @@ namespace TEN::Entities::Generic
 	int PushableBlockCeilingBorder(short itemNumber)
 	{
 		const auto& item = g_Level.Items[itemNumber];
+
 		return item.Pose.Position.y;
 	}
 }
