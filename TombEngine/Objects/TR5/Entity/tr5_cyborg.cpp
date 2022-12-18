@@ -28,7 +28,7 @@ namespace TEN::Entities::Creatures::TR5
 	constexpr auto CYBORG_HEALTH_MAX = 50;
 
 	const auto CyborgGunBite = BiteInfo(Vector3(0.0f, 300.0f, 64.0f), 7);
-	const auto HitmanJoints = std::vector<unsigned int>{ 15, 14, 13, 6, 5, 12, 7, 4, 10, 11, 19 };
+	unsigned int HitmanJoints[11] = { 15, 14, 13, 6, 5, 12, 7, 4, 10, 11, 19 }; // TODO
 
 	enum CyborgState
 	{
