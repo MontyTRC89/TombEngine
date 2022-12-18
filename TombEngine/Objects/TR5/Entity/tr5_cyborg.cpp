@@ -112,7 +112,7 @@ namespace TEN::Entities::Creatures::TR5
 		auto& item = g_Level.Items[itemNumber];
 
 		ClearItem(itemNumber);
-		SetAnimation(&item, CYBORG_ANIM_IDLE);		
+		SetAnimation(&item, CYBORG_ANIM_IDLE);
 	}
 
 	void CyborgControl(short itemNumber)
@@ -122,7 +122,6 @@ namespace TEN::Entities::Creatures::TR5
 
 		auto& item = g_Level.Items[itemNumber];
 		auto& creature = *GetCreatureInfo(&item);
-		auto& object = Objects[item.ObjectNumber];
 
 		short headingAngle = 0;
 		short joint0 = 0;
@@ -209,7 +208,7 @@ namespace TEN::Entities::Creatures::TR5
 
 			TriggerLightningGlow(pos.x, pos.y, pos.z, 48, 32, 32, 64);
 	
-			TriggerCyborgSpark(Vector3i(pos.x, pos.y, pos.z));
+			SpawnCyborgSpark(pos.ToVector3());
 			TriggerDynamicLight(pos.x, pos.y, pos.z, (GetRandomControl() & 3) + 16, 31, 63, 127);
 
 			SoundEffect(SFX_TR5_HITMAN_SPARKS_SHORT, &item.Pose);
@@ -232,9 +231,7 @@ namespace TEN::Entities::Creatures::TR5
 					{
 						DropEntityPickups(&item);
 						DoDamage(&item, INT_MAX);
-						item.Animation.ActiveState = CYBORG_STATE_DEATH;
-						item.Animation.AnimNumber = object.animIndex + CYBORG_ANIM_ELECTROCUTION_DEATH;
-						item.Animation.FrameNumber = g_Level.Anims[item.Animation.AnimNumber].frameBase;
+						SetAnimation(&item, CYBORG_ANIM_ELECTROCUTION_DEATH);
 					}
 				
 					break;
@@ -278,11 +275,7 @@ namespace TEN::Entities::Creatures::TR5
 				item.Animation.ActiveState = CYBORG_STATE_RUN;
 
 				if (item.HitPoints <= 0)
-				{
-					item.Animation.ActiveState = CYBORG_STATE_GASSED;
-					item.Animation.AnimNumber = object.animIndex + CYBORG_ANIM_CHOKE_DEATH;
-					item.Animation.FrameNumber = g_Level.Anims[item.Animation.AnimNumber].frameBase;
-				}
+					SetAnimation(&item, CYBORG_ANIM_CHOKE_DEATH);
 			}
 			// Keep cyborg invincible if not in gassed room or shocked in water.
 			else
@@ -360,9 +353,7 @@ namespace TEN::Entities::Creatures::TR5
 						{
 							if (canJump1block || canJump2blocks)
 							{
-								item.Animation.AnimNumber = object.animIndex + CYBORG_ANIM_LEAP_FORWARD_START;
-								item.Animation.ActiveState = CYBORG_STATE_JUMP;
-								item.Animation.FrameNumber = g_Level.Anims[item.Animation.AnimNumber].frameBase;
+								SetAnimation(&item, CYBORG_ANIM_LEAP_FORWARD_START);
 								creature.MaxTurn = 0;
 
 								if (canJump2blocks)
@@ -416,9 +407,7 @@ namespace TEN::Entities::Creatures::TR5
 				{
 					if (canJump1block || canJump2blocks)
 					{
-						item.Animation.AnimNumber = object.animIndex + CYBORG_ANIM_LEAP_FORWARD_START;
-						item.Animation.ActiveState = CYBORG_STATE_JUMP;
-						item.Animation.FrameNumber = g_Level.Anims[item.Animation.AnimNumber].frameBase;
+						SetAnimation(&item, CYBORG_ANIM_LEAP_FORWARD_START);
 						creature.MaxTurn = 0;
 
 						if (canJump2blocks)
@@ -462,9 +451,7 @@ namespace TEN::Entities::Creatures::TR5
 				}
 				else if (canJump1block || canJump2blocks)
 				{
-					item.Animation.AnimNumber = object.animIndex + CYBORG_ANIM_LEAP_FORWARD_START;
-					item.Animation.ActiveState = CYBORG_STATE_JUMP;
-					item.Animation.FrameNumber = g_Level.Anims[item.Animation.AnimNumber].frameBase;
+					SetAnimation(&item, CYBORG_ANIM_LEAP_FORWARD_START);
 					creature.MaxTurn = 0;
 
 					if (canJump2blocks)
