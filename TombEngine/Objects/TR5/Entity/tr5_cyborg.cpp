@@ -26,6 +26,14 @@ using namespace TEN::Effects::Spark;
 namespace TEN::Entities::Creatures::TR5
 {
 	constexpr auto CYBORG_HEALTH_MAX = 50;
+	constexpr auto CYBORG_GUN_ATTACK_DAMAGE = 12;
+
+	constexpr auto CYBORG_AWARE_RANGE	   = SQUARE(BLOCK(2));
+	constexpr auto CYBORG_IDLE_RANGE	   = SQUARE(BLOCK(1));
+	constexpr auto CYBORG_WALK_RANGE	   = SQUARE(BLOCK(3));
+	constexpr auto CYBORG_GUN_ATTACK_RANGE = SQUARE(BLOCK(4));
+
+	constexpr auto CYBORG_DISTURBANCE_VELOCITY = 20.0f;
 
 	const auto CyborgGunBite = BiteInfo(Vector3(0.0f, 300.0f, 64.0f), 7);
 	unsigned int HitmanJoints[11] = { 15, 14, 13, 6, 5, 12, 7, 4, 10, 11, 19 }; // TODO
@@ -260,7 +268,7 @@ namespace TEN::Entities::Creatures::TR5
 				int dx = LaraItem->Pose.Position.x - item.Pose.Position.x;
 				int dz = LaraItem->Pose.Position.z - item.Pose.Position.z;
 				laraAI.angle = phd_atan(dz, dx) - item.Pose.Orientation.y;
-				laraAI.distance = pow(dx, 2) + pow(dz, 2);
+				laraAI.distance = SQUARE(dx) + SQUARE(dz);
 			}
 			
 			GetCreatureMood(&item, &AI, creature.Enemy != LaraItem);
@@ -287,8 +295,8 @@ namespace TEN::Entities::Creatures::TR5
 
 			headingAngle = CreatureTurn(&item, creature.MaxTurn);
 
-			if (laraAI.distance < pow(BLOCK(2), 2) &&
-				LaraItem->Animation.Velocity.z > 20 ||
+			if (laraAI.distance < CYBORG_AWARE_RANGE &&
+				LaraItem->Animation.Velocity.z > CYBORG_DISTURBANCE_VELOCITY ||
 				item.HitStatus ||
 				TargetVisible(&item, &laraAI))
 			{
@@ -334,7 +342,7 @@ namespace TEN::Entities::Creatures::TR5
 					}
 					else if (Targetable(&item, &AI))
 					{
-						if (AI.distance < pow(BLOCK(4), 2) || AI.zoneNumber != AI.enemyZone)
+						if (AI.distance < CYBORG_GUN_ATTACK_RANGE || AI.zoneNumber != AI.enemyZone)
 						{
 							item.Animation.TargetState = CYBORG_STATE_AIM;
 						}
@@ -365,7 +373,7 @@ namespace TEN::Entities::Creatures::TR5
 							{
 								if (creature.Mood != MoodType::Bored)
 								{
-									if (AI.distance < pow(BLOCK(3), 2) || item.AIBits & FOLLOW)
+									if (AI.distance < CYBORG_WALK_RANGE || item.AIBits & FOLLOW)
 										item.Animation.TargetState = CYBORG_STATE_WALK;
 									else
 										item.Animation.TargetState = CYBORG_STATE_RUN;
@@ -397,7 +405,7 @@ namespace TEN::Entities::Creatures::TR5
 				creature.LOT.IsJumping = false;
 
 				if (Targetable(&item, &AI) &&
-					(AI.distance < pow(BLOCK(4), 2) ||
+					(AI.distance < CYBORG_GUN_ATTACK_RANGE ||
 						AI.zoneNumber != AI.enemyZone))
 				{
 					item.Animation.TargetState = CYBORG_STATE_IDLE;
@@ -417,17 +425,17 @@ namespace TEN::Entities::Creatures::TR5
 					}
 					else if (!creature.MonkeySwingAhead)
 					{
-						if (AI.distance >= pow(BLOCK(1), 2))
+						if (AI.distance < CYBORG_IDLE_RANGE)
 						{
-							if (AI.distance > pow(BLOCK(3), 2))
+							item.Animation.TargetState = CYBORG_STATE_IDLE;
+						}
+						else
+						{
+							if (AI.distance > CYBORG_WALK_RANGE)
 							{
 								if (!item.AIBits)
 									item.Animation.TargetState = CYBORG_STATE_RUN;
 							}
-						}
-						else
-						{
-							item.Animation.TargetState = CYBORG_STATE_IDLE;
 						}
 					}
 					else
@@ -443,7 +451,7 @@ namespace TEN::Entities::Creatures::TR5
 				creature.LOT.IsJumping = false;
 
 				if (Targetable(&item, &AI) &&
-					(AI.distance < pow(BLOCK(4), 2) ||
+					(AI.distance < CYBORG_GUN_ATTACK_RANGE ||
 						AI.zoneNumber != AI.enemyZone))
 				{
 					item.Animation.TargetState = CYBORG_STATE_IDLE;
@@ -465,7 +473,7 @@ namespace TEN::Entities::Creatures::TR5
 					{
 						item.Animation.TargetState = CYBORG_STATE_IDLE;
 					}
-					else if (AI.distance < pow(BLOCK(3), 2))
+					else if (AI.distance < CYBORG_WALK_RANGE)
 					{
 						item.Animation.TargetState = CYBORG_STATE_WALK;
 					}
@@ -533,7 +541,7 @@ namespace TEN::Entities::Creatures::TR5
 				}
 
 				if (Targetable(&item, &AI) &&
-					(AI.distance < pow(BLOCK(4), 2) ||
+					(AI.distance < CYBORG_GUN_ATTACK_RANGE ||
 						AI.zoneNumber != AI.enemyZone))
 				{
 					item.Animation.TargetState = CYBORG_STATE_FIRE;
@@ -571,7 +579,7 @@ namespace TEN::Entities::Creatures::TR5
 					((byte)item.Animation.FrameNumber - (byte)g_Level.Anims[item.Animation.AnimNumber].frameBase) & 1)
 				{
 					creature.FiredWeapon = 1;
-					ShotLara(&item, &AI, CyborgGunBite, joint0, 12);
+					ShotLara(&item, &AI, CyborgGunBite, joint0, CYBORG_GUN_ATTACK_DAMAGE);
 				}
 
 				break;
