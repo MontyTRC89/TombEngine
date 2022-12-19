@@ -40,7 +40,7 @@ namespace TEN::Entities::Creatures::TR5
 
 	const auto LaserguardHead = BiteInfo(Vector3(0.0f, -200.0f, 0.0f), 2);
 
-	enum TwogunState //TODO: apply enum to switches in control function
+	enum TwogunState
 	{
 		TWOGUN_STATE_EMPTY = -1,
 		TWOGUN_STATE_IDLE = 1,
@@ -75,8 +75,7 @@ namespace TEN::Entities::Creatures::TR5
 		TWOGUN_ANIM_GUN_BLOCKAGE = 13,
 		TWOGUN_ANIM_FALLSTART = 14,
 		TWOGUN_ANIM_FALLLOOP = 15,
-		TWOGUN_ANIM_FALLDEATH = 16
-		
+		TWOGUN_ANIM_FALLDEATH = 16		
 	};
 
 	void InitialiseTwogun(short itemNumber)
