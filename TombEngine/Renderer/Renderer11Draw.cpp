@@ -1811,7 +1811,7 @@ namespace TEN::Renderer
 			nativeItem->Pose.Position.y + 96 * phd_sin(TO_RAD(nativeItem->Pose.Orientation.x)),
 			nativeItem->Pose.Position.z + speed * phd_cos(TO_RAD(nativeItem->Pose.Orientation.y)));
 
-		AddLine3D(start, end, Vector4(30 / 255.0f, 30 / 255.0f, 30 / 255.0f, 0.5f));
+		AddLine3D(start, end, Vector4(250 / 255.0f, 250 / 255.0f, 250 / 255.0f, 0.5f));
 	}
 
 	void Renderer11::DrawStatics(RenderView& view, bool transparent)

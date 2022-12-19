@@ -15,6 +15,7 @@
 #include "Sound/sound.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
+#include "Game/missile.h"
 
 using namespace TEN::Entities::Traps;
 using namespace TEN::Math;
@@ -23,10 +24,11 @@ using std::vector;
 
 namespace TEN::Entities::Creatures::TR3
 {
-	const auto TribesmanAxeBite	  = BiteInfo(Vector3(0.0f, 16.0f, 265.0f), 13);
+	const auto TribesmanAxeBite = BiteInfo(Vector3(0.0f, 56.0f, 265.0f), 13);
 	const auto TribesmanDartBite1 = BiteInfo(Vector3(0.0f, 0.0f, -200.0f), 13);
-	const auto TribesmanDartBite2 = BiteInfo(Vector3(8.0f, 40.0f, -248.0f), 13);
-	const vector<unsigned int> TribesmanAxeAttackJoints	= { 13 };
+	//const auto TribesmanDartBite2 = BiteInfo(Vector3(8.0f, 40.0f, -248.0f), 13);
+	const auto TribesmanDartBite2 = BiteInfo(Vector3(0.0f, 0.0f, -148.0f), 13);
+	const vector<unsigned int> TribesmanAxeAttackJoints = { 13 };
 	const vector<unsigned int> TribesmanDartAttackJoints = { 10, 13 }; // TODO: Check.
 
 	const unsigned char TribesmanAxeHit[13][3] =
@@ -339,17 +341,19 @@ namespace TEN::Entities::Creatures::TR3
 	static void TribesmanShotDart(ItemInfo* item)
 	{
 		short dartItemNumber = CreateItem();
-		if (dartItemNumber != NO_ITEM)
-		{
+		if (dartItemNumber == NO_ITEM)
+			return;
+		
 			auto* dartItem = &g_Level.Items[dartItemNumber];
+
 			dartItem->ObjectNumber = ID_DARTS;
 			dartItem->RoomNumber = item->RoomNumber;
 
-			auto pos1 = GetJointPosition(item, TribesmanDartBite2.meshNum, Vector3i(TribesmanDartBite2.Position));
+			auto pos1 = GetJointPosition(item, TribesmanDartBite1.meshNum, Vector3i(TribesmanDartBite1.Position));
 
 			auto pos2 = pos1;
 			pos2.z *= 2;
-			pos2 = GetJointPosition(item, TribesmanDartBite2.meshNum, pos2);
+			pos2 = GetJointPosition(LaraItem, LM_LHAND, Vector3i::Zero);
 
 			auto orient = Geometry::GetOrientToPoint(pos1.ToVector3(), pos2.ToVector3());
 
@@ -370,7 +374,7 @@ namespace TEN::Entities::Creatures::TR3
 
 			TriggerDartSmoke(pos1.x, pos1.y, pos1.z, 0, 0, 1);
 			TriggerDartSmoke(pos1.x, pos1.y, pos1.z, 0, 0, 1);
-		}
+		
 	}
 
 	void TribemanDartsControl(short itemNumber)
@@ -385,6 +389,7 @@ namespace TEN::Entities::Creatures::TR3
 		short tilt = 0;
 		auto extraHeadRot = EulerAngles::Zero;
 		auto extraTorsoRot = EulerAngles::Zero;
+		short torso = 0;
 
 		if (item->HitPoints <= 0)
 		{
@@ -584,7 +589,9 @@ namespace TEN::Entities::Creatures::TR3
 				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + 15)
 				{
 					item->Animation.TargetState = TRIBESMAN_STATE_CROUCH_IDLE;
-					TribesmanShotDart(item);
+					//TribesmanShotDart(item);
+					torso = AI.angle / 2;
+					CreatureEffect2(item, TribesmanDartBite1, 250, torso, DartGun);
 				}
 
 				break;
@@ -629,4 +636,25 @@ namespace TEN::Entities::Creatures::TR3
 
 		CreatureAnimation(itemNumber, angle, 0);
 	}
+
+	short DartGun(int x, int y, int z, short velocity, short yRot, short roomNumber)
+	{
+		short fxNumber = CreateNewEffect(roomNumber);
+		if (fxNumber != NO_ITEM)
+		{
+			auto& fx = EffectList[fxNumber];
+
+			fx.pos.Position = Vector3i(x, y, z);
+			fx.pos.Orientation = EulerAngles(0, yRot, 0);
+			fx.roomNumber = roomNumber;
+			fx.speed = velocity;
+			fx.frameNumber = 0;
+			fx.objectNumber = ID_PROJ_SHARD;
+			fx.color = Vector4::One;
+			ShootAtLara(fx);
+		}
+
+		return fxNumber;
+	}
+
 }

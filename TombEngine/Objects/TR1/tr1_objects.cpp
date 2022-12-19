@@ -191,6 +191,7 @@ static void StartProjectiles(ObjectInfo* obj)
 	InitProjectile(obj, ControlMissile, ID_PROJ_SHARD);
 	InitProjectile(obj, ControlMissile, ID_PROJ_NATLA);
 	InitProjectile(obj, ControlMissile, ID_PROJ_BOMB);
+	InitProjectile(obj, ControlMissile, ID_DARTS);
 }
 
 static ObjectInfo* objToInit;

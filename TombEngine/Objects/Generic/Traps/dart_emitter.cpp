@@ -25,7 +25,7 @@ namespace TEN::Entities::Traps
 		else
 		{
 			int oldX = item->Pose.Position.x;
-			int oldZ = item->Pose.Position.z - 1000;
+			int oldZ = item->Pose.Position.z -1000;
 
 			int velocity = item->Animation.Velocity.z * phd_cos(item->Pose.Orientation.x);
 
