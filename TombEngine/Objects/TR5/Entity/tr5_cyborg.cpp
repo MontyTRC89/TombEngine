@@ -36,7 +36,7 @@ namespace TEN::Entities::Creatures::TR5
 	constexpr auto CYBORG_DISTURBANCE_VELOCITY = 20.0f;
 
 	const auto CyborgGunBite = BiteInfo(Vector3(0.0f, 300.0f, 64.0f), 7);
-	unsigned int HitmanJoints[11] = { 15, 14, 13, 6, 5, 12, 7, 4, 10, 11, 19 }; // TODO
+	const auto CyborgJoints = std::vector<unsigned int>{ 15, 14, 13, 6, 5, 12, 7, 4, 10, 11, 19 };
 
 	enum CyborgState
 	{
@@ -193,11 +193,12 @@ namespace TEN::Entities::Creatures::TR5
 		// Swap joint meshes as damage is taken.
 		if (item.HitStatus)
 		{
-			if (!(GetRandomControl() & 7))
+			if (Random::TestProbability(1 / 8.0f))
 			{
-				if (item.ItemFlags[0] < 11)
+				if (item.ItemFlags[0] < CyborgJoints.size())
 				{
-					item.Timer |= 1 << HitmanJoints[item.ItemFlags[0]];
+					unsigned int jointBit = 1 << CyborgJoints[item.ItemFlags[0]];
+					item.Timer |= jointBit;
 
 					item.SetMeshSwapFlags(item.Timer);
 					item.ItemFlags[0]++;
@@ -205,13 +206,12 @@ namespace TEN::Entities::Creatures::TR5
 			}
 		}
 
-		byte random = (byte)GetRandomControl();
-		if (TestEnvironment(ENV_FLAG_WATER, item.RoomNumber))
-			random &= 31;
+		int randomIndex = TestEnvironment(ENV_FLAG_WATER, item.RoomNumber) ?
+			Random::GenerateInt(0, 4) : Random::GenerateInt(0, 10);
 
-		if (random < item.ItemFlags[0])
+		if (randomIndex < item.ItemFlags[0])
 		{
-			auto pos = GetJointPosition(&item, HitmanJoints[random], Vector3i(0, 0, 50));
+			auto pos = GetJointPosition(&item, CyborgJoints[randomIndex], Vector3i(0, 0, 50));
 
 			TriggerLightningGlow(pos.x, pos.y, pos.z, 48, 32, 32, 64);
 	
@@ -220,11 +220,11 @@ namespace TEN::Entities::Creatures::TR5
 
 			SoundEffect(SFX_TR5_HITMAN_SPARKS_SHORT, &item.Pose);
 
-			if (random == 5 || random == 7 || random == 10)
+			if (randomIndex == 5 || randomIndex == 7 || randomIndex == 10)
 			{
 				auto pos2 = Vector3i::Zero;
 				auto pointColl2 = GetCollision(pos2.x, pos2.y, pos2.z, item.RoomNumber);
-				switch (random)
+				switch (randomIndex)
 				{
 				case 5:
 					pos2 = GetJointPosition(&item, 15, Vector3i(0, 0, 50));
