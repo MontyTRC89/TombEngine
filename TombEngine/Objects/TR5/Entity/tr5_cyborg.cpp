@@ -64,7 +64,6 @@ namespace TEN::Entities::Creatures::TR5
 		CYBORG_STATE_DEATH = 43
 	};
 
-	// All missing animations are empty animations in WadTool
 	enum CyborgAnim
 	{
 		CYBORG_ANIM_WALK = 0,
@@ -153,7 +152,7 @@ namespace TEN::Entities::Creatures::TR5
 		x += dx;
 		z += dz;
 		auto pointColl = GetCollision(x, item.Pose.Position.y, z, item.RoomNumber);
-		short roomNumber = pointColl.RoomNumber;
+		int roomNumber = pointColl.RoomNumber;
 		int height3 = pointColl.Position.Floor;
 
 		bool canJump1block = true;
@@ -258,7 +257,7 @@ namespace TEN::Entities::Creatures::TR5
 		if (item.HitPoints > 0)
 		{
 			AI_INFO laraAI;
-			if (creature.Enemy == LaraItem)
+			if (creature.Enemy->IsLara())
 			{
 				laraAI.angle = AI.angle;
 				laraAI.distance = AI.distance;
@@ -271,7 +270,7 @@ namespace TEN::Entities::Creatures::TR5
 				laraAI.distance = SQUARE(dx) + SQUARE(dz);
 			}
 			
-			GetCreatureMood(&item, &AI, creature.Enemy != LaraItem);
+			GetCreatureMood(&item, &AI, !creature.Enemy->IsLara());
 
 			if (TestEnvironment(ENV_FLAG_NO_LENSFLARE, &item))
 			{
@@ -291,7 +290,7 @@ namespace TEN::Entities::Creatures::TR5
 				item.HitPoints = CYBORG_HEALTH_MAX;
 			}
 
-			CreatureMood(&item, &AI, creature.Enemy != LaraItem);
+			CreatureMood(&item, &AI, !creature.Enemy->IsLara());
 
 			headingAngle = CreatureTurn(&item, creature.MaxTurn);
 
