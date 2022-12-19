@@ -1804,14 +1804,14 @@ namespace TEN::Renderer
 			nativeItem->Pose.Position.y,
 			nativeItem->Pose.Position.z);
 
-		float speed = (-96 * phd_cos(TO_RAD(nativeItem->Pose.Orientation.x)));
+		float speed = (-96 * phd_cos(nativeItem->Pose.Orientation.x));
 
 		Vector3 end = Vector3(
-			nativeItem->Pose.Position.x + speed * phd_sin(TO_RAD(nativeItem->Pose.Orientation.y)),
-			nativeItem->Pose.Position.y + 96 * phd_sin(TO_RAD(nativeItem->Pose.Orientation.x)),
-			nativeItem->Pose.Position.z + speed * phd_cos(TO_RAD(nativeItem->Pose.Orientation.y)));
+			nativeItem->Pose.Position.x + speed * phd_sin(nativeItem->Pose.Orientation.y),
+			nativeItem->Pose.Position.y + 96 * phd_sin(nativeItem->Pose.Orientation.x),
+			nativeItem->Pose.Position.z + speed * phd_cos(nativeItem->Pose.Orientation.y));
 
-		AddLine3D(start, end, Vector4(250 / 255.0f, 250 / 255.0f, 250 / 255.0f, 0.5f));
+		AddLine3D(start, end, Vector4(140 / 255.0f, 80 / 255.0f, 30 / 255.0f, 0.8f));
 	}
 
 	void Renderer11::DrawStatics(RenderView& view, bool transparent)

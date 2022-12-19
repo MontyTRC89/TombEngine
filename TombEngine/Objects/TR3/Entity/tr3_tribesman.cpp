@@ -26,8 +26,7 @@ namespace TEN::Entities::Creatures::TR3
 {
 	const auto TribesmanAxeBite = BiteInfo(Vector3(0.0f, 56.0f, 265.0f), 13);
 	const auto TribesmanDartBite1 = BiteInfo(Vector3(0.0f, 0.0f, -200.0f), 13);
-	//const auto TribesmanDartBite2 = BiteInfo(Vector3(8.0f, 40.0f, -248.0f), 13);
-	const auto TribesmanDartBite2 = BiteInfo(Vector3(0.0f, 0.0f, -148.0f), 13);
+	const auto TribesmanDartBite2 = BiteInfo(Vector3(8.0f, 40.0f, -248.0f), 13);
 	const vector<unsigned int> TribesmanAxeAttackJoints = { 13 };
 	const vector<unsigned int> TribesmanDartAttackJoints = { 10, 13 }; // TODO: Check.
 
@@ -350,10 +349,7 @@ namespace TEN::Entities::Creatures::TR3
 			dartItem->RoomNumber = item->RoomNumber;
 
 			auto pos1 = GetJointPosition(item, TribesmanDartBite1.meshNum, Vector3i(TribesmanDartBite1.Position));
-
-			auto pos2 = pos1;
-			pos2.z *= 2;
-			pos2 = GetJointPosition(LaraItem, LM_LHAND, Vector3i::Zero);
+			auto pos2 = GetJointPosition(LaraItem, LM_LHAND);
 
 			auto orient = Geometry::GetOrientToPoint(pos1.ToVector3(), pos2.ToVector3());
 
@@ -363,6 +359,7 @@ namespace TEN::Entities::Creatures::TR3
 
 			dartItem->Pose.Orientation = orient;
 			dartItem->Animation.Velocity.z = CLICK(1);
+			dartItem->TriggerFlags = 1;
 
 			AddActiveItem(dartItemNumber);
 
@@ -373,8 +370,7 @@ namespace TEN::Entities::Creatures::TR3
 			pos1 = GetJointPosition(item, TribesmanDartBite2.meshNum, pos1);
 
 			TriggerDartSmoke(pos1.x, pos1.y, pos1.z, 0, 0, 1);
-			TriggerDartSmoke(pos1.x, pos1.y, pos1.z, 0, 0, 1);
-		
+			TriggerDartSmoke(pos1.x, pos1.y, pos1.z, 0, 0, 1);		
 	}
 
 	void TribemanDartsControl(short itemNumber)
@@ -589,9 +585,7 @@ namespace TEN::Entities::Creatures::TR3
 				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + 15)
 				{
 					item->Animation.TargetState = TRIBESMAN_STATE_CROUCH_IDLE;
-					//TribesmanShotDart(item);
-					torso = AI.angle / 2;
-					CreatureEffect2(item, TribesmanDartBite1, 250, torso, DartGun);
+					TribesmanShotDart(item);
 				}
 
 				break;
@@ -636,25 +630,4 @@ namespace TEN::Entities::Creatures::TR3
 
 		CreatureAnimation(itemNumber, angle, 0);
 	}
-
-	short DartGun(int x, int y, int z, short velocity, short yRot, short roomNumber)
-	{
-		short fxNumber = CreateNewEffect(roomNumber);
-		if (fxNumber != NO_ITEM)
-		{
-			auto& fx = EffectList[fxNumber];
-
-			fx.pos.Position = Vector3i(x, y, z);
-			fx.pos.Orientation = EulerAngles(0, yRot, 0);
-			fx.roomNumber = roomNumber;
-			fx.speed = velocity;
-			fx.frameNumber = 0;
-			fx.objectNumber = ID_PROJ_SHARD;
-			fx.color = Vector4::One;
-			ShootAtLara(fx);
-		}
-
-		return fxNumber;
-	}
-
 }
