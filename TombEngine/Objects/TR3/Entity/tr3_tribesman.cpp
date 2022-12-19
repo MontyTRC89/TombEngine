@@ -349,7 +349,7 @@ namespace TEN::Entities::Creatures::TR3
 			dartItem->RoomNumber = item->RoomNumber;
 
 			auto pos1 = GetJointPosition(item, TribesmanDartBite1.meshNum, Vector3i(TribesmanDartBite1.Position));
-			auto pos2 = GetJointPosition(LaraItem, LM_LHAND);
+			auto pos2 = GetJointPosition(LaraItem, LM_TORSO);
 
 			auto orient = Geometry::GetOrientToPoint(pos1.ToVector3(), pos2.ToVector3());
 
@@ -360,6 +360,7 @@ namespace TEN::Entities::Creatures::TR3
 			dartItem->Pose.Orientation = orient;
 			dartItem->Animation.Velocity.z = CLICK(1);
 			dartItem->TriggerFlags = 1;
+			dartItem->Color = item->Color;
 
 			AddActiveItem(dartItemNumber);
 

@@ -90,6 +90,7 @@ namespace TEN::Entities::Traps
 			dartItem->Pose.Orientation.z = item->Pose.Orientation.z;
 			dartItem->Animation.Velocity.z = 256;
 			dartItem->TriggerFlags = item->TriggerFlags;
+			dartItem->Color = item->Color;
 
 			for (int i = 0; i < 4; i++)
 			TriggerDartSmoke(dartItem->Pose.Position.x, dartItem->Pose.Position.y, dartItem->Pose.Position.z, 0, 0, false);
