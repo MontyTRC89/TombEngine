@@ -7,6 +7,7 @@ Version 1.0.5
 * Fix discrepancies between statistics and save / load game time units.
 * Fix draw key incorrectly working in binoculars / lasersight mode.
 * Fix FLAME_EMITTER_3 not burning player.
+* Fix pathfinding problems for first initialized enemies of every slot.
 
 
 Version 1.0.4

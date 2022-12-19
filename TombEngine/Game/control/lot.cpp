@@ -159,9 +159,6 @@ void InitialiseSlot(short itemNumber, short slot, bool makeTarget)
 	{
 		default:
 		case ZoneType::None:
-		    creature->LOT.Step = CLICK(1);
-			creature->LOT.Drop = -CLICK(1);
-			object->ZoneType = ZoneType::Basic; // Only entities that use CreatureActive() will reach InitialiseSlot().
 			break;
 
 		// Can jump.
