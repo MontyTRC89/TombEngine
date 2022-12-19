@@ -216,7 +216,7 @@ namespace TEN::Entities::Creatures::TR5
 			TriggerLightningGlow(pos.x, pos.y, pos.z, 48, 32, 32, 64);
 	
 			SpawnCyborgSpark(pos.ToVector3());
-			TriggerDynamicLight(pos.x, pos.y, pos.z, (GetRandomControl() & 3) + 16, 31, 63, 127);
+			TriggerDynamicLight(pos.x, pos.y, pos.z, Random::GenerateInt(4, 20), 31, 63, 127);
 
 			SoundEffect(SFX_TR5_HITMAN_SPARKS_SHORT, &item.Pose);
 
@@ -249,7 +249,7 @@ namespace TEN::Entities::Creatures::TR5
 				}
 
 				TriggerLightning(
-					&pos, &pos2, Random::GenerateInt(0, 7) + 8, 
+					&pos, &pos2, Random::GenerateInt(8, 16), 
 					32, 64, 128, 24, (LI_SPLINE | LI_THINOUT | LI_THININ), 6, 3);
 			}
 		}
