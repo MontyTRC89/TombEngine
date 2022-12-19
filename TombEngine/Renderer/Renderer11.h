@@ -661,7 +661,6 @@ namespace TEN::Renderer
 		void FlipRooms(short roomNumber1, short roomNumber2);
 		void UpdateLaraAnimations(bool force);
 		void UpdateItemAnimations(int itemNumber, bool force);
-		void UpdateRoomAmbientLight(int roomNumber, Vector4& color);
 		void GetItemAbsBonePosition(int itemNumber, Vector3& pos, int jointIndex);
 		int  GetSpheres(short itemNumber, BoundingSphere* ptr, char worldSpace, Matrix local);
 		void GetBoneMatrix(short itemNumber, int jointIndex, Matrix* outMatrix);

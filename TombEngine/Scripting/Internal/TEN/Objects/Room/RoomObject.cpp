@@ -70,16 +70,6 @@ void Room::Register(sol::table& parent)
 		// @tparam bool the room's new flag value
 		ScriptReserved_SetFlag, &Room::SetFlag,
 
-		/// Get the room's ambient light color.
-		// @function Room:GetAmbientLight
-		// @treturn Color the room's ambient light color.
-		ScriptReserved_GetAmbientLight, &Room::GetAmbientLight,
-
-		/// Set the room's ambient light color.
-		// @function Room:SetAmbientLight
-		// @tparam Color new ambient light value
-		ScriptReserved_SetAmbientLight, &Room::SetAmbientLight,
-
 		/// Checks if specified tag is set for this room.
 		// @function Room:IsTagPresent
 		// @treturn bool true if tag is present, false if not
@@ -135,17 +125,6 @@ void Room::SetFlag(RoomEnvFlags flag, bool value)
 		m_room.flags |= flag;
 	else
 		m_room.flags &= ~flag;
-}
-
-ScriptColor Room::GetAmbientLight() const
-{
-	return ScriptColor{ m_room.ambient };
-}
-
-void Room::SetAmbientLight(ScriptColor color)
-{
-	m_room.ambient = color;
-	TEN::Renderer::g_Renderer.UpdateRoomAmbientLight(m_room.index, Vector4(color));
 }
 
 bool Room::IsTagPresent(const std::string& tag) const

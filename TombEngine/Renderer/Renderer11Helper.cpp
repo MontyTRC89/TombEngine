@@ -512,10 +512,4 @@ namespace TEN::Renderer
 
 		return s;
 	}
-
-	void Renderer11::UpdateRoomAmbientLight(int roomNumber, Vector4& color)
-	{
-		assertion(roomNumber < m_rooms.size(), "Incorrect room index");
-		m_rooms[roomNumber].AmbientLight = color;
-	}
 }

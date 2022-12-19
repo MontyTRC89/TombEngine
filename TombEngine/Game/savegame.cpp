@@ -470,7 +470,6 @@ bool SaveGame::Save(int slot)
 		serializedInfo.add_name(nameOffset);
 		serializedInfo.add_index(room.index);
 		serializedInfo.add_reverb_type((int)room.reverbType);
-		serializedInfo.add_ambient(&FromVector3(room.ambient));
 		serializedInfo.add_flags(room.flags);
 		auto serializedInfoOffset = serializedInfo.Finish();
 
@@ -1272,8 +1271,6 @@ bool SaveGame::Load(int slot)
 		g_Level.Rooms[room->index()].name = room->name()->str();
 		g_Level.Rooms[room->index()].flags = room->flags();
 		g_Level.Rooms[room->index()].reverbType = (ReverbType)room->reverb_type();
-		g_Level.Rooms[room->index()].ambient = ToVector3(room->ambient());
-		g_Renderer.UpdateRoomAmbientLight(room->index(), ToVector4(room->ambient()));
 	}
 
 	// Static objects
