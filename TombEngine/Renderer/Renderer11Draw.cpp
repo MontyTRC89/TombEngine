@@ -1791,25 +1791,6 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer11::DrawDarts(RendererItem* item, RenderView& view)
-	{
-		ItemInfo* nativeItem = &g_Level.Items[item->ItemNumber];
-
-		Vector3 start = Vector3(
-			nativeItem->Pose.Position.x,
-			nativeItem->Pose.Position.y,
-			nativeItem->Pose.Position.z);
-
-		float speed = (-96 * phd_cos(nativeItem->Pose.Orientation.x));
-
-		Vector3 end = Vector3(
-			nativeItem->Pose.Position.x + speed * phd_sin(nativeItem->Pose.Orientation.y),
-			nativeItem->Pose.Position.y + 96 * phd_sin(nativeItem->Pose.Orientation.x),
-			nativeItem->Pose.Position.z + speed * phd_cos(nativeItem->Pose.Orientation.y));
-
-		AddLine3D(start, end, Vector4(140 / 255.0f, 80 / 255.0f, 30 / 255.0f, 0.8f));
-	}
-
 	void Renderer11::DrawStatics(RenderView& view, bool transparent)
 	{
 		// Static mesh shader is used for all forthcoming renderer routines, so we
