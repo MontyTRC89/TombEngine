@@ -546,6 +546,10 @@ namespace TEN::Entities
 		obj = &Objects[ID_BABOON_SILENT];
 		if (obj->loaded)
 		{
+			if (Objects[ID_BABOON_NORMAL].loaded)
+				obj->animIndex = Objects[ID_BABOON_NORMAL].animIndex;
+			else
+				TENLog("Failed to assign ID_BABOON_SILENT animation index, ID_BABOON_NORMAL not found !", LogLevel::Warning);
 			obj->initialise = InitialiseBaboon;
 			obj->control = BaboonControl;
 			obj->collision = CreatureCollision;
@@ -556,9 +560,6 @@ namespace TEN::Entities
 			obj->radius = 256;
 			obj->intelligent = true;
 			obj->ZoneType = ZoneType::Basic;
-
-			if (Objects[ID_BABOON_NORMAL].loaded)
-				Objects[ID_BABOON_SILENT].animIndex = Objects[ID_BABOON_NORMAL].animIndex;
 		}
 
 		obj = &Objects[ID_CROCODILE_GOD];
@@ -575,8 +576,8 @@ namespace TEN::Entities
 			obj->intelligent = true;
 			obj->undead = true;
 			obj->ZoneType = ZoneType::Water;
-			g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_Y | ROT_X;
-			g_Level.Bones[obj->boneIndex + 7 * 4] |= ROT_Y | ROT_X;
+			obj->SetBoneRotation(6, ROT_X | ROT_Y);
+			obj->SetBoneRotation(7, ROT_X | ROT_Y);
 		}
 
 		obj = &Objects[ID_LOCUSTS_EMITTER];
@@ -585,7 +586,6 @@ namespace TEN::Entities
 			obj->initialise = TEN::Entities::TR4::InitialiseLocust;
 			obj->control = TEN::Entities::TR4::LocustControl;
 			obj->drawRoutine = NULL;
-			obj->ZoneType = ZoneType::Basic;
 		}
 
 		obj = &Objects[ID_WRAITH1];
@@ -612,10 +612,9 @@ namespace TEN::Entities
 		obj = &Objects[ID_LITTLE_BEETLE];
 		if (obj->loaded)
 		{
-			obj->initialise = TEN::Entities::TR4::InitialiseBeetleSwarm;
-			obj->control = TEN::Entities::TR4::BeetleSwarmControl;
+			obj->initialise = InitialiseBeetleSwarm;
+			obj->control = BeetleSwarmControl;
 			obj->drawRoutine = NULL;
-			obj->ZoneType = ZoneType::Basic;
 		}
 
 		obj = &Objects[ID_SAS_DYING];
@@ -633,11 +632,11 @@ namespace TEN::Entities
 			obj->shadowType = ShadowMode::All;
 			obj->radius = 512;
 			obj->HitPoints = 40;
-			obj->ZoneType = ZoneType::Basic;
-			g_Level.Bones[obj->boneIndex + 4 * 8] |= ROT_X;
-			g_Level.Bones[obj->boneIndex + 4 * 9] |= ROT_X;
-			g_Level.Bones[obj->boneIndex + 4 * 11] |= ROT_X;
-			g_Level.Bones[obj->boneIndex + 4 * 12] |= ROT_X;
+			obj->ZoneType = ZoneType::HumanJumpAndMonkey;
+			obj->SetBoneRotation(8, ROT_X);
+			obj->SetBoneRotation(9, ROT_X);
+			obj->SetBoneRotation(11, ROT_X);
+			obj->SetBoneRotation(12, ROT_X);
 		}
 
 		obj = &Objects[ID_VON_CROY];
@@ -652,10 +651,8 @@ namespace TEN::Entities
 			obj->explodableMeshbits = 0x200000;
 			obj->intelligent = true;
 			obj->ZoneType = ZoneType::HumanLongJumpAndMonkey;
-			g_Level.Bones[obj->boneIndex + 4 * 6] |= ROT_X;
-			g_Level.Bones[obj->boneIndex + 4 * 6] |= ROT_Y;
-			g_Level.Bones[obj->boneIndex + 4 * 20] |= ROT_X;
-			g_Level.Bones[obj->boneIndex + 4 * 20] |= ROT_Y;
+			obj->SetBoneRotation(6, ROT_X|ROT_Y);
+			obj->SetBoneRotation(20, ROT_X|ROT_Y);
 		}
 	}
 

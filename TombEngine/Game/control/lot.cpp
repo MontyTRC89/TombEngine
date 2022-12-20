@@ -34,7 +34,7 @@ int EnableEntityAI(short itemNum, int always, bool makeTarget)
 
 	if (item->IsCreature())
 		return true;
-	   	
+	// TODO: what is that ? TokyoSU - 20/12/2022
 	/*
 	if (SlotsUsed >= NUM_SLOTS)
 	{
@@ -159,7 +159,10 @@ void InitialiseSlot(short itemNumber, short slot, bool makeTarget)
 	switch (object->ZoneType)
 	{
 		default:
-		case ZoneType::None:
+		case ZoneType::Basic:
+			creature->LOT.Step = CLICK(1);
+			creature->LOT.Drop = -CLICK(2);
+			creature->LOT.Zone = ZoneType::Basic;
 			break;
 
 		// Can jump.
@@ -168,12 +171,6 @@ void InitialiseSlot(short itemNumber, short slot, bool makeTarget)
 			creature->LOT.Drop = -CLICK(1);
 			creature->LOT.CanJump = true;
 			creature->LOT.Zone = ZoneType::Skeleton;
-			break;
-
-		case ZoneType::Basic:
-			creature->LOT.Step = CLICK(1);
-			creature->LOT.Drop = -CLICK(1);
-			creature->LOT.Zone = ZoneType::Basic;
 			break;
 
 		// Can fly.
@@ -201,47 +198,48 @@ void InitialiseSlot(short itemNumber, short slot, bool makeTarget)
 				creature->LOT.IsAmphibious = true; // Can walk and swim.
 			}
 			else
-				creature->LOT.Fly = DEFAULT_SWIM_UPDOWN_SPEED;
-			
+			{
+				creature->LOT.Fly = item->ObjectNumber == ID_BAT ? DEFAULT_SWIM_UPDOWN_SPEED / 2 : DEFAULT_SWIM_UPDOWN_SPEED;
+			}
 			break;
 
 		// Can climb.
-		case ZoneType::HumanClassic:
-			creature->LOT.Step = SECTOR(1);
-			creature->LOT.Drop = -SECTOR(1);
-			creature->LOT.Zone = ZoneType::HumanClassic;
+		case ZoneType::Human:
+			creature->LOT.Step = BLOCK(1);
+			creature->LOT.Drop = -BLOCK(1);
+			creature->LOT.Zone = ZoneType::Human;
 			break;
 
 		// Can climb and jump.
 		case ZoneType::HumanJump:
-			creature->LOT.Step = SECTOR(1);
-			creature->LOT.Drop = -SECTOR(1);
+			creature->LOT.Step = BLOCK(1);
+			creature->LOT.Drop = -BLOCK(1);
 			creature->LOT.CanJump = true;
-			creature->LOT.Zone = ZoneType::HumanClassic;
+			creature->LOT.Zone = ZoneType::Human;
 			break;
 
 		// Can climb, jump, monkeyswing.
 		case ZoneType::HumanJumpAndMonkey:
-			creature->LOT.Step = SECTOR(1);
-			creature->LOT.Drop = -SECTOR(1);
+			creature->LOT.Step = BLOCK(1);
+			creature->LOT.Drop = -BLOCK(1);
 			creature->LOT.CanJump = true;
 			creature->LOT.CanMonkey = true;
-			creature->LOT.Zone = ZoneType::HumanClassic;
+			creature->LOT.Zone = ZoneType::Human;
 			break;
 
 		// Can climb, jump, monkey swing, long jump.
 		case ZoneType::HumanLongJumpAndMonkey:
-			creature->LOT.Step = SECTOR(1) + CLICK(3);
-			creature->LOT.Drop = -(SECTOR(1) + CLICK(3));
+			creature->LOT.Step = BLOCK(1) + CLICK(3);
+			creature->LOT.Drop = -(BLOCK(1) + CLICK(3));
 			creature->LOT.CanJump = true;
 			creature->LOT.CanMonkey = true;
-			creature->LOT.Zone = ZoneType::VonCroy;
+			creature->LOT.Zone = ZoneType::Human;
 			break;
 
 		case ZoneType::Spider:
-			creature->LOT.Step = SECTOR(1) - CLICK(2);
-			creature->LOT.Drop = -(SECTOR(1) - CLICK(2));
-			creature->LOT.Zone = ZoneType::HumanClassic;
+			creature->LOT.Step = BLOCK(1) - CLICK(2);
+			creature->LOT.Drop = -(BLOCK(1) - CLICK(2));
+			creature->LOT.Zone = ZoneType::Human;
 			break;
 
 		case ZoneType::Blockable:
@@ -251,13 +249,13 @@ void InitialiseSlot(short itemNumber, short slot, bool makeTarget)
 
 		case ZoneType::Ape:
 			creature->LOT.Step = CLICK(2);
-			creature->LOT.Drop = -SECTOR(1);
+			creature->LOT.Drop = -BLOCK(1);
 			break;
 
 		case ZoneType::SophiaLee:
-			creature->LOT.Step = SECTOR(1);
+			creature->LOT.Step = BLOCK(1);
 			creature->LOT.Drop = -CLICK(3);
-			creature->LOT.Zone = ZoneType::HumanClassic;
+			creature->LOT.Zone = ZoneType::Human;
 			break;
 	}
 

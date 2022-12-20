@@ -15,18 +15,23 @@ struct BOX_NODE
 
 enum class ZoneType
 {
-	None = -1,
+	/// Basic zones (used by LOT.zone and loaded from g_Level.Zones[ZoneType])
+	
+	// Can jump
 	Skeleton,
 	Basic,
-	Flyer,
-	HumanClassic,
-	VonCroy,
+	// Only underwater (exception for Crocodile which can go to land)
 	Water,
-	Max,
+	// Enable jump and monkey
+	Human,
+	Flyer,
 
-	// Custom zones (above zones are used for LOT.zone):
-	HumanJumpAndMonkey,
+	/// Custom zones (above zones are used for LOT.zone):
+
+	// Enable jump (also 1 block climb/fall)
 	HumanJump,
+	// Enable jump and MonkeySwing (also 1 block climb/fall)
+	HumanJumpAndMonkey,
 	Spider,
 	Blockable, // For large creatures such as trex and shiva.
 	SophiaLee, // Prevents Sophia from going to lower levels again.
@@ -34,7 +39,7 @@ enum class ZoneType
 	HumanLongJumpAndMonkey,
 };
 
-struct LOTInfo 
+struct LOTInfo
 {
 	bool Initialised;
 
@@ -42,7 +47,7 @@ struct LOTInfo
 	int Head;
 	int Tail;
 
-	ZoneType Zone = ZoneType::None;
+	ZoneType Zone = ZoneType::Basic;
 	Vector3i Target = Vector3i::Zero;
 	int SearchNumber;
 	int BlockMask;

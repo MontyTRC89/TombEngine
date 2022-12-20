@@ -116,7 +116,7 @@ namespace TEN::Entities::TR4
 		object.pivotLength = 50;
 		object.radius = 102;
 		object.intelligent = true;
-		object.ZoneType = ZoneType::HumanClassic;
+		object.ZoneType = ZoneType::Human;
 
 		g_Level.Bones[object.boneIndex] |= ROT_Y;
 		g_Level.Bones[object.boneIndex] |= ROT_X;

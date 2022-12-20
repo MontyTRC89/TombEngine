@@ -96,7 +96,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->radius = 102;
 		obj->pivotLength = 50;
 		obj->intelligent = true;
-		obj->ZoneType = ZoneType::HumanClassic;
+		obj->ZoneType = ZoneType::Human;
 		
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_X;
@@ -118,7 +118,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->radius = 102;
 		obj->explodableMeshbits = 0x4000;
 		obj->intelligent = true;
-		obj->ZoneType = ZoneType::HumanClassic;
+		obj->ZoneType = ZoneType::Human;
 		
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_X;
@@ -142,7 +142,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->radius = 102;
 		obj->explodableMeshbits = 0x4000;
 		obj->intelligent = true;
-		obj->ZoneType = ZoneType::HumanClassic;
+		obj->ZoneType = ZoneType::Human;
 		
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_X;
@@ -169,7 +169,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->pivotLength = 50;
 		obj->radius = 102;
 		obj->intelligent = true;
-		obj->ZoneType = ZoneType::HumanClassic;
+		obj->ZoneType = ZoneType::Human;
 		
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_X;
@@ -197,7 +197,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->radius = 102;
 		obj->explodableMeshbits = 0x4000;
 		obj->intelligent = true;
-		obj->ZoneType = ZoneType::HumanClassic;
+		obj->ZoneType = ZoneType::Human;
 		
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_X;
@@ -223,7 +223,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->pivotLength = 50;
 		obj->radius = 102;
 		obj->intelligent = true;
-		obj->ZoneType = ZoneType::HumanClassic;
+		obj->ZoneType = ZoneType::Human;
 		
 		g_Level.Bones[Objects[69].boneIndex + 6 * 4] |= ROT_Y;
 		g_Level.Bones[Objects[69].boneIndex + 6 * 4] |= ROT_X;
@@ -251,7 +251,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->radius = 102;
 		obj->explodableMeshbits = 0x4000;
 		obj->intelligent = true;
-		obj->ZoneType = ZoneType::HumanClassic;
+		obj->ZoneType = ZoneType::Human;
 		
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_X;
@@ -280,7 +280,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->radius = 102;
 		obj->explodableMeshbits = 0x4000;
 		obj->intelligent = true;
-		obj->ZoneType = ZoneType::HumanClassic;
+		obj->ZoneType = ZoneType::Human;
 		
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_X;
@@ -321,7 +321,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->radius = 102;
 		obj->biteOffset = 0;
 		obj->intelligent = true;
-		obj->ZoneType = ZoneType::HumanClassic;
+		obj->ZoneType = ZoneType::Human;
 		
 		g_Level.Bones[obj->boneIndex + 4 * 6] |= ROT_Y;
 		g_Level.Bones[obj->boneIndex + 4 * 6] |= ROT_X;
@@ -411,7 +411,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->radius = 102;
 		obj->explodableMeshbits = 0x4000;
 		obj->intelligent = true;
-		obj->ZoneType = ZoneType::HumanClassic;
+		obj->ZoneType = ZoneType::Human;
 		obj->meshSwapSlot = ID_MESHSWAP_MAFIA2;
 		
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
@@ -433,7 +433,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->pivotLength = 50;
 		obj->radius = 102;
 		obj->intelligent = true;
-		obj->ZoneType = ZoneType::HumanClassic;
+		obj->ZoneType = ZoneType::Human;
 		
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_X;
@@ -454,7 +454,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->pivotLength = 50;
 		obj->radius = 102;
 		obj->intelligent = true;
-		obj->ZoneType = ZoneType::HumanClassic;
+		obj->ZoneType = ZoneType::Human;
 		
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_X;
@@ -476,7 +476,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->radius = 102;
 		obj->intelligent = true;
 		obj->undead = true;
-		obj->ZoneType = ZoneType::HumanClassic;
+		obj->ZoneType = ZoneType::Human;
 		obj->meshSwapSlot = ID_MESHSWAP_HITMAN;
 
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
@@ -521,7 +521,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->explodableMeshbits = 4;
 		obj->intelligent = true;
 		obj->undead = true;
-		obj->ZoneType = ZoneType::HumanClassic;
+		obj->ZoneType = ZoneType::Human;
 		
 		g_Level.Bones[obj->boneIndex] |= ROT_Y;
 		g_Level.Bones[obj->boneIndex] |= ROT_X;
@@ -649,7 +649,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->pivotLength = 20;
 		obj->radius = 256;
 		obj->intelligent = true;
-		obj->ZoneType = ZoneType::HumanClassic;
+		obj->ZoneType = ZoneType::Human;
 		
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_X;
@@ -697,7 +697,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->pivotLength = 50;
 		obj->radius = 102;
 		obj->intelligent = true;
-		obj->ZoneType = ZoneType::HumanClassic;
+		obj->ZoneType = ZoneType::Human;
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_X;
 		g_Level.Bones[obj->boneIndex + 13 * 4] |= ROT_Y;
@@ -720,7 +720,7 @@ static void StartEntity(ObjectInfo *obj)
 			obj->radius = 256;
 			obj->intelligent = true;
 			obj->meshSwapSlot = ID_MESHSWAP_ROMAN_GOD1 + i;
-			obj->ZoneType = ZoneType::HumanClassic;
+			obj->ZoneType = ZoneType::Human;
 			g_Level.Bones[obj->boneIndex + 24] |= ROT_Y;
 			g_Level.Bones[obj->boneIndex + 24] |= ROT_X;
 			g_Level.Bones[obj->boneIndex + 52] |= ROT_Y;
