@@ -21,7 +21,7 @@ void InitialiseLOTarray(int itemNumber)
 	auto* item = &g_Level.Items[itemNumber];
 	auto* creature = GetCreatureInfo(item);
 
-	if(!creature->LOT.Initialised)
+	if (!creature->LOT.Initialised)
 	{
 		creature->LOT.Node = std::vector<BOX_NODE>(g_Level.Boxes.size(), BOX_NODE{});
 		creature->LOT.Initialised = true;
@@ -134,14 +134,15 @@ void InitialiseSlot(short itemNumber, short slot, bool makeTarget)
 	creature->Patrol = false;
 	creature->JumpAhead = false;
 	creature->MonkeySwingAhead = false;
+	creature->MaxTurn = ANGLE(1);
+	creature->Flags = 0;
+	creature->Enemy = nullptr;
+
 	creature->LOT.CanJump = false;
 	creature->LOT.CanMonkey = false;
 	creature->LOT.IsAmphibious = false; // True for crocodile by default as the only the crocodile that can move in water and on land.
 	creature->LOT.IsJumping = false;
 	creature->LOT.IsMonkeying = false;
-	creature->MaxTurn = ANGLE(1);
-	creature->Flags = 0;
-	creature->Enemy = nullptr;
 	creature->LOT.Fly = NO_FLYING;
 	creature->LOT.BlockMask = BLOCKED;
 
