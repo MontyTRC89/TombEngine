@@ -67,7 +67,6 @@ struct LOTInfo
 
 enum class MoodType 
 {
-	None,
 	Bored,
 	Attack,
 	Escape,
@@ -87,7 +86,7 @@ struct CreatureInfo
 	short ItemNumber = -1;
 
 	LOTInfo	  LOT			 = {};
-	MoodType  Mood			 = MoodType::None;
+	MoodType  Mood			 = MoodType::Bored;
 	ItemInfo* Enemy			 = nullptr;
 	ItemInfo* AITarget		 = nullptr;
 	short	  AITargetNumber = -1;

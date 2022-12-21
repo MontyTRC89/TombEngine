@@ -59,6 +59,9 @@
     <LibraryPath>$(LibraryPath);$(DXSDK_DIR)Lib\x86;$(SolutionDir)Libs\spdlog;$(SolutionDir)Libs\zlib\dll32;$(SolutionDir)Libs\lua;$(SolutionDir)Libs\ois;$(SolutionDir)Libs\bass</LibraryPath>
     <TargetExt>.exe</TargetExt>
   </PropertyGroup>
+  <PropertyGroup Label="Vcpkg">
+    <VcpkgEnabled>false</VcpkgEnabled>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <PrecompiledHeader>Use</PrecompiledHeader>

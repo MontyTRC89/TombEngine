@@ -23,6 +23,8 @@ namespace TEN::Entities::Creatures::TR3
 	const vector<unsigned int> MPStickPunchAttackJoints = { 10, 13 };
 	const vector<unsigned int> MPStickKickAttackJoints  = { 5, 6 };
 
+	constexpr auto MPSTICK_VAULT_SHIFT = 260;
+
 	enum MPStickState
 	{
 		// No state 0.
@@ -44,18 +46,21 @@ namespace TEN::Entities::Creatures::TR3
 		MPSTICK_STATE_FALL3 = 16,
 	};
 
-	// TODO
 	enum MPStickAnim
 	{
-
+		MPSTICK_ANIM_IDLE = 6,
+		MPSTICK_ANIM_DEATH = 26,
+		MPSTICK_CLIMB3_ANIM = 27,
+		MPSTICK_CLIMB1_ANIM = 28,
+		MPSTICK_CLIMB2_ANIM = 29,
+		MPSTICK_FALL4_ANIM = 30
 	};
 
 	void InitialiseMPStick(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
-
-		ClearItem(itemNumber);
-		SetAnimation(item, 6);
+		InitialiseCreature(itemNumber);
+		SetAnimation(item, MPSTICK_ANIM_IDLE);
 	}
 
 	void MPStickControl(short itemNumber)
@@ -140,7 +145,7 @@ namespace TEN::Entities::Creatures::TR3
 				int dx = LaraItem->Pose.Position.x - item->Pose.Position.x;
 				int dz = LaraItem->Pose.Position.z - item->Pose.Position.z;
 				laraAI.angle = phd_atan(dz, dx) - item->Pose.Orientation.y;
-				laraAI.distance = pow(dx, 2) + pow(dz, 2);
+				laraAI.distance = SQUARE(dx) + SQUARE(dz);
 			}
 
 			GetCreatureMood(item, &AI, true);
@@ -478,34 +483,26 @@ namespace TEN::Entities::Creatures::TR3
 
 		if (item->Animation.ActiveState < MPSTICK_STATE_DEATH)
 		{
-			switch (CreatureVault(itemNumber, angle, 2, 260))
+			switch (CreatureVault(itemNumber, angle, 2, MPSTICK_VAULT_SHIFT))
 			{
 			case 2:
-				item->Animation.AnimNumber = Objects[ID_MP_WITH_STICK].animIndex + 28;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-				item->Animation.ActiveState = MPSTICK_STATE_CLIMB1;
 				creature->MaxTurn = 0;
+				SetAnimation(item, MPSTICK_CLIMB1_ANIM);
 				break;
 
 			case 3:
-				item->Animation.AnimNumber = Objects[ID_MP_WITH_STICK].animIndex + 29;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-				item->Animation.ActiveState = MPSTICK_STATE_CLIMB2;
 				creature->MaxTurn = 0;
+				SetAnimation(item, MPSTICK_CLIMB2_ANIM);
 				break;
 
 			case 4:
-				item->Animation.AnimNumber = Objects[ID_MP_WITH_STICK].animIndex + 27;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-				item->Animation.ActiveState = MPSTICK_STATE_CLIMB3;
 				creature->MaxTurn = 0;
+				SetAnimation(item, MPSTICK_CLIMB3_ANIM);
 				break;
 
-			case -4:
-				item->Animation.AnimNumber = Objects[ID_MP_WITH_STICK].animIndex + 30;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-				item->Animation.ActiveState = MPSTICK_STATE_FALL3;
+			case -3:
 				creature->MaxTurn = 0;
+				SetAnimation(item, MPSTICK_FALL4_ANIM);
 				break;
 			}
 		}

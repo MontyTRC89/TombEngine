@@ -54,8 +54,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->intelligent = true;
 		obj->waterCreature = true;
 		obj->ZoneType = ZoneType::Water;
-		
-		g_Level.Bones[obj->boneIndex + 9 * 4] |= ROT_Y;
+		obj->SetBoneRotationFlags(9, ROT_Y);
 	}
 
 	obj = &Objects[ID_BARRACUDA];
@@ -71,8 +70,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->intelligent = true;
 		obj->waterCreature = true;
 		obj->ZoneType = ZoneType::Water;
-		
-		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
+		obj->SetBoneRotationFlags(6, ROT_Y);
 	}
 
 	obj = &Objects[ID_EAGLE];
@@ -108,6 +106,7 @@ static void StartEntity(ObjectInfo* obj)
 	obj = &Objects[ID_RAT];
 	if (obj->loaded)
 	{
+		obj->initialise = InitialiseCreature;
 		obj->control = RatControl;
 		obj->collision = CreatureCollision;
 		obj->HitPoints = 5;
@@ -131,9 +130,8 @@ static void StartEntity(ObjectInfo* obj)
 		obj->pivotLength = 100;
 		obj->intelligent = true;
 		obj->ZoneType = ZoneType::Human;
-		
-		g_Level.Bones[obj->boneIndex + 6 * 4] |= (ROT_Y);
-		g_Level.Bones[obj->boneIndex + 14 * 4] |= (ROT_Y);
+		obj->SetBoneRotationFlags(6, ROT_Y);
+		obj->SetBoneRotationFlags(14, ROT_Y);
 	}
 
 	obj = &Objects[ID_GOON_SILENCER1];
@@ -149,9 +147,8 @@ static void StartEntity(ObjectInfo* obj)
 		obj->radius = 102;
 		obj->pivotLength = 50;
 		obj->intelligent = true;
-		
-		g_Level.Bones[obj->boneIndex + 0] |= (ROT_X | ROT_Y);
-		g_Level.Bones[obj->boneIndex + 1 * 4] |= (ROT_X | ROT_Y);
+		obj->SetBoneRotationFlags(0, ROT_X | ROT_Y);
+		obj->SetBoneRotationFlags(1, ROT_X | ROT_Y);
 	}
 
 	obj = &Objects[ID_GOON_SILENCER2];
@@ -177,9 +174,8 @@ static void StartEntity(ObjectInfo* obj)
 		obj->radius = 102;
 		obj->pivotLength = 50;
 		obj->intelligent = true;
-		
-		g_Level.Bones[obj->boneIndex + 0] |= (ROT_X | ROT_Y);
-		g_Level.Bones[obj->boneIndex + 1 * 4] |= (ROT_X | ROT_Y);
+		obj->SetBoneRotationFlags(0, ROT_X | ROT_Y);
+		obj->SetBoneRotationFlags(1, ROT_X | ROT_Y);
 	}
 
 	obj = &Objects[ID_GOON_SILENCER3];
@@ -205,9 +201,8 @@ static void StartEntity(ObjectInfo* obj)
 		obj->radius = 102;
 		obj->pivotLength = 50;
 		obj->intelligent = true;
-		
-		g_Level.Bones[obj->boneIndex + 0] |= (ROT_X | ROT_Y);
-		g_Level.Bones[obj->boneIndex + 1 * 4] |= (ROT_X | ROT_Y);
+		obj->SetBoneRotationFlags(0, ROT_X | ROT_Y);
+		obj->SetBoneRotationFlags(1, ROT_X | ROT_Y);
 	}
 
 	obj = &Objects[ID_WORKER_SHOTGUN];
@@ -223,9 +218,8 @@ static void StartEntity(ObjectInfo* obj)
 		obj->pivotLength = 50;
 		obj->radius = 102;
 		obj->intelligent = true;
-		//g_Level.Bones[obj->boneIndex + 5*4] |= (ROT_X | ROT_Y);
-		//g_Level.Bones[obj->boneIndex + 14*4] |= (ROT_X | ROT_Y);
-		// TODO: get the correct torso and head Bones value and assign ROT_X and ROT_Y to it !
+		obj->SetBoneRotationFlags(4, ROT_X | ROT_Y);
+		obj->SetBoneRotationFlags(13, ROT_X | ROT_Y);
 	}
 
 	obj = &Objects[ID_WORKER_MACHINEGUN];
@@ -240,9 +234,8 @@ static void StartEntity(ObjectInfo* obj)
 		obj->pivotLength = 50;
 		obj->radius = 102;
 		obj->intelligent = true;
-		//g_Level.Bones[obj->boneIndex + 5*4] |= (ROT_X | ROT_Y);
-		//g_Level.Bones[obj->boneIndex + 14*4] |= (ROT_X | ROT_Y);
-		// TODO: get the correct torso and head Bones value and assign ROT_X and ROT_Y to it !
+		obj->SetBoneRotationFlags(4, ROT_X | ROT_Y);
+		obj->SetBoneRotationFlags(13, ROT_X | ROT_Y);
 	}
 
 	obj = &Objects[ID_SMALL_SPIDER];
@@ -285,9 +278,8 @@ static void StartEntity(ObjectInfo* obj)
 		obj->pivotLength = 0;
 		obj->radius = 102;
 		obj->intelligent = true;
-		
-		g_Level.Bones[obj->boneIndex + 11 * 4] |= (ROT_X | ROT_Y);
-		g_Level.Bones[obj->boneIndex + 0 * 4] |= (ROT_X | ROT_Y);
+		obj->SetBoneRotationFlags(0, ROT_X | ROT_Y);
+		obj->SetBoneRotationFlags(11, ROT_X | ROT_Y);
 	}
 
 	obj = &Objects[ID_BIRDMONSTER];
@@ -302,8 +294,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->pivotLength = 0;
 		obj->radius = 341;
 		obj->intelligent = true;
-		
-		g_Level.Bones[obj->boneIndex + 14 * 4] |= (ROT_X | ROT_Y);
+		obj->SetBoneRotationFlags(14, ROT_X | ROT_Y);
 	}
 
 	obj = &Objects[ID_WORKER_FLAMETHROWER];
@@ -318,9 +309,8 @@ static void StartEntity(ObjectInfo* obj)
 		obj->pivotLength = 0;
 		obj->radius = 102;
 		obj->intelligent = true;
-		
-		g_Level.Bones[obj->boneIndex + 4 * 4] |= (ROT_X | ROT_Y);
-		g_Level.Bones[obj->boneIndex + 14 * 4] |= (ROT_X | ROT_Y);
+		obj->SetBoneRotationFlags(4, ROT_X | ROT_Y);
+		obj->SetBoneRotationFlags(14, ROT_X | ROT_Y);
 	}
 
 	obj = &Objects[ID_KNIFETHROWER];
@@ -335,9 +325,8 @@ static void StartEntity(ObjectInfo* obj)
 		obj->pivotLength = 50;
 		obj->radius = 102;
 		obj->intelligent = true;
-		//g_Level.Bones[obj->boneIndex + 8 * 4] |= (ROT_X | ROT_Y);
-		//g_Level.Bones[obj->boneIndex + 0 * 4] |= (ROT_X | ROT_Y);
-		// TODO: find the correct for Bones (knifethrower).
+		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
+		obj->SetBoneRotationFlags(8, ROT_X | ROT_Y);
 	}
 
 	obj = &Objects[ID_KNIFETHROWER_KNIFE];
@@ -356,9 +345,8 @@ static void StartEntity(ObjectInfo* obj)
 		obj->pivotLength = 0;
 		obj->radius = 102;
 		obj->intelligent = true;
-		
-		g_Level.Bones[obj->boneIndex + 6 * 4] |= (ROT_X | ROT_Y);
-		g_Level.Bones[obj->boneIndex + 8 * 4] |= (ROT_X | ROT_Y);
+		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
+		obj->SetBoneRotationFlags(8, ROT_X | ROT_Y);
 	}
 
 	obj = &Objects[ID_MERCENARY_AUTOPISTOLS1];
@@ -400,9 +388,8 @@ static void StartEntity(ObjectInfo* obj)
 		obj->pivotLength = 0;
 		obj->radius = 102;
 		obj->intelligent = true;
-		
-		g_Level.Bones[obj->boneIndex + 6 * 4] |= (ROT_X | ROT_Y);
-		g_Level.Bones[obj->boneIndex + 8 * 4] |= (ROT_X | ROT_Y);
+		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
+		obj->SetBoneRotationFlags(8, ROT_X | ROT_Y);
 	}
 
 	obj = &Objects[ID_MONK1];
@@ -417,7 +404,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->pivotLength = 0;
 		obj->radius = 204;
 		obj->intelligent = true;
-		g_Level.Bones[obj->boneIndex + 6 * 4] |= (ROT_X | ROT_Y);
+		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
 	}
 
 	obj = &Objects[ID_MONK2];
@@ -432,7 +419,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->pivotLength = 0;
 		obj->radius = 204;
 		obj->intelligent = true;
-		g_Level.Bones[obj->boneIndex + 6 * 4] |= (ROT_X | ROT_Y);
+		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
 	}
 
 	obj = &Objects[ID_SWORD_GUARDIAN];
@@ -448,10 +435,8 @@ static void StartEntity(ObjectInfo* obj)
 		obj->pivotLength = 0;
 		obj->radius = 204;
 		obj->intelligent = true;
-		g_Level.Bones[obj->boneIndex + 6 * 4] |= (ROT_X | ROT_Y);
-		g_Level.Bones[obj->boneIndex + 16 * 4] |= (ROT_X | ROT_Y);
-		// TODO: Bones value is not correct (shiva) !
-		// need the correct one.
+		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
+		obj->SetBoneRotationFlags(12, ROT_X | ROT_Y);
 	}
 
 	obj = &Objects[ID_SPEAR_GUARDIAN];
@@ -467,9 +452,8 @@ static void StartEntity(ObjectInfo* obj)
 		obj->pivotLength = 0;
 		obj->radius = 204;
 		obj->intelligent = true;
-		//g_Level.Bones[obj->boneIndex + 6 * 4] |= (ROT_X | ROT_Y);
-		//g_Level.Bones[obj->boneIndex + 12 * 4] |= (ROT_X | ROT_Y);
-		// TODO: get the correct id for Bones ! (spear)
+		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
+		obj->SetBoneRotationFlags(16, ROT_X | ROT_Y);
 	}
 
 	obj = &Objects[ID_DRAGON_FRONT];
@@ -485,7 +469,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->pivotLength = 300;
 		obj->radius = 256;
 		obj->intelligent = true;
-		g_Level.Bones[obj->boneIndex + 10 * 4] |= ROT_Z;
+		obj->SetBoneRotationFlags(10, ROT_Z);
 	}
 
 	obj = &Objects[ID_DRAGON_BACK];

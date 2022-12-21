@@ -151,9 +151,8 @@ static void StartEntity(ObjectInfo* obj)
 		obj->pivotLength = 1800;
 		obj->radius = 512;
 		obj->intelligent = true;
-		
-		g_Level.Bones[obj->boneIndex + 10 * 4] |= ROT_Y;
-		g_Level.Bones[obj->boneIndex + 11 * 4] |= ROT_Y;
+		obj->SetBoneRotationFlags(10, ROT_Y);
+		obj->SetBoneRotationFlags(11, ROT_Y);
 	}
 
 	obj = &Objects[ID_SCUBA_DIVER];
@@ -169,9 +168,8 @@ static void StartEntity(ObjectInfo* obj)
 		obj->waterCreature = true;
 		obj->pivotLength = 50;
 		obj->ZoneType = ZoneType::Water;
-		
-		g_Level.Bones[obj->boneIndex + 10 * 4] |= ROT_Y;
-		g_Level.Bones[obj->boneIndex + 14 * 4] |= ROT_Z;
+		obj->SetBoneRotationFlags(10, ROT_X | ROT_Y);
+		obj->SetBoneRotationFlags(14, ROT_Y);
 	}
 
 	obj = &Objects[ID_SCUBA_HARPOON];
@@ -193,10 +191,8 @@ static void StartEntity(ObjectInfo* obj)
 		obj->radius = 102;
 		obj->intelligent = true;
 		obj->pivotLength = 0;
-		
-		g_Level.Bones[obj->boneIndex + 0 * 4] |= ROT_Y;
-		g_Level.Bones[obj->boneIndex + 0 * 4] |= ROT_X;
-		g_Level.Bones[obj->boneIndex + 7 * 4] |= ROT_Y;
+		obj->SetBoneRotationFlags(0, ROT_X | ROT_Y);
+		obj->SetBoneRotationFlags(7, ROT_Y);
 	}
 
 	obj = &Objects[ID_MONKEY];
@@ -211,10 +207,8 @@ static void StartEntity(ObjectInfo* obj)
 		obj->radius = 102;
 		obj->intelligent = true;
 		obj->pivotLength = 0;
-
-		g_Level.Bones[obj->boneIndex + 0 * 4] |= ROT_Y;
-		g_Level.Bones[obj->boneIndex + 0 * 4] |= ROT_X;
-		g_Level.Bones[obj->boneIndex + 7 * 4] |= ROT_Y;
+		obj->SetBoneRotationFlags(0, ROT_X | ROT_Y);
+		obj->SetBoneRotationFlags(7, ROT_Y);
 	}
 
 	obj = &Objects[ID_MP_WITH_GUN];
@@ -229,10 +223,8 @@ static void StartEntity(ObjectInfo* obj)
 		obj->intelligent = true;
 		obj->pivotLength = 0;
 		obj->biteOffset = 0;
-
-		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
-		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_X;
-		g_Level.Bones[obj->boneIndex + 13 * 4] |= ROT_Y;
+		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
+		obj->SetBoneRotationFlags(13, ROT_Y);
 	}
 
 	obj = &Objects[ID_MP_WITH_STICK];
@@ -248,10 +240,8 @@ static void StartEntity(ObjectInfo* obj)
 		obj->intelligent = true;
 		obj->pivotLength = 0;
 		obj->ZoneType = ZoneType::Human;
-
-		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
-		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_X;
-		g_Level.Bones[obj->boneIndex + 13 * 4] |= ROT_Y;
+		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
+		obj->SetBoneRotationFlags(13, ROT_Y);
 	}
 
 	obj = &Objects[ID_SHIVA];
@@ -285,10 +275,8 @@ static void StartEntity(ObjectInfo* obj)
 		obj->hitEffect = HIT_BLOOD;
 		obj->radius = 102;
 		obj->intelligent = true;
-		
-		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
-		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_X;
-		g_Level.Bones[obj->boneIndex + 13 * 4] |= ROT_Y;
+		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
+		obj->SetBoneRotationFlags(13, ROT_Y);
 	}
 
 	obj = &Objects[ID_CIVVIE];
@@ -303,10 +291,9 @@ static void StartEntity(ObjectInfo* obj)
 		obj->radius = 102;
 		obj->intelligent = true;
 		obj->pivotLength = 0;
-		
-		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
-		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_X;
-		g_Level.Bones[obj->boneIndex + 13 * 4] |= ROT_Y;
+		obj->ZoneType = ZoneType::Human;
+		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
+		obj->SetBoneRotationFlags(13, ROT_Y);
 	}
 }
 

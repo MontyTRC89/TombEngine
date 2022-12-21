@@ -40,7 +40,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->pivotLength = 375;
 		obj->radius = 340;
 		obj->intelligent = true;
-		obj->SetBoneRotation(2, ROT_Y); // head
+		obj->SetBoneRotationFlags(2, ROT_Y); // head
 	}
 
 	obj = &Objects[ID_BEAR];
@@ -55,7 +55,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->pivotLength = 500;
 		obj->radius = 340;
 		obj->intelligent = true;
-		obj->SetBoneRotation(13, ROT_Y); // head
+		obj->SetBoneRotationFlags(13, ROT_Y); // head
 	}
 
 	obj = &Objects[ID_APE];
@@ -86,7 +86,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->intelligent = true;
 		obj->waterCreature = true;
 		obj->ZoneType = ZoneType::Water;
-		obj->SetBoneRotation(1, ROT_Y); // head
+		obj->SetBoneRotationFlags(1, ROT_Y); // head
 	}
 
 	obj = &Objects[ID_NATLA];
@@ -100,7 +100,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->radius = 204;
 		obj->hitEffect = HIT_BLOOD;
 		obj->intelligent = true;
-		obj->SetBoneRotation(2, ROT_X | ROT_Z);
+		obj->SetBoneRotationFlags(2, ROT_X | ROT_Z);
 	}
 
 	obj = &Objects[ID_GIANT_MUTANT];
@@ -114,7 +114,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->hitEffect = HIT_BLOOD;
 		obj->radius = 341;
 		obj->intelligent = true;
-		obj->SetBoneRotation(1, ROT_Y);
+		obj->SetBoneRotationFlags(1, ROT_Y);
 	}
 
 	obj = &Objects[ID_DOPPELGANGER];
@@ -147,7 +147,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->radius = WALL_SIZE / 3;
 		obj->intelligent = true;
 		obj->ZoneType = ZoneType::Blockable;
-		obj->SetBoneRotation(10, ROT_X | ROT_Y);
+		obj->SetBoneRotationFlags(10, ROT_X | ROT_Y);
 	}
 
 	obj = &Objects[ID_WINGED_MUMMY];
@@ -163,8 +163,8 @@ static void StartEntity(ObjectInfo* obj)
 		obj->HitPoints = 50;
 		obj->intelligent = true;
 		obj->ZoneType = ZoneType::Flyer;
-		obj->SetBoneRotation(1, ROT_Y); // torso
-		obj->SetBoneRotation(2, ROT_Y); // head
+		obj->SetBoneRotationFlags(1, ROT_Y); // torso
+		obj->SetBoneRotationFlags(2, ROT_Y); // head
 	}
 }
 

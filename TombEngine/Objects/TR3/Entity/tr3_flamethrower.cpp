@@ -23,18 +23,34 @@ namespace TEN::Entities::Creatures::TR3
 	const auto FlamethrowerOffset = Vector3i(0, 340, 0);
 	const auto FlamethrowerBite = BiteInfo(Vector3(0.0f, 340.0f, 64.0f), 7);
 
+	constexpr int FlamethrowerDetectionRange = SQUARE(SECTOR(8));
+	constexpr int FlamethrowerAttackRange = SQUARE(SECTOR(1.5f));
+	constexpr int FlamethrowerStopRange = SQUARE(SECTOR(2));
+	constexpr int FlamethrowerWalkAngle = ANGLE(5.0f);
+
 	// TODO
 	enum FlamethrowerState
 	{
-
+		// No state 0.
+		FLAME_STATE_STOP = 1,
+		FLAME_STATE_WALK = 2,
+		FLAME_STATE_IDLE = 3,
+		FLAME_STATE_WAIT = 4,
+		FLAME_STATE_WALK_ATTACK = 6,
+		FLAME_STATE_DEATH = 7,
+		FLAME_STATE_WALK_AIM = 9,
+		FLAME_STATE_AIM1 = 10,
+		FLAME_STATE_ATTACK1 = 11,
 	};
 
 	// TODO
 	enum FlamethrowerAnim
 	{
-
+		FLAME_ANIM_IDLE = 12,
+		FLAME_ANIM_DEATH = 19
 	};
 
+	// TODO: Remove LaraItem dependencies !
 	void FlameThrowerControl(short itemNumber)
 	{
 		if (!CreatureActive(itemNumber))
@@ -42,12 +58,10 @@ namespace TEN::Entities::Creatures::TR3
 
 		auto* item = &g_Level.Items[itemNumber];
 		auto* creature = GetCreatureInfo(item);
-
 		short angle = 0;
 		short tilt = 0;
 		auto extraHeadRot = EulerAngles::Zero;
 		auto extraTorsoRot = EulerAngles::Zero;
-
 		auto pos = GetJointPosition(item, FlamethrowerBite.meshNum, Vector3i(FlamethrowerBite.Position));
 
 		int randomInt = GetRandomControl();
@@ -61,8 +75,8 @@ namespace TEN::Entities::Creatures::TR3
 
 		if (item->HitPoints <= 0)
 		{
-			if (item->Animation.ActiveState != 7)
-				SetAnimation(item, 19);
+			if (item->Animation.ActiveState != FLAME_STATE_DEATH)
+				SetAnimation(item, FLAME_ANIM_DEATH);
 		}
 		else
 		{
@@ -83,13 +97,13 @@ namespace TEN::Entities::Creatures::TR3
 						continue;
 
 					target = &g_Level.Items[currentCreature->ItemNumber];
-					if (target->ObjectNumber == ID_LARA || target->HitPoints <= 0)
+					if (target->ObjectNumber == ID_LARA || target->HitPoints <= 0 || target->ObjectNumber == ID_FLAMETHROWER_BADDY)
 						continue;
 
 					int x = target->Pose.Position.x - item->Pose.Position.x;
 					int z = target->Pose.Position.z - item->Pose.Position.z;
 
-					int distance = pow(x, 2) + pow(z, 2);
+					int distance = SQUARE(z) + SQUARE(x);
 					if (distance < minDistance)
 					{
 						creature->Enemy = target;
@@ -116,7 +130,7 @@ namespace TEN::Entities::Creatures::TR3
 				int dz = LaraItem->Pose.Position.z - item->Pose.Position.z;
 
 				laraAI.angle = phd_atan(dz, dz) - item->Pose.Orientation.y;
-				laraAI.distance = pow(dx, 2) + pow(dz, 2);
+				laraAI.distance = SQUARE(dz) + SQUARE(dx);
 
 				AI.xAngle -= ANGLE(11.25f);
 			}
@@ -125,10 +139,10 @@ namespace TEN::Entities::Creatures::TR3
 			CreatureMood(item, &AI, true);
 
 			angle = CreatureTurn(item, creature->MaxTurn);
-
 			auto* realEnemy = creature->Enemy;
+			bool CanAttack = (realEnemy != nullptr && !realEnemy->IsLara()) || creature->HurtByLara;
 
-			if (item->HitStatus || laraAI.distance < pow(SECTOR(1), 2) || TargetVisible(item, &laraAI))
+			if (item->HitStatus || laraAI.distance < FlamethrowerDetectionRange || TargetVisible(item, &laraAI))
 			{
 				if (!creature->Alerted)
 					SoundEffect(SFX_TR3_AMERCAN_HOY, &item->Pose);
@@ -138,7 +152,7 @@ namespace TEN::Entities::Creatures::TR3
 
 			switch (item->Animation.ActiveState)
 			{
-			case 1:
+			case FLAME_STATE_STOP:
 				creature->MaxTurn = 0;
 				creature->Flags = 0;
 				extraHeadRot.y = laraAI.angle;
@@ -148,25 +162,25 @@ namespace TEN::Entities::Creatures::TR3
 					extraHeadRot.y = AIGuard(creature);
 
 					if (TestProbability(1.0f / 128))
-						item->Animation.TargetState = 4;
+						item->Animation.TargetState = FLAME_STATE_WAIT;
 
 					break;
 				}
 				else if (item->AIBits & PATROL1)
-					item->Animation.TargetState = 2;
+					item->Animation.TargetState = FLAME_STATE_WALK;
 				else if (creature->Mood == MoodType::Escape)
-					item->Animation.TargetState = 2;
-				else if (Targetable(item, &AI) && (realEnemy != LaraItem || creature->HurtByLara))
+					item->Animation.TargetState = FLAME_STATE_WALK;
+				else if (Targetable(item, &AI) && CanAttack)
 				{
-					if (AI.distance < pow(SECTOR(2), 2))
-						item->Animation.TargetState = 10;
+					if (AI.distance < FlamethrowerAttackRange)
+						item->Animation.TargetState = FLAME_STATE_AIM1;
 					else
-						item->Animation.TargetState = 2;
+						item->Animation.TargetState = FLAME_STATE_WALK;
 				}
 				else if (creature->Mood == MoodType::Bored && AI.ahead && TestProbability(1.0f / 128))
-					item->Animation.TargetState = 4;
+					item->Animation.TargetState = FLAME_STATE_WAIT;
 				else if (creature->Mood == MoodType::Attack || TestProbability(1.0f / 128))
-					item->Animation.TargetState = 2;
+					item->Animation.TargetState = FLAME_STATE_WALK;
 
 				break;
 
@@ -178,48 +192,46 @@ namespace TEN::Entities::Creatures::TR3
 					extraHeadRot.y = AIGuard(creature);
 
 					if (TestProbability(1.0f / 128))
-						item->Animation.TargetState = 1;
+						item->Animation.TargetState = FLAME_STATE_STOP;
 
 					break;
 				}
 				else if ((Targetable(item, &AI) &&
-					AI.distance < pow(SECTOR(4), 2) &&
-					(realEnemy != LaraItem || creature->HurtByLara) ||
+					AI.distance < FlamethrowerAttackRange && CanAttack ||
 					creature->Mood != MoodType::Bored ||
 					TestProbability(1.0f / 128)))
 				{
-					item->Animation.TargetState = 1;
+					item->Animation.TargetState = FLAME_STATE_STOP;
 				}
 
 				break;
 
-			case 2:
-				creature->MaxTurn = ANGLE(5.0f);
+			case FLAME_STATE_WALK:
+				creature->MaxTurn = FlamethrowerWalkAngle;
 				creature->Flags = 0;
 				extraHeadRot.y = laraAI.angle;
 
 				if (item->AIBits & GUARD)
-					SetAnimation(item, 12);
+					SetAnimation(item, FLAME_ANIM_IDLE);
 				else if (item->AIBits & PATROL1)
-					item->Animation.TargetState = 2;
+					item->Animation.TargetState = FLAME_STATE_WALK;
 				else if (creature->Mood == MoodType::Escape)
-					item->Animation.TargetState = 2;
-				else if (Targetable(item, &AI) &&
-					(realEnemy != LaraItem || creature->HurtByLara))
+					item->Animation.TargetState = FLAME_STATE_WALK;
+				else if (Targetable(item, &AI) && CanAttack)
 				{
-					if (AI.distance < pow(SECTOR(4), 2))
-						item->Animation.TargetState = 1;
-					else
-						item->Animation.TargetState = 9;
+					if (AI.distance < FlamethrowerStopRange)
+						item->Animation.TargetState = FLAME_STATE_STOP;
+					else if (AI.distance < FlamethrowerAttackRange)
+						item->Animation.TargetState = FLAME_STATE_WALK_AIM;
 				}
 				else if (creature->Mood == MoodType::Bored && AI.ahead)
-					item->Animation.TargetState = 1;
+					item->Animation.TargetState = FLAME_STATE_STOP;
 				else
-					item->Animation.TargetState = 2;
+					item->Animation.TargetState = FLAME_STATE_WALK;
 
 				break;
 
-			case 10:
+			case FLAME_STATE_AIM1:
 				creature->Flags = 0;
 
 				if (AI.ahead)
@@ -228,18 +240,17 @@ namespace TEN::Entities::Creatures::TR3
 					extraTorsoRot.y = AI.angle;
 
 					if (Targetable(item, &AI) &&
-						AI.distance < pow(SECTOR(4), 2) &&
-						(realEnemy != LaraItem || creature->HurtByLara))
+						AI.distance < FlamethrowerAttackRange && CanAttack)
 					{
-						item->Animation.TargetState = 11;
+						item->Animation.TargetState = FLAME_STATE_ATTACK1;
 					}
 					else
-						item->Animation.TargetState = 1;
+						item->Animation.TargetState = FLAME_STATE_STOP;
 				}
 
 				break;
 
-			case 9:
+			case FLAME_STATE_WALK_AIM:
 				creature->Flags = 0;
 
 				if (AI.ahead)
@@ -248,18 +259,17 @@ namespace TEN::Entities::Creatures::TR3
 					extraTorsoRot.y = AI.angle;
 
 					if (Targetable(item, &AI) &&
-						AI.distance < pow(SECTOR(4), 2) &&
-						(realEnemy != LaraItem || creature->HurtByLara))
+						AI.distance < FlamethrowerAttackRange && CanAttack)
 					{
-						item->Animation.TargetState = 6;
+						item->Animation.TargetState = FLAME_STATE_WALK_ATTACK;
 					}
 					else
-						item->Animation.TargetState = 2;
+						item->Animation.TargetState = FLAME_STATE_WALK;
 				}
 
 				break;
 
-			case 11:
+			case FLAME_STATE_ATTACK1:
 				if (creature->Flags < 40)
 					creature->Flags += (creature->Flags / 4) + 1;
 
@@ -269,22 +279,21 @@ namespace TEN::Entities::Creatures::TR3
 					extraTorsoRot.y = AI.angle;
 
 					if (Targetable(item, &AI) &&
-						AI.distance < pow(SECTOR(4), 2) &&
-						(realEnemy != LaraItem || creature->HurtByLara))
+						AI.distance < FlamethrowerAttackRange && CanAttack)
 					{
-						item->Animation.TargetState = 11;
+						item->Animation.TargetState = FLAME_STATE_ATTACK1;
 					}
 					else
-						item->Animation.TargetState = 1;
+						item->Animation.TargetState = FLAME_STATE_STOP;
 				}
 				else
-					item->Animation.TargetState = 1;
+					item->Animation.TargetState = FLAME_STATE_STOP;
 
 				if (creature->Flags < 40)
 					ThrowFire(itemNumber, FlamethrowerBite.meshNum, FlamethrowerOffset, Vector3i(0, creature->Flags * 1.5f, 0));
 				else
 				{
-					ThrowFire(itemNumber, FlamethrowerBite.meshNum, FlamethrowerOffset, Vector3i(0, (GetRandomControl() & 63) + 12, 0));
+					ThrowFire(itemNumber, FlamethrowerBite.meshNum, FlamethrowerOffset, Vector3i(0, (Random::GenerateInt() & 63) + 12, 0));
 					if (realEnemy)
 					{
 						/*code*/
@@ -294,7 +303,7 @@ namespace TEN::Entities::Creatures::TR3
 				SoundEffect(SFX_TR4_FLAME_EMITTER, &item->Pose);
 				break;
 
-			case 6:
+			case FLAME_STATE_WALK_ATTACK:
 				if (creature->Flags < 40)
 					creature->Flags += (creature->Flags / 4) + 1;
 
@@ -304,16 +313,15 @@ namespace TEN::Entities::Creatures::TR3
 					extraTorsoRot.y = AI.angle;
 
 					if (Targetable(item, &AI) &&
-						AI.distance < pow(SECTOR(4), 2) &&
-						(!realEnemy->IsLara() || creature->HurtByLara))
+						AI.distance < FlamethrowerAttackRange && CanAttack)
 					{
-						item->Animation.TargetState = 6;
+						item->Animation.TargetState = FLAME_STATE_WALK_ATTACK;
 					}
 					else
-						item->Animation.TargetState = 2;
+						item->Animation.TargetState = FLAME_STATE_WALK;
 				}
 				else
-					item->Animation.TargetState = 2;
+					item->Animation.TargetState = FLAME_STATE_WALK;
 
 				if (creature->Flags < 40)
 					ThrowFire(itemNumber, FlamethrowerBite.meshNum, FlamethrowerOffset, Vector3i(0, creature->Flags * 1.5f, 0));
@@ -335,7 +343,6 @@ namespace TEN::Entities::Creatures::TR3
 		CreatureJoint(item, 0, extraTorsoRot.y);
 		CreatureJoint(item, 1, extraTorsoRot.x);
 		CreatureJoint(item, 2, extraHeadRot.y);
-
 		CreatureAnimation(itemNumber, angle, 0);
 	}
 }

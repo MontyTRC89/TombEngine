@@ -201,28 +201,29 @@ namespace TEN::Entities
 		obj = &Objects[ID_BADDY1];
 		if (obj->loaded)
 		{
-			obj->biteOffset = 9;
+			if (!Objects[ID_MESHSWAP_BADDY1].loaded)
+				TENLog("ID_MESHSWAP_BADDY1 is missing, ID_BADDY1 will not have the sword and uzi mesh !", LogLevel::Warning);
 			obj->initialise = InitialiseBaddy;
 			obj->control = BaddyControl;
 			obj->collision = CreatureCollision;
 			obj->shadowType = ShadowMode::All;
 			obj->HitPoints = 25;
 			obj->hitEffect = HIT_BLOOD;
+			obj->biteOffset = 9;
 			obj->pivotLength = 50;
 			obj->radius = 102;
 			obj->intelligent = true;
 			obj->meshSwapSlot = ID_MESHSWAP_BADDY1;
 			obj->ZoneType = ZoneType::HumanJumpAndMonkey;
-			g_Level.Bones[obj->boneIndex + 28 * 4] |= ROT_Y;
-			g_Level.Bones[obj->boneIndex + 28 * 4] |= ROT_X;
-			//g_Level.Bones[obj->boneIndex + 88 * 4] |= ROT_Y;
-			//g_Level.Bones[obj->boneIndex + 88 * 4] |= ROT_X;
+			obj->SetBoneRotationFlags(7, ROT_X | ROT_Y);
+			obj->SetBoneRotationFlags(22, ROT_X | ROT_Y);
 		}
 
 		obj = &Objects[ID_BADDY2];
 		if (obj->loaded)
 		{
-			obj->biteOffset = 9;
+			if (!Objects[ID_MESHSWAP_BADDY2].loaded)
+				TENLog("ID_MESHSWAP_BADDY2 is missing, ID_BADDY2 will not have the sword and uzi mesh !", LogLevel::Warning);
 			obj->initialise = InitialiseBaddy;
 			obj->control = BaddyControl;
 			obj->collision = CreatureCollision;
@@ -230,19 +231,32 @@ namespace TEN::Entities
 			obj->HitPoints = 25;
 			obj->hitEffect = HIT_BLOOD;
 			obj->pivotLength = 50;
+			obj->biteOffset = 9;
 			obj->radius = 102;
 			obj->intelligent = true;
 			obj->meshSwapSlot = ID_MESHSWAP_BADDY2;
 			obj->ZoneType = ZoneType::HumanJumpAndMonkey;
-			g_Level.Bones[obj->boneIndex + 28 * 4] |= ROT_Y;
-			g_Level.Bones[obj->boneIndex + 28 * 4] |= ROT_X;
-			//g_Level.Bones[obj->boneIndex + 88 * 4] |= ROT_Y;
-			//g_Level.Bones[obj->boneIndex + 88 * 4] |= ROT_X;
+			obj->SetBoneRotationFlags(7, ROT_X | ROT_Y);
+			obj->SetBoneRotationFlags(22, ROT_X | ROT_Y);
 		}
 
 		obj = &Objects[ID_SAS_CAIRO];
 		if (obj->loaded)
-			SetupSas(*obj);
+		{
+			obj->initialise = InitialiseSas;
+			obj->control = SasControl;
+			obj->collision = CreatureCollision;
+			obj->shadowType = ShadowMode::All;
+			obj->biteOffset = 10;
+			obj->HitPoints = 40;
+			obj->hitEffect = HIT_BLOOD;
+			obj->pivotLength = 50;
+			obj->radius = 102;
+			obj->intelligent = true;
+			obj->ZoneType = ZoneType::Human;
+			obj->SetBoneRotationFlags(0, ROT_X | ROT_Y);
+			obj->SetBoneRotationFlags(7, ROT_X | ROT_Y);
+		}
 
 		obj = &Objects[ID_MUMMY];
 		if (obj->loaded)
@@ -256,17 +270,14 @@ namespace TEN::Entities
 			obj->radius = 170;
 			obj->intelligent = true;
 			obj->undead = true;
-			obj->ZoneType = ZoneType::Basic;
-			g_Level.Bones[obj->boneIndex + 7 * 4] |= ROT_Y;
-			g_Level.Bones[obj->boneIndex + 7 * 4] |= ROT_X;
-
+			obj->SetBoneRotationFlags(7, ROT_X | ROT_Y);
 		}
 
 		obj = &Objects[ID_SKELETON];
 		if (obj->loaded)
 		{
-			obj->initialise = TEN::Entities::TR4::InitialiseSkeleton;
-			obj->control = TEN::Entities::TR4::SkeletonControl;
+			obj->initialise = InitialiseSkeleton;
+			obj->control = SkeletonControl;
 			obj->collision = CreatureCollision;
 			obj->HitPoints = 15;
 			obj->hitEffect = HIT_SMOKE;
@@ -281,7 +292,20 @@ namespace TEN::Entities
 
 		obj = &Objects[ID_KNIGHT_TEMPLAR];
 		if (obj->loaded)
-			SetupKnightTemplar(*obj);
+		{
+			obj->initialise = InitialiseKnightTemplar;
+			obj->control = KnightTemplarControl;
+			obj->collision = CreatureCollision;
+			obj->shadowType = ShadowMode::All;
+			obj->HitPoints = 15;
+			obj->hitEffect = HIT_SMOKE;
+			obj->pivotLength = 50;
+			obj->radius = 128;
+			obj->intelligent = true;
+			obj->undead = true;
+			obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
+			obj->SetBoneRotationFlags(7, ROT_Y);
+		}
 
 		obj = &Objects[ID_BIG_BEETLE];
 		if (obj->loaded)
@@ -328,10 +352,8 @@ namespace TEN::Entities
 			obj->radius = 341;
 			obj->intelligent = true;
 			obj->undead = true;
-			obj->ZoneType = ZoneType::Basic;
-
-			g_Level.Bones[obj->boneIndex + 4 * 4] |= ROT_X | ROT_Y | ROT_Z;
-			g_Level.Bones[obj->boneIndex + 5 * 4] |= ROT_Y;
+			obj->SetBoneRotationFlags(8, ROT_X | ROT_Y | ROT_Z);
+			obj->SetBoneRotationFlags(20, ROT_Y);
 		}
 
 		obj = &Objects[ID_DEMIGOD2];
@@ -347,8 +369,8 @@ namespace TEN::Entities
 			obj->radius = 341;
 			obj->intelligent = true;
 			obj->ZoneType = ZoneType::Basic;
-			g_Level.Bones[obj->boneIndex + 4 * 4] |= ROT_X | ROT_Y | ROT_Z;
-			g_Level.Bones[obj->boneIndex + 5 * 4] |= ROT_Y;
+			obj->SetBoneRotationFlags(8, ROT_X | ROT_Y | ROT_Z);
+			obj->SetBoneRotationFlags(20, ROT_Y);
 		}
 
 		obj = &Objects[ID_DEMIGOD3];
@@ -363,9 +385,8 @@ namespace TEN::Entities
 			obj->pivotLength = 50;
 			obj->radius = 341;
 			obj->intelligent = true;
-			obj->ZoneType = ZoneType::Basic;
-			g_Level.Bones[obj->boneIndex + 4 * 4] |= ROT_X | ROT_Y | ROT_Z;
-			g_Level.Bones[obj->boneIndex + 5 * 4] |= ROT_Y;
+			obj->SetBoneRotationFlags(8, ROT_X | ROT_Y | ROT_Z);
+			obj->SetBoneRotationFlags(20, ROT_Y);
 		}
 
 		obj = &Objects[ID_JEAN_YVES];
@@ -376,7 +397,6 @@ namespace TEN::Entities
 			obj->collision = ObjectCollision;
 			obj->hitEffect = HIT_BLOOD;
 			obj->nonLot = true;
-			obj->ZoneType = ZoneType::Basic;
 		}
 
 		obj = &Objects[ID_TROOPS];
@@ -392,9 +412,8 @@ namespace TEN::Entities
 			obj->pivotLength = 50;
 			obj->radius = 102;
 			obj->intelligent = true;
-			obj->ZoneType = ZoneType::Basic;
-			g_Level.Bones[obj->boneIndex] |= ROT_X | ROT_Y;
-			g_Level.Bones[obj->boneIndex + 7 * 4] |= ROT_X | ROT_Y;
+			obj->SetBoneRotationFlags(0, ROT_X | ROT_Y);
+			obj->SetBoneRotationFlags(7, ROT_X | ROT_Y);
 		}
 
 		obj = &Objects[ID_SENTRY_GUN];
@@ -410,12 +429,11 @@ namespace TEN::Entities
 			obj->pivotLength = 50;
 			obj->radius = 204;
 			obj->intelligent = true;
-			obj->explodableMeshbits = 64;
-			obj->ZoneType = ZoneType::Basic;
-			g_Level.Bones[obj->boneIndex + 0] |= ROT_Y;
-			g_Level.Bones[obj->boneIndex + 1 * 4] |= ROT_X;
-			g_Level.Bones[obj->boneIndex + 2 * 4] |= ROT_Z;
-			g_Level.Bones[obj->boneIndex + 3 * 4] |= ROT_Z;
+			obj->explodableMeshbits = 0x40;
+			obj->SetBoneRotationFlags(0, ROT_X | ROT_Y);
+			obj->SetBoneRotationFlags(1, ROT_X | ROT_X);
+			obj->SetBoneRotationFlags(2, ROT_X | ROT_Z);
+			obj->SetBoneRotationFlags(3, ROT_X | ROT_Z);
 		}
 
 		obj = &Objects[ID_HARPY];
@@ -433,23 +451,22 @@ namespace TEN::Entities
 			obj->ZoneType = ZoneType::Flyer;
 		}
 
-	obj = &Objects[ID_GUIDE];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialiseGuide;
-		obj->control = GuideControl;
-		obj->collision = CreatureCollision;
-		obj->shadowType = ShadowMode::All;
-		obj->HitPoints = NOT_TARGETABLE;
-		obj->hitEffect = HIT_BLOOD;
-		obj->pivotLength = 0;
-		obj->radius = 128;
-		obj->intelligent = true;
-		obj->meshSwapSlot = ID_MESHSWAP2;
-		obj->ZoneType = ZoneType::Basic;
-
-			g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_X | ROT_Y;
-			g_Level.Bones[obj->boneIndex + 20 * 4] |= ROT_X | ROT_Y;
+		obj = &Objects[ID_GUIDE];
+		if (obj->loaded)
+		{
+			obj->initialise = InitialiseGuide;
+			obj->control = GuideControl;
+			obj->collision = CreatureCollision;
+			obj->shadowType = ShadowMode::All;
+			obj->HitPoints = NOT_TARGETABLE;
+			obj->hitEffect = HIT_BLOOD;
+			obj->pivotLength = 0;
+			obj->radius = 128;
+			obj->intelligent = true;
+			obj->meshSwapSlot = ID_MESHSWAP2;
+			obj->ZoneType = ZoneType::Basic;
+			obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
+			obj->SetBoneRotationFlags(20, ROT_X | ROT_Y);
 		}
 
 		obj = &Objects[ID_CROCODILE];
@@ -466,10 +483,10 @@ namespace TEN::Entities
 			obj->intelligent = true;
 			obj->waterCreature = true;
 			obj->ZoneType = ZoneType::Water;
-			g_Level.Bones[obj->boneIndex] |= ROT_Y;
-			g_Level.Bones[obj->boneIndex + 7 * 4] |= ROT_Y;
-			g_Level.Bones[obj->boneIndex + 9 * 4] |= ROT_Y;
-			g_Level.Bones[obj->boneIndex + 10 * 4] |= ROT_Y;
+			obj->SetBoneRotationFlags(0, ROT_Y);
+			obj->SetBoneRotationFlags(7, ROT_Y);
+			obj->SetBoneRotationFlags(9, ROT_Y);
+			obj->SetBoneRotationFlags(10, ROT_Y);
 		}
 
 		obj = &Objects[ID_SPHINX];
@@ -484,7 +501,6 @@ namespace TEN::Entities
 			obj->pivotLength = 500;
 			obj->radius = 512;
 			obj->intelligent = true;
-			obj->ZoneType = ZoneType::Basic;
 		}
 
 		obj = &Objects[ID_HORSE];
@@ -507,7 +523,6 @@ namespace TEN::Entities
 			obj->pivotLength = 500;
 			obj->radius = 409;
 			obj->intelligent = true;
-			obj->ZoneType = ZoneType::Basic;
 		}
 
 		obj = &Objects[ID_BABOON_NORMAL];
@@ -522,12 +537,15 @@ namespace TEN::Entities
 			obj->pivotLength = 200;
 			obj->radius = 256;
 			obj->intelligent = true;
-			obj->ZoneType = ZoneType::Basic;
 		}
 
 		obj = &Objects[ID_BABOON_INV];
 		if (obj->loaded)
 		{
+			if (Objects[ID_BABOON_NORMAL].loaded)
+				obj->animIndex = Objects[ID_BABOON_NORMAL].animIndex;
+			else
+				TENLog("Failed to assign ID_BABOON_INV animation index, ID_BABOON_NORMAL not found !", LogLevel::Warning);
 			obj->initialise = InitialiseBaboon;
 			obj->control = BaboonControl;
 			obj->collision = CreatureCollision;
@@ -537,10 +555,6 @@ namespace TEN::Entities
 			obj->pivotLength = 200;
 			obj->radius = 256;
 			obj->intelligent = true;
-			obj->ZoneType = ZoneType::Basic;
-
-			if (Objects[ID_BABOON_NORMAL].loaded)
-				Objects[ID_BABOON_INV].animIndex = Objects[ID_BABOON_NORMAL].animIndex;
 		}
 
 		obj = &Objects[ID_BABOON_SILENT];
@@ -559,14 +573,13 @@ namespace TEN::Entities
 			obj->pivotLength = 200;
 			obj->radius = 256;
 			obj->intelligent = true;
-			obj->ZoneType = ZoneType::Basic;
 		}
 
-		obj = &Objects[ID_CROCODILE_GOD];
+		obj = &Objects[ID_CROCODILE_GOD]; // He is not a crocodile nor do he go in water ! TokyoSU: 20/12/2022
 		if (obj->loaded)
 		{
-			obj->initialise = TEN::Entities::TR4::InitialiseCrocgod;
-			obj->control = TEN::Entities::TR4::CrocgodControl;
+			obj->initialise = InitialiseCrocgod;
+			obj->control = CrocgodControl;
 			obj->collision = CreatureCollision;
 			obj->shadowType = ShadowMode::All;
 			obj->HitPoints = NOT_TARGETABLE;
@@ -575,16 +588,15 @@ namespace TEN::Entities
 			obj->radius = 128;
 			obj->intelligent = true;
 			obj->undead = true;
-			obj->ZoneType = ZoneType::Water;
-			obj->SetBoneRotation(6, ROT_X | ROT_Y);
-			obj->SetBoneRotation(7, ROT_X | ROT_Y);
+			obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
+			obj->SetBoneRotationFlags(7, ROT_X | ROT_Y);
 		}
 
 		obj = &Objects[ID_LOCUSTS_EMITTER];
 		if (obj->loaded)
 		{
-			obj->initialise = TEN::Entities::TR4::InitialiseLocust;
-			obj->control = TEN::Entities::TR4::LocustControl;
+			obj->initialise = InitialiseLocust;
+			obj->control = LocustControl;
 			obj->drawRoutine = NULL;
 		}
 
@@ -619,7 +631,12 @@ namespace TEN::Entities
 
 		obj = &Objects[ID_SAS_DYING];
 		if (obj->loaded)
-			SetupInjuredSas(*obj);
+		{
+			obj->initialise = InitialiseInjuredSas;
+			obj->control = InjuredSasControl;
+			obj->collision = ObjectCollision;
+			obj->hitEffect = HIT_BLOOD;
+		}
 
 		obj = &Objects[ID_ENEMY_JEEP];
 		if (obj->loaded)
@@ -633,10 +650,10 @@ namespace TEN::Entities
 			obj->radius = 512;
 			obj->HitPoints = 40;
 			obj->ZoneType = ZoneType::HumanJumpAndMonkey;
-			obj->SetBoneRotation(8, ROT_X);
-			obj->SetBoneRotation(9, ROT_X);
-			obj->SetBoneRotation(11, ROT_X);
-			obj->SetBoneRotation(12, ROT_X);
+			obj->SetBoneRotationFlags(8, ROT_X);
+			obj->SetBoneRotationFlags(9, ROT_X);
+			obj->SetBoneRotationFlags(11, ROT_X);
+			obj->SetBoneRotationFlags(12, ROT_X);
 		}
 
 		obj = &Objects[ID_VON_CROY];
@@ -651,8 +668,8 @@ namespace TEN::Entities
 			obj->explodableMeshbits = 0x200000;
 			obj->intelligent = true;
 			obj->ZoneType = ZoneType::HumanLongJumpAndMonkey;
-			obj->SetBoneRotation(6, ROT_X|ROT_Y);
-			obj->SetBoneRotation(20, ROT_X|ROT_Y);
+			obj->SetBoneRotationFlags(6, ROT_X|ROT_Y);
+			obj->SetBoneRotationFlags(20, ROT_X|ROT_Y);
 		}
 	}
 
@@ -660,7 +677,10 @@ namespace TEN::Entities
 	{
 		obj = &Objects[ID_SAS_DRAG_BLOKE];
 		if (obj->loaded)
-			SetupSasDraggableSas(*obj);
+		{
+			obj->control = AnimatingControl;
+			obj->collision = SasDragBlokeCollision;
+		}
 
 		obj = &Objects[ID_SARCOPHAGUS];
 		if (obj->loaded)
@@ -692,11 +712,11 @@ namespace TEN::Entities
 			obj->initialise = InitialiseGameSticks;
 			obj->control = GameSticksControl;
 			obj->collision = GameSticksCollision;
-			g_Level.Bones[obj->boneIndex] |= 0x10;
-			g_Level.Bones[obj->boneIndex + 4] |= 0x10;
-			g_Level.Bones[obj->boneIndex + 8] |= 0x10;
-			g_Level.Bones[obj->boneIndex + 12] |= 0x10;
 			obj->HitPoints = 1;
+			obj->SetBoneRotationFlags(0, ROT_Z);
+			obj->SetBoneRotationFlags(1, ROT_Z);
+			obj->SetBoneRotationFlags(2, ROT_Z);
+			obj->SetBoneRotationFlags(3, ROT_Z);
 		}
 
 		obj = &Objects[ID_ENEMY_PIECE];
@@ -715,7 +735,6 @@ namespace TEN::Entities
 		for (int i = 0; i < 3; i++)
 		{
 			obj = &Objects[ID_GAME_PIECE1 + i];
-
 			if (obj->loaded)
 			{
 				obj->initialise = InitialiseGamePiece;
@@ -922,7 +941,6 @@ namespace TEN::Entities
 			obj->pivotLength = 50;
 			obj->radius = 128;
 			obj->intelligent = true;
-			obj->ZoneType = ZoneType::Basic;
 		}
 
 		obj = &Objects[ID_TEETH_SPIKES];
@@ -978,6 +996,6 @@ namespace TEN::Entities
 
 	void AllocTR4Objects()
 	{
-		ZeroMemory(TEN::Entities::TR4::BeetleSwarm, TEN::Entities::TR4::NUM_BEETLES * sizeof(BeetleData));
+		ZeroMemory(BeetleSwarm, NUM_BEETLES * sizeof(BeetleData));
 	}
 }

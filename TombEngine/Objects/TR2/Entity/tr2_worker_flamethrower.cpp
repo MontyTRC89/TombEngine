@@ -21,6 +21,10 @@ namespace TEN::Entities::Creatures::TR2
 	const auto WorkerFlamethrowerOffset = Vector3i(0, 140, 0);
 	const auto WorkerFlamethrowerBite = BiteInfo(Vector3(0.0f, 250.0f, 32.0f), 9);
 
+	constexpr int WorkerFlamethrowerAttackRange = SQUARE(SECTOR(1.5f));
+	constexpr int WorkerFlamethrowerStopRange = SQUARE(SECTOR(2));
+	constexpr int WorkerFlamethrowerWalkAngle = ANGLE(5.0f);
+
 	// TODO
 	enum WorkerFlamethrowerState
 	{
@@ -121,7 +125,7 @@ namespace TEN::Entities::Creatures::TR2
 				break;
 
 			case 2:
-				creature->MaxTurn = ANGLE(5.0f);
+				creature->MaxTurn = WorkerFlamethrowerWalkAngle;
 
 				if (AI.ahead)
 				{

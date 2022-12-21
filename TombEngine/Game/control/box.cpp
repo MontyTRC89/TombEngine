@@ -228,8 +228,7 @@ void AlertNearbyGuards(ItemInfo* item)
 		int x = (currentTarget->Pose.Position.x - item->Pose.Position.x) / 64;
 		int y = (currentTarget->Pose.Position.y - item->Pose.Position.y) / 64;
 		int z = (currentTarget->Pose.Position.z - item->Pose.Position.z) / 64;
-
-		int distance = (pow(x, 2) + pow(y, 2) + pow(z, 2));
+		int distance = SQUARE(z) + SQUARE(y) + SQUARE(x);
 		if (distance < SECTOR(8))
 			currentCreature->Alerted = true;
 	}
@@ -301,7 +300,7 @@ bool CreaturePathfind(ItemInfo* item, short angle, short tilt)
 	else
 		nextHeight = g_Level.Boxes[nextBox].height;
 
-	if (floor->Box == NO_BOX || !LOT->IsJumping && (LOT->Fly == NO_FLYING && item->BoxNumber != NO_BOX && zone[item->BoxNumber] != zone[floor->Box] || boxHeight - height > LOT->Step || boxHeight - height < LOT->Drop))
+	if (floor->Box == NO_BOX || !LOT->IsJumping && (item->BoxNumber != NO_BOX && zone[item->BoxNumber] != zone[floor->Box] || boxHeight - height > LOT->Step || boxHeight - height < LOT->Drop))
 	{
 		xPos = item->Pose.Position.x / SECTOR(1);
 		zPos = item->Pose.Position.z / SECTOR(1);
@@ -690,7 +689,7 @@ void CreatureFloat(short itemNumber)
 
 void CreatureJoint(ItemInfo* item, short joint, short required) 
 {
-	if (!item->Data)
+	if (!item->IsCreature())
 		return;
 
 	auto* creature = GetCreatureInfo(item);
@@ -718,8 +717,6 @@ void CreatureTilt(ItemInfo* item, short angle)
 	else if (angle > ANGLE(3.0f))
 		angle = ANGLE(3.0f);
 
-	short theAngle = -ANGLE(3.0f);
-
 	short absRot = abs(item->Pose.Orientation.z);
 	if (absRot < ANGLE(15.0f) || absRot > ANGLE(30.0f))
 		angle >>= 1;
@@ -729,7 +726,7 @@ void CreatureTilt(ItemInfo* item, short angle)
 
 short CreatureTurn(ItemInfo* item, short maxTurn)
 {
-	if (!item->Data || maxTurn == 0)
+	if (!item->IsCreature() || maxTurn == 0)
 		return 0;
 
 	auto* creature = GetCreatureInfo(item);
@@ -739,9 +736,9 @@ short CreatureTurn(ItemInfo* item, short maxTurn)
 	int z = creature->Target.z - item->Pose.Position.z;
 	angle = phd_atan(z, x) - item->Pose.Orientation.y;
 	int range = (item->Animation.Velocity.z * 16384) / maxTurn;
-	int distance = pow(x, 2) + pow(z, 2);
+	int distance = SQUARE(z) + SQUARE(x);
 
-	if (angle > FRONT_ARC || angle < -FRONT_ARC && distance < pow(range, 2))
+	if (angle > FRONT_ARC || angle < -FRONT_ARC && distance < SQUARE(range))
 		maxTurn /= 2;
 
 	if (angle > maxTurn)
@@ -1146,6 +1143,27 @@ int StalkBox(ItemInfo* item, ItemInfo* enemy, int boxNumber)
 	return true;
 }
 
+// TODO: find a way to do that in LUA instead ! TokyoSU: 21/12/22
+static bool IsCreatureVaultAvailable(ItemInfo* item, int clickRequired)
+{
+	switch (clickRequired)
+	{
+	case 3:
+		return item->ObjectNumber != ID_VON_CROY
+			&& item->ObjectNumber != ID_BADDY1
+			&& item->ObjectNumber != ID_BADDY2
+			&& item->ObjectNumber != ID_CIVVY
+			&& item->ObjectNumber != ID_MP_WITH_STICK;
+	case 2:
+		return item->ObjectNumber != ID_VON_CROY 
+			&& item->ObjectNumber != ID_BADDY1
+			&& item->ObjectNumber != ID_BADDY2
+			&& item->ObjectNumber != ID_CIVVY
+			&& item->ObjectNumber != ID_MP_WITH_STICK;
+	}
+	return true;
+}
+
 int CreatureVault(short itemNumber, short angle, int vault, int shift)
 {
 	auto* item = &g_Level.Items[itemNumber];
@@ -1158,25 +1176,15 @@ int CreatureVault(short itemNumber, short angle, int vault, int shift)
 
 	CreatureAnimation(itemNumber, angle, 0);
 
+	// FIXME: edit assets adding climb down animations for Von Croy and baddies?
 	if (item->Floor > y + CHECK_CLICK(9))
 		vault = 0;
 	else if (item->Floor > y + CHECK_CLICK(7))
 		vault = -4;
-	// FIXME: edit assets adding climb down animations for Von Croy and baddies?
-	else if (item->Floor > y + CHECK_CLICK(5) &&
-		item->ObjectNumber != ID_VON_CROY &&
-		item->ObjectNumber != ID_BADDY1 &&
-		item->ObjectNumber != ID_BADDY2)
-	{
+	else if (item->Floor > y + CHECK_CLICK(5) && IsCreatureVaultAvailable(item, 3))
 		vault = -3;
-	}
-	else if (item->Floor > y + CHECK_CLICK(3) &&
-		item->ObjectNumber != ID_VON_CROY &&
-		item->ObjectNumber != ID_BADDY1 &&
-		item->ObjectNumber != ID_BADDY2)
-	{
+	else if (item->Floor > y + CHECK_CLICK(3) && IsCreatureVaultAvailable(item, 2))
 		vault = -2;
-	}
 	else if (item->Pose.Position.y > y - CHECK_CLICK(3))
 		return 0;
 	else if (item->Pose.Position.y > y - CHECK_CLICK(5))
@@ -1418,7 +1426,7 @@ void FindAITargetObject(CreatureInfo* creature, short objectNumber)
 
 void CreatureAIInfo(ItemInfo* item, AI_INFO* AI)
 {
-	if (!item->Data)
+	if (!item->IsCreature())
 		return;
 
 	auto* object = &Objects[item->ObjectNumber];
@@ -1435,18 +1443,13 @@ void CreatureAIInfo(ItemInfo* item, AI_INFO* AI)
 	int* zone = g_Level.Zones[(int)creature->LOT.Zone][FlipStatus].data();
 
 	auto* room = &g_Level.Rooms[item->RoomNumber];
-	item->BoxNumber = NO_BOX;
 	FloorInfo* floor = GetSector(room, item->Pose.Position.x - room->x, item->Pose.Position.z - room->z);
 	if (floor)
 		item->BoxNumber = floor->Box;
-
 	if (item->BoxNumber != NO_BOX)
 		AI->zoneNumber = zone[item->BoxNumber];
 	else
 		AI->zoneNumber = NO_ZONE;
-
-	enemy->BoxNumber = NO_BOX;
-
 	room = &g_Level.Rooms[enemy->RoomNumber];
 	floor = GetSector(room, enemy->Pose.Position.x - room->x, enemy->Pose.Position.z - room->z);
 
@@ -1469,7 +1472,6 @@ void CreatureAIInfo(ItemInfo* item, AI_INFO* AI)
 
 	if (floor && reachable)
 		enemy->BoxNumber = floor->Box;
-
 	if (enemy->BoxNumber != NO_BOX)
 		AI->enemyZone = zone[enemy->BoxNumber];
 	else
@@ -1517,8 +1519,7 @@ void CreatureAIInfo(ItemInfo* item, AI_INFO* AI)
 		if (creature->Enemy != nullptr)
 		{
 			// TODO: distance is squared, verticalDistance is not. Desquare distance later. -- Lwmte, 27.06.22
-
-			AI->distance = pow(vector.x, 2) + pow(vector.z, 2); // 2D distance.
+			AI->distance = SQUARE(vector.z) + SQUARE(vector.x); // 2D distance.
 			AI->verticalDistance = abs(vector.y);
 		}
 		else
@@ -1549,7 +1550,7 @@ void CreatureAIInfo(ItemInfo* item, AI_INFO* AI)
 
 void CreatureMood(ItemInfo* item, AI_INFO* AI, bool isViolent)
 {
-	if (!item->Data)
+	if (!item->IsCreature())
 		return;
 
 	auto* creature = GetCreatureInfo(item);
@@ -1699,7 +1700,7 @@ void CreatureMood(ItemInfo* item, AI_INFO* AI, bool isViolent)
 
 void GetCreatureMood(ItemInfo* item, AI_INFO* AI, bool isViolent)
 {
-	if (!item->Data)
+	if (!item->IsCreature())
 		return;
 
 	auto* creature = GetCreatureInfo(item);

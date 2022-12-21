@@ -57,24 +57,6 @@ namespace TEN::Entities::TR4
 		KTEMPLAR_ANIM_WALK_FORWARD_RIGHT_2 = 12
 	};
 
-	void SetupKnightTemplar(ObjectInfo& object)
-	{
-		object.initialise = InitialiseKnightTemplar;
-		object.control = KnightTemplarControl;
-		object.collision = CreatureCollision;
-		object.shadowType = ShadowMode::All;
-		object.HitPoints = 15;
-		object.hitEffect = HIT_SMOKE;
-		object.pivotLength = 50;
-		object.radius = 128;
-		object.intelligent = true;
-		object.undead = true;
-		object.ZoneType = ZoneType::Basic;
-
-		g_Level.Bones[object.boneIndex + 6 * 4] |= ROT_X | ROT_Y;
-		g_Level.Bones[object.boneIndex + 7 * 4] |= ROT_Y;
-	}
-
 	void InitialiseKnightTemplar(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
