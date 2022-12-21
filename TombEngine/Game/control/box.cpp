@@ -163,15 +163,12 @@ bool SameZone(CreatureInfo* creature, ItemInfo* target)
 	FloorInfo* floor = GetSector(room, item->Pose.Position.x - room->x, item->Pose.Position.z - room->z);
 	if (floor->Box == NO_BOX)
 		return false;
-
 	item->BoxNumber = floor->Box;
 
 	room = &g_Level.Rooms[target->RoomNumber];
 	floor = GetSector(room, target->Pose.Position.x - room->x, target->Pose.Position.z - room->z);
-
 	if (floor->Box == NO_BOX)
 		return false;
-
 	target->BoxNumber = floor->Box;
 
 	return (zone[item->BoxNumber] == zone[target->BoxNumber]);
@@ -277,8 +274,6 @@ bool CreaturePathfind(ItemInfo* item, short angle, short tilt)
 	short roomNumber = item->RoomNumber;
 	GetFloor(prevPos.x, y, prevPos.z, &roomNumber);
 	FloorInfo* floor = GetFloor(item->Pose.Position.x, y, item->Pose.Position.z, &roomNumber);
-
-	// TODO: Check why some blocks have box = -1 assigned to them -- Lwmte, 10.11.21
 	if (floor->Box == NO_BOX)
 		return false;
 
@@ -924,7 +919,6 @@ void TargetBox(LOTInfo* LOT, int boxNumber)
 	if (boxNumber == NO_BOX)
 		return;
 
-	boxNumber &= NO_BOX;
 	auto* box = &g_Level.Boxes[boxNumber];
 
 	// Maximize target precision. DO NOT change bracket precedence!
@@ -1480,7 +1474,7 @@ void CreatureAIInfo(ItemInfo* item, AI_INFO* AI)
 
 	if (!object->nonLot)
 	{
-		if (enemy->BoxNumber != NO_BOX && g_Level.Boxes[enemy->BoxNumber].flags & creature->LOT.BlockMask)
+		if (enemy->BoxNumber != NO_BOX && g_Level.Boxes[enemy->BoxNumber].overlapIndex & creature->LOT.BlockMask)
 			AI->enemyZone |= BLOCKED;
 		else if (item->BoxNumber != NO_BOX && creature->LOT.Node[item->BoxNumber].searchNumber == (creature->LOT.SearchNumber | BLOCKED_SEARCH))
 			AI->enemyZone |= BLOCKED;
