@@ -359,7 +359,7 @@ namespace TEN::Entities::Creatures::TR3
 
 			dartItem->Pose.Orientation = orient;
 			dartItem->Animation.Velocity.z = CLICK(1);
-			dartItem->TriggerFlags = 1;
+			dartItem->TriggerFlags = -25;
 			dartItem->Color = item->Color;
 
 			AddActiveItem(dartItemNumber);
@@ -386,7 +386,6 @@ namespace TEN::Entities::Creatures::TR3
 		short tilt = 0;
 		auto extraHeadRot = EulerAngles::Zero;
 		auto extraTorsoRot = EulerAngles::Zero;
-		short torso = 0;
 
 		if (item->HitPoints <= 0)
 		{

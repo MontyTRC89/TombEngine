@@ -11,17 +11,27 @@
 
 namespace TEN::Entities::Traps
 {
+	constexpr auto DEFAULT_DART_DAMAGE = 25;
+
 	void DartControl(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
 		if (item->TouchBits.TestAny())
 		{
-			DoDamage(LaraItem, 25);
+
+			if (item->TriggerFlags < 0)
+				Lara.PoisonPotency += 1; // Was 160 with the total poison potency later shifted right by 8 when applied to Lara's health. The effect was that each dart contributed a mere fraction to the potency. @Sezz 2022.03.09
+			
+			if (item->TriggerFlags == 0)
+				DoDamage(LaraItem, DEFAULT_DART_DAMAGE);
+			else
+				DoDamage(LaraItem, abs(item->TriggerFlags));
+
+
 			DoBloodSplat(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, (GetRandomControl() & 3) + 4, LaraItem->Pose.Orientation.y, LaraItem->RoomNumber);
 			
-			if (item->TriggerFlags)
-			Lara.PoisonPotency += 1; // Was 160 with the total poison potency later shifted right by 8 when applied to Lara's health. The effect was that each dart contributed a mere fraction to the potency. @Sezz 2022.03.09
+		
 			
 			KillItem(itemNumber);
 		}
@@ -80,12 +90,12 @@ namespace TEN::Entities::Traps
 			dartItem->RoomNumber = item->RoomNumber;
 
 			dartItem->Pose.Position.x = item->Pose.Position.x ;
-			dartItem->Pose.Position.y = item->Pose.Position.y -CLICK(0.9);
+			dartItem->Pose.Position.y = item->Pose.Position.y - CLICK(0.9);
 			dartItem->Pose.Position.z = item->Pose.Position.z;
 
 			InitialiseItem(dartItemNumber);
 
-			dartItem->Pose.Orientation.x = item->Pose.Orientation.x + -ANGLE(180);
+			dartItem->Pose.Orientation.x = item->Pose.Orientation.x - ANGLE(180);
 			dartItem->Pose.Orientation.y = item->Pose.Orientation.y ;
 			dartItem->Pose.Orientation.z = item->Pose.Orientation.z;
 			dartItem->Animation.Velocity.z = 256;
