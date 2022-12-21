@@ -281,7 +281,6 @@ namespace TEN::Entities::Creatures::TR5
 					item.HitPoints--;
 
 				creature.Mood = MoodType::Escape;
-				creature.Enemy = nullptr;
 				item.Animation.ActiveState = CYBORG_STATE_RUN;
 
 				if (item.HitPoints <= 0)
