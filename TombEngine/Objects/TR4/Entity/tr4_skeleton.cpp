@@ -73,10 +73,9 @@ namespace TEN::Entities::TR4
 	void InitialiseSkeleton(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
+		InitialiseCreature(itemNumber);
 
-		ClearItem(itemNumber);
-
-		// TODO: Check cases 0 and 3.
+		// TODO: Check cases 0 to 3.
 		switch (item->TriggerFlags)
 		{
 		case 0:

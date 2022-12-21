@@ -932,7 +932,7 @@ namespace TEN::Entities
 		obj = &Objects[ID_LARA_DOUBLE];
 		if (obj->loaded)
 		{
-			obj->initialise = InitialiseLaraDouble;
+			obj->initialise = InitialiseCreature;
 			obj->control = LaraDoubleControl;
 			obj->collision = CreatureCollision;
 			obj->hitEffect = HIT_SMOKE;

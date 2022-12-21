@@ -425,7 +425,7 @@ static void StartEntity(ObjectInfo* obj)
 	obj = &Objects[ID_SWORD_GUARDIAN];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseSwordGuardian;
+		obj->initialise = InitialiseCreature;
 		obj->collision = CreatureCollision;
 		obj->control = SwordGuardianControl;
 		//obj->drawRoutine = DrawStatue;

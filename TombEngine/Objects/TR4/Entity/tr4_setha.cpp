@@ -127,8 +127,6 @@ namespace TEN::Entities::TR4
 	void InitialiseSeth(short itemNumber)
 	{
 		auto& item = g_Level.Items[itemNumber];
-
-		ClearItem(itemNumber);
 		InitialiseCreature(itemNumber);
 		SetAnimation(&item, SETH_ANIM_IDLE);
 	}

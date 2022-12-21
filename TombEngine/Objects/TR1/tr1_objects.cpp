@@ -123,7 +123,7 @@ static void StartEntity(ObjectInfo* obj)
 		if (Objects[ID_LARA].loaded)
 			obj->animIndex = Objects[ID_LARA].animIndex;
 
-		obj->initialise = InitialiseDoppelganger;
+		obj->initialise = InitialiseCreature;
 		obj->collision = CreatureCollision;
 		obj->control = DoppelgangerControl;
 		//obj->drawRoutine = DrawEvilLara;

@@ -1099,7 +1099,10 @@ int CreatureActive(short itemNumber)
 
 void InitialiseCreature(short itemNumber) 
 {
-	ClearItem(itemNumber);
+	auto* item = &g_Level.Items[itemNumber];
+	item->Collidable = true;
+	item->Data = nullptr;
+	item->StartPose = item->Pose;
 }
 
 int StalkBox(ItemInfo* item, ItemInfo* enemy, int boxNumber)

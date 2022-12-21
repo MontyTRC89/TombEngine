@@ -13,14 +13,9 @@ namespace TEN::Entities::Creatures::TR5
 {
 	void InitialiseReaper(short itemNumber)
 	{
-		ClearItem(itemNumber);
-
 		auto* item = &g_Level.Items[itemNumber];
-
-		item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 1;
-		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-		item->Animation.TargetState = 2;
-		item->Animation.ActiveState = 2;
+		InitialiseCreature(itemNumber);
+		SetAnimation(item, 1);
 	}
 
 	void ReaperControl(short itemNumber)

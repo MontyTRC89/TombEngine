@@ -19,13 +19,6 @@ namespace TEN::Entities::Creatures::TR2
 {
 	const auto SwordBite = BiteInfo(Vector3(0.0f, 37.0f, 550.0f), 15);
 
-	void InitialiseSwordGuardian(short itemNumber)
-	{
-		auto* item = &g_Level.Items[itemNumber];
-
-		ClearItem(itemNumber);
-	}
-
 	void SwordGuardianFly(ItemInfo* item)
 	{
 		auto pos = Vector3i(

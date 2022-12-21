@@ -55,8 +55,7 @@ namespace TEN::Entities::TR4
 	void InitialiseSmallScorpion(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
-
-		ClearItem(itemNumber);
+		InitialiseCreature(itemNumber);
 		SetAnimation(item, SSCORPION_ANIM_IDLE);
 	}
 

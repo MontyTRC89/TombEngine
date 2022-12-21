@@ -49,8 +49,7 @@ namespace TEN::Entities::TR4
 	void InitialiseTroops(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
-
-		ClearItem(itemNumber);
+		InitialiseCreature(itemNumber);
 
 		if (item->TriggerFlags == 1)
 		{

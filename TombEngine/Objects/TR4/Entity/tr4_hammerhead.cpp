@@ -59,8 +59,7 @@ namespace TEN::Entities::TR4
 	void InitialiseHammerhead(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
-
-		ClearItem(itemNumber);
+		InitialiseCreature(itemNumber);
 		SetAnimation(item, HAMMERHEAD_ANIM_IDLE);
 	}
 

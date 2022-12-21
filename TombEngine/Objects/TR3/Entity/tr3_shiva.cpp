@@ -191,15 +191,8 @@ namespace TEN::Entities::Creatures::TR3
 	void InitialiseShiva(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
-
-		ClearItem(itemNumber);
-
-		item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + SHIVA_ANIM_INACTIVE;
-
-		auto* anim = &g_Level.Anims[item->Animation.AnimNumber];
-
-		item->Animation.FrameNumber = anim->frameBase;
-		item->Animation.ActiveState = anim->ActiveState;
+		InitialiseCreature(itemNumber);
+		SetAnimation(item, SHIVA_ANIM_INACTIVE);
 	}
 
 	void ShivaControl(short itemNumber)

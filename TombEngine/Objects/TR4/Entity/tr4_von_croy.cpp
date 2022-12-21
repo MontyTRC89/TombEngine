@@ -137,14 +137,11 @@ namespace TEN::Entities::TR4
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		ClearItem(itemNumber);
-		item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + VON_CROY_ANIM_KNIFE_EQUIP_UNEQUIP;
-		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-		item->Animation.TargetState = VON_CROY_STATE_TOGGLE_KNIFE;
-		item->Animation.ActiveState = VON_CROY_STATE_TOGGLE_KNIFE;
+		InitialiseCreature(itemNumber);
+		SetAnimation(item, VON_CROY_ANIM_KNIFE_EQUIP_UNEQUIP);
 		item->SetMeshSwapFlags(VonCroyKnifeSwapJoints);
 
-		memset(VonCroyPassedWaypoints, 0, 128);
+		ZeroMemory(VonCroyPassedWaypoints, sizeof(VonCroyPassedWaypoints));
 	}
 
 	void VonCroyControl(short itemNumber)

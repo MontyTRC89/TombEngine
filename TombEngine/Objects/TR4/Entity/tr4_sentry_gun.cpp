@@ -26,8 +26,7 @@ namespace TEN::Entities::TR4
 	void InitialiseSentryGun(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
-
-		ClearItem(itemNumber);
+		InitialiseCreature(itemNumber);
 		item->ItemFlags[0] = 0;
 		item->ItemFlags[1] = 768;
 		item->ItemFlags[2] = 0;

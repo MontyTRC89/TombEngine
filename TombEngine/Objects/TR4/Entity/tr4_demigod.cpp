@@ -298,13 +298,8 @@ namespace TEN::Entities::TR4
 	void InitialiseDemigod(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
-
-		ClearItem(itemNumber);
-
-		item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex;
-		item->Animation.TargetState = DEMIGOD_STATE_IDLE;
-		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-		item->Animation.ActiveState = DEMIGOD_STATE_IDLE;
+		InitialiseCreature(itemNumber);
+		SetAnimation(item, 0);
 
 		/*if (g_Level.NumItems > 0)
 		{

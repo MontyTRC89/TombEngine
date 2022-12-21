@@ -37,8 +37,7 @@ namespace TEN::Entities::Creatures::TR5
 	void InitialiseLarson(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
-
-		ClearItem(itemNumber);
+		InitialiseCreature(itemNumber);
 		SetAnimation(item, 0);
 
 		if (!item->TriggerFlags)

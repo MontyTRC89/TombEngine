@@ -124,8 +124,7 @@ namespace TEN::Entities::Creatures::TR5
 	void InitialiseCyborg(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
-
-		ClearItem(itemNumber);
+		InitialiseCreature(itemNumber);
 		SetAnimation(item, CYBORG_ANIM_IDLE);
 	}
 

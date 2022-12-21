@@ -25,13 +25,12 @@ namespace TEN::Entities::Creatures::TR5
 	const vector<unsigned int> BrownBeastAttackJoints1 = { 14, 15, 16, 17 };
 	const vector<unsigned int> BrownBeastAttackJoints2 = { 20, 21, 22, 23 };
 
-	// TODO
+	// TODO: Add animation and state for BrownBeast
 	enum BrownBeastState
 	{
 
 	};
 
-	// TODO
 	enum BrownBeastAnim
 	{
 
@@ -40,8 +39,7 @@ namespace TEN::Entities::Creatures::TR5
 	void InitialiseBrownBeast(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
-
-		ClearItem(itemNumber);
+		InitialiseCreature(itemNumber);
 		SetAnimation(item, 0);
 	}
 

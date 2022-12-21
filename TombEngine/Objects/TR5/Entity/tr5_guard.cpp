@@ -98,7 +98,7 @@ namespace TEN::Entities::Creatures::TR5
 	void InitialiseGuard(short itemNum)
 	{
 		auto* item = &g_Level.Items[itemNum];
-		ClearItem(itemNum);
+		InitialiseCreature(itemNum);
 
 	   int anim = Objects[ID_SWAT].animIndex;
 		if (!Objects[ID_SWAT].loaded)
@@ -201,8 +201,7 @@ namespace TEN::Entities::Creatures::TR5
 	void InitialiseSniper(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
-
-		ClearItem(itemNumber);
+		InitialiseCreature(itemNumber);
 		SetAnimation(item, 0);
 		item->Pose.Position.x += SECTOR(1) * phd_sin(item->Pose.Orientation.y + ANGLE(90.0f));
 		item->Pose.Position.y += CLICK(2);
@@ -212,8 +211,7 @@ namespace TEN::Entities::Creatures::TR5
 	void InitialiseGuardLaser(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
-
-		ClearItem(itemNumber);
+		InitialiseCreature(itemNumber);
 		SetAnimation(item, 6);
 	}
 
@@ -1078,13 +1076,8 @@ namespace TEN::Entities::Creatures::TR5
 	void InitialiseMafia2(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
-
-		ClearItem(itemNumber);
-
-		item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex;
-		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-		item->Animation.TargetState = GUARD_STATE_IDLE;
-		item->Animation.ActiveState = GUARD_STATE_IDLE;
+		InitialiseCreature(itemNumber);
+		SetAnimation(item, 0);
 		item->SetMeshSwapFlags(9216);
 	}
 
