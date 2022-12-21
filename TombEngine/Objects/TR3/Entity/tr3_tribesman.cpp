@@ -359,7 +359,7 @@ namespace TEN::Entities::Creatures::TR3
 
 			dartItem->Pose.Orientation = orient;
 			dartItem->Animation.Velocity.z = CLICK(1);
-			dartItem->TriggerFlags = -25;
+			dartItem->TriggerFlags = item->TriggerFlags;
 			dartItem->Color = item->Color;
 
 			AddActiveItem(dartItemNumber);
