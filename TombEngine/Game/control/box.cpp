@@ -212,13 +212,12 @@ short AIGuard(CreatureInfo* creature)
 
 void AlertNearbyGuards(ItemInfo* item) 
 {
-	for (int i = 0; i < ActiveCreatures.size(); i++)
+	for (auto& currentCreature : ActiveCreatures)
 	{
-		auto* currentCreature = ActiveCreatures[i];
 		if (currentCreature->ItemNumber == NO_ITEM)
 			continue;
 
-		auto* currentTarget = &g_Level.Items[currentCreature->ItemNumber + i];
+		auto* currentTarget = &g_Level.Items[currentCreature->ItemNumber];
 		if (item->RoomNumber == currentTarget->RoomNumber)
 		{
 			currentCreature->Alerted = true;
@@ -237,18 +236,17 @@ void AlertNearbyGuards(ItemInfo* item)
 
 void AlertAllGuards(short itemNumber) 
 {
-	for (int i = 0; i < ActiveCreatures.size(); i++)
+	for (auto& currentCreature : ActiveCreatures)
 	{
-		auto* creature = ActiveCreatures[i];
-		if (creature->ItemNumber == NO_ITEM)
+		if (currentCreature->ItemNumber == NO_ITEM)
 			continue;
 
-		auto* target = &g_Level.Items[creature->ItemNumber];
+		auto* target = &g_Level.Items[currentCreature->ItemNumber];
 		short objNumber = g_Level.Items[itemNumber].ObjectNumber;
 		if (objNumber == target->ObjectNumber)
 		{
 			if (target->Status == ITEM_ACTIVE)
-				creature->Alerted = true;
+				currentCreature->Alerted = true;
 		}
 	}
 }

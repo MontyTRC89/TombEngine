@@ -147,12 +147,11 @@ namespace TEN::Entities::TR4
 
 				float minDistance = FLT_MAX;
 
-				for (auto* activeCreature : ActiveCreatures)
+				for (auto& currentCreature : ActiveCreatures)
 				{
-					if (activeCreature->ItemNumber != NO_ITEM && activeCreature->ItemNumber != itemNumber)
+					if (currentCreature->ItemNumber != NO_ITEM && currentCreature->ItemNumber != itemNumber)
 					{
-						auto* currentItem = &g_Level.Items[activeCreature->ItemNumber];
-
+						auto* currentItem = &g_Level.Items[currentCreature->ItemNumber];
 						if (currentItem->ObjectNumber != ID_LARA)
 						{
 							if (currentItem->ObjectNumber != ID_TROOPS &&

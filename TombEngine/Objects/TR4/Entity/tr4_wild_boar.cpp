@@ -84,10 +84,9 @@ namespace TEN::Entities::TR4
 
 				int minDistance = INT_MAX;
 
-				for (int i = 0; i < ActiveCreatures.size(); i++)
+				for (auto& currentCreature : ActiveCreatures)
 				{
-					auto* currentItem = ActiveCreatures[i];
-
+					auto* currentItem = currentCreature;
 					if (currentItem->ItemNumber == NO_ITEM || currentItem->ItemNumber == itemNumber)
 						continue;
 
