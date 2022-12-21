@@ -87,13 +87,11 @@ namespace TEN::Entities::Creatures::TR1
 		{
 			creature->LOT.Step = BLOCK(20);
 			creature->LOT.Drop = -BLOCK(20);
-			creature->LOT.Fly = NO_FLYING; // avoid rat going underwater !
 		}
 		else
 		{
 			creature->LOT.Step = CLICK(1);
 			creature->LOT.Drop = -CLICK(1);
-			creature->LOT.Fly = NO_FLYING;
 		}
 		return waterDepth != NO_HEIGHT;
 	}
