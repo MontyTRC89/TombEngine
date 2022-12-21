@@ -43,7 +43,6 @@ namespace TEN::Entities::Creatures::TR3
 		FLAME_STATE_ATTACK1 = 11,
 	};
 
-	// TODO
 	enum FlamethrowerAnim
 	{
 		FLAME_ANIM_IDLE = 12,
