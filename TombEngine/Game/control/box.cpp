@@ -1521,7 +1521,6 @@ void CreatureMood(ItemInfo* item, AI_INFO* AI, bool isViolent)
 		return;
 
 	auto* creature = GetCreatureInfo(item);
-	auto* object = &Objects[item->ObjectNumber];
 	auto* LOT = &creature->LOT;
 	auto* enemy = creature->Enemy;
 
