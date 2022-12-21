@@ -24,7 +24,7 @@
 #define ESCAPE_DIST SECTOR(5)
 #define STALK_DIST SECTOR(3)
 #define REACHED_GOAL_RADIUS 640
-#define ATTACK_RANGE pow(SECTOR(3), 2)
+#define ATTACK_RANGE SQUARE(SECTOR(3))
 #define ESCAPE_CHANCE  0x800
 #define RECOVER_CHANCE 0x100
 #define BIFF_AVOID_TURN 1536
@@ -824,7 +824,7 @@ int BadFloor(int x, int y, int z, int boxHeight, int nextHeight, short roomNumbe
 	if (LOT->IsJumping)
 		return false;
 
-	if (g_Level.Boxes[floor->Box].flags & LOT->BlockMask)
+	if (g_Level.Boxes[floor->Box].overlapIndex & LOT->BlockMask)
 		return true;
 
 	int height = g_Level.Boxes[floor->Box].height;
@@ -886,7 +886,7 @@ int ValidBox(ItemInfo* item, short zoneNumber, short boxNumber)
 		return false;
 
 	auto* box = &g_Level.Boxes[boxNumber];
-	if (box->flags & creature->LOT.BlockMask)
+	if (box->overlapIndex & creature->LOT.BlockMask)
 		return false;
 
 	if (item->Pose.Position.z > (box->left * SECTOR(1)) &&
@@ -1025,7 +1025,7 @@ int SearchLOT(LOTInfo* LOT, int depth)
 						continue;
 					}
 
-					if (g_Level.Boxes[boxNumber].flags & LOT->BlockMask)
+					if (g_Level.Boxes[boxNumber].overlapIndex & LOT->BlockMask)
 						expand->searchNumber = node->searchNumber | BLOCKED_SEARCH;
 					else
 					{
@@ -1152,15 +1152,13 @@ static bool IsCreatureVaultAvailable(ItemInfo* item, int clickRequired)
 	switch (clickRequired)
 	{
 	case 3:
-		return item->ObjectNumber != ID_VON_CROY
-			&& item->ObjectNumber != ID_BADDY1
+		return item->ObjectNumber != ID_BADDY1
 			&& item->ObjectNumber != ID_BADDY2
 			&& item->ObjectNumber != ID_CIVVY
 			&& item->ObjectNumber != ID_MP_WITH_STICK
 			&& item->ObjectNumber != ID_YETI;
 	case 2:
-		return item->ObjectNumber != ID_VON_CROY 
-			&& item->ObjectNumber != ID_BADDY1
+		return item->ObjectNumber != ID_BADDY1
 			&& item->ObjectNumber != ID_BADDY2
 			&& item->ObjectNumber != ID_CIVVY
 			&& item->ObjectNumber != ID_MP_WITH_STICK
@@ -2014,7 +2012,7 @@ TARGET_TYPE CalculateTarget(Vector3i* target, ItemInfo* item, LOTInfo* LOT)
 		}
 
 		boxNumber = LOT->Node[boxNumber].exitBox;
-		if (boxNumber != NO_BOX && (g_Level.Boxes[boxNumber].flags & LOT->BlockMask))
+		if (boxNumber != NO_BOX && (g_Level.Boxes[boxNumber].overlapIndex & LOT->BlockMask))
 			break;
 	} while (boxNumber != NO_BOX);
 
