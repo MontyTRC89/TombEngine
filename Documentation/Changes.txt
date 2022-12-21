@@ -18,6 +18,7 @@ Version 1.0.5
 * Fix fly pathfinding (not entirly but more nice).
 * Fix some entities which bone rotation is wrong.
 * Fix VON_CROY not using the animation for 2 and 3 block down vault.
+* Fix BADDY1&2 not using the animation for 3 block down vault.
 
 Version 1.0.4
 =============
