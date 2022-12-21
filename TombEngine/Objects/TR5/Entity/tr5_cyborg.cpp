@@ -118,8 +118,9 @@ namespace TEN::Entities::Creatures::TR5
 	{
 		auto& item = g_Level.Items[itemNumber];
 
-		ClearItem(itemNumber);
+		InitialiseCreature(itemNumber);
 		SetAnimation(&item, CYBORG_ANIM_IDLE);
+		
 	}
 
 	void CyborgControl(short itemNumber)
@@ -134,6 +135,7 @@ namespace TEN::Entities::Creatures::TR5
 		short joint0 = 0;
 		short joint1 = 0;
 		short joint2 = 0;
+		
 
 		int x = item.Pose.Position.x;
 		int z = item.Pose.Position.z;
@@ -198,16 +200,17 @@ namespace TEN::Entities::Creatures::TR5
 				if (item.ItemFlags[0] < CyborgJoints.size())
 				{
 					unsigned int jointBit = 1 << CyborgJoints[item.ItemFlags[0]];
-					item.Timer |= jointBit;
+					
+					item.ItemFlags[1] |= jointBit >> 4;
 
-					item.SetMeshSwapFlags(item.Timer);
+					item.SetMeshSwapFlags(item.ItemFlags[1] << 4);
 					item.ItemFlags[0]++;
 				}
 			}
 		}
 
 		int randomIndex = TestEnvironment(ENV_FLAG_WATER, item.RoomNumber) ?
-			Random::GenerateInt(0, 4) : Random::GenerateInt(0, 10);
+			Random::GenerateInt(0, 4) : Random::GenerateInt(4, 70);
 
 		if (randomIndex < item.ItemFlags[0])
 		{
