@@ -10,7 +10,7 @@ Version 1.0.5
 * Fix pathfinding problems for first initialized enemies of every slot.
 * Fix water and fly zone being inverted.
 * Fix CROCODILE attack range and joint speed being to fast.
-* Fix CIVVY and MP_WITH_STICK vault bug.
+* Fix CIVVY/MP_WITH_STICK/YETI vault bug.
 * Added more log when slot require other slot which is missing.
 * Fix rare crash when smash item is inside a wall, also added a log when it happen.
 * Fix FLAMETHROWER_BADDY and WORKER_FLAMETHROWER attack range and aim walking anim being looped until near lara.

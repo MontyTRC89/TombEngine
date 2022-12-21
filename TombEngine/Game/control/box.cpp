@@ -1156,13 +1156,15 @@ static bool IsCreatureVaultAvailable(ItemInfo* item, int clickRequired)
 			&& item->ObjectNumber != ID_BADDY1
 			&& item->ObjectNumber != ID_BADDY2
 			&& item->ObjectNumber != ID_CIVVY
-			&& item->ObjectNumber != ID_MP_WITH_STICK;
+			&& item->ObjectNumber != ID_MP_WITH_STICK
+			&& item->ObjectNumber != ID_YETI;
 	case 2:
 		return item->ObjectNumber != ID_VON_CROY 
 			&& item->ObjectNumber != ID_BADDY1
 			&& item->ObjectNumber != ID_BADDY2
 			&& item->ObjectNumber != ID_CIVVY
-			&& item->ObjectNumber != ID_MP_WITH_STICK;
+			&& item->ObjectNumber != ID_MP_WITH_STICK
+			&& item->ObjectNumber != ID_YETI;
 	}
 	return true;
 }
