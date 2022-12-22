@@ -202,7 +202,7 @@ namespace TEN::Entities
 		if (obj->loaded)
 		{
 			if (!Objects[ID_MESHSWAP_BADDY1].loaded)
-				TENLog("ID_MESHSWAP_BADDY1 is missing, ID_BADDY1 will not have the sword and uzi mesh !", LogLevel::Warning);
+				TENLog("ID_MESHSWAP_BADDY1 missing; ID_BADDY1 will not use its sword and uzi meshes.", LogLevel::Warning);
 
 			obj->initialise = InitialiseBaddy;
 			obj->control = BaddyControl;
@@ -224,7 +224,7 @@ namespace TEN::Entities
 		if (obj->loaded)
 		{
 			if (!Objects[ID_MESHSWAP_BADDY2].loaded)
-				TENLog("ID_MESHSWAP_BADDY2 is missing, ID_BADDY2 will not have the sword and uzi mesh !", LogLevel::Warning);
+				TENLog("ID_MESHSWAP_BADDY2 missing; ID_BADDY1 will not use its sword and uzi meshes.", LogLevel::Warning);
 
 			obj->initialise = InitialiseBaddy;
 			obj->control = BaddyControl;
@@ -547,7 +547,7 @@ namespace TEN::Entities
 			if (Objects[ID_BABOON_NORMAL].loaded)
 				obj->animIndex = Objects[ID_BABOON_NORMAL].animIndex;
 			else
-				TENLog("Failed to assign ID_BABOON_INV animation index, ID_BABOON_NORMAL not found !", LogLevel::Warning);
+				TENLog("Failed to assign ID_BABOON_INV animation index; ID_BABOON_NORMAL not found.", LogLevel::Warning);
 
 			obj->initialise = InitialiseBaboon;
 			obj->control = BaboonControl;
@@ -566,7 +566,7 @@ namespace TEN::Entities
 			if (Objects[ID_BABOON_NORMAL].loaded)
 				obj->animIndex = Objects[ID_BABOON_NORMAL].animIndex;
 			else
-				TENLog("Failed to assign ID_BABOON_SILENT animation index, ID_BABOON_NORMAL not found !", LogLevel::Warning);
+				TENLog("Failed to assign ID_BABOON_SILENT animation index; ID_BABOON_NORMAL not found.", LogLevel::Warning);
 
 			obj->initialise = InitialiseBaboon;
 			obj->control = BaboonControl;

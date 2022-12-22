@@ -18,7 +18,7 @@ void InitialiseSmashObject(short itemNumber)
 	FloorInfo* floor = GetSector(room, item->Pose.Position.x - room->x, item->Pose.Position.z - room->z);
 	if (floor->Box == NO_BOX)
 	{
-		TENLog("Smash item don't have a floor when it need to, maybe it's on a wall, id: " + std::to_string(itemNumber), LogLevel::Warning);
+		TENLog("Smash object with ID " + std::to_string(itemNumber) + " may be inside a wall." , LogLevel::Warning);
 		return;
 	}
 

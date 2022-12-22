@@ -161,7 +161,7 @@ static void StartEntity(ObjectInfo* obj)
 		}
 		else
 		{
-			TENLog("ID_GOON_SILENCER1 not found!", LogLevel::Error);
+			TENLog("ID_GOON_SILENCER1 not found.", LogLevel::Error);
 		}
 
 		obj->initialise = InitialiseCreature;
@@ -188,7 +188,7 @@ static void StartEntity(ObjectInfo* obj)
 		}
 		else
 		{
-			TENLog("ID_GOON_SILENCER1 not found!", LogLevel::Error);
+			TENLog("ID_GOON_SILENCER1 not found.", LogLevel::Error);
 		}
 
 		obj->initialise = InitialiseCreature;
