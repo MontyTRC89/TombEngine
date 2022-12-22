@@ -20,6 +20,7 @@ namespace TEN::Entities::Creatures::TR5
 	// TODO
 	enum ChefState
 	{
+		// No state 0.
 		CHEF_STATE_COOKING = 1,
 		CHEF_STATE_TURN_180 = 2,
 		CHEF_STATE_ATTACK = 3,
@@ -33,12 +34,13 @@ namespace TEN::Entities::Creatures::TR5
 	enum ChefAnim
 	{
 		CHEF_ANIM_IDLE = 0,
-		CHEF_ANIM_DEATH = 16,
+		CHEF_ANIM_DEATH = 16
 	};
 
 	void InitialiseChef(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
+
 		InitialiseCreature(itemNumber);
 		SetAnimation(item, CHEF_ANIM_IDLE);
 		item->Pose.Position.x += 192 * phd_sin(item->Pose.Orientation.y);

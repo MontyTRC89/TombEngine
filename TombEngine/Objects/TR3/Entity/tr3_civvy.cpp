@@ -64,6 +64,7 @@ namespace TEN::Entities::Creatures::TR3
 	enum CivvyAnim
 	{
 		CIVVY_ANIM_IDLE = 6,
+
 		CIVVY_ANIM_DEATH = 26,
 		CIVVY_CLIMB3_ANIM = 27,
 		CIVVY_CLIMB1_ANIM = 28,

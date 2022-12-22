@@ -107,6 +107,7 @@ namespace TEN::Entities::TR4
 	void InitialiseSas(short itemNumber)
 	{
 		auto& item = g_Level.Items[itemNumber];
+
 		InitialiseCreature(itemNumber);
 		SetAnimation(&item, SAS_ANIM_STAND);
 	}

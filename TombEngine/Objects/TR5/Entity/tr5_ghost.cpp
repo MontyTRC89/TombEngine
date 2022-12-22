@@ -17,6 +17,7 @@ namespace TEN::Entities::Creatures::TR5
 	void InitialiseInvisibleGhost(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
+
 		InitialiseCreature(itemNumber);
 		SetAnimation(item, 0);
 		item->Pose.Position.y += CLICK(2);

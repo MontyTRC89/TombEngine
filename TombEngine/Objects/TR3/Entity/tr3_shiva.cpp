@@ -81,6 +81,14 @@ namespace TEN::Entities::Creatures::TR3
 
 	};
 
+	void InitialiseShiva(short itemNumber)
+	{
+		auto* item = &g_Level.Items[itemNumber];
+
+		InitialiseCreature(itemNumber);
+		SetAnimation(item, SHIVA_ANIM_INACTIVE);
+	}
+
 	void TriggerShivaSmoke(long x, long y, long z, long uw)
 	{
 		long dx = LaraItem->Pose.Position.x - x;
@@ -186,13 +194,6 @@ namespace TEN::Entities::Creatures::TR3
 			SoundEffect(SFX_TR2_CRUNCH2, &item->Pose);
 			creature->Flags = 1;
 		}
-	}
-
-	void InitialiseShiva(short itemNumber)
-	{
-		auto* item = &g_Level.Items[itemNumber];
-		InitialiseCreature(itemNumber);
-		SetAnimation(item, SHIVA_ANIM_INACTIVE);
 	}
 
 	void ShivaControl(short itemNumber)

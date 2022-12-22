@@ -9,19 +9,19 @@
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
 #include "Game/people.h"
+#include "Math/Math.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-using namespace TEN::Math::Random;
-using std::vector;
+using namespace TEN::Math;
 
 namespace TEN::Entities::Creatures::TR3
 {
 	const auto MPStickBite1 = BiteInfo(Vector3(247.0f, 10.0f, 11.0f), 13);
 	const auto MPStickBite2 = BiteInfo(Vector3(0.0f, 0.0f, 100.0f), 6);
-	const vector<unsigned int> MPStickPunchAttackJoints = { 10, 13 };
-	const vector<unsigned int> MPStickKickAttackJoints  = { 5, 6 };
+	const std::vector<unsigned int> MPStickPunchAttackJoints = { 10, 13 };
+	const std::vector<unsigned int> MPStickKickAttackJoints  = { 5, 6 };
 
 	constexpr auto MPSTICK_VAULT_SHIFT = 260;
 
@@ -43,22 +43,23 @@ namespace TEN::Entities::Creatures::TR3
 		MPSTICK_STATE_CLIMB3 = 13,
 		MPSTICK_STATE_CLIMB1 = 14,
 		MPSTICK_STATE_CLIMB2 = 15,
-		MPSTICK_STATE_FALL3 = 16,
+		MPSTICK_STATE_FALL3 = 16
 	};
 
 	enum MPStickAnim
 	{
 		MPSTICK_ANIM_IDLE = 6,
 		MPSTICK_ANIM_DEATH = 26,
-		MPSTICK_CLIMB3_ANIM = 27,
-		MPSTICK_CLIMB1_ANIM = 28,
-		MPSTICK_CLIMB2_ANIM = 29,
-		MPSTICK_FALL4_ANIM = 30
+		MPSTICK_ANIM_VAULT_3_STEPS_UP = 27,
+		MPSTICK_ANIM_VAULT_1_STEPS_UP = 28,
+		MPSTICK_ANIM_VAULT_2_STEPS_UP = 29,
+		MPSTICK_ANIM_VAULT_4_STEPS_DOWN = 30
 	};
 
 	void InitialiseMPStick(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
+
 		InitialiseCreature(itemNumber);
 		SetAnimation(item, MPSTICK_ANIM_IDLE);
 	}
@@ -184,7 +185,7 @@ namespace TEN::Entities::Creatures::TR3
 				if (item->AIBits & GUARD)
 				{
 					head = AIGuard(creature);
-					if (TestProbability(1.0f / 256))
+					if (Random::TestProbability(1 / 256.0f))
 					{
 						if (item->Animation.ActiveState == MPSTICK_STATE_STOP)
 							item->Animation.TargetState = MPSTICK_STATE_WAIT;
@@ -239,7 +240,7 @@ namespace TEN::Entities::Creatures::TR3
 					item->Animation.TargetState = MPSTICK_STATE_RUN;
 				else if (creature->Mood == MoodType::Bored)
 				{
-					if (TestProbability(1.0f / 128))
+					if (Random::TestProbability(1 / 128.0f))
 					{
 						item->Animation.RequiredState = MPSTICK_STATE_WAIT;
 						item->Animation.TargetState = MPSTICK_STATE_STOP;
@@ -487,22 +488,22 @@ namespace TEN::Entities::Creatures::TR3
 			{
 			case 2:
 				creature->MaxTurn = 0;
-				SetAnimation(item, MPSTICK_CLIMB1_ANIM);
+				SetAnimation(item, MPSTICK_ANIM_VAULT_1_STEPS_UP);
 				break;
 
 			case 3:
 				creature->MaxTurn = 0;
-				SetAnimation(item, MPSTICK_CLIMB2_ANIM);
+				SetAnimation(item, MPSTICK_ANIM_VAULT_2_STEPS_UP);
 				break;
 
 			case 4:
 				creature->MaxTurn = 0;
-				SetAnimation(item, MPSTICK_CLIMB3_ANIM);
+				SetAnimation(item, MPSTICK_ANIM_VAULT_3_STEPS_UP);
 				break;
 
 			case -3:
 				creature->MaxTurn = 0;
-				SetAnimation(item, MPSTICK_FALL4_ANIM);
+				SetAnimation(item, MPSTICK_ANIM_VAULT_4_STEPS_DOWN);
 				break;
 			}
 		}

@@ -8,17 +8,17 @@ Version 1.0.5
 * Fix draw key incorrectly working in binoculars / lasersight mode.
 * Fix FLAME_EMITTER_3 not burning player.
 * Fix pathfinding problems for first initialized enemies of every slot.
-* Fix water and fly zone being inverted.
-* Fix CROCODILE attack range and joint speed being to fast.
-* Fix CIVVY/MP_WITH_STICK/YETI vault bug.
-* Added more log when slot require other slot which is missing.
-* Fix rare crash when smash item is inside a wall, also added a log when it happen.
-* Fix FLAMETHROWER_BADDY and WORKER_FLAMETHROWER attack range and aim walking anim being looped until near lara.
-* Fix water pathfinding (not entirly but more nice).
-* Fix fly pathfinding (not entirly but more nice).
-* Fix some entities which bone rotation is wrong.
-* Fix VON_CROY not using the animation for 2 and 3 block down vault.
-* Fix BADDY1&2 not using the animation for 3 block down vault.
+* Fix inverted water and fly zones.
+* Fix CROCODILE attack range and joint rotation speed.
+* Fix CIVVY, MP_WITH_STICK, and YETI vault bugs.
+* Added warning log when one slot requires another slot which is missing.
+* Fix rare crash when smash item is inside a wall and add warning log for the scenario.
+* Fix FLAMETHROWER_BADDY and WORKER_FLAMETHROWER attack ranges + aim walking anim looping when away from the player.
+* Fix pathfinding of water creatures (partial).
+* Fix pathfinding of flying creatures (partial).
+* Fix bone rotations of some entities
+* Fix VON_CROY not using animation for 2 and 3 step vault down.
+* Fix BADDY1 and BADDY2 not using animation for 3 step vault down.
 
 Version 1.0.4
 =============

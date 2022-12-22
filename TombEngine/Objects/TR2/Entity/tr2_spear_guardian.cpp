@@ -55,6 +55,7 @@ namespace TEN::Entities::Creatures::TR2
 	void InitialiseSpearGuardian(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
+
 		InitialiseCreature(itemNumber);
 		SetAnimation(item, 48);
 	}

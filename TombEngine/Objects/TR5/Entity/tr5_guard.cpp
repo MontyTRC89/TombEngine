@@ -26,6 +26,7 @@ namespace TEN::Entities::Creatures::TR5
 
 	enum GuardState
 	{
+		// No state 0.
 		GUARD_STATE_IDLE = 1,
 		GUARD_STATE_TURN_180 = 2,
 		GUARD_STATE_FIRE_SINGLE = 3,
@@ -201,6 +202,7 @@ namespace TEN::Entities::Creatures::TR5
 	void InitialiseSniper(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
+
 		InitialiseCreature(itemNumber);
 		SetAnimation(item, 0);
 		item->Pose.Position.x += SECTOR(1) * phd_sin(item->Pose.Orientation.y + ANGLE(90.0f));
@@ -211,6 +213,7 @@ namespace TEN::Entities::Creatures::TR5
 	void InitialiseGuardLaser(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
+
 		InitialiseCreature(itemNumber);
 		SetAnimation(item, 6);
 	}
@@ -1076,6 +1079,7 @@ namespace TEN::Entities::Creatures::TR5
 	void InitialiseMafia2(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
+
 		InitialiseCreature(itemNumber);
 		SetAnimation(item, 0);
 		item->SetMeshSwapFlags(9216);

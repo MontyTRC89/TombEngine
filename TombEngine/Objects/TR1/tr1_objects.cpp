@@ -40,7 +40,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->pivotLength = 375;
 		obj->radius = 340;
 		obj->intelligent = true;
-		obj->SetBoneRotationFlags(2, ROT_Y); // head
+		obj->SetBoneRotationFlags(2, ROT_Y); // Head.
 	}
 
 	obj = &Objects[ID_BEAR];
@@ -55,7 +55,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->pivotLength = 500;
 		obj->radius = 340;
 		obj->intelligent = true;
-		obj->SetBoneRotationFlags(13, ROT_Y); // head
+		obj->SetBoneRotationFlags(13, ROT_Y); // Head.
 	}
 
 	obj = &Objects[ID_APE];
@@ -86,7 +86,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->intelligent = true;
 		obj->waterCreature = true;
 		obj->ZoneType = ZoneType::Water;
-		obj->SetBoneRotationFlags(1, ROT_Y); // head
+		obj->SetBoneRotationFlags(1, ROT_Y); // Head.
 	}
 
 	obj = &Objects[ID_NATLA];
@@ -163,8 +163,8 @@ static void StartEntity(ObjectInfo* obj)
 		obj->HitPoints = 50;
 		obj->intelligent = true;
 		obj->ZoneType = ZoneType::Flyer;
-		obj->SetBoneRotationFlags(1, ROT_Y); // torso
-		obj->SetBoneRotationFlags(2, ROT_Y); // head
+		obj->SetBoneRotationFlags(1, ROT_Y); // Torso.
+		obj->SetBoneRotationFlags(2, ROT_Y); // Head.
 	}
 }
 

@@ -37,6 +37,7 @@ namespace TEN::Entities::Creatures::TR5
 	void InitialiseLarson(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
+
 		InitialiseCreature(itemNumber);
 		SetAnimation(item, 0);
 

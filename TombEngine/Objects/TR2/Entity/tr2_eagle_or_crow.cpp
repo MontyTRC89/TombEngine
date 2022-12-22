@@ -30,6 +30,7 @@ namespace TEN::Entities::Creatures::TR2
 	void InitialiseEagle(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
+
 		InitialiseCreature(itemNumber);
 
 		if (item->ObjectNumber == ID_CROW)

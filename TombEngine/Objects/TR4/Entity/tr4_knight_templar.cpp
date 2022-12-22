@@ -60,6 +60,7 @@ namespace TEN::Entities::TR4
 	void InitialiseKnightTemplar(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
+
 		InitialiseCreature(itemNumber);
 		SetAnimation(item, KTEMPLAR_ANIM_IDLE);
 		item->MeshBits &= 0xF7FF;

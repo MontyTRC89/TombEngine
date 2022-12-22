@@ -15,27 +15,30 @@ struct BOX_NODE
 
 enum class ZoneType
 {
-	/// Basic zones (used by LOT.zone and loaded from g_Level.Zones[ZoneType])
+	// BASIC ZONES (used by LOT.zone and loaded from g_Level.Zones[ZoneType])
 	
 	// Can jump
 	Skeleton,
 	Basic,
-	// Only underwater (exception for Crocodile which can go to land)
+
+	// Only underwater (exception: crocodile can go on land)
 	Water,
+
 	// Enable jump and monkey
 	Human,
 	Flyer,
 
-	/// Custom zones (above zones are used for LOT.zone):
+	// ADDED ZONES (above zones are used for LOT.zone):
 
-	// Enable jump (also 1 block climb/fall)
+	// Enable jump (also 1 block vault/fall)
 	HumanJump,
-	// Enable jump and MonkeySwing (also 1 block climb/fall)
+
+	// Enable jump and monkey swing (also 1 block climb/fall)
 	HumanJumpAndMonkey,
 	Spider,
 	Blockable, // For large creatures such as trex and shiva.
 	SophiaLee, // Prevents Sophia from going to lower levels again.
-	Ape,	   // Only 0.5 block climb.
+	Ape,	   // Only 1/2 block vault.
 	HumanLongJumpAndMonkey,
 };
 

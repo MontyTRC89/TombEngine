@@ -91,6 +91,30 @@ namespace TEN::Entities::TR4
 		DEMIGOD_ANIM_RUN_OVER_DEATH = 27
 	};
 
+	void InitialiseDemigod(short itemNumber)
+	{
+		auto* item = &g_Level.Items[itemNumber];
+
+		InitialiseCreature(itemNumber);
+		SetAnimation(item, 0);
+
+		/*if (g_Level.NumItems > 0)
+		{
+			ItemInfo* currentItem = &g_Level.Items[0];
+			int k = 0;
+
+			while (item == currentItem || currentItem->objectNumber != ID_DEMIGOD3 || currentItem->itemFlags[0])
+			{
+				k++;
+				currentItem++;
+				if (k >= g_Level.NumItems)
+					return;
+			}
+
+			item->itemFlags[0] = k;
+		}*/
+	}
+
 	void TriggerDemigodMissileFlame(short fxNumber, short xVel, short yVel, short zVel)
 	{
 		auto* fx = &EffectList[fxNumber];
@@ -293,29 +317,6 @@ namespace TEN::Entities::TR4
 				angle += deltaAngle;
 			}
 		}
-	}
-
-	void InitialiseDemigod(short itemNumber)
-	{
-		auto* item = &g_Level.Items[itemNumber];
-		InitialiseCreature(itemNumber);
-		SetAnimation(item, 0);
-
-		/*if (g_Level.NumItems > 0)
-		{
-			ItemInfo* currentItem = &g_Level.Items[0];
-			int k = 0;
-
-			while (item == currentItem || currentItem->objectNumber != ID_DEMIGOD3 || currentItem->itemFlags[0])
-			{
-				k++;
-				currentItem++;
-				if (k >= g_Level.NumItems)
-					return;
-			}
-
-			item->itemFlags[0] = k;
-		}*/
 	}
 
 	void DemigodControl(short itemNumber)

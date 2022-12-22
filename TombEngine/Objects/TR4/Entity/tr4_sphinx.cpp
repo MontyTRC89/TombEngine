@@ -27,6 +27,7 @@ namespace TEN::Entities::TR4
 
 	enum SphinxState
 	{
+		// No state 0.
 		SPHINX_STATE_NONE = 0,
 		SPHINX_STATE_REST = 1,
 		SPHINX_STATE_REST_ALERTED = 2,
@@ -62,6 +63,7 @@ namespace TEN::Entities::TR4
 	void InitialiseSphinx(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
+
 		InitialiseCreature(itemNumber);
 		SetAnimation(item, SPHINX_ANIM_REST);
 	}

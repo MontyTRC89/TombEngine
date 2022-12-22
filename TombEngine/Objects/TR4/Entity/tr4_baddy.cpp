@@ -209,6 +209,7 @@ namespace TEN::Entities::TR4
 	void InitialiseBaddy(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
+
 		InitialiseCreature(itemNumber);
 
 		short objectNumber = (Objects[ID_BADDY2].loaded ? ID_BADDY2 : ID_BADDY1);

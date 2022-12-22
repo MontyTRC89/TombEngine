@@ -24,8 +24,8 @@ namespace TEN::Entities::Creatures::TR2
 		auto pos = Vector3i(
 			(GetRandomControl() * 256 / 32768) + item->Pose.Position.x - 128,
 			(GetRandomControl() * 256 / 32768) + item->Pose.Position.y - 256,
-			(GetRandomControl() * 256 / 32768) + item->Pose.Position.z - 128
-		);
+			(GetRandomControl() * 256 / 32768) + item->Pose.Position.z - 128);
+
 		TriggerGunSmoke(pos.x, pos.y, pos.z, 1, 1, 1, 1, LaraWeaponType::GrenadeLauncher, 32);
 		SoundEffect(SFX_TR2_WARRIOR_HOVER, &item->Pose);
 	}

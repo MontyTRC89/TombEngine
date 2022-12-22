@@ -43,6 +43,7 @@ namespace TEN::Entities::Creatures::TR5
 	void InitialiseImp(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
+
 		InitialiseCreature(itemNumber);
 		ImpState state;
 

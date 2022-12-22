@@ -31,8 +31,10 @@ void InitialiseLOTarray(int itemNumber)
 int EnableEntityAI(short itemNum, int always, bool makeTarget)
 {
 	ItemInfo* item = &g_Level.Items[itemNum];
+
 	if (item->IsCreature())
 		return true;
+
 	InitialiseSlot(itemNum, 0, makeTarget);
 	ActiveCreatures.push_back(item->Data);
 	return true;
@@ -141,6 +143,7 @@ void InitialiseSlot(short itemNumber, short slot, bool makeTarget)
 			{
 				creature->LOT.Fly = item->ObjectNumber == ID_BAT ? DEFAULT_SWIM_UPDOWN_SPEED / 2 : DEFAULT_SWIM_UPDOWN_SPEED;
 			}
+
 			break;
 
 		// Can climb.

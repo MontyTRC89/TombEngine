@@ -30,6 +30,7 @@ namespace TEN::Entities::TR4
 
 	enum VonCroyState
 	{
+		// No state 0.
 		VON_CROY_STATE_IDLE = 1,
 		VON_CROY_STATE_WALK = 2,
 		VON_CROY_STATE_RUN = 3,

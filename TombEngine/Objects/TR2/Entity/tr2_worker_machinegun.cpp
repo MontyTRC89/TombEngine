@@ -18,6 +18,7 @@ namespace TEN::Entities::Creatures::TR2
 	void InitialiseWorkerMachineGun(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
+
 		InitialiseCreature(itemNumber);
 		SetAnimation(item, 12);
 	}

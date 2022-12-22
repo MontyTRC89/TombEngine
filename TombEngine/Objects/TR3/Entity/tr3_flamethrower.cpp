@@ -20,27 +20,28 @@ using namespace TEN::Math::Random;
 
 namespace TEN::Entities::Creatures::TR3
 {
+	constexpr auto FLAMETHROWER_ATTACK_RANGE = SQUARE(SECTOR(1.5f));
+	constexpr auto FLAMETHROWER_IDLE_RANGE	 = SQUARE(SECTOR(2));
+	constexpr auto FLAMETHROWER_AWARE_RANGE	 = SQUARE(SECTOR(8));
+
+	constexpr auto FlamethrowerWalkAngle = ANGLE(5.0f);
+
 	const auto FlamethrowerOffset = Vector3i(0, 340, 0);
 	const auto FlamethrowerBite = BiteInfo(Vector3(0.0f, 340.0f, 64.0f), 7);
-
-	constexpr int FlamethrowerDetectionRange = SQUARE(SECTOR(8));
-	constexpr int FlamethrowerAttackRange = SQUARE(SECTOR(1.5f));
-	constexpr int FlamethrowerStopRange = SQUARE(SECTOR(2));
-	constexpr int FlamethrowerWalkAngle = ANGLE(5.0f);
 
 	// TODO
 	enum FlamethrowerState
 	{
 		// No state 0.
-		FLAME_STATE_STOP = 1,
-		FLAME_STATE_WALK = 2,
+		FLAMETHROWER_STATE_IDLE = 1,
+		FLAMETHROWER_STATE_WALK_FORWARD = 2,
 		FLAME_STATE_IDLE = 3,
 		FLAME_STATE_WAIT = 4,
-		FLAME_STATE_WALK_ATTACK = 6,
+		FLAMETHROWER_STATE_WALK_FORWARD_ATTACK = 6,
 		FLAME_STATE_DEATH = 7,
-		FLAME_STATE_WALK_AIM = 9,
-		FLAME_STATE_AIM1 = 10,
-		FLAME_STATE_ATTACK1 = 11,
+		FLAMETHROWER_STATE_WALK_FORWARD_AIM = 9,
+		FLAMETHROWER_STATE_AIM_1 = 10,
+		FLAMETHROWER_STATE_ATTACK_1 = 11
 	};
 
 	enum FlamethrowerAnim
@@ -49,7 +50,7 @@ namespace TEN::Entities::Creatures::TR3
 		FLAME_ANIM_DEATH = 19
 	};
 
-	// TODO: Remove LaraItem dependencies !
+	// TODO: Remove LaraItem dependencies.
 	void FlameThrowerControl(short itemNumber)
 	{
 		if (!CreatureActive(itemNumber))
@@ -57,10 +58,12 @@ namespace TEN::Entities::Creatures::TR3
 
 		auto* item = &g_Level.Items[itemNumber];
 		auto* creature = GetCreatureInfo(item);
+
 		short angle = 0;
 		short tilt = 0;
 		auto extraHeadRot = EulerAngles::Zero;
 		auto extraTorsoRot = EulerAngles::Zero;
+
 		auto pos = GetJointPosition(item, FlamethrowerBite.meshNum, Vector3i(FlamethrowerBite.Position));
 
 		int randomInt = GetRandomControl();
@@ -70,7 +73,9 @@ namespace TEN::Entities::Creatures::TR3
 			TriggerPilotFlame(itemNumber, 9);
 		}
 		else
+		{
 			TriggerDynamicLight(pos.x, pos.y, pos.z, (randomInt & 3) + 10, 31 - ((randomInt / 16) & 3), 24 - ((randomInt / 64) & 3), randomInt & 7);
+		}
 
 		if (item->HitPoints <= 0)
 		{
@@ -80,9 +85,13 @@ namespace TEN::Entities::Creatures::TR3
 		else
 		{
 			if (item->AIBits)
+			{
 				GetAITarget(creature);
+			}
 			else if (creature->HurtByLara)
+			{
 				creature->Enemy = LaraItem;
+			}
 			else
 			{
 				creature->Enemy = nullptr;
@@ -139,9 +148,10 @@ namespace TEN::Entities::Creatures::TR3
 
 			angle = CreatureTurn(item, creature->MaxTurn);
 			auto* realEnemy = creature->Enemy;
-			bool CanAttack = (realEnemy != nullptr && !realEnemy->IsLara()) || creature->HurtByLara;
 
-			if (item->HitStatus || laraAI.distance < FlamethrowerDetectionRange || TargetVisible(item, &laraAI))
+			bool canAttack = ((realEnemy != nullptr && !realEnemy->IsLara()) || creature->HurtByLara);
+
+			if (item->HitStatus || laraAI.distance < FLAMETHROWER_AWARE_RANGE || TargetVisible(item, &laraAI))
 			{
 				if (!creature->Alerted)
 					SoundEffect(SFX_TR3_AMERCAN_HOY, &item->Pose);
@@ -151,7 +161,7 @@ namespace TEN::Entities::Creatures::TR3
 
 			switch (item->Animation.ActiveState)
 			{
-			case FLAME_STATE_STOP:
+			case FLAMETHROWER_STATE_IDLE:
 				creature->MaxTurn = 0;
 				creature->Flags = 0;
 				extraHeadRot.y = laraAI.angle;
@@ -166,20 +176,28 @@ namespace TEN::Entities::Creatures::TR3
 					break;
 				}
 				else if (item->AIBits & PATROL1)
-					item->Animation.TargetState = FLAME_STATE_WALK;
-				else if (creature->Mood == MoodType::Escape)
-					item->Animation.TargetState = FLAME_STATE_WALK;
-				else if (Targetable(item, &AI) && CanAttack)
 				{
-					if (AI.distance < FlamethrowerAttackRange)
-						item->Animation.TargetState = FLAME_STATE_AIM1;
+					item->Animation.TargetState = FLAMETHROWER_STATE_WALK_FORWARD;
+				}
+				else if (creature->Mood == MoodType::Escape)
+				{
+					item->Animation.TargetState = FLAMETHROWER_STATE_WALK_FORWARD;
+				}
+				else if (Targetable(item, &AI) && canAttack)
+				{
+					if (AI.distance < FLAMETHROWER_ATTACK_RANGE)
+						item->Animation.TargetState = FLAMETHROWER_STATE_AIM_1;
 					else
-						item->Animation.TargetState = FLAME_STATE_WALK;
+						item->Animation.TargetState = FLAMETHROWER_STATE_WALK_FORWARD;
 				}
 				else if (creature->Mood == MoodType::Bored && AI.ahead && TestProbability(1.0f / 128))
+				{
 					item->Animation.TargetState = FLAME_STATE_WAIT;
+				}
 				else if (creature->Mood == MoodType::Attack || TestProbability(1.0f / 128))
-					item->Animation.TargetState = FLAME_STATE_WALK;
+				{
+					item->Animation.TargetState = FLAMETHROWER_STATE_WALK_FORWARD;
+				}
 
 				break;
 
@@ -191,21 +209,21 @@ namespace TEN::Entities::Creatures::TR3
 					extraHeadRot.y = AIGuard(creature);
 
 					if (TestProbability(1.0f / 128))
-						item->Animation.TargetState = FLAME_STATE_STOP;
+						item->Animation.TargetState = FLAMETHROWER_STATE_IDLE;
 
 					break;
 				}
 				else if ((Targetable(item, &AI) &&
-					AI.distance < FlamethrowerAttackRange && CanAttack ||
+					AI.distance < FLAMETHROWER_ATTACK_RANGE && canAttack ||
 					creature->Mood != MoodType::Bored ||
 					TestProbability(1.0f / 128)))
 				{
-					item->Animation.TargetState = FLAME_STATE_STOP;
+					item->Animation.TargetState = FLAMETHROWER_STATE_IDLE;
 				}
 
 				break;
 
-			case FLAME_STATE_WALK:
+			case FLAMETHROWER_STATE_WALK_FORWARD:
 				creature->MaxTurn = FlamethrowerWalkAngle;
 				creature->Flags = 0;
 				extraHeadRot.y = laraAI.angle;
@@ -213,24 +231,24 @@ namespace TEN::Entities::Creatures::TR3
 				if (item->AIBits & GUARD)
 					SetAnimation(item, FLAME_ANIM_IDLE);
 				else if (item->AIBits & PATROL1)
-					item->Animation.TargetState = FLAME_STATE_WALK;
+					item->Animation.TargetState = FLAMETHROWER_STATE_WALK_FORWARD;
 				else if (creature->Mood == MoodType::Escape)
-					item->Animation.TargetState = FLAME_STATE_WALK;
-				else if (Targetable(item, &AI) && CanAttack)
+					item->Animation.TargetState = FLAMETHROWER_STATE_WALK_FORWARD;
+				else if (Targetable(item, &AI) && canAttack)
 				{
-					if (AI.distance < FlamethrowerStopRange)
-						item->Animation.TargetState = FLAME_STATE_STOP;
-					else if (AI.distance < FlamethrowerAttackRange)
-						item->Animation.TargetState = FLAME_STATE_WALK_AIM;
+					if (AI.distance < FLAMETHROWER_IDLE_RANGE)
+						item->Animation.TargetState = FLAMETHROWER_STATE_IDLE;
+					else if (AI.distance < FLAMETHROWER_ATTACK_RANGE)
+						item->Animation.TargetState = FLAMETHROWER_STATE_WALK_FORWARD_AIM;
 				}
 				else if (creature->Mood == MoodType::Bored && AI.ahead)
-					item->Animation.TargetState = FLAME_STATE_STOP;
+					item->Animation.TargetState = FLAMETHROWER_STATE_IDLE;
 				else
-					item->Animation.TargetState = FLAME_STATE_WALK;
+					item->Animation.TargetState = FLAMETHROWER_STATE_WALK_FORWARD;
 
 				break;
 
-			case FLAME_STATE_AIM1:
+			case FLAMETHROWER_STATE_AIM_1:
 				creature->Flags = 0;
 
 				if (AI.ahead)
@@ -239,17 +257,17 @@ namespace TEN::Entities::Creatures::TR3
 					extraTorsoRot.y = AI.angle;
 
 					if (Targetable(item, &AI) &&
-						AI.distance < FlamethrowerAttackRange && CanAttack)
+						AI.distance < FLAMETHROWER_ATTACK_RANGE && canAttack)
 					{
-						item->Animation.TargetState = FLAME_STATE_ATTACK1;
+						item->Animation.TargetState = FLAMETHROWER_STATE_ATTACK_1;
 					}
 					else
-						item->Animation.TargetState = FLAME_STATE_STOP;
+						item->Animation.TargetState = FLAMETHROWER_STATE_IDLE;
 				}
 
 				break;
 
-			case FLAME_STATE_WALK_AIM:
+			case FLAMETHROWER_STATE_WALK_FORWARD_AIM:
 				creature->Flags = 0;
 
 				if (AI.ahead)
@@ -258,17 +276,17 @@ namespace TEN::Entities::Creatures::TR3
 					extraTorsoRot.y = AI.angle;
 
 					if (Targetable(item, &AI) &&
-						AI.distance < FlamethrowerAttackRange && CanAttack)
+						AI.distance < FLAMETHROWER_ATTACK_RANGE && canAttack)
 					{
-						item->Animation.TargetState = FLAME_STATE_WALK_ATTACK;
+						item->Animation.TargetState = FLAMETHROWER_STATE_WALK_FORWARD_ATTACK;
 					}
 					else
-						item->Animation.TargetState = FLAME_STATE_WALK;
+						item->Animation.TargetState = FLAMETHROWER_STATE_WALK_FORWARD;
 				}
 
 				break;
 
-			case FLAME_STATE_ATTACK1:
+			case FLAMETHROWER_STATE_ATTACK_1:
 				if (creature->Flags < 40)
 					creature->Flags += (creature->Flags / 4) + 1;
 
@@ -278,15 +296,15 @@ namespace TEN::Entities::Creatures::TR3
 					extraTorsoRot.y = AI.angle;
 
 					if (Targetable(item, &AI) &&
-						AI.distance < FlamethrowerAttackRange && CanAttack)
+						AI.distance < FLAMETHROWER_ATTACK_RANGE && canAttack)
 					{
-						item->Animation.TargetState = FLAME_STATE_ATTACK1;
+						item->Animation.TargetState = FLAMETHROWER_STATE_ATTACK_1;
 					}
 					else
-						item->Animation.TargetState = FLAME_STATE_STOP;
+						item->Animation.TargetState = FLAMETHROWER_STATE_IDLE;
 				}
 				else
-					item->Animation.TargetState = FLAME_STATE_STOP;
+					item->Animation.TargetState = FLAMETHROWER_STATE_IDLE;
 
 				if (creature->Flags < 40)
 					ThrowFire(itemNumber, FlamethrowerBite.meshNum, FlamethrowerOffset, Vector3i(0, creature->Flags * 1.5f, 0));
@@ -302,7 +320,7 @@ namespace TEN::Entities::Creatures::TR3
 				SoundEffect(SFX_TR4_FLAME_EMITTER, &item->Pose);
 				break;
 
-			case FLAME_STATE_WALK_ATTACK:
+			case FLAMETHROWER_STATE_WALK_FORWARD_ATTACK:
 				if (creature->Flags < 40)
 					creature->Flags += (creature->Flags / 4) + 1;
 
@@ -312,15 +330,15 @@ namespace TEN::Entities::Creatures::TR3
 					extraTorsoRot.y = AI.angle;
 
 					if (Targetable(item, &AI) &&
-						AI.distance < FlamethrowerAttackRange && CanAttack)
+						AI.distance < FLAMETHROWER_ATTACK_RANGE && canAttack)
 					{
-						item->Animation.TargetState = FLAME_STATE_WALK_ATTACK;
+						item->Animation.TargetState = FLAMETHROWER_STATE_WALK_FORWARD_ATTACK;
 					}
 					else
-						item->Animation.TargetState = FLAME_STATE_WALK;
+						item->Animation.TargetState = FLAMETHROWER_STATE_WALK_FORWARD;
 				}
 				else
-					item->Animation.TargetState = FLAME_STATE_WALK;
+					item->Animation.TargetState = FLAMETHROWER_STATE_WALK_FORWARD;
 
 				if (creature->Flags < 40)
 					ThrowFire(itemNumber, FlamethrowerBite.meshNum, FlamethrowerOffset, Vector3i(0, creature->Flags * 1.5f, 0));

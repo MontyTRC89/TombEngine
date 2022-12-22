@@ -16,7 +16,6 @@
 #include "Specific/setup.h"
 
 using namespace TEN::Math::Random;
-using std::vector;
 
 namespace TEN::Entities::TR4
 {
@@ -26,16 +25,16 @@ namespace TEN::Entities::TR4
 	constexpr auto CROC_VISIBILITY_RANGE = SQUARE(SECTOR(5));
 	constexpr auto CROC_STATE_RUN_RANGE  = SQUARE(SECTOR(1));
 	constexpr auto CROC_MAXRUN_RANGE	 = SQUARE(SECTOR(1.5f));
-	constexpr auto CROC_ATTACK_RANGE	 = SQUARE(CLICK(2.4f)); // NOTE: It's CLICK(3) in TR4, but the crocodile does not go near Lara to do damage in certain cases.
+	constexpr auto CROC_ATTACK_RANGE	 = SQUARE(CLICK(2.4f)); // NOTE: It's CLICK(3) in TR4, but the crocodile doesn't go near the player to do damage in certain cases.
 
-	constexpr auto CROC_SWIM_SPEED	  = 16;
+	constexpr auto CROC_SWIM_SPEED = 16;
 
 	#define CROC_STATE_WALK_TURN_RATE_MAX ANGLE(3.0f)
 	#define CROC_STATE_RUN_TURN_RATE_MAX  ANGLE(5.0f)
 	#define CROC_STATE_SWIM_TURN_RATE_MAX ANGLE(3.0f)
 
 	const auto CrocodileBite = BiteInfo(Vector3(0.0f, -100.0f, 500.0f), 9);
-	const vector<unsigned int> CrocodileBiteAttackJoints = { 8, 9 };
+	const std::vector<unsigned int> CrocodileBiteAttackJoints = { 8, 9 };
 
 	enum CrocodileState
 	{
@@ -91,6 +90,7 @@ namespace TEN::Entities::TR4
 	{
 		auto* object = &Objects[item->ObjectNumber];
 		auto* creature = GetCreatureInfo(item);
+
 		int waterDepth = GetWaterSurface(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, item->RoomNumber);
 		if (waterDepth != NO_HEIGHT)
 		{
@@ -104,6 +104,7 @@ namespace TEN::Entities::TR4
 			creature->LOT.Drop = -CLICK(1);
 			creature->LOT.Fly = NO_FLYING;
 		}
+
 		return waterDepth != NO_HEIGHT;
 	}
 

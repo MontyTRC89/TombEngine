@@ -28,7 +28,7 @@ namespace TEN::Entities::TR4
 
 	enum GuideState
 	{
-		GUIDE_STATE_NONE = 0,
+		// No state 0.
 		GUIDE_STATE_IDLE = 1,
 		GUIDE_STATE_WALK_FORWARD = 2,
 		GUIDE_STATE_RUN_FORWARD = 3,
@@ -97,10 +97,10 @@ namespace TEN::Entities::TR4
 	void InitialiseGuide(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
+
 		InitialiseCreature(itemNumber);
 		SetAnimation(item, GUIDE_ANIM_IDLE);
 		item->SetMeshSwapFlags(GuideRightHandSwapJoints);
-
 	}
 
 	void GuideControl(short itemNumber)

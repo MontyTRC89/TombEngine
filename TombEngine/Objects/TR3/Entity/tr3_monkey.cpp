@@ -88,6 +88,7 @@ namespace TEN::Entities::Creatures::TR3
 	void InitialiseMonkey(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
+
 		InitialiseCreature(itemNumber);
 		SetAnimation(item, MONKEY_ANIM_SIT);
 	}

@@ -11,15 +11,13 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-using std::vector;
-
 namespace TEN::Entities::TR4
 {
 	constexpr auto HAMMERHEAD_BITE_ATTACK_DAMAGE = 120;
 	constexpr auto HAMMERHEAD_ATTACK_RANGE = SQUARE(SECTOR(0.66f));
 
 	const auto HammerheadBite = BiteInfo(Vector3::Zero, 12);
-	const vector<unsigned int> HammerheadBiteAttackJoints = { 10, 12, 13 };
+	const std::vector<unsigned int> HammerheadBiteAttackJoints = { 10, 12, 13 };
 
 	enum HammerheadState
 	{
@@ -59,6 +57,7 @@ namespace TEN::Entities::TR4
 	void InitialiseHammerhead(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
+
 		InitialiseCreature(itemNumber);
 		SetAnimation(item, HAMMERHEAD_ANIM_IDLE);
 	}

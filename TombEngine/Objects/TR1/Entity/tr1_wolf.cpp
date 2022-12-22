@@ -61,6 +61,7 @@ namespace TEN::Entities::Creatures::TR1
 	void InitialiseWolf(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
+
 		InitialiseCreature(itemNumber);
 		item->Animation.FrameNumber = WOLF_SLEEP_FRAME;
 	}

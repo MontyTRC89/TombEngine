@@ -48,6 +48,7 @@ namespace TEN::Entities::TR4
 	void InitialiseWildBoar(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
+
 		InitialiseCreature(itemNumber);
 		SetAnimation(item, BOAR_ANIM_IDLE);
 	}

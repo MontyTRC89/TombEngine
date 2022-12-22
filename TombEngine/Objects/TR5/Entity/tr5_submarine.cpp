@@ -23,6 +23,17 @@ using namespace TEN::Math;
 
 namespace TEN::Entities::Creatures::TR5
 {
+	void InitialiseSubmarine(short itemNumber)
+	{
+		auto* item = &g_Level.Items[itemNumber];
+
+		InitialiseCreature(itemNumber);
+		SetAnimation(item, 0);
+
+		if (!item->TriggerFlags)
+			item->TriggerFlags = 120;
+	}
+
 	void TriggerSubmarineSparks(short itemNumber)
 	{
 		auto* spark = GetFreeParticle();
@@ -167,16 +178,6 @@ namespace TEN::Entities::Creatures::TR5
 		torpedoItem->ItemFlags[0] = -1;
 
 		AddActiveItem(itemNumber);
-	}
-
-	void InitialiseSubmarine(short itemNumber)
-	{
-		auto* item = &g_Level.Items[itemNumber];
-		InitialiseCreature(itemNumber);
-		SetAnimation(item, 0);
-
-		if (!item->TriggerFlags)
-			item->TriggerFlags = 120;
 	}
 
 	void SubmarineControl(short itemNumber)

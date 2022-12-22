@@ -28,6 +28,7 @@ namespace TEN::Entities::Creatures::TR5
 
 	enum CyborgState
 	{
+		// No state 0.
 		CYBORG_STATE_IDLE = 1,
 		CYBORG_STATE_WALK = 2,
 		CYBORG_STATE_RUN = 3,
@@ -124,6 +125,7 @@ namespace TEN::Entities::Creatures::TR5
 	void InitialiseCyborg(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
+
 		InitialiseCreature(itemNumber);
 		SetAnimation(item, CYBORG_ANIM_IDLE);
 	}
