@@ -141,7 +141,7 @@ void InitialiseSlot(short itemNumber, short slot, bool makeTarget)
 			}
 			else
 			{
-				creature->LOT.Fly = item->ObjectNumber == ID_BAT ? DEFAULT_SWIM_UPDOWN_SPEED / 2 : DEFAULT_SWIM_UPDOWN_SPEED;
+				creature->LOT.Fly = DEFAULT_SWIM_UPDOWN_SPEED;
 			}
 
 			break;
