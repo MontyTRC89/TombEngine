@@ -88,9 +88,7 @@ namespace TEN::Entities::TR4
 
 	static bool IsCrocodileInWater(ItemInfo* item)
 	{
-		auto* object = &Objects[item->ObjectNumber];
 		auto* creature = GetCreatureInfo(item);
-
 		int waterDepth = GetWaterSurface(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, item->RoomNumber);
 		if (waterDepth != NO_HEIGHT)
 		{
@@ -123,9 +121,11 @@ namespace TEN::Entities::TR4
 
 		if (item->HitPoints <= 0)
 		{
+			bool onWater = TestEnvironment(ENV_FLAG_WATER, item);
+
 			if (item->Animation.ActiveState != CROC_STATE_DEATH && item->Animation.ActiveState != CROC_STATE_WATER_DEATH)
 			{
-				if (TestEnvironment(ENV_FLAG_WATER, item))
+				if (onWater)
 				{
 					SetAnimation(item, CROC_ANIM_WATER_DEATH);
 					item->HitPoints = NOT_TARGETABLE;
@@ -134,7 +134,7 @@ namespace TEN::Entities::TR4
 					SetAnimation(item, CROC_ANIM_LAND_DEATH);
 			}
 
-			if (TestEnvironment(ENV_FLAG_WATER, item))
+			if (onWater)
 			{
 				CreatureFloat(itemNumber);
 				return;
