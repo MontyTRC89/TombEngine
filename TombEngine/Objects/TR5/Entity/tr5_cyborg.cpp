@@ -120,7 +120,6 @@ namespace TEN::Entities::Creatures::TR5
 
 		InitialiseCreature(itemNumber);
 		SetAnimation(&item, CYBORG_ANIM_IDLE);
-		
 	}
 
 	void CyborgControl(short itemNumber)
@@ -135,7 +134,6 @@ namespace TEN::Entities::Creatures::TR5
 		short joint0 = 0;
 		short joint1 = 0;
 		short joint2 = 0;
-		
 
 		int x = item.Pose.Position.x;
 		int z = item.Pose.Position.z;
