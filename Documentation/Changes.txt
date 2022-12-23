@@ -7,6 +7,11 @@ Version 1.0.5
 * Fix discrepancies between statistics and save / load game time units.
 * Fix draw key incorrectly working in binoculars / lasersight mode.
 * Fix FLAME_EMITTER_3 not burning player.
+* Fix Tribeman with axe not attacking Lara.
+* fix Tribeman with dart not shooting at Lara's direction.
+* Dart emitter can now draw real mesh from ID_DARTS and rotate at every angle.
+* customize dart_emitter with ocb: 
+     - -ve number ocb will poison Lara where as +ve number ocb will not but add damage. ocb 0 will have a default damage (25)
 
 
 Version 1.0.4
