@@ -22,7 +22,7 @@ using namespace TEN::Math;
 
 namespace TEN::Entities::Creatures::TR3
 {
-	const auto TribesmanAxeBite	 = BiteInfo(Vector3(0.0f, 56.0f, 265.0f), 13);
+	const auto TribesmanAxeBite	  = BiteInfo(Vector3(0.0f, 56.0f, 265.0f), 13);
 	const auto TribesmanDartBite1 = BiteInfo(Vector3(0.0f, 0.0f, -200.0f), 13);
 	const auto TribesmanDartBite2 = BiteInfo(Vector3(8.0f, 40.0f, -248.0f), 13);
 	const auto TribesmanAxeAttackJoints  = std::vector<unsigned int>{ 13 };
