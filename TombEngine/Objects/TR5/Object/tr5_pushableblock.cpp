@@ -21,10 +21,6 @@ using namespace TEN::Input;
 constexpr auto PUSHABLE_FALL_VELOCITY_MAX	 = BLOCK(1 / 8.0f);
 constexpr auto PUSHABLE_FALL_RUMBLE_VELOCITY = 96.0f;
 
-// TODO: Derive from anim data.
-constexpr auto PUSHABLE_BOX_OFFSET_PUSH = 1108 - BLOCK(1);
-constexpr auto PUSHABLE_BOX_OFFSET_PULL = BLOCK(1) - 944;
-
 static auto PushableBlockPos = Vector3i::Zero;
 ObjectCollisionBounds PushableBlockBounds = 
 {
@@ -202,13 +198,15 @@ void PushableBlockControl(short itemNumber)
 	}
 
 	// Move pushable based on player bounds.Z2.
+	int displaceDepth = 0;
 	int displaceBox = GameBoundingBox(LaraItem).Z2;
 	auto prevPos = item->Pose.Position;
 
 	switch (LaraItem->Animation.AnimNumber)
 	{
 	case LA_PUSHABLE_PUSH:
-		displaceBox -= PUSHABLE_BOX_OFFSET_PUSH;
+		displaceDepth = GetLastFrame(GAME_OBJECT_ID::ID_LARA, LaraItem->Animation.AnimNumber)->boundingBox.Z2;
+		displaceBox -= displaceDepth - BLOCK(1);
 
 		if (LaraItem->Animation.FrameNumber == g_Level.Anims[LaraItem->Animation.AnimNumber].frameBase)
 		{
@@ -298,7 +296,8 @@ void PushableBlockControl(short itemNumber)
 		break;
 
 	case LA_PUSHABLE_PULL:
-		displaceBox -= PUSHABLE_BOX_OFFSET_PULL;
+		displaceDepth = GetLastFrame(GAME_OBJECT_ID::ID_LARA, LaraItem->Animation.AnimNumber)->boundingBox.Z2;
+		displaceBox -= BLOCK(1) + displaceDepth;
 
 		if (LaraItem->Animation.FrameNumber == g_Level.Anims[LaraItem->Animation.AnimNumber].frameBase)
 		{

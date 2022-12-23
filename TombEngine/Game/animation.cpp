@@ -410,17 +410,43 @@ AnimFrame* GetBestFrame(ItemInfo* item)
 		return framePtr[1];
 }
 
+AnimFrame* GetFirstFrame(GAME_OBJECT_ID slot, int animNumber)
+{
+	return GetFrame(slot, animNumber, 0);
+}
+
+AnimFrame* GetLastFrame(GAME_OBJECT_ID slot, int animNumber)
+{
+	return GetFrame(slot, animNumber, INT_MAX);
+}
+
+AnimFrame* GetFrame(GAME_OBJECT_ID slot, int animNumber, int frameNumber)
+{
+	int animIndex = Objects[slot].animIndex + animNumber;
+	assertion(animIndex < g_Level.Anims.size(), "GetFrame: Attempt to access nonexistent animation.");
+
+	const auto& anim = g_Level.Anims[animIndex];
+
+	int frameCount = anim.frameEnd - anim.frameBase;
+	if (frameNumber > frameCount)
+		frameNumber = frameCount;
+
+	AnimFrame* result = &g_Level.Frames[anim.FramePtr];
+	result += (frameNumber / anim.Interpolation);
+	return result;
+}
+
 int GetFrame(ItemInfo* item, AnimFrame* outFramePtr[], int& outRate)
 {
 	int frame = item->Animation.FrameNumber;
 	const auto& anim = g_Level.Anims[item->Animation.AnimNumber];
 
 	outFramePtr[0] = outFramePtr[1] = &g_Level.Frames[anim.FramePtr];
-	int rate2 = outRate = anim.Interpolation & 0x00ff;
+	int rate = outRate = anim.Interpolation & 0x00FF;
 	frame -= anim.frameBase; 
 
-	int first = frame / rate2;
-	int interpolation = frame % rate2;
+	int first = frame / rate;
+	int interpolation = frame % rate;
 	outFramePtr[0] += first;			 // Get frame pointers...
 	outFramePtr[1] = outFramePtr[0] + 1; // and store away.
 
@@ -428,9 +454,9 @@ int GetFrame(ItemInfo* item, AnimFrame* outFramePtr[], int& outRate)
 		return 0;
 
 	// Clamp key frame to end if need be.
-	int second = first * rate2 + rate2;
+	int second = first * rate + rate;
 	if (second > anim.frameEnd)
-		outRate = anim.frameEnd - (second - rate2);
+		outRate = anim.frameEnd - (second - rate);
 
 	return interpolation;
 }
