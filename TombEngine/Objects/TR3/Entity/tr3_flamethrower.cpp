@@ -24,7 +24,7 @@ namespace TEN::Entities::Creatures::TR3
 	constexpr auto FLAMETHROWER_IDLE_RANGE	 = SQUARE(SECTOR(2));
 	constexpr auto FLAMETHROWER_AWARE_RANGE	 = SQUARE(SECTOR(8));
 
-	constexpr auto FlamethrowerWalkAngle = ANGLE(5.0f);
+	constexpr auto FLAMETHROWER_WALK_TURN_RATE_MAX = ANGLE(5.0f);
 
 	const auto FlamethrowerOffset = Vector3i(0, 340, 0);
 	const auto FlamethrowerBite = BiteInfo(Vector3(0.0f, 340.0f, 64.0f), 7);
@@ -224,7 +224,7 @@ namespace TEN::Entities::Creatures::TR3
 				break;
 
 			case FLAMETHROWER_STATE_WALK_FORWARD:
-				creature->MaxTurn = FlamethrowerWalkAngle;
+				creature->MaxTurn = FLAMETHROWER_WALK_TURN_RATE_MAX;
 				creature->Flags = 0;
 				extraHeadRot.y = laraAI.angle;
 

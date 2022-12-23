@@ -23,8 +23,8 @@ namespace TEN::Entities::Creatures::TR2
 	constexpr auto WORKER_FLAME_WALK_RANGE	 = SQUARE(SECTOR(2));
 	constexpr auto WORKER_FLAME_RUN_RANGE	 = SQUARE(SECTOR(4));
 
-	constexpr auto WORKER_FLAME_WALK_TURN_RATE = ANGLE(5.0f);
-	constexpr auto WORKER_FLAME_RUN_TURN_RATE  = ANGLE(10.0f);
+	constexpr auto WORKER_FLAME_WALK_TURN_RATE_MAX = ANGLE(5.0f);
+	constexpr auto WORKER_FLAME_RUN_TURN_RATE_MAX  = ANGLE(10.0f);
 
 	const auto WorkerFlamethrowerOffset = Vector3i(0, 140, 0);
 	const auto WorkerFlamethrowerBite = BiteInfo(Vector3(0.0f, 250.0f, 32.0f), 9);
@@ -133,7 +133,7 @@ namespace TEN::Entities::Creatures::TR2
 				break;
 
 			case WORKER_FLAME_STATE_WALK_FORWARD:
-				creature->MaxTurn = WORKER_FLAME_WALK_TURN_RATE;
+				creature->MaxTurn = WORKER_FLAME_WALK_TURN_RATE_MAX;
 
 				if (AI.ahead)
 				{
@@ -161,7 +161,7 @@ namespace TEN::Entities::Creatures::TR2
 				break;
 
 			case WORKER_FLAME_STATE_RUN:
-				creature->MaxTurn = WORKER_FLAME_RUN_TURN_RATE;
+				creature->MaxTurn = WORKER_FLAME_RUN_TURN_RATE_MAX;
 
 				if (AI.ahead)
 				{
