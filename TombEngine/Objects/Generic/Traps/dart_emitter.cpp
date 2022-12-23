@@ -21,12 +21,8 @@ namespace TEN::Entities::Traps
 		{
 			if (item->TriggerFlags < 0)
 				Lara.PoisonPotency += 1;
-			
-			if (item->TriggerFlags == 0)
-				DoDamage(LaraItem, DART_DEFAULT_DAMAGE);
-			else
-				DoDamage(LaraItem, abs(item->TriggerFlags));
 
+			DoDamage(LaraItem, item->TriggerFlags ? abs(item->TriggerFlags) : DART_DEFAULT_DAMAGE);
 			DoBloodSplat(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, (GetRandomControl() & 3) + 4, LaraItem->Pose.Orientation.y, LaraItem->RoomNumber);
 			KillItem(itemNumber);
 		}
