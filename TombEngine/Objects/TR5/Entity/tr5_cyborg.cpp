@@ -208,7 +208,7 @@ namespace TEN::Entities::Creatures::TR5
 		}
 
 		int randomIndex = TestEnvironment(ENV_FLAG_WATER, item.RoomNumber) ?
-			Random::GenerateInt(0, 4) : Random::GenerateInt(4, 70);
+			Random::GenerateInt(0, 4) : Random::GenerateInt(0, 70);
 
 		if (randomIndex < item.ItemFlags[0])
 		{
