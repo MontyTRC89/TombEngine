@@ -13,7 +13,7 @@ struct PushableInfo
 
 	int height;				// height for collision, also in floor procedure
 	int weight;
-	unsigned int stackLimit;
+	int stackLimit;
 	int moveX;				// used for pushable movement code
 	int moveZ;				// used for pushable movement code
 	int linkedIndex;		// using itemFlags[1] for now
