@@ -880,11 +880,14 @@ bool SaveGame::Save(int slot)
 				volstate.add_timestamp(entry.Timestamp);
 				queue.push_back(volstate.Finish());
 			}
+
 			auto queueOffset = fbb.CreateVector(queue);
+			auto nameOffset = fbb.CreateString(currVolume.Name);
 
 			Save::VolumeBuilder volume{ fbb };
 			volume.add_room_number(room->index);
 			volume.add_number(j);
+			volume.add_name(nameOffset);
 			volume.add_enabled(currVolume.Enabled);
 			volume.add_position(&FromVector3(currVolume.Box.Center));
 			volume.add_rotation(&FromVector4(currVolume.Box.Orientation));
@@ -1305,6 +1308,7 @@ bool SaveGame::Load(int slot)
 		int number = volume->number();
 
 		room->triggerVolumes[number].Enabled = volume->enabled();
+		room->triggerVolumes[number].Name = volume->name()->str();
 		room->triggerVolumes[number].Box.Center =
 		room->triggerVolumes[number].Sphere.Center = ToVector3(volume->position());
 		room->triggerVolumes[number].Box.Orientation = ToVector4(volume->rotation());
