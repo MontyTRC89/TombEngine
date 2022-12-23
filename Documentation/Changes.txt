@@ -5,11 +5,10 @@ Version 1.0.5
 * Fix classic rollingball not behaving properly in rooms beyond the distance of 32 blocks.
 * Fix rollingball not killing Lara under certain movement angles.
 * Fix discrepancies between statistics and save / load game time units.
-* Cyborg Fixes:
-	- Fix Cyborg game crash
-	- Fix water death
-	- Fix meshswap
-
+* Fix draw key incorrectly working in binoculars / lasersight mode.
+* Fix FLAME_EMITTER_3 not burning player.
+* Fix pathfinding problems for first initialized enemies of every slot.
+* Fix crash, water death and meshswap issues for TR5 cyborg.
 
 Version 1.0.4
 =============
