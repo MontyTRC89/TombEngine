@@ -991,8 +991,8 @@ bool CheckStackLimit(ItemInfo* item)
 {
 	auto* pushable = GetPushableInfo(item);
 
-	unsigned int limit = pushable->stackLimit;
-	unsigned int count = 1;
+	int limit = pushable->stackLimit;
+	int count = 1;
 
 	auto* stackItem = item;
 	while (stackItem->ItemFlags[1] != NO_ITEM)
