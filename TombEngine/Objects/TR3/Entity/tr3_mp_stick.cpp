@@ -501,7 +501,7 @@ namespace TEN::Entities::Creatures::TR3
 				SetAnimation(item, MPSTICK_ANIM_VAULT_3_STEPS_UP);
 				break;
 
-			case -3:
+			case -4:
 				creature->MaxTurn = 0;
 				SetAnimation(item, MPSTICK_ANIM_VAULT_4_STEPS_DOWN);
 				break;
