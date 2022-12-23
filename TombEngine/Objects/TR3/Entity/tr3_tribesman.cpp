@@ -29,6 +29,7 @@ namespace TEN::Entities::Creatures::TR3
 	const auto TribesmanDartBite2 = BiteInfo(Vector3(8.0f, 40.0f, -248.0f), 13);
 	const vector<unsigned int> TribesmanAxeAttackJoints = { 13 };
 	const vector<unsigned int> TribesmanDartAttackJoints = { 10, 13 }; // TODO: Check.
+	constexpr auto TRIBESMEN_DART_DAMAGE = -25; //TODO: make damage editable with lua in future
 
 	const unsigned char TribesmanAxeHit[13][3] =
 	{
@@ -359,7 +360,7 @@ namespace TEN::Entities::Creatures::TR3
 
 			dartItem->Pose.Orientation = orient;
 			dartItem->Animation.Velocity.z = CLICK(1);
-			dartItem->TriggerFlags = item->TriggerFlags;
+			dartItem->TriggerFlags = TRIBESMEN_DART_DAMAGE; 			
 			dartItem->Color = item->Color;
 
 			AddActiveItem(dartItemNumber);
