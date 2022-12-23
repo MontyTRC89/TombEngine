@@ -180,7 +180,7 @@ void PushableBlockControl(short itemNumber)
 			MoveStackY(itemNumber, relY);
 			AddBridgeStack(itemNumber);
 
-			// If fallen on top of existing pushabl, don't test triggers.
+			// If fallen on top of existing pushable, don't test triggers.
 			if (FindStack(itemNumber) == NO_ITEM)
 				TestTriggers(item, true, item->Flags & IFLAG_ACTIVATION_MASK);
 			
