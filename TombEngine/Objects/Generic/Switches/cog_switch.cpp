@@ -60,7 +60,7 @@ namespace TEN::Entities::Switches
 
 		// Door was not found, do ordinary collision and exit.
 
-		if (door == nullptr)
+		if ((door == nullptr) && (switchItem->TriggerFlags == 0x00))
 		{
 			ObjectCollision(itemNum, laraItem, coll);
 			return;
@@ -96,7 +96,7 @@ namespace TEN::Entities::Switches
 						switchItem->Animation.TargetState = SWITCH_ON;
 						switchItem->Status = ITEM_ACTIVE;
 
-						if (door != NULL)
+						if ((door != NULL) && (switchItem->TriggerFlags == 0x00))
 						{
 							if (!door->opened)
 							{
@@ -139,8 +139,11 @@ namespace TEN::Entities::Switches
 			{
 				if (LaraItem->Animation.FrameNumber == g_Level.Anims[LaraItem->Animation.AnimNumber].frameBase + 10)
 				{
-					auto* doorItem = &g_Level.Items[Lara.InteractedItem];
-					doorItem->ItemFlags[0] = COG_DOOR_TURN;
+					if (switchItem->TriggerFlags == 0x00)
+					{
+						auto* doorItem = &g_Level.Items[Lara.InteractedItem];
+						doorItem->ItemFlags[0] = COG_DOOR_TURN;
+					}
 				}
 			}
 		}
@@ -153,8 +156,8 @@ namespace TEN::Entities::Switches
 
 				RemoveActiveItem(itemNumber);
 
-				LaraItem->Animation.AnimNumber = LA_STAND_SOLID;
-				LaraItem->Animation.FrameNumber = g_Level.Anims[LaraItem->Animation.AnimNumber].frameBase;
+				LaraItem->Animation.AnimNumber = LA_COGWHEEL_RELEASE;
+				LaraItem->Animation.FrameNumber = g_Level.Anims[LaraItem->Animation.AnimNumber].frameBase + 11;
 				LaraItem->Animation.TargetState = LS_IDLE;
 				LaraItem->Animation.ActiveState = LS_IDLE;
 				Lara.Control.HandStatus = HandStatus::Free;
