@@ -35,10 +35,10 @@ namespace TEN::Entities::Creatures::TR3
 		// No state 0.
 		FLAMETHROWER_STATE_IDLE = 1,
 		FLAMETHROWER_STATE_WALK_FORWARD = 2,
-		FLAME_STATE_IDLE = 3,
-		FLAME_STATE_WAIT = 4,
+		FLAMETHROWER_STATE_IDLE = 3,
+		FLAMETHROWER_STATE_WAIT = 4,
 		FLAMETHROWER_STATE_WALK_FORWARD_ATTACK = 6,
-		FLAME_STATE_DEATH = 7,
+		FLAMETHROWER_STATE_DEATH = 7,
 		FLAMETHROWER_STATE_WALK_FORWARD_AIM = 9,
 		FLAMETHROWER_STATE_AIM_1 = 10,
 		FLAMETHROWER_STATE_ATTACK_1 = 11
@@ -79,7 +79,7 @@ namespace TEN::Entities::Creatures::TR3
 
 		if (item->HitPoints <= 0)
 		{
-			if (item->Animation.ActiveState != FLAME_STATE_DEATH)
+			if (item->Animation.ActiveState != FLAMETHROWER_STATE_DEATH)
 				SetAnimation(item, FLAME_ANIM_DEATH);
 		}
 		else
@@ -171,7 +171,7 @@ namespace TEN::Entities::Creatures::TR3
 					extraHeadRot.y = AIGuard(creature);
 
 					if (TestProbability(1.0f / 128))
-						item->Animation.TargetState = FLAME_STATE_WAIT;
+						item->Animation.TargetState = FLAMETHROWER_STATE_WAIT;
 
 					break;
 				}
@@ -192,7 +192,7 @@ namespace TEN::Entities::Creatures::TR3
 				}
 				else if (creature->Mood == MoodType::Bored && AI.ahead && TestProbability(1.0f / 128))
 				{
-					item->Animation.TargetState = FLAME_STATE_WAIT;
+					item->Animation.TargetState = FLAMETHROWER_STATE_WAIT;
 				}
 				else if (creature->Mood == MoodType::Attack || TestProbability(1.0f / 128))
 				{
