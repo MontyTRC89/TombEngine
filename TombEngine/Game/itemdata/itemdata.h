@@ -27,7 +27,6 @@ template<class... Ts> visitor(Ts...)->visitor<Ts...>; // line not needed in C++2
 
 using namespace TEN::Entities::TR4;
 using namespace TEN::Entities::Creatures::TR5;
-using namespace TEN::Entities::Generic;
 using namespace TEN::Entities::Vehicles;
 
 struct ItemInfo;
