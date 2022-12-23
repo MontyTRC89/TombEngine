@@ -9,26 +9,24 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
+#include "Game/missile.h"
 #include "Game/people.h"
-#include "Math/Random.h"
+#include "Math/Math.h"
 #include "Objects/Generic/Traps/dart_emitter.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
-#include "Game/missile.h"
 
 using namespace TEN::Entities::Traps;
 using namespace TEN::Math;
-using namespace TEN::Math::Random;
-using std::vector;
 
 namespace TEN::Entities::Creatures::TR3
 {
-	const auto TribesmanAxeBite = BiteInfo(Vector3(0.0f, 56.0f, 265.0f), 13);
+	const auto TribesmanAxeBite	 = BiteInfo(Vector3(0.0f, 56.0f, 265.0f), 13);
 	const auto TribesmanDartBite1 = BiteInfo(Vector3(0.0f, 0.0f, -200.0f), 13);
 	const auto TribesmanDartBite2 = BiteInfo(Vector3(8.0f, 40.0f, -248.0f), 13);
-	const vector<unsigned int> TribesmanAxeAttackJoints = { 13 };
-	const vector<unsigned int> TribesmanDartAttackJoints = { 10, 13 }; // TODO: Check.
+	const auto TribesmanAxeAttackJoints  = std::vector<unsigned int>{ 13 };
+	const auto TribesmanDartAttackJoints = std::vector<unsigned int>{ 10, 13 }; // TODO: Check.
 
 	const unsigned char TribesmanAxeHit[13][3] =
 	{
@@ -49,6 +47,7 @@ namespace TEN::Entities::Creatures::TR3
 
 	enum TribesmanState
 	{
+		// No state 0.
 		TRIBESMAN_STATE_CROUCH_IDLE = 1,
 		TRIBESMAN_STATE_WALK_FORWARD = 2,
 		TRIBESMAN_STATE_RUN_FORWARD = 3,
@@ -154,7 +153,7 @@ namespace TEN::Entities::Creatures::TR3
 				{
 					creature->MaxTurn = 0;
 
-					if (TestProbability(1.0f / 128))
+					if (Random::TestProbability(1 / 128.0f))
 						item->Animation.TargetState = TRIBESMAN_STATE_WALK_FORWARD;
 				}
 				else if (creature->Mood == MoodType::Escape)
@@ -170,18 +169,24 @@ namespace TEN::Entities::Creatures::TR3
 					item->ItemFlags[0] = 0;
 				}
 				else if (AI.ahead && AI.distance < pow(682, 2))
+				{
 					item->Animation.TargetState = TRIBESMAN_STATE_CROUCH_AXE_ATTACK;
+				}
 				else if (AI.ahead && AI.distance < pow(SECTOR(1), 2))
 				{
-					if (TestProbability(0.5f))
+					if (Random::TestProbability(1 / 2.0f))
 						item->Animation.TargetState = TRIBESMAN_STATE_WALK_FORWARD;
 					else
 						item->Animation.TargetState = TRIBESMAN_STATE_CROUCH_AXE_ATTACK;
 				}
 				else if (AI.ahead && AI.distance < pow(SECTOR(2), 2))
+				{
 					item->Animation.TargetState = TRIBESMAN_STATE_WALK_FORWARD;
+				}
 				else
+				{
 					item->Animation.TargetState = TRIBESMAN_STATE_RUN_FORWARD;
+				}
 
 				break;
 
@@ -193,7 +198,7 @@ namespace TEN::Entities::Creatures::TR3
 				{
 					creature->MaxTurn = 0;
 
-					if (TestProbability(1.0f / 128))
+					if (Random::TestProbability(1 / 128.0f))
 						item->Animation.TargetState = TRIBESMAN_STATE_WALK_FORWARD;
 				}
 				else if (creature->Mood == MoodType::Escape)
@@ -205,15 +210,19 @@ namespace TEN::Entities::Creatures::TR3
 				}
 				else if (AI.ahead && AI.distance < pow(682, 2))
 				{
-					if (TestProbability(0.0625f))
+					if (Random::TestProbability(0.0625f))
 						item->Animation.TargetState = TRIBESMAN_STATE_AXE_ATTACK_LOW;
 					else
 						item->Animation.TargetState = TRIBESMAN_STATE_AXE_ATTACK_HIGH_START;
 				}
 				else if (AI.distance < pow(SECTOR(2), 2))
+				{
 					item->Animation.TargetState = TRIBESMAN_STATE_WALK_FORWARD;
+				}
 				else
+				{
 					item->Animation.TargetState = TRIBESMAN_STATE_RUN_FORWARD;
+				}
 
 				break;
 
@@ -226,25 +235,29 @@ namespace TEN::Entities::Creatures::TR3
 				{
 					creature->MaxTurn /= 4;
 
-					if (TestProbability(1.0f / 128))
+					if (Random::TestProbability(1 / 128.0f))
 					{
-						if (TestProbability(0.25f))
+						if (Random::TestProbability(1 / 4.0f))
 							item->Animation.TargetState = TRIBESMAN_STATE_CROUCH_IDLE;
 						else
 							item->Animation.TargetState = TRIBESMAN_STATE_IDLE;
 					}
 				}
 				else if (creature->Mood == MoodType::Escape)
+				{
 					item->Animation.TargetState = TRIBESMAN_STATE_RUN_FORWARD;
+				}
 				else if (AI.ahead && AI.distance < pow(682, 2))
 				{
-					if (TestProbability(0.25f))
+					if (Random::TestProbability(1 / 4.0f))
 						item->Animation.TargetState = TRIBESMAN_STATE_CROUCH_IDLE;
 					else
 						item->Animation.TargetState = TRIBESMAN_STATE_IDLE;
 				}
 				else if (AI.distance > pow(SECTOR(2), 2))
+				{
 					item->Animation.TargetState = TRIBESMAN_STATE_RUN_FORWARD;
+				}
 
 				break;
 
@@ -257,24 +270,32 @@ namespace TEN::Entities::Creatures::TR3
 				{
 					creature->MaxTurn /= 4;
 
-					if (TestProbability(1.0f / 128))
+					if (Random::TestProbability(1 / 128.0f))
 					{
-						if (TestProbability(0.5f))
+						if (Random::TestProbability(1 / 2.0f))
 							item->Animation.TargetState = TRIBESMAN_STATE_CROUCH_IDLE;
 						else
 							item->Animation.TargetState = TRIBESMAN_STATE_IDLE;
 					}
 				}
 				else if (creature->Mood == MoodType::Escape && Lara.TargetEntity != item && AI.ahead)
+				{
 					item->Animation.TargetState = TRIBESMAN_STATE_IDLE;
+				}
 				else if (AI.bite || AI.distance < pow(SECTOR(2), 2))
 				{
-					if (TestProbability(0.5f))
+					if (Random::TestProbability(1 / 2.0f))
+					{
 						item->Animation.TargetState = TRIBESMAN_STATE_RUN_AXE_ATTACK_HIGH;
-					else if (TestProbability(0.25f))
+					}
+					else if (Random::TestProbability(1 / 4.0f))
+					{
 						item->Animation.TargetState = TRIBESMAN_STATE_RUN_AXE_ATTACK_LOW;
+					}
 					else
+					{
 						item->Animation.TargetState = TRIBESMAN_STATE_WALK_FORWARD;
+					}
 				}
 
 				break;
@@ -337,41 +358,39 @@ namespace TEN::Entities::Creatures::TR3
 		CreatureAnimation(itemNumber, angle, 0);
 	}
 
-	static void TribesmanShotDart(ItemInfo* item)
+	void TribesmanShotDart(ItemInfo* item)
 	{
-		short dartItemNumber = CreateItem();
+		int dartItemNumber = CreateItem();
 		if (dartItemNumber == NO_ITEM)
 			return;
 		
-			auto* dartItem = &g_Level.Items[dartItemNumber];
+		auto* dartItem = &g_Level.Items[dartItemNumber];
 
-			dartItem->ObjectNumber = ID_DARTS;
-			dartItem->RoomNumber = item->RoomNumber;
+		dartItem->ObjectNumber = ID_DARTS;
+		dartItem->RoomNumber = item->RoomNumber;
 
-			auto pos1 = GetJointPosition(item, TribesmanDartBite1.meshNum, Vector3i(TribesmanDartBite1.Position));
-			auto pos2 = GetJointPosition(LaraItem, LM_TORSO);
+		auto pos1 = GetJointPosition(item, TribesmanDartBite1.meshNum, Vector3i(TribesmanDartBite1.Position));
+		auto pos2 = GetJointPosition(LaraItem, LM_TORSO);
+		auto orient = Geometry::GetOrientToPoint(pos1.ToVector3(), pos2.ToVector3());
 
-			auto orient = Geometry::GetOrientToPoint(pos1.ToVector3(), pos2.ToVector3());
+		dartItem->Pose.Position = pos1;
 
-			dartItem->Pose.Position = pos1;
+		InitialiseItem(dartItemNumber);
 
-			InitialiseItem(dartItemNumber);
+		dartItem->Pose.Orientation = orient;
+		dartItem->Animation.Velocity.z = CLICK(1);
+		dartItem->TriggerFlags = item->TriggerFlags;
+		dartItem->Color = item->Color;
 
-			dartItem->Pose.Orientation = orient;
-			dartItem->Animation.Velocity.z = CLICK(1);
-			dartItem->TriggerFlags = item->TriggerFlags;
-			dartItem->Color = item->Color;
+		AddActiveItem(dartItemNumber);
+		dartItem->Status = ITEM_ACTIVE;
 
-			AddActiveItem(dartItemNumber);
+		pos1 = Vector3i(TribesmanDartBite2.Position);
+		pos1.z += 96;
+		pos1 = GetJointPosition(item, TribesmanDartBite2.meshNum, pos1);
 
-			dartItem->Status = ITEM_ACTIVE;
-
-			pos1 = Vector3i(TribesmanDartBite2.Position);
-			pos1.z += 96;
-			pos1 = GetJointPosition(item, TribesmanDartBite2.meshNum, pos1);
-
-			TriggerDartSmoke(pos1.x, pos1.y, pos1.z, 0, 0, 1);
-			TriggerDartSmoke(pos1.x, pos1.y, pos1.z, 0, 0, 1);		
+		TriggerDartSmoke(pos1.x, pos1.y, pos1.z, 0, 0, true);
+		TriggerDartSmoke(pos1.x, pos1.y, pos1.z, 0, 0, true);
 	}
 
 	void TribemanDartsControl(short itemNumber)
@@ -397,7 +416,9 @@ namespace TEN::Entities::Creatures::TR3
 					SetAnimation(item, TRIBESMAN_ANIM_CROUCH_DEATH);
 				}
 				else
+				{
 					SetAnimation(item, TRIBESMAN_ANIM_IDLE_DEATH);
+				}
 			}
 		}
 		else
@@ -448,7 +469,7 @@ namespace TEN::Entities::Creatures::TR3
 					extraTorsoRot.x = 0;
 					extraTorsoRot.y = 0;
 
-					if (TestProbability(1.0f / 256))
+					if (Random::TestProbability(1.0f / 256))
 						item->Animation.TargetState = TRIBESMAN_STATE_IDLE;
 
 					break;
@@ -461,20 +482,28 @@ namespace TEN::Entities::Creatures::TR3
 						item->Animation.TargetState = TRIBESMAN_STATE_RUN_FORWARD;
 				}
 				else if (AI.bite && AI.distance < pow(SECTOR(0.5f), 2))
+				{
 					item->Animation.TargetState = TRIBESMAN_STATE_IDLE;
+				}
 				else if (AI.bite && AI.distance < pow(SECTOR(2), 2))
+				{
 					item->Animation.TargetState = TRIBESMAN_STATE_WALK_FORWARD;
+				}
 				else if (Targetable(item, &AI) && AI.distance < pow(MAX_VISIBILITY_DISTANCE, 2))
+				{
 					item->Animation.TargetState = TRIBESMAN_STATE_DART_ATTACK;
+				}
 				else if (creature->Mood == MoodType::Bored)
 				{
-					if (TestProbability(1.0f / 64))
+					if (Random::TestProbability(1.0f / 64))
 						item->Animation.TargetState = TRIBESMAN_STATE_WALK_FORWARD;
 					else
 						break;
 				}
 				else
+				{
 					item->Animation.TargetState = TRIBESMAN_STATE_RUN_FORWARD;
+				}
 
 				break;
 
@@ -489,7 +518,7 @@ namespace TEN::Entities::Creatures::TR3
 					extraTorsoRot.x = 0;
 					extraTorsoRot.y = 0;
 
-					if (TestProbability(1.0f / 256))
+					if (Random::TestProbability(1.0f / 256))
 						item->Animation.TargetState = TRIBESMAN_STATE_CROUCH_IDLE;
 
 					break;
@@ -502,15 +531,25 @@ namespace TEN::Entities::Creatures::TR3
 						item->Animation.TargetState = TRIBESMAN_STATE_RUN_FORWARD;
 				}
 				else if (AI.bite && AI.distance < pow(SECTOR(0.5f), 2))
+				{
 					item->Animation.TargetState = TRIBESMAN_STATE_AXE_ATTACK_HIGH_CONTINUE;
+				}
 				else if (AI.bite && AI.distance < pow(SECTOR(2), 2))
+				{
 					item->Animation.TargetState = TRIBESMAN_STATE_WALK_FORWARD;
+				}
 				else if (Targetable(item, &AI) && AI.distance < pow(MAX_VISIBILITY_DISTANCE, 2))
+				{
 					item->Animation.TargetState = TRIBESMAN_STATE_CROUCH_IDLE;
-				else if (creature->Mood == MoodType::Bored && TestProbability(1.0f / 64))
+				}
+				else if (creature->Mood == MoodType::Bored && Random::TestProbability(1.0f / 64))
+				{
 					item->Animation.TargetState = TRIBESMAN_STATE_WALK_FORWARD;
+				}
 				else
+				{
 					item->Animation.TargetState = TRIBESMAN_STATE_RUN_FORWARD;
+				}
 
 				break;
 
@@ -518,24 +557,40 @@ namespace TEN::Entities::Creatures::TR3
 				creature->MaxTurn = ANGLE(9.0f);
 
 				if (AI.bite && AI.distance < pow(SECTOR(0.5f), 2))
+				{
 					item->Animation.TargetState = TRIBESMAN_STATE_IDLE;
+				}
 				else if (AI.bite && AI.distance < pow(SECTOR(2), 2))
+				{
 					item->Animation.TargetState = TRIBESMAN_STATE_WALK_FORWARD;
+				}
 				else if (Targetable(item, &AI) && AI.distance < pow(MAX_VISIBILITY_DISTANCE, 2))
+				{
 					item->Animation.TargetState = TRIBESMAN_STATE_CROUCH_IDLE;
+				}
 				else if (creature->Mood == MoodType::Escape)
+				{
 					item->Animation.TargetState = TRIBESMAN_STATE_RUN_FORWARD;
+				}
 				else if (creature->Mood == MoodType::Bored)
 				{
-					if (TestProbability(0.985f))
+					if (Random::TestProbability(0.985f))
+					{
 						item->Animation.TargetState = TRIBESMAN_STATE_WALK_FORWARD;
-					else if (TestProbability(0.985f))
+					}
+					else if (Random::TestProbability(0.985f))
+					{
 						item->Animation.TargetState = TRIBESMAN_STATE_IDLE;
+					}
 					else
+					{
 						item->Animation.TargetState = TRIBESMAN_STATE_CROUCH_IDLE;
+					}
 				}
 				else if (AI.distance > pow(SECTOR(2), 2))
+				{
 					item->Animation.TargetState = TRIBESMAN_STATE_RUN_FORWARD;
+				}
 
 				break;
 
@@ -545,16 +600,26 @@ namespace TEN::Entities::Creatures::TR3
 				tilt = angle / 4;
 
 				if (AI.bite && AI.distance < pow(SECTOR(0.5f), 2))
+				{
 					item->Animation.TargetState = TRIBESMAN_STATE_IDLE;
+				}
 				else if (Targetable(item, &AI) && AI.distance < pow(MAX_VISIBILITY_DISTANCE, 2), 2)
+				{
 					item->Animation.TargetState = TRIBESMAN_STATE_CROUCH_IDLE;
+				}
 
 				if (item->AIBits & GUARD)
+				{
 					item->Animation.TargetState = TRIBESMAN_STATE_IDLE;
+				}
 				else if (creature->Mood == MoodType::Escape && Lara.TargetEntity != item && AI.ahead)
+				{
 					item->Animation.TargetState = TRIBESMAN_STATE_IDLE;
+				}
 				else if (creature->Mood == MoodType::Bored)
+				{
 					item->Animation.TargetState = TRIBESMAN_STATE_CROUCH_IDLE;
+				}
 
 				break;
 
@@ -576,11 +641,17 @@ namespace TEN::Entities::Creatures::TR3
 				}
 
 				if (abs(AI.angle) < ANGLE(2.0f))
+				{
 					item->Pose.Orientation.y += AI.angle;
+				}
 				else if (AI.angle < 0)
+				{
 					item->Pose.Orientation.y -= ANGLE(2.0f);
+				}
 				else
+				{
 					item->Pose.Orientation.y += ANGLE(2.0f);
+				}
 
 				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + 15)
 				{
@@ -627,7 +698,6 @@ namespace TEN::Entities::Creatures::TR3
 		CreatureJoint(item, 1, extraTorsoRot.x);
 		CreatureJoint(item, 2, extraHeadRot.y);
 		CreatureJoint(item, 3, extraHeadRot.x);
-
 		CreatureAnimation(itemNumber, angle, 0);
 	}
 }
