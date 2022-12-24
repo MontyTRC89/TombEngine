@@ -119,7 +119,6 @@ static void StartEntity(ObjectInfo* obj)
 		obj->radius = 102;
 		obj->intelligent = true;
 		obj->pivotLength = 0;
-		obj->ZoneType = ZoneType::Basic;
 		
 		g_Level.Bones[obj->boneIndex + 13 * 4] |= ROT_Y;
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
@@ -136,7 +135,6 @@ static void StartEntity(ObjectInfo* obj)
 		obj->radius = 102;
 		obj->intelligent = true;
 		obj->pivotLength = 0;
-		obj->ZoneType = ZoneType::Basic;
 		
 		g_Level.Bones[obj->boneIndex + 13 * 4] |= ROT_Y;
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
@@ -179,7 +177,6 @@ static void StartEntity(ObjectInfo* obj)
 	{
 		obj->control = ScubaHarpoonControl;
 		obj->collision = ObjectCollision;
-		
 	}
 
 	obj = &Objects[ID_FLAMETHROWER_BADDY];

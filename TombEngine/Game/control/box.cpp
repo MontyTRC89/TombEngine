@@ -20,7 +20,6 @@
 #include "Objects/TR5/Object/tr5_pushableblock.h"
 #include "Renderer/Renderer11.h"
 
-#define CHECK_CLICK(x) CLICK(x) / 2
 #define ESCAPE_DIST SECTOR(5)
 #define STALK_DIST SECTOR(3)
 #define REACHED_GOAL_RADIUS 640
@@ -1150,12 +1149,12 @@ bool IsCreatureVaultAvailable(ItemInfo* item, int stepCount)
 {
 	switch (stepCount)
 	{
-	case 3:
+	case -3:
 		return (item->ObjectNumber != ID_CIVVY &&
 				item->ObjectNumber != ID_MP_WITH_STICK &&
 				item->ObjectNumber != ID_YETI);
 
-	case 2:
+	case -2:
 		return (item->ObjectNumber != ID_BADDY1 &&
 				item->ObjectNumber != ID_BADDY2 &&
 				item->ObjectNumber != ID_CIVVY &&
@@ -1179,19 +1178,19 @@ int CreatureVault(short itemNumber, short angle, int vault, int shift)
 	CreatureAnimation(itemNumber, angle, 0);
 
 	// FIXME: Add climb down animations for Von Croy and baddies?
-	if (item->Floor > y + CHECK_CLICK(9))
+	if (item->Floor > y + CLICK(4.5f))
 		vault = 0;
-	else if (item->Floor > y + CHECK_CLICK(7))
+	else if (item->Floor > y + CLICK(3.5f))
 		vault = -4;
-	else if (item->Floor > y + CHECK_CLICK(5) && IsCreatureVaultAvailable(item, 3))
+	else if (item->Floor > y + CLICK(2.5f) && IsCreatureVaultAvailable(item, -3))
 		vault = -3;
-	else if (item->Floor > y + CHECK_CLICK(3) && IsCreatureVaultAvailable(item, 2))
+	else if (item->Floor > y + CLICK(1.5f) && IsCreatureVaultAvailable(item, -2))
 		vault = -2;
-	else if (item->Pose.Position.y > y - CHECK_CLICK(3))
+	else if (item->Pose.Position.y > y - CLICK(1.5f))
 		return 0;
-	else if (item->Pose.Position.y > y - CHECK_CLICK(5))
+	else if (item->Pose.Position.y > y - CLICK(2.5f))
 		vault = 2;
-	else if (item->Pose.Position.y > y - CHECK_CLICK(7))
+	else if (item->Pose.Position.y > y - CLICK(3.5f))
 		vault = 3;
 	else
 		vault = 4;
@@ -2101,13 +2100,13 @@ void InitialiseItemBoxData()
 			if (!(g_Level.Boxes[floor->Box].flags & BLOCKED))
 			{
 				int floorHeight = floor->FloorHeight(mesh.pos.Position.x, mesh.pos.Position.z);
-				auto bBox = GetBoundsAccurate(mesh, false);
+				const auto& bBox = GetBoundsAccurate(mesh, false);
 
 				if (floorHeight <= mesh.pos.Position.y - bBox.Y2 + CLICK(2) &&
 					floorHeight < mesh.pos.Position.y - bBox.Y1)
 				{
 					if (bBox.X1 == 0 || bBox.X2 == 0 || bBox.Z1 == 0 || bBox.Z2 == 0 ||
-					   ((bBox.X1 < 0) ^ (bBox.X2 < 0)) && ((bBox.Z1 < 0) ^ (bBox.Z2 < 0)))
+					  ((bBox.X1 < 0) ^ (bBox.X2 < 0)) && ((bBox.Z1 < 0) ^ (bBox.Z2 < 0)))
 					{
 						floor->Stopper = true;
 					}
@@ -2115,4 +2114,59 @@ void InitialiseItemBoxData()
 			}
 		}
 	}
+}
+
+bool CheckIfCreatureCanJumpOrRoll(ItemInfo* item, BlockDistanceRequest request, float angle)
+{
+	auto creature = GetCreatureInfo(item);
+	if (creature->Enemy == NULL) // if there is no target, then no jump is required !
+		return false;
+
+	int distance;
+	switch (request)
+	{
+	case BlockDistanceRequest::For1Block:
+	default:
+		distance = CLICK(2);
+		break;
+	case BlockDistanceRequest::For2Block:
+		distance = CLICK(3);
+		break;
+	}
+
+	int dx = distance * phd_sin(item->Pose.Orientation.y + angle);
+	int dz = distance * phd_cos(item->Pose.Orientation.y + angle);
+	int x = item->Pose.Position.x + dx;
+	int y = item->Pose.Position.y;
+	int z = item->Pose.Position.z + dz;
+	auto nearJump = GetCollision(x, y, z, item->RoomNumber);
+	auto midJump = GetCollision(x + dx, y, z + dz, item->RoomNumber);
+	auto farJump = GetCollision(x + (dx * 2), y, z + (dz * 2), item->RoomNumber); // only for 2 block jump !
+
+	bool canJumpOrRoll = true;
+	switch (request)
+	{
+	case BlockDistanceRequest::For1Block:
+		if ((creature->Enemy && item->BoxNumber == creature->Enemy->BoxNumber) ||
+			y >= (nearJump.Position.Floor - STEPUP_HEIGHT) ||
+			y >= (midJump.Position.Floor + CLICK(1)) ||
+			y <= (midJump.Position.Floor - CLICK(1)))
+		{
+			canJumpOrRoll = false;
+		}
+		break;
+	case BlockDistanceRequest::For2Block:
+		if ((creature->Enemy && item->BoxNumber == creature->Enemy->BoxNumber) ||
+			y >= (nearJump.Position.Floor - STEPUP_HEIGHT) ||
+			y >= (midJump.Position.Floor - STEPUP_HEIGHT) ||
+			y >= (farJump.Position.Floor + CLICK(1)) ||
+			y <= (farJump.Position.Floor - CLICK(1)))
+		{
+			
+			canJumpOrRoll = false;
+		}
+		break;
+	}
+
+	return canJumpOrRoll;
 }

@@ -93,6 +93,12 @@ struct OVERLAP
 	int flags;
 };
 
+enum class BlockDistanceRequest : int
+{
+	For1Block,
+	For2Block
+};
+
 struct BiteInfo
 {
 	Vector3 Position = Vector3::Zero;
@@ -184,6 +190,7 @@ int CreatureAnimation(short itemNumber, short angle, short tilt);
 void CreatureHealth(ItemInfo* item);
 void AdjustStopperFlag(ItemInfo* item, int direction, bool set);
 void InitialiseItemBoxData();
+bool CheckIfCreatureCanJumpOrRoll(ItemInfo* item, BlockDistanceRequest request, float angle = 0.0f); // 0.0f = front
 
 void DrawBox(int boxIndex, Vector3 color);
 void DrawNearbyPathfinding(int boxIndex);

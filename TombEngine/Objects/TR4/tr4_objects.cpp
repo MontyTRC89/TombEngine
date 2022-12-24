@@ -144,7 +144,6 @@ namespace TEN::Entities
 			obj->pivotLength = 50;
 			obj->radius = 102;
 			obj->intelligent = true;
-			obj->ZoneType = ZoneType::Basic;
 			g_Level.Bones[obj->boneIndex + 48 * 4] |= ROT_Z;
 			g_Level.Bones[obj->boneIndex + 48 * 4] |= ROT_Y;
 			g_Level.Bones[obj->boneIndex + 52 * 4] |= ROT_Z;
@@ -163,7 +162,6 @@ namespace TEN::Entities
 			obj->pivotLength = 50;
 			obj->radius = 256;
 			obj->intelligent = true;
-			obj->ZoneType = ZoneType::Basic;
 			g_Level.Bones[obj->boneIndex + 19 * 4] |= ROT_Y;
 		}
 
@@ -194,7 +192,6 @@ namespace TEN::Entities
 			obj->pivotLength = 300;
 			obj->radius = 341;
 			obj->intelligent = true;
-			obj->ZoneType = ZoneType::Basic;
 			g_Level.Bones[obj->boneIndex + 9 * 4] |= ROT_Y;
 		}
 

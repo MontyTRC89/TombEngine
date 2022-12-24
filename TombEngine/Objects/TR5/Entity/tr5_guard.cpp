@@ -24,10 +24,19 @@ namespace TEN::Entities::Creatures::TR5
 	const auto SniperGunBite	  = BiteInfo(Vector3(0.0f, 480.0f, 110.0f), 13);
 	const auto ArmedMafia2GunBite = BiteInfo(Vector3(-50.0f, 220.0f, 60.0f), 13);
 
+	constexpr auto GUARD_ALERT_RANGE = SQUARE(BLOCK(6));
+	constexpr auto GUARD_WALK_RANGE = SQUARE(BLOCK(3));
+	constexpr auto GUARD_ATTACK_RANGE = SQUARE(BLOCK(4));
+	constexpr auto GUARD_WALK_TURN_ANGLE_MAX = ANGLE(5.0f);
+	constexpr auto GUARD_RUN_TURN_ANGLE_MAX = ANGLE(10.0f);
+	constexpr auto GUARD_LARA_ANGLE_FOR_DEATH2 = ANGLE(67.5f);
+	
+	constexpr auto GUARD_NO_WEAPON_ON_HAND_SWAPFLAG = 0x2000;
+
 	enum GuardState
 	{
 		// No state 0.
-		GUARD_STATE_IDLE = 1,
+		GUARD_STATE_STOP = 1, // Also idle.
 		GUARD_STATE_TURN_180 = 2,
 		GUARD_STATE_FIRE_SINGLE = 3,
 		GUARD_STATE_AIM = 4,
@@ -35,25 +44,33 @@ namespace TEN::Entities::Creatures::TR5
 		GUARD_STATE_DEATH_1 = 6,
 		GUARD_STATE_RUN = 7,
 		GUARD_STATE_DEATH_2 = 8,
-		GUARD_STATE_RECOIL = 11,
-
+		GUARD_STATE_RELOAD = 11,
+		GUARD_STATE_THROW_GRENADE = 12,
 		GUARD_STATE_CROUCH = 13,
 		GUARD_STATE_ROPE_DOWN = 14,
 		GUARD_STATE_SIT = 15,
 		GUARD_STATE_STAND_UP = 16,
-
+		GUARD_STATE_SLEEP_ON_CHAIR_LOOP = 17,
+		GUARD_STATE_AWAKE_FROM_SLEEP = 18, // This one include a kick on the chair.
 		GUARD_STATE_WAITING_ON_WALL = 19,
+		GUARD_STATE_CLIMB_2CLICK = 20,
+		GUARD_STATE_CLIMB_3CLICK = 21,
+		GUARD_STATE_CLIMB_4CLICK = 22,
+		GUARD_SATTE_FALL_4CLICK = 23,
+		GUARD_STATE_FALL_3CLICK = 24,
+		GUARD_STATE_FALL_2CLICK = 23,
 
 		GUARD_STATE_IDLE_START_JUMP = 26,
 		GUARD_STATE_JUMP_1_BLOCK = 27,
 		GUARD_STATE_JUMP_2_BLOCKS = 28,
 		GUARD_STATE_LAND = 29,
 		GUARD_STATE_HUNT = 30,
-		GUARD_STATE_HUNT_IDLE = 31,
+		GUARD_STATE_HUNT_STOP = 31,
+		GUARD_STATE_ANOTHER_TURN_180 = 32,
 
 		GUARD_STATE_FIRE_FAST = 35,
 		GUARD_STATE_INSERT_CODE = 36,
-		GUARD_STATE_START_USE_COMPUTER = 37,
+		GUARD_STATE_USE_KEYPAD = 37,
 		GUARD_STATE_USE_COMPUTER = 38,
 		GUARD_STATE_SURRENDER = 39,
 	};
@@ -68,14 +85,11 @@ namespace TEN::Entities::Creatures::TR5
 		MAFIA2_STATE_DEATH_1 = 6,
 		MAFIA2_STATE_RUN = 7,
 		MAFIA2_STATE_DEATH_2 = 8,
-
 		MAFIA2_STATE_IDLE_START_JUMP = 26,
 		MAFIA2_STATE_JUMP_1_BLOCK = 27,
 		MAFIA2_STATE_JUMP_2_BLOCKS = 28,
 		MAFIA2_STATE_LAND = 29,
-
 		MAFIA2_STATE_TURN_180 = 32,
-
 		MAFIA2_STATE_UNDRAW_GUNS = 37
 	};
 
@@ -91,111 +105,171 @@ namespace TEN::Entities::Creatures::TR5
 
 	enum GuardAnim
 	{
-		ANIMATION_GUARD_DEATH1 = 11,
-		ANIMATION_GUARD_DEATH2 = 16,
-		ANIMATION_GUARD_START_JUMP = 41
+		ANIMATION_GUARD_IDLE = 0,
+		ANIMATION_GUARD_TURN_180_1,
+		ANIMATION_GUARD_SINGLE_SHOOT,
+		ANIMATION_GUARD_AIM,
+		ANIMATION_GUARD_START_WALK,
+		ANIMATION_GUARD_WALK,
+		ANIMATION_GUARD_WALK_STOP,
+		ANIMATION_GUARD_WALK_TO_AIM,
+		ANIMATION_GUARD_AIM_TO_WALK,
+		ANIMATION_GUARD_AIM_TO_STOP,
+		ANIMATION_GUARD_STOP_TO_AIM,
+		ANIMATION_GUARD_DEATH1,
+		ANIMATION_GUARD_RUN,
+		ANIMATION_GUARD_AIM_TO_RUN,
+		ANIMATION_GUARD_RUN_TO_AIM,
+		ANIMATION_GUARD_RUN_TO_WALK,
+		ANIMATION_GUARD_DEATH2,
+		ANIMATION_GUARD_WALK_TO_RUN,
+		ANIMATION_GUARD_STOP_TO_RUN,
+		ANIMATION_GUARD_CROUCH_AIM_HAND_UP_START,
+		ANIMATION_GUARD_CROUCH_AIM_HAND_UP,
+		ANIMATION_GUARD_CROUCH_HAND_UP_SINGLE_SHOOT,
+		ANIMATION_GUARD_CROUCH_HAND_UP_TO_STOP,
+		ANIMATION_GUARD_RELOAD,
+		ANIMATION_GUARD_THROW_GRENADE,
+		ANIMATION_GUARD_OPEN_DOOR_KICK,
+		ANIMATION_GUARD_ROPE_DOWN_FAST,
+		ANIMATION_GUARD_ROPE_DOWN_FAST_TO_AIM_FRONT,
+		ANIMATION_GUARD_ROPE_DOWN,
+		ANIMATION_GUARD_ROPE_TO_AIM,
+		ANIMATION_GUARD_SLEEPING,
+		ANIMATION_GUARD_SLEEPING_TO_AIM, // he kick a chair, need to found the chair near him before doing this anim.
+		ANIMATION_GUARD_WAITING_ON_WALL,
+		ANIMATION_GUARD_WAITING_ON_WALL_TO_STOP,
+		ANIMATION_GUARD_UNKNOWN,
+		ANIMATION_GUARD_CLIMB2CLICK,
+		ANIMATION_GUARD_CLIMB3CLICK,
+		ANIMATION_GUARD_CLIMB4CLICK,
+		ANIMATION_GUARD_FALL4CLICK,
+		ANIMATION_GUARD_FALL3CLICK,
+		ANIMATION_GUARD_FALL2CLICK,
+		ANIMATION_GUARD_JUMP_1BLOCK,
+		ANIMATION_GUARD_JUMP_FINISH,
+		ANIMATION_GUARD_JUMP_2BLOCK,
+		ANIMATION_GUARD_HUNT_WALK,
+		ANIMATION_GUARD_HUNT,
+		ANIMATION_GUARD_HUNT_TO_STOP,
+		ANIMATION_GUARD_STOP_TO_HUNT,
+		ANIMATION_GUARD_TURN_180_2,
+		ANIMATION_GUARD_JUMP_START,
+		ANIMATION_GUARD_STOP_TO_CROUCH_AIM_HAND_DOWN,
+		ANIMATION_GUARD_CROUCH_AIM_HAND_DOWN,
+		ANIMATION_GUARD_CROUCH_HAND_DOWN_SHOOT_FAST,
+		ANIMATION_GUARD_CROUCH_HAND_DOWN_TO_STOP,
+		ANIMATION_GUARD_SHOOT_FAST,
+		ANIMATION_GUARD_INSERT_CODE,
+		ANIMATION_GUARD_USE_KEYPAD,
+		ANIMATION_GUARD_USE_COMPUTER_START,
+		ANIMATION_GUARD_USE_COMPUTER,
+		ANIMATION_GUARD_USE_COMPUTER_TO_STOP,
+		ANIMATION_GUARD_SURRENDER_START,
+		ANIMATION_GUARD_SURRENDER,
+		ANIMATION_GUARD_SURRENDER_TO_STOP
+	};
+
+	enum class GuardOcb : short
+	{
+		None = 0,
+		Reload = 1,
+		DoorKick = 2,
+		RopeDown = 3,
+		Sleeping = 4,
+		RopeDownFast = 5,
+		WaitOnWall = 6,
+		UseComputer = 7,
+		StartHuntStop = 8,
+		UseComputerScientist = 9,
+		Idle = 10,
+		Run = 11
 	};
 
 	void InitialiseGuard(short itemNum)
 	{
-		auto* item = &g_Level.Items[itemNum];
+		auto item = &g_Level.Items[itemNum];
+		short roomItemNumber;
+
 		InitialiseCreature(itemNum);
 
-	   int anim = Objects[ID_SWAT].animIndex;
-		if (!Objects[ID_SWAT].loaded)
-			anim = Objects[ID_GUARD1].animIndex;
-
-		short roomItemNumber;
-		switch (item->TriggerFlags)
+		switch ((GuardOcb)item->TriggerFlags)
 		{
-			case 0:
-			case 10:
-				item->Animation.AnimNumber = anim;
-				item->Animation.TargetState = GUARD_STATE_IDLE;
-				break;
+		default:
+		case GuardOcb::Idle:
+			SetAnimation(item, ANIMATION_GUARD_IDLE);
+			break;
 
-			case 1:
-				item->Animation.AnimNumber = anim + 23;
-				item->Animation.TargetState = GUARD_STATE_RECOIL;
-				break;
+		case GuardOcb::Reload:
+			SetAnimation(item, ANIMATION_GUARD_RELOAD);
+			break;
 
-			case 2:
-				item->Animation.AnimNumber = anim + 25;
-				item->Animation.TargetState = GUARD_STATE_CROUCH;
-				// TODO: item->flags2 ^= (item->flags2 ^ ((item->flags2 & 0xFE) + 2)) & 6;
-				break;
+		case GuardOcb::DoorKick:
+			SetAnimation(item, ANIMATION_GUARD_OPEN_DOOR_KICK);
+			item->Animation.TargetState = GUARD_STATE_CROUCH;
+			// TODO: item->flags2 ^= (item->flags2 ^ ((item->flags2 & 0xFE) + 2)) & 6;
+			break;
 
-			case 3:
-				item->Animation.AnimNumber = anim + 28;
-				item->Animation.TargetState = GUARD_STATE_SIT;
-				item->SetMeshSwapFlags(9216);
+		case GuardOcb::RopeDown:
+			SetAnimation(item, ANIMATION_GUARD_ROPE_DOWN);
+			item->SetMeshSwapFlags(9216);
 
-				roomItemNumber = g_Level.Rooms[item->RoomNumber].itemNumber;
-				if (roomItemNumber != NO_ITEM)
+			roomItemNumber = g_Level.Rooms[item->RoomNumber].itemNumber;
+			if (roomItemNumber != NO_ITEM)
+			{
+				ItemInfo* item2 = nullptr;
+				while (true)
 				{
-					ItemInfo* item2 = nullptr;
-					while (true)
+					item2 = &g_Level.Items[roomItemNumber];
+					if (item2->ObjectNumber >= ID_ANIMATING1 &&
+						item2->ObjectNumber <= ID_ANIMATING15 &&
+						item2->RoomNumber == item->RoomNumber &&
+						item2->TriggerFlags == (short)GuardOcb::RopeDown)
 					{
-						item2 = &g_Level.Items[roomItemNumber];
-						if (item2->ObjectNumber >= ID_ANIMATING1 &&
-							item2->ObjectNumber <= ID_ANIMATING15 &&
-							item2->RoomNumber == item->RoomNumber &&
-							item2->TriggerFlags == 3)
-						{
-							break;
-						}
-
-						roomItemNumber = item2->NextItem;
-						if (roomItemNumber == NO_ITEM)
-						{
-							item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-							item->Animation.ActiveState = item->Animation.TargetState;
-							break;
-						}
+						break;
 					}
 
-					item2->MeshBits = -5;
+					roomItemNumber = item2->NextItem;
+					if (roomItemNumber == NO_ITEM)
+					{
+						item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+						item->Animation.ActiveState = item->Animation.TargetState;
+						break;
+					}
 				}
+				item2->MeshBits = -5;
+			}
 
-				break;
+			break;
 
-			case 4:
-				item->Animation.AnimNumber = anim + 30;
-				item->Animation.TargetState = 17;
-				item->SetMeshSwapFlags(8192);
-				break;
+		case GuardOcb::Sleeping:
+			SetAnimation(item, ANIMATION_GUARD_SLEEPING);
+			item->SetMeshSwapFlags(GUARD_NO_WEAPON_ON_HAND_SWAPFLAG);
+			break;
 
-			case 5:
-				item->Animation.AnimNumber = anim + 26;
-				item->Animation.TargetState = GUARD_STATE_ROPE_DOWN;
-				item->Pose.Position.y = GetCollision(item).Position.Ceiling - SECTOR(2);
-				break;
+		case GuardOcb::RopeDownFast:
+			SetAnimation(item, ANIMATION_GUARD_ROPE_DOWN_FAST);
+			item->Pose.Position.y = GetCollision(item).Position.Ceiling - BLOCK(2);
+			break;
 
-			case 6:
-				item->Animation.AnimNumber = anim + 32;
-				item->Animation.TargetState = GUARD_STATE_WAITING_ON_WALL;
-				break;
+		case GuardOcb::WaitOnWall:
+			SetAnimation(item, ANIMATION_GUARD_WAITING_ON_WALL);
+			break;
 
-			case 7:
-			case 9:
-				item->Animation.AnimNumber = anim + 59;
-				item->Animation.TargetState = GUARD_STATE_USE_COMPUTER;
-				item->Pose.Position.x -= CLICK(2) * phd_sin(item->Pose.Orientation.y);
-				item->Pose.Position.z -= CLICK(2) * phd_cos(item->Pose.Orientation.y);
-				break;
+		case GuardOcb::UseComputer:
+		case GuardOcb::UseComputerScientist:
+			SetAnimation(item, ANIMATION_GUARD_USE_COMPUTER);
+			item->Pose.Position.x -= CLICK(2) * phd_sin(item->Pose.Orientation.y);
+			item->Pose.Position.z -= CLICK(2) * phd_cos(item->Pose.Orientation.y);
+			break;
 
-			case 8:
-				item->Animation.TargetState = GUARD_STATE_HUNT_IDLE;
-				item->Animation.AnimNumber = anim + 46;
-				break;
+		case GuardOcb::StartHuntStop:
+			SetAnimation(item, ANIMATION_GUARD_HUNT_TO_STOP);
+			break;
 
-			case 11:
-				item->Animation.TargetState = GUARD_STATE_RUN;
-				item->Animation.AnimNumber = anim + 12;
-				break;
-
-			default:
-				break;
+		case GuardOcb::Run:
+			SetAnimation(item, ANIMATION_GUARD_RUN);
+			break;
 		}
 	}
 
@@ -223,67 +297,28 @@ namespace TEN::Entities::Creatures::TR5
 
 	}
 
+	// TODO: deal with LaraItem global !
 	void GuardControl(short itemNumber)
 	{
 		if (!CreatureActive(itemNumber))
 			return;
 
-		int animIndex = 0;
-		if (Objects[ID_SWAT].loaded)
-			animIndex= Objects[ID_SWAT].animIndex;
-		else
-			animIndex = Objects[ID_GUARD1].animIndex;
-
-		auto* item = &g_Level.Items[itemNumber];
-		auto* creature = GetCreatureInfo(item);
+		auto item = &g_Level.Items[itemNumber];
+		auto creature = GetCreatureInfo(item);
 
 		short angle = 0;
-		short joint0 = 0;
-		short joint1 = 0;
-		short joint2 = 0;
+		short torsoX = 0;
+		short torsoY = 0;
+		short headY = 0;
 
-		int x = item->Pose.Position.x;
-		int z = item->Pose.Position.z;
-		int dx = 870 * phd_sin(item->Pose.Orientation.y);
-		int dz = 870 * phd_cos(item->Pose.Orientation.y);
-
-		x += dx;
-		z += dz;
-		int height1 = GetCollision(x, item->Pose.Position.y, z, item->RoomNumber).Position.Floor;
-
-		x += dx;
-		z += dz;
-		int height2 = GetCollision(x, item->Pose.Position.y, z, item->RoomNumber).Position.Floor;
-
-		x += dx;
-		z += dz;
-		int height3 = GetCollision(x, item->Pose.Position.y, z, item->RoomNumber).Position.Floor;
-
-		bool canJump1block = true;
-		if (item->BoxNumber == LaraItem->BoxNumber ||
-			item->Pose.Position.y >= (height1 - CLICK(1.5f)) ||
-			item->Pose.Position.y >= (height2 + CLICK(1)) ||
-			item->Pose.Position.y <= (height2 - CLICK(1)))
-		{
-			canJump1block = false;
-		}
-
-		bool canJump2blocks = true;
-		if (item->BoxNumber == LaraItem->BoxNumber ||
-			item->Pose.Position.y >= (height1 - CLICK(1.5f)) ||
-			item->Pose.Position.y >= (height2 - CLICK(1.5f)) ||
-			item->Pose.Position.y >= (height3 + CLICK(1)) ||
-			item->Pose.Position.y <= (height3 - CLICK(1)))
-		{
-			canJump2blocks = false;
-		}
+		bool canJump1block = CheckIfCreatureCanJumpOrRoll(item, BlockDistanceRequest::For1Block);
+		bool canJump2blocks = !canJump1block && CheckIfCreatureCanJumpOrRoll(item, BlockDistanceRequest::For2Block);
 
 		if (creature->FiredWeapon)
 		{
-			creature->FiredWeapon--;
-
 			auto pos = GetJointPosition(item, SwatGunBite.meshNum, Vector3i(SwatGunBite.Position));
 			TriggerDynamicLight(pos.x, pos.y, pos.z, 2 * creature->FiredWeapon + 10, 192, 128, 32);
+			creature->FiredWeapon--;
 		}
 
 		if (item->AIBits)
@@ -305,7 +340,7 @@ namespace TEN::Entities::Creatures::TR5
 			int dx = LaraItem->Pose.Position.x - item->Pose.Position.x;
 			int dz = LaraItem->Pose.Position.z - item->Pose.Position.z;
 			laraAI.angle = phd_atan(dz, dx) - item->Pose.Orientation.y;
-			laraAI.distance = pow(dx, 2) + pow(dz, 2);
+			laraAI.distance = SQUARE(dz) + SQUARE(dx);
 		}
 	
 		if (item->HitPoints <= 0)
@@ -313,16 +348,14 @@ namespace TEN::Entities::Creatures::TR5
 			if (item->Animation.ActiveState != GUARD_STATE_DEATH_1 &&
 				item->Animation.ActiveState != GUARD_STATE_DEATH_2)
 			{
-				if (laraAI.angle >= ANGLE(67.5f) || laraAI.angle <= -ANGLE(67.5f))
+				if (laraAI.angle >= GUARD_LARA_ANGLE_FOR_DEATH2 || laraAI.angle <= -GUARD_LARA_ANGLE_FOR_DEATH2)
 				{
-					item->Animation.AnimNumber = animIndex + ANIMATION_GUARD_DEATH2;
-					item->Animation.ActiveState = GUARD_STATE_DEATH_2;
+					SetAnimation(item, ANIMATION_GUARD_DEATH2);
 					item->Pose.Orientation.y += laraAI.angle + -ANGLE(180.0f);
 				}
 				else
 				{
-					item->Animation.AnimNumber = animIndex + ANIMATION_GUARD_DEATH1;
-					item->Animation.ActiveState = GUARD_STATE_DEATH_1;
+					SetAnimation(item, ANIMATION_GUARD_DEATH1);
 					item->Pose.Orientation.y += laraAI.angle;
 				}
 
@@ -359,13 +392,8 @@ namespace TEN::Entities::Creatures::TR5
 
 					if (!(GlobalCounter & 7))
 						item->HitPoints--;
-
 					if (item->HitPoints <= 0)
-					{
-						item->Animation.AnimNumber = animIndex + ANIMATION_GUARD_DEATH2;
-						item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-						item->Animation.ActiveState = GUARD_STATE_DEATH_2;
-					}
+						SetAnimation(item, ANIMATION_GUARD_DEATH2);
 				}
 			}
 
@@ -375,7 +403,7 @@ namespace TEN::Entities::Creatures::TR5
 			angle = CreatureTurn(item, creature->MaxTurn);
 			creature->Enemy = LaraItem;
 
-			if ((laraAI.distance < pow(SECTOR(2), 2) && LaraItem->Animation.Velocity.z > 20) ||
+			if ((laraAI.distance < GUARD_ALERT_RANGE && LaraItem->Animation.Velocity.z > 20) ||
 				item->HitStatus ||
 				TargetVisible(item, &laraAI))
 			{
@@ -400,28 +428,26 @@ namespace TEN::Entities::Creatures::TR5
 			auto target = GameVector(
 				LaraItem->Pose.Position.x,
 				LaraItem->Pose.Position.y + ((frame->boundingBox.Y2 + 3 * frame->boundingBox.Y1) / 4),
-				LaraItem->Pose.Position.z
+				LaraItem->Pose.Position.z,
+				LaraItem->RoomNumber
 			);
-			bool los = !LOS(&origin, &target) && item->TriggerFlags != 10;
-
-			creature->MaxTurn = 0;
-
+			bool los = !LOS(&origin, &target) && item->TriggerFlags != (short)GuardOcb::Idle;
 			ItemInfo* currentItem = nullptr;
 			short currentItemNumber;
 
 			switch (item->Animation.ActiveState)
 			{
-			case GUARD_STATE_IDLE:
+			case GUARD_STATE_STOP:
 				creature->LOT.IsJumping = false;
 				creature->Flags = 0;
-				joint2 = laraAI.angle;
+				headY = laraAI.angle;
 
 				if (AI.ahead)
 				{
 					if (!(item->AIBits & FOLLOW))
 					{
-						joint0 = AI.angle / 2;
-						joint1 = AI.xAngle;
+						torsoX = AI.angle / 2;
+						torsoY = AI.xAngle;
 					}
 				}
 
@@ -432,14 +458,14 @@ namespace TEN::Entities::Creatures::TR5
 				else if (item->AIBits & GUARD)
 				{
 					if (item->AIBits & MODIFY)
-						joint2 = 0;
+						headY = 0;
 					else
-						joint2 = AIGuard(creature);
+						headY = AIGuard(creature);
 			
 					if (item->AIBits & PATROL1)
 					{
 						item->TriggerFlags--;
-						if (item->TriggerFlags < 1)
+						if (item->TriggerFlags <= (short)GuardOcb::None)
 							item->AIBits &= ~GUARD;
 					}
 				}
@@ -465,9 +491,7 @@ namespace TEN::Entities::Creatures::TR5
 				}
 				else if (canJump1block || canJump2blocks)
 				{
-					item->Animation.AnimNumber = animIndex + 41;
-					item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-					item->Animation.ActiveState = GUARD_STATE_IDLE_START_JUMP;
+					SetAnimationWithoutTargetState(item, ANIMATION_GUARD_JUMP_START+1);
 					creature->MaxTurn = 0;
 
 					if (canJump1block)
@@ -478,19 +502,19 @@ namespace TEN::Entities::Creatures::TR5
 					creature->LOT.IsJumping = true;
 				}
 				else if (los)
-					item->Animation.TargetState = GUARD_STATE_HUNT_IDLE;
+					item->Animation.TargetState = GUARD_STATE_HUNT_STOP;
 				else if (creature->Mood != MoodType::Bored)
 				{
-					if (AI.distance < pow(SECTOR(3), 2) || item->AIBits & FOLLOW)
+					if (AI.distance < GUARD_WALK_RANGE || item->AIBits & FOLLOW)
 						item->Animation.TargetState = GUARD_STATE_WALK;
 					else
 						item->Animation.TargetState = GUARD_STATE_RUN;
 				}
 				else
-					item->Animation.TargetState = GUARD_STATE_IDLE;
+					item->Animation.TargetState = GUARD_STATE_STOP;
 			
-				if (item->TriggerFlags == 11)
-					item->TriggerFlags = 0;
+				if (item->TriggerFlags == (short)GuardOcb::Run)
+					item->TriggerFlags = (short)GuardOcb::None;
 
 				break;
 
@@ -509,11 +533,13 @@ namespace TEN::Entities::Creatures::TR5
 
 			case GUARD_STATE_FIRE_SINGLE:
 			case GUARD_STATE_FIRE_FAST:
-				joint0 = laraAI.angle / 2;
-				joint2 = laraAI.angle / 2;
+				creature->MaxTurn = 0;
+				torsoX = laraAI.angle / 2;
+				headY = laraAI.angle / 2;
 
 				if (AI.ahead)
-					joint1 = AI.xAngle;
+					torsoY = AI.xAngle;
+
 				if (abs(AI.angle) >= ANGLE(2.0f))
 				{
 					if (AI.angle >= 0)
@@ -542,9 +568,9 @@ namespace TEN::Entities::Creatures::TR5
 					creature->Flags = 1;
 
 					if (item->Animation.ActiveState == GUARD_STATE_FIRE_SINGLE)
-						ShotLara(item, &AI, SwatGunBite, joint0, 30);
+						ShotLara(item, &AI, SwatGunBite, torsoX, 30);
 					else
-						ShotLara(item, &AI, SwatGunBite, joint0, 10);
+						ShotLara(item, &AI, SwatGunBite, torsoX, 10);
 				
 					// TODO: just for testing energy arcs
 					/*pos1.x = SwatGunBite.x;
@@ -558,12 +584,13 @@ namespace TEN::Entities::Creatures::TR5
 				break;
 
 			case GUARD_STATE_AIM:
+				creature->MaxTurn = 0;
 				creature->Flags = 0;
-				joint0 = laraAI.angle / 2;
-				joint2 = laraAI.angle / 2;
+				torsoX = laraAI.angle / 2;
+				headY = laraAI.angle / 2;
 
 				if (AI.ahead)
-					joint1 = AI.xAngle;
+					torsoY = AI.xAngle;
 
 				if (abs(AI.angle) >= ANGLE(2.0f))
 				{
@@ -576,7 +603,7 @@ namespace TEN::Entities::Creatures::TR5
 					item->Pose.Orientation.y += AI.angle;
 
 				if (!Targetable(item, &AI))
-					item->Animation.TargetState = GUARD_STATE_IDLE;
+					item->Animation.TargetState = GUARD_STATE_STOP;
 				else if (item->ObjectNumber == ID_GUARD1 || item->ObjectNumber == ID_GUARD2)
 					item->Animation.TargetState = GUARD_STATE_FIRE_SINGLE;
 				else
@@ -585,7 +612,7 @@ namespace TEN::Entities::Creatures::TR5
 				break;
 
 			case GUARD_STATE_WALK:
-				creature->MaxTurn = ANGLE(5.0f);
+				creature->MaxTurn = GUARD_WALK_TURN_ANGLE_MAX;
 				creature->LOT.IsJumping = false;
 
 				if (!Targetable(item, &AI) ||
@@ -595,10 +622,8 @@ namespace TEN::Entities::Creatures::TR5
 				{
 					if (canJump1block || canJump2blocks)
 					{
-						item->Animation.AnimNumber = animIndex + 41;
-						item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-						item->Animation.ActiveState = GUARD_STATE_IDLE_START_JUMP;
 						creature->MaxTurn = 0;
+						SetAnimationWithoutTargetState(item, ANIMATION_GUARD_JUMP_START+1);
 
 						if (canJump1block)
 							item->Animation.TargetState = GUARD_STATE_JUMP_1_BLOCK;
@@ -611,17 +636,17 @@ namespace TEN::Entities::Creatures::TR5
 					{
 						if (!los || item->AIBits)
 						{
-							if (AI.distance > pow(SECTOR(3), 2))
+							if (AI.distance > GUARD_WALK_RANGE)
 							{
 								if (!(item->InDrawRoom))
 									item->Animation.TargetState = GUARD_STATE_RUN;
 							}
 						}
 						else
-							item->Animation.TargetState = GUARD_STATE_IDLE;
+							item->Animation.TargetState = GUARD_STATE_STOP;
 					}
 					else
-						item->Animation.TargetState = GUARD_STATE_IDLE;
+						item->Animation.TargetState = GUARD_STATE_STOP;
 				}
 				else
 					item->Animation.TargetState = GUARD_STATE_AIM;
@@ -629,21 +654,18 @@ namespace TEN::Entities::Creatures::TR5
 				break;
 
 			case GUARD_STATE_RUN:
-				creature->MaxTurn = ANGLE(10.0f);
+				creature->MaxTurn = GUARD_RUN_TURN_ANGLE_MAX;
 				creature->LOT.IsJumping = false;
 
-				if (Targetable(item, &AI) &&
-					(AI.distance < pow(SECTOR(4), 2) || AI.enemyZone == AI.zoneNumber) &&
+				if (Targetable(item, &AI) && (AI.distance < GUARD_ATTACK_RANGE || AI.enemyZone == AI.zoneNumber) &&
 					item->ObjectNumber != ID_SCIENTIST)
 				{
 					item->Animation.TargetState = GUARD_STATE_AIM;
 				}
 				else if (canJump1block || canJump2blocks)
 				{
-					item->Animation.AnimNumber = animIndex + 50;
-					item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-					item->Animation.ActiveState = GUARD_STATE_IDLE_START_JUMP;
 					creature->MaxTurn = 0;
+					SetAnimationWithoutTargetState(item, ANIMATION_GUARD_JUMP_START+1);
 
 					if (canJump1block)
 						item->Animation.TargetState = GUARD_STATE_JUMP_1_BLOCK;
@@ -653,10 +675,10 @@ namespace TEN::Entities::Creatures::TR5
 					creature->LOT.IsJumping = true;
 				}
 				else if (los)
-					item->Animation.TargetState = GUARD_STATE_IDLE;
-				else if (AI.distance < pow(SECTOR(3), 2))
+					item->Animation.TargetState = GUARD_STATE_STOP;
+				else if (AI.distance < GUARD_WALK_RANGE)
 					item->Animation.TargetState = GUARD_STATE_WALK;
-				if (item->TriggerFlags == 11)
+				if (item->TriggerFlags == (short)GuardOcb::Run) // TODO: why is this set for run ? he is not jumping this time ! - TokyoSU: 24/12/2022
 				{
 					creature->MaxTurn = 0;
 					creature->LOT.IsJumping = true;
@@ -665,17 +687,17 @@ namespace TEN::Entities::Creatures::TR5
 				break;
 
 			case GUARD_STATE_ROPE_DOWN:
-				joint2 = laraAI.angle;
+				creature->MaxTurn = 0;
+				headY = laraAI.angle;
 
-				if (item->Pose.Position.y <= (item->Floor - SECTOR(2)) ||
-					item->TriggerFlags != 5)
+				if (item->Pose.Position.y <= (item->Floor - SECTOR(2)) || item->TriggerFlags != (short)GuardOcb::RopeDownFast)
 				{
 					if (item->Pose.Position.y >= (item->Floor - CLICK(2)))
 						item->Animation.TargetState = GUARD_STATE_AIM;
 				}
 				else
 				{
-					item->TriggerFlags = 0;
+					item->TriggerFlags = (short)GuardOcb::None;
 					TestTriggers(item, true);
 					SoundEffect(SFX_TR4_LARA_POLE_SLIDE_LOOP, &item->Pose);
 				}
@@ -692,7 +714,8 @@ namespace TEN::Entities::Creatures::TR5
 				break;
 
 			case GUARD_STATE_SIT:
-				joint2 = AIGuard(creature);
+				creature->MaxTurn = 0;
+				headY = AIGuard(creature);
 
 				if (creature->Alerted)
 					item->Animation.TargetState = GUARD_STATE_STAND_UP;
@@ -700,7 +723,8 @@ namespace TEN::Entities::Creatures::TR5
 				break;
 
 			case GUARD_STATE_STAND_UP:
-			case 18:
+			case GUARD_STATE_AWAKE_FROM_SLEEP:
+				creature->MaxTurn = 0;
 				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase)
 				{
 					TestTriggers(item, true);
@@ -723,12 +747,12 @@ namespace TEN::Entities::Creatures::TR5
 							currentItem->ObjectNumber <= ID_ANIMATING15 &&
 							currentItem->RoomNumber == item->RoomNumber)
 						{
-							if (currentItem->TriggerFlags > 2 && currentItem->TriggerFlags < 5)
+							if (currentItem->TriggerFlags > (short)GuardOcb::DoorKick && currentItem->TriggerFlags < (short)GuardOcb::RopeDownFast)
 								break;
 						}
 
 						currentItemNumber = currentItem->NextItem;
-						if (currentItemNumber == -1)
+						if (currentItemNumber == NO_ITEM)
 							break;
 					}
 
@@ -742,8 +766,9 @@ namespace TEN::Entities::Creatures::TR5
 			
 				break;
 
-			case 17:
-				joint2 = 0;
+			case GUARD_STATE_SLEEP_ON_CHAIR_LOOP:
+				creature->MaxTurn = 0;
+				headY = 0;
 
 				if (!item->HitStatus &&
 					LaraItem->Animation.Velocity.z < 40 &&
@@ -753,48 +778,50 @@ namespace TEN::Entities::Creatures::TR5
 				}
 
 				if (creature->Alerted)
-					item->Animation.TargetState = 18;
+					item->Animation.TargetState = GUARD_STATE_AWAKE_FROM_SLEEP;
 
 				break;
 
 			case GUARD_STATE_WAITING_ON_WALL:
-				joint2 = AIGuard(creature);
+				creature->MaxTurn = 0;
+				headY = AIGuard(creature);
 
 				if (creature->Alerted)
-					item->Animation.TargetState = GUARD_STATE_IDLE;
+					item->Animation.TargetState = GUARD_STATE_STOP;
 
 				break;
 
 			case GUARD_STATE_HUNT:
-			case GUARD_STATE_HUNT_IDLE:
-				creature->MaxTurn = ANGLE(5.0f);
+			case GUARD_STATE_HUNT_STOP:
+				creature->MaxTurn = GUARD_WALK_TURN_ANGLE_MAX;
 				creature->LOT.IsJumping = false;
 
-				if (item->Animation.ActiveState == GUARD_STATE_HUNT_IDLE)
+				if (item->Animation.ActiveState == GUARD_STATE_HUNT_STOP)
 				{
-					if (item->TriggerFlags != 8 || !los || item->HitStatus)
+					if (item->TriggerFlags != (short)GuardOcb::StartHuntStop || !los || item->HitStatus)
 						item->Animation.TargetState = GUARD_STATE_HUNT;
 				}
 
 				if (canJump1block || canJump2blocks || AI.distance < pow(SECTOR(1), 2) || !los || item->HitStatus)
-					item->Animation.TargetState = GUARD_STATE_IDLE;
+					item->Animation.TargetState = GUARD_STATE_STOP;
 
 				break;
 
 			case GUARD_STATE_INSERT_CODE:
+				creature->MaxTurn = 0;
 				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + 39)
 					TestTriggers(item, true);
 			
 				break;
 
-			case GUARD_STATE_START_USE_COMPUTER:
+			case GUARD_STATE_USE_KEYPAD:
+				creature->MaxTurn = 0;
 				currentItem = nullptr;
 
 				for (currentItemNumber = g_Level.Rooms[item->RoomNumber].itemNumber; currentItemNumber != NO_ITEM; currentItemNumber = currentItem->NextItem)
 				{
 					currentItem = &g_Level.Items[currentItemNumber];
-
-					if (item->ObjectNumber == ID_PUZZLE_HOLE8)
+					if (item->ObjectNumber == ID_PUZZLE_HOLE8) // TODO: avoid hardcoded object number ! - TokyoSU 24/12/2022
 						break;
 				}
 
@@ -830,48 +857,47 @@ namespace TEN::Entities::Creatures::TR5
 				break;
 
 			case GUARD_STATE_USE_COMPUTER:
+				creature->MaxTurn = 0;
 				if ((item->ObjectNumber != ID_SCIENTIST || item != Lara.TargetEntity) &&
-					(TestProbability(0.992f) || item->TriggerFlags >= 10 || item->TriggerFlags == 9))
+					(TestProbability(0.992f) || item->TriggerFlags >= (short)GuardOcb::Idle || item->TriggerFlags == (short)GuardOcb::UseComputerScientist))
 				{
 					if (item->AIBits & GUARD)
 					{
-						joint2 = AIGuard(creature);
+						headY = AIGuard(creature);
 
 						if (item->AIBits & PATROL1)
 						{
 							item->TriggerFlags--;
-							if (item->TriggerFlags < 1)
+							if (item->TriggerFlags <= (short)GuardOcb::None)
 								item->AIBits = PATROL1 | MODIFY;
 						}
 					}
 				}
 				else
-					item->Animation.TargetState = GUARD_STATE_IDLE;
+					item->Animation.TargetState = GUARD_STATE_STOP;
 			
 				break;
 
 			case GUARD_STATE_SURRENDER:
+				creature->MaxTurn = 0;
 				if (item != Lara.TargetEntity && TestProbability(1.0f / 64))
 				{
-					if (item->TriggerFlags == 7 || item->TriggerFlags == 9)
+					if (item->TriggerFlags == (short)GuardOcb::UseComputer || item->TriggerFlags == (short)GuardOcb::UseComputerScientist)
 						item->Animation.RequiredState = GUARD_STATE_USE_COMPUTER;
 
-					item->Animation.TargetState = GUARD_STATE_IDLE;
+					item->Animation.TargetState = GUARD_STATE_STOP;
 				}
 
 				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + 39)
 					TestTriggers(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, enemy->RoomNumber, true);
 
 				break;
-
-			default:
-				break;
 			}
 		}
 
-		CreatureJoint(item, 0, joint0);
-		CreatureJoint(item, 1, joint1);
-		CreatureJoint(item, 2, joint2);
+		CreatureJoint(item, 0, torsoX);
+		CreatureJoint(item, 1, torsoY);
+		CreatureJoint(item, 2, headY);
 
 		if (creature->ReachedGoal && creature->Enemy)
 		{
@@ -881,7 +907,7 @@ namespace TEN::Entities::Creatures::TR5
 			{
 				if (enemy->Flags & 0x10)
 				{
-					item->Animation.TargetState = GUARD_STATE_IDLE;
+					item->Animation.TargetState = GUARD_STATE_STOP;
 					item->Animation.RequiredState = GUARD_STATE_USE_COMPUTER;
 					item->TriggerFlags = 300;
 					item->AIBits = GUARD | PATROL1;
@@ -890,8 +916,8 @@ namespace TEN::Entities::Creatures::TR5
 				{
 					if (enemy->Flags & 0x20)
 					{
-						item->Animation.TargetState = GUARD_STATE_IDLE;
-						item->Animation.RequiredState = 36;
+						item->Animation.TargetState = GUARD_STATE_STOP;
+						item->Animation.RequiredState = GUARD_STATE_INSERT_CODE;
 						item->AIBits = PATROL1 | MODIFY;
 					}
 					else
@@ -904,7 +930,7 @@ namespace TEN::Entities::Creatures::TR5
 
 						if (creature->Enemy->Flags & 8)
 						{
-							item->Animation.RequiredState = GUARD_STATE_IDLE;
+							item->Animation.RequiredState = GUARD_STATE_STOP;
 							item->TriggerFlags = 300;
 							item->AIBits |= GUARD | PATROL1;
 						}
@@ -913,11 +939,11 @@ namespace TEN::Entities::Creatures::TR5
 			}
 			else
 			{
-				item->Animation.TargetState = GUARD_STATE_IDLE;
-				item->Animation.RequiredState = 37;
+				item->Animation.TargetState = GUARD_STATE_STOP;
+				item->Animation.RequiredState = GUARD_STATE_USE_KEYPAD;
 			}
 		}
-		if ((item->Animation.ActiveState >= 20 ||
+		if ((item->Animation.ActiveState >= GUARD_STATE_CLIMB_2CLICK ||
 			item->Animation.ActiveState == GUARD_STATE_DEATH_1 ||
 			item->Animation.ActiveState == GUARD_STATE_DEATH_2) &&
 			item->Animation.ActiveState != GUARD_STATE_HUNT)
@@ -926,48 +952,36 @@ namespace TEN::Entities::Creatures::TR5
 		}
 		else
 		{
-			switch (CreatureVault(itemNumber, angle, 2, 256) + 4)
+			switch (CreatureVault(itemNumber, angle, 2, 256))
 			{
-			case 0:
-				item->Animation.AnimNumber = animIndex + 38;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-				item->Animation.ActiveState = 23;
-				creature->MaxTurn = 0;
-				break;
-
-			case 1:
-				item->Animation.AnimNumber = animIndex + 39;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-				item->Animation.ActiveState = 24;
-				creature->MaxTurn = 0;
-				break;
-
 			case 2:
-				item->Animation.AnimNumber = animIndex + 40;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-				item->Animation.ActiveState = 25;
 				creature->MaxTurn = 0;
+				SetAnimation(item, ANIMATION_GUARD_CLIMB2CLICK);
 				break;
 
-			case 6:
-				item->Animation.AnimNumber = animIndex + 35;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-				item->Animation.ActiveState = 20;
+			case 3:
 				creature->MaxTurn = 0;
+				SetAnimation(item, ANIMATION_GUARD_CLIMB3CLICK);
 				break;
 
-			case 7:
-				item->Animation.AnimNumber = animIndex + 36;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-				item->Animation.ActiveState = 21;
+			case 4:
 				creature->MaxTurn = 0;
+				SetAnimation(item, ANIMATION_GUARD_CLIMB4CLICK);
 				break;
 
-			case 8:
-				item->Animation.AnimNumber = animIndex + 37;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-				item->Animation.ActiveState = 22;
+			case -2:
 				creature->MaxTurn = 0;
+				SetAnimation(item, ANIMATION_GUARD_FALL2CLICK);
+				break;
+
+			case -3:
+				creature->MaxTurn = 0;
+				SetAnimation(item, ANIMATION_GUARD_FALL3CLICK);
+				break;
+
+			case -4:
+				creature->MaxTurn = 0;
+				SetAnimation(item, ANIMATION_GUARD_FALL4CLICK);
 				break;
 			}
 		}
