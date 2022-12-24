@@ -1,8 +1,6 @@
 #pragma once
 #include "Math/Math.h"
 
-using std::vector;
-
 struct ItemInfo;
 
 struct BOX_NODE 
@@ -46,7 +44,7 @@ struct LOTInfo
 {
 	bool Initialised;
 
-	vector<BOX_NODE> Node = {};
+	std::vector<BOX_NODE> Node = {};
 	int Head;
 	int Tail;
 

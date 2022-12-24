@@ -7,7 +7,13 @@ Version 1.0.5
 * Fix discrepancies between statistics and save / load game time units.
 * Fix draw key incorrectly working in binoculars / lasersight mode.
 * Fix FLAME_EMITTER_3 not burning player.
+* Fix Tribeman with axe not attacking Lara.
+* Fix Tribeman with dart not shooting at Lara's direction.
+* Allow to freely rotate dart emitter in all directions.
+* Customize dart emitter damage with OCB. Negative number will additionally poison Lara.
+* Draw real mesh for darts.
 * Fix pathfinding problems for first initialized enemies of every slot.
+* Fix crash, water death and meshswap issues for TR5 cyborg.
 * Fix inverted water and fly zones.
 * Fix CROCODILE attack range and joint rotation speed.
 * Fix CIVVY, MP_WITH_STICK, and YETI vault bugs.
