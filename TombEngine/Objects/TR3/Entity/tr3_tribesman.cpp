@@ -22,12 +22,13 @@ using namespace TEN::Math;
 
 namespace TEN::Entities::Creatures::TR3
 {
+	constexpr auto TRIBESMAN_DART_DAMAGE = -25; // NOTE: Negative value gives poison.
+
 	const auto TribesmanAxeBite	  = BiteInfo(Vector3(0.0f, 56.0f, 265.0f), 13);
 	const auto TribesmanDartBite1 = BiteInfo(Vector3(0.0f, 0.0f, -200.0f), 13);
 	const auto TribesmanDartBite2 = BiteInfo(Vector3(8.0f, 40.0f, -248.0f), 13);
 	const auto TribesmanAxeAttackJoints  = std::vector<unsigned int>{ 13 };
 	const auto TribesmanDartAttackJoints = std::vector<unsigned int>{ 10, 13 }; // TODO: Check.
-	constexpr auto TRIBESMEN_DART_DAMAGE = -25;
 
 	const unsigned char TribesmanAxeHit[13][3] =
 	{
@@ -380,7 +381,7 @@ namespace TEN::Entities::Creatures::TR3
 
 		dartItem->Pose.Orientation = orient;
 		dartItem->Animation.Velocity.z = CLICK(1);
-		dartItem->TriggerFlags = TRIBESMEN_DART_DAMAGE;
+		dartItem->TriggerFlags = TRIBESMAN_DART_DAMAGE;
 		dartItem->Color = item->Color;
 
 		AddActiveItem(dartItemNumber);
