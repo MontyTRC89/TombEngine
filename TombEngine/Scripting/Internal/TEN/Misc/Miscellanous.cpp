@@ -112,7 +112,7 @@ namespace Misc
 	//@tparam float angle in degrees (clamped to [10, 170])
 	static void SetFOV(float angle)
 	{
-		AlterFOV(FROM_DEGREES(std::clamp(abs(angle), 10.0f, 170.0f)));
+		AlterFOV(ANGLE(std::clamp(abs(angle), 10.0f, 170.0f)));
 	}
 
 	//Get field of view.
@@ -239,8 +239,9 @@ namespace Misc
 	//@treturn int the direct distance from one position to the other
 	static int CalculateDistance(Vec3 const& pos1, Vec3 const& pos2)
 	{
-		auto result = sqrt(SQUARE(pos1.x - pos2.x) + SQUARE(pos1.y - pos2.y) + SQUARE(pos1.z - pos2.z));
-		return static_cast<int>(round(result));
+		auto p1 = Vector3{ (float)pos1.x, (float)pos1.y, (float)pos1.z };
+		auto p2 = Vector3{ (float)pos2.x, (float)pos2.y, (float)pos2.z };
+		return static_cast<int>(round(Vector3::Distance(p1, p2)));
 	}
 
 	///Calculate the horizontal distance between two positions.
@@ -250,8 +251,9 @@ namespace Misc
 	//@treturn int the direct distance on the XZ plane from one position to the other
 	static int CalculateHorizontalDistance(Vec3 const& pos1, Vec3 const& pos2)
 	{
-		auto result = sqrt(SQUARE(pos1.x - pos2.x) + SQUARE(pos1.z - pos2.z));
-		return static_cast<int>(round(result));
+		auto p1 = Vector2{ (float)pos1.x, (float)pos1.z };
+		auto p2 = Vector2{ (float)pos2.x, (float)pos2.z };
+		return static_cast<int>(round(Vector2::Distance(p1, p2)));
 	}
 
 	///Translate a pair of percentages to screen-space pixel coordinates.
@@ -332,22 +334,22 @@ namespace Misc
 
 		/// Check if particular action key is held
 		//@function KeyIsHeld
-		//@tparam ActionID action action mapping index to check
+		//@tparam Misc.ActionID action action mapping index to check
 		table_misc.set_function(ScriptReserved_KeyIsHeld, &KeyIsHeld);
 
 		/// Check if particular action key was hit (once)
 		//@function KeyIsHit
-		//@tparam ActionID action action mapping index to check
+		//@tparam Misc.ActionID action action mapping index to check
 		table_misc.set_function(ScriptReserved_KeyIsHit, &KeyIsHit);
 
 		/// Emulate pushing of a certain action key
 		//@function KeyPush
-		//@tparam ActionID action action mapping index to push
+		//@tparam Misc.ActionID action action mapping index to push
 		table_misc.set_function(ScriptReserved_KeyPush, &KeyPush);
 
 		/// Clears particular input from action key
 		//@function KeyClear
-		//@tparam ActionID action action mapping index to clear
+		//@tparam Misc.ActionID action action mapping index to clear
 		table_misc.set_function(ScriptReserved_KeyClear, &KeyClear);
 
 		table_misc.set_function(ScriptReserved_CalculateDistance, &CalculateDistance);

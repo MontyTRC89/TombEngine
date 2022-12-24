@@ -2,12 +2,15 @@
 
 class Pose;
 struct ItemInfo;
+struct ObjectInfo;
 
 namespace TEN::Entities::TR4
 {
-	void InitialiseSetha(short itemNumber);
-	void SethaControl(short itemNumber);
-	void SethaThrowAttack(Pose* pose, short roomNumber, int flags);
-	void SethaKill(ItemInfo* sethItem, ItemInfo* laraItem);
-	void SethaAttack(int itemNumber);
+	void SetupSeth(ObjectInfo& object);
+	void InitialiseSeth(short itemNumber);
+	void SethControl(short itemNumber);
+
+	void SethProjectileAttack(const Pose& pose, int roomNumber, int flags);
+	void SethAttack(int itemNumber);
+	void SethKillAttack(ItemInfo* item, ItemInfo* laraItem);
 }

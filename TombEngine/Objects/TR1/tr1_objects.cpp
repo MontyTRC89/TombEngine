@@ -183,7 +183,7 @@ static void StartTrap(ObjectInfo* obj)
 {
 	obj = &Objects[ID_DAMOCLES_SWORD];
 	if (obj->loaded)
-		SetupDamoclesSword(obj);
+		SetupDamoclesSword(*obj);
 }
 
 static void StartProjectiles(ObjectInfo* obj)

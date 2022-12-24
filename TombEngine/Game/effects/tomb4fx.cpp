@@ -27,6 +27,7 @@ using namespace TEN::Effects::Bubble;
 using namespace TEN::Effects::Drip;
 using namespace TEN::Effects::Environment;
 using namespace TEN::Effects::Ripple;
+using namespace TEN::Effects::Smoke;
 using namespace TEN::Floordata;
 using namespace TEN::Math;
 using std::vector;
@@ -628,96 +629,7 @@ byte TriggerGunSmoke_SubFunction(LaraWeaponType weaponType)
 
 void TriggerGunSmoke(int x, int y, int z, short xv, short yv, short zv, byte initial, LaraWeaponType weaponType, byte count)
 {
-	/*
-	SMOKE_SPARKS* spark;
-
-	spark = &SmokeSparks[GetFreeSmokeSpark()];
-	spark->on = true;
-	spark->sShade = 0;
-	spark->dShade = (count << 2);
-	spark->colFadeSpeed = 4;
-	spark->fadeToBlack = 32 - (initial << 4);
-	spark->life = (GetRandomControl() & 3) + 40;
-	spark->sLife = spark->life;
-
-	if (weaponType == LaraWeaponType::Pistol || weaponType == LaraWeaponType::Revolver || weaponType == LaraWeaponType::Uzi)
-	{
-		if (spark->dShade > 64)
-			spark->dShade = 64;
-	}
-
-	spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
-	spark->x = x + (GetRandomControl() & 31) - 16;
-	spark->y = y + (GetRandomControl() & 31) - 16;
-	spark->z = z + (GetRandomControl() & 31) - 16;
-
-	if (initial)
-	{
-		spark->xVel = ((GetRandomControl() & 1023) - 512) + xv;
-		spark->yVel = ((GetRandomControl() & 1023) - 512) + yv;
-		spark->zVel = ((GetRandomControl() & 1023) - 512) + zv;
-	}
-	else
-	{
-		float f = (frand() * 6) - 3;
-		spark->xVel = (frand() * 6) - 3;
-		spark->yVel = (frand() * 6) - 3;
-		spark->zVel = (frand() * 6) - 3;
-	}
-
-	spark->friction = 4;
-
-	if (GetRandomControl() & 1)
-	{
-		if (g_Level.Rooms[LaraItem->roomNumber].flags & ENV_FLAG_WIND)
-			spark->flags = SP_ROTATE | SP_WIND;
-		else
-			spark->flags = SP_ROTATE;
-
-		spark->rotAng = GetRandomControl() & 0xFFF;
-
-		if (GetRandomControl() & 1)
-			spark->rotAdd = -(GetRandomControl() & 0x0F) - 16;
-		else
-			spark->rotAdd = (GetRandomControl() & 0x0F) + 16;
-	}
-	else if (g_Level.Rooms[LaraItem->roomNumber].flags & ENV_FLAG_WIND)
-	{
-		spark->flags = SP_WIND;
-	}
-	else
-	{
-		spark->flags = SP_NONE;
-	}
-	float gravity = frand() * 1.25f;
-	spark->gravity = gravity;
-	spark->maxYvel = frand() * 16;
-
-	byte size = ((GetRandomControl() & 0x0F) + 24); // -TriggerGunSmoke_SubFunction(weaponType);
-
-	if (initial)
-	{
-		spark->sSize = size >> 1;
-		spark->size = size >> 1;
-		spark->dSize = (size << 1) + 8;
-	}
-	else
-	{
-		spark->sSize = size >> 2;
-		spark->size = size >> 2;
-		spark->dSize = size;
-	}
-
-	/*if (gfLevelFlags & 0x20 && LaraItem->roomNumber == gfMirrorRoom) // 0x20 = GF_MIRROR_ENABLED
-	{
-		spark->mirror = 1;
-	}
-	else
-	{
-		spark->mirror = 0;
-	}*/
-	TEN::Effects::Smoke::TriggerGunSmokeParticles(x, y, z, xv, yv, zv, initial, weaponType, count);
-
+	TriggerGunSmokeParticles(x, y, z, xv, yv, zv, initial, weaponType, count);
 }
 
 void TriggerShatterSmoke(int x, int y, int z)

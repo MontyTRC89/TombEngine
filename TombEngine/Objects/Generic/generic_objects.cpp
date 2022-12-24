@@ -360,7 +360,6 @@ void StartTraps()
 		//object->drawRoutine = DrawDart;
 		object->collision = ObjectCollision;
 		object->control = DartControl;
-		object->usingDrawAnimatingItem = false;
 	}
 
 	object = &Objects[ID_DART_EMITTER];

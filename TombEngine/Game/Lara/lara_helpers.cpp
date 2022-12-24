@@ -78,6 +78,7 @@ void HandleLaraMovementParameters(ItemInfo* item, CollisionInfo* coll)
 		lara->Control.TurnRate = 0;
 
 	lara->Control.IsLow = false;
+	lara->Control.IsMonkeySwinging = false;
 }
 
 bool HandleLaraVehicle(ItemInfo* item, CollisionInfo* coll)

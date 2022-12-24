@@ -33,8 +33,8 @@ public:
 	GAME_OBJECT_ID GetObjectID() const;
 	void SetObjectID(GAME_OBJECT_ID);
 
-	short GetYRot() const;
-	void SetYRot(short);
+	float GetYRot() const;
+	void SetYRot(float);
 
 private:
 	AI_OBJECT & m_aiObject;

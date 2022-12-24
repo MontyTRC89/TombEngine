@@ -64,7 +64,7 @@ namespace TEN::Effects::Spark
 		v += Vector3(GenerateFloat(-64, 64), GenerateFloat(-64, 64), GenerateFloat(-64, 64));
 		v.Normalize(v);
 		s.velocity = v *GenerateFloat(17,24);
-		s.sourceColor = Vector4(1, 1, 1, 1);
+		s.sourceColor = Vector4::One;
 		s.destinationColor = Vector4(color.r / 255.0f, color.g / 255.0f, color.b / 255.0f, 1.0f);
 		s.active = true;
 	}
@@ -174,5 +174,40 @@ namespace TEN::Effects::Spark
 		spark.maxYvel = 0;
 		spark.gravity = 0;
 		spark.flags = SP_NONE;
+	}
+
+	void SpawnCyborgSpark(const Vector3& pos)
+	{
+		auto& spark = *GetFreeParticle();
+		
+		int velSign = -1;
+		int randomInt = Random::GenerateInt();
+
+		spark.sR = -1;
+		spark.sG = -1;
+		spark.sB = -1;
+		spark.dR = -1;
+		spark.dG = (randomInt & 167) + 64;
+		spark.dB = 192 - spark.dG;
+		spark.on = 1;
+		spark.colFadeSpeed = 3;
+		spark.fadeToBlack = 5;
+		spark.life = 10;
+		spark.sLife = 10;
+		spark.blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+		spark.friction = 34;
+		spark.scalar = 2;
+		spark.x = (randomInt & 7) + pos.x - 3;
+		spark.y = ((randomInt >> 3) & 7) + pos.y - 3;
+		spark.z = ((randomInt >> 6) & 7) + pos.z - 3;
+		spark.xVel = (int)(((randomInt >> 2) & 0xFF) + velSign - 128);
+		spark.yVel = (int)(((randomInt >> 4) & 0xFF) + velSign - 128);
+		spark.zVel = (int)(((randomInt >> 6) & 0xFF) + velSign - 128);
+		spark.flags = SP_SCALE;
+		spark.size = ((randomInt >> 9) & 3) + 4;
+		spark.sSize = ((randomInt >> 9) & 3) + 4;
+		spark.dSize = ((randomInt >> 12) & 1) + 1;
+		spark.maxYvel = 0;
+		spark.gravity = 0;
 	}
 }
