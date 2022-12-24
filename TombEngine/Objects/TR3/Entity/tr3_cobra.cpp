@@ -21,7 +21,7 @@ namespace TEN::Entities::Creatures::TR3
 	constexpr auto COBRA_AWARE_RANGE  = SQUARE(BLOCK(1.5f));
 	constexpr auto COBRA_SLEEP_RANGE  = SQUARE(BLOCK(2.5f));
 
-	constexpr auto COBRA_DISTURBANCE_VELOCITY = 15;
+	constexpr auto COBRA_DISTURBANCE_VELOCITY = 15.0f;
 	constexpr auto COBRA_SLEEP_FRAME = 45;
 
 	const auto CobraBite = BiteInfo(Vector3::Zero, 13);

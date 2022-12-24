@@ -7,7 +7,6 @@
 #include <OISJoyStick.h>
 #include <OISKeyboard.h>
 
-#include "Game/camera.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"

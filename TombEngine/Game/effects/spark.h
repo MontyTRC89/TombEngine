@@ -30,4 +30,5 @@ namespace TEN::Effects::Spark
 	void TriggerFrictionSpark(const GameVector& pos, const EulerAngles& angle, float length, int count);
 	void TriggerElectricSpark(const GameVector& pos, const EulerAngles& angle, int count);
 	void TriggerAttackSpark(const Vector3& basePos, const Vector3& color);
+	void SpawnCyborgSpark(const Vector3& pos);
 }

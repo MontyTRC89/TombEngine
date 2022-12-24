@@ -111,19 +111,19 @@ void AIObject::SetObjectID(GAME_OBJECT_ID objNum)
 	m_aiObject.objectNumber = objNum;
 }
 
-short AIObject::GetYRot() const
+float AIObject::GetYRot() const
 {
-	return m_aiObject.pos.Orientation.y;
+	return TO_DEGREES(m_aiObject.pos.Orientation.y);
 }
 
-void AIObject::SetYRot(short yRot)
+void AIObject::SetYRot(float yRot)
 {
-	m_aiObject.pos.Orientation.y = yRot;
+	m_aiObject.pos.Orientation.y = ANGLE(yRot);
 }
 
 std::string AIObject::GetName() const
 {
-	return m_aiObject.luaName;
+	return m_aiObject.Name;
 }
 
 void AIObject::SetName(std::string const & id) 
@@ -136,8 +136,8 @@ void AIObject::SetName(std::string const & id)
 	if (s_callbackSetName(id, m_aiObject))
 	{
 		// remove the old name if we have one
-		s_callbackRemoveName(m_aiObject.luaName);
-		m_aiObject.luaName = id;
+		s_callbackRemoveName(m_aiObject.Name);
+		m_aiObject.Name = id;
 	}
 	else
 	{

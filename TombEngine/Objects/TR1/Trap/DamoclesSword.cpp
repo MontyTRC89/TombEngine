@@ -30,7 +30,7 @@ namespace TEN::Entities::Traps::TR1
 		object.initialise = InitialiseDamoclesSword;
 		object.control = ControlDamoclesSword;
 		object.collision = CollideDamoclesSword;
-		//object->shadowSize = UNIT_SHADOW;
+		object.shadowType = ShadowMode::All;
 	}
 
 	void InitialiseDamoclesSword(short itemNumber)

@@ -43,10 +43,6 @@ extern "C"
 	__declspec(dllexport) int AmdPowerXpressRequestHighPerformance = 1;
 }
 
-#if _DEBUG
-string commit;
-#endif
-
 bool ArgEquals(wchar_t* incomingArg, std::string name)
 {
 	auto lowerArg = TEN::Utils::ToLower(TEN::Utils::FromWchar(incomingArg));
