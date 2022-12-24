@@ -697,19 +697,19 @@ namespace TEN::Entities::Generic
 		switch (quadrant)
 		{
 		case NORTH:
-			offset = Vector3(0, 0, -BLOCK(1));
+			offset = Vector3i(0, 0, -BLOCK(1));
 			break;
 
 		case EAST:
-			offset = Vector3(-BLOCK(1), 0, 0);
+			offset = Vector3i(-BLOCK(1), 0, 0);
 			break;
 
 		case SOUTH:
-			offset = Vector3(0, 0, BLOCK(1));
+			offset = Vector3i(0, 0, BLOCK(1));
 			break;
 
 		case WEST:
-			offset = Vector3(BLOCK(1), 0, 0);
+			offset = Vector3i(BLOCK(1), 0, 0);
 			break;
 		}
 
