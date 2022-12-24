@@ -51,7 +51,6 @@ void DrawBox(int boxIndex, Vector3 color)
 	auto  y = currBox.height - CLICK(1);
 	float z = ((float)currBox.top + (float)(currBox.bottom - currBox.top) / 2.0f) * 1024.0f;
 
-
 	auto center = Vector3(z, y, x);
 	auto corner = Vector3(currBox.bottom * SECTOR(1), currBox.height + CLICK(1), currBox.right * SECTOR(1));
 	auto extents = (corner - center) * 0.9f;
@@ -1293,8 +1292,7 @@ void GetAITarget(CreatureInfo* creature)
 			abs(enemy->Pose.Position.y - item->Pose.Position.y) < REACHED_GOAL_RADIUS &&
 			abs(enemy->Pose.Position.z - item->Pose.Position.z) < REACHED_GOAL_RADIUS)
 		{
-			TestTriggers(enemy, true);
-
+			TestTriggers(enemy, true);		
 			creature->ReachedGoal = true;
 			creature->Enemy = LaraItem;
 			item->AIBits &= ~(AMBUSH /* | MODIFY*/);

@@ -46,7 +46,7 @@ struct MESH_INFO
 	short flags;
 	Vector4 color;
 	short HitPoints;
-	std::string luaName;
+	std::string Name;
 };
 
 struct LIGHTINFO

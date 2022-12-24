@@ -24,6 +24,7 @@
 #include "Objects/Generic/Object/objects.h"
 #include "Objects/Generic/Switches/generic_switch.h"
 #include "Sound/sound.h"
+#include "Specific/clock.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
@@ -1568,7 +1569,7 @@ void HandleProjectile(ItemInfo& item, ItemInfo& emitter, const Vector3i& prevPos
 				if (isExplosive)
 				{
 					doExplosion = isExplosive;
-					if (type != ProjectileType::FlashGrenade)
+					if (type != ProjectileType::FlashGrenade && !currentObject.undead)
 						DoExplosiveDamage(emitter, *currentItem, item, damage);
 				}
 				else if (type == ProjectileType::Poison)
@@ -1579,7 +1580,7 @@ void HandleProjectile(ItemInfo& item, ItemInfo& emitter, const Vector3i& prevPos
 					if (currentItem->IsLara())
 						GetLaraInfo(currentItem)->PoisonPotency += 5;
 				}
-				else
+				else if (!currentObject.undead)
 				{
 					DoDamage(currentItem, damage);
 				}

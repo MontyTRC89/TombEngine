@@ -11,6 +11,7 @@
 #include "Objects/ScriptInterfaceObjectsHandler.h"
 #include "Scripting/Include/ScriptInterfaceGame.h"
 #include "Sound/sound.h"
+#include "Specific/clock.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
@@ -76,12 +77,12 @@ bool ItemInfo::TestMeshSwapFlags(const std::vector<unsigned int>& flags)
 
 void ItemInfo::SetMeshSwapFlags(unsigned int flags, bool clear)
 {
-	bool meshSwapPresent = Objects[ObjectNumber].meshSwapSlot != -1 && 
-						   Objects[Objects[ObjectNumber].meshSwapSlot].loaded;
+	bool isMeshSwapPresent = Objects[ObjectNumber].meshSwapSlot != -1 && 
+							 Objects[Objects[ObjectNumber].meshSwapSlot].loaded;
 
 	for (size_t i = 0; i < Model.MeshIndex.size(); i++)
 	{
-		if (meshSwapPresent && (flags & (1 << i)))
+		if (isMeshSwapPresent && (flags & (1 << i)))
 		{
 			if (clear)
 				Model.MeshIndex[i] = Model.BaseMesh + i;
@@ -89,7 +90,9 @@ void ItemInfo::SetMeshSwapFlags(unsigned int flags, bool clear)
 				Model.MeshIndex[i] = Objects[Objects[ObjectNumber].meshSwapSlot].meshIndex + i;
 		}
 		else
+		{
 			Model.MeshIndex[i] = Model.BaseMesh + i;
+		}
 	}
 }
 

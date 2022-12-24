@@ -29,7 +29,8 @@ span.types:before { content:"("; }
 span.types:after { content:")"; }
 .type { font-weight: bold; font-style:italic }
 
-body, p, td, th { font-size: .95em; line-height: 1.2em;}
+body, td, th { font-size: .95em; line-height: 1.2em;}
+p { line-height: 1.2em;}
 
 p, ul { margin: 10px 0 0 0px;}
 

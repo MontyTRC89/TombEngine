@@ -56,6 +56,7 @@
   <li>    <a href="../2 classes/Objects.Sink.html">Objects.Sink</a></li>
   <li>    <a href="../2 classes/Objects.SoundSource.html">Objects.SoundSource</a></li>
   <li>    <a href="../2 classes/Objects.Static.html">Objects.Static</a></li>
+  <li>    <a href="../2 classes/Objects.Volume.html">Objects.Volume</a></li>
   <li>    <a href="../2 classes/Strings.DisplayString.html">Strings.DisplayString</a></li>
 </ul>
 <h2>3 Primitive Classes</h2>
@@ -275,7 +276,7 @@ associated getters and setters.</td>
 	<td class="summary">Determine whether the moveable is active or not</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#Moveable:GetJointPosition">Moveable:GetJointPosition()</a></td>
+	<td class="name" ><a href="#Moveable:GetJointPosition">Moveable:GetJointPosition(index)</a></td>
 	<td class="summary">Get the object's joint position</td>
 	</tr>
 	<tr>
@@ -363,7 +364,7 @@ most can just be ignored (see usage).
     <h3>Parameters:</h3>
     <ul>
         <li><span class="parameter">object</span>
-            <span class="types"><span class="type">ObjID</span></span>
+            <span class="types"><a class="type" href="../4 enums/Objects.ObjID.html#">ObjID</a></span>
          ID
         </li>
         <li><span class="parameter">name</span>
@@ -371,11 +372,11 @@ most can just be ignored (see usage).
          Lua name of the item
         </li>
         <li><span class="parameter">position</span>
-            <span class="types"><span class="type">Vec3</span></span>
+            <span class="types"><a class="type" href="../3 primitive classes/Vec3.html#">Vec3</a></span>
          position in level
         </li>
         <li><span class="parameter">rotation</span>
-            <span class="types"><span class="type">Rotation</span></span>
+            <span class="types"><a class="type" href="../3 primitive classes/Rotation.html#">Rotation</a></span>
          rotation about x, y, and z axes (default Rotation(0, 0, 0))
          (<em>optional</em>)
         </li>
@@ -517,7 +518,7 @@ most can just be ignored (see usage).
     <h3>Parameters:</h3>
     <ul>
         <li><span class="parameter">effect</span>
-            <span class="types"><span class="type">EffectID</span></span>
+            <span class="types"><a class="type" href="../4 enums/Effects.EffectID.html#">EffectID</a></span>
          Type of effect to assign.
         </li>
         <li><span class="parameter">timeout</span>
@@ -543,11 +544,11 @@ most can just be ignored (see usage).
     <h3>Parameters:</h3>
     <ul>
         <li><span class="parameter">Color1</span>
-            <span class="types"><span class="type">Color</span></span>
+            <span class="types"><a class="type" href="../3 primitive classes/Color.html#">Color</a></span>
          color the primary color of the effect (also used for lighting).
         </li>
         <li><span class="parameter">Color2</span>
-            <span class="types"><span class="type">Color</span></span>
+            <span class="types"><a class="type" href="../3 primitive classes/Color.html#">Color</a></span>
          color the secondary color of the effect.
         </li>
         <li><span class="parameter">timeout</span>
@@ -574,7 +575,7 @@ most can just be ignored (see usage).
     <h3>Returns:</h3>
     <ol>
 
-           <span class="types"><span class="type">EffectID</span></span>
+           <span class="types"><a class="type" href="../4 enums/Effects.EffectID.html#">EffectID</a></span>
         effect type currently assigned to moveable.
     </ol>
 
@@ -880,7 +881,7 @@ shiva:SetObjectID(TEN.Objects.ObjID.BIGMEDI_ITEM)</pre>
     <h3>Parameters:</h3>
     <ul>
         <li><span class="parameter">velocity</span>
-            <span class="types"><span class="type">Vec3</span></span>
+            <span class="types"><a class="type" href="../3 primitive classes/Vec3.html#">Vec3</a></span>
          velocity represented as vector
         </li>
     </ul>
@@ -905,7 +906,7 @@ shiva:SetObjectID(TEN.Objects.ObjID.BIGMEDI_ITEM)</pre>
     <h3>Returns:</h3>
     <ol>
 
-           <span class="types"><span class="type">Vec3</span></span>
+           <span class="types"><a class="type" href="../3 primitive classes/Vec3.html#">Vec3</a></span>
         current object velocity
     </ol>
 
@@ -1060,7 +1061,7 @@ shiva:SetObjectID(TEN.Objects.ObjID.BIGMEDI_ITEM)</pre>
     <h3>Returns:</h3>
     <ol>
 
-           <span class="types"><span class="type">Color</span></span>
+           <span class="types"><a class="type" href="../3 primitive classes/Color.html#">Color</a></span>
         a copy of the moveable's color
     </ol>
 
@@ -1080,7 +1081,7 @@ shiva:SetObjectID(TEN.Objects.ObjID.BIGMEDI_ITEM)</pre>
     <h3>Parameters:</h3>
     <ul>
         <li><span class="parameter">color</span>
-            <span class="types"><span class="type">Color</span></span>
+            <span class="types"><a class="type" href="../3 primitive classes/Color.html#">Color</a></span>
          the new color of the moveable
         </li>
     </ul>
@@ -1377,18 +1378,25 @@ sas:SetAIBits({<span class="number">1</span>, <span class="number">0</span>, <sp
 </dd>
     <dt>
     <a name = "Moveable:GetJointPosition"></a>
-    <strong>Moveable:GetJointPosition()</strong>
+    <strong>Moveable:GetJointPosition(index)</strong>
     </dt>
     <dd>
     Get the object's joint position
 
 
 
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">index</span>
+            <span class="types"><span class="type">int</span></span>
+         of a joint to get position
+        </li>
+    </ul>
 
     <h3>Returns:</h3>
     <ol>
 
-           <span class="types"><span class="type">Vec3</span></span>
+           <span class="types"><a class="type" href="../3 primitive classes/Vec3.html#">Vec3</a></span>
         a copy of the moveable's position
     </ol>
 
@@ -1409,7 +1417,7 @@ sas:SetAIBits({<span class="number">1</span>, <span class="number">0</span>, <sp
     <h3>Returns:</h3>
     <ol>
 
-           <span class="types"><span class="type">Rotation</span></span>
+           <span class="types"><a class="type" href="../3 primitive classes/Rotation.html#">Rotation</a></span>
         a copy of the moveable's rotation
     </ol>
 
@@ -1429,7 +1437,7 @@ sas:SetAIBits({<span class="number">1</span>, <span class="number">0</span>, <sp
     <h3>Parameters:</h3>
     <ul>
         <li><span class="parameter">rotation</span>
-            <span class="types"><span class="type">Rotation</span></span>
+            <span class="types"><a class="type" href="../3 primitive classes/Rotation.html#">Rotation</a></span>
          The moveable's new rotation
         </li>
     </ul>
@@ -1505,8 +1513,8 @@ sas:SetAIBits({<span class="number">1</span>, <span class="number">0</span>, <sp
     <h3>Returns:</h3>
     <ol>
 
-           <span class="types"><span class="type">valid</span></span>
-        bool true if the object is still not destroyed
+           <span class="types"><span class="type">bool</span></span>
+        valid true if the object is still not destroyed
     </ol>
 
 
@@ -1562,7 +1570,7 @@ sas:SetAIBits({<span class="number">1</span>, <span class="number">0</span>, <sp
     <h3>Parameters:</h3>
     <ul>
         <li><span class="parameter">ObjectID</span>
-            <span class="types"><span class="type">ObjID</span></span>
+            <span class="types"><a class="type" href="../4 enums/Objects.ObjID.html#">ObjID</a></span>
          to take animation and stateID from,
         </li>
         <li><span class="parameter">animNumber</span>
@@ -1593,7 +1601,7 @@ sas:SetAIBits({<span class="number">1</span>, <span class="number">0</span>, <sp
     <h3>Returns:</h3>
     <ol>
 
-           <span class="types"><span class="type">Vec3</span></span>
+           <span class="types"><a class="type" href="../3 primitive classes/Vec3.html#">Vec3</a></span>
         a copy of the moveable's position
     </ol>
 
@@ -1616,7 +1624,7 @@ sas:SetAIBits({<span class="number">1</span>, <span class="number">0</span>, <sp
     <h3>Parameters:</h3>
     <ul>
         <li><span class="parameter">position</span>
-            <span class="types"><span class="type">Vec3</span></span>
+            <span class="types"><a class="type" href="../3 primitive classes/Vec3.html#">Vec3</a></span>
          the new position of the moveable
         </li>
         <li><span class="parameter">updateRoom</span>
@@ -1732,7 +1740,7 @@ sas:SetPosition(destinationPosition, <span class="keyword">false</span>)</pre>
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
-<i style="float:right;">Last updated 2022-12-09 22:06:20 </i>
+<i style="float:right;">Last updated 2022-12-16 18:35:53 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>

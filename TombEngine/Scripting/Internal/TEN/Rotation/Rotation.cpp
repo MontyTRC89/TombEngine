@@ -1,65 +1,72 @@
 #include "framework.h"
-#include "Rotation.h"
+#include "Scripting/Internal/TEN/Rotation/Rotation.h"
 
 #include "Math/Math.h"
-#include "ReservedScriptNames.h"
+#include "Scripting/Internal/ReservedScriptNames.h"
 
 /*** Represents a rotation.
 Rotations are specifed as a combination of individual
 angles, in degrees, about each axis.
-All values will be clamped to [-32768, 32767].
+All values will be clamped to [0.0f, 360.0f].
 @tenprimitive Rotation
 @pragma nostrip
 */
 
-void Rotation::Register(sol::table & parent)
+void Rotation::Register(sol::table& parent)
 {
-	using ctors = sol::constructors<Rotation(int, int, int)>;
+	using ctors = sol::constructors<Rotation(float, float, float)>;
 	parent.new_usertype<Rotation>(ScriptReserved_Rotation,
 		ctors(),
 		sol::call_constructor, ctors(),
 		sol::meta_function::to_string, &Rotation::ToString,
 
-/// (int) rotation about x axis
+/// (float) rotation about x axis
 //@mem x
 		"x", &Rotation::x,
 
-/// (int) rotation about y axis
+/// (float) rotation about y axis
 //@mem y
 		"y", &Rotation::y,
 
-/// (int) rotation about z axis
+/// (float) rotation about z axis
 //@mem z
 		"z", &Rotation::z
 	);
 }
 
 /*** 
-@int X rotation about x axis
-@int Y rotation about y axis
-@int Z rotation about z axis
+@tparam float X rotation about x axis
+@tparam float Y rotation about y axis
+@tparam float Z rotation about z axis
 @treturn Rotation A Rotation object.
 @function Rotation
 */
-Rotation::Rotation(int aX, int aY, int aZ)
+Rotation::Rotation(float aX, float aY, float aZ)
 {
 	x = aX;
 	y = aY;
 	z = aZ;
 }
 
-void Rotation::StoreInPHDPos(Pose& pos) const
+Rotation::Rotation(const EulerAngles& eulers)
 {
-	pos.Orientation.x = x;
-	pos.Orientation.y = y;
-	pos.Orientation.z = z;
+	x = TO_DEGREES(eulers.x);
+	y = TO_DEGREES(eulers.y);
+	z = TO_DEGREES(eulers.z);
 }
 
-Rotation::Rotation(Pose const & pos)
+Rotation::Rotation(const Pose& pose)
 {
-	x = pos.Orientation.x;
-	y = pos.Orientation.y;
-	z = pos.Orientation.z;
+	x = TO_DEGREES(pose.Orientation.x);
+	y = TO_DEGREES(pose.Orientation.y);
+	z = TO_DEGREES(pose.Orientation.z);
+}
+
+void Rotation::StoreInPHDPos(Pose& pose) const
+{
+	pose.Orientation.x = ANGLE(x);
+	pose.Orientation.y = ANGLE(y);
+	pose.Orientation.z = ANGLE(z);
 }
 
 /***
@@ -69,6 +76,5 @@ Rotation::Rotation(Pose const & pos)
 */
 std::string Rotation::ToString() const
 {
-	return "{" + std::to_string(x) + ", " + std::to_string(y) + ", " + std::to_string(z) + "}";
+	return ("{" + std::to_string(x) + ", " + std::to_string(y) + ", " + std::to_string(z) + "}");
 }
-

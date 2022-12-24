@@ -12,6 +12,7 @@
 #include "Game/Lara/lara_tests.h"
 #include "Math/Math.h"
 #include "Sound/sound.h"
+#include "Specific/clock.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
 

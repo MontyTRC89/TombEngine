@@ -56,6 +56,7 @@
   <li>    <a href="../2 classes/Objects.Sink.html">Objects.Sink</a></li>
   <li>    <a href="../2 classes/Objects.SoundSource.html">Objects.SoundSource</a></li>
   <li>    <a href="../2 classes/Objects.Static.html">Objects.Static</a></li>
+  <li>    <a href="../2 classes/Objects.Volume.html">Objects.Volume</a></li>
   <li>    <a href="../2 classes/Strings.DisplayString.html">Strings.DisplayString</a></li>
 </ul>
 <h2>3 Primitive Classes</h2>
@@ -107,14 +108,6 @@
 	<td class="summary">Get air value of Lara</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#LaraObject:SetSprintEnergy">LaraObject:SetSprintEnergy(sprint)</a></td>
-	<td class="summary">Set sprint energy value of Lara</td>
-	</tr>
-	<tr>
-	<td class="name" ><a href="#LaraObject:GetSprintEnergy">LaraObject:GetSprintEnergy()</a></td>
-	<td class="summary">Get sprint energy value of Lara</td>
-	</tr>
-	<tr>
 	<td class="name" ><a href="#LaraObject:SetWet">LaraObject:SetWet(Wetness)</a></td>
 	<td class="summary">Set wetness value of Lara (causes dripping)</td>
 	</tr>
@@ -123,16 +116,12 @@
 	<td class="summary">Get wetness value of Lara</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#LaraObject:GetAmmoCount">LaraObject:GetAmmoCount()</a></td>
-	<td class="summary">Get current weapon's ammo count</td>
+	<td class="name" ><a href="#LaraObject:SetSprintEnergy">LaraObject:SetSprintEnergy(sprint)</a></td>
+	<td class="summary">Set sprint energy value of Lara</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#LaraObject:GetVehicle">LaraObject:GetVehicle()</a></td>
-	<td class="summary">Get current vehicle, if it exists</td>
-	</tr>
-	<tr>
-	<td class="name" ><a href="#LaraObject:GetTarget">LaraObject:GetTarget()</a></td>
-	<td class="summary">Get current target enemy, if it exists</td>
+	<td class="name" ><a href="#LaraObject:GetSprintEnergy">LaraObject:GetSprintEnergy()</a></td>
+	<td class="summary">Get sprint energy value of Lara</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#LaraObject:UndrawWeapon">LaraObject:UndrawWeapon()</a></td>
@@ -153,6 +142,22 @@
 	<tr>
 	<td class="name" ><a href="#LaraObject:SetWeaponType">LaraObject:SetWeaponType(weaponType, activate)</a></td>
 	<td class="summary">Set Lara weapon type</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#LaraObject:GetAmmoCount">LaraObject:GetAmmoCount()</a></td>
+	<td class="summary">Get current weapon's ammo count</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#LaraObject:GetVehicle">LaraObject:GetVehicle()</a></td>
+	<td class="summary">Get current vehicle, if it exists</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#LaraObject:GetTarget">LaraObject:GetTarget()</a></td>
+	<td class="summary">Get current target enemy, if it exists</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#LaraObject:TorchIsLit">LaraObject:TorchIsLit()</a></td>
+	<td class="summary">Get current light state of the torch, if it exists</td>
 	</tr>
 </table>
 
@@ -267,57 +272,6 @@
 
 </dd>
     <dt>
-    <a name = "LaraObject:SetSprintEnergy"></a>
-    <strong>LaraObject:SetSprintEnergy(sprint)</strong>
-    </dt>
-    <dd>
-    Set sprint energy value of Lara
-
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">sprint</span>
-            <span class="types"><span class="type">int</span></span>
-         energy to give to Lara; maximum value is 120.
-        </li>
-    </ul>
-
-
-
-
-    <h3>Usage:</h3>
-    <ul>
-        <pre class="example">Lara:SetSprintEnergy(<span class="number">120</span>)</pre>
-    </ul>
-
-</dd>
-    <dt>
-    <a name = "LaraObject:GetSprintEnergy"></a>
-    <strong>LaraObject:GetSprintEnergy()</strong>
-    </dt>
-    <dd>
-    Get sprint energy value of Lara
-
-
-
-
-    <h3>Returns:</h3>
-    <ol>
-
-           <span class="types"><span class="type">int</span></span>
-        current sprint value
-    </ol>
-
-
-
-    <h3>Usage:</h3>
-    <ul>
-        <pre class="example"><span class="keyword">local</span> sprintEnergy = Lara:GetSprintEnergy()</pre>
-    </ul>
-
-</dd>
-    <dt>
     <a name = "LaraObject:SetWet"></a>
     <strong>LaraObject:SetWet(Wetness)</strong>
     </dt>
@@ -369,11 +323,37 @@
 
 </dd>
     <dt>
-    <a name = "LaraObject:GetAmmoCount"></a>
-    <strong>LaraObject:GetAmmoCount()</strong>
+    <a name = "LaraObject:SetSprintEnergy"></a>
+    <strong>LaraObject:SetSprintEnergy(sprint)</strong>
     </dt>
     <dd>
-    Get current weapon's ammo count
+    Set sprint energy value of Lara
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">sprint</span>
+            <span class="types"><span class="type">int</span></span>
+         energy to give to Lara; maximum value is 120.
+        </li>
+    </ul>
+
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">Lara:SetSprintEnergy(<span class="number">120</span>)</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "LaraObject:GetSprintEnergy"></a>
+    <strong>LaraObject:GetSprintEnergy()</strong>
+    </dt>
+    <dd>
+    Get sprint energy value of Lara
 
 
 
@@ -382,64 +362,14 @@
     <ol>
 
            <span class="types"><span class="type">int</span></span>
-        current ammo count (-1 if infinite)
+        current sprint value
     </ol>
 
 
 
     <h3>Usage:</h3>
     <ul>
-        <pre class="example"><span class="keyword">local</span> equippedWeaponAmmoLeft = Lara:GetAmmoCount()</pre>
-    </ul>
-
-</dd>
-    <dt>
-    <a name = "LaraObject:GetVehicle"></a>
-    <strong>LaraObject:GetVehicle()</strong>
-    </dt>
-    <dd>
-    Get current vehicle, if it exists
-
-
-
-
-    <h3>Returns:</h3>
-    <ol>
-
-           <span class="types"><span class="type">Moveable</span></span>
-        current vehicle (nil if no vehicle present)
-    </ol>
-
-
-
-    <h3>Usage:</h3>
-    <ul>
-        <pre class="example"><span class="keyword">local</span> vehicle = Lara:GetVehicle()</pre>
-    </ul>
-
-</dd>
-    <dt>
-    <a name = "LaraObject:GetTarget"></a>
-    <strong>LaraObject:GetTarget()</strong>
-    </dt>
-    <dd>
-    Get current target enemy, if it exists
-
-
-
-
-    <h3>Returns:</h3>
-    <ol>
-
-           <span class="types"><span class="type">Moveable</span></span>
-        current target enemy (nil if no target present)
-    </ol>
-
-
-
-    <h3>Usage:</h3>
-    <ul>
-        <pre class="example"><span class="keyword">local</span> target = Lara:GetTarget()</pre>
+        <pre class="example"><span class="keyword">local</span> sprintEnergy = Lara:GetSprintEnergy()</pre>
     </ul>
 
 </dd>
@@ -577,6 +507,106 @@ ROCKETLAUNCHER
     </ul>
 
 </dd>
+    <dt>
+    <a name = "LaraObject:GetAmmoCount"></a>
+    <strong>LaraObject:GetAmmoCount()</strong>
+    </dt>
+    <dd>
+    Get current weapon's ammo count
+
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">int</span></span>
+        current ammo count (-1 if infinite)
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="keyword">local</span> equippedWeaponAmmoLeft = Lara:GetAmmoCount()</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "LaraObject:GetVehicle"></a>
+    <strong>LaraObject:GetVehicle()</strong>
+    </dt>
+    <dd>
+    Get current vehicle, if it exists
+
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../2 classes/Objects.Moveable.html#">Moveable</a></span>
+        current vehicle (nil if no vehicle present)
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="keyword">local</span> vehicle = Lara:GetVehicle()</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "LaraObject:GetTarget"></a>
+    <strong>LaraObject:GetTarget()</strong>
+    </dt>
+    <dd>
+    Get current target enemy, if it exists
+
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../2 classes/Objects.Moveable.html#">Moveable</a></span>
+        current target enemy (nil if no target present)
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="keyword">local</span> target = Lara:GetTarget()</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "LaraObject:TorchIsLit"></a>
+    <strong>LaraObject:TorchIsLit()</strong>
+    </dt>
+    <dd>
+    Get current light state of the torch, if it exists
+
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">bool</span></span>
+        is torch currently lit or not? (false if no torch exists)
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="keyword">local</span> torchIsLit = Lara:TorchIsLit()</pre>
+    </ul>
+
+</dd>
 </dl>
 
 
@@ -584,7 +614,7 @@ ROCKETLAUNCHER
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
-<i style="float:right;">Last updated 2022-12-09 22:06:20 </i>
+<i style="float:right;">Last updated 2022-12-16 18:35:53 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>
