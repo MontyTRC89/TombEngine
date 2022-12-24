@@ -463,8 +463,9 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 
 	RumbleLaraHealthCondition(item);
 
-	bool isWater = TestEnvironment(ENV_FLAG_WATER, item);
-	bool isSwamp = TestEnvironment(ENV_FLAG_SWAMP, item);
+	bool isWater  = TestEnvironment(ENV_FLAG_WATER,  item);
+	bool isSwamp  = TestEnvironment(ENV_FLAG_SWAMP,  item);
+	bool isDamage = TestEnvironment(ENV_FLAG_DAMAGE, item);
 
 	bool isWaterOnHeadspace = false;
 
@@ -667,6 +668,11 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 
 			break;
 		}
+	}
+
+	if (isDamage && item->HitPoints > 0)
+	{
+		item->HitPoints--;
 	}
 
 	if (item->HitPoints <= 0)

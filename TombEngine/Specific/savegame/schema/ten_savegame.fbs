@@ -383,7 +383,6 @@ table Volume {
 	name: string;
 	number: int32;
 	room_number: int32;
-	name: string;
 	enabled: bool;
 	position: Vector3;
 	rotation: Vector4;
