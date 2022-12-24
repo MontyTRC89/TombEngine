@@ -180,7 +180,7 @@ void LoadItems()
 			item->Pose.Orientation.y = ReadInt16();
 			item->Pose.Orientation.x = ReadInt16();
 			item->Pose.Orientation.z = ReadInt16();
-			item->Color = ReadVector4();
+			item->Model.Color = ReadVector4();
 			item->TriggerFlags = ReadInt16();
 			item->Flags = ReadInt16();
 			item->Name = ReadString();

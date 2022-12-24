@@ -637,7 +637,7 @@ bool SaveGame::Save(int slot)
 		serializedItem.add_room_number(itemToSerialize.RoomNumber);
 		serializedItem.add_velocity(&FromVector3(itemToSerialize.Animation.Velocity));
 		serializedItem.add_timer(itemToSerialize.Timer);
-		serializedItem.add_color(&FromVector4(itemToSerialize.Color));
+		serializedItem.add_color(&FromVector4(itemToSerialize.Model.Color));
 		serializedItem.add_touch_bits(itemToSerialize.TouchBits.ToPackedBits());
 		serializedItem.add_trigger_flags(itemToSerialize.TriggerFlags);
 		serializedItem.add_triggered((itemToSerialize.Flags & (TRIGGERED | CODE_BITS | ONESHOT)) != 0);
@@ -1420,7 +1420,7 @@ bool SaveGame::Load(int slot)
 		item->Flags = savedItem->flags();
 
 		// Color
-		item->Color = ToVector4(savedItem->color());
+		item->Model.Color = ToVector4(savedItem->color());
 
 		// Carried item
 		item->CarriedItem = savedItem->carried_item();

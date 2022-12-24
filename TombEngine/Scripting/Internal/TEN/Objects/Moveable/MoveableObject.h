@@ -67,7 +67,7 @@ public:
 	void SetVelocity(Vec3 velocity);
 
 	[[nodiscard]] ScriptColor GetColor() const;
-	void SetColor(ScriptColor const& col);
+	void SetColor(const ScriptColor& color);
 
 	[[nodiscard]] short GetHP() const;
 	void SetHP(short hp);

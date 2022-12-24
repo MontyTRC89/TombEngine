@@ -747,12 +747,12 @@ void Moveable::SetItemFlags(short value, int index)
 
 ScriptColor Moveable::GetColor() const
 {
-	return ScriptColor{ m_item->Color };
+	return ScriptColor{ m_item->Model.Color };
 }
 
-void Moveable::SetColor(ScriptColor const& col)
+void Moveable::SetColor(const ScriptColor& color)
 {
-	m_item->Color = col;
+	m_item->Model.Color = color;
 }
 
 aiBitsType Moveable::GetAIBits() const
