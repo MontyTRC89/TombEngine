@@ -7,6 +7,7 @@
 #include "Game/itemdata/creature_info.h"
 #include "Game/itemdata/door_data.h"
 #include "Game/Lara/lara_struct.h"
+#include "Math/Math.h"
 #include "Objects/TR2/Vehicles/skidoo_info.h"
 #include "Objects/TR2/Vehicles/speedboat_info.h"
 #include "Objects/TR3/Vehicles/big_gun_info.h"
@@ -20,13 +21,13 @@
 #include "Objects/TR4/Vehicles/motorbike_info.h"
 #include "Objects/TR5/Entity/tr5_laserhead_info.h"
 #include "Objects/TR5/Object/tr5_pushableblock_info.h"
-#include "Math/Math.h"
 
 template<class... Ts> struct visitor : Ts... { using Ts::operator()...; };
 template<class... Ts> visitor(Ts...)->visitor<Ts...>; // line not needed in C++20...
 
 using namespace TEN::Entities::TR4;
 using namespace TEN::Entities::Creatures::TR5;
+using namespace TEN::Entities::Generic;
 using namespace TEN::Entities::Vehicles;
 
 struct ItemInfo;
