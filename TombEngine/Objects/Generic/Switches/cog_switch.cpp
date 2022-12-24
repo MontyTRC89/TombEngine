@@ -131,7 +131,7 @@ namespace TEN::Entities::Switches
 		{
 			if (switchItem->Animation.TargetState == SWITCH_ON && !(TrInput & IN_ACTION))
 			{
-				LaraItem->Animation.TargetState = LS_IDLE;
+				LaraItem->Animation.TargetState = LS_COGWHEEL_UNGRAB;
 				switchItem->Animation.TargetState = SWITCH_OFF;
 			}
 
@@ -156,10 +156,6 @@ namespace TEN::Entities::Switches
 
 				RemoveActiveItem(itemNumber);
 
-				LaraItem->Animation.AnimNumber = LA_COGWHEEL_RELEASE;
-				LaraItem->Animation.FrameNumber = g_Level.Anims[LaraItem->Animation.AnimNumber].frameBase + 11;
-				LaraItem->Animation.TargetState = LS_IDLE;
-				LaraItem->Animation.ActiveState = LS_IDLE;
 				Lara.Control.HandStatus = HandStatus::Free;
 			}
 		}
