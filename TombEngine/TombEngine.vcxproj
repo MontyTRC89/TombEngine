@@ -156,7 +156,7 @@ CALL gen.bat</Command>
     <ClInclude Include="Game\collision\collide_item.h" />
     <ClInclude Include="Game\control\box.h" />
     <ClInclude Include="Game\control\los.h" />
-    <ClInclude Include="Game\control\volumetriggerer.h" />
+    <ClInclude Include="Game\control\volumeactivator.h" />
     <ClInclude Include="Game\effects\bubble.h" />
     <ClInclude Include="Game\effects\chaffFX.h" />
     <ClInclude Include="Game\control\trigger.h" />
@@ -169,6 +169,7 @@ CALL gen.bat</Command>
     <ClInclude Include="Scripting\Internal\TEN\Effects\EffectIDs.h" />
     <ClInclude Include="Scripting\Internal\TEN\Misc\ActionIDs.h" />
     <ClInclude Include="Scripting\Internal\TEN\Objects\Lara\LaraObject.h" />
+    <ClInclude Include="Scripting\Internal\TEN\Objects\Volume\VolumeObject.h" />
     <ClInclude Include="Specific\Input\InputAction.h" />
     <ClInclude Include="Game\itemdata\door_data.h" />
     <ClInclude Include="Game\effects\drip.h" />
@@ -452,7 +453,7 @@ CALL gen.bat</Command>
     <ClInclude Include="Objects\TR5\Emitter\tr5_bats_emitter.h" />
     <ClInclude Include="Objects\TR5\Emitter\tr5_rats_emitter.h" />
     <ClInclude Include="Objects\TR5\Emitter\tr5_spider_emitter.h" />
-    <ClInclude Include="Objects\TR5\Entity\tr5_autoguns.h" />
+    <ClInclude Include="Objects\TR5\Entity\AutoGun.h" />
     <ClInclude Include="Objects\TR5\Entity\tr5_brownbeast.h" />
     <ClInclude Include="Objects\TR5\Entity\tr5_chef.h" />
     <ClInclude Include="Objects\TR5\Entity\tr5_cyborg.h" />
@@ -634,6 +635,7 @@ CALL gen.bat</Command>
     <ClCompile Include="Game\GuiObjects.cpp" />
     <ClCompile Include="Objects\TR1\Trap\DamoclesSword.cpp" />
     <ClCompile Include="Scripting\Internal\TEN\Objects\Lara\LaraObject.cpp" />
+    <ClCompile Include="Scripting\Internal\TEN\Objects\Volume\VolumeObject.cpp" />
     <ClCompile Include="Specific\Input\InputAction.cpp" />
     <ClCompile Include="Game\itemdata\itemdata.cpp" />
     <ClCompile Include="Game\Lara\lara_basic.cpp" />
@@ -815,7 +817,7 @@ CALL gen.bat</Command>
     <ClCompile Include="Objects\TR5\Emitter\tr5_bats_emitter.cpp" />
     <ClCompile Include="Objects\TR5\Emitter\tr5_rats_emitter.cpp" />
     <ClCompile Include="Objects\TR5\Emitter\tr5_spider_emitter.cpp" />
-    <ClCompile Include="Objects\TR5\Entity\tr5_autoguns.cpp" />
+    <ClCompile Include="Objects\TR5\Entity\AutoGun.cpp" />
     <ClCompile Include="Objects\TR5\Entity\tr5_brownbeast.cpp" />
     <ClCompile Include="Objects\TR5\Entity\tr5_chef.cpp" />
     <ClCompile Include="Objects\TR5\Entity\tr5_cyborg.cpp" />

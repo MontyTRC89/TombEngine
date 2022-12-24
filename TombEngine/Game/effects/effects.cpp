@@ -19,6 +19,7 @@
 #include "Objects/objectslist.h"
 #include "Renderer/Renderer11.h"
 #include "Sound/sound.h"
+#include "Specific/clock.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
@@ -1486,10 +1487,13 @@ void TriggerFireFlame(int x, int y, int z, FlameType type, const Vector3& color1
 	}
 }
 
-void TriggerMetalSparks(int x, int y, int z, int xv, int yv, int zv, int additional)
+void TriggerMetalSparks(int x, int y, int z, int xv, int yv, int zv, const Vector3& color, int additional)
 {
 	int dx = LaraItem->Pose.Position.x - x;
 	int dz = LaraItem->Pose.Position.z - z;
+	int colorR = std::clamp(int(color.x * UCHAR_MAX), 0, UCHAR_MAX);
+	int colorG = std::clamp(int(color.y * UCHAR_MAX), 0, UCHAR_MAX);
+	int colorB = std::clamp(int(color.z * UCHAR_MAX), 0, UCHAR_MAX);
 
 	if (dx >= -16384 && dx <= 16384 && dz >= -16384 && dz <= 16384)
 	{
@@ -1497,14 +1501,14 @@ void TriggerMetalSparks(int x, int y, int z, int xv, int yv, int zv, int additio
 
 		auto* spark = GetFreeParticle();
 
-		spark->dG = (r & 0x7F) + 64;
-		spark->dB = -64 - (r & 0x7F) + 64;
+		spark->dG =  colorG;
+		spark->dB =  colorB;
 		spark->life = 10;
 		spark->sLife = 10;
-		spark->sR = 255;
-		spark->sG = 255;
-		spark->sB = 255;
-		spark->dR = 255;
+		spark->sR = colorR;
+		spark->sG = colorG;
+		spark->sB = colorB;
+		spark->dR = colorR;
 		spark->x = (r & 7) + x - 3;
 		spark->on = 1;
 		spark->colFadeSpeed = 3;
@@ -1512,7 +1516,7 @@ void TriggerMetalSparks(int x, int y, int z, int xv, int yv, int zv, int additio
 		spark->y = ((r >> 3) & 7) + y - 3;
 		spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
 		spark->friction = 34;
-		spark->scalar = 1;
+		spark->scalar = 2;
 		spark->z = ((r >> 6) & 7) + z - 3;
 		spark->flags = 2;
 		spark->xVel = (byte)(r >> 2) + xv - 128;
@@ -1706,7 +1710,7 @@ void ProcessEffects(ItemInfo* item)
 		item->Effect.Type = EffectType::None;
 }
 
-void TriggerAttackFlame(const Vector3i& pos, const Vector3& color, int size)
+void TriggerAttackFlame(const Vector3i& pos, const Vector3& color, int scale)
 {
 	auto& spark = *GetFreeParticle();
 
@@ -1718,19 +1722,19 @@ void TriggerAttackFlame(const Vector3i& pos, const Vector3& color, int size)
 	spark.dG = color.y;
 	spark.dB = color.z;
 	spark.fadeToBlack = 8;
-	spark.colFadeSpeed = (GetRandomControl() & 3) + 4;
+	spark.colFadeSpeed = Random::GenerateInt(4, 8);
 	spark.blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
-	spark.life = (GetRandomControl() & 7) + 20;
+	spark.life = Random::GenerateInt(20, 28);
 	spark.sLife = spark.life;
-	spark.x = pos.x + (GetRandomControl() & 0xF) - 8;
+	spark.x = pos.x + Random::GenerateInt(-8, 8);
 	spark.y = pos.y;
-	spark.z = pos.z + (GetRandomControl() & 0xF) - 8;
-	spark.xVel = (GetRandomControl() & 0xFF) - 128;
+	spark.z = pos.z + Random::GenerateInt(-8, 8);
+	spark.xVel = Random::GenerateInt(-128, 128);
 	spark.yVel = 0;
-	spark.zVel = (GetRandomControl() & 0xFF) - 128;
+	spark.zVel = Random::GenerateInt(-128, 128);
 	spark.friction = 5;
 	spark.flags = SP_EXPDEF | SP_DEF | SP_SCALE;
-	spark.rotAng = GetRandomControl() & 0xFFF;
+	spark.rotAng = Random::GenerateInt(0, 4096); // NOTE: Effect angles use [0, 4096] range.
 
 	if (TestProbability(1 / 2.0f))
 		spark.rotAdd = -32 - (GetRandomControl() & 0x1F);
@@ -1738,9 +1742,9 @@ void TriggerAttackFlame(const Vector3i& pos, const Vector3& color, int size)
 		spark.rotAdd = (GetRandomControl() & 0x1F) + 32;
 
 	spark.maxYvel = 0;
-	spark.gravity = (GetRandomControl() & 0x1F) + 16;
+	spark.gravity = Random::GenerateInt(16, 48);
 	spark.scalar = 2;
-	spark.size = (GetRandomControl() & 0xF) + size;
+	spark.size = Random::GenerateInt(0, 16) + scale;
 	spark.sSize = spark.size;
 	spark.dSize = spark.size / 4;
 }

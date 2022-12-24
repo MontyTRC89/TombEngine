@@ -24,16 +24,16 @@
 		this->Z2 = (int)round(z2);
 	}
 
-	GameBoundingBox::GameBoundingBox(ItemInfo* item, bool isAccurate)
+	GameBoundingBox::GameBoundingBox(ItemInfo* item)
 	{
 		int rate = 0;
 		AnimFrame* framePtr[2];
 
 		int frac = GetFrame(item, framePtr, rate);
-		if (frac == 0 || !isAccurate)
+		if (frac == 0)
 			*this = framePtr[0]->boundingBox;
 		else
-			*this = framePtr[0]->boundingBox + ((framePtr[1]->boundingBox - framePtr[0]->boundingBox) * (frac / rate));
+			*this = framePtr[0]->boundingBox + (((framePtr[1]->boundingBox - framePtr[0]->boundingBox) * frac) / rate);
 	}
 
 	int GameBoundingBox::GetWidth() const
@@ -122,5 +122,13 @@
 			X1 * scale, X2 * scale,
 			Y1 * scale, Y2 * scale,
 			Z1 * scale, Z2 * scale);
+	}
+
+	GameBoundingBox GameBoundingBox::operator /(float scale) const
+	{
+		return GameBoundingBox(
+			X1 / scale, X2 / scale,
+			Y1 / scale, Y2 / scale,
+			Z1 / scale, Z2 / scale);
 	}
 //}

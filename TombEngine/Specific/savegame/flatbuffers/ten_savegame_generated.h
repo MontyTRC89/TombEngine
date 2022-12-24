@@ -121,6 +121,10 @@ struct VolumeState;
 struct VolumeStateBuilder;
 struct VolumeStateT;
 
+struct Volume;
+struct VolumeBuilder;
+struct VolumeT;
+
 struct KeyValPair;
 
 struct ScriptTable;
@@ -5136,14 +5140,9 @@ flatbuffers::Offset<EventSetCallCounters> CreateEventSetCallCounters(flatbuffers
 
 struct VolumeStateT : public flatbuffers::NativeTable {
   typedef VolumeState TableType;
-  int32_t number = 0;
-  int32_t room_number = 0;
-  std::unique_ptr<TEN::Save::Vector3> position{};
-  std::unique_ptr<TEN::Save::Vector4> rotation{};
-  std::unique_ptr<TEN::Save::Vector3> scale{};
-  int32_t state = 0;
-  int32_t triggerer = 0;
-  int32_t timeout = 0;
+  int32_t status = 0;
+  int32_t activator = 0;
+  int32_t timestamp = 0;
 };
 
 struct VolumeState FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
@@ -5151,49 +5150,24 @@ struct VolumeState FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   typedef VolumeStateBuilder Builder;
   struct Traits;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
-    VT_NUMBER = 4,
-    VT_ROOM_NUMBER = 6,
-    VT_POSITION = 8,
-    VT_ROTATION = 10,
-    VT_SCALE = 12,
-    VT_STATE = 14,
-    VT_TRIGGERER = 16,
-    VT_TIMEOUT = 18
+    VT_STATUS = 4,
+    VT_ACTIVATOR = 6,
+    VT_TIMESTAMP = 8
   };
-  int32_t number() const {
-    return GetField<int32_t>(VT_NUMBER, 0);
+  int32_t status() const {
+    return GetField<int32_t>(VT_STATUS, 0);
   }
-  int32_t room_number() const {
-    return GetField<int32_t>(VT_ROOM_NUMBER, 0);
+  int32_t activator() const {
+    return GetField<int32_t>(VT_ACTIVATOR, 0);
   }
-  const TEN::Save::Vector3 *position() const {
-    return GetStruct<const TEN::Save::Vector3 *>(VT_POSITION);
-  }
-  const TEN::Save::Vector4 *rotation() const {
-    return GetStruct<const TEN::Save::Vector4 *>(VT_ROTATION);
-  }
-  const TEN::Save::Vector3 *scale() const {
-    return GetStruct<const TEN::Save::Vector3 *>(VT_SCALE);
-  }
-  int32_t state() const {
-    return GetField<int32_t>(VT_STATE, 0);
-  }
-  int32_t triggerer() const {
-    return GetField<int32_t>(VT_TRIGGERER, 0);
-  }
-  int32_t timeout() const {
-    return GetField<int32_t>(VT_TIMEOUT, 0);
+  int32_t timestamp() const {
+    return GetField<int32_t>(VT_TIMESTAMP, 0);
   }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
-           VerifyField<int32_t>(verifier, VT_NUMBER) &&
-           VerifyField<int32_t>(verifier, VT_ROOM_NUMBER) &&
-           VerifyField<TEN::Save::Vector3>(verifier, VT_POSITION) &&
-           VerifyField<TEN::Save::Vector4>(verifier, VT_ROTATION) &&
-           VerifyField<TEN::Save::Vector3>(verifier, VT_SCALE) &&
-           VerifyField<int32_t>(verifier, VT_STATE) &&
-           VerifyField<int32_t>(verifier, VT_TRIGGERER) &&
-           VerifyField<int32_t>(verifier, VT_TIMEOUT) &&
+           VerifyField<int32_t>(verifier, VT_STATUS) &&
+           VerifyField<int32_t>(verifier, VT_ACTIVATOR) &&
+           VerifyField<int32_t>(verifier, VT_TIMESTAMP) &&
            verifier.EndTable();
   }
   VolumeStateT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
@@ -5205,29 +5179,14 @@ struct VolumeStateBuilder {
   typedef VolumeState Table;
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
-  void add_number(int32_t number) {
-    fbb_.AddElement<int32_t>(VolumeState::VT_NUMBER, number, 0);
+  void add_status(int32_t status) {
+    fbb_.AddElement<int32_t>(VolumeState::VT_STATUS, status, 0);
   }
-  void add_room_number(int32_t room_number) {
-    fbb_.AddElement<int32_t>(VolumeState::VT_ROOM_NUMBER, room_number, 0);
+  void add_activator(int32_t activator) {
+    fbb_.AddElement<int32_t>(VolumeState::VT_ACTIVATOR, activator, 0);
   }
-  void add_position(const TEN::Save::Vector3 *position) {
-    fbb_.AddStruct(VolumeState::VT_POSITION, position);
-  }
-  void add_rotation(const TEN::Save::Vector4 *rotation) {
-    fbb_.AddStruct(VolumeState::VT_ROTATION, rotation);
-  }
-  void add_scale(const TEN::Save::Vector3 *scale) {
-    fbb_.AddStruct(VolumeState::VT_SCALE, scale);
-  }
-  void add_state(int32_t state) {
-    fbb_.AddElement<int32_t>(VolumeState::VT_STATE, state, 0);
-  }
-  void add_triggerer(int32_t triggerer) {
-    fbb_.AddElement<int32_t>(VolumeState::VT_TRIGGERER, triggerer, 0);
-  }
-  void add_timeout(int32_t timeout) {
-    fbb_.AddElement<int32_t>(VolumeState::VT_TIMEOUT, timeout, 0);
+  void add_timestamp(int32_t timestamp) {
+    fbb_.AddElement<int32_t>(VolumeState::VT_TIMESTAMP, timestamp, 0);
   }
   explicit VolumeStateBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
@@ -5242,23 +5201,13 @@ struct VolumeStateBuilder {
 
 inline flatbuffers::Offset<VolumeState> CreateVolumeState(
     flatbuffers::FlatBufferBuilder &_fbb,
-    int32_t number = 0,
-    int32_t room_number = 0,
-    const TEN::Save::Vector3 *position = 0,
-    const TEN::Save::Vector4 *rotation = 0,
-    const TEN::Save::Vector3 *scale = 0,
-    int32_t state = 0,
-    int32_t triggerer = 0,
-    int32_t timeout = 0) {
+    int32_t status = 0,
+    int32_t activator = 0,
+    int32_t timestamp = 0) {
   VolumeStateBuilder builder_(_fbb);
-  builder_.add_timeout(timeout);
-  builder_.add_triggerer(triggerer);
-  builder_.add_state(state);
-  builder_.add_scale(scale);
-  builder_.add_rotation(rotation);
-  builder_.add_position(position);
-  builder_.add_room_number(room_number);
-  builder_.add_number(number);
+  builder_.add_timestamp(timestamp);
+  builder_.add_activator(activator);
+  builder_.add_status(status);
   return builder_.Finish();
 }
 
@@ -5268,6 +5217,168 @@ struct VolumeState::Traits {
 };
 
 flatbuffers::Offset<VolumeState> CreateVolumeState(flatbuffers::FlatBufferBuilder &_fbb, const VolumeStateT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
+struct VolumeT : public flatbuffers::NativeTable {
+  typedef Volume TableType;
+  std::string name{};
+  int32_t number = 0;
+  int32_t room_number = 0;
+  bool enabled = false;
+  std::unique_ptr<TEN::Save::Vector3> position{};
+  std::unique_ptr<TEN::Save::Vector4> rotation{};
+  std::unique_ptr<TEN::Save::Vector3> scale{};
+  std::vector<std::unique_ptr<TEN::Save::VolumeStateT>> queue{};
+};
+
+struct Volume FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef VolumeT NativeTableType;
+  typedef VolumeBuilder Builder;
+  struct Traits;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_NAME = 4,
+    VT_NUMBER = 6,
+    VT_ROOM_NUMBER = 8,
+    VT_ENABLED = 10,
+    VT_POSITION = 12,
+    VT_ROTATION = 14,
+    VT_SCALE = 16,
+    VT_QUEUE = 18
+  };
+  const flatbuffers::String *name() const {
+    return GetPointer<const flatbuffers::String *>(VT_NAME);
+  }
+  int32_t number() const {
+    return GetField<int32_t>(VT_NUMBER, 0);
+  }
+  int32_t room_number() const {
+    return GetField<int32_t>(VT_ROOM_NUMBER, 0);
+  }
+  bool enabled() const {
+    return GetField<uint8_t>(VT_ENABLED, 0) != 0;
+  }
+  const TEN::Save::Vector3 *position() const {
+    return GetStruct<const TEN::Save::Vector3 *>(VT_POSITION);
+  }
+  const TEN::Save::Vector4 *rotation() const {
+    return GetStruct<const TEN::Save::Vector4 *>(VT_ROTATION);
+  }
+  const TEN::Save::Vector3 *scale() const {
+    return GetStruct<const TEN::Save::Vector3 *>(VT_SCALE);
+  }
+  const flatbuffers::Vector<flatbuffers::Offset<TEN::Save::VolumeState>> *queue() const {
+    return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<TEN::Save::VolumeState>> *>(VT_QUEUE);
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyOffset(verifier, VT_NAME) &&
+           verifier.VerifyString(name()) &&
+           VerifyField<int32_t>(verifier, VT_NUMBER) &&
+           VerifyField<int32_t>(verifier, VT_ROOM_NUMBER) &&
+           VerifyField<uint8_t>(verifier, VT_ENABLED) &&
+           VerifyField<TEN::Save::Vector3>(verifier, VT_POSITION) &&
+           VerifyField<TEN::Save::Vector4>(verifier, VT_ROTATION) &&
+           VerifyField<TEN::Save::Vector3>(verifier, VT_SCALE) &&
+           VerifyOffset(verifier, VT_QUEUE) &&
+           verifier.VerifyVector(queue()) &&
+           verifier.VerifyVectorOfTables(queue()) &&
+           verifier.EndTable();
+  }
+  VolumeT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(VolumeT *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static flatbuffers::Offset<Volume> Pack(flatbuffers::FlatBufferBuilder &_fbb, const VolumeT* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+};
+
+struct VolumeBuilder {
+  typedef Volume Table;
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_name(flatbuffers::Offset<flatbuffers::String> name) {
+    fbb_.AddOffset(Volume::VT_NAME, name);
+  }
+  void add_number(int32_t number) {
+    fbb_.AddElement<int32_t>(Volume::VT_NUMBER, number, 0);
+  }
+  void add_room_number(int32_t room_number) {
+    fbb_.AddElement<int32_t>(Volume::VT_ROOM_NUMBER, room_number, 0);
+  }
+  void add_enabled(bool enabled) {
+    fbb_.AddElement<uint8_t>(Volume::VT_ENABLED, static_cast<uint8_t>(enabled), 0);
+  }
+  void add_position(const TEN::Save::Vector3 *position) {
+    fbb_.AddStruct(Volume::VT_POSITION, position);
+  }
+  void add_rotation(const TEN::Save::Vector4 *rotation) {
+    fbb_.AddStruct(Volume::VT_ROTATION, rotation);
+  }
+  void add_scale(const TEN::Save::Vector3 *scale) {
+    fbb_.AddStruct(Volume::VT_SCALE, scale);
+  }
+  void add_queue(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<TEN::Save::VolumeState>>> queue) {
+    fbb_.AddOffset(Volume::VT_QUEUE, queue);
+  }
+  explicit VolumeBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  flatbuffers::Offset<Volume> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<Volume>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<Volume> CreateVolume(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    flatbuffers::Offset<flatbuffers::String> name = 0,
+    int32_t number = 0,
+    int32_t room_number = 0,
+    bool enabled = false,
+    const TEN::Save::Vector3 *position = 0,
+    const TEN::Save::Vector4 *rotation = 0,
+    const TEN::Save::Vector3 *scale = 0,
+    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<TEN::Save::VolumeState>>> queue = 0) {
+  VolumeBuilder builder_(_fbb);
+  builder_.add_queue(queue);
+  builder_.add_scale(scale);
+  builder_.add_rotation(rotation);
+  builder_.add_position(position);
+  builder_.add_room_number(room_number);
+  builder_.add_number(number);
+  builder_.add_name(name);
+  builder_.add_enabled(enabled);
+  return builder_.Finish();
+}
+
+struct Volume::Traits {
+  using type = Volume;
+  static auto constexpr Create = CreateVolume;
+};
+
+inline flatbuffers::Offset<Volume> CreateVolumeDirect(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    const char *name = nullptr,
+    int32_t number = 0,
+    int32_t room_number = 0,
+    bool enabled = false,
+    const TEN::Save::Vector3 *position = 0,
+    const TEN::Save::Vector4 *rotation = 0,
+    const TEN::Save::Vector3 *scale = 0,
+    const std::vector<flatbuffers::Offset<TEN::Save::VolumeState>> *queue = nullptr) {
+  auto name__ = name ? _fbb.CreateString(name) : 0;
+  auto queue__ = queue ? _fbb.CreateVector<flatbuffers::Offset<TEN::Save::VolumeState>>(*queue) : 0;
+  return TEN::Save::CreateVolume(
+      _fbb,
+      name__,
+      number,
+      room_number,
+      enabled,
+      position,
+      rotation,
+      scale,
+      queue__);
+}
+
+flatbuffers::Offset<Volume> CreateVolume(flatbuffers::FlatBufferBuilder &_fbb, const VolumeT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
 
 struct ScriptTableT : public flatbuffers::NativeTable {
   typedef ScriptTable TableType;
@@ -6148,7 +6259,7 @@ struct SaveGameT : public flatbuffers::NativeTable {
   std::unique_ptr<TEN::Save::RopeT> rope{};
   std::unique_ptr<TEN::Save::PendulumT> pendulum{};
   std::unique_ptr<TEN::Save::PendulumT> alternate_pendulum{};
-  std::vector<std::unique_ptr<TEN::Save::VolumeStateT>> volume_states{};
+  std::vector<std::unique_ptr<TEN::Save::VolumeT>> volumes{};
   std::vector<std::unique_ptr<TEN::Save::EventSetCallCountersT>> call_counters{};
   std::unique_ptr<TEN::Save::UnionVecT> script_vars{};
   std::vector<std::string> callbacks_pre_control{};
@@ -6195,7 +6306,7 @@ struct SaveGame FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     VT_ROPE = 68,
     VT_PENDULUM = 70,
     VT_ALTERNATE_PENDULUM = 72,
-    VT_VOLUME_STATES = 74,
+    VT_VOLUMES = 74,
     VT_CALL_COUNTERS = 76,
     VT_SCRIPT_VARS = 78,
     VT_CALLBACKS_PRE_CONTROL = 80,
@@ -6306,8 +6417,8 @@ struct SaveGame FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   const TEN::Save::Pendulum *alternate_pendulum() const {
     return GetPointer<const TEN::Save::Pendulum *>(VT_ALTERNATE_PENDULUM);
   }
-  const flatbuffers::Vector<flatbuffers::Offset<TEN::Save::VolumeState>> *volume_states() const {
-    return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<TEN::Save::VolumeState>> *>(VT_VOLUME_STATES);
+  const flatbuffers::Vector<flatbuffers::Offset<TEN::Save::Volume>> *volumes() const {
+    return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<TEN::Save::Volume>> *>(VT_VOLUMES);
   }
   const flatbuffers::Vector<flatbuffers::Offset<TEN::Save::EventSetCallCounters>> *call_counters() const {
     return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<TEN::Save::EventSetCallCounters>> *>(VT_CALL_COUNTERS);
@@ -6394,9 +6505,9 @@ struct SaveGame FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            verifier.VerifyTable(pendulum()) &&
            VerifyOffset(verifier, VT_ALTERNATE_PENDULUM) &&
            verifier.VerifyTable(alternate_pendulum()) &&
-           VerifyOffset(verifier, VT_VOLUME_STATES) &&
-           verifier.VerifyVector(volume_states()) &&
-           verifier.VerifyVectorOfTables(volume_states()) &&
+           VerifyOffset(verifier, VT_VOLUMES) &&
+           verifier.VerifyVector(volumes()) &&
+           verifier.VerifyVectorOfTables(volumes()) &&
            VerifyOffset(verifier, VT_CALL_COUNTERS) &&
            verifier.VerifyVector(call_counters()) &&
            verifier.VerifyVectorOfTables(call_counters()) &&
@@ -6524,8 +6635,8 @@ struct SaveGameBuilder {
   void add_alternate_pendulum(flatbuffers::Offset<TEN::Save::Pendulum> alternate_pendulum) {
     fbb_.AddOffset(SaveGame::VT_ALTERNATE_PENDULUM, alternate_pendulum);
   }
-  void add_volume_states(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<TEN::Save::VolumeState>>> volume_states) {
-    fbb_.AddOffset(SaveGame::VT_VOLUME_STATES, volume_states);
+  void add_volumes(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<TEN::Save::Volume>>> volumes) {
+    fbb_.AddOffset(SaveGame::VT_VOLUMES, volumes);
   }
   void add_call_counters(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<TEN::Save::EventSetCallCounters>>> call_counters) {
     fbb_.AddOffset(SaveGame::VT_CALL_COUNTERS, call_counters);
@@ -6587,7 +6698,7 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGame(
     flatbuffers::Offset<TEN::Save::Rope> rope = 0,
     flatbuffers::Offset<TEN::Save::Pendulum> pendulum = 0,
     flatbuffers::Offset<TEN::Save::Pendulum> alternate_pendulum = 0,
-    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<TEN::Save::VolumeState>>> volume_states = 0,
+    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<TEN::Save::Volume>>> volumes = 0,
     flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<TEN::Save::EventSetCallCounters>>> call_counters = 0,
     flatbuffers::Offset<TEN::Save::UnionVec> script_vars = 0,
     flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>>> callbacks_pre_control = 0,
@@ -6599,7 +6710,7 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGame(
   builder_.add_callbacks_pre_control(callbacks_pre_control);
   builder_.add_script_vars(script_vars);
   builder_.add_call_counters(call_counters);
-  builder_.add_volume_states(volume_states);
+  builder_.add_volumes(volumes);
   builder_.add_alternate_pendulum(alternate_pendulum);
   builder_.add_pendulum(pendulum);
   builder_.add_rope(rope);
@@ -6678,7 +6789,7 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGameDirect(
     flatbuffers::Offset<TEN::Save::Rope> rope = 0,
     flatbuffers::Offset<TEN::Save::Pendulum> pendulum = 0,
     flatbuffers::Offset<TEN::Save::Pendulum> alternate_pendulum = 0,
-    const std::vector<flatbuffers::Offset<TEN::Save::VolumeState>> *volume_states = nullptr,
+    const std::vector<flatbuffers::Offset<TEN::Save::Volume>> *volumes = nullptr,
     const std::vector<flatbuffers::Offset<TEN::Save::EventSetCallCounters>> *call_counters = nullptr,
     flatbuffers::Offset<TEN::Save::UnionVec> script_vars = 0,
     const std::vector<flatbuffers::Offset<flatbuffers::String>> *callbacks_pre_control = nullptr,
@@ -6701,7 +6812,7 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGameDirect(
   auto ambient_track__ = ambient_track ? _fbb.CreateString(ambient_track) : 0;
   auto oneshot_track__ = oneshot_track ? _fbb.CreateString(oneshot_track) : 0;
   auto cd_flags__ = cd_flags ? _fbb.CreateVector<int32_t>(*cd_flags) : 0;
-  auto volume_states__ = volume_states ? _fbb.CreateVector<flatbuffers::Offset<TEN::Save::VolumeState>>(*volume_states) : 0;
+  auto volumes__ = volumes ? _fbb.CreateVector<flatbuffers::Offset<TEN::Save::Volume>>(*volumes) : 0;
   auto call_counters__ = call_counters ? _fbb.CreateVector<flatbuffers::Offset<TEN::Save::EventSetCallCounters>>(*call_counters) : 0;
   auto callbacks_pre_control__ = callbacks_pre_control ? _fbb.CreateVector<flatbuffers::Offset<flatbuffers::String>>(*callbacks_pre_control) : 0;
   auto callbacks_post_control__ = callbacks_post_control ? _fbb.CreateVector<flatbuffers::Offset<flatbuffers::String>>(*callbacks_post_control) : 0;
@@ -6742,7 +6853,7 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGameDirect(
       rope,
       pendulum,
       alternate_pendulum,
-      volume_states__,
+      volumes__,
       call_counters__,
       script_vars,
       callbacks_pre_control__,
@@ -8174,14 +8285,9 @@ inline VolumeStateT *VolumeState::UnPack(const flatbuffers::resolver_function_t 
 inline void VolumeState::UnPackTo(VolumeStateT *_o, const flatbuffers::resolver_function_t *_resolver) const {
   (void)_o;
   (void)_resolver;
-  { auto _e = number(); _o->number = _e; }
-  { auto _e = room_number(); _o->room_number = _e; }
-  { auto _e = position(); if (_e) _o->position = std::unique_ptr<TEN::Save::Vector3>(new TEN::Save::Vector3(*_e)); }
-  { auto _e = rotation(); if (_e) _o->rotation = std::unique_ptr<TEN::Save::Vector4>(new TEN::Save::Vector4(*_e)); }
-  { auto _e = scale(); if (_e) _o->scale = std::unique_ptr<TEN::Save::Vector3>(new TEN::Save::Vector3(*_e)); }
-  { auto _e = state(); _o->state = _e; }
-  { auto _e = triggerer(); _o->triggerer = _e; }
-  { auto _e = timeout(); _o->timeout = _e; }
+  { auto _e = status(); _o->status = _e; }
+  { auto _e = activator(); _o->activator = _e; }
+  { auto _e = timestamp(); _o->timestamp = _e; }
 }
 
 inline flatbuffers::Offset<VolumeState> VolumeState::Pack(flatbuffers::FlatBufferBuilder &_fbb, const VolumeStateT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
@@ -8192,24 +8298,61 @@ inline flatbuffers::Offset<VolumeState> CreateVolumeState(flatbuffers::FlatBuffe
   (void)_rehasher;
   (void)_o;
   struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const VolumeStateT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _status = _o->status;
+  auto _activator = _o->activator;
+  auto _timestamp = _o->timestamp;
+  return TEN::Save::CreateVolumeState(
+      _fbb,
+      _status,
+      _activator,
+      _timestamp);
+}
+
+inline VolumeT *Volume::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = std::make_unique<VolumeT>();
+  UnPackTo(_o.get(), _resolver);
+  return _o.release();
+}
+
+inline void Volume::UnPackTo(VolumeT *_o, const flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = name(); if (_e) _o->name = _e->str(); }
+  { auto _e = number(); _o->number = _e; }
+  { auto _e = room_number(); _o->room_number = _e; }
+  { auto _e = enabled(); _o->enabled = _e; }
+  { auto _e = position(); if (_e) _o->position = std::unique_ptr<TEN::Save::Vector3>(new TEN::Save::Vector3(*_e)); }
+  { auto _e = rotation(); if (_e) _o->rotation = std::unique_ptr<TEN::Save::Vector4>(new TEN::Save::Vector4(*_e)); }
+  { auto _e = scale(); if (_e) _o->scale = std::unique_ptr<TEN::Save::Vector3>(new TEN::Save::Vector3(*_e)); }
+  { auto _e = queue(); if (_e) { _o->queue.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->queue[_i] = std::unique_ptr<TEN::Save::VolumeStateT>(_e->Get(_i)->UnPack(_resolver)); } } }
+}
+
+inline flatbuffers::Offset<Volume> Volume::Pack(flatbuffers::FlatBufferBuilder &_fbb, const VolumeT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateVolume(_fbb, _o, _rehasher);
+}
+
+inline flatbuffers::Offset<Volume> CreateVolume(flatbuffers::FlatBufferBuilder &_fbb, const VolumeT *_o, const flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const VolumeT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _name = _o->name.empty() ? _fbb.CreateSharedString("") : _fbb.CreateString(_o->name);
   auto _number = _o->number;
   auto _room_number = _o->room_number;
+  auto _enabled = _o->enabled;
   auto _position = _o->position ? _o->position.get() : 0;
   auto _rotation = _o->rotation ? _o->rotation.get() : 0;
   auto _scale = _o->scale ? _o->scale.get() : 0;
-  auto _state = _o->state;
-  auto _triggerer = _o->triggerer;
-  auto _timeout = _o->timeout;
-  return TEN::Save::CreateVolumeState(
+  auto _queue = _fbb.CreateVector<flatbuffers::Offset<TEN::Save::VolumeState>> (_o->queue.size(), [](size_t i, _VectorArgs *__va) { return CreateVolumeState(*__va->__fbb, __va->__o->queue[i].get(), __va->__rehasher); }, &_va );
+  return TEN::Save::CreateVolume(
       _fbb,
+      _name,
       _number,
       _room_number,
+      _enabled,
       _position,
       _rotation,
       _scale,
-      _state,
-      _triggerer,
-      _timeout);
+      _queue);
 }
 
 inline ScriptTableT *ScriptTable::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
@@ -8558,7 +8701,7 @@ inline void SaveGame::UnPackTo(SaveGameT *_o, const flatbuffers::resolver_functi
   { auto _e = rope(); if (_e) _o->rope = std::unique_ptr<TEN::Save::RopeT>(_e->UnPack(_resolver)); }
   { auto _e = pendulum(); if (_e) _o->pendulum = std::unique_ptr<TEN::Save::PendulumT>(_e->UnPack(_resolver)); }
   { auto _e = alternate_pendulum(); if (_e) _o->alternate_pendulum = std::unique_ptr<TEN::Save::PendulumT>(_e->UnPack(_resolver)); }
-  { auto _e = volume_states(); if (_e) { _o->volume_states.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->volume_states[_i] = std::unique_ptr<TEN::Save::VolumeStateT>(_e->Get(_i)->UnPack(_resolver)); } } }
+  { auto _e = volumes(); if (_e) { _o->volumes.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->volumes[_i] = std::unique_ptr<TEN::Save::VolumeT>(_e->Get(_i)->UnPack(_resolver)); } } }
   { auto _e = call_counters(); if (_e) { _o->call_counters.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->call_counters[_i] = std::unique_ptr<TEN::Save::EventSetCallCountersT>(_e->Get(_i)->UnPack(_resolver)); } } }
   { auto _e = script_vars(); if (_e) _o->script_vars = std::unique_ptr<TEN::Save::UnionVecT>(_e->UnPack(_resolver)); }
   { auto _e = callbacks_pre_control(); if (_e) { _o->callbacks_pre_control.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->callbacks_pre_control[_i] = _e->Get(_i)->str(); } } }
@@ -8608,7 +8751,7 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGame(flatbuffers::FlatBufferBuild
   auto _rope = _o->rope ? CreateRope(_fbb, _o->rope.get(), _rehasher) : 0;
   auto _pendulum = _o->pendulum ? CreatePendulum(_fbb, _o->pendulum.get(), _rehasher) : 0;
   auto _alternate_pendulum = _o->alternate_pendulum ? CreatePendulum(_fbb, _o->alternate_pendulum.get(), _rehasher) : 0;
-  auto _volume_states = _fbb.CreateVector<flatbuffers::Offset<TEN::Save::VolumeState>> (_o->volume_states.size(), [](size_t i, _VectorArgs *__va) { return CreateVolumeState(*__va->__fbb, __va->__o->volume_states[i].get(), __va->__rehasher); }, &_va );
+  auto _volumes = _fbb.CreateVector<flatbuffers::Offset<TEN::Save::Volume>> (_o->volumes.size(), [](size_t i, _VectorArgs *__va) { return CreateVolume(*__va->__fbb, __va->__o->volumes[i].get(), __va->__rehasher); }, &_va );
   auto _call_counters = _fbb.CreateVector<flatbuffers::Offset<TEN::Save::EventSetCallCounters>> (_o->call_counters.size(), [](size_t i, _VectorArgs *__va) { return CreateEventSetCallCounters(*__va->__fbb, __va->__o->call_counters[i].get(), __va->__rehasher); }, &_va );
   auto _script_vars = _o->script_vars ? CreateUnionVec(_fbb, _o->script_vars.get(), _rehasher) : 0;
   auto _callbacks_pre_control = _fbb.CreateVectorOfStrings(_o->callbacks_pre_control);
@@ -8650,7 +8793,7 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGame(flatbuffers::FlatBufferBuild
       _rope,
       _pendulum,
       _alternate_pendulum,
-      _volume_states,
+      _volumes,
       _call_counters,
       _script_vars,
       _callbacks_pre_control,

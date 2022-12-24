@@ -1253,15 +1253,17 @@ struct LaraControlData
 	TightropeControlData Tightrope;
 	SubsuitControlData Subsuit;
 
-	bool CanLook;
-	bool IsMoving;
-	bool KeepLow;
-	bool IsLow;
-	bool CanClimbLadder;
-	bool IsClimbingLadder;
-	bool CanMonkeySwing;
-	bool RunJumpQueued;
-	bool Locked;
+	bool IsClimbingLadder = false;
+	bool Locked			  = false;
+	bool IsLow			  = false;
+	bool IsMonkeySwinging = false;
+	bool IsMoving		  = false;
+	bool RunJumpQueued	  = false;
+	bool KeepLow		  = false;
+
+	bool CanClimbLadder = false;
+	bool CanLook		= false;
+	bool CanMonkeySwing = false;
 };
 
 struct LaraInfo

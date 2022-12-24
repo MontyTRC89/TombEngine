@@ -50,6 +50,7 @@ public:
 	int GetAmmoCount() const;
 	void UndrawWeapon();
 	void ThrowAwayTorch();
+	bool TorchIsLit() const;
 	static void Register(sol::table & parent);
 	using Moveable::Moveable;
 };

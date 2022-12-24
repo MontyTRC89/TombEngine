@@ -897,7 +897,7 @@ void LaraAboveWater(ItemInfo* item, CollisionInfo* coll)
 	// Test for flags and triggers.
 	ProcessSectorFlags(item);
 	TestTriggers(item, false);
-	TestVolumes(Lara.ItemNumber);
+	TestVolumes(Lara.ItemNumber, &coll->Setup);
 
 	DrawNearbyPathfinding(GetCollision(item).BottomBlock->Box);
 }

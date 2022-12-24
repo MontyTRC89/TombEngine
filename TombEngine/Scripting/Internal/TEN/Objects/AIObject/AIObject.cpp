@@ -81,7 +81,7 @@ void AIObject::Register(sol::table & parent)
 		// For example, you could have a pair of AI_GUARD objects, and change one or the other two
 		// AI_PATROL_1 based on whether the player has a certain item or not.
 		// @function AIObject:SetObjectID
-		// @tparam ObjID ID the new ID 
+		// @tparam Objects.ObjID ID the new ID 
 		// @usage
 		// aiObj = TEN.Objects.GetMoveableByName("ai_guard_sphinx_room")
 		// aiObj:SetObjectID(TEN.Objects.ObjID.AI_PATROL1)
@@ -111,19 +111,19 @@ void AIObject::SetObjectID(GAME_OBJECT_ID objNum)
 	m_aiObject.objectNumber = objNum;
 }
 
-short AIObject::GetYRot() const
+float AIObject::GetYRot() const
 {
-	return m_aiObject.pos.Orientation.y;
+	return TO_DEGREES(m_aiObject.pos.Orientation.y);
 }
 
-void AIObject::SetYRot(short yRot)
+void AIObject::SetYRot(float yRot)
 {
-	m_aiObject.pos.Orientation.y = yRot;
+	m_aiObject.pos.Orientation.y = ANGLE(yRot);
 }
 
 std::string AIObject::GetName() const
 {
-	return m_aiObject.luaName;
+	return m_aiObject.Name;
 }
 
 void AIObject::SetName(std::string const & id) 
@@ -136,8 +136,8 @@ void AIObject::SetName(std::string const & id)
 	if (s_callbackSetName(id, m_aiObject))
 	{
 		// remove the old name if we have one
-		s_callbackRemoveName(m_aiObject.luaName);
-		m_aiObject.luaName = id;
+		s_callbackRemoveName(m_aiObject.Name);
+		m_aiObject.Name = id;
 	}
 	else
 	{

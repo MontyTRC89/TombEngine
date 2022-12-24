@@ -77,6 +77,7 @@ void HandleLaraMovementParameters(ItemInfo* item, CollisionInfo* coll)
 		ResetLaraTurnRateY(item);
 
 	lara.Control.IsLow = false;
+	lara.Control.IsMonkeySwinging = false;
 }
 
 bool HandleLaraVehicle(ItemInfo* item, CollisionInfo* coll)

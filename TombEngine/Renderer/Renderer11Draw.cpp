@@ -811,12 +811,10 @@ namespace TEN::Renderer
 
 	void Renderer11::AddDebugSphere(Vector3 center, float radius, Vector4 color, RENDERER_DEBUG_PAGE page)
 	{
-#ifdef _DEBUG
-		if (m_numDebugPage != page)
+		if (!DebugMode || m_numDebugPage != page)
 			return;
 
 		AddSphere(center, radius, color);
-#endif _DEBUG
 	}
 
 	void Renderer11::AddBox(Vector3* corners, Vector4 color)
@@ -933,23 +931,19 @@ namespace TEN::Renderer
 
 	void Renderer11::AddDebugBox(BoundingOrientedBox box, Vector4 color, RENDERER_DEBUG_PAGE page)
 	{
-#ifdef _DEBUG
-		if (m_numDebugPage != page)
+		if (!DebugMode || m_numDebugPage != page)
 			return;
 
 		Vector3 corners[8];
 		box.GetCorners(corners);
 		AddBox(corners, color);
-#endif _DEBUG
 	}
 
 	void Renderer11::AddDebugBox(Vector3 min, Vector3 max, Vector4 color, RENDERER_DEBUG_PAGE page)
 	{
-#ifdef _DEBUG
 		if (m_numDebugPage != page)
 			return;
 		AddBox(min, max, color);
-#endif _DEBUG
 	}
 
 	void Renderer11::AddDynamicLight(int x, int y, int z, short falloff, byte r, byte g, byte b)
@@ -1627,10 +1621,6 @@ namespace TEN::Renderer
 					DrawLara(view, transparent);
 					break;
 
-				case ID_DARTS:
-					DrawDarts(itemToDraw, view);
-					break;
-
 				case ID_WATERFALL1:
 				case ID_WATERFALL2:
 				case ID_WATERFALL3:
@@ -1799,25 +1789,6 @@ namespace TEN::Renderer
 
 			drawnVertices += TRANSPARENT_BUCKET_SIZE;
 		}
-	}
-
-	void Renderer11::DrawDarts(RendererItem* item, RenderView& view)
-	{
-		ItemInfo* nativeItem = &g_Level.Items[item->ItemNumber];
-
-		Vector3 start = Vector3(
-			nativeItem->Pose.Position.x,
-			nativeItem->Pose.Position.y,
-			nativeItem->Pose.Position.z);
-
-		float speed = (-96 * phd_cos(TO_RAD(nativeItem->Pose.Orientation.x)));
-
-		Vector3 end = Vector3(
-			nativeItem->Pose.Position.x + speed * phd_sin(TO_RAD(nativeItem->Pose.Orientation.y)),
-			nativeItem->Pose.Position.y + 96 * phd_sin(TO_RAD(nativeItem->Pose.Orientation.x)),
-			nativeItem->Pose.Position.z + speed * phd_cos(TO_RAD(nativeItem->Pose.Orientation.y)));
-
-		AddLine3D(start, end, Vector4(30 / 255.0f, 30 / 255.0f, 30 / 255.0f, 0.5f));
 	}
 
 	void Renderer11::DrawStatics(RenderView& view, bool transparent)

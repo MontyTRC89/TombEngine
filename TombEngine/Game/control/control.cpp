@@ -32,7 +32,7 @@
 #include "Game/room.h"
 #include "Game/savegame.h"
 #include "Game/spotcam.h"
-#include "Math/Random.h"
+#include "Math/Math.h"
 #include "Objects/Effects/tr4_locusts.h"
 #include "Objects/Generic/Object/objects.h"
 #include "Objects/Generic/Object/rope.h"

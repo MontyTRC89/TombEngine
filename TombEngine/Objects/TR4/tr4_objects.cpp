@@ -10,75 +10,75 @@
 #include "Specific/level.h"
 
 // Creatures
-#include "tr4_enemy_jeep.h"
-#include "tr4_ahmet.h" // OK
-#include "tr4_baddy.h" // OK
-#include "tr4_bat.h" // OK
-#include "tr4_big_scorpion.h" // OK
-#include "tr4_crocodile.h" // OK
-#include "tr4_demigod.h" // OK
-#include "tr4_guide.h" // OK
-#include "tr4_harpy.h" // OK
-#include "tr4_horseman.h" // OFF
-#include "tr4_jean_yves.h" // OK
-#include "tr4_knight_templar.h" // OK
+#include "Objects/TR4/Entity/tr4_enemy_jeep.h"
+#include "Objects/TR4/Entity/tr4_ahmet.h" // OK
+#include "Objects/TR4/Entity/tr4_baddy.h" // OK
+#include "Objects/TR4/Entity/tr4_bat.h" // OK
+#include "Objects/TR4/Entity/tr4_big_scorpion.h" // OK
+#include "Objects/TR4/Entity/tr4_crocodile.h" // OK
+#include "Objects/TR4/Entity/tr4_demigod.h" // OK
+#include "Objects/TR4/Entity/tr4_guide.h" // OK
+#include "Objects/TR4/Entity/tr4_harpy.h" // OK
+#include "Objects/TR4/Entity/tr4_horseman.h" // OFF
+#include "Objects/TR4/Entity/tr4_jean_yves.h" // OK
+#include "Objects/TR4/Entity/tr4_knight_templar.h" // OK
+#include "Objects/TR4/Entity/tr4_lara_double.h"
 #include "Objects/TR4/Entity/tr4_beetle_swarm.h"
-#include "tr4_mummy.h" // OK
-#include "tr4_sas.h" // OK
-#include "tr4_sentry_gun.h" // OK
-#include "tr4_skeleton.h" // OK
-#include "tr4_small_scorpion.h" // OK
-#include "tr4_sphinx.h" // OK
-#include "tr4_troops.h" // OK
-#include "tr4_wild_boar.h" // OK
-#include "tr4_wraith.h" // OFF
-#include "tr4_baboon.h" // OK
-#include "tr4_mutant.h" // OK
-#include "tr4_locusts.h" // OK
-#include "tr4_big_beetle.h" // OFF
-#include "tr4_joby_spikes.h"
-#include "tr4_mapper.h"
-#include "tr4_moving_blade.h"
-#include "tr4_element_puzzle.h"
-#include "tr4_von_croy.h"
-#include "tr4_hammerhead.h"
-#include "tr4_dog.h"
-#include "tr4_hammer.h"
+#include "Objects/TR4/Entity/tr4_mummy.h" // OK
+#include "Objects/TR4/Entity/tr4_sas.h" // OK
+#include "Objects/TR4/Entity/tr4_sentry_gun.h" // OK
+#include "Objects/TR4/Entity/tr4_skeleton.h" // OK
+#include "Objects/TR4/Entity/tr4_small_scorpion.h" // OK
+#include "Objects/TR4/Entity/tr4_sphinx.h" // OK
+#include "Objects/TR4/Entity/tr4_troops.h" // OK
+#include "Objects/TR4/Entity/tr4_wild_boar.h" // OK
+#include "Objects/TR4/Entity/tr4_wraith.h" // OFF
+#include "Objects/TR4/Entity/tr4_baboon.h" // OK
+#include "Objects/TR4/Entity/tr4_mutant.h" // OK
+#include "Objects/TR4/Entity/tr4_big_beetle.h" // OFF
+#include "Objects/TR4/Entity/tr4_von_croy.h"
+#include "Objects/TR4/Entity/tr4_hammerhead.h"
+#include "Objects/TR4/Entity/tr4_dog.h"
+#include "Objects/TR4/Entity/tr4_setha.h"
 
 // Objects
-#include "tr4_sarcophagus.h"
-#include "tr4_senet.h"
+#include "Objects/TR4/Object/tr4_element_puzzle.h"
+#include "Objects/TR4/Object/tr4_mapper.h"
+#include "Objects/TR4/Object/tr4_sarcophagus.h"
+#include "Objects/TR4/Object/tr4_senet.h"
 #include "Objects/TR4/Object/tr4_clockwork_beetle.h"
-#include "tr4_obelisk.h"
-
-// Puzzles
-#include "tr4_scales.h"
+#include "Objects/TR4/Object/tr4_obelisk.h"
+#include "Objects/TR4/Object/tr4_scales.h"
 
 // Switches
 
 // Traps
-#include "tr4_birdblade.h"
-#include "tr4_blade.h"
-#include "tr4_catwalkblade.h"
-#include "tr4_chain.h"
-#include "tr4_fourblades.h"
-#include "tr4_mine.h"
-#include "tr4_plinthblade.h"
-#include "tr4_plough.h"
-#include "tr4_sethblade.h"
-#include "tr4_slicerdicer.h"
-#include "tr4_spikeball.h"
-#include "tr4_spikywall.h"
-#include "tr4_spikyceiling.h"
-#include "tr4_stargate.h"
-#include "tr4_cog.h"
-#include "tr4_lara_double.h"
-#include "tr4_setha.h"
-#include "tr4_teethspike.h"
+#include "Objects/TR4/Trap/tr4_birdblade.h"
+#include "Objects/TR4/Trap/tr4_blade.h"
+#include "Objects/TR4/Trap/tr4_catwalkblade.h"
+#include "Objects/TR4/Trap/tr4_chain.h"
+#include "Objects/TR4/Trap/tr4_fourblades.h"
+#include "Objects/TR4/Trap/tr4_hammer.h"
+#include "Objects/TR4/Trap/tr4_joby_spikes.h"
+#include "Objects/TR4/Trap/tr4_mine.h"
+#include "Objects/TR4/Trap/tr4_moving_blade.h"
+#include "Objects/TR4/Trap/tr4_plinthblade.h"
+#include "Objects/TR4/Trap/tr4_plough.h"
+#include "Objects/TR4/Trap/tr4_sethblade.h"
+#include "Objects/TR4/Trap/tr4_slicerdicer.h"
+#include "Objects/TR4/Trap/tr4_spikeball.h"
+#include "Objects/TR4/Trap/tr4_spikywall.h"
+#include "Objects/TR4/Trap/tr4_spikyceiling.h"
+#include "Objects/TR4/Trap/tr4_stargate.h"
+#include "Objects/TR4/Trap/tr4_cog.h"
+#include "Objects/TR4/Trap/tr4_teethspike.h"
 
 // Vehicles
 #include "Objects/TR4/Vehicles/jeep.h"
 #include "Objects/TR4/Vehicles/motorbike.h"
+
+// Effects
+#include "Objects/Effects/tr4_locusts.h" // OK
 
 using namespace TEN::Entities::Traps;
 
@@ -242,23 +242,7 @@ namespace TEN::Entities
 
 		obj = &Objects[ID_SAS_CAIRO];
 		if (obj->loaded)
-		{
-			obj->biteOffset = 10;
-			obj->initialise = InitialiseSas;
-			obj->control = SasControl;
-			obj->collision = CreatureCollision;
-			obj->shadowType = ShadowMode::All;
-			obj->HitPoints = 40;
-			obj->hitEffect = HIT_BLOOD;
-			obj->pivotLength = 50;
-			obj->radius = 102;
-			obj->intelligent = true;
-			obj->ZoneType = ZoneType::HumanClassic;
-			g_Level.Bones[obj->boneIndex] |= ROT_Y;
-			g_Level.Bones[obj->boneIndex] |= ROT_X;
-			g_Level.Bones[obj->boneIndex + 28 * 4] |= ROT_Y;
-			g_Level.Bones[obj->boneIndex + 28 * 4] |= ROT_X;
-		}
+			SetupSas(*obj);
 
 		obj = &Objects[ID_MUMMY];
 		if (obj->loaded)
@@ -297,20 +281,7 @@ namespace TEN::Entities
 
 		obj = &Objects[ID_KNIGHT_TEMPLAR];
 		if (obj->loaded)
-		{
-			obj->initialise = InitialiseKnightTemplar;
-			obj->control = KnightTemplarControl;
-			obj->collision = CreatureCollision;
-			obj->shadowType = ShadowMode::All;
-			obj->HitPoints = 15;
-			obj->hitEffect = HIT_SMOKE;
-			obj->pivotLength = 50;
-			obj->radius = 128;
-			obj->intelligent = true;
-			obj->ZoneType = ZoneType::Basic;
-			g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_X | ROT_Y;
-			g_Level.Bones[obj->boneIndex + 7 * 4] |= ROT_Y;
-		}
+			SetupKnightTemplar(*obj);
 
 		obj = &Objects[ID_BIG_BEETLE];
 		if (obj->loaded)
@@ -331,8 +302,8 @@ namespace TEN::Entities
 		obj = &Objects[ID_SETHA];
 		if (obj->loaded)
 		{
-			obj->initialise = InitialiseSetha;
-			obj->control = SethaControl;
+			obj->initialise = InitialiseSeth;
+			obj->control = SethControl;
 			obj->collision = CreatureCollision;
 			obj->shadowType = ShadowMode::All;
 			obj->HitPoints = 500;
@@ -649,13 +620,7 @@ namespace TEN::Entities
 
 		obj = &Objects[ID_SAS_DYING];
 		if (obj->loaded)
-		{
-			obj->initialise = InitialiseInjuredSas;
-			obj->control = InjuredSasControl;
-			obj->collision = ObjectCollision;
-			obj->hitEffect = HIT_BLOOD;
-			obj->ZoneType = ZoneType::Basic;
-		}
+			SetupInjuredSas(*obj);
 
 		obj = &Objects[ID_ENEMY_JEEP];
 		if (obj->loaded)
@@ -698,10 +663,7 @@ namespace TEN::Entities
 	{
 		obj = &Objects[ID_SAS_DRAG_BLOKE];
 		if (obj->loaded)
-		{
-			obj->control = AnimatingControl;
-			obj->collision = SasDragBlokeCollision;
-		}
+			SetupSasDraggableSas(*obj);
 
 		obj = &Objects[ID_SARCOPHAGUS];
 		if (obj->loaded)

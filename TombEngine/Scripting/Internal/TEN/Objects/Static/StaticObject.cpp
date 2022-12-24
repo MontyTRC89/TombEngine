@@ -174,23 +174,24 @@ void Static::SetScale(float const& scale)
 // (e.g. 90 degrees = -270 degrees = 450 degrees)
 Rotation Static::GetRot() const
 {
-	return {
-		static_cast<int>(TO_DEGREES(m_mesh.pos.Orientation.x)) % 360,
-		static_cast<int>(TO_DEGREES(m_mesh.pos.Orientation.y)) % 360,
-		static_cast<int>(TO_DEGREES(m_mesh.pos.Orientation.z)) % 360
+	return 
+	{
+		TO_DEGREES(m_mesh.pos.Orientation.x),
+		TO_DEGREES(m_mesh.pos.Orientation.y),
+		TO_DEGREES(m_mesh.pos.Orientation.z)
 	};
 }
 
 void Static::SetRot(Rotation const& rot)
 {
-	m_mesh.pos.Orientation.x = FROM_DEGREES(rot.x);
-	m_mesh.pos.Orientation.y = FROM_DEGREES(rot.y);
-	m_mesh.pos.Orientation.z = FROM_DEGREES(rot.z);
+	m_mesh.pos.Orientation.x = ANGLE(rot.x);
+	m_mesh.pos.Orientation.y = ANGLE(rot.y);
+	m_mesh.pos.Orientation.z = ANGLE(rot.z);
 }
 
 std::string Static::GetName() const
 {
-	return m_mesh.luaName;
+	return m_mesh.Name;
 }
 
 void Static::SetName(std::string const & name) 
@@ -203,8 +204,8 @@ void Static::SetName(std::string const & name)
 	if (s_callbackSetName(name, m_mesh))
 	{
 		// remove the old name if we have one
-		s_callbackRemoveName(m_mesh.luaName);
-		m_mesh.luaName = name;
+		s_callbackRemoveName(m_mesh.Name);
+		m_mesh.Name = name;
 	}
 	else
 	{
