@@ -398,44 +398,6 @@ bool GetStateDispatch(ItemInfo* item, const AnimData& anim)
 	return false;
 }
 
-AnimFrame* GetBestFrame(ItemInfo* item)
-{
-	int rate = 0;
-	AnimFrame* framePtr[2];
-	int frac = GetFrame(item, framePtr, rate);
-
-	if (frac <= (rate >> 1))
-		return framePtr[0];
-	else
-		return framePtr[1];
-}
-
-AnimFrame* GetFirstFrame(GAME_OBJECT_ID slot, int animNumber)
-{
-	return GetFrame(slot, animNumber, 0);
-}
-
-AnimFrame* GetLastFrame(GAME_OBJECT_ID slot, int animNumber)
-{
-	return GetFrame(slot, animNumber, INT_MAX);
-}
-
-AnimFrame* GetFrame(GAME_OBJECT_ID slot, int animNumber, int frameNumber)
-{
-	int animIndex = Objects[slot].animIndex + animNumber;
-	assertion(animIndex < g_Level.Anims.size(), "GetFrame: Attempt to access nonexistent animation.");
-
-	const auto& anim = g_Level.Anims[animIndex];
-
-	int frameCount = anim.frameEnd - anim.frameBase;
-	if (frameNumber > frameCount)
-		frameNumber = frameCount;
-
-	AnimFrame* result = &g_Level.Frames[anim.FramePtr];
-	result += (frameNumber / anim.Interpolation);
-	return result;
-}
-
 int GetFrame(ItemInfo* item, AnimFrame* outFramePtr[], int& outRate)
 {
 	int frame = item->Animation.FrameNumber;
@@ -443,7 +405,7 @@ int GetFrame(ItemInfo* item, AnimFrame* outFramePtr[], int& outRate)
 
 	outFramePtr[0] = outFramePtr[1] = &g_Level.Frames[anim.FramePtr];
 	int rate = outRate = anim.Interpolation & 0x00FF;
-	frame -= anim.frameBase; 
+	frame -= anim.frameBase;
 
 	int first = frame / rate;
 	int interpolation = frame % rate;
@@ -459,6 +421,44 @@ int GetFrame(ItemInfo* item, AnimFrame* outFramePtr[], int& outRate)
 		outRate = anim.frameEnd - (second - rate);
 
 	return interpolation;
+}
+
+AnimFrame* GetFrame(GAME_OBJECT_ID slot, int animNumber, int frameNumber)
+{
+	int animIndex = Objects[slot].animIndex + animNumber;
+	assertion(animIndex < g_Level.Anims.size(), "GetFrame() attempted to access nonexistent animation.");
+
+	const auto& anim = g_Level.Anims[animIndex];
+
+	int frameCount = anim.frameEnd - anim.frameBase;
+	if (frameNumber > frameCount)
+		frameNumber = frameCount;
+
+	auto* result = &g_Level.Frames[anim.FramePtr];
+	result += frameNumber / anim.Interpolation;
+	return result;
+}
+
+AnimFrame* GetFirstFrame(GAME_OBJECT_ID slot, int animNumber)
+{
+	return GetFrame(slot, animNumber, 0);
+}
+
+AnimFrame* GetLastFrame(GAME_OBJECT_ID slot, int animNumber)
+{
+	return GetFrame(slot, animNumber, INT_MAX);
+}
+
+AnimFrame* GetBestFrame(ItemInfo* item)
+{
+	int rate = 0;
+	AnimFrame* framePtr[2];
+	int frac = GetFrame(item, framePtr, rate);
+
+	if (frac <= (rate >> 1))
+		return framePtr[0];
+	else
+		return framePtr[1];
 }
 
 int GetCurrentRelativeFrameNumber(ItemInfo* item)

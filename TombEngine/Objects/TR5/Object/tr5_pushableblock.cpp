@@ -442,27 +442,27 @@ void PushableBlockCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo*
 		}
 
 		int quadrant = GetQuadrant(LaraItem->Pose.Orientation.y);
-		bool quadrantDisabled = false;
+		bool isQuadrantDisabled = false;
 		switch (quadrant)
 		{
 		case NORTH:
-			quadrantDisabled = pushable->disableN;
+			isQuadrantDisabled = pushable->disableN;
 			break;
 
 		case EAST:
-			quadrantDisabled = pushable->disableE;
+			isQuadrantDisabled = pushable->disableE;
 			break;
 
 		case SOUTH:
-			quadrantDisabled = pushable->disableS;
+			isQuadrantDisabled = pushable->disableS;
 			break;
 
 		case WEST:
-			quadrantDisabled = pushable->disableW;
+			isQuadrantDisabled = pushable->disableW;
 			break;
 		}
 
-		if (quadrantDisabled)
+		if (isQuadrantDisabled)
 			return;
 
 		if (!CheckStackLimit(pushableItem))
@@ -509,19 +509,30 @@ void PushableBlockCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo*
 		PushableBlockBounds.BoundingBox.Z2 = 0;
 
 		short yOrient = pushableItem->Pose.Orientation.y;
-		pushableItem->Pose.Orientation.y = (laraItem->Pose.Orientation.y + ANGLE(45.0f)) & 0xC000;
+		pushableItem->Pose.Orientation.y = GetQuadrant(laraItem->Pose.Orientation.y) * ANGLE(90.0f);
 
 		if (TestLaraPosition(PushableBlockBounds, pushableItem, laraItem))
 		{
-			int quadrant = int((pushableItem->Pose.Orientation.y / 0x4000) + ((yOrient + 0x2000) / 0x4000));
-			if (quadrant & 1)
-				PushableBlockPos.z = bounds.X1 - CLICK(0.4f);
-			else
+			int quadrant = GetQuadrant(pushableItem->Pose.Orientation.y);
+			switch (quadrant)
+			{
+			case NORTH:
+			case SOUTH:
 				PushableBlockPos.z = bounds.Z1 - CLICK(0.4f);
+				break;
+
+			case EAST:
+			case WEST:
+				PushableBlockPos.z = bounds.X1 - CLICK(0.4f);
+				break;
+
+			default:
+				break;
+			}
 
 			if (pushable->hasFloorCeiling)
 			{					
-				// Don't use auto align function because it interferes with vaulting.
+				// NOTE: Not using auto align function because it interferes with vaulting.
 
 				SetAnimation(laraItem, LA_PUSHABLE_GRAB);
 				laraItem->Pose.Orientation = pushableItem->Pose.Orientation;

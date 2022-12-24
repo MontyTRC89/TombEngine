@@ -95,6 +95,7 @@ int GetFrameCount(int animNumber);
 int GetNextAnimState(ItemInfo* item);
 int GetNextAnimState(int objectID, int animNumber);
 bool GetStateDispatch(ItemInfo* item, const AnimData& anim);
+
 int GetFrame(ItemInfo* item, AnimFrame* outFramePtr[], int& outRate);
 AnimFrame* GetFrame(GAME_OBJECT_ID slot, int animNumber, int frameNumber);
 AnimFrame* GetFirstFrame(GAME_OBJECT_ID slot, int animNumber);
