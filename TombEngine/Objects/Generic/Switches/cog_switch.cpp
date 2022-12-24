@@ -149,7 +149,8 @@ namespace TEN::Entities::Switches
 		}
 		else
 		{
-			if (switchItem->Animation.FrameNumber == g_Level.Anims[switchItem->Animation.AnimNumber].frameEnd)
+			if ((switchItem->Animation.FrameNumber == g_Level.Anims[switchItem->Animation.AnimNumber].frameEnd)
+				&& (LaraItem->Animation.AnimNumber == LA_COGWHEEL_RELEASE))
 			{
 				switchItem->Animation.ActiveState = SWITCH_OFF;
 				switchItem->Status = ITEM_NOT_ACTIVE;
@@ -157,6 +158,12 @@ namespace TEN::Entities::Switches
 				RemoveActiveItem(itemNumber);
 
 				Lara.Control.HandStatus = HandStatus::Free;
+			}
+			else
+			{
+				//If Lara is repeating the PULL animation (because player dropped after the frame check).
+				//do the wheel animation again.
+				switchItem->Animation.TargetState = SWITCH_ON;
 			}
 		}
 	}
