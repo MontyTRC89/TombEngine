@@ -2045,6 +2045,10 @@ void HandleOptics(ItemInfo* item)
 	if (LaserSight && !(TrInput & IN_LOOK))
 		breakOptics = true;
 
+	// If lasersight, and weapon is holstered, exit optics.
+	if (LaserSight && (TrInput & IN_DRAW))
+		breakOptics = true;
+
 	if (!LaserSight && !breakOptics && (TrInput == IN_LOOK)) // Engage lasersight, if available.
 	{
 		if (Lara.Control.HandStatus == HandStatus::WeaponReady &&

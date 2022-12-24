@@ -373,6 +373,7 @@ table VolumeState {
 }
 
 table Volume {
+	name: string;
 	number: int32;
 	room_number: int32;
 	enabled: bool;

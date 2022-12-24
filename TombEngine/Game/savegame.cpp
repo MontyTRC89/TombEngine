@@ -158,10 +158,13 @@ bool SaveGame::Save(int slot)
 
 	Save::SaveGameHeaderBuilder sghb{ fbb };
 	sghb.add_level_name(levelNameOffset);
-	sghb.add_days((GameTimer / FPS) / 8640);
-	sghb.add_hours(((GameTimer / FPS) % 86400) / 3600);
-	sghb.add_minutes(((GameTimer / FPS) / 60) % 6);
-	sghb.add_seconds((GameTimer / FPS) % 60);
+
+	auto gameTime = GetGameTime(GameTimer);
+	sghb.add_days(gameTime.Days);
+	sghb.add_hours(gameTime.Hours);
+	sghb.add_minutes(gameTime.Minutes);
+	sghb.add_seconds(gameTime.Seconds);
+
 	sghb.add_level(CurrentLevel);
 	sghb.add_timer(GameTimer);
 	sghb.add_count(++LastSaveGame);
@@ -828,7 +831,7 @@ bool SaveGame::Save(int slot)
 
 			staticMesh.add_flags(room->mesh[j].flags);
 			staticMesh.add_hit_points(room->mesh[j].HitPoints);
-			staticMesh.add_room_number(room->mesh[j].roomNumber);
+			staticMesh.add_room_number(i);
 			staticMesh.add_number(j);
 			staticMeshes.push_back(staticMesh.Finish());
 		}
@@ -854,11 +857,14 @@ bool SaveGame::Save(int slot)
 				volstate.add_timestamp(entry.Timestamp);
 				queue.push_back(volstate.Finish());
 			}
+
 			auto queueOffset = fbb.CreateVector(queue);
+			auto nameOffset = fbb.CreateString(currVolume.Name);
 
 			Save::VolumeBuilder volume{ fbb };
 			volume.add_room_number(i);
 			volume.add_number(j);
+			volume.add_name(nameOffset);
 			volume.add_enabled(currVolume.Enabled);
 			volume.add_position(&FromVector3(currVolume.Box.Center));
 			volume.add_rotation(&FromVector4(currVolume.Box.Orientation));
@@ -1303,6 +1309,7 @@ bool SaveGame::Load(int slot)
 		int number = volume->number();
 
 		room->triggerVolumes[number].Enabled = volume->enabled();
+		room->triggerVolumes[number].Name = volume->name()->str();
 		room->triggerVolumes[number].Box.Center =
 		room->triggerVolumes[number].Sphere.Center = ToVector3(volume->position());
 		room->triggerVolumes[number].Box.Orientation = ToVector4(volume->rotation());
