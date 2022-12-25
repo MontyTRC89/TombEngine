@@ -347,7 +347,7 @@ void TranslateItem(ItemInfo* item, const Vector3& direction, float distance)
 	item->Pose.Translate(direction, distance);
 }
 
-void SetAnimation(ItemInfo* item, int animIndex, int frameToStart, bool targetStateEnabled)
+void SetAnimation(ItemInfo* item, int animIndex, int frameToStart, int customTargetState)
 {
 	if (item->Animation.AnimNumber == animIndex)
 		return;
@@ -360,10 +360,10 @@ void SetAnimation(ItemInfo* item, int animIndex, int frameToStart, bool targetSt
 	}
 
 	item->Animation.AnimNumber = index;
-	item->Animation.FrameNumber = g_Level.Anims[index].frameBase + frameToStart;
-	item->Animation.ActiveState = g_Level.Anims[index].ActiveState;
-	if (targetStateEnabled)
-		item->Animation.TargetState = item->Animation.ActiveState;
+	const auto& anim = g_Level.Anims[index];
+	item->Animation.FrameNumber = anim.frameBase + frameToStart;
+	item->Animation.ActiveState = anim.ActiveState;
+	item->Animation.TargetState = customTargetState != -1 ? customTargetState : anim.ActiveState;
 }
 
 bool GetStateDispatch(ItemInfo* item, const AnimData& anim)

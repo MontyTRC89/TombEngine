@@ -300,8 +300,7 @@ static void StartTrap(ObjectInfo* obj)
 	{
 		obj->control = TrainControl;
 		obj->collision = TrainCollision;
-		obj->isSolid = true;
-		obj->SetupHitEffect();
+		obj->SetupHitEffect(true);
 	}
 }
 
@@ -313,8 +312,7 @@ static void StartVehicles(ObjectInfo* obj)
 		obj->initialise = InitialiseQuadBike;
 		obj->collision = QuadBikePlayerCollision;
 		obj->shadowType = ShadowMode::Lara;
-		obj->isSolid = true;
-		obj->SetupHitEffect();
+		obj->SetupHitEffect(true);
 	}
 
 	obj = &Objects[ID_RUBBER_BOAT];
@@ -325,8 +323,7 @@ static void StartVehicles(ObjectInfo* obj)
 		obj->collision = RubberBoatPlayerCollision;
 		obj->drawRoutine = DrawRubberBoat;
 		obj->shadowType = ShadowMode::Lara;
-		obj->isSolid = true;
-		obj->SetupHitEffect();
+		obj->SetupHitEffect(true);
 
 	}
 
@@ -336,8 +333,7 @@ static void StartVehicles(ObjectInfo* obj)
 		obj->initialise = InitialiseKayak;
 		obj->collision = KayakPlayerCollision;
 		obj->shadowType = ShadowMode::Lara;
-		obj->isSolid = true;
-		obj->SetupHitEffect();
+		obj->SetupHitEffect(true);
 
 	}
 
@@ -347,8 +343,7 @@ static void StartVehicles(ObjectInfo* obj)
 		obj->initialise = InitialiseMinecart;
 		obj->collision = MinecartPlayerCollision;
 		obj->shadowType = ShadowMode::Lara;
-		obj->isSolid = true;
-		obj->SetupHitEffect();
+		obj->SetupHitEffect(true);
 
 	}
 
@@ -358,8 +353,7 @@ static void StartVehicles(ObjectInfo* obj)
 		obj->initialise = BigGunInitialise;
 		obj->collision = BigGunCollision;
 		obj->shadowType = ShadowMode::Lara;
-		obj->isSolid = true;
-		obj->SetupHitEffect();
+		obj->SetupHitEffect(true);
 	}
 
 	obj = &Objects[ID_UPV];
@@ -369,8 +363,7 @@ static void StartVehicles(ObjectInfo* obj)
 		obj->control = UPVEffects;
 		obj->collision = UPVPlayerCollision;
 		obj->shadowType = ShadowMode::Lara;
-		obj->isSolid = true;
-		obj->SetupHitEffect();
+		obj->SetupHitEffect(true);
 	}
 }
 

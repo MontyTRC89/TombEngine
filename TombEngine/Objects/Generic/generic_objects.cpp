@@ -55,8 +55,7 @@ static void StartObject(ObjectInfo* obj)
 			obj->ceilingBorder = TrapDoorCeilingBorder;
 			obj->floor = TrapDoorFloor;
 			obj->ceiling = TrapDoorCeiling;
-			obj->isSolid = true;
-			obj->SetupHitEffect();
+			obj->SetupHitEffect(true);
 		}
 	}
 
@@ -118,8 +117,7 @@ void StartSwitches(ObjectInfo* obj)
 	{
 		obj->collision = CogSwitchCollision;
 		obj->control = CogSwitchControl;
-		obj->isSolid = true;
-		obj->SetupHitEffect();
+		obj->SetupHitEffect(true);
 	}
 
 	obj = &Objects[ID_LEVER_SWITCH];
@@ -127,8 +125,7 @@ void StartSwitches(ObjectInfo* obj)
 	{
 		obj->collision = RailSwitchCollision;
 		obj->control = SwitchControl;
-		obj->isSolid = true;
-		obj->SetupHitEffect();
+		obj->SetupHitEffect(true);
 	}
 
 	obj = &Objects[ID_JUMP_SWITCH];
@@ -136,8 +133,7 @@ void StartSwitches(ObjectInfo* obj)
 	{
 		obj->collision = JumpSwitchCollision;
 		obj->control = SwitchControl;
-		obj->isSolid = true;
-		obj->SetupHitEffect();
+		obj->SetupHitEffect(true);
 	}
 
 	for (int objectNum = ID_SWITCH_TYPE1; objectNum <= ID_SWITCH_TYPE16; objectNum++)
@@ -147,8 +143,7 @@ void StartSwitches(ObjectInfo* obj)
 		{
 			obj->collision = SwitchCollision;
 			obj->control = SwitchControl;
-			obj->isSolid = true;
-			obj->SetupHitEffect();
+			obj->SetupHitEffect(true);
 		}
 	}
 
@@ -157,8 +152,7 @@ void StartSwitches(ObjectInfo* obj)
 	{
 		obj->collision = CrowbarSwitchCollision;
 		obj->control = SwitchControl;
-		obj->isSolid = true;
-		obj->SetupHitEffect();
+		obj->SetupHitEffect(true);
 	}
 
 	for (int objectNum = ID_UNDERWATER_SWITCH1; objectNum <= ID_UNDERWATER_SWITCH4; objectNum++)
@@ -168,7 +162,6 @@ void StartSwitches(ObjectInfo* obj)
 		{
 			obj->control = SwitchControl;
 			obj->collision = UnderwaterSwitchCollision;
-			obj->isSolid = true;
 		}
 	}
 
@@ -178,7 +171,6 @@ void StartSwitches(ObjectInfo* obj)
 		obj->initialise = InitialisePulleySwitch;
 		obj->control = SwitchControl;
 		obj->collision = PulleySwitchCollision;
-		obj->isSolid = true;
 	}
 
 	obj = &Objects[ID_TURN_SWITCH];
@@ -186,8 +178,7 @@ void StartSwitches(ObjectInfo* obj)
 	{
 		obj->control = TurnSwitchControl;
 		obj->collision = TurnSwitchCollision;
-		obj->isSolid = true;
-		obj->SetupHitEffect();
+		obj->SetupHitEffect(true);
 	}
 
 	obj = &Objects[ID_SEQUENCE_SWITCH1];
@@ -195,8 +186,7 @@ void StartSwitches(ObjectInfo* obj)
 	{
 		obj->collision = FullBlockSwitchCollision;
 		obj->control = FullBlockSwitchControl;
-		obj->isSolid = true;
-		obj->SetupHitEffect();
+		obj->SetupHitEffect(true);
 	}
 
 	obj = &Objects[ID_SEQUENCE_SWITCH2];
@@ -204,8 +194,7 @@ void StartSwitches(ObjectInfo* obj)
 	{
 		obj->collision = FullBlockSwitchCollision;
 		obj->control = FullBlockSwitchControl;
-		obj->isSolid = true;
-		obj->SetupHitEffect();
+		obj->SetupHitEffect(true);
 	}
 
 	obj = &Objects[ID_SEQUENCE_SWITCH3];
@@ -213,8 +202,7 @@ void StartSwitches(ObjectInfo* obj)
 	{
 		obj->collision = FullBlockSwitchCollision;
 		obj->control = FullBlockSwitchControl;
-		obj->isSolid = true;
-		obj->SetupHitEffect();
+		obj->SetupHitEffect(true);
 	}
 }
 
@@ -228,8 +216,7 @@ void StartDoors(ObjectInfo* obj)
 			obj->initialise = InitialiseDoor;
 			obj->control = DoorControl;
 			obj->collision = DoorCollision;
-			obj->isSolid = true;
-			obj->SetupHitEffect();
+			obj->SetupHitEffect(true);
 		}
 	}
 
@@ -238,8 +225,7 @@ void StartDoors(ObjectInfo* obj)
 	{
 		obj->initialise = InitialiseDoor;
 		obj->control = DoorControl;
-		obj->isSolid = true;
-		obj->SetupHitEffect();
+		obj->SetupHitEffect(true);
 	}
 
 	obj = &Objects[ID_LIFT_DOORS2];
@@ -247,8 +233,7 @@ void StartDoors(ObjectInfo* obj)
 	{
 		obj->initialise = InitialiseDoor;
 		obj->control = DoorControl;
-		obj->isSolid = true;
-		obj->SetupHitEffect();
+		obj->SetupHitEffect(true);
 	}
 
 	obj = &Objects[ID_SEQUENCE_DOOR1];
@@ -257,8 +242,7 @@ void StartDoors(ObjectInfo* obj)
 		obj->initialise = InitialiseDoor;
 		obj->collision = DoorCollision;
 		obj->control = SequenceDoorControl;
-		obj->isSolid = true;
-		obj->SetupHitEffect();
+		obj->SetupHitEffect(true);
 	}
 
 	for (int i = ID_DOUBLE_DOORS1; i <= ID_DOUBLE_DOORS4; i++)
@@ -269,8 +253,7 @@ void StartDoors(ObjectInfo* obj)
 			obj->initialise = InitialiseDoor;
 			obj->collision = DoubleDoorCollision;
 			obj->control = PushPullKickDoorControl;
-			obj->isSolid = true;
-			obj->SetupHitEffect();
+			obj->SetupHitEffect(true);
 		}
 	}
 
@@ -282,8 +265,7 @@ void StartDoors(ObjectInfo* obj)
 			obj->initialise = InitialiseDoor;
 			obj->collision = UnderwaterDoorCollision;
 			obj->control = PushPullKickDoorControl;
-			obj->isSolid = true;
-			obj->SetupHitEffect();
+			obj->SetupHitEffect(true);
 		}
 	}
 
@@ -295,8 +277,7 @@ void StartDoors(ObjectInfo* obj)
 			obj->initialise = InitialiseDoor;
 			obj->collision = PushPullKickDoorCollision;
 			obj->control = PushPullKickDoorControl;
-			obj->isSolid = true;
-			obj->SetupHitEffect();
+			obj->SetupHitEffect(true);
 		}
 	}
 
@@ -305,8 +286,7 @@ void StartDoors(ObjectInfo* obj)
 	{
 		obj->initialise = InitialiseSteelDoor;
 		obj->collision = SteelDoorCollision;
-		obj->isSolid = true;
-		obj->SetupHitEffect();
+		obj->SetupHitEffect(true);
 	}
 }
 
@@ -350,8 +330,7 @@ void StartTraps(ObjectInfo* obj)
 	if (obj->loaded)
 	{
 		obj->collision = PoleCollision;
-		obj->isSolid = true;
-		obj->SetupHitEffect();
+		obj->SetupHitEffect(true);
 	}
 
 	obj = &Objects[ID_BURNING_TORCH_ITEM];

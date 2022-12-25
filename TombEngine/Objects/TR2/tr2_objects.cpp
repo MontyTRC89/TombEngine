@@ -161,7 +161,7 @@ static void StartEntity(ObjectInfo* obj)
 		}
 		else
 		{
-			TENLog("ID_GOON_SILENCER1 not found.", LogLevel::Error);
+			TENLog("ID_GOON_SILENCER1 not found.", LogLevel::Warning);
 		}
 
 		obj->initialise = InitialiseCreature;
@@ -188,7 +188,7 @@ static void StartEntity(ObjectInfo* obj)
 		}
 		else
 		{
-			TENLog("ID_GOON_SILENCER1 not found.", LogLevel::Error);
+			TENLog("ID_GOON_SILENCER1 not found.", LogLevel::Warning);
 		}
 
 		obj->initialise = InitialiseCreature;
@@ -375,7 +375,7 @@ static void StartEntity(ObjectInfo* obj)
 		}
 		else
 		{
-			TENLog("ID_MERCENARY_AUTOPISTOLS1 not found!", LogLevel::Error);
+			TENLog("ID_MERCENARY_AUTOPISTOLS1 not found!", LogLevel::Warning);
 		}
 
 		obj->initialise = InitialiseCreature;
@@ -457,7 +457,7 @@ static void StartEntity(ObjectInfo* obj)
 	if (obj->loaded)
 	{
 		if (!Objects[ID_DRAGON_BACK].loaded)
-			TENLog("ID_DRAGON_FRONT needs ID_DRAGON_BACK!", LogLevel::Error);
+			TENLog("ID_DRAGON_FRONT needs ID_DRAGON_BACK!", LogLevel::Warning);
 
 		obj->collision = DragonCollision;
 		obj->control = DragonControl;
@@ -473,7 +473,7 @@ static void StartEntity(ObjectInfo* obj)
 	if (obj->loaded)
 	{
 		if (!Objects[ID_MARCO_BARTOLI].loaded)
-			TENLog("ID_DRAGON_BACK needs ID_MARCO_BARTOLI!", LogLevel::Error);
+			TENLog("ID_DRAGON_BACK needs ID_MARCO_BARTOLI!", LogLevel::Warning);
 
 		obj->collision = DragonCollision;
 		obj->control = DragonControl;
@@ -537,8 +537,7 @@ static void StartTrap(ObjectInfo* obj)
 		obj->initialise = InitialiseKillerStatue;
 		obj->control = KillerStatueControl;
 		obj->collision = ObjectCollision;
-		obj->isSolid = true;
-		obj->SetupHitEffect();
+		obj->SetupHitEffect(true);
 	}
 }
 
@@ -553,8 +552,7 @@ static void StartVehicles(ObjectInfo* obj)
 		obj->collision = SpeedboatPlayerCollision;
 		obj->control = SpeedboatControl;
 		obj->shadowType = ShadowMode::Lara;
-		obj->isSolid = true;
-		obj->SetupHitEffect();
+		obj->SetupHitEffect(true);
 	}
 
 	obj = &Objects[ID_SNOWMOBILE]; // TODO: create a new render for the skidoo. (with track animated)
@@ -563,8 +561,7 @@ static void StartVehicles(ObjectInfo* obj)
 		obj->initialise = InitialiseSkidoo;
 		obj->collision = SkidooPlayerCollision;
 		obj->shadowType = ShadowMode::Lara;
-		obj->isSolid = true;
-		obj->SetupHitEffect();
+		obj->SetupHitEffect(true);
 	}
 }
 

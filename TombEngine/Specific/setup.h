@@ -64,7 +64,6 @@ struct ObjectInfo
 	bool undead;
 	bool isPickup;
 	bool isPuzzleHole;
-	bool isSolid; // define a slot object like switch, door, trapdoor etc... as solid, which set hitEffect to Spark !
 	int meshSwapSlot;
 	DWORD explodableMeshbits;
 
@@ -83,7 +82,7 @@ struct ObjectInfo
 	/// example: if it's intelligent and have hp without undead then it's alive = blood.
 	/// </summary>
 	/// <param name="isAlive">use this if the object is alive but not intelligent, it will setup it to blood.</param>
-	void SetupHitEffect(bool isAlive = false)
+	void SetupHitEffect(bool isSolid = false, bool isAlive = false)
 	{
 		if (isAlive) // avoid some object like: ID_SAS_DYING to have None !
 		{

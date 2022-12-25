@@ -122,9 +122,7 @@ static void StartEntity(ObjectInfo* obj)
 	obj = &Objects[ID_DOPPELGANGER];
 	if (obj->loaded)
 	{
-		if (Objects[ID_LARA].loaded)
-			obj->animIndex = Objects[ID_LARA].animIndex;
-
+		obj->animIndex = Objects[ID_LARA].animIndex; // NOTE: lara is obviously loaded by default.
 		obj->initialise = InitialiseCreature;
 		obj->collision = CreatureCollision;
 		obj->control = DoppelgangerControl;
@@ -188,8 +186,7 @@ static void StartTrap(ObjectInfo* obj)
 		obj->control = ControlDamoclesSword;
 		obj->collision = CollideDamoclesSword;
 		obj->shadowType = ShadowMode::All;
-		obj->isSolid = true;
-		obj->SetupHitEffect();
+		obj->SetupHitEffect(true);
 	}
 }
 

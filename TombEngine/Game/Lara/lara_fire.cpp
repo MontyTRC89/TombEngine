@@ -348,7 +348,7 @@ Ammo& GetAmmo(LaraInfo& lara, LaraWeaponType weaponType)
 
 GameVector GetTargetPoint(ItemInfo* targetEntity)
 {
-	const auto& bounds = *(GameBoundingBox*)GetBestFrame(targetEntity);
+	const auto& bounds = GetBestFrame(targetEntity)->boundingBox;
 
 	auto center = Vector3i(
 		(bounds.X1 + bounds.X2) / 2,
@@ -1098,13 +1098,13 @@ void HitTarget(ItemInfo* laraItem, ItemInfo* targetEntity, GameVector* hitPos, i
 	if (targetEntity->IsCreature())
 		GetCreatureInfo(targetEntity)->HurtByLara = true;
 
-	auto object = &Objects[targetEntity->ObjectNumber];
+	const auto& object = Objects[targetEntity->ObjectNumber];
 
 	if (hitPos != nullptr)
 	{
-		if (object->hitEffect != HitEffect::None)
+		if (object.hitEffect != HitEffect::None)
 		{
-			switch (object->hitEffect)
+			switch (object.hitEffect)
 			{
 			case HitEffect::Blood:
 				if (targetEntity->ObjectNumber == ID_BADDY2 &&
@@ -1142,7 +1142,7 @@ void HitTarget(ItemInfo* laraItem, ItemInfo* targetEntity, GameVector* hitPos, i
 		}
 	}
 
-	if (!object->undead || grenade)
+	if (!object.undead || grenade)
 	{
 		if (targetEntity->HitPoints > 0)
 		{

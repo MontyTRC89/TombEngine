@@ -426,10 +426,9 @@ static void StartEntity(ObjectInfo *obj)
 		obj->undead = true;
 		obj->zoneType = ZoneType::Human;
 		obj->meshSwapSlot = ID_MESHSWAP_HITMAN;
-		obj->isSolid = true;
 		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
 		obj->SetBoneRotationFlags(13, ROT_X | ROT_Y);
-		obj->SetupHitEffect();
+		obj->SetupHitEffect(true);
 	}
 
 	obj = &Objects[ID_SNIPER];
@@ -464,10 +463,9 @@ static void StartEntity(ObjectInfo *obj)
 		obj->explodableMeshbits = 4;
 		obj->intelligent = true;
 		obj->undead = true;
-		obj->isSolid = true;
 		obj->SetBoneRotationFlags(0, ROT_X | ROT_Y);
 		obj->SetBoneRotationFlags(1, ROT_X | ROT_Y);
-		obj->SetupHitEffect();
+		obj->SetupHitEffect(true);
 	}
 
 	obj = &Objects[ID_HYDRA];
@@ -637,12 +635,11 @@ static void StartEntity(ObjectInfo *obj)
 			obj->pivotLength = 50;
 			obj->radius = 256;
 			obj->intelligent = true;
-			obj->isSolid = true;
 			obj->zoneType = ZoneType::Human;
 			obj->meshSwapSlot = ID_MESHSWAP_ROMAN_GOD1 + i;
 			obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
 			obj->SetBoneRotationFlags(13, ROT_X | ROT_Y);
-			obj->SetupHitEffect();
+			obj->SetupHitEffect(true);
 		}
 	}
 
@@ -655,9 +652,8 @@ static void StartEntity(ObjectInfo *obj)
 		obj->explodableMeshbits = 6;
 		obj->usingDrawAnimatingItem = false;
 		obj->undead = true;
-		obj->isSolid = true;
 		obj->nonLot = true;
-		obj->SetupHitEffect();
+		obj->SetupHitEffect(true);
 	}
 
 	obj = &Objects[ID_AUTOGUN];
@@ -667,20 +663,18 @@ static void StartEntity(ObjectInfo *obj)
 		obj->control = ControlAutoGun;
 		obj->intelligent = true;
 		obj->undead = true;
-		obj->isSolid = true;
 		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
 		obj->SetBoneRotationFlags(8, ROT_Y);
-		obj->SetupHitEffect();
+		obj->SetupHitEffect(true);
 	}
 
 	obj = &Objects[ID_GUNSHIP];
 	if (obj->loaded)
 	{
 		obj->control = ControlGunShip;
-		obj->isSolid = true;
 		obj->SetBoneRotationFlags(0, ROT_Y);
 		obj->SetBoneRotationFlags(1, ROT_X);
-		obj->SetupHitEffect();
+		obj->SetupHitEffect(true);
 	}
 }
 
@@ -703,8 +697,7 @@ static void StartObject(ObjectInfo *obj)
 		obj->ceiling = TwoBlocksPlatformCeiling;
 		obj->floorBorder = TwoBlocksPlatformFloorBorder;
 		obj->ceilingBorder = TwoBlocksPlatformCeilingBorder;
-		obj->isSolid = true;
-		obj->SetupHitEffect();
+		obj->SetupHitEffect(true);
 	}
 
 	for (int objNum = ID_RAISING_BLOCK1; objNum <= ID_RAISING_BLOCK4; objNum++)
@@ -718,8 +711,7 @@ static void StartObject(ObjectInfo *obj)
 			obj->ceiling = RaisingBlockCeiling;
 			obj->floorBorder = RaisingBlockFloorBorder;
 			obj->ceilingBorder = RaisingBlockCeilingBorder;
-			obj->isSolid = true;
-			obj->SetupHitEffect();
+			obj->SetupHitEffect(true);
 		}
 	}
 
@@ -732,8 +724,7 @@ static void StartObject(ObjectInfo *obj)
 		obj->ceiling = ExpandingPlatformCeiling;
 		obj->floorBorder = ExpandingPlatformFloorBorder;
 		obj->ceilingBorder = ExpandingPlatformCeilingBorder;
-		obj->isSolid = true;
-		obj->SetupHitEffect();
+		obj->SetupHitEffect(true);
 	}
 
 	obj = &Objects[ID_ELECTRICAL_LIGHT];
@@ -853,8 +844,7 @@ static void StartTrap(ObjectInfo *obj)
 		obj->initialise = InitialiseZipLine;
 		obj->collision = ZipLineCollision;
 		obj->control = ControlZipLine;
-		obj->isSolid = true;
-		obj->SetupHitEffect();
+		obj->SetupHitEffect(true);
 	}
 
 	obj = &Objects[ID_PROPELLER_H];
@@ -862,8 +852,7 @@ static void StartTrap(ObjectInfo *obj)
 	{
 		obj->initialise = InitialiseVentilator;
 		obj->control = VentilatorControl;
-		obj->isSolid = true;
-		obj->SetupHitEffect();
+		obj->SetupHitEffect(true);
 	}
 
 	obj = &Objects[ID_PROPELLER_V];
@@ -871,8 +860,7 @@ static void StartTrap(ObjectInfo *obj)
 	{
 		obj->initialise = InitialiseVentilator;
 		obj->control = VentilatorControl;
-		obj->isSolid = true;
-		obj->SetupHitEffect();
+		obj->SetupHitEffect(true);
 	}
 
 	obj = &Objects[ID_ELECTRICAL_CABLES];
@@ -887,8 +875,7 @@ static void StartTrap(ObjectInfo *obj)
 		obj->initialise = InitialiseRomeHammer;
 		obj->collision = GenericSphereBoxCollision;
 		obj->control = AnimatingControl;
-		obj->isSolid = true;
-		obj->SetupHitEffect();
+		obj->SetupHitEffect(true);
 	}
 
 	obj = &Objects[ID_FALLING_CEILING];
@@ -904,8 +891,7 @@ static void StartTrap(ObjectInfo *obj)
 		obj->collision = RollingBallCollision;
 		obj->control = RollingBallControl;
 		obj->shadowType = ShadowMode::All;
-		obj->isSolid = true;
-		obj->SetupHitEffect();
+		obj->SetupHitEffect(true);
 	}
 	
 	obj = &Objects[ID_CLASSIC_ROLLING_BALL];
@@ -914,8 +900,7 @@ static void StartTrap(ObjectInfo *obj)
 		obj->initialise = InitialiseClassicRollingBall;
 		obj->control = ClassicRollingBallControl;
 		obj->collision = ClassicRollingBallCollision;
-		obj->isSolid = true;
-		obj->SetupHitEffect();
+		obj->SetupHitEffect(true);
 	}
 
 	obj = &Objects[ID_BIG_ROLLING_BALL];
@@ -924,8 +909,7 @@ static void StartTrap(ObjectInfo *obj)
 		obj->collision = ClassicRollingBallCollision;
 		obj->control = ClassicRollingBallControl;
 		obj->initialise = InitialiseClassicRollingBall;
-		obj->isSolid = true;
-		obj->SetupHitEffect();
+		obj->SetupHitEffect(true);
 	}
 
 	obj = &Objects[ID_GEN_SLOT3];
@@ -960,8 +944,7 @@ static void StartSwitch(ObjectInfo *obj)
 	{
 		obj->initialise = InitialiseRaisingCog;
 		obj->control = RaisingCogControl;
-		obj->isSolid = true;
-		obj->SetupHitEffect();
+		obj->SetupHitEffect(true);
 	}
 
 	obj = &Objects[ID_CROWDOVE_SWITCH];
@@ -970,8 +953,7 @@ static void StartSwitch(ObjectInfo *obj)
 		obj->initialise = InitialiseCrowDoveSwitch;
 		obj->collision = CrowDoveSwitchCollision;
 		obj->control = CrowDoveSwitchControl;
-		obj->isSolid = true;
-		obj->SetupHitEffect();
+		obj->SetupHitEffect(true);
 	}
 
 	obj = &Objects[ID_WRECKING_BALL];
@@ -980,8 +962,7 @@ static void StartSwitch(ObjectInfo *obj)
 		obj->initialise = InitialiseWreckingBall;
 		obj->collision = WreckingBallCollision;
 		obj->control = WreckingBallControl;
-		obj->isSolid = true;
-		obj->SetupHitEffect();
+		obj->SetupHitEffect(true);
 	}
 }
 

@@ -19,8 +19,7 @@ void InitSmashObject(ObjectInfo* obj, int objectNumber)
 		obj->initialise = InitialiseSmashObject;
 		obj->collision = ObjectCollision;
 		obj->control = SmashObjectControl;
-		obj->isSolid = true;
-		obj->SetupHitEffect();
+		obj->SetupHitEffect(true);
 	}
 }
 
@@ -30,8 +29,7 @@ void InitKeyHole(ObjectInfo* obj, int objectNumber)
 	if (obj->loaded)
 	{
 		obj->collision = KeyHoleCollision;
-		obj->isSolid = true;
-		obj->SetupHitEffect();
+		obj->SetupHitEffect(true);
 	}
 }
 
@@ -43,8 +41,7 @@ void InitPuzzleHole(ObjectInfo* obj, int objectNumber)
 		obj->collision = PuzzleHoleCollision;
 		obj->control = AnimatingControl;
 		obj->isPuzzleHole = true;
-		obj->isSolid = true;
-		obj->SetupHitEffect();
+		obj->SetupHitEffect(true);
 	}
 }
 
@@ -55,8 +52,7 @@ void InitPuzzleDone(ObjectInfo* obj, int objectNumber)
 	{
 		obj->collision = PuzzleDoneCollision;
 		obj->control = AnimatingControl;
-		obj->isSolid = true;
-		obj->SetupHitEffect();
+		obj->SetupHitEffect(true);
 	}
 }
 
@@ -68,8 +64,7 @@ void InitAnimating(ObjectInfo* obj, int objectNumber)
 		obj->initialise = InitialiseAnimating;
 		obj->control = AnimatingControl;
 		obj->collision = ObjectCollision;
-		obj->isSolid = true;
-		obj->SetupHitEffect();
+		obj->SetupHitEffect(true);
 	}
 }
 
@@ -82,8 +77,7 @@ void InitPickup(ObjectInfo* obj, int objectNumber)
 		obj->collision = PickupCollision;
 		obj->control = PickupControl;
 		obj->isPickup = true;
-		obj->isSolid = true;
-		obj->SetupHitEffect();
+		obj->SetupHitEffect(true);
 	}
 }
 
@@ -99,8 +93,7 @@ void InitPickup(ObjectInfo* obj, int objectNumber, std::function<ControlFunction
 		else
 			obj->control = PickupControl;
 		obj->isPickup = true;
-		obj->isSolid = true;
-		obj->SetupHitEffect();
+		obj->SetupHitEffect(true);
 	}
 }
 
@@ -152,7 +145,6 @@ void InitPushableObject(ObjectInfo* obj, int objectNumber)
 		obj->ceiling = PushableBlockCeiling;
 		obj->floorBorder = PushableBlockFloorBorder;
 		obj->ceilingBorder = PushableBlockCeilingBorder;
-		obj->isSolid = true;
-		obj->SetupHitEffect();
+		obj->SetupHitEffect(true);
 	}
 }
