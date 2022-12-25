@@ -96,7 +96,7 @@ namespace TEN::Entities::Switches
 						switchItem->Animation.TargetState = SWITCH_ON;
 						switchItem->Status = ITEM_ACTIVE;
 
-						if ((door != NULL) && (!switchItem->TriggerFlags))
+						if ((door != nullptr) && (!switchItem->TriggerFlags))
 						{
 							if (!door->opened)
 							{
