@@ -354,19 +354,18 @@ void InitialiseObjects()
 		obj->radius = DEFAULT_RADIUS;
 		obj->shadowType = ShadowMode::None;
 		obj->HitPoints = NOT_TARGETABLE;
-		obj->hitEffect = HIT_NONE;
+		obj->hitEffect = HitEffect::None;
 		obj->explodableMeshbits = 0;
 		obj->intelligent = false;
 		obj->waterCreature = false;
 		obj->nonLot = true;
 		obj->usingDrawAnimatingItem = true;
 		obj->undead = false;
-		obj->ZoneType = ZoneType::Basic;
+		obj->zoneType = ZoneType::Basic;
 		obj->biteOffset = -1;
 		obj->meshSwapSlot = NO_ITEM;
 		obj->isPickup = false;
 		obj->isPuzzleHole = false;
-		//obj->frameBase += (short)g_Level.Frames.data();
 	}
 
 	InitialiseEffectsObjects();

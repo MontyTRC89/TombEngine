@@ -762,7 +762,7 @@ int CreatureAnimation(short itemNumber, short angle, short tilt)
 
 void CreatureHealth(ItemInfo* item)
 {
-	auto* creature = GetCreatureInfo(item);
+	auto creature = GetCreatureInfo(item);
 
 	if (creature->Poisoned && item->HitPoints > 1 && (GlobalCounter & 0x1F) == 0x1F)
 		item->HitPoints--;
@@ -780,19 +780,26 @@ void CreatureHealth(ItemInfo* item)
 
 void CreatureDie(short itemNumber, bool explode)
 {
-	auto* item = &g_Level.Items[itemNumber];
+	auto item = &g_Level.Items[itemNumber];
+	auto object = &Objects[item->ObjectNumber];
 
 	item->HitPoints = NOT_TARGETABLE;
 	item->Collidable = false;
 
 	if (explode)
 	{
-		if (Objects[item->ObjectNumber].hitEffect & HIT_BLOOD)
+		switch (object->hitEffect)
+		{
+		case HitEffect::Blood:
 			ExplodingDeath(itemNumber, BODY_EXPLODE | BODY_GIBS);
-		else if (Objects[item->ObjectNumber].hitEffect & HIT_SMOKE)
+			break;
+		case HitEffect::Smoke:
 			ExplodingDeath(itemNumber, BODY_EXPLODE | BODY_NO_BOUNCE);
-		else
+			break;
+		default:
 			ExplodingDeath(itemNumber, BODY_EXPLODE);
+			break;
+		}
 
 		KillItem(itemNumber);
 	}
@@ -1400,8 +1407,8 @@ int TargetReachable(ItemInfo* item, ItemInfo* enemy)
 	// This prevents enemies from running to the player and attacking nothing when they are hanging or shimmying. -- Lwmte, 27.06.22
 
 	bool reachable = false;
-	if (object->ZoneType == ZoneType::Flyer ||
-	   (object->ZoneType == ZoneType::Water && TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, item->RoomNumber)))
+	if (object->zoneType == ZoneType::Flyer ||
+	   (object->zoneType == ZoneType::Water && TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, item->RoomNumber)))
 	{
 		reachable = true; // If NPC is flying or swimming in water, player is always reachable.
 	}

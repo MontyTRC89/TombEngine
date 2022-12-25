@@ -5,6 +5,7 @@
 #include "Game/control/box.h"
 #include "Game/itemdata/creature_info.h"
 #include "Game/pickup/pickup.h"
+#include "Objects/Utils/object_helper.h"
 #include "Objects/Generic/Object/objects.h"
 #include "Specific/setup.h"
 #include "Specific/level.h"
@@ -94,11 +95,10 @@ namespace TEN::Entities
 			obj->collision = CreatureCollision;
 			obj->shadowType = ShadowMode::All;
 			obj->HitPoints = 8;
-			obj->hitEffect = HIT_BLOOD;
 			obj->pivotLength = 20;
 			obj->radius = 128;
 			obj->intelligent = true;
-			obj->ZoneType = ZoneType::Basic;
+			obj->SetupHitEffect();
 		}
 
 		obj = &Objects[ID_BIG_SCORPION];
@@ -109,11 +109,10 @@ namespace TEN::Entities
 			obj->collision = CreatureCollision;
 			obj->shadowType = ShadowMode::All;
 			obj->HitPoints = 80;
-			obj->hitEffect = HIT_BLOOD;
 			obj->pivotLength = 50;
 			obj->radius = 512;
 			obj->intelligent = true;
-			obj->ZoneType = ZoneType::Basic;
+			obj->SetupHitEffect();
 		}
 
 		obj = &Objects[ID_HAMMERHEAD];
@@ -124,12 +123,12 @@ namespace TEN::Entities
 			obj->collision = CreatureCollision;
 			obj->shadowType = ShadowMode::All;
 			obj->HitPoints = 8;
-			obj->hitEffect = HIT_BLOOD;
 			obj->pivotLength = 20;
 			obj->radius = 128;
 			obj->intelligent = true;
 			obj->waterCreature = true;
-			obj->ZoneType = ZoneType::Water;
+			obj->zoneType = ZoneType::Water;
+			obj->SetupHitEffect();
 		}
 
 		obj = &Objects[ID_WILD_BOAR];
@@ -140,14 +139,12 @@ namespace TEN::Entities
 			obj->collision = CreatureCollision;
 			obj->shadowType = ShadowMode::All;
 			obj->HitPoints = 40;
-			obj->hitEffect = HIT_BLOOD;
 			obj->pivotLength = 50;
 			obj->radius = 102;
 			obj->intelligent = true;
-			g_Level.Bones[obj->boneIndex + 48 * 4] |= ROT_Z;
-			g_Level.Bones[obj->boneIndex + 48 * 4] |= ROT_Y;
-			g_Level.Bones[obj->boneIndex + 52 * 4] |= ROT_Z;
-			g_Level.Bones[obj->boneIndex + 52 * 4] |= ROT_Y;
+			obj->SetBoneRotationFlags(12, ROT_Y | ROT_Z);
+			obj->SetBoneRotationFlags(13, ROT_Y | ROT_Z);
+			obj->SetupHitEffect();
 		}
 
 		obj = &Objects[ID_DOG];
@@ -158,11 +155,12 @@ namespace TEN::Entities
 			obj->control = Tr4DogControl;
 			obj->shadowType = ShadowMode::All;
 			obj->HitPoints = 18;
-			obj->hitEffect = HIT_BLOOD;
 			obj->pivotLength = 50;
 			obj->radius = 256;
 			obj->intelligent = true;
-			g_Level.Bones[obj->boneIndex + 19 * 4] |= ROT_Y;
+			obj->SetBoneRotationFlags(0, ROT_Y);
+			obj->SetBoneRotationFlags(2, ROT_X | ROT_Y);
+			obj->SetupHitEffect();
 		}
 
 		obj = &Objects[ID_BAT];
@@ -173,11 +171,11 @@ namespace TEN::Entities
 			obj->collision = CreatureCollision;
 			obj->shadowType = ShadowMode::All;
 			obj->HitPoints = 5;
-			obj->hitEffect = HIT_BLOOD;
 			obj->pivotLength = 10;
 			obj->radius = 102;
 			obj->intelligent = true;
-			obj->ZoneType = ZoneType::Flyer;
+			obj->zoneType = ZoneType::Flyer;
+			obj->SetupHitEffect();
 		}
 
 		obj = &Objects[ID_AHMET];
@@ -188,11 +186,11 @@ namespace TEN::Entities
 			obj->collision = CreatureCollision;
 			obj->shadowType = ShadowMode::All;
 			obj->HitPoints = 80;
-			obj->hitEffect = HIT_BLOOD;
 			obj->pivotLength = 300;
 			obj->radius = 341;
 			obj->intelligent = true;
-			g_Level.Bones[obj->boneIndex + 9 * 4] |= ROT_Y;
+			obj->SetBoneRotationFlags(9, ROT_Y);
+			obj->SetupHitEffect();
 		}
 
 		obj = &Objects[ID_BADDY1];
@@ -206,15 +204,15 @@ namespace TEN::Entities
 			obj->collision = CreatureCollision;
 			obj->shadowType = ShadowMode::All;
 			obj->HitPoints = 25;
-			obj->hitEffect = HIT_BLOOD;
 			obj->biteOffset = 9;
 			obj->pivotLength = 50;
 			obj->radius = 102;
 			obj->intelligent = true;
 			obj->meshSwapSlot = ID_MESHSWAP_BADDY1;
-			obj->ZoneType = ZoneType::HumanJumpAndMonkey;
+			obj->zoneType = ZoneType::HumanJumpAndMonkey;
 			obj->SetBoneRotationFlags(7, ROT_X | ROT_Y);
 			obj->SetBoneRotationFlags(22, ROT_X | ROT_Y);
+			obj->SetupHitEffect();
 		}
 
 		obj = &Objects[ID_BADDY2];
@@ -228,15 +226,15 @@ namespace TEN::Entities
 			obj->collision = CreatureCollision;
 			obj->shadowType = ShadowMode::All;
 			obj->HitPoints = 25;
-			obj->hitEffect = HIT_BLOOD;
 			obj->pivotLength = 50;
 			obj->biteOffset = 9;
 			obj->radius = 102;
 			obj->intelligent = true;
 			obj->meshSwapSlot = ID_MESHSWAP_BADDY2;
-			obj->ZoneType = ZoneType::HumanJumpAndMonkey;
+			obj->zoneType = ZoneType::HumanJumpAndMonkey;
 			obj->SetBoneRotationFlags(7, ROT_X | ROT_Y);
 			obj->SetBoneRotationFlags(22, ROT_X | ROT_Y);
+			obj->SetupHitEffect();
 		}
 
 		obj = &Objects[ID_SAS_CAIRO];
@@ -248,13 +246,13 @@ namespace TEN::Entities
 			obj->shadowType = ShadowMode::All;
 			obj->biteOffset = 10;
 			obj->HitPoints = 40;
-			obj->hitEffect = HIT_BLOOD;
 			obj->pivotLength = 50;
 			obj->radius = 102;
 			obj->intelligent = true;
-			obj->ZoneType = ZoneType::Human;
+			obj->zoneType = ZoneType::Human;
 			obj->SetBoneRotationFlags(0, ROT_X | ROT_Y);
 			obj->SetBoneRotationFlags(7, ROT_X | ROT_Y);
+			obj->SetupHitEffect();
 		}
 
 		obj = &Objects[ID_MUMMY];
@@ -265,11 +263,11 @@ namespace TEN::Entities
 			obj->collision = CreatureCollision;
 			obj->shadowType = ShadowMode::All;
 			obj->HitPoints = 15;
-			obj->hitEffect = HIT_SMOKE;
 			obj->radius = 170;
 			obj->intelligent = true;
 			obj->undead = true;
 			obj->SetBoneRotationFlags(7, ROT_X | ROT_Y);
+			obj->SetupHitEffect();
 		}
 
 		obj = &Objects[ID_SKELETON];
@@ -279,14 +277,14 @@ namespace TEN::Entities
 			obj->control = SkeletonControl;
 			obj->collision = CreatureCollision;
 			obj->HitPoints = 15;
-			obj->hitEffect = HIT_SMOKE;
 			obj->shadowType = ShadowMode::All;
 			obj->pivotLength = 50;
 			obj->radius = 128;
 			obj->explodableMeshbits = 0xA00;
 			obj->intelligent = true;
 			obj->undead = true;
-			obj->ZoneType = ZoneType::Skeleton;
+			obj->zoneType = ZoneType::Skeleton;
+			obj->SetupHitEffect();
 		}
 
 		obj = &Objects[ID_KNIGHT_TEMPLAR];
@@ -297,13 +295,13 @@ namespace TEN::Entities
 			obj->collision = CreatureCollision;
 			obj->shadowType = ShadowMode::All;
 			obj->HitPoints = 15;
-			obj->hitEffect = HIT_SMOKE;
 			obj->pivotLength = 50;
 			obj->radius = 128;
 			obj->intelligent = true;
 			obj->undead = true;
 			obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
 			obj->SetBoneRotationFlags(7, ROT_Y);
+			obj->SetupHitEffect();
 		}
 
 		obj = &Objects[ID_BIG_BEETLE];
@@ -314,12 +312,12 @@ namespace TEN::Entities
 			obj->collision = CreatureCollision;
 			obj->shadowType = ShadowMode::All;
 			obj->HitPoints = 30;
-			obj->hitEffect = HIT_BLOOD;
 			obj->pivotLength = 50;
 			obj->radius = 204;
 			obj->intelligent = true;
 			obj->undead = false;
-			obj->ZoneType = ZoneType::Flyer;
+			obj->zoneType = ZoneType::Flyer;
+			obj->SetupHitEffect();
 		}
 
 		obj = &Objects[ID_SETHA];
@@ -330,12 +328,12 @@ namespace TEN::Entities
 			obj->collision = CreatureCollision;
 			obj->shadowType = ShadowMode::All;
 			obj->HitPoints = 500;
-			obj->hitEffect = HIT_NONE;
 			obj->pivotLength = 50;
 			obj->radius = 341;
 			obj->intelligent = true;
 			obj->undead = true;
-			obj->ZoneType = ZoneType::Basic;
+			obj->isSolid = true;
+			obj->SetupHitEffect();
 		}
 
 		obj = &Objects[ID_DEMIGOD1];
@@ -346,13 +344,14 @@ namespace TEN::Entities
 			obj->collision = CreatureCollision;
 			obj->shadowType = ShadowMode::All;
 			obj->HitPoints = 200;
-			obj->hitEffect = HIT_RICOCHET;
 			obj->pivotLength = 50;
 			obj->radius = 341;
 			obj->intelligent = true;
 			obj->undead = true;
+			obj->isSolid = true;
 			obj->SetBoneRotationFlags(8, ROT_X | ROT_Y | ROT_Z);
 			obj->SetBoneRotationFlags(20, ROT_Y);
+			obj->SetupHitEffect();
 		}
 
 		obj = &Objects[ID_DEMIGOD2];
@@ -363,13 +362,13 @@ namespace TEN::Entities
 			obj->collision = CreatureCollision;
 			obj->shadowType = ShadowMode::All;
 			obj->HitPoints = 200;
-			obj->hitEffect = HIT_RICOCHET;
 			obj->pivotLength = 50;
 			obj->radius = 341;
 			obj->intelligent = true;
-			obj->ZoneType = ZoneType::Basic;
+			obj->isSolid = true;
 			obj->SetBoneRotationFlags(8, ROT_X | ROT_Y | ROT_Z);
 			obj->SetBoneRotationFlags(20, ROT_Y);
+			obj->SetupHitEffect();
 		}
 
 		obj = &Objects[ID_DEMIGOD3];
@@ -380,12 +379,13 @@ namespace TEN::Entities
 			obj->collision = CreatureCollision;
 			obj->shadowType = ShadowMode::All;
 			obj->HitPoints = 200;
-			obj->hitEffect = HIT_RICOCHET;
 			obj->pivotLength = 50;
 			obj->radius = 341;
 			obj->intelligent = true;
+			obj->isSolid = true;
 			obj->SetBoneRotationFlags(8, ROT_X | ROT_Y | ROT_Z);
 			obj->SetBoneRotationFlags(20, ROT_Y);
+			obj->SetupHitEffect();
 		}
 
 		obj = &Objects[ID_JEAN_YVES];
@@ -394,8 +394,8 @@ namespace TEN::Entities
 			obj->initialise = InitialiseJeanYves;
 			obj->control = JeanYvesControl;
 			obj->collision = ObjectCollision;
-			obj->hitEffect = HIT_BLOOD;
 			obj->nonLot = true;
+			obj->SetupHitEffect(true);
 		}
 
 		obj = &Objects[ID_TROOPS];
@@ -407,12 +407,12 @@ namespace TEN::Entities
 			obj->collision = CreatureCollision;
 			obj->shadowType = ShadowMode::All;
 			obj->HitPoints = 40;
-			obj->hitEffect = HIT_BLOOD;
 			obj->pivotLength = 50;
 			obj->radius = 102;
 			obj->intelligent = true;
 			obj->SetBoneRotationFlags(0, ROT_X | ROT_Y);
 			obj->SetBoneRotationFlags(7, ROT_X | ROT_Y);
+			obj->SetupHitEffect();
 		}
 
 		obj = &Objects[ID_SENTRY_GUN];
@@ -424,15 +424,16 @@ namespace TEN::Entities
 			obj->shadowType = ShadowMode::All;
 			obj->undead = true;
 			obj->HitPoints = 30;
-			obj->hitEffect = HIT_RICOCHET;
 			obj->pivotLength = 50;
 			obj->radius = 204;
 			obj->intelligent = true;
 			obj->explodableMeshbits = 0x40;
+			obj->isSolid = true;
 			obj->SetBoneRotationFlags(0, ROT_X | ROT_Y);
 			obj->SetBoneRotationFlags(1, ROT_X | ROT_X);
 			obj->SetBoneRotationFlags(2, ROT_X | ROT_Z);
 			obj->SetBoneRotationFlags(3, ROT_X | ROT_Z);
+			obj->SetupHitEffect();
 		}
 
 		obj = &Objects[ID_HARPY];
@@ -443,11 +444,11 @@ namespace TEN::Entities
 			obj->collision = CreatureCollision;
 			obj->shadowType = ShadowMode::All;
 			obj->HitPoints = 60;
-			obj->hitEffect = HIT_SMOKE;
 			obj->pivotLength = 50;
 			obj->radius = 409;
 			obj->intelligent = true;
-			obj->ZoneType = ZoneType::Flyer;
+			obj->zoneType = ZoneType::Flyer;
+			obj->SetupHitEffect();
 		}
 
 		obj = &Objects[ID_GUIDE];
@@ -458,14 +459,13 @@ namespace TEN::Entities
 			obj->collision = CreatureCollision;
 			obj->shadowType = ShadowMode::All;
 			obj->HitPoints = NOT_TARGETABLE;
-			obj->hitEffect = HIT_BLOOD;
 			obj->pivotLength = 0;
 			obj->radius = 128;
 			obj->intelligent = true;
 			obj->meshSwapSlot = ID_MESHSWAP2;
-			obj->ZoneType = ZoneType::Basic;
 			obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
 			obj->SetBoneRotationFlags(20, ROT_X | ROT_Y);
+			obj->SetupHitEffect();
 		}
 
 		obj = &Objects[ID_CROCODILE];
@@ -476,16 +476,16 @@ namespace TEN::Entities
 			obj->collision = CreatureCollision;
 			obj->shadowType = ShadowMode::All;
 			obj->HitPoints = 36;
-			obj->hitEffect = HIT_BLOOD;
 			obj->pivotLength = 300;
 			obj->radius = 409;
 			obj->intelligent = true;
 			obj->waterCreature = true;
-			obj->ZoneType = ZoneType::Water;
+			obj->zoneType = ZoneType::Water;
 			obj->SetBoneRotationFlags(0, ROT_Y);
 			obj->SetBoneRotationFlags(7, ROT_Y);
 			obj->SetBoneRotationFlags(9, ROT_Y);
 			obj->SetBoneRotationFlags(10, ROT_Y);
+			obj->SetupHitEffect();
 		}
 
 		obj = &Objects[ID_SPHINX];
@@ -496,10 +496,10 @@ namespace TEN::Entities
 			obj->collision = CreatureCollision;
 			obj->shadowType = ShadowMode::All;
 			obj->HitPoints = 1000;
-			obj->hitEffect = HIT_RICOCHET;
 			obj->pivotLength = 500;
 			obj->radius = 512;
 			obj->intelligent = true;
+			obj->SetupHitEffect();
 		}
 
 		obj = &Objects[ID_HORSE];
@@ -508,6 +508,8 @@ namespace TEN::Entities
 			obj->initialise = InitialiseHorse;
 			obj->control = nullptr;
 			obj->collision = ObjectCollision;
+			obj->isSolid = true;
+			obj->SetupHitEffect();
 		}
 
 		obj = &Objects[ID_HORSEMAN];
@@ -518,10 +520,11 @@ namespace TEN::Entities
 			obj->collision = CreatureCollision;
 			obj->shadowType = ShadowMode::All;
 			obj->HitPoints = 25;
-			obj->hitEffect = HIT_RICOCHET;
 			obj->pivotLength = 500;
 			obj->radius = 409;
 			obj->intelligent = true;
+			obj->isSolid = true;
+			obj->SetupHitEffect();
 		}
 
 		obj = &Objects[ID_BABOON_NORMAL];
@@ -532,10 +535,10 @@ namespace TEN::Entities
 			obj->collision = CreatureCollision;
 			obj->shadowType = ShadowMode::All;
 			obj->HitPoints = 30;
-			obj->hitEffect = HIT_BLOOD;
 			obj->pivotLength = 200;
 			obj->radius = 256;
 			obj->intelligent = true;
+			obj->SetupHitEffect();
 		}
 
 		obj = &Objects[ID_BABOON_INV];
@@ -551,10 +554,10 @@ namespace TEN::Entities
 			obj->collision = CreatureCollision;
 			obj->shadowType = ShadowMode::All;
 			obj->HitPoints = 30;
-			obj->hitEffect = HIT_BLOOD;
 			obj->pivotLength = 200;
 			obj->radius = 256;
 			obj->intelligent = true;
+			obj->SetupHitEffect();
 		}
 
 		obj = &Objects[ID_BABOON_SILENT];
@@ -570,10 +573,10 @@ namespace TEN::Entities
 			obj->collision = CreatureCollision;
 			obj->shadowType = ShadowMode::All;
 			obj->HitPoints = 30;
-			obj->hitEffect = HIT_BLOOD;
 			obj->pivotLength = 200;
 			obj->radius = 256;
 			obj->intelligent = true;
+			obj->SetupHitEffect();
 		}
 
 		obj = &Objects[ID_CROCODILE_GOD];
@@ -584,13 +587,13 @@ namespace TEN::Entities
 			obj->collision = CreatureCollision;
 			obj->shadowType = ShadowMode::All;
 			obj->HitPoints = NOT_TARGETABLE;
-			obj->hitEffect = HIT_SMOKE;
 			obj->pivotLength = 50;
 			obj->radius = 128;
 			obj->intelligent = true;
 			obj->undead = true;
 			obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
 			obj->SetBoneRotationFlags(7, ROT_X | ROT_Y);
+			obj->SetupHitEffect();
 		}
 
 		obj = &Objects[ID_LOCUSTS_EMITTER];
@@ -636,7 +639,8 @@ namespace TEN::Entities
 			obj->initialise = InitialiseInjuredSas;
 			obj->control = InjuredSasControl;
 			obj->collision = ObjectCollision;
-			obj->hitEffect = HIT_BLOOD;
+			obj->HitPoints = NOT_TARGETABLE;
+			obj->SetupHitEffect(true);
 		}
 
 		obj = &Objects[ID_ENEMY_JEEP];
@@ -645,16 +649,18 @@ namespace TEN::Entities
 			obj->initialise = InitialiseEnemyJeep;
 			obj->control = EnemyJeepControl;
 			obj->collision = CreatureCollision;
-			obj->intelligent = true;
-			obj->pivotLength = 500;
 			obj->shadowType = ShadowMode::All;
-			obj->radius = 512;
 			obj->HitPoints = 40;
-			obj->ZoneType = ZoneType::HumanJumpAndMonkey;
+			obj->pivotLength = 500;
+			obj->radius = 512;
+			obj->zoneType = ZoneType::HumanJumpAndMonkey;
+			obj->intelligent = true;
+			obj->isSolid = true;
 			obj->SetBoneRotationFlags(8, ROT_X);
 			obj->SetBoneRotationFlags(9, ROT_X);
 			obj->SetBoneRotationFlags(11, ROT_X);
 			obj->SetBoneRotationFlags(12, ROT_X);
+			obj->SetupHitEffect();
 		}
 
 		obj = &Objects[ID_VON_CROY];
@@ -668,7 +674,7 @@ namespace TEN::Entities
 			obj->HitPoints = 15;
 			obj->explodableMeshbits = 0x200000;
 			obj->intelligent = true;
-			obj->ZoneType = ZoneType::HumanLongJumpAndMonkey;
+			obj->zoneType = ZoneType::HumanLongJumpAndMonkey;
 			obj->SetBoneRotationFlags(6, ROT_X|ROT_Y);
 			obj->SetBoneRotationFlags(20, ROT_X|ROT_Y);
 		}
@@ -681,6 +687,7 @@ namespace TEN::Entities
 		{
 			obj->control = AnimatingControl;
 			obj->collision = SasDragBlokeCollision;
+			obj->SetupHitEffect(true);
 		}
 
 		obj = &Objects[ID_SARCOPHAGUS];
@@ -688,7 +695,8 @@ namespace TEN::Entities
 		{
 			obj->control = AnimatingControl;
 			obj->collision = SarcophagusCollision;
-			obj->hitEffect = HIT_RICOCHET;
+			obj->isSolid = true;
+			obj->SetupHitEffect();
 		}
 
 		obj = &Objects[ID_MAPPER];
@@ -714,17 +722,20 @@ namespace TEN::Entities
 			obj->control = GameSticksControl;
 			obj->collision = GameSticksCollision;
 			obj->HitPoints = 1;
+			obj->isSolid = true;
 			obj->SetBoneRotationFlags(0, ROT_Z);
 			obj->SetBoneRotationFlags(1, ROT_Z);
 			obj->SetBoneRotationFlags(2, ROT_Z);
 			obj->SetBoneRotationFlags(3, ROT_Z);
+			obj->SetupHitEffect();
 		}
 
 		obj = &Objects[ID_ENEMY_PIECE];
 		if (obj->loaded)
 		{
 			obj->collision = ObjectCollision;
-			obj->hitEffect = HIT_RICOCHET;
+			obj->isSolid = true;
+			obj->SetupHitEffect();
 		}
 
 		obj = &Objects[ID_GOD_HEAD];
@@ -741,29 +752,14 @@ namespace TEN::Entities
 				obj->initialise = InitialiseGamePiece;
 				obj->control = SenetControl;
 				obj->collision = ObjectCollision;
-				obj->hitEffect = HIT_RICOCHET;
+				obj->isSolid = true;
+				obj->SetupHitEffect();
 			}
 		}
 
-		obj = &Objects[ID_CLOCKWORK_BEETLE];
-		if (obj->loaded)
-		{
-			obj->initialise = 0;
-			obj->control = ClockworkBeetleControl;
-			obj->collision = PickupCollision;
-		}
-
-		obj = &Objects[ID_CLOCKWORK_BEETLE_COMBO1];
-		if (obj->loaded)
-		{
-			obj->collision = PickupCollision;
-		}
-
-		obj = &Objects[ID_CLOCKWORK_BEETLE_COMBO2];
-		if (obj->loaded)
-		{
-			obj->collision = PickupCollision;
-		}
+		InitPickup(obj, ID_CLOCKWORK_BEETLE, ClockworkBeetleControl);
+		InitPickup(obj, ID_CLOCKWORK_BEETLE_COMBO1);
+		InitPickup(obj, ID_CLOCKWORK_BEETLE_COMBO2);
 
 		obj = &Objects[ID_OBELISK];
 		if (obj->loaded)
@@ -771,6 +767,8 @@ namespace TEN::Entities
 			obj->initialise = InitialiseObelisk;
 			obj->control = ObeliskControl;
 			obj->collision = ObjectCollision;
+			obj->isSolid = true;
+			obj->SetupHitEffect();
 		}
 	}
 
@@ -781,7 +779,8 @@ namespace TEN::Entities
 		{
 			obj->control = ChainControl;
 			obj->collision = GenericSphereBoxCollision;
-			obj->hitEffect = HIT_RICOCHET;
+			obj->isSolid = true;
+			obj->SetupHitEffect();
 		}
 
 		obj = &Objects[ID_PLOUGH];
@@ -789,7 +788,8 @@ namespace TEN::Entities
 		{
 			obj->control = PloughControl;
 			obj->collision = GenericSphereBoxCollision;
-			obj->hitEffect = HIT_RICOCHET;
+			obj->isSolid = true;
+			obj->SetupHitEffect();
 		}
 
 		obj = &Objects[ID_CATWALK_BLADE];
@@ -797,7 +797,8 @@ namespace TEN::Entities
 		{
 			obj->control = CatwalkBladeControl;
 			obj->collision = BladeCollision;
-			obj->hitEffect = HIT_RICOCHET;
+			obj->isSolid = true;
+			obj->SetupHitEffect();
 		}
 
 		obj = &Objects[ID_SETH_BLADE];
@@ -806,7 +807,8 @@ namespace TEN::Entities
 			obj->initialise = InitialiseSethBlade;
 			obj->control = SethBladeControl;
 			obj->collision = GenericSphereBoxCollision;
-			obj->hitEffect = HIT_RICOCHET;
+			obj->isSolid = true;
+			obj->SetupHitEffect();
 		}
 
 		obj = &Objects[ID_PLINTH_BLADE];
@@ -814,7 +816,8 @@ namespace TEN::Entities
 		{
 			obj->control = PlinthBladeControl;
 			obj->collision = BladeCollision;
-			obj->hitEffect = HIT_RICOCHET;
+			obj->isSolid = true;
+			obj->SetupHitEffect();
 		}
 
 		obj = &Objects[ID_BIRD_BLADE];
@@ -822,7 +825,8 @@ namespace TEN::Entities
 		{
 			obj->control = BirdBladeControl;
 			obj->collision = GenericSphereBoxCollision;
-			obj->hitEffect = HIT_RICOCHET;
+			obj->isSolid = true;
+			obj->SetupHitEffect();
 		}
 
 		obj = &Objects[ID_JOBY_SPIKES];
@@ -831,7 +835,8 @@ namespace TEN::Entities
 			obj->initialise = InitialiseJobySpikes;
 			obj->control = JobySpikesControl;
 			obj->collision = GenericSphereBoxCollision;
-			obj->hitEffect = HIT_RICOCHET;
+			obj->isSolid = true;
+			obj->SetupHitEffect();
 		}
 
 		obj = &Objects[ID_MOVING_BLADE];
@@ -839,7 +844,8 @@ namespace TEN::Entities
 		{
 			obj->control = MovingBladeControl;
 			obj->collision = BladeCollision;
-			obj->hitEffect = HIT_RICOCHET;
+			obj->isSolid = true;
+			obj->SetupHitEffect();
 		}
 
 		obj = &Objects[ID_SPIKEBALL];
@@ -847,6 +853,8 @@ namespace TEN::Entities
 		{
 			obj->control = SpikeballControl;
 			obj->collision = GenericSphereBoxCollision;
+			obj->isSolid = true;
+			obj->SetupHitEffect();
 		}
 
 		obj = &Objects[ID_CHAIN];
@@ -854,7 +862,8 @@ namespace TEN::Entities
 		{
 			obj->control = ChainControl;
 			obj->collision = GenericSphereBoxCollision;
-			obj->hitEffect = HIT_RICOCHET;
+			obj->isSolid = true;
+			obj->SetupHitEffect();
 		}
 
 		obj = &Objects[ID_PLOUGH];
@@ -862,7 +871,8 @@ namespace TEN::Entities
 		{
 			obj->control = PloughControl;
 			obj->collision = GenericSphereBoxCollision;
-			obj->hitEffect = HIT_RICOCHET;
+			obj->isSolid = true;
+			obj->SetupHitEffect();
 		}
 
 		obj = &Objects[ID_FLOOR_4BLADES];
@@ -870,7 +880,8 @@ namespace TEN::Entities
 		{
 			obj->control = FourBladesControl;
 			obj->collision = GenericSphereBoxCollision;
-			obj->hitEffect = HIT_RICOCHET;
+			obj->isSolid = true;
+			obj->SetupHitEffect();
 		}
 
 		obj = &Objects[ID_CEILING_4BLADES];
@@ -878,7 +889,8 @@ namespace TEN::Entities
 		{
 			obj->control = FourBladesControl;
 			obj->collision = GenericSphereBoxCollision;
-			obj->hitEffect = HIT_RICOCHET;
+			obj->isSolid = true;
+			obj->SetupHitEffect();
 		}
 
 		obj = &Objects[ID_STARGATE];
@@ -886,7 +898,8 @@ namespace TEN::Entities
 		{
 			obj->control = StargateControl;
 			obj->collision = StargateCollision;
-			obj->hitEffect = HIT_RICOCHET;
+			obj->isSolid = true;
+			obj->SetupHitEffect();
 		}
 
 		obj = &Objects[ID_SLICER_DICER];
@@ -895,7 +908,8 @@ namespace TEN::Entities
 			obj->initialise = InitialiseSlicerDicer;
 			obj->control = SlicerDicerControl;
 			obj->collision = BladeCollision;
-			obj->hitEffect = HIT_RICOCHET;
+			obj->isSolid = true;
+			obj->SetupHitEffect();
 		}
 
 		obj = &Objects[ID_MINE];
@@ -911,7 +925,8 @@ namespace TEN::Entities
 		{
 			obj->control = ControlSpikyWall;
 			obj->collision = ObjectCollision;
-			obj->hitEffect = HIT_RICOCHET;
+			obj->isSolid = true;
+			obj->SetupHitEffect();
 		}
 
 		obj = &Objects[ID_SPIKY_CEILING];
@@ -919,7 +934,8 @@ namespace TEN::Entities
 		{
 			obj->control = ControlSpikyCeiling;
 			obj->collision = TrapCollision;
-			obj->hitEffect = HIT_RICOCHET;
+			obj->isSolid = true;
+			obj->SetupHitEffect();
 		}
 
 		obj = &Objects[ID_COG];
@@ -927,7 +943,8 @@ namespace TEN::Entities
 		{
 			obj->control = CogControl;
 			obj->collision = CogCollision;
-			obj->hitEffect = HIT_RICOCHET;
+			obj->isSolid = true;
+			obj->SetupHitEffect();
 		}
 
 		obj = &Objects[ID_LARA_DOUBLE];
@@ -936,12 +953,12 @@ namespace TEN::Entities
 			obj->initialise = InitialiseCreature;
 			obj->control = LaraDoubleControl;
 			obj->collision = CreatureCollision;
-			obj->hitEffect = HIT_SMOKE;
 			obj->shadowType = ShadowMode::All;
 			obj->HitPoints = 1000;
 			obj->pivotLength = 50;
 			obj->radius = 128;
 			obj->intelligent = true;
+			obj->SetupHitEffect();
 		}
 
 		obj = &Objects[ID_TEETH_SPIKES];
@@ -956,6 +973,8 @@ namespace TEN::Entities
 		{
 			obj->control = HammerControl;
 			obj->collision = GenericSphereBoxCollision;
+			obj->isSolid = true;
+			obj->SetupHitEffect();
 		}
 	}
 
@@ -966,8 +985,9 @@ namespace TEN::Entities
 		{
 			obj->initialise = InitialiseJeep;
 			obj->collision = JeepPlayerCollision;
-			obj->hitEffect = HIT_RICOCHET;
 			obj->shadowType = ShadowMode::Lara;
+			obj->isSolid = true;
+			obj->SetupHitEffect();
 		}
 
 		obj = &Objects[ID_MOTORBIKE];
@@ -975,8 +995,9 @@ namespace TEN::Entities
 		{
 			obj->initialise = InitialiseMotorbike;
 			obj->collision = MotorbikePlayerCollision;
-			obj->hitEffect = HIT_RICOCHET;
 			obj->shadowType = ShadowMode::Lara;
+			obj->isSolid = true;
+			obj->SetupHitEffect();
 		}
 	}
 
@@ -985,9 +1006,9 @@ namespace TEN::Entities
 	
 	}
 
-	static ObjectInfo* objToInit;
 	void InitialiseTR4Objects()
 	{
+		ObjectInfo* objToInit = nullptr;
 		StartEntity(objToInit);
 		StartObject(objToInit);
 		StartSwitch(objToInit);

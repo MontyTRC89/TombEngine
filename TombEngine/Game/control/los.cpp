@@ -164,15 +164,17 @@ bool GetTargetOnLOS(GameVector* origin, GameVector* target, bool drawTarget, boo
 						}
 						else
 						{
+							auto object = &Objects[item->ObjectNumber];
+
 							if (drawTarget && (Lara.Control.Weapon.GunType == LaraWeaponType::Revolver ||
 								Lara.Control.Weapon.GunType == LaraWeaponType::HK))
 							{
-								if (Objects[item->ObjectNumber].intelligent)
+								if (object->intelligent)
 									HitTarget(LaraItem, item, &target2, Weapons[(int)Lara.Control.Weapon.GunType].Damage, 0);
 								else
 								{
 									// TR5
-									if (Objects[item->ObjectNumber].hitEffect == HIT_RICOCHET)
+									if (object->hitEffect == HitEffect::Richochet)
 										TriggerRicochetSpark(target2, LaraItem->Pose.Orientation.y, 3, 0);
 								}
 							}
@@ -182,12 +184,18 @@ bool GetTargetOnLOS(GameVector* origin, GameVector* target, bool drawTarget, boo
 									SmashObject(itemNumber);
 								else
 								{
-									if (Objects[item->ObjectNumber].hitEffect == HIT_BLOOD)
+									switch (object->hitEffect)
+									{
+									case HitEffect::Blood:
 										DoBloodSplat(target2.x, target2.y, target2.z, (GetRandomControl() & 3) + 3, item->Pose.Orientation.y, item->RoomNumber);
-									else if (Objects[item->ObjectNumber].hitEffect == HIT_SMOKE)
+										break;
+									case HitEffect::Smoke:
 										TriggerRicochetSpark(target2, LaraItem->Pose.Orientation.y, 3, -5);
-									else if (Objects[item->ObjectNumber].hitEffect == HIT_RICOCHET)
+										break;
+									case HitEffect::Richochet:
 										TriggerRicochetSpark(target2, LaraItem->Pose.Orientation.y, 3, 0);
+										break;
+									}
 
 									DoDamage(item, Weapons[(int)Lara.Control.Weapon.GunType].Damage);
 

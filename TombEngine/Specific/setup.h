@@ -10,21 +10,21 @@ struct ItemInfo;
 
 constexpr auto DEFAULT_RADIUS = 10;
 
-enum JointRotationFlags
+enum JointRotationFlags : int
 {
 	ROT_X = (1 << 2),
 	ROT_Y = (1 << 3),
 	ROT_Z = (1 << 4)
 };
 
-enum HitEffectEnum
+enum class HitEffect
 {
-    HIT_NONE,
-    HIT_BLOOD,
-    HIT_SMOKE,
-    HIT_RICOCHET,
-	HIT_SPECIAL,
-    MAX_HIT_EFFECT
+    None,
+    Blood,
+    Smoke,
+    Richochet,
+	Special,
+    Max
 };
 
 enum ShatterType
@@ -36,9 +36,9 @@ enum ShatterType
 
 struct ObjectInfo
 {
-	int nmeshes; 
+	int nmeshes;
 	int meshIndex;
-	int boneIndex; 
+	int boneIndex;
 	int frameBase;
 	std::function<void(short itemNumber)> initialise;
 	std::function<void(short itemNumber)> control;
@@ -48,29 +48,62 @@ struct ObjectInfo
 	std::function<int(short itemNumber)> ceilingBorder;
 	std::function<void(ItemInfo* item)> drawRoutine;
 	std::function<void(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)> collision;
-	ZoneType ZoneType;
-	int animIndex; 
-	short HitPoints; 
-	short pivotLength; 
-	short radius; 
+	ZoneType zoneType;
+	int animIndex;
+	short HitPoints;
+	short pivotLength;
+	short radius;
 	ShadowMode shadowType;
-	short biteOffset; 
+	short biteOffset;
 	bool loaded;
 	bool intelligent;
 	bool nonLot;
 	bool waterCreature;
 	bool usingDrawAnimatingItem;
-	HitEffectEnum hitEffect;
+	HitEffect hitEffect;
 	bool undead;
 	bool isPickup;
 	bool isPuzzleHole;
+	bool isSolid; // define a slot object like switch, door, trapdoor etc... as solid, which set hitEffect to Spark !
 	int meshSwapSlot;
 	DWORD explodableMeshbits;
 
-	// Use ROT_X/Y/Z to allow bone to be rotated with CreatureJoint().
+	/// <summary>
+	/// Use ROT_X/Y/Z to allow bone to be rotated with CreatureJoint().
+	/// </summary>
+	/// <param name="boneID">the mesh id - 1</param>
+	/// <param name="flags">can be ROT_X, ROT_Y, ROT_Z or all.</param>
 	void SetBoneRotationFlags(int boneID, int flags)
 	{
 		g_Level.Bones[boneIndex + boneID * 4] |= flags;
+	}
+
+	/// <summary>
+	/// Use this to setup a hiteffect for slot based on what value it has,
+	/// example: if it's intelligent and have hp without undead then it's alive = blood.
+	/// </summary>
+	/// <param name="isAlive">use this if the object is alive but not intelligent, it will setup it to blood.</param>
+	void SetupHitEffect(bool isAlive = false)
+	{
+		if (isAlive) // avoid some object like: ID_SAS_DYING to have None !
+		{
+			hitEffect = HitEffect::Blood;
+			return;
+		}
+
+		if (intelligent)
+		{
+			if (isSolid && HitPoints > 0)
+				hitEffect = HitEffect::Richochet;
+			else if ((undead && HitPoints > 0) || HitPoints == NOT_TARGETABLE)
+				hitEffect = HitEffect::Smoke;
+			else if (!undead && HitPoints > 0)
+				hitEffect = HitEffect::Blood;
+		}
+		else if (isSolid && HitPoints <= 0)
+			hitEffect = HitEffect::Richochet;
+		else
+			hitEffect = HitEffect::None;
 	}
 };
 

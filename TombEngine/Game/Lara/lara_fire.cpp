@@ -1098,15 +1098,15 @@ void HitTarget(ItemInfo* laraItem, ItemInfo* targetEntity, GameVector* hitPos, i
 	if (targetEntity->IsCreature())
 		GetCreatureInfo(targetEntity)->HurtByLara = true;
 
-	const auto& object = Objects[targetEntity->ObjectNumber];
+	auto object = &Objects[targetEntity->ObjectNumber];
 
 	if (hitPos != nullptr)
 	{
-		if (object.hitEffect != HIT_NONE)
+		if (object->hitEffect != HitEffect::None)
 		{
-			switch (object.hitEffect)
+			switch (object->hitEffect)
 			{
-			case HIT_BLOOD:
+			case HitEffect::Blood:
 				if (targetEntity->ObjectNumber == ID_BADDY2 &&
 					(targetEntity->Animation.ActiveState == 8 || GetRandomControl() & 1) &&
 					(lara.Control.Weapon.GunType == LaraWeaponType::Pistol ||
@@ -1125,13 +1125,8 @@ void HitTarget(ItemInfo* laraItem, ItemInfo* targetEntity, GameVector* hitPos, i
 
 				break;
 
-			case HIT_RICOCHET:
+			case HitEffect::Richochet:
 				TriggerRicochetSpark(*hitPos, laraItem->Pose.Orientation.y, 3, 0);
-				break;
-
-			case HIT_SMOKE:
-				TriggerRicochetSpark(*hitPos, laraItem->Pose.Orientation.y, 3, -5);
-
 				if (targetEntity->ObjectNumber == ID_ROMAN_GOD1 ||
 					targetEntity->ObjectNumber == ID_ROMAN_GOD2)
 				{
@@ -1139,11 +1134,15 @@ void HitTarget(ItemInfo* laraItem, ItemInfo* targetEntity, GameVector* hitPos, i
 				}
 
 				break;
+
+			case HitEffect::Smoke:
+				TriggerRicochetSpark(*hitPos, laraItem->Pose.Orientation.y, 3, -5);
+				break;
 			}
 		}
 	}
 
-	if (!object.undead || grenade)
+	if (!object->undead || grenade)
 	{
 		if (targetEntity->HitPoints > 0)
 		{

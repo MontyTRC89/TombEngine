@@ -24,7 +24,7 @@ namespace TEN::Entities::Creatures::TR5
 	const auto SniperGunBite	  = BiteInfo(Vector3(0.0f, 480.0f, 110.0f), 13);
 	const auto ArmedMafia2GunBite = BiteInfo(Vector3(-50.0f, 220.0f, 60.0f), 13);
 
-	constexpr auto GUARD_ALERT_RANGE = SQUARE(BLOCK(6));
+	constexpr auto GUARD_ALERT_RANGE = SQUARE(BLOCK(1));
 	constexpr auto GUARD_WALK_RANGE = SQUARE(BLOCK(3));
 	constexpr auto GUARD_ATTACK_RANGE = SQUARE(BLOCK(4));
 	constexpr auto GUARD_WALK_TURN_ANGLE_MAX = ANGLE(5.0f);
@@ -106,68 +106,68 @@ namespace TEN::Entities::Creatures::TR5
 	enum GuardAnim
 	{
 		ANIMATION_GUARD_IDLE = 0,
-		ANIMATION_GUARD_TURN_180_1,
-		ANIMATION_GUARD_SINGLE_SHOOT,
-		ANIMATION_GUARD_AIM,
-		ANIMATION_GUARD_START_WALK,
-		ANIMATION_GUARD_WALK,
-		ANIMATION_GUARD_WALK_STOP,
-		ANIMATION_GUARD_WALK_TO_AIM,
-		ANIMATION_GUARD_AIM_TO_WALK,
-		ANIMATION_GUARD_AIM_TO_STOP,
-		ANIMATION_GUARD_STOP_TO_AIM,
-		ANIMATION_GUARD_DEATH1,
-		ANIMATION_GUARD_RUN,
-		ANIMATION_GUARD_AIM_TO_RUN,
-		ANIMATION_GUARD_RUN_TO_AIM,
-		ANIMATION_GUARD_RUN_TO_WALK,
-		ANIMATION_GUARD_DEATH2,
-		ANIMATION_GUARD_WALK_TO_RUN,
-		ANIMATION_GUARD_STOP_TO_RUN,
-		ANIMATION_GUARD_CROUCH_AIM_HAND_UP_START,
-		ANIMATION_GUARD_CROUCH_AIM_HAND_UP,
-		ANIMATION_GUARD_CROUCH_HAND_UP_SINGLE_SHOOT,
-		ANIMATION_GUARD_CROUCH_HAND_UP_TO_STOP,
-		ANIMATION_GUARD_RELOAD,
-		ANIMATION_GUARD_THROW_GRENADE,
-		ANIMATION_GUARD_OPEN_DOOR_KICK,
-		ANIMATION_GUARD_ROPE_DOWN_FAST,
-		ANIMATION_GUARD_ROPE_DOWN_FAST_TO_AIM_FRONT,
-		ANIMATION_GUARD_ROPE_DOWN,
-		ANIMATION_GUARD_ROPE_TO_AIM,
-		ANIMATION_GUARD_SLEEPING,
-		ANIMATION_GUARD_SLEEPING_TO_AIM, // he kick a chair, need to found the chair near him before doing this anim.
-		ANIMATION_GUARD_WAITING_ON_WALL,
-		ANIMATION_GUARD_WAITING_ON_WALL_TO_STOP,
-		ANIMATION_GUARD_UNKNOWN,
-		ANIMATION_GUARD_CLIMB2CLICK,
-		ANIMATION_GUARD_CLIMB3CLICK,
-		ANIMATION_GUARD_CLIMB4CLICK,
-		ANIMATION_GUARD_FALL4CLICK,
-		ANIMATION_GUARD_FALL3CLICK,
-		ANIMATION_GUARD_FALL2CLICK,
-		ANIMATION_GUARD_JUMP_1BLOCK,
-		ANIMATION_GUARD_JUMP_FINISH,
-		ANIMATION_GUARD_JUMP_2BLOCK,
-		ANIMATION_GUARD_HUNT_WALK,
-		ANIMATION_GUARD_HUNT,
-		ANIMATION_GUARD_HUNT_TO_STOP,
-		ANIMATION_GUARD_STOP_TO_HUNT,
-		ANIMATION_GUARD_TURN_180_2,
-		ANIMATION_GUARD_JUMP_START,
-		ANIMATION_GUARD_STOP_TO_CROUCH_AIM_HAND_DOWN,
-		ANIMATION_GUARD_CROUCH_AIM_HAND_DOWN,
-		ANIMATION_GUARD_CROUCH_HAND_DOWN_SHOOT_FAST,
-		ANIMATION_GUARD_CROUCH_HAND_DOWN_TO_STOP,
-		ANIMATION_GUARD_SHOOT_FAST,
-		ANIMATION_GUARD_INSERT_CODE,
-		ANIMATION_GUARD_USE_KEYPAD,
-		ANIMATION_GUARD_USE_COMPUTER_START,
-		ANIMATION_GUARD_USE_COMPUTER,
-		ANIMATION_GUARD_USE_COMPUTER_TO_STOP,
-		ANIMATION_GUARD_SURRENDER_START,
-		ANIMATION_GUARD_SURRENDER,
-		ANIMATION_GUARD_SURRENDER_TO_STOP
+		ANIMATION_GUARD_TURN_180_1 = 1,
+		ANIMATION_GUARD_SINGLE_SHOOT = 2,
+		ANIMATION_GUARD_AIM = 3,
+		ANIMATION_GUARD_START_WALK = 4,
+		ANIMATION_GUARD_WALK = 5,
+		ANIMATION_GUARD_WALK_STOP = 6,
+		ANIMATION_GUARD_WALK_TO_AIM = 7,
+		ANIMATION_GUARD_AIM_TO_WALK = 8,
+		ANIMATION_GUARD_AIM_TO_STOP = 9,
+		ANIMATION_GUARD_STOP_TO_AIM = 10,
+		ANIMATION_GUARD_DEATH1 = 11,
+		ANIMATION_GUARD_RUN = 12,
+		ANIMATION_GUARD_AIM_TO_RUN = 13,
+		ANIMATION_GUARD_RUN_TO_AIM = 14,
+		ANIMATION_GUARD_RUN_TO_WALK = 15,
+		ANIMATION_GUARD_DEATH2 = 16,
+		ANIMATION_GUARD_WALK_TO_RUN = 17,
+		ANIMATION_GUARD_STOP_TO_RUN = 18,
+		ANIMATION_GUARD_CROUCH_AIM_HAND_UP_START = 19,
+		ANIMATION_GUARD_CROUCH_AIM_HAND_UP = 20,
+		ANIMATION_GUARD_CROUCH_HAND_UP_SINGLE_SHOOT = 21,
+		ANIMATION_GUARD_CROUCH_HAND_UP_TO_STOP = 22,
+		ANIMATION_GUARD_RELOAD = 23,
+		ANIMATION_GUARD_THROW_GRENADE = 24,
+		ANIMATION_GUARD_OPEN_DOOR_KICK = 25,
+		ANIMATION_GUARD_ROPE_DOWN_FAST = 26,
+		ANIMATION_GUARD_ROPE_DOWN_FAST_TO_AIM_FRONT = 27,
+		ANIMATION_GUARD_ROPE_DOWN = 28,
+		ANIMATION_GUARD_ROPE_TO_AIM = 29,
+		ANIMATION_GUARD_SLEEPING = 30,
+		ANIMATION_GUARD_SLEEPING_TO_AIM = 31, // he kick a chair, need to found the chair near him before doing this anim.
+		ANIMATION_GUARD_WAITING_ON_WALL = 32,
+		ANIMATION_GUARD_WAITING_ON_WALL_TO_STOP = 33,
+		ANIMATION_GUARD_UNKNOWN = 34,
+		ANIMATION_GUARD_CLIMB2CLICK = 35,
+		ANIMATION_GUARD_CLIMB3CLICK = 36,
+		ANIMATION_GUARD_CLIMB4CLICK = 37,
+		ANIMATION_GUARD_FALL4CLICK = 38,
+		ANIMATION_GUARD_FALL3CLICK = 39,
+		ANIMATION_GUARD_FALL2CLICK = 40,
+		ANIMATION_GUARD_JUMP_1BLOCK = 41, // ID_SWAP use ANIMATION_GUARD_JUMP_START starting here (it add an animation), just need to remove the animation 41 in ID_SWAP for this GuardAnim enum to work !
+		ANIMATION_GUARD_JUMP_FINISH = 42,
+		ANIMATION_GUARD_JUMP_2BLOCK = 43,
+		ANIMATION_GUARD_HUNT_WALK = 44,
+		ANIMATION_GUARD_HUNT = 45,
+		ANIMATION_GUARD_HUNT_TO_STOP = 46,
+		ANIMATION_GUARD_STOP_TO_HUNT = 47,
+		ANIMATION_GUARD_TURN_180_2 = 48,
+		ANIMATION_GUARD_JUMP_START = 49,
+		ANIMATION_GUARD_STOP_TO_CROUCH_AIM_HAND_DOWN = 50,
+		ANIMATION_GUARD_CROUCH_AIM_HAND_DOWN = 51,
+		ANIMATION_GUARD_CROUCH_HAND_DOWN_SHOOT_FAST = 52,
+		ANIMATION_GUARD_CROUCH_HAND_DOWN_TO_STOP = 53,
+		ANIMATION_GUARD_SHOOT_FAST = 54,
+		ANIMATION_GUARD_INSERT_CODE = 55,
+		ANIMATION_GUARD_USE_KEYPAD = 56,
+		ANIMATION_GUARD_USE_COMPUTER_START = 57,
+		ANIMATION_GUARD_USE_COMPUTER = 58,
+		ANIMATION_GUARD_USE_COMPUTER_TO_STOP = 59,
+		ANIMATION_GUARD_SURRENDER_START = 60,
+		ANIMATION_GUARD_SURRENDER = 61,
+		ANIMATION_GUARD_SURRENDER_TO_STOP = 62
 	};
 
 	enum class GuardOcb : short
@@ -375,6 +375,7 @@ namespace TEN::Entities::Creatures::TR5
 				else
 					creature->Mood = MoodType::Escape;
 			}
+
 			if (TestEnvironment(ENV_FLAG_NO_LENSFLARE, item->RoomNumber)) // TODO: CHECK
 			{
 				if (item->ObjectNumber == ID_SWAT_PLUS)
@@ -411,7 +412,7 @@ namespace TEN::Entities::Creatures::TR5
 					item->ObjectNumber != ID_SCIENTIST &&
 					abs(item->Pose.Position.y - LaraItem->Pose.Position.y) < SECTOR(1.25f))
 				{
-					creature->Enemy = LaraItem;
+					creature->Enemy = LaraItem; // TODO: deal with LaraItem global !
 					AlertAllGuards(itemNumber);
 				}
 			}
@@ -424,10 +425,10 @@ namespace TEN::Entities::Creatures::TR5
 				item->Pose.Position.z,
 				item->RoomNumber
 			);
-			auto* frame = GetBestFrame(LaraItem);
+			auto& bounds = GetBestFrame(LaraItem)->boundingBox; // TODO: deal with LaraItem global !
 			auto target = GameVector(
 				LaraItem->Pose.Position.x,
-				LaraItem->Pose.Position.y + ((frame->boundingBox.Y2 + 3 * frame->boundingBox.Y1) / 4),
+				LaraItem->Pose.Position.y + ((bounds.Y2 + 3 * bounds.Y1) / 4),
 				LaraItem->Pose.Position.z,
 				LaraItem->RoomNumber
 			);
@@ -481,7 +482,7 @@ namespace TEN::Entities::Creatures::TR5
 					item->Animation.TargetState = GUARD_STATE_RUN;
 				else if (Targetable(item, &AI) && item->ObjectNumber != ID_SCIENTIST)
 				{
-					if (AI.distance >= pow(SECTOR(4), 2) && AI.zoneNumber == AI.enemyZone)
+					if (AI.distance >= GUARD_ATTACK_RANGE  && AI.zoneNumber == AI.enemyZone)
 					{
 						if (!(item->AIBits & MODIFY))
 							item->Animation.TargetState = GUARD_STATE_WALK;
@@ -491,7 +492,7 @@ namespace TEN::Entities::Creatures::TR5
 				}
 				else if (canJump1block || canJump2blocks)
 				{
-					SetAnimationWithoutTargetState(item, ANIMATION_GUARD_JUMP_START+1);
+					SetAnimation(item, ANIMATION_GUARD_JUMP_START, 0, false);
 					creature->MaxTurn = 0;
 
 					if (canJump1block)
@@ -616,14 +617,14 @@ namespace TEN::Entities::Creatures::TR5
 				creature->LOT.IsJumping = false;
 
 				if (!Targetable(item, &AI) ||
-					AI.distance >= pow(SECTOR(4), 2) && AI.zoneNumber == AI.enemyZone ||
+					AI.distance >= GUARD_ATTACK_RANGE && AI.zoneNumber == AI.enemyZone ||
 					item->ObjectNumber == ID_SCIENTIST ||
 					item->AIBits & AMBUSH || item->AIBits & PATROL1) // TODO: CHECK
 				{
 					if (canJump1block || canJump2blocks)
 					{
 						creature->MaxTurn = 0;
-						SetAnimationWithoutTargetState(item, ANIMATION_GUARD_JUMP_START+1);
+						SetAnimation(item, ANIMATION_GUARD_JUMP_START, 0, false);
 
 						if (canJump1block)
 							item->Animation.TargetState = GUARD_STATE_JUMP_1_BLOCK;
@@ -632,7 +633,7 @@ namespace TEN::Entities::Creatures::TR5
 
 						creature->LOT.IsJumping = true;
 					}
-					else if (AI.distance >= pow(SECTOR(1), 2))
+					else if (AI.distance >= SQUARE(SECTOR(1)))
 					{
 						if (!los || item->AIBits)
 						{
@@ -657,15 +658,14 @@ namespace TEN::Entities::Creatures::TR5
 				creature->MaxTurn = GUARD_RUN_TURN_ANGLE_MAX;
 				creature->LOT.IsJumping = false;
 
-				if (Targetable(item, &AI) && (AI.distance < GUARD_ATTACK_RANGE || AI.enemyZone == AI.zoneNumber) &&
-					item->ObjectNumber != ID_SCIENTIST)
+				if (Targetable(item, &AI) && (AI.distance < GUARD_ATTACK_RANGE || AI.enemyZone == AI.zoneNumber) && item->ObjectNumber != ID_SCIENTIST)
 				{
 					item->Animation.TargetState = GUARD_STATE_AIM;
 				}
 				else if (canJump1block || canJump2blocks)
 				{
 					creature->MaxTurn = 0;
-					SetAnimationWithoutTargetState(item, ANIMATION_GUARD_JUMP_START+1);
+					SetAnimation(item, ANIMATION_GUARD_JUMP_START, 0, false);
 
 					if (canJump1block)
 						item->Animation.TargetState = GUARD_STATE_JUMP_1_BLOCK;
@@ -678,6 +678,7 @@ namespace TEN::Entities::Creatures::TR5
 					item->Animation.TargetState = GUARD_STATE_STOP;
 				else if (AI.distance < GUARD_WALK_RANGE)
 					item->Animation.TargetState = GUARD_STATE_WALK;
+
 				if (item->TriggerFlags == (short)GuardOcb::Run) // TODO: why is this set for run ? he is not jumping this time ! - TokyoSU: 24/12/2022
 				{
 					creature->MaxTurn = 0;
@@ -802,7 +803,7 @@ namespace TEN::Entities::Creatures::TR5
 						item->Animation.TargetState = GUARD_STATE_HUNT;
 				}
 
-				if (canJump1block || canJump2blocks || AI.distance < pow(SECTOR(1), 2) || !los || item->HitStatus)
+				if (canJump1block || canJump2blocks || AI.distance < SQUARE(SECTOR(1)) || !los || item->HitStatus)
 					item->Animation.TargetState = GUARD_STATE_STOP;
 
 				break;
@@ -901,7 +902,7 @@ namespace TEN::Entities::Creatures::TR5
 
 		if (creature->ReachedGoal && creature->Enemy)
 		{
-			auto* enemy = creature->Enemy;
+			auto enemy = creature->Enemy;
 		
 			if (enemy->Flags != 4)
 			{

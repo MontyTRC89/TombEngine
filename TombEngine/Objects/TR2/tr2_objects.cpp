@@ -48,13 +48,13 @@ static void StartEntity(ObjectInfo* obj)
 		obj->collision = CreatureCollision;
 		obj->shadowType = ShadowMode::All;
 		obj->HitPoints = 30;
-		obj->hitEffect = HIT_BLOOD;
 		obj->pivotLength = 200;
 		obj->radius = 340;
 		obj->intelligent = true;
 		obj->waterCreature = true;
-		obj->ZoneType = ZoneType::Water;
+		obj->zoneType = ZoneType::Water;
 		obj->SetBoneRotationFlags(9, ROT_Y);
+		obj->SetupHitEffect();
 	}
 
 	obj = &Objects[ID_BARRACUDA];
@@ -64,13 +64,13 @@ static void StartEntity(ObjectInfo* obj)
 		obj->collision = CreatureCollision;
 		obj->shadowType = ShadowMode::All;
 		obj->HitPoints = 12;
-		obj->hitEffect = HIT_BLOOD;
 		obj->pivotLength = 200;
 		obj->radius = 204;
 		obj->intelligent = true;
 		obj->waterCreature = true;
-		obj->ZoneType = ZoneType::Water;
+		obj->zoneType = ZoneType::Water;
 		obj->SetBoneRotationFlags(6, ROT_Y);
+		obj->SetupHitEffect();
 	}
 
 	obj = &Objects[ID_EAGLE];
@@ -81,11 +81,11 @@ static void StartEntity(ObjectInfo* obj)
 		obj->collision = CreatureCollision;
 		obj->shadowType = ShadowMode::All;
 		obj->HitPoints = 20;
-		obj->hitEffect = HIT_BLOOD;
 		obj->radius = 204;
 		obj->intelligent = true;
 		obj->pivotLength = 0;
-		obj->ZoneType = ZoneType::Flyer;
+		obj->zoneType = ZoneType::Flyer;
+		obj->SetupHitEffect();
 	}
 
 	obj = &Objects[ID_CROW];
@@ -96,11 +96,11 @@ static void StartEntity(ObjectInfo* obj)
 		obj->collision = CreatureCollision;
 		obj->shadowType = ShadowMode::All;
 		obj->HitPoints = 15;
-		obj->hitEffect = HIT_BLOOD;
 		obj->radius = 204;
 		obj->intelligent = true;
 		obj->pivotLength = 0;
-		obj->ZoneType = ZoneType::Flyer;
+		obj->zoneType = ZoneType::Flyer;
+		obj->SetupHitEffect();
 	}
 
 	obj = &Objects[ID_RAT];
@@ -110,11 +110,11 @@ static void StartEntity(ObjectInfo* obj)
 		obj->control = RatControl;
 		obj->collision = CreatureCollision;
 		obj->HitPoints = 5;
-		obj->hitEffect = HIT_BLOOD;
 		obj->shadowType = ShadowMode::All;
 		obj->pivotLength = 50;
 		obj->radius = 204;
 		obj->intelligent = true;
+		obj->SetupHitEffect();
 	}
 
 	obj = &Objects[ID_YETI];
@@ -124,14 +124,14 @@ static void StartEntity(ObjectInfo* obj)
 		obj->collision = CreatureCollision;
 		obj->control = YetiControl;
 		obj->HitPoints = 30;
-		obj->hitEffect = HIT_BLOOD;
 		obj->shadowType = ShadowMode::All;
 		obj->radius = 128;
 		obj->pivotLength = 100;
 		obj->intelligent = true;
-		obj->ZoneType = ZoneType::Human;
+		obj->zoneType = ZoneType::Human;
 		obj->SetBoneRotationFlags(6, ROT_Y);
 		obj->SetBoneRotationFlags(14, ROT_Y);
+		obj->SetupHitEffect();
 	}
 
 	obj = &Objects[ID_GOON_SILENCER1];
@@ -142,13 +142,13 @@ static void StartEntity(ObjectInfo* obj)
 		obj->control = SilencerControl;
 		obj->shadowType = ShadowMode::All;
 		obj->HitPoints = 25;
-		obj->hitEffect = HIT_BLOOD;
 		obj->biteOffset = 0;
 		obj->radius = 102;
 		obj->pivotLength = 50;
 		obj->intelligent = true;
 		obj->SetBoneRotationFlags(0, ROT_X | ROT_Y);
 		obj->SetBoneRotationFlags(1, ROT_X | ROT_Y);
+		obj->SetupHitEffect();
 	}
 
 	obj = &Objects[ID_GOON_SILENCER2];
@@ -169,13 +169,13 @@ static void StartEntity(ObjectInfo* obj)
 		obj->control = SilencerControl;
 		obj->shadowType = ShadowMode::All;
 		obj->HitPoints = 25;
-		obj->hitEffect = HIT_BLOOD;
 		obj->biteOffset = 0;
 		obj->radius = 102;
 		obj->pivotLength = 50;
 		obj->intelligent = true;
 		obj->SetBoneRotationFlags(0, ROT_X | ROT_Y);
 		obj->SetBoneRotationFlags(1, ROT_X | ROT_Y);
+		obj->SetupHitEffect();
 	}
 
 	obj = &Objects[ID_GOON_SILENCER3];
@@ -196,13 +196,13 @@ static void StartEntity(ObjectInfo* obj)
 		obj->control = SilencerControl;
 		obj->shadowType = ShadowMode::All;
 		obj->HitPoints = 25;
-		obj->hitEffect = HIT_BLOOD;
 		obj->biteOffset = 0;
 		obj->radius = 102;
 		obj->pivotLength = 50;
 		obj->intelligent = true;
 		obj->SetBoneRotationFlags(0, ROT_X | ROT_Y);
 		obj->SetBoneRotationFlags(1, ROT_X | ROT_Y);
+		obj->SetupHitEffect();
 	}
 
 	obj = &Objects[ID_WORKER_SHOTGUN];
@@ -214,12 +214,12 @@ static void StartEntity(ObjectInfo* obj)
 		obj->control = WorkerShotgunControl;
 		obj->shadowType = ShadowMode::All;
 		obj->HitPoints = 25;
-		obj->hitEffect = HIT_BLOOD;
 		obj->pivotLength = 50;
 		obj->radius = 102;
 		obj->intelligent = true;
 		obj->SetBoneRotationFlags(4, ROT_X | ROT_Y);
 		obj->SetBoneRotationFlags(13, ROT_X | ROT_Y);
+		obj->SetupHitEffect();
 	}
 
 	obj = &Objects[ID_WORKER_MACHINEGUN];
@@ -230,12 +230,12 @@ static void StartEntity(ObjectInfo* obj)
 		obj->control = WorkerMachineGunControl;
 		obj->shadowType = ShadowMode::All;
 		obj->HitPoints = 20;
-		obj->hitEffect = HIT_BLOOD;
 		obj->pivotLength = 50;
 		obj->radius = 102;
 		obj->intelligent = true;
 		obj->SetBoneRotationFlags(4, ROT_X | ROT_Y);
 		obj->SetBoneRotationFlags(13, ROT_X | ROT_Y);
+		obj->SetupHitEffect();
 	}
 
 	obj = &Objects[ID_SMALL_SPIDER];
@@ -246,10 +246,10 @@ static void StartEntity(ObjectInfo* obj)
 		obj->control = SmallSpiderControl;
 		obj->shadowType = ShadowMode::All;
 		obj->HitPoints = 5;
-		obj->hitEffect = HIT_SMOKE;
 		obj->pivotLength = 0;
 		obj->radius = 102;
 		obj->intelligent = true;
+		obj->SetupHitEffect();
 	}
 
 	obj = &Objects[ID_BIG_SPIDER];
@@ -260,10 +260,10 @@ static void StartEntity(ObjectInfo* obj)
 		obj->control = BigSpiderControl;
 		obj->shadowType = ShadowMode::All;
 		obj->HitPoints = 40;
-		obj->hitEffect = HIT_SMOKE;
 		obj->pivotLength = 0;
 		obj->radius = 102;
 		obj->intelligent = true;
+		obj->SetupHitEffect();
 	}
 
 	obj = &Objects[ID_WORKER_DUAL_REVOLVER];
@@ -274,12 +274,12 @@ static void StartEntity(ObjectInfo* obj)
 		obj->control = WorkerDualGunControl;
 		obj->shadowType = ShadowMode::All;
 		obj->HitPoints = 150;
-		obj->hitEffect = HIT_BLOOD;
 		obj->pivotLength = 0;
 		obj->radius = 102;
 		obj->intelligent = true;
 		obj->SetBoneRotationFlags(0, ROT_X | ROT_Y);
 		obj->SetBoneRotationFlags(11, ROT_X | ROT_Y);
+		obj->SetupHitEffect();
 	}
 
 	obj = &Objects[ID_BIRDMONSTER];
@@ -290,11 +290,11 @@ static void StartEntity(ObjectInfo* obj)
 		obj->control = BirdMonsterControl;
 		obj->shadowType = ShadowMode::All;
 		obj->HitPoints = 200;
-		obj->hitEffect = HIT_BLOOD;
 		obj->pivotLength = 0;
 		obj->radius = 341;
 		obj->intelligent = true;
 		obj->SetBoneRotationFlags(14, ROT_X | ROT_Y);
+		obj->SetupHitEffect();
 	}
 
 	obj = &Objects[ID_WORKER_FLAMETHROWER];
@@ -305,12 +305,12 @@ static void StartEntity(ObjectInfo* obj)
 		obj->control = WorkerFlamethrower;
 		obj->shadowType = ShadowMode::All;
 		obj->HitPoints = 20;
-		obj->hitEffect = HIT_BLOOD;
 		obj->pivotLength = 0;
 		obj->radius = 102;
 		obj->intelligent = true;
 		obj->SetBoneRotationFlags(4, ROT_X | ROT_Y);
 		obj->SetBoneRotationFlags(14, ROT_X | ROT_Y);
+		obj->SetupHitEffect();
 	}
 
 	obj = &Objects[ID_KNIFETHROWER];
@@ -321,12 +321,12 @@ static void StartEntity(ObjectInfo* obj)
 		obj->control = KnifeThrowerControl;
 		obj->shadowType = ShadowMode::All;
 		obj->HitPoints = 60;
-		obj->hitEffect = HIT_BLOOD;
 		obj->pivotLength = 50;
 		obj->radius = 102;
 		obj->intelligent = true;
 		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
 		obj->SetBoneRotationFlags(8, ROT_X | ROT_Y);
+		obj->SetupHitEffect();
 	}
 
 	obj = &Objects[ID_KNIFETHROWER_KNIFE];
@@ -341,12 +341,12 @@ static void StartEntity(ObjectInfo* obj)
 		obj->control = MercenaryUziControl;
 		obj->shadowType = ShadowMode::All;
 		obj->HitPoints = 45;
-		obj->hitEffect = HIT_BLOOD;
 		obj->pivotLength = 0;
 		obj->radius = 102;
 		obj->intelligent = true;
 		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
 		obj->SetBoneRotationFlags(8, ROT_X | ROT_Y);
+		obj->SetupHitEffect();
 	}
 
 	obj = &Objects[ID_MERCENARY_AUTOPISTOLS1];
@@ -357,13 +357,12 @@ static void StartEntity(ObjectInfo* obj)
 		obj->control = MercenaryAutoPistolControl;
 		obj->shadowType = ShadowMode::All;
 		obj->HitPoints = 50;
-		obj->hitEffect = HIT_BLOOD;
 		obj->pivotLength = 0;
 		obj->radius = 102;
 		obj->intelligent = true;
-		
-		g_Level.Bones[obj->boneIndex + 6 * 4] |= (ROT_X | ROT_Y);
-		g_Level.Bones[obj->boneIndex + 8 * 4] |= (ROT_X | ROT_Y);
+		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
+		obj->SetBoneRotationFlags(8, ROT_X | ROT_Y);
+		obj->SetupHitEffect();
 	}
 
 	obj = &Objects[ID_MERCENARY_AUTOPISTOLS2];
@@ -384,12 +383,12 @@ static void StartEntity(ObjectInfo* obj)
 		obj->control = MercenaryAutoPistolControl;
 		obj->shadowType = ShadowMode::All;
 		obj->HitPoints = 50;
-		obj->hitEffect = HIT_BLOOD;
 		obj->pivotLength = 0;
 		obj->radius = 102;
 		obj->intelligent = true;
 		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
 		obj->SetBoneRotationFlags(8, ROT_X | ROT_Y);
+		obj->SetupHitEffect();
 	}
 
 	obj = &Objects[ID_MONK1];
@@ -400,11 +399,11 @@ static void StartEntity(ObjectInfo* obj)
 		obj->control = MonkControl;
 		obj->shadowType = ShadowMode::All;
 		obj->HitPoints = 50;
-		obj->hitEffect = HIT_BLOOD;
 		obj->pivotLength = 0;
 		obj->radius = 204;
 		obj->intelligent = true;
 		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
+		obj->SetupHitEffect();
 	}
 
 	obj = &Objects[ID_MONK2];
@@ -415,11 +414,11 @@ static void StartEntity(ObjectInfo* obj)
 		obj->control = MonkControl;
 		obj->shadowType = ShadowMode::All;
 		obj->HitPoints = 50;
-		obj->hitEffect = HIT_BLOOD;
 		obj->pivotLength = 0;
 		obj->radius = 204;
 		obj->intelligent = true;
 		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
+		obj->SetupHitEffect();
 	}
 
 	obj = &Objects[ID_SWORD_GUARDIAN];
@@ -428,15 +427,14 @@ static void StartEntity(ObjectInfo* obj)
 		obj->initialise = InitialiseCreature;
 		obj->collision = CreatureCollision;
 		obj->control = SwordGuardianControl;
-		//obj->drawRoutine = DrawStatue;
 		obj->shadowType = ShadowMode::All;
 		obj->HitPoints = 80;
-		obj->hitEffect = HIT_BLOOD;
 		obj->pivotLength = 0;
 		obj->radius = 204;
 		obj->intelligent = true;
 		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
 		obj->SetBoneRotationFlags(12, ROT_X | ROT_Y);
+		obj->SetupHitEffect();
 	}
 
 	obj = &Objects[ID_SPEAR_GUARDIAN];
@@ -445,15 +443,14 @@ static void StartEntity(ObjectInfo* obj)
 		obj->initialise = InitialiseSpearGuardian;
 		obj->collision = CreatureCollision;
 		obj->control = SpearGuardianControl;
-		//obj->drawRoutine = DrawStatue;
 		obj->shadowType = ShadowMode::All;
 		obj->HitPoints = 100;
-		obj->hitEffect = HIT_BLOOD;
 		obj->pivotLength = 0;
 		obj->radius = 204;
 		obj->intelligent = true;
 		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
 		obj->SetBoneRotationFlags(16, ROT_X | ROT_Y);
+		obj->SetupHitEffect();
 	}
 
 	obj = &Objects[ID_DRAGON_FRONT];
@@ -465,11 +462,11 @@ static void StartEntity(ObjectInfo* obj)
 		obj->collision = DragonCollision;
 		obj->control = DragonControl;
 		obj->HitPoints = 300;
-		obj->hitEffect = HIT_BLOOD;
 		obj->pivotLength = 300;
 		obj->radius = 256;
 		obj->intelligent = true;
 		obj->SetBoneRotationFlags(10, ROT_Z);
+		obj->SetupHitEffect();
 	}
 
 	obj = &Objects[ID_DRAGON_BACK];
@@ -480,8 +477,8 @@ static void StartEntity(ObjectInfo* obj)
 
 		obj->collision = DragonCollision;
 		obj->control = DragonControl;
-		obj->hitEffect = HIT_BLOOD;
 		obj->radius = 256;
+		obj->SetupHitEffect(true);
 	}
 
 	obj = &Objects[ID_MARCO_BARTOLI];
@@ -491,17 +488,16 @@ static void StartEntity(ObjectInfo* obj)
 		obj->control = BartoliControl;
 	}
 
-	obj = &Objects[ID_SNOWMOBILE_GUN];
+	obj = &Objects[ID_SNOWMOBILE_GUN]; // TODO: recreate renderer for skidoo
 	if (obj->loaded)
 	{
 		obj->collision = SkidooManCollision;
-		//obj->drawRoutine = DrawSkidoo; // TODO: recreate renderer for skidoo
 		obj->shadowType = ShadowMode::All;
 		obj->HitPoints = 100;
-		obj->hitEffect = HIT_BLOOD;
 		obj->pivotLength = 0;
 		obj->radius = 256;
 		obj->intelligent = true;
+		obj->SetupHitEffect();
 	}
 
 	obj = &Objects[ID_SNOWMOBILE_DRIVER];
@@ -510,7 +506,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->initialise = InitialiseSkidooMan;
 		obj->control = SkidooManControl;
 		obj->HitPoints = 1;
-		obj->hitEffect = HIT_BLOOD;
+		obj->SetupHitEffect(true);
 	}
 }
 
@@ -541,6 +537,8 @@ static void StartTrap(ObjectInfo* obj)
 		obj->initialise = InitialiseKillerStatue;
 		obj->control = KillerStatueControl;
 		obj->collision = ObjectCollision;
+		obj->isSolid = true;
+		obj->SetupHitEffect();
 	}
 }
 
@@ -554,24 +552,25 @@ static void StartVehicles(ObjectInfo* obj)
 		obj->initialise = InitialiseSpeedboat;
 		obj->collision = SpeedboatPlayerCollision;
 		obj->control = SpeedboatControl;
-		obj->hitEffect = HIT_RICOCHET;
 		obj->shadowType = ShadowMode::Lara;
+		obj->isSolid = true;
+		obj->SetupHitEffect();
 	}
 
-	obj = &Objects[ID_SNOWMOBILE];
+	obj = &Objects[ID_SNOWMOBILE]; // TODO: create a new render for the skidoo. (with track animated)
 	if (obj->loaded)
 	{
 		obj->initialise = InitialiseSkidoo;
 		obj->collision = SkidooPlayerCollision;
-		//obj->drawRoutine = DrawSkidoo; // TODO: create a new render for the skidoo. (with track animated)
-		obj->hitEffect = HIT_RICOCHET;
 		obj->shadowType = ShadowMode::Lara;
+		obj->isSolid = true;
+		obj->SetupHitEffect();
 	}
 }
 
-static ObjectInfo* objToInit;
 void InitialiseTR2Objects()
 {
+	ObjectInfo* objToInit = nullptr;
 	StartEntity(objToInit);
 	StartObject(objToInit);
 	StartTrap(objToInit);

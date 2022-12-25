@@ -6,7 +6,6 @@ struct ObjectInfo;
 
 namespace TEN::Entities::Traps::TR1
 {
-	void SetupDamoclesSword(ObjectInfo& object);
 	void InitialiseDamoclesSword(short itemNumber);
 
 	void ControlDamoclesSword(short itemNumber);

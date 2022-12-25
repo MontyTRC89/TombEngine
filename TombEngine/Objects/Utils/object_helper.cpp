@@ -19,6 +19,8 @@ void InitSmashObject(ObjectInfo* obj, int objectNumber)
 		obj->initialise = InitialiseSmashObject;
 		obj->collision = ObjectCollision;
 		obj->control = SmashObjectControl;
+		obj->isSolid = true;
+		obj->SetupHitEffect();
 	}
 }
 
@@ -28,7 +30,8 @@ void InitKeyHole(ObjectInfo* obj, int objectNumber)
 	if (obj->loaded)
 	{
 		obj->collision = KeyHoleCollision;
-		obj->hitEffect = HIT_RICOCHET;
+		obj->isSolid = true;
+		obj->SetupHitEffect();
 	}
 }
 
@@ -39,8 +42,9 @@ void InitPuzzleHole(ObjectInfo* obj, int objectNumber)
 	{
 		obj->collision = PuzzleHoleCollision;
 		obj->control = AnimatingControl;
-		obj->hitEffect = HIT_RICOCHET;
 		obj->isPuzzleHole = true;
+		obj->isSolid = true;
+		obj->SetupHitEffect();
 	}
 }
 
@@ -51,7 +55,8 @@ void InitPuzzleDone(ObjectInfo* obj, int objectNumber)
 	{
 		obj->collision = PuzzleDoneCollision;
 		obj->control = AnimatingControl;
-		obj->hitEffect = HIT_RICOCHET;
+		obj->isSolid = true;
+		obj->SetupHitEffect();
 	}
 }
 
@@ -63,9 +68,8 @@ void InitAnimating(ObjectInfo* obj, int objectNumber)
 		obj->initialise = InitialiseAnimating;
 		obj->control = AnimatingControl;
 		obj->collision = ObjectCollision;
-		obj->hitEffect = HIT_RICOCHET;
-		//Bones[obj->boneIndex + (0 * 4)] |= ROT_Y;
-		//Bones[obj->boneIndex + (1 * 4)] |= ROT_X;
+		obj->isSolid = true;
+		obj->SetupHitEffect();
 	}
 }
 
@@ -78,6 +82,25 @@ void InitPickup(ObjectInfo* obj, int objectNumber)
 		obj->collision = PickupCollision;
 		obj->control = PickupControl;
 		obj->isPickup = true;
+		obj->isSolid = true;
+		obj->SetupHitEffect();
+	}
+}
+
+void InitPickup(ObjectInfo* obj, int objectNumber, std::function<ControlFunction> func)
+{
+	obj = &Objects[objectNumber];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialisePickup;
+		obj->collision = PickupCollision;
+		if (func != nullptr)
+			obj->control = func;
+		else
+			obj->control = PickupControl;
+		obj->isPickup = true;
+		obj->isSolid = true;
+		obj->SetupHitEffect();
 	}
 }
 
@@ -129,6 +152,7 @@ void InitPushableObject(ObjectInfo* obj, int objectNumber)
 		obj->ceiling = PushableBlockCeiling;
 		obj->floorBorder = PushableBlockFloorBorder;
 		obj->ceilingBorder = PushableBlockCeilingBorder;
-		obj->hitEffect = HIT_RICOCHET;
+		obj->isSolid = true;
+		obj->SetupHitEffect();
 	}
 }

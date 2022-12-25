@@ -347,7 +347,7 @@ void TranslateItem(ItemInfo* item, const Vector3& direction, float distance)
 	item->Pose.Translate(direction, distance);
 }
 
-void SetAnimation(ItemInfo* item, int animIndex, int frameToStart)
+void SetAnimation(ItemInfo* item, int animIndex, int frameToStart, bool targetStateEnabled)
 {
 	if (item->Animation.AnimNumber == animIndex)
 		return;
@@ -362,24 +362,8 @@ void SetAnimation(ItemInfo* item, int animIndex, int frameToStart)
 	item->Animation.AnimNumber = index;
 	item->Animation.FrameNumber = g_Level.Anims[index].frameBase + frameToStart;
 	item->Animation.ActiveState = g_Level.Anims[index].ActiveState;
-	item->Animation.TargetState = item->Animation.ActiveState;
-}
-
-void SetAnimationWithoutTargetState(ItemInfo* item, int animIndex, int frameToStart)
-{
-	if (item->Animation.AnimNumber == animIndex)
-		return;
-
-	int index = Objects[item->ObjectNumber].animIndex + animIndex;
-	if (index < 0 || index >= g_Level.Anims.size())
-	{
-		TENLog(std::string("Attempted to set nonexistent animation ") + std::to_string(animIndex) + std::string(" for object ") + std::to_string(item->ObjectNumber), LogLevel::Warning);
-		return;
-	}
-
-	item->Animation.AnimNumber = index;
-	item->Animation.FrameNumber = g_Level.Anims[index].frameBase + frameToStart;
-	item->Animation.ActiveState = g_Level.Anims[index].ActiveState;
+	if (targetStateEnabled)
+		item->Animation.TargetState = item->Animation.ActiveState;
 }
 
 bool GetStateDispatch(ItemInfo* item, const AnimData& anim)
