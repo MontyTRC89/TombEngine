@@ -24,8 +24,8 @@ public:
 	Vec3 GetPos() const;
 	void SetPos(Vec3 const& pos);
 
-	short GetRoom() const;
-	void SetRoom(short room);
+	short GetRoomNumber() const;
+	void SetRoomNumber(short room);
 
 	std::string GetName() const;
 	void SetName(std::string const &);

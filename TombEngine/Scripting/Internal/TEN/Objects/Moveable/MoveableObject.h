@@ -101,8 +101,8 @@ public:
 	[[nodiscard]] bool GetActive() const;
 	void SetActive(bool active);
 
-	[[nodiscard]] short GetRoom() const;
-	void SetRoom(short room);
+	[[nodiscard]] short GetRoomNumber() const;
+	void SetRoomNumber(short room);
 
 	void AttachObjCamera(short camMeshId, Moveable& mov, short targetMeshId);
 	void AnimFromObject(GAME_OBJECT_ID object, int animNumber, int stateID);

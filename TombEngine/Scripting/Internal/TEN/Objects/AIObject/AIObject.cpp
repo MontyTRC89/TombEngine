@@ -58,16 +58,16 @@ void AIObject::Register(sol::table & parent)
 		// @tparam string name The object's new name
 		ScriptReserved_SetName, &AIObject::SetName,
 
-		/// Get the current room of the object
-		// @function AIObject:GetRoom
+		/// Get the current room number of the object
+		// @function AIObject:GetRoomNumber
 		// @treturn int number representing the current room of the object
-		ScriptReserved_GetRoom, &AIObject::GetRoom,
+		ScriptReserved_GetRoomNumber, &AIObject::GetRoomNumber,
 
-		/// Set room of object 
+		/// Set room number of the object 
 		// This is used in conjunction with SetPosition to teleport the object to a new room.
-		// @function AIObject:SetRoom
+		// @function AIObject:SetRoomNumber
 		// @tparam int ID the ID of the new room 
-		ScriptReserved_SetRoom, &AIObject::SetRoom,
+		ScriptReserved_SetRoomNumber, &AIObject::SetRoomNumber,
 
 		/// Retrieve the object ID
 		// @function AIObject:GetObjectID
@@ -146,12 +146,12 @@ void AIObject::SetName(std::string const & id)
 	}
 }
 
-short AIObject::GetRoom() const
+short AIObject::GetRoomNumber() const
 {
 	return m_aiObject.roomNumber;
 }
 
-void AIObject::SetRoom(short room)
+void AIObject::SetRoomNumber(short room)
 {
 	const size_t nRooms = g_Level.Rooms.size();
 	if (room < 0 || static_cast<size_t>(room) >= nRooms)

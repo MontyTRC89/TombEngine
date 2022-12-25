@@ -114,7 +114,7 @@ static std::unique_ptr<Moveable> Create(
 		if (std::holds_alternative<short>(room))
 		{
 			ptr->SetPos(pos, false);
-			ptr->SetRoom(std::get<short>(room));
+			ptr->SetRoomNumber(std::get<short>(room));
 		}
 		else
 			ptr->SetPos(pos, true);
@@ -410,9 +410,9 @@ ScriptReserved_GetSlotHP, & Moveable::GetSlotHP,
 // @treturn bool true if the moveable is active
 	ScriptReserved_GetActive, &Moveable::GetActive,
 
-	ScriptReserved_GetRoom, &Moveable::GetRoom,
+	ScriptReserved_GetRoomNumber, &Moveable::GetRoomNumber,
 
-	ScriptReserved_SetRoom, &Moveable::SetRoom,
+	ScriptReserved_SetRoomNumber, &Moveable::SetRoomNumber,
 
 	ScriptReserved_GetPosition, & Moveable::GetPos,
 
@@ -611,7 +611,7 @@ void Moveable::SetPos(Vec3 const& pos, sol::optional<bool> updateRoom)
 		{
 			int potentialNewRoom = FindRoomNumber(m_item->Pose.Position, m_item->RoomNumber);
 			if (potentialNewRoom != m_item->RoomNumber)
-				SetRoom(potentialNewRoom);
+				SetRoomNumber(potentialNewRoom);
 		}
 	}
 }
@@ -849,23 +849,23 @@ bool Moveable::GetHitStatus() const
 	return m_item->HitStatus;
 }
 
-/// Get the current room of the object
-// @function Moveable:GetRoom
+/// Get the current room number of the object
+// @function Moveable:GetRoomNumber
 // @treturn int number representing the current room of the object
-short Moveable::GetRoom() const
+short Moveable::GetRoomNumber() const
 {
 	return m_item->RoomNumber;
 }
 
-/// Set room of object 
+/// Set room number of object 
 // Use this if you are not using SetPosition's automatic room update - for example, when dealing with overlapping rooms.
-// @function Moveable:SetRoom
+// @function Moveable:SetRoomNumber
 // @tparam int ID the ID of the new room 
 // @usage 
 // local sas = TEN.Objects.GetMoveableByName("sas_enemy")
-// sas:SetRoom(destinationRoom)
+// sas:SetRoomNumber(destinationRoom)
 // sas:SetPosition(destinationPosition, false)
-void Moveable::SetRoom(short room)
+void Moveable::SetRoomNumber(short room)
 {	
 	const size_t nRooms = g_Level.Rooms.size();
 	if (room < 0 || static_cast<size_t>(room) >= nRooms)
