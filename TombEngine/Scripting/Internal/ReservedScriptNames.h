@@ -93,6 +93,7 @@ static constexpr char ScriptReserved_UnswapMesh[]			= "UnswapMesh";
 static constexpr char ScriptReserved_GetHitStatus[]			= "GetHitStatus";
 static constexpr char ScriptReserved_GetActive[]			= "GetActive";
 static constexpr char ScriptReserved_GetRoom[]				= "GetRoom";
+static constexpr char ScriptReserved_UpdateFloorCollision[] = "UpdateFloorCollision";
 static constexpr char ScriptReserved_GetRoomNumber[]		= "GetRoomNumber";
 static constexpr char ScriptReserved_SetRoomNumber[]		= "SetRoomNumber";
 static constexpr char ScriptReserved_GetStrength[]			= "GetStrength";

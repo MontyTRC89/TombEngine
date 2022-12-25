@@ -6,6 +6,7 @@
 #include "Game/effects/item_fx.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
+#include "Game/collision/floordata.h"
 #include "Objects/objectslist.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
@@ -417,6 +418,10 @@ ScriptReserved_GetSlotHP, & Moveable::GetSlotHP,
 	ScriptReserved_SetRoomNumber, &Moveable::SetRoomNumber,
 
 	ScriptReserved_GetPosition, & Moveable::GetPos,
+
+/// Updates the floor collision of standable objects. (Note: This is one of the most expensive functions, use with caution).
+// @function Moveable:UpdateFloorCollision
+	ScriptReserved_UpdateFloorCollision, & Moveable::UpdateFloorCollision,
 
 /// Get the object's joint position
 // @function Moveable:GetJointPosition
@@ -897,6 +902,13 @@ void Moveable::SetRoomNumber(short room)
 		if (m_item->IsLara())
 			m_item->Location.roomNumber = room;
 	}
+}
+
+/// Updates the floor collision of standable objects. (Note: This is one of the most expensive functions, use with caution).
+// @function Moveable:UpdateFloorCollision
+void Moveable::UpdateFloorCollision()
+{
+	TEN::Floordata::UpdateBridgeItem(m_item->Index);
 }
 
 short Moveable::GetStatus() const

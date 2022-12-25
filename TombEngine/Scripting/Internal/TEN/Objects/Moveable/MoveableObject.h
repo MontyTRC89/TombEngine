@@ -106,6 +106,8 @@ public:
 	[[nodiscard]] int GetRoomNumber() const;
 	void SetRoomNumber(short room);
 
+	[[nodiscard]] void UpdateFloorCollision();
+
 	void AttachObjCamera(short camMeshId, Moveable& mov, short targetMeshId);
 	void AnimFromObject(GAME_OBJECT_ID object, int animNumber, int stateID);
 
