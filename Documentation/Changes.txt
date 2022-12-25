@@ -15,6 +15,10 @@ Version 1.0.5
 * Draw real mesh for darts.
 * Fix pathfinding problems for first initialized enemies of every slot.
 * Fix crash, water death and meshswap issues for TR5 cyborg.
+* Fix Lara's animation for Cog_Switch release
+* Added new OCB to object Cog_Switch. 
+	- Use OCB 0 to have the traditional behaviour
+	- Use any other OCB to can use the Cog switch without need of any door linked.
 
 Lua API changes:
 * Add new Room class and several methods for it.
