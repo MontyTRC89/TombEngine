@@ -410,6 +410,8 @@ ScriptReserved_GetSlotHP, & Moveable::GetSlotHP,
 // @treturn bool true if the moveable is active
 	ScriptReserved_GetActive, &Moveable::GetActive,
 
+	ScriptReserved_GetRoom, &Moveable::GetRoom,
+
 	ScriptReserved_GetRoomNumber, &Moveable::GetRoomNumber,
 
 	ScriptReserved_SetRoomNumber, &Moveable::SetRoomNumber,
@@ -849,10 +851,18 @@ bool Moveable::GetHitStatus() const
 	return m_item->HitStatus;
 }
 
+/// Get the current room of the object
+// @function Moveable:GetRoom
+// @treturn Room current room of the object
+std::unique_ptr<Room> Moveable::GetRoom() const
+{
+	return std::make_unique<Room>(g_Level.Rooms[m_item->RoomNumber]);
+}
+
 /// Get the current room number of the object
 // @function Moveable:GetRoomNumber
 // @treturn int number representing the current room of the object
-short Moveable::GetRoomNumber() const
+int Moveable::GetRoomNumber() const
 {
 	return m_item->RoomNumber;
 }

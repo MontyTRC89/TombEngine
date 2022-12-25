@@ -58,6 +58,11 @@ void AIObject::Register(sol::table & parent)
 		// @tparam string name The object's new name
 		ScriptReserved_SetName, &AIObject::SetName,
 
+		/// Get the current room of the object
+		// @function AIObject:GetRoom
+		// @treturn Room current room of the object
+		ScriptReserved_GetRoom, &AIObject::GetRoom,
+
 		/// Get the current room number of the object
 		// @function AIObject:GetRoomNumber
 		// @treturn int number representing the current room of the object
@@ -146,7 +151,12 @@ void AIObject::SetName(std::string const & id)
 	}
 }
 
-short AIObject::GetRoomNumber() const
+std::unique_ptr<Room> AIObject::GetRoom() const
+{
+	return std::make_unique<Room>(g_Level.Rooms[m_aiObject.roomNumber]);
+}
+
+int AIObject::GetRoomNumber() const
 {
 	return m_aiObject.roomNumber;
 }

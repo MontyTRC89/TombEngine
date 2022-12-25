@@ -48,6 +48,11 @@ void CameraObject::Register(sol::table & parent)
 		// @tparam string name The camera's new name
 		ScriptReserved_SetName, &CameraObject::SetName,
 
+		/// Get the current room of the camera
+		// @function CameraObject:GetRoom
+		// @treturn Room current room of the camera
+		ScriptReserved_GetRoom, &CameraObject::GetRoom,
+
 		/// Get the current room number of the camera
 		// @function Camera:GetRoomNumber
 		// @treturn int number representing the current room of the camera
@@ -96,7 +101,12 @@ void CameraObject::SetName(std::string const & id)
 	}
 }
 
-short CameraObject::GetRoomNumber() const
+std::unique_ptr<Room> CameraObject::GetRoom() const
+{
+	return std::make_unique<Room>(g_Level.Rooms[m_camera.RoomNumber]);
+}
+
+int CameraObject::GetRoomNumber() const
 {
 	return m_camera.RoomNumber;
 }

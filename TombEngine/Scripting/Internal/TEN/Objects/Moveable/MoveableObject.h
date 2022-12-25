@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ScriptUtil.h"
+#include "Objects/Room/RoomObject.h"
 #include "Objects/NamedBase.h"
 
 class LevelFunc;
@@ -101,7 +102,8 @@ public:
 	[[nodiscard]] bool GetActive() const;
 	void SetActive(bool active);
 
-	[[nodiscard]] short GetRoomNumber() const;
+	std::unique_ptr<Room> GetRoom() const;
+	[[nodiscard]] int GetRoomNumber() const;
 	void SetRoomNumber(short room);
 
 	void AttachObjCamera(short camMeshId, Moveable& mov, short targetMeshId);

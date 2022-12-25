@@ -15,7 +15,7 @@ class Room : public NamedBase<Room, ROOM_INFO&>
 {
 public:
 	using IdentifierType = std::reference_wrapper<ROOM_INFO>;
-	Room(ROOM_INFO& volume);
+	Room(ROOM_INFO& room);
 	~Room() = default;
 
 	Room& operator =(const Room& other) = delete;
