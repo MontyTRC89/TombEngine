@@ -133,34 +133,26 @@ bool GetTargetOnLOS(GameVector* origin, GameVector* target, bool drawTarget, boo
 
 					if (item->ObjectNumber < ID_SHOOT_SWITCH1 || item->ObjectNumber > ID_SHOOT_SWITCH4)
 					{
-						if ((Objects[item->ObjectNumber].explodableMeshbits & ShatterItem.bit) &&
+						if (Objects[item->ObjectNumber].explodableMeshbits & ShatterItem.bit &&
 							LaserSight)
 						{
-							//if (!Objects[item->objectNumber].intelligent)
-							//{
+							if (item->ObjectNumber == ID_GUARD_LASER)
+							{
+								float angle = phd_atan(LaraItem->Pose.Position.z - item->Pose.Position.z, LaraItem->Pose.Position.x - item->Pose.Position.x) - item->Pose.Orientation.y;
+								if (angle > -ANGLE(90) && angle < ANGLE(90))
+								{
+									DoDamage(item, INT_MAX);
+									HitTarget(LaraItem, item, &target2, Weapons[(int)Lara.Control.Weapon.GunType].Damage, 0);
+								}
+							}
+							else
+							{
 								item->MeshBits &= ~ShatterItem.bit;
 								ShatterImpactData.impactDirection = directionNorm;
 								ShatterImpactData.impactLocation = Vector3(ShatterItem.sphere.x, ShatterItem.sphere.y, ShatterItem.sphere.z);
 								ShatterObject(&ShatterItem, 0, 128, target2.RoomNumber, 0);
 								TriggerRicochetSpark(target2, LaraItem->Pose.Orientation.y, 3, 0);
-							/*}
-							else
-							{
-								if (item->objectNumber != ID_GUARD_LASER)
-								{
-									DoDamage(item, 30);
-									HitTarget(item, &target, Weapons[Lara.gunType].damage, 0);
-								}
-								else
-								{
-									angle = phd_atan(LaraItem->pos.Position.z - item->pos.Position.z, LaraItem->pos.Position.x - item->pos.Position.x) - item->pos.Orientation.y;
-									if (angle > -ANGLE(90) && angle < ANGLE(90))
-									{
-										DoDamage(item, INT_MAX);
-										HitTarget(item, &target, Weapons[Lara.gunType].damage, 0);
-									}
-								}
-							}*/
+							}
 						}
 						else
 						{
@@ -189,6 +181,7 @@ bool GetTargetOnLOS(GameVector* origin, GameVector* target, bool drawTarget, boo
 									else if (Objects[item->ObjectNumber].hitEffect == HIT_RICOCHET)
 										TriggerRicochetSpark(target2, LaraItem->Pose.Orientation.y, 3, 0);
 
+									if (!Objects[item->ObjectNumber].undead)
 									DoDamage(item, Weapons[(int)Lara.Control.Weapon.GunType].Damage);
 
 									if (!item->Callbacks.OnHit.empty())
@@ -471,9 +464,9 @@ bool DoRayBox(GameVector* origin, GameVector* target, GameBoundingBox* box, Pose
 					p[0].y = p[1].y + ((r0 * (p[2].y - p[1].y)) >> 16);
 					p[0].z = p[1].z + ((r0 * (p[2].z - p[1].z)) >> 16);
 
-					int dx = p[0].x - p[3].x;
-					int dy = p[0].y - p[3].y;
-					int dz = p[0].z - p[3].z;
+					int dx = SQUARE(p[0].x - p[3].x);
+					int dy = SQUARE(p[0].y - p[3].y);
+					int dz = SQUARE(p[0].z - p[3].z);
 
 					int distance = dx + dy + dz;
 
