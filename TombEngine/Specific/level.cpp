@@ -590,6 +590,7 @@ void ReadRooms()
 	int numRooms = ReadInt32();
 	TENLog("Num rooms: " + std::to_string(numRooms), LogLevel::Info);
 
+	g_Level.Rooms.reserve(numRooms);
 	for (int i = 0; i < numRooms; i++)
 	{
 		auto& room = g_Level.Rooms.emplace_back();
@@ -804,11 +805,14 @@ void ReadRooms()
 		room.flippedRoom = ReadInt32();
 		room.flags = ReadInt32();
 		room.meshEffect = ReadInt32();
-		room.reverbType = ReadInt32();
+		room.reverbType = (ReverbType)ReadInt32();
 		room.flipNumber = ReadInt32();
 
 		room.itemNumber = NO_ITEM;
 		room.fxNumber = NO_ITEM;
+		room.index = i;
+
+		g_GameScriptEntities->AddName(room.name, room);
 	}
 }
 

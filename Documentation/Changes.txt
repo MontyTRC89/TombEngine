@@ -4,6 +4,7 @@ Version 1.0.5
 * Fix combined items not existing in inventory upon game reload.
 * Fix classic rollingball not behaving properly in rooms beyond the distance of 32 blocks.
 * Fix rollingball not killing Lara under certain movement angles.
+* Fix savegame crashes when rooms with static meshes are flipped.
 * Fix discrepancies between statistics and save / load game time units.
 * Fix draw key incorrectly working in binoculars / lasersight mode.
 * Fix FLAME_EMITTER_3 not burning player.
@@ -14,6 +15,9 @@ Version 1.0.5
 * Draw real mesh for darts.
 * Fix pathfinding problems for first initialized enemies of every slot.
 * Fix crash, water death and meshswap issues for TR5 cyborg.
+
+Lua API changes:
+* Add new Room class and several methods for it.
 
 Version 1.0.4
 =============
