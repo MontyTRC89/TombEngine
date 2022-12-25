@@ -463,9 +463,8 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 
 	RumbleLaraHealthCondition(item);
 
-	bool isWater  = TestEnvironment(ENV_FLAG_WATER,  item);
-	bool isSwamp  = TestEnvironment(ENV_FLAG_SWAMP,  item);
-	bool isDamage = TestEnvironment(ENV_FLAG_DAMAGE, item);
+	bool isWater = TestEnvironment(ENV_FLAG_WATER, item);
+	bool isSwamp = TestEnvironment(ENV_FLAG_SWAMP, item);
 
 	bool isWaterOnHeadspace = false;
 
@@ -670,7 +669,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 		}
 	}
 
-	if (isDamage && item->HitPoints > 0)
+	if (TestEnvironment(ENV_FLAG_DAMAGE, item) && item->HitPoints > 0)
 	{
 		item->HitPoints--;
 	}
@@ -683,7 +682,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 			StopSoundTracks();
 
 		lara->Control.Count.Death++;
-		if ((item->Flags & 0x100))
+		if ((item->Flags & IFLAG_INVISIBLE))
 		{
 			lara->Control.Count.Death++;
 			return;
