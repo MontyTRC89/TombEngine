@@ -133,7 +133,7 @@ bool GetTargetOnLOS(GameVector* origin, GameVector* target, bool drawTarget, boo
 
 					if (item->ObjectNumber < ID_SHOOT_SWITCH1 || item->ObjectNumber > ID_SHOOT_SWITCH4)
 					{
-						if (Objects[item->ObjectNumber].explodableMeshbits & ShatterItem.bit &&
+						if ((Objects[item->ObjectNumber].explodableMeshbits & ShatterItem.bit) &&
 							LaserSight)
 						{
 							if (item->ObjectNumber == ID_GUARD_LASER)
