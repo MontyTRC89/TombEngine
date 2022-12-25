@@ -32,6 +32,8 @@ public:
 	std::string GetName() const;
 	void SetName(std::string const &);
 
+	void PlayCamera(Vec3 const& TargetPos, int TargetRoom);
+
 private:
 	LevelCameraInfo & m_camera;
 };
