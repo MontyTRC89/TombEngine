@@ -27,7 +27,6 @@
 #include "Objects/TR5/Emitter/tr5_rats_emitter.h"
 #include "Objects/TR5/Emitter/tr5_bats_emitter.h"
 #include "Objects/TR5/Emitter/tr5_spider_emitter.h"
-#include "Renderer/Renderer11.h"
 #include "Sound/sound.h"
 #include "Specific/clock.h"
 #include "Specific/level.h"
@@ -43,7 +42,6 @@ using namespace TEN::Entities::Switches;
 using namespace TEN::Entities::TR4;
 using namespace TEN::Entities::Generic;
 using namespace TEN::Floordata;
-using namespace TEN::Renderer;
 using namespace flatbuffers;
 
 namespace Save = TEN::Save;
