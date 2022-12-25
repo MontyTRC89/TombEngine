@@ -12,7 +12,7 @@ Constants for room flag IDs.
 
 /*** Objects.RoomFlagID constants.
 
-The following constants are inside ActionID.
+The following constants are inside RoomFlagID.
 
 	WATER
 	QUICKSAND
