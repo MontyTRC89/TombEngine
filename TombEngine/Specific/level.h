@@ -3,6 +3,7 @@
 #include "Game/control/volumeactivator.h"
 #include "Game/items.h"
 #include "Game/room.h"
+#include "Game/itemdata/creature_info.h"
 #include "Sound/sound.h"
 #include "Specific/IO/ChunkId.h"
 #include "Specific/IO/ChunkReader.h"
@@ -13,8 +14,6 @@
 
 #define AddPtr(p, t, n) p = (t*)((char*)(p) + (ptrdiff_t)(n));
 #define MESHES(slot, mesh) (Objects[slot].meshIndex + mesh)
-
-#define MAX_ZONES 6
 
 using namespace TEN::Control::Volumes;
 
@@ -114,7 +113,7 @@ struct LEVEL
 	std::vector<SoundSourceInfo> SoundSources;
 	std::vector<BOX_INFO> Boxes;
 	std::vector<OVERLAP> Overlaps;
-	std::vector<int> Zones[MAX_ZONES][2];
+	std::vector<int> Zones[(int)ZoneType::MaxZone][2];
 	std::vector<short> SoundMap;
 	std::vector<SampleInfo> SoundDetails;
 	std::vector<ANIMATED_TEXTURES_SEQUENCE> AnimatedTexturesSequences;
