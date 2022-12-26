@@ -1164,14 +1164,16 @@ int CreatureVault(short itemNumber, short angle, int vault, int shift)
 	else if (item->Floor > y + CHECK_CLICK(5) &&
 		item->ObjectNumber != ID_VON_CROY &&
 		item->ObjectNumber != ID_BADDY1 &&
-		item->ObjectNumber != ID_BADDY2)
+		item->ObjectNumber != ID_BADDY2 &&
+		item->ObjectNumber != ID_LIZARD)
 	{
 		vault = -3;
 	}
 	else if (item->Floor > y + CHECK_CLICK(3) &&
 		item->ObjectNumber != ID_VON_CROY &&
 		item->ObjectNumber != ID_BADDY1 &&
-		item->ObjectNumber != ID_BADDY2)
+		item->ObjectNumber != ID_BADDY2 &&
+		item->ObjectNumber != ID_LIZARD)
 	{
 		vault = -2;
 	}

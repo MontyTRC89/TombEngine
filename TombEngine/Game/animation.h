@@ -81,6 +81,9 @@ void AnimateItem(ItemInfo* item);
 
 bool HasStateDispatch(ItemInfo* item, int targetState = NO_STATE);
 bool TestLastFrame(ItemInfo* item, int animNumber = NO_ANIM);
+bool TestCurrentAnimation(ItemInfo* item, int animIndex = NO_ANIM);
+bool TestFrameSingle(ItemInfo* item, int frameToStart);
+bool TestFrameBetween(ItemInfo* item, int frameStart, int frameEnd);
 
 void TranslateItem(ItemInfo* item, short headingAngle, float forward, float down = 0.0f, float right = 0.0f);
 void TranslateItem(ItemInfo* item, const EulerAngles& orient, float distance);

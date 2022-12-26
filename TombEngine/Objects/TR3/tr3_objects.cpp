@@ -23,6 +23,7 @@
 #include "Objects/TR3/Entity/tr3_tony.h" // OK
 #include "Objects/TR3/Entity/tr3_trex.h" // OK
 #include "Objects/TR3/Entity/tr3_tribesman.h" // OK
+#include "Objects/TR3/Entity/tr3_lizard.h" // OK
 
 // Traps
 #include "Objects/TR3/Trap/train.h"
@@ -307,6 +308,22 @@ static void StartEntity(ObjectInfo* obj)
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_X;
 		g_Level.Bones[obj->boneIndex + 13 * 4] |= ROT_Y;
+	}
+
+	obj = &Objects[ID_LIZARD];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseCreature;
+		obj->control = LizardControl;
+		obj->collision = CreatureCollision;
+		obj->shadowType = ShadowMode::All;
+		obj->HitPoints = 36;
+		obj->hitEffect = HIT_BLOOD;
+		obj->intelligent = true;
+		obj->pivotLength = 0;
+		obj->radius = 204;
+		obj->ZoneType = ZoneType::HumanClassic;
+		obj->SetBoneRotation(9, ROT_X|ROT_Z);
 	}
 }
 

@@ -332,6 +332,23 @@ bool TestLastFrame(ItemInfo* item, int animNumber)
 	return (item->Animation.FrameNumber >= anim.frameEnd);
 }
 
+bool TestCurrentAnimation(ItemInfo* item, int animIndex)
+{
+	return animIndex == NO_ANIM ? false : item->Animation.AnimNumber == Objects[item->ObjectNumber].animIndex + animIndex;
+}
+
+bool TestFrameSingle(ItemInfo* item, int frameToStart)
+{
+	const auto& anim = g_Level.Anims[item->Animation.AnimNumber];
+	return item->Animation.FrameNumber == (anim.frameBase + frameToStart);
+}
+
+bool TestFrameBetween(ItemInfo* item, int frameStart, int frameEnd)
+{
+	const auto& anim = g_Level.Anims[item->Animation.AnimNumber];
+	return item->Animation.FrameNumber >= (anim.frameBase + frameStart) && item->Animation.FrameNumber <= (anim.frameBase + frameEnd);
+}
+
 void TranslateItem(ItemInfo* item, short headingAngle, float forward, float down, float right)
 {
 	item->Pose.Translate(headingAngle, forward, down, right);
