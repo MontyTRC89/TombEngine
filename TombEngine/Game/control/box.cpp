@@ -170,8 +170,8 @@ bool SameZone(CreatureInfo* creature, ItemInfo* target)
 
 short AIGuard(CreatureInfo* creature) 
 {
-	auto* item = &g_Level.Items[creature->ItemNumber];
-	if (item->AIBits & MODIFY)
+	auto& item = g_Level.Items[creature->ItemNumber];
+	if (item.AIBits & MODIFY)
 		return 0;
 
 	if (Random::TestProbability(1 / 4.0f))
@@ -179,7 +179,7 @@ short AIGuard(CreatureInfo* creature)
 		creature->HeadRight = true;
 		creature->HeadLeft = true;
 	}
-	else if (Random::TestProbability(0.35f))
+	else if (Random::TestProbability(1 / 3.0f))
 	{
 		creature->HeadRight = false;
 		creature->HeadLeft = true;
@@ -267,9 +267,6 @@ bool CreaturePathfind(ItemInfo* item, short angle, short tilt)
 
 	GetFloor(prevPos.x, y, prevPos.z, &roomNumber);
 	auto* floor = GetFloor(item->Pose.Position.x, y, item->Pose.Position.z, &roomNumber);
-	//if (floor->Box == NO_BOX)
-	//	return false;
-
 	int height = g_Level.Boxes[floor->Box].height;
 	int nextHeight = 0;
 
@@ -906,7 +903,7 @@ bool ValidBox(ItemInfo* item, short zoneNumber, short boxNumber)
 	return true;
 }
 
-int EscapeBox(ItemInfo* item, ItemInfo* enemy, int boxNumber) 
+bool EscapeBox(ItemInfo* item, ItemInfo* enemy, int boxNumber) 
 {
 	auto* box = &g_Level.Boxes[boxNumber];
 	int x = (box->top + box->bottom) * SECTOR(1) / 2 - enemy->Pose.Position.x;
@@ -918,7 +915,8 @@ int EscapeBox(ItemInfo* item, ItemInfo* enemy, int boxNumber)
 		return false;
 	}
 
-	return ((z > 0) == (item->Pose.Position.z > enemy->Pose.Position.z)) || ((x > 0) == (item->Pose.Position.x > enemy->Pose.Position.x));
+	return ((z > 0) == (item->Pose.Position.z > enemy->Pose.Position.z)) ||
+		   ((x > 0) == (item->Pose.Position.x > enemy->Pose.Position.x));
 }
 
 void TargetBox(LOTInfo* LOT, int boxNumber)

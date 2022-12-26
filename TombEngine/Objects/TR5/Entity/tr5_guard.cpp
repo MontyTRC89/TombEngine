@@ -505,8 +505,8 @@ namespace TEN::Entities::Creatures::TR5
 				}
 				else if (canJump1block || canJump2blocks)
 				{
-					SetAnimation(item, GUARD_ANIM_JUMP_START);
 					creature->MaxTurn = 0;
+					SetAnimation(item, GUARD_ANIM_JUMP_START);
 
 					if (canJump1block)
 						item->Animation.TargetState = GUARD_STATE_JUMP_1_BLOCK;

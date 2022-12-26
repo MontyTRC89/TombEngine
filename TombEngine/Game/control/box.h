@@ -177,7 +177,7 @@ void CreatureDie(short itemNumber, bool explode);
 bool BadFloor(int x, int y, int z, int boxHeight, int nextHeight, short roomNumber, LOTInfo* LOT);
 int CreatureCreature(short itemNumber);
 bool ValidBox(ItemInfo* item, short zoneNumber, short boxNumber);
-int EscapeBox(ItemInfo* item, ItemInfo* enemy, int boxNumber);
+bool EscapeBox(ItemInfo* item, ItemInfo* enemy, int boxNumber);
 void TargetBox(LOTInfo* LOT, int boxNumber);
 bool UpdateLOT(LOTInfo* LOT, int expansion);
 bool SearchLOT(LOTInfo* LOT, int expansion);
