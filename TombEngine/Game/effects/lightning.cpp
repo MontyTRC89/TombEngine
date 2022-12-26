@@ -69,39 +69,38 @@ namespace TEN::Effects::Lightning
 		}
 	}
 
-	LIGHTNING_INFO TriggerLightning(Vector3i* src, Vector3i* dest, unsigned char amplitude, unsigned char r, unsigned char g, unsigned char b, unsigned char life, char flags, char width, char segments)
+	LIGHTNING_INFO* TriggerLightning(Vector3i* src, Vector3i* dest, byte amplitude, byte r, byte g, byte b, byte life, char flags, char width, char segments)
 	{
 		LIGHTNING_INFO arc;
+		arc.pos1 = *src;
+		arc.pos2.x = ((src->x * 3) + dest->x) >> 2;
+		arc.pos2.y = ((src->y * 3) + dest->y) >> 2;
+		arc.pos2.z = ((src->z * 3) + dest->z) >> 2;
+		arc.pos3.x = ((dest->x * 3) + src->x) >> 2;
+		arc.pos3.y = ((dest->y * 3) + src->y) >> 2;
+		arc.pos3.z = ((dest->z * 3) + src->z) >> 2;
+		arc.pos4 = *dest;
 
-			arc.pos1 = *src;
-			arc.pos2.x = ((src->x * 3) + dest->x) >> 2;
-			arc.pos2.y = ((src->y * 3) + dest->y) >> 2;
-			arc.pos2.z = ((src->z * 3) + dest->z) >> 2;
-			arc.pos3.x = ((dest->x * 3) + src->x) >> 2;
-			arc.pos3.y = ((dest->y * 3) + src->y) >> 2;
-			arc.pos3.z = ((dest->z * 3) + src->z) >> 2;
-			arc.pos4 = *dest;
+		arc.flags = flags;
 
-			arc.flags = flags;
+		for (int i = 0; i < 9; i++)
+		{
+			if (arc.flags & 2 || i < 6)
+				arc.interpolation[i] = ((unsigned char)(GetRandomControl() % amplitude) - (unsigned char)(amplitude >> 1));
+			else
+				arc.interpolation[i] = 0;
+		}
 
-			for (int i = 0; i < 9; i++)
-			{
-				if (arc.flags & 2 || i < 6)
-					arc.interpolation[i] = ((unsigned char)(GetRandomControl() % amplitude) - (unsigned char)(amplitude >> 1));
-				else
-					arc.interpolation[i] = 0;
-			}
+		arc.r = r;
+		arc.g = g;
+		arc.b = b;
+		arc.life = life;
+		arc.segments = segments;
+		arc.amplitude = amplitude;
+		arc.width = width;
 
-			arc.r = r;
-			arc.g = g;
-			arc.b = b;
-			arc.life = life;
-			arc.segments = segments;
-			arc.amplitude = amplitude;
-			arc.width = width;
-
-			Lightning.push_back(arc);	
-			return arc;
+		Lightning.push_back(arc);
+		return &Lightning[Lightning.size() - 1];
 	}
 
 	// New function used in TR5, we'll decompile it in the future
