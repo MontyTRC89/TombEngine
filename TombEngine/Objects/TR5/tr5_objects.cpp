@@ -127,14 +127,14 @@ static void StartEntity(ObjectInfo *obj)
 		if (Objects[ID_SWAT].loaded)
 			obj->animIndex = Objects[ID_SWAT].animIndex;
 
-		obj->biteOffset = 4;
 		obj->initialise = InitialiseGuard;
 		obj->collision = CreatureCollision;
 		obj->control = GuardControl;
-		obj->pivotLength = 50;
 		obj->shadowType = ShadowMode::All;
+		obj->biteOffset = 4;
 		obj->HitPoints = 24;
 		obj->radius = 102;
+		obj->pivotLength = 50;
 		obj->explodableMeshbits = 0x4000;
 		obj->intelligent = true;
 		obj->ZoneType = ZoneType::Human;
@@ -146,18 +146,16 @@ static void StartEntity(ObjectInfo *obj)
 	obj = &Objects[ID_SWAT_PLUS];
 	if (obj->loaded)
 	{
-		short animIndex;
 		if (!Objects[ID_SWAT].loaded)
-			animIndex = Objects[ID_GUARD1].animIndex;
+			obj->animIndex = Objects[ID_GUARD1].animIndex;
 		else
-			animIndex = Objects[ID_SWAT].animIndex;
+			obj->animIndex = Objects[ID_SWAT].animIndex;
 
-		obj->animIndex = animIndex;
-		obj->biteOffset = 0;
 		obj->initialise = InitialiseGuard;
 		obj->collision = CreatureCollision;
 		obj->control = GuardControl;
 		obj->shadowType = ShadowMode::All;
+		obj->biteOffset = 0;
 		obj->HitPoints = 24;
 		obj->pivotLength = 50;
 		obj->radius = 102;
@@ -176,11 +174,11 @@ static void StartEntity(ObjectInfo *obj)
 		else
 			obj->animIndex = Objects[ID_SWAT].animIndex;
 
-		obj->biteOffset = 0;
 		obj->initialise = InitialiseGuard;
 		obj->collision = CreatureCollision;
 		obj->control = GuardControl;
 		obj->shadowType = ShadowMode::All;
+		obj->biteOffset = 0;
 		obj->HitPoints = 24;
 		obj->pivotLength = 50;
 		obj->radius = 102;
@@ -217,18 +215,16 @@ static void StartEntity(ObjectInfo *obj)
 	obj = &Objects[ID_GUARD2];
 	if (obj->loaded)
 	{
-		short animIndex;
 		if (!Objects[ID_SWAT].loaded)
-			animIndex = Objects[ID_GUARD1].animIndex;
+			obj->animIndex = Objects[ID_GUARD1].animIndex;
 		else
-			animIndex = Objects[ID_SWAT].animIndex;
+			obj->animIndex = Objects[ID_SWAT].animIndex;
 
-		obj->animIndex = animIndex;
-		obj->biteOffset = 4;
 		obj->initialise = InitialiseGuard;
 		obj->control = GuardControl;
 		obj->collision = CreatureCollision;
 		obj->shadowType = ShadowMode::All;
+		obj->biteOffset = 4;
 		obj->HitPoints = 24;
 		obj->pivotLength = 50;
 		obj->radius = 102;
@@ -248,11 +244,11 @@ static void StartEntity(ObjectInfo *obj)
 		else
 			obj->animIndex = Objects[ID_SWAT].animIndex;
 
-		obj->biteOffset = 4;
 		obj->initialise = InitialiseGuard;
 		obj->control = GuardControl;
 		obj->collision = CreatureCollision;
 		obj->shadowType = ShadowMode::All;
+		obj->biteOffset = 4;
 		obj->HitPoints = 24;
 		obj->pivotLength = 50;
 		obj->radius = 102;
@@ -514,13 +510,13 @@ static void StartEntity(ObjectInfo *obj)
 	obj = &Objects[ID_WILLOWISP];
 	if (obj->loaded)
 	{
-		obj->biteOffset = 256;
 		obj->initialise = InitialiseLightingGuide;
 		//obj->control = ControlLightingGuide;
 		obj->drawRoutine = nullptr;
 		obj->shadowType = ShadowMode::All;
+		obj->biteOffset = 256;
 		obj->radius = 256;
-		obj->HitPoints = 16;
+		obj->HitPoints = NOT_TARGETABLE;
 		obj->pivotLength = 20;
 		obj->intelligent = true;
 		obj->ZoneType = ZoneType::Flyer;
