@@ -347,7 +347,7 @@ void TranslateItem(ItemInfo* item, const Vector3& direction, float distance)
 	item->Pose.Translate(direction, distance);
 }
 
-void SetAnimation(ItemInfo* item, int animIndex, int frameToStart, int targetState)
+void SetAnimation(ItemInfo* item, int animIndex, int frameToStart)
 {
 	if (item->Animation.AnimNumber == animIndex)
 		return;
@@ -364,7 +364,7 @@ void SetAnimation(ItemInfo* item, int animIndex, int frameToStart, int targetSta
 
 	item->Animation.FrameNumber = anim.frameBase + frameToStart;
 	item->Animation.ActiveState = anim.ActiveState;
-	item->Animation.TargetState = (targetState != NO_STATE) ? targetState : anim.ActiveState;
+	item->Animation.TargetState = anim.ActiveState;
 }
 
 bool GetStateDispatch(ItemInfo* item, const AnimData& anim)
