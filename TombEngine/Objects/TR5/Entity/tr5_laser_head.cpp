@@ -17,6 +17,7 @@
 #include "Game/effects/item_fx.h"
 #include "Game/misc.h"
 #include "Math/Math.h"
+#include "Game/Lara/lara_fire.h"
 
 using namespace TEN::Effects::Items;
 using namespace TEN::Effects::Lightning;
@@ -214,43 +215,382 @@ namespace TEN::Entities::Creatures::TR5
 		auto* item = &g_Level.Items[itemNumber];
 		auto* creature = (LaserHeadInfo*)item->Data;
 
-		GameVector origin, target;
+		auto origin = GameVector::Zero;
+		auto target = GameVector::Zero;
 
 		// NOTICE: itemFlags[0] seems to be a state machine, if it's equal to 3 then death animations is triggered
 		// Other values still unknown
 
-		if (item->ItemFlags[0])
+		if (!item->ItemFlags[0])
 		{
-			// Maybe number of eye hits?
-			if (item->ItemFlags[0] > 2)
+			if (item->ItemFlags[2] < 8)
 			{
 				if (!(GlobalCounter & 7))
 				{
-					if (item->Animation.ActiveState < 8)
+					short tentacleItemNumber = creature->Tentacles[item->ItemFlags[2]];
+					auto* tentacleItem = &g_Level.Items[tentacleItemNumber];
+					AddActiveItem(tentacleItemNumber);
+					tentacleItem->Status = ITEM_ACTIVE;
+					tentacleItem->Flags |= 0x3E00;
+					item->ItemFlags[2]++;
+				}
+			}
+			else
+			{
+				if (item->Pose.Position.y > item->ItemFlags[1])
+				{
+					item->Animation.Velocity.y += 3.0f;
+
+					if (item->Animation.Velocity.y > 32.0f)
+						item->Animation.Velocity.y = 32.0f;
+
+					item->Pose.Position.y -= item->Animation.Velocity.y;
+				}
+				else
+				{
+					auto origin = GameVector(GetJointPosition(item, 0, Vector3i(0, 168, 248)), item->RoomNumber);
+					auto target = GameVector(GetJointPosition(LaraItem, LM_HEAD, Vector3i(0, 0, 0)), LaraItem->RoomNumber);
+
+					if (LOS(&origin, &target))
 					{
-						short tentacleNumber = creature->Tentacles[item->Animation.ActiveState];
-						g_Level.Items[tentacleNumber].Animation.TargetState = 2;
-						item->Animation.ActiveState++;
+						item->ItemFlags[0]++;
+						item->ItemFlags[1] = item->Pose.Position.y;
+						item->ItemFlags[2] = 2640;
 					}
 				}
+			}
+		}
+		else if (item->ItemFlags[0] <= 2)
+		{
+			item->TriggerFlags++;
+			item->Pose.Position.y = item->ItemFlags[1] - 128 * phd_sin(item->ItemFlags[2] >> 14);//ohne<<14
+			item->ItemFlags[2] += ANGLE(3.0f);
 
-				// Destroy tentacle items
-				if (item->Animation.ActiveState > 0)
+			// Get guardian head's position.
+			auto origin = GameVector(GetJointPosition(item, 0, Vector3i(0, 168, 248)), item->RoomNumber);
+
+			if (item->ItemFlags[0] == 1)
+			{
+				// Get Lara's left hand position
+				// TODO: check if left hand or head
+				auto target = GameVector(GetJointPosition(LaraItem, LM_HEAD, Vector3i::Zero), LaraItem->RoomNumber);
+
+				// Calculate distance between guardian and Lara
+				int distance = sqrt(pow(origin.x - target.x, 2) + pow(origin.y - target.y, 2) + pow(origin.z - target.z, 2));
+
+				// Check if there's a valid LOS between guardian and Lara 
+				// and if distance is less than 8 sectors  and if Lara is alive and not burning
+				if (LOS(&origin, &target) &&
+					distance <= MAX_VISIBILITY_DISTANCE &&
+					LaraItem->HitPoints > 0 &&
+					LaraItem->Effect.Type == EffectType::None &&
+					(LaserHeadData.target.x || LaserHeadData.target.y || LaserHeadData.target.z))
 				{
-					for (int i = 0; i < 8; i++)
-					{
-						auto* tentacleItem = &g_Level.Items[creature->Tentacles[i]];
+					// Lock target for attacking.
+					 target = GameVector(GetJointPosition(LaraItem, LM_HIPS), target.RoomNumber);
+					LaserHeadData.target.x = target.x;
+					LaserHeadData.target.y = target.y;
+					LaserHeadData.target.z = target.z;
+					LaserHeadData.byte1 = 3;
+					LaserHeadData.byte2 = 1;
+				}
+				else
+				{
+					// Randomly turn head try to finding Lara
+					bool condition = !(GetRandomControl() & 0x7F) && item->TriggerFlags > 150;
 
-						if (tentacleItem->Animation.AnimNumber == Objects[tentacleItem->ObjectNumber].animIndex + 1 &&
-							tentacleItem->Animation.FrameNumber == g_Level.Anims[tentacleItem->Animation.AnimNumber].frameEnd &&
-							tentacleItem->MeshBits & 1)
+					if (item->ItemFlags[3]-- <= 0 || condition)
+					{
+						short xRot = (GetRandomControl() / 4) - 4096;
+						short yRot;
+						if (condition)
+							yRot = item->Pose.Orientation.y + (GetRandomControl() & 0x3FFF) + ANGLE(135.0f);
+						else
+							yRot = 2 * GetRandomControl();
+						int v = ((GetRandomControl() & 0x1FFF) + 8192);
+						int c = v * phd_cos(-xRot);
+						target.x = origin.x + c * phd_sin(yRot);
+						target.y = origin.y + v * phd_sin(-xRot);
+						target.z = origin.z + c * phd_cos(yRot);
+
+						if (condition)
 						{
-							SoundEffect(SFX_TR5_SMASH_ROCK2, &item->Pose);
-							ExplodeItemNode(tentacleItem, 0, 0, 128);
-							KillItem(creature->Tentacles[i]);
+							LaserHeadData.byte1 = 2;
+							item->TriggerFlags = 0;
+						}
+						else
+							LaserHeadData.byte1 = (GetRandomControl() & 2) + 3;
+
+						item->ItemFlags[3] = LaserHeadData.byte1 * ((GetRandomControl() & 3) + 8);
+
+						LaserHeadData.target.x = target.x;
+						LaserHeadData.target.y = target.y;
+						LaserHeadData.target.z = target.z;
+					}
+					else
+					{
+						target.x = LaserHeadData.target.x;
+						target.y = LaserHeadData.target.y;
+						target.z = LaserHeadData.target.z;
+					}
+
+					LaserHeadData.byte2 = 0;
+				}
+			}
+			else
+			{
+				LaserHeadData.byte1 = 3;
+
+				if (JustLoaded)
+				{
+					int c = 8192 * phd_cos(item->Pose.Orientation.x + 3328);
+
+					target.x = LaserHeadData.target.x = origin.x + c * phd_sin(item->Pose.Orientation.y);
+					target.y = LaserHeadData.target.y = origin.y + SECTOR(8) * phd_sin(3328 - item->Pose.Orientation.x);
+					target.z = LaserHeadData.target.z = origin.z + c * phd_cos(item->Pose.Orientation.y);
+				}
+				else
+				{
+					target.x = LaserHeadData.target.x;
+					target.y = LaserHeadData.target.y;
+					target.z = LaserHeadData.target.z;
+				}
+			}
+
+			auto angles = Geometry::GetOrientToPoint(origin.ToVector3(), LaserHeadData.target.ToVector3());
+			InterpolateAngle(angles.x + 3328, item->Pose.Orientation.x, LaserHeadData.xRot, LaserHeadData.byte1);
+			InterpolateAngle(angles.y, item->Pose.Orientation.y, LaserHeadData.yRot, LaserHeadData.byte1);
+
+			if (item->ItemFlags[0] == 1)
+			{
+				if (LaserHeadData.byte2)
+				{
+					if (!(GetRandomControl() & 0x1F) &&
+						abs(LaserHeadData.xRot) < ANGLE(5.6f) &&
+						abs(LaserHeadData.yRot) < ANGLE(5.6f) &&
+						!LaraItem->Animation.Velocity.y ||
+						!(GetRandomControl() & 0x1FF))
+					{
+						item->ItemFlags[0]++;
+						item->ItemFlags[3] = 0;
+					}
+				}
+				else if (!(GetRandomControl() & 0x3F) && item->TriggerFlags > 300)
+				{
+					item->ItemFlags[0]++;
+					item->TriggerFlags = 0;
+					item->ItemFlags[3] = 0;
+				}
+			}
+			else
+			{
+				if (item->ItemFlags[3] <= 90)
+				{
+					SoundEffect(SFX_TR5_GOD_HEAD_CHARGE, &item->Pose);
+					LaserHeadCharge(item);
+					item->ItemFlags[3]++;
+				}
+
+				if (item->ItemFlags[3] >= 90)
+				{
+					byte r = 0;
+					byte g = (GetRandomControl() & 0x1F) + 128;
+					byte b = (GetRandomControl() & 0x1F) + 64;
+
+					auto* arc = LaserHeadData.fireArcs[0];
+					if (!LaserHeadData.fireArcs[0])
+						arc = LaserHeadData.fireArcs[1];
+
+					if ((item->ItemFlags[3] <= 90 ||
+						!arc ||
+						arc->life) &&
+						LaraItem->HitPoints > 0 &&
+						LaraItem->Effect.Type == EffectType::None)
+					{
+						if (item->ItemFlags[3] > 90 &&
+							arc &&
+							arc->life < 16)
+						{
+							g = (arc->life * g) / 16;
+							b = (arc->life * b) / 16;
+						}
+
+						for (int i = 0; i < 2; i++)
+						{
+							// If eye was not destroyed then fire from it
+							if (!(1 << GuardianMeshes[i] & item->MeshBits.ToPackedBits()))
+							{
+								if (item->ItemFlags[3] > 90 && LaserHeadData.fireArcs[i])
+								{
+									LaserHeadData.fireArcs[i]->life = 0;
+									LaserHeadData.fireArcs[i] = nullptr;
+								}
+							}
+							else
+							{
+								GameVector origin = GameVector(GetJointPosition(item, GuardianMeshes[i], Vector3i::Zero));
+
+								int c = ANGLE(45.0f) * phd_cos(angles.x);
+								target.x = origin.x + c * phd_sin(item->Pose.Orientation.y);
+								target.y = origin.y + 8192 * phd_sin(-angles.x);
+								target.z = origin.z + c * phd_cos(item->Pose.Orientation.y);
+
+								if (item->ItemFlags[3] != 90 &&
+									LaserHeadData.fireArcs[i] == nullptr)
+								{
+									// Eye is aready firing.
+									SoundEffect(SFX_TR5_GOD_HEAD_LASER_LOOPS, &item->Pose);
+
+									LaserHeadData.fireArcs[i]->pos1.x = origin.x;
+									LaserHeadData.fireArcs[i]->pos1.y = origin.y;
+									LaserHeadData.fireArcs[i]->pos1.z = origin.z;
+								}
+								else
+								{
+									// Start firing from eye
+									origin.RoomNumber = item->RoomNumber;
+									LaserHeadData.LOS[i] = LOS(&origin, &target);
+									TriggerLightning((Vector3i*)&origin, (Vector3i*)&target, 2, r, g, b, 32, LI_SPLINE, 64, 5);
+									//LaserHeadData.fireArcs[i] = test; // (GetRandomControl() & 7) + 4, b | ((&unk_640000 | g) << 8), 12, 64, 5);
+									StopSoundEffect(SFX_TR5_GOD_HEAD_CHARGE);
+									SoundEffect(SFX_TR5_GOD_HEAD_BLAST, &item->Pose);
+								}
+
+								
+
+								if (GlobalCounter & 1)
+								{
+									TriggerLaserHeadSparks((Vector3i*)&origin, 3, r, g, b, 0);
+									TriggerLightningGlow(origin.x, origin.y, origin.z, (GetRandomControl() & 3) + 32, r, g, b);
+									TriggerDynamicLight(origin.x, origin.y, origin.z, (GetRandomControl() & 3) + 16, r, g, b);
+
+									if (!LaserHeadData.LOS[i])
+									{
+										//TriggerLightningGlow(currentArc->pos4.x, currentArc->pos4.y, currentArc->pos4.z, (GetRandomControl() & 3) + 16, r, g, b);
+										//TriggerDynamicLight(currentArc->pos4.x, currentArc->pos4.y, currentArc->pos4.z, (GetRandomControl() & 3) + 6, r, g, b);
+										//TriggerLaserHeadSparks((Vector3i*)&currentArc->pos4, 3, r, g, b, 0);
+									}
+								}
+
+								// Check if Lara was hit by energy arcs
+								if (LaraItem->Effect.Type == EffectType::None)
+								{
+									int someIndex = 0;
+									auto* currentArc = LaserHeadData.fireArcs[i];
+
+									auto bounds = GameBoundingBox(LaraItem);
+									auto tBounds = GameBoundingBox::Zero;
+									tBounds.RotateNoPersp(LaraItem->Pose.Orientation, bounds);
+
+									int x1 = LaraItem->Pose.Position.x + tBounds.X1;
+									int x2 = LaraItem->Pose.Position.x + tBounds.X2;
+									int y1 = LaraItem->Pose.Position.y + tBounds.Y1;
+									int y2 = LaraItem->Pose.Position.y + tBounds.Y1;
+									int z1 = LaraItem->Pose.Position.z + tBounds.Z1;
+									int z2 = LaraItem->Pose.Position.z + tBounds.Z2;
+
+									int xc = LaraItem->Pose.Position.x + ((bounds.X1 + bounds.X2) / 2);
+									int yc = LaraItem->Pose.Position.y + ((bounds.Y1 + bounds.Y2) / 2);
+									int zc = LaraItem->Pose.Position.z + ((bounds.Z1 + bounds.Z2) / 2);
+
+									int distance = sqrt(pow(xc - origin.x, 2) + pow(yc - origin.y, 2) + pow(zc - origin.z, 2));
+
+									if (distance < MAX_VISIBILITY_DISTANCE)
+									{
+										int dl = distance + CLICK(2);
+
+										if (dl < MAX_VISIBILITY_DISTANCE)
+										{
+											target.x = origin.x + dl * (target.x - origin.x) / MAX_VISIBILITY_DISTANCE;
+											target.y = origin.y + dl * (target.y - origin.y) / MAX_VISIBILITY_DISTANCE;
+											target.z = origin.z + dl * (target.z - origin.z) / MAX_VISIBILITY_DISTANCE;
+										}
+
+										int dx = (target.x - origin.x) / 32;
+										int dy = (target.y - origin.y) / 32;
+										int dz = (target.z - origin.z) / 32;
+
+										int adx = LaserHeadData.fireArcs[i]->pos4.x - origin.x;
+										int ady = LaserHeadData.fireArcs[i]->pos4.y - origin.y;
+										int adz = LaserHeadData.fireArcs[i]->pos4.z - origin.z;
+
+										int x = origin.x;
+										int y = origin.y;
+										int z = origin.z;
+
+										for (int j = 0; j < 32; j++)
+										{
+											if (someIndex)
+											{
+												someIndex--;
+												if (!someIndex)
+													break;
+											}
+
+											if (abs(adx) < 280 && abs(ady) < 280 && abs(adz) < 280)
+												someIndex = 2;
+
+											if (x > x1 && x < x2 && y > y1 && y < y2 && z > z1 && z < z2)
+											{
+												ItemElectricBurn(LaraItem);
+												DoDamage(LaraItem, INT_MAX);
+												break;
+											}
+
+											x += dx;
+											y += dy;
+											z += dz;
+
+											adx -= dx;
+											ady -= dy;
+											adz -= dz;
+										}
+									}
+								}
+							}
+							
 						}
 					}
+					else
+					{
+						if (arc)
+						{
+							LaserHeadData.fireArcs[0] = nullptr;
+							LaserHeadData.fireArcs[1] = nullptr;
+						}
+
+						item->ItemFlags[0] = 1;
+						item->TriggerFlags = 0;
+					}
 				}
+			}
+		}
+	else
+	{
+			// Maybe number of eye hits?
+		if (!(GlobalCounter & 7) && item->Animation.ActiveState < 8)
+		{
+			short tentacleNumber = creature->Tentacles[item->Animation.ActiveState];
+			g_Level.Items[tentacleNumber].Animation.TargetState = 2;
+			item->Animation.ActiveState++;					
+		}
+			// Destroy tentacle items
+		if (item->Animation.ActiveState > 0)
+		{
+			for (int i = 0; i < 8; i++)
+			{
+				auto* tentacleItem = &g_Level.Items[creature->Tentacles[i]];
+
+				if (tentacleItem->Animation.AnimNumber == Objects[tentacleItem->ObjectNumber].animIndex + 1 &&
+					tentacleItem->Animation.FrameNumber == g_Level.Anims[tentacleItem->Animation.AnimNumber].frameEnd &&
+					tentacleItem->MeshBits & 1)
+				{
+					SoundEffect(SFX_TR5_SMASH_ROCK2, &item->Pose);
+					ExplodeItemNode(tentacleItem, 0, 0, 128);
+					KillItem(creature->Tentacles[i]);
+				}
+			}
+		}
 
 				item->Pose.Position.y = item->ItemFlags[1] - (192 - item->Animation.Velocity.z) * phd_sin(item->ItemFlags[2]);
 				item->ItemFlags[2] += ANGLE(item->Animation.Velocity.z);
@@ -294,345 +634,6 @@ namespace TEN::Entities::Creatures::TR5
 					KillItem(itemNumber);
 				}
 			}
-			else
-			{
-				item->TriggerFlags++;
-				item->Pose.Position.y = item->ItemFlags[1] - 128 * phd_sin(item->ItemFlags[2]);
-				item->ItemFlags[2] += ANGLE(3.0f);
-
-				// Get guardian head's position.
-				origin = GameVector(GetJointPosition(item, 0, Vector3i(0, 168, 248)), item->RoomNumber);
-
-				if (item->ItemFlags[0] == 1)
-				{
-					// Get Lara's left hand position
-					// TODO: check if left hand or head
-					target = GameVector(GetJointPosition(LaraItem, LM_HEAD), target.RoomNumber);
-
-					// Calculate distance between guardian and Lara
-					int distance = sqrt(pow(origin.x - target.x, 2) + pow(origin.y - target.y, 2) + pow(origin.z - target.z, 2));
-
-					// Check if there's a valid LOS between guardian and Lara 
-					// and if distance is less than 8 sectors  and if Lara is alive and not burning
-					if (LOS(&origin, &target) &&
-						distance <= MAX_VISIBILITY_DISTANCE &&
-						LaraItem->HitPoints > 0 &&
-						LaraItem->Effect.Type == EffectType::None &&
-						(LaserHeadData.target.x || LaserHeadData.target.y || LaserHeadData.target.z))
-					{
-						// Lock target for attacking.
-						target = GameVector(GetJointPosition(LaraItem, LM_HIPS), target.RoomNumber);
-						LaserHeadData.target.x = target.x;
-						LaserHeadData.target.y = target.y;
-						LaserHeadData.target.z = target.z;
-						LaserHeadData.byte1 = 3;
-						LaserHeadData.byte2 = 1;
-					}
-					else
-					{
-						// Randomly turn head try to finding Lara
-						bool condition = !(GetRandomControl() & 0x7F) && item->TriggerFlags > 150;
-
-						if (item->ItemFlags[3]-- <= 0 || condition)
-						{
-							short xRot = (GetRandomControl() / 4) - 4096;
-							short yRot;
-							if (condition)
-								yRot = item->Pose.Orientation.y + (GetRandomControl() & 0x3FFF) + ANGLE(135.0f);
-							else
-								yRot = 2 * GetRandomControl();
-							int v = ((GetRandomControl() & 0x1FFF) + 8192);
-							int c = v * phd_cos(-xRot);
-							target.x = origin.x + c * phd_sin(yRot);
-							target.y = origin.y + v * phd_sin(-xRot);
-							target.z = origin.z + c * phd_cos(yRot);
-
-							if (condition)
-							{
-								LaserHeadData.byte1 = 2;
-								item->TriggerFlags = 0;
-							}
-							else
-								LaserHeadData.byte1 = (GetRandomControl() & 2) + 3;
-
-							item->ItemFlags[3] = LaserHeadData.byte1 * ((GetRandomControl() & 3) + 8);
-
-							LaserHeadData.target.x = target.x;
-							LaserHeadData.target.y = target.y;
-							LaserHeadData.target.z = target.z;
-						}
-						else
-						{
-							target.x = LaserHeadData.target.x;
-							target.y = LaserHeadData.target.y;
-							target.z = LaserHeadData.target.z;
-						}
-
-						LaserHeadData.byte2 = 0;
-					}
-				}
-				else
-				{
-					LaserHeadData.byte1 = 3;
-
-					if (JustLoaded)
-					{
-						int c = 8192 * phd_cos(item->Pose.Orientation.x + 3328);
-
-						target.x = LaserHeadData.target.x = origin.x + c * phd_sin(item->Pose.Orientation.y);
-						target.y = LaserHeadData.target.y = origin.y + SECTOR(8) * phd_sin(3328 - item->Pose.Orientation.x);
-						target.z = LaserHeadData.target.z = origin.z + c * phd_cos(item->Pose.Orientation.y);
-					}
-					else
-					{
-						target.x = LaserHeadData.target.x;
-						target.y = LaserHeadData.target.y;
-						target.z = LaserHeadData.target.z;
-					}
-				}
-
-			auto angles = Geometry::GetOrientToPoint(origin.ToVector3(), LaserHeadData.target.ToVector3());
-			InterpolateAngle(angles.x + 3328, item->Pose.Orientation.x, LaserHeadData.xRot, LaserHeadData.byte1);
-			InterpolateAngle(angles.y, item->Pose.Orientation.y, LaserHeadData.yRot, LaserHeadData.byte1);
-
-				if (item->ItemFlags[0] == 1)
-				{
-					if (LaserHeadData.byte2)
-					{
-						if (!(GetRandomControl() & 0x1F) &&
-							abs(LaserHeadData.xRot) < ANGLE(5.6f) &&
-							abs(LaserHeadData.yRot) < ANGLE(5.6f) &&
-							!LaraItem->Animation.Velocity.y ||
-							!(GetRandomControl() & 0x1FF))
-						{
-							item->ItemFlags[0]++;
-							item->ItemFlags[3] = 0;
-						}
-					}
-					else if (!(GetRandomControl() & 0x3F) && item->TriggerFlags > 300)
-					{
-						item->ItemFlags[0]++;
-						item->TriggerFlags = 0;
-						item->ItemFlags[3] = 0;
-					}
-				}
-				else
-				{
-					if (item->ItemFlags[3] <= 90)
-					{
-						SoundEffect(SFX_TR5_GOD_HEAD_CHARGE, &item->Pose);
-						LaserHeadCharge(item);
-						item->ItemFlags[3]++;
-					}
-
-					if (item->ItemFlags[3] >= 90)
-					{
-						byte r = 0;
-						byte g = (GetRandomControl() & 0x1F) + 128;
-						byte b = (GetRandomControl() & 0x1F) + 64;
-
-						auto* arc = LaserHeadData.fireArcs[0];
-						if (!LaserHeadData.fireArcs[0])
-							arc = LaserHeadData.fireArcs[1];
-
-						if (item->ItemFlags[3] > 90 &&
-							arc &&
-							!arc->life ||
-							LaraItem->HitPoints <= 0 ||
-							LaraItem->Effect.Type != EffectType::None)
-						{
-							if (arc)
-							{
-								LaserHeadData.fireArcs[0] = nullptr;
-								LaserHeadData.fireArcs[1] = nullptr;
-							}
-
-							item->ItemFlags[0] = 1;
-							item->TriggerFlags = 0;
-						}
-						else
-						{
-							if (item->ItemFlags[3] > 90 &&
-								arc &&
-								arc->life < 16)
-							{
-								g = (arc->life * g) / 16;
-								b = (arc->life * b) / 16;
-							}
-
-							for (int i = 0; i < 2; i++)
-							{
-								// If eye was not destroyed then fire from it
-								if ((1 << GuardianMeshes[i]) & item->MeshBits.ToPackedBits())
-								{
-									origin = GameVector(GetJointPosition(item, GuardianMeshes[i]), origin.RoomNumber);
-
-									int c = ANGLE(45.0f) * phd_cos(angles.x);
-									target.x = origin.x + c * phd_sin(item->Pose.Orientation.y);
-									target.y = origin.y + 8192 * phd_sin(-angles.x);
-									target.z = origin.z + c * phd_cos(item->Pose.Orientation.y);
-
-									if (item->ItemFlags[3] != 90 &&
-										LaserHeadData.fireArcs[i] != nullptr)
-									{
-										// Eye is aready firing.
-										SoundEffect(SFX_TR5_GOD_HEAD_LASER_LOOPS, &item->Pose);
-
-										LaserHeadData.fireArcs[i]->pos1.x = origin.x;
-										LaserHeadData.fireArcs[i]->pos1.y = origin.y;
-										LaserHeadData.fireArcs[i]->pos1.z = origin.z;
-									}
-									else
-									{
-										// Start firing from eye
-										origin.RoomNumber = item->RoomNumber;
-										LaserHeadData.LOS[i] = LOS(&origin, &target);
-										//LaserHeadData.fireArcs[i] = TriggerEnergyArc((Vector3i*)& src, (Vector3i*)& dest, r, g, b, 32, 64, 64, ENERGY_ARC_NO_RANDOMIZE, ENERGY_ARC_STRAIGHT_LINE); // (GetRandomControl() & 7) + 4, b | ((&unk_640000 | g) << 8), 12, 64, 5);
-										StopSoundEffect(SFX_TR5_GOD_HEAD_CHARGE);
-										SoundEffect(SFX_TR5_GOD_HEAD_BLAST, &item->Pose);
-									}
-
-									auto* currentArc = LaserHeadData.fireArcs[i];
-
-									if (GlobalCounter & 1)
-									{
-										TriggerLaserHeadSparks((Vector3i*)&origin, 3, r, g, b, 0);
-										TriggerLightningGlow(origin.x, origin.y, origin.z, (GetRandomControl() & 3) + 32, r, g, b);
-										TriggerDynamicLight(origin.x, origin.y, origin.z, (GetRandomControl() & 3) + 16, r, g, b);
-
-										if (!LaserHeadData.LOS[i])
-										{
-											TriggerLightningGlow(currentArc->pos4.x, currentArc->pos4.y, currentArc->pos4.z, (GetRandomControl() & 3) + 16, r, g, b);
-											TriggerDynamicLight(currentArc->pos4.x, currentArc->pos4.y, currentArc->pos4.z, (GetRandomControl() & 3) + 6, r, g, b);
-											TriggerLaserHeadSparks((Vector3i*)&currentArc->pos4, 3, r, g, b, 0);
-										}
-									}
-
-									// Check if Lara was hit by energy arcs
-									if (LaraItem->Effect.Type == EffectType::None)
-									{
-										int someIndex = 0;
-
-										auto bounds = GameBoundingBox(LaraItem);
-										auto tBounds = GameBoundingBox::Zero;
-										tBounds.RotateNoPersp(LaraItem->Pose.Orientation, bounds);
-
-										int x1 = LaraItem->Pose.Position.x + tBounds.X1;
-										int x2 = LaraItem->Pose.Position.x + tBounds.X2;
-										int y1 = LaraItem->Pose.Position.y + tBounds.Y1;
-										int y2 = LaraItem->Pose.Position.y + tBounds.Y1;
-										int z1 = LaraItem->Pose.Position.z + tBounds.Z1;
-										int z2 = LaraItem->Pose.Position.z + tBounds.Z2;
-
-										int xc = LaraItem->Pose.Position.x + ((bounds.X1 + bounds.X2) / 2);
-										int yc = LaraItem->Pose.Position.y + ((bounds.Y1 + bounds.Y2) / 2);
-										int zc = LaraItem->Pose.Position.z + ((bounds.Z1 + bounds.Z2) / 2);
-
-										int distance = sqrt(pow(xc - origin.x, 2) + pow(yc - origin.y, 2) + pow(zc - origin.z, 2));
-
-										if (distance < MAX_VISIBILITY_DISTANCE)
-										{
-											int dl = distance + CLICK(2);
-
-											if (dl < MAX_VISIBILITY_DISTANCE)
-											{
-												target.x = origin.x + dl * (target.x - origin.x) / MAX_VISIBILITY_DISTANCE;
-												target.y = origin.y + dl * (target.y - origin.y) / MAX_VISIBILITY_DISTANCE;
-												target.z = origin.z + dl * (target.z - origin.z) / MAX_VISIBILITY_DISTANCE;
-											}
-
-											int dx = (target.x - origin.x) / 32;
-											int dy = (target.y - origin.y) / 32;
-											int dz = (target.z - origin.z) / 32;
-
-											int adx = currentArc->pos4.x - origin.z;
-											int ady = currentArc->pos4.y - origin.y;
-											int adz = currentArc->pos4.z - origin.z;
-
-											int x = origin.x;
-											int y = origin.y;
-											int z = origin.z;
-
-											for (int j = 0; j < 32; j++)
-											{
-												if (someIndex)
-												{
-													someIndex--;
-													if (!someIndex)
-														break;
-												}
-
-												if (abs(adx) < 280 && abs(ady) < 280 && abs(adz) < 280)
-													someIndex = 2;
-
-												if (x > x1 && x < x2 && y > y1 && y < y2 && z > z1 && z < z2)
-												{
-													ItemElectricBurn(LaraItem);
-													DoDamage(LaraItem, INT_MAX);
-													break;
-												}
-
-												x += dx;
-												y += dy;
-												z += dz;
-
-												adx -= dx;
-												ady -= dy;
-												adz -= dz;
-											}
-										}
-									}
-								}
-								else if (item->ItemFlags[3] > 90)
-								{
-									if (LaserHeadData.fireArcs[i])
-									{
-										LaserHeadData.fireArcs[i]->life = 0;
-										LaserHeadData.fireArcs[i] = nullptr;
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-		else
-		{
-			if (item->ItemFlags[2] >= 8)
-			{
-				if (item->Pose.Position.y <= item->ItemFlags[1])
-				{
-					origin = GameVector(GetJointPosition(item, 0, Vector3i(0, 168, 248)), item->RoomNumber);
-					target = GameVector(GetJointPosition(LaraItem, LM_HEAD), target.RoomNumber);
-					
-					if (LOS(&origin, &origin))
-					{
-						item->ItemFlags[0]++;
-						item->ItemFlags[1] = item->Pose.Position.y;
-						item->ItemFlags[2] = 2640;
-					}
-				}
-				else
-				{
-					item->Animation.Velocity.y += 3.0f;
-
-					if (item->Animation.Velocity.y > 32.0f)
-						item->Animation.Velocity.y = 32.0f;
-
-					item->Pose.Position.y -= item->Animation.Velocity.y;
-				}
-			}
-			else if (!(GlobalCounter & 7))
-			{
-				short tentacleItemNumber = creature->Tentacles[item->ItemFlags[2]];
-				auto* tentacleItem = &g_Level.Items[tentacleItemNumber];
-				AddActiveItem(tentacleItemNumber);
-				tentacleItem->Status = ITEM_ACTIVE;
-				tentacleItem->Flags |= 0x3E00;
-				item->ItemFlags[2]++;
-			}
-		}
 
 		if (item->ItemFlags[0] < 3)
 		{
@@ -643,7 +644,7 @@ namespace TEN::Entities::Creatures::TR5
 				auto* tentacleItem = &g_Level.Items[tentacleItemNumber];
 
 				if (tentacleItem->Animation.AnimNumber == Objects[tentacleItem->ObjectNumber].animIndex &&
-					tentacleItem->Animation.FrameNumber != g_Level.Anims[tentacleItem->Animation.AnimNumber].frameEnd)
+					tentacleItem->Animation.FrameNumber != g_Level.Anims[tentacleItem->Animation.AnimNumber].frameEnd )
 				{
 					break;
 				}

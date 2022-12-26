@@ -80,7 +80,9 @@ namespace TEN::Effects::Lightning
 		arc.pos3.x = (src->x + 3 * dest->x) >> 2;
 		arc.pos3.y = (src->y + 3 * dest->y) >> 2;
 		arc.pos3.z = (src->z + 3 * dest->z) >> 2;
-		arc.pos4 = *dest;
+		arc.pos4.x = dest->x;
+		arc.pos4.y = dest->y;
+		arc.pos4.z = dest->z;
 		arc.flags = flags;
 
 		for (int i = 0; i < 9; i++)
@@ -100,6 +102,7 @@ namespace TEN::Effects::Lightning
 		arc.width = width;
 
 		Lightning.push_back(arc);
+		
 	}
 
 	// New function used in TR5, we'll decompile it in the future
