@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Objects/NamedBase.h"
+#include "Objects/Room/RoomObject.h"
 #include "Specific/level.h"
 
 namespace sol {
@@ -24,8 +25,9 @@ public:
 	Vec3 GetPos() const;
 	void SetPos(Vec3 const& pos);
 
-	short GetRoom() const;
-	void SetRoom(short Room);
+	std::unique_ptr<Room> GetRoom() const;
+	int GetRoomNumber() const;
+	void SetRoomNumber(short Room);
 
 	std::string GetName() const;
 	void SetName(std::string const &);

@@ -1,5 +1,6 @@
 #pragma once
 #include "Math/Math.h"
+#include "Objects/game_object_ids.h"
 
 using namespace TEN::Math;
 
@@ -95,7 +96,11 @@ int GetFrameCount(int animNumber);
 int GetNextAnimState(ItemInfo* item);
 int GetNextAnimState(int objectID, int animNumber);
 bool GetStateDispatch(ItemInfo* item, const AnimData& anim);
+
 int GetFrame(ItemInfo* item, AnimFrame* outFramePtr[], int& outRate);
+AnimFrame* GetFrame(GAME_OBJECT_ID slot, int animNumber, int frameNumber);
+AnimFrame* GetFirstFrame(GAME_OBJECT_ID slot, int animNumber);
+AnimFrame* GetLastFrame(GAME_OBJECT_ID slot, int animNumber);
 AnimFrame* GetBestFrame(ItemInfo* item);
 
 void ClampRotation(Pose& outPose, short angle, short rotation); 

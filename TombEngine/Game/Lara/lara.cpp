@@ -669,6 +669,11 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 		}
 	}
 
+	if (TestEnvironment(ENV_FLAG_DAMAGE, item) && item->HitPoints > 0)
+	{
+		item->HitPoints--;
+	}
+
 	if (item->HitPoints <= 0)
 	{
 		item->HitPoints = -1;
@@ -677,7 +682,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 			StopSoundTracks();
 
 		lara->Control.Count.Death++;
-		if ((item->Flags & 0x100))
+		if ((item->Flags & IFLAG_INVISIBLE))
 		{
 			lara->Control.Count.Death++;
 			return;

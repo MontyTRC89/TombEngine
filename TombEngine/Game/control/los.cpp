@@ -530,7 +530,7 @@ bool DoRayBox(GameVector* origin, GameVector* target, GameBoundingBox* box, Pose
 
 		ShatterItem.yRot = item->Pose.Orientation.y;
 		ShatterItem.meshIndex = meshIndex;
-		ShatterItem.color = item->Color;
+		ShatterItem.color = item->Model.Color;
 		ShatterItem.sphere.x = CreatureSpheres[sp].x;
 		ShatterItem.sphere.y = CreatureSpheres[sp].y;
 		ShatterItem.sphere.z = CreatureSpheres[sp].z;

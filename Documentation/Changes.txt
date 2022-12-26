@@ -4,16 +4,21 @@ Version 1.0.5
 * Fix combined items not existing in inventory upon game reload.
 * Fix classic rollingball not behaving properly in rooms beyond the distance of 32 blocks.
 * Fix rollingball not killing Lara under certain movement angles.
+* Fix savegame crashes when rooms with static meshes are flipped.
 * Fix discrepancies between statistics and save / load game time units.
 * Fix draw key incorrectly working in binoculars / lasersight mode.
-* Fix FLAME_EMITTER_3 not burning player.
-* Fix Tribeman with axe not attacking Lara.
-* Fix Tribeman with dart not shooting at Lara's direction.
+* Fix pathfinding problems for first initialized enemy of every slot.
+* Fix Flame Emitter 3 not burning player.
+* Fix TR3 Tribeman with axe not attacking Lara.
+* Fix TR3 Tribeman with dart not shooting at Lara's direction.
+* Fix crash, water death and meshswap issues for TR5 cyborg.
+* Fix Lara's animation for cog switch release
+* Added new OCB to cog switch object: 
+	- Use OCB 0 to have the traditional behaviour.
+	- Use any other OCB to can use the Cog Switch without need of any door linked.
 * Allow to freely rotate dart emitter in all directions.
 * Customize dart emitter damage with OCB. Negative number will additionally poison Lara.
 * Draw real mesh for darts.
-* Fix pathfinding problems for first initialized enemies of every slot.
-* Fix crash, water death and meshswap issues for TR5 cyborg.
 * Fix inverted water and fly zones.
 * Fix CROCODILE attack range and joint rotation speed.
 * Fix CIVVY, MP_WITH_STICK, and YETI vault bugs.
@@ -25,6 +30,9 @@ Version 1.0.5
 * Fix bone rotations of some entities
 * Fix VON_CROY not using animation for 2 and 3 step vault down.
 * Fix BADDY1 and BADDY2 not using animation for 3 step vault down.
+
+Lua API changes:
+* Add new Room class and several methods for it.
 
 Version 1.0.4
 =============

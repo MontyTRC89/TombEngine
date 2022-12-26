@@ -142,23 +142,24 @@ namespace TEN::Entities::Creatures::TR5
 		SoundEffect(SFX_TR5_UNDERWATER_TORPEDO, &torpedoItem->Pose, SoundEnvironment::Always);
 
 		torpedoItem->ObjectNumber = ID_TORPEDO;
-		torpedoItem->Color = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
+		torpedoItem->Model.Color = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
 
-			auto pos1 = Vector3i::Zero;
-			auto pos2 = Vector3i::Zero;
-			for (int i = 0; i < 8; i++)
-			{
-				pos1 = GetJointPosition(item, 4, Vector3i(
+		auto pos1 = Vector3i::Zero;
+		auto pos2 = Vector3i::Zero;
+		for (int i = 0; i < 8; i++)
+		{
+			pos1 = GetJointPosition(
+				item, 4,
+				Vector3i(
 					(GetRandomControl() & 0x7F) - 414,
 					-320,
-					352
-				));
+					352));
 
-				pos2 = GetJointPosition(item, 4, Vector3i(
+			pos2 = GetJointPosition(
+				item, 4, Vector3i(
 					(GetRandomControl() & 0x3FF) - 862,
 					-320 - (GetRandomControl() & 0x3FF),
-					(GetRandomControl() & 0x3FF) - 160
-				));
+					(GetRandomControl() & 0x3FF) - 160));
 
 			TriggerTorpedoSparks2(&pos1, &pos2, 0);
 		}

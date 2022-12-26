@@ -653,7 +653,7 @@ namespace TEN::Entities::TR4
 
 		auto grenadeItem = &g_Level.Items[itemNumber];
 
-		grenadeItem->Color = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
+		grenadeItem->Model.Color = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
 		grenadeItem->ObjectNumber = ID_GRENADE;
 		grenadeItem->RoomNumber = item.RoomNumber;
 
