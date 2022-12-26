@@ -249,7 +249,7 @@ namespace TEN::Entities::Creatures::TR5
 					break;
 				}
 
-				TriggerLightning(
+				(LIGHTNING_INFO*)&TriggerLightning(
 					&pos, &pos2, Random::GenerateInt(8, 16), 
 					32, 64, 128, 24, (LI_SPLINE | LI_THINOUT | LI_THININ), 6, 3);
 			}
