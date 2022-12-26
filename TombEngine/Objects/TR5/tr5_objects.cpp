@@ -104,11 +104,11 @@ static void StartEntity(ObjectInfo *obj)
 	obj = &Objects[ID_SWAT];
 	if (obj->loaded)
 	{
-		obj->biteOffset = 0;
 		obj->initialise = InitialiseGuard;
 		obj->collision = CreatureCollision;
 		obj->control = GuardControl;
 		obj->shadowType = ShadowMode::All;
+		obj->biteOffset = 0;
 		obj->HitPoints = 24;
 		obj->pivotLength = 50;
 		obj->radius = 102;
@@ -381,11 +381,11 @@ static void StartEntity(ObjectInfo *obj)
 	obj = &Objects[ID_PIERRE];
 	if (obj->loaded)
 	{
-		obj->biteOffset = 1;
 		obj->initialise = InitialiseLarson;
 		obj->collision = CreatureCollision;
 		obj->control = LarsonControl;
 		obj->shadowType = ShadowMode::All;
+		obj->biteOffset = 1;
 		obj->HitPoints = 60;
 		obj->pivotLength = 50;
 		obj->radius = 102;
@@ -492,11 +492,11 @@ static void StartEntity(ObjectInfo *obj)
 	obj = &Objects[ID_IMP];
 	if (obj->loaded)
 	{
-		obj->biteOffset = 256;
 		obj->initialise = InitialiseImp;
 		obj->collision = CreatureCollision;
 		obj->control = ImpControl;
 		obj->shadowType = ShadowMode::All;
+		obj->biteOffset = 256;
 		obj->HitPoints = 12;
 		obj->pivotLength = 20;
 		obj->radius = 102;

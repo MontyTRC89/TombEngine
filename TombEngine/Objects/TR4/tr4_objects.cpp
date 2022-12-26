@@ -397,11 +397,11 @@ namespace TEN::Entities
 		obj = &Objects[ID_TROOPS];
 		if (obj->loaded)
 		{
-			obj->biteOffset = 11;
 			obj->initialise = InitialiseTroops;
 			obj->control = TroopsControl;
 			obj->collision = CreatureCollision;
 			obj->shadowType = ShadowMode::All;
+			obj->biteOffset = 11;
 			obj->HitPoints = 40;
 			obj->pivotLength = 50;
 			obj->radius = 102;
@@ -639,8 +639,9 @@ namespace TEN::Entities
 			obj->HitPoints = 40;
 			obj->pivotLength = 500;
 			obj->radius = 512;
-			obj->ZoneType = ZoneType::HumanJumpAndMonkey;
 			obj->intelligent = true;
+			obj->undead = true; // NOTE: avoid the enemy jeep from being killed with snowmobile gun or something like that...
+			obj->ZoneType = ZoneType::HumanJumpAndMonkey;
 			obj->SetBoneRotationFlags(8, ROT_X);
 			obj->SetBoneRotationFlags(9, ROT_X);
 			obj->SetBoneRotationFlags(11, ROT_X);

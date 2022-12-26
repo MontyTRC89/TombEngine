@@ -44,6 +44,7 @@ static void StartEntity(ObjectInfo* obj)
 	obj = &Objects[ID_SHARK];
 	if (obj->loaded)
 	{
+		obj->initialise = InitialiseCreature;
 		obj->control = SharkControl;
 		obj->collision = CreatureCollision;
 		obj->shadowType = ShadowMode::All;
@@ -60,6 +61,7 @@ static void StartEntity(ObjectInfo* obj)
 	obj = &Objects[ID_BARRACUDA];
 	if (obj->loaded)
 	{
+		obj->initialise = InitialiseCreature;
 		obj->control = BarracudaControl;
 		obj->collision = CreatureCollision;
 		obj->shadowType = ShadowMode::All;
@@ -208,11 +210,11 @@ static void StartEntity(ObjectInfo* obj)
 	obj = &Objects[ID_WORKER_SHOTGUN];
 	if (obj->loaded)
 	{
-		obj->biteOffset = 0;
 		obj->initialise = InitialiseWorkerShotgun;
 		obj->collision = CreatureCollision;
 		obj->control = WorkerShotgunControl;
 		obj->shadowType = ShadowMode::All;
+		obj->biteOffset = 0;
 		obj->HitPoints = 25;
 		obj->pivotLength = 50;
 		obj->radius = 102;
@@ -459,6 +461,7 @@ static void StartEntity(ObjectInfo* obj)
 		if (!Objects[ID_DRAGON_BACK].loaded)
 			TENLog("ID_DRAGON_FRONT needs ID_DRAGON_BACK.", LogLevel::Warning);
 
+		obj->initialise = InitialiseCreature;
 		obj->collision = DragonCollision;
 		obj->control = DragonControl;
 		obj->HitPoints = 300;
@@ -475,6 +478,7 @@ static void StartEntity(ObjectInfo* obj)
 		if (!Objects[ID_MARCO_BARTOLI].loaded)
 			TENLog("ID_DRAGON_BACK needs ID_MARCO_BARTOLI.", LogLevel::Warning);
 
+		obj->initialise = InitialiseCreature;
 		obj->collision = DragonCollision;
 		obj->control = DragonControl;
 		obj->radius = 256;

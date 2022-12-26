@@ -45,7 +45,6 @@ static void StartEntity(ObjectInfo* obj)
 		obj->initialise = InitialiseTony;
 		obj->collision = CreatureCollision;
 		obj->control = TonyControl;
-		obj->drawRoutine = S_DrawTonyBoss;
 		obj->shadowType = ShadowMode::All;
 		obj->HitPoints = 100;
 		obj->pivotLength = 50;
@@ -59,6 +58,7 @@ static void StartEntity(ObjectInfo* obj)
 	obj = &Objects[ID_TIGER];
 	if (obj->loaded)
 	{
+		obj->initialise = InitialiseCreature;
 		obj->control = TigerControl;
 		obj->collision = CreatureCollision;
 		obj->shadowType = ShadowMode::All;
@@ -89,6 +89,7 @@ static void StartEntity(ObjectInfo* obj)
 	obj = &Objects[ID_RAPTOR];
 	if (obj->loaded)
 	{
+		obj->initialise = InitialiseCreature;
 		obj->control = RaptorControl;
 		obj->collision = CreatureCollision;
 		obj->shadowType = ShadowMode::All;
@@ -106,6 +107,7 @@ static void StartEntity(ObjectInfo* obj)
 	obj = &Objects[ID_TRIBESMAN_WITH_AX];
 	if (obj->loaded)
 	{
+		obj->initialise = InitialiseCreature;
 		obj->control = TribemanAxeControl;
 		obj->collision = CreatureCollision;
 		obj->shadowType = ShadowMode::All;
@@ -121,6 +123,7 @@ static void StartEntity(ObjectInfo* obj)
 	obj = &Objects[ID_TRIBESMAN_WITH_DARTS];
 	if (obj->loaded)
 	{
+		obj->initialise = InitialiseCreature;
 		obj->control = TribemanDartsControl;
 		obj->collision = CreatureCollision;
 		obj->shadowType = ShadowMode::All;
@@ -136,6 +139,7 @@ static void StartEntity(ObjectInfo* obj)
 	obj = &Objects[ID_TYRANNOSAUR];
 	if (obj->loaded)
 	{
+		obj->initialise = InitialiseCreature;
 		obj->control = TRexControl;
 		obj->collision = CreatureCollision;
 		obj->shadowType = ShadowMode::All;
@@ -152,6 +156,7 @@ static void StartEntity(ObjectInfo* obj)
 	obj = &Objects[ID_SCUBA_DIVER];
 	if (obj->loaded)
 	{
+		obj->initialise = InitialiseCreature;
 		obj->control = ScubaControl;
 		obj->collision = CreatureCollision;
 		obj->shadowType = ShadowMode::All;
@@ -176,6 +181,7 @@ static void StartEntity(ObjectInfo* obj)
 	obj = &Objects[ID_FLAMETHROWER_BADDY];
 	if (obj->loaded)
 	{
+		obj->initialise = InitialiseCreature;
 		obj->control = FlameThrowerControl;
 		obj->collision = CreatureCollision;
 		obj->shadowType = ShadowMode::All;
@@ -207,6 +213,7 @@ static void StartEntity(ObjectInfo* obj)
 	obj = &Objects[ID_MP_WITH_GUN];
 	if (obj->loaded)
 	{
+		obj->initialise = InitialiseCreature;
 		obj->control = MPGunControl;
 		obj->collision = CreatureCollision;
 		obj->shadowType = ShadowMode::All;
