@@ -13,7 +13,7 @@ struct BOX_NODE
 
 enum class ZoneType
 {
-	// BASIC ZONES (used by LOT.zone and loaded from g_Level.Zones[zoneType])
+	// BASIC ZONES (used by LOT.zone and loaded from g_Level.Zones[ZoneType])
 	
 	// Can jump
 	Skeleton,

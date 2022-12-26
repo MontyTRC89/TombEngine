@@ -45,6 +45,7 @@ namespace TEN::Entities::Creatures::TR2
 			CreatureAIInfo(item, &AI);
 			GetCreatureMood(item, &AI, true);
 			CreatureMood(item, &AI, true);
+
 			angle = CreatureTurn(item, creature->MaxTurn);
 
 			switch (item->Animation.ActiveState)

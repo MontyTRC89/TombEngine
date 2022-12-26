@@ -52,7 +52,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->radius = 340;
 		obj->intelligent = true;
 		obj->waterCreature = true;
-		obj->zoneType = ZoneType::Water;
+		obj->ZoneType = ZoneType::Water;
 		obj->SetBoneRotationFlags(9, ROT_Y);
 		obj->SetupHitEffect();
 	}
@@ -68,7 +68,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->radius = 204;
 		obj->intelligent = true;
 		obj->waterCreature = true;
-		obj->zoneType = ZoneType::Water;
+		obj->ZoneType = ZoneType::Water;
 		obj->SetBoneRotationFlags(6, ROT_Y);
 		obj->SetupHitEffect();
 	}
@@ -84,7 +84,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->radius = 204;
 		obj->intelligent = true;
 		obj->pivotLength = 0;
-		obj->zoneType = ZoneType::Flyer;
+		obj->ZoneType = ZoneType::Flyer;
 		obj->SetupHitEffect();
 	}
 
@@ -99,7 +99,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->radius = 204;
 		obj->intelligent = true;
 		obj->pivotLength = 0;
-		obj->zoneType = ZoneType::Flyer;
+		obj->ZoneType = ZoneType::Flyer;
 		obj->SetupHitEffect();
 	}
 
@@ -128,7 +128,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->radius = 128;
 		obj->pivotLength = 100;
 		obj->intelligent = true;
-		obj->zoneType = ZoneType::Human;
+		obj->ZoneType = ZoneType::Human;
 		obj->SetBoneRotationFlags(6, ROT_Y);
 		obj->SetBoneRotationFlags(14, ROT_Y);
 		obj->SetupHitEffect();
@@ -375,7 +375,7 @@ static void StartEntity(ObjectInfo* obj)
 		}
 		else
 		{
-			TENLog("ID_MERCENARY_AUTOPISTOLS1 not found!", LogLevel::Warning);
+			TENLog("ID_MERCENARY_AUTOPISTOLS1 not found.", LogLevel::Warning);
 		}
 
 		obj->initialise = InitialiseCreature;
@@ -457,7 +457,7 @@ static void StartEntity(ObjectInfo* obj)
 	if (obj->loaded)
 	{
 		if (!Objects[ID_DRAGON_BACK].loaded)
-			TENLog("ID_DRAGON_FRONT needs ID_DRAGON_BACK!", LogLevel::Warning);
+			TENLog("ID_DRAGON_FRONT needs ID_DRAGON_BACK.", LogLevel::Warning);
 
 		obj->collision = DragonCollision;
 		obj->control = DragonControl;
@@ -473,7 +473,7 @@ static void StartEntity(ObjectInfo* obj)
 	if (obj->loaded)
 	{
 		if (!Objects[ID_MARCO_BARTOLI].loaded)
-			TENLog("ID_DRAGON_BACK needs ID_MARCO_BARTOLI!", LogLevel::Warning);
+			TENLog("ID_DRAGON_BACK needs ID_MARCO_BARTOLI.", LogLevel::Warning);
 
 		obj->collision = DragonCollision;
 		obj->control = DragonControl;
@@ -488,7 +488,8 @@ static void StartEntity(ObjectInfo* obj)
 		obj->control = BartoliControl;
 	}
 
-	obj = &Objects[ID_SNOWMOBILE_GUN]; // TODO: recreate renderer for skidoo
+	// TODO: Recreate renderer for skidoo.
+	obj = &Objects[ID_SNOWMOBILE_GUN];
 	if (obj->loaded)
 	{
 		obj->collision = SkidooManCollision;
@@ -544,7 +545,7 @@ static void StartTrap(ObjectInfo* obj)
 // boat, snowmobile, snowmobile gun
 static void StartVehicles(ObjectInfo* obj)
 {
-	// TODO: fix BoatControl() not using int BoatControl(void)
+	// TODO: Fix BoatControl() not using BoatControl().
 	obj = &Objects[ID_SPEEDBOAT];
 	if (obj->loaded)
 	{
@@ -555,7 +556,8 @@ static void StartVehicles(ObjectInfo* obj)
 		obj->SetupHitEffect(true);
 	}
 
-	obj = &Objects[ID_SNOWMOBILE]; // TODO: create a new render for the skidoo. (with track animated)
+	// TODO: Create a new renderer for the skidoo with animated track.
+	obj = &Objects[ID_SNOWMOBILE];
 	if (obj->loaded)
 	{
 		obj->initialise = InitialiseSkidoo;
@@ -567,9 +569,9 @@ static void StartVehicles(ObjectInfo* obj)
 
 void InitialiseTR2Objects()
 {
-	ObjectInfo* objToInit = nullptr;
-	StartEntity(objToInit);
-	StartObject(objToInit);
-	StartTrap(objToInit);
-	StartVehicles(objToInit);
+	ObjectInfo* objectPtr = nullptr;
+	StartEntity(objectPtr);
+	StartObject(objectPtr);
+	StartTrap(objectPtr);
+	StartVehicles(objectPtr);
 }

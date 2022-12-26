@@ -127,7 +127,7 @@ namespace TEN::Entities
 			obj->radius = 128;
 			obj->intelligent = true;
 			obj->waterCreature = true;
-			obj->zoneType = ZoneType::Water;
+			obj->ZoneType = ZoneType::Water;
 			obj->SetupHitEffect();
 		}
 
@@ -174,7 +174,7 @@ namespace TEN::Entities
 			obj->pivotLength = 10;
 			obj->radius = 102;
 			obj->intelligent = true;
-			obj->zoneType = ZoneType::Flyer;
+			obj->ZoneType = ZoneType::Flyer;
 			obj->SetupHitEffect();
 		}
 
@@ -209,7 +209,7 @@ namespace TEN::Entities
 			obj->radius = 102;
 			obj->intelligent = true;
 			obj->meshSwapSlot = ID_MESHSWAP_BADDY1;
-			obj->zoneType = ZoneType::HumanJumpAndMonkey;
+			obj->ZoneType = ZoneType::HumanJumpAndMonkey;
 			obj->SetBoneRotationFlags(7, ROT_X | ROT_Y);
 			obj->SetBoneRotationFlags(22, ROT_X | ROT_Y);
 			obj->SetupHitEffect();
@@ -231,7 +231,7 @@ namespace TEN::Entities
 			obj->radius = 102;
 			obj->intelligent = true;
 			obj->meshSwapSlot = ID_MESHSWAP_BADDY2;
-			obj->zoneType = ZoneType::HumanJumpAndMonkey;
+			obj->ZoneType = ZoneType::HumanJumpAndMonkey;
 			obj->SetBoneRotationFlags(7, ROT_X | ROT_Y);
 			obj->SetBoneRotationFlags(22, ROT_X | ROT_Y);
 			obj->SetupHitEffect();
@@ -249,7 +249,7 @@ namespace TEN::Entities
 			obj->pivotLength = 50;
 			obj->radius = 102;
 			obj->intelligent = true;
-			obj->zoneType = ZoneType::Human;
+			obj->ZoneType = ZoneType::Human;
 			obj->SetBoneRotationFlags(0, ROT_X | ROT_Y);
 			obj->SetBoneRotationFlags(7, ROT_X | ROT_Y);
 			obj->SetupHitEffect();
@@ -283,7 +283,7 @@ namespace TEN::Entities
 			obj->explodableMeshbits = 0xA00;
 			obj->intelligent = true;
 			obj->undead = true;
-			obj->zoneType = ZoneType::Skeleton;
+			obj->ZoneType = ZoneType::Skeleton;
 			obj->SetupHitEffect();
 		}
 
@@ -316,7 +316,7 @@ namespace TEN::Entities
 			obj->radius = 204;
 			obj->intelligent = true;
 			obj->undead = false;
-			obj->zoneType = ZoneType::Flyer;
+			obj->ZoneType = ZoneType::Flyer;
 			obj->SetupHitEffect();
 		}
 
@@ -442,7 +442,7 @@ namespace TEN::Entities
 			obj->pivotLength = 50;
 			obj->radius = 409;
 			obj->intelligent = true;
-			obj->zoneType = ZoneType::Flyer;
+			obj->ZoneType = ZoneType::Flyer;
 			obj->SetupHitEffect();
 		}
 
@@ -475,7 +475,7 @@ namespace TEN::Entities
 			obj->radius = 409;
 			obj->intelligent = true;
 			obj->waterCreature = true;
-			obj->zoneType = ZoneType::Water;
+			obj->ZoneType = ZoneType::Water;
 			obj->SetBoneRotationFlags(0, ROT_Y);
 			obj->SetBoneRotationFlags(7, ROT_Y);
 			obj->SetBoneRotationFlags(9, ROT_Y);
@@ -639,7 +639,7 @@ namespace TEN::Entities
 			obj->HitPoints = 40;
 			obj->pivotLength = 500;
 			obj->radius = 512;
-			obj->zoneType = ZoneType::HumanJumpAndMonkey;
+			obj->ZoneType = ZoneType::HumanJumpAndMonkey;
 			obj->intelligent = true;
 			obj->SetBoneRotationFlags(8, ROT_X);
 			obj->SetBoneRotationFlags(9, ROT_X);
@@ -659,7 +659,7 @@ namespace TEN::Entities
 			obj->HitPoints = 15;
 			obj->explodableMeshbits = 0x200000;
 			obj->intelligent = true;
-			obj->zoneType = ZoneType::HumanLongJumpAndMonkey;
+			obj->ZoneType = ZoneType::HumanLongJumpAndMonkey;
 			obj->SetBoneRotationFlags(6, ROT_X|ROT_Y);
 			obj->SetBoneRotationFlags(20, ROT_X|ROT_Y);
 		}
@@ -967,12 +967,12 @@ namespace TEN::Entities
 
 	void InitialiseTR4Objects()
 	{
-		ObjectInfo* objToInit = nullptr;
-		StartEntity(objToInit);
-		StartObject(objToInit);
-		StartSwitch(objToInit);
-		StartTrap(objToInit);
-		StartVehicles(objToInit);
+		ObjectInfo* objectPtr = nullptr;
+		StartEntity(objectPtr);
+		StartObject(objectPtr);
+		StartSwitch(objectPtr);
+		StartTrap(objectPtr);
+		StartVehicles(objectPtr);
 	}
 
 	void AllocTR4Objects()

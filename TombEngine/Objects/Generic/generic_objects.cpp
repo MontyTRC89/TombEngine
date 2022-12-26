@@ -41,305 +41,305 @@ using namespace TEN::Entities::Doors;
 using namespace TEN::Entities::Traps;
 using namespace TEN::Entities::Generic;
 
-static void StartObject(ObjectInfo* obj)
+static void StartObject(ObjectInfo* object)
 {
-	for (int objectNum = ID_TRAPDOOR1; objectNum <= ID_CEILING_TRAPDOOR2; objectNum++)
+	for (int objectNumber = ID_TRAPDOOR1; objectNumber <= ID_CEILING_TRAPDOOR2; objectNumber++)
 	{
-		obj = &Objects[objectNum];
-		if (obj->loaded)
+		object = &Objects[objectNumber];
+		if (object->loaded)
 		{
-			obj->initialise = InitialiseTrapDoor;
-			obj->collision = TrapDoorCollision;
-			obj->control = TrapDoorControl;
-			obj->floorBorder = TrapDoorFloorBorder;
-			obj->ceilingBorder = TrapDoorCeilingBorder;
-			obj->floor = TrapDoorFloor;
-			obj->ceiling = TrapDoorCeiling;
-			obj->SetupHitEffect(true);
+			object->initialise = InitialiseTrapDoor;
+			object->collision = TrapDoorCollision;
+			object->control = TrapDoorControl;
+			object->floorBorder = TrapDoorFloorBorder;
+			object->ceilingBorder = TrapDoorCeilingBorder;
+			object->floor = TrapDoorFloor;
+			object->ceiling = TrapDoorCeiling;
+			object->SetupHitEffect(true);
 		}
 	}
 
-	obj = &Objects[ID_BRIDGE_FLAT];
-	if (obj->loaded)
+	object = &Objects[ID_BRIDGE_FLAT];
+	if (object->loaded)
 	{
-		obj->initialise = InitialiseBridge;
-		obj->floor = BridgeFloor<0>;
-		obj->ceiling = BridgeCeiling<0>;
-		obj->floorBorder = BridgeFloorBorder<0>;
-		obj->ceilingBorder = BridgeCeilingBorder<0>;
+		object->initialise = InitialiseBridge;
+		object->floor = BridgeFloor<0>;
+		object->ceiling = BridgeCeiling<0>;
+		object->floorBorder = BridgeFloorBorder<0>;
+		object->ceilingBorder = BridgeCeilingBorder<0>;
 	}
 
-	obj = &Objects[ID_BRIDGE_TILT1];
-	if (obj->loaded)
+	object = &Objects[ID_BRIDGE_TILT1];
+	if (object->loaded)
 	{
-		obj->initialise = InitialiseBridge;
-		obj->floor = BridgeFloor<1>;
-		obj->ceiling = BridgeCeiling<1>;
-		obj->floorBorder = BridgeFloorBorder<1>;
-		obj->ceilingBorder = BridgeCeilingBorder<1>;
+		object->initialise = InitialiseBridge;
+		object->floor = BridgeFloor<1>;
+		object->ceiling = BridgeCeiling<1>;
+		object->floorBorder = BridgeFloorBorder<1>;
+		object->ceilingBorder = BridgeCeilingBorder<1>;
 	}
 
-	obj = &Objects[ID_BRIDGE_TILT2];
-	if (obj->loaded)
+	object = &Objects[ID_BRIDGE_TILT2];
+	if (object->loaded)
 	{
-		obj->initialise = InitialiseBridge;
-		obj->floor = BridgeFloor<2>;
-		obj->ceiling = BridgeCeiling<2>;
-		obj->floorBorder = BridgeFloorBorder<2>;
-		obj->ceilingBorder = BridgeCeilingBorder<2>;
+		object->initialise = InitialiseBridge;
+		object->floor = BridgeFloor<2>;
+		object->ceiling = BridgeCeiling<2>;
+		object->floorBorder = BridgeFloorBorder<2>;
+		object->ceilingBorder = BridgeCeilingBorder<2>;
 	}
 
-	obj = &Objects[ID_BRIDGE_TILT3];
-	if (obj->loaded)
+	object = &Objects[ID_BRIDGE_TILT3];
+	if (object->loaded)
 	{
-		obj->initialise = InitialiseBridge;
-		obj->floor = BridgeFloor<3>;
-		obj->ceiling = BridgeCeiling<3>;
-		obj->floorBorder = BridgeFloorBorder<3>;
-		obj->ceilingBorder = BridgeCeilingBorder<3>;
+		object->initialise = InitialiseBridge;
+		object->floor = BridgeFloor<3>;
+		object->ceiling = BridgeCeiling<3>;
+		object->floorBorder = BridgeFloorBorder<3>;
+		object->ceilingBorder = BridgeCeilingBorder<3>;
 	}
 
-	obj = &Objects[ID_BRIDGE_TILT4];
-	if (obj->loaded)
+	object = &Objects[ID_BRIDGE_TILT4];
+	if (object->loaded)
 	{
-		obj->initialise = InitialiseBridge;
-		obj->floor = BridgeFloor<4>;
-		obj->ceiling = BridgeCeiling<4>;
-		obj->floorBorder = BridgeFloorBorder<4>;
-		obj->ceilingBorder = BridgeCeilingBorder<4>;
+		object->initialise = InitialiseBridge;
+		object->floor = BridgeFloor<4>;
+		object->ceiling = BridgeCeiling<4>;
+		object->floorBorder = BridgeFloorBorder<4>;
+		object->ceilingBorder = BridgeCeilingBorder<4>;
 	}
 }
 
-void StartSwitches(ObjectInfo* obj)
+void StartSwitches(ObjectInfo* object)
 {
-	obj = &Objects[ID_COG_SWITCH];
-	if (obj->loaded)
+	object = &Objects[ID_COG_SWITCH];
+	if (object->loaded)
 	{
-		obj->collision = CogSwitchCollision;
-		obj->control = CogSwitchControl;
-		obj->SetupHitEffect(true);
+		object->collision = CogSwitchCollision;
+		object->control = CogSwitchControl;
+		object->SetupHitEffect(true);
 	}
 
-	obj = &Objects[ID_LEVER_SWITCH];
-	if (obj->loaded)
+	object = &Objects[ID_LEVER_SWITCH];
+	if (object->loaded)
 	{
-		obj->collision = RailSwitchCollision;
-		obj->control = SwitchControl;
-		obj->SetupHitEffect(true);
+		object->collision = RailSwitchCollision;
+		object->control = SwitchControl;
+		object->SetupHitEffect(true);
 	}
 
-	obj = &Objects[ID_JUMP_SWITCH];
-	if (obj->loaded)
+	object = &Objects[ID_JUMP_SWITCH];
+	if (object->loaded)
 	{
-		obj->collision = JumpSwitchCollision;
-		obj->control = SwitchControl;
-		obj->SetupHitEffect(true);
+		object->collision = JumpSwitchCollision;
+		object->control = SwitchControl;
+		object->SetupHitEffect(true);
 	}
 
-	for (int objectNum = ID_SWITCH_TYPE1; objectNum <= ID_SWITCH_TYPE16; objectNum++)
+	for (int objectNumber = ID_SWITCH_TYPE1; objectNumber <= ID_SWITCH_TYPE16; objectNumber++)
 	{
-		obj = &Objects[objectNum];
-		if (obj->loaded)
+		object = &Objects[objectNumber];
+		if (object->loaded)
 		{
-			obj->collision = SwitchCollision;
-			obj->control = SwitchControl;
-			obj->SetupHitEffect(true);
+			object->collision = SwitchCollision;
+			object->control = SwitchControl;
+			object->SetupHitEffect(true);
 		}
 	}
 
-	obj = &Objects[ID_CROWBAR_SWITCH];
-	if (obj->loaded)
+	object = &Objects[ID_CROWBAR_SWITCH];
+	if (object->loaded)
 	{
-		obj->collision = CrowbarSwitchCollision;
-		obj->control = SwitchControl;
-		obj->SetupHitEffect(true);
+		object->collision = CrowbarSwitchCollision;
+		object->control = SwitchControl;
+		object->SetupHitEffect(true);
 	}
 
-	for (int objectNum = ID_UNDERWATER_SWITCH1; objectNum <= ID_UNDERWATER_SWITCH4; objectNum++)
+	for (int objectNumber = ID_UNDERWATER_SWITCH1; objectNumber <= ID_UNDERWATER_SWITCH4; objectNumber++)
 	{
-		obj = &Objects[objectNum];
-		if (obj->loaded)
+		object = &Objects[objectNumber];
+		if (object->loaded)
 		{
-			obj->control = SwitchControl;
-			obj->collision = UnderwaterSwitchCollision;
+			object->control = SwitchControl;
+			object->collision = UnderwaterSwitchCollision;
 		}
 	}
 
-	obj = &Objects[ID_PULLEY];
-	if (obj->loaded)
+	object = &Objects[ID_PULLEY];
+	if (object->loaded)
 	{
-		obj->initialise = InitialisePulleySwitch;
-		obj->control = SwitchControl;
-		obj->collision = PulleySwitchCollision;
+		object->initialise = InitialisePulleySwitch;
+		object->control = SwitchControl;
+		object->collision = PulleySwitchCollision;
 	}
 
-	obj = &Objects[ID_TURN_SWITCH];
-	if (obj->loaded)
+	object = &Objects[ID_TURN_SWITCH];
+	if (object->loaded)
 	{
-		obj->control = TurnSwitchControl;
-		obj->collision = TurnSwitchCollision;
-		obj->SetupHitEffect(true);
+		object->control = TurnSwitchControl;
+		object->collision = TurnSwitchCollision;
+		object->SetupHitEffect(true);
 	}
 
-	obj = &Objects[ID_SEQUENCE_SWITCH1];
-	if (obj->loaded)
+	object = &Objects[ID_SEQUENCE_SWITCH1];
+	if (object->loaded)
 	{
-		obj->collision = FullBlockSwitchCollision;
-		obj->control = FullBlockSwitchControl;
-		obj->SetupHitEffect(true);
+		object->collision = FullBlockSwitchCollision;
+		object->control = FullBlockSwitchControl;
+		object->SetupHitEffect(true);
 	}
 
-	obj = &Objects[ID_SEQUENCE_SWITCH2];
-	if (obj->loaded)
+	object = &Objects[ID_SEQUENCE_SWITCH2];
+	if (object->loaded)
 	{
-		obj->collision = FullBlockSwitchCollision;
-		obj->control = FullBlockSwitchControl;
-		obj->SetupHitEffect(true);
+		object->collision = FullBlockSwitchCollision;
+		object->control = FullBlockSwitchControl;
+		object->SetupHitEffect(true);
 	}
 
-	obj = &Objects[ID_SEQUENCE_SWITCH3];
-	if (obj->loaded)
+	object = &Objects[ID_SEQUENCE_SWITCH3];
+	if (object->loaded)
 	{
-		obj->collision = FullBlockSwitchCollision;
-		obj->control = FullBlockSwitchControl;
-		obj->SetupHitEffect(true);
+		object->collision = FullBlockSwitchCollision;
+		object->control = FullBlockSwitchControl;
+		object->SetupHitEffect(true);
 	}
 }
 
-void StartDoors(ObjectInfo* obj)
+void StartDoors(ObjectInfo* object)
 {
 	for (int objectNumber = ID_DOOR_TYPE1; objectNumber <= ID_DOOR_TYPE30; objectNumber++)
 	{
-		obj = &Objects[objectNumber];
-		if (obj->loaded)
+		object = &Objects[objectNumber];
+		if (object->loaded)
 		{
-			obj->initialise = InitialiseDoor;
-			obj->control = DoorControl;
-			obj->collision = DoorCollision;
-			obj->SetupHitEffect(true);
+			object->initialise = InitialiseDoor;
+			object->control = DoorControl;
+			object->collision = DoorCollision;
+			object->SetupHitEffect(true);
 		}
 	}
 
-	obj = &Objects[ID_LIFT_DOORS1];
-	if (obj->loaded)
+	object = &Objects[ID_LIFT_DOORS1];
+	if (object->loaded)
 	{
-		obj->initialise = InitialiseDoor;
-		obj->control = DoorControl;
-		obj->SetupHitEffect(true);
+		object->initialise = InitialiseDoor;
+		object->control = DoorControl;
+		object->SetupHitEffect(true);
 	}
 
-	obj = &Objects[ID_LIFT_DOORS2];
-	if (obj->loaded)
+	object = &Objects[ID_LIFT_DOORS2];
+	if (object->loaded)
 	{
-		obj->initialise = InitialiseDoor;
-		obj->control = DoorControl;
-		obj->SetupHitEffect(true);
+		object->initialise = InitialiseDoor;
+		object->control = DoorControl;
+		object->SetupHitEffect(true);
 	}
 
-	obj = &Objects[ID_SEQUENCE_DOOR1];
-	if (obj->loaded)
+	object = &Objects[ID_SEQUENCE_DOOR1];
+	if (object->loaded)
 	{
-		obj->initialise = InitialiseDoor;
-		obj->collision = DoorCollision;
-		obj->control = SequenceDoorControl;
-		obj->SetupHitEffect(true);
+		object->initialise = InitialiseDoor;
+		object->collision = DoorCollision;
+		object->control = SequenceDoorControl;
+		object->SetupHitEffect(true);
 	}
 
 	for (int i = ID_DOUBLE_DOORS1; i <= ID_DOUBLE_DOORS4; i++)
 	{
-		obj = &Objects[i];
-		if (obj->loaded)
+		object = &Objects[i];
+		if (object->loaded)
 		{
-			obj->initialise = InitialiseDoor;
-			obj->collision = DoubleDoorCollision;
-			obj->control = PushPullKickDoorControl;
-			obj->SetupHitEffect(true);
+			object->initialise = InitialiseDoor;
+			object->collision = DoubleDoorCollision;
+			object->control = PushPullKickDoorControl;
+			object->SetupHitEffect(true);
 		}
 	}
 
 	for (int i = ID_UNDERWATER_DOOR1; i <= ID_UNDERWATER_DOOR4; i++)
 	{
-		obj = &Objects[i];
-		if (obj->loaded)
+		object = &Objects[i];
+		if (object->loaded)
 		{
-			obj->initialise = InitialiseDoor;
-			obj->collision = UnderwaterDoorCollision;
-			obj->control = PushPullKickDoorControl;
-			obj->SetupHitEffect(true);
+			object->initialise = InitialiseDoor;
+			object->collision = UnderwaterDoorCollision;
+			object->control = PushPullKickDoorControl;
+			object->SetupHitEffect(true);
 		}
 	}
 
 	for (int objectNum = ID_PUSHPULL_DOOR1; objectNum <= ID_KICK_DOOR4; objectNum++)
 	{
-		obj = &Objects[objectNum];
-		if (obj->loaded)
+		object = &Objects[objectNum];
+		if (object->loaded)
 		{
-			obj->initialise = InitialiseDoor;
-			obj->collision = PushPullKickDoorCollision;
-			obj->control = PushPullKickDoorControl;
-			obj->SetupHitEffect(true);
+			object->initialise = InitialiseDoor;
+			object->collision = PushPullKickDoorCollision;
+			object->control = PushPullKickDoorControl;
+			object->SetupHitEffect(true);
 		}
 	}
 
-	obj = &Objects[ID_STEEL_DOOR];
-	if (obj->loaded)
+	object = &Objects[ID_STEEL_DOOR];
+	if (object->loaded)
 	{
-		obj->initialise = InitialiseSteelDoor;
-		obj->collision = SteelDoorCollision;
-		obj->SetupHitEffect(true);
+		object->initialise = InitialiseSteelDoor;
+		object->collision = SteelDoorCollision;
+		object->SetupHitEffect(true);
 	}
 }
 
-void StartTraps(ObjectInfo* obj)
+void StartTraps(ObjectInfo* object)
 {
-	obj = &Objects[ID_DARTS];
-	if (obj->loaded)
+	object = &Objects[ID_DARTS];
+	if (object->loaded)
 	{
-		obj->collision = ObjectCollision;
-		obj->control = DartControl;
-		obj->shadowType = ShadowMode::All;
+		object->collision = ObjectCollision;
+		object->control = DartControl;
+		object->shadowType = ShadowMode::All;
 	}
 
-	obj = &Objects[ID_DART_EMITTER];
-	if (obj->loaded)
+	object = &Objects[ID_DART_EMITTER];
+	if (object->loaded)
 	{
-		obj->control = DartEmitterControl;
-		obj->drawRoutine = nullptr;
-		obj->usingDrawAnimatingItem = false;
+		object->control = DartEmitterControl;
+		object->drawRoutine = nullptr;
+		object->usingDrawAnimatingItem = false;
 	}
 
-	obj = &Objects[ID_HOMING_DART_EMITTER];
-	if (obj->loaded)
+	object = &Objects[ID_HOMING_DART_EMITTER];
+	if (object->loaded)
 	{
-		obj->control = DartEmitterControl;
-		obj->drawRoutine = nullptr;
-		obj->usingDrawAnimatingItem = false;
+		object->control = DartEmitterControl;
+		object->drawRoutine = nullptr;
+		object->usingDrawAnimatingItem = false;
 	}
 
-	obj = &Objects[ID_ROPE];
-	if (obj->loaded)
+	object = &Objects[ID_ROPE];
+	if (object->loaded)
 	{
-		obj->initialise = InitialiseRope;
-		obj->control = RopeControl;
-		obj->collision = RopeCollision;
-		obj->drawRoutine = nullptr;
-		obj->usingDrawAnimatingItem = false;
+		object->initialise = InitialiseRope;
+		object->control = RopeControl;
+		object->collision = RopeCollision;
+		object->drawRoutine = nullptr;
+		object->usingDrawAnimatingItem = false;
 	}
 
-	obj = &Objects[ID_POLEROPE];
-	if (obj->loaded)
+	object = &Objects[ID_POLEROPE];
+	if (object->loaded)
 	{
-		obj->collision = PoleCollision;
-		obj->SetupHitEffect(true);
+		object->collision = PoleCollision;
+		object->SetupHitEffect(true);
 	}
 
-	obj = &Objects[ID_BURNING_TORCH_ITEM];
-	if (obj->loaded)
+	object = &Objects[ID_BURNING_TORCH_ITEM];
+	if (object->loaded)
 	{
-		obj->control = TorchControl;
-		obj->collision = PickupCollision;
-		obj->usingDrawAnimatingItem = true;
-		obj->isPickup = true;
+		object->control = TorchControl;
+		object->collision = PickupCollision;
+		object->usingDrawAnimatingItem = true;
+		object->isPickup = true;
 	}
 }
 

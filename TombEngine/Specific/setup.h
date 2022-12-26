@@ -10,7 +10,7 @@ struct ItemInfo;
 
 constexpr auto DEFAULT_RADIUS = 10;
 
-enum JointRotationFlags : int
+enum JointRotationFlags
 {
 	ROT_X = (1 << 2),
 	ROT_Y = (1 << 3),
@@ -48,7 +48,7 @@ struct ObjectInfo
 	std::function<int(short itemNumber)> ceilingBorder;
 	std::function<void(ItemInfo* item)> drawRoutine;
 	std::function<void(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)> collision;
-	ZoneType zoneType;
+	ZoneType ZoneType;
 	int animIndex;
 	short HitPoints;
 	short pivotLength;
@@ -68,7 +68,7 @@ struct ObjectInfo
 	DWORD explodableMeshbits;
 
 	/// <summary>
-	/// Use ROT_X/Y/Z to allow bone to be rotated with CreatureJoint().
+	/// Use ROT_X/Y/Z to allow bones to be rotated with CreatureJoint().
 	/// </summary>
 	/// <param name="boneID">the mesh id - 1</param>
 	/// <param name="flags">can be ROT_X, ROT_Y, ROT_Z or all.</param>
@@ -78,13 +78,13 @@ struct ObjectInfo
 	}
 
 	/// <summary>
-	/// Use this to setup a hiteffect for slot based on what value it has,
-	/// example: if it's intelligent and have hp without undead then it's alive = blood.
+	/// Use this to set up a hit rffect for the slot based on its value.
 	/// </summary>
-	/// <param name="isAlive">use this if the object is alive but not intelligent, it will setup it to blood.</param>
+	/// <param name="isAlive">Use this if the object is alive but not intelligent to set up blood effects.</param>
 	void SetupHitEffect(bool isSolid = false, bool isAlive = false)
 	{
-		if (isAlive) // avoid some object like: ID_SAS_DYING to have None !
+		// Avoid some objects such as ID_SAS_DYING having None.
+		if (isAlive)
 		{
 			hitEffect = HitEffect::Blood;
 			return;
@@ -93,16 +93,26 @@ struct ObjectInfo
 		if (intelligent)
 		{
 			if (isSolid && HitPoints > 0)
+			{
 				hitEffect = HitEffect::Richochet;
+			}
 			else if ((undead && HitPoints > 0) || HitPoints == NOT_TARGETABLE)
+			{
 				hitEffect = HitEffect::Smoke;
+			}
 			else if (!undead && HitPoints > 0)
+			{
 				hitEffect = HitEffect::Blood;
+			}
 		}
 		else if (isSolid && HitPoints <= 0)
+		{
 			hitEffect = HitEffect::Richochet;
+		}
 		else
+		{
 			hitEffect = HitEffect::None;
+		}
 	}
 };
 

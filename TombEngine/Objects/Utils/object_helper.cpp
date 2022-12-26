@@ -9,8 +9,6 @@
 #include "Objects/TR5/Object/tr5_pushableblock.h"
 #include "Specific/level.h"
 
-using std::function;
-
 void InitSmashObject(ObjectInfo* obj, int objectNumber)
 {
 	obj = &Objects[objectNumber];
@@ -87,11 +85,9 @@ void InitPickup(ObjectInfo* obj, int objectNumber, std::function<ControlFunction
 	if (obj->loaded)
 	{
 		obj->initialise = InitialisePickup;
+
 		obj->collision = PickupCollision;
-		if (func != nullptr)
-			obj->control = func;
-		else
-			obj->control = PickupControl;
+		obj->control = (func != nullptr) ? func : PickupControl;
 		obj->isPickup = true;
 		obj->SetupHitEffect(true);
 	}
@@ -105,13 +101,13 @@ void InitFlare(ObjectInfo* obj, int objectNumber)
 		obj->collision = PickupCollision;
 		obj->control = FlareControl;
 		obj->pivotLength = 256;
-		obj->HitPoints = 256; // Time
+		obj->HitPoints = 256; // Time.
 		obj->usingDrawAnimatingItem = false;
 		obj->isPickup = true;
 	}
 }
 
-void InitProjectile(ObjectInfo* obj, function<InitFunction> func, int objectNumber, bool noLoad)
+void InitProjectile(ObjectInfo* obj, std::function<InitFunction> func, int objectNumber, bool noLoad)
 {
 	obj = &Objects[objectNumber];
 	if (obj->loaded || noLoad)

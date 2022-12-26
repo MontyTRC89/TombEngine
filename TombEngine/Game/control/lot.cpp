@@ -98,7 +98,7 @@ void InitialiseSlot(short itemNumber, short slot, bool makeTarget)
 	else
 		creature->AITarget = nullptr;
 
-	switch (object->zoneType)
+	switch (object->ZoneType)
 	{
 		default:
 		case ZoneType::Basic:

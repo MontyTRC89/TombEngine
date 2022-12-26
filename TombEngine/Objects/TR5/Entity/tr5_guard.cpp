@@ -115,69 +115,69 @@ namespace TEN::Entities::Creatures::TR5
 
 	enum GuardAnim
 	{
-		ANIMATION_GUARD_IDLE = 0,
-		ANIMATION_GUARD_TURN_180_1,
-		ANIMATION_GUARD_SINGLE_FIRE_ATTACK,
-		ANIMATION_GUARD_AIM,
-		ANIMATION_GUARD_START_WALK,
-		ANIMATION_GUARD_WALK_FORWARD,
-		ANIMATION_GUARD_WALK_FORWARD_TO_IDLE,
-		ANIMATION_GUARD_WALK_FORWARD_TO_AIM,
-		ANIMATION_GUARD_AIM_TO_WALK,
-		ANIMATION_GUARD_AIM_TO_STOP,
-		ANIMATION_GUARD_STOP_TO_AIM,
-		ANIMATION_GUARD_DEATH1,
-		ANIMATION_GUARD_RUN_FORWARD,
-		ANIMATION_GUARD_AIM_TO_RUN,
-		ANIMATION_GUARD_RUN_FORWARD_TO_AIM,
-		ANIMATION_GUARD_RUN_FORWARD_TO_WALK,
-		ANIMATION_GUARD_DEATH_2,
-		ANIMATION_GUARD_WALK_FORWARD_TO_RUN,
-		ANIMATION_GUARD_STOP_TO_RUN,
-		ANIMATION_GUARD_CROUCH_AIM_HAND_UP_START,
-		ANIMATION_GUARD_CROUCH_AIM_HAND_UP,
-		ANIMATION_GUARD_CROUCH_HAND_UP_SINGLE_SHOOT,
-		ANIMATION_GUARD_CROUCH_HAND_UP_TO_IDLE,
-		ANIMATION_GUARD_RELOAD,
-		ANIMATION_GUARD_THROW_GRENADE,
-		ANIMATION_GUARD_OPEN_DOOR_KICK,
-		ANIMATION_GUARD_ROPE_DOWN_FAST,
-		ANIMATION_GUARD_ROPE_DOWN_FAST_TO_AIM_FRONT,
-		ANIMATION_GUARD_ROPE_DOWN,
-		ANIMATION_GUARD_ROPE_TO_AIM,
-		ANIMATION_GUARD_SLEEPING,
-		ANIMATION_GUARD_SLEEPING_TO_AIM, // Kick a chair. Must find chair nearby before doing this anim.
-		ANIMATION_GUARD_WAITING_ON_WALL,
-		ANIMATION_GUARD_WAITING_ON_WALL_TO_IDLE,
-		ANIMATION_GUARD_UNKNOWN,
-		ANIMATION_GUARD_VAULT_2_STEPS_UP,
-		ANIMATION_GUARD_VAULT_3_STEPS_UP,
-		ANIMATION_GUARD_VAULT_4_STEPS_UP,
-		ANIMATION_GUARD_VAULT_4_STEPS_DOWN,
-		ANIMATION_GUARD_VAULT_3_STEPS_DOWN,
-		ANIMATION_GUARD_VAULT_2_STEPS_DOWN,
-		ANIMATION_GUARD_JUMP_1_BLOCK,
-		ANIMATION_GUARD_JUMP_END,
-		ANIMATION_GUARD_JUMP_2_BLOCKS,
-		ANIMATION_GUARD_HUNT_WALK_FORWARD,
-		ANIMATION_GUARD_HUNT,
-		ANIMATION_GUARD_HUNT_TO_IDLE,
-		ANIMATION_GUARD_STOP_TO_HUNT,
-		ANIMATION_GUARD_TURN_180_2,
-		ANIMATION_GUARD_JUMP_START,
-		ANIMATION_GUARD_STOP_TO_CROUCH_AIM_HAND_DOWN,
-		ANIMATION_GUARD_CROUCH_AIM_HAND_DOWN,
-		ANIMATION_GUARD_CROUCH_HAND_DOWN_SHOOT_FAST,
-		ANIMATION_GUARD_CROUCH_HAND_DOWN_TO_IDLE,
-		ANIMATION_GUARD_RAPID_FIRE_ATTACK,
-		ANIMATION_GUARD_INSERT_CODE,
-		ANIMATION_GUARD_USE_KEYPAD,
-		ANIMATION_GUARD_USE_COMPUTER_START,
-		ANIMATION_GUARD_USE_COMPUTER,
-		ANIMATION_GUARD_USE_COMPUTER_TO_IDLE,
-		ANIMATION_GUARD_SURRENDER_START,
-		ANIMATION_GUARD_SURRENDER,
-		ANIMATION_GUARD_SURRENDER_TO_IDLE
+		GUARD_ANIM_IDLE = 0,
+		GUARD_ANIM_TURN_180_1 = 1,
+		GUARD_ANIM_SINGLE_FIRE_ATTACK = 2,
+		GUARD_ANIM_AIM = 3,
+		GUARD_ANIM_START_WALK = 4,
+		GUARD_ANIM_WALK_FORWARD = 5,
+		GUARD_ANIM_WALK_FORWARD_TO_IDLE = 6,
+		GUARD_ANIM_WALK_FORWARD_TO_AIM = 7,
+		GUARD_ANIM_AIM_TO_WALK = 8,
+		GUARD_ANIM_AIM_TO_STOP = 9,
+		GUARD_ANIM_STOP_TO_AIM = 10,
+		GUARD_ANIM_DEATH_1 = 11,
+		GUARD_ANIM_RUN_FORWARD = 12,
+		GUARD_ANIM_AIM_TO_RUN = 13,
+		GUARD_ANIM_RUN_FORWARD_TO_AIM = 14,
+		GUARD_ANIM_RUN_FORWARD_TO_WALK = 15,
+		GUARD_ANIM_DEATH_2 = 16,
+		GUARD_ANIM_WALK_FORWARD_TO_RUN = 17,
+		GUARD_ANIM_STOP_TO_RUN = 18,
+		GUARD_ANIM_CROUCH_AIM_HAND_UP_START = 19,
+		GUARD_ANIM_CROUCH_AIM_HAND_UP = 20,
+		GUARD_ANIM_CROUCH_HAND_UP_SINGLE_SHOOT = 21,
+		GUARD_ANIM_CROUCH_HAND_UP_TO_IDLE = 22,
+		GUARD_ANIM_RELOAD = 23,
+		GUARD_ANIM_THROW_GRENADE = 24,
+		GUARD_ANIM_OPEN_DOOR_KICK = 25,
+		GUARD_ANIM_ROPE_DOWN_FAST = 26,
+		GUARD_ANIM_ROPE_DOWN_FAST_TO_AIM_FRONT = 27,
+		GUARD_ANIM_ROPE_DOWN = 28,
+		GUARD_ANIM_ROPE_TO_AIM = 29,
+		GUARD_ANIM_SLEEPING = 30,
+		GUARD_ANIM_SLEEPING_TO_AIM = 31, // Kick a chair. Must find chair nearby before doing this anim.
+		GUARD_ANIM_WAITING_ON_WALL = 32,
+		GUARD_ANIM_WAITING_ON_WALL_TO_IDLE = 33,
+		GUARD_ANIM_UNKNOWN = 34,
+		GUARD_ANIM_VAULT_2_STEPS_UP = 35,
+		GUARD_ANIM_VAULT_3_STEPS_UP = 36,
+		GUARD_ANIM_VAULT_4_STEPS_UP = 37,
+		GUARD_ANIM_VAULT_4_STEPS_DOWN = 38,
+		GUARD_ANIM_VAULT_3_STEPS_DOWN = 39,
+		GUARD_ANIM_VAULT_2_STEPS_DOWN = 40,
+		GUARD_ANIM_JUMP_1_BLOCK = 41,
+		GUARD_ANIM_JUMP_END = 42,
+		GUARD_ANIM_JUMP_2_BLOCKS = 43,
+		GUARD_ANIM_HUNT_WALK_FORWARD = 44,
+		GUARD_ANIM_HUNT = 45,
+		GUARD_ANIM_HUNT_TO_IDLE = 46,
+		GUARD_ANIM_STOP_TO_HUNT = 47,
+		GUARD_ANIM_TURN_180_2 = 48,
+		GUARD_ANIM_JUMP_START = 49,
+		GUARD_ANIM_STOP_TO_CROUCH_AIM_HAND_DOWN = 50,
+		GUARD_ANIM_CROUCH_AIM_HAND_DOWN = 51,
+		GUARD_ANIM_CROUCH_HAND_DOWN_SHOOT_FAST = 52,
+		GUARD_ANIM_CROUCH_HAND_DOWN_TO_IDLE = 53,
+		GUARD_ANIM_RAPID_FIRE_ATTACK = 54,
+		GUARD_ANIM_INSERT_CODE = 55,
+		GUARD_ANIM_USE_KEYPAD = 56,
+		GUARD_ANIM_USE_COMPUTER_START = 57,
+		GUARD_ANIM_USE_COMPUTER = 58,
+		GUARD_ANIM_USE_COMPUTER_TO_IDLE = 59,
+		GUARD_ANIM_SURRENDER_START = 60,
+		GUARD_ANIM_SURRENDER = 61,
+		GUARD_ANIM_SURRENDER_TO_IDLE = 62
 	};
 
 	enum class GuardOcb
@@ -207,21 +207,21 @@ namespace TEN::Entities::Creatures::TR5
 		{
 		default:
 		case GuardOcb::Idle:
-			SetAnimation(item, ANIMATION_GUARD_IDLE);
+			SetAnimation(item, GUARD_ANIM_IDLE);
 			break;
 
 		case GuardOcb::Reload:
-			SetAnimation(item, ANIMATION_GUARD_RELOAD);
+			SetAnimation(item, GUARD_ANIM_RELOAD);
 			break;
 
 		case GuardOcb::DoorKick:
-			SetAnimation(item, ANIMATION_GUARD_OPEN_DOOR_KICK);
+			SetAnimation(item, GUARD_ANIM_OPEN_DOOR_KICK);
 			item->Animation.TargetState = GUARD_STATE_CROUCH;
 			// TODO: item->flags2 ^= (item->flags2 ^ ((item->flags2 & 0xFE) + 2)) & 6;
 			break;
 
 		case GuardOcb::RopeDown:
-			SetAnimation(item, ANIMATION_GUARD_ROPE_DOWN);
+			SetAnimation(item, GUARD_ANIM_ROPE_DOWN);
 			item->SetMeshSwapFlags(9216);
 
 			roomItemNumber = g_Level.Rooms[item->RoomNumber].itemNumber;
@@ -254,32 +254,32 @@ namespace TEN::Entities::Creatures::TR5
 			break;
 
 		case GuardOcb::Sleeping:
-			SetAnimation(item, ANIMATION_GUARD_SLEEPING);
+			SetAnimation(item, GUARD_ANIM_SLEEPING);
 			item->SetMeshSwapFlags(GUARD_NO_WEAPON_ON_HAND_SWAPFLAG);
 			break;
 
 		case GuardOcb::RopeDownFast:
-			SetAnimation(item, ANIMATION_GUARD_ROPE_DOWN_FAST);
+			SetAnimation(item, GUARD_ANIM_ROPE_DOWN_FAST);
 			item->Pose.Position.y = GetCollision(item).Position.Ceiling - BLOCK(2);
 			break;
 
 		case GuardOcb::WaitOnWall:
-			SetAnimation(item, ANIMATION_GUARD_WAITING_ON_WALL);
+			SetAnimation(item, GUARD_ANIM_WAITING_ON_WALL);
 			break;
 
 		case GuardOcb::UseComputer:
 		case GuardOcb::UseComputerScientist:
-			SetAnimation(item, ANIMATION_GUARD_USE_COMPUTER);
+			SetAnimation(item, GUARD_ANIM_USE_COMPUTER);
 			item->Pose.Position.x -= CLICK(2) * phd_sin(item->Pose.Orientation.y);
 			item->Pose.Position.z -= CLICK(2) * phd_cos(item->Pose.Orientation.y);
 			break;
 
 		case GuardOcb::StartHuntStop:
-			SetAnimation(item, ANIMATION_GUARD_HUNT_TO_IDLE);
+			SetAnimation(item, GUARD_ANIM_HUNT_TO_IDLE);
 			break;
 
 		case GuardOcb::Run:
-			SetAnimation(item, ANIMATION_GUARD_RUN_FORWARD);
+			SetAnimation(item, GUARD_ANIM_RUN_FORWARD);
 			break;
 		}
 	}
@@ -361,12 +361,12 @@ namespace TEN::Entities::Creatures::TR5
 			{
 				if (laraAI.angle >= GUARD_LARA_ANGLE_FOR_DEATH2 || laraAI.angle <= -GUARD_LARA_ANGLE_FOR_DEATH2)
 				{
-					SetAnimation(item, ANIMATION_GUARD_DEATH_2);
+					SetAnimation(item, GUARD_ANIM_DEATH_2);
 					item->Pose.Orientation.y += laraAI.angle + ANGLE(-180.0f);
 				}
 				else
 				{
-					SetAnimation(item, ANIMATION_GUARD_DEATH1);
+					SetAnimation(item, GUARD_ANIM_DEATH_1);
 					item->Pose.Orientation.y += laraAI.angle;
 				}
 
@@ -406,7 +406,7 @@ namespace TEN::Entities::Creatures::TR5
 						item->HitPoints--;
 
 					if (item->HitPoints <= 0)
-						SetAnimation(item, ANIMATION_GUARD_DEATH_2);
+						SetAnimation(item, GUARD_ANIM_DEATH_2);
 				}
 			}
 
@@ -505,7 +505,7 @@ namespace TEN::Entities::Creatures::TR5
 				}
 				else if (canJump1block || canJump2blocks)
 				{
-					SetAnimation(item, ANIMATION_GUARD_JUMP_START, 0, false);
+					SetAnimation(item, GUARD_ANIM_JUMP_START);
 					creature->MaxTurn = 0;
 
 					if (canJump1block)
@@ -637,7 +637,7 @@ namespace TEN::Entities::Creatures::TR5
 					if (canJump1block || canJump2blocks)
 					{
 						creature->MaxTurn = 0;
-						SetAnimation(item, ANIMATION_GUARD_JUMP_START, 0, false);
+						SetAnimation(item, GUARD_ANIM_JUMP_START);
 
 						if (canJump1block)
 							item->Animation.TargetState = GUARD_STATE_JUMP_1_BLOCK;
@@ -678,7 +678,7 @@ namespace TEN::Entities::Creatures::TR5
 				else if (canJump1block || canJump2blocks)
 				{
 					creature->MaxTurn = 0;
-					SetAnimation(item, ANIMATION_GUARD_JUMP_START, 0, false);
+					SetAnimation(item, GUARD_ANIM_JUMP_START);
 
 					if (canJump1block)
 						item->Animation.TargetState = GUARD_STATE_JUMP_1_BLOCK;
@@ -970,32 +970,32 @@ namespace TEN::Entities::Creatures::TR5
 			switch (CreatureVault(itemNumber, angle, 2, BLOCK(0.25f)))
 			{
 			case 2:
-				SetAnimation(item, ANIMATION_GUARD_VAULT_2_STEPS_UP);
+				SetAnimation(item, GUARD_ANIM_VAULT_2_STEPS_UP);
 				creature->MaxTurn = 0;
 				break;
 
 			case 3:
-				SetAnimation(item, ANIMATION_GUARD_VAULT_3_STEPS_UP);
+				SetAnimation(item, GUARD_ANIM_VAULT_3_STEPS_UP);
 				creature->MaxTurn = 0;
 				break;
 
 			case 4:
-				SetAnimation(item, ANIMATION_GUARD_VAULT_4_STEPS_UP);
+				SetAnimation(item, GUARD_ANIM_VAULT_4_STEPS_UP);
 				creature->MaxTurn = 0;
 				break;
 
 			case -2:
-				SetAnimation(item, ANIMATION_GUARD_VAULT_2_STEPS_DOWN);
+				SetAnimation(item, GUARD_ANIM_VAULT_2_STEPS_DOWN);
 				creature->MaxTurn = 0;
 				break;
 
 			case -3:
-				SetAnimation(item, ANIMATION_GUARD_VAULT_3_STEPS_DOWN);
+				SetAnimation(item, GUARD_ANIM_VAULT_3_STEPS_DOWN);
 				creature->MaxTurn = 0;
 				break;
 
 			case -4:
-				SetAnimation(item, ANIMATION_GUARD_VAULT_4_STEPS_DOWN);
+				SetAnimation(item, GUARD_ANIM_VAULT_4_STEPS_DOWN);
 				creature->MaxTurn = 0;
 				break;
 			}

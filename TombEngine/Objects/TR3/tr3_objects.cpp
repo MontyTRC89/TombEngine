@@ -143,7 +143,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->pivotLength = 1800;
 		obj->radius = 512;
 		obj->intelligent = true;
-		obj->zoneType = ZoneType::Blockable;
+		obj->ZoneType = ZoneType::Blockable;
 		obj->SetBoneRotationFlags(10, ROT_Y);
 		obj->SetBoneRotationFlags(11, ROT_Y);
 		obj->SetupHitEffect();
@@ -160,7 +160,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->intelligent = true;
 		obj->waterCreature = true;
 		obj->pivotLength = 50;
-		obj->zoneType = ZoneType::Water;
+		obj->ZoneType = ZoneType::Water;
 		obj->SetBoneRotationFlags(10, ROT_X | ROT_Y);
 		obj->SetBoneRotationFlags(14, ROT_Y);
 		obj->SetupHitEffect();
@@ -231,7 +231,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->radius = 102;
 		obj->intelligent = true;
 		obj->pivotLength = 0;
-		obj->zoneType = ZoneType::Human;
+		obj->ZoneType = ZoneType::Human;
 		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
 		obj->SetBoneRotationFlags(13, ROT_Y);
 		obj->SetupHitEffect();
@@ -281,7 +281,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->radius = 102;
 		obj->intelligent = true;
 		obj->pivotLength = 0;
-		obj->zoneType = ZoneType::Human;
+		obj->ZoneType = ZoneType::Human;
 		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
 		obj->SetBoneRotationFlags(13, ROT_Y);
 		obj->SetupHitEffect();
@@ -376,10 +376,10 @@ static void StartProjectiles(ObjectInfo* obj)
 
 void InitialiseTR3Objects()
 {
-	ObjectInfo* objToInit = nullptr;
-	StartEntity(objToInit);
-	StartObject(objToInit);
-	StartTrap(objToInit);
-	StartVehicles(objToInit);
-	StartProjectiles(objToInit);
+	ObjectInfo* objectPtr = nullptr;
+	StartEntity(objectPtr);
+	StartObject(objectPtr);
+	StartTrap(objectPtr);
+	StartVehicles(objectPtr);
+	StartProjectiles(objectPtr);
 }

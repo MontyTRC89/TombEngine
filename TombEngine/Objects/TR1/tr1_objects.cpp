@@ -69,7 +69,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->pivotLength = 250;
 		obj->radius = 340;
 		obj->intelligent = true;
-		obj->zoneType = ZoneType::Ape;
+		obj->ZoneType = ZoneType::Ape;
 		obj->SetupHitEffect();
 	}
 
@@ -85,7 +85,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->radius = 204;
 		obj->intelligent = true;
 		obj->waterCreature = true;
-		obj->zoneType = ZoneType::Water;
+		obj->ZoneType = ZoneType::Water;
 		obj->SetBoneRotationFlags(1, ROT_Y);
 		obj->SetupHitEffect();
 	}
@@ -112,9 +112,9 @@ static void StartEntity(ObjectInfo* obj)
 		obj->control = GiantMutantControl;
 		obj->shadowType = ShadowMode::All;
 		obj->HitPoints = 500;
-		obj->radius = WALL_SIZE / 3;
+		obj->radius = BLOCK(1 / 3.0f);
 		obj->intelligent = true;
-		obj->zoneType = ZoneType::Blockable;
+		obj->ZoneType = ZoneType::Blockable;
 		obj->SetBoneRotationFlags(1, ROT_Y);
 		obj->SetupHitEffect();
 	}
@@ -141,9 +141,9 @@ static void StartEntity(ObjectInfo* obj)
 		obj->shadowType = ShadowMode::All;
 		obj->HitPoints = 120;
 		obj->pivotLength = 400;
-		obj->radius = WALL_SIZE / 3;
+		obj->radius = BLOCK(1 / 3.0f);
 		obj->intelligent = true;
-		obj->zoneType = ZoneType::Blockable;
+		obj->ZoneType = ZoneType::Blockable;
 		obj->SetBoneRotationFlags(10, ROT_X | ROT_Y);
 		obj->SetupHitEffect();
 	}
@@ -157,10 +157,10 @@ static void StartEntity(ObjectInfo* obj)
 		obj->shadowType = ShadowMode::All;
 		obj->hitEffect = HitEffect::Blood;
 		obj->pivotLength = 150;
-		obj->radius = WALL_SIZE / 3;
+		obj->radius = BLOCK(1 / 3.0f);
 		obj->HitPoints = 50;
 		obj->intelligent = true;
-		obj->zoneType = ZoneType::Flyer;
+		obj->ZoneType = ZoneType::Flyer;
 		obj->SetBoneRotationFlags(1, ROT_Y);
 		obj->SetBoneRotationFlags(2, ROT_Y);
 		obj->SetupHitEffect();
@@ -199,9 +199,9 @@ static void StartProjectiles(ObjectInfo* obj)
 
 void InitialiseTR1Objects()
 {
-	ObjectInfo* objToInit = nullptr;
-	StartEntity(objToInit);
-	StartObject(objToInit);
-	StartTrap(objToInit);
-	StartProjectiles(objToInit);
+	ObjectInfo* objectPtr = nullptr;
+	StartEntity(objectPtr);
+	StartObject(objectPtr);
+	StartTrap(objectPtr);
+	StartProjectiles(objectPtr);
 }

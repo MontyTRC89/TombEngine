@@ -174,7 +174,7 @@ short AIGuard(CreatureInfo* creature)
 	if (item->AIBits & MODIFY)
 		return 0;
 
-	if (Random::TestProbability(0.25f))
+	if (Random::TestProbability(1 / 4.0f))
 	{
 		creature->HeadRight = true;
 		creature->HeadLeft = true;
@@ -184,7 +184,7 @@ short AIGuard(CreatureInfo* creature)
 		creature->HeadRight = false;
 		creature->HeadLeft = true;
 	}
-	else if (Random::TestProbability(0.5f))
+	else if (Random::TestProbability(1 / 2.0f))
 	{
 		creature->HeadRight = true;
 		creature->HeadLeft = false;
@@ -1421,8 +1421,8 @@ int TargetReachable(ItemInfo* item, ItemInfo* enemy)
 	// This prevents enemies from running to the player and attacking nothing when they are hanging or shimmying. -- Lwmte, 27.06.22
 
 	bool isReachable = false;
-	if (object->zoneType == ZoneType::Flyer ||
-	   (object->zoneType == ZoneType::Water && TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, item->RoomNumber)))
+	if (object->ZoneType == ZoneType::Flyer ||
+	   (object->ZoneType == ZoneType::Water && TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, item->RoomNumber)))
 	{
 		isReachable = true; // If NPC is flying or swimming in water, player is always reachable.
 	}
