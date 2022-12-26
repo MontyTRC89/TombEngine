@@ -441,17 +441,16 @@ namespace TEN::Entities::Creatures::TR5
 									// Eye is aready firing.
 									SoundEffect(SFX_TR5_GOD_HEAD_LASER_LOOPS, &item->Pose);
 
-									LaserHeadData.fireArcs[i]->pos1.x = origin.x;
-									LaserHeadData.fireArcs[i]->pos1.y = origin.y;
-									LaserHeadData.fireArcs[i]->pos1.z = origin.z;
+									//LaserHeadData.fireArcs[i]->pos1.x = origin.x;  // NOTE: CRASH
+									//LaserHeadData.fireArcs[i]->pos1.y = origin.y;  // NOTE: CRASH
+									//LaserHeadData.fireArcs[i]->pos1.z = origin.z;  // NOTE: CRASH
 								}
 								else
 								{
 									// Start firing from eye
 									origin.RoomNumber = item->RoomNumber;
-									LaserHeadData.LOS[i] = LOS(&origin, &target);
-									TriggerLightning((Vector3i*)&origin, (Vector3i*)&target, 2, r, g, b, 32, LI_SPLINE, 64, 5);
-									//LaserHeadData.fireArcs[i] = test; // (GetRandomControl() & 7) + 4, b | ((&unk_640000 | g) << 8), 12, 64, 5);
+									LaserHeadData.LOS[i] = LOS(&origin, &target);																						
+									//LaserHeadData.fireArcs[i] = TriggerLightning((Vector3i*)&origin, (Vector3i*)&target, Random::GenerateInt(8, 16), r, g, b, 24, (LI_SPLINE | LI_THINOUT | LI_THININ), 6, 5);  // NOTE: TriggerLightning does not support ``return arc``
 									StopSoundEffect(SFX_TR5_GOD_HEAD_CHARGE);
 									SoundEffect(SFX_TR5_GOD_HEAD_BLAST, &item->Pose);
 								}
@@ -464,8 +463,8 @@ namespace TEN::Entities::Creatures::TR5
 									TriggerLightningGlow(origin.x, origin.y, origin.z, (GetRandomControl() & 3) + 32, r, g, b);
 									TriggerDynamicLight(origin.x, origin.y, origin.z, (GetRandomControl() & 3) + 16, r, g, b);
 
-									if (!LaserHeadData.LOS[i])
-									{
+									if (!LaserHeadData.LOS[i]) 
+									{// NOTE: CRASH
 										//TriggerLightningGlow(currentArc->pos4.x, currentArc->pos4.y, currentArc->pos4.z, (GetRandomControl() & 3) + 16, r, g, b);
 										//TriggerDynamicLight(currentArc->pos4.x, currentArc->pos4.y, currentArc->pos4.z, (GetRandomControl() & 3) + 6, r, g, b);
 										//TriggerLaserHeadSparks((Vector3i*)&currentArc->pos4, 3, r, g, b, 0);
@@ -473,10 +472,10 @@ namespace TEN::Entities::Creatures::TR5
 								}
 
 								// Check if Lara was hit by energy arcs
-								if (LaraItem->Effect.Type == EffectType::None)
-								{
-									int someIndex = 0;
-									auto* currentArc = LaserHeadData.fireArcs[i];
+								if (LaraItem->Effect.Type == EffectType::None) 
+								{// NOTE: This section crashes, because LaserHeadData.fireArcs[i]->pos4 throws an exception
+									/*int someIndex = 0;
+									auto& currentArc = LaserHeadData.fireArcs[i];
 
 									auto bounds = GameBoundingBox(LaraItem);
 									auto tBounds = GameBoundingBox::Zero;
@@ -506,14 +505,14 @@ namespace TEN::Entities::Creatures::TR5
 											target.z = origin.z + dl * (target.z - origin.z) / MAX_VISIBILITY_DISTANCE;
 										}
 
-										int dx = (target.x - origin.x) / 32;
-										int dy = (target.y - origin.y) / 32;
-										int dz = (target.z - origin.z) / 32;
+											int dx = (target.x - origin.x) / 32;
+											int dy = (target.y - origin.y) / 32;
+											int dz = (target.z - origin.z) / 32;
 
-										int adx = LaserHeadData.fireArcs[i]->pos4.x - origin.x;
-										int ady = LaserHeadData.fireArcs[i]->pos4.y - origin.y;
-										int adz = LaserHeadData.fireArcs[i]->pos4.z - origin.z;
-
+											int adx = LaserHeadData.fireArcs[i]->pos4.x - origin.x;
+											int ady = LaserHeadData.fireArcs[i]->pos4.y - origin.y;
+											int adz = LaserHeadData.fireArcs[i]->pos4.z - origin.z;
+										
 										int x = origin.x;
 										int y = origin.y;
 										int z = origin.z;
@@ -545,7 +544,7 @@ namespace TEN::Entities::Creatures::TR5
 											ady -= dy;
 											adz -= dz;
 										}
-									}
+									}*/
 								}
 							}
 							
