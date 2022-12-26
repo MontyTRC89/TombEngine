@@ -138,7 +138,7 @@ bool GetTargetOnLOS(GameVector* origin, GameVector* target, bool drawTarget, boo
 						{
 							if (item->ObjectNumber == ID_GUARD_LASER)
 							{
-								float angle = phd_atan(LaraItem->Pose.Position.z - item->Pose.Position.z, LaraItem->Pose.Position.x - item->Pose.Position.x) - item->Pose.Orientation.y;
+								short angle = phd_atan(LaraItem->Pose.Position.z - item->Pose.Position.z, LaraItem->Pose.Position.x - item->Pose.Position.x) - item->Pose.Orientation.y;
 								if (angle > -ANGLE(90) && angle < ANGLE(90))
 								{
 									DoDamage(item, INT_MAX);
