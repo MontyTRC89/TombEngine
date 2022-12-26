@@ -182,7 +182,7 @@ bool GetTargetOnLOS(GameVector* origin, GameVector* target, bool drawTarget, boo
 										TriggerRicochetSpark(target2, LaraItem->Pose.Orientation.y, 3, 0);
 
 									if (!Objects[item->ObjectNumber].undead)
-									DoDamage(item, Weapons[(int)Lara.Control.Weapon.GunType].Damage);
+										DoDamage(item, Weapons[(int)Lara.Control.Weapon.GunType].Damage);
 
 									if (!item->Callbacks.OnHit.empty())
 									{
