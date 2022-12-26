@@ -920,7 +920,7 @@ static void StartTrap(ObjectInfo *obj)
 		obj->control = AnimatingControl;
 	}
 
-	obj = &Objects[ID_GEN_SLOT4]; // TODO: why the function are commented ? - TokyoSU - 24/12/2022
+	obj = &Objects[ID_GEN_SLOT4]; // TODO: Why commented? -- TokyoSU, 2022.12.24
 	if (obj->loaded)
 	{
 		//obj->initialise = InitialiseGenSlot4;
