@@ -159,11 +159,17 @@ bool SameZone(CreatureInfo* creature, ItemInfo* target)
 	auto& item = g_Level.Items[creature->ItemNumber];
 	auto* zone = g_Level.Zones[(int)creature->LOT.Zone][FlipStatus].data();
 
-	auto& room1 = g_Level.Rooms[item.RoomNumber];
-	item.BoxNumber = GetSector(&room1, item.Pose.Position.x - room1.z, item.Pose.Position.z - room1.z)->Box;
+	auto& roomSource = g_Level.Rooms[item.RoomNumber];
+	auto& boxSource = GetSector(&roomSource, item.Pose.Position.x - roomSource.z, item.Pose.Position.z - roomSource.z)->Box;
+	if (boxSource == NO_BOX)
+		return false;
+	item.BoxNumber = boxSource;
 
-	auto& room2 = g_Level.Rooms[target->RoomNumber];
-	target->BoxNumber = GetSector(&room2, target->Pose.Position.x - room2.z, target->Pose.Position.z - room2.z)->Box;
+	auto& roomTarget = g_Level.Rooms[target->RoomNumber];
+	auto& boxTarget = GetSector(&roomTarget, target->Pose.Position.x - roomTarget.z, target->Pose.Position.z - roomTarget.z)->Box;
+	if (boxTarget == NO_BOX)
+		return false;
+	target->BoxNumber = boxTarget;
 
 	return (zone[item.BoxNumber] == zone[target->BoxNumber]);
 }
@@ -171,20 +177,20 @@ bool SameZone(CreatureInfo* creature, ItemInfo* target)
 short AIGuard(CreatureInfo* creature) 
 {
 	auto& item = g_Level.Items[creature->ItemNumber];
-	if (item.AIBits & MODIFY)
+	if (item.AIBits & (MODIFY|PATROL1|PATROL2|AMBUSH|FOLLOW))
 		return 0;
 
-	if (Random::TestProbability(1 / 4.0f))
+	if (Random::TestProbability(1.0f / 256.0f))
 	{
 		creature->HeadRight = true;
 		creature->HeadLeft = true;
 	}
-	else if (Random::TestProbability(1 / 3.0f))
+	else if (Random::TestProbability(1.0f / 384.0f))
 	{
 		creature->HeadRight = false;
 		creature->HeadLeft = true;
 	}
-	else if (Random::TestProbability(1 / 2.0f))
+	else if (Random::TestProbability(1.0f / 512.0f))
 	{
 		creature->HeadRight = true;
 		creature->HeadLeft = false;
@@ -267,6 +273,8 @@ bool CreaturePathfind(ItemInfo* item, short angle, short tilt)
 
 	GetFloor(prevPos.x, y, prevPos.z, &roomNumber);
 	auto* floor = GetFloor(item->Pose.Position.x, y, item->Pose.Position.z, &roomNumber);
+	if (floor->Box == NO_BOX)
+		return false;
 	int height = g_Level.Boxes[floor->Box].height;
 	int nextHeight = 0;
 
@@ -882,6 +890,8 @@ int CreatureCreature(short itemNumber)
 
 bool ValidBox(ItemInfo* item, short zoneNumber, short boxNumber) 
 {
+	if (boxNumber == NO_BOX)
+		return false;
 	auto* creature = GetCreatureInfo(item);
 	auto* zone = g_Level.Zones[(int)creature->LOT.Zone][FlipStatus].data();
 
@@ -905,6 +915,8 @@ bool ValidBox(ItemInfo* item, short zoneNumber, short boxNumber)
 
 bool EscapeBox(ItemInfo* item, ItemInfo* enemy, int boxNumber) 
 {
+	if (boxNumber == NO_BOX)
+		return false;
 	auto* box = &g_Level.Boxes[boxNumber];
 	int x = (box->top + box->bottom) * SECTOR(1) / 2 - enemy->Pose.Position.x;
 	int z = (box->left + box->right) * SECTOR(1) / 2 - enemy->Pose.Position.z;
@@ -921,6 +933,8 @@ bool EscapeBox(ItemInfo* item, ItemInfo* enemy, int boxNumber)
 
 void TargetBox(LOTInfo* LOT, int boxNumber)
 {
+	if (boxNumber == NO_BOX)
+		return;
 	auto* box = &g_Level.Boxes[boxNumber];
 
 	// Maximize target precision. DO NOT change bracket precedence!
@@ -1098,9 +1112,8 @@ void InitialiseCreature(short itemNumber)
 
 bool StalkBox(ItemInfo* item, ItemInfo* enemy, int boxNumber)
 {
-	if (enemy == nullptr)
+	if (enemy == nullptr || boxNumber == NO_BOX)
 		return false;
-
 	auto* box = &g_Level.Boxes[boxNumber];
 
 	int xRange = STALK_DIST + ((box->bottom - box->top) * SECTOR(1));
@@ -1116,7 +1129,7 @@ bool StalkBox(ItemInfo* item, ItemInfo* enemy, int boxNumber)
 	if (enemyQuad == boxQuad)
 		return false;
 
-	int baddyQuad = false;
+	int baddyQuad = 0;
 	if (item->Pose.Position.z > enemy->Pose.Position.z)
 		baddyQuad = (item->Pose.Position.x > enemy->Pose.Position.x) ? 2 : 1;
 	else
