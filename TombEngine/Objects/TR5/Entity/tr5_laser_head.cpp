@@ -11,6 +11,7 @@
 #include "Specific/setup.h"
 #include "Specific/level.h"
 #include "Game/Lara/lara.h"
+#include "Game/Lara/lara_helpers.h"
 #include "Sound/sound.h"
 #include "Objects/TR5/Entity/tr5_laserhead_info.h"
 #include "Game/effects/item_fx.h"
@@ -25,7 +26,7 @@ using namespace TEN::Math;
 
 namespace TEN::Entities::Creatures::TR5
 {
-	int GuardianMeshes[5] = { 1, 2 };
+	int GuardianMeshes[2] = { 1, 2 };
 	auto LaserHeadBasePosition = Vector3i(0, -640, 0);
 	Vector3i GuardianChargePositions[4] =
 	{
@@ -93,6 +94,7 @@ namespace TEN::Entities::Creatures::TR5
 	{
 		auto* creature = GetLaserHeadInfo(item);
 		byte size = item->ItemFlags[3];
+		byte r = 0;
 		byte g = ((GetRandomControl() & 0x1F) + 128);
 		byte b = ((GetRandomControl() & 0x1F) + 64);
 
@@ -121,8 +123,7 @@ namespace TEN::Entities::Creatures::TR5
 			}
 
 			origin = GetJointPosition(&g_Level.Items[creature->BaseItem], 0, GuardianChargePositions[i]);
-		//creature->chargeArcs[i] = TriggerLightning(&origin, &target, Random::GenerateInt(8, 16), 0, 128, 64, 16, (LI_SPLINE | LI_THINOUT | LI_THININ), 6, 5);
-			//creature->chargeArcs[i] = TriggerEnergyArc(&origin, &target, 0, g, b, 256, 90, 64, ENERGY_ARC_NO_RANDOMIZE, ENERGY_ARC_STRAIGHT_LINE); //  (GetRandomControl() & 7) + 8, v4 | ((v1 | 0x240000) << 8), 13, 48, 3);
+			TriggerLightning(&origin, &target, Random::GenerateInt(8, 16), r, g, b, 16, (LI_SPLINE | LI_THINOUT | LI_THININ), 6, 5);
 		}
 
 		if (GlobalCounter & 1)
@@ -142,12 +143,8 @@ namespace TEN::Entities::Creatures::TR5
 		}
 
 		if (!(GlobalCounter & 3))
-		{
-		//TriggerLightning(&target, (Vector3i*)&item->Pose.Position, Random::GenerateInt(8, 16), 0, 128, 64, 16, (LI_SPLINE | LI_THINOUT | LI_THININ), 6, 5);
-			//TriggerEnergyArc(&target, (Vector3i*)&item->pos, 0, g, b, 256, 3, 64, ENERGY_ARC_NO_RANDOMIZE, ENERGY_ARC_STRAIGHT_LINE);
-			//TriggerEnergyArc(&target, &item->pos, (GetRandomControl() & 7) + 8, v4 | ((v1 | 0x180000) << 8), 13, 64, 3);
-		}
-
+		TriggerLightning(&target, (Vector3i*)&item->Pose.Position, Random::GenerateInt(8, 16), r, g, b, 16, (LI_SPLINE | LI_THINOUT | LI_THININ), 6, 5);
+		
 		TriggerLaserHeadSparks(&target, 3, 0, g, b, 1);
 	}
 
@@ -184,15 +181,6 @@ namespace TEN::Entities::Creatures::TR5
 			rotation += ANGLE(45.0f);
 		}
 
-		for (int i = 0; i < g_Level.NumItems; i++)
-		{
-			if (g_Level.Items[i].ObjectNumber == ID_PUZZLE_ITEM4)
-			{
-				creature->PuzzleItem = i;
-				break;
-			}
-		}
-
 		int y = item->Pose.Position.y - 640;
 		item->Pose.Position.y = y;
 		item->Animation.ActiveState = 0;
@@ -207,7 +195,7 @@ namespace TEN::Entities::Creatures::TR5
 
 		auto origin = GameVector::Zero;
 		auto target = GameVector::Zero;
-
+		int farAway;
 		// NOTICE: itemFlags[0] seems to be a state machine, if it's equal to 3 then death animations is triggered
 		// Other values still unknown
 
@@ -274,7 +262,7 @@ namespace TEN::Entities::Creatures::TR5
 				if (LOS(&origin, &target) &&
 					distance <= MAX_VISIBILITY_DISTANCE &&
 					LaraItem->HitPoints > 0 &&
-					LaraItem->Effect.Type != EffectType::Fire &&
+					LaraItem->Effect.Type == EffectType::None &&
 					(creature->target.x || creature->target.y || creature->target.z))
 				{
 					// Lock target for attacking.
@@ -289,23 +277,23 @@ namespace TEN::Entities::Creatures::TR5
 				else
 				{
 					// Randomly turn head try to finding Lara
-					bool condition = !(GetRandomControl() & 0x7F) && item->TriggerFlags > 150;
+					farAway = !(GetRandomControl() & 0x7F) && item->TriggerFlags > 150;
 					item->ItemFlags[3]--;
-					if (item->ItemFlags[3] <= 0 || condition)
+					if (item->ItemFlags[3] <= 0 || farAway)
 					{
 						short xRot = (GetRandomControl() / 4) - ANGLE(22.5f);
 						short yRot;
-						if (condition)
+						if (farAway)
 							yRot = item->Pose.Orientation.y + (GetRandomControl() & 0x3FFF) + ANGLE(135.0f);
 						else
 							yRot = 2 * GetRandomControl();
-						int v = ((GetRandomControl() & 0x1FFF) + 8192);
+						int v = ((GetRandomControl() & 0x1FFF) + MAX_VISIBILITY_DISTANCE);
 						int c = v * phd_cos(-xRot);
 						target.x = origin.x + c * phd_sin(yRot);
 						target.y = origin.y + v * phd_sin(-xRot);
 						target.z = origin.z + c * phd_cos(yRot);
 
-						if (condition)
+						if (farAway)
 						{
 							creature->trackSpeed = 2;
 							item->TriggerFlags = 0;
@@ -410,7 +398,6 @@ namespace TEN::Entities::Creatures::TR5
 						for (int i = 0; i < LASERHEAD_FIRE_ARCS_COUNT; i++)
 						{
 							// If eye was not destroyed then fire from it
-							//TENLog("Eyes flag: " + std::to_string(!(1 << GuardianMeshes[i] & item->MeshBits.ToPackedBits())));
 							if (!(1 << GuardianMeshes[i] & item->MeshBits.ToPackedBits()))
 							{
 								if (item->ItemFlags[3] > 90 &&
@@ -424,28 +411,30 @@ namespace TEN::Entities::Creatures::TR5
 							{
 								GameVector origin1 = GetJointPosition(item, GuardianMeshes[i], Vector3i::Zero);
 								origin1.RoomNumber = item->RoomNumber;
-								GameVector eye;// = GameVector(0, 0, 0, LaraItem->RoomNumber);
+								GameVector eye = GameVector::Zero;
 								eye.RoomNumber = item->RoomNumber;
-								int c = ANGLE(45.0f) * phd_cos(angles.x);
-								eye.x = origin1.x + (c * phd_sin(item->Pose.Orientation.y));
-								eye.y = origin1.y + phd_sin(-angles.x) * ANGLE(45);
-								eye.z = origin1.z + (c * phd_cos(item->Pose.Orientation.y));
+
+								int c = MAX_VISIBILITY_DISTANCE * phd_cos(angles.x);
+								eye.x = origin1.x + c * phd_sin(item->Pose.Orientation.y);
+								eye.y = origin1.y + MAX_VISIBILITY_DISTANCE * phd_sin(-angles.x);
+								eye.z = origin1.z + c * phd_cos(item->Pose.Orientation.y);
 
 								if (item->ItemFlags[3] != 90 && creature->fireArcs[i])
 								{
 									// Eye is aready firing.
 									SoundEffect(SFX_TR5_GOD_HEAD_LASER_LOOPS, &item->Pose);
-
+									arc = creature->fireArcs[i];
 									creature->fireArcs[i]->pos1.x =  origin1.x;
-									creature->fireArcs[i]->pos1.y =  origin1.y; 
+									creature->fireArcs[i]->pos1.y =  origin1.y;
 									creature->fireArcs[i]->pos1.z =  origin1.z;
 
+									//resets fireArcs and let head follow Lara
 									if (creature->fireArcs[i]->life > 0)
 										creature->fireArcs[i]->life -= 2;
 									else
 									{
 										creature->fireArcs[i]->life = 0;
-										//creature->fireArcs[i] = nullptr;
+										creature->fireArcs[i] = nullptr;
 										item->ItemFlags[0] = 1;
 										item->TriggerFlags = 0;
 
@@ -456,12 +445,12 @@ namespace TEN::Entities::Creatures::TR5
 									// Start firing from eye
 									origin1.RoomNumber = item->RoomNumber;
 									creature->LOS[i] = LOS(&origin1, &eye);
-									creature->fireArcs[i] = TriggerLightning((Vector3i*)&origin1, (Vector3i*)&eye, Random::GenerateInt(8, 16), r, 128, 64, 46, ( LI_THININ | LI_SPLINE | LI_THINOUT), 6, 10);  // NOTE: TriggerLightning does not support ``return arc``
+									creature->fireArcs[i] = TriggerLightning((Vector3i*)&origin1, (Vector3i*)&eye, 1, r, g, b, 46, ( LI_THININ | LI_SPLINE | LI_THINOUT), 6, 10);
 									StopSoundEffect(SFX_TR5_GOD_HEAD_CHARGE);
 									SoundEffect(SFX_TR5_GOD_HEAD_BLAST, &item->Pose);
 								}
 
-								auto* currentArc = creature->fireArcs[i];
+								arc = creature->fireArcs[i];
 
 								if (GlobalCounter & 1)
 								{
@@ -469,89 +458,58 @@ namespace TEN::Entities::Creatures::TR5
 									TriggerLightningGlow(origin1.x, origin1.y, origin1.z, (GetRandomControl() & 3) + 32, r, g, b);
 									TriggerDynamicLight(origin1.x, origin1.y, origin1.z, (GetRandomControl() & 3) + 16, r, g, b);
 
-									if (!creature->LOS[i])
+									if (!creature->LOS[i] && creature->fireArcs[i] != nullptr)
 									{
-										TriggerLightningGlow(currentArc->pos4.x, currentArc->pos4.y, currentArc->pos4.z, (GetRandomControl() & 3) + 16, r, g, b);
-										TriggerDynamicLight(currentArc->pos4.x, currentArc->pos4.y, currentArc->pos4.z, (GetRandomControl() & 3) + 6, r, g, b);
-										TriggerLaserHeadSparks((Vector3i*)&currentArc->pos4, 3, r, g, b, 0);
+										TriggerLightningGlow(creature->fireArcs[i]->pos4.x, creature->fireArcs[i]->pos4.y, creature->fireArcs[i]->pos4.z, (GetRandomControl() & 3) + 16, r, g, b);
+										TriggerDynamicLight(creature->fireArcs[i]->pos4.x, creature->fireArcs[i]->pos4.y, creature->fireArcs[i]->pos4.z, (GetRandomControl() & 3) + 6, r, g, b);
+										TriggerLaserHeadSparks((Vector3i*)&creature->fireArcs[i]->pos4, 3, r, g, b, 0);
 									}
 								}
 
 								// Check if Lara was hit by energy arcs
-								if (LaraItem->Effect.Type == EffectType::None)
+								if (LaraItem->Effect.Type == EffectType::None && creature->fireArcs[i] != nullptr)
 								{
-									
-									GetLaraDeadlyBounds();
+										
+									int adx = creature->fireArcs[i]->pos4.x - origin1.x;
+									int ady = creature->fireArcs[i]->pos4.y - origin1.y;
+									int adz = creature->fireArcs[i]->pos4.z - origin1.z;
 
-
-									int xc = LaraItem->Pose.Position.x + ((DeadlyBounds.X1 + DeadlyBounds.X2) / 2) - target.x;
-									int yc = LaraItem->Pose.Position.y + ((DeadlyBounds.Y1 + DeadlyBounds.Y2) / 2) - target.y;
-									int zc = LaraItem->Pose.Position.z + ((DeadlyBounds.Z1 + DeadlyBounds.Z2) / 2) - target.z;
-									
-
-									int distance = sqrt(SQUARE(xc - origin1.x) + SQUARE(yc - origin1.y) + SQUARE(zc - origin1.z));
-									if (distance < MAX_VISIBILITY_DISTANCE)
+									farAway = 0;
+									for (int j = 0; j < 32; j++)
 									{
-										//int dl = 
-											distance += CLICK(2);
-										if (distance < MAX_VISIBILITY_DISTANCE)
+
+										if (farAway)
 										{
-											eye.x = origin1.x + (eye.x - origin1.x) * distance / MAX_VISIBILITY_DISTANCE;
-											eye.y = origin1.y + (eye.y - origin1.y) * distance / MAX_VISIBILITY_DISTANCE;
-											eye.z = origin1.z + (eye.z - origin1.z) * distance / MAX_VISIBILITY_DISTANCE;
+											farAway--;
+											if (!farAway)
+												break;
 										}
 
-										int dx = (eye.x - origin1.x) / 32;
-										int dy = (eye.y - origin1.y) / 32;
-										int dz = (eye.z - origin1.z) / 32;
-										int adx = currentArc->pos4.x - origin1.x;
-										int ady = currentArc->pos4.y - origin1.y;
-										int adz = currentArc->pos4.z - origin1.z;
-										int x = origin1.x;
-										int y = origin1.y;
-										int z = origin1.z;
+										if (adx < 280 && ady < 280 && adz < 280)
+											farAway = 2;
 
+										Vector3i hitPos;
+										MESH_INFO* hitMesh = nullptr;
 
-										int someIndex = 0;
-										for (int j = 0; j < 32; j++)
+										GameVector start = GameVector(creature->fireArcs[i]->pos1.x, creature->fireArcs[i]->pos1.y, creature->fireArcs[i]->pos1.z);
+										start.RoomNumber = item->RoomNumber;
+										GameVector end = GameVector(creature->fireArcs[i]->pos4.x, creature->fireArcs[i]->pos4.y, creature->fireArcs[i]->pos4.z,0);
+
+										if (ObjectOnLOS2(&start, &end, &hitPos, &hitMesh, ID_LARA) == GetLaraInfo(LaraItem)->ItemNumber)
 										{
-											if (someIndex)
+											if (LaraItem->Effect.Type != EffectType::Smoke)
 											{
-												someIndex--;
-												if (!someIndex)
-													break;
+												ItemCustomBurn(LaraItem, Vector3(0.0f, 0.8f, 0.1f), Vector3(0.0f, 0.9f, 0.8f), 1 * FPS);
 											}
+											else
+												ItemSmoke(LaraItem, -1);
 
-											if (abs(adx) < 280 && abs(ady) < 280 && abs(adz) < 280)
-												someIndex = 2;
-
-											if (x > DeadlyBounds.X1 && x < DeadlyBounds.X2 &&
-												y > DeadlyBounds.Y1 && y < DeadlyBounds.Y2 &&
-												z > DeadlyBounds.Z1 && z < DeadlyBounds.Z2)
-											{
-												if (LaraItem->Effect.Type != EffectType::Smoke)
-												{
-													ItemCustomBurn(LaraItem, Vector3(0.0f, 0.8f, 0.1f), Vector3(0.0f, 0.9f, 0.8f), 2 * FPS);
-												}
-												else
-													ItemSmoke(LaraItem, -1);
-
-												DoDamage(LaraItem, INT_MAX);
-												break;
-											}
-
-											x += dx;
-											y += dy;
-											z += dz;
-
-											adx -= dx;
-											ady -= dy;
-											adz -= dz;
+											DoDamage(LaraItem, INT_MAX);
+											break;
 										}
 									}
 								}
-							}
-				
+							}				
 						}
 					}
 					else
@@ -622,9 +580,9 @@ namespace TEN::Entities::Creatures::TR5
 				TriggerExplosionSparks(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, 3, -2, 2, item->RoomNumber);
 				TriggerExplosionSparks(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, 2, 0, 2, item->RoomNumber);
 
-				TriggerShockwave(&item->Pose, 32, 160, 64, 64, 128, 0, 36, 0, 0);
-				TriggerShockwave(&item->Pose, 32, 160, 64, 64, 128, 0, 36, 0x3000, 0);
-				TriggerShockwave(&item->Pose, 32, 160, 64, 64, 128, 0, 36, 0x6000, 0);
+				TriggerShockwave(&item->Pose, 32, 160, 64, 0, 128, 64, 36, 0, 0);
+				TriggerShockwave(&item->Pose, 32, 160, 64, 0, 128, 64, 36, 0x3000, 0);
+				TriggerShockwave(&item->Pose, 32, 160, 64, 0, 128, 64, 36, 0x6000, 0);
 
 				g_Level.Items[creature->PuzzleItem].Pose.Position.y = item->Pose.Position.y;
 				TestTriggers(item, true);
