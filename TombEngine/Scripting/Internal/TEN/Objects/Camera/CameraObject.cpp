@@ -29,6 +29,11 @@ void CameraObject::Register(sol::table & parent)
 		sol::meta_function::index, index_error,
 		sol::meta_function::new_index, newindex_error,
 
+		/// Get the camera's index
+		// @function Camera:GetIndex
+		// @treturn short a copy of the camera index position in the level
+		ScriptReserved_GetIndex, & CameraObject::GetIndex,
+
 		/// Get the camera's position
 		// @function Camera:GetPosition
 		// @treturn Vec3 a copy of the camera's position
@@ -129,19 +134,17 @@ void CameraObject::SetRoomNumber(short room)
 	m_camera.RoomNumber = room;
 }
 
-void CameraObject::PlayCamera(Vec3 const& TargetPos, int TargetRoom)
+short CameraObject::GetIndex() const
 {
-	//Camera.timer
-	Camera.type = CameraType::Fixed;
-	Camera.pos = m_camera.Position;
-	//Camera.speed = m_camera.Speed;
-	//Camera.flags = m_camera.Flags;
+	return m_camera.Index;
+}
 
-	GameVector TargetVector;
-	TargetVector.x = TargetPos.x;
-	TargetVector.y = TargetPos.y;
-	TargetVector.z = TargetPos.z;
-	TargetVector.RoomNumber = TargetRoom;
-	Camera.target = TargetVector;
+void CameraObject::PlayCamera(sol::optional<Moveable&> TargetObj)
+{
+	Camera.number = m_camera.Index;
+	Camera.type = CameraType::Fixed;
+
+	if (TargetObj.has_value()) //Otherwise, it will point to Lara by default.
+		Camera.item = &g_Level.Items[TargetObj.value().GetIndex()];
 }
 

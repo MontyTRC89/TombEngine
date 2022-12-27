@@ -416,6 +416,7 @@ void LoadCameras()
 	for (int i = 0; i < numCameras; i++)
 	{
 		auto& camera = g_Level.Cameras.emplace_back();
+		camera.Index = i;
 		camera.Position.x = ReadInt32();
 		camera.Position.y = ReadInt32();
 		camera.Position.z = ReadInt32();

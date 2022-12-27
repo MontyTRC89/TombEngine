@@ -40,6 +40,8 @@ public:
 	[[nodiscard]] GAME_OBJECT_ID GetObjectID() const;
 	void SetObjectID(GAME_OBJECT_ID id);
 
+	short GetIndex() const;
+
 	[[nodiscard]] std::string GetName() const;
 	bool SetName(std::string const &);
 
