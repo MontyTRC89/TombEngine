@@ -943,8 +943,8 @@ void TriggerWaterfallMist(const ItemInfo& item)
 
 	float finalFade = ((fadeMin >= 1.0f) && (fadeMin == fadeMax)) ? 1.0f : std::max(fadeMin, fadeMax);
 
-	auto startColor = item.Color / 4.0f * finalFade * float(UCHAR_MAX);
-	auto endColor   = item.Color / 8.0f * finalFade * float(UCHAR_MAX);
+	auto startColor = item.Model.Color / 4.0f * finalFade * float(UCHAR_MAX);
+	auto endColor   = item.Model.Color / 8.0f * finalFade * float(UCHAR_MAX);
 
 	float step = size * scale;
 	int steps = int((width / 2) / step);

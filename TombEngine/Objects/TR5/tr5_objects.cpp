@@ -14,26 +14,26 @@
 #include "Specific/setup.h"
 
 // Creatures
-#include "tr5_autoguns.h"	  // OK
-#include "tr5_brownbeast.h"	  // OK
-#include "tr5_chef.h"		  // OK
-#include "tr5_cyborg.h"		  // OK
-#include "tr5_doberman.h"	  // OK
-#include "tr5_dog.h"		  // OK
-#include "tr5_ghost.h"		  // OK
-#include "tr5_gladiator.h"	  // OK
-#include "tr5_guard.h"		  // OK
-#include "tr5_gunship.h"	  // OK
-#include "tr5_hydra.h"		  // OK
-#include "tr5_imp.h"		  // OK
-#include "tr5_lagoon_witch.h" // OK
-#include "tr5_larson.h"		  // OK
-#include "tr5_laser_head.h"	  // OK
-#include "tr5_lion.h"		  // OK
-#include "tr5_reaper.h"		  // OK
-#include "tr5_roman_statue.h" // OK
-#include "tr5_submarine.h"	  // OK
-#include "tr5_willowwisp.h"	  // OK
+#include "Objects/TR5/Entity/AutoGun.h"			 // OK
+#include "Objects/TR5/Entity/tr5_brownbeast.h"	 // OK
+#include "Objects/TR5/Entity/tr5_chef.h"		 // OK
+#include "Objects/TR5/Entity/tr5_cyborg.h"		 // OK
+#include "Objects/TR5/Entity/tr5_doberman.h"	 // OK
+#include "Objects/TR5/Entity/tr5_dog.h"			 // OK
+#include "Objects/TR5/Entity/tr5_ghost.h"		 // OK
+#include "Objects/TR5/Entity/tr5_gladiator.h"	 // OK
+#include "Objects/TR5/Entity/tr5_guard.h"		 // OK
+#include "Objects/TR5/Entity/tr5_gunship.h"		 // OK
+#include "Objects/TR5/Entity/tr5_hydra.h"		 // OK
+#include "Objects/TR5/Entity/tr5_imp.h"			 // OK
+#include "Objects/TR5/Entity/tr5_lagoon_witch.h" // OK
+#include "Objects/TR5/Entity/tr5_larson.h"		 // OK
+#include "Objects/TR5/Entity/tr5_laser_head.h"	 // OK
+#include "Objects/TR5/Entity/tr5_lion.h"		 // OK
+#include "Objects/TR5/Entity/tr5_reaper.h"		 // OK
+#include "Objects/TR5/Entity/tr5_roman_statue.h" // OK
+#include "Objects/TR5/Entity/tr5_submarine.h"	 // OK
+#include "Objects/TR5/Entity/tr5_willowwisp.h"	 // OK
 
 // Emitters
 #include "Objects/TR5/Emitter/tr5_rats_emitter.h"
@@ -743,14 +743,7 @@ static void StartEntity(ObjectInfo *obj)
 
 	obj = &Objects[ID_AUTOGUN];
 	if (obj->loaded)
-	{
-		obj->initialise = InitialiseAutoGuns;
-		obj->control = AutoGunsControl;
-		obj->hitEffect = HIT_RICOCHET;
-		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
-		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_X;
-		g_Level.Bones[obj->boneIndex + 8 * 4] |= ROT_Y;
-	}
+		SetupAutoGun(*obj);
 
 	obj = &Objects[ID_GUNSHIP];
 	if (obj->loaded)

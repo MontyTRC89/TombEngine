@@ -81,9 +81,12 @@ struct EntityAnimationData
 
 struct EntityModelData
 {
-	int BaseMesh;
-	std::vector<int> MeshIndex = {};
-	std::vector<BoneMutator> Mutator = {};
+	int BaseMesh = 0;
+
+	Vector4 Color = Vector4::Zero;
+
+	std::vector<int>		 MeshIndex = {};
+	std::vector<BoneMutator> Mutator   = {};
 };
 
 struct EntityCallbackData
@@ -136,7 +139,6 @@ struct ItemInfo
 
 	int BoxNumber;
 	int Timer;
-	Vector4 Color;
 
 	BitField TouchBits	  = BitField();
 	BitField MeshBits	  = BitField();

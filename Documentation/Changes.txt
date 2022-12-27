@@ -1,3 +1,28 @@
+Version 1.0.5 
+=============
+
+* Fix combined items not existing in inventory upon game reload.
+* Fix classic rollingball not behaving properly in rooms beyond the distance of 32 blocks.
+* Fix rollingball not killing Lara under certain movement angles.
+* Fix savegame crashes when rooms with static meshes are flipped.
+* Fix discrepancies between statistics and save / load game time units.
+* Fix draw key incorrectly working in binoculars / lasersight mode.
+* Fix pathfinding problems for first initialized enemy of every slot.
+* Fix Flame Emitter 3 not burning player.
+* Fix TR3 Tribeman with axe not attacking Lara.
+* Fix TR3 Tribeman with dart not shooting at Lara's direction.
+* Fix crash, water death and meshswap issues for TR5 cyborg.
+* Fix Lara's animation for cog switch release
+* Added new OCB to cog switch object: 
+	- Use OCB 0 to have the traditional behaviour.
+	- Use any other OCB to can use the Cog Switch without need of any door linked.
+* Allow to freely rotate dart emitter in all directions.
+* Customize dart emitter damage with OCB. Negative number will additionally poison Lara.
+* Draw real mesh for darts.
+
+Lua API changes:
+* Add new Room class and several methods for it.
+
 Version 1.0.4
 =============
 
@@ -5,6 +30,7 @@ Version 1.0.4
 * Add ability to burn enemies with FLAME_EMITTER_1 and death blocks.
 * Add wireframe mode and other visual debug information (switch by F10/F11 debug page scroll hotkeys).
 * Activate Lara-bound volume triggers with mounted vehicles.
+* Allow multiple individual activators for the same volume at the same time.
 * Remove TRC remnant which added HK to inventory if pistols weren't available.
 * Change default shatter sound to TR4_SMASH_ROCK (tomb4 default).
 * Reduce idle pose time from 30 to 20 seconds.
@@ -18,7 +44,11 @@ Version 1.0.4
     - Restored spark effects.
     - Can destroy statics in shatter slots.
 	- Fix crash when attacking.
-	
+* SAS enhancements:
+    - Fix grenade shooting.
+    - Fix AI_MODIFY and AI_GUARD behaviour.
+* Fix choppy camera movement in several cases.
+* Fix Lara's vertical position when shimmying around steep slope corners.
 * Fix legacy pickup triggers not working in certain cases.
 * Fix crawl pickup not actually doing any pickups.
 * Fix demigod and harpy shooting in incorrect directions.
@@ -32,6 +62,7 @@ Version 1.0.4
 * Fix original bug with incorrect climb up behaviour on ladders under sloped ceilings.
 * Fix original bug with reassigned control keys still triggering default events.
 * Fix TR1 centaur bubble targeting.
+* Fix TR5 autogun rotation.
 * Fix occasional wrong rollingball collision in narrow pits.
 * Fix classic rollingball and big rollingball not behaving properly.
 * Fix caustics not turning off in display settings.
@@ -45,6 +76,7 @@ Version 1.0.4
 * Fix crash if there is an attempt to display a string with missing characters.
 
 Lua API changes:
+* Add new Volume class and several methods for it.
 * Add new Moveable functions: GetEffect, SetEffect and SetCustomEffect (for colored fire).
 * Add new Lara functions: GetTarget, GetVehicle and TorchIsLit.
 * Remove Lara functions: SetOnFire and GetOnFire (replaced with GetEffect and SetEffect).
@@ -58,6 +90,8 @@ Lua API changes:
 * Fix action key script functions not fully working in some cases.
 * Fix mounted vehicles ignoring Disable, Shatter and Explode script commands.
 * Fix SetPosition command not updating room number correctly.
+* Fix Rotation class using integers under the hood which prevented using fractional rotation values.
+* Fix distance tests failing on a very high distances.
 
 Version 1.0.3
 =============

@@ -35,5 +35,4 @@ float phd_sin(short x);
 float phd_cos(short x);
 int	  phd_atan(int y, int x);
 
-void InterpolateAngle(short angle, short& rotation, short& outAngle, int shift);
 void GetMatrixFromTrAngle(Matrix& matrix, short* framePtr, int index);

@@ -77,12 +77,12 @@ bool ItemInfo::TestMeshSwapFlags(const std::vector<unsigned int>& flags)
 
 void ItemInfo::SetMeshSwapFlags(unsigned int flags, bool clear)
 {
-	bool meshSwapPresent = Objects[ObjectNumber].meshSwapSlot != -1 && 
-						   Objects[Objects[ObjectNumber].meshSwapSlot].loaded;
+	bool isMeshSwapPresent = Objects[ObjectNumber].meshSwapSlot != -1 && 
+							 Objects[Objects[ObjectNumber].meshSwapSlot].loaded;
 
 	for (size_t i = 0; i < Model.MeshIndex.size(); i++)
 	{
-		if (meshSwapPresent && (flags & (1 << i)))
+		if (isMeshSwapPresent && (flags & (1 << i)))
 		{
 			if (clear)
 				Model.MeshIndex[i] = Model.BaseMesh + i;
@@ -90,7 +90,9 @@ void ItemInfo::SetMeshSwapFlags(unsigned int flags, bool clear)
 				Model.MeshIndex[i] = Objects[Objects[ObjectNumber].meshSwapSlot].meshIndex + i;
 		}
 		else
+		{
 			Model.MeshIndex[i] = Model.BaseMesh + i;
+		}
 	}
 }
 
@@ -592,7 +594,7 @@ short SpawnItem(ItemInfo* item, GAME_OBJECT_ID objectNumber)
 		InitialiseItem(itemNumber);
 
 		spawn->Status = ITEM_NOT_ACTIVE;
-		spawn->Color = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
+		spawn->Model.Color = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
 	}
 
 	return itemNumber;

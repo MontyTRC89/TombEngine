@@ -1292,8 +1292,7 @@ void GetAITarget(CreatureInfo* creature)
 			abs(enemy->Pose.Position.y - item->Pose.Position.y) < REACHED_GOAL_RADIUS &&
 			abs(enemy->Pose.Position.z - item->Pose.Position.z) < REACHED_GOAL_RADIUS)
 		{
-			TestTriggers(enemy, true);
-
+			TestTriggers(enemy, true);		
 			creature->ReachedGoal = true;
 			creature->Enemy = LaraItem;
 			item->AIBits &= ~(AMBUSH /* | MODIFY*/);
@@ -2066,7 +2065,7 @@ void InitialiseItemBoxData()
 		auto* currentItem = &g_Level.Items[i];
 
 		if (currentItem->Active && currentItem->Data.is<PushableInfo>())
-			ClearMovableBlockSplitters(currentItem->Pose.Position.x, currentItem->Pose.Position.y, currentItem->Pose.Position.z, currentItem->RoomNumber);
+			ClearMovableBlockSplitters(currentItem->Pose.Position, currentItem->RoomNumber);
 	}
 
 	for (auto& room : g_Level.Rooms)

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ScriptUtil.h"
+#include "Objects/Room/RoomObject.h"
 #include "Objects/NamedBase.h"
 
 class LevelFunc;
@@ -67,7 +68,7 @@ public:
 	void SetVelocity(Vec3 velocity);
 
 	[[nodiscard]] ScriptColor GetColor() const;
-	void SetColor(ScriptColor const& col);
+	void SetColor(const ScriptColor& color);
 
 	[[nodiscard]] short GetHP() const;
 	void SetHP(short hp);
@@ -101,8 +102,9 @@ public:
 	[[nodiscard]] bool GetActive() const;
 	void SetActive(bool active);
 
-	[[nodiscard]] short GetRoom() const;
-	void SetRoom(short room);
+	std::unique_ptr<Room> GetRoom() const;
+	[[nodiscard]] int GetRoomNumber() const;
+	void SetRoomNumber(short room);
 
 	void AttachObjCamera(short camMeshId, Moveable& mov, short targetMeshId);
 	void AnimFromObject(GAME_OBJECT_ID object, int animNumber, int stateID);

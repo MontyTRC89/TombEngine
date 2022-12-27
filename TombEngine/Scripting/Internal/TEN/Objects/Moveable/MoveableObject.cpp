@@ -114,7 +114,7 @@ static std::unique_ptr<Moveable> Create(
 		if (std::holds_alternative<short>(room))
 		{
 			ptr->SetPos(pos, false);
-			ptr->SetRoom(std::get<short>(room));
+			ptr->SetRoomNumber(std::get<short>(room));
 		}
 		else
 			ptr->SetPos(pos, true);
@@ -412,12 +412,15 @@ ScriptReserved_GetSlotHP, & Moveable::GetSlotHP,
 
 	ScriptReserved_GetRoom, &Moveable::GetRoom,
 
-	ScriptReserved_SetRoom, &Moveable::SetRoom,
+	ScriptReserved_GetRoomNumber, &Moveable::GetRoomNumber,
+
+	ScriptReserved_SetRoomNumber, &Moveable::SetRoomNumber,
 
 	ScriptReserved_GetPosition, & Moveable::GetPos,
 
 /// Get the object's joint position
 // @function Moveable:GetJointPosition
+// @tparam int index of a joint to get position
 // @treturn Vec3 a copy of the moveable's position
 	ScriptReserved_GetJointPosition, & Moveable::GetJointPos,
 
@@ -450,7 +453,7 @@ ScriptReserved_GetSlotHP, & Moveable::GetSlotHP,
 
 /// Test if the object is in a valid state (i.e. has not been destroyed through Lua or killed by Lara).
 // @function Moveable:GetValid
-// @treturn valid bool true if the object is still not destroyed
+// @treturn bool valid true if the object is still not destroyed
 	ScriptReserved_GetValid, &Moveable::GetValid,
 
 /// Destroy the moveable. This will mean it can no longer be used, except to re-initialise it with another object.
@@ -459,7 +462,9 @@ ScriptReserved_GetSlotHP, & Moveable::GetSlotHP,
 
 /// Attach camera to an object.
 // @function Moveable:AttachObjCamera
-// @tparam int mesh 1 for camera, mesh 2 for target
+// @tparam int mesh of a moveable to use as a camera position
+// @tparam Moveable target moveable to attach camera to
+// @tparam int mesh of a target moveable to use as a camera target
 	ScriptReserved_AttachObjCamera, &Moveable::AttachObjCamera,
 
 /// Borrow animation from an object
@@ -469,7 +474,6 @@ ScriptReserved_GetSlotHP, & Moveable::GetSlotHP,
 // @tparam int stateID state from object
 	ScriptReserved_AnimFromObject, &Moveable::AnimFromObject);
 }
-
 
 void Moveable::Init()
 {
@@ -609,7 +613,7 @@ void Moveable::SetPos(Vec3 const& pos, sol::optional<bool> updateRoom)
 		{
 			int potentialNewRoom = FindRoomNumber(m_item->Pose.Position, m_item->RoomNumber);
 			if (potentialNewRoom != m_item->RoomNumber)
-				SetRoom(potentialNewRoom);
+				SetRoomNumber(potentialNewRoom);
 		}
 	}
 }
@@ -626,10 +630,11 @@ Vec3 Moveable::GetJointPos(int jointIndex) const
 // (e.g. 90 degrees = -270 degrees = 450 degrees)
 Rotation Moveable::GetRot() const
 {
-	return {
-		static_cast<int>(TO_DEGREES(m_item->Pose.Orientation.x)) % 360,
-		static_cast<int>(TO_DEGREES(m_item->Pose.Orientation.y)) % 360,
-		static_cast<int>(TO_DEGREES(m_item->Pose.Orientation.z)) % 360
+	return 
+	{
+		TO_DEGREES(m_item->Pose.Orientation.x),
+		TO_DEGREES(m_item->Pose.Orientation.y),
+		TO_DEGREES(m_item->Pose.Orientation.z)
 	};
 }
 
@@ -743,12 +748,12 @@ void Moveable::SetItemFlags(short value, int index)
 
 ScriptColor Moveable::GetColor() const
 {
-	return ScriptColor{ m_item->Color };
+	return ScriptColor{ m_item->Model.Color };
 }
 
-void Moveable::SetColor(ScriptColor const& col)
+void Moveable::SetColor(const ScriptColor& color)
 {
-	m_item->Color = col;
+	m_item->Model.Color = color;
 }
 
 aiBitsType Moveable::GetAIBits() const
@@ -848,21 +853,29 @@ bool Moveable::GetHitStatus() const
 
 /// Get the current room of the object
 // @function Moveable:GetRoom
+// @treturn Room current room of the object
+std::unique_ptr<Room> Moveable::GetRoom() const
+{
+	return std::make_unique<Room>(g_Level.Rooms[m_item->RoomNumber]);
+}
+
+/// Get the current room number of the object
+// @function Moveable:GetRoomNumber
 // @treturn int number representing the current room of the object
-short Moveable::GetRoom() const
+int Moveable::GetRoomNumber() const
 {
 	return m_item->RoomNumber;
 }
 
-/// Set room of object 
+/// Set room number of object 
 // Use this if you are not using SetPosition's automatic room update - for example, when dealing with overlapping rooms.
-// @function Moveable:SetRoom
+// @function Moveable:SetRoomNumber
 // @tparam int ID the ID of the new room 
 // @usage 
 // local sas = TEN.Objects.GetMoveableByName("sas_enemy")
-// sas:SetRoom(destinationRoom)
+// sas:SetRoomNumber(destinationRoom)
 // sas:SetPosition(destinationPosition, false)
-void Moveable::SetRoom(short room)
+void Moveable::SetRoomNumber(short room)
 {	
 	const size_t nRooms = g_Level.Rooms.size();
 	if (room < 0 || static_cast<size_t>(room) >= nRooms)

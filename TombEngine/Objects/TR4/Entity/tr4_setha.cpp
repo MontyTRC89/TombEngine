@@ -3,6 +3,7 @@
 
 #include "Game/animation.h"
 #include "Game/camera.h"
+#include "Game/collision/collide_item.h"
 #include "Game/collision/collide_room.h"
 #include "Game/control/control.h"
 #include "Game/effects/effects.h"
@@ -40,16 +41,16 @@ namespace TEN::Entities::TR4
 	constexpr auto SETH_DUAL_PROJECTILE_ATTACK_CHANCE = 1 / 2.0f;
 	constexpr auto SETH_JUMP_PROJECTILE_ATTACK_CHANCE = 1 / 2.0f;
 
-	const auto SETH_WALK_TURN_RATE_MAX = ANGLE(7.0f);
-	const auto SETH_RUN_TURN_RATE_MAX  = ANGLE(11.0f);
-
-	const auto SethPounceAttackJoints1 = std::vector<unsigned int>{ 13, 14, 15 };
-	const auto SethPounceAttackJoints2 = std::vector<unsigned int>{ 16, 17, 18 };
+	constexpr auto SETH_WALK_TURN_RATE_MAX = ANGLE(7.0f);
+	constexpr auto SETH_RUN_TURN_RATE_MAX  = ANGLE(11.0f);
 
 	const auto SethBite1   = BiteInfo(Vector3(0.0f, 220.0f, 50.0f), 17);
 	const auto SethBite2   = BiteInfo(Vector3(0.0f, 220.0f, 50.0f), 13);
 	const auto SethAttack1 = BiteInfo(Vector3(-16.0f, 200.0f, 32.0f), 13);
 	const auto SethAttack2 = BiteInfo(Vector3(16.0f, 200.0f, 32.0f), 17);
+
+	const auto SethPounceAttackJoints1 = std::vector<unsigned int>{ 13, 14, 15 };
+	const auto SethPounceAttackJoints2 = std::vector<unsigned int>{ 16, 17, 18 };
 
 	constexpr auto LARA_STATE_SETH_DEATH = 13;
 	constexpr auto LARA_ANIM_SETH_DEATH	 = 14;
@@ -107,6 +108,21 @@ namespace TEN::Entities::TR4
 		SETH_ANIM_HOVER_IDLE_TO_LAND = 27,
 		SETH_ANIM_HOVER_IDLE = 28
 	};
+
+	void SetupSeth(ObjectInfo& object)
+	{
+		object.initialise = InitialiseSeth;
+		object.control = SethControl;
+		object.collision = CreatureCollision;
+		object.shadowType = ShadowMode::All;
+		object.HitPoints = 500;
+		object.hitEffect = HIT_NONE;
+		object.pivotLength = 50;
+		object.radius = 341;
+		object.intelligent = true;
+		object.undead = true;
+		object.ZoneType = ZoneType::Basic;
+	}
 
 	void InitialiseSeth(short itemNumber)
 	{

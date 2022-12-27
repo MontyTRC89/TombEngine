@@ -25,11 +25,12 @@ using namespace TEN::Effects::Items;
 using namespace TEN::Effects::Lightning;
 using namespace TEN::Effects::Environment;
 
-constexpr int FLAME_RADIUS = 128;
-constexpr int FLAME_ITEM_BURN_TIMEOUT = 3 * FPS;
-
 namespace TEN::Entities::Effects
 {
+	constexpr int FLAME_RADIUS = CLICK(0.5f);
+	constexpr int FLAME_BIG_RADIUS = CLICK(2.33f);
+	constexpr int FLAME_ITEM_BURN_TIMEOUT = 3 * FPS;
+
 	byte Flame3xzoffs[16][2] =
 	{
 		{ 9, 9 },
@@ -61,9 +62,9 @@ namespace TEN::Entities::Effects
 
 	bool FlameEmitterFlags[8];
 
-	void BurnNearbyItems(ItemInfo* item)
+	void BurnNearbyItems(ItemInfo* item, int radius)
 	{
-		GetCollidedObjects(item, FLAME_RADIUS, true, &CollidedItems[0], &CollidedMeshes[0], false);
+		GetCollidedObjects(item, radius, true, &CollidedItems[0], &CollidedMeshes[0], false);
 
 		for (int i = 0; i < MAX_COLLIDED_OBJECTS; i++)
 		{
@@ -181,7 +182,7 @@ namespace TEN::Entities::Effects
 				SoundEffect(SFX_TR4_LOOP_FOR_SMALL_FIRES, &item->Pose);
 
 				if ((Wibble & 0x04) && Random::TestProbability(1 / 2.0f))
-					BurnNearbyItems(item);
+					BurnNearbyItems(item, FLAME_RADIUS);
 			}
 		}
 		else
@@ -482,22 +483,29 @@ namespace TEN::Entities::Effects
 				}
 
 				SoundEffect(SFX_TR4_LOOP_FOR_SMALL_FIRES, &item->Pose);
-
 				TriggerDynamicLight(x, item->Pose.Position.y, z, 12, (GetRandomControl() & 0x3F) + 192, ((GetRandomControl() >> 4) & 0x1F) + 96, 0);
 
 				auto pos = item->Pose.Position;
-				if (ItemNearLara(pos, FLAME_RADIUS))
+				if (ItemNearLara(pos, FLAME_BIG_RADIUS))
 				{
-					if (LaraItem->Effect.Type != EffectType::None && Lara.Control.WaterStatus != WaterStatus::FlyCheat)
+					// Burn Lara only in case she is very close to the fire.
+					if (LaraItem->Effect.Type != EffectType::Fire && 
+						Lara.Control.WaterStatus != WaterStatus::FlyCheat)
 					{
 						DoDamage(LaraItem, 5);
 
 						int dx = LaraItem->Pose.Position.x - item->Pose.Position.x;
 						int dz = LaraItem->Pose.Position.z - item->Pose.Position.z;
 
-						if (SQUARE(dx) + SQUARE(dz) < SQUARE(450))
+						if (SQUARE(dx) + SQUARE(dz) < SQUARE(FLAME_BIG_RADIUS - FLAME_RADIUS))
 							ItemBurn(LaraItem);
 					}
+				}
+				else
+				{
+					// Burn other items as usual.
+					if ((Wibble & 0x04) && Random::TestProbability(1 / 8.0f))
+						BurnNearbyItems(item, FLAME_RADIUS);
 				}
 			}
 		}
