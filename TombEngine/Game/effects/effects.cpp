@@ -1670,10 +1670,6 @@ void ProcessEffects(ItemInfo* item)
 
 	switch (item->Effect.Type)
 	{
-	case EffectType::Smoke:
-		SoundEffect(SOUND_EFFECTS::SFX_TR5_HISS_LOOP_SMALL, &item->Pose);
-		break;
-
 	case EffectType::ElectricIgnite:
 	case EffectType::Sparks:
 		SoundEffect(SOUND_EFFECTS::SFX_TR4_LARA_ELECTRIC_CRACKLES, &item->Pose);
