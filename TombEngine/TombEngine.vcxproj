@@ -167,6 +167,7 @@ CALL gen.bat</Command>
     <ClInclude Include="Game\GuiObjects.h" />
     <ClInclude Include="Objects\TR1\Trap\DamoclesSword.h" />
     <ClInclude Include="Objects\TR3\Entity\tr3_lizard.h" />
+    <ClInclude Include="Objects\TR3\Entity\tr3_punaboss.h" />
     <ClInclude Include="Scripting\Internal\TEN\Effects\EffectIDs.h" />
     <ClInclude Include="Scripting\Internal\TEN\Misc\ActionIDs.h" />
     <ClInclude Include="Scripting\Internal\TEN\Objects\Lara\LaraObject.h" />
@@ -634,6 +635,7 @@ CALL gen.bat</Command>
     <ClCompile Include="Game\GuiObjects.cpp" />
     <ClCompile Include="Objects\TR1\Trap\DamoclesSword.cpp" />
     <ClCompile Include="Objects\TR3\Entity\tr3_lizard.cpp" />
+    <ClCompile Include="Objects\TR3\Entity\tr3_punaboss.cpp" />
     <ClCompile Include="Scripting\Internal\TEN\Objects\Lara\LaraObject.cpp" />
     <ClCompile Include="Scripting\Internal\TEN\Objects\Volume\VolumeObject.cpp" />
     <ClCompile Include="Specific\Input\InputAction.cpp" />

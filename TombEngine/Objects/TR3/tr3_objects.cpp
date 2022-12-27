@@ -24,6 +24,7 @@
 #include "Objects/TR3/Entity/tr3_trex.h" // OK
 #include "Objects/TR3/Entity/tr3_tribesman.h" // OK
 #include "Objects/TR3/Entity/tr3_lizard.h" // OK
+#include "Objects/TR3/Entity/tr3_punaboss.h" // IN_DEV
 
 // Traps
 #include "Objects/TR3/Trap/train.h"
@@ -324,6 +325,23 @@ static void StartEntity(ObjectInfo* obj)
 		obj->radius = 204;
 		obj->ZoneType = ZoneType::HumanClassic;
 		obj->SetBoneRotation(9, ROT_X|ROT_Z);
+	}
+
+	obj = &Objects[ID_PUNA_BOSS];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialisePuna;
+		obj->control = PunaControl;
+		obj->collision = CreatureCollision;
+		obj->HitPoints = 200;
+		obj->intelligent = true;
+		obj->shadowType = ShadowMode::All;
+		obj->nonLot = true;
+		obj->hitEffect = HIT_BLOOD;
+		obj->radius = 102;
+		obj->pivotLength = 50;
+		obj->SetBoneRotation(4, ROT_Y);
+		obj->SetBoneRotation(7, ROT_X | ROT_Y);
 	}
 }
 
