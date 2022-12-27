@@ -640,7 +640,7 @@ namespace TEN::Entities
 			obj->pivotLength = 500;
 			obj->radius = 512;
 			obj->intelligent = true;
-			obj->undead = true; // NOTE: avoid the enemy jeep from being killed with snowmobile gun or something like that...
+			obj->undead = true; // NOTE: Prevents enemy jeep from being killed with skidoo gun or something like that.
 			obj->ZoneType = ZoneType::HumanJumpAndMonkey;
 			obj->SetBoneRotationFlags(8, ROT_X);
 			obj->SetBoneRotationFlags(9, ROT_X);

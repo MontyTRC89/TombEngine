@@ -2,8 +2,8 @@
 #include "Game/animation.h"
 #include "Game/control/volumeactivator.h"
 #include "Game/items.h"
-#include "Game/room.h"
 #include "Game/itemdata/creature_info.h"
+#include "Game/room.h"
 #include "Sound/sound.h"
 #include "Specific/IO/ChunkId.h"
 #include "Specific/IO/ChunkReader.h"
@@ -11,9 +11,6 @@
 #include "Specific/IO/Streams.h"
 #include "Specific/LevelCameraInfo.h"
 #include "Specific/newtypes.h"
-
-#define AddPtr(p, t, n) p = (t*)((char*)(p) + (ptrdiff_t)(n));
-#define MESHES(slot, mesh) (Objects[slot].meshIndex + mesh)
 
 using namespace TEN::Control::Volumes;
 
@@ -23,6 +20,9 @@ struct SampleInfo;
 struct SinkInfo;
 struct BOX_INFO;
 struct OVERLAP;
+
+#define AddPtr(p, t, n) p = (t*)((char*)(p) + (ptrdiff_t)(n));
+#define MESHES(slot, mesh) (Objects[slot].meshIndex + mesh)
 
 struct TEXTURE
 {

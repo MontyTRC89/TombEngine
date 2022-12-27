@@ -23,7 +23,7 @@ void InitialiseLOTarray(int itemNumber)
 
 	if (!creature->LOT.Initialised)
 	{
-		creature->LOT.Node = std::vector<BOX_NODE>(g_Level.Boxes.size(), BOX_NODE{});
+		creature->LOT.Node = std::vector<BoxNode>(g_Level.Boxes.size(), BoxNode{});
 		creature->LOT.Initialised = true;
 	}
 }
