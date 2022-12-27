@@ -12,7 +12,8 @@ Version 1.0.5
 * Fix TR3 Tribeman with axe not attacking Lara.
 * Fix TR3 Tribeman with dart not shooting at Lara's direction.
 * Fix crash, water death and meshswap issues for TR5 cyborg.
-* Fix Lara's animation for cog switch release
+* Fix Lara's animation for cog switch release.
+* Fix incorrect picking up from plinths concealed by raising blocks.
 * Added new OCB to cog switch object: 
 	- Use OCB 0 to have the traditional behaviour.
 	- Use any other OCB to can use the Cog Switch without need of any door linked.
