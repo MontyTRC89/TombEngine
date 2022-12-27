@@ -114,7 +114,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->radius = 102;
 		obj->intelligent = true;
 		obj->explodableMeshbits = 0x4000;
-		obj->ZoneType = ZoneType::Human;
+		obj->ZoneType = ZoneType::HumanJump;
 		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
 		obj->SetBoneRotationFlags(13, ROT_X | ROT_Y);
 		obj->SetupHitEffect();
@@ -137,7 +137,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->pivotLength = 50;
 		obj->explodableMeshbits = 0x4000;
 		obj->intelligent = true;
-		obj->ZoneType = ZoneType::Human;
+		obj->ZoneType = ZoneType::HumanJump;
 		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
 		obj->SetBoneRotationFlags(13, ROT_X | ROT_Y);
 		obj->SetupHitEffect();
@@ -160,7 +160,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->pivotLength = 50;
 		obj->radius = 102;
 		obj->intelligent = true;
-		obj->ZoneType = ZoneType::Human;
+		obj->ZoneType = ZoneType::HumanJump;
 		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
 		obj->SetBoneRotationFlags(13, ROT_X | ROT_Y);
 		obj->SetupHitEffect();
@@ -184,7 +184,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->radius = 102;
 		obj->explodableMeshbits = 0x4000;
 		obj->intelligent = true;
-		obj->ZoneType = ZoneType::Human;
+		obj->ZoneType = ZoneType::HumanJump;
 		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
 		obj->SetBoneRotationFlags(13, ROT_X | ROT_Y);
 		obj->SetupHitEffect();
@@ -206,7 +206,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->pivotLength = 50;
 		obj->radius = 102;
 		obj->intelligent = true;
-		obj->ZoneType = ZoneType::Human;
+		obj->ZoneType = ZoneType::HumanJump;
 		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
 		obj->SetBoneRotationFlags(13, ROT_X | ROT_Y);
 		obj->SetupHitEffect();

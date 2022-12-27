@@ -7,16 +7,18 @@ enum class ZoneType
 {
 	// BASIC ZONES (used by LOT.zone and loaded from g_Level.Zones[ZoneType])
 
-	// Can jump
+	// Enable jump (also 1 block vault/fall)
 	Skeleton,
+	// Enable 1 click vault/fall (default)
 	Basic,
-
 	// Only underwater (exception: crocodile can go on land)
+	// TODO: underwater creature can go on land like the crocodile which is wrong since the flag IsAmphibious was not set for them !
 	Water,
-
-	// Enable jump and monkey
+	// Enable 1 block vault/fall
 	Human,
+	// Enable jump/long jump and monkey (also 1 block vault/fall)
 	VonCroy,
+	// Can fly anywhere except in water room
 	Flyer,
 	MaxZone,
 

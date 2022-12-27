@@ -2108,11 +2108,11 @@ bool CanCreatureJump(ItemInfo& item, JumpDistance jumpDistType)
 	{
 	default:
 	case JumpDistance::Block1:
-		stepDist = BLOCK(0.5f);
+		stepDist = BLOCK(0.51f);
 		break;
 
 	case JumpDistance::Block2:
-		stepDist = BLOCK(0.75f);
+		stepDist = BLOCK(0.76f);
 		break;
 	}
 
