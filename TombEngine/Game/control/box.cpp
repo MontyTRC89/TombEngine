@@ -180,17 +180,17 @@ short AIGuard(CreatureInfo* creature)
 	if (item.AIBits & (MODIFY|PATROL1|PATROL2|AMBUSH|FOLLOW))
 		return 0;
 
-	if (Random::TestProbability(1.0f / 256.0f))
+	if (Random::TestProbability(1.0f / 128.0f))
 	{
 		creature->HeadRight = true;
 		creature->HeadLeft = true;
 	}
-	else if (Random::TestProbability(1.0f / 384.0f))
+	else if (Random::TestProbability(1.0f / 96.0f))
 	{
 		creature->HeadRight = false;
 		creature->HeadLeft = true;
 	}
-	else if (Random::TestProbability(1.0f / 512.0f))
+	else if (Random::TestProbability(1.0f / 64.0f))
 	{
 		creature->HeadRight = true;
 		creature->HeadLeft = false;
