@@ -30,7 +30,9 @@ namespace TEN::Entities::Creatures::TR3
         InitialiseCreature(itemNumber);
         SetAnimation(item, PUNA_IDLE);
         item->ItemFlags[0] = Objects[ID_LIZARD].loaded; // does the lizard are loaded ? if not then it will just fire at lara !
-        item->ItemFlags[1] = item->Pose.Orientation.y + ANGLE(180); // same the angle of puna, it will be used to restore this angle when he is waiting (after summoning the lizard).
+        // save the angle of puna, it will be used to restore this angle when he is waiting (after summoning the lizard).
+        // puna is rotated to not face lara, so add 180° to face her.
+        item->ItemFlags[1] = item->Pose.Orientation.y + ANGLE(180);
     }
 
     void PunaControl(short itemNumber)
