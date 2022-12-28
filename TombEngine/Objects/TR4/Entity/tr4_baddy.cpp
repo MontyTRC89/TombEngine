@@ -404,11 +404,11 @@ namespace TEN::Entities::TR4
 			{
 				currentItem = &g_Level.Items[itemNum];
 				if ((currentItem->ObjectNumber == ID_SMALLMEDI_ITEM ||
-					currentItem->ObjectNumber == ID_BIGMEDI_ITEM ||
-					currentItem->ObjectNumber == ID_UZI_AMMO_ITEM) &&
+					 currentItem->ObjectNumber == ID_BIGMEDI_ITEM ||
+					 currentItem->ObjectNumber == ID_UZI_AMMO_ITEM) &&
 					SameZone(creature, currentItem))
 				{
-					if (item->Status != ITEM_INVISIBLE)
+					if (currentItem->Status != ITEM_INVISIBLE)
 					{
 						creature->Enemy = currentItem;
 						break;
