@@ -1257,19 +1257,28 @@ struct LaraControlData
 	bool CanMonkeySwing = false;
 };
 
+struct LimbRotationData
+{
+	EulerAngles Base   = EulerAngles::Zero;
+	EulerAngles Middle = EulerAngles::Zero;
+	EulerAngles End	   = EulerAngles::Zero;
+};
+
+struct JointRotationData
+{
+	EulerAngles Head  = EulerAngles::Zero;
+	EulerAngles Torso = EulerAngles::Zero;
+
+	LimbRotationData LeftArm  = {};
+	LimbRotationData RightArm = {};
+	LimbRotationData LeftLeg  = {};
+	LimbRotationData RightLeg = {};
+};
+
 struct LaraInfo
 {
-	//--- Very rough IK stuff.
-
-	int yPosOffset;
-	short lThighXrot;
-	short lShinXrot;
-	short rThighXrot;
-	short rShinXrot;
-	short lFootXrot;
-	short rFootXrot;
-
-	//---
+	int VerticalOffset = 0;
+	JointRotationData ExtraJointRot = {};
 
 	short ItemNumber;
 	LaraControlData Control;

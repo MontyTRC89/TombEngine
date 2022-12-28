@@ -756,14 +756,17 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 
 void ResetLegIK(ItemInfo* item, CollisionInfo* coll)
 {
-	int div = 3;
-	Lara.yPosOffset -= Lara.yPosOffset / div;
-	Lara.lThighXrot -= Lara.lThighXrot / div;
-	Lara.lShinXrot -= Lara.lShinXrot / div;
-	Lara.lFootXrot -= Lara.lFootXrot / div;
-	Lara.rThighXrot -= Lara.rThighXrot / div;
-	Lara.rShinXrot -= Lara.rShinXrot / div;
-	Lara.rFootXrot -= Lara.rFootXrot / div;
+	static constexpr auto alpha = 0.3f;
+
+	/*Lara.VerticalOffset -= Lara.VerticalOffset / alpha;
+
+	Lara.ExtraJointRot.LeftLeg.Base -= Lara.ExtraJointRot.LeftLeg.Base / alpha;
+	Lara.ExtraJointRot.LeftLeg.Middle -= Lara.ExtraJointRot.LeftLeg.Middle / alpha;
+	Lara.ExtraJointRot.LeftLeg.End -= Lara.ExtraJointRot.LeftLeg.End / alpha;
+
+	Lara.ExtraJointRot.RightLeg.Base -= Lara.ExtraJointRot.RightLeg.Base / alpha;
+	Lara.ExtraJointRot.RightLeg.Middle -= Lara.ExtraJointRot.RightLeg.Middle / alpha;
+	Lara.ExtraJointRot.RightLeg.End -= Lara.ExtraJointRot.RightLeg.End / alpha;*/
 }
 
 void LaraAboveWater(ItemInfo* item, CollisionInfo* coll)
