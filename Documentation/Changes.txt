@@ -8,6 +8,7 @@ Version 1.0.5
 * Fix discrepancies between statistics and save / load game time units.
 * Fix draw key incorrectly working in binoculars / lasersight mode.
 * Fix incorrect picking up from plinths concealed by raising blocks.
+* Fix reversed grenade rotation.
 * Fix flame emitter 3 not burning player.
 * Fix TR2 yeti, TR3 civvy and MP with stick vault bugs.
 * Fix TR2 worker with flamethrower and TR3 flamethrower baddy attack ranges and aiming issues.
