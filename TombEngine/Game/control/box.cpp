@@ -686,7 +686,7 @@ void CreatureFloat(short itemNumber)
 	}
 }
 
-void CreatureJoint(ItemInfo* item, short joint, short required) 
+void CreatureJoint(ItemInfo* item, short joint, short required, short maxAngle)
 {
 	if (!item->Data)
 		return;
@@ -701,10 +701,10 @@ void CreatureJoint(ItemInfo* item, short joint, short required)
 
 	creature->JointRotation[joint] += change;
 
-	if (creature->JointRotation[joint] > ANGLE(70.0f))
-		creature->JointRotation[joint] = ANGLE(70.0f);
-	else if (creature->JointRotation[joint] < -ANGLE(70.0f))
-		creature->JointRotation[joint] = -ANGLE(70.0f);
+	if (creature->JointRotation[joint] > maxAngle)
+		creature->JointRotation[joint] = maxAngle;
+	else if (creature->JointRotation[joint] < -maxAngle)
+		creature->JointRotation[joint] = -maxAngle;
 }
 
 void CreatureTilt(ItemInfo* item, short angle) 

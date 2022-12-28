@@ -1,6 +1,6 @@
 #include "framework.h"
 #include "Objects/TR3/tr3_objects.h"
-
+#include "Objects/TR5/Object/tr5_missile.h"
 #include "Game/collision/collide_item.h"
 #include "Game/control/box.h"
 #include "Game/itemdata/creature_info.h"
@@ -26,6 +26,9 @@
 #include "Objects/TR3/Entity/tr3_lizard.h" // OK
 #include "Objects/TR3/Entity/tr3_punaboss.h" // IN_DEV
 
+// Object
+#include "Objects/TR3/Object/tr3_boss_object.h"
+
 // Traps
 #include "Objects/TR3/Trap/train.h"
 
@@ -36,7 +39,9 @@
 #include "Objects/TR3/Vehicles/quad_bike.h"
 #include "Objects/TR3/Vehicles/upv.h"
 #include "Objects/TR3/Vehicles/rubber_boat.h"
+#include "Objects/Utils/object_helper.h"
 
+using namespace TEN::Entities::Object::TR3;
 using namespace TEN::Entities::Creatures::TR3;
 
 static void StartEntity(ObjectInfo* obj)
@@ -333,21 +338,46 @@ static void StartEntity(ObjectInfo* obj)
 		obj->initialise = InitialisePuna;
 		obj->control = PunaControl;
 		obj->collision = CreatureCollision;
-		obj->HitPoints = 200;
+		obj->HitPoints = 1;
 		obj->intelligent = true;
 		obj->shadowType = ShadowMode::All;
 		obj->nonLot = true;
 		obj->hitEffect = HIT_BLOOD;
 		obj->radius = 102;
 		obj->pivotLength = 50;
-		obj->SetBoneRotation(4, ROT_Y);
-		obj->SetBoneRotation(7, ROT_X | ROT_Y);
+		obj->SetBoneRotation(4, ROT_Y); // Puna quest object.
+		obj->SetBoneRotation(7, ROT_X | ROT_Y); // Head
 	}
 }
 
 static void StartObject(ObjectInfo* obj)
 {
+	obj = &Objects[ID_BOSS_SHIELD];
+	if (obj->loaded)
+	{
+		obj->initialise = nullptr;
+		obj->collision = ObjectCollision;
+		obj->control = BOSS_EffectShieldControl;
+		obj->shadowType = ShadowMode::None;
+	}
 
+	obj = &Objects[ID_BOSS_EXPLOSION_RING];
+	if (obj->loaded)
+	{
+		obj->initialise = nullptr;
+		obj->collision = BOSS_EffectShockwaveDummyCollision;
+		obj->control = BOSS_EffectShockwaveRingControl;
+		obj->shadowType = ShadowMode::None;
+	}
+
+	obj = &Objects[ID_BOSS_EXPLOSION_SHOCKWAVE];
+	if (obj->loaded)
+	{
+		obj->initialise = nullptr;
+		obj->collision = BOSS_EffectShockwaveDummyCollision;
+		obj->control = BOSS_EffectShockwaveExplosionControl;
+		obj->shadowType = ShadowMode::None;
+	}
 }
 
 static void StartTrap(ObjectInfo* obj)

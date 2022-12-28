@@ -69,7 +69,7 @@ namespace TEN::Effects::Lightning
 		}
 	}
 
-	void TriggerLightning(Vector3i* src, Vector3i* dest, unsigned char amplitude, unsigned char r, unsigned char g, unsigned char b, unsigned char life, char flags, char width, char segments)
+	void TriggerLightning(Vector3i* src, Vector3i* dest, byte amplitude, byte r, byte g, byte b, byte life, char flags, char width, char segments)
 	{
 		LIGHTNING_INFO arc;
 

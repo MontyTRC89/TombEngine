@@ -164,7 +164,7 @@ short CreatureEffect2(ItemInfo* item, BiteInfo bite, short velocity, short angle
 short CreatureEffect(ItemInfo* item, BiteInfo bite, std::function<CreatureEffectFunction> func);
 void CreatureUnderwater(ItemInfo* item, int depth);
 void CreatureFloat(short itemNumber);
-void CreatureJoint(ItemInfo* item, short joint, short required);
+void CreatureJoint(ItemInfo* item, short joint, short required, short maxAngle = ANGLE(70.0f));
 void CreatureTilt(ItemInfo* item, short angle);
 short CreatureTurn(ItemInfo* item, short maxTurn);
 void CreatureDie(short itemNumber, bool explode);

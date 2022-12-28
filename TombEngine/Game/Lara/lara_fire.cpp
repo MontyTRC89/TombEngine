@@ -19,6 +19,8 @@
 #include "Game/misc.h"
 #include "Game/savegame.h"
 #include "Math/Math.h"
+#include "Objects/TR3/Object/tr3_boss_object.h"
+#include "Objects/TR3/Entity/tr3_punaboss.h"
 #include "Objects/Generic/Object/burning_torch.h"
 #include "Objects/Generic/Object/objects.h"
 #include "Objects/ScriptInterfaceObjectsHandler.h"
@@ -30,6 +32,8 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
+using namespace TEN::Entities::Object::TR3;
+using namespace TEN::Entities::Creatures::TR3;
 using namespace TEN::Entities::Generic;
 using namespace TEN::Input;
 using namespace TEN::Math;
@@ -832,11 +836,24 @@ FireWeaponType FireWeapon(LaraWeaponType weaponType, ItemInfo* targetEntity, Ite
 	}
 	else
 	{
-		Statistics.Game.AmmoHits++;
 
 		target = origin + (directionNorm * bestDistance);
 
 		auto vTarget = GameVector(target);
+
+		if (targetEntity->ObjectNumber == ID_PUNA_BOSS)
+		{
+			// Shield is loaded ?
+			// And puna activated it ?
+			// Then spawn it and do the richochet effect !
+			if (CHK_ANY(targetEntity->ItemFlags[BOSSFlag_Object], BOSS_Shield) && targetEntity->ItemFlags[BOSSFlag_ShieldIsEnabled] == 1)
+			{
+				BOSS_SpawnShieldAndRichochetSparksAtPosition(vTarget.x, vTarget.y, vTarget.z, targetEntity, Vector4(0.10f, 0.10f, 0.5f, 0.1f));
+				return FireWeaponType::Miss;
+			}
+		}
+
+		Statistics.Game.AmmoHits++;
 
 		// TODO: Enable when slot is created.
 		/*
@@ -847,7 +864,7 @@ FireWeaponType FireWeapon(LaraWeaponType weaponType, ItemInfo* targetEntity, Ite
 			dx = (vDest.x - vSrc.x) >> 5;
 			dy = (vDest.y - vSrc.y) >> 5;
 			dz = (vDest.z - vSrc.z) >> 5;
-			FindClosestShieldPoint(vDest.x - dx, vDest.y - dy, vDest.z - dz, target);
+			BOSS_SpawnShieldAndRichochetSparksAtPosition(vDest.x - dx, vDest.y - dy, vDest.z - dz, target);
 		}
 		else if (target->ObjectNumber == ID_ARMY_WINSTON || target->ObjectNumber == ID_LONDONBOSS) //Don't want blood on Winston - never get the stains out
 		{

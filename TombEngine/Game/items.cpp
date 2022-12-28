@@ -544,8 +544,7 @@ short CreateItem()
 {
 	short itemNumber = 0;
 
-	if (NextItemFree == -1) return NO_ITEM;
-
+	if (NextItemFree == NO_ITEM) return NO_ITEM;
 	itemNumber = NextItemFree;
 	g_Level.Items[NextItemFree].Flags = 0;
 	NextItemFree = g_Level.Items[NextItemFree].NextItem;
