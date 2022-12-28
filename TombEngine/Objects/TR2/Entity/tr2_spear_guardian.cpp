@@ -54,15 +54,10 @@ namespace TEN::Entities::Creatures::TR2
 
 	void InitialiseSpearGuardian(short itemNumber)
 	{
-		ClearItem(itemNumber);
-
 		auto* item = &g_Level.Items[itemNumber];
-		item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 48;
 
-		auto* anim = &g_Level.Anims[item->Animation.AnimNumber];
-
-		item->Animation.FrameNumber = anim->frameBase;
-		item->Animation.ActiveState = anim->ActiveState;
+		InitialiseCreature(itemNumber);
+		SetAnimation(item, 48);
 	}
 
 	void SpearGuardianControl(short itemNumber)

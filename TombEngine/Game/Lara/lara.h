@@ -7,7 +7,7 @@ struct CollisionInfo;
 struct ItemInfo;
 
 const auto LARA_GRAB_THRESHOLD = ANGLE(40.0f);
-const auto FRONT_ARC		   = ANGLE(90.0f); // TODO: Check use.
+const auto FRONT_ARC		   = ANGLE(90.0f);
 
 // Lean rates
 const auto LARA_LEAN_RATE = ANGLE(1.5f);

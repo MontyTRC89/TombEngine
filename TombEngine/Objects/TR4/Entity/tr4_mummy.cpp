@@ -77,7 +77,7 @@ namespace TEN::Entities::TR4
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		ClearItem(itemNumber);
+		InitialiseCreature(itemNumber);
 
 		if (item->TriggerFlags == 2)
 		{
@@ -85,7 +85,9 @@ namespace TEN::Entities::TR4
 			item->Status -= ITEM_INVISIBLE;
 		}
 		else
+		{
 			SetAnimation(item, MUMMY_ANIM_ARMS_CROSSED);
+		}
 	}
 
 	void MummyControl(short itemNumber)

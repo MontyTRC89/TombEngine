@@ -9,19 +9,21 @@
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
 #include "Game/people.h"
+#include "Math/Math.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-using namespace TEN::Math::Random;
-using std::vector;
+using namespace TEN::Math;
 
 namespace TEN::Entities::Creatures::TR3
 {
 	const auto MPStickBite1 = BiteInfo(Vector3(247.0f, 10.0f, 11.0f), 13);
 	const auto MPStickBite2 = BiteInfo(Vector3(0.0f, 0.0f, 100.0f), 6);
-	const vector<unsigned int> MPStickPunchAttackJoints = { 10, 13 };
-	const vector<unsigned int> MPStickKickAttackJoints  = { 5, 6 };
+	const std::vector<unsigned int> MPStickPunchAttackJoints = { 10, 13 };
+	const std::vector<unsigned int> MPStickKickAttackJoints  = { 5, 6 };
+
+	constexpr auto MPSTICK_VAULT_SHIFT = 260;
 
 	enum MPStickState
 	{
@@ -41,21 +43,25 @@ namespace TEN::Entities::Creatures::TR3
 		MPSTICK_STATE_CLIMB3 = 13,
 		MPSTICK_STATE_CLIMB1 = 14,
 		MPSTICK_STATE_CLIMB2 = 15,
-		MPSTICK_STATE_FALL3 = 16,
+		MPSTICK_STATE_FALL3 = 16
 	};
 
-	// TODO
 	enum MPStickAnim
 	{
-
+		MPSTICK_ANIM_IDLE = 6,
+		MPSTICK_ANIM_DEATH = 26,
+		MPSTICK_ANIM_VAULT_3_STEPS_UP = 27,
+		MPSTICK_ANIM_VAULT_1_STEPS_UP = 28,
+		MPSTICK_ANIM_VAULT_2_STEPS_UP = 29,
+		MPSTICK_ANIM_VAULT_4_STEPS_DOWN = 30
 	};
 
 	void InitialiseMPStick(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		ClearItem(itemNumber);
-		SetAnimation(item, 6);
+		InitialiseCreature(itemNumber);
+		SetAnimation(item, MPSTICK_ANIM_IDLE);
 	}
 
 	void MPStickControl(short itemNumber)
@@ -140,7 +146,7 @@ namespace TEN::Entities::Creatures::TR3
 				int dx = LaraItem->Pose.Position.x - item->Pose.Position.x;
 				int dz = LaraItem->Pose.Position.z - item->Pose.Position.z;
 				laraAI.angle = phd_atan(dz, dx) - item->Pose.Orientation.y;
-				laraAI.distance = pow(dx, 2) + pow(dz, 2);
+				laraAI.distance = SQUARE(dx) + SQUARE(dz);
 			}
 
 			GetCreatureMood(item, &AI, true);
@@ -179,7 +185,7 @@ namespace TEN::Entities::Creatures::TR3
 				if (item->AIBits & GUARD)
 				{
 					head = AIGuard(creature);
-					if (TestProbability(1.0f / 256))
+					if (Random::TestProbability(1 / 256.0f))
 					{
 						if (item->Animation.ActiveState == MPSTICK_STATE_STOP)
 							item->Animation.TargetState = MPSTICK_STATE_WAIT;
@@ -234,7 +240,7 @@ namespace TEN::Entities::Creatures::TR3
 					item->Animation.TargetState = MPSTICK_STATE_RUN;
 				else if (creature->Mood == MoodType::Bored)
 				{
-					if (TestProbability(1.0f / 128))
+					if (Random::TestProbability(1 / 128.0f))
 					{
 						item->Animation.RequiredState = MPSTICK_STATE_WAIT;
 						item->Animation.TargetState = MPSTICK_STATE_STOP;
@@ -478,34 +484,26 @@ namespace TEN::Entities::Creatures::TR3
 
 		if (item->Animation.ActiveState < MPSTICK_STATE_DEATH)
 		{
-			switch (CreatureVault(itemNumber, angle, 2, 260))
+			switch (CreatureVault(itemNumber, angle, 2, MPSTICK_VAULT_SHIFT))
 			{
 			case 2:
-				item->Animation.AnimNumber = Objects[ID_MP_WITH_STICK].animIndex + 28;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-				item->Animation.ActiveState = MPSTICK_STATE_CLIMB1;
 				creature->MaxTurn = 0;
+				SetAnimation(item, MPSTICK_ANIM_VAULT_1_STEPS_UP);
 				break;
 
 			case 3:
-				item->Animation.AnimNumber = Objects[ID_MP_WITH_STICK].animIndex + 29;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-				item->Animation.ActiveState = MPSTICK_STATE_CLIMB2;
 				creature->MaxTurn = 0;
+				SetAnimation(item, MPSTICK_ANIM_VAULT_2_STEPS_UP);
 				break;
 
 			case 4:
-				item->Animation.AnimNumber = Objects[ID_MP_WITH_STICK].animIndex + 27;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-				item->Animation.ActiveState = MPSTICK_STATE_CLIMB3;
 				creature->MaxTurn = 0;
+				SetAnimation(item, MPSTICK_ANIM_VAULT_3_STEPS_UP);
 				break;
 
 			case -4:
-				item->Animation.AnimNumber = Objects[ID_MP_WITH_STICK].animIndex + 30;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-				item->Animation.ActiveState = MPSTICK_STATE_FALL3;
 				creature->MaxTurn = 0;
+				SetAnimation(item, MPSTICK_ANIM_VAULT_4_STEPS_DOWN);
 				break;
 			}
 		}

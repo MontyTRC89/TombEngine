@@ -14,7 +14,14 @@ void InitialiseSmashObject(short itemNumber)
 
 	auto* room = &g_Level.Rooms[item->RoomNumber];
 
+	// NOTE: Avoids crash when attempting to access Boxes[] array while box is equal to NO_BOX. -- TokyoSU 2022.12.20
 	FloorInfo* floor = GetSector(room, item->Pose.Position.x - room->x, item->Pose.Position.z - room->z);
+	if (floor->Box == NO_BOX)
+	{
+		TENLog("Smash object with ID " + std::to_string(itemNumber) + " may be inside a wall." , LogLevel::Warning);
+		return;
+	}
+
 	auto* box = &g_Level.Boxes[floor->Box];
 	if (box->flags & 0x8000)
 		box->flags |= BLOCKED;
