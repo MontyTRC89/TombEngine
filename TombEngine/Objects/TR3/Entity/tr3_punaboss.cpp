@@ -3,6 +3,7 @@
 #include "Game/misc.h"
 #include "Game/effects/effects.h"
 #include "Game/Lara/lara.h"
+#include "Game/control/lot.h"
 #include "Game/effects/spark.h"
 #include "Objects/TR3/Object/tr3_boss_object.h"
 #include "Specific/setup.h"
@@ -45,18 +46,18 @@ namespace TEN::Entities::Creatures::TR3
 
     enum PunaAttackType
     {
-        PUNA_Normal,
-        PUNA_Summon
+        PUNA_DeathLaser,
+        PUNA_SummonLaser,
+        PUNA_Wait // when the summon is fighting !
     };
 
-    std::vector<GameVector> FoundAllLizardAISpawnPoint(ItemInfo* item, short objectNumber)
+    std::vector<AI_OBJECT> FoundAllLizardAISpawnPoint(ItemInfo* item, short objectNumber)
     {
-        std::vector<GameVector> itemList;
-        for (size_t i = 0; i < g_Level.AIObjects.size(); i++)
+        std::vector<AI_OBJECT> itemList;
+        for (auto& aiObj : g_Level.AIObjects)
         {
-            auto* itemTarget = &g_Level.AIObjects[i];
-            if (itemTarget->objectNumber == objectNumber && itemTarget->roomNumber == item->RoomNumber)
-                itemList.push_back(GameVector(itemTarget->pos.Position, itemTarget->roomNumber));
+            if (aiObj.objectNumber == objectNumber && aiObj.roomNumber == item->RoomNumber)
+                itemList.push_back(aiObj);
         }
         return itemList;
     }
@@ -70,8 +71,8 @@ namespace TEN::Entities::Creatures::TR3
 
         // save the angle of puna, it will be used to restore this angle when he is waiting (after summoning the lizard).
         // puna is rotated to not face lara, so add 180° to face her.
-        item->ItemFlags[BOSSFlag_Rotation] = item->Pose.Orientation.y + ANGLE(180);
-        item->ItemFlags[BOSSFlag_AttackType] = PUNA_Normal; // normal behaviour at start !
+        item->ItemFlags[BOSSFlag_Rotation] = item->Pose.Orientation.y - ANGLE(180.0f);
+        item->ItemFlags[BOSSFlag_AttackType] = PUNA_DeathLaser; // normal behaviour at start !
         item->ItemFlags[BOSSFlag_ShieldIsEnabled] = 1; // activated at start.
         item->ItemFlags[BOSSFlag_AttackCount] = 0;
         item->ItemFlags[BOSSFlag_DeathCount] = 0;
@@ -79,36 +80,72 @@ namespace TEN::Entities::Creatures::TR3
         item->ItemFlags[BOSSFlag_ExplodeCount] = 0;
     }
 
-    void PunaLaser(ItemInfo* item, ItemInfo* enemy, GameVector targetPos, const BiteInfo& bite, short xHandAngle, int intensity, bool isSummon) // TODO: deal with LaraItem global !
+    void SpawnLizard(ItemInfo* item, AI_OBJECT targetPos)
     {
-        GameVector src = GetJointPosition(item, bite.meshNum, bite.Position);
-        src.RoomNumber = item->RoomNumber;
-        GameVector target;
-        Vector3i hitPos;
-        MESH_INFO* mesh = nullptr;
-
-        switch (item->ItemFlags[BOSSFlag_AttackType])
+        if (CHK_ANY(item->ItemFlags[BOSSFlag_Object], BOSS_Lizard))
         {
-        case PUNA_Normal:
-            xHandAngle -= PUMABOSS_ADJUST_LASER_XANGLE;
-            target.x = src.x + ((BLOCK(8) * phd_cos(xHandAngle)) * phd_sin(item->Pose.Orientation.y));
-            target.y = src.y + BLOCK(8) * phd_sin(-xHandAngle);
-            target.z = src.z + ((BLOCK(8) * phd_cos(xHandAngle)) * phd_cos(item->Pose.Orientation.y));
-            TriggerLightning((Vector3i*)&src, (Vector3i*)&target, intensity, 0, 255, 255, 10, LI_SPLINE | LI_THINOUT, 50, 5);
-            if (ObjectOnLOS2(&src, &target, &hitPos, &mesh, ID_LARA) == GetLaraInfo(enemy)->ItemNumber)
+            short itemNumber = CreateItem();
+            if (itemNumber != NO_ITEM)
             {
-                TENLog("Hit lara !", LogLevel::Info, LogConfig::All, true);
+                auto* spawned = &g_Level.Items[itemNumber];
+                spawned->Pose.Position = targetPos.pos.Position;
+                spawned->Pose.Orientation = targetPos.pos.Orientation;
+                spawned->RoomNumber = targetPos.roomNumber;
+                spawned->ObjectNumber = ID_LIZARD;
+                spawned->Model.Color = Vector4(1.0f, 1.0f, 1.0f, 1.0f); // set the color the same as puna, to avoid black lizard.
+                InitialiseItem(itemNumber);
+                AddActiveItem(itemNumber);
+                spawned->ItemFlags[0] = 1; // specify that this lizard is summoned !
+                spawned->Active = true;
+                spawned->Flags |= IFLAG_ACTIVATION_MASK;
+                spawned->Status = ITEM_ACTIVE;
+                EnableEntityAI(itemNumber, 1);
+                UpdateItemRoom(itemNumber);
+                item->ItemFlags[BOSSFlag_ItemNumber] = itemNumber;
             }
-            break;
-        case PUNA_Summon:
-            target.x = targetPos.x;
-            target.y = targetPos.y;
-            target.z = targetPos.z;
-            target.RoomNumber = targetPos.RoomNumber;
-            TriggerLightning((Vector3i*)&src, (Vector3i*)&target, intensity, 0, 255, 255, 10, LI_SPLINE | LI_THINOUT, 50, 5);
-            // summon lizard at target !
-            break;
         }
+    }
+
+    void PunaLaserSummon(ItemInfo* item, AI_OBJECT spawnPoint, const BiteInfo& bite, short xHandAngle, int intensity)
+    {
+        xHandAngle -= PUMABOSS_ADJUST_LASER_XANGLE;
+
+        GameVector src = GameVector(GetJointPosition(item, bite.meshNum, bite.Position), item->RoomNumber);
+        GameVector target = GameVector::Zero;
+        target.x = src.x + ((BLOCK(8) * phd_cos(xHandAngle)) * phd_sin(item->Pose.Orientation.y));
+        target.y = src.y + BLOCK(8) * phd_sin(-xHandAngle);
+        target.z = src.z + ((BLOCK(8) * phd_cos(xHandAngle)) * phd_cos(item->Pose.Orientation.y));
+        target.RoomNumber = item->RoomNumber;
+        TriggerLightning((Vector3i*)&src, (Vector3i*)&target, intensity, 0, 255, 255, 10, LI_SPLINE | LI_THINOUT, 50, 5);
+
+        item->ItemFlags[BOSSFlag_AttackType] = PUNA_Wait;
+        SpawnLizard(item, spawnPoint);
+    }
+
+    void PunaLaser(ItemInfo* item, ItemInfo* enemy, const BiteInfo& bite, short xHandAngle, int intensity) // TODO: deal with LaraItem global !
+    {
+        xHandAngle -= PUMABOSS_ADJUST_LASER_XANGLE;
+
+        GameVector src = GameVector(GetJointPosition(item, bite.meshNum, bite.Position), item->RoomNumber);
+        GameVector target = GameVector::Zero;
+        Vector3i hitPos = Vector3i::Zero;
+        MESH_INFO* mesh = nullptr;
+        target.x = src.x + ((BLOCK(8) * phd_cos(xHandAngle)) * phd_sin(item->Pose.Orientation.y));
+        target.y = src.y + BLOCK(8) * phd_sin(-xHandAngle);
+        target.z = src.z + ((BLOCK(8) * phd_cos(xHandAngle)) * phd_cos(item->Pose.Orientation.y));
+        target.RoomNumber = enemy->RoomNumber;
+        TriggerLightning((Vector3i*)&src, (Vector3i*)&target, intensity, 0, 255, 255, 10, LI_SPLINE | LI_THINOUT, 50, 5);
+        if (ObjectOnLOS2(&src, &target, &hitPos, &mesh, ID_LARA) == GetLaraInfo(enemy)->ItemNumber)
+        {
+            TENLog("Hit lara !", LogLevel::Info, LogConfig::All, true);
+        }
+    }
+
+    short GetPunaHeadAngleTarget(ItemInfo* item, Vector3i target)
+    {
+        auto headJointPos = GetJointPosition(item, PunaBossHeadBite.meshNum);
+        auto headAngle = Math::Geometry::GetOrientToPoint(headJointPos.ToVector3(), target.ToVector3());
+        return headAngle.y - item->Pose.Orientation.y;
     }
 
     void PunaControl(short itemNumber)
@@ -119,10 +156,8 @@ namespace TEN::Entities::Creatures::TR3
         auto* item = &g_Level.Items[itemNumber];
         auto* creature = GetCreatureInfo(item);
         auto* object = &Objects[item->ObjectNumber];
+        std::vector<AI_OBJECT> lizardList;
         auto head = EulerAngles::Zero;
-        std::vector<GameVector> lizardList;
-        int lizardID = 0;
-        
         short angle = 0, oldrotation = 0;
         bool haveTurned = false;
 
@@ -161,7 +196,6 @@ namespace TEN::Entities::Creatures::TR3
         else
         {
             oldrotation = item->Pose.Orientation.y;
-            creature->Target = LaraItem->Pose.Position;
 
             AI_INFO AI;
             CreatureAIInfo(item, &AI);
@@ -171,67 +205,105 @@ namespace TEN::Entities::Creatures::TR3
                 head.y = AI.angle;
             }
 
+            // Get target
+            if (item->ItemFlags[BOSSFlag_AttackType] == PUNA_DeathLaser)
+            {
+                creature->Target = LaraItem->Pose.Position;
+            }
+            else if (item->ItemFlags[BOSSFlag_AttackType] == PUNA_SummonLaser &&
+                     item->ItemFlags[BOSSFlag_ItemNumber] == NO_ITEM &&
+                     item->ItemFlags[BOSSFlag_AttackType] != PUNA_Wait)
+            {
+                // get a random spawn point !
+                lizardList = FoundAllLizardAISpawnPoint(item, ID_AI_AMBUSH);
+                item->ItemFlags[BOSSFlag_ItemNumber] = Random::GenerateInt(0, lizardList.size() - 1);
+                creature->Target = lizardList[item->ItemFlags[BOSSFlag_ItemNumber]].pos.Position;
+                TENLog("Done setting the lizard spawn point !");
+            }
+            else if (item->ItemFlags[BOSSFlag_AttackType] == PUNA_Wait && item->ItemFlags[BOSSFlag_ItemNumber] != NO_ITEM)
+            {
+                // rotate to idle position (for waiting lara to die by lizard)
+                auto targetOrient = EulerAngles(item->Pose.Orientation.x, item->ItemFlags[BOSSFlag_Rotation], item->Pose.Orientation.z);
+                item->Pose.Orientation.InterpolateConstant(targetOrient, ANGLE(3.0f));
+
+                // check if target is dead !
+                auto& summonItem = g_Level.Items[item->ItemFlags[BOSSFlag_ItemNumber]];
+                if (summonItem.HitPoints <= 0)
+                {
+                    // Reset the attack type, attack count and itemNumber and restart the sequence !
+                    item->ItemFlags[BOSSFlag_AttackType] = PUNA_DeathLaser;
+                    item->ItemFlags[BOSSFlag_AttackCount] = 0;
+                    item->ItemFlags[BOSSFlag_ItemNumber] = NO_ITEM;
+                }
+            }
+
             // if puna take damage then he will say it
             if (item->HitStatus)
                 SoundEffect(SFX_TR3_PUNA_BOSS_TAKE_HIT, &item->Pose);
-            
-            switch (item->ItemFlags[BOSSFlag_AttackType])
+
+            short angleHead = GetPunaHeadAngleTarget(item, creature->Target);
+            angle = CreatureTurn(item, creature->MaxTurn);
+
+            switch (item->Animation.ActiveState)
             {
-            case PUNA_Normal:
-                angle = CreatureTurn(item, creature->MaxTurn);
-
-                switch (item->Animation.ActiveState)
-                {
-                case PUNA_STATE_STOP:
-                    creature->MaxTurn = PUMABOSS_TURN_RATE_MAX;
-                    item->ItemFlags[BOSSFlag_ShieldIsEnabled] = 1;
-
-                    if ((item->Animation.TargetState != PUNA_STATE_ATTACK_WITH_HAND || item->Animation.TargetState != PUNA_STATE_ATTACK_WITH_HEAD) &&
-                        AI.angle > -ANGLE(1) && AI.angle < ANGLE(1) &&
-                        LaraItem->HitPoints > 0 &&
-                        item->ItemFlags[BOSSFlag_AttackCount] < PUNABOSS_MAX_HEAD_ATTACK)
-                    {
-                        creature->MaxTurn = 0;
-                        item->Animation.TargetState = PUNA_STATE_ATTACK_WITH_HAND;
-                        item->ItemFlags[BOSSFlag_AttackCount]++;
-                    }
-                    else if (item->ItemFlags[BOSSFlag_AttackCount] >= PUNABOSS_MAX_HEAD_ATTACK && LaraItem->HitPoints > 0)
-                    {
-                        lizardList = FoundAllLizardAISpawnPoint(item, ID_AI_AMBUSH); // FINISH THIS !
-                        lizardID = Random::GenerateInt(0, lizardList.size() - 1); // get a random lizard spawn point.
-                        creature->Target = Vector3i(lizardList[lizardID].x, lizardList[lizardID].y, lizardList[lizardID].z);
-                    }
-
-                    break;
-                case PUNA_STATE_ATTACK_WITH_HEAD:
-                    creature->MaxTurn = 0;
-                    item->ItemFlags[BOSSFlag_ShieldIsEnabled] = 0;
-                    if (item->Animation.FrameNumber == GetFrameNumber(item, 14))
-                    {
-                        PunaLaser(item, creature->Enemy, GameVector::Zero, PunaBossHeadBite, head.x, 10, false);
-                    }
-
-                    break;
-                case PUNA_STATE_ATTACK_WITH_HAND:
-                    creature->MaxTurn = 0;
-                    item->ItemFlags[BOSSFlag_ShieldIsEnabled] = 0;
-                    if (item->Animation.FrameNumber == GetFrameNumber(item, 30))
-                    {
-                        PunaLaser(item, creature->Enemy, GameVector::Zero, PunaBossHandBite, head.x, 5, false);
-                    }
-
-                    break;
-                }
-                break;
-            case PUNA_Summon:
+            case PUNA_STATE_STOP:
+                creature->MaxTurn = PUMABOSS_TURN_RATE_MAX;
                 item->ItemFlags[BOSSFlag_ShieldIsEnabled] = 1;
-                head.x = 0; // reset puna head rotation when doing summon.
-                head.y = 0;
+
+                if ((item->Animation.TargetState != PUNA_STATE_ATTACK_WITH_HAND && item->Animation.TargetState != PUNA_STATE_ATTACK_WITH_HEAD) &&
+                    AI.angle > -ANGLE(1) && AI.angle < ANGLE(1) &&
+                    LaraItem->HitPoints > 0 &&
+                    item->ItemFlags[BOSSFlag_AttackCount] < PUNABOSS_MAX_HEAD_ATTACK &&
+                    item->ItemFlags[BOSSFlag_AttackType] != PUNA_SummonLaser && item->ItemFlags[BOSSFlag_AttackType] != PUNA_Wait)
+                {
+                    creature->MaxTurn = 0;
+                    item->ItemFlags[BOSSFlag_AttackType] = PUNA_DeathLaser;
+                    if (Random::GenerateInt(0, 2) == 1) // alternate attack with head/hand, 1/3 chance
+                        item->Animation.TargetState = PUNA_STATE_ATTACK_WITH_HEAD;
+                    else
+                        item->Animation.TargetState = PUNA_STATE_ATTACK_WITH_HAND;
+                    item->ItemFlags[BOSSFlag_AttackCount]++;
+                }
+                else if (item->ItemFlags[BOSSFlag_AttackCount] >= PUNABOSS_MAX_HEAD_ATTACK && LaraItem->HitPoints > 0 &&
+                    item->ItemFlags[BOSSFlag_AttackType] != PUNA_Wait)
+                {
+                    item->ItemFlags[BOSSFlag_AttackType] = PUNA_SummonLaser;
+                    if (item->ItemFlags[BOSSFlag_ItemNumber] != NO_ITEM)
+                    {
+                        if (angleHead > -ANGLE(1) && angleHead < ANGLE(1))
+                            item->Animation.TargetState = PUNA_STATE_ATTACK_WITH_HAND;
+                    }
+                }
+
+                break;
+            case PUNA_STATE_ATTACK_WITH_HEAD:
+                creature->MaxTurn = 0;
+                item->ItemFlags[BOSSFlag_ShieldIsEnabled] = 0;
+                if (item->Animation.FrameNumber == GetFrameNumber(item, 14))
+                {
+                    PunaLaser(item, creature->Enemy, PunaBossHeadBite, head.x, 10);
+                }
+
+                break;
+            case PUNA_STATE_ATTACK_WITH_HAND:
+                creature->MaxTurn = 0;
+                item->ItemFlags[BOSSFlag_ShieldIsEnabled] = 0;
+                if (item->Animation.FrameNumber == GetFrameNumber(item, 30))
+                {
+                    if (item->ItemFlags[BOSSFlag_AttackType] == PUNA_SummonLaser && item->ItemFlags[BOSSFlag_ItemNumber] != NO_ITEM)
+                    {
+                        lizardList = FoundAllLizardAISpawnPoint(item, ID_AI_AMBUSH);
+                        PunaLaserSummon(item, lizardList[item->ItemFlags[BOSSFlag_ItemNumber]], PunaBossHandBite, head.x, 5);
+                    }
+                    else
+                    {
+                        PunaLaser(item, creature->Enemy, PunaBossHandBite, head.x, 10);
+                    }
+                }
 
                 break;
             }
         }
-
 
         creature->JointRotation[0] += PUNABOSS_ITEM_ROTATE_RATE_MAX; // Rotate the object on puna boss chair !
         CreatureJoint(item, 1, head.y);

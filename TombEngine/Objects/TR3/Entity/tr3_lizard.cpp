@@ -80,11 +80,13 @@ namespace TEN::Entities::Creatures::TR3
         auto* creature = GetCreatureInfo(item);
         short angle = 0, tilt = 0;
         auto neck = EulerAngles::Zero;
-        
+
         if (item->HitPoints <= 0)
         {
-            if (item->Animation.ActiveState != LIZARD_STATE_DEATH)
+            if (item->Animation.ActiveState != LIZARD_STATE_DEATH) // Avoid doing the animation if it's a summon !
                 SetAnimation(item, LIZARD_ANIMATION_DEATH);
+            if (item->ItemFlags[0] == 1 && item->Animation.FrameNumber == GetFrameNumber(item, 50))
+                CreatureDie(itemNumber, true); // Just explode the lizard if it's a summon !
         }
         else
         {

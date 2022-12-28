@@ -6,13 +6,13 @@ namespace TEN::Entities::Object::TR3
 {
     enum BossItemFlags
     {
-        BOSSFlag_Object = 0,
-        BOSSFlag_Rotation = 1,
+        BOSSFlag_Object = 0, // BossFlagValue enum
+        BOSSFlag_Rotation = 1, // Store rotation for use, like puna when summoning.
         BOSSFlag_ShieldIsEnabled = 2,
-        BOSSFlag_AttackType = 3,
-        BOSSFlag_AttackCount = 4,
+        BOSSFlag_AttackType = 3, // Which attack was performed.
+        BOSSFlag_AttackCount = 4, // Will change behaviour after some attack.
         BOSSFlag_DeathCount = 5,
-        BOSSFlag_ItemNumber = 6,
+        BOSSFlag_ItemNumber = 6, // To check if summon is dead.
         BOSSFlag_ExplodeCount = 7,
     };
 
