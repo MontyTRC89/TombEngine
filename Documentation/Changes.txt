@@ -7,31 +7,29 @@ Version 1.0.5
 * Fix savegame crashes when rooms with static meshes are flipped.
 * Fix discrepancies between statistics and save / load game time units.
 * Fix draw key incorrectly working in binoculars / lasersight mode.
-* Fix pathfinding problems for first initialized enemy of every slot.
-* Fix Flame Emitter 3 not burning player.
+* Fix incorrect picking up from plinths concealed by raising blocks.
+* Fix flame emitter 3 not burning player.
+* Fix TR2 yeti, TR3 civvy and MP with stick vault bugs.
+* Fix TR2 worker with flamethrower and TR3 flamethrower baddy attack ranges and aiming issues.
 * Fix TR3 Tribeman with axe not attacking Lara.
 * Fix TR3 Tribeman with dart not shooting at Lara's direction.
 * Fix TR3 Crow and TR4 Harpy death animations not performing correctly.
+* Fix TR4 Crocodile attack range and joint rotation speed.
+* Fix TR4 Von Croy not using animation for 2 and 3 step down vaults.
+* Fix TR4 baddies not using animation for 3 step down vaults.
 * Fix crash, water death and meshswap issues for TR5 cyborg.
+* Fix pathfinding problems for first initialized enemy of every slot.
+* Fix pathfinding of flying and water creatures (partial).
+* Fix rare crash when smash item is inside a wall and add warning log for the scenario.
+* Fix bone rotations of some entities.
 * Fix Lara's animation for cog switch release.
-* Fix incorrect picking up from plinths concealed by raising blocks.
 * Added new OCB to cog switch object: 
 	- Use OCB 0 to have the traditional behaviour.
 	- Use any other OCB to can use the Cog Switch without need of any door linked.
 * Allow to freely rotate dart emitter in all directions.
 * Customize dart emitter damage with OCB. Negative number will additionally poison Lara.
 * Draw real mesh for darts.
-* Fix inverted water and fly zones.
-* Fix CROCODILE attack range and joint rotation speed.
-* Fix CIVVY, MP_WITH_STICK, and YETI vault bugs.
 * Added warning log when one slot requires another slot which is missing.
-* Fix rare crash when smash item is inside a wall and add warning log for the scenario.
-* Fix FLAMETHROWER_BADDY and WORKER_FLAMETHROWER attack ranges + aim walking anim looping when away from the player.
-* Fix pathfinding of water creatures (partial).
-* Fix pathfinding of flying creatures (partial).
-* Fix bone rotations of some entities
-* Fix VON_CROY not using animation for 2 and 3 step vault down.
-* Fix BADDY1 and BADDY2 not using animation for 3 step vault down.
 
 Lua API changes:
 * Add new Room class and several methods for it.
