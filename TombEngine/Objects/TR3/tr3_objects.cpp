@@ -309,12 +309,12 @@ static void StartEntity(ObjectInfo* obj)
 		obj->collision = CreatureCollision;
 		obj->shadowType = ShadowMode::All;
 		obj->HitPoints = 36;
-		obj->hitEffect = HIT_BLOOD;
 		obj->intelligent = true;
 		obj->pivotLength = 0;
 		obj->radius = 204;
-		obj->ZoneType = ZoneType::HumanClassic;
-		obj->SetBoneRotation(9, ROT_X|ROT_Z);
+		obj->ZoneType = ZoneType::Human;
+		obj->SetBoneRotationFlags(9, ROT_X | ROT_Z);
+		obj->SetupHitEffect();
 	}
 
 	obj = &Objects[ID_PUNA_BOSS];
@@ -327,11 +327,11 @@ static void StartEntity(ObjectInfo* obj)
 		obj->intelligent = true;
 		obj->shadowType = ShadowMode::All;
 		obj->nonLot = true;
-		obj->hitEffect = HIT_BLOOD;
 		obj->radius = 102;
 		obj->pivotLength = 50;
-		obj->SetBoneRotation(4, ROT_Y); // Puna quest object.
-		obj->SetBoneRotation(7, ROT_X | ROT_Y); // Head
+		obj->SetBoneRotationFlags(4, ROT_Y); // Puna quest object.
+		obj->SetBoneRotationFlags(7, ROT_X | ROT_Y); // Head
+		obj->SetupHitEffect();
 	}
 }
 

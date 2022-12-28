@@ -26,7 +26,7 @@ namespace TEN::Entities::Object::TR3
                 spawned->ObjectNumber = ID_BOSS_SHIELD;
                 spawned->RoomNumber = item->RoomNumber;
                 InitialiseItem(itemNumber);
-                spawned->Color = shieldColor;
+                spawned->Model.Color = shieldColor;
                 spawned->Collidable = true;
                 spawned->ItemFlags[0] = 2;
                 spawned->Model.Mutator[0].Scale = Vector3(2.0f); // change the model size to be *2.
@@ -55,7 +55,7 @@ namespace TEN::Entities::Object::TR3
                 spawned->ObjectNumber = ID_BOSS_EXPLOSION_SHOCKWAVE;
                 spawned->RoomNumber = item->RoomNumber;
                 InitialiseItem(itemNumber);
-                spawned->Color = explosionColor;
+                spawned->Model.Color = explosionColor;
                 spawned->Collidable = false; // no collision for this item !
                 spawned->ItemFlags[0] = 70; // timer before clear, will fadeout when finished then destroyed !
                 spawned->Model.Mutator[0].Scale = Vector3(0.0f); // start without size !
@@ -87,7 +87,7 @@ namespace TEN::Entities::Object::TR3
                 InitialiseItem(itemNumber);
                 Vector4 resultColor = ringColor;
                 resultColor.w = 1; // avoid the ring to have transparency (at last for the color).
-                spawned->Color = resultColor;
+                spawned->Model.Color = resultColor;
                 spawned->Collidable = false; // no collision for this item !
                 spawned->ItemFlags[0] = 70; // timer before clear, will fadeout when finished then destroyed !
                 spawned->Model.Mutator[0].Scale = Vector3(0.0f); // start without size !
@@ -111,7 +111,7 @@ namespace TEN::Entities::Object::TR3
             KillItem(itemNumber);
         }
 
-        item->Color = Vector4::Lerp(item->Color, Vector4(item->Color.x - 0.1f, item->Color.y - 0.1f, item->Color.z - 0.1f, item->Color.w), 0.35f);
+        item->Model.Color = Vector4::Lerp(item->Model.Color, Vector4(item->Model.Color.x - 0.1f, item->Model.Color.y - 0.1f, item->Model.Color.z - 0.1f, item->Model.Color.w), 0.35f);
         item->Pose.Orientation.y += Random::GenerateAngle();
 
         auto& result = GetCollision(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, item->RoomNumber);
@@ -129,10 +129,10 @@ namespace TEN::Entities::Object::TR3
             item->ItemFlags[0]--;
         if (item->ItemFlags[0] <= 0)
         {
-            item->Color = Vector4::Lerp(item->Color, Vector4(item->Color.x - 0.1f, item->Color.y - 0.1f, item->Color.z - 0.1f, item->Color.w), 0.35f);
-            if (item->Color.x <= 0 &&
-                item->Color.y <= 0 &&
-                item->Color.z <= 0)
+            item->Model.Color = Vector4::Lerp(item->Model.Color, Vector4(item->Model.Color.x - 0.1f, item->Model.Color.y - 0.1f, item->Model.Color.z - 0.1f, item->Model.Color.w), 0.35f);
+            if (item->Model.Color.x <= 0 &&
+                item->Model.Color.y <= 0 &&
+                item->Model.Color.z <= 0)
             {
                 RemoveActiveItem(itemNumber);
                 KillItem(itemNumber);
@@ -154,10 +154,10 @@ namespace TEN::Entities::Object::TR3
             item->ItemFlags[0]--;
         if (item->ItemFlags[0] <= 0)
         {
-            item->Color = Vector4::Lerp(item->Color, Vector4(item->Color.x - 0.1f, item->Color.y - 0.1f, item->Color.z - 0.1f, item->Color.w), 0.35f);
-            if (item->Color.x <= 0 &&
-                item->Color.y <= 0 &&
-                item->Color.z <= 0)
+            item->Model.Color = Vector4::Lerp(item->Model.Color, Vector4(item->Model.Color.x - 0.1f, item->Model.Color.y - 0.1f, item->Model.Color.z - 0.1f, item->Model.Color.w), 0.35f);
+            if (item->Model.Color.x <= 0 &&
+                item->Model.Color.y <= 0 &&
+                item->Model.Color.z <= 0)
             {
                 RemoveActiveItem(itemNumber);
                 KillItem(itemNumber);
@@ -181,7 +181,7 @@ namespace TEN::Entities::Object::TR3
     void BOSS_ExplodeBoss(ItemInfo* item, const Vector4& explosionColor)
     { 
         // disable shield
-        //item->ItemFlags[BOSSFlag_ShieldIsEnabled] = 0;
+        item->ItemFlags[BOSSFlag_ShieldIsEnabled] = 0;
         item->HitPoints = NOT_TARGETABLE;
 
         // start doing the explosion (entity will do the count !)
