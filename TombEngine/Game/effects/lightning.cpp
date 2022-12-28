@@ -40,7 +40,7 @@ namespace TEN::Effects::Lightning
 	void UpdateLightning()
 	{
 		for (int i = 0; i < Lightning.size(); i++)
-		{			
+		{
 			LIGHTNING_INFO* arc = &Lightning[i];
 
 			if (arc->life > 0)
@@ -80,7 +80,6 @@ namespace TEN::Effects::Lightning
 		arc.pos3.y = ((dest->y * 3) + src->y) >> 2;
 		arc.pos3.z = ((dest->z * 3) + src->z) >> 2;
 		arc.pos4 = *dest;
-
 		arc.flags = flags;
 
 		for (int i = 0; i < 9; i++)
